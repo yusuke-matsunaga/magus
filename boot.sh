@@ -114,8 +114,7 @@ SUBMODULE=`cat $BASEDIR/etc/modules`
  case $# in
      0)
 	 clean_config $BASEDIR/config
-	 clean $BASEDIR
-	 clean $BASEDIR/include
+	 clean_root $BASEDIR
 	 for module in $SUBMODULE; do
 	     clean_config $BASEDIR/$module
 	     clean $BASEDIR/$module
@@ -127,9 +126,16 @@ SUBMODULE=`cat $BASEDIR/etc/modules`
 	 done
          ;;
      1)
-	 clean_config $1
-	 clean $1
-         boot $1
+	 if test "x$1" = "xroot"; then
+	     clean_config $BASEDIR/config
+	     clean_root $BASEDIR
+	     boot $BASEDIR
+	     boot $BASEDIR/include
+	 else
+	     clean_config $1
+	     clean $1
+             boot $1
+	 fi
          ;;
      *)
 	 echo "Usage: $0 [<module-name>] : (re)generating configure script"

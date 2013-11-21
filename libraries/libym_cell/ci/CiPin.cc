@@ -188,22 +188,12 @@ CiPin::internal_id() const
   return 0;
 }
 
-#if 0
-// @brief 出力ピン(入出力ピン)の関数を設定する．
-// @param[in] function 関数を表す論理式
+// @brief dump 用の共通情報を出力する．
 void
-CiPin::set_function(const LogExpr& function)
+CiPin::dump_common(ODO& s) const
 {
-  assert_not_reached(__FILE__, __LINE__);
-}
-#endif
-
-// @brief 出力ピン(入出力ピン)の three_state 条件を設定する．
-// @param[in] expr three_state 条件を表す論理式
-void
-CiPin::set_three_state(const LogExpr& expr)
-{
-  assert_not_reached(__FILE__, __LINE__);
+  s << name()
+    << pin_id();
 }
 
 
@@ -235,10 +225,10 @@ CiInputPin::~CiInputPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiInputPin::direction() const
 {
-  return kDirInput;
+  return kCellPinInput;
 }
 
 // @brief 入力ピンの時に true を返す．
@@ -277,6 +267,18 @@ CiInputPin::fall_capacitance() const
   return mFallCapacitance;
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiInputPin::dump(ODO& s) const
+{
+  dump_common(s);
+
+  s << capacitance()
+    << rise_capacitance()
+    << fall_capacitance();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiOutputPinBase
@@ -285,6 +287,9 @@ CiInputPin::fall_capacitance() const
 // @brief コンストラクタ
 // @param[in] cell 親のセル
 // @param[in] name ピン名
+// @param[in] has_logic 論理式を持つとき true にするフラグ
+// @param[in] logic_expr 論理式
+// @param[in] tristate_expr tristate 条件式
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
 // @param[in] max_capacitance 最大負荷容量
@@ -293,6 +298,9 @@ CiInputPin::fall_capacitance() const
 // @param[in] min_transition 最小遷移時間
 CiOutputPinBase::CiOutputPinBase(CiCell* cell,
 				 const ShString& name,
+				 bool has_logic,
+				 const LogExpr& logic_expr,
+				 const LogExpr& tristate_expr,
 				 CellCapacitance max_fanout,
 				 CellCapacitance min_fanout,
 				 CellCapacitance max_capacitance,
@@ -301,6 +309,8 @@ CiOutputPinBase::CiOutputPinBase(CiCell* cell,
 				 CellTime min_transition) :
   CiPin(cell, name),
   mHasFunction(0U),
+  mFunction(logic_expr),
+  mThreeState(tristate_expr),
   mMaxFanout(max_fanout),
   mMinFanout(min_fanout),
   mMaxCapacitance(max_capacitance),
@@ -308,6 +318,14 @@ CiOutputPinBase::CiOutputPinBase(CiCell* cell,
   mMaxTransition(max_transition),
   mMinTransition(min_transition)
 {
+  if ( has_logic ) {
+    if ( tristate_expr.is_zero() ) {
+      mHasFunction = 1U;
+    }
+    else {
+      mHasFunction = 3U;
+    }
+  }
 }
 
 // @brief デストラクタ
@@ -393,58 +411,17 @@ CiOutputPinBase::min_transition() const
   return mMinTransition;
 }
 
-#if 0
-// @brief タイミング情報の取得
-// @param[in] ipos 開始ピン番号
-// @param[in] timing_sense タイミング情報の摘要条件
-// @return 条件に合致するタイミング情報を返す．
-// @note なければ NULL を返す．
-const CellTiming*
-CiOutputPinBase::timing(ymuint ipos,
-			tTimingSense sense) const
-{
-  ymuint offset = 0;
-  if ( sense == kSenseNegaUnate ) {
-    offset = 1;
-  }
-  return mTimingArray[ipos * 2 + offset];
-}
-#endif
-
-// @brief 出力ピン(入出力ピン)の関数を設定する．
-// @param[in] function 関数を表す論理式
-void
-CiOutputPinBase::set_function(const LogExpr& function)
-{
-  mHasFunction |= 1U;
-  mFunction = function;
-}
-
-// @brief 出力ピンの three_state() 属性を設定する．
-void
-CiOutputPinBase::set_three_state(const LogExpr& three_state)
-{
-  mHasFunction |= 2U;
-  mThreeState = three_state;
-}
-
-#if 0
-// @brief 出力ピン(入力ピン)のタイミング情報格納用の配列を確保する．
-void
-CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
-{
-  mTimingArray = timing_array;
-}
-#endif
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiOutputPin
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
- /// @param[in] cell 親のセル
+// @param[in] cell 親のセル
 // @param[in] name ピン名
+// @param[in] has_logic 論理式を持つとき true にするフラグ
+// @param[in] logic_expr 論理式
+// @param[in] tristate_expr tristate 条件式
 // @param[in] max_fanout 最大ファンアウト容量
 // @param[in] min_fanout 最小ファンアウト容量
 // @param[in] max_capacitance 最大負荷容量
@@ -453,6 +430,9 @@ CiOutputPinBase::set_timing_array(const CellTiming** timing_array)
 // @param[in] min_transition 最小遷移時間
 CiOutputPin::CiOutputPin(CiCell* cell,
 			 const ShString& name,
+			 bool has_logic,
+			 const LogExpr& logic_expr,
+			 const LogExpr& tristate_expr,
 			 CellCapacitance max_fanout,
 			 CellCapacitance min_fanout,
 			 CellCapacitance max_capacitance,
@@ -460,6 +440,7 @@ CiOutputPin::CiOutputPin(CiCell* cell,
 			 CellTime max_transition,
 			 CellTime min_transition) :
   CiOutputPinBase(cell, name,
+		  has_logic, logic_expr, tristate_expr,
 		  max_fanout, min_fanout,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition)
@@ -472,10 +453,10 @@ CiOutputPin::~CiOutputPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiOutputPin::direction() const
 {
-  return kDirOutput;
+  return kCellPinOutput;
 }
 
 // @brief 出力ピンの時に true を返す．
@@ -483,6 +464,21 @@ bool
 CiOutputPin::is_output() const
 {
   return true;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiOutputPin::dump(ODO& s) const
+{
+  dump_common(s);
+
+  s << max_fanout()
+    << min_fanout()
+    << max_capacitance()
+    << min_capacitance()
+    << max_transition()
+    << min_transition();
 }
 
 
@@ -493,6 +489,9 @@ CiOutputPin::is_output() const
 // @brief コンストラクタ
 // @param[in] cell 親のセル
 // @param[in] name ピン名
+// @param[in] has_logic 論理式を持つとき true にするフラグ
+// @param[in] logic_expr 論理式
+// @param[in] tristate_expr tristate 条件式
 // @param[in] capacitance 負荷容量
 // @param[in] rise_capacitance 立ち上がり時の負荷容量
 // @param[in] fall_capacitance 立ち下がり時の負荷容量
@@ -504,6 +503,9 @@ CiOutputPin::is_output() const
 // @param[in] min_transition 最小遷移時間
 CiInoutPin::CiInoutPin(CiCell* cell,
 		       const ShString& name,
+		       bool has_logic,
+		       const LogExpr& logic_expr,
+		       const LogExpr& tristate_expr,
 		       CellCapacitance capacitance,
 		       CellCapacitance rise_capacitance,
 		       CellCapacitance fall_capacitance,
@@ -514,12 +516,13 @@ CiInoutPin::CiInoutPin(CiCell* cell,
 		       CellTime max_transition,
 		       CellTime min_transition) :
   CiOutputPinBase(cell, name,
+		  has_logic, logic_expr, tristate_expr,
 		  max_fanout, min_fanout,
 		  max_capacitance, min_capacitance,
 		  max_transition, min_transition),
   mCapacitance(capacitance),
-  mRiseCapacitance(mRiseCapacitance),
-  mFallCapacitance(mFallCapacitance)
+  mRiseCapacitance(rise_capacitance),
+  mFallCapacitance(fall_capacitance)
 {
 }
 
@@ -529,10 +532,10 @@ CiInoutPin::~CiInoutPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiInoutPin::direction() const
 {
-  return kDirInput;
+  return kCellPinInput;
 }
 
 // @brief 入出力ピンの時に true を返す．
@@ -571,6 +574,24 @@ CiInoutPin::fall_capacitance() const
   return mFallCapacitance;
 }
 
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiInoutPin::dump(ODO& s) const
+{
+  dump_common(s);
+
+  s << capacitance()
+    << rise_capacitance()
+    << fall_capacitance()
+    << max_fanout()
+    << min_fanout()
+    << max_capacitance()
+    << min_capacitance()
+    << max_transition()
+    << min_transition();
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス CiInternalPin
@@ -591,10 +612,10 @@ CiInternalPin::~CiInternalPin()
 }
 
 // @brief 方向を返す．
-CellPin::tDirection
+tCellPinDirection
 CiInternalPin::direction() const
 {
-  return kDirInternal;
+  return kCellPinInternal;
 }
 
 // @brief 内部ピンの時に true を返す．
@@ -610,6 +631,16 @@ ymuint
 CiInternalPin::internal_id() const
 {
   return mInternalId;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiInternalPin::dump(ODO& s) const
+{
+  dump_common(s);
+
+  s << internal_id();
 }
 
 END_NAMESPACE_YM_CELL

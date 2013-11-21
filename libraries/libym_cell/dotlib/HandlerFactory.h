@@ -183,66 +183,6 @@ public:
   GroupHandler*
   new_group(GroupHandler* parent);
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // complex attribute 用のハンドラの生成
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 汎用の complex attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_complex(GroupHandler* parent);
-
-  /// @brief define complex attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_define(GroupHandler* parent);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // simple attribute 用のハンドラの生成
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 汎用の simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_simple(GroupHandler* parent);
-
-  /// @brief シンボルモードの simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_sym_simple(GroupHandler* parent);
-
-  /// @brief 整数の simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_int_simple(GroupHandler* parent);
-
-  /// @brief 実数の simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_float_simple(GroupHandler* parent);
-
-  /// @brief 文字列の simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_string_simple(GroupHandler* parent);
-
-  /// @brief 式の simple attribute 用のハンドラを作る．
-  /// @param[in] parent 親のハンドラ
-  static
-  DotlibHandler*
-  new_expr_simple(GroupHandler* parent);
-
 };
 
 END_NAMESPACE_YM_DOTLIB

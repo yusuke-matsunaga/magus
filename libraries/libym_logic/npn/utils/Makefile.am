@@ -4,7 +4,7 @@
 
 SUBDIRS =
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

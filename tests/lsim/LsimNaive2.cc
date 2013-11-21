@@ -51,12 +51,12 @@ LsimNaive2::set_network(const BdnMgr& bdn)
   ymuint lnum = mBdnMgr->lnode_num();
   mNodeList.clear();
   mNodeList.resize(lnum);
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   mBdnMgr->sort(node_list);
   ymuint id = 0;
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p, ++ id) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     SimNode& snode = mNodeList[id];
     snode.mFanins[0] = map[node->fanin(0)->id()];
     snode.mFanins[1] = map[node->fanin(1)->id()];

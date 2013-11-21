@@ -31,7 +31,7 @@ BottomUp::~BottomUp()
 void
 BottomUp::operator()(BdnMgr& network,
 		     ymuint limit,
-		     EnumCutOp* op)
+		     EnumCutOp2* op)
 {
   op->all_init(network, limit);
 
@@ -62,7 +62,7 @@ BottomUp::operator()(BdnMgr& network,
   }
 
   vector<BdnNode*> node_list;
-  network.sort(node_list);
+  network._sort(node_list);
   for (vector<BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BdnNode* node = *p;

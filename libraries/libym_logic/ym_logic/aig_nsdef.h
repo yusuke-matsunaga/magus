@@ -27,7 +27,6 @@ BEGIN_NAMESPACE_YM_AIG
 
 class AigMgr;
 class Aig;
-class AigNode;
 
 class AigSatMgr;
 
@@ -38,7 +37,6 @@ BEGIN_NAMESPACE_YM
 
 using nsAig::AigMgr;
 using nsAig::Aig;
-using nsAig::AigNode;
 
 using nsAig::AigSatMgr;
 

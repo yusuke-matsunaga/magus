@@ -16,7 +16,6 @@
 #endif
 
 #include "ym_utils/random.h"
-#include "ym_utils/Generator.h"
 #include "ym_logic/TvFunc.h"
 
 #include "TvFuncTest.h"

@@ -58,6 +58,12 @@ public:
   cap_merge(const ImpValList& src1,
 	    const ImpValList& src2);
 
+  /// @brief 2つのリストの共通部分をマージする．
+  /// @note 簡単化付き．
+  void
+  cap_merge2(const ImpValList& src1,
+	     const ImpValList& src2);
+
   /// @brief 先頭を表す反復子を返す．
   ImpValListIter
   begin() const;
@@ -97,6 +103,20 @@ public:
   /// @brief 内容を出力する
   void
   print(ostream& s) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 同じIDを持った要素がないか調べる．
+  /// @param[in] src 対象のリスト
+  /// @retval 0 なかった．
+  /// @retval 1 同相でおなじIDを持つ要素があった．
+  /// @retval 2 逆相でおなじIDを持つ要素があった．
+  int
+  check_list(const ImpValList& src) const;
 
 
 private:

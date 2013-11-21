@@ -74,18 +74,15 @@ xform_func4(ymuint16 fv,
 
 ymuint16
 cannonical4(ymuint16 func,
+	    const hash_set<ymuint32>& rep_hash,
 	    ymuint16& cperm)
 {
-  hash_set<ymuint32> npn_hash;
-  for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
-    npn_hash.insert(npn4rep[i]);
-  }
-
   // ベタなやり方
+  // 全ての変換を試して変換結果が代表関数になった変換を返す．
   for (ymuint p = 0; p < 768; ++ p) {
     ymuint16 perm_data = npn4perm[p];
     ymuint16 fv1 = xform_func4(func, perm_data);
-    if ( npn_hash.count(fv1) > 0 ) {
+    if ( rep_hash.count(fv1) > 0 ) {
       cperm = perm_data;
       return fv1;
     }
@@ -95,22 +92,39 @@ cannonical4(ymuint16 func,
 }
 
 void
-cannonical()
+cannonical(bool debug)
 {
+  // 代表関数を記録するハッシュ表
+  hash_set<ymuint32> rep_hash;
+  for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
+    rep_hash.insert(npn4rep[i]);
+  }
+
   for (ymuint32 func = 0; func < 65536; ++ func) {
     ymuint16 cperm;
-    ymuint16 cfunc = cannonical4(func, cperm);
-    cout << "  { 0x" << setw(4) << setfill('0')
-	 << hex << cfunc << dec
-	 << ", 0x" << setw(4) << setfill('0')
-	 << hex << cperm << dec << "}, " << endl;
+    ymuint16 cfunc = cannonical4(func, rep_hash, cperm);
+    if ( debug ) {
+      NpnXform xf(cperm);
+      cout << "original: " << setw(4) << setfill('0')
+	   << hex << func << dec << endl
+	   << "  cfunc: " << setw(4) << setfill('0')
+	   << hex << cfunc << dec << endl
+	   << "  cperm:" << xf << endl
+	   << endl;
+    }
+    else {
+      cout << "  { 0x" << setw(4) << setfill('0')
+	   << hex << cfunc << dec
+	   << ", 0x" << setw(4) << setfill('0')
+	   << hex << cperm << dec << "}, " << endl;
+    }
   }
 }
 
 void
 usage(char* progname)
 {
-  cerr << "USAGE: " << progname << endl;
+  cerr << "USAGE: " << progname << " [-debug]" << endl;
 }
 
 END_NAMESPACE_YM
@@ -123,12 +137,20 @@ main(int argc,
   using namespace std;
   using namespace nsYm;
 
+  bool debug = false;
+
+  if ( argc == 2 ) {
+    if ( strcmp(argv[1], "-debug") == 0 ) {
+      debug = true;
+      -- argc;
+    }
+  }
   if ( argc != 1 ) {
     usage(argv[0]);
     exit(1);
   }
 
-  cannonical();
+  cannonical(debug);
 
   return 0;
 

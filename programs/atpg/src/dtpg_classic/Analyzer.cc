@@ -58,7 +58,7 @@ Analyzer::run(Network& network,
 	      TvMgr& tvmgr)
 {
   clear();
-  
+
   // AIG を作る．
   ymuint npi = network.input_num2();
   ymuint npo = network.output_num2();
@@ -67,7 +67,7 @@ Analyzer::run(Network& network,
 
   ymuint max_id = network.node_num();
   vector<AigHandle> node_map(max_id);
-  
+
   mAigMgr = new AigMgr;
 
   // 入力の生成
@@ -80,7 +80,7 @@ Analyzer::run(Network& network,
   // 内部ノードの生成
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = network.sorted_logic(i);
-    ymuint nfi = node->ni();
+    ymuint nfi = node->fanin_num();
     vector<AigHandle> fanins(nfi);
     for (ymuint j = 0; j < nfi; ++ j) {
       const TgNode* inode = node->fanin(j);
@@ -94,7 +94,7 @@ Analyzer::run(Network& network,
       node_map[node->gid()] = gate2aig(node->type(), fanins);
     }
   }
-  
+
   // AIG 上でランダムシミュレーションを行う．
   // その結果，
   // - 0/1 に固定してそうなノード
@@ -204,7 +204,7 @@ Analyzer::run(Network& network,
       }
     }
   }
-  
+
   bool need_sat = false;
   for (ymuint i = 0; i < naig; ++ i) {
     if ( c0_cands[i] || c1_cands[i] ) {
@@ -230,14 +230,14 @@ Analyzer::run(Network& network,
 	  pol0 = kPolNega;
 	}
 	Literal lit0(id0, pol0);
-	
+
 	ymuint id1 = node->fanin1()->node_id();
 	tPol pol1 = kPolPosi;
 	if ( node->fanin_inv1() ) {
 	  pol1 = kPolNega;
 	}
 	Literal lit1(id1, pol1);
-	
+
 	Literal olit(id, kPolPosi);
 	solver->add_clause(lit0, ~olit);
 	solver->add_clause(lit1, ~olit);
@@ -276,16 +276,16 @@ Analyzer::run(Network& network,
       }
     }
   }
-  
+
 #ifdef DEBUG
   cerr << "Finding conflict-free node assignment." << endl;
 #endif
-  
+
   mTvMgr = &tvmgr;
-  
+
   mNpi = network.npi();
   ymuint nn = network.ngate();
-  
+
   rf_array.clear();
   rf_array.resize(nn);
 
@@ -297,7 +297,7 @@ Analyzer::run(Network& network,
     gate->set_cfna0();
     gate->set_cfna1();
   }
-  
+
   // basis node に対して正当化ができるか試す．
   for (ymuint i = mNpi; i < nn; ++ i) {
     Gate* gate = network.gate(i);
@@ -324,7 +324,7 @@ Analyzer::run(Network& network,
       rf_gate(gate) = 0;
     }
   }
-  
+
   clear_vector();
   for (ymuint i = mNpi; i < nn; ++ i) {
     Gate* gate = network.gate(i);
@@ -403,7 +403,7 @@ rf_chk(Gate* gate0,
        Network& network)
 {
   ymuint no = gate0->nfo();
-  
+
   if ( no < 2 ) {
     return false;
   }
@@ -558,7 +558,7 @@ Analyzer::justify_gate(Gate* gate,
   switch ( gate->gate_type() ) {
   case kTgInput:
     return true;
-    
+
   case kTgConst0:
     if ( val == kVal0 ) {
       return true;
@@ -570,11 +570,11 @@ Analyzer::justify_gate(Gate* gate,
       return true;
     }
     return false;
-    
+
   case kTgNot:
     val = ~val;
     // わざと次に続く
-    
+
   case kTgBuff:
     {
       Gate* i_gate = gate->fanin(0);
@@ -625,7 +625,7 @@ Analyzer::justify_gate(Gate* gate,
   case kTgXnor:
     val = ~val;
     // わざと次に続く
-    
+
   case kTgXor:
     {
       bool slack = false;

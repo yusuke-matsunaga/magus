@@ -87,16 +87,16 @@ backtrace_g(Gate* gate,
       break;
     }
     switch ( gate->gate_type() ) {
-    case kTgBuff:
+    case kTgGateBuff:
       gate = gate->fanin(0);
       break;
 
-    case kTgNot:
+    case kTgGateNot:
       gate = gate->fanin(0);
       val = ~val;
       break;
-      
-    case kTgAnd:
+
+    case kTgGateAnd:
       if ( val == kVal0 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -118,8 +118,8 @@ backtrace_g(Gate* gate,
 	}
       }
       break;
-	
-    case kTgNand:
+
+    case kTgGateNand:
       if ( val == kVal1 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -141,8 +141,8 @@ backtrace_g(Gate* gate,
 	}
       }
       break;
-      
-    case kTgOr:
+
+    case kTgGateOr:
       if ( val == kVal1 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -164,8 +164,8 @@ backtrace_g(Gate* gate,
 	}
       }
       break;
-      
-    case kTgNor:
+
+    case kTgGateNor:
       if ( val == kVal0 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -187,9 +187,9 @@ backtrace_g(Gate* gate,
 	}
       }
       break;
-      
-    case kTgXor:
-    case kTgXnor:
+
+    case kTgGateXor:
+    case kTgGateXnor:
       for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	Gate* i_gate = gate->sorted_fanin(i);
 	if ( !i_gate->chk_gj() ) {
@@ -202,7 +202,7 @@ backtrace_g(Gate* gate,
 	}
       }
       break;
-      
+
     default:
       assert_not_reached(__FILE__, __LINE__);
       break;
@@ -224,16 +224,16 @@ backtrace_f(Gate* gate,
       break;
     }
     switch ( gate->gate_type() ) {
-    case kTgBuff:
+    case kTgGateBuff:
       gate = gate->fanin(0);
       break;
 
-    case kTgNot:
+    case kTgGateNot:
       val = ~val;
       gate = gate->fanin(0);
       break;
-      
-    case kTgAnd:
+
+    case kTgGateAnd:
       if ( val == kVal0 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -255,8 +255,8 @@ backtrace_f(Gate* gate,
 	}
       }
       break;
-      
-    case kTgNand:
+
+    case kTgGateNand:
       if ( val == kVal1 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -278,8 +278,8 @@ backtrace_f(Gate* gate,
 	}
       }
       break;
-      
-    case kTgOr:
+
+    case kTgGateOr:
       if ( val == kVal1 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -301,8 +301,8 @@ backtrace_f(Gate* gate,
 	}
       }
       break;
-      
-    case kTgNor:
+
+    case kTgGateNor:
       if ( val == kVal0 ) {
 	for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	  Gate* i_gate = gate->sorted_fanin(i);
@@ -324,9 +324,9 @@ backtrace_f(Gate* gate,
 	}
       }
       break;
-      
-    case kTgXor:
-    case kTgXnor:
+
+    case kTgGateXor:
+    case kTgGateXnor:
       for (ymuint i = 0; i < gate->nfi(); ++ i) {
 	Gate* i_gate = gate->sorted_fanin(i);
 	if ( !i_gate->chk_fj() ) {
@@ -339,7 +339,7 @@ backtrace_f(Gate* gate,
 	}
       }
       break;
-      
+
     default:
       assert_not_reached(__FILE__, __LINE__);
       break;
@@ -422,7 +422,7 @@ Gate::chk_just()
     // 両方の値が正当化されている．
     return;
   }
-  
+
   if ( chk_mark() ) {
     // すでに処理済み
     return;

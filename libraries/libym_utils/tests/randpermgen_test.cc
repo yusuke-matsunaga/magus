@@ -3,6 +3,7 @@
 // RandPermGen のテスト
 
 
+#include "ym_utils/RandPermGen.h"
 #include "ym_utils/RandGen.h"
 
 
@@ -11,18 +12,18 @@ main(int argc,
      char** argv)
 {
   using namespace nsYm;
-  
+
   if ( argc != 2 ) {
     cerr << "USAGE: " << argv[0] << " <#elem>" << endl;
     return -1;
   }
   size_t n = atoi(argv[1]);
-  
+
   try {
-    
+
     RandGen rg;
     RandPermGen rpg(n);
-    
+
     for (size_t i = 0; i < 1000; ++ i) {
       rpg.generate(rg);
       for (size_t j = 0; j < n; ++ j) {

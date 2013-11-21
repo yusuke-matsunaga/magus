@@ -82,6 +82,18 @@ VlWriter::begin_input()
   mFirst = true;
 }
 
+// @brief 'input' 記述の開始
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+// @note input [msb:lsb] までを出力する．
+void
+VlWriter::begin_input(int msb,
+		      int lsb)
+{
+  begin_input();
+  put_range(msb, lsb);
+}
+
 // @brief 'input' 記述の終了
 // @note ';' nl を出力する．
 void
@@ -98,6 +110,18 @@ VlWriter::begin_output()
   put_str("output");
 
   mFirst = true;
+}
+
+// @brief 'output' 記述の開始
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+// @note output [msb:lsb] までを出力する．
+void
+VlWriter::begin_output(int msb,
+		       int lsb)
+{
+  begin_output();
+  put_range(msb, lsb);
 }
 
 // @brief 'output' 記述の終了
@@ -118,6 +142,18 @@ VlWriter::begin_inout()
   mFirst = true;
 }
 
+// @brief 'inout' 記述の開始
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+// @note inout までを出力する．
+void
+VlWriter::begin_inout(int msb,
+		      int lsb)
+{
+  begin_inout();
+  put_range(msb, lsb);
+}
+
 // @brief 'inout' 記述の終了
 // @note ';' nl を出力する．
 void
@@ -136,6 +172,18 @@ VlWriter::begin_wire()
   mFirst = true;
 }
 
+// @brief 'wire' 記述の開始
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+// @note wire までを出力する．
+void
+VlWriter::begin_wire(int msb,
+		     int lsb)
+{
+  begin_wire();
+  put_range(msb, lsb);
+}
+
 // @brief 'wire' 記述の終了
 // @note ';' nl を出力する．
 void
@@ -152,6 +200,18 @@ VlWriter::begin_reg()
   put_str("reg");
 
   mFirst = true;
+}
+
+// @brief 'reg' 記述の開始
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+// @note reg までを出力する．
+void
+VlWriter::begin_reg(int msb,
+		    int lsb)
+{
+  begin_reg();
+  put_range(msb, lsb);
 }
 
 // @brief 'reg' 記述の終了
@@ -183,35 +243,6 @@ void
 VlWriter::put_elem(const string& name)
 {
   put_elem(name.c_str());
-}
-
-// @bried 宣言要素を出力する(範囲指定付き)
-// @param[in] name 識別子名
-// @param[in] lsb 範囲の LSB
-// @param[in] msb 範囲の MSB
-void
-VlWriter::put_elem(const char* name,
-		   int lsb,
-		   int msb)
-{
-  put_elem(name);
-  put_str("[");
-  put_num(lsb);
-  put_str(":");
-  put_num(msb);
-  put_str("]");
-}
-
-// @bried 宣言要素を出力する(範囲指定付き)
-// @param[in] name 識別子名
-// @param[in] lsb 範囲の LSB
-// @param[in] msb 範囲の MSB
-void
-VlWriter::put_elem(const string& name,
-		   int lsb,
-		   int msb)
-{
-  put_elem(name.c_str(), lsb, msb);
 }
 
 // @brief 'assign' 記述の開始
@@ -281,6 +312,20 @@ void
 VlWriter::end_inst_elem()
 {
   put_str(")");
+}
+
+// @brief 範囲を出力する．
+// @param[in] msb 範囲の MSB
+// @param[in] lsb 範囲の LSB
+void
+VlWriter::put_range(int msb,
+		    int lsb)
+{
+  put_str(" [");
+  put_num(msb);
+  put_str(":");
+  put_num(lsb);
+  put_str("]");
 }
 
 // @brief 識別子を出力する．

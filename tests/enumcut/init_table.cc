@@ -35,8 +35,9 @@ main(int argc,
 
   mgr.print(cout);
 
+#if 0
   ostringstream buf;
-  BinOStream bos(buf);
+  ODOStream bos(buf);
   mgr.dump(bos);
 
   string str = buf.str();
@@ -50,6 +51,7 @@ main(int argc,
     }
   }
   cout << endl;
+#endif
 
   return 0;
 }

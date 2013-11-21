@@ -1,11 +1,11 @@
-#ifndef BASE_FAULTMGR_H
-#define BASE_FAULTMGR_H
+#ifndef FAULTMGR_H
+#define FAULTMGR_H
 
-/// @file src/base/FaultMgr.h
+/// @file FaultMgr.h
 /// @brief FaultMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "atpg_nsdef.h"
@@ -79,6 +79,22 @@ public:
   ymuint
   untest_num() const;
 
+  /// @brief 出力の故障を取り出す．
+  /// @param[in] node 対象のノード
+  /// @param[in] val 縮退している値
+  SaFault*
+  find_ofault(const TgNode* node,
+	      int val);
+
+  /// @brief 入力の故障を取り出す．
+  /// @param[in] node 対象のノード
+  /// @param[in] pos 入力の故障の時に入力番号を表す
+  /// @param[in] val 縮退している値
+  SaFault*
+  find_ifault(const TgNode* node,
+	      ymuint pos,
+	      int val);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -142,22 +158,6 @@ private:
 	    bool is_output,
 	    ymuint pos,
 	    int val);
-
-  /// @brief 出力の故障を取り出す．
-  /// @param[in] node 対象のノード
-  /// @param[in] val 縮退している値
-  SaFault*
-  find_ofault(const TgNode* node,
-	      int val);
-
-  /// @brief 入力の故障を取り出す．
-  /// @param[in] node 対象のノード
-  /// @param[in] pos 入力の故障の時に入力番号を表す
-  /// @param[in] val 縮退している値
-  SaFault*
-  find_ifault(const TgNode* node,
-	      ymuint pos,
-	      int val);
 
   /// @brief 故障を追加する．
   /// @param[in] node 対象のノード
@@ -337,4 +337,4 @@ FaultMgr::add_ifault(const TgNode* node,
 
 END_NAMESPACE_YM_ATPG
 
-#endif // ATPG_FAULTMGR_H
+#endif // FAULTMGR_H

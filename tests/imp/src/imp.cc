@@ -46,7 +46,13 @@ void
 imp(const string& filename,
     bool blif,
     bool iscas89,
-    const string& method_str,
+    bool do_direct,
+    bool do_const,
+    bool do_contra,
+    bool do_naimp,
+    bool do_naimp2,
+    bool do_sat,
+    bool do_recur,
     ymuint level)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
@@ -71,178 +77,137 @@ imp(const string& filename,
 
   StopWatch timer;
 
-  if ( method_str == "cnf" ) {
-    timer.reset();
-    timer.start();
+  timer.start();
 
-    ImpMgr imp_mgr;
+  ImpMgr imp_mgr;
 
-#if 0
-    // BDN の情報を ImpMgr にコピーする．
-    imp_mgr.set(network);
-    CnfImp2 cnfimp;
-    ImpInfo cnf_imp;
-    cnfimp.learning(imp_mgr, cnf_imp);
-    timer.stop();
-    USTime cnf_time = timer.time();
-    cout << "CNF Implications:             " << setw(10) << cnf_imp.size()
-	 << ": " << cnf_time << endl;
-#endif
-  }
-  else {
-    timer.start();
+  // BDN の情報を ImpMgr にコピーする．
+  imp_mgr.set(bdn_network);
 
-    ImpMgr imp_mgr;
+  timer.reset();
+  timer.start();
+  StrImp strimp;
+  ImpInfo direct_imp;
 
-    // BDN の情報を ImpMgr にコピーする．
-    imp_mgr.set(bdn_network);
-
-    timer.reset();
-    timer.start();
-    StrImp strimp;
-    ImpInfo direct_imp;
+  if ( do_direct ) {
     strimp.learning(imp_mgr, direct_imp);
-    timer.stop();
-    USTime direct_time = timer.time();
+  }
+  timer.stop();
+  USTime direct_time = timer.time();
 
-    timer.reset();
-    timer.start();
-    ContraImp contraimp;
-    ImpInfo contra_imp;
+  timer.reset();
+  timer.start();
+  ConstImp constimp;
+  if ( do_const ) {
+    constimp.learning(imp_mgr);
+  }
+  timer.stop();
+  USTime const_time = timer.time();
+
+  timer.reset();
+  timer.start();
+  ContraImp contraimp;
+  ImpInfo contra_imp;
+
+  if ( do_contra ) {
     contraimp.learning(imp_mgr, contra_imp);
     //contra_imp.make_closure();
-    timer.stop();
-    USTime contra_time = timer.time();
+  }
 
-    timer.reset();
-    timer.start();
-    NaImp naimp;
-    ImpInfo na_imp;
-#if 1
+  timer.stop();
+  USTime contra_time = timer.time();
+
+  timer.reset();
+  timer.start();
+  NaImp naimp;
+  ImpInfo na_imp;
+
+  if ( do_naimp ) {
     naimp.learning(imp_mgr, na_imp);
     //na_imp.make_closure();
-#endif
-    timer.stop();
-    USTime na_time = timer.time();
+  }
 
-    timer.reset();
-    timer.start();
-    RlImp rlimp;
-    ImpInfo rl_imp;
-    if ( level > 0 ) {
-      rlimp.set_learning_level(level);
-    }
-#if 1
+  timer.stop();
+  USTime na_time = timer.time();
+
+  timer.reset();
+  timer.start();
+  NaImp naimp2;
+  ImpInfo na_imp2;
+  naimp2.use_cap_merge2(false);
+
+  if ( do_naimp2 ) {
+    naimp2.learning(imp_mgr, na_imp2);
+  }
+
+  timer.stop();
+  USTime na_time2 = timer.time();
+
+  timer.reset();
+  timer.start();
+  RlImp rlimp;
+  ImpInfo rl_imp;
+  if ( level > 0 ) {
+    rlimp.set_learning_level(level);
+  }
+  if ( do_recur ) {
     rlimp.learning(imp_mgr, rl_imp);
     //rl_imp.make_closure();
-#endif
-    timer.stop();
-    USTime rl_time = timer.time();
+  }
+  timer.stop();
+  USTime rl_time = timer.time();
 
-    timer.reset();
-    timer.start();
-    ConstImp constimp;
-#if 0
-    constimp.learning(imp_mgr);
-#endif
-    timer.stop();
-    USTime const_time = timer.time();
-
-    timer.reset();
-    timer.start();
-    SatImp satimp;
-    ImpInfo sat_imp;
-#if 1
+  timer.reset();
+  timer.start();
+  SatImp satimp;
+  ImpInfo sat_imp;
+  if ( do_sat ) {
     satimp.learning(imp_mgr, sat_imp);
-#endif
-    timer.stop();
-    USTime sat_time = timer.time();
+  }
+  timer.stop();
+  USTime sat_time = timer.time();
 
-#if 0
-    timer.reset();
-    timer.start();
-    NaImp2 naimp2;
-    ImpInfo na_imp2;
-#if 1
-    naimp2.learning(imp_mgr, na_imp2);
-#endif
-    timer.stop();
-    USTime na_time2 = timer.time();
-#endif
-
-    ymuint and_node = 0;
-    ymuint xor_node = 0;
-    {
-      const BdnNodeList& node_list = bdn_network.lnode_list();
-      for (BdnNodeList::const_iterator p = node_list.begin();
-	   p != node_list.end(); ++ p) {
-	const BdnNode* node = *p;
-	if ( node->is_and() ) {
-	  ++ and_node;
-	}
-	else if ( node->is_xor() ) {
-	  ++ xor_node;
-	}
-	else {
-	  assert_not_reached(__FILE__, __LINE__);
-	}
+  ymuint and_node = 0;
+  ymuint xor_node = 0;
+  {
+    const BdnNodeList& node_list = bdn_network.lnode_list();
+    for (BdnNodeList::const_iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      const BdnNode* node = *p;
+      if ( node->is_and() ) {
+	++ and_node;
+      }
+      else if ( node->is_xor() ) {
+	++ xor_node;
+      }
+      else {
+	assert_not_reached(__FILE__, __LINE__);
       }
     }
-    ymuint node_num2 = bdn_network.lnode_num();
+  }
+  ymuint node_num2 = bdn_network.lnode_num();
 
-    cout << "BDN:" << endl
-	 << "Total " << bdn_network.input_num() << " inputs" << endl
-	 << "Total " << node_num2 << " nodes"
-	 << " ( " << and_node << " ANDs + "
-	 << xor_node << " XORs )" << endl
-	 << "Total " << imp_mgr.node_num() - imp_mgr.input_num()
-	 << " ImpNodes" << endl
-	 << "Constant detection:              " << setw(10) << 0
-	 << ": " << const_time << endl
-	 << "Direct Implications:             " << setw(10) << direct_imp.imp_num(imp_mgr)
-	 << ": " << direct_time << endl
-	 << "Contraposition Implications:     " << setw(10) << contra_imp.imp_num(imp_mgr)
-	 << ": " << contra_time << endl
-	 << "Recursive Learning Implications: " << setw(10) << rl_imp.imp_num(imp_mgr)
-	 << ": " << rl_time << endl
-	 << "Naive Implications:              " << setw(10) << na_imp.imp_num(imp_mgr)
-	 << ": " << na_time << endl
-#if 0
-	 << "Naive Implications(2):           " << setw(10) << na_imp2.imp_num(imp_mgr)
-	 << ": " << na_time2 << endl
-#endif
-	 << "Complete Implications:           " << setw(10) << sat_imp.imp_num(imp_mgr)
-	 << ": " << sat_time << endl;
-  }
-#if 0
-  else if ( method_str == "cnf" ) {
-    CnfImp imp;
-    imp.learning(network, imp_info);
-  }
-  else if ( method_str == "cnf2" ) {
-    CnfImp2 imp;
-    imp.learning(network, imp_info);
-  }
-  else if ( method_str == "sat" ) {
-    SatImp imp;
-    imp.learning(network, imp_info);
-  }
-  else if ( method_str == "rl" ) {
-    RlImp imp;
-    if ( level > 0 ) {
-      imp.set_learning_level(level);
-    }
-    imp.learning(network, imp_info);
-  }
-  else {
-    cerr << "Unknown method: " << method_str << endl;
-  }
-#if 0
-  imp_info.print(cout);
-#else
-  cout << "Total " << imp_info.size() << " implications" << endl;
-#endif
-#endif
+  cout << "BDN:" << endl
+       << "Total " << bdn_network.input_num() << " inputs" << endl
+       << "Total " << node_num2 << " nodes"
+       << " ( " << and_node << " ANDs + "
+       << xor_node << " XORs )" << endl
+       << "Total " << imp_mgr.node_num() - imp_mgr.input_num()
+       << " ImpNodes" << endl
+       << "Constant detection:              " << setw(10) << 0
+       << ": " << const_time << endl
+       << "Direct Implications:             " << setw(10) << direct_imp.imp_num(imp_mgr)
+       << ": " << direct_time << endl
+       << "Contraposition Implications:     " << setw(10) << contra_imp.imp_num(imp_mgr)
+       << ": " << contra_time << endl
+       << "Recursive Learning Implications: " << setw(10) << rl_imp.imp_num(imp_mgr)
+       << ": " << rl_time << endl
+       << "Naive Implications:              " << setw(10) << na_imp.imp_num(imp_mgr)
+       << ": " << na_time << endl
+       << "Naive Implications(2):           " << setw(10) << na_imp2.imp_num(imp_mgr)
+       << ": " << na_time2 << endl
+       << "Complete Implications:           " << setw(10) << sat_imp.imp_num(imp_mgr)
+       << ": " << sat_time << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS
@@ -255,9 +220,15 @@ main(int argc,
   using namespace std;
   using namespace nsYm::nsNetworks;
 
-  const char* method_str = "bottom_up";
   bool blif = false;
   bool iscas = false;
+  bool do_direct = false;
+  bool do_const = false;
+  bool do_contra = false;
+  bool do_naimp = false;
+  bool do_naimp2 = false;
+  bool do_sat = false;
+  bool do_recur = false;
   ymuint level = 0;
 
   // オプション解析用のデータ
@@ -269,14 +240,47 @@ main(int argc,
     // option tag
     // docstr
     // argstr
-    { "method", 'm', POPT_ARG_STRING, &method_str, 0,
-      "specify evaluation method", "bottom_up|top_down|zdd" },
-
     { "blif", '\0', POPT_ARG_NONE, NULL, 0x100,
       "blif mode", NULL },
 
     { "iscas89", '\0', POPT_ARG_NONE, NULL, 0x101,
       "iscas89 mode", NULL },
+
+    { "direct", '\0', POPT_ARG_NONE, NULL, 0x130,
+      "do direct implication", NULL},
+
+    { "no-direct", '\0', POPT_ARG_NONE, NULL, 0x131,
+      "without direct implication", NULL},
+
+    { "contra", '\0', POPT_ARG_NONE, NULL, 0x140,
+      "do contraposition learning", NULL},
+
+    { "no-contra", '\0', POPT_ARG_NONE, NULL, 0x141,
+      "without contraposition learning", NULL},
+
+    { "naive", '\0', POPT_ARG_NONE, NULL, 0x150,
+      "do naive-learning", NULL},
+
+    { "no-naive", '\0', POPT_ARG_NONE, NULL, 0x151,
+      "without naive-learning", NULL},
+
+    { "naive2", '\0', POPT_ARG_NONE, NULL, 0x160,
+      "do naive2-learning", NULL},
+
+    { "no-naive2", '\0', POPT_ARG_NONE, NULL, 0x161,
+      "without naive2-learning", NULL},
+
+    { "sat", '\0', POPT_ARG_NONE, NULL, 0x200,
+      "do sat-learning", NULL},
+
+    { "no-sat", '\0', POPT_ARG_NONE, NULL, 0x201,
+      "without sat-learning", NULL},
+
+    { "recursive", '\0', POPT_ARG_NONE, NULL, 0x210,
+      "do recursive-learning", NULL},
+
+    { "no-recursive", '\0', POPT_ARG_NONE, NULL, 0x211,
+      "without recursive-learning", NULL},
 
     { "level", 'l', POPT_ARG_INT, &level, 0,
       "specify recursive learning level", "<level>" },
@@ -309,6 +313,42 @@ main(int argc,
     else if ( rc == 0x101 ) {
       iscas = true;
     }
+    else if ( rc == 0x130 ) {
+      do_direct = true;
+    }
+    else if ( rc == 0x131 ) {
+      do_direct = false;
+    }
+    else if ( rc == 0x140 ) {
+      do_contra = true;
+    }
+    else if ( rc == 0x141 ) {
+      do_contra = false;
+    }
+    else if ( rc == 0x150 ) {
+      do_naimp = true;
+    }
+    else if ( rc == 0x151 ) {
+      do_naimp = false;
+    }
+    else if ( rc == 0x160 ) {
+      do_naimp2 = true;
+    }
+    else if ( rc == 0x161 ) {
+      do_naimp2 = false;
+    }
+    else if ( rc == 0x200 ) {
+      do_sat = true;
+    }
+    else if ( rc == 0x201 ) {
+      do_sat = false;
+    }
+    else if ( rc == 0x210 ) {
+      do_recur = true;
+    }
+    else if ( rc == 0x211 ) {
+      do_recur = false;
+    }
   }
 
   if ( !blif && !iscas ) {
@@ -323,7 +363,8 @@ main(int argc,
   }
 
   string filename(str);
-  imp(filename, blif, iscas, method_str, level);
+  imp(filename, blif, iscas,
+      do_direct, do_const, do_contra, do_naimp, do_naimp2, do_sat, do_recur, level);
 
   return 0;
 }

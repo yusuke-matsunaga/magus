@@ -126,40 +126,40 @@ IteOp::apply_step(BddEdge f,
   ymuint f_level = f_vp->level();
   ymuint g_level = g_vp->level();
   ymuint h_level = h_vp->level();
+  ymuint top_level = f_level;
+  if ( top_level > g_level ) {
+    top_level = g_level;
+  }
+  if ( top_level > h_level ) {
+    top_level = h_level;
+  }
+
+  tPol f_pol = f.pol();
+  BddEdge f_0, f_1;
+  split1(top_level, f_level, f, f_vp, f_pol, f_0, f_1);
+
+  tPol g_pol = g.pol();
+  BddEdge g_0, g_1;
+  split1(top_level, g_level, g, g_vp, g_pol, g_0, g_1);
+
+  tPol h_pol = h.pol();
+  BddEdge h_0, h_1;
+  split1(top_level, h_level, h, h_vp, h_pol, h_0, h_1);
 
   BddEdge result;
 
-  tPol f_pol = f.pol();
-  if ( f_vp->edge0(f_pol).is_zero() &&
-       f_vp->edge1(f_pol).is_one() &&
-       f_level < g_level && f_level < h_level ) {
+  if ( f_0.is_zero() && f_1.is_one() ) {
     // f が肯定のリテラル関数でもっとも小さいレベルならそのままノードを作る．
-    result = new_node(f_level, h, g);
+    result = new_node(f_level, h_0, g_1);
   }
-  else if ( f_vp->edge0(f_pol).is_one() &&
-	    f_vp->edge1(f_pol).is_zero() &&
-	    f_level < g_level && f_level < h_level ) {
+  else if ( f_0.is_one() && f_1.is_zero() ) {
     // f が否定のリテラル関数でもっとも小さいレベルならそのままノードを作る．
-    result = new_node(f_level, g, h);
+    result = new_node(f_level, g_0, h_1);
   }
   else {
+    // 演算結果テーブルを調べる．
     result = get(f, g, h);
     if ( result.is_error() ) {
-      tPol g_pol = g.pol();
-      tPol h_pol = h.pol();
-      ymuint top = f_level;
-      if ( top > g_level) {
-	top = g_level;
-      }
-      if ( top > h_level ) {
-	top = h_level;
-      }
-      BddEdge f_0, f_1;
-      BddEdge g_0, g_1;
-      BddEdge h_0, h_1;
-      split1(top, f_level, f, f_vp, f_pol, f_0, f_1);
-      split1(top, g_level, g, g_vp, g_pol, g_0, g_1);
-      split1(top, h_level, h, h_vp, h_pol, h_0, h_1);
       BddEdge r_0 = apply_step(f_0, g_0, h_0);
       if ( r_0.is_overflow() ) {
 	return BddEdge::make_overflow();
@@ -168,7 +168,7 @@ IteOp::apply_step(BddEdge f,
       if ( r_1.is_overflow() ) {
 	return BddEdge::make_overflow();
       }
-      result = new_node(top, r_0, r_1);
+      result = new_node(top_level, r_0, r_1);
       put(f, g, h, result);
     }
   }

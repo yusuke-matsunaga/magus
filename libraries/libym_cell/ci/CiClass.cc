@@ -100,7 +100,7 @@ CiClass::init(const vector<NpnMapM>& idmap_list,
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiClass::dump(BinO& bos) const
+CiClass::dump(ODO& bos) const
 {
   bos << mIdmapNum
       << mGroupNum;
@@ -123,7 +123,7 @@ CiClass::dump(BinO& bos) const
 // @param[in] library セルライブラリ
 // @param[in] alloc メモリアロケータ
 void
-CiClass::restore(BinI& bis,
+CiClass::restore(IDO& bis,
 		 const CellLibrary& library,
 		 Alloc& alloc)
 {

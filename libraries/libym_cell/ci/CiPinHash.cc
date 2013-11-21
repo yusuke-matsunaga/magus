@@ -60,7 +60,7 @@ CiPinHash::add(CiPin* pin)
       for (CiPin* pin = old_table[i]; pin; ) {
 	CiPin* tmp = pin;
 	pin = pin->mLink;
-	ymuint pos = hash_func(pin->mCell, pin->mName) % mSize;
+	ymuint pos = hash_func(tmp->mCell, tmp->mName) % mSize;
 	tmp->mLink = mTable[pos];
 	mTable[pos] = tmp;
       }

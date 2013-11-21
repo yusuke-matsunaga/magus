@@ -11,6 +11,7 @@ SUBDIRS = \
 	mislib \
 	dotlib \
 	libcomp \
+	$(YM_EXTRA_SUBDIRS) \
 	. \
 	tests
 
@@ -33,8 +34,6 @@ libym_cell_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_la_SOURCES = \
-	CellDotlibReader.cc \
-	CellMislibReader.cc \
 	CellFFInfo.cc \
 	CellLatchInfo.cc \
 	display.cc

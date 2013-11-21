@@ -253,7 +253,7 @@ test_dump(CNFddMgr& cnfddmgr)
       cout << "cannot open output file: " << fn << endl;
       return false;
     }
-    BinOStream bos(ofs);
+    ODOStream bos(ofs);
     cnfdd.dump(bos);
   }
   CNFdd cnfdd2;
@@ -263,7 +263,7 @@ test_dump(CNFddMgr& cnfddmgr)
       cout << "cannont open input file: " << fn << endl;
       return false;
     }
-    BinIStream bis(ifs);
+    IDOStream bis(ifs);
     cnfdd2 = cnfddmgr.restore(bis);
   }
   if ( cnfdd != cnfdd2 ) {

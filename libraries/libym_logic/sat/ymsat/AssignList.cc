@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_SAT
 
 // @brief コンストラクタ
 AssignList::AssignList() :
-  mSize(4),
+  mSize(1024),
   mList(new Literal[mSize]),
   mTail(0),
   mHead(0),

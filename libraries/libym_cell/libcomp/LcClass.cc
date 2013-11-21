@@ -19,10 +19,12 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] builtin 組み込みクラスの時 true にするフラグ
 // @param[in] repfunc 代表関数
 LcClass::LcClass(ymuint id,
+		 bool builtin,
 		 const TvFunc& repfunc) :
-  mId(id),
+  mId((id << 1) | static_cast<ymuint>(builtin)),
   mRepFunc(TvFuncM(vector<TvFunc>(1, repfunc))),
   mCellClass(NULL)
 {
@@ -30,10 +32,12 @@ LcClass::LcClass(ymuint id,
 
 // @brief コンストラクタ
 // @param[in] id ID番号
+// @param[in] builtin 組み込みクラスの時 true にするフラグ
 // @param[in] repfunc 代表関数
 LcClass::LcClass(ymuint id,
+		 bool builtin,
 		 const TvFuncM& repfunc) :
-  mId(id),
+  mId((id << 1) | static_cast<ymuint>(builtin)),
   mRepFunc(repfunc),
   mCellClass(NULL)
 {
@@ -48,7 +52,14 @@ LcClass::~LcClass()
 ymuint
 LcClass::id() const
 {
-  return mId;
+  return mId >> 1;
+}
+
+// @brief 組み込みクラスの時 true を返す．
+bool
+LcClass::builtin() const
+{
+  return static_cast<bool>(mId & 1U);
 }
 
 // @brief 代表関数を返す．
@@ -91,4 +102,3 @@ LcClass::add_group(LcGroup* group,
 
 
 END_NAMESPACE_YM_CELL_LIBCOMP
-

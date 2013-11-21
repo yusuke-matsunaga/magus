@@ -128,14 +128,14 @@ ItvlMgr::print_tree(ostream& s) const
 
 // @brief バイナリファイルに書き出す．
 void
-ItvlMgr::dump(BinO& s) const
+ItvlMgr::dump(ODO& s) const
 {
   mImpl->dump(s);
 }
 
 // @brief バイナリファイルを読み込む．
 void
-ItvlMgr::restore(BinI& s)
+ItvlMgr::restore(IDO& s)
 {
   mImpl->restore(s);
 }

@@ -17,6 +17,14 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 /// @class NpnXform NpnXform.h "NpnXform.h"
 /// @brief NPN 変換を表すクラス(4入力限定)
+///
+/// 順列は全部で (4 x 3 x 2 x 1) = 24通りしかないので
+/// 0 - 23 までのIDに対応付ける．
+/// そのため順列同士の演算はすべて表引きで行なう．
+/// 符号化は以下の通り
+/// - 0      bit目: 出力の反転
+/// - 1 -  4 bit目: 入力の反転
+/// - 5 - 10 bit目: 順列
 //////////////////////////////////////////////////////////////////////
 class NpnXform
 {
@@ -60,6 +68,13 @@ public:
   bool
   output_inv() const;
 
+  /// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
+  /// @param[in] sup_vec サポートベクタ
+  /// @return 正規化後の自分自身を返す．
+  /// @note サポートに含まれていない変数の変換を消去する．
+  NpnXform
+  rep(ymuint8 sup_vec) const;
+
   /// @brief 生のデータを取り出す．
   /// @note 値域は 0 - 1023
   ymuint
@@ -70,6 +85,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力の反転属性を反転させる．
+  void
+  flip_iinv(ymuint pos);
 
   /// @brief 出力の反転属性を反転させる．
   void
@@ -95,13 +114,66 @@ public:
   /// @brief 合成する．
   friend
   NpnXform
-  operator*(const NpnXform& left,
-	    const NpnXform& right);
+  operator*(NpnXform left,
+	    NpnXform right);
+
+  /// @brief 合成する．
+  const NpnXform&
+  operator*=(NpnXform right);
+
+  /// @brief サポートベクタに対する変換
+  /// @note といっても ymuint なのでちょっと危険
+  friend
+  ymuint
+  operator*(ymuint sup_vec,
+	    NpnXform xform);
+
+  /// @brief 正規化する．
+  /// @param[in] sup サポート数
+  /// @return 正規化後の自分自身を返す．
+  /// @note サポートに含まれていない変数の変換を消去する．
+  const NpnXform&
+  normalize(ymuint sup);
 
   /// @brief 逆変換を求める．
   friend
   NpnXform
-  inverse(const NpnXform& left);
+  inverse(NpnXform left);
+
+  /// @brief マージする．
+  friend
+  bool
+  merge(NpnXform left,
+	ymuint left_sup,
+	NpnXform right,
+	ymuint right_sup,
+	NpnXform& result);
+
+  /// @brief 等価比較
+  friend
+  bool
+  operator==(NpnXform left,
+	     NpnXform right);
+
+  /// @brief 大小比較
+  friend
+  bool
+  operator<(NpnXform left,
+	    NpnXform right);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 順列番号を取り出す．
+  ymuint
+  get_perm() const;
+
+  /// @brief 極性ベクタを取り出す．
+  ymuint
+  get_pols() const;
 
 
 private:
@@ -114,13 +186,50 @@ private:
 
 };
 
+/// @brief 等価比較
+/// @param[in] left, right オペランド
+bool
+operator==(NpnXform left,
+	   NpnXform right);
+
+/// @brief 非等価比較
+/// @param[in] left, right オペランド
+bool
+operator!=(NpnXform left,
+	   NpnXform right);
+
+/// @brief 大小比較 ( < )
+/// @param[in] left, right オペランド
+bool
+operator<(NpnXform left,
+	  NpnXform right);
+
+/// @brief 大小比較 ( > )
+/// @param[in] left, right オペランド
+bool
+operator>(NpnXform left,
+	  NpnXform right);
+
+/// @brief 大小比較 ( <= )
+/// @param[in] left, right オペランド
+bool
+operator<=(NpnXform left,
+	   NpnXform right);
+
+/// @brief 大小比較 ( >= )
+/// @param[in] left, right オペランド
+bool
+operator>=(NpnXform left,
+	   NpnXform right);
 
 /// @brief 関数ベクタを変換する．
+/// @param[in] left, right オペランド
 ymuint16
-xform(ymuint16 func,
-      NpnXform xf);
+xform_func(ymuint16 func,
+	   NpnXform xf);
 
 /// @brief 内容を表示する．
+/// @param[in] left, right オペランド
 ostream&
 operator<<(ostream& s,
 	   NpnXform xf);
@@ -164,7 +273,7 @@ inline
 bool
 NpnXform::input_inv(ymuint pos) const
 {
-  return static_cast<bool>((mData >> pos) & 1U);
+  return static_cast<bool>((mData >> (pos + 1)) & 1U);
 }
 
 // @brief 出力の極性を得る．
@@ -172,7 +281,7 @@ inline
 bool
 NpnXform::output_inv() const
 {
-  return static_cast<bool>((mData >> 4) & 1U);
+  return static_cast<bool>(mData & 1U);
 }
 
 // @brief 生のデータを取り出す．
@@ -183,12 +292,116 @@ NpnXform::data() const
   return mData;
 }
 
+// @brief 入力の反転属性を反転させる．
+inline
+void
+NpnXform::flip_iinv(ymuint pos)
+{
+  mData ^= (1U << (pos + 1));
+}
+
 // @brief 出力の反転属性を反転させる．
 inline
 void
 NpnXform::flip_oinv()
 {
-  mData ^= 16U;
+  mData ^= 1U;
+}
+
+// @brief 合成する．
+inline
+NpnXform
+operator*(NpnXform left,
+	  NpnXform right)
+{
+  return NpnXform(left).operator*=(right);
+}
+
+// @brief 等価比較
+// @param[in] left, right オペランド
+inline
+bool
+operator==(NpnXform left,
+	   NpnXform right)
+{
+  return left.mData == right.mData;
+}
+
+// @brief 非等価比較
+// @param[in] left, right オペランド
+inline
+bool
+operator!=(NpnXform left,
+	   NpnXform right)
+{
+  return !operator==(left, right);
+}
+
+// @brief 大小比較 ( < )
+// @param[in] left, right オペランド
+inline
+bool
+operator<(NpnXform left,
+	  NpnXform right)
+{
+  return left.mData < right.mData;
+}
+
+// @brief 大小比較 ( > )
+// @param[in] left, right オペランド
+inline
+bool
+operator>(NpnXform left,
+	  NpnXform right)
+{
+  return operator<(right, left);
+}
+
+// @brief 大小比較 ( <= )
+// @param[in] left, right オペランド
+inline
+bool
+operator<=(NpnXform left,
+	   NpnXform right)
+{
+  return !operator<(right, left);
+}
+
+// @brief 大小比較 ( >= )
+// @param[in] left, right オペランド
+inline
+bool
+operator>=(NpnXform left,
+	   NpnXform right)
+{
+  return !operator<(left, right);
+}
+
+// @brief 順列番号を取り出す．
+inline
+ymuint
+NpnXform::get_perm() const
+{
+  return (mData >> 5) & 31U;
+}
+
+// @brief 極性ベクタを取り出す．
+inline
+ymuint
+NpnXform::get_pols() const
+{
+  return mData & 31U;
+}
+
+// @brief 与えられた関数のサポートに関する同値類の代表変換を求める．
+// @param[in] sup_vec サポートベクタ
+// @return 正規化後の自分自身を返す．
+// @note サポートに含まれていない変数の変換を消去する．
+inline
+NpnXform
+NpnXform::rep(ymuint8 sup_vec) const
+{
+  return NpnXform(*this).normalize(sup_vec);
 }
 
 END_NAMESPACE_YM

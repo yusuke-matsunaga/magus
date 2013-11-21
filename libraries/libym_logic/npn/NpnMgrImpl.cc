@@ -152,7 +152,7 @@ void
 ww0_refine(vector<NpnConf>& pollist)
 {
   const NpnConf& conf0 = pollist.front();
-  ymuint ni = conf0.ni();
+  ymuint ni = conf0.input_num();
 
   if ( debug & debug_ww0_refine ) {
     cout << "before ww0_refine()" << endl;
@@ -214,7 +214,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
 		       int algorithm)
 {
   // 特例
-  if ( func.ni() == 0 ) {
+  if ( func.input_num() == 0 ) {
     if ( func.value(0) == 0 ) {
       // 定数0関数
       cmap.set_identity(0);
@@ -227,7 +227,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
       return;
     }
   }
-  if ( func.ni() == 1 ) {
+  if ( func.input_num() == 1 ) {
     if ( func.value(0) == 0 ) {
       if ( func.value(1) == 0 ) {
 	// 1入力の定数0関数
@@ -288,7 +288,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     mMaxList.push_back(conf0);
   }
   else {
-    mMaxFunc = TvFunc::const_zero(func.ni());
+    mMaxFunc = TvFunc::const_zero(func.input_num());
 
     switch ( algorithm ) {
     case 0:
@@ -641,7 +641,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
     }
     cout << "func1 = " << func1 << endl
 	 << "w2 = {";
-    ymuint ni = conf.ni();
+    ymuint ni = conf.input_num();
     for (ymuint i = 1; i < ni; ++ i) {
       for (ymuint j = 0; j < i; ++ j) {
 	int w2 = func1.walsh_2(i, j);
@@ -661,7 +661,7 @@ NpnMgrImpl::w2max_recur(NpnConf& conf,
     else {
       int diff = 0;
 
-      ymuint ni = conf.ni();
+      ymuint ni = conf.input_num();
       if ( !mMaxW2Valid ) {
 	for (ymuint i = 1; i < ni; ++ i) {
 	  ymuint base = i * ni;
@@ -749,7 +749,7 @@ NpnMgrImpl::set_maxfunc(const TvFunc& func)
   mMaxFunc = func;
   mMaxW2Valid = false;
 #if 0
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   for (ymuint i = 1; i < ni; ++ i) {
     ymuint base = i * ni;
     for (ymuint j = 0; j < i; ++ j) {
@@ -760,7 +760,7 @@ NpnMgrImpl::set_maxfunc(const TvFunc& func)
 #if 0
   cout << "mMaxFunc = " << mMaxFunc << endl
        << "w2 = {";
-  ymuint ni = conf.ni();
+  ymuint ni = conf.input_num();
   for (ymuint i = 1; i < ni; ++ i) {
     ymuint base = i * ni;
     for (ymuint j = 0; j < i; ++ j) {

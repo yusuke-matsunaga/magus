@@ -56,11 +56,11 @@ makebdd(const string& filename)
       bddmap[node->id()] = bdd;
     }
 
-    vector<BdnNode*> node_list;
+    vector<const BdnNode*> node_list;
     network.sort(node_list);
     ymuint node_num = node_list.size();
     id = 0;
-    for (vector<BdnNode*>::const_iterator p = node_list.begin();
+    for (vector<const BdnNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       const BdnNode* node = *p;
       cout << id << " / " << node_num;

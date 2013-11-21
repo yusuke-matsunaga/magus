@@ -10,7 +10,8 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "ym_utils/Alloc.h"
 #include "libcomp/libcomp_nsdef.h"
 
@@ -109,7 +110,7 @@ public:
   /// @brief バイナリダンプを行う．
   /// @param[in] bos 出力先のストリーム
   void
-  dump(BinO& bos) const;
+  dump(ODO& bos) const;
 
 
 public:
@@ -130,7 +131,7 @@ public:
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  restore(BinI& bis,
+  restore(IDO& bis,
 	  Alloc& alloc);
 
 

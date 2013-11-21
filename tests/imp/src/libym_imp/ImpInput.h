@@ -74,10 +74,16 @@ public:
   ymuint32
   cur_state() const;
 
+  /// @brief 状態を表す文字列を返す．
+  virtual
+  string
+  cur_state_str() const;
+
   /// @brief 状態を元にもどす．
   virtual
   void
-  restore(ymuint32 val);
+  restore(ImpMgr& mgr,
+	  ymuint32 val);
 
   /// @brief unjustified ノードの時 true を返す．
   virtual

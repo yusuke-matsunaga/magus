@@ -10,7 +10,7 @@
 
 
 #include "ym_logic/LogExprWriter.h"
-#include "LexpNode.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP
@@ -35,7 +35,7 @@ LogExprWriter::dump(ostream& s,
 		    const LogExpr& expr,
 		    const VarStrMap& var_names) const
 {
-  dump_sub(s, expr.root(), var_names);
+  dump_sub(s, expr, var_names);
   return s;
 }
 
@@ -114,20 +114,20 @@ operator<<(ostream& s,
 // dump() のサブルーティン
 void
 LogExprWriter::dump_sub(ostream& s,
-			const LexpNode* node,
+			const LogExpr& expr,
 			const VarStrMap& var_names) const
 {
-  if ( node->is_zero() ) {
+  if ( expr.is_zero() ) {
     s << "0";
   }
-  else if ( node->is_one() ) {
+  else if ( expr.is_one() ) {
     s << "1";
   }
-  else if ( node->is_literal() ) {
-    if ( node->is_negaliteral() ) {
+  else if ( expr.is_literal() ) {
+    if ( expr.is_negaliteral() ) {
       s << not_str();
     }
-    VarId id = node->varid();
+    VarId id = expr.varid();
     VarStrMap::const_iterator p = var_names.find(id);
     if ( p == var_names.end() ) {
       s << "V" << id;
@@ -138,19 +138,24 @@ LogExprWriter::dump_sub(ostream& s,
   }
   else { // AND/OR/XOR
     string delim;
-    switch ( node->type() ) {
-    case kAnd: delim = and_str(); break;
-    case kOr:  delim = or_str(); break;
-    case kXor: delim = xor_str(); break;
-    default:
-      break;
+    if ( expr.is_and() ) {
+      delim = and_str();
+    }
+    else if ( expr.is_or() ) {
+      delim = or_str();
+    }
+    else if ( expr.is_xor() ) {
+      delim = xor_str();
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
     }
     s << "( ";
     string delim1 = "";
-    ymuint n = node->child_num();
+    ymuint n = expr.child_num();
     for (ymuint i = 0; i < n; ++ i) {
       s << delim1;
-      dump_sub(s, node->child(i), var_names);
+      dump_sub(s, expr.child(i), var_names);
       delim1 = " " + delim + " ";
     }
     s << " )";

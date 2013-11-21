@@ -71,6 +71,21 @@ public:
 	     Literal lit2,
 	     Literal lit3);
 
+  /// @brief 4項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4);
+
+  /// @brief 5項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4,
+	     Literal lit5);
+
   /// @brief SAT 問題を解く．
   /// @param[out] model 充足するときの値の割り当てを格納する配列．
   /// @retval kB3True  充足した．
@@ -91,6 +106,10 @@ public:
   Bool3
   solve(const vector<Literal>& assumptions,
 	vector<Bool3>& model);
+
+  /// @brief 学習節の整理を行なう．
+  void
+  reduce_learnt_clause();
 
   /// @brief 現在の内部状態を得る．
   /// @param[out] stats 状態を格納する構造体

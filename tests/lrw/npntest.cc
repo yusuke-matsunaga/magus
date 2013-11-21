@@ -8,7 +8,7 @@
 
 
 #include "NpnXform.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -60,11 +60,10 @@ test1()
 {
   cout << "test1" << endl;
   bool error = false;
-  PermGen pg(4, 4);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {
@@ -79,14 +78,14 @@ test1()
 	  error1 = true;
 	  break;
 	}
-	ymuint p_ref = (pols >> i) & 1U;
+	ymuint p_ref = (pols >> (i + 1)) & 1U;
 	ymuint p_cur = xf.input_inv(i);
 	if ( p_ref != p_cur ) {
 	  error1 = true;
 	  break;
 	}
       }
-      ymuint p_ref = (pols >> 4) & 1U;
+      ymuint p_ref = pols & 1U;
       ymuint p_cur = xf.output_inv();
       if ( p_ref != p_cur ) {
 	error1 = true;
@@ -99,12 +98,6 @@ test1()
 	     << ", " << perm[2]
 	     << ", " << perm[3]
 	     << ") ";
-	if ( pols & 1U ) {
-	  cout << "N";
-	}
-	else {
-	  cout << "P";
-	}
 	if ( pols & 2U ) {
 	  cout << "N";
 	}
@@ -123,8 +116,14 @@ test1()
 	else {
 	  cout << "P";
 	}
-	cout << "|";
 	if ( pols & 16U ) {
+	  cout << "N";
+	}
+	else {
+	  cout << "P";
+	}
+	cout << "|";
+	if ( pols & 1U ) {
 	  cout << "N";
 	}
 	else {
@@ -145,21 +144,19 @@ test2()
 {
   cout << "test2" << endl;
   bool error = false;
-  PermGen pg(4, 4);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {
       NpnXform xf(pid, pols);
 
-      PermGen pg2(4, 4);
-      for (PermGen::iterator q = pg2.begin(); !q.is_end(); ++ q) {
+      for (PermGen pg2(4, 4); !pg2.is_end(); ++ pg2) {
 	ymuint perm2[4];
 	for (ymuint i = 0; i < 4; ++ i) {
-	  perm2[i] = q(i);
+	  perm2[i] = pg2(i);
 	}
 	ymuint pid2 = NpnXform::perm_id(perm2);
 	for (ymuint pols2 = 0; pols2 < 32; ++ pols2) {
@@ -177,15 +174,15 @@ test2()
 	  ymuint j2 = perm2[i2];
 	  ymuint j3 = perm2[i3];
 
-	  ymuint inv0 = (pols >> 0) & 1U;
-	  inv0 ^= ((pols2 >> i0) & 1U);
-	  ymuint inv1 = (pols >> 1) & 1U;
-	  inv1 ^= ((pols2 >> i1) & 1U);
-	  ymuint inv2 = (pols >> 2) & 1U;
-	  inv2 ^= ((pols2 >> i2) & 1U);
-	  ymuint inv3 = (pols >> 3) & 1U;
-	  inv3 ^= ((pols2 >> i3) & 1U);
-	  ymuint oinv = ((pols >> 4) & 1U) ^ ((pols2 >> 4) & 1U);
+	  ymuint inv0 = (pols >> 1) & 1U;
+	  inv0 ^= ((pols2 >> (i0 + 1)) & 1U);
+	  ymuint inv1 = (pols >> 2) & 1U;
+	  inv1 ^= ((pols2 >> (i1 + 1)) & 1U);
+	  ymuint inv2 = (pols >> 3) & 1U;
+	  inv2 ^= ((pols2 >> (i2 + 1)) & 1U);
+	  ymuint inv3 = (pols >> 4) & 1U;
+	  inv3 ^= ((pols2 >> (i3 + 1)) & 1U);
+	  ymuint oinv = ((pols >> 0) & 1U) ^ ((pols2 >> 0) & 1U);
 
 	  if ( cxf.input_perm(0) != j0 ||
 	       cxf.input_perm(1) != j1 ||
@@ -218,11 +215,10 @@ test3()
 {
   cout << "test3" << endl;
   bool error = false;
-  PermGen pg(4, 4);
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
     ymuint perm[4];
     for (ymuint i = 0; i < 4; ++ i) {
-      perm[i] = p(i);
+      perm[i] = pg(i);
     }
     ymuint pid = NpnXform::perm_id(perm);
     for (ymuint pols = 0; pols < 32; ++ pols) {

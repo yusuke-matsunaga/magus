@@ -48,7 +48,7 @@ GroupHandler::read_attr(const ShString& attr_name,
 			const FileRegion& attr_loc)
 {
   FileRegion dummy_loc;
-  DotlibNodeImpl* value = parse_complex(dummy_loc);
+  DotlibNodeImpl* value = parse_complex(false, dummy_loc);
   if ( value == NULL ) {
     return false;
   }
@@ -124,7 +124,7 @@ GroupHandler::add_attr(const ShString& attr_name,
 		       DotlibNodeImpl* value,
 		       const FileRegion& loc)
 {
-  DotlibNodeImpl* attr = mgr()->new_attr(attr_name, value, loc);
+  DotlibAttr* attr = mgr()->new_attr(attr_name, value, loc);
   mNode->add_attr(attr);
   return true;
 }
@@ -195,8 +195,7 @@ GroupHandler::end_group(const ShString& attr_name,
 {
   FileRegion loc(attr_loc, end_loc);
   if ( attr_name == "library" ) {
-    DotlibNodeImpl* root = mgr()->new_attr(attr_name, mNode, loc);
-    mgr()->set_root_node(root);
+    mgr()->set_root_node(mNode);
   }
   else {
     parent()->add_attr(attr_name, mNode, loc);
@@ -256,7 +255,7 @@ EmptyGroupHandler::check_group_value(const ShString& attr_name,
 {
   ymuint n = value_list->list_size();
   if ( n > 0 ) {
-    const DotlibNode* top = value_list->top();
+    const DotlibNode* top = value_list->list_elem(0);
     FileRegion loc = top->loc();
     ostringstream buf;
     buf << attr_name << " statement does not have parameters.";
@@ -316,9 +315,9 @@ Str1GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* top = value_list->top();
+  const DotlibNode* top = value_list->list_elem(0);
   if ( n > 1 ) {
-    const DotlibNode* second = top->next();
+    const DotlibNode* second = value_list->list_elem(1);
     FileRegion loc = second->loc();
     ostringstream buf;
     buf << attr_name << " statement has only one string parameter.";
@@ -379,10 +378,10 @@ Str2GroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* top = value_list->top();
-  const DotlibNode* second = top->next();
+  const DotlibNode* top = value_list->list_elem(0);
+  const DotlibNode* second = value_list->list_elem(1);
   if ( n > 2 ) {
-    const DotlibNode* third = second->next();
+    const DotlibNode* third = value_list->list_elem(2);
     FileRegion loc = third->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string parameters.";
@@ -451,11 +450,11 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* top = value_list->top();
-  const DotlibNode* second = top->next();
-  const DotlibNode* third = second->next();
+  const DotlibNode* top = value_list->list_elem(0);
+  const DotlibNode* second = value_list->list_elem(1);
+  const DotlibNode* third = value_list->list_elem(2);
   if ( n > 3 ) {
-    const DotlibNode* forth = third->next();
+    const DotlibNode* forth = value_list->list_elem(3);
   FileRegion loc = forth->loc();
     ostringstream buf;
     buf << attr_name << " statement has two string and an integer parameters.";
@@ -480,7 +479,7 @@ Str2IntGroupHandler::check_group_value(const ShString& attr_name,
 		    "string value is expected.");
     return false;
   }
-  if ( !third->is_string() ) {
+  if ( !third->is_int() ) {
     MsgMgr::put_msg(__FILE__, __LINE__, second->loc(),
 		    kMsgError,
 		    "DOTLIB_PARSER",

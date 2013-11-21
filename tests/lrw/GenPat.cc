@@ -8,7 +8,7 @@
 
 
 #include "GenPat.h"
-#include "GpNode.h"
+#include "ym_utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -40,6 +40,44 @@ ymuint32 n_compose;
 ymuint32 level_over;
 ymuint32 duplicate_aig;
 
+// 関数のサポートを求める．
+ymuint
+support(ymuint16 func)
+{
+  // 数が少ないので個別にやる．
+  ymuint ans = 0U;
+
+  // 0 番めの変数
+  ymuint16 c0_0 = func & 0x5555U;
+  ymuint16 c0_1 = (func & 0xaaaaU) >> 1;
+  if ( c0_0 != c0_1 ) {
+    ans |= 1U;
+  }
+
+  // 1 番めの変数
+  ymuint16 c1_0 = func & 0x3333U;
+  ymuint16 c1_1 = (func & 0xccccU) >> 2;
+  if ( c1_0 != c1_1 ) {
+    ans |= 2U;
+  }
+
+  // 2 番めの変数
+  ymuint16 c2_0 = func & 0x0f0fU;
+  ymuint16 c2_1 = (func & 0xf0f0U) >> 4;
+  if ( c2_0 != c2_1 ) {
+    ans |= 4U;
+  }
+
+  // 3 番めの変数
+  ymuint16 c3_0 = func & 0x00ffU;
+  ymuint16 c3_1 = (func & 0xff00U) >> 8;
+  if ( c3_0 != c3_1 ) {
+    ans |= 8;
+  }
+
+  return ans;
+}
+
 END_NONAMESPACE
 
 
@@ -61,6 +99,9 @@ GenPat::~GenPat()
 void
 GenPat::operator()(ymuint slack)
 {
+  StopWatch timer;
+  timer.start();
+
   init_npn4rep();
 
   mGpList.clear();
@@ -92,86 +133,106 @@ GenPat::operator()(ymuint slack)
 
   // レベル0のパタンを作る．
   {
+    mGpList.push_back(vector<GpHandle>());
+    mRepList.push_back(vector<GpHandle>());
+
     GpHandle ih = mMgr.make_input(0);
-    add_cand(ih, 0);
+    ymuint16 fv = ih.func();
+    mFuncLevel[fv] = 0;
+    -- mRemainFunc;
+    -- mRemainRep;
+    mFuncArray[fv].push_back(ih);
+    mRepList[0].push_back(ih);
+    mGpList[0].push_back(ih);
+
+    for (ymuint i = 1; i < 4; ++ i) {
+      GpHandle ih = mMgr.make_input(i);
+      ymuint16 fv = ih.func();
+      mFuncLevel[fv] = 0;
+      -- mRemainFunc;
+      mFuncArray[fv].push_back(ih);
+      mGpList[0].push_back(ih);
+    }
   }
 
   // レベル1以上のパタンを作る．
   ymuint max_level = 0;
-  for (ymuint level = 0; level < mCandListArray.size(); ++ level ) {
+  for (ymuint level1 = 1; ; ++ level1) {
     cout << endl
-	 << "level = " << level << ", remain_func = " << mRemainFunc << endl
+	 << "level = " << level1 << ", remain_func = " << mRemainFunc << endl
 	 << "   remain_rep = " << mRemainRep << endl;
-    max_level = level;
+    max_level = level1;
 
-    while ( mGpList.size() <= level ) {
-      mGpList.push_back(vector<GpHandle>());
-    }
-    while ( mRepList.size() <= level ) {
-      mRepList.push_back(vector<GpHandle>());
-    }
-
-    ymuint n = mCandListArray[level].size();
-    cout << "  " << n << " seed patterns" << endl;
-    for (ymuint i = 0; i < n; ++ i) {
-      GpHandle handle = mCandListArray[level][i];
-      GpNode* node = handle.node();
-      if ( mFuncLevel[node->func()] + mSlack < level ) {
-	continue;
-      }
-      mRepList[level].push_back(handle);
-    }
-
-    const vector<GpHandle>& src_list1 = mRepList[level];
+    const vector<GpHandle>& src_list1 = mRepList[level1 - 1];
     ymuint n1 = src_list1.size();
-    cout << "  " << n1 << " true seed patterns" << endl;
-    for (ymuint i = 0; i < n1; ++ i) {
-      GpHandle handle = src_list1[i];
-      if ( 1 ) {
-	mMgr.dump_handle(cout, handle);
-	cout << endl;
-      }
-      npn_expand(handle, level);
-    }
-    cout << "  expand " << mGpList[level].size() << " patterns" << endl;
-
-    if ( mRemainFunc == 0 ) {
-      cout << "All functions has its patterns" << endl;
-      break;
-    }
-
-    // level の代表パタンと他のパタンとの対を作る．
-    for (ymuint i = 0; i < n1; ++ i) {
-      GpHandle handle1 = src_list1[i];
+    for (ymuint i1 = 0; i1 < n1; ++ i1) {
+      GpHandle handle1 = src_list1[i1];
 
       mCountHash.clear();
       ymuint level_base = count1(handle1);
 
-      for (ymuint l = 0; l < level; ++ l) {
-	const vector<GpHandle>& src_list2 = mGpList[l];
+      for (ymuint level2 = 0; level2 < level1; ++ level2) {
+	const vector<GpHandle>& src_list2 = mGpList[level2];
 	ymuint n2 = src_list2.size();
-	for (ymuint j = 0; j < n2; ++ j) {
-	  GpHandle handle2 = src_list2[j];
-	  if ( 0 ) {
-	    cout << "L#" << l << ": " << j << " / " << n2
-		 << " | " << i << " / " << n1 << endl;
-	  }
+	for (ymuint i2 = 0; i2 < n2; ++ i2) {
+	  GpHandle handle2 = src_list2[i2];
 	  compose(handle1, handle2, level_base);
 	}
       }
+    }
 
-      const vector<GpHandle>& src_list2 = mGpList[level];
-      ymuint n2 = src_list2.size();
-      for (ymuint j = 0; j < n2; ++ j) {
-	if ( 0 ) {
-	  cout << "L#" << level << ": " << j << " / " << n2
-	       << " | " << i << " / " << n1 << endl;
-	}
-	GpHandle handle2 = src_list2[j];
-	compose(handle1, handle2, level_base);
-      }
+    while ( mGpList.size() <= level1 ) {
+      mGpList.push_back(vector<GpHandle>());
+    }
+    while ( mRepList.size() <= level1 ) {
+      mRepList.push_back(vector<GpHandle>());
+    }
+
+    const vector<GpPair>& gp_and_list = mAndCandPairListArray[level1];
+    ymuint n_and = gp_and_list.size();
+    for (ymuint i = 0; i < n_and; ++ i) {
+      const GpPair& gp = gp_and_list[i];
+      GpHandle handle = mMgr.make_and(gp.mHandle1, gp.mHandle2);
+      add_pat(handle, level1);
+    }
+
+    const vector<GpPair>& gp_xor_list = mXorCandPairListArray[level1];
+    ymuint n_xor = gp_xor_list.size();
+    for (ymuint i = 0; i < n_xor; ++ i) {
+      const GpPair& gp = gp_xor_list[i];
+      GpHandle handle = mMgr.make_xor(gp.mHandle1, gp.mHandle2);
+      add_pat(handle, level1);
+    }
+    if ( mRemainFunc == 0 ) {
+      cout << "All functions has its patterns" << endl;
+      break;
     }
   }
+#if 0
+  {
+    hash_map<ymuint16, vector<GpHandle> > pat_list;
+    vector<ymuint16> flist;
+    for (ymuint i = 0; i < n1; ++ i) {
+      GpHandle handle = src_list1[i];
+      ymuint16 func = handle.func();
+      if ( mFuncLevel[func] + mSlack >= level ) {
+	if ( pat_list.count(func) == 0 ) {
+	  flist.push_back(func);
+	}
+	pat_list[func].push_back(handle);
+      }
+    }
+    sort(flist.begin(), flist.end());
+    for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
+      hash_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
+      assert_cond( q != pat_list.end(), __FILE__, __LINE__);
+      vector<GpHandle>& handle_list = q->second;
+      cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
+      mMgr.dump_handle(cout, handle_list);
+      cout << endl;
+    }
+  }
+#endif
 
   ymuint total_cost = 0;
   bool error = false;
@@ -198,7 +259,8 @@ GenPat::operator()(ymuint slack)
       }
       cout << "Function#" << hex << setw(4) << setfill('0')
 	   << i << dec << ": "
-	   << "Level " << mFuncLevel[i] << ": ";
+	   << "Level " << mFuncLevel[i] << ": " << endl;
+#if 0
       for (vector<GpHandle>::iterator p = mFuncArray[i].begin();
 	   p != mFuncArray[i].end(); ++ p) {
 	GpHandle handle = *p;
@@ -210,57 +272,20 @@ GenPat::operator()(ymuint slack)
 	handle_list.push_back(handle);
       }
       cout << endl;
+#endif
     }
+#if 0
     mMgr.dump_handle(cout, handle_list);
+#endif
   }
 
-  cout << "# # of compose = " << n_compose << endl
-       << "# level over = " << level_over << endl
+  timer.stop();
+  USTime time = timer.time();
+  cout << "# # of compose  = " << n_compose << endl
+       << "# level over    = " << level_over << endl
        << "# duplicate aig = " << duplicate_aig << endl;
-}
-
-// @brief NPN同値類を求める．
-// @param[in] handle ハンドル
-// @param[in] level レベル
-void
-GenPat::npn_expand(GpHandle handle,
-		   ymuint32 level)
-{
-  hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
-  p = mNpnHash.find(handle.func());
-  assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
-  const vector<FuncXform>& xf_list = p->second;
-  for (vector<FuncXform>::const_iterator q = xf_list.begin();
-       q != xf_list.end(); ++ q) {
-    const FuncXform& xform = *q;
-    GpHandle handle1 = xform4(handle, xform.mXf);
-    add_pat(handle1, level);
-  }
-}
-
-// @brief パタンを登録する．
-// @param[in] fv 関数ベクタ
-// @param[in] aig AIG
-// @param[in] level レベル
-void
-GenPat::add_pat(GpHandle handle,
-		ymuint32 level)
-{
-  ymuint16 fv = handle.func();
-  if ( mFuncArray[fv].empty() ) {
-    mFuncLevel[fv] = level;
-    -- mRemainFunc;
-    if ( mNpnHash.count(fv) > 0 ) {
-      -- mRemainRep;
-    }
-  }
-  else if ( mFuncLevel[fv] > level ) {
-    mFuncLevel[fv] = level;
-  }
-
-  mFuncArray[fv].push_back(handle);
-
-  mGpList[level].push_back(handle);
+  cout << "# of nodes      = " << mMgr.node_num() << endl
+       << "CPU time        = " << time << endl;
 }
 
 // @brief 2つのノードから新しいパタンを作る．
@@ -279,23 +304,42 @@ GenPat::compose(GpHandle handle1,
   ymuint32 fv4 = fv1_n & fv2;
   ymuint32 fv5 = fv1 ^ fv2;
 
-  bool valid1 = false;
-  if ( fv3 != 0U && fv3 != fv1 && fv3 != fv2 ) {
-    if ( (mFuncLevel[fv3] + mSlack) >= level_base + 1 ) {
-      valid1 = true;
-    }
+  ymuint sup0 = support(fv1) | support(fv2);
+
+  ymuint sup3 = support(fv3);
+  bool valid1 = true;
+  if ( sup3 != sup0 ) {
+    valid1 = false;
   }
-  bool valid2 = false;
-  if ( fv4 != 0U && fv4 != fv1_n && fv4 != fv2 ) {
-    if ( (mFuncLevel[fv4] + mSlack) >= level_base + 1 ) {
-      valid2 = true;
-    }
+  else if ( fv3 == fv1 || fv3 == fv2 ) {
+    valid1 = false;
   }
-  bool valid3 = false;
-  if ( fv5 != 0U && fv5 != 0xFFFF && fv5 != fv1 && fv5 != fv2 ) {
-    if ( (mFuncLevel[fv5] + mSlack) >= level_base + 1 ) {
-      valid3 = true;
-    }
+  else if ( (mFuncLevel[fv3] + mSlack) < level_base + 1 ) {
+    valid1 = false;
+  }
+
+  ymuint sup4 = support(fv4);
+  bool valid2 = true;
+  if ( sup4 != sup0 ) {
+    valid2 = false;
+  }
+  else if ( fv4 == fv1 || fv4 == fv2 ) {
+    valid2 = false;
+  }
+  else if ( (mFuncLevel[fv4] + mSlack) < level_base + 1 ) {
+    valid2 = false;
+  }
+
+  ymuint sup5 = support(fv5);
+  bool valid3 = true;
+  if ( sup5 != sup0 ) {
+    valid3 = false;
+  }
+  else if ( fv5 == fv1 || fv5 == fv2 ) {
+    valid3 = false;
+  }
+  else if ( (mFuncLevel[fv5] + mSlack) < level_base + 1 ) {
+    valid3 = false;
   }
 
   if ( !valid1 && !valid2 && !valid3 ) {
@@ -304,27 +348,37 @@ GenPat::compose(GpHandle handle1,
 
   ymuint level = count2(handle2) + level_base + 1;
 
-  if ( valid1 && (mFuncLevel[fv3] + mSlack) >= level ) {
-    GpHandle handle = mMgr.make_and(handle1, handle2);
-    add_pair(handle, level);
+  if ( valid1 ) {
+    add_cand(handle1, handle2, level, mAndCandPairListArray);
   }
 
-  if ( valid2 && (mFuncLevel[fv4] + mSlack) >= level ) {
-    GpHandle handle = mMgr.make_and(~handle1, handle2);
-    add_pair(handle, level);
+  if ( valid2 ) {
+    add_cand(~handle1, handle2, level, mAndCandPairListArray);
   }
 
-  if ( valid3 && (mFuncLevel[fv5] + mSlack) >= level ) {
-    GpHandle handle = mMgr.make_xor(handle1, handle2);
-    add_pair(handle, level);
+  if ( valid3 ) {
+    add_cand(handle1, handle2, level, mXorCandPairListArray);
   }
 }
 
-// @brief GpHandle を登録する．
-// @note 結果は mCandListArray に追加される．
+// @brief 候補のリストに追加する．
 void
-GenPat::add_pair(GpHandle handle,
-		 ymuint level)
+GenPat::add_cand(GpHandle handle1,
+		 GpHandle handle2,
+		 ymuint level,
+		 vector<vector<GpPair> >& list_array)
+{
+  while ( list_array.size() <= level ) {
+    list_array.push_back(vector<GpPair>());
+  }
+
+  list_array[level].push_back(GpPair(handle1, handle2));
+}
+
+// @brief GpHandle を登録する．
+void
+GenPat::add_pat(GpHandle handle,
+		ymuint level)
 {
   NpnXform xf(npn4cannon[handle.func()].mPerm);
   GpHandle chandle = xform4(handle, xf);
@@ -332,22 +386,43 @@ GenPat::add_pair(GpHandle handle,
   GpNode* node = chandle.node();
   if ( mGpHash.count(node->id()) == 0 ) {
     mGpHash.insert(node->id());
-    add_cand(chandle, level);
+
+    ymuint16 fv = chandle.func();
+    if ( mFuncArray[fv].empty() ) {
+      mFuncArray[fv].push_back(chandle);
+      mFuncLevel[fv] = level;
+      -- mRemainFunc;
+      -- mRemainRep;
+    }
+    else if ( mFuncLevel[fv] > level ) {
+      // ここにくることはないはず
+      mFuncLevel[fv] = level;
+    }
+    mGpList[level].push_back(chandle);
+    mRepList[level].push_back(chandle);
+
+    hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+    p = mNpnHash.find(chandle.func());
+    assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
+    const vector<FuncXform>& xf_list = p->second;
+    for (vector<FuncXform>::const_iterator q = xf_list.begin();
+	 q != xf_list.end(); ++ q) {
+      const FuncXform& xform = *q;
+      GpHandle handle1 = xform4(chandle, xform.mXf);
+      mGpList[level].push_back(handle1);
+#if 1
+      ymint16 fv1 = handle1.func();
+      if ( fv1 != fv && mFuncArray[fv1].empty() ) {
+	mFuncArray[fv1].push_back(handle1);
+	mFuncLevel[fv1] = level;
+	-- mRemainFunc;
+      }
+#endif
+    }
   }
   else {
     ++ duplicate_aig;
   }
-}
-
-// @brief 候補のリストに追加する．
-void
-GenPat::add_cand(GpHandle handle,
-		 ymuint level)
-{
-  while ( mCandListArray.size() <= level ) {
-    mCandListArray.push_back(vector<GpHandle>());
-  }
-  mCandListArray[level].push_back(handle);
 }
 
 // @brief handle の子供に印をつけてノード数を数える．

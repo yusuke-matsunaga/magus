@@ -12,7 +12,8 @@
 
 #include "ym_logic/zdd_nsdef.h"
 #include "ym_logic/VarId.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "gmpxx.h"
 
 
@@ -352,12 +353,12 @@ public:
   /// @brief ZDD の内容をダンプする．
   /// @param[in] s 出力ストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルに保存されたZDDを読み込む．
   /// @param[in] s 入力ストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
   /// @}
   //////////////////////////////////////////////////////////////////////

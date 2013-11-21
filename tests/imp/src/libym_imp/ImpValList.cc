@@ -149,6 +149,7 @@ ImpValList::cap_merge(const ImpValList& src1,
 		      const ImpValList& src2)
 {
   sanity_check();
+
   Cell* prev = &mDummyTop;
   Cell* cell = NULL;
   Cell* src1_cell = src1.mDummyTop.mLink;
@@ -200,6 +201,127 @@ ImpValList::cap_merge(const ImpValList& src1,
     }
   }
   sanity_check();
+}
+
+// @brief 2つのリストの共通部分をマージする．
+void
+ImpValList::cap_merge2(const ImpValList& src1,
+		       const ImpValList& src2)
+{
+  sanity_check();
+
+  // special case
+  {
+    int stat1 = check_list(src1);
+    switch ( stat1 ) {
+    case 0: break;
+    case 1: return;
+    case 2:
+      merge(src2);
+      return;
+    }
+  }
+  {
+    int stat2 = check_list(src2);
+    switch ( stat2 ) {
+    case 0: break;
+    case 1: return;
+    case 2:
+      merge(src1);
+      return;
+    }
+  }
+
+  Cell* prev = &mDummyTop;
+  Cell* cell = NULL;
+  Cell* src1_cell = src1.mDummyTop.mLink;
+  Cell* src2_cell = src2.mDummyTop.mLink;
+  while ( (cell = prev->mLink) != NULL && src1_cell != NULL && src2_cell != NULL ) {
+    if ( src1_cell->mVal < src2_cell->mVal ) {
+      src1_cell = src1_cell->mLink;
+    }
+    else if ( src1_cell->mVal > src2_cell->mVal ) {
+      src2_cell = src2_cell->mLink;
+    }
+    else { // src1_cell->mVal == src2_cell->mVal
+      if ( cell->mVal < src1_cell->mVal ) {
+	prev = cell;
+      }
+      else if ( cell->mVal == src1_cell->mVal ) {
+	prev = cell;
+	src1_cell = src1_cell->mLink;
+	src2_cell = src2_cell->mLink;
+      }
+      else { // cell->mVal > src1_cell->mVal
+	Cell* new_cell = get_cell();
+	new_cell->mVal = src1_cell->mVal;
+	prev->mLink = new_cell;
+	new_cell->mLink = cell;
+	prev = new_cell;
+	src1_cell = src1_cell->mLink;
+	src2_cell = src2_cell->mLink;
+	++ mNum;
+      }
+    }
+  }
+  while ( src1_cell != NULL && src2_cell != NULL ) {
+    if ( src1_cell->mVal < src2_cell->mVal ) {
+      src1_cell = src1_cell->mLink;
+    }
+    else if ( src1_cell->mVal > src2_cell->mVal ) {
+      src2_cell = src2_cell->mLink;
+    }
+    else { // src1_cell->mVal == src2_cell->mVal;
+      Cell* new_cell = get_cell();
+      new_cell->mVal = src1_cell->mVal;
+      prev->mLink = new_cell;
+      new_cell->mLink = NULL;
+      prev = new_cell;
+      src1_cell = src1_cell->mLink;
+      src2_cell = src2_cell->mLink;
+      ++ mNum;
+    }
+  }
+  sanity_check();
+}
+
+// @brief 同じIDを持った要素がないか調べる．
+// @param[in] src 対象のリスト
+// @retval 0 なかった．
+// @retval 1 同相でおなじIDを持つ要素があった．
+// @retval 2 逆相でおなじIDを持つ要素があった．
+int
+ImpValList::check_list(const ImpValList& src) const
+{
+  Cell* src0_cell = mDummyTop.mLink;
+  Cell* src1_cell = src.mDummyTop.mLink;
+  bool p_found = false;
+  while ( src0_cell != NULL && src1_cell != NULL ) {
+    ymuint id0 = src0_cell->mVal.id();
+    ymuint id1 = src1_cell->mVal.id();
+    if ( id0 < id1 ) {
+      src0_cell = src0_cell->mLink;
+    }
+    else if ( id0 > id1 ) {
+      src1_cell = src1_cell->mLink;
+    }
+    else { // id0 == id1
+      if ( src0_cell->mVal.val() == src1_cell->mVal.val() ) {
+	// 同相で同じ
+	//p_found = true;
+	src0_cell = src0_cell->mLink;
+	src1_cell = src1_cell->mLink;
+      }
+      else {
+	// 逆相で同じ
+	return 2;
+      }
+    }
+  }
+  if ( p_found ) {
+    return 1;
+  }
+  return 0;
 }
 
 // @brief 先頭を表す反復子を返す．

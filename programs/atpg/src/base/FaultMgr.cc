@@ -78,7 +78,7 @@ ord_ffr(const TgNode* node,
 {
   if ( !check_fos(node) && !node->is_input() ) {
     node_list.push_back(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       ord_ffr(node->fanin(i), node_list);
     }
@@ -108,7 +108,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     Fnode& fnode = mFnodeArray[i];
     fnode.mOfault[0] = new_fault(node, true, 0, 0);
     fnode.mOfault[1] = new_fault(node, true, 0, 1);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     void* p = mIfaultsAlloc.get_memory(sizeof(SaFault*) * ni * 2);
     fnode.mIfaults = new (p) SaFault*[ni * 2];
     for (ymuint j = 0; j < ni; ++ j) {
@@ -134,7 +134,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     }
     list<const TgNode*> node_list;
     node_list.push_back(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       ord_ffr(node->fanin(j), node_list);
     }
@@ -178,63 +178,57 @@ FaultMgr::reg_faults(const TgNode* node)
   SaFault* f0 = add_ofault(node, 0, rep0);
   SaFault* f1 = add_ofault(node, 1, rep1);
 
-  tTgGateType type = node->type();
-  ymuint ni = node->ni();
+  tTgGateType type = node->gate_type();
+  ymuint ni = node->fanin_num();
   switch ( type ) {
-  case kTgUndef:
-  case kTgInput:
-  case kTgOutput:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-
-  case kTgBuff:
+  case kTgGateBuff:
     add_ifault(node, 0, 0, f0);
     add_ifault(node, 0, 1, f1);
     break;
 
-  case kTgNot:
+  case kTgGateNot:
     add_ifault(node, 0, 0, f1);
     add_ifault(node, 0, 1, f0);
     break;
 
-  case kTgXor:
+  case kTgGateXor:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0);
       add_ifault(node, j, 1);
     }
     break;
 
-  case kTgAnd:
+  case kTgGateAnd:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0, f0);
       add_ifault(node, j, 1);
     }
     break;
 
-  case kTgNand:
+  case kTgGateNand:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0, f1);
       add_ifault(node, j, 1);
     }
     break;
 
-  case kTgOr:
+  case kTgGateOr:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0);
       add_ifault(node, j, 1, f1);
     }
     break;
 
-  case kTgNor:
+  case kTgGateNor:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0);
       add_ifault(node, j, 1, f0);
     }
     break;
 
-  default:
+  case kTgGateCplx:
     {
-      LogExpr ofunc = mNetwork->get_lexp(node);
+      LogExpr ofunc = mNetwork->get_lexp(node->func_id());
       for (ymuint j = 0; j < ni; ++ j) {
 	LogExpr tmp = ofunc.compose(VarId(j), LogExpr::make_zero());
 	SaFault* rep = NULL;
@@ -256,6 +250,10 @@ FaultMgr::reg_faults(const TgNode* node)
 	add_ifault(node, j, 1, rep);
       }
     }
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
     break;
   }
 }

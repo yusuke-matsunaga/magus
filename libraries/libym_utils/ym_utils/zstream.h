@@ -21,33 +21,15 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class zlib_error zstream.h "ym_utils/zstream.h"
-/// @brief zlib 関係のエラーオブジェクト
-//////////////////////////////////////////////////////////////////////
-struct zlib_error
-{
-  zlib_error(const char* label,
-	     int status,
-	     const char* msg) :
-    mLabel(label),
-    mStatus(status),
-    mMsg(msg)
-  {
-  }
-
-  const char* mLabel;
-  int mStatus;
-  const char* mMsg;
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class zstream zstream.h "ym_utils/zstream.h"
 /// @brief z_stream の C++ 的に進化したもの
 //////////////////////////////////////////////////////////////////////
 class zstream
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // クラスメソッド
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief zlib のバージョンを表す文字列を返す．
   static
@@ -56,14 +38,25 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  zstream();
+  /// @param[in] af alloc 関数
+  /// @param[in] ff free 関数
+  /// @param[in] op opaque オブジェクト
+  zstream(alloc_func af = Z_NULL,
+	  free_func ff = Z_NULL,
+	  voidp op = Z_NULL);
 
   /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
   zstream(const zstream& src);
 
   /// @brief 代入演算子
+  /// @param[in] src コピー元のオブジェクト
+  /// @return 自分自身への定数参照を返す．
   const zstream&
   operator=(const zstream& src);
 
@@ -72,28 +65,79 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 公開インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief deflate 用の初期化を行う．
+  /// @param[in] level 圧縮レベル ( 0 <= level <= 9 )
+  /// @retval Z_OK 初期化が成功した．
+  /// @retval Z_MEM_ERROR メモリの確保に失敗した．
+  /// @retval Z_STREAM_ERROR level の値が不適切だった．
+  /// @retval Z_VERSION_ERROR 呼出側とライブラリの間でバージョンの不一致があった．
+  /// @note level = 0 は非圧縮
   int
-  deflate_init(int level);
+  deflate_init(int level = Z_DEFAULT_COMPRESSION);
 
   /// @brief データを圧縮する．
+  /// @param[in] flush フラッシュフラグ
+  /// @note flush で意味のある値は以下のとおり
+  ///  - Z_NO_FLUSH   : フラッシュしない．
+  ///  - Z_SYNC_FLUSH : deflate() ごとにフラッシュする．
+  ///  - Z_FULL_FLUSH : Z_SYNC_FLUSH + 内部状態も毎回リセットする．
+  ///  - Z_FINISH     : 入力を一気に読み込む．
+  /// @retval Z_OK 何らかの処理を行なってエラーが起こらなかった．
+  /// @retval Z_STREAM_END 処理が終わった．
+  /// @retval Z_STREAM_ERROR 内部状態が異常だった．
+  /// @retval Z_BUF_ERROR 入力が読めなかったか出力バッファに余裕がなかった．
+  /// @note Z_FINISH を指定した場合，Z_STREAM_END を返すまで繰り返す必要がある．
   int
-  deflate(int flush);
+  deflate(int flush = Z_NO_FLUSH);
+
+  /// @brief avail_out の取得
+  /// @return 書き込めるデータのバイト数を返す．
+  uInt
+  avail_out() const;
 
   /// @brief deflate 用に確保された領域の解放を行う．
+  /// @retval Z_OK 処理が成功した．
+  /// @retval Z_STREAM_ERROR 内部状態が異常だった．
+  /// @retval Z_DATA_ERROR まだデータが残っている状態で呼び出された．
   int
   deflate_end();
 
   /// @brief inflate 用の初期化を行う．
+  /// @retval Z_OK 処理が成功した．
+  /// @retval Z_MEM_ERROR メモリの確保に失敗した．
+  /// @retval Z_VERSION_ERROR ヘッダとライブラリのバージョンが不一致だった．
   int
   inflate_init();
 
   /// @brief データを伸長する．
+  /// @param[in] flush フラッシュフラグ
+  /// @note flush で意味のある値は以下のとおり
+  ///  - Z_NO_FLUSH フラッシュしない
+  ///  - Z_SYNC_FLUSH できる限り出力バッファに書き出す．
+  ///  - Z_FINISH 一気に伸長を行なう．
+  ///  - Z_BLOCK ブロック単位で処理を行なう．
+  /// @retval Z_OK 処理が成功した．
+  /// @retval Z_NEED_DICT 辞書が必要
+  /// @retval Z_STREAM_END 全てのデータを処理し終わった．
+  /// @retval Z_DATA_ERROR 入力データが壊れていた．
+  /// @retval Z_MEM_ERROR 十分な量のメモリが確保できなかった．
+  /// @retval Z_STREAM_ERROR 内部状態が異常だった．
+  /// @retval Z_BUF_ERROR 出力バッファに空きがなかった．
   int
   inflate(int flush);
 
+  /// @brief avail_in の取得
+  /// @return 読み出せるデータのバイト数を返す．
+  uInt
+  avail_in() const;
+
   /// @brief inflate 用に確保された領域の解放を行う．
+  /// @retval Z_OK 処理が成功した．
+  /// @retval Z_STREAM_ERROR 内部状態が異常だった．
   int
   inflate_end();
 
@@ -101,32 +145,19 @@ public:
   int
   end();
 
-
-public:
-
-  /// @brief zalloc, zfree, opaque を設定する．
-  void
-  set_alloc(alloc_func af,
-	    free_func ff,
-	    voidp op);
-
   /// @brief in バッファを設定する．
+  /// @param[in] buf バッファ本体
+  /// @param[in] size バッファのサイズ
   void
-  set_inbuf(Bytef* buf,
-	    uInt size);
+  set_inbuf(const ymuint8* buf,
+	    ymuint64 size);
 
   /// @brief out バッファを設定する．
+  /// @param[in] buf バッファ本体
+  /// @param[in] size バッファのサイズ
   void
-  set_outbuf(Bytef* buf,
-	     uInt size);
-
-  /// @brief avail_in の取得
-  uInt
-  avail_in() const;
-
-  /// @brief avail_out の取得
-  uInt
-  avail_out() const;
+  set_outbuf(ymuint8* buf,
+	     ymuint64 size);
 
   /// @brief msg を得る．
   const char*
@@ -134,6 +165,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 圧縮用の内部のパラメータ調整用の公開インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 詳細な設定を行う deflate 用の初期化
   int
@@ -168,6 +202,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 伸長用の内部のパラメータ調整用の公開インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief inflate 用の詳細な設定を行う初期化
   int
@@ -188,7 +225,11 @@ public:
 
 
 #if ZLIB_VERNUM >= 0x1230
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // Ver 1.23 以降に追加された公開インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief deflate 用の細かなパラメータをセットする．
   int
@@ -209,7 +250,8 @@ public:
   /// @brief inflate 用のヘッダの取得
   int
   inflate_get_header(gz_headerp head);
-#endif
+
+#endif // ZLIB_VERNUM >= 0x1230
 
 
 private:
@@ -284,6 +326,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で呼ばれる下請け関数
+  //////////////////////////////////////////////////////////////////////
 
   // バッファの内容を書き出す．
   void
@@ -295,6 +340,7 @@ private:
   // 定数
   //////////////////////////////////////////////////////////////////////
 
+  // バッファサイズ
   static
   const ymuint kBufSize = 4096;
 
@@ -457,6 +503,9 @@ protected:
 
 
 protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // mBuff を zstream 用にキャストする．
   Bytef*
@@ -485,9 +534,9 @@ private:
   // 定数
   //////////////////////////////////////////////////////////////////////
 
-  enum {
-    kBufSize = 4096
-  };
+  // バッファサイズ
+  static
+  const ymuint kBufSize = 4096;
 
 
 private:
@@ -593,13 +642,18 @@ zstream::version()
 }
 
 // @brief コンストラクタ
+// @param[in] af alloc 関数
+// @param[in] ff free 関数
+// @param[in] op opaque オブジェクト
 inline
-zstream::zstream() :
+zstream::zstream(alloc_func af,
+		 free_func ff,
+		 voidp op) :
   mMode(0)
 {
-  mZ.zalloc = Z_NULL;
-  mZ.zfree = Z_NULL;
-  mZ.opaque = 0;
+  mZ.zalloc = af;
+  mZ.zfree = ff;
+  mZ.opaque = op;
 }
 
 // @brief コピーコンストラクタ
@@ -650,9 +704,7 @@ zstream::deflate_init(int level)
 {
   mMode = 1;
   int status = deflateInit(&mZ, level);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit", status, msg());
-  }
+  // エラーは素通しにする．
   return status;
 }
 
@@ -662,9 +714,7 @@ int
 zstream::deflate(int flush)
 {
   int status = ::deflate(&mZ, flush);
-  if ( status < 0 ) {
-    throw zlib_error("deflate", status, msg());
-  }
+  // エラーは素通しにする．
   return status;
 }
 
@@ -675,9 +725,7 @@ zstream::deflate_end()
 {
   mMode = 0;
   int status = deflateEnd(&mZ);
-  if ( status < 0 ) {
-    throw zlib_error("deflateEnd", status, msg());
-  }
+  // エラーは素通しにする．
   return status;
 }
 
@@ -688,9 +736,7 @@ zstream::inflate_init()
 {
   mMode = 2;
   int status = inflateInit(&mZ);
-  if ( status < 0 ) {
-    throw zlib_error("inflateInit", status, msg());
-  }
+  // エラーは素通しにする．
   return status;
 }
 
@@ -700,9 +746,7 @@ int
 zstream::inflate(int flush)
 {
   int status = ::inflate(&mZ, flush);
-  if ( status < 0 ) {
-    throw zlib_error("inflate", status, msg());
-  }
+  // エラーは素通しにする．
   return status;
 }
 
@@ -713,9 +757,7 @@ zstream::inflate_end()
 {
   mMode = 0;
   int status = inflateEnd(&mZ);
-  if ( status < 0 ) {
-    throw zlib_error("inflateEnd", status, msg());
-  }
+  // エラーは素通しにする．
   return status;
 }
 
@@ -734,33 +776,21 @@ zstream::end()
   return Z_OK;
 }
 
-// @brief zalloc, zfree, opaque を設定する．
-inline
-void
-zstream::set_alloc(alloc_func af,
-		   free_func ff,
-		   voidp op)
-{
-  mZ.zalloc = af;
-  mZ.zfree = ff;
-  mZ.opaque = op;
-}
-
 // @brief in バッファを設定する．
 inline
 void
-zstream::set_inbuf(Bytef* buf,
-		   uInt size)
+zstream::set_inbuf(const ymuint8* buf,
+		   ymuint64 size)
 {
-  mZ.next_in = buf;
+  mZ.next_in = const_cast<Bytef*>(buf);
   mZ.avail_in = size;
 }
 
 // @brief out バッファを設定する．
 inline
 void
-zstream::set_outbuf(Bytef* buf,
-		    uInt size)
+zstream::set_outbuf(ymuint8* buf,
+		    ymuint64 size)
 {
   mZ.next_out = buf;
   mZ.avail_out = size;
@@ -801,9 +831,6 @@ zstream::deflate_init2(int level,
 {
   mMode = 1;
   int status = deflateInit2(&mZ, level, method, windowBits, memLevel, strategy);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -814,9 +841,6 @@ zstream::deflate_set_dictionary(const Bytef* dictionary,
 				uInt dictLength)
 {
   int status = deflateSetDictionary(&mZ, dictionary, dictLength);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 
 }
@@ -827,9 +851,6 @@ int
 zstream::deflate_reset()
 {
   int status = deflateReset(&mZ);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -840,9 +861,6 @@ zstream::deflate_params(int level,
 			int strategy)
 {
   int status = deflateParams(&mZ, level, strategy);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -852,9 +870,6 @@ int
 zstream::deflate_bound(uLong sourceLen)
 {
   int status = deflateBound(&mZ, sourceLen);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -865,9 +880,6 @@ zstream::deflate_prime(int bits,
 		       int value)
 {
   int status = deflatePrime(&mZ, bits, value);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -878,9 +890,6 @@ zstream::inflate_init2(int windowBits)
 {
   mMode = 2;
   int status = inflateInit2(&mZ, windowBits);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -891,9 +900,6 @@ zstream::inflate_set_dictionary(const Bytef* dictionary,
 				uInt dictLength)
 {
   int status = inflateSetDictionary(&mZ, dictionary, dictLength);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -903,9 +909,6 @@ int
 zstream::inflate_sync()
 {
   int status = inflateSync(&mZ);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -915,9 +918,6 @@ int
 zstream::inflate_reset()
 {
   int status = inflateReset(&mZ);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -932,9 +932,6 @@ zstream::deflate_tune(int good_length,
 		      int max_chain)
 {
   int status = deflateTune(&mZ, good_length, max_lazy, nice_length, max_chain);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -944,9 +941,6 @@ int
 zstream::deflate_set_header(gz_headerp head)
 {
   int status = deflateSetHeader(&mZ, head);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -957,9 +951,6 @@ zstream::inflate_prime(int bits,
 		       int value)
 {
   int status = inflatePrime(&mZ, bits, value);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 
@@ -969,9 +960,6 @@ int
 zstream::inflate_get_header(gz_headerp head)
 {
   int status = inflateGetHeader(&mZ, head);
-  if ( status < 0 ) {
-    throw zlib_error("deflateInit2", status, msg());
-  }
   return status;
 }
 #endif

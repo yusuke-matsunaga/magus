@@ -11,6 +11,7 @@
 
 #include "ymtools.h"
 #include "ym_utils/SimpleAlloc.h"
+#include "NpnXform.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -61,6 +62,16 @@ public:
   make_and(NpnHandle fanin0,
 	   NpnHandle fanin1);
 
+  /// @brief ORノードを生成する．
+  /// @param[in] fanin0 ファンイン0
+  /// @param[in] fanin1 ファンイン1
+  /// @note もしも既に同じ構造のノードがあればそれを返す．
+  /// @note 場合によってはファンインその物や定数ノードを返すこともある．
+  /// @note 実際には AND ノード＋反転属性
+  NpnHandle
+  make_or(NpnHandle fanin0,
+	  NpnHandle fanin1);
+
   /// @brief XORノードを生成する．
   /// @param[in] fanin0 ファンイン0
   /// @param[in] fanin1 ファンイン1
@@ -76,7 +87,16 @@ public:
 
   /// @brief ハンドルの表す関数を返す．
   ymuint16
-  func(NpnHandle handle) const;
+  handle_func(NpnHandle handle) const;
+
+  /// @brief NpnHandle に NPN 変換を施す．
+  NpnHandle
+  xform_handle(NpnHandle handle,
+	       NpnXform xf) const;
+
+  /// @brief 展開したノード数を仮想的に返す．
+  ymuint
+  count(NpnHandle handle) const;
 
   /// @brief ハンドルとその子供の内容を出力する．
   void
@@ -88,26 +108,59 @@ public:
   dump_handle(ostream& s,
 	      const vector<NpnHandle>& handle_list) const;
 
+  /// @brief ハンドルとその子供の内容を出力する．
+  void
+  dump_handle2(ostream& s,
+	       NpnHandle handle) const;
+
+  /// @brief 複数のハンドルとその子供の内容を出力する．
+  void
+  dump_handle2(ostream& s,
+	       const vector<NpnHandle>& handle_list) const;
+
+  /// @brief 全ノード数を返す．
+  ymuint
+  node_num() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 枝を正規化する．
-  NpnHandle
-  cannonical(NpnHandle src);
-
   /// @brief 新しいノードを登録する関数
   /// @param[in] is_xor XOR ノードの時 true にするフラグ
-  /// @param[in] func 関数ベクタ
+  /// @param[in] oinv 出力の極性
   /// @param[in] fanin0, fanin1 ファンインのハンドル
   /// @note おなじノードが既に存在していたらそのノードを返す．
-  NpnNode*
+  NpnHandle
   new_node(bool is_xor,
-	   ymuint16 func,
+	   bool oinv,
 	   NpnHandle fanin0,
 	   NpnHandle fanin1);
+
+  /// @brief ファンインを正規化する．
+  void
+  normalize(NpnHandle fanin0,
+	    NpnHandle fanin1,
+	    NpnHandle& new_fanin0,
+	    NpnHandle& new_fanin1,
+	    NpnXform& oxf,
+	    bool is_xor);
+
+  /// @brief 関数を求める．
+  ymuint
+  calc_func(bool is_xor,
+	    NpnHandle fanin0,
+	    NpnHandle fanin1,
+	    NpnXform oxf);
+
+  /// @brief 関数を求める．
+  ymuint
+  calc_func(bool is_xor,
+	    NpnHandle fanin0,
+	    NpnHandle fanin1,
+	    bool oinv);
 
   /// @brief ノードを生成する関数
   NpnNode*
@@ -123,11 +176,22 @@ private:
   void
   alloc_table(ymuint req_size);
 
+  /// @brief count() の下請け関数
+  ymuint
+  count_sub(NpnHandle handle,
+	    hash_set<ymuint32>& hash1) const;
+
   /// @brief dump_handle() の下請け関数
   void
   dh_sub(ostream& s,
 	 ymuint id,
 	 hash_set<ymuint32>& node_hash) const;
+
+  /// @brief dump_handle() の下請け関数
+  void
+  dh2_sub(ostream& s,
+	  NpnHandle handle,
+	  hash_set<ymuint32>& node_hash) const;
 
 
 private:
@@ -172,6 +236,14 @@ NpnNode*
 NpnNodeMgr::node(ymuint id) const
 {
   return mNodeList[id];
+}
+
+// @brief 全ノード数を返す．
+inline
+ymuint
+NpnNodeMgr::node_num() const
+{
+  return mNodeList.size();
 }
 
 END_NAMESPACE_YM

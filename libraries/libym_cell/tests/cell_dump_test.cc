@@ -11,6 +11,9 @@
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
 
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
+
 
 BEGIN_NAMESPACE_YM_CELL
 
@@ -35,33 +38,26 @@ dump_load_test(const char* in_filename,
 
   const char* data_filename = "cell_dump.bin";
   {
-    ofstream os;
-    os.open(data_filename, ios::binary);
-    if ( !os ) {
+    FileODO bo(data_filename);
+    if ( !bo ) {
       // エラー
       cerr << "Could not create " << data_filename << endl;
       return false;
     }
-    BinOStream bos(os);
-
-    library->dump(bos);
-
-    os.close();
+    library->dump(bo);
   }
 
   CellLibrary* library2 = NULL;
   {
-    ifstream ifs;
-    ifs.open(data_filename, ios::binary);
-    if ( !ifs ) {
+    FileIDO bi(data_filename);
+    if ( !bi ) {
       // エラー
       cerr << "Could not open " << data_filename << endl;
       return false;
     }
-    BinIStream bis(ifs);
 
     library2 = CellLibrary::new_obj();
-    library2->restore(bis);
+    library2->restore(bi);
   }
 
   display_library(cout, *library2);

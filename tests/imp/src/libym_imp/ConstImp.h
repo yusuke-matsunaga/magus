@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
+#include "ym_networks/BNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -18,8 +18,8 @@ class ImpMgr;
 class ImpInfo;
 
 //////////////////////////////////////////////////////////////////////
-/// @class ConstImp ConstImp.h "ConstImp.h"
-/// @brief SATを用いた間接含意エンジン
+/// @class ConstImp ConstImp.h "CosntImp.h"
+/// @brief 構造を用いた間接含意エンジン
 //////////////////////////////////////////////////////////////////////
 class ConstImp
 {
@@ -29,6 +29,7 @@ public:
   ConstImp();
 
   /// @brief デストラクタ
+  virtual
   ~ConstImp();
 
 
@@ -39,6 +40,7 @@ public:
 
   /// @brief ネットワーク中の間接含意を求める．
   /// @param[in] imp_mgr マネージャ
+  virtual
   void
   learning(ImpMgr& imp_mgr);
 

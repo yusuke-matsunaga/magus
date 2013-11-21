@@ -54,6 +54,11 @@ public:
   bool
   is_string() const;
 
+  /// @brief ベクタ型(kVector)の時に true を返す．
+  virtual
+  bool
+  is_vector() const;
+
   /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
   virtual
   bool
@@ -68,11 +73,6 @@ public:
   virtual
   bool
   is_group() const;
-
-  /// @brief 属性型(kAttr)の時に true を返す．
-  virtual
-  bool
-  is_attr() const;
 
   /// @brief 整数値を返す．
   /// @note is_int() = true の時のみ意味を持つ．
@@ -92,6 +92,26 @@ public:
   ShString
   string_value() const;
 
+  /// @brief ベクタの要素数を返す．
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  ymuint
+  vector_size() const;
+
+  /// @brief ベクタの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  double
+  vector_elem(ymuint pos) const;
+
+  /// @brief ベクタの全体を取り出す．
+  /// @param[out] vector 結果を格納する変数
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  void
+  get_vector(vector<double>& vector) const;
+
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
@@ -104,17 +124,18 @@ public:
   const DotlibNode*
   opr2() const;
 
-  /// @brief リストの先頭の要素を返す．
-  /// @note is_list() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  top() const;
-
   /// @brief リストの要素数を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   ymuint
   list_size() const;
+
+  /// @brief リストの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+  /// @note is_list() == true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  list_elem(ymuint pos) const;
 
   /// @brief グループの値を得る．
   /// @note is_group() = true の時のみ意味を持つ．
@@ -125,26 +146,8 @@ public:
   /// @brief 先頭の属性を得る．
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
-  const DotlibNode*
+  const DotlibAttr*
   attr_top() const;
-
-  /// @brief 属性名を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  ShString
-  attr_name() const;
-
-  /// @brief 属性の値を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  attr_value() const;
-
-  /// @brief リストの次の要素を得る．
-  /// @note これはすべての型で意味を持つ．
-  virtual
-  const DotlibNode*
-  next() const;
 
 
 public:
@@ -164,21 +167,7 @@ public:
   /// @note is_group() = true の時のみ意味を持つ．
   virtual
   void
-  add_attr(DotlibNodeImpl* attr);
-
-  /// @brief 次の要素を設定する．
-  /// @param[in] next 次の要素
-  void
-  set_next(DotlibNodeImpl* next);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 次の要素を指すリンクポインタ
-  DotlibNodeImpl* mNext;
+  add_attr(DotlibAttr* attr);
 
 };
 
@@ -409,6 +398,82 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
+/// @class DotlibVector DotlibNodeImpl.h "DotlibNodeImpl.h"
+/// @brief ベクタを表すクラス
+//////////////////////////////////////////////////////////////////////
+class DotlibVector :
+  public DotlibNodeBase
+{
+  friend class DotlibMgrImpl;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] value_list 値のリスト
+  /// @param[in] loc ファイル上の位置
+  DotlibVector(const vector<double>& value_list,
+	       const FileRegion& loc);
+
+  /// @brief デストラクタ
+  ~DotlibVector();
+
+
+public:
+
+  /// @brief 型を得る．
+  virtual
+  tType
+  type() const;
+
+  /// @brief ベクタ型(kVector)の時に true を返す．
+  virtual
+  bool
+  is_vector() const;
+
+  /// @brief ベクタの要素数を返す．
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  ymuint
+  vector_size() const;
+
+  /// @brief ベクタの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  double
+  vector_elem(ymuint pos) const;
+
+  /// @brief ベクタの全体を取り出す．
+  /// @param[out] vector 結果を格納する変数
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  void
+  get_vector(vector<double>& vector) const;
+
+  /// @brief 内容をストリーム出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] indent インデント量
+  virtual
+  void
+  dump(ostream& s,
+       ymuint indent = 0) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 要素数
+  ymuint32 mNum;
+
+  // ベクタの本体
+  double mBody[1];
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class DotlibNot DotlibNodeImpl.h "DotlibNodeImpl.h"
 /// @brief NOT 演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
@@ -582,17 +647,18 @@ public:
   FileRegion
   loc() const;
 
-  /// @brief リストの先頭の要素を返す．
-  /// @note type() が kList の時のみ意味をもつ．
-  virtual
-  const DotlibNode*
-  top() const;
-
   /// @brief リストの要素数を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   ymuint
   list_size() const;
+
+  /// @brief リストの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+  /// @note is_list() == true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  list_elem(ymuint pos) const;
 
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム
@@ -621,11 +687,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 先頭の要素
-  const DotlibNodeImpl* mTop;
-
-  // 末尾の要素
-  DotlibNodeImpl* mTail;
+  // 要素
+  vector<const DotlibNodeImpl*> mBody;
 
 };
 
@@ -674,7 +737,7 @@ public:
   /// @brief 先頭の属性を得る．
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
-  const DotlibNode*
+  const DotlibAttr*
   attr_top() const;
 
   /// @brief 内容をストリーム出力する．
@@ -696,7 +759,7 @@ public:
   /// @note type() が kGroup の時のみ意味を持つ．
   virtual
   void
-  add_attr(DotlibNodeImpl* attr);
+  add_attr(DotlibAttr* attr);
 
 
 private:
@@ -708,82 +771,10 @@ private:
   const DotlibNode* mValue;
 
   // 属性の先頭
-  DotlibNodeImpl* mAttrTop;
+  DotlibAttr* mAttrTop;
 
   // 属性の末尾
-  DotlibNodeImpl* mAttrTail;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DotlibAttr DotlibNodeImpl.h "DotlibNodeImpl.h"
-/// @brief 属性を表す DotlibNode の継承クラス
-//////////////////////////////////////////////////////////////////////
-class DotlibAttr :
-  public DotlibNodeBase
-{
-  friend class DotlibMgrImpl;
-
-private:
-
-  /// @brief コンストラクタ
-  /// @param[in] attr_name 属性名
-  /// @param[in] value 値
-  /// @param[in] loc ファイル上の位置
-  DotlibAttr(const ShString& attr_name,
-	     const DotlibNode* value,
-	     const FileRegion& loc);
-
-  /// @brief デストラクタ
-  virtual
-  ~DotlibAttr();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を参照する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型を得る．
-  virtual
-  tType
-  type() const;
-
-  /// @brief 属性型(kAttr)の時に true を返す．
-  virtual
-  bool
-  is_attr() const;
-
-  /// @brief 属性名を得る．
-  virtual
-  ShString
-  attr_name() const;
-
-  /// @brief 属性の値を得る．
-  virtual
-  const DotlibNode*
-  attr_value() const;
-
-  /// @brief 内容をストリーム出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] indent インデント量
-  virtual
-  void
-  dump(ostream& s,
-       ymuint indent = 0) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 属性名
-  ShString mAttrName;
-
-  // 値
-  const DotlibNode* mValue;
+  DotlibAttr* mAttrTail;
 
 };
 

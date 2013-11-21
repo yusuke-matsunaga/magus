@@ -10,7 +10,7 @@
 
 
 #include "BddMgrImpl.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -26,7 +26,7 @@ public:
   /// @param[in] mgr BddMgr
   /// @param[in] s 入力元のストリーム
   Restorer(BddMgrImpl* mgr,
-	   BinI& s);
+	   IDO& s);
 
   /// @brief デストラクタ
   ~Restorer();
@@ -66,7 +66,7 @@ private:
   BddMgrImpl* mMgr;
 
   // 入力用のストリーム
-  BinI& mStream;
+  IDO& mStream;
 
   // 根の枝を格納しておくベクタ
   vector<BddEdge> mRootVector;

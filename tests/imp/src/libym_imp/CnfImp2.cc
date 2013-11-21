@@ -45,11 +45,11 @@ CnfImp2::learning(const BdnMgr& network,
     mgr.new_var(VarId(i));
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   network.sort(node_list);
 
   CNFdd cnf = mgr.make_empty();
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* bnode = *p;
     ymuint id = bnode->id();

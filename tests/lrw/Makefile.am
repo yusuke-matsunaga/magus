@@ -31,11 +31,13 @@ AM_CPPFLAGS = \
 noinst_PROGRAMS = \
 	npngen \
 	cannonical \
+	ident \
 	read_table \
 	xform_comp_gen \
 	npntest \
 	npnnodemgr_test \
 	genpat \
+	normalize \
 	lrw
 
 npngen_SOURCES = \
@@ -51,12 +53,29 @@ cannonical_SOURCES = \
 	NpnXform.h \
 	NpnXform.cc
 
+normalize_SOURCES = \
+	normalize.cc \
+	NpnXform.h \
+	NpnXform.cc
+
+ident_SOURCES = \
+	ident.cc \
+	NpnXform.h \
+	NpnXform.cc
+
 read_table_SOURCES = \
 	read_table.cc \
 	abc_data.cc \
 	RwtMgr.h \
 	RwtMgr.cc \
-	RwtNode.h
+	RwtNode.h \
+	NpnNodeMgr.h \
+	NpnNodeMgr.cc \
+	NppHandle.h \
+	NpnNode.h \
+	NpnXform.h \
+	NpnXform.cc
+
 
 read_table_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
@@ -88,6 +107,7 @@ npnnodemgr_test_LDADD = \
 genpat_SOURCES = \
 	NpnXform.h \
 	NpnXform.cc \
+	NpnHandle.h \
 	NpnNode.h \
 	NpnNodeMgr.h \
 	NpnNodeMgr.cc \
@@ -98,7 +118,12 @@ genpat_SOURCES = \
 	GpMgr.h \
 	GpMgr.cc \
 	GpNode.h \
-	genpat.cc
+	genpat.cc \
+	npn4cannon.h \
+	npn4ident.h \
+	npn4norm.h \
+	npn4perm.h \
+	npn4rep.h
 
 genpat_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \

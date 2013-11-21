@@ -9,6 +9,7 @@ SUBDIRS = \
 	expr \
 	npn \
 	sat \
-	aig
+	aig \
+	$(YM_EXTRA_TESTS_SUBDIRS)
 
 MAINTAINERCLEANFILES = Makefile.in

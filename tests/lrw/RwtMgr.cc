@@ -138,6 +138,8 @@ RwtMgr::init()
     RwtNode* node = find_node(func);
     assert_cond( node != NULL, __FILE__, __LINE__);
   }
+
+  cout << "read_abc_table end. # of nodes = " << mNodeNum << endl;
 }
 
 // @brief ノードを設定する．
@@ -192,6 +194,22 @@ RwtMgr::find_node(ymuint16 func) const
     return NULL;
   }
   return p->second;
+}
+
+// @brief ノード数を得る．
+ymuint
+RwtMgr::node_num() const
+{
+  return mNodeNum;
+}
+
+// @brief ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < node_num() )
+RwtNode*
+RwtMgr::node(ymuint pos) const
+{
+  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
+  return &mNodeArray[pos];
 }
 
 // @brief 内容をダンプする．

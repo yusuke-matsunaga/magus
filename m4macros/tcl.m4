@@ -35,7 +35,7 @@ for ym_tmp_dir in $prefix $ac_default_prefix /usr /usr/local; do
   done
 done
 YM_CHECK_TCLLIB(tcl, $ym_tmp_path,
-                [tcl8.5 tcl8.4 tcl8.3 tcl8.2 tcl8.1 tcl8.0 tcl8.0jp tcl],
+                [tcl8.6 tcl8.5 tcl8.4 tcl8.3 tcl8.2 tcl8.1 tcl8.0 tcl8.0jp tcl],
                 TCL_LIB_SPEC, TCL_MAJOR_VERSION, TCL_MINOR_VERSION)
 if test $ym_tmp_found = no; then
   AC_MSG_ERROR([Tcl is not found. Use --with-tcl to specify the directory containing TclConfig.sh])
@@ -105,7 +105,7 @@ CPPFLAGS="$CPPFLAGS $TCL_INCLUDES"
 # Checks for Tk
 ym_have_tk=no
 YM_CHECK_TCLLIB(tk, $ym_tmp_path,
-                [tk8.5 tk8.4 tk8.3 tk8.2 tk8.1 tk8.0 tk8.0jp tk],
+                [tk8.6 tk8.5 tk8.4 tk8.3 tk8.2 tk8.1 tk8.0 tk8.0jp tk],
                 TK_LIB_SPEC, TK_MAJOR_VERSION, TK_MINOR_VERSION)
 if test $ym_tmp_found = yes; then
   TK_LDADD="$ym_tmp_ldadd $ym_tcl_ldadd $TK_LIBS"

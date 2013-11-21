@@ -158,7 +158,7 @@ CnfImp::learning(ImpMgr& imp_mgr,
   for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
        p != node_list.rend(); ++ p) {
     ImpNode* node = *p;
-    if ( !node->fanout_list().empty() ) {
+    if ( node->fanout_num() > 0 ) {
       rnode_list.push_back(node);
     }
   }
@@ -268,14 +268,13 @@ CnfImp::learning(ImpMgr& imp_mgr,
 
 	CNFdd& dst0_list = imp_lists[idx_0];
 	CNFdd& dst1_list = imp_lists[idx_1];
-	const vector<ImpEdge*>& fo_list = node->fanout_list();
-	for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
-	     p != fo_list.end(); ++ p) {
-	  const ImpEdge* edge = *p;
-	  ImpNode* onode = edge->dst_node();
+	ymuint nfo = node->fanout_num();
+	for (ymuint i = 0; i < nfo; ++ i) {
+	  const ImpEdge& edge = node->fanout(i);
+	  ImpNode* onode = edge.dst_node();
 	  ymuint oid = onode->id();
-	  ymuint opos = edge->dst_pos();
-	  bool inv = edge->src_inv();
+	  ymuint opos = edge.dst_pos();
+	  bool inv = edge.src_inv();
 	  ymuint oidx_0 = oid * 2 + 0;
 	  ymuint oidx_1 = oid * 2 + 1;
 

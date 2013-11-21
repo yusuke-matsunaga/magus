@@ -47,12 +47,12 @@ RtpgCmd::~RtpgCmd()
 int
 RtpgCmd::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
     return TCL_ERROR;
   }
-  
+
   bool n_flag = false;
   ymuint max_pat = 10000;
   ymuint max_i = 4;
@@ -78,16 +78,16 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
   if ( mPoptFile->is_specified() ) {
     // 未実装
   }
-  
+
   bool print_stats = mPoptPrintStats->is_specified();
-  
+
   if ( n_flag ) {
     min_f = 0;
     max_i = 0;
   }
-  
+
   mRtpg(min_f, max_i, max_pat);
-  
+
   after_update_faults();
 
   if ( print_stats ) {
@@ -101,7 +101,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
 	 << ": # of effective patterns" << endl
 	 << stats.time() << endl;
   }
-  
+
   return TCL_OK;
 }
 

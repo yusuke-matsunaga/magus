@@ -2,7 +2,7 @@
 /// @file calc_svf/CalcSvf.cc
 /// @brief CalcSvf の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: CalcSvf.cc 1920 2008-12-20 15:52:42Z matsunaga $
 ///
 /// Copyright (C) 2005-2008 Yusuke Matsunaga
@@ -38,7 +38,7 @@ CalcSvf::CalcSvf() :
   mNodeAlloc(4096)
 {
 }
-  
+
 // @brief デストラクタ
 CalcSvf::~CalcSvf()
 {
@@ -65,9 +65,9 @@ CalcSvf::clear()
   mLogicArray.clear();
 
   mFFRArray.clear();
-  
+
   mClearArray.clear();
-  
+
   mNodeAlloc.destroy();
 
   // 念のため
@@ -113,7 +113,7 @@ CalcSvf::set_network(const TgNetwork& network,
 		     bool dss)
 {
   assert_cond(time_frame > 0, __FILE__, __LINE__);
-  
+
   clear();
 
   mNetwork = &network;
@@ -124,7 +124,7 @@ CalcSvf::set_network(const TgNetwork& network,
   size_t no = mNetwork->output_num2();
   size_t no1 = mNetwork->output_num1();
   size_t nl = mNetwork->logic_num();
-  
+
   // SimNode の生成
   // 対応付けを行うマップの初期化
   mSimMapOffset = nn;
@@ -133,7 +133,7 @@ CalcSvf::set_network(const TgNetwork& network,
   mOutputArray.resize(no + no1 * (time_frame - 1));
   mOutput1Array.resize(no);
   mNodeArray.reserve(nn * time_frame);
-  
+
   // 外部入力に対応する SimNode の生成
   for (size_t i = 0; i < ni; ++ i) {
     const TgNode* tgnode = mNetwork->input(i);
@@ -145,7 +145,7 @@ CalcSvf::set_network(const TgNetwork& network,
   // 論理ノードに対応する SimNode の生成
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* tgnode = mNetwork->sorted_logic(i);
-    size_t ni = tgnode->ni();
+    size_t ni = tgnode->fanin_num();
     vector<SimNode*> inputs(ni);
     for (size_t i = 0; i < ni; ++ i) {
       const TgNode* itgnode = tgnode->fanin(i);
@@ -167,7 +167,7 @@ CalcSvf::set_network(const TgNetwork& network,
     mSimMap[tgnode->gid()] = simnode;
     simnode->mTimeFrame = 0;
   }
-  
+
   // 外部出力に対応する SimNode の生成
   for (size_t i = 0; i < no1; ++ i) {
     const TgNode* onode = mNetwork->output(i);
@@ -184,13 +184,13 @@ CalcSvf::set_network(const TgNetwork& network,
     inode->set_output1();
     mOutput1Array[i] = inode;
   }
-  
+
   // 時間展開を行う．
   for (size_t tf = 1; tf < time_frame; ++ tf) {
     size_t offset = nn * tf;
     size_t ioffset = ni + ni1 * (tf - 1);
     size_t ooffset = no1 * tf;
-    
+
     // 真の外部入力はタイムフレーム数分作る．
     for (size_t i = 0; i < ni1; ++ i) {
       const TgNode* tgnode = mNetwork->input(i);
@@ -208,11 +208,11 @@ CalcSvf::set_network(const TgNetwork& network,
       SimNode* inode = find_simnode(tginode->fanin(0), tf - 1);
       mSimMap[tgnode->gid() + offset] = inode;
     }
-    
+
     // 論理ノードに対応する SimNode の生成
     for (size_t i = 0; i < nl; ++ i) {
       const TgNode* tgnode = mNetwork->sorted_logic(i);
-      size_t ni = tgnode->ni();
+      size_t ni = tgnode->fanin_num();
       vector<SimNode*> inputs(ni);
       for (size_t i = 0; i < ni; ++ i) {
 	const TgNode* itgnode = tgnode->fanin(i);
@@ -220,7 +220,7 @@ CalcSvf::set_network(const TgNetwork& network,
 	assert_cond(inode, __FILE__, __LINE__);
 	inputs[i] = inode;
       }
-      
+
       // 出力の論理を表す SimNode を作る．
       SimNode* simnode = NULL;
       if ( tgnode->is_cplx_logic() ) {
@@ -234,7 +234,7 @@ CalcSvf::set_network(const TgNetwork& network,
       mSimMap[tgnode->gid() + offset] = simnode;
       simnode->mTimeFrame = tf;
     }
-  
+
     // 外部出力に対応する SimNode の生成
     for (size_t i = 0; i < no1; ++ i) {
       const TgNode* onode = mNetwork->output(i);
@@ -244,7 +244,7 @@ CalcSvf::set_network(const TgNetwork& network,
       mOutputArray[i + ooffset] = inode;
     }
   }
-  
+
   // 外部出力に対応する SimNode の生成
   size_t offset = nn * (time_frame - 1);
   size_t ooffset = no1 * (time_frame - 1);
@@ -255,7 +255,7 @@ CalcSvf::set_network(const TgNetwork& network,
     mSimMap[onode->gid() + offset] = inode;
     mOutputArray[i + ooffset] = inode;
   }
-  
+
   // 各ノードのファンアウト数を数える．
   // complex gate を分解しているので TgNode と異なる場合がある．
   for (vector<SimNode*>::iterator p = mNodeArray.begin();
@@ -287,7 +287,7 @@ CalcSvf::set_network(const TgNetwork& network,
       ++ inode->mNfo;
     }
   }
-  
+
   // FFR の設定
   size_t node_num = mNodeArray.size();
   size_t fn = 0;
@@ -315,10 +315,10 @@ CalcSvf::set_network(const TgNetwork& network,
       node->mFFR = node->fanout(0)->mFFR;
     }
   }
-  
+
   // mClearArray の最大サイズは全ノード数
   mClearArray.reserve(node_num);
-  
+
   // 最大レベルを求め，イベントキューを初期化する．
   size_t max_level = 0;
   for (vector<SimNode*>::iterator p = mOutput1Array.begin();
@@ -329,7 +329,7 @@ CalcSvf::set_network(const TgNetwork& network,
     }
   }
   mEventQ.init(max_level);
-  
+
   if ( dss ) {
     find_dss();
   }
@@ -342,7 +342,7 @@ CalcSvf::find_dss()
   size_t fn = mFFRArray.size();
   size_t no = mOutput1Array.size();
   size_t nn = mNodeArray.size();
-  
+
   // po-mark の設定
   // po-mark は FFR の根のノードでしか計算しない．
   vector<PoMark> pmarray(nn);
@@ -372,7 +372,7 @@ CalcSvf::find_dss()
       pomark.merge(pomark1);
     }
   }
-    
+
 
   NodeSet cur_set(nn);
   NodeSet tmp_set(nn);
@@ -387,9 +387,9 @@ CalcSvf::find_dss()
     SimFFR& ffr = mFFRArray[i];
     SimNode* node = ffr.root();
     if ( node->is_output1() ) continue;
-    
+
     dss.clear();
-    
+
     // node のファンアウトを cur_set に入れる．
     cur_set.clear();
     size_t nfo = node->nfo();
@@ -403,11 +403,11 @@ CalcSvf::find_dss()
       // 共有しているノードは next_set にコピーする．
       sharedpo.clear();
       next_set.clear();
-      
+
       // next_set の要素のレベルの最小値
       size_t min_level = 0;
       SimNode* min_node = NULL;
-      
+
       size_t n = cur_set.num();
       for (size_t i = 0; i < n; ++ i) {
 	SimNode* node = cur_set.node(i);
@@ -422,7 +422,7 @@ CalcSvf::find_dss()
 	  for (size_t j = i + 1; j < n; ++ j) {
 	    SimNode* node1 = cur_set.node(j);
 	    if ( node1 == NULL ) continue;
-	    
+
 	    const PoMark& pomark1 = pmarray[node1->ffr()->root()->id()];
 	    if ( pomark && pomark1 ) {
 	      shared = true;
@@ -433,7 +433,7 @@ CalcSvf::find_dss()
 		min_level = node1->level();
 		min_node = node1;
 	      }
-	      
+
 	      // 処理済みの印として NULL にしておく
 	      cur_set.del(j);
 	      break;
@@ -634,7 +634,7 @@ CalcSvf::make_node(tTgGateType type,
     p = mNodeAlloc.get_memory(sizeof(SnInput));
     node = new (p) SnInput(id);
     break;
-    
+
   case kTgBuff:
     p = mNodeAlloc.get_memory(sizeof(SnBuff));
     node = new (p) SnBuff(id, inputs);
@@ -656,19 +656,19 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnAnd3));
       node = new (p) SnAnd3(id, inputs);
       break;
-      
+
     case 4:
       p = mNodeAlloc.get_memory(sizeof(SnAnd4));
       node = new (p) SnAnd4(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnAnd));
       node = new (p) SnAnd(id, inputs);
       break;
     }
     break;
-    
+
   case kTgNand:
     switch ( ni ) {
     case 2:
@@ -680,7 +680,7 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnNand3));
       node = new (p) SnNand3(id, inputs);
       break;
-      
+
     case 4:
       p = mNodeAlloc.get_memory(sizeof(SnNand4));
       node = new (p) SnNand4(id, inputs);
@@ -699,7 +699,7 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnOr2));
       node = new (p) SnOr2(id, inputs);
       break;
-      
+
     case 3:
       p = mNodeAlloc.get_memory(sizeof(SnOr3));
       node = new (p) SnOr3(id, inputs);
@@ -709,7 +709,7 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnOr4));
       node = new (p) SnOr4(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnOr));
       node = new (p) SnOr(id, inputs);
@@ -723,12 +723,12 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnNor2));
       node = new (p) SnNor2(id, inputs);
       break;
-      
+
     case 3:
       p = mNodeAlloc.get_memory(sizeof(SnNor3));
       node = new (p) SnNor3(id, inputs);
       break;
-      
+
     case 4:
       p = mNodeAlloc.get_memory(sizeof(SnNor4));
       node = new (p) SnNor4(id, inputs);
@@ -747,7 +747,7 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnXor2));
       node = new (p) SnXor2(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnXor));
       node = new (p) SnXor(id, inputs);
@@ -761,7 +761,7 @@ CalcSvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnXnor2));
       node = new (p) SnXnor2(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnXnor));
       node = new (p) SnXnor(id, inputs);
@@ -779,7 +779,7 @@ CalcSvf::make_node(tTgGateType type,
   }
   return node;
 }
-  
+
 // @brief 正常値のシミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
 void
@@ -803,7 +803,7 @@ CalcSvf::calc_gval(const vector<TestVector*>& tv_array)
     SimNode* simnode = mInputArray[i];
     simnode->set_gval(val);
   }
-  
+
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
        q != mLogicArray.end(); ++ q) {
     SimNode* node = *q;
@@ -817,13 +817,13 @@ void
 CalcSvf::calc_exact(const vector<TestVector*>& tv_array)
 {
   calc_gval(tv_array);
-  
+
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     SimFFR& ffr = *p;
     SimNode* root = ffr.root();
     tPackedVal obs = kPvAll0;
-    
+
     if ( root->is_output() ) {
       // 外部出力ならすべて可観測
       obs = kPvAll1;
@@ -855,14 +855,14 @@ CalcSvf::calc_exact(const vector<TestVector*>& tv_array)
 	  }
 	}
       }
-      
+
       // 今の故障シミュレーションで値の変わったノードを元にもどしておく
       for (vector<SimNode*>::iterator p = mClearArray.begin();
 	   p != mClearArray.end(); ++ p) {
 	(*p)->clear_fval();
       }
     }
-    
+
     // FFR 内のノードの obs を計算しセットする．
     root->calc_iobs(obs, true);
   }
@@ -874,13 +874,13 @@ void
 CalcSvf::calc_exact2(const vector<TestVector*>& tv_array)
 {
   calc_gval(tv_array);
-  
+
   size_t no = mOutputArray.size();
   for (size_t i = 0; i < no; ++ i) {
     SimNode* node = mOutputArray[i];
     node->set_obs(kPvAll1);
   }
-  
+
   size_t nl = mLogicArray.size();
   for (size_t i = nl; i > 0; ) {
     -- i;
@@ -889,13 +889,13 @@ CalcSvf::calc_exact2(const vector<TestVector*>& tv_array)
       node->calc_pseudo_min_iobs();
     }
   }
-  
+
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     SimFFR& ffr = *p;
     SimNode* root = ffr.root();
     tPackedVal obs = kPvAll0;
-    
+
     if ( root->is_output() ) {
       // 外部出力ならすべて可観測
       obs = kPvAll1;
@@ -906,7 +906,7 @@ CalcSvf::calc_exact2(const vector<TestVector*>& tv_array)
     else {
       // このノード(roo) に対する DSS をターゲットとする．
       tPackedVal req = ffr.set_target();
-      
+
       // root の値を反転させてその影響が PO で観測されるか調べる．
       tPackedVal pat = root->get_gval() ^ req;
       root->set_fval(pat);
@@ -939,7 +939,7 @@ CalcSvf::calc_exact2(const vector<TestVector*>& tv_array)
 	  }
 	}
       }
-      
+
       // 今の故障シミュレーションで値の変わったノードを元にもどしておく
       for (vector<SimNode*>::iterator p = mClearArray.begin();
 	   p != mClearArray.end(); ++ p) {
@@ -949,7 +949,7 @@ CalcSvf::calc_exact2(const vector<TestVector*>& tv_array)
       // ターゲットマークを消す．
       ffr.clear_target();
     }
-    
+
     // FFR 内のノードの obs を計算しセットする．
     root->calc_iobs(obs, true);
   }
@@ -961,13 +961,13 @@ void
 CalcSvf::calc_pseudo_min(const vector<TestVector*>& tv_array)
 {
   calc_gval(tv_array);
-  
+
   size_t no = mOutputArray.size();
   for (size_t i = 0; i < no; ++ i) {
     SimNode* node = mOutputArray[i];
     node->set_obs(kPvAll1);
   }
-  
+
   size_t nl = mLogicArray.size();
   for (size_t i = nl; i > 0; ) {
     -- i;
@@ -982,13 +982,13 @@ void
 CalcSvf::calc_max(const vector<TestVector*>& tv_array)
 {
   calc_gval(tv_array);
-  
+
   size_t no = mOutputArray.size();
   for (size_t i = 0; i < no; ++ i) {
     SimNode* node = mOutputArray[i];
     node->set_obs(kPvAll1);
   }
-  
+
   size_t nl = mLogicArray.size();
   for (size_t i = nl; i > 0; ) {
     -- i;
@@ -1042,7 +1042,7 @@ CalcSvf::dump(ostream& s) const
     SimNode* simnode = find_simnode(node);
     s << "LOGIC#" << i
       << ": \t" << node->name() << ": " << simnode->id() << endl;
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     for (size_t j = 0; j < ni; ++ j) {
       s << "\t\tI" << j << ": ";
       const TgNode* inode = node->fanin(j);

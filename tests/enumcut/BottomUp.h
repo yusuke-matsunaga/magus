@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "EnumCut.h"
+#include "EnumCut2.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 /// @brief ボトムアップのカット列挙を行うクラス
 //////////////////////////////////////////////////////////////////////
 class BottomUp :
-  public EnumCut
+  public EnumCut2
 {
 public:
 
@@ -40,7 +40,7 @@ public:
   void
   operator()(BdnMgr& network,
 	     ymuint limit,
-	     EnumCutOp* op);
+	     EnumCutOp2* op);
 
 
 private:

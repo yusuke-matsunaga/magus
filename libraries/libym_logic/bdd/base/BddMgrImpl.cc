@@ -3,7 +3,7 @@
 /// @brief BddMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -84,6 +84,9 @@ BddEdge::set_mark()
 bool
 BddEdge::noref() const
 {
+  if ( is_const() ) {
+    return false;
+  }
   BddNode* node = get_node();
   return node->noref();
 }

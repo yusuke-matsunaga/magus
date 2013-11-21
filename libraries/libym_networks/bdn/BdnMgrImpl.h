@@ -91,6 +91,10 @@ public:
   ymuint
   max_node_id() const;
 
+  /// @brief ID 番号をキーにノードを取り出す．
+  const BdnNode*
+  node(ymuint id) const;
+
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
   ymuint
@@ -136,13 +140,25 @@ public:
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
   void
-  sort(vector<BdnNode*>& node_list) const;
+  sort(vector<const BdnNode*>& node_list) const;
+
+  /// @brief ソートされた論理ノードのリストを得る．
+  /// @param[out] node_list ノードのリストの格納先
+  /// @note 入力ノードと出力ノード，ラッチノードは含まない．
+  void
+  _sort(vector<BdnNode*>& node_list);
 
   /// @brief 逆順でソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
   /// @note 入力ノードと出力ノード，ラッチノードは含まない．
   void
-  rsort(vector<BdnNode*>& node_list) const;
+  rsort(vector<const BdnNode*>& node_list) const;
+
+  /// @brief 逆順でソートされた論理ノードのリストを得る．
+  /// @param[out] node_list ノードのリストの格納先
+  /// @note 入力ノードと出力ノード，ラッチノードは含まない．
+  void
+  _rsort(vector<BdnNode*>& node_list);
 
   /// @brief 最大段数を求める．
   /// @note 段数とは入力ノードから出力ノードへ至る経路中の論理ノードの数
@@ -349,8 +365,8 @@ private:
   /// @note 見つからなければ NULL を返す．
   BdnNode*
   find_node(ymuint fcode,
-	    BdnNode* node1,
-	    BdnNode* node2);
+	    const BdnNode* node1,
+	    const BdnNode* node2) const;
 
   /// @brief D-FF を削除する．
   /// @param[in] dff 削除対象の D-FF
@@ -561,6 +577,14 @@ ymuint
 BdnMgrImpl::max_node_id() const
 {
   return mNodeArray.size();
+}
+
+// @brief ID 番号をキーにノードを取り出す．
+inline
+const BdnNode*
+BdnMgrImpl::node(ymuint id) const
+{
+  return mNodeArray[id];
 }
 
 // @brief 入力ノード数の取得

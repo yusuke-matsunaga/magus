@@ -179,7 +179,7 @@ Iscas89Network::write_iscas89(ostream& s) const
     }
     s << "(";
     const char* comma = "";
-    for (ymuint j = 0; j < node->ni(); ++ j) {
+    for (ymuint j = 0; j < node->fanin_num(); ++ j) {
       const Iscas89Node* inode = node->fanin(j);
       s << comma << inode->name();
       comma = ", ";

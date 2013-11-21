@@ -11,7 +11,8 @@
 
 #include "ym_cell/cell_nsdef.h"
 #include "ym_logic/lexp_nsdef.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -22,24 +23,6 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellLibrary
 {
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @brief テクノロジを表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tTechnology {
-    kTechAsic,
-    kTechFpga
-  };
-
-  //////////////////////////////////////////////////////////////////////
-  /// @brief 遅延モデルを表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tDelayModel {
-    kDelayGeneric,
-    kDelayPiecewise,
-    kDelayNonlinear
-  };
-
 public:
 
   /// @brief コンストラクタ
@@ -67,21 +50,23 @@ public:
 
   /// @brief テクノロジの取得
   /// 返り値は
-  /// - kTechAsic
+  /// - kTechCmos
   /// - kTechFpga
   /// のどちらか
   virtual
-  tTechnology
+  tCellTechnology
   technology() const = 0;
 
   /// @brief 遅延モデルの取得
   /// 返り値は
-  /// - kDelayGeneric
-  /// - kDelayPiecewise
-  /// - kDelayNonlinear
+  /// - kCellDelayGenericCmos
+  /// - kCellDelayTableLookup
+  /// - kCellDelayPiecewiseCmos
+  /// - kCellDelayCmos2
+  /// - kCellDelayDcm
   /// のいずれか
   virtual
-  tDelayModel
+  tCellDelayModel
   delay_model() const = 0;
 
   /// @brief バス命名規則の取得
@@ -125,16 +110,34 @@ public:
   pulling_resistance_unit() const = 0;
 
   /// @brief 容量単位の取得
+  /// @note なぜかここだけインターフェイスが異なる．
+  virtual
+  double
+  capacitive_load_unit() const = 0;
+
+  /// @brief 容量単位文字列の取得
+  /// @note なぜかここだけインターフェイスが異なる．
   virtual
   string
-  capacitive_load_unit() const = 0;
+  capacitive_load_unit_str() const = 0;
 
   /// @brief 電力単位の取得
   virtual
   string
   leakage_power_unit() const = 0;
 
-  /// @brief ルックアップテーブルのテンプレートの取得
+  /// @brief 遅延テーブルのテンプレート数の取得
+  virtual
+  ymuint
+  lu_table_template_num() const = 0;
+
+  /// @brief 遅延テーブルのテンプレートの取得
+  /// @param[in] pos 位置番号 ( 0 <= pos < lu_table_template_num() )
+  virtual
+  const CellLutTemplate*
+  lu_table_template(ymuint pos) const = 0;
+
+  /// @brief 遅延テーブルのテンプレートの取得
   /// @param[in] name テンプレート名
   /// @note なければ NULL を返す．
   virtual
@@ -262,72 +265,72 @@ public:
   /// @brief 総パタン数を返す．
   virtual
   ymuint
-  pat_num() const = 0;
+  pg_pat_num() const = 0;
 
   /// @brief パタンを返す．
-  /// @param[in] id パタン番号 ( 0 <= id < pat_num() )
+  /// @param[in] id パタン番号 ( 0 <= id < pg_pat_num() )
   virtual
   const CellPatGraph&
-  pat(ymuint id) const = 0;
+  pg_pat(ymuint id) const = 0;
 
   /// @brief パタンの最大の入力数を得る．
   virtual
   ymuint
-  max_input() const = 0;
+  pg_max_input() const = 0;
 
   /// @brief 総ノード数を返す．
   virtual
   ymuint
-  node_num() const = 0;
+  pg_node_num() const = 0;
 
   /// @brief ノードの種類を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
   virtual
   tCellPatType
-  node_type(ymuint id) const = 0;
+  pg_node_type(ymuint id) const = 0;
 
   /// @brief ノードが入力ノードの時に入力番号を返す．
-  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] id ノード番号 ( 0 <= id < pg_node_num() )
   /// @note 入力ノードでない場合の返り値は不定
   virtual
   ymuint
-  input_id(ymuint id) const = 0;
+  pg_input_id(ymuint id) const = 0;
 
   /// @brief 入力のノード番号を返す．
-  /// @param[in] input_id 入力番号 ( 0 <= input_id < input_num() )
+  /// @param[in] input_id 入力番号 ( 0 <= input_id < pg_input_num() )
   /// @return input_id の入力に対応するノードのノード番号
   virtual
   ymuint
-  input_node(ymuint input_id) const = 0;
+  pg_input_node(ymuint input_id) const = 0;
 
   /// @brief 総枝数を返す．
   virtual
   ymuint
-  edge_num() const = 0;
+  pg_edge_num() const = 0;
 
   /// @brief 枝のファンイン元のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  edge_from(ymuint id) const = 0;
+  pg_edge_from(ymuint id) const = 0;
 
   /// @brief 枝のファンアウト先のノード番号を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  edge_to(ymint id) const = 0;
+  pg_edge_to(ymint id) const = 0;
 
   /// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  edge_pos(ymuint id) const = 0;
+  pg_edge_pos(ymuint id) const = 0;
 
   /// @brief 枝の反転属性を返す．
-  /// @param[in] id 枝番号 ( 0 <= id < node_num() * 2 )
+  /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   bool
-  edge_inv(ymuint id) const = 0;
+  pg_edge_inv(ymuint id) const = 0;
 
 
 public:
@@ -339,13 +342,13 @@ public:
   /// @param[in] s 出力先のストリーム
   virtual
   void
-  dump(BinO& s) const = 0;
+  dump(ODO& s) const = 0;
 
   /// @brief バイナリダンプされた内容を読み込む．
   /// @param[in] s 入力元のストリーム
   virtual
   void
-  restore(BinI& s) = 0;
+  restore(IDO& s) = 0;
 
 
 public:
@@ -359,7 +362,34 @@ public:
   void
   set_name(const string& name) = 0;
 
-  /// @brief 属性を設定する．
+  /// @brief 'technology' を設定する．
+  virtual
+  void
+  set_technology(tCellTechnology technology) = 0;
+
+  /// @brief 遅延モデルを設定する．
+  /// @param[in] delay_model 遅延モデル．
+  virtual
+  void
+  set_delay_model(tCellDelayModel delay_model) = 0;
+
+  /// @brief 'capacitive_load_unit' を設定する．
+  /// @param[in] unit 単位
+  /// @param[in] ustr 単位の後に表示する文字列
+  virtual
+  void
+  set_capacitive_load_unit(double unit,
+			   const string& ustr) = 0;
+
+  /// @brief 属性を設定する(浮動小数点型)
+  /// @param[in] attr_name 属性名
+  /// @param[in] value 値
+  virtual
+  void
+  set_attr(const string& attr_name,
+	   double value) = 0;
+
+  /// @brief 属性を設定する(文字列型)．
   /// @param[in] attr_name 属性名
   /// @param[in] value 値
   virtual
@@ -367,11 +397,70 @@ public:
   set_attr(const string& attr_name,
 	   const string& value) = 0;
 
+  /// @brief 遅延テーブルのテンプレート数を設定する．
+  virtual
+  void
+  set_lu_table_template_num(ymuint num) = 0;
+
+  /// @brief 1次元の LUT のテンプレートを作る．
+  /// @param[in] id ID 番号
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  virtual
+  void
+  new_lut_template1(ymuint id,
+		    const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1) = 0;
+
+  /// @brief 2次元の LUT のテンプレートを作る．
+  /// @param[in] id ID 番号
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  /// @param[in] var_type2 変数型
+  /// @param[in] index_list2 インデックス値のリスト
+  virtual
+  void
+  new_lut_template2(ymuint id,
+		    const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1,
+		    tCellVarType var_type2,
+		    const vector<double>& index_list2) = 0;
+
+  /// @brief 3次元の LUT のテンプレートを作る．
+  /// @param[in] id ID 番号
+  /// @param[in] name 名前
+  /// @param[in] var_type1 変数型
+  /// @param[in] index_list1 インデックス値のリスト
+  /// @param[in] var_type2 変数型
+  /// @param[in] index_list2 インデックス値のリスト
+  /// @param[in] var_type3 変数型
+  /// @param[in] index_list3 インデックス値のリスト
+  virtual
+  void
+  new_lut_template3(ymuint id,
+		    const string& name,
+		    tCellVarType var_type1,
+		    const vector<double>& index_list1,
+		    tCellVarType var_type2,
+		    const vector<double>& index_list2,
+		    tCellVarType var_type3,
+		    const vector<double>& index_list3) = 0;
+
   /// @brief セル数を設定する．
   /// @param[in] num 設定する値
   virtual
   void
   set_cell_num(ymuint num) = 0;
+
+  /// @brief セルを取り出す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < cell_num() )
+  virtual
+  Cell*
+  cell(ymuint pos) = 0;
 
   /// @brief 論理セルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
@@ -538,6 +627,9 @@ public:
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
   /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 出力ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] max_fanout 最大ファンアウト容量
   /// @param[in] min_fanout 最小ファンアウト容量
   /// @param[in] max_capacitance 最大負荷容量
@@ -550,6 +642,9 @@ public:
 		  ymuint pin_id,
 		  ymuint output_id,
 		  const string& name,
+		  bool has_logic,
+		  const LogExpr& logic_expr,
+		  const LogExpr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -563,6 +658,9 @@ public:
   /// @param[in] input_id 入力ピン番号 ( 0 <= input_id < cell->input_num2() )
   /// @param[in] output_id 出力ピン番号 ( 0 <= output_id < cell->output_num2() )
   /// @param[in] name 入出力ピン名
+  /// @param[in] has_logic 論理式を持つとき true にするフラグ
+  /// @param[in] logic_expr 論理式
+  /// @param[in] tristate_expr tristate 条件式
   /// @param[in] capacitance 入力ピンの負荷容量
   /// @param[in] rise_capacitance 入力ピンの立ち上がり負荷容量
   /// @param[in] fall_capacitance 入力ピンの立ち下がり負荷容量
@@ -579,6 +677,9 @@ public:
 		 ymuint input_id,
 		 ymuint output_id,
 		 const string& name,
+		 bool has_logic,
+		 const LogExpr& logic_expr,
+		 const LogExpr& tristate_expr,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance,
@@ -592,18 +693,28 @@ public:
   /// @brief セルの内部ピンを生成する．
   /// @param[in] cell セル
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
-  /// @param[in] internal_id 入力ピン番号 ( 0 <= internal_id < cell->internal_num() )
+  /// @param[in] int_id 入力ピン番号 ( 0 <= int_id < cell->internal_num() )
   /// @param[in] name 内部ピン名
   virtual
   void
   new_cell_internal(ymuint cell_id,
 		    ymuint pin_id,
-		    ymuint internal_id,
+		    ymuint int_id,
 		    const string& name) = 0;
 
-  /// @brief タイミング情報を作る．
-  /// @param[in] id ID番号
+  /// @brief タイミング情報の数を設定する．
+  /// @param[in] cell_id セル番号
+  /// @param[in] timing_num タイミング情報の数．
+  virtual
+  void
+  set_timing_num(ymuint cell_id,
+		 ymuint timing_num) = 0;
+
+  /// @brief タイミング情報を作る(ジェネリック遅延モデル)．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
   /// @param[in] type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
@@ -611,33 +722,129 @@ public:
   /// @param[in] rise_resistance 立ち上がり負荷依存係数
   /// @param[in] fall_resistance 立ち下がり負荷依存係数
   virtual
-  CellTiming*
-  new_timing(ymuint id,
-	     tCellTimingType type,
-	     CellTime intrinsic_rise,
-	     CellTime intrinsic_fall,
-	     CellTime slope_rise,
-	     CellTime slope_fall,
-	     CellResistance rise_resistance,
-	     CellResistance fall_resistance) = 0;
+  void
+  new_timing_generic(ymuint cell_id,
+		     ymuint tid,
+		     tCellTimingType type,
+		     const LogExpr& cond,
+		     CellTime intrinsic_rise,
+		     CellTime intrinsic_fall,
+		     CellTime slope_rise,
+		     CellTime slope_fall,
+		     CellResistance rise_resistance,
+		     CellResistance fall_resistance) = 0;
+
+  /// @brief タイミング情報を作る(折れ線近似)．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
+  /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
+  /// @param[in] intrinsic_rise 立ち上がり固有遅延
+  /// @param[in] intrinsic_fall 立ち下がり固有遅延
+  /// @param[in] slope_rise 立ち上がりスロープ遅延
+  /// @param[in] slope_fall 立ち下がりスロープ遅延
+  virtual
+  void
+  new_timing_piecewise(ymuint cell_id,
+		       ymuint tid,
+		       tCellTimingType timing_type,
+		       const LogExpr& cond,
+		       CellTime intrinsic_rise,
+		       CellTime intrinsic_fall,
+		       CellTime slope_rise,
+		       CellTime slope_fall,
+		       CellResistance rise_pin_resistance,
+		       CellResistance fall_pin_resistance) = 0;
+
+  /// @brief タイミング情報を作る(非線形タイプ1)．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
+  /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
+  /// @param[in] cell_rise 立ち上がりセル遅延テーブル
+  /// @param[in] cell_fall 立ち下がりセル遅延テーブル
+  /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
+  /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
+  virtual
+  void
+  new_timing_lut1(ymuint cell_id,
+		  ymuint tid,
+		  tCellTimingType timing_type,
+		  const LogExpr& cond,
+		  CellLut* cell_rise,
+		  CellLut* cell_fall,
+		  CellLut* rise_transition,
+		  CellLut* fall_transition) = 0;
+
+  /// @brief タイミング情報を作る(非線形タイプ2)．
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
+  /// @param[in] tid タイミングID ( 0 <= tid < cell->timing_num() )
+  /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
+  /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
+  /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
+  /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
+  /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
+  virtual
+  void
+  new_timing_lut2(ymuint cell_id,
+		  ymuint tid,
+		  tCellTimingType timing_type,
+		  const LogExpr& cond,
+		  CellLut* rise_transition,
+		  CellLut* fall_transition,
+		  CellLut* rise_propagation,
+		  CellLut* fall_propagation) = 0;
 
   /// @brief タイミング情報をセットする．
-  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
-  /// @param[in] opin_id 出力(入出力)ピン番号 ( *1 )
-  /// @param[in] ipin_id 関連する入力(入出力)ピン番号 ( *2 )
-  /// @param[in] sense タイミング条件
-  /// @param[in] timing 設定するタイミング情報
-  /// @note ( *1 ) opin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->output_num() を使う．
-  /// @note ( *2 ) ipin_id で入出力ピンを表す時には入出力ピン番号
-  ///  + cell->input_num() を使う．
+  /// @param[in] cell_id セルID
+  /// @param[in] input_id 入力ピンID
+  /// @param[in] output_id 出力ピンID
+  /// @param[in] timing_sense タイミングセンス
+  /// @param[in] tid_list タイミングIDのリスト
   virtual
   void
   set_timing(ymuint cell_id,
-	     ymuint ipin_id,
-	     ymuint opin_id,
-	     tCellTimingSense sense,
-	     CellTiming* timing) = 0;
+	     ymuint input_id,
+	     ymuint output_id,
+	     tCellTimingSense timing_sense,
+	     const vector<ymuint>& tid_list) = 0;
+
+  /// @brief 1次元の LUT を作る．
+  /// @param[in] lut_template テンプレート
+  /// @param[in] value_array 値の配列
+  /// @param[in] index_array インデックス値のリスト
+  virtual
+  CellLut*
+  new_lut1(const CellLutTemplate* lut_template,
+	   const vector<double>& value_array,
+	   const vector<double>& index_array = vector<double>()) = 0;
+
+  /// @brief 2次元の LUT を作る．
+  /// @param[in] lut_template テンプレート
+  /// @param[in] value_array 値の配列
+  /// @param[in] index_array1 インデックス値のリスト
+  /// @param[in] index_array2 インデックス値のリスト
+  virtual
+  CellLut*
+  new_lut2(const CellLutTemplate* lut_template,
+	   const vector<double>& value_array,
+	   const vector<double>& index_array1 = vector<double>(),
+	   const vector<double>& index_array2 = vector<double>()) = 0;
+
+  /// @brief 3次元の LUT を作る．
+  /// @param[in] lut_template テンプレート
+  /// @param[in] value_array 値の配列
+  /// @param[in] index_array1 インデックス値のリスト
+  /// @param[in] index_array2 インデックス値のリスト
+  /// @param[in] index_array3 インデックス値のリスト
+  virtual
+  CellLut*
+  new_lut3(const CellLutTemplate* lut_template,
+	   const vector<double>& value_array,
+	   const vector<double>& index_array1 = vector<double>(),
+	   const vector<double>& index_array2 = vector<double>(),
+	   const vector<double>& index_array3 = vector<double>()) = 0;
 
   /// @brief セルのグループ分けを行う．
   /// @note 論理セルのパタングラフも作成する．

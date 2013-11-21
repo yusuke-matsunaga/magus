@@ -41,7 +41,7 @@ add_fanin(BNetManip& manip,
 	  ymuint ipos,
 	  BNode* new_node)
 {
-  ymuint ni = onode->ni();
+  ymuint ni = onode->fanin_num();
   vector<BNode*> fanins(ni + 1);
   for (ymuint i = 0; i < ni; ++ i) {
     fanins[i] = onode->fanin(i);
@@ -173,7 +173,7 @@ DupCmd::cmd_proc(TclObjVector& objv)
   for (vector<BNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BNode* node = *p;
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     vector<BNode*> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = node->fanin(i);

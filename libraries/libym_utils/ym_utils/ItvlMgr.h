@@ -5,12 +5,13 @@
 /// @brief ItvlMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ymtools.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -58,10 +59,24 @@ public:
   void
   erase(int d);
 
+  /// @brief [d1, d2] を使用可能な区間から削除する．
+  /// @param[in] d1 区間の開始点
+  /// @param[in] d2 区間の終了点
+  void
+  erase(int d1,
+	int d2);
+
   /// @brief d を使用可能な区間に追加する．
   /// @param[in] d 使用可能となった要素
   void
   add(int d);
+
+  /// @brief [d1, d2] を使用可能な区間に追加する．
+  /// @param[in] d1 区間の開始点
+  /// @param[in] d2 区間の終了点
+  void
+  add(int d1,
+      int d2);
 
   /// @brief [d1, d2] が使用可能な区間かどうか調べる．
   /// @param[in] d1 区間の開始点
@@ -84,20 +99,6 @@ public:
   int
   max_id() const;
 
-  /// @brief [d1, d2] を使用可能な区間から削除する．
-  /// @param[in] d1 区間の開始点
-  /// @param[in] d2 区間の終了点
-  void
-  erase(int d1,
-	int d2);
-
-  /// @brief [d1, d2] を使用可能な区間に追加する．
-  /// @param[in] d1 区間の開始点
-  /// @param[in] d2 区間の終了点
-  void
-  add(int d1,
-      int d2);
-
   /// @brief 内部構造が正しいかチェックする．
   /// @note おかしい時は例外を投げる．
   void
@@ -115,11 +116,11 @@ public:
 
   /// @brief バイナリファイルに書き出す．
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:
@@ -139,8 +140,8 @@ private:
 /// @param[in] itvlmgr 対象のオブジェクト
 /// @return s を返す．
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const ItvlMgr& itvlmgr)
 {
   itvlmgr.dump(s);
@@ -153,8 +154,8 @@ operator<<(BinO& s,
 /// @param[in] itvlmgr 読み込む先のオブジェクト
 /// @return s を返す．
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   ItvlMgr& itvlmgr)
 {
   itvlmgr.restore(s);

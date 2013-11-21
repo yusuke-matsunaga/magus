@@ -28,13 +28,6 @@ DotlibAttrMap::~DotlibAttrMap()
 {
 }
 
-// @brief 内容を初期化する．
-void
-DotlibAttrMap::init()
-{
-  mHash.clear();
-}
-
 // @brief 値を得る．
 // @param[in] name 属性名
 // @param[out] node_list 値のリストを格納する変数
@@ -119,6 +112,13 @@ DotlibAttrMap::get_singleton_or_null(const char* name,
     return false;
   }
   return true;
+}
+
+// @brief 内容を初期化する．
+void
+DotlibAttrMap::init()
+{
+  mHash.clear();
 }
 
 // @brief 値を追加する．

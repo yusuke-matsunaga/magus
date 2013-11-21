@@ -24,7 +24,14 @@ libym_cec_la_SOURCES = \
 	FraigMgrImpl.cc \
 	FraigMgr.h \
 	FraigMgr.cc \
-	check_ceq.cc
+	check_ceq.cc \
+	CecHandle.h \
+	CecHash.h \
+	CecMgr.h \
+	CecMgr.cc \
+	CecNode.h \
+	check_ceq2.cc \
+	make_miter.cc
 
 libym_cec_la_LIBADD =
 

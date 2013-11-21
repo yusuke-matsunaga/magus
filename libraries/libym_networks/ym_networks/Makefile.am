@@ -6,11 +6,14 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_HEADERS = \
 	networks_nsdef.h \
+	blif_nsdef.h \
 	bdn.h \
 	bnet.h \
 	cmn.h \
 	mvn.h \
 	tgnet.h \
+	BlifNetwork.h \
+	BlifNode.h \
 	BdnBlifWriter.h \
 	BdnDff.h \
 	BdnDumper.h \
@@ -18,6 +21,7 @@ noinst_HEADERS = \
 	BdnMgr.h \
 	BdnNode.h \
 	BdnNodeHandle.h \
+	BdnConstNodeHandle.h \
 	BdnPort.h \
 	BdnVerilogWriter.h \
 	BNetwork.h \
@@ -50,7 +54,6 @@ noinst_HEADERS = \
 	MvnVerilogReader.h \
 	MvnVerilogWriter.h \
 	TgBlifReader.h \
-	TgGateTemplate.h \
 	TgIscas89Reader.h \
 	TgNetwork.h \
 	TgNode.h

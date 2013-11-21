@@ -14,7 +14,8 @@
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
 #include "ym_logic/TvFunc.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -109,7 +110,7 @@ public:
   /// @brief 入力数を得る．
   /// @return 入力数
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 入力の変換情報の取得
   /// @param[in] var 入力変数
@@ -181,8 +182,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] map 変換マップ
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const NpnMap& map);
 
 /// @relates NpnMap
@@ -190,8 +191,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力ストリーム
 /// @param[out] map 結果を格納する変数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   NpnMap& map);
 
 
@@ -202,7 +203,7 @@ operator>>(BinI& s,
 // 入力数を得る．
 inline
 ymuint
-NpnMap::ni() const
+NpnMap::input_num() const
 {
   return mNiPol >> 1;
 }
@@ -213,7 +214,7 @@ NpnVmap
 NpnMap::imap(VarId var) const
 {
   ymuint idx = var.val();
-  if ( idx < ni() ) {
+  if ( idx < input_num() ) {
     return mImap[idx];
   }
   else {

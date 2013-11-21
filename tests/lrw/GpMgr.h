@@ -77,6 +77,10 @@ public:
   dump_handle(ostream& s,
 	      const vector<GpHandle>& handle_list) const;
 
+  /// @brief 全ノード数を返す．
+  ymuint
+  node_num() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

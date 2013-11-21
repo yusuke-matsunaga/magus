@@ -305,7 +305,7 @@ BNetwork::copy(const BNetwork& src)
     BNode* dst_node = node_assoc[src_node->id()];
     assert_cond(dst_node != NULL, __FILE__, __LINE__);
 
-    size_t n = src_node->ni();
+    size_t n = src_node->fanin_num();
     fanins.clear();
     fanins.resize(n);
     for (size_t i = 0; i < n; i ++) {
@@ -347,7 +347,7 @@ BNetwork::lexp_simplify()
   for (ymuint i = 0; i < n; ++ i) {
     BNode* node = node_list[i];
     lexp_simplify_node(node);
-    if ( node->ni() <= 1 ) {
+    if ( node->fanin_num() <= 1 ) {
       manip.eliminate_node(node);
     }
   }
@@ -400,7 +400,7 @@ BNetwork::clean_up()
   while ( !del_nodes.empty() ) {
     BNode* node = del_nodes.back();
     del_nodes.pop_back();
-    ymuint n = node->ni();
+    ymuint n = node->fanin_num();
     for (ymuint i = 0; i < n; i ++) {
       BNode* inode = node->fanin(i);
       if ( inode->is_input() ) continue;
@@ -439,7 +439,7 @@ BNetwork::sweep()
     for (BNodeVector::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       BNode* node = *p;
-      if ( node->ni() == 0 || node->ni() == 1 ) {
+      if ( node->fanin_num() == 0 || node->fanin_num() == 1 ) {
 	manip.eliminate_node(node);
       }
     }
@@ -764,7 +764,7 @@ BNetwork::set_node_fanins(BNode* node,
 			  const BNodeVector& fanins)
 {
   // 昔の接続を切る．
-  ymuint old_ni = node->ni();
+  ymuint old_ni = node->fanin_num();
   BNodeEdge* edge_array = node->mFaninEdgeArray;
   for (ymuint i = 0; i < old_ni; i ++) {
     BNodeEdge* edge = &edge_array[i];
@@ -780,7 +780,7 @@ BNetwork::set_node_fanins(BNode* node,
     mgr.free_edgearray(old_ni, edge_array);
     edge_array = mgr.alloc_edgearray(new_ni);
     node->mFaninEdgeArray = edge_array;
-    node->flags_set_ni(new_ni);
+    node->flags_set_fanin_num(new_ni);
   }
 
   // 新しいファンインの情報を設定する．
@@ -966,7 +966,7 @@ BNetwork::tsort_sub(BNode* node,
     return;
   }
 
-  ymuint n = node->ni();
+  ymuint n = node->fanin_num();
   for (ymuint i = 0; i < n; i ++) {
     BNode* inode = node->fanin(i);
     if ( !inode->flags_get_temp() ) {

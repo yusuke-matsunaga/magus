@@ -13,6 +13,7 @@
 #include "DotlibMgrImpl.h"
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/ShString.h"
 #include "DotlibNodeImpl.h"
@@ -25,12 +26,14 @@ DotlibParserImpl::DotlibParserImpl() :
   mDotlibMgr(NULL),
   mLibraryHandler( HandlerFactory::new_library(*this) )
 {
+  mScanner = NULL;
 }
 
 // デストラクタ
 DotlibParserImpl::~DotlibParserImpl()
 {
   delete mLibraryHandler;
+  delete mScanner;
 }
 
 // @brief ファイルを読み込む．
@@ -51,7 +54,8 @@ DotlibParserImpl::read_file(const string& filename,
   mDebug = debug;
   mAllowNoSemi = allow_no_semi;
 
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     ostringstream buf;
     buf << filename << ": Could not open.";
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -61,6 +65,8 @@ DotlibParserImpl::read_file(const string& filename,
 		    buf.str());
     return false;
   }
+
+  mScanner = new DotlibScanner(ido);
 
   bool error = false;
   tTokenType type;
@@ -100,8 +106,9 @@ DotlibParserImpl::read_file(const string& filename,
 		    "contents after library group are ignored.");
   }
 
-last:
-  mScanner.close_file();
+ last:
+  delete mScanner;
+  mScanner = NULL;
 
   if ( error ) {
     return false;

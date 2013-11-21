@@ -26,27 +26,95 @@ npnnodemgr_test()
   NpnHandle x2 = mgr.make_input(2);
   NpnHandle x3 = mgr.make_input(3);
 
+  NpnHandle x2n = ~x2;
+
   NpnHandle and01 = mgr.make_and(x0, x1);
   NpnHandle and13 = mgr.make_and(x1, x3);
   NpnHandle and0n1n = mgr.make_and(~x0, ~x1);
-  NpnHandle or1 = ~mgr.make_and(~and01, ~and13);
+  NpnHandle or1 = mgr.make_or(and01, and13);
   NpnHandle and23 = mgr.make_and(x2, x3);
-  NpnHandle andor0123 = ~mgr.make_and(~and01, ~and23);
+  NpnHandle orand0123 = mgr.make_or(and01, and23);
+  NpnHandle and0n2 = mgr.make_and(~x0, x2);
+  NpnHandle mpx1 = mgr.make_or(and01, and0n2);
+  NpnHandle and0n1 = mgr.make_and(~x0, x1);
+  NpnHandle and02 = mgr.make_and(x0, x2);
+  NpnHandle mpx2 = mgr.make_or(and0n1, and02);
+  NpnHandle and012n = mgr.make_and(and01, ~x2);
+  NpnHandle orand011n = mgr.make_or(and01, ~x1);
+  NpnHandle and01n = mgr.make_and(x0, ~x1);
+  NpnHandle orand01n1 = mgr.make_or(and01n, x1);
+  NpnHandle xor01 = mgr.make_xor(x0, x1);
+  NpnHandle xor0n1 = mgr.make_xor(~x0, x1);
+  NpnHandle xor01n = mgr.make_xor(x0, ~x1);
+  NpnHandle xor0n1n = mgr.make_xor(~x0, ~x1);
+  NpnHandle xor012n = mgr.make_xor(xor01, x2n);
+  NpnHandle xor01n2 = mgr.make_xor(~xor01, x2);
 
-  vector<NpnHandle> handle_list;
-  handle_list.push_back(c0);
-  handle_list.push_back(c1);
-  handle_list.push_back(x0);
-  handle_list.push_back(x1);
-  handle_list.push_back(x2);
-  handle_list.push_back(x3);
-  handle_list.push_back(and01);
-  handle_list.push_back(and13);
-  handle_list.push_back(and0n1n);
-  handle_list.push_back(or1);
-  handle_list.push_back(andor0123);
+  cout << "const0" << endl;
+  mgr.dump_handle(cout, c0);
 
-  mgr.dump_handle(cout, handle_list);
+  cout << "const1" << endl;
+  mgr.dump_handle(cout, c1);
+
+  cout << "x0" << endl;
+  mgr.dump_handle(cout, x0);
+
+  cout << "x1" << endl;
+  mgr.dump_handle(cout, x1);
+
+  cout << "~x2" << endl;
+  mgr.dump_handle(cout, x2n);
+
+  cout << "x0 & x1" << endl;
+  mgr.dump_handle(cout, and01);
+
+  cout << "x1 & x3" << endl;
+  mgr.dump_handle(cout, and13);
+
+  cout << "~x0 & ~x1" << endl;
+  mgr.dump_handle(cout, and0n1n);
+
+  cout << "(x0 & x1) | (x1 & x3)" << endl;
+  mgr.dump_handle(cout, or1);
+
+  cout << "(x0 & x1) | (x2 & x3)" << endl;
+  mgr.dump_handle(cout, orand0123);
+
+  cout << "~x0 & x2" << endl;
+  mgr.dump_handle(cout, and0n2);
+
+  cout << "(x0 & x1) | (~x0 & x2)" << endl;
+  mgr.dump_handle(cout, mpx1);
+
+  cout << "(~x0 & x1) | (x0 & x2)" << endl;
+  mgr.dump_handle(cout, mpx2);
+
+  cout << "(x0 & x1) & ~x2)" << endl;
+  mgr.dump_handle(cout, and012n);
+
+  cout << "(x0 & x1) | ~x1" << endl;
+  mgr.dump_handle(cout, orand011n);
+
+  cout << "(x0 & ~x1) | x1" << endl;
+  mgr.dump_handle(cout, orand01n1);
+
+  cout << "x0 ^ x1" << endl;
+  mgr.dump_handle(cout, xor01);
+
+  cout << "~x0 ^ x1" << endl;
+  mgr.dump_handle(cout, xor0n1);
+
+  cout << "x0 ^ ~x1" << endl;
+  mgr.dump_handle(cout, xor01n);
+
+  cout << "~x0 ^ ~x1" << endl;
+  mgr.dump_handle(cout, xor0n1n);
+
+  cout << "(x0 ^ x1) ^ ~x2" << endl;
+  mgr.dump_handle(cout, xor012n);
+
+  cout << "~(x0 ^ x1) ^ x2" << endl;
+  mgr.dump_handle(cout, xor01n2);
 }
 
 END_NAMESPACE_YM

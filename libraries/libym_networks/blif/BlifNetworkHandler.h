@@ -5,7 +5,7 @@
 /// @brief BlifNetworkHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,9 +13,9 @@
 #include "ym_cell/cell_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
-class BlifNetwork;
+class BlifNetworkImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BlifNetworkHandler BlifNetworkHandler.h
@@ -36,10 +36,9 @@ public:
 
 public:
 
-  /// @brief 読み込む対象のネットワークとセルライブラリを設定する．
+  /// @brief 読み込む対象のネットワークを設定する．
   void
-  set(BlifNetwork* network,
-      const CellLibrary* cell_library);
+  set(BlifNetworkImpl* network);
 
 
 public:
@@ -78,7 +77,8 @@ public:
   outputs_elem(ymuint32 name_id);
 
   /// @brief .names 文の処理
-  /// @param[in] name_id_array 各識別子のID番号の配列
+  /// @param[in] onode_id ノード名のID番号
+  /// @param[in] inode_id_array ファンイン各のID番号の配列
   /// @param[in] nc キューブ数
   /// @param[in] cover_pat 入力カバーを表す文字列
   /// @param[in] opat 出力の極性
@@ -89,34 +89,35 @@ public:
   /// @note opat は '0' か '1' のどちらか
   virtual
   bool
-  names(const vector<ymuint32>& name_id_array,
+  names(ymuint32 onode_id,
+	const vector<ymuint32>& inode_id_array,
 	ymuint32 nc,
 	const char* cover_pat,
 	char opat);
 
   /// @brief .gate 文の処理
-  /// @param[in] cell セル
   /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] cell セル
   /// @param[in] inode_id_array 入力ノードのID番号の配列
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  gate(const Cell* cell,
-       ymuint32 onode_id,
-       const vector<ymuint32>& inode_id_array);
+  gate(ymuint32 onode_id,
+       const vector<ymuint32>& inode_id_array,
+       const Cell* cell);
 
-  /// @brief .latch 文中の本体の処理
-  /// @param[in] name1_id 最初の文字列
-  /// @param[in] name2_id 次の文字列
+  /// @brief .latch 文の処理
+  /// @param[in] onode_id 出力ノードのID番号
+  /// @param[in] inode_id 入力ノードのID番号
   /// @param[in] loc4 リセット値の位置情報
-  /// @param[in] rval リセット時の値 ('0'/'1') 未定義なら ' '
+  /// @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
   /// @retval true 処理が成功した．
   /// @retval false エラーが起こった．
   virtual
   bool
-  latch(ymuint32 name1_id,
-	ymuint32 name2_id,
+  latch(ymuint32 onode_id,
+	ymuint32 inode_id,
 	const FileRegion& loc4,
 	char rval);
 
@@ -145,13 +146,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のネットワーク
-  BlifNetwork* mNetwork;
-
-  // セルライブラリ
-  const CellLibrary* mCellLibrary;
+  BlifNetworkImpl* mNetwork;
 
 };
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // BLIFNETWORKHANDLER_H

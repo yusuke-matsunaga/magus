@@ -8,7 +8,6 @@
 
 
 #include "ym_logic/AigMgr.h"
-#include "AigNode.h"
 #include "AigMgrImpl.h"
 
 
@@ -37,13 +36,6 @@ AigMgr::input_num() const
   return mImpl->input_num();
 }
 
-// @brief 入力ノードを取り出す．
-const AigNode*
-AigMgr::input_node(VarId id) const
-{
-  return mImpl->input_node(id);
-}
-
 // @brief ノード数を得る．
 ymuint
 AigMgr::node_num() const
@@ -51,40 +43,31 @@ AigMgr::node_num() const
   return mImpl->node_num();
 }
 
-// @brief ノードを取り出す．
-// @param[in] pos ノード番号 ( 0 <= pos < input_num() )
-// @note ANDノードの他に入力ノードも含まれる．
-const AigNode*
-AigMgr::node(ymuint pos) const
-{
-  return mImpl->node(pos);
-}
-
 
 BEGIN_NONAMESPACE
 
 void
 dfs(ostream& s,
-    AigNode* node,
+    Aig aig,
     hash_set<ymuint>& mark)
 {
-  if ( node == NULL ) {
+  if ( aig.is_const() ) {
     return;
   }
-  ymuint id = node->node_id();
+  ymuint id = aig.node_id();
   if ( mark.count(id) > 0 ) {
     return;
   }
   mark.insert(id);
   s << "Node#" << id << ": ";
-  if ( node->is_input() ) {
-    s << "Input#" << node->input_id() << endl;
+  if ( aig.is_input() ) {
+    s << "Input#" << aig.input_id() << endl;
   }
   else {
-    s << "And(" << node->fanin0() << ", "
-      << node->fanin1() << ")" << endl;
-    dfs(s, node->fanin0_node(), mark);
-    dfs(s, node->fanin1_node(), mark);
+    s << "And(" << aig.fanin0() << ", "
+      << aig.fanin1() << ")" << endl;
+    dfs(s, aig.fanin0(), mark);
+    dfs(s, aig.fanin1(), mark);
   }
 }
 
@@ -104,7 +87,7 @@ AigMgr::print_handles(ostream& s,
     Aig handle = *p;
     s << "Root#" << i << ": " << handle << endl;
     ++ i;
-    dfs(s, handle.node(), mark);
+    dfs(s, handle, mark);
   }
 }
 
@@ -307,11 +290,10 @@ AigMgr::make_cofactor(Aig edge,
     return edge;
   }
 
-  AigNode* node = edge.node();
   Aig ans;
-  if ( node->is_input() ) {
+  if ( edge.is_input() ) {
     // 入力ノード時は番号が id どうかで処理が変わる．
-    if ( node->input_id() == id ) {
+    if ( edge.input_id() == id ) {
       if ( pol == kPolPosi ) {
 	ans = make_one();
       }
@@ -320,14 +302,14 @@ AigMgr::make_cofactor(Aig edge,
       }
     }
     else {
-      ans = Aig(node, false);
+      ans = edge.normalize();
     }
   }
   else {
     // AND ノードの場合
     // 2つの子供に再帰的な処理を行って結果の AND を計算する．
-    Aig new_handle0 = make_cofactor(node->fanin0(), id, pol);
-    Aig new_handle1 = make_cofactor(node->fanin1(), id, pol);
+    Aig new_handle0 = make_cofactor(edge.fanin0(), id, pol);
+    Aig new_handle1 = make_cofactor(edge.fanin1(), id, pol);
     Aig ans = make_and(new_handle0, new_handle1);
   }
   if ( edge.inv() ) {

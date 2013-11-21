@@ -34,10 +34,11 @@ libym_cell_mislib_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_mislib_la_SOURCES = \
+	CellMislibReader.cc \
 	mislib_nsdef.h \
 	mislib_grammer.yy \
-	MislibLex.h \
-	MislibLex.cc \
+	MislibScanner.h \
+	MislibScanner.cc \
 	MislibMgr.h \
 	MislibMgr.cc \
 	MislibMgrImpl.h \
@@ -71,4 +72,3 @@ libym_cell_mislib_la_SOURCES = \
 libym_cell_mislib_la_LIBADD =
 
 libym_cell_mislib_la_LDFLAGS =
-

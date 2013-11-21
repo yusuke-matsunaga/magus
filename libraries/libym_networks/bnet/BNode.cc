@@ -31,7 +31,7 @@ BNode::BNode() :
 BNode::~BNode()
 {
   assert_cond( fanout_num() == 0, __FILE__, __LINE__);
-  assert_cond( ni() == 0, __FILE__, __LINE__);
+  assert_cond( fanin_num() == 0, __FILE__, __LINE__);
 }
 
 // ノードタイプをセットする．
@@ -63,7 +63,7 @@ int
 BNode::fanin_pos(BNode* node) const
 {
   int i;
-  for (i = ni(); -- i >= 0; ) {
+  for (i = fanin_num(); -- i >= 0; ) {
     if ( mFaninEdgeArray[i].from() == node ) break;
   }
   // 範囲外の場合にも具合良く-1になっている．

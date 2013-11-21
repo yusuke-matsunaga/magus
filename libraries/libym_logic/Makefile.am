@@ -11,7 +11,9 @@ SUBDIRS = \
 	zdd \
 	cnfdd \
 	sat \
+	smt \
 	aig \
+	$(YM_EXTRA_SUBDIRS) \
 	. \
 	tests
 
@@ -39,6 +41,7 @@ libym_logic_la_LIBADD = \
 	zdd/libym_logic_zdd.la \
 	cnfdd/libym_logic_cnfdd.la \
 	sat/libym_logic_sat.la \
+	smt/libym_logic_smt.la \
 	aig/libym_logic_aig.la
 
 libym_logic_la_LDFLAGS = \

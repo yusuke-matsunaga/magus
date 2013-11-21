@@ -11,7 +11,6 @@
 
 #include "ym_logic/sat_nsdef.h"
 #include "ym_logic/Literal.h"
-#include "ym_logic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -57,7 +56,7 @@ public:
   is_clause() const;
 
   /// @brief 節を取り出す．
-  SatClause&
+  SatClause*
   clause() const;
 
   /// @brief 内容がリテラルの時 true を返す．
@@ -143,10 +142,10 @@ SatReason::is_clause() const
 
 // @brief 節を取り出す．
 inline
-SatClause&
+SatClause*
 SatReason::clause() const
 {
-  return *reinterpret_cast<SatClause*>(mBody);
+  return reinterpret_cast<SatClause*>(mBody);
 }
 
 // @brief 内容がリテラルの時 true を返す．

@@ -59,7 +59,7 @@ LcGroup::cell_group() const
 }
 
 // @brief 属しているセルのリストを返す．
-const vector<const Cell*>&
+const vector<Cell*>&
 LcGroup::cell_list() const
 {
   return mCellList;
@@ -68,7 +68,7 @@ LcGroup::cell_list() const
 // @brief セルを追加する．
 // @param[in] cell セル
 void
-LcGroup::add_cell(const Cell* cell)
+LcGroup::add_cell(Cell* cell)
 {
   mCellList.push_back(cell);
 }

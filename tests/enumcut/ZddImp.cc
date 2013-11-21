@@ -44,7 +44,7 @@ ZddImp::operator()(BdnMgr& network,
   const BdnNodeList& input_list = network.input_list();
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
 
     Zdd cut = mMgr.make_base();
     cut.swap(VarId(node->id()));
@@ -57,19 +57,19 @@ ZddImp::operator()(BdnMgr& network,
     cout << endl;
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   network.sort(node_list);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
 
-    BdnNode* node0 = node->fanin(0);
-    BdnNode* node1 = node->fanin(1);
+    const BdnNode* node0 = node->fanin(0);
+    const BdnNode* node1 = node->fanin(1);
     Zdd cut0 = mCuts[node0->id()];
     Zdd cut1 = mCuts[node1->id()];
     Zdd cut = mMgr.merge(cut0, cut1);
     cut = mMgr.n_element(cut, limit);
-    cut = mMgr.minimum_set(cut);
+    cut = mMgr.make_minimal(cut);
     Zdd cut2 = mMgr.make_base();
     cut2.swap(VarId(node->id()));
     cut |= cut2;

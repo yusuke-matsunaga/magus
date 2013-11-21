@@ -8,9 +8,8 @@
 
 
 #include "ym_networks/BdnBlifReader.h"
+#include "ym_networks/BlifNetwork.h"
 
-#include "BlifNetwork.h"
-#include "BlifNetworkReader.h"
 #include "BlifBdnConv.h"
 
 
@@ -41,17 +40,14 @@ BdnBlifReader::operator()(const string& filename,
 			  BdnMgr& network,
 			  const CellLibrary* cell_library)
 {
-  using namespace nsBlif;
-
-  BlifNetworkReader read;
   BlifNetwork blif_network;
 
-  if ( !read(filename, blif_network, cell_library) ) {
+  if ( !blif_network.read_blif(filename, cell_library) ) {
     cerr << "Error in reading " << filename << endl;
     return false;
   }
 
-  BlifBdnConv conv;
+  nsYm::nsNetworks::nsBlif::BlifBdnConv conv;
   bool stat = conv(blif_network, network);
   if ( !stat ) {
     cerr << "Error in converting from BlifNetwork to BdnMgr" << endl;

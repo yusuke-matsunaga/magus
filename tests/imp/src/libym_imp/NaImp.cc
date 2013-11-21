@@ -49,6 +49,7 @@ NaImp::NaImp()
 {
   mUseDI = true;
   mUseContra = true;
+  mUseCapMerge2 = true;
 }
 
 // @brief デストラクタ
@@ -69,6 +70,14 @@ NaImp::use_contra(bool use)
 {
   mUseContra = use;
 }
+
+// @brief cap_merge2 を用いるかどうかのフラグをセットする．
+void
+NaImp::use_cap_merge2(bool use)
+{
+  mUseCapMerge2 = use;
+}
+
 
 // @brief ネットワーク中の間接含意を求める．
 // @param[in] imp_mgr マネージャ
@@ -166,7 +175,7 @@ NaImp::learning(ImpMgr& imp_mgr,
   for (vector<ImpNode*>::reverse_iterator p = node_list.rbegin();
        p != node_list.rend(); ++ p) {
     ImpNode* node = *p;
-    if ( !node->fanout_list().empty() ) {
+    if ( node->fanout_num() > 0 ) {
       rnode_list.push_back(node);
     }
   }
@@ -268,7 +277,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	    ymuint old_num = dst_list.num();
 	    if ( src1_list.changed() ||
 		 src2_list.changed() ) {
-	      dst_list.cap_merge(src1_list, src2_list);
+	      if ( mUseCapMerge2 ) {
+		dst_list.cap_merge2(src1_list, src2_list);
+	      }
+	      else {
+		dst_list.cap_merge(src1_list, src2_list);
+	      }
 	    }
 	    ymuint delta1 = dst_list.num() - old_num;
 	    if ( delta1 > 0 ) {
@@ -316,16 +330,15 @@ NaImp::learning(ImpMgr& imp_mgr,
 	ImpValList& dst1_list = imp_lists[idx_1];
 	dst0_list.reset_change2();
 	dst1_list.reset_change2();
-	const vector<ImpEdge*>& fo_list = node->fanout_list();
-	for (vector<ImpEdge*>::const_iterator p = fo_list.begin();
-	     p != fo_list.end(); ++ p) {
-	  const ImpEdge* edge = *p;
+	ymuint nfo = node->fanout_num();
+	for (ymuint i = 0; i < nfo; ++ i) {
+	  const ImpEdge& edge = node->fanout(i);
 
 	  // 出力の情報
-	  ImpNode* onode = edge->dst_node();
+	  ImpNode* onode = edge.dst_node();
 	  ymuint oid = onode->id();
-	  ymuint opos = edge->dst_pos();
-	  bool inv = edge->src_inv();
+	  ymuint opos = edge.dst_pos();
+	  bool inv = edge.src_inv();
 	  ymuint oidx_0 = oid * 2 + 0;
 	  ymuint oidx_1 = oid * 2 + 1;
 
@@ -372,7 +385,12 @@ NaImp::learning(ImpMgr& imp_mgr,
 	    ymuint old_num = dst_list.num();
 	    if ( src1_list.changed() ||
 		 src2_list.changed() ) {
-	      dst_list.cap_merge(src1_list, src2_list);
+	      if ( mUseCapMerge2 ) {
+		dst_list.cap_merge2(src1_list, src2_list);
+	      }
+	      else {
+		dst_list.cap_merge(src1_list, src2_list);
+	      }
 	    }
 	    ymuint delta1 = dst_list.num() - old_num;
 	    if ( delta1 > 0 ) {

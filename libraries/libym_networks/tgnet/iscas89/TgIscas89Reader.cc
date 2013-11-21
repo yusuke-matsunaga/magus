@@ -30,7 +30,7 @@ TgIscas89Reader::TgIscas89Reader() :
 TgIscas89Reader::~TgIscas89Reader()
 {
   delete mParser;
-  // mHandler は Iscas89Reader が責任をもって破壊してくれる．
+  // mHandler は Iscas89Parser が責任をもって破壊してくれる．
 }
 
 // @brief blif ファイルを読み込む．

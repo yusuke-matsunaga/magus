@@ -35,7 +35,7 @@
 BEGIN_NAMESPACE_YM_NETWORKS
 
 class SimpleOp :
-  public EnumCutOp
+  public EnumCutOp2
 {
 public:
 
@@ -69,7 +69,7 @@ public:
   /// @brief 処理の最後に呼ばれる関数
   virtual
   void
-  all_end(const BdnMgr& sbjgraph,
+  all_end(BdnMgr& sbjgraph,
 	  ymuint limit);
 
 
@@ -149,7 +149,7 @@ SimpleOp::node_end(BdnNode* node)
 
 // @brief 処理の最後に呼ばれる関数
 void
-SimpleOp::all_end(const BdnMgr& sbjgraph,
+SimpleOp::all_end(BdnMgr& sbjgraph,
 		  ymuint limit)
 {
   cout << "Total " << mNcAll << " cuts" << endl;
@@ -190,11 +190,13 @@ enumcut(const string& filename,
 
     enumcut(network, cut_size, &op);
   }
+#if 0
   else if ( method_str == "top_down" ) {
     TopDown enumcut;
 
     enumcut(network, cut_size, &op);
   }
+#endif
   else if ( method_str == "zdd" ) {
     ZddMgr mgr("zddmgr");
     ZddImp enumcut(mgr);

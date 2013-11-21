@@ -10,7 +10,7 @@
 
 
 #include "ZddMgrImpl.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -139,7 +139,7 @@ public:
   /// @param[in] mgr ZddMgr
   /// @param[in] s 出力先のストリーム
   Dumper(ZddMgrImpl* mgr,
-	 BinO& s);
+	 ODO& s);
 
   /// @brief デストラクタ
   ~Dumper();
@@ -165,7 +165,7 @@ private:
   ZddMgrImpl* mMgr;
 
   // 出力用のストリーム
-  BinO& mStream;
+  ODO& mStream;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;
@@ -184,7 +184,7 @@ public:
   /// @param[in] mgr ZddMgr
   /// @param[in] s 入力元のストリーム
   Restorer(ZddMgrImpl* mgr,
-	   BinI& s);
+	   IDO& s);
 
   /// @brief デストラクタ
   ~Restorer();
@@ -224,7 +224,7 @@ private:
   ZddMgrImpl* mMgr;
 
   // 入力用のストリーム
-  BinI& mStream;
+  IDO& mStream;
 
   // 根の枝を格納しておくベクタ
   vector<ZddEdge> mRootVector;

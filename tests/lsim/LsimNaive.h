@@ -60,13 +60,13 @@ private:
   const BdnMgr* mBdnMgr;
 
   // 入力ノードの配列
-  vector<BdnNode*> mInputList;
+  vector<const BdnNode*> mInputList;
 
   // 論理ノードの配列
-  vector<BdnNode*> mNodeList;
+  vector<const BdnNode*> mNodeList;
 
   // 出力ノードの配列
-  vector<BdnNode*> mOutputList;
+  vector<const BdnNode*> mOutputList;
 
   // 値を入れておく配列
   // node->id() をキーにする．

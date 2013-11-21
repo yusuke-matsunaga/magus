@@ -40,15 +40,6 @@ Network::Network() :
 Network::~Network()
 {
   clear();
-  
-  for (list<GateSa*>::iterator p = mSa0List.begin();
-       p != mSa0List.end(); ++ p) {
-    delete *p;
-  }
-  for (list<GateSa*>::iterator p = mSa1List.begin();
-       p != mSa1List.end(); ++ p) {
-    delete *p;
-  }
 }
 
 
@@ -61,10 +52,22 @@ Network::clear()
        p != mGateList.end(); ++ p) {
     delete *p;
   }
-  mNpi = 0;
+  mGateList.clear();
   mOutputList.clear();
+  mNpi = 0;
   mActGateList.clear();
   mGateMap.clear();
+
+  for (list<GateSa*>::iterator p = mSa0List.begin();
+       p != mSa0List.end(); ++ p) {
+    delete *p;
+  }
+  for (list<GateSa*>::iterator p = mSa1List.begin();
+       p != mSa1List.end(); ++ p) {
+    delete *p;
+  }
+  mSa0List.clear();
+  mSa1List.clear();
 }
 
 // @brief 内容を設定する．
@@ -84,11 +87,11 @@ Network::set(const TgNetwork& tgnetwork)
   mGateList.reserve(ngate);
   mActGateList.reserve(ngate);
   mOutputList.resize(npo);
-  
+
   mNpi = npi;
   ymuint max_id = tgnetwork.node_num();
   mGateMap.resize(max_id);
-  
+
   // 入力の生成
   for (ymuint i = 0; i < npi; ++ i) {
     const TgNode* node = tgnetwork.input(i);
@@ -99,17 +102,17 @@ Network::set(const TgNetwork& tgnetwork)
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* node = tgnetwork.sorted_logic(i);
     Gate* gate =  new_Gate(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       const TgNode* inode = node->fanin(j);
       Gate* igate = mGateMap[inode->gid()];
       gate->set_fanin(j, igate);
       ++ igate->mNo;
     }
-    if ( gate->gate_type() == kTgConst0 ) {
+    if ( gate->gate_type() == kTgGateConst0 ) {
       sm.add_const0(gate);
     }
-    if ( gate->gate_type() == kTgConst1 ) {
+    if ( gate->gate_type() == kTgGateConst1 ) {
       sm.add_const1(gate);
     }
   }
@@ -129,7 +132,7 @@ Network::set(const TgNetwork& tgnetwork)
     gate->init_fogate(gate->mNo);
     gate->mNo = 0;
   }
-  
+
   // ファンアウトの接続
   for (ymuint i = npi; i < ngate; ++ i) {
     Gate* gate = mGateList[i];
@@ -140,7 +143,7 @@ Network::set(const TgNetwork& tgnetwork)
       ++ igate->mNo;
     }
   }
-  
+
   // FFR の根 (fanout stem) を求める．
   for (int i = ngate; -- i >= 0; ) {
     Gate* gate = mGateList[i];
@@ -151,7 +154,7 @@ Network::set(const TgNetwork& tgnetwork)
       gate->set_fos(gate);
     }
   }
-  
+
   // レベルを計算する．
   for (ymuint i = 0; i < ngate; ++ i) {
     Gate* gate = mGateList[i];
@@ -191,17 +194,17 @@ Network::set(const TgNetwork& tgnetwork)
       gate->mMinLevel = level;
     }
   }
-  
+
   // 等価ゲートを求める．
   set_eq_gate();
-  
+
   // basis node の計算
   calc_basis();
-  
+
   // testability measure の計算
   t_analyze();
 }
-  
+
 // @brief ゲートを生成する．
 // @param[in] node オリジナルのノード
 // @param[in] input_id 入力番号
@@ -209,24 +212,28 @@ Gate*
 Network::new_Gate(const TgNode* node,
 		  ymuint input_id)
 {
-  tTgGateType type = node->type();
-  ymuint ni = node->ni();
   Gate* gate = NULL;
   ymuint id = mGateList.size();
-  switch ( type ) {
-  case kTgConst0: gate = new GateConst0(id, node); break;
-  case kTgConst1: gate = new GateConst1(id, node); break;
-  case kTgInput:  gate = new GateInput(id, node, input_id); break;
-  case kTgBuff:   gate = new GateBuf(id, node); break;
-  case kTgNot:    gate = new GateNot(id, node); break;
-  case kTgAnd:    gate = new GateAnd(id, node, ni); break;
-  case kTgNand:   gate = new GateNand(id, node, ni); break;
-  case kTgOr:     gate = new GateOr(id, node, ni); break;
-  case kTgNor:    gate = new GateNor(id, node, ni); break;
-  case kTgXor:    gate = new GateXor(id, node, ni); break;
-  case kTgXnor:   gate = new XGateNor(id, node, ni); break;
-  default:
-    assert_not_reached(__FILE__, __LINE__);
+  if ( node->is_input() ) {
+    gate = new GateInput(id, node, input_id);
+  }
+  else {
+    tTgGateType type = node->gate_type();
+    ymuint ni = node->fanin_num();
+    switch ( type ) {
+    case kTgGateConst0: gate = new GateConst0(id, node); break;
+    case kTgGateConst1: gate = new GateConst1(id, node); break;
+      case kTgGateBuff:   gate = new GateBuf(id, node); break;
+    case kTgGateNot:    gate = new GateNot(id, node); break;
+    case kTgGateAnd:    gate = new GateAnd(id, node, ni); break;
+    case kTgGateNand:   gate = new GateNand(id, node, ni); break;
+    case kTgGateOr:     gate = new GateOr(id, node, ni); break;
+    case kTgGateNor:    gate = new GateNor(id, node, ni); break;
+    case kTgGateXor:    gate = new GateXor(id, node, ni); break;
+    case kTgGateXnor:   gate = new XGateNor(id, node, ni); break;
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
   }
   mGateList.push_back(gate);
   mGateMap[node->gid()] = gate;
@@ -376,7 +383,7 @@ Network::calc_basis()
 {
   vector<Gate*> dom_array(ngate());
   vector<Gate*> di_array(ngate());
-  
+
   // 各ゲートの dominator を求める．
   for (int i = ngate(); -- i >= 0; ) {
     Gate* gate = mGateList[i];
@@ -394,7 +401,7 @@ Network::calc_basis()
     dom_array[gate->id()] = d;
   }
 
-  // 各ゲートのファンインの dominator の共通部分を求める． 
+  // 各ゲートのファンインの dominator の共通部分を求める．
   for (ymuint i = 0; i < ngate(); ++ i) {
     Gate* gate = mGateList[i];
     ymuint ni = gate->nfi();
@@ -459,7 +466,7 @@ Network::activate_tfitfo(Gate* pivot)
   if ( !reached ) {
     return false;
   }
-  
+
   mActGateList.clear();
   for (Gate* gate; (gate = lvlq.get_from_top());  ) {
     ymuint k = 0;
@@ -676,15 +683,15 @@ Network::new_fault(Val3 fval)
   f_gate->mState = 0;
   f_gate->clr_flag();
   f_gate->set_fj();
-  
+
   return f_gate;
 }
-  
+
 // @brief 故障ノードを削除する．
 void
 Network::delete_fault(GateSa* f_gate)
 {
-  if ( f_gate->gate_type() == kTgConst0 ) {
+  if ( f_gate->gate_type() == kTgGateConst0 ) {
     mSa0List.push_back(f_gate);
   }
   else {

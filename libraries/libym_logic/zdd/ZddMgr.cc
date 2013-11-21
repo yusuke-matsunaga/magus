@@ -117,6 +117,15 @@ ZddMgr::n_element(const Zdd& left,
 
 // @brief 極小集合のみにする．
 Zdd
+ZddMgr::make_minimal(const Zdd& left)
+{
+  ZddEdge e(left.mRoot);
+  ZddEdge ans = mImpl->make_minimal(e);
+  return Zdd(mImpl, ans);
+}
+
+// @brief 要素数最小の集合を一つ返す．
+Zdd
 ZddMgr::minimum_set(const Zdd& left)
 {
   ZddEdge e(left.mRoot);

@@ -33,7 +33,7 @@ RfsimCmd::~RfsimCmd()
 int
 RfsimCmd::cmd_proc(TclObjVector& objv)
 {
-  size_t objc = objv.size();
+  ymuint objc = objv.size();
   if ( objc != 1 ) {
     print_usage();
     return TCL_ERROR;
@@ -41,7 +41,7 @@ RfsimCmd::cmd_proc(TclObjVector& objv)
 
   // GO!
   //mRfsim();
-  
+
   return TCL_OK;
 }
 

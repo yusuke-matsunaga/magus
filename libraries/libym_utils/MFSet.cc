@@ -69,17 +69,6 @@ MFSetCell::find()
   return parent;
 }
 
-// x 番めのセルを取り出す．
-MFSetCell*
-MFSet::get(ymuint id)
-{
-  if ( id >= mNum ) {
-    // 範囲外の場合はNULLを返す．
-    return NULL;
-  }
-  return &mCellArray[id];
-}
-
 // n 個の要素を持つ集合を作るコンストラクタ．
 MFSet::MFSet(ymuint n) :
   mNum(n),
@@ -96,6 +85,13 @@ MFSet::~MFSet()
   delete [] mCellArray;
 }
 
+// @brief 要素数を返す．
+ymuint
+MFSet::num() const
+{
+  return mNum;
+}
+
 // x を含む集合の代表元を返す．
 // x が存在しない時には 0 を返す．
 ymuint
@@ -107,7 +103,7 @@ MFSet::find(ymuint id)
     return x->mId;
   }
   else {
-    return 0;
+    return kBadID;
   }
 }
 
@@ -118,10 +114,10 @@ MFSet::merge(ymuint x_id,
 	     ymuint y_id)
 {
   MFSetCell* x = get(x_id);
-  if ( !x ) return 0;
+  if ( !x ) return kBadID;
 
   MFSetCell* y = get(y_id);
-  if ( !y ) return 0;
+  if ( !y ) return kBadID;
 
   if ( x->mParent != x ) {
     // xは代表点ではない．
@@ -153,6 +149,17 @@ MFSet::merge(ymuint x_id,
     x->mParent = y;
     return y->mId;
   }
+}
+
+// x 番めのセルを取り出す．
+MFSetCell*
+MFSet::get(ymuint id)
+{
+  if ( id >= mNum ) {
+    // 範囲外の場合はNULLを返す．
+    return NULL;
+  }
+  return &mCellArray[id];
 }
 
 END_NAMESPACE_YM

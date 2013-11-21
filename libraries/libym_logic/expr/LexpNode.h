@@ -276,7 +276,7 @@ inline
 tType
 LexpNode::type() const
 {
-  return tType(mRefType & 7);
+  return static_cast<tType>(mRefType & 7U);
 }
 
 inline

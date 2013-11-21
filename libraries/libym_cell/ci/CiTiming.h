@@ -23,13 +23,17 @@ BEGIN_NAMESPACE_YM_CELL
 class CiTiming :
   public CellTiming
 {
+  friend class CiLibrary;
+
 protected:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] type タイミング条件の型
+  /// @param[in] cond タイミング条件を表す式
   CiTiming(ymuint id,
-	   tCellTimingType type);
+	   tCellTimingType type,
+	   const LogExpr& cond);
 
   /// @brief デストラクタ
   ~CiTiming();
@@ -40,7 +44,8 @@ public:
   // 共通の属性
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ID番号を返す．
+  /// @brief ID番号の取得
+  /// @note timing = cell->timing(id); の時，timing->id() = id となる．
   virtual
   ymuint
   id() const;
@@ -49,6 +54,12 @@ public:
   virtual
   tCellTimingType
   type() const;
+
+  /// @brief タイミング条件式の取得
+  /// @note ない場合には定数1の式が返される．
+  virtual
+  LogExpr
+  timing_cond() const;
 
 
 public:
@@ -155,6 +166,19 @@ public:
   cell_fall() const;
 
 
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // dump 用の下請け関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 共通な情報をダンプする．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] type_id 型の ID
+  void
+  dump_common(ODO& s,
+	      ymuint8 type_id) const;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -165,6 +189,9 @@ private:
 
   // 型
   tCellTimingType mType;
+
+  // タイミング条件
+  LogExpr mCond;
 
 };
 
@@ -181,12 +208,14 @@ protected:
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   CiTimingGP(ymuint id,
 	     tCellTimingType timing_type,
+	     const LogExpr& cond,
 	     CellTime intrinsic_rise,
 	     CellTime intrinsic_fall,
 	     CellTime slope_rise,
@@ -257,6 +286,7 @@ private:
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
@@ -265,6 +295,7 @@ private:
   /// @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
   CiTimingGeneric(ymuint id,
 		  tCellTimingType timing_type,
+		  const LogExpr& cond,
 		  CellTime intrinsic_rise,
 		  CellTime intrinsic_fall,
 		  CellTime slope_rise,
@@ -291,6 +322,18 @@ public:
   virtual
   CellResistance
   fall_resistance() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const;
 
 
 private:
@@ -321,12 +364,14 @@ private:
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] intrinsic_rise 立ち上がり固有遅延
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   CiTimingPiecewise(ymuint id,
 		    tCellTimingType timing_type,
+		    const LogExpr& cond,
 		    CellTime intrinsic_rise,
 		    CellTime intrinsic_fall,
 		    CellTime slope_rise,
@@ -365,6 +410,18 @@ public:
   fall_delay_intercept() const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const;
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -380,10 +437,10 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiTimingNonlinear1 CiTiming.h "CiTiming.h"
+/// @class CiTimingLut1 CiTiming.h "CiTiming.h"
 /// @brief CMOS非線形タイプの CellTiming の実装クラス
 //////////////////////////////////////////////////////////////////////
-class CiTimingNonlinear1 :
+class CiTimingLut1 :
   public CiTiming
 {
   friend class CiLibrary;
@@ -393,17 +450,21 @@ private:
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] cell_rise 立ち上がりセル遅延テーブル
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
-  CiTimingNonlinear1(ymuint id,
-		     tCellTimingType timing_type,
-		     CellLut* cell_rise,
-		     CellLut* cell_fall);
+  CiTimingLut1(ymuint id,
+	       tCellTimingType timing_type,
+	       const LogExpr& cond,
+	       CellLut* cell_rise,
+	       CellLut* cell_fall,
+	       CellLut* rise_transition,
+	       CellLut* fall_transition);
 
 
   /// @brief デストラクタ
   virtual
-  ~CiTimingNonlinear1();
+  ~CiTimingLut1();
 
 
 public:
@@ -421,6 +482,28 @@ public:
   const CellLut*
   cell_fall() const;
 
+  /// @brief 立ち上がり遷移遅延テーブルの取得
+  virtual
+  const CellLut*
+  rise_transition() const;
+
+  /// @brief 立ち下がり遷移遅延テーブルの取得
+  virtual
+  const CellLut*
+  fall_transition() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -433,14 +516,20 @@ private:
   // 立ち下がりセル遅延テーブル
   const CellLut* mCellFall;
 
+  // 立ち上がり遷移遅延テーブル
+  const CellLut* mRiseTransition;
+
+  // 立ち下がり遷移遅延テーブル
+  const CellLut* mFallTransition;
+
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class CiTimingNonlinear2 CiTiming.h "CiTiming.h"
+/// @class CiTimingLut2 CiTiming.h "CiTiming.h"
 /// @brief CMOS非線形タイプの CellTiming の実装クラス
 //////////////////////////////////////////////////////////////////////
-class CiTimingNonlinear2 :
+class CiTimingLut2 :
   public CiTiming
 {
   friend class CiLibrary;
@@ -450,21 +539,23 @@ private:
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] timing_type タイミングの型
+  /// @param[in] cond タイミング条件を表す式
   /// @param[in] rise_transition 立ち上がり遷移遅延テーブル
   /// @param[in] fall_transition 立ち下がり遷移遅延テーブル
   /// @param[in] rise_propagation 立ち上がり伝搬遅延テーブル
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
-  CiTimingNonlinear2(ymuint id,
-		     tCellTimingType timing_type,
-		     CellLut* rise_transition,
-		     CellLut* fall_transition,
-		     CellLut* rise_propagation,
-		     CellLut* fall_propagation);
+  CiTimingLut2(ymuint id,
+	       tCellTimingType timing_type,
+	       const LogExpr& cond,
+	       CellLut* rise_transition,
+	       CellLut* fall_transition,
+	       CellLut* rise_propagation,
+	       CellLut* fall_propagation);
 
 
   /// @brief デストラクタ
   virtual
-  ~CiTimingNonlinear2();
+  ~CiTimingLut2();
 
 
 public:
@@ -491,6 +582,18 @@ public:
   virtual
   const CellLut*
   fall_propagation() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const;
 
 
 private:

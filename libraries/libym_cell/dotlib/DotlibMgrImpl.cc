@@ -9,6 +9,7 @@
 
 #include "DotlibMgrImpl.h"
 #include "DotlibNodeImpl.h"
+#include "DotlibAttr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -21,20 +22,12 @@ BEGIN_NAMESPACE_YM_DOTLIB
 DotlibMgrImpl::DotlibMgrImpl() :
   mAlloc(4096)
 {
-  mIntNum = 0;
-  mFloatNum = 0;
-  mStrNum = 0;
-  mOprNum = 0;
-  mNotNum = 0;
-  mListNum = 0;
-  mGroupNum = 0;
-  mAttrNum = 0;
+  clear();
 }
 
 // @brief デストラクタ
 DotlibMgrImpl::~DotlibMgrImpl()
 {
-  clear();
 }
 
 // @brief 初期化する．
@@ -43,6 +36,17 @@ void
 DotlibMgrImpl::clear()
 {
   mAlloc.destroy();
+
+  mIntNum = 0;
+  mFloatNum = 0;
+  mStrNum = 0;
+  mVectNum = 0;
+  mVectElemSize = 0;
+  mOprNum = 0;
+  mNotNum = 0;
+  mListNum = 0;
+  mGroupNum = 0;
+  mAttrNum = 0;
 }
 
 // @brief 整数値を表す DotlibNode を生成する．
@@ -81,6 +85,21 @@ DotlibMgrImpl::new_string(ShString value,
   ++ mStrNum;
   void* p = mAlloc.get_memory(sizeof(DotlibString));
   DotlibNodeImpl* node = new (p) DotlibString(value, loc);
+  return node;
+}
+
+// @brief ベクタを表す DotlibNode を生成する．
+// @param[in] value_list 値のリスト
+// @param[in] loc ファイル上の位置
+DotlibNodeImpl*
+DotlibMgrImpl::new_vector(const vector<double>& value_list,
+			  const FileRegion& loc)
+{
+  ++ mVectNum;
+  ymuint n = value_list.size();
+  void* p = mAlloc.get_memory(sizeof(DotlibVector) + (n - 1) * sizeof(double));
+  mVectElemSize += (n - 1);
+  DotlibNodeImpl* node = new (p) DotlibVector(value_list, loc);
   return node;
 }
 
@@ -205,20 +224,20 @@ DotlibMgrImpl::new_group(const DotlibNode* value,
 }
 
 // @brief DotlibAttr を生成する．
-DotlibNodeImpl*
+DotlibAttr*
 DotlibMgrImpl::new_attr(const ShString& attr_name,
 			const DotlibNode* value,
 			const FileRegion& loc)
 {
   ++ mAttrNum;
   void* p = mAlloc.get_memory(sizeof(DotlibAttr));
-  DotlibNodeImpl* node =  new (p) DotlibAttr(attr_name, value, loc);
-  return node;
+  DotlibAttr* attr =  new (p) DotlibAttr(attr_name, value, loc);
+  return attr;
 }
 
 // @brief 根のノードを設定する．
 void
-DotlibMgrImpl::set_root_node(DotlibNodeImpl* root)
+DotlibMgrImpl::set_root_node(DotlibNode* root)
 {
   mRoot = root;
 }
@@ -247,6 +266,14 @@ DotlibMgrImpl::show_stats(ostream& s) const
     << " x " << setw(3) << sizeof(DotlibString)
     << " = " << setw(10) << mStrNum * sizeof(DotlibString) << endl
 
+    << "DotlibVector:       " << setw(7) << mVectNum
+    << " x " << setw(3) << sizeof(DotlibVector)
+    << " = " << setw(10) << mVectNum * sizeof(DotlibVector) << endl
+
+    << "Vector Elements:    " << setw(7) << mVectElemSize
+    << " x " << setw(3) << sizeof(double)
+    << " = " << setw(10) << mVectElemSize * sizeof(double) << endl
+
     << "DotlibOpr:          " << setw(7) << mOprNum
     << " x " << setw(3) << sizeof(DotlibOpr)
     << " = " << setw(10) << mOprNum * sizeof(DotlibOpr) << endl
@@ -267,14 +294,14 @@ DotlibMgrImpl::show_stats(ostream& s) const
     << " x " << setw(3) << sizeof(DotlibAttr)
     << " = " << setw(10) << mAttrNum * sizeof(DotlibAttr) << endl
 
-    << "Total memory:                 = "
+    << "Total memory:                     = "
     << setw(10) << mAlloc.used_size() << endl
     << endl
 
-    << "Allocated memory:             = "
+    << "Allocated memory:                 = "
     << setw(10) << mAlloc.allocated_size() << endl
 
-    << "ShString:                     = "
+    << "ShString:                         = "
     << setw(10) << ShString::allocated_size() << endl;
 }
 

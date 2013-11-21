@@ -12,7 +12,8 @@
 #include "ymtools.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -104,12 +105,12 @@ public:
   /// @brief バイナリファイルに出力する．
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルから読み込む．
   /// @param[in] s 入力元のストリーム
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:
@@ -196,8 +197,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力先のストリーム
 /// @param[in] lit 対象のリテラル
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const Literal& lit);
 
 /// @relates Literal
@@ -205,8 +206,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力元のストリーム
 /// @param[out] lit 対象のリテラル
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   Literal& lit);
 
 
@@ -308,7 +309,7 @@ Literal::make_negative() const
 // @param[in] s 出力先のストリーム
 inline
 void
-Literal::dump(BinO& s) const
+Literal::dump(ODO& s) const
 {
   s << mBody;
 }
@@ -317,7 +318,7 @@ Literal::dump(BinO& s) const
 // @param[in] s 入力元のストリーム
 inline
 void
-Literal::restore(BinI& s)
+Literal::restore(IDO& s)
 {
   s >> mBody;
 }
@@ -379,8 +380,8 @@ operator>=(Literal lit1,
 // @param[in] lit 対象のリテラル
 // @return s
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const Literal& lit)
 {
   lit.dump(s);
@@ -392,8 +393,8 @@ operator<<(BinO& s,
 // @param[out] lit 対象のリテラル
 // @return s
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   Literal& lit)
 {
   lit.restore(s);

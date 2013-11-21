@@ -11,11 +11,26 @@
 
 #include "ymtools.h"
 #include "GpMgr.h"
+#include "GpNode.h"
 #include "NpnXform.h"
 #include "FuncXform.h"
 
 
 BEGIN_NAMESPACE_YM
+
+struct GpPair
+{
+  GpPair(GpHandle handle1,
+	 GpHandle handle2) :
+    mHandle1(handle1),
+    mHandle2(handle2)
+  {
+  }
+
+  GpHandle mHandle1;
+  GpHandle mHandle2;
+};
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class GenPat GenPat.h "GenPat.h"
@@ -61,14 +76,6 @@ private:
   xf4_sub(GpHandle handle,
 	  NpnXform xf);
 
-  /// @brief パタンを登録する．
-  /// @param[in] handle ハンドル
-  /// @param[in] fv 関数ベクタ
-  /// @param[in] level レベル
-  void
-  add_pat(GpHandle handle,
-	  ymuint32 level);
-
   /// @brief 2つのノードから新しいパタンを作る．
   /// @note 具体的には aig1 & aig2 と ~aig & aig
   void
@@ -76,16 +83,18 @@ private:
 	  GpHandle handle2,
 	  ymuint level_base);
 
+  /// @brief 候補のリストに追加する．
+  void
+  add_cand(GpHandle handle1,
+	   GpHandle handle2,
+	   ymuint level,
+	   vector<vector<GpPair> >& list_array);
+
   /// @brief ノードの対を登録する．
   /// @note 結果は mCandListArray に追加される．
   void
-  add_pair(GpHandle handle,
-	   ymuint level);
-
-  /// @brief 候補のリストに追加する．
-  void
-  add_cand(GpHandle handle,
-	   ymuint level);
+  add_pat(GpHandle handle,
+	  ymuint level);
 
   /// @brief handle の子供に印をつけてノード数を数える．
   ymuint
@@ -136,6 +145,12 @@ private:
 
   // レベルごとの代表関数の GpHandle のリスト
   vector<vector<GpHandle> > mRepList;
+
+  // レベルごとのAND候補ペアのリスト
+  vector<vector<GpPair> > mAndCandPairListArray;
+
+  // レベルごとのXOR候補ペアのリスト
+  vector<vector<GpPair> > mXorCandPairListArray;
 
   // GpHandle の候補のリスト
   vector<vector<GpHandle> > mCandListArray;

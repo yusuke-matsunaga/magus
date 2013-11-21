@@ -19,7 +19,7 @@
 #include "ym_networks/TgNetwork.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_utils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG
@@ -41,13 +41,13 @@ public:
   /// @brief デストラクタ
   ~AtpgMgr();
 
-  
+
 public:
-  
+
   /// @brief TgNetwork を取り出す．
   TgNetwork&
   _network();
-  
+
   /// @brief FaultMgr を取り出す．
   FaultMgr&
   _fault_mgr();
@@ -55,34 +55,34 @@ public:
   /// @brief TvMgr を取り出す．
   TvMgr&
   _tv_mgr();
-  
+
   /// @brief テストベクタのリストを取り出す．
   vector<TestVector*>&
   _tv_list();
-  
+
   /// @brief Fsim を取り出す．
   Fsim&
   _fsim();
-  
+
   /// @brief Fsim を取り出す．
   Fsim3&
   _fsim3();
-  
+
   /// @brief Fsim を取り出す．
   FsimX&
   _fsimx();
-  
+
   /// @brief タイマーを取り出す．
   MStopWatch&
   _timer();
 
-  
+
 public:
 
   /// @brief モジュールを登録する．
   void
   bind_module(ModBase* mod);
-  
+
   /// @brief ネットワークをセットした後に呼ぶ関数
   void
   after_set_network();
@@ -99,31 +99,31 @@ private:
 
   // 対象のネットワーク
   TgNetwork mNetwork;
-  
+
   // 故障リスト
   FaultMgr mFaultMgr;
 
   // テストベクタを管理するオブジェクト
   TvMgr mTvMgr;
-  
+
   // テストベクタのリスト
   vector<TestVector*> mTvList;
 
   // タイマー
   MStopWatch mTimer;
-  
+
   // 登録されているモジュール
   list<ModBase*> mModList;
-  
+
   // Fsim モジュール
   Fsim* mFsim;
-  
+
   // Fsim3 モジュール
   Fsim3* mFsim3;
-  
+
   // FsimX モジュール
   FsimX* mFsimX;
-  
+
 };
 
 
@@ -154,7 +154,7 @@ AtpgMgr::_tv_mgr()
 {
   return mTvMgr;
 }
-  
+
 // @brief テストベクタのリストを取り出す．
 inline
 vector<TestVector*>&
@@ -186,7 +186,7 @@ AtpgMgr::_fsimx()
 {
   return *mFsimX;
 }
-  
+
 // @brief タイマーを取り出す．
 inline
 MStopWatch&

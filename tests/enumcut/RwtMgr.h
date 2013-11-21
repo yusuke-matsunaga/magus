@@ -12,7 +12,8 @@
 #include "ym_networks/bdn.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_utils/SimpleAlloc.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -65,7 +66,7 @@ public:
 
   /// @brief 内容をバイナリダンプする．
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
 
 public:
@@ -79,7 +80,7 @@ public:
 
   /// @brief バイナリファイルを読み込んで内容を設定する．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:

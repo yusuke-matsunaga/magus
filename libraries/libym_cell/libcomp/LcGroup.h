@@ -52,13 +52,13 @@ public:
   cell_group() const;
 
   /// @brief 属しているセルのリストを返す．
-  const vector<const Cell*>&
+  const vector<Cell*>&
   cell_list() const;
 
   /// @brief セルを追加する．
   /// @param[in] cell セル
   void
-  add_cell(const Cell* cell);
+  add_cell(Cell* cell);
 
 
 private:
@@ -79,7 +79,7 @@ private:
   CellGroup* mCellGroup;
 
   // セルのリスト
-  vector<const Cell*> mCellList;
+  vector<Cell*> mCellList;
 
 };
 

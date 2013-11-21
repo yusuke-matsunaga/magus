@@ -134,13 +134,13 @@ BEGIN_NAMESPACE_YM
 // 中身は恒偽関数
 TvFuncM::TvFuncM(ymuint ni,
 		 ymuint no) :
-  mNi(ni),
-  mNo(no),
-  mNblk1(nblock(ni)),
-  mNblk(mNblk1 * no),
-  mVector(new ymulong[mNblk])
+  mInputNum(ni),
+  mOutputNum(no),
+  mBlockNum1(nblock(ni)),
+  mBlockNum(mBlockNum1 * no),
+  mVector(new ymulong[mBlockNum])
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = 0UL;
   }
 }
@@ -152,21 +152,21 @@ TvFuncM::TvFuncM(const vector<TvFunc>& src_list)
 {
   assert_cond( !src_list.empty(), __FILE__, __LINE__);
   const TvFunc& first = src_list.front();
-  ymuint ni = first.ni();
+  ymuint ni = first.input_num();
   ymuint no = src_list.size();
   for (ymuint i = 1; i < no; ++ i) {
-    assert_cond( src_list[i].ni() == ni, __FILE__, __LINE__);
+    assert_cond( src_list[i].input_num() == ni, __FILE__, __LINE__);
   }
 
-  mNi = ni;
-  mNo = no;
-  mNblk1 = nblock(ni);
-  mNblk = mNblk1 * no;
-  mVector = new ymulong[mNblk];
+  mInputNum = ni;
+  mOutputNum = no;
+  mBlockNum1 = nblock(ni);
+  mBlockNum = mBlockNum1 * no;
+  mVector = new ymulong[mBlockNum];
   for (ymuint i = 0; i < no; ++ i) {
-    ymuint offset = i * mNblk1;
+    ymuint offset = i * mBlockNum1;
     const TvFunc& src1 = src_list[i];
-    for (ymuint j = 0; j < mNblk1; ++ j) {
+    for (ymuint j = 0; j < mBlockNum1; ++ j) {
       mVector[offset + j] = src1.raw_data(j);
     }
   }
@@ -174,13 +174,13 @@ TvFuncM::TvFuncM(const vector<TvFunc>& src_list)
 
 // コピーコンストラクタ
 TvFuncM::TvFuncM(const TvFuncM& src) :
-  mNi(src.mNi),
-  mNo(src.mNo),
-  mNblk1(src.mNblk1),
-  mNblk(src.mNblk),
-  mVector(new ymulong[mNblk])
+  mInputNum(src.mInputNum),
+  mOutputNum(src.mOutputNum),
+  mBlockNum1(src.mBlockNum1),
+  mBlockNum(src.mBlockNum),
+  mVector(new ymulong[mBlockNum])
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = src.mVector[i];
   }
 }
@@ -188,13 +188,13 @@ TvFuncM::TvFuncM(const TvFuncM& src) :
 // @brief TvFunc からの変換用コンストラクタ
 TvFuncM::TvFuncM(const TvFunc& src)
 {
-  ymuint ni = src.ni();
-  mNi = ni;
-  mNo = 1;
-  mNblk1 = nblock(ni);
-  mNblk = mNblk1;
-  mVector = new ymulong[mNblk];
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  ymuint ni = src.input_num();
+  mInputNum = ni;
+  mOutputNum = 1;
+  mBlockNum1 = nblock(ni);
+  mBlockNum = mBlockNum1;
+  mVector = new ymulong[mBlockNum];
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = src.raw_data(i);
   }
 }
@@ -203,16 +203,16 @@ TvFuncM::TvFuncM(const TvFunc& src)
 const TvFuncM&
 TvFuncM::operator=(const TvFuncM& src)
 {
-  if ( mNblk != src.mNblk ) {
+  if ( mBlockNum != src.mBlockNum ) {
     delete [] mVector;
-    mNblk1 = src.mNblk1;
-    mNblk = src.mNblk;
-    mVector = new ymulong[mNblk];
+    mBlockNum1 = src.mBlockNum1;
+    mBlockNum = src.mBlockNum;
+    mVector = new ymulong[mBlockNum];
   }
-  mNi = src.mNi;
-  mNo = src.mNo;
+  mInputNum = src.mInputNum;
+  mOutputNum = src.mOutputNum;
 
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = src.mVector[i];
   }
 
@@ -229,46 +229,46 @@ TvFuncM::~TvFuncM()
 const TvFuncM&
 TvFuncM::negate()
 {
-  switch ( mNi ) {
+  switch ( mInputNum ) {
   case 0:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0x1;
     }
     break;
 
   case 1:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0x3;
     }
     break;
 
   case 2:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0xF;
     }
     break;
 
   case 3:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0xFF;
     }
     break;
 
   case 4:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0xFFFF;
     }
     break;
 
   case 5:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0xFFFFFFFF;
     }
     break;
 
 #if WORD64
   case 6:
-    for (ymuint i = 0; i < mNo; ++ i) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0xFFFFFFFFFFFFFFFF;
     }
     break;
@@ -276,7 +276,7 @@ TvFuncM::negate()
 
   default:
     {
-      ymulong* endp = mVector + mNblk;
+      ymulong* endp = mVector + mBlockNum;
       for (ymulong* bp = mVector; bp != endp; ++ bp) {
 	*bp ^= ~(0UL);
       }
@@ -289,7 +289,7 @@ TvFuncM::negate()
 const TvFuncM&
 TvFuncM::operator&=(const TvFuncM& src1)
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] &= src1.mVector[i];
   }
   return *this;
@@ -299,7 +299,7 @@ TvFuncM::operator&=(const TvFuncM& src1)
 const TvFuncM&
 TvFuncM::operator|=(const TvFuncM& src1)
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] |= src1.mVector[i];
   }
   return *this;
@@ -309,7 +309,7 @@ TvFuncM::operator|=(const TvFuncM& src1)
 const TvFuncM&
 TvFuncM::operator^=(const TvFuncM& src1)
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] ^= src1.mVector[i];
   }
   return *this;
@@ -330,7 +330,7 @@ TvFuncM::set_cofactor(VarId varid,
       mask = ~mask;
     }
     int shift = 1 << pos;
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       ymulong pat = mVector[i] & mask;
       if ( pol == kPolPosi ) {
 	pat |= (pat >> shift);
@@ -344,9 +344,9 @@ TvFuncM::set_cofactor(VarId varid,
   else {
     pos -= NIPW;
     ymuint bit = 1U << pos;
-    for (ymuint j = 0; j < mNo; ++ j) {
-      ymuint offset = j * mNblk1;
-      for (ymuint i = 0; i < mNblk1; ++ i) {
+    for (ymuint j = 0; j < mOutputNum; ++ j) {
+      ymuint offset = j * mBlockNum1;
+      for (ymuint i = 0; i < mBlockNum1; ++ i) {
 	if ( pol == kPolPosi ) {
 	  if ( (i & bit) == 0U ) {
 	    mVector[i + offset] = mVector[(i ^ bit) + offset];
@@ -370,12 +370,12 @@ TvFuncM::output(VarId ovar) const
 {
   #warning "効率が悪い仮のコード"
 
-  ymuint np = 1U << ni();
+  ymuint np = 1U << input_num();
   vector<int> tmp(np);
   for (ymuint i = 0; i < np; ++ i) {
     tmp[i] = value(ovar, i);
   }
-  return TvFunc(ni(), tmp);
+  return TvFunc(input_num(), tmp);
 }
 
 // var がサポートの時 true を返す．
@@ -387,7 +387,7 @@ TvFuncM::check_sup(VarId var) const
     // ブロックごとにチェック
     ymuint dist = 1U << i;
     ymulong mask = c_masks[i];
-    for (ymuint i = 0; i < mNblk; ++ i) {
+    for (ymuint i = 0; i < mBlockNum; ++ i) {
       ymulong word = mVector[i];
       if ( (word ^ (word << dist)) & mask ) {
 	return true;
@@ -398,9 +398,9 @@ TvFuncM::check_sup(VarId var) const
     // ブロック単位でチェック
     ymuint i5 = i - NIPW;
     ymuint check = 1U << i5;
-    for (ymuint i = 0; i < mNo; ++ i) {
-      ymuint offset = i * mNblk1;
-      for (ymuint b = 0; b < mNblk1; ++ b) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
+      ymuint offset = i * mBlockNum1;
+      for (ymuint b = 0; b < mBlockNum1; ++ b) {
 	if ( (b & check) &&
 	     (mVector[b + offset] != mVector[(b ^ check) + offset]) ) {
 	  return true;
@@ -443,9 +443,9 @@ TvFuncM::check_sym(VarId var1,
     else {
       cond = 0UL;
     }
-    for (ymuint i = 0; i < mNo; ++ i) {
-      ymuint offset = i * mNblk1;
-      for (ymuint v = 0; v < mNblk1; ++ v) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
+      ymuint offset = i * mBlockNum1;
+      for (ymuint v = 0; v < mBlockNum1; ++ v) {
 	if ( (v & mask_all) == cond &&
 	     mVector[v + offset] != mVector[(v ^ mask_all) + offset] ) {
 	  ans = false;
@@ -467,9 +467,9 @@ TvFuncM::check_sym(VarId var1,
     }
     ymulong mask2 = ~c_masks[j];
     ymuint s = 1U << j;
-    for (ymuint i = 0; i < mNo; ++ i) {
-      ymuint offset = i * mNblk1;
-      for (ymuint v = 0; v < mNblk1; ++ v) {
+    for (ymuint i = 0; i < mOutputNum; ++ i) {
+      ymuint offset = i * mBlockNum1;
+      for (ymuint v = 0; v < mBlockNum1; ++ v) {
 	if ( (v & mask_i) == cond &&
 	     (mVector[v + offset] ^ (mVector[(v ^ mask_i) + offset] >> s)) & mask2 ) {
 	  ans = false;
@@ -484,7 +484,7 @@ TvFuncM::check_sym(VarId var1,
     if ( pol == kPolPosi ) {
       ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) - (1U << j);
-      for (ymuint i = 0; i < mNblk; ++ i) {
+      for (ymuint i = 0; i < mBlockNum; ++ i) {
 	ymulong word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
@@ -495,7 +495,7 @@ TvFuncM::check_sym(VarId var1,
     else {
       ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) + (1U << j);
-      for (ymuint i = 0; i < mNblk; ++ i) {
+      for (ymuint i = 0; i < mBlockNum; ++ i) {
 	ymulong word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
@@ -511,7 +511,7 @@ TvFuncM::check_sym(VarId var1,
 TvFuncM
 TvFuncM::xform(const NpnMapM& npnmap) const
 {
-  ymuint ni_pow = 1UL << mNi;
+  ymuint ni_pow = 1UL << mInputNum;
 
 #if defined(DEBUG)
   cout << "xform" << endl
@@ -521,7 +521,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
 
   ymuint imask = 0UL;
   ymuint ipat[kMaxNi];
-  for (ymuint i = 0; i < mNi; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     VarId src_var(i);
     NpnVmap imap = npnmap.imap(src_var);
     if ( imap.pol() == kPolNega ) {
@@ -532,9 +532,9 @@ TvFuncM::xform(const NpnMapM& npnmap) const
     ipat[i] = 1UL << j;
   }
 
-  TvFuncM ans(mNi, mNo);
+  TvFuncM ans(mInputNum, mOutputNum);
 
-  for (ymuint o = 0; o < mNo; ++ o) {
+  for (ymuint o = 0; o < mOutputNum; ++ o) {
     VarId src_var(o);
     NpnVmap omap = npnmap.omap(src_var);
     VarId dst_var = omap.var();
@@ -543,13 +543,13 @@ TvFuncM::xform(const NpnMapM& npnmap) const
     for (ymuint i = 0; i < ni_pow; ++ i) {
       ymuint new_i = 0;
       ymuint tmp = i;
-      for (ymuint b = 0; b < mNi; ++ b, tmp >>= 1) {
+      for (ymuint b = 0; b < mInputNum; ++ b, tmp >>= 1) {
 	if ( tmp & 1 ) {
 	  new_i |= ipat[b];
 	}
       }
       ymulong pat = (value(VarId(o), i ^ imask) ^ omask);
-      ans.mVector[block(new_i) + dst_pos * mNblk1] |= pat << shift(new_i);
+      ans.mVector[block(new_i) + dst_pos * mBlockNum1] |= pat << shift(new_i);
     }
   }
 
@@ -565,10 +565,10 @@ ymuint
 TvFuncM::hash() const
 {
   ymulong ans = 0;
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans ^= mVector[i];
   }
-  return ans + mNi + (mNo << 8);
+  return ans + mInputNum + (mOutputNum << 8);
 }
 
 // 等価比較
@@ -579,7 +579,7 @@ operator==(const TvFuncM& func1,
   if ( !TvFuncM::check_nio(func1, func2) ) {
     return false;
   }
-  ymuint n = func1.mNblk;
+  ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     if ( func1.mVector[i] != func2.mVector[i] ) {
       return false;
@@ -593,9 +593,9 @@ operator==(const TvFuncM& func1,
 bool
 TvFuncM::lt(const TvFuncM& right) const
 {
-  for (ymuint i = 0; i < mNblk; ++ i) {
-    ymulong w1 = mVector[mNblk - i - 1];
-    ymulong w2 = right.mVector[mNblk - i - 1];
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
+    ymulong w1 = mVector[mBlockNum - i - 1];
+    ymulong w2 = right.mVector[mBlockNum - i - 1];
     if ( w1 > w2 ) {
       return false;
     }
@@ -615,7 +615,7 @@ operator&&(const TvFuncM& func1,
   if ( !TvFuncM::check_nio(func1, func2) ) {
     return false;
   }
-  ymuint n = func1.mNblk;
+  ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     ymulong w1 = func1.mVector[i];
     ymulong w2 = func2.mVector[i];
@@ -632,13 +632,13 @@ void
 TvFuncM::print(ostream& s,
 	       int mode) const
 {
-  ymuint ni_pow = 1UL << mNi;
+  ymuint ni_pow = 1UL << mInputNum;
   const ymuint wordsize = SIZEOF_SIZE_T * 8;
   if ( mode == 2 ) {
     ymulong* bp = mVector;
     ymulong tmp = *bp;
     const char* del = "";
-    for (ymuint j = 0; j < mNo; ++ j) {
+    for (ymuint j = 0; j < mOutputNum; ++ j) {
       s << del;
       del = "|";
       ymuint offset = 0;
@@ -662,7 +662,7 @@ TvFuncM::print(ostream& s,
     ymuint ni_pow4 = ni_pow / 4;
     ymulong* bp = mVector;
     ymulong tmp = *bp;
-    for (ymuint j = 0; j < mNo; ++ j) {
+    for (ymuint j = 0; j < mOutputNum; ++ j) {
       const char* del = "";
       ymuint offset = 0;
       for (ymuint i = 0; i < ni_pow4; ++ i) {
@@ -697,14 +697,14 @@ TvFuncM::print(ostream& s,
 // @brief バイナリファイルの書き出し
 // @param[in] s 出力先のストリーム
 void
-TvFuncM::dump(BinO& s) const
+TvFuncM::dump(ODO& s) const
 {
-  s << mNi
-    << mNo
-    << mNblk1
-    << mNblk;
+  s << mInputNum
+    << mOutputNum
+    << mBlockNum1
+    << mBlockNum;
 
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     s << mVector[i];
   }
 }
@@ -712,21 +712,21 @@ TvFuncM::dump(BinO& s) const
 // @brief バイナリファイルの読み込み
 // @param[in] s 入力元のストリーム
 void
-TvFuncM::restore(BinI& s)
+TvFuncM::restore(IDO& s)
 {
   ymuint32 nblk;
 
-  s >> mNi
-    >> mNo
-    >> mNblk1
+  s >> mInputNum
+    >> mOutputNum
+    >> mBlockNum1
     >> nblk;
 
-  if ( mNblk != nblk ) {
+  if ( mBlockNum != nblk ) {
     delete [] mVector;
-    mNblk = nblk;
-    mVector = new ymulong[mNblk];
+    mBlockNum = nblk;
+    mVector = new ymulong[mBlockNum];
   }
-  for (ymuint i = 0; i < mNblk; ++ i) {
+  for (ymuint i = 0; i < mBlockNum; ++ i) {
     s >> mVector[i];
   }
 }

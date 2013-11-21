@@ -39,27 +39,27 @@ public:
   /// @param[in] mode カット列挙モード
   virtual
   void
-  all_init(BdnMgr& sbjgraph,
+  all_init(const BdnMgr& sbjgraph,
 	   ymuint limit) = 0;
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_init(BdnNode* node) = 0;
+  node_init(const BdnNode* node) = 0;
 
   /// @brief カットを見つけたときに呼ばれる関数
   virtual
   void
-  found_cut(BdnNode* root,
+  found_cut(const BdnNode* root,
 	    ymuint ni,
-	    BdnNode** inputs) = 0;
+	    const BdnNode** inputs) = 0;
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_end(BdnNode* node) = 0;
+  node_end(const BdnNode* node) = 0;
 
   /// @brief 処理の最後に呼ばれる関数
   virtual
@@ -84,7 +84,7 @@ public:
   /// @param[in] limit カットサイズの制限
   virtual
   void
-  operator()(BdnMgr& network,
+  operator()(const BdnMgr& network,
 	     ymuint limit,
 	     EnumCutOp* op) = 0;
 

@@ -11,7 +11,7 @@
 
 #include "CNFddMgrImpl.h"
 #include "IdMgr.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -28,7 +28,7 @@ public:
   /// @param[in] mgr CNFddMgr
   /// @param[in] s 出力先のストリーム
   Dumper(CNFddMgrImpl* mgr,
-	 BinO& s);
+	 ODO& s);
 
   /// @brief デストラクタ
   ~Dumper();
@@ -54,7 +54,7 @@ private:
   CNFddMgrImpl* mMgr;
 
   // 出力用のストリーム
-  BinO& mStream;
+  ODO& mStream;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;

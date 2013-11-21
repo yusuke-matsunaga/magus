@@ -32,6 +32,8 @@ public:
     kFloat,
     /// @brief 文字列型の定数
     kString,
+    /// @brief 浮動小数点数ベクタ型の定数
+    kVector,
     /// @brief + 演算子
     kPlus,
     /// @brief - 演算子
@@ -51,9 +53,7 @@ public:
     /// @brief リスト
     kList,
     /// @brief グループ
-    kGroup,
-    /// @brief 属性
-    kAttr
+    kGroup
   };
 
 protected:
@@ -88,6 +88,11 @@ public:
   bool
   is_string() const = 0;
 
+  /// @brief ベクタ型(kVector)の時に true を返す．
+  virtual
+  bool
+  is_vector() const = 0;
+
   /// @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
   virtual
   bool
@@ -102,11 +107,6 @@ public:
   virtual
   bool
   is_group() const = 0;
-
-  /// @brief 属性型(kAttr)の時に true を返す．
-  virtual
-  bool
-  is_attr() const = 0;
 
   /// @brief ファイル上の位置を返す．
   virtual
@@ -131,6 +131,26 @@ public:
   ShString
   string_value() const = 0;
 
+  /// @brief ベクタの要素数を返す．
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  ymuint
+  vector_size() const = 0;
+
+  /// @brief ベクタの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  double
+  vector_elem(ymuint pos) const = 0;
+
+  /// @brief ベクタの全体を取り出す．
+  /// @param[out] vector 結果を格納する変数
+  /// @note is_vector() = true の時のみ意味を持つ．
+  virtual
+  void
+  get_vector(vector<double>& vector) const = 0;
+
   /// @brief 第一オペランドを返す．
   /// @note is_opr() = true の時のみ意味を持つ．
   virtual
@@ -143,17 +163,18 @@ public:
   const DotlibNode*
   opr2() const = 0;
 
-  /// @brief リストの先頭の要素を返す．
-  /// @note is_list() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  top() const = 0;
-
   /// @brief リストの要素数を返す．
   /// @note is_list() = true の時のみ意味を持つ．
   virtual
   ymuint
   list_size() const = 0;
+
+  /// @brief リストの要素を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+  /// @note is_list() == true の時のみ意味を持つ．
+  virtual
+  const DotlibNode*
+  list_elem(ymuint pos) const = 0;
 
   /// @brief グループの値を得る．
   /// @note is_group() = true の時のみ意味を持つ．
@@ -165,26 +186,8 @@ public:
   /// @note is_group() = true の時のみ意味を持つ．
   /// @note 返り値のノードの型は kAttr
   virtual
-  const DotlibNode*
+  const DotlibAttr*
   attr_top() const = 0;
-
-  /// @brief 属性名を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  ShString
-  attr_name() const = 0;
-
-  /// @brief 属性の値を得る．
-  /// @note is_attr() = true の時のみ意味を持つ．
-  virtual
-  const DotlibNode*
-  attr_value() const = 0;
-
-  /// @brief リストの次の要素を得る．
-  /// @note これはすべての型で意味を持つ．
-  virtual
-  const DotlibNode*
-  next() const = 0;
 
   /// @brief 内容をストリーム出力する．
   /// @param[in] s 出力先のストリーム
@@ -199,46 +202,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // パーズ用の便利関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief ライブラリを表すノードから情報を取り出す．
-  /// @param[out] library_info ライブラリの情報を格納する変数
-  /// @retval true 正しく読み込めた．
-  /// @retval false エラーが起こった．
-  /// @note エラーは MsgMgr に出力する．
-  bool
-  get_library_info(DotlibLibrary& library_info) const;
-
-  /// @brief セルを表すノードから情報を取り出す．
-  /// @param[out] cell_info セルの情報を格納する変数
-  /// @retval true 正しく読み込めた．
-  /// @retval false エラーが起こった．
-  /// @note エラーは MsgMgr に出力する．
-  bool
-  get_cell_info(DotlibCell& cell_info) const;
-
-  /// @brief FFを表すノードから情報を取り出す．
-  /// @param[out] ff_info FFの情報を格納する変数
-  /// @retval true 正しく読み込めた．
-  /// @retval false エラーが起こった．
-  /// @note エラーは MsgMgr に出力する．
-  bool
-  get_ff_info(DotlibFF& ff_info) const;
-
-  /// @brief ラッチを表すノードから情報を取り出す．
-  /// @param[out] latch_info ラッチの情報を格納する変数
-  /// @retval true 正しく読み込めた．
-  /// @retval false エラーが起こった．
-  /// @note エラーは MsgMgr に出力する．
-  bool
-  get_latch_info(DotlibLatch& latch_info) const;
-
-  /// @brief ピンを表すノードから情報を取り出す．
-  /// @param[out] pin_info ピンの情報を格納する変数
-  /// @retval true 正しく読み込めた．
-  /// @retval false エラーが起こった．
-  /// @note エラーは MsgMgr に出力する．
-  bool
-  get_pin_info(DotlibPin& pin_info) const;
 
   /// @brief 1つの文字列からなるリストの場合に文字列を返す．
   /// @note 仮定が外れたらアボートする．
@@ -255,15 +218,15 @@ public:
   get_string_pair(ShString& str1,
 		  ShString& str2) const;
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief get_ff_info() と get_latch_info() の共通処理
+  /// @brief float 値を取り出す．
+  /// @note 型が違ったらエラーを MsgMgr に出力する．
   bool
-  get_fl_info(DotlibFL& fl_info) const;
+  get_float(double& value) const;
+
+  /// @brief 文字列を取り出す．
+  /// @note 型が違ったらエラーを MsgMgr に出力する．
+  bool
+  get_string(ShString& value) const;
 
 };
 
