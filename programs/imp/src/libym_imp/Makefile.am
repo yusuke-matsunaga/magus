@@ -14,7 +14,7 @@ noinst_LTLIBRARIES = \
 	libym_imp.la
 
 libym_imp_la_CPPFLAGS = \
-	-I$(top_srcdir)/imp/include \
+	-I$(top_srcdir)/include \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	@GMP_INCLUDES@

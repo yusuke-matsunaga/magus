@@ -70,7 +70,7 @@ YM_BUILD_LIBRARY([libym_smtlibv2], [yes],
 		  ym_libym_logic_enable])
 
 # libym_mincov
-YM_BUILD_LIBRARY([libym_mincov], [yes],
+YM_BUILD_LIBRARY([libym_mincov], [no],
 		 [ym_libym_utils_enable])
 
 # libym_cell
@@ -131,7 +131,7 @@ YM_FINISH_LIBRARIES_SUBDIRS
 YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
-YM_BUILD_PROGRAM([magus_tclsh], [yes],
+YM_BUILD_PROGRAM([magus_tclsh], [no],
 		 [ym_libym_tclpp_enable])
 
 # atpg
@@ -170,6 +170,55 @@ YM_BUILD_PROGRAM([igf], [no],
 YM_BUILD_PROGRAM([llvmeq], [no],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
+		  ym_libym_tclpp_enable])
+
+# bnet2aig
+YM_BUILD_PROGRAM([bnet2aig], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# enumcut
+YM_BUILD_PROGRAM([enumcut], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# genaig
+YM_BUILD_PROGRAM([genaig], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# imp
+YM_BUILD_PROGRAM([imp], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# lrw
+YM_BUILD_PROGRAM([lrw], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# lsim
+YM_BUILD_PROGRAM([lsim], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# makebdd
+YM_BUILD_PROGRAM([makebdd], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS

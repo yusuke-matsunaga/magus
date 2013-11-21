@@ -21,3 +21,10 @@ programs/satpg
 programs/seal
 programs/igf
 programs/llvmeq
+programs/bnet2aig
+programs/enumcut
+programs/genaig
+programs/imp
+programs/lrw
+programs/lsim
+programs/makebdd

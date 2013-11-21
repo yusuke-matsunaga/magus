@@ -4,18 +4,11 @@
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+EXTRA_DIST =
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
-
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
-
-TESTS =
-
 
 noinst_PROGRAMS = \
 	lsim

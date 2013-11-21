@@ -4,14 +4,8 @@
 
 SUBDIRS = include src
 
-EXTRA_DIST = local_defs $(TESTS)
+EXTRA_DIST =
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
-
-TESTS_ENVIROMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
-
-TESTS =

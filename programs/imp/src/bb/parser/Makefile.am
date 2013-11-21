@@ -16,7 +16,7 @@ noinst_LTLIBRARIES = \
 libbb_parser_la_CPPFLAGS = \
 	-I $(YMTOOLS_SRCDIR)/include \
 	-I $(YMTOOLS_BUILDDIR)/include \
-	-I $(top_srcdir)/imp/src/bb/include
+	-I $(top_srcdir)/src/bb/include
 
 libbb_parser_la_SOURCES = \
 	bb_grammer.yy \

@@ -7,13 +7,9 @@
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+EXTRA_DIST =
 
 MAINTAINERCLEANFILES = Makefile.in
-
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
 TESTS =
 

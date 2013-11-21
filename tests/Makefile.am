@@ -2,14 +2,7 @@
 
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
-SUBDIRS = \
-	bnet2aig \
-	makebdd \
-	lsim \
-	enumcut \
-	imp \
-	genaig \
-	lrw
+SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 

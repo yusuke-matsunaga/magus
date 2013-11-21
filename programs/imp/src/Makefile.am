@@ -17,8 +17,8 @@ noinst_PROGRAMS = \
 imp_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/imp/include \
-	-I$(top_srcdir)/imp/src/libym_imp \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/libym_imp \
 	@GMP_INCLUDES@
 
 imp_SOURCES = \
@@ -38,8 +38,8 @@ imp_LDFLAGS =
 impsh_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/imp/include \
-	-I$(top_srcdir)/imp/src/libym_imp \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/libym_imp \
 	@TCL_INCLUDES@ \
 	@GMP_INCLUDES@
 

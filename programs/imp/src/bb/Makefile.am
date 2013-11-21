@@ -16,8 +16,8 @@ bin_PROGRAMS = \
 bb_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/imp/include \
-	-I$(top_srcdir)/imp/src/bb/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/bb/include
 
 bb_SOURCES = \
 	bb.cc
