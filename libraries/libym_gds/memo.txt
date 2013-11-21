@@ -48,8 +48,8 @@ record 番号  record 名       データ型
          28   ANGLE        Eight-Byte Real
          29   UINTEGER     ---
          30   USTRING      ---
-         31   REFLIBS      ASCII String
-         32   FONTS        ASCII String
+         31   REFLIBS      ASCII String ( 44 bytes x n )
+         32   FONTS        ASCII String ( 44 bytes x 4 )
          33   PATHTYPE     Two-Byte Signed Integer ( 0 - 4 )
          34   GENERATIONS  Two-Byte Signed Integer ( 2 - 99 )
          35   ATTRTABLE    ASCII String

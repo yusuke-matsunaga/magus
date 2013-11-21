@@ -48,6 +48,10 @@ public:
   const char*
   value() const;
 
+  /// @brief 次の要素を返す．
+  const GdsProperty*
+  next();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -59,6 +63,9 @@ private:
 
   // PROPVALUE の値
   GdsString* mValue;
+
+  // 次の要素
+  GdsProperty* mLink;
 
 };
 
@@ -74,7 +81,8 @@ inline
 GdsProperty::GdsProperty(ymuint attr,
 			 GdsString* value) :
   mAttr(attr),
-  mValue(value)
+  mValue(value),
+  mLink(NULL)
 {
 }
 
@@ -98,6 +106,14 @@ const char*
 GdsProperty::value() const
 {
   return mValue->str();
+}
+
+// @brief 次の要素を返す．
+inline
+const GdsProperty*
+GdsProperty::next()
+{
+  return mLink;
 }
 
 END_NAMESPACE_YM_GDS

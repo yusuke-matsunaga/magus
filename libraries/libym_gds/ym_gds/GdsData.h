@@ -1,7 +1,7 @@
 #ifndef YM_GDS_GDSDATA_H
 #define YM_GDS_GDSDATA_H
 
-/// @file GdsData.h
+/// @file ym_gds/GdsData.h
 /// @brief GdsData のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,80 +15,109 @@
 BEGIN_NAMESPACE_YM_GDS
 
 //////////////////////////////////////////////////////////////////////
-// GDS-II のヘッダ情報
+/// @class GdsData GdsData.h "ym_gds/GdsData.h"
+/// @brief GDS-II のデータを表すクラス
 //////////////////////////////////////////////////////////////////////
-class GdsHeader
+class GdsData
 {
+  friend class GdsParser;
+
+private:
+
+  /// @brief コンストラクタ
+  /// @param[in] version バージョン番号
+  /// @param[in] date 2つの日時の配列
+  /// @param[in] libdirsize LIBDIRSIZE の値
+  /// @param[in] srfname SRFNAME の値
+  /// @param[in] acl LIBSECURE の値
+  /// @param[in] libname LIBNAME の値
+  /// @param[in] reflibs REFLIBS の値
+  /// @param[in] fonts FONTS の値
+  /// @param[in] attrtable ATTRTABLE の値
+  /// @param[in] generations GENERATIONS の値
+  /// @param[in] format フォーマット情報
+  /// @param[in] units UNITS の値
+  GdsData(ymint16 version,
+	  GdsDate* date,
+	  ymint16 libdirsize,
+	  GdsString* srfname,
+	  GdsACL* acl,
+	  GdsString* libname,
+	  GdsString* reflibs,
+	  GdsString* fonts,
+	  GdsString* attrtable,
+	  ymint16 generations,
+	  GdsFormat* format,
+	  GdsUnits* units);
+
+  /// @brief デストラクタ
+  ~GdsData();
+
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
-  // コンストラクタ
-  GdsHeader();
-
-  // デストラクタ
-  ~GdsHeader();
-
-
-public:
-
-  // バージョン番号を返す．
+  /// @brief バージョン番号を返す．
   int
-  version_no() const;
+  version() const;
 
-  // 最終更新日時を返す．
-  Date
+  /// @brief 最終更新日時を返す．
+  const GdsDate&
   last_modification_time() const;
 
-  // 最終アクセス日時を返す．
-  Date
+  /// @brief 最終アクセス日時を返す．
+  const GdsDate&
   last_access_time() const;
 
-  // LIBDIRSIZE を返す．
+  /// @brief LIBDIRSIZE を返す．
   int
   lib_dir_size() const;
 
-  // SRFNAME(spacing rule file name) を返す．
-  string
+  /// @brief SRFNAME(spacing rule file name) を返す．
+  const char*
   srf_name() const;
 
-  // ACL リストを返す．
-  const vector<ACL>&
+  /// @brief ACL リストを返す．
+  GdsACL*
   acl_list() const;
 
-  // ライブラリ名を返す．
-  string
+  /// @brief ライブラリ名を返す．
+  const char*
   lib_name() const;
 
-  // 参照しているライブラリ名のリストを返す．
-  const vector<string>&
-  reflib_names() const;
+  /// @brief 参照しているライブラリ名のリストを返す．
+  const char*
+  reflibs() const;
 
-  // フォント名のリストを返す．
-  const vector<string>&
-  font_names() const;
+  /// @brief フォント名のリストを返す．
+  const char*
+  fonts() const;
 
-  // 属性定義ファイル名を返す．
-  string
-  attr_table_name() const;
+  /// @brief 属性定義ファイル名を返す．
+  const char*
+  attrtable() const;
 
-  // 世代を返す．
+  /// @brief 世代を返す．
   int
   generations() const;
 
-  // フォーマット番号を返す．
-  int
+  /// @brief フォーマット情報を返す．
+  const GdsFormat*
   format() const;
 
-  // マスク情報を返す．
-  const vector<string>&
-  masks() const;
-
-  // user unit を返す．
+  /// @brief user unit を返す．
   double
   user_unit() const;
 
-  // unit in meters を返す．
+  /// @brief unit in meters を返す．
   double
   meter_unit() const;
+
+  /// @brief GdsStruct の先頭を返す．
+  const GdsStruct*
+  struct_top() const;
 
 
 private:
@@ -97,638 +126,46 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // バージョン番号
-  ymuint16 mVersionNo;
+  ymint16 mVersion;
 
-  // 最終更新日時
-  Date mLastModificationTime;
-
-  // 最終アクセス日時
-  Date mLastAccessTime;
+  // 最終更新日時/最終アクセス日時
+  GdsDate* mDate;
 
   // LIBDIRSIZE
-  int mLibDirSize;
+  ymint16 mLibDirSize;
 
   // SRFNAME(spacing rule file name)
-  string mSrfName;
+  GdsString* mSrfName;
 
   // LIBSECRUE
-  vector<ACL> mAclList;
+  GdsACL* mAclList;
 
   // ライブラリ名
-  string mLibName;
+  GdsString* mLibName;
 
   // reference libraries
-  vector<string> mRefLibNames;
+  GdsString* mRefLibs;
 
   // フォント名
-  vector<string> mFontNames;
+  GdsString* mFonts;
 
   // 属性定義ファイル名
-  string mAttrTableName;
+  GdsString* mAttrTable;
 
-  // 世代
-  int mGenerations;
+  // 世代 ( 2 - 99 )
+  ymuint8 mGenerations;
 
-  // フォーマット番号
-  int mFormat;
+  // フォーマット情報
+  GdsFormat* mFormat;
 
-  // マスク情報
-  vector<string> mMasks;
+  // UNITS
+  GdsUnits* mUnits;
 
-  // user unit
-  double mUserUnit;
-
-  // unit in meters
-  double mMeterUnit;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// GDS-II の構造単位
-//////////////////////////////////////////////////////////////////////
-class GdsStruct
-{
-public:
-
-  // コンストラクタ
-  GdsStruct();
-
-  // デストラクタ
-  ~GdsStruct();
-
-
-public:
-
-  // 生成日時を返す．
-  Date
-  creation_time() const;
-
-  // 最終更新日時を返す．
-  Date
-  last_modification_time() const;
-
-  // 名前を返す．
-  string
-  name() const;
-
-  // 要素のリストを返す．
-  const list<Element*>&
-  element_list() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 生成日時
-  Date mCreationTime;
-
-  // 最終更新日時
-  Date mLastModificationTime;
-
-  // 名前
-  string mName;
-
-  // 要素のリスト
-  list<Element*> mElementList;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// 要素の基底クラス
-//////////////////////////////////////////////////////////////////////
-class Element
-{
-public:
-
-  // コンストラクタ
-  Element();
-
-  // デストラクタ
-  virtual
-  ~Element();
-
-
-public:
-
-  // external data ビットが立っているとき true を返す．
-  bool
-  external_data() const;
-
-  // template data ビットが立っているとき true を返す．
-  bool
-  template_data() const;
-
-  // plex 番号を返す．
-  int
-  plex() const;
-
-  // property のリストを返す．
-  const list<Property*>&
-  property_list() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ELFLAGS
-  size_t mElFlags;
-
-  // PLEX
-  int mPlex;
-
-  // property のリスト
-  list<Property*> mPropertyList;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// BOUNDARY
-//////////////////////////////////////////////////////////////////////
-class Boundary :
-  public Element
-{
-public:
-
-  // コンストラクタ
-  Boundary();
-
-  // デストラクタ
-  virtual
-  ~Boundary();
-
-
-public:
-
-  // 層番号を返す．
-  int
-  layer() const;
-
-  // データ型を返す．
-  int
-  datatype() const;
-
-  // 座標のリストを返す．
-  const vector<XY>&
-  xy_list() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 層番号
-  int mLayer;
-
-  // データ型
-  int mDataType;
-
-  // 座標のリスト
-  vector<XY> mXYList;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// PATH
-//////////////////////////////////////////////////////////////////////
-class Path :
-  public Element
-{
-public:
-
-  // コンストラクタ
-  Path();
-
-  // デストラクタ
-  virtual
-  ~Path();
-
-
-public:
-
-  // 層番号を返す．
-  int
-  layer() const;
-
-  // データ型を返す．
-  int
-  datatype() const;
-
-  // パスタイプを返す．
-  int
-  pathtype() const;
-
-  // 幅を返す．
-  int
-  width() const;
-
-  // BGNEXTN を返す．
-  int
-  bgn_extn() const;
-
-  // ENDEXTN を返す．
-  int
-  end_extn() const;
-
-  // 座標のリストを返す．
-  const vector<XY>&
-  xy_list() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 層番号
-  int mLayer;
-
-  // データ型
-  int mDataType;
-
-  // パスタイプ
-  int mPathType;
-
-  // 幅
-  int mWidth;
-
-  // BGNEXTN
-  int mBgnExtn;
-
-  // ENDEXTN
-  int mEndExtn;
-
-  // 座標のリスト
-  vector<XY> mXYList;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// 参照型要素の基底クラス
-//////////////////////////////////////////////////////////////////////
-class RefBase :
-  public Element
-{
-public:
-
-  // コンストラクタ
-  RefBase();
-
-  // デストラクタ
-  virtual
-  ~RefBase();
-
-
-public:
-
-  // 参照している構造名を返す．
-  string
-  strname();
-
-  // reflection ビットが立っていたら true を返す．
-  bool
-  reflection() const;
-
-  // absolute magnification ビットが立っていたら true を返す．
-  bool
-  absolute_magnification() const;
-
-  // absolute angle ビットが立っていたら true を返す．
-  bool
-  absolute_angle() const;
-
-  // magnification factor を返す．
-  double
-  mag() const;
-
-  // angular rotation factor を返す．
-  double
-  angle() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 参照している構造名
-  string mStrName;
-
-  // STRANS bit array
-  size_t mStrans;
-
-  // magnification factor
-  double mMag;
-
-  // angular rotation factor
-  double mAngle;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// SREF
-//////////////////////////////////////////////////////////////////////
-class Sref :
-  public RefBase
-{
-public:
-
-  // コンストラクタ
-  Sref();
-
-  // デストラクタ
-  virtual
-  ~Sref();
-
-
-public:
-
-  // XY 座標を返す．
-  XY
-  xy() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // XY座標
-  XY mXY;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// AREF
-//////////////////////////////////////////////////////////////////////
-class Aref :
-  public RefBase
-{
-public:
-
-  // コンストラクタ
-  Aref();
-
-  // デストラクタ
-  virtual
-  ~Aref();
-
-
-public:
-
-  // column 数を返す．
-  int
-  column() const;
-
-  // row 数を返す．
-  int
-  row() const;
-
-  // 基準(左下)の XY 座標を返す．
-  XY
-  xy1() const;
-
-  // 右下隅の XY 座標を返す．
-  XY
-  xy2() const;
-
-  // 左上隅の XY 座標を返す．
-  XY
-  xy3() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // column 数
-  int mColumn;
-
-  // row 数
-  int mRow;
-
-  // XY座標
-  XY mXY[3];
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// TEXT
-//////////////////////////////////////////////////////////////////////
-class Text
-{
-public:
-
-  // コンストラクタ
-  Text();
-
-  // デストラクタ
-  virtual
-  ~Text();
-
-
-public:
-
-  // 層番号を返す．
-  int
-  layer() const;
-
-  // テキスト型を返す．
-  int
-  texttype() const;
-
-  // パスタイプを返す．
-  int
-  pathtype() const;
-
-  // 幅を返す．
-  int
-  width() const;
-
-  // reflection ビットが立っていたら true を返す．
-  bool
-  reflection() const;
-
-  // absolute magnification ビットが立っていたら true を返す．
-  bool
-  absolute_magnification() const;
-
-  // absolute angle ビットが立っていたら true を返す．
-  bool
-  absolute_angle() const;
-
-  // magnification factor を返す．
-  double
-  mag() const;
-
-  // angular rotation factor を返す．
-  double
-  angle() const;
-
-  // 座標を返す．
-  XY
-  xy() const;
-
-  // 本体の文字列を返す．
-  string
-  body() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 層番号
-  int mLayer;
-
-  // TEXTTYPE
-  int mTextType;
-
-  // PRESENTATION
-  size_t mPresentation;
-
-  // パスタイプ
-  int mPathType;
-
-  // 幅
-  int mWidth;
-
-  // STRANS bit array
-  size_t mStrans;
-
-  // magnification factor
-  double mMag;
-
-  // angular rotation factor
-  double mAngle;
-
-  // XY座標
-  XY mXY;
-
-  // 本体の文字列
-  string mBody;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// NODE
-//////////////////////////////////////////////////////////////////////
-class Node :
-  public Element
-{
-public:
-
-  // コンストラクタ
-  Node();
-
-  // デストラクタ
-  virtual
-  ~Node();
-
-
-public:
-
-  // 層番号を返す．
-  int
-  layer() const;
-
-  // ノード型を返す．
-  int
-  nodetype() const;
-
-  // 座標のリストを返す．
-  const vector<XY>&
-  xy_list() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 層番号
-  int mLayer;
-
-  // ノード型
-  int mNodeType;
-
-  // 座標のリスト
-  vector<XY> mXYList;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-// BOX
-//////////////////////////////////////////////////////////////////////
-class Box :
-  public Element
-{
-public:
-
-  // コンストラクタ
-  Box();
-
-  // デストラクタ
-  virtual
-  ~Box();
-
-
-public:
-
-  // 層番号を返す．
-  int
-  layer() const;
-
-  // ボックス型を返す．
-  int
-  boxtype() const;
-
-  // 座標を返す．
-  XY
-  xy1() const;
-
-  XY
-  xy2() const;
-
-  XY
-  xy3() const;
-
-  XY
-  xy4() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 層番号
-  int mLayer;
-
-  // ボックス型
-  int mBoxType;
-
-  // 座標のリスト
-  XY mXY[4];
+  // GdsStruct の先頭
+  GdsStruct* mStruct;
 
 };
 
 END_NAMESPACE_YM_GDS
 
-#endif
+#endif // YM_GDS_GDSDATA_H
