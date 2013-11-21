@@ -128,15 +128,6 @@ YM_FINISH_LIBRARIES_SUBDIRS
 # Declare files in 'programs' subdirectories
 # ===================================================================
 
-<<<<<<< HEAD
-ym_magus_tclsh_enable=1
-ym_atpg_enable=1
-ym_matpg_enable=1
-ym_satpg_enable=1
-ym_led_enable=1
-
-=======
->>>>>>> origin/mat/current
 YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
