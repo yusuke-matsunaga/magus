@@ -1,28 +1,15 @@
-#ifndef LED_GLV_H
-#define LED_GLV_H
+#ifndef GLV_H
+#define GLV_H
 
-/// @file led/Glv.h
+/// @file Glv.h
 /// @brief GLを用いた描画用プログラムの共通ヘッダ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Glv.h 346 2007-01-12 13:56:03Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ymtools.h"
-
-#include <gtkmm.h>
-#include <gtkglmm.h>
-
-#ifdef G_OS_WIN32
-#define WIN32_LEAN_AND_MEAN 1
-#include <windows.h>
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 
 /// @brief glv 用の名前空間の開始
@@ -38,7 +25,6 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_GLV
 
-
 //////////////////////////////////////////////////////////////////////
 /// @class Point Glv.h "Glv.h"
 /// @brief 「点」を表すクラス
@@ -52,7 +38,7 @@ struct Point
     mY(0.0)
   {
   }
-  
+
   /// @brief X座標とY座標を指定するコンストラクタ
   /// @param[in] x X座標
   /// @param[in] y Y座標
@@ -66,13 +52,14 @@ struct Point
   /// @brief 移動する．
   /// @param[in] vec 移動量を表すベクタ
   /// @return 移動後の自分自身への定数参照を返す．
-  const Point& move(const Point& vec)
+  const Point&
+  move(const Point& vec)
   {
     mX += vec.mX;
     mY += vec.mY;
     return *this;
   }
-  
+
   /// @brief X座標
   GLdouble mX;
   /// @brief Y座標
@@ -127,7 +114,8 @@ struct DiagPoints
   /// @brief 平行移動する．
   /// @param[in] vec 移動量を表すベクタ
   /// @return 移動後の自分自身への定数参照を返す．
-  const DiagPoints& move(const Point& vec)
+  const DiagPoints&
+  move(const Point& vec)
   {
     mLeft += vec.mX;
     mUpper += vec.mY;
@@ -135,7 +123,7 @@ struct DiagPoints
     mLower += vec.mY;
     return *this;
   }
-  
+
   /// @brief 左端のX座標
   GLdouble mLeft;
   /// @brief 上端のY座標

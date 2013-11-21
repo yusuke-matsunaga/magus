@@ -15,6 +15,7 @@ libraries/libym_ymsh
 tests
 programs/magus_tclsh
 programs/atpg
+programs/led
 programs/matpg
 programs/satpg
 programs/seal

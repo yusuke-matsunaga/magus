@@ -154,6 +154,12 @@ YM_BUILD_PROGRAM([satpg], [no],
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
+# led
+YM_BUILD_PROGRAM([led], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable])
+
 # igf
 YM_BUILD_PROGRAM([igf], [no],
 		 [ym_libym_utils_enable,
