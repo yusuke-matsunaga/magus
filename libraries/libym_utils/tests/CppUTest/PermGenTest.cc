@@ -14,7 +14,7 @@
 using namespace nsYm;
 
 
-TEST_GROUP(PermGenTestGroup)
+TEST_GROUP(libym_utils_PermGenTestGroup)
 {
   ymuint* exp_data;
 
@@ -155,12 +155,12 @@ TEST_GROUP(PermGenTestGroup)
 };
 
 // setup(), teardown() で問題が起きないことをチェックするためのテスト
-TEST(PermGenTestGroup, empty)
+TEST(libym_utils_PermGenTestGroup, empty)
 {
 }
 
 // 組み合わせ列挙のテスト
-TEST(PermGenTestGroup, permgen)
+TEST(libym_utils_PermGenTestGroup, permgen)
 {
   PermGen pg(5, 5);
 
@@ -186,7 +186,7 @@ TEST(PermGenTestGroup, permgen)
 }
 
 // コピーコンストラクタのテスト1
-TEST(PermGenTestGroup, copy1)
+TEST(libym_utils_PermGenTestGroup, copy1)
 {
   PermGen pg(5, 5);
 
@@ -205,7 +205,7 @@ TEST(PermGenTestGroup, copy1)
 }
 
 // コピーコンストラクタのテスト2
-TEST(PermGenTestGroup, copy2)
+TEST(libym_utils_PermGenTestGroup, copy2)
 {
   PermGen pg(5, 5);
 
@@ -228,7 +228,7 @@ TEST(PermGenTestGroup, copy2)
 }
 
 // 代入演算子のテスト1
-TEST(PermGenTestGroup, assign1)
+TEST(libym_utils_PermGenTestGroup, assign1)
 {
   PermGen pg(5, 5);
 
@@ -248,7 +248,7 @@ TEST(PermGenTestGroup, assign1)
 }
 
 // 代入演算子のテスト2
-TEST(PermGenTestGroup, assign2)
+TEST(libym_utils_PermGenTestGroup, assign2)
 {
   PermGen pg(5, 5);
 

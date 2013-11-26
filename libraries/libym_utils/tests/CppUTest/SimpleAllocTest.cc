@@ -14,7 +14,7 @@
 
 using namespace nsYm;
 
-TEST_GROUP(SimpleAllocTestGroup)
+TEST_GROUP(libym_utils_SimpleAllocTestGroup)
 {
   SimpleAlloc* mAlloc;
 
@@ -30,12 +30,12 @@ TEST_GROUP(SimpleAllocTestGroup)
 };
 
 // setup(), teardown() でメモリリークが発生していないことを確認するためのテスト
-TEST(SimpleAllocTestGroup, empty)
+TEST(libym_utils_SimpleAllocTestGroup, empty)
 {
 }
 
 // メモリ領域の確保のテスト
-TEST(SimpleAllocTestGroup, simple_alloc)
+TEST(libym_utils_SimpleAllocTestGroup, simple_alloc)
 {
   void* p = mAlloc->get_memory(16);
 

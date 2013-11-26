@@ -14,7 +14,7 @@
 
 using namespace nsYm;
 
-TEST_GROUP(UnitAllocTestGroup)
+TEST_GROUP(libym_utils_UnitAllocTestGroup)
 {
   #define UNIT_SIZE  560
 
@@ -32,12 +32,12 @@ TEST_GROUP(UnitAllocTestGroup)
 };
 
 // setup(), teardown() でメモリリークが発生していないことを確認するためのテスト
-TEST(UnitAllocTestGroup, empty)
+TEST(libym_utils_UnitAllocTestGroup, empty)
 {
 }
 
 // メモリ領域の確保のテスト
-TEST(UnitAllocTestGroup, simple_alloc)
+TEST(libym_utils_UnitAllocTestGroup, simple_alloc)
 {
   for (ymuint i = 0; i < 1000000; ++ i) {
     void* p = mAlloc->get_memory(UNIT_SIZE);
