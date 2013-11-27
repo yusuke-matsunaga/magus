@@ -2,10 +2,7 @@
 
 ## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = \
+	$(YM_TESTS_SUBDIRS)
 
 MAINTAINERCLEANFILES = Makefile.in
-
-EXTRA_DIST = \
-	configure \
-	configure.ac

@@ -2,7 +2,7 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = $(YM_EXTRA_TESTS_SUBDIRS)
+SUBDIRS = $(YM_TESTS_SUBDIRS)
 
 CLEANFILES =
 

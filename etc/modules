@@ -12,7 +12,7 @@ libraries/libym_gbm
 libraries/libym_seal
 libraries/libym_tclpp
 libraries/libym_ymsh
-tests
+
 programs/magus_tclsh
 programs/atpg
 programs/led
