@@ -45,11 +45,11 @@ TEST(libym_logic_LogExprTestGroup, const0)
   CHECK( !zero.is_xor() );
   CHECK( !zero.is_op() );
   LONGS_EQUAL( 0, zero.child_num() );
-  CHECK( !zero.is_simple() );
+  CHECK( zero.is_simple() );
   CHECK( !zero.is_simple_and() );
   CHECK( !zero.is_simple_or() );
   CHECK( !zero.is_simple_xor() );
-  CHECK( !zero.is_sop() );
+  CHECK( zero.is_sop() );
   LONGS_EQUAL( 0, zero.litnum() );
   LONGS_EQUAL( 0, zero.input_size() );
   LONGS_EQUAL( 0, zero.sop_cubenum() );

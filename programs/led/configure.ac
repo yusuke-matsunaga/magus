@@ -122,9 +122,9 @@ YM_CHECK_PYTHON([ym_have_python=1], [ym_have_python=0])
 # ===================================================================
 # Check for QT
 # ===================================================================
-YM_CHECK_QT([ym_qt_enable=yes], [ym_qt_enable=no])
-if test $ym_qt_enable = no; then
-   AC_MSG_ERROR([Qt is not enabled])
+YM_CHECK_QT([ym_have_qt=yes], [ym_have_qt=no])
+if test $ym_have_qt = no; then
+   AC_MSG_ERROR([Qt is not available])
 fi
 
 

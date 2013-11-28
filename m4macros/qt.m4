@@ -7,21 +7,18 @@
 
 
 # ===================================================================
-# YM_CHECK_QT([action-if-found], [action-if-not-found])
+# YM_CHECK_QT(action-if-found, action-if-not-found)
+#
+# Qt を使用するかどうか調べ，使用する場合には実際に
+# 使用できるかチェックする．
 # ===================================================================
 AC_DEFUN([YM_CHECK_QT],[dnl
-AC_ARG_ENABLE([qt],
-	      AS_HELP_STRING([--enable-qt], [Turn on QT]),
-	      [
-case "${enableval}" in
-     yes) ym_tmp_qt=yes ;;
-     no)  ym_tmp_qt=no ;;
-     *) AC_MSG_ERROR([bad value ${enableval} for --enable-qt]) ;;
-esac
-],
-[ym_tmp_qt=no])
+# autotroll のマクロをそのまま使う．
+AT_WITH_QT([], [], [], [ym_tmp_qt=no], [ym_tmp_qt=yes])
+
+# automacro 用のシンボル 'WITH_QT' を定義する．
 AM_CONDITIONAL([WITH_QT], [test $ym_tmp_qt = yes])
-if test $ym_tmp_qt = yes; then
-  AT_WITH_QT
-fi
+
+# マクロ引数を実行する．
+AS_IF([test $ym_tmp_qt = yes], [$1], [$2])
 ])

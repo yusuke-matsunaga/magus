@@ -8,7 +8,9 @@
 
 
 #include "CppUTest/CommandLineTestRunner.h"
+
 #include "CppUTest/ym_utils_CppUTest.h"
+#include "CppUTest/ym_logic_CppUTest.h"
 
 
 int
