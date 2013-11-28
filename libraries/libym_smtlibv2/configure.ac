@@ -71,23 +71,6 @@ AC_TYPE_SIZE_T
 
 
 # ===================================================================
-# Check for QT
-# It's a kind of magic!
-# ===================================================================
-AC_ARG_ENABLE([qt],
-[  --enable-qt    Turn on QT],
-[case "${enableval}" in
- yes) qt=true ;;
- no)  qt=false ;;
- *) AC_MSG_ERROR([bad value ${enableval} for --enable-qt]) ;;
- esac],[qt=false])
-AM_CONDITIONAL([WITH_QT], [test x$qt = xtrue])
-if test x$qt = xtrue; then
-  AT_WITH_QT
-fi
-
-
-# ===================================================================
 # Checks for other packages
 # ===================================================================
 
@@ -96,6 +79,13 @@ fi
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
+
+
+# ===================================================================
+# Check for QT
+# It's a kind of magic!
+# ===================================================================
+YM_CHECK_QT([ym_qt_enable=yes], [ym_qt_enable=no])
 
 
 # ===================================================================
