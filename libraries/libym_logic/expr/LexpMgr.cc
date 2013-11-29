@@ -19,14 +19,17 @@ BEGIN_NAMESPACE_YM_LEXP
 // クラス LexpMgr
 //////////////////////////////////////////////////////////////////////
 
+// 唯一のオブジェクト
+static LexpMgr* mTheObj = NULL;
 
 // @brief 唯一のインスタンスを返す．
 LexpMgr&
 LexpMgr::the_obj()
 {
-  // 唯一のオブジェクト
-  static LexpMgr mTheObj;
-  return mTheObj;
+  if ( mTheObj == NULL ) {
+    mTheObj = new LexpMgr;
+  }
+  return *mTheObj;
 }
 
 // @brief コンストラクタ
@@ -36,10 +39,6 @@ LexpMgr::LexpMgr() :
   mMaxNodeNum(0),
   mStuckNodeNum(0)
 {
-  mConst0 = alloc_node(kConst0);
-  ++ mStuckNodeNum;
-  mConst1 = alloc_node(kConst1);
-  ++ mStuckNodeNum;
 }
 
 // デストラクタ
@@ -47,10 +46,23 @@ LexpMgr::~LexpMgr()
 {
 }
 
+// @brief 確保したメモリを開放する．
+// @note メモリリークチェックのための関数
+void
+LexpMgr::clear_memory()
+{
+  delete mTheObj;
+  mTheObj = NULL;
+}
+
 // 恒偽関数を作る．
 LexpNodePtr
 LexpMgr::make_zero()
 {
+  if ( !mConst0 ) {
+    mConst0 = alloc_node(kConst0);
+    ++ mStuckNodeNum;
+  }
   return mConst0;
 }
 
@@ -58,6 +70,10 @@ LexpMgr::make_zero()
 LexpNodePtr
 LexpMgr::make_one()
 {
+  if ( !mConst1 ) {
+    mConst1 = alloc_node(kConst1);
+    ++ mStuckNodeNum;
+  }
   return mConst1;
 }
 
@@ -688,7 +704,7 @@ LexpMgr::alloc_node(tType type)
 
   ymuint req_size = calc_size(nc);
   void* p = mNodeAlloc.get_memory(req_size);
-  LexpNode* node = reinterpret_cast<LexpNode*>(p);
+  LexpNode* node = new (p) LexpNode;
   node->mRefType = static_cast<ymuint32>(type);
   node->mNc = nc;
   for (ymuint i = 0; i < nc; ++ i) {

@@ -184,6 +184,14 @@ LogExpr::make_xor(const LogExprList& chd_list)
   return LogExpr(mgr.make_xor(begin));
 }
 
+// @brief 確保していたメモリを開放する．
+// @note メモリリークチェックのための関数なので通常は使用しない．
+void
+LogExpr::clear_memory()
+{
+  LexpMgr::clear_memory();
+}
+
 // 否定の論理式を与える演算子
 LogExpr
 LogExpr::operator~() const
