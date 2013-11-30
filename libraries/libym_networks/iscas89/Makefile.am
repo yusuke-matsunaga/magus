@@ -2,10 +2,13 @@
 
 SUBDIRS =
 
-YFLAGS =-d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	iscas89_grammer.cc iscas89_grammer.h y.output iscas89_grammer.output
+	iscas89_grammer.cc \
+	iscas89_grammer.hh \
+	y.output \
+	iscas89_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 

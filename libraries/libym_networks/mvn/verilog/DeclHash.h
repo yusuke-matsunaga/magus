@@ -11,7 +11,7 @@
 
 #include "ym_networks/mvn.h"
 #include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG

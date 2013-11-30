@@ -27,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  SptFactory(AllocBase& alloc);
+  SptFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   /// @note このオブジェクトが生成したすべての Pt オブジェクトを破壊する．

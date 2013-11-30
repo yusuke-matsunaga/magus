@@ -24,10 +24,10 @@ write_expr(const LogExpr& f,
 	   ostream& s)
 {
   VarStrMap fanins;
-  for (size_t i = 0; i < node->ni(); i ++) {
+  for (ymuint i = 0; i < node->fanin_num(); i ++) {
     BNode* inode = node->fanin(i);
     assert_cond(inode != 0, __FILE__, __LINE__);
-    fanins[i] = inode->name();
+    fanins.insert(make_pair(VarId(i), inode->name()));
   }
   writer.dump(s, f, fanins);
 }

@@ -165,16 +165,16 @@ VerilogWriterImpl::dump(ostream& s,
 	}
       }
       if ( !has_output ) {
-	VlwInput vlw_decl(writer);
-	writer.put_elem(port_name, nb - 1, 0);
+	VlwInput vlw_decl(writer, nb - 1, 0);
+	writer.put_elem(port_name);
       }
       else if ( !has_input ) {
-	VlwOutput vlw_decl(writer);
-	writer.put_elem(port_name, nb - 1, 0);
+	VlwOutput vlw_decl(writer, nb - 1, 0);
+	writer.put_elem(port_name);
       }
       else {
-	VlwInout vlw_decl(writer);
-	writer.put_elem(port_name, nb - 1, 0);
+	VlwInout vlw_decl(writer, nb - 1, 0);
+	writer.put_elem(port_name);
       }
     }
   }

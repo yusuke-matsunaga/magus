@@ -297,7 +297,7 @@ NodeCmd::set_logic_node_dsc()
 void
 NodeCmd::set_fanin(BNode* node)
 {
-  size_t ni = node->ni();
+  size_t ni = node->fanin_num();
   init_array(ni);
   for (size_t i = 0; i < ni; i ++) {
     BNode* inode = node->fanin(i);

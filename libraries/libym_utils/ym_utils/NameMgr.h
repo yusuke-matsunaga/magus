@@ -35,6 +35,9 @@ public:
   /// @brief デストラクタ
   ~NameMgr();
 
+
+public:
+
   /// @brief 接頭語と接尾語を変更する．
   /// @param[in] prefix 接頭語
   /// @param[in] suffix 接尾語
@@ -76,10 +79,13 @@ public:
   /// @param[in] s 出力先のストリーム
   /// @note 主にデバッグ用
   void
-  dump(ostream& s) const;
+  print(ostream& s) const;
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // name が <prefix>ddd<suffix> の形の時に
   // ddd を数値に直したものを返す．

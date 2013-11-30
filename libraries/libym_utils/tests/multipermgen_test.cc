@@ -3,7 +3,7 @@
 // nsMagus::MultiPermGen のテスト
 
 
-#include "ym_utils/Generator.h"
+#include "ym_utils/MultiPermGen.h"
 
 int
 main(int argc,
@@ -18,19 +18,19 @@ main(int argc,
 	cerr << "ERROR: ngrp must be specified" << endl;
 	return 2;
       }
-      size_t ngrp = atoi(p);
+      ymuint ngrp = atoi(p);
       if ( ngrp == 0 ) {
 	cerr << "ERROR: ngrp == 0" << endl;
 	return 2;
       }
-      vector<pair<size_t, size_t> > nk_array(ngrp);
-      for (size_t g = 0; g < ngrp; ++ g) {
+      vector<pair<ymuint, ymuint> > nk_array(ngrp);
+      for (ymuint g = 0; g < ngrp; ++ g) {
 	char* p = strtok(NULL, " \t");
 	if ( !p ) {
 	  cerr << "ERROR: n must be specified" << endl;
 	  return 2;
 	}
-	size_t n = atoi(p);
+	ymuint n = atoi(p);
 	if ( n == 0 ) {
 	  cerr << "ERROR: n == 0" << endl;
 	  return 2;
@@ -40,7 +40,7 @@ main(int argc,
 	  cerr << "ERROR: k must be specified" << endl;
 	  return 2;
 	}
-	size_t k = atoi(p);
+	ymuint k = atoi(p);
 	if ( k == 0 ) {
 	  cerr << "ERROR: k == 0" << endl;
 	  return 2;
@@ -51,12 +51,11 @@ main(int argc,
 	}
 	nk_array[g] = make_pair(n, k);
       }
-      MultiPermGen mpg(nk_array);
-      for (MultiPermGen::iterator p = mpg.begin(); !p.is_end(); ++ p) {
-	for (size_t g = 0; g < ngrp; ++ g) {
-	  size_t k = nk_array[g].second;
-	  for (size_t i = 0; i < k; ++ i) {
-	    cout << " " << p(g, i);
+      for (MultiPermGen mpg(nk_array); !mpg.is_end(); ++ mpg) {
+	for (ymuint g = 0; g < ngrp; ++ g) {
+	  ymuint k = nk_array[g].second;
+	  for (ymuint i = 0; i < k; ++ i) {
+	    cout << " " << mpg(g, i);
 	  }
 	  cout << " |";
 	}

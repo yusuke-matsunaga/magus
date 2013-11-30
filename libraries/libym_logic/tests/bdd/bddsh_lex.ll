@@ -19,7 +19,7 @@ using namespace nsYm::nsBdd;
 
 #define YYSTYPE Bdd
 
-#include "bddsh_parser.h"
+#include "bddsh_parser.hh"
 
 string cur_text;
 int cur_num;

@@ -39,8 +39,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief CNF 上の変数番号を返す．
-  ymuint
-  var_id() const;
+  VarId
+  varid() const;
 
 
 public:
@@ -225,7 +225,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // CNF 上の変数番号
-  ymuint32 mVarId;
+  VarId mVarId;
 
   // ファンインのノード
   FraigNode* mFanins[2];
@@ -311,8 +311,8 @@ private:
 
 // @brief CNF 上の変数番号を返す．
 inline
-ymuint
-FraigNode::var_id() const
+VarId
+FraigNode::varid() const
 {
   return mVarId;
 }

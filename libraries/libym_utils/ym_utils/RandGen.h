@@ -14,7 +14,6 @@
 
 BEGIN_NAMESPACE_YM
 
-
 //////////////////////////////////////////////////////////////////////
 /// @class RandGen RandGen.h "ym_utils/RandGen.h"
 /// @ingroup YmUtils
@@ -76,6 +75,9 @@ public:
   /// @brief デストラクタ
   ~RandGen();
 
+
+public:
+
   /// @brief シードで初期化する．
   /// @param[in] s シード
   /// @note 以下，原文\n
@@ -93,7 +95,7 @@ public:
   /// slight change for C++, 2004/2/26
   void
   init_by_array(ymuint32 init_key[],
-		size_t key_length);
+		ymuint key_length);
 
   /// @brief 32ビット符号無し整数の乱数を発生させる．
   /// @note 以下，原文\n
@@ -143,9 +145,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   static
-  const size_t N = 624;
+  const ymuint32 N = 624;
   static
-  const size_t M = 397;
+  const ymuint32 M = 397;
   static
   const ymuint32 MATRIX_A = 0x9908b0dfUL;   // constant vector a
   static
@@ -163,110 +165,7 @@ private:
   ymuint32 mV[N];
 
   // 状態ベクタのインデックス
-  size_t mIdx;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class RandPermGen RandGen.h "ym_utils/RandGen.h"
-/// @brief ランダムな順列を作るクラス
-//////////////////////////////////////////////////////////////////////
-class RandPermGen
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] n 要素数
-  RandPermGen(size_t n);
-
-  /// @brief デストラクタ
-  ~RandPermGen();
-
-
-public:
-
-  /// @brief 要素数を返す．
-  size_t
-  num() const;
-
-  /// @brief ランダムな順列を生成する．
-  /// @param[in] randgen 乱数発生器
-  void
-  generate(RandGen& randgen);
-
-  /// @brief 順列の要素を取り出す．
-  /// @param[in] pos 要素の位置番号 ( 0 <= pos < num() )
-  ymuint32
-  elem(size_t pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 要素数
-  size_t mNum;
-
-  // 現在の順列
-  ymuint32* mArray;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class RandCombiGen RandGen.h "ym_utils/RandGen.h"
-/// @brief ランダムな組み合わせを作るクラス
-//////////////////////////////////////////////////////////////////////
-class RandCombiGen
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] n 全要素数
-  /// @param[in] k 組み合わせの要素数
-  RandCombiGen(size_t n,
-	       size_t k);
-
-  /// @brief デストラクタ
-  ~RandCombiGen();
-
-
-public:
-
-  /// @brief 全要素数を返す．
-  size_t
-  num() const;
-
-  /// @brief 組み合わせの要素数を返す．
-  size_t
-  combi_num() const;
-
-  /// @brief ランダムな組み合わせを生成する．
-  /// @param[in] randgen 乱数発生器
-  void
-  generate(RandGen& randgen);
-
-  /// @brief 組み合わせの要素を取り出す．
-  /// @param[in] pos 要素の位置番号 ( 0 <= pos < combi_num() )
-  ymuint32
-  elem(size_t pos) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 要素数
-  size_t mNum;
-
-  // 組み合わせの要素数
-  size_t mCombiNum;
-
-  // 現在の順列
-  ymuint32* mArray;
+  ymuint32 mIdx;
 
 };
 

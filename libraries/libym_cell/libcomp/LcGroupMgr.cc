@@ -13,7 +13,7 @@
 #include "LibComp.h"
 #include "ym_cell/Cell.h"
 #include "ym_utils/MFSet.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -45,7 +45,7 @@ LcGroupMgr::clear()
 
 // @brief セルを追加する．
 void
-LcGroupMgr::add_cell(const Cell* cell)
+LcGroupMgr::add_cell(Cell* cell)
 {
   if ( !cell->has_logic() || cell->output_num2() == 0 ) {
     // ひとつでも論理式を持たない出力があるセルは独立したグループとなる．
@@ -55,7 +55,7 @@ LcGroupMgr::add_cell(const Cell* cell)
     ymuint ni = cell->input_num2();
     ymuint no = cell->output_num2();
     TvFuncM repfunc(ni, no);
-    LcClass* fclass = mLibComp.new_class(repfunc);
+    LcClass* fclass = mLibComp.new_class(repfunc, false);
     NpnMapM xmap;
     xmap.set_identity(ni, no);
     fclass->add_group(fgroup, xmap);
@@ -66,7 +66,7 @@ LcGroupMgr::add_cell(const Cell* cell)
     gen_signature(cell, f);
 
     // f に対するセルグループを求める．
-    LcGroup* fgroup = find_group(f);
+    LcGroup* fgroup = find_group(f, false);
 
     // セル(番号)を追加する．
     fgroup->add_cell(cell);
@@ -75,9 +75,11 @@ LcGroupMgr::add_cell(const Cell* cell)
 
 // @brief f に対応する LcGroup を求める．
 // @param[in] f 関数
+// @param[in] builtin 組み込みクラスの時 true にするフラグ
 // @note なければ新規に作る．
 LcGroup*
-LcGroupMgr::find_group(const TvFuncM& f)
+LcGroupMgr::find_group(const TvFuncM& f,
+		       bool builtin)
 {
   LcGroup* fgroup = NULL;
   hash_map<TvFuncM, ymuint>::iterator p = mGroupMap.find(f);
@@ -95,7 +97,7 @@ LcGroupMgr::find_group(const TvFuncM& f)
     hash_map<TvFuncM, ymuint>::iterator q = mClassMap.find(repfunc);
     if ( q == mClassMap.end() ) {
       // まだ登録されていない．
-      fclass = mLibComp.new_class(repfunc);
+      fclass = mLibComp.new_class(repfunc, builtin);
       mClassMap.insert(make_pair(repfunc, fclass->id()));
       find_idmap_list(repfunc, fclass->mIdmapList);
     }
@@ -122,10 +124,11 @@ BEGIN_NONAMESPACE
 ymuint32
 gen_support(const TvFunc& f)
 {
-  ymuint ni = f.ni();
+  ymuint ni = f.input_num();
   ymuint32 ans = 0U;
   for (ymuint i = 0; i < ni; ++ i) {
-    if ( f.check_sup(i) ) {
+    VarId var(i);
+    if ( f.check_sup(var) ) {
       ans |= (1U << i);
     }
   }
@@ -138,14 +141,15 @@ gen_maxmap(const TvFuncM& f,
 	   ymuint offset,
 	   NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
-  ymuint no = f.no();
+  ymuint ni = f.input_num();
+  ymuint no = f.output_num();
 
-  vector<ymuint> i_list;
+  vector<VarId> i_list;
   i_list.reserve(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    if ( f.check_sup(i) ) {
-      i_list.push_back(i);
+    VarId var(i);
+    if ( f.check_sup(var) ) {
+      i_list.push_back(var);
     }
   }
   ymuint ni1 = i_list.size();
@@ -156,17 +160,18 @@ gen_maxmap(const TvFuncM& f,
   NpnMapM map;
   bool first = true;
   TvFuncM repfunc;
-  PermGen pg(ni1, ni1);
   ymuint nip = 1U << ni1;
-  for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+  for (PermGen pg(ni1, ni1); !pg.is_end(); ++ pg) {
     NpnMapM map1(ni, no);
     for (ymuint i = 0; i < no; ++ i) {
-      map1.set_omap(i, i, kPolPosi);
+      map1.set_omap(VarId(i), VarId(i), kPolPosi);
     }
     for (ymuint x = 0U; x < nip; ++ x) {
       for (ymuint i = 0; i < ni1; ++ i) {
 	tPol pol = (x & (1U << i)) ? kPolPosi : kPolNega;
-	map1.set_imap(i_list[i], p(i) + offset, pol);
+	VarId src_var = i_list[i];
+	VarId dst_var(pg(i) + offset);
+	map1.set_imap(src_var, dst_var, pol);
       }
       TvFuncM f1 = f.xform(map1);
       if ( first || repfunc < f1 ) {
@@ -177,11 +182,11 @@ gen_maxmap(const TvFuncM& f,
     }
   }
 
-  for (vector<ymuint>::iterator p = i_list.begin();
+  for (vector<VarId>::iterator p = i_list.begin();
        p != i_list.end(); ++ p) {
-    ymuint i = *p;
-    NpnVmap vmap = map.imap(i);
-    xmap.set_imap(i, vmap);
+    VarId src_var = *p;
+    NpnVmap vmap = map.imap(src_var);
+    xmap.set_imap(src_var, vmap);
   }
 
   return ni1;
@@ -195,13 +200,14 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
 			    TvFuncM& repfunc,
 			    NpnMapM& xmap)
 {
-  ymuint ni = f.ni();
-  ymuint no = f.no();
+  ymuint ni = f.input_num();
+  ymuint no = f.output_num();
 
   // 各出力のサポートをビットベクタの形で求める．
   vector<ymuint32> sup_array(no);
   for (ymuint o = 0; o < no; ++ o) {
-    TvFunc func1 = f.output(o);
+    VarId ovar(o);
+    TvFunc func1 = f.output(ovar);
     ymuint32 supbits = gen_support(func1);
     sup_array[o] = supbits;
   }
@@ -228,9 +234,10 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
     vector<TvFunc> f_list;
     f_list.reserve(no);
     for (ymuint o = 0; o < no; ++ o) {
+      VarId ovar(o);
       if ( mfset.find(o) == first ) {
 	o_list.push_back(o);
-	f_list.push_back(f.output(o));
+	f_list.push_back(f.output(ovar));
       }
     }
     TvFuncM f1(f_list);
@@ -246,7 +253,7 @@ LcGroupMgr::default_repfunc(const TvFuncM& f,
 // @brief 内容をバイナリダンプする．
 // @param[in] bos 出力先のストリーム
 void
-LcGroupMgr::dump(BinO& bos) const
+LcGroupMgr::dump(ODO& bos) const
 {
   // セルグループの情報をダンプする．
   ymuint32 ng = group_num();
@@ -257,7 +264,7 @@ LcGroupMgr::dump(BinO& bos) const
 
     // 論理クラスに対する変換マップをダンプする．
     const NpnMapM& map = group->map();
-    ymuint32 ni = map.ni();
+    ymuint32 ni = map.input_num();
     bos << ni;
     for (ymuint i = 0; i < ni; ++ i) {
       NpnVmap imap = map.imap(i);
@@ -269,7 +276,7 @@ LcGroupMgr::dump(BinO& bos) const
       }
       bos << v;
     }
-    ymuint32 no = map.no();
+    ymuint32 no = map.output_num();
     bos << no;
     for (ymuint i = 0; i < no; ++ i) {
       NpnVmap omap = map.omap(i);

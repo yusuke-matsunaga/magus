@@ -15,7 +15,7 @@
 #include "ym_utils/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 TgBlifHandler::TgBlifHandler()
@@ -80,24 +80,35 @@ TgBlifHandler::outputs_elem(ymuint32 name_id)
 }
 
 // @brief .names 文の処理
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 各識別子のID番号の配列
+// @param[in] nc キューブ数
+// @param[in] cover_pat 入力カバーを表す文字列
+// @param[in] opat 出力の極性
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
+// @note cover_pat は ni 個ごとに1行のパタンを表す．
+// 各要素のとりうる値は '0', '1', '-' を表す．
+// @note opat は '0' か '1' のどちらか
 bool
-TgBlifHandler::names(const vector<ymuint32>& name_id_array,
+TgBlifHandler::names(ymuint32 onode_id,
+		     const vector<ymuint32>& inode_id_array,
 		     ymuint32 nc,
 		     const char* cover_pat,
 		     char opat)
 {
-  ymuint32 n = name_id_array.size();
+  ymuint32 ni = inode_id_array.size();
 
   mCurFanins.clear();
-  for (ymuint32 i = 0; i < n; ++ i) {
-    ymuint32 id = name_id_array[i];
+  for (ymuint32 i = 0; i < ni; ++ i) {
+    ymuint32 id = inode_id_array[i];
     const char* name = id2str(id);
     TgNode* node = mNetwork->find_node(name, true);
     mCurFanins.push_back(node);
   }
 
-  ymuint32 ni = n - 1;
-  TgNode* node = mCurFanins[ni];
+  TgNode* node = mNetwork->find_node(id2str(onode_id), true);
+
   mChd2.reserve(ni);
 
   LogExpr expr;
@@ -108,10 +119,10 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  mChd2.push_back(LogExpr::make_negaliteral(i));
+	  mChd2.push_back(LogExpr::make_negaliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  mChd2.push_back(LogExpr::make_posiliteral(i));
+	  mChd2.push_back(LogExpr::make_posiliteral(VarId(i)));
 	}
       }
       mChd1.push_back(LogExpr::make_and(mChd2));
@@ -129,10 +140,10 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  mChd2.push_back(LogExpr::make_posiliteral(i));
+	  mChd2.push_back(LogExpr::make_posiliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  mChd2.push_back(LogExpr::make_negaliteral(i));
+	  mChd2.push_back(LogExpr::make_negaliteral(VarId(i)));
 	}
       }
       mChd1.push_back(LogExpr::make_or(mChd2));
@@ -144,15 +155,15 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
       expr = LogExpr::make_and(mChd1);
     }
   }
-  TgGateTemplate id = mNetwork->reg_lexp(expr);
 
-  mNetwork->set_to_logic(node, id);
-  if ( ni != node->ni() ) {
+  mNetwork->set_to_logic(node, expr);
+
+  if ( ni != node->fanin_num() ) {
     // .names の後の要素数とパタンの列数が異なる．
     ostringstream buf;
     buf << node->name() << ": illegal cover" << endl;
     MsgMgr::put_msg(__FILE__, __LINE__,
-		    id2loc(name_id_array[ni]),
+		    id2loc(onode_id),
 		    kMsgError,
 		    "TG_BLIF_005",
 		    buf.str());
@@ -166,32 +177,38 @@ TgBlifHandler::names(const vector<ymuint32>& name_id_array,
 }
 
 // @brief .gate 文の処理
-// @param[in] cell セル
 // @param[in] onode_id 出力ノードのID番号
 // @param[in] inode_id_array 入力ノードのID番号の配列
+// @param[in] cell セル
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TgBlifHandler::gate(const Cell* cell,
-		    ymuint32 onode_id,
-		    const vector<ymuint32>& inode_id_array)
+TgBlifHandler::gate(ymuint32 onode_id,
+		    const vector<ymuint32>& inode_id_array,
+		    const Cell* cell)
 {
   return true;
 }
 
-// @brief .latch 文の読み込み
+// @brief .latch 文の処理
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id 入力ノードのID番号
+// @param[in] loc4 リセット値の位置情報
+// @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
 bool
-TgBlifHandler::latch(ymuint32 name1_id,
-		     ymuint32 name2_id,
+TgBlifHandler::latch(ymuint32 onode_id,
+		     ymuint32 inode_id,
 		     const FileRegion& loc4,
 		     char rval)
 {
-  const char* name2 = id2str(name2_id);
-  TgNode* ffout = mNetwork->find_node(name2, true);
+  const char* oname = id2str(onode_id);
+  TgNode* ffout = mNetwork->find_node(oname, true);
   TgNode* ffin = mNetwork->new_node();
   mNetwork->set_to_ff(ffin, ffout);
-  const char* name1 = id2str(name1_id);
-  TgNode* inode = mNetwork->find_node(name1, true);
+  const char* iname = id2str(inode_id);
+  TgNode* inode = mNetwork->find_node(iname, true);
   connect(inode, ffin, 0);
 
   // rval は使っていない．
@@ -209,8 +226,8 @@ TgBlifHandler::end(const FileRegion& loc)
   }
   mConList.clear();
 
-  size_t n = mNetwork->node_num();
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = mNetwork->node_num();
+  for (ymuint i = 0; i < n; ++ i) {
     const TgNode* node = mNetwork->node(i);
     if ( node->is_undef() ) {
       // node は定義されていない
@@ -247,7 +264,7 @@ TgBlifHandler::error_exit()
 void
 TgBlifHandler::connect(TgNode* from,
 		       TgNode* to,
-		       size_t pos)
+		       ymuint pos)
 {
   if ( from->is_undef() ) {
     mConList.push_back(Connection(from, to, pos));
@@ -257,4 +274,4 @@ TgBlifHandler::connect(TgNode* from,
   }
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

@@ -2,7 +2,7 @@
 /// @file libym_cec/FraigMgr.cc
 /// @brief FraigMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: FraigMgr.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -40,7 +40,7 @@ FraigMgr::~FraigMgr()
 {
   delete mImpl;
 }
-  
+
 // @brief 入力ノード数を得る．
 ymuint
 FraigMgr::input_num() const
@@ -130,37 +130,39 @@ FraigMgr::make_logic(const LogExpr& expr,
     return make_one();
   }
   if ( expr.is_posiliteral() ) {
-    tVarId id = expr.varid();
+    VarId var = expr.varid();
+    ymuint id = var.val();
     assert_cond(id < inputs.size(), __FILE__, __LINE__);
     return inputs[id];
   }
   if ( expr.is_negaliteral() ) {
-    tVarId id = expr.varid();
+    VarId var = expr.varid();
+    ymuint id = var.val();
     assert_cond(id < inputs.size(), __FILE__, __LINE__);
     return ~inputs[id];
   }
   if ( expr.is_and() ) {
-    size_t n = expr.child_num();
+    ymuint n = expr.child_num();
     FraigHandle ans = make_logic(expr.child(0), inputs);
-    for (size_t i = 1; i < n; ++ i) {
+    for (ymuint i = 1; i < n; ++ i) {
       FraigHandle tmp = make_logic(expr.child(i), inputs);
       ans = make_and(ans, tmp);
     }
     return ans;
   }
   if ( expr.is_or() ) {
-    size_t n = expr.child_num();
+    ymuint n = expr.child_num();
     FraigHandle ans = make_logic(expr.child(0), inputs);
-    for (size_t i = 1; i < n; ++ i) {
+    for (ymuint i = 1; i < n; ++ i) {
       FraigHandle tmp = make_logic(expr.child(i), inputs);
       ans = make_or(ans, tmp);
     }
     return ans;
   }
   if ( expr.is_xor() ) {
-    size_t n = expr.child_num();
+    ymuint n = expr.child_num();
     FraigHandle ans = make_logic(expr.child(0), inputs);
-    for (size_t i = 1; i < n; ++ i) {
+    for (ymuint i = 1; i < n; ++ i) {
       FraigHandle tmp = make_logic(expr.child(i), inputs);
       ans = make_xor(ans, tmp);
     }
@@ -172,23 +174,23 @@ FraigMgr::make_logic(const LogExpr& expr,
 
 // @brief コファクターを計算する．
 // @param[in] edge 対象の AIG ハンドル
-// @param[in] id コファクターをとる変数番号
+// @param[in] input_id コファクターをとる入力番号
 // @param[in] pol 極性
 FraigHandle
 FraigMgr::make_cofactor(FraigHandle edge,
-			tVarId id,
+			ymuint input_id,
 			tPol pol)
 {
   if ( edge.is_const() ) {
     // edge が定数の時は変更なし
     return edge;
   }
-  
+
   FraigNode* node = edge.node();
   FraigHandle ans;
   if ( node->is_input() ) {
-    // 入力ノード時は番号が id どうかで処理が変わる．
-    if ( node->input_id() == id ) {
+    // 入力ノード時は番号が input_id どうかで処理が変わる．
+    if ( node->input_id() == input_id ) {
       if ( pol == kPolPosi ) {
 	ans = make_one();
       }
@@ -203,8 +205,8 @@ FraigMgr::make_cofactor(FraigHandle edge,
   else {
     // AND ノードの場合
     // 2つの子供に再帰的な処理を行って結果の AND を計算する．
-    FraigHandle new_handle0 = make_cofactor(node->fanin0_handle(), id, pol);
-    FraigHandle new_handle1 = make_cofactor(node->fanin1_handle(), id, pol);
+    FraigHandle new_handle0 = make_cofactor(node->fanin0_handle(), input_id, pol);
+    FraigHandle new_handle1 = make_cofactor(node->fanin1_handle(), input_id, pol);
     FraigHandle ans = make_and(new_handle0, new_handle1);
   }
   if ( edge.inv() ) {
@@ -212,7 +214,7 @@ FraigMgr::make_cofactor(FraigHandle edge,
   }
   return ans;
 }
-  
+
 // @brief 2つのハンドルが等価かどうか調べる．
 Bool3
 FraigMgr::check_equiv(FraigHandle aig1,
@@ -238,11 +240,11 @@ FraigMgr::set_logstream(ostream* out)
 
 // @brief ランダムシミュレーション制御用のパラメータを設定する．
 void
-FraigMgr::set_loop_limit(size_t val)
+FraigMgr::set_loop_limit(ymuint val)
 {
   mImpl->set_loop_limit(val);
 }
-  
+
 // @brief 内部の統計情報を出力する．
 void
 FraigMgr::dump_stats(ostream& s)

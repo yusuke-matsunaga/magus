@@ -14,13 +14,14 @@
 #include "ym_verilog/pt/PtP.h"
 #include "PtiFwd.h"
 #include "PtrList.h"
+#include "Parser.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 class PuHierName;
 
-#include "verilog_grammer.h"
+#include "verilog_grammer.hh"
 
 END_NAMESPACE_YM_VERILOG
 

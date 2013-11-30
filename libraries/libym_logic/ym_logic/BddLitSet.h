@@ -85,6 +85,11 @@ public:
   explicit
   BddLitSet(BddMgr& mgr);
 
+  /// @brief BDD を指定するコンストラクタ
+  /// @param[in] bdd 対象のBDD
+  explicit
+  BddLitSet(const Bdd& bdd);
+
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
   BddLitSet(const BddLitSet& src);
@@ -99,7 +104,7 @@ public:
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   BddLitSet(BddMgr& mgr,
-	    tVarId varid,
+	    VarId varid,
 	    tPol pol);
 
   /// @brief リテラル1つだけを要素とする集合を作るコンストラクタ
@@ -198,11 +203,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief BDD を指定するコンストラクタ
-  /// @param[in] bdd 対象のBDD
-  explicit
-  BddLitSet(const Bdd& bdd);
 
   /// @brief サイズを設定する．
   void

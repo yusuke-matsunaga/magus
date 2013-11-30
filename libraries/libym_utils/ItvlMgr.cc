@@ -10,7 +10,7 @@
 
 
 #include "ym_utils/ItvlMgr.h"
-#include "ItvlCell.h"
+#include "ItvlMgrImpl.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -21,22 +21,21 @@ BEGIN_NAMESPACE_YM
 
 // コンストラクタ
 ItvlMgr::ItvlMgr() :
-  mRoot(NULL)
+  mImpl(new ItvlMgrImpl)
 {
-  clear();
 }
 
 // デストラクタ
 ItvlMgr::~ItvlMgr()
 {
-  ItvlCell::make_empty(mRoot);
+  delete mImpl;
 }
 
 // 内容をクリアして全区間を使用可能とする．
 void
 ItvlMgr::clear()
 {
-  ItvlCell::add_allcell(mRoot);
+  mImpl->clear();
 }
 
 // 使用可能な数字を得る．
@@ -45,7 +44,7 @@ ItvlMgr::clear()
 int
 ItvlMgr::avail_num() const
 {
-  return ItvlCell::avail_num(mRoot);
+  return mImpl->avail_num();
 }
 
 // [d1, d2]という区間が使用可能などうか調べる．
@@ -53,7 +52,7 @@ bool
 ItvlMgr::check(int d1,
 	       int d2) const
 {
-  return ItvlCell::check(d1, d2, mRoot);
+  return mImpl->check(d1, d2);
 }
 
 // 使用されている区間の最小値を求める．
@@ -61,7 +60,7 @@ ItvlMgr::check(int d1,
 int
 ItvlMgr::min_id() const
 {
-  return ItvlCell::min_id(mRoot);
+  return mImpl->min_id();
 }
 
 // 使用されている区間の最大値を求める．
@@ -69,14 +68,14 @@ ItvlMgr::min_id() const
 int
 ItvlMgr::max_id() const
 {
-  return ItvlCell::max_id(mRoot);
+  return mImpl->max_id();
 }
 
 // d を使用可能な区間から削除する．
 void
 ItvlMgr::erase(int d)
 {
-  ItvlCell::erase(d, mRoot);
+  mImpl->erase(d);
   sanity_check();
 }
 
@@ -85,7 +84,7 @@ void
 ItvlMgr::erase(int d1,
 	       int d2)
 {
-  ItvlCell::erase(d1, d2, mRoot);
+  mImpl->erase(d1, d2);
   sanity_check();
 }
 
@@ -93,7 +92,7 @@ ItvlMgr::erase(int d1,
 void
 ItvlMgr::add(int d)
 {
-  ItvlCell::add(d, mRoot);
+  mImpl->add(d);
   sanity_check();
 }
 
@@ -102,7 +101,7 @@ void
 ItvlMgr::add(int d1,
 	     int d2)
 {
-  ItvlCell::add(d1, d2, mRoot);
+  mImpl->add(d1, d2);
   sanity_check();
 }
 
@@ -110,28 +109,35 @@ ItvlMgr::add(int d1,
 void
 ItvlMgr::sanity_check() const
 {
-#ifdef DEBUG_ITVLMGR
-  int d1, d2; // ダミー変数
-  mRoot->check_internal(d1, d2);
-#endif
+  mImpl->sanity_check();
 }
 
 // 内容を表示する．
 void
-ItvlMgr::dump(ostream& s) const
+ItvlMgr::print(ostream& s) const
 {
-  if ( mRoot ) {
-    mRoot->dump_sub(s);
-  }
+  mImpl->print(s);
 }
 
 // 木構造を表示する．
 void
-ItvlMgr::disp_tree(ostream& s) const
+ItvlMgr::print_tree(ostream& s) const
 {
-  if ( mRoot ) {
-    mRoot->disp_tree_sub(s, 0);
-  }
+  mImpl->print_tree(s);
+}
+
+// @brief バイナリファイルに書き出す．
+void
+ItvlMgr::dump(ODO& s) const
+{
+  mImpl->dump(s);
+}
+
+// @brief バイナリファイルを読み込む．
+void
+ItvlMgr::restore(IDO& s)
+{
+  mImpl->restore(s);
 }
 
 END_NAMESPACE_YM

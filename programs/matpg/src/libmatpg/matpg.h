@@ -13,14 +13,14 @@
  *
  * Revision 2.0  91/12/21  18:53:46  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
  */
 
 #include "matpg_nsdef.h"
-#include <ym_utils/StopWatch.h>
+#include "ym_utils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_MATPG

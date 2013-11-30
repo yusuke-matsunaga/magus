@@ -42,21 +42,21 @@ SaBase::alloc_var(ymuint size)
 void
 SaBase::simplify(vector<Literal>& learnt)
 {
-  size_t nl = learnt.size();
+  ymuint nl = learnt.size();
 
   // learnt に含まれているリテラルのレベルのビットマップ
   // ただし 64 のモジュロをとっている．
   ymuint64 lmask = 0UL;
-  for (size_t i = 0; i < nl; ++ i) {
+  for (ymuint i = 0; i < nl; ++ i) {
     Literal p = learnt[i];
     int level = decision_level(p.varid());
     lmask |= (1UL << (level & 63));
   }
 
-  size_t wpos = 0;
-  for (size_t i = 0; i < nl; ++ i) {
+  ymuint wpos = 0;
+  for (ymuint i = 0; i < nl; ++ i) {
     Literal p = learnt[i];
-    tVarId var = p.varid();
+    VarId var = p.varid();
     mClearQueue2.clear();
     if ( check_recur(var, lmask) ) {
       if ( wpos != i ) {
@@ -64,9 +64,9 @@ SaBase::simplify(vector<Literal>& learnt)
       }
       ++ wpos;
     }
-    for (vector<tVarId>::iterator p = mClearQueue2.begin();
+    for (vector<VarId>::iterator p = mClearQueue2.begin();
 	 p != mClearQueue2.end(); ++ p) {
-      tVarId var = *p;
+      VarId var = *p;
       set_mark(var, false);
     }
   }
@@ -82,7 +82,7 @@ SaBase::simplify(vector<Literal>& learnt)
 // 以前の探索の結果が true ならその場で再帰関数は終わるので2度と
 // たどることはないし，以前の結果が false ならそのままでよい．
 bool
-SaBase::check_recur(tVarId varid,
+SaBase::check_recur(VarId varid,
 		    ymuint64 lmask)
 {
   SatReason r = reason(varid);
@@ -99,11 +99,13 @@ SaBase::check_recur(tVarId varid,
   }
 
   if ( r.is_clause() ) {
-    SatClause& clause = r.clause();
-    size_t n = clause.size();
-    for (size_t i = 1; i < n; ++ i) {
-      Literal q = clause.lit(i);
-      tVarId var1 = q.varid();
+    SatClause* clause = r.clause();
+    ymuint n = clause->lit_num();
+    Literal p = clause->wl0();
+    for (ymuint i = 0; i < n; ++ i) {
+      Literal q = clause->lit(i);
+      if ( q == p ) continue;
+      VarId var1 = q.varid();
       if ( !get_mark(var1) && decision_level(var1) > 0 ) {
 	set_mark(var1, true);
 	mClearQueue2.push_back(var1);
@@ -115,7 +117,7 @@ SaBase::check_recur(tVarId varid,
   }
   else {
     Literal q = r.literal();
-    tVarId var1 = q.varid();
+    VarId var1 = q.varid();
     if ( !get_mark(var1) && decision_level(var1) > 0 ) {
       set_mark(var1, true);
       mClearQueue2.push_back(var1);
@@ -132,14 +134,14 @@ SaBase::check_recur(tVarId varid,
 int
 SaBase::reorder(vector<Literal>& learnt)
 {
-  size_t n = learnt.size();
+  ymuint n = learnt.size();
   if ( n < 2 ) {
     return 0;
   }
   Literal lit1 = learnt[1];
   int level = decision_level(lit1.varid());
-  size_t pos = 1;
-  for (size_t i = 2; i < n; ++ i) {
+  ymuint pos = 1;
+  for (ymuint i = 2; i < n; ++ i) {
     Literal lit2 = learnt[i];
     int level2 = decision_level(lit2.varid());
     if ( level < level2 ) {
@@ -156,7 +158,7 @@ SaBase::reorder(vector<Literal>& learnt)
 
 // var->mMark を設定してキューに積む
 void
-SaBase::set_mark_and_putq(tVarId var)
+SaBase::set_mark_and_putq(VarId var)
 {
   set_mark(var, true);
   mClearQueue.push_back(var);
@@ -167,9 +169,9 @@ void
 SaBase::clear_marks()
 {
   // var->mMark をクリアする．
-  for (vector<tVarId>::iterator p = mClearQueue.begin();
+  for (vector<VarId>::iterator p = mClearQueue.begin();
        p != mClearQueue.end(); ++ p) {
-    tVarId var = *p;
+    VarId var = *p;
     set_mark(var, false);
   }
   mClearQueue.clear();

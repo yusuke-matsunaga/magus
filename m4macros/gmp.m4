@@ -25,13 +25,15 @@ if test "X$arch" = "Xx86_64"; then
 fi
 # --with-gmp-prefix
 AC_ARG_WITH([gmp-prefix],
-[  --with-gmp-prefix=DIR  gmpxx.h is in $DIR/include],
+[AS_HELP_STRING([--with-gmp-prefix=DIR],
+		[gmpxx.h is in DIR/include])],
 [gmp_list="$withval"],
 [gmp_list="$prefix $ac_default_prefix /usr /usr/local"])
 #
 # --with-gmp-libdir
 AC_ARG_WITH([gmp-libdir],
-[  --with-gmp-libdir=DIR  libgmp is in $DIR],
+[AS_HELP_STRING([--with-gmp-libdir=DIR],
+		[libgmp is in DIR])],
 [gmp_libdir="$withval"],
 [gmp_libdir=""])
 

@@ -30,7 +30,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  CptFactory(AllocBase& alloc);
+  CptFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual

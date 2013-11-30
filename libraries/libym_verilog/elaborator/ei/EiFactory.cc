@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 // @brief コンストラクタ
 // @param[in] alloc メモリ確保用のアロケータ
-EiFactory::EiFactory(AllocBase& alloc) :
+EiFactory::EiFactory(Alloc& alloc) :
   mAlloc(alloc)
 {
 }

@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 // @param[in] alloc メモリアロケータ
 PtiFactory*
 PtiFactory::make_obj(const string& type,
-		     AllocBase& alloc)
+		     Alloc& alloc)
 {
   if ( type == "spt" ) {
     return new SptFactory(alloc);
@@ -32,7 +32,7 @@ PtiFactory::make_obj(const string& type,
 
 // @brief コンストラクタ
 // @param[in] alloc メモリアロケータ
-PtiFactory::PtiFactory(AllocBase& alloc) :
+PtiFactory::PtiFactory(Alloc& alloc) :
   mAlloc(alloc)
 {
 }
@@ -376,7 +376,7 @@ PtiFactory::ConArray(const PtExpr* expr1,
 }
 
 // @brief メモリアロケータを得る．
-AllocBase&
+Alloc&
 PtiFactory::alloc()
 {
   return mAlloc;

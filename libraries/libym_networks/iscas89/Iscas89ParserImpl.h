@@ -123,7 +123,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 字句解析器
-  Iscas89Scanner mScanner;
+  Iscas89Scanner* mScanner;
 
   // イベントハンドラのリスト
   list<Iscas89Handler*> mHandlerList;

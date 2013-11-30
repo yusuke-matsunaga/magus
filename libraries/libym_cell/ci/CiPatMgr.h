@@ -10,7 +10,8 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "ym_utils/Alloc.h"
 #include "libcomp/libcomp_nsdef.h"
 
@@ -109,7 +110,7 @@ public:
   /// @brief バイナリダンプを行う．
   /// @param[in] bos 出力先のストリーム
   void
-  dump(BinO& bos) const;
+  dump(ODO& bos) const;
 
 
 public:
@@ -122,7 +123,7 @@ public:
   /// @param[in] alloc メモリアロケータ
   void
   copy(const nsLibcomp::LcPatMgr& src,
-       AllocBase& alloc);
+       Alloc& alloc);
 
   /// @brief データを読み込んでセットする．
   /// @param[in] bis 入力元のストリーム
@@ -130,8 +131,8 @@ public:
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  restore(BinI& bis,
-	  AllocBase& alloc);
+  restore(IDO& bis,
+	  Alloc& alloc);
 
 
 private:
@@ -144,12 +145,12 @@ private:
   /// @param[in] alloc メモリアロケータ
   void
   set_node_num(ymuint nn,
-	       AllocBase& alloc);
+	       Alloc& alloc);
 
   /// @brief パタン数を設定する．
   void
   set_pat_num(ymuint np,
-	      AllocBase& alloc);
+	      Alloc& alloc);
 
 
 private:

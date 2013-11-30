@@ -9,7 +9,6 @@
 #endif
 
 #include "ym_utils/random.h"
-#include "ym_utils/Generator.h"
 #include "ym_utils/StopWatch.h"
 #include "ym_logic/TvFunc.h"
 
@@ -29,7 +28,7 @@ walsh_0(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag;
-  cout << "Result of walsh_0(ni = " << func.ni()
+  cout << "Result of walsh_0(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -41,17 +40,18 @@ walsh_1(const TvFunc& func,
 {
   StopWatch sw;
 
-  size_t ni = func.ni();
+  ymuint ni = func.input_num();
   sw.start();
-  for (size_t j = 0; j < ni; ++ j) {
+  for (ymuint j = 0; j < ni; ++ j) {
+    VarId var(j);
     for (int i = 0; i < mag; ++ i) {
-      func.walsh_1(j);
+      func.walsh_1(var);
     }
   }
   sw.stop();
 
   double usec = sw.time().usr_time() / mag / ni;
-  cout << "Result of walsh_1(ni = " << func.ni()
+  cout << "Result of walsh_1(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -63,19 +63,21 @@ walsh_2(const TvFunc& func,
 {
   StopWatch sw;
 
-  size_t ni = func.ni();
+  ymuint ni = func.input_num();
   sw.start();
-  for (size_t j = 0; j < ni; ++ j) {
-    for (size_t k = 0; k < ni; ++ k) {
+  for (ymuint j = 0; j < ni; ++ j) {
+    VarId var1(j);
+    for (ymuint k = 0; k < ni; ++ k) {
+      VarId var2(k);
       for (int i = 0; i < mag; ++ i) {
-	func.walsh_2(j, k);
+	func.walsh_2(var1, var2);
       }
     }
   }
   sw.stop();
 
   double usec = sw.time().usr_time() / mag / (ni * ni);
-  cout << "Result of walsh_0(ni = " << func.ni()
+  cout << "Result of walsh_0(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -96,7 +98,7 @@ walsh_01(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag;
-  cout << "Result of walsh_01(ni = " << func.ni()
+  cout << "Result of walsh_01(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;
@@ -118,7 +120,7 @@ walsh_012(const TvFunc& func,
   sw.stop();
 
   double usec = sw.time().usr_time() / mag;
-  cout << "Result of walsh_012(ni = " << func.ni()
+  cout << "Result of walsh_012(ni = " << func.input_num()
        << ", mag = " << mag << ")"
        << endl
        << "CPU time(avr.): " << usec << endl;

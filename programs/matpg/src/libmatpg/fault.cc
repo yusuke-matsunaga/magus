@@ -10,7 +10,7 @@
  *
  * Revision 2.0  91/12/21  18:50:46  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -57,7 +57,7 @@ fault_set_all()
       continue;
     }
     for (gate_t* gate1 = gate; ; gate1 = gate1->next_eval) {
-      if ( gate1->is_po() || gate1->get_no() > 1 ) {
+      if ( gate1->is_po() || gate1->get_fanout_num() > 1 ) {
 	fault_add(val_0, gate1, -1);
 	fault_add(val_1, gate1, -1);
       }
@@ -69,7 +69,7 @@ fault_set_all()
   }
   for (size_t i = 0; i < npi; ++ i) {
     gate_t* gate = gn_get_gate(i);
-    if ( gate->is_po() || gate->get_no() > 1 ) {
+    if ( gate->is_po() || gate->get_fanout_num() > 1 ) {
       fault_add(val_0, gate, -1);
       fault_add(val_1, gate, -1);
     }
@@ -100,17 +100,17 @@ fault_sweep()
     case FTYPE_U:
       fault_undetected[new_undet_num ++] = f;
       break;
-      
+
     case FTYPE_D:
       fault_detected.push_back(f);
       ++ fault_det_num;
       break;
-      
+
     case FTYPE_R:
       fault_redundant.push_back(f);
       ++ fault_red_num;
       break;
-      
+
     case FTYPE_W:
       /* never happens */
       break;
@@ -133,7 +133,7 @@ fault_retryD()
       f->ftype = FTYPE_U;
       fault_undetected[fault_undet_num ++] = f;
       break;
-      
+
     case FTYPE_R:
     case FTYPE_W:
       break;
@@ -172,16 +172,16 @@ fault_get(int pos,
   switch (ftype) {
   case FTYPE_W:
     return fault_whole[pos];
-    
+
   case FTYPE_U:
     return fault_undetected[pos];
-    
+
   case FTYPE_D:
     return fault_detected[pos];
-    
+
   case FTYPE_R:
     return fault_redundant[pos];
-    
+
   case FTYPE_A:
     break;
   }

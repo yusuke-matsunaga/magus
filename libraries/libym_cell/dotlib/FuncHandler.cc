@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 // @param[in] parent 親のハンドラ
 FuncHandler::FuncHandler(GroupHandler* parent) :
-  SimpleHandler(parent)
+  SimpleHandler(parent, false)
 {
 }
 
@@ -122,7 +122,7 @@ FuncHandler::read_primary2()
   return node;
 }
 
-// @brief prudct を読み込む．
+// @brief product を読み込む．
 DotlibNodeImpl*
 FuncHandler::read_product()
 {

@@ -44,7 +44,7 @@ public:
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
   virtual
-  tVarId
+  VarId
   new_var() = 0;
 
   /// @brief 節を追加する．
@@ -52,6 +52,14 @@ public:
   virtual
   void
   add_clause(const vector<Literal>& lits) = 0;
+
+  /// @brief 節を追加する．
+  /// @param[in] lit_num リテラル数
+  /// @param[in] lits リテラルの配列
+  virtual
+  void
+  add_clause(ymuint lit_num,
+	     Literal* lits) = 0;
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -64,6 +72,11 @@ public:
   Bool3
   solve(const vector<Literal>& assumptions,
 	vector<Bool3>& model) = 0;
+
+  /// @brief 学習節の整理を行なう．
+  virtual
+  void
+  reduce_learnt_clause() = 0;
 
   /// @brief 現在の内部状態を得る．
   /// @param[out] stats 状態を格納する構造体

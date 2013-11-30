@@ -1,0 +1,111 @@
+# -*- coding:utf-8 -*-
+
+import logic
+
+
+# VarId オブジェクトの比較演算子のテスト関数
+def comp_check(v1, v1_name, v2, v2_name) :
+
+   print ""
+   print "compare %s(%d) with %s(%d)" % (v1_name, v1.val(), v2_name, v2.val())
+   if v1 == v2 :
+      print "%s == %s" % (v1_name, v2_name)
+   else :
+      print "!(%s == %s)" % (v1_name, v2_name)
+
+   if v1 != v2 :
+      print "%s != %s" % (v1_name, v2_name)
+   else :
+      print "!(%s != %s)" % (v1_name, v2_name)
+
+   if v1 < v2 :
+      print "%s < %s" % (v1_name, v2_name)
+   else :
+      print "!(%s < %s)" % (v1_name, v2_name)
+
+   if v1 <= v2 :
+      print "%s <= %s" % (v1_name, v2_name)
+   else :
+      print "!(%s <= %s)" % (v1_name, v2_name)
+
+   if v1 > v2 :
+      print "%s > %s" % (v1_name, v2_name)
+   else :
+      print "!(%s > %s)" % (v1_name, v2_name)
+
+   if v1 >= v2 :
+      print "%s >= %s" % (v1_name, v2_name)
+   else :
+      print "!(%s >= %s)" % (v1_name, v2_name)
+
+
+# オブジェクトの生成
+v0 = logic.VarId(0)
+v1 = logic.VarId(1)
+v2 = logic.VarId(2)
+
+u0 =  v0
+
+u1 = logic.VarId(0)
+u1.set(v1.val() + 10)
+
+u2 = logic.VarId() # 引数なし
+
+# 内容の表示
+print "v0 = %s" % v0
+print "v1 = %s" % v1
+print "v2 = %s" % v2
+print "u0 = %s" % u0
+print "u1 = %s" % u1
+print "u2 = %s" % u2
+
+# 比較関数
+comp_check(v0, "v0", v0, "v0")
+comp_check(v0, "v0", v1, "v1")
+comp_check(v0, "v0", v2, "v2")
+comp_check(v0, "v0", u0, "u0")
+comp_check(v0, "v0", u1, "u1")
+comp_check(v0, "v0", u2, "u2")
+
+comp_check(v1, "v1", v0, "v0")
+comp_check(v1, "v1", v1, "v1")
+comp_check(v1, "v1", v2, "v2")
+comp_check(v1, "v1", u0, "u0")
+comp_check(v1, "v1", u1, "u1")
+comp_check(v1, "v1", u2, "u2")
+
+comp_check(v2, "v2", v0, "v0")
+comp_check(v2, "v2", v1, "v1")
+comp_check(v2, "v2", v2, "v2")
+comp_check(v2, "v2", u0, "u0")
+comp_check(v2, "v2", u1, "u1")
+comp_check(v2, "v2", u2, "u2")
+
+comp_check(u0, "u0", v0, "v0")
+comp_check(u0, "u0", v1, "v1")
+comp_check(u0, "u0", v2, "v2")
+comp_check(u0, "u0", u0, "u0")
+comp_check(u0, "u0", u1, "u1")
+comp_check(u0, "u0", u2, "u2")
+
+comp_check(u1, "u1", v0, "v0")
+comp_check(u1, "u1", v1, "v1")
+comp_check(u1, "u1", v2, "v2")
+comp_check(u1, "u1", u0, "u0")
+comp_check(u1, "u1", u1, "u1")
+comp_check(u1, "u1", u2, "u2")
+
+comp_check(u2, "u2", v0, "v0")
+comp_check(u2, "u2", v1, "v1")
+comp_check(u2, "u2", v2, "v2")
+comp_check(u2, "u2", u0, "u0")
+comp_check(u2, "u2", u1, "u1")
+comp_check(u2, "u2", u2, "u2")
+
+# ハッシュ関数のテスト
+varmap = { v0 : "v0", v1 : "v1", v2 : "v2", u1 : "u1" }
+
+print ""
+print "varmap[u0] = %s" % varmap[u0]
+print "varmap[u1] = %s" % varmap[u1]
+print "varmap[u2] = %s" % varmap[u2]

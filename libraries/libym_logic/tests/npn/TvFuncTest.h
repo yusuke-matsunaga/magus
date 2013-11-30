@@ -38,18 +38,18 @@ public:
   /// TvFunc::nega_literal(size_t ni, tVarId pos)
   /// のテストを行う．
   void
-  check0(size_t ni);
+  check0(ymuint ni);
 
   /// @brief 基本的なテスト
   /// @param[in] ni 入力数
   /// @param[in] vect テストする論理関数のベクタ
   ///
   /// TvFunc::TvFunc(size_t ni, const vector<int>& vect)
-  /// TvFunc::ni()
+  /// TvFunc::input_num()
   /// TvFunc::value(size_t pos)
   /// のテストを行う．
   void
-  check_base(size_t ni,
+  check_base(ymuint ni,
 	     const vector<int>& vect);
 
   /// @brief 基本的なテストその2
@@ -87,7 +87,7 @@ public:
   /// のテストを行う．
   void
   check_walsh_1(const TvFunc& func,
-		size_t pos);
+		VarId pos);
 
   /// @brief walsh_2 のテスト
   /// @param[in] func 検査対象の論理関数
@@ -97,8 +97,8 @@ public:
   /// のテストを行う．
   void
   check_walsh_2(const TvFunc& func,
-		size_t pos1,
-		size_t pos2);
+		VarId pos1,
+		VarId pos2);
 
   /// @brief walsh_01 のテスト
   /// @param[in] func 検査対象の論理関数
@@ -124,7 +124,7 @@ public:
   /// のテストを行う．
   void
   check_check_sup(const TvFunc& func,
-		       size_t pos);
+		  VarId pos);
 
   /// @brief check_sym のテスト
   /// @param[in] func 検査対象の論理関数
@@ -134,8 +134,8 @@ public:
   /// のテストを行う．
   void
   check_check_sym(const TvFunc& func,
-		  size_t pos1,
-		  size_t pos2);
+		  VarId pos1,
+		  VarId pos2);
 
   /// @brief walsh_w0() のテスト
   /// @param[in] func 検査対象の論理関数
@@ -145,7 +145,7 @@ public:
   /// のテストを行う．
   void
   check_walsh_w0(const TvFunc& func,
-		 size_t ibits);
+		 ymuint ibits);
 
   /// @brief walsh_w1() のテスト
   /// @param[in] func 検査対象の論理関数
@@ -156,8 +156,8 @@ public:
   /// のテストを行う．
   void
   check_walsh_w1(const TvFunc& func,
-		 size_t pos,
-		 size_t ibits);
+		 VarId pos,
+		 ymuint ibits);
 
   /// @brief cofactor() のテスト
   /// @param[in] func 検査対象の論理関数
@@ -165,7 +165,7 @@ public:
   /// @param[in] pol 極性
   void
   check_cofactor(const TvFunc& func,
-		 ymuint pos,
+		 VarId pos,
 		 tPol pol);
 
   /// @brief エラー回数を得る．
@@ -219,7 +219,7 @@ private:
   int* mW1Cache;
 
   // mW1Cache のサイズ
-  size_t mW1CacheSize;
+  ymuint32 mW1CacheSize;
 
   // w2_cache 対象の論理関数
   TvFunc mW2Func;
@@ -228,7 +228,7 @@ private:
   int* mW2Cache;
 
   // mW2Cache のサイズ
-  size_t mW2CacheSize;
+  ymuint32 mW2CacheSize;
 
 };
 

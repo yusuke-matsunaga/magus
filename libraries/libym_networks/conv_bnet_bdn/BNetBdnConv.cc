@@ -160,10 +160,10 @@ make_node_sub(BdnMgr& bdn,
     return BdnNodeHandle::make_one();
   }
   if ( func.is_posiliteral() ) {
-    return fanins[func.varid()];
+    return fanins[func.varid().val()];
   }
   if ( func.is_negaliteral() ) {
-    return ~fanins[func.varid()];
+    return ~fanins[func.varid().val()];
   }
   // 以降は AND/OR/XOR
   ymuint n = func.child_num();
@@ -193,7 +193,7 @@ BNetBdnConv::make_node(const BNode* bnode)
   BdnNodeHandle node_handle;
   if ( !get_node(bnode, node_handle) ) {
     assert_cond( bnode->is_logic(), __FILE__, __LINE__);
-    ymuint ni = bnode->ni();
+    ymuint ni = bnode->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = make_node(bnode->fanin(i));

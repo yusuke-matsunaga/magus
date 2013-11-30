@@ -72,8 +72,8 @@ private:
   // root_node が NULL の場合には新しいノードを作る．
   // いずれの場合でも根のノードを返す．
   BNode*
-  build_xorsop_tree(size_t b,
-		    size_t ni,
+  build_xorsop_tree(ymuint b,
+		    ymuint ni,
 		    const BNodeVector& tmp_fanins,
 		    tPol pol,
 		    BNode* root_node);

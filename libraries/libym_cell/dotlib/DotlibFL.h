@@ -21,8 +21,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibFL :
   public DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -35,8 +33,8 @@ public:
 public:
 
   /// @brief 内容を初期化する．
-  void
-  init();
+  bool
+  set_data(const DotlibNode* fl_node);
 
   /// @brief var1 の名前を返す．
   ShString

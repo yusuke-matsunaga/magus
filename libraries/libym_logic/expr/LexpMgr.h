@@ -14,7 +14,7 @@
 #include "LexpNode.h"
 #include "LexpNodePtr.h"
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_LEXP
@@ -61,12 +61,12 @@ public:
   /// @brief 肯定のリテラルを作る．
   /// @param[in] varid 変数番号
   LexpNodePtr
-  make_posiliteral(tVarId varid);
+  make_posiliteral(VarId varid);
 
   /// @brief 否定のリテラルを作る．
   /// @param[in] varid 変数番号
   LexpNodePtr
-  make_negaliteral(tVarId varid);
+  make_negaliteral(VarId varid);
 
   /// @brief AND ノードの生成
   /// @param[in] begin ノードスタック中の開始位置
@@ -131,7 +131,7 @@ public:
   /// @note sub の中のリテラルは展開しない
   LexpNodePtr
   compose(const LexpNode* node,
-	  tVarId varid,
+	  VarId varid,
 	  const LexpNodePtr& sub);
 
   /// @brief 一度に複数の置き換えを行う．
@@ -213,7 +213,7 @@ private:
 
   // id 番めまでのリテラルノードを作る．
   void
-  make_literals(tVarId id);
+  make_literals(VarId id);
 
   // LexpNode を確保して内容を設定する．
   LexpNode*

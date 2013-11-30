@@ -11,12 +11,17 @@
 
 
 #include "ym_logic/bdd_nsdef.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/LogExpr.h"
 #include "ym_utils/Binder.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 #include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
+
+class BddMgrImpl;
 
 //////////////////////////////////////////////////////////////////////
 /// @class BddMgrParam BddMgr.h "ym_logic/BddMgr.h"
@@ -60,6 +65,8 @@ class BddMgr
 {
   friend class Bdd;
   friend class BddMgrImpl;
+  friend class BddVector;
+  friend class BddList;
   friend class DgMgr;
 
 public:
@@ -115,7 +122,7 @@ public:
   /// @param[in] pol 極性
   /// @return 生成された BDD
   Bdd
-  make_literal(tVarId varid,
+  make_literal(VarId varid,
 	       tPol pol);
 
   /// @brief リテラル関数を表すBDDを作る
@@ -129,13 +136,13 @@ public:
   /// @param[in] varid 変数番号
   /// @return 生成された BDD
   Bdd
-  make_posiliteral(tVarId varid);
+  make_posiliteral(VarId varid);
 
   /// @brief 否定のリテラル関数を作る．
   /// @param[in] varid 変数番号
   /// @return 生成された BDD
   Bdd
-  make_negaliteral(tVarId varid);
+  make_negaliteral(VarId varid);
 
   /// @brief インデックスと左右の子供を指定してBDDを作る．
   /// @param[in] varid 変数番号
@@ -143,7 +150,7 @@ public:
   /// @param[in] chd_1 1枝の指す BDD
   /// @return 生成された BDD
   Bdd
-  make_bdd(tVarId varid,
+  make_bdd(VarId varid,
 	   const Bdd& chd_0,
 	   const Bdd& chd_1);
 
@@ -156,7 +163,7 @@ public:
   /// @warning v の大きさは 2^ni に等しくなければならない．
   Bdd
   tvec_to_bdd(const vector<int>& v,
-	      tVarSize ni);
+	      ymuint ni);
 
   /// @brief ベクタを真理値表と見なしてBDDを作る(変数割当て付き)．
   /// @param[in] v 真理値表ベクタ
@@ -229,63 +236,21 @@ public:
   /// となる関数のこと．
   /// @note 関数処理で作るよりも効率的．
   Bdd
-  make_thfunc(tVarSize n,
-	      tVarSize th);
-
-  /// @brief 複数のBDDの論理積を求める．
-  /// @param[in] bdds BDD のベクタ
-  /// @return 生成された BDD
-  Bdd
-  and_op(const BddVector& bdds);
-
-  /// @brief 複数のBDDの論理積を求める．
-  /// @param[in] bdds BDD のリスト
-  /// @return 生成された BDD
-  Bdd
-  and_op(const BddList& bdds);
-
-  /// @brief 複数のBDDの論理和を求める．
-  /// @param[in] bdds BDD のベクタ
-  /// @return 生成された BDD
-  Bdd
-  or_op(const BddVector& bdds);
-
-  /// @brief 複数のBDDの論理和を求める．
-  /// @param[in] bdds BDD のリスト
-  /// @return 生成された BDD
-  Bdd
-  or_op(const BddList& bdds);
-
-  /// @brief 複数のBDDの排他的論理和を求める．
-  /// @param[in] bdds BDD のベクタ
-  /// @return 生成された BDD
-  Bdd
-  xor_op(const BddVector& bdds);
-
-  /// @brief 複数のBDDの排他的論理和を求める．
-  /// @param[in] bdds BDD のリスト
-  /// @return 生成された BDD
-  Bdd
-  xor_op(const BddList& bdds);
-
-  /// @brief 保存されたBDDを読み込む．
-  /// @param[in] s 入力ストリーム
-  /// @return 生成された BDD
-  Bdd
-  restore(istream& s);
+  make_thfunc(ymuint n,
+	      ymuint th);
 
   /// @brief 保存されたBDDをベクタに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された BDD を格納するベクタ
   void
-  restore(istream& s,
+  restore(IDO& s,
 	  BddVector& array);
 
   /// @brief 保存されたBDDをリストに読み込む．
   /// @param[in] s 入力ストリーム
   /// @param[out] array 生成された BDD を格納するリスト
   void
-  restore(istream& s,
+  restore(IDO& s,
 	  BddList& array);
 
   /// @}
@@ -302,26 +267,26 @@ public:
   /// @retval false 確保に失敗した
   /// @note 新しい変数は最後の変数の後ろに挿入される．
   bool
-  new_var(tVarId varid);
+  new_var(VarId varid);
 
   /// @brief 現在登録されている変数をそのレベルの昇順で返す．
   /// @param[out] vlist 変数を格納するリスト
   /// @return 変数の要素数
-  tVarSize
-  var_list(list<tVarId>& vlist) const;
+  ymuint
+  var_list(list<VarId>& vlist) const;
 
   /// @brief 変数番号からレベルを得る．
   /// @param[in] varid 変数番号
   /// @return varid に対応するレベル
   /// @note もしもレベルが割り当てられていない場合にはエラーとなる．
-  tLevel
-  level(tVarId varid) const;
+  ymuint
+  level(VarId varid) const;
 
   /// @brief レベルから変数番号を得る．
   /// @param[in] level レベル
   /// @return level に対応する変数番号
-  tVarId
-  varid(tLevel level) const;
+  VarId
+  varid(ymuint level) const;
 
   /// @brief 動的変数順変更を許可する．
   /// @note BddMgr の実装によっては動的変数順の変更をサポートして

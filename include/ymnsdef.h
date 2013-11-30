@@ -61,6 +61,12 @@ BEGIN_NAMESPACE(nsYm)
 #define END_NAMESPACE_YM \
 END_NAMESPACE(nsYm)
 
+/// @brief c 用の名前空間の開始
+#define BEGIN_EXTERN_C extern "C" {
+
+/// @brief c 用の名前空間の終了
+#define END_EXTERN_C }
+
 /// @namespace nsYm
 /// @brief ymtools の全ての要素が属する名前空間
 

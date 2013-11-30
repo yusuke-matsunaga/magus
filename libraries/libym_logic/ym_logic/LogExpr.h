@@ -11,7 +11,8 @@
 
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/Literal.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -39,10 +40,12 @@ class LexpNode;
 ///
 /// このクラスでは表現としての論理式を扱っているので論理関数としての
 /// 処理は行っていない．
-/// @sa tVarId, tPol, Literal
+/// @sa VarId, tPol, Literal
 //////////////////////////////////////////////////////////////////////
 class LogExpr
 {
+  friend class LexpMgr;
+
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name コンストラクタ/デストラクタ/代入演算子/生成用クラスメソッド
@@ -106,7 +109,7 @@ public:
   /// @return 生成したオブジェクト
   static
   LogExpr
-  make_literal(tVarId varid,
+  make_literal(VarId varid,
 	       tPol pol);
 
   /// @brief リテラル式の生成
@@ -121,14 +124,14 @@ public:
   /// @return 生成したオブジェクト
   static
   LogExpr
-  make_posiliteral(tVarId varid);
+  make_posiliteral(VarId varid);
 
   /// @brief 負(否定)リテラル式の生成
   /// @param[in] varid 変数番号
   /// @return 生成したオブジェクト
   static
   LogExpr
-  make_negaliteral(tVarId varid);
+  make_negaliteral(VarId varid);
 
   /// @brief AND 式の生成
   /// @param[in] chd_list オペランドのベクタ
@@ -221,7 +224,7 @@ public:
   /// -もしも自分自身の論理式の中に varid 番目のリテラル
   /// が含まれない場合にはなにも変わらない．
   LogExpr
-  compose(tVarId varid,
+  compose(VarId varid,
 	  const LogExpr& sub) const;
 
   /// @brief 複数変数の compose 演算
@@ -274,11 +277,6 @@ public:
   /// @name 根本の演算子の情報を得る．
   /// @{
 
-  /// @brief 根のノートを得る．
-  /// @note LexpNode の情報が非公開なのでほとんど無意味な関数
-  const LexpNode*
-  root() const;
-
   /// @brief 恒偽関数のチェック
   /// @return 恒偽関数を表している時に true を返す．
   bool
@@ -312,7 +310,7 @@ public:
   /// @brief リテラルの変数番号の取得
   /// @retval 変数番号 リテラルの場合
   /// @retval kVarMaxId リテラル以外
-  tVarId
+  VarId
   varid() const;
 
   /// @brief AND 式のチェック
@@ -398,14 +396,14 @@ public:
   /// @param[in] varid 変数番号
   /// @return varid 番めの変数のリテラルの出現回数を得る．
   ymuint
-  litnum(tVarId varid) const;
+  litnum(VarId varid) const;
 
   /// @brief リテラルの出現回数の取得
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   /// @return varid 番めの変数の極性が pol のリテラルの出現回数を得る．
   ymuint
-  litnum(tVarId varid,
+  litnum(VarId varid,
 	 tPol pol) const;
 
   /// @brief リテラルの出現回数の取得
@@ -432,7 +430,7 @@ public:
   /// @param[in] varid 変数番号
   /// @return SOP形式の varid 番めの変数のリテラルの出現回数
   ymuint
-  sop_litnum(tVarId varid) const;
+  sop_litnum(VarId varid) const;
 
   /// @brief SOP形式に展開した時のテラルの出現回数の見積もり
   /// @param[in] varid 変数番号
@@ -440,7 +438,7 @@ public:
   /// @return SOP形式に展開した時の varid 番めの変数の極性が
   /// pol のリテラルの出現回数
   ymuint
-  sop_litnum(tVarId varid,
+  sop_litnum(VarId varid,
 	     tPol pol) const;
 
   /// @brief SOP形式に展開したときのリテラルの出現回数の見積もり
@@ -536,6 +534,10 @@ private:
   void
   set_root(const LexpNode* node);
 
+  /// @brief 根のノートを得る．
+  const LexpNode*
+  root() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -603,8 +605,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] expr 論理式
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const LogExpr& expr);
 
 /// @relates LogExpr
@@ -612,8 +614,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力ストリーム
 /// @param[out] expr 論理式
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   LogExpr& expr);
 
 
@@ -623,7 +625,7 @@ operator>>(BinI& s,
 
 inline
 LogExpr
-LogExpr::make_literal(tVarId varid,
+LogExpr::make_literal(VarId varid,
 		      tPol pol)
 {
   return pol == kPolPosi ? make_posiliteral(varid) : make_negaliteral(varid);

@@ -86,13 +86,19 @@ CmnDumper::operator()(ostream& s,
       << dff->input()->fanin(0)->id_str() << endl
       << "  CLOCK(" << dff->clock()->id_str() << ") = "
       << dff->clock()->fanin(0)->id_str() << endl;
-    if ( dff->clear() ) {
-      s << "  CLEAR(" << dff->clear()->id_str() << ") = "
-	<< dff->clear()->fanin(0)->id_str() << endl;
+
+    const CmnNode* clear = dff->clear();
+    if ( clear ) {
+      const CmnNode* fanin = clear->fanin(0);
+      s << "  CLEAR(" << clear->id_str() << ") = "
+	<< fanin->id_str() << endl;
     }
-    if ( dff->preset() ) {
-      s << "  PRESET(" << dff->preset()->id_str() << ") = "
-	<< dff->preset()->fanin(0)->id_str() << endl;
+
+    const CmnNode* preset = dff->preset();
+    if ( preset ) {
+      const CmnNode* fanin = preset->fanin(0);
+      s << "  PRESET(" << preset->id_str() << ") = "
+	<< fanin->id_str() << endl;
     }
     s << endl;
   }
@@ -126,7 +132,7 @@ CmnDumper::operator()(ostream& s,
     s << "CELL(" << node->id_str() << ") = "
       << cell->name() << "(";
     const char* comma = "";
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       const CmnNode* inode = node->fanin(i);
       s << comma << inode->id_str();

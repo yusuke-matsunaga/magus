@@ -35,11 +35,11 @@ public:
   static
   PtiFactory*
   make_obj(const string& type,
-	   AllocBase& alloc);
+	   Alloc& alloc);
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリアロケータ
-  PtiFactory(AllocBase& alloc);
+  PtiFactory(Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -2333,7 +2333,7 @@ protected:
 
 
   /// @brief メモリアロケータを得る．
-  AllocBase&
+  Alloc&
   alloc();
 
 
@@ -2343,7 +2343,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリアロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
 };
 

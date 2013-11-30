@@ -34,8 +34,8 @@ public:
   /// @param[in] state_vars 状態変数番号の配列(現状態と次状態のペア)
   /// @param[in] trans_relation 状態遷移関係
   BddFsm(BddMgr& bdd_mgr,
-	 const vector<ymuint>& input_vars,
-	 const vector<pair<ymuint, ymuint> >& state_vars,
+	 const vector<VarId>& input_vars,
+	 const vector<pair<VarId, VarId> >& state_vars,
 	 const Bdd& trans_relation);
 
   /// @brief デストラクタ
@@ -54,31 +54,31 @@ public:
 
   /// @brief 入力の変数番号を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-  ymuint
+  VarId
   input_varid(ymuint pos) const;
 
   /// @brief 現状態の変数番号を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < ff_num() )
-  ymuint
+  VarId
   cur_varid(ymuint pos) const;
 
   /// @brief 現状態の変数番号から位置番号に変換する．
   /// @retval true 変換成功
   /// @retval false 変数番号が範囲外だった．
   bool
-  cur_varid2pos(ymuint varid,
+  cur_varid2pos(VarId varid,
 		ymuint& pos) const;
 
   /// @brief 次状態の変数番号を返す．
   /// @param[in] pos 位置番号 ( 0<= pos < ff_num() )
-  ymuint
+  VarId
   next_varid(ymuint pos) const;
 
   /// @brief 次状態の変数番号から位置番号に変換する．
   /// @retval true 変換成功
   /// @retval false 変数番号が範囲外だった．
   bool
-  next_varid2pos(ymuint varid,
+  next_varid2pos(VarId varid,
 		 ymuint& pos) const;
 
   /// @brief 次状態遷移関係を返す．
@@ -147,13 +147,13 @@ private:
   BddMgr& mBddMgr;
 
   // 入力変数の配列
-  vector<ymuint32> mInputVarIds;
+  vector<VarId> mInputVarIds;
 
   // 現状態変数の配列
-  vector<ymuint32> mCurVarIds;
+  vector<VarId> mCurVarIds;
 
   // 次状態変数の配列
-  vector<ymuint32> mNextVarIds;
+  vector<VarId> mNextVarIds;
 
   // 次状態遷移関係
   Bdd mTransRel;
@@ -199,7 +199,7 @@ BddFsm::ff_num() const
 // @brief 入力の変数番号を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < input_num() )
 inline
-ymuint
+VarId
 BddFsm::input_varid(ymuint pos) const
 {
   return mInputVarIds[pos];
@@ -208,7 +208,7 @@ BddFsm::input_varid(ymuint pos) const
 // @brief 現状態の変数番号を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < ff_num() )
 inline
-ymuint
+VarId
 BddFsm::cur_varid(ymuint pos) const
 {
   return mCurVarIds[pos];
@@ -219,7 +219,7 @@ BddFsm::cur_varid(ymuint pos) const
 // @retval false 変数番号が範囲外だった．
 inline
 bool
-BddFsm::cur_varid2pos(ymuint varid,
+BddFsm::cur_varid2pos(VarId varid,
 		      ymuint& pos) const
 {
   ymuint n = ff_num();
@@ -234,7 +234,7 @@ BddFsm::cur_varid2pos(ymuint varid,
 // @brief 次状態の変数番号を返す．
 // @param[in] pos 位置番号 ( 0<= pos < ff_num() )
 inline
-ymuint
+VarId
 BddFsm::next_varid(ymuint pos) const
 {
   return mNextVarIds[pos];
@@ -245,7 +245,7 @@ BddFsm::next_varid(ymuint pos) const
 // @retval false 変数番号が範囲外だった．
 inline
 bool
-BddFsm::next_varid2pos(ymuint varid,
+BddFsm::next_varid2pos(VarId varid,
 		       ymuint& pos) const
 {
   ymuint n = ff_num();

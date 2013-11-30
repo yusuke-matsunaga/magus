@@ -52,7 +52,7 @@ CiCell::CiCell(CiLibrary* library,
 	       const vector<bool>& output_array,
 	       const vector<LogExpr>& logic_array,
 	       const vector<LogExpr>& tristate_array,
-	       AllocBase& alloc)
+	       Alloc& alloc)
 {
   mLibrary = library;
 
@@ -92,10 +92,10 @@ CiCell::CiCell(CiLibrary* library,
 
   {
     ymuint n = ni2 * no2 * 2;
-    void* s = alloc.get_memory(sizeof(const CiTiming*) * n);
-    mTimingArray = new (s) CellTiming*[n];
+    void* s = alloc.get_memory(sizeof(const CiTimingArray*) * n);
+    mTimingMap = new (s) CiTimingArray*[n];
     for (ymuint i = 0; i < n; ++ i) {
-      mTimingArray[i] = NULL;
+      mTimingMap[i] = NULL;
     }
   }
 
@@ -117,11 +117,11 @@ CiCell::CiCell(CiLibrary* library,
   for (ymuint i = 0; i < no2; ++ i) {
     ymuint8 val = 0U;
     if ( output_array[i] ) {
-      if ( tristate_array[i].is_zero() ) {
-	val = 1U;
+      if ( !tristate_array[i].is_zero() ) {
+	val = 2U;
       }
       else {
-	val = 2U;
+	val = 1U;
       }
     }
     mLTArray[i] = val;
@@ -310,29 +310,65 @@ CiCell::bundle(const string& name) const
   return NULL;
 }
 
+// @brief タイミング情報の数の取得
+ymuint
+CiCell::timing_num() const
+{
+  return mTimingNum;
+}
+
+// @brief タイミング情報の取得
+// @param[in] pos 位置番号 ( 0 <= pos < timing_num() )
+const CellTiming*
+CiCell::timing(ymuint pos) const
+{
+  assert_cond( pos < timing_num(), __FILE__, __LINE__);
+  return mTimingArray[pos];
+}
+
+// @brief 条件に合致するタイミング情報の数の取得
+// @param[in] ipos 開始ピン番号 ( 0 <= ipos < input_num2() )
+// @param[in] opos 終了ピン番号 ( 0 <= opos < output_num2() )
+// @param[in] timing_sense タイミング情報の摘要条件
+ymuint
+CiCell::timing_num(ymuint ipos,
+		   ymuint opos,
+		   tCellTimingSense sense) const
+{
+  ymuint base = (opos * input_num2() + ipos) * 2;
+  switch ( sense ) {
+  case kCellPosiUnate: base += 0; break;
+  case kCellNegaUnate: base += 1; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  if ( mTimingMap[base] == NULL ) {
+    return 0;
+  }
+  return mTimingMap[base]->mNum;
+}
+
 // @brief タイミング情報の取得
 // @param[in] ipos 開始ピン番号
 // @param[in] opos 終了ピン番号
 // @param[in] timing_sense タイミング情報の摘要条件
+// @param[in] pos 位置番号 ( 0 <= pos < timing_num(ipos, opos, timing_sense) )
 // @return 条件に合致するタイミング情報を返す．
-// @note なければ NULL を返す．
 const CellTiming*
 CiCell::timing(ymuint ipos,
 	       ymuint opos,
-	       tCellTimingSense sense) const
+	       tCellTimingSense sense,
+	       ymuint pos) const
 {
-  ymuint base = opos * input_num2() + ipos;
+  assert_cond( pos < timing_num(ipos, opos, sense), __FILE__, __LINE__);
+  ymuint base = (opos * input_num2() + ipos) * 2;
   switch ( sense ) {
-  case kCellPosiUnate:
-    return mTimingArray[base + 0];
-
-  case kCellNegaUnate:
-    return mTimingArray[base + 1];
-
+  case kCellPosiUnate: base += 0; break;
+  case kCellNegaUnate: base += 1; break;
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
-  return NULL;
+  return mTimingMap[base]->mArray[pos];
 }
 
 // @brief 属している CellGroup を返す．
@@ -513,6 +549,133 @@ ymuint
 CiCell::clear_preset_var2() const
 {
   return 0;
+}
+
+// @brief 内容をバイナリダンプする．
+// @param[in] s 出力先のストリーム
+void
+CiCell::dump(ODO& s) const
+{
+  ymuint8 tid = 0;
+  if ( is_logic() ) {
+    tid = 0;
+  }
+  else if ( is_ff() ) {
+    tid = 1;
+  }
+  else if ( is_latch() ) {
+    tid = 2;
+  }
+  else if ( is_fsm() ) {
+    tid = 3;
+  }
+  else {
+    // 無視？
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  ymuint32 ni = input_num();
+  ymuint32 no = output_num();
+  ymuint32 nio = inout_num();
+  ymuint32 nit = internal_num();
+  ymuint32 nbus = bus_num();
+  ymuint32 nbundle = bundle_num();
+
+  s << tid
+    << name()
+    << area()
+    << ni
+    << no
+    << nio
+    << nit
+    << nbus
+    << nbundle;
+
+  ymuint no2 = no + nio;
+  for (ymuint opos = 0; opos < no2; ++ opos) {
+    s << has_logic()
+      << logic_expr(opos)
+      << tristate_expr(opos);
+  }
+
+  if ( is_ff() ) {
+    s << next_state_expr()
+      << clock_expr()
+      << clock2_expr()
+      << clear_expr()
+      << preset_expr()
+      << static_cast<ymuint8>(clear_preset_var1())
+      << static_cast<ymuint8>(clear_preset_var2());
+  }
+  else if ( is_latch() ) {
+    s << data_in_expr()
+      << enable_expr()
+      << enable2_expr()
+      << clear_expr()
+      << preset_expr()
+      << static_cast<ymuint8>(clear_preset_var1())
+      << static_cast<ymuint8>(clear_preset_var2());
+  }
+
+  // 入力ピンのダンプ
+  for (ymuint32 ipin = 0; ipin < ni; ++ ipin) {
+    input(ipin)->dump(s);
+  }
+
+  // 出力ピンのダンプ
+  for (ymuint32 opin = 0; opin < no; ++ opin) {
+    output(opin)->dump(s);
+  }
+
+  // 入出力ピンのダンプ
+  for (ymuint32 iopin = 0; iopin < nio; ++ iopin) {
+    output(iopin)->dump(s);
+  }
+
+  // 内部ピンのダンプ
+  for (ymuint32 itpin = 0; itpin < nit; ++ itpin) {
+    internal(itpin)->dump(s);
+  }
+
+  // タイミング情報のダンプ
+  ymuint32 nt = timing_num();
+  s << nt;
+  for (ymuint i = 0; i < nt; ++ i) {
+    timing(i)->dump(s);
+  }
+
+  // ちょっと効率が悪いけど線形探索を用いている．
+  // 効率が気になるならハッシュ関数を用いればよい．
+  for (ymuint32 ipos = 0; ipos < ni + nio; ++ ipos) {
+    for (ymuint32 opos = 0; opos < no + nio; ++ opos) {
+      ymuint32 np = timing_num(ipos, opos, kCellPosiUnate);
+      s << np;
+      for (ymuint i = 0; i < np; ++ i) {
+	const CellTiming* timing1 = timing(ipos, opos, kCellPosiUnate, i);
+	for (ymuint32 j = 0; j < nt; ++ j) {
+	  if ( timing(j) == timing1 ) {
+	    s << j;
+	  }
+	}
+      }
+      ymuint32 nn = timing_num(ipos, opos, kCellNegaUnate);
+      s << nn;
+      for (ymuint i = 0; i < nn; ++ i) {
+	const CellTiming* timing1 = timing(ipos, opos, kCellNegaUnate, i);
+	for (ymuint32 j = 0; j < nt; ++ j) {
+	  if ( timing(j) == timing1 ) {
+	    s << j;
+	  }
+	}
+      }
+    }
+  }
+}
+
+// @brief セルグループを設定する．
+void
+CiCell::set_group(const CellGroup* group)
+{
+  mCellGroup = group;
 }
 
 END_NAMESPACE_YM_CELL

@@ -41,61 +41,61 @@ LcFFMgr::init()
 
   { // クリアなし，プリセットなしのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(4, 0));
-    f_list.push_back(TvFunc::posi_literal(4, 1));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(1)));
     f_list.push_back(TvFunc::const_zero(4));
     f_list.push_back(TvFunc::const_zero(4));
-    f_list.push_back(TvFunc::posi_literal(4, 2));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(2)));
     f_list.push_back(TvFunc::const_zero(4));
-    f_list.push_back(TvFunc::posi_literal(4, 3));
+    f_list.push_back(TvFunc::posi_literal(4, VarId(3)));
     f_list.push_back(TvFunc::const_zero(4));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[0] = cclass->id();
   }
   { // クリアあり，プリセットなしのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(5, 0));
-    f_list.push_back(TvFunc::posi_literal(5, 1));
-    f_list.push_back(TvFunc::posi_literal(5, 2));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(1)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(2)));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(3)));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 4));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(4)));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[1] = cclass->id();
   }
   { // クリアなし，プリセットありのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(5, 0));
-    f_list.push_back(TvFunc::posi_literal(5, 1));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(1)));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 2));
-    f_list.push_back(TvFunc::posi_literal(5, 3));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(2)));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(3)));
     f_list.push_back(TvFunc::const_zero(5));
-    f_list.push_back(TvFunc::posi_literal(5, 4));
+    f_list.push_back(TvFunc::posi_literal(5, VarId(4)));
     f_list.push_back(TvFunc::const_zero(5));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[2] = cclass->id();
   }
   { // クリアあり，プリセットありのFFクラスの登録
     vector<TvFunc> f_list;
-    f_list.push_back(TvFunc::posi_literal(6, 0));
-    f_list.push_back(TvFunc::posi_literal(6, 1));
-    f_list.push_back(TvFunc::posi_literal(6, 2));
-    f_list.push_back(TvFunc::posi_literal(6, 3));
-    f_list.push_back(TvFunc::posi_literal(6, 4));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(0)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(1)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(2)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(3)));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(4)));
     f_list.push_back(TvFunc::const_zero(6));
-    f_list.push_back(TvFunc::posi_literal(6, 5));
+    f_list.push_back(TvFunc::posi_literal(6, VarId(5)));
     f_list.push_back(TvFunc::const_zero(6));
     TvFuncM f(f_list);
-    LcGroup* group = find_group(f);
+    LcGroup* group = find_group(f, false);
     LcClass* cclass = group->parent();
     mFFClass[3] = cclass->id();
   }

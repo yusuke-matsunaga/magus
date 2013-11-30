@@ -9,19 +9,20 @@
 
 #include "MislibParserImpl.h"
 #include "MislibMgrImpl.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NONAMESPACE
 
-// MislibLex::read_token() をデバッグする時に true にする．
+// MislibScanner::read_token() をデバッグする時に true にする．
 bool debug_read_token = false;
 
 END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_MISLIB
 
-#include "mislib_grammer.h"
+#include "mislib_grammer.hh"
 
 //////////////////////////////////////////////////////////////////////
 // クラス MislibParserImpl
@@ -30,11 +31,13 @@ BEGIN_NAMESPACE_YM_MISLIB
 // コンストラクタ
 MislibParserImpl::MislibParserImpl()
 {
+  mScanner = NULL;
 }
 
 // デストラクタ
 MislibParserImpl::~MislibParserImpl()
 {
+  delete mScanner;
 }
 
 
@@ -84,10 +87,10 @@ bool
 MislibParserImpl::read_file(const string& filename,
 			    MislibMgrImpl* mgr)
 {
-  int yyparse(MislibParserImpl& parser,
-	      MislibMgrImpl* mgr);
+  int yyparse(MislibParserImpl& parser);
 
-  if ( !mLex.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -100,6 +103,7 @@ MislibParserImpl::read_file(const string& filename,
   }
 
   // 初期化
+  mScanner = new MislibScanner(ido);
   mMislibMgr = mgr;
   mMislibMgr->clear();
 
@@ -107,7 +111,10 @@ MislibParserImpl::read_file(const string& filename,
 
   // パース木を作る．
   // 結果は MislibMgrImpl が持っている．
-  yyparse(*this, mgr);
+  yyparse(*this);
+
+  delete mScanner;
+  mScanner = NULL;
 
   if ( MsgMgr::error_num() > prev_errnum ) {
     // 異常終了
@@ -225,15 +232,15 @@ int
 MislibParserImpl::scan(MislibNodeImpl*& lval,
 		       FileRegion& lloc)
 {
-  int tok = mLex.read_token(lloc);
+  int tok = mScanner->read_token(lloc);
 
   switch ( tok ) {
   case STR:
-    lval = mMislibMgr->new_str(lloc, ShString(mLex.cur_string()));
+    lval = mMislibMgr->new_str(lloc, ShString(mScanner->cur_string()));
     break;
 
   case NUM:
-    lval = mMislibMgr->new_num(lloc, mLex.cur_num());
+    lval = mMislibMgr->new_num(lloc, mScanner->cur_num());
     break;
 
   case NONINV:
@@ -264,11 +271,11 @@ MislibParserImpl::scan(MislibNodeImpl*& lval,
     cout << "MislibParserImpl::scan(): ";
     switch ( tok ) {
     case STR:
-      cout << "STR(" << mLex.cur_string() << ")" << endl;
+      cout << "STR(" << mScanner->cur_string() << ")" << endl;
       break;
 
     case NUM:
-      cout << "NUM(" << mLex.cur_num() << ")" << endl;
+      cout << "NUM(" << mScanner->cur_num() << ")" << endl;
       break;
 
     case NONINV:

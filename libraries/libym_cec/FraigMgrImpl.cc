@@ -49,15 +49,15 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief ノードの通し番号を得る．
-ymuint
-FraigHandle::var_id() const
+VarId
+FraigHandle::varid() const
 {
   FraigNode* n = node();
   if ( n ) {
-    return n->var_id();
+    return n->varid();
   }
   else {
-    return 0;
+    return kVarIdIllegal;
   }
 }
 
@@ -125,7 +125,7 @@ operator<<(ostream& s,
       s << "I" << src.input_id();
     }
     else {
-      s << "A" << src.var_id();
+      s << "A" << src.varid();
     }
   }
   return s;
@@ -266,7 +266,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   }
 
   // 順番の正規化
-  if ( handle1.var_id() < handle2.var_id() ) {
+  if ( handle1.varid().val() < handle2.varid().val() ) {
     FraigHandle tmp = handle1;
     handle1 = handle2;
     handle2 = tmp;
@@ -302,9 +302,9 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   mHashTable1.add_elem(pos1, node, node->mLink1);
 
   // 入出力の関係を表す CNF を作る．
-  ymuint id = node->var_id();
-  ymuint id0 = handle1.var_id();
-  ymuint id1 = handle2.var_id();
+  VarId id = node->varid();
+  VarId id0 = handle1.varid();
+  VarId id1 = handle2.varid();
   tPol pol0 = handle1.inv() ? kPolNega : kPolPosi;
   tPol pol1 = handle2.inv() ? kPolNega : kPolPosi;
   Literal lito(id, kPolPosi);
@@ -410,7 +410,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
     FraigNode* node1 = mAllNodes[i];
     if ( node1->is_input() ) {
       ymuint32 pat = 0U;
-      if ( mModel[node1->var_id()] == kB3True ) {
+      if ( mModel[node1->varid().val()] == kB3True ) {
 	pat = ~0U;
       }
       else {
@@ -565,7 +565,7 @@ FraigMgrImpl::new_node()
   void* p = mAlloc.get_memory(sizeof(FraigNode));
   FraigNode* node = new (p) FraigNode();
   node->mVarId = mSolver.new_var();
-  assert_cond(node->mVarId == mAllNodes.size(), __FILE__, __LINE__);
+  assert_cond(node->mVarId.val() == mAllNodes.size(), __FILE__, __LINE__);
   init_pat(node);
   mAllNodes.push_back(node);
   return node;
@@ -576,7 +576,7 @@ Bool3
 FraigMgrImpl::check_const(FraigNode* node,
 			  bool inv)
 {
-  ymuint id = node->var_id();
+  VarId id = node->varid();
 
   if ( debug ) {
     cout << "CHECK CONST";
@@ -633,8 +633,8 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
 			  FraigNode* node2,
 			  bool inv)
 {
-  ymuint id1 = node1->var_id();
-  ymuint id2 = node2->var_id();
+  VarId id1 = node1->varid();
+  VarId id2 = node2->varid();
 
   if ( debug ) {
     cout << "CHECK EQUIV  "
@@ -703,12 +703,12 @@ FraigMgrImpl::check_condition(Literal lit1)
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    tVarId id = solver.new_var();
-    assert_cond(id == node->var_id(), __FILE__, __LINE__);
+    VarId id = solver.new_var();
+    assert_cond(id == node->varid(), __FILE__, __LINE__);
     if ( node->is_and() ) {
       Literal lito(id, kPolPosi);
-      Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-      Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
+      Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+      Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause( lit1, ~lito);
       solver.add_clause( lit2, ~lito);
@@ -725,10 +725,10 @@ FraigMgrImpl::check_condition(Literal lit1)
 	 p != mAllNodes.end(); ++ p) {
       FraigNode* node = *p;
       if ( node->is_and() ) {
-	tVarId id = node->var_id();
+	VarId id = node->varid();
 	Literal lito(id, kPolPosi);
-	Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-	Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
+	Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+	Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -742,7 +742,7 @@ FraigMgrImpl::check_condition(Literal lit1)
 // lit1 & lit2 が成り立つか調べる．
 Bool3
 FraigMgrImpl::check_condition(Literal lit1,
-				Literal lit2)
+			      Literal lit2)
 {
   vector<Literal> assumptions(2);
   assumptions[0] = lit1;
@@ -754,12 +754,12 @@ FraigMgrImpl::check_condition(Literal lit1,
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    tVarId id = solver.new_var();
-    assert_cond(id == node->var_id(), __FILE__, __LINE__);
+    VarId id = solver.new_var();
+    assert_cond(id == node->varid(), __FILE__, __LINE__);
     if ( node->is_and() ) {
       Literal lito(id, kPolPosi);
-      Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-      Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
+      Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+      Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause(lit1, ~lito);
       solver.add_clause(lit2, ~lito);
@@ -777,10 +777,10 @@ FraigMgrImpl::check_condition(Literal lit1,
 	 p != mAllNodes.end(); ++ p) {
       FraigNode* node = *p;
       if ( node->is_and() ) {
-	tVarId id = node->var_id();
+	VarId id = node->varid();
 	Literal lito(id, kPolPosi);
-	Literal lit1(node->fanin0()->var_id(), inv2pol(node->fanin0_inv()));
-	Literal lit2(node->fanin1()->var_id(), inv2pol(node->fanin1_inv()));
+	Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
+	Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -797,9 +797,9 @@ Literal
 FraigMgrImpl::fraig2literal(FraigHandle aig)
 {
   if ( aig.is_const() ) {
-    return Literal(0, kPolPosi);
+    return Literal(VarId(0), kPolPosi);
   }
-  ymuint id = aig.node()->var_id();
+  VarId id = aig.node()->varid();
   if ( aig.inv() ) {
     return Literal(id, kPolNega);
   }

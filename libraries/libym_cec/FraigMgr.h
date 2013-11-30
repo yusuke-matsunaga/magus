@@ -110,11 +110,11 @@ public:
 
   /// @brief コファクターを計算する．
   /// @param[in] edge 対象の AIG ハンドル
-  /// @param[in] id コファクターをとる変数番号
+  /// @param[in] input_id コファクターをとる入力番号
   /// @param[in] pol 極性
   FraigHandle
   make_cofactor(FraigHandle edge,
-		tVarId id,
+		ymuint input_id,
 		tPol pol);
 
 
@@ -136,7 +136,7 @@ public:
   /// @brief ランダムシミュレーション制御用のパラメータを設定する．
   /// @param[in] loop_limit 変化のない状態がこの回数連続したら止める．
   void
-  set_loop_limit(size_t loop_limit);
+  set_loop_limit(ymuint loop_limit);
 
   /// @brief 内部の統計情報を出力する．
   void

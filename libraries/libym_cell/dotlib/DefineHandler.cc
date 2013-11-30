@@ -42,7 +42,7 @@ DefineHandler::read_attr(const ShString& attr_name,
 			 const FileRegion& attr_loc)
 {
   FileRegion dummy_loc;
-  const DotlibNode* value = parse_complex(dummy_loc);
+  const DotlibNode* value = parse_complex(false, dummy_loc);
   if ( value == NULL ) {
     return false;
   }
@@ -55,7 +55,7 @@ DefineHandler::read_attr(const ShString& attr_name,
     cout << attr_name << " : " << value << endl;
   }
 
-  const DotlibNode* keyword = value->top();
+  const DotlibNode* keyword = value->list_elem(0);
   if ( keyword == NULL || !keyword->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    keyword->loc(),
@@ -65,7 +65,7 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* group = keyword->next();
+  const DotlibNode* group = value->list_elem(1);
   if ( group == NULL || !group->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    group->loc(),
@@ -75,7 +75,7 @@ DefineHandler::read_attr(const ShString& attr_name,
     return false;
   }
 
-  const DotlibNode* type_token = group->next();
+  const DotlibNode* type_token = value->list_elem(2);
   if ( type_token == NULL || !type_token->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    type_token->loc(),
@@ -118,7 +118,7 @@ DefineHandler::read_attr(const ShString& attr_name,
     new_handler = new FloatSimpleHandler(g_handler);
   }
   else if ( type_str == "string" ) {
-    new_handler = new StrSimpleHandler(g_handler);
+    new_handler = new StrSimpleHandler(g_handler, false);
   }
   else {
     ostringstream buf;

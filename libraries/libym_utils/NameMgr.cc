@@ -86,7 +86,7 @@ NameMgr::add(const char* name)
     // 数字を抜き出す．
     d = str_to_num(name);
   }
-  
+
   if ( d != -1 ) {
     // 区間から d を削除
     mInterval.erase(d);
@@ -113,31 +113,31 @@ NameMgr::erase(const char* name)
 int
 NameMgr::str_to_num(const char* name) const
 {
-  size_t plen = mPrefix.size();
-  size_t slen = mSuffix.size();
-  size_t nlen = strlen(name);
+  ymuint plen = mPrefix.size();
+  ymuint slen = mSuffix.size();
+  ymuint nlen = strlen(name);
 
   // 接頭語と接尾語を足した長さのほうが長ければ数値があるわけない．
   if ( plen + slen >= nlen ) {
     return -1;
   }
-  
+
   // prefix を比較
-  for (size_t i = 0; i < plen; ++ i) {
+  for (ymuint i = 0; i < plen; ++ i) {
     if ( mPrefix[i] != name[i] ) {
       return -1;
     }
   }
   // suffix を比較
-  for (size_t i = 0; i < slen; ++ i ) {
+  for (ymuint i = 0; i < slen; ++ i ) {
     if ( mSuffix[i] != name[nlen - slen + i] ) {
       return -1;
     }
   }
-  
+
   // 数字を抜き出す．
   int d = 0;
-  for (size_t i = plen; i < nlen - slen; ++ i) {
+  for (ymuint i = plen; i < nlen - slen; ++ i) {
     char c = name[i];
     if ( !isdigit(c) ) {
       // 数字以外の文字があった．
@@ -145,19 +145,19 @@ NameMgr::str_to_num(const char* name) const
     }
     d = (d * 10) + (c - '0');
   }
-  
+
   // それを返す．
   return d;
 }
 
 // 内容を表示する．
 void
-NameMgr::dump(ostream& s) const
+NameMgr::print(ostream& s) const
 {
   s << "<<<<NameMgr>>>>" << endl
     << "Prefix: '" << mPrefix << "'" << endl
     << "Suffix: '" << mSuffix << "'" << endl;
-  mInterval.dump(s);
+  mInterval.print(s);
 }
 
 END_NAMESPACE_YM

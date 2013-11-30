@@ -1,11 +1,11 @@
-#ifndef LIBYM_NPN_NPNCONF_H
-#define LIBYM_NPN_NPNCONF_H
+#ifndef NPNCONF_H
+#define NPNCONF_H
 
-/// @file libym_npn/NpnConf.h
+/// @file NpnConf.h
 /// @brief NpnConf のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -73,7 +73,7 @@ public:
 
   /// @brief 入力数を得る．
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 完全な正規形になっているとき true を返す．
   /// @param[in] g0 調べ始める最初のグループ番号
@@ -238,8 +238,9 @@ public:
 public:
 
   /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
   void
-  dump(ostream& s) const;
+  print(ostream& s) const;
 
 
 private:
@@ -317,9 +318,9 @@ NpnConf::func() const
 // @brief 入力数を得る．
 inline
 ymuint
-NpnConf::ni() const
+NpnConf::input_num() const
 {
-  return mBaseConf->ni();
+  return mBaseConf->input_num();
 }
 
 // @brief 出力極性が確定のときに true を返す．
@@ -589,4 +590,4 @@ NpnConf::refine(ymuint g0,
 
 END_NAMESPACE_YM_NPN
 
-#endif // YM_NPN_NPNCONF
+#endif // NPNCONF

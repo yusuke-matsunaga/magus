@@ -10,7 +10,7 @@
 
 
 #include "ym_ymsh/ymsh_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 #include "ym_utils/StrBuff.h"
 
 

@@ -39,92 +39,87 @@ AtpgCmd::after_set_network()
 {
   // 諸元を TCL 変数にセットしておく
   TgNetwork& network = _network();
-  size_t nlo = network.logic_num();
-  size_t n_buff = 0;
-  size_t n_not = 0;
-  size_t n_and = 0;
-  size_t n_and2 = 0;
-  size_t n_and3 = 0;
-  size_t n_and4 = 0;
-  size_t n_nand = 0;
-  size_t n_nand2 = 0;
-  size_t n_nand3 = 0;
-  size_t n_nand4 = 0;
-  size_t n_or = 0;
-  size_t n_or2 = 0;
-  size_t n_or3 = 0;
-  size_t n_or4 = 0;
-  size_t n_nor = 0;
-  size_t n_nor2 = 0;
-  size_t n_nor3 = 0;
-  size_t n_nor4 = 0;
-  size_t n_xor = 0;
-  size_t n_xor2 = 0;
-  size_t n_xnor = 0;
-  size_t n_xnor2 = 0;
-  size_t n_cplx = 0;
-  for (size_t i = 0; i < nlo; ++ i) {
+  ymuint nlo = network.logic_num();
+  ymuint n_buff = 0;
+  ymuint n_not = 0;
+  ymuint n_and = 0;
+  ymuint n_and2 = 0;
+  ymuint n_and3 = 0;
+  ymuint n_and4 = 0;
+  ymuint n_nand = 0;
+  ymuint n_nand2 = 0;
+  ymuint n_nand3 = 0;
+  ymuint n_nand4 = 0;
+  ymuint n_or = 0;
+  ymuint n_or2 = 0;
+  ymuint n_or3 = 0;
+  ymuint n_or4 = 0;
+  ymuint n_nor = 0;
+  ymuint n_nor2 = 0;
+  ymuint n_nor3 = 0;
+  ymuint n_nor4 = 0;
+  ymuint n_xor = 0;
+  ymuint n_xor2 = 0;
+  ymuint n_xnor = 0;
+  ymuint n_xnor2 = 0;
+  ymuint n_cplx = 0;
+  for (ymuint i = 0; i < nlo; ++ i) {
     const TgNode* node = network.logic(i);
-    switch ( node->type() ) {
-    case kTgUndef:
-    case kTgInput:
-    case kTgOutput:
-      break;
-      
-    case kTgBuff:
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
       ++ n_buff;
       break;
-      
-    case kTgNot:
+
+    case kTgGateNot:
       ++ n_not;
       break;
-      
-    case kTgAnd:
+
+    case kTgGateAnd:
       ++ n_and;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_and2; break;
       case 3: ++ n_and3; break;
       case 4: ++ n_and4; break;
       }
       break;
-      
-    case kTgNand:
+
+    case kTgGateNand:
       ++ n_nand;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_nand2; break;
       case 3: ++ n_nand3; break;
       case 4: ++ n_nand4; break;
       }
       break;
-      
-    case kTgOr:
+
+    case kTgGateOr:
       ++ n_or;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_or2; break;
       case 3: ++ n_or3; break;
       case 4: ++ n_or4; break;
       }
       break;
-      
-    case kTgNor:
+
+    case kTgGateNor:
       ++ n_nor;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_nor2; break;
       case 3: ++ n_nor3; break;
       case 4: ++ n_nor4; break;
       }
       break;
-      
-    case kTgXor:
+
+    case kTgGateXor:
       ++ n_xor;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_xor2; break;
       }
       break;
-      
-    case kTgXnor:
+
+    case kTgGateXnor:
       ++ n_xnor;
-      switch ( node->ni() ) {
+      switch ( node->fanin_num() ) {
       case 2: ++ n_xnor2; break;
       }
       break;
@@ -199,17 +194,17 @@ void
 AtpgCmd::after_update_faults()
 {
   FaultMgr& fault_mgr = _fault_mgr();
-  
+
   // 諸元を TCL 変数にセットしておく
   const vector<SaFault*>& all_list = fault_mgr.all_list();
   const vector<SaFault*>& rep_list = fault_mgr.all_rep_list();
   const vector<SaFault*>& remain_list = fault_mgr.remain_list();
   const vector<SaFault*>& untest_list = fault_mgr.untest_list();
-  size_t n_all = all_list.size();
-  size_t n_rep = rep_list.size();
-  size_t n_remain = remain_list.size();
-  size_t n_untest = untest_list.size();
-  size_t n_det = n_rep - n_remain - n_untest;
+  ymuint n_all = all_list.size();
+  ymuint n_rep = rep_list.size();
+  ymuint n_remain = remain_list.size();
+  ymuint n_untest = untest_list.size();
+  ymuint n_det = n_rep - n_remain - n_untest;
 
   TclObj varname = "::atpg::info";
   int varflag = 0;
@@ -257,7 +252,7 @@ AtpgCmd::after_update_faults()
   }
 #endif
 }
-  
+
 // @brief TgNetwork を取り出す．
 TgNetwork&
 AtpgCmd::_network()

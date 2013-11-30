@@ -12,7 +12,7 @@
 #include "ym_networks/cmn.h"
 #include "ym_cell/cell_nsdef.h"
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/FragAlloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 

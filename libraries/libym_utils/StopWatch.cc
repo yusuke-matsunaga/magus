@@ -1,15 +1,15 @@
 
-/// @file libym_utils/StopWatch.cc
+/// @file StopWatch.cc
 /// @brief 時間計測用のクラスの実装ファイル
 /// @author Yusuke Matsunaga
 ///
-/// $Id: StopWatch.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
+#include "ym_utils/USTime.h"
 #include "ym_utils/StopWatch.h"
+#include "ym_utils/MStopWatch.h"
 
 #if HAVE_GETRUSAGE
 #  include <sys/resource.h>
@@ -24,44 +24,20 @@
 
 BEGIN_NAMESPACE_YM
 
-// 時間をとってくる関数
-USTime
-StopWatch::cur_time()
-{
-  double u, s, r;
-#if HAVE_GETRUSAGE
-  struct rusage ru;
-  getrusage(RUSAGE_SELF, &ru);
-  u = xchg(ru.ru_utime);
-  s = xchg(ru.ru_stime);
-#elif HAVE_TIMES
-  struct tms buffer;
-  (void) times(&buffer);
-  u = (double)buffer.tms_utime * 1000.0 * 1000.0 / (double)CLK_TCK;
-  s = (double)buffer.tms.stime * 1000.0 * 1000.0 / (double)CLK_TCK;
-#else
-# error "neither getrusage() nor times() are found"
-#endif
-  struct timeval tv;
-  (void) gettimeofday(&tv, NULL);
-  // オーバーフローさせないためのオフセット
-  const int kRTimeOffset = ((2000 - 1970)*365+(2000-1969)/4)*24*3600;
-  tv.tv_sec -= kRTimeOffset;
-  r = xchg(tv);
-  return USTime(u, s, r);
-}
 
-// timeval構造体をdoubleに変換する関数
-double
-StopWatch::xchg(struct timeval& tv)
-{
-  return (double)tv.tv_sec * 1000.0 * 1000.0 + (double)tv.tv_usec;
-}
+//////////////////////////////////////////////////////////////////////
+// クラス StopWatch
+//////////////////////////////////////////////////////////////////////
 
 // コンストラクタ．実はリセット
 StopWatch::StopWatch()
 {
   reset();
+}
+
+// @brief デストラクタ
+StopWatch::~StopWatch()
+{
 }
 
 // ”リセット”
@@ -110,12 +86,52 @@ StopWatch::time() const
   return ans;
 }
 
+// 時間をとってくる関数
+USTime
+StopWatch::cur_time()
+{
+  double u, s, r;
+#if HAVE_GETRUSAGE
+  struct rusage ru;
+  getrusage(RUSAGE_SELF, &ru);
+  u = xchg(ru.ru_utime);
+  s = xchg(ru.ru_stime);
+#elif HAVE_TIMES
+  struct tms buffer;
+  (void) times(&buffer);
+  u = (double)buffer.tms_utime * 1000.0 * 1000.0 / (double)CLK_TCK;
+  s = (double)buffer.tms.stime * 1000.0 * 1000.0 / (double)CLK_TCK;
+#else
+# error "neither getrusage() nor times() are found"
+#endif
+  struct timeval tv;
+  (void) gettimeofday(&tv, NULL);
+  // オーバーフローさせないためのオフセット
+  const int kRTimeOffset = ((2000 - 1970)*365+(2000-1969)/4)*24*3600;
+  tv.tv_sec -= kRTimeOffset;
+  r = xchg(tv);
+  return USTime(u, s, r);
+}
+
+// timeval構造体をdoubleに変換する関数
+double
+StopWatch::xchg(struct timeval& tv)
+{
+  return (double)tv.tv_sec * 1000.0 * 1000.0 + (double)tv.tv_usec;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス MStopWatch
+//////////////////////////////////////////////////////////////////////
+
+
 // コンストラクタ，時計の数と最初にアクティブな時計番号
-MStopWatch::MStopWatch(size_t n,
-		       size_t id) :
+MStopWatch::MStopWatch(ymuint n,
+		       ymuint id) :
   mNum(n),
   mCur(id),
-  mWarray(n)
+  mWarray(new StopWatch[n])
 {
   // 範囲外の場合は補正する．
   if ( mCur >= mNum ) {
@@ -123,12 +139,18 @@ MStopWatch::MStopWatch(size_t n,
   }
   mWarray[mCur].start();
 }
-    
-// アクティブな時計を切替える．昔の時計番号を返す
-size_t
-MStopWatch::change(size_t new_id)
+
+// @brief デストラクタ
+MStopWatch::~MStopWatch()
 {
-  size_t old_id = mCur;
+  delete [] mWarray;
+}
+
+// アクティブな時計を切替える．昔の時計番号を返す
+ymuint
+MStopWatch::change(ymuint new_id)
+{
+  ymuint old_id = mCur;
 
   // 範囲外の場合は何もしない．
   if ( new_id < mNum ) {
@@ -139,7 +161,7 @@ MStopWatch::change(size_t new_id)
       StopWatch& old_sw = mWarray[old_id];
       old_sw.mState = StopWatch::OFF;
       old_sw.mTotalTime += tmp_time - old_sw.mStartTime;
-  
+
       StopWatch& new_sw = mWarray[new_id];
       new_sw.mState = StopWatch::ON;
       new_sw.mStartTime = tmp_time;

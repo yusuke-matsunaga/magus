@@ -12,7 +12,8 @@
 #include "ym_cell/CellGroup.h"
 #include "ym_logic/NpnMapM.h"
 #include "ym_utils/Alloc.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -53,10 +54,10 @@ public:
   // 機能情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 属している CellClass を返す．
+  /// @brief 代表クラスを返す．
   virtual
   const CellClass*
-  cell_class() const;
+  rep_class() const;
 
   /// @brief 代表クラスに対する変換マップを返す．
   virtual
@@ -199,8 +200,8 @@ public:
   void
   init(const CellClass* cell_class,
        const NpnMapM& map,
-       const vector<const Cell*>& cell_list,
-       AllocBase& alloc);
+       const vector<Cell*>& cell_list,
+       Alloc& alloc);
 
   /// @brief FFのピン情報を設定する．
   /// @param[in] pos_array ピン位置と極性情報の配列
@@ -234,16 +235,16 @@ public:
   /// @brief バイナリダンプを行う．
   /// @param[in] bos 出力先のストリーム
   void
-  dump(BinO& bos) const;
+  dump(ODO& bos) const;
 
   /// @brief バイナリファイルを読み込む．
   /// @param[in] bis 入力元のストリーム
   /// @param[in] library セルライブラリ
   /// @param[in] alloc メモリアロケータ
   void
-  restore(BinI& bis,
-	  const CellLibrary& library,
-	  AllocBase& alloc);
+  restore(IDO& bis,
+	  CellLibrary& library,
+	  Alloc& alloc);
 
 
 private:
@@ -254,7 +255,7 @@ private:
   /// @brief メモリ領域の確保を行う．
   /// @param[in] alloc メモリアロケータ
   void
-  alloc_array(AllocBase& alloc);
+  alloc_array(Alloc& alloc);
 
 
 private:
@@ -266,7 +267,7 @@ private:
   ymuint32 mId;
 
   // 属している CellClass
-  const CellClass* mCellClass;
+  const CellClass* mRepClass;
 
   // CellClass に対する入出力の変換関数
   NpnMapM mMap;

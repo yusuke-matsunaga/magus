@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-SptFactory::SptFactory(AllocBase& alloc) :
+SptFactory::SptFactory(Alloc& alloc) :
   PtiFactory(alloc)
 {
 }

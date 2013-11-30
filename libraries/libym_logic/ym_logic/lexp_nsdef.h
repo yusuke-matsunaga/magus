@@ -15,6 +15,7 @@
 
 
 #include "ymtools.h"
+#include "ym_logic/VarId.h"
 
 
 /// @brief ym_lexp 用の名前空間の開始
@@ -55,7 +56,7 @@ typedef list<LogExpr> LogExprList;
 
 /// @ingroup LexpGroup
 /// @brief 変数番号から LogExpr への写像 (連想配列)
-typedef hash_map<ymuint, LogExpr> VarLogExprMap;
+typedef hash_map<VarId, LogExpr> VarLogExprMap;
 
 
 END_NAMESPACE_YM_LEXP

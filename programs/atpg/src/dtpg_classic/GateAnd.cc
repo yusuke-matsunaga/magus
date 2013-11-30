@@ -37,7 +37,7 @@ GateAnd::~GateAnd()
 tTgGateType
 GateAnd::gate_type() const
 {
-  return kTgAnd;
+  return kTgGateAnd;
 }
 
 bool
@@ -279,7 +279,7 @@ GateAnd::o_val() const
 //////////////////////////////////////////////////////////////////////
 // クラス GateNand
 //////////////////////////////////////////////////////////////////////
-  
+
 // @brief コンストラクタ
 // @param[in] id ゲートID
 // @param[in] node 元のノード
@@ -290,7 +290,7 @@ GateNand::GateNand(ymuint id,
   GateAnd(id, node, ni)
 {
 }
-  
+
 // @brief デストラクタ
 GateNand::~GateNand()
 {
@@ -299,7 +299,7 @@ GateNand::~GateNand()
 tTgGateType
 GateNand::gate_type() const
 {
-  return kTgNand;
+  return kTgGateNand;
 }
 
 bool

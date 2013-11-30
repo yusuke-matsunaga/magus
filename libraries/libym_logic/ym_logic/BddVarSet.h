@@ -35,7 +35,7 @@ public:
 
     // 現在指している要素を返す．
     // 末尾かどうかのチェックは行わない．
-    tVarId
+    VarId
     operator*() const;
 
     // ひとつ先に進める．
@@ -80,6 +80,10 @@ public:
   explicit
   BddVarSet(BddMgr& mgr);
 
+  /// @brief BDD を指定するコンストラクタ
+  explicit
+  BddVarSet(const Bdd& bdd);
+
   /// @brief コピーコンストラクタ
   BddVarSet(const BddVarSet& src);
 
@@ -91,7 +95,7 @@ public:
   /// @param[in] mgr BddMgr
   /// @param[in] varid 変数番号
   BddVarSet(BddMgr& mgr,
-	    tVarId varid);
+	    VarId varid);
 
   /// @brief vector からの変換用コンストラクタ
   /// @param[in] mgr BddMgr
@@ -195,10 +199,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief BDD を指定するコンストラクタ
-  explicit
-  BddVarSet(const Bdd& bdd);
 
   /// @brief サイズを設定する．
   void

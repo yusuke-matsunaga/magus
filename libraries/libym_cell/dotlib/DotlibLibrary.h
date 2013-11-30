@@ -10,6 +10,8 @@
 
 
 #include "DotlibAttrMap.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -21,8 +23,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 class DotlibLibrary :
   public DotlibAttrMap
 {
-  friend class DotlibNode;
-
 public:
 
   /// @brief コンストラクタ
@@ -34,13 +34,21 @@ public:
 
 public:
 
-  /// @brief 内容を初期化する．
-  void
-  init();
+  /// @brief 内容を設定する．
+  bool
+  set_data(const DotlibNode* lib_node);
 
   /// @brief 名前を返す．
   ShString
   name() const;
+
+  /// @brief "technology" を返す．
+  tCellTechnology
+  technology() const;
+
+  /// @brief "delay_model" を返す．
+  tCellDelayModel
+  delay_model() const;
 
   /// @brief "bus_naming_style" を返す．
   const DotlibNode*
@@ -58,6 +66,15 @@ public:
   const DotlibNode*
   revision() const;
 
+  /// @brief "capacitive_load_unit"->top() の値を返す．
+  /// @note 未定義なら 0.0 が返る．
+  double
+  capacitive_load_unit() const;
+
+  /// @brief "capacitive_load_unit"->top()->next() の値を返す．
+  string
+  capacitive_load_unit_str() const;
+
   /// @brief "current_unit" を返す．
   const DotlibNode*
   current_unit() const;
@@ -66,6 +83,10 @@ public:
   const DotlibNode*
   leakage_power_unit() const;
 
+  /// @brief "pulling_resistance_unit" を返す．
+  const DotlibNode*
+  pulling_resistance_unit() const;
+
   /// @brief "time_unit" を返す．
   const DotlibNode*
   time_unit() const;
@@ -73,6 +94,10 @@ public:
   /// @brief "voltage_unit" を返す．
   const DotlibNode*
   voltage_unit() const;
+
+  /// @brief lu_table_template のリストを返す．
+  const list<const DotlibNode*>&
+  lut_template_list() const;
 
   /// @brief セル定義のリストを返す．
   const list<const DotlibNode*>&
@@ -87,6 +112,12 @@ private:
   // ライブラリ名
   ShString mName;
 
+  // "technology"
+  tCellTechnology mTechnology;
+
+  // "delay_model"
+  tCellDelayModel mDelayModel;
+
   // "bus_naming_style"
   const DotlibNode* mBusNamingStyle;
 
@@ -99,17 +130,29 @@ private:
   // "revision"
   const DotlibNode* mRevision;
 
+  // "capacitive_load_unit->top"
+  double mCapacitiveLoadUnit;
+
+  // "capacitive_load_unit->top->next"
+  ShString mCapacitiveLoadUnitStr;
+
   // "current_unit"
   const DotlibNode* mCurrentUnit;
 
   // "leakage_power_unit"
   const DotlibNode* mLeakagePowerUnit;
 
+  // "pulling_resistance_unit"
+  const DotlibNode* mPullingResistanceUnit;
+
   // "time_unit"
   const DotlibNode* mTimeUnit;
 
   // "voltage_unit"
   const DotlibNode* mVoltageUnit;
+
+  // lu_table_template のリスト
+  list<const DotlibNode*> mLutTemplateList;
 
   // セル定義のリスト
   list<const DotlibNode*> mCellList;

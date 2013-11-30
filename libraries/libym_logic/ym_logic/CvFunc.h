@@ -11,7 +11,7 @@
 
 #include "ym_npn/npn_nsdef.h"
 #include "ym_lexp/Literal.h"
-
+#error "not tested"
 
 BEGIN_NAMESPACE_YM_NPN
 
@@ -113,11 +113,11 @@ public:
 
   /// @brief 入力数を得る．
   size_t
-  ni() const;
+  input_num() const;
 
   /// @brief キューブ数を得る．
   size_t
-  nc() const;
+  cube_num() const;
 
   /// @brief 0 の数を数える．
   size_t
@@ -248,25 +248,25 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  size_t mNi;
+  ymuint32 mInputNum;
 
   // キューブ数
-  size_t mNc;
+  ymuint32 mCubeNum;
 
   // 1行当たりのブロック数
-  size_t mNbpc;
+  ymuint32 mBlockPerCube;
 
   // ブロック数
-  size_t mNblk;
+  ymuint32 mBlockNum;
 
   // 実際に確保されているサイズ
-  size_t mSize;
+  ymuint32 mSize;
 
   // カバー全体を表す配列
-  size_t* mChunk;
+  ymuint32* mChunk;
 
   // cofactor で使うマークを入れる領域
-  size_t* mMark;
+  ymuint32* mMark;
 
 };
 
@@ -311,7 +311,7 @@ operator!=(const CvFunc& src1,
 // 入力数を得る．
 inline
 size_t
-CvFunc::ni() const
+CvFunc::input_num() const
 {
   return mNi;
 }
@@ -319,7 +319,7 @@ CvFunc::ni() const
 // キューブ数を得る．
 inline
 size_t
-CvFunc::nc() const
+CvFunc::cube_num() const
 {
   return mNc;
 }

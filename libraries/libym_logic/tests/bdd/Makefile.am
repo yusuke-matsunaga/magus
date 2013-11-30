@@ -4,12 +4,16 @@
 
 SUBDIRS =
 
-YFLAGS=-d -v
+AM_YFLAGS = -d -v
 
 EXTRA_DIST = local_defs $(TESTS)
 
-CLEANFILES = bddsh_lex.cc bddsh_parser.h bddsh_parser.cc y.output \
-		bddsh_parser.output
+CLEANFILES = \
+	bddsh_lex.cc \
+	bddsh_parser.hh \
+	bddsh_parser.cc \
+	y.output \
+	bddsh_parser.output
 
 MAINTAINERCLEANFILES = Makefile.in
 

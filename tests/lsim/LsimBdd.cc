@@ -66,7 +66,7 @@ LsimBdd::set_network(const BdnMgr& bdn,
     }
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
   for (vector<BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {

@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/base/Bdd.cc
+/// @file Bdd.cc
 /// @brief Bdd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Bdd.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -12,9 +10,10 @@
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddVarSet.h"
 #include "ym_logic/BddLitSet.h"
+#include "ym_logic/BddVector.h"
+#include "ym_logic/BddList.h"
 
 #include "BddMgrImpl.h"
-#include "Dumper.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -22,12 +21,13 @@ BEGIN_NAMESPACE_YM_BDD
 // @brief mgr, root をセットする時に呼ばれる関数
 void
 Bdd::set(BddMgrImpl* mgr,
-	 BddEdge root)
+	 ympuint root)
 {
   mMgr = mgr;
   mRoot = root;
 
-  mMgr->inc_rootref(mRoot);
+  BddEdge e(mRoot);
+  mMgr->inc_rootref(e);
 
   // BDD のリストに追加
   Bdd* top = mMgr->mTopBdd;
@@ -43,7 +43,9 @@ Bdd::set(BddMgrImpl* mgr,
 void
 Bdd::reset()
 {
-  mMgr->dec_rootref(mRoot);
+  BddEdge e(mRoot);
+
+  mMgr->dec_rootref(e);
 
   // BDD のリストから削除
   Bdd* p = mPrev;
@@ -61,17 +63,25 @@ Bdd::reset()
 
 // @brief 根の枝を new_e に置き換える．
 void
-Bdd::assign(BddEdge new_e)
+Bdd::assign(ympuint new_e)
 {
-  mMgr->inc_rootref(new_e);
-  mMgr->dec_rootref(mRoot);
+  BddEdge e1(new_e);
+  mMgr->inc_rootref(e1);
+  BddEdge e2(mRoot);
+  mMgr->dec_rootref(e2);
   mRoot = new_e;
 }
 
 // @brief デフォルトのコンストラクタ
 Bdd::Bdd()
 {
-  set(BddMgr::default_mgr().mImpl, BddEdge::make_zero());
+  set(BddMgr::default_mgr().mImpl, BddEdge::make_error());
+}
+
+// @brief マネージャを指定したコンストラクタ
+Bdd::Bdd(BddMgr& mgr)
+{
+  set(mgr.mImpl, BddEdge::make_error());
 }
 
 // @brief コピーコンストラクタ
@@ -82,7 +92,7 @@ Bdd::Bdd(const Bdd& src)
 
 // @brief BDD マネージャと根の枝を引数とするコンストラクタ
 Bdd::Bdd(BddMgrImpl* mgr,
-	 BddEdge e)
+	 ympuint e)
 {
   set(mgr, e);
 }
@@ -91,6 +101,99 @@ Bdd::Bdd(BddMgrImpl* mgr,
 Bdd::~Bdd()
 {
   reset();
+}
+
+// @brief 定数0 のチェック
+// @return 定数0の時 true を返す．
+bool
+Bdd::is_zero() const
+{
+  return BddEdge(mRoot).is_zero();
+}
+
+// @brief 定数1 のチェック
+// @return 定数1 の時 true を返す．
+bool
+Bdd::is_one() const
+{
+  return BddEdge(mRoot).is_one();
+}
+
+// @brief 定数のチェック
+// @return 定数の時 true を返す．
+bool
+Bdd::is_const() const
+{
+  return BddEdge(mRoot).is_const();
+}
+
+// @brief オーバーフローのチェック
+// @return 演算結果がオーバーフローしたとき true を返す．
+bool
+Bdd::is_overflow() const
+{
+  return BddEdge(mRoot).is_overflow();
+}
+
+// @brief エラーのチェック
+// @return 演算結果がエラーになったとき true を返す．
+bool
+Bdd::is_error() const
+{
+  return BddEdge(mRoot).is_error();
+}
+
+// @brief オーバーフローとエラーのチェック
+// @return 演算結果がオーバーフローかエラーのとき true を返す．
+bool
+Bdd::is_invalid() const
+{
+  return BddEdge(mRoot).is_invalid();
+}
+
+// @brief 終端ノードのチェック
+// @return 終端ノードのとき true を返す．
+bool
+Bdd::is_leaf() const
+{
+  return BddEdge(mRoot).is_leaf();
+}
+
+// @brief 定数0に設定する．
+void
+Bdd::set_zero()
+{
+  set(mMgr, BddEdge::make_zero());
+}
+
+// @brief 定数1に設定する．
+void
+Bdd::set_one()
+{
+  set(mMgr, BddEdge::make_one());
+}
+
+// @brief エラー値に設定する．
+void
+Bdd::set_error()
+{
+  set(mMgr, BddEdge::make_error());
+}
+
+// @brief オーバーフロー値に設定する．
+void
+Bdd::set_overflow()
+{
+  set(mMgr, BddEdge::make_overflow());
+}
+
+// @brief 等価比較
+// @return 2つのBDDが等しいとき true を返す．
+bool
+Bdd::operator==(const Bdd& src2) const
+{
+  // 実はただのポインタ（スカラ値）比較でわかる．
+  return mRoot == src2.mRoot;
 }
 
 // @brief 代入演算子
@@ -113,14 +216,16 @@ Bdd::operator=(const Bdd& src)
 Bdd
 Bdd::operator~() const
 {
-  return Bdd(mMgr, ~mRoot);
+  BddEdge e(mRoot);
+  BddEdge ne = ~e;
+  return Bdd(mMgr, ne);
 }
 
 // @brief 否定の論理を計算して代入する．
 const Bdd&
 Bdd::negate()
 {
-  mRoot.negate();
+  mRoot = ~BddEdge(mRoot);
   return *this;
 }
 
@@ -134,7 +239,9 @@ Bdd::operator&=(const Bdd& src2)
     ans = BddEdge::make_error();
   }
   else {
-    ans = mMgr->and_op(mRoot, src2.mRoot);
+    BddEdge e1(mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = mMgr->and_op(e1, e2);
   }
   assign(ans);
   return *this;
@@ -150,9 +257,9 @@ Bdd::operator|=(const Bdd& src2)
     ans = BddEdge::make_error();
   }
   else {
-    BddEdge e1 = ~mRoot;
-    BddEdge e2 = ~src2.mRoot;
-    ans = ~mMgr->and_op(e1, e2);
+    BddEdge e1(mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = ~mMgr->and_op(~e1, ~e2);
   }
   assign(ans);
   return *this;
@@ -168,7 +275,9 @@ Bdd::operator^=(const Bdd& src2)
     ans = BddEdge::make_error();
   }
   else {
-    ans = mMgr->xor_op(mRoot, src2.mRoot);
+    BddEdge e1(mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = mMgr->xor_op(e1, e2);
   }
   assign(ans);
   return *this;
@@ -184,7 +293,9 @@ Bdd::operator&&(const Bdd& src2) const
     // マネージャが異なる．
     return false;
   }
-  return mMgr->check_intersect(mRoot, src2.mRoot).is_one();
+  BddEdge e1(mRoot);
+  BddEdge e2(src2.mRoot);
+  return mMgr->check_intersect(e1, e2).is_one();
 }
 
 // @brief 包含関係のチェック
@@ -197,14 +308,14 @@ Bdd::operator>=(const Bdd& src2) const
     // マネージャが異なる．
     return false;
   }
-  BddEdge e1 = ~mRoot;
-  BddEdge e2 = src2.mRoot;
-  return mMgr->check_intersect(e1, e2).is_zero();
+  BddEdge e1(mRoot);
+  BddEdge e2(src2.mRoot);
+  return mMgr->check_intersect(~e1, e2).is_zero();
 }
 
 // @brief compose 演算
 Bdd
-Bdd::compose(tVarId var,
+Bdd::compose(VarId var,
 	     const Bdd& g) const
 {
   BddEdge ans;
@@ -216,8 +327,10 @@ Bdd::compose(tVarId var,
   }
   else {
     mMgr->compose_start();
-    mMgr->compose_reg(var, g.mRoot);
-    ans = mMgr->compose(mRoot);
+    BddEdge e1(g.mRoot);
+    mMgr->compose_reg(var, e1);
+    BddEdge e2(mRoot);
+    ans = mMgr->compose(e2);
   }
   return Bdd(mMgr, ans);
 }
@@ -241,11 +354,13 @@ Bdd::compose(const VarBddMap& comp_map) const
   mMgr->compose_start();
   for (VarBddMap::const_iterator p = comp_map.begin();
        p != comp_map.end(); ++ p) {
-    tVarId id = p->first;
+    VarId id = p->first;
     Bdd bdd = p->second;
-    mMgr->compose_reg(id, bdd.mRoot);
+    BddEdge e1(bdd.mRoot);
+    mMgr->compose_reg(id, e1);
   }
-  BddEdge ans = mMgr->compose(mRoot);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->compose(e);
   return Bdd(mMgr, ans);
 }
 
@@ -256,21 +371,23 @@ Bdd::remap_var(const VarVarMap& var_map) const
   mMgr->compose_start();
   for (VarVarMap::const_iterator p = var_map.begin();
        p != var_map.end(); ++ p) {
-    tVarId id = p->first;
-    tVarId mid = p->second;
-    Bdd bdd(mMgr, mMgr->make_posiliteral(mid));
-    mMgr->compose_reg(id, bdd.mRoot);
+    VarId id = p->first;
+    VarId mid = p->second;
+    BddEdge e1 = mMgr->make_posiliteral(mid);
+    mMgr->compose_reg(id, e1);
   }
-  BddEdge ans = mMgr->compose(mRoot);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->compose(e);
   return Bdd(mMgr, ans);
 }
 
 // @brief コファクター演算
 Bdd
-Bdd::cofactor(tVarId var,
+Bdd::cofactor(VarId var,
 	      tPol pol) const
 {
-  BddEdge ans = mMgr->scofactor(mRoot, var, pol);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->scofactor(e, var, pol);
   return Bdd(mMgr, ans);
 }
 
@@ -291,7 +408,9 @@ Bdd::operator/=(const Bdd& c)
     ans = BddEdge::make_error();
   }
   else {
-    ans = mMgr->gcofactor(mRoot, c.mRoot);
+    BddEdge e1(mRoot);
+    BddEdge e2(c.mRoot);
+    ans = mMgr->gcofactor(e1, e2);
   }
   assign(ans);
   return *this;
@@ -299,9 +418,10 @@ Bdd::operator/=(const Bdd& c)
 
 // @brief Davio 展開のモーメント項を求める処理
 Bdd
-Bdd::xor_moment(tVarId idx) const
+Bdd::xor_moment(VarId idx) const
 {
-  BddEdge ans = mMgr->xor_moment(mRoot, idx);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->xor_moment(e, idx);
   return Bdd(mMgr, ans);
 }
 
@@ -309,7 +429,8 @@ Bdd::xor_moment(tVarId idx) const
 Bdd
 Bdd::SCC() const
 {
-  BddEdge ans = mMgr->SCC(mRoot);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->SCC(e);
   return Bdd(mMgr, ans);
 }
 
@@ -357,20 +478,22 @@ operator/(const Bdd& src,
 bool
 Bdd::is_posi_cube() const
 {
-  return mMgr->check_posi_cube(mRoot);
+  BddEdge e(mRoot);
+  return mMgr->check_posi_cube(e);
 }
 
 // @brief キューブの時，真となる．
 bool
 Bdd::is_cube() const
 {
-  return mMgr->check_cube(mRoot);
+  BddEdge e(mRoot);
+  return mMgr->check_cube(e);
 }
 
 // @brief 対称性のチェック
 bool
-Bdd::check_symmetry(tVarId x,
-		    tVarId y,
+Bdd::check_symmetry(VarId x,
+		    VarId y,
 		    tPol pol) const
 {
   if ( x == y ) {
@@ -414,7 +537,8 @@ Bdd::check_symmetry(tVarId x,
   }
   return result2;
 #else
-  return mMgr->check_symmetry(mRoot, x, y, pol);
+  BddEdge e(mRoot);
+  return mMgr->check_symmetry(e, x, y, pol);
 #endif
 }
 
@@ -422,16 +546,10 @@ Bdd::check_symmetry(tVarId x,
 Bdd
 Bdd::esmooth(const BddVarSet& svars) const
 {
-  Bdd sbdd = svars.function();
-  BddEdge ans;
-  if ( mMgr != sbdd.mMgr ) {
-    // マネージャが異なる．
-    // 本当は異なってもいいね
-    ans = BddEdge::make_error();
-  }
-  else {
-    ans = mMgr->esmooth(mRoot, sbdd.mRoot);
-  }
+  BddEdge e(mRoot);
+  BddEdge s(svars.function().mRoot);
+  BddEdge ans = mMgr->esmooth(e, s);
+
   return Bdd(mMgr, ans);
 }
 
@@ -439,73 +557,103 @@ Bdd::esmooth(const BddVarSet& svars) const
 Bdd
 Bdd::asmooth(const BddVarSet& svars) const
 {
-  Bdd sbdd = svars.function();
-  BddEdge ans;
-  if ( mMgr != sbdd.mMgr ) {
-    // マネージャが異なる．
-    // 本当は異なってもいいね
-    ans = BddEdge::make_error();
-  }
-  else {
-    ans = ~mMgr->esmooth(~mRoot, sbdd.mRoot);
-  }
+  BddEdge e(mRoot);
+  BddEdge s(svars.function().mRoot);
+  BddEdge ans = ~mMgr->esmooth(~e, s);
+
   return Bdd(mMgr, ans);
 }
 
 // @brief x_level の変数を y_level まで「押し込む」
 Bdd
-Bdd::push_down(tLevel x_level,
-	       tLevel y_level,
+Bdd::push_down(ymuint x_level,
+	       ymuint y_level,
 	       tPol pol) const
 {
   if ( x_level >= y_level ) {
     return Bdd(mMgr, BddEdge::make_error());
   }
-  BddEdge ans = mMgr->push_down(mRoot, x_level, y_level, pol);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->push_down(e, x_level, y_level, pol);
   return Bdd(mMgr, ans);
 }
 
 // @brief Shannon 展開 (Boole 展開) を行なう．
-tVarId
+VarId
 Bdd::root_decomp(Bdd& f0,
 		 Bdd& f1) const
 {
-  BddEdge e0, e1;
-  tVarId ans = mMgr->root_decomp(mRoot, e0, e1);
-  f0 = Bdd(mMgr, e0);
-  f1 = Bdd(mMgr, e1);
-  return ans;
+  BddEdge e(mRoot);
+  tPol pol = e.pol();
+  BddNode* node = e.get_node();
+  if ( node ) {
+    BddEdge e0 = node->edge0(pol);
+    f0 = Bdd(mMgr, e0);
+    BddEdge e1 = node->edge1(pol);
+    f1 = Bdd(mMgr, e1);
+    ymuint level = node->level();
+    return mMgr->varid(level);
+  }
+  else {
+    f0 = f1 = *this;
+    return kVarIdIllegal;
+  }
 }
 
 // @brief 根の変数番号を取り出す．
-tVarId
+VarId
 Bdd::root_var() const
 {
-  return mMgr->root_var(mRoot);
+  BddEdge e(mRoot);
+  BddNode* node = e.get_node();
+  if ( node ) {
+    ymuint level = node->level();
+    return mMgr->varid(level);
+  }
+  else {
+    return kVarIdIllegal;
+  }
 }
 
 // @brief 0枝の取得
 Bdd
 Bdd::edge0() const
 {
-  BddEdge ans = mMgr->edge0(mRoot);
-  return Bdd(mMgr, ans);
+  BddEdge e(mRoot);
+  tPol pol = e.pol();
+  BddNode* node = e.get_node();
+  if ( node ) {
+    BddEdge e0 = node->edge0(pol);
+    return Bdd(mMgr, e0);
+  }
+  else {
+    return *this;
+  }
 }
 
 // @brief 1枝の取得
 Bdd
 Bdd::edge1() const
 {
-  BddEdge ans = mMgr->edge1(mRoot);
-  return Bdd(mMgr, ans);
+  BddEdge e(mRoot);
+  tPol pol = e.pol();
+  BddNode* node = e.get_node();
+  if ( node ) {
+    BddEdge e1 = node->edge1(pol);
+    return Bdd(mMgr, e1);
+  }
+  else {
+    return *this;
+  }
 }
 
 // @brief BDD の内容を積和形論理式に変換する．
 LogExpr
 Bdd::sop() const
 {
+  BddEdge e(mRoot);
   LogExpr ans_expr;
-  mMgr->isop(mRoot, mRoot, ans_expr);
+  mMgr->isop(e, e, ans_expr);
   return ans_expr;
 }
 
@@ -513,7 +661,8 @@ Bdd::sop() const
 BddLitSet
 Bdd::onepath() const
 {
-  BddEdge ans = mMgr->onepath(mRoot);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->onepath(e);
   return BddLitSet(Bdd(mMgr, ans));
 }
 
@@ -521,421 +670,103 @@ Bdd::onepath() const
 BddLitSet
 Bdd::shortest_onepath() const
 {
-  BddEdge ans = mMgr->shortest_onepath(mRoot);
+  BddEdge e(mRoot);
+  BddEdge ans = mMgr->shortest_onepath(e);
   return BddLitSet(Bdd(mMgr, ans));
 }
 
 // @brief 最短の 1パスの長さの取得
-tVarSize
+ymuint
 Bdd::shortest_onepath_len() const
 {
-  return mMgr->shortest_onepath_len(mRoot);
-}
-
-// @brief BDD の内容を書き出す．
-ymuint64
-Bdd::display(ostream& s) const
-{
-  Displayer displayer(mMgr, s);
-  displayer.display_root(mRoot);
-  return displayer.num();
-}
-
-// @brief BDD ベクタの内容を書き出す
-// @param[in] array BDD ベクタ
-// @param[in] s 出力ストリーム
-ymuint64
-display(const BddVector& array,
-	ostream& s)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  Displayer displayer(mgr, s);
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    displayer.display_root(bdd.root());
-  }
-  return displayer.num();
-}
-
-// @brief BDD リストの内容を書き出す
-// @param[in] array BDD リスト
-// @param[in] s 出力ストリーム
-ymuint64
-display(const BddList& array,
-	ostream& s)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  Displayer displayer(mgr, s);
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    displayer.display_root(bdd.root());
-  }
-  return displayer.num();
-}
-
-// @brief 内容のダンプ
-void
-Bdd::dump(ostream& s) const
-{
-  Dumper dumper(mMgr, s);
-  dumper.dump(mRoot);
-  dumper.dump_edge(mRoot);
-  s << endl;
-}
-
-// @brief BDD ベクタの内容をダンプする．
-// @param[in] array BDD の配列
-// @param[in] s 出力ストリーム
-void
-dump(const BddVector& array,
-     ostream& s)
-{
-  if ( array.empty() ) {
-    return;
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  Dumper dumper(mgr, s);
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    dumper.dump(bdd.root());
-  }
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    dumper.dump_edge(bdd.root());
-    s << endl;
-  }
-}
-
-// @brief BDD リストの内容をダンプする．
-// @param[in] array BDD のリスト
-// @param[in] s 出力ストリーム
-void
-dump(const BddList& array,
-     ostream& s)
-{
-  if ( array.empty() ) {
-    return;
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  Dumper dumper(mgr, s);
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    dumper.dump(bdd.root());
-  }
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    dumper.dump_edge(bdd.root());
-    s << endl;
-  }
+  BddEdge e(mRoot);
+  return mMgr->shortest_onepath_len(e);
 }
 
 // @brief BDD が使っているノード数を数える．
 ymuint64
-Bdd::size() const
+Bdd::node_count() const
 {
-  return mMgr->size(mRoot);
-}
-
-// @brief BDD ベクタが使っているノード数を数える．
-// @param[in] array BDD ベクタ
-// @return BDD ベクタが使っているノード数
-ymuint64
-size(const BddVector& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddVector::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  return mgr->size(edge_list);
-}
-
-// @brief BDD リストが使っているノード数を数える．
-// @param[in] array BDD リスト
-// @return BDD リストが使っているノード数
-ymuint64
-size(const BddList& array)
-{
-  if ( array.empty() ) {
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddList::const_iterator p = array.begin();
-       p != array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は array の中のBDDのマネージャがすべて同じと仮定している．
-  BddMgrImpl* mgr = array.front().mMgr;
-  return mgr->size(edge_list);
+  BddEdge e(mRoot);
+  return mMgr->node_count(vector<BddEdge>(1, e));
 }
 
 // @brief 真理値表密度の計算
 // @param[in] n 入力数
 double
-Bdd::density(tVarSize n) const
+Bdd::density(ymuint nvar) const
 {
-  mpz_class mc = mMgr->minterm_count(mRoot, n);
+  BddEdge e(mRoot);
+  mpz_class mc = mMgr->minterm_count(e, nvar);
   mpf_class mc_f(mc);
-  mpz_class w = mpz_class(1) << n;
+  mpz_class w = mpz_class(1) << nvar;
   mpf_class d = mc_f / w;
   return d.get_d();
 }
 
 // @brief 最小項の数の計算
 mpz_class
-Bdd::minterm_count(tVarSize n) const
+Bdd::minterm_count(ymuint nvar) const
 {
-  return mMgr->minterm_count(mRoot, n);
+  BddEdge e(mRoot);
+  return mMgr->minterm_count(e, nvar);
 }
 
 // @brief Walsh変換の 0次係数の計算
 mpz_class
-Bdd::walsh0(tVarSize n) const
+Bdd::walsh0(ymuint nvar) const
 {
-  return mMgr->walsh0(mRoot, n);
+  BddEdge e(mRoot);
+  return mMgr->walsh0(e, nvar);
 }
 
 // @brief Walsh変換の 1次係数の計算
 mpz_class
-Bdd::walsh1(tVarId var,
-	    tVarSize n) const
+Bdd::walsh1(VarId var,
+	    ymuint nvar) const
 {
-  return mMgr->walsh1(mRoot, var, n);
+  BddEdge e(mRoot);
+  return mMgr->walsh1(e, var, nvar);
 }
 
 // @brief サポート変数集合の計算 (VarVector)
-tVarSize
+ymuint
 Bdd::support(VarVector& vars) const
 {
-  mMgr->mark_support(mRoot);
-  return mMgr->mark_to_vector(vars);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
+  mgr->mark_support(vector<BddEdge>(1, e));
+  return mgr->mark_to_vector(vars);
 }
 
 // @brief サポート変数集合の計算 (VarList)
-tVarSize
+ymuint
 Bdd::support(VarList& vars) const
 {
-  mMgr->mark_support(mRoot);
-  return mMgr->mark_to_list(vars);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
+  mgr->mark_support(vector<BddEdge>(1, e));
+  return mgr->mark_to_list(vars);
 }
 
 // @brief サポート変数集合の計算 (BddVarSet)
 BddVarSet
 Bdd::support() const
 {
-  mMgr->mark_support(mRoot);
-  BddEdge ans = mMgr->mark_to_bdd();
-  return BddVarSet(Bdd(mMgr, ans));
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
+  mgr->mark_support(vector<BddEdge>(1, e));
+  BddEdge ans = mgr->mark_to_bdd();
+  return BddVarSet(Bdd(mgr, ans));
 }
 
 // @brief サポート変数集合の要素数の計算
-tVarSize
+ymuint
 Bdd::support_size() const
 {
-  return mMgr->mark_support(mRoot);
-}
-
-// @brief BDD ベクタのサポート変数集合の計算 (VarVector)
-// @param[in] bdd_array BDD のベクタ
-// @param[in] sup サポート変数集合を格納するベクタ
-// @return サポート変数集合の要素数
-tVarSize
-support(const BddVector& bdd_array,
-	VarVector& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_vector(sup);
-}
-
-// @brief BDD ベクタのサポート変数集合の計算 (VarList)
-// @param[in] bdd_array BDD のベクタ
-// @param[in] sup サポート変数集合を格納するリスト
-// @return サポート変数集合の要素数
-tVarSize
-support(const BddVector& bdd_array,
-	VarList& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_list(sup);
-}
-
-// @brief BDD ベクタのサポート変数集合の計算 (BddVarSet)
-// @param[in] bdd_array BDD のベクタ
-// @return サポート変数集合
-BddVarSet
-support(const BddVector& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return BddVarSet(BddMgr::default_mgr());
-  }
-  list<BddEdge> edge_list;
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  BddEdge ans = mgr->mark_to_bdd();
-  return BddVarSet(Bdd(mgr, ans));
-}
-
-// @brief BDD ベクタのサポート変数集合の要素数の計算
-// @param[in] bdd_array BDD のベクタ
-// @return サポート変数集合の要素数
-tVarSize
-support_size(const BddVector& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddVector::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  return mgr->mark_support(edge_list);
-}
-
-// @brief BDD リストのサポート変数集合の計算 (VarVector)
-// @param[in] bdd_array BDD のリスト
-// @param[in] sup サポート変数集合を格納するベクタ
-// @return サポート変数集合の要素数
-tVarSize
-support(const BddList& bdd_array,
-	VarVector& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_vector(sup);
-}
-
-// @brief BDD リストのサポート変数集合の計算 (VarList)
-// @param[in] bdd_array BDD のリスト
-// @param[in] sup サポート変数集合を格納するリスト
-// @return サポート変数集合の要素数
-tVarSize
-support(const BddList& bdd_array,
-	VarList& sup)
-{
-  if ( bdd_array.empty() ) {
-    sup.clear();
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  return mgr->mark_to_list(sup);
-}
-
-// @brief BDD リストのサポート変数集合の計算 (BddVarSet)
-// @param[in] bdd_array BDD のリスト
-// @return[in] サポート変数集合
-BddVarSet
-support(const BddList& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return BddVarSet(BddMgr::default_mgr());
-  }
-  list<BddEdge> edge_list;
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  mgr->mark_support(edge_list);
-  BddEdge ans = mgr->mark_to_bdd();
-  return BddVarSet(Bdd(mgr, ans));
-}
-
-// @brief BDD リストのサポート変数集合の要素数の計算
-// @param[in] bdd_array BDD のリスト
-// @return サポート変数集合の要素数
-tVarSize
-support_size(const BddList& bdd_array)
-{
-  if ( bdd_array.empty() ) {
-    return 0;
-  }
-  list<BddEdge> edge_list;
-  for (BddList::const_iterator p = bdd_array.begin();
-       p != bdd_array.end(); ++ p) {
-    Bdd bdd = *p;
-    edge_list.push_back(bdd.root());
-  }
-  // 今は手抜きで bdd_array 中の BDD のマネージャは全部同じと仮定している．
-  BddMgrImpl* mgr = bdd_array.front().mMgr;
-  return mgr->mark_support(edge_list);
+  BddMgrImpl* mgr = mMgr;
+  BddEdge e(mRoot);
+  return mgr->mark_support(vector<BddEdge>(1, e));
 }
 
 // @brief if-then-else 演算．
@@ -954,7 +785,10 @@ ite_op(const Bdd& cond,
     ans = BddEdge::make_error();
   }
   else {
-    ans = cond.mMgr->ite_op(cond.root(), s.root(), t.root());
+    BddEdge e1(cond.mRoot);
+    BddEdge e2(s.mRoot);
+    BddEdge e3(t.mRoot);
+    ans = cond.mMgr->ite_op(e1, e2, e3);
   }
   return Bdd(cond.mMgr, ans);
 }
@@ -976,7 +810,10 @@ and_exist(const Bdd& src1,
     ans = BddEdge::make_error();
   }
   else {
-    ans = src1.mMgr->and_exist(src1.root(), src2.root(), sbdd.root());
+    BddEdge e1(src1.mRoot);
+    BddEdge e2(src2.mRoot);
+    BddEdge e3(sbdd.mRoot);
+    ans = src1.mMgr->and_exist(e1, e2, e3);
   }
   return Bdd(src1.mMgr, ans);
 }
@@ -997,7 +834,9 @@ isop(const Bdd& lower,
     ans = BddEdge::make_error();
   }
   else {
-    ans = lower.mMgr->isop(lower.root(), upper.root(), cover);
+    BddEdge e1(lower.mRoot);
+    BddEdge e2(upper.mRoot);
+    ans = lower.mMgr->isop(e1, e2, cover);
   }
   return Bdd(lower.mMgr, ans);
 }
@@ -1014,7 +853,9 @@ prime_cover(const Bdd& lower,
     // マネージャが異なる．
     return LogExpr();
   }
-  return lower.mMgr->prime_cover(lower.root(), upper.root());
+  BddEdge e1(lower.mRoot);
+  BddEdge e2(upper.mRoot);
+  return lower.mMgr->prime_cover(e1, e2);
 }
 
 // @brief 極小サポート集合の計算
@@ -1031,7 +872,9 @@ minimal_support(const Bdd& lower,
     ans = BddEdge::make_error();
   }
   else {
-    ans = lower.mMgr->minimal_support(lower.root(), upper.root());
+    BddEdge e1(lower.mRoot);
+    BddEdge e2(upper.mRoot);
+    ans = lower.mMgr->minimal_support(e1, e2);
   }
   return Bdd(lower.mMgr, ans);
 }
@@ -1050,7 +893,9 @@ vscap(const Bdd& src1,
     ans = BddEdge::make_error();
   }
   else {
-    ans = src1.mMgr->vscap(src1.root(), src2.root());
+    BddEdge e1(src1.mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = src1.mMgr->vscap(e1, e2);
   }
   return Bdd(src1.mMgr, ans);
 }
@@ -1069,7 +914,9 @@ vsdiff(const Bdd& src1,
     ans = BddEdge::make_error();
   }
   else {
-    ans = src1.mMgr->vsdiff(src1.root(), src2.root());
+    BddEdge e1(src1.mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = src1.mMgr->vsdiff(e1, e2);
   }
   return Bdd(src1.mMgr, ans);
 }
@@ -1086,7 +933,9 @@ vsintersect(const Bdd& src1,
     // マネージャが異なる．
     return false;
   }
-  return src1.mMgr->vsintersect(src1.root(), src2.root());
+  BddEdge e1(src1.mRoot);
+  BddEdge e2(src2.mRoot);
+  return src1.mMgr->vsintersect(e1, e2);
 }
 
 // @brief リテラル集合としての共通部分の計算
@@ -1103,7 +952,9 @@ lscap(const Bdd& src1,
     ans = BddEdge::make_error();
   }
   else {
-    ans = src1.mMgr->lscap(src1.root(), src2.root());
+    BddEdge e1(src1.mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = src1.mMgr->lscap(e1, e2);
   }
   return Bdd(src1.mMgr, ans);
 }
@@ -1122,7 +973,9 @@ lsdiff(const Bdd& src1,
     ans = BddEdge::make_error();
   }
   else {
-    ans = src1.mMgr->lsdiff(src1.root(), src2.root());
+    BddEdge e1(src1.mRoot);
+    BddEdge e2(src2.mRoot);
+    ans = src1.mMgr->lsdiff(e1, e2);
   }
   return Bdd(src1.mMgr, ans);
 }
@@ -1139,80 +992,60 @@ lsintersect(const Bdd& src1,
     // マネージャが異なる．
     return false;
   }
-  return src1.mMgr->lsintersect(src1.root(), src2.root());
+  BddEdge e1(src1.mRoot);
+  BddEdge e2(src2.mRoot);
+  return src1.mMgr->lsintersect(e1, e2);
 }
 
 // @brief BddLitSet を表しているときに内容をベクタに変換する．
 // @param[in] dst 結果を格納するベクタ
 // @return 要素数
-tVarSize
+ymuint
 Bdd::to_literalvector(LiteralVector& dst) const
 {
-  return mMgr->to_literalvector(mRoot, dst);
+  BddEdge e(mRoot);
+  return mMgr->to_literalvector(e, dst);
 }
 
 // @brief BddLitSet を表しているときに内容をリストに変換する．
 // @param[in] dst 結果を格納するリスト
 // @return 要素数
-tVarSize
+ymuint
 Bdd::to_literallist(LiteralList& dst) const
 {
-  return mMgr->to_literallist(mRoot, dst);
-}
-
-// @brief 節点に n-mark を付け，各変数ごとにノード数を数える．
-// @param[out] node_counts 変数番号をキーとして，
-// その変数のノード数を格納する連想配列
-void
-Bdd::scan(hash_map<tVarId, size_t>& node_counts) const
-{
-  return mMgr->scan(mRoot, node_counts);
-}
-
-// @brief レベル level のノード数を数える．
-// @param[in] level 変数のレベル
-// @return level のノード数
-// ただし n-mark が付いていないノードがあったら UINT_MAX を返す．
-ymuint64
-Bdd::count_at(tLevel level) const
-{
-  return mMgr->count_at(mRoot, level);
-}
-
-// @brief scan で付けた n-mark を消す．
-void
-Bdd::clear_scanmark() const
-{
-  mMgr->clear_scanmark(mRoot);
+  BddEdge e(mRoot);
+  return mMgr->to_literallist(e, dst);
 }
 
 // @brief カルノー図を描く
 // @param[in] s 出力ストリーム
 // 4入力以下した受け付けない
 void
-Bdd::display_map(ostream& s) const
+Bdd::print_map(ostream& s) const
 {
   char val[16];
   bool flag = true;
+  Bdd f = *this;
   for (ymuint i = 0; i < 16; i ++) {
-    BddEdge e = mRoot;
     for (ymuint j = 0; j < 4; j ++) {
-      BddEdge e0;
-      BddEdge e1;
-      tVarId vid = mMgr->root_decomp(e, e0, e1);
-      if ( vid == kVarIdMax ) break;
-      if ( vid > j ) continue;
+      if ( f.is_const() ) {
+	break;
+      }
+      Bdd f0;
+      Bdd f1;
+      VarId vid = f.root_decomp(f0, f1);
+      if ( vid.val() > j ) continue;
       if ( i & (1 << j) ) {
-	e = e1;
+	f = f1;
       }
       else {
-	e = e0;
+	f = f0;
       }
     }
-    if ( e.is_zero() ) {
+    if ( f.is_zero() ) {
       val[i] = '0';
     }
-    else if ( e.is_one() ) {
+    else if ( f.is_one() ) {
       val[i] = '1';
     }
     else {

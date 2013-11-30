@@ -1,4 +1,4 @@
-/* 
+/*
  * tclAppInit.c --
  *
  *	Provides a default version of the main program and Tcl_AppInit
@@ -52,7 +52,7 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
  */
 
 #ifndef TCL_LOCAL_APPINIT
-#define TCL_LOCAL_APPINIT Tcl_AppInit    
+#define TCL_LOCAL_APPINIT Tcl_AppInit
 #endif
 extern
 int
@@ -92,21 +92,21 @@ main(int argc,
    * script, prime the library or encoding paths, fiddle with the argv,
    * etc., without needing to rewrite Tcl_Main()
    */
-  
+
 #ifdef TCL_LOCAL_MAIN_HOOK
   extern int TCL_LOCAL_MAIN_HOOK _ANSI_ARGS_((int *argc, char ***argv));
 #endif
-  
+
 #ifdef TCL_XT_TEST
   XtToolkitInitialize();
 #endif
-  
+
 #ifdef TCL_LOCAL_MAIN_HOOK
   TCL_LOCAL_MAIN_HOOK(&argc, &argv);
 #endif
-  
+
   Tcl_Main(argc, argv, TCL_LOCAL_APPINIT);
-  
+
   return 0;			/* Needed only to prevent compiler warning. */
 }
 
@@ -134,7 +134,7 @@ Tcl_AppInit(Tcl_Interp* interp)
 {
   using namespace std;
   using nsYm::nsAtpg::atpg_init;
-  
+
   if (Tcl_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
@@ -176,7 +176,7 @@ Tcl_AppInit(Tcl_Interp* interp)
   int status = Tcl_EvalFile(interp, file.c_str());
   if ( status != TCL_OK ) {
     cerr << "(TclreadlineAppInit) unable to eval " << file << endl;
-    exit (1);
+    return TCL_ERROR;
   }
 #ifdef ERRORCODE_HACK
   // よくわからないけど errorCode と errorInfo を定義しておかないと
@@ -186,7 +186,7 @@ Tcl_AppInit(Tcl_Interp* interp)
     if ( Tcl_Eval(interp, tmp_script) != TCL_OK ) {
       cerr << "(Tcl_AppInit) unable to eval \"" << tmp_script
 	   << "\"" << endl;
-      exit(1);
+      return TCL_ERROR;
     }
   }
 #endif // ERRORCODE_HACK
@@ -205,21 +205,21 @@ Tcl_AppInit(Tcl_Interp* interp)
   if ( atpg_init(interp) == TCL_ERROR ) {
     return TCL_ERROR;
   }
-  
+
   /*
    * Call Tcl_CreateCommand for application-specific commands, if
    * they weren't already created by the init procedures called above.
    */
-  
-  
+
+
   /*
    * Specify a user-specific startup file to invoke if the application
    * is run interactively.  Typically the startup file is "~/.apprc"
    * where "app" is the name of the application.  If this line is deleted
    * then no user-specific startup file will be run under any conditions.
    */
-  
+
   Tcl_SetVar(interp, "tcl_rcFileName", "~/.magusrc", TCL_GLOBAL_ONLY);
-  
+
   return TCL_OK;
 }

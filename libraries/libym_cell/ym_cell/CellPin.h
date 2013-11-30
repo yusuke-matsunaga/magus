@@ -10,7 +10,6 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellCapacitance.h"
 #include "ym_logic/lexp_nsdef.h"
 
 
@@ -22,17 +21,6 @@ BEGIN_NAMESPACE_YM_CELL
 //////////////////////////////////////////////////////////////////////
 class CellPin
 {
-public:
-  //////////////////////////////////////////////////////////////////////
-  /// @brief ピンの方向を表す列挙型
-  //////////////////////////////////////////////////////////////////////
-  enum tDirection {
-    kDirInput,
-    kDirOutput,
-    kDirInout,
-    kDirInternal
-  };
-
 protected:
 
   /// @brief コンストラクタ
@@ -60,7 +48,7 @@ public:
 
   /// @brief 方向を返す．
   virtual
-  tDirection
+  tCellPinDirection
   direction() const = 0;
 
   /// @brief 入力ピンの時に true を返す．
@@ -187,6 +175,18 @@ public:
   virtual
   ymuint
   internal_id() const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const = 0;
 
 };
 

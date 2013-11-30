@@ -5,35 +5,39 @@
 /// @brief BlibScanner のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "blif_nsdef.h"
-#include "ym_utils/FileScanner.h"
+#include "ym_networks/blif_nsdef.h"
+#include "ym_utils/Scanner.h"
 #include "ym_utils/StrBuff.h"
 #include "BlifDic.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class BlifScanner BlifScanner.h "BlifScanner.h"
 /// @brief blif 用の字句解析器
 //////////////////////////////////////////////////////////////////////
 class BlifScanner :
-  public FileScanner
+  public Scanner
 {
 public:
 
   /// @brief コンストラクタ
-  BlifScanner();
+  /// @param[in] ido 入力データ
+  BlifScanner(IDO& ido);
 
   /// @brief デストラクタ
   ~BlifScanner();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンを一つ読み出す．
   /// @param[out] loc トークンの位置を格納する変数
@@ -88,6 +92,6 @@ BlifScanner::cur_string()
   return mCurString.c_str();
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // BLIFSCANNER_H

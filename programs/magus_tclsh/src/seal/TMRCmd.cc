@@ -38,9 +38,9 @@ TMRCmd::cmd_proc(TclObjVector& objv)
   BNetManip manip(&network);
 
   vector<BNode*> fanins;
-  LogExpr l0 = LogExpr::make_posiliteral(0);
-  LogExpr l1 = LogExpr::make_posiliteral(1);
-  LogExpr l2 = LogExpr::make_posiliteral(2);
+  LogExpr l0 = LogExpr::make_posiliteral(VarId(0));
+  LogExpr l1 = LogExpr::make_posiliteral(VarId(1));
+  LogExpr l2 = LogExpr::make_posiliteral(VarId(2));
   LogExpr maj_exp = (l0 & l1) | (l1 & l2) | (l2 & l0);
 
   // 論理ノードの複製を2つづつ作る．
@@ -62,7 +62,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
   for (BNodeVector::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BNode* node = *p;
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     fanins.resize(ni);
     LogExpr lexp = node->func();
 
@@ -94,7 +94,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
     BNode* ibnode = obnode->fanin(0);
 
     // ibnode の複製をもう一つ作る．
-    size_t ni = ibnode->ni();
+    size_t ni = ibnode->fanin_num();
     fanins.resize(ni);
     for (size_t i = 0; i < ni; ++ i) {
       fanins[i] = ibnode->fanin(i);

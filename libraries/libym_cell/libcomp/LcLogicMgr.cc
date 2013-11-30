@@ -44,22 +44,22 @@ LcLogicMgr::init()
 
   { // 定数0グループの登録
     TvFuncM const0(TvFunc::const_zero(0));
-    LcGroup* func0 = find_group(const0);
+    LcGroup* func0 = find_group(const0, false);
     mLogicGroup[0] = func0->id();
   }
   { // 定数1グループの登録
     TvFuncM const1(TvFunc::const_one(0));
-    LcGroup* func1 = find_group(const1);
+    LcGroup* func1 = find_group(const1, false);
     mLogicGroup[1] = func1->id();
   }
   { // バッファグループの登録
-    TvFuncM plit(TvFunc::posi_literal(1, 0));
-    LcGroup* func2 = find_group(plit);
+    TvFuncM plit(TvFunc::posi_literal(1, VarId(0)));
+    LcGroup* func2 = find_group(plit, false);
     mLogicGroup[2] = func2->id();
   }
   { // インバーターグループの登録
-    TvFuncM nlit(TvFunc::nega_literal(1, 0));
-    LcGroup* func3 = find_group(nlit);
+    TvFuncM nlit(TvFunc::nega_literal(1, VarId(0)));
+    LcGroup* func3 = find_group(nlit, false);
     mLogicGroup[3] = func3->id();
   }
 }
@@ -118,15 +118,18 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
 			 TvFuncM& repfunc,
 			 NpnMapM& xmap)
 {
-  ymuint no = f.no();
+  ymuint no = f.output_num();
 
   if ( no == 1 ) {
-    TvFunc f1 = f.output(0);
+    TvFunc f1 = f.output(VarId(0));
     NpnMap xmap1;
     mNpnMgr.cannonical(f1, xmap1);
     xmap = NpnMapM(xmap1);
     repfunc = f.xform(xmap);
-    TvFunc repfunc1 = f1.xform(xmap1);
+    {
+      TvFunc repfunc1 = f1.xform(xmap1);
+      assert_cond( repfunc.output(VarId(0)) == repfunc1, __FILE__, __LINE__);
+    }
   }
   else {
     default_repfunc(f, repfunc, xmap);
@@ -142,14 +145,20 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
 {
   idmap_list.clear();
 
-  ymuint ni = func.ni();
-  ymuint no = func.no();
+  ymuint ni = func.input_num();
+  ymuint no = func.output_num();
   if ( no == 1 ) {
     NpnMap xmap1;
-    TvFunc f1 = func.output(0);
+    TvFunc f1 = func.output(VarId(0));
     mNpnMgr.cannonical(f1, xmap1);
     { // 検証
       TvFunc f2 = f1.xform(xmap1);
+      if ( f1 != f2 ) {
+	cerr << "f1   = " << f1 << endl
+	     << "f2   = " << f2 << endl
+	     << "func = " << func << endl
+	     << "xmap1 = " << xmap1 << endl;
+      }
       assert_cond( f1 == f2, __FILE__, __LINE__);
     }
     vector<NpnMap> tmp_list;
@@ -161,8 +170,9 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
       // 恒等変換は追加しない．
       bool ident = true;
       for (ymuint i = 0; i < ni; ++ i) {
-	NpnVmap vmap = map.imap(i);
-	if ( vmap.pos() != i || vmap.pol() != kPolPosi ) {
+	VarId src_var(i);
+	NpnVmap vmap = map.imap(src_var);
+	if ( vmap.var() != src_var || vmap.pol() != kPolPosi ) {
 	  ident = false;
 	  break;
 	}

@@ -37,6 +37,7 @@ libym_tclpp_la_SOURCES = \
 	TclObj.cc \
 	TclBase.cc \
 	TclCmd.cc \
+	TclObjMsgHandler.cc \
 	TclPopt.cc \
 	TclVarTrace.cc \
 	TclHandler.cc

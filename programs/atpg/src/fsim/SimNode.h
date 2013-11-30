@@ -5,16 +5,14 @@
 /// @brief SimNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SimNode.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010,2012-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "fsim_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal.h"
-#include "ym_networks/TgGateTemplate.h"
+#include "ym_networks/tgnet.h"
 #include "ym_logic/LogExpr.h"
 
 
@@ -44,7 +42,12 @@ public:
 
 public:
 
-  /// @brief ノードを生成するクラスメソッド
+  /// @brief 入力ノードを生成するくらすメソッド
+  static
+  SimNode*
+  new_input(ymuint32 id);
+
+  /// @brief 論理ノードを生成するクラスメソッド
   static
   SimNode*
   new_node(ymuint32 id,

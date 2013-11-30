@@ -12,6 +12,8 @@
 #include "ymtools.h"
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -20,7 +22,7 @@ BEGIN_NAMESPACE_YM
 /// @ingroup LogicGroup
 /// @class Literal Literal.h "ym_logic/Literal.h"
 /// @brief リテラル(変数番号＋極性)を表すクラス
-/// @sa tVarId, tPol
+/// @sa VarId, tPol
 //////////////////////////////////////////////////////////////////////
 class Literal
 {
@@ -33,7 +35,7 @@ public:
   /// @brief 変数番号と極性を指定したコンストラクタ
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
-  Literal(tVarId varid,
+  Literal(VarId varid,
 	  tPol pol);
 
   /// @brief index からの変換関数
@@ -46,7 +48,7 @@ public:
 
   /// @brief 変数番号を得る．
   /// @return 変数番号
-  tVarId
+  VarId
   varid() const;
 
   /// @brief 極性を得る．
@@ -58,7 +60,7 @@ public:
   /// @param[in] varid 変数番号
   /// @param[in] pol 極性
   void
-  set(tVarId varid,
+  set(VarId varid,
       tPol pol);
 
   /// @brief 極性の反転
@@ -95,9 +97,25 @@ public:
   index() const;
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // バイナリダンプ用の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief バイナリファイルに出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(ODO& s) const;
+
+  /// @brief バイナリファイルから読み込む．
+  /// @param[in] s 入力元のストリーム
+  void
+  restore(IDO& s);
+
+
 private:
 
-  // 内部でのみ用いるコンストラクタ
+  /// @brief 内部でのみ用いるコンストラクタ
   explicit
   Literal(ymuint32 body);
 
@@ -115,8 +133,7 @@ private:
 /// @relates Literal
 /// @brief 未定義リテラル
 extern
-const
-Literal kLiteralX;
+const Literal kLiteralX;
 
 /// @relates Literal
 /// @brief 等価比較
@@ -175,6 +192,24 @@ ostream&
 operator<<(ostream& s,
 	   const Literal& lit);
 
+/// @relates Literal
+/// @brief Literal の内容をバイナリファイルに出力する関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] lit 対象のリテラル
+/// @return s
+ODO&
+operator<<(ODO& s,
+	   const Literal& lit);
+
+/// @relates Literal
+/// @brief Literal の内容をバイナリファイルから読み込む関数
+/// @param[in] s 入力元のストリーム
+/// @param[out] lit 対象のリテラル
+/// @return s
+IDO&
+operator>>(IDO& s,
+	   Literal& lit);
+
 
 //////////////////////////////////////////////////////////////////////
 // 上記のクラスを要素とするコンテナクラス
@@ -194,10 +229,10 @@ typedef list<Literal> LiteralList;
 // 内容を設定する．
 inline
 void
-Literal::set(tVarId varid,
+Literal::set(VarId varid,
 	     tPol pol)
 {
-  mBody = (varid << 1) + static_cast<ymuint32>(pol);
+  mBody = (varid.val() << 1) + static_cast<ymuint32>(pol);
 }
 
 // デフォルトコンストラクタ
@@ -209,7 +244,7 @@ Literal::Literal() :
 
 // 変数番号と極性を指定したコンストラクタ
 inline
-Literal::Literal(tVarId varid,
+Literal::Literal(VarId varid,
 		 tPol pol)
 {
   set(varid, pol);
@@ -217,7 +252,7 @@ Literal::Literal(tVarId varid,
 
 // 内部でのみ用いるコンストラクタ
 inline
-Literal::Literal(ymuint body) :
+Literal::Literal(ymuint32 body) :
   mBody(body)
 {
 }
@@ -225,17 +260,17 @@ Literal::Literal(ymuint body) :
 // @brief index からの変換関数
 inline
 Literal
-Literal::index2literal(ymuint index)
+Literal::index2literal(ymuint32 index)
 {
   return Literal(index);
 }
 
 // 変数番号を得る．
 inline
-tVarId
+VarId
 Literal::varid() const
 {
-  return static_cast<tVarId>(mBody >> 1);
+  return VarId(mBody >> 1);
 }
 
 // 極性を得る．
@@ -268,6 +303,24 @@ Literal
 Literal::make_negative() const
 {
   return Literal(mBody | 1U);
+}
+
+// @brief バイナリファイルに出力する．
+// @param[in] s 出力先のストリーム
+inline
+void
+Literal::dump(ODO& s) const
+{
+  s << mBody;
+}
+
+// @brief バイナリファイルから読み込む．
+// @param[in] s 入力元のストリーム
+inline
+void
+Literal::restore(IDO& s)
+{
+  s >> mBody;
 }
 
 // 等価比較
@@ -320,6 +373,32 @@ operator>=(Literal lit1,
 	   Literal lit2)
 {
   return !operator<(lit1, lit2);
+}
+
+// @brief Literal の内容をバイナリファイルに出力する関数
+// @param[in] s 出力先のストリーム
+// @param[in] lit 対象のリテラル
+// @return s
+inline
+ODO&
+operator<<(ODO& s,
+	   const Literal& lit)
+{
+  lit.dump(s);
+  return s;
+}
+
+// @brief Literal の内容をバイナリファイルから読み込む関数
+// @param[in] s 入力元のストリーム
+// @param[out] lit 対象のリテラル
+// @return s
+inline
+IDO&
+operator>>(IDO& s,
+	   Literal& lit)
+{
+  lit.restore(s);
+  return s;
 }
 
 // ハッシュ用の関数

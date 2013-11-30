@@ -12,6 +12,7 @@
 #include "ym_cell/cell_nsdef.h"
 #include "ym_cell/CellTime.h"
 #include "ym_cell/CellResistance.h"
+#include "ym_logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -37,7 +38,8 @@ public:
   // 共通の属性
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ID番号を返す．
+  /// @brief ID番号の取得
+  /// @note timing = cell->timing(id); の時，timing->id() = id となる．
   virtual
   ymuint
   id() const = 0;
@@ -46,6 +48,12 @@ public:
   virtual
   tCellTimingType
   type() const = 0;
+
+  /// @brief タイミング条件式の取得
+  /// @note ない場合には定数1の式が返される．
+  virtual
+  LogExpr
+  timing_cond() const = 0;
 
 
 public:
@@ -150,6 +158,18 @@ public:
   virtual
   const CellLut*
   cell_fall() const = 0;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const = 0;
 
 };
 

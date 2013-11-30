@@ -42,6 +42,9 @@ protected:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief solver をセットする．
   /// @param[in] solver YmSat のポインタ
@@ -73,24 +76,24 @@ protected:
   decision_level() const;
 
   // 割り当てリストの末尾を得る．
-  size_t
+  ymuint
   last_assign();
 
   // 割り当てリストの pos 番めの要素を得る．
   Literal
-  get_assign(size_t pos);
+  get_assign(ymuint pos);
 
   // 変数の decision level を得る．
   int
-  decision_level(tVarId varid) const;
+  decision_level(VarId varid) const;
 
   // 変数の割り当て理由を得る．
   SatReason
-  reason(tVarId varid) const;
+  reason(VarId varid) const;
 
   // 変数のアクティビティを増加させる．
   void
-  bump_var_activity(tVarId varid);
+  bump_var_activity(VarId varid);
 
   // 節のアクティビティを上げる．
   void
@@ -148,7 +151,7 @@ SatAnalyzer::decision_level() const
 
 // 割り当てリストの末尾を得る．
 inline
-size_t
+ymuint
 SatAnalyzer::last_assign()
 {
   return mSolver->mAssignList.size() - 1;
@@ -157,7 +160,7 @@ SatAnalyzer::last_assign()
 // 割り当てリストの pos 番めの要素を得る．
 inline
 Literal
-SatAnalyzer::get_assign(size_t pos)
+SatAnalyzer::get_assign(ymuint pos)
 {
   return mSolver->mAssignList.get(pos);
 }
@@ -165,7 +168,7 @@ SatAnalyzer::get_assign(size_t pos)
 // 変数の decision level を得る．
 inline
 int
-SatAnalyzer::decision_level(tVarId varid) const
+SatAnalyzer::decision_level(VarId varid) const
 {
   return mSolver->decision_level(varid);
 }
@@ -173,7 +176,7 @@ SatAnalyzer::decision_level(tVarId varid) const
 // 変数の割り当て理由を得る．
 inline
 SatReason
-SatAnalyzer::reason(tVarId varid) const
+SatAnalyzer::reason(VarId varid) const
 {
   return mSolver->reason(varid);
 }
@@ -181,7 +184,7 @@ SatAnalyzer::reason(tVarId varid) const
 // 変数のアクティビティを増加させる．
 inline
 void
-SatAnalyzer::bump_var_activity(tVarId var)
+SatAnalyzer::bump_var_activity(VarId var)
 {
   mSolver->bump_var_activity(var);
 }

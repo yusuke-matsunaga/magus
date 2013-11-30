@@ -15,144 +15,139 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class AllocBase Alloc.h "ym_utils/Alloc.h"
+/// @class Alloc Alloc.h "ym_utils/Alloc.h"
 /// @brief メモリの管理を行うクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
-class AllocBase
-{
-public:
-
-  /// @brief デストラクタ
-  virtual
-  ~AllocBase() { }
-
-
-public:
-
-  /// @brief n バイトの領域を確保する．
-  virtual
-  void*
-  get_memory(size_t n) = 0;
-
-  /// @brief n バイトの領域を開放する．
-  virtual
-  void
-  put_memory(size_t n,
-	     void* blk) = 0;
-
-  /// @brief 今までに確保した全ての領域を破棄する．
-  /// @note 個々のオブジェクトのデストラクタなどは起動されない
-  /// ので使用には注意が必要
-  virtual
-  void
-  destroy() = 0;
-
-
-public:
-
-  /// @brief 使用されているメモリ量を返す．
-  virtual
-  size_t
-  used_size() const = 0;
-
-  /// @brief used_size() の最大値を返す．
-  virtual
-  size_t
-  max_used_size() const = 0;
-
-  /// @brief 実際に確保したメモリ量を返す．
-  virtual
-  size_t
-  allocated_size() const = 0;
-
-  /// @brief 実際に確保した回数を返す．
-  virtual
-  size_t
-  allocated_count() const = 0;
-
-  /// @brief 内部状態を出力する．
-  virtual
-  void
-  print_stats(ostream& s) const = 0;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SimpleAlloc Alloc.h "ym_utils/Alloc.h"
-/// @brief 単純なメモリ管理
-//////////////////////////////////////////////////////////////////////
-class SimpleAlloc :
-  public AllocBase
+class Alloc
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] max_size このオブジェクトが管理する最大サイズ
-  /// @note max_size 以上のメモリ領域はデフォルトのアロケーターを
-  /// 使用する．
-  SimpleAlloc(size_t max_size);
+  Alloc();
 
   /// @brief デストラクタ
   virtual
-  ~SimpleAlloc();
+  ~Alloc();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name メモリの確保/開放を行う関数
+  /// @{
 
   /// @brief n バイトの領域を確保する．
-  virtual
+  /// @param[in] n 確保するメモリ量(単位はバイト)
   void*
-  get_memory(size_t n);
+  get_memory(ymuint64 n);
 
   /// @brief n バイトの領域を開放する．
-  virtual
+  /// @param[in] n 確保したメモリ量(単位はバイト)
+  /// @param[in] blk 開放するメモリ領域の先頭番地
   void
-  put_memory(size_t n,
+  put_memory(ymuint64 n,
 	     void* blk);
 
   /// @brief 今までに確保した全ての領域を破棄する．
-  /// @note 個々のオブジェクトのデストラクタなどは起動されない
+  /// 個々のオブジェクトのデストラクタなどは起動されない
   /// ので使用には注意が必要
-  virtual
   void
   destroy();
 
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name メモリ量の制限値に関する関数
+  /// @{
+
+  /// @brief メモリ量の制限値を設定する．
+  /// @param[in] limit 制限値(単位はバイト)
+  /// @note limit が 0 の時は制限なし
+  void
+  set_mem_limit(ymuint64 limit);
+
+  /// @brief メモリ量の制限値を返す．
+  ymuint64
+  mem_limit() const;
+
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @name 統計情報を返す関数
+  /// @{
 
   /// @brief 使用されているメモリ量を返す．
-  virtual
-  size_t
+  ymuint64
   used_size() const;
 
-  /// @brief used_size() の最大値を返す．
-  virtual
-  size_t
+  /// @brief used_size() の今までの最大値を返す．
+  ymuint64
   max_used_size() const;
 
   /// @brief 実際に確保したメモリ量を返す．
-  virtual
-  size_t
+  ymuint64
   allocated_size() const;
 
   /// @brief 実際に確保した回数を返す．
-  virtual
-  size_t
+  ymuint64
   allocated_count() const;
 
   /// @brief 内部状態を出力する．
-  virtual
   void
   print_stats(ostream& s) const;
 
+  /// @}
+  //////////////////////////////////////////////////////////////////////
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 真のアロケート関数
+  /// @param[in] n 確保するメモリ量(単位はバイト)
+  /// @note 確保した総量が制限値を越えていたら 0 を返す．
+  void*
+  alloc(ymuint64 n);
+
+  /// @brief 新のフリー関数
+  /// @param[in] n 解放するメモリ量(単位はバイト)
+  /// @param[in] blk 解放するメモリ領域
+  void
+  free(ymuint64 n,
+       void* blk);
+
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  // 継承クラスで実装する必要がある．
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief アラインメントを考慮してサイズを調節する．
-  static
-  size_t
-  align(size_t req_size);
+  /// @brief 実際にメモリ領域の確保を行う関数
+  /// @param[in] n 確保するメモリ量(単位はバイト)
+  virtual
+  void*
+  _get_memory(ymuint64 n) = 0;
+
+  /// @brief 実際にメモリ領域の開放を行う関数
+  /// @param[in] n 確保したメモリ量(単位はバイト)
+  /// @param[in] blk 開放するメモリ領域の先頭番地
+  virtual
+  void
+  _put_memory(ymuint64 n,
+	      void* blk) = 0;
+
+  /// @brief 実際に destory() の処理を行う関数
+  virtual
+  void
+  _destroy() = 0;
 
 
 private:
@@ -160,300 +155,77 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // コンストラクタの引数
-  size_t mMaxSize;
-
-  // mMaxSize を越えない2の巾乗の数．
-  size_t mMaxPowerSize;
-
-  // mMaxPowerSize のログ
-  size_t mMaxLogSize;
-
-  // 現在利用可能なメモリ領域
-  char* mCurBlock;
-
-  // mCurBlock の次に利用可能な位置
-  size_t mNextPos;
-
-  // 確保して使用中のメモリ領域のリスト
-  list<char*> mAllocList;
+  // メモリ量の制限値
+  ymuint64 mMemLimit;
 
   // 使用中のメモリサイズ
-  size_t mUsedSize;
+  ymuint64 mUsedSize;
 
   // 使用した最大のメモリサイズ
-  size_t mMaxUsedSize;
+  ymuint64 mMaxUsedSize;
 
   // 確保したメモリサイズ
-  size_t mAllocSize;
+  ymuint64 mAllocSize;
 
   // 確保した回数
-  size_t mAllocCount;
+  ymuint64 mAllocCount;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class FragAlloc Alloc.h "ym_utils/Alloc.h"
-/// @brief 2の巾乗の単位で管理する
+// インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-class FragAlloc :
-  public AllocBase
+
+// @brief メモリ量の制限値を設定する．
+// @param[in] limit 制限値(単位はバイト)
+// @note limit が 0 の時は制限なし
+inline
+void
+Alloc::set_mem_limit(ymuint64 limit)
 {
-public:
+  mMemLimit = limit;
+}
 
-  /// @brief コンストラクタ
-  /// @param[in] max_size このオブジェクトが管理する最大サイズ
-  /// @note max_size 以上のメモリ領域はデフォルトのアロケーターを
-  /// 使用する．
-  FragAlloc(size_t max_size);
-
-  /// @brief デストラクタ
-  ~FragAlloc();
-
-
-public:
-
-  /// @brief n バイトの領域を確保する．
-  virtual
-  void*
-  get_memory(size_t n);
-
-  /// @brief n バイトの領域を開放する．
-  virtual
-  void
-  put_memory(size_t n,
-	     void* blk);
-
-  /// @brief 今までに確保した全ての領域を破棄する．
-  /// @note 個々のオブジェクトのデストラクタなどは起動されない
-  /// ので使用には注意が必要
-  virtual
-  void
-  destroy();
-
-
-public:
-
-  /// @brief 使用されているメモリ量を返す．
-  virtual
-  size_t
-  used_size() const;
-
-  /// @brief used_size() の最大値を返す．
-  virtual
-  size_t
-  max_used_size() const;
-
-  /// @brief 実際に確保したメモリ量を返す．
-  virtual
-  size_t
-  allocated_size() const;
-
-  /// @brief 実際に確保した回数を返す．
-  virtual
-  size_t
-  allocated_count() const;
-
-  /// @brief 内部状態を出力する．
-  virtual
-  void
-  print_stats(ostream& s) const;
-
-
-private:
-
-  // サイズ 2^p のブロックを確保する．
-  char*
-  alloc_block(size_t p);
-
-  // サイズ 2^p のブロックがあれば返す．
-  // なければ NULL を返す．
-  char*
-  get_block(size_t p);
-
-  // サイズ 2^p のブロックをリストに戻す．
-  void
-  put_block(size_t p,
-	    char* block);
-
-
-private:
-
-  // 利用可能なメモリ領域を管理するための構造体
-  struct Block
-  {
-    // 次の要素を指すポインタ
-    Block* mLink;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 最小のサイズ
-  size_t mMinSize;
-
-  // mMinSize の log
-  size_t mMinLogSize;
-
-  // コンストラクタの引数
-  size_t mMaxSize;
-
-  // mMaxSize を越えない2の巾乗の数．
-  size_t mMaxPowerSize;
-
-  // mMaxPowerSize の log
-  size_t mMaxLogSize;
-
-  // サイズごとに分けられたブロックリストの配列
-  // 配列の大きさは mMaxLogSize + 1
-  Block** mBlockListArray;
-
-  // 確保して使用中のメモリ領域のリスト
-  list<char*> mAllocList;
-
-  // 使用中のメモリサイズ
-  size_t mUsedSize;
-
-  // 使用した最大のメモリサイズ
-  size_t mMaxUsedSize;
-
-  // 確保したメモリサイズ
-  size_t mAllocSize;
-
-  // 確保した回数
-  size_t mAllocCount;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class UnitAlloc Alloc.h "ym_utils/Alloc.h"
-/// @brief 単一サイズのメモリ領域の管理を行うクラス
-//////////////////////////////////////////////////////////////////////
-class UnitAlloc :
-  public AllocBase
+// @brief メモリ量の制限値を返す．
+inline
+ymuint64
+Alloc::mem_limit() const
 {
-public:
+  return mMemLimit;
+}
 
-  /// @brief コンストラクタ
-  /// @param[in] unit_size メモリ割り当ての単位となるサイズ
-  /// @param[in] block_size 一度に確保する個数
-  UnitAlloc(size_t unit_size,
-	    size_t block_size);
+// @brief 使用されているメモリ量を返す．
+inline
+ymuint64
+Alloc::used_size() const
+{
+  return mUsedSize;
+}
 
-  /// @brief デストラクタ
-  virtual
-  ~UnitAlloc();
+// @brief used_size() の今までの最大値を返す．
+inline
+ymuint64
+Alloc::max_used_size() const
+{
+  return mMaxUsedSize;
+}
 
+// @brief 実際に確保したメモリ量を返す．
+inline
+ymuint64
+Alloc::allocated_size() const
+{
+  return mAllocSize;
+}
 
-public:
-
-  /// @brief n バイトの領域を確保する．
-  /// @note n != unit_size の場合にはデフォルトアロケータを用いる．
-  virtual
-  void*
-  get_memory(size_t n);
-
-  /// @brief n バイトの領域を開放する．
-  /// @note n != unit_size の場合にはデフォルトアロケータを用いる．
-  virtual
-  void
-  put_memory(size_t n,
-	     void* blk);
-
-  /// @brief 今までに確保した全ての領域を破棄する．
-  /// @note 個々のオブジェクトのデストラクタなどは起動されない
-  /// ので使用には注意が必要
-  virtual
-  void
-  destroy();
-
-
-public:
-
-  /// @brief 使用されているメモリ量を返す．
-  virtual
-  size_t
-  used_size() const;
-
-  /// @brief used_size() の最大値を返す．
-  virtual
-  size_t
-  max_used_size() const;
-
-  /// @brief 実際に確保したメモリ量を返す．
-  virtual
-  size_t
-  allocated_size() const;
-
-  /// @brief 実際に確保した回数を返す．
-  virtual
-  size_t
-  allocated_count() const;
-
-  /// @brief 内部状態を出力する．
-  virtual
-  void
-  print_stats(ostream& s) const;
-
-
-private:
-
-  // サイズ 2^p のブロックがあれば返す．
-  // なければ NULL を返す．
-  char*
-  get_block(size_t p);
-
-  // サイズ 2^p のブロックをリストに戻す．
-  void
-  put_block(size_t p,
-	    char* block);
-
-
-private:
-
-  // 利用可能なメモリ領域を管理するための構造体
-  struct Block
-  {
-    // 次の要素を指すポインタ
-    Block* mLink;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 単位サイズ
-  size_t mUnitSize;
-
-  // ブロックサイズ
-  size_t mBlockSize;
-
-  // 利用可能なメモリ領域のリスト
-  Block* mAvailTop;
-
-  // 確保して使用中のメモリ領域のリスト
-  list<char*> mAllocList;
-
-  // 使用中のメモリサイズ
-  size_t mUsedSize;
-
-  // 使用した最大のメモリサイズ
-  size_t mMaxUsedSize;
-
-  // 確保したメモリサイズ
-  size_t mAllocSize;
-
-  // 確保した回数
-  size_t mAllocCount;
-
-};
+// @brief 実際に確保した回数を返す．
+inline
+ymuint64
+Alloc::allocated_count() const
+{
+  return mAllocCount;
+}
 
 END_NAMESPACE_YM
 

@@ -5,9 +5,7 @@
 /// @brief GL用の描画領域クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GlvScene.h 347 2007-01-16 02:37:45Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2006, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "Glv.h"
@@ -35,10 +33,12 @@ public:
 public:
 
   /// @brief ウィンドウ全体を無効化する．
-  void invalidate();
+  void
+  invalidate();
 
   /// @brief ウィンドウを更新する．
-  void update();
+  void
+  update();
 
 
 protected:
@@ -50,13 +50,15 @@ protected:
   /// @note on_realize() 中で呼ばれる．
   /// @note gl_begin() と gl_end() で挟まれている．
   virtual
-  void initialize();
+  void
+  initialize();
 
   /// @brief ウィンドウのサイズが変わったときの処理
   /// @note on_configure_event() 中で呼ばれる．
   /// @note gl_begin() と gl_end() で挟まれている．
   virtual
-  void resize();
+  void
+  resize();
 
   /// @brief 描画を行う．
   /// @note on_expose_event() 中で呼ばれる．
@@ -64,7 +66,8 @@ protected:
   /// @note ただし gl_end() の前に swap_buffers() か glFlush()
   /// を行う．
   virtual
-  void draw();
+  void
+  draw();
 
 
 protected:
@@ -74,27 +77,33 @@ protected:
 
   /// @brief "realize" イベントハンドラ
   virtual
-  void on_realize();
+  void
+  on_realize();
 
   /// @brief "configure" イベントハンドラ
   virtual
-  bool on_configure_event(GdkEventConfigure* event);
+  bool
+  on_configure_event(GdkEventConfigure* event);
 
   /// @brief "expose" イベントハンドラ
   virtual
-  bool on_expose_event(GdkEventExpose* event);
+  bool
+  on_expose_event(GdkEventExpose* event);
 
   /// @brief "map" イベントハンドラ
   virtual
-  bool on_map_event(GdkEventAny* event);
+  bool
+  on_map_event(GdkEventAny* event);
 
   /// @brief "unmap" イベントハンドラ
   virtual
-  bool on_unmap_event(GdkEventAny* event);
+  bool
+  on_unmap_event(GdkEventAny* event);
 
   /// @brief "visibility notify" イベントハンドラ
   virtual
-  bool on_visibility_notify_event(GdkEventVisibility* event);
+  bool
+  on_visibility_notify_event(GdkEventVisibility* event);
 
 };
 

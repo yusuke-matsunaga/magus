@@ -31,7 +31,7 @@ BNode::BNode() :
 BNode::~BNode()
 {
   assert_cond( fanout_num() == 0, __FILE__, __LINE__);
-  assert_cond( ni() == 0, __FILE__, __LINE__);
+  assert_cond( fanin_num() == 0, __FILE__, __LINE__);
 }
 
 // ノードタイプをセットする．
@@ -45,7 +45,7 @@ BNode::set_type(tType type)
   case kPI:
     break;
   case kPO:
-    mFunc = LogExpr::make_posiliteral(0);
+    mFunc = LogExpr::make_posiliteral(VarId(0));
     break;
   case kLO:
     break;
@@ -63,7 +63,7 @@ int
 BNode::fanin_pos(BNode* node) const
 {
   int i;
-  for (i = ni(); -- i >= 0; ) {
+  for (i = fanin_num(); -- i >= 0; ) {
     if ( mFaninEdgeArray[i].from() == node ) break;
   }
   // 範囲外の場合にも具合良く-1になっている．
@@ -95,7 +95,7 @@ BNode::value() const
       feed_to_outputs = true;
     }
     else {
-      c += onode->mFunc.litnum(edge->pos());
+      c += onode->mFunc.litnum(VarId(edge->pos()));
     }
   }
 

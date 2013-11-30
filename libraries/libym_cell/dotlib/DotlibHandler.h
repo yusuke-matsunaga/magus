@@ -77,19 +77,23 @@ protected:
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief group attribute 用のパースを行う．
+  /// @brief complex attribute 用のパースを行う．
+  /// @param[in] vector_mode ベクタモードの時 true にするフラグ
   /// @param[out] end_loc 右括弧の位置を格納する変数
   /// @return 読み込んだ値(リスト)を返す．
   /// @note エラーが起きたら NULL を返す．
   DotlibNodeImpl*
-  parse_complex(FileRegion& end_loc);
+  parse_complex(bool vector_mode,
+		FileRegion& end_loc);
 
   /// @brief DotlibNode (の派生クラス)を生成する．
   /// @param[in] type 型
+  /// @param[in] vector_mode ベクタモードの時 true にするフラグ
   /// @param[in] loc ファイル上の位置情報
   /// @note 残りの情報は parser() からとってくる．
   DotlibNodeImpl*
   new_value(tTokenType type,
+	    bool vector_mode,
 	    const FileRegion& loc);
 
   /// @brief 引数の種類のトークンでなければエラーメッセージを出力する．

@@ -2,7 +2,7 @@
 /// @file src/base/TvMgr.cc
 /// @brief TvMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: TvMgr.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
@@ -45,10 +45,10 @@ TvMgr::clear()
 // @brief 内容を初期化する．
 // @param[in] ni 入力数
 void
-TvMgr::init(size_t ni)
+TvMgr::init(ymuint ni)
 {
   clear();
-  
+
   mNi = ni;
   if ( mNi == 0 ) {
     // 0 だとヤバい
@@ -67,20 +67,20 @@ TvMgr::new_vector()
     mAvail.pop_back();
     return tv;
   }
-  
-  size_t nb = TestVector::block_num(mNi);
-  size_t size = sizeof(TestVector) + kPvBitLen * (nb - 1);
+
+  ymuint nb = TestVector::block_num(mNi);
+  ymuint size = sizeof(TestVector) + kPvBitLen * (nb - 1);
   void* p = mAlloc.get_memory(size);
   TestVector* tv = new (p) TestVector(mNi);
 
   // X に初期化しておく．
-  for (size_t i = 0; i < nb; ++ i) {
+  for (ymuint i = 0; i < nb; ++ i) {
     tv->mPat[i] = kPvAll0;
   }
 
   return tv;
 }
-  
+
 // @brief パタンを削除する．
 void
 TvMgr::delete_vector(TestVector* tv)

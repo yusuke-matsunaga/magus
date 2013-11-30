@@ -32,7 +32,7 @@ BddVarSet::iterator::iterator(const Bdd& bdd) :
 
 // 現在指している要素を返す．
 // 末尾かどうかのチェックは行わない．
-tVarId
+VarId
 BddVarSet::iterator::operator*() const
 {
   return mCur.root_var();
@@ -108,7 +108,7 @@ BddVarSet::operator=(const BddVarSet& src)
 
 // 変数一つだけを要素とする集合を作るコンストラクタ
 BddVarSet::BddVarSet(BddMgr& mgr,
-		     tVarId varid) :
+		     VarId varid) :
   mBody(mgr.make_posiliteral(varid)),
   mSize(0U)
 {
@@ -160,7 +160,7 @@ ymuint
 BddVarSet::size() const
 {
   if ( !static_cast<bool>(mSize & 1U) ) {
-    set_size(mBody.size());
+    set_size(mBody.node_count());
   }
   return (mSize >> 1);
 }
@@ -282,10 +282,10 @@ operator<<(ostream& s,
     s << "Overflow";
   }
   else {
-    list<tVarId> varlist;
+    list<VarId> varlist;
     varset.to_list(varlist);
     bool first = true;
-    for (list<tVarId>::iterator p = varlist.begin();
+    for (list<VarId>::iterator p = varlist.begin();
 	 p != varlist.end(); ++ p) {
       if ( first ) {
 	first = false;
@@ -293,7 +293,7 @@ operator<<(ostream& s,
       else {
 	s << ", ";
       }
-      tVarId varid = *p;
+      VarId varid = *p;
       s << varid;
     }
   }

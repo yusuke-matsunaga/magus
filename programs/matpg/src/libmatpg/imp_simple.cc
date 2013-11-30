@@ -13,10 +13,10 @@
  *
  * Revision 2.1  91/12/23  23:11:29  yusuke
  * a slightly speed-up
- * 
+ *
  * Revision 2.0  91/12/21  18:52:17  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.7  1991/10/17  02:55:53  yusuke
  * made a new function eq_imp()
  *
@@ -58,8 +58,8 @@ SIMPLE_gate_t::fwd_imp_h(val3 i_val)
     if (old_val == val_X) {
       val3 nc_val = neg3(c_val);
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	if (get_figate(i)->get_gval() != nc_val) {
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	if (get_fanin_gate(i)->get_gval() != nc_val) {
 	  break;
 	}
       }
@@ -71,8 +71,8 @@ SIMPLE_gate_t::fwd_imp_h(val3 i_val)
       int ucount = 0;
       gate_t* last = NULL;
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 val = i_gate->get_gval();
 	if (val == val_X) {
 	  ucount ++;
@@ -94,7 +94,7 @@ SIMPLE_gate_t::fwd_imp_h(val3 i_val)
       }
     }
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::fwd_imp_h end\n", get_name());
 #endif
@@ -123,8 +123,8 @@ SIMPLE_gate_t::fwd_imp_g(val3 i_val)
     if (old_val == val_X) {
       val3 nc_val = neg3(c_val);
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	if (get_figate(i)->get_gval() != nc_val) {
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	if (get_fanin_gate(i)->get_gval() != nc_val) {
 	  break;
 	}
       }
@@ -136,8 +136,8 @@ SIMPLE_gate_t::fwd_imp_g(val3 i_val)
       int ucount = 0;
       gate_t* last = NULL;
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 val = i_gate->get_gval();
 	if (val == val_X) {
 	  ucount ++;
@@ -164,7 +164,7 @@ SIMPLE_gate_t::fwd_imp_g(val3 i_val)
       }
     }
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::fwd_imp_g end\n", get_name());
 #endif
@@ -193,8 +193,8 @@ SIMPLE_gate_t::fwd_imp_f(val3 i_val)
     if (old_val == val_X) {
       val3 nc_val = neg3(c_val);
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	if (get_figate(i)->get_fval() != nc_val) {
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	if (get_fanin_gate(i)->get_fval() != nc_val) {
 	  break;
 	}
       }
@@ -206,8 +206,8 @@ SIMPLE_gate_t::fwd_imp_f(val3 i_val)
       int ucount = 0;
       gate_t* last = NULL;
       int i;
-      for (i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 val = i_gate->get_fval();
 	if (val == val_X) {
 	  ucount ++;
@@ -234,7 +234,7 @@ SIMPLE_gate_t::fwd_imp_f(val3 i_val)
       }
     }
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::fwd_imp_f end\n", get_name());
 #endif
@@ -266,8 +266,8 @@ SIMPLE_gate_t::bwd_imp_h(val3 i_val,
 	int ucount = 0;
 	gate_t* last = NULL;
 	int i;
-	for (i = get_ni(); -- i >= 0; ) {
-	  gate_t* i_gate = get_figate(i);
+	for (i = get_fanin_num(); -- i >= 0; ) {
+	  gate_t* i_gate = get_fanin_gate(i);
 	  val3 val1 = i_gate->get_gval();
 	  if (val1 == val_X) {
 	    ucount ++;
@@ -293,8 +293,8 @@ SIMPLE_gate_t::bwd_imp_h(val3 i_val,
       }
       else {
 	val3 nc_val = neg3(c_val);
-	for (int i = get_ni(); -- i >= 0; ) {
-	  get_figate(i)->bwd_imp_h(nc_val, this);
+	for (int i = get_fanin_num(); -- i >= 0; ) {
+	  get_fanin_gate(i)->bwd_imp_h(nc_val, this);
 	}
       }
     }
@@ -305,7 +305,7 @@ SIMPLE_gate_t::bwd_imp_h(val3 i_val,
 #endif
     imp_fail();
   }
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s::bwd_imp_h end\n", get_name());
 #endif
@@ -327,8 +327,8 @@ SIMPLE_gate_t::bwd_imp_g(val3 i_val,
     if (i_val == o_val) {
       int ucount = 0;
       gate_t* last = NULL;
-      for (int i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (int i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 val1 = i_gate->get_gval();
 	if (val1 == val_X) {
 	  ucount ++;
@@ -359,8 +359,8 @@ SIMPLE_gate_t::bwd_imp_g(val3 i_val,
     }
     else {
       val3 nc_val = neg3(c_val);
-      for (int i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (int i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	if (i_gate->chk_fcone() == true) {
 	  i_gate->bwd_imp_g(nc_val, this);
 	}
@@ -398,8 +398,8 @@ SIMPLE_gate_t::bwd_imp_f(val3 i_val,
     if (i_val == o_val) {
       int ucount = 0;
       gate_t* last = NULL;
-      for (int i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (int i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	val3 val1 = i_gate->get_fval();
 	if (val1 == val_X) {
 	  ucount ++;
@@ -427,8 +427,8 @@ SIMPLE_gate_t::bwd_imp_f(val3 i_val,
     }
     else {
       val3 nc_val = neg3(c_val);
-      for (int i = get_ni(); -- i >= 0; ) {
-	gate_t* i_gate = get_figate(i);
+      for (int i = get_fanin_num(); -- i >= 0; ) {
+	gate_t* i_gate = get_fanin_gate(i);
 	if (i_gate->chk_fcone() == true) {
 	  i_gate->bwd_imp_f(nc_val, this);
 	}

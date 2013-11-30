@@ -1,0 +1,5 @@
+import utils
+cg = utils.MultiCombiGen((5, 3), (4, 2))
+while not cg.is_end() :
+    print cg.get()
+    cg.next()

@@ -1,15 +1,13 @@
 
-/// @file libym_utils/SimpleAlloc.cc
+/// @file SimpleAlloc.cc
 /// @brief SimpleAlloc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SimpleAlloc.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,16 +17,10 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SimpleAlloc::SimpleAlloc(size_t max_size) :
-  mUsedSize(0),
-  mMaxUsedSize(0),
-  mAllocSize(0),
-  mAllocCount(0)
+SimpleAlloc::SimpleAlloc(ymuint64 page_size)
 {
-  assert_cond(max_size > 0, __FILE__, __LINE__);
-  mMaxSize = align(max_size);
-  mCurBlock = NULL;
-  mNextPos = mMaxSize;
+  assert_cond(page_size > 0, __FILE__, __LINE__);
+  mPageSize = align(page_size);
 }
 
 // デストラクタ
@@ -39,110 +31,85 @@ SimpleAlloc::~SimpleAlloc()
 
 // @brief n バイトの領域を確保する．
 void*
-SimpleAlloc::get_memory(size_t n)
+SimpleAlloc::_get_memory(ymuint64 n)
 {
-  if ( n == 0 ) {
-    return NULL;
-  }
-  
-  mUsedSize += n;
-  if ( mMaxUsedSize < mUsedSize ) {
-    mMaxUsedSize = mUsedSize;
+  if ( n > mPageSize ) {
+    // mPageSize を越えるものは普通にアロケートする．
+    return alloc(n);
   }
 
-  if ( n > mMaxSize ) {
-    // mMaxSize を越えるものは普通にアロケートする．
-    mAllocSize += n;
-    ++ mAllocCount;
-    return ::operator new(n);
-  }
-  
   // ワード境界に乗るようにサイズに整える．
-  size_t alloc_size = align(n);
-  if ( mNextPos + alloc_size > mMaxSize ) {
-    mCurBlock = new char[mMaxSize];
-    mNextPos = 0;
-    mAllocList.push_back(mCurBlock);
-    mAllocSize += mMaxSize;
-    ++ mAllocCount;
-  }
-  char* p = &mCurBlock[mNextPos];
-  mNextPos += alloc_size;
+  ymuint64 alloc_size = align(n);
 
-  return static_cast<void*>(p);
+  // alloc_size 以上の余りがあるページを探す．
+  list<Page>::iterator p = mAvailList.begin();
+  for ( ; p != mAvailList.end(); ++ p) {
+    Page& page = *p;
+    if ( page.mNextPos + alloc_size <= mPageSize ) {
+      // 見つけた．
+      break;
+    }
+  }
+  if ( p == mAvailList.end() ) {
+    // 適当なページがなければ新しいページを確保する．
+    void* chunk = alloc(mPageSize);
+    mAvailList.push_back(Page(chunk));
+    p = mAvailList.end();
+    -- p;
+  }
+
+  Page& page = *p;
+  char* s = &page.mChunk[page.mNextPos];
+  page.mNextPos += alloc_size;
+
+  // page の余りがなくなったら mUsedList に移す．
+  if ( page.mNextPos + align(1) > mPageSize ) {
+    mAvailList.erase(p);
+    mUsedList.push_back(page);
+  }
+
+  return static_cast<void*>(s);
 }
 
 // @brief n バイトの領域を開放する．
 void
-SimpleAlloc::put_memory(size_t n,
-			void* block)
+SimpleAlloc::_put_memory(ymuint64 n,
+			 void* block)
 {
-  mUsedSize -= n;
-  
-  if ( n > mMaxSize ) {
-    // mMaxSize を越えるものは普通に開放する．
-    ::operator delete(block);
+  if ( n > mPageSize ) {
+    // mPageSize を越えるものは普通に開放する．
+    free(n, block);
   }
-  
+
   // このクラスでは領域の再利用はしない．
   return;
 }
 
 // @brief 今までに確保した全ての領域を破棄する．
 void
-SimpleAlloc::destroy()
+SimpleAlloc::_destroy()
 {
-  for (list<char*>::iterator p = mAllocList.begin();
-       p != mAllocList.end(); ++ p) {
-    delete [] *p;
+  for (list<Page>::iterator p = mAvailList.begin();
+       p != mAvailList.end(); ++ p) {
+    Page& page = *p;
+    void* chunk = static_cast<void*>(page.mChunk);
+    free(mPageSize, chunk);
   }
-  mAllocList.clear();
-  mCurBlock = NULL;
-  mNextPos = mMaxSize;
-}
+  mAvailList.clear();
 
-// @brief 使用されているメモリ量を返す．
-size_t
-SimpleAlloc::used_size() const
-{
-  return mUsedSize;
-}
-
-// @brief used_size() の最大値を返す．
-size_t
-SimpleAlloc::max_used_size() const
-{
-  return mMaxUsedSize;
-}
-
-// @brief 実際に確保したメモリ量を返す．
-size_t
-SimpleAlloc::allocated_size() const
-{
-  return mAllocSize;
-}
-
-// @brief 実際に確保した回数を返す．
-size_t
-SimpleAlloc::allocated_count() const
-{
-  return mAllocCount;
-}
-
-// @brief 内部状態を出力する．
-void
-SimpleAlloc::print_stats(ostream& s) const
-{
-  s << "maximum used size: " << max_used_size() << endl
-    << "current used size: " << used_size() << endl
-    << "allocated size:    " << allocated_size() << endl
-    << "allocated count:   " << allocated_count() << endl
-    << endl;
+  for (list<Page>::iterator p = mUsedList.begin();
+       p != mUsedList.end(); ++ p) {
+    Page& page = *p;
+    void* chunk = static_cast<void*>(page.mChunk);
+    free(mPageSize, chunk);
+  }
+  mUsedList.clear();
 }
 
 // @brief アラインメントを考慮してサイズを調節する．
-size_t
-SimpleAlloc::align(size_t req_size)
+inline
+ymuint64
+SimpleAlloc::align(ymuint64 req_size)
 {
   return ((req_size + ALIGNOF_DOUBLE - 1) / ALIGNOF_DOUBLE) * ALIGNOF_DOUBLE;
 }

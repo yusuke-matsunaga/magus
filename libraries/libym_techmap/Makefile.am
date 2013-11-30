@@ -6,6 +6,7 @@ SUBDIRS = \
 	ym_techmap \
 	cellmap \
 	lutmap \
+	lutmapx \
 	. \
 	tests
 

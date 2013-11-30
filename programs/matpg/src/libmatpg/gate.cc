@@ -10,7 +10,7 @@
  *
  * Revision 2.0  91/12/21  18:51:04  yusuke
  * '91 Cristmas version
- * 
+ *
  * Revision 1.5  1991/10/05  08:18:18  yusuke
  * add Log and RCSid for RCS
  *
@@ -30,57 +30,57 @@ new_gate_t(tTgGateType id,
 	   int ni)
 {
   switch (id) {
-  case kTgConst0:   return new C0_gate_t(node);
-  case kTgConst1:   return new C1_gate_t(node);
-  case kTgBuff:  return new BUF_gate_t(node);
-  case kTgNot:  return new NOT_gate_t(node);
-  case kTgAnd:
+  case kTgGateConst0:   return new C0_gate_t(node);
+  case kTgGateConst1:   return new C1_gate_t(node);
+  case kTgGateBuff:  return new BUF_gate_t(node);
+  case kTgGateNot:  return new NOT_gate_t(node);
+  case kTgGateAnd:
     switch (ni) {
     case 2:		return new AND_2_gate_t(node);
     case 3:		return new AND_3_gate_t(node);
     case 4:		return new AND_4_gate_t(node);
     }
     return new AND_gate_t(node, ni);
-    
-  case kTgNand:
+
+  case kTgGateNand:
     switch (ni) {
     case 2:		return new NAND_2_gate_t(node);
     case 3:		return new NAND_3_gate_t(node);
     case 4:		return new NAND_4_gate_t(node);
     }
     return new NAND_gate_t(node, ni);
-    
-  case kTgOr:
+
+  case kTgGateOr:
     switch (ni) {
     case 2:		return new OR_2_gate_t(node);
     case 3:		return new OR_3_gate_t(node);
     case 4:		return new OR_4_gate_t(node);
     }
     return new OR_gate_t(node, ni);
-    
-  case kTgNor:
+
+  case kTgGateNor:
     switch (ni) {
     case 2:		return new NOR_2_gate_t(node);
     case 3:		return new NOR_3_gate_t(node);
     case 4:		return new NOR_4_gate_t(node);
     }
     return new NOR_gate_t(node, ni);
-    
-  case kTgXor:
+
+  case kTgGateXor:
     if (ni == 2) return new XOR_2_gate_t(node);
     return new XOR_gate_t(node, ni);
-    
-  case kTgXnor:
+
+  case kTgGateXnor:
     if (ni == 2) return new XNOR_2_gate_t(node);
     return new XNOR_gate_t(node, ni);
-    
+
   default:
     break;
   }
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
-  
+
 gate_t::gate_t(const TgNode* node0,
 	       int ni0)
 {
@@ -91,7 +91,7 @@ gate_t::gate_t(const TgNode* node0,
   if ( ni ) {
     igate = new gate_t*[ni];
     sorted_pos = new int[ni];
-    for (size_t i = 0; i < ni; ++ i) {
+    for (int i = 0; i < ni; ++ i) {
       sorted_pos[i] = i;
     }
   }
@@ -118,20 +118,20 @@ gate_t::~gate_t()
 }
 
 void
-gate_t::init_figate(int pos,
-		    gate_t* input)
+gate_t::init_fanin_gate(int pos,
+			gate_t* input)
 {
-  set_figate(pos, input);
+  set_fanin_gate(pos, input);
   ++ input->no;
 }
 
 void
-gate_t::init_fogate(gate_t* output,
-		    int pos)
+gate_t::init_fanout_gate(gate_t* output,
+			 int pos)
 {
   if (outputs == NULL) {
     outputs = new net_t[no];
-    for (size_t i = 0; i < no; ++ i) {
+    for (int i = 0; i < no; ++ i) {
       outputs[i].gate = NULL;
     }
     act_outputs = new net_t[no + 1];
@@ -139,13 +139,13 @@ gate_t::init_fogate(gate_t* output,
   if (output != NULL) {
     int i;
     for (i = 0; i < no; i ++) {
-      if (get_fogate(i) == NULL) {
-	set_fogate(i, output, pos);
+      if (get_fanout_gate(i) == NULL) {
+	set_fanout_gate(i, output, pos);
 	break;
       }
     }
     if (i >= no) {
-      fputs("init_fogate: ERROR!\n", stderr);
+      fputs("init_fanout_gate: ERROR!\n", stderr);
       exit(1);
     }
   }
@@ -186,7 +186,7 @@ gate_t::get_pi_id() const
 {
   return -1;
 }
-  
+
 bool
 gate_t::is_f_site() const
 {
@@ -214,7 +214,7 @@ gate_t::get_name() const
 tTgGateType
 gate_t::get_gtype() const
 {
-  return node->type();
+  return node->gate_type();
 }
 
 void
@@ -247,7 +247,7 @@ PI_gate_t::dump(FILE* fp) const
 tTgGateType
 C0_gate_t::get_gtype() const
 {
-  return kTgConst0;
+  return kTgGateConst0;
 }
 
 void
@@ -261,7 +261,7 @@ C0_gate_t::dump(FILE* fp) const
 tTgGateType
 C1_gate_t::get_gtype() const
 {
-  return kTgConst1;
+  return kTgGateConst1;
 }
 
 void
@@ -275,7 +275,7 @@ C1_gate_t::dump(FILE* fp) const
 tTgGateType
 BUF_gate_t::get_gtype() const
 {
-  return kTgBuff;
+  return kTgGateBuff;
 }
 
 void
@@ -283,7 +283,7 @@ BUF_gate_t::dump(FILE* fp) const
 {
   fputs(get_name(), fp);
   fputs(" = BUF(", fp);
-  fputs(get_figate(0)->get_name(), fp);
+  fputs(get_fanin_gate(0)->get_name(), fp);
   fputs(")\n", fp);
 }
 
@@ -291,7 +291,7 @@ BUF_gate_t::dump(FILE* fp) const
 tTgGateType
 NOT_gate_t::get_gtype() const
 {
-  return kTgNot;
+  return kTgGateNot;
 }
 
 void
@@ -299,7 +299,7 @@ NOT_gate_t::dump(FILE* fp) const
 {
   fputs(get_name(), fp);
   fputs(" = NOT(", fp);
-  fputs(get_figate(0)->get_name(), fp);
+  fputs(get_fanin_gate(0)->get_name(), fp);
   fputs(")\n", fp);
 }
 
@@ -331,7 +331,7 @@ SIMPLE_gate_t::get_no_val() const
 tTgGateType
 AND_gate_t::get_gtype() const
 {
-  return kTgAnd;
+  return kTgGateAnd;
 }
 
 void
@@ -341,11 +341,11 @@ AND_gate_t::dump(FILE* fp) const
   fputs(" = AND(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -355,7 +355,7 @@ AND_gate_t::dump(FILE* fp) const
 tTgGateType
 NAND_gate_t::get_gtype() const
 {
-  return kTgNand;
+  return kTgGateNand;
 }
 
 void
@@ -365,11 +365,11 @@ NAND_gate_t::dump(FILE* fp) const
   fputs(" = NAND(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -379,7 +379,7 @@ NAND_gate_t::dump(FILE* fp) const
 tTgGateType
 OR_gate_t::get_gtype() const
 {
-  return kTgOr;
+  return kTgGateOr;
 }
 
 void
@@ -389,11 +389,11 @@ OR_gate_t::dump(FILE* fp) const
   fputs(" = OR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -403,7 +403,7 @@ OR_gate_t::dump(FILE* fp) const
 tTgGateType
 NOR_gate_t::get_gtype() const
 {
-  return kTgNor;
+  return kTgGateNor;
 }
 
 void
@@ -413,11 +413,11 @@ NOR_gate_t::dump(FILE* fp) const
   fputs(" = NOR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -427,7 +427,7 @@ NOR_gate_t::dump(FILE* fp) const
 tTgGateType
 XOR_gate_t::get_gtype() const
 {
-  return kTgXor;
+  return kTgGateXor;
 }
 
 void
@@ -437,11 +437,11 @@ XOR_gate_t::dump(FILE* fp) const
   fputs(" = XOR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);
@@ -451,7 +451,7 @@ XOR_gate_t::dump(FILE* fp) const
 tTgGateType
 XNOR_gate_t::get_gtype() const
 {
-  return kTgXnor;
+  return kTgGateXnor;
 }
 
 void
@@ -461,11 +461,11 @@ XNOR_gate_t::dump(FILE* fp) const
   fputs(" = XNOR(", fp);
   for ( int i = 0; i < ni; i ++) {
     if (i > 0) fputs(", ", fp);
-    if (get_figate(i)->get_name()) {
-      fputs(get_figate(i)->get_name(), fp);
+    if (get_fanin_gate(i)->get_name()) {
+      fputs(get_fanin_gate(i)->get_name(), fp);
     }
     else {
-      get_figate(i)->dump(fp);
+      get_fanin_gate(i)->dump(fp);
     }
   }
   fputs(")\n", fp);

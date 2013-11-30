@@ -39,6 +39,8 @@ void prompt();
 
 %}
 
+
+// トークンの定義
 %token NUMBER
 %token TRUE
 %token FALSE
@@ -83,13 +85,13 @@ list
 line
 : expr SEMI
 {
-  $1.display(cout);
+  $1.print(cout);
   prompt();
 }
 | ID { lname = cur_text; } EQ expr SEMI
 {
   id_table[lname] = $4;
-  $4.display(cout);
+  $4.print(cout);
   cout << " is stored in " << lname << endl;
   prompt();
 }
@@ -116,7 +118,7 @@ expr
 }
 | NUMBER
 {
-  tVarId id = cur_num;
+  VarId id(cur_num);
   $$ = mgr.make_posiliteral(id);
 }
 | expr BAND expr

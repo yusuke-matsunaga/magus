@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_isop.cc
+/// @file bmm_isop.cc
 /// @brief ISOP を求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_isop.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -20,7 +18,7 @@ BEGIN_NONAMESPACE
 // cov を積和形論理式と見なして各キューブにリテラルを追加する
 LogExpr
 sop_litand(const LogExpr& cov,
-	   tVarId varid,
+	   VarId varid,
 	   tPol pol)
 {
   if ( cov.is_zero() ) {
@@ -40,9 +38,9 @@ sop_litand(const LogExpr& cov,
   }
 
   // あとはカバーの場合のみ
-  size_t n = cov.child_num();
+  ymuint n = cov.child_num();
   LogExpr ans = LogExpr::make_zero();
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     LogExpr child = cov.child(i);
     ans |= child & lit;
   }
@@ -112,7 +110,7 @@ BddMgrModern::minimal_support(BddEdge l,
   if ( result.is_error() ) {
     BddEdge l0, l1;
     BddEdge u0, u1;
-    Var* var = split(l, u, l0, l1, u0, u1);
+    ymuint level = split(l, u, l0, l1, u0, u1);
 
     // level を含む場合の極小サポート
     BddEdge r_dep = minimal_support(l0, u0);
@@ -124,7 +122,7 @@ BddMgrModern::minimal_support(BddEdge l,
     // level を含まない場合の極小サポート
     BddEdge r_indep = minimal_support(or_op(l0, l1), and_op(u0, u1));
 
-    result = new_node(var, r_indep, r_dep);
+    result = new_node(level, r_indep, r_dep);
     mMinsupTable->put(l, u, result);
   }
   return result;
@@ -154,20 +152,20 @@ BddMgrModern::isop_step(BddEdge l,
     // 見つからなかった．
     BddEdge l_0, l_1;
     BddEdge u_0, u_1;
-    Var* var = split(l, u, l_0, l_1, u_0, u_1);
-    BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    tVarId varid = var->varid();
+    ymuint level = split(l, u, l_0, l_1, u_0, u_1);
+    BddEdge var_edge = new_node(level, BddEdge::make_zero(), BddEdge::make_one());
+    VarId vid = varid(level);
     BddEdge z_0 = and_op(l_0, ~u_1);
     LogExpr p_0;
     BddEdge c_0 = isop_step(z_0, u_0, p_0);
     BddEdge cc_0 = and_op(c_0, ~var_edge);
-    p_0 = sop_litand(p_0, varid, kPolNega);
+    p_0 = sop_litand(p_0, vid, kPolNega);
 
     BddEdge z_1 = and_op(l_1, ~u_0);
     LogExpr p_1;
     BddEdge c_1 = isop_step(z_1, u_1, p_1);
     BddEdge cc_1 = and_op(c_1, var_edge);
-    p_1 = sop_litand(p_1, varid, kPolPosi);
+    p_1 = sop_litand(p_1, vid, kPolPosi);
 
     BddEdge h_01 = and_op(l_0, ~c_0);
     BddEdge h_02 = and_op(l_1, ~c_1);
@@ -208,23 +206,23 @@ BddMgrModern::pc_step(BddEdge l,
     // 見つからなかった．
     BddEdge l_0, l_1;
     BddEdge u_0, u_1;
-    Var* var = split(l, u, l_0, l_1, u_0, u_1);
-    BddEdge var_edge = new_node(var, BddEdge::make_zero(), BddEdge::make_one());
-    tVarId varid = var->varid();
+    ymuint level = split(l, u, l_0, l_1, u_0, u_1);
+    BddEdge var_edge = new_node(level, BddEdge::make_zero(), BddEdge::make_one());
+    VarId vid = varid(level);
 
     // \bar{x} を含む prime implicants の生成
     BddEdge z_0 = and_op(l_0, ~u_1);
     LogExpr p_0;
     BddEdge c_0 = pc_step(z_0, u_0, p_0);
     BddEdge cc_0 = and_op(c_0, ~var_edge);
-    p_0 = sop_litand(p_0, varid, kPolNega);
+    p_0 = sop_litand(p_0, vid, kPolNega);
 
     // x を含む prime implicatns の生成
     BddEdge z_1 = and_op(l_1, ~u_0);
     LogExpr p_1;
     BddEdge c_1 = pc_step(z_1, u_1, p_1);
     BddEdge cc_1 = and_op(c_1, var_edge);
-    p_1 = sop_litand(p_1, varid, kPolPosi);
+    p_1 = sop_litand(p_1, vid, kPolPosi);
 
     // x/\bar{x} を含まない prime implicants の生成
     BddEdge h_01 = and_op(l_0, ~c_0);

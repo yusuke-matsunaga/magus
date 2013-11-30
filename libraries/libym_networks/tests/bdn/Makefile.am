@@ -21,6 +21,7 @@ distclean-local:
 LIBYM_NET = \
 	../../libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 bin_PROGRAMS = \

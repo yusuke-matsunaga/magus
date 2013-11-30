@@ -51,16 +51,16 @@ makebdd(const string& filename)
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = bddmgr.make_posiliteral(id);
+      Bdd bdd = bddmgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }
 
-    vector<BdnNode*> node_list;
+    vector<const BdnNode*> node_list;
     network.sort(node_list);
     ymuint node_num = node_list.size();
     id = 0;
-    for (vector<BdnNode*>::const_iterator p = node_list.begin();
+    for (vector<const BdnNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       const BdnNode* node = *p;
       cout << id << " / " << node_num;

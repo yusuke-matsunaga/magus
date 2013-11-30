@@ -24,7 +24,6 @@ nodist_EXTRA_libym_verilog_la_SOURCES = dummy.cc
 libym_verilog_la_LIBADD = \
 	common/libym_vl_common.la \
 	parser/libym_vl_parser.la \
-	elaborator/libym_vl_elab.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la
+	elaborator/libym_vl_elab.la
 
 libym_verilog_la_LDFLAGS =

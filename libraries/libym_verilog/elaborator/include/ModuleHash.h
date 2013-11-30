@@ -28,7 +28,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のオブジェクト
-  ModuleHash(AllocBase& alloc);
+  ModuleHash(Alloc& alloc);
 
   /// @brief デストラクタ
   ~ModuleHash();
@@ -103,7 +103,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Cell の確保用アロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // ハッシュ表のサイズ
   ymuint32 mSize;

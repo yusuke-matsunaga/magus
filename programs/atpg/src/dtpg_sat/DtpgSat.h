@@ -15,6 +15,7 @@
 #include "dtpgsat_nsdef.h"
 #include "ym_networks/tgnet.h"
 #include "ym_networks/TgNode.h"
+#include "ym_logic/VarId.h"
 #include "ym_logic/SatStats.h"
 
 
@@ -50,7 +51,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
-  /// @param[in] network 対称の回路
+  /// @param[in] network 対象の回路
   /// @param[in] f 対象の故障
   /// @param[out] tv 生成したパタンを入れるベクタ
   /// @retval kDetect パタン生成が成功した．
@@ -60,6 +61,44 @@ public:
   run(const TgNetwork& network,
       SaFault* f,
       TestVector* tv);
+
+  /// @brief 一つの故障に対してテストパタン生成を行なう．
+  /// @param[in] network 対象の回路
+  /// @param[in] fnode 故障ノード
+  /// @param[in] is_input_fault 入力の故障の時 true
+  /// @param[in] ipos 故障の入力位置
+  /// @param[in] fsrc 故障ノードの入力
+  /// @param[in] fval 故障値
+  /// @param[in] tv 生成したパタンを入れるベクタ
+  /// @retval kDetect パタン生成が成功した．
+  /// @retval kUntest テスト不能故障だった．
+  /// @retval kAbort アボートした．
+  tStat
+  dtpg_single(const TgNetwork& network,
+	      const TgNode* fnode,
+	      bool is_input_fault,
+	      ymuint ipos,
+	      const TgNode* fsrc,
+	      int fval,
+	      TestVector* tv);
+
+  /// @brief 同じ位置の2つの故障に対してテストパタン生成を行なう．
+  /// @param[in] network 対象の回路
+  /// @param[in] fnode 故障ノード
+  /// @param[in] is_input_fault 入力の故障の時 true
+  /// @param[in] ipos 故障の入力位置
+  /// @param[in] fsrc 故障ノードの入力
+  /// @param[in] tv 生成したパタンを入れるベクタ
+  /// @retval kDetect パタン生成が成功した．
+  /// @retval kUntest テスト不能故障だった．
+  /// @retval kAbort アボートした．
+  pair<tStat, tStat>
+  dtpg_dual(const TgNetwork& network,
+	    const TgNode* fnode,
+	    bool is_input_fault,
+	    ymuint ipos,
+	    const TgNode* fsrc,
+	    TestVector* tv[]);
 
   /// @brief 直前の実行結果を得る．
   const SatStats&
@@ -75,6 +114,15 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 同じ位置の故障に対する CNF を作る．
+  void
+  make_cnf(SatSolver& solver,
+	   const TgNetwork& network,
+	   const TgNode* fnode,
+	   bool is_input_fault,
+	   ymuint ipos,
+	   const TgNode* fsrc);
+
   enum Mark {
     kNone,
     kTFO,
@@ -86,15 +134,15 @@ private:
   mark(const TgNode* node);
 
   /// @brief 正常回路の変数番号を得る．
-  ymuint
+  VarId
   gvar(const TgNode* node);
 
   /// @brief 故障回路の変数番号を得る．
-  ymuint
+  VarId
   fvar(const TgNode* node);
 
   /// @brief 故障差の変数番号を得る．
-  ymuint
+  VarId
   dvar(const TgNode* node);
 
 
@@ -109,13 +157,13 @@ private:
     Mark mMark;
 
     // 正常回路の変数番号
-    ymuint mGid;
+    VarId mGid;
 
     // 故障回路の変数番号
-    ymuint mFid;
+    VarId mFid;
 
     // 故障差の変数番号
-    ymuint mDid;
+    VarId mDid;
   };
 
 
@@ -145,7 +193,7 @@ DtpgSat::mark(const TgNode* node)
 
 // @brief 正常回路の変数番号を得る．
 inline
-ymuint
+VarId
 DtpgSat::gvar(const TgNode* node)
 {
   Var& var = mVarMap[node->gid()];
@@ -155,7 +203,7 @@ DtpgSat::gvar(const TgNode* node)
 
 // @brief 故障回路の変数番号を得る．
 inline
-ymuint
+VarId
 DtpgSat::fvar(const TgNode* node)
 {
   Var& var = mVarMap[node->gid()];
@@ -165,7 +213,7 @@ DtpgSat::fvar(const TgNode* node)
 
 // @brief 故障差の変数番号を得る．
 inline
-ymuint
+VarId
 DtpgSat::dvar(const TgNode* node)
 {
   Var& var = mVarMap[node->gid()];

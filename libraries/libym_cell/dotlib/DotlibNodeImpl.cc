@@ -8,6 +8,7 @@
 
 
 #include "DotlibNodeImpl.h"
+#include "DotlibAttr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -55,8 +56,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DotlibNodeImpl::DotlibNodeImpl() :
-  mNext(NULL)
+DotlibNodeImpl::DotlibNodeImpl()
 {
 }
 
@@ -86,6 +86,13 @@ DotlibNodeImpl::is_string() const
   return false;
 }
 
+// @brief ベクタ型(kVector)の時に true を返す．
+bool
+DotlibNodeImpl::is_vector() const
+{
+  return false;
+}
+
 // @brief 演算子型(kPlus, kMinsu, kMult, kDiv)の時に true を返す．
 bool
 DotlibNodeImpl::is_opr() const
@@ -107,18 +114,13 @@ DotlibNodeImpl::is_group() const
   return false;
 }
 
-// @brief 属性型(kAttr)の時に true を返す．
-bool
-DotlibNodeImpl::is_attr() const
-{
-  return false;
-}
-
 // @brief 整数値を返す．
 // @note is_int() = true の時のみ意味を持つ．
 int
 DotlibNodeImpl::int_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0;
 }
@@ -128,6 +130,8 @@ DotlibNodeImpl::int_value() const
 double
 DotlibNodeImpl::float_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0.0;
 }
@@ -137,8 +141,44 @@ DotlibNodeImpl::float_value() const
 ShString
 DotlibNodeImpl::string_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return ShString();
+}
+
+// @brief ベクタの要素数を返す．
+// @note is_vector() = true の時のみ意味を持つ．
+ymuint
+DotlibNodeImpl::vector_size() const
+{
+  dump(cout);
+  cout << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief ベクタの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+// @note is_vector() = true の時のみ意味を持つ．
+double
+DotlibNodeImpl::vector_elem(ymuint pos) const
+{
+  dump(cout);
+  cout << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return 0.0;
+}
+
+// @brief ベクタの全体を取り出す．
+// @param[out] vector 結果を格納する変数
+// @note is_vector() = true の時のみ意味を持つ．
+void
+DotlibNodeImpl::get_vector(vector<double>& vector) const
+{
+  dump(cout);
+  cout << endl;
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 // @brief 第一オペランドを返す．
@@ -146,6 +186,8 @@ DotlibNodeImpl::string_value() const
 const DotlibNode*
 DotlibNodeImpl::opr1() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -155,15 +197,8 @@ DotlibNodeImpl::opr1() const
 const DotlibNode*
 DotlibNodeImpl::opr2() const
 {
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
-// @brief リストの先頭の要素を返す．
-// @note is_list() = true の時のみ意味を持つ．
-const DotlibNode*
-DotlibNodeImpl::top() const
-{
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
@@ -173,8 +208,22 @@ DotlibNodeImpl::top() const
 ymuint
 DotlibNodeImpl::list_size() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return 0;
+}
+
+// @brief リストの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+// @note is_list() == true の時のみ意味を持つ．
+const DotlibNode*
+DotlibNodeImpl::list_elem(ymuint pos) const
+{
+  dump(cout);
+  cout << endl;
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
 }
 
 // @brief グループの値を得る．
@@ -182,42 +231,21 @@ DotlibNodeImpl::list_size() const
 const DotlibNode*
 DotlibNodeImpl::group_value() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
 }
 
 // @brief 先頭の属性を得る．
 // @note is_group() = true の時のみ意味を持つ．
-const DotlibNode*
+const DotlibAttr*
 DotlibNodeImpl::attr_top() const
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
   return NULL;
-}
-
-// @brief 属性名を得る．
-// @note is_attr() = true の時のみ意味を持つ．
-ShString
-DotlibNodeImpl::attr_name() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return ShString();
-}
-
-// @brief 属性の値を得る．
-// @note is_attr() = true の時のみ意味を持つ．
-const DotlibNode*
-DotlibNodeImpl::attr_value() const
-{
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
-}
-
-// @brief 次の要素を得る．
-const DotlibNode*
-DotlibNodeImpl::next() const
-{
-  return mNext;
 }
 
 // @brief 要素を追加する．
@@ -226,6 +254,8 @@ DotlibNodeImpl::next() const
 void
 DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
 }
 
@@ -233,8 +263,10 @@ DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-DotlibNodeImpl::add_attr(DotlibNodeImpl* attr)
+DotlibNodeImpl::add_attr(DotlibAttr* attr)
 {
+  dump(cout);
+  cout << endl;
   assert_not_reached(__FILE__, __LINE__);
 }
 
@@ -435,6 +467,89 @@ DotlibString::dump(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス DotlibVector
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] value_list 値のリスト
+// @param[in] loc ファイル上の位置
+DotlibVector::DotlibVector(const vector<double>& value_list,
+			   const FileRegion& loc) :
+  DotlibNodeBase(loc),
+  mNum(value_list.size())
+{
+  for (ymuint i = 0; i < mNum; ++ i) {
+    mBody[i] = value_list[i];
+  }
+}
+
+// @brief デストラクタ
+DotlibVector::~DotlibVector()
+{
+}
+
+// @brief 型を得る．
+DotlibNode::tType
+DotlibVector::type() const
+{
+  return kVector;
+}
+
+// @brief ベクタ型(kVector)の時に true を返す．
+bool
+DotlibVector::is_vector() const
+{
+  return true;
+}
+
+// @brief ベクタの要素数を返す．
+// @note is_vector() = true の時のみ意味を持つ．
+ymuint
+DotlibVector::vector_size() const
+{
+  return mNum;
+}
+
+// @brief ベクタの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < vector_size() )
+// @note is_vector() = true の時のみ意味を持つ．
+double
+DotlibVector::vector_elem(ymuint pos) const
+{
+  return mBody[pos];
+}
+
+// @brief ベクタの全体を取り出す．
+// @param[out] vector 結果を格納する変数
+// @note is_vector() = true の時のみ意味を持つ．
+void
+DotlibVector::get_vector(vector<double>& vector) const
+{
+  vector.clear();
+  vector.resize(mNum);
+  for (ymuint i = 0; i < mNum; ++ i) {
+    vector[i] = mBody[i];
+  }
+}
+
+// @brief 内容をストリーム出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] indent インデント量
+void
+DotlibVector::dump(ostream& s,
+		   ymuint indent) const
+{
+  const char* comma = "";
+  s << "(";
+  for (ymuint i = 0; i < mNum; ++ i) {
+    s << comma << mBody[i];
+    comma = ", ";
+  }
+  s << ")";
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス DotlibNot
 //////////////////////////////////////////////////////////////////////
 
@@ -582,9 +697,7 @@ DotlibOpr::dump(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-DotlibList::DotlibList() :
-  mTop(NULL),
-  mTail(NULL)
+DotlibList::DotlibList()
 {
 }
 
@@ -611,18 +724,10 @@ DotlibList::is_list() const
 FileRegion
 DotlibList::loc() const
 {
-  if ( mTop == NULL ) {
+  if ( mBody.empty() ) {
     return FileRegion();
   }
-  return FileRegion(mTop->loc(), mTail->loc());
-}
-
-// @brief リストの先頭の要素を返す．
-// @note type() が kList の時のみ意味をもつ．
-const DotlibNode*
-DotlibList::top() const
-{
-  return mTop;
+  return FileRegion(mBody.front()->loc(), mBody.back()->loc());
 }
 
 // @brief リストの要素数を返す．
@@ -630,11 +735,16 @@ DotlibList::top() const
 ymuint
 DotlibList::list_size() const
 {
-  ymuint n = 0;
-  for (const DotlibNode* v = top(); v; v = v->next()) {
-    ++ n;
-  }
-  return n;
+  return mBody.size();
+}
+
+// @brief リストの要素を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < list_size() )
+// @note is_list() == true の時のみ意味を持つ．
+const DotlibNode*
+DotlibList::list_elem(ymuint pos) const
+{
+  return mBody[pos];
 }
 
 // @brief 内容をストリーム出力する．
@@ -646,7 +756,9 @@ DotlibList::dump(ostream& s,
 {
   s << "(";
   const char* comma = "";
-  for (const DotlibNode* v = top(); v; v = v->next()) {
+  for (vector<const DotlibNodeImpl*>::const_iterator p = mBody.begin();
+       p != mBody.end(); ++ p) {
+    const DotlibNodeImpl* v = *p;
     s << comma;
     v->dump(s, 0);
     comma = ", ";
@@ -660,13 +772,7 @@ DotlibList::dump(ostream& s,
 void
 DotlibList::add_node(DotlibNodeImpl* node)
 {
-  if ( mTop != NULL ) {
-    mTail->mNext = node;
-    mTail = node;
-  }
-  else {
-    mTop = mTail = node;
-  }
+  mBody.push_back(node);
 }
 
 
@@ -715,7 +821,7 @@ DotlibGroup::group_value() const
 
 // @brief 先頭の属性を得る．
 // @note type() が kGroup の時のみ意味を持つ．
-const DotlibNode*
+const DotlibAttr*
 DotlibGroup::attr_top() const
 {
   return mAttrTop;
@@ -731,8 +837,8 @@ DotlibGroup::dump(ostream& s,
   s << ' ';
   group_value()->dump(s, 0);
   s << " {" << endl;
-  for (const DotlibNode* node = attr_top(); node; node = node->next()) {
-    node->dump(s, indent + 2);
+  for (const DotlibAttr* attr = attr_top(); attr; attr = attr->next()) {
+    attr->dump(s, indent + 2);
   }
   s << indent_str(indent) << "}";
 }
@@ -741,7 +847,7 @@ DotlibGroup::dump(ostream& s,
 // @param[in] attr 属性
 // @note type() が kGroup の時のみ意味を持つ．
 void
-DotlibGroup::add_attr(DotlibNodeImpl* attr)
+DotlibGroup::add_attr(DotlibAttr* attr)
 {
   if ( mAttrTop != NULL ) {
     mAttrTail->mNext = attr;
@@ -750,72 +856,6 @@ DotlibGroup::add_attr(DotlibNodeImpl* attr)
   else {
     mAttrTop = mAttrTail = attr;
   }
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス DotlibAttr
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] attr_name 属性名
-// @param[in] value 値
-// @param[in] loc ファイル上の位置
-DotlibAttr::DotlibAttr(const ShString& attr_name,
-		       const DotlibNode* value,
-		       const FileRegion& loc) :
-  DotlibNodeBase(loc),
-  mAttrName(attr_name),
-  mValue(value)
-{
-}
-
-// @brief デストラクタ
-DotlibAttr::~DotlibAttr()
-{
-}
-
-// @brief 型を得る．
-DotlibNode::tType
-DotlibAttr::type() const
-{
-  return kAttr;
-}
-
-// @brief 属性型(kAttr)の時に true を返す．
-bool
-DotlibAttr::is_attr() const
-{
-  return true;
-}
-
-// @brief 属性名を得る．
-ShString
-DotlibAttr::attr_name() const
-{
-  return mAttrName;
-}
-
-// @brief 属性の値を得る．
-const DotlibNode*
-DotlibAttr::attr_value() const
-{
-  return mValue;
-}
-
-// @brief 内容をストリーム出力する．
-// @param[in] s 出力先のストリーム
-// @param[in] indent インデント量
-void
-DotlibAttr::dump(ostream& s,
-		 ymuint indent) const
-{
-  s << indent_str(indent) << attr_name() << ": ";
-  attr_value()->dump(s, indent);
-  if ( attr_value()->type() != kGroup ) {
-    s << ";";
-  }
-  s << endl;
 }
 
 END_NAMESPACE_YM_DOTLIB

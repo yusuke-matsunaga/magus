@@ -10,6 +10,7 @@
 
 
 #include "ym_cec/cec_nsdef.h"
+#include "ym_logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -64,8 +65,8 @@ public:
   node() const;
 
   /// @brief ノードの通し番号を得る．
-  ymuint
-  var_id() const;
+  VarId
+  varid() const;
 
   /// @brief 極性を得る．
   /// @return 反転しているとき true を返す．

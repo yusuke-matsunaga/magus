@@ -16,7 +16,6 @@
 #endif
 
 #include "ym_utils/random.h"
-#include "ym_utils/Generator.h"
 #include "ym_logic/TvFunc.h"
 
 #include "TvFuncTest.h"
@@ -30,13 +29,13 @@ bool verbose = false;
 BEGIN_NAMESPACE_YM
 
 void
-check(size_t ni,
+check(ymuint ni,
       const vector<int>& vect,
-      size_t nc)
+      ymuint nc)
 {
   TvFuncTest test(cout);
 
-  size_t ni_pow = 1UL << ni;
+  ymuint ni_pow = 1UL << ni;
 
   for ( ; ; ) {
     test.check_base(ni, vect);
@@ -53,14 +52,17 @@ check(size_t ni,
     test.check_walsh_0(func);
     if ( test.nerr() ) break;
 
-    for (size_t i = 0; i < ni; ++ i) {
-      test.check_walsh_1(func, i);
+    for (ymuint i = 0; i < ni; ++ i) {
+      VarId var(i);
+      test.check_walsh_1(func, var);
     }
     if ( test.nerr() ) break;
 
-    for (size_t i = 0; i < ni; ++ i) {
-      for (size_t j = 0; j < ni; ++ j) {
-	test.check_walsh_2(func, i, j);
+    for (ymuint i = 0; i < ni; ++ i) {
+      VarId var1(i);
+      for (ymuint j = 0; j < ni; ++ j) {
+	VarId var2(j);
+	test.check_walsh_2(func, var1, var2);
       }
     }
     if ( test.nerr() ) break;
@@ -71,73 +73,77 @@ check(size_t ni,
     test.check_walsh_012(func);
     if ( test.nerr() ) break;
 
-    for (size_t i = 0; i < ni; ++ i) {
-      test.check_check_sup(func, i);
+    for (ymuint i = 0; i < ni; ++ i) {
+      VarId var(i);
+      test.check_check_sup(func, var);
     }
     if ( test.nerr() ) break;
 
-    for (size_t i = 0; i < ni; ++ i) {
-      for (size_t j = 0; j < ni; ++ j) {
-	test.check_check_sym(func, i, j);
+    for (ymuint i = 0; i < ni; ++ i) {
+      VarId var1(i);
+      for (ymuint j = 0; j < ni; ++ j) {
+	VarId var2(j);
+	test.check_check_sym(func, var1, var2);
       }
     }
     if ( test.nerr() ) break;
 
     if ( nc == 0 ) {
-      for (size_t ibits = 0; ibits < ni_pow; ++ ibits) {
+      for (ymuint ibits = 0; ibits < ni_pow; ++ ibits) {
 	test.check_walsh_w0(func, ibits);
       }
     }
     else {
-      size_t ibits0 = (1 << ni) - 1;
+      ymuint ibits0 = (1 << ni) - 1;
 
       // 全ての 0 のパタン
       test.check_walsh_w0(func, 0);
       // 全ての 1 のパタン
       test.check_walsh_w0(func, ibits0);
       // 2つだけ 1 のパタン (1つだけの場合も含む)
-      for (size_t i = 0; i < ni; ++ i) {
-	size_t ibits1 = 1 << i;
-	for (size_t j = 0; j < ni; ++ j) {
-	  size_t ibits = ibits1 | (1 << j);
+      for (ymuint i = 0; i < ni; ++ i) {
+	ymuint ibits1 = 1 << i;
+	for (ymuint j = 0; j < ni; ++ j) {
+	  ymuint ibits = ibits1 | (1 << j);
 	  test.check_walsh_w0(func, ibits);
 	  test.check_walsh_w0(func, ibits ^ ibits0);
 	}
       }
 
-      for (size_t i = 0; i < nc; ++ i) {
-	size_t ibits = random_num() & ((1 << ni) - 1);
+      for (ymuint i = 0; i < nc; ++ i) {
+	ymuint ibits = random_num() & ((1 << ni) - 1);
 	test.check_walsh_w0(func, ibits);
       }
     }
     if ( test.nerr() ) break;
 
-    for (size_t i = 0; i < ni; ++ i) {
+    for (ymuint i = 0; i < ni; ++ i) {
+      VarId var(i);
       if ( nc == 0 ) {
-	for (size_t ibits = 0; ibits < ni_pow; ++ ibits) {
-	  test.check_walsh_w1(func, i, ibits);
+	for (ymuint ibits = 0; ibits < ni_pow; ++ ibits) {
+	  test.check_walsh_w1(func, var, ibits);
 	}
       }
       else {
-	size_t ibits0 = (1 << ni) - 1;
+	ymuint ibits0 = (1 << ni) - 1;
 
 	// 全ての 0 のパタン
-	test.check_walsh_w1(func, i, 0);
+	test.check_walsh_w1(func, var, 0);
 	// 全ての 1 のパタン
-	test.check_walsh_w1(func, i, ibits0);
+	test.check_walsh_w1(func, var, ibits0);
 	// 2つだけ 1 のパタン (1つだけの場合も含む)
-	for (size_t j = 0; j < ni; ++ j) {
-	  size_t ibits1 = 1 << j;
-	  for (size_t k = 0; k < ni; ++ k) {
-	    size_t ibits = ibits1 | (1 << k);
-	    test.check_walsh_w1(func, i, ibits);
-	    test.check_walsh_w1(func, i, ibits ^ ibits0);
+	for (ymuint j = 0; j < ni; ++ j) {
+	  ymuint ibits1 = 1 << j;
+	  for (ymuint k = 0; k < ni; ++ k) {
+	    ymuint ibits = ibits1 | (1 << k);
+	    test.check_walsh_w1(func, var, ibits);
+	    test.check_walsh_w1(func, var, ibits ^ ibits0);
 	  }
 	}
 
-	for (size_t j = 0; j < nc; ++ j) {
-	  size_t ibits = random_num() & ((1 << ni) - 1);
-	  test.check_walsh_w1(func, i, ibits);
+	for (ymuint j = 0; j < nc; ++ j) {
+	  ymuint ibits = random_num() & ((1 << ni) - 1);
+	  test.check_walsh_w1(func, var, ibits);
 	}
       }
     }
@@ -150,19 +156,19 @@ check(size_t ni,
 END_NAMESPACE_YM
 
 void
-gen(size_t ni,
-    size_t limit)
+gen(ymuint ni,
+    ymuint limit)
 {
-  size_t ni_exp = 1 << ni;
+  ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
-  for (size_t i = 0; i < ni_exp; ++ i) {
+  for (ymuint i = 0; i < ni_exp; ++ i) {
     buff[i] = 0;
   }
-  size_t frontier = 0;
+  ymuint frontier = 0;
   for ( ; ; ) {
     if ( verbose ) {
       if ( buff[frontier] ) {
-	for (size_t i = 0; i < ni_exp; ++ i) {
+	for (ymuint i = 0; i < ni_exp; ++ i) {
 	  cout << buff[i];
 	}
 	cout << endl;
@@ -175,7 +181,7 @@ gen(size_t ni,
     check(ni, buff, 0);
 
     bool carry = false;
-    for (size_t i = 0; i < ni_exp; ++ i) {
+    for (ymuint i = 0; i < ni_exp; ++ i) {
       if ( buff[i] == 0 ) {
 	buff[i] = 1;
 	break;
@@ -195,18 +201,18 @@ gen(size_t ni,
 }
 
 void
-rgen(size_t ni,
-     size_t num,
-     size_t num2)
+rgen(ymuint ni,
+     ymuint num,
+     ymuint num2)
 {
-  size_t ni_exp = 1 << ni;
+  ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
-  for (size_t k = 0; k < num; ++ k) {
-    for (size_t i = 0; i < ni_exp; ++ i) {
+  for (ymuint k = 0; k < num; ++ k) {
+    for (ymuint i = 0; i < ni_exp; ++ i) {
       buff[i] = random_num() & 1;
     }
     if ( verbose ) {
-      for (size_t i = 0; i < ni_exp; ++ i) {
+      for (ymuint i = 0; i < ni_exp; ++ i) {
 	cout << buff[i];
       }
       cout << endl;
@@ -236,7 +242,7 @@ main(int argc,
   int ni = 4;
   int rnum = 10000;
   int rseed = 0;
-  size_t bnum = 10;
+  ymuint bnum = 10;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {

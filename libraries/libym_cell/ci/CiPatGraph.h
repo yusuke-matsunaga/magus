@@ -11,7 +11,8 @@
 
 #include "ym_cell/CellPatGraph.h"
 #include "ym_utils/Alloc.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -78,14 +79,14 @@ public:
   /// @brief バイナリダンプを行う．
   /// @param[in] bos 出力先のストリーム
   void
-  dump(BinO& bos) const;
+  dump(ODO& bos) const;
 
   /// @brief バイナリファイルを読み込む．
   /// @param[in] bis 入力元のストリーム
   /// @param[in] alloc メモリアロケータ
   void
-  restore(BinI& bis,
-	  AllocBase& alloc);
+  restore(IDO& bis,
+	  Alloc& alloc);
 
 
 public:
@@ -102,7 +103,7 @@ public:
   init(ymuint rep_id,
        ymuint input_num,
        ymuint edge_num,
-       AllocBase& alloc);
+       Alloc& alloc);
 
   /// @brief 枝のデータを設定する．
   /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
@@ -122,7 +123,7 @@ private:
   /// @param[in] alloc メモリアロケータ
   /// @note mEdgeNum に値が設定されているものとする．
   void
-  alloc_array(AllocBase& alloc);
+  alloc_array(Alloc& alloc);
 
 
 private:

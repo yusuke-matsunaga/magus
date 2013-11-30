@@ -48,10 +48,10 @@ public:
   // 機能情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 属している CellClass を返す．
+  /// @brief 代表クラスを返す．
   virtual
   const CellClass*
-  cell_class() const = 0;
+  rep_class() const = 0;
 
   /// @brief 代表クラスに対する変換マップを返す．
   virtual

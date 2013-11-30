@@ -13,26 +13,157 @@
 BEGIN_NAMESPACE_YM_SMTLIBV2
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtLibNodeBase
+// クラス SmtLibNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
-SmtLibNodeBase::SmtLibNodeBase(const FileRegion& loc) :
-  mLoc(loc)
+// @param[in] id ID番号
+SmtLibNode::SmtLibNode(const FileRegion& loc,
+		       ymuint id) :
+  mLoc(loc),
+  mId(id),
+  mSibling(NULL)
 {
 }
 
 // @brief デストラクタ
-SmtLibNodeBase::~SmtLibNodeBase()
+SmtLibNode::~SmtLibNode()
 {
 }
 
-// @brief ファイル上の位置を返す．
-FileRegion
-SmtLibNodeBase::loc() const
+// @brief 終端型の場合の値を返す．
+ShString
+SmtLibNode::str_value() const
 {
-  return mLoc;
+  assert_not_reached(__FILE__, __LINE__);
+  return ShString();
+}
+
+// @brief NUM型の場合の整数値を返す．
+ymint32
+SmtLibNode::int_value() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief LIST型の場合の子供のノードの要素数を返す．
+ymuint
+SmtLibNode::child_num() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return 0;
+}
+
+// @brief LIST型の場合の子供の先頭のノードを返す．
+const SmtLibNode*
+SmtLibNode::child() const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
+
+BEGIN_NONAMESPACE
+
+// 字下げ用の空白を出力する．
+void
+print_space(ostream& s,
+	    ymuint ident_level)
+{
+  for (ymuint i = 0; i < ident_level; ++ i) {
+    s << "  ";
+  }
+}
+
+END_NONAMESPACE
+
+// @relates SmtLibNode
+// @brief SmbLitNode の内容を出力する(デバッグ用)．
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+// @param[in] ident_level 字下げのレベル
+// @param[in] print_loc ファイル位置の情報を出力するとき true にするフラグ
+void
+display(ostream& s,
+	const SmtLibNode* node,
+	ymuint ident_level,
+	bool print_loc)
+{
+  if ( print_loc ) {
+    print_space(s, ident_level);
+    s << "Loc:  " << node->loc() << endl;
+  }
+  const char* type_str = NULL;
+  switch ( node->type() ) {
+  case kNumToken:     type_str = "Numeral"; break;
+  case kDecToken:     type_str = "Decimal"; break;
+  case kHexToken:     type_str = "Hexadecimal"; break;
+  case kBinToken:     type_str = "Binary"; break;
+  case kStringToken:  type_str = "String"; break;
+  case kSymbolToken:  type_str = "Symbol"; break;
+  case kKeywordToken: type_str = "Keyword"; break;
+  case kListToken:    type_str = "List"; break;
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+  }
+  print_space(s, ident_level);
+  s << "Type: " << type_str << endl;
+  if ( node->type() == kListToken ) {
+    ymuint ident_level1 = ident_level + 1;
+    ymuint n = node->child_num();
+    const SmtLibNode* child = node->child();
+    for (ymuint i = 0; i < n; ++ i, child = child->sibling()) {
+      print_space(s, ident_level1);
+      s << "Child#" << i << endl;
+      display(s, child, ident_level1, print_loc);
+    }
+  }
+  else if ( node->type() == kNumToken ) {
+    print_space(s, ident_level);
+    s << "Value: " << node->int_value() << endl;
+  }
+  else {
+    print_space(s, ident_level);
+    s << "Value: " << node->str_value() << endl;
+  }
+}
+
+// @relates SmtLibNode
+// @brief SmtLibNode の内容をもとの形で出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+void
+print(ostream& s,
+      const SmtLibNode* node)
+{
+  for ( ; node != NULL; node = node->sibling()) {
+    s << " ";
+    switch ( node->type() ) {
+    case kNumToken:
+      s << node->int_value();
+      break;
+
+    case kDecToken:
+    case kHexToken:
+    case kBinToken:
+    case kStringToken:
+    case kSymbolToken:
+    case kKeywordToken:
+      s << node->str_value();
+      break;
+
+    case kListToken:
+      s << "(";
+      print(s, node->child());
+      s << " )";
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
 }
 
 
@@ -42,10 +173,12 @@ SmtLibNodeBase::loc() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibTerminalNode::SmtLibTerminalNode(const FileRegion& loc,
-				       StrId val) :
-  SmtLibNodeBase(loc),
+				       ymuint id,
+				       const ShString& val) :
+  SmtLibNode(loc, id),
   mVal(val)
 {
 }
@@ -56,25 +189,10 @@ SmtLibTerminalNode::~SmtLibTerminalNode()
 }
 
 // @brief 終端型の場合の値を返す．
-const char*
-SmtLibTerminalNode::value() const
+ShString
+SmtLibTerminalNode::str_value() const
 {
   return mVal;
-}
-
-// @brief LIST型の場合の子供のノードの要素数を返す．
-ymuint
-SmtLibTerminalNode::child_num() const
-{
-  return 0;
-}
-
-// @brief LIST型の場合の子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
-const SmtLibNode*
-SmtLibTerminalNode::child(ymuint pos) const
-{
-  return NULL;
 }
 
 
@@ -84,10 +202,13 @@ SmtLibTerminalNode::child(ymuint pos) const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibNumNode::SmtLibNumNode(const FileRegion& loc,
-			     StrId val) :
-  SmtLibTerminalNode(loc, val)
+			     ymuint id,
+			     ymint32 val) :
+  SmtLibNode(loc, id),
+  mValue(val)
 {
 }
 
@@ -103,6 +224,13 @@ SmtLibNumNode::type() const
   return kNumToken;
 }
 
+// @brief NUM型の場合の整数値を返す．
+ymint32
+SmtLibNumNode::int_value() const
+{
+  return mValue;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス SmtLibDecNode
@@ -110,10 +238,12 @@ SmtLibNumNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibDecNode::SmtLibDecNode(const FileRegion& loc,
-			     StrId val) :
-  SmtLibTerminalNode(loc, val)
+			     ymuint id,
+			     const ShString& val) :
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -136,10 +266,12 @@ SmtLibDecNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibHexNode::SmtLibHexNode(const FileRegion& loc,
-			     StrId val) :
-  SmtLibTerminalNode(loc, val)
+			     ymuint id,
+			     const ShString& val) :
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -162,10 +294,12 @@ SmtLibHexNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibBinNode::SmtLibBinNode(const FileRegion& loc,
-			     StrId val) :
-  SmtLibTerminalNode(loc, val)
+			     ymuint id,
+			     const ShString& val) :
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -183,26 +317,28 @@ SmtLibBinNode::type() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmtLibStringNode
+// クラス SmtLibStrNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
-SmtLibStringNode::SmtLibStringNode(const FileRegion& loc,
-				   StrId val) :
-  SmtLibTerminalNode(loc, val)
+SmtLibStrNode::SmtLibStrNode(const FileRegion& loc,
+			     ymuint id,
+			     const ShString& val) :
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
 // @brief デストラクタ
-SmtLibStringNode::~SmtLibStringNode()
+SmtLibStrNode::~SmtLibStrNode()
 {
 }
 
 // @brief 型を返す．
 tTokenType
-SmtLibStringNode::type() const
+SmtLibStrNode::type() const
 {
   return kStringToken;
 }
@@ -214,10 +350,12 @@ SmtLibStringNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibSymbolNode::SmtLibSymbolNode(const FileRegion& loc,
-				   StrId val) :
-  SmtLibTerminalNode(loc, val)
+				   ymuint id,
+				   const ShString& val) :
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -240,10 +378,12 @@ SmtLibSymbolNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
+// @param[in] id ID番号
 // @param[in] val 値
 SmtLibKeywordNode::SmtLibKeywordNode(const FileRegion& loc,
-				     StrId val) :
-  SmtLibTerminalNode(loc, val)
+				     ymuint id,
+				     const ShString& val) :
+  SmtLibTerminalNode(loc, id, val)
 {
 }
 
@@ -266,10 +406,14 @@ SmtLibKeywordNode::type() const
 
 // @brief コンストラクタ
 // @param[in] loc ファイル上の位置
-SmtLibListNode::SmtLibListNode(const FileRegion& loc) :
-  SmtLibNodeBase(loc),
-  mChildNum(0),
-  mChildArray(NULL)
+// @param[in] id ID番号
+SmtLibListNode::SmtLibListNode(const FileRegion& loc,
+			       ymuint id,
+			       ymuint num,
+			       const SmtLibNode* child) :
+  SmtLibNode(loc, id),
+  mChildNum(num),
+  mChild(child)
 {
 }
 
@@ -285,13 +429,6 @@ SmtLibListNode::type() const
   return kListToken;
 }
 
-// @brief 終端型の場合の値を返す．
-const char*
-SmtLibListNode::value() const
-{
-  return NULL;
-}
-
 // @brief LIST型の場合の子供のノードの要素数を返す．
 ymuint
 SmtLibListNode::child_num() const
@@ -300,11 +437,10 @@ SmtLibListNode::child_num() const
 }
 
 // @brief LIST型の場合の子供のノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < child_num() )
 const SmtLibNode*
-SmtLibListNode::child(ymuint pos) const
+SmtLibListNode::child() const
 {
-  return mChildArray[pos];
+  return mChild;
 }
 
 END_NAMESPACE_YM_SMTLIBV2

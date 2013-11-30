@@ -3,15 +3,16 @@
 /// @brief BlifNetworkHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BlifNetworkHandler.h"
-#include "BlifNetwork.h"
+#include "BlifNetworkImpl.h"
+#include "ym_networks/BlifNode.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 BlifNetworkHandler::BlifNetworkHandler() :
@@ -24,13 +25,11 @@ BlifNetworkHandler::~BlifNetworkHandler()
 {
 }
 
-// @brief 読み込む対象のネットワークとセルライブラリを設定する．
+// @brief 読み込む対象のネットワークを設定する．
 void
-BlifNetworkHandler::set(BlifNetwork* network,
-			const CellLibrary* cell_library)
+BlifNetworkHandler::set(BlifNetworkImpl* network)
 {
   mNetwork = network;
-  mCellLibrary = cell_library;
 }
 
 // @brief 初期化
@@ -38,6 +37,7 @@ bool
 BlifNetworkHandler::init()
 {
   mNetwork->clear();
+
   return true;
 }
 
@@ -49,7 +49,8 @@ BlifNetworkHandler::model(const FileRegion& loc1,
 			  const FileRegion& loc2,
 			  const char* name)
 {
-  mNetwork->mName = name;
+  mNetwork->set_model(name);
+
   return true;
 }
 
@@ -59,10 +60,8 @@ BlifNetworkHandler::model(const FileRegion& loc1,
 bool
 BlifNetworkHandler::inputs_elem(ymuint32 name_id)
 {
-  BlifNode* node = mNetwork->get_node(name_id);
-  if ( !mNetwork->set_input_type(node) ) {
-    return false;
-  }
+  mNetwork->new_input(name_id, id2str(name_id));
+
   return true;
 }
 
@@ -72,61 +71,64 @@ BlifNetworkHandler::inputs_elem(ymuint32 name_id)
 bool
 BlifNetworkHandler::outputs_elem(ymuint32 name_id)
 {
-  BlifNode* node = mNetwork->get_node(name_id);
-  mNetwork->mPOArray.push_back(node);
+  mNetwork->new_output(name_id);
+
   return true;
 }
 
 // @brief .names 文の処理
+// @param[in] onode_id ノード名のID番号
+// @param[in] inode_id_array ファンイン各のID番号の配列
+// @param[in] nc キューブ数
+// @param[in] cover_pat 入力カバーを表す文字列
+// @param[in] opat 出力の極性
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
+// @note cover_pat は ni 個ごとに1行のパタンを表す．
+// 各要素のとりうる値は '0', '1', '-' を表す．
+// @note opat は '0' か '1' のどちらか
 bool
-BlifNetworkHandler::names(const vector<ymuint32>& name_id_array,
+BlifNetworkHandler::names(ymuint32 onode_id,
+			  const vector<ymuint32>& inode_id_array,
 			  ymuint32 nc,
 			  const char* cover_pat,
 			  char opat)
 {
-  ymuint32 n = name_id_array.size();
-  ymuint32 ni = n - 1;
-  ymuint32 name_id = name_id_array[ni];
-  BlifNode* node = mNetwork->get_node(name_id);
-  if ( !mNetwork->set_logic_type(node, ni, nc, cover_pat, opat) ) {
-    return false;
-  }
-  for (size_t i = 0; i < ni; ++ i) {
-    ymuint32 id = name_id_array[i];
-    BlifNode* inode = mNetwork->get_node(id);
-    node->mFanins[i] = inode;
-  }
+  mNetwork->new_logic(onode_id, id2str(onode_id), inode_id_array, nc, cover_pat, opat);
 
   return true;
 }
 
 // @brief .gate 文の処理
-// @param[in] cell セル
 // @param[in] onode_id 出力ノードのID番号
+// @param[in] cell セル
 // @param[in] inode_id_array 入力ノードのID番号の配列
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-BlifNetworkHandler::gate(const Cell* cell,
-			 ymuint32 onode_id,
-			 const vector<ymuint32>& inode_id_array)
+BlifNetworkHandler::gate(ymuint32 onode_id,
+			 const vector<ymuint32>& inode_id_array,
+			 const Cell* cell)
 {
+  mNetwork->new_gate(onode_id, id2str(onode_id), inode_id_array, cell);
+
   return true;
 }
 
-// @brief .latch 文の読み込み
+// @brief .latch 文の処理
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id 入力ノードのID番号
+// @param[in] loc4 リセット値の位置情報
+// @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
 bool
-BlifNetworkHandler::latch(ymuint32 name1_id,
-			  ymuint32 name2_id,
+BlifNetworkHandler::latch(ymuint32 onode_id,
+			  ymuint32 inode_id,
 			  const FileRegion& loc4,
 			  char rval)
 {
-  BlifNode* node2 = mNetwork->get_node(name2_id);
-  if ( !mNetwork->set_latch_type(node2, rval) ) {
-    return false;
-  }
-  BlifNode* node1 = mNetwork->get_node(name1_id);
-  node2->mFanins[0] = node1;
+  mNetwork->new_latch(onode_id, id2str(onode_id), inode_id, rval);
 
   return true;
 }
@@ -136,13 +138,6 @@ BlifNetworkHandler::latch(ymuint32 name1_id,
 bool
 BlifNetworkHandler::end(const FileRegion& loc)
 {
-  // 各ノードの名前の領域を確保する．
-  ymuint32 n = mNetwork->max_node_id();
-  for (ymuint32 id = 0; id < n; ++ id) {
-    BlifNode* node = mNetwork->mNodeArray[id];
-    if ( node == NULL ) continue;
-    mNetwork->set_node_name(node, id2str(id));
-  }
   return true;
 }
 
@@ -159,4 +154,4 @@ BlifNetworkHandler::error_exit()
   mNetwork->clear();
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

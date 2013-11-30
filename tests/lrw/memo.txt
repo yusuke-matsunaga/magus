@@ -1,0 +1,22 @@
+		abc: rwtUtil.c のリバースエンジニアリング
+
+- rwtUtil.c で定義されているデータ構造
+
+  - statuc unsigned short s_RwtAigSubgraphs[];
+    - 16 bit のデータ2組で一つのデータを表す．
+      Entry0 と Entry1 で表す．
+
+      - Entry0 == 0 && Entry1 == 0 が end mark
+      - Entry0 の 0 bit は XOR フラグ
+      - Entry0 >> 2 が左の子供の番号を表す．
+      - Entry1 >> 1 が右の子供の番号を表す．
+      - Entry0 の 1 bit が左の子供への反転属性を表す．
+      - Entry1 の 0 bit が右の子供への反転属性を表す．
+
+    - ただし，この配列のデータの前に，
+      - 定数0
+      - リテラル関数 0 - 3
+      の5つのノードがある．
+
+  - static unsigned short s_RwtPracticalClasses[];
+    - 対象の関数をベクタの形で表したもの．

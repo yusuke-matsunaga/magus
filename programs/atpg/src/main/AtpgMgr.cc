@@ -31,7 +31,7 @@ AtpgMgr::AtpgMgr() :
   mFsim = new Fsim();
   mFsim3 = new Fsim3();
   mFsimX = new FsimX();
-  
+
   bind_module(mFsim);
   bind_module(mFsim3);
   bind_module(mFsimX);
@@ -53,14 +53,14 @@ AtpgMgr::after_set_network()
   TgNetwork& network = _network();
   TvMgr& tv_mgr = _tv_mgr();
   FaultMgr& fmgr = _fault_mgr();
-  
+
   fmgr.clear();
-  
+
   tv_mgr.clear();
 
-  size_t ni = network.input_num2();
+  ymuint ni = network.input_num2();
   tv_mgr.init(ni);
-  
+
   for (list<ModBase*>::iterator p = mModList.begin();
        p != mModList.end(); ++ p) {
     ModBase* mod = *p;
@@ -73,7 +73,7 @@ void
 AtpgMgr::after_update_faults()
 {
   const vector<SaFault*>& flist = _fault_mgr().remain_list();
-  
+
   for (list<ModBase*>::iterator p = mModList.begin();
        p != mModList.end(); ++ p) {
     ModBase* mod = *p;

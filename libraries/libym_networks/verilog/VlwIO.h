@@ -14,26 +14,6 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS
 
-#if 0
-//////////////////////////////////////////////////////////////////////
-/// @class VlwIO VlwIO.h "VlwIO.h"
-/// @brief VlwInput/VlwOutput に共通の基底クラス
-//////////////////////////////////////////////////////////////////////
-class VlwIO :
-  public VlwBase
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] writer 出力用オブジェクト
-  VlwIO(VlWriter& writer);
-
-  /// @brief デストラクタ
-  ~VlwIO();
-
-};
-#endif
-
 //////////////////////////////////////////////////////////////////////
 /// @class VlwInput VlwIO.h "VlwIO.h"
 /// @brief 入力宣言のためのクラス
@@ -46,6 +26,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] writer 出力用オブジェクト
   VlwInput(VlWriter& writer);
+
+  /// @brief コンストラクタ
+  /// @param[in] writer 出力用オブジェクト
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  VlwInput(VlWriter& writer,
+	   int msb,
+	   int lsb);
 
   /// @brief デストラクタ
   ~VlwInput();
@@ -66,6 +54,14 @@ public:
   /// @param[in] writer 出力用オブジェクト
   VlwOutput(VlWriter& writer);
 
+  /// @brief コンストラクタ
+  /// @param[in] writer 出力用オブジェクト
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  VlwOutput(VlWriter& writer,
+	    int msb,
+	    int lsb);
+
   /// @brief デストラクタ
   ~VlwOutput();
 
@@ -84,6 +80,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] writer 出力用オブジェクト
   VlwInout(VlWriter& writer);
+
+  /// @brief コンストラクタ
+  /// @param[in] writer 出力用オブジェクト
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  VlwInout(VlWriter& writer,
+	   int msb,
+	   int lsb);
 
   /// @brief デストラクタ
   ~VlwInout();
@@ -104,6 +108,14 @@ public:
   /// @param[in] writer 出力用オブジェクト
   VlwWire(VlWriter& writer);
 
+  /// @brief コンストラクタ
+  /// @param[in] writer 出力用オブジェクト
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  VlwWire(VlWriter& writer,
+	  int msb,
+	  int lsb);
+
   /// @brief デストラクタ
   ~VlwWire();
 
@@ -122,6 +134,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] writer 出力用オブジェクト
   VlwReg(VlWriter& writer);
+
+  /// @brief コンストラクタ
+  /// @param[in] writer 出力用オブジェクト
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  VlwReg(VlWriter& writer,
+	 int msb,
+	 int lsb);
 
   /// @brief デストラクタ
   ~VlwReg();

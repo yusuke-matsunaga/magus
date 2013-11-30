@@ -4,18 +4,18 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/ei
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_vl_common.la
+
+libym_vl_common_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/parser/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog/elaborator/ei
 
 libym_vl_common_la_SOURCES = \
 	BitVector.cc \

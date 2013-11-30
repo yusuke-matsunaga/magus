@@ -2,7 +2,7 @@
 /// @file src/base/FaultMgr.cc
 /// @brief FaultMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: FaultMgr.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2009 Yusuke Matsunaga
@@ -78,7 +78,7 @@ ord_ffr(const TgNode* node,
 {
   if ( !check_fos(node) && !node->is_input() ) {
     node_list.push_back(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       ord_ffr(node->fanin(i), node_list);
     }
@@ -95,11 +95,11 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
   clear();
 
   mNetwork = &network;
-  
+
   ymuint ni = network.input_num2();
   ymuint nl = network.logic_num();
   ymuint nn = network.node_num();
-  
+
   mFnodeArray.resize(network.node_num());
 
   // 全部の故障を生成する．
@@ -108,7 +108,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     Fnode& fnode = mFnodeArray[i];
     fnode.mOfault[0] = new_fault(node, true, 0, 0);
     fnode.mOfault[1] = new_fault(node, true, 0, 1);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     void* p = mIfaultsAlloc.get_memory(sizeof(SaFault*) * ni * 2);
     fnode.mIfaults = new (p) SaFault*[ni * 2];
     for (ymuint j = 0; j < ni; ++ j) {
@@ -116,7 +116,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
       fnode.mIfaults[j * 2 + 1] = new_fault(node, false, j, 1);
     }
   }
-  
+
   // 代表故障を記録していく．
 #if 0
   // トポロジカル順
@@ -134,7 +134,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     }
     list<const TgNode*> node_list;
     node_list.push_back(node);
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       ord_ffr(node->fanin(j), node_list);
     }
@@ -145,7 +145,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     }
   }
 #endif
-  
+
   for (ymuint i = 0; i < ni; ++ i) {
     const TgNode* node = network.input(i);
     SaFault* rep0 = NULL;
@@ -161,7 +161,7 @@ FaultMgr::set_ssa_fault(const TgNetwork& network)
     add_ofault(node, 1, rep1);
   }
 }
-  
+
 // @brief node に関する故障を登録する．
 void
 FaultMgr::reg_faults(const TgNode* node)
@@ -177,66 +177,60 @@ FaultMgr::reg_faults(const TgNode* node)
   }
   SaFault* f0 = add_ofault(node, 0, rep0);
   SaFault* f1 = add_ofault(node, 1, rep1);
-  
-  tTgGateType type = node->type();
-  ymuint ni = node->ni();
+
+  tTgGateType type = node->gate_type();
+  ymuint ni = node->fanin_num();
   switch ( type ) {
-  case kTgUndef:
-  case kTgInput:
-  case kTgOutput:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-    
-  case kTgBuff:
+  case kTgGateBuff:
     add_ifault(node, 0, 0, f0);
     add_ifault(node, 0, 1, f1);
     break;
-    
-  case kTgNot:
+
+  case kTgGateNot:
     add_ifault(node, 0, 0, f1);
     add_ifault(node, 0, 1, f0);
     break;
-    
-  case kTgXor:
+
+  case kTgGateXor:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0);
       add_ifault(node, j, 1);
     }
     break;
-    
-  case kTgAnd:
+
+  case kTgGateAnd:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0, f0);
       add_ifault(node, j, 1);
     }
     break;
-    
-  case kTgNand:
+
+  case kTgGateNand:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0, f1);
       add_ifault(node, j, 1);
     }
     break;
-    
-  case kTgOr:
+
+  case kTgGateOr:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0);
       add_ifault(node, j, 1, f1);
     }
     break;
-    
-  case kTgNor:
+
+  case kTgGateNor:
     for (ymuint j = 0; j < ni; ++ j) {
       add_ifault(node, j, 0);
       add_ifault(node, j, 1, f0);
     }
     break;
-    
-  default:
+
+  case kTgGateCplx:
     {
-      LogExpr ofunc = mNetwork->get_lexp(node);
+      LogExpr ofunc = mNetwork->get_lexp(node->func_id());
       for (ymuint j = 0; j < ni; ++ j) {
-	LogExpr tmp = ofunc.compose(j, LogExpr::make_zero());
+	LogExpr tmp = ofunc.compose(VarId(j), LogExpr::make_zero());
 	SaFault* rep = NULL;
 	if ( tmp.is_zero() ) {
 	  rep = f0;
@@ -245,7 +239,7 @@ FaultMgr::reg_faults(const TgNode* node)
 	  rep = f1;
 	}
 	add_ifault(node, j, 0, rep);
-	tmp = ofunc.compose(j, LogExpr::make_one());
+	tmp = ofunc.compose(VarId(j), LogExpr::make_one());
 	rep = NULL;
 	if ( tmp.is_zero() ) {
 	  rep = f0;
@@ -257,9 +251,13 @@ FaultMgr::reg_faults(const TgNode* node)
       }
     }
     break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
 }
-  
+
 // @brief 故障を生成する．
 // @param[in] node 対象のノード
 // @param[in] is_output 出力の故障のときに true とするフラグ
@@ -322,7 +320,7 @@ FaultMgr::add_fault(const TgNode* node,
 
   if ( rep ) {
     f->mFinfo = rep->mFinfo;
-    
+
   }
   else {
     void* p = mFinfoAlloc.get_memory(sizeof(Finfo));
@@ -331,10 +329,10 @@ FaultMgr::add_fault(const TgNode* node,
     mRemainList.push_back(f);
   }
   f->mFinfo->mEqFaults.push_back(f);
-  
+
   return f;
 }
-  
+
 // @brief fault の状態を変更する．
 void
 FaultMgr::set_status(SaFault* fault,
@@ -365,7 +363,7 @@ FaultMgr::update()
       case kFsDetected:
 	mDetList.push_back(f);
 	break;
-	
+
       case kFsUntestable:
 	mUntestList.push_back(f);
 	break;

@@ -3,6 +3,7 @@
 ## $Id: Makefile.am 33 2006-07-16 14:58:17Z matsunaga $
 
 SUBDIRS = \
+	include \
 	base \
 	bmc \
 	bmm \

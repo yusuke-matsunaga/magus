@@ -216,14 +216,14 @@ SatDimacsHandler::read_clause(const FileRegion& loc,
   for (vector<int>::const_iterator p = lits.begin();
        p != lits.end(); ++ p) {
     int i = *p;
-    tVarId vid;
+    VarId vid;
     tPol pol;
     if ( i > 0 ) {
-      vid = static_cast<tVarId>(i - 1);
+      vid = VarId(i - 1);
       pol = kPolPosi;
     }
     else {
-      vid = static_cast<tVarId>(- i - 1);
+      vid = VarId(- i - 1);
       pol = kPolNega;
     }
     tmp.push_back(Literal(vid, pol));
