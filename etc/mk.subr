@@ -219,6 +219,36 @@ set_program() {
     # ログファイル
     MK_LOG=$BASEDIR/mk.log
     cat /dev/null > $MK_LOG
+
+    # サブモジュールのディレクトリ名
+    SUBMODULE='libraries/libym_utils
+               libraries/libym_logic
+	       libraries/libym_smtlibv2
+	       libraries/libym_mincov
+	       libraries/libym_cell
+	       libraries/libym_verilog
+	       libraries/libym_networks
+	       libraries/libym_gds
+	       libraries/libym_cec
+	       libraries/libym_techmap
+	       libraries/libym_gbm
+	       libraries/libym_seal
+	       libraries/libym_tclpp
+	       libraries/libym_ymsh
+
+	       programs/magus_tclsh
+	       programs/led
+	       programs/satpg
+	       programs/seal
+	       programs/igf
+	       programs/llvmeq
+	       programs/bnet2aig
+	       programs/enumcut
+	       programs/genaig
+	       programs/imp
+	       programs/lrw
+	       programs/lsim
+	       programs/makebdd'
 }
 
 

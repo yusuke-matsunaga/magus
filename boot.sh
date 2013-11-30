@@ -16,19 +16,6 @@
 #   automake, autoconf などを使って configure スクリプトおよび Makefile.in
 #   を生成する．
 #
-# ./boot autogen <build-dir> <install-dir> <compile-mode>
-#   configure スクリプトを実行するための autogen スクリプトを生成する．
-#   <build-dir> は実際にコンパイルを行うディレクトリ
-#   <install-dir> はインストール先の根本のディレクトリ
-#                  (その下に bin, include, lib が作られる)
-#   <compile-mode> opt|debug
-#
-# ./boot clean
-#   生成されたファイルを削除してチェックアウトした直後の状態に戻す
-#
-# ./boot debug
-#   使用するツールのバージョンを出力する
-#
 # [環境変数]
 #
 # AUTOCONF
@@ -107,8 +94,6 @@ BASEDIR=`cd $basedir; pwd`
 # プログラム名の設定
 set_program
 
-# サブモジュールのディレクトリ名
-SUBMODULE=`cat $BASEDIR/etc/modules`
 
 # 第1引数に応じた処理を行う．
  case $# in
