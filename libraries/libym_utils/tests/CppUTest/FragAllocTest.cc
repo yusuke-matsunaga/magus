@@ -14,7 +14,7 @@
 
 using namespace nsYm;
 
-TEST_GROUP(FragAllocTestGroup)
+TEST_GROUP(libym_utils_FragAllocTestGroup)
 {
   FragAlloc* mAlloc;
 
@@ -30,12 +30,12 @@ TEST_GROUP(FragAllocTestGroup)
 };
 
 // setup(), teardown() でメモリリークが発生していないことを確認するためのテスト
-TEST(FragAllocTestGroup, empty)
+TEST(libym_utils_FragAllocTestGroup, empty)
 {
 }
 
 // メモリ領域の確保のテスト
-TEST(FragAllocTestGroup, simple_alloc)
+TEST(libym_utils_FragAllocTestGroup, simple_alloc)
 {
   void* p = mAlloc->get_memory(16);
 
@@ -45,7 +45,7 @@ TEST(FragAllocTestGroup, simple_alloc)
 }
 
 // ちゃんと解放したメモリが再利用できるかのテスト
-TEST(FragAllocTestGroup, simple_alloc2)
+TEST(libym_utils_FragAllocTestGroup, simple_alloc2)
 {
   const ymuint SIZE1 = 1001;
   const ymuint SIZE2 = 1024;

@@ -14,7 +14,7 @@
 using namespace nsYm;
 
 
-TEST_GROUP(CombiGenTestGroup)
+TEST_GROUP(libym_utils_CombiGenTestGroup)
 {
   ymuint* exp_data;
 
@@ -45,12 +45,12 @@ TEST_GROUP(CombiGenTestGroup)
 };
 
 // setup(), teardown() で問題が起きないことをチェックするためのテスト
-TEST(CombiGenTestGroup, empty)
+TEST(libym_utils_CombiGenTestGroup, empty)
 {
 }
 
 // 組み合わせ列挙のテスト
-TEST(CombiGenTestGroup, combigen)
+TEST(libym_utils_CombiGenTestGroup, combigen)
 {
   CombiGen cg(5, 3);
 
@@ -76,7 +76,7 @@ TEST(CombiGenTestGroup, combigen)
 }
 
 // コピーコンストラクタのテスト1
-TEST(CombiGenTestGroup, copy1)
+TEST(libym_utils_CombiGenTestGroup, copy1)
 {
   CombiGen cg(5, 3);
 
@@ -95,7 +95,7 @@ TEST(CombiGenTestGroup, copy1)
 }
 
 // コピーコンストラクタのテスト2
-TEST(CombiGenTestGroup, copy2)
+TEST(libym_utils_CombiGenTestGroup, copy2)
 {
   CombiGen cg(5, 3);
 
@@ -118,7 +118,7 @@ TEST(CombiGenTestGroup, copy2)
 }
 
 // 代入演算子のテスト1
-TEST(CombiGenTestGroup, assign1)
+TEST(libym_utils_CombiGenTestGroup, assign1)
 {
   CombiGen cg(5, 3);
 
@@ -138,7 +138,7 @@ TEST(CombiGenTestGroup, assign1)
 }
 
 // 代入演算子のテスト2
-TEST(CombiGenTestGroup, assign2)
+TEST(libym_utils_CombiGenTestGroup, assign2)
 {
   CombiGen cg(5, 3);
 

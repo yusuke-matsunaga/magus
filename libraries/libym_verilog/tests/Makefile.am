@@ -4,7 +4,7 @@
 
 SUBDIRS = . \
 	vltest \
-	$(YM_EXTRA_TESTS_SUBDIRS)
+	$(YM_TESTS_SUBDIRS)
 
 YFLAGS=-d -v
 

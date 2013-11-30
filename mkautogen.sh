@@ -117,5 +117,6 @@ EOF
 
 # update スクリプトのコピー
 cp etc/update $builddir/update
+cp etc/autogen.common $builddir/autogen.common
 
 # end of mkautogen

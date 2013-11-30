@@ -177,6 +177,12 @@ public:
   LogExpr
   make_xor(const LogExprList& chd_list);
 
+  /// @brief 確保していたメモリを開放する．
+  /// @note メモリリークチェックのための関数なので通常は使用しない．
+  static
+  void
+  clear_memory();
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 

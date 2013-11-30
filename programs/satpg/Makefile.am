@@ -4,6 +4,8 @@
 
 SUBDIRS = \
 	old \
+	old_matpg \
+	old_atpg \
 	include \
 	src \
 	tclsrc

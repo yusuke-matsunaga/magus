@@ -74,17 +74,7 @@ AC_TYPE_SIZE_T
 # Check for QT
 # It's a kind of magic!
 # ===================================================================
-AC_ARG_ENABLE([qt],
-[  --enable-qt    Turn on QT],
-[case "${enableval}" in
- yes) qt=true ;;
- no)  qt=false ;;
- *) AC_MSG_ERROR([bad value ${enableval} for --enable-qt]) ;;
- esac],[qt=false])
-AM_CONDITIONAL([WITH_QT], [test x$qt = xtrue])
-if test x$qt = xtrue; then
-  AT_WITH_QT
-fi
+YM_CHECK_QT([ym_have_qt=yes], [ym_have_qt=no])
 
 
 # ===================================================================
@@ -110,16 +100,16 @@ YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
-YM_INIT_EXTRA_TESTS_SUBDIRS
+YM_INIT_TESTS_SUBDIRS
 
-if test x$qt = xtrue; then
-   YM_ADD_EXTRA_TESTS_SUBDIRS([qt])
+if test $ym_have_qt = yes; then
+   YM_ADD_TESTS_SUBDIRS([qt])
    AC_CONFIG_FILES([tests/qt/Makefile])
    AC_CONFIG_FILES([tests/qt/ptview/Makefile])
    AC_CONFIG_FILES([tests/qt/vlview/Makefile])
 fi
 
-YM_FINISH_EXTRA_TESTS_SUBDIRS
+YM_FINISH_TESTS_SUBDIRS
 
 
 # ===================================================================

@@ -13,7 +13,7 @@
 
 using namespace nsYm;
 
-TEST_GROUP(FileTestGroup)
+TEST_GROUP(libym_utils_FileTestGroup)
 {
   TEST_SETUP() {
   }
@@ -59,12 +59,12 @@ TEST_GROUP(FileTestGroup)
 };
 
 // setup(), teardown() のみで問題が起きないことのテスト
-TEST(FileTestGroup, empty)
+TEST(libym_utils_FileTestGroup, empty)
 {
 }
 
 // 空の PathName のテスト
-TEST(FileTestGroup, pathname_empty)
+TEST(libym_utils_FileTestGroup, pathname_empty)
 {
   PathName path_name;
 
@@ -79,7 +79,7 @@ TEST(FileTestGroup, pathname_empty)
 }
 
 // 絶対パス指定のテスト1
-TEST(FileTestGroup, pathname_abs1)
+TEST(libym_utils_FileTestGroup, pathname_abs1)
 {
   PathName path_name("/0123/456.");
 
@@ -94,7 +94,7 @@ TEST(FileTestGroup, pathname_abs1)
 }
 
 // 絶対パス指定のテスト2
-TEST(FileTestGroup, pathname_abs2)
+TEST(libym_utils_FileTestGroup, pathname_abs2)
 {
   PathName path_name("/xyz/0123/abcd.yyx");
 
@@ -109,7 +109,7 @@ TEST(FileTestGroup, pathname_abs2)
 }
 
 // 絶対パス指定のテスト3
-TEST(FileTestGroup, pathname_abs3)
+TEST(libym_utils_FileTestGroup, pathname_abs3)
 {
   PathName path_name("/abc/.xxx");
 
@@ -124,7 +124,7 @@ TEST(FileTestGroup, pathname_abs3)
 }
 
 // 相対パス指定のテスト4
-TEST(FileTestGroup, pathname_abs4)
+TEST(libym_utils_FileTestGroup, pathname_abs4)
 {
   PathName path_name("abcde");
 

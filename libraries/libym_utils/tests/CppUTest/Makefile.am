@@ -28,6 +28,10 @@ bin_PROGRAMS =
 noinst_PROGRAMS = \
 	run_all_test
 
+noinst_LTLIBRARIES = \
+	libym_utils_cpputest.la
+
+
 ############################################################
 ## run_all_test
 ############################################################
@@ -37,14 +41,29 @@ run_all_test_CPPFLAGS = \
 	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
+	main.cc \
+	ym_utils_CppUTest.h
+
+run_all_test_LDADD = \
+	libym_utils_cpputest.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+run_all_test_LDFLAGS = \
+	$(CPPUTEST_LIBS)
+
+
+############################################################
+## libym_utils_cpputest.la
+############################################################
+libym_utils_cpputest_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(CPPUTEST_INCLUDES)
+
+libym_utils_cpputest_la_SOURCES = \
 	SimpleAllocTest.cc \
 	FragAllocTest.cc \
 	UnitAllocTest.cc \
 	FileTest.cc \
 	CombiGenTest.cc \
-	PermGenTest.cc \
-	main.cc
-
-run_all_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
-	$(CPPUTEST_LIBS)
+	PermGenTest.cc

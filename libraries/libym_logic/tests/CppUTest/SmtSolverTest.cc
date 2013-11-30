@@ -20,7 +20,7 @@ using namespace nsYm;
 using namespace nsYm::nsSmt;
 
 
-TEST_GROUP(SmtSolverTestGroup)
+TEST_GROUP(libym_logic_SmtSolverTestGroup)
 {
   SmtSolver* mSolver;
 
@@ -218,12 +218,12 @@ TEST_GROUP(SmtSolverTestGroup)
 };
 
 // setup(), teardown() でメモリリークが発生していないことを確認するためのテスト
-TEST(SmtSolverTestGroup, empty)
+TEST(libym_logic_SmtSolverTestGroup, empty)
 {
 }
 
 // set_logic テスト
-TEST(SmtSolverTestGroup, set_logic)
+TEST(libym_logic_SmtSolverTestGroup, set_logic)
 {
   // 最初は成功するはず．
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_UF);
@@ -235,7 +235,7 @@ TEST(SmtSolverTestGroup, set_logic)
 }
 
 // make_sort テスト0
-TEST(SmtSolverTestGroup, make_sort0)
+TEST(libym_logic_SmtSolverTestGroup, make_sort0)
 {
   // set_logic() を呼ばないと失敗する．
 
@@ -245,7 +245,7 @@ TEST(SmtSolverTestGroup, make_sort0)
 }
 
 // make_sort テスト1
-TEST(SmtSolverTestGroup, make_sort1)
+TEST(libym_logic_SmtSolverTestGroup, make_sort1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -271,7 +271,7 @@ TEST(SmtSolverTestGroup, make_sort1)
 }
 
 // make_var テスト0
-TEST(SmtSolverTestGroup, make_var0)
+TEST(libym_logic_SmtSolverTestGroup, make_var0)
 {
   // set_logic() を呼ばないと失敗する．
 
@@ -280,7 +280,7 @@ TEST(SmtSolverTestGroup, make_var0)
 }
 
 // make_var テスト1
-TEST(SmtSolverTestGroup, make_var1)
+TEST(libym_logic_SmtSolverTestGroup, make_var1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -303,7 +303,7 @@ TEST(SmtSolverTestGroup, make_var1)
 }
 
 // make_fun テスト0
-TEST(SmtSolverTestGroup, make_fun0)
+TEST(libym_logic_SmtSolverTestGroup, make_fun0)
 {
   // set_logic() を呼ばないと失敗する．
 
@@ -312,7 +312,7 @@ TEST(SmtSolverTestGroup, make_fun0)
 }
 
 // make_fun テスト1
-TEST(SmtSolverTestGroup, make_fun1)
+TEST(libym_logic_SmtSolverTestGroup, make_fun1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -334,7 +334,7 @@ TEST(SmtSolverTestGroup, make_fun1)
 }
 
 // make_numeral_term テスト
-TEST(SmtSolverTestGroup, make_numeral_term)
+TEST(libym_logic_SmtSolverTestGroup, make_numeral_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -347,7 +347,7 @@ TEST(SmtSolverTestGroup, make_numeral_term)
 }
 
 // make_decimal_term テスト
-TEST(SmtSolverTestGroup, make_decimal_term)
+TEST(libym_logic_SmtSolverTestGroup, make_decimal_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -360,7 +360,7 @@ TEST(SmtSolverTestGroup, make_decimal_term)
 }
 
 // make_hexadecimal_term テスト
-TEST(SmtSolverTestGroup, make_hexadecimal_term)
+TEST(libym_logic_SmtSolverTestGroup, make_hexadecimal_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -373,7 +373,7 @@ TEST(SmtSolverTestGroup, make_hexadecimal_term)
 }
 
 // make_binary_term テスト
-TEST(SmtSolverTestGroup, make_binary_term)
+TEST(libym_logic_SmtSolverTestGroup, make_binary_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -386,7 +386,7 @@ TEST(SmtSolverTestGroup, make_binary_term)
 }
 
 // make_string_term テスト
-TEST(SmtSolverTestGroup, make_string_term)
+TEST(libym_logic_SmtSolverTestGroup, make_string_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -399,7 +399,7 @@ TEST(SmtSolverTestGroup, make_string_term)
 }
 
 // make_var_term テスト
-TEST(SmtSolverTestGroup, make_var_term)
+TEST(libym_logic_SmtSolverTestGroup, make_var_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -414,7 +414,7 @@ TEST(SmtSolverTestGroup, make_var_term)
 }
 
 // make_fun_term テスト1
-TEST(SmtSolverTestGroup, make_fun_term1)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term1)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -440,7 +440,7 @@ TEST(SmtSolverTestGroup, make_fun_term1)
 }
 
 // make_fun_term テスト2
-TEST(SmtSolverTestGroup, make_fun_term2)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term2)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -489,7 +489,7 @@ TEST(SmtSolverTestGroup, make_fun_term2)
 }
 
 // make_fun_term テスト (true)
-TEST(SmtSolverTestGroup, make_fun_term_true)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_true)
 {
   // true 関数
 
@@ -506,7 +506,7 @@ TEST(SmtSolverTestGroup, make_fun_term_true)
 }
 
 // make_fun_term テスト (false)
-TEST(SmtSolverTestGroup, make_fun_term_false)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_false)
 {
   // false 関数
 
@@ -523,7 +523,7 @@ TEST(SmtSolverTestGroup, make_fun_term_false)
 }
 
 // make_fun_term テスト (not)
-TEST(SmtSolverTestGroup, make_fun_term_not)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_not)
 {
   // not 関数
 
@@ -548,7 +548,7 @@ TEST(SmtSolverTestGroup, make_fun_term_not)
 }
 
 // make_fun_term テスト (uminus)
-TEST(SmtSolverTestGroup, make_fun_term_uminus)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_uminus)
 {
   // uminus 関数
 
@@ -573,7 +573,7 @@ TEST(SmtSolverTestGroup, make_fun_term_uminus)
 }
 
 // make_fun_term テスト (and)
-TEST(SmtSolverTestGroup, make_fun_term_and)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_and)
 {
   // and 関数
 
@@ -600,7 +600,7 @@ TEST(SmtSolverTestGroup, make_fun_term_and)
 }
 
 // make_fun_term テスト (or)
-TEST(SmtSolverTestGroup, make_fun_term_or)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_or)
 {
   // or 関数
 
@@ -627,7 +627,7 @@ TEST(SmtSolverTestGroup, make_fun_term_or)
 }
 
 // make_fun_term テスト (xor)
-TEST(SmtSolverTestGroup, make_fun_term_xor)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_xor)
 {
   // xor 関数
 
@@ -654,7 +654,7 @@ TEST(SmtSolverTestGroup, make_fun_term_xor)
 }
 
 // make_fun_term テスト (imp)
-TEST(SmtSolverTestGroup, make_fun_term_imp)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_imp)
 {
   // imp 関数
 
@@ -681,7 +681,7 @@ TEST(SmtSolverTestGroup, make_fun_term_imp)
 }
 
 // make_fun_term テスト (add)
-TEST(SmtSolverTestGroup, make_fun_term_add)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_add)
 {
   // add 関数
 
@@ -710,7 +710,7 @@ TEST(SmtSolverTestGroup, make_fun_term_add)
 }
 
 // make_fun_term テスト (sub)
-TEST(SmtSolverTestGroup, make_fun_term_sub)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_sub)
 {
   // sub 関数
 
@@ -739,7 +739,7 @@ TEST(SmtSolverTestGroup, make_fun_term_sub)
 }
 
 // make_fun_term テスト (mul)
-TEST(SmtSolverTestGroup, make_fun_term_mul)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_mul)
 {
   // mul 関数
 
@@ -768,7 +768,7 @@ TEST(SmtSolverTestGroup, make_fun_term_mul)
 }
 
 // make_fun_term テスト (div)
-TEST(SmtSolverTestGroup, make_fun_term_div)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_div)
 {
   // div 関数
 
@@ -796,7 +796,7 @@ TEST(SmtSolverTestGroup, make_fun_term_div)
 }
 
 // make_fun_term テスト (eq)
-TEST(SmtSolverTestGroup, make_fun_term_eq)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_eq)
 {
   // eq 関数
 
@@ -840,7 +840,7 @@ TEST(SmtSolverTestGroup, make_fun_term_eq)
 }
 
 // make_fun_term テスト (diseq)
-TEST(SmtSolverTestGroup, make_fun_term_diseq)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_diseq)
 {
   // diseq 関数
 
@@ -884,7 +884,7 @@ TEST(SmtSolverTestGroup, make_fun_term_diseq)
 }
 
 // make_fun_term テスト (lt)
-TEST(SmtSolverTestGroup, make_fun_term_lt)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_lt)
 {
   // lt 関数
 
@@ -926,7 +926,7 @@ TEST(SmtSolverTestGroup, make_fun_term_lt)
 }
 
 // make_fun_term テスト (le)
-TEST(SmtSolverTestGroup, make_fun_term_le)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_le)
 {
   // le 関数
 
@@ -968,7 +968,7 @@ TEST(SmtSolverTestGroup, make_fun_term_le)
 }
 
 // make_fun_term テスト (gt)
-TEST(SmtSolverTestGroup, make_fun_term_gt)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_gt)
 {
   // gt 関数
 
@@ -1010,7 +1010,7 @@ TEST(SmtSolverTestGroup, make_fun_term_gt)
 }
 
 // make_fun_term テスト (ge)
-TEST(SmtSolverTestGroup, make_fun_term_ge)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_ge)
 {
   // ge 関数
 
@@ -1052,7 +1052,7 @@ TEST(SmtSolverTestGroup, make_fun_term_ge)
 }
 
 // make_fun_term テスト (ite)
-TEST(SmtSolverTestGroup, make_fun_term_ite)
+TEST(libym_logic_SmtSolverTestGroup, make_fun_term_ite)
 {
   // ite 関数
 
@@ -1094,7 +1094,7 @@ TEST(SmtSolverTestGroup, make_fun_term_ite)
 }
 
 // make_forall_term テスト
-TEST(SmtSolverTestGroup, make_forall_term)
+TEST(libym_logic_SmtSolverTestGroup, make_forall_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );
@@ -1126,7 +1126,7 @@ TEST(SmtSolverTestGroup, make_forall_term)
 }
 
 // make_exists_term テスト
-TEST(SmtSolverTestGroup, make_exists_term)
+TEST(libym_logic_SmtSolverTestGroup, make_exists_term)
 {
   bool stat1 = mSolver->set_logic(kSmtLogic_QF_LIA);
   CHECK( stat1 );

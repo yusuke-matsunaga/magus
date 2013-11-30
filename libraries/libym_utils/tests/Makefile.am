@@ -4,7 +4,7 @@
 
 SUBDIRS = \
 	. \
-	$(YM_EXTRA_TESTS_SUBDIRS)
+	$(YM_TESTS_SUBDIRS)
 
 EXTRA_DIST = local_defs $(TESTS)
 
