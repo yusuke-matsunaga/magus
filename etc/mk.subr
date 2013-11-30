@@ -248,7 +248,8 @@ set_program() {
 	       programs/imp
 	       programs/lrw
 	       programs/lsim
-	       programs/makebdd'
+	       programs/makebdd
+	       programs/svm'
 }
 
 

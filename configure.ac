@@ -272,6 +272,12 @@ YM_BUILD_PROGRAM([makebdd], [no],
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
+# svm
+YM_BUILD_PROGRAM([svm], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_tclpp_enable])
+
 YM_FINISH_PROGRAMS_SUBDIRS
 
 
