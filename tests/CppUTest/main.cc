@@ -9,8 +9,13 @@
 
 #include "CppUTest/CommandLineTestRunner.h"
 
+#if HAVE_LIBYM_UTILS
 #include "CppUTest/ym_utils_CppUTest.h"
+#endif
+
+#if HAVE_LIBYM_UTILS
 #include "CppUTest/ym_logic_CppUTest.h"
+#endif
 
 
 int

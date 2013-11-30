@@ -117,6 +117,11 @@ fi
 #==================================================================
 AC_DEFUN([YM_BUILD_LIBRARY],
 [
+__YM_BUILD_LIBRARY([$1], [$2], [$3], m4_toupper($1))
+])
+
+AC_DEFUN([__YM_BUILD_LIBRARY],
+[
 AC_ARG_ENABLE([$1],
 	[AS_HELP_STRING([--enable-$1],
 	                [build $1 (default is $2)])],
@@ -134,9 +139,10 @@ m4_ifval([$3], [
 if test "$ym_tmp_enable" = "yes"; then
     YM_ADD_LIBRARIES_SUBDIRS([$1])
     AC_CONFIG_SUBDIRS([libraries/$1])
+    AC_DEFINE([HAVE_$4], [1])
     AC_MSG_NOTICE(['$1' is enabled])
 fi
-AM_CONDITIONAL(m4_toupper([YM_HAVE_$1]), [test $ym_tmp_enable = yes])
+AM_CONDITIONAL([YM_HAVE_$4], [test $ym_tmp_enable = yes])
 ])
 
 
@@ -182,6 +188,11 @@ AC_SUBST([YM_LIBRARIES_SUBDIRS], $ym_libraries_subdirs)
 #==================================================================
 AC_DEFUN([YM_BUILD_PROGRAM],
 [
+__YM_BUILD_PROGRAM([$1], [$2], [$3], m4_toupper($1))
+])
+
+AC_DEFUN([__YM_BUILD_PROGRAM],
+[
 AC_ARG_ENABLE([$1],
 	[AS_HELP_STRING([--enable-$1],
 	                [build $1 (default is $2)])],
@@ -199,9 +210,10 @@ m4_ifval([$3], [
 if test "$ym_tmp_enable" = "yes"; then
     YM_ADD_PROGRAMS_SUBDIRS([$1])
     AC_CONFIG_SUBDIRS([programs/$1])
+    AC_DEFINE([HAVE_$4], [1], [Define if $1 is enabled])
     AC_MSG_NOTICE(['$1' is enabled])
 fi
-AM_CONDITIONAL(m4_toupper([YM_HAVE_$1]), [test $ym_tmp_enable = yes])
+AM_CONDITIONAL([YM_HAVE_$4], [test $ym_tmp_enable = yes])
 ])
 
 
