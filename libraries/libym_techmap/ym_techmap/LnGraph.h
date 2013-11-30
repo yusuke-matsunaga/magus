@@ -13,7 +13,8 @@
 
 #include "ym_techmap/lutmap_nsdef.h"
 
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
+#include "ym_utils/FragAlloc.h"
 #include "ym_utils/DlList.h"
 #include "ym_utils/ItvlMgr.h"
 

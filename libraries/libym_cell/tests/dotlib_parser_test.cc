@@ -78,7 +78,7 @@ dotlibparser_test(int argc,
       // break を使いたいだけの擬似ループ
       const DotlibNode* dt_library = mgr.root_node();
       DotlibLibrary library_info;
-      if ( !dt_library->attr_value()->get_library_info(library_info) ) {
+      if ( !library_info.set_data(dt_library) ) {
 	break;
       }
       cout << "library name = " << library_info.name() << endl;
@@ -88,7 +88,7 @@ dotlibparser_test(int argc,
 	   p != cell_list.end(); ++ p) {
 	const DotlibNode* dt_cell = *p;
 	DotlibCell cell_info;
-	if ( !dt_cell->get_cell_info(cell_info) ) {
+	if ( !cell_info.set_data(dt_cell) ) {
 	  continue;
 	}
 	cout << endl
@@ -97,7 +97,7 @@ dotlibparser_test(int argc,
 	const DotlibNode* dt_ff = cell_info.ff();
 	if ( dt_ff ) {
 	  DotlibFF ff_info;
-	  if ( !dt_ff->get_ff_info(ff_info) ) {
+	  if ( !ff_info.set_data(dt_ff) ) {
 	    continue;
 	  }
 	  cout << "       ff (" << ff_info.var1_name()
@@ -140,7 +140,7 @@ dotlibparser_test(int argc,
 	const DotlibNode* dt_latch = cell_info.latch();
 	if ( dt_latch ) {
 	  DotlibLatch latch_info;
-	  if ( !dt_latch->get_latch_info(latch_info) ) {
+	  if ( !latch_info.set_data(dt_latch) ) {
 	    continue;
 	  }
 	  cout << "       latch (" << latch_info.var1_name()
@@ -187,10 +187,15 @@ dotlibparser_test(int argc,
 	     q != dt_pin_list.end(); ++ q) {
 	  const DotlibNode* dt_pin = *q;
 	  DotlibPin pin_info;
-	  if ( !dt_pin->get_pin_info(pin_info) ) {
+	  if ( !pin_info.set_data(dt_pin) ) {
 	    continue;
 	  }
-	  cout << "    pin name = " << pin_info.name() << endl
+	  cout << "    pin name = ";
+	  ymuint np = pin_info.num();
+	  for (ymuint i = 0; i < np; ++ i) {
+	    cout << " " << pin_info.name(i);
+	  }
+	  cout << endl
 	       << "        direction = ";
 	  switch ( pin_info.direction() ) {
 	  case DotlibPin::kInput: cout << "input"; break;

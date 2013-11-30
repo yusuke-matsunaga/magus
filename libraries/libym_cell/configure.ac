@@ -69,36 +69,24 @@ AC_TYPE_SIZE_T
 
 
 # ===================================================================
+# Checks for other packages
+# ===================================================================
+
+# Check for Python
+YM_CHECK_PYTHON([ym_have_python=yes], [ym_have_python=no])
+
+
+# ===================================================================
 # Check for QT
 # It's a kind of magic!
 # ===================================================================
-AC_ARG_ENABLE([qt],
-[  --enable-qt    Turn on QT],
-[case "${enableval}" in
- yes) qt=true ;;
- no)  qt=false ;;
- *) AC_MSG_ERROR([bad value ${enableval} for --enable-qt]) ;;
- esac],[qt=false])
-AM_CONDITIONAL([WITH_QT], [test x$qt = xtrue])
-if test x$qt = xtrue; then
-  AT_WITH_QT
-fi
+YM_CHECK_QT([ym_have_qt=yes], [ym_have_qt=no])
 
 
 # ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
-
-
-# ===================================================================
-# Local definitions
-# ===================================================================
-
-YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
-YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
-AC_SUBST([YMTOOLS_SRCDIR])
-AC_SUBST([YMTOOLS_BUILDDIR])
 
 
 # ===================================================================
@@ -111,7 +99,34 @@ AC_CONFIG_FILES([mislib/Makefile])
 AC_CONFIG_FILES([dotlib/Makefile])
 AC_CONFIG_FILES([libcomp/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([tests/dotlib_ptview/Makefile])
+
+
+# ===================================================================
+# Local definitions
+# ===================================================================
+
+YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
+YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
+AC_SUBST([YMTOOLS_SRCDIR])
+AC_SUBST([YMTOOLS_BUILDDIR])
+
+YM_INIT_EXTRA_SUBDIRS
+YM_INIT_TESTS_SUBDIRS
+
+if test $ym_have_python = yes; then
+   YM_ADD_EXTRA_SUBDIRS([python])
+   YM_ADD_TESTS_SUBDIRS([python])
+   AC_CONFIG_FILES([python/Makefile])
+   AC_CONFIG_FILES([tests/python/Makefile])
+fi
+
+if test $ym_have_qt = yes; then
+   YM_ADD_TESTS_SUBDIRS([qt])
+   AC_CONFIG_FILES([tests/qt/Makefile])
+fi
+
+YM_FINISH_EXTRA_SUBDIRS
+YM_FINISH_TESTS_SUBDIRS
 
 
 # ===================================================================

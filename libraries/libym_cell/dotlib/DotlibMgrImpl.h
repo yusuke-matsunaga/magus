@@ -12,7 +12,7 @@
 #include "dotlib_int.h"
 #include "ym_utils/ShString.h"
 #include "ym_utils/FileRegion.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -58,6 +58,13 @@ public:
   /// @param[in] loc ファイル上の位置
   DotlibNodeImpl*
   new_string(ShString value,
+	     const FileRegion& loc);
+
+  /// @brief ベクタを表す DotlibNode を生成する．
+  /// @param[in] value_list 値のリスト
+  /// @param[in] loc ファイル上の位置
+  DotlibNodeImpl*
+  new_vector(const vector<double>& value_list,
 	     const FileRegion& loc);
 
   /// @brief + 演算子を表す DotlibNode を生成する．
@@ -122,14 +129,14 @@ public:
 	    const FileRegion& loc);
 
   /// @brief DotlibAttr を生成する．
-  DotlibNodeImpl*
+  DotlibAttr*
   new_attr(const ShString& attr_name,
 	   const DotlibNode* value,
 	   const FileRegion& loc);
 
   /// @brief 根のノードを設定する．
   void
-  set_root_node(DotlibNodeImpl* root);
+  set_root_node(DotlibNode* root);
 
   /// @brief 根のノードを返す．
   const DotlibNode*
@@ -150,12 +157,14 @@ private:
   SimpleAlloc mAlloc;
 
   // 根のノード
-  DotlibNodeImpl* mRoot;
+  DotlibNode* mRoot;
 
   // 個々の要素の使用数
   ymuint32 mIntNum;
   ymuint32 mFloatNum;
   ymuint32 mStrNum;
+  ymuint32 mVectNum;
+  ymuint32 mVectElemSize;
   ymuint32 mOprNum;
   ymuint32 mNotNum;
   ymuint32 mListNum;

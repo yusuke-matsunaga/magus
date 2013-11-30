@@ -10,7 +10,8 @@
 
 
 #include "ymtools.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -87,11 +88,11 @@ public:
   /// @brief バイナリファイルに出力する．
   /// @param[in] s 出力先のストリーム
   void
-  dump(BinO& s) const;
+  dump(ODO& s) const;
 
   /// @brief バイナリファイルを読み込む．
   void
-  restore(BinI& s);
+  restore(IDO& s);
 
 
 private:
@@ -117,16 +118,16 @@ operator<<(ostream& s,
 /// @brief バイナリファイルの出力
 /// @param[in] s 出力先のストリーム
 /// @param[in] varid 対象の変数
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const VarId& varid);
 
 /// @relates Varid
 /// @brief バイナリファイルの読み込み
 /// @param[in] s 入力元のストリーム
 /// @param[out] varid 対象の変数
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   VarId& varid);
 
 
@@ -255,7 +256,7 @@ VarId::operator>=(const VarId& right) const
 // @param[in] s 出力先のストリーム
 inline
 void
-VarId::dump(BinO& s) const
+VarId::dump(ODO& s) const
 {
   s << mVal;
 }
@@ -263,7 +264,7 @@ VarId::dump(BinO& s) const
 // @brief バイナリファイルを読み込む．
 inline
 void
-VarId::restore(BinI& s)
+VarId::restore(IDO& s)
 {
   s >> mVal;
 }
@@ -285,8 +286,8 @@ operator<<(ostream& s,
 // @param[in] s 出力先のストリーム
 // @param[in] varid 対象の変数
 inline
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const VarId& varid)
 {
   varid.dump(s);
@@ -298,8 +299,8 @@ operator<<(BinO& s,
 // @param[in] s 入力元のストリーム
 // @param[out] varid 対象の変数
 inline
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   VarId& varid)
 {
   varid.restore(s);

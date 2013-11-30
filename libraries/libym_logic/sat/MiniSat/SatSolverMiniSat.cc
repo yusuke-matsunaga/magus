@@ -61,6 +61,22 @@ SatSolverMiniSat::add_clause(const vector<Literal>& lits)
   mSolver.addClause(tmp);
 }
 
+// @brief 節を追加する．
+// @param[in] lit_num リテラル数
+// @param[in] lits リテラルの配列
+void
+SatSolverMiniSat::add_clause(ymuint lit_num,
+			     Literal* lits)
+{
+  vec<Lit> tmp;
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    Literal l = lits[i];
+    Lit lit(l.varid().val(), l.pol() == kPolNega);
+    tmp.push(lit);
+  }
+  mSolver.addClause(tmp);
+}
+
 // @brief SAT 問題を解く．
 // @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
 // @param[out] model 充足するときの値の割り当てを格納する配列．
@@ -98,6 +114,12 @@ SatSolverMiniSat::solve(const vector<Literal>& assumptions,
     return kB3True;
   }
   return kB3False;
+}
+
+// @brief 学習節の整理を行なう．
+void
+SatSolverMiniSat::reduce_learnt_clause()
+{
 }
 
 // @brief conflict_limit の最大値

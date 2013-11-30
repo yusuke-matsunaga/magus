@@ -10,6 +10,7 @@
 #include "ym_networks/BNetDecomp.h"
 #include "ym_networks/BNetManip.h"
 #include "ym_utils/HeapTree.h"
+#include "ym_utils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET
@@ -96,7 +97,7 @@ BNetDecomp::operator()(BNetwork& network,
   for (ymuint i = 0; i < n; ++ i) {
     BNode* node = node_list[i];
 
-    ymuint max_fanin1 = ( max_fanin < 2 ) ? node->ni() : max_fanin;
+    ymuint max_fanin1 = ( max_fanin < 2 ) ? node->fanin_num() : max_fanin;
     const LogExpr& expr = node->func();
     if ( !expr.is_simple() || expr.litnum() > max_fanin || no_xor && expr.is_xor() ) {
       // ここに来ているということは expr の根のタイプは二項演算子
@@ -139,7 +140,7 @@ BNetDecomp::operator()(BNetwork& network,
   for (ymuint i = 0; i < n; ++ i) {
     BNode* node = node_list[i];
 
-    ymuint max_fanin1 = ( max_fanin < 2 ) ? node->ni() : max_fanin;
+    ymuint max_fanin1 = ( max_fanin < 2 ) ? node->fanin_num() : max_fanin;
     const LogExpr& expr = node->func();
     if ( !expr.is_simple() || expr.litnum() > max_fanin1 || no_xor && expr.is_xor() ) {
       // ここに来ているということは expr の根のタイプは二項演算子
@@ -415,7 +416,7 @@ int
 BNetDecomp::calc_depth(BNode* node)
 {
   int d = 0;
-  ymuint ni = node->ni();
+  ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     BNode* inode = node->fanin(i);
     hash_map<ymuint32, int>::iterator p = mDepthMap.find(inode->id());

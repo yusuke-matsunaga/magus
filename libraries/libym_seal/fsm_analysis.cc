@@ -180,7 +180,7 @@ fsm_analysis(const BNetwork& bnetwork,
        p != tmp_list.end(); ++ p) {
     BNode* node = *p;
     LogExpr expr = node->func();
-    ymuint ni = node->ni();
+    ymuint ni = node->fanin_num();
     VarBddMap fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {
       BNode* inode = node->fanin(i);
@@ -323,22 +323,22 @@ fsm_analysis(const BNetwork& bnetwork,
   }
 
   if ( report_size ) {
-    cout << "trans_rel.size() = " << trans_rel.size() << endl
-	 << "err_trans_rel.size() = " << err_trans_rel.size() << endl
-	 << "eq.size() = " << eq.size() << endl
-	 << "ident.size() = " << ident.size() << endl;
+    cout << "trans_rel.node_count() = " << trans_rel.node_count() << endl
+	 << "err_trans_rel.node_count() = " << err_trans_rel.node_count() << endl
+	 << "eq.node_count() = " << eq.node_count() << endl
+	 << "ident.node_count() = " << ident.node_count() << endl;
   }
 
   // 回路対の基本の状態遷移関係
   Bdd trans_rel2 = trans_rel & err_trans_rel & cur_normal;
   if ( report_size ) {
-    cout << "trans_rel2.size() = " << trans_rel2.size() << endl;
+    cout << "trans_rel2.node_count() = " << trans_rel2.node_count() << endl;
   }
 
   // 回路対の一時状態の状態遷移関係
   Bdd trans_rel3 = eq & ~ident & trans_rel2 & next_normal;
   if ( report_size ) {
-    cout << "trans_rel3.size() = " << trans_rel3.size() << endl;
+    cout << "trans_rel3.node_count() = " << trans_rel3.node_count() << endl;
   }
 
   // 次状態を消去するための変数集合
@@ -351,13 +351,13 @@ fsm_analysis(const BNetwork& bnetwork,
   // 出力にエラーが伝搬する遷移関係
   Bdd trans_rel4 = (~eq & trans_rel2).esmooth(nvars) & next_err_state;
   if ( report_size ) {
-    cout << "trans_rel4.size() = " << trans_rel4.size() << endl;
+    cout << "trans_rel4.node_count() = " << trans_rel4.node_count() << endl;
   }
 
   // 次状態対が同一になる遷移関係
   Bdd trans_rel5 = (eq & ident & trans_rel2).esmooth(nvars) & next_ident_state;
   if ( report_size ) {
-    cout << "trans_rel5.size() = " << trans_rel5.size() << endl;
+    cout << "trans_rel5.node_count() = " << trans_rel5.node_count() << endl;
   }
 
   // エラー状態の遷移
@@ -370,7 +370,7 @@ fsm_analysis(const BNetwork& bnetwork,
   Bdd trans_rel_all = trans_rel3 | trans_rel4 | trans_rel5 |
     trans_rel6 | trans_rel7;
   if ( report_size ) {
-    cout << "trans_rel_all.size() = " << trans_rel_all.size() << endl;
+    cout << "trans_rel_all.node_count() = " << trans_rel_all.node_count() << endl;
   }
 
   // 回路対の FSM の生成

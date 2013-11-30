@@ -141,6 +141,13 @@ BdnMgr::max_node_id() const
   return mImpl->max_node_id();
 }
 
+// @brief ID 番号をキーにノードを取り出す．
+const BdnNode*
+BdnMgr::node(ymuint id) const
+{
+  return mImpl->node(id);
+}
+
 // @brief 入力ノード数の取得
 // @return 入力ノード数を返す．
 ymuint
@@ -214,14 +221,23 @@ BdnMgr::find_xor(BdnNodeHandle inode1_handle,
 
 // @brief ソートされたノードのリストを得る．
 void
-BdnMgr::sort(vector<BdnNode*>& node_list) const
+BdnMgr::sort(vector<const BdnNode*>& node_list) const
 {
   mImpl->sort(node_list);
 }
 
+// @brief ソートされた論理ノードのリストを得る．
+// @param[out] node_list ノードのリストの格納先
+// @note 入力ノードと出力ノード，ラッチノードは含まない．
+void
+BdnMgr::_sort(vector<BdnNode*>& node_list) const
+{
+  mImpl->_sort(node_list);
+}
+
 // @brief 逆順でソートされたノードのリストを得る．
 void
-BdnMgr::rsort(vector<BdnNode*>& node_list) const
+BdnMgr::rsort(vector<const BdnNode*>& node_list) const
 {
   mImpl->rsort(node_list);
 }

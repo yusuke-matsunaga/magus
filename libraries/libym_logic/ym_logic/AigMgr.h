@@ -42,27 +42,16 @@ public:
   ymuint
   input_num() const;
 
-  /// @brief 入力ノードを取り出す．
-  /// @param[in] id 入力番号
-  const AigNode*
-  input_node(VarId id) const;
-
   /// @brief ノード数を得る．
   ymuint
   node_num() const;
-
-  /// @brief ノードを取り出す．
-  /// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
-  /// @note ANDノードの他に入力ノードも含まれる．
-  const AigNode*
-  node(ymuint pos) const;
 
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] handle_list 対象のハンドルのリスト
   void
-  dump_handles(ostream& s,
-	       const list<Aig>& handle_list) const;
+  print_handles(ostream& s,
+		const list<Aig>& handle_list) const;
 
 
 public:

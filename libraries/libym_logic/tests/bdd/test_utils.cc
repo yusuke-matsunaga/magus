@@ -183,8 +183,12 @@ check_bddv(BddMgr& bddmgr,
   if ( bdd != spec_bdd ) {
     cout << "Error[check_bddv(e)]: " << bdd_str << " != \"" << spec << "\""
 	 << endl;
-    bdd.display(cout);
-    spec_bdd.display(cout);
+    cout << "bdd:" << endl;
+    bdd.print(cout);
+    cout << endl;
+    cout << "spec:" << endl;
+    spec_bdd.print(cout);
+    cout << endl;
     return false;
   }
   return true;
@@ -199,9 +203,14 @@ check_bdde(BddMgr& bddmgr,
 {
   Bdd bdd2 = str2bdd(bddmgr, str);
   if ( bdd != bdd2 ) {
-    bdd.display(cout);
-    bdd2.display(cout);
+    cout << "bdd:" << endl;
+    bdd.print(cout);
+    cout << endl;
+    cout << "spec:" << endl;
+    bdd2.print(cout);
+    cout << endl;
     cout << "ERROR[check_bdde]: " << bdd_str << " != " << str << endl;
+    cout << endl;
     return false;
   }
   return true;
@@ -221,8 +230,8 @@ check_ite(BddMgr& bddmgr,
   Bdd ans_ref = if_bdd & then_bdd | ~if_bdd & else_bdd;
   Bdd ans = ite_op(if_bdd, then_bdd, else_bdd);
   if ( ans != ans_ref ) {
-    ans_ref.display(cout);
-    ans.display(cout);
+    ans_ref.print(cout);
+    ans.print(cout);
     cout << "ERROR[check_ite]: ite_op( " << if_str << ", " << then_str
 	 << ", " << else_str << ")" << endl;
     return false;
@@ -249,7 +258,7 @@ check_support(BddMgr& bddmgr,
   }
   BddVarSet vs = bdd.support();
   if ( vs != ref_vs ) {
-    bdd.display(cout);
+    bdd.print(cout);
     cout << "reference: " << ref_vs << endl;
     cout << "bdd.support(): " << vs << endl;
     cout << "ERROR[check_support]" << endl;

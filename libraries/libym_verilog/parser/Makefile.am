@@ -11,8 +11,6 @@ SUBDIRS = \
 	cpt \
 	.
 
-INCLUDES =
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in

@@ -17,8 +17,15 @@ test1(const LogExpr& expr,
       LogicMgr& lm)
 {
   cout << "Registering: " << expr << endl;
-  TgGateTemplate id = lm.reg_logic(expr);
-  cout << "  ID = " << id << endl;
+  ymuint32 id;
+  tTgGateType type = lm.reg_logic(expr, id);
+  ymuint ni = expr.input_size();
+
+  cout << "  TYPE = " << type << "(" << ni << ")";
+  if ( type == kTgGateCplx ) {
+    cout << ", ID = " << id;
+  }
+  cout << endl;
 }
 
 END_NAMESPACE_YM_NETWORKS_TGNET
@@ -59,8 +66,6 @@ main(int argc,
 
     LogExpr tmp3 = v0 & v1 | v2 & v3 | v4 & v5 | v6 & v7;
     test1(tmp3, lm);
-
-    lm.dump(cout);
   }
   catch ( AssertError x) {
     cout << x << endl;

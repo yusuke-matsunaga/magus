@@ -1,6 +1,4 @@
 # Process this file with autoconf to produce a configure script
-#
-# $Id: configure.ac 2507 2009-10-17 16:24:02Z matsunaga $
 
 # ===================================================================
 # Initial block
@@ -14,7 +12,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2011 Yusuke Matsunaga
+Copyright (C) 2005-2013 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -32,6 +30,12 @@ AM_INIT_AUTOMAKE()dnl
 # ===================================================================
 AC_ISC_POSIX
 AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_LN_S
+AC_PROG_INSTALL
+AC_PROG_YACC
+AM_PROG_LEX
 AC_PROG_LIBTOOL
 AC_CHECK_PROG([DOXYGEN],
 	      [doxygen],
@@ -41,10 +45,51 @@ AC_SUBST(DOXYGEN)
 
 
 # ===================================================================
-# Checks for header files
+# Check for gmp
 # ===================================================================
+YM_CHECK_GMP
 
-AC_CHECK_HEADERS([zlib.h], [ym_have_zlib=1])
+
+# ===================================================================
+# Check for popt
+# ===================================================================
+YM_CHECK_POPT
+
+
+# ===================================================================
+# Check for TCL environment
+# ===================================================================
+YM_CHECK_TCL
+
+
+# ===================================================================
+# Check for tclreadline
+# ===================================================================
+YM_CHECK_TCLREADLINE
+
+
+# ===================================================================
+# Check for Python environment
+# ===================================================================
+YM_CHECK_PYTHON
+
+
+# ===================================================================
+# Check for C++ language
+# ===================================================================
+AC_LANG_CPLUSPLUS
+
+
+# ===================================================================
+# Check for QT
+# ===================================================================
+YM_CHECK_QT([ym_have_qt=yes], [ym_have_qt=no])
+
+
+# ===================================================================
+# Check for CppUTest
+# ===================================================================
+YM_CHECK_CPPUTEST([ym_have_cpputest=yes], [ym_have_cpputest=no])
 
 
 # ===================================================================
@@ -53,89 +98,90 @@ AC_CHECK_HEADERS([zlib.h], [ym_have_zlib=1])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libraries/Makefile])
 AC_CONFIG_FILES([programs/Makefile])
+AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([Doxyfile])
 
 AC_CONFIG_SUBDIRS([include])
-AC_CONFIG_SUBDIRS([tests])
+
+
+# ===================================================================
+# Local definitions
+# ===================================================================
+
+YMTOOLS_SRCDIR="\$(top_srcdir)"
+YMTOOLS_BUILDDIR="\$(top_builddir)"
+AC_SUBST([YMTOOLS_SRCDIR])
+AC_SUBST([YMTOOLS_BUILDDIR])
 
 
 # ===================================================================
 # Declare files in 'libraries' subdirectories
 # ===================================================================
 
-ym_libym_utils_enable=1
-ym_libym_logic_enable=1
-ym_libym_smtlibv2_enable=0
-ym_libym_cell_enable=1
-ym_libym_verilog_enable=1
-ym_libym_networks_enable=1
-ym_libym_gds_enable=1
-ym_libym_cec_enable=1
-ym_libym_techmap_enable=1
-ym_libym_seal_enable=1
-ym_libym_tclpp_enable=1
-ym_libym_ymsh_enable=1
-
-
 YM_INIT_LIBRARIES_SUBDIRS
 
 # libym_utils
-YM_BUILD_LIBRARY([libym_utils],
+YM_BUILD_LIBRARY([libym_utils], [yes],
 		 [])
 
 # libym_logic
-YM_BUILD_LIBRARY([libym_logic],
+YM_BUILD_LIBRARY([libym_logic], [yes],
 		 [ym_libym_utils_enable])
 
 # libym_smtlibv2
-YM_BUILD_LIBRARY([libym_smtlibv2],
+YM_BUILD_LIBRARY([libym_smtlibv2], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable])
 
 # libym_mincov
-YM_BUILD_LIBRARY([libym_mincov],
+YM_BUILD_LIBRARY([libym_mincov], [no],
 		 [ym_libym_utils_enable])
 
 # libym_cell
-YM_BUILD_LIBRARY([libym_cell],
+YM_BUILD_LIBRARY([libym_cell], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable])
 
 # libym_verilog
-YM_BUILD_LIBRARY([libym_verilog],
+YM_BUILD_LIBRARY([libym_verilog], [yes],
 		 [ym_libym_utils_enable])
 
 # libym_networks
-YM_BUILD_LIBRARY([libym_networks],
+YM_BUILD_LIBRARY([libym_networks], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_verilog_enable])
 
 # libym_gds
-YM_BUILD_LIBRARY([libym_gds],
+YM_BUILD_LIBRARY([libym_gds], [no],
 		 [])
 
 # libym_cec
-YM_BUILD_LIBRARY([libym_cec],
+YM_BUILD_LIBRARY([libym_cec], [yes],
 		 [ym_libym_networks_enable,
 		  ym_libym_logic_enable])
 
 # libym_techmap
-YM_BUILD_LIBRARY([libym_techmap],
+YM_BUILD_LIBRARY([libym_techmap], [yes],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable])
 
+# libym_gbm
+YM_BUILD_LIBRARY([libym_gbm], [no],
+		 [ym_libym_networks_enable,
+		  ym_libym_logic_enable])
+
 # libym_seal
-YM_BUILD_LIBRARY([libym_seal],
+YM_BUILD_LIBRARY([libym_seal], [no],
 		 [ym_libym_logic_enable,
 		  ym_libym_networks_enable])
 
 # libym_tclpp
-YM_BUILD_LIBRARY([libym_tclpp],
+YM_BUILD_LIBRARY([libym_tclpp], [yes],
 		 [])
 
 # libym_ymsh
-YM_BUILD_LIBRARY([libym_ymsh],
+YM_BUILD_LIBRARY([libym_ymsh], [no],
 		 [])
 
 
@@ -146,30 +192,101 @@ YM_FINISH_LIBRARIES_SUBDIRS
 # Declare files in 'programs' subdirectories
 # ===================================================================
 
-ym_magus_tclsh_enable=1
-ym_atpg_enable=1
-ym_matpg_enable=1
-
 YM_INIT_PROGRAMS_SUBDIRS
 
 # magus_tclsh
-YM_BUILD_PROGRAM([magus_tclsh],
+YM_BUILD_PROGRAM([magus_tclsh], [no],
 		 [ym_libym_tclpp_enable])
 
-# atpg
-YM_BUILD_PROGRAM([atpg],
+# satpg
+YM_BUILD_PROGRAM([satpg], [no],
 		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
-# matpg
-YM_BUILD_PROGRAM([matpg],
+# led
+YM_BUILD_PROGRAM([led], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable])
+
+# igf
+YM_BUILD_PROGRAM([igf], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_tclpp_enable])
+
+# llvmeq
+YM_BUILD_PROGRAM([llvmeq], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_tclpp_enable])
+
+# bnet2aig
+YM_BUILD_PROGRAM([bnet2aig], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# enumcut
+YM_BUILD_PROGRAM([enumcut], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# genaig
+YM_BUILD_PROGRAM([genaig], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# imp
+YM_BUILD_PROGRAM([imp], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# lrw
+YM_BUILD_PROGRAM([lrw], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# lsim
+YM_BUILD_PROGRAM([lsim], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
+
+# makebdd
+YM_BUILD_PROGRAM([makebdd], [no],
 		 [ym_libym_utils_enable,
 		  ym_libym_logic_enable,
 		  ym_libym_networks_enable,
 		  ym_libym_tclpp_enable])
 
 YM_FINISH_PROGRAMS_SUBDIRS
+
+
+# ===================================================================
+# Declare files in 'tests' subdirectories
+# ===================================================================
+
+YM_INIT_TESTS_SUBDIRS
+
+if test $ym_have_cpputest = yes; then
+   YM_ADD_TESTS_SUBDIRS([CppUTest])
+   AC_CONFIG_FILES([tests/CppUTest/Makefile])
+fi
+
+YM_FINISH_TESTS_SUBDIRS
 
 
 # ===================================================================

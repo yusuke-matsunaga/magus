@@ -10,17 +10,17 @@
 /// All rights reserved.
 
 
-#include <ym_verilog/BitVector.h>
+#include "ym_verilog/BitVector.h"
 
 using namespace std;
 using nsYm::nsVerilog::BitVector;
 
 #define YYSTYPE BitVector
 
-#include "bvcalc.h"
+#include "bvcalc.hh"
 
 string cur_text;
- 
+
 %}
 
 A        [_a-zA-Z]

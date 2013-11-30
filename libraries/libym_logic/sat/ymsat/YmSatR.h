@@ -26,8 +26,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] out 出力ストリーム
   /// @param[in] analyzer 解析器のポインタ
+  /// @param[in] option オプション文字列
   YmSatR(ostream& out,
-	 SatAnalyzer* analyer);
+	 SatAnalyzer* analyer,
+	 const string& option = string());
 
   /// @brief デストラクタ
   virtual

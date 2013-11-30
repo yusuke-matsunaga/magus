@@ -174,8 +174,8 @@ CellFFInfo::xq_pos() const
 // @param[in] bos 出力先のストリーム
 // @param[in] ffinfo 対象の CellFFInfo
 // @return ストリームを返す．
-BinO&
-operator<<(BinO& bos,
+ODO&
+operator<<(ODO& bos,
 	   const CellFFInfo& ffinfo)
 {
   return bos << ffinfo.mBits;
@@ -185,8 +185,8 @@ operator<<(BinO& bos,
 // @param[in] bis 入力元のストリーム
 // @param[out] ffinfo 結果を格納する変数
 // @return ストリームを返す．
-BinI&
-operator>>(BinI& bis,
+IDO&
+operator>>(IDO& bis,
 	   CellFFInfo& ffinfo)
 {
   return bis >> ffinfo.mBits;

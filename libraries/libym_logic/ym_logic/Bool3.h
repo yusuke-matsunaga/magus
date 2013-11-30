@@ -35,6 +35,24 @@ operator~(Bool3 val)
   return static_cast<Bool3>(-static_cast<int>(val));
 }
 
+/// @brief Bool3 の inplace XOR 演算
+inline
+Bool3
+operator^=(Bool3& left,
+	   Bool3 right)
+{
+  return left = static_cast<Bool3>(static_cast<int>(left) * static_cast<int>(right) * -1);
+}
+
+/// @brief Bool3 の XOR 演算
+inline
+Bool3
+operator^(Bool3 left,
+	  Bool3 right)
+{
+  return static_cast<Bool3>(static_cast<int>(left) * static_cast<int>(right) * -1);
+}
+
 /// @brief bool からのキャスト演算子
 /// @ingroup LogicGroup
 inline

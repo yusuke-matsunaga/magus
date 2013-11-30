@@ -10,7 +10,7 @@
 
 
 #include "iscas89_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -70,7 +70,7 @@ public:
 
   /// @brief ファンイン数を得る．
   ymuint32
-  ni() const;
+  fanin_num() const;
 
   /// @brief ファンインを求める．
   const Iscas89Node*
@@ -280,7 +280,7 @@ Iscas89Node::gate_type() const
 // @brief ファンイン数を得る．
 inline
 ymuint32
-Iscas89Node::ni() const
+Iscas89Node::fanin_num() const
 {
   return mNi;
 }

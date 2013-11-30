@@ -13,7 +13,8 @@
 #include "ym_logic/VarId.h"
 #include "ym_logic/Pol.h"
 #include "ym_logic/NpnVmap.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -127,11 +128,11 @@ public:
   /// @brief 入力数を得る．
   /// @return 入力数
   ymuint
-  ni() const;
+  input_num() const;
 
   /// @brief 出力数を得る．
   ymuint
-  no() const;
+  output_num() const;
 
   /// @brief 入力の変換情報の取得
   /// @param[in] var 入力番号
@@ -172,54 +173,64 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数
-  ymuint32 mNi;
+  ymuint32 mInputNum;
 
   // 出力数
-  ymuint32 mNo;
+  ymuint32 mOutputNum;
 
   // 入力と出力のマッピング情報
   NpnVmap* mMapArray;
 
 };
 
-// @brief 逆写像を求める．
-// @param[in] src 入力となるマップ
-// @return src の逆写像
-// @note 1対1写像でなければ答えは不定．
+
+//////////////////////////////////////////////////////////////////////
+// NpnMapM に関連した関数
+//////////////////////////////////////////////////////////////////////
+
+/// @relates NpnMapM
+/// @brief 逆写像を求める．
+/// @param[in] src 入力となるマップ
+/// @return src の逆写像
+/// @note 1対1写像でなければ答えは不定．
 NpnMapM
 inverse(const NpnMapM& src);
 
-// @brief 合成を求める．
-// @param[in] src1,src2 入力となるマップ
-// @return src1 と src2 を合成したもの
-// @note src1の値域とsrc2の定義域は一致していな
-// ければならない．そうでなければ答えは不定．
+/// @relates NpnMapM
+/// @brief 合成を求める．
+/// @param[in] src1,src2 入力となるマップ
+/// @return src1 と src2 を合成したもの
+/// src1の値域とsrc2の定義域は一致していなければならない．
+/// そうでなければ答えは不定．
 NpnMapM
 operator*(const NpnMapM& src1,
 	  const NpnMapM& src2);
 
-// @brief 内容を表示する(主にデバッグ用)．
-// @param[in] s 出力ストリーム
-// @param[in] map 出力対象のマップ
-// @note 改行はしない．
+/// @relates NpnMapM
+/// @brief 内容を表示する(主にデバッグ用)．
+/// @param[in] s 出力ストリーム
+/// @param[in] map 出力対象のマップ
+/// @note 改行はしない．
 ostream&
 operator<<(ostream& s,
 	   const NpnMapM& map);
 
+/// @relates NpnMapM
 /// @brief バイナリ出力
 /// @param[in] s 出力ストリーム
 /// @param[in] map 変換マップ
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const NpnMapM& map);
 
+/// @relates NpnMapM
 /// @brief バイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] map 結果を格納する変数
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   NpnMapM& map);
 
 
@@ -230,17 +241,17 @@ operator>>(BinI& s,
 // 入力数を得る．
 inline
 ymuint
-NpnMapM::ni() const
+NpnMapM::input_num() const
 {
-  return mNi;
+  return mInputNum;
 }
 
 // @brief 出力数を得る．
 inline
 ymuint
-NpnMapM::no() const
+NpnMapM::output_num() const
 {
-  return mNo;
+  return mOutputNum;
 }
 
 // var に対応するマッピング情報を得る．
@@ -249,7 +260,7 @@ NpnVmap
 NpnMapM::imap(VarId var) const
 {
   ymuint idx = var.val();
-  if ( idx < ni() ) {
+  if ( idx < input_num() ) {
     return mMapArray[idx];
   }
   return NpnVmap::invalid();
@@ -266,10 +277,36 @@ NpnVmap
 NpnMapM::omap(VarId var) const
 {
   ymuint idx = var.val();
-  if ( idx < no() ) {
-    return mMapArray[idx + ni()];
+  if ( idx < output_num() ) {
+    return mMapArray[idx + input_num()];
   }
   return NpnVmap::invalid();
+}
+
+// @brief 入力の変換内容の設定
+// @param[in] src_var 入力番号
+// @param[in] dst_var 変換先の入力番号
+// @param[in] pol 極性
+inline
+void
+NpnMapM::set_imap(VarId src_var,
+		  VarId dst_var,
+		  tPol pol)
+{
+  set_imap(src_var, NpnVmap(dst_var, pol));
+}
+
+// @brief 出力の変換内容の設定
+// @param[in] src_var 出力番号
+// @param[in] dst_var 変換先の出力番号
+// @param[in] pol 極性
+inline
+void
+NpnMapM::set_omap(VarId src_var,
+		  VarId dst_var,
+		  tPol pol)
+{
+  set_omap(src_var, NpnVmap(dst_var, pol));
 }
 
 END_NAMESPACE_YM_NPN

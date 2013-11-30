@@ -4,9 +4,12 @@
 
 SUBDIRS = \
 	bdd \
+	zdd \
+	cnfdd \
 	expr \
 	npn \
 	sat \
-	aig
+	aig \
+	$(YM_TESTS_SUBDIRS)
 
 MAINTAINERCLEANFILES = Makefile.in

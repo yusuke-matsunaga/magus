@@ -193,7 +193,7 @@ BNetBdnConv::make_node(const BNode* bnode)
   BdnNodeHandle node_handle;
   if ( !get_node(bnode, node_handle) ) {
     assert_cond( bnode->is_logic(), __FILE__, __LINE__);
-    ymuint ni = bnode->ni();
+    ymuint ni = bnode->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = make_node(bnode->fanin(i));

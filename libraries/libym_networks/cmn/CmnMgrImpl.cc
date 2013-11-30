@@ -161,7 +161,7 @@ CmnMgrImpl::copy(const CmnMgrImpl& src)
   ymuint nl = node_list.size();
   for (ymuint i = 0; i < nl; ++ i) {
     const CmnNode* src_node = node_list[i];
-    ymuint ni = src_node->ni();
+    ymuint ni = src_node->fanin_num();
     vector<CmnNode*> dst_inputs(ni);
     for (ymuint j = 0; j < ni; ++ j) {
       const CmnNode* src_inode = src_node->fanin(j);
@@ -203,7 +203,7 @@ sort_sub(const CmnNode* node,
     const CmnNode* onode = e->to();
     if ( mark[onode->id()] || !onode->is_logic() ) continue;
     bool ready = true;
-    ymuint ni = onode->ni();
+    ymuint ni = onode->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       const CmnNode* inode0 = onode->fanin(i);
       if ( !mark[inode0->id()] ) {
@@ -242,7 +242,7 @@ CmnMgrImpl::sort(vector<const CmnNode*>& node_list) const
   for (CmnNodeList::const_iterator p = mLogicList.begin();
        p != mLogicList.end(); ++ p) {
     const CmnNode* node = *p;
-    if ( node->ni() == 0 && !mark[node->id()] ) {
+    if ( node->fanin_num() == 0 && !mark[node->id()] ) {
       mark[node->id()] = true;
       node_list.push_back(node);
     }
@@ -406,12 +406,18 @@ CmnMgrImpl::new_dff(const CmnDffCell* cell,
     dff->mClear = clear;
     reg_output(clear);
   }
+  else {
+    dff->mClear = NULL;
+  }
 
   if ( cell->has_preset() ) {
     p = mAlloc.get_memory(sizeof(CmnNodeDffPreset));
     CmnNode* preset = new (p) CmnNodeDffPreset(dff);
     dff->mPreset = preset;
     reg_output(preset);
+  }
+  else {
+    dff->mPreset = NULL;
   }
 
   return dff;
@@ -677,7 +683,7 @@ CmnMgrImpl::delete_logic(CmnNode* node)
 {
   assert_cond(node->is_logic(), __FILE__, __LINE__);
   assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
-  ymuint ni = node->ni();
+  ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     connect(NULL, node, i);
   }

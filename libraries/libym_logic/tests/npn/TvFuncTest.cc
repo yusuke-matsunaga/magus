@@ -161,13 +161,13 @@ TvFuncTest::check_base(ymuint ni,
 
   TvFunc func(ni, vect);
 
-  // ni() のテスト
-  if ( func.ni() != ni ) {
-    mOut << "Error: TvFunc::ni()" << endl
+  // input_num() のテスト
+  if ( func.input_num() != ni ) {
+    mOut << "Error: TvFunc::input_num()" << endl
 	 << "  func: " << func << endl
 	 << "  vect[]: ";
     dump_vect(mOut, ni, vect);
-    mOut << "  func.ni() = " << func.ni() << endl
+    mOut << "  func.input_num() = " << func.input_num() << endl
 	 << "  ni = " << ni << endl;
     ++ mNerr;
   }
@@ -190,7 +190,7 @@ TvFuncTest::check_base(ymuint ni,
 void
 TvFuncTest::check_base2(const TvFunc& func)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1UL << ni;
 
   // コピーコンストラクタのテスト
@@ -239,7 +239,7 @@ TvFuncTest::check_base2(const TvFunc& func)
 void
 TvFuncTest::check_count_one(const TvFunc& func)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1UL << ni;
 
   ymuint c0_true = 0;
@@ -318,7 +318,7 @@ TvFuncTest::check_walsh_2(const TvFunc& func,
   }
   int w2 = func.walsh_2(pos1, pos2);
   walsh_2(func);
-  int w2_true = mW2Cache[pos1.val() * func.ni() + pos2.val()];
+  int w2_true = mW2Cache[pos1.val() * func.input_num() + pos2.val()];
   if ( w2 != w2_true ) {
     mOut << "Error: TvFunc::walsh_2(size_t i, size_t j)" << endl
 	 << "  func: " << func << endl
@@ -333,7 +333,7 @@ TvFuncTest::check_walsh_2(const TvFunc& func,
 void
 TvFuncTest::check_walsh_01(const TvFunc& func)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
 
   int* w1_vec = new int[ni];
   int w0 = func.walsh_01(w1_vec);
@@ -365,7 +365,7 @@ TvFuncTest::check_walsh_01(const TvFunc& func)
 void
 TvFuncTest::check_walsh_012(const TvFunc& func)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
 
   int* w1_vec = new int[ni];
   int* w2_vec = new int[ni * ni];
@@ -417,7 +417,7 @@ void
 TvFuncTest::check_check_sup(const TvFunc& func,
 			    VarId pos)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1 << ni;
 
   bool stat = func.check_sup(pos);
@@ -448,7 +448,7 @@ TvFuncTest::check_check_sym(const TvFunc& func,
 {
   if ( pos1 == pos2 ) return;
 
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1 << ni;
 
   bool stat_p = func.check_sym(pos1, pos2, kPolPosi);
@@ -499,7 +499,7 @@ void
 TvFuncTest::check_walsh_w0(const TvFunc& func,
 			   ymuint ibits)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1 << ni;
 
   for (ymuint w = 0; w <= ni; ++ w) {
@@ -558,7 +558,7 @@ TvFuncTest::check_walsh_w1(const TvFunc& func,
 			   VarId var,
 			   ymuint ibits)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1 << ni;
 
   ymuint pos = var.val();
@@ -631,7 +631,7 @@ TvFuncTest::check_cofactor(const TvFunc& func,
 			   VarId var,
 			   tPol pol)
 {
-  ymuint ni = func.ni();
+  ymuint ni = func.input_num();
   ymuint ni_pow = 1UL << ni;
 
   TvFunc cfunc = func;
@@ -679,7 +679,7 @@ void
 TvFuncTest::walsh_0(const TvFunc& func)
 {
   if ( func != mW0Func ) {
-    ymuint ni_pow = 1UL << func.ni();
+    ymuint ni_pow = 1UL << func.input_num();
     int w0 = 0;
     for (size_t i = 0; i < ni_pow; ++ i) {
       if ( func.value(i) == 0 ) {
@@ -701,7 +701,7 @@ void
 TvFuncTest::walsh_1(const TvFunc& func)
 {
   if ( func != mW1Func ) {
-    ymuint ni = func.ni();
+    ymuint ni = func.input_num();
     ymuint ni_pow = 1 << ni;
 
     if ( ni > mW1CacheSize ) {
@@ -743,7 +743,7 @@ void
 TvFuncTest::walsh_2(const TvFunc& func)
 {
   if ( func != mW2Func ) {
-    ymuint ni = func.ni();
+    ymuint ni = func.input_num();
     ymuint ni_pow = 1 << ni;
 
     ymuint new_size = ni * ni;

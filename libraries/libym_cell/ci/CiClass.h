@@ -11,7 +11,8 @@
 
 #include "ym_cell/CellClass.h"
 #include "ym_utils/Alloc.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -88,7 +89,7 @@ public:
   void
   init(const vector<NpnMapM>& idmap_list,
        const vector<const CellGroup*>& group_list,
-       AllocBase& alloc);
+       Alloc& alloc);
 
 
 public:
@@ -99,16 +100,16 @@ public:
   /// @brief バイナリダンプを行う．
   /// @param[in] bos 出力先のストリーム
   void
-  dump(BinO& bos) const;
+  dump(ODO& bos) const;
 
   /// @brief バイナリファイルを読み込む．
   /// @param[in] bis 入力元のストリーム
   /// @param[in] library セルライブラリ
   /// @param[in] alloc メモリアロケータ
   void
-  restore(BinI& bis,
+  restore(IDO& bis,
 	  const CellLibrary& library,
-	  AllocBase& alloc);
+	  Alloc& alloc);
 
 
 private:
@@ -120,7 +121,7 @@ private:
   /// @param[in] alloc メモリアロケータ
   /// @note mIdmapNum, mGroupNum が適切に設定されている必要がある．
   void
-  alloc_array(AllocBase& alloc);
+  alloc_array(Alloc& alloc);
 
 
 private:

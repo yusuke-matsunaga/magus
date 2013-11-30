@@ -151,10 +151,10 @@ public:
   /// @brief ファンイン数を得る．
   virtual
   ymuint
-  ni() const;
+  fanin_num() const;
 
   /// @brief ファンインのノードを得る．
-  /// @param[in] pos 入力番号
+  /// @param[in] pos 入力番号 ( 0 <= pos < fanin_num() )
   /// @return pos 番めのファンインのノード
   /// @note 該当するファンインがなければ NULL を返す．
   virtual

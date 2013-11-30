@@ -46,7 +46,7 @@ CiFsmCell::CiFsmCell(CiLibrary* library,
 		     const vector<bool>& output_array,
 		     const vector<LogExpr>& logic_array,
 		     const vector<LogExpr>& tristate_array,
-		     AllocBase& alloc) :
+		     Alloc& alloc) :
   CiCell(library, id, name, area,
 	 ni, no, nio, nit, nb, nc,
 	 output_array,

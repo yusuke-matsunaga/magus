@@ -7,10 +7,13 @@
 
 SUBDIRS =
 
-YFLAGS = -d -v
+AM_YFLAGS = -d -v
 
 CLEANFILES = \
-	mislib_grammer.cc mislib_grammer.h y.output mislib_grammer.output
+	mislib_grammer.cc \
+	mislib_grammer.hh \
+	y.output \
+	mislib_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -31,10 +34,11 @@ libym_cell_mislib_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_mislib_la_SOURCES = \
+	CellMislibReader.cc \
 	mislib_nsdef.h \
 	mislib_grammer.yy \
-	MislibLex.h \
-	MislibLex.cc \
+	MislibScanner.h \
+	MislibScanner.cc \
 	MislibMgr.h \
 	MislibMgr.cc \
 	MislibMgrImpl.h \
@@ -68,4 +72,3 @@ libym_cell_mislib_la_SOURCES = \
 libym_cell_mislib_la_LIBADD =
 
 libym_cell_mislib_la_LDFLAGS =
-

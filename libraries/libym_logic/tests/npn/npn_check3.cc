@@ -10,7 +10,7 @@
 #endif
 
 #include "ym_utils/random.h"
-#include "ym_utils/Generator.h"
+#include "ym_utils/PermGen.h"
 #include "ym_logic/TvFunc.h"
 #include "ym_logic/NpnMgr.h"
 
@@ -59,7 +59,7 @@ str2vect(ymuint ni,
   return true;
 }
 
-void
+ymuint
 gen(ymuint ni,
     ymuint limit,
     ymuint flow,
@@ -67,6 +67,8 @@ gen(ymuint ni,
     int dump)
 {
   hash_set<TvFunc> repfunc_set;
+
+  ymuint nerr = 0;
 
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
@@ -119,7 +121,13 @@ gen(ymuint ni,
       NpnMap map1;
       mgr.cannonical(repfunc, map1);
       TvFunc func2 = repfunc.xform(map1);
-      assert_cond( repfunc == func2, __FILE__, __LINE__);
+      if ( repfunc != func2 ) {
+	++ nerr;
+	cerr << "repfunc: " << repfunc << endl
+	     << "func2:   " << func2 << endl
+	     << "orgfunc: " << orgfunc << endl
+	     << endl;
+      }
     }
 
     bool carry = false;
@@ -160,9 +168,11 @@ gen(ymuint ni,
       cout << ni << " " << *p << endl;
     }
   }
+
+  return nerr;
 }
 
-void
+ymuint
 rgen(ymuint ni,
      int rseed,
      ymuint num,
@@ -170,6 +180,8 @@ rgen(ymuint ni,
      int algorithm)
 {
   hash_set<TvFunc> repfunc_set;
+
+  ymuint nerr = 0;
 
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
@@ -210,7 +222,13 @@ rgen(ymuint ni,
       NpnMap map1;
       mgr.cannonical(repfunc, map1);
       TvFunc func2 = repfunc.xform(map1);
-      assert_cond( repfunc == func2, __FILE__, __LINE__);
+      if ( repfunc != func2 ) {
+	++ nerr;
+	cerr << "repfunc: " << repfunc << endl
+	     << "func2:   " << func2 << endl
+	     << "orgfunc: " << func << endl
+	     << endl;
+      }
     }
 
     if ( flow & 1024 ) {
@@ -235,6 +253,8 @@ rgen(ymuint ni,
        << endl
        << "NPN rep:                 " << repfunc_set.size() << endl
        << "AVE. CPU time(usec):     " << usec << endl;
+
+  return nerr;
 }
 
 void
@@ -335,7 +355,7 @@ read_func(const char* filename,
        << "AVE. CPU time(usec):     " << usec << endl;
 }
 
-void
+ymuint
 verify(ymuint ni,
        ymuint rseed,
        ymuint num,
@@ -343,6 +363,8 @@ verify(ymuint ni,
        int algorithm)
 {
   init_random_seed(rseed);
+
+  ymuint nerr = 0;
 
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
@@ -385,11 +407,10 @@ verify(ymuint ni,
 	}
       }
 
-      PermGen pg(ni, ni);
-      for (PermGen::iterator p = pg.begin(); !p.is_end(); ++ p) {
+      for (PermGen pg(ni, ni); !pg.is_end(); ++ pg) {
 	NpnMap perm_map(ni);
 	for (ymuint i = 0; i < ni; ++ i) {
-	  ymuint j = p(i);
+	  ymuint j = pg(i);
 	  perm_map.set(VarId(i), VarId(j), kPolPosi);
 	}
 
@@ -405,14 +426,14 @@ verify(ymuint ni,
 	TvFunc rep_func2 = tmp_func.xform(repmap);
 
 	if ( rep_func2 != rep_func ) {
-	  cout << "Error" << endl
+	  cerr << "Error" << endl
 	       << " orig_func: " << orig_func << endl
 	       << " rep_func:  " << rep_func << endl
 	       << endl
 	       << " tmp_map: " << tmpmap << endl
 	       << " tmp_func:  " << tmp_func << endl
 	       << " rep_func2: " << rep_func2 << endl;
-	  exit(1);
+	  ++ nerr;
 	}
       }
     }
@@ -421,6 +442,7 @@ verify(ymuint ni,
   cout << "Result of verify(ni = " << ni
        << ", rseed = " << rseed
        << ", rnum = " << num
+       << ")"
        << endl
 #if 0
        << "Step1  undetermined num: " << ph1unum << endl
@@ -436,6 +458,8 @@ verify(ymuint ni,
        << "       permutations:     " << ph4pnum << endl
 #endif
        << "CPU time:                " << usec << endl;
+
+  return nerr;
 }
 
 void
@@ -581,21 +605,24 @@ main(int argc,
   if ( finish ) {
     flow |= 1024;
   }
+
+  ymuint nerr = 0;
+
 #if !defined(YM_DEBUG)
   try {
 #endif
     switch ( mode ) {
     case 1: // gen
-      gen(ni, 0, flow, algorithm, dump);
+      nerr = gen(ni, 0, flow, algorithm, dump);
       break;
 
     case 2: // rgen
       init_random_seed(rseed);
-      rgen(ni, rseed, rnum, flow, algorithm);
+      nerr = rgen(ni, rseed, rnum, flow, algorithm);
       break;
 
     case 3: // verify
-      verify(ni, rseed, rnum, flow, algorithm);
+      nerr = verify(ni, rseed, rnum, flow, algorithm);
       break;
 
     case 4: // function
@@ -742,5 +769,5 @@ main(int argc,
   }
 #endif
 
-  return 0;
+  return nerr;
 }

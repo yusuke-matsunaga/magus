@@ -28,7 +28,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のオブジェクト
-  TagDict(AllocBase& alloc);
+  TagDict(Alloc& alloc);
 
   /// @brief デストラクタ
   ~TagDict();
@@ -283,7 +283,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Cell の確保用アロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // ハッシュ表のサイズ
   ymuint32 mSize;

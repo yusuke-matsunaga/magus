@@ -15,7 +15,6 @@ noinst_LTLIBRARIES = libmagus_core_tcl.la
 libmagus_core_tcl_la_SOURCES = \
 	MagMgr.cc \
 	NetHandle.cc \
-	TclObjMsgHandler.cc \
 	BNetHandle.h \
 	BNetHandle.cc \
 	BdnHandle.h \

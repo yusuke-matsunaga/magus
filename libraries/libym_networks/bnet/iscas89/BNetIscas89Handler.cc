@@ -32,14 +32,19 @@ void
 BNetIscas89Handler::set_network(BNetwork* network)
 {
   mNetwork = network;
-  mManip = new BNetManip(network);
 }
 
 // @brief 初期化
 bool
 BNetIscas89Handler::init()
 {
+  assert_cond( mManip == NULL, __FILE__, __LINE__);
+
+  mManip = new BNetManip(mNetwork);
   mNetwork->clear();
+
+  mNodeArray.clear();
+
   return true;
 }
 

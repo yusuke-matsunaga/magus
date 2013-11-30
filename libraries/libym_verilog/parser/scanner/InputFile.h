@@ -5,15 +5,13 @@
 /// @brief InputFile のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: InputFile.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_verilog/verilog.h"
 
-#include "ym_utils/FileScanner.h"
+#include "ym_utils/Scanner.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/FileInfo.h"
 #include "ym_utils/StrBuff.h"
@@ -34,21 +32,27 @@ BEGIN_NAMESPACE_YM_VERILOG
 /// @sa FileInfo RawLex
 //////////////////////////////////////////////////////////////////////
 class InputFile :
-  public FileScanner
+  public Scanner
 {
   friend class InputMgr;
 
 private:
 
   /// @brief コンストラクタ
+  /// @param[in] ido 入力データ
   /// @param[in] lex 親の Lex
-  InputFile(RawLex* lex);
+  /// @note ido はこのクラスが管理する．(デストラクタで破壊する)
+  InputFile(IDO* ido,
+	    RawLex& lex);
 
   /// @brief デストラクタ
   ~InputFile();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief トークンの読み出しを行う．
   /// @param[out] buff 結果の文字列を格納するバッファ
@@ -59,12 +63,14 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief read_token() の下請け関数
   /// @param[out] buff 結果の文字列を格納するバッファ
   int
   _read_token(StrBuff& buff);
-
 
   /// @brief 2進数モードの読み込みを行う．
   /// @param[in] c 最初の文字
@@ -150,7 +156,7 @@ private:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // FileScanner の仮想関数
+  // Scanner の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 改行を読み込んだ時に起動する関数
@@ -165,8 +171,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 入力データ
+  // Scanner() と二重に持つことになるけどまあいいか．
+  IDO* mIDO;
+
   // 親の Lex
-  RawLex* mLex;
+  RawLex& mLex;
 
 };
 

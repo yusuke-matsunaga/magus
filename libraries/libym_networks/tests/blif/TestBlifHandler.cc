@@ -13,7 +13,7 @@
 #include "ym_utils/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 TestBlifHandler::TestBlifHandler(ostream* streamptr) :
@@ -64,22 +64,34 @@ TestBlifHandler::outputs_elem(ymuint32 name_id)
 }
 
 // @brief .names 文の処理
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 各識別子のID番号の配列
+// @param[in] nc キューブ数
+// @param[in] cover_pat 入力カバーを表す文字列
+// @param[in] opat 出力の極性
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
+// @note cover_pat は ni 個ごとに1行のパタンを表す．
+// 各要素のとりうる値は '0', '1', '-' を表す．
+// @note opat は '0' か '1' のどちらか
 bool
-TestBlifHandler::names(const vector<ymuint32>& name_id_array,
+TestBlifHandler::names(ymuint32 onode_id,
+		       const vector<ymuint32>& inode_id_array,
 		       ymuint32 nc,
 		       const char* cover_pat,
 		       char opat)
 {
   (*mStreamPtr) << ".names" << endl;
-  size_t n = name_id_array.size();
-  for (size_t i = 0; i < n; ++ i) {
-    ymuint32 id = name_id_array[i];
+  ymuint ni = inode_id_array.size();
+  for (ymuint i = 0; i < ni; ++ i) {
+    ymuint32 id = inode_id_array[i];
     (*mStreamPtr) << id2str(id) << endl
 		  << "\t[" << id2loc(id) << "]" << endl;
   }
-  size_t ni = n - 1;
-  for (size_t i = 0; i < nc; ++ i) {
-    for (size_t j = 0; j < ni; ++ j) {
+  (*mStreamPtr) << id2str(onode_id) << endl
+		  << "\t[" << id2loc(onode_id) << "]" << endl;
+  for (ymuint i = 0; i < nc; ++ i) {
+    for (ymuint j = 0; j < ni; ++ j) {
       (*mStreamPtr) << cover_pat[i * ni + j];
     }
     if ( ni > 0 ) {
@@ -91,15 +103,15 @@ TestBlifHandler::names(const vector<ymuint32>& name_id_array,
 }
 
 // @brief .gate 文の処理
-// @param[in] cell セル
 // @param[in] onode_id 出力ノードのID番号
 // @param[in] inode_id_array 入力ノードのID番号の配列
+// @param[in] cell セル
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-TestBlifHandler::gate(const Cell* cell,
-		      ymuint32 onode_id,
-		      const vector<ymuint32>& inode_id_array)
+TestBlifHandler::gate(ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array,
+		      const Cell* cell)
 {
   (*mStreamPtr) << ".gate " << cell->name() << " " << id2str(onode_id)
 		<< "\t[" << id2loc(onode_id) << "]" << endl;
@@ -113,17 +125,23 @@ TestBlifHandler::gate(const Cell* cell,
 }
 
 // @brief .latch 文の処理
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id 入力ノードのID番号
+// @param[in] loc4 リセット値の位置情報
+// @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
+// @retval true 処理が成功した．
+// @retval false エラーが起こった．
 bool
-TestBlifHandler::latch(ymuint32 name1_id,
-		       ymuint32 name2_id,
+TestBlifHandler::latch(ymuint32 onode_id,
+		       ymuint32 inode_id,
 		       const FileRegion& loc4,
 		       char rval)
 {
   (*mStreamPtr) << ".latch "
-		<< id2str(name1_id) << " "
-		<< id2str(name2_id) << " " << rval << endl
-		<< "\t[" << id2loc(name1_id) << "]" << endl
-		<< "\t[" << id2loc(name2_id) << "]" << endl
+		<< id2str(inode_id) << " "
+		<< id2str(onode_id) << " " << rval << endl
+		<< "\t[" << id2loc(inode_id) << "]" << endl
+		<< "\t[" << id2loc(onode_id) << "]" << endl
 		<< "\t[" << loc4 << "]" << endl;
   return true;
 }
@@ -151,4 +169,4 @@ TestBlifHandler::error_exit()
   (*mStreamPtr) << "error_exit" << endl;
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

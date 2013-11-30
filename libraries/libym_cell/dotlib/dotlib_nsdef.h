@@ -30,6 +30,7 @@ END_NAMESPACE_YM_CELL
 BEGIN_NAMESPACE_YM_DOTLIB
 
 // クラス名の前方宣言
+class DotlibAttr;
 class DotlibMgr;
 class DotlibParser;
 class DotlibNode;
@@ -39,6 +40,7 @@ class DotlibFL;
 class DotlibFF;
 class DotlibLatch;
 class DotlibPin;
+class DotlibTiming;
 
 END_NAMESPACE_YM_DOTLIB
 

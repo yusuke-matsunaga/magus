@@ -108,7 +108,7 @@ fi
 
 
 #==================================================================
-# YM_BUILD_LIBRARY(libname, required-conditions)
+# YM_BUILD_LIBRARY(libname, default_value, required-conditions)
 #
 # Description: libname をビルドするかどうかを判断し，設定する．
 #              required-conditions にはカンマで区切られた shell 変数
@@ -117,29 +117,41 @@ fi
 #==================================================================
 AC_DEFUN([YM_BUILD_LIBRARY],
 [
+__YM_BUILD_LIBRARY([$1], [$2], [$3], m4_toupper($1))
+])
+
+AC_DEFUN([__YM_BUILD_LIBRARY],
+[
+AC_ARG_ENABLE([$1],
+	[AS_HELP_STRING([--enable-$1],
+	                [build $1 (default is $2)])],
+        [ym_[]$1[]_enable=$enableval],
+	[ym_[]$1[]_enable=$2])
 ym_tmp_enable=${ym_[]$1[]_enable}
-m4_ifval([$2], [
-    m4_foreach([XXX], [$2], [
-       if test "$ym_tmp_enable" = "1" -a "$XXX" != "1"; then
-           ym_tmp_enable=0
+m4_ifval([$3], [
+    m4_foreach([XXX], [$3], [
+       if test "$ym_tmp_enable" = "yes" -a "$XXX" != "yes"; then
+           ym_tmp_enable=no
 	   AC_MSG_NOTICE(['$1' will be disabled because 'XXX' is disabled])
        fi
     ])
 ])
-if test "$ym_tmp_enable" = "1"; then
+if test "$ym_tmp_enable" = "yes"; then
     YM_ADD_LIBRARIES_SUBDIRS([$1])
     AC_CONFIG_SUBDIRS([libraries/$1])
+    AC_DEFINE([HAVE_$4], [1])
     AC_MSG_NOTICE(['$1' is enabled])
 fi
+AM_CONDITIONAL([YM_HAVE_$4], [test $ym_tmp_enable = yes])
 ])
 
 
 # ==================================================================
 # YM_INIT_LIBRARIES_SUBDIRS
-# 
+#
 # Description: Initialize 'YM_LIBRARIES_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_INIT_LIBRARIES_SUBDIRS], 
+AC_DEFUN([YM_INIT_LIBRARIES_SUBDIRS],
 [
 ym_libraries_subdirs=""
 ])
@@ -150,7 +162,7 @@ ym_libraries_subdirs=""
 #
 # Description: add <dirname> to 'YM_LIBRARIES_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_ADD_LIBRARIES_SUBDIRS], 
+AC_DEFUN([YM_ADD_LIBRARIES_SUBDIRS],
 [
 ym_libraries_subdirs="$ym_libraries_subdirs $1"
 ])
@@ -167,7 +179,7 @@ AC_SUBST([YM_LIBRARIES_SUBDIRS], $ym_libraries_subdirs)
 
 
 #==================================================================
-# YM_BUILD_PROGRAM(progname, required-conditions)
+# YM_BUILD_PROGRAM(progname, default_value, required-conditions)
 #
 # Description: progname をビルドするかどうかを判断し，設定する．
 #              required-conditions にはカンマで区切られた shell 変数
@@ -176,31 +188,43 @@ AC_SUBST([YM_LIBRARIES_SUBDIRS], $ym_libraries_subdirs)
 #==================================================================
 AC_DEFUN([YM_BUILD_PROGRAM],
 [
+__YM_BUILD_PROGRAM([$1], [$2], [$3], m4_toupper($1))
+])
+
+AC_DEFUN([__YM_BUILD_PROGRAM],
+[
+AC_ARG_ENABLE([$1],
+	[AS_HELP_STRING([--enable-$1],
+	                [build $1 (default is $2)])],
+        [ym_[]$1[]_enable=$enableval],
+	[ym_[]$1[]_enable=$2])
 ym_tmp_enable=${ym_[]$1[]_enable}
-m4_ifval([$2], [
-    m4_foreach([XXX], [$2], [
-       if test "$ym_tmp_enable" = "1" -a "$XXX" != "1"; then
-           ym_tmp_enable=0
+m4_ifval([$3], [
+    m4_foreach([XXX], [$3], [
+       if test "$ym_tmp_enable" = "yes" -a "$XXX" != "yes"; then
+           ym_tmp_enable=no
 	   AC_MSG_NOTICE(['$1' will be disabled because 'XXX' is disabled])
        fi
     ])
 ])
-if test "$ym_tmp_enable" = "1"; then
+if test "$ym_tmp_enable" = "yes"; then
     YM_ADD_PROGRAMS_SUBDIRS([$1])
     AC_CONFIG_SUBDIRS([programs/$1])
+    AC_DEFINE([HAVE_$4], [1], [Define if $1 is enabled])
     AC_MSG_NOTICE(['$1' is enabled])
 fi
+AM_CONDITIONAL([YM_HAVE_$4], [test $ym_tmp_enable = yes])
 ])
 
 
 # ==================================================================
 # YM_INIT_PROGRAMS_SUBDIRS
-# 
+#
 # Description: Initialize 'YM_PROGRAMS_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_INIT_PROGRAMS_SUBDIRS], 
+AC_DEFUN([YM_INIT_PROGRAMS_SUBDIRS],
 [
-ym_pgorams_subdirs=""
+ym_programs_subdirs=""
 ])
 
 
@@ -209,7 +233,7 @@ ym_pgorams_subdirs=""
 #
 # Description: add <dirname> to 'YM_PROGRAMS_SUBDIRS'
 # ==================================================================
-AC_DEFUN([YM_ADD_PROGRAMS_SUBDIRS], 
+AC_DEFUN([YM_ADD_PROGRAMS_SUBDIRS],
 [
 ym_programs_subdirs="$ym_programs_subdirs $1"
 ])
@@ -222,4 +246,68 @@ ym_programs_subdirs="$ym_programs_subdirs $1"
 # ==================================================================
 AC_DEFUN([YM_FINISH_PROGRAMS_SUBDIRS], [
 AC_SUBST([YM_PROGRAMS_SUBDIRS], $ym_programs_subdirs)
+])
+
+
+# ==================================================================
+# YM_INIT_EXTRA_SUBDIRS
+#
+# Description: Initialize 'YM_EXTRA_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_INIT_EXTRA_SUBDIRS],
+[
+ym_extra_subdirs=""
+])
+
+
+# ==================================================================
+# YM_ADD_EXTRA_SUBDIRS(dirname)
+#
+# Description: add <dirname> to 'YM_EXTRA_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_ADD_EXTRA_SUBDIRS],
+[
+ym_extra_subdirs="$ym_extra_subdirs $1"
+])
+
+
+# ==================================================================
+# YM_FINISH_EXTRA_SUBDIRS
+#
+# Description: finalize 'YM_EXTRA_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_FINISH_EXTRA_SUBDIRS], [
+AC_SUBST([YM_EXTRA_SUBDIRS], $ym_extra_subdirs)
+])
+
+
+# ==================================================================
+# YM_INIT_TESTS_SUBDIRS
+#
+# Description: Initialize 'YM_TESTS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_INIT_TESTS_SUBDIRS],
+[
+ym_tests_subdirs=""
+])
+
+
+# ==================================================================
+# YM_ADD_TESTS_SUBDIRS(dirname)
+#
+# Description: add <dirname> to 'YM_TESTS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_ADD_TESTS_SUBDIRS],
+[
+ym_tests_subdirs="$ym_tests_subdirs $1"
+])
+
+
+# ==================================================================
+# YM_FINISH_TESTS_SUBDIRS
+#
+# Description: finalize 'YM_TESTS_SUBDIRS'
+# ==================================================================
+AC_DEFUN([YM_FINISH_TESTS_SUBDIRS], [
+AC_SUBST([YM_TESTS_SUBDIRS], $ym_tests_subdirs)
 ])

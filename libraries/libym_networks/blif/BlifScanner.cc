@@ -10,7 +10,7 @@
 #include "BlifScanner.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 BEGIN_NONAMESPACE
 
@@ -25,7 +25,9 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BlifScanner::BlifScanner()
+// @param[in] ido 入力データ
+BlifScanner::BlifScanner(IDO& ido) :
+  Scanner(ido)
 {
 }
 
@@ -193,4 +195,4 @@ BlifScanner::check_word(bool start_with_dot)
   return kTokenSTRING;
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

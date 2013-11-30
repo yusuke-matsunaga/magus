@@ -206,10 +206,12 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     else {
       if ( inv ) {
 	// 定数1ノードを作る．
+	assert_cond( const1_cell != NULL, __FILE__, __LINE__);
 	mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), const1_cell);
       }
       else {
 	// 定数0ノードを作る．
+	assert_cond( const0_cell != NULL, __FILE__, __LINE__);
 	mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), const0_cell);
       }
     }

@@ -55,10 +55,15 @@ Params kDefaultParams(0.95, 0.02, 0.999);
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmSat::YmSat(SatAnalyzer* analyzer) :
+YmSat::YmSat(SatAnalyzer* analyzer,
+	     const string& option) :
   mAnalyzer(analyzer),
   mSane(true),
   mAlloc(4096),
+  mConstrBinNum(0),
+  mConstrLitNum(0),
+  mLearntBinNum(0),
+  mLearntLitNum(0),
   mVarNum(0),
   mOldVarNum(0),
   mVarSize(0),
@@ -79,17 +84,16 @@ YmSat::YmSat(SatAnalyzer* analyzer) :
   mConflictNum(0),
   mDecisionNum(0),
   mPropagationNum(0),
-  mConstrBinNum(0),
-  mConstrLitNum(0),
-  mLearntBinNum(0),
-  mLearntLitNum(0),
   mConflictLimit(0),
   mLearntLimit(0),
   mMaxConflict(1024 * 10)
 {
   mAnalyzer->set_solver(this);
 
-  mTmpBinClause = new_clause(vector<Literal>(2));
+  mTmpLitsSize = 1024;
+  mTmpLits = new Literal[mTmpLitsSize];
+
+  mTmpBinClause = new_clause(2);
 
   mRestart = 0;
 
@@ -99,6 +103,10 @@ YmSat::YmSat(SatAnalyzer* analyzer) :
 // @brief デストラクタ
 YmSat::~YmSat()
 {
+  for (ymuint i = 0; i < mVarSize * 2; ++ i) {
+    mWatcherList[i].finish(mAlloc);
+  }
+
   delete mAnalyzer;
   delete [] mVal;
   delete [] mDecisionLevel;
@@ -107,6 +115,7 @@ YmSat::~YmSat()
   delete [] mActivity;
   delete [] mWatcherList;
   delete [] mHeap;
+  delete [] mTmpLits;
 }
 
 // @brief 正しい状態のときに true を返す．
@@ -192,6 +201,32 @@ YmSat::expand_var()
 void
 YmSat::add_clause(const vector<Literal>& lits)
 {
+  ymuint n = lits.size();
+  alloc_lits(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    mTmpLits[i] = lits[i];
+  }
+  add_clause_sub(n);
+}
+
+// @brief 節を追加する．
+// @param[in] lit_num リテラル数
+// @param[in] lits リテラルの配列
+void
+YmSat::add_clause(ymuint lit_num,
+		  Literal* lits)
+{
+  alloc_lits(lit_num);
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    mTmpLits[i] = lits[i];
+  }
+  add_clause_sub(lit_num);
+}
+
+// @brief add_clause() の下請け関数
+void
+YmSat::add_clause_sub(ymuint lit_num)
+{
   if ( decision_level() != 0 ) {
     // エラー
     cout << "Error![YmSat]: decision_level() != 0" << endl;
@@ -203,20 +238,15 @@ YmSat::add_clause(const vector<Literal>& lits)
     return;
   }
 
-  // operator<(Literal, Literal) を使ったソート
-  mAcTmp = lits;
-  sort(mAcTmp.begin(), mAcTmp.end());
-
   alloc_var();
 
   // - 重複したリテラルの除去
   // - false literal の除去
   // - true literal を持つかどうかのチェック
-  vector<Literal>::iterator wp = mAcTmp.begin();
-  for (vector<Literal>::const_iterator rp = mAcTmp.begin();
-       rp != mAcTmp.end(); ++ rp) {
-    Literal l = *rp;
-    if ( wp != mAcTmp.begin() && *(wp - 1) == l ) {
+  ymuint wpos = 0;
+  for (ymuint rpos = 0; rpos < lit_num; ++ rpos) {
+    Literal l = mTmpLits[rpos];
+    if ( wpos != 0 && mTmpLits[wpos - 1] == l ) {
       // 重複している．
       continue;
     }
@@ -236,22 +266,21 @@ YmSat::add_clause(const vector<Literal>& lits)
       return;
     }
     // 追加する．
-    *wp = l;
-    ++ wp;
+    mTmpLits[wpos] = l;
+    ++ wpos;
   }
-  mAcTmp.erase(wp, mAcTmp.end());
+  lit_num = wpos;
 
-  ymuint n = mAcTmp.size();
-  mConstrLitNum += n;
+  mConstrLitNum += lit_num;
 
-  if ( n == 0 ) {
+  if ( lit_num == 0 ) {
     // empty clause があったら unsat
     mSane = false;
     return;
   }
 
-  Literal l0 = mAcTmp[0];
-  if ( n == 1 ) {
+  Literal l0 = mTmpLits[0];
+  if ( lit_num == 1 ) {
     // unit clause があったら値の割り当てを行う．
     bool stat = check_and_assign(l0);
     if ( debug & debug_assign ) {
@@ -269,17 +298,18 @@ YmSat::add_clause(const vector<Literal>& lits)
     return;
   }
 
-  Literal l1 = mAcTmp[1];
+  Literal l1 = mTmpLits[1];
 
-  if ( n == 2 ) {
+  if ( lit_num == 2 ) {
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
+
     ++ mConstrBinNum;
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(mAcTmp);
+    SatClause* clause = new_clause(lit_num, mTmpLits);
     mConstrClause.push_back(clause);
 
     // watcher-list の設定
@@ -290,9 +320,9 @@ YmSat::add_clause(const vector<Literal>& lits)
 
 // 学習節を追加する．
 void
-YmSat::add_learnt_clause(const vector<Literal>& lits)
+YmSat::add_learnt_clause()
 {
-  ymuint n = lits.size();
+  ymuint n = mLearntLits.size();
   mLearntLitNum += n;
 
   if ( n == 0 ) {
@@ -301,7 +331,7 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
     return;
   }
 
-  Literal l0 = lits[0];
+  Literal l0 = mLearntLits[0];
   if ( n == 1 ) {
     // unit clause があったら値の割り当てを行う．
     bool stat = check_and_assign(l0);
@@ -321,19 +351,25 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
   }
 
   SatReason reason;
-  Literal l1 = lits[1];
+  Literal l1 = mLearntLits[1];
   if ( n == 2 ) {
     reason = SatReason(l1);
 
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
+
     ++ mLearntBinNum;
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(lits, true);
+    alloc_lits(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      mTmpLits[i] = mLearntLits[i];
+    }
+    SatClause* clause = new_clause(n, true);
     mLearntClause.push_back(clause);
+
     reason = SatReason(clause);
 
     // watcher-list の設定
@@ -351,14 +387,31 @@ YmSat::add_learnt_clause(const vector<Literal>& lits)
   assign(l0, reason);
 }
 
-// Watcher を追加する．
+// @brief watcher を削除する．
+// @param[in] watch_lit リテラル
+// @param[in] reason 理由
 void
-YmSat::add_watcher(Literal watch_lit,
+YmSat::del_watcher(Literal watch_lit,
 		   SatReason reason)
 {
-  watcher_list(watch_lit).add(Watcher(reason));
+  Watcher w0(reason);
+  WatcherList& wlist = watcher_list(watch_lit);
+  ymuint n = wlist.num();
+  ymuint wpos = 0;
+  for ( ; wpos < n; ++ wpos) {
+    Watcher w = wlist.elem(wpos);
+    if ( w == w0 ) {
+      break;
+    }
+  }
+  assert_cond( wpos < n, __FILE__, __LINE__);
+  -- n;
+  for ( ; wpos < n; ++ wpos) {
+    Watcher w = wlist.elem(wpos + 1);
+    wlist.set_elem(wpos, w);
+  }
+  wlist.erase(n);
 }
-
 
 // @brief SAT 問題を解く．
 // @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -396,11 +449,17 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   alloc_var();
 
+  // 自明な簡単化を行う．
   simplifyDB();
   if ( !mSane ) {
+    // その時点で充足不可能なら終わる．
+    if ( debug & debug_solve ) {
+      cout << "UNSAT in simplifyDB()" << endl;
+    }
     return kB3False;
   }
 
+  // パラメータの初期化
   double confl_limit = 100;
   double learnt_limit = mConstrClause.size() / 3;
   mVarDecay = mParams.mVarDecay;
@@ -427,14 +486,19 @@ YmSat::solve(const vector<Literal>& assumptions,
       }
     }
 
+    // 条件式のなかに重要な手続きが書いてあるあんまり良くないコード
+    // だけど implication() は stat == true の時しか実行しないのでしょうがない．
     if ( !stat || implication() != kNullSatReason ) {
+      // 矛盾が起こった．
       backtrack(0);
       if ( debug & debug_solve ) {
 	cout << "UNSAT" << endl;
       }
+
       return kB3False;
     }
   }
+
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();
   if ( debug & (debug_assign | debug_decision) ) {
@@ -443,6 +507,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   Bool3 stat = kB3X;
   for ( ; ; ) {
+    // 実際の探索を行う．
     mConflictLimit = static_cast<ymuint64>(confl_limit);
     if ( mConflictLimit > mMaxConflict ) {
       mConflictLimit = mMaxConflict;
@@ -458,11 +523,15 @@ YmSat::solve(const vector<Literal>& assumptions,
     ++ mRestart;
     stat = search();
     if ( stat != kB3X ) {
+      // 結果が求められた．
       break;
     }
     if ( mConflictLimit == mMaxConflict ) {
+      // 制限値に達した．(アボート)
       break;
     }
+
+    // 判定できなかったのでパラメータを更新して次のラウンドへ
     decay_var_activity2();
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit * 1.1;
@@ -492,6 +561,13 @@ YmSat::solve(const vector<Literal>& assumptions,
   }
 
   return stat;
+}
+
+// @brief 学習節の整理を行なう．
+void
+YmSat::reduce_learnt_clause()
+{
+  reduceDB();
 }
 
 // @brief conflict_limit の最大値
@@ -556,16 +632,15 @@ YmSat::search()
       }
 
       // 今の矛盾の解消に必要な条件を「学習」する．
-      vector<Literal> learnt;
-      int bt_level = mAnalyzer->analyze(conflict, learnt);
+      int bt_level = mAnalyzer->analyze(conflict, mLearntLits);
 
       if ( debug & debug_analyze ) {
 	cout << endl
 	     << "analyze for " << conflict << endl
 	     << "learnt clause is ";
 	const char* plus = "";
-	for (ymuint i = 0; i < learnt.size(); ++ i) {
-	  Literal l = learnt[i];
+	for (ymuint i = 0; i < mLearntLits.size(); ++ i) {
+	  Literal l = mLearntLits[i];
 	  cout << plus << l << " @" << decision_level(l.varid());
 	  plus = " + ";
 	}
@@ -579,7 +654,7 @@ YmSat::search()
       backtrack(bt_level);
 
       // 学習節の生成
-      add_learnt_clause(learnt);
+      add_learnt_clause();
 
       decay_var_activity();
       decay_clause_activity();
@@ -639,6 +714,7 @@ YmSat::implication()
       ++ rpos;
       ++ wpos;
       if ( w.is_literal() ) {
+	// 2-リテラル節の場合は相方のリテラルに基づく値の割り当てを行う．
 	Literal l0 = w.literal();
 	Bool3 val0 = eval(l0);
 	if ( val0 == kB3X ) {
@@ -655,91 +731,107 @@ YmSat::implication()
 		 << "\t    " << ~l0 << " was assigned at level "
 		 << decision_level(l0.varid()) << endl;
 	  }
+
 	  // ループを抜けるためにキューの末尾まで先頭を動かす．
 	  mAssignList.skip_all();
-	  mTmpBinClause->mLits[0] = l0;
-	  mTmpBinClause->mLits[1] = nl;
+
+	  // 矛盾の理由を表す節を作る．
+	  mTmpBinClause->set(l0, nl);
 	  conflict = SatReason(mTmpBinClause);
 	  break;
 	}
       }
-      else {
-	SatClause& c = w.clause();
-	Literal l0 = c.lit0();
+      else { // w.is_clause()
+	// 3つ以上のリテラルを持つ節の場合は，
+	// - nl(~l) を wl1() にする．(場合によっては wl0 を入れ替える)
+	// - wl0() が充足していたらなにもしない．
+	// - wl0() が不定，もしくは偽なら，nl の代わりの watch literal を探す．
+	// - 代わりが見つかったらそのリテラルを wl1() にする．
+	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
+	SatClause* c = w.clause();
+	Literal l0 = c->wl0();
 	if ( l0 == nl ) {
-	  // nl を 2番めのリテラルにする．
-	  l0 = c.lit1();
-	  c.lit0() = l0;
-	  c.lit1() = nl;
+	  // nl を 1番めのリテラルにする．
+	  c->xchange_wl();
+	  // 新しい wl0 を得る．
+	  l0 = c->wl0();
 	}
 	else { // l1 == nl
 	  if ( debug & debug_implication ) {
 	    // この assert は重いのでデバッグ時にしかオンにしない．
 	    // ※ debug と debug_implication が const なので結果が0の
 	    // ときにはコンパイル時に消されることに注意
-	    assert_cond(c.lit1() == nl, __FILE__, __LINE__);
+	    assert_cond(c->wl1() == nl, __FILE__, __LINE__);
 	  }
 	}
 
 	Bool3 val0 = eval(l0);
-	if ( val0 != kB3True ) {
-	  if ( debug & debug_implication ) {
-	    cout << "\t\texamining watcher clause " << c << endl;
-	  }
+	if ( val0 == kB3True ) {
+	  // すでに充足していた．
+	  continue;
+	}
 
-	  // nl の替わりのリテラルを見つける．
-	  // この時，替わりのリテラルが未定かすでに充足しているかどうか
-	  // は問題でない．
-	  bool found = false;
-	  int n = c.size();
-	  for (int i = 2; i < n; ++ i) {
-	    Literal l2 = c.lit(i);
-	    if ( eval(l2) != kB3False ) {
-	      c.lit(i) = nl;
-	      c.lit1() = l2;
-	      if ( debug & debug_implication ) {
-		cout << "\t\t\tsecond watching literal becomes "
-		     << l2 << endl;
-	      }
-	      // l の watcher list からは取り除く
-	      -- wpos;
-	      // ~tmp の watcher list に追加する．
-	      watcher_list(~l2).add(w);
-	      found = true;
-	      break;
-	    }
-	  }
-	  if ( found ) {
-	    continue;
-	  }
+	if ( debug & debug_implication ) {
+	  cout << "\t\texamining watcher clause " << c << endl;
+	}
 
-	  if ( debug & debug_implication ) {
-	    cout << "\t\tno other watching literals" << endl;
-	  }
+	// nl の替わりのリテラルを見つける．
+	// この時，替わりのリテラルが未定かすでに充足しているかどうか
+	// は問題でない．
+	bool found = false;
+	ymuint n = c->lit_num();
+	for (ymuint i = 2; i < n; ++ i) {
+	  Literal l2 = c->lit(i);
+	  if ( eval(l2) != kB3False ) {
+	    // l2 を 1番めの watch literal にする．
+	    c->insert(i, 1);
+	    if ( debug & debug_implication ) {
+	      cout << "\t\t\tsecond watching literal becomes "
+		   << l2 << endl;
+	    }
+	    // l の watcher list から取り除く
+	    -- wpos;
+	    // ~l2 の watcher list に追加する．
+	    add_watcher(~l2, w);
 
-	  // 見付からなかったので l0 に従った割り当てを行う．
-	  if ( val0 == kB3X ) {
-	    if ( debug & debug_assign ) {
-	      cout << "\tassign " << l0 << " @" << decision_level()
-		   << " from " << w << endl;
-	    }
-	    assign(l0, w);
-	  }
-	  else {
-	    // 矛盾がおこった．
-	    if ( debug & debug_assign ) {
-	      cout << "\t--> conflict with previous assignment" << endl
-		   << "\t    " << ~l0 << " was assigned at level "
-		   << decision_level(l0.varid()) << endl;
-	    }
-	    // ループを抜けるためにキューの末尾まで先頭を動かす．
-	    mAssignList.skip_all();
-	    conflict = w;
+	    found = true;
 	    break;
 	  }
 	}
+	if ( found ) {
+	  continue;
+	}
+
+	if ( debug & debug_implication ) {
+	  cout << "\t\tno other watching literals" << endl;
+	}
+
+	// 見付からなかったので l0 に従った割り当てを行う．
+	if ( val0 == kB3X ) {
+	  if ( debug & debug_assign ) {
+	    cout << "\tassign " << l0 << " @" << decision_level()
+		 << " from " << w << endl;
+	  }
+	  assign(l0, w);
+	}
+	else {
+	  // 矛盾がおこった．
+	  if ( debug & debug_assign ) {
+	    cout << "\t--> conflict with previous assignment" << endl
+		 << "\t    " << ~l0 << " was assigned at level "
+		 << decision_level(l0.varid()) << endl;
+	  }
+
+	  // ループを抜けるためにキューの末尾まで先頭を動かす．
+	  mAssignList.skip_all();
+
+	  // この場合は w が矛盾の理由を表す節になっている．
+	  conflict = w;
+	  break;
+	}
       }
     }
+    // 途中でループを抜けた場合に wlist の後始末をしておく．
     if ( wpos != rpos ) {
       for ( ; rpos < n; ++ rpos) {
 	wlist.set_elem(wpos, wlist.elem(rpos));
@@ -785,19 +877,25 @@ Literal
 YmSat::next_decision()
 {
 #if 0
+  // 一定確率でランダムな変数を選ぶ．
   if ( mRandGen.real1() < mParams.mVarFreq && !heap_empty() ) {
     ymuint pos = mRandGen.int32() % mVarNum;
+    VarId vid(pos);
     tPol pol = kPolNega;
-    if ( eval(pos) == kB3X ) {
-      return Literal(pos, pol);
+    if ( eval(VarId(vid)) == kB3X ) {
+      return Literal(vid, pol);
     }
   }
 #endif
   while ( !heap_empty() ) {
     ymuint vindex = heap_pop_top();
     if ( mVal[vindex] == kB3X ) {
-      //tPol pol = (mRandGen.int32() & 1) ? kPolPosi : kPolNega;
+      // Watcher の多い方の極性を(わざと)選ぶ
+      ymuint v2 = vindex * 2;
       tPol pol = kPolNega;
+      if ( mWatcherList[v2 + 0].num() >= mWatcherList[v2 + 1].num() ) {
+	pol = kPolPosi;
+      }
       return Literal(VarId(vindex), pol);
     }
   }
@@ -829,7 +927,7 @@ public:
   operator()(SatClause* a,
 	     SatClause* b)
   {
-    return a->size() > 2 && (b->size() == 2 || a->activity() < b->activity() );
+    return a->lit_num() > 2 && (b->lit_num() == 2 || a->activity() < b->activity() );
   }
 };
 END_NONAMESPACE
@@ -849,7 +947,7 @@ YmSat::reduceDB()
   vector<SatClause*>::iterator wpos = mLearntClause.begin();
   for (ymuint i = 0; i < n2; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->size() > 2 && !is_locked(clause) ) {
+    if ( clause->lit_num() > 2 && !is_locked(clause) ) {
       delete_clause(clause);
     }
     else {
@@ -859,7 +957,7 @@ YmSat::reduceDB()
   }
   for (ymuint i = n2; i < n; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->size() > 2 && !is_locked(clause) &&
+    if ( clause->lit_num() > 2 && !is_locked(clause) &&
 	 clause->activity() < abs_limit ) {
       delete_clause(clause);
     }
@@ -875,43 +973,43 @@ YmSat::reduceDB()
 
 // 新しい節を生成する．
 SatClause*
-YmSat::new_clause(const vector<Literal>& lits,
-			  bool learnt)
+YmSat::new_clause(ymuint lit_num,
+		  bool learnt)
 {
-  ymuint n = lits.size();
-  ymuint size = sizeof(SatClause) + sizeof(Literal) * (n - 1);
-  void* tmp = mAlloc.get_memory(size);
-  return new (tmp) SatClause(lits, learnt);
+  ymuint size = sizeof(SatClause) + sizeof(Literal) * (lit_num - 1);
+  void* p = mAlloc.get_memory(size);
+  SatClause* clause = new (p) SatClause(lit_num, mTmpLits, learnt);
+
+  return clause;
+}
+
+// @brief mTmpLits を確保する．
+void
+YmSat::alloc_lits(ymuint lit_num)
+{
+  ymuint old_size = mTmpLitsSize;
+  while ( mTmpLitsSize <= lit_num ) {
+    mTmpLitsSize <<= 1;
+  }
+  if ( old_size < mTmpLitsSize ) {
+    delete [] mTmpLits;
+    mTmpLits = new Literal[mTmpLitsSize];
+  }
 }
 
 // 節を捨てる．
 void
 YmSat::delete_clause(SatClause* clause)
 {
-  // 0 番目と 1 番目のリテラルに関係する watch list を更新
-  for (ymuint i = 0; i < 2; ++ i) {
-    Literal l = ~clause->lit(i);
-    WatcherList& wlist = watcher_list(l);
-    ymuint n = wlist.num();
-    ymuint rpos = 0;
-    ymuint wpos = 0;
-    for ( ; rpos < n; ++ rpos) {
-      Watcher w = wlist.elem(rpos);
-      if ( w != SatReason(clause) ) {
-	wlist.set_elem(wpos, w);
-	++ wpos;
-      }
-    }
-    wlist.erase(wpos);
-  }
-  if ( clause->is_learnt() ) {
-    mLearntLitNum -= clause->size();
-  }
-  else {
-    mConstrLitNum -= clause->size();
-  }
+  assert_cond( clause->is_learnt(), __FILE__, __LINE__);
 
-  ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->size() - 1);
+  // watch list を更新
+  del_watcher(~clause->wl0(), SatReason(clause));
+  del_watcher(~clause->wl1(), SatReason(clause));
+
+  mLearntLitNum -= clause->lit_num();
+
+  ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->lit_num() - 1);
   mAlloc.put_memory(size, static_cast<void*>(clause));
 }
 
@@ -957,12 +1055,12 @@ YmSat::decay_var_activity2()
 void
 YmSat::bump_clause_activity(SatClause* clause)
 {
-  clause->mActivity += mClauseBump;
-  if ( clause->mActivity > 1e+100 ) {
+  clause->increase_activity(mClauseBump);
+  if ( clause->activity() > 1e+100 ) {
     for (vector<SatClause*>::iterator p = mLearntClause.begin();
 	 p != mLearntClause.end(); ++ p) {
       SatClause* clause1 = *p;
-      clause1->mActivity *= 1e-100;
+      clause1->factor_activity(1e-100);
     }
     mClauseBump *= 1e-100;
   }

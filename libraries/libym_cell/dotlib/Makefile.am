@@ -26,6 +26,7 @@ libym_cell_dotlib_la_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_dotlib_la_SOURCES = \
+	CellDotlibReader.cc \
 	dotlib_nsdef.h \
 	dotlib_int.h \
 	DotlibParser.h \
@@ -57,6 +58,8 @@ libym_cell_dotlib_la_SOURCES = \
 	DotlibMgrImpl.h \
 	DotlibMgrImpl.cc \
 	DotlibNode.h \
+	DotlibAttr.h \
+	DotlibAttr.cc \
 	DotlibNodeImpl.h \
 	DotlibNodeImpl.cc \
 	DotlibNode.cc \
@@ -73,7 +76,13 @@ libym_cell_dotlib_la_SOURCES = \
 	DotlibLatch.h \
 	DotlibLatch.cc \
 	DotlibPin.h \
-	DotlibPin.cc
+	DotlibPin.cc \
+	DotlibTiming.h \
+	DotlibTiming.cc \
+	DotlibTemplate.h \
+	DotlibTemplate.cc \
+	DotlibLut.h \
+	DotlibLut.cc
 
 libym_cell_dotlib_la_LDFLAGS =
 

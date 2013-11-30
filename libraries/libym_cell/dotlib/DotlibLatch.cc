@@ -8,6 +8,7 @@
 
 
 #include "DotlibLatch.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -19,7 +20,6 @@ BEGIN_NAMESPACE_YM_DOTLIB
 // @brief コンストラクタ
 DotlibLatch::DotlibLatch()
 {
-  init();
 }
 
 // @brief デストラクタ
@@ -28,14 +28,33 @@ DotlibLatch::~DotlibLatch()
 }
 
 // @brief 内容を初期化する．
-void
-DotlibLatch::init()
+bool
+DotlibLatch::set_data(const DotlibNode* latch_node)
 {
-  DotlibFL::init();
+  if ( !DotlibFL::set_data(latch_node) ) {
+    return false;
+  }
 
   mDataIn = NULL;
   mEnable = NULL;
   mEnableAlso = NULL;
+
+  // data_in を取り出す．
+  if ( !get_singleton_or_null("data_in", mDataIn) ) {
+    return false;
+  }
+
+  // enable を取り出す．
+  if ( !get_singleton_or_null("enable", mEnable) ) {
+    return false;
+  }
+
+  // enable_also を取り出す．
+  if ( !get_singleton_or_null("enable_also", mEnableAlso) ) {
+    return false;
+  }
+
+  return true;
 }
 
 // @brief "data_in" を返す．

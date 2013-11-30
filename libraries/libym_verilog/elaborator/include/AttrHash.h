@@ -26,7 +26,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] alloc メモリ確保用のアロケータ
-  AttrHash(AllocBase& alloc);
+  AttrHash(Alloc& alloc);
 
   /// @brief デストラクタ
   ~AttrHash();
@@ -105,7 +105,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // Cell の確保用アロケータ
-  AllocBase& mAlloc;
+  Alloc& mAlloc;
 
   // ハッシュ表のサイズ
   ymuint32 mSize;

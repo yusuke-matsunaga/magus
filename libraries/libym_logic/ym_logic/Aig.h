@@ -15,8 +15,6 @@
 
 BEGIN_NAMESPACE_YM_AIG
 
-class AigNode;
-
 //////////////////////////////////////////////////////////////////////
 /// @class Aig Aig.h "ym_logic/Aig.h"
 /// @brief AIG を表すクラス (実際には根の枝を表すクラス)
@@ -34,21 +32,8 @@ public:
   /// @brief 空のコンストラクタ
   Aig();
 
-  /// @brief 内容を設定したコンストラクタ
-  /// @param[in] node ノード
-  /// @param[in] inv 反転している時に true とするフラグ
-  Aig(AigNode* node,
-      bool inv);
-
   /// @brief デストラクタ
   ~Aig();
-
-  /// @brief 内容を設定する．
-  /// @param[in] node ノード
-  /// @param[in] inv 反転している時に true とするフラグ
-  void
-  set(AigNode* node,
-      bool inv);
 
 
 public:
@@ -56,13 +41,13 @@ public:
   // 内部の情報を取得するメンバ関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 否定の枝を返す．
+  /// @brief 否定したハンドルを返す．
   Aig
   operator~() const;
 
-  /// @brief ノードを得る．
-  AigNode*
-  node() const;
+  /// @brief 反転属性を落としたハンドルを返す．
+  Aig
+  normalize() const;
 
   /// @brief ノードの通し番号を得る．
   ymuint
@@ -131,6 +116,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を直接指定したコンストラクタ
   explicit
@@ -185,27 +173,10 @@ Aig::Aig(ympuint data) :
 {
 }
 
-// @brief 内容を設定したコンストラクタ
-inline
-Aig::Aig(AigNode* node,
-	 bool inv)
-{
-  mPackedData = reinterpret_cast<ympuint>(node) | inv;
-}
-
 // @brief デストラクタ
 inline
 Aig::~Aig()
 {
-}
-
-// @brief 内容を設定する．
-inline
-void
-Aig::set(AigNode* node,
-	 bool inv)
-{
-  mPackedData = reinterpret_cast<ympuint>(node) | inv;
 }
 
 // @brief 否定の枝を返す．
@@ -216,12 +187,12 @@ Aig::operator~() const
   return Aig(mPackedData ^ 1UL);
 }
 
-// @brief ノードを得る．
+// @brief 反転属性を落としたハンドルを返す．
 inline
-AigNode*
-Aig::node() const
+Aig
+Aig::normalize() const
 {
-  return reinterpret_cast<AigNode*>(mPackedData & ~3UL);
+  return Aig(mPackedData & ~1UL);
 }
 
 // @brief 極性を得る．

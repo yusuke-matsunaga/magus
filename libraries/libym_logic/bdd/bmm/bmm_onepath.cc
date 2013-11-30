@@ -1,9 +1,7 @@
 
-/// @file libym_logic/bdd/bmm/bmm_onepath.cc
+/// @file bmm_onepath.cc
 /// @brief パスを求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: bmm_onepath.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -29,19 +27,19 @@ BddMgrModern::onepath(BddEdge e)
     return BddEdge::make_one();
   }
 
-  Node* vp = get_node(e);
+  BddNode* vp = e.get_node();
   tPol pol = e.pol();
-  Var* var = vp->var();
+  ymuint level = vp->level();
   BddEdge l = vp->edge0(pol);
   BddEdge h = vp->edge1(pol);
   BddEdge result;
   if ( h.is_zero() ) {
     BddEdge chd = onepath(l);
-    result = new_node(var, chd, BddEdge::make_zero());
+    result = new_node(level, chd, BddEdge::make_zero());
   }
   else {
     BddEdge chd = onepath(h);
-    result = new_node(var, BddEdge::make_zero(), chd);
+    result = new_node(level, BddEdge::make_zero(), chd);
   }
   return result;
 }
@@ -76,7 +74,7 @@ BddMgrModern::sp_step(BddEdge e,
   BddEdge result;
   hash_map<BddEdge, BddEdge>::iterator p = sp_assoc.find(e);
   if ( p == sp_assoc.end() ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     BddEdge l = sp_step(vp->edge0(pol), sp_assoc);
     BddEdge h = sp_step(vp->edge1(pol), sp_assoc);
@@ -88,7 +86,8 @@ BddMgrModern::sp_step(BddEdge e,
     else if ( llen != -1 && llen < hlen + 1 ) {
       h = BddEdge::make_zero();
     }
-    result = new_node(vp->var(), l, h);
+    ymuint level = vp->level();
+    result = new_node(level, l, h);
     sp_assoc[e] = result;
   }
   else {
@@ -105,7 +104,7 @@ BddMgrModern::sp_len(BddEdge e)
   }
   int len = 0;
   while ( !e.is_one() ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     BddEdge l = vp->edge0(pol);
     if ( l.is_zero() ) {
@@ -121,7 +120,7 @@ BddMgrModern::sp_len(BddEdge e)
 
 // 最短1パスの長さを求める．
 // 演算結果テーブルを拡張しようとしてエラーとなる可能性がある．
-tVarSize
+ymuint
 BddMgrModern::shortest_onepath_len(BddEdge e)
 {
   if ( e.is_invalid() ) {
@@ -130,7 +129,7 @@ BddMgrModern::shortest_onepath_len(BddEdge e)
   hash_map<BddEdge, ymint> assoc;
   ymint tmp = spl_step(e, assoc);
   assert_cond(tmp >= 0, __FILE__, __LINE__);
-  return static_cast<tVarSize>(tmp);
+  return static_cast<ymuint>(tmp);
 }
 
 ymint
@@ -147,7 +146,7 @@ BddMgrModern::spl_step(BddEdge e,
   ymint result;
   hash_map<BddEdge, ymint>::iterator p = assoc.find(e);
   if ( p == assoc.end() ) {
-    Node* vp = get_node(e);
+    BddNode* vp = e.get_node();
     tPol pol = e.pol();
     ymint ans1 = spl_step(vp->edge0(pol), assoc);
     ymint ans2 = spl_step(vp->edge1(pol), assoc) + 1;

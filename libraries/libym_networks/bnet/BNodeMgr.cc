@@ -77,6 +77,9 @@ BNodeMgr::free_name(const char* src)
 BNodeEdge*
 BNodeMgr::alloc_edgearray(size_t n)
 {
+  if ( n == 0 ) {
+    return NULL;
+  }
   void* p = mEdgeAlloc.get_memory(sizeof(BNodeEdge) * n);
   return new (p) BNodeEdge[n];
 }
@@ -86,7 +89,9 @@ void
 BNodeMgr::free_edgearray(size_t n,
 			 BNodeEdge* array)
 {
-  mEdgeAlloc.put_memory(sizeof(BNodeEdge) * n, array);
+  if ( n > 0 ) {
+    mEdgeAlloc.put_memory(sizeof(BNodeEdge) * n, array);
+  }
 }
 
 END_NAMESPACE_YM_NETWORKS_BNET

@@ -15,8 +15,6 @@
 #include "LcLatchMgr.h"
 #include "LcPatMgr.h"
 
-#include "ym_utils/BinIO.h"
-
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
@@ -38,10 +36,13 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief セルのグループ化，クラス化を行う．
   void
-  compile(const CellLibrary& library);
+  compile(CellLibrary& library);
 
   /// @brief 論理セルグループの情報を取り出す．
   const LcGroupMgr&
@@ -122,8 +123,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief expr から生成されるパタンを登録する．
+  /// @param[in] expr 論理式
+  /// @param[in] builtin 組み込みクラスの時 true にするフラグ
   void
-  reg_expr(const LogExpr& expr);
+  reg_expr(const LogExpr& expr,
+	   bool builtin);
 
   /// @brief 新しいグループを作る．
   LcGroup*
@@ -131,8 +135,10 @@ private:
 
   /// @brief 新しいクラスを作る．
   /// @param[in] repfunc 代表関数
+  /// @param[in] builtin 組み込みクラスの時 true にするフラグ
   LcClass*
-  new_class(const TvFuncM& repfunc);
+  new_class(const TvFuncM& repfunc,
+	    bool builtin);
 
 
 private:

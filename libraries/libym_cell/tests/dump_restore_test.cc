@@ -10,11 +10,12 @@
 #include "ym_cell/CellLibrary.h"
 #include "ym_cell/CellMislibReader.h"
 #include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellDumper.h"
-#include "ym_cell/CellRestorer.h"
+
+#include "ym_utils/FileIDO.h"
+#include "ym_utils/FileODO.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM
 
 /// @brief genlib 形式のファイルを読み込む．
 /// @param[in] filename ファイル名
@@ -38,7 +39,7 @@ read_dotlib(const char* filename)
   return read(filename);
 }
 
-END_NAMESPACE_YM_CELL
+END_NAMESPACE_YM
 
 
 int
@@ -46,7 +47,7 @@ main(int argc,
      char** argv)
 {
   using namespace std;
-  using namespace nsYm::nsCell;
+  using namespace nsYm;
 
   if ( argc < 2 ) {
     cerr << "Usage: " << argv[0] << " [--liberty] <liberty-file>" << endl;
@@ -72,36 +73,45 @@ main(int argc,
     cerr << filename << ": Error in reading library" << endl;
     return 1;
   }
-  display_library(cout, *library);
+  ofstream os1;
+  os1.open("dump1.cell", ios::binary);
+  if ( !os1 ) {
+    cerr << "Could not create " << "dump1.cell" << endl;
+    return 2;
+  }
+  display_library(os1, *library);
+  os1.close();
 
   const char* datafile = "patdata.bin";
   {
-    ofstream os;
-    os.open(datafile, ios::binary);
-    if ( !os ) {
+    FileODO bo(datafile);
+    if ( !bo ) {
       // エラー
       cerr << "Could not create " << datafile << endl;
       return 2;
     }
-
-    CellDumper dump;
-    dump(os, *library);
+    library->dump(bo);
   }
 
   {
-    ifstream ifs;
-    ifs.open(datafile, ios::binary);
-    if ( !ifs ) {
+    FileIDO bi(datafile);
+    if ( !bi ) {
       // エラー
       cerr << "Could not open " << datafile << endl;
       return 3;
     }
 
-    CellRestorer restore;
+    CellLibrary* library2 = CellLibrary::new_obj();
+    library2->restore(bi);
 
-    const CellLibrary* library2 = restore(ifs);
-
-    display_library(cout, *library2);
+    ofstream os2;
+    os2.open("dump2.cell", ios::binary);
+    if ( !os2 ) {
+      cerr << "Could not create " << "dump2.cell" << endl;
+      return 2;
+    }
+    display_library(os2, *library2);
+    os2.close();
   }
 
   return 0;

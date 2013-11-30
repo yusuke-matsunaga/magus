@@ -130,7 +130,7 @@ CmnNode::latch() const
 
 // @brief 入力数を得る．
 ymuint
-CmnNode::ni() const
+CmnNode::fanin_num() const
 {
   return 0;
 }
@@ -436,7 +436,7 @@ CmnNodeOutput::is_output() const
 
 // @brief ファンイン数を得る．
 ymuint
-CmnNodeOutput::ni() const
+CmnNodeOutput::fanin_num() const
 {
   return 1;
 }
@@ -808,7 +808,7 @@ CmnNodeLogic::is_logic() const
 
 // @brief 入力数を得る．
 ymuint
-CmnNodeLogic::ni() const
+CmnNodeLogic::fanin_num() const
 {
   return mNi;
 }

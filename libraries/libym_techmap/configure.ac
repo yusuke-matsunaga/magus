@@ -93,6 +93,7 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ym_techmap/Makefile])
 AC_CONFIG_FILES([cellmap/Makefile])
 AC_CONFIG_FILES([lutmap/Makefile])
+AC_CONFIG_FILES([lutmapx/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 

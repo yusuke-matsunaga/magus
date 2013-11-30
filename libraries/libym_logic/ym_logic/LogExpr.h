@@ -11,7 +11,8 @@
 
 #include "ym_logic/lexp_nsdef.h"
 #include "ym_logic/Literal.h"
-#include "ym_utils/BinIO.h"
+#include "ym_utils/IDO.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -43,6 +44,8 @@ class LexpNode;
 //////////////////////////////////////////////////////////////////////
 class LogExpr
 {
+  friend class LexpMgr;
+
 public:
   //////////////////////////////////////////////////////////////////////
   /// @name コンストラクタ/デストラクタ/代入演算子/生成用クラスメソッド
@@ -174,6 +177,12 @@ public:
   LogExpr
   make_xor(const LogExprList& chd_list);
 
+  /// @brief 確保していたメモリを開放する．
+  /// @note メモリリークチェックのための関数なので通常は使用しない．
+  static
+  void
+  clear_memory();
+
   /// @}
   //////////////////////////////////////////////////////////////////////
 
@@ -273,11 +282,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   /// @name 根本の演算子の情報を得る．
   /// @{
-
-  /// @brief 根のノートを得る．
-  /// @note LexpNode の情報が非公開なのでほとんど無意味な関数
-  const LexpNode*
-  root() const;
 
   /// @brief 恒偽関数のチェック
   /// @return 恒偽関数を表している時に true を返す．
@@ -536,6 +540,10 @@ private:
   void
   set_root(const LexpNode* node);
 
+  /// @brief 根のノートを得る．
+  const LexpNode*
+  root() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -603,8 +611,8 @@ operator<<(ostream& s,
 /// @param[in] s 出力ストリーム
 /// @param[in] expr 論理式
 /// @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const LogExpr& expr);
 
 /// @relates LogExpr
@@ -612,8 +620,8 @@ operator<<(BinO& s,
 /// @param[in] s 入力ストリーム
 /// @param[out] expr 論理式
 /// @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   LogExpr& expr);
 
 

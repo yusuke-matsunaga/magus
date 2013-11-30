@@ -10,10 +10,10 @@
 
 
 #include "ym_networks/bdn.h"
-#include "blif_nsdef.h"
+#include "ym_networks/blif_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 /// @class BlifBdnConv BlifBdnConv.h "BlifBdnConv.h"
@@ -49,9 +49,10 @@ public:
 
 private:
 
-  /// @brief blif_node に対応した BdnNode を生成する．
+  /// @brief node_id に対応した BdnNode を生成する．
   BdnNodeHandle
-  make_node(const BlifNode* blif_node);
+  make_node(const BlifNetwork& blif_network,
+	    ymuint node_id);
 
   /// @brief blif_node に対応した BdnNode を取り出す．
   bool
@@ -81,6 +82,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
 #endif // BLIFBDNCONV_H

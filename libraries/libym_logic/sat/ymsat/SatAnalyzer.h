@@ -42,6 +42,9 @@ protected:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief solver をセットする．
   /// @param[in] solver YmSat のポインタ
@@ -73,12 +76,12 @@ protected:
   decision_level() const;
 
   // 割り当てリストの末尾を得る．
-  size_t
+  ymuint
   last_assign();
 
   // 割り当てリストの pos 番めの要素を得る．
   Literal
-  get_assign(size_t pos);
+  get_assign(ymuint pos);
 
   // 変数の decision level を得る．
   int
@@ -148,7 +151,7 @@ SatAnalyzer::decision_level() const
 
 // 割り当てリストの末尾を得る．
 inline
-size_t
+ymuint
 SatAnalyzer::last_assign()
 {
   return mSolver->mAssignList.size() - 1;
@@ -157,7 +160,7 @@ SatAnalyzer::last_assign()
 // 割り当てリストの pos 番めの要素を得る．
 inline
 Literal
-SatAnalyzer::get_assign(size_t pos)
+SatAnalyzer::get_assign(ymuint pos)
 {
   return mSolver->mAssignList.get(pos);
 }

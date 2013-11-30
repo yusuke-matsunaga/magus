@@ -10,7 +10,7 @@
 
 
 #include "ym_seal/seal_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "ym_utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL

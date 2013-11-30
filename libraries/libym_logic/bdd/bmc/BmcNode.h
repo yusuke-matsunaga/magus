@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_BDD_BMC_BMCNODE_H
-#define LIBYM_LOGIC_BDD_BMC_BMCNODE_H
+#ifndef BMCNODE_H
+#define BMCNODE_H
 
-/// @file libym_logic/bdd/bmc/BmcNode.h
+/// @file BmcNode.h
 /// @brief BmcNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,68 +13,6 @@
 
 
 BEGIN_NAMESPACE_YM_BDD
-
-//////////////////////////////////////////////////////////////////////
-// 変数の情報を格納しておくクラス
-//////////////////////////////////////////////////////////////////////
-class BmcVar
-{
-  friend class BddMgrClassic;
-public:
-
-  // 変数番号を得る．
-  VarId
-  varid() const
-  {
-    return mId;
-  }
-
-  // レベルを得る．
-  tLevel
-  level() const
-  {
-    return static_cast<tLevel>(mId.val());
-  }
-
-private:
-
-  // コンストラクタ
-  BmcVar(VarId id) :
-    mId(id),
-    mMark(0),
-    mLink(NULL)
-  {
-  }
-
-  // デストラクタ
-  ~BmcVar()
-  {
-  }
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 変数番号
-  // レベルも同一
-  VarId mId;
-
-  // 作業用のマーク
-  int mMark;
-
-  // compose用にBDDの枝を入れておくメンバ
-  BddEdge mCompEdge;
-
-  // 変数リスト中の次の要素を指すポインタ
-  BmcVar* mNext;
-
-  // ハッシュ表中の次の要素を指すポインタ
-  BmcVar* mLink;
-
-};
-
 
 //////////////////////////////////////////////////////////////////////
 // BDDのノードを表す構造体
@@ -124,16 +62,8 @@ public:
   BddEdge
   edge1(tPol p) const;
 
-  // 変数を得る．
-  BmcVar*
-  var() const;
-
-  // 変数インデックス値を得る
-  VarId
-  varid() const;
-
   // レベルを得る．
-  tLevel
+  ymuint
   level() const;
 
   // p-mark が付いていたらtrueを返す
@@ -159,7 +89,7 @@ public:
   rst_mark();
 
   // リンク数を得る．
-  size_t
+  ymuint
   refcount() const;
 
   // 参照されていない時にtrueを返す
@@ -174,11 +104,13 @@ private:
   linkdelta() const;
 
   // リンク数を増やす(オーバーフロー時は何もしない)
-  size_t
+  // 結果のリンク数を返す．
+  ymuint
   linkinc();
 
   // リンク数を減らす(オーバーフロー時は何もしない)
-  size_t
+  // 結果のリンク数を返す．
+  ymuint
   linkdec();
 
   // コンストラクタ
@@ -197,8 +129,8 @@ private:
   // 1枝
   BddEdge mEdge1;
 
-  // 変数へのポインタ
-  BmcVar* mVar;
+  // レベル
+  ymuint32 mLevel;
 
   // 参照回数＋α(上の定数を参照)
   ymuint32 mRefMark;
@@ -239,28 +171,12 @@ BmcNode::edge1(tPol p) const
   return BddEdge(mEdge1, p);
 }
 
-// 変数を得る．
-inline
-BmcVar*
-BmcNode::var() const
-{
-  return mVar;
-}
-
-// 変数インデックス値を得る
-inline
-VarId
-BmcNode::varid() const
-{
-  return mVar->varid();
-}
-
 // レベルを得る
 inline
-tLevel
+ymuint
 BmcNode::level() const
 {
-  return mVar->level();
+  return mLevel;
 }
 
 // p-mark が付いていたらtrueを返す
@@ -315,10 +231,10 @@ BmcNode::rst_mark()
 
 // リンク数を得る．
 inline
-size_t
+ymuint
 BmcNode::refcount() const
 {
-  return static_cast<size_t>(mRefMark & kLMask);
+  return static_cast<ymuint>(mRefMark & kLMask);
 }
 
 // 参照されていない時にtrueを返す
@@ -339,7 +255,7 @@ BmcNode::linkdelta() const
 
 // リンク数を増やす(オーバーフロー時は何もしない)
 inline
-size_t
+ymuint
 BmcNode::linkinc()
 {
   int d = linkdelta();
@@ -348,7 +264,7 @@ BmcNode::linkinc()
 
 // リンク数を減らす(オーバーフロー時は何もしない)
 inline
-size_t
+ymuint
 BmcNode::linkdec()
 {
   int d = linkdelta();
@@ -369,12 +285,12 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::nsBdd::BmcNode*>
 {
-  size_t
+  ymuint
   operator()(nsYm::nsBdd::BmcNode* node) const
   {
-    return reinterpret_cast<size_t>(node)/sizeof(void*);
+    return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }
 };
 END_NAMESPACE_HASH
 
-#endif // LIBYM_LOGIC_BDD_BMC_BMCNODE_H
+#endif // BMCNODE_H

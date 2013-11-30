@@ -9,7 +9,6 @@
 
 #include "CiPatMgr.h"
 #include "CiPatGraph.h"
-#include "ym_utils/BinIO.h"
 #include "libcomp/LcPatMgr.h"
 #include "libcomp/LcPatNode.h"
 #include "libcomp/LcPatHandle.h"
@@ -67,7 +66,7 @@ CiPatMgr::pat(ymuint id) const
 // @param[in] alloc メモリアロケータ
 void
 CiPatMgr::copy(const LcPatMgr& src,
-	       AllocBase& alloc)
+	       Alloc& alloc)
 {
   // ノードの情報をコピーする．
   ymuint nn = src.node_num();
@@ -115,7 +114,7 @@ CiPatMgr::copy(const LcPatMgr& src,
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiPatMgr::dump(BinO& bos) const
+CiPatMgr::dump(ODO& bos) const
 {
   // パタングラフのノード情報のダンプ
   bos << mNodeNum;
@@ -138,8 +137,8 @@ CiPatMgr::dump(BinO& bos) const
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-CiPatMgr::restore(BinI& bis,
-		  AllocBase& alloc)
+CiPatMgr::restore(IDO& bis,
+		  Alloc& alloc)
 {
   // ノードと枝の情報を読み込む．
   ymuint32 nn;
@@ -170,7 +169,7 @@ CiPatMgr::restore(BinI& bis,
 // @param[in] alloc メモリアロケータ
 void
 CiPatMgr::set_node_num(ymuint nn,
-		       AllocBase& alloc)
+		       Alloc& alloc)
 {
   mNodeNum = nn;
   void* p = alloc.get_memory(sizeof(ymuint32) * mNodeNum);
@@ -182,7 +181,7 @@ CiPatMgr::set_node_num(ymuint nn,
 // @brief パタン数を設定する．
 void
 CiPatMgr::set_pat_num(ymuint np,
-		      AllocBase& alloc)
+		      Alloc& alloc)
 {
   mPatNum = np;
   void* p = alloc.get_memory(sizeof(CiPatGraph) * mPatNum);

@@ -66,6 +66,14 @@ public:
   void
   begin_input();
 
+  /// @brief 'input' 記述の開始
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  /// @note input [msb:lsb] までを出力する．
+  void
+  begin_input(int msb,
+	      int lsb);
+
   /// @brief 'input' 記述の終了
   /// @note ';' nl を出力する．
   void
@@ -75,6 +83,14 @@ public:
   /// @note output までを出力する．
   void
   begin_output();
+
+  /// @brief 'output' 記述の開始
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  /// @note output [msb:lsb] までを出力する．
+  void
+  begin_output(int msb,
+	       int lsb);
 
   /// @brief 'output' 記述の終了
   /// @note ';' nl を出力する．
@@ -86,6 +102,14 @@ public:
   void
   begin_inout();
 
+  /// @brief 'inout' 記述の開始
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  /// @note inout [msb:lsb] までを出力する．
+  void
+  begin_inout(int msb,
+	      int lsb);
+
   /// @brief 'inout' 記述の終了
   /// @note ';' nl を出力する．
   void
@@ -96,6 +120,14 @@ public:
   void
   begin_wire();
 
+  /// @brief 'wire' 記述の開始
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  /// @note wire [msb:lsb] までを出力する．
+  void
+  begin_wire(int msb,
+	     int lsb);
+
   /// @brief 'wire' 記述の終了
   /// @note ';' nl を出力する．
   void
@@ -105,6 +137,14 @@ public:
   /// @note reg までを出力する．
   void
   begin_reg();
+
+  /// @brief 'reg' 記述の開始
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  /// @note reg [msb:lsb] までを出力する．
+  void
+  begin_reg(int msb,
+	    int lsb);
 
   /// @brief 'reg' 記述の終了
   /// @note ';' nl を出力する．
@@ -120,24 +160,6 @@ public:
   /// @param[in] name 識別子名
   void
   put_elem(const string& name);
-
-  /// @bried 宣言要素を出力する(範囲指定付き)
-  /// @param[in] name 識別子名
-  /// @param[in] lsb 範囲の LSB
-  /// @param[in] msb 範囲の MSB
-  void
-  put_elem(const char* name,
-	   int lsb,
-	   int msb);
-
-  /// @bried 宣言要素を出力する(範囲指定付き)
-  /// @param[in] name 識別子名
-  /// @param[in] lsb 範囲の LSB
-  /// @param[in] msb 範囲の MSB
-  void
-  put_elem(const string& name,
-	   int lsb,
-	   int msb);
 
   /// @brief 'assign' 記述の開始
   /// @note assign までを出力する．
@@ -186,6 +208,13 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 低レベル関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 範囲を出力する．
+  /// @param[in] msb 範囲の MSB
+  /// @param[in] lsb 範囲の LSB
+  void
+  put_range(int msb,
+	    int lsb);
 
   /// @brief 識別子を出力する．
   /// @param[in] name 識別子名

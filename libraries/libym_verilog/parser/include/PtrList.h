@@ -105,7 +105,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] alloc アロケータ
   /// @note 空のリストを作る
-  PtrList(UnitAlloc& alloc);
+  PtrList(Alloc& alloc);
 
   /// @brief デストラクタ
   ~PtrList();
@@ -153,7 +153,7 @@ public:
   /// @param[in] alloc 配列用のメモリアロケータ
   /// @note この処理の後ではリストは空になる．
   PtArray<T2>
-  to_array(AllocBase& alloc);
+  to_array(Alloc& alloc);
 
 
 private:
@@ -162,7 +162,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // メモリ確保用のアロケータ
-  UnitAlloc& mAlloc;
+  Alloc& mAlloc;
 
   // 先頭の要素
   Cell* mTop;
@@ -257,7 +257,7 @@ PtrListIterator<T>::is_valid() const
 template <typename T1,
 	  typename T2>
 inline
-PtrList<T1, T2>::PtrList(UnitAlloc& alloc) :
+PtrList<T1, T2>::PtrList(Alloc& alloc) :
   mAlloc(alloc),
   mTop(NULL),
   mEnd(NULL),
@@ -381,7 +381,7 @@ template <typename T1,
 	  typename T2>
 inline
 PtArray<T2>
-PtrList<T1, T2>::to_array(AllocBase& alloc)
+PtrList<T1, T2>::to_array(Alloc& alloc)
 {
   ymuint n = mNum;
   void* p = alloc.get_memory(sizeof(T2*) * n);

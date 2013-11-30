@@ -50,7 +50,7 @@ SealCmd::cmd_proc(TclObjVector& objv)
     BNode* ibnode = obnode->fanin(0);
 
     // ibnode の複製を3つ作る．
-    size_t ni = ibnode->ni();
+    size_t ni = ibnode->fanin_num();
     fanins.resize(ni);
     for (size_t i = 0; i < ni; ++ i) {
       fanins[i] = ibnode->fanin(i);

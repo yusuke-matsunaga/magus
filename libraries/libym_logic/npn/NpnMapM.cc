@@ -20,8 +20,8 @@ BEGIN_NAMESPACE_YM_NPN
 // @brief 空のコンストラクタ．
 // @note 内容は不定
 NpnMapM::NpnMapM() :
-  mNi(0),
-  mNo(0),
+  mInputNum(0),
+  mOutputNum(0),
   mMapArray(NULL)
 {
 }
@@ -32,8 +32,8 @@ NpnMapM::NpnMapM() :
 // @note 各変数の変換内容は不正な値になっている．
 NpnMapM::NpnMapM(ymuint ni,
 		 ymuint no) :
-  mNi(0),
-  mNo(0),
+  mInputNum(0),
+  mOutputNum(0),
   mMapArray(NULL)
 {
   resize(ni, no);
@@ -42,8 +42,8 @@ NpnMapM::NpnMapM(ymuint ni,
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 NpnMapM::NpnMapM(const NpnMapM& src) :
-  mNi(0),
-  mNo(0),
+  mInputNum(0),
+  mOutputNum(0),
   mMapArray(NULL)
 {
   copy(src);
@@ -65,8 +65,8 @@ NpnMapM::operator=(const NpnMapM& src)
 void
 NpnMapM::copy(const NpnMapM& src)
 {
-  ymuint ni = src.mNi;
-  ymuint no = src.mNo;
+  ymuint ni = src.mInputNum;
+  ymuint no = src.mOutputNum;
   resize(ni, no);
   ymuint n = ni + no;
   for (ymuint i = 0; i < n; ++ i) {
@@ -77,12 +77,12 @@ NpnMapM::copy(const NpnMapM& src)
 // @brief NpnMap からの変換コンストラクタ
 // @note 出力数が1となる．
 NpnMapM::NpnMapM(const NpnMap& src) :
-  mNi(0),
-  mNo(0),
+  mInputNum(0),
+  mOutputNum(0),
   mMapArray(NULL)
 {
-  resize(src.ni(), 1);
-  for (ymuint i = 0; i < mNi; ++ i) {
+  resize(src.input_num(), 1);
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     mMapArray[i] = src.imap(VarId(i));
   }
   set_omap(VarId(0), VarId(0), src.opol());
@@ -99,7 +99,7 @@ NpnMapM::~NpnMapM()
 void
 NpnMapM::clear()
 {
-  ymuint n = mNi + mNo;
+  ymuint n = mInputNum + mOutputNum;
   for (ymuint i = 0; i < n; ++ i) {
     mMapArray[i] = NpnVmap::invalid();
   }
@@ -114,12 +114,12 @@ NpnMapM::resize(ymuint ni,
 		ymuint no)
 {
   ymuint n = ni + no;
-  if ( mNi + mNo != n ) {
+  if ( mInputNum + mOutputNum != n ) {
     delete [] mMapArray;
     mMapArray = new NpnVmap[n];
   }
-  mNi = ni;
-  mNo = no;
+  mInputNum = ni;
+  mOutputNum = no;
   clear();
 }
 
@@ -140,18 +140,6 @@ NpnMapM::set_identity(ymuint ni,
 }
 
 // @brief 入力の変換内容の設定
-// @param[in] src_var 入力番号
-// @param[in] dst_var 変換先の入力番号
-// @param[in] pol 極性
-void
-NpnMapM::set_imap(VarId src_var,
-		  VarId dst_var,
-		  tPol pol)
-{
-  set_imap(src_var, NpnVmap(dst_var, pol));
-}
-
-// @brief 入力の変換内容の設定
 // @param[in] var 入力番号
 // @param[in] imap 変換情報(変換先の入力番号と極性)
 // @sa NpnVmap
@@ -160,21 +148,9 @@ NpnMapM::set_imap(VarId var,
 		  NpnVmap imap)
 {
   ymuint pos = var.val();
-  if ( pos < ni() ) {
+  if ( pos < input_num() ) {
     mMapArray[pos] = imap;
   }
-}
-
-// @brief 出力の変換内容の設定
-// @param[in] src_var 出力番号
-// @param[in] dst_var 変換先の出力番号
-// @param[in] pol 極性
-void
-NpnMapM::set_omap(VarId src_var,
-		  VarId dst_var,
-		  tPol pol)
-{
-  set_omap(src_var, NpnVmap(dst_var, pol));
 }
 
 // @brief 出力の変換内容の設定
@@ -186,8 +162,8 @@ NpnMapM::set_omap(VarId var,
 		  NpnVmap omap)
 {
   ymuint pos = var.val();
-  if ( pos < no() ) {
-    mMapArray[pos + mNi] = omap;
+  if ( pos < output_num() ) {
+    mMapArray[pos + mInputNum] = omap;
   }
 }
 
@@ -197,10 +173,10 @@ NpnMapM::set_omap(VarId var,
 bool
 NpnMapM::operator==(const NpnMapM& src) const
 {
-  if ( src.mNi != mNi || src.mNo != mNo ) {
+  if ( src.mInputNum != mInputNum || src.mOutputNum != mOutputNum ) {
     return false;
   }
-  ymuint n = mNi + mNo;
+  ymuint n = mInputNum + mOutputNum;
   for (ymuint i = 0; i < n; ++ i) {
     if ( mMapArray[i] != src.mMapArray[i] ) {
       return false;
@@ -216,8 +192,8 @@ NpnMapM::operator==(const NpnMapM& src) const
 NpnMapM
 inverse(const NpnMapM& src)
 {
-  ymuint ni = src.ni();
-  ymuint no = src.no();
+  ymuint ni = src.input_num();
+  ymuint no = src.output_num();
 
   NpnMapM ans(ni, no);
 
@@ -256,9 +232,9 @@ NpnMapM
 operator*(const NpnMapM& src1,
 	  const NpnMapM& src2)
 {
-  ymuint ni = src1.ni();
-  ymuint no = src1.no();
-  if ( ni != src2.ni() || no != src2.no() ) {
+  ymuint ni = src1.input_num();
+  ymuint no = src1.output_num();
+  if ( ni != src2.input_num() || no != src2.output_num() ) {
     // 不正な値を返す．
     return NpnMapM(ni, no);
   }
@@ -313,7 +289,7 @@ operator<<(ostream& s,
   const char* comma = "";
 
   s << "INPUT(";
-  for (ymuint i = 0; i < map.ni(); ++ i) {
+  for (ymuint i = 0; i < map.input_num(); ++ i) {
     s << comma;
     comma = ", ";
     s << i << " ==> ";
@@ -334,7 +310,7 @@ operator<<(ostream& s,
 
   comma = "";
   s << " OUTPUT(";
-  for (ymuint i = 0; i < map.no(); ++ i) {
+  for (ymuint i = 0; i < map.output_num(); ++ i) {
     s << comma;
     comma = ", ";
     s << i << " ==> ";
@@ -357,14 +333,14 @@ operator<<(ostream& s,
 }
 
 // バイナリ出力
-BinO&
-operator<<(BinO& bos,
+ODO&
+operator<<(ODO& bos,
 	   const NpnMapM& map)
 {
-  ymuint32 ni = map.ni();
+  ymuint32 ni = map.input_num();
   bos << ni;
 
-  ymuint32 no = map.no();
+  ymuint32 no = map.output_num();
   bos << no;
 
   for (ymuint i = 0; i < ni; ++ i) {
@@ -381,8 +357,8 @@ operator<<(BinO& bos,
 }
 
 // バイナリ入力
-BinI&
-operator>>(BinI& bis,
+IDO&
+operator>>(IDO& bis,
 	   NpnMapM& map)
 {
   ymuint32 ni;
@@ -405,4 +381,3 @@ operator>>(BinI& bis,
   return bis;
 }
 END_NAMESPACE_YM_NPN
-

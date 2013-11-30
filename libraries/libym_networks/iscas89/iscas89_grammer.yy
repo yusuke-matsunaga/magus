@@ -33,7 +33,7 @@
 BEGIN_NAMESPACE_YM_ISCAS89
 
 // yacc/bison が生成するヘッダファイル
-#include "iscas89_grammer.h"
+#include "iscas89_grammer.hh"
 
 // 字句解析関数
 int
@@ -64,6 +64,7 @@ END_NONAMESPACE
 
 %}
 
+
 // "pure" parser にする．
 %pure-parser
 
@@ -76,8 +77,10 @@ END_NONAMESPACE
 // yylex の引数
 %lex-param {Iscas89ParserImpl& parser}
 
+// 開始位置
 %start  file
 
+// トークンの定義
 %token  INPUT
 %token  OUTPUT
 %token  BUFF

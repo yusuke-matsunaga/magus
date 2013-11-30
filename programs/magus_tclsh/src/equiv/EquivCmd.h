@@ -12,6 +12,7 @@
 
 #include "MagCmd.h"
 #include "NetHandle.h"
+#include "ym_networks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -34,6 +35,9 @@ public:
 
 
 protected:
+  //////////////////////////////////////////////////////////////////////
+  // 派生クラスのためのインターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 共通のオプション解析と前処理を行う．
   /// @return エラーが起きたら TCL_ERROR を返す．
@@ -60,12 +64,12 @@ protected:
   ostream*
   sat_out() const;
 
-  /// @brief 検証対象のネットワーク1を返す．
-  const BNetwork*
+  /// @brief ネットワーク1を返す．
+  const BdnMgr&
   network1() const;
 
-  /// @brief 検証対象のネットワーク2を返す．
-  const BNetwork*
+  /// @brief ネットワーク2を返す．
+  const BdnMgr&
   network2() const;
 
   /// @brief 入力の対応関係を返す．
@@ -91,18 +95,25 @@ private:
 
   /// @brief 順番で対応をとり，ID番号のペアのリストを作る．
   void
-  assoc_by_order(const BNetwork& network1,
-		 const BNetwork& network2,
+  assoc_by_order(const BdnMgr& network1,
+		 const BdnMgr& network2,
 		 vector<pair<ymuint32, ymuint32> >& iassoc,
 		 vector<pair<ymuint32, ymuint32> >& oassoc);
 
   /// @brief 名前で対応をとり, ID番号のペアのリストを作る．
   /// @return エラーが起きたら TCL_ERROR を返す．
   bool
-  assoc_by_name(const BNetwork& network1,
-		const BNetwork& network2,
+  assoc_by_name(const BdnMgr& network1,
+		const BdnMgr& network2,
 		vector<pair<ymuint32, ymuint32> >& iassoc,
 		vector<pair<ymuint32, ymuint32> >& oassoc);
+
+  /// @brief 対象のネットワークを BDN に変換する．
+  /// @param[in] net_handle ネットワークハンドル
+  /// @param[out] dst_network 変換したネットワークを格納する変数
+  void
+  conv_to_bdn(const NetHandle* net_handle,
+	      BdnMgr& dst_network);
 
 
 private:
@@ -150,10 +161,10 @@ private:
   ofstream mSatLogFile;
 
   // 検証対象のネットワーク1
-  NetHandle* mNetwork1;
+  BdnMgr mNetwork1;
 
   // 検証対象のネットワーク2
-  NetHandle* mNetwork2;
+  BdnMgr mNetwork2;
 
   // 入力の対応関係
   vector<pair<ymuint32, ymuint32> > mInputMatch;
@@ -179,6 +190,45 @@ public:
   /// @brief デストラクタ
   virtual
   ~EquivCmd();
+
+
+protected:
+
+  /// @brief コマンド処理関数
+  /// @param[in] objv 引数の配列
+  int
+  cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // loglevel オプション解析用のオブジェクト
+  TclPoptInt* mPoptLoglevel;
+
+  // sigsize オプション解析用のオブジェクト
+  TclPoptInt* mPoptSigSize;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EquivCmd2 EquivCmd.h "EquivCmd.h"
+/// @brief 検証を行うコマンド
+//////////////////////////////////////////////////////////////////////
+class EquivCmd2 :
+  public EquivCmdBase
+{
+public:
+
+  /// @brief コンストラクタ
+  EquivCmd2(MagMgr* mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~EquivCmd2();
 
 
 protected:
@@ -248,18 +298,18 @@ EquivCmdBase::sat_out() const
 
 // @brief 検証対象のネットワーク1を返す．
 inline
-const BNetwork*
+const BdnMgr&
 EquivCmdBase::network1() const
 {
-  return mNetwork1->bnetwork();
+  return mNetwork1;
 }
 
 // @brief 検証対象のネットワーク2を返す．
 inline
-const BNetwork*
+const BdnMgr&
 EquivCmdBase::network2() const
 {
-  return mNetwork2->bnetwork();
+  return mNetwork2;
 }
 
 // @brief 入力の対応関係を返す．

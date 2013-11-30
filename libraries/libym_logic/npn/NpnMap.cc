@@ -1,9 +1,7 @@
 
-/// @file libym_npn/NpnMap.cc
+/// @file NpnMap.cc
 /// @brief NpnMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: NpnMap.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
@@ -34,7 +32,7 @@ NpnMap::NpnMap() :
 // 各入力の変換内容は kImapBad になっている．
 NpnMap::NpnMap(ymuint ni,
 	       tPol pol) :
-  mNiPol((ni << 1) | static_cast<ymuint>(pol))
+  mNiPol((ni << 1) | static_cast<ymuint32>(pol))
 {
   for (ymuint i = 0; i < ni; ++ i) {
     mImap[i] = NpnVmap::invalid();
@@ -45,7 +43,7 @@ NpnMap::NpnMap(ymuint ni,
 NpnMap::NpnMap(const NpnMap& src) :
   mNiPol(src.mNiPol)
 {
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mImap[i] = src.mImap[i];
   }
 }
@@ -55,7 +53,7 @@ const NpnMap&
 NpnMap::operator=(const NpnMap& src)
 {
   mNiPol = src.mNiPol;
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mImap[i] = src.mImap[i];
   }
   return *this;
@@ -73,7 +71,7 @@ void
 NpnMap::clear()
 {
   mNiPol &= ~(1UL);
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     mImap[i] = NpnVmap::invalid();
   }
 }
@@ -98,24 +96,17 @@ NpnMap::set_identity(ymuint new_ni)
   }
 }
 
-// pos 番目の入力の変換内容を設定する．
-void
-NpnMap::set(VarId src_var,
-	    VarId dst_var,
-	    tPol pol)
-{
-  ymuint src_pos = src_var.val();
-  if ( src_pos < ni() ) {
-    mImap[src_pos] = NpnVmap(dst_var, pol);
-  }
-}
+// @brief 入力の変換内容の設定
+// @param[in] src_var 入力変数
+// @param[in] dst_var 変換先の入力変数
+// @param[in] pol 極性
 void
 NpnMap::set(VarId var,
 	    NpnVmap imap)
 {
-  ymuint pos = var.val();
-  if ( pos < ni() ) {
-    mImap[pos] = imap;
+  ymuint src_pos = var.val();
+  if ( src_pos < input_num() ) {
+    mImap[src_pos] = imap;
   }
 }
 
@@ -138,7 +129,7 @@ NpnMap::operator==(const NpnMap& src) const
   if ( mNiPol != src.mNiPol ) {
     return false;
   }
-  for (ymuint i = 0; i < ni(); ++ i) {
+  for (ymuint i = 0; i < input_num(); ++ i) {
     if ( mImap[i] != src.mImap[i] ) {
       return false;
     }
@@ -156,7 +147,7 @@ inverse(const NpnMap& src)
 	 << endl;
   }
 
-  ymuint src_ni = src.ni();
+  ymuint src_ni = src.input_num();
   NpnMap dst_map(src_ni, src.opol());
   for (ymuint i = 0; i < src_ni; ++ i) {
     VarId src_var(i);
@@ -199,7 +190,7 @@ operator*(const NpnMap& src1,
 	 << endl;
   }
 
-  ymuint ni1 = src1.ni();
+  ymuint ni1 = src1.input_num();
   NpnMap dst_map(ni1, src1.opol() * src2.opol());
   for (ymuint i1 = 0; i1 < ni1; ++ i1) {
     VarId var1(i1);
@@ -282,7 +273,7 @@ operator<<(ostream& s,
 {
   const char* comma = "";
   s << "INPUT(";
-  for (ymuint i = 0; i < map.ni(); ++ i) {
+  for (ymuint i = 0; i < map.input_num(); ++ i) {
     s << comma;
     comma = ", ";
     s << i << " ==> ";
@@ -311,11 +302,11 @@ operator<<(ostream& s,
 }
 
 // バイナリ出力
-BinO&
-operator<<(BinO& bos,
+ODO&
+operator<<(ODO& bos,
 	   const NpnMap& map)
 {
-  ymuint32 ni = map.ni();
+  ymuint32 ni = map.input_num();
   bos << ni;
   for (ymuint i = 0; i < ni; ++ i) {
     NpnVmap vmap = map.imap(VarId(i));
@@ -327,8 +318,8 @@ operator<<(BinO& bos,
 }
 
 // バイナリ入力
-BinI&
-operator>>(BinI& bis,
+IDO&
+operator>>(IDO& bis,
 	   NpnMap& map)
 {
   ymuint32 ni;

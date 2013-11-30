@@ -48,7 +48,7 @@ AigMgrImpl::make_input(VarId id)
   // すでに存在しているか調べる．
   AigNode* node = input_node(id);
   if ( node != NULL ) {
-    return Aig(node, false);
+    return Aig(pack(node, false));
   }
   // なかったので新たに作る．
   if ( mInputNum >= mInputNextLimit ) {
@@ -76,7 +76,7 @@ AigMgrImpl::make_input(VarId id)
   node->mLink = mInputHashTable[pos];
   mInputHashTable[pos] = node;
 
-  return Aig(node, false);
+  return Aig(pack(node, false));
 }
 
 // @brief 入力ノードを取り出す．
@@ -111,7 +111,7 @@ AigMgrImpl::make_and(Aig handle1,
   if ( handle1 == handle2 ) {
     return handle1;
   }
-  if ( handle1.node() == handle2.node() ) {
+  if ( handle1.normalize() == handle2.normalize() ) {
     // handle1.inv != handle2.inv() のはず
     return make_zero();
   }
@@ -130,7 +130,7 @@ AigMgrImpl::make_and(Aig handle1,
     if ( node->fanin0() == handle1 &&
 	 node->fanin1() == handle2 ) {
       // 同じノードがあった．
-      return Aig(node, false);
+      return Aig(pack(node, false));
     }
   }
 
@@ -163,7 +163,7 @@ AigMgrImpl::make_and(Aig handle1,
   node->mLink = mAndHashTable[idx];
   mAndHashTable[idx] = node;
 
-  return Aig(node, false);
+  return Aig(pack(node, false));
 }
 
 // 新しいノードを作成する．

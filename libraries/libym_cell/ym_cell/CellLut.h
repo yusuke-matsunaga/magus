@@ -10,32 +10,10 @@
 
 
 #include "ym_cell/cell_nsdef.h"
-#include "ym_cell/cell_type.h"
+#include "ym_utils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
-
-//////////////////////////////////////////////////////////////////////
-/// @brief ルックアップテーブルの変数の型
-//////////////////////////////////////////////////////////////////////
-enum tCellVarType {
-  kVarInputNetTransition,
-
-  kVarTotalOutputNetCapacitance,
-  kVarOutputNetLength,
-  kVarOutputNetWireCap,
-  kVarOutputNetPinCap,
-
-  kVarRelatedOutTotalOutputNetCapacitance,
-  kVarRelatedOutOutputNetLength,
-  kVarRelatedOutOutputNetWireCap,
-  kVarRelatedOutOutputNetPinCap,
-
-  kVarConstrainedPinTransition,
-
-  kVarRelatedPinTransition
-};
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class CellLutTemplate CellLut.h "ym_cell/CellLut.h"
@@ -85,6 +63,18 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // dump/restore 関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const = 0;
+
 };
 
 
@@ -111,23 +101,27 @@ public:
   const CellLutTemplate*
   lut_template() const = 0;
 
-  /// @brief 名前の取得
+  /// @brief テンプレート名の取得
+  virtual
   const char*
-  name() const;
+  template_name() const = 0;
 
   /// @brief 次元数の取得
+  virtual
   ymuint32
-  dimension() const;
+  dimension() const = 0;
 
   /// @brief 変数型の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
   tCellVarType
-  variable_type(ymuint32 var) const;
+  variable_type(ymuint32 var) const = 0;
 
   /// @brief インデックス数の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
+  virtual
   ymuint32
-  index_num(ymuint32 var) const;
+  index_num(ymuint32 var) const = 0;
 
   /// @brief インデックス値の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
@@ -137,55 +131,33 @@ public:
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
 
+  /// @brief 格子点の値の取得
+  /// @param[in] pos_array 格子点座標
+  /// @note pos_array のサイズは dimension() と同じ
+  virtual
+  double
+  grid_value(const vector<ymuint32>& pos_array) const = 0;
 
-private:
+  /// @brief 値の取得
+  /// @param[in] val_array 入力の値の配列
+  /// @note val_array のサイズは dimension() と同じ
+  virtual
+  double
+  value(const vector<double>& val_array) const = 0;
+
+
+public:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
+  // dump/restore 関数
   //////////////////////////////////////////////////////////////////////
 
-  // テンプレート
-  const CellLutTemplate* mTemplate;
+  /// @brief 内容をバイナリダンプする．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  dump(ODO& s) const = 0;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 名前の取得
-inline
-const char*
-CellLut::name() const
-{
-  return lut_template()->name();
-}
-
-// @brief 次元数の取得
-inline
-ymuint32
-CellLut::dimension() const
-{
-  return lut_template()->dimension();
-}
-
-// @brief 変数型の取得
-// @param[in] var 変数番号 ( 0 <= var < dimension() )
-inline
-tCellVarType
-CellLut::variable_type(ymuint32 var) const
-{
-  return lut_template()->variable_type(var);
-}
-
-// @brief インデックス数の取得
-// @param[in] var 変数番号 ( 0 <= var < dimension() )
-inline
-ymuint32
-CellLut::index_num(ymuint32 var) const
-{
-  return lut_template()->index_num(var);
-}
 
 END_NAMESPACE_YM_CELL
 

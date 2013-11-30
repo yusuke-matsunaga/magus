@@ -4,11 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/elaborator/include
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -20,6 +15,12 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## libym_vl_elab_ei.la
 ############################################################
+
+libym_vl_elab_ei_la_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/elaborator/include
+
 libym_vl_elab_ei_la_SOURCES = \
 	EiFactory.h \
 	EiFactory.cc \

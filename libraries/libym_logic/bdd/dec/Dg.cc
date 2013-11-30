@@ -106,7 +106,7 @@ Dg::is_CBF() const
   if ( node->type() == kCplx ) {
     return false;
   }
-  for (size_t i = 0; i < node->ni(); ++ i) {
+  for (size_t i = 0; i < node->input_num(); ++ i) {
     if ( !(input(i).is_CBF()) ) {
       return false;
     }
@@ -140,10 +140,10 @@ Dg::is_bidecomp() const
 // @brief 根の分解の入力数の取得
 // @return 根の分解の入力数
 size_t
-Dg::ni() const
+Dg::input_num() const
 {
   DgNode* node = edge2node(mRoot);
-  return node->ni();
+  return node->input_num();
 }
 
 // @brief 根の分解の入力の取得
@@ -239,7 +239,7 @@ Dg::ed_recur(size_t llimit,
   if ( llimit < s ) {
     if ( is_bidecomp() ) {
       // 子供の部分集合を登録する．
-      size_t nexp = (1 << ni()) - 1;
+      size_t nexp = (1 << input_num()) - 1;
       // 0 と (1 << ni) - 1 を含めていないのは
       // 空集合と全集合を除外するため．
       BddMgr& mgr = mMgr->mMgr;
@@ -247,7 +247,7 @@ Dg::ed_recur(size_t llimit,
 	size_t n = 0;
 	BddVarSet tmp_support(mgr);
 	vector<size_t> iset;
-	for (size_t i = 0; i < ni(); ++ i) {
+	for (size_t i = 0; i < input_num(); ++ i) {
 	  if (p & (1 << i)) {
 	    ++ n;
 	    tmp_support += input(i).support();
@@ -266,7 +266,7 @@ Dg::ed_recur(size_t llimit,
     }
 
     // (どのタイプのノードでも)子供に対して再帰する．
-    for (size_t i = 0; i < ni(); i ++) {
+    for (size_t i = 0; i < input_num(); i ++) {
       input(i).ed_recur(llimit, ulimit, all_sup, dec_list);
     }
   }

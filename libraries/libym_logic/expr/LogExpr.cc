@@ -184,6 +184,14 @@ LogExpr::make_xor(const LogExprList& chd_list)
   return LogExpr(mgr.make_xor(begin));
 }
 
+// @brief 確保していたメモリを開放する．
+// @note メモリリークチェックのための関数なので通常は使用しない．
+void
+LogExpr::clear_memory()
+{
+  LexpMgr::clear_memory();
+}
+
 // 否定の論理式を与える演算子
 LogExpr
 LogExpr::operator~() const
@@ -643,7 +651,7 @@ BEGIN_NONAMESPACE
 
 // 論理式をバイナリダンプする．
 void
-write_expr(BinO& s,
+write_expr(ODO& s,
 	   const LogExpr& expr)
 {
   if ( expr.is_zero() ) {
@@ -690,7 +698,7 @@ write_expr(BinO& s,
 
 // バイナリストリームから論理式を作る．
 LogExpr
-read_expr(BinI& s)
+read_expr(IDO& s)
 {
   ymuint8 type;
   s >> type;
@@ -749,8 +757,8 @@ END_NONAMESPACE
 // @param[in] s 出力ストリーム
 // @param[in] expr 論理式
 // @return s
-BinO&
-operator<<(BinO& s,
+ODO&
+operator<<(ODO& s,
 	   const LogExpr& expr)
 {
   write_expr(s, expr);
@@ -762,8 +770,8 @@ operator<<(BinO& s,
 // @param[in] s 入力ストリーム
 // @param[out] expr 論理式
 // @return s
-BinI&
-operator>>(BinI& s,
+IDO&
+operator>>(IDO& s,
 	   LogExpr& expr)
 {
   expr = read_expr(s);

@@ -5,14 +5,14 @@
 /// @brief BlibDic のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "blif_nsdef.h"
+#include "ym_networks/blif_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 /// @brief blif 形式のトークン
 enum tToken {
@@ -126,6 +126,6 @@ operator<<(ostream& s,
 	   tToken token);
 
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF
 
-#endif // LIBYM_BLIF_BLIFDIC_H
+#endif // BLIFDIC_H

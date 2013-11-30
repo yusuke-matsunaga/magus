@@ -56,6 +56,7 @@ class TclBase;
 class TclObj;
 typedef vector<TclObj> TclObjVector;
 typedef list<TclObj> TclObjList;
+class TclObjMsgHandler;
 class TclCmd;
 class TclCmdCls;
 template<typename cmd>
@@ -123,6 +124,7 @@ using nsTclpp::TclBase;
 using nsTclpp::TclObj;
 using nsTclpp::TclObjVector;
 using nsTclpp::TclObjList;
+using nsTclpp::TclObjMsgHandler;
 using nsTclpp::TclCmd;
 using nsTclpp::TclCmdCls;
 using nsTclpp::TclCmdBinder;

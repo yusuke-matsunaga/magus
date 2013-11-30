@@ -116,6 +116,7 @@ class BdnLatch;
 
 class BdnNode;
 class BdnNodeHandle;
+class BdnConstNodeHandle;
 
 class BdnEdge;
 
@@ -166,6 +167,8 @@ using nsNetworks::nsBdn::BdnLatchList;
 
 using nsNetworks::nsBdn::BdnNode;
 using nsNetworks::nsBdn::BdnNodeHandle;
+using nsNetworks::nsBdn::BdnConstNodeHandle;
+
 using nsNetworks::nsBdn::BdnNodeVector;
 using nsNetworks::nsBdn::BdnNodeList;
 

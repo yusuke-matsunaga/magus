@@ -12,15 +12,15 @@ fi
 # this is the test script
 cat <<\EOF > in
 a<1>
-d
+p
 a<3>
-d
+p
 n
-d
+p
 e<1>
-d
+p
 c
-d
+p
 q
 EOF
 

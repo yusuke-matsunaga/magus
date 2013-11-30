@@ -78,7 +78,7 @@ CiPatGraph::edge(ymuint pos) const
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiPatGraph::dump(BinO& bos) const
+CiPatGraph::dump(ODO& bos) const
 {
   bos << mRepId
       << mInputNum
@@ -91,8 +91,8 @@ CiPatGraph::dump(BinO& bos) const
 // @brief バイナリファイルを読み込む．
 // @param[in] bis 入力元のストリーム
 void
-CiPatGraph::restore(BinI& bis,
-		    AllocBase& alloc)
+CiPatGraph::restore(IDO& bis,
+		    Alloc& alloc)
 {
   bis >> mRepId
       >> mInputNum
@@ -112,7 +112,7 @@ void
 CiPatGraph::init(ymuint rep_id,
 		 ymuint input_num,
 		 ymuint edge_num,
-		 AllocBase& alloc)
+		 Alloc& alloc)
 {
   mRepId = rep_id;
   mInputNum = input_num;
@@ -136,7 +136,7 @@ CiPatGraph::set_edge(ymuint pos,
 // @param[in] alloc メモリアロケータ
 // @note mEdgeNum に値が設定されているものとする．
 void
-CiPatGraph::alloc_array(AllocBase& alloc)
+CiPatGraph::alloc_array(Alloc& alloc)
 {
   if ( mEdgeNum > 0 ) {
     void* p = alloc.get_memory(sizeof(ymuint32) * mEdgeNum);

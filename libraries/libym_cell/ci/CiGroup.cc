@@ -60,7 +60,7 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 CiGroup::CiGroup() :
-  mCellClass(NULL),
+  mRepClass(NULL),
   mPinInfo(0U),
   mCellNum(0),
   mCellList(NULL)
@@ -81,11 +81,11 @@ CiGroup::id() const
   return mId;
 }
 
-// @brief 属している CellClass を返す．
+// @brief 代表クラスを返す．
 const CellClass*
-CiGroup::cell_class() const
+CiGroup::rep_class() const
 {
-  return mCellClass;
+  return mRepClass;
 }
 
 // @brief 代表クラスに対する変換マップを返す．
@@ -276,16 +276,18 @@ CiGroup::cell(ymuint pos) const
 void
 CiGroup::init(const CellClass* cell_class,
 	      const NpnMapM& map,
-	      const vector<const Cell*>& cell_list,
-	      AllocBase& alloc)
+	      const vector<Cell*>& cell_list,
+	      Alloc& alloc)
 {
-  mCellClass = cell_class;
+  mRepClass = cell_class;
   mMap = map;
   mCellNum = cell_list.size();
 
   alloc_array(alloc);
   for (ymuint i = 0; i < mCellNum; ++ i) {
-    mCellList[i] = cell_list[i];
+    Cell* cell = cell_list[i];
+    mCellList[i] = cell;
+    cell->set_group(this);
   }
 }
 
@@ -333,9 +335,9 @@ CiGroup::set_latch_info(ymuint pos_array[])
 // @brief バイナリダンプを行う．
 // @param[in] bos 出力先のストリーム
 void
-CiGroup::dump(BinO& bos) const
+CiGroup::dump(ODO& bos) const
 {
-  ymuint32 parent_id = mCellClass->id();
+  ymuint32 parent_id = mRepClass->id();
   bos << parent_id
       << mMap
       << mPinInfo
@@ -351,29 +353,31 @@ CiGroup::dump(BinO& bos) const
 // @param[in] library セルライブラリ
 // @param[in] alloc メモリアロケータ
 void
-CiGroup::restore(BinI& bis,
-		 const CellLibrary& library,
-		 AllocBase& alloc)
+CiGroup::restore(IDO& bis,
+		 CellLibrary& library,
+		 Alloc& alloc)
 {
   ymuint32 parent_id;
   bis >> parent_id
       >> mMap
       >> mPinInfo
       >> mCellNum;
-  mCellClass = library.npn_class(parent_id);
+  mRepClass = library.npn_class(parent_id);
 
   alloc_array(alloc);
   for (ymuint i = 0; i < mCellNum; ++ i) {
     ymuint32 cell_id;
     bis >> cell_id;
-    mCellList[i] = library.cell(cell_id);
+    Cell* cell = library.cell(cell_id);
+    mCellList[i] = cell;
+    cell->set_group(this);
   }
 }
 
 // @brief メモリ領域の確保を行う．
 // @param[in] alloc メモリアロケータ
 void
-CiGroup::alloc_array(AllocBase& alloc)
+CiGroup::alloc_array(Alloc& alloc)
 {
   if ( mCellNum > 0 ) {
     void* p = alloc.get_memory(sizeof(const Cell*) * mCellNum);

@@ -45,7 +45,7 @@ public:
   /// @param[in] vect テストする論理関数のベクタ
   ///
   /// TvFunc::TvFunc(size_t ni, const vector<int>& vect)
-  /// TvFunc::ni()
+  /// TvFunc::input_num()
   /// TvFunc::value(size_t pos)
   /// のテストを行う．
   void

@@ -1,11 +1,9 @@
 
-/// @file libym_gds/GdsRecored.cc
-/// @brief GDS-II のひとかたまりのデータを表すクラス
+/// @file GdsRecored.cc
+/// @brief GdsRecord の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsRecord.cc 997 2007-09-07 09:58:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,25 +17,14 @@ BEGIN_NAMESPACE_YM_GDS
 // Record
 //////////////////////////////////////////////////////////////////////
 
-// 先頭のオフセットを取り出す．
-size_t
-GdsRecord::offset() const
+// @brief コンストラクタ
+GdsRecord::GdsRecord()
 {
-  return mOffset;
 }
 
-// サイズを取り出す．
-size_t
-GdsRecord::size() const
+// @brief デストラクタ
+GdsRecord::~GdsRecord()
 {
-  return mSize;
-}
-
-// レコード型を取り出す．
-tGdsRtype
-GdsRecord::rtype() const
-{
-  return mRtype;
 }
 
 // レコード型を表すトークンを返す．
@@ -54,13 +41,6 @@ GdsRecord::rtype_string() const
   return GdsRecTable::obj().rtype_string(mRtype);
 }
 
-// データ型を取り出す．
-tGdsDtype
-GdsRecord::dtype() const
-{
-  return mDtype;
-}
-
 // データ型を表す文字列を返す．
 const char*
 GdsRecord::dtype_string() const
@@ -68,54 +48,39 @@ GdsRecord::dtype_string() const
   return GdsRecTable::obj().dtype_string(mDtype);
 }
 
-// データサイズを取り出す．
-size_t
-GdsRecord::dsize() const
-{
-  return size() - 4;
-}
-
-// pos 番目のバイトデータを返す．
-tGdsByte
-GdsRecord::conv_1byte(size_t pos) const
-{
-  return mData[pos];
-}
-
 // pos 番目の 2バイトのデータを符号つき数(2の補数表現)に変換する．
 // kGds2Int 用の変換関数
-int
-GdsRecord::conv_2byte_int(size_t pos) const
+ymint16
+GdsRecord::conv_2byte_int(ymuint32 pos) const
 {
-  size_t offset = pos * 2;
-  ymuint ans = (static_cast<ymuint>(mData[offset]) << 8);
-  ans += static_cast<ymuint>(mData[offset + 1]);
-  return static_cast<int>(ans);
+  ymuint32 offset = pos * 2;
+  ymuint16 ans = (conv_1byte(offset) << 8) + conv_1byte(offset + 1);
+  return static_cast<ymint16>(ans);
 }
 
 // pos 番目の 4バイトのデータを符号つき数(2の補数表現)に変換する．
 // kGds4Int 用の変換関数
-int
-GdsRecord::conv_4byte_int(size_t pos) const
+ymint32
+GdsRecord::conv_4byte_int(ymuint32 pos) const
 {
-  size_t offset = pos * 4;
-  ymuint ans = (static_cast<ymuint>(mData[offset]) << 24);
-  ans += (static_cast<ymuint>(mData[offset + 1]) << 16);
-  ans += (static_cast<ymuint>(mData[offset + 2]) << 8);
-  ans += static_cast<ymuint>(mData[offset + 3]);
-  return static_cast<int>(ans);
+  ymuint32 offset = pos * 4;
+  ymuint32 ans = (conv_1byte(offset + 0) << 24);
+  ans += (conv_1byte(offset + 1) << 16);
+  ans += (conv_1byte(offset + 2) << 8);
+  ans += conv_1byte(offset + 3);
+  return static_cast<ymint32>(ans);
 }
 
 // pos 番目の 4バイトのデータを浮動小数点数に変換する．
 // kGds4Real 用の変換関数
 double
-GdsRecord::conv_4byte_real(size_t pos) const
+GdsRecord::conv_4byte_real(ymuint32 pos) const
 {
-  size_t offset = pos * 4;
+  ymuint32 offset = pos * 4;
   bool zero = true;
   ymuint v[4];
-  for (size_t i = 0; i < 4; ++ i) {
-    v[i] = static_cast<ymuint>(mData[i + offset]);
+  for (ymuint i = 0; i < 4; ++ i) {
+    v[i] = conv_1byte(i + offset);
     if ( v[i] ) {
       zero = false;
     }
@@ -130,19 +95,19 @@ GdsRecord::conv_4byte_real(size_t pos) const
   double ans = 0.0;
   double w = 0.5;
   if ( exp >= 64 ) {
-    size_t sn = exp - 64;
-    for (size_t i = 0; i < sn; ++ i) {
+    ymuint sn = exp - 64;
+    for (ymuint i = 0; i < sn; ++ i) {
       w *= 16.0;
     }
   }
   else {
-    size_t sn = 64 - exp;
-    for (size_t i = 0; i < sn; ++ i) {
+    ymuint sn = 64 - exp;
+    for (ymuint i = 0; i < sn; ++ i) {
       w /= 16.0;
     }
   }
   ymuint mask = (1 << 23);
-  for (size_t i = 0; i < 24; ++ i) {
+  for (ymuint i = 0; i < 24; ++ i) {
     if ( mag & mask ) {
       ans += w;
     }
@@ -158,13 +123,13 @@ GdsRecord::conv_4byte_real(size_t pos) const
 // pos 番目の 8バイトのデータを浮動小数点数に変換する．
 // kGds8Real 用の変換関数
 double
-GdsRecord::conv_8byte_real(size_t pos) const
+GdsRecord::conv_8byte_real(ymuint pos) const
 {
-  size_t offset = pos * 8;
+  ymuint offset = pos * 8;
   bool zero = true;
   ymuint v[8];
-  for (size_t i = 0; i < 8; ++ i) {
-    v[i] = static_cast<ymuint>(mData[i + offset]);
+  for (ymuint i = 0; i < 8; ++ i) {
+    v[i] = conv_1byte(i + offset);
     if ( v[i] ) {
       zero = false;
     }
@@ -178,20 +143,20 @@ GdsRecord::conv_8byte_real(size_t pos) const
   double ans = 0.0;
   double w = 0.5;
   if ( exp >= 64 ) {
-    size_t sn = exp - 64;
-    for (size_t i = 0; i < sn; ++ i) {
+    ymuint sn = exp - 64;
+    for (ymuint i = 0; i < sn; ++ i) {
       w *= 16.0;
     }
   }
   else {
-    size_t sn = 64 - exp;
-    for (size_t i = 0; i < sn; ++ i) {
+    ymuint sn = 64 - exp;
+    for (ymuint i = 0; i < sn; ++ i) {
       w /= 16.0;
     }
   }
-  size_t block = 1;
+  ymuint block = 1;
   ymuint mask = (1 << 7);
-  for (size_t i = 0; i < 56; ++ i) {
+  for (ymuint i = 0; i < 56; ++ i) {
     if ( v[block] & mask ) {
       ans += w;
     }
@@ -214,16 +179,16 @@ GdsRecord::conv_8byte_real(size_t pos) const
 string
 GdsRecord::conv_string() const
 {
-  size_t n = dsize();
-  size_t len = n;
-  for (size_t i = 0; i < n; ++ i) {
+  ymuint n = dsize();
+  ymuint len = n;
+  for (ymuint i = 0; i < n; ++ i) {
     if ( mData[i] == '\0' ) {
       len = i;
       break;
     }
   }
   string buf;
-  for (size_t i = 0; i < len; ++ i) {
+  for (ymuint i = 0; i < len; ++ i) {
     buf.push_back(mData[i]);
   }
 

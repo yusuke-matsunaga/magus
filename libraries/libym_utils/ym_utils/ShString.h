@@ -23,6 +23,9 @@ BEGIN_NAMESPACE_YM
 class ShString
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
   /// @note NULL がセットされる．
@@ -63,6 +66,12 @@ public:
   /// @brief デストラクタ
   ~ShString();
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief const char* に変換する．
   operator const char*() const;
 
@@ -75,13 +84,19 @@ public:
   id() const;
 
   /// @brief ハッシュ用のキーを返す．
-  size_t
+  ymuint
   hash() const;
 
   /// @brief ShString 関連でアロケートされたメモリサイズ
   static
   ymuint
   allocated_size();
+
+  /// @brief ShString 関連でアロケートされたメモリをすべて開放する．
+  /// @note 非常に破壊的なのでメモリリーク検査時の終了直前などの場合のみに使う．
+  static
+  void
+  free_all_memory();
 
 
 private:
@@ -274,11 +289,11 @@ ShString::id() const
 
 // @brief ハッシュ用のキーを返す．
 inline
-size_t
+ymuint
 ShString::hash() const
 {
   // 共有されているのでポインタ比較でOK
-  return reinterpret_cast<size_t>(mPtr)/sizeof(void*);
+  return reinterpret_cast<ympuint>(mPtr)/sizeof(void*);
 }
 
 // 等価比較演算子
@@ -359,7 +374,7 @@ BEGIN_NAMESPACE_HASH
 template <>
 struct hash<nsYm::ShString>
 {
-  size_t
+  ymuint
   operator()(nsYm::ShString str) const
   {
     return str.hash();

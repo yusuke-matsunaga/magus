@@ -2,7 +2,7 @@
 /// @file calc_cvf/CalcCvf.cc
 /// @brief CalcCvf の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: CalcCvf.cc 1978 2009-02-06 12:29:16Z matsunaga $
 ///
 /// Copyright (C) 2005-2008 Yusuke Matsunaga
@@ -38,7 +38,7 @@ CalcCvf::CalcCvf() :
   mNodeAlloc(4096)
 {
 }
-  
+
 // @brief デストラクタ
 CalcCvf::~CalcCvf()
 {
@@ -66,9 +66,9 @@ CalcCvf::clear()
   mFFRArray.clear();
 
   mClearArray.clear();
-  
+
   mNodeAlloc.destroy();
-  
+
   // 念のため
   mNetwork = NULL;
 }
@@ -94,7 +94,7 @@ CalcCvf::set_network(const TgNetwork& network,
   mInputArray.resize(ni);
   mOutputArray.resize(no);
   mNodeArray.reserve(nn);
-  
+
   // 外部入力に対応する SimNode の生成
   for (size_t i = 0; i < ni; ++ i) {
     const TgNode* tgnode = mNetwork->input(i);
@@ -105,7 +105,7 @@ CalcCvf::set_network(const TgNetwork& network,
   // 論理ノードに対応する SimNode の生成
   for (size_t i = 0; i < nl; ++ i) {
     const TgNode* tgnode = mNetwork->sorted_logic(i);
-    size_t ni = tgnode->ni();
+    size_t ni = tgnode->fanin_num();
     vector<SimNode*> inputs(ni);
     for (size_t i = 0; i < ni; ++ i) {
       const TgNode* itgnode = tgnode->fanin(i);
@@ -134,7 +134,7 @@ CalcCvf::set_network(const TgNetwork& network,
     mSimMap[onode->gid()] = inode;
     mOutputArray[i] = inode;
   }
-  
+
   // 各ノードのファンアウト数を数える．
   // complex gate を分解しているので TgNode と異なる場合がある．
   for (vector<SimNode*>::iterator p = mNodeArray.begin();
@@ -166,7 +166,7 @@ CalcCvf::set_network(const TgNetwork& network,
       ++ inode->mNfo;
     }
   }
-  
+
   // FFR の設定
   size_t node_num = mNodeArray.size();
   size_t fn = 0;
@@ -192,10 +192,10 @@ CalcCvf::set_network(const TgNetwork& network,
       node->mFFR = node->fanout(0)->mFFR;
     }
   }
-  
+
   // mClearArray の最大サイズは全ノード数
   mClearArray.reserve(node_num);
-  
+
   // 最大レベルを求め，イベントキューを初期化する．
   size_t max_level = 0;
   for (size_t i = 0; i < no; ++ i) {
@@ -218,7 +218,7 @@ CalcCvf::find_dss(bool new_algorithm)
   size_t fn = mFFRArray.size();
   size_t no = mOutputArray.size();
   size_t nn = mNodeArray.size();
-  
+
   // po-mark の設定
   // po-mark は FFR の根のノードでしか計算しない．
   vector<PoMark> pmarray(nn);
@@ -248,7 +248,7 @@ CalcCvf::find_dss(bool new_algorithm)
       pomark.merge(pomark1);
     }
   }
-    
+
 
   NodeSet cur_set(nn);
   NodeSet tmp_set(nn);
@@ -262,7 +262,7 @@ CalcCvf::find_dss(bool new_algorithm)
   for (size_t i = 0; i < fn; ++ i) {
     SimFFR& ffr = mFFRArray[i];
     SimNode* node = ffr.root();
-    
+
     // node のファンアウトを cur_set に入れる．
     cur_set.clear();
     size_t nfo = node->nfo();
@@ -277,11 +277,11 @@ CalcCvf::find_dss(bool new_algorithm)
       // 共有しているノードは next_set にコピーする．
       sharedpo.clear();
       next_set.clear();
-      
+
       // next_set の要素のレベルの最小値
       size_t min_level = 0;
       SimNode* min_node = NULL;
-      
+
       size_t n = cur_set.num();
       for (size_t i = 0; i < n; ++ i) {
 	SimNode* node = cur_set.node(i);
@@ -296,7 +296,7 @@ CalcCvf::find_dss(bool new_algorithm)
 	  for (size_t j = i + 1; j < n; ++ j) {
 	    SimNode* node1 = cur_set.node(j);
 	    if ( node1 == NULL ) continue;
-	    
+
 	    const PoMark& pomark1 = pmarray[node1->ffr()->root()->id()];
 	    if ( pomark && pomark1 ) {
 	      shared = true;
@@ -307,7 +307,7 @@ CalcCvf::find_dss(bool new_algorithm)
 		min_level = node1->level();
 		min_node = node1;
 	      }
-	      
+
 	      // 処理済みの印として NULL にしておく
 	      cur_set.del(j);
 	      break;
@@ -510,7 +510,7 @@ CalcCvf::make_node(tTgGateType type,
     p = mNodeAlloc.get_memory(sizeof(SnInput));
     node = new (p) SnInput(id);
     break;
-    
+
   case kTgBuff:
     p = mNodeAlloc.get_memory(sizeof(SnBuff));
     node = new (p) SnBuff(id, inputs);
@@ -532,19 +532,19 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnAnd3));
       node = new (p) SnAnd3(id, inputs);
       break;
-      
+
     case 4:
       p = mNodeAlloc.get_memory(sizeof(SnAnd4));
       node = new (p) SnAnd4(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnAnd));
       node = new (p) SnAnd(id, inputs);
       break;
     }
     break;
-    
+
   case kTgNand:
     switch ( ni ) {
     case 2:
@@ -556,7 +556,7 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnNand3));
       node = new (p) SnNand3(id, inputs);
       break;
-      
+
     case 4:
       p = mNodeAlloc.get_memory(sizeof(SnNand4));
       node = new (p) SnNand4(id, inputs);
@@ -575,7 +575,7 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnOr2));
       node = new (p) SnOr2(id, inputs);
       break;
-      
+
     case 3:
       p = mNodeAlloc.get_memory(sizeof(SnOr3));
       node = new (p) SnOr3(id, inputs);
@@ -585,7 +585,7 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnOr4));
       node = new (p) SnOr4(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnOr));
       node = new (p) SnOr(id, inputs);
@@ -599,12 +599,12 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnNor2));
       node = new (p) SnNor2(id, inputs);
       break;
-      
+
     case 3:
       p = mNodeAlloc.get_memory(sizeof(SnNor3));
       node = new (p) SnNor3(id, inputs);
       break;
-      
+
     case 4:
       p = mNodeAlloc.get_memory(sizeof(SnNor4));
       node = new (p) SnNor4(id, inputs);
@@ -623,7 +623,7 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnXor2));
       node = new (p) SnXor2(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnXor));
       node = new (p) SnXor(id, inputs);
@@ -637,7 +637,7 @@ CalcCvf::make_node(tTgGateType type,
       p = mNodeAlloc.get_memory(sizeof(SnXnor2));
       node = new (p) SnXnor2(id, inputs);
       break;
-      
+
     default:
       p = mNodeAlloc.get_memory(sizeof(SnXnor));
       node = new (p) SnXnor(id, inputs);
@@ -655,7 +655,7 @@ CalcCvf::make_node(tTgGateType type,
   }
   return node;
 }
-  
+
 // @brief 正常値のシミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
 void
@@ -688,13 +688,13 @@ void
 CalcCvf::calc_exact(const vector<TestVector*>& tv_array)
 {
   calc_gval(tv_array);
-  
+
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     SimFFR& ffr = *p;
     SimNode* root = ffr.root();
     tPackedVal obs = kPvAll0;
-    
+
     if ( root->is_output() ) {
       // 外部出力ならすべて可観測
       obs = kPvAll1;
@@ -702,7 +702,7 @@ CalcCvf::calc_exact(const vector<TestVector*>& tv_array)
     else {
       // このノード(roo) に対する DSS をターゲットとする．
       tPackedVal req1 = ffr.set_target();
-      
+
       // root の値を反転させてその影響が PO で観測されるか調べる．
       tPackedVal pat = root->get_gval() ^ req1;
       root->set_fval(pat);
@@ -732,7 +732,7 @@ CalcCvf::calc_exact(const vector<TestVector*>& tv_array)
 	  }
 	}
       }
-      
+
       // 今の故障シミュレーションで値の変わったノードを元にもどしておく
       for (vector<SimNode*>::iterator p = mClearArray.begin();
 	   p != mClearArray.end(); ++ p) {
@@ -754,13 +754,13 @@ void
 CalcCvf::calc_pseudo_min(const vector<TestVector*>& tv_array)
 {
   calc_gval(tv_array);
-  
+
   size_t no = mOutputArray.size();
   for (size_t i = 0; i < no; ++ i) {
     SimNode* node = mOutputArray[i];
     node->set_obs(kPvAll1);
   }
-  
+
   size_t nl = mLogicArray.size();
   for (size_t i = nl; i > 0; ) {
     -- i;
@@ -776,7 +776,7 @@ CalcCvf::calc_max(const vector<TestVector*>& tv_array,
 		  size_t ns)
 {
   calc_gval(tv_array);
-  
+
   size_t nl = mLogicArray.size();
   size_t ni = mInputArray.size();
   size_t no = mOutputArray.size();
@@ -877,7 +877,7 @@ CalcCvf::dump(ostream& s) const
     SimNode* simnode = find_simnode(node);
     s << "LOGIC#" << i
       << ": \t" << node->name() << ": " << simnode->id() << endl;
-    size_t ni = node->ni();
+    size_t ni = node->fanin_num();
     for (size_t j = 0; j < ni; ++ j) {
       s << "\t\tI" << j << ": ";
       const TgNode* inode = node->fanin(j);

@@ -1,21 +1,17 @@
 
-/// @file libym_logic/bdd/base/BddMgrRef.cc
+/// @file BddMgrRef.cc
 /// @brief BddMgrRef の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: BddMgrRef.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_logic/BddMgr.h"
+#include "ym_logic/BddVector.h"
+#include "ym_logic/BddList.h"
 
 #include "BddMgrImpl.h"
-#include "Dumper.h"
-
-#include "bmc/BddMgrClassic.h"
-#include "bmm/BddMgrModern.h"
 
 #include "ym_utils/HeapTree.h"
 
@@ -56,15 +52,7 @@ BddMgr::BddMgr(const string& type,
 	       const string& name,
 	       const string& option)
 {
-  if ( type == "bmc" ) {
-    mImpl = new BddMgrClassic(name, option);
-  }
-  else if ( type == "bmm" ) {
-    mImpl = new BddMgrModern(name, option);
-  }
-  else {
-    mImpl = new BddMgrClassic(name, option);
-  }
+  mImpl = BddMgrImpl::new_mgr(type, name, option);
   assert_cond(mImpl, __FILE__, __LINE__);
 }
 
@@ -110,9 +98,7 @@ Bdd
 BddMgr::make_literal(VarId index,
 		     tPol pol)
 {
-  BddEdge ans = mImpl->make_posiliteral(index);
-  ans.addpol(pol);
-  return Bdd(mImpl, ans);
+  return Bdd(mImpl, mImpl->make_literal(index, pol));
 }
 
 // リテラル関数を表すBDDを作る
@@ -144,7 +130,8 @@ BddMgr::make_bdd(VarId index,
 		 const Bdd& chd0,
 		 const Bdd& chd1)
 {
-  return Bdd(mImpl, mImpl->make_bdd(index, chd0.root(), chd1.root()));
+  Bdd idx_bdd = make_posiliteral(index);
+  return ite_op(idx_bdd, chd1, chd0);
 }
 
 // ベクタを真理値表と見なしてBDDを作る．
@@ -153,7 +140,7 @@ BddMgr::make_bdd(VarId index,
 // v の大きさは 2^ni に等しくなければならない．
 Bdd
 BddMgr::tvec_to_bdd(const vector<int>& v,
-		    tVarSize ni)
+		    ymuint ni)
 {
   VarVector vv(ni);
   for (ymuint i = 0; i < ni; ++ i) {
@@ -237,19 +224,19 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
 
   // ここまで来たら根はAND/OR/XOR演算子
   ymuint n = expr.child_num();
-  vector<Bdd> bdd_list(n);
+  BddVector bdd_list(*this, n);
   for (ymuint i = 0; i < n; ++ i) {
     Bdd bdd = expr_to_bdd(expr.child(i), varmap);
     bdd_list[i] = bdd;
   }
   if ( expr.is_and() ) {
-    return and_op(bdd_list);
+    return bdd_list.and_op();
   }
   if ( expr.is_or() ) {
-    return or_op(bdd_list);
+    return bdd_list.or_op();
   }
   if ( expr.is_xor() ) {
-    return xor_op(bdd_list);
+    return bdd_list.xor_op();
   }
   assert_not_reached(__FILE__, __LINE__);
   return make_error();
@@ -320,8 +307,8 @@ END_NONAMESPACE
 
 // 閾値関数を作る．
 Bdd
-BddMgr::make_thfunc(tVarSize n,
-		    tVarSize th)
+BddMgr::make_thfunc(ymuint n,
+		    ymuint th)
 {
   vector<BddEdge> table((n + 1) * (th + 1));
   table[elem(n, 0, th)] = BddEdge::make_one();
@@ -329,6 +316,7 @@ BddMgr::make_thfunc(tVarSize n,
     table[elem(n, i, th)] = BddEdge::make_zero();
   }
   for (ymuint i = n; i -- > 0; ) {
+    BddEdge idx = mImpl->make_posiliteral(VarId(i));
     table[elem(i, 0, th)] = BddEdge::make_one();
     for (ymuint j = 1; j <= th; j ++) {
       if ( j > n - i ) {
@@ -337,7 +325,7 @@ BddMgr::make_thfunc(tVarSize n,
       else {
 	BddEdge l = table[elem(i + 1, j, th)];
 	BddEdge h = table[elem(i + 1, j - 1, th)];
-	BddEdge tmp = mImpl->make_bdd(VarId(i), l, h);
+	BddEdge tmp = mImpl->ite_op(idx, h, l);
 	if ( tmp.is_overflow() ) {
 	  return make_overflow();
 	}
@@ -347,291 +335,6 @@ BddMgr::make_thfunc(tVarSize n,
   }
   BddEdge ans = table[elem(0, th, th)];
   return Bdd(mImpl, ans);
-}
-
-// 複数のBDDの論理積を求める．
-Bdd
-BddMgr::and_op(const BddVector& bdds)
-{
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_one();
-  }
-  if ( n == 1 ) {
-    return bdds[0];
-  }
-  if ( n == 2 ) {
-    return bdds[0] & bdds[1];
-  }
-
-  BddEdge ans_e;
-  if ( n == 3 ) {
-    ans_e = mImpl->and_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
-  }
-  else if ( n < kNiLimit ) {
-    BddVector::const_iterator p = bdds.begin();
-    ans_e = p->root();
-    for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->and_op(ans_e, p->root());
-    }
-  }
-  else {
-    SimpleHeapTree<BddEdge> work;
-    for (BddVector::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->and_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Bdd(mImpl, ans_e);
-}
-
-Bdd
-BddMgr::and_op(const BddList& bdds)
-{
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_one();
-  }
-  if ( n == 1 ) {
-    return bdds.front();
-  }
-  if ( n == 2 ) {
-    BddList::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    return bdd0 & bdd1;
-  }
-
-  BddEdge ans_e;
-  if ( n == 3 ) {
-    BddList::const_iterator p = bdds.begin();
-    BddEdge e0 = p->root();
-    ++ p;
-    BddEdge e1 = p->root();
-    ++ p;
-    BddEdge e2 = p->root();
-    ans_e = mImpl->and_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    BddList::const_iterator p = bdds.begin();
-    ans_e = p->root();
-    for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->and_op(ans_e, p->root());
-    }
-  }
-  else {
-    SimpleHeapTree<BddEdge> work;
-    for (BddList::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->and_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Bdd(mImpl, ans_e);
-}
-
-// 複数のBDDの論理和を求める．
-Bdd
-BddMgr::or_op(const BddVector& bdds)
-{
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_zero();
-  }
-  if ( n == 1 ) {
-    return bdds[0];
-  }
-  if ( n == 2 ) {
-    return bdds[0] | bdds[1];
-  }
-
-  BddEdge ans_e;
-  if ( n == 3 ) {
-    ans_e = mImpl->or_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
-  }
-  else if ( n < kNiLimit ) {
-    BddVector::const_iterator p = bdds.begin();
-    ans_e = p->root();
-    for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->or_op(ans_e, p->root());
-    }
-  }
-  else {
-    SimpleHeapTree<BddEdge> work;
-    for (BddVector::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->or_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Bdd(mImpl, ans_e);
-}
-
-Bdd
-BddMgr::or_op(const BddList& bdds)
-{
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_zero();
-  }
-  if ( n == 1 ) {
-    return bdds.front();
-  }
-  if ( n == 2 ) {
-    BddList::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    return bdd0 | bdd1;
-  }
-
-  BddEdge ans_e;
-  if ( n == 3 ) {
-    BddList::const_iterator p = bdds.begin();
-    BddEdge e0 = p->root();
-    ++ p;
-    BddEdge e1 = p->root();
-    ++ p;
-    BddEdge e2 = p->root();
-    ans_e = mImpl->or_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    BddList::const_iterator p = bdds.begin();
-    ans_e = p->root();
-    for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->or_op(ans_e, p->root());
-    }
-  }
-  else {
-    SimpleHeapTree<BddEdge> work;
-    for (BddList::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->or_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Bdd(mImpl, ans_e);
-}
-
-// 複数のBDDの排他的論理和を求める．
-Bdd
-BddMgr::xor_op(const BddVector& bdds)
-{
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_zero();
-  }
-  if ( n == 1 ) {
-    return bdds[0];
-  }
-  if ( n == 2 ) {
-    return bdds[0] ^ bdds[1];
-  }
-
-  BddEdge ans_e;
-  if ( n == 3 ) {
-    ans_e = mImpl->xor_op(bdds[0].root(), bdds[1].root(), bdds[2].root());
-  }
-  else if ( n < kNiLimit ) {
-    BddVector::const_iterator p = bdds.begin();
-    ans_e = p->root();
-    for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->xor_op(ans_e, p->root());
-    }
-  }
-  else {
-    SimpleHeapTree<BddEdge> work;
-    for (BddVector::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->xor_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Bdd(mImpl, ans_e);
-}
-
-Bdd
-BddMgr::xor_op(const BddList& bdds)
-{
-  ymuint n = bdds.size();
-  if ( n == 0 ) {
-    return make_zero();
-  }
-  if ( n == 1 ) {
-    return bdds.front();
-  }
-  if ( n == 2 ) {
-    BddList::const_iterator p = bdds.begin();
-    Bdd bdd0 = *p;
-    ++ p;
-    Bdd bdd1 = *p;
-    return bdd0 ^ bdd1;
-  }
-
-  BddEdge ans_e;
-  if ( n == 3 ) {
-    BddList::const_iterator p = bdds.begin();
-    BddEdge e0 = p->root();
-    ++ p;
-    BddEdge e1 = p->root();
-    ++ p;
-    BddEdge e2 = p->root();
-    ans_e = mImpl->xor_op(e0, e1, e2);
-  }
-  else if ( n < kNiLimit ) {
-    BddList::const_iterator p = bdds.begin();
-    ans_e = p->root();
-    for (++ p; p != bdds.end(); ++ p) {
-      ans_e = mImpl->xor_op(ans_e, p->root());
-    }
-  }
-  else {
-    SimpleHeapTree<BddEdge> work;
-    for (BddList::const_iterator p = bdds.begin();
-	 p != bdds.end(); ++p) {
-      BddEdge e = p->root();
-      work.put(e, mImpl->size(e));
-    }
-    ans_e = work.getmin();
-    work.popmin();
-    while ( !work.empty() ) {
-      ans_e = mImpl->xor_op(ans_e, work.getmin());
-      ans_e = work.xchgmin(ans_e, mImpl->size(ans_e));
-    }
-  }
-  return Bdd(mImpl, ans_e);
 }
 
 // 変数を確保する．
@@ -644,7 +347,7 @@ BddMgr::new_var(VarId varid)
 }
 
 // 現在登録されている変数をそのレベルの昇順で返す．
-tVarSize
+ymuint
 BddMgr::var_list(list<VarId>& vlist) const
 {
   return mImpl->var_list(vlist);
@@ -652,7 +355,7 @@ BddMgr::var_list(list<VarId>& vlist) const
 
 // 変数番号からレベルを得る．
 // もしもレベルが割り当てられていない場合にはエラーとなる．
-tLevel
+ymuint
 BddMgr::level(VarId varid) const
 {
   return mImpl->level(varid);
@@ -660,7 +363,7 @@ BddMgr::level(VarId varid) const
 
 // レベルから変数番号を得る．
 VarId
-BddMgr::varid(tLevel level) const
+BddMgr::varid(ymuint level) const
 {
   return mImpl->varid(level);
 }
@@ -787,52 +490,6 @@ ymuint64
 BddMgr::gc_count() const
 {
   return mImpl->gc_count();
-}
-
-// @brief ダンプされた情報を BDD を読み込む．
-// @param[in] s 入力ストリーム
-// @return 読み込まれた BDD
-Bdd
-BddMgr::restore(BinI& s)
-{
-  Restorer restorer(mImpl, s);
-  ymuint n = restorer.read();
-  if ( n != 1 ) {
-    // エラーもしくは複数の BDD データだった．
-    return make_error();
-  }
-  else {
-    return Bdd(mImpl, restorer.root(0));
-  }
-}
-
-// @brief ダンプされた情報を BDD ベクタに読み込む．
-// @param[in] s 入力ストリーム
-// @param[in] array 読み込み先の BDD ベクタ
-void
-BddMgr::restore(BinI& s,
-		BddVector& array)
-{
-  Restorer restorer(mImpl, s);
-  ymuint n = restorer.read();
-  array.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    array[i] = Bdd(mImpl, restorer.root(i));
-  }
-}
-
-// @brief ダンプされた情報を BDD リストに読み込む．
-// @param[in] s 入力ストリーム
-// @param[in] array 読み込み先の BDD リスト
-void
-BddMgr::restore(BinI& s,
-		BddList& array)
-{
-  Restorer restorer(mImpl, s);
-  ymuint n = restorer.read();
-  for (ymuint i = 0; i < n; ++ i) {
-    array.push_back(Bdd(mImpl, restorer.root(i)));
-  }
 }
 
 END_NAMESPACE_YM_BDD

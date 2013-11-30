@@ -59,7 +59,7 @@ protected:
 	      const LogExpr& data_in,
 	      const LogExpr& enable,
 	      const LogExpr& enable_also,
-	      AllocBase& alloc);
+	      Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -159,7 +159,7 @@ protected:
 	       const LogExpr& enable,
 	       const LogExpr& enable_also,
 	       const LogExpr& clear,
-	       AllocBase& alloc);
+	       Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -241,7 +241,7 @@ protected:
 	       const LogExpr& enable,
 	       const LogExpr& enable_also,
 	       const LogExpr& preset,
-	       AllocBase& alloc);
+	       Alloc& alloc);
 
   /// @brief デストラクタ
   virtual
@@ -329,7 +329,7 @@ protected:
 		const LogExpr& preset,
 		ymuint clear_preset_var1,
 		ymuint clear_preset_var2,
-		AllocBase& alloc);
+		Alloc& alloc);
 
   /// @brief デストラクタ
   virtual

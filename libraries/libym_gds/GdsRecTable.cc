@@ -1,11 +1,9 @@
 
-/// @file libym_gds/GdsRecTable.cc
-/// @brief GDS-II の予約語の変換テーブル
+/// @file GdsRecTable.cc
+/// @brief GdsRecTable の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GdsRecTable.cc 997 2007-09-07 09:58:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2012 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +13,7 @@
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
 // yacc/bison が生成したヘッダファイル
-#include "GdsParser.h"
+#include "gds_grammer.hh"
 
 END_NAMESPACE_YM_GDS_PARSER
 

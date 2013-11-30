@@ -10,7 +10,7 @@
 #include "NullBlifHandler.h"
 
 
-BEGIN_NAMESPACE_YM_BLIF
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 // @brief コンストラクタ
 NullBlifHandler::NullBlifHandler()
@@ -66,7 +66,8 @@ NullBlifHandler::outputs_elem(ymuint32 name_id)
 }
 
 // @brief .names 文の処理
-// @param[in] name_id_array 各識別子のID番号の配列
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id_array 各識別子のID番号の配列
 // @param[in] nc キューブ数
 // @param[in] cover_pat 入力カバーを表す文字列
 // @param[in] opat 出力の極性
@@ -76,7 +77,8 @@ NullBlifHandler::outputs_elem(ymuint32 name_id)
 // 各要素のとりうる値は '0', '1', '-' を表す．
 // @note opat は '0' か '1' のどちらか
 bool
-NullBlifHandler::names(const vector<ymuint32>& name_id_array,
+NullBlifHandler::names(ymuint32 onode_id,
+		       const vector<ymuint32>& inode_id_array,
 		       ymuint32 nc,
 		       const char* cover_pat,
 		       char opat)
@@ -85,29 +87,29 @@ NullBlifHandler::names(const vector<ymuint32>& name_id_array,
 }
 
 // @brief .gate 文の処理
-// @param[in] cell セル
 // @param[in] onode_id 出力ノードのID番号
 // @param[in] inode_id_array 入力ノードのID番号の配列
+// @param[in] cell セル
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-NullBlifHandler::gate(const Cell* cell,
-		      ymuint32 onode_id,
-		      const vector<ymuint32>& inode_id_array)
+NullBlifHandler::gate(ymuint32 onode_id,
+		      const vector<ymuint32>& inode_id_array,
+		      const Cell* cell)
 {
   return true;
 }
 
 // @brief .latch 文の処理
-// @param[in] name1_id 最初の識別子のID番号
-// @param[in] name2_id 次の識別子のID番号
+// @param[in] onode_id 出力ノードのID番号
+// @param[in] inode_id 入力ノードのID番号
 // @param[in] loc4 リセット値の位置情報
 // @param[in] rval リセット時の値('0'/'1') 未定義なら ' '
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-NullBlifHandler::latch(ymuint32 name1_id,
-		       ymuint32 name2_id,
+NullBlifHandler::latch(ymuint32 onode_id,
+		       ymuint32 inode_id,
 		       const FileRegion& loc4,
 		       char rval)
 {
@@ -136,4 +138,4 @@ NullBlifHandler::error_exit()
 {
 }
 
-END_NAMESPACE_YM_BLIF
+END_NAMESPACE_YM_NETWORKS_BLIF

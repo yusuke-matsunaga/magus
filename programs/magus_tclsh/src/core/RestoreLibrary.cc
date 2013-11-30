@@ -8,7 +8,8 @@
 
 
 #include "RestoreLibrary.h"
-#include "ym_cell/CellRestorer.h"
+#include "ym_cell/CellLibrary.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -34,16 +35,17 @@ RestoreLibrary::~RestoreLibrary()
 const CellLibrary*
 RestoreLibrary::read_library(const string& filename)
 {
-  ifstream ifs;
-  ifs.open(filename.c_str(), ios::binary);
-  if ( !ifs ) {
+  FileIDO bi(filename);
+  if ( !bi ) {
     TclObj emsg;
     emsg << "Could not open " << filename;
     set_result(emsg);
     return NULL;
   }
-  CellRestorer read;
-  return read(ifs);
+
+  CellLibrary* library = CellLibrary::new_obj();
+  library->restore(bi);
+  return library;
 }
 
 END_NAMESPACE_MAGUS

@@ -9,13 +9,14 @@
 
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Handler.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
 
 // yacc/bison が生成するヘッダファイル
-#include "iscas89_grammer.h"
+#include "iscas89_grammer.hh"
 
 //////////////////////////////////////////////////////////////////////
 // Iscas89ParserImpl
@@ -24,6 +25,7 @@ BEGIN_NAMESPACE_YM_ISCAS89
 // コンストラクタ
 Iscas89ParserImpl::Iscas89ParserImpl()
 {
+  mScanner = NULL;
 }
 
 // デストラクタ
@@ -34,6 +36,7 @@ Iscas89ParserImpl::~Iscas89ParserImpl()
     Iscas89Handler* handler = *p;
     delete handler;
   }
+  delete mScanner;
 }
 
 // 読み込みを行なう．
@@ -43,7 +46,8 @@ Iscas89ParserImpl::read(const string& filename)
   int yyparse(Iscas89ParserImpl&);
 
   // ファイルをオープンする．
-  if ( !mScanner.open_file(filename) ) {
+  FileIDO ido(filename);
+  if ( !ido ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";
@@ -52,15 +56,22 @@ Iscas89ParserImpl::read(const string& filename)
     return false;
   }
 
+  mScanner = new Iscas89Scanner(ido);
+
   for (list<Iscas89Handler*>::iterator p = mHandlerList.begin();
        p != mHandlerList.end(); ++ p) {
     Iscas89Handler* handler = *p;
     if ( !handler->init() ) {
+      delete mScanner;
+      mScanner = NULL;
       return false;
     }
   }
 
   int status = yyparse(*this);
+
+  delete mScanner;
+  mScanner = NULL;
 
   if ( status == 0 ) {
     // 成功
@@ -100,9 +111,9 @@ int
 Iscas89ParserImpl::scan(ymuint32& lval,
 			FileRegion& lloc)
 {
-  int id = mScanner.read_token(lloc);
+  int id = mScanner->read_token(lloc);
   if ( id == NAME ) {
-    lval = reg_str(mScanner.cur_string(), lloc);
+    lval = reg_str(mScanner->cur_string(), lloc);
   }
   return id;
 }

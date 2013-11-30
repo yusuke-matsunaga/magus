@@ -1,7 +1,7 @@
-#ifndef LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBFACTORY_H
-#define LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBFACTORY_H
+#ifndef ELBFACTORY_H
+#define ELBFACTORY_H
 
-/// @file libym_verilog/elaborator/include/ElbFactory.h
+/// @file ElbFactory.h
 /// @brief ElbFactory のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -1100,4 +1100,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELABORATOR_INCLUDE_ELBFACTORY_H
+#endif // ELBFACTORY_H

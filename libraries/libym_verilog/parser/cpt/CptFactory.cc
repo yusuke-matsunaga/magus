@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CptFactory::CptFactory(AllocBase& alloc) :
+CptFactory::CptFactory(Alloc& alloc) :
   PtiFactory(alloc)
 {
 }

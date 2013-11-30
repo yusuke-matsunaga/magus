@@ -160,7 +160,7 @@ ymuint
 BddVarSet::size() const
 {
   if ( !static_cast<bool>(mSize & 1U) ) {
-    set_size(mBody.size());
+    set_size(mBody.node_count());
   }
   return (mSize >> 1);
 }

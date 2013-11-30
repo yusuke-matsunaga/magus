@@ -15,10 +15,6 @@
 
 BEGIN_NAMESPACE_YM_LEXP
 
-// クラス名の先行宣言
-class LogExpr;
-class LexpNode;
-
 //////////////////////////////////////////////////////////////////////
 /// @class LogExprWriter LogExprWriter.h "ym_logic/LogExprWriter.h"
 /// @ingroup LexpGroup
@@ -96,11 +92,14 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   // dump() のサブルーティン
   void
   dump_sub(ostream& s,
-	   const LexpNode* node,
+	   const LogExpr& expr,
 	   const VarStrMap& var_names) const;
 
 
