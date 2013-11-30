@@ -198,19 +198,6 @@ YM_INIT_PROGRAMS_SUBDIRS
 YM_BUILD_PROGRAM([magus_tclsh], [no],
 		 [ym_libym_tclpp_enable])
 
-# atpg
-YM_BUILD_PROGRAM([atpg], [no],
-		 [ym_libym_utils_enable,
-		  ym_libym_networks_enable,
-		  ym_libym_tclpp_enable])
-
-# matpg
-YM_BUILD_PROGRAM([matpg], [no],
-		 [ym_libym_utils_enable,
-		  ym_libym_logic_enable,
-		  ym_libym_networks_enable,
-		  ym_libym_tclpp_enable])
-
 # satpg
 YM_BUILD_PROGRAM([satpg], [no],
 		 [ym_libym_utils_enable,

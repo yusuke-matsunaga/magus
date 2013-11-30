@@ -14,9 +14,7 @@ libraries/libym_tclpp
 libraries/libym_ymsh
 
 programs/magus_tclsh
-programs/atpg
 programs/led
-programs/matpg
 programs/satpg
 programs/seal
 programs/igf
