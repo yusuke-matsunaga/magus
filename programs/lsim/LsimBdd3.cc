@@ -74,8 +74,9 @@ make_lut_sub(Bdd bdd,
 
   Bdd bdd0;
   Bdd bdd1;
-  ymuint var = bdd.root_decomp(bdd0, bdd1);
-  if ( var >= limit ) {
+  VarId var = bdd.root_decomp(bdd0, bdd1);
+  ymuint var_id = var.val();
+  if ( var_id >= limit ) {
     make_lut(bdd, cut_points, lutmap, nlut);
   }
   else {
@@ -103,13 +104,14 @@ make_lut(Bdd bdd,
 
   Bdd bdd0;
   Bdd bdd1;
-  ymuint var = bdd.root_decomp(bdd0, bdd1);
+  VarId var = bdd.root_decomp(bdd0, bdd1);
+  ymuint var_id = var.val();
 
   ymuint limit = 0;
   for (vector<ymuint>::const_iterator p = cut_points.begin();
        p != cut_points.end(); ++ p) {
     limit = *p;
-    if ( limit > var ) {
+    if ( limit > var_id ) {
       break;
     }
   }
@@ -170,7 +172,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }
@@ -186,14 +188,14 @@ LsimBdd3::set_network(const BdnMgr& bdn,
 	abort();
       }
       ymuint id = q->second;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       bddmap[node->id()] = bdd;
     }
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     const BdnNode* fanin0 = node->fanin0();

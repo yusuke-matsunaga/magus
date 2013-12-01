@@ -1,13 +1,13 @@
 
-/// @file LsimBdd2.cc
-/// @brief LsimBdd2 の実装ファイル
+/// @file LsimBdd1.cc
+/// @brief LsimBdd1 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LsimBdd2.h"
+#include "LsimBdd1.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnPort.h"
 
@@ -15,17 +15,17 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス LsimBdd2
+// クラス LsimBdd1
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LsimBdd2::LsimBdd2() :
+LsimBdd1::LsimBdd1() :
   mBddMgr("bmc", "Bdd Manager")
 {
 }
 
 // @brief デストラクタ
-LsimBdd2::~LsimBdd2()
+LsimBdd1::~LsimBdd1()
 {
 }
 
@@ -34,17 +34,17 @@ BEGIN_NONAMESPACE
 
 inline
 ympuint
-encode(LsimBdd2::Bdd2Node* node,
+encode(LsimBdd1::Bdd1Node* node,
        bool inv)
 {
   return reinterpret_cast<ympuint>(node) | inv;
 }
 
 inline
-LsimBdd2::Bdd2Node*
+LsimBdd1::Bdd1Node*
 decode_node(ympuint val)
 {
-  return reinterpret_cast<LsimBdd2::Bdd2Node*>(val & ~1UL);
+  return reinterpret_cast<LsimBdd1::Bdd1Node*>(val & ~1UL);
 }
 
 inline
@@ -60,21 +60,20 @@ END_NONAMESPACE
 // @param[in] bdn 対象のネットワーク
 // @param[in] order_map 順序マップ
 void
-LsimBdd2::set_network(const BdnMgr& bdn,
+LsimBdd1::set_network(const BdnMgr& bdn,
 		      const hash_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
 
   const BdnNodeList& input_list = bdn.input_list();
-  ymuint ni = input_list.size();
 
   if ( order_map.empty() ) {
     ymuint id = 0;
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }
@@ -90,14 +89,14 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 	abort();
       }
       ymuint id = q->second;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       bddmap[node->id()] = bdd;
     }
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     const BdnNode* fanin0 = node->fanin0();
@@ -161,7 +160,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 }
 
 ympuint
-LsimBdd2::make_node(Bdd bdd,
+LsimBdd1::make_node(Bdd bdd,
 		    hash_map<Bdd, ympuint>& node_map)
 {
   if ( bdd.is_zero() ) {
@@ -183,66 +182,16 @@ LsimBdd2::make_node(Bdd bdd,
 
   Bdd bdd0;
   Bdd bdd1;
-  ymuint varid0 = bdd.root_decomp(bdd0, bdd1);
+  VarId varid0 = bdd.root_decomp(bdd0, bdd1);
 
-  ymuint varid2 = 0;
-  Bdd bdd00;
-  Bdd bdd01;
-  ympuint node00;
-  ympuint node01;
-  if ( bdd0.is_zero() ) {
-    node00 = node01 = 0UL;
-  }
-  else if ( bdd0.is_one() ) {
-    node00 = node01 = 1UL;
-  }
-  else {
-    varid2 = bdd0.root_decomp(bdd00, bdd01);
-  }
-
-  ymuint varid3 = 0;
-  Bdd bdd10;
-  Bdd bdd11;
-  ympuint node10;
-  ympuint node11;
-  if ( bdd1.is_zero() ) {
-    node10 = node11 = 0UL;
-  }
-  else if ( bdd1.is_one() ) {
-    node10 = node11 = 1UL;
-  }
-  else {
-    varid3 = bdd1.root_decomp(bdd10, bdd11);
-  }
-
-  ymuint varid1 = varid2;
-  if ( varid1 == 0 ) {
-    varid1 = varid3;
-  }
-  if ( varid1 > varid3 ) {
-    varid1 = varid3;
-  }
-
-  if ( varid2 == 0 || varid2 != varid1 ) {
-    node00 = node01 = make_node(bdd0, node_map);
-  }
-  else {
-    node00 = make_node(bdd00, node_map);
-    node01 = make_node(bdd01, node_map);
-  }
-  if ( varid3 == 0 || varid3 != varid1 ) {
-    node10 = node11 = make_node(bdd1, node_map);
-  }
-  else {
-    node10 = make_node(bdd10, node_map);
-    node11 = make_node(bdd11, node_map);
-  }
+  ympuint node0 = make_node(bdd0, node_map);
+  ympuint node1 = make_node(bdd1, node_map);
 
 #if 0
-  mNodeList.push_back(Bdd2Node(varid0, varid1, node00, node01, node10, node11));
+  mNodeList.push_back(Bdd1Node(varid0, varid1, node00, node01, node10, node11));
   ympuint ptr = encode(&mNodeList.back(), false);
 #else
-  Bdd2Node* node = new Bdd2Node(varid0, varid1, node00, node01, node10, node11);
+  Bdd1Node* node = new Bdd1Node(varid0, node0, node1);
   mNodeList.push_back(node);
   ympuint ptr = encode(node, false);
 #endif
@@ -254,9 +203,6 @@ LsimBdd2::make_node(Bdd bdd,
 
 BEGIN_NONAMESPACE
 
-ymuint total_step;
-ymuint total_num;
-
 ymuint64
 eval_bdd(ympuint ptr0,
 	 const vector<ymuint64>& iv)
@@ -265,9 +211,7 @@ eval_bdd(ympuint ptr0,
   for (ymuint b = 0; b < 64; ++ b) {
     ympuint ptr = ptr0;
     ymuint64 bit = 1UL << b;
-    ++ total_num;
     for ( ; ; ) {
-      ++ total_step;
       if ( ptr == 0UL ) {
 	break;
       }
@@ -275,20 +219,16 @@ eval_bdd(ympuint ptr0,
 	val |= bit;
 	break;
       }
-      LsimBdd2::Bdd2Node* node = decode_node(ptr);
+      LsimBdd1::Bdd1Node* node = decode_node(ptr);
       bool inv = decode_inv(ptr);
-      ymuint id0 = node->mId[0];
-      ymuint id1 = node->mId[1];
-      ymuint64 ival0 = iv[id0];
-      ymuint64 ival1 = iv[id1];
-      ymuint addr = 0U;
-      if ( ival0 & bit ) {
-	addr |= 2U;
+      VarId id = node->mId;
+      ymuint64 ival = iv[id.val()];
+      if ( ival & bit ) {
+	ptr = node->mFanins[1];
       }
-      if ( ival1 & bit ) {
-	addr |= 1U;
+      else {
+	ptr = node->mFanins[0];
       }
-      ptr = node->mFanins[addr];
       if ( inv ) {
 	ptr = ptr ^ 1UL;
       }
@@ -303,21 +243,14 @@ END_NONAMESPACE
 // @param[in] iv 入力ベクタ
 // @param[out] ov 出力ベクタ
 void
-LsimBdd2::eval(const vector<ymuint64>& iv,
+LsimBdd1::eval(const vector<ymuint64>& iv,
 	       vector<ymuint64>& ov)
 {
-  total_step = 0;
-  total_num = 0;
   ymuint no = ov.size();
   for (ymuint i = 0; i < no; ++ i) {
     ympuint ptr = mOutputList[i];
     ov[i] = eval_bdd(ptr, iv);
   }
-#if 0
-  cout << "total_step = " << total_step << endl
-       << "total_num  = " << total_num << endl
-       << "ave. step  = " << static_cast<double>(total_step) / total_num << endl;
-#endif
 }
 
 END_NAMESPACE_YM

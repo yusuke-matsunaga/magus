@@ -20,7 +20,8 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 LsimBdd::LsimBdd() :
-  mBddMgr("bmc", "Bdd Manager")
+  mBddMgr("bmc", "Bdd Manager"),
+  mOutputList(mBddMgr)
 {
 }
 
@@ -45,7 +46,7 @@ LsimBdd::set_network(const BdnMgr& bdn,
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }
@@ -61,14 +62,14 @@ LsimBdd::set_network(const BdnMgr& bdn,
 	abort();
       }
       ymuint id = q->second;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       bddmap[node->id()] = bdd;
     }
   }
 
   vector<const BdnNode*> node_list;
   bdn.sort(node_list);
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     const BdnNode* fanin0 = node->fanin0();
@@ -123,7 +124,7 @@ LsimBdd::set_network(const BdnMgr& bdn,
     mOutputList.push_back(bdd);
   }
 
-  cout << "BDD size: " << size(mOutputList) << endl;
+  cout << "BDD size: " << mOutputList.node_count() << endl;
 }
 
 
@@ -147,8 +148,8 @@ eval_bdd(Bdd bdd0,
       }
       Bdd bdd0;
       Bdd bdd1;
-      ymuint id = bdd.root_decomp(bdd0, bdd1);
-      ymuint64 ival = iv[id];
+      VarId id = bdd.root_decomp(bdd0, bdd1);
+      ymuint64 ival = iv[id.val()];
       if ( ival & bit ) {
 	bdd = bdd1;
       }

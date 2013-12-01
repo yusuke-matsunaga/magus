@@ -1,8 +1,8 @@
-#ifndef LSIMBDD1_H
-#define LSIMBDD1_H
+#ifndef LSIMMPX_H
+#define LSIMMPX_H
 
-/// @file LsimBdd1.h
-/// @brief LsimBdd1 のヘッダファイル
+/// @file LsimMpx.h
+/// @brief LsimMpx のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class LsimBdd1 LsimBdd1.h "LsimBdd1.h"
-/// @brief BDD を用いた Lsim の実装
+/// @class LsimMpx LsimMpx.h "LsimMpx.h"
+/// @brief BDD から セレクタ回路を構成する Lsim の実装
 //////////////////////////////////////////////////////////////////////
-class LsimBdd1 :
+class LsimMpx :
   public Lsim
 {
 public:
 
   /// @brief コンストラクタ
-  LsimBdd1();
+  LsimMpx();
 
   /// @brief デストラクタ
   virtual
-  ~LsimBdd1();
+  ~LsimMpx();
 
 
 public:
@@ -57,31 +57,39 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
+  // 内部で用いる下請け関数
   //////////////////////////////////////////////////////////////////////
 
   ympuint
-  make_node(Bdd bdd,
-	    hash_map<Bdd, ympuint>& node_map);
+  make_mpx(Bdd bdd,
+	   hash_map<Bdd, ympuint>& mpx_map);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
+  // 内部で用いるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  struct Bdd1Node {
-    Bdd1Node(ymuint id,
-	     ympuint node0,
-	     ympuint node1)
+  struct MpxNode
+  {
+    MpxNode(VarId id,
+	    ympuint ptr0,
+	    ympuint ptr1)
     {
       mId = id;
-      mFanins[0] = node0;
-      mFanins[1] = node1;
+      mFanins[0] = ptr0;
+      mFanins[1] = ptr1;
     }
 
-    ymuint mId;
+    // 変数番号
+    VarId mId;
+
+    // ファンイン＋極性
     ympuint mFanins[2];
+
+    // 値
+    ymuint64 mVal;
+
   };
 
 
@@ -93,14 +101,17 @@ private:
   // BDD の管理用オブジェクト
   BddMgr mBddMgr;
 
-  // ノードの配列
-  vector<Bdd1Node*> mNodeList;
+  // 入力ノードの配列
+  vector<MpxNode> mInputList;
 
-  // 出力のノードの配列
+  // MPXノードの配列
+  vector<MpxNode> mNodeList;
+
+  // 出力ノードのポインタ配列
   vector<ympuint> mOutputList;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // LSIMBDD1_H
+#endif // LSIMBDD_H

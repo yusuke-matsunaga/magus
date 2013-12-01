@@ -18,17 +18,17 @@ BEGIN_NONAMESPACE
 void
 xoring(BdnMgr& bdnmgr)
 {
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdnmgr.sort(node_list);
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
-    BdnNode* node0 = node->fanin(0);
-    BdnNode* node1 = node->fanin(1);
-    BdnNode* node00 = node0->fanin(0);
-    BdnNode* node01 = node0->fanin(1);
-    BdnNode* node10 = node1->fanin(0);
-    BdnNode* node11 = node1->fanin(1);
+    const BdnNode* node = *p;
+    const BdnNode* node0 = node->fanin(0);
+    const BdnNode* node1 = node->fanin(1);
+    const BdnNode* node00 = node0->fanin(0);
+    const BdnNode* node01 = node0->fanin(1);
+    const BdnNode* node10 = node1->fanin(0);
+    const BdnNode* node11 = node1->fanin(1);
     if ( node00 == node10 && node01 == node11 ) {
       if ( (node0->fanin_inv(0) ^ node0->fanin_inv(1)) &&
 	   (node1->fanin_inv(0) ^ node1->fanin_inv(1)) ) {
@@ -85,7 +85,7 @@ LsimNaive2::set_network(const BdnMgr& bdn,
   ymuint lnum = mBdnMgr.lnode_num();
   mNodeList.clear();
   mNodeList.resize(lnum);
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   mBdnMgr.sort(node_list);
   ymuint id = 0;
   for (vector<const BdnNode*>::iterator p = node_list.begin();

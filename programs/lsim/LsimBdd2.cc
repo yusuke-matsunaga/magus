@@ -1,13 +1,13 @@
 
-/// @file LsimBdd10.cc
-/// @brief LsimBdd10 の実装ファイル
+/// @file LsimBdd2.cc
+/// @brief LsimBdd2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LsimBdd10.h"
+#include "LsimBdd2.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnPort.h"
 
@@ -15,17 +15,17 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス LsimBdd10
+// クラス LsimBdd2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LsimBdd10::LsimBdd10() :
+LsimBdd2::LsimBdd2() :
   mBddMgr("bmc", "Bdd Manager")
 {
 }
 
 // @brief デストラクタ
-LsimBdd10::~LsimBdd10()
+LsimBdd2::~LsimBdd2()
 {
 }
 
@@ -34,17 +34,17 @@ BEGIN_NONAMESPACE
 
 inline
 ympuint
-encode(LsimBdd10::Bdd10Node* node,
+encode(LsimBdd2::Bdd2Node* node,
        bool inv)
 {
   return reinterpret_cast<ympuint>(node) | inv;
 }
 
 inline
-LsimBdd10::Bdd10Node*
+LsimBdd2::Bdd2Node*
 decode_node(ympuint val)
 {
-  return reinterpret_cast<LsimBdd10::Bdd10Node*>(val & ~1UL);
+  return reinterpret_cast<LsimBdd2::Bdd2Node*>(val & ~1UL);
 }
 
 inline
@@ -60,21 +60,20 @@ END_NONAMESPACE
 // @param[in] bdn 対象のネットワーク
 // @param[in] order_map 順序マップ
 void
-LsimBdd10::set_network(const BdnMgr& bdn,
+LsimBdd2::set_network(const BdnMgr& bdn,
 		      const hash_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
 
   const BdnNodeList& input_list = bdn.input_list();
-  ymuint ni = input_list.size();
 
   if ( order_map.empty() ) {
     ymuint id = 0;
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }
@@ -90,14 +89,14 @@ LsimBdd10::set_network(const BdnMgr& bdn,
 	abort();
       }
       ymuint id = q->second;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       bddmap[node->id()] = bdd;
     }
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     const BdnNode* fanin0 = node->fanin0();
@@ -161,8 +160,8 @@ LsimBdd10::set_network(const BdnMgr& bdn,
 }
 
 ympuint
-LsimBdd10::make_node(Bdd bdd,
-		     hash_map<Bdd, ympuint>& node_map)
+LsimBdd2::make_node(Bdd bdd,
+		    hash_map<Bdd, ympuint>& node_map)
 {
   if ( bdd.is_zero() ) {
     return 0UL;
@@ -181,52 +180,71 @@ LsimBdd10::make_node(Bdd bdd,
     return p->second ^ 1UL;
   }
 
-  VarVector sup_list;
-  bdd.support(sup_list);
+  Bdd bdd0;
+  Bdd bdd1;
+  VarId varid0 = bdd.root_decomp(bdd0, bdd1);
 
-  Bdd10Node* node = new Bdd10Node;
-  ymuint n = sup_list.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( i >= 10 ) {
-      break;
-    }
-    node->mId[i] = sup_list[i];
+  VarId varid2(0);
+  Bdd bdd00;
+  Bdd bdd01;
+  ympuint node00;
+  ympuint node01;
+  if ( bdd0.is_zero() ) {
+    node00 = node01 = 0UL;
   }
-  for (ymuint i = n; i < 10; ++ i) {
-    node->mId[i] = 0;
+  else if ( bdd0.is_one() ) {
+    node00 = node01 = 1UL;
   }
-  for (ymuint addr = 0U; addr < 1024; ++ addr) {
-    hash_map<ymuint, ymuint> var_map;
-    for (ymuint i = 0; i < 10; ++ i) {
-      if ( addr & (1U << i) ) {
-	var_map.insert(make_pair(sup_list[i], 1));
-      }
-      else {
-	var_map.insert(make_pair(sup_list[i], 0));
-      }
-    }
-    Bdd tmp_bdd = bdd;
-    for ( ; ; ) {
-      Bdd bdd0;
-      Bdd bdd1;
-      ymuint id = tmp_bdd.root_decomp(bdd0, bdd1);
-      hash_map<ymuint, ymuint>::iterator p = var_map.find(id);
-      if ( p == var_map.end() ) {
-	break;
-      }
-      ymuint val = p->second;
-      if ( val ) {
-	tmp_bdd = bdd1;
-      }
-      else {
-	tmp_bdd = bdd0;
-      }
-    }
-    ympuint ptr = make_node(tmp_bdd, node_map);
-    node->mFanins[addr] = ptr;
+  else {
+    varid2 = bdd0.root_decomp(bdd00, bdd01);
   }
+
+  VarId varid3(0);
+  Bdd bdd10;
+  Bdd bdd11;
+  ympuint node10;
+  ympuint node11;
+  if ( bdd1.is_zero() ) {
+    node10 = node11 = 0UL;
+  }
+  else if ( bdd1.is_one() ) {
+    node10 = node11 = 1UL;
+  }
+  else {
+    varid3 = bdd1.root_decomp(bdd10, bdd11);
+  }
+
+  VarId varid1 = varid2;
+  if ( varid1 == VarId(0) ) {
+    varid1 = varid3;
+  }
+  if ( varid1 > varid3 ) {
+    varid1 = varid3;
+  }
+
+  if ( varid2 == VarId(0) || varid2 != varid1 ) {
+    node00 = node01 = make_node(bdd0, node_map);
+  }
+  else {
+    node00 = make_node(bdd00, node_map);
+    node01 = make_node(bdd01, node_map);
+  }
+  if ( varid3 == VarId(0) || varid3 != varid1 ) {
+    node10 = node11 = make_node(bdd1, node_map);
+  }
+  else {
+    node10 = make_node(bdd10, node_map);
+    node11 = make_node(bdd11, node_map);
+  }
+
+#if 0
+  mNodeList.push_back(Bdd2Node(varid0, varid1, node00, node01, node10, node11));
+  ympuint ptr = encode(&mNodeList.back(), false);
+#else
+  Bdd2Node* node = new Bdd2Node(varid0, varid1, node00, node01, node10, node11);
   mNodeList.push_back(node);
   ympuint ptr = encode(node, false);
+#endif
 
   node_map.insert(make_pair(bdd, ptr));
 
@@ -256,15 +274,18 @@ eval_bdd(ympuint ptr0,
 	val |= bit;
 	break;
       }
-      LsimBdd10::Bdd10Node* node = decode_node(ptr);
+      LsimBdd2::Bdd2Node* node = decode_node(ptr);
       bool inv = decode_inv(ptr);
+      VarId id0 = node->mId[0];
+      VarId id1 = node->mId[1];
+      ymuint64 ival0 = iv[id0.val()];
+      ymuint64 ival1 = iv[id1.val()];
       ymuint addr = 0U;
-      for (ymuint i = 0; i < 10; ++ i) {
-	ymuint id = node->mId[i];
-	ymuint64 ival = iv[id];
-	if ( ival & bit ) {
-	  addr |= (1U << i);
-	}
+      if ( ival0 & bit ) {
+	addr |= 2U;
+      }
+      if ( ival1 & bit ) {
+	addr |= 1U;
       }
       ptr = node->mFanins[addr];
       if ( inv ) {
@@ -281,7 +302,7 @@ END_NONAMESPACE
 // @param[in] iv 入力ベクタ
 // @param[out] ov 出力ベクタ
 void
-LsimBdd10::eval(const vector<ymuint64>& iv,
+LsimBdd2::eval(const vector<ymuint64>& iv,
 	       vector<ymuint64>& ov)
 {
   total_step = 0;

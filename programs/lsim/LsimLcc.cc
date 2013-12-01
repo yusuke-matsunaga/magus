@@ -34,7 +34,7 @@ void
 LsimLcc::set_network(const BdnMgr& bdn,
 		     const hash_map<string, ymuint>& order_map)
 {
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
   ymuint n = bdn.max_node_id();
 
@@ -60,9 +60,9 @@ LsimLcc::set_network(const BdnMgr& bdn,
     const BdnNode* node = *p;
     cout << "  vals[" << node->id() << "] = ivals[" << input_id << "];" << endl;
   }
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     cout << "  vals[" << node->id() << "] = ";
 
     if ( node->fanin_inv(0) ) {

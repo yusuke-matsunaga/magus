@@ -10,6 +10,7 @@
 #include "LsimMpx2.h"
 #include "ym_networks/BdnNode.h"
 #include "ym_networks/BdnPort.h"
+#include "ym_logic/BddVector.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -84,13 +85,12 @@ LsimMpx2::set_network(const BdnMgr& bdn,
   hash_map<Bdd, ympuint> mpx_map;
 
   const BdnNodeList& input_list = bdn.input_list();
-  ymuint ni = input_list.size();
   if ( order_map.empty() ) {
     ymuint id = 0;
     for (BdnNodeList::const_iterator p = input_list.begin();
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       ++ id;
       bddmap[node->id()] = bdd;
     }
@@ -106,14 +106,14 @@ LsimMpx2::set_network(const BdnMgr& bdn,
 	abort();
       }
       ymuint id = q->second;
-      Bdd bdd = mBddMgr.make_posiliteral(id);
+      Bdd bdd = mBddMgr.make_posiliteral(VarId(id));
       bddmap[node->id()] = bdd;
     }
   }
 
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   bdn.sort(node_list);
-  for (vector<BdnNode*>::const_iterator p = node_list.begin();
+  for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
     const BdnNode* fanin0 = node->fanin0();
@@ -149,7 +149,7 @@ LsimMpx2::set_network(const BdnMgr& bdn,
   mBddMgr.disable_gc();
 
   const BdnNodeList& output_list = bdn.output_list();
-  vector<Bdd> output_bdd_list;
+  BddVector output_bdd_list(mBddMgr);
   output_bdd_list.reserve(output_list.size());
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
@@ -168,7 +168,7 @@ LsimMpx2::set_network(const BdnMgr& bdn,
     output_bdd_list.push_back(bdd);
   }
 
-  ymuint nbdd = size(output_bdd_list);
+  ymuint nbdd = output_bdd_list.node_count();
 
   cout << "BDD size: " << nbdd << endl;
 
@@ -208,9 +208,9 @@ LsimMpx2::make_mpx(Bdd bdd,
 
   Bdd bdd0;
   Bdd bdd1;
-  ymuint varid1 = bdd.root_decomp(bdd0, bdd1);
+  VarId varid1 = bdd.root_decomp(bdd0, bdd1);
 
-  ymuint varid2 = 0;
+  VarId varid2(0);
   ympuint node00;
   ympuint node01;
   if ( bdd0.is_zero() ) {
@@ -227,7 +227,7 @@ LsimMpx2::make_mpx(Bdd bdd,
     node01 = make_mpx(bdd01, mpx_map);
   }
 
-  ymuint varid3 = 0;
+  VarId varid3(0);
   ympuint node10;
   ympuint node11;
   if ( bdd1.is_zero() ) {
@@ -271,9 +271,9 @@ LsimMpx2::eval(const vector<ymuint64>& iv,
     ympuint ptr11 = node.mFanins[3];
     ymuint64 val11 = ptr_eval(ptr11);
 
-    ymuint64 c_val1 = iv[node.mId[0]];
-    ymuint64 c_val2 = iv[node.mId[1]];
-    ymuint64 c_val3 = iv[node.mId[2]];
+    ymuint64 c_val1 = iv[node.mId[0].val()];
+    ymuint64 c_val2 = iv[node.mId[1].val()];
+    ymuint64 c_val3 = iv[node.mId[2].val()];
 
     ymuint64 val0 = (c_val2 & val01) | (~c_val2 & val00);
     ymuint64 val1 = (c_val3 & val11) | (~c_val3 & val10);

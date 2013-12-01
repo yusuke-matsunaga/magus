@@ -1,8 +1,8 @@
-#ifndef LSIMBDD2_H
-#define LSIMBDD2_H
+#ifndef LSIMMPX2_H
+#define LSIMMPX2_H
 
-/// @file LsimBdd2.h
-/// @brief LsimBdd2 のヘッダファイル
+/// @file LsimMpx2.h
+/// @brief LsimMpx2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class LsimBdd2 LsimBdd2.h "LsimBdd2.h"
-/// @brief BDD を用いた Lsim の実装
+/// @class LsimMpx2 LsimMpx2.h "LsimMpx2.h"
+/// @brief BDD から セレクタ回路を構成する Lsim の実装
 //////////////////////////////////////////////////////////////////////
-class LsimBdd2 :
+class LsimMpx2 :
   public Lsim
 {
 public:
 
   /// @brief コンストラクタ
-  LsimBdd2();
+  LsimMpx2();
 
   /// @brief デストラクタ
   virtual
-  ~LsimBdd2();
+  ~LsimMpx2();
 
 
 public:
@@ -57,37 +57,47 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
+  // 内部で用いる下請け関数
   //////////////////////////////////////////////////////////////////////
 
   ympuint
-  make_node(Bdd bdd,
-	    hash_map<Bdd, ympuint>& node_map);
+  make_mpx(Bdd bdd,
+	   hash_map<Bdd, ympuint>& mpx_map);
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
+  // 内部で用いるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  struct Bdd2Node {
-    Bdd2Node(ymuint id0,
-	     ymuint id1,
-	     ympuint node00,
-	     ympuint node01,
-	     ympuint node10,
-	     ympuint node11)
+  struct MpxNode
+  {
+    MpxNode(VarId id1,
+	    VarId id2,
+	    VarId id3,
+	    ympuint ptr00,
+	    ympuint ptr01,
+	    ympuint ptr10,
+	    ympuint ptr11)
     {
-      mId[0] = id0;
-      mId[1] = id1;
-      mFanins[0] = node00;
-      mFanins[1] = node01;
-      mFanins[2] = node10;
-      mFanins[3] = node11;
+      mId[0] = id1;
+      mId[1] = id2;
+      mId[2] = id3;
+      mFanins[0] = ptr00;
+      mFanins[1] = ptr01;
+      mFanins[2] = ptr10;
+      mFanins[3] = ptr11;
     }
 
-    ymuint mId[2];
+    // 変数番号
+    VarId mId[3];
+
+    // ファンイン＋極性
     ympuint mFanins[4];
+
+    // 値
+    ymuint64 mVal;
+
   };
 
 
@@ -99,14 +109,17 @@ private:
   // BDD の管理用オブジェクト
   BddMgr mBddMgr;
 
-  // ノードの配列
-  vector<Bdd2Node*> mNodeList;
+  // 入力ノードの配列
+  vector<MpxNode> mInputList;
 
-  // 出力のノードの配列
+  // MPXノードの配列
+  vector<MpxNode> mNodeList;
+
+  // 出力ノードのポインタ配列
   vector<ympuint> mOutputList;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // LSIMBDD2_H
+#endif // LSIMMPX2_H

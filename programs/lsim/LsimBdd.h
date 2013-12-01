@@ -12,6 +12,7 @@
 #include "Lsim.h"
 #include "ym_logic/Bdd.h"
 #include "ym_logic/BddMgr.h"
+#include "ym_logic/BddVector.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -64,7 +65,7 @@ private:
   BddMgr mBddMgr;
 
   // 出力のBDDの配列
-  vector<Bdd> mOutputList;
+  BddVector mOutputList;
 
 };
 

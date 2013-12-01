@@ -94,13 +94,13 @@ LsimNaive3::set_network(const BdnMgr& bdn,
   }
 
   ymuint lnum = mBdnMgr->lnode_num();
-  vector<BdnNode*> node_list;
+  vector<const BdnNode*> node_list;
   mBdnMgr->sort(node_list);
 
   ymuint n = 0;
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     if ( node->is_xor() ) {
       n += 2;
     }
@@ -110,9 +110,9 @@ LsimNaive3::set_network(const BdnMgr& bdn,
   mNodeList.resize(n);
 
   ymuint id = 0;
-  for (vector<BdnNode*>::iterator p = node_list.begin();
+  for (vector<const BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     SimNode* snode = &mNodeList[id];
     ++ id;
     SimNode* snode0 = map[node->fanin(0)->id()];
