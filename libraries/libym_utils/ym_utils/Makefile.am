@@ -9,6 +9,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
+	BtgMatch.h \
 	CombiGen.h \
 	CompIDO.h \
 	CompODO.h \
