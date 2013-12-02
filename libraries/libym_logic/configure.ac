@@ -133,6 +133,10 @@ AC_CONFIG_FILES([sat/ymsat/Makefile])
 AC_CONFIG_FILES([sat/MiniSat/Makefile])
 AC_CONFIG_FILES([sat/dimacs/Makefile])
 AC_CONFIG_FILES([smt/Makefile])
+AC_CONFIG_FILES([smt/core/Makefile])
+AC_CONFIG_FILES([smt/smtlibv2/Makefile])
+AC_CONFIG_FILES([smt/smtlibv2/parser/Makefile])
+AC_CONFIG_FILES([smt/smtlibv2/shell/Makefile])
 AC_CONFIG_FILES([aig/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/expr/Makefile])
@@ -166,6 +170,8 @@ fi
 if test $ym_have_cpputest = yes; then
    YM_ADD_TESTS_SUBDIRS([CppUTest])
    AC_CONFIG_FILES([tests/CppUTest/Makefile])
+   AC_CONFIG_FILES([tests/CppUTest/expr/Makefile])
+   AC_CONFIG_FILES([tests/CppUTest/smt/Makefile])
 fi
 
 YM_FINISH_EXTRA_SUBDIRS

@@ -128,11 +128,6 @@ YM_BUILD_LIBRARY([libym_utils], [yes],
 YM_BUILD_LIBRARY([libym_logic], [yes],
 		 [ym_libym_utils_enable])
 
-# libym_smtlibv2
-YM_BUILD_LIBRARY([libym_smtlibv2], [yes],
-		 [ym_libym_utils_enable,
-		  ym_libym_logic_enable])
-
 # libym_mincov
 YM_BUILD_LIBRARY([libym_mincov], [no],
 		 [ym_libym_utils_enable])

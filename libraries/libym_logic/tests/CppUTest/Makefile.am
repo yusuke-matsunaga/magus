@@ -2,7 +2,10 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS =
+SUBDIRS = \
+	expr \
+	smt \
+	.
 
 CLEANFILES =
 
@@ -36,9 +39,6 @@ noinst_LTLIBRARIES = \
 run_all_test_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/parser \
-	-I$(top_srcdir)/main \
 	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
@@ -60,11 +60,13 @@ run_all_test_LDFLAGS = \
 libym_logic_cpputest_la_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/parser \
-	-I$(top_srcdir)/main \
 	$(CPPUTEST_INCLUDES)
 
-libym_logic_cpputest_la_SOURCES = \
-	LogExprTest.cc \
-	SmtSolverTest.cc
+libym_logic_cpputest_la_SOURCES =
+
+libym_logic_cpputest_la_LIBADD = \
+	smt/libym_logic_cpputest_smt.la \
+	expr/libym_logic_cpputest_expr.la
+
+# Dummy C++ source to cause C++ linking.
+nodist_EXTRA_libym_logic_cpputest_la_SOURCES = dummy.cc
