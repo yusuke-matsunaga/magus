@@ -3,7 +3,6 @@
 
 #optflags="$optflags --enable-libym_utils"
 #optflags="$optflags --enable-libym_logic"
-#optflags="$optflags --enable-libym_smtlibv2"
 #optflags="$optflags --enable-libym_mincov"
 #optflags="$optflags --enable-libym_cell"
 #optflags="$optflags --enable-libym_verilog"
