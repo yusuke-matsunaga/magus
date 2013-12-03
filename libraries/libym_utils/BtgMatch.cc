@@ -111,6 +111,45 @@ BtgMatch::nedge_info(ymuint pos,
   weight = edge->weight();
 }
 
+
+BEGIN_NONAMESPACE
+
+// @brief 増加パスを見つける．
+bool
+find_alt_path(BtgNode* v1,
+	      vector<bool>& mark)
+{
+  if ( mark[v1->id()] ) {
+    return false;
+  }
+
+  mark[v1->id()] = true;
+
+  ymuint ne = v1->edge_num();
+  for (ymuint i = 0; i < ne; ++ i) {
+    BtgEdge* edge = v1->edge(i);
+    BtgNode* v2 = edge->v2();
+    BtgEdge* edge1 = v2->cur_edge();
+    if ( edge1 == NULL ) {
+      // 見つけた．
+      v1->set_cur_edge(edge);
+      v2->set_cur_edge(edge);
+      return true;
+    }
+
+    if ( find_alt_path(edge1->v1(), mark) ) {
+      // 見つけた．
+      v1->mCurEdge = edge;
+      v2->mCurEdge = edge;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+END_NONAMESPACE
+
 // @brief 最大マッチングを求める．
 // @param[in] edge_list マッチング結果の枝を格納するリスト
 // @return マッチング結果の重みの総和を返す．
@@ -125,61 +164,27 @@ BtgMatch::calc_match(vector<ymuint>& edge_list)
     for (ymuint j = 0; j < ne; ++ j) {
       BtgEdge* edge = v1->edge(j);
       BtgNode* v2 = edge->v2();
-      BtgEdge* edge1 = v2->mCurEdge;
+      BtgEdge* edge1 = v2->cur_edge();
       if ( edge1 == NULL ) {
-	v1->mCurEdge = edge;
-	v2->mCurEdge = edge;
+	v1->set_cur_edge(edge);
+	v2->set_cur_edge(edge);
 	found = true;
 	break;
       }
     }
-    if ( found ) {
-      continue;
-    }
-
-    // なかったので既に割り当てられている枝を取り替える．
-    vector<bool> mark(mNode1Num, false);
-    if ( !find_alt_path(v1, mark) ) {
-      return false;
+    if ( !found ) {
+      // なかったので既に割り当てられている枝を取り替える．
+      vector<bool> mark(mNode1Num, false);
+      find_alt_path(v1, mark);
     }
   }
 
   for (ymuint i = 0; i < mNode1Num; ++ i) {
     BtgNode* v1 = &mNode1Array[i];
-    BtgEdge* edge = v1->mCurEdge;
+    BtgEdge* edge = v1->cur_edge();
     edge_list.push_back(edge);
   }
-  return true;
-}
 
-// @brief 増加パスを見つける．
-bool
-BtgMatch::find_alt_path(BtgNode* v1,
-			vector<bool>& mark)
-{
-  if ( mark[v1->id()] ) {
-    return false;
-  }
-  mark[v1->id()] = true;
-  ymuint ne = v1->edge_num();
-  for (ymuint i = 0; i < ne; ++ i) {
-    BtgEdge* edge = v1->edge(i);
-    BtgNode* v2 = edge->v2();
-    BtgEdge* edge1 = v2->mCurEdge;
-    if ( edge1 == NULL ) {
-      // 見つけた．
-      v1->mCurEdge = edge;
-      v2->mCurEdge = edge;
-      return true;
-    }
-    if ( find_alt_path(edge1->v1(), mark) ) {
-      // 見つけた．
-      v1->mCurEdge = edge;
-      v2->mCurEdge = edge;
-      return true;
-    }
-  }
-  return false;
 }
 
 END_NAMESPACE_YM_IGF

@@ -22,8 +22,6 @@ class BtgEdge;
 //////////////////////////////////////////////////////////////////////
 class BtgNode
 {
-  friend class BtgMatch;
-
 public:
 
   /// @brief コンストラクタ
@@ -61,6 +59,14 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
   BtgEdge*
   edge(ymuint pos);
+
+  /// @brief 選ばれている枝を返す．
+  BtgEdge*
+  cur_edge() const;
+
+  /// @brief マッチングの枝を設定する．
+  void
+  set_cur_edge(BtgEdge* edge);
 
 
 private:
@@ -140,6 +146,22 @@ BtgNode::edge(ymuint pos)
 {
   assert_cond( pos < mEdgeList.size(), __FILE__, __LINE__);
   return mEdgeList[pos];
+}
+
+// @brief 選ばれている枝を返す．
+inline
+BtgEdge*
+BtgNode::cur_edge() const
+{
+  return mCurEdge;
+}
+
+// @brief マッチングの枝を設定する．
+inline
+void
+BtgNode::set_cur_edge(BtgEdge* edge)
+{
+  mCurEdge = edge;
 }
 
 END_NAMESPACE_YM
