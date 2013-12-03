@@ -51,14 +51,14 @@ BtgMatch::~BtgMatch()
 
 // @brief 節点グループ1 の要素数を返す．
 ymuint
-BtgMatch::node1_num()
+BtgMatch::node1_num() const
 {
   return mNode1Num;
 }
 
 // @brief 節点グループ2 の要素数を返す．
 ymuint
-BtgMatch::node2_num()
+BtgMatch::node2_num() const
 {
   return mNode2Num;
 }
@@ -80,15 +80,19 @@ BtgMatch::add_edge(ymuint node1_id,
 		   ymuint node2_id,
 		   ymuint weight)
 {
-  BtgEdge* edge = new BtgEdge(node1_id, node2_id, weight);
+  assert_cond( node1_id < node1_num(), __FILE__, __LINE__);
+  assert_cond( node2_id < node2_num(), __FILE__, __LINE__);
+  BtgNode* node1 = &mNode1Array[node1_id];
+  BtgNode* node2 = &mNode2Array[node2_id];
+  BtgEdge* edge = new BtgEdge(node1, node2, weight);
   mEdgeList.push_back(edge);
-  mNode1Array[node1_id].mEdgeList.push_back(edge);
-  mNode2Array[node2_id].mEdgeList.push_back(edge);
+  node1->mEdgeList.push_back(edge);
+  node2->mEdgeList.push_back(edge);
 }
 
 // @brief 枝数を返す．
 ymuint
-BtgMatch::edge_num()
+BtgMatch::edge_num() const
 {
   return mEdgeList.size();
 }
@@ -99,10 +103,10 @@ BtgMatch::edge_num()
 // @param[out] node2_id 節点グループ2のノード番号
 // @param[out] weight 枝の重み
 void
-BtgMatch::nedge_info(ymuint pos,
-		     ymuint& node1_id,
-		     ymuint& node2_id,
-		     ymuint& weight) const
+BtgMatch::edge_info(ymuint pos,
+		    ymuint& node1_id,
+		    ymuint& node2_id,
+		    ymuint& weight) const
 {
   assert_cond( pos < edge_num(), __FILE__, __LINE__);
   BtgEdge* edge = mEdgeList[pos];
@@ -128,7 +132,7 @@ find_alt_path(BtgNode* v1,
   ymuint ne = v1->edge_num();
   for (ymuint i = 0; i < ne; ++ i) {
     BtgEdge* edge = v1->edge(i);
-    BtgNode* v2 = edge->v2();
+    BtgNode* v2 = edge->node2();
     BtgEdge* edge1 = v2->cur_edge();
     if ( edge1 == NULL ) {
       // 見つけた．
@@ -137,10 +141,10 @@ find_alt_path(BtgNode* v1,
       return true;
     }
 
-    if ( find_alt_path(edge1->v1(), mark) ) {
+    if ( find_alt_path(edge1->node1(), mark) ) {
       // 見つけた．
-      v1->mCurEdge = edge;
-      v2->mCurEdge = edge;
+      v1->set_cur_edge(edge);
+      v2->set_cur_edge(edge);
       return true;
     }
   }
@@ -163,7 +167,7 @@ BtgMatch::calc_match(vector<ymuint>& edge_list)
     // 空いているノードを探す．
     for (ymuint j = 0; j < ne; ++ j) {
       BtgEdge* edge = v1->edge(j);
-      BtgNode* v2 = edge->v2();
+      BtgNode* v2 = edge->node2();
       BtgEdge* edge1 = v2->cur_edge();
       if ( edge1 == NULL ) {
 	v1->set_cur_edge(edge);
@@ -182,9 +186,9 @@ BtgMatch::calc_match(vector<ymuint>& edge_list)
   for (ymuint i = 0; i < mNode1Num; ++ i) {
     BtgNode* v1 = &mNode1Array[i];
     BtgEdge* edge = v1->cur_edge();
-    edge_list.push_back(edge);
+    //edge_list.push_back(edge);
   }
 
 }
 
-END_NAMESPACE_YM_IGF
+END_NAMESPACE_YM

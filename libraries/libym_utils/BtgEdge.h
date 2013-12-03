@@ -53,20 +53,6 @@ public:
   ymuint
   weight() const;
 
-  /// @brief flow を設定する．
-  void
-  set_flow(ymuint flow);
-
-  /// @brief flow を返す．
-  /// @note 答えは 0 か 1
-  ymuint
-  flow();
-
-  /// @brief residual を返す．
-  /// @note 答えは 0 か 1
-  ymuint
-  residual();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -82,9 +68,6 @@ private:
   // 重み
   ymuint32 mWeight;
 
-  // flow を組にしたもの
-  ymuint32 mFlow;
-
 };
 
 
@@ -99,8 +82,8 @@ private:
 BtgEdge::BtgEdge(BtgNode* node1,
 		 BtgNode* node2,
 		 ymuint weight) :
-  mNode1(v1),
-  mNode2(v2),
+  mNode1(node1),
+  mNode2(node2),
   mWeight(weight)
 {
 }
@@ -112,14 +95,14 @@ BtgEdge::~BtgEdge()
 
 // @brief 節点グループ1 側のノードを返す．
 BtgNode*
-BtgEdge::node1()
+BtgEdge::node1() const
 {
   return mNode1;
 }
 
 // @brief 節点グループ2 側のノードを返す．
 BtgNode*
-BtgEdge::node2()
+BtgEdge::node2() const
 {
   return mNode2;
 }
@@ -129,29 +112,6 @@ ymuint
 BtgEdge::weight() const
 {
   return mWeight;
-}
-
-// @brief flow を設定する．
-void
-BtgEdge::set_flow(ymuint flow)
-{
-  mFlow = flow;
-}
-
-// @brief flow を返す．
-// @note 答えは 0 か 1
-ymuint
-BtgEdge::flow()
-{
-  return mFlow;
-}
-
-// @brief residual を返す．
-// @note 答えは 0 か 1
-ymuint
-BtgEdge::residual()
-{
-  return 1 - mFlow;
 }
 
 END_NAMESPACE_YM

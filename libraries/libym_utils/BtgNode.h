@@ -22,6 +22,8 @@ class BtgEdge;
 //////////////////////////////////////////////////////////////////////
 class BtgNode
 {
+  friend class BtgMatch;
+
 public:
 
   /// @brief コンストラクタ

@@ -31,6 +31,9 @@ libym_utils_la_CPPFLAGS = \
 libym_utils_la_SOURCES = \
 	Alloc.cc \
 	Binder.cc \
+	BtgEdge.h \
+	BtgMatch.cc \
+	BtgNode.h \
 	CombiGen.cc \
 	CompBase.h \
 	CompBase.cc \
