@@ -67,12 +67,12 @@ public:
   edge_num() const;
 
   /// @brief 枝の情報を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
+  /// @param[in] edge_id 枝のID番号 ( 0 <= edge_id < edge_num() )
   /// @param[out] node1_id 節点グループ1のノード番号
   /// @param[out] node2_id 節点グループ2のノード番号
   /// @param[out] weight 枝の重み
   void
-  edge_info(ymuint pos,
+  edge_info(ymuint edge_id,
 	    ymuint& node1_id,
 	    ymuint& node2_id,
 	    ymuint& weight) const;
@@ -98,6 +98,24 @@ public:
   /// @note この関数を呼ぶ前に calc_match() を呼んでいる必要がある．
   ymuint
   node2_match(ymuint node2_id) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 節点グループ1でまわす calc_match()
+  /// @param[in] edge_list マッチング結果の枝を格納するリスト
+  /// @return マッチング結果の重みの総和を返す．
+  ymuint
+  calc_match1(vector<ymuint>& edge_list);
+
+  /// @brief 節点グループ2でまわす calc_match()
+  /// @param[in] edge_list マッチング結果の枝を格納するリスト
+  /// @return マッチング結果の重みの総和を返す．
+  ymuint
+  calc_match2(vector<ymuint>& edge_list);
 
 
 private:

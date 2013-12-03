@@ -53,6 +53,7 @@ public:
   ymuint
   id() const;
 
+#if 0
   /// @brief 接続している枝を返す．
   ymuint
   edge_num() const;
@@ -61,6 +62,11 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
   BtgEdge*
   edge(ymuint pos);
+#else
+  /// @brief 接続している枝の先頭を返す．
+  BtgEdge*
+  edge_top() const;
+#endif
 
   /// @brief 選ばれている枝を返す．
   BtgEdge*
@@ -79,8 +85,8 @@ private:
   // ID番号と種類(1bit)をパックしたもの
   ymuint32 mIdType;
 
-  // 枝のリスト
-  vector<BtgEdge*> mEdgeList;
+  // 枝の先頭
+  BtgEdge* mEdgeTop;
 
   // 今選択されている枝
   BtgEdge* mCurEdge;
@@ -96,6 +102,7 @@ private:
 inline
 BtgNode::BtgNode()
 {
+  mEdgeTop = NULL;
   mCurEdge = NULL;
 }
 
@@ -132,6 +139,7 @@ BtgNode::id() const
   return mIdType >> 1;
 }
 
+#if 0
 // @brief 接続している枝を返す．
 inline
 ymuint
@@ -149,6 +157,15 @@ BtgNode::edge(ymuint pos)
   assert_cond( pos < mEdgeList.size(), __FILE__, __LINE__);
   return mEdgeList[pos];
 }
+#else
+// @brief 接続している枝の先頭を返す．
+inline
+BtgEdge*
+BtgNode::edge_top() const
+{
+  return mEdgeTop;
+}
+#endif
 
 // @brief 選ばれている枝を返す．
 inline
