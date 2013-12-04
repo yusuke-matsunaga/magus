@@ -107,14 +107,12 @@ private:
 
   /// @brief 節点グループ1でまわす calc_match()
   /// @param[in] edge_list マッチング結果の枝を格納するリスト
-  /// @return マッチング結果の重みの総和を返す．
-  ymuint
+  void
   calc_match1(vector<ymuint>& edge_list);
 
   /// @brief 節点グループ2でまわす calc_match()
   /// @param[in] edge_list マッチング結果の枝を格納するリスト
-  /// @return マッチング結果の重みの総和を返す．
-  ymuint
+  void
   calc_match2(vector<ymuint>& edge_list);
 
 

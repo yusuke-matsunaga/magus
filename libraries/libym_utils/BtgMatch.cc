@@ -132,12 +132,67 @@ BtgMatch::edge_info(ymuint pos,
 ymuint
 BtgMatch::calc_match(vector<ymuint>& edge_list)
 {
+  ymuint ne = mEdgeList.size();
+  if ( ne == 0 ) {
+    return 0;
+  }
+
+  // 最初に重みを無視したマッチングを求める．
   if ( mNode1Num <= mNode2Num ) {
-    return calc_match1(edge_list);
+    calc_match1(edge_list);
   }
   else {
-    return calc_match2(edge_list);
+    calc_match2(edge_list);
   }
+
+  ymuint w0 = mEdgeList[0]->weight();
+  bool uniform = true;
+  for (ymuint i = 1; i < ne; ++ i) {
+    if ( mEdgeList[i]->weight() != w0 ) {
+      uniform = false;
+      break;
+    }
+  }
+
+  if ( !uniform ) {
+    // 最大重みマッチングを求める．
+    BtgNode* v1_0 = NULL;
+    for (ymuint i = 0; i < mNode1Num; ++ i) {
+      BtgNode* v1 = &mNode1Array[i];
+      BtgEdge* edge = v1->cur_edge();
+      if ( edge != NULL ) {
+	for (BtgEdge* edge1 = v1->edge_top();
+	     edge1 != NULL; edge1 = edge1->link1()) {
+	  if ( edge1->weight() > edge->weight() ) {
+	    v1_0 = v1;
+	    break;
+	  }
+	}
+	if ( v1_0 != NULL ) {
+	  break;
+	}
+      }
+    }
+
+    for ( ; ; ) {
+      for (BtgNode* v1 = v1_0; ; ) {
+	BtgEdge* edge = v1->cur_edge();
+	BtgNode* v2 = edge->node2();
+      }
+    }
+  }
+
+  ymuint weight_sum = 0;
+  for (ymuint i = 0; i < mNode1Num; ++ i) {
+    BtgNode* v1 = &mNode1Array[i];
+    BtgEdge* edge = v1->cur_edge();
+    if ( edge != NULL ) {
+      edge_list.push_back(edge->id());
+      weight_sum += edge->weight();
+    }
+  }
+
+  return weight_sum;
 }
 
 
@@ -179,8 +234,7 @@ END_NONAMESPACE
 
 // @brief 節点グループ1でまわす calc_match()
 // @param[in] edge_list マッチング結果の枝を格納するリスト
-// @return マッチング結果の重みの総和を返す．
-ymuint
+void
 BtgMatch::calc_match1(vector<ymuint>& edge_list)
 {
   for (ymuint i = 0; i < mNode1Num; ++ i) {
@@ -198,18 +252,6 @@ BtgMatch::calc_match1(vector<ymuint>& edge_list)
       }
     }
   }
-
-  ymuint weight_sum = 0;
-  for (ymuint i = 0; i < mNode1Num; ++ i) {
-    BtgNode* v1 = &mNode1Array[i];
-    BtgEdge* edge = v1->cur_edge();
-    if ( edge != NULL ) {
-      edge_list.push_back(edge->id());
-      weight_sum += edge->weight();
-    }
-  }
-
-  return weight_sum;
 }
 
 
@@ -251,8 +293,7 @@ END_NONAMESPACE
 
 // @brief 節点グループ2でまわす calc_match()
 // @param[in] edge_list マッチング結果の枝を格納するリスト
-// @return マッチング結果の重みの総和を返す．
-ymuint
+void
 BtgMatch::calc_match2(vector<ymuint>& edge_list)
 {
   for (ymuint i = 0; i < mNode2Num; ++ i) {
@@ -270,18 +311,6 @@ BtgMatch::calc_match2(vector<ymuint>& edge_list)
       }
     }
   }
-
-  ymuint weight_sum = 0;
-  for (ymuint i = 0; i < mNode2Num; ++ i) {
-    BtgNode* v2 = &mNode2Array[i];
-    BtgEdge* edge = v2->cur_edge();
-    if ( edge != NULL ) {
-      edge_list.push_back(edge->id());
-      weight_sum += edge->weight();
-    }
-  }
-
-  return weight_sum;
 }
 
 END_NAMESPACE_YM
