@@ -25,6 +25,9 @@ class BtgMatch
 {
 public:
 
+  /// @brief 空のコンストラクタ
+  BtgMatch();
+
   /// @brief コンストラクタ
   /// @param[in] node1_num 節点グループ1の要素数
   /// @param[in] node2_num 節点グループ2の要素数
@@ -39,6 +42,14 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 節点数を設定する．
+  /// @param[in] node1_num 節点グループ1の要素数
+  /// @param[in] node2_num 節点グループ2の要素数
+  /// @note 以前の内容はクリアされる．
+  void
+  resize(ymuint node_num1,
+	 ymuint node_num2);
 
   /// @brief 節点グループ1の要素数を返す．
   ymuint

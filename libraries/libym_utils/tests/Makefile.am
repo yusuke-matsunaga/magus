@@ -53,7 +53,8 @@ noinst_PROGRAMS = \
 	mscg_test \
 	CompIDO_test \
 	CompODO_test \
-	StrListIDO_test
+	StrListIDO_test \
+	FlowTest
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \
@@ -317,4 +318,23 @@ zstream_test_SOURCES = \
 zstream_test_LDFLAGS =
 
 zstream_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building FlowTest
+############################################################
+
+FlowTest_SOURCES = \
+	FlowTest.cc \
+	FlowNode.h \
+	FlowEdge.h \
+	FlowNodeHeap.h \
+	FlowNodeHeap.cc \
+	FlowGraph.h \
+	FlowGraph.cc
+
+FlowTest_LDFLAGS =
+
+FlowTest_LDADD = \
 	$(YMUTILS)

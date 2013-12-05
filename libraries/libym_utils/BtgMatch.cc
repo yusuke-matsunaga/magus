@@ -18,6 +18,15 @@ BEGIN_NAMESPACE_YM
 // クラス BtgMatch
 //////////////////////////////////////////////////////////////////////
 
+// @brief 空のコンストラクタ
+BtgMatch::BtgMatch()
+{
+  mNode1Num = 0;
+  mNode1Array = NULL;
+  mNode2Num = 0;
+  mNode2Array = NULL;
+}
+
 // @brief コンストラクタ
 // @param[in] node1_num 節点グループ1 の要素数
 // @param[in] node2_num 節点グループ2 の要素数
@@ -44,6 +53,35 @@ BtgMatch::~BtgMatch()
 
   delete [] mNode1Array;
   delete [] mNode2Array;
+}
+
+// @brief 節点数を設定する．
+// @param[in] node1_num 節点グループ1の要素数
+// @param[in] node2_num 節点グループ2の要素数
+// @note 以前の内容はクリアされる．
+void
+BtgMatch::resize(ymuint node_num1,
+		 ymuint node_num2)
+{
+  clear_edge();
+
+  if ( mNode1Num != node_num1 ) {
+    delete [] mNode1Array;
+    mNode1Num = node_num1;
+    mNode1Array = new BtgNode[mNode1Num];
+  }
+  for (ymuint i = 0; i < mNode1Num; ++ i) {
+    mNode1Array[i].set(0, i);
+  }
+
+  if ( mNode2Num != node_num2 ) {
+    delete [] mNode2Array;
+    mNode2Num = node_num2;
+    mNode2Array = new BtgNode[mNode2Num];
+  }
+  for (ymuint i = 0; i < mNode2Num; ++ i) {
+    mNode2Array[i].set(1, i);
+  }
 }
 
 // @brief 節点グループ1 の要素数を返す．
