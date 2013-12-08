@@ -54,6 +54,7 @@ noinst_PROGRAMS = \
 	CompIDO_test \
 	CompODO_test \
 	StrListIDO_test \
+	BtgMatch_test \
 	FlowTest
 
 if YM_HAVE_ZLIB
@@ -322,6 +323,18 @@ zstream_test_LDADD = \
 
 
 ############################################################
+## Variables for building BtgMatch_test
+############################################################
+
+BtgMatch_test_SOURCES = \
+	BtgMatch_test.cc
+
+BtgMatch_test_LDFLAGS =
+
+BtgMatch_test_LDADD = \
+	$(YMUTILS)
+
+############################################################
 ## Variables for building FlowTest
 ############################################################
 
@@ -338,3 +351,4 @@ FlowTest_LDFLAGS =
 
 FlowTest_LDADD = \
 	$(YMUTILS)
+
