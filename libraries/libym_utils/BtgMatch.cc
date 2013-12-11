@@ -10,6 +10,7 @@
 #include "ym_utils/BtgMatch.h"
 #include "BtgNode.h"
 #include "BtgEdge.h"
+#include "BtgHeapTree.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -211,7 +212,7 @@ BtgMatch::calc_match(vector<ymuint>& edge_list)
   ymuint weight_sum = 0;
   for (vector<ymuint>::iterator p = edge_list.begin();
        p != edge_list.end(); ++ p) {
-    BtgEdge* edge = mEdgeArray[*p];
+    BtgEdge* edge = mEdgeList[*p];
     weight_sum += edge->weight();
   }
 
@@ -349,57 +350,142 @@ BtgMatch::calc_match2(vector<ymuint>& edge_list)
 void
 BtgMatch::calc_wmatch1(vector<ymuint>& edge_list)
 {
+  // 次に処理すべき節点グループを保持するキュー
+  BtgHeapTree queue(mNode1Num);
+
   for (ymuint i = 0; i < mNode1Num; ++ i) {
     BtgNode* v1 = &mNode1Array[i];
 
-    // 次に処理すべき節点グループを保持するキュー
-    vector<bool> qmark(mNode1Num);
-    vector<BtgNode*> queue;
-    queue.reserve(mNode1Num);
+    queue.clear();
+    for (ymuint j = 0; j < mNode1Num; ++ j) {
+      mNode1Array[j].mPos = 0;
+    }
 
     // たどる元の枝を保持する配列
     vector<BtgEdge*> parent(mNode2Num, NULL);
 
     // v1 をキューに積む．
-    queue.push_back(v1);
-    qmark[v1->id()] = true;
+    v1->mWeight = 0;
+    queue.put(v1);
 
-    ymuint rpos = 0;
-    while ( rpos < queue.size() ) {
+    while ( !queue.empty() ) {
       // キューから節点を取り出す．
-      BtgNode* v1 = queue[rpos];
-      ++ rpos;
+      BtgNode* v1 = queue.get();
 
       // v1 に隣接している節点でマッチしていないものを探す．
       for (BtgEdge* edge = v1->edge_top();
 	   edge != NULL; edge = edge->link1()) {
 	BtgNode* v2 = edge->node2();
+	v2->mWeight = v1->weight() + edge->weight();
 	BtgEdge* cur_edge = v2->cur_edge();
 	if ( cur_edge == NULL ) {
 	  // 見つけた．
-	  // 後ろ向きにたどる．
-	  for ( ; ; ) {
-	    BtgEdge* old_edge = v1->cur_edge();
-	    v1->set_cur_edge(edge);
-	    v2->set_cur_edge(edge);
-	    edge_list.push_back(edge->id());
-	    if ( old_edge == NULL ) {
-	      break;
+	  if ( v2->weight() > 0 ) {
+	    // 後ろ向きにたどる．
+	    for ( ; ; ) {
+	      BtgEdge* old_edge = v1->cur_edge();
+	      v1->set_cur_edge(edge);
+	      v2->set_cur_edge(edge);
+	      edge_list.push_back(edge->id());
+	      if ( old_edge == NULL ) {
+		break;
+	      }
+	      v2 = old_edge->node2();
+	      edge = parent[v2->id()];
+	      v1 = edge->node1();
 	    }
-	    v2 = old_edge->node2();
-	    edge = parent[v2->id()];
-	    v1 = edge->node1();
+	    break;
 	  }
-	  break;
 	}
 	else {
 	  // すでにマッチしていた．
 	  // マッチ先のノードから探索する．
 	  BtgNode* v3 = cur_edge->node1();
-	  if ( !qmark[v3->id()] ) {
-	    qmark[v3->id()] = true;
-	    queue.push_back(v3);
+	  ymint32 w_new = v2->weight() - cur_edge->weight();
+	  if ( v3->mPos > 0 ) {
+	    if ( w_new > v3->weight() ) {
+	      v3->mWeight = w_new;
+	      queue.update(v3);
+	    }
+	  }
+	  else {
+	    v3->mWeight = w_new;
+	    queue.put(v3);
 	    parent[v2->id()] = edge;
+	  }
+	}
+      }
+    }
+  }
+}
+
+// @brief 節点グループ2でまわす calc_wmatch()
+// @param[in] edge_list マッチング結果の枝を格納するリスト
+void
+BtgMatch::calc_wmatch2(vector<ymuint>& edge_list)
+{
+  // 次に処理すべき節点グループを保持するキュー
+  BtgHeapTree queue(mNode2Num);
+
+  for (ymuint i = 0; i < mNode2Num; ++ i) {
+    BtgNode* v2 = &mNode2Array[i];
+
+    queue.clear();
+    for (ymuint j = 0; j < mNode2Num; ++ j) {
+      mNode2Array[j].mPos = 0;
+    }
+
+    // たどる元の枝を保持する配列
+    vector<BtgEdge*> parent(mNode1Num, NULL);
+
+    // v2 をキューに積む．
+    v2->mWeight = 0;
+    queue.put(v2);
+
+    while ( !queue.empty() ) {
+      // キューから節点を取り出す．
+      BtgNode* v2 = queue.get();
+
+      // v2 に隣接している節点でマッチしていないものを探す．
+      for (BtgEdge* edge = v2->edge_top();
+	   edge != NULL; edge = edge->link2()) {
+	BtgNode* v1 = edge->node1();
+	v1->mWeight = v2->weight() + edge->weight();
+	BtgEdge* cur_edge = v1->cur_edge();
+	if ( cur_edge == NULL ) {
+	  // 見つけた．
+	  if ( v1->weight() > 0 ) {
+	    // 後ろ向きにたどる．
+	    for ( ; ; ) {
+	      BtgEdge* old_edge = v2->cur_edge();
+	      v2->set_cur_edge(edge);
+	      v1->set_cur_edge(edge);
+	      edge_list.push_back(edge->id());
+	      if ( old_edge == NULL ) {
+		break;
+	      }
+	      v1 = old_edge->node1();
+	      edge = parent[v1->id()];
+	      v2 = edge->node2();
+	    }
+	    break;
+	  }
+	}
+	else {
+	  // すでにマッチしていた．
+	  // マッチ先のノードから探索する．
+	  BtgNode* v3 = cur_edge->node2();
+	  ymint32 w_new = v1->weight() - cur_edge->weight();
+	  if ( v3->mPos > 0 ) {
+	    if ( w_new > v3->weight() ) {
+	      v3->mWeight = w_new;
+	      queue.update(v3);
+	    }
+	  }
+	  else {
+	    v3->mWeight = w_new;
+	    queue.put(v3);
+	    parent[v1->id()] = edge;
 	  }
 	}
       }

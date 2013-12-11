@@ -146,6 +146,19 @@ BtgMatch_test(int argc,
     }
   }
 
+  vector<ymuint> edge_list;
+  bm.calc_match(edge_list);
+
+  for (vector<ymuint>::iterator p = edge_list.begin();
+       p != edge_list.end(); ++ p) {
+    ymuint e_id = *p;
+    ymuint node1;
+    ymuint node2;
+    ymuint weight;
+    bm.edge_info(e_id, node1, node2, weight);
+    cout << node1 << " - " << node2 << endl;
+  }
+
   return 0;
 }
 

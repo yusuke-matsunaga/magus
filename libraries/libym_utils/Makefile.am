@@ -32,6 +32,8 @@ libym_utils_la_SOURCES = \
 	Alloc.cc \
 	Binder.cc \
 	BtgEdge.h \
+	BtgHeapTree.h \
+	BtgHeapTree.cc \
 	BtgMatch.cc \
 	BtgNode.h \
 	CombiGen.cc \

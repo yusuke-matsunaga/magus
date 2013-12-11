@@ -126,6 +126,16 @@ private:
   void
   calc_match2(vector<ymuint>& edge_list);
 
+  /// @brief 節点グループ1でまわす calc_wmatch()
+  /// @param[in] edge_list マッチング結果の枝を格納するリスト
+  void
+  calc_wmatch1(vector<ymuint>& edge_list);
+
+  /// @brief 節点グループ2でまわす calc_wmatch()
+  /// @param[in] edge_list マッチング結果の枝を格納するリスト
+  void
+  calc_wmatch2(vector<ymuint>& edge_list);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

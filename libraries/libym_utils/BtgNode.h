@@ -23,6 +23,7 @@ class BtgEdge;
 class BtgNode
 {
   friend class BtgMatch;
+  friend class BtgHeapTree;
 
 public:
 
@@ -53,20 +54,9 @@ public:
   ymuint
   id() const;
 
-#if 0
-  /// @brief 接続している枝を返す．
-  ymuint
-  edge_num() const;
-
-  /// @brief 枝を返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
-  BtgEdge*
-  edge(ymuint pos);
-#else
   /// @brief 接続している枝の先頭を返す．
   BtgEdge*
   edge_top() const;
-#endif
 
   /// @brief 選ばれている枝を返す．
   BtgEdge*
@@ -75,6 +65,10 @@ public:
   /// @brief マッチングの枝を設定する．
   void
   set_cur_edge(BtgEdge* edge);
+
+  /// @brief 重みの和を得る．
+  ymint32
+  weight() const;
 
 
 private:
@@ -90,6 +84,12 @@ private:
 
   // 今選択されている枝
   BtgEdge* mCurEdge;
+
+  // 重みの和
+  ymint32 mWeight;
+
+  // ヒープ上の位置
+  ymuint32 mPos;
 
 };
 
@@ -139,25 +139,6 @@ BtgNode::id() const
   return mIdType >> 1;
 }
 
-#if 0
-// @brief 接続している枝を返す．
-inline
-ymuint
-BtgNode::edge_num() const
-{
-  return mEdgeList.size();
-}
-
-// @brief 枝を返す．
-// @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
-inline
-BtgEdge*
-BtgNode::edge(ymuint pos)
-{
-  assert_cond( pos < mEdgeList.size(), __FILE__, __LINE__);
-  return mEdgeList[pos];
-}
-#else
 // @brief 接続している枝の先頭を返す．
 inline
 BtgEdge*
@@ -165,7 +146,6 @@ BtgNode::edge_top() const
 {
   return mEdgeTop;
 }
-#endif
 
 // @brief 選ばれている枝を返す．
 inline
@@ -181,6 +161,14 @@ void
 BtgNode::set_cur_edge(BtgEdge* edge)
 {
   mCurEdge = edge;
+}
+
+// @brief 重みの和を得る．
+inline
+ymint32
+BtgNode::weight() const
+{
+  return mWeight;
 }
 
 END_NAMESPACE_YM
