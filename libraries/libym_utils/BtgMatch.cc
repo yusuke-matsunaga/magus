@@ -185,44 +185,58 @@ BtgMatch::calc_match(vector<ymuint>& edge_list)
     }
   }
 
-  if ( uniform ) {
-    // 全ての同じ重みだった
-    //  -> 最大マッチングを求める．
+  ymuint weight_sum = 0;
 
-    // 節点数の少ない方から探した方が速い．
-    if ( mNode1Num <= mNode2Num ) {
-      calc_match1(edge_list);
+  // 節点数の少ない方から探した方が速い．
+  if ( mNode1Num <= mNode2Num ) {
+    if ( uniform ) {
+      // 全ての同じ重みだった
+      //  -> 最大マッチングを求める．
+      calc_match1();
     }
     else {
-      calc_match2(edge_list);
+      //  -> 重み最大マッチングを求める．
+      calc_wmatch1();
+    }
+
+    for (ymuint i = 0; i < mNode1Num; ++ i) {
+      BtgNode* v1 = &mNode1Array[i];
+      BtgEdge* edge = v1->cur_edge();
+      if ( edge != NULL ) {
+	assert_cond( edge->node2()->cur_edge() == edge, __FILE__, __LINE__);
+	edge_list.push_back(edge->id());
+	weight_sum += edge->weight();
+      }
     }
   }
   else {
-    // 重み最大マッチングを求める．
-
-    // 節点数の少ない方から探した方が速い．
-    if ( mNode1Num <= mNode2Num ) {
-      calc_wmatch1(edge_list);
+    if ( uniform ) {
+      // 全ての同じ重みだった
+      //  -> 最大マッチングを求める．
+      calc_match2();
     }
     else {
-      calc_wmatch2(edge_list);
+      //  -> 重み最大マッチングを求める．
+      calc_wmatch2();
     }
-  }
 
-  ymuint weight_sum = 0;
-  for (vector<ymuint>::iterator p = edge_list.begin();
-       p != edge_list.end(); ++ p) {
-    BtgEdge* edge = mEdgeList[*p];
-    weight_sum += edge->weight();
+    for (ymuint i = 0; i < mNode2Num; ++ i) {
+      BtgNode* v2 = &mNode2Array[i];
+      BtgEdge* edge = v2->cur_edge();
+      if ( edge != NULL ) {
+	assert_cond( edge->node1()->cur_edge() == edge, __FILE__, __LINE__);
+	edge_list.push_back(edge->id());
+	weight_sum += edge->weight();
+      }
+    }
   }
 
   return weight_sum;
 }
 
 // @brief 節点グループ1でまわす calc_match()
-// @param[in] edge_list マッチング結果の枝を格納するリスト
 void
-BtgMatch::calc_match1(vector<ymuint>& edge_list)
+BtgMatch::calc_match1()
 {
   for (ymuint i = 0; i < mNode1Num; ++ i) {
     BtgNode* v1 = &mNode1Array[i];
@@ -257,7 +271,6 @@ BtgMatch::calc_match1(vector<ymuint>& edge_list)
 	    BtgEdge* old_edge = v1->cur_edge();
 	    v1->set_cur_edge(edge);
 	    v2->set_cur_edge(edge);
-	    edge_list.push_back(edge->id());
 	    if ( old_edge == NULL ) {
 	      break;
 	    }
@@ -283,9 +296,8 @@ BtgMatch::calc_match1(vector<ymuint>& edge_list)
 }
 
 // @brief 節点グループ2でまわす calc_match()
-// @param[in] edge_list マッチング結果の枝を格納するリスト
 void
-BtgMatch::calc_match2(vector<ymuint>& edge_list)
+BtgMatch::calc_match2()
 {
   for (ymuint i = 0; i < mNode2Num; ++ i) {
     BtgNode* v2 = &mNode2Array[i];
@@ -320,7 +332,6 @@ BtgMatch::calc_match2(vector<ymuint>& edge_list)
 	    BtgEdge* old_edge = v2->cur_edge();
 	    v1->set_cur_edge(edge);
 	    v2->set_cur_edge(edge);
-	    edge_list.push_back(edge->id());
 	    if ( old_edge == NULL ) {
 	      break;
 	    }
@@ -346,15 +357,15 @@ BtgMatch::calc_match2(vector<ymuint>& edge_list)
 }
 
 // @brief 節点グループ1でまわす calc_wmatch()
-// @param[in] edge_list マッチング結果の枝を格納するリスト
 void
-BtgMatch::calc_wmatch1(vector<ymuint>& edge_list)
+BtgMatch::calc_wmatch1()
 {
   // 次に処理すべき節点グループを保持するキュー
   BtgHeapTree queue(mNode1Num);
 
-  for (ymuint i = 0; i < mNode1Num; ++ i) {
-    BtgNode* v1 = &mNode1Array[i];
+  for ( ; ; ) {
+    ymint max_weight = 0;
+    BtgNode* max_v2 = NULL;
 
     queue.clear();
     for (ymuint j = 0; j < mNode1Num; ++ j) {
@@ -364,9 +375,14 @@ BtgMatch::calc_wmatch1(vector<ymuint>& edge_list)
     // たどる元の枝を保持する配列
     vector<BtgEdge*> parent(mNode2Num, NULL);
 
-    // v1 をキューに積む．
-    v1->mWeight = 0;
-    queue.put(v1);
+    for (ymuint i = 0; i < mNode1Num; ++ i) {
+      BtgNode* v1 = &mNode1Array[i];
+      if ( v1->cur_edge() == NULL ) {
+	// v1 をキューに積む．
+	v1->mWeight = 0;
+	queue.put(v1);
+      }
+    }
 
     while ( !queue.empty() ) {
       // キューから節点を取り出す．
@@ -380,21 +396,10 @@ BtgMatch::calc_wmatch1(vector<ymuint>& edge_list)
 	BtgEdge* cur_edge = v2->cur_edge();
 	if ( cur_edge == NULL ) {
 	  // 見つけた．
-	  if ( v2->weight() > 0 ) {
-	    // 後ろ向きにたどる．
-	    for ( ; ; ) {
-	      BtgEdge* old_edge = v1->cur_edge();
-	      v1->set_cur_edge(edge);
-	      v2->set_cur_edge(edge);
-	      edge_list.push_back(edge->id());
-	      if ( old_edge == NULL ) {
-		break;
-	      }
-	      v2 = old_edge->node2();
-	      edge = parent[v2->id()];
-	      v1 = edge->node1();
-	    }
-	    break;
+	  if ( max_weight < v2->weight() ) {
+	    max_weight = v2->weight();
+	    max_v2 = v2;
+	    parent[v2->id()] = edge;
 	  }
 	}
 	else {
@@ -416,19 +421,38 @@ BtgMatch::calc_wmatch1(vector<ymuint>& edge_list)
 	}
       }
     }
+
+    if ( max_weight == 0 ) {
+      // 重みを増加させる経路がなくなったら終わる．
+      break;
+    }
+
+    // 後ろ向きにたどる．
+    for (BtgNode* v2 = max_v2; ; ) {
+      BtgEdge* edge = parent[v2->id()];
+      BtgNode* v1 = edge->node1();
+      BtgEdge* old_edge = v1->cur_edge();
+      v1->set_cur_edge(edge);
+      v2->set_cur_edge(edge);
+      cout << "(" << v1->id() << ", " << v2->id() << ")" << endl;
+      if ( old_edge == NULL ) {
+	break;
+      }
+      v2 = old_edge->node2();
+    }
   }
 }
 
 // @brief 節点グループ2でまわす calc_wmatch()
-// @param[in] edge_list マッチング結果の枝を格納するリスト
 void
-BtgMatch::calc_wmatch2(vector<ymuint>& edge_list)
+BtgMatch::calc_wmatch2()
 {
   // 次に処理すべき節点グループを保持するキュー
   BtgHeapTree queue(mNode2Num);
 
-  for (ymuint i = 0; i < mNode2Num; ++ i) {
-    BtgNode* v2 = &mNode2Array[i];
+  for ( ; ; ) {
+    ymint max_weight = 0;
+    BtgNode* max_v1 = NULL;
 
     queue.clear();
     for (ymuint j = 0; j < mNode2Num; ++ j) {
@@ -438,9 +462,15 @@ BtgMatch::calc_wmatch2(vector<ymuint>& edge_list)
     // たどる元の枝を保持する配列
     vector<BtgEdge*> parent(mNode1Num, NULL);
 
-    // v2 をキューに積む．
-    v2->mWeight = 0;
-    queue.put(v2);
+    for (ymuint i = 0; i < mNode2Num; ++ i) {
+      BtgNode* v2 = &mNode2Array[i];
+
+      if ( v2->cur_edge() == NULL ) {
+	// v2 をキューに積む．
+	v2->mWeight = 0;
+	queue.put(v2);
+      }
+    }
 
     while ( !queue.empty() ) {
       // キューから節点を取り出す．
@@ -454,21 +484,10 @@ BtgMatch::calc_wmatch2(vector<ymuint>& edge_list)
 	BtgEdge* cur_edge = v1->cur_edge();
 	if ( cur_edge == NULL ) {
 	  // 見つけた．
-	  if ( v1->weight() > 0 ) {
-	    // 後ろ向きにたどる．
-	    for ( ; ; ) {
-	      BtgEdge* old_edge = v2->cur_edge();
-	      v2->set_cur_edge(edge);
-	      v1->set_cur_edge(edge);
-	      edge_list.push_back(edge->id());
-	      if ( old_edge == NULL ) {
-		break;
-	      }
-	      v1 = old_edge->node1();
-	      edge = parent[v1->id()];
-	      v2 = edge->node2();
-	    }
-	    break;
+	  if ( max_weight < v1->weight() ) {
+	    max_weight = v1->weight();
+	    max_v1 = v1;
+	    parent[v1->id()] = edge;
 	  }
 	}
 	else {
@@ -489,6 +508,24 @@ BtgMatch::calc_wmatch2(vector<ymuint>& edge_list)
 	  }
 	}
       }
+    }
+
+    if ( max_weight == 0 ) {
+      // 重みを増加させる経路がなくなったら終わる．
+      break;
+    }
+
+    // 後ろ向きにたどる．
+    for (BtgNode* v1 = max_v1; ; ) {
+      BtgEdge* edge = parent[v1->id()];
+      BtgNode* v2 = edge->node2();
+      BtgEdge* old_edge = v2->cur_edge();
+      v2->set_cur_edge(edge);
+      v1->set_cur_edge(edge);
+      if ( old_edge == NULL ) {
+	break;
+      }
+      v1 = old_edge->node1();
     }
   }
 }

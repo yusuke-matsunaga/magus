@@ -117,24 +117,20 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 節点グループ1でまわす calc_match()
-  /// @param[in] edge_list マッチング結果の枝を格納するリスト
   void
-  calc_match1(vector<ymuint>& edge_list);
+  calc_match1();
 
   /// @brief 節点グループ2でまわす calc_match()
-  /// @param[in] edge_list マッチング結果の枝を格納するリスト
   void
-  calc_match2(vector<ymuint>& edge_list);
+  calc_match2();
 
   /// @brief 節点グループ1でまわす calc_wmatch()
-  /// @param[in] edge_list マッチング結果の枝を格納するリスト
   void
-  calc_wmatch1(vector<ymuint>& edge_list);
+  calc_wmatch1();
 
   /// @brief 節点グループ2でまわす calc_wmatch()
-  /// @param[in] edge_list マッチング結果の枝を格納するリスト
   void
-  calc_wmatch2(vector<ymuint>& edge_list);
+  calc_wmatch2();
 
 
 private:
