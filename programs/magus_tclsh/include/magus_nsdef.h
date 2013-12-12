@@ -1,12 +1,10 @@
 #ifndef MAGUS_MAGUS_NSDEF_H
 #define MAGUS_MAGUS_NSDEF_H
 
-/// @file magus.h
+/// @file magus_nsdef.h
 /// @brief magus用名前空間の定義ファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: magus.h 1343 2008-03-25 17:15:35Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.

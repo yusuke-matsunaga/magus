@@ -105,7 +105,7 @@ public:
   bool
   is_x() const;
 
-  /// @biref Z の時に true を返す．
+  /// @brief Z の時に true を返す．
   bool
   is_z() const;
 
@@ -151,7 +151,6 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 否定
-  /// @param[in] right オペランド
   VlScalarVal
   operator!() const;
 

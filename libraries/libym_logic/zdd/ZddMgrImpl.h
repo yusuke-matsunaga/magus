@@ -112,7 +112,7 @@ public:
   cup(ZddEdge e1,
       ZddEdge e2);
 
-  /// @brief src1 $\setdiff$ src2 を計算する．
+  /// @brief src1 $\setminus$ src2 を計算する．
   ZddEdge
   diff(ZddEdge e1,
        ZddEdge e2);

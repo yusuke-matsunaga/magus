@@ -49,7 +49,7 @@ public:
   file_info() const;
 
   /// @brief 現在のファイル情報を書き換える．
-  /// @param[in] new_info 新しいファイル情報
+  /// @param[in] file_info 新しいファイル情報
   /// @note プリプロセッサのプラグマなどで用いることを想定している．
   /// @note 通常は使わないこと．
   virtual

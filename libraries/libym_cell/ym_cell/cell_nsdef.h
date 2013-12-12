@@ -9,7 +9,7 @@
 /// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
-/// @defgroup CellGroup セルライブラリ
+/// @defgroup Cell セルライブラリ
 ///
 /// セルライブラリを扱うためのクラスライブラリ
 
@@ -199,7 +199,7 @@ enum tCellPatType {
 
 /// @brief ストリーム出力演算子
 /// @param[in] s 出力先のストリーム
-/// @param[in] delay_mode 遅延モード
+/// @param[in] delay_model 遅延モデル
 /// @return s を返す．
 ostream&
 operator<<(ostream& s,

@@ -46,7 +46,7 @@ public:
   /// @param[in] s 出力先のストリーム
   /// @param[in] sbjgraph 対象のサブジェクトグラフ
   void
-  dump_blif(ostream&,
+  dump_blif(ostream& s,
 	    const SbjGraph& sbjgraph);
 
   /// @brief Verilog-HDL 形式で出力する関数

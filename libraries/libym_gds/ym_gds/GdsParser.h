@@ -136,14 +136,14 @@ public:
   add_box(ymuint16 elflags,
 	  ymint32 plex,
 	  ymint16 layer,
-	  ymint16 datatype,
+	  ymint16 boxtype,
 	  GdsXY* xy);
 
   /// @brief GdsNode の作成
   /// @param[in] elflags ELFLAGS の値
   /// @param[in] plex PLEX の値
   /// @param[in] layer LAYER の値
-  /// @param[in] datatype DATATYPE の値
+  /// @param[in] nodetype DATATYPE の値
   /// @param[in] xy XY の値
   void
   add_node(ymuint16 elflags,

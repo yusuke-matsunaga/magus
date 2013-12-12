@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvnInputPin MvPin.h "ym_networks/MvPin.h"
+/// @class MvnInputPin MvnInputPin.h "ym_networks/MvnInputPin.h"
 /// @brief ノードの入力ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
 class MvnInputPin :
@@ -38,7 +38,7 @@ private:
 
 public:
 
-  /// @breif 属しているノードを得る．
+  /// @brief 属しているノードを得る．
   MvnNode*
   node() const;
 

@@ -35,7 +35,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ファイルを開く
-  /// @param[in] filenmae ファイル名
+  /// @param[in] filename ファイル名
   /// @retval true オープンに成功した．
   /// @retval false オープンに失敗した．
   bool

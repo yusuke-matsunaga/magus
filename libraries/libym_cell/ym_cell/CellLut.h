@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLLUT_H
 #define YM_CELL_CELLLUT_H
 
-/// @file　ym_cell/CellLut.h
+/// @file ym_cell/CellLut.h
 /// @brief CellLut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

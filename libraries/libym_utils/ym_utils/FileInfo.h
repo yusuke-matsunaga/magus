@@ -1,7 +1,7 @@
 #ifndef YM_UTILS_FILEINFO_H
 #define YM_UTILS_FILEINFO_H
 
-/// @file ym_utils/FinleInfo.h
+/// @file ym_utils/FileInfo.h
 /// @brief FinleInfo のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

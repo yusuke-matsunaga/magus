@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLLIBRARY_H
 #define YM_CELL_CELLLIBRARY_H
 
-/// @file　ym_cell/CellLibrary.h
+/// @file ym_cell/CellLibrary.h
 /// @brief CellLibrary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -473,7 +473,7 @@ public:
   /// @param[in] nc バンドル数
   /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
-  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// *1: - false 論理式なし
   ///     - true 論理式あり
   virtual
@@ -501,7 +501,7 @@ public:
   /// @param[in] nc バンドル数
   /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
-  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] next_state "next_state" 関数の式
   /// @param[in] clocked_on "clocked_on" 関数の式
   /// @param[in] clocked_on_also "clocked_on_also" 関数の式
@@ -543,7 +543,7 @@ public:
   /// @param[in] nc バンドル数
   /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
-  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// @param[in] data_in "data_in" 関数の式
   /// @param[in] enable "enable" 関数の式
   /// @param[in] clear "clear" 関数の式
@@ -586,7 +586,7 @@ public:
   /// @param[in] nc バンドル数
   /// @param[in] output_array 出力の情報の配列(*1)
   /// @param[in] logic_array 出力の論理式の配列
-  /// @param[in] tristated_array トライステート条件の論理式の配列
+  /// @param[in] tristate_array トライステート条件の論理式の配列
   /// *1: - false 論理式なし
   ///     - true 論理式あり
   virtual
@@ -691,7 +691,7 @@ public:
 		 CellTime min_transition) = 0;
 
   /// @brief セルの内部ピンを生成する．
-  /// @param[in] cell セル
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] pin_id ピン番号 ( 0 <= pin_id < cell->pin_num() )
   /// @param[in] int_id 入力ピン番号 ( 0 <= int_id < cell->internal_num() )
   /// @param[in] name 内部ピン名
@@ -703,7 +703,7 @@ public:
 		    const string& name) = 0;
 
   /// @brief タイミング情報の数を設定する．
-  /// @param[in] cell_id セル番号
+  /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
   /// @param[in] timing_num タイミング情報の数．
   virtual
   void
@@ -743,6 +743,8 @@ public:
   /// @param[in] intrinsic_fall 立ち下がり固有遅延
   /// @param[in] slope_rise 立ち上がりスロープ遅延
   /// @param[in] slope_fall 立ち下がりスロープ遅延
+  /// @param[in] rise_pin_resistance 立ち上がりピン抵抗
+  /// @param[in] fall_pin_resistance 立ち上がりピン抵抗
   virtual
   void
   new_timing_piecewise(ymuint cell_id,

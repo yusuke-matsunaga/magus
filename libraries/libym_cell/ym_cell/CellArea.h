@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLAREA_H
 #define YM_CELL_CELLAREA_H
 
-/// @file　ym_cell/CellArea.h
+/// @file ym_cell/CellArea.h
 /// @brief CellArea のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @calss CellArea CellArea.h "ym_cell/CellArea.h"
+/// @class CellArea CellArea.h "ym_cell/CellArea.h"
 /// @brief 面積を表すクラス
 //////////////////////////////////////////////////////////////////////
 class CellArea
@@ -88,56 +88,56 @@ private:
 };
 
 /// @brief 加算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 CellArea
 operator+(const CellArea& left,
 	  const CellArea& right);
 
 /// @brief 減算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 CellArea
 operator-(const CellArea& left,
 	  const CellArea& right);
 
 /// @brief 等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 bool
 operator==(const CellArea& left,
 	   const CellArea& right);
 
 /// @brief 非等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 bool
 operator!=(const CellArea& left,
 	   const CellArea& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 bool
 operator<(const CellArea& left,
 	  const CellArea& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 bool
 operator>(const CellArea& left,
 	  const CellArea& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 bool
 operator<=(const CellArea& left,
 	   const CellArea& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellArea
 bool
 operator>=(const CellArea& left,
@@ -254,7 +254,7 @@ operator-(const CellArea& left,
 }
 
 // @brief 等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellArea
 inline
 bool
@@ -265,7 +265,7 @@ operator==(const CellArea& left,
 }
 
 // @brief 非等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellArea
 inline
 bool
@@ -276,7 +276,7 @@ operator!=(const CellArea& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellArea
 inline
 bool
@@ -287,7 +287,7 @@ operator<(const CellArea& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellArea
 inline
 bool
@@ -298,7 +298,7 @@ operator>(const CellArea& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellArea
 inline
 bool
@@ -309,7 +309,7 @@ operator<=(const CellArea& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellArea
 inline
 bool

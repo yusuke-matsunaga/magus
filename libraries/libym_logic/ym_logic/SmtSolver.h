@@ -153,35 +153,35 @@ public:
   const SmtFunValidator*
   get_fun_validator(tSmtFunType fun_type) = 0;
 
-  /// @brief <numeral> 型の term を作る．
+  /// @brief \<numeral\> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
   make_numeral_term(ymuint32 val) = 0;
 
-  /// @brief <decimal> 型の term を作る．
+  /// @brief \<decimal\> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
   make_decimal_term(const ShString& val) = 0;
 
-  /// @brief <hexadecimal> 型の term を作る．
+  /// @brief \<hexadecimal\> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
   make_hexadecimal_term(const ShString& val) = 0;
 
-  /// @brief <binary> 型の term を作る．
+  /// @brief \<binary\> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
   const SmtTerm*
   make_binary_term(const ShString& val) = 0;
 
-  /// @brief <string> 型の term を作る．
+  /// @brief \<string\> 型の term を作る．
   /// @param[in] val 値
   /// @return 作成した式を返す．
   virtual
@@ -288,8 +288,7 @@ public:
 
   /// @brief 直前の check_sat() の値割り当てを得る．
   /// @param[in] expr_list expr 式のリスト
-  /// @param[out] value_list 値のリスト
-  /// @note expr_list[i] に対応する値が value_list[i] に格納される．
+  /// @todo 値をどうやって返す？
   virtual
   tSmtLibResponse
   get_value(const vector<const SmtTerm*>& expr_list) = 0;

@@ -42,7 +42,7 @@ public:
   /// @retval kVlOutput 出力
   /// @retval kVlInout 入出力
   /// @retval kVlMixedIO ビットごとに異なる混合タイプ
-  /// @retvla kVlNoDirection 方向の属性なし．
+  /// @retval kVlNoDirection 方向の属性なし．
   virtual
   tVlDirection
   direction() const = 0;

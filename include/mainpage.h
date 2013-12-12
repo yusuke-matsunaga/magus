@@ -18,7 +18,8 @@
 ///   Tck/Tk の内部拡張を行うための C++ ラッパクラスライブラリ
 ///
 /// - libym_logic
-///   \ref LogicGroup
+///   \ref LexpGroup
+///   \ref Bdd
 ///   論理関数処理を行うクラス群
 ///
 /// - libym_verilog
@@ -26,11 +27,11 @@
 ///   Verilog-HDL(IEEE1364-2001) フロントエンド
 ///
 /// - libym_networks
-///   \ref NetworksGroup
+///   \ref Networks
 ///   回路ネットワークを表すクラス群
 ///
 /// - libym_cell
-///   \ref CellGraoup
+///   \ref Cell
 ///   セルライブラリを扱うためのクラスライブラリ
 ///
 /// - magus

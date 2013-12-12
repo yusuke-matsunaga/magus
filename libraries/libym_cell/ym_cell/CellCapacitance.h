@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLCAPACITANCE_H
 #define YM_CELL_CELLCAPACITANCE_H
 
-/// @file　ym_cell/CellCapacitance.h
+/// @file ym_cell/CellCapacitance.h
 /// @brief CellCapacitance のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -88,56 +88,56 @@ private:
 };
 
 /// @brief 加算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 CellCapacitance
 operator+(const CellCapacitance& left,
 	  const CellCapacitance& right);
 
 /// @brief 減算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 CellCapacitance
 operator-(const CellCapacitance& left,
 	  const CellCapacitance& right);
 
 /// @brief 等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 bool
 operator==(const CellCapacitance& left,
 	   const CellCapacitance& right);
 
 /// @brief 非等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 bool
 operator!=(const CellCapacitance& left,
 	   const CellCapacitance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 bool
 operator<(const CellCapacitance& left,
 	  const CellCapacitance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 bool
 operator>(const CellCapacitance& left,
 	  const CellCapacitance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 bool
 operator<=(const CellCapacitance& left,
 	   const CellCapacitance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellCapacitance
 bool
 operator>=(const CellCapacitance& left,
@@ -255,7 +255,7 @@ operator-(const CellCapacitance& left,
 }
 
 // @brief 等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellCapacitance
 inline
 bool
@@ -266,7 +266,7 @@ operator==(const CellCapacitance& left,
 }
 
 // @brief 非等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellCapacitance
 inline
 bool
@@ -277,7 +277,7 @@ operator!=(const CellCapacitance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellCapacitance
 inline
 bool
@@ -288,7 +288,7 @@ operator<(const CellCapacitance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellCapacitance
 inline
 bool
@@ -299,7 +299,7 @@ operator>(const CellCapacitance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellCapacitance
 inline
 bool
@@ -310,7 +310,7 @@ operator<=(const CellCapacitance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellCapacitance
 inline
 bool

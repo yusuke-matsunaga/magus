@@ -59,6 +59,8 @@ public:
   /// @brief 解析を行う．
   /// @param[in] network 対象のネットワーク
   /// @param[in] init_states 初期状態の集合
+  /// @param[in] use_bdd BDD を使うときに true にするフラグ
+  /// @param[in] dump_trans 遷移関係をダンプするときに true にするフラグ
   void
   analyze(const BNetwork& network,
 	  const vector<State>& init_states,

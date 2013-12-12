@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELL_H
 #define YM_CELL_CELL_H
 
-/// @file　ym_cell/Cell.h
+/// @file ym_cell/Cell.h
 /// @brief Cell のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -192,7 +192,7 @@ public:
   /// @brief 条件に合致するタイミング情報の数の取得
   /// @param[in] ipos 開始ピン番号 ( 0 <= ipos < input_num2() )
   /// @param[in] opos 終了ピン番号 ( 0 <= opos < output_num2() )
-  /// @param[in] timing_sense タイミング情報の摘要条件
+  /// @param[in] sense タイミング情報の摘要条件
   virtual
   ymuint
   timing_num(ymuint ipos,
@@ -202,8 +202,8 @@ public:
   /// @brief 条件に合致するタイミング情報の取得
   /// @param[in] ipos 開始ピン番号 ( 0 <= ipos < input_num2() )
   /// @param[in] opos 終了ピン番号 ( 0 <= opos < output_num2() )
-  /// @param[in] timing_sense タイミング情報の摘要条件
-  /// @param[in] pos 位置番号 ( 0 <= pos < timing_num(ipos, opos, timing_sense) )
+  /// @param[in] sense タイミング情報の摘要条件
+  /// @param[in] pos 位置番号 ( 0 <= pos < timing_num(ipos, opos, sense) )
   /// @return 条件に合致するタイミング情報を返す．
   virtual
   const CellTiming*

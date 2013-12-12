@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLBUS_H
 #define YM_CELL_CELLBUS_H
 
-/// @file　ym_cell/CellBus.h
+/// @file ym_cell/CellBus.h
 /// @brief CellBus のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -1,7 +1,7 @@
 #ifndef YM_LOGIC_SMTSORTINFO_H
 #define YM_LOGIC_SMTSORTINFO_H
 
-/// @file ym_logic/SmtSort.h
+/// @file ym_logic/SmtSortInfo.h
 /// @brief SmtSort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

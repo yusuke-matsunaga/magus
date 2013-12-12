@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclObjMsgHandler BNetIoCmd.h "BNetIoCmd.h"
+/// @class TclObjMsgHandler TclObjMsgHandler.h "ym_tclpp/TclObjMsgHandler.h"
 /// @brief TclObj に出力するメッセージハンドラ
 //////////////////////////////////////////////////////////////////////
 class TclObjMsgHandler :
@@ -39,6 +39,7 @@ public:
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
   /// @param[in] loc ファイル位置
+  /// @param[in] type メッセージタイプ
   /// @param[in] label メッセージラベル
   /// @param[in] body メッセージ本文
   virtual

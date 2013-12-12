@@ -39,6 +39,7 @@ public:
   /// @brief 論理関数の正規化を行う．
   /// @param[in] func 対象の論理関数
   /// @param[out] cmap 正規化するための変換マップ(の一つ)
+  /// @param[in] algorithm アルゴリズムの種類を表す番号
   /// @note func.xform(cmap) の結果が正規化された関数となる．
   /// @note 同位体変換がある時は次の all_map() で取得する．
   void

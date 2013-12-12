@@ -37,7 +37,7 @@ public:
   // メインの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief \f$\setdiff\f$演算を行う関数
+  /// @brief \f$\setminus\f$演算を行う関数
   /// @param[in] left, right オペランド
   virtual
   CNFddEdge

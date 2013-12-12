@@ -201,7 +201,7 @@ public:
 
   /// @brief スコープに属する primitive のリストを取り出す．
   /// @param[in] parent 検索対象のスコープ
-  /// @param[out] primtive_list 結果を格納するリスト
+  /// @param[out] primitive_list 結果を格納するリスト
   /// @retval true 該当する要素が1つ以上あった．
   /// @retval false 該当する要素がなかった．
   bool

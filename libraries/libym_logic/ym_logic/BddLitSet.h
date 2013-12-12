@@ -167,34 +167,34 @@ public:
   to_list(LiteralList& dst) const;
 
   /// @brief 集合和を計算する．
-  /// @param[in] src2 オペランド
+  /// @param[in] set2 オペランド
   /// @note 肯定のリテラルと否定のリテラルが両方含まれていた場合には空集合となる．
   BddLitSet
   operator+(const BddLitSet& set2) const;
 
   /// @brief 集合和を計算して代入する．
-  /// @param[in] src2 オペランド
+  /// @param[in] set2 オペランド
   /// @note 肯定のリテラルと否定のリテラルが両方含まれていた場合には空集合となる．
   const BddLitSet&
   operator+=(const BddLitSet& set2);
 
   /// @brief 集合積を計算する．
-  /// @param[in] src2 オペランド
+  /// @param[in] set2 オペランド
   BddLitSet
   operator*(const BddLitSet& set2) const;
 
   /// @brief 集合積を計算して代入する．
-  /// @param[in] src2 オペランド
+  /// @param[in] set2 オペランド
   const BddLitSet&
   operator*=(const BddLitSet& set2);
 
   /// @brief 集合差を計算する．
-  /// @param[in] src2 オペランド
+  /// @param[in] set2 オペランド
   BddLitSet
   operator-(const BddLitSet& set2) const;
 
   /// @brief 集合差を計算して代入する．
-  /// @param[in] src2 オペランド
+  /// @param[in] set2 オペランド
   const BddLitSet&
   operator-=(const BddLitSet& set2);
 
@@ -284,7 +284,8 @@ operator<(const BddLitSet& set1,
 
 /// @relates BddLitSet
 /// @brief ストリームに出力する．
-/// @param[in] set1, set2 オペランド
+/// @param[in] s 出力先のストリーム
+/// @param[in] litset 対象のリテラルセット
 ostream&
 operator<<(ostream& s,
 	   const BddLitSet& litset);

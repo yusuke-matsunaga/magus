@@ -503,7 +503,7 @@ public:
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号
   /// @return ID 番号が id のノードを返す．
-  /// @retrun 該当するノードが無い場合には NULL を返す．
+  /// @note 該当するノードが無い場合には NULL を返す．
   const LnNode*
   node(ymuint id) const;
 

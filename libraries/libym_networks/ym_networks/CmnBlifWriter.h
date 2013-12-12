@@ -1,7 +1,7 @@
 #ifndef YM_NETWORKS_CMNBLIFWRITER_H
 #define YM_NETWORKS_CMNBLIFWRITER_H
 
-/// @file ym_network/CmnBlifWriter.h
+/// @file ym_networks/CmnBlifWriter.h
 /// @brief CmnBlifWriter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

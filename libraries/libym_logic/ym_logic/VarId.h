@@ -122,7 +122,7 @@ ODO&
 operator<<(ODO& s,
 	   const VarId& varid);
 
-/// @relates Varid
+/// @relates VarId
 /// @brief バイナリファイルの読み込み
 /// @param[in] s 入力元のストリーム
 /// @param[out] varid 対象の変数

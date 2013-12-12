@@ -1,7 +1,7 @@
 #ifndef YM_NPN_CVFUNC_H
 #define YM_NPN_CVFUNC_H
 
-/// @file ym_npn/CvFunc.h
+/// @file ym_logic/CvFunc.h
 /// @brief CvFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

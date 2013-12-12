@@ -397,7 +397,7 @@ PyCellCell_AsCellPtr(PyObject* py_obj);
 // PyCellPin: セルのピンを表す型
 //////////////////////////////////////////////////////////////////////
 
-/// @breif CellPin を表すタイプオブジェクト
+/// @brief CellPin を表すタイプオブジェクト
 extern
 PyTypeObject PyCellPin_Type;
 

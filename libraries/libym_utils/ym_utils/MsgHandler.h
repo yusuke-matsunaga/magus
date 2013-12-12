@@ -77,7 +77,7 @@ public:
   /// @brief メッセージが登録されるたびに呼ばれる仮想関数
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
+  /// @param[in] loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
   /// @param[in] body メッセージ本文
@@ -99,7 +99,7 @@ private:
   /// @brief メッセージが登録されるたびに呼ばれる仮想関数
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
+  /// @param[in] loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
   /// @param[in] body メッセージ本文
@@ -156,7 +156,7 @@ public:
   /// @brief メッセージが登録されるたびに呼ばれる仮想関数
   /// @param[in] src_file この関数を読んでいるソースファイル名
   /// @param[in] src_line この関数を読んでいるソースの行番号
-  /// @param[in] file_loc ファイル位置
+  /// @param[in] loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
   /// @param[in] body メッセージ本文

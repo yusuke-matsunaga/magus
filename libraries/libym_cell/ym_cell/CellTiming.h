@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLTIMING_H
 #define YM_CELL_CELLTIMING_H
 
-/// @file　ym_cell/CellTiming.h
+/// @file ym_cell/CellTiming.h
 /// @brief CellTiming のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

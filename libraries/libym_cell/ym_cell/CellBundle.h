@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLBUNDLE_H
 #define YM_CELL_CELLBUNDLE_H
 
-/// @file　ym_cell/CellBundle.h
+/// @file ym_cell/CellBundle.h
 /// @brief CellBundle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -1,7 +1,7 @@
 #ifndef YM_LOGIC_BDDDECOMP_H
 #define YM_LOGIC_BDDDECOMP_H
 
-/// @file ym_logic/BddDecomp
+/// @file ym_logic/BddDecomp.h
 /// @brief BddDecomp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

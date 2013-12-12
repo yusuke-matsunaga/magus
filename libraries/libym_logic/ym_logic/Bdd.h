@@ -481,7 +481,6 @@ public:
   support() const;
 
   /// @brief サポート変数集合の要素数の計算
-  /// @param[in] bdd 対象の BDD
   /// @return サポート変数集合の要素数
   ymuint
   support_size() const;

@@ -39,7 +39,7 @@ public:
   /// @param[in] reset_name リセット信号のポート名
   /// @note clock_name と reset_name はオプション
   bool
-  operator()(const BNetwork& blif_network,
+  operator()(const BNetwork& bnetwork,
 	     BdnMgr& network,
 	     const string& clock_name = "clock",
 	     const string& reset_name = "reset");

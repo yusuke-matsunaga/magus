@@ -76,7 +76,7 @@ public:
   /// @param[in] edge 入力の AIG ハンドル
   static
   Aig
-  make_not(Aig aig);
+  make_not(Aig edge);
 
   /// @brief 2つのノードの AND を取る．
   /// @param[in] aig1, aig2 入力の AIG ハンドル

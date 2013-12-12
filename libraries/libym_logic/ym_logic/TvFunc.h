@@ -34,7 +34,7 @@ public:
   TvFunc(ymuint ni = 0);
 
   /// @brief 入力数と真理値を指定したコンストラクタ
-  /// @param[in] 入力数
+  /// @param[in] ni 入力数
   /// @param[in] values 真理値のベクタ
   TvFunc(ymuint ni,
 	 const vector<int>& values);

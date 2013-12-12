@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLPIN_H
 #define YM_CELL_CELLPIN_H
 
-/// @file　ym_cell/CellPin.h
+/// @file ym_cell/CellPin.h
 /// @brief CellPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

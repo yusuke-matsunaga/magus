@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 //////////////////////////////////////////////////////////////////////
-/// @class TgEdge TgEdge.h "ym_networks/TgNode.h"
+/// @class TgEdge TgNode.h "ym_networks/TgNode.h"
 /// @brief ゲート間の接続を表すクラス
 /// @note 具体的には
 ///  - destination のノードへのポインタ

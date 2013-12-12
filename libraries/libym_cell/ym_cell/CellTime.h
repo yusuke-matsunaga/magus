@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLTIME_H
 #define YM_CELL_CELLTIME_H
 
-/// @file　ym_cell/CellTime.h
+/// @file ym_cell/CellTime.h
 /// @brief CellTime のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -88,56 +88,56 @@ private:
 };
 
 /// @brief 加算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 CellTime
 operator+(const CellTime& left,
 	  const CellTime& right);
 
 /// @brief 減算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 CellTime
 operator-(const CellTime& left,
 	  const CellTime& right);
 
 /// @brief 等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 bool
 operator==(const CellTime& left,
 	   const CellTime& right);
 
 /// @brief 非等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 bool
 operator!=(const CellTime& left,
 	   const CellTime& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 bool
 operator<(const CellTime& left,
 	  const CellTime& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 bool
 operator>(const CellTime& left,
 	  const CellTime& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 bool
 operator<=(const CellTime& left,
 	   const CellTime& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellTime
 bool
 operator>=(const CellTime& left,
@@ -251,7 +251,7 @@ operator-(const CellTime& left,
 }
 
 // @brief 等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellTime
 inline
 bool
@@ -262,7 +262,7 @@ operator==(const CellTime& left,
 }
 
 // @brief 非等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellTime
 inline
 bool
@@ -273,7 +273,7 @@ operator!=(const CellTime& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellTime
 inline
 bool
@@ -284,7 +284,7 @@ operator<(const CellTime& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellTime
 inline
 bool
@@ -295,7 +295,7 @@ operator>(const CellTime& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellTime
 inline
 bool
@@ -306,7 +306,7 @@ operator<=(const CellTime& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellTime
 inline
 bool

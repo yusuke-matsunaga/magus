@@ -93,8 +93,8 @@ public:
 
   /// @brief ネットワークの削除
   /// @param[in] name 名前
-  /// @param[int] err_out エラー出力
-  /// @retrun name という名のネットワークが存在したら削除して true を返す．
+  /// @param[in] err_out エラー出力
+  /// @return name という名のネットワークが存在したら削除して true を返す．
   /// @note 名前が不適切な場合や存在しない場合にはエラーとなり，false を返す．
   bool
   delete_nethandle(const string& name,

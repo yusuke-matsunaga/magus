@@ -155,7 +155,7 @@ public:
   const CNFdd&
   operator|=(const CNFdd& src);
 
-  /// @brief diff (\f$\setdiff\f$)付き代入
+  /// @brief diff (\f$\setminus\f$)付き代入
   /// @param[in] src オペランド
   /// @return 自分自身
   const CNFdd&
@@ -352,7 +352,6 @@ public:
   support(VarList& support) const;
 
   /// @brief サポート変数集合の要素数の計算
-  /// @param[in] bdd 対象の BDD
   /// @return サポート変数集合の要素数
   ymuint
   support_size() const;
@@ -471,7 +470,7 @@ operator|(const CNFdd& left,
 
 /// @relates CNFdd
 /// @ingroup CNFdd
-/// @brief diff (\f$\setdiff\f$)演算
+/// @brief diff (\f$\setminus\f$)演算
 /// @param[in] left, right オペランド
 /// @return left と right の diff
 CNFdd

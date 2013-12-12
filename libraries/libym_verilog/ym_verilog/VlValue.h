@@ -772,7 +772,6 @@ multi_concat(const list<VlValue>& src_list);
 
 /// @relates VlValue
 /// @brief 繰り返し連結演算
-/// @param[in] rep 繰り返し数
 /// @param[in] src_list 連結する値のリスト
 /// @return src_list[1~n-1] の内容を src_list[0] 回繰り返して連結したもの
 VlValue

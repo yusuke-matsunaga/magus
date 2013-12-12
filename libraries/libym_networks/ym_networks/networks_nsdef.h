@@ -8,6 +8,10 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
+/// @defgroup Networks 回路ネットワークを扱うパッケージ
+///
+///
+
 #include "ymtools.h"
 
 

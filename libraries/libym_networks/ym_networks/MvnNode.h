@@ -131,7 +131,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] module 親のモジュール
+  /// @param[in] parent 親のモジュール
   MvnNode(MvnModule* parent);
 
   /// @brief デストラクタ

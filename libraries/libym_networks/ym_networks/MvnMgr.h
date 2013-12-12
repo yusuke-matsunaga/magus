@@ -73,7 +73,7 @@ public:
 
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
-  /// @note NULL が還されることもある．
+  /// @note NULL が返されることもある．
   const MvnNode*
   node(ymuint id) const;
 
@@ -468,7 +468,7 @@ public:
   /// @note 出力のビット幅は入力のビット幅の和となる．
   MvnNode*
   new_concat(MvnModule* module,
-	     const vector<ymuint>& ibitwidth_arary);
+	     const vector<ymuint>& ibitwidth_array);
 
   /// @brief bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -495,7 +495,7 @@ public:
   /// @brief 可変 bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width1 入力のビット幅
-  /// @param[in] bit_widht2 ビット指定入力のビット幅
+  /// @param[in] bit_width2 ビット指定入力のビット幅
   /// @return 生成したノードを返す．
   MvnNode*
   new_bitselect(MvnModule* module,
@@ -549,7 +549,7 @@ public:
   /// @param[in] src_node 入力元のノード
   /// @param[in] src_pin_pos 入力元のピン番号
   /// @param[in] dst_node 出力先のノード
-  /// @param[in] dst_pin 出力先のピン番号
+  /// @param[in] dst_pin_pos 出力先のピン番号
   /// @retval true 接続が成功した．
   /// @retval false 接続が失敗した．
   /// @note 接続が失敗するのは，
@@ -565,7 +565,7 @@ public:
   /// @param[in] src_node 入力元のノード
   /// @param[in] src_pin_pos 入力元のピン番号
   /// @param[in] dst_node 出力先のノード
-  /// @param[in] dst_pin 出力先のピン番号
+  /// @param[in] dst_pin_pos 出力先のピン番号
   /// @note 現在の実装はあまり効率が良くない．
   void
   disconnect(MvnNode* src_node,

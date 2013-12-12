@@ -28,15 +28,15 @@ public:
 
   /// @brief 種類を表す型
   enum tType {
-    /// @brief <numeral>
+    /// @brief \<numeral\>
     kNumConst,
-    /// @brief <decimal>
+    /// @brief \<decimal\>
     kDecConst,
-    /// @brief <hexadecimal>
+    /// @brief \<hexadecimal\>
     kHexConst,
-    /// @brief <binary>
+    /// @brief \<binary\>
     kBinConst,
-    /// @brief <string>
+    /// @brief \<string\>
     kStrConst,
     /// @brief variable term
     kVarTerm,

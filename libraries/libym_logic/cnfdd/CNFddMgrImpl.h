@@ -111,7 +111,7 @@ public:
   disjunction(CNFddEdge e1,
 	      CNFddEdge e2);
 
-  /// @brief src1 $\setdiff$ src2 を計算する．
+  /// @brief src1 $\setminus$ src2 を計算する．
   CNFddEdge
   diff(CNFddEdge e1,
        CNFddEdge e2);

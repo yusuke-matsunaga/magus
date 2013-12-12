@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLCLASS_H
 #define YM_CELL_CELLCLASS_H
 
-/// @file libym_cell/CellClass.h
+/// @file ym_cell/CellClass.h
 /// @brief CellClass のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

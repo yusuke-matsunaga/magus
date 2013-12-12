@@ -81,13 +81,13 @@ public:
   /// @{
 
   /// @brief サポート変数集合の計算 (VarVector)
-  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @param[out] sup サポート変数集合を格納するベクタ
   /// @return サポートの要素数
   ymuint
   support(VarVector& sup) const;
 
   /// @brief サポート変数集合の計算 (VarList)
-  /// @param[out] support サポート変数集合を格納するベクタ
+  /// @param[out] sup サポート変数集合を格納するベクタ
   /// @return サポートの要素数
   ymuint
   support(VarList& sup) const;

@@ -1,7 +1,7 @@
 #ifndef YM_CELL_CELLRESISTANCE_H
 #define YM_CELL_CELLRESISTANCE_H
 
-/// @file　ym_cell/CellResistance.h
+/// @file ym_cell/CellResistance.h
 /// @brief CellResistance のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -88,56 +88,56 @@ private:
 };
 
 /// @brief 加算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 CellResistance
 operator+(const CellResistance& left,
 	  const CellResistance& right);
 
 /// @brief 減算
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 CellResistance
 operator-(const CellResistance& left,
 	  const CellResistance& right);
 
 /// @brief 等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 bool
 operator==(const CellResistance& left,
 	   const CellResistance& right);
 
 /// @brief 非等価比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 bool
 operator!=(const CellResistance& left,
 	   const CellResistance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 bool
 operator<(const CellResistance& left,
 	  const CellResistance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 bool
 operator>(const CellResistance& left,
 	  const CellResistance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 bool
 operator<=(const CellResistance& left,
 	   const CellResistance& right);
 
 /// @brief 大小比較演算子
-/// @paream[in] left, right オペランド
+/// @param[in] left, right オペランド
 /// @relates CellResistance
 bool
 operator>=(const CellResistance& left,
@@ -254,7 +254,7 @@ operator-(const CellResistance& left,
 }
 
 // @brief 等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellResistance
 inline
 bool
@@ -265,7 +265,7 @@ operator==(const CellResistance& left,
 }
 
 // @brief 非等価比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellResistance
 inline
 bool
@@ -276,7 +276,7 @@ operator!=(const CellResistance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellResistance
 inline
 bool
@@ -287,7 +287,7 @@ operator<(const CellResistance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellResistance
 inline
 bool
@@ -298,7 +298,7 @@ operator>(const CellResistance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellResistance
 inline
 bool
@@ -309,7 +309,7 @@ operator<=(const CellResistance& left,
 }
 
 // @brief 大小比較演算子
-// @paream[in] left, right オペランド
+// @param[in] left, right オペランド
 // @relates CellResistance
 inline
 bool

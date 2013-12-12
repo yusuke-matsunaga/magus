@@ -44,6 +44,9 @@ public:
   /// @brief blif ファイルを読み込む．
   /// @param[in] filename ファイル名
   /// @param[in] network 設定対象のネットワーク
+  /// @param[in] cell_library セルライブラリ
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
   bool
   operator()(const string& filename,
 	     TgNetwork& network,

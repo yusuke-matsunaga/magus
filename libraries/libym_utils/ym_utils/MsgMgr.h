@@ -63,7 +63,7 @@ public:
   /// @param[in] file_loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
+  /// @param[in] msg メッセージ本文
   static
   void
   put_msg(const char* src_file,
@@ -79,7 +79,7 @@ public:
   /// @param[in] file_loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
+  /// @param[in] msg メッセージ本文
   static
   void
   put_msg(const char* src_file,

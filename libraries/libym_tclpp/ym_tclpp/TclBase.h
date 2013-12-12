@@ -817,6 +817,7 @@ public:
   /// @brief 入力ファイルのオープン
   /// @param[out] ifs 開いたファイルの入力ストリームをセットする変数
   /// @param[in] name ファイル名
+  /// @param[in] openmode ファイルを開くときのモード
   /// @retval true オープンに成功した．
   /// @retval false オープンに失敗した．
   ///
@@ -830,6 +831,7 @@ public:
   /// @brief 出力ファイルのオープン
   /// @param[out] ofs 開いたファイルの出力ストリームをセットする変数
   /// @param[in] name ファイル名
+  /// @param[in] openmode ファイルを開くときのモード
   /// @retval true オープンに成功した．
   /// @retval false オープンに失敗した．
   ///

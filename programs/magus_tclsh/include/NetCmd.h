@@ -68,7 +68,7 @@ protected:
   /// @brief コマンド行の引数をパーズする関数．
   /// @param[in] objv 引数の配列
   /// objv で与えられるコマンド行引数のうちで，
-  /// -network <network名> | -nwk <network名>
+  /// -network \<network名\> | -nwk \<network名\>
   /// の形のオプションがあればカレントネットワークのスタックに積む．
   /// その場合には mNetworkSpecified のフラグに true がセットされる．
   /// objv からはこれらのオプション文字列が削除される．

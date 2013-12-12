@@ -696,7 +696,7 @@ public:
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
   /// @return ID 番号が id のノードを返す．
-  /// @retrun 該当するノードが無い場合には NULL を返す．
+  /// @note 該当するノードが無い場合には NULL を返す．
   const SbjNode*
   node(ymuint id) const;
 
@@ -855,35 +855,35 @@ public:
 	  bool inv = false);
 
   /// @brief 出力ノードの内容を変更する
-  /// @param[in] 変更対象の出力ノード
+  /// @param[in] node 変更対象の出力ノード
   /// @param[in] ihandle 入力ハンドル
   void
   change_output(SbjNode* node,
 		SbjHandle ihandle);
 
   /// @brief DFFノードの内容を変更する
-  /// @param[in] 変更対象のDFFノード
+  /// @param[in] node 変更対象のDFFノード
   /// @param[in] ihandle 入力のハンドル
   void
   set_dff_data(SbjNode* node,
 	       SbjHandle ihandle);
 
   /// @brief DFFノードのクロック入力を設定する．
-  /// @param[in] 変更対象のDFFノード
+  /// @param[in] node 変更対象のDFFノード
   /// @param[in] ihandle 入力のハンドル
   void
   set_dff_clock(SbjNode* node,
 		SbjHandle ihandle);
 
   /// @brief DFFノードのセット入力を設定する．
-  /// @param[in] 変更対象のDFFノード
+  /// @param[in] node 変更対象のDFFノード
   /// @param[in] ihandle 入力のハンドル
   void
   set_dff_set(SbjNode* node,
 	      SbjHandle ihandle);
 
   /// @brief DFFノードのリセット入力を設定する．
-  /// @param[in] 変更対象のDFFノード
+  /// @param[in] node 変更対象のDFFノード
   /// @param[in] ihandle 入力のハンドル
   void
   set_dff_rst(SbjNode* node,

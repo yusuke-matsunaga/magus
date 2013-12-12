@@ -1,7 +1,7 @@
 #ifndef YM_LOGIC_LEXP_NSDEF_H
 #define YM_LOGIC_LEXP_NSDEF_H
 
-/// @file ym_lexp/lexp_nsdef.h
+/// @file ym_logic/lexp_nsdef.h
 /// @brief ym_lexp パッケージの基本ヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
