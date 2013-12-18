@@ -23,5 +23,6 @@ IMPORT_TEST_GROUP(libym_utils_PermGenTestGroup);
 IMPORT_TEST_GROUP(libym_utils_SimpleAllocTestGroup);
 IMPORT_TEST_GROUP(libym_utils_UnitAllocTestGroup);
 IMPORT_TEST_GROUP(libym_utils_HeapTreeTestGroup);
+IMPORT_TEST_GROUP(libym_utils_BtgMatchTestGroup);
 
 #endif // YM_UTILS_CPPUTEST_H
