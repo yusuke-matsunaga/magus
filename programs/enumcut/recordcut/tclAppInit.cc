@@ -210,7 +210,6 @@ Tcl_AppInit(Tcl_Interp* interp)
    * they weren't already created by the init procedures called above.
    */
 
-
   /*
    * Specify a user-specific startup file to invoke if the application
    * is run interactively.  Typically the startup file is "~/.apprc"
@@ -218,7 +217,7 @@ Tcl_AppInit(Tcl_Interp* interp)
    * then no user-specific startup file will be run under any conditions.
    */
 
-  Tcl_SetVar(interp, "tcl_rcFileName", "~/.magusrc", TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, "tcl_rcFileName", "~/.tclrc", TCL_GLOBAL_ONLY);
 
   return TCL_OK;
 }
