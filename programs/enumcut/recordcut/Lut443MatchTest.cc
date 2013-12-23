@@ -8,7 +8,10 @@
 
 
 #include "Lut443Match.h"
+#include "GbmNaive.h"
+#include "GbmNaiveOneHot.h"
 #include "ym_utils/RandGen.h"
+#include "ym_utils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -17,17 +20,18 @@ BEGIN_NONAMESPACE
 
 TvFunc
 make_lutfunc(ymuint ni,
+	     ymuint nfi,
 	     const vector<int>& tv,
 	     const vector<TvFunc>& inputs)
 {
-  ymuint nexp = 1U << ni;
+  ymuint nexp = 1U << nfi;
   assert_cond( nexp == tv.size(), __FILE__, __LINE__);
-  assert_cond( ni == inputs.size(), __FILE__, __LINE__);
-  TvFunc func = TvFunc::const_zero(9);
+  assert_cond( nfi == inputs.size(), __FILE__, __LINE__);
+  TvFunc func = TvFunc::const_zero(ni);
   for (ymuint b = 0; b < nexp; ++ b) {
     if ( tv[b] ) {
       TvFunc prod = TvFunc::const_one(9);
-      for (ymuint i = 0; i < ni; ++ i) {
+      for (ymuint i = 0; i < nfi; ++ i) {
 	if ( b & (1U << i) ) {
 	  prod &= inputs[i];
 	}
@@ -41,32 +45,35 @@ make_lutfunc(ymuint ni,
   return func;
 }
 
-END_NONAMESPACE
-
-
-int
-Lut443MatchTest(int argc,
-		const char** argv)
+void
+test_common(GbmSolver& solver,
+	    ymuint id_list[])
 {
+  ymuint ni = 0;
+  for (ymuint i = 0; i < 9; ++ i) {
+    ymuint id = id_list[i];
+    if ( ni < id ) {
+      ni = id;
+    }
+  }
+  ++ ni;
+
   RandGen rg;
+  RandPermGen rpg(ni);
   Lut443Match matcher;
 
-  vector<TvFunc> inputs(9);
-  for (ymuint i = 0; i < 9; ++ i) {
-    inputs[i] = TvFunc::posi_literal(9, VarId(i));
+  vector<TvFunc> orig_inputs(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    orig_inputs[i] = TvFunc::posi_literal(ni, VarId(i));
   }
-
-#if 0
-  TvFunc and9 = TvFunc::const_one(9);
-  for (ymuint i = 0; i < 9; ++ i) {
-    and9 &= inputs[i];
-  }
-  if ( !matcher.match(and9) ) {
-    cout << "Error on and9" << endl;
-  }
-#endif
 
   for (ymuint i = 0; i < 10; ++ i) {
+    vector<TvFunc> inputs(ni);
+    rpg.generate(rg);
+    for (ymuint j = 0; j < ni; ++ j) {
+      inputs[j] = orig_inputs[rpg.elem(j)];
+    }
+
     vector<int> tv1(16);
     for (ymuint b = 0; b < 16; ++ b) {
       tv1[b] = rg.int32() & 1;
@@ -83,30 +90,167 @@ Lut443MatchTest(int argc,
     }
 
     vector<TvFunc> inputs1(4);
-    inputs1[0] = inputs[0];
-    inputs1[1] = inputs[1];
-    inputs1[2] = inputs[2];
-    inputs1[3] = inputs[3];
-    TvFunc lut1 = make_lutfunc(4, tv1, inputs1);
+    inputs1[0] = inputs[id_list[0]];
+    inputs1[1] = inputs[id_list[1]];
+    inputs1[2] = inputs[id_list[2]];
+    inputs1[3] = inputs[id_list[3]];
+    TvFunc lut1 = make_lutfunc(ni, 4, tv1, inputs1);
 
     vector<TvFunc> inputs2(4);
-    inputs2[0] = inputs[4];
-    inputs2[1] = inputs[5];
-    inputs2[2] = inputs[6];
-    inputs2[3] = inputs[7];
-    TvFunc lut2 = make_lutfunc(4, tv2, inputs2);
+    inputs2[0] = inputs[id_list[4]];
+    inputs2[1] = inputs[id_list[5]];
+    inputs2[2] = inputs[id_list[6]];
+    inputs2[3] = inputs[id_list[7]];
+    TvFunc lut2 = make_lutfunc(ni, 4, tv2, inputs2);
 
     vector<TvFunc> inputs3(3);
     inputs3[0] = lut1;
     inputs3[1] = lut2;
-    inputs3[2] = inputs[8];
-    TvFunc lut3 = make_lutfunc(3, tv3, inputs3);
+    inputs3[2] = inputs[id_list[8]];
+    TvFunc lut3 = make_lutfunc(ni, 3, tv3, inputs3);
 
-    bool stat = matcher.match(lut3);
+    bool stat = matcher.match(lut3, solver);
     if ( !stat ) {
       cout << "Error: " << lut3 << endl;
     }
   }
+}
+
+END_NONAMESPACE
+
+
+void
+A0Test(GbmSolver& solver)
+{
+  cout << "A0 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+  test_common(solver, id_list);
+
+  cout << "A0 test end" << endl << endl;
+}
+
+void
+A1Test(GbmSolver& solver)
+{
+  cout << "A1 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 0, 4, 5, 6, 7 };
+  test_common(solver, id_list);
+
+  cout << "A1 test end" << endl << endl;
+}
+
+void
+A2Test(GbmSolver& solver)
+{
+  cout << "A2 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 0, 1, 4, 5, 6 };
+  test_common(solver, id_list);
+
+  cout << "A2 test end" << endl << endl;
+}
+
+void
+A3Test(GbmSolver& solver)
+{
+  cout << "A3 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 0, 1, 2, 4, 5 };
+  test_common(solver, id_list);
+
+  cout << "A3 test end" << endl << endl;
+}
+
+void
+B0Test(GbmSolver& solver)
+{
+  cout << "B0 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0 };
+  test_common(solver, id_list);
+
+  cout << "B0 test end" << endl << endl;
+}
+
+void
+B1Test(GbmSolver& solver)
+{
+  cout << "B1 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 1, 4, 5, 6, 0 };
+  test_common(solver, id_list);
+
+  cout << "B1 test end" << endl << endl;
+}
+
+void
+B2Test(GbmSolver& solver)
+{
+  cout << "B2 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 1, 2, 4, 5, 0 };
+  test_common(solver, id_list);
+
+  cout << "B2 test end" << endl << endl;
+}
+
+void
+C0Test(GbmSolver& solver)
+{
+  cout << "C0 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0 };
+  test_common(solver, id_list);
+
+  cout << "C0 test end" << endl << endl;
+}
+
+void
+C1Test(GbmSolver& solver)
+{
+  cout << "C1 test" << endl;
+
+  ymuint id_list[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0 };
+  test_common(solver, id_list);
+
+  cout << "C0 test end" << endl << endl;
+}
+
+int
+Lut443MatchTest(int argc,
+		const char** argv)
+{
+  GbmSolver* solver = NULL;
+  if ( argc > 1 ) {
+    if ( strcmp(argv[1], "naive_binary") == 0 ) {
+      solver = new GbmNaive();
+    }
+    else if ( strcmp(argv[1], "naive_onehot") == 0 ) {
+      solver = new GbmNaiveOneHot();
+    }
+    else {
+      cerr << "Illegal method: " << argv[0] << endl;
+      return -1;
+    }
+  }
+  if ( solver == NULL ) {
+    // fall-back
+    solver = new GbmNaive();
+  }
+
+  A0Test(*solver);
+  A1Test(*solver);
+  A2Test(*solver);
+  A3Test(*solver);
+  B0Test(*solver);
+  B1Test(*solver);
+  B2Test(*solver);
+  C0Test(*solver);
+  C1Test(*solver);
+
+  delete solver;
 
   return 0;
 }

@@ -23,6 +23,8 @@
 #include "FuncRec.h"
 
 #include "Lut443Match.h"
+#include "GbmNaive.h"
+#include "GbmNaiveOneHot.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -41,7 +43,8 @@ rec_func(FuncMgr& func_mgr,
 	 bool blif,
 	 bool iscas89,
 	 ymuint min_cut_size,
-	 ymuint max_cut_size)
+	 ymuint max_cut_size,
+	 const string& method)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
@@ -81,15 +84,32 @@ rec_func(FuncMgr& func_mgr,
     cout << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
 
+  GbmSolver* solver = NULL;
+  if ( method == "naive_binary" ) {
+    solver = new GbmNaive();
+  }
+  else if ( method == "naive_onehot" ) {
+    solver = new GbmNaiveOneHot();
+  }
+  else if ( method != string() ) {
+    cerr << "Illegal method: " << method << endl;
+    return;
+  }
+  if ( solver == NULL ) {
+    solver = new GbmNaive();
+  }
+
   StopWatch timer;
   timer.start();
   Lut443Match matcher;
   for (vector<TvFunc>::const_iterator p = func_list.begin();
        p != func_list.end(); ++ p) {
-    matcher.match(*p);
+    matcher.match(*p, *solver);
   }
   timer.stop();
   cout << "Total CPUT time " << timer.time() << endl;
+
+  delete solver;
 
 #if 0
   const list<Cut*>& cut_list = cut_mgr.cut_list();
@@ -163,6 +183,7 @@ main(int argc,
   bool iscas = false;
   int max_cut_size = -1;
   int min_cut_size = -1;
+  char* method_str = NULL;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -184,6 +205,9 @@ main(int argc,
 
     { "min_cut_size", 'c', POPT_ARG_INT, &min_cut_size, 0,
       "specify minimum cut size", NULL },
+
+    { "method", 'm', POPT_ARG_STRING, &method_str, 0,
+      "specify matcing method", NULL },
 
     POPT_AUTOHELP
 
@@ -231,6 +255,11 @@ main(int argc,
     }
   }
 
+  string method;
+  if ( method_str != NULL ) {
+    method = method_str;
+  }
+
   if ( !blif && !iscas ) {
     blif = true;
   }
@@ -245,7 +274,7 @@ main(int argc,
   FuncMgr func_mgr;
 
   string filename(str);
-  rec_func(func_mgr, filename, blif, iscas, min_cut_size, max_cut_size);
+  rec_func(func_mgr, filename, blif, iscas, min_cut_size, max_cut_size, method);
 
   return 0;
 }

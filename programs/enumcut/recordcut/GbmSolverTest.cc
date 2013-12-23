@@ -8,7 +8,7 @@
 
 
 #include "GbmSolver.h"
-#include "GbmMgr.h"
+#include "RcfNetwork.h"
 
 #include "GbmNaive.h"
 
@@ -18,29 +18,31 @@ BEGIN_NAMESPACE_YM
 bool
 and9_test()
 {
-  GbmMgr mgr;
+  RcfNetwork network;
 
-  vector<GbmNodeHandle> inputs(9);
+  vector<RcfNodeHandle> inputs(9);
   for (ymuint i = 0; i < 9; ++ i) {
-    inputs[i] = mgr.new_input();
+    inputs[i] = network.new_input();
   }
 
-  vector<GbmNodeHandle> fanin1(4);
+  vector<RcfNodeHandle> fanin1(4);
   for (ymuint i = 0; i < 4; ++ i) {
     fanin1[i] = inputs[i];
   }
-  GbmNodeHandle lut1 = mgr.new_lut(fanin1);
+  RcfNodeHandle lut1 = network.new_lut(fanin1);
 
   for (ymuint i = 0; i < 4; ++ i) {
     fanin1[i] = inputs[i + 4];
   }
-  GbmNodeHandle lut2 = mgr.new_lut(fanin1);
+  RcfNodeHandle lut2 = network.new_lut(fanin1);
 
-  vector<GbmNodeHandle> fanin2(3);
+  vector<RcfNodeHandle> fanin2(3);
   fanin2[0] = lut1;
   fanin2[1] = lut2;
   fanin2[2] = inputs[8];
-  GbmNodeHandle lut3 = mgr.new_lut(fanin2);
+  RcfNodeHandle lut3 = network.new_lut(fanin2);
+
+  network.set_output(lut3);
 
   TvFunc and9 = TvFunc::const_one(9);
   for (ymuint i = 0; i < 9; ++ i) {
@@ -51,10 +53,10 @@ and9_test()
   GbmNaive solver;
   vector<bool> conf_bits;
   vector<ymuint> iorder;
-  bool stat = solver.solve(mgr, lut3, and9, conf_bits, iorder);
+  bool stat = solver.solve(network, and9, conf_bits, iorder);
   if ( stat ) {
     cout << "Match succeed" << endl;
-    ymuint nc = mgr.conf_var_num();
+    ymuint nc = network.conf_var_num();
     for (ymuint i = 0; i < nc; ++ i) {
       cout << " C#" << i << ": " << conf_bits[i] << endl;
     }
@@ -70,21 +72,23 @@ int
 GbmSolverTest(int argc,
 	      const char** argv)
 {
-  GbmMgr mgr;
+  RcfNetwork network;
 
-  GbmNodeHandle i1 = mgr.new_input();
-  GbmNodeHandle i2 = mgr.new_input();
-  GbmNodeHandle i3 = mgr.new_input();
+  RcfNodeHandle i1 = network.new_input();
+  RcfNodeHandle i2 = network.new_input();
+  RcfNodeHandle i3 = network.new_input();
 
-  vector<GbmNodeHandle> inputs1(2);
+  vector<RcfNodeHandle> inputs1(2);
   inputs1[0] = i1;
   inputs1[1] = i2;
-  GbmNodeHandle lut1 = mgr.new_lut(inputs1);
+  RcfNodeHandle lut1 = network.new_lut(inputs1);
 
-  vector<GbmNodeHandle> inputs2(2);
+  vector<RcfNodeHandle> inputs2(2);
   inputs2[0] = i3;
   inputs2[1] = lut1;
-  GbmNodeHandle lut2 = mgr.new_lut(inputs2);
+  RcfNodeHandle lut2 = network.new_lut(inputs2);
+
+  network.set_output(lut2);
 
   vector<int> tv(8);
   tv[0] = 0;
@@ -100,14 +104,14 @@ GbmSolverTest(int argc,
   GbmNaive solver;
   vector<bool> conf_bits;
   vector<ymuint> iorder;
-  bool stat = solver.solve(mgr, lut2, func, conf_bits, iorder);
+  bool stat = solver.solve(network, func, conf_bits, iorder);
   if ( stat ) {
     cout << "Match succeed" << endl;
-    ymuint nc = mgr.conf_var_num();
+    ymuint nc = network.conf_var_num();
     for (ymuint i = 0; i < nc; ++ i) {
       cout << " C#" << i << ": " << conf_bits[i] << endl;
     }
-    ymuint ni = mgr.input_num();
+    ymuint ni = network.input_num();
     for (ymuint i = 0; i < ni; ++ i) {
       cout << " I#" << i << ": " << iorder[i] << endl;
     }

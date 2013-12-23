@@ -9,8 +9,9 @@
 /// All rights reserved.
 
 
-#include "GbmMgr.h"
+#include "RcfNetwork.h"
 #include "ym_logic/TvFunc.h"
+#include "GbmSolver.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -37,8 +38,10 @@ public:
 
   /// @brief 与えられた関数を LUT ネットワークで実現できるか調べる．
   /// @param[in] func 対象の関数
+  /// @param[in] solver GBM ソルバ
   bool
-  match(const TvFunc& func);
+  match(const TvFunc& func,
+	GbmSolver& solver);
 
 
 private:
@@ -46,35 +49,32 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // LUT ネットワークを管理するクラス
-  GbmMgr mMgr;
+  // A0
+  RcfNetwork mA0;
 
-  // A0 の出力
-  GbmNodeHandle mA0Root;
+  // A1
+  RcfNetwork mA1;
 
-  // A1 の出力
-  GbmNodeHandle mA1Root;
+  // A2
+  RcfNetwork mA2;
 
-  // A2 の出力
-  GbmNodeHandle mA2Root;
+  // A3
+  RcfNetwork mA3;
 
-  // A3 の出力
-  GbmNodeHandle mA3Root;
+  // B0
+  RcfNetwork mB0;
 
-  // B0 の出力
-  GbmNodeHandle mB0Root;
+  // B1
+  RcfNetwork mB1;
 
-  // B1 の出力
-  GbmNodeHandle mB1Root;
+  // B2
+  RcfNetwork mB2;
 
-  // B2 の出力p
-  GbmNodeHandle mB2Root;
+  // C0
+  RcfNetwork mC0;
 
-  // C1 の出力
-  GbmNodeHandle mC1Root;
-
-  // C2 の出力
-  GbmNodeHandle mC2Root;
+  // C1
+  RcfNetwork mC1;
 
 };
 

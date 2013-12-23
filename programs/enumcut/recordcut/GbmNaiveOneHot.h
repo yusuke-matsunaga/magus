@@ -1,8 +1,8 @@
-#ifndef GBMNAIVE_H
-#define GBMNAIVE_H
+#ifndef GBMNAIVEONEHOT_H
+#define GBMNAIVEONEHOT_H
 
-/// @file GbmNaive.h
-/// @brief GbmNaive のヘッダファイル
+/// @file GbmNaiveOneHot.h
+/// @brief GbmNaiveOneHot のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -19,19 +19,19 @@ BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class GbmNaive GbmNaive.h "GbmNaive.h"
-/// @brief 単純な GbmSolver
+/// @brief 単純な GbmSolver (one-hot encoding)
 //////////////////////////////////////////////////////////////////////
-class GbmNaive :
+class GbmNaiveOneHot :
   public GbmSolver
 {
 public:
 
   /// @brief コンストラクタ
-  GbmNaive();
+  GbmNaiveOneHot();
 
   /// @brief デストラクタ
   virtual
-  ~GbmNaive();
+  ~GbmNaiveOneHot();
 
 
 private:
@@ -51,7 +51,6 @@ private:
 
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] network RcfNetwork
-  /// @param[in] output Reconfigurable Network の出力
   /// @param[in] func マッチング対象の関数
   /// @param[out] conf_bits configuration ビットの値を収める配列
   /// @param[out] iorder 入力順序
@@ -99,4 +98,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // GBMNAIVE_H
+#endif // GBMNAIVEONEHOT_H

@@ -26,18 +26,20 @@ libgbm_la_CPPFLAGS = \
 	-I$(top_srcdir)/include
 
 libgbm_la_SOURCES = \
-	GbmMgr.h \
-	GbmMgr.cc \
-	GbmNode.h \
-	GbmNodeImpl.h \
-	GbmNodeImpl.cc \
-	GbmVar.h \
 	GbmEngine.h \
 	GbmEngine.cc \
 	GbmSolver.h \
 	GbmSolver.cc \
 	GbmNaive.h \
 	GbmNaive.cc \
+	GbmNaiveOneHot.h \
+	GbmNaiveOneHot.cc \
+	RcfNetwork.h \
+	RcfNetwork.cc \
+	RcfNode.h \
+	RcfNodeImpl.h \
+	RcfNodeImpl.cc \
+	RcfNodeHandle.h \
 	Lut443Match.h \
 	Lut443Match.cc
 

@@ -1,35 +1,35 @@
-#ifndef GBMMGR_H
-#define GBMMGR_H
+#ifndef RCFNETWORK_H
+#define RCFNETWORK_H
 
-/// @file GbmMgr.h
-/// @brief GbmMgr のヘッダファイル
+/// @file RcfNetwork.h
+/// @brief RcfNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNodeHandle.h"
+#include "RcfNodeHandle.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM
 
-class GbmNode;
+class RcfNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmMgr GbmMgr.h "GbmMgr.h"
-/// @brief Generilized Boolean Matcher
+/// @class RcfNetwork RcfNetwork.h "RcfNetwork.h"
+/// @brief Reconfigurable Network を表すクラス
 //////////////////////////////////////////////////////////////////////
-class GbmMgr
+class RcfNetwork
 {
 public:
 
   /// @brief コンストラクタ
-  GbmMgr();
+  RcfNetwork();
 
   /// @brief デストラクタ
-  ~GbmMgr();
+  ~RcfNetwork();
 
 
 public:
@@ -39,53 +39,58 @@ public:
 
   /// @brief 外部入力ノードを作る．
   /// @return 作成したノードのハンドルを返す．
-  GbmNodeHandle
+  RcfNodeHandle
   new_input();
 
   /// @brief ANDゲートを作る．
   /// @param[in] input0 ファンイン0のハンドル
   /// @param[in] input1 ファンイン0のハンドル
   /// @return 作成したノードのハンドルを返す．
-  GbmNodeHandle
-  new_and(GbmNodeHandle input0,
-	  GbmNodeHandle input1);
+  RcfNodeHandle
+  new_and(RcfNodeHandle input0,
+	  RcfNodeHandle input1);
 
   /// @brief ORゲートを作る．
   /// @param[in] input0 ファンイン0のハンドル
   /// @param[in] input1 ファンイン0のハンドル
   /// @return 作成したノードのハンドルを返す．
-  GbmNodeHandle
-  new_or(GbmNodeHandle input0,
-	 GbmNodeHandle input1);
+  RcfNodeHandle
+  new_or(RcfNodeHandle input0,
+	 RcfNodeHandle input1);
 
   /// @brief XORゲートを作る．
   /// @param[in] input0 ファンイン0のハンドル
   /// @param[in] input1 ファンイン0のハンドル
   /// @return 作成したノードのハンドルを返す．
-  GbmNodeHandle
-  new_xor(GbmNodeHandle input0,
-	  GbmNodeHandle input1);
+  RcfNodeHandle
+  new_xor(RcfNodeHandle input0,
+	  RcfNodeHandle input1);
 
   /// @brief XNORゲートを作る．
   /// @param[in] input0 ファンイン0のハンドル
   /// @param[in] input1 ファンイン0のハンドル
   /// @return 作成したノードのハンドルを返す．
-  GbmNodeHandle
-  new_xnor(GbmNodeHandle input0,
-	   GbmNodeHandle input1);
+  RcfNodeHandle
+  new_xnor(RcfNodeHandle input0,
+	   RcfNodeHandle input1);
 
   /// @brief LUTを作る．
   /// @param[in] inputs ファンインのハンドルのリスト
   /// @return 作成したノードのハンドルを返す．
-  GbmNodeHandle
-  new_lut(const vector<GbmNodeHandle>& inputs);
+  RcfNodeHandle
+  new_lut(const vector<RcfNodeHandle>& inputs);
 
   /// @brief MUXを作る．
   /// @param[in] inputs ファンインのハンドルのリスト
   /// @return 作成したノードのハンドルを返す．
   /// @note inputs のサイズが2のべき乗でないときは0でパディングされる．
-  GbmNodeHandle
-  new_mux(const vector<GbmNodeHandle>& inputs);
+  RcfNodeHandle
+  new_mux(const vector<RcfNodeHandle>& inputs);
+
+  /// @brief 外部出力をセットする．
+  /// @param[in] handle 出力にするハンドル
+  void
+  set_output(RcfNodeHandle handle);
 
 
 public:
@@ -100,7 +105,7 @@ public:
 
   /// @brief ノードを返す．
   /// @param[in] id ID番号 ( 0 <= id < node_num() )
-  const GbmNode*
+  const RcfNode*
   node(ymuint id) const;
 
   /// @brief 外部入力数を返す．
@@ -109,7 +114,7 @@ public:
 
   /// @brief 外部入力ノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-  const GbmNode*
+  const RcfNode*
   input_node(ymuint pos) const;
 
   /// @brief ANDノード数を返す．
@@ -118,7 +123,7 @@ public:
 
   /// @brief ANDノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < and_num() )
-  const GbmNode*
+  const RcfNode*
   and_node(ymuint pos) const;
 
   /// @brief LUTノード数を返す．
@@ -127,7 +132,7 @@ public:
 
   /// @brief LUTノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < lut_num() )
-  const GbmNode*
+  const RcfNode*
   lut_node(ymuint pos) const;
 
   /// @brief MUXノード数を返す．
@@ -136,18 +141,25 @@ public:
 
   /// @brief MUXノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < mux_num() )
-  const GbmNode*
+  const RcfNode*
   mux_node(ymuint pos) const;
+
+  /// @brief 機能ノード(外部入力以外のノード)数を返す．
+  ymuint
+  fnode_num() const;
+
+  /// @brief 機能ノードを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < fnode_num() )
+  const RcfNode*
+  fnode(ymuint pos) const;
+
+  /// @brief 外部出力のハンドルを返す．
+  RcfNodeHandle
+  output() const;
 
   /// @brief configuration 変数の数を返す．
   ymuint
   conf_var_num() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
 
 private:
@@ -158,20 +170,26 @@ private:
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
-  // 全ての GbmNode を格納するベクタ
-  vector<GbmNode*> mNodeList;
+  // 全ての RcfNode を格納するベクタ
+  vector<RcfNode*> mNodeList;
 
   // 入力ノードを格納するベクタ
-  vector<GbmNode*> mInputList;
+  vector<RcfNode*> mInputList;
 
   // ANDノードを格納するベクタ
-  vector<GbmNode*> mAndList;
+  vector<RcfNode*> mAndList;
 
   // LUTノードを格納するベクタ
-  vector<GbmNode*> mLutList;
+  vector<RcfNode*> mLutList;
 
   // MUXノードを格納するベクタ
-  vector<GbmNode*> mMuxList;
+  vector<RcfNode*> mMuxList;
+
+  // 機能ノードを格納するベクタ
+  vector<RcfNode*> mFnodeList;
+
+  // 外部出力のハンドル
+  RcfNodeHandle mOutput;
 
   // 次の configuration 変数番号
   ymuint32 mNextConfVar;
@@ -188,9 +206,9 @@ private:
 // @param[in] input1 ファンイン0のハンドル
 // @return 作成したノードのハンドルを返す．
 inline
-GbmNodeHandle
-GbmMgr::new_or(GbmNodeHandle input0,
-	       GbmNodeHandle input1)
+RcfNodeHandle
+RcfNetwork::new_or(RcfNodeHandle input0,
+		   RcfNodeHandle input1)
 {
   return ~new_and(~input0, ~input1);
 }
@@ -200,12 +218,12 @@ GbmMgr::new_or(GbmNodeHandle input0,
 // @param[in] input1 ファンイン0のハンドル
 // @return 作成したノードのハンドルを返す．
 inline
-GbmNodeHandle
-GbmMgr::new_xor(GbmNodeHandle input0,
-		GbmNodeHandle input1)
+RcfNodeHandle
+RcfNetwork::new_xor(RcfNodeHandle input0,
+		    RcfNodeHandle input1)
 {
-  GbmNodeHandle n1 = new_and( input0, ~input1);
-  GbmNodeHandle n2 = new_and(~input0,  input1);
+  RcfNodeHandle n1 = new_and( input0, ~input1);
+  RcfNodeHandle n2 = new_and(~input0,  input1);
   return new_or(n1, n2);
 }
 
@@ -214,15 +232,15 @@ GbmMgr::new_xor(GbmNodeHandle input0,
 // @param[in] input1 ファンイン0のハンドル
 // @return 作成したノードのハンドルを返す．
 inline
-GbmNodeHandle
-GbmMgr::new_xnor(GbmNodeHandle input0,
-		 GbmNodeHandle input1)
+RcfNodeHandle
+RcfNetwork::new_xnor(RcfNodeHandle input0,
+		     RcfNodeHandle input1)
 {
-  GbmNodeHandle n1 = new_and( input0,  input1);
-  GbmNodeHandle n2 = new_and(~input0, ~input1);
+  RcfNodeHandle n1 = new_and( input0,  input1);
+  RcfNodeHandle n2 = new_and(~input0, ~input1);
   return new_or(n1, n2);
 }
 
 END_NAMESPACE_YM
 
-#endif // GBMMGR_H
+#endif // RCFNETWORK_H

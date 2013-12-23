@@ -1,35 +1,35 @@
-#ifndef GBMNODEIMPL_H
-#define GBMNODEIMPL_H
+#ifndef RCFNODEIMPL_H
+#define RCFNODEIMPL_H
 
-/// @file GbmNodeImpl.h
-/// @brief GbmNodeImpl のヘッダファイル
+/// @file RcfNodeImpl.h
+/// @brief RcfNodeImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNode.h"
+#include "RcfNode.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmNodeImpl GbmNodeImpl.h "GbmNodeImpl.h"
-/// @brief GbmNode の実装クラス
+/// @class RcfNodeImpl RcfNodeImpl.h "RcfNodeImpl.h"
+/// @brief RcfNode の実装クラス
 //////////////////////////////////////////////////////////////////////
-class GbmNodeImpl :
-  public GbmNode
+class RcfNodeImpl :
+  public RcfNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
-  GbmNodeImpl(ymuint id);
+  RcfNodeImpl(ymuint id);
 
   /// @brief デストラクタ
   virtual
-  ~GbmNodeImpl();
+  ~RcfNodeImpl();
 
 
 public:
@@ -78,7 +78,7 @@ public:
   /// @brief ファンインのハンドルを返す．
   /// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
   virtual
-  GbmNodeHandle
+  RcfNodeHandle
   fanin(ymuint pos) const;
 
   /// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
@@ -104,23 +104,23 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmInputNode GbmNodeImpl.h "GbmNodeImpl.h"
+/// @class RcfInputNode RcfNodeImpl.h "RcfNodeImpl.h"
 /// @brief 外部入力ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class GbmInputNode :
-  public GbmNodeImpl
+class RcfInputNode :
+  public RcfNodeImpl
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] input_id 入力番号
-  GbmInputNode(ymuint id,
+  RcfInputNode(ymuint id,
 	       ymuint input_id);
 
   /// @brief デストラクタ
   virtual
-  ~GbmInputNode();
+  ~RcfInputNode();
 
 
 public:
@@ -158,24 +158,24 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmAndNode GbmNodeImpl.h "GbmNodeImpl.h"
+/// @class RcfAndNode RcfNodeImpl.h "RcfNodeImpl.h"
 /// @brief AND ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class GbmAndNode :
-  public GbmNodeImpl
+class RcfAndNode :
+  public RcfNodeImpl
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] fanin0, fanin1 ファンインのハンドル
-  GbmAndNode(ymuint id,
-	     GbmNodeHandle fanin0,
-	     GbmNodeHandle fanin1);
+  RcfAndNode(ymuint id,
+	     RcfNodeHandle fanin0,
+	     RcfNodeHandle fanin1);
 
   /// @brief デストラクタ
   virtual
-  ~GbmAndNode();
+  ~RcfAndNode();
 
 
 public:
@@ -198,7 +198,7 @@ public:
   /// @brief ファンインのハンドルを返す．
   /// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
   virtual
-  GbmNodeHandle
+  RcfNodeHandle
   fanin(ymuint pos) const;
 
   /// @brief 関数を計算する．
@@ -214,17 +214,17 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ファンインの配列
-  GbmNodeHandle mFanin[2];
+  RcfNodeHandle mFanin[2];
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmLutNode GbmNodeImpl.h "GbmNodeImpl.h"
+/// @class RcfLutNode RcfNodeImpl.h "RcfNodeImpl.h"
 /// @brief LUT ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class GbmLutNode :
-  public GbmNodeImpl
+class RcfLutNode :
+  public RcfNodeImpl
 {
 public:
 
@@ -232,13 +232,13 @@ public:
   /// @param[in] id ID番号
   /// @param[in] conf_base configuration 変数の基底
   /// @param[in] fanin_list ファンインのリスト
-  GbmLutNode(ymuint id,
+  RcfLutNode(ymuint id,
 	     ymuint conf_base,
-	     const vector<GbmNodeHandle>& fanin_list);
+	     const vector<RcfNodeHandle>& fanin_list);
 
   /// @brief デストラクタ
   virtual
-  ~GbmLutNode();
+  ~RcfLutNode();
 
 
 public:
@@ -261,7 +261,7 @@ public:
   /// @brief ファンインのハンドルを返す．
   /// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
   virtual
-  GbmNodeHandle
+  RcfNodeHandle
   fanin(ymuint pos) const;
 
   /// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
@@ -293,17 +293,17 @@ private:
   ymuint32 mFaninNum;
 
   // ファンインの配列
-  GbmNodeHandle mFanin[1];
+  RcfNodeHandle mFanin[1];
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmMuxNode GbmNodeImpl.h "GbmNodeImpl.h"
+/// @class RcfMuxNode RcfNodeImpl.h "RcfNodeImpl.h"
 /// @brief MUX ノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class GbmMuxNode :
-  public GbmNodeImpl
+class RcfMuxNode :
+  public RcfNodeImpl
 {
 public:
 
@@ -311,13 +311,13 @@ public:
   /// @param[in] id ID番号
   /// @param[in] conf_base configuration 変数の基底
   /// @param[in] fanin_list ファンインのリスト
-  GbmMuxNode(ymuint id,
+  RcfMuxNode(ymuint id,
 	     ymuint conf_base,
-	     const vector<GbmNodeHandle>& fanin_list);
+	     const vector<RcfNodeHandle>& fanin_list);
 
   /// @brief デストラクタ
   virtual
-  ~GbmMuxNode();
+  ~RcfMuxNode();
 
 
 public:
@@ -340,7 +340,7 @@ public:
   /// @brief ファンインのハンドルを返す．
   /// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
   virtual
-  GbmNodeHandle
+  RcfNodeHandle
   fanin(ymuint pos) const;
 
   /// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
@@ -375,10 +375,10 @@ private:
   ymuint32 mFaninNum;
 
   // ファンインの配列
-  GbmNodeHandle mFanin[1];
+  RcfNodeHandle mFanin[1];
 
 };
 
 END_NAMESPACE_YM
 
-#endif // GBMNODEIMPL_H
+#endif // RCFNODEIMPL_H

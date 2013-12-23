@@ -1,31 +1,31 @@
-#ifndef GBMNODE_H
-#define GBMNODE_H
+#ifndef RCFNODE_H
+#define RCFNODE_H
 
-/// @file GbmNode.h
-/// @brief GbmNode のヘッダファイル
+/// @file RcfNode.h
+/// @brief RcfNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNodeHandle.h"
+#include "RcfNodeHandle.h"
 #include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmNode GbmNode.h "GbmNode.h"
-/// @brief Gbm で用いるノードを表すクラス
+/// @class RcfNode RcfNode.h "RcfNode.h"
+/// @brief Rcf で用いるノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class GbmNode
+class RcfNode
 {
 public:
 
   /// @brief デストラクタ
   virtual
-  ~GbmNode() { }
+  ~RcfNode() { }
 
 
 public:
@@ -74,7 +74,7 @@ public:
   /// @brief ファンインのハンドルを返す．
   /// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
   virtual
-  GbmNodeHandle
+  RcfNodeHandle
   fanin(ymuint pos) const = 0;
 
   /// @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
@@ -96,4 +96,4 @@ public:
 
 END_NAMESPACE_YM
 
-#endif // YM_GBM_GBMNODE_H
+#endif // RCFNODE_H

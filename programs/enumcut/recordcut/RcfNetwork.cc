@@ -1,113 +1,124 @@
 
-/// @file GbmMgr.cc
-/// @brief GbmMgr の実装ファイル
+/// @file RcfNetwork.cc
+/// @brief RcfNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmMgr.h"
-#include "GbmNodeImpl.h"
+#include "RcfNetwork.h"
+#include "RcfNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmMgr
+// クラス RcfNetwork
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmMgr::GbmMgr() :
+RcfNetwork::RcfNetwork() :
   mAlloc(4096)
 {
   mNextConfVar =0;
 }
 
 // @brief デストラクタ
-GbmMgr::~GbmMgr()
+RcfNetwork::~RcfNetwork()
 {
 }
 
 // @brief 外部入力ノードを作る．
 // @return 作成したノードのハンドルを返す．
-GbmNodeHandle
-GbmMgr::new_input()
+RcfNodeHandle
+RcfNetwork::new_input()
 {
   ymuint id = mNodeList.size();
   ymuint input_id = mInputList.size();
 
-  void* p = mAlloc.get_memory(sizeof(GbmInputNode));
-  GbmNode* node = new (p) GbmInputNode(id, input_id);
+  void* p = mAlloc.get_memory(sizeof(RcfInputNode));
+  RcfNode* node = new (p) RcfInputNode(id, input_id);
   mNodeList.push_back(node);
   mInputList.push_back(node);
-  return GbmNodeHandle(node->id(), false);
+  return RcfNodeHandle(node->id(), false);
 }
 
 // @brief ANDゲートを作る．
 // @param[in] input0 ファンイン0のハンドル
 // @param[in] input1 ファンイン0のハンドル
 // @return 作成したノードのハンドルを返す．
-GbmNodeHandle
-GbmMgr::new_and(GbmNodeHandle input0,
-		GbmNodeHandle input1)
+RcfNodeHandle
+RcfNetwork::new_and(RcfNodeHandle input0,
+		    RcfNodeHandle input1)
 {
   ymuint id = mNodeList.size();
 
-  void* p = mAlloc.get_memory(sizeof(GbmAndNode));
-  GbmNode* node = new (p) GbmAndNode(id, input0, input1);
+  void* p = mAlloc.get_memory(sizeof(RcfAndNode));
+  RcfNode* node = new (p) RcfAndNode(id, input0, input1);
   mNodeList.push_back(node);
   mAndList.push_back(node);
-  return GbmNodeHandle(node->id(), false);
+  mFnodeList.push_back(node);
+  return RcfNodeHandle(node->id(), false);
 }
 
 // @brief LUTを作る．
 // @param[in] inputs ファンインのハンドルのリスト
 // @return 作成したノードのハンドルを返す．
-GbmNodeHandle
-GbmMgr::new_lut(const vector<GbmNodeHandle>& inputs)
+RcfNodeHandle
+RcfNetwork::new_lut(const vector<RcfNodeHandle>& inputs)
 {
   ymuint id = mNodeList.size();
 
   ymuint n = inputs.size();
-  void* p = mAlloc.get_memory(sizeof(GbmLutNode) + sizeof(GbmNodeHandle) * (n - 1));
-  GbmNode* node = new (p) GbmLutNode(id, mNextConfVar, inputs);
+  void* p = mAlloc.get_memory(sizeof(RcfLutNode) + sizeof(RcfNodeHandle) * (n - 1));
+  RcfNode* node = new (p) RcfLutNode(id, mNextConfVar, inputs);
   mNodeList.push_back(node);
   mLutList.push_back(node);
+  mFnodeList.push_back(node);
   mNextConfVar += node->conf_size();
-  return GbmNodeHandle(node->id(), false);
+  return RcfNodeHandle(node->id(), false);
 }
 
 // @brief MUXを作る．
 // @param[in] inputs ファンインのハンドルのリスト
 // @return 作成したノードのハンドルを返す．
 // @note inputs のサイズが2のべき乗でないときは0でパディングされる．
-GbmNodeHandle
-GbmMgr::new_mux(const vector<GbmNodeHandle>& inputs)
+RcfNodeHandle
+RcfNetwork::new_mux(const vector<RcfNodeHandle>& inputs)
 {
   ymuint id = mNodeList.size();
 
   ymuint n = inputs.size();
-  void* p = mAlloc.get_memory(sizeof(GbmMuxNode) + sizeof(GbmNodeHandle) * (n - 1));
-  GbmNode* node = new (p) GbmMuxNode(id, mNextConfVar, inputs);
+  void* p = mAlloc.get_memory(sizeof(RcfMuxNode) + sizeof(RcfNodeHandle) * (n - 1));
+  RcfNode* node = new (p) RcfMuxNode(id, mNextConfVar, inputs);
   mNodeList.push_back(node);
   mMuxList.push_back(node);
+  mFnodeList.push_back(node);
   mNextConfVar += node->conf_size();
-  return GbmNodeHandle(node->id(), false);
+  return RcfNodeHandle(node->id(), false);
+}
+
+// @brief 外部出力をセットする．
+// @param[in] handle 出力にするハンドル
+void
+RcfNetwork::set_output(RcfNodeHandle handle)
+{
+  mOutput = handle;
 }
 
 // @brief 全ノード数を返す．
 // @note ノードIDの最大値 + 1 と一致する．
 ymuint
-GbmMgr::node_num() const
+RcfNetwork::node_num() const
 {
   return mNodeList.size();
 }
 
 // @brief ノードを返す．
 // @param[in] id ID番号 ( 0 <= id < node_num() )
-const GbmNode*
-GbmMgr::node(ymuint id) const
+const RcfNode*
+RcfNetwork::node(ymuint id) const
 {
   assert_cond( id < node_num(), __FILE__, __LINE__);
   return mNodeList[id];
@@ -115,15 +126,15 @@ GbmMgr::node(ymuint id) const
 
 // @brief 外部入力数を返す．
 ymuint
-GbmMgr::input_num() const
+RcfNetwork::input_num() const
 {
   return mInputList.size();
 }
 
 // @brief 外部入力ノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < input_num() )
-const GbmNode*
-GbmMgr::input_node(ymuint pos) const
+const RcfNode*
+RcfNetwork::input_node(ymuint pos) const
 {
   assert_cond( pos < input_num(), __FILE__, __LINE__);
   return mInputList[pos];
@@ -131,15 +142,15 @@ GbmMgr::input_node(ymuint pos) const
 
 // @brief ANDノード数を返す．
 ymuint
-GbmMgr::and_num() const
+RcfNetwork::and_num() const
 {
   return mAndList.size();
 }
 
 // @brief ANDノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < and_num() )
-const GbmNode*
-GbmMgr::and_node(ymuint pos) const
+const RcfNode*
+RcfNetwork::and_node(ymuint pos) const
 {
   assert_cond( pos < and_num(), __FILE__, __LINE__);
   return mAndList[pos];
@@ -147,15 +158,15 @@ GbmMgr::and_node(ymuint pos) const
 
 // @brief LUTノード数を返す．
 ymuint
-GbmMgr::lut_num() const
+RcfNetwork::lut_num() const
 {
   return mLutList.size();
 }
 
 // @brief LUTノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < lut_num() )
-const GbmNode*
-GbmMgr::lut_node(ymuint pos) const
+const RcfNode*
+RcfNetwork::lut_node(ymuint pos) const
 {
   assert_cond( pos < lut_num(), __FILE__, __LINE__);
   return mLutList[pos];
@@ -163,23 +174,46 @@ GbmMgr::lut_node(ymuint pos) const
 
 // @brief MUXノード数を返す．
 ymuint
-GbmMgr::mux_num() const
+RcfNetwork::mux_num() const
 {
   return mMuxList.size();
 }
 
 // @brief MUXノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < mux_num() )
-const GbmNode*
-GbmMgr::mux_node(ymuint pos) const
+const RcfNode*
+RcfNetwork::mux_node(ymuint pos) const
 {
   assert_cond( pos < mux_num(), __FILE__, __LINE__);
   return mMuxList[pos];
 }
 
+// @brief 機能ノード(外部入力以外のノード)数を返す．
+ymuint
+RcfNetwork::fnode_num() const
+{
+  return mFnodeList.size();
+}
+
+// @brief 機能ノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < fnode_num() )
+const RcfNode*
+RcfNetwork::fnode(ymuint pos) const
+{
+  assert_cond( pos < fnode_num(), __FILE__, __LINE__);
+  return mFnodeList[pos];
+}
+
+// @brief 外部出力のハンドルを返す．
+RcfNodeHandle
+RcfNetwork::output() const
+{
+  return mOutput;
+}
+
 // @brief configuration 変数の数を返す．
 ymuint
-GbmMgr::conf_var_num() const
+RcfNetwork::conf_var_num() const
 {
   return mNextConfVar;
 }

@@ -1,24 +1,24 @@
 
-/// @file GbmNodeImpl.cc
-/// @brief GbmNodeImpl の実装ファイル
+/// @file RcfNodeImpl.cc
+/// @brief RcfNodeImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNodeImpl.h"
+#include "RcfNodeImpl.h"
 
 
 BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
-// @brief GbmNodeHandle を TvFunc に変換する．
+// @brief RcfNodeHandle を TvFunc に変換する．
 // @param[in] h ハンドル
 // @param[in] func_array 関数の配列
 TvFunc
-handle2func(GbmNodeHandle h,
+handle2func(RcfNodeHandle h,
 	    const vector<TvFunc>& func_array)
 {
   if ( h.inv() ) {
@@ -32,52 +32,52 @@ handle2func(GbmNodeHandle h,
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmNodeImpl
+// クラス RcfNodeImpl
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
-GbmNodeImpl::GbmNodeImpl(ymuint id) :
+RcfNodeImpl::RcfNodeImpl(ymuint id) :
   mId(id)
 {
 }
 
 // @brief デストラクタ
-GbmNodeImpl::~GbmNodeImpl()
+RcfNodeImpl::~RcfNodeImpl()
 {
 }
 
 // @brief ID番号を返す．
 ymuint
-GbmNodeImpl::id() const
+RcfNodeImpl::id() const
 {
   return mId;
 }
 
 // @brief 外部入力ノードの時 true を返す．
 bool
-GbmNodeImpl::is_input() const
+RcfNodeImpl::is_input() const
 {
   return false;
 }
 
 // @brief ANDノードの時 true を返す．
 bool
-GbmNodeImpl::is_and() const
+RcfNodeImpl::is_and() const
 {
   return false;
 }
 
 // @brief LUTノードの時 true を返す．
 bool
-GbmNodeImpl::is_lut() const
+RcfNodeImpl::is_lut() const
 {
   return false;
 }
 
 // @brief MUX ノードの時 true を返す．
 bool
-GbmNodeImpl::is_mux() const
+RcfNodeImpl::is_mux() const
 {
   return false;
 }
@@ -85,7 +85,7 @@ GbmNodeImpl::is_mux() const
 // @brief 外部入力番号を返す．
 // @note is_input() == true の時のみ意味を持つ．
 ymuint
-GbmNodeImpl::input_id() const
+RcfNodeImpl::input_id() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
@@ -95,23 +95,23 @@ GbmNodeImpl::input_id() const
 // @note 外部入力ノードの場合は常に0
 // @note AND ノードの場合は常に2
 ymuint
-GbmNodeImpl::fanin_num() const
+RcfNodeImpl::fanin_num() const
 {
   return 0;
 }
 
 // @brief ファンインのハンドルを返す．
 // @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
-GbmNodeHandle
-GbmNodeImpl::fanin(ymuint pos) const
+RcfNodeHandle
+RcfNodeImpl::fanin(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return GbmNodeHandle();
+  return RcfNodeHandle();
 }
 
 // @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
 ymuint
-GbmNodeImpl::conf_base() const
+RcfNodeImpl::conf_base() const
 {
   assert_not_reached(__FILE__, __LINE__);
   return 0;
@@ -119,34 +119,34 @@ GbmNodeImpl::conf_base() const
 
 // @brief LUT/MUX ノードの時の configuration 変数の数を得る．
 ymuint
-GbmNodeImpl::conf_size() const
+RcfNodeImpl::conf_size() const
 {
   return 0;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmInputNode
+// クラス RcfInputNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] input_id 入力番号
-GbmInputNode::GbmInputNode(ymuint id,
+RcfInputNode::RcfInputNode(ymuint id,
 			   ymuint input_id) :
-  GbmNodeImpl(id),
+  RcfNodeImpl(id),
   mInputId(input_id)
 {
 }
 
 // @brief デストラクタ
-GbmInputNode::~GbmInputNode()
+RcfInputNode::~RcfInputNode()
 {
 }
 
 // @brief 外部入力ノードの時 true を返す．
 bool
-GbmInputNode::is_input() const
+RcfInputNode::is_input() const
 {
   return true;
 }
@@ -154,14 +154,14 @@ GbmInputNode::is_input() const
 // @brief 外部入力番号を返す．
 // @note is_input() == true の時のみ意味を持つ．
 ymuint
-GbmInputNode::input_id() const
+RcfInputNode::input_id() const
 {
   return mInputId;
 }
 
 // @brief 関数を計算する．
 TvFunc
-GbmInputNode::calc_func(const vector<TvFunc>& func_array,
+RcfInputNode::calc_func(const vector<TvFunc>& func_array,
 			const vector<bool>& conf_bits) const
 {
   assert_not_reached(__FILE__, __LINE__);
@@ -170,29 +170,29 @@ GbmInputNode::calc_func(const vector<TvFunc>& func_array,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmAndNode
+// クラス RcfAndNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] fanin0, fanin1 ファンインのハンドル
-GbmAndNode::GbmAndNode(ymuint id,
-		       GbmNodeHandle fanin0,
-		       GbmNodeHandle fanin1) :
-  GbmNodeImpl(id)
+RcfAndNode::RcfAndNode(ymuint id,
+		       RcfNodeHandle fanin0,
+		       RcfNodeHandle fanin1) :
+  RcfNodeImpl(id)
 {
   mFanin[0] = fanin0;
   mFanin[1] = fanin1;
 }
 
 // @brief デストラクタ
-GbmAndNode::~GbmAndNode()
+RcfAndNode::~RcfAndNode()
 {
 }
 
 // @brief ANDノードの時 true を返す．
 bool
-GbmAndNode::is_and() const
+RcfAndNode::is_and() const
 {
   return true;
 }
@@ -201,15 +201,15 @@ GbmAndNode::is_and() const
 // @note 外部入力ノードの場合は常に0
 // @note AND ノードの場合は常に2
 ymuint
-GbmAndNode::fanin_num() const
+RcfAndNode::fanin_num() const
 {
   return 2;
 }
 
 // @brief ファンインのハンドルを返す．
 // @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
-GbmNodeHandle
-GbmAndNode::fanin(ymuint pos) const
+RcfNodeHandle
+RcfAndNode::fanin(ymuint pos) const
 {
   assert_cond( pos < 2, __FILE__, __LINE__);
   return mFanin[pos];
@@ -217,7 +217,7 @@ GbmAndNode::fanin(ymuint pos) const
 
 // @brief 関数を計算する．
 TvFunc
-GbmAndNode::calc_func(const vector<TvFunc>& func_array,
+RcfAndNode::calc_func(const vector<TvFunc>& func_array,
 		      const vector<bool>& conf_bits) const
 {
   TvFunc if0 = handle2func(mFanin[0], func_array);
@@ -228,17 +228,17 @@ GbmAndNode::calc_func(const vector<TvFunc>& func_array,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmLutNode
+// クラス RcfLutNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] conf_base configuration 変数の基底
 // @param[in] fanin_list ファンインのリスト
-GbmLutNode::GbmLutNode(ymuint id,
+RcfLutNode::RcfLutNode(ymuint id,
 		       ymuint conf_base,
-		       const vector<GbmNodeHandle>& fanin_list) :
-  GbmNodeImpl(id),
+		       const vector<RcfNodeHandle>& fanin_list) :
+  RcfNodeImpl(id),
   mConfBase(conf_base),
   mFaninNum(fanin_list.size())
 {
@@ -248,13 +248,13 @@ GbmLutNode::GbmLutNode(ymuint id,
 }
 
 // @brief デストラクタ
-GbmLutNode::~GbmLutNode()
+RcfLutNode::~RcfLutNode()
 {
 }
 
 // @brief LUTノードの時 true を返す．
 bool
-GbmLutNode::is_lut() const
+RcfLutNode::is_lut() const
 {
   return true;
 }
@@ -263,15 +263,15 @@ GbmLutNode::is_lut() const
 // @note 外部入力ノードの場合は常に0
 // @note AND ノードの場合は常に2
 ymuint
-GbmLutNode::fanin_num() const
+RcfLutNode::fanin_num() const
 {
   return mFaninNum;
 }
 
 // @brief ファンインのハンドルを返す．
 // @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
-GbmNodeHandle
-GbmLutNode::fanin(ymuint pos) const
+RcfNodeHandle
+RcfLutNode::fanin(ymuint pos) const
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mFanin[pos];
@@ -279,21 +279,21 @@ GbmLutNode::fanin(ymuint pos) const
 
 // @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
 ymuint
-GbmLutNode::conf_base() const
+RcfLutNode::conf_base() const
 {
   return mConfBase;
 }
 
 // @brief LUT/MUX ノードの時の configuration 変数の数を得る．
 ymuint
-GbmLutNode::conf_size() const
+RcfLutNode::conf_size() const
 {
   return (1U << mFaninNum);
 }
 
 // @brief 関数を計算する．
 TvFunc
-GbmLutNode::calc_func(const vector<TvFunc>& func_array,
+RcfLutNode::calc_func(const vector<TvFunc>& func_array,
 		      const vector<bool>& conf_bits) const
 {
   vector<TvFunc> ifuncs(mFaninNum);
@@ -322,17 +322,17 @@ GbmLutNode::calc_func(const vector<TvFunc>& func_array,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmMuxNode
+// クラス RcfMuxNode
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] conf_base configuration 変数の基底
 // @param[in] fanin_list ファンインのリスト
-GbmMuxNode::GbmMuxNode(ymuint id,
+RcfMuxNode::RcfMuxNode(ymuint id,
 		       ymuint conf_base,
-		       const vector<GbmNodeHandle>& fanin_list) :
-  GbmNodeImpl(id),
+		       const vector<RcfNodeHandle>& fanin_list) :
+  RcfNodeImpl(id),
   mConfBase(conf_base),
   mFaninNum(fanin_list.size())
 {
@@ -345,13 +345,13 @@ GbmMuxNode::GbmMuxNode(ymuint id,
 }
 
 // @brief デストラクタ
-GbmMuxNode::~GbmMuxNode()
+RcfMuxNode::~RcfMuxNode()
 {
 }
 
 // @brief MUX ノードの時 true を返す．
 bool
-GbmMuxNode::is_mux() const
+RcfMuxNode::is_mux() const
 {
   return true;
 }
@@ -360,15 +360,15 @@ GbmMuxNode::is_mux() const
 // @note 外部入力ノードの場合は常に0
 // @note AND ノードの場合は常に2
 ymuint
-GbmMuxNode::fanin_num() const
+RcfMuxNode::fanin_num() const
 {
   return mFaninNum;
 }
 
 // @brief ファンインのハンドルを返す．
 // @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
-GbmNodeHandle
-GbmMuxNode::fanin(ymuint pos) const
+RcfNodeHandle
+RcfMuxNode::fanin(ymuint pos) const
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mFanin[pos];
@@ -376,21 +376,21 @@ GbmMuxNode::fanin(ymuint pos) const
 
 // @brief LUT/MUX ノードの時の configuration 変数の最初の番号を得る．
 ymuint
-GbmMuxNode::conf_base() const
+RcfMuxNode::conf_base() const
 {
   return mConfBase;
 }
 
 // @brief LUT/MUX ノードの時の configuration 変数の数を得る．
 ymuint
-GbmMuxNode::conf_size() const
+RcfMuxNode::conf_size() const
 {
   return mConfSize;
 }
 
 // @brief 関数を計算する．
 TvFunc
-GbmMuxNode::calc_func(const vector<TvFunc>& func_array,
+RcfMuxNode::calc_func(const vector<TvFunc>& func_array,
 		      const vector<bool>& conf_bits) const
 {
   ymuint pos = 0;

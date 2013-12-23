@@ -8,8 +8,8 @@
 
 
 #include "GbmSolver.h"
-#include "GbmNode.h"
-#include "GbmNodeHandle.h"
+#include "RcfNode.h"
+#include "RcfNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -29,26 +29,24 @@ GbmSolver::~GbmSolver()
 }
 
 // @brief 問題を解く
-// @param[in] mgr GbmMgr
-// @param[in] output Reconfigurable Network の出力
+// @param[in] network RcfNetwork
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 bool
-GbmSolver::solve(const GbmMgr& mgr,
-		 GbmNodeHandle output,
+GbmSolver::solve(const RcfNetwork& network,
 		 const TvFunc& func,
 		 vector<bool>& conf_bits)
 {
-  bool stat = _solve(mgr, output, func, conf_bits);
+  bool stat = _solve(network, func, conf_bits);
 
   if ( stat ) {
     // 検証を行う．
-    ymuint ni = mgr.input_num();
+    ymuint ni = network.input_num();
     vector<ymuint> iorder(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       iorder[i] = i;
     }
-    bool vstat = verify(mgr, output, func, conf_bits, iorder);
+    bool vstat = verify(network, func, conf_bits, iorder);
     assert_cond( vstat, __FILE__, __LINE__);
   }
 
@@ -56,24 +54,22 @@ GbmSolver::solve(const GbmMgr& mgr,
 }
 
 // @brief 入力順を考慮したマッチング問題を解く
-// @param[in] mgr GbmMgr
-// @param[in] output Reconfigurable Network の出力
+// @param[in] network RcfNetwork
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した GbmMgr の入力番号が入る．
+// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
 bool
-GbmSolver::solve(const GbmMgr& mgr,
-		 GbmNodeHandle output,
+GbmSolver::solve(const RcfNetwork& network,
 		 const TvFunc& func,
 		 vector<bool>& conf_bits,
 		 vector<ymuint>& iorder)
 {
-  bool stat = _solve(mgr, output, func, conf_bits, iorder);
+  bool stat = _solve(network, func, conf_bits, iorder);
 
   if ( stat ) {
     // 検証を行う．
-    bool vstat = verify(mgr, output, func, conf_bits, iorder);
+    bool vstat = verify(network, func, conf_bits, iorder);
     assert_cond( vstat, __FILE__, __LINE__);
   }
 
@@ -81,26 +77,24 @@ GbmSolver::solve(const GbmMgr& mgr,
 }
 
 // @brief 検証を行う．
-// @param[in] mgr GbmMgr
-// @param[in] output Reconfigurable Network の出力
+// @param[in] network RcfNetwork
 // @param[in] func マッチング対象の関数
 // @param[in] conf_bits configuration ビットの値を収める配列
 // @param[in] iorder 入力順序
 bool
-GbmSolver::verify(const GbmMgr& mgr,
-		  GbmNodeHandle output,
+GbmSolver::verify(const RcfNetwork& network,
 		  const TvFunc& func,
 		  const vector<bool>& conf_bits,
 		  const vector<ymuint>& iorder)
 {
-  ymuint nn = mgr.node_num();
+  ymuint nn = network.node_num();
   vector<TvFunc> func_array(nn);
   vector<bool> done(nn, false);
 
   ymuint npi = func.input_num();
-  // これは mgr.input_num() と等しいはず
+  // これは network.input_num() と等しいはず
   for (ymuint i = 0; i < npi; ++ i) {
-    const GbmNode* node = mgr.input_node(iorder[i]);
+    const RcfNode* node = network.input_node(iorder[i]);
     ymuint id = node->id();
     func_array[id] = TvFunc::posi_literal(npi, VarId(i));
     done[id] = true;
@@ -116,11 +110,11 @@ GbmSolver::verify(const GbmMgr& mgr,
       }
 
       // まだ処理していないファンインを持つノードも飛ばす．
-      const GbmNode* node = mgr.node(i);
+      const RcfNode* node = network.node(i);
       ymuint nfi = node->fanin_num();
       bool not_yet = false;
       for (ymuint j = 0; j < nfi; ++ j) {
-	GbmNodeHandle ihandle = node->fanin(j);
+	RcfNodeHandle ihandle = node->fanin(j);
 	ymuint iid = ihandle.id();
 	if ( !done[iid] ) {
 	  not_yet = true;
@@ -140,6 +134,7 @@ GbmSolver::verify(const GbmMgr& mgr,
     }
   }
 
+  RcfNodeHandle output = network.output();
   TvFunc ofunc = func_array[output.id()];
   if ( output.inv() ) {
     ofunc = ~ofunc;
