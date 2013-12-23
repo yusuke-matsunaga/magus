@@ -14,7 +14,7 @@
 #include "ym_logic/Aig.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 class CutMgr;
 
@@ -118,6 +118,6 @@ Cut::aig() const
   return mAig;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 #endif // CUT_H

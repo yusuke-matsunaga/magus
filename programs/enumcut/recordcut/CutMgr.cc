@@ -12,7 +12,7 @@
 #include "ym_networks/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス CutMgr
@@ -294,4 +294,4 @@ CutMgr::restore(IDO& s)
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

@@ -14,7 +14,7 @@
 #include "ym_networks/bdn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class ZddTopDown ZddTopDown.h "ZddTopDown.h"
@@ -81,6 +81,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 #endif // ZDDTOPDOWN_H

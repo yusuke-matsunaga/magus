@@ -18,7 +18,7 @@
 #include "CutHash.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 class Cut;
 
@@ -97,7 +97,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
-
+END_NAMESPACE_YM
 
 #endif // CUTMGR_H

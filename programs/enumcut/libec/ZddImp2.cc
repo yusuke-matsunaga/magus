@@ -13,7 +13,7 @@
 #include "ym_networks/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] mgr
@@ -84,4 +84,4 @@ ZddImp2::operator()(BdnMgr& network,
   cout << "Total " << nc_all << " cuts" << endl;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

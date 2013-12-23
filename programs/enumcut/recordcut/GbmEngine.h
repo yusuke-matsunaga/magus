@@ -65,7 +65,6 @@ public:
   /// @param[in] s_vars 選択信号変数のリスト
   /// @param[in] output_var 出力変数
   /// @note d_vars のサイズは s_vars のサイズの指数乗
-  /// @note 実は make_LUT() と同じことをやっている．
   /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
   make_MUX(SatSolver& solver,

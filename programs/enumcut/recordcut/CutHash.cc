@@ -11,7 +11,7 @@
 #include "Cut.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス CutHash
@@ -94,4 +94,4 @@ CutHash::alloc_table(ymuint32 new_size)
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

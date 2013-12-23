@@ -13,7 +13,7 @@
 #include "ym_networks/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class TopDown TopDown.h "TopDown.h"
@@ -693,6 +693,6 @@ TopDown::set_input(const BdnNode* node)
   ++ mInputPos;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 #endif // TOPDOWN_H

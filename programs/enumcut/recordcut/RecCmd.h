@@ -13,7 +13,7 @@
 #include "ym_tclpp/TclCmd.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 class FuncMgr;
 
@@ -263,6 +263,6 @@ protected:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 #endif // RECCMD_H

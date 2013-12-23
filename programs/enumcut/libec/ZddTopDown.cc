@@ -13,7 +13,7 @@
 #include "ym_networks/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] mgr
@@ -152,4 +152,4 @@ ZddTopDown::dfs(const BdnNode* node,
   return ans;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

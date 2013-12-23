@@ -14,7 +14,7 @@
 //#define DEBUG_ENUM_RECUR 1
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス TopDown2
@@ -354,4 +354,4 @@ TopDown2::set_cur_node_list_recur(BdnNode* node,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

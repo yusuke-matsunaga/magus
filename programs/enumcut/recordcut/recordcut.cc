@@ -22,6 +22,8 @@
 #include "FuncMgr.h"
 #include "FuncRec.h"
 
+#include "Lut443Match.h"
+
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
 
@@ -29,9 +31,9 @@
 
 #include "ym_utils/FileIDO.h"
 #include "ym_utils/FileODO.h"
+#include "ym_utils/StopWatch.h"
 
-
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 void
 rec_func(FuncMgr& func_mgr,
@@ -78,6 +80,16 @@ rec_func(FuncMgr& func_mgr,
     func_mgr.func_list(i, func_list);
     cout << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
+
+  StopWatch timer;
+  timer.start();
+  Lut443Match matcher;
+  for (vector<TvFunc>::const_iterator p = func_list.begin();
+       p != func_list.end(); ++ p) {
+    matcher.match(*p);
+  }
+  timer.stop();
+  cout << "Total CPUT time " << timer.time() << endl;
 
 #if 0
   const list<Cut*>& cut_list = cut_mgr.cut_list();
@@ -137,7 +149,7 @@ restore_func(FuncMgr& func_mgr,
   func_mgr.restore(bi);
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 
 int
@@ -145,7 +157,7 @@ main(int argc,
      const char** argv)
 {
   using namespace std;
-  using namespace nsYm::nsNetworks;
+  using namespace nsYm;
 
   bool blif = false;
   bool iscas = false;

@@ -12,6 +12,25 @@
 
 BEGIN_NAMESPACE_YM
 
+BEGIN_NONAMESPACE
+
+// @brief GbmNodeHandle を TvFunc に変換する．
+// @param[in] h ハンドル
+// @param[in] func_array 関数の配列
+TvFunc
+handle2func(GbmNodeHandle h,
+	    const vector<TvFunc>& func_array)
+{
+  if ( h.inv() ) {
+    return ~func_array[h.id()];
+  }
+  else {
+    return func_array[h.id()];
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス GbmNodeImpl
 //////////////////////////////////////////////////////////////////////
@@ -63,13 +82,6 @@ GbmNodeImpl::is_mux() const
   return false;
 }
 
-// @brief 関数ノードの時 true を返す．
-bool
-GbmNodeImpl::is_func() const
-{
-  return false;
-}
-
 // @brief 外部入力番号を返す．
 // @note is_input() == true の時のみ意味を持つ．
 ymuint
@@ -112,15 +124,6 @@ GbmNodeImpl::conf_size() const
   return 0;
 }
 
-// @brief 関数ノードの時に関数を返す．
-const TvFunc&
-GbmNodeImpl::func() const
-{
-  static TvFunc dummy;
-  assert_not_reached(__FILE__, __LINE__);
-  return dummy;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス GbmInputNode
@@ -154,6 +157,15 @@ ymuint
 GbmInputNode::input_id() const
 {
   return mInputId;
+}
+
+// @brief 関数を計算する．
+TvFunc
+GbmInputNode::calc_func(const vector<TvFunc>& func_array,
+			const vector<bool>& conf_bits) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return TvFunc::const_zero(0);
 }
 
 
@@ -201,6 +213,17 @@ GbmAndNode::fanin(ymuint pos) const
 {
   assert_cond( pos < 2, __FILE__, __LINE__);
   return mFanin[pos];
+}
+
+// @brief 関数を計算する．
+TvFunc
+GbmAndNode::calc_func(const vector<TvFunc>& func_array,
+		      const vector<bool>& conf_bits) const
+{
+  TvFunc if0 = handle2func(mFanin[0], func_array);
+  TvFunc if1 = handle2func(mFanin[1], func_array);
+
+  return if0 & if1;
 }
 
 
@@ -268,6 +291,35 @@ GbmLutNode::conf_size() const
   return (1U << mFaninNum);
 }
 
+// @brief 関数を計算する．
+TvFunc
+GbmLutNode::calc_func(const vector<TvFunc>& func_array,
+		      const vector<bool>& conf_bits) const
+{
+  vector<TvFunc> ifuncs(mFaninNum);
+  for (ymuint i = 0; i < mFaninNum; ++ i) {
+    ifuncs[i] = handle2func(mFanin[i], func_array);
+  }
+  ymuint ni = ifuncs[0].input_num();
+  TvFunc func = TvFunc::const_zero(ni);
+  ymuint nexp = 1U << mFaninNum;
+  for (ymuint b = 0; b < nexp; ++ b) {
+    if ( conf_bits[mConfBase + b] ) {
+      TvFunc prod = TvFunc::const_one(ni);
+      for (ymuint i = 0; i < mFaninNum; ++ i) {
+	if ( b & (1U << i) ) {
+	  prod &= ifuncs[i];
+	}
+	else {
+	  prod &= ~ifuncs[i];
+	}
+      }
+      func |= prod;
+    }
+  }
+  return func;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス GbmMuxNode
@@ -288,6 +340,7 @@ GbmMuxNode::GbmMuxNode(ymuint id,
     mFanin[i] = fanin_list[i];
   }
 
+  // ファンインを区別するのに必要なビット数 ( = mConfSize ) を計算する．
   for (ymuint tmp = 1U, mConfSize = 0; tmp < mFaninNum; ++ mConfSize, tmp <<= 1) ;
 }
 
@@ -335,62 +388,19 @@ GbmMuxNode::conf_size() const
   return mConfSize;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス GbmFuncNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id ID番号
-// @param[in] func 関数
-// @param[in] fanin_list ファンインのリスト
-GbmFuncNode::GbmFuncNode(ymuint id,
-			 const TvFunc& func,
-			 const vector<GbmNodeHandle>& fanin_list) :
-  GbmNodeImpl(id),
-  mFunc(func),
-  mFaninNum(fanin_list.size())
+// @brief 関数を計算する．
+TvFunc
+GbmMuxNode::calc_func(const vector<TvFunc>& func_array,
+		      const vector<bool>& conf_bits) const
 {
-  for (ymuint i = 0; i < mFaninNum; ++ i) {
-    mFanin[i] = fanin_list[i];
+  ymuint pos = 0;
+  for (ymuint i = 0; i < mConfSize; ++ i) {
+    if ( conf_bits[mConfBase + i] ) {
+      pos += (1U << i);
+    }
   }
-}
-
-// @brief デストラクタ
-GbmFuncNode::~GbmFuncNode()
-{
-}
-
-// @brief 関数ノードの時 true を返す．
-bool
-GbmFuncNode::is_func() const
-{
-  return true;
-}
-
-// @brief ファンイン数を返す．
-// @note 外部入力ノードの場合は常に0
-// @note AND ノードの場合は常に2
-ymuint
-GbmFuncNode::fanin_num() const
-{
-  return mFaninNum;
-}
-
-// @brief ファンインのハンドルを返す．
-// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
-GbmNodeHandle
-GbmFuncNode::fanin(ymuint pos) const
-{
-  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
-  return mFanin[pos];
-}
-
-// @brief 関数ノードの時に関数を返す．
-const TvFunc&
-GbmFuncNode::func() const
-{
-  return mFunc;
+  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  return handle2func(mFanin[pos], func_array);
 }
 
 END_NAMESPACE_YM

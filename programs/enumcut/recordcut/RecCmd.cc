@@ -26,7 +26,7 @@
 #include "FuncRec.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス RecCmd
@@ -500,7 +500,7 @@ PrintCmd::cmd_proc(TclObjVector& objv)
   return TCL_OK;
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////
@@ -510,7 +510,6 @@ END_NAMESPACE_YM_NETWORKS
 int
 rec_init(Tcl_Interp* interp)
 {
-  using namespace nsYm::nsNetworks;
   using namespace nsYm;
 
   //////////////////////////////////////////////////////////////////////

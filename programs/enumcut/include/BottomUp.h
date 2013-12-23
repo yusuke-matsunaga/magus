@@ -12,7 +12,7 @@
 #include "EnumCut2.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class BottomUp BottomUp.h "BottomUp.h"
@@ -96,6 +96,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 #endif // BOTTOMUP_H

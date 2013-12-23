@@ -11,7 +11,7 @@
 #include "ym_networks/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 // クラス EnumCut
@@ -118,4 +118,4 @@ EnumCut::all_end(const BdnMgr& sbjgraph,
 #endif
 }
 #endif
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

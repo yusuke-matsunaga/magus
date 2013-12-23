@@ -34,17 +34,36 @@ public:
   ~GbmNaive();
 
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
+  // GbmSolver の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 問題を解く
+  /// @param[in] mgr GbmMgr
+  /// @param[in] output Reconfigurable Network の出力
+  /// @param[in] func マッチング対象の関数
+  /// @param[out] conf_bits configuration ビットの値を収める配列
   virtual
   bool
-  solve(const GbmMgr& mgr,
-	GbmNodeHandle output1,
-	GbmNodeHandle output2);
+  _solve(const GbmMgr& mgr,
+	 GbmNodeHandle output,
+	 const TvFunc& func,
+	 vector<bool>& conf_bits);
+
+  /// @brief 入力順を考慮したマッチング問題を解く
+  /// @param[in] mgr GbmMgr
+  /// @param[in] output Reconfigurable Network の出力
+  /// @param[in] func マッチング対象の関数
+  /// @param[out] conf_bits configuration ビットの値を収める配列
+  /// @param[out] iorder 入力順序
+  /// @note iorder[0] に func の0番めの入力に対応した GbmMgr の入力番号が入る．
+  bool
+  _solve(const GbmMgr& mgr,
+	 GbmNodeHandle output,
+	 const TvFunc& func,
+	 vector<bool>& conf_bits,
+	 vector<ymuint>& iorder);
 
 
 private:
@@ -57,7 +76,7 @@ private:
   /// @param[in] node 対象のノード
   /// @param[in] node_var_array ノードの変数番号の配列
   /// @param[in] conf_var_array 設定変数番号の配列
-  void
+  bool
   make_node_cnf(SatSolver& solver,
 		const GbmNode* node,
 		const vector<GbmLit>& node_var_array,

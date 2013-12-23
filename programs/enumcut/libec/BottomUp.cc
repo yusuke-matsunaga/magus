@@ -13,7 +13,7 @@
 #include "ym_networks/BdnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 BottomUp::BottomUp()
@@ -252,4 +252,4 @@ BottomUp::clear_cut2(BdnNode* node)
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

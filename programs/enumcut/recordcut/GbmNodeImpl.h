@@ -62,11 +62,6 @@ public:
   bool
   is_mux() const;
 
-  /// @brief 関数ノードの時 true を返す．
-  virtual
-  bool
-  is_func() const;
-
   /// @brief 外部入力番号を返す．
   /// @note is_input() == true の時のみ意味を持つ．
   virtual
@@ -95,11 +90,6 @@ public:
   virtual
   ymuint
   conf_size() const;
-
-  /// @brief 関数ノードの時に関数を返す．
-  virtual
-  const TvFunc&
-  func() const;
 
 
 private:
@@ -148,6 +138,12 @@ public:
   virtual
   ymuint
   input_id() const;
+
+  /// @brief 関数を計算する．
+  virtual
+  TvFunc
+  calc_func(const vector<TvFunc>& func_array,
+	    const vector<bool>& conf_bits) const;
 
 
 private:
@@ -204,6 +200,12 @@ public:
   virtual
   GbmNodeHandle
   fanin(ymuint pos) const;
+
+  /// @brief 関数を計算する．
+  virtual
+  TvFunc
+  calc_func(const vector<TvFunc>& func_array,
+	    const vector<bool>& conf_bits) const;
 
 
 private:
@@ -271,6 +273,12 @@ public:
   virtual
   ymuint
   conf_size() const;
+
+  /// @brief 関数を計算する．
+  virtual
+  TvFunc
+  calc_func(const vector<TvFunc>& func_array,
+	    const vector<bool>& conf_bits) const;
 
 
 private:
@@ -345,6 +353,12 @@ public:
   ymuint
   conf_size() const;
 
+  /// @brief 関数を計算する．
+  virtual
+  TvFunc
+  calc_func(const vector<TvFunc>& func_array,
+	    const vector<bool>& conf_bits) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -356,74 +370,6 @@ private:
 
   // configuration 変数の数．
   ymuint32 mConfSize;
-
-  // ファンイン数
-  ymuint32 mFaninNum;
-
-  // ファンインの配列
-  GbmNodeHandle mFanin[1];
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class GbmFuncNode GbmNodeImpl.h "GbmNodeImpl.h"
-/// @brief 関数ノードを表すクラス
-//////////////////////////////////////////////////////////////////////
-class GbmFuncNode :
-  public GbmNodeImpl
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] func 関数
-  /// @param[in] fanin_list ファンインのリスト
-  GbmFuncNode(ymuint id,
-	      const TvFunc& func,
-	      const vector<GbmNodeHandle>& fanin_list);
-
-  /// @brief デストラクタ
-  virtual
-  ~GbmFuncNode();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 関数ノードの時 true を返す．
-  virtual
-  bool
-  is_func() const;
-
-  /// @brief ファンイン数を返す．
-  /// @note 外部入力ノードの場合は常に0
-  /// @note AND ノードの場合は常に2
-  virtual
-  ymuint
-  fanin_num() const;
-
-  /// @brief ファンインのハンドルを返す．
-  /// @param[in] pos ファンイン番号 ( 0 <= pos < fanin_num() )
-  virtual
-  GbmNodeHandle
-  fanin(ymuint pos) const;
-
-  /// @brief 関数ノードの時に関数を返す．
-  virtual
-  const TvFunc&
-  func() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 関数
-  TvFunc mFunc;
 
   // ファンイン数
   ymuint32 mFaninNum;

@@ -12,7 +12,7 @@
 #include "FuncMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 
 //////////////////////////////////////////////////////////////////////
@@ -181,4 +181,4 @@ FuncRec::all_end(const BdnMgr& sbjgraph,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM

@@ -13,7 +13,7 @@
 #include "EnumCut.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 class FuncMgr;
 
@@ -116,6 +116,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 #endif // FUNCREC_H

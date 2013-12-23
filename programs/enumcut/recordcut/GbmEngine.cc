@@ -30,6 +30,7 @@ GbmEngine::~GbmEngine()
 // @param[in] solver SATソルバ
 // @param[in] input_vars 入力変数のリスト
 // @param[in] output_var 出力変数
+// @return 割り当てが矛盾を起こしたら false を返す．
 bool
 GbmEngine::make_AND(SatSolver& solver,
 		    const vector<GbmLit>& input_vars,
@@ -112,12 +113,14 @@ GbmEngine::make_AND(SatSolver& solver,
 // @param[in] lut_vars LUT変数のリスト
 // @param[in] output_var 出力変数
 // @note lut_vars のサイズは input_vars のサイズの指数乗
+// @return 割り当てが矛盾を起こしたら false を返す．
 bool
 GbmEngine::make_LUT(SatSolver& solver,
 		    const vector<GbmLit>& input_vars,
 		    const vector<GbmLit>& lut_vars,
 		    GbmLit output_var)
 {
+  // 実は入力を入れ替えれて MUX で作る．
   return make_MUX(solver, lut_vars, input_vars, output_var);
 }
 
@@ -127,7 +130,7 @@ GbmEngine::make_LUT(SatSolver& solver,
 // @param[in] s_vars 選択信号変数のリスト
 // @param[in] output_var 出力変数
 // @note d_vars のサイズは s_vars のサイズの指数乗
-// @note 実は make_LUT() と同じことをやっている．
+// @return 割り当てが矛盾を起こしたら false を返す．
 bool
 GbmEngine::make_MUX(SatSolver& solver,
 		    const vector<GbmLit>& d_vars,

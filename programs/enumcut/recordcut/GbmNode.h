@@ -58,11 +58,6 @@ public:
   bool
   is_mux() const = 0;
 
-  /// @brief 関数ノードの時 true を返す．
-  virtual
-  bool
-  is_func() const = 0;
-
   /// @brief 外部入力番号を返す．
   /// @note is_input() == true の時のみ意味を持つ．
   virtual
@@ -92,11 +87,11 @@ public:
   ymuint
   conf_size() const = 0;
 
-  /// @brief 関数ノードの時に関数を返す．
+  /// @brief 関数を計算する．
   virtual
-  const TvFunc&
-  func() const = 0;
-
+  TvFunc
+  calc_func(const vector<TvFunc>& func_array,
+	    const vector<bool>& conf_bits) const = 0;
 };
 
 END_NAMESPACE_YM
