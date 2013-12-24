@@ -14,6 +14,12 @@
 
 BEGIN_NAMESPACE_YM
 
+BEGIN_NONAMESPACE
+
+bool debug = false;
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス Lut443Match
 //////////////////////////////////////////////////////////////////////
@@ -131,6 +137,7 @@ Lut443Match::Lut443Match()
   mC1.set_input_pred(4, 2);
   mC1.set_input_pred(5, 4);
 
+  reset_count();
 }
 
 // @brief デストラクタ
@@ -145,8 +152,6 @@ bool
 Lut443Match::match(const TvFunc& func,
 		   GbmSolver& solver)
 {
-  cout << "Lut443Match::match(" << func << ")" << endl;
-
   ymuint ni = func.input_num();
 
   // まず関数の真のサポートを求める．
@@ -160,7 +165,9 @@ Lut443Match::match(const TvFunc& func,
 
   TvFunc func1 = func;
   ymuint ni1 = sup_list.size();
-  cout << " ni1 = " << ni1 << endl;
+  if ( debug ) {
+    cout << " ni1 = " << ni1 << endl;
+  }
   if ( ni1 < ni ) {
     // 冗長な入力があった．
     ymuint nexp1 = (1U << ni1);
@@ -179,6 +186,7 @@ Lut443Match::match(const TvFunc& func,
 
   if ( ni1 <= 5 ) {
     // 自明
+    ++ mTrivialNum;
     return true;
   }
 
@@ -188,34 +196,43 @@ Lut443Match::match(const TvFunc& func,
   if ( ni1 == 6 ) {
     bool stat = solver.solve(mA3, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type A-3 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type A-3 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mA3Num;
       return true;
     }
 
     stat = solver.solve(mB2, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type B-2 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type B-2 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mB2Num;
       return true;
     }
 
     stat = solver.solve(mC1, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type C-1 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type C-1 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mC1Num;
       return true;
     }
   }
@@ -223,34 +240,43 @@ Lut443Match::match(const TvFunc& func,
   if ( ni1 == 7 ) {
     bool stat = solver.solve(mA2, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type A-2 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type A-2 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mA2Num;
       return true;
     }
 
     stat = solver.solve(mB1, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type B-1 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type B-1 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mB1Num;
       return true;
     }
 
     stat = solver.solve(mC0, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type C-0 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type C-0 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mC0Num;
       return true;
     }
   }
@@ -258,23 +284,29 @@ Lut443Match::match(const TvFunc& func,
   if ( ni1 == 8 ) {
     bool stat = solver.solve(mA1, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type A-1 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type A-1 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mA1Num;
       return true;
     }
 
     stat = solver.solve(mB0, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type B-0 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type B-0 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mB0Num;
       return true;
     }
   }
@@ -282,18 +314,68 @@ Lut443Match::match(const TvFunc& func,
   if ( ni1 == 9 ) {
     bool stat = solver.solve(mA0, func1, conf_bits, iorder);
     if ( stat ) {
-      cout << "Type A-0 Match" << endl;
-      cout << "  iorder = ";
-      for (ymuint i = 0; i < ni1; ++ i) {
-	cout << " " << iorder[i];
+      if ( debug ) {
+	cout << "Type A-0 Match" << endl;
+	cout << "  iorder = ";
+	for (ymuint i = 0; i < ni1; ++ i) {
+	  cout << " " << iorder[i];
+	}
+	cout << endl;
       }
-      cout << endl;
+      ++ mA0Num;
       return true;
     }
   }
 
-  cout << "Not found" << endl;
+  if ( debug ) {
+    cout << "Not found" << endl;
+  }
+  ++ mFailNum;
   return false;
+}
+
+// @brief カウンタをリセットする．
+void
+Lut443Match::reset_count()
+{
+  mTrivialNum = 0;
+  mA0Num = 0;
+  mA1Num = 0;
+  mA2Num = 0;
+  mA3Num = 0;
+  mB0Num = 0;
+  mB1Num = 0;
+  mB2Num = 0;
+  mC0Num = 0;
+  mC1Num = 0;
+  mFailNum = 0;
+}
+
+// @brief カウンタの値を得る．
+void
+Lut443Match::get_count(ymuint& trival_num,
+		       ymuint& a0_num,
+		       ymuint& a1_num,
+		       ymuint& a2_num,
+		       ymuint& a3_num,
+		       ymuint& b0_num,
+		       ymuint& b1_num,
+		       ymuint& b2_num,
+		       ymuint& c0_num,
+		       ymuint& c1_num,
+		       ymuint& fail_num)
+{
+  trival_num = mTrivialNum;
+  a0_num = mA0Num;
+  a1_num = mA1Num;
+  a2_num = mA2Num;
+  a3_num = mA3Num;
+  b0_num = mB0Num;
+  b1_num = mB1Num;
+  b2_num = mB2Num;
+  c0_num = mC0Num;
+  c1_num = mC1Num;
+  fail_num = mFailNum;
 }
 
 END_NAMESPACE_YM

@@ -9,7 +9,11 @@
 
 #include "Lut443Match.h"
 #include "GbmNaive.h"
+#include "GbmNaiveEnum.h"
 #include "GbmNaiveOneHot.h"
+#include "GbmIncrEnum.h"
+#include "GbmIncrBinary.h"
+#include "GbmIncrOneHot.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
 
@@ -47,7 +51,8 @@ make_lutfunc(ymuint ni,
 
 void
 test_common(GbmSolver& solver,
-	    ymuint id_list[])
+	    ymuint id_list[],
+	    const char* testname)
 {
   ymuint ni = 0;
   for (ymuint i = 0; i < 9; ++ i) {
@@ -111,7 +116,8 @@ test_common(GbmSolver& solver,
 
     bool stat = matcher.match(lut3, solver);
     if ( !stat ) {
-      cout << "Error: " << lut3 << endl;
+      cout << "Error in " << testname << endl
+	   << "  " << lut3 << endl;
     }
   }
 }
@@ -122,100 +128,64 @@ END_NONAMESPACE
 void
 A0Test(GbmSolver& solver)
 {
-  cout << "A0 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-  test_common(solver, id_list);
-
-  cout << "A0 test end" << endl << endl;
+  test_common(solver, id_list, "A0 test");
 }
 
 void
 A1Test(GbmSolver& solver)
 {
-  cout << "A1 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 0, 4, 5, 6, 7 };
-  test_common(solver, id_list);
-
-  cout << "A1 test end" << endl << endl;
+  test_common(solver, id_list, "A1 test");
 }
 
 void
 A2Test(GbmSolver& solver)
 {
-  cout << "A2 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 0, 1, 4, 5, 6 };
-  test_common(solver, id_list);
-
-  cout << "A2 test end" << endl << endl;
+  test_common(solver, id_list, "A2 test");
 }
 
 void
 A3Test(GbmSolver& solver)
 {
-  cout << "A3 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 0, 1, 2, 4, 5 };
-  test_common(solver, id_list);
-
-  cout << "A3 test end" << endl << endl;
+  test_common(solver, id_list, "A3 test");
 }
 
 void
 B0Test(GbmSolver& solver)
 {
-  cout << "B0 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0 };
-  test_common(solver, id_list);
-
-  cout << "B0 test end" << endl << endl;
+  test_common(solver, id_list, "B0 test");
 }
 
 void
 B1Test(GbmSolver& solver)
 {
-  cout << "B1 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 1, 4, 5, 6, 0 };
-  test_common(solver, id_list);
-
-  cout << "B1 test end" << endl << endl;
+  test_common(solver, id_list, "B1 test");
 }
 
 void
 B2Test(GbmSolver& solver)
 {
-  cout << "B2 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 1, 2, 4, 5, 0 };
-  test_common(solver, id_list);
-
-  cout << "B2 test end" << endl << endl;
+  test_common(solver, id_list, "B2 test");
 }
 
 void
 C0Test(GbmSolver& solver)
 {
-  cout << "C0 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0 };
-  test_common(solver, id_list);
-
-  cout << "C0 test end" << endl << endl;
+  test_common(solver, id_list, "C0 test");
 }
 
 void
 C1Test(GbmSolver& solver)
 {
-  cout << "C1 test" << endl;
-
   ymuint id_list[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0 };
-  test_common(solver, id_list);
-
-  cout << "C0 test end" << endl << endl;
+  test_common(solver, id_list, "C1 test");
 }
 
 int
@@ -227,8 +197,20 @@ Lut443MatchTest(int argc,
     if ( strcmp(argv[1], "naive_binary") == 0 ) {
       solver = new GbmNaive();
     }
+    else if ( strcmp(argv[1], "naive_enum") == 0 ) {
+      solver = new GbmNaiveEnum();
+    }
     else if ( strcmp(argv[1], "naive_onehot") == 0 ) {
       solver = new GbmNaiveOneHot();
+    }
+    else if ( strcmp(argv[1], "incr_enum") == 0 ) {
+      solver = new GbmIncrEnum();
+    }
+    else if ( strcmp(argv[1], "incr_binary") == 0 ) {
+      solver = new GbmIncrBinary();
+    }
+    else if ( strcmp(argv[1], "incr_onehot") == 0 ) {
+      solver = new GbmIncrOneHot();
     }
     else {
       cerr << "Illegal method: " << argv[0] << endl;

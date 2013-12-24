@@ -1,13 +1,13 @@
 
-/// @file GbmNaive.cc
-/// @brief GbmNaive の実装ファイル
+/// @file GbmIncrOneHot.cc
+/// @brief GbmIncrOneHot の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNaive.h"
+#include "GbmIncrOneHot.h"
 #include "GbmEngine.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandler.h"
@@ -22,28 +22,27 @@ const bool debug = false;
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmNaive
+// クラス GbmIncrOneHot
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmNaive::GbmNaive()
+GbmIncrOneHot::GbmIncrOneHot()
 {
 }
 
 // @brief デストラクタ
-GbmNaive::~GbmNaive()
+GbmIncrOneHot::~GbmIncrOneHot()
 {
 }
 
 // @brief 問題を解く
 // @param[in] network RcfNetwork
-// @param[in] output Reconfigurable Network の出力
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 bool
-GbmNaive::_solve(const RcfNetwork& network,
-		 const TvFunc& func,
-		 vector<bool>& conf_bits)
+GbmIncrOneHot::_solve(const RcfNetwork& network,
+		       const TvFunc& func,
+		       vector<bool>& conf_bits)
 {
   SatSolver solver;
 
@@ -212,10 +211,10 @@ END_NONAMESPACE
 // @param[out] iorder 入力順序
 // @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
 bool
-GbmNaive::_solve(const RcfNetwork& network,
-		 const TvFunc& func,
-		 vector<bool>& conf_bits,
-		 vector<ymuint>& iorder)
+GbmIncrOneHot::_solve(const RcfNetwork& network,
+		      const TvFunc& func,
+		      vector<bool>& conf_bits,
+		      vector<ymuint>& iorder)
 {
 #if 1
   SatSolver solver("minisat");
@@ -249,12 +248,10 @@ GbmNaive::_solve(const RcfNetwork& network,
 
   // 入力順用の変数を作る．
   ymuint ni = network.input_num();
-  ymuint m = 0;
-  for (ymuint t = 1; t < ni; t <<= 1, ++ m) ;
-  vector<VarId> iorder_vid_array(ni * m);
+  vector<VarId> iorder_vid_array(ni * ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    for (ymuint j = 0; j < m; ++ j) {
-      iorder_vid_array[i * m + j] = solver.new_var();
+    for (ymuint j = 0; j < ni; ++ j) {
+      iorder_vid_array[i * ni + j] = solver.new_var();
     }
   }
   iorder.resize(ni, 0);
@@ -277,8 +274,8 @@ GbmNaive::_solve(const RcfNetwork& network,
   vector<GbmLit> node_var_array(nn);
   ymuint ni_exp = 1U << ni;
   Bool3 stat = kB3X;
-  vector<Bool3> model;
   bool conflict = false;
+  vector<Bool3> model;
   for (ymuint b = 0U; b < ni_exp && !conflict; ++ b) {
     // 入力に定数を割り当てる．
     if ( debug ) {
@@ -302,100 +299,65 @@ GbmNaive::_solve(const RcfNetwork& network,
       }
       node_var_array[id] = GbmLit(vid);
       // 入力と外部入力の間の関係式を作る．
-      vector<Literal> tmp_lits(m + 1);
       for (ymuint j = 0; j < ni; ++ j) {
-	for (ymuint k = 0; k < m; ++ k) {
-	  VarId kvar = iorder_vid_array[i * m + k];
-	  // こちらは含意の左辺なので否定する．
-	  if ( j & (1U << k) ) {
-	    tmp_lits[k] = Literal(kvar, kPolNega);
-	  }
-	  else {
-	    tmp_lits[k] = Literal(kvar, kPolPosi);
-	  }
-	}
-	if ( b & (1U << j) ) {
-	  tmp_lits[m] = Literal(vid, kPolPosi);
-	}
-	else {
-	  tmp_lits[m] = Literal(vid, kPolNega);
-	}
+	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+	tPol pol = ( b & (1U << j) ) ? kPolPosi : kPolNega;
+	Literal lit1(vid, pol);
 	if ( debug ) {
-	  cout << " added clause = ";
-	  for (ymuint x = 0; x <= m; ++ x) {
-	    cout << " " << tmp_lits[x];
-	  }
-	  cout << endl;
+	  cout << " added clause = " << lit0 << " " << lit1 << endl;
 	}
-	solver.add_clause(tmp_lits);
+	solver.add_clause(lit0, lit1);
       }
-      // 使っていない変数の組み合わせを禁止する．
-      vector<Literal> tmp_lits2(m);
-      for (ymuint j = ni; j < (1U << m); ++ j) {
-	for (ymuint k = 0; k < m; ++ k) {
-	  VarId kvar = iorder_vid_array[i * m + k];
-	  if ( j & (1U << k) ) {
-	    tmp_lits2[k] = Literal(kvar, kPolNega);
+      // 2つの変数が同時に true になってはいけないというルール
+      for (ymuint j = 0; j < ni; ++ j) {
+	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+	for (ymuint k = j + 1; k < ni; ++ k) {
+	  Literal lit1(iorder_vid_array[i * ni + k], kPolNega);
+	  if ( debug ) {
+	    cout << " added clause = " << lit0 << " " << lit1 << endl;
 	  }
-	  else {
-	    tmp_lits2[k] = Literal(kvar, kPolPosi);
-	  }
+	  solver.add_clause(lit0, lit1);
 	}
-	if ( debug ) {
-	  cout << " added clause = ";
-	  for (ymuint x = 0; x < m; ++ x) {
-	    cout << " " << tmp_lits2[x];
-	  }
-	  cout << endl;
-	}
-	solver.add_clause(tmp_lits2);
       }
-#if 0
+      // 最低1つの変数が true にならなければならないというルール
+      vector<Literal> tmp_lits(ni);
+      for (ymuint j = 0; j < ni; ++ j) {
+	tmp_lits[j] = Literal(iorder_vid_array[i * ni + j], kPolPosi);
+      }
+      if ( debug ) {
+	cout << " added clause = ";
+	for (ymuint x = 0; x < ni; ++ x) {
+	  cout << " " << tmp_lits[x];
+	}
+	cout << endl;
+      }
+      solver.add_clause(tmp_lits);
       // 異なる LUT 入力におなじ入力が接続してはいけないというルール
       for (ymuint j = 0; j < ni; ++ j) {
-	vector<Literal> tmp_lits3(m * 2);
+	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
 	for (ymuint k = 0; k < i; ++ k) {
-	  for (ymuint l = 0; l < m; ++ l) {
-	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	    tmp_lits3[l] = Literal(iorder_vid_array[k * m + l], pol);
-	    tmp_lits3[l + m] = Literal(iorder_vid_array[i * m + l], pol);
-	  }
+	  Literal lit1(iorder_vid_array[k * ni + j], kPolNega);
 	  if ( debug ) {
-	    cout << " added clause = ";
-	    for (ymuint x = 0; x < m; ++ x) {
-	      cout << " " << tmp_lits3[x];
-	    }
-	    cout << endl;
+	    cout << " added clause = " << lit0 << " " << lit1 << endl;
 	  }
-	  solver.add_clause(tmp_lits3);
+	  solver.add_clause(lit0, lit1);
 	}
       }
+
       // 対称性を考慮したルール
       ymuint pred;
       if ( network.get_pred(i, pred) ) {
 	for (ymuint j = 0; j < ni; ++ j) {
-	  vector<Literal> tmp_lits3(m * 2);
-	  for (ymuint l = 0; l < m; ++ l) {
-	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	    tmp_lits3[l] = Literal(iorder_vid_array[i * m + l], pol);
-	  }
+	  Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
 	  for (ymuint k = j + 1; k < ni; ++ k) {
-	    for (ymuint l = 0; l < m; ++ l) {
-	      tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	      tmp_lits3[l + m] = Literal(iorder_vid_array[pred * m + l], pol);
-	    }
+	    Literal lit1(iorder_vid_array[pred * ni + k], kPolNega);
 	    if ( debug ) {
-	      cout << " added clause = ";
-	      for (ymuint x = 0; x < m; ++ x) {
-		cout << " " << tmp_lits3[x];
-	      }
-	      cout << endl;
+	      cout << " added clause = " << lit0 << " " << lit1 << endl;
 	    }
-	    solver.add_clause(tmp_lits3);
+	    solver.add_clause(lit0, lit1);
 	  }
 	}
       }
-#endif
     }
     // 内部のノードに変数番号を割り当てる．
     for (vector<const RcfNode*>::iterator p = node_list.begin();
@@ -429,21 +391,25 @@ GbmNaive::_solve(const RcfNetwork& network,
     if ( conflict ) {
       break;
     }
+
+    stat = solver.solve(model);
+    if ( stat == kB3False ) {
+      conflict = true;
+      break;
+    }
   }
 
-  stat = solver.solve(model);
-
 #if 0
-    SatStats stats;
-    solver.get_stats(stats);
+  SatStats stats;
+  solver.get_stats(stats);
 
-    cout << "===================================================================" << endl;
-    cout << "restarts          : " << stats.mRestart << endl
-	 << "conflicts         : " << stats.mConflictNum << endl
-	 << "decisions         : " << stats.mDecisionNum << endl
-	 << "propagations      : " << stats.mPropagationNum << endl
-	 << "conflict literals : " << stats.mLearntLitNum << endl
-	 << "CPU time          : " << stats.mTime << endl;
+  cout << "===================================================================" << endl;
+  cout << "restarts          : " << stats.mRestart << endl
+       << "conflicts         : " << stats.mConflictNum << endl
+       << "decisions         : " << stats.mDecisionNum << endl
+       << "propagations      : " << stats.mPropagationNum << endl
+       << "conflict literals : " << stats.mLearntLitNum << endl
+       << "CPU time          : " << stats.mTime << endl;
 #endif
 
   if ( stat == kB3True ) {
@@ -456,14 +422,13 @@ GbmNaive::_solve(const RcfNetwork& network,
 	conf_bits[i] = false;
       }
       for (ymuint i = 0; i < ni; ++ i) {
-	ymuint pos = 0;
-	for (ymuint j = 0; j < m; ++ j) {
-	  VarId vid = iorder_vid_array[i * m + j];
+	for (ymuint j = 0; j < ni; ++ j) {
+	  VarId vid = iorder_vid_array[i * ni + j];
 	  if ( model[vid.val()] == kB3True ) {
-	    pos += (1U << j);
+	    iorder[j] = i;
+	    break;
 	  }
 	}
-	iorder[pos] = i;
       }
     }
     return true;
@@ -481,10 +446,10 @@ GbmNaive::_solve(const RcfNetwork& network,
 // @param[in] node_var_array ノードの変数番号の配列
 // @param[in] conf_var_array 設定変数番号の配列
 bool
-GbmNaive::make_node_cnf(SatSolver& solver,
-			const RcfNode* node,
-			const vector<GbmLit>& node_var_array,
-			const vector<GbmLit>& conf_var_array)
+GbmIncrOneHot::make_node_cnf(SatSolver& solver,
+			     const RcfNode* node,
+			     const vector<GbmLit>& node_var_array,
+			     const vector<GbmLit>& conf_var_array)
 {
   if ( node->is_input() ) {
     return true;
@@ -540,9 +505,9 @@ GbmNaive::make_node_cnf(SatSolver& solver,
 // @param[in] node_var_array ノードの変数番号の配列
 // @param[out] inputs 結果のリテラルを格納する配列
 void
-GbmNaive::make_inputs(const RcfNode* node,
-		      const vector<GbmLit>& node_var_array,
-		      vector<GbmLit>& inputs)
+GbmIncrOneHot::make_inputs(const RcfNode* node,
+			   const vector<GbmLit>& node_var_array,
+			   vector<GbmLit>& inputs)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -555,8 +520,8 @@ GbmNaive::make_inputs(const RcfNode* node,
 // @param[in] handle ハンドル
 // @param[in] node_var_array ノードの変数番号の配列
 GbmLit
-GbmNaive::handle_to_lit(RcfNodeHandle handle,
-			const vector<GbmLit>& node_var_array)
+GbmIncrOneHot::handle_to_lit(RcfNodeHandle handle,
+			     const vector<GbmLit>& node_var_array)
 {
   if ( handle.is_zero() ) {
     return GbmLit::make_zero();

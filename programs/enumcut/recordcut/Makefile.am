@@ -32,8 +32,16 @@ libgbm_la_SOURCES = \
 	GbmSolver.cc \
 	GbmNaive.h \
 	GbmNaive.cc \
+	GbmNaiveEnum.h \
+	GbmNaiveEnum.cc \
 	GbmNaiveOneHot.h \
 	GbmNaiveOneHot.cc \
+	GbmIncrEnum.h \
+	GbmIncrEnum.cc \
+	GbmIncrBinary.h \
+	GbmIncrBinary.cc \
+	GbmIncrOneHot.h \
+	GbmIncrOneHot.cc \
 	RcfNetwork.h \
 	RcfNetwork.cc \
 	RcfNode.h \

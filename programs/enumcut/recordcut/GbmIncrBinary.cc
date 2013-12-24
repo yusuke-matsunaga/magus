@@ -1,13 +1,13 @@
 
-/// @file GbmNaive.cc
-/// @brief GbmNaive の実装ファイル
+/// @file GbmIncrBinary.cc
+/// @brief GbmIncrBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNaive.h"
+#include "GbmIncrBinary.h"
 #include "GbmEngine.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandler.h"
@@ -22,16 +22,16 @@ const bool debug = false;
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmNaive
+// クラス GbmIncrBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmNaive::GbmNaive()
+GbmIncrBinary::GbmIncrBinary()
 {
 }
 
 // @brief デストラクタ
-GbmNaive::~GbmNaive()
+GbmIncrBinary::~GbmIncrBinary()
 {
 }
 
@@ -41,9 +41,9 @@ GbmNaive::~GbmNaive()
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 bool
-GbmNaive::_solve(const RcfNetwork& network,
-		 const TvFunc& func,
-		 vector<bool>& conf_bits)
+GbmIncrBinary::_solve(const RcfNetwork& network,
+		      const TvFunc& func,
+		      vector<bool>& conf_bits)
 {
   SatSolver solver;
 
@@ -212,10 +212,10 @@ END_NONAMESPACE
 // @param[out] iorder 入力順序
 // @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
 bool
-GbmNaive::_solve(const RcfNetwork& network,
-		 const TvFunc& func,
-		 vector<bool>& conf_bits,
-		 vector<ymuint>& iorder)
+GbmIncrBinary::_solve(const RcfNetwork& network,
+		      const TvFunc& func,
+		      vector<bool>& conf_bits,
+		      vector<ymuint>& iorder)
 {
 #if 1
   SatSolver solver("minisat");
@@ -429,9 +429,12 @@ GbmNaive::_solve(const RcfNetwork& network,
     if ( conflict ) {
       break;
     }
+    stat = solver.solve(model);
+    if ( stat == kB3False ) {
+      conflict = true;
+      break;
+    }
   }
-
-  stat = solver.solve(model);
 
 #if 0
     SatStats stats;
@@ -481,10 +484,10 @@ GbmNaive::_solve(const RcfNetwork& network,
 // @param[in] node_var_array ノードの変数番号の配列
 // @param[in] conf_var_array 設定変数番号の配列
 bool
-GbmNaive::make_node_cnf(SatSolver& solver,
-			const RcfNode* node,
-			const vector<GbmLit>& node_var_array,
-			const vector<GbmLit>& conf_var_array)
+GbmIncrBinary::make_node_cnf(SatSolver& solver,
+			     const RcfNode* node,
+			     const vector<GbmLit>& node_var_array,
+			     const vector<GbmLit>& conf_var_array)
 {
   if ( node->is_input() ) {
     return true;
@@ -540,9 +543,9 @@ GbmNaive::make_node_cnf(SatSolver& solver,
 // @param[in] node_var_array ノードの変数番号の配列
 // @param[out] inputs 結果のリテラルを格納する配列
 void
-GbmNaive::make_inputs(const RcfNode* node,
-		      const vector<GbmLit>& node_var_array,
-		      vector<GbmLit>& inputs)
+GbmIncrBinary::make_inputs(const RcfNode* node,
+			   const vector<GbmLit>& node_var_array,
+			   vector<GbmLit>& inputs)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -555,8 +558,8 @@ GbmNaive::make_inputs(const RcfNode* node,
 // @param[in] handle ハンドル
 // @param[in] node_var_array ノードの変数番号の配列
 GbmLit
-GbmNaive::handle_to_lit(RcfNodeHandle handle,
-			const vector<GbmLit>& node_var_array)
+GbmIncrBinary::handle_to_lit(RcfNodeHandle handle,
+			     const vector<GbmLit>& node_var_array)
 {
   if ( handle.is_zero() ) {
     return GbmLit::make_zero();

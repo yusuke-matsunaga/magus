@@ -273,7 +273,9 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   }
   vector<GbmLit> node_var_array(nn);
   ymuint ni_exp = 1U << ni;
+  Bool3 stat = kB3X;
   bool conflict = false;
+  vector<Bool3> model;
   for (ymuint b = 0U; b < ni_exp && !conflict; ++ b) {
     // 入力に定数を割り当てる．
     if ( debug ) {
@@ -386,22 +388,24 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 	break;
       }
     }
+    if ( conflict ) {
+      break;
+    }
   }
 
-  vector<Bool3> model;
-  Bool3 stat = solver.solve(model);
+  stat = solver.solve(model);
 
 #if 0
-    SatStats stats;
-    solver.get_stats(stats);
+  SatStats stats;
+  solver.get_stats(stats);
 
-    cout << "===================================================================" << endl;
-    cout << "restarts          : " << stats.mRestart << endl
-	 << "conflicts         : " << stats.mConflictNum << endl
-	 << "decisions         : " << stats.mDecisionNum << endl
-	 << "propagations      : " << stats.mPropagationNum << endl
-	 << "conflict literals : " << stats.mLearntLitNum << endl
-	 << "CPU time          : " << stats.mTime << endl;
+  cout << "===================================================================" << endl;
+  cout << "restarts          : " << stats.mRestart << endl
+       << "conflicts         : " << stats.mConflictNum << endl
+       << "decisions         : " << stats.mDecisionNum << endl
+       << "propagations      : " << stats.mPropagationNum << endl
+       << "conflict literals : " << stats.mLearntLitNum << endl
+       << "CPU time          : " << stats.mTime << endl;
 #endif
 
   if ( stat == kB3True ) {

@@ -43,6 +43,24 @@ public:
   match(const TvFunc& func,
 	GbmSolver& solver);
 
+  /// @brief カウンタをリセットする．
+  void
+  reset_count();
+
+  /// @brief カウンタの値を得る．
+  void
+  get_count(ymuint& trivial_num,
+	    ymuint& a0_num,
+	    ymuint& a1_num,
+	    ymuint& a2_num,
+	    ymuint& a3_num,
+	    ymuint& b0_num,
+	    ymuint& b1_num,
+	    ymuint& b2_num,
+	    ymuint& c0_num,
+	    ymuint& c1_num,
+	    ymuint& fail_num);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -75,6 +93,39 @@ private:
 
   // C1
   RcfNetwork mC1;
+
+  // 自明なマッチ (<= 5)の回数
+  ymuint32 mTrivialNum;
+
+  // A0 の回数
+  ymuint32 mA0Num;
+
+  // A1 の回数
+  ymuint32 mA1Num;
+
+  // A2 の回数
+  ymuint32 mA2Num;
+
+  // A3 の回数
+  ymuint32 mA3Num;
+
+  // B0 の回数
+  ymuint32 mB0Num;
+
+  // B1 の回数
+  ymuint32 mB1Num;
+
+  // B2 の回数
+  ymuint32 mB2Num;
+
+  // C0 の回数
+  ymuint32 mC0Num;
+
+  // C1 の回数
+  ymuint32 mC1Num;
+
+  // マッチしなかった回数
+  ymuint32 mFailNum;
 
 };
 

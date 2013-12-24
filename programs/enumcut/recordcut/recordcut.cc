@@ -25,6 +25,9 @@
 #include "Lut443Match.h"
 #include "GbmNaive.h"
 #include "GbmNaiveOneHot.h"
+#include "GbmNaiveEnum.h"
+#include "GbmIncrOneHot.h"
+#include "GbmIncrEnum.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -34,6 +37,7 @@
 #include "ym_utils/FileIDO.h"
 #include "ym_utils/FileODO.h"
 #include "ym_utils/StopWatch.h"
+#include "ym_utils/RandGen.h"
 
 BEGIN_NAMESPACE_YM
 
@@ -44,7 +48,8 @@ rec_func(FuncMgr& func_mgr,
 	 bool iscas89,
 	 ymuint min_cut_size,
 	 ymuint max_cut_size,
-	 const string& method)
+	 const string& method,
+	 ymuint nrand)
 {
   MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
   MsgMgr::reg_handler(msg_handler);
@@ -70,7 +75,7 @@ rec_func(FuncMgr& func_mgr,
   TopDown enumcut;
 
   op.set_min_size(min_cut_size);
-  op.set_debug_level(1);
+  op.set_debug_level(0);
 
   enumcut(network, max_cut_size, &op);
 
@@ -91,6 +96,15 @@ rec_func(FuncMgr& func_mgr,
   else if ( method == "naive_onehot" ) {
     solver = new GbmNaiveOneHot();
   }
+  else if ( method == "naive_enum" ) {
+    solver = new GbmNaiveEnum();
+  }
+  else if ( method == "incr_onehot" ) {
+    solver = new GbmIncrOneHot();
+  }
+  else if ( method == "incr_enum" ) {
+    solver = new GbmIncrEnum();
+  }
   else if ( method != string() ) {
     cerr << "Illegal method: " << method << endl;
     return;
@@ -102,10 +116,50 @@ rec_func(FuncMgr& func_mgr,
   StopWatch timer;
   timer.start();
   Lut443Match matcher;
-  for (vector<TvFunc>::const_iterator p = func_list.begin();
-       p != func_list.end(); ++ p) {
-    matcher.match(*p, *solver);
+
+  if ( nrand > 0 ) {
+    RandGen rg;
+    for (ymuint i = 0; i < nrand; ++ i) {
+      ymuint pos = rg.ulong() % func_list.size();
+      matcher.match(func_list[pos], *solver);
+    }
   }
+  else {
+    for (vector<TvFunc>::const_iterator p = func_list.begin();
+	 p != func_list.end(); ++ p) {
+      matcher.match(*p, *solver);
+    }
+  }
+
+  ymuint t_num = 0;
+  ymuint a0_num = 0;
+  ymuint a1_num = 0;
+  ymuint a2_num = 0;
+  ymuint a3_num = 0;
+  ymuint b0_num = 0;
+  ymuint b1_num = 0;
+  ymuint b2_num = 0;
+  ymuint c0_num = 0;
+  ymuint c1_num = 0;
+  ymuint fail_num = 0;
+  matcher.get_count(t_num,
+		    a0_num, a1_num, a2_num, a3_num,
+		    b0_num, b1_num, b2_num,
+		    c0_num, c1_num,
+		    fail_num);
+
+  cout << "Trivial: " << t_num << endl
+       << "A-0    : " << a0_num << endl
+       << "A-1    : " << a1_num << endl
+       << "A-2    : " << a2_num << endl
+       << "A-3    : " << a3_num << endl
+       << "B-0    : " << b0_num << endl
+       << "B-1    : " << b1_num << endl
+       << "B-2    : " << b2_num << endl
+       << "C-0    : " << c0_num << endl
+       << "C-1    : " << c1_num << endl
+       << "Fail   : " << fail_num << endl;
+
   timer.stop();
   cout << "Total CPUT time " << timer.time() << endl;
 
@@ -184,6 +238,7 @@ main(int argc,
   int max_cut_size = -1;
   int min_cut_size = -1;
   char* method_str = NULL;
+  ymuint nrand = 0;
 
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -208,6 +263,9 @@ main(int argc,
 
     { "method", 'm', POPT_ARG_STRING, &method_str, 0,
       "specify matcing method", NULL },
+
+    { "randam_sample", 'r', POPT_ARG_INT, &nrand, 0,
+      "do randam smpling", "# of samples" },
 
     POPT_AUTOHELP
 
@@ -274,7 +332,7 @@ main(int argc,
   FuncMgr func_mgr;
 
   string filename(str);
-  rec_func(func_mgr, filename, blif, iscas, min_cut_size, max_cut_size, method);
+  rec_func(func_mgr, filename, blif, iscas, min_cut_size, max_cut_size, method, nrand);
 
   return 0;
 }
