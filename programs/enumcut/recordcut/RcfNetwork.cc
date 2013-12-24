@@ -41,6 +41,7 @@ RcfNetwork::new_input()
   RcfNode* node = new (p) RcfInputNode(id, input_id);
   mNodeList.push_back(node);
   mInputList.push_back(node);
+  mInputPredList.push_back(0U);
   return RcfNodeHandle(node->id(), false);
 }
 
@@ -105,6 +106,15 @@ void
 RcfNetwork::set_output(RcfNodeHandle handle)
 {
   mOutput = handle;
+}
+
+// @brief 先行者番号をセットする．
+void
+RcfNetwork::set_input_pred(ymuint pos,
+			   ymuint pred)
+{
+  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  mInputPredList[pos] = (pred << 1) | 1U;
 }
 
 // @brief 全ノード数を返す．
@@ -209,6 +219,22 @@ RcfNodeHandle
 RcfNetwork::output() const
 {
   return mOutput;
+}
+
+// @brief 入力の先行者があれば true を返す．
+// @param[in] pos 入力の位置番号 ( 0 <= pos < input_num() )
+// @param[out] pred 先行者番号
+bool
+RcfNetwork::get_pred(ymuint pos,
+		     ymuint& pred) const
+{
+  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ymuint v = mInputPredList[pos];
+  if ( v == 0U ) {
+    return false;
+  }
+  pred = v >> 1;
+  return true;
 }
 
 // @brief configuration 変数の数を返す．

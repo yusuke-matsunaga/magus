@@ -306,7 +306,7 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 	}
 	solver.add_clause(lit0, lit1);
       }
-      // 使っていない変数の組み合わせを禁止する．
+      // 2つの変数が同時に true になってはいけないというルール
       for (ymuint j = 0; j < ni; ++ j) {
 	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
 	for (ymuint k = j + 1; k < ni; ++ k) {
@@ -317,6 +317,7 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 	  solver.add_clause(lit0, lit1);
 	}
       }
+      // 最低1つの変数が true にならなければならないというルール
       vector<Literal> tmp_lits(ni);
       for (ymuint j = 0; j < ni; ++ j) {
 	tmp_lits[j] = Literal(iorder_vid_array[i * ni + j], kPolPosi);
@@ -329,6 +330,7 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 	cout << endl;
       }
       solver.add_clause(tmp_lits);
+      // 異なる LUT 入力におなじ入力が接続してはいけないというルール
       for (ymuint j = 0; j < ni; ++ j) {
 	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
 	for (ymuint k = 0; k < i; ++ k) {
@@ -337,6 +339,21 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 	    cout << " added clause = " << lit0 << " " << lit1 << endl;
 	  }
 	  solver.add_clause(lit0, lit1);
+	}
+      }
+
+      // 対称性を考慮したルール
+      ymuint pred;
+      if ( network.get_pred(i, pred) ) {
+	for (ymuint j = 0; j < ni; ++ j) {
+	  Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+	  for (ymuint k = j + 1; k < ni; ++ k) {
+	    Literal lit1(iorder_vid_array[pred * ni + k], kPolNega);
+	    if ( debug ) {
+	      cout << " added clause = " << lit0 << " " << lit1 << endl;
+	    }
+	    solver.add_clause(lit0, lit1);
+	  }
 	}
       }
     }

@@ -348,6 +348,52 @@ GbmNaive::_solve(const RcfNetwork& network,
 	}
 	solver.add_clause(tmp_lits2);
       }
+#if 0
+      // 異なる LUT 入力におなじ入力が接続してはいけないというルール
+      for (ymuint j = 0; j < ni; ++ j) {
+	vector<Literal> tmp_lits3(m * 2);
+	for (ymuint k = 0; k < i; ++ k) {
+	  for (ymuint l = 0; l < m; ++ l) {
+	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
+	    tmp_lits3[l] = Literal(iorder_vid_array[k * m + l], pol);
+	    tmp_lits3[l + m] = Literal(iorder_vid_array[i * m + l], pol);
+	  }
+	  if ( debug ) {
+	    cout << " added clause = ";
+	    for (ymuint x = 0; x < m; ++ x) {
+	      cout << " " << tmp_lits3[x];
+	    }
+	    cout << endl;
+	  }
+	  solver.add_clause(tmp_lits3);
+	}
+      }
+      // 対称性を考慮したルール
+      ymuint pred;
+      if ( network.get_pred(i, pred) ) {
+	for (ymuint j = 0; j < ni; ++ j) {
+	  vector<Literal> tmp_lits3(m * 2);
+	  for (ymuint l = 0; l < m; ++ l) {
+	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
+	    tmp_lits3[l] = Literal(iorder_vid_array[i * m + l], pol);
+	  }
+	  for (ymuint k = j + 1; k < ni; ++ k) {
+	    for (ymuint l = 0; l < m; ++ l) {
+	      tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
+	      tmp_lits3[l + m] = Literal(iorder_vid_array[pred * m + l], pol);
+	    }
+	    if ( debug ) {
+	      cout << " added clause = ";
+	      for (ymuint x = 0; x < m; ++ x) {
+		cout << " " << tmp_lits3[x];
+	      }
+	      cout << endl;
+	    }
+	    solver.add_clause(tmp_lits3);
+	  }
+	}
+      }
+#endif
     }
     // 内部のノードに変数番号を割り当てる．
     for (vector<const RcfNode*>::iterator p = node_list.begin();

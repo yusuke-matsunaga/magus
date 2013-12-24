@@ -61,38 +61,75 @@ Lut443Match::Lut443Match()
   // LUT-A0 を作る．
   ymuint id_a0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
   make_lut443(mA0, 9, id_a0);
+  mA0.set_input_pred(1, 0);
+  mA0.set_input_pred(2, 1);
+  mA0.set_input_pred(3, 2);
+  mA0.set_input_pred(4, 0);
+  mA0.set_input_pred(5, 4);
+  mA0.set_input_pred(6, 5);
+  mA0.set_input_pred(7, 6);
 
   // LUT-A1 を作る．
   ymuint id_a1[] = { 0, 1, 2, 3, 0, 4, 5, 6, 7 };
   make_lut443(mA1, 8, id_a1);
+  mA1.set_input_pred(2, 1);
+  mA1.set_input_pred(3, 2);
+  mA1.set_input_pred(4, 1);
+  mA1.set_input_pred(5, 4);
+  mA1.set_input_pred(6, 5);
 
   // LUT-A2 を作る．
   ymuint id_a2[] = { 0, 1, 2, 3, 0, 1, 4, 5, 6 };
   make_lut443(mA2, 7, id_a2);
+  mA2.set_input_pred(1, 0);
+  mA2.set_input_pred(3, 2);
+  mA2.set_input_pred(4, 2);
+  mA2.set_input_pred(5, 4);
 
   // LUT-A3 を作る．
   ymuint id_a3[] = { 0, 1, 2, 3, 0, 1, 2, 4, 5 };
   make_lut443(mA3, 6, id_a3);
+  mA3.set_input_pred(1, 0);
+  mA3.set_input_pred(2, 1);
+  mA3.set_input_pred(4, 3);
 
   // LUT-B0 を作る．
   ymuint id_b0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0 };
   make_lut443(mB0, 8, id_b0);
+  mB0.set_input_pred(2, 1);
+  mB0.set_input_pred(3, 2);
+  mB0.set_input_pred(5, 4);
+  mB0.set_input_pred(6, 5);
+  mB0.set_input_pred(7, 6);
 
   // LUT-B1 を作る．
   ymuint id_b1[] = { 0, 1, 2, 3, 1, 4, 5, 6, 0 };
   make_lut443(mB1, 7, id_b1);
+  mB1.set_input_pred(3, 2);
+  mB1.set_input_pred(5, 4);
+  mB1.set_input_pred(6, 5);
 
   // LUT-B2 を作る．
   ymuint id_b2[] = { 0, 1, 2, 3, 1, 2, 4, 5, 0 };
   make_lut443(mB2, 6, id_b2);
+  mB2.set_input_pred(2, 1);
+  mB2.set_input_pred(5, 4);
 
   // LUT-C0 を作る．
   ymuint id_c0[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0 };
   make_lut443(mC0, 7, id_c0);
+  mC0.set_input_pred(2, 1);
+  mC0.set_input_pred(3, 2);
+  mC0.set_input_pred(4, 1);
+  mC0.set_input_pred(5, 4);
+  mC0.set_input_pred(6, 5);
 
   // LUT-C1 を作る．
   ymuint id_c1[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0 };
   make_lut443(mC1, 7, id_c1);
+  mC1.set_input_pred(3, 2);
+  mC1.set_input_pred(4, 2);
+  mC1.set_input_pred(5, 4);
 
 }
 

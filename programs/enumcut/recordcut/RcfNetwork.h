@@ -92,6 +92,11 @@ public:
   void
   set_output(RcfNodeHandle handle);
 
+  /// @brief 先行者番号をセットする．
+  void
+  set_input_pred(ymuint pos,
+		 ymuint pred);
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -157,6 +162,13 @@ public:
   RcfNodeHandle
   output() const;
 
+  /// @brief 入力の先行者があれば true を返す．
+  /// @param[in] pos 入力の位置番号 ( 0 <= pos < input_num() )
+  /// @param[out] pred 先行者番号
+  bool
+  get_pred(ymuint pos,
+	   ymuint& pred) const;
+
   /// @brief configuration 変数の数を返す．
   ymuint
   conf_var_num() const;
@@ -175,6 +187,9 @@ private:
 
   // 入力ノードを格納するベクタ
   vector<RcfNode*> mInputList;
+
+  // 入力順の先行者を格納するベクタ
+  vector<ymuint32> mInputPredList;
 
   // ANDノードを格納するベクタ
   vector<RcfNode*> mAndList;
