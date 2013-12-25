@@ -5,7 +5,7 @@
 /// @brief SatSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -30,12 +30,26 @@ protected:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ヘッダの出力
+  virtual
+  void
+  print_header() = 0;
 
   /// @brief 内部状態の出力を行う仮想関数
   /// @param[in] stats SAT ソルバの内部状態
   virtual
   void
   operator()(const SatStats& stats) = 0;
+
+  /// @brief 終了メッセージの出力
+  /// @param[in] stats SAT ソルバの内部状態
+  virtual
+  void
+  print_tailer(const SatStats& stats) = 0;
 
 };
 

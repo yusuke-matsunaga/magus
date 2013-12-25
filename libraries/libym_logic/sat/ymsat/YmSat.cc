@@ -441,6 +441,13 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
 
+  // メッセージハンドラにヘッダの出力を行わせる．
+  for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
+       p != mMsgHandlerList.end(); ++ p) {
+    SatMsgHandler& handler = *(*p);
+    handler.print_header();
+  }
+
   if ( mTimerOn ) {
     mTimer.stop();
     mTimer.reset();
@@ -549,6 +556,17 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   if ( mTimerOn ) {
     mTimer.stop();
+  }
+
+  // メッセージハンドラに終了メッセージを出力させる．
+  {
+    SatStats stats;
+    get_stats(stats);
+    for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
+	 p != mMsgHandlerList.end(); ++ p) {
+      SatMsgHandler& handler = *(*p);
+      handler.print_tailer(stats);
+    }
   }
 
   if ( debug & debug_solve ) {

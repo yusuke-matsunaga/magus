@@ -15,6 +15,8 @@
 
 #include "ym_utils/StopWatch.h"
 
+#include "YmsatMsgHandler.h"
+
 #if USE_ZSTREAM
 #include "ym_utils/zstream.h"
 #endif
@@ -22,67 +24,6 @@
 
 BEGIN_NAMESPACE_YM
 BEGIN_NONAMESPACE
-
-//////////////////////////////////////////////////////////////////////
-// ymsat 用の SatMsgHandler
-//////////////////////////////////////////////////////////////////////
-class YmsatMsgHandler :
-  public SatMsgHandler
-{
-public:
-
-  /// @brief コンストラクタ
-  YmsatMsgHandler(ostream& s);
-
-  /// @brief デストラクタ
-  virtual
-  ~YmsatMsgHandler();
-
-  /// @brief メッセージ出力関数
-  virtual
-  void
-  operator()(const SatStats& stats);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 出力ストリーム
-  ostream& mS;
-
-};
-
-// @brief コンストラクタ
-YmsatMsgHandler::YmsatMsgHandler(ostream& s) :
-  mS(s)
-{
-}
-
-// @brief デストラクタ
-YmsatMsgHandler::~YmsatMsgHandler()
-{
-}
-
-// @brief メッセージ出力関数
-void
-YmsatMsgHandler::operator()(const SatStats& stats)
-{
-  mS << "| "
-     << setw(9) << stats.mConflictNum
-     << " | "
-     << setw(9) << stats.mConstrClauseNum
-     << " "
-     << setw(9) << stats.mConstrLitNum
-     << " | "
-     << setw(9) << stats.mLearntLimit
-     << " "
-     << setw(9) << stats.mLearntClauseNum
-     << " "
-     << setw(9) << stats.mLearntLitNum
-     << " |" << endl;
-}
 
 // c という文字がでるまで読み飛ばす．
 void

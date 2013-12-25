@@ -16,6 +16,8 @@
 
 #include "ym_utils/StopWatch.h"
 
+#include "YmsatMsgHandler.h"
+
 #if USE_ZSTREAM
 #include "ym_utils/zstream.h"
 #endif
@@ -133,38 +135,6 @@ public:
 	     const string& body);
 };
 #endif
-
-
-//////////////////////////////////////////////////////////////////////
-// ymsat 用の SatMsgHandler
-//////////////////////////////////////////////////////////////////////
-class YmsatMsgHandler :
-  public SatMsgHandler
-{
-public:
-
-  /// @brief コンストラクタ
-  YmsatMsgHandler(ostream& s);
-
-  /// @brief デストラクタ
-  virtual
-  ~YmsatMsgHandler();
-
-  /// @brief メッセージ出力関数
-  virtual
-  void
-  operator()(const SatStats& stats);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 出力ストリーム
-  ostream& mS;
-
-};
 
 
 // @brief コンストラクタ
@@ -317,36 +287,6 @@ SatDimacsMsgHandler::operator()(const char* src_file,
 }
 #endif
 
-// @brief コンストラクタ
-YmsatMsgHandler::YmsatMsgHandler(ostream& s) :
-  mS(s)
-{
-}
-
-// @brief デストラクタ
-YmsatMsgHandler::~YmsatMsgHandler()
-{
-}
-
-// @brief メッセージ出力関数
-void
-YmsatMsgHandler::operator()(const SatStats& stats)
-{
-  mS << "| "
-     << setw(9) << stats.mConflictNum
-     << " | "
-     << setw(9) << stats.mConstrClauseNum
-     << " "
-     << setw(9) << stats.mConstrLitNum
-     << " | "
-     << setw(9) << stats.mLearntLimit
-     << " "
-     << setw(9) << stats.mLearntClauseNum
-     << " "
-     << setw(9) << stats.mLearntLitNum
-     << " |" << endl;
-}
-
 END_NONAMESPACE
 END_NAMESPACE_YM
 
@@ -399,27 +339,11 @@ main(int argc,
     solver.reg_msg_handler(&satmsghandler);
     solver.timer_on(true);
 
-    cout << "===================================================================" << endl;
-    cout << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl;
-    cout << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl;
-    cout << "===================================================================" << endl;
-
     StopWatch sw;
     sw.start();
     vector<Bool3> model;
     Bool3 ans = solver.solve(model);
     sw.stop();
-
-    SatStats stats;
-    solver.get_stats(stats);
-
-    cout << "===================================================================" << endl;
-    cout << "restarts          : " << stats.mRestart << endl
-	 << "conflicts         : " << stats.mConflictNum << endl
-	 << "decisions         : " << stats.mDecisionNum << endl
-	 << "propagations      : " << stats.mPropagationNum << endl
-	 << "conflict literals : " << stats.mLearntLitNum << endl
-	 << "CPU time          : " << stats.mTime << endl;
 
     if ( ans == kB3True ) {
       handler.verify(model);

@@ -32,6 +32,12 @@ PySatMsgHandler::~PySatMsgHandler()
   Py_DECREF(mFuncObj);
 }
 
+// @brief ヘッダの出力
+void
+PySatMsgHandler::print_header()
+{
+}
+
 // @brief 内部状態の出力を行う仮想関数
 // @param[in] stats SAT ソルバの内部状態
 void
@@ -69,6 +75,13 @@ PySatMsgHandler::operator()(const SatStats& stats)
     // どちらにせよ結果は使わない．
     Py_DECREF(result);
   }
+}
+
+// @brief 終了メッセージの出力
+// @param[in] stats SAT ソルバの内部状態
+void
+PySatMsgHandler::print_tailer(const SatStats& stats)
+{
 }
 
 END_NAMESPACE_YM

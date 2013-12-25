@@ -1,36 +1,31 @@
-#ifndef PYSATMSGHANDLER_H
-#define PYSATMSGHANDLER_H
 
-/// @file PySatMsgHandler.h
-/// @brief PySatMshgHandler のヘッダファイル
+/// @file YmsatMsgHandler.h
+/// @brief YmsatMsgHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym_logic/SatMsgHandler.h"
-#include "ym_logic/pylogic.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class PySatMsgHandler PySatMsgHanlder.h "PySatMsgHandler.h"
-/// @brief Python のコードを呼び出す SatMsgHandler の継承クラス
+// ymsat 用の SatMsgHandler
 //////////////////////////////////////////////////////////////////////
-class PySatMsgHandler :
+class YmsatMsgHandler :
   public SatMsgHandler
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func_obj Python の関数オブジェクト
-  PySatMsgHandler(PyObject* func_obj);
+  YmsatMsgHandler(ostream& s);
 
   /// @brief デストラクタ
   virtual
-  ~PySatMsgHandler();
+  ~YmsatMsgHandler();
 
 
 public:
@@ -43,8 +38,7 @@ public:
   void
   print_header();
 
-  /// @brief 内部状態の出力を行う仮想関数
-  /// @param[in] stats SAT ソルバの内部状態
+  /// @brief メッセージ出力関数
   virtual
   void
   operator()(const SatStats& stats);
@@ -61,11 +55,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の処理を行う Python の関数オブジェクト
-  PyObject* mFuncObj;
+  // 出力ストリーム
+  ostream& mS;
 
 };
 
 END_NAMESPACE_YM
-
-#endif // PYSATMSGHANDLER_H
