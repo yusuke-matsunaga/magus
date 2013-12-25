@@ -296,6 +296,40 @@ main(int argc,
   using namespace std;
   using namespace nsYm;
 
+  int verbose = 0;
+  bool minisat = false;
+
+  int wpos = 1;
+  string opt;
+  for (int rpos = 1; rpos < argc; ++ rpos) {
+    if ( argv[rpos][0] == '-' ) {
+      if ( strcmp(argv[rpos], "-v") == 0 ||
+	   strcmp(argv[rpos], "--verbose") == 0 ) {
+	++ verbose;
+      }
+      else if ( strcmp(argv[rpos], "--minisat") == 0 ) {
+	minisat = true;
+      }
+      else if ( strcmp(argv[rpos], "--analyzer-uip1") == 0 ) {
+	opt = "uip1";
+      }
+      else if ( strcmp(argv[rpos], "--analyzer-simple") == 0 ) {
+	opt = "simple";
+      }
+      else {
+	cerr << argv[rpos] << " : illegal option" << endl;
+	return 1;
+      }
+    }
+    else {
+      if ( rpos != wpos ) {
+	argv[wpos] = argv[rpos];
+      }
+      ++ wpos;
+    }
+  }
+  argc = wpos;
+
   if ( argc != 2 ) {
     cerr << "USAGE : " << argv[0] << " cnf-file" << endl;
     return 2;
@@ -317,7 +351,12 @@ main(int argc,
     istream& s1 = s;
 #endif
 #endif
-    SatSolver solver;
+
+    string type;
+    if ( minisat ) {
+      type = "minisat";
+    }
+    SatSolver solver(type, opt);
 
     DimacsParser parser;
     SatDimacsHandler handler(solver);

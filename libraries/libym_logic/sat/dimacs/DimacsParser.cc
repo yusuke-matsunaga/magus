@@ -12,6 +12,7 @@
 #include "ym_logic/DimacsParser.h"
 #include "DimacsParserImpl.h"
 #include "ym_utils/FileIDO.h"
+#include "ym_utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -157,15 +158,13 @@ DimacsParserImpl::read(const string& filename)
   FileIDO ido(filename);
   if ( !ido ) {
     // ファイルが開けなかった．
-#if 0
     ostringstream buf;
     buf << filename << " : No such file.";
-    mMsgMgr.put_msg(__FILE__, __LINE__,
+    MsgMgr::put_msg(__FILE__, __LINE__,
 		    FileRegion(),
 		    kMsgFailure,
 		    "DIMACS_PARSER",
 		    buf.str());
-#endif
     return false;
   }
 
