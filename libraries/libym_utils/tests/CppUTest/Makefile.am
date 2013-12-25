@@ -67,4 +67,5 @@ libym_utils_cpputest_la_SOURCES = \
 	FileTest.cc \
 	CombiGenTest.cc \
 	PermGenTest.cc \
-	HeapTreeTest.cc
+	HeapTreeTest.cc \
+	BtgMatchTest.cc
