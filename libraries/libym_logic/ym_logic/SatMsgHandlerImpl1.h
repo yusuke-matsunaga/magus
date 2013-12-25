@@ -1,6 +1,8 @@
+#ifndef YM_LOGIC_SAT_MSGHANDLERIMPL1_H
+#define YM_LOGIC_SAT_MSGHANDLERIMPL1_H
 
-/// @file YmsatMsgHandler.h
-/// @brief YmsatMsgHandler のヘッダファイル
+/// @file ym_logic/SatMsgHandlerImpl1.h
+/// @brief SatMsgHandlerImpl1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
@@ -13,19 +15,21 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// ymsat 用の SatMsgHandler
+/// @class SatMsgHandlerImpl1 SatMsgHandlerImpl1.h "ym_logic/SatMsgHandlerImpl1.h"
+/// @brief SatMsgHandler の実装例
 //////////////////////////////////////////////////////////////////////
-class YmsatMsgHandler :
+class SatMsgHandlerImpl1 :
   public SatMsgHandler
 {
 public:
 
   /// @brief コンストラクタ
-  YmsatMsgHandler(ostream& s);
+  /// @param[in] s 出力先のストリーム
+  SatMsgHandlerImpl1(ostream& s);
 
   /// @brief デストラクタ
   virtual
-  ~YmsatMsgHandler();
+  ~SatMsgHandlerImpl1();
 
 
 public:
@@ -41,13 +45,13 @@ public:
   /// @brief メッセージ出力関数
   virtual
   void
-  operator()(const SatStats& stats);
+  print_message(const SatStats& stats);
 
-  /// @brief 終了メッセージの出力
+  /// @brief フッタの出力
   /// @param[in] stats SAT ソルバの内部状態
   virtual
   void
-  print_tailer(const SatStats& stats);
+  print_footer(const SatStats& stats);
 
 
 private:
@@ -61,3 +65,5 @@ private:
 };
 
 END_NAMESPACE_YM
+
+#endif // YM_LOGIC_SAT_MSGHANDLERIMPL1_H

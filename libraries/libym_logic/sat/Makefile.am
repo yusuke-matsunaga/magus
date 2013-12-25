@@ -18,7 +18,8 @@ libym_logic_sat_la_CPPFLAGS = \
 	-I$(top_srcdir)/sat/include
 
 libym_logic_sat_la_SOURCES = \
-	SatSolver.cc
+	SatSolver.cc \
+	SatMsgHandlerImpl1.cc
 
 libym_logic_sat_la_LIBADD = \
 	ymsat/libym_sat_ymsat.la \

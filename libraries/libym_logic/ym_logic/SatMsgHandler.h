@@ -43,13 +43,13 @@ public:
   /// @param[in] stats SAT ソルバの内部状態
   virtual
   void
-  operator()(const SatStats& stats) = 0;
+  print_message(const SatStats& stats) = 0;
 
-  /// @brief 終了メッセージの出力
+  /// @brief フッタの出力
   /// @param[in] stats SAT ソルバの内部状態
   virtual
   void
-  print_tailer(const SatStats& stats) = 0;
+  print_footer(const SatStats& stats) = 0;
 
 };
 

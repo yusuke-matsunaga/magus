@@ -11,12 +11,11 @@
 
 #include "ym_logic/DimacsParser.h"
 #include "ym_logic/SatSolver.h"
-#include "ym_logic/SatMsgHandler.h"
+#include "ym_logic/SatMsgHandlerImpl1.h"
 #include "ym_logic/SatStats.h"
 
 #include "ym_utils/StopWatch.h"
 
-#include "YmsatMsgHandler.h"
 
 #if USE_ZSTREAM
 #include "ym_utils/zstream.h"
@@ -335,7 +334,7 @@ main(int argc,
       return 4;
     }
 
-    YmsatMsgHandler satmsghandler(cout);
+    SatMsgHandlerImpl1 satmsghandler(cout);
     solver.reg_msg_handler(&satmsghandler);
     solver.timer_on(true);
 

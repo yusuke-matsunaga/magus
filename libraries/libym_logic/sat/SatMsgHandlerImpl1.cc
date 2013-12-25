@@ -1,34 +1,38 @@
 
-/// @file YmsatMsgHandler.cc
-/// @brief YmsatMsgHandler の実装ファイル
+/// @file SatMsgHandlerImpl1.cc
+/// @brief SatMsgHandlerImpl1 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmsatMsgHandler.h"
+#include "ym_logic/SatMsgHandlerImpl1.h"
 #include "ym_logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
-YmsatMsgHandler::YmsatMsgHandler(ostream& s) :
+SatMsgHandlerImpl1::SatMsgHandlerImpl1(ostream& s) :
   mS(s)
 {
 }
 
 // @brief デストラクタ
-YmsatMsgHandler::~YmsatMsgHandler()
+SatMsgHandlerImpl1::~SatMsgHandlerImpl1()
 {
 }
 
 // @brief ヘッダの出力
 void
-YmsatMsgHandler::print_header()
+SatMsgHandlerImpl1::print_header()
 {
-  mS << "===================================================================" << endl
+  mS << "====================[ Problem Statistics ] ========================" << endl
+     << "|                                                                 |" << endl
+     << "|  Number of variables:                                           |" << endl
+     << "|  Number of clauses:                                             |" << endl
+     << "====================[ Search Statistics ] =========================" << endl
      << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl
      << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl
      << "===================================================================" << endl;
@@ -36,7 +40,7 @@ YmsatMsgHandler::print_header()
 
 // @brief メッセージ出力関数
 void
-YmsatMsgHandler::operator()(const SatStats& stats)
+SatMsgHandlerImpl1::print_message(const SatStats& stats)
 {
   mS << "| "
      << setw(9) << stats.mConflictNum
@@ -53,10 +57,10 @@ YmsatMsgHandler::operator()(const SatStats& stats)
      << " |" << endl;
 }
 
-// @brief 終了メッセージの出力
+// @brief フッタの出力
 // @param[in] stats SAT ソルバの内部状態
 void
-YmsatMsgHandler::print_tailer(const SatStats& stats)
+SatMsgHandlerImpl1::print_footer(const SatStats& stats)
 {
   mS << "===================================================================" << endl
      << "restarts          : " << stats.mRestart << endl

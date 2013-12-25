@@ -43,17 +43,17 @@ public:
   void
   print_header();
 
-  /// @brief 内部状態の出力を行う仮想関数
+  /// @brief メッセージの出力を行う仮想関数
   /// @param[in] stats SAT ソルバの内部状態
   virtual
   void
-  operator()(const SatStats& stats);
+  print_message(const SatStats& stats);
 
-  /// @brief 終了メッセージの出力
+  /// @brief フッタの出力
   /// @param[in] stats SAT ソルバの内部状態
   virtual
   void
-  print_tailer(const SatStats& stats);
+  print_footer(const SatStats& stats);
 
 
 private:
@@ -63,6 +63,15 @@ private:
 
   // 実際の処理を行う Python の関数オブジェクト
   PyObject* mFuncObj;
+
+  // "print_header" を表す文字列オブジェクト
+  PyObject* mPrintHeaderObj;
+
+  // "print_msg" を表す文字列オブジェクト
+  PyObject* mPrintMessageObj;
+
+  // "print_footer" を表す文字列オブジェクト
+  PyObject* mPrintFooterObj;
 
 };
 

@@ -86,7 +86,7 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mPropagationNum(0),
   mConflictLimit(0),
   mLearntLimit(0),
-  mMaxConflict(1024 * 10)
+  mMaxConflict(1024 * 100)
 {
   mAnalyzer->set_solver(this);
 
@@ -454,23 +454,28 @@ YmSat::solve(const vector<Literal>& assumptions,
     mTimer.start();
   }
 
+  // 変数領域の確保を行う．
   alloc_var();
+
+  // パラメータの初期化
+  double confl_limit = 100;
+#if 0
+  double learnt_limit = mConstrClause.size() / 3.0;
+#else
+  double learnt_limit = clause_num() / 3.0;
+#endif
+  mVarDecay = mParams.mVarDecay;
+  mClauseDecay = mParams.mClauseDecay;
+
+  Bool3 stat = kB3X;
 
   // 自明な簡単化を行う．
   simplifyDB();
   if ( !mSane ) {
     // その時点で充足不可能なら終わる．
-    if ( debug & debug_solve ) {
-      cout << "UNSAT in simplifyDB()" << endl;
-    }
-    return kB3False;
+    stat = kB3False;
+    goto end;
   }
-
-  // パラメータの初期化
-  double confl_limit = 100;
-  double learnt_limit = mConstrClause.size() / 3;
-  mVarDecay = mParams.mVarDecay;
-  mClauseDecay = mParams.mClauseDecay;
 
   assert_cond(decision_level() == 0, __FILE__, __LINE__);
 
@@ -498,11 +503,9 @@ YmSat::solve(const vector<Literal>& assumptions,
     if ( !stat || implication() != kNullSatReason ) {
       // 矛盾が起こった．
       backtrack(0);
-      if ( debug & debug_solve ) {
-	cout << "UNSAT" << endl;
-      }
 
-      return kB3False;
+      stat = kB3False;
+      goto end;
     }
   }
 
@@ -512,7 +515,6 @@ YmSat::solve(const vector<Literal>& assumptions,
     cout << "RootLevel = " << mRootLevel << endl;
   }
 
-  Bool3 stat = kB3X;
   for ( ; ; ) {
     // 実際の探索を行う．
     mConflictLimit = static_cast<ymuint64>(confl_limit);
@@ -520,13 +522,16 @@ YmSat::solve(const vector<Literal>& assumptions,
       mConflictLimit = mMaxConflict;
     }
     mLearntLimit = static_cast<ymuint64>(learnt_limit);
+
+    // メッセージ出力を行う．
     SatStats stats;
     get_stats(stats);
     for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
 	 p != mMsgHandlerList.end(); ++ p) {
       SatMsgHandler& handler = *(*p);
-      handler(stats);
+      handler.print_message(stats);
     }
+
     ++ mRestart;
     stat = search();
     if ( stat != kB3X ) {
@@ -558,6 +563,8 @@ YmSat::solve(const vector<Literal>& assumptions,
     mTimer.stop();
   }
 
+ end:
+
   // メッセージハンドラに終了メッセージを出力させる．
   {
     SatStats stats;
@@ -565,7 +572,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
 	 p != mMsgHandlerList.end(); ++ p) {
       SatMsgHandler& handler = *(*p);
-      handler.print_tailer(stats);
+      handler.print_footer(stats);
     }
   }
 

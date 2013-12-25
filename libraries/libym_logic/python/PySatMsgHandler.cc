@@ -14,36 +14,14 @@
 
 BEGIN_NAMESPACE_YM
 
-//////////////////////////////////////////////////////////////////////
-// クラス PySatMsgHandler
-//////////////////////////////////////////////////////////////////////
+BEGIN_NONAMESPACE
 
-// @brief コンストラクタ
-PySatMsgHandler::PySatMsgHandler(PyObject* func_obj) :
-  mFuncObj(func_obj)
-{
-  assert_cond( PyCallable_Check(func_obj), __FILE__, __LINE__);
-  Py_INCREF(func_obj);
-}
-
-// @brief デストラクタ
-PySatMsgHandler::~PySatMsgHandler()
-{
-  Py_DECREF(mFuncObj);
-}
-
-// @brief ヘッダの出力
-void
-PySatMsgHandler::print_header()
-{
-}
-
-// @brief 内部状態の出力を行う仮想関数
+// @brief SatStats の内容を Python の dictionary オブジェクトに変換する．
 // @param[in] stats SAT ソルバの内部状態
-void
-PySatMsgHandler::operator()(const SatStats& stats)
+// @return stats の内容を表す Python オブジェクト
+PyObject*
+PyObject_from_SatStats(const SatStats& stats)
 {
-  // stats を Python の dictionary に格納する．
   PyObject* dict_obj = PyDict_New();
 
   PyDict_SetItemString(dict_obj, "restart",            PyObject_FromYmuint64(stats.mRestart));
@@ -61,8 +39,66 @@ PySatMsgHandler::operator()(const SatStats& stats)
 
   PyObject* args = Py_BuildValue("O", dict_obj);
 
-  // Python の関数を呼び出す．
-  PyObject* result = PyObject_CallObject(mFuncObj, args);
+  return args;
+}
+
+END_NONAMESPACE
+
+//////////////////////////////////////////////////////////////////////
+// クラス PySatMsgHandler
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+PySatMsgHandler::PySatMsgHandler(PyObject* func_obj) :
+  mFuncObj(func_obj)
+{
+  assert_cond( PyCallable_Check(func_obj), __FILE__, __LINE__);
+  Py_INCREF(func_obj);
+
+  mPrintHeaderObj = Py_BuildValue("s", "print_header");
+
+  mPrintMessageObj = Py_BuildValue("s", "print_message");
+
+  mPrintFooterObj = Py_BuildValue("s", "print_footer");
+}
+
+// @brief デストラクタ
+PySatMsgHandler::~PySatMsgHandler()
+{
+  Py_DECREF(mFuncObj);
+  Py_DECREF(mPrintHeaderObj);
+  Py_DECREF(mPrintMessageObj);
+  Py_DECREF(mPrintFooterObj);
+}
+
+// @brief ヘッダの出力
+void
+PySatMsgHandler::print_header()
+{
+  // mFuncObj.print_header() を呼び出す．
+  PyObject* result = PyObject_CallMethodObjArgs(mFuncObj, mPrintHeaderObj, NULL);
+
+  if ( result == NULL ) {
+    // コールバック中でエラーが起こった．
+    // けどこの関数はエラーを送出できない．
+    PyErr_Clear();
+  }
+  else {
+    // どちらにせよ結果は使わない．
+    Py_DECREF(result);
+  }
+}
+
+// @brief メッセージの出力を行う仮想関数
+// @param[in] stats SAT ソルバの内部状態
+void
+PySatMsgHandler::print_message(const SatStats& stats)
+{
+  // stats を Python オブジェクトに格納する．
+  PyObject* args = PyObject_from_SatStats(stats);
+
+  // mFuncObj.print_message(stats) を呼び出す．
+  PyObject* result = PyObject_CallMethodObjArgs(mFuncObj, mPrintMessageObj, args, NULL);
 
   Py_DECREF(args);
 
@@ -77,11 +113,28 @@ PySatMsgHandler::operator()(const SatStats& stats)
   }
 }
 
-// @brief 終了メッセージの出力
+// @brief フッタの出力
 // @param[in] stats SAT ソルバの内部状態
 void
-PySatMsgHandler::print_tailer(const SatStats& stats)
+PySatMsgHandler::print_footer(const SatStats& stats)
 {
+  // stats を Python オブジェクトに格納する．
+  PyObject* args = PyObject_from_SatStats(stats);
+
+  // mFuncObj.print_footer(stats) を呼び出す．
+  PyObject* result = PyObject_CallMethodObjArgs(mFuncObj, mPrintFooterObj, args, NULL);
+
+  Py_DECREF(args);
+
+  if ( result == NULL ) {
+    // コールバック中でエラーが起こった．
+    // けどこの関数はエラーを送出できない．
+    PyErr_Clear();
+  }
+  else {
+    // どちらにせよ結果は使わない．
+    Py_DECREF(result);
+  }
 }
 
 END_NAMESPACE_YM

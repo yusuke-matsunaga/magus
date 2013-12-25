@@ -10,12 +10,11 @@
 
 
 #include "ym_logic/SatSolver.h"
-#include "ym_logic/SatMsgHandler.h"
+#include "ym_logic/SatMsgHandlerImpl1.h"
 #include "ym_logic/SatStats.h"
 
 #include "ym_utils/StopWatch.h"
 
-#include "YmsatMsgHandler.h"
 
 #if USE_ZSTREAM
 #include "ym_utils/zstream.h"
@@ -145,7 +144,7 @@ main(int argc,
     }
     SatSolver solver(type, opt);
 
-    YmsatMsgHandler satmsghandler(cout);
+    SatMsgHandlerImpl1 satmsghandler(cout);
     if ( verbose > 2 ) {
       solver.reg_msg_handler(&satmsghandler);
 

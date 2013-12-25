@@ -41,17 +41,13 @@ dimacstest_LDADD = \
 	$(LIBYM_SAT)
 
 ymsat_SOURCES = \
-	ymsat.cc \
-	YmsatMsgHandler.h \
-	YmsatMsgHandler.cc
+	ymsat.cc
 
 ymsat_LDADD = \
 	$(LIBYM_SAT)
 
 ymsat2_SOURCES = \
-	ymsat2.cc \
-	YmsatMsgHandler.h \
-	YmsatMsgHandler.cc
+	ymsat2.cc
 
 ymsat2_LDADD = \
 	$(LIBYM_SAT)
