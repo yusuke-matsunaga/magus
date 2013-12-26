@@ -39,8 +39,12 @@ libym_utils_la_SOURCES = \
 	CombiGen.cc \
 	CompBase.h \
 	CompBase.cc \
-	CompI.h \
-	CompO.h \
+	CompIn.h \
+	CompOn.h \
+	CompressCoder.h \
+	CompressCoder.cc \
+	CompressDecoder.h \
+	CompressDecoder.cc \
 	DlList.cc \
 	File.cc \
 	FileBuff.h \
@@ -82,7 +86,13 @@ libym_utils_la_SOURCES = \
 	random.cc
 
 if YM_HAVE_ZLIB
-libym_utils_la_SOURCES += zstream.cc GzIDO.cc
+libym_utils_la_SOURCES += \
+	zstream.cc \
+	GzIDO.cc \
+	GzCoder.h \
+	GzCoder.cc \
+	GzDecoder.h \
+	GzDecoder.cc
 endif
 
 libym_utils_la_LIBADD = \

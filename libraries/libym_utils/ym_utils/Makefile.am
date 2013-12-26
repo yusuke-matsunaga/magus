@@ -15,6 +15,8 @@ noinst_HEADERS = \
 	CompODO.h \
 	DlList.h \
 	File.h \
+	FileCoder.h \
+	FileDecoder.h \
 	FileIDO.h \
 	FileInfo.h \
 	FileLoc.h \
