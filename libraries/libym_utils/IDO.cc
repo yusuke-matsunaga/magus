@@ -21,8 +21,8 @@
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"
 
-#include "CompIn.h"
-#include "CompOut.h"
+#include "CompressCoder.h"
+#include "CompressDecoder.h"
 
 #include "FileBuff.h"
 
@@ -255,7 +255,7 @@ FileIDO::read(ymuint8* buff,
 CompIDO::CompIDO(const char* filename,
 		 const FileLoc& parent_loc)
 {
-  mZ = new CompIn();
+  mDecoder = new CompressDecoder();
   open(filename, parent_loc);
 }
 
@@ -266,7 +266,7 @@ CompIDO::CompIDO(const char* filename,
 CompIDO::CompIDO(const string& filename,
 		 const FileLoc& parent_loc)
 {
-  mZ = new CompIn();
+  mDecoder = new CompressDecoder();
   open(filename.c_str(), parent_loc);
 }
 
@@ -274,7 +274,7 @@ CompIDO::CompIDO(const string& filename,
 CompIDO::~CompIDO()
 {
   close();
-  delete mZ;
+  delete mDecoder;
 }
 
 // @brief ファイルをオープンする．
@@ -286,7 +286,7 @@ bool
 CompIDO::open(const char* filename,
 	      const FileLoc& parent_loc)
 {
-  bool stat = mZ->open(filename, O_RDONLY, 0);
+  bool stat = mDecoder->open(filename);
   if ( stat ) {
     mFileInfo = FileInfo(filename, parent_loc);
   }
@@ -297,13 +297,13 @@ CompIDO::open(const char* filename,
 void
 CompIDO::close()
 {
-  return mZ->close();
+  mDecoder->close();
 }
 
 // @brief 読み出し可能なら true を返す．
 CompIDO::operator bool() const
 {
-  return mZ->is_ready();
+  return mDecoder->is_ready();
 }
 
 // @brief オープン中のファイル情報を得る．
@@ -332,7 +332,7 @@ ssize_t
 CompIDO::read(ymuint8* buff,
 	      size_t size)
 {
-  return mZ->read(buff, size);
+  return mDecoder->read(buff, size);
 }
 
 
@@ -619,10 +619,9 @@ StreamODO::write(const ymuint8* buff,
 //////////////////////////////////////////////////////////////////////
 
 // @brief 空のコンストラクタ
-// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
 CompODO::CompODO(ymuint bits)
 {
-  mZ = new CompOut(bits);
+  mCoder = new CompressCoder();
 }
 
 // @brief コンストラクタ
@@ -631,8 +630,8 @@ CompODO::CompODO(ymuint bits)
 CompODO::CompODO(const char* filename,
 		 ymuint bits)
 {
-  mZ = new CompOut(bits);
-  open(filename);
+  mCoder = new CompressCoder();
+  open(filename, bits);
 }
 
 // @brief コンストラクタ
@@ -641,19 +640,32 @@ CompODO::CompODO(const char* filename,
 CompODO::CompODO(const string& filename,
 		 ymuint bits)
 {
-  mZ = new CompOut(bits);
+  mCoder = new CompressCoder();
+  open(filename, bits);
 }
 
 // @brief デストラクタ
 CompODO::~CompODO()
 {
-  delete mZ;
+  delete mCoder;
 }
 
 // @brief 書き込み可能なら true を返す．
 CompODO::operator bool() const
 {
-  return mZ->is_ready();
+  return mCoder->is_ready();
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
+// @retval true オープンが成功した．
+// @retval false オープンが失敗した．
+bool
+CompODO::open(const char* filename,
+	      ymuint bits)
+{
+  return mCoder->open(filename, bits);
 }
 
 // @brief ファイルを開く
@@ -661,19 +673,10 @@ CompODO::operator bool() const
 // @retval true オープンが成功した．
 // @retval false オープンが失敗した．
 bool
-CompODO::open(const char* filename)
+CompODO::open(const string& filename,
+	      ymuint bits)
 {
-  return mZ->open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-}
-
-// @brief ファイルを開く
-// @param[in] filename ファイル名
-// @retval true オープンが成功した．
-// @retval false オープンが失敗した．
-bool
-CompODO::open(const string& filename)
-{
-  return open(filename.c_str());
+  return open(filename.c_str(), bits);
 }
 
 // @brief ファイルを閉じる．
@@ -681,7 +684,7 @@ CompODO::open(const string& filename)
 void
 CompODO::close()
 {
-  mZ->close();
+  mCoder->close();
 }
 
 // @brief データを書き出す．
@@ -692,7 +695,7 @@ ssize_t
 CompODO::write(const ymuint8* buff,
 	       ymuint64 n)
 {
-  return mZ->write(buff, n);
+  return mCoder->write(buff, n);
 }
 
 

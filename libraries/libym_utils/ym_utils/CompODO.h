@@ -10,11 +10,10 @@
 
 
 #include "ym_utils/ODO.h"
+#include "ym_utils/FileCoder.h"
 
 
 BEGIN_NAMESPACE_YM
-
-class CompOut;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CompODO CompODO.h "ym_utils/CompODO.h"
@@ -60,17 +59,21 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
   /// @retval true オープンが成功した．
   /// @retval false オープンが失敗した．
   bool
-  open(const char* filename);
+  open(const char* filename,
+       ymuint bits = 0);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] bits 初期ビットサイズ (0 でデフォルト値を用いる)
   /// @retval true オープンが成功した．
   /// @retval false オープンが失敗した．
   bool
-  open(const string& filename);
+  open(const string& filename,
+       ymuint bits = 0);
 
   /// @brief ファイルを閉じる．
   /// @note 以降の書き込みは行われない．
@@ -99,7 +102,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際の処理を行うエンジン
-  CompOut* mZ;
+  FileCoder* mCoder;
 
 };
 

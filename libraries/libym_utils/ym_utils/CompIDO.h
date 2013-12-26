@@ -12,11 +12,10 @@
 #include "ym_utils/IDO.h"
 #include "ym_utils/FileLoc.h"
 #include "ym_utils/FileInfo.h"
+#include "ym_utils/FileDecoder.h"
 
 
 BEGIN_NAMESPACE_YM
-
-class CompIn;
 
 //////////////////////////////////////////////////////////////////////
 /// @class CompIDO CompIDO.h "CompIDO.h"
@@ -108,7 +107,7 @@ private:
   FileInfo mFileInfo;
 
   // 実際の処理を行なうエンジン
-  CompIn* mZ;
+  FileDecoder* mDecoder;
 
 };
 

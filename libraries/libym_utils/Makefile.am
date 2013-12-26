@@ -37,10 +37,6 @@ libym_utils_la_SOURCES = \
 	BtgMatch.cc \
 	BtgNode.h \
 	CombiGen.cc \
-	CompBase.h \
-	CompBase.cc \
-	CompIn.h \
-	CompOn.h \
 	CompressCoder.h \
 	CompressCoder.cc \
 	CompressDecoder.h \
