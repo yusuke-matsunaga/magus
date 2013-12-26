@@ -10,14 +10,12 @@
 
 
 #include "ym_utils/IDO.h"
-#include "ym_utils/zstream.h"
 #include "ym_utils/FileLoc.h"
 #include "ym_utils/FileInfo.h"
+#include "ym_utils/FileDecoder.h"
 
 
 BEGIN_NAMESPACE_YM
-
-class FileBuff;
 
 //////////////////////////////////////////////////////////////////////
 /// @class GzIDO GzIDO.h "GzIDO.h"
@@ -108,17 +106,8 @@ private:
   // ファイル情報
   FileInfo mFileInfo;
 
-  // 入力ファイル用のバッファ
-  FileBuff* mBuff;
-
-  // zstream
-  zstream mZS;
-
-  // CRC コード
-  ymuint32 mCRC;
-
-  // 出力バッファに書き込まれたサイズ
-  ymuint32 mOutSize;
+  // 実際の処理を行うエンジン
+  FileDecoder* mDecoder;
 
 };
 

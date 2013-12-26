@@ -10,12 +10,10 @@
 
 
 #include "ym_utils/ODO.h"
-#include "ym_utils/zstream.h"
+#include "ym_utils/FileCoder.h"
 
 
 BEGIN_NAMESPACE_YM
-
-class FileBuff;
 
 //////////////////////////////////////////////////////////////////////
 /// @class GzODO GzODO.h "ym_utils/GzODO.h"
@@ -101,17 +99,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 出力用のバッファ
-  FileBuff* mBuff;
-
-  // zstream
-  zstream mZ;
-
-  // CRC コード
-  ymuint32 mCRC;
-
-  // 出力されたデータサイズ
-  ymuint32 mOutSize;
+  // 実際の処理を行うエンジン
+  FileCoder* mCoder;
 
 };
 
