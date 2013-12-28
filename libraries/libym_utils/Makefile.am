@@ -45,6 +45,10 @@ libym_utils_la_SOURCES = \
 	File.cc \
 	FileBuff.h \
 	FileBuff.cc \
+	FileCoder.cc \
+	FileDecoder.cc \
+	FileIDO.cc \
+	FileODO.cc \
 	FileInfo.h \
 	FileInfo.cc \
 	FileInfoMgr.h \
@@ -78,6 +82,10 @@ libym_utils_la_SOURCES = \
 	StrPool.h \
 	StrPool.cc \
 	StopWatch.cc \
+	ThruCoder.h \
+	ThruCoder.cc \
+	ThruDecoder.h \
+	ThruDecoder.cc \
 	UnitAlloc.cc \
 	random.cc
 

@@ -29,6 +29,7 @@ CompressCoder::~CompressCoder()
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
+// @param[in] mode ファイル作成用のモード
 // @param[in] level 圧縮レベル
 // @retval true 成功した
 // @retval false 失敗した．
@@ -37,6 +38,7 @@ CompressCoder::~CompressCoder()
 //  - ファイルに対する書き込み許可がない．
 bool
 CompressCoder::open(const char* filename,
+		    mode_t mode,
 		    ymuint level)
 {
   m_state = kStart;
@@ -53,7 +55,7 @@ CompressCoder::open(const char* filename,
   m_in_count = 1;			/* Length of input. */
   m_out_count = 0;			/* # of codes output (for debugging). */
 
-  return mBuff.open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  return mBuff.open(filename, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
 // @brief ファイルを閉じる．

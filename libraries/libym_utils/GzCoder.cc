@@ -39,18 +39,20 @@ GzCoder::is_ready() const
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
+// @param[in] mode ファイル作成用のモード
 // @param[in] level 圧縮レベル (0 でデフォルト値を用いる)
 // @retval true オープンが成功した．
 // @retval false オープンが失敗した．
 bool
 GzCoder::open(const char* filename,
+	      mode_t mode,
 	      ymuint level)
 {
   static ymuint8 header[] = { GZIP_MAGIC0, GZIP_MAGIC1, Z_DEFLATED, 0,
 			      0, 0, 0, 0,
 			      0, OS_CODE };
 
-  bool stat = mBuff.open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  bool stat = mBuff.open(filename, O_WRONLY | O_CREAT | O_TRUNC, mode);
   if ( !stat ) {
     return false;
   }
@@ -64,7 +66,8 @@ GzCoder::open(const char* filename,
     if ( level == 0 ) {
       level = 6;
     }
-    int error = mZ.deflate_init2(level, Z_DEFLATED, (-MAX_WBITS), 8, Z_DEFAULT_STRATEGY);
+    int error = mZ.deflate_init2(level, Z_DEFLATED, (-MAX_WBITS),
+				 8, Z_DEFAULT_STRATEGY);
     if ( error != Z_OK ) {
       // なんか知らないけどエラーが起きた．
       goto error_out;

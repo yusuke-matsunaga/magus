@@ -1,36 +1,35 @@
-#ifndef GZCODER_H
-#define GZCODER_H
+#ifndef THRUDECODER_H
+#define THRUDECODER_H
 
-/// @file GzCoder.h
-/// @brief GzCoder のヘッダファイル
+/// @file ThruDecoder.h
+/// @brief ThruDecoder のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/FileCoder.h"
-#include "ym_utils/zstream.h"
+#include "ym_utils/FileDecoder.h"
 #include "FileBuff.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GzCoder GzCoder.h "GzCoder.h"
-/// @brief gzip'ed 形式の圧縮器
+/// @class ThruDecoder ThruDecoder.h "ThruDecoder.h"
+/// @brief 変換しない FileDecoder
 //////////////////////////////////////////////////////////////////////
-class GzCoder :
-  public FileCoder
+class ThruDecoder :
+  public FileDecoder
 {
 public:
 
   /// @brief コンストラクタ
-  GzCoder();
+  ThruDecoder();
 
   /// @brief デストラクタ
   virtual
-  ~GzCoder();
+  ~ThruDecoder();
 
 
 public:
@@ -40,38 +39,36 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
-  /// @param[in] mode ファイル作成用のモード
-  /// @param[in] level 圧縮レベル
   /// @retval true 成功した
   /// @retval false 失敗した．
   ///
   /// 失敗する理由は以下の通り
-  ///  - ファイルに対する書き込み許可がない．
+  ///  - ファイルが存在しない．
+  ///  - ファイルに対する読み出し許可がない．
+  ///  - ファイルの形式が異なる．
   virtual
   bool
-  open(const char* filename,
-       mode_t mode = 0666,
-       ymuint level = 0);
+  open(const char* filename);
 
   /// @brief ファイルを閉じる．
   virtual
   void
   close();
 
-  /// @brief 書き込み可能の時に true を返す．
+  /// @brief 読み出せるデータがある時に true を返す．
   virtual
   bool
   is_ready() const;
 
-  /// @brief 最大 num バイトのデータを圧縮してファイルに書き込む．
-  /// @param[in] wbuff 圧縮するデータを格納するバッファ
-  /// @param[in] num 書き込むデータ数(バイト)
-  /// @return 実際に書き込んだバイト数を返す．
+  /// @brief 圧縮されたファイルを読んで最大 num バイトをバッファに格納する．
+  /// @param[in] rbuff 展開したデータを格納するバッファ
+  /// @param[in] num 読み出すデータ数(バイト)
+  /// @return 実際に読み出したバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
   virtual
   ssize_t
-  write(const ymuint8* wbuff,
-	ymuint64 num);
+  read(ymuint8* rbuff,
+       ymuint64 num);
 
 
 private:
@@ -79,21 +76,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 出力用のバッファ
+  // ファイルバッファ
   FileBuff mBuff;
-
-  // zstream
-  zstream mZ;
-
-  // CRC コード
-  ymuint32 mCRC;
-
-  // 出力されたデータサイズ
-  ymuint32 mOutSize;
 
 };
 
-
 END_NAMESPACE_YM
 
-#endif // GZCODER_H
+#endif // THRUDECODER_H

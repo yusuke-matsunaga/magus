@@ -12,11 +12,12 @@
 #include "ym_utils/IDO.h"
 #include "ym_utils/FileLoc.h"
 #include "ym_utils/FileInfo.h"
+#include "ym_utils/CodecType.h"
 
 
 BEGIN_NAMESPACE_YM
 
-class FileBuff;
+class FileDecoder;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FileIDO FileIDO.h "ym_utils/FileIDO.h"
@@ -26,33 +27,30 @@ class FileBuff;
 class FileIDO :
   public IDO
 {
-private:
-
-  static
-  const ymuint kDefaultBuffSize = 4096;
-
-
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] filename ファイル名
-  /// @param[in] parent_loc インクルード元の親ファイルの情報
-  /// @param[in] buff_size バッファサイズ
-  /// @note 意味的にはコンストラクタ + open()
+  /// @param[in] codec_type Decoder の種類
   explicit
-  FileIDO(const char* filename,
-	  const FileLoc& parent_loc = FileLoc(),
-	  ymuint buff_size = kDefaultBuffSize);
+  FileIDO(tCodecType codec_type);
 
   /// @brief コンストラクタ
+  /// @param[in] codec_type Decoder の種類
   /// @param[in] filename ファイル名
   /// @param[in] parent_loc インクルード元の親ファイルの情報
-  /// @param[in] buff_size バッファサイズ
   /// @note 意味的にはコンストラクタ + open()
-  explicit
-  FileIDO(const string& filename,
-	  const FileLoc& parent_loc = FileLoc(),
-	  ymuint buff_size = kDefaultBuffSize);
+  FileIDO(tCodecType codec_type,
+	  const char* filename,
+	  const FileLoc& parent_loc = FileLoc());
+
+  /// @brief コンストラクタ
+  /// @param[in] codec_type Decoder の種類
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  /// @note 意味的にはコンストラクタ + open()
+  FileIDO(tCodecType codec_type,
+	  const string& filename,
+	  const FileLoc& parent_loc = FileLoc());
 
   /// @brief デストラクタ
   virtual
@@ -92,9 +90,9 @@ public:
        ymuint64 n);
 
 
-private:
+public:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる下請け関数
+  // FileIDO の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ファイルを開く
@@ -119,8 +117,8 @@ private:
   // ファイル情報
   FileInfo mFileInfo;
 
-  // ファイルバッファ
-  FileBuff* mFileBuff;
+  // ファイル復号器
+  FileDecoder* mDecoder;
 
 };
 

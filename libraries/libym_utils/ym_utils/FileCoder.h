@@ -10,6 +10,7 @@
 
 
 #include "ymtools.h"
+#include "CodecType.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -21,6 +22,14 @@ BEGIN_NAMESPACE_YM
 class FileCoder
 {
 public:
+
+  /// @brief FileCoder のインスタンスを作る関数
+  /// @param[in] type FileCoder の型
+  /// @return 作成したインスタンスを返す．
+  /// @note type が不正な値の場合は NULL を返す．
+  static
+  FileCoder*
+  new_coder(tCodecType type);
 
   /// @brief デストラクタ
   virtual
@@ -34,6 +43,7 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] mode ファイル作成用のモード
   /// @param[in] level 圧縮レベル
   /// @retval true 成功した
   /// @retval false 失敗した．
@@ -43,10 +53,12 @@ public:
   virtual
   bool
   open(const char* filename,
+       mode_t mode = 0666,
        ymuint level = 0) = 0;
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] mode ファイル作成用のモード
   /// @param[in] level 圧縮レベル
   /// @retval true 成功した
   /// @retval false 失敗した．
@@ -55,6 +67,7 @@ public:
   ///  - ファイルに対する書き込み許可がない．
   bool
   open(const string& filename,
+       mode_t mode = 0666,
        ymuint level = 0);
 
   /// @brief ファイルを閉じる．
@@ -86,6 +99,7 @@ public:
 
 // @brief ファイルを開く
 // @param[in] filename ファイル名
+// @param[in] mode ファイル作成用のモード
 // @param[in] level 圧縮レベル
 // @retval true 成功した
 // @retval false 失敗した．
@@ -95,6 +109,7 @@ public:
 inline
 bool
 FileCoder::open(const string& filename,
+		mode_t mode,
 		ymuint level)
 {
   return open(filename.c_str(), level);

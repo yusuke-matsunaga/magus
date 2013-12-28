@@ -10,11 +10,12 @@
 
 
 #include "ym_utils/ODO.h"
+#include "ym_utils/CodecType.h"
 
 
 BEGIN_NAMESPACE_YM
 
-class FileBuff;
+class FileCoder;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FileODO FileODO.h "ym_utils/FileODO.h"
@@ -24,31 +25,34 @@ class FileBuff;
 class FileODO :
   public ODO
 {
-private:
-
-  static
-  const ymuint kDefaultBuffSize = 4096;
-
 public:
 
-  /// @brief 空のコンストラクタ
-  /// @param[in] buff_size バッファサイズ
+  /// @brief コンストラクタ
+  /// @param[in] codec_type Coder の種類
   explicit
-  FileODO(ymuint buff_size = kDefaultBuffSize);
+  FileODO(tCodecType codec_type);
 
   /// @brief コンストラクタ
+  /// @param[in] codec_type Coder の種類
   /// @param[in] filename ファイル名
-  /// @param[in] buff_size バッファサイズ
-  explicit
-  FileODO(const char* filename,
-	  ymuint buff_size = kDefaultBuffSize);
+  /// @param[in] mode ファイル作成用のモード
+  /// @param[in] opt 圧縮用のオプション
+  FileODO(tCodecType codec_type,
+	  const char* filename,
+	  mode_t mode = 0666,
+	  ymuint opt = 0);
+
 
   /// @brief コンストラクタ
+  /// @param[in] codec_type Coder の種類
   /// @param[in] filename ファイル名
-  /// @param[in] buff_size バッファサイズ
+  /// @param[in] mode ファイル作成用のモード
+  /// @param[in] opt 圧縮用のオプション
   explicit
-  FileODO(const string& filename,
-	  ymuint buff_size = kDefaultBuffSize);
+  FileODO(tCodecType codec_type,
+	  const string& filename,
+	  mode_t mode = 0666,
+	  ymuint opt = 0);
 
   /// @brief デストラクタ
   virtual
@@ -65,13 +69,21 @@ public:
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] mode ファイル作成用のモード
+  /// @param[in] opt 圧縮用のオプション
   bool
-  open(const char* filename);
+  open(const char* filename,
+       mode_t mode = 0666,
+       ymuint opt = 0);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名
+  /// @param[in] mode ファイル作成用のモード
+  /// @param[in] opt 圧縮用のオプション
   bool
-  open(const string& filename);
+  open(const string& filename,
+       mode_t mode = 0666,
+       ymuint opt = 0);
 
   /// @brief ファイルを閉じる．
   /// @note 以降の書き込みは行われない．
@@ -99,8 +111,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイルバッファ
-  FileBuff* mFileBuff;
+  // ファイル符号器
+  FileCoder* mCoder;
 
 };
 
