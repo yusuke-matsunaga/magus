@@ -10,7 +10,7 @@
 #include "GbmNaiveOneHot.h"
 #include "GbmEngine.h"
 #include "ym_logic/SatStats.h"
-#include "ym_logic/SatMsgHandler.h"
+#include "ym_logic/SatMsgHandlerImpl1.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -138,72 +138,6 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   return false;
 }
 
-
-BEGIN_NONAMESPACE
-
-//////////////////////////////////////////////////////////////////////
-// ymsat 用の SatMsgHandler
-//////////////////////////////////////////////////////////////////////
-class YmsatMsgHandler :
-  public SatMsgHandler
-{
-public:
-
-  /// @brief コンストラクタ
-  YmsatMsgHandler(ostream& s);
-
-  /// @brief デストラクタ
-  virtual
-  ~YmsatMsgHandler();
-
-  /// @brief メッセージ出力関数
-  virtual
-  void
-  operator()(const SatStats& stats);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 出力ストリーム
-  ostream& mS;
-
-};
-
-// @brief コンストラクタ
-YmsatMsgHandler::YmsatMsgHandler(ostream& s) :
-  mS(s)
-{
-}
-
-// @brief デストラクタ
-YmsatMsgHandler::~YmsatMsgHandler()
-{
-}
-
-// @brief メッセージ出力関数
-void
-YmsatMsgHandler::operator()(const SatStats& stats)
-{
-  mS << "| "
-     << setw(9) << stats.mConflictNum
-     << " | "
-     << setw(9) << stats.mConstrClauseNum
-     << " "
-     << setw(9) << stats.mConstrLitNum
-     << " | "
-     << setw(9) << stats.mLearntLimit
-     << " "
-     << setw(9) << stats.mLearntClauseNum
-     << " "
-     << setw(9) << stats.mLearntLitNum
-     << " |" << endl;
-}
-
-END_NONAMESPACE
-
 // @brief 入力順を考慮したマッチング問題を解く
 // @param[in] network RcfNetwork
 // @param[in] func マッチング対象の関数
@@ -222,18 +156,11 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   SatSolver solver;
 #endif
 
-  YmsatMsgHandler satmsghandler(cout);
+  SatMsgHandlerImpl1 satmsghandler(cout);
   solver.reg_msg_handler(&satmsghandler);
   solver.timer_on(true);
 
   solver.set_max_conflict(100 * 1024);
-
-#if 0
-  cout << "===================================================================" << endl;
-  cout << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl;
-  cout << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl;
-  cout << "===================================================================" << endl;
-#endif
 
   // configuration 変数を作る．
   ymuint nc = network.conf_var_num();
@@ -394,20 +321,6 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   }
 
   stat = solver.solve(model);
-
-#if 0
-  SatStats stats;
-  solver.get_stats(stats);
-
-  cout << "===================================================================" << endl;
-  cout << "restarts          : " << stats.mRestart << endl
-       << "conflicts         : " << stats.mConflictNum << endl
-       << "decisions         : " << stats.mDecisionNum << endl
-       << "propagations      : " << stats.mPropagationNum << endl
-       << "conflict literals : " << stats.mLearntLitNum << endl
-       << "CPU time          : " << stats.mTime << endl;
-#endif
-
   if ( stat == kB3True ) {
     for (ymuint i = 0; i < nc; ++ i) {
       VarId vid = conf_vid_array[i];

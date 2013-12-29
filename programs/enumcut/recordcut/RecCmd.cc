@@ -273,8 +273,8 @@ DumpCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileODO bo(ex_file_name);
-  if ( !bo ) {
+  FileODO bo;
+  if ( !bo.open(ex_file_name) ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
     set_result(emsg);
@@ -326,8 +326,8 @@ DumpRepCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileODO bo(ex_file_name);
-  if ( !bo ) {
+  FileODO bo;
+  if ( !bo.open(ex_file_name) ) {
     TclObj emsg;
     emsg << "Could not create " << file_name;
     set_result(emsg);
@@ -378,8 +378,8 @@ RestoreCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  FileIDO bi(ex_file_name);
-  if ( !bi ) {
+  FileIDO bi;
+  if ( !bi.open(ex_file_name) ) {
     TclObj emsg;
     emsg << "Could not open " << file_name;
     set_result(emsg);

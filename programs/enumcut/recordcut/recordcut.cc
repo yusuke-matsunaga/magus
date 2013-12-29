@@ -201,8 +201,8 @@ void
 dump_func(FuncMgr& func_mgr,
 	  const char* filename)
 {
-  FileODO bo(filename);
-  if ( !bo ) {
+  FileODO bo;
+  if ( !bo.open(filename) ) {
     cerr << "Could not create " << filename << endl;
     return;
   }
@@ -214,8 +214,8 @@ void
 restore_func(FuncMgr& func_mgr,
 	     const char* filename)
 {
-  FileIDO bi(filename);
-  if ( !bi ) {
+  FileIDO bi;
+  if ( !bi.open(filename) ) {
     cerr << "Could not create " << filename << endl;
     return;
   }
