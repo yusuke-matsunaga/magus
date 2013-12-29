@@ -12,9 +12,7 @@
 #include "ym_logic/DimacsParser.h"
 #include "ym_logic/DimacsHandler.h"
 
-#if USE_ZSTREAM
-#include "ym_utils/zstream.h"
-#endif
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -226,23 +224,7 @@ main(int argc,
     return 2;
   }
 
-#if 0
-  ifstream s(argv[1]);
-  if ( !s.is_open() ) {
-    cerr << "Could not open " << argv[1] << endl;
-    return 3;
-  }
-#endif
-
   try {
-#if 0
-#if USE_ZSTREAM
-    izstream zs(s);
-    istream& s1 = zs;
-#else
-    istream& s1 = s;
-#endif
-#endif
     DimacsParser parser;
     TestDimacsHandler handler;
 #if 0
@@ -253,7 +235,12 @@ main(int argc,
     parser.add_msg_handler(&msg_handler);
 #endif
 
-    if ( !parser.read(argv[1]) ) {
+    FileIDO ido;
+    if ( !ido.open(argv[1]) ) {
+      cerr << "Could not open " << argv[1] << endl;
+      return -1;
+    }
+    if ( !parser.read(ido) ) {
       cerr << "Error in reading " << argv[1] << endl;
       return 4;
     }
@@ -261,12 +248,6 @@ main(int argc,
   catch ( AssertError x) {
     cout << x << endl;
   }
-
-#if USE_ZSTREAM
-  catch ( zlib_error x ) {
-    cout << x.mMsg << endl;
-  }
-#endif
 
   return 0;
 }

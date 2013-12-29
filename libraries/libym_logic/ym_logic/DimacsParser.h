@@ -10,7 +10,7 @@
 
 
 #include "ym_logic/sat_nsdef.h"
-#include "ym_utils/FileRegion.h"
+#include "ym_utils/IDO.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -38,11 +38,11 @@ public:
 public:
 
   /// @brief 読み込みを行う．
-  /// @param[in] filename ファイル名
+  /// @param[in] ido 入力データ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  read(const string& filename);
+  read(IDO& ido);
 
   /// @brief イベントハンドラの登録
   void

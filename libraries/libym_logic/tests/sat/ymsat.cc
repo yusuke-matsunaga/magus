@@ -3,9 +3,7 @@
 /// @brief 簡単な SAT プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ymsat.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,12 +14,8 @@
 #include "ym_logic/SatMsgHandlerImpl1.h"
 #include "ym_logic/SatStats.h"
 
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/StopWatch.h"
-
-
-#if USE_ZSTREAM
-#include "ym_utils/zstream.h"
-#endif
 
 
 int
@@ -36,6 +30,7 @@ main(int argc,
 
   int wpos = 1;
   string opt;
+  bool z_flag = false;
   for (int rpos = 1; rpos < argc; ++ rpos) {
     if ( argv[rpos][0] == '-' ) {
       if ( strcmp(argv[rpos], "-v") == 0 ||
@@ -50,6 +45,9 @@ main(int argc,
       }
       else if ( strcmp(argv[rpos], "--analyzer-simple") == 0 ) {
 	opt = "simple";
+      }
+      else if ( strcmp(argv[rpos], "-Z") == 0 ) {
+	z_flag = true;
       }
       else {
 	cerr << argv[rpos] << " : illegal option" << endl;
@@ -70,28 +68,12 @@ main(int argc,
     return 2;
   }
 
-#if 0
-  ifstream s(argv[1]);
-  if ( !s.is_open() ) {
-    cerr << "Could not open " << argv[1] << endl;
-    return 3;
-  }
-#endif
   try {
-#if 0
-#if USE_ZSTREAM
-    izstream zs(s);
-    istream& s1 = zs;
-#else
-    istream& s1 = s;
-#endif
-#endif
-
-    string type;
+    string sat_type;
     if ( minisat ) {
-      type = "minisat";
+      sat_type = "minisat";
     }
-    SatSolver solver(type, opt);
+    SatSolver solver(sat_type, opt);
 
     DimacsParser parser;
     SatDimacsHandler handler(solver);
@@ -99,7 +81,17 @@ main(int argc,
     parser.add_handler(&handler);
     parser.add_handler(&verifier);
 
-    if ( !parser.read(argv[1]) ) {
+    tCodecType codec_type = kCodecThrough;
+    if ( z_flag ) {
+      codec_type = kCodecZ;
+    }
+    FileIDO ido(codec_type);
+
+    if ( ido.open(argv[1]) ) {
+      cerr << "Could not open " << argv[1] << endl;
+    }
+
+    if ( !parser.read(ido) ) {
       cerr << "Error in reading " << argv[1] << endl;
       return 4;
     }
@@ -130,12 +122,6 @@ main(int argc,
   catch ( AssertError x) {
     cout << x << endl;
   }
-
-#if USE_ZSTREAM
-  catch ( zlib_error x ) {
-    cout << x.mMsg << endl;
-  }
-#endif
 
   return 0;
 }

@@ -130,21 +130,15 @@ main(int argc,
   }
 
   try {
-#if USE_ZSTREAM
-    izstream zs(s);
-    istream& s1 = zs;
-#else
-    istream& s1 = s;
-#endif
-    string type;
+    string sat_type;
     if ( minisat ) {
-      type = "minisat";
+      sat_type = "minisat";
     }
-    SatSolver solver(type, opt);
+    SatSolver solver(sat_type, opt);
 
-    SatMsgHandlerImpl1 satmsghandler(cout);
+    SatMsgHandlerImpl1 msghandler(cout);
     if ( verbose > 2 ) {
-      solver.reg_msg_handler(&satmsghandler);
+      solver.reg_msg_handler(&msghandler);
     }
 
     solver.timer_on(true);
@@ -215,12 +209,6 @@ main(int argc,
   catch ( AssertError x) {
     cout << x << endl;
   }
-
-#if USE_ZSTREAM
-  catch ( zlib_error x ) {
-    cout << x.mMsg << endl;
-  }
-#endif
 
   return 0;
 }

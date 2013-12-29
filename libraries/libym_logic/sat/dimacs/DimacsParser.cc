@@ -3,8 +3,6 @@
 /// @brief DimacsParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DimacsParser.cc 750 2007-06-30 09:09:58Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -12,7 +10,7 @@
 #include "ym_logic/DimacsParser.h"
 #include "ym_logic/DimacsHandler.h"
 #include "DimacsParserImpl.h"
-#include "ym_utils/FileIDO.h"
+#include "DimacsScanner.h"
 #include "ym_utils/MsgMgr.h"
 
 
@@ -97,13 +95,13 @@ DimacsParser::~DimacsParser()
 }
 
 // @brief 読み込みを行う．
-// @param[in] filename ファイル名
+// @param[in] ido 入力データ
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-DimacsParser::read(const string& filename)
+DimacsParser::read(IDO& ido)
 {
-  return mImpl->read(filename);
+  return mImpl->read(ido);
 }
 
 // @brief イベントハンドラの登録
@@ -129,11 +127,11 @@ DimacsParserImpl::~DimacsParserImpl()
 }
 
 // @brief 読み込みを行なう．
-// @param[in] filename ファイル名
+// @param[in] ido 入力データ
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-DimacsParserImpl::read(const string& filename)
+DimacsParserImpl::read(IDO& ido)
 {
   // 読込用の内部状態
   enum {
@@ -156,6 +154,7 @@ DimacsParserImpl::read(const string& filename)
   // 実際に読み込んだ節の数
   int act_nc = 0;
 
+#if 0
   FileIDO ido;
   if ( !ido.open(filename) ) {
     // ファイルが開けなかった．
@@ -168,6 +167,7 @@ DimacsParserImpl::read(const string& filename)
 		    buf.str());
     return false;
   }
+#endif
 
   vector<int> lits;
 
