@@ -31,6 +31,24 @@ public:
   FileCoder*
   new_coder(tCodecType type);
 
+  /// @brief thru coder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileCoder*
+  new_thru_coder();
+
+  /// @brief compress coder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileCoder*
+  new_z_coder();
+
+  /// @brief gzip coder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileCoder*
+  new_gzip_coder();
+
   /// @brief デストラクタ
   virtual
   ~FileCoder() { }

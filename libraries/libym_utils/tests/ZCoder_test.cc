@@ -1,23 +1,23 @@
 
-/// @file CompressCoder_test.cc
-/// @brief CompressCoder のテストプログラム
+/// @file ZCoder_test.cc
+/// @brief ZCoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "../CompressCoder.h"
+#include "../ZCoder.h"
 #include <fcntl.h>
 
 
 BEGIN_NAMESPACE_YM
 
 int
-CompressCoder_test(int argc,
-	   const char** argv)
+ZCoder_test(int argc,
+	    const char** argv)
 {
-  CompressCoder coder;
+  ZCoder coder;
 
   if ( argc != 3 ) {
     cerr << "USAGE: " << argv[0] << " <input-filename> <output-filename>" << endl;
@@ -48,7 +48,7 @@ CompressCoder_test(int argc,
     }
     ssize_t n2 = coder.write(buff, n);
     if ( n2 != n ) {
-      cerr << "ERROR in CompressCoder::write(): n2 = " << n2 << endl;
+      cerr << "ERROR in ZCoder::write(): n2 = " << n2 << endl;
       return -2;
     }
   }
@@ -65,5 +65,5 @@ main(int argc,
 {
   using namespace nsYm;
 
-  return CompressCoder_test(argc, argv);
+  return ZCoder_test(argc, argv);
 }

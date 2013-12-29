@@ -906,8 +906,8 @@ test_dump(BddMgr& bddmgr)
   Bdd bdd = str2bdd(bddmgr, "0 & 2 | 1 & 3 | ~1 & ~3");
   const char* fn = "/tmp/magus_bdd_base_test";
   {
-    FileODO bo(fn);
-    if ( !bo ) {
+    FileODO bo;
+    if ( !bo.open(fn) ) {
       cout << "cannot open output file: " << fn << endl;
       stat = false;
     }
@@ -915,8 +915,8 @@ test_dump(BddMgr& bddmgr)
   }
   Bdd bdd2(bddmgr);
   {
-    FileIDO bi(fn);
-    if ( !bi ) {
+    FileIDO bi;
+    if ( !bi.open(fn) ) {
       cout << "cannont open input file: " << fn << endl;
       stat = false;
     }

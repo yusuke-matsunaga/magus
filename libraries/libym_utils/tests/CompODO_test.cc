@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/CompODO.h"
+#include "ym_utils/FileODO.h"
 #include <fcntl.h>
 
 
@@ -17,8 +17,6 @@ int
 CompODO_test(int argc,
 	     const char** argv)
 {
-  CompODO odo;
-
   if ( argc != 3 ) {
     cerr << "Usage: " << argv[0] << " <original filename> <compressed filename>" << endl;
     return 1;
@@ -30,6 +28,7 @@ CompODO_test(int argc,
     return -1;
   }
 
+  FileODO odo(kCodecZ);
   if ( !odo.open(argv[2]) ) {
     cerr << argv[2] << ": Could not create" << endl;
     return -1;

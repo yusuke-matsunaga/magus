@@ -1,5 +1,5 @@
 
-/// @file CompressDecoder.cc
+/// @file ZDecoder.cc
 /// @brief CpressDecoder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,17 +7,17 @@
 /// All rights reserved.
 
 
-#include "CompressDecoder.h"
+#include "ZDecoder.h"
 
 
 BEGIN_NAMESPACE_YM_COMPCOMMON
 
 //////////////////////////////////////////////////////////////////////
-// クラス CompressDecoder
+// クラス ZDecoder
 //////////////////////////////////////////////////////////////////////
 
 /// @brief コンストラクタ
-CompressDecoder::CompressDecoder()
+ZDecoder::ZDecoder()
 {
   m_state = kStart;
 
@@ -32,7 +32,7 @@ CompressDecoder::CompressDecoder()
 }
 
 // @brief デストラクタ
-CompressDecoder::~CompressDecoder()
+ZDecoder::~ZDecoder()
 {
   close();
 }
@@ -47,21 +47,21 @@ CompressDecoder::~CompressDecoder()
 //  - ファイルに対する読み出し許可がない．
 //  - ファイルの形式が異なる．
 bool
-CompressDecoder::open(const char* filename)
+ZDecoder::open(const char* filename)
 {
   return mBuff.open(filename, O_RDONLY, 0);
 }
 
 // @brief ファイルを閉じる．
 void
-CompressDecoder::close()
+ZDecoder::close()
 {
   mBuff.close();
 }
 
 // @brief 読み出せるデータがある時に true を返す．
 bool
-CompressDecoder::is_ready() const
+ZDecoder::is_ready() const
 {
   return mBuff.is_ready();
 }
@@ -72,8 +72,8 @@ CompressDecoder::is_ready() const
 // @return 実際に読み出したバイト数を返す．
 // @note エラーが起こったら -1 を返す．
 ssize_t
-CompressDecoder::read(ymuint8* rbuff,
-		      ymuint64 num)
+ZDecoder::read(ymuint8* rbuff,
+	       ymuint64 num)
 {
   if ( num == 0 ) {
     cerr << "num == 0" << endl;
@@ -190,7 +190,7 @@ CompressDecoder::read(ymuint8* rbuff,
 }
 
 code_int
-CompressDecoder::getcode()
+ZDecoder::getcode()
 {
   ymuint8* bp = m_gbuf;
   if ( m_clear_flg > 0 || m_roffset >= m_size || m_free_ent > m_maxcode ) {

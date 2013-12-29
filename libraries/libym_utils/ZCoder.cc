@@ -1,28 +1,28 @@
 
-/// @file CompressCoder.cc
-/// @brief CompressCoder の実装ファイル
+/// @file ZCoder.cc
+/// @brief ZCoder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CompressCoder.h"
+#include "ZCoder.h"
 
 
 BEGIN_NAMESPACE_YM_COMPCOMMON
 
 //////////////////////////////////////////////////////////////////////
-// クラス CompressCoder
+// クラス ZCoder
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CompressCoder::CompressCoder()
+ZCoder::ZCoder()
 {
 }
 
 // @brief デストラクタ
-CompressCoder::~CompressCoder()
+ZCoder::~ZCoder()
 {
   close();
 }
@@ -37,9 +37,9 @@ CompressCoder::~CompressCoder()
 // 失敗する理由は以下の通り
 //  - ファイルに対する書き込み許可がない．
 bool
-CompressCoder::open(const char* filename,
-		    mode_t mode,
-		    ymuint level)
+ZCoder::open(const char* filename,
+	     mode_t mode,
+	     ymuint level)
 {
   m_state = kStart;
 
@@ -60,7 +60,7 @@ CompressCoder::open(const char* filename,
 
 // @brief ファイルを閉じる．
 void
-CompressCoder::close()
+ZCoder::close()
 {
   if ( is_ready() ) {
     if ( output(m_ent) == -1 ) {
@@ -80,7 +80,7 @@ CompressCoder::close()
 
 // @brief 書き込み可能の時に true を返す．
 bool
-CompressCoder::is_ready() const
+ZCoder::is_ready() const
 {
   return mBuff.is_ready();
 }
@@ -91,8 +91,8 @@ CompressCoder::is_ready() const
 // @return 実際に書き込んだバイト数を返す．
 // @note エラーが起こったら -1 を返す．
 ssize_t
-CompressCoder::write(const ymuint8* wbuff,
-		     ymuint64 num)
+ZCoder::write(const ymuint8* wbuff,
+	      ymuint64 num)
 {
   if ( num == 0 ) {
     return 0;
@@ -198,7 +198,7 @@ CompressCoder::write(const ymuint8* wbuff,
 
 // Table clear for block compress
 int
-CompressCoder::cl_block()
+ZCoder::cl_block()
 {
   m_checkpoint = m_in_count + k_CHECK_GAP;
 
@@ -232,7 +232,7 @@ CompressCoder::cl_block()
 }
 
 void
-CompressCoder::cl_hash(count_int cl_hsize)
+ZCoder::cl_hash(count_int cl_hsize)
 {
   long m1 = -1;
   count_int* htab_p = m_htab + cl_hsize;
@@ -262,7 +262,7 @@ CompressCoder::cl_hash(count_int cl_hsize)
 }
 
 int
-CompressCoder::output(code_int ocode)
+ZCoder::output(code_int ocode)
 {
   int r_off = m_offset;
   ymuint32 bits = m_n_bits;

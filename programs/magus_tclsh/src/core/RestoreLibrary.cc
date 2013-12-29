@@ -35,8 +35,8 @@ RestoreLibrary::~RestoreLibrary()
 const CellLibrary*
 RestoreLibrary::read_library(const string& filename)
 {
-  FileIDO bi(filename);
-  if ( !bi ) {
+  FileIDO bi;
+  if ( !bi.open(filename) ) {
     TclObj emsg;
     emsg << "Could not open " << filename;
     set_result(emsg);

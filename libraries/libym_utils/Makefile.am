@@ -37,10 +37,10 @@ libym_utils_la_SOURCES = \
 	BtgMatch.cc \
 	BtgNode.h \
 	CombiGen.cc \
-	CompressCoder.h \
-	CompressCoder.cc \
-	CompressDecoder.h \
-	CompressDecoder.cc \
+	ZCoder.h \
+	ZCoder.cc \
+	ZDecoder.h \
+	ZDecoder.cc \
 	DlList.cc \
 	File.cc \
 	FileBuff.h \
@@ -72,6 +72,7 @@ libym_utils_la_SOURCES = \
 	MultiSetPermGen.cc \
 	MultiPermGen.cc \
 	NameMgr.cc \
+	ODO.cc \
 	PermGen.cc \
 	PoptMainApp.cc \
 	RandGen.cc \

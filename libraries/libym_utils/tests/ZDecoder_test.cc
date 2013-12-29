@@ -1,27 +1,27 @@
 
-/// @file CompressDecoder_test.cc
-/// @brief CompressDecoder のテストプログラム
+/// @file ZDecoder_test.cc
+/// @brief ZDecoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "../CompressDecoder.h"
+#include "../ZDecoder.h"
 
 
 BEGIN_NAMESPACE_YM
 
 int
-CompressDecoder_test(int argc,
-	       const char** argv)
+ZDecoder_test(int argc,
+	      const char** argv)
 {
   if ( argc != 2 ) {
     cerr << "USAGE: " << argv[0] << " <filename>" << endl;
     return 1;
   }
 
-  CompressDecoder decoder;
+  ZDecoder decoder;
 
   if ( !decoder.open(argv[1]) ) {
     cerr << argv[1] << ": No such file" << endl;
@@ -33,7 +33,7 @@ CompressDecoder_test(int argc,
     ymuint8 buff[BUFF_SIZE];
     ssize_t n = decoder.read(buff, BUFF_SIZE);
     if ( n < 0 ) {
-      cerr << "ERROR in CompressDecoder::read(): n = " << n << endl;
+      cerr << "ERROR in ZDecoder::read(): n = " << n << endl;
       return -1;
     }
     if ( n == 0 ) {
@@ -56,5 +56,5 @@ main(int argc,
 {
   using namespace nsYm;
 
-  return CompressDecoder_test(argc, argv);
+  return ZDecoder_test(argc, argv);
 }

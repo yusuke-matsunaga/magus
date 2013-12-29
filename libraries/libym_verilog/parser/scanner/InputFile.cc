@@ -41,12 +41,9 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] ido 入力データ
 // @param[in] lex 親の Lex
-InputFile::InputFile(IDO* ido,
-		     RawLex& lex) :
-  Scanner(*ido),
-  mIDO(ido),
+InputFile::InputFile(RawLex& lex) :
+  Scanner(mIDO),
   mLex(lex)
 {
 }
@@ -54,7 +51,17 @@ InputFile::InputFile(IDO* ido,
 // @brief デストラクタ
 InputFile::~InputFile()
 {
-  delete mIDO;
+}
+
+// @brief ファイルを開く
+// @param[in] filename ファイル名
+// @param[in] parent_loc インクルードされた場合の親のファイル位置
+// @return 成功したら true を返す．
+bool
+InputFile::open(const string& filename,
+		const FileLoc& parent_file)
+{
+  return mIDO.open(filename, parent_file);
 }
 
 // @brief トークンの読み出しを行う．

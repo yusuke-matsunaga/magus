@@ -71,8 +71,8 @@ BlifParser::read(const string& filename,
 		 const CellLibrary* cell_library)
 {
   // ファイルをオープンする．
-  FileIDO ido(filename);
-  if ( !ido ) {
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";

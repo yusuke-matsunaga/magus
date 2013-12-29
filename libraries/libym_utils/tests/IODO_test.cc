@@ -60,10 +60,11 @@ END_NONAMESPACE
 bool
 IODO_test()
 {
+  tCodecType type = kCodecThrough;
   const char* datafile = "IODO_test.bin";
 
-  FileODO bo(datafile);
-  if ( !bo ) {
+  FileODO bo(type);
+  if ( !bo.open(datafile) ) {
     // エラー
     cerr << "Could not create " << datafile << endl;
   }
@@ -82,8 +83,8 @@ IODO_test()
   }
   bo.close();
 
-  FileIDO bi(datafile);
-  if ( !bi ) {
+  FileIDO bi(type);
+  if ( !bi.open(datafile) ) {
     // エラー
     cerr << "Could not open " << datafile << endl;
     return false;
@@ -139,11 +140,12 @@ IODO_test()
 bool
 IODO_test2()
 {
+  tCodecType type = kCodecThrough;
   const char* datafile = "IODO_test2.bin";
 
   {
-    FileODO bo(datafile);
-    if ( !bo ) {
+    FileODO bo(type);
+    if ( !bo.open(datafile) ) {
       // エラー
       cerr << "Could not create " << datafile << endl;
       return false;
@@ -165,8 +167,8 @@ IODO_test2()
 
   ymuint nerr = 0;
   {
-    FileIDO bi(datafile);
-    if ( !bi ) {
+    FileIDO bi(type);
+    if ( !bi.open(datafile) ) {
       // エラー
       cerr << "Could not open " << datafile << endl;
       return false;

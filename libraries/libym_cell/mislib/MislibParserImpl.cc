@@ -89,8 +89,8 @@ MislibParserImpl::read_file(const string& filename,
 {
   int yyparse(MislibParserImpl& parser);
 
-  FileIDO ido(filename);
-  if ( !ido ) {
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";

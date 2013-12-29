@@ -155,8 +155,8 @@ DimacsParserImpl::read(const string& filename)
   // 実際に読み込んだ節の数
   int act_nc = 0;
 
-  FileIDO ido(filename);
-  if ( !ido ) {
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
     // ファイルが開けなかった．
     ostringstream buf;
     buf << filename << " : No such file.";

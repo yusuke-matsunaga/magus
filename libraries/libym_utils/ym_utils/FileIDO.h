@@ -32,8 +32,9 @@ public:
   /// @brief コンストラクタ
   /// @param[in] codec_type Decoder の種類
   explicit
-  FileIDO(tCodecType codec_type);
+  FileIDO(tCodecType codec_type = kCodecThrough);
 
+#if 0
   /// @brief コンストラクタ
   /// @param[in] codec_type Decoder の種類
   /// @param[in] filename ファイル名
@@ -51,6 +52,7 @@ public:
   FileIDO(tCodecType codec_type,
 	  const string& filename,
 	  const FileLoc& parent_loc = FileLoc());
+#endif
 
   /// @brief デストラクタ
   virtual
@@ -101,6 +103,14 @@ public:
   /// @note 他のファイルを開いていたら強制的に close する．
   bool
   open(const char* filename,
+       const FileLoc& parent_loc = FileLoc());
+
+  /// @brief ファイルを開く
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルード元の親ファイルの情報
+  /// @note 他のファイルを開いていたら強制的に close する．
+  bool
+  open(const string& filename,
        const FileLoc& parent_loc = FileLoc());
 
   /// @brief ファイルを閉じる．

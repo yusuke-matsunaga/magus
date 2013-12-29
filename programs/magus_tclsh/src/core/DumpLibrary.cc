@@ -44,8 +44,8 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     // ファイル名文字列の中に誤り
     return TCL_ERROR;
   }
-  FileODO bo(ex_name);
-  if ( !bo ) {
+  FileODO bo;
+  if ( !bo.open(ex_name) ) {
     // 開けなかった．
     TclObj errmsg;
     errmsg << ex_name << ": " << posix_error();

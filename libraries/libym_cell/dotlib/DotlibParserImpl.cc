@@ -54,8 +54,8 @@ DotlibParserImpl::read_file(const string& filename,
   mDebug = debug;
   mAllowNoSemi = allow_no_semi;
 
-  FileIDO ido(filename);
-  if ( !ido ) {
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
     ostringstream buf;
     buf << filename << ": Could not open.";
     MsgMgr::put_msg(__FILE__, __LINE__,

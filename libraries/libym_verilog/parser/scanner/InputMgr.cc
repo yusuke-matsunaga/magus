@@ -95,13 +95,10 @@ InputMgr::open_file(const string& filename,
   // 本当のパス名
   string realname = pathname.str();
 
-  FileIDO* ido = new FileIDO(realname, parent_file);
-  if ( !(*ido) ) {
-    delete ido;
+  InputFile* new_file = new InputFile(mLex);
+  if ( !new_file->open(realname, parent_file) ) {
     return false;
   }
-
-  InputFile* new_file = new InputFile(ido, mLex);
 
   if ( mCurFile ) {
     mFileStack.push_back(mCurFile);

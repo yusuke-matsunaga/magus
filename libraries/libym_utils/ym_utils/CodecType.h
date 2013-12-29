@@ -20,8 +20,8 @@ BEGIN_NAMESPACE_YM
 enum tCodecType {
   /// @brief 無変換
   kCodecThrough,
-  /// @brief compress
-  kCodecCompress,
+  /// @brief compress (Z)
+  kCodecZ,
   /// @brief gzip
   kCodecGzip
 };

@@ -38,8 +38,8 @@ dump_load_test(const char* in_filename,
 
   const char* data_filename = "cell_dump.bin";
   {
-    FileODO bo(data_filename);
-    if ( !bo ) {
+    FileODO bo;
+    if ( !bo.open(data_filename) ) {
       // エラー
       cerr << "Could not create " << data_filename << endl;
       return false;
@@ -49,8 +49,8 @@ dump_load_test(const char* in_filename,
 
   CellLibrary* library2 = NULL;
   {
-    FileIDO bi(data_filename);
-    if ( !bi ) {
+    FileIDO bi;
+    if ( !bi.open(data_filename) ) {
       // エラー
       cerr << "Could not open " << data_filename << endl;
       return false;

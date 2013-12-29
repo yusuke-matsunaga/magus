@@ -46,8 +46,8 @@ Iscas89ParserImpl::read(const string& filename)
   int yyparse(Iscas89ParserImpl&);
 
   // ファイルをオープンする．
-  FileIDO ido(filename);
-  if ( !ido ) {
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
     // エラー
     ostringstream buf;
     buf << filename << " : No such file.";

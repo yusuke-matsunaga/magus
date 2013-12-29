@@ -84,8 +84,8 @@ main(int argc,
 
   const char* datafile = "patdata.bin";
   {
-    FileODO bo(datafile);
-    if ( !bo ) {
+    FileODO bo;
+    if ( !bo.open(datafile) ) {
       // エラー
       cerr << "Could not create " << datafile << endl;
       return 2;
@@ -94,8 +94,8 @@ main(int argc,
   }
 
   {
-    FileIDO bi(datafile);
-    if ( !bi ) {
+    FileIDO bi;
+    if ( !bi.open(datafile) ) {
       // エラー
       cerr << "Could not open " << datafile << endl;
       return 3;

@@ -25,6 +25,7 @@ FileODO::FileODO(tCodecType codec_type)
   mCoder = FileCoder::new_coder(codec_type);
 }
 
+#if 0
 // @brief コンストラクタ
 // @param[in] codec_type Coder の種類
 // @param[in] filename ファイル名
@@ -52,6 +53,7 @@ FileODO::FileODO(tCodecType codec_type,
   mCoder = FileCoder::new_coder(codec_type);
   open(filename, mode, opt);
 }
+#endif
 
 // @brief デストラクタ
 FileODO::~FileODO()

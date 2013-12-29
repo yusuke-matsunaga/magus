@@ -8,9 +8,9 @@
 
 
 #include "ym_utils/FileDecoder.h"
-#include "CompressDecoder.h"
-#include "GzDecoder.h"
 #include "ThruDecoder.h"
+#include "ZDecoder.h"
+#include "GzDecoder.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -31,14 +31,38 @@ FileDecoder::new_decoder(tCodecType type)
   if ( type == kCodecThrough ) {
     decoder = new ThruDecoder();
   }
-  else if ( type == kCodecCompress ) {
-    decoder = new CompressDecoder();
+  else if ( type == kCodecZ ) {
+    decoder = new ZDecoder();
   }
   else if ( type == kCodecGzip ) {
     decoder = new GzDecoder();
   }
 
   return decoder;
+}
+
+// @brief thru decoder のインスタンスを作る関数
+// @return 作成したインスタンスを返す．
+FileDecoder*
+FileDecoder::new_thru_decoder()
+{
+  return new ThruDecoder();
+}
+
+// @brief compress decoder のインスタンスを作る関数
+// @return 作成したインスタンスを返す．
+FileDecoder*
+FileDecoder::new_z_decoder()
+{
+  return new ZDecoder();
+}
+
+// @brief gzip decoder のインスタンスを作る関数
+// @return 作成したインスタンスを返す．
+FileDecoder*
+FileDecoder::new_gzip_decoder()
+{
+  return new GzDecoder();
 }
 
 END_NAMESPACE_YM

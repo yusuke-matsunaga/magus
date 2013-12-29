@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/CompIDO.h"
+#include "ym_utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -20,8 +20,8 @@ CompIDO_test(int argc,
     return 1;
   }
 
-  CompIDO ido(argv[1]);
-  if ( !ido ) {
+  FileIDO ido(kCodecZ);
+  if ( !ido.open(argv[1]) ) {
     cerr << argv[1] << ": No such file" << endl;
     return -1;
   }

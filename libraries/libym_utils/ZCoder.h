@@ -1,8 +1,8 @@
-#ifndef COMPRESSCODER_H
-#define COMPRESSCODER_H
+#ifndef ZCODER_H
+#define ZCODER_H
 
-/// @file CompressCoder.h
-/// @brief CompressCoder のヘッダファイル
+/// @file ZCoder.h
+/// @brief ZCoder のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM_COMPCOMMON
 
 //////////////////////////////////////////////////////////////////////
-/// @class CompressCoder CompressCoder.h "CompressCoder.h"
+/// @class ZCoder ZCoder.h "ZCoder.h"
 /// @brief compress(Z) 形式の圧縮器
 //////////////////////////////////////////////////////////////////////
-class CompressCoder :
+class ZCoder :
   public FileCoder
 {
 public:
 
   /// @brief コンストラクタ
-  CompressCoder();
+  ZCoder();
 
   /// @brief デストラクタ
   virtual
-  ~CompressCoder();
+  ~ZCoder();
 
 
 public:
@@ -160,14 +160,14 @@ private:
 
 inline
 count_int&
-CompressCoder::htabof(ymuint i)
+ZCoder::htabof(ymuint i)
 {
   return m_htab[i];
 }
 
 inline
 u_short&
-CompressCoder::codetabof(ymuint i)
+ZCoder::codetabof(ymuint i)
 {
   return m_codetab[i];
 }
@@ -177,8 +177,8 @@ END_NAMESPACE_YM_COMPCOMMON
 
 BEGIN_NAMESPACE_YM
 
-using nsCompCommon::CompressCoder;
+using nsCompCommon::ZCoder;
 
 END_NAMESPACE_YM
 
-#endif // COMPRESSCODER_H
+#endif // ZCODER_H

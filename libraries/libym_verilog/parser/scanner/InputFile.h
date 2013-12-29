@@ -12,6 +12,7 @@
 #include "ym_verilog/verilog.h"
 
 #include "ym_utils/Scanner.h"
+#include "ym_utils/FileIDO.h"
 #include "ym_utils/FileRegion.h"
 #include "ym_utils/FileInfo.h"
 #include "ym_utils/StrBuff.h"
@@ -39,11 +40,8 @@ class InputFile :
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] ido 入力データ
   /// @param[in] lex 親の Lex
-  /// @note ido はこのクラスが管理する．(デストラクタで破壊する)
-  InputFile(IDO* ido,
-	    RawLex& lex);
+  InputFile(RawLex& lex);
 
   /// @brief デストラクタ
   ~InputFile();
@@ -53,6 +51,14 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ファイルを開く
+  /// @param[in] filename ファイル名
+  /// @param[in] parent_loc インクルードされた場合の親のファイル位置
+  /// @return 成功したら true を返す．
+  bool
+  open(const string& filename,
+       const FileLoc& parent_file);
 
   /// @brief トークンの読み出しを行う．
   /// @param[out] buff 結果の文字列を格納するバッファ
@@ -172,8 +178,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力データ
-  // Scanner() と二重に持つことになるけどまあいいか．
-  IDO* mIDO;
+  FileIDO mIDO;
 
   // 親の Lex
   RawLex& mLex;

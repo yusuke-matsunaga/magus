@@ -53,8 +53,8 @@ noinst_PROGRAMS = \
 	mscg_test \
 	CompIDO_test \
 	CompODO_test \
-	CompressCoder_test \
-	CompressDecoder_test \
+	ZCoder_test \
+	ZDecoder_test \
 	StrListIDO_test \
 	BtgMatch_test \
 	FlowTest
@@ -275,28 +275,28 @@ CompODO_test_LDADD = \
 
 
 ############################################################
-## Variables for building CompressCoder_test
+## Variables for building ZCoder_test
 ############################################################
 
-CompressCoder_test_SOURCES = \
-	CompressCoder_test.cc
+ZCoder_test_SOURCES = \
+	ZCoder_test.cc
 
-CompressCoder_test_LDFLAGS =
+ZCoder_test_LDFLAGS =
 
-CompressCoder_test_LDADD = \
+ZCoder_test_LDADD = \
 	$(YMUTILS)
 
 
 ############################################################
-## Variables for building CompressDecoder_test
+## Variables for building ZDecoder_test
 ############################################################
 
-CompressDecoder_test_SOURCES = \
-	CompressDecoder_test.cc
+ZDecoder_test_SOURCES = \
+	ZDecoder_test.cc
 
-CompressDecoder_test_LDFLAGS =
+ZDecoder_test_LDFLAGS =
 
-CompressDecoder_test_LDADD = \
+ZDecoder_test_LDADD = \
 	$(YMUTILS)
 
 

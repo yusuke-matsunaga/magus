@@ -3,7 +3,7 @@
 /// @brief FileODO の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -26,7 +26,7 @@ struct FileODOObject
   PyObject_HEAD
 
   // FileODO の本体
-  FileODO mBody;
+  FileODO* mBody;
 
 };
 
@@ -44,8 +44,7 @@ FileODO_new(PyTypeObject* type)
     return NULL;
   }
 
-  // FileODO の最低限の初期化を行う．
-  new (&self->mBody) FileODO();
+  self->mBody = NULL;
 
   return self;
 }
@@ -55,7 +54,7 @@ void
 FileODO_dealloc(FileODOObject* self)
 {
   // FileODO の後始末を行う．
-  self->mBody.close();
+  delete self->mBody;
 
   PyObject_Del(self);
 }
@@ -63,19 +62,34 @@ FileODO_dealloc(FileODOObject* self)
 // 初期化関数
 int
 FileODO_init(FileODOObject* self,
-	      PyObject* args)
+	     PyObject* args)
 {
   // 引数の形式は
   // - ()
-  // - (str) : ファイル名
-  char* filename = NULL;
-  if ( !PyArg_ParseTuple(args, "|s", &filename) ) {
+  // - (str) : 種類
+  char* type_str = NULL;
+  if ( !PyArg_ParseTuple(args, "|s", &type_str) ) {
     return -1;
   }
 
-  if ( filename != NULL ) {
-    self->mBody.open(filename);
+  tCodecType type = kCodecThrough;
+  if ( type_str != NULL ) {
+    if ( strcmp(type_str, "through") == 0 ) {
+      type = kCodecThrough;
+    }
+    else if ( strcmp(type_str, "compress") == 0 ) {
+      type = kCodecZ;
+    }
+    else if ( strcmp(type_str, "gzip") == 0 ) {
+      type = kCodecGzip;
+    }
+    else {
+#warning "TODO: エラーメッセージを作る．"
+      return -1;
+    }
   }
+
+  self->mBody = new FileODO(type);
 
   // 正常に終了したら 0 を返す．
   return 0;
@@ -84,10 +98,10 @@ FileODO_init(FileODOObject* self,
 // ok 関数
 PyObject*
 FileODO_ok(FileODOObject* self,
-	    PyObject* args)
+	   PyObject* args)
 {
   // 奇妙な文
-  bool stat = self->mBody;
+  bool stat = *(self->mBody);
 
   return PyObject_FromBool(stat);
 }
@@ -95,14 +109,14 @@ FileODO_ok(FileODOObject* self,
 // open 関数
 PyObject*
 FileODO_open(FileODOObject* self,
-	      PyObject* args)
+	     PyObject* args)
 {
   char* filename = NULL;
   if ( !PyArg_ParseTuple(args, "s", &filename) ) {
     return NULL;
   }
 
-  self->mBody.open(filename);
+  self->mBody->open(filename);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -111,9 +125,9 @@ FileODO_open(FileODOObject* self,
 // close 関数
 PyObject*
 FileODO_close(FileODOObject* self,
-	       PyObject* args)
+	      PyObject* args)
 {
-  self->mBody.close();
+  self->mBody->close();
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -122,14 +136,14 @@ FileODO_close(FileODOObject* self,
 // write_8 関数
 PyObject*
 FileODO_write_8(FileODOObject* self,
-		 PyObject* args)
+		PyObject* args)
 {
   ymuint8 val;
   if ( !PyArg_ParseTuple(args, "b", &val) ) {
     return NULL;
   }
 
-  self->mBody.write_8(val);
+  self->mBody->write_8(val);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -138,14 +152,14 @@ FileODO_write_8(FileODOObject* self,
 // write_16 関数
 PyObject*
 FileODO_write_16(FileODOObject* self,
-		  PyObject* args)
+		 PyObject* args)
 {
   ymuint16 val;
   if ( !PyArg_ParseTuple(args, "H", &val) ) {
     return NULL;
   }
 
-  self->mBody.write_16(val);
+  self->mBody->write_16(val);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -154,14 +168,14 @@ FileODO_write_16(FileODOObject* self,
 // write_32 関数
 PyObject*
 FileODO_write_32(FileODOObject* self,
-		  PyObject* args)
+		 PyObject* args)
 {
   ymuint32 val;
   if ( !PyArg_ParseTuple(args, "k", &val) ) {
     return NULL;
   }
 
-  self->mBody.write_32(val);
+  self->mBody->write_32(val);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -170,14 +184,14 @@ FileODO_write_32(FileODOObject* self,
 // write_64 関数
 PyObject*
 FileODO_write_64(FileODOObject* self,
-		  PyObject* args)
+		 PyObject* args)
 {
   ymuint64 val;
   if ( !PyArg_ParseTuple(args, "K", &val) ) {
     return NULL;
   }
 
-  self->mBody.write_64(val);
+  self->mBody->write_64(val);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -186,14 +200,14 @@ FileODO_write_64(FileODOObject* self,
 // write_float 関数
 PyObject*
 FileODO_write_float(FileODOObject* self,
-		     PyObject* args)
+		    PyObject* args)
 {
   float val;
   if ( !PyArg_ParseTuple(args, "f", &val) ) {
     return NULL;
   }
 
-  self->mBody.write_float(val);
+  self->mBody->write_float(val);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -202,14 +216,14 @@ FileODO_write_float(FileODOObject* self,
 // write_double 関数
 PyObject*
 FileODO_write_double(FileODOObject* self,
-		      PyObject* args)
+		     PyObject* args)
 {
   double val;
   if ( !PyArg_ParseTuple(args, "d", &val) ) {
     return NULL;
   }
 
-  self->mBody.write_double(val);
+  self->mBody->write_double(val);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -218,14 +232,14 @@ FileODO_write_double(FileODOObject* self,
 // write_str 関数
 PyObject*
 FileODO_write_str(FileODOObject* self,
-		   PyObject* args)
+		  PyObject* args)
 {
   char* str;
   if ( !PyArg_ParseTuple(args, "s", &str) ) {
     return NULL;
   }
 
-  self->mBody.write_str(str);
+  self->mBody->write_str(str);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -382,7 +396,7 @@ PyFileODO_AsFileODOPtr(PyObject* py_obj)
   // 強制的にキャスト
   FileODOObject* my_obj = (FileODOObject*)py_obj;
 
-  return &my_obj->mBody;
+  return my_obj->mBody;
 }
 
 // @brief 引数をパースして FileODO を取り出す．

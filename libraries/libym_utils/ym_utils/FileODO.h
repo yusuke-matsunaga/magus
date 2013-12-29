@@ -30,8 +30,9 @@ public:
   /// @brief コンストラクタ
   /// @param[in] codec_type Coder の種類
   explicit
-  FileODO(tCodecType codec_type);
+  FileODO(tCodecType codec_type = kCodecThrough);
 
+#if 0
   /// @brief コンストラクタ
   /// @param[in] codec_type Coder の種類
   /// @param[in] filename ファイル名
@@ -53,6 +54,7 @@ public:
 	  const string& filename,
 	  mode_t mode = 0666,
 	  ymuint opt = 0);
+#endif
 
   /// @brief デストラクタ
   virtual

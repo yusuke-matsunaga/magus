@@ -210,7 +210,11 @@ CellLibrary_init(CellLibraryObject* self,
     self->mLibrary = library;
   }
   else if ( strcmp(type, "binary") == 0 ) {
-    FileIDO s(filename);
+    FileIDO s;
+    if ( !s.open(filename) ) {
+      PyErr_SetString(PyExc_ValueError, "Read error");
+      return -1;
+    }
     CellLibrary* library = CellLibrary::new_obj();
     library->restore(s);
     self->mLibrary = library;

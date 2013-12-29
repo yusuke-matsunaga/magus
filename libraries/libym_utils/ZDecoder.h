@@ -1,8 +1,8 @@
-#ifndef COMPRESSDECODER_H
-#define COMPRESSDECODER_H
+#ifndef ZDECODER_H
+#define ZDECODER_H
 
-/// @file CompressDecoder.h
-/// @brief CompressDecoder のヘッダファイル
+/// @file ZDecoder.h
+/// @brief ZDecoder のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM_COMPCOMMON
 
 //////////////////////////////////////////////////////////////////////
-/// @class CompressDecoder CompressDecoder.h "CompressDecoder.h"
+/// @class ZDecoder ZDecoder.h "ZDecoder.h"
 /// @brief compress(Z) 形式の伸長器
 //////////////////////////////////////////////////////////////////////
-class CompressDecoder :
+class ZDecoder :
   public FileDecoder
 {
 public:
 
   /// @brief コンストラクタ
-  CompressDecoder();
+  ZDecoder();
 
   /// @brief デストラクタ
   virtual
-  ~CompressDecoder();
+  ~ZDecoder();
 
 
 public:
@@ -168,14 +168,14 @@ private:
 
 inline
 u_short&
-CompressDecoder::tab_prefixof(ymuint i)
+ZDecoder::tab_prefixof(ymuint i)
 {
   return mPrefix[i];
 }
 
 inline
 char_type&
-CompressDecoder::tab_suffixof(ymuint i)
+ZDecoder::tab_suffixof(ymuint i)
 {
   return mSuffix[i];
 }
@@ -183,7 +183,7 @@ CompressDecoder::tab_suffixof(ymuint i)
 // @brief スタックを初期化する．
 inline
 void
-CompressDecoder::init_stack()
+ZDecoder::init_stack()
 {
   mStackPtr = &mStack[0];
 }
@@ -191,7 +191,7 @@ CompressDecoder::init_stack()
 // @brief スタックが空の時 true を返す．
 inline
 bool
-CompressDecoder::is_empty()
+ZDecoder::is_empty()
 {
   return mStackPtr == &mStack[0];
 }
@@ -199,7 +199,7 @@ CompressDecoder::is_empty()
 // @brief スタックにデータを積む．
 inline
 void
-CompressDecoder::push_stack(char_type data)
+ZDecoder::push_stack(char_type data)
 {
   assert_cond( mStackPtr < &mStack[8000], __FILE__, __LINE__);
   *(mStackPtr ++) = data;
@@ -208,7 +208,7 @@ CompressDecoder::push_stack(char_type data)
 // @brief スタックからデータを取り出す．
 inline
 char_type
-CompressDecoder::pop_stack()
+ZDecoder::pop_stack()
 {
   return *(-- mStackPtr);
 }
@@ -217,8 +217,8 @@ END_NAMESPACE_YM_COMPCOMMON
 
 BEGIN_NAMESPACE_YM
 
-using nsCompCommon::CompressDecoder;
+using nsCompCommon::ZDecoder;
 
 END_NAMESPACE_YM
 
-#endif // COMPRESSDECODER_H
+#endif // ZDECODER_H

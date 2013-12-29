@@ -65,13 +65,31 @@ FileIDO_init(FileIDOObject* self,
 	     PyObject* args)
 {
   // 引数の形式は
-  // - (str) : ファイル名
-  char* filename = NULL;
-  if ( !PyArg_ParseTuple(args, "s", &filename) ) {
+  // - ()
+  // - (str) : 種類を表す文字列
+  char* type_str = NULL;
+  if ( !PyArg_ParseTuple(args, "!s", &type_str) ) {
     return -1;
   }
 
-  self->mBody = new FileIDO(filename);
+  tCodecType type = kCodecThrough;
+  if ( type_str != NULL ) {
+    if ( strcmp(type_str, "through") == 0 ) {
+      type = kCodecThrough;
+    }
+    else if ( strcmp(type_str, "compress") == 0 ) {
+      type = kCodecZ;
+    }
+    else if ( strcmp(type_str, "gzip") == 0 ) {
+      type = kCodecGzip;
+    }
+    else {
+#warning "TODO: エラーメッセージを作る．"
+      return -1;
+    }
+  }
+
+  self->mBody = new FileIDO(type);
 
   // 正常に終了したら 0 を返す．
   return 0;
@@ -84,6 +102,23 @@ FileIDO_ok(FileIDOObject* self,
 {
   // 奇妙な文
   bool stat = *(self->mBody);
+
+  return PyObject_FromBool(stat);
+}
+
+// open 関数
+PyObject*
+FileIDO_open(FileIDOObject* self,
+	     PyObject* args)
+{
+  // 引数の形式は
+  // - (str) : ファイル名
+  char* filename = NULL;
+  if ( !PyArg_ParseTuple(args, "s", &filename) ) {
+    return NULL;
+  }
+
+  bool stat = self->mBody->open(filename);
 
   return PyObject_FromBool(stat);
 }
@@ -171,6 +206,8 @@ PyMethodDef FileIDO_methods[] = {
   //  - METH_STATIC
   //  - METH_COEXIST
   {"ok", (PyCFunction)FileIDO_ok, METH_NOARGS,
+   PyDoc_STR("check if writable (NONE)")},
+  {"open", (PyCFunction)FileIDO_open, METH_NOARGS,
    PyDoc_STR("check if writable (NONE)")},
   {"read_8", (PyCFunction)FileIDO_read_8, METH_NOARGS,
    PyDoc_STR("read 8bit data (NONE)")},
