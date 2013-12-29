@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/DimacsParser.h"
+#include "ym_logic/DimacsHandler.h"
 
 #if USE_ZSTREAM
 #include "ym_utils/zstream.h"

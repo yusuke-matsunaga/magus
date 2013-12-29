@@ -26,6 +26,9 @@ noinst_HEADERS = \
 	CvFunc.h \
 	Dg.h \
 	DimacsParser.h \
+	DimacsHandler.h \
+	DimacsVerifier.h \
+	SatDimacsHandler.h \
 	Literal.h \
 	LogExpr.h \
 	LogExprWriter.h \

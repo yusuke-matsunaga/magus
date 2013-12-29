@@ -3,9 +3,7 @@
 /// @brief 簡単な SAT プログラム(2)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ymsat2.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -147,11 +145,6 @@ main(int argc,
     SatMsgHandlerImpl1 satmsghandler(cout);
     if ( verbose > 2 ) {
       solver.reg_msg_handler(&satmsghandler);
-
-      cout << "===================================================================" << endl;
-      cout << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl;
-      cout << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl;
-      cout << "===================================================================" << endl;
     }
 
     solver.timer_on(true);
@@ -197,20 +190,6 @@ main(int argc,
 	}
 	vector<Bool3> model;
 	solver.solve(lits, model);
-	if ( verbose ) {
-	  SatStats stats;
-	  solver.get_stats(stats);
-	  cout << "===================================================================" << endl;
-	  cout << "restarts          : " << stats.mRestart << endl
-	       << "conflicts         : " << stats.mConflictNum << endl
-	       << "decisions         : " << stats.mDecisionNum << endl
-	       << "propagations      : " << stats.mPropagationNum << endl
-	       << "conflict literals : " << stats.mLearntLitNum << endl
-	       << "clauses           : " << stats.mConstrClauseNum << endl
-	       << "clause literals   : " << stats.mConstrLitNum << endl
-	       << "learnts           : " << stats.mLearntClauseNum << endl
-	       << "CPU time          : " << stats.mTime << endl;
-	}
       }
     }
 

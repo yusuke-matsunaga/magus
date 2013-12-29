@@ -17,7 +17,9 @@ libym_sat_dimacs_la_SOURCES = \
 	DimacsParser.cc \
 	DimacsParserImpl.h \
 	DimacsScanner.h \
-	DimacsScanner.cc
+	DimacsScanner.cc \
+	DimacsVerifier.cc \
+	SatDimacsHandler.cc
 
 libym_sat_dimacs_la_LIBADD =
 

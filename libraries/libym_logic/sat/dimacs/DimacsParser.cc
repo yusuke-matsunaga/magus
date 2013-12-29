@@ -10,6 +10,7 @@
 
 
 #include "ym_logic/DimacsParser.h"
+#include "ym_logic/DimacsHandler.h"
 #include "DimacsParserImpl.h"
 #include "ym_utils/FileIDO.h"
 #include "ym_utils/MsgMgr.h"
