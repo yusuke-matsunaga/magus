@@ -5,7 +5,7 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([ymtools_header], [1.0], 
+AC_INIT([ymtools_header], [1.0],
         [yusuke_matsunaga@ieee.org],
         [ymtools_header])dnl
 
@@ -43,6 +43,8 @@ _AC_COMPUTE_INT([__GNUC__], ym_gnuc)
 # ===================================================================
 
 AC_CHECK_LIB([z], [compress], [ym_have_libz=yes])
+AC_CHECK_LIB([bz2], [BZ2_bzCompress], [ym_have_libz=yes])
+AC_CHECK_LIB([lzma], [lzma_easy_encoder], [ym_have_liblzma=yes])
 
 
 # ===================================================================
@@ -58,6 +60,8 @@ AC_CHECK_HEADERS([math.h], [ym_have_math_h=yes])
 AC_CHECK_HEADERS([sys/time.h], [ym_have_sys_time_h=yes])
 AC_CHECK_HEADERS([sys/stat.h], [ym_have_sys_stat_h=yes])
 AC_CHECK_HEADERS([zlib.h], [ym_have_zlib_h=yes])
+AC_CHECK_HEADERS([bzlib.h], [ym_have_bzlib_h=yes])
+AC_CHECK_HEADERS([lzma.h], [ym_have_lzma_h=yes])
 
 
 # ===================================================================
@@ -97,6 +101,20 @@ if test "x$ym_have_zlib_h" = xyes -a "x$ym_have_libz" = xyes; then
    ym_have_zlib=1
 else
    ym_have_zlib=0
+fi
+
+# Check for bzlib
+if test "x$ym_have_bzlib_h" = xyes -a "x$ym_have_libbz2" = xyes; then
+   ym_have_bzlib=1
+else
+   ym_have_bzlib=0
+fi
+
+# Check for liblzma
+if test "x$ym_have_lzma_h" = xyes -a "x$ym_have_liblzma" = xyes; then
+   ym_have_liblzma=1
+else
+   ym_have_liblzma=0
 fi
 
 AC_CACHE_SAVE
@@ -228,6 +246,20 @@ if test $ym_have_zlib=1; then
 ___EOF___
 fi
 
+if test $ym_have_bzlib=1; then
+  cat >> $ymtools << ___EOF___
+/* Define if you have bzlib.h */
+#define HAVE_BZLIB 1
+___EOF___
+fi
+
+if test $ym_have_liblzma=1; then
+  cat >> $ymtools << ___EOF___
+/* Define if you have lzma.h */
+#define HAVE_LAMA 1
+___EOF___
+fi
+
 cat >> $ymtools << ___EOF___
 
 //////////////////////////////////////////////////////////////////////
@@ -279,7 +311,7 @@ cat >> $ymtools << ___EOF___
 
 BEGIN_NAMESPACE_HASH
 
-// string/const string の hash_set/map 用のハッシュ関数クラス 
+// string/const string の hash_set/map 用のハッシュ関数クラス
 // hash<string>, hash<const string>定義．
 // SGI STL の string クラス (v3.1 以降)にはこの定義は不要．
 #if !defined(__SGI_STL_STRING) && !defined(DEFINE_HASH_STRING)
@@ -294,11 +326,11 @@ hash<std::string>
   size_t
   operator()(const std::string& __x) const
   {
-    unsigned long __h = 0; 
+    unsigned long __h = 0;
     for (std::string::const_iterator __s = __x.begin(); __s != __x.end();
 	 ++__s)
       __h = 5*__h + *__s;
-    
+
     return size_t(__h);
   }
 };
@@ -309,15 +341,15 @@ hash<const std::string>
 {
   size_t
   operator()(const std::string& __x) const {
-    unsigned long __h = 0; 
+    unsigned long __h = 0;
     for (std::string::const_iterator __s = __x.begin(); __s != __x.end();
 	 ++__s)
       __h = 5*__h + *__s;
-    
+
     return size_t(__h);
   }
 };
- 
+
 #endif // __SGI_STL_STRING
 
 END_NAMESPACE_HASH

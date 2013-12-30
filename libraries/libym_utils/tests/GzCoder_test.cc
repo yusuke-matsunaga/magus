@@ -7,7 +7,8 @@
 /// All rights reserved.
 
 
-#include "../GzCoder.h"
+//#include "../GzCoder.h"
+#include "ym_utils/FileCoder.h"
 #include <fcntl.h>
 
 
@@ -17,7 +18,8 @@ int
 GzCoder_test(int argc,
 	   const char** argv)
 {
-  GzCoder coder;
+  //GzCoder coder;
+  FileCoder* coder = FileCoder::new_coder(kCodecGzip);
 
   if ( argc != 3 ) {
     cerr << "USAGE: " << argv[0] << " <input-filename> <output-filename>" << endl;
@@ -30,7 +32,7 @@ GzCoder_test(int argc,
     return -1;
   }
 
-  if ( !coder.open(argv[2]) ) {
+  if ( !coder->open(argv[2]) ) {
     cerr << argv[2] << ": Could not create" << endl;
     return -1;
   }
@@ -46,12 +48,14 @@ GzCoder_test(int argc,
     if ( n == 0 ) {
       break;
     }
-    ssize_t n2 = coder.write(buff, n);
+    ssize_t n2 = coder->write(buff, n);
     if ( n2 != n ) {
       cerr << "ERROR in GzCoder::write(): n2 = " << n2 << endl;
       return -2;
     }
   }
+
+  delete coder;
 
   return 0;
 }

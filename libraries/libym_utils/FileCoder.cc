@@ -15,6 +15,10 @@
 #include "GzCoder.h"
 #endif
 
+#if defined(HAVE_BZLIB)
+#include "BzCoder.h"
+#endif
+
 
 BEGIN_NAMESPACE_YM
 
@@ -45,6 +49,16 @@ FileCoder::new_coder(tCodecType type)
 		    kMsgError,
 		    "FileCoder",
 		    "gzip format is not supported on this system");
+#endif
+  }
+  else if ( type == kCodecBzip2 ) {
+#if defined(HAVE_BZLIB)
+    coder = new BzCoder();
+#else
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    kMsgError,
+		    "FileCoder",
+		    "bzip2 format is not supported on this system");
 #endif
   }
 

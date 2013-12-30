@@ -10,7 +10,7 @@
 #include "GzDecoder.h"
 #include "gz_common.h"
 
-#include <sys/cdefs.h>
+//#include <sys/cdefs.h>
 
 
 BEGIN_NAMESPACE_YM
@@ -136,6 +136,7 @@ GzDecoder::open(const char* filename)
 void
 GzDecoder::close()
 {
+  mZS.inflate_end();
   mBuff.close();
 }
 
@@ -172,10 +173,8 @@ GzDecoder::read(ymuint8* buff,
 {
   mZS.set_outbuf(buff, size);
 
-  int inflate_stat = 0;
-
- start:
-  {
+  int ret = 0;
+  for ( ; ; ) {
     // 入力バッファが空なら新たなデータを読み込む．
     if ( !mBuff.prepare() ) {
       // 読み込みに失敗した．
@@ -187,48 +186,50 @@ GzDecoder::read(ymuint8* buff,
     mZS.set_inbuf(mBuff.buff_ptr(), old_size);
 
     // 伸長する．
-    inflate_stat = mZS.inflate(Z_FINISH);
+    ret = mZS.inflate(Z_FINISH);
 
     // 今回の inflate で消費した分だけ入力バッファを空読みする．
     ymuint in_size = old_size - mZS.avail_in();
     mBuff.seek(in_size);
-  }
-  switch ( inflate_stat ) {
-  case Z_BUF_ERROR:
-    // Z_BUF_ERROR goes with Z_FINISH ...
-    if ( mZS.avail_out() > 0 ) {
-      // 出力バッファが満杯でないのに BUF_ERROR ということは
-      // 入力データが枯渇したということ．
-      assert_cond( mZS.avail_in() == 0, __FILE__, __LINE__);
-      // もう一回繰り返す．
-      goto start;
+
+    switch ( ret ) {
+    case Z_OK:
+      break;
+
+    case Z_STREAM_END:
+      break;
+
+    case Z_BUF_ERROR:
+      if ( mZS.avail_out() > 0 ) {
+	// 出力バッファが満杯でないのに BUF_ERROR ということは
+	// 入力データが枯渇したということ．
+	assert_cond( mZS.avail_in() == 0, __FILE__, __LINE__);
+	// もう一回繰り返す．
+	continue;
+      }
+      // こちらは出力バッファが満杯になってしまった．
+      break;
+
+    case Z_NEED_DICT:
+      cerr << "Z_NEED_DICT" << endl;
+      return -1;
+
+    case Z_DATA_ERROR:
+      cerr << "Z_DATA_ERROR" << endl;
+      return -1;
+
+    case Z_STREAM_ERROR:
+      cerr << "Z_STREAM_ERROR" << endl;
+      return -1;
+
+    case Z_MEM_ERROR:
+      cerr << "Z_MEM_ERROR" << endl;
+      return -1;
+
+    default:
+      cerr << "Unknown error codde (" << ret << ")" << endl;
+      return -1;
     }
-    break;
-
-  case Z_OK:
-    break;
-
-  case Z_STREAM_END:
-    break;
-
-  case Z_NEED_DICT:
-    //meybe_err("Z_NEED_DICT error");
-    break;
-
-  case Z_DATA_ERROR:
-    //maybe_err("data stream error");
-    break;
-
-  case Z_STREAM_ERROR:
-    //maybe_err("internal stream error");
-    break;
-
-  case Z_MEM_ERROR:
-    //maybe_err("memory allocation error");
-    break;
-
-  default:
-    //maybe_err("unknown error from inflate(): %d", status);
     break;
   }
 
@@ -240,9 +241,8 @@ GzDecoder::read(ymuint8* buff,
     mOutSize += wr;
   }
 
-  if ( inflate_stat == Z_STREAM_END ) {
+  if ( ret == Z_STREAM_END ) {
     // データの末尾を読んだときの処理
-    mZS.inflate_end();
 
     // データ末尾の次の4バイトは CRC コード
     ymuint8 tmp_buff[4];
@@ -269,8 +269,6 @@ GzDecoder::read(ymuint8* buff,
       cerr << "data-length ERROR!" << endl;
       return -1;
     }
-
-    close();
   }
 
  end:

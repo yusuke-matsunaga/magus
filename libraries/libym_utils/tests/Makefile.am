@@ -56,16 +56,22 @@ noinst_PROGRAMS = \
 	ZCoder_test \
 	ZDecoder_test \
 	StrListIDO_test \
+	Codec_test \
 	BtgMatch_test \
 	FlowTest
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \
-	GzIDO_test \
-	GzODO_test \
 	GzCoder_test \
 	GzDecoder_test \
 	zstream_test
+endif
+
+if YM_HAVE_BZLIB
+noinst_PROGRAMS += \
+	BzEngine_test \
+	BzCoder_test \
+	BzDecoder_test
 endif
 
 
@@ -314,28 +320,15 @@ StrListIDO_test_LDADD = \
 
 
 ############################################################
-## Variables for building GzIDO_test
+## Variables for building Codec_test
 ############################################################
 
-GzIDO_test_SOURCES = \
-	GzIDO_test.cc
+Codec_test_SOURCES = \
+	Codec_test.cc
 
-GzIDO_test_LDFLAGS =
+Codec_test_LDFLAGS =
 
-GzIDO_test_LDADD = \
-	$(YMUTILS)
-
-
-############################################################
-## Variables for building GzODO_test
-############################################################
-
-GzODO_test_SOURCES = \
-	GzODO_test.cc
-
-GzODO_test_LDFLAGS =
-
-GzODO_test_LDADD = \
+Codec_test_LDADD = \
 	$(YMUTILS)
 
 
@@ -375,6 +368,45 @@ zstream_test_SOURCES = \
 zstream_test_LDFLAGS =
 
 zstream_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building BzEngine_test
+############################################################
+
+BzEngine_test_SOURCES = \
+	BzEngine_test.cc
+
+BzEngine_test_LDFLAGS =
+
+BzEngine_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building BzCoder_test
+############################################################
+
+BzCoder_test_SOURCES = \
+	BzCoder_test.cc
+
+BzCoder_test_LDFLAGS =
+
+BzCoder_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building BzDecoder_test
+############################################################
+
+BzDecoder_test_SOURCES = \
+	BzDecoder_test.cc
+
+BzDecoder_test_LDFLAGS =
+
+BzDecoder_test_LDADD = \
 	$(YMUTILS)
 
 

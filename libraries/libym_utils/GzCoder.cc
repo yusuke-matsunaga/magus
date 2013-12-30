@@ -10,8 +10,6 @@
 #include "GzCoder.h"
 #include "gz_common.h"
 
-#include <sys/cdefs.h>
-
 
 BEGIN_NAMESPACE_YM
 

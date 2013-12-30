@@ -8,9 +8,7 @@
 
 
 #include "ym_utils/ODO.h"
-#include "ym_utils/FileODO.h"
 #include "ym_utils/StreamODO.h"
-#include "ym_utils/CompODO.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/FileRegion.h"

@@ -9,7 +9,6 @@
 
 #include "ym_utils/IDO.h"
 #include "ym_utils/StreamIDO.h"
-#include "ym_utils/CompIDO.h"
 #include "ym_utils/StrListIDO.h"
 
 #include "ym_utils/MsgMgr.h"

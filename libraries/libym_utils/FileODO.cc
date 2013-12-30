@@ -25,36 +25,6 @@ FileODO::FileODO(tCodecType codec_type)
   mCoder = FileCoder::new_coder(codec_type);
 }
 
-#if 0
-// @brief コンストラクタ
-// @param[in] codec_type Coder の種類
-// @param[in] filename ファイル名
-// @param[in] mode ファイル作成用のモード
-// @param[in] opt 圧縮用のオプション
-FileODO::FileODO(tCodecType codec_type,
-		 const char* filename,
-		 mode_t mode,
-		 ymuint opt)
-{
-  mCoder = FileCoder::new_coder(codec_type);
-  open(filename, mode, opt);
-}
-
-// @brief コンストラクタ
-// @param[in] codec_type Coder の種類
-// @param[in] filename ファイル名
-// @param[in] mode ファイル作成用のモード
-// @param[in] opt 圧縮用のオプション
-FileODO::FileODO(tCodecType codec_type,
-		 const string& filename,
-		 mode_t mode,
-		 ymuint opt)
-{
-  mCoder = FileCoder::new_coder(codec_type);
-  open(filename, mode, opt);
-}
-#endif
-
 // @brief デストラクタ
 FileODO::~FileODO()
 {

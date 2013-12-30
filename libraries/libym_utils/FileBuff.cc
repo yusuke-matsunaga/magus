@@ -158,6 +158,7 @@ FileBuff::prepare()
     // バッファが空なら実際に読み込む．
     ssize_t n = ::read(mFd, reinterpret_cast<void*>(mBuff), mBuffSize);
     if ( n < 0 ) {
+      perror("FileBuff::prepare()");
       return false;
     }
 

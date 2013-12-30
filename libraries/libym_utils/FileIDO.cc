@@ -24,32 +24,6 @@ FileIDO::FileIDO(tCodecType codec_type)
   mDecoder = FileDecoder::new_decoder(codec_type);
 }
 
-#if 0
-// @brief コンストラクタ
-// @param[in] codec_type Decoder の種類
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元の親ファイルの情報
-FileIDO::FileIDO(tCodecType codec_type,
-		 const char* filename,
-		 const FileLoc& parent_loc)
-{
-  mDecoder = FileDecoder::new_decoder(codec_type);
-  open(filename, parent_loc);
-}
-
-// @brief コンストラクタ
-// @param[in] codec_type Decoder の種類
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元の親ファイルの情報
-FileIDO::FileIDO(tCodecType codec_type,
-		 const string& filename,
-		 const FileLoc& parent_loc)
-{
-  mDecoder = FileDecoder::new_decoder(codec_type);
-  open(filename.c_str(), parent_loc);
-}
-#endif
-
 // @brief デストラクタ
 FileIDO::~FileIDO()
 {

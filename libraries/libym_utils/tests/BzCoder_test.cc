@@ -1,23 +1,25 @@
 
-/// @file GzODO_test.cc
-/// @brief GzODO のテストプログラム
+/// @file BzCoder_test.cc
+/// @brief BzCoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/GzODO.h"
+//#include "../BzCoder.h"
+#include "ym_utils/FileCoder.h"
 #include <fcntl.h>
 
 
 BEGIN_NAMESPACE_YM
 
 int
-GzODO_test(int argc,
+BzCoder_test(int argc,
 	   const char** argv)
 {
-  GzODO odo;
+  //BzCoder coder;
+  FileCoder* coder = FileCoder::new_coder(kCodecBzip2);
 
   if ( argc != 3 ) {
     cerr << "USAGE: " << argv[0] << " <input-filename> <output-filename>" << endl;
@@ -30,14 +32,14 @@ GzODO_test(int argc,
     return -1;
   }
 
-  if ( !odo.open(argv[2]) ) {
+  if ( !coder->open(argv[2]) ) {
     cerr << argv[2] << ": Could not create" << endl;
     return -1;
   }
 
+  const ymuint BUFF_SIZE = 4096;
+  ymuint8 buff[BUFF_SIZE];
   for ( ; ; ) {
-    const ymuint BUFF_SIZE = 4096;
-    ymuint8 buff[BUFF_SIZE];
     ssize_t n = read(fd, buff, BUFF_SIZE);
     if ( n < 0 ) {
       cerr << "ERROR in read(): n = " << n << endl;
@@ -46,12 +48,13 @@ GzODO_test(int argc,
     if ( n == 0 ) {
       break;
     }
-    ssize_t n2 = odo.write(buff, n);
+    ssize_t n2 = coder->write(buff, n);
     if ( n2 != n ) {
-      cerr << "ERROR in GzODO::write(): n2 = " << n2 << endl;
+      cerr << "ERROR in BzCoder::write(): n2 = " << n2 << endl;
       return -2;
     }
   }
+  delete coder;
 
   return 0;
 }
@@ -65,5 +68,5 @@ main(int argc,
 {
   using namespace nsYm;
 
-  return GzODO_test(argc, argv);
+  return BzCoder_test(argc, argv);
 }

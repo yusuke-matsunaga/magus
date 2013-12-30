@@ -10,9 +10,8 @@ noinst_HEADERS = \
 	Alloc.h \
 	Binder.h \
 	BtgMatch.h \
+	BzEngine.h \
 	CombiGen.h \
-	CompIDO.h \
-	CompODO.h \
 	DlList.h \
 	File.h \
 	FileCoder.h \
@@ -23,8 +22,6 @@ noinst_HEADERS = \
 	FileODO.h \
 	FileRegion.h \
 	GenBase.h \
-	GzIDO.h \
-	GzODO.h \
 	HeapTree.h \
 	IDO.h \
 	ItvlMgr.h \

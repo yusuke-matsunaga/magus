@@ -90,18 +90,38 @@ libym_utils_la_SOURCES = \
 	UnitAlloc.cc \
 	random.cc
 
+libym_utils_la_LIBADD = \
+	@POPT_LIBS@
+
+libym_utils_la_LDFLAGS =
+
+
 if YM_HAVE_ZLIB
 libym_utils_la_SOURCES += \
 	zstream.cc \
-	GzIDO.cc \
 	GzCoder.h \
 	GzCoder.cc \
 	GzDecoder.h \
 	GzDecoder.cc
+
+libym_utils_la_LDFLAGS += \
+	-lz
 endif
 
-libym_utils_la_LIBADD = \
-	@POPT_LIBS@
+if YM_HAVE_BZLIB
+libym_utils_la_SOURCES += \
+	BzCoder.h \
+	BzCoder.cc \
+	BzDecoder.h \
+	BzDecoder.cc
 
-libym_utils_la_LDFLAGS = \
-	-lz
+libym_utils_la_LDFLAGS += \
+	-lbz2
+endif
+
+if YM_HAVE_LZMA
+#libym_utils_la_SOURCES +=
+
+libym_utils_la_LDFLAGS += \
+	-llzma
+endif

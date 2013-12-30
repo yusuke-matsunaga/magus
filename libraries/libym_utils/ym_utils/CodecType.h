@@ -23,7 +23,11 @@ enum tCodecType {
   /// @brief compress (Z)
   kCodecZ,
   /// @brief gzip
-  kCodecGzip
+  kCodecGzip,
+  /// @brief bzip2
+  kCodecBzip2,
+  /// @brief lzma (xz)
+  kCodecLzma
 };
 
 END_NAMESPACE_YM

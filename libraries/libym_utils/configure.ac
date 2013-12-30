@@ -59,6 +59,8 @@ AC_CHECK_HEADERS([pwd.h])
 AC_CHECK_HEADERS([sys/param.h])
 
 AC_CHECK_HEADERS([zlib.h], [ym_have_zlib=yes], [ym_have_zlib=no])
+AC_CHECK_HEADERS([bzlib.h], [ym_have_bzlib=yes], [ym_have_bzlib=no])
+AC_CHECK_HEADERS([lzma.h], [ym_have_lzma=yes], [ym_have_lzma=no])
 
 
 
@@ -138,6 +140,8 @@ YM_INIT_EXTRA_SUBDIRS
 YM_INIT_TESTS_SUBDIRS
 
 AM_CONDITIONAL([YM_HAVE_ZLIB], [test $ym_have_zlib = yes])
+AM_CONDITIONAL([YM_HAVE_BZLIB], [test $ym_have_bzlib = yes])
+AM_CONDITIONAL([YM_HAVE_LZMA], [test $ym_have_lzma = yes])
 
 if test $ym_have_python = yes; then
    YM_ADD_EXTRA_SUBDIRS([python])

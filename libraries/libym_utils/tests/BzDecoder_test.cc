@@ -1,39 +1,39 @@
 
-/// @file GzIDO_test.cc
-/// @brief GzIDO のテストプログラム
+/// @file BzDecoder_test.cc
+/// @brief BzDecoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/GzIDO.h"
+#include "../BzDecoder.h"
 
 
 BEGIN_NAMESPACE_YM
 
 int
-GzIDO_test(int argc,
-	   const char** argv)
+BzDecoder_test(int argc,
+	       const char** argv)
 {
   if ( argc != 2 ) {
     cerr << "USAGE: " << argv[0] << " <filename>" << endl;
     return 1;
   }
 
-  GzIDO ido(argv[1]);
-  if ( !ido ) {
+  BzDecoder decoder;
+
+  if ( !decoder.open(argv[1]) ) {
     cerr << argv[1] << ": No such file" << endl;
     return 2;
   }
 
-#if 1
-  while ( ido ) {
+  while ( decoder.is_ready() ) {
     const ymuint BUFF_SIZE = 4096;
     ymuint8 buff[BUFF_SIZE];
-    ssize_t n = ido.read(buff, BUFF_SIZE);
+    ssize_t n = decoder.read(buff, BUFF_SIZE);
     if ( n < 0 ) {
-      cerr << "ERROR in GzIDO::read(): n = " << n << endl;
+      cerr << "ERROR in BzDecoder::read(): n = " << n << endl;
       return -1;
     }
     if ( n == 0 ) {
@@ -43,13 +43,6 @@ GzIDO_test(int argc,
       cout << static_cast<char>(buff[i]);
     }
   }
-#else
-  while ( ido ) {
-    ymuint8 c;
-    ido >> c;
-    cout << static_cast<char>(c);
-  }
-#endif
 
   return 0;
 }
@@ -63,5 +56,5 @@ main(int argc,
 {
   using namespace nsYm;
 
-  return GzIDO_test(argc, argv);
+  return BzDecoder_test(argc, argv);
 }
