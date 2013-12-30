@@ -86,6 +86,22 @@ MsgMgr::put_msg(const char* src_file,
   gTheMgr.put_msg(src_file, src_line, file_loc, type, label, msg);
 }
 
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
+void
+MsgMgr::put_msg(const char* src_file,
+		int src_line,
+		tMsgType type,
+		const char* label,
+		const char* msg)
+{
+  gTheMgr.put_msg(src_file, src_line, type, label, msg);
+}
+
 // @brief カウント値をクリアする．
 void
 MsgMgr::clear_count()

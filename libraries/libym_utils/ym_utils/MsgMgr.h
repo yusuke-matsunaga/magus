@@ -57,9 +57,9 @@ public:
   // メッセージの出力
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
+  /// @brief メッセージを出力する(パーサー用)．
+  /// @param[in] src_file この関数を呼んでいるソースファイル名
+  /// @param[in] src_line この関数を呼んでいるソースの行番号
   /// @param[in] file_loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
@@ -73,9 +73,9 @@ public:
 	  const char* label,
 	  const char* msg);
 
-  /// @brief メッセージを出力する．
-  /// @param[in] src_file この関数を読んでいるソースファイル名
-  /// @param[in] src_line この関数を読んでいるソースの行番号
+  /// @brief メッセージを出力する(パーサー用)．
+  /// @param[in] src_file この関数を呼んでいるソースファイル名
+  /// @param[in] src_line この関数を呼んでいるソースの行番号
   /// @param[in] file_loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
@@ -85,6 +85,34 @@ public:
   put_msg(const char* src_file,
 	  int src_line,
 	  const FileRegion& file_loc,
+	  tMsgType type,
+	  const char* label,
+	  const string& msg);
+
+  /// @brief メッセージを出力する(一般用)．
+  /// @param[in] src_file この関数を呼んでいるソースファイル名
+  /// @param[in] src_line この関数を呼んでいるソースの行番号
+  /// @param[in] type メッセージの種類
+  /// @param[in] label メッセージラベル
+  /// @param[in] msg メッセージ本文
+  static
+  void
+  put_msg(const char* src_file,
+	  int src_line,
+	  tMsgType type,
+	  const char* label,
+	  const char* msg);
+
+  /// @brief メッセージを出力する(一般用)．
+  /// @param[in] src_file この関数を呼んでいるソースファイル名
+  /// @param[in] src_line この関数を呼んでいるソースの行番号
+  /// @param[in] type メッセージの種類
+  /// @param[in] label メッセージラベル
+  /// @param[in] msg メッセージ本文
+  static
+  void
+  put_msg(const char* src_file,
+	  int src_line,
 	  tMsgType type,
 	  const char* label,
 	  const string& msg);
@@ -137,9 +165,9 @@ public:
 //　インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief メッセージを出力する．
-// @param[in] src_file この関数を読んでいるソースファイル名
-// @param[in] src_line この関数を読んでいるソースの行番号
+// @brief メッセージを出力する(パーサー用)．
+// @param[in] src_file この関数を呼んでいるソースファイル名
+// @param[in] src_line この関数を呼んでいるソースの行番号
 // @param[in] file_loc ファイル位置
 // @param[in] type メッセージの種類
 // @param[in] label メッセージラベル
@@ -154,6 +182,23 @@ MsgMgr::put_msg(const char* src_file,
 		const string& msg)
 {
   put_msg(src_file, src_line, file_loc, type, label, msg.c_str());
+}
+
+// @brief メッセージを出力する(一般用)．
+// @param[in] src_file この関数を呼んでいるソースファイル名
+// @param[in] src_line この関数を呼んでいるソースの行番号
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] msg メッセージ本文
+inline
+void
+MsgMgr::put_msg(const char* src_file,
+		int src_line,
+		tMsgType type,
+		const char* label,
+		const string& msg)
+{
+  put_msg(src_file, src_line, type, label, msg.c_str());
 }
 
 END_NAMESPACE_YM

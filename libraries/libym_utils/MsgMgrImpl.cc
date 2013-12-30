@@ -81,6 +81,32 @@ MsgMgrImpl::put_msg(const char* src_file,
   mMgr.prop_event(src_file, src_line, file_loc, type, label, msg);
 }
 
+// @brief メッセージを出力する．
+// @param[in] src_file この関数を読んでいるソースファイル名
+// @param[in] src_line この関数を読んでいるソースの行番号
+// @param[in] file_loc ファイル位置
+// @param[in] type メッセージの種類
+// @param[in] label メッセージラベル
+// @param[in] body メッセージ本文
+void
+MsgMgrImpl::put_msg(const char* src_file,
+		    int src_line,
+		    tMsgType type,
+		    const char* label,
+		    const char* msg)
+{
+  switch ( type ) {
+  case kMsgError:    ++ mErrorNum; break;
+  case kMsgWarning:  ++ mWarningNum; break;
+  case kMsgInfo:     ++ mInfoNum; break;
+  case kMsgFailure:  ++ mFailNum; break;
+  case kMsgDebug:    ++ mDebugNum; break;
+  default: assert_not_reached(__FILE__, __LINE__);
+  }
+
+  mMgr.prop_event(src_file, src_line, FileRegion(), type, label, msg);
+}
+
 // @brief カウント値をクリアする．
 void
 MsgMgrImpl::clear_count()
