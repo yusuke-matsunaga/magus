@@ -10,7 +10,10 @@
 #include "ym_utils/FileCoder.h"
 #include "ThruCoder.h"
 #include "ZCoder.h"
+
+#if defined(HAVE_ZLIB)
 #include "GzCoder.h"
+#endif
 
 
 BEGIN_NAMESPACE_YM
@@ -35,7 +38,14 @@ FileCoder::new_coder(tCodecType type)
     coder = new ZCoder();
   }
   else if ( type == kCodecGzip ) {
+#if defined(HAVE_ZLIB)
     coder = new GzCoder();
+#else
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    kMsgError,
+		    "FileCoder",
+		    "gzip format is not supported on this system");
+#endif
   }
 
   return coder;
