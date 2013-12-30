@@ -145,20 +145,20 @@ main(int argc,
     StopWatch sw;
     sw.start();
 
-    while ( s1 ) {
-      int c = s1.get();
+    while ( s ) {
+      int c = s.get();
       if ( c == '\n' ) continue;
       if ( c == '#' ) {
-	skip_until(s1, '\n');
+	skip_until(s, '\n');
 	continue;
       }
       if ( c == 'N' ) {
-	skip_until(s1, '\n');
+	skip_until(s, '\n');
 	solver.new_var();
       }
       else if ( c == 'A' ) {
 	vector<Literal> lits;
-	read_lits(s1, lits);
+	read_lits(s, lits);
 	if ( verbose > 1 ) {
 	  cout << "A";
 	  for (vector<Literal>::iterator p = lits.begin();
@@ -172,7 +172,7 @@ main(int argc,
       }
       else if ( c == 'S' ) {
 	vector<Literal> lits;
-	read_lits(s1, lits);
+	read_lits(s, lits);
 	if ( verbose > 1 ) {
 	  cout << "S";
 	  for (vector<Literal>::iterator p = lits.begin();
