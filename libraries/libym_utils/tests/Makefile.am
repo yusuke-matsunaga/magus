@@ -74,6 +74,11 @@ noinst_PROGRAMS += \
 	BzDecoder_test
 endif
 
+if YM_HAVE_LZMA
+noinst_PROGRAMS += \
+	LzmaEngine_test
+endif
+
 
 ############################################################
 ## Common Variables
@@ -407,6 +412,19 @@ BzDecoder_test_SOURCES = \
 BzDecoder_test_LDFLAGS =
 
 BzDecoder_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building LzmaEngine_test
+############################################################
+
+LzmaEngine_test_SOURCES = \
+	LzmaEngine_test.cc
+
+LzmaEngine_test_LDFLAGS =
+
+LzmaEngine_test_LDADD = \
 	$(YMUTILS)
 
 

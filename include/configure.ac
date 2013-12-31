@@ -256,7 +256,7 @@ fi
 if test $ym_have_liblzma=1; then
   cat >> $ymtools << ___EOF___
 /* Define if you have lzma.h */
-#define HAVE_LAMA 1
+#define HAVE_LZMA 1
 ___EOF___
 fi
 
