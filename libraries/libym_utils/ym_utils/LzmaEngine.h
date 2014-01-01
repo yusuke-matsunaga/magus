@@ -53,7 +53,7 @@ public:
   ///  - LZMA_CHECK_SHA256
   ///
   /// 成功したら LZMA_OK を返す．
-  int
+  lzma_ret
   easy_encoder(ymuint32 preset = 6,
 	       lzma_check check = LZMA_CHECK_CRC64);
 
@@ -61,7 +61,7 @@ public:
   /// @param[in] memlimit 割り当てるメモリの上限
   /// @param[in] flags 動作制御用のフラグ
   /// @return 終了コードを返す．
-  int
+  lzma_ret
   stream_decoder(ymuint64 memlimit = 128 * 1024 * 1024,
 		 ymuint32 flags = 0);
 
@@ -84,7 +84,7 @@ public:
   ///  - LZMA_SYNC_FLUSH
   ///  - LZMA_FULL_FLUSH
   ///  - LZMA_FINISH
-  int
+  lzma_ret
   code(lzma_action action);
 
 
@@ -154,7 +154,7 @@ LzmaEngine::~LzmaEngine()
 // @param[in] check 検査方法
 // @return 終了コードを返す．
 inline
-int
+lzma_ret
 LzmaEngine::easy_encoder(ymuint32 preset,
 			 lzma_check check)
 {
@@ -166,7 +166,7 @@ LzmaEngine::easy_encoder(ymuint32 preset,
 // @param[in] flags 動作制御用のフラグ
 // @return 終了コードを返す．
 inline
-int
+lzma_ret
 LzmaEngine::stream_decoder(ymuint64 memlimit,
 			   ymuint32 flags)
 {
@@ -185,7 +185,7 @@ LzmaEngine::end()
 // @param[in] action 動作コード
 // @return 終了コードを返す．
 inline
-int
+lzma_ret
 LzmaEngine::code(lzma_action action)
 {
   return lzma_code(&mLzmaStream, action);
@@ -199,14 +199,7 @@ void
 LzmaEngine::set_inbuf(const ymuint8* buf,
 		      ymuint64 size)
 {
-#if 0
-  // void* を利用した巧妙なキャスト
-  // といっても本当は良くないコード
-  void* tmp = const_cast<ymuint8*>(buf);
-  mLzmaStream.next_in = static_cast<char*>(tmp);
-#else
   mLzmaStream.next_in = buf;
-#endif
   mLzmaStream.avail_in = size;
 }
 
@@ -218,14 +211,7 @@ void
 LzmaEngine::set_outbuf(ymuint8* buf,
 		       ymuint64 size)
 {
-#if 0
-  // void* を利用した巧妙なキャスト
-  // といっても本当は良くないコード
-  void* tmp = buf;
-  mLzmaStream.next_out = static_cast<char*>(tmp);
-#else
   mLzmaStream.next_out = buf;
-#endif
   mLzmaStream.avail_out = size;
 }
 

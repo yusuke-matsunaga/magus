@@ -49,6 +49,18 @@ public:
   FileDecoder*
   new_gzip_decoder();
 
+  /// @brief bzip2 decoder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileDecoder*
+  new_bzip2_decoder();
+
+  /// @brief lzma(xz) decoder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileDecoder*
+  new_xz_decoder();
+
   /// @brief デストラクタ
   virtual
   ~FileDecoder() { }

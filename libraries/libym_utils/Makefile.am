@@ -120,7 +120,11 @@ libym_utils_la_LDFLAGS += \
 endif
 
 if YM_HAVE_LZMA
-#libym_utils_la_SOURCES +=
+libym_utils_la_SOURCES += \
+	LzmaCoder.h \
+	LzmaCoder.cc \
+	LzmaDecoder.h \
+	LzmaDecoder.cc
 
 libym_utils_la_LDFLAGS += \
 	-llzma

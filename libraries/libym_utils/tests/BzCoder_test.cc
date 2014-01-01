@@ -7,8 +7,7 @@
 /// All rights reserved.
 
 
-//#include "../BzCoder.h"
-#include "ym_utils/FileCoder.h"
+#include "../BzCoder.h"
 #include <fcntl.h>
 
 
@@ -18,8 +17,7 @@ int
 BzCoder_test(int argc,
 	   const char** argv)
 {
-  //BzCoder coder;
-  FileCoder* coder = FileCoder::new_coder(kCodecBzip2);
+  BzCoder coder;
 
   if ( argc != 3 ) {
     cerr << "USAGE: " << argv[0] << " <input-filename> <output-filename>" << endl;
@@ -32,7 +30,7 @@ BzCoder_test(int argc,
     return -1;
   }
 
-  if ( !coder->open(argv[2]) ) {
+  if ( !coder.open(argv[2]) ) {
     cerr << argv[2] << ": Could not create" << endl;
     return -1;
   }
@@ -48,13 +46,12 @@ BzCoder_test(int argc,
     if ( n == 0 ) {
       break;
     }
-    ssize_t n2 = coder->write(buff, n);
+    ssize_t n2 = coder.write(buff, n);
     if ( n2 != n ) {
       cerr << "ERROR in BzCoder::write(): n2 = " << n2 << endl;
       return -2;
     }
   }
-  delete coder;
 
   return 0;
 }

@@ -800,6 +800,13 @@ codec_test()
   }
 #endif
 
+#if defined(HAVE_LZMA)
+  ret = codec_test1(kCodecLzma);
+  if ( ret < 0 ) {
+    return ret;
+  }
+#endif
+
   return ret;
 }
 

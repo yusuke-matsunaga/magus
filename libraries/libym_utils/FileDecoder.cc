@@ -19,6 +19,10 @@
 #include "BzDecoder.h"
 #endif
 
+#if defined(HAVE_LZMA)
+#include "LzmaDecoder.h"
+#endif
+
 
 BEGIN_NAMESPACE_YM
 
@@ -61,6 +65,16 @@ FileDecoder::new_decoder(tCodecType type)
 		    "bzip2 format is not supported on this system");
 #endif
   }
+  else if ( type == kCodecLzma ) {
+#if defined(HAVE_LZMA)
+    decoder = new LzmaDecoder();
+#else
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    kMsgError,
+		    "FileCoder",
+		    "lzma(xz) format is not supported on this system");
+#endif
+  }
 
 
   return decoder;
@@ -87,7 +101,47 @@ FileDecoder::new_z_decoder()
 FileDecoder*
 FileDecoder::new_gzip_decoder()
 {
+#if defined(HAVE_ZLIB)
   return new GzDecoder();
+#else
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  kMsgError,
+		  "FileDecoder",
+		  "gzip format is not supported on this system");
+  return NULL;
+#endif
+}
+
+// @brief bzip2 coder のインスタンスを作る関数
+// @return 作成したインスタンスを返す．
+FileDecoder*
+FileDecoder::new_bzip2_decoder()
+{
+#if defined(HAVE_BZLIB)
+  return new BzDecoder();
+#else
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  kMsgError,
+		  "FileDecoder",
+		  "bzip2 format is not supported on this system");
+  return NULL;
+#endif
+}
+
+// @brief xz coder のインスタンスを作る関数
+// @return 作成したインスタンスを返す．
+FileDecoder*
+FileDecoder::new_xz_decoder()
+{
+#if defined(HAVE_LZMA)
+  return new LzmaDecoder();
+#else
+  MsgMgr::put_msg(__FILE__, __LINE__,
+		  kMsgError,
+		  "FileDecoder",
+		  "xz format is not supported on this system");
+  return NULL;
+#endif
 }
 
 END_NAMESPACE_YM

@@ -49,6 +49,18 @@ public:
   FileCoder*
   new_gzip_coder();
 
+  /// @brief bzip2 coder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileCoder*
+  new_bzip2_coder();
+
+  /// @brief xz coder のインスタンスを作る関数
+  /// @return 作成したインスタンスを返す．
+  static
+  FileCoder*
+  new_xz_coder();
+
   /// @brief デストラクタ
   virtual
   ~FileCoder() { }

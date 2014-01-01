@@ -1,23 +1,24 @@
 
-/// @file GzCoder_test.cc
-/// @brief GzCoder のテストプログラム
+/// @file LzmaCoder_test.cc
+/// @brief LzmaCoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "../GzCoder.h"
+#include "../LzmaCoder.h"
+#include "ym_utils/FileCoder.h"
 #include <fcntl.h>
 
 
 BEGIN_NAMESPACE_YM
 
 int
-GzCoder_test(int argc,
+LzmaCoder_test(int argc,
 	   const char** argv)
 {
-  GzCoder coder;
+  LzmaCoder coder;
 
   if ( argc != 3 ) {
     cerr << "USAGE: " << argv[0] << " <input-filename> <output-filename>" << endl;
@@ -35,9 +36,9 @@ GzCoder_test(int argc,
     return -1;
   }
 
+  const ymuint BUFF_SIZE = 4096;
+  ymuint8 buff[BUFF_SIZE];
   for ( ; ; ) {
-    const ymuint BUFF_SIZE = 4096;
-    ymuint8 buff[BUFF_SIZE];
     ssize_t n = read(fd, buff, BUFF_SIZE);
     if ( n < 0 ) {
       cerr << "ERROR in read(): n = " << n << endl;
@@ -48,7 +49,7 @@ GzCoder_test(int argc,
     }
     ssize_t n2 = coder.write(buff, n);
     if ( n2 != n ) {
-      cerr << "ERROR in GzCoder::write(): n2 = " << n2 << endl;
+      cerr << "ERROR in LzmaCoder::write(): n2 = " << n2 << endl;
       return -2;
     }
   }
@@ -65,5 +66,5 @@ main(int argc,
 {
   using namespace nsYm;
 
-  return GzCoder_test(argc, argv);
+  return LzmaCoder_test(argc, argv);
 }

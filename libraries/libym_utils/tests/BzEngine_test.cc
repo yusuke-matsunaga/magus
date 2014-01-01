@@ -86,6 +86,7 @@ compress(const char* infile,
   }
 
   int action = BZ_RUN;
+  bce.set_outbuf(wbuff, BUFF_SIZE);
   do {
     ssize_t res = read(i_fd, rbuff, BUFF_SIZE);
     if ( res < 0 ) {
@@ -100,8 +101,6 @@ compress(const char* infile,
 
     bce.set_inbuf(rbuff, static_cast<ymuint>(res));
     do {
-      bce.set_outbuf(wbuff, BUFF_SIZE);
-
       ret = bce.compress(action);
       cerr << "compress(" << BZ_ACTION(action) << ") => " << BZ_RET(ret) << endl;
       if ( ret == BZ_SEQUENCE_ERROR ) {

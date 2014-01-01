@@ -76,7 +76,9 @@ endif
 
 if YM_HAVE_LZMA
 noinst_PROGRAMS += \
-	LzmaEngine_test
+	LzmaEngine_test \
+	LzmaCoder_test \
+	LzmaDecoder_test
 endif
 
 
@@ -425,6 +427,32 @@ LzmaEngine_test_SOURCES = \
 LzmaEngine_test_LDFLAGS =
 
 LzmaEngine_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building LzmaCoder_test
+############################################################
+
+LzmaCoder_test_SOURCES = \
+	LzmaCoder_test.cc
+
+LzmaCoder_test_LDFLAGS =
+
+LzmaCoder_test_LDADD = \
+	$(YMUTILS)
+
+
+############################################################
+## Variables for building LzmaDecoder_test
+############################################################
+
+LzmaDecoder_test_SOURCES = \
+	LzmaDecoder_test.cc
+
+LzmaDecoder_test_LDFLAGS =
+
+LzmaDecoder_test_LDADD = \
 	$(YMUTILS)
 
 
