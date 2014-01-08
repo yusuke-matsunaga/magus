@@ -39,16 +39,6 @@ private:
   // GbmSolver の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 問題を解く
-  /// @param[in] network RcfNetwork
-  /// @param[in] func マッチング対象の関数
-  /// @param[out] conf_bits configuration ビットの値を収める配列
-  virtual
-  bool
-  _solve(const RcfNetwork& network,
-	 const TvFunc& func,
-	 vector<bool>& conf_bits);
-
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] network RcfNetwork
   /// @param[in] output Reconfigurable Network の出力

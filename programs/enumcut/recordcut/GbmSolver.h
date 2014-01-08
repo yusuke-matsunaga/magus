@@ -37,15 +37,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 単純なマッチング問題を解く
-  /// @param[in] network RcfNetwork
-  /// @param[in] func マッチング対象の関数
-  /// @param[out] conf_bits configuration ビットの値を収める配列
-  bool
-  solve(const RcfNetwork& network,
-	const TvFunc& func,
-	vector<bool>& conf_bits);
-
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] networkr RcfNetwork
   /// @param[in] func マッチング対象の関数
@@ -63,16 +54,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 実際に問題を解く仮想関数
-  /// @param[in] network RcfNetwork
-  /// @param[in] func マッチング対象の関数
-  /// @param[out] conf_bits configuration ビットの値を収める配列
-  virtual
-  bool
-  _solve(const RcfNetwork& network,
-	 const TvFunc& func,
-	 vector<bool>& conf_bits) = 0;
 
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] network RcfNetwork
