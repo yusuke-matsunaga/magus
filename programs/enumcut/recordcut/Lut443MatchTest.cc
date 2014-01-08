@@ -8,7 +8,7 @@
 
 
 #include "Lut443Match.h"
-#include "GbmNaive.h"
+#include "GbmNaiveBinary.h"
 #include "GbmNaiveEnum.h"
 #include "GbmNaiveOneHot.h"
 #include "GbmIncrEnum.h"
@@ -195,7 +195,7 @@ Lut443MatchTest(int argc,
   GbmSolver* solver = NULL;
   if ( argc > 1 ) {
     if ( strcmp(argv[1], "naive_binary") == 0 ) {
-      solver = new GbmNaive();
+      solver = new GbmNaiveBinary();
     }
     else if ( strcmp(argv[1], "naive_enum") == 0 ) {
       solver = new GbmNaiveEnum();
@@ -219,7 +219,7 @@ Lut443MatchTest(int argc,
   }
   if ( solver == NULL ) {
     // fall-back
-    solver = new GbmNaive();
+    solver = new GbmNaiveBinary();
   }
 
   A0Test(*solver);

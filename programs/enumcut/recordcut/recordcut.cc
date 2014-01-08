@@ -23,7 +23,7 @@
 #include "FuncRec.h"
 
 #include "Lut443Match.h"
-#include "GbmNaive.h"
+#include "GbmNaiveBinary.h"
 #include "GbmNaiveOneHot.h"
 #include "GbmNaiveEnum.h"
 #include "GbmIncrOneHot.h"
@@ -91,7 +91,7 @@ rec_func(FuncMgr& func_mgr,
 
   GbmSolver* solver = NULL;
   if ( method == "naive_binary" ) {
-    solver = new GbmNaive();
+    solver = new GbmNaiveBinary();
   }
   else if ( method == "naive_onehot" ) {
     solver = new GbmNaiveOneHot();
@@ -110,7 +110,8 @@ rec_func(FuncMgr& func_mgr,
     return;
   }
   if ( solver == NULL ) {
-    solver = new GbmNaive();
+    // デフォルトフォールバック
+    solver = new GbmNaiveBinary();
   }
 
   StopWatch timer;

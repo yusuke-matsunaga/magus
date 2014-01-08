@@ -1,8 +1,8 @@
-#ifndef GBMNAIVE_H
-#define GBMNAIVE_H
+#ifndef GBMNAIVEBINARY_H
+#define GBMNAIVEBINARY_H
 
-/// @file GbmNaive.h
-/// @brief GbmNaive のヘッダファイル
+/// @file GbmNaiveBinary.h
+/// @brief GbmNaiveBinary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -18,20 +18,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmNaive GbmNaive.h "GbmNaive.h"
+/// @class GbmNaiveBinary GbmNaiveBinary.h "GbmNaiveBinary.h"
 /// @brief 単純な GbmSolver
 //////////////////////////////////////////////////////////////////////
-class GbmNaive :
+class GbmNaiveBinary :
   public GbmSolver
 {
 public:
 
   /// @brief コンストラクタ
-  GbmNaive();
+  GbmNaiveBinary();
 
   /// @brief デストラクタ
   virtual
-  ~GbmNaive();
+  ~GbmNaiveBinary();
 
 
 private:
@@ -89,4 +89,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // GBMNAIVE_H
+#endif // GBMNAIVEBINARY_H

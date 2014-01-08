@@ -30,8 +30,8 @@ libgbm_la_SOURCES = \
 	GbmEngine.cc \
 	GbmSolver.h \
 	GbmSolver.cc \
-	GbmNaive.h \
-	GbmNaive.cc \
+	GbmNaiveBinary.h \
+	GbmNaiveBinary.cc \
 	GbmNaiveEnum.h \
 	GbmNaiveEnum.cc \
 	GbmNaiveOneHot.h \

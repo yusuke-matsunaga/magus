@@ -1,13 +1,13 @@
 
-/// @file GbmNaive.cc
-/// @brief GbmNaive の実装ファイル
+/// @file GbmNaiveBinary.cc
+/// @brief GbmNaiveBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNaive.h"
+#include "GbmNaiveBinary.h"
 #include "GbmEngine.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandlerImpl1.h"
@@ -22,16 +22,16 @@ const bool debug = false;
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmNaive
+// クラス GbmNaiveBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmNaive::GbmNaive()
+GbmNaiveBinary::GbmNaiveBinary()
 {
 }
 
 // @brief デストラクタ
-GbmNaive::~GbmNaive()
+GbmNaiveBinary::~GbmNaiveBinary()
 {
 }
 
@@ -42,10 +42,10 @@ GbmNaive::~GbmNaive()
 // @param[out] iorder 入力順序
 // @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
 bool
-GbmNaive::_solve(const RcfNetwork& network,
-		 const TvFunc& func,
-		 vector<bool>& conf_bits,
-		 vector<ymuint>& iorder)
+GbmNaiveBinary::_solve(const RcfNetwork& network,
+		       const TvFunc& func,
+		       vector<bool>& conf_bits,
+		       vector<ymuint>& iorder)
 {
 #if 1
   SatSolver solver("minisat");
@@ -291,10 +291,10 @@ GbmNaive::_solve(const RcfNetwork& network,
 // @param[in] node_var_array ノードの変数番号の配列
 // @param[in] conf_var_array 設定変数番号の配列
 bool
-GbmNaive::make_node_cnf(SatSolver& solver,
-			const RcfNode* node,
-			const vector<GbmLit>& node_var_array,
-			const vector<GbmLit>& conf_var_array)
+GbmNaiveBinary::make_node_cnf(SatSolver& solver,
+			      const RcfNode* node,
+			      const vector<GbmLit>& node_var_array,
+			      const vector<GbmLit>& conf_var_array)
 {
   if ( node->is_input() ) {
     return true;
@@ -350,9 +350,9 @@ GbmNaive::make_node_cnf(SatSolver& solver,
 // @param[in] node_var_array ノードの変数番号の配列
 // @param[out] inputs 結果のリテラルを格納する配列
 void
-GbmNaive::make_inputs(const RcfNode* node,
-		      const vector<GbmLit>& node_var_array,
-		      vector<GbmLit>& inputs)
+GbmNaiveBinary::make_inputs(const RcfNode* node,
+			    const vector<GbmLit>& node_var_array,
+			    vector<GbmLit>& inputs)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -365,8 +365,8 @@ GbmNaive::make_inputs(const RcfNode* node,
 // @param[in] handle ハンドル
 // @param[in] node_var_array ノードの変数番号の配列
 GbmLit
-GbmNaive::handle_to_lit(RcfNodeHandle handle,
-			const vector<GbmLit>& node_var_array)
+GbmNaiveBinary::handle_to_lit(RcfNodeHandle handle,
+			      const vector<GbmLit>& node_var_array)
 {
   if ( handle.is_zero() ) {
     return GbmLit::make_zero();
