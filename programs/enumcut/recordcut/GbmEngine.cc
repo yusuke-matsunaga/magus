@@ -3,7 +3,7 @@
 /// @brief GbmEngine の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,7 +17,15 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmEngine::GbmEngine()
+// @param[in] solver SATソルバ
+// @param[in] node_num ノード数
+// @param[in] conf_num 設定変数の数
+GbmEngine::GbmEngine(SatSolver& solver,
+		     ymuint node_num,
+		     ymuint conf_num) :
+  mSolver(solver),
+  mNodeVarArray(node_num),
+  mConfVarArray(conf_num)
 {
 }
 
@@ -26,14 +34,79 @@ GbmEngine::~GbmEngine()
 {
 }
 
+// @brief ノードに対応するリテラルを登録する．
+// @param[in] id ノード番号
+// @param[in] lit リテラル
+void
+GbmEngine::set_node_var(ymuint id,
+			GbmLit lit)
+{
+  assert_cond( id < mNodeVarArray.size(), __FILE__, __LINE__);
+  mNodeVarArray[id] = lit;
+}
+
+// @brief 設定変数に対応するリテラルを登録する．
+// @param[in] id 変数番号
+// @param[in] lit リテラル
+void
+GbmEngine::set_conf_var(ymuint id,
+			GbmLit lit)
+{
+  assert_cond( id < mConfVarArray.size(), __FILE__, __LINE__);
+  mConfVarArray[id] = lit;
+}
+
+// @brief ノードの入出力の関係を表す CNF 式を作る．
+// @param[in] node 対象のノード
+// @return 割り当てが矛盾を起こしたら false を返す．
+bool
+GbmEngine::make_node_cnf(const RcfNode* node)
+{
+  if ( node->is_input() ) {
+    return true;
+  }
+
+  GbmLit output = mNodeVarArray[node->id()];
+
+  ymuint ni = node->fanin_num();
+  vector<GbmLit> inputs(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    RcfNodeHandle ih = node->fanin(i);
+    inputs[i] = handle_to_lit(ih);
+  }
+
+  bool stat = false;
+  if ( node->is_and() ) {
+    stat = make_AND(inputs, output);
+  }
+  else if ( node->is_lut() ) {
+    ymuint ni_exp = 1U << ni;
+    vector<GbmLit> lut_vars(ni_exp);
+    ymuint conf0 = node->conf_base();
+    for (ymuint i = 0; i < ni_exp; ++ i) {
+      lut_vars[i] = mConfVarArray[conf0 + i];
+    }
+    stat = make_LUT(inputs, lut_vars, output);
+  }
+  else if ( node->is_mux() ) {
+    ymuint ns = node->conf_size();
+    vector<GbmLit> s_vars(ns);
+    ymuint s0 = node->conf_base();
+    for (ymuint i = 0; i < ns; ++ i) {
+      s_vars[i] = mConfVarArray[s0 + i];
+    }
+    stat = make_MUX(inputs, s_vars, output);
+  }
+
+  return stat;
+}
+
 // @brief AND ゲートを表す節を追加する．
-// @param[in] solver SATソルバ
 // @param[in] input_vars 入力変数のリスト
 // @param[in] output_var 出力変数
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_AND(SatSolver& solver,
-		    const vector<GbmLit>& input_vars,
+GbmEngine::make_AND(const vector<GbmLit>& input_vars,
 		    GbmLit output_var)
 {
   ymuint n = input_vars.size();
@@ -61,7 +134,7 @@ GbmEngine::make_AND(SatSolver& solver,
       return false;
     }
     // 出力は0になる．
-    solver.add_clause(Literal(output_var.var_id(), kPolNega));
+    mSolver.add_clause(Literal(output_var.var_id(), kPolNega));
     return true;
   }
 
@@ -78,14 +151,14 @@ GbmEngine::make_AND(SatSolver& solver,
       const GbmLit& var = tmp_lits[i];
       tmp_list.push_back(~var.literal());
     }
-    solver.add_clause(tmp_list);
+    mSolver.add_clause(tmp_list);
     return true;
   }
   if ( output_var.is_one() ) {
     // 全ての入力が1でなければならない．
     for (ymuint i = 0; i < n1; ++ i) {
       const GbmLit& var = tmp_lits[i];
-      solver.add_clause(var.literal());
+      mSolver.add_clause(var.literal());
     }
     return true;
   }
@@ -98,42 +171,38 @@ GbmEngine::make_AND(SatSolver& solver,
     tmp_list.push_back(~var.literal());
   }
   tmp_list.push_back(output_var.literal());
-  solver.add_clause(tmp_list);
+  mSolver.add_clause(tmp_list);
 
   for (ymuint i = 0; i < n1; ++ i) {
     const GbmLit& var = tmp_lits[i];
-    solver.add_clause(var.literal(), ~output_var.literal());
+    mSolver.add_clause(var.literal(), ~output_var.literal());
   }
   return true;
 }
 
 // @brief LUT を表す節を追加する．
-// @param[in] solver SATソルバ
 // @param[in] input_vars 入力変数のリスト
 // @param[in] lut_vars LUT変数のリスト
 // @param[in] output_var 出力変数
 // @note lut_vars のサイズは input_vars のサイズの指数乗
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_LUT(SatSolver& solver,
-		    const vector<GbmLit>& input_vars,
+GbmEngine::make_LUT(const vector<GbmLit>& input_vars,
 		    const vector<GbmLit>& lut_vars,
 		    GbmLit output_var)
 {
   // 実は入力を入れ替えれて MUX で作る．
-  return make_MUX(solver, lut_vars, input_vars, output_var);
+  return make_MUX(lut_vars, input_vars, output_var);
 }
 
 // @brief MUX を表す節を追加する．
-// @param[in] solver SATソルバ
 // @param[in] d_vars データ入力変数のリスト
 // @param[in] s_vars 選択信号変数のリスト
 // @param[in] output_var 出力変数
 // @note d_vars のサイズは s_vars のサイズの指数乗
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_MUX(SatSolver& solver,
-		    const vector<GbmLit>& d_vars,
+GbmEngine::make_MUX(const vector<GbmLit>& d_vars,
 		    const vector<GbmLit>& s_vars,
 		    GbmLit output_var)
 {
@@ -185,7 +254,7 @@ GbmEngine::make_MUX(SatSolver& solver,
       }
       else {
 	tmp_list.push_back(~output_var.literal());
-	solver.add_clause(tmp_list);
+	mSolver.add_clause(tmp_list);
       }
     }
     else if ( dvar.is_one() ) {
@@ -198,30 +267,48 @@ GbmEngine::make_MUX(SatSolver& solver,
       }
       else {
 	tmp_list.push_back(output_var.literal());
-	solver.add_clause(tmp_list);
+	mSolver.add_clause(tmp_list);
       }
     }
     else {
       if ( output_var.is_zero() ) {
 	tmp_list.push_back(~dvar.literal());
-	solver.add_clause(tmp_list);
+	mSolver.add_clause(tmp_list);
       }
       else if ( output_var.is_one() ) {
 	tmp_list.push_back(dvar.literal());
-	solver.add_clause(tmp_list);
+	mSolver.add_clause(tmp_list);
       }
       else {
 	tmp_list.push_back(~dvar.literal());
 	tmp_list.push_back(output_var.literal());
-	solver.add_clause(tmp_list);
+	mSolver.add_clause(tmp_list);
 	ymuint n = tmp_list.size();
 	tmp_list[n - 2] = dvar.literal();
 	tmp_list[n - 1] = ~output_var.literal();
-	solver.add_clause(tmp_list);
+	mSolver.add_clause(tmp_list);
       }
     }
   }
   return true;
+}
+
+// @brief RcfNodeHandle から GbmLit を作る．
+// @param[in] handle ハンドル
+GbmLit
+GbmEngine::handle_to_lit(RcfNodeHandle handle)
+{
+  if ( handle.is_zero() ) {
+    return GbmLit::make_zero();
+  }
+  if ( handle.is_one() ) {
+    return GbmLit::make_one();
+  }
+  GbmLit lit = mNodeVarArray[handle.id()];
+  if ( handle.inv() ) {
+    lit.negate();
+  }
+  return lit;
 }
 
 END_NAMESPACE_YM

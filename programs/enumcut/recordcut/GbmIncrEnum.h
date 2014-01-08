@@ -71,33 +71,6 @@ private:
 		    const vector<ymuint>& iorder,
 		    vector<bool>& conf_bits);
 
-  /// @brief ノードの入出力の関係を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバ
-  /// @param[in] node 対象のノード
-  /// @param[in] node_var_array ノードの変数番号の配列
-  /// @param[in] conf_var_array 設定変数番号の配列
-  bool
-  make_node_cnf(SatSolver& solver,
-		const RcfNode* node,
-		const vector<GbmLit>& node_var_array,
-		const vector<GbmLit>& conf_var_array);
-
-  /// @brief ノードの入力を表すリテラルを作る．
-  /// @param[in] node 対象のノード
-  /// @param[in] node_var_array ノードの変数番号の配列
-  /// @param[out] inputs 結果のリテラルを格納する配列
-  void
-  make_inputs(const RcfNode* node,
-	      const vector<GbmLit>& node_var_array,
-	      vector<GbmLit>& inputs);
-
-  /// @brief RcfNodeHandle から GbmLit を作る．
-  /// @param[in] handle ハンドル
-  /// @param[in] node_var_array ノードの変数番号の配列
-  GbmLit
-  handle_to_lit(RcfNodeHandle handle,
-		const vector<GbmLit>& node_var_array);
-
 };
 
 END_NAMESPACE_YM

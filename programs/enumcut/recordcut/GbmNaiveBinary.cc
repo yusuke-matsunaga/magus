@@ -9,6 +9,7 @@
 
 #include "GbmNaiveBinary.h"
 #include "GbmEngine.h"
+#include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandlerImpl1.h"
 
@@ -53,6 +54,11 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
   SatSolver solver;
 #endif
 
+  ymuint nn = network.node_num();
+  ymuint nc = network.conf_var_num();
+
+  GbmEngine engine(solver, nn, nc);
+
   SatMsgHandlerImpl1 satmsghandler(cout);
   solver.reg_msg_handler(&satmsghandler);
   solver.timer_on(true);
@@ -60,13 +66,12 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
   solver.set_max_conflict(100 * 1024);
 
   // configuration 変数を作る．
-  ymuint nc = network.conf_var_num();
   vector<VarId> conf_vid_array(nc);
   vector<GbmLit> conf_var_array(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     VarId vid = solver.new_var();
     conf_vid_array[i] = vid;
-    conf_var_array[i] = GbmLit(vid);
+    engine.set_conf_var(i, GbmLit(vid));
   }
   conf_bits.resize(nc, false);
 
@@ -88,7 +93,6 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
   bool oinv = output.inv();
 
   // 外部入力変数に値を割り当てたときの CNF 式を作る．
-  ymuint nn = network.node_num();
   vector<const RcfNode*> node_list;
   node_list.reserve(nn);
   for (ymuint id = 0; id < nn; ++ id) {
@@ -97,7 +101,6 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
       node_list.push_back(node);
     }
   }
-  vector<GbmLit> node_var_array(nn);
   ymuint ni_exp = 1U << ni;
   Bool3 stat = kB3X;
   vector<Bool3> model;
@@ -123,7 +126,8 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
       if ( debug ) {
 	cout << " lut_input#" << i << ": " << vid << endl;
       }
-      node_var_array[id] = GbmLit(vid);
+      engine.set_node_var(id, GbmLit(vid));
+
       // 入力と外部入力の間の関係式を作る．
       vector<Literal> tmp_lits(m + 1);
       for (ymuint j = 0; j < ni; ++ j) {
@@ -227,22 +231,22 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
       if ( node->id() == oid ) {
 	// 外部出力の時は関数の値に応じた定数となる．
 	if ( static_cast<bool>(func.value(b)) ^ oinv ) {
-	  node_var_array[oid] = GbmLit::make_one();
+	  engine.set_node_var(oid, GbmLit::make_one());
 	}
 	else {
-	  node_var_array[oid] = GbmLit::make_zero();
+	  engine.set_node_var(oid, GbmLit::make_zero());
 	}
       }
       else {
 	VarId vid = solver.new_var();
-	node_var_array[node->id()] = GbmLit(vid);
+	engine.set_node_var(node->id(), GbmLit(vid));
       }
     }
     // 内部のノードに対する CNF 式を作る．
     for (vector<const RcfNode*>::iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       const RcfNode* node = *p;
-      bool stat = make_node_cnf(solver, node, node_var_array, conf_var_array);
+      bool stat = engine.make_node_cnf(node);
       if ( !stat ) {
 	// 矛盾が起こった．
 	conflict = true;
@@ -283,102 +287,6 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
   }
 
   return false;
-}
-
-// @brief ノードの入出力の関係を表す CNF 式を作る．
-// @param[in] solver SAT ソルバ
-// @param[in] node 対象のノード
-// @param[in] node_var_array ノードの変数番号の配列
-// @param[in] conf_var_array 設定変数番号の配列
-bool
-GbmNaiveBinary::make_node_cnf(SatSolver& solver,
-			      const RcfNode* node,
-			      const vector<GbmLit>& node_var_array,
-			      const vector<GbmLit>& conf_var_array)
-{
-  if ( node->is_input() ) {
-    return true;
-  }
-
-  GbmEngine engine;
-
-  GbmLit output = node_var_array[node->id()];
-
-  ymuint ni = node->fanin_num();
-  if ( node->is_and() ) {
-    vector<GbmLit> inputs(ni);
-    make_inputs(node, node_var_array, inputs);
-    bool stat = engine.make_AND(solver, inputs, output);
-    if ( !stat ) {
-      return false;
-    }
-  }
-  else if ( node->is_lut() ) {
-    vector<GbmLit> inputs(ni);
-    make_inputs(node, node_var_array, inputs);
-    ymuint ni_exp = 1U << ni;
-    vector<GbmLit> lut_vars(ni_exp);
-    ymuint conf0 = node->conf_base();
-    for (ymuint i = 0; i < ni_exp; ++ i) {
-      lut_vars[i] = conf_var_array[conf0 + i];
-    }
-    bool stat = engine.make_LUT(solver, inputs, lut_vars, output);
-    if ( !stat ) {
-      return false;
-    }
-  }
-  else if ( node->is_mux() ) {
-    vector<GbmLit> inputs(ni);
-    make_inputs(node, node_var_array, inputs);
-    ymuint ns = node->conf_size();
-    vector<GbmLit> s_vars(ns);
-    ymuint s0 = node->conf_base();
-    for (ymuint i = 0; i < ns; ++ i) {
-      s_vars[i] = conf_var_array[s0 + i];
-    }
-    bool stat = engine.make_MUX(solver, inputs, s_vars, output);
-    if ( !stat ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-// @brief ノードの入力を表すリテラルを作る．
-// @param[in] node 対象のノード
-// @param[in] node_var_array ノードの変数番号の配列
-// @param[out] inputs 結果のリテラルを格納する配列
-void
-GbmNaiveBinary::make_inputs(const RcfNode* node,
-			    const vector<GbmLit>& node_var_array,
-			    vector<GbmLit>& inputs)
-{
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    RcfNodeHandle ih = node->fanin(i);
-    inputs[i] = handle_to_lit(ih, node_var_array);
-  }
-}
-
-// @brief RcfNodeHandle から GbmLit を作る．
-// @param[in] handle ハンドル
-// @param[in] node_var_array ノードの変数番号の配列
-GbmLit
-GbmNaiveBinary::handle_to_lit(RcfNodeHandle handle,
-			      const vector<GbmLit>& node_var_array)
-{
-  if ( handle.is_zero() ) {
-    return GbmLit::make_zero();
-  }
-  if ( handle.is_one() ) {
-    return GbmLit::make_one();
-  }
-  GbmLit lit = node_var_array[handle.id()];
-  if ( handle.inv() ) {
-    lit.negate();
-  }
-  return lit;
 }
 
 END_NAMESPACE_YM
