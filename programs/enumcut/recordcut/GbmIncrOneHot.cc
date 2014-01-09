@@ -149,13 +149,13 @@ GbmIncrOneHot::_solve(const RcfNetwork& network,
       else {
 	conf_bits[i] = false;
       }
-      for (ymuint i = 0; i < ni; ++ i) {
-	for (ymuint j = 0; j < ni; ++ j) {
-	  VarId vid = iorder_vid_array[i * ni + j];
-	  if ( model[vid.val()] == kB3True ) {
-	    iorder[j] = i;
-	    break;
-	  }
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      for (ymuint j = 0; j < ni; ++ j) {
+	VarId vid = iorder_vid_array[i * ni + j];
+	if ( model[vid.val()] == kB3True ) {
+	  iorder[j] = i;
+	  break;
 	}
       }
     }

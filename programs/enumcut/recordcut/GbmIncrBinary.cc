@@ -142,16 +142,16 @@ GbmIncrBinary::_solve(const RcfNetwork& network,
       else {
 	conf_bits[i] = false;
       }
-      for (ymuint i = 0; i < ni; ++ i) {
-	ymuint pos = 0;
-	for (ymuint j = 0; j < m; ++ j) {
-	  VarId vid = iorder_vid_array[i * m + j];
-	  if ( model[vid.val()] == kB3True ) {
-	    pos += (1U << j);
-	  }
+    }
+    for (ymuint i = 0; i < ni; ++ i) {
+      ymuint pos = 0;
+      for (ymuint j = 0; j < m; ++ j) {
+	VarId vid = iorder_vid_array[i * m + j];
+	if ( model[vid.val()] == kB3True ) {
+	  pos += (1U << j);
 	}
-	iorder[pos] = i;
       }
+      iorder[pos] = i;
     }
     return true;
   }

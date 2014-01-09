@@ -10,8 +10,6 @@
 
 
 #include "GbmSolver.h"
-#include "GbmLit.h"
-#include "RcfNode.h"
 
 
 BEGIN_NAMESPACE_YM
