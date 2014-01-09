@@ -56,6 +56,47 @@ GbmEngine::set_conf_var(ymuint id,
   mConfVarArray[id] = lit;
 }
 
+// @brief 内部ノードに変数番号を割り当て，CNF式を作る．
+// @param[in] node_list ノードリスト(入力と出力は含まない)
+// @param[in] oid 出力のノード番号
+// @param[in] oval 出力値
+// @return 割り当てが矛盾を起こしたら false を返す．
+bool
+GbmEngine::make_nodes_cnf(const vector<const RcfNode*>& node_list,
+			  ymuint oid,
+			  ymuint oval)
+{
+  // 内部のノードに変数番号を割り当てる．
+  for (vector<const RcfNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    const RcfNode* node = *p;
+    if ( node->id() == oid ) {
+      // 外部出力の時は関数の値に応じた定数となる．
+      if ( oval ) {
+	set_node_var(oid, GbmLit::make_one());
+      }
+      else {
+	set_node_var(oid, GbmLit::make_zero());
+      }
+    }
+    else {
+      VarId vid = mSolver.new_var();
+      set_node_var(node->id(), GbmLit(vid));
+    }
+  }
+  // 内部のノードに対する CNF 式を作る．
+  for (vector<const RcfNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    const RcfNode* node = *p;
+    bool stat = make_node_cnf(node);
+    if ( !stat ) {
+      // 矛盾が起こった．
+      return false;
+    }
+  }
+  return true;
+}
+
 // @brief ノードの入出力の関係を表す CNF 式を作る．
 // @param[in] node 対象のノード
 // @return 割り当てが矛盾を起こしたら false を返す．

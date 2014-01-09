@@ -100,9 +100,8 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 
   ymuint ni_exp = 1U << ni;
   Bool3 stat = kB3X;
-  bool conflict = false;
   vector<Bool3> model;
-  for (ymuint b = 0U; b < ni_exp && !conflict; ++ b) {
+  for (ymuint b = 0U; b < ni_exp; ++ b) {
     // 入力に定数を割り当てる．
     if ( debug ) {
       cout << "INPUT: ";
@@ -185,36 +184,9 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
 	}
       }
     }
-    // 内部のノードに変数番号を割り当てる．
-    for (vector<const RcfNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      const RcfNode* node = *p;
-      if ( node->id() == oid ) {
-	// 外部出力の時は関数の値に応じた定数となる．
-	if ( static_cast<bool>(func.value(b)) ^ oinv ) {
-	  engine.set_node_var(oid, GbmLit::make_one());
-	}
-	else {
-	  engine.set_node_var(oid, GbmLit::make_zero());
-	}
-      }
-      else {
-	VarId vid = solver.new_var();
-	engine.set_node_var(node->id(), GbmLit(vid));
-      }
-    }
-    // 内部のノードに対する CNF 式を作る．
-    for (vector<const RcfNode*>::iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      const RcfNode* node = *p;
-      bool stat = engine.make_node_cnf(node);
-      if ( !stat ) {
-	// 矛盾が起こった．
-	conflict = true;
-	break;
-      }
-    }
-    if ( conflict ) {
+    ymuint oval = static_cast<bool>(func.value(b)) ^ oinv;
+    bool ok = engine.make_nodes_cnf(node_list, oid, oval);
+    if ( !ok ) {
       break;
     }
   }

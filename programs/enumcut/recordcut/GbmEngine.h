@@ -56,17 +56,27 @@ public:
   set_conf_var(ymuint id,
 	       GbmLit lit);
 
-  /// @brief ノードの入出力の関係を表す CNF 式を作る．
-  /// @param[in] node 対象のノード
+  /// @brief 内部ノードに変数番号を割り当て，CNF式を作る．
+  /// @param[in] node_list ノードリスト(入力と出力は含まない)
+  /// @param[in] oid 出力のノード番号
+  /// @param[in] oval 出力値
   /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
-  make_node_cnf(const RcfNode* node);
+  make_nodes_cnf(const vector<const RcfNode*>& node_list,
+		 ymuint oid,
+		 ymuint oval);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの入出力の関係を表す CNF 式を作る．
+  /// @param[in] node 対象のノード
+  /// @return 割り当てが矛盾を起こしたら false を返す．
+  bool
+  make_node_cnf(const RcfNode* node);
 
   /// @brief AND ゲートを表す節を追加する．
   /// @param[in] input_vars 入力変数のリスト
