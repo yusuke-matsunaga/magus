@@ -244,4 +244,41 @@ RcfNetwork::conf_var_num() const
   return mNextConfVar;
 }
 
+// @brief 出力値を計算する．
+// @param[in] ival_list 入力値のリスト
+// @param[in] conf_bits 設定変数の値のリスト
+// @return 出力値を返す．
+bool
+RcfNetwork::simulate(const vector<bool>& ival_list,
+		     const vector<bool>& conf_bits) const
+{
+  ymuint ni = input_num();
+  assert_cond( ival_list.size(), __FILE__, __LINE__);
+  ymuint nc = conf_var_num();
+  assert_cond( conf_bits.size(), __FILE__, __LINE__);
+
+  ymuint nn = node_num();
+  vector<bool> val_list(nn);
+
+  // API の都合上，入力からのトポロジカル順になっている．
+  for (ymuint i = 0; i < nn; ++ i) {
+    const RcfNode* node = this->node(i);
+    bool val;
+    if ( node->is_input() ) {
+      val = ival_list[node->input_id()];
+    }
+    else {
+      val = node->simulate(val_list, conf_bits);
+    }
+    val_list[i] = val;
+  }
+
+  RcfNodeHandle oh = output();
+  bool oval = val_list[oh.id()];
+  if ( oh.inv() ) {
+    oval = !oval;
+  }
+  return oval;
+}
+
 END_NAMESPACE_YM

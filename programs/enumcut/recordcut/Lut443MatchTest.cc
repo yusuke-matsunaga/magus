@@ -14,6 +14,9 @@
 #include "GbmIncrEnum.h"
 #include "GbmIncrBinary.h"
 #include "GbmIncrOneHot.h"
+#include "GbmCegarBinary.h"
+#include "GbmCegarOneHot.h"
+#include "GbmCegarEnum.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
 
@@ -211,6 +214,15 @@ Lut443MatchTest(int argc,
     }
     else if ( strcmp(argv[1], "incr_onehot") == 0 ) {
       solver = new GbmIncrOneHot();
+    }
+    else if ( strcmp(argv[1], "cegar_binary") == 0 ) {
+      solver = new GbmCegarBinary();
+    }
+    else if ( strcmp(argv[1], "cegar_onehot") == 0 ) {
+      solver = new GbmCegarOneHot();
+    }
+    else if ( strcmp(argv[1], "cegar_enum") == 0 ) {
+      solver = new GbmCegarEnum();
     }
     else {
       cerr << "Illegal method: " << argv[0] << endl;

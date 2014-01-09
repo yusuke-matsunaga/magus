@@ -42,6 +42,12 @@ libgbm_la_SOURCES = \
 	GbmIncrBinary.cc \
 	GbmIncrOneHot.h \
 	GbmIncrOneHot.cc \
+	GbmCegarBinary.h \
+	GbmCegarBinary.cc \
+	GbmCegarOneHot.h \
+	GbmCegarOneHot.cc \
+	GbmCegarEnum.h \
+	GbmCegarEnum.cc \
 	RcfNetwork.h \
 	RcfNetwork.cc \
 	RcfNode.h \

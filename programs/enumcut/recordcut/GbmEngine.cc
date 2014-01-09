@@ -132,6 +132,7 @@ GbmEngine::make_inputs_cnf_binary(const vector<const RcfNode*>& input_list,
       }
       mSolver.add_clause(tmp_lits2);
     }
+
 #if 0
     // 異なる LUT 入力におなじ入力が接続してはいけないというルール
     for (ymuint j = 0; j < ni; ++ j) {
@@ -152,6 +153,7 @@ GbmEngine::make_inputs_cnf_binary(const vector<const RcfNode*>& input_list,
 	mSolver.add_clause(tmp_lits3);
       }
     }
+
     // 対称性を考慮したルール
     ymuint pred;
     if ( network.get_pred(i, pred) ) {

@@ -173,6 +173,14 @@ public:
   ymuint
   conf_var_num() const;
 
+  /// @brief 出力値を計算する．
+  /// @param[in] ival_list 入力値のリスト
+  /// @param[in] conf_bits 設定変数の値のリスト
+  /// @return 出力値を返す．
+  bool
+  simulate(const vector<bool>& ival_list,
+	   const vector<bool>& conf_bits) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

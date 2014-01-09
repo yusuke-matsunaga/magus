@@ -26,8 +26,12 @@
 #include "GbmNaiveBinary.h"
 #include "GbmNaiveOneHot.h"
 #include "GbmNaiveEnum.h"
+#include "GbmIncrBinary.h"
 #include "GbmIncrOneHot.h"
 #include "GbmIncrEnum.h"
+#include "GbmCegarBinary.h"
+#include "GbmCegarOneHot.h"
+#include "GbmCegarEnum.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -99,11 +103,23 @@ rec_func(FuncMgr& func_mgr,
   else if ( method == "naive_enum" ) {
     solver = new GbmNaiveEnum();
   }
+  else if ( method == "incr_binary" ) {
+    solver = new GbmIncrBinary();
+  }
   else if ( method == "incr_onehot" ) {
     solver = new GbmIncrOneHot();
   }
   else if ( method == "incr_enum" ) {
     solver = new GbmIncrEnum();
+  }
+  else if ( method == "cegar_binary" ) {
+    solver = new GbmCegarBinary();
+  }
+  else if ( method == "cegar_onehot" ) {
+    solver = new GbmCegarOneHot();
+  }
+  else if ( method == "cegar_enum" ) {
+    solver = new GbmCegarEnum();
   }
   else if ( method != string() ) {
     cerr << "Illegal method: " << method << endl;

@@ -64,48 +64,20 @@ GbmSolver::verify(const RcfNetwork& network,
 {
   ymuint nn = network.node_num();
   vector<TvFunc> func_array(nn);
-  vector<bool> done(nn, false);
 
   ymuint npi = func.input_num();
   // これは network.input_num() と等しいはず
+  assert_cond( npi == network.input_num(), __FILE__, __LINE__);
   for (ymuint i = 0; i < npi; ++ i) {
     const RcfNode* node = network.input_node(iorder[i]);
     ymuint id = node->id();
     func_array[id] = TvFunc::posi_literal(npi, VarId(i));
-    done[id] = true;
   }
 
-  // ちょっと効率が悪いけどわかりやすいコード
-  for ( ; ; ) {
-    bool skipped = false;
-    for (ymuint i = 0; i < nn; ++ i) {
-      if ( done[i] ) {
-	// 既に処理したものは飛ばす．
-	continue;
-      }
-
-      // まだ処理していないファンインを持つノードも飛ばす．
-      const RcfNode* node = network.node(i);
-      ymuint nfi = node->fanin_num();
-      bool not_yet = false;
-      for (ymuint j = 0; j < nfi; ++ j) {
-	RcfNodeHandle ihandle = node->fanin(j);
-	ymuint iid = ihandle.id();
-	if ( !done[iid] ) {
-	  not_yet = true;
-	  break;
-	}
-      }
-      if ( not_yet ) {
-	skipped = true;
-	continue;
-      }
-
+  for (ymuint i = 0; i < nn; ++ i) {
+    const RcfNode* node = network.node(i);
+    if ( !node->is_input() ) {
       func_array[i] = node->calc_func(func_array, conf_bits);
-      done[i] = true;
-    }
-    if ( !skipped ) {
-      break;
     }
   }
 
