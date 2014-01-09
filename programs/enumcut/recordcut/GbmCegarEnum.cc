@@ -8,7 +8,7 @@
 
 
 #include "GbmCegarEnum.h"
-#include "GbmEngine.h"
+#include "GbmEngineEnum.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandler.h"
 #include "ym_utils/PermGen.h"
@@ -45,9 +45,9 @@ GbmCegarEnum::~GbmCegarEnum()
 //             関数の入力番号が入る．
 bool
 GbmCegarEnum::_solve(const RcfNetwork& network,
-		    const TvFunc& func,
-		    vector<bool>& conf_bits,
-		    vector<ymuint>& iorder)
+		     const TvFunc& func,
+		     vector<bool>& conf_bits,
+		     vector<ymuint>& iorder)
 {
   ymuint ni = network.input_num();
   for (PermGen pg(ni, ni); !pg.is_end(); ++ pg) {
@@ -97,28 +97,14 @@ GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
   ymuint nc = network.conf_var_num();
   ymuint nn = network.node_num();
 
-  GbmEngine engine(solver, nn, nc);
+  GbmEngineEnum engine(solver, nn, nc);
 
-  // configuration 変数を作る．
-  vector<VarId> conf_vid_array(nc);
   conf_bits.resize(nc, false);
-  for (ymuint i = 0; i < nc; ++ i) {
-    VarId vid = solver.new_var();
-    conf_vid_array[i] = vid;
-    engine.set_conf_var(i, GbmLit(vid));
-  }
 
   // 外部出力のノード番号と極性
   RcfNodeHandle output = network.output();
   ymuint oid = output.id();
   bool oinv = output.inv();
-
-  ymuint fn = network.func_node_num();
-  vector<const RcfNode*> node_list(fn);
-  for (ymuint i = 0; i < fn; ++ i) {
-    const RcfNode* node = network.func_node(i);
-    node_list[i] = node;
-  }
 
   ymuint ni = network.input_num();
   ymuint ni_exp = 1U << ni;
@@ -128,41 +114,22 @@ GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
   ymuint bit_pat = 0U;
   for ( ; ; ) {
     check[bit_pat] = true;
-    // 入力に定数を割り当てる．
-    for (ymuint i = 0; i < ni; ++ i) {
-      const RcfNode* node = network.input_node(i);
-      ymuint id = node->id();
-      ymuint src_pos = iorder[i];
-      if ( bit_pat & (1U << src_pos) ) {
-	engine.set_node_var(id, GbmLit::make_one());
-      }
-      else {
-	engine.set_node_var(id, GbmLit::make_zero());
-      }
-    }
-    // 外部入力変数に値を割り当てたときの CNF 式を作る．
+    // 入力に定数を割り当てたときの CNF 式を作る．
     ymuint oval = static_cast<bool>(func.value(bit_pat)) ^ oinv;
-    bool ok = engine.make_nodes_cnf(node_list, oid, oval);
+    bool ok = engine.make_cnf(network, bit_pat, iorder, oid, oval);
     if ( !ok ) {
       break;
     }
     stat = solver.solve(model);
     if ( stat == kB3False ) {
-      break;
+      return false;
     }
     if ( stat == kB3X ) {
-      break;
+      return false;
     }
+
     // 現在の model で全部の入力が成り立つか調べてみる．
-    for (ymuint i = 0; i < nc; ++ i) {
-      VarId vid = conf_vid_array[i];
-      if ( model[vid.val()] == kB3True ) {
-	conf_bits[i] = true;
-      }
-      else {
-	conf_bits[i] = false;
-      }
-    }
+    engine.get_conf_bits(model, conf_bits);
     bool pass = true;
     for (ymuint b = 0; b < ni_exp; ++ b) {
       if ( check[b] ) {
@@ -182,21 +149,8 @@ GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
       }
     }
     if ( pass ) {
-      break;
+      return true;
     }
-  }
-
-  if ( stat == kB3True ) {
-    for (ymuint i = 0; i < nc; ++ i) {
-      VarId vid = conf_vid_array[i];
-      if ( model[vid.val()] == kB3True ) {
-	conf_bits[i] = true;
-      }
-      else {
-	conf_bits[i] = false;
-      }
-    }
-    return true;
   }
 
   return false;

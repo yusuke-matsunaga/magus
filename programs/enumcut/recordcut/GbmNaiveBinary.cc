@@ -8,7 +8,7 @@
 
 
 #include "GbmNaiveBinary.h"
-#include "GbmEngine.h"
+#include "GbmEngineBinary.h"
 #include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandlerImpl1.h"
@@ -57,8 +57,9 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
 
   ymuint nn = network.node_num();
   ymuint nc = network.conf_var_num();
+  ymuint ni = network.input_num();
 
-  GbmEngine engine(solver, nn, nc);
+  GbmEngineBinary engine(solver, nn, nc, ni);
 
   SatMsgHandlerImpl1 satmsghandler(cout);
   solver.reg_msg_handler(&satmsghandler);
@@ -66,43 +67,13 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
 
   solver.set_max_conflict(100 * 1024);
 
-  // configuration 変数を作る．
-  vector<VarId> conf_vid_array(nc);
-  vector<GbmLit> conf_var_array(nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    VarId vid = solver.new_var();
-    conf_vid_array[i] = vid;
-    engine.set_conf_var(i, GbmLit(vid));
-  }
   conf_bits.resize(nc, false);
-
-  // 入力順用の変数を作る．
-  ymuint ni = network.input_num();
-  ymuint m = 0;
-  for (ymuint t = 1; t < ni; t <<= 1, ++ m) ;
-  vector<VarId> iorder_vid_array(ni * m);
-  for (ymuint i = 0; i < ni; ++ i) {
-    for (ymuint j = 0; j < m; ++ j) {
-      iorder_vid_array[i * m + j] = solver.new_var();
-    }
-  }
   iorder.resize(ni, 0);
 
   // 外部出力のノード番号と極性
   RcfNodeHandle output = network.output();
   ymuint oid = output.id();
   bool oinv = output.inv();
-
-  vector<const RcfNode*> input_list(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    input_list[i] = network.input_node(i);
-  }
-  ymuint fn = network.func_node_num();
-  vector<const RcfNode*> node_list(fn);
-  for (ymuint i = 0; i < fn; ++ i) {
-    const RcfNode* node = network.func_node(i);
-    node_list[i] = node;
-  }
 
   ymuint ni_exp = 1U << ni;
   Bool3 stat = kB3X;
@@ -122,9 +93,8 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
       cout << endl;
     }
     // 外部入力変数に値を割り当てたときの CNF 式を作る．
-    engine.make_inputs_cnf_binary(input_list, iorder_vid_array, m, b);
     ymuint oval = static_cast<bool>(func.value(b)) ^ oinv;
-    bool ok = engine.make_nodes_cnf(node_list, oid, oval);
+    bool ok = engine.make_cnf(network, b, oid, oval);
     if ( !ok ) {
       break;
     }
@@ -133,25 +103,8 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
   stat = solver.solve(model);
 
   if ( stat == kB3True ) {
-    for (ymuint i = 0; i < nc; ++ i) {
-      VarId vid = conf_vid_array[i];
-      if ( model[vid.val()] == kB3True ) {
-	conf_bits[i] = true;
-      }
-      else {
-	conf_bits[i] = false;
-      }
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      ymuint pos = 0;
-      for (ymuint j = 0; j < m; ++ j) {
-	VarId vid = iorder_vid_array[i * m + j];
-	if ( model[vid.val()] == kB3True ) {
-	  pos += (1U << j);
-	}
-      }
-      iorder[i] = pos;
-    }
+    engine.get_conf_bits(model, conf_bits);
+    engine.get_iorder(model, iorder);
     return true;
   }
   else if ( stat == kB3X ) {

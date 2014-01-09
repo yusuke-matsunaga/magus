@@ -28,6 +28,12 @@ libgbm_la_CPPFLAGS = \
 libgbm_la_SOURCES = \
 	GbmEngine.h \
 	GbmEngine.cc \
+	GbmEngineBinary.h \
+	GbmEngineBinary.cc \
+	GbmEngineOneHot.h \
+	GbmEngineOneHot.cc \
+	GbmEngineEnum.h \
+	GbmEngineEnum.cc \
 	GbmSolver.h \
 	GbmSolver.cc \
 	GbmNaiveBinary.h \

@@ -11,6 +11,7 @@
 
 #include "ymtools.h"
 #include "GbmLit.h"
+#include "RcfNetwork.h"
 #include "RcfNode.h"
 #include "ym_logic/SatSolver.h"
 
@@ -42,6 +43,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief SAT モデルから設定変数の割り当てを取り出す．
+  /// @param[in] model SAT モデル
+  /// @param[out] conf_bits 設定変数の割り当て
+  void
+  get_conf_bits(const vector<Bool3>& model,
+		vector<bool>& conf_bits) const;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief ノードに対応するリテラルを登録する．
   /// @param[in] id ノード番号
   /// @param[in] lit リテラル
@@ -49,45 +63,30 @@ public:
   set_node_var(ymuint id,
 	       GbmLit lit);
 
-  /// @brief 設定変数に対応するリテラルを登録する．
-  /// @param[in] id 変数番号
-  /// @param[in] lit リテラル
-  void
-  set_conf_var(ymuint id,
-	       GbmLit lit);
-
-  /// @brief 外部入力の順列入れ替えを2値符号化する場合の CNF 式を作る．
-  /// @param[in] input_list 入力ノードのリスト
-  /// @param[in] iorder_vid_array 入力順を表す変数の配列
-  /// @param[in] bw 1つの入力の符号化に用いるビット長
-  /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
-  void
-  make_inputs_cnf_binary(const vector<const RcfNode*>& input_list,
-			 const vector<VarId> iorder_vid_array,
-			 ymuint bw,
-			 ymuint bit_pat);
-
-  /// @brief 外部入力の順列入れ替えをone-hot符号化する場合の CNF 式を作る．
-  /// @param[in] input_list 入力ノードのリスト
-  /// @param[in] pred_list 各入力に対する先行者の情報を入れた配列
-  /// @param[in] iorder_vid_array 入力順を表す変数の配列
-  /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
-  /// @note pred_list[] が -1 の時は先行者なし
-  void
-  make_inputs_cnf_onehot(const vector<const RcfNode*>& input_list,
-			const vector<int>& pred_list,
-			const vector<VarId> iorder_vid_array,
-			ymuint bit_pat);
+  /// @brief ノードに対応する新しい変数を割り当てる．
+  /// @param[in] id ノード番号
+  /// @return 変数番号を返す．
+  VarId
+  set_node_newvar(ymuint id);
 
   /// @brief 内部ノードに変数番号を割り当て，CNF式を作る．
-  /// @param[in] node_list ノードリスト(入力と出力は含まない)
+  /// @param[in] network 対象の LUT ネットワーク
   /// @param[in] oid 出力のノード番号
   /// @param[in] oval 出力値
   /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
-  make_nodes_cnf(const vector<const RcfNode*>& node_list,
+  make_nodes_cnf(const RcfNetwork& network,
 		 ymuint oid,
 		 ymuint oval);
+
+  /// @brief 節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2);
+
+  /// @brief 節を追加する．
+  void
+  add_clause(const vector<Literal>& lits);
 
 
 private:
@@ -148,8 +147,8 @@ private:
   // ノードIDをキーにしてリテラルを格納する配列
   vector<GbmLit> mNodeVarArray;
 
-  // 設定変数番号をキーにしてリテラルを格納する配列
-  vector<GbmLit> mConfVarArray;
+  // 設定変数番号をキーにしてSATソルバ上の変数番号を格納する配列
+  vector<VarId> mConfVarArray;
 
 };
 
