@@ -92,7 +92,10 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
   ymuint oid = output.id();
   bool oinv = output.inv();
 
-  // 外部入力変数に値を割り当てたときの CNF 式を作る．
+  vector<const RcfNode*> input_list(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    input_list[i] = network.input_node(i);
+  }
   vector<const RcfNode*> node_list;
   node_list.reserve(nn);
   for (ymuint id = 0; id < nn; ++ id) {
@@ -118,111 +121,8 @@ GbmNaiveBinary::_solve(const RcfNetwork& network,
       }
       cout << endl;
     }
-    for (ymuint i = 0; i < ni; ++ i) {
-      const RcfNode* node = network.input_node(i);
-      ymuint id = node->id();
-      VarId vid = solver.new_var();
-      if ( debug ) {
-	cout << " lut_input#" << i << ": " << vid << endl;
-      }
-      engine.set_node_var(id, GbmLit(vid));
-
-      // 入力と外部入力の間の関係式を作る．
-      vector<Literal> tmp_lits(m + 1);
-      for (ymuint j = 0; j < ni; ++ j) {
-	for (ymuint k = 0; k < m; ++ k) {
-	  VarId kvar = iorder_vid_array[i * m + k];
-	  // こちらは含意の左辺なので否定する．
-	  if ( j & (1U << k) ) {
-	    tmp_lits[k] = Literal(kvar, kPolNega);
-	  }
-	  else {
-	    tmp_lits[k] = Literal(kvar, kPolPosi);
-	  }
-	}
-	if ( b & (1U << j) ) {
-	  tmp_lits[m] = Literal(vid, kPolPosi);
-	}
-	else {
-	  tmp_lits[m] = Literal(vid, kPolNega);
-	}
-	if ( debug ) {
-	  cout << " added clause = ";
-	  for (ymuint x = 0; x <= m; ++ x) {
-	    cout << " " << tmp_lits[x];
-	  }
-	  cout << endl;
-	}
-	solver.add_clause(tmp_lits);
-      }
-      // 使っていない変数の組み合わせを禁止する．
-      vector<Literal> tmp_lits2(m);
-      for (ymuint j = ni; j < (1U << m); ++ j) {
-	for (ymuint k = 0; k < m; ++ k) {
-	  VarId kvar = iorder_vid_array[i * m + k];
-	  if ( j & (1U << k) ) {
-	    tmp_lits2[k] = Literal(kvar, kPolNega);
-	  }
-	  else {
-	    tmp_lits2[k] = Literal(kvar, kPolPosi);
-	  }
-	}
-	if ( debug ) {
-	  cout << " added clause = ";
-	  for (ymuint x = 0; x < m; ++ x) {
-	    cout << " " << tmp_lits2[x];
-	  }
-	  cout << endl;
-	}
-	solver.add_clause(tmp_lits2);
-      }
-#if 0
-      // 異なる LUT 入力におなじ入力が接続してはいけないというルール
-      for (ymuint j = 0; j < ni; ++ j) {
-	vector<Literal> tmp_lits3(m * 2);
-	for (ymuint k = 0; k < i; ++ k) {
-	  for (ymuint l = 0; l < m; ++ l) {
-	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	    tmp_lits3[l] = Literal(iorder_vid_array[k * m + l], pol);
-	    tmp_lits3[l + m] = Literal(iorder_vid_array[i * m + l], pol);
-	  }
-	  if ( debug ) {
-	    cout << " added clause = ";
-	    for (ymuint x = 0; x < m; ++ x) {
-	      cout << " " << tmp_lits3[x];
-	    }
-	    cout << endl;
-	  }
-	  solver.add_clause(tmp_lits3);
-	}
-      }
-      // 対称性を考慮したルール
-      ymuint pred;
-      if ( network.get_pred(i, pred) ) {
-	for (ymuint j = 0; j < ni; ++ j) {
-	  vector<Literal> tmp_lits3(m * 2);
-	  for (ymuint l = 0; l < m; ++ l) {
-	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	    tmp_lits3[l] = Literal(iorder_vid_array[i * m + l], pol);
-	  }
-	  for (ymuint k = j + 1; k < ni; ++ k) {
-	    for (ymuint l = 0; l < m; ++ l) {
-	      tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	      tmp_lits3[l + m] = Literal(iorder_vid_array[pred * m + l], pol);
-	    }
-	    if ( debug ) {
-	      cout << " added clause = ";
-	      for (ymuint x = 0; x < m; ++ x) {
-		cout << " " << tmp_lits3[x];
-	      }
-	      cout << endl;
-	    }
-	    solver.add_clause(tmp_lits3);
-	  }
-	}
-      }
-#endif
-    }
+    // 外部入力変数に値を割り当てたときの CNF 式を作る．
+    engine.make_inputs_cnf_binary(input_list, iorder_vid_array, m, b);
     ymuint oval = static_cast<bool>(func.value(b)) ^ oinv;
     bool ok = engine.make_nodes_cnf(node_list, oid, oval);
     if ( !ok ) {

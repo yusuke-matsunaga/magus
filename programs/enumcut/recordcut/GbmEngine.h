@@ -56,6 +56,29 @@ public:
   set_conf_var(ymuint id,
 	       GbmLit lit);
 
+  /// @brief 外部入力の順列入れ替えを2値符号化する場合の CNF 式を作る．
+  /// @param[in] input_list 入力ノードのリスト
+  /// @param[in] iorder_vid_array 入力順を表す変数の配列
+  /// @param[in] bw 1つの入力の符号化に用いるビット長
+  /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+  void
+  make_inputs_cnf_binary(const vector<const RcfNode*>& input_list,
+			 const vector<VarId> iorder_vid_array,
+			 ymuint bw,
+			 ymuint bit_pat);
+
+  /// @brief 外部入力の順列入れ替えをone-hot符号化する場合の CNF 式を作る．
+  /// @param[in] input_list 入力ノードのリスト
+  /// @param[in] pred_list 各入力に対する先行者の情報を入れた配列
+  /// @param[in] iorder_vid_array 入力順を表す変数の配列
+  /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+  /// @note pred_list[] が -1 の時は先行者なし
+  void
+  make_inputs_cnf_onehot(const vector<const RcfNode*>& input_list,
+			const vector<int>& pred_list,
+			const vector<VarId> iorder_vid_array,
+			ymuint bit_pat);
+
   /// @brief 内部ノードに変数番号を割り当て，CNF式を作る．
   /// @param[in] node_list ノードリスト(入力と出力は含まない)
   /// @param[in] oid 出力のノード番号

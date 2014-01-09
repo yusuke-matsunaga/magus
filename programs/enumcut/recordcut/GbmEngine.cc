@@ -12,6 +12,12 @@
 
 BEGIN_NAMESPACE_YM
 
+BEGIN_NONAMESPACE
+
+const bool debug = false;
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス GbmEngine
 //////////////////////////////////////////////////////////////////////
@@ -54,6 +60,209 @@ GbmEngine::set_conf_var(ymuint id,
 {
   assert_cond( id < mConfVarArray.size(), __FILE__, __LINE__);
   mConfVarArray[id] = lit;
+}
+
+// @brief 外部入力の順列入れ替えを2値符号化する場合の CNF 式を作る．
+// @param[in] input_list 入力ノードのリスト
+// @param[in] iorder_vid_array 入力順を表す変数の配列
+// @param[in] bw 1つの入力の符号化に用いるビット長
+// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+void
+GbmEngine::make_inputs_cnf_binary(const vector<const RcfNode*>& input_list,
+				  const vector<VarId> iorder_vid_array,
+				  ymuint bw,
+				  ymuint bit_pat)
+{
+  ymuint ni = input_list.size();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const RcfNode* node = input_list[i];
+    ymuint id = node->id();
+    VarId vid = mSolver.new_var();
+    if ( debug ) {
+      cout << " lut_input#" << i << ": " << vid << endl;
+    }
+    set_node_var(id, GbmLit(vid));
+
+      // 入力と外部入力の間の関係式を作る．
+    vector<Literal> tmp_lits(bw + 1);
+    for (ymuint j = 0; j < ni; ++ j) {
+      for (ymuint k = 0; k < bw; ++ k) {
+	VarId kvar = iorder_vid_array[i * bw + k];
+	// こちらは含意の左辺なので否定する．
+	if ( j & (1U << k) ) {
+	  tmp_lits[k] = Literal(kvar, kPolNega);
+	}
+	else {
+	  tmp_lits[k] = Literal(kvar, kPolPosi);
+	}
+      }
+      if ( bit_pat & (1U << j) ) {
+	tmp_lits[bw] = Literal(vid, kPolPosi);
+      }
+      else {
+	tmp_lits[bw] = Literal(vid, kPolNega);
+      }
+      if ( debug ) {
+	cout << " added clause = ";
+	for (ymuint x = 0; x <= bw; ++ x) {
+	  cout << " " << tmp_lits[x];
+	}
+	cout << endl;
+      }
+      mSolver.add_clause(tmp_lits);
+    }
+    // 使っていない変数の組み合わせを禁止する．
+    vector<Literal> tmp_lits2(bw);
+    for (ymuint j = ni; j < (1U << bw); ++ j) {
+      for (ymuint k = 0; k < bw; ++ k) {
+	VarId kvar = iorder_vid_array[i * bw + k];
+	if ( j & (1U << k) ) {
+	  tmp_lits2[k] = Literal(kvar, kPolNega);
+	}
+	else {
+	  tmp_lits2[k] = Literal(kvar, kPolPosi);
+	}
+      }
+      if ( debug ) {
+	cout << " added clause = ";
+	for (ymuint x = 0; x < bw; ++ x) {
+	  cout << " " << tmp_lits2[x];
+	}
+	cout << endl;
+      }
+      mSolver.add_clause(tmp_lits2);
+    }
+#if 0
+    // 異なる LUT 入力におなじ入力が接続してはいけないというルール
+    for (ymuint j = 0; j < ni; ++ j) {
+      vector<Literal> tmp_lits3(bw * 2);
+      for (ymuint k = 0; k < i; ++ k) {
+	for (ymuint l = 0; l < bw; ++ l) {
+	  tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
+	  tmp_lits3[l] = Literal(iorder_vid_array[k * bw + l], pol);
+	  tmp_lits3[l + bw] = Literal(iorder_vid_array[i * bw + l], pol);
+	}
+	if ( debug ) {
+	  cout << " added clause = ";
+	  for (ymuint x = 0; x < bw; ++ x) {
+	    cout << " " << tmp_lits3[x];
+	  }
+	  cout << endl;
+	}
+	mSolver.add_clause(tmp_lits3);
+      }
+    }
+    // 対称性を考慮したルール
+    ymuint pred;
+    if ( network.get_pred(i, pred) ) {
+      for (ymuint j = 0; j < ni; ++ j) {
+	vector<Literal> tmp_lits3(bw * 2);
+	for (ymuint l = 0; l < m; ++ l) {
+	  tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
+	  tmp_lits3[l] = Literal(iorder_vid_array[i * bw + l], pol);
+	}
+	for (ymuint k = j + 1; k < ni; ++ k) {
+	  for (ymuint l = 0; l < bw; ++ l) {
+	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
+	    tmp_lits3[l + bw] = Literal(iorder_vid_array[pred * bw + l], pol);
+	  }
+	  if ( debug ) {
+	    cout << " added clause = ";
+	    for (ymuint x = 0; x < bw; ++ x) {
+	      cout << " " << tmp_lits3[x];
+	    }
+	    cout << endl;
+	  }
+	  mSolver.add_clause(tmp_lits3);
+	}
+      }
+    }
+#endif
+  }
+}
+
+// @brief 外部入力の順列入れ替えをone-hot符号化する場合の CNF 式を作る．
+// @param[in] input_list 入力ノードのリスト
+// @param[in] pred_list 各入力に対する先行者の情報を入れた配列
+// @param[in] iorder_vid_array 入力順を表す変数の配列
+// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+void
+GbmEngine::make_inputs_cnf_onehot(const vector<const RcfNode*>& input_list,
+				  const vector<int>& pred_list,
+				  const vector<VarId> iorder_vid_array,
+				  ymuint bit_pat)
+{
+  ymuint ni = input_list.size();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const RcfNode* node = input_list[i];
+    ymuint id = node->id();
+    VarId vid = mSolver.new_var();
+    if ( debug ) {
+      cout << " lut_input#" << i << ": " << vid << endl;
+    }
+    set_node_var(id, GbmLit(vid));
+
+    // 入力と外部入力の間の関係式を作る．
+    for (ymuint j = 0; j < ni; ++ j) {
+      Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+      tPol pol = ( bit_pat & (1U << j) ) ? kPolPosi : kPolNega;
+      Literal lit1(vid, pol);
+      if ( debug ) {
+	cout << " added clause = " << lit0 << " " << lit1 << endl;
+      }
+      mSolver.add_clause(lit0, lit1);
+    }
+    // 2つの変数が同時に true になってはいけないというルール
+    for (ymuint j = 0; j < ni; ++ j) {
+      Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+      for (ymuint k = j + 1; k < ni; ++ k) {
+	Literal lit1(iorder_vid_array[i * ni + k], kPolNega);
+	if ( debug ) {
+	  cout << " added clause = " << lit0 << " " << lit1 << endl;
+	}
+	mSolver.add_clause(lit0, lit1);
+      }
+    }
+    // 最低1つの変数が true にならなければならないというルール
+    vector<Literal> tmp_lits(ni);
+    for (ymuint j = 0; j < ni; ++ j) {
+      tmp_lits[j] = Literal(iorder_vid_array[i * ni + j], kPolPosi);
+    }
+    if ( debug ) {
+      cout << " added clause = ";
+      for (ymuint x = 0; x < ni; ++ x) {
+	cout << " " << tmp_lits[x];
+      }
+      cout << endl;
+    }
+    mSolver.add_clause(tmp_lits);
+    // 異なる LUT 入力におなじ入力が接続してはいけないというルール
+    for (ymuint j = 0; j < ni; ++ j) {
+      Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+      for (ymuint k = 0; k < i; ++ k) {
+	Literal lit1(iorder_vid_array[k * ni + j], kPolNega);
+	if ( debug ) {
+	  cout << " added clause = " << lit0 << " " << lit1 << endl;
+	}
+	mSolver.add_clause(lit0, lit1);
+      }
+    }
+
+    // 対称性を考慮したルール
+    int pred = pred_list[i];
+    if ( pred >= 0 ) {
+      for (ymuint j = 0; j < ni; ++ j) {
+	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
+	for (ymuint k = j + 1; k < ni; ++ k) {
+	  Literal lit1(iorder_vid_array[pred * ni + k], kPolNega);
+	  if ( debug ) {
+	    cout << " added clause = " << lit0 << " " << lit1 << endl;
+	  }
+	  mSolver.add_clause(lit0, lit1);
+	}
+      }
+    }
+  }
 }
 
 // @brief 内部ノードに変数番号を割り当て，CNF式を作る．

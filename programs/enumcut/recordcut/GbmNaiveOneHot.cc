@@ -88,7 +88,18 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   ymuint oid = output.id();
   bool oinv = output.inv();
 
-  // 外部入力変数に値を割り当てたときの CNF 式を作る．
+  vector<const RcfNode*> input_list(ni);
+  vector<int> pred_list(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    input_list[i] = network.input_node(i);
+    ymuint pred;
+    if ( network.get_pred(i, pred) ) {
+      pred_list[i] = pred;
+    }
+    else {
+      pred_list[i] = -1;
+    }
+  }
   vector<const RcfNode*> node_list;
   node_list.reserve(nn);
   for (ymuint id = 0; id < nn; ++ id) {
@@ -115,75 +126,8 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
       }
       cout << endl;
     }
-    for (ymuint i = 0; i < ni; ++ i) {
-      const RcfNode* node = network.input_node(i);
-      ymuint id = node->id();
-      VarId vid = solver.new_var();
-      if ( debug ) {
-	cout << " lut_input#" << i << ": " << vid << endl;
-      }
-      engine.set_node_var(id, GbmLit(vid));
-      // 入力と外部入力の間の関係式を作る．
-      for (ymuint j = 0; j < ni; ++ j) {
-	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
-	tPol pol = ( b & (1U << j) ) ? kPolPosi : kPolNega;
-	Literal lit1(vid, pol);
-	if ( debug ) {
-	  cout << " added clause = " << lit0 << " " << lit1 << endl;
-	}
-	solver.add_clause(lit0, lit1);
-      }
-      // 2つの変数が同時に true になってはいけないというルール
-      for (ymuint j = 0; j < ni; ++ j) {
-	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
-	for (ymuint k = j + 1; k < ni; ++ k) {
-	  Literal lit1(iorder_vid_array[i * ni + k], kPolNega);
-	  if ( debug ) {
-	    cout << " added clause = " << lit0 << " " << lit1 << endl;
-	  }
-	  solver.add_clause(lit0, lit1);
-	}
-      }
-      // 最低1つの変数が true にならなければならないというルール
-      vector<Literal> tmp_lits(ni);
-      for (ymuint j = 0; j < ni; ++ j) {
-	tmp_lits[j] = Literal(iorder_vid_array[i * ni + j], kPolPosi);
-      }
-      if ( debug ) {
-	cout << " added clause = ";
-	for (ymuint x = 0; x < ni; ++ x) {
-	  cout << " " << tmp_lits[x];
-	}
-	cout << endl;
-      }
-      solver.add_clause(tmp_lits);
-      // 異なる LUT 入力におなじ入力が接続してはいけないというルール
-      for (ymuint j = 0; j < ni; ++ j) {
-	Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
-	for (ymuint k = 0; k < i; ++ k) {
-	  Literal lit1(iorder_vid_array[k * ni + j], kPolNega);
-	  if ( debug ) {
-	    cout << " added clause = " << lit0 << " " << lit1 << endl;
-	  }
-	  solver.add_clause(lit0, lit1);
-	}
-      }
-
-      // 対称性を考慮したルール
-      ymuint pred;
-      if ( network.get_pred(i, pred) ) {
-	for (ymuint j = 0; j < ni; ++ j) {
-	  Literal lit0(iorder_vid_array[i * ni + j], kPolNega);
-	  for (ymuint k = j + 1; k < ni; ++ k) {
-	    Literal lit1(iorder_vid_array[pred * ni + k], kPolNega);
-	    if ( debug ) {
-	      cout << " added clause = " << lit0 << " " << lit1 << endl;
-	    }
-	    solver.add_clause(lit0, lit1);
-	  }
-	}
-      }
-    }
+    // 外部入力変数に値を割り当てたときの CNF 式を作る．
+    engine.make_inputs_cnf_onehot(input_list, pred_list, iorder_vid_array, b);
     ymuint oval = static_cast<bool>(func.value(b)) ^ oinv;
     bool ok = engine.make_nodes_cnf(node_list, oid, oval);
     if ( !ok ) {
