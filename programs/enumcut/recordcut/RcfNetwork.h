@@ -5,7 +5,7 @@
 /// @brief RcfNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -110,6 +110,8 @@ public:
 
   /// @brief ノードを返す．
   /// @param[in] id ID番号 ( 0 <= id < node_num() )
+  ///
+  /// node(id)->id() = id となる．
   const RcfNode*
   node(ymuint id) const;
 
@@ -118,9 +120,20 @@ public:
   input_num() const;
 
   /// @brief 外部入力ノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < input_num() )
+  /// @param[in] id 入力番号 ( 0 <= id < input_num() )
+  ///
+  /// input_node(id)->input_id() = id となる．
   const RcfNode*
-  input_node(ymuint pos) const;
+  input_node(ymuint id) const;
+
+  /// @brief 機能ノード(外部入力以外のノード)数を返す．
+  ymuint
+  func_node_num() const;
+
+  /// @brief 機能ノードを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < func_node_num() )
+  const RcfNode*
+  func_node(ymuint pos) const;
 
   /// @brief ANDノード数を返す．
   ymuint
@@ -148,15 +161,6 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < mux_num() )
   const RcfNode*
   mux_node(ymuint pos) const;
-
-  /// @brief 機能ノード(外部入力以外のノード)数を返す．
-  ymuint
-  fnode_num() const;
-
-  /// @brief 機能ノードを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < fnode_num() )
-  const RcfNode*
-  fnode(ymuint pos) const;
 
   /// @brief 外部出力のハンドルを返す．
   RcfNodeHandle
@@ -199,6 +203,9 @@ private:
   // 入力順の先行者を格納するベクタ
   vector<ymuint32> mInputPredList;
 
+  // 機能ノードを格納するベクタ
+  vector<RcfNode*> mFuncNodeList;
+
   // ANDノードを格納するベクタ
   vector<RcfNode*> mAndList;
 
@@ -207,9 +214,6 @@ private:
 
   // MUXノードを格納するベクタ
   vector<RcfNode*> mMuxList;
-
-  // 機能ノードを格納するベクタ
-  vector<RcfNode*> mFnodeList;
 
   // 外部出力のハンドル
   RcfNodeHandle mOutput;

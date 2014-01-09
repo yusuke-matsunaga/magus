@@ -45,6 +45,8 @@
 
 BEGIN_NAMESPACE_YM
 
+bool verbose = false;
+
 void
 rec_func(FuncMgr& func_mgr,
 	 const string& filename,
@@ -138,6 +140,9 @@ rec_func(FuncMgr& func_mgr,
     RandGen rg;
     for (ymuint i = 0; i < nrand; ++ i) {
       ymuint pos = rg.ulong() % func_list.size();
+      if ( verbose ) {
+	cout << "#" << i << endl;
+      }
       matcher.match(func_list[pos], *solver);
     }
   }
@@ -284,6 +289,9 @@ main(int argc,
     { "randam_sample", 'r', POPT_ARG_INT, &nrand, 0,
       "do randam smpling", "# of samples" },
 
+    { "verbose", 'v', POPT_ARG_NONE, NULL, 0x200,
+      "set verbose flag", NULL },
+
     POPT_AUTOHELP
 
     { NULL, '\0', 0, NULL, 0, NULL, NULL }
@@ -311,6 +319,9 @@ main(int argc,
     }
     else if ( rc == 0x101 ) {
       iscas = true;
+    }
+    else if ( rc == 0x200 ) {
+      verbose = true;
     }
   }
 

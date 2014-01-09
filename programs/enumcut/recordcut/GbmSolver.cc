@@ -33,7 +33,8 @@ GbmSolver::~GbmSolver()
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmSolver::solve(const RcfNetwork& network,
 		 const TvFunc& func,
@@ -56,6 +57,8 @@ GbmSolver::solve(const RcfNetwork& network,
 // @param[in] func マッチング対象の関数
 // @param[in] conf_bits configuration ビットの値を収める配列
 // @param[in] iorder 入力順序
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmSolver::verify(const RcfNetwork& network,
 		  const TvFunc& func,
@@ -69,16 +72,15 @@ GbmSolver::verify(const RcfNetwork& network,
   // これは network.input_num() と等しいはず
   assert_cond( npi == network.input_num(), __FILE__, __LINE__);
   for (ymuint i = 0; i < npi; ++ i) {
-    const RcfNode* node = network.input_node(iorder[i]);
+    const RcfNode* node = network.input_node(i);
     ymuint id = node->id();
-    func_array[id] = TvFunc::posi_literal(npi, VarId(i));
+    func_array[id] = TvFunc::posi_literal(npi, VarId(iorder[i]));
   }
 
-  for (ymuint i = 0; i < nn; ++ i) {
-    const RcfNode* node = network.node(i);
-    if ( !node->is_input() ) {
-      func_array[i] = node->calc_func(func_array, conf_bits);
-    }
+  ymuint nf = network.func_node_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const RcfNode* node = network.func_node(i);
+    func_array[node->id()] = node->calc_func(func_array, conf_bits);
   }
 
   RcfNodeHandle output = network.output();
@@ -87,6 +89,26 @@ GbmSolver::verify(const RcfNetwork& network,
     ofunc = ~ofunc;
   }
 
+  if ( func != ofunc ) {
+    cerr << "verification error" << endl
+	 << " original func: " << func << endl
+	 << " lut func:      " << ofunc << endl;
+    cerr << " iorder: ";
+    for (ymuint i = 0; i < npi; ++ i) {
+      cerr << " " << iorder[i];
+    }
+    cerr << endl;
+    ymuint nc = conf_bits.size();
+    cerr << " conf_bits =    ";
+    for (ymuint i = 0; i < nc; ++ i) {
+      cerr << conf_bits[i];
+    }
+    cerr << endl;
+    for (ymuint i = 0; i < nf; ++ i) {
+      const RcfNode* node = network.func_node(i);
+      cerr << "Node#" << node->id() << ": " << func_array[node->id()] << endl;
+    }
+  }
   return func == ofunc;
 }
 

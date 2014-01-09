@@ -3,7 +3,7 @@
 /// @brief RcfNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -58,8 +58,8 @@ RcfNetwork::new_and(RcfNodeHandle input0,
   void* p = mAlloc.get_memory(sizeof(RcfAndNode));
   RcfNode* node = new (p) RcfAndNode(id, input0, input1);
   mNodeList.push_back(node);
+  mFuncNodeList.push_back(node);
   mAndList.push_back(node);
-  mFnodeList.push_back(node);
   return RcfNodeHandle(node->id(), false);
 }
 
@@ -75,8 +75,8 @@ RcfNetwork::new_lut(const vector<RcfNodeHandle>& inputs)
   void* p = mAlloc.get_memory(sizeof(RcfLutNode) + sizeof(RcfNodeHandle) * (n - 1));
   RcfNode* node = new (p) RcfLutNode(id, mNextConfVar, inputs);
   mNodeList.push_back(node);
+  mFuncNodeList.push_back(node);
   mLutList.push_back(node);
-  mFnodeList.push_back(node);
   mNextConfVar += node->conf_size();
   return RcfNodeHandle(node->id(), false);
 }
@@ -94,8 +94,8 @@ RcfNetwork::new_mux(const vector<RcfNodeHandle>& inputs)
   void* p = mAlloc.get_memory(sizeof(RcfMuxNode) + sizeof(RcfNodeHandle) * (n - 1));
   RcfNode* node = new (p) RcfMuxNode(id, mNextConfVar, inputs);
   mNodeList.push_back(node);
+  mFuncNodeList.push_back(node);
   mMuxList.push_back(node);
-  mFnodeList.push_back(node);
   mNextConfVar += node->conf_size();
   return RcfNodeHandle(node->id(), false);
 }
@@ -150,6 +150,22 @@ RcfNetwork::input_node(ymuint pos) const
   return mInputList[pos];
 }
 
+// @brief 機能ノード(外部入力以外のノード)数を返す．
+ymuint
+RcfNetwork::func_node_num() const
+{
+  return mFuncNodeList.size();
+}
+
+// @brief 機能ノードを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < func_node_num() )
+const RcfNode*
+RcfNetwork::func_node(ymuint pos) const
+{
+  assert_cond( pos < mFuncNodeList.size(), __FILE__, __LINE__);
+  return mFuncNodeList[pos];
+}
+
 // @brief ANDノード数を返す．
 ymuint
 RcfNetwork::and_num() const
@@ -196,22 +212,6 @@ RcfNetwork::mux_node(ymuint pos) const
 {
   assert_cond( pos < mux_num(), __FILE__, __LINE__);
   return mMuxList[pos];
-}
-
-// @brief 機能ノード(外部入力以外のノード)数を返す．
-ymuint
-RcfNetwork::fnode_num() const
-{
-  return mFnodeList.size();
-}
-
-// @brief 機能ノードを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < fnode_num() )
-const RcfNode*
-RcfNetwork::fnode(ymuint pos) const
-{
-  assert_cond( pos < fnode_num(), __FILE__, __LINE__);
-  return mFnodeList[pos];
 }
 
 // @brief 外部出力のハンドルを返す．

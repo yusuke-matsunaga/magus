@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
-const bool debug = true;
+const bool debug = false;
 
 END_NONAMESPACE
 
@@ -40,7 +40,8 @@ GbmCegarBinary::~GbmCegarBinary()
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmCegarBinary::_solve(const RcfNetwork& network,
 		       const TvFunc& func,
@@ -94,13 +95,11 @@ GbmCegarBinary::_solve(const RcfNetwork& network,
   for (ymuint i = 0; i < ni; ++ i) {
     input_list[i] = network.input_node(i);
   }
-  vector<const RcfNode*> node_list;
-  node_list.reserve(nn);
-  for (ymuint id = 0; id < nn; ++ id) {
-    const RcfNode* node = network.node(id);
-    if ( !node->is_input() ) {
-      node_list.push_back(node);
-    }
+  ymuint nf = network.func_node_num();
+  vector<const RcfNode*> node_list(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    const RcfNode* node = network.func_node(i);
+    node_list[i] = node;
   }
 
   ymuint ni_exp = 1U << ni;
@@ -155,7 +154,7 @@ GbmCegarBinary::_solve(const RcfNetwork& network,
 	  pos += (1U << j);
 	}
       }
-      iorder[pos] = i;
+      iorder[i] = pos;
     }
     bool pass = true;
     for (ymuint b = 0; b < ni_exp; ++ b) {
@@ -165,8 +164,9 @@ GbmCegarBinary::_solve(const RcfNetwork& network,
       ymuint exp_out = func.value(b);
       vector<bool> ival_list(ni);
       for (ymuint i = 0; i < ni; ++ i) {
-	bool val = (b & (1U << i)) ? true : false;
-	ival_list[iorder[i]] = val;
+	ymuint src_pos = iorder[i];
+	bool val = (b & (1U << src_pos)) ? true : false;
+	ival_list[i] = val;
       }
       if ( network.simulate(ival_list, conf_bits) != exp_out ) {
 	bit_pat = b;
@@ -197,16 +197,12 @@ GbmCegarBinary::_solve(const RcfNetwork& network,
 	  pos += (1U << j);
 	}
       }
-      iorder[pos] = i;
+      iorder[i] = pos;
     }
-    cout << "Found" << endl;
     return true;
   }
   else if ( stat == kB3X ) {
     cout << "Aborted" << endl;
-  }
-  else {
-    cout << "Failed" << endl;
   }
 
   return false;

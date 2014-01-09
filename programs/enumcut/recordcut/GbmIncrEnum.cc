@@ -41,7 +41,8 @@ GbmIncrEnum::~GbmIncrEnum()
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmIncrEnum::_solve(const RcfNetwork& network,
 		    const TvFunc& func,
@@ -70,7 +71,7 @@ GbmIncrEnum::_solve(const RcfNetwork& network,
     if ( stat ) {
       iorder.resize(ni, 0);
       for (ymuint i = 0; i < ni; ++ i) {
-	iorder[tmp_order[i]] = i;
+	iorder[i] = tmp_order[i];
       }
       return true;
     }
@@ -83,6 +84,8 @@ GbmIncrEnum::_solve(const RcfNetwork& network,
 // @param[in] output Reconfigurable Network の出力
 // @param[in] func マッチング対象の関数
 // @param[in] iorder 入力順序
+//            iorder[pos] に network の pos 番めの入力に対応した
+//            関数の入力番号が入る．
 // @param[out] conf_bits configuration ビットの値を収める配列
 bool
 GbmIncrEnum::_solve_with_order(const RcfNetwork& network,
@@ -112,10 +115,10 @@ GbmIncrEnum::_solve_with_order(const RcfNetwork& network,
   bool oinv = output.inv();
 
   // 外部入力変数に値を割り当てたときの CNF 式を作る．
-  ymuint fn = network.fnode_num();
+  ymuint fn = network.func_node_num();
   vector<const RcfNode*> node_list(fn);
   for (ymuint i = 0; i < fn; ++ i) {
-    const RcfNode* node = network.fnode(i);
+    const RcfNode* node = network.func_node(i);
     node_list[i] = node;
   }
 

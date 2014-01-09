@@ -40,7 +40,8 @@ GbmCegarOneHot::~GbmCegarOneHot()
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmCegarOneHot::_solve(const RcfNetwork& network,
 		       const TvFunc& func,
@@ -157,7 +158,7 @@ GbmCegarOneHot::_solve(const RcfNetwork& network,
       for (ymuint j = 0; j < ni; ++ j) {
 	VarId vid = iorder_vid_array[i * ni + j];
 	if ( model[vid.val()] == kB3True ) {
-	  iorder[j] = i;
+	  iorder[i] = j;
 	}
       }
     }
@@ -169,8 +170,9 @@ GbmCegarOneHot::_solve(const RcfNetwork& network,
       ymuint exp_out = func.value(b);
       vector<bool> ival_list(ni);
       for (ymuint i = 0; i < ni; ++ i) {
-	bool val = (b & (1U << i)) ? true : false;
-	ival_list[iorder[i]] = val;
+	ymuint src_pos = iorder[i];
+	bool val = (b & (1U << src_pos)) ? true : false;
+	ival_list[i] = val;
       }
       if ( network.simulate(ival_list, conf_bits) != exp_out ) {
 	bit_pat = b;
@@ -197,7 +199,7 @@ GbmCegarOneHot::_solve(const RcfNetwork& network,
       for (ymuint j = 0; j < ni; ++ j) {
 	VarId vid = iorder_vid_array[i * ni + j];
 	if ( model[vid.val()] == kB3True ) {
-	  iorder[j] = i;
+	  iorder[i] = j;
 	  break;
 	}
       }

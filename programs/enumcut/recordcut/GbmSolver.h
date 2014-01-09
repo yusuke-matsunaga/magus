@@ -38,11 +38,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力順を考慮したマッチング問題を解く
-  /// @param[in] networkr RcfNetwork
+  /// @param[in] networrk RcfNetwork
   /// @param[in] func マッチング対象の関数
   /// @param[out] conf_bits configuration ビットの値を収める配列
   /// @param[out] iorder 入力順序
-  /// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   bool
   solve(const RcfNetwork& network,
 	const TvFunc& func,
@@ -61,7 +62,8 @@ private:
   /// @param[in] func マッチング対象の関数
   /// @param[out] conf_bits configuration ビットの値を収める配列
   /// @param[out] iorder 入力順序
-  /// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   virtual
   bool
   _solve(const RcfNetwork& network,
@@ -74,6 +76,8 @@ private:
   /// @param[in] func マッチング対象の関数
   /// @param[in] conf_bits configuration ビットの値を収める配列
   /// @param[in] iorder 入力順序
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   bool
   verify(const RcfNetwork& network,
 	 const TvFunc& func,

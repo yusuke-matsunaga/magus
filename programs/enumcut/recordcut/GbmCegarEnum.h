@@ -45,7 +45,8 @@ private:
   /// @param[in] func マッチング対象の関数
   /// @param[out] conf_bits configuration ビットの値を収める配列
   /// @param[out] iorder 入力順序
-  /// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   bool
   _solve(const RcfNetwork& network,
 	 const TvFunc& func,
@@ -63,8 +64,9 @@ private:
   /// @param[in] output Reconfigurable Network の出力
   /// @param[in] func マッチング対象の関数
   /// @param[in] iorder 入力順序
+  ///            iorder[pos] に network の pos 番めの入力に対応した
+  ///            関数の入力番号が入る．
   /// @param[out] conf_bits configuration ビットの値を収める配列
-  /// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
   bool
   _solve_with_order(const RcfNetwork& network,
 		    const TvFunc& func,

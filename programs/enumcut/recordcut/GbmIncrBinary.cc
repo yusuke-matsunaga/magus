@@ -40,7 +40,8 @@ GbmIncrBinary::~GbmIncrBinary()
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmIncrBinary::_solve(const RcfNetwork& network,
 		      const TvFunc& func,
@@ -94,13 +95,11 @@ GbmIncrBinary::_solve(const RcfNetwork& network,
   for (ymuint i = 0; i < ni; ++ i) {
     input_list[i] = network.input_node(i);
   }
-  vector<const RcfNode*> node_list;
-  node_list.reserve(nn);
-  for (ymuint id = 0; id < nn; ++ id) {
-    const RcfNode* node = network.node(id);
-    if ( !node->is_input() ) {
-      node_list.push_back(node);
-    }
+  ymuint fn = network.func_node_num();
+  vector<const RcfNode*> node_list(fn);
+  for (ymuint i = 0; i < fn; ++ i) {
+    const RcfNode* node = network.func_node(i);
+    node_list[i] = node;
   }
 
   ymuint ni_exp = 1U << ni;
@@ -151,7 +150,7 @@ GbmIncrBinary::_solve(const RcfNetwork& network,
 	  pos += (1U << j);
 	}
       }
-      iorder[pos] = i;
+      iorder[i] = pos;
     }
     return true;
   }
