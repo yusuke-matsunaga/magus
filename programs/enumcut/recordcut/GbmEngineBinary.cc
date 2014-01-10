@@ -21,12 +21,16 @@ BEGIN_NAMESPACE_YM
 // @param[in] node_num ノード数
 // @param[in] conf_num 設定変数の数
 // @param[in] input_num 入力数
+// @param[in] rep 関数の対称変数の代表番号を収める配列
+//            rep[pos] に pos 番めの入力の代表番号が入る．
 GbmEngineBinary::GbmEngineBinary(SatSolver& solver,
 				 ymuint node_num,
 				 ymuint conf_num,
-				 ymuint input_num) :
+				 ymuint input_num,
+				 const vector<ymuint>& rep) :
   GbmEngine(solver, node_num, conf_num),
-  mInputNum(input_num)
+  mInputNum(input_num),
+  mRep(rep)
 {
   ymuint m = 0;
   for (ymuint t = 1; t < input_num; t <<= 1, ++ m) ;
@@ -154,7 +158,7 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
       }
     }
 
-    // 対称性を考慮したルール
+    // LUT ネットワークの対称性を考慮したルール
     ymuint pred;
     if ( network.get_pred(i, pred) ) {
       // 最上位ビットで Vi > Vj となる条件
@@ -221,6 +225,61 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
 	  em_lit = ek_lit;
 	}
       }
+    }
+
+    // 関数の対称性に関するルール
+    for (ymuint j = 0; j < ni; ++ j) {
+      ymuint cur_rep = mRep[j];
+      if ( cur_rep == j ) {
+	continue;
+      }
+      // 0 - (i - 1) までの入力で cur_rep が選ばれていなければならない．
+      // ~X(i,j) + X(0, cur_rep) + X(1, cur_rep) + ...
+      // だが，X はビットベクタなので積項となり面倒くさい．
+      vector<Literal> tmp_lits(i + mIorderBitWidth);
+      vector<ymuint> pos_array(i);
+      for (ymuint k = 0; k < i; ++ k) {
+	pos_array[k] = 0;
+      }
+      for (ymuint l = 0; l < mIorderBitWidth; ++ l) {
+	tPol pol = (j & (1U << l)) ? kPolPosi : kPolNega;
+	Literal lit(mIorderVarArray[i * mIorderBitWidth + l], pol);
+	tmp_lits[i + l] = ~lit;
+      }
+      // 全部展開するとオーバーヘッドが大きい様なので mIorderBitWidth 個だけ展開する．
+      // 完全ではなくても枝刈りには使える．
+#if 1
+      for (ymuint l = 0; l < mIorderBitWidth; ++ l) {
+	for (ymuint k = 0; k < i; ++ k) {
+	  tPol pol = (cur_rep & (1U << l)) ? kPolPosi : kPolNega;
+	  Literal lit(mIorderVarArray[k * mIorderBitWidth + l], pol);
+	  tmp_lits[k] = lit;
+	}
+	add_clause(tmp_lits);
+      }
+#else
+      for ( ; ; ) {
+	for (ymuint k = 0; k < i; ++ k) {
+	  ymuint pos = pos_array[k];
+	  tPol pol = (cur_rep & (1U << pos)) ? kPolPosi : kPolNega;
+	  Literal lit(mIorderVarArray[k * mIorderBitWidth + pos], pol);
+	  tmp_lits[k] = lit;
+	}
+	add_clause(tmp_lits);
+	bool end = true;
+	for (ymuint k = 0; k < i; ++ k) {
+	  ++ pos_array[k];
+	  if ( pos_array[k] < mIorderBitWidth ) {
+	    end = false;
+	    break;
+	  }
+	  pos_array[k] = 0;
+	}
+	if ( end ) {
+	  break;
+	}
+      }
+#endif
     }
   }
 

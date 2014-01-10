@@ -21,12 +21,16 @@ BEGIN_NAMESPACE_YM
 // @param[in] node_num ノード数
 // @param[in] conf_num 設定変数の数
 // @param[in] input_num 入力数
+// @param[in] rep 関数の対称変数の代表番号を収める配列
+//            rep[pos] に pos 番めの入力の代表番号が入る．
 GbmEngineOneHot::GbmEngineOneHot(SatSolver& solver,
 				 ymuint node_num,
 				 ymuint conf_num,
-				 ymuint input_num) :
+				 ymuint input_num,
+				 const vector<ymuint>& rep) :
   GbmEngine(solver, node_num, conf_num),
   mInputNum(input_num),
+  mRep(rep),
   mIorderVarArray(input_num * input_num)
 {
 }
@@ -108,7 +112,7 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
       }
     }
 
-    // 対称性を考慮したルール
+    // LUT の対称性を考慮したルール
     ymuint pred;
     if ( network.get_pred(i, pred) ) {
       for (ymuint j = 0; j < ni; ++ j) {
@@ -117,6 +121,21 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
 	  Literal lit1(mIorderVarArray[pred * ni + k], kPolNega);
 	  add_clause(lit0, lit1);
 	}
+      }
+    }
+
+    // 関数の対称性を考慮したルール
+    for (ymuint j = 0; j < ni; ++ j) {
+      ymuint cur_rep = mRep[j];
+      if ( cur_rep != j ) {
+	vector<Literal> tmp_lits(i + 1);
+	Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
+	for (ymuint k = 0; k < i; ++ k) {
+	  Literal lit1(mIorderVarArray[k * ni + cur_rep], kPolPosi);
+	  tmp_lits[k] = lit1;
+	}
+	tmp_lits[i] = lit0;
+	add_clause(tmp_lits);
       }
     }
   }

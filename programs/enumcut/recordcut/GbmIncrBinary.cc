@@ -32,6 +32,8 @@ GbmIncrBinary::~GbmIncrBinary()
 // @brief 入力順を考慮したマッチング問題を解く
 // @param[in] network RcfNetwork
 // @param[in] func マッチング対象の関数
+// @param[in] rep 関数の対称変数の代表番号を収める配列
+//            rep[pos] に pos 番めの入力の代表番号が入る．
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
 //             iorder[pos] に network の pos 番めの入力に対応した
@@ -39,6 +41,7 @@ GbmIncrBinary::~GbmIncrBinary()
 bool
 GbmIncrBinary::_solve(const RcfNetwork& network,
 		      const TvFunc& func,
+		      const vector<ymuint>& rep,
 		      vector<bool>& conf_bits,
 		      vector<ymuint>& iorder)
 {
@@ -58,7 +61,7 @@ GbmIncrBinary::_solve(const RcfNetwork& network,
   ymuint nn = network.node_num();
   ymuint ni = network.input_num();
 
-  GbmEngineBinary engine(solver, nn, nc, ni);
+  GbmEngineBinary engine(solver, nn, nc, ni, rep);
 
   if ( debug() ) {
     engine.debug_on();

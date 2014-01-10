@@ -78,7 +78,21 @@ GbmSolver::solve(const RcfNetwork& network,
 		 vector<bool>& conf_bits,
 		 vector<ymuint>& iorder)
 {
-  bool stat = _solve(network, func, conf_bits, iorder);
+  ymuint ni = func.input_num();
+  vector<ymuint> rep(ni);
+  rep[0] = 0;
+  for (ymuint i = 1; i < ni; ++ i) {
+    rep[i] = i;
+    for (ymuint j = i; j > 0; ) {
+      -- j;
+      if ( func.check_sym(VarId(i), VarId(j)) ) {
+	rep[i] = j;
+	break;
+      }
+    }
+  }
+
+  bool stat = _solve(network, func, rep, conf_bits, iorder);
 
   if ( mVerify && stat ) {
     // 検証を行う．

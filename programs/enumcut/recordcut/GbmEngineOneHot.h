@@ -28,10 +28,13 @@ public:
   /// @param[in] node_num ノード数
   /// @param[in] conf_num 設定変数の数
   /// @param[in] input_num 入力数
+  /// @param[in] rep 関数の対称変数の代表番号を収める配列
+  ///            rep[pos] に pos 番めの入力の代表番号が入る．
   GbmEngineOneHot(SatSolver& solver,
 		  ymuint node_num,
 		  ymuint conf_num,
-		  ymuint input_num);
+		  ymuint input_num,
+		  const vector<ymuint>& rep);
 
   /// @brief デストラクタ
   ~GbmEngineOneHot();
@@ -81,6 +84,9 @@ private:
 
   // 入力数
   ymuint32 mInputNum;
+
+  // 関数の対称性を表す配列
+  const vector<ymuint>& mRep;
 
   // 入力順を表す変数の配列
   vector<VarId> mIorderVarArray;
