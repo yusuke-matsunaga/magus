@@ -15,12 +15,6 @@
 
 BEGIN_NAMESPACE_YM
 
-BEGIN_NONAMESPACE
-
-const bool debug = false;
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス GbmNaiveOneHot
 //////////////////////////////////////////////////////////////////////
@@ -54,20 +48,25 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   SatSolver solver;
 #endif
 
-  ymuint nc = network.conf_var_num();
-  ymuint nn = network.node_num();
-  ymuint ni = network.input_num();
-
-  GbmEngineOneHot engine(solver, nn, nc, ni);
-
   SatMsgHandlerImpl1 satmsghandler(cout);
   solver.reg_msg_handler(&satmsghandler);
   solver.timer_on(true);
 
   solver.set_max_conflict(100 * 1024);
 
-  conf_bits.resize(nc, false);
+  ymuint nc = network.conf_var_num();
+  ymuint nn = network.node_num();
+  ymuint ni = network.input_num();
 
+  GbmEngineOneHot engine(solver, nn, nc, ni);
+
+  if ( debug() ) {
+    engine.debug_on();
+  }
+
+  engine.init_vars();
+
+  conf_bits.resize(nc, false);
   iorder.resize(ni, 0);
 
   // 外部出力のノード番号と極性
@@ -80,7 +79,7 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   vector<Bool3> model;
   for (ymuint b = 0U; b < ni_exp; ++ b) {
     // 入力に定数を割り当てる．
-    if ( debug ) {
+    if ( debug() ) {
       cout << "INPUT: ";
       for (ymuint i = 0; i < ni; ++ i) {
 	if ( b & (1U << (ni - i - 1)) ) {

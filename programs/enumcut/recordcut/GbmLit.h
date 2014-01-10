@@ -125,6 +125,12 @@ private:
 };
 
 
+/// @brief GbmLit の内容をストリームに出力する．
+ostream&
+operator<<(ostream& s,
+	   GbmLit lit);
+
+
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
@@ -258,6 +264,24 @@ GbmLit::negate()
 {
   mVal ^= 1U;
   return *this;
+}
+
+// @brief GbmLit の内容をストリームに出力する．
+inline
+ostream&
+operator<<(ostream& s,
+	   GbmLit lit)
+{
+  if ( lit.is_zero() ) {
+    s << "CONST-0";
+  }
+  else if ( lit.is_one() ) {
+    s << "CONST-1";
+  }
+  else {
+    s << lit.literal();
+  }
+  return s;
 }
 
 END_NAMESPACE_YM

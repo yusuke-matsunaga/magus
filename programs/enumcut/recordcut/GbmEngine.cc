@@ -28,14 +28,6 @@ GbmEngine::GbmEngine(SatSolver& solver,
   mConfVarArray(conf_num),
   mDebug(false)
 {
-  // configuration 変数を作る．
-  for (ymuint i = 0; i < conf_num; ++ i) {
-    VarId vid = mSolver.new_var();
-    mConfVarArray[i] = vid;
-    if ( debug() ) {
-      cout << "conf_bits[" << i << "] = " << vid << endl;
-    }
-  }
 }
 
 // @brief デストラクタ
@@ -64,6 +56,19 @@ GbmEngine::debug() const
   return mDebug;
 }
 
+// @brief 設定変数を初期化する．
+void
+GbmEngine::init_conf_vars()
+{
+  for (ymuint i = 0; i < mConfVarArray.size(); ++ i) {
+    VarId vid = new_var();
+    mConfVarArray[i] = vid;
+    if ( debug() ) {
+      cout << "conf_bits[" << i << "] = " << vid << endl;
+    }
+  }
+}
+
 // @brief ノードに対応するリテラルを登録する．
 // @param[in] id ノード番号
 // @param[in] lit リテラル
@@ -73,6 +78,9 @@ GbmEngine::set_node_var(ymuint id,
 {
   assert_cond( id < mNodeVarArray.size(), __FILE__, __LINE__);
   mNodeVarArray[id] = lit;
+  if ( debug() ) {
+    cout << "Node#" << id << ": " << lit << endl;
+  }
 }
 
 // @brief SAT用の新しい変数を作る．

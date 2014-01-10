@@ -37,6 +37,26 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief verify フラグを立てる
+  void
+  verify_on();
+
+  /// @brief verify フラグを降ろす
+  void
+  verify_off();
+
+  /// @brief debug フラグを立てる．
+  void
+  debug_on();
+
+  /// @brief debug フラグを降ろす.
+  void
+  debug_off();
+
+  /// @brief debug フラグを得る．
+  bool
+  debug() const;
+
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] networrk RcfNetwork
   /// @param[in] func マッチング対象の関数
@@ -83,6 +103,18 @@ private:
 	 const TvFunc& func,
 	 const vector<bool>& conf_bits,
 	 const vector<ymuint>& iorder);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // verify フラグ
+  bool mVerify;
+
+  // debug フラグ
+  bool mDebug;
 
 };
 

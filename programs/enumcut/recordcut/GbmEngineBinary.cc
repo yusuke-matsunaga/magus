@@ -25,22 +25,35 @@ GbmEngineBinary::GbmEngineBinary(SatSolver& solver,
 				 ymuint node_num,
 				 ymuint conf_num,
 				 ymuint input_num) :
-  GbmEngine(solver, node_num, conf_num)
+  GbmEngine(solver, node_num, conf_num),
+  mInputNum(input_num)
 {
   ymuint m = 0;
   for (ymuint t = 1; t < input_num; t <<= 1, ++ m) ;
   mIorderBitWidth = m;
   mIorderVarArray.resize(input_num * m);
-  for (ymuint i = 0; i < input_num; ++ i) {
-    for (ymuint j = 0; j < m; ++ j) {
-      mIorderVarArray[i * m + j] = solver.new_var();
-    }
-  }
 }
 
 // @brief デストラクタ
 GbmEngineBinary::~GbmEngineBinary()
 {
+}
+
+// @brief 変数の初期化を行う．
+void
+GbmEngineBinary::init_vars()
+{
+  init_conf_vars();
+
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    for (ymuint j = 0; j < mIorderBitWidth; ++ j) {
+      VarId vid = new_var();
+      mIorderVarArray[i * mIorderBitWidth + j] = vid;
+      if ( debug() ) {
+	cout << "Iorder[" << i << "][" << j << "] = " << vid << endl;
+      }
+    }
+  }
 }
 
 // @brief 入力値を割り当てて CNF 式を作る．

@@ -21,11 +21,48 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 GbmSolver::GbmSolver()
 {
+  mVerify = false;
+  mDebug = false;
 }
 
 // @brief デストラクタ
 GbmSolver::~GbmSolver()
 {
+}
+
+// @brief verify フラグを立てる
+void
+GbmSolver::verify_on()
+{
+  mVerify = true;
+}
+
+// @brief verify フラグを降ろす
+void
+GbmSolver::verify_off()
+{
+  mVerify = false;
+}
+
+// @brief debug フラグを立てる．
+void
+GbmSolver::debug_on()
+{
+  mDebug = true;
+}
+
+// @brief debug フラグを降ろす.
+void
+GbmSolver::debug_off()
+{
+  mDebug = false;
+}
+
+// @brief debug フラグを得る．
+bool
+GbmSolver::debug() const
+{
+  return mDebug;
 }
 
 // @brief 入力順を考慮したマッチング問題を解く
@@ -43,9 +80,17 @@ GbmSolver::solve(const RcfNetwork& network,
 {
   bool stat = _solve(network, func, conf_bits, iorder);
 
-  if ( stat ) {
+  if ( mVerify && stat ) {
     // 検証を行う．
     bool vstat = verify(network, func, conf_bits, iorder);
+    if ( debug() ) {
+      if ( vstat ) {
+	cout << "Verify succeeded" << endl;
+      }
+      else {
+	cout << "Verify failed" << endl;
+      }
+    }
     assert_cond( vstat, __FILE__, __LINE__);
   }
 

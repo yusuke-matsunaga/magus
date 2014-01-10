@@ -26,20 +26,33 @@ GbmEngineOneHot::GbmEngineOneHot(SatSolver& solver,
 				 ymuint conf_num,
 				 ymuint input_num) :
   GbmEngine(solver, node_num, conf_num),
+  mInputNum(input_num),
   mIorderVarArray(input_num * input_num)
 {
-  // 入力順用の変数を作る．
-  for (ymuint i = 0; i < input_num; ++ i) {
-    ymuint base = i * input_num;
-    for (ymuint j = 0; j < input_num; ++ j) {
-      mIorderVarArray[base + j] = solver.new_var();
-    }
-  }
 }
 
 // @brief デストラクタ
 GbmEngineOneHot::~GbmEngineOneHot()
 {
+}
+
+// @brief 変数を初期化する．
+void
+GbmEngineOneHot::init_vars()
+{
+  init_conf_vars();
+
+  // 入力順用の変数を作る．
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    ymuint base = i * mInputNum;
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      VarId vid = new_var();
+      mIorderVarArray[base + j] = vid;
+      if ( debug() ) {
+	cout << "Iorder[" << i << "][" << j << "] = " << vid << endl;
+      }
+    }
+  }
 }
 
 // @brief 入力値を割り当てて CNF 式を作る．

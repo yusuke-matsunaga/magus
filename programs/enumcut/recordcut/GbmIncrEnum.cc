@@ -16,12 +16,6 @@
 
 BEGIN_NAMESPACE_YM
 
-BEGIN_NONAMESPACE
-
-const bool debug = false;
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス GbmIncrEnum
 //////////////////////////////////////////////////////////////////////
@@ -98,6 +92,12 @@ GbmIncrEnum::_solve_with_order(const RcfNetwork& network,
   ymuint nn = network.node_num();
 
   GbmEngineEnum engine(solver, nn, nc);
+
+  if ( debug() ) {
+    engine.debug_on();
+  }
+
+  engine.init_conf_vars();
 
   conf_bits.resize(nc, false);
 

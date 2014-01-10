@@ -51,6 +51,14 @@ public:
   void
   debug_off();
 
+  /// @brief debug フラグの値を得る．
+  bool
+  debug() const;
+
+  /// @brief 設定変数を初期化する．
+  void
+  init_conf_vars();
+
   /// @brief SAT モデルから設定変数の割り当てを取り出す．
   /// @param[in] model SAT モデル
   /// @param[out] conf_bits 設定変数の割り当て
@@ -63,10 +71,6 @@ protected:
   //////////////////////////////////////////////////////////////////////
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief debug フラグの値を得る．
-  bool
-  debug() const;
 
   /// @brief ノードに対応するリテラルを登録する．
   /// @param[in] id ノード番号
