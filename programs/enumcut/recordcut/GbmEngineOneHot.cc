@@ -12,12 +12,6 @@
 
 BEGIN_NAMESPACE_YM
 
-BEGIN_NONAMESPACE
-
-const bool debug = false;
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス GbmEngineOneHot
 //////////////////////////////////////////////////////////////////////
@@ -64,8 +58,9 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
   for (ymuint i = 0; i < ni; ++ i) {
     const RcfNode* node = network.input_node(i);
     ymuint id = node->id();
-    VarId vid = set_node_newvar(id);
-    if ( debug ) {
+    VarId vid = new_var();
+    set_node_var(id, GbmLit(vid));
+    if ( debug() ) {
       cout << " lut_input#" << i << ": " << vid << endl;
     }
 
@@ -74,9 +69,6 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
       Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
       tPol pol = ( bit_pat & (1U << j) ) ? kPolPosi : kPolNega;
       Literal lit1(vid, pol);
-      if ( debug ) {
-	cout << " added clause = " << lit0 << " " << lit1 << endl;
-      }
       add_clause(lit0, lit1);
     }
     // 2つの変数が同時に true になってはいけないというルール
@@ -84,9 +76,6 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
       Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
       for (ymuint k = j + 1; k < ni; ++ k) {
 	Literal lit1(mIorderVarArray[i * ni + k], kPolNega);
-	if ( debug ) {
-	  cout << " added clause = " << lit0 << " " << lit1 << endl;
-	}
 	add_clause(lit0, lit1);
       }
     }
@@ -95,13 +84,6 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
     for (ymuint j = 0; j < ni; ++ j) {
       tmp_lits[j] = Literal(mIorderVarArray[i * ni + j], kPolPosi);
     }
-    if ( debug ) {
-      cout << " added clause = ";
-      for (ymuint x = 0; x < ni; ++ x) {
-	cout << " " << tmp_lits[x];
-      }
-      cout << endl;
-    }
     add_clause(tmp_lits);
 
     // 異なる LUT 入力におなじ入力が接続してはいけないというルール
@@ -109,9 +91,6 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
       Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
       for (ymuint k = 0; k < i; ++ k) {
 	Literal lit1(mIorderVarArray[k * ni + j], kPolNega);
-	if ( debug ) {
-	  cout << " added clause = " << lit0 << " " << lit1 << endl;
-	}
 	add_clause(lit0, lit1);
       }
     }
@@ -123,9 +102,6 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
 	Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
 	for (ymuint k = j + 1; k < ni; ++ k) {
 	  Literal lit1(mIorderVarArray[pred * ni + k], kPolNega);
-	  if ( debug ) {
-	    cout << " added clause = " << lit0 << " " << lit1 << endl;
-	  }
 	  add_clause(lit0, lit1);
 	}
       }

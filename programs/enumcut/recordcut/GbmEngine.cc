@@ -12,12 +12,6 @@
 
 BEGIN_NAMESPACE_YM
 
-BEGIN_NONAMESPACE
-
-const bool debug = false;
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス GbmEngine
 //////////////////////////////////////////////////////////////////////
@@ -31,18 +25,43 @@ GbmEngine::GbmEngine(SatSolver& solver,
 		     ymuint conf_num) :
   mSolver(solver),
   mNodeVarArray(node_num),
-  mConfVarArray(conf_num)
+  mConfVarArray(conf_num),
+  mDebug(false)
 {
   // configuration 変数を作る．
   for (ymuint i = 0; i < conf_num; ++ i) {
     VarId vid = mSolver.new_var();
     mConfVarArray[i] = vid;
+    if ( debug() ) {
+      cout << "conf_bits[" << i << "] = " << vid << endl;
+    }
   }
 }
 
 // @brief デストラクタ
 GbmEngine::~GbmEngine()
 {
+}
+
+// @brief debug フラグを立てる
+void
+GbmEngine::debug_on()
+{
+  mDebug = true;
+}
+
+// @brief debug フラグを降ろす
+void
+GbmEngine::debug_off()
+{
+  mDebug = false;
+}
+
+// @brief debug フラグの値を得る．
+bool
+GbmEngine::debug() const
+{
+  return mDebug;
 }
 
 // @brief ノードに対応するリテラルを登録する．
@@ -56,15 +75,11 @@ GbmEngine::set_node_var(ymuint id,
   mNodeVarArray[id] = lit;
 }
 
-// @brief ノードに対応する新しい変数を割り当てる．
-// @param[in] id ノード番号
-// @return 変数番号を返す．
+// @brief SAT用の新しい変数を作る．
 VarId
-GbmEngine::set_node_newvar(ymuint id)
+GbmEngine::new_var()
 {
-  VarId vid = mSolver.new_var();
-  set_node_var(id, GbmLit(vid));
-  return vid;
+  return mSolver.new_var();
 }
 
 // @brief 節を追加する．
@@ -73,6 +88,44 @@ GbmEngine::add_clause(Literal lit1,
 		      Literal lit2)
 {
   mSolver.add_clause(lit1, lit2);
+
+  if ( mDebug ) {
+    cout << " added clause (" << lit1 << " + " << lit2 << ")" << endl;
+  }
+}
+
+// @brief 節を追加する．
+void
+GbmEngine::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3)
+{
+  mSolver.add_clause(lit1, lit2, lit3);
+
+  if ( mDebug ) {
+    cout << " added clause ("
+	 << lit1 << " + "
+	 << lit2 << " + "
+	 << lit3 << ")" << endl;
+  }
+}
+
+// @brief 節を追加する．
+void
+GbmEngine::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4)
+{
+  mSolver.add_clause(lit1, lit2, lit3, lit4);
+
+  if ( mDebug ) {
+    cout << " added clause ("
+	 << lit1 << " + "
+	 << lit2 << " + "
+	 << lit3 << " + "
+	 << lit4 << ")" << endl;
+  }
 }
 
 // @brief 節を追加する．
@@ -80,6 +133,16 @@ void
 GbmEngine::add_clause(const vector<Literal>& lits)
 {
   mSolver.add_clause(lits);
+
+  if ( mDebug ) {
+    cout << " added clause (";
+    const char* plus = "";
+    for (ymuint i = 0; i < lits.size(); ++ i) {
+      cout << plus << lits[i];
+      plus = " + ";
+    }
+    cout << ")" << endl;
+  }
 }
 
 // @brief SAT モデルから設定変数の割り当てを取り出す．
@@ -129,6 +192,9 @@ GbmEngine::make_nodes_cnf(const RcfNetwork& network,
       // そうでなければ新しい変数を作る．
       VarId vid = mSolver.new_var();
       set_node_var(node->id(), GbmLit(vid));
+      if ( debug() ) {
+	cout << "Node#" << node->id() << ": " << vid << endl;
+      }
     }
     bool stat = make_node_cnf(node);
     if ( !stat ) {

@@ -43,6 +43,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief debug フラグを立てる
+  void
+  debug_on();
+
+  /// @brief debug フラグを降ろす
+  void
+  debug_off();
+
   /// @brief SAT モデルから設定変数の割り当てを取り出す．
   /// @param[in] model SAT モデル
   /// @param[out] conf_bits 設定変数の割り当て
@@ -56,18 +64,16 @@ protected:
   // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief debug フラグの値を得る．
+  bool
+  debug() const;
+
   /// @brief ノードに対応するリテラルを登録する．
   /// @param[in] id ノード番号
   /// @param[in] lit リテラル
   void
   set_node_var(ymuint id,
 	       GbmLit lit);
-
-  /// @brief ノードに対応する新しい変数を割り当てる．
-  /// @param[in] id ノード番号
-  /// @return 変数番号を返す．
-  VarId
-  set_node_newvar(ymuint id);
 
   /// @brief 内部ノードに変数番号を割り当て，CNF式を作る．
   /// @param[in] network 対象の LUT ネットワーク
@@ -79,10 +85,27 @@ protected:
 		 ymuint oid,
 		 ymuint oval);
 
+  /// @brief SAT用の新しい変数を作る．
+  VarId
+  new_var();
+
   /// @brief 節を追加する．
   void
   add_clause(Literal lit1,
 	     Literal lit2);
+
+  /// @brief 節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3);
+
+  /// @brief 節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4);
 
   /// @brief 節を追加する．
   void
@@ -149,6 +172,9 @@ private:
 
   // 設定変数番号をキーにしてSATソルバ上の変数番号を格納する配列
   vector<VarId> mConfVarArray;
+
+  // debug フラグ
+  bool mDebug;
 
 };
 

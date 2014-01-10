@@ -17,6 +17,7 @@ noinst_PROGRAMS = \
 	rec \
 	recordcut \
 	GbmSolverTest \
+	lut4match_test \
 	Lut443MatchTest
 
 # libgbm.la
@@ -162,3 +163,21 @@ Lut443MatchTest_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 Lut443MatchTest_LDFLAGS =
+
+# lut4match_test
+lut4match_test_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include
+
+lut4match_test_SOURCES = \
+	lut4match_test.cc
+
+lut4match_test_LDADD = \
+	libgbm.la \
+	$(top_builddir)/libec/libec.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+lut4match_test_LDFLAGS =

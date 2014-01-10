@@ -12,12 +12,6 @@
 
 BEGIN_NAMESPACE_YM
 
-BEGIN_NONAMESPACE
-
-const bool debug = false;
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス GbmEngineBinary
 //////////////////////////////////////////////////////////////////////
@@ -65,16 +59,19 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
   for (ymuint i = 0; i < ni; ++ i) {
     const RcfNode* node = network.input_node(i);
     ymuint id = node->id();
-    VarId vid = set_node_newvar(id);
-    if ( debug ) {
+    VarId vid = new_var();
+    set_node_var(id, GbmLit(vid));
+    if ( debug() ) {
       cout << " lut_input#" << i << ": " << vid << endl;
     }
 
-      // 入力と外部入力の間の関係式を作る．
+    ymuint base_i = i * mIorderBitWidth;
+
+    // 入力と外部入力の間の関係式を作る．
     vector<Literal> tmp_lits(mIorderBitWidth + 1);
     for (ymuint j = 0; j < ni; ++ j) {
       for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
-	VarId kvar = mIorderVarArray[i * mIorderBitWidth + k];
+	VarId kvar = mIorderVarArray[base_i + k];
 	// こちらは含意の左辺なので否定する．
 	if ( j & (1U << k) ) {
 	  tmp_lits[k] = Literal(kvar, kPolNega);
@@ -89,84 +86,129 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
       else {
 	tmp_lits[mIorderBitWidth] = Literal(vid, kPolNega);
       }
-      if ( debug ) {
-	cout << " added clause = ";
-	for (ymuint x = 0; x <= mIorderBitWidth; ++ x) {
-	  cout << " " << tmp_lits[x];
-	}
-	cout << endl;
-      }
       add_clause(tmp_lits);
     }
     // 使っていない変数の組み合わせを禁止する．
     vector<Literal> tmp_lits2(mIorderBitWidth);
-    for (ymuint j = ni; j < (1U << mIorderBitWidth); ++ j) {
+    for (ymuint b = ni; b < (1U << mIorderBitWidth); ++ b) {
       for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
-	VarId kvar = mIorderVarArray[i * mIorderBitWidth + k];
-	if ( j & (1U << k) ) {
+	VarId kvar = mIorderVarArray[base_i + k];
+	if ( b & (1U << k) ) {
 	  tmp_lits2[k] = Literal(kvar, kPolNega);
 	}
 	else {
 	  tmp_lits2[k] = Literal(kvar, kPolPosi);
 	}
       }
-      if ( debug ) {
-	cout << " added clause = ";
-	for (ymuint x = 0; x < mIorderBitWidth; ++ x) {
-	  cout << " " << tmp_lits2[x];
-	}
-	cout << endl;
-      }
       add_clause(tmp_lits2);
     }
 
-#if 0
     // 異なる LUT 入力におなじ入力が接続してはいけないというルール
-    for (ymuint j = 0; j < ni; ++ j) {
-      vector<Literal> tmp_lits3(mIorderBitWidth * 2);
-      for (ymuint k = 0; k < i; ++ k) {
-	for (ymuint l = 0; l < mIorderBitWidth; ++ l) {
-	  tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	  tmp_lits3[l] = Literal(mIorderVarArray[k * mIorderBitWidth + l], pol);
-	  tmp_lits3[l + mIorderBitWidth] = Literal(mIorderVarArray[i * mIorderBitWidth + l], pol);
+    for (ymuint j = 0; j < i; ++ j) {
+      ymuint base_j = j * mIorderBitWidth;
+      // 0ビット目が異なるときに真となる変数
+      VarId d0 = new_var();
+      if ( debug() ) {
+	cout << "diff[" << i << ", " << j << "][0] = " << d0 << endl;
+      }
+      Literal d0_lit(d0, kPolPosi);
+      Literal xi0_lit(mIorderVarArray[base_i + 0], kPolPosi);
+      Literal xj0_lit(mIorderVarArray[base_j + 0], kPolPosi);
+      add_clause(~d0_lit,  xi0_lit,  xj0_lit);
+      add_clause(~d0_lit, ~xi0_lit, ~xj0_lit);
+      add_clause( d0_lit,  xi0_lit, ~xj0_lit);
+      add_clause( d0_lit, ~xi0_lit,  xj0_lit);
+      for (ymuint k = 1; k < mIorderBitWidth; ++ k) {
+	Literal xik_lit(mIorderVarArray[base_i + k], kPolPosi);
+	Literal xjk_lit(mIorderVarArray[base_j + k], kPolPosi);
+	if ( k == mIorderBitWidth - 1 ) {
+	  add_clause( d0_lit,  xik_lit,  xjk_lit);
+	  add_clause( d0_lit, ~xik_lit, ~xjk_lit);
 	}
-	if ( debug ) {
-	  cout << " added clause = ";
-	  for (ymuint x = 0; x < mIorderBitWidth; ++ x) {
-	    cout << " " << tmp_lits3[x];
+	else {
+	  VarId dk = new_var();
+	  if ( debug() ) {
+	    cout << "diff[" << i << ", " << j << "][" << k << "] = " << dk << endl;
 	  }
-	  cout << endl;
+	  Literal dk_lit(dk, kPolPosi);
+	  add_clause(~dk_lit,  d0_lit,  xik_lit,  xjk_lit);
+	  add_clause(~dk_lit,  d0_lit, ~xik_lit, ~xjk_lit);
+
+	  add_clause( dk_lit, ~d0_lit,  xik_lit, ~xjk_lit);
+	  add_clause( dk_lit, ~d0_lit, ~xik_lit,  xjk_lit);
+	  d0_lit = dk_lit;
 	}
-	add_clause(tmp_lits3);
       }
     }
 
     // 対称性を考慮したルール
     ymuint pred;
     if ( network.get_pred(i, pred) ) {
-      for (ymuint j = 0; j < ni; ++ j) {
-	vector<Literal> tmp_lits3(mIorderBitWidth * 2);
-	for (ymuint l = 0; l < m; ++ l) {
-	  tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	  tmp_lits3[l] = Literal(mIorderVarArray[i * mIorderBitWidth + l], pol);
+      // 最上位ビットで Vi > Vj となる条件
+      VarId gm = new_var();
+      if ( debug() ) {
+	cout << "gt[" << i << ", " << pred << "][" << (mIorderBitWidth - 1) << "] = " << gm << endl;
+      }
+      Literal gm_lit(gm, kPolPosi);
+      // 最上位ビットが等しい条件
+      VarId em = new_var();
+      if ( debug() ) {
+	cout << "eq[" << i << ", " << pred << "][" << (mIorderBitWidth - 1) << "] = " << em << endl;
+      }
+      ymuint base_j = pred * mIorderBitWidth;
+      Literal em_lit(em, kPolPosi);
+      Literal xm_lit(mIorderVarArray[base_i + mIorderBitWidth - 1], kPolPosi);
+      Literal ym_lit(mIorderVarArray[base_j + mIorderBitWidth - 1], kPolPosi);
+      add_clause(~gm_lit,  xm_lit);
+      add_clause(~gm_lit, ~ym_lit);
+
+      add_clause( gm_lit, ~xm_lit,  ym_lit);
+
+      add_clause(~em_lit,  xm_lit, ~ym_lit);
+      add_clause(~em_lit, ~xm_lit,  ym_lit);
+
+      add_clause( em_lit,  xm_lit,  ym_lit);
+      add_clause( em_lit, ~xm_lit, ~ym_lit);
+      for (ymuint k = mIorderBitWidth - 2; ; -- k) {
+	Literal xk_lit(mIorderVarArray[base_i + k], kPolPosi);
+	Literal yk_lit(mIorderVarArray[base_j + k], kPolPosi);
+	if ( k == 0 ) {
+	  add_clause( gm_lit,  em_lit);
+	  add_clause( gm_lit,  xk_lit);
+	  add_clause( gm_lit, ~yk_lit);
+	  break;
 	}
-	for (ymuint k = j + 1; k < ni; ++ k) {
-	  for (ymuint l = 0; l < mIorderBitWidth; ++ l) {
-	    tPol pol = ( j & (1U << l) ) ? kPolNega : kPolPosi;
-	    tmp_lits3[l + mIorderBitWidth] = Literal(mIorderVarArray[pred * mIorderBitWidth + l], pol);
+	else {
+	  // k ビット以上で Vi > Vj となる条件
+	  VarId gk = new_var();
+	  if ( debug() ) {
+	    cout << "gt[" << i << ", " << pred << "][" << k << "] = " << gk << endl;
 	  }
-	  if ( debug ) {
-	    cout << " added clause = ";
-	    for (ymuint x = 0; x < mIorderBitWidth; ++ x) {
-	      cout << " " << tmp_lits3[x];
-	    }
-	    cout << endl;
+	  Literal gk_lit(gk, kPolPosi);
+	  // k ビット以上で Vi = Vj となる条件
+	  VarId ek = new_var();
+	  if ( debug() ) {
+	    cout << "eq[" << i << ", " << pred << "][" << k << "] = " << ek << endl;
 	  }
-	  add_clause(tmp_lits3);
+	  Literal ek_lit(ek, kPolPosi);
+	  add_clause(~gk_lit,  gm_lit,  em_lit);
+	  add_clause(~gk_lit,  gm_lit,  xk_lit);
+	  add_clause(~gk_lit,  gm_lit, ~yk_lit);
+
+	  add_clause( gk_lit, ~gm_lit);
+	  add_clause( gk_lit, ~em_lit, ~xk_lit,  yk_lit);
+
+	  add_clause(~ek_lit,  em_lit);
+	  add_clause(~ek_lit,  xk_lit, ~yk_lit);
+	  add_clause(~ek_lit, ~xk_lit,  yk_lit);
+
+	  add_clause( ek_lit, ~em_lit,  xk_lit,  yk_lit);
+	  add_clause( ek_lit, ~em_lit, ~xk_lit, ~yk_lit);
+	  gm_lit = gk_lit;
+	  em_lit = ek_lit;
 	}
       }
     }
-#endif
   }
 
   return make_nodes_cnf(network, oid, oval);
