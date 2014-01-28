@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libseal_io_cmds.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libseal_io_cmds.la
 
 libseal_io_cmds_la_SOURCES = \
 	SealMsgHandler.h \

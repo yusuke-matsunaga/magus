@@ -19,7 +19,7 @@ TESTS =
 noinst_PROGRAMS = \
 	gbm_test
 
-gbm_test_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

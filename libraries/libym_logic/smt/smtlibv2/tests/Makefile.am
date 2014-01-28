@@ -21,6 +21,15 @@ testsubdir = testSubDir
 distclean-local:
 	-rm -rf $(testsubdir)
 
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/parser \
+	-I$(top_builddir)/parser
+
+
 bin_PROGRAMS =
 
 
@@ -33,12 +42,6 @@ noinst_PROGRAMS = \
 ############################################################
 ## lextest
 ############################################################
-lextest_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/parser \
-	-I$(top_builddir)/parser
 
 lextest_SOURCES = \
 	lextest.cc
@@ -51,12 +54,6 @@ lextest_LDADD = \
 ############################################################
 ## parsertest
 ############################################################
-parsertest_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/parser \
-	-I$(top_builddir)/parser
 
 parsertest_SOURCES = \
 	parsertest.cc

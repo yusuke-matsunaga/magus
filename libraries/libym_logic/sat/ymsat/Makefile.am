@@ -6,11 +6,14 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_sat_ymsat.la
 
-libym_sat_ymsat_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+noinst_LTLIBRARIES = libym_sat_ymsat.la
+
 
 libym_sat_ymsat_la_SOURCES = \
 	AssignList.h \

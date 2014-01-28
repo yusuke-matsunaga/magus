@@ -4,14 +4,14 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	$(TCL_INCLUDES) \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libseal_testvect.la
+
+AM_CPPFLAGS = \
+	$(TCL_INCLUDES) \
+	$(YM_INCLUDES) \
+	-I$(top_srcdir)/include
 
 libseal_testvect_la_SOURCES = \
 	TestVector.cc

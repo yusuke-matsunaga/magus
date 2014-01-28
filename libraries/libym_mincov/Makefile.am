@@ -7,15 +7,15 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_mincov.la
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_mincov_la_SOURCES = \
 	MincovCost.cc \

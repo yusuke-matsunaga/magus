@@ -7,14 +7,14 @@ SUBDIRS = \
 	. \
 	tests
 
-INCLUDES = \
-	$(GMP_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_seal.la
+
+AM_CPPFLAGS = \
+	$(GMP_INCLUDES) \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_seal_la_SOURCES = \
 	BddFsm.h \

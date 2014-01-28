@@ -15,7 +15,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LTLIBRARIES = libym_gbm.la
 
 # libym_gbm.la
-libym_gbm_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

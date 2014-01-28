@@ -7,8 +7,6 @@
 
 SUBDIRS =
 
-AM_YFLAGS = -d -v
-
 CLEANFILES = \
 	mislib_grammer.cc \
 	mislib_grammer.hh \
@@ -29,9 +27,11 @@ noinst_LTLIBRARIES = libym_cell_mislib.la
 ## Variables for building libym_cell_mislib.la
 ############################################################
 
-libym_cell_mislib_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+AM_YFLAGS = -d -v
 
 libym_cell_mislib_la_SOURCES = \
 	CellMislibReader.cc \

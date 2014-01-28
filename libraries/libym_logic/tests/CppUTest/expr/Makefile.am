@@ -11,6 +11,12 @@ EXTRA_DIST =
 MAINTAINERCLEANFILES = Makefile.in
 
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(CPPUTEST_INCLUDES)
+
+
 noinst_LTLIBRARIES = \
 	libym_logic_cpputest_expr.la
 
@@ -18,10 +24,6 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## libym_logic_cpputest_expr_la
 ############################################################
-libym_logic_cpputest_expr_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(CPPUTEST_INCLUDES)
 
 libym_logic_cpputest_expr_la_SOURCES = \
 	LogExprTest.cc

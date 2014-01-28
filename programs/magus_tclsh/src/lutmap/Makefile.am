@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libmagus_lutmap_tcl.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libmagus_lutmap_tcl.la
 
 libmagus_lutmap_tcl_la_SOURCES = \
 	Ln2BNet.h \

@@ -9,7 +9,7 @@ noinst_LTLIBRARIES = libym_cell_python.la
 ## libym_cell_python.la
 ############################################################
 
-libym_cell_python_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(PYTHON_CPPFLAGS)

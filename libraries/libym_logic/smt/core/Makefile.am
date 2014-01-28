@@ -6,11 +6,14 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_logic_smt_core.la
 
-libym_logic_smt_core_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+noinst_LTLIBRARIES = libym_logic_smt_core.la
+
 
 libym_logic_smt_core_la_SOURCES = \
 	SmtFunImpl.h \

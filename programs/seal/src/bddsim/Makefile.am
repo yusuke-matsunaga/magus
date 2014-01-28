@@ -4,14 +4,14 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	$(TCL_INCLUDES) \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libseal_bddsim.la
+
+AM_CPPFLAGS = \
+	$(TCL_INCLUDES) \
+	$(YM_INCLUDES) \
+	-I$(top_srcdir)/include
 
 libseal_bddsim_la_SOURCES = \
 	BddsimCmd.h \
@@ -21,7 +21,7 @@ libseal_bddsim_la_SOURCES = \
 	SimNode.h \
 	SimNode.cc \
 	bddsim_init.cc \
-	nsdef.h 
+	nsdef.h
 
 libseal_bddsim_la_LDFLAGS =
 

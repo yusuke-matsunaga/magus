@@ -8,7 +8,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_techmap_sbj.la
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

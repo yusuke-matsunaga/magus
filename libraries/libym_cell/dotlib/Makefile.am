@@ -9,6 +9,10 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 
 ############################################################
 ## Variables for building targets
@@ -20,10 +24,6 @@ noinst_LTLIBRARIES = libym_cell_dotlib.la
 ############################################################
 ## Variables for building libym_cell_dotlib.la
 ############################################################
-
-libym_cell_dotlib_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_cell_dotlib_la_SOURCES = \
 	CellDotlibReader.cc \

@@ -4,16 +4,16 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libmagus_test.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/magus_tclsh/include
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libmagus_test.la
 
 libmagus_test_la_LIBADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \

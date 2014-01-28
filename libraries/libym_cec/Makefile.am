@@ -11,7 +11,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_cec.la
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

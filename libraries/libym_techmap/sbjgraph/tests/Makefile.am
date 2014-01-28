@@ -4,10 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -30,6 +26,10 @@ LIBYM_BNET = $(YMTOOLS_BUILDDIR)/libraries/libym_bnet/libym_bnet.la
 bin_PROGRAMS = \
 	read_blif \
 	mindepth_test
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 read_blif_SOURCES = \
 	read_blif.cc

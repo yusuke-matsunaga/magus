@@ -4,13 +4,14 @@
 
 SUBDIRS =
 
-AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
+
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 YM_BASE = $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 

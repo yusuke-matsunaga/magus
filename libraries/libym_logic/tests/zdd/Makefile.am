@@ -4,25 +4,10 @@
 
 SUBDIRS =
 
-YFLAGS=-d -v
-
-EXTRA_DIST = local_defs $(TESTS)
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
-
-TESTS = \
-	base_test
-
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -33,7 +18,12 @@ YM_BDD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
+
 noinst_LTLIBRARIES = libymzddtest.la
+
+noinst_PROGRAMS = \
+	base_test
+
 
 libymzddtest_la_SOURCES = \
 	zddtest.h \
@@ -44,9 +34,6 @@ libymzddtest_la_SOURCES = \
 libymzddtest_la_LIBADD =
 
 libymzddtest_la_LDFLAGS =
-
-noinst_PROGRAMS = \
-	base_test
 
 
 base_test_SOURCES = \

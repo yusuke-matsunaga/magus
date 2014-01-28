@@ -2,18 +2,24 @@
 
 SUBDIRS =
 
+CLEANFILES =
 
-noinst_LTLIBRARIES = libym_logic_python.la
+MAINTAINERCLEANFILES = Makefile.in
 
-############################################################
-## libym_logic_python.la
-############################################################
 
-libym_logic_python_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(GMP_INCLUDES) \
 	$(PYTHON_CPPFLAGS)
+
+
+noinst_LTLIBRARIES = libym_logic_python.la
+
+
+############################################################
+## libym_logic_python.la
+############################################################
 
 libym_logic_python_la_SOURCES = \
 	pylogic_init.cc \

@@ -4,13 +4,13 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libmagus_lutmap_old.la
+
+AM_CPPFLAGS = \
+	$(YM_INCLUDES) \
+	-I$(top_srcdir)/include
 
 libmagus_lutmap_old_la_SOURCES = \
 	lutmap.h \

@@ -4,23 +4,10 @@
 
 SUBDIRS =
 
-EXTRA_DIST = $(TESTS)
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
-
-TESTS = \
-	npn.test
-
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -42,6 +29,7 @@ noinst_PROGRAMS = \
 	cofactor_test \
 	npn_check3 \
 	$(NPN_CHECK)
+
 
 tvfunc_test_SOURCES = \
 	TvFuncTest.h \

@@ -7,6 +7,12 @@ SUBDIRS =
 MAINTAINERCLEANFILES = Makefile.in
 
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(GMP_INCLUDES)
+
+
 ############################################################
 ## Variables for building targets
 ############################################################
@@ -17,11 +23,6 @@ noinst_LTLIBRARIES = libym_logic_zdd.la
 ############################################################
 ## Variables for building libym_logic_zdd.la
 ############################################################
-
-libym_logic_zdd_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(GMP_INCLUDES)
 
 libym_logic_zdd_la_SOURCES = \
 	CompTbl.h \

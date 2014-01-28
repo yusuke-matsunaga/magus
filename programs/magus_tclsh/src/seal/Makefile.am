@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libmagus_seal_tcl.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libmagus_seal_tcl.la
 
 libmagus_seal_tcl_la_SOURCES = \
 	SealCmd.h \

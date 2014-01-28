@@ -4,31 +4,19 @@
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-#TESTS = \
-#	base_test
-
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
-
-noinst_PROGRAMS = \
-	pylogic_test
-
-pylogic_test_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(PYTHON_CPPFLAGS)
+
+
+noinst_PROGRAMS = \
+	pylogic_test
 
 pylogic_test_SOURCES = \
 	pylogic_test.cc

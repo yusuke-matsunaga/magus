@@ -11,7 +11,9 @@ CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
 noinst_LTLIBRARIES = libym_logic_smt_smtlibv2.la
+
 
 libym_logic_smt_smtlibv2_la_SOURCES =
 
@@ -21,3 +23,6 @@ libym_logic_smt_smtlibv2_la_LIBADD = \
 
 libym_logic_smt_smtlibv2_la_LDFLAGS = \
 	-lreadline -lncurses
+
+# Dummy C++ source to cause C++ linking.
+nodist_EXTRA_libym_logic_smt_la_SOURCES = dummy.cc

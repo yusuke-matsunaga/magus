@@ -6,6 +6,11 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(GMP_INCLUDES)
+
 
 ############################################################
 ## Variables for building targets
@@ -17,11 +22,6 @@ noinst_LTLIBRARIES = libym_logic_cnfdd.la
 ############################################################
 ## Variables for building libym_logic_cnfdd.la
 ############################################################
-
-libym_logic_cnfdd_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(GMP_INCLUDES)
 
 libym_logic_cnfdd_la_SOURCES = \
 	CompTbl.h \
@@ -83,4 +83,3 @@ libym_logic_cnfdd_la_SOURCES = \
 libym_logic_cnfdd_la_LIBADD =
 
 libym_logic_cnfdd_la_LDFLAGS =
-

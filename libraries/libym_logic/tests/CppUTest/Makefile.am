@@ -13,17 +13,11 @@ EXTRA_DIST =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS = \
-	SmtIdMgrTest
-
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(CPPUTEST_INCLUDES)
 
 
 noinst_PROGRAMS = \
@@ -36,10 +30,6 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## run_all_test
 ############################################################
-run_all_test_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(CPPUTEST_INCLUDES)
 
 run_all_test_SOURCES = \
 	main.cc \
@@ -57,10 +47,6 @@ run_all_test_LDFLAGS = \
 ############################################################
 ## libym_logic_cpputest_la
 ############################################################
-libym_logic_cpputest_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(CPPUTEST_INCLUDES)
 
 libym_logic_cpputest_la_SOURCES =
 

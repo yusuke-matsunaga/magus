@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libmagus_misc_tcl.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libmagus_misc_tcl.la
 
 libmagus_misc_tcl_la_SOURCES = \
 	TimeCmd.h \
@@ -22,4 +22,3 @@ libmagus_misc_tcl_la_SOURCES = \
 	misc_init.cc
 
 libmagus_misc_tcl_la_LIBADD =
-

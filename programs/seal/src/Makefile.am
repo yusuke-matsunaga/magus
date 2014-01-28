@@ -16,14 +16,14 @@ AM_CXXFLAGS = \
 	-DSEAL_DATADIR='"$(SEAL_DATADIR)"' \
 	-DSEAL_BINDIR='"$(SEAL_BINDIR)"'
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)
-
-MAINTAINERCLEANFILES = Makefile.in
 
 bin_PROGRAMS = \
 	seal_tclsh

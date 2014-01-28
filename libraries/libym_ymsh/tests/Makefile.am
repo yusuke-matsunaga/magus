@@ -7,10 +7,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -32,6 +28,10 @@ LIBYM_YMSH = \
 
 noinst_PROGRAMS = \
 	ymsh_test
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 ymsh_test_SOURCES = \
 	ymsh_test.cc

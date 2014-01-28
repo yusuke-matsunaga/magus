@@ -4,10 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -25,6 +21,10 @@ distclean-local:
 	-rm -rf $(testsubdir)
 
 #LIBYM_NET = $(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 #bin_PROGRAMS = \
 #	makenode \

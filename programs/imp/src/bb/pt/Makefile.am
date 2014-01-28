@@ -2,15 +2,15 @@
 
 ## $Id: Makefile.am 697 2007-05-28 17:10:53Z matsunaga $
 
-INCLUDES = \
-	-I $(YMTOOLS_SRCDIR)/include \
-	-I $(YMTOOLS_BUILDDIR)/include \
-	-I $(top_srcdir)/src/bb/include
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = \
 	libbb_pt.la
+
+AM_CPPFLAGS = \
+	-I $(YMTOOLS_SRCDIR)/include \
+	-I $(YMTOOLS_BUILDDIR)/include \
+	-I $(top_srcdir)/src/bb/include
 
 libbb_pt_la_SOURCES = \
 	Assign.cc \

@@ -4,10 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_BUILDDIR) \
-	-I$(YMTOOLS_SRCDIR)/include
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -29,7 +25,7 @@ distclean-local:
 bin_PROGRAMS = \
 	cec_test
 
-cec_test_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

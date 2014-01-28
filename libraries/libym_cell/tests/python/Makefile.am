@@ -25,7 +25,7 @@ distclean-local:
 noinst_PROGRAMS = \
 	pycell_test
 
-pycell_test_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(PYTHON_CPPFLAGS)

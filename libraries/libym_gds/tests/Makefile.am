@@ -2,9 +2,6 @@
 
 ## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
 EXTRA_DIST = local_defs $(TESTS)
 
@@ -29,6 +26,10 @@ noinst_PROGRAMS = \
 	gdsparse \
 	gdsprint \
 	gdsencode
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
 
 gdsparse_SOURCES = \
 	gdsparse.cc

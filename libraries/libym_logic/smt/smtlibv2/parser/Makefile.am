@@ -9,6 +9,12 @@ CLEANFILES =
 MAINTAINERCLEANFILES = Makefile.in
 
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/smt/smtlibv2/include
+
+
 ############################################################
 ## build targets
 ############################################################
@@ -19,10 +25,6 @@ noinst_LTLIBRARIES = \
 ############################################################
 ## libym_smt_parser.la
 ############################################################
-libym_smt_parser_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/smt/smtlibv2/include
 
 libym_smt_parser_la_SOURCES = \
 	SmtLibScanner.h \

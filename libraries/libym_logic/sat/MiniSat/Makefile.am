@@ -6,15 +6,14 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_minisat.la
 
-libym_minisat_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_minisat_la_LIBADD =
 
-libym_minisat_la_LDFLAGS =
+noinst_LTLIBRARIES = libym_minisat.la
+
 
 libym_minisat_la_SOURCES = \
 	SatSolverMiniSat.h \
@@ -27,3 +26,6 @@ libym_minisat_la_SOURCES = \
 	Sort.h \
 	VarOrder.h
 
+libym_minisat_la_LIBADD =
+
+libym_minisat_la_LDFLAGS =

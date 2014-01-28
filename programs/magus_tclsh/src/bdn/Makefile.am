@@ -2,15 +2,15 @@
 
 ## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libmagus_logbase_tcl.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libmagus_logbase_tcl.la
 
 libmagus_logbase_tcl_la_SOURCES = \
 	MvnReadVerilog.h \

@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libseal_misc.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libseal_misc.la
 
 libseal_misc_la_SOURCES = \
 	TimeCmd.h \

@@ -29,7 +29,7 @@ noinst_LTLIBRARIES = libym_cell.la
 ## Variables for building libym_cell.la
 ############################################################
 
-libym_cell_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 

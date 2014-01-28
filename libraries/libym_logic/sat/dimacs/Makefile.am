@@ -6,12 +6,15 @@ SUBDIRS =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_sat_dimacs.la
 
-libym_sat_dimacs_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
+
+
+noinst_LTLIBRARIES = libym_sat_dimacs.la
+
 
 libym_sat_dimacs_la_SOURCES = \
 	DimacsParser.cc \

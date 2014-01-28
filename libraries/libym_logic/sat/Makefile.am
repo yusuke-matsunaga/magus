@@ -10,12 +10,15 @@ SUBDIRS = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_logic_sat.la
 
-libym_logic_sat_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/sat/include
+
+
+noinst_LTLIBRARIES = libym_logic_sat.la
+
 
 libym_logic_sat_la_SOURCES = \
 	SatSolver.cc \

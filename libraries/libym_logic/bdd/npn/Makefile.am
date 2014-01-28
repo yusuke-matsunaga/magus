@@ -5,14 +5,14 @@
 ## $Revision: 1.3 $
 ## $Date: 2006/05/31 03:24:25 $
 
-INCLUDES = \
-	-I$(top_builddir) \
-	-I$(top_srcdir) \
-	$(GMP_INCLUDES)
-
 MAINTAINERCLEANFILES = Makefile.in
 
 noinst_LTLIBRARIES = libym_bdd_npn.la
+
+AM_CPPFLAGS = \
+	-I$(top_builddir) \
+	-I$(top_srcdir) \
+	$(GMP_INCLUDES)
 
 libym_bdd_npn_la_LIBADD =
 

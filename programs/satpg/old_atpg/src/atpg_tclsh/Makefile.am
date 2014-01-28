@@ -4,22 +4,22 @@
 
 SUBDIRS =
 
+MAINTAINERCLEANFILES = Makefile.in
+
+bin_PROGRAMS = \
+	atpg_tclsh
+
 AM_CXXFLAGS = \
 	-DATPG_LIBDIR='"$(ATPG_LIBDIR)"' \
 	-DATPG_DATADIR='"$(ATPG_DATADIR)"' \
 	-DATPG_BINDIR='"$(ATPG_BINDIR)"'
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/old_atpg/include
-
-MAINTAINERCLEANFILES = Makefile.in
-
-bin_PROGRAMS = \
-	atpg_tclsh
 
 atpg_tclsh_SOURCES = \
 	tclAppInit.cc \

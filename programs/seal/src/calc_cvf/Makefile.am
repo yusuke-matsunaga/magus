@@ -4,15 +4,15 @@
 
 SUBDIRS =
 
-INCLUDES = \
+MAINTAINERCLEANFILES = Makefile.in
+
+noinst_LTLIBRARIES = libseal_calc_cvf.la
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)
-
-MAINTAINERCLEANFILES = Makefile.in
-
-noinst_LTLIBRARIES = libseal_calc_cvf.la
 
 libseal_calc_cvf_la_SOURCES = \
 	nsdef.h \

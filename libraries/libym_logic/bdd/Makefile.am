@@ -11,6 +11,10 @@ SUBDIRS = \
 
 MAINTAINERCLEANFILES = Makefile.in
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
 
 ############################################################
 ## Variables for building targets
@@ -22,10 +26,6 @@ noinst_LTLIBRARIES = libym_logic_bdd.la
 ############################################################
 ## Variables for building libym_logic_bdd.la
 ############################################################
-
-libym_logic_bdd_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_logic_bdd_la_SOURCES =
 

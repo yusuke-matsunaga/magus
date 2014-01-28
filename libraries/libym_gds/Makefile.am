@@ -7,8 +7,6 @@ SUBDIRS = \
 	. \
 	tests
 
-AM_YFLAGS = -d -v
-
 CLEANFILES = \
 	gds_grammer.cc \
 	gds_grammer.hh \
@@ -16,6 +14,13 @@ CLEANFILES = \
 	gds_grammer.output
 
 MAINTAINERCLEANFILES = Makefile.in
+
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+AM_YFLAGS = -d -v
 
 
 ############################################################
@@ -28,10 +33,6 @@ noinst_LTLIBRARIES = libym_gds.la
 ############################################################
 ## Variables for building libym_gds.la
 ############################################################
-
-libym_gds_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
 libym_gds_la_SOURCES = \
 	gds_grammer.yy \

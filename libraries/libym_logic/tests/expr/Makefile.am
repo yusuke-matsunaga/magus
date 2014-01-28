@@ -4,23 +4,9 @@
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
-
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
-
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
-
-#TESTS = \
-#	base_test
-
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -29,6 +15,7 @@ AM_CPPFLAGS = \
 YM_LEXP = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_logic.la \
         $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
 
 #noinst_PROGRAMS = \
 #	base_test

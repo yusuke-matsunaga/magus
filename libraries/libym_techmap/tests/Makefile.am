@@ -4,11 +4,6 @@
 
 SUBDIRS =
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_techmap
-
 EXTRA_DIST = local_defs $(TESTS)
 
 MAINTAINERCLEANFILES = Makefile.in
@@ -35,6 +30,11 @@ LIBYM_TECHMAP = \
 
 bin_PROGRAMS = \
 	areacover_test
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_techmap
 
 areacover_test_SOURCES = \
 	areacover_test.cc

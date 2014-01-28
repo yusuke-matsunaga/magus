@@ -30,9 +30,9 @@ nodist_ptview_SOURCES = \
 	VerilogView.moc.cc \
 	ParseTreeView.moc.cc
 
-ptview_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
+AM_CXXFLAGS = $(QT_CXXFLAGS)
 
-ptview_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir) \
@@ -49,4 +49,3 @@ ptview_LDADD = \
 BUILT_SOURCES = \
 	VerilogView.moc.cc \
 	ParseTreeView.moc.cc
-
