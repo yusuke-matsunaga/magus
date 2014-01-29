@@ -1,12 +1,39 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 557 2007-04-09 05:05:15Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 noinst_LTLIBRARIES = libmagus_test.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
 AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
@@ -15,10 +42,17 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/magus_tclsh/include
 
-libmagus_test_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
-libmagus_test_la_LDFLAGS =
+
+############################################################
+## libmagus_test.la 用の変数の定義
+############################################################
+
 libmagus_test_la_SOURCES = \
 	TestCmd.h \
 	TestCmd.cc
+
+libmagus_test_la_LIBADD =
+
+libmagus_test_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la

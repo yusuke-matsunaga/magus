@@ -1,6 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2203 2009-04-16 05:04:40Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	sat_engine \
@@ -8,17 +11,45 @@ SUBDIRS = \
 	dop \
 	uop
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
 
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 noinst_LTLIBRARIES = libatpg_dtpg.la
 
-libatpg_dtpg_la_CPPFLAGS = \
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src \
 	$(GMP_INCLUDES)
+
+
+############################################################
+## libatpg_dtpg.la 用の変数の定義
+############################################################
 
 libatpg_dtpg_la_SOURCES = \
 	DtpgSat.h \
@@ -30,10 +61,10 @@ libatpg_dtpg_la_SOURCES = \
 	DtpgNodeGroup.cc \
 	SatEngine.h
 
-libatpg_dtpg_la_LDFLAGS =
-
 libatpg_dtpg_la_LIBADD = \
 	sat_engine/libatpg_sat_engine.la \
 	bt/libatpg_bt.la \
 	dop/libatpg_dop.la \
 	uop/libatpg_uop.la
+
+libatpg_dtpg_la_LDFLAGS =

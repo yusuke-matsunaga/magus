@@ -1,20 +1,54 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	ym_seal \
 	. \
 	tests
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST = \
+	configure \
+	configure.ac
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 noinst_LTLIBRARIES = libym_seal.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
 AM_CPPFLAGS = \
 	$(GMP_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## libym_seal.la 用の変数の定義
+############################################################
 
 libym_seal_la_SOURCES = \
 	BddFsm.h \
@@ -36,8 +70,7 @@ libym_seal_la_SOURCES = \
 
 libym_seal_la_LIBADD =
 
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
-
 libym_seal_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 	$(GMP_LIBS)

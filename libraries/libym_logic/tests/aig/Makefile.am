@@ -1,24 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_aig/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.2 $
-## $Date: 2006/02/21 18:04:13 $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_PROGRAMS = \
+	genpat \
+	enum_pat3
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 
-noinst_PROGRAMS = \
-	genpat \
-	enum_pat3
-
+############################################################
+## genpat 用の変数の指定
+############################################################
 
 genpat_SOURCES = \
 	GpNode.h \
@@ -28,9 +54,17 @@ genpat_SOURCES = \
 genpat_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
 
+genpat_LDFLAGS =
+
+
+############################################################
+## enum_pat3 用の変数の指定
+############################################################
 
 enum_pat3_SOURCES = \
 	enum_pat3.cc
 
 enum_pat3_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+
+enum_pat3_LDFLAGS =

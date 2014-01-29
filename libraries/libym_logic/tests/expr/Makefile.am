@@ -1,21 +1,32 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
 
-YM_LEXP = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_logic.la \
-        $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+############################################################
+## dist ターゲットの指定
+############################################################
 
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 #noinst_PROGRAMS = \
 #	base_test
@@ -25,3 +36,21 @@ YM_LEXP = \
 
 #base_test_LDADD = \
 #	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_lexp.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## 共通の変数の定義
+############################################################
+
+YM_LEXP = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_lexp/libym_logic.la \
+        $(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

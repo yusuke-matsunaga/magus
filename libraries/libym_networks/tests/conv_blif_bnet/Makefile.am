@@ -1,29 +1,49 @@
 ## Process this file with automake to produce Makefile.in
 
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-#TESTS = \
-#	read_blif.test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 bin_PROGRAMS = \
 	bliftest
 
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## bliftest 用の変数の定義
+############################################################
 
 bliftest_SOURCES = \
 	bliftest.cc
@@ -35,3 +55,5 @@ bliftest_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_blif/libym_blif.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+bliftest_LDFLAGS =

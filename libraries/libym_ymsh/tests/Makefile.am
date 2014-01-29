@@ -1,39 +1,55 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_aig/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.2 $
-## $Date: 2006/02/21 18:04:13 $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS =
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
 
-LIBYM_YMSH = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_ymsh/libym_ymsh.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_PROGRAMS = \
 	ymsh_test
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
+
+############################################################
+## ymsh_test 用の変数の定義
+############################################################
+
 ymsh_test_SOURCES = \
 	ymsh_test.cc
+
 ymsh_test_LDADD = \
-	$(LIBYM_YMSH)
+	$(YMTOOLS_BUILDDIR)/libraries/libym_ymsh/libym_ymsh.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+ymsh_test_LDFLAGS =

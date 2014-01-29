@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2275 2009-06-10 10:56:15Z matsunaga $
 
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	include \
@@ -9,9 +11,19 @@ SUBDIRS = \
 	tests \
 	programs
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
 CLEANFILES = doxygen.warnings
 
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
 
 EXTRA_DIST = \
 	BUILDING \
@@ -21,8 +33,10 @@ EXTRA_DIST = \
 	configure \
 	configure.ac \
 	etc/autogen.tmpl \
+	etc/autogen.common \
 	etc/autotroll.mk \
 	etc/common_defs \
+	etc/update \
 	etc/mk.subr \
 	m4macros/autotroll.m4 \
 	m4macros/gmp.m4
@@ -33,8 +47,9 @@ EXTRA_DIST = \
 	mkautogen
 
 
+############################################################
+## Doxygen 用の記述
+############################################################
+
 dox:
 	@DOXYGEN@
-
-
-

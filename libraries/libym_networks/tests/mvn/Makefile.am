@@ -1,22 +1,51 @@
 ## Process this file with automake to produce Makefile.in
 
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-#TESTS = \
-#	read_blif.test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_PROGRAMS = \
+	makenode_test \
+	read_test
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
+
+
+############################################################
+## 共通の変数の定義
+############################################################
 
 LIBYM_NET = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
@@ -25,13 +54,10 @@ LIBYM_NET = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-noinst_PROGRAMS = \
-	makenode_test \
-	read_test
 
-AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+############################################################
+## makenode_test 用の変数の定義
+############################################################
 
 makenode_test_SOURCES = \
 	makenode_test.cc
@@ -39,14 +65,18 @@ makenode_test_SOURCES = \
 makenode_test_LDADD = \
 	$(LIBYM_NET)
 
-read_test_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	@POPT_INCLUDES@
+makenode_test_LDFLAGS =
+
+
+############################################################
+## read_test 用の変数の定義
+############################################################
 
 read_test_SOURCES = \
 	read_test.cc
 
 read_test_LDADD = \
-	$(LIBYM_NET) \
+	$(LIBYM_NET)
+
+read_test_LDFLAGS = \
 	@POPT_LIBS@

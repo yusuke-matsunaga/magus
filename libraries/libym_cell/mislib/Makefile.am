@@ -1,11 +1,16 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_cell/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.1.1.1 $
-## $Date: 2005/12/11 17:07:26 $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES = \
 	mislib_grammer.cc \
@@ -17,14 +22,21 @@ MAINTAINERCLEANFILES = Makefile.in
 
 
 ############################################################
-## Variables for building targets
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
 ############################################################
 
 noinst_LTLIBRARIES = libym_cell_mislib.la
 
 
 ############################################################
-## Variables for building libym_cell_mislib.la
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
 AM_CPPFLAGS = \
@@ -32,6 +44,11 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include
 
 AM_YFLAGS = -d -v
+
+
+############################################################
+## libym_cell_mislib.la 用の変数の指定
+############################################################
 
 libym_cell_mislib_la_SOURCES = \
 	CellMislibReader.cc \

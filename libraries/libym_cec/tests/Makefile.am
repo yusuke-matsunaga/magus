@@ -1,33 +1,49 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1921 2008-12-21 13:55:05Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-#TESTS = \
-#	read_blif.test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
 
-#LIBYM_NET = $(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+############################################################
+## build ターゲットの指定
+############################################################
 
 bin_PROGRAMS = \
 	cec_test
 
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## cec_test 用の変数の指定
+############################################################
 
 cec_test_SOURCES = \
 	cec_test.cc

@@ -1,15 +1,31 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2203 2009-04-16 05:04:40Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 
 ############################################################
-## Variables for building targets
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
 ############################################################
 
 noinst_PROGRAMS = \
@@ -20,13 +36,18 @@ noinst_LTLIBRARIES = \
 
 
 ############################################################
-## Variables for building EufMgr_test
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-EufMgr_test_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
+
+
+############################################################
+## EufMgr_test 用の変数の定義
+############################################################
 
 EufMgr_test_SOURCES = \
 	EufMgr_test.cc
@@ -36,15 +57,12 @@ EufMgr_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
+EufMgr_test_LDFLAGS =
+
 
 ############################################################
-## Variables for building libeuf.la
+## libeuf.la 用の変数の定義
 ############################################################
-
-libeuf_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
 
 libeuf_la_SOURCES = \
 	EufBin.h \
@@ -72,6 +90,6 @@ libeuf_la_SOURCES = \
 	EufVarMgr.h \
 	EufVarMgr.cc
 
-libeuf_la_LDFLAGS =
-
 libeuf_la_LIBADD =
+
+libeuf_la_LDFLAGS =

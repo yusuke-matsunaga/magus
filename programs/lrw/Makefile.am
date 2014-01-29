@@ -1,22 +1,34 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_aig/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.2 $
-## $Date: 2006/02/21 18:04:13 $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST =
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 
-AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	@POPT_INCLUDES@
+############################################################
+## dist ターゲットの指定
+############################################################
 
+EXTRA_DIST =
+	configure \
+	configure.ac
+
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_PROGRAMS = \
 	npngen \
@@ -30,6 +42,21 @@ noinst_PROGRAMS = \
 	normalize \
 	lrw
 
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	@POPT_INCLUDES@
+
+
+############################################################
+## npngen 用の変数の定義
+############################################################
+
 npngen_SOURCES = \
 	npngen.cc \
 	NpnXform.h \
@@ -38,20 +65,54 @@ npngen_SOURCES = \
 npngen_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
+npngen_LDFLAGS =
+
+
+############################################################
+## cannonical 用の変数の定義
+############################################################
+
 cannonical_SOURCES = \
 	cannonical.cc \
 	NpnXform.h \
 	NpnXform.cc
+
+cannonical_LDADD =
+
+cannonical_LDFLAGS =
+
+
+############################################################
+## normalize 用の変数の定義
+############################################################
 
 normalize_SOURCES = \
 	normalize.cc \
 	NpnXform.h \
 	NpnXform.cc
 
+normalize_LDADD =
+
+normalize_LDFLAGS =
+
+
+############################################################
+## ident 用の変数の定義
+############################################################
+
 ident_SOURCES = \
 	ident.cc \
 	NpnXform.h \
 	NpnXform.cc
+
+ident_LDADD =
+
+ident_LDFLAGS =
+
+
+############################################################
+## read_table 用の変数の定義
+############################################################
 
 read_table_SOURCES = \
 	read_table.cc \
@@ -66,14 +127,27 @@ read_table_SOURCES = \
 	NpnXform.h \
 	NpnXform.cc
 
-
 read_table_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+read_table_LDFLAGS =
+
+
+############################################################
+## xform_comp_gen 用の変数の定義
+############################################################
 
 xform_comp_gen_SOURCES = \
 	xform_comp_gen.cc
 
 xform_comp_gen_LDADD =
+
+xform_comp_gen_LDFLAGS =
+
+
+############################################################
+## npntest 用の変数の定義
+############################################################
 
 npntest_SOURCES = \
 	NpnXform.h \
@@ -82,6 +156,13 @@ npntest_SOURCES = \
 
 npntest_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+npntest_LDFLAGS =
+
+
+############################################################
+## npnnodemgr_test 用の変数の定義
+############################################################
 
 npnnodemgr_test_SOURCES = \
 	NpnXform.h \
@@ -93,6 +174,13 @@ npnnodemgr_test_SOURCES = \
 
 npnnodemgr_test_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+npnnodemgr_test_LDFLAGS =
+
+
+############################################################
+## genpat 用の変数の定義
+############################################################
 
 genpat_SOURCES = \
 	NpnXform.h \
@@ -116,8 +204,15 @@ genpat_SOURCES = \
 	npn4rep.h
 
 genpat_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+genpat_LDFLAGS = \
 	@POPT_LIBS@
+
+
+############################################################
+## lrw 用の変数の定義
+############################################################
 
 lrw_SOURCES = \
 	AigTemplate.h \
@@ -130,5 +225,7 @@ lrw_SOURCES = \
 
 lrw_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+lrw_LDFLAGS = \
 	@POPT_LIBS@
