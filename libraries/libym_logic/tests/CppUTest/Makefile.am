@@ -1,30 +1,35 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	expr \
 	smt \
 	.
 
-CLEANFILES =
 
-EXTRA_DIST =
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS = \
-	SmtIdMgrTest
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
 
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_PROGRAMS = \
 	run_all_test
@@ -34,12 +39,18 @@ noinst_LTLIBRARIES = \
 
 
 ############################################################
-## run_all_test
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
-run_all_test_CPPFLAGS = \
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(CPPUTEST_INCLUDES)
+
+
+############################################################
+## run_all_test 用の変数の指定
+############################################################
 
 run_all_test_SOURCES = \
 	main.cc \
@@ -55,12 +66,8 @@ run_all_test_LDFLAGS = \
 
 
 ############################################################
-## libym_logic_cpputest_la
+## libym_logic_cpputest_la 用の変数の指定
 ############################################################
-libym_logic_cpputest_la_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	$(CPPUTEST_INCLUDES)
 
 libym_logic_cpputest_la_SOURCES =
 

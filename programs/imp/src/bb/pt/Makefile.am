@@ -1,16 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 697 2007-05-28 17:10:53Z matsunaga $
 
-INCLUDES = \
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = \
+	libbb_pt.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I $(YMTOOLS_SRCDIR)/include \
 	-I $(YMTOOLS_BUILDDIR)/include \
 	-I $(top_srcdir)/src/bb/include
 
-MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = \
-	libbb_pt.la
+############################################################
+## libbb_pt.la 用の変数の定義
+############################################################
 
 libbb_pt_la_SOURCES = \
 	Assign.cc \
@@ -57,6 +91,7 @@ libbb_pt_la_SOURCES = \
 	PtXorOp.h \
 	PtXorOp.cc
 
+libbb_pt_la_LIBADD =
 
-libbb_pt_la_LIBADD = \
+libbb_pt_la_LDFLAGS = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

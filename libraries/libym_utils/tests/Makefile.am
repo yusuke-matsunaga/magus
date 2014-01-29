@@ -1,38 +1,33 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1978 2009-02-06 12:29:16Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	. \
 	$(YM_TESTS_SUBDIRS)
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS = \
-	file.test \
-	namemgr.test \
-	combigen.test \
-	permgen.test \
-	multicombigen.test \
-	multipermgen.test \
-	strbuff.test \
-	dllist.test \
-	heaptree.test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
+EXTRA_DIST =
 
 
 ############################################################
-## Variables for building targets
+## build ターゲットの指定
 ############################################################
 
 noinst_PROGRAMS = \
@@ -83,12 +78,17 @@ endif
 
 
 ############################################################
-## Common Variables
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## Common Variables
+############################################################
 
 YMUTILS = ../libym_utils.la
 
@@ -103,6 +103,8 @@ IODO_test_SOURCES = \
 IODO_test_LDADD = \
 	$(YMUTILS)
 
+IODO_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building file_test
@@ -113,6 +115,8 @@ file_test_SOURCES = \
 
 file_test_LDADD = \
 	$(YMUTILS)
+
+file_test_LDFLAGS =
 
 
 ############################################################
@@ -125,6 +129,8 @@ namemgr_test_SOURCES = \
 namemgr_test_LDADD = \
 	$(YMUTILS)
 
+namemgr_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building combigen_test
@@ -135,6 +141,8 @@ combigen_test_SOURCES = \
 
 combigen_test_LDADD = \
 	$(YMUTILS)
+
+combigen_test_LDFLAGS =
 
 
 ############################################################
@@ -147,6 +155,8 @@ permgen_test_SOURCES = \
 permgen_test_LDADD = \
 	$(YMUTILS)
 
+permgen_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building multicombigen_test
@@ -157,6 +167,8 @@ multicombigen_test_SOURCES = \
 
 multicombigen_test_LDADD = \
 	$(YMUTILS)
+
+multicombigen_test_LDFLAGS =
 
 
 ############################################################
@@ -169,6 +181,8 @@ multipermgen_test_SOURCES = \
 multipermgen_test_LDADD = \
 	$(YMUTILS)
 
+multipermgen_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building strbuff_test
@@ -179,6 +193,8 @@ strbuff_test_SOURCES = \
 
 strbuff_test_LDADD = \
 	$(YMUTILS)
+
+strbuff_test_LDFLAGS =
 
 
 ############################################################
@@ -191,6 +207,8 @@ randgen_test_SOURCES = \
 randgen_test_LDADD = \
 	$(YMUTILS)
 
+randgen_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building randpermgen_test
@@ -201,6 +219,8 @@ randpermgen_test_SOURCES = \
 
 randpermgen_test_LDADD = \
 	$(YMUTILS)
+
+randpermgen_test_LDFLAGS =
 
 
 ############################################################
@@ -213,6 +233,8 @@ randcombigen_test_SOURCES = \
 randcombigen_test_LDADD = \
 	$(YMUTILS)
 
+randcombigen_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building dllist_test
@@ -224,6 +246,8 @@ dllist_test_SOURCES = \
 dllist_test_LDADD = \
 	$(YMUTILS)
 
+dllist_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building heaptree_test
@@ -231,8 +255,11 @@ dllist_test_LDADD = \
 
 heaptree_test_SOURCES = \
 	heaptree_test.cc
+
 heaptree_test_LDADD = \
 	$(YMUTILS)
+
+heaptree_test_LDFLAGS =
 
 
 ############################################################
@@ -242,10 +269,10 @@ heaptree_test_LDADD = \
 mscg_test_SOURCES = \
 	mscg_test.cc
 
-mscg_test_LDFLAGS =
-
 mscg_test_LDADD = \
 	$(YMUTILS)
+
+mscg_test_LDFLAGS =
 
 
 ############################################################
@@ -268,10 +295,10 @@ mspg_test_LDADD = \
 CompIDO_test_SOURCES = \
 	CompIDO_test.cc
 
-CompIDO_test_LDFLAGS =
-
 CompIDO_test_LDADD = \
 	$(YMUTILS)
+
+CompIDO_test_LDFLAGS =
 
 
 ############################################################
@@ -281,10 +308,10 @@ CompIDO_test_LDADD = \
 CompODO_test_SOURCES = \
 	CompODO_test.cc
 
-CompODO_test_LDFLAGS =
-
 CompODO_test_LDADD = \
 	$(YMUTILS)
+
+CompODO_test_LDFLAGS =
 
 
 ############################################################
@@ -294,10 +321,10 @@ CompODO_test_LDADD = \
 ZCoder_test_SOURCES = \
 	ZCoder_test.cc
 
-ZCoder_test_LDFLAGS =
-
 ZCoder_test_LDADD = \
 	$(YMUTILS)
+
+ZCoder_test_LDFLAGS =
 
 
 ############################################################
@@ -307,10 +334,10 @@ ZCoder_test_LDADD = \
 ZDecoder_test_SOURCES = \
 	ZDecoder_test.cc
 
-ZDecoder_test_LDFLAGS =
-
 ZDecoder_test_LDADD = \
 	$(YMUTILS)
+
+ZDecoder_test_LDFLAGS =
 
 
 ############################################################
@@ -320,10 +347,10 @@ ZDecoder_test_LDADD = \
 StrListIDO_test_SOURCES = \
 	StrListIDO_test.cc
 
-StrListIDO_test_LDFLAGS =
-
 StrListIDO_test_LDADD = \
 	$(YMUTILS)
+
+StrListIDO_test_LDFLAGS =
 
 
 ############################################################
@@ -333,10 +360,10 @@ StrListIDO_test_LDADD = \
 Codec_test_SOURCES = \
 	Codec_test.cc
 
-Codec_test_LDFLAGS =
-
 Codec_test_LDADD = \
 	$(YMUTILS)
+
+Codec_test_LDFLAGS =
 
 
 ############################################################
@@ -346,10 +373,10 @@ Codec_test_LDADD = \
 GzCoder_test_SOURCES = \
 	GzCoder_test.cc
 
-GzCoder_test_LDFLAGS =
-
 GzCoder_test_LDADD = \
 	$(YMUTILS)
+
+GzCoder_test_LDFLAGS =
 
 
 ############################################################
@@ -359,10 +386,10 @@ GzCoder_test_LDADD = \
 GzDecoder_test_SOURCES = \
 	GzDecoder_test.cc
 
-GzDecoder_test_LDFLAGS =
-
 GzDecoder_test_LDADD = \
 	$(YMUTILS)
+
+GzDecoder_test_LDFLAGS =
 
 
 ############################################################
@@ -372,10 +399,10 @@ GzDecoder_test_LDADD = \
 zstream_test_SOURCES = \
 	zstream_test.cc
 
-zstream_test_LDFLAGS =
-
 zstream_test_LDADD = \
 	$(YMUTILS)
+
+zstream_test_LDFLAGS =
 
 
 ############################################################
@@ -463,10 +490,11 @@ LzmaDecoder_test_LDADD = \
 BtgMatch_test_SOURCES = \
 	BtgMatch_test.cc
 
-BtgMatch_test_LDFLAGS =
-
 BtgMatch_test_LDADD = \
 	$(YMUTILS)
+
+BtgMatch_test_LDFLAGS =
+
 
 ############################################################
 ## Variables for building FlowTest
@@ -481,7 +509,7 @@ FlowTest_SOURCES = \
 	FlowGraph.h \
 	FlowGraph.cc
 
-FlowTest_LDFLAGS =
-
 FlowTest_LDADD = \
 	$(YMUTILS)
+
+FlowTest_LDFLAGS =

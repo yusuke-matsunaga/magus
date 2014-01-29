@@ -88,10 +88,22 @@ public:
   conf_size() const = 0;
 
   /// @brief 関数を計算する．
+  /// @param[in] func_array ノード番号をキーにして関数を格納した配列
+  /// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
   virtual
   TvFunc
   calc_func(const vector<TvFunc>& func_array,
 	    const vector<bool>& conf_bits) const = 0;
+
+  /// @brief 値を計算する．
+  /// @param[in] val_array ノード番号をキーにして値を格納した配列
+  /// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
+  virtual
+  bool
+  simulate(const vector<bool>& val_array,
+	   const vector<bool>& conf_bits) const = 0;
+
+
 };
 
 END_NAMESPACE_YM

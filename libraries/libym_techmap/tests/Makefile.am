@@ -1,29 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1921 2008-12-21 13:55:05Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-INCLUDES = \
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+bin_PROGRAMS = \
+	areacover_test
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_techmap
 
-EXTRA_DIST = local_defs $(TESTS)
 
-MAINTAINERCLEANFILES = Makefile.in
-
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
-
-#TESTS = \
-#	read_blif.test
-
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
+############################################################
+## 共通の変数の定義
+############################################################
 
 LIBYM_TECHMAP = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
@@ -33,11 +54,15 @@ LIBYM_TECHMAP = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-bin_PROGRAMS = \
-	areacover_test
+
+############################################################
+## areacover_test 用の変数の定義
+############################################################
 
 areacover_test_SOURCES = \
 	areacover_test.cc
 
 areacover_test_LDADD = \
 	$(LIBYM_TECHMAP)
+
+areacover_test_LDFLAGS =

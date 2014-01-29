@@ -1,13 +1,19 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 997 2007-09-07 09:58:29Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	ym_gds \
 	. \
 	tests
 
-AM_YFLAGS = -d -v
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES = \
 	gds_grammer.cc \
@@ -19,19 +25,35 @@ MAINTAINERCLEANFILES = Makefile.in
 
 
 ############################################################
-## Variables for building targets
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST = \
+	configure \
+	configure.ac
+
+
+############################################################
+## build ターゲットの指定
 ############################################################
 
 noinst_LTLIBRARIES = libym_gds.la
 
 
 ############################################################
-## Variables for building libym_gds.la
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-libym_gds_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+AM_YFLAGS = -d -v
+
+
+############################################################
+## libym_gds.la 用の変数の指定
+############################################################
 
 libym_gds_la_SOURCES = \
 	gds_grammer.yy \
@@ -65,6 +87,5 @@ libym_gds_la_SOURCES = \
 	GdsText.cc
 
 libym_gds_la_LIBADD =
-#	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 libym_gds_la_LDFLAGS =

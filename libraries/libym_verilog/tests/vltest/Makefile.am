@@ -1,24 +1,42 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-YFLAGS=-d -v
+############################################################
+## サブディレクトリの指定
+############################################################
 
-EXTRA_DIST =
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 bin_PROGRAMS = \
 	vltest
 
 
-#############################################################
-# vltest
-#############################################################
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
-vltest_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_verilog \
@@ -26,6 +44,11 @@ vltest_CPPFLAGS = \
 	-I$(top_srcdir)/parser/scanner \
 	-I$(top_builddir)/parser/main \
 	@POPT_INCLUDES@
+
+
+#############################################################
+# vltest 用の変数の定義
+#############################################################
 
 vltest_SOURCES = \
 	VlDumper.h \
@@ -50,5 +73,7 @@ vltest_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+vltest_LDFLAGS = \
 	@POPT_LIBS@

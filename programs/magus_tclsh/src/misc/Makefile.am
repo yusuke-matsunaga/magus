@@ -1,18 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 558 2007-04-09 05:54:44Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-INCLUDES = \
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = libmagus_misc_tcl.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
 
-MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libmagus_misc_tcl.la
+############################################################
+## libmagus_misc_tcl.la 用の変数の定義
+############################################################
 
 libmagus_misc_tcl_la_SOURCES = \
 	TimeCmd.h \
@@ -23,3 +55,4 @@ libmagus_misc_tcl_la_SOURCES = \
 
 libmagus_misc_tcl_la_LIBADD =
 
+libmagus_misc_tcl_la_LDFLAGS =

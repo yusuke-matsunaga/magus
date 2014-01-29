@@ -1,30 +1,31 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1978 2009-02-06 12:29:16Z matsunaga $
 
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS =
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
-
-distclean-local:
-	-rm -rf $(testsubdir)
+EXTRA_DIST =
 
 
 ############################################################
-## Variables for building targets
+## build ターゲットの指定
 ############################################################
 
 noinst_PROGRAMS = \
@@ -32,13 +33,18 @@ noinst_PROGRAMS = \
 
 
 ############################################################
-## Variables for building pyutils_test
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-pyutils_test_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(PYTHON_CPPFLAGS)
+
+
+############################################################
+## Variables for building pyutils_test
+############################################################
 
 pyutils_test_SOURCES = \
 	pyutils_test.cc

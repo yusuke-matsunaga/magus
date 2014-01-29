@@ -1,27 +1,32 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1293 2008-02-21 02:25:52Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS =
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
 
-LIBYM_SAT = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_PROGRAMS = \
 	dimacstest
@@ -30,9 +35,28 @@ bin_PROGRAMS = \
 	ymsat \
 	ymsat2
 
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## 共通の変数の定義
+############################################################
+
+LIBYM_SAT = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+############################################################
+## dimacstest 用の変数の指定
+############################################################
 
 dimacstest_SOURCES = \
 	dimacstest.cc
@@ -40,14 +64,30 @@ dimacstest_SOURCES = \
 dimacstest_LDADD = \
 	$(LIBYM_SAT)
 
+dimacstest_LDFLAGS =
+
+
+############################################################
+## ymsat 用の変数の指定
+############################################################
+
 ymsat_SOURCES = \
 	ymsat.cc
 
 ymsat_LDADD = \
 	$(LIBYM_SAT)
 
+ymsat_LDFLAGS =
+
+
+############################################################
+## ymsat2 用の変数の指定
+############################################################
+
 ymsat2_SOURCES = \
 	ymsat2.cc
 
 ymsat2_LDADD = \
 	$(LIBYM_SAT)
+
+ymsat2_LDFLAGS =

@@ -8,12 +8,15 @@
 
 
 #include "Lut443Match.h"
-#include "GbmNaive.h"
+#include "GbmNaiveBinary.h"
 #include "GbmNaiveEnum.h"
 #include "GbmNaiveOneHot.h"
 #include "GbmIncrEnum.h"
 #include "GbmIncrBinary.h"
 #include "GbmIncrOneHot.h"
+#include "GbmCegarBinary.h"
+#include "GbmCegarOneHot.h"
+#include "GbmCegarEnum.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
 
@@ -195,7 +198,7 @@ Lut443MatchTest(int argc,
   GbmSolver* solver = NULL;
   if ( argc > 1 ) {
     if ( strcmp(argv[1], "naive_binary") == 0 ) {
-      solver = new GbmNaive();
+      solver = new GbmNaiveBinary();
     }
     else if ( strcmp(argv[1], "naive_enum") == 0 ) {
       solver = new GbmNaiveEnum();
@@ -212,6 +215,15 @@ Lut443MatchTest(int argc,
     else if ( strcmp(argv[1], "incr_onehot") == 0 ) {
       solver = new GbmIncrOneHot();
     }
+    else if ( strcmp(argv[1], "cegar_binary") == 0 ) {
+      solver = new GbmCegarBinary();
+    }
+    else if ( strcmp(argv[1], "cegar_onehot") == 0 ) {
+      solver = new GbmCegarOneHot();
+    }
+    else if ( strcmp(argv[1], "cegar_enum") == 0 ) {
+      solver = new GbmCegarEnum();
+    }
     else {
       cerr << "Illegal method: " << argv[0] << endl;
       return -1;
@@ -219,7 +231,7 @@ Lut443MatchTest(int argc,
   }
   if ( solver == NULL ) {
     // fall-back
-    solver = new GbmNaive();
+    solver = new GbmNaiveBinary();
   }
 
   A0Test(*solver);

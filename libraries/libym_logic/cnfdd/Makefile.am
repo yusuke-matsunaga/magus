@@ -1,27 +1,49 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 33 2006-07-16 14:58:17Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 
 ############################################################
-## Variables for building targets
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
 ############################################################
 
 noinst_LTLIBRARIES = libym_logic_cnfdd.la
 
 
 ############################################################
-## Variables for building libym_logic_cnfdd.la
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-libym_logic_cnfdd_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(GMP_INCLUDES)
+
+
+############################################################
+## libym_logic_cnfdd.la 用の変数の指定
+############################################################
 
 libym_logic_cnfdd_la_SOURCES = \
 	CompTbl.h \
@@ -83,4 +105,3 @@ libym_logic_cnfdd_la_SOURCES = \
 libym_logic_cnfdd_la_LIBADD =
 
 libym_logic_cnfdd_la_LDFLAGS =
-

@@ -1,7 +1,32 @@
 ## Process this file with automake to produce Makefile.in
 
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_LTLIBRARIES =
 
@@ -9,14 +34,19 @@ noinst_PROGRAMS =
 
 
 ############################################################
-## libigf_python.la
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-#libigf_python_la_CPPFLAGS = \
-#	-I$(YMTOOLS_SRCDIR)/include \
-#	-I$(YMTOOLS_BUILDDIR)/include \
-#	-I$(top_srcdir)/include \
-#	$(PYTHON_CPPFLAGS)
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	$(PYTHON_CPPFLAGS)
+
+
+############################################################
+## libigf_python.la 用の変数の定義
+############################################################
 
 #libigf_python_la_SOURCES = \
 #	pyigf_FuncVect.cc \
@@ -34,12 +64,6 @@ noinst_PROGRAMS =
 ############################################################
 ## pyigf_test
 ############################################################
-
-#pyigf_test_CPPFLAGS = \
-#	-I$(YMTOOLS_SRCDIR)/include \
-#	-I$(YMTOOLS_BUILDDIR)/include \
-#	-I$(top_srcdir)/include \
-#	$(PYTHON_CPPFLAGS)
 
 #pyigf_test_SOURCES = \
 #	pyigf_test.cc

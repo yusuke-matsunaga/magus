@@ -1,17 +1,43 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1617 2008-07-27 16:56:12Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_LTLIBRARIES = \
 	libmatpg_tcl.la
 
 bin_PROGRAMS = \
 	matpg_tclsh
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
 AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
@@ -23,6 +49,11 @@ AM_CPPFLAGS = \
 	-DMATPG_LIBDIR='"$(MATPG_LIBDIR)"' \
 	-DMATPG_DATADIR='"$(MATPG_DATADIR)"' \
 	-DMATPG_BINDIR='"$(MATPG_BINDIR)"'
+
+
+############################################################
+## libmatpg_tcl.la 用の変数の定義
+############################################################
 
 libmatpg_tcl_la_SOURCES = \
 	MatpgMsgHandler.h \
@@ -49,6 +80,13 @@ libmatpg_tcl_la_SOURCES = \
 
 libmatpg_tcl_la_LIBADD =
 
+libmatpg_tcl_la_LDFLAGS =
+
+
+############################################################
+## matpg_tclsh 用の変数の定義
+############################################################
+
 matpg_tclsh_SOURCES = \
 	tclAppInit.cc
 
@@ -61,3 +99,5 @@ matpg_tclsh_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LADD)
+
+matpg_tclsh_LDFLAGS =

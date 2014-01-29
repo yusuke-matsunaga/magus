@@ -1,26 +1,44 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST = $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS = \
-	npn.test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_PROGRAMS = \
+	tvfunc_test \
+	tvfunc_test2 \
+	cofactor_test \
+	npn_check3 \
+	$(NPN_CHECK)
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
 
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
@@ -29,19 +47,22 @@ AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	@POPT_INCLUDES@
 
-YM_TCLPP = $(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
+
+############################################################
+## 共通の変数の定義
+############################################################
+
+YM_TCLPP = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
 
 YM_LOGIC = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 
-noinst_PROGRAMS = \
-	tvfunc_test \
-	tvfunc_test2 \
-	cofactor_test \
-	npn_check3 \
-	$(NPN_CHECK)
+############################################################
+## tvfunc_test 用の変数の指定
+############################################################
 
 tvfunc_test_SOURCES = \
 	TvFuncTest.h \
@@ -52,12 +73,26 @@ tvfunc_test_LDADD = \
 	$(YM_LOGIC) \
 	@POPT_LIBS@
 
+tvfunc_test_LDFLAGS =
+
+
+############################################################
+## tv_func_test2 用の変数の指定
+############################################################
+
 tvfunc_test2_SOURCES = \
 	tvfunc_test2.cc
 
 tvfunc_test2_LDADD = \
 	$(YM_LOGIC) \
 	@POPT_LIBS@
+
+tvfunc_test2_LDFLAGS =
+
+
+############################################################
+## cofactor_test 用の変数の指定
+############################################################
 
 cofactor_test_SOURCES = \
 	cofactor_test.cc \
@@ -67,12 +102,21 @@ cofactor_test_SOURCES = \
 cofactor_test_LDADD = \
 	$(YM_LOGIC)
 
+cofactor_test_LDFLAGS =
+
+
+############################################################
+## npn_check3 用の変数の指定
+############################################################
+
 npn_check3_SOURCES = \
 	npn_check3.cc
 
 npn_check3_LDADD = \
 	$(YM_LOGIC) \
 	@POPT_LIBS@
+
+npn_check3_LDFLAGS =
 
 #npn_check_SOURCES = \
 #	TvFuncTest.h \

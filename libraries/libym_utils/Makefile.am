@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	ym_utils \
@@ -9,24 +11,45 @@ SUBDIRS = \
 	$(YM_EXTRA_SUBDIRS) \
 	tests
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
 
 ############################################################
-## Variables for building targets
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST = \
+	configure \
+	configure.ac
+
+
+############################################################
+## build ターゲットの指定
 ############################################################
 
 noinst_LTLIBRARIES = libym_utils.la
 
 
 ############################################################
-## Variables for building libym_utils.la
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-libym_utils_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	@POPT_INCLUDES@
+
+
+############################################################
+## libym_utils.la 用の変数の定義
+############################################################
 
 libym_utils_la_SOURCES = \
 	Alloc.cc \
@@ -90,10 +113,10 @@ libym_utils_la_SOURCES = \
 	UnitAlloc.cc \
 	random.cc
 
-libym_utils_la_LIBADD = \
-	@POPT_LIBS@
+libym_utils_la_LIBADD =
 
-libym_utils_la_LDFLAGS =
+libym_utils_la_LDFLAGS = \
+	@POPT_LIBS@
 
 
 if YM_HAVE_ZLIB

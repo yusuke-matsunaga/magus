@@ -1,29 +1,48 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_aig/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.2 $
-## $Date: 2006/02/21 18:04:13 $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
 
 ############################################################
-## Variables for building targets
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
 ############################################################
 
 noinst_LTLIBRARIES = libym_logic_aig.la
 
 
 ############################################################
-## Variables for building libym_aig.la
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
-libym_logic_aig_la_CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## libym_aig.la 用の変数の指定
+############################################################
 
 libym_logic_aig_la_SOURCES = \
 	AigNode.h \
@@ -38,7 +57,7 @@ libym_logic_aig_la_SOURCES = \
 #	AigTemplate.h \
 #	AigTemplate.cc
 
-libym_logic_aig_la_LIBADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+libym_logic_aig_la_LIBADD =
 
-libym_logic_aig_la_LDFLAGS =
+libym_logic_aig_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la

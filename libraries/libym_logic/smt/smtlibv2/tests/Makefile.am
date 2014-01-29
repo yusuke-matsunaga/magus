@@ -1,28 +1,35 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
 
-SUBDIRS = $(YM_TESTS_SUBDIRS)
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS = \
+	$(YM_TESTS_SUBDIRS)
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
-EXTRA_DIST = local_defs $(TESTS)
-
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS =
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 bin_PROGRAMS =
-
 
 noinst_PROGRAMS = \
 	lextest \
@@ -31,14 +38,20 @@ noinst_PROGRAMS = \
 
 
 ############################################################
-## lextest
+## 汎用のプリプロセッサ用フラグの指定
 ############################################################
-lextest_CPPFLAGS = \
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/parser \
 	-I$(top_builddir)/parser
+
+
+############################################################
+## lextest 用の変数の指定
+############################################################
 
 lextest_SOURCES = \
 	lextest.cc
@@ -47,16 +60,12 @@ lextest_LDADD = \
 	../parser/libym_smt_parser.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
+lextest_LDFLAGS =
+
 
 ############################################################
-## parsertest
+## parsertest 用の変数の指定
 ############################################################
-parsertest_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/parser \
-	-I$(top_builddir)/parser
 
 parsertest_SOURCES = \
 	parsertest.cc
@@ -65,16 +74,14 @@ parsertest_LDADD = \
 	../parser/libym_smt_parser.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
+parsertest_LDFLAGS =
+
 
 ############################################################
-## SmtLibShell_test
+## SmtLibShell_test 用の変数の指定
 ############################################################
 SmtLibShell_test_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/parser \
-	-I$(top_builddir)/parser \
+	$(AM_CPPFLAGS) \
 	-I$(top_srcdir)/shell
 
 SmtLibShell_test_SOURCES = \
@@ -84,3 +91,5 @@ SmtLibShell_test_LDADD = \
 	../libym_smtlibv2.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+SmtLibShell_test_LDFLAGS =

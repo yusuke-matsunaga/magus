@@ -37,21 +37,33 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 単純なマッチング問題を解く
-  /// @param[in] network RcfNetwork
-  /// @param[in] func マッチング対象の関数
-  /// @param[out] conf_bits configuration ビットの値を収める配列
+  /// @brief verify フラグを立てる
+  void
+  verify_on();
+
+  /// @brief verify フラグを降ろす
+  void
+  verify_off();
+
+  /// @brief debug フラグを立てる．
+  void
+  debug_on();
+
+  /// @brief debug フラグを降ろす.
+  void
+  debug_off();
+
+  /// @brief debug フラグを得る．
   bool
-  solve(const RcfNetwork& network,
-	const TvFunc& func,
-	vector<bool>& conf_bits);
+  debug() const;
 
   /// @brief 入力順を考慮したマッチング問題を解く
-  /// @param[in] networkr RcfNetwork
+  /// @param[in] networrk RcfNetwork
   /// @param[in] func マッチング対象の関数
   /// @param[out] conf_bits configuration ビットの値を収める配列
   /// @param[out] iorder 入力順序
-  /// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   bool
   solve(const RcfNetwork& network,
 	const TvFunc& func,
@@ -64,27 +76,21 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 実際に問題を解く仮想関数
-  /// @param[in] network RcfNetwork
-  /// @param[in] func マッチング対象の関数
-  /// @param[out] conf_bits configuration ビットの値を収める配列
-  virtual
-  bool
-  _solve(const RcfNetwork& network,
-	 const TvFunc& func,
-	 vector<bool>& conf_bits) = 0;
-
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] network RcfNetwork
   /// @param[in] output Reconfigurable Network の出力
   /// @param[in] func マッチング対象の関数
+  /// @param[in] rep 関数の対称変数の代表番号を収める配列
+  ///            rep[pos] に pos 番めの入力の代表番号が入る．
   /// @param[out] conf_bits configuration ビットの値を収める配列
   /// @param[out] iorder 入力順序
-  /// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   virtual
   bool
   _solve(const RcfNetwork& network,
 	 const TvFunc& func,
+	 const vector<ymuint>& rep,
 	 vector<bool>& conf_bits,
 	 vector<ymuint>& iorder) = 0;
 
@@ -93,11 +99,25 @@ private:
   /// @param[in] func マッチング対象の関数
   /// @param[in] conf_bits configuration ビットの値を収める配列
   /// @param[in] iorder 入力順序
+  ///             iorder[pos] に network の pos 番めの入力に対応した
+  ///             関数の入力番号が入る．
   bool
   verify(const RcfNetwork& network,
 	 const TvFunc& func,
 	 const vector<bool>& conf_bits,
 	 const vector<ymuint>& iorder);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // verify フラグ
+  bool mVerify;
+
+  // debug フラグ
+  bool mDebug;
 
 };
 

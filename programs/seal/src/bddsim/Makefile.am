@@ -1,17 +1,49 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-INCLUDES = \
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = libseal_bddsim.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include
 
-MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libseal_bddsim.la
+############################################################
+## libseal_bddsim.la 用の変数の定義
+############################################################
 
 libseal_bddsim_la_SOURCES = \
 	BddsimCmd.h \
@@ -21,9 +53,9 @@ libseal_bddsim_la_SOURCES = \
 	SimNode.h \
 	SimNode.cc \
 	bddsim_init.cc \
-	nsdef.h 
+	nsdef.h
 
-libseal_bddsim_la_LDFLAGS =
+libseal_bddsim_la_LIBADD =
 
-libseal_bddsim_la_LIBADD = \
+libseal_bddsim_la_LDFLAGS = \
 	$(YM_LIBS_LIBYM_BDD)

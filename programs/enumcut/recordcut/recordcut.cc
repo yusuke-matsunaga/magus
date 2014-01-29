@@ -23,11 +23,15 @@
 #include "FuncRec.h"
 
 #include "Lut443Match.h"
-#include "GbmNaive.h"
+#include "GbmNaiveBinary.h"
 #include "GbmNaiveOneHot.h"
 #include "GbmNaiveEnum.h"
+#include "GbmIncrBinary.h"
 #include "GbmIncrOneHot.h"
 #include "GbmIncrEnum.h"
+#include "GbmCegarBinary.h"
+#include "GbmCegarOneHot.h"
+#include "GbmCegarEnum.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -40,6 +44,8 @@
 #include "ym_utils/RandGen.h"
 
 BEGIN_NAMESPACE_YM
+
+bool verbose = false;
 
 void
 rec_func(FuncMgr& func_mgr,
@@ -91,7 +97,7 @@ rec_func(FuncMgr& func_mgr,
 
   GbmSolver* solver = NULL;
   if ( method == "naive_binary" ) {
-    solver = new GbmNaive();
+    solver = new GbmNaiveBinary();
   }
   else if ( method == "naive_onehot" ) {
     solver = new GbmNaiveOneHot();
@@ -99,18 +105,31 @@ rec_func(FuncMgr& func_mgr,
   else if ( method == "naive_enum" ) {
     solver = new GbmNaiveEnum();
   }
+  else if ( method == "incr_binary" ) {
+    solver = new GbmIncrBinary();
+  }
   else if ( method == "incr_onehot" ) {
     solver = new GbmIncrOneHot();
   }
   else if ( method == "incr_enum" ) {
     solver = new GbmIncrEnum();
   }
+  else if ( method == "cegar_binary" ) {
+    solver = new GbmCegarBinary();
+  }
+  else if ( method == "cegar_onehot" ) {
+    solver = new GbmCegarOneHot();
+  }
+  else if ( method == "cegar_enum" ) {
+    solver = new GbmCegarEnum();
+  }
   else if ( method != string() ) {
     cerr << "Illegal method: " << method << endl;
     return;
   }
   if ( solver == NULL ) {
-    solver = new GbmNaive();
+    // デフォルトフォールバック
+    solver = new GbmNaiveBinary();
   }
 
   StopWatch timer;
@@ -121,6 +140,9 @@ rec_func(FuncMgr& func_mgr,
     RandGen rg;
     for (ymuint i = 0; i < nrand; ++ i) {
       ymuint pos = rg.ulong() % func_list.size();
+      if ( verbose ) {
+	cout << "#" << i << endl;
+      }
       matcher.match(func_list[pos], *solver);
     }
   }
@@ -267,6 +289,9 @@ main(int argc,
     { "randam_sample", 'r', POPT_ARG_INT, &nrand, 0,
       "do randam smpling", "# of samples" },
 
+    { "verbose", 'v', POPT_ARG_NONE, NULL, 0x200,
+      "set verbose flag", NULL },
+
     POPT_AUTOHELP
 
     { NULL, '\0', 0, NULL, 0, NULL, NULL }
@@ -294,6 +319,9 @@ main(int argc,
     }
     else if ( rc == 0x101 ) {
       iscas = true;
+    }
+    else if ( rc == 0x200 ) {
+      verbose = true;
     }
   }
 

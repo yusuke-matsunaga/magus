@@ -1,21 +1,59 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+############################################################
+## autotroll のおまじない
+############################################################
 
 include $(top_srcdir)/../../etc/autotroll.mk
 
-EXTRA_DIST =
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 bin_PROGRAMS = \
 	vlview
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CXXFLAGS = \
+	$(QT_CXXFLAGS)
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(QT_CPPFLAGS)
+
+
+############################################################
+## vlview 用の変数の定義
+############################################################
 
 vlview_SOURCES = \
 	VlView.h \
@@ -48,18 +86,16 @@ nodist_vlview_SOURCES = \
 	VlView.moc.cc \
 	VerilogView.moc.cc
 
-vlview_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
-
-vlview_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
-
-vlview_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
+BUILT_SOURCES = \
+	VlView.moc.cc \
+	VerilogView.moc.cc
 
 vlview_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(QT_LIBS) \
-	$(LIDADD)
+	$(LDADD)
 
-BUILT_SOURCES = \
-	VlView.moc.cc \
-	VerilogView.moc.cc
+vlview_LDFLAGS  = \
+	$(QT_LDFLAGS) \
+	$(LDFLAGS)

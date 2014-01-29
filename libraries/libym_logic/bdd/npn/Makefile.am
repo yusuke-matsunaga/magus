@@ -1,22 +1,49 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_bdd/npn/Makefile.am,v $
-## $Author: matsunaga $
-## $Revision: 1.3 $
-## $Date: 2006/05/31 03:24:25 $
 
-INCLUDES = \
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = libym_bdd_npn.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(top_builddir) \
 	-I$(top_srcdir) \
 	$(GMP_INCLUDES)
 
-MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_bdd_npn.la
-
-libym_bdd_npn_la_LIBADD =
-
-libym_bdd_npn_la_LDFLAGS =
+############################################################
+## libym_bdd_npn.la 用の変数の指定
+############################################################
 
 libym_bdd_npn_la_SOURCES = \
 	WalshSig.cc \
@@ -32,3 +59,7 @@ libym_bdd_npn_la_SOURCES = \
 	Matcher.h \
 	NpnMap.cc \
 	NpnMgr.cc
+
+libym_bdd_npn_la_LIBADD =
+
+libym_bdd_npn_la_LDFLAGS =

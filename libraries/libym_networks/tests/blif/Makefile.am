@@ -1,22 +1,52 @@
 ## Process this file with automake to produce Makefile.in
 
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS = \
-	parser.test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_PROGRAMS = \
+	parser_test \
+	lexptest \
+	reader_test
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/blif
+
+
+############################################################
+## 共通の変数の定義
+############################################################
 
 LIBYM_BLIF = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
@@ -24,15 +54,10 @@ LIBYM_BLIF = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
-noinst_PROGRAMS = \
-	parser_test \
-	lexptest \
-	reader_test
 
-AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/blif
+############################################################
+## parser_test 用の変数の定義
+############################################################
 
 parser_test_SOURCES = \
 	parser_test.cc \
@@ -43,14 +68,28 @@ parser_test_SOURCES = \
 
 parser_test_LDADD = $(LIBYM_BLIF)
 
+parser_test_LDFLAGS =
+
+
+############################################################
+## lexp_test 用の変数の定義
+############################################################
 
 lexptest_SOURCES = \
 	lexptest.cc
 
 lexptest_LDADD = $(LIBYM_BLIF)
 
+lexptest_LDFLAGS =
+
+
+############################################################
+## reader_test 用の変数の定義
+############################################################
 
 reader_test_SOURCES = \
 	reader_test.cc
 
 reader_test_LDADD = $(LIBYM_BLIF)
+
+reader_test_LDFLAGS =

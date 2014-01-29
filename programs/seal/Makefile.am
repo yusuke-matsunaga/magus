@@ -1,18 +1,31 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
 
-SUBDIRS = include src tclsrc
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS = \
+	include \
+	src \
+	tclsrc
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
 EXTRA_DIST = \
-	seal_config.h.in \
 	configure \
 	configure.ac \
-	mk \
-	etc/autogen.tmpl \
-	etc/common_defs \
-	etc/mk.subr \
 	utils/tclpkg-install.tcl \
 	utils/tclpkg-setup.tcl

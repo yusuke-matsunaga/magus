@@ -1,17 +1,51 @@
 ## Process this file with automake to produce Makefile.in
 
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
 SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLANFILES = Makefiles.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 bin_PROGRAMS = pysatpg
 
-pysatpg_CPPFLAGS = \
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	$(PYTHON_CPPFLAGS) \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src
+
+
+############################################################
+## pysatpg 用の変数の定義
+############################################################
 
 pysatpg_SOURCES = \
 	pysatpg.cc \
@@ -22,10 +56,6 @@ pysatpg_SOURCES = \
 	pysatpg_TestVector.cc \
 	pysatpg_TvMgr.cc \
 	pysatpg_AtpgMgr.cc
-
-
-pysatpg_LDFLAGS = \
-	$(PYTHON_LDFLAGS)
 
 pysatpg_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \
@@ -40,3 +70,6 @@ pysatpg_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/python/libym_utils_python.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
+
+pysatpg_LDFLAGS = \
+	$(PYTHON_LDFLAGS)

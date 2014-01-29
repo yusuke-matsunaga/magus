@@ -1,34 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1920 2008-12-20 15:52:42Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-EXTRA_DIST = local_defs $(TESTS)
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-#TESTS = \
-#	base_test
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_PROGRAMS = \
 	pylogic_test
 
-pylogic_test_CPPFLAGS = \
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	$(PYTHON_CPPFLAGS)
+
+
+############################################################
+## pylogic_test 用の変数の指定
+############################################################
 
 pylogic_test_SOURCES = \
 	pylogic_test.cc

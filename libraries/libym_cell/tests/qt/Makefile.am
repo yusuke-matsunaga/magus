@@ -1,17 +1,54 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## autotroll のおまじない
+############################################################
 
 include $(top_srcdir)/../../etc/autotroll.mk
 
-EXTRA_DIST =
+
+############################################################
+## clean ターゲットの指定
+############################################################
 
 CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 bin_PROGRAMS = \
 	ptview
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CXXFLAGS = \
+	$(QT_CXXFLAGS)
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir) \
+	$(QT_CPPFLAGS)
+
+
+############################################################
+## ptview 用の変数の指定
+############################################################
 
 ptview_SOURCES = \
 	VerilogView.h \
@@ -30,14 +67,6 @@ nodist_ptview_SOURCES = \
 	VerilogView.moc.cc \
 	ParseTreeView.moc.cc
 
-ptview_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
-
-ptview_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir) \
-	$(QT_CPPFLAGS)
-
 ptview_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
 
 ptview_LDADD = \
@@ -49,4 +78,3 @@ ptview_LDADD = \
 BUILT_SOURCES = \
 	VerilogView.moc.cc \
 	ParseTreeView.moc.cc
-

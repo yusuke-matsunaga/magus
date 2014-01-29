@@ -1,17 +1,53 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2203 2009-04-16 05:04:40Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libatpg_fsimx2.la
 
-libatpg_fsimx2_la_CPPFLAGS = \
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = \
+	libatpg_fsimx2.la
+
+noinst_PROGRAMS = \
+	simnode_test
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include
+
+
+############################################################
+## libatpg_fsimx2.la 用の変数の定義
+############################################################
 
 libatpg_fsimx2_la_SOURCES = \
 	fsimx2_nsdef.h \
@@ -40,16 +76,14 @@ libatpg_fsimx2_la_LIBADD =
 libatpg_fsimx2_la_LDFLAGS =
 
 
-noinst_PROGRAMS = \
-	simnode_test
-
-simnode_test_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+############################################################
+## simnode_test 用の変数の定義
+############################################################
 
 simnode_test_SOURCES = \
 	simnode_test.cc
 
 simnode_test_LDADD = \
 	libatpg_fsimx2.la
+
+simnode_test_LDFLAGS =

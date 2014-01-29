@@ -8,8 +8,6 @@
 
 
 #include "Lut443Match.h"
-#include "GbmNaive.h"
-#include "GbmNaiveOneHot.h"
 
 
 BEGIN_NAMESPACE_YM

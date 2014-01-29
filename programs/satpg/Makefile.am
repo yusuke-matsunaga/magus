@@ -1,6 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1417 2008-05-06 18:12:40Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	old \
@@ -10,14 +13,21 @@ SUBDIRS = \
 	src \
 	tclsrc
 
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
 
 EXTRA_DIST = \
 	configure \
-	configure.ac \
-	mk \
-	etc/autogen.tmpl \
-	etc/common_defs \
-	etc/mk.subr \
+	configure.ac
 	utils/tclpkg-install.tcl \
 	utils/tclpkg-setup.tcl

@@ -1,6 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS = \
 	testvect \
@@ -11,22 +14,51 @@ SUBDIRS = \
 	calc_svf \
 	.
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+bin_PROGRAMS = \
+	seal_tclsh
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
 AM_CXXFLAGS = \
 	-DSEAL_LIBDIR='"$(SEAL_LIBDIR)"' \
 	-DSEAL_DATADIR='"$(SEAL_DATADIR)"' \
 	-DSEAL_BINDIR='"$(SEAL_BINDIR)"'
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)
 
-MAINTAINERCLEANFILES = Makefile.in
 
-bin_PROGRAMS = \
-	seal_tclsh
+############################################################
+## seal_tclsh 用の変数の定義
+############################################################
 
 seal_tclsh_SOURCES = \
 	tclAppInit.cc \
@@ -46,3 +78,5 @@ seal_tclsh_LDADD = \
 	$(YM_LIBS_LIBYM_UTILS) \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
+
+seal_tclsh_LDFLAGS =

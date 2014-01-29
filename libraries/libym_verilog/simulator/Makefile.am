@@ -1,18 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 169 2006-08-22 09:17:46Z matsunaga $
 
-INCLUDES = \
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = libym_vl_sim.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(top_builddir) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/libraries/libym_verilog
 
-MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libym_vl_sim.la
+############################################################
+## libym_vl_sim.la 用の変数の定義
+############################################################
 
-libym_vl_sim_la_LIBADD =
-libym_vl_sim_la_LDFLAGS =
 libym_vl_sim_la_SOURCES = \
 	SimEngine.h \
 	SimEventQueue.h \
@@ -36,3 +68,7 @@ libym_vl_sim_la_SOURCES = \
 	SimCaLink.cc \
 	SimScope.cc \
 	SimStmtGraph.cc
+
+libym_vl_sim_la_LIBADD =
+
+libym_vl_sim_la_LDFLAGS =

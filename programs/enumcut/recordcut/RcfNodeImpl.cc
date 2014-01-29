@@ -17,6 +17,7 @@ BEGIN_NONAMESPACE
 // @brief RcfNodeHandle を TvFunc に変換する．
 // @param[in] h ハンドル
 // @param[in] func_array 関数の配列
+inline
 TvFunc
 handle2func(RcfNodeHandle h,
 	    const vector<TvFunc>& func_array)
@@ -29,7 +30,24 @@ handle2func(RcfNodeHandle h,
   }
 }
 
+// @brief RcfNodeHandle を bool に変換する．
+// @param[in] h ハンドル
+// @param[in] val_array 値の配列
+inline
+bool
+handle2val(RcfNodeHandle h,
+	   const vector<bool>& val_array)
+{
+  if ( h.inv() ) {
+    return !val_array[h.id()];
+  }
+  else {
+    return val_array[h.id()];
+  }
+}
+
 END_NONAMESPACE
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス RcfNodeImpl
@@ -160,12 +178,25 @@ RcfInputNode::input_id() const
 }
 
 // @brief 関数を計算する．
+// @param[in] func_array ノード番号をキーにして関数を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
 TvFunc
 RcfInputNode::calc_func(const vector<TvFunc>& func_array,
 			const vector<bool>& conf_bits) const
 {
   assert_not_reached(__FILE__, __LINE__);
   return TvFunc::const_zero(0);
+}
+
+// @brief 値を計算する．
+// @param[in] val_array ノード番号をキーにして値を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
+bool
+RcfInputNode::simulate(const vector<bool>& val_array,
+		       const vector<bool>& conf_bits) const
+{
+  assert_not_reached(__FILE__, __LINE__);
+  return false;
 }
 
 
@@ -216,6 +247,8 @@ RcfAndNode::fanin(ymuint pos) const
 }
 
 // @brief 関数を計算する．
+// @param[in] func_array ノード番号をキーにして関数を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
 TvFunc
 RcfAndNode::calc_func(const vector<TvFunc>& func_array,
 		      const vector<bool>& conf_bits) const
@@ -224,6 +257,19 @@ RcfAndNode::calc_func(const vector<TvFunc>& func_array,
   TvFunc if1 = handle2func(mFanin[1], func_array);
 
   return if0 & if1;
+}
+
+// @brief 値を計算する．
+// @param[in] val_array ノード番号をキーにして値を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
+bool
+RcfAndNode::simulate(const vector<bool>& val_array,
+		     const vector<bool>& conf_bits) const
+{
+  bool val0 = handle2val(mFanin[0], val_array);
+  bool val1 = handle2val(mFanin[1], val_array);
+
+  return val0 && val1;
 }
 
 
@@ -292,6 +338,8 @@ RcfLutNode::conf_size() const
 }
 
 // @brief 関数を計算する．
+// @param[in] func_array ノード番号をキーにして関数を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
 TvFunc
 RcfLutNode::calc_func(const vector<TvFunc>& func_array,
 		      const vector<bool>& conf_bits) const
@@ -318,6 +366,22 @@ RcfLutNode::calc_func(const vector<TvFunc>& func_array,
     }
   }
   return func;
+}
+
+// @brief 値を計算する．
+// @param[in] val_array ノード番号をキーにして値を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
+bool
+RcfLutNode::simulate(const vector<bool>& val_array,
+		     const vector<bool>& conf_bits) const
+{
+  ymuint pos = 0U;
+  for (ymuint i = 0; i < mFaninNum; ++ i) {
+    if ( handle2val(mFanin[i], val_array) ) {
+      pos |= (1U << i);
+    }
+  }
+  return conf_bits[mConfBase + pos];
 }
 
 
@@ -389,11 +453,13 @@ RcfMuxNode::conf_size() const
 }
 
 // @brief 関数を計算する．
+// @param[in] func_array ノード番号をキーにして関数を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
 TvFunc
 RcfMuxNode::calc_func(const vector<TvFunc>& func_array,
 		      const vector<bool>& conf_bits) const
 {
-  ymuint pos = 0;
+  ymuint pos = 0U;
   for (ymuint i = 0; i < mConfSize; ++ i) {
     if ( conf_bits[mConfBase + i] ) {
       pos += (1U << i);
@@ -401,6 +467,23 @@ RcfMuxNode::calc_func(const vector<TvFunc>& func_array,
   }
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return handle2func(mFanin[pos], func_array);
+}
+
+// @brief 値を計算する．
+// @param[in] val_array ノード番号をキーにして値を格納した配列
+// @param[in] conf_bits 設定変数番号をキーにして値を格納した配列
+bool
+RcfMuxNode::simulate(const vector<bool>& val_array,
+		     const vector<bool>& conf_bits) const
+{
+  ymuint pos = 0U;
+  for (ymuint i = 0; i < mConfSize; ++ i) {
+    if ( conf_bits[mConfBase + i] ) {
+      pos += (1U << i);
+    }
+  }
+  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  return handle2val(mFanin[pos], val_array);
 }
 
 END_NAMESPACE_YM

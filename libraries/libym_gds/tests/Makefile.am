@@ -1,45 +1,90 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 958 2007-08-28 05:38:02Z matsunaga $
 
-INCLUDES = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+############################################################
+## サブディレクトリの指定
+############################################################
 
-EXTRA_DIST = local_defs $(TESTS)
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
-TESTS_ENVIRONMENT = \
-	top_builddir=$(top_builddir) \
-	top_srcdir=$(top_srcdir)
 
-TESTS =
+############################################################
+## dist ターゲットの指定
+############################################################
 
-testsubdir = testSubDir
+EXTRA_DIST =
 
-distclean-local:
-	-rm -rf $(testsubdir)
 
-LIBYM_GDS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_gds/libym_gds.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_PROGRAMS = \
 	gdsparse \
 	gdsprint \
 	gdsencode
 
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include
+
+
+############################################################
+## 共通の変数の定義
+############################################################
+
+LIBYM_GDS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_gds/libym_gds.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+
+############################################################
+## gdsparse 用の変数の指定
+############################################################
+
 gdsparse_SOURCES = \
 	gdsparse.cc
+
 gdsparse_LDADD = \
 	$(LIBYM_GDS)
 
+gdsparse_LDFLAGS =
+
+
+############################################################
+## gdsprint 用の変数の指定
+############################################################
+
 gdsprint_SOURCES = \
 	gdsprint.cc
+
 gdsprint_LDADD = \
 	$(LIBYM_GDS)
 
+gdsprint_LDFLAGS =
+
+
+############################################################
+## gdsencode 用の変数の指定
+############################################################
+
 gdsencode_SOURCES = \
 	gdsencode.cc
+
 gdsencode_LDADD =
+
+gdsencode_LDFLAGS =

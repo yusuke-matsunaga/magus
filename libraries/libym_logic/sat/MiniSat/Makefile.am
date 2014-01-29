@@ -1,20 +1,48 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 1293 2008-02-21 02:25:52Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
 MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
 
 noinst_LTLIBRARIES = libym_minisat.la
 
-libym_minisat_la_CPPFLAGS = \
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include
 
-libym_minisat_la_LIBADD =
 
-libym_minisat_la_LDFLAGS =
+############################################################
+## libym_minisat.la 用の変数の指定
+############################################################
 
 libym_minisat_la_SOURCES = \
 	SatSolverMiniSat.h \
@@ -27,3 +55,6 @@ libym_minisat_la_SOURCES = \
 	Sort.h \
 	VarOrder.h
 
+libym_minisat_la_LIBADD =
+
+libym_minisat_la_LDFLAGS =

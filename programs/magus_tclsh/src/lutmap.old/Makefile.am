@@ -1,16 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-INCLUDES = \
-	$(YM_INCLUDES) \
-	-I$(top_srcdir)/include
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
 
 MAINTAINERCLEANFILES = Makefile.in
 
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST = \
+	configure \
+	configure.ac
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
 noinst_LTLIBRARIES = libmagus_lutmap_old.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	$(YM_INCLUDES) \
+	-I$(top_srcdir)/include
+
+
+############################################################
+## libmagus_lutmap_old.la 用の変数の定義
+############################################################
 
 libmagus_lutmap_old_la_SOURCES = \
 	lutmap.h \
@@ -66,8 +100,8 @@ libmagus_lutmap_old_la_SOURCES = \
 	OdcMgr.h \
 	OdcMgr.cc
 
-libmagus_lutmap_old_la_LIBADD = \
-	$(YM_LIBS_LIBYM_BDD) \
-	$(YM_LIBS_LIBYM_BNET)
+libmagus_lutmap_old_la_LIBADD =
 
 libmagus_lutmap_old_la_LDFLAGS =
+	$(YM_LIBS_LIBYM_BDD) \
+	$(YM_LIBS_LIBYM_BNET)

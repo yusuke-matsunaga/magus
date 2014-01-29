@@ -21,6 +21,8 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 GbmSolver::GbmSolver()
 {
+  mVerify = false;
+  mDebug = false;
 }
 
 // @brief デストラクタ
@@ -28,29 +30,39 @@ GbmSolver::~GbmSolver()
 {
 }
 
-// @brief 問題を解く
-// @param[in] network RcfNetwork
-// @param[in] func マッチング対象の関数
-// @param[out] conf_bits configuration ビットの値を収める配列
-bool
-GbmSolver::solve(const RcfNetwork& network,
-		 const TvFunc& func,
-		 vector<bool>& conf_bits)
+// @brief verify フラグを立てる
+void
+GbmSolver::verify_on()
 {
-  bool stat = _solve(network, func, conf_bits);
+  mVerify = true;
+}
 
-  if ( stat ) {
-    // 検証を行う．
-    ymuint ni = network.input_num();
-    vector<ymuint> iorder(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      iorder[i] = i;
-    }
-    bool vstat = verify(network, func, conf_bits, iorder);
-    assert_cond( vstat, __FILE__, __LINE__);
-  }
+// @brief verify フラグを降ろす
+void
+GbmSolver::verify_off()
+{
+  mVerify = false;
+}
 
-  return stat;
+// @brief debug フラグを立てる．
+void
+GbmSolver::debug_on()
+{
+  mDebug = true;
+}
+
+// @brief debug フラグを降ろす.
+void
+GbmSolver::debug_off()
+{
+  mDebug = false;
+}
+
+// @brief debug フラグを得る．
+bool
+GbmSolver::debug() const
+{
+  return mDebug;
 }
 
 // @brief 入力順を考慮したマッチング問題を解く
@@ -58,18 +70,41 @@ GbmSolver::solve(const RcfNetwork& network,
 // @param[in] func マッチング対象の関数
 // @param[out] conf_bits configuration ビットの値を収める配列
 // @param[out] iorder 入力順序
-// @note iorder[0] に func の0番めの入力に対応した RcfNetwork の入力番号が入る．
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmSolver::solve(const RcfNetwork& network,
 		 const TvFunc& func,
 		 vector<bool>& conf_bits,
 		 vector<ymuint>& iorder)
 {
-  bool stat = _solve(network, func, conf_bits, iorder);
+  ymuint ni = func.input_num();
+  vector<ymuint> rep(ni);
+  rep[0] = 0;
+  for (ymuint i = 1; i < ni; ++ i) {
+    rep[i] = i;
+    for (ymuint j = i; j > 0; ) {
+      -- j;
+      if ( func.check_sym(VarId(i), VarId(j)) ) {
+	rep[i] = j;
+	break;
+      }
+    }
+  }
 
-  if ( stat ) {
+  bool stat = _solve(network, func, rep, conf_bits, iorder);
+
+  if ( mVerify && stat ) {
     // 検証を行う．
     bool vstat = verify(network, func, conf_bits, iorder);
+    if ( debug() ) {
+      if ( vstat ) {
+	cout << "Verify succeeded" << endl;
+      }
+      else {
+	cout << "Verify failed" << endl;
+      }
+    }
     assert_cond( vstat, __FILE__, __LINE__);
   }
 
@@ -81,6 +116,8 @@ GbmSolver::solve(const RcfNetwork& network,
 // @param[in] func マッチング対象の関数
 // @param[in] conf_bits configuration ビットの値を収める配列
 // @param[in] iorder 入力順序
+//             iorder[pos] に network の pos 番めの入力に対応した
+//             関数の入力番号が入る．
 bool
 GbmSolver::verify(const RcfNetwork& network,
 		  const TvFunc& func,
@@ -89,49 +126,20 @@ GbmSolver::verify(const RcfNetwork& network,
 {
   ymuint nn = network.node_num();
   vector<TvFunc> func_array(nn);
-  vector<bool> done(nn, false);
 
   ymuint npi = func.input_num();
   // これは network.input_num() と等しいはず
+  assert_cond( npi == network.input_num(), __FILE__, __LINE__);
   for (ymuint i = 0; i < npi; ++ i) {
-    const RcfNode* node = network.input_node(iorder[i]);
+    const RcfNode* node = network.input_node(i);
     ymuint id = node->id();
-    func_array[id] = TvFunc::posi_literal(npi, VarId(i));
-    done[id] = true;
+    func_array[id] = TvFunc::posi_literal(npi, VarId(iorder[i]));
   }
 
-  // ちょっと効率が悪いけどわかりやすいコード
-  for ( ; ; ) {
-    bool skipped = false;
-    for (ymuint i = 0; i < nn; ++ i) {
-      if ( done[i] ) {
-	// 既に処理したものは飛ばす．
-	continue;
-      }
-
-      // まだ処理していないファンインを持つノードも飛ばす．
-      const RcfNode* node = network.node(i);
-      ymuint nfi = node->fanin_num();
-      bool not_yet = false;
-      for (ymuint j = 0; j < nfi; ++ j) {
-	RcfNodeHandle ihandle = node->fanin(j);
-	ymuint iid = ihandle.id();
-	if ( !done[iid] ) {
-	  not_yet = true;
-	  break;
-	}
-      }
-      if ( not_yet ) {
-	skipped = true;
-	continue;
-      }
-
-      func_array[i] = node->calc_func(func_array, conf_bits);
-      done[i] = true;
-    }
-    if ( !skipped ) {
-      break;
-    }
+  ymuint nf = network.func_node_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const RcfNode* node = network.func_node(i);
+    func_array[node->id()] = node->calc_func(func_array, conf_bits);
   }
 
   RcfNodeHandle output = network.output();
@@ -140,6 +148,26 @@ GbmSolver::verify(const RcfNetwork& network,
     ofunc = ~ofunc;
   }
 
+  if ( func != ofunc ) {
+    cerr << "verification error" << endl
+	 << " original func: " << func << endl
+	 << " lut func:      " << ofunc << endl;
+    cerr << " iorder: ";
+    for (ymuint i = 0; i < npi; ++ i) {
+      cerr << " " << iorder[i];
+    }
+    cerr << endl;
+    ymuint nc = conf_bits.size();
+    cerr << " conf_bits =    ";
+    for (ymuint i = 0; i < nc; ++ i) {
+      cerr << conf_bits[i];
+    }
+    cerr << endl;
+    for (ymuint i = 0; i < nf; ++ i) {
+      const RcfNode* node = network.func_node(i);
+      cerr << "Node#" << node->id() << ": " << func_array[node->id()] << endl;
+    }
+  }
   return func == ofunc;
 }
 

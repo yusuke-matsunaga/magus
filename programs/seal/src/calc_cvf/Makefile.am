@@ -1,18 +1,50 @@
 ## Process this file with automake to produce Makefile.in
 
-## $Id: Makefile.am 2507 2009-10-17 16:24:02Z matsunaga $
+
+############################################################
+## サブディレクトリの指定
+############################################################
 
 SUBDIRS =
 
-INCLUDES = \
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = libseal_calc_cvf.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(YM_INCLUDES) \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)
 
-MAINTAINERCLEANFILES = Makefile.in
 
-noinst_LTLIBRARIES = libseal_calc_cvf.la
+############################################################
+## libseal_calc_cvf.la 用の変数の定義
+############################################################
 
 libseal_calc_cvf_la_SOURCES = \
 	nsdef.h \
@@ -41,10 +73,10 @@ libseal_calc_cvf_la_SOURCES = \
 	CvfCmd.h \
 	CvfCmd.cc
 
-libseal_calc_cvf_la_LDFLAGS =
-
 libseal_calc_cvf_la_LIBADD = \
 	$(YM_LIBS_LIBYM_TGNET) \
 	$(YM_LIBS_LIBYM_LEXP) \
 	$(YM_LIBS_LIBYM_TCLPP) \
 	$(YM_LIBS_LIBYM_UTILS)
+
+libseal_calc_cvf_la_LDFLAGS =
