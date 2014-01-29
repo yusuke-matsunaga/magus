@@ -71,6 +71,6 @@ libym_seal_la_SOURCES = \
 libym_seal_la_LIBADD =
 
 libym_seal_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_bdd/libym_bdd.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
 	$(GMP_LIBS)
