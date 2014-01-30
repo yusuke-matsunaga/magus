@@ -106,15 +106,14 @@ GbmNaiveEnum::_solve_with_order(const RcfNetwork& network,
   SatSolver solver("minisat");
 
   ymuint nc = network.conf_var_num();
-  ymuint nn = network.node_num();
 
-  GbmEngineEnum engine(solver, nn, nc);
+  GbmEngineEnum engine(solver);
 
   if ( debug() ) {
     engine.debug_on();
   }
 
-  engine.init_conf_vars();
+  engine.init_conf_vars(network);
 
   conf_bits.resize(nc, false);
 

@@ -8,6 +8,7 @@
 
 
 #include "GbmBddEngine.h"
+#include "ym_logic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -18,17 +19,9 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] mgr BddMgr
-// @param[in] conf_num 設定変数の数
-// @param[in] input_num 入力数
-// @param[in] rep 関数の対称変数の代表番号を収める配列
-GbmBddEngine::GbmBddEngine(BddMgr& mgr,
-			   ymuint conf_num,
-			   ymuint input_num,
-			   const vector<ymuint>& rep) :
-  mConfVarArray(conf_num),
-  mInputNum(input_num),
-  mRep(rep),
-  mIorderVarArray(input_num * input_num)
+GbmBddEngine::GbmBddEngine(BddMgr& mgr) :
+  mMgr(mgr),
+  mDebug(false)
 {
 }
 
@@ -37,10 +30,41 @@ GbmBddEngine::~GbmBddEngine()
 {
 }
 
-// @brief 対称性を考慮して初期解を作る．
+// @brief debug フラグを立てる
 void
-GbmBddEngine::init_vars()
+GbmBddEngine::debug_on()
 {
+  mDebug = true;
+}
+
+// @brief debug フラグを降ろす
+void
+GbmBddEngine::debug_off()
+{
+  mDebug = false;
+}
+
+// @brief debug フラグの値を得る．
+bool
+GbmBddEngine::debug() const
+{
+  return mDebug;
+}
+
+// @brief 対称性を考慮して初期解を作る．
+// @param[in] rep 関数の対称変数の代表番号を収める配列
+void
+GbmBddEngine::init_vars(const RcfNetwork& network,
+			const vector<ymuint>& rep)
+{
+  ymuint nc = network.conf_var_num();
+  mConfVarArray.clear();
+  mConfVarArray.resize(nc);
+
+  mInputNum = network.input_num();
+  mIorderVarArray.clear();
+  mIorderVarArray.resize(mInputNum * mInputNum);
+
   // 最初に入力順を表す変数を確保する．
   for (ymuint i = 0; i < mInputNum; ++ i) {
     for (ymuint j = 0; j < mInputNum; ++ j) {
@@ -55,10 +79,13 @@ GbmBddEngine::init_vars()
   ymuint base = mInputNum * mInputNum;
   for (ymuint i = 0; i < mConfVarArray.size(); ++ i) {
     VarId vid(base + i);
-    mConvVarArray[i] = vid;
+    mConfVarArray[i] = vid;
     bool stat = mMgr.new_var(vid);
     assert_cond( stat, __FILE__, __LINE__);
   }
+
+  // one-hot 制約と対称性を考慮して初期解を作る．
+
 }
 
 // @brief 入力値を割り当てて解の候補を求める．
@@ -71,10 +98,83 @@ GbmBddEngine::init_vars()
 bool
 GbmBddEngine::make_bdd(const RcfNetwork& network,
 		       ymuint bitpat,
-		       ymuint oid,
-		       bool oval,
-		       vector<Bool3>& model)
+		       bool oval)
 {
+  ymuint nn = network.node_num();
+  mNodeBddArray.clear();
+  mNodeBddArray.resize(nn);
+
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    const RcfNode* node = network.input_node(i);
+    ymuint id = node->id();
+    Bdd y = mMgr.make_zero();
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      VarId vid_j = mIorderVarArray[i * mInputNum + j];
+      Bdd x1 = mMgr.make_posiliteral(vid_j);
+      if ( (bitpat & (1U << j)) == 0U ) {
+	x1 = ~x1;
+      }
+      y |= x1;
+    }
+    mNodeBddArray[id] = y;
+  }
+
+  // 外部出力のノード番号と極性
+  RcfNodeHandle output = network.output();
+  ymuint oid = output.id();
+  bool oinv = output.inv();
+
+  if ( oinv ) {
+    oval = !oval;
+  }
+
+  ymuint nf = network.func_node_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const RcfNode* node = network.func_node(i);
+    if ( node->id() == oid ) {
+      continue;
+    }
+    make_node_func(node);
+  }
+
+  if ( oval ) {
+    mSolution &= mNodeBddArray[oid];
+  }
+  else {
+    mSolution &= ~mNodeBddArray[oid];
+  }
+
+  if ( mSolution.is_zero() ) {
+    return false;
+  }
+  return true;
+}
+
+// @brief 結果からモデルを一つ取り出す．
+void
+GbmBddEngine::get_model(vector<Bool3>& model)
+{
+  if ( mSolution.is_zero() ) {
+    return;
+  }
+
+  ymuint nall = mConfVarArray.size() + mIorderVarArray.size();
+  model.clear();
+  model.resize(nall, kB3X);
+
+  BddLitSet opath = mSolution.onepath();
+  LiteralVector lv;
+  opath.to_vector(lv);
+  for (LiteralVector::iterator p = lv.begin();
+       p != lv.end(); ++ p) {
+    Literal l = *p;
+    if ( l.pol() == kPolPosi ) {
+      model[l.varid().val()] = kB3True;
+    }
+    else {
+      model[l.varid().val()] = kB3False;
+    }
+  }
 }
 
 // @brief SAT モデルから設定変数の割り当てを取り出す．
@@ -116,6 +216,93 @@ GbmBddEngine::get_iorder(const vector<Bool3>& model,
       }
     }
   }
+}
+
+// @brief RcfNode に対応する関数を計算する．
+// @param[in] node 対象のノード
+// @note 結果は mNodeBddArray に格納される．
+void
+GbmBddEngine::make_node_func(const RcfNode* node)
+{
+  assert_cond( !node->is_input(), __FILE__, __LINE__);
+
+  ymuint ni = node->fanin_num();
+  vector<Bdd> inputs(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    RcfNodeHandle ih = node->fanin(i);
+    assert_cond( !ih.is_const(), __FILE__, __LINE__);
+    ymuint id = ih.id();
+    Bdd f = mNodeBddArray[id];
+    if ( ih.inv() ) {
+      f = ~f;
+    }
+    inputs[i] = f;
+  }
+
+  Bdd output;
+  if ( node->is_and() ) {
+    output = inputs[0];
+    for (ymuint i = 1; i < ni; ++ i) {
+      output &= inputs[i];
+    }
+  }
+  else if ( node->is_lut() ) {
+    ymuint ni_exp = 1U << ni;
+    vector<Bdd> lut_vars(ni_exp);
+    ymuint conf0 = node->conf_base();
+    for (ymuint i = 0; i < ni_exp; ++ i) {
+      lut_vars[i] = mMgr.make_posiliteral(mConfVarArray[conf0 + i]);
+    }
+    output = make_LUT(inputs, lut_vars);
+  }
+  else if ( node->is_mux() ) {
+    ymuint ns = node->conf_size();
+    vector<Bdd> s_vars(ns);
+    ymuint s0 = node->conf_base();
+    for (ymuint i = 0; i < ns; ++ i) {
+      s_vars[i] = mMgr.make_posiliteral(mConfVarArray[s0 + i]);
+    }
+    output = make_MUX(inputs, s_vars);
+  }
+
+  mNodeBddArray[node->id()] = output;
+}
+
+// @brief LUT ノードの出力の論理関数を計算する．
+// @param[in] inputs ファンインの論理関数
+// @param[in] lut_vars LUT のコンフィグレーションメモリ
+Bdd
+GbmBddEngine::make_LUT(const vector<Bdd>& inputs,
+		       const vector<Bdd>& lut_vars)
+{
+  return make_MUX(lut_vars, inputs);
+}
+
+// @brief セレクタの出力の論理関数を計算する．
+// @param[in] inputs ファンインの論理関数
+// @param[in] s_vars 選択変数
+Bdd
+GbmBddEngine::make_MUX(const vector<Bdd>& inputs,
+		       const vector<Bdd>& s_vars)
+{
+  ymuint nd = inputs.size();
+  ymuint ns = s_vars.size();
+  assert_cond( (1U << ns) == nd, __FILE__, __LINE__);
+  Bdd output = mMgr.make_zero();
+  for (ymuint b = 0; b < nd; ++ b) {
+    Bdd dvar = inputs[b];
+    for (ymuint i = 0; i < ns; ++ i) {
+      Bdd svar = s_vars[i];
+      if ( (1 << i) & b ) {
+	dvar &= svar;
+      }
+      else {
+	dvar &= ~svar;
+      }
+    }
+    output |= dvar;
+  }
+  return output;
 }
 
 END_NAMESPACE_YM

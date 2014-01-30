@@ -58,16 +58,15 @@ GbmCegarBinary::_solve(const RcfNetwork& network,
   solver.set_max_conflict(100 * 1024);
 
   ymuint nc = network.conf_var_num();
-  ymuint nn = network.node_num();
   ymuint ni = network.input_num();
 
-  GbmEngineBinary engine(solver, nn, nc, ni, rep);
+  GbmEngineBinary engine(solver);
 
   if ( debug() ) {
     engine.debug_on();
   }
 
-  engine.init_vars(network);
+  engine.init_vars(network, rep);
 
   conf_bits.resize(nc, false);
   iorder.resize(ni, 0);

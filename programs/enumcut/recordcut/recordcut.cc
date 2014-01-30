@@ -32,6 +32,7 @@
 #include "GbmCegarBinary.h"
 #include "GbmCegarOneHot.h"
 #include "GbmCegarEnum.h"
+#include "GbmCegarBdd.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -122,6 +123,9 @@ rec_func(FuncMgr& func_mgr,
   }
   else if ( method == "cegar_enum" ) {
     solver = new GbmCegarEnum();
+  }
+  else if ( method == "cegar_bdd" ) {
+    solver = new GbmCegarBdd();
   }
   else if ( method != string() ) {
     cerr << "Illegal method: " << method << endl;

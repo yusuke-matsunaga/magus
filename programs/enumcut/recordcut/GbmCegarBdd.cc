@@ -8,6 +8,7 @@
 
 
 #include "GbmCegarBdd.h"
+#include "GbmBddEngine.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -44,24 +45,20 @@ GbmCegarBdd::_solve(const RcfNetwork& network,
 		    vector<ymuint>& iorder)
 {
   ymuint nc = network.conf_var_num();
-  ymuint nn = network.node_num();
   ymuint ni = network.input_num();
 
-  GbmEngineBdd(nn, nc, ni, rep);
+  BddMgr mgr("bmc", "gbm");
+
+  GbmBddEngine engine(mgr);
 
   if ( debug() ) {
     engine.debug_on();
   }
 
-  engine.init_vars();
+  engine.init_vars(network, rep);
 
   conf_bits.resize(nc, false);
   iorder.resize(ni, 0);
-
-  // 外部出力のノード番号と極性
-  RcfNodeHandle output = network.output();
-  ymuint oid = output.id();
-  bool oinv = output.inv();
 
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
@@ -84,26 +81,17 @@ GbmCegarBdd::_solve(const RcfNetwork& network,
       cout << endl;
     }
     // 外部入力変数に値を割り当てたときのBDDを作る．
-    ymuint oval = static_cast<bool>(func.value(bit_pat)) ^ oinv;
-    Bdd model = engine.make_bdd(network, bit_pat, oid, oval);
-    if ( model.is_zero() ) {
+    ymuint oval = func.value(bit_pat);
+    bool stat = engine.make_bdd(network, bit_pat, oval);
+    if ( !stat ) {
       break;
-    }
-    if ( model.is_invalid() ) {
-      break;
-    }
-    // 現在の model で全部の入力が成り立つか調べてみる．
-    BddLitSet one_path = model.onepath();
-    vector<Bool3> model_array(nc, kB3False);
-    for (BddLitSet::iterator p = one_path.begin();
-	 p != one_path.end(); ++ p) {
-      Literal lit = *p;
-      VarId vid = lit.varid();
-      model_array[vid.val()] = (lit.pol() == kPolPosi) ? kB3True : kB3False;
     }
 
-    engine.get_conf_bits(model_array, conf_bits);
-    engine.get_iorder(model_array, iorder);
+    // 現在の model で全部の入力が成り立つか調べてみる．
+    vector<Bool3> model;
+    engine.get_model(model);
+    engine.get_conf_bits(model, conf_bits);
+    engine.get_iorder(model, iorder);
     bool pass = true;
     for (ymuint b = 0; b < ni_exp; ++ b) {
       if ( check[b] ) {

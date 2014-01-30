@@ -39,7 +39,8 @@ noinst_PROGRAMS = \
 AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/include \
 	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	@GMP_INCLUDES@
 
 
 ############################################################
@@ -55,6 +56,8 @@ libgbm_la_SOURCES = \
 	GbmEngineOneHot.cc \
 	GbmEngineEnum.h \
 	GbmEngineEnum.cc \
+	GbmBddEngine.h \
+	GbmBddEngine.cc \
 	GbmSolver.h \
 	GbmSolver.cc \
 	GbmNaiveBinary.h \
@@ -75,6 +78,8 @@ libgbm_la_SOURCES = \
 	GbmCegarOneHot.cc \
 	GbmCegarEnum.h \
 	GbmCegarEnum.cc \
+	GbmCegarBdd.h \
+	GbmCegarBdd.cc \
 	RcfNetwork.h \
 	RcfNetwork.cc \
 	RcfNode.h \

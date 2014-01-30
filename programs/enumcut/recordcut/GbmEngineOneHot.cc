@@ -18,20 +18,8 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-// @param[in] node_num ノード数
-// @param[in] conf_num 設定変数の数
-// @param[in] input_num 入力数
-// @param[in] rep 関数の対称変数の代表番号を収める配列
-//            rep[pos] に pos 番めの入力の代表番号が入る．
-GbmEngineOneHot::GbmEngineOneHot(SatSolver& solver,
-				 ymuint node_num,
-				 ymuint conf_num,
-				 ymuint input_num,
-				 const vector<ymuint>& rep) :
-  GbmEngine(solver, node_num, conf_num),
-  mInputNum(input_num),
-  mRep(rep),
-  mIorderVarArray(input_num * input_num)
+GbmEngineOneHot::GbmEngineOneHot(SatSolver& solver) :
+  GbmEngine(solver)
 {
 }
 
@@ -42,12 +30,18 @@ GbmEngineOneHot::~GbmEngineOneHot()
 
 // @brief 変数を初期化する．
 // @param[in] network 対象の LUT ネットワーク
+// @param[in] rep 関数の対称変数の代表番号を収める配列
+//            rep[pos] に pos 番めの入力の代表番号が入る．
 void
-GbmEngineOneHot::init_vars(const RcfNetwork& network)
+GbmEngineOneHot::init_vars(const RcfNetwork& network,
+			   const vector<ymuint>& rep)
 {
-  init_conf_vars();
+  init_conf_vars(network);
 
   // 入力順用の変数を作る．
+  mInputNum = network.input_num();
+  mIorderVarArray.clear();
+  mIorderVarArray.resize(mInputNum * mInputNum);
   for (ymuint i = 0; i < mInputNum; ++ i) {
     ymuint base = i * mInputNum;
     for (ymuint j = 0; j < mInputNum; ++ j) {
@@ -59,28 +53,29 @@ GbmEngineOneHot::init_vars(const RcfNetwork& network)
     }
   }
 
-  ymuint ni = network.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    ymuint base = i * mInputNum;
+
     // 2つの変数が同時に true になってはいけないというルール
-    for (ymuint j = 0; j < ni; ++ j) {
-      Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
-      for (ymuint k = j + 1; k < ni; ++ k) {
-	Literal lit1(mIorderVarArray[i * ni + k], kPolNega);
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      Literal lit0(mIorderVarArray[base + j], kPolNega);
+      for (ymuint k = j + 1; k < mInputNum; ++ k) {
+	Literal lit1(mIorderVarArray[base + k], kPolNega);
 	add_clause(lit0, lit1);
       }
     }
     // 最低1つの変数が true にならなければならないというルール
-    vector<Literal> tmp_lits(ni);
-    for (ymuint j = 0; j < ni; ++ j) {
-      tmp_lits[j] = Literal(mIorderVarArray[i * ni + j], kPolPosi);
+    vector<Literal> tmp_lits(mInputNum);
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      tmp_lits[j] = Literal(mIorderVarArray[base + j], kPolPosi);
     }
     add_clause(tmp_lits);
 
     // 異なる LUT 入力におなじ入力が接続してはいけないというルール
-    for (ymuint j = 0; j < ni; ++ j) {
-      Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      Literal lit0(mIorderVarArray[base + j], kPolNega);
       for (ymuint k = 0; k < i; ++ k) {
-	Literal lit1(mIorderVarArray[k * ni + j], kPolNega);
+	Literal lit1(mIorderVarArray[k * mInputNum + j], kPolNega);
 	add_clause(lit0, lit1);
       }
     }
@@ -88,23 +83,23 @@ GbmEngineOneHot::init_vars(const RcfNetwork& network)
     // LUT の対称性を考慮したルール
     ymuint pred;
     if ( network.get_pred(i, pred) ) {
-      for (ymuint j = 0; j < ni; ++ j) {
-	Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
-	for (ymuint k = j + 1; k < ni; ++ k) {
-	  Literal lit1(mIorderVarArray[pred * ni + k], kPolNega);
+      for (ymuint j = 0; j < mInputNum; ++ j) {
+	Literal lit0(mIorderVarArray[base + j], kPolNega);
+	for (ymuint k = j + 1; k < mInputNum; ++ k) {
+	  Literal lit1(mIorderVarArray[pred * mInputNum + k], kPolNega);
 	  add_clause(lit0, lit1);
 	}
       }
     }
 
     // 関数の対称性を考慮したルール
-    for (ymuint j = 0; j < ni; ++ j) {
-      ymuint cur_rep = mRep[j];
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      ymuint cur_rep = rep[j];
       if ( cur_rep != j ) {
 	vector<Literal> tmp_lits(i + 1);
-	Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
+	Literal lit0(mIorderVarArray[i * mInputNum + j], kPolNega);
 	for (ymuint k = 0; k < i; ++ k) {
-	  Literal lit1(mIorderVarArray[k * ni + cur_rep], kPolPosi);
+	  Literal lit1(mIorderVarArray[k * mInputNum + cur_rep], kPolPosi);
 	  tmp_lits[k] = lit1;
 	}
 	tmp_lits[i] = lit0;
@@ -125,8 +120,7 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
 			  ymuint bit_pat,
 			  bool oval)
 {
-  ymuint ni = network.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     const RcfNode* node = network.input_node(i);
     ymuint id = node->id();
     VarId vid = new_var();
@@ -136,8 +130,8 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
     }
 
     // 入力と外部入力の間の関係式を作る．
-    for (ymuint j = 0; j < ni; ++ j) {
-      Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      Literal lit0(mIorderVarArray[i * mInputNum + j], kPolNega);
       tPol pol = ( bit_pat & (1U << j) ) ? kPolPosi : kPolNega;
       Literal lit1(vid, pol);
       add_clause(lit0, lit1);
@@ -156,10 +150,9 @@ void
 GbmEngineOneHot::get_iorder(const vector<Bool3>& model,
 			    vector<ymuint>& iorder) const
 {
-  ymuint ni = iorder.size();
-  for (ymuint i = 0; i < ni; ++ i) {
-    ymuint base = i * ni;
-    for (ymuint j = 0; j < ni; ++ j) {
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    ymuint base = i * mInputNum;
+    for (ymuint j = 0; j < mInputNum; ++ j) {
       VarId vid = mIorderVarArray[base + j];
       if ( model[vid.val()] == kB3True ) {
 	iorder[i] = j;

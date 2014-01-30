@@ -18,24 +18,9 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-// @param[in] node_num ノード数
-// @param[in] conf_num 設定変数の数
-// @param[in] input_num 入力数
-// @param[in] rep 関数の対称変数の代表番号を収める配列
-//            rep[pos] に pos 番めの入力の代表番号が入る．
-GbmEngineBinary::GbmEngineBinary(SatSolver& solver,
-				 ymuint node_num,
-				 ymuint conf_num,
-				 ymuint input_num,
-				 const vector<ymuint>& rep) :
-  GbmEngine(solver, node_num, conf_num),
-  mInputNum(input_num),
-  mRep(rep)
+GbmEngineBinary::GbmEngineBinary(SatSolver& solver) :
+  GbmEngine(solver)
 {
-  ymuint m = 0;
-  for (ymuint t = 1; t < input_num; t <<= 1, ++ m) ;
-  mIorderBitWidth = m;
-  mIorderVarArray.resize(input_num * m);
 }
 
 // @brief デストラクタ
@@ -45,15 +30,24 @@ GbmEngineBinary::~GbmEngineBinary()
 
 // @brief 変数の初期化を行う．
 // @param[in] network 対象の LUT ネットワーク
+// @param[in] rep 関数の対称変数の代表番号を収める配列
+//            rep[pos] に pos 番めの入力の代表番号が入る．
 void
-GbmEngineBinary::init_vars(const RcfNetwork& network)
+GbmEngineBinary::init_vars(const RcfNetwork& network,
+			   const vector<ymuint>& rep)
 {
-  init_conf_vars();
+  init_conf_vars(network);
 
+  mInputNum = network.input_num();
+  ymuint m = 0;
+  for (ymuint t = 1; t < mInputNum; t <<= 1, ++ m) ;
+  mIorderBitWidth = m;
+  mIorderVarArray.resize(mInputNum * m);
   for (ymuint i = 0; i < mInputNum; ++ i) {
+    ymuint base = i * mIorderBitWidth;
     for (ymuint j = 0; j < mIorderBitWidth; ++ j) {
       VarId vid = new_var();
-      mIorderVarArray[i * mIorderBitWidth + j] = vid;
+      mIorderVarArray[base + j] = vid;
       if ( debug() ) {
 	cout << "Iorder[" << i << "][" << j << "] = " << vid << endl;
       }
@@ -186,7 +180,7 @@ GbmEngineBinary::init_vars(const RcfNetwork& network)
 
     // 関数の対称性に関するルール
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      ymuint cur_rep = mRep[j];
+      ymuint cur_rep = rep[j];
       if ( cur_rep == j ) {
 	continue;
       }

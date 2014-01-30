@@ -10,6 +10,11 @@
 
 
 #include "ymtools.h"
+#include "ym_logic/Bdd.h"
+#include "ym_logic/BddMgr.h"
+#include "ym_logic/Bool3.h"
+#include "RcfNetwork.h"
+#include "RcfNode.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -24,13 +29,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr BddMgr
-  /// @param[in] conf_num 設定変数の数
-  /// @param[in] input_num 入力数
-  /// @param[in] rep 関数の対称変数の代表番号を収める配列
-  GbmBddEngine(BddMgr& mgr,
-	       ymuint conf_num,
-	       ymuint input_num,
-	       const vector<ymuint>& rep);
+  GbmBddEngine(BddMgr& mgr);
 
   /// @brief デストラクタ
   ~GbmBddEngine();
@@ -41,23 +40,39 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 対称性を考慮して初期解を作る．
+  /// @brief debug フラグを立てる
   void
-  init_vars();
+  debug_on();
+
+  /// @brief debug フラグを降ろす
+  void
+  debug_off();
+
+  /// @brief debug フラグの値を得る．
+  bool
+  debug() const;
+
+  /// @brief 対称性を考慮して初期解を作る．
+  /// @param[in] network 対象の LUT ネットワーク
+  /// @param[in] rep 関数の対称変数の代表番号を収める配列
+  void
+  init_vars(const RcfNetwork& network,
+	    const vector<ymuint>& rep);
 
   /// @brief 入力値を割り当てて解の候補を求める．
   /// @param[in] network 対象の LUT ネットワーク
   /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
-  /// @param[in] oid 出力のノード番号
   /// @param[in] oval 出力の値
   /// @param[out] model モデル
   /// @return 結果が空でなければ true を返し，model にその1つを収める．
   bool
   make_bdd(const RcfNetwork& network,
 	   ymuint bitpat,
-	   ymuint oid,
-	   bool oval,
-	   vector<Bool3>& model);
+	   bool oval);
+
+  /// @brief 結果からモデルを一つ取り出す．
+  void
+  get_model(vector<Bool3>& model);
 
   /// @brief SAT モデルから設定変数の割り当てを取り出す．
   /// @param[in] model SAT モデル
@@ -78,8 +93,37 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief RcfNode に対応する関数を計算する．
+  /// @param[in] node 対象のノード
+  /// @note 結果は mNodeBddArray に格納される．
+  void
+  make_node_func(const RcfNode* node);
+
+  /// @brief LUT ノードの出力の論理関数を計算する．
+  /// @param[in] inputs ファンインの論理関数
+  /// @param[in] lut_vars LUT のコンフィグレーションメモリ
+  Bdd
+  make_LUT(const vector<Bdd>& inputs,
+	   const vector<Bdd>& lut_vars);
+
+  /// @brief セレクタの出力の論理関数を計算する．
+  /// @param[in] inputs ファンインの論理関数
+  /// @param[in] s_vars 選択変数
+  Bdd
+  make_MUX(const vector<Bdd>& inputs,
+	   const vector<Bdd>& s_vars);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // BddMgr
+  BddMgr& mMgr;
 
   // 設定変数番号をキーにして BDD上の変数番号を格納する配列
   vector<VarId> mConfVarArray;
@@ -87,18 +131,20 @@ private:
   // 入力数
   ymuint32 mInputNum;
 
-  // 関数の対称性を表す配列
-  // mRep[i] に関数の i 番めの入力の等価グループの先行者番号が入る．
-  // 自分が等価グループの先頭の場合(singleton も含む)には自分の番号が入る．
-  const vector<ymuint>& mRep;
-
   // 入力順を表す変数の配列
   // i * mInputNum + j 番めの要素は LUT network の i 番めの入力と
   // 関数の j 番めの入力が接続しているときに true となる変数を
   // 格納している．
   vector<VarId> mIorderVarArray;
 
+  // 各 RcfNode の関数を格納する配列
+  vector<Bdd> mNodeBddArray;
 
+  // 途中結果を表す BDD
+  Bdd mSolution;
+
+  // デバッグフラグ
+  bool mDebug;
 };
 
 END_NAMESPACE_YM

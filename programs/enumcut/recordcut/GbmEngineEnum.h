@@ -25,11 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  /// @param[in] node_num ノード数
-  /// @param[in] conf_num 設定変数の数
-  GbmEngineEnum(SatSolver& solver,
-		ymuint node_num,
-		ymuint conf_num);
+  GbmEngineEnum(SatSolver& solver);
 
   /// @brief デストラクタ
   ~GbmEngineEnum();

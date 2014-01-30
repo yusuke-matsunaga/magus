@@ -25,16 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  /// @param[in] node_num ノード数
-  /// @param[in] conf_num 設定変数の数
-  /// @param[in] input_num 入力数
-  /// @param[in] rep 関数の対称変数の代表番号を収める配列
-  ///            rep[pos] に pos 番めの入力の代表番号が入る．
-  GbmEngineOneHot(SatSolver& solver,
-		  ymuint node_num,
-		  ymuint conf_num,
-		  ymuint input_num,
-		  const vector<ymuint>& rep);
+  GbmEngineOneHot(SatSolver& solver);
 
   /// @brief デストラクタ
   ~GbmEngineOneHot();
@@ -47,8 +38,11 @@ public:
 
   /// @brief 変数を初期化する．
   /// @param[in] network 対象の LUT ネットワーク
+  /// @param[in] rep 関数の対称変数の代表番号を収める配列
+  ///            rep[pos] に pos 番めの入力の代表番号が入る．
   void
-  init_vars(const RcfNetwork& network);
+  init_vars(const RcfNetwork& network,
+	    const vector<ymuint>& rep);
 
   /// @brief 入力値を割り当てて CNF 式を作る．
   /// @param[in] network 対象の LUT ネットワーク
@@ -83,11 +77,6 @@ private:
 
   // 入力数
   ymuint32 mInputNum;
-
-  // 関数の対称性を表す配列
-  // mRep[i] に関数の i 番めの入力の等価グループの先行者番号が入る．
-  // 自分が等価グループの先頭の場合(singleton も含む)には自分の番号が入る．
-  const vector<ymuint>& mRep;
 
   // 入力順を表す変数の配列
   // i * mInputNum + j 番めの要素は LUT network の i 番めの入力と

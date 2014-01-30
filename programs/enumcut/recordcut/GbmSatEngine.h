@@ -1,37 +1,39 @@
-#ifndef GBMENGINE_H
-#define GBMENGINE_H
+#ifndef GBMSATENGINE_H
+#define GBMSATENGINE_H
 
-/// @file GbmEngine.h
-/// @brief GbmEngine のヘッダファイル
+/// @file GbmSatEngine.h
+/// @brief GbmSatEngine のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "GbmLit.h"
-#include "RcfNetwork.h"
-#include "RcfNode.h"
+#include "GbmEngine.h"
 #include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmEngine GbmEngine.h "GbmEngine.h"
-/// @brief GBM の基本処理を行なうクラス
+/// @class GbmSatEngine GbmSatEngine.h "GbmSatEngine.h"
+/// @brief SAT ベースの GbmEngine
 //////////////////////////////////////////////////////////////////////
-class GbmEngine
+class GbmSatEngine :
+  public GbmEngine
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  GbmEngine(SatSolver& solver);
+  /// @param[in] node_num ノード数
+  /// @param[in] conf_num 設定変数の数
+  GbmSatEngine(SatSolver& solver,
+	       ymuint node_num,
+	       ymuint conf_num);
 
   /// @brief デストラクタ
-  ~GbmEngine();
+  ~GbmSatEngine();
 
 
 public:
@@ -39,22 +41,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief debug フラグを立てる
-  void
-  debug_on();
-
-  /// @brief debug フラグを降ろす
-  void
-  debug_off();
-
-  /// @brief debug フラグの値を得る．
-  bool
-  debug() const;
-
   /// @brief 設定変数を初期化する．
-  /// @param[in] network 対象の LUT ネットワーク
   void
-  init_conf_vars(const RcfNetwork& network);
+  init_conf_vars();
 
   /// @brief SAT モデルから設定変数の割り当てを取り出す．
   /// @param[in] model SAT モデル
@@ -179,4 +168,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // GBMENGINE_H
+#endif // GBMSATENGINE_H

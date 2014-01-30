@@ -18,12 +18,8 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-// @param[in] node_num ノード数
-// @param[in] conf_num 設定変数の数
-GbmEngineEnum::GbmEngineEnum(SatSolver& solver,
-			     ymuint node_num,
-			     ymuint conf_num) :
-  GbmEngine(solver, node_num, conf_num)
+GbmEngineEnum::GbmEngineEnum(SatSolver& solver) :
+  GbmEngine(solver)
 {
 }
 

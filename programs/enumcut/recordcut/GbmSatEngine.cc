@@ -18,8 +18,14 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-GbmEngine::GbmEngine(SatSolver& solver) :
+// @param[in] node_num ノード数
+// @param[in] conf_num 設定変数の数
+GbmEngine::GbmEngine(SatSolver& solver,
+		     ymuint node_num,
+		     ymuint conf_num) :
   mSolver(solver),
+  mNodeVarArray(node_num),
+  mConfVarArray(conf_num),
   mDebug(false)
 {
 }
@@ -51,24 +57,16 @@ GbmEngine::debug() const
 }
 
 // @brief 設定変数を初期化する．
-// @param[in] network 対象の LUT ネットワーク
 void
-GbmEngine::init_conf_vars(const RcfNetwork& network)
+GbmEngine::init_conf_vars()
 {
-  ymuint nc = network.conf_var_num();
-  mConfVarArray.clear();
-  mConfVarArray.resize(nc);
-  for (ymuint i = 0; i < nc; ++ i) {
+  for (ymuint i = 0; i < mConfVarArray.size(); ++ i) {
     VarId vid = new_var();
     mConfVarArray[i] = vid;
     if ( debug() ) {
       cout << "conf_bits[" << i << "] = " << vid << endl;
     }
   }
-
-  ymuint nn = network.node_num();
-  mNodeVarArray.clear();
-  mNodeVarArray.resize(nn);
 }
 
 // @brief ノードに対応するリテラルを登録する．
@@ -182,6 +180,7 @@ bool
 GbmEngine::make_nodes_cnf(const RcfNetwork& network,
 			  ymuint oval)
 {
+
   // 外部出力のノード番号と極性
   RcfNodeHandle output = network.output();
   ymuint oid = output.id();
