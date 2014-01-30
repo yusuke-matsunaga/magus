@@ -58,6 +58,10 @@ libgbm_la_SOURCES = \
 	GbmEngineEnum.cc \
 	GbmBddEngine.h \
 	GbmBddEngine.cc \
+	GbmBddEngineBinary.h \
+	GbmBddEngineBinary.cc \
+	GbmBddEngineEnum.h \
+	GbmBddEngineEnum.cc \
 	GbmSolver.h \
 	GbmSolver.cc \
 	GbmNaiveBinary.h \
@@ -80,6 +84,10 @@ libgbm_la_SOURCES = \
 	GbmCegarEnum.cc \
 	GbmCegarBdd.h \
 	GbmCegarBdd.cc \
+	GbmBddCegarBinary.h \
+	GbmBddCegarBinary.cc \
+	GbmBddCegarEnum.h \
+	GbmBddCegarEnum.cc \
 	RcfNetwork.h \
 	RcfNetwork.cc \
 	RcfNode.h \

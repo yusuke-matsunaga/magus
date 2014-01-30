@@ -1,32 +1,30 @@
 
-/// @file GbmCegarEnum.cc
-/// @brief GbmCegarEnum の実装ファイル
+/// @file GbmBddCegarEnum.cc
+/// @brief GbmBddCegarEnum の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmCegarEnum.h"
-#include "GbmEngineEnum.h"
-#include "ym_logic/SatStats.h"
-#include "ym_logic/SatMsgHandler.h"
+#include "GbmBddCegarEnum.h"
+#include "GbmBddEngineEnum.h"
 #include "ym_utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmCegarEnum
+// クラス GbmBddCegarEnum
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmCegarEnum::GbmCegarEnum()
+GbmBddCegarEnum::GbmBddCegarEnum()
 {
 }
 
 // @brief デストラクタ
-GbmCegarEnum::~GbmCegarEnum()
+GbmBddCegarEnum::~GbmBddCegarEnum()
 {
 }
 
@@ -40,11 +38,11 @@ GbmCegarEnum::~GbmCegarEnum()
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 bool
-GbmCegarEnum::_solve(const RcfNetwork& network,
-		     const TvFunc& func,
-		     const vector<ymuint>& rep,
-		     vector<bool>& conf_bits,
-		     vector<ymuint>& iorder)
+GbmBddCegarEnum::_solve(const RcfNetwork& network,
+			const TvFunc& func,
+			const vector<ymuint>& rep,
+			vector<bool>& conf_bits,
+			vector<ymuint>& iorder)
 {
   ymuint ni = network.input_num();
   ymuint np = 0;
@@ -85,11 +83,11 @@ GbmCegarEnum::_solve(const RcfNetwork& network,
       for (ymuint i = 0; i < ni; ++ i) {
 	iorder[i] = tmp_order[i];
       }
-      cout << "total " << np << " permutations" << endl;
+      cout << "total " << np << " permutations (success)" << endl;
       return true;
     }
   }
-  cout << "total " << np << " permutations" << endl;
+  cout << "total " << np << " permutations (fail)" << endl;
   return false;
 }
 
@@ -102,50 +100,39 @@ GbmCegarEnum::_solve(const RcfNetwork& network,
 //            関数の入力番号が入る．
 // @param[out] conf_bits configuration ビットの値を収める配列
 bool
-GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
-			       const TvFunc& func,
-			       const vector<ymuint>& iorder,
-			       vector<bool>& conf_bits)
+GbmBddCegarEnum::_solve_with_order(const RcfNetwork& network,
+				   const TvFunc& func,
+				   const vector<ymuint>& iorder,
+				   vector<bool>& conf_bits)
 {
-  SatSolver solver("minisat");
+  BddMgr mgr("bmc", "gbm");
+
   ymuint nc = network.conf_var_num();
 
-  GbmEngineEnum engine(solver);
+  GbmBddEngineEnum engine(mgr);
 
   if ( debug() ) {
     engine.debug_on();
   }
 
-  engine.init_conf_vars(network);
+  engine.init_vars(network);
 
   conf_bits.resize(nc, false);
 
-  cout << "_solve_with_order" << endl;
   ymuint ni = network.input_num();
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
-  Bool3 stat = kB3X;
   vector<Bool3> model;
   ymuint bit_pat = 0U;
   for ( ; ; ) {
-    cout << " bit_pat = " << hex << bit_pat << dec << endl;
     check[bit_pat] = true;
     // 入力に定数を割り当てたときの CNF 式を作る．
     ymuint oval = func.value(bit_pat);
-    bool ok = engine.make_cnf(network, bit_pat, iorder, oval);
+    bool ok = engine.make_bdd(network, bit_pat, iorder, oval);
     if ( !ok ) {
-      cout << "  --> NG" << endl;
       return false;
     }
-    stat = solver.solve(model);
-    if ( stat == kB3False ) {
-      cout << "  --> NG" << endl;
-      return false;
-    }
-    if ( stat == kB3X ) {
-      cout << "  --> NG" << endl;
-      return false;
-    }
+    engine.get_model(model);
 
     // 現在の model で全部の入力が成り立つか調べてみる．
     engine.get_conf_bits(model, conf_bits);
@@ -168,7 +155,6 @@ GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
       }
     }
     if ( pass ) {
-      cout << " ==> PASS" << endl;
       return true;
     }
   }

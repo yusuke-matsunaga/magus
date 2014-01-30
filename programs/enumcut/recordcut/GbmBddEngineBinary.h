@@ -1,8 +1,8 @@
-#ifndef GBMBDDENGINE_H
-#define GBMBDDENGINE_H
+#ifndef GBMBDDENGINEBINARY_H
+#define GBMBDDENGINEBINARY_H
 
-/// @file GbmBddEngine.h
-/// @brief GbmBddEngine のヘッダファイル
+/// @file GbmBddEngineBinary.h
+/// @brief GbmBddEngineBinary のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -20,19 +20,19 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmBddEngine GbmBddEngine.h "GbmBddEngine.h"
+/// @class GbmBddEngineBinary GbmBddEngineBinary.h "GbmBddEngineBinary.h"
 /// @brief BDD ベースの GbmEngine
 //////////////////////////////////////////////////////////////////////
-class GbmBddEngine
+class GbmBddEngineBinary
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr BddMgr
-  GbmBddEngine(BddMgr& mgr);
+  GbmBddEngineBinary(BddMgr& mgr);
 
   /// @brief デストラクタ
-  ~GbmBddEngine();
+  ~GbmBddEngineBinary();
 
 
 public:
@@ -143,10 +143,13 @@ private:
   // 入力数
   ymuint32 mInputNum;
 
+
+  // 入力順を表す変数の数
+  ymuint32 mIorderBitWidth;
+
   // 入力順を表す変数の配列
-  // i * mInputNum + j 番めの要素は LUT network の i 番めの入力と
-  // 関数の j 番めの入力が接続しているときに true となる変数を
-  // 格納している．
+  // i * mIorderBitWidth から mIorderBitWidth 分の変数が LUT network の i 番めの入力と
+  // 接続している関数の入力番号を表す．
   vector<VarId> mIorderVarArray;
 
   // 各 RcfNode の関数を格納する配列
@@ -165,4 +168,4 @@ private:
 END_NAMESPACE_YM
 
 
-#endif // GBMBDDENGINE_H
+#endif // GBMBDDENGINEBINARY_H

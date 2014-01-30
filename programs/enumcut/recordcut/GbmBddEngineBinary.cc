@@ -1,52 +1,52 @@
 
-/// @file GbmBddEngine.cc
-/// @brief GbmBddEngine の実装ファイル
+/// @file GbmBddEngineBinary.cc
+/// @brief GbmBddEngineBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmBddEngine.h"
+#include "GbmBddEngineBinary.h"
 #include "ym_logic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmBddEngine
+// クラス GbmBddEngineBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr BddMgr
-GbmBddEngine::GbmBddEngine(BddMgr& mgr) :
+GbmBddEngineBinary::GbmBddEngineBinary(BddMgr& mgr) :
   mMgr(mgr),
   mDebug(false)
 {
 }
 
 // @brief デストラクタ
-GbmBddEngine::~GbmBddEngine()
+GbmBddEngineBinary::~GbmBddEngineBinary()
 {
 }
 
 // @brief debug フラグを立てる
 void
-GbmBddEngine::debug_on()
+GbmBddEngineBinary::debug_on()
 {
   mDebug = true;
 }
 
 // @brief debug フラグを降ろす
 void
-GbmBddEngine::debug_off()
+GbmBddEngineBinary::debug_off()
 {
   mDebug = false;
 }
 
 // @brief debug フラグの値を得る．
 bool
-GbmBddEngine::debug() const
+GbmBddEngineBinary::debug() const
 {
   return mDebug;
 }
@@ -54,29 +54,32 @@ GbmBddEngine::debug() const
 // @brief 対称性を考慮して初期解を作る．
 // @param[in] rep 関数の対称変数の代表番号を収める配列
 void
-GbmBddEngine::init_vars(const RcfNetwork& network,
-			const vector<ymuint>& rep)
+GbmBddEngineBinary::init_vars(const RcfNetwork& network,
+			      const vector<ymuint>& rep)
 {
   ymuint nc = network.conf_var_num();
   mConfVarArray.clear();
   mConfVarArray.resize(nc);
 
   mInputNum = network.input_num();
+  ymuint m = 0;
+  for (ymuint t = 1; t < mInputNum; t <<= 1, ++ m) ;
+  mIorderBitWidth = m;
   mIorderVarArray.clear();
-  mIorderVarArray.resize(mInputNum * mInputNum);
+  mIorderVarArray.resize(mInputNum * m);
 
   // 最初に入力順を表す変数を確保する．
   for (ymuint i = 0; i < mInputNum; ++ i) {
-    for (ymuint j = 0; j < mInputNum; ++ j) {
-      VarId vid(i * mInputNum + j);
-      mIorderVarArray[i * mInputNum + j] = vid;
+    for (ymuint j = 0; j < mIorderBitWidth; ++ j) {
+      VarId vid(i * mIorderBitWidth + j);
+      mIorderVarArray[i * mIorderBitWidth + j] = vid;
       bool stat = mMgr.new_var(vid);
       assert_cond( stat, __FILE__, __LINE__);
     }
   }
 
   // 次に configuration bit 用の変数を確保する．
-  ymuint base = mInputNum * mInputNum;
+  ymuint base = mInputNum * mIorderBitWidth;
   for (ymuint i = 0; i < mConfVarArray.size(); ++ i) {
     VarId vid(base + i);
     mConfVarArray[i] = vid;
@@ -95,7 +98,7 @@ GbmBddEngine::init_vars(const RcfNetwork& network,
   mIorderBddArray[0] = mMgr.make_one();
   mSolution = make_iorder_bdd(0, var_list, network);
 
-  if ( debug() ) {
+  if ( true || debug() ) {
     mpz_class mc = mSolution.minterm_count(nc);
     cout << "Total " << mc << " permutations" << endl;
     mSolution.print(cout);
@@ -109,9 +112,9 @@ GbmBddEngine::init_vars(const RcfNetwork& network,
 // @param[in] oval 出力の値
 // @return 結果が空でなければ true を返し，model にその1つを収める．
 Bool3
-GbmBddEngine::make_bdd(const RcfNetwork& network,
-		       ymuint bitpat,
-		       bool oval)
+GbmBddEngineBinary::make_bdd(const RcfNetwork& network,
+			     ymuint bitpat,
+			     bool oval)
 {
   ymuint nn = network.node_num();
   mNodeBddArray.clear();
@@ -120,14 +123,25 @@ GbmBddEngine::make_bdd(const RcfNetwork& network,
   for (ymuint i = 0; i < mInputNum; ++ i) {
     const RcfNode* node = network.input_node(i);
     ymuint id = node->id();
+
+    ymuint base_i = i * mIorderBitWidth;
+
     Bdd y = mMgr.make_zero();
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      VarId vid_j = mIorderVarArray[i * mInputNum + j];
-      Bdd x1 = mMgr.make_posiliteral(vid_j);
-      if ( (bitpat & (1U << j)) == 0U ) {
-	x1 = ~x1;
+      Bdd p = mMgr.make_one();
+      for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
+	VarId kvar = mIorderVarArray[base_i + k];
+	if ( j & (1U << k) ) {
+	  p &= mMgr.make_posiliteral(kvar);
+	}
+	else {
+	  p &= mMgr.make_negaliteral(kvar);
+	}
       }
-      y |= x1;
+      if ( (bitpat & (1U << j)) == 0U ) {
+	p = ~p;
+      }
+      y |= p;
     }
     mNodeBddArray[id] = y;
   }
@@ -165,7 +179,7 @@ GbmBddEngine::make_bdd(const RcfNetwork& network,
 
 // @brief 結果からモデルを一つ取り出す．
 void
-GbmBddEngine::get_model(vector<Bool3>& model)
+GbmBddEngineBinary::get_model(vector<Bool3>& model)
 {
   assert_cond( !mSolution.is_invalid(), __FILE__, __LINE__);
 
@@ -196,8 +210,8 @@ GbmBddEngine::get_model(vector<Bool3>& model)
 // @param[in] model SAT モデル
 // @param[out] conf_bits 設定変数の割り当て
 void
-GbmBddEngine::get_conf_bits(const vector<Bool3>& model,
-			    vector<bool>& conf_bits) const
+GbmBddEngineBinary::get_conf_bits(const vector<Bool3>& model,
+				  vector<bool>& conf_bits) const
 {
   ymuint nc = mConfVarArray.size();
   for (ymuint i = 0; i < nc; ++ i) {
@@ -222,19 +236,20 @@ GbmBddEngine::get_conf_bits(const vector<Bool3>& model,
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 void
-GbmBddEngine::get_iorder(const vector<Bool3>& model,
-			 vector<ymuint>& iorder) const
+GbmBddEngineBinary::get_iorder(const vector<Bool3>& model,
+			       vector<ymuint>& iorder) const
 {
   ymuint ni = iorder.size();
   for (ymuint i = 0; i < ni; ++ i) {
-    ymuint base = i * ni;
-    for (ymuint j = 0; j < ni; ++ j) {
+    ymuint pos = 0;
+    ymuint base = i * mIorderBitWidth;
+    for (ymuint j = 0; j < mIorderBitWidth; ++ j) {
       VarId vid = mIorderVarArray[base + j];
       if ( model[vid.val()] == kB3True ) {
-	iorder[i] = j;
-	break;
+	pos += (1U << j);
       }
     }
+    iorder[i] = pos;
   }
 }
 
@@ -245,9 +260,9 @@ GbmBddEngine::get_iorder(const vector<Bool3>& model,
 // var_list に含まれる変数の順列をすべて表す
 // BDD を返す．
 Bdd
-GbmBddEngine::make_iorder_bdd(ymuint level,
-			      ymuint var_list,
-			      const RcfNetwork& network)
+GbmBddEngineBinary::make_iorder_bdd(ymuint level,
+				    ymuint var_list,
+				    const RcfNetwork& network)
 {
 #if 0
   cout << "make_iorder_bdd(" << level << ")" << endl;
@@ -278,12 +293,12 @@ GbmBddEngine::make_iorder_bdd(ymuint level,
 #endif
 	ymuint var_list1 = var_list & ~(1U << i);
 	Bdd f1 = make_iorder_bdd(level + 1, var_list1, network);
-	for (ymuint j = 0; j < mInputNum; ++ j) {
-	  if ( j == i ) {
-	    f1 &= mMgr.make_posiliteral(mIorderVarArray[level * mInputNum + j]);
+	for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
+	  if ( i & (1U << k) ) {
+	    f1 &= mMgr.make_posiliteral(mIorderVarArray[level * mIorderBitWidth + k]);
 	  }
 	  else {
-	    f1 &= ~mMgr.make_posiliteral(mIorderVarArray[level * mInputNum + j]);
+	    f1 &= mMgr.make_negaliteral(mIorderVarArray[level * mIorderBitWidth + k]);
 	  }
 	}
 	f |= f1;
@@ -302,7 +317,7 @@ GbmBddEngine::make_iorder_bdd(ymuint level,
 // @param[in] node 対象のノード
 // @note 結果は mNodeBddArray に格納される．
 void
-GbmBddEngine::make_node_func(const RcfNode* node)
+GbmBddEngineBinary::make_node_func(const RcfNode* node)
 {
   assert_cond( !node->is_input(), __FILE__, __LINE__);
 
@@ -352,8 +367,8 @@ GbmBddEngine::make_node_func(const RcfNode* node)
 // @param[in] inputs ファンインの論理関数
 // @param[in] lut_vars LUT のコンフィグレーションメモリ
 Bdd
-GbmBddEngine::make_LUT(const vector<Bdd>& inputs,
-		       const vector<Bdd>& lut_vars)
+GbmBddEngineBinary::make_LUT(const vector<Bdd>& inputs,
+			     const vector<Bdd>& lut_vars)
 {
   return make_MUX(lut_vars, inputs);
 }
@@ -362,8 +377,8 @@ GbmBddEngine::make_LUT(const vector<Bdd>& inputs,
 // @param[in] inputs ファンインの論理関数
 // @param[in] s_vars 選択変数
 Bdd
-GbmBddEngine::make_MUX(const vector<Bdd>& inputs,
-		       const vector<Bdd>& s_vars)
+GbmBddEngineBinary::make_MUX(const vector<Bdd>& inputs,
+			     const vector<Bdd>& s_vars)
 {
   ymuint nd = inputs.size();
   ymuint ns = s_vars.size();

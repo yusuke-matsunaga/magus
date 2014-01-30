@@ -1,35 +1,35 @@
 
-/// @file GbmCegarBdd.cc
-/// @brief GbmCegarBdd の実装ファイル
+/// @file GbmBddCegarBinary.cc
+/// @brief GbmBddCegarBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmCegarBdd.h"
-#include "GbmBddEngine.h"
+#include "GbmBddCegarBinary.h"
+#include "GbmBddEngineBinary.h"
+#include "ym_logic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmCegarBdd
+// クラス GbmBddCegarBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmCegarBdd::GbmCegarBdd()
+GbmBddCegarBinary::GbmBddCegarBinary()
 {
 }
 
 // @brief デストラクタ
-GbmCegarBdd::~GbmCegarBdd()
+GbmBddCegarBinary::~GbmBddCegarBinary()
 {
 }
 
 // @brief 入力順を考慮したマッチング問題を解く
 // @param[in] network RcfNetwork
-// @param[in] output Reconfigurable Network の出力
 // @param[in] func マッチング対象の関数
 // @param[in] rep 関数の対称変数の代表番号を収める配列
 //            rep[pos] に pos 番めの入力の代表番号が入る．
@@ -38,18 +38,18 @@ GbmCegarBdd::~GbmCegarBdd()
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 bool
-GbmCegarBdd::_solve(const RcfNetwork& network,
-		    const TvFunc& func,
-		    const vector<ymuint>& rep,
-		    vector<bool>& conf_bits,
-		    vector<ymuint>& iorder)
+GbmBddCegarBinary::_solve(const RcfNetwork& network,
+			  const TvFunc& func,
+			  const vector<ymuint>& rep,
+			  vector<bool>& conf_bits,
+			  vector<ymuint>& iorder)
 {
   ymuint nc = network.conf_var_num();
   ymuint ni = network.input_num();
 
   BddMgr mgr("bmc", "gbm");
 
-  GbmBddEngine engine(mgr);
+  GbmBddEngineBinary engine(mgr);
 
   if ( debug() ) {
     engine.debug_on();
@@ -63,6 +63,7 @@ GbmCegarBdd::_solve(const RcfNetwork& network,
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
   Bool3 stat = kB3X;
+  vector<Bool3> model;
   ymuint bit_pat = 0;
   for ( ;; ) {
     check[bit_pat] = true;
@@ -79,18 +80,18 @@ GbmCegarBdd::_solve(const RcfNetwork& network,
       }
       cout << endl;
     }
-    // 外部入力変数に値を割り当てたときのBDDを作る．
+    // 外部入力変数に値を割り当てたときの CNF 式を作る．
     ymuint oval = func.value(bit_pat);
     stat = engine.make_bdd(network, bit_pat, oval);
     if ( stat != kB3True ) {
       break;
     }
+    engine.get_model(model);
 
     // 現在の model で全部の入力が成り立つか調べてみる．
-    vector<Bool3> model;
-    engine.get_model(model);
     engine.get_conf_bits(model, conf_bits);
     engine.get_iorder(model, iorder);
+
     bool pass = true;
     for (ymuint b = 0; b < ni_exp; ++ b) {
       if ( check[b] ) {

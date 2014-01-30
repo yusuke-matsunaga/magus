@@ -1,8 +1,8 @@
-#ifndef GBMBDDENGINE_H
-#define GBMBDDENGINE_H
+#ifndef GBMBDDENGINEENUM_H
+#define GBMBDDENGINEENUM_H
 
-/// @file GbmBddEngine.h
-/// @brief GbmBddEngine のヘッダファイル
+/// @file GbmBddEngineEnum.h
+/// @brief GbmBddEngineEnum のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -20,19 +20,19 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmBddEngine GbmBddEngine.h "GbmBddEngine.h"
+/// @class GbmBddEngineEnum GbmBddEngineEnum.h "GbmBddEngineEnum.h"
 /// @brief BDD ベースの GbmEngine
 //////////////////////////////////////////////////////////////////////
-class GbmBddEngine
+class GbmBddEngineEnum
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr BddMgr
-  GbmBddEngine(BddMgr& mgr);
+  GbmBddEngineEnum(BddMgr& mgr);
 
   /// @brief デストラクタ
-  ~GbmBddEngine();
+  ~GbmBddEngineEnum();
 
 
 public:
@@ -54,23 +54,22 @@ public:
 
   /// @brief 対称性を考慮して初期解を作る．
   /// @param[in] network 対象の LUT ネットワーク
-  /// @param[in] rep 関数の対称変数の代表番号を収める配列
   void
-  init_vars(const RcfNetwork& network,
-	    const vector<ymuint>& rep);
+  init_vars(const RcfNetwork& network);
 
   /// @brief 入力値を割り当てて解の候補を求める．
   /// @param[in] network 対象の LUT ネットワーク
   /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
   /// @param[in] oval 出力の値
-  /// @param[out] model モデル
   /// @return 結果が空でなければ true を返し，model にその1つを収める．
-  Bool3
+  bool
   make_bdd(const RcfNetwork& network,
 	   ymuint bitpat,
+	   const vector<ymuint>& iorder,
 	   bool oval);
 
   /// @brief 結果からモデルを一つ取り出す．
+  /// @param[out] model モデル
   void
   get_model(vector<Bool3>& model);
 
@@ -81,32 +80,11 @@ public:
   get_conf_bits(const vector<Bool3>& model,
 		vector<bool>& conf_bits) const;
 
-  /// @brief SAT モデルから入力順を取り出す．
-  /// @param[in] model SAT モデル
-  /// @param[out] iorder 入力順
-  ///             iorder[pos] に network の pos 番めの入力に対応した
-  ///             関数の入力番号が入る．
-  void
-  get_iorder(const vector<Bool3>& model,
-	     vector<ymuint>& iorder) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 変数順を表すBDDを作る．
-  /// @param[in] level レベル
-  /// @param[in] var_list 変数の集合を表すビットベクタ
-  /// @param[in] network 対象の LUT ネットワーク
-  ///
-  /// var_list に含まれる変数の順列をすべて表す
-  /// BDD を返す．
-  Bdd
-  make_iorder_bdd(ymuint level,
-		  ymuint var_list,
-		  const RcfNetwork& network);
 
   /// @brief RcfNode に対応する関数を計算する．
   /// @param[in] node 対象のノード
@@ -143,17 +121,8 @@ private:
   // 入力数
   ymuint32 mInputNum;
 
-  // 入力順を表す変数の配列
-  // i * mInputNum + j 番めの要素は LUT network の i 番めの入力と
-  // 関数の j 番めの入力が接続しているときに true となる変数を
-  // 格納している．
-  vector<VarId> mIorderVarArray;
-
   // 各 RcfNode の関数を格納する配列
   vector<Bdd> mNodeBddArray;
-
-  // var_list をキーにして順列の集合を表すBDDを格納する配列
-  vector<Bdd> mIorderBddArray;
 
   // 途中結果を表す BDD
   Bdd mSolution;
@@ -165,4 +134,4 @@ private:
 END_NAMESPACE_YM
 
 
-#endif // GBMBDDENGINE_H
+#endif // GBMBDDENGINEENUM_H
