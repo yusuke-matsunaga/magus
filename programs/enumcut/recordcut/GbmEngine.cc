@@ -174,14 +174,22 @@ GbmEngine::get_conf_bits(const vector<Bool3>& model,
 
 // @brief 内部ノードに変数番号を割り当て，CNF式を作る．
 // @param[in] network 対象の LUT ネットワーク
-// @param[in] oid 出力のノード番号
 // @param[in] oval 出力値
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
 GbmEngine::make_nodes_cnf(const RcfNetwork& network,
-			  ymuint oid,
 			  ymuint oval)
 {
+
+  // 外部出力のノード番号と極性
+  RcfNodeHandle output = network.output();
+  ymuint oid = output.id();
+  bool oinv = output.inv();
+
+  if ( oinv ) {
+    oval = !oval;
+  }
+
   // 内部のノードに変数番号を割り当てて，
   // ノードの入出力の関係を表す CNF 式を作る．
   ymuint nf = network.func_node_num();

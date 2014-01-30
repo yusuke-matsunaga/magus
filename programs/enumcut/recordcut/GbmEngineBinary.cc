@@ -44,8 +44,9 @@ GbmEngineBinary::~GbmEngineBinary()
 }
 
 // @brief 変数の初期化を行う．
+// @param[in] network 対象の LUT ネットワーク
 void
-GbmEngineBinary::init_vars()
+GbmEngineBinary::init_vars(const RcfNetwork& network)
 {
   init_conf_vars();
 
@@ -58,56 +59,12 @@ GbmEngineBinary::init_vars()
       }
     }
   }
-}
 
-// @brief 入力値を割り当てて CNF 式を作る．
-// @param[in] network 対象の LUT ネットワーク
-// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
-// @param[in] oid 出力のノード番号
-// @param[in] oval 出力の値
-// @note 結果のCNF式は SAT ソルバに追加される．
-bool
-GbmEngineBinary::make_cnf(const RcfNetwork& network,
-			  ymuint bit_pat,
-			  ymuint oid,
-			  bool oval)
-{
-  ymuint ni = network.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const RcfNode* node = network.input_node(i);
-    ymuint id = node->id();
-    VarId vid = new_var();
-    set_node_var(id, GbmLit(vid));
-    if ( debug() ) {
-      cout << " lut_input#" << i << ": " << vid << endl;
-    }
-
+  for (ymuint i = 0; i < mInputNum; ++ i) {
     ymuint base_i = i * mIorderBitWidth;
-
-    // 入力と外部入力の間の関係式を作る．
-    vector<Literal> tmp_lits(mIorderBitWidth + 1);
-    for (ymuint j = 0; j < ni; ++ j) {
-      for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
-	VarId kvar = mIorderVarArray[base_i + k];
-	// こちらは含意の左辺なので否定する．
-	if ( j & (1U << k) ) {
-	  tmp_lits[k] = Literal(kvar, kPolNega);
-	}
-	else {
-	  tmp_lits[k] = Literal(kvar, kPolPosi);
-	}
-      }
-      if ( bit_pat & (1U << j) ) {
-	tmp_lits[mIorderBitWidth] = Literal(vid, kPolPosi);
-      }
-      else {
-	tmp_lits[mIorderBitWidth] = Literal(vid, kPolNega);
-      }
-      add_clause(tmp_lits);
-    }
     // 使っていない変数の組み合わせを禁止する．
     vector<Literal> tmp_lits2(mIorderBitWidth);
-    for (ymuint b = ni; b < (1U << mIorderBitWidth); ++ b) {
+    for (ymuint b = mInputNum; b < (1U << mIorderBitWidth); ++ b) {
       for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
 	VarId kvar = mIorderVarArray[base_i + k];
 	if ( b & (1U << k) ) {
@@ -228,7 +185,7 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
     }
 
     // 関数の対称性に関するルール
-    for (ymuint j = 0; j < ni; ++ j) {
+    for (ymuint j = 0; j < mInputNum; ++ j) {
       ymuint cur_rep = mRep[j];
       if ( cur_rep == j ) {
 	continue;
@@ -282,8 +239,53 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
 #endif
     }
   }
+}
 
-  return make_nodes_cnf(network, oid, oval);
+// @brief 入力値を割り当てて CNF 式を作る．
+// @param[in] network 対象の LUT ネットワーク
+// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+// @param[in] oval 出力の値
+// @note 結果のCNF式は SAT ソルバに追加される．
+bool
+GbmEngineBinary::make_cnf(const RcfNetwork& network,
+			  ymuint bit_pat,
+			  bool oval)
+{
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    const RcfNode* node = network.input_node(i);
+    ymuint id = node->id();
+    VarId vid = new_var();
+    set_node_var(id, GbmLit(vid));
+    if ( debug() ) {
+      cout << " lut_input#" << i << ": " << vid << endl;
+    }
+
+    ymuint base_i = i * mIorderBitWidth;
+
+    // 入力と外部入力の間の関係式を作る．
+    vector<Literal> tmp_lits(mIorderBitWidth + 1);
+    for (ymuint j = 0; j < mInputNum; ++ j) {
+      for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
+	VarId kvar = mIorderVarArray[base_i + k];
+	// こちらは含意の左辺なので否定する．
+	if ( j & (1U << k) ) {
+	  tmp_lits[k] = Literal(kvar, kPolNega);
+	}
+	else {
+	  tmp_lits[k] = Literal(kvar, kPolPosi);
+	}
+      }
+      if ( bit_pat & (1U << j) ) {
+	tmp_lits[mIorderBitWidth] = Literal(vid, kPolPosi);
+      }
+      else {
+	tmp_lits[mIorderBitWidth] = Literal(vid, kPolNega);
+      }
+      add_clause(tmp_lits);
+    }
+  }
+
+  return make_nodes_cnf(network, oval);
 }
 
 // @brief SAT モデルから入力順を取り出す．

@@ -81,12 +81,10 @@ protected:
 
   /// @brief 内部ノードに変数番号を割り当て，CNF式を作る．
   /// @param[in] network 対象の LUT ネットワーク
-  /// @param[in] oid 出力のノード番号
   /// @param[in] oval 出力値
   /// @return 割り当てが矛盾を起こしたら false を返す．
   bool
   make_nodes_cnf(const RcfNetwork& network,
-		 ymuint oid,
 		 ymuint oval);
 
   /// @brief SAT用の新しい変数を作る．

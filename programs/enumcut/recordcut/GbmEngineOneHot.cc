@@ -41,8 +41,9 @@ GbmEngineOneHot::~GbmEngineOneHot()
 }
 
 // @brief 変数を初期化する．
+// @param[in] network 対象の LUT ネットワーク
 void
-GbmEngineOneHot::init_vars()
+GbmEngineOneHot::init_vars(const RcfNetwork& network)
 {
   init_conf_vars();
 
@@ -57,37 +58,9 @@ GbmEngineOneHot::init_vars()
       }
     }
   }
-}
 
-// @brief 入力値を割り当てて CNF 式を作る．
-// @param[in] network 対象の LUT ネットワーク
-// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
-// @param[in] oid 出力のノード番号
-// @param[in] oval 出力の値
-// @note 結果のCNF式は SAT ソルバに追加される．
-bool
-GbmEngineOneHot::make_cnf(const RcfNetwork& network,
-			  ymuint bit_pat,
-			  ymuint oid,
-			  bool oval)
-{
   ymuint ni = network.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    const RcfNode* node = network.input_node(i);
-    ymuint id = node->id();
-    VarId vid = new_var();
-    set_node_var(id, GbmLit(vid));
-    if ( debug() ) {
-      cout << " lut_input#" << i << ": " << vid << endl;
-    }
-
-    // 入力と外部入力の間の関係式を作る．
-    for (ymuint j = 0; j < ni; ++ j) {
-      Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
-      tPol pol = ( bit_pat & (1U << j) ) ? kPolPosi : kPolNega;
-      Literal lit1(vid, pol);
-      add_clause(lit0, lit1);
-    }
     // 2つの変数が同時に true になってはいけないというルール
     for (ymuint j = 0; j < ni; ++ j) {
       Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
@@ -139,8 +112,39 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
       }
     }
   }
+}
 
-  return make_nodes_cnf(network, oid, oval);
+// @brief 入力値を割り当てて CNF 式を作る．
+// @param[in] network 対象の LUT ネットワーク
+// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+// @param[in] oid 出力のノード番号
+// @param[in] oval 出力の値
+// @note 結果のCNF式は SAT ソルバに追加される．
+bool
+GbmEngineOneHot::make_cnf(const RcfNetwork& network,
+			  ymuint bit_pat,
+			  bool oval)
+{
+  ymuint ni = network.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const RcfNode* node = network.input_node(i);
+    ymuint id = node->id();
+    VarId vid = new_var();
+    set_node_var(id, GbmLit(vid));
+    if ( debug() ) {
+      cout << " lut_input#" << i << ": " << vid << endl;
+    }
+
+    // 入力と外部入力の間の関係式を作る．
+    for (ymuint j = 0; j < ni; ++ j) {
+      Literal lit0(mIorderVarArray[i * ni + j], kPolNega);
+      tPol pol = ( bit_pat & (1U << j) ) ? kPolPosi : kPolNega;
+      Literal lit1(vid, pol);
+      add_clause(lit0, lit1);
+    }
+  }
+
+  return make_nodes_cnf(network, oval);
 }
 
 // @brief SAT モデルから入力順を取り出す．

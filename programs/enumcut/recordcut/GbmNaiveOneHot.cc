@@ -67,15 +67,10 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
     engine.debug_on();
   }
 
-  engine.init_vars();
+  engine.init_vars(network);
 
   conf_bits.resize(nc, false);
   iorder.resize(ni, 0);
-
-  // 外部出力のノード番号と極性
-  RcfNodeHandle output = network.output();
-  ymuint oid = output.id();
-  bool oinv = output.inv();
 
   ymuint ni_exp = 1U << ni;
   Bool3 stat = kB3X;
@@ -95,8 +90,8 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
       cout << endl;
     }
     // 外部入力変数に値を割り当てたときの CNF 式を作る．
-    ymuint oval = static_cast<bool>(func.value(b)) ^ oinv;
-    bool ok = engine.make_cnf(network, b, oid, oval);
+    ymuint oval = func.value(b);
+    bool ok = engine.make_cnf(network, b, oval);
     if ( !ok ) {
       break;
     }

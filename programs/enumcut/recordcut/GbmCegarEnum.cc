@@ -117,11 +117,6 @@ GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
 
   conf_bits.resize(nc, false);
 
-  // 外部出力のノード番号と極性
-  RcfNodeHandle output = network.output();
-  ymuint oid = output.id();
-  bool oinv = output.inv();
-
   ymuint ni = network.input_num();
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
@@ -131,8 +126,8 @@ GbmCegarEnum::_solve_with_order(const RcfNetwork& network,
   for ( ; ; ) {
     check[bit_pat] = true;
     // 入力に定数を割り当てたときの CNF 式を作る．
-    ymuint oval = static_cast<bool>(func.value(bit_pat)) ^ oinv;
-    bool ok = engine.make_cnf(network, bit_pat, iorder, oid, oval);
+    ymuint oval = func.value(bit_pat);
+    bool ok = engine.make_cnf(network, bit_pat, iorder, oval);
     if ( !ok ) {
       break;
     }

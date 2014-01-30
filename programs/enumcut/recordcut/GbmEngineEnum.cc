@@ -38,14 +38,12 @@ GbmEngineEnum::~GbmEngineEnum()
 // @param[in] iorder 入力順
 //　          iorder[pos] に network の pos 番めの入力に対応した
 //            関数の入力番号が入る．
-// @param[in] oid 出力のノード番号
 // @param[in] oval 出力の値
 // @note 結果のCNF式は SAT ソルバに追加される．
 bool
 GbmEngineEnum::make_cnf(const RcfNetwork& network,
 			ymuint bit_pat,
 			const vector<ymuint>& iorder,
-			ymuint oid,
 			bool oval)
 {
   ymuint ni = network.input_num();
@@ -60,7 +58,7 @@ GbmEngineEnum::make_cnf(const RcfNetwork& network,
       set_node_var(id, GbmLit::make_zero());
     }
   }
-  return make_nodes_cnf(network, oid, oval);
+  return make_nodes_cnf(network, oval);
 }
 
 END_NAMESPACE_YM

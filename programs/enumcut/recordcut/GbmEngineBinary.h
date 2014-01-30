@@ -46,19 +46,18 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 変数の初期化を行う．
+  /// @param[in] network 対象の LUT ネットワーク
   void
-  init_vars();
+  init_vars(const RcfNetwork& network);
 
   /// @brief 入力値を割り当てて CNF 式を作る．
   /// @param[in] network 対象の LUT ネットワーク
   /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
-  /// @param[in] oid 出力のノード番号
   /// @param[in] oval 出力の値
   /// @note 結果のCNF式は SAT ソルバに追加される．
   bool
   make_cnf(const RcfNetwork& network,
 	   ymuint bit_pat,
-	   ymuint oid,
 	   bool oval);
 
   /// @brief SAT モデルから入力順を取り出す．

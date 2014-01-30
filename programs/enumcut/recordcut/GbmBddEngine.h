@@ -1,43 +1,39 @@
-#ifndef GBMENGINEONEHOT_H
-#define GBMENGINEONEHOT_H
+#ifndef GBMBDDENGINE_H
+#define GBMBDDENGINE_H
 
-/// @file GbmEngine.h
-/// @brief GbmEngine のヘッダファイル
+/// @file GbmBddEngine.h
+/// @brief GbmBddEngine のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013, 2014 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngine.h"
+#include "ymtools.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmEngineOneHot GbmEngineOneHot.h "GbmEngineOneHot.h"
-/// @brief 入力順を one-hot 符号化する GbmEngine
+/// @class GbmBddEngine GbmBddEngine.h "GbmBddEngine.h"
+/// @brief BDD ベースの GbmEngine
 //////////////////////////////////////////////////////////////////////
-class GbmEngineOneHot :
-  public GbmEngine
+class GbmBddEngine
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] solver SATソルバ
-  /// @param[in] node_num ノード数
+  /// @param[in] mgr BddMgr
   /// @param[in] conf_num 設定変数の数
   /// @param[in] input_num 入力数
   /// @param[in] rep 関数の対称変数の代表番号を収める配列
-  ///            rep[pos] に pos 番めの入力の代表番号が入る．
-  GbmEngineOneHot(SatSolver& solver,
-		  ymuint node_num,
-		  ymuint conf_num,
-		  ymuint input_num,
-		  const vector<ymuint>& rep);
+  GbmBddEngine(BddMgr& mgr,
+	       ymuint conf_num,
+	       ymuint input_num,
+	       const vector<ymuint>& rep);
 
   /// @brief デストラクタ
-  ~GbmEngineOneHot();
+  ~GbmBddEngine();
 
 
 public:
@@ -45,20 +41,30 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を初期化する．
-  /// @param[in] network 対象の LUT ネットワーク
+  /// @brief 対称性を考慮して初期解を作る．
   void
-  init_vars(const RcfNetwork& network);
+  init_vars();
 
-  /// @brief 入力値を割り当てて CNF 式を作る．
+  /// @brief 入力値を割り当てて解の候補を求める．
   /// @param[in] network 対象の LUT ネットワーク
   /// @param[in] bit_pat 外部入力の割り当てを表すビットパタン
+  /// @param[in] oid 出力のノード番号
   /// @param[in] oval 出力の値
-  /// @note 結果のCNF式は SAT ソルバに追加される．
+  /// @param[out] model モデル
+  /// @return 結果が空でなければ true を返し，model にその1つを収める．
   bool
-  make_cnf(const RcfNetwork& network,
-	   ymuint bit_pat,
-	   bool oval);
+  make_bdd(const RcfNetwork& network,
+	   ymuint bitpat,
+	   ymuint oid,
+	   bool oval,
+	   vector<Bool3>& model);
+
+  /// @brief SAT モデルから設定変数の割り当てを取り出す．
+  /// @param[in] model SAT モデル
+  /// @param[out] conf_bits 設定変数の割り当て
+  void
+  get_conf_bits(const vector<Bool3>& model,
+		vector<bool>& conf_bits) const;
 
   /// @brief SAT モデルから入力順を取り出す．
   /// @param[in] model SAT モデル
@@ -72,14 +78,11 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 設定変数番号をキーにして BDD上の変数番号を格納する配列
+  vector<VarId> mConfVarArray;
 
   // 入力数
   ymuint32 mInputNum;
@@ -95,8 +98,10 @@ private:
   // 格納している．
   vector<VarId> mIorderVarArray;
 
+
 };
 
 END_NAMESPACE_YM
 
-#endif // GBMENGINEONEHOT_H
+
+#endif // GBMBDDENGINE_H

@@ -67,15 +67,10 @@ GbmCegarOneHot::_solve(const RcfNetwork& network,
     engine.debug_on();
   }
 
-  engine.init_vars();
+  engine.init_vars(network);
 
   conf_bits.resize(nc, false);
   iorder.resize(ni, 0);
-
-  // 外部出力のノード番号と極性
-  RcfNodeHandle output = network.output();
-  ymuint oid = output.id();
-  bool oinv = output.inv();
 
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
@@ -98,8 +93,8 @@ GbmCegarOneHot::_solve(const RcfNetwork& network,
       cout << endl;
     }
     // 外部入力変数に値を割り当てたときの CNF 式を作る．
-    ymuint oval = static_cast<bool>(func.value(bit_pat)) ^ oinv;
-    bool ok = engine.make_cnf(network, bit_pat, oid, oval);
+    ymuint oval = func.value(bit_pat);
+    bool ok = engine.make_cnf(network, bit_pat, oval);
     if ( !ok ) {
       break;
     }
