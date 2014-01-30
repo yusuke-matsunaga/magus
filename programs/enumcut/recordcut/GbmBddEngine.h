@@ -96,6 +96,18 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 変数順を表すBDDを作る．
+  /// @param[in] level レベル
+  /// @param[in] var_list 変数の集合を表すビットベクタ
+  /// @param[in] network 対象の LUT ネットワーク
+  ///
+  /// var_list に含まれる変数の順列をすべて表す
+  /// BDD を返す．
+  Bdd
+  make_iorder_bdd(ymuint level,
+		  ymuint var_list,
+		  const RcfNetwork& network);
+
   /// @brief RcfNode に対応する関数を計算する．
   /// @param[in] node 対象のノード
   /// @note 結果は mNodeBddArray に格納される．
@@ -139,6 +151,9 @@ private:
 
   // 各 RcfNode の関数を格納する配列
   vector<Bdd> mNodeBddArray;
+
+  // var_list をキーにして順列の集合を表すBDDを格納する配列
+  vector<Bdd> mIorderBddArray;
 
   // 途中結果を表す BDD
   Bdd mSolution;

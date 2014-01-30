@@ -85,7 +85,14 @@ GbmBddEngine::init_vars(const RcfNetwork& network,
   }
 
   // one-hot 制約と対称性を考慮して初期解を作る．
-
+  ymuint var_list = 0U;
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    var_list |= (1U << i);
+  }
+  ymuint ni_exp = 1U << mInputNum;
+  mIorderBddArray.clear();
+  mIorderBddArray.resize(ni_exp, mMgr.make_zero());
+  mSolution = make_iorder_bdd(0, var_list, network);
 }
 
 // @brief 入力値を割り当てて解の候補を求める．
@@ -216,6 +223,38 @@ GbmBddEngine::get_iorder(const vector<Bool3>& model,
       }
     }
   }
+}
+
+// @brief 変数順を表すBDDを作る．
+// @param[in] level レベル
+// @param[in] var_list 変数の集合を表すビットベクタ
+//
+// var_list に含まれる変数の順列をすべて表す
+// BDD を返す．
+Bdd
+GbmBddEngine::make_iorder_bdd(ymuint level,
+			      ymuint var_list,
+			      const RcfNetwork& network)
+{
+  Bdd f = mIorderBddArray[var_list];
+  if ( f.is_zero() ) {
+    f = mMgr.make_zero();
+    for (ymuint i = 0; i < mInputNum; ++ i) {
+      if ( var_list & (1U << i) ) {
+	ymuint pred;
+	if ( network.get_pred(i, pred) &&
+	     (var_list & (1U << pred)) ) {
+	  // LUTの対称性により枝刈り
+	  continue;
+	}
+	ymuint var_list1 = var_list & ~(1U << i);
+	Bdd f1 = make_iorder_bdd(level + 1, var_list1, network);
+	f |= f1 & mMgr.make_posiliteral(mIorderVarArray[level * mInputNum + i]);
+      }
+    }
+    mIorderBddArray[var_list] = f;
+  }
+  return f;
 }
 
 // @brief RcfNode に対応する関数を計算する．
