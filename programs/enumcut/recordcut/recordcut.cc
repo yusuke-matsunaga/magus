@@ -23,17 +23,14 @@
 #include "FuncRec.h"
 
 #include "Lut443Match.h"
-#include "GbmNaiveBinary.h"
-#include "GbmNaiveOneHot.h"
-#include "GbmNaiveEnum.h"
-#include "GbmIncrBinary.h"
-#include "GbmIncrOneHot.h"
-#include "GbmIncrEnum.h"
-#include "GbmCegarBinary.h"
-#include "GbmCegarOneHot.h"
-#include "GbmCegarEnum.h"
-#include "GbmCegarBdd.h"
+#include "GbmSatNaiveBinary.h"
+#include "GbmSatNaiveOneHot.h"
+#include "GbmSatNaiveEnum.h"
+#include "GbmSatCegarBinary.h"
+#include "GbmSatCegarOneHot.h"
+#include "GbmSatCegarEnum.h"
 #include "GbmBddCegarBinary.h"
+#include "GbmBddCegarOneHot.h"
 #include "GbmBddCegarEnum.h"
 
 #include "ym_utils/MsgMgr.h"
@@ -99,35 +96,26 @@ rec_func(FuncMgr& func_mgr,
   }
 
   GbmSolver* solver = NULL;
-  if ( method == "naive_binary" ) {
-    solver = new GbmNaiveBinary();
+  if ( method == "sat_naive_binary" ) {
+    solver = new GbmSatNaiveBinary();
   }
-  else if ( method == "naive_onehot" ) {
-    solver = new GbmNaiveOneHot();
+  else if ( method == "sat_naive_onehot" ) {
+    solver = new GbmSatNaiveOneHot();
   }
-  else if ( method == "naive_enum" ) {
-    solver = new GbmNaiveEnum();
+  else if ( method == "sat_naive_enum" ) {
+    solver = new GbmSatNaiveEnum();
   }
-  else if ( method == "incr_binary" ) {
-    solver = new GbmIncrBinary();
+  else if ( method == "sat_cegar_binary" ) {
+    solver = new GbmSatCegarBinary();
   }
-  else if ( method == "incr_onehot" ) {
-    solver = new GbmIncrOneHot();
+  else if ( method == "sat_cegar_onehot" ) {
+    solver = new GbmSatCegarOneHot();
   }
-  else if ( method == "incr_enum" ) {
-    solver = new GbmIncrEnum();
+  else if ( method == "sat_cegar_enum" ) {
+    solver = new GbmSatCegarEnum();
   }
-  else if ( method == "cegar_binary" ) {
-    solver = new GbmCegarBinary();
-  }
-  else if ( method == "cegar_onehot" ) {
-    solver = new GbmCegarOneHot();
-  }
-  else if ( method == "cegar_enum" ) {
-    solver = new GbmCegarEnum();
-  }
-  else if ( method == "cegar_bdd" ) {
-    solver = new GbmCegarBdd();
+  else if ( method == "bdd_cegar_onehot" ) {
+    solver = new GbmBddCegarOneHot();
   }
   else if ( method == "bdd_cegar_enum" ) {
     solver = new GbmBddCegarEnum();
@@ -141,7 +129,7 @@ rec_func(FuncMgr& func_mgr,
   }
   if ( solver == NULL ) {
     // デフォルトフォールバック
-    solver = new GbmNaiveBinary();
+    solver = new GbmSatCegarOneHot();
   }
 
   StopWatch timer;

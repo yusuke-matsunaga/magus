@@ -1,14 +1,14 @@
 
-/// @file GbmNaiveOneHot.cc
-/// @brief GbmNaiveOneHot の実装ファイル
+/// @file GbmSatCegarBinary.cc
+/// @brief GbmSatCegarBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNaiveOneHot.h"
-#include "GbmEngineOneHot.h"
+#include "GbmSatCegarBinary.h"
+#include "GbmSatEngineBinary.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandlerImpl1.h"
 
@@ -16,16 +16,16 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmNaiveOneHot
+// クラス GbmSatCegarBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmNaiveOneHot::GbmNaiveOneHot()
+GbmSatCegarBinary::GbmSatCegarBinary()
 {
 }
 
 // @brief デストラクタ
-GbmNaiveOneHot::~GbmNaiveOneHot()
+GbmSatCegarBinary::~GbmSatCegarBinary()
 {
 }
 
@@ -39,11 +39,11 @@ GbmNaiveOneHot::~GbmNaiveOneHot()
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 bool
-GbmNaiveOneHot::_solve(const RcfNetwork& network,
-		       const TvFunc& func,
-		       const vector<ymuint>& rep,
-		       vector<bool>& conf_bits,
-		       vector<ymuint>& iorder)
+GbmSatCegarBinary::_solve(const RcfNetwork& network,
+			  const TvFunc& func,
+			  const vector<ymuint>& rep,
+			  vector<bool>& conf_bits,
+			  vector<ymuint>& iorder)
 {
 #if 1
   SatSolver solver("minisat");
@@ -60,7 +60,7 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   ymuint nc = network.conf_var_num();
   ymuint ni = network.input_num();
 
-  GbmEngineOneHot engine(solver);
+  GbmSatEngineBinary engine(solver);
 
   if ( debug() ) {
     engine.debug_on();
@@ -72,14 +72,17 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
   iorder.resize(ni, 0);
 
   ymuint ni_exp = 1U << ni;
+  vector<bool> check(ni_exp, false);
   Bool3 stat = kB3X;
   vector<Bool3> model;
-  for (ymuint b = 0U; b < ni_exp; ++ b) {
+  ymuint bit_pat = 0;
+  for ( ;; ) {
+    check[bit_pat] = true;
     // 入力に定数を割り当てる．
     if ( debug() ) {
       cout << "INPUT: ";
       for (ymuint i = 0; i < ni; ++ i) {
-	if ( b & (1U << (ni - i - 1)) ) {
+	if ( bit_pat & (1U << (ni - i - 1)) ) {
 	  cout << "1";
 	}
 	else {
@@ -89,20 +92,46 @@ GbmNaiveOneHot::_solve(const RcfNetwork& network,
       cout << endl;
     }
     // 外部入力変数に値を割り当てたときの CNF 式を作る．
-    ymuint oval = func.value(b);
-    bool ok = engine.make_cnf(network, b, oval);
+    ymuint oval = func.value(bit_pat);
+    bool ok = engine.make_cnf(network, bit_pat, oval);
     if ( !ok ) {
       break;
     }
-  }
-
-  stat = solver.solve(model);
-  if ( stat == kB3True ) {
+    stat = solver.solve(model);
+    if ( stat == kB3False ) {
+      break;
+    }
+    if ( stat == kB3X ) {
+      break;
+    }
+    // 現在の model で全部の入力が成り立つか調べてみる．
     engine.get_conf_bits(model, conf_bits);
     engine.get_iorder(model, iorder);
-    return true;
+
+    bool pass = true;
+    for (ymuint b = 0; b < ni_exp; ++ b) {
+      if ( check[b] ) {
+	continue;
+      }
+      ymuint exp_out = func.value(b);
+      vector<bool> ival_list(ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	ymuint src_pos = iorder[i];
+	bool val = (b & (1U << src_pos)) ? true : false;
+	ival_list[i] = val;
+      }
+      if ( network.simulate(ival_list, conf_bits) != exp_out ) {
+	bit_pat = b;
+	pass = false;
+	break;
+      }
+    }
+    if ( pass ) {
+      return true;
+    }
   }
-  else if ( stat == kB3X ) {
+
+  if ( stat == kB3X ) {
     cout << "Aborted" << endl;
   }
 

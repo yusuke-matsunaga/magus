@@ -1,30 +1,30 @@
 
-/// @file GbmEngineEnum.cc
-/// @brief GbmEngineEnum の実装ファイル
+/// @file GbmSatEngineEnum.cc
+/// @brief GbmSatEngineEnum の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngineEnum.h"
+#include "GbmSatEngineEnum.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmEngineEnum
+// クラス GbmSatEngineEnum
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-GbmEngineEnum::GbmEngineEnum(SatSolver& solver) :
-  GbmEngine(solver)
+GbmSatEngineEnum::GbmSatEngineEnum(SatSolver& solver) :
+  GbmSatEngine(solver)
 {
 }
 
 // @brief デストラクタ
-GbmEngineEnum::~GbmEngineEnum()
+GbmSatEngineEnum::~GbmSatEngineEnum()
 {
 }
 
@@ -37,10 +37,10 @@ GbmEngineEnum::~GbmEngineEnum()
 // @param[in] oval 出力の値
 // @note 結果のCNF式は SAT ソルバに追加される．
 bool
-GbmEngineEnum::make_cnf(const RcfNetwork& network,
-			ymuint bit_pat,
-			const vector<ymuint>& iorder,
-			bool oval)
+GbmSatEngineEnum::make_cnf(const RcfNetwork& network,
+			   ymuint bit_pat,
+			   const vector<ymuint>& iorder,
+			   bool oval)
 {
   ymuint ni = network.input_num();
   for (ymuint i = 0; i < ni; ++ i) {

@@ -1,52 +1,52 @@
 
-/// @file GbmBddEngine.cc
-/// @brief GbmBddEngine の実装ファイル
+/// @file GbmBddEngineOneHot.cc
+/// @brief GbmBddEngineOneHot の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmBddEngine.h"
+#include "GbmBddEngineOneHot.h"
 #include "ym_logic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmBddEngine
+// クラス GbmBddEngineOneHot
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mgr BddMgr
-GbmBddEngine::GbmBddEngine(BddMgr& mgr) :
+GbmBddEngineOneHot::GbmBddEngineOneHot(BddMgr& mgr) :
   mMgr(mgr),
   mDebug(false)
 {
 }
 
 // @brief デストラクタ
-GbmBddEngine::~GbmBddEngine()
+GbmBddEngineOneHot::~GbmBddEngineOneHot()
 {
 }
 
 // @brief debug フラグを立てる
 void
-GbmBddEngine::debug_on()
+GbmBddEngineOneHot::debug_on()
 {
   mDebug = true;
 }
 
 // @brief debug フラグを降ろす
 void
-GbmBddEngine::debug_off()
+GbmBddEngineOneHot::debug_off()
 {
   mDebug = false;
 }
 
 // @brief debug フラグの値を得る．
 bool
-GbmBddEngine::debug() const
+GbmBddEngineOneHot::debug() const
 {
   return mDebug;
 }
@@ -54,8 +54,8 @@ GbmBddEngine::debug() const
 // @brief 対称性を考慮して初期解を作る．
 // @param[in] rep 関数の対称変数の代表番号を収める配列
 void
-GbmBddEngine::init_vars(const RcfNetwork& network,
-			const vector<ymuint>& rep)
+GbmBddEngineOneHot::init_vars(const RcfNetwork& network,
+			      const vector<ymuint>& rep)
 {
   ymuint nc = network.conf_var_num();
   mConfVarArray.clear();
@@ -109,9 +109,9 @@ GbmBddEngine::init_vars(const RcfNetwork& network,
 // @param[in] oval 出力の値
 // @return 結果が空でなければ true を返し，model にその1つを収める．
 Bool3
-GbmBddEngine::make_bdd(const RcfNetwork& network,
-		       ymuint bitpat,
-		       bool oval)
+GbmBddEngineOneHot::make_bdd(const RcfNetwork& network,
+			     ymuint bitpat,
+			     bool oval)
 {
   ymuint nn = network.node_num();
   mNodeBddArray.clear();
@@ -165,7 +165,7 @@ GbmBddEngine::make_bdd(const RcfNetwork& network,
 
 // @brief 結果からモデルを一つ取り出す．
 void
-GbmBddEngine::get_model(vector<Bool3>& model)
+GbmBddEngineOneHot::get_model(vector<Bool3>& model)
 {
   assert_cond( !mSolution.is_invalid(), __FILE__, __LINE__);
 
@@ -196,8 +196,8 @@ GbmBddEngine::get_model(vector<Bool3>& model)
 // @param[in] model SAT モデル
 // @param[out] conf_bits 設定変数の割り当て
 void
-GbmBddEngine::get_conf_bits(const vector<Bool3>& model,
-			    vector<bool>& conf_bits) const
+GbmBddEngineOneHot::get_conf_bits(const vector<Bool3>& model,
+				  vector<bool>& conf_bits) const
 {
   ymuint nc = mConfVarArray.size();
   for (ymuint i = 0; i < nc; ++ i) {
@@ -222,8 +222,8 @@ GbmBddEngine::get_conf_bits(const vector<Bool3>& model,
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 void
-GbmBddEngine::get_iorder(const vector<Bool3>& model,
-			 vector<ymuint>& iorder) const
+GbmBddEngineOneHot::get_iorder(const vector<Bool3>& model,
+			       vector<ymuint>& iorder) const
 {
   ymuint ni = iorder.size();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -245,9 +245,9 @@ GbmBddEngine::get_iorder(const vector<Bool3>& model,
 // var_list に含まれる変数の順列をすべて表す
 // BDD を返す．
 Bdd
-GbmBddEngine::make_iorder_bdd(ymuint level,
-			      ymuint var_list,
-			      const RcfNetwork& network)
+GbmBddEngineOneHot::make_iorder_bdd(ymuint level,
+				    ymuint var_list,
+				    const RcfNetwork& network)
 {
 #if 0
   cout << "make_iorder_bdd(" << level << ")" << endl;
@@ -302,7 +302,7 @@ GbmBddEngine::make_iorder_bdd(ymuint level,
 // @param[in] node 対象のノード
 // @note 結果は mNodeBddArray に格納される．
 void
-GbmBddEngine::make_node_func(const RcfNode* node)
+GbmBddEngineOneHot::make_node_func(const RcfNode* node)
 {
   assert_cond( !node->is_input(), __FILE__, __LINE__);
 
@@ -352,8 +352,8 @@ GbmBddEngine::make_node_func(const RcfNode* node)
 // @param[in] inputs ファンインの論理関数
 // @param[in] lut_vars LUT のコンフィグレーションメモリ
 Bdd
-GbmBddEngine::make_LUT(const vector<Bdd>& inputs,
-		       const vector<Bdd>& lut_vars)
+GbmBddEngineOneHot::make_LUT(const vector<Bdd>& inputs,
+			     const vector<Bdd>& lut_vars)
 {
   return make_MUX(lut_vars, inputs);
 }
@@ -362,8 +362,8 @@ GbmBddEngine::make_LUT(const vector<Bdd>& inputs,
 // @param[in] inputs ファンインの論理関数
 // @param[in] s_vars 選択変数
 Bdd
-GbmBddEngine::make_MUX(const vector<Bdd>& inputs,
-		       const vector<Bdd>& s_vars)
+GbmBddEngineOneHot::make_MUX(const vector<Bdd>& inputs,
+			     const vector<Bdd>& s_vars)
 {
   ymuint nd = inputs.size();
   ymuint ns = s_vars.size();

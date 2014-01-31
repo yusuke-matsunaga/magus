@@ -1,14 +1,14 @@
 
-/// @file GbmNaiveEnum.cc
-/// @brief GbmNaiveEnum の実装ファイル
+/// @file GbmSatNaiveEnum.cc
+/// @brief GbmSatNaiveEnum の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmNaiveEnum.h"
-#include "GbmEngineEnum.h"
+#include "GbmSatNaiveEnum.h"
+#include "GbmSatEngineEnum.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandler.h"
 #include "ym_utils/PermGen.h"
@@ -17,16 +17,16 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmNaiveEnum
+// クラス GbmSatNaiveEnum
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmNaiveEnum::GbmNaiveEnum()
+GbmSatNaiveEnum::GbmSatNaiveEnum()
 {
 }
 
 // @brief デストラクタ
-GbmNaiveEnum::~GbmNaiveEnum()
+GbmSatNaiveEnum::~GbmSatNaiveEnum()
 {
 }
 
@@ -40,7 +40,7 @@ GbmNaiveEnum::~GbmNaiveEnum()
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 bool
-GbmNaiveEnum::_solve(const RcfNetwork& network,
+GbmSatNaiveEnum::_solve(const RcfNetwork& network,
 		     const TvFunc& func,
 		     const vector<ymuint>& rep,
 		     vector<bool>& conf_bits,
@@ -98,16 +98,16 @@ GbmNaiveEnum::_solve(const RcfNetwork& network,
 //            関数の入力番号が入る．
 // @param[out] conf_bits configuration ビットの値を収める配列
 bool
-GbmNaiveEnum::_solve_with_order(const RcfNetwork& network,
-				const TvFunc& func,
-				const vector<ymuint>& iorder,
-				vector<bool>& conf_bits)
+GbmSatNaiveEnum::_solve_with_order(const RcfNetwork& network,
+				   const TvFunc& func,
+				   const vector<ymuint>& iorder,
+				   vector<bool>& conf_bits)
 {
   SatSolver solver("minisat");
 
   ymuint nc = network.conf_var_num();
 
-  GbmEngineEnum engine(solver);
+  GbmSatEngineEnum engine(solver);
 
   if ( debug() ) {
     engine.debug_on();

@@ -1,34 +1,34 @@
-#ifndef GBMENGINEBINARY_H
-#define GBMENGINEBINARY_H
+#ifndef GBMSATENGINEONEHOT_H
+#define GBMSATENGINEONEHOT_H
 
-/// @file GbmEngineBinary.h
-/// @brief GbmEngineBinary のヘッダファイル
+/// @file GbmSatEngine.h
+/// @brief GbmSatEngine のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngine.h"
+#include "GbmSatEngine.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmEngineBinary GbmEngineBinary.h "GbmEngineBinary.h"
-/// @brief 入力順を2値符号化する GbmEngine
+/// @class GbmSatEngineOneHot GbmSatEngineOneHot.h "GbmSatEngineOneHot.h"
+/// @brief 入力順を one-hot 符号化する GbmSatEngine
 //////////////////////////////////////////////////////////////////////
-class GbmEngineBinary :
-  public GbmEngine
+class GbmSatEngineOneHot :
+  public GbmSatEngine
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  GbmEngineBinary(SatSolver& solver);
+  GbmSatEngineOneHot(SatSolver& solver);
 
   /// @brief デストラクタ
-  ~GbmEngineBinary();
+  ~GbmSatEngineOneHot();
 
 
 public:
@@ -36,7 +36,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数の初期化を行う．
+  /// @brief 変数を初期化する．
   /// @param[in] network 対象の LUT ネットワーク
   /// @param[in] rep 関数の対称変数の代表番号を収める配列
   ///            rep[pos] に pos 番めの入力の代表番号が入る．
@@ -78,14 +78,14 @@ private:
   // 入力数
   ymuint32 mInputNum;
 
-  // 入力順を表す変数の数
-  ymuint32 mIorderBitWidth;
-
   // 入力順を表す変数の配列
+  // i * mInputNum + j 番めの要素は LUT network の i 番めの入力と
+  // 関数の j 番めの入力が接続しているときに true となる変数を
+  // 格納している．
   vector<VarId> mIorderVarArray;
 
 };
 
 END_NAMESPACE_YM
 
-#endif // GBMENGINEBINARY_H
+#endif // GBMSATENGINEONEHOT_H

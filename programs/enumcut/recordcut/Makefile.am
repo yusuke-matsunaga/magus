@@ -48,42 +48,36 @@ AM_CPPFLAGS = \
 ############################################################
 
 libgbm_la_SOURCES = \
-	GbmEngine.h \
-	GbmEngine.cc \
-	GbmEngineBinary.h \
-	GbmEngineBinary.cc \
-	GbmEngineOneHot.h \
-	GbmEngineOneHot.cc \
-	GbmEngineEnum.h \
-	GbmEngineEnum.cc \
-	GbmBddEngine.h \
-	GbmBddEngine.cc \
+	GbmSatEngine.h \
+	GbmSatEngine.cc \
+	GbmSatEngineBinary.h \
+	GbmSatEngineBinary.cc \
+	GbmSatEngineOneHot.h \
+	GbmSatEngineOneHot.cc \
+	GbmSatEngineEnum.h \
+	GbmSatEngineEnum.cc \
+	GbmBddEngineOneHot.h \
+	GbmBddEngineOneHot.cc \
 	GbmBddEngineBinary.h \
 	GbmBddEngineBinary.cc \
 	GbmBddEngineEnum.h \
 	GbmBddEngineEnum.cc \
 	GbmSolver.h \
 	GbmSolver.cc \
-	GbmNaiveBinary.h \
-	GbmNaiveBinary.cc \
-	GbmNaiveEnum.h \
-	GbmNaiveEnum.cc \
-	GbmNaiveOneHot.h \
-	GbmNaiveOneHot.cc \
-	GbmIncrEnum.h \
-	GbmIncrEnum.cc \
-	GbmIncrBinary.h \
-	GbmIncrBinary.cc \
-	GbmIncrOneHot.h \
-	GbmIncrOneHot.cc \
-	GbmCegarBinary.h \
-	GbmCegarBinary.cc \
-	GbmCegarOneHot.h \
-	GbmCegarOneHot.cc \
-	GbmCegarEnum.h \
-	GbmCegarEnum.cc \
-	GbmCegarBdd.h \
-	GbmCegarBdd.cc \
+	GbmSatNaiveBinary.h \
+	GbmSatNaiveBinary.cc \
+	GbmSatNaiveEnum.h \
+	GbmSatNaiveEnum.cc \
+	GbmSatNaiveOneHot.h \
+	GbmSatNaiveOneHot.cc \
+	GbmSatCegarBinary.h \
+	GbmSatCegarBinary.cc \
+	GbmSatCegarOneHot.h \
+	GbmSatCegarOneHot.cc \
+	GbmSatCegarEnum.h \
+	GbmSatCegarEnum.cc \
+	GbmBddCegarOneHot.h \
+	GbmBddCegarOneHot.cc \
 	GbmBddCegarBinary.h \
 	GbmBddCegarBinary.cc \
 	GbmBddCegarEnum.h \

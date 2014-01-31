@@ -1,30 +1,30 @@
 
-/// @file GbmEngineBinary.cc
-/// @brief GbmEngineBinary の実装ファイル
+/// @file GbmSatEngineBinary.cc
+/// @brief GbmSatEngineBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngineBinary.h"
+#include "GbmSatEngineBinary.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmEngineBinary
+// クラス GbmSatEngineBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-GbmEngineBinary::GbmEngineBinary(SatSolver& solver) :
-  GbmEngine(solver)
+GbmSatEngineBinary::GbmSatEngineBinary(SatSolver& solver) :
+  GbmSatEngine(solver)
 {
 }
 
 // @brief デストラクタ
-GbmEngineBinary::~GbmEngineBinary()
+GbmSatEngineBinary::~GbmSatEngineBinary()
 {
 }
 
@@ -33,8 +33,8 @@ GbmEngineBinary::~GbmEngineBinary()
 // @param[in] rep 関数の対称変数の代表番号を収める配列
 //            rep[pos] に pos 番めの入力の代表番号が入る．
 void
-GbmEngineBinary::init_vars(const RcfNetwork& network,
-			   const vector<ymuint>& rep)
+GbmSatEngineBinary::init_vars(const RcfNetwork& network,
+			      const vector<ymuint>& rep)
 {
   init_conf_vars(network);
 
@@ -241,9 +241,9 @@ GbmEngineBinary::init_vars(const RcfNetwork& network,
 // @param[in] oval 出力の値
 // @note 結果のCNF式は SAT ソルバに追加される．
 bool
-GbmEngineBinary::make_cnf(const RcfNetwork& network,
-			  ymuint bit_pat,
-			  bool oval)
+GbmSatEngineBinary::make_cnf(const RcfNetwork& network,
+			     ymuint bit_pat,
+			     bool oval)
 {
   for (ymuint i = 0; i < mInputNum; ++ i) {
     const RcfNode* node = network.input_node(i);
@@ -288,8 +288,8 @@ GbmEngineBinary::make_cnf(const RcfNetwork& network,
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 void
-GbmEngineBinary::get_iorder(const vector<Bool3>& model,
-			    vector<ymuint>& iorder) const
+GbmSatEngineBinary::get_iorder(const vector<Bool3>& model,
+			       vector<ymuint>& iorder) const
 {
   ymuint ni = iorder.size();
   for (ymuint i = 0; i < ni; ++ i) {

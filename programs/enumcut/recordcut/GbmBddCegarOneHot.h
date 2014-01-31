@@ -1,8 +1,8 @@
-#ifndef GBMCEGARONEHOT_H
-#define GBMCEGARONEHOT_H
+#ifndef GBMBDDCEGARONEHOT_H
+#define GBMBDDCEGARONEHOT_H
 
-/// @file GbmCegarOneHot.h
-/// @brief GbmCegarOneHot のヘッダファイル
+/// @file GbmBddCegarOneHot.h
+/// @brief GbmBddCegarOneHot のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,20 +15,20 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmCegarOneHot GbmCegarOneHot.h "GbmCegarOneHot.h"
-/// @brief CEGAR ベースの GbmSolver (2値符号化版)
+/// @class GbmBddCegarOneHot GbmBddCegarOneHot.h "GbmBddCegarOneHot.h"
+/// @brief BDD/CEGAR ベースの GbmSolver
 //////////////////////////////////////////////////////////////////////
-class GbmCegarOneHot :
+class GbmBddCegarOneHot :
   public GbmSolver
 {
 public:
 
   /// @brief コンストラクタ
-  GbmCegarOneHot();
+  GbmBddCegarOneHot();
 
   /// @brief デストラクタ
   virtual
-  ~GbmCegarOneHot();
+  ~GbmBddCegarOneHot();
 
 
 private:
@@ -64,4 +64,4 @@ private:
 END_NAMESPACE_YM
 
 
-#endif // GBMCEGARONEHOT_H
+#endif // GBMBDDCEGARONEHOT_H

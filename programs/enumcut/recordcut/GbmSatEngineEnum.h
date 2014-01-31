@@ -1,34 +1,34 @@
-#ifndef GBMENGINEENUM_H
-#define GBMENGINEENUM_H
+#ifndef GBMSATENGINEENUM_H
+#define GBMSATENGINEENUM_H
 
-/// @file GbmEngineEnum.h
-/// @brief GbmEngineEnum のヘッダファイル
+/// @file GbmSatEngineEnum.h
+/// @brief GbmSatEngineEnum のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngine.h"
+#include "GbmSatEngine.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmEngineEnum GbmEngineEnum.h "GbmEngineEnum.h"
-/// @brief 入力順を固定する GbmEngine
+/// @class GbmSatEngineEnum GbmSatEngineEnum.h "GbmSatEngineEnum.h"
+/// @brief 入力順を固定する GbmSatEngine
 //////////////////////////////////////////////////////////////////////
-class GbmEngineEnum :
-  public GbmEngine
+class GbmSatEngineEnum :
+  public GbmSatEngine
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  GbmEngineEnum(SatSolver& solver);
+  GbmSatEngineEnum(SatSolver& solver);
 
   /// @brief デストラクタ
-  ~GbmEngineEnum();
+  ~GbmSatEngineEnum();
 
 
 public:
@@ -54,4 +54,4 @@ public:
 
 END_NAMESPACE_YM
 
-#endif // GBMENGINEENUM_H
+#endif // GBMSATENGINEENUM_H

@@ -8,15 +8,15 @@
 
 
 #include "Lut443Match.h"
-#include "GbmNaiveBinary.h"
-#include "GbmNaiveEnum.h"
-#include "GbmNaiveOneHot.h"
-#include "GbmIncrEnum.h"
-#include "GbmIncrBinary.h"
-#include "GbmIncrOneHot.h"
-#include "GbmCegarBinary.h"
-#include "GbmCegarOneHot.h"
-#include "GbmCegarEnum.h"
+#include "GbmSatNaiveBinary.h"
+#include "GbmSatNaiveEnum.h"
+#include "GbmSatNaiveOneHot.h"
+#include "GbmSatCegarBinary.h"
+#include "GbmSatCegarOneHot.h"
+#include "GbmSatCegarEnum.h"
+#include "GbmBddCegarBinary.h"
+#include "GbmBddCegarOneHot.h"
+#include "GbmBddCegarEnum.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
 
@@ -197,41 +197,42 @@ Lut443MatchTest(int argc,
 {
   GbmSolver* solver = NULL;
   if ( argc > 1 ) {
-    if ( strcmp(argv[1], "naive_binary") == 0 ) {
-      solver = new GbmNaiveBinary();
+    string method = argv[1];
+    if ( method == "sat_naive_binary" ) {
+      solver = new GbmSatNaiveBinary();
     }
-    else if ( strcmp(argv[1], "naive_enum") == 0 ) {
-      solver = new GbmNaiveEnum();
+    else if ( method == "sat_naive_onehot" ) {
+      solver = new GbmSatNaiveOneHot();
     }
-    else if ( strcmp(argv[1], "naive_onehot") == 0 ) {
-      solver = new GbmNaiveOneHot();
+    else if ( method == "sat_naive_enum" ) {
+      solver = new GbmSatNaiveEnum();
     }
-    else if ( strcmp(argv[1], "incr_enum") == 0 ) {
-      solver = new GbmIncrEnum();
+    else if ( method == "sat_cegar_binary" ) {
+      solver = new GbmSatCegarBinary();
     }
-    else if ( strcmp(argv[1], "incr_binary") == 0 ) {
-      solver = new GbmIncrBinary();
+    else if ( method == "sat_cegar_onehot" ) {
+      solver = new GbmSatCegarOneHot();
     }
-    else if ( strcmp(argv[1], "incr_onehot") == 0 ) {
-      solver = new GbmIncrOneHot();
+    else if ( method == "sat_cegar_enum" ) {
+      solver = new GbmSatCegarEnum();
     }
-    else if ( strcmp(argv[1], "cegar_binary") == 0 ) {
-      solver = new GbmCegarBinary();
+    else if ( method == "bdd_cegar_onehot" ) {
+      solver = new GbmBddCegarOneHot();
     }
-    else if ( strcmp(argv[1], "cegar_onehot") == 0 ) {
-      solver = new GbmCegarOneHot();
+    else if ( method == "bdd_cegar_enum" ) {
+      solver = new GbmBddCegarEnum();
     }
-    else if ( strcmp(argv[1], "cegar_enum") == 0 ) {
-      solver = new GbmCegarEnum();
+    else if ( method == "bdd_cegar_binary" ) {
+      solver = new GbmBddCegarBinary();
     }
-    else {
-      cerr << "Illegal method: " << argv[0] << endl;
+    else if ( method != string() ) {
+      cerr << "Illegal method: " << method << endl;
       return -1;
     }
   }
   if ( solver == NULL ) {
     // fall-back
-    solver = new GbmNaiveBinary();
+    solver = new GbmSatCegarOneHot();
   }
 
   A0Test(*solver);

@@ -1,29 +1,29 @@
 
-/// @file GbmCegarBdd.cc
-/// @brief GbmCegarBdd の実装ファイル
+/// @file GbmBddCegarOneHot.cc
+/// @brief GbmBddCegarOneHot の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmCegarBdd.h"
-#include "GbmBddEngine.h"
+#include "GbmBddCegarOneHot.h"
+#include "GbmBddEngineOneHot.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmCegarBdd
+// クラス GbmBddCegarOneHot
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmCegarBdd::GbmCegarBdd()
+GbmBddCegarOneHot::GbmBddCegarOneHot()
 {
 }
 
 // @brief デストラクタ
-GbmCegarBdd::~GbmCegarBdd()
+GbmBddCegarOneHot::~GbmBddCegarOneHot()
 {
 }
 
@@ -38,18 +38,18 @@ GbmCegarBdd::~GbmCegarBdd()
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 bool
-GbmCegarBdd::_solve(const RcfNetwork& network,
-		    const TvFunc& func,
-		    const vector<ymuint>& rep,
-		    vector<bool>& conf_bits,
-		    vector<ymuint>& iorder)
+GbmBddCegarOneHot::_solve(const RcfNetwork& network,
+			  const TvFunc& func,
+			  const vector<ymuint>& rep,
+			  vector<bool>& conf_bits,
+			  vector<ymuint>& iorder)
 {
   ymuint nc = network.conf_var_num();
   ymuint ni = network.input_num();
 
   BddMgr mgr("bmc", "gbm");
 
-  GbmBddEngine engine(mgr);
+  GbmBddEngineOneHot engine(mgr);
 
   if ( debug() ) {
     engine.debug_on();

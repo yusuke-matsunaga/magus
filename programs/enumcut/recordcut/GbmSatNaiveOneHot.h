@@ -1,8 +1,8 @@
-#ifndef GBMNAIVEBINARY_H
-#define GBMNAIVEBINARY_H
+#ifndef GBMSATNAIVEONEHOT_H
+#define GBMSATNAIVEONEHOT_H
 
-/// @file GbmNaiveBinary.h
-/// @brief GbmNaiveBinary のヘッダファイル
+/// @file GbmSatNaiveOneHot.h
+/// @brief GbmSatNaiveOneHot のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -10,25 +10,28 @@
 
 
 #include "GbmSolver.h"
+#include "GbmLit.h"
+#include "RcfNode.h"
+#include "ym_logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmNaiveBinary GbmNaiveBinary.h "GbmNaiveBinary.h"
-/// @brief 単純な GbmSolver
+/// @class GbmSatNaive GbmSatNaive.h "GbmSatNaive.h"
+/// @brief 単純な GbmSolver (one-hot encoding)
 //////////////////////////////////////////////////////////////////////
-class GbmNaiveBinary :
+class GbmSatNaiveOneHot :
   public GbmSolver
 {
 public:
 
   /// @brief コンストラクタ
-  GbmNaiveBinary();
+  GbmSatNaiveOneHot();
 
   /// @brief デストラクタ
   virtual
-  ~GbmNaiveBinary();
+  ~GbmSatNaiveOneHot();
 
 
 private:
@@ -38,7 +41,6 @@ private:
 
   /// @brief 入力順を考慮したマッチング問題を解く
   /// @param[in] network RcfNetwork
-  /// @param[in] output Reconfigurable Network の出力
   /// @param[in] func マッチング対象の関数
   /// @param[in] rep 関数の対称変数の代表番号を収める配列
   ///            rep[pos] に pos 番めの入力の代表番号が入る．
@@ -53,14 +55,8 @@ private:
 	 vector<bool>& conf_bits,
 	 vector<ymuint>& iorder);
 
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
 };
 
 END_NAMESPACE_YM
 
-#endif // GBMNAIVEBINARY_H
+#endif // GBMSATNAIVEONEHOT_H

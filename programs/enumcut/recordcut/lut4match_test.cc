@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "GbmNaiveBinary.h"
-#include "GbmNaiveOneHot.h"
+#include "GbmSatNaiveBinary.h"
+#include "GbmSatNaiveOneHot.h"
 #include "ym_utils/RandGen.h"
 
 
@@ -20,7 +20,7 @@ lut4match_test(int argc,
 {
   RandGen rg;
 
-  GbmNaiveBinary solver;
+  GbmSatNaiveBinary solver;
 
   solver.verify_on();
   solver.debug_on();

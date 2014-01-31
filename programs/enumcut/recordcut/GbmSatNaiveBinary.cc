@@ -1,14 +1,15 @@
 
-/// @file GbmIncrBinary.cc
-/// @brief GbmIncrBinary の実装ファイル
+/// @file GbmSatNaiveBinary.cc
+/// @brief GbmSatNaiveBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmIncrBinary.h"
-#include "GbmEngineBinary.h"
+#include "GbmSatNaiveBinary.h"
+#include "GbmSatEngineBinary.h"
+#include "ym_logic/SatSolver.h"
 #include "ym_logic/SatStats.h"
 #include "ym_logic/SatMsgHandlerImpl1.h"
 
@@ -16,16 +17,16 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmIncrBinary
+// クラス GbmSatNaiveBinary
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GbmIncrBinary::GbmIncrBinary()
+GbmSatNaiveBinary::GbmSatNaiveBinary()
 {
 }
 
 // @brief デストラクタ
-GbmIncrBinary::~GbmIncrBinary()
+GbmSatNaiveBinary::~GbmSatNaiveBinary()
 {
 }
 
@@ -39,11 +40,11 @@ GbmIncrBinary::~GbmIncrBinary()
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 bool
-GbmIncrBinary::_solve(const RcfNetwork& network,
-		      const TvFunc& func,
-		      const vector<ymuint>& rep,
-		      vector<bool>& conf_bits,
-		      vector<ymuint>& iorder)
+GbmSatNaiveBinary::_solve(const RcfNetwork& network,
+			  const TvFunc& func,
+			  const vector<ymuint>& rep,
+			  vector<bool>& conf_bits,
+			  vector<ymuint>& iorder)
 {
 #if 1
   SatSolver solver("minisat");
@@ -60,7 +61,7 @@ GbmIncrBinary::_solve(const RcfNetwork& network,
   ymuint nc = network.conf_var_num();
   ymuint ni = network.input_num();
 
-  GbmEngineBinary engine(solver);
+  GbmSatEngineBinary engine(solver);
 
   if ( debug() ) {
     engine.debug_on();
@@ -94,11 +95,9 @@ GbmIncrBinary::_solve(const RcfNetwork& network,
     if ( !ok ) {
       break;
     }
-    stat = solver.solve(model);
-    if ( stat == kB3False ) {
-      break;
-    }
   }
+
+  stat = solver.solve(model);
 
   if ( stat == kB3True ) {
     engine.get_conf_bits(model, conf_bits);

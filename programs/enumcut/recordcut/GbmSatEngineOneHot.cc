@@ -1,30 +1,30 @@
 
-/// @file GbmEngineOneHot.cc
-/// @brief GbmEngineOneHot の実装ファイル
+/// @file GbmSatEngineOneHot.cc
+/// @brief GbmSatEngineOneHot の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngineOneHot.h"
+#include "GbmSatEngineOneHot.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmEngineOneHot
+// クラス GbmSatEngineOneHot
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-GbmEngineOneHot::GbmEngineOneHot(SatSolver& solver) :
-  GbmEngine(solver)
+GbmSatEngineOneHot::GbmSatEngineOneHot(SatSolver& solver) :
+  GbmSatEngine(solver)
 {
 }
 
 // @brief デストラクタ
-GbmEngineOneHot::~GbmEngineOneHot()
+GbmSatEngineOneHot::~GbmSatEngineOneHot()
 {
 }
 
@@ -33,8 +33,8 @@ GbmEngineOneHot::~GbmEngineOneHot()
 // @param[in] rep 関数の対称変数の代表番号を収める配列
 //            rep[pos] に pos 番めの入力の代表番号が入る．
 void
-GbmEngineOneHot::init_vars(const RcfNetwork& network,
-			   const vector<ymuint>& rep)
+GbmSatEngineOneHot::init_vars(const RcfNetwork& network,
+			      const vector<ymuint>& rep)
 {
   init_conf_vars(network);
 
@@ -116,9 +116,9 @@ GbmEngineOneHot::init_vars(const RcfNetwork& network,
 // @param[in] oval 出力の値
 // @note 結果のCNF式は SAT ソルバに追加される．
 bool
-GbmEngineOneHot::make_cnf(const RcfNetwork& network,
-			  ymuint bit_pat,
-			  bool oval)
+GbmSatEngineOneHot::make_cnf(const RcfNetwork& network,
+			     ymuint bit_pat,
+			     bool oval)
 {
   for (ymuint i = 0; i < mInputNum; ++ i) {
     const RcfNode* node = network.input_node(i);
@@ -147,8 +147,8 @@ GbmEngineOneHot::make_cnf(const RcfNetwork& network,
 //             iorder[pos] に network の pos 番めの入力に対応した
 //             関数の入力番号が入る．
 void
-GbmEngineOneHot::get_iorder(const vector<Bool3>& model,
-			    vector<ymuint>& iorder) const
+GbmSatEngineOneHot::get_iorder(const vector<Bool3>& model,
+			       vector<ymuint>& iorder) const
 {
   for (ymuint i = 0; i < mInputNum; ++ i) {
     ymuint base = i * mInputNum;

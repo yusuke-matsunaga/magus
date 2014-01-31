@@ -10,7 +10,7 @@
 #include "GbmSolver.h"
 #include "RcfNetwork.h"
 
-#include "GbmNaiveBinary.h"
+#include "GbmSatNaiveBinary.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -50,7 +50,7 @@ and9_test()
   }
 
   cout << "AND9 test" << endl;
-  GbmNaiveBinary solver;
+  GbmSatNaiveBinary solver;
   vector<bool> conf_bits;
   vector<ymuint> iorder;
   bool stat = solver.solve(network, and9, conf_bits, iorder);
@@ -101,7 +101,7 @@ GbmSolverTest(int argc,
   tv[7] = 1;
   TvFunc func(3, tv);
 
-  GbmNaiveBinary solver;
+  GbmSatNaiveBinary solver;
   vector<bool> conf_bits;
   vector<ymuint> iorder;
   bool stat = solver.solve(network, func, conf_bits, iorder);

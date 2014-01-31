@@ -1,80 +1,82 @@
 
-/// @file GbmEngine.cc
-/// @brief GbmEngine の実装ファイル
+/// @file GbmSatEngine.cc
+/// @brief GbmSatEngine の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GbmEngine.h"
+#include "GbmSatEngine.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス GbmEngine
+// クラス GbmSatEngine
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-// @param[in] node_num ノード数
-// @param[in] conf_num 設定変数の数
-GbmEngine::GbmEngine(SatSolver& solver,
-		     ymuint node_num,
-		     ymuint conf_num) :
+GbmSatEngine::GbmSatEngine(SatSolver& solver) :
   mSolver(solver),
-  mNodeVarArray(node_num),
-  mConfVarArray(conf_num),
   mDebug(false)
 {
 }
 
 // @brief デストラクタ
-GbmEngine::~GbmEngine()
+GbmSatEngine::~GbmSatEngine()
 {
 }
 
 // @brief debug フラグを立てる
 void
-GbmEngine::debug_on()
+GbmSatEngine::debug_on()
 {
   mDebug = true;
 }
 
 // @brief debug フラグを降ろす
 void
-GbmEngine::debug_off()
+GbmSatEngine::debug_off()
 {
   mDebug = false;
 }
 
 // @brief debug フラグの値を得る．
 bool
-GbmEngine::debug() const
+GbmSatEngine::debug() const
 {
   return mDebug;
 }
 
 // @brief 設定変数を初期化する．
+// @param[in] network 対象の LUT ネットワーク
 void
-GbmEngine::init_conf_vars()
+GbmSatEngine::init_conf_vars(const RcfNetwork& network)
 {
-  for (ymuint i = 0; i < mConfVarArray.size(); ++ i) {
+  ymuint nc = network.conf_var_num();
+  mConfVarArray.clear();
+  mConfVarArray.resize(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
     VarId vid = new_var();
     mConfVarArray[i] = vid;
     if ( debug() ) {
       cout << "conf_bits[" << i << "] = " << vid << endl;
     }
   }
+
+  ymuint nn = network.node_num();
+  mNodeVarArray.clear();
+  mNodeVarArray.resize(nn);
 }
 
 // @brief ノードに対応するリテラルを登録する．
 // @param[in] id ノード番号
 // @param[in] lit リテラル
 void
-GbmEngine::set_node_var(ymuint id,
-			GbmLit lit)
+GbmSatEngine::set_node_var(ymuint id,
+			   GbmLit lit)
 {
   assert_cond( id < mNodeVarArray.size(), __FILE__, __LINE__);
   mNodeVarArray[id] = lit;
@@ -85,15 +87,15 @@ GbmEngine::set_node_var(ymuint id,
 
 // @brief SAT用の新しい変数を作る．
 VarId
-GbmEngine::new_var()
+GbmSatEngine::new_var()
 {
   return mSolver.new_var();
 }
 
 // @brief 節を追加する．
 void
-GbmEngine::add_clause(Literal lit1,
-		      Literal lit2)
+GbmSatEngine::add_clause(Literal lit1,
+			 Literal lit2)
 {
   mSolver.add_clause(lit1, lit2);
 
@@ -104,9 +106,9 @@ GbmEngine::add_clause(Literal lit1,
 
 // @brief 節を追加する．
 void
-GbmEngine::add_clause(Literal lit1,
-		      Literal lit2,
-		      Literal lit3)
+GbmSatEngine::add_clause(Literal lit1,
+			 Literal lit2,
+			 Literal lit3)
 {
   mSolver.add_clause(lit1, lit2, lit3);
 
@@ -120,10 +122,10 @@ GbmEngine::add_clause(Literal lit1,
 
 // @brief 節を追加する．
 void
-GbmEngine::add_clause(Literal lit1,
-		      Literal lit2,
-		      Literal lit3,
-		      Literal lit4)
+GbmSatEngine::add_clause(Literal lit1,
+			 Literal lit2,
+			 Literal lit3,
+			 Literal lit4)
 {
   mSolver.add_clause(lit1, lit2, lit3, lit4);
 
@@ -138,7 +140,7 @@ GbmEngine::add_clause(Literal lit1,
 
 // @brief 節を追加する．
 void
-GbmEngine::add_clause(const vector<Literal>& lits)
+GbmSatEngine::add_clause(const vector<Literal>& lits)
 {
   mSolver.add_clause(lits);
 
@@ -157,8 +159,8 @@ GbmEngine::add_clause(const vector<Literal>& lits)
 // @param[in] model SAT モデル
 // @param[out] conf_bits 設定変数の割り当て
 void
-GbmEngine::get_conf_bits(const vector<Bool3>& model,
-			 vector<bool>& conf_bits) const
+GbmSatEngine::get_conf_bits(const vector<Bool3>& model,
+			    vector<bool>& conf_bits) const
 {
   ymuint nc = mConfVarArray.size();
   for (ymuint i = 0; i < nc; ++ i) {
@@ -177,10 +179,9 @@ GbmEngine::get_conf_bits(const vector<Bool3>& model,
 // @param[in] oval 出力値
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_nodes_cnf(const RcfNetwork& network,
-			  ymuint oval)
+GbmSatEngine::make_nodes_cnf(const RcfNetwork& network,
+			     ymuint oval)
 {
-
   // 外部出力のノード番号と極性
   RcfNodeHandle output = network.output();
   ymuint oid = output.id();
@@ -225,7 +226,7 @@ GbmEngine::make_nodes_cnf(const RcfNetwork& network,
 // @param[in] node 対象のノード
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_node_cnf(const RcfNode* node)
+GbmSatEngine::make_node_cnf(const RcfNode* node)
 {
   if ( node->is_input() ) {
     return true;
@@ -271,8 +272,8 @@ GbmEngine::make_node_cnf(const RcfNode* node)
 // @param[in] output_var 出力変数
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_AND(const vector<GbmLit>& input_vars,
-		    GbmLit output_var)
+GbmSatEngine::make_AND(const vector<GbmLit>& input_vars,
+		       GbmLit output_var)
 {
   ymuint n = input_vars.size();
   // 入力に定数0がないかチェック
@@ -352,9 +353,9 @@ GbmEngine::make_AND(const vector<GbmLit>& input_vars,
 // @note lut_vars のサイズは input_vars のサイズの指数乗
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_LUT(const vector<GbmLit>& input_vars,
-		    const vector<GbmLit>& lut_vars,
-		    GbmLit output_var)
+GbmSatEngine::make_LUT(const vector<GbmLit>& input_vars,
+		       const vector<GbmLit>& lut_vars,
+		       GbmLit output_var)
 {
   // 実は入力を入れ替えれて MUX で作る．
   return make_MUX(lut_vars, input_vars, output_var);
@@ -367,9 +368,9 @@ GbmEngine::make_LUT(const vector<GbmLit>& input_vars,
 // @note d_vars のサイズは s_vars のサイズの指数乗
 // @return 割り当てが矛盾を起こしたら false を返す．
 bool
-GbmEngine::make_MUX(const vector<GbmLit>& d_vars,
-		    const vector<GbmLit>& s_vars,
-		    GbmLit output_var)
+GbmSatEngine::make_MUX(const vector<GbmLit>& d_vars,
+		       const vector<GbmLit>& s_vars,
+		       GbmLit output_var)
 {
   ymuint nd = d_vars.size();
   ymuint ns = s_vars.size();
@@ -461,7 +462,7 @@ GbmEngine::make_MUX(const vector<GbmLit>& d_vars,
 // @brief RcfNodeHandle から GbmLit を作る．
 // @param[in] handle ハンドル
 GbmLit
-GbmEngine::handle_to_lit(RcfNodeHandle handle)
+GbmSatEngine::handle_to_lit(RcfNodeHandle handle)
 {
   if ( handle.is_zero() ) {
     return GbmLit::make_zero();

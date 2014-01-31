@@ -9,7 +9,10 @@
 /// All rights reserved.
 
 
-#include "GbmEngine.h"
+#include "ymtools.h"
+#include "GbmLit.h"
+#include "RcfNetwork.h"
+#include "RcfNode.h"
 #include "ym_logic/SatSolver.h"
 
 
@@ -17,20 +20,15 @@ BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class GbmSatEngine GbmSatEngine.h "GbmSatEngine.h"
-/// @brief SAT ベースの GbmEngine
+/// @brief GBM の基本処理を行なうクラス
 //////////////////////////////////////////////////////////////////////
-class GbmSatEngine :
-  public GbmEngine
+class GbmSatEngine
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  /// @param[in] node_num ノード数
-  /// @param[in] conf_num 設定変数の数
-  GbmSatEngine(SatSolver& solver,
-	       ymuint node_num,
-	       ymuint conf_num);
+  GbmSatEngine(SatSolver& solver);
 
   /// @brief デストラクタ
   ~GbmSatEngine();
@@ -41,9 +39,22 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 設定変数を初期化する．
+  /// @brief debug フラグを立てる
   void
-  init_conf_vars();
+  debug_on();
+
+  /// @brief debug フラグを降ろす
+  void
+  debug_off();
+
+  /// @brief debug フラグの値を得る．
+  bool
+  debug() const;
+
+  /// @brief 設定変数を初期化する．
+  /// @param[in] network 対象の LUT ネットワーク
+  void
+  init_conf_vars(const RcfNetwork& network);
 
   /// @brief SAT モデルから設定変数の割り当てを取り出す．
   /// @param[in] model SAT モデル

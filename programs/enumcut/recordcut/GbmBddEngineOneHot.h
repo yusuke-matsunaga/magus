@@ -1,8 +1,8 @@
-#ifndef GBMBDDENGINE_H
-#define GBMBDDENGINE_H
+#ifndef GBMBDDENGINEONEHOT_H
+#define GBMBDDENGINEONEHOT_H
 
-/// @file GbmBddEngine.h
-/// @brief GbmBddEngine のヘッダファイル
+/// @file GbmBddEngineOneHot.h
+/// @brief GbmBddEngineOneHot のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -20,19 +20,19 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class GbmBddEngine GbmBddEngine.h "GbmBddEngine.h"
+/// @class GbmBddEngineOneHot GbmBddEngineOneHot.h "GbmBddEngineOneHot.h"
 /// @brief BDD ベースの GbmEngine
 //////////////////////////////////////////////////////////////////////
-class GbmBddEngine
+class GbmBddEngineOneHot
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr BddMgr
-  GbmBddEngine(BddMgr& mgr);
+  GbmBddEngineOneHot(BddMgr& mgr);
 
   /// @brief デストラクタ
-  ~GbmBddEngine();
+  ~GbmBddEngineOneHot();
 
 
 public:
@@ -165,4 +165,4 @@ private:
 END_NAMESPACE_YM
 
 
-#endif // GBMBDDENGINE_H
+#endif // GBMBDDENGINEONEHOT_H
