@@ -62,8 +62,6 @@ GbmBddCegarBinary::_solve(const RcfNetwork& network,
 
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
-  Bool3 stat = kB3X;
-  vector<Bool3> model;
   ymuint bit_pat = 0;
   for ( ;; ) {
     check[bit_pat] = true;
@@ -82,10 +80,15 @@ GbmBddCegarBinary::_solve(const RcfNetwork& network,
     }
     // 外部入力変数に値を割り当てたときの CNF 式を作る．
     ymuint oval = func.value(bit_pat);
-    stat = engine.make_bdd(network, bit_pat, oval);
+    Bool3 stat = engine.make_bdd(network, bit_pat, oval);
     if ( stat != kB3True ) {
-      break;
+      if ( stat == kB3X ) {
+	cout << "Aborted" << endl;
+      }
+      return false;
     }
+
+    vector<Bool3> model;
     engine.get_model(model);
 
     // 現在の model で全部の入力が成り立つか調べてみる．
@@ -114,11 +117,7 @@ GbmBddCegarBinary::_solve(const RcfNetwork& network,
       return true;
     }
   }
-
-  if ( stat == kB3X ) {
-    cout << "Aborted" << endl;
-  }
-
+  assert_not_reached(__FILE__, __LINE__);
   return false;
 }
 

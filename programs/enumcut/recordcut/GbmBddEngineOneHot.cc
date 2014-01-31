@@ -122,12 +122,11 @@ GbmBddEngineOneHot::make_bdd(const RcfNetwork& network,
     ymuint id = node->id();
     Bdd y = mMgr.make_zero();
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      VarId vid_j = mIorderVarArray[i * mInputNum + j];
-      Bdd x1 = mMgr.make_posiliteral(vid_j);
-      if ( (bitpat & (1U << j)) == 0U ) {
-	x1 = ~x1;
+      if ( bitpat & (1U << j) ) {
+	VarId vid_j = mIorderVarArray[i * mInputNum + j];
+	Bdd x1 = mMgr.make_posiliteral(vid_j);
+	y |= x1;
       }
-      y |= x1;
     }
     mNodeBddArray[id] = y;
   }

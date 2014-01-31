@@ -122,7 +122,6 @@ GbmBddCegarEnum::_solve_with_order(const RcfNetwork& network,
   ymuint ni = network.input_num();
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
-  vector<Bool3> model;
   ymuint bit_pat = 0U;
   for ( ; ; ) {
     check[bit_pat] = true;
@@ -132,6 +131,8 @@ GbmBddCegarEnum::_solve_with_order(const RcfNetwork& network,
     if ( !ok ) {
       return false;
     }
+
+    vector<Bool3> model;
     engine.get_model(model);
 
     // 現在の model で全部の入力が成り立つか調べてみる．

@@ -79,14 +79,15 @@ GbmBddEngineBinary::init_vars(const RcfNetwork& network,
   }
 
   // 次に configuration bit 用の変数を確保する．
-  ymuint base = mInputNum * mIorderBitWidth;
+  ymuint base0 = mInputNum * mIorderBitWidth;
   for (ymuint i = 0; i < mConfVarArray.size(); ++ i) {
-    VarId vid(base + i);
+    VarId vid(base0 + i);
     mConfVarArray[i] = vid;
     bool stat = mMgr.new_var(vid);
     assert_cond( stat, __FILE__, __LINE__);
   }
 
+#if 0
   // one-hot 制約と対称性を考慮して初期解を作る．
   ymuint var_list = 0U;
   for (ymuint i = 0; i < mInputNum; ++ i) {
@@ -103,6 +104,65 @@ GbmBddEngineBinary::init_vars(const RcfNetwork& network,
     cout << "Total " << mc << " permutations" << endl;
     mSolution.print(cout);
   }
+#else
+  mSolution = mMgr.make_one();
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    ymuint base_i = i * mIorderBitWidth;
+    ymuint nexp = 1U << mIorderBitWidth;
+
+    // 使っていない変数の組み合わせを禁止する．
+    Bdd ng = mMgr.make_zero();
+    for (ymuint b = mInputNum; b < nexp; ++ b) {
+      Bdd ng1 = mMgr.make_one();
+      for (ymuint j = 0; j < mIorderBitWidth; ++ j) {
+	if ( b & (1U << (mIorderBitWidth - j - 1)) ) {
+	  ng1 &= mMgr.make_posiliteral(mIorderVarArray[base_i + j]);
+	}
+	else {
+	  ng1 &= mMgr.make_negaliteral(mIorderVarArray[base_i + j]);
+	}
+      }
+      ng |= ng1;
+    }
+    mSolution &= ~ng;
+
+    // 異なる LUT 入力におなじ入力が接続してはいけないというルール
+    for (ymuint j = 0; j < i; ++ j) {
+      ymuint base_j = j * mIorderBitWidth;
+      Bdd ng = mMgr.make_one();
+      for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
+	VarId ivar = mIorderVarArray[base_i + k];
+	VarId jvar = mIorderVarArray[base_j + k];
+	ng &= ~(mMgr.make_posiliteral(ivar) ^ mMgr.make_posiliteral(jvar));
+      }
+      mSolution &= ~ng;
+    }
+
+#if 0
+    // LUT ネットワークの対称性を考慮したルール
+    ymuint pred;
+    if ( network.get_pred(i, pred) ) {
+      ymuint base_j = pred * mIorderBitWidth;
+      // Vi > Vj が ng
+      Bdd ng = mMgr.make_zero();
+      Bdd eq = mMgr.make_one();
+      for (ymuint k = 0; k < mIorderBitWidth; ++k) {
+	VarId ivar = mIorderVarArray[base_i + k];
+	VarId jvar = mIorderVarArray[base_j + k];
+	Bdd ibdd = mMgr.make_posiliteral(ivar);
+	Bdd jbdd = mMgr.make_posiliteral(jvar);
+	ng |= eq & ibdd & ~jbdd;
+	eq &= ~(ibdd ^ jbdd);
+      }
+      mSolution &= ~ng;
+    }
+#endif
+  }
+
+  mpz_class mc = mSolution.minterm_count(nc);
+  cout << "Total " << mc << " permutations" << endl;
+  mSolution.print(cout);
+#endif
 }
 
 // @brief 入力値を割り当てて解の候補を求める．
@@ -128,22 +188,27 @@ GbmBddEngineBinary::make_bdd(const RcfNetwork& network,
 
     Bdd y = mMgr.make_zero();
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      Bdd p = mMgr.make_one();
-      for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
-	VarId kvar = mIorderVarArray[base_i + k];
-	if ( j & (1U << k) ) {
-	  p &= mMgr.make_posiliteral(kvar);
+      if ( bitpat & (1U << j) ) {
+	Bdd p = mMgr.make_one();
+	for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
+	  VarId kvar = mIorderVarArray[base_i + k];
+	  if ( j & (1U << (mIorderBitWidth - k - 1)) ) {
+	    p &= mMgr.make_posiliteral(kvar);
+	  }
+	  else {
+	    p &= mMgr.make_negaliteral(kvar);
+	  }
 	}
-	else {
-	  p &= mMgr.make_negaliteral(kvar);
-	}
+	y |= p;
       }
-      if ( (bitpat & (1U << j)) == 0U ) {
-	p = ~p;
-      }
-      y |= p;
     }
     mNodeBddArray[id] = y;
+  }
+
+  ymuint nf = network.func_node_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const RcfNode* node = network.func_node(i);
+    make_node_func(node);
   }
 
   // 外部出力のノード番号と極性
@@ -153,12 +218,6 @@ GbmBddEngineBinary::make_bdd(const RcfNetwork& network,
 
   if ( oinv ) {
     oval = !oval;
-  }
-
-  ymuint nf = network.func_node_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    const RcfNode* node = network.func_node(i);
-    make_node_func(node);
   }
 
   if ( oval ) {
@@ -294,7 +353,7 @@ GbmBddEngineBinary::make_iorder_bdd(ymuint level,
 	ymuint var_list1 = var_list & ~(1U << i);
 	Bdd f1 = make_iorder_bdd(level + 1, var_list1, network);
 	for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
-	  if ( i & (1U << k) ) {
+	  if ( i & (1U << (mIorderBitWidth - k - 1)) ) {
 	    f1 &= mMgr.make_posiliteral(mIorderVarArray[level * mIorderBitWidth + k]);
 	  }
 	  else {
