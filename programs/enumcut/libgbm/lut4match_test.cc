@@ -9,6 +9,7 @@
 
 #include "GbmSatNaiveBinary.h"
 #include "GbmSatNaiveOneHot.h"
+#include "RcfNetwork.h"
 #include "ym_utils/RandGen.h"
 
 

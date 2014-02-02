@@ -3,20 +3,12 @@
 /// @brief Lut443Match のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Lut443Match.h"
-#include "GbmSatNaiveBinary.h"
-#include "GbmSatNaiveEnum.h"
-#include "GbmSatNaiveOneHot.h"
-#include "GbmSatCegarBinary.h"
-#include "GbmSatCegarOneHot.h"
-#include "GbmSatCegarEnum.h"
-#include "GbmBddCegarBinary.h"
-#include "GbmBddCegarOneHot.h"
-#include "GbmBddCegarEnum.h"
+#include "GbmSolver.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
 
@@ -195,44 +187,13 @@ int
 Lut443MatchTest(int argc,
 		const char** argv)
 {
-  GbmSolver* solver = NULL;
+  string method;
   if ( argc > 1 ) {
-    string method = argv[1];
-    if ( method == "sat_naive_binary" ) {
-      solver = new GbmSatNaiveBinary();
-    }
-    else if ( method == "sat_naive_onehot" ) {
-      solver = new GbmSatNaiveOneHot();
-    }
-    else if ( method == "sat_naive_enum" ) {
-      solver = new GbmSatNaiveEnum();
-    }
-    else if ( method == "sat_cegar_binary" ) {
-      solver = new GbmSatCegarBinary();
-    }
-    else if ( method == "sat_cegar_onehot" ) {
-      solver = new GbmSatCegarOneHot();
-    }
-    else if ( method == "sat_cegar_enum" ) {
-      solver = new GbmSatCegarEnum();
-    }
-    else if ( method == "bdd_cegar_onehot" ) {
-      solver = new GbmBddCegarOneHot();
-    }
-    else if ( method == "bdd_cegar_enum" ) {
-      solver = new GbmBddCegarEnum();
-    }
-    else if ( method == "bdd_cegar_binary" ) {
-      solver = new GbmBddCegarBinary();
-    }
-    else if ( method != string() ) {
-      cerr << "Illegal method: " << method << endl;
-      return -1;
-    }
+    method = argv[1];
   }
+  GbmSolver* solver = GbmSolver::new_solver(method);
   if ( solver == NULL ) {
-    // fall-back
-    solver = new GbmSatCegarOneHot();
+    return -1;
   }
 
   A0Test(*solver);

@@ -8,8 +8,19 @@
 
 
 #include "GbmSolver.h"
+#include "RcfNetwork.h"
 #include "RcfNode.h"
 #include "RcfNodeHandle.h"
+
+#include "GbmSatNaiveBinary.h"
+#include "GbmSatNaiveEnum.h"
+#include "GbmSatNaiveOneHot.h"
+#include "GbmSatCegarBinary.h"
+#include "GbmSatCegarEnum.h"
+#include "GbmSatCegarOneHot.h"
+#include "GbmBddCegarBinary.h"
+#include "GbmBddCegarEnum.h"
+#include "GbmBddCegarOneHot.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -28,6 +39,47 @@ GbmSolver::GbmSolver()
 // @brief デストラクタ
 GbmSolver::~GbmSolver()
 {
+}
+
+// @brief 派生クラスを作るクラスメソッド
+// @param[in] method 手法を表す文字列
+GbmSolver*
+GbmSolver::new_solver(const string& method)
+{
+  GbmSolver* solver = NULL;
+  if ( method == "sat_naive_binary" ) {
+    solver = new GbmSatNaiveBinary();
+  }
+  else if ( method == "sat_naive_enum" ) {
+    solver = new GbmSatNaiveEnum();
+  }
+  else if ( method == "sat_naive_onehot" ) {
+    solver = new GbmSatNaiveOneHot();
+  }
+  else if ( method == "sat_cegar_binary" ) {
+    solver = new GbmSatCegarBinary();
+  }
+  else if ( method == "sat_cegar_enum" ) {
+    solver = new GbmSatCegarEnum();
+  }
+  else if ( method == "sat_cegar_onehot" ) {
+    solver = new GbmSatCegarOneHot();
+  }
+  else if ( method == "bdd_cegar_binary" ) {
+    solver = new GbmBddCegarBinary();
+  }
+  else if ( method == "bdd_cegar_enum" ) {
+    solver = new GbmBddCegarEnum();
+  }
+  else if ( method == "bdd_cegar_onehot" ) {
+    solver = new GbmBddCegarOneHot();
+  }
+  else if ( method == string() ) {
+    // default fall-back
+    solver = new GbmSatCegarOneHot();
+  }
+
+  return solver;
 }
 
 // @brief verify フラグを立てる

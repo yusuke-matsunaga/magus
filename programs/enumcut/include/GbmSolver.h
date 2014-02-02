@@ -10,11 +10,12 @@
 
 
 #include "ymtools.h"
-#include "RcfNetwork.h"
 #include "ym_logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM
+
+class RcfNetwork;
 
 //////////////////////////////////////////////////////////////////////
 /// @class GbmSolver GbmSolver.h "GbmSolver.h"
@@ -30,6 +31,12 @@ public:
   /// @brief デストラクタ
   virtual
   ~GbmSolver();
+
+  /// @brief 派生クラスを作るクラスメソッド
+  /// @param[in] method 手法を表す文字列
+  static
+  GbmSolver*
+  new_solver(const string& method = string());
 
 
 public:

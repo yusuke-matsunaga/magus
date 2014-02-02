@@ -22,16 +22,8 @@
 #include "FuncMgr.h"
 #include "FuncRec.h"
 
+#include "GbmSolver.h"
 #include "Lut443Match.h"
-#include "GbmSatNaiveBinary.h"
-#include "GbmSatNaiveOneHot.h"
-#include "GbmSatNaiveEnum.h"
-#include "GbmSatCegarBinary.h"
-#include "GbmSatCegarOneHot.h"
-#include "GbmSatCegarEnum.h"
-#include "GbmBddCegarBinary.h"
-#include "GbmBddCegarOneHot.h"
-#include "GbmBddCegarEnum.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -95,41 +87,9 @@ rec_func(FuncMgr& func_mgr,
     cout << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
 
-  GbmSolver* solver = NULL;
-  if ( method == "sat_naive_binary" ) {
-    solver = new GbmSatNaiveBinary();
-  }
-  else if ( method == "sat_naive_onehot" ) {
-    solver = new GbmSatNaiveOneHot();
-  }
-  else if ( method == "sat_naive_enum" ) {
-    solver = new GbmSatNaiveEnum();
-  }
-  else if ( method == "sat_cegar_binary" ) {
-    solver = new GbmSatCegarBinary();
-  }
-  else if ( method == "sat_cegar_onehot" ) {
-    solver = new GbmSatCegarOneHot();
-  }
-  else if ( method == "sat_cegar_enum" ) {
-    solver = new GbmSatCegarEnum();
-  }
-  else if ( method == "bdd_cegar_onehot" ) {
-    solver = new GbmBddCegarOneHot();
-  }
-  else if ( method == "bdd_cegar_enum" ) {
-    solver = new GbmBddCegarEnum();
-  }
-  else if ( method == "bdd_cegar_binary" ) {
-    solver = new GbmBddCegarBinary();
-  }
-  else if ( method != string() ) {
-    cerr << "Illegal method: " << method << endl;
-    return;
-  }
+  GbmSolver* solver = GbmSolver::new_solver(method);
   if ( solver == NULL ) {
-    // デフォルトフォールバック
-    solver = new GbmSatCegarOneHot();
+    return;
   }
 
   StopWatch timer;

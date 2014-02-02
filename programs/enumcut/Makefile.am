@@ -7,6 +7,7 @@
 
 SUBDIRS = \
 	libec \
+	libgbm \
 	enumcut \
 	lr \
 	recordcut

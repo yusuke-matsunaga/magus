@@ -21,15 +21,10 @@ MAINTAINERCLEANFILES = Makefile.in
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
-	libgbm.la
-
 noinst_PROGRAMS = \
 	rec \
-	recordcut \
-	GbmSolverTest \
-	lut4match_test \
-	Lut443MatchTest
+	Lut443MatchTest \
+	recordcut
 
 
 ############################################################
@@ -41,59 +36,6 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_BUILDDIR)/include \
 	-I$(top_srcdir)/include \
 	@GMP_INCLUDES@
-
-
-############################################################
-## libgbm.la 用の変数の定義
-############################################################
-
-libgbm_la_SOURCES = \
-	GbmSatEngine.h \
-	GbmSatEngine.cc \
-	GbmSatEngineBinary.h \
-	GbmSatEngineBinary.cc \
-	GbmSatEngineOneHot.h \
-	GbmSatEngineOneHot.cc \
-	GbmSatEngineEnum.h \
-	GbmSatEngineEnum.cc \
-	GbmBddEngineOneHot.h \
-	GbmBddEngineOneHot.cc \
-	GbmBddEngineBinary.h \
-	GbmBddEngineBinary.cc \
-	GbmBddEngineEnum.h \
-	GbmBddEngineEnum.cc \
-	GbmSolver.h \
-	GbmSolver.cc \
-	GbmSatNaiveBinary.h \
-	GbmSatNaiveBinary.cc \
-	GbmSatNaiveEnum.h \
-	GbmSatNaiveEnum.cc \
-	GbmSatNaiveOneHot.h \
-	GbmSatNaiveOneHot.cc \
-	GbmSatCegarBinary.h \
-	GbmSatCegarBinary.cc \
-	GbmSatCegarOneHot.h \
-	GbmSatCegarOneHot.cc \
-	GbmSatCegarEnum.h \
-	GbmSatCegarEnum.cc \
-	GbmBddCegarOneHot.h \
-	GbmBddCegarOneHot.cc \
-	GbmBddCegarBinary.h \
-	GbmBddCegarBinary.cc \
-	GbmBddCegarEnum.h \
-	GbmBddCegarEnum.cc \
-	RcfNetwork.h \
-	RcfNetwork.cc \
-	RcfNode.h \
-	RcfNodeImpl.h \
-	RcfNodeImpl.cc \
-	RcfNodeHandle.h \
-	Lut443Match.h \
-	Lut443Match.cc
-
-libgbm_la_LIBADD =
-
-libgbm_la_LDFLAGS =
 
 
 ############################################################
@@ -147,10 +89,12 @@ recordcut_SOURCES = \
 	FuncMgr.h \
 	FuncMgr.cc \
 	FuncRec.h \
-	FuncRec.cc
+	FuncRec.cc \
+	Lut443Match.h \
+	Lut443Match.cc
 
 recordcut_LDADD = \
-	libgbm.la \
+	$(top_builddir)/libgbm/libgbm.la \
 	$(top_builddir)/libec/libec.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
@@ -161,51 +105,19 @@ recordcut_LDFLAGS = \
 
 
 ############################################################
-## GbmSolverTest 用の変数の定義
-############################################################
-
-GbmSolverTest_SOURCES = \
-	GbmSolverTest.cc
-
-GbmSolverTest_LDADD = \
-	libgbm.la \
-	$(top_builddir)/libec/libec.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-GbmSolverTest_LDFLAGS =
-
-
-############################################################
 ## Lut443MatchTest 用の変数の定義
 ############################################################
 
 Lut443MatchTest_SOURCES = \
+	Lut443Match.h \
+	Lut443Match.cc \
 	Lut443MatchTest.cc
 
 Lut443MatchTest_LDADD = \
-	libgbm.la \
+	$(top_builddir)/libgbm/libgbm.la \
 	$(top_builddir)/libec/libec.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 Lut443MatchTest_LDFLAGS =
-
-
-############################################################
-## lut4match_test 用の変数の定義
-############################################################
-
-lut4match_test_SOURCES = \
-	lut4match_test.cc
-
-lut4match_test_LDADD = \
-	libgbm.la \
-	$(top_builddir)/libec/libec.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
-
-lut4match_test_LDFLAGS =
