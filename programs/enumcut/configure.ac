@@ -146,6 +146,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libec/Makefile])
+AC_CONFIG_FILES([libgbm/Makefile])
 AC_CONFIG_FILES([enumcut/Makefile])
 AC_CONFIG_FILES([lr/Makefile])
 AC_CONFIG_FILES([recordcut/Makefile])

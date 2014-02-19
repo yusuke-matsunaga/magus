@@ -22,16 +22,8 @@
 #include "FuncMgr.h"
 #include "FuncRec.h"
 
+#include "GbmSolver.h"
 #include "Lut443Match.h"
-#include "GbmNaiveBinary.h"
-#include "GbmNaiveOneHot.h"
-#include "GbmNaiveEnum.h"
-#include "GbmIncrBinary.h"
-#include "GbmIncrOneHot.h"
-#include "GbmIncrEnum.h"
-#include "GbmCegarBinary.h"
-#include "GbmCegarOneHot.h"
-#include "GbmCegarEnum.h"
 
 #include "ym_utils/MsgMgr.h"
 #include "ym_utils/MsgHandler.h"
@@ -95,41 +87,9 @@ rec_func(FuncMgr& func_mgr,
     cout << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
 
-  GbmSolver* solver = NULL;
-  if ( method == "naive_binary" ) {
-    solver = new GbmNaiveBinary();
-  }
-  else if ( method == "naive_onehot" ) {
-    solver = new GbmNaiveOneHot();
-  }
-  else if ( method == "naive_enum" ) {
-    solver = new GbmNaiveEnum();
-  }
-  else if ( method == "incr_binary" ) {
-    solver = new GbmIncrBinary();
-  }
-  else if ( method == "incr_onehot" ) {
-    solver = new GbmIncrOneHot();
-  }
-  else if ( method == "incr_enum" ) {
-    solver = new GbmIncrEnum();
-  }
-  else if ( method == "cegar_binary" ) {
-    solver = new GbmCegarBinary();
-  }
-  else if ( method == "cegar_onehot" ) {
-    solver = new GbmCegarOneHot();
-  }
-  else if ( method == "cegar_enum" ) {
-    solver = new GbmCegarEnum();
-  }
-  else if ( method != string() ) {
-    cerr << "Illegal method: " << method << endl;
-    return;
-  }
+  GbmSolver* solver = GbmSolver::new_solver(method);
   if ( solver == NULL ) {
-    // デフォルトフォールバック
-    solver = new GbmNaiveBinary();
+    return;
   }
 
   StopWatch timer;

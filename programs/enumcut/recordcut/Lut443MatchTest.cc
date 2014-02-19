@@ -3,20 +3,12 @@
 /// @brief Lut443Match のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Lut443Match.h"
-#include "GbmNaiveBinary.h"
-#include "GbmNaiveEnum.h"
-#include "GbmNaiveOneHot.h"
-#include "GbmIncrEnum.h"
-#include "GbmIncrBinary.h"
-#include "GbmIncrOneHot.h"
-#include "GbmCegarBinary.h"
-#include "GbmCegarOneHot.h"
-#include "GbmCegarEnum.h"
+#include "GbmSolver.h"
 #include "ym_utils/RandGen.h"
 #include "ym_utils/RandPermGen.h"
 
@@ -195,43 +187,13 @@ int
 Lut443MatchTest(int argc,
 		const char** argv)
 {
-  GbmSolver* solver = NULL;
+  string method;
   if ( argc > 1 ) {
-    if ( strcmp(argv[1], "naive_binary") == 0 ) {
-      solver = new GbmNaiveBinary();
-    }
-    else if ( strcmp(argv[1], "naive_enum") == 0 ) {
-      solver = new GbmNaiveEnum();
-    }
-    else if ( strcmp(argv[1], "naive_onehot") == 0 ) {
-      solver = new GbmNaiveOneHot();
-    }
-    else if ( strcmp(argv[1], "incr_enum") == 0 ) {
-      solver = new GbmIncrEnum();
-    }
-    else if ( strcmp(argv[1], "incr_binary") == 0 ) {
-      solver = new GbmIncrBinary();
-    }
-    else if ( strcmp(argv[1], "incr_onehot") == 0 ) {
-      solver = new GbmIncrOneHot();
-    }
-    else if ( strcmp(argv[1], "cegar_binary") == 0 ) {
-      solver = new GbmCegarBinary();
-    }
-    else if ( strcmp(argv[1], "cegar_onehot") == 0 ) {
-      solver = new GbmCegarOneHot();
-    }
-    else if ( strcmp(argv[1], "cegar_enum") == 0 ) {
-      solver = new GbmCegarEnum();
-    }
-    else {
-      cerr << "Illegal method: " << argv[0] << endl;
-      return -1;
-    }
+    method = argv[1];
   }
+  GbmSolver* solver = GbmSolver::new_solver(method);
   if ( solver == NULL ) {
-    // fall-back
-    solver = new GbmNaiveBinary();
+    return -1;
   }
 
   A0Test(*solver);
