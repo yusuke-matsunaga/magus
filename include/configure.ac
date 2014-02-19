@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2010 Yusuke Matsunaga
+Copyright (C) 2005-2014 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -42,8 +42,8 @@ _AC_COMPUTE_INT([__GNUC__], ym_gnuc)
 # Checks for libraries
 # ===================================================================
 
-AC_CHECK_LIB([z], [compress], [ym_have_libz=yes])
-AC_CHECK_LIB([bz2], [BZ2_bzCompress], [ym_have_libz=yes])
+AC_CHECK_LIB([z],    [compress],          [ym_have_libz=yes])
+AC_CHECK_LIB([bz2],  [BZ2_bzCompress],    [ym_have_libbz2=yes])
 AC_CHECK_LIB([lzma], [lzma_easy_encoder], [ym_have_liblzma=yes])
 
 
@@ -52,16 +52,16 @@ AC_CHECK_LIB([lzma], [lzma_easy_encoder], [ym_have_liblzma=yes])
 # ===================================================================
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS([strings.h], [ym_have_strings_h=yes])
-AC_CHECK_HEADERS([unistd.h], [ym_have_unistd_h=yes])
-AC_CHECK_HEADERS([limits.h], [ym_have_limits_h=yes])
-AC_CHECK_HEADERS([float.h], [ym_have_float_h=yes])
-AC_CHECK_HEADERS([math.h], [ym_have_math_h=yes])
+AC_CHECK_HEADERS([strings.h],  [ym_have_strings_h=yes])
+AC_CHECK_HEADERS([unistd.h],   [ym_have_unistd_h=yes])
+AC_CHECK_HEADERS([limits.h],   [ym_have_limits_h=yes])
+AC_CHECK_HEADERS([float.h],    [ym_have_float_h=yes])
+AC_CHECK_HEADERS([math.h],     [ym_have_math_h=yes])
 AC_CHECK_HEADERS([sys/time.h], [ym_have_sys_time_h=yes])
 AC_CHECK_HEADERS([sys/stat.h], [ym_have_sys_stat_h=yes])
-AC_CHECK_HEADERS([zlib.h], [ym_have_zlib_h=yes])
-AC_CHECK_HEADERS([bzlib.h], [ym_have_bzlib_h=yes])
-AC_CHECK_HEADERS([lzma.h], [ym_have_lzma_h=yes])
+AC_CHECK_HEADERS([zlib.h],     [ym_have_zlib_h=yes])
+AC_CHECK_HEADERS([bzlib.h],    [ym_have_bzlib_h=yes])
+AC_CHECK_HEADERS([lzma.h],     [ym_have_lzma_h=yes])
 
 
 # ===================================================================
@@ -133,7 +133,7 @@ cat > $ymtools <<___EOF___
 /// @brief ymtools に共通な型定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 // Do not edit! This file is generated from configure.in
