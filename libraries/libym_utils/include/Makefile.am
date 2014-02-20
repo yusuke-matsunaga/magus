@@ -54,7 +54,6 @@ nobase_ym_HEADERS = \
 	utils/IDO.h \
 	utils/ItvlMgr.h \
 	utils/MStopWatch.h \
-	utils/Makefile.am
 	utils/MsgHandler.h \
 	utils/MsgMgr.h \
 	utils/MultiCombiGen.h \
