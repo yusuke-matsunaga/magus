@@ -43,8 +43,8 @@ noinst_LTLIBRARIES = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)/include \
 	$(CPPUTEST_INCLUDES)
 
 
@@ -58,7 +58,7 @@ run_all_test_SOURCES = \
 
 run_all_test_LDADD = \
 	libym_utils_cpputest.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 run_all_test_LDFLAGS = \
 	$(CPPUTEST_LIBS)
@@ -75,8 +75,7 @@ libym_utils_cpputest_la_SOURCES = \
 	FileTest.cc \
 	CombiGenTest.cc \
 	PermGenTest.cc \
-	HeapTreeTest.cc \
-	BtgMatchTest.cc
+	HeapTreeTest.cc
 
 libym_utils_cpputest_la_LIBADD =
 

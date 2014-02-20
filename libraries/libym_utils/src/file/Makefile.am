@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libfile.la
+noinst_LTLIBRARIES = \
+	libfile.la \
+	libfile_d.la \
+	libfile_p.la
 
 
 ############################################################
@@ -41,16 +44,51 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libfile.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libfile_la_SOURCES = \
+COMMON_SOURCES = \
 	File.cc \
 	FileInfo.h \
 	FileInfo.cc \
 	FileInfoMgr.h \
 	FileInfoMgr.cc
 
+
+############################################################
+## libfile.la 用の変数の定義
+############################################################
+
+libfile_la_CXXFLAGS = -O2
+
+libfile_la_SOURCES = $(COMMON_SOURCES)
+
 libfile_la_LIBADD =
 
 libfile_la_LDFLAGS =
+
+
+############################################################
+## libfile_d.la 用の変数の定義
+############################################################
+
+libfile_d_la_CXXFLAGS = -O2 -g
+
+libfile_d_la_SOURCES = $(COMMON_SOURCES)
+
+libfile_d_la_LIBADD =
+
+libfile_d_la_LDFLAGS =
+
+
+############################################################
+## libfile_p.la 用の変数の定義
+############################################################
+
+libfile_p_la_CXXFLAGS = -O2 -pg
+
+libfile_p_la_SOURCES = $(COMMON_SOURCES)
+
+libfile_p_la_LIBADD =
+
+libfile_p_la_LDFLAGS =

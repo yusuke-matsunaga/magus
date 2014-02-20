@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libstr.la
+noinst_LTLIBRARIES = \
+	libstr.la \
+	libstr_d.la \
+	libstr_p.la
 
 
 ############################################################
@@ -41,14 +44,49 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libstr.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libstr_la_SOURCES = \
+COMMON_SOURCES = \
 	StrBuff.cc \
 	StrPool.h \
 	StrPool.cc
 
+
+############################################################
+## libstr.la 用の変数の定義
+############################################################
+
+libstr_la_CXXFLAGS = -O2
+
+libstr_la_SOURCES = $(COMMON_SOURCES)
+
 libstr_la_LIBADD =
 
 libstr_la_LDFLAGS =
+
+
+############################################################
+## libstr_d.la 用の変数の定義
+############################################################
+
+libstr_d_la_CXXFLAGS = -O2 -g
+
+libstr_d_la_SOURCES = $(COMMON_SOURCES)
+
+libstr_d_la_LIBADD =
+
+libstr_d_la_LDFLAGS =
+
+
+############################################################
+## libstr_p.la 用の変数の定義
+############################################################
+
+libstr_p_la_CXXFLAGS = -O2 -pg
+
+libstr_p_la_SOURCES = $(COMMON_SOURCES)
+
+libstr_p_la_LIBADD =
+
+libstr_p_la_LDFLAGS =

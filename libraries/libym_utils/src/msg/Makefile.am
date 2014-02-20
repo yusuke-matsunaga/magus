@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libmsg.la
+noinst_LTLIBRARIES = \
+	libmsg.la \
+	libmsg_d.la \
+	libmsg_p.la
 
 
 ############################################################
@@ -41,15 +44,50 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libmsg.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libmsg_la_SOURCES = \
+COMMON_SOURCES = \
 	MsgHandler.cc \
 	MsgMgr.cc \
 	MsgMgrImpl.h \
 	MsgMgrImpl.cc
 
+
+############################################################
+## libmsg.la 用の変数の定義
+############################################################
+
+libmsg_la_CXXFLAGS = -O2
+
+libmsg_la_SOURCES = $(COMMON_SOURCES)
+
 libmsg_la_LIBADD =
 
 libmsg_la_LDFLAGS =
+
+
+############################################################
+## libmsg_d.la 用の変数の定義
+############################################################
+
+libmsg_d_la_CXXFLAGS = -O2 -g
+
+libmsg_d_la_SOURCES = $(COMMON_SOURCES)
+
+libmsg_d_la_LIBADD =
+
+libmsg_d_la_LDFLAGS =
+
+
+############################################################
+## libmsg_p.la 用の変数の定義
+############################################################
+
+libmsg_p_la_CXXFLAGS = -O2 -pg
+
+libmsg_p_la_SOURCES = $(COMMON_SOURCES)
+
+libmsg_p_la_LIBADD =
+
+libmsg_p_la_LDFLAGS =

@@ -8,7 +8,7 @@
 
 
 #include "CppUTest/TestHarness.h"
-#include "ym_utils/CombiGen.h"
+#include "utils/CombiGen.h"
 
 
 using namespace nsYm;

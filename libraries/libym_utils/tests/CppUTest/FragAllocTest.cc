@@ -9,7 +9,7 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "ym_utils/FragAlloc.h"
+#include "utils/FragAlloc.h"
 
 
 using namespace nsYm;

@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libgen.la
+noinst_LTLIBRARIES = \
+	libgen.la \
+	libgen_d.la \
+	libgen_p.la
 
 
 ############################################################
@@ -41,10 +44,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libgen.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libgen_la_SOURCES = \
+COMMON_SOURCES = \
 	CombiGen.cc \
 	GenBase.cc \
 	MultiCombiGen.cc \
@@ -55,6 +58,41 @@ libgen_la_SOURCES = \
 	MultiPermGen.cc \
 	PermGen.cc
 
+
+############################################################
+## libgen.la 用の変数の定義
+############################################################
+
+libgen_la_CXXFLAGS = -O2
+
+libgen_la_SOURCES = $(COMMON_SOURCES)
+
 libgen_la_LIBADD =
 
 libgen_la_LDFLAGS =
+
+
+############################################################
+## libgen_d.la 用の変数の定義
+############################################################
+
+libgen_d_la_CXXFLAGS = -O2 -g
+
+libgen_d_la_SOURCES = $(COMMON_SOURCES)
+
+libgen_d_la_LIBADD =
+
+libgen_d_la_LDFLAGS =
+
+
+############################################################
+## libgen_p.la 用の変数の定義
+############################################################
+
+libgen_p_la_CXXFLAGS = -O2 -pg
+
+libgen_p_la_SOURCES = $(COMMON_SOURCES)
+
+libgen_p_la_LIBADD =
+
+libgen_p_la_LDFLAGS =

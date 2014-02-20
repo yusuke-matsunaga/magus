@@ -9,7 +9,7 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "ym_utils/UnitAlloc.h"
+#include "utils/UnitAlloc.h"
 
 
 using namespace nsYm;

@@ -8,7 +8,7 @@
 
 
 #include "CppUTest/TestHarness.h"
-#include "ym_utils/HeapTree.h"
+#include "utils/HeapTree.h"
 
 
 using namespace nsYm;

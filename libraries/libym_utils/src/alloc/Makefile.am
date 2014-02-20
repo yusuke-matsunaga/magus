@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = liballoc.la
+noinst_LTLIBRARIES = \
+	liballoc.la \
+	liballoc_d.la \
+	liballoc_p.la
 
 
 ############################################################
@@ -41,15 +44,50 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## liballoc.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-liballoc_la_SOURCES = \
+COMMON_SOURCES = \
 	Alloc.cc \
 	FragAlloc.cc \
 	SimpleAlloc.cc \
 	UnitAlloc.cc
 
+
+############################################################
+## liballoc.la 用の変数の定義
+############################################################
+
+liballoc_la_CXXFLAGS = -O2
+
+liballoc_la_SOURCES = $(COMMON_SOURCES)
+
 liballoc_la_LIBADD =
 
 liballoc_la_LDFLAGS =
+
+
+############################################################
+## liballoc_d.la 用の変数の定義
+############################################################
+
+liballoc_d_la_CXXFLAGS = -O2 -g
+
+liballoc_d_la_SOURCES = $(COMMON_SOURCES)
+
+liballoc_d_la_LIBADD =
+
+liballoc_d_la_LDFLAGS =
+
+
+############################################################
+## liballoc_p.la 用の変数の定義
+############################################################
+
+liballoc_p_la_CXXFLAGS = -O2 -pg
+
+liballoc_p_la_SOURCES = $(COMMON_SOURCES)
+
+liballoc_p_la_LIBADD =
+
+liballoc_p_la_LDFLAGS =

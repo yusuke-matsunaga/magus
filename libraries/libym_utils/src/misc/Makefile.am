@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libmisc.la
+noinst_LTLIBRARIES = \
+	libmisc.la \
+	libmisc_d.la \
+	libmisc_p.la
 
 
 ############################################################
@@ -42,10 +45,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libmisc.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libmisc_la_SOURCES = \
+COMMON_SOURCES = \
 	Binder.cc \
 	DlList.cc \
 	PoptMainApp.cc \
@@ -53,7 +56,44 @@ libmisc_la_SOURCES = \
 	RefCount.cc \
 	Scanner.cc
 
+COMMON_LDFLAGS = \
+	@POPT_LIBS@
+
+
+############################################################
+## libmisc.la 用の変数の定義
+############################################################
+
+libmisc_la_CXXFLAGS = -O2
+
+libmisc_la_SOURCES = $(COMMON_SOURCES)
+
 libmisc_la_LIBADD =
 
-libmisc_la_LDFLAGS = \
-	@POPT_LIBS@
+libmisc_la_LDFLAGS = $(COMMON_LDFLAGS)
+
+
+############################################################
+## libmisc_d.la 用の変数の定義
+############################################################
+
+libmisc_d_la_CXXFLAGS = -O2 -g
+
+libmisc_d_la_SOURCES = $(COMMON_SOURCES)
+
+libmisc_d_la_LIBADD =
+
+libmisc_d_la_LDFLAGS = $(COMMON_LDFLAGS)
+
+
+############################################################
+## libmisc_p.la 用の変数の定義
+############################################################
+
+libmisc_p_la_CXXFLAGS = -O2 -pg
+
+libmisc_p_la_SOURCES = $(COMMON_SOURCES)
+
+libmisc_p_la_LIBADD =
+
+libmisc_p_la_LDFLAGS = $(COMMON_LDFLAGS)

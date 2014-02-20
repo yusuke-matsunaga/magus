@@ -8,7 +8,7 @@
 
 
 #include "CppUTest/TestHarness.h"
-#include "ym_utils/PermGen.h"
+#include "utils/PermGen.h"
 
 
 using namespace nsYm;

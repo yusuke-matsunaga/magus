@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libitvl.la
+noinst_LTLIBRARIES = \
+	libitvl.la \
+	libitvl_d.la \
+	libitvl_p.la
 
 
 ############################################################
@@ -41,16 +44,51 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libitvl.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libitvl_la_SOURCES = \
+COMMON_SOURCES = \
 	ItvlCell.h \
 	ItvlMgrImpl.h \
 	ItvlMgrImpl.cc \
 	ItvlMgr.cc \
 	NameMgr.cc
 
+
+############################################################
+## libitvl.la 用の変数の定義
+############################################################
+
+libitvl_la_CXXFLAGS = -O2
+
+libitvl_la_SOURCES = $(COMMON_SOURCES)
+
 libitvl_la_LIBADD =
 
 libitvl_la_LDFLAGS =
+
+
+############################################################
+## libitvl_d.la 用の変数の定義
+############################################################
+
+libitvl_d_la_CXXFLAGS = -O2 -g
+
+libitvl_d_la_SOURCES = $(COMMON_SOURCES)
+
+libitvl_d_la_LIBADD =
+
+libitvl_d_la_LDFLAGS =
+
+
+############################################################
+## libitvl_p.la 用の変数の定義
+############################################################
+
+libitvl_p_la_CXXFLAGS = -O2 -pg
+
+libitvl_p_la_SOURCES = $(COMMON_SOURCES)
+
+libitvl_p_la_LIBADD =
+
+libitvl_p_la_LDFLAGS =
