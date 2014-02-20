@@ -3,7 +3,7 @@
 // RandGen のテスト
 
 
-#include "ym_utils/RandGen.h"
+#include "utils/RandGen.h"
 
 
 int

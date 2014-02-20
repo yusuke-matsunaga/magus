@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "../LzmaCoder.h"
-#include "ym_utils/FileCoder.h"
+#include "io/LzmaCoder.h"
+#include "io/FileCoder.h"
 #include <fcntl.h>
 
 

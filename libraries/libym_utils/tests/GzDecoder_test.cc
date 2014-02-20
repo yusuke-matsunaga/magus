@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "../GzDecoder.h"
+#include "io/GzDecoder.h"
 
 
 BEGIN_NAMESPACE_YM

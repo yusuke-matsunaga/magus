@@ -3,7 +3,7 @@
 // nsMagus::MultiPermGen のテスト
 
 
-#include "ym_utils/MultiPermGen.h"
+#include "utils/MultiPermGen.h"
 
 int
 main(int argc,

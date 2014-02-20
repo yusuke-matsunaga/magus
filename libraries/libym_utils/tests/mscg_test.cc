@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/MultiSetCombiGen.h"
+#include "utils/MultiSetCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM

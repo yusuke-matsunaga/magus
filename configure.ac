@@ -3,20 +3,20 @@
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([ymtools], [1.2],
+AC_INIT([ymtools], [2.0],
         [yusuke_matsunaga@ieee.org],
         [ymtools])dnl
 
 AC_REVISION($Rev: 2507 $)dnl
 
-AC_PREREQ(2.57)dnl
+AC_PREREQ(2.69)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2013 Yusuke Matsunaga
+Copyright (C) 2005-2014 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([include/ymnsdef.h])dnl
+AC_CONFIG_SRCDIR([boot.sh])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl
@@ -101,8 +101,6 @@ AC_CONFIG_FILES([programs/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([Doxyfile])
 
-AC_CONFIG_SUBDIRS([include])
-
 
 # ===================================================================
 # Local definitions
@@ -122,6 +120,10 @@ YM_INIT_LIBRARIES_SUBDIRS
 
 # libym_utils
 YM_BUILD_LIBRARY([libym_utils], [yes],
+		 [])
+
+# libym_utils
+YM_BUILD_LIBRARY([libym_dsa], [yes],
 		 [])
 
 # libym_logic

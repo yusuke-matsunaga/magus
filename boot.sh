@@ -105,7 +105,6 @@ set_program
 	     clean $BASEDIR/$module
 	 done
          boot $BASEDIR
-	 boot $BASEDIR/include
 	 for module in $SUBMODULE; do
 	     boot $BASEDIR/$module
 	 done
@@ -115,7 +114,6 @@ set_program
 	     clean_config $BASEDIR/config
 	     clean_root $BASEDIR
 	     boot $BASEDIR
-	     boot $BASEDIR/include
 	 else
 	     clean_config $1
 	     clean $1

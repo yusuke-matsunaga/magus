@@ -3,8 +3,8 @@
 // RandCombiGen のテスト
 
 
-#include "ym_utils/RandCombiGen.h"
-#include "ym_utils/RandGen.h"
+#include "utils/RandCombiGen.h"
+#include "utils/RandGen.h"
 
 
 int

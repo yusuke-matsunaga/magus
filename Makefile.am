@@ -6,7 +6,6 @@
 ############################################################
 
 SUBDIRS = \
-	include \
 	libraries \
 	tests \
 	programs
@@ -30,6 +29,7 @@ EXTRA_DIST = \
 	Doxyfile.in \
 	aclocal.m4 \
 	boot.sh \
+	clean.sh \
 	configure \
 	configure.ac \
 	etc/autogen.tmpl \
@@ -39,9 +39,12 @@ EXTRA_DIST = \
 	etc/update \
 	etc/mk.subr \
 	m4macros/autotroll.m4 \
+	m4macros/cpputest.m4 \
 	m4macros/gmp.m4
 	m4macros/popt.m4 \
+	m4macros/py.m4 \
 	m4macros/qscintilla2.m4 \
+	m4macros/qt4.m4 \
 	m4macros/tcl.m4 \
 	m4macros/ymlibs.m4 \
 	mkautogen

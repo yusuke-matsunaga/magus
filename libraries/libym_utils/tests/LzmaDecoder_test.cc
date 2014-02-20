@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "../LzmaDecoder.h"
+#include "io/LzmaDecoder.h"
 
 
 BEGIN_NAMESPACE_YM

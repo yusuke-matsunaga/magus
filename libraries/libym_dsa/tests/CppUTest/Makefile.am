@@ -1,0 +1,81 @@
+## Process this file with automake to produce Makefile.in
+
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIRS =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+bin_PROGRAMS =
+
+
+noinst_PROGRAMS =
+
+noinst_LTLIBRARIES =
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/include \
+	-I$(YMTOOLS_BUILDDIR)/include \
+	$(CPPUTEST_INCLUDES)
+
+
+############################################################
+## run_all_test 用の変数の定義
+############################################################
+
+run_all_test_SOURCES = \
+	main.cc \
+	ym_utils_CppUTest.h
+
+run_all_test_LDADD = \
+	libym_utils_cpputest.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+
+run_all_test_LDFLAGS = \
+	$(CPPUTEST_LIBS)
+
+
+############################################################
+## libym_utils_cpputest.la
+############################################################
+
+libym_utils_cpputest_la_SOURCES = \
+	SimpleAllocTest.cc \
+	FragAllocTest.cc \
+	UnitAllocTest.cc \
+	FileTest.cc \
+	CombiGenTest.cc \
+	PermGenTest.cc \
+	HeapTreeTest.cc \
+	BtgMatchTest.cc
+
+libym_utils_cpputest_la_LIBADD =
+
+libym_utils_cpputest_la_LDLFAGS =

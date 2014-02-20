@@ -3,7 +3,7 @@
 // HeapTree のテスト
 
 
-#include "ym_utils/HeapTree.h"
+#include "utils/HeapTree.h"
 
 
 using namespace std;

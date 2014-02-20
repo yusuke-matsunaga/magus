@@ -3,7 +3,7 @@
 // PathName のテスト
 
 
-#include "ym_utils/File.h"
+#include "utils/File.h"
 
 using namespace nsYm;
 

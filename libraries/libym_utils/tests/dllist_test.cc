@@ -2,7 +2,7 @@
 
 // DlList のテスト
 
-#include "ym_utils/DlList.h"
+#include "utils/DlList.h"
 
 
 using namespace std;

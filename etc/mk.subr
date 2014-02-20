@@ -222,8 +222,8 @@ set_program() {
 
     # サブモジュールのディレクトリ名
     SUBMODULE='libraries/libym_utils
+               libraries/libym_dsa
                libraries/libym_logic
-	       libraries/libym_mincov
 	       libraries/libym_cell
 	       libraries/libym_verilog
 	       libraries/libym_networks

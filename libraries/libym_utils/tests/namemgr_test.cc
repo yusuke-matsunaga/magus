@@ -3,7 +3,7 @@
 // NameMgr のテスト
 
 
-#include "ym_utils/NameMgr.h"
+#include "utils/NameMgr.h"
 
 int
 main(int argc,

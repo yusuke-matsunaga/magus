@@ -51,9 +51,7 @@ noinst_PROGRAMS = \
 	ZCoder_test \
 	ZDecoder_test \
 	StrListIDO_test \
-	Codec_test \
-	BtgMatch_test \
-	FlowTest
+	Codec_test
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \
@@ -82,15 +80,16 @@ endif
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(top_srcdir)/include \
+	-I$(top_builddir)/include \
+	-I$(top_srcdir)/src
 
 
 ############################################################
 ## Common Variables
 ############################################################
 
-YMUTILS = ../libym_utils.la
+YMUTILS = ../src/libym_utils.la
 
 
 ############################################################

@@ -2,7 +2,7 @@
 // zstream のテスト
 
 
-#include "ym_utils/BzEngine.h"
+#include "io/BzEngine.h"
 #include <fcntl.h>
 
 

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "../BzDecoder.h"
+#include "io/BzDecoder.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -3,8 +3,8 @@
 // RandPermGen のテスト
 
 
-#include "ym_utils/RandPermGen.h"
-#include "ym_utils/RandGen.h"
+#include "utils/RandPermGen.h"
+#include "utils/RandGen.h"
 
 
 int

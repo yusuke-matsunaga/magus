@@ -1,24 +1,22 @@
 # Process this file with autoconf to produce a configure script
-#
-# $Id: configure.ac 2507 2009-10-17 16:24:02Z matsunaga $
 
 # ===================================================================
 # Initial block
 # ===================================================================
-AC_INIT([libym_utils], [1.0],
+AC_INIT([libym_utils], [2.0],
         [yusuke_matsunaga@ieee.org],
         [libym_utils])dnl
 
 AC_REVISION($Rev: 2507 $)dnl
 
-AC_PREREQ(2.57)dnl
+AC_PREREQ(2.69)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2005-2013 Yusuke Matsunaga
+Copyright (C) 2005-2014 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
-AC_CONFIG_SRCDIR([ym_utils/Alloc.h])dnl
+AC_CONFIG_SRCDIR([include/ymassert.h])dnl
 
 AC_CONFIG_AUX_DIR([config])dnl
 AC_CONFIG_MACRO_DIR([config])dnl
@@ -46,27 +44,45 @@ if test $enable_shared = no; then
   AC_SUBST(AM_LDFLAGS)
 fi
 
+# GCC のバージョンを $ym_gnuc に入れておく．
+_AC_COMPUTE_INT([__GNUC__], ym_gnuc)
+
 
 # ===================================================================
 # Checks for libraries
 # ===================================================================
 
+AC_CHECK_LIB([z],    [compress],          [ym_have_libz=yes])
+AC_CHECK_LIB([bz2],  [BZ2_bzCompress],    [ym_have_libbz2=yes])
+AC_CHECK_LIB([lzma], [lzma_easy_encoder], [ym_have_liblzma=yes])
+
 
 # ===================================================================
 # Checks for header files
 # ===================================================================
+
+AC_HEADER_STDC
+AC_HEADER_TIME
+
+AC_CHECK_HEADERS([strings.h],  [ym_have_strings_h=yes])
+AC_CHECK_HEADERS([unistd.h],   [ym_have_unistd_h=yes])
+AC_CHECK_HEADERS([limits.h],   [ym_have_limits_h=yes])
+AC_CHECK_HEADERS([float.h],    [ym_have_float_h=yes])
+AC_CHECK_HEADERS([math.h],     [ym_have_math_h=yes])
+AC_CHECK_HEADERS([sys/time.h], [ym_have_sys_time_h=yes])
+AC_CHECK_HEADERS([sys/stat.h], [ym_have_sys_stat_h=yes])
 AC_CHECK_HEADERS([pwd.h])
 AC_CHECK_HEADERS([sys/param.h])
 
-AC_CHECK_HEADERS([zlib.h], [ym_have_zlib=yes], [ym_have_zlib=no])
-AC_CHECK_HEADERS([bzlib.h], [ym_have_bzlib=yes], [ym_have_bzlib=no])
-AC_CHECK_HEADERS([lzma.h], [ym_have_lzma=yes], [ym_have_lzma=no])
-
+AC_CHECK_HEADERS([zlib.h],     [ym_have_zlib_h=yes],  [ym_have_zlib_h=no])
+AC_CHECK_HEADERS([bzlib.h],    [ym_have_bzlib_h=yes], [ym_have_bzlib_h=no])
+AC_CHECK_HEADERS([lzma.h],     [ym_have_lzma_h=yes],  [ym_have_lzma_h=no])
 
 
 # ===================================================================
 # Checks for typedefs, structures, and compiler characteristics
 # ===================================================================
+
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
@@ -76,7 +92,13 @@ AC_TYPE_SIZE_T
 # Check for size of built-in types
 # ===================================================================
 
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF(void*)
+AC_CHECK_SIZEOF(size_t)
 
 _AC_COMPUTE_INT([__alignof__ (double)], ym_alignof_double)
 AC_DEFINE_UNQUOTED(ALIGNOF_DOUBLE, $ym_alignof_double, [Alignment of double])
@@ -95,10 +117,26 @@ AC_CHECK_FUNCS([getcwd gettimeofday strtod])
 # Checks for other packages
 # ===================================================================
 
-# Check for Python
-YM_CHECK_PYTHON([ym_have_python=yes], [ym_have_python=no])
+# Check for zlib
+if test "x$ym_have_zlib_h" = xyes -a "x$ym_have_libz" = xyes; then
+   ym_have_zlib=yes
+else
+   ym_have_zlib=no
+fi
 
-AC_CACHE_SAVE
+# Check for bzlib
+if test "x$ym_have_bzlib_h" = xyes -a "x$ym_have_libbz2" = xyes; then
+   ym_have_bz2=yes
+else
+   ym_have_bz2=no
+fi
+
+# Check for liblzma
+if test "x$ym_have_lzma_h" = xyes -a "x$ym_have_liblzma" = xyes; then
+   ym_have_lzma=yes
+else
+   ym_have_lzma=no
+fi
 
 
 # ===================================================================
@@ -119,11 +157,325 @@ AC_LANG_CPLUSPLUS
 YM_CHECK_CPPUTEST([ym_have_cpputest=yes], [ym_have_cpputest=no])
 
 
+AC_CACHE_SAVE
+
+
+# ===================================================================
+# Generating ymtools.h
+# ===================================================================
+AC_CONFIG_COMMANDS([ymtools.h],[
+ymtools="ymtools.h-tmp"
+cat > $ymtools <<___EOF___
+#ifndef YMTOOLS_H
+#define YMTOOLS_H
+
+/// @file ymtools.h
+/// @brief ymtools に共通な型定義ファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2014 Yusuke Matsunaga
+/// All rights reserved.
+
+// Do not edit! This file is generated from configure.in
+
+//////////////////////////////////////////////////////////////////////
+// 基本的なヘッダフィルのインクルード
+//////////////////////////////////////////////////////////////////////
+
+#include <stdio.h>
+#include <sys/types.h>
+___EOF___
+
+if test "x$ac_cv_header_stdc" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <stdlib.h>
+#include <string.h>
+___EOF___
+elif test "x$ym_have_strings_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <strings.h>
+___EOF___
+fi
+
+if test "x$ym_have_unistd_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <unistd.h>
+___EOF___
+fi
+
+if test "x$ym_have_limits_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <limits.h>
+___EOF___
+fi
+
+if test "x$ym_have_float_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <float.h>
+___EOF___
+fi
+
+if test "x$ym_have_math_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <math.h>
+___EOF___
+fi
+
+if test "x$ac_cv_header_time" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <sys/time.h>
+#include <time.h>
+___EOF___
+elif test "x$ym_have_sys_time_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <sys/time.h>
+___EOF___
+else
+  cat >> $ymtools << ___EOF___
+#include <time.h>
+___EOF___
+fi
+
+if test "x$ym_have_sys_stat_h" = xyes; then
+  cat >> $ymtools << ___EOF___
+#include <sys/stat.h>
+___EOF___
+fi
+
+cat >> $ymtools << ___EOF___
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <exception>
+#include <new>
+#include <utility>
+#include <string>
+#include <vector>
+#include <list>
+___EOF___
+
+if test $ym_gnuc -ge 3; then
+  cat >> $ymtools << ___EOF___
+#include <ext/algorithm>
+#include <ext/functional>
+#include <ext/hash_set>
+#include <ext/hash_map>
+#define HASH_NAMESPACE __gnu_cxx
+___EOF___
+else
+  cat >> $ymtools << ___EOF___
+#include <algorithm>
+#include <functional>
+#include <hash_set>
+#include <hash_map>
+#define HASH_NAMESPACE std
+___EOF___
+fi
+
+cat >> $ymtools << ___EOF___
+#include "ymnsdef.h"
+#include "ymassert.h"
+#include "ymmath.h"
+___EOF___
+
+if test $ym_have_zlib=yes; then
+  cat >> $ymtools << ___EOF___
+/* Define if you have zlib.h */
+#define HAVE_ZLIB 1
+___EOF___
+fi
+
+if test $ym_have_bz2=yes; then
+  cat >> $ymtools << ___EOF___
+/* Define if you have bzlib.h */
+#define HAVE_BZLIB 1
+___EOF___
+fi
+
+if test $ym_have_lzma=yes; then
+  cat >> $ymtools << ___EOF___
+/* Define if you have lzma.h */
+#define HAVE_LZMA 1
+___EOF___
+fi
+
+cat >> $ymtools << ___EOF___
+
+//////////////////////////////////////////////////////////////////////
+// 整数型の定義
+//////////////////////////////////////////////////////////////////////
+
+/// @brief 符号付き整数型
+typedef int ymint;
+
+/// @brief 符号付きlong型
+typedef long ymlong;
+
+/// @brief 符号無し整数型
+typedef unsigned int ymuint;
+
+/// @brief 符号無しlong型
+typedef unsigned long ymulong;
+
+/// @brief 8ビット符号付き整数型
+typedef $ymint8 ymint8;
+
+/// @brief 16ビット符号付き整数型
+typedef $ymint16 ymint16;
+
+/// @brief 32ビット符号付き整数型
+typedef $ymint32 ymint32;
+
+/// @brief 64ビット符号付き整数型
+typedef $ymint64 ymint64;
+
+/// @brief 8ビット符号なし整数型
+typedef unsigned $ymint8 ymuint8;
+
+/// @brief 16ビット符号なし整数型
+typedef unsigned $ymint16 ymuint16;
+
+/// @brief 32ビット符号なし整数型
+typedef unsigned $ymint32 ymuint32;
+
+/// @brief 64ビット符号なし整数型
+typedef unsigned $ymint64 ymuint64;
+
+/// @brief ポインタと同じサイズの符号なし整数型
+typedef $ymptrint ympuint;
+
+___EOF___
+
+cat >> $ymtools << ___EOF___
+
+BEGIN_NAMESPACE_HASH
+
+// string/const string の hash_set/map 用のハッシュ関数クラス
+// hash<string>, hash<const string>定義．
+// SGI STL の string クラス (v3.1 以降)にはこの定義は不要．
+#if !defined(__SGI_STL_STRING) && !defined(DEFINE_HASH_STRING)
+#define DEFINE_HASH_STRING
+
+template<typename __Key> struct hash;
+
+template <>
+struct
+hash<std::string>
+{
+  size_t
+  operator()(const std::string& __x) const
+  {
+    unsigned long __h = 0;
+    for (std::string::const_iterator __s = __x.begin(); __s != __x.end();
+	 ++__s)
+      __h = 5*__h + *__s;
+
+    return size_t(__h);
+  }
+};
+
+template <>
+struct
+hash<const std::string>
+{
+  size_t
+  operator()(const std::string& __x) const {
+    unsigned long __h = 0;
+    for (std::string::const_iterator __s = __x.begin(); __s != __x.end();
+	 ++__s)
+      __h = 5*__h + *__s;
+
+    return size_t(__h);
+  }
+};
+
+#endif // __SGI_STL_STRING
+
+END_NAMESPACE_HASH
+
+
+#endif // YMTOOLS_H
+___EOF___
+
+if test ! -d include; then
+   mkdir include
+fi
+if cmp -s $ymtools include/ymtools.h; then
+  AC_MSG_NOTICE([ymtools.h is unchanged])
+  rm -f $ymtools
+else
+  mv $ymtools include/ymtools.h
+fi
+],[
+ac_cv_header_stdc=$ac_cv_header_stdc
+ac_cv_header_time=$ac_cv_header_time
+ym_have_strings_h=$ym_have_strings_h
+ym_have_unistd_h=$ym_have_unistd_h
+ym_have_limits_h=$ym_have_limits_h
+ym_have_float_h=$ym_have_float_h
+ym_have_math_h=$ym_have_math_h
+ym_have_sys_time_h=$ym_have_sys_time_h
+ym_have_sys_stat_h=$ym_have_sys_stat_h
+ym_gnuc=$ym_gnuc
+ymint8=char
+case 2 in
+$ac_cv_sizeof_short)
+  ymint16=short
+  ;;
+$ac_cv_sizeof_int)
+  ymint16=int
+  ;;
+esac
+case 4 in
+$ac_cv_sizeof_short)
+  ymint32=short
+  ;;
+$ac_cv_sizeof_int)
+  ymint32=int
+  ;;
+$ac_cv_sizeof_long)
+  ymint32=long
+  ;;
+esac
+case 8 in
+$ac_cv_sizeof_int)
+  ymint64=int
+  ;;
+$ac_cv_sizeof_long)
+  ymint64=long
+  ;;
+$ac_cv_sizeof_long_long)
+  ymint64='long long'
+  ;;
+esac
+case $ac_cv_sizeof_voidp in
+$ac_cv_sizeof_int)
+  ymptrint='unsigned int'
+  ;;
+$ac_cv_sizeof_long)
+  ymptrint='unsigned long'
+  ;;
+$ac_cv_sizeof_long_long)
+  ymptrint='unsigned long long'
+  ;;
+esac
+])
+
+
 # ===================================================================
 # Declare files to be generated by configure script
 # ===================================================================
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([ym_utils/Makefile])
+AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([src/alloc/Makefile])
+AC_CONFIG_FILES([src/file/Makefile])
+AC_CONFIG_FILES([src/gen/Makefile])
+AC_CONFIG_FILES([src/io/Makefile])
+AC_CONFIG_FILES([src/itvl/Makefile])
+AC_CONFIG_FILES([src/misc/Makefile])
+AC_CONFIG_FILES([src/msg/Makefile])
+AC_CONFIG_FILES([src/str/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 
@@ -139,16 +491,9 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 YM_INIT_EXTRA_SUBDIRS
 YM_INIT_TESTS_SUBDIRS
 
-AM_CONDITIONAL([YM_HAVE_ZLIB], [test $ym_have_zlib = yes])
-AM_CONDITIONAL([YM_HAVE_BZLIB], [test $ym_have_bzlib = yes])
-AM_CONDITIONAL([YM_HAVE_LZMA], [test $ym_have_lzma = yes])
-
-if test $ym_have_python = yes; then
-   YM_ADD_EXTRA_SUBDIRS([python])
-   YM_ADD_TESTS_SUBDIRS([python])
-   AC_CONFIG_FILES([python/Makefile])
-   AC_CONFIG_FILES([tests/python/Makefile])
-fi
+AM_CONDITIONAL([YM_HAVE_ZLIB],  [test $ym_have_zlib = yes])
+AM_CONDITIONAL([YM_HAVE_BZLIB], [test $ym_have_bz2 = yes])
+AM_CONDITIONAL([YM_HAVE_LZMA],  [test $ym_have_lzma = yes])
 
 if test $ym_have_cpputest = yes; then
    YM_ADD_TESTS_SUBDIRS([CppUTest])

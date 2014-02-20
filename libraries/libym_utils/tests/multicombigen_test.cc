@@ -3,7 +3,7 @@
 // nsMagus::MultiCombiGen のテスト
 
 
-#include "ym_utils/MultiCombiGen.h"
+#include "utils/MultiCombiGen.h"
 
 int
 main(int argc,

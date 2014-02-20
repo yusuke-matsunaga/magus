@@ -1,0 +1,64 @@
+## Process this file with automake to produce Makefile.in
+
+
+############################################################
+## サブディレクトリの指定
+############################################################
+
+SUBDIR =
+
+
+############################################################
+## clean ターゲットの指定
+############################################################
+
+CLEANFILES =
+
+MAINTAINERCLEANFILES = Makefile.in
+
+
+############################################################
+## dist ターゲットの指定
+############################################################
+
+EXTRA_DIST =
+
+
+############################################################
+## build ターゲットの指定
+############################################################
+
+noinst_LTLIBRARIES = libym_bdd_bmc.la
+
+
+############################################################
+## 汎用のプリプロセッサ用フラグの指定
+############################################################
+
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
+	-I$(top_srcdir)/src/bdd/include \
+	$(GMP_INCLUDES)
+
+
+############################################################
+## libym_bdd_bmc.la 用の変数の指定
+############################################################
+
+libym_bdd_bmc_la_SOURCES = \
+	BddMgrClassic.h \
+	BddMgrClassic.cc \
+	BmcCompTbl.h \
+	BmcCompTbl.cc \
+	bmc_ite.cc \
+	bmc_isop.cc \
+	bmc_onepath.cc \
+	bmc_vs.cc \
+	bmc_ls.cc
+
+libym_bdd_bmc_la_LIBADD =
+
+libym_bdd_bmc_la_LDFLAGS = \
+	$(GMP_LIBS)

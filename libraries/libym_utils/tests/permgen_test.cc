@@ -3,7 +3,7 @@
 // PermGen のテスト
 
 
-#include "ym_utils/PermGen.h"
+#include "utils/PermGen.h"
 
 
 int

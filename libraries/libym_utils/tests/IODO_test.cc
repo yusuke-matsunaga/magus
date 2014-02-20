@@ -1,14 +1,14 @@
 
-/// @file libym_utils/tests/IODO_test.cc
+/// @file IODO_test.cc
 /// @brief IDOO のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/FileIDO.h"
-#include "ym_utils/FileODO.h"
+#include "utils/FileIDO.h"
+#include "utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM

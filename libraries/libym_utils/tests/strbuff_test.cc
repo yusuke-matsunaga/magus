@@ -3,7 +3,7 @@
 // StrBuff のテスト
 
 
-#include "ym_utils/StrBuff.h"
+#include "utils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -130,7 +130,7 @@ main(int argc,
     cout << "(a1 == \"\") = " << (a1 == "") << endl;
     cout << "(a3 == a5) = " << (a3 == a5) << endl;
     cout << "(\"assign from C-string\" == a1) = " << ("assign from C-string" == a1) << endl;
-    
+
   }
   catch ( AssertError a ) {
     cerr << a << endl;

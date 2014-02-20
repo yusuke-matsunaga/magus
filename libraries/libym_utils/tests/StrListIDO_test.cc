@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/StrListIDO.h"
+#include "utils/StrListIDO.h"
 
 
 BEGIN_NAMESPACE_YM
