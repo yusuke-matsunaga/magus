@@ -30,7 +30,9 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-nobase_include_HEADERS = \
+ymdir = $(includedir)
+
+nobase_ym_HEADERS = \
 	ymassert.h \
 	ymmath.h \
 	ymnsdef.h \
