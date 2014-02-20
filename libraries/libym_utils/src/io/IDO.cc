@@ -10,7 +10,7 @@
 #include "utils/IDO.h"
 #include "utils/StreamIDO.h"
 #include "utils/StrListIDO.h"
-
+#include "utils/StrBuff.h"
 #include "utils/MsgMgr.h"
 #include "utils/FileRegion.h"
 
@@ -144,98 +144,18 @@ IDO::read_str()
   }
 }
 
-#if 0
-//////////////////////////////////////////////////////////////////////
-// クラス CompIDO
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元の親ファイルの情報
-// @note 意味的にはコンストラクタ + open()
-CompIDO::CompIDO(const char* filename,
-		 const FileLoc& parent_loc)
+// @brief 一行分の文字列の読み出し．
+string
+IDO::read_line()
 {
-  mDecoder = new CompressDecoder();
-  open(filename, parent_loc);
-}
-
-// @brief コンストラクタ
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元の親ファイルの情報
-// @note 意味的にはコンストラクタ + open()
-CompIDO::CompIDO(const string& filename,
-		 const FileLoc& parent_loc)
-{
-  mDecoder = new CompressDecoder();
-  open(filename.c_str(), parent_loc);
-}
-
-// @brief デストラクタ
-CompIDO::~CompIDO()
-{
-  close();
-  delete mDecoder;
-}
-
-// @brief ファイルをオープンする．
-// @param[in] filename ファイル名
-// @param[in] parent_loc インクルード元の親ファイルの情報
-// @retval true オープンが成功した．
-// @retval false オープンが失敗した．
-bool
-CompIDO::open(const char* filename,
-	      const FileLoc& parent_loc)
-{
-  bool stat = mDecoder->open(filename);
-  if ( stat ) {
-    mFileInfo = FileInfo(filename, parent_loc);
+  StrBuff buf;
+  ymuint8 c;
+  while ( (c = read_8()) != '\n' && c != '\0' ) {
+    buf.put_char(c);
   }
-  return stat;
+  return buf;
 }
 
-// @brief ファイルをクローズする．
-void
-CompIDO::close()
-{
-  mDecoder->close();
-}
-
-// @brief 読み出し可能なら true を返す．
-CompIDO::operator bool() const
-{
-  return mDecoder->is_ready();
-}
-
-// @brief オープン中のファイル情報を得る．
-const FileInfo&
-CompIDO::file_info() const
-{
-  return mFileInfo;
-}
-
-// @brief 現在のファイル情報を書き換える．
-// @param[in] new_info 新しいファイル情報
-// @note プリプロセッサのプラグマなどで用いることを想定している．
-// @note 通常は使わないこと．
-void
-CompIDO::set_file_info(const FileInfo& file_info)
-{
-  mFileInfo = file_info;
-}
-
-// @brief 圧縮されたデータを伸長してバッファに書き込む．
-// @param[in] buff 伸長したデータを格納するバッファ
-// @param[in] size バッファの空きサイズ
-// @return バッファに書き込まれたデータサイズを返す．
-// @note エラーが起こった場合には負の値が返される．
-ssize_t
-CompIDO::read(ymuint8* buff,
-	      size_t size)
-{
-  return mDecoder->read(buff, size);
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス StreamIDO
