@@ -25,14 +25,11 @@ public:
   /// @param[in] src コピー元のオブジェクト
   CombiGen(const CombiGen& src);
 
-  /// @brief 代入演算子
-  /// @param[in] src コピー元のオブジェクト
-  /// @return 自分自身
-  const CombiGen&
-  operator=(const CombiGen& src);
-
   /// @brief 次の要素を求める．
   void
-  operator++();
+  next();
+  %MethodCode
+  sipCpp->operator++();
+  %End
 
 };

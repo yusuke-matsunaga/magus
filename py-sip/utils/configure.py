@@ -11,13 +11,13 @@ config = sipconfig.Configuration()
 # Get the extra SIP flags needed by the imported PyQt modules.  Note that
 # this normally only includes those flags (-x and -t) that relate to SIP's
 # versioning system.
-_sip_flags = config.sip_flags
+sip_flags = ""
 
 # Run SIP to generate the code.  Note that we tell SIP where to find the qt
 # module's specification files using the -I flag.
 sipsrc="YmUtils_mod.sip"
 os.system(" ".join([config.sip_bin, "-c", ".", "-b", build_file,
-                    "-I", config.sip_dir,
+                    "-I", config.default_sip_dir,
                     "-s", ".cc",
                     sip_flags, sipsrc]))
 
@@ -25,7 +25,7 @@ os.system(" ".join([config.sip_bin, "-c", ".", "-b", build_file,
 # its configuration module.
 installs = []
 
-my_sip_dir = "/home/matsunaga/lib/python2.7/site-packages"
+my_sip_dir = "/home/matsunaga/share/py-sip"
 
 installs.append(["YmUtils_mod.sip", os.path.join(my_sip_dir, "OthCore")])
 installs.append(["Ban.sip", os.path.join(my_sip_dir, "OthCore")])
@@ -35,7 +35,7 @@ installs.append(["YmUtilsConfig.py", config.default_mod_dir])
 # Create the Makefile.  The QtGuiModuleMakefile class provided by the
 # pyqtconfig module takes care of all the extra preprocessor, compiler and
 # linker flags needed by the Qt library.
-makefile = sipconfig.PythonModuleMakefile(
+makefile = sipconfig.SIPModuleMakefile(
     configuration=config,
     build_file=build_file,
     installs=installs
@@ -45,8 +45,8 @@ makefile = sipconfig.PythonModuleMakefile(
 # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the
 # ".dll" extension on Windows).
 makefile.extra_libs = ["ym_utils"]
-makefile.extra_include_dirs = ["/home/matsunaga/include"]
-makefile.extra_lib_dirs = ["/home/matsunaga/lib"]
+makefile.extra_include_dirs = ["/home/yusuke/include"]
+makefile.extra_lib_dirs = ["/home/yusuke/lib"]
 
 # Generate the Makefile itself.
 makefile.generate()
@@ -63,7 +63,7 @@ content = {
     # same flags needed by the qt module we could leave it out, but this
     # allows us to change the flags at a later date without breaking
     # scripts that import the configuration module.
-    "YmUtils_sip_flags":  sip_flags
+    "YmUtils_sip_flags":  ""
 }
 
 # This creates the helloconfig.py module from the helloconfig.py.in
