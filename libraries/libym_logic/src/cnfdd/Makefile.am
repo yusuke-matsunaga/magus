@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_logic_cnfdd.la
+noinst_LTLIBRARIES = \
+	libym_logic_cnfdd.la \
+	libym_logic_cnfdd_d.la \
+	libym_logic_cnfdd_p.la
 
 
 ############################################################
@@ -38,16 +41,15 @@ noinst_LTLIBRARIES = libym_logic_cnfdd.la
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/../libym_utils/include \
-	-I$(top_srcdir)/../libym_dsa/include \
 	-I$(top_builddir)/../libym_utils/include \
 	$(GMP_INCLUDES)
 
 
 ############################################################
-## libym_logic_cnfdd.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_logic_cnfdd_la_SOURCES = \
+COMMON_SOURCES = \
 	CompTbl.h \
 	CompTbl.cc \
 	CNFddEdge.h \
@@ -104,6 +106,41 @@ libym_logic_cnfdd_la_SOURCES = \
 	Restorer.h \
 	Restorer.cc
 
+
+############################################################
+## libym_logic_cnfdd.la 用の変数の指定
+############################################################
+
+libym_logic_cnfdd_la_CXXFLAGS = -O2
+
+libym_logic_cnfdd_la_SOURCES = $(COMMON_SOURCES)
+
 libym_logic_cnfdd_la_LIBADD =
 
 libym_logic_cnfdd_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_cnfdd_d.la 用の変数の指定
+############################################################
+
+libym_logic_cnfdd_d_la_CXXFLAGS = -O2 -g
+
+libym_logic_cnfdd_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_cnfdd_d_la_LIBADD =
+
+libym_logic_cnfdd_d_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_cnfdd_p.la 用の変数の指定
+############################################################
+
+libym_logic_cnfdd_p_la_CXXFLAGS = -O2 -pg
+
+libym_logic_cnfdd_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_cnfdd_p_la_LIBADD =
+
+libym_logic_cnfdd_p_la_LDFLAGS =

@@ -29,7 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_smt_shell.la
+	libym_smt_shell.la \
+	libym_smt_shell_d.la \
+	libym_smt_shell_p.la
 
 
 ############################################################
@@ -44,10 +46,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_smt_shell.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_smt_shell_la_SOURCES = \
+COMMON_SOURCES = \
 	IdImpl.h \
 	IdImpl.cc \
 	IdMgr.h \
@@ -65,6 +67,41 @@ libym_smt_shell_la_SOURCES = \
 	SortMgr.h \
 	SortMgr.cc
 
+
+############################################################
+## libym_smt_shell.la 用の変数の指定
+############################################################
+
+libym_smt_shell_la_CXXFLAGS = -O2
+
+libym_smt_shell_la_SOURCES = $(COMMON_SOURCES)
+
 libym_smt_shell_la_LIBADD =
 
-libym_smt_shell_la_LDFLAGS =
+libym_smt_shell_la_LDFLAGS = -lreadline -lcurses
+
+
+############################################################
+## libym_smt_shell_d.la 用の変数の指定
+############################################################
+
+libym_smt_shell_d_la_CXXFLAGS = -O2 -g
+
+libym_smt_shell_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_smt_shell_d_la_LIBADD =
+
+libym_smt_shell_d_la_LDFLAGS = -lreadline -lcurses
+
+
+############################################################
+## libym_smt_shell_p.la 用の変数の指定
+############################################################
+
+libym_smt_shell_p_la_CXXFLAGS = -O2 -pg
+
+libym_smt_shell_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_smt_shell_p_la_LIBADD =
+
+libym_smt_shell_p_la_LDFLAGS = -lreadline -lcurses

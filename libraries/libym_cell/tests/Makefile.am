@@ -46,19 +46,11 @@ bin_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell
-
-
-############################################################
-## 変数定義
-############################################################
-
-YM_CELL = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_logic/include \
+	-I$(top_builddir)/../libym_utils/include \
+	-I$(top_srcdir)/src
 
 
 ############################################################
@@ -69,7 +61,7 @@ mislib_parser_test_SOURCES = \
 	mislib_parser_test.cc
 
 mislib_parser_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 mislib_parser_test_LDFLAGS =
 
@@ -82,7 +74,7 @@ mislib_reader_test_SOURCES = \
 	mislib_reader_test.cc
 
 mislib_reader_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 mislib_reader_test_LDFLAGS =
 
@@ -95,7 +87,7 @@ dotlib_reader_test_SOURCES = \
 	dotlib_reader_test.cc
 
 dotlib_reader_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 dotlib_reader_test_LDFLAGS =
 
@@ -108,7 +100,7 @@ luttest_SOURCES = \
 	luttest.cc
 
 luttest_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 luttest_LDFLAGS =
 
@@ -125,7 +117,7 @@ lcpatmgr_test_SOURCES = \
 	lcpatmgr_test.cc
 
 lcpatmgr_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 lcpatmgr_test_LDFLAGS =
 
@@ -138,7 +130,7 @@ dotlib_parser_test_SOURCES = \
 	dotlib_parser_test.cc
 
 dotlib_parser_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 dotlib_parser_test_LDFLAGS =
 
@@ -151,7 +143,7 @@ dump_restore_test_SOURCES = \
 	dump_restore_test.cc
 
 dump_restore_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 dump_restore_test_LDFLAGS =
 
@@ -164,7 +156,7 @@ cell_mgr_test_SOURCES = \
 	cell_mgr_test.cc
 
 cell_mgr_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 cell_mgr_test_LDFLAGS =
 
@@ -177,7 +169,7 @@ cell_dump_test_SOURCES = \
 	cell_dump_test.cc
 
 cell_dump_test_LDADD = \
-	$(YM_CELL)
+	$(top_builddir)/src/libym_cell.la
 
 
 #libdump_test_SOURCES = \

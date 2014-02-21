@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_logic_expr.la
+noinst_LTLIBRARIES = \
+	libym_logic_expr.la \
+	libym_logic_expr_d.la \
+	libym_logic_expr_p.la
 
 
 ############################################################
@@ -42,10 +45,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_logic_expr.la 用の変数指定
+## 共通の変数定義
 ############################################################
 
-libym_logic_expr_la_SOURCES = \
+COMMON_SOURCES = \
 	lexp_types.h \
 	LexpMgr.h \
 	LexpNode.h \
@@ -59,6 +62,41 @@ libym_logic_expr_la_SOURCES = \
 	LogExpr.cc \
 	LogExprWriter.cc
 
+
+############################################################
+## libym_logic_expr.la 用の変数指定
+############################################################
+
+libym_logic_expr_la_CXXFLAGS = -O2
+
+libym_logic_expr_la_SOURCES = $(COMMON_SOURCES)
+
 libym_logic_expr_la_LIBADD =
 
 libym_logic_expr_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_expr_d.la 用の変数指定
+############################################################
+
+libym_logic_expr_d_la_CXXFLAGS = -O2 -g
+
+libym_logic_expr_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_expr_d_la_LIBADD =
+
+libym_logic_expr_d_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_expr_p.la 用の変数指定
+############################################################
+
+libym_logic_expr_p_la_CXXFLAGS = -O2 -pg
+
+libym_logic_expr_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_expr_p_la_LIBADD =
+
+libym_logic_expr_p_la_LDFLAGS =

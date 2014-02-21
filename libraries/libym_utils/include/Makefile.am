@@ -39,6 +39,7 @@ nobase_ym_HEADERS = \
 	ymtools.h \
 	utils/Alloc.h \
 	utils/Binder.h \
+	utils/BtgMatch.h \
 	utils/CodecType.h \
 	utils/CombiGen.h \
 	utils/DlList.h \
@@ -53,6 +54,7 @@ nobase_ym_HEADERS = \
 	utils/HeapTree.h \
 	utils/IDO.h \
 	utils/ItvlMgr.h \
+	utils/MFSet.h \
 	utils/MStopWatch.h \
 	utils/MsgHandler.h \
 	utils/MsgMgr.h \

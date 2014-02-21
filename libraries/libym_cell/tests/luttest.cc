@@ -1,19 +1,19 @@
 
-/// @file libym_cell/tests/luttest.cc
+/// @file luttest.cc
 /// @brief CellDotlibReader のテスト用プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/Cell.h"
-#include "ym_cell/CellTiming.h"
-#include "ym_cell/CellLut.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
+#include "cell/CellDotlibReader.h"
+#include "cell/CellLibrary.h"
+#include "cell/Cell.h"
+#include "cell/CellTiming.h"
+#include "cell/CellLut.h"
 
 
 //#define ERROR_EPSILON 1.0e-10

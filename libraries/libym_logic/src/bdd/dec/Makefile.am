@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_bdd_dec.la
+noinst_LTLIBRARIES = \
+	libym_bdd_dec.la \
+	libym_bdd_dec_d.la \
+	libym_bdd_dec_p.la
 
 
 ############################################################
@@ -38,16 +41,15 @@ noinst_LTLIBRARIES = libym_bdd_dec.la
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/../libym_utils/include \
-	-I$(top_srcdir)/../libym_dsa/include \
 	-I$(top_builddir)/../libym_utils/include \
 	$(GMP_INCLUDES)
 
 
 ############################################################
-## libym_bdd_dec.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_bdd_dec_la_SOURCES = \
+COMMON_SOURCES = \
 	Dg.cc \
 	DgNode.cc \
 	DgNode.h \
@@ -55,6 +57,41 @@ libym_bdd_dec_la_SOURCES = \
 	Bidec.cc \
 	PrimDec.cc
 
+
+############################################################
+## libym_bdd_dec.la 用の変数の指定
+############################################################
+
+libym_bdd_dec_la_CXXFLAGS = -O2
+
+libym_bdd_dec_la_SOURCES = $(COMMON_SOURCES)
+
 libym_bdd_dec_la_LIBADD =
 
 libym_bdd_dec_la_LDFLAGS =
+
+
+############################################################
+## libym_bdd_dec_d.la 用の変数の指定
+############################################################
+
+libym_bdd_dec_d_la_CXXFLAGS = -O2 -g
+
+libym_bdd_dec_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_bdd_dec_d_la_LIBADD =
+
+libym_bdd_dec_d_la_LDFLAGS =
+
+
+############################################################
+## libym_bdd_dec_p.la 用の変数の指定
+############################################################
+
+libym_bdd_dec_p_la_CXXFLAGS = -O2 -pg
+
+libym_bdd_dec_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_bdd_dec_p_la_LIBADD =
+
+libym_bdd_dec_p_la_LDFLAGS =

@@ -30,7 +30,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_logic_npn.la
+noinst_LTLIBRARIES = \
+	libym_logic_npn.la \
+	libym_logic_npn_d.la \
+	libym_logic_npn_p.la
 
 
 ############################################################
@@ -44,10 +47,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_logic_npn.ls 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_logic_npn_la_SOURCES = \
+COMMON_SOURCES = \
 	NpnBaseConf.h \
 	NpnBaseConf.cc \
 	NpnRawSig.h \
@@ -60,6 +63,41 @@ libym_logic_npn_la_SOURCES = \
 	NpnMap.cc \
 	NpnMapM.cc
 
+
+############################################################
+## libym_logic_npn.la 用の変数の指定
+############################################################
+
+libym_logic_npn_la_CXXFLAGS = -O2
+
+libym_logic_npn_la_SOURCES = $(COMMON_SOURCES)
+
 libym_logic_npn_la_LIBADD =
 
 libym_logic_npn_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_npn.la 用の変数の指定
+############################################################
+
+libym_logic_npn_d_la_CXXFLAGS = -O2 -g
+
+libym_logic_npn_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_npn_d_la_LIBADD =
+
+libym_logic_npn_d_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_npn_p.la 用の変数の指定
+############################################################
+
+libym_logic_npn_p_la_CXXFLAGS = -O2 -pg
+
+libym_logic_npn_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_npn_p_la_LIBADD =
+
+libym_logic_npn_p_la_LDFLAGS =

@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_minisat.la
+noinst_LTLIBRARIES = \
+	libym_minisat.la \
+	libym_minisat_d.la \
+	libym_minisat_p.la
 
 
 ############################################################
@@ -42,10 +45,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_minisat.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_minisat_la_SOURCES = \
+COMMON_SOURCES = \
 	SatSolverMiniSat.h \
 	SatSolverMiniSat.cc \
 	Global.h \
@@ -56,6 +59,41 @@ libym_minisat_la_SOURCES = \
 	Sort.h \
 	VarOrder.h
 
+
+############################################################
+## libym_minisat.la 用の変数の指定
+############################################################
+
+libym_minisat_la_CXXFLAGS = -O2
+
+libym_minisat_la_SOURCES = $(COMMON_SOURCES)
+
 libym_minisat_la_LIBADD =
 
 libym_minisat_la_LDFLAGS =
+
+
+############################################################
+## libym_minisat_d.la 用の変数の指定
+############################################################
+
+libym_minisat_d_la_CXXFLAGS = -O2 -g
+
+libym_minisat_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_minisat_d_la_LIBADD =
+
+libym_minisat_d_la_LDFLAGS =
+
+
+############################################################
+## libym_minisat_p.la 用の変数の指定
+############################################################
+
+libym_minisat_p_la_CXXFLAGS = -O2 -pg
+
+libym_minisat_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_minisat_p_la_LIBADD =
+
+libym_minisat_p_la_LDFLAGS =

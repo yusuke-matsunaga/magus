@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_sat_ymsat.la
+noinst_LTLIBRARIES = \
+	libym_sat_ymsat.la \
+	libym_sat_ymsat_p.la \
+	libym_sat_ymsat_d.la
 
 
 ############################################################
@@ -41,12 +44,11 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/../libym_utils/include
 
 
-
 ############################################################
-## libym_sat_ymsat.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_sat_ymsat_la_SOURCES = \
+COMMON_SOURCES = \
 	AssignList.h \
 	AssignList.cc \
 	SaBase.h \
@@ -64,6 +66,41 @@ libym_sat_ymsat_la_SOURCES = \
 	YmSatR.h \
 	YmSatR.cc
 
+
+############################################################
+## libym_sat_ymsat.la 用の変数の指定
+############################################################
+
+libym_sat_ymsat_la_CXXFLAGS = -O2
+
+libym_sat_ymsat_la_SOURCES = $(COMMON_SOURCES)
+
 libym_sat_ymsat_la_LIBADD =
 
 libym_sat_ymsat_la_LDFLAGS =
+
+
+############################################################
+## libym_sat_ymsat_d.la 用の変数の指定
+############################################################
+
+libym_sat_ymsat_d_la_CXXFLAGS = -O2 -g
+
+libym_sat_ymsat_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_sat_ymsat_d_la_LIBADD =
+
+libym_sat_ymsat_d_la_LDFLAGS =
+
+
+############################################################
+## libym_sat_ymsat_p.la 用の変数の指定
+############################################################
+
+libym_sat_ymsat_p_la_CXXFLAGS = -O2 -pg
+
+libym_sat_ymsat_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_sat_ymsat_p_la_LIBADD =
+
+libym_sat_ymsat_p_la_LDFLAGS =

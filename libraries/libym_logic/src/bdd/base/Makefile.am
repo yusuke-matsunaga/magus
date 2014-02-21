@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_bdd_base.la
+noinst_LTLIBRARIES = \
+	libym_bdd_base.la \
+	libym_bdd_base_d.la \
+	libym_bdd_base_p.la
 
 
 ############################################################
@@ -44,10 +47,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_bdd_base.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_bdd_base_la_SOURCES = \
+COMMON_SOURCES = \
 	Bdd.cc \
 	BddMgr.cc \
 	BddMgrImpl.cc \
@@ -111,6 +114,41 @@ libym_bdd_base_la_SOURCES = \
 	Restorer.h \
 	Restorer.cc
 
+
+############################################################
+## libym_bdd_base.la 用の変数の指定
+############################################################
+
+libym_bdd_base_la_CXXFLAGS = -O2
+
+libym_bdd_base_la_SOURCES = $(COMMON_SOURCES)
+
 libym_bdd_base_la_LIBADD =
 
 libym_bdd_base_la_LDFLAGS =
+
+
+############################################################
+## libym_bdd_base_d.la 用の変数の指定
+############################################################
+
+libym_bdd_base_d_la_CXXFLAGS = -O2 -g
+
+libym_bdd_base_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_bdd_base_d_la_LIBADD =
+
+libym_bdd_base_d_la_LDFLAGS =
+
+
+############################################################
+## libym_bdd_base_p.la 用の変数の指定
+############################################################
+
+libym_bdd_base_p_la_CXXFLAGS = -O2 -pg
+
+libym_bdd_base_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_bdd_base_p_la_LIBADD =
+
+libym_bdd_base_p_la_LDFLAGS =

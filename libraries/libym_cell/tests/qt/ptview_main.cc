@@ -14,8 +14,8 @@
 #include "VerilogView.h"
 #include "ParseTreeModel.h"
 #include "ParseTreeView.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 #include "dotlib/DotlibMgr.h"
 #include "dotlib/DotlibParser.h"

@@ -1,16 +1,16 @@
 
-/// @file libym_cell/tests/mislib_reader_test.cc
+/// @file mislib_reader_test.cc
 /// @brief CellMislibReader のテスト用プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_cell/CellMislibReader.h"
-#include "ym_cell/CellLibrary.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
+#include "cell/CellMislibReader.h"
+#include "cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

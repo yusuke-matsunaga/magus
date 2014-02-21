@@ -1,18 +1,16 @@
 
-/// @file libym_cell/tests/dotlib_reader_test.cc
+/// @file dotlib_reader_test.cc
 /// @brief CellDotlibReader のテスト用プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: dotlib_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellLibrary.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
+#include "cell/CellDotlibReader.h"
+#include "cell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

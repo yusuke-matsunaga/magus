@@ -1,11 +1,9 @@
 
-/// @file libym_cell/tests/mislib_parser_test.cc
+/// @file mislib_parser_test.cc
 /// @brief MislibParser のテスト用プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: mislib_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,8 +11,8 @@
 #include "mislib/MislibMgr.h"
 #include "mislib/MislibNode.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

@@ -1,16 +1,16 @@
 
-/// @file libym_techmap/test/libdump_test.cc
+/// @file libdump_test.cc
 /// @brief LibDump のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/CellDotlibReader.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "cell/CellLibrary.h"
+#include "cell/CellDotlibReader.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 #include "libdump/LibDump.h"
 
 

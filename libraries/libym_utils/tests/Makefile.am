@@ -51,7 +51,8 @@ noinst_PROGRAMS = \
 	ZCoder_test \
 	ZDecoder_test \
 	StrListIDO_test \
-	Codec_test
+	Codec_test \
+	BtgMatch_test
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \

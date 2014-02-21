@@ -1,7 +1,7 @@
 #ifndef PARSETREEMODEL_H
 #define PARSETREEMODEL_H
 
-/// @file libym_cell/tests/dotlib_ptview/ParseTreeModel.h
+/// @file ParseTreeModel.h
 /// @brief ParseTreeModel のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 
 #include <QAbstractItemModel>
 #include "dotlib/DotlibNode.h"
-#include "ym_utils/FileRegion.h"
+#include "utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

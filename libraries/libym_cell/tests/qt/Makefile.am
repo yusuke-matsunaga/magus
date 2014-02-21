@@ -40,9 +40,11 @@ AM_CXXFLAGS = \
 	$(QT_CXXFLAGS)
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir) \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_logic/include \
+	-I$(top_builddir)/../libym_utils/include \
+	-I$(top_srcdir)/src \
 	$(QT_CPPFLAGS)
 
 
@@ -70,8 +72,7 @@ nodist_ptview_SOURCES = \
 ptview_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
 
 ptview_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(top_builddir)/src/libym_cell.la \
 	$(QT_LIBS) \
 	$(LIDADD)
 

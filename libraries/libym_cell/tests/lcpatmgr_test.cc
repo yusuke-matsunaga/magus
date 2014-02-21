@@ -3,12 +3,12 @@
 /// @brief LcPatMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LcPatMgr.h"
-#include "ym_logic/LogExpr.h"
+#include "libcomp/LcPatMgr.h"
+#include "logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

@@ -1,11 +1,9 @@
 
-/// @file libym_cell/tests/dotlib_parser_test.cc
+/// @file dotlib_parser_test.cc
 /// @brief DotlibParser のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: dotlib_lex_test.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -20,10 +18,10 @@
 #include "dotlib/DotlibLatch.h"
 #include "dotlib/DotlibPin.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

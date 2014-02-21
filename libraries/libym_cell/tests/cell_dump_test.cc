@@ -3,16 +3,16 @@
 /// @brief CellLibrary::dump(), restore() のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/CellMislibReader.h"
-#include "ym_cell/CellDotlibReader.h"
+#include "cell/CellLibrary.h"
+#include "cell/CellMislibReader.h"
+#include "cell/CellDotlibReader.h"
 
-#include "ym_utils/FileIDO.h"
-#include "ym_utils/FileODO.h"
+#include "utils/FileIDO.h"
+#include "utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

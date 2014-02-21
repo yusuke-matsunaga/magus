@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_logic_zdd.la
+noinst_LTLIBRARIES = \
+	libym_logic_zdd.la \
+	libym_logic_zdd_d.la \
+	libym_logic_zdd_p.la
 
 
 ############################################################
@@ -43,10 +46,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_logic_zdd.la 用の変数の指定
+## 共通の変数定義
 ############################################################
 
-libym_logic_zdd_la_SOURCES = \
+COMMON_SOURCES = \
 	CompTbl.h \
 	CompTbl.cc \
 	ZddEdge.h \
@@ -99,6 +102,41 @@ libym_logic_zdd_la_SOURCES = \
 	Restorer.h \
 	Restorer.cc
 
+
+############################################################
+## libym_logic_zdd.la 用の変数の指定
+############################################################
+
+libym_logic_zdd_la_CXXFLAGS = -O2
+
+libym_logic_zdd_la_SOURCES = $(COMMON_SOURCES)
+
 libym_logic_zdd_la_LIBADD =
 
 libym_logic_zdd_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_zdd_d.la 用の変数の指定
+############################################################
+
+libym_logic_zdd_d_la_CXXFLAGS = -O2 -g
+
+libym_logic_zdd_d_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_zdd_d_la_LIBADD =
+
+libym_logic_zdd_d_la_LDFLAGS =
+
+
+############################################################
+## libym_logic_zdd_p.la 用の変数の指定
+############################################################
+
+libym_logic_zdd_p_la_CXXFLAGS = -O2 -pg
+
+libym_logic_zdd_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_logic_zdd_p_la_LIBADD =
+
+libym_logic_zdd_p_la_LDFLAGS =

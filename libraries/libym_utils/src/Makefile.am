@@ -10,10 +10,12 @@
 
 SUBDIRS = \
 	alloc \
+	btg \
 	file \
 	gen \
 	io \
 	itvl \
+	mfset \
 	misc \
 	msg \
 	str
@@ -63,10 +65,12 @@ nodist_EXTRA_libym_utils_la_SOURCES = dummy.cc
 
 libym_utils_la_LIBADD = \
 	alloc/liballoc.la \
+	btg/libbtg.la \
 	file/libfile.la \
 	gen/libgen.la \
 	itvl/libitvl.la \
 	io/libio.la \
+	mfset/libmfset.la \
 	misc/libmisc.la \
 	msg/libmsg.la \
 	str/libstr.la
@@ -85,10 +89,12 @@ nodist_EXTRA_libym_utils_d_la_SOURCES = dummy.cc
 
 libym_utils_d_la_LIBADD = \
 	alloc/liballoc_d.la \
+	btg/libbtg_d.la \
 	file/libfile_d.la \
 	gen/libgen_d.la \
 	itvl/libitvl_d.la \
 	io/libio_d.la \
+	mfset/libmfset_d.la \
 	misc/libmisc_d.la \
 	msg/libmsg_d.la \
 	str/libstr_d.la
@@ -107,10 +113,12 @@ nodist_EXTRA_libym_utils_p_la_SOURCES = dummy.cc
 
 libym_utils_p_la_LIBADD = \
 	alloc/liballoc_p.la \
+	btg/libbtg_p.la \
 	file/libfile_p.la \
 	gen/libgen_p.la \
 	itvl/libitvl_p.la \
 	io/libio_p.la \
+	mfset/libmfset_p.la \
 	misc/libmisc_p.la \
 	msg/libmsg_p.la \
 	str/libstr_p.la
