@@ -18,8 +18,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選択する要素数
-  PermGen(ymuint n,
-	  ymuint k);
+  PermGen(unsigned int n,
+	  unsigned int k);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト

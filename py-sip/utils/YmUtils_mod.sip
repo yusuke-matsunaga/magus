@@ -8,7 +8,7 @@
 
 %Module YmUtils
 
-//%Include GenBase.sip
-//%Include CombiGen.sip
-//%Include PermGen.sip
+%Include GenBase.sip
+%Include CombiGen.sip
+%Include PermGen.sip
 %Include RandGen.sip

@@ -63,22 +63,30 @@ set_program
 
 # コマンドラインの引数の解析
 case $# in
-    1) ;;
+    2) ;;
     *)
-	echo "USAGE: $0 <build-dir>"
+	echo "USAGE: $0 <build-dir> <prefix-dir>"
 	exit 1
 	;;
 esac
 
-builddir=$1
+build_dir=$1
+prefix_dir=$2
 
-mk_autogen $BASEDIR $builddir
+mk_autogen $BASEDIR $build_dir
 
 # update スクリプトをコピー
-cp etc/update $builddir/update
-chmod +x $builddir/update
+cp etc/update $build_dir/update
+chmod +x $build_dir/update
 
-# autogen.local のテンプレートをコピー
-cp etc/autogen.common $builddir/autogen.local
+# autogen.local を生成
+sed -e s!__YM_PREFIX_DIR__!$prefix_dir! \
+    etc/autogen.local.tmpl > $build_dir/autogen.local
+
+
+# py-sip の configure.py スクリプトを生成する．
+for dir in utils; do
+    mk_configure_py $BASEDIR/py-sip/$dir $build_dir/py-sip/$dir $prefix_dir
+done
 
 # end of mk_builddir.sh

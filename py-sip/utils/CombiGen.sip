@@ -18,8 +18,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] n 全要素数
   /// @param[in] k 選び出す要素数
-  CombiGen(ymuint n,
-	   ymuint k);
+  CombiGen(unsigned int n,
+	   unsigned int k);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
