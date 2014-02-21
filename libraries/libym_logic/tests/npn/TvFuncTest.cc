@@ -1,15 +1,13 @@
 
-/// @file libym_logic/tests/npn/TvFuncTest.cc
+/// @file TvFuncTest.cc
 /// @brief TvFuncTest の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: TvFuncTest.cc 1594 2008-07-18 10:26:12Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/TvFunc.h"
+#include "logic/TvFunc.h"
 
 #include "TvFuncTest.h"
 

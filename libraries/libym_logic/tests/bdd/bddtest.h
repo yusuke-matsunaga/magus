@@ -1,15 +1,15 @@
-#ifndef LIBYM_LOGIC_TESTS_BDD_BDDTEST_H
-#define LIBYM_LOGIC_TESTS_BDD_BDDTEST_H
+#ifndef BDDTEST_H
+#define BDDTEST_H
 
-/// @file libym_logic/tests/bdd/bddtest.h
+/// @file bddtest.h
 /// @brief テスト用の関数定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/bdd_nsdef.h"
+#include "logic/bdd_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -74,4 +74,4 @@ check_support(BddMgr& bddmgr,
 
 END_NAMESPACE_YM_BDD
 
-#endif // LIBYM_LOGIC_TESTS_BDD_BDDTEST_H
+#endif // BDDTEST_H

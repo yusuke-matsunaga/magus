@@ -1,7 +1,7 @@
 #ifndef LIBYM_AIG_TESTS_AIGTEMPLATE_H
 #define LIBYM_AIG_TESTS_AIGTEMPLATE_H
 
-/// @file libym_aig/tests/AigTemplate.h
+/// @file AigTemplate.h
 /// @brief AigTemplate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_aig/AigHandle.h"
-#include "ym_npn/NpnMap.h"
+#include "aig/AigHandle.h"
+#include "npn/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM

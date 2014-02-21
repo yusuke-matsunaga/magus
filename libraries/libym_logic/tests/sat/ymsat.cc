@@ -1,5 +1,5 @@
 
-/// @file libym_sat/tests/ymsat.cc
+/// @file ymsat.cc
 /// @brief 簡単な SAT プログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,15 +7,15 @@
 /// All rights reserved.
 
 
-#include "ym_logic/DimacsParser.h"
-#include "ym_logic/SatDimacsHandler.h"
-#include "ym_logic/DimacsVerifier.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatMsgHandlerImpl1.h"
-#include "ym_logic/SatStats.h"
+#include "logic/DimacsParser.h"
+#include "logic/SatDimacsHandler.h"
+#include "logic/DimacsVerifier.h"
+#include "logic/SatSolver.h"
+#include "logic/SatMsgHandlerImpl1.h"
+#include "logic/SatStats.h"
 
-#include "ym_utils/FileIDO.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/FileIDO.h"
+#include "utils/StopWatch.h"
 
 
 int

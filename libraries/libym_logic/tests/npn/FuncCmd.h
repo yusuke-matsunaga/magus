@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_TESTS_NPN_FUNCCMD_H
-#define LIBYM_LOGIC_TESTS_NPN_FUNCCMD_H
+#ifndef FUNCCMD_H
+#define FUNCCMD_H
 
-/// @file libym_logic/tests/npn/FuncCmd.h
+/// @file FuncCmd.h
 /// @brief FuncCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_tclpp/TclCmd.h"
-#include "ym_logic/common.h"
+#include "tclpp/TclCmd.h"
+#include "logic/common.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -92,4 +92,4 @@ protected:
 
 END_NAMESPACE_YM_NPN
 
-#endif // LIBYM_LOGIC_TESTS_NPN_FUNCCMD_H
+#endif // FUNCCMD_H

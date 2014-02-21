@@ -39,18 +39,15 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
 	$(GMP_INCLUDES)
 
 
 ############################################################
 ## 共通の変数の指定
 ############################################################
-
-YM_BDD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 
 ############################################################
@@ -77,6 +74,6 @@ base_test_SOURCES = \
 
 base_test_LDADD = \
 	libymzddtest.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+	$(top_builddir)/src/libym_logic.la
 
 base_test_LDFLAGS =

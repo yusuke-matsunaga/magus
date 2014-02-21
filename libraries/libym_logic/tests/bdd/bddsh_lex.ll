@@ -1,18 +1,16 @@
 %{
 
-/// @file libym_logic/tests/bdd/bddsh_lex.ll
+/// @file bddsh_lex.ll
 /// @brief Bdd のテスト用shellの字句解析用ソース
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bddsh_lex.ll 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddVarSet.h"
-#include "ym_logic/BddLitSet.h"
+#include "logic/Bdd.h"
+#include "logic/BddVarSet.h"
+#include "logic/BddLitSet.h"
 
 using namespace std;
 using namespace nsYm::nsBdd;

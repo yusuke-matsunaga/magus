@@ -3,7 +3,7 @@
 /// @brief BddMgr 用のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 // BDD パッケージのテスト
@@ -11,9 +11,9 @@
 // の処理を正しく行っているかのチェック
 
 
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/BddVarSet.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "logic/BddVarSet.h"
 
 #include "bddtest.h"
 

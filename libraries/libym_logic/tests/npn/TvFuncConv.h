@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_TESTS_NPN_TVFUNCCONV_H
-#define LIBYM_LOGIC_TESTS_NPN_TVFUNCCONV_H
+#ifndef TVFUNCCONV_H
+#define TVFUNCCONV_H
 
-/// @file libym_logic/tests/npn/TvFuncConv.h
+/// @file TvFuncConv.h
 /// @brief TvFuncConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_tclpp/TclObj.h"
-#include "ym_logic/TvFunc.h"
+#include "tclpp/TclObj.h"
+#include "logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

@@ -1,10 +1,5 @@
-// $Id: npn_check.cc 700 2007-05-31 00:41:30Z matsunaga $
 
 // NPN パッケージのテスト
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include <ymtools/ymtools.h>
 #include <ymtools/random.h>
@@ -35,7 +30,7 @@ struct Func {
 
   // 正規化後の関数
   TvFunc mNormFunc;
-  
+
   // コンストラクタ
   Func(const TvFunc& ofunc, const TvFunc& nfunc);
 
@@ -49,7 +44,7 @@ struct FuncGroup {
   list<Func*> mRepList;
 
   FuncGroup* mLink;
-  
+
   // コンストラクタ
   FuncGroup(const WalshSigInt& sig);
 
@@ -200,7 +195,7 @@ FuncGroup::check(const TvFunc& func1) const
 	++ n;
       }
     }
-      
+
     for (size_t i = 0; i < ni_pow; ++ i) {
       size_t j = 0;
       for (size_t b = 0; b < ni; ++ b) {
@@ -211,7 +206,7 @@ FuncGroup::check(const TvFunc& func1) const
       }
       new_i[i] = j;
     }
-    
+
     size_t bitpos = 0;
     for (size_t i = 0; i < ni; ++ i) {
       if ( mSignature.c1(i) == 0 ) {
@@ -425,7 +420,7 @@ void
 gen(size_t ni, size_t limit)
 {
   FuncGroupList func_group_list;
-  
+
   size_t ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
   for (size_t i = 0; i < ni_exp; ++ i) {
@@ -495,7 +490,7 @@ void
 rgen(size_t ni, size_t num)
 {
   FuncGroupList func_group_list;
-  
+
   size_t ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
   for (size_t k = 0; k < num; ++ k) {
@@ -578,13 +573,13 @@ main(int argc, char** argv)
       usage(argv[0]);
       return 2;
     }
-    
+
     if ( strcmp(argv[base], "signature") == 0 ) {
       if ( argc - base != 2 ) {
 	usage(argv[0]);
 	return 2;
       }
-      
+
       size_t ni = atoi(argv[base + 1]);
       size_t ni_pow = 1 << ni;
       char buff[256];
@@ -604,7 +599,7 @@ main(int argc, char** argv)
 	usage(argv[0]);
 	return 2;
       }
-      
+
       FuncGroupList tmp_list;
       size_t ni = atoi(argv[base + 1]);
       vector<int> tmp(1 << ni);
@@ -618,7 +613,7 @@ main(int argc, char** argv)
 	usage(argv[0]);
 	return 2;
       }
-      
+
       size_t ni = atoi(argv[base + 1]);
       gen(ni, 0);
     }
@@ -627,7 +622,7 @@ main(int argc, char** argv)
 	usage(argv[0]);
 	return 2;
       }
-      
+
       size_t ni = atoi(argv[base + 1]);
       size_t n = atoi(argv[base + 2]);
       gen(ni, n);
@@ -637,7 +632,7 @@ main(int argc, char** argv)
 	usage(argv[0]);
 	return 2;
       }
-      
+
       size_t ni = atoi(argv[base + 1]);
       size_t num = atoi(argv[base + 2]);
       int seed = atoi(argv[base + 3]);

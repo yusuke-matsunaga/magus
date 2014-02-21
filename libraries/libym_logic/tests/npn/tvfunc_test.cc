@@ -15,8 +15,8 @@
 #include <popt.h>
 #endif
 
-#include "ym_utils/random.h"
-#include "ym_logic/TvFunc.h"
+#include "utils/RandGen.h"
+#include "logic/TvFunc.h"
 
 #include "TvFuncTest.h"
 
@@ -34,6 +34,8 @@ check(ymuint ni,
       ymuint nc)
 {
   TvFuncTest test(cout);
+
+  RandGen rg;
 
   ymuint ni_pow = 1UL << ni;
 
@@ -111,7 +113,7 @@ check(ymuint ni,
       }
 
       for (ymuint i = 0; i < nc; ++ i) {
-	ymuint ibits = random_num() & ((1 << ni) - 1);
+	ymuint ibits = rg.int32() & ((1 << ni) - 1);
 	test.check_walsh_w0(func, ibits);
       }
     }
@@ -142,7 +144,7 @@ check(ymuint ni,
 	}
 
 	for (ymuint j = 0; j < nc; ++ j) {
-	  ymuint ibits = random_num() & ((1 << ni) - 1);
+	  ymuint ibits = rg.int32() & ((1 << ni) - 1);
 	  test.check_walsh_w1(func, var, ibits);
 	}
       }
@@ -205,11 +207,12 @@ rgen(ymuint ni,
      ymuint num,
      ymuint num2)
 {
+  RandGen rg;
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
   for (ymuint k = 0; k < num; ++ k) {
     for (ymuint i = 0; i < ni_exp; ++ i) {
-      buff[i] = random_num() & 1;
+      buff[i] = rg.int32() & 1;
     }
     if ( verbose ) {
       for (ymuint i = 0; i < ni_exp; ++ i) {
@@ -313,7 +316,6 @@ main(int argc,
       break;
 
     case 2: // rgen
-      init_random_seed(rseed);
       rgen(ni, rnum, bnum);
       break;
 

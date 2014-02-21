@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/zdd_nsdef.h"
+#include "logic/zdd_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD

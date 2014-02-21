@@ -1,15 +1,13 @@
 
-/// @file libym_npn/tests/TvFuncTestCmd.cc
+/// @file TvFuncTestCmd.cc
 /// @brief TvFuncTestCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: TvFuncTestCmd.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_npn/TvFunc.h"
+#include "npn/TvFunc.h"
 
 #include "TvFuncTestCmd.h"
 #include "TvFuncConv.h"

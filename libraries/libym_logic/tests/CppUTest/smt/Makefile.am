@@ -37,11 +37,12 @@ noinst_LTLIBRARIES = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/smt/smtlibv2/include \
-	-I$(top_srcdir)/smt/smtlibv2/parser \
-	-I$(top_srcdir)/smt/smtlibv2/shell \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
+	-I$(top_srcdir)/src/smt/smtlibv2/include \
+	-I$(top_srcdir)/src/smt/smtlibv2/parser \
+	-I$(top_srcdir)/src/smt/smtlibv2/shell \
 	$(CPPUTEST_INCLUDES)
 
 
@@ -58,4 +59,5 @@ libym_logic_cpputest_smt_la_SOURCES = \
 
 libym_logic_cpputest_smt_la_LIBADD =
 
-libym_logic_cpputest_smt_la_LDFLAGS =
+libym_logic_cpputest_smt_la_LDFLAGS = \
+	$(top_builddir)/src/libym_logic.la

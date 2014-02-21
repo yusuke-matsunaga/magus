@@ -9,7 +9,7 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "ym_logic/LogExpr.h"
+#include "logic/LogExpr.h"
 
 using namespace nsYm;
 
@@ -246,5 +246,3 @@ TEST(libym_logic_LogExprTestGroup, make_and1)
   LONGS_EQUAL( 1, expr.sop_cubenum() );
   LONGS_EQUAL( 3, expr.sop_litnum() );
 }
-
-

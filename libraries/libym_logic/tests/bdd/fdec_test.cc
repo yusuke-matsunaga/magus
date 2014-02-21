@@ -1,15 +1,13 @@
 
-/// @file libym_logic/tests/bdd/fdec_test.cc
+/// @file fdec_test.cc
 /// @brief 関数分解用のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: fdec_test.cc 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/Dg.h"
+#include "logic/Dg.h"
 
 #include "bddtest.h"
 

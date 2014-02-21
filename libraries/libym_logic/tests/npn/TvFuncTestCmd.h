@@ -1,7 +1,7 @@
-#ifndef LIBYM_NPN_TESTS_TVFUNCTESTCMD_H
-#define LIBYM_NPN_TESTS_TVFUNCTESTCMD_H
+#ifndef TVFUNCTESTCMD_H
+#define TVFUNCTESTCMD_H
 
-/// @file libym_npn/tests/TvFuncTestCmd.h
+/// @file TvFuncTestCmd.h
 /// @brief TvFuncTestCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_tclpp/TclCmd.h"
-#include "ym_npn/common.h"
+#include "tclpp/TclCmd.h"
+#include "npn/common.h"
 
 #include "TvFuncTest.h"
 

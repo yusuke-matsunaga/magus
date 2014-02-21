@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/TvFunc.h"
+#include "logic/TvFunc.h"
 #include "TvFuncTest.h"
 
 

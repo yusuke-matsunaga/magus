@@ -1,7 +1,7 @@
-#ifndef LIBYM_LOGIC_TESTS_NPN_TVFUNCTEST_H
-#define LIBYM_LOGIC_TESTS_NPN_TVFUNCTEST_H
+#ifndef TVFUNCTEST_H
+#define TVFUNCTEST_H
 
-/// @file libym_logic/tests/npn/TvFuncTest.h
+/// @file TvFuncTest.h
 /// @brief TvFuncTest のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/TvFunc.h"
+#include "logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM

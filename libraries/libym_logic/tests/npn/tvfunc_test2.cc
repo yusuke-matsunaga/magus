@@ -8,9 +8,8 @@
 #include <popt.h>
 #endif
 
-#include "ym_utils/random.h"
-#include "ym_utils/StopWatch.h"
-#include "ym_logic/TvFunc.h"
+#include "utils/StopWatch.h"
+#include "logic/TvFunc.h"
 
 using namespace std;
 using namespace nsYm;

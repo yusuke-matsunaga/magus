@@ -38,8 +38,9 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -52,7 +53,7 @@ genpat_SOURCES = \
 	genpat.cc
 
 genpat_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+	$(top_builddir)/src/libym_logic.la
 
 genpat_LDFLAGS =
 
@@ -65,6 +66,6 @@ enum_pat3_SOURCES = \
 	enum_pat3.cc
 
 enum_pat3_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+	$(top_builddir)/src/libym_logic.la
 
 enum_pat3_LDFLAGS =

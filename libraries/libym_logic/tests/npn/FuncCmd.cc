@@ -1,16 +1,14 @@
 
-/// @file libym_logic/tests/npn/FuncCmd.cc
+/// @file FuncCmd.cc
 /// @brief FuncCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: FuncCmd.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/random.h"
-#include "ym_logic/TvFunc.h"
+#include "utils/random.h"
+#include "logic/TvFunc.h"
 
 #include "TvFuncConv.h"
 #include "FuncCmd.h"

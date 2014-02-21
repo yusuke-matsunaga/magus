@@ -11,7 +11,7 @@
 
 #include "SmtId.h"
 #include "IdMgr.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "utils/SimpleAlloc.h"
 
 
 using namespace nsYm;

@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_logic/CNFdd.h"
-#include "ym_logic/CNFddMgr.h"
+#include "logic/CNFdd.h"
+#include "logic/CNFddMgr.h"
 
 #include "cnfddtest.h"
 

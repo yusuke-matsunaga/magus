@@ -57,9 +57,7 @@ run_all_test_SOURCES = \
 	ym_logic_CppUTest.h
 
 run_all_test_LDADD = \
-	libym_logic_cpputest.la \
-	$(top_builddir)/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	libym_logic_cpputest.la
 
 run_all_test_LDFLAGS = \
 	$(CPPUTEST_LIBS)

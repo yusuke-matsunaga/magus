@@ -1,5 +1,5 @@
 
-/// @file libym_logic/tests/ymsat2.cc
+/// @file ymsat2.cc
 /// @brief 簡単な SAT プログラム(2)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,16 +7,11 @@
 /// All rights reserved.
 
 
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatMsgHandlerImpl1.h"
-#include "ym_logic/SatStats.h"
+#include "logic/SatSolver.h"
+#include "logic/SatMsgHandlerImpl1.h"
+#include "logic/SatStats.h"
 
-#include "ym_utils/StopWatch.h"
-
-
-#if USE_ZSTREAM
-#include "ym_utils/zstream.h"
-#endif
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

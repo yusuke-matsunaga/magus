@@ -37,8 +37,9 @@ noinst_LTLIBRARIES = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
 	$(CPPUTEST_INCLUDES)
 
 
@@ -51,4 +52,5 @@ libym_logic_cpputest_expr_la_SOURCES = \
 
 libym_logic_cpputest_expr_la_LIBADD =
 
-libym_logic_cpputest_expr_la_LDFLAGS =
+libym_logic_cpputest_expr_la_LDFLAGS = \
+	$(top_builddir)/src/libym_logic.la

@@ -9,12 +9,12 @@
 #include <popt.h>
 #endif
 
-#include "ym_utils/random.h"
-#include "ym_utils/PermGen.h"
-#include "ym_logic/TvFunc.h"
-#include "ym_logic/NpnMgr.h"
+#include "utils/RandGen.h"
+#include "utils/PermGen.h"
+#include "logic/TvFunc.h"
+#include "logic/NpnMgr.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 //#define DEBUG
 
@@ -186,7 +186,9 @@ rgen(ymuint ni,
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
 
-  init_random_seed(rseed);
+  RandGen rg;
+
+  rg.init(rseed);
 
   ymulong w2count_total = 0;
   ymulong tvcount_total = 0;
@@ -195,7 +197,7 @@ rgen(ymuint ni,
 
   for (ymuint k = 0; k < num; ++ k) {
     for (ymuint i = 0; i < ni_exp; ++ i) {
-      buff[i] = random_num() & 1;
+      buff[i] = rg.int32() & 1;
     }
     if ( verbose ) {
       for (ymuint i = 0; i < ni_exp; ++ i) {
@@ -267,12 +269,13 @@ rgen_walsh(ymuint ni,
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);
 
-  init_random_seed(rseed);
+  RandGen rg;
+  rg.init(rseed);
 
   sw.reset();
   for (ymuint k = 0; k < num; ++ k) {
     for (ymuint i = 0; i < ni_exp; ++ i) {
-      buff[i] = random_num() & 1;
+      buff[i] = rg.int32() & 1;
     }
     if ( verbose ) {
       for (ymuint i = 0; i < ni_exp; ++ i) {
@@ -362,7 +365,8 @@ verify(ymuint ni,
        ymuint flow,
        int algorithm)
 {
-  init_random_seed(rseed);
+  RandGen rg;
+  rg.init(rseed);
 
   ymuint nerr = 0;
 
@@ -371,7 +375,7 @@ verify(ymuint ni,
   ymuint c = 0;
   for (ymuint k = 0; k < num; ++ k) {
     for (ymuint i = 0; i < ni_exp; ++ i) {
-      buff[i] = random_num() & 1;
+      buff[i] = rg.int32() & 1;
     }
     if ( verbose ) {
       for (ymuint i = 0; i < ni_exp; ++ i) {
@@ -617,7 +621,6 @@ main(int argc,
       break;
 
     case 2: // rgen
-      init_random_seed(rseed);
       nerr = rgen(ni, rseed, rnum, flow, algorithm);
       break;
 
@@ -630,7 +633,6 @@ main(int argc,
       break;
 
     case 5: // rgen_walsh
-      init_random_seed(rseed);
       rgen_walsh(ni, rseed, rnum);
       break;
 

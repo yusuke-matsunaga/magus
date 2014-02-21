@@ -1,9 +1,7 @@
 
-/// @file libym_logic/tests/bdd/test_utils.cc
+/// @file test_utils.cc
 /// @brief BDD パッケージのテスト用の便利関数
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: test_utils.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
@@ -12,10 +10,10 @@
 
 #include "bddtest.h"
 
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/BddVarSet.h"
-#include "ym_logic/BddLitSet.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "logic/BddVarSet.h"
+#include "logic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

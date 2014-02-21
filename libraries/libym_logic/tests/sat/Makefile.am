@@ -41,17 +41,9 @@ bin_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
-
-############################################################
-## 共通の変数の定義
-############################################################
-
-LIBYM_SAT = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -62,7 +54,7 @@ dimacstest_SOURCES = \
 	dimacstest.cc
 
 dimacstest_LDADD = \
-	$(LIBYM_SAT)
+	$(top_builddir)/src/libym_logic.la
 
 dimacstest_LDFLAGS =
 
@@ -75,7 +67,7 @@ ymsat_SOURCES = \
 	ymsat.cc
 
 ymsat_LDADD = \
-	$(LIBYM_SAT)
+	$(top_builddir)/src/libym_logic.la
 
 ymsat_LDFLAGS =
 
@@ -88,6 +80,6 @@ ymsat2_SOURCES = \
 	ymsat2.cc
 
 ymsat2_LDADD = \
-	$(LIBYM_SAT)
+	$(top_builddir)/src/libym_logic.la
 
 ymsat2_LDFLAGS =

@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/BddVarSet.h"
-#include "ym_logic/BddVector.h"
-#include "ym_logic/BddList.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "logic/BddVarSet.h"
+#include "logic/BddVector.h"
+#include "logic/BddList.h"
 
-#include "ym_utils/FileIDO.h"
-#include "ym_utils/FileODO.h"
+#include "utils/FileIDO.h"
+#include "utils/FileODO.h"
 
 #include "bddtest.h"
 

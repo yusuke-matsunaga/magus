@@ -9,11 +9,11 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "ym_logic/SmtSolver.h"
-#include "ym_logic/SmtSortInfo.h"
-#include "ym_logic/SmtVar.h"
-#include "ym_logic/SmtFun.h"
-#include "ym_logic/SmtTerm.h"
+#include "logic/SmtSolver.h"
+#include "logic/SmtSortInfo.h"
+#include "logic/SmtVar.h"
+#include "logic/SmtFun.h"
+#include "logic/SmtTerm.h"
 
 
 using namespace nsYm;

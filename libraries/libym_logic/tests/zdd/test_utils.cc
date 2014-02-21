@@ -10,8 +10,8 @@
 
 #include "zddtest.h"
 
-#include "ym_logic/Zdd.h"
-#include "ym_logic/ZddMgr.h"
+#include "logic/Zdd.h"
+#include "logic/ZddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD

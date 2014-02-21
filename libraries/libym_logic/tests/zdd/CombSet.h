@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_logic/zdd_nsdef.h"
-#include "ym_logic/VarId.h"
+#include "logic/zdd_nsdef.h"
+#include "logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD

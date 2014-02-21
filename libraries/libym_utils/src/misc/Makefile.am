@@ -54,7 +54,8 @@ COMMON_SOURCES = \
 	PoptMainApp.cc \
 	RandGen.cc \
 	RefCount.cc \
-	Scanner.cc
+	Scanner.cc \
+	StopWatch.cc
 
 COMMON_LDFLAGS = \
 	@POPT_LIBS@

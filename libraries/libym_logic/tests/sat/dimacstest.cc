@@ -1,18 +1,16 @@
 
-/// @file libym_logic/tests/dimacstest.cc
+/// @file dimacstest.cc
 /// @brief DIMACS CNF ファイルの読み込みテスト
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: dimacstest.cc 700 2007-05-31 00:41:30Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_logic/DimacsParser.h"
-#include "ym_logic/DimacsHandler.h"
+#include "logic/DimacsParser.h"
+#include "logic/DimacsHandler.h"
 
-#include "ym_utils/FileIDO.h"
+#include "utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM

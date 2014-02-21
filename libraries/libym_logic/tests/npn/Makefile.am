@@ -41,9 +41,9 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir) \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
 	$(TCL_INCLUDES) \
 	@POPT_INCLUDES@
 
@@ -51,13 +51,6 @@ AM_CPPFLAGS = \
 ############################################################
 ## 共通の変数の定義
 ############################################################
-
-YM_TCLPP = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la
-
-YM_LOGIC = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 
 ############################################################
@@ -70,7 +63,7 @@ tvfunc_test_SOURCES = \
 	tvfunc_test.cc
 
 tvfunc_test_LDADD = \
-	$(YM_LOGIC) \
+	$(top_builddir)/src/libym_logic.la \
 	@POPT_LIBS@
 
 tvfunc_test_LDFLAGS =
@@ -84,7 +77,7 @@ tvfunc_test2_SOURCES = \
 	tvfunc_test2.cc
 
 tvfunc_test2_LDADD = \
-	$(YM_LOGIC) \
+	$(top_builddir)/src/libym_logic.la \
 	@POPT_LIBS@
 
 tvfunc_test2_LDFLAGS =
@@ -100,7 +93,7 @@ cofactor_test_SOURCES = \
 	TvFuncTest.cc
 
 cofactor_test_LDADD = \
-	$(YM_LOGIC)
+	$(top_builddir)/src/libym_logic.la
 
 cofactor_test_LDFLAGS =
 
@@ -113,7 +106,7 @@ npn_check3_SOURCES = \
 	npn_check3.cc
 
 npn_check3_LDADD = \
-	$(YM_LOGIC) \
+	$(top_builddir)/src/libym_logic.la \
 	@POPT_LIBS@
 
 npn_check3_LDFLAGS =
