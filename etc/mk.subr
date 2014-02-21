@@ -84,58 +84,31 @@ boot() {
 
 
 # compile ディレクトリに autogen ファイルを作る．
+#
+# USAGE: mk_autogen <source-dir> <build-dir>
 mk_autogen() {
     if test "x$1" != x; then
 	srcdir=$1
     else
 	srcdir=`pwd`
     fi
-    cdir=$2
-    echo "Making compile directory $cdir for source tree $srcdir ..." | tee -a $MK_LOG
-    echo "mkdir -p $cdir" | tee -a $MK_LOG
-    mkdir -p $cdir 2>> $MK_LOG
+    builddir=$2
+    echo "Making compile directory $builddir for source tree $srcdir ..." | tee -a $MK_LOG
+    echo "mkdir -p $builddir" | tee -a $MK_LOG
+    mkdir -p $builddir 2>> $MK_LOG
 
-    echo "test -d $3 || mkdir -p $3" | tee -a $MK_LOG
-    test -d $3 || mkdir -p $3
-    dstdir=`cd $3; pwd`
-
-    case "x$4" in
-    xdebug)
-	mode="debug"
-	;;
-    xopt)
-	mode="opt"
-	;;
-    xprof)
-	mode="prof"
-        ;;
-    *)
-	mode="debug"
-	;;
-    esac
-
+    # AUTOGEN_COMMON が設定されていなければ /dev/null にする．
     if test "x$AUTOGEN_COMMON" = x; then
-	AUTOGEN_COMMON="../autogen.common"
+	AUTOGEN_COMMON="/dev/null"
     fi
 
     sed -e s!__YM__SRC__DIRECTORY__!$srcdir! \
-	-e s!__YM__DST__DIRECTORY__!$dstdir! \
-	-e s!__YM__COMPILE_MODE__!$mode! \
 	-e s!__YM__AUTOGEN_COMMON__!$AUTOGEN_COMMON! \
-	$srcdir/etc/autogen.tmpl > $cdir/autogen
-    chmod +x $cdir/autogen
+	$srcdir/etc/autogen.tmpl > $builddir/autogen
+    chmod +x $builddir/autogen
     echo "  done" | tee -a $MK_LOG
 }
 
-
-# usage を表示する．
-usage() {
-    echo "Usage: $0 clean   : clean up the source tree"
-    echo "       $0 boot    : generating configure script"
-    echo "       $0 autogen <compile-dir> <prefix-dir> <mode>"
-    echo "                  : generating autogen script"
-    echo "       $0 debug   : displaying each tools version"
-}
 
 # 各ツールを表す環境変数をセットする．
 # ただしもともと環境変数に値がセットされていたらそれを用いる．
