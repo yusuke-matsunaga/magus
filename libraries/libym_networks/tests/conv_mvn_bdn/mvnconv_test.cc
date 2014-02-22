@@ -3,22 +3,22 @@
 /// @brief mvnconv_test のソースファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnDumper.h"
-#include "ym_networks/BdnVerilogWriter.h"
-#include "ym_networks/MvnMgr.h"
-#include "ym_networks/MvnVerilogReader.h"
-#include "ym_networks/MvnVlMap.h"
-#include "ym_networks/MvnDumper.h"
-#include "ym_networks/MvnBdnConv.h"
-#include "ym_networks/MvnBdnMap.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnDumper.h"
+#include "networks/BdnVerilogWriter.h"
+#include "networks/MvnMgr.h"
+#include "networks/MvnVerilogReader.h"
+#include "networks/MvnVlMap.h"
+#include "networks/MvnDumper.h"
+#include "networks/MvnBdnConv.h"
+#include "networks/MvnBdnMap.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 int

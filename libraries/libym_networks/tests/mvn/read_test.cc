@@ -3,7 +3,7 @@
 /// @brief MvnNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,17 +14,17 @@
 #endif
 
 
-#include "ym_networks/MvnMgr.h"
-#include "ym_networks/MvnVerilogReader.h"
-#include "ym_networks/MvnVlMap.h"
-#include "ym_networks/MvnDumper.h"
-#include "ym_networks/MvnVerilogWriter.h"
+#include "networks/MvnMgr.h"
+#include "networks/MvnVerilogReader.h"
+#include "networks/MvnVlMap.h"
+#include "networks/MvnDumper.h"
+#include "networks/MvnVerilogWriter.h"
 
-#include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellMislibReader.h"
+#include "cell/CellDotlibReader.h"
+#include "cell/CellMislibReader.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 int

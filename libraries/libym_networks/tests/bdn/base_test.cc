@@ -3,14 +3,14 @@
 /// @brief BdnMgr の基本機能のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnPort.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnNodeHandle.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

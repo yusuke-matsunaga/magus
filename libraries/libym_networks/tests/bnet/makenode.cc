@@ -3,12 +3,12 @@
 /// @brief BNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetManip.h"
+#include "networks/BNetwork.h"
+#include "networks/BNetManip.h"
 
 
 int

@@ -38,21 +38,13 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_logic/include \
+	-I$(top_srcdir)/../libym_cell/include \
+	-I$(top_srcdir)/../libym_verilog/include \
+	-I$(top_builddir)/../libym_utils/include \
 	@POPT_INCLUDES@
-
-
-############################################################
-## 共通の変数の定義
-############################################################
-
-LIBYM_NET = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
 
 
 ############################################################
@@ -63,7 +55,7 @@ makenode_test_SOURCES = \
 	makenode_test.cc
 
 makenode_test_LDADD = \
-	$(LIBYM_NET)
+	$(top_builddir)/src/libym_networks.la
 
 makenode_test_LDFLAGS =
 
@@ -76,7 +68,7 @@ read_test_SOURCES = \
 	read_test.cc
 
 read_test_LDADD = \
-	$(LIBYM_NET)
+	$(top_builddir)/src/libym_networks.la
 
 read_test_LDFLAGS = \
 	@POPT_LIBS@

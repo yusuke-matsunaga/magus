@@ -3,15 +3,15 @@
 /// @brief blif ファイルの読み込みに置ける LogExpr の性能テスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BlifParser.h"
 #include "BlifHandler.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_logic/LogExpr.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
+#include "logic/LogExpr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

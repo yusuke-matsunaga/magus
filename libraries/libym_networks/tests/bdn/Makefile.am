@@ -39,19 +39,11 @@ bin_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
-
-
-############################################################
-## 共通の変数の定義
-############################################################
-
-LIBYM_NET = \
-	../../libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_logics/include \
+	-I$(top_srcdir)/../libym_cell/include \
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -62,7 +54,7 @@ base_test_SOURCES = \
 	base_test.cc
 
 base_test_LDADD = \
-	$(LIBYM_NET)
+	$(top_builddir)/src/libym_networks.la
 
 base_test_LDFLAGS =
 
@@ -75,7 +67,7 @@ bliftest_SOURCES = \
 	bliftest.cc
 
 bliftest_LDADD = \
-	$(LIBYM_NET)
+	$(top_builddir)/src/libym_networks.la
 
 bliftest_LDFLAGS =
 
@@ -88,6 +80,6 @@ change_test_SOURCES = \
 	change_test.cc
 
 change_test_LDADD = \
-	$(LIBYM_NET)
+	$(top_builddir)/src/libym_networks.la
 
 change_test_LDFLAGS =

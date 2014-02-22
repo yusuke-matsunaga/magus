@@ -3,18 +3,18 @@
 /// @brief blif ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetBlifReader.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BNetBdnConv.h"
-#include "ym_networks/BdnDumper.h"
+#include "networks/BNetwork.h"
+#include "networks/BNetBlifReader.h"
+#include "networks/BdnMgr.h"
+#include "networks/BNetBdnConv.h"
+#include "networks/BdnDumper.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 int

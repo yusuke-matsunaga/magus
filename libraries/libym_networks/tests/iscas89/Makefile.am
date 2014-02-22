@@ -38,9 +38,10 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/iscas89
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/iscas89 \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -51,9 +52,7 @@ parsertest_SOURCES = \
 	parsertest.cc
 
 parsertest_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_networks.la
 
 parsertest_LDFLAGS =
 
@@ -66,8 +65,6 @@ reader_test_SOURCES = \
 	reader_test.cc
 
 reader_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_networks.la
 
 reader_test_LDFLAGS =

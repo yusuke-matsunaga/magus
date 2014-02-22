@@ -3,17 +3,17 @@
 /// @brief BlifNetworkReader のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/BlifNetwork.h"
+#include "networks/BlifNetwork.h"
 
-#include "ym_cell/CellMislibReader.h"
-#include "ym_cell/CellLibrary.h"
+#include "cell/CellMislibReader.h"
+#include "cell/CellLibrary.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM

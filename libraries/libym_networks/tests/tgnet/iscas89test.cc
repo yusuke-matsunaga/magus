@@ -3,14 +3,14 @@
 /// @brief iscas89 ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgIscas89Reader.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "networks/TgNetwork.h"
+#include "networks/TgIscas89Reader.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 int

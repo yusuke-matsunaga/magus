@@ -39,9 +39,12 @@ bin_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/tgnet
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/tgnet \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_logic/include \
+	-I$(top_srcdir)/../libym_cell/include \
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -52,10 +55,7 @@ lmtest_SOURCES = \
 	lmtest.cc
 
 lmtest_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_networks.la
 
 lmtest_LDFLAGS =
 
@@ -68,10 +68,7 @@ bliftest_SOURCES = \
 	bliftest.cc
 
 bliftest_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_networks.la
 
 bliftest_LDFLAGS =
 
@@ -84,9 +81,6 @@ iscas89test_SOURCES = \
 	iscas89test.cc
 
 iscas89test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_networks.la
 
 iscas89test_LDFLAGS =

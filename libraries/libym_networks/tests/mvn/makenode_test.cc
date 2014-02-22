@@ -3,14 +3,14 @@
 /// @brief MvnNode を生成するテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_networks/MvnMgr.h"
-#include "ym_networks/MvnModule.h"
-#include "ym_networks/MvnNode.h"
-#include "ym_networks/MvnDumper.h"
+#include "networks/MvnMgr.h"
+#include "networks/MvnModule.h"
+#include "networks/MvnNode.h"
+#include "networks/MvnDumper.h"
 
 
 int
