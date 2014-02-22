@@ -1,19 +1,17 @@
 #ifndef VMDECLNODE_H
 #define VMDECLNODE_H
 
-/// @file libym_verilog/tests/vlview/VmDeclNode.h
+/// @file VmDeclNode.h
 /// @brief VmDeclNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmDeclNode.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmNode.h"
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/vl/VlFwd.h"
+#include "verilog/verilog.h"
+#include "verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

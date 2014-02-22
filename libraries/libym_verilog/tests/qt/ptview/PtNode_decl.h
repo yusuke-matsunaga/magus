@@ -1,20 +1,18 @@
 #ifndef PTNODE_DECL_H
 #define PTNODE_DECL_H
 
-/// @file libym_verilog/tests/vlview/PtNode_decl.h
+/// @file PtNode_decl.h
 /// @brief PtNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PtNode_decl.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PtNode.h"
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/pt/PtP.h"
-#include "ym_verilog/pt/PtArray.h"
+#include "verilog/verilog.h"
+#include "verilog/pt/PtP.h"
+#include "verilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -41,12 +39,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -60,7 +58,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -68,7 +66,7 @@ private:
 
   // IO宣言ヘッダリスト
   PtIOHeadArray mIOHeadArray;
-  
+
 };
 
 
@@ -94,12 +92,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -113,7 +111,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -121,7 +119,7 @@ private:
 
   // IO宣言ヘッダ
   const PtIOHead* mIOHead;
-  
+
 };
 
 
@@ -147,12 +145,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -166,7 +164,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -174,7 +172,7 @@ private:
 
   // IO宣言ヘッダ
   const PtIOHead* mIOHead;
-  
+
 };
 
 
@@ -200,12 +198,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -219,7 +217,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -227,7 +225,7 @@ private:
 
   // IO宣言要素
   const PtIOItem* mIOItem;
-  
+
 };
 
 
@@ -255,12 +253,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -274,18 +272,18 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 宣言ヘッダリスト
   PtDeclHeadArray mDeclHeadArray;
-  
+
 };
 
 
@@ -311,12 +309,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -330,7 +328,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -338,7 +336,7 @@ private:
 
   // 宣言ヘッダ
   const PtDeclHead* mDeclHead;
-  
+
 };
 
 
@@ -364,12 +362,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -383,7 +381,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -391,7 +389,7 @@ private:
 
   // 宣言ヘッダ
   const PtDeclHead* mDeclHead;
-  
+
 };
 
 
@@ -417,12 +415,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -436,7 +434,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -444,7 +442,7 @@ private:
 
   // 宣言要素
   const PtDeclItem* mDeclItem;
-  
+
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -468,12 +466,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -487,7 +485,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -495,7 +493,7 @@ private:
 
   // 宣言要素
   const PtDeclItem* mDeclItem;
-  
+
 };
 
 
@@ -520,12 +518,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -539,7 +537,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -547,7 +545,7 @@ private:
 
   // 範囲
   const PtRange* mRange;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

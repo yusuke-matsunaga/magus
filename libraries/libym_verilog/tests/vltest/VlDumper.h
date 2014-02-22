@@ -1,17 +1,15 @@
-#ifndef YM_VERILOG_VL_VLDUMPER_H
-#define YM_VERILOG_VL_VLDUMPER_H
+#ifndef VLDUMPER_H
+#define VLDUMPER_H
 
-/// @file ym_verilog/vl/VlDumper.h
+/// @file VlDumper.h
 /// @brief VlDumper のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlDumper.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2006, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_verilog/verilog.h>
+#include "verilog/verilog.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -31,21 +29,21 @@ public:
   /// @brief コンストラクタ
   /// @param[in] s 出力ストリーム
   VlDumper(ostream& s);
-  
+
   /// @brief デストラクタ
   ~VlDumper();
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 内容を出力する関数
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief VlMgr の持っている内容を出力する
   /// @param[in] vlmgr VlMgr
   void
   operator()(const VlMgr& vlmgr);
-  
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -93,7 +91,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 実際の実装クラス
   VlDumperImpl* mImpl;
 
@@ -102,4 +100,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // YM_VERILOG_VL_VLDUMPER_H
+#endif // VLDUMPER_H

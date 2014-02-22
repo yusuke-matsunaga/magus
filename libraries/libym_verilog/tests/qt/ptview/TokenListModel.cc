@@ -1,20 +1,18 @@
 
-/// @file libym_verilog/tests/vlview/TokenListModel.cc
+/// @file TokenListModel.cc
 /// @brief TokenListModel の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TokenListModel.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "TokenListModel.h"
 #include "Lex.h"
-#include "parser.h"
+#include "parser_common.h"
 #include "RsrvWordDic.h"
 
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のオブジェクト
 TokenListModel::TokenListModel(QObject* parent) :
@@ -62,61 +60,61 @@ TokenListModel::data(const QModelIndex& index,
   else if ( role == Qt::DisplayRole ) {
     using nsYm::nsVerilog::RsrvWordDic;
     const RsrvWordDic& dic = RsrvWordDic::the_dic();
-  
+
     int row = index.row();
     const Token& token = mList.at(row);
-  
+
     QString str;
     if ( col == 0 ) {
       switch ( token.mId ) {
       case SPACE:
 	str = "SPACE";
 	break;
-	
+
       case NL:
 	str = "NL";
 	break;
-	
+
       case COMMENT1:
 	str = "COMMENT1";
 	break;
-	
+
       case COMMENT2:
 	str = "COMMENT2";
 	break;
-	
+
       case IDENTIFIER:
 	str = "IDENTIFIER";
 	break;
-	
+
       case SYS_IDENTIFIER:
 	str = "SYS_IDENTIFIER";
 	break;
-	
+
       case UNUMBER:
 	str = "UNUMBER";
 	break;
-	
+
       case UNUM_INT:
 	str = "UNUM_INT";
 	break;
-	
+
       case RNUMBER:
 	str = "RNUMBER";
 	break;
-	
+
       case STRING:
 	str = "STRING";
 	break;
-	
+
       case CD_SYMBOL:
 	str = "CD_SYMBOL";
 	break;
-	
+
       case ERROR:
 	str = "ERROR";
 	break;
-	
+
       default:
 	str = "RESERVED";
 	break;
@@ -135,7 +133,7 @@ TokenListModel::data(const QModelIndex& index,
       case CD_SYMBOL:
 	str = token.mStr;
 	break;
-	
+
       default:
 	if ( dic.str(token.mId) == NULL ) {
 	  str = "???";
@@ -152,7 +150,7 @@ TokenListModel::data(const QModelIndex& index,
     return QVariant();
   }
 }
-  
+
 // @brief トークンを追加する．
 // @param[in] id トークン番号
 // @param[in] file_region トークンのファイル上の位置
@@ -168,7 +166,7 @@ TokenListModel::add_token(int id,
   QModelIndex index2 = index(row, 1);
   emit dataChanged(index1, index2);
 }
-  
+
 // @brief トークンのファイル上の位置を返す．
 const TokenListModel::FileRegion&
 TokenListModel::loc(int row_pos)

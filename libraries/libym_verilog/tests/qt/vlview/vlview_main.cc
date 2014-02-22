@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/vlview/vlview_main.cc
+/// @file vlview_main.cc
 /// @brief vlview の main ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: vlview_main.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,10 +13,10 @@
 #include "VerilogModel.h"
 #include "VerilogView.h"
 
-#include "ym_verilog/VlMgr.h"
+#include "verilog/VlMgr.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 int

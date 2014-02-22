@@ -1,24 +1,22 @@
 
-/// @file libym_verilog/tests/vlview/VmStmtNode.cc
+/// @file VmStmtNode.cc
 /// @brief VmStmtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmStmtNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmStmtNode.h"
-#include "ym_verilog/vl/VlModule.h"
-#include "ym_verilog/vl/VlDecl.h"
-#include "ym_verilog/vl/VlProcess.h"
-#include "ym_verilog/vl/VlStmt.h"
-#include "ym_verilog/vl/VlTaskFunc.h"
-#include "ym_verilog/vl/VlUserSystf.h"
-#include "ym_verilog/vl/VlControl.h"
-#include "ym_verilog/vl/VlExpr.h"
-#include "ym_verilog/vl/VlNamedObj.h"
+#include "verilog/vl/VlModule.h"
+#include "verilog/vl/VlDecl.h"
+#include "verilog/vl/VlProcess.h"
+#include "verilog/vl/VlStmt.h"
+#include "verilog/vl/VlTaskFunc.h"
+#include "verilog/vl/VlUserSystf.h"
+#include "verilog/vl/VlControl.h"
+#include "verilog/vl/VlExpr.h"
+#include "verilog/vl/VlNamedObj.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

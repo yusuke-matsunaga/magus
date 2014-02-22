@@ -46,8 +46,9 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include
 
 AM_YFLAGS=-d -v
 
@@ -61,8 +62,7 @@ bvcalc_SOURCES = \
 	bvlex.ll
 
 bvcalc_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_verilog.la
 
 bvcalc_LDFLAGS =
 
@@ -87,8 +87,7 @@ scalarval_test_SOURCES = \
 	scalarval_test.cc
 
 scalarval_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_verilog.la
 
 scalarval_test_LDFLAGS =
 
@@ -101,8 +100,7 @@ udpval_test_SOURCES = \
 	udpval_test.cc
 
 udpval_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_verilog.la
 
 udpval_test_LDFLAGS =
 
@@ -115,7 +113,6 @@ valuetype_test_SOURCES = \
 	valuetype_test.cc
 
 valuetype_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_verilog.la
 
 valuetype_test_LDFLAGS =

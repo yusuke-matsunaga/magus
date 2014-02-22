@@ -1,18 +1,16 @@
 
-/// @file libym_verilog/tests/vlview/VmPortNode.cc
+/// @file VmPortNode.cc
 /// @brief VmPortNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmNode_port.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmPortNode.h"
 #include "VmExprNode.h"
 #include "VmMiscNode.h"
-#include "ym_verilog/vl/VlPort.h"
+#include "verilog/vl/VlPort.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -35,7 +33,7 @@ VmPortNode::~VmPortNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPortNode::data(int column,
 		 int role) const
@@ -55,7 +53,7 @@ VmPortNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 PortNode::loc() const

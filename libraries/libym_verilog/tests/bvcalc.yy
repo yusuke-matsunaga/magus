@@ -1,16 +1,14 @@
 %{
 
-/// @file libym_verilog/tests/bvcal.yy
+/// @file bvcal.yy
 /// @brief BitVector のテスト用簡易電卓の構文解析用ソース
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bvcalc.yy 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_verilog/BitVector.h"
+#include "verilog/BitVector.h"
 
 using namespace std;
 using HASH_NAMESPACE::hash_map;

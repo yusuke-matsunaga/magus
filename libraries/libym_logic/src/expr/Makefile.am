@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_expr.la \
-	libym_logic_expr_d.la \
-	libym_logic_expr_p.la
+	libexpr.la \
+	libexpr_d.la \
+	libexpr_p.la
 
 
 ############################################################
@@ -54,49 +54,49 @@ COMMON_SOURCES = \
 	LexpNode.h \
 	LexpNodePtr.h \
 	LexpParser.h \
-	SopLit.h \
-	Literal.cc \
 	LexpMgr.cc \
 	LexpNode.cc \
 	LexpParser.cc \
+	Literal.cc \
 	LogExpr.cc \
-	LogExprWriter.cc
+	LogExprWriter.cc \
+	SopLit.h
 
 
 ############################################################
-## libym_logic_expr.la 用の変数指定
+## libexpr.la 用の変数指定
 ############################################################
 
-libym_logic_expr_la_CXXFLAGS = -O2
+libexpr_la_CXXFLAGS = -O2
 
-libym_logic_expr_la_SOURCES = $(COMMON_SOURCES)
+libexpr_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_expr_la_LIBADD =
+libexpr_la_LIBADD =
 
-libym_logic_expr_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_expr_d.la 用の変数指定
-############################################################
-
-libym_logic_expr_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_expr_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_expr_d_la_LIBADD =
-
-libym_logic_expr_d_la_LDFLAGS =
+libexpr_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_expr_p.la 用の変数指定
+## libexpr_d.la 用の変数指定
 ############################################################
 
-libym_logic_expr_p_la_CXXFLAGS = -O2 -pg
+libexpr_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_expr_p_la_SOURCES = $(COMMON_SOURCES)
+libexpr_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_expr_p_la_LIBADD =
+libexpr_d_la_LIBADD =
 
-libym_logic_expr_p_la_LDFLAGS =
+libexpr_d_la_LDFLAGS =
+
+
+############################################################
+## libexpr_p.la 用の変数指定
+############################################################
+
+libexpr_p_la_CXXFLAGS = -O2 -pg
+
+libexpr_p_la_SOURCES = $(COMMON_SOURCES)
+
+libexpr_p_la_LIBADD =
+
+libexpr_p_la_LDFLAGS =

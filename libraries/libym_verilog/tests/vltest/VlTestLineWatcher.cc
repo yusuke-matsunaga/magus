@@ -1,17 +1,11 @@
 
-/// @file libym_verilog/tests/vltest/VlTestLineWatcher.cc
+/// @file VlTestLineWatcher.cc
 /// @brief VlTestLineWatcher の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlTestLineWatcher.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
 
 #include "VlTestLineWatcher.h"
 

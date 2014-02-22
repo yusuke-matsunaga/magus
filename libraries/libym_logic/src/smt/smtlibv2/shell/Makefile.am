@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_smt_shell.la \
-	libym_smt_shell_d.la \
-	libym_smt_shell_p.la
+	libsmtshell.la \
+	libsmtshell_d.la \
+	libsmtshell_p.la
 
 
 ############################################################
@@ -69,39 +69,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_smt_shell.la 用の変数の指定
+## libsmtshell.la 用の変数の指定
 ############################################################
 
-libym_smt_shell_la_CXXFLAGS = -O2
+libsmtshell_la_CXXFLAGS = -O2
 
-libym_smt_shell_la_SOURCES = $(COMMON_SOURCES)
+libsmtshell_la_SOURCES = $(COMMON_SOURCES)
 
-libym_smt_shell_la_LIBADD =
+libsmtshell_la_LIBADD =
 
-libym_smt_shell_la_LDFLAGS = -lreadline -lcurses
-
-
-############################################################
-## libym_smt_shell_d.la 用の変数の指定
-############################################################
-
-libym_smt_shell_d_la_CXXFLAGS = -O2 -g
-
-libym_smt_shell_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_smt_shell_d_la_LIBADD =
-
-libym_smt_shell_d_la_LDFLAGS = -lreadline -lcurses
+libsmtshell_la_LDFLAGS = -lreadline -lcurses
 
 
 ############################################################
-## libym_smt_shell_p.la 用の変数の指定
+## libsmtshell_d.la 用の変数の指定
 ############################################################
 
-libym_smt_shell_p_la_CXXFLAGS = -O2 -pg
+libsmtshell_d_la_CXXFLAGS = -O2 -g
 
-libym_smt_shell_p_la_SOURCES = $(COMMON_SOURCES)
+libsmtshell_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_smt_shell_p_la_LIBADD =
+libsmtshell_d_la_LIBADD =
 
-libym_smt_shell_p_la_LDFLAGS = -lreadline -lcurses
+libsmtshell_d_la_LDFLAGS = -lreadline -lcurses
+
+
+############################################################
+## libsmtshell_p.la 用の変数の指定
+############################################################
+
+libsmtshell_p_la_CXXFLAGS = -O2 -pg
+
+libsmtshell_p_la_SOURCES = $(COMMON_SOURCES)
+
+libsmtshell_p_la_LIBADD =
+
+libsmtshell_p_la_LDFLAGS = -lreadline -lcurses

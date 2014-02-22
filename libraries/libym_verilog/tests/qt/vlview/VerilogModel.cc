@@ -1,18 +1,16 @@
 
-/// @file libym_verilog/tests/vlview/VerilogModel.cc
+/// @file VerilogModel.cc
 /// @brief VerilogModel の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VerilogModel.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VerilogModel.h"
 #include "VmNode.h"
 #include "VmRootNode.h"
-  
+
 
 BEGIN_NAMESPACE_YM_VERILOG
 
@@ -28,7 +26,7 @@ VerilogModel::VerilogModel(QObject* parent) :
 VerilogModel::~VerilogModel()
 {
 }
-  
+
 // @brief 対応するインデックスを返す．
 // @param[in] row 行番号
 // @param[in] column 列番号
@@ -42,7 +40,7 @@ VerilogModel::index(int row,
   if ( !node ) {
     return QModelIndex();
   }
-  
+
   VmNode* cnode = node->child(row);
   cnode->mParentIndex = parent;
   return createIndex(row, column, cnode);
@@ -61,7 +59,7 @@ VerilogModel::parent(const QModelIndex& child) const
     return QModelIndex();
   }
 }
-  
+
 // @brief コラム数を返す．
 int
 VerilogModel::columnCount(const QModelIndex& /* parent */) const
@@ -69,7 +67,7 @@ VerilogModel::columnCount(const QModelIndex& /* parent */) const
   // ラベル, 値 の2つ
   return 2;
 }
-  
+
 // @brief 行数を返す．
 int
 VerilogModel::rowCount(const QModelIndex& parent) const
@@ -82,7 +80,7 @@ VerilogModel::rowCount(const QModelIndex& parent) const
     return 0;
   }
 }
-  
+
 // @brief 該当するデータを返す．
 QVariant
 VerilogModel::data(const QModelIndex& index,

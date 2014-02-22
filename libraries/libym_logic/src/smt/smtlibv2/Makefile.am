@@ -32,54 +32,54 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_smt_smtlibv2.la \
-	libym_logic_smt_smtlibv2_d.la \
-	libym_logic_smt_smtlibv2_p.la
+	libsmtlibv2.la \
+	libsmtlibv2_d.la \
+	libsmtlibv2_p.la
 
 
 ############################################################
-## libym_logic_smt_smtlibv2.la 用の変数の指定
+## libsmtlibv2.la 用の変数の指定
 ############################################################
 
-libym_logic_smt_smtlibv2_la_SOURCES =
+libsmtlibv2_la_SOURCES =
 
 # Dummy C++ source to cause C++ linking.
-nodist_EXTRA_libym_logic_smt_smtlibv2_la_SOURCES = dummy.cc
+nodist_EXTRA_libsmtlibv2_la_SOURCES = dummy.cc
 
-libym_logic_smt_smtlibv2_la_LIBADD = \
-	shell/libym_smt_shell.la \
-	parser/libym_smt_parser.la
+libsmtlibv2_la_LIBADD = \
+	shell/libsmtshell.la \
+	parser/libsmtparser.la
 
-libym_logic_smt_smtlibv2_la_LDFLAGS =
+libsmtlibv2_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_smt_smtlibv2_d.la 用の変数の指定
+## libsmtlibv2_d.la 用の変数の指定
 ############################################################
 
-libym_logic_smt_smtlibv2_d_la_SOURCES =
+libsmtlibv2_d_la_SOURCES =
 
 # Dummy C++ source to cause C++ linking.
-nodist_EXTRA_libym_logic_smt_smtlibv2_d_la_SOURCES = dummy.cc
+nodist_EXTRA_libsmtlibv2_d_la_SOURCES = dummy.cc
 
-libym_logic_smt_smtlibv2_d_la_LIBADD = \
-	shell/libym_smt_shell_d.la \
-	parser/libym_smt_parser_d.la
+libsmtlibv2_d_la_LIBADD = \
+	shell/libsmtshell_d.la \
+	parser/libsmtparser_d.la
 
-libym_logic_smt_smtlibv2_d_la_LDFLAGS =
+libsmtlibv2_d_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_smt_smtlibv2_p.la 用の変数の指定
+## libsmtlibv2_p.la 用の変数の指定
 ############################################################
 
-libym_logic_smt_smtlibv2_p_la_SOURCES =
+libsmtlibv2_p_la_SOURCES =
 
 # Dummy C++ source to cause C++ linking.
-nodist_EXTRA_libym_logic_smt_smtlibv2_p_la_SOURCES = dummy.cc
+nodist_EXTRA_libsmtlibv2_p_la_SOURCES = dummy.cc
 
-libym_logic_smt_smtlibv2_p_la_LIBADD = \
-	shell/libym_smt_shell_p.la \
-	parser/libym_smt_parser_p.la
+libsmtlibv2_p_la_LIBADD = \
+	shell/libsmtshell_p.la \
+	parser/libsmtparser_p.la
 
-libym_logic_smt_smtlibv2_p_la_LDFLAGS =
+libsmtlibv2_p_la_LDFLAGS =

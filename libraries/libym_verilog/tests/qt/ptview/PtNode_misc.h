@@ -1,20 +1,18 @@
 #ifndef PTNODE_MISC_H
 #define PTNODE_MISC_H
 
-/// @file libym_verilog/tests/vlview/PtNode_misc.h
+/// @file PtNode_misc.h
 /// @brief PtNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PtNode_misc.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PtNode.h"
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/pt/PtP.h"
-#include "ym_verilog/pt/PtArray.h"
+#include "verilog/verilog.h"
+#include "verilog/pt/PtP.h"
+#include "verilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

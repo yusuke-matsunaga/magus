@@ -1,23 +1,21 @@
 
-/// @file libym_verilog/tests/vltest/vltest_elaborate.cc
+/// @file vltest_elaborate.cc
 /// @brief elabrate モードのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: vltest_elaborate.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2006, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
-#include "ym_verilog/VlMgr.h"
+#include "verilog/VlMgr.h"
 #include "VlDumper.h"
 
-#include "ym_cell/cell_nsdef.h"
+#include "cell/cell_nsdef.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

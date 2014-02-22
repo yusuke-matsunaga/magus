@@ -1,29 +1,23 @@
 
-/// @file libym_verilog/tests/vltest/vltest_rawlex.cc
+/// @file vltest_rawlex.cc
 /// @brief rawlex モードのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: vltest_rawlex.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include "ymconfig.h"
-#endif
-
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 #include "VlTestLineWatcher.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 #include "Lex.h"
 #include "print_token.h"
 #include "LexModuleState.h"
 
-#include "parser.h"
+#include "parser_common.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -1,11 +1,11 @@
 #ifndef VERILOGSYNTAXHIGHLIGTHER_H
 #define VERILOGSYNTAXHIGHLIGTHER_H
 
-/// @file libym_verilog/tests/ptview/VerilogSyntaxHighlighter.h
+/// @file VerilogSyntaxHighlighter.h
 /// @brief VerilogSyntaxHighlighter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -86,16 +86,16 @@ private:
 
   // エラーの色
   QColor mErrorColor;
-  
+
   // 通常の文字用のフォーマット
   QTextCharFormat mNormalFormat;
-  
+
   // 識別子用のフォーマット
   QTextCharFormat mIdentifierFormat;
 
   // 予約語用のフォーマット
   QTextCharFormat mKeywordFormat;
-  
+
   // 文字列用のフォーマット
   QTextCharFormat mStringFormat;
 
@@ -107,13 +107,13 @@ private:
 
   // コンパイラディレクティブ用のフォーマット
   QTextCharFormat mDirectiveFormat;
-  
+
   // エラー用のフォーマット
   QTextCharFormat mErrorFormat;
 
   // 予約語の検査用ハッシュ表
   QHash<QString, int> mKeywordHash;
-  
+
 
 private:
   //////////////////////////////////////////////////////////////////////

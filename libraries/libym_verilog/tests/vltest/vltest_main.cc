@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/vltest/vltest_main.cc
+/// @file vltest_main.cc
 /// @brief Verilog-HDL フロントエンドのテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: vltest_main.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2006 Yusuke Matsunaga
+/// Copyright (C) 2005-2006, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,9 +11,9 @@
 #include <popt.h>
 #endif
 
-#include "ym_verilog/verilog.h"
-#include "ym_cell/CellDotlibReader.h"
-#include "ym_cell/CellMislibReader.h"
+#include "verilog/verilog.h"
+#include "cell/CellDotlibReader.h"
+#include "cell/CellMislibReader.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

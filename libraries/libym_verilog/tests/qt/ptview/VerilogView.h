@@ -1,13 +1,11 @@
 #ifndef VERILOGVIEW_H
 #define VERILOGVIEW_H
 
-/// @file libym_verilog/tests/ptview/VerilogView.h
+/// @file VerilogView.h
 /// @brief VerilogView のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VerilogView.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,9 +25,9 @@ class VerilogView :
   public QWidget
 {
   Q_OBJECT
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
   VerilogView(QWidget* parent = NULL);
@@ -45,7 +43,7 @@ public:
   /// @return 読み込みに成功したら true を返す．
   bool
   open(const char* file_name);
-  
+
   /// @brief カーソルの位置を該当する箇所にセットする．
   /// @param[in] cursor 対象のカーソル
   /// @param[in] start_line 開始位置の行番号
@@ -68,7 +66,7 @@ public:
   set_cursor_pos(QTextCursor& cursor,
 		 int start_line,
 		 int end_line);
-			      
+
 
 public slots:
 
@@ -127,13 +125,13 @@ private:
 
   // 内容を表示するウィジェット
   QTextEdit* mTextEdit;
-  
+
   // 各行の先頭の位置を記録する配列
   QList<int> mStartPos;
 
   // syntax highlighter
   VerilogSyntaxHighlighter* mHighlighter;
-  
+
 };
 
 #endif // VERILOGVIEW_H

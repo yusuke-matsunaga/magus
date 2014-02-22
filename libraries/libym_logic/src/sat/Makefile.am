@@ -33,9 +33,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_sat.la \
-	libym_logic_sat_d.la \
-	libym_logic_sat_p.la
+	libsat.la \
+	libsat_d.la \
+	libsat_p.la
 
 
 ############################################################
@@ -58,48 +58,48 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_logic_sat.la 用の変数の指定
+## libsat.la 用の変数の指定
 ############################################################
 
-libym_logic_sat_la_CXXFLAGS = -O2
+libsat_la_CXXFLAGS = -O2
 
-libym_logic_sat_la_SOURCES = $(COMMON_SOURCES)
+libsat_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_sat_la_LIBADD = \
-	ymsat/libym_sat_ymsat.la \
-	MiniSat/libym_minisat.la \
-	dimacs/libym_sat_dimacs.la
+libsat_la_LIBADD = \
+	ymsat/libymsat.la \
+	MiniSat/libminisat.la \
+	dimacs/libdimacs.la
 
-libym_logic_sat_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_sat_d.la 用の変数の指定
-############################################################
-
-libym_logic_sat_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_sat_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_sat_d_la_LIBADD = \
-	ymsat/libym_sat_ymsat_d.la \
-	MiniSat/libym_minisat_d.la \
-	dimacs/libym_sat_dimacs_d.la
-
-libym_logic_sat_d_la_LDFLAGS =
+libsat_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_sat_p.la 用の変数の指定
+## libsat_d.la 用の変数の指定
 ############################################################
 
-libym_logic_sat_p_la_CXXFLAGS = -O2 -pg
+libsat_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_sat_p_la_SOURCES = $(COMMON_SOURCES)
+libsat_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_sat_p_la_LIBADD = \
-	ymsat/libym_sat_ymsat_p.la \
-	MiniSat/libym_minisat_p.la \
-	dimacs/libym_sat_dimacs_p.la
+libsat_d_la_LIBADD = \
+	ymsat/libymsat_d.la \
+	MiniSat/libminisat_d.la \
+	dimacs/libdimacs_d.la
 
-libym_logic_sat_p_la_LDFLAGS =
+libsat_d_la_LDFLAGS =
+
+
+############################################################
+## libsat_p.la 用の変数の指定
+############################################################
+
+libsat_p_la_CXXFLAGS = -O2 -pg
+
+libsat_p_la_SOURCES = $(COMMON_SOURCES)
+
+libsat_p_la_LIBADD = \
+	ymsat/libymsat_p.la \
+	MiniSat/libminisat_p.la \
+	dimacs/libdimacs_p.la
+
+libsat_p_la_LDFLAGS =

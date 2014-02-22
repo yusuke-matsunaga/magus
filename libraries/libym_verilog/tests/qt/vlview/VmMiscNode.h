@@ -1,18 +1,16 @@
 #ifndef VMMISCNODE_H
 #define VMMISCNODE_H
 
-/// @file libym_verilog/tests/vlview/VmMiscNode.h
+/// @file VmMiscNode.h
 /// @brief VmMiscNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmMiscNode.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmNode.h"
-#include "ym_verilog/verilog.h"
+#include "verilog/verilog.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

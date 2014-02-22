@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/ptview/TokenView.cc
+/// @file TokenView.cc
 /// @brief TokenView の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TokenView.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,7 +11,7 @@
 #include <QTableView>
 #include "TokenListModel.h"
 
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のウィジェット
 TokenView::TokenView(QWidget* parent) :
@@ -42,7 +40,7 @@ TokenView::selectionChanged(const QItemSelection& selected,
 			    const QItemSelection& deselected)
 {
   QAbstractItemView::selectionChanged(selected, deselected);
-  
+
   QList<QModelIndex> index_list = selected.indexes();
   QListIterator<QModelIndex> p(index_list);
   if ( p.hasNext() ) {

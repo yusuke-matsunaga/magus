@@ -1,13 +1,11 @@
 #ifndef VLVIEW_H
 #define VLVIEW_H
 
-/// @file libym_verilog/tests/vlview/VlView.h
+/// @file VlView.h
 /// @brief VlView のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlView.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -25,9 +23,9 @@ class VlView :
   public QWidget
 {
   Q_OBJECT
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
   VlView(QWidget* parent = NULL);
@@ -43,7 +41,7 @@ public:
   /// @return 読み込みに成功したら true を返す．
   bool
   open(const char* file_name);
-  
+
 
   /// @brief 該当する箇所を表すカーソルを返す．
   /// @param[in] start_line 開始位置の行番号
@@ -55,12 +53,12 @@ public:
 	 int start_column,
 	 int end_line,
 	 int end_column);
-  
+
   /// @brief 指定された領域を強調表示する．
   void
   hilight(QTextCursor* cursor);
-  
-			      
+
+
 public slots:
 
   /// @brief 指定された領域を強調表示する．
@@ -73,7 +71,7 @@ public slots:
 	  int start_column,
 	  int end_line,
 	  int end_column);
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -86,7 +84,7 @@ private:
   xy2pos(int line,
 	 int column) const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -94,10 +92,10 @@ private:
 
   // 内容を表示するウィジェット
   QTextEdit* mTextEdit;
-  
+
   // 各行の先頭の位置を記録する配列
   std::vector<int> mStartPos;
-  
+
 };
 
 #endif // VLVIEW_H

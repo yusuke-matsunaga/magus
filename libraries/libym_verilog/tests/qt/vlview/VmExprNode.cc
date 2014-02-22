@@ -1,21 +1,19 @@
 
-/// @file libym_verilog/tests/vlview/VmExprNode.cc
+/// @file VmExprNode.cc
 /// @brief VmExprNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmExprNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmExprNode.h"
-#include "ym_verilog/VlValue.h"
-#include "ym_verilog/vl/VlExpr.h"
-#include "ym_verilog/vl/VlDecl.h"
-#include "ym_verilog/vl/VlTaskFunc.h"
-#include "ym_verilog/vl/VlUserSystf.h"
-#include "ym_verilog/vl/VlPrimitive.h"
+#include "verilog/VlValue.h"
+#include "verilog/vl/VlExpr.h"
+#include "verilog/vl/VlDecl.h"
+#include "verilog/vl/VlTaskFunc.h"
+#include "verilog/vl/VlUserSystf.h"
+#include "verilog/vl/VlPrimitive.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

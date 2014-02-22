@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_tvfunc.la \
-	libym_logic_tvfunc_d.la \
-	libym_logic_tvfunc_p.la
+	libtvfunc.la \
+	libtvfunc_d.la \
+	libtvfunc_p.la
 
 
 ############################################################
@@ -55,39 +55,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_logic_tvfunc.la 用の変数の指定
+## libtvfunc.la 用の変数の指定
 ############################################################
 
-libym_logic_tvfunc_la_CXXFLAGS = -O2
+libtvfunc_la_CXXFLAGS = -O2
 
-libym_logic_tvfunc_la_SOURCES = $(COMMON_SOURCES)
+libtvfunc_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_tvfunc_la_LIBADD =
+libtvfunc_la_LIBADD =
 
-libym_logic_tvfunc_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_tvfunc_d.la 用の変数の指定
-############################################################
-
-libym_logic_tvfunc_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_tvfunc_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_tvfunc_d_la_LIBADD =
-
-libym_logic_tvfunc_d_la_LDFLAGS =
+libtvfunc_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_tvfunc_p.la 用の変数の指定
+## libtvfunc_d.la 用の変数の指定
 ############################################################
 
-libym_logic_tvfunc_p_la_CXXFLAGS = -O2 -pg
+libtvfunc_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_tvfunc_p_la_SOURCES = $(COMMON_SOURCES)
+libtvfunc_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_tvfunc_p_la_LIBADD =
+libtvfunc_d_la_LIBADD =
 
-libym_logic_tvfunc_p_la_LDFLAGS =
+libtvfunc_d_la_LDFLAGS =
+
+
+############################################################
+## libtvfunc_p.la 用の変数の指定
+############################################################
+
+libtvfunc_p_la_CXXFLAGS = -O2 -pg
+
+libtvfunc_p_la_SOURCES = $(COMMON_SOURCES)
+
+libtvfunc_p_la_LIBADD =
+
+libtvfunc_p_la_LDFLAGS =

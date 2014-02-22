@@ -1,23 +1,21 @@
 
-/// @file libym_verilog/tests/vlview/VmItermNode.cc
+/// @file VmItermNode.cc
 /// @brief VmItemNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_item.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmItemNode.h"
 #include "VmMiscNode.h"
-#include "ym_verilog/vl/VlParamAssign.h"
-#include "ym_verilog/vl/VlDecl.h"
-#include "ym_verilog/vl/VlTaskFunc.h"
-#include "ym_verilog/vl/VlPrimitive.h"
-#include "ym_verilog/vl/VlContAssign.h"
-#include "ym_verilog/vl/VlModule.h"
-#include "ym_verilog/vl/VlUdp.h"
+#include "verilog/vl/VlParamAssign.h"
+#include "verilog/vl/VlDecl.h"
+#include "verilog/vl/VlTaskFunc.h"
+#include "verilog/vl/VlPrimitive.h"
+#include "verilog/vl/VlContAssign.h"
+#include "verilog/vl/VlModule.h"
+#include "verilog/vl/VlUdp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/ptview/GoToLine.cc
+/// @file GoToLine.cc
 /// @brief GoToLine の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GoToLine.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,18 +25,18 @@ GoToLine::GoToLine(QWidget* parent) :
   mLineEdit = new QLineEdit;
   mValidator = new QIntValidator(mLineEdit);
   mGotoButton = new QPushButton(tr("Go To"));
-  
+
   mLabel->setBuddy(mLineEdit);
   mLineEdit->setValidator(mValidator);
   mGotoButton->setDefault(true);
   mGotoButton->setEnabled(false);
-  
+
   connect(mLineEdit, SIGNAL(textChanged(const QString&)),
 	  this, SLOT(on_lineedit_changed(const QString&)));
 
   connect(mGotoButton, SIGNAL(clicked()),
 	  this, SLOT(on_goto_clicked()));
-  
+
   QHBoxLayout* hbox = new QHBoxLayout;
   hbox->addWidget(mLabel);
   hbox->addWidget(mLineEdit);

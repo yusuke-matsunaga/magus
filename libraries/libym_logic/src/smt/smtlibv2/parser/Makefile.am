@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_smt_parser.la \
-	libym_smt_parser_d.la \
-	libym_smt_parser_p.la
+	libsmtparser.la \
+	libsmtparser_d.la \
+	libsmtparser_p.la
 
 
 ############################################################
@@ -58,39 +58,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_smt_parser.la 用の変数の指定
+## libsmtparser.la 用の変数の指定
 ############################################################
 
-libym_smt_parser_la_CXXFLAGS = -O2
+libsmtparser_la_CXXFLAGS = -O2
 
-libym_smt_parser_la_SOURCES = $(COMMON_SOURCES)
+libsmtparser_la_SOURCES = $(COMMON_SOURCES)
 
-libym_smt_parser_la_LIBADD =
+libsmtparser_la_LIBADD =
 
-libym_smt_parser_la_LDFLAGS =
-
-
-############################################################
-## libym_smt_parser_d.la 用の変数の指定
-############################################################
-
-libym_smt_parser_d_la_CXXFLAGS = -O2 -g
-
-libym_smt_parser_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_smt_parser_d_la_LIBADD =
-
-libym_smt_parser_d_la_LDFLAGS =
+libsmtparser_la_LDFLAGS =
 
 
 ############################################################
-## libym_smt_parser_p.la 用の変数の指定
+## libsmtparser_d.la 用の変数の指定
 ############################################################
 
-libym_smt_parser_p_la_CXXFLAGS = -O2 -pg
+libsmtparser_d_la_CXXFLAGS = -O2 -g
 
-libym_smt_parser_p_la_SOURCES = $(COMMON_SOURCES)
+libsmtparser_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_smt_parser_p_la_LIBADD =
+libsmtparser_d_la_LIBADD =
 
-libym_smt_parser_p_la_LDFLAGS =
+libsmtparser_d_la_LDFLAGS =
+
+
+############################################################
+## libsmtparser_p.la 用の変数の指定
+############################################################
+
+libsmtparser_p_la_CXXFLAGS = -O2 -pg
+
+libsmtparser_p_la_SOURCES = $(COMMON_SOURCES)
+
+libsmtparser_p_la_LIBADD =
+
+libsmtparser_p_la_LDFLAGS =

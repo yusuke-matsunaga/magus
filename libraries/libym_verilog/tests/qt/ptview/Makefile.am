@@ -46,11 +46,13 @@ AM_CXXFLAGS = \
 	$(QT_CXXFLAGS)
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/parser/include \
-	-I$(top_srcdir)/parser/scanner \
-	-I$(top_builddir)/parser/main \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/parser/include \
+	-I$(top_srcdir)/src/parser/scanner \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_cell/include \
+	-I$(top_builddir)/../libym_utils/include \
+	-I$(top_builddir)/src/parser/main \
 	$(QT_CPPFLAGS)
 
 
@@ -108,8 +110,7 @@ BUILT_SOURCES = \
 	GoToLine.moc.cc
 
 ptview_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(top_builddir)/src/libym_verilog.la \
 	$(QT_LIBS) \
 	$(LDADD)
 

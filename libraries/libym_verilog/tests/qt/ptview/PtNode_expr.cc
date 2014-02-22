@@ -1,18 +1,16 @@
 
-/// @file libym_verilog/tests/vlview/PtNode_expr.cc
+/// @file PtNode_expr.cc
 /// @brief PtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PtNode_expr.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
-#include "ym_verilog/pt/PtExpr.h"
-#include "ym_verilog/pt/PtArray.h"
+#include "verilog/pt/PtExpr.h"
+#include "verilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

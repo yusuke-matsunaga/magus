@@ -1,16 +1,14 @@
 
-/// @file libym_verilog/tests/vlview/VmNode.cc
+/// @file VmNode.cc
 /// @brief VmNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmNode.h"
-#include "ym_verilog/VlMgr.h"
+#include "verilog/VlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

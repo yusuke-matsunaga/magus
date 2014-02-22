@@ -1,17 +1,15 @@
 #ifndef VLTESTLINEWATCHER_H
 #define VLTESTLINEWATCHER_H
 
-/// @file libym_verilog/tests/vltest/VlTestLineWatcher.h
+/// @file VlTestLineWatcher.h
 /// @brief VlTestLineWatcher のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlTestLineWatcher.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include <ym_verilog/VlLineWatcher.h>
+#include "verilog/VlLineWatcher.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -24,7 +22,7 @@ class VlTestLineWatcher :
   public VlLineWatcher
 {
 public:
-  
+
   // コンストラクタ
   VlTestLineWatcher(int line_unit);
 
@@ -37,7 +35,7 @@ public:
   void
   event_proc(int line);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

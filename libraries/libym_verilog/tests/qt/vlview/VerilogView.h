@@ -1,18 +1,16 @@
 #ifndef VLPARSETREEVIEW_H
 #define VLPARSETREEVIEW_H
 
-/// @file libym_verilog/tests/vlview/VlParseTreeView.h
+/// @file VlParseTreeView.h
 /// @brief VlParseTreeView のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlParseTreeView.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include <QTreeView>
-#include "ym_verilog/verilog.h"
+#include "verilog/verilog.h"
 #include "VerilogModel.h"
 
 class QItemSelection;
@@ -25,9 +23,9 @@ class VerilogView :
   public QTreeView
 {
   Q_OBJECT
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
   VerilogView(QWidget* parent = NULL);
@@ -42,7 +40,7 @@ public:
   void
   setModel(nsYm::nsVerilog::VerilogModel* model);
 
-  
+
 signals:
 
   /// @brief トークンが選択されたときに発生するシグナル．
@@ -55,8 +53,8 @@ signals:
 	       int start_column,
 	       int end_line,
 	       int end_column);
-  
-  
+
+
 protected:
 
   /// @brief selection が変化したときに呼ばれる関数
@@ -65,15 +63,15 @@ protected:
   selectionChanged(const QItemSelection& selected,
 		   const QItemSelection& deselected);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 内容を表すモデル．
   nsYm::nsVerilog::VerilogModel* mModel;
-  
+
 };
 
 #endif // VLPARSETREEVIEW_H

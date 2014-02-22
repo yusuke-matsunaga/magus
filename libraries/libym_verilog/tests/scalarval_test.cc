@@ -3,11 +3,11 @@
 /// @brief VlScalarVal のテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_verilog/VlScalarVal.h"
+#include "verilog/VlScalarVal.h"
 
 
 BEGIN_NAMESPACE_YM

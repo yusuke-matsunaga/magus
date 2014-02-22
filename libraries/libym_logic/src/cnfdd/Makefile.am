@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_cnfdd.la \
-	libym_logic_cnfdd_d.la \
-	libym_logic_cnfdd_p.la
+	libcnfdd.la \
+	libcnfdd_d.la \
+	libcnfdd_p.la
 
 
 ############################################################
@@ -108,39 +108,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_logic_cnfdd.la 用の変数の指定
+## libcnfdd.la 用の変数の指定
 ############################################################
 
-libym_logic_cnfdd_la_CXXFLAGS = -O2
+libcnfdd_la_CXXFLAGS = -O2
 
-libym_logic_cnfdd_la_SOURCES = $(COMMON_SOURCES)
+libcnfdd_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_cnfdd_la_LIBADD =
+libcnfdd_la_LIBADD =
 
-libym_logic_cnfdd_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_cnfdd_d.la 用の変数の指定
-############################################################
-
-libym_logic_cnfdd_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_cnfdd_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_cnfdd_d_la_LIBADD =
-
-libym_logic_cnfdd_d_la_LDFLAGS =
+libcnfdd_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_cnfdd_p.la 用の変数の指定
+## libcnfdd_d.la 用の変数の指定
 ############################################################
 
-libym_logic_cnfdd_p_la_CXXFLAGS = -O2 -pg
+libcnfdd_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_cnfdd_p_la_SOURCES = $(COMMON_SOURCES)
+libcnfdd_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_cnfdd_p_la_LIBADD =
+libcnfdd_d_la_LIBADD =
 
-libym_logic_cnfdd_p_la_LDFLAGS =
+libcnfdd_d_la_LDFLAGS =
+
+
+############################################################
+## libcnfdd_p.la 用の変数の指定
+############################################################
+
+libcnfdd_p_la_CXXFLAGS = -O2 -pg
+
+libcnfdd_p_la_SOURCES = $(COMMON_SOURCES)
+
+libcnfdd_p_la_LIBADD =
+
+libcnfdd_p_la_LDFLAGS =

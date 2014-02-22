@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_smt_core.la \
-	libym_logic_smt_core_d.la \
-	libym_logic_smt_core_p.la
+	libsmtcore.la \
+	libsmtcore_d.la \
+	libsmtcore_p.la
 
 
 ############################################################
@@ -64,39 +64,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_logic_smt_core.la 用の変数の指定
+## libsmtcore.la 用の変数の指定
 ############################################################
 
-libym_logic_smt_core_la_CXXFLAGS = -O2
+libsmtcore_la_CXXFLAGS = -O2
 
-libym_logic_smt_core_la_SOURCES = $(COMMON_SOURCES)
+libsmtcore_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_smt_core_la_LIBADD =
+libsmtcore_la_LIBADD =
 
-libym_logic_smt_core_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_smt_core_d.la 用の変数の指定
-############################################################
-
-libym_logic_smt_core_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_smt_core_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_smt_core_d_la_LIBADD =
-
-libym_logic_smt_core_d_la_LDFLAGS =
+libsmtcore_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_smt_core_p.la 用の変数の指定
+## libsmtcore_d.la 用の変数の指定
 ############################################################
 
-libym_logic_smt_core_p_la_CXXFLAGS = -O2 -pg
+libsmtcore_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_smt_core_p_la_SOURCES = $(COMMON_SOURCES)
+libsmtcore_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_smt_core_p_la_LIBADD =
+libsmtcore_d_la_LIBADD =
 
-libym_logic_smt_core_p_la_LDFLAGS =
+libsmtcore_d_la_LDFLAGS =
+
+
+############################################################
+## libsmtcore_p.la 用の変数の指定
+############################################################
+
+libsmtcore_p_la_CXXFLAGS = -O2 -pg
+
+libsmtcore_p_la_SOURCES = $(COMMON_SOURCES)
+
+libsmtcore_p_la_LIBADD =
+
+libsmtcore_p_la_LDFLAGS =

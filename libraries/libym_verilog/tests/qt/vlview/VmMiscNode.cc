@@ -1,16 +1,14 @@
 
-/// @file libym_verilog/tests/vlview/VmMiscNode.cc
+/// @file VmMiscNode.cc
 /// @brief VmMiscNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmMiscNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmMiscNode.h"
-#include "ym_verilog/vl/VlDelay.h"
+#include "verilog/vl/VlDelay.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -1,18 +1,16 @@
 
-/// @file libym_verilog/tests/ptview/PtNode_port.cc
+/// @file PtNode_port.cc
 /// @brief PtNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PtNode_port.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PtNode_port.h"
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
-#include "ym_verilog/pt/PtPort.h"
+#include "verilog/pt/PtPort.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

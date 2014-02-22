@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_bdd_bmc.la \
-	libym_bdd_bmc_d.la \
-	libym_bdd_bmc_p.la
+	libbdd_bmc.la \
+	libbdd_bmc_d.la \
+	libbdd_bmc_p.la
 
 
 ############################################################
@@ -63,42 +63,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_bdd_bmc.la 用の変数の指定
+## libbdd_bmc.la 用の変数の指定
 ############################################################
 
-libym_bdd_bmc_la_CXXFLAGS = -O2
+libbdd_bmc_la_CXXFLAGS = -O2
 
-libym_bdd_bmc_la_SOURCES = $(COMMON_SOURCES)
+libbdd_bmc_la_SOURCES = $(COMMON_SOURCES)
 
-libym_bdd_bmc_la_LIBADD =
+libbdd_bmc_la_LIBADD =
 
-libym_bdd_bmc_la_LDFLAGS = \
-	$(GMP_LIBS)
-
-
-############################################################
-## libym_bdd_bmc_d.la 用の変数の指定
-############################################################
-
-libym_bdd_bmc_d_la_CXXFLAGS = -O2 -g
-
-libym_bdd_bmc_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_bdd_bmc_d_la_LIBADD =
-
-libym_bdd_bmc_d_la_LDFLAGS = \
-	$(GMP_LIBS)
+libbdd_bmc_la_LDFLAGS =
 
 
 ############################################################
-## libym_bdd_bmc_p.la 用の変数の指定
+## libbdd_bmc_d.la 用の変数の指定
 ############################################################
 
-libym_bdd_bmc_p_la_CXXFLAGS = -O2 -pg
+libbdd_bmc_d_la_CXXFLAGS = -O2 -g
 
-libym_bdd_bmc_p_la_SOURCES = $(COMMON_SOURCES)
+libbdd_bmc_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_bdd_bmc_p_la_LIBADD =
+libbdd_bmc_d_la_LIBADD =
 
-libym_bdd_bmc_p_la_LDFLAGS = \
-	$(GMP_LIBS)
+libbdd_bmc_d_la_LDFLAGS =
+
+
+############################################################
+## libbdd_bmc_p.la 用の変数の指定
+############################################################
+
+libbdd_bmc_p_la_CXXFLAGS = -O2 -pg
+
+libbdd_bmc_p_la_SOURCES = $(COMMON_SOURCES)
+
+libbdd_bmc_p_la_LIBADD =
+
+libbdd_bmc_p_la_LDFLAGS =

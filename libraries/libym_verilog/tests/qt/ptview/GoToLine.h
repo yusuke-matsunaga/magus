@@ -1,13 +1,11 @@
 #ifndef GOTOLINE_H
 #define GOTOLINE_H
 
-/// @file libym_verilog/tests/ptview/GoToLine.h
+/// @file GoToLine.h
 /// @brief GoToLine のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TokenView.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -31,7 +29,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ/デストラクタ
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
   GoToLine(QWidget* parent = NULL);
@@ -44,7 +42,7 @@ public slots:
   //////////////////////////////////////////////////////////////////////
   // 内容を設定する関数．スロットでもある．
   //////////////////////////////////////////////////////////////////////
-  
+
   /// @brief 最小値を設定する．
   void
   set_minimum(int val);
@@ -52,7 +50,7 @@ public slots:
   /// @brief 最大値を設定する．
   void
   set_maximum(int val);
-  
+
   /// @brief 値を設定する．
   /// @param[in] val 設定する値
   void
@@ -68,7 +66,7 @@ signals:
   /// @param[in] val 変更後の値
   void
   on_goto(int val);
-  
+
 
 private slots:
   //////////////////////////////////////////////////////////////////////
@@ -88,7 +86,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QLabel* mLabel;
 
@@ -100,7 +98,7 @@ private:
 
   // "GoTo" ボタン
   QPushButton* mGotoButton;
-  
+
 };
 
 #endif // GOTOLINE_H

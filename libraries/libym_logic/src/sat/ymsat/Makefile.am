@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_sat_ymsat.la \
-	libym_sat_ymsat_p.la \
-	libym_sat_ymsat_d.la
+	libymsat.la \
+	libymsat_p.la \
+	libymsat_d.la
 
 
 ############################################################
@@ -68,39 +68,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_sat_ymsat.la 用の変数の指定
+## libymsat.la 用の変数の指定
 ############################################################
 
-libym_sat_ymsat_la_CXXFLAGS = -O2
+libymsat_la_CXXFLAGS = -O2
 
-libym_sat_ymsat_la_SOURCES = $(COMMON_SOURCES)
+libymsat_la_SOURCES = $(COMMON_SOURCES)
 
-libym_sat_ymsat_la_LIBADD =
+libymsat_la_LIBADD =
 
-libym_sat_ymsat_la_LDFLAGS =
-
-
-############################################################
-## libym_sat_ymsat_d.la 用の変数の指定
-############################################################
-
-libym_sat_ymsat_d_la_CXXFLAGS = -O2 -g
-
-libym_sat_ymsat_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_sat_ymsat_d_la_LIBADD =
-
-libym_sat_ymsat_d_la_LDFLAGS =
+libymsat_la_LDFLAGS =
 
 
 ############################################################
-## libym_sat_ymsat_p.la 用の変数の指定
+## libymsat_d.la 用の変数の指定
 ############################################################
 
-libym_sat_ymsat_p_la_CXXFLAGS = -O2 -pg
+libymsat_d_la_CXXFLAGS = -O2 -g
 
-libym_sat_ymsat_p_la_SOURCES = $(COMMON_SOURCES)
+libymsat_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_sat_ymsat_p_la_LIBADD =
+libymsat_d_la_LIBADD =
 
-libym_sat_ymsat_p_la_LDFLAGS =
+libymsat_d_la_LDFLAGS =
+
+
+############################################################
+## libymsat_p.la 用の変数の指定
+############################################################
+
+libymsat_p_la_CXXFLAGS = -O2 -pg
+
+libymsat_p_la_SOURCES = $(COMMON_SOURCES)
+
+libymsat_p_la_LIBADD =
+
+libymsat_p_la_LDFLAGS =

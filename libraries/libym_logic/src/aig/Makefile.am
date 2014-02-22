@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_aig.la \
-	libym_logic_aig_d.la \
-	libym_logic_aig_p.la
+	libaig.la \
+	libaig_d.la \
+	libaig_p.la
 
 
 ############################################################
@@ -66,36 +66,36 @@ COMMON_SOURCES = \
 ## libym_aig.la 用の変数の指定
 ############################################################
 
-libym_logic_aig_la_CXXFLAGS = -O2
+libaig_la_CXXFLAGS = -O2
 
-libym_logic_aig_la_SOURCES = $(COMMON_FLAGS)
+libaig_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_aig_la_LIBADD =
+libaig_la_LIBADD =
 
-libym_logic_aig_la_LDFLAGS =
+libaig_la_LDFLAGS =
 
 
 ############################################################
 ## libym_aig_d.la 用の変数の指定
 ############################################################
 
-libym_logic_aig_d_la_CXXFLAGS = -O2 -g
+libaig_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_aig_d_la_SOURCES = $(COMMON_FLAGS)
+libaig_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_aig_d_la_LIBADD =
+libaig_d_la_LIBADD =
 
-libym_logic_aig_d_la_LDFLAGS =
+libaig_d_la_LDFLAGS =
 
 
 ############################################################
 ## libym_aig_p.la 用の変数の指定
 ############################################################
 
-libym_logic_aig_p_la_CXXFLAGS = -O2 -pg
+libaig_p_la_CXXFLAGS = -O2 -pg
 
-libym_logic_aig_p_la_SOURCES = $(COMMON_FLAGS)
+libaig_p_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_aig_p_la_LIBADD =
+libaig_p_la_LIBADD =
 
-libym_logic_aig_p_la_LDFLAGS =
+libaig_p_la_LDFLAGS =

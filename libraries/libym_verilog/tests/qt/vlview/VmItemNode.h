@@ -1,19 +1,17 @@
 #ifndef VMITEMNODE_H
 #define VMITEMNODE_H
 
-/// @file libym_verilog/tests/vlview/VmItemNode.h
+/// @file VmItemNode.h
 /// @brief VmItemNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmItemNode.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmNode.h"
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/vl/VlFwd.h"
+#include "verilog/verilog.h"
+#include "verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -40,12 +38,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -59,15 +57,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パラメータ代入文の配列
   vector<const VlParamAssign*> mParamAssignArray;
-  
+
 };
 
 
@@ -93,12 +91,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -112,15 +110,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // パラメータ代入文
   const VlParamAssign* mParamAssign;
-  
+
 };
 
 
@@ -146,12 +144,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -165,15 +163,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // defparamの配列
   vector<const VlDefParam*> mDefParamArray;
-  
+
 };
 
 
@@ -185,7 +183,7 @@ class VmDefParamNode :
   public VmNode
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] defparam defparam文
   VmDefParamNode(const VlDefParam* defparam);
@@ -199,12 +197,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -218,12 +216,12 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // defparam文
   const VlDefParam* mDefParam;
 
@@ -254,12 +252,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -273,15 +271,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // スコープの配列
   vector<const VlNamedObj*> mScopeArray;
-  
+
 };
 
 
@@ -293,7 +291,7 @@ class VmScopeNode :
   public VmNode1
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
   /// @param[in] scope スコープ
@@ -309,12 +307,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -328,12 +326,12 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // スコープ
   const VlNamedObj* mScope;
 
@@ -364,12 +362,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -383,15 +381,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // タスクの配列
   vector<const VlTaskFunc*> mTaskArray;
-  
+
 };
 
 
@@ -403,7 +401,7 @@ class VmTaskNode :
   public VmNode1
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
   /// @param[in] task タスク
@@ -419,12 +417,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -438,12 +436,12 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // タスク
   const VlTaskFunc* mTask;
 
@@ -474,12 +472,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -493,15 +491,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 関数の配列
   vector<const VlTaskFunc*> mFunctionArray;
-  
+
 };
 
 
@@ -513,7 +511,7 @@ class VmFunctionNode :
   public VmNode1
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] vl_mgr VlMgr
   /// @param[in] function 関数
@@ -529,12 +527,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -548,12 +546,12 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 関数
   const VlTaskFunc* mFunction;
 
@@ -582,12 +580,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -601,15 +599,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // プリミティブ配列の配列
   vector<const VlPrimArray*> mPrimArrayArray;
-  
+
 };
 
 
@@ -621,7 +619,7 @@ class VmPrimArrayNode :
   public VmNode
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] primarray プリミティブ配列
   VmPrimArrayNode(const VlPrimArray* primarray);
@@ -635,12 +633,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -654,12 +652,12 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // プリミティブ配列
   const VlPrimArray* mPrimArray;
 };
@@ -687,12 +685,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -706,15 +704,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // プリミティブの配列
   vector<const VlPrimitive*> mPrimArray;
-  
+
 };
 
 
@@ -740,12 +738,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -759,15 +757,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // プリミティブ
   const VlPrimitive* mPrimitive;
-  
+
 };
 
 
@@ -779,7 +777,7 @@ class VmPrimTermListNode :
   public VmNode
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] primitive 親のプリミティブ
   VmPrimTermListNode(const VlPrimitive* primitive);
@@ -793,12 +791,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -812,15 +810,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 親のプリミティブ
   const VlPrimitive* mPrimitive;
-  
+
 };
 
 
@@ -832,7 +830,7 @@ class VmPrimTermNode :
   public VmNode
 {
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] prim_term プリミティブの端子
   VmPrimTermNode(const VlPrimTerm* prim_term);
@@ -846,12 +844,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -865,12 +863,12 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // プリミティブの端子
   const VlPrimTerm* mPrimTerm;
 
@@ -899,12 +897,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -918,15 +916,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // continuous assign 文の配列
   vector<const VlContAssign*> mContAssignArray;
-  
+
 };
 
 
@@ -952,12 +950,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -971,15 +969,15 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // continuous assign 文
   const VlContAssign* mContAssign;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_zdd.la \
-	libym_logic_zdd_d.la \
-	libym_logic_zdd_p.la
+	libzdd.la \
+	libzdd_d.la \
+	libzdd_p.la
 
 
 ############################################################
@@ -104,39 +104,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_logic_zdd.la 用の変数の指定
+## libzdd.la 用の変数の指定
 ############################################################
 
-libym_logic_zdd_la_CXXFLAGS = -O2
+libzdd_la_CXXFLAGS = -O2
 
-libym_logic_zdd_la_SOURCES = $(COMMON_SOURCES)
+libzdd_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_zdd_la_LIBADD =
+libzdd_la_LIBADD =
 
-libym_logic_zdd_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_zdd_d.la 用の変数の指定
-############################################################
-
-libym_logic_zdd_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_zdd_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_zdd_d_la_LIBADD =
-
-libym_logic_zdd_d_la_LDFLAGS =
+libzdd_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_zdd_p.la 用の変数の指定
+## libzdd_d.la 用の変数の指定
 ############################################################
 
-libym_logic_zdd_p_la_CXXFLAGS = -O2 -pg
+libzdd_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_zdd_p_la_SOURCES = $(COMMON_SOURCES)
+libzdd_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_zdd_p_la_LIBADD =
+libzdd_d_la_LIBADD =
 
-libym_logic_zdd_p_la_LDFLAGS =
+libzdd_d_la_LDFLAGS =
+
+
+############################################################
+## libzdd_p.la 用の変数の指定
+############################################################
+
+libzdd_p_la_CXXFLAGS = -O2 -pg
+
+libzdd_p_la_SOURCES = $(COMMON_SOURCES)
+
+libzdd_p_la_LIBADD =
+
+libzdd_p_la_LDFLAGS =

@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_sat_dimacs.la \
-	libym_sat_dimacs_d.la \
-	libym_sat_dimacs_p.la
+	libdimacs.la \
+	libdimacs_d.la \
+	libdimacs_p.la
 
 
 ############################################################
@@ -58,39 +58,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_sat_dimacs.la 用の変数の指定
+## libdimacs.la 用の変数の指定
 ############################################################
 
-libym_sat_dimacs_la_CXXFLAGS = -O2
+libdimacs_la_CXXFLAGS = -O2
 
-libym_sat_dimacs_la_SOURCES = $(COMMON_SOURCES)
+libdimacs_la_SOURCES = $(COMMON_SOURCES)
 
-libym_sat_dimacs_la_LIBADD =
+libdimacs_la_LIBADD =
 
-libym_sat_dimacs_la_LDFLAGS =
-
-
-############################################################
-## libym_sat_dimacs_d.la 用の変数の指定
-############################################################
-
-libym_sat_dimacs_d_la_CXXFLAGS = -O2 -g
-
-libym_sat_dimacs_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_sat_dimacs_d_la_LIBADD =
-
-libym_sat_dimacs_d_la_LDFLAGS =
+libdimacs_la_LDFLAGS =
 
 
 ############################################################
-## libym_sat_dimacs_p.la 用の変数の指定
+## libdimacs_d.la 用の変数の指定
 ############################################################
 
-libym_sat_dimacs_p_la_CXXFLAGS = -O2 -pg
+libdimacs_d_la_CXXFLAGS = -O2 -g
 
-libym_sat_dimacs_p_la_SOURCES = $(COMMON_SOURCES)
+libdimacs_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_sat_dimacs_p_la_LIBADD =
+libdimacs_d_la_LIBADD =
 
-libym_sat_dimacs_p_la_LDFLAGS =
+libdimacs_d_la_LDFLAGS =
+
+
+############################################################
+## libdimacs_p.la 用の変数の指定
+############################################################
+
+libdimacs_p_la_CXXFLAGS = -O2 -pg
+
+libdimacs_p_la_SOURCES = $(COMMON_SOURCES)
+
+libdimacs_p_la_LIBADD =
+
+libdimacs_p_la_LDFLAGS =

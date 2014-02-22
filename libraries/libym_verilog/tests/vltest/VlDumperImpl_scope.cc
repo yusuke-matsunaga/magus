@@ -1,23 +1,17 @@
 
-/// @file libym_verilog/elb/VlDumperImpl_scope.cc
+/// @file VlDumperImpl_scope.cc
 /// @brief VlDumperImpl の実装ファイル (scope担当)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlDumperImpl_scope.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#if HAVE_CONFIG_H
-#include <ymconfig.h>
-#endif
-
 #include "VlDumperImpl.h"
 
-#include <ym_verilog/VlMgr.h>
-#include <ym_verilog/vl/VlModule.h>
-#include <ym_verilog/vl/VlTaskFunc.h>
+#include "verilog/VlMgr.h"
+#include "verilog/vl/VlModule.h"
+#include "verilog/vl/VlTaskFunc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

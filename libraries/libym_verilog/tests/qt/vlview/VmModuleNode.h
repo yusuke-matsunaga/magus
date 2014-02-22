@@ -1,19 +1,17 @@
 #ifndef VMMODULEMODE_H
 #define VMMODULEMODE_H
 
-/// @file libym_verilog/tests/vlview/VmModuleNode.h
+/// @file VmModuleNode.h
 /// @brief VmModuleNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlPtNode_module.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmNode.h"
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/vl/VlFwd.h"
+#include "verilog/verilog.h"
+#include "verilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -42,12 +40,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -69,7 +67,7 @@ private:
 
   // モジュール配列の配列
   vector<const VlModuleArray*> mModuleArrayArray;
-  
+
 };
 
 
@@ -97,12 +95,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -116,7 +114,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -124,7 +122,7 @@ private:
 
   // 対応する ModuleArray
   const VlModuleArray* mModuleArray;
-  
+
 };
 
 
@@ -152,12 +150,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -171,7 +169,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -179,7 +177,7 @@ private:
 
   // モジュールの配列
   vector<const VlModule*> mModuleArray;
-  
+
 };
 
 
@@ -205,12 +203,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -223,7 +221,7 @@ private:
   virtual
   void
   expand() const;
-  
+
 };
 
 
@@ -251,12 +249,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -270,7 +268,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -278,7 +276,7 @@ private:
 
   // 対応する Module
   const VlModule* mModule;
-  
+
 };
 
 
@@ -304,12 +302,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -323,7 +321,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -331,7 +329,7 @@ private:
 
   // 対応する Module
   const VlModule* mModule;
-  
+
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -356,12 +354,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -375,7 +373,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -383,7 +381,7 @@ private:
 
   // 対応するポート
   const VlPort* mPort;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

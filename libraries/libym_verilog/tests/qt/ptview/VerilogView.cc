@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/ptview/VerilogView.cc
+/// @file VerilogView.cc
 /// @brief VerilogView の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VerilogView.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -17,18 +15,18 @@
 #include <QTextStream>
 #include <iostream>
 
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のウィジェット
 VerilogView::VerilogView(QWidget* parent) :
   QWidget(parent)
 {
   mTextEdit = new QTextEdit;
-  
+
   mTextEdit->setReadOnly(true);
 
   mHighlighter = new VerilogSyntaxHighlighter(mTextEdit);
-  
+
   QHBoxLayout* layout = new QHBoxLayout;
   layout->addWidget(mTextEdit);
   setLayout(layout);
@@ -46,7 +44,7 @@ bool
 VerilogView::open(const char* file_name)
 {
   using namespace std;
-  
+
   QFile file(file_name);
   if ( !file.open(QIODevice::ReadOnly) ) {
     cerr << file_name << " : Could not open: "

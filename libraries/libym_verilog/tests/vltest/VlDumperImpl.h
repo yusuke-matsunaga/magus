@@ -1,19 +1,17 @@
-#ifndef LIBYM_VERILOG_ELB_VLDUMPERIMPL_H
-#define LIBYM_VERILOG_ELB_VLDUMPERIMPL_H
+#ifndef VLDUMPERIMPL_H
+#define VLDUMPERIMPL_H
 
-/// @file libym_verilog/elb/VlDumperImpl.h
+/// @file VlDumperImpl.h
 /// @brief VlDumperImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlDumperImpl.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/vl/VlFwd.h"
-#include "ym_utils/FileRegion.h"
+#include "verilog/verilog.h"
+#include "verilog/vl/VlFwd.h"
+#include "utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -554,4 +552,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LIBYM_VERILOG_ELB_VLDUMPERIMPL_H
+#endif // VLDUMPERIMPL_H

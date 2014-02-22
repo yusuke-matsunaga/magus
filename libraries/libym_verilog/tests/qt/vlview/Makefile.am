@@ -46,8 +46,11 @@ AM_CXXFLAGS = \
 	$(QT_CXXFLAGS)
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_logic/include \
+	-I$(top_srcdir)/../libym_cell/include \
+	-I$(top_builddir)/../libym_utils/include \
 	$(QT_CPPFLAGS)
 
 
@@ -91,8 +94,7 @@ BUILT_SOURCES = \
 	VerilogView.moc.cc
 
 vlview_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(top_builddir)/src/libym_verilog.la \
 	$(QT_LIBS) \
 	$(LDADD)
 

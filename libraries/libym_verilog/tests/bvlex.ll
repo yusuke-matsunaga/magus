@@ -1,16 +1,14 @@
 %{
 
-/// @file libym_verilog/tests/bvlex.ll
+/// @file bvlex.ll
 /// @brief BitVector のテスト用簡易電卓の字句解析用ソース
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bvlex.ll 700 2007-05-31 00:41:30Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_verilog/BitVector.h"
+#include "verilog/BitVector.h"
 
 using namespace std;
 using nsYm::nsVerilog::BitVector;

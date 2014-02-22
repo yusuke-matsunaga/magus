@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_minisat.la \
-	libym_minisat_d.la \
-	libym_minisat_p.la
+	libminisat.la \
+	libminisat_d.la \
+	libminisat_p.la
 
 
 ############################################################
@@ -61,39 +61,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_minisat.la 用の変数の指定
+## libminisat.la 用の変数の指定
 ############################################################
 
-libym_minisat_la_CXXFLAGS = -O2
+libminisat_la_CXXFLAGS = -O2
 
-libym_minisat_la_SOURCES = $(COMMON_SOURCES)
+libminisat_la_SOURCES = $(COMMON_SOURCES)
 
-libym_minisat_la_LIBADD =
+libminisat_la_LIBADD =
 
-libym_minisat_la_LDFLAGS =
-
-
-############################################################
-## libym_minisat_d.la 用の変数の指定
-############################################################
-
-libym_minisat_d_la_CXXFLAGS = -O2 -g
-
-libym_minisat_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_minisat_d_la_LIBADD =
-
-libym_minisat_d_la_LDFLAGS =
+libminisat_la_LDFLAGS =
 
 
 ############################################################
-## libym_minisat_p.la 用の変数の指定
+## libminisat_d.la 用の変数の指定
 ############################################################
 
-libym_minisat_p_la_CXXFLAGS = -O2 -pg
+libminisat_d_la_CXXFLAGS = -O2 -g
 
-libym_minisat_p_la_SOURCES = $(COMMON_SOURCES)
+libminisat_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_minisat_p_la_LIBADD =
+libminisat_d_la_LIBADD =
 
-libym_minisat_p_la_LDFLAGS =
+libminisat_d_la_LDFLAGS =
+
+
+############################################################
+## libminisat_p.la 用の変数の指定
+############################################################
+
+libminisat_p_la_CXXFLAGS = -O2 -pg
+
+libminisat_p_la_SOURCES = $(COMMON_SOURCES)
+
+libminisat_p_la_LIBADD =
+
+libminisat_p_la_LDFLAGS =

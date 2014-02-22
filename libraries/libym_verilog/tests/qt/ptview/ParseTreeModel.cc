@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/ptview/ParseTreeModel.cc
+/// @file ParseTreeModel.cc
 /// @brief ParseTreeModel の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ParseTreeModel.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -28,7 +26,7 @@ ParseTreeModel::ParseTreeModel(QObject* parent) :
 ParseTreeModel::~ParseTreeModel()
 {
 }
-  
+
 // @brief 対応するインデックスを返す．
 // @param[in] row 行番号
 // @param[in] column 列番号
@@ -42,7 +40,7 @@ ParseTreeModel::index(int row,
   if ( !node ) {
     return QModelIndex();
   }
-  
+
   PtNode* cnode = node->child(row);
   cnode->mParentIndex = parent;
   return createIndex(row, column, cnode);
@@ -61,7 +59,7 @@ ParseTreeModel::parent(const QModelIndex& child) const
     return QModelIndex();
   }
 }
-  
+
 // @brief コラム数を返す．
 int
 ParseTreeModel::columnCount(const QModelIndex& parent) const
@@ -69,7 +67,7 @@ ParseTreeModel::columnCount(const QModelIndex& parent) const
   // ラベル, 値 の2つ
   return 2;
 }
-  
+
 // @brief 行数を返す．
 int
 ParseTreeModel::rowCount(const QModelIndex& parent) const
@@ -82,7 +80,7 @@ ParseTreeModel::rowCount(const QModelIndex& parent) const
     return 0;
   }
 }
-  
+
 // @brief 該当するデータを返す．
 QVariant
 ParseTreeModel::data(const QModelIndex& index,
@@ -121,7 +119,7 @@ ParseTreeModel::set_pt(const VlMgr& vl_mgr)
   delete mRootNode;
   mRootNode = new RootNode(vl_mgr);
 }
-  
+
 // @brief トークンのファイル上の位置を返す．
 FileRegion
 ParseTreeModel::loc(const QModelIndex& index)

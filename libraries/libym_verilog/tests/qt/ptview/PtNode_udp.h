@@ -1,20 +1,18 @@
 #ifndef PTNODE_UDP_H
 #define PTNODE_UDP_H
 
-/// @file libym_verilog/tests/ptview/PtNode_udp.h
+/// @file PtNode_udp.h
 /// @brief PtNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PtNode_udp.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PtNode.h"
-#include "ym_verilog/verilog.h"
-#include "ym_verilog/pt/PtP.h"
-#include "ym_verilog/pt/PtArray.h"
+#include "verilog/verilog.h"
+#include "verilog/pt/PtP.h"
+#include "verilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -41,12 +39,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -60,7 +58,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -68,7 +66,7 @@ private:
 
   // 対応する UDP
   const PtUdp* mUdp;
-  
+
 };
 
 
@@ -94,12 +92,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -113,7 +111,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -121,7 +119,7 @@ private:
 
   // 対応する UDP
   const PtUdp* mUdp;
-  
+
 };
 
 
@@ -147,12 +145,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -166,7 +164,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -174,7 +172,7 @@ private:
 
   // 対応するテーブルの配列
   PtUdpEntryArray mTableArray;
-  
+
 };
 
 
@@ -200,12 +198,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -219,7 +217,7 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
@@ -227,7 +225,7 @@ private:
 
   // 対応するテーブル
   const PtUdpEntry* mTable;
-  
+
 };
 
 
@@ -255,12 +253,12 @@ public:
 
   /// @brief データを返す．
   /// @param[in] column コラム番号
-  /// @param[in] role 
+  /// @param[in] role
   virtual
   QVariant
   data(int column,
        int role) const;
-    
+
   /// @brief 対象のファイル上での位置を返す．
   virtual
   FileRegion
@@ -274,18 +272,18 @@ private:
   void
   expand() const;
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // ラベル
   QString mLabel;
-  
+
   // 値
   const PtUdpValue* mVal;
-  
+
 };
 
 END_NAMESPACE_YM_VERILOG

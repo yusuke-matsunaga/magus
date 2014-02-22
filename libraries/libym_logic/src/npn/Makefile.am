@@ -31,9 +31,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libym_logic_npn.la \
-	libym_logic_npn_d.la \
-	libym_logic_npn_p.la
+	libnpn.la \
+	libnpn_d.la \
+	libnpn_p.la
 
 
 ############################################################
@@ -65,39 +65,39 @@ COMMON_SOURCES = \
 
 
 ############################################################
-## libym_logic_npn.la 用の変数の指定
+## libnpn.la 用の変数の指定
 ############################################################
 
-libym_logic_npn_la_CXXFLAGS = -O2
+libnpn_la_CXXFLAGS = -O2
 
-libym_logic_npn_la_SOURCES = $(COMMON_SOURCES)
+libnpn_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_npn_la_LIBADD =
+libnpn_la_LIBADD =
 
-libym_logic_npn_la_LDFLAGS =
-
-
-############################################################
-## libym_logic_npn.la 用の変数の指定
-############################################################
-
-libym_logic_npn_d_la_CXXFLAGS = -O2 -g
-
-libym_logic_npn_d_la_SOURCES = $(COMMON_SOURCES)
-
-libym_logic_npn_d_la_LIBADD =
-
-libym_logic_npn_d_la_LDFLAGS =
+libnpn_la_LDFLAGS =
 
 
 ############################################################
-## libym_logic_npn_p.la 用の変数の指定
+## libnpn.la 用の変数の指定
 ############################################################
 
-libym_logic_npn_p_la_CXXFLAGS = -O2 -pg
+libnpn_d_la_CXXFLAGS = -O2 -g
 
-libym_logic_npn_p_la_SOURCES = $(COMMON_SOURCES)
+libnpn_d_la_SOURCES = $(COMMON_SOURCES)
 
-libym_logic_npn_p_la_LIBADD =
+libnpn_d_la_LIBADD =
 
-libym_logic_npn_p_la_LDFLAGS =
+libnpn_d_la_LDFLAGS =
+
+
+############################################################
+## libnpn_p.la 用の変数の指定
+############################################################
+
+libnpn_p_la_CXXFLAGS = -O2 -pg
+
+libnpn_p_la_SOURCES = $(COMMON_SOURCES)
+
+libnpn_p_la_LIBADD =
+
+libnpn_p_la_LDFLAGS =

@@ -1,11 +1,9 @@
 
-/// @file libym_verilog/tests/vlview/VlView.cc
+/// @file VlView.cc
 /// @brief VlView の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlView.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,16 +14,16 @@
 #include <QTextStream>
 #include <iostream>
 
-  
+
 // @brief コンストラクタ
 // @param[in] parent 親のウィジェット
 VlView::VlView(QWidget* parent) :
   QWidget(parent)
 {
   mTextEdit = new QTextEdit;
-  
+
   mTextEdit->setReadOnly(true);
-  
+
   QHBoxLayout* layout = new QHBoxLayout;
   layout->addWidget(mTextEdit);
   setLayout(layout);
@@ -43,7 +41,7 @@ bool
 VlView::open(const char* file_name)
 {
   using namespace std;
-  
+
   QFile file(file_name);
   if ( !file.open(QIODevice::ReadOnly) ) {
     cerr << file_name << " : Could not open: "
@@ -80,7 +78,7 @@ VlView::cursor(int start_line,
   cursor->setPosition(xy2pos(end_line, end_column), QTextCursor::KeepAnchor);
   return cursor;
 }
-  
+
 // @brief 指定された領域を強調表示する．
 void
 VlView::hilight(QTextCursor* cursor)
@@ -111,7 +109,7 @@ VlView::hilight(int start_line,
   cursor.setPosition(end_pos, QTextCursor::MoveAnchor);
   int start_pos = xy2pos(start_line, start_column);
   cursor.setPosition(start_pos, QTextCursor::KeepAnchor);
-  
+
   mTextEdit->setTextCursor(cursor);
   mTextEdit->ensureCursorVisible();
 }

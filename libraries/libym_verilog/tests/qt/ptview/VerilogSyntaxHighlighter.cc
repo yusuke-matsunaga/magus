@@ -1,9 +1,9 @@
 
-/// @file libym_verilog/tests/ptview/VerilogSyntaxHighlighter.cc
+/// @file VerilogSyntaxHighlighter.cc
 /// @brief VerilogSyntaxHighlighter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,7 +27,7 @@ VerilogSyntaxHighlighter::VerilogSyntaxHighlighter(QTextEdit* parent) :
   mErrorColor = Qt::red;
 
   set_format();
-  
+
   // 予約語の登録
   mKeywordHash.insert("always", 1);
   mKeywordHash.insert("and", 1);
@@ -152,7 +152,7 @@ VerilogSyntaxHighlighter::VerilogSyntaxHighlighter(QTextEdit* parent) :
   mKeywordHash.insert("wor", 1);
   mKeywordHash.insert("xor", 1);
   mKeywordHash.insert("xnor", 1);
-  
+
   mKeywordHash.insert("$setup", 1);
   mKeywordHash.insert("$hold", 1);
   mKeywordHash.insert("$setuphold", 1);
@@ -179,15 +179,15 @@ VerilogSyntaxHighlighter::set_format()
   mNormalFormat.setFont(mFont);
   mNormalFormat.setForeground(mNormalColor);
   mNormalFormat.setFontFixedPitch(true);
-  
+
   mIdentifierFormat.setFont(mFont);
   mIdentifierFormat.setForeground(mIdentifierColor);
   mIdentifierFormat.setFontFixedPitch(true);
-  
+
   mKeywordFormat.setFont(mFont);
   mKeywordFormat.setForeground(mKeywordColor);
   mKeywordFormat.setFontFixedPitch(true);
-  
+
   mStringFormat.setFont(mFont);
   mStringFormat.setForeground(mStringColor);
   mStringFormat.setFontFixedPitch(true);
@@ -341,7 +341,7 @@ VerilogSyntaxHighlighter::highlightBlock(const QString& text)
   if ( state == -1 ) {
     state = kNormal;
   }
-  
+
   bool in_comment = static_cast<bool>((state >> 4) & 1);
   state &= 15;
   int pos = 0;
@@ -527,7 +527,7 @@ VerilogSyntaxHighlighter::highlightBlock(const QString& text)
       }
       state = kNormal;
       break;
-      
+
     case kOct:
       if ( !is_octchar(text[pos]) ) {
 	// 次の区切りまでエラー
@@ -552,7 +552,7 @@ VerilogSyntaxHighlighter::highlightBlock(const QString& text)
       }
       state = kNormal;
       break;
-      
+
     case kDec:
       if ( !is_decchar(text[pos]) ) {
 	// 次の区切りまでエラー
@@ -577,7 +577,7 @@ VerilogSyntaxHighlighter::highlightBlock(const QString& text)
       }
       state = kNormal;
       break;
-      
+
     case kHex:
       if ( !is_hexchar(text[pos]) ) {
 	// 次の区切りまでエラー
@@ -641,4 +641,3 @@ VerilogSyntaxHighlighter::highlightBlock(const QString& text)
   }
   setCurrentBlockState(state);
 }
-

@@ -1,25 +1,23 @@
 
-/// @file libym_verilog/elb/VlDumperImpl_decl.cc
+/// @file VlDumperImpl_decl.cc
 /// @brief VlDumper の実装ファイル (decl担当)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VlDumperImpl_decl.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VlDumperImpl.h"
 
-#include "ym_verilog/VlMgr.h"
-#include "ym_verilog/VlValue.h"
-#include "ym_verilog/vl/VlIODecl.h"
-#include "ym_verilog/vl/VlDecl.h"
-#include "ym_verilog/vl/VlDeclArray.h"
-#include "ym_verilog/vl/VlParamAssign.h"
-#include "ym_verilog/vl/VlModule.h"
-#include "ym_verilog/vl/VlUdp.h"
-#include "ym_verilog/vl/VlTaskFunc.h"
+#include "verilog/VlMgr.h"
+#include "verilog/VlValue.h"
+#include "verilog/vl/VlIODecl.h"
+#include "verilog/vl/VlDecl.h"
+#include "verilog/vl/VlDeclArray.h"
+#include "verilog/vl/VlParamAssign.h"
+#include "verilog/vl/VlModule.h"
+#include "verilog/vl/VlUdp.h"
+#include "verilog/vl/VlTaskFunc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

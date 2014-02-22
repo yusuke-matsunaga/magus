@@ -1,18 +1,16 @@
 #ifndef TOKENVIEW_H
 #define TOKENVIEW_H
 
-/// @file libym_verilog/tests/ptview/TokenView.h
+/// @file TokenView.h
 /// @brief TokenView のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: TokenView.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2009 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include <QTableView>
-#include <ym_utils/FileRegion.h>
+#include "utils/FileRegion.h"
 
 
 class TokenListModel;
@@ -26,11 +24,11 @@ class TokenView :
   public QTableView
 {
   Q_OBJECT
-  
+
   typedef nsYm::FileRegion FileRegion;
-  
+
 public:
-  
+
   /// @brief コンストラクタ
   /// @param[in] parent 親のウィジェット
   TokenView(QWidget* parent = NULL);
@@ -45,7 +43,7 @@ public:
   void
   setModel(TokenListModel* model);
 
-  
+
 signals:
 
   /// @brief トークンが選択されたときに発生するシグナル．
@@ -58,8 +56,8 @@ signals:
 	       int start_column,
 	       int end_line,
 	       int end_column);
-  
-  
+
+
 protected:
 
   /// @brief selection が変化したときに呼ばれる関数
@@ -68,15 +66,15 @@ protected:
   selectionChanged(const QItemSelection& selected,
 		   const QItemSelection& deselected);
 
-  
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-  
+
   // 内容を表すモデル．
   TokenListModel* mModel;
-  
+
 };
 
 #endif // TOKENVIEW_H

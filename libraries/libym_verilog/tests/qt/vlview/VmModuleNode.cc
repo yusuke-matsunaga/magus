@@ -1,19 +1,17 @@
 
-/// @file libym_verilog/tests/vlview/VmModuleNode.cc
+/// @file VmModuleNode.cc
 /// @brief VmModuleNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: VmModuleNode.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "VmModuleNode.h"
 #include "VmMiscNode.h"
-#include "ym_verilog/VlMgr.h"
-#include "ym_verilog/vl/VlModule.h"
-#include "ym_verilog/vl/VlPort.h"
+#include "verilog/VlMgr.h"
+#include "verilog/vl/VlModule.h"
+#include "verilog/vl/VlPort.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -67,7 +65,7 @@ VmModuleArrayListNode::~VmModuleArrayListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmModuleArrayListNode::data(int column,
 		       int role) const
@@ -122,7 +120,7 @@ VmModuleArrayNode::~VmModuleArrayNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmModuleArrayNode::data(int column,
 			int role) const
@@ -178,7 +176,7 @@ VmModuleInstListNode::~VmModuleInstListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmModuleInstListNode::data(int column,
 			   int role) const
@@ -231,7 +229,7 @@ VmModuleListNode::~VmModuleListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmModuleListNode::data(int column,
 		       int role) const
@@ -287,7 +285,7 @@ VmModuleNode::~VmModuleNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmModuleNode::data(int column,
 		   int role) const
@@ -366,7 +364,7 @@ VmModuleNode::expand() const
   add_child( new VmUdNode(mModule->unconn_drive()) );
   add_child( new VmDelayModeNode(mModule->def_delay_mode()) );
   add_int("vpiDefaultDecayTime", mModule->def_decay_time());
-  
+
   add_str("Config", mModule->config());
   add_str("Library", mModule->library());
   add_str("Cell", mModule->cell());
@@ -406,7 +404,7 @@ VmPortListNode::~VmPortListNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPortListNode::data(int column,
 		     int role) const
@@ -458,7 +456,7 @@ VmPortNode::~VmPortNode()
 
 // @brief データを返す．
 // @param[in] column コラム番号
-// @param[in] role 
+// @param[in] role
 QVariant
 VmPortNode::data(int column,
 		 int role) const
@@ -478,7 +476,7 @@ VmPortNode::data(int column,
   }
   return QVariant();
 }
-    
+
 // @brief 対象のファイル上での位置を返す．
 FileRegion
 VmPortNode::loc() const

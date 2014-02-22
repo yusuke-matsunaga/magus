@@ -6,15 +6,15 @@
 ############################################################
 
 SUBDIRS = \
-	expr \
-	tvfunc \
-	npn \
+	aig \
 	bdd \
-	zdd \
 	cnfdd \
+	expr \
+	npn \
 	sat \
 	smt \
-	aig
+	tvfunc \
+	zdd
 
 
 ############################################################
@@ -44,6 +44,13 @@ lib_LTLIBRARIES = \
 
 
 ############################################################
+## 共通の変数定義
+############################################################
+
+utils_dir = $(top_builddir)/../libym_utils/src
+
+
+############################################################
 ## libym_logic.la 用の変数の指定
 ############################################################
 
@@ -53,18 +60,19 @@ libym_logic_la_SOURCES =
 nodist_EXTRA_libym_logic_la_SOURCES = dummy.cc
 
 libym_logic_la_LIBADD = \
-	expr/libym_logic_expr.la \
-	tvfunc/libym_logic_tvfunc.la \
-	npn/libym_logic_npn.la \
-	bdd/libym_logic_bdd.la \
-	zdd/libym_logic_zdd.la \
-	cnfdd/libym_logic_cnfdd.la \
-	sat/libym_logic_sat.la \
-	smt/libym_logic_smt.la \
-	aig/libym_logic_aig.la
+	aig/libaig.la \
+	bdd/libbdd.la \
+	cnfdd/libcnfdd.la \
+	expr/libexpr.la \
+	npn/libnpn.la \
+	sat/libsat.la \
+	smt/libsmt.la \
+	tvfunc/libtvfunc.la \
+	zdd/libzdd.la
 
 libym_logic_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
+	$(utils_dir)/libym_utils.la \
+	$(GMP_LIBS)
 
 
 ############################################################
@@ -77,18 +85,19 @@ libym_logic_d_la_SOURCES =
 nodist_EXTRA_libym_logic_d_la_SOURCES = dummy.cc
 
 libym_logic_d_la_LIBADD = \
-	expr/libym_logic_expr_d.la \
-	tvfunc/libym_logic_tvfunc_d.la \
-	npn/libym_logic_npn_d.la \
-	bdd/libym_logic_bdd_d.la \
-	zdd/libym_logic_zdd_d.la \
-	cnfdd/libym_logic_cnfdd_d.la \
-	sat/libym_logic_sat_d.la \
-	smt/libym_logic_smt_d.la \
-	aig/libym_logic_aig_d.la
+	aig/libaig_d.la \
+	bdd/libbdd_d.la \
+	cnfdd/libcnfdd_d.la \
+	expr/libexpr_d.la \
+	npn/libnpn_d.la \
+	sat/libsat_d.la \
+	smt/libsmt_d.la \
+	tvfunc/libtvfunc_d.la \
+	zdd/libzdd_d.la
 
 libym_logic_d_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la
+	$(utils_dir)/libym_utils_d.la \
+	$(GMP_LIBS)
 
 
 ############################################################
@@ -101,15 +110,16 @@ libym_logic_p_la_SOURCES =
 nodist_EXTRA_libym_logic_p_la_SOURCES = dummy.cc
 
 libym_logic_p_la_LIBADD = \
-	expr/libym_logic_expr_p.la \
-	tvfunc/libym_logic_tvfunc_p.la \
-	npn/libym_logic_npn_p.la \
-	bdd/libym_logic_bdd_p.la \
-	zdd/libym_logic_zdd_p.la \
-	cnfdd/libym_logic_cnfdd_p.la \
-	sat/libym_logic_sat_p.la \
-	smt/libym_logic_smt_p.la \
-	aig/libym_logic_aig_p.la
+	aig/libaig_p.la \
+	bdd/libbdd_p.la \
+	cnfdd/libcnfdd_p.la \
+	expr/libexpr_p.la \
+	npn/libnpn_p.la \
+	sat/libsat_p.la \
+	smt/libsmt_p.la \
+	tvfunc/libtvfunc_p.la \
+	zdd/libzdd_p.la
 
 libym_logic_p_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_p.la
+	$(utils_dir)/libym_utils_p.la \
+	$(GMP_LIBS)
