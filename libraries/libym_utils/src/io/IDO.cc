@@ -174,7 +174,8 @@ StreamIDO::~StreamIDO()
 }
 
 // @brief 読み出し可能なら true を返す．
-StreamIDO::operator bool() const
+bool
+StreamIDO::is_ready() const
 {
   return mS;
 }
@@ -226,7 +227,8 @@ StrListIDO::~StrListIDO()
 }
 
 // @brief 読み出し可能なら true を返す．
-StrListIDO::operator bool() const
+bool
+StrListIDO::is_ready() const
 {
   if ( mLineNum < mStrList.size() ) {
     return true;

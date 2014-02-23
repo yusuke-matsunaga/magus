@@ -146,6 +146,12 @@ YM_CHECK_POPT
 
 
 # ===================================================================
+# Check for Python environment
+# ===================================================================
+YM_CHECK_PYTHON([ym_have_python=yes], [ym_have_python=no])
+
+
+# ===================================================================
 # Check for C++ language
 # ===================================================================
 AC_LANG_CPLUSPLUS
@@ -498,11 +504,9 @@ AM_CONDITIONAL([YM_HAVE_ZLIB],  [test $ym_have_zlib = yes])
 AM_CONDITIONAL([YM_HAVE_BZLIB], [test $ym_have_bz2 = yes])
 AM_CONDITIONAL([YM_HAVE_LZMA],  [test $ym_have_lzma = yes])
 
-if test $ym_have_path = yes; then
+if test $ym_have_python = yes; then
    AC_CONFIG_FILES([py-sip/configure.py])
 fi
-
-AC_CONFIG_FILES([py-sip/configure.py])
 
 if test $ym_have_cpputest = yes; then
    YM_ADD_TESTS_SUBDIRS([CppUTest])

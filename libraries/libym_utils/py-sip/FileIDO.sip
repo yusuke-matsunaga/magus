@@ -26,11 +26,9 @@ using nsYm::kCodecLzma;
   FileIDO(tCodecType codec_type = kCodecThrough);
 
   /// @brief 読み出し可能なら true を返す．
+  virtual
   bool
   is_ready() const;
-  %MethodCode
-  sipRes = sipCpp->operator bool();
-  %End
 
   /// @brief オープン中のファイル情報を得る．
   virtual
@@ -43,7 +41,7 @@ using nsYm::kCodecLzma;
   /// @note 通常は使わないこと．
   virtual
   void
-  set_file_info(FileInfo file_info);
+  set_file_info(const FileInfo& file_info);
 
   /// @brief データを読み込む．
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
@@ -51,9 +49,9 @@ using nsYm::kCodecLzma;
   /// @return 実際に読み込んだ量を返す．
   /// @note エラーが起こったら負の数を返す．
   virtual
-  long long
+  long
   read(unsigned char* buff,
-       unsigned long long n);
+       unsigned long n);
 
   /// @brief ファイルを開く
   /// @param[in] filename ファイル名

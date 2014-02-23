@@ -30,11 +30,23 @@ os.system(" ".join([config.sip_bin, "-c", ".", "-b", build_file,
 installs = []
 
 mod_sip_dir = os.path.join(prefix_dir, "share", "py-sip", "YmUtils")
-installs.append(["YmUtils_mod.sip", mod_sip_dir])
-installs.append(["RandGen.sip",     mod_sip_dir])
-installs.append(["GenBase.sip",     mod_sip_dir])
-installs.append(["PermGen.sip",     mod_sip_dir])
-installs.append(["CombiGen.sip",    mod_sip_dir])
+sip_src_list = [
+    "YmUtils_mod.sip",
+    "RandGen.sip",
+    "GenBase.sip",
+    "PermGen.sip",
+    "CombiGen.sip",
+    "FileInfo.sip",
+    "FileLoc.sip",
+    "FileRegion.sip",
+    "IDO.sip",
+    "ODO.sip",
+    "CodecType.sip",
+    "FileIDO.sip",
+    "FileODO.sip"]
+for sip_src in sip_src_list :
+    path = os.path.join(src_dir, sip_src)
+    installs.append([path, mod_sip_dir])
 
 my_mod_dir = os.path.join(prefix_dir, "lib", "python-2.7", "site-packages")
 installs.append(["YmUtilsConfig.py", my_mod_dir])
@@ -45,7 +57,8 @@ installs.append(["YmUtilsConfig.py", my_mod_dir])
 makefile = sipconfig.SIPModuleMakefile(
     configuration=config,
     build_file=build_file,
-    installs=installs
+    installs=installs,
+    install_dir=my_mod_dir
 )
 
 # Add the library we are wrapping.  The name doesn't include any platform

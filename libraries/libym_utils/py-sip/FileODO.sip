@@ -50,8 +50,8 @@ public:
   /// @param[in] n データサイズ
   /// @return 実際に書き出した量を返す．
   virtual
-  long long
+  long
   write(const unsigned char* buff,
-	unsigned long long n);
+	unsigned long n);
 
 };

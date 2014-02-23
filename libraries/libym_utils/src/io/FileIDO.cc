@@ -70,7 +70,8 @@ FileIDO::close()
 }
 
 // @brief 読み出し可能なら true を返す．
-FileIDO::operator bool() const
+bool
+FileIDO::is_ready() const
 {
   if ( mDecoder == NULL ) {
     return false;

@@ -6,7 +6,7 @@
 /// Copyright (C) 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
-class ODO /Abstract/
+class ODO
 {
 
 %TypeHeaderCode
@@ -56,8 +56,8 @@ public:
   /// @param[in] n データサイズ
   /// @return 実際に書き出した量を返す．
   virtual
-  long long
+  long
   write(const unsigned char* buff,
-	unsigned long long n) = 0;
+	unsigned long n) = 0;
 
 };

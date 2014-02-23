@@ -6,7 +6,8 @@
 /// Copyright (C) 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
-class IDO /Abstract/ {
+class IDO
+{
 
 %TypeHeaderCode
 #include "utils/IDO.h"
@@ -62,7 +63,8 @@ public:
 
   /// @brief 読み出し可能なら true を返す．
   virtual
-  operator bool() const = 0;
+  bool
+  is_ready() const = 0;
 
   /// @brief オープン中のファイル情報を得る．
   virtual
@@ -75,15 +77,15 @@ public:
   /// @note 通常は使わないこと．
   virtual
   void
-  set_file_info(FileInfo file_info) = 0;
+  set_file_info(const FileInfo& file_info) = 0;
 
   /// @brief データを読み込む．
   /// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
   /// @param[in] n 読み込むデータサイズ
   /// @return 実際に読み込んだ量を返す．
   virtual
-  long long
+  long
   read(unsigned char* buff,
-       unsigned long long n) = 0;
+       unsigned long n) = 0;
 
 };

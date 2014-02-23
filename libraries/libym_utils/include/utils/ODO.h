@@ -23,9 +23,6 @@ class ODO
 {
 public:
 
-  /// @brief コンストラクタ
-  ODO() { }
-
   /// @brief デストラクタ
   virtual
   ~ODO() { }

@@ -82,7 +82,8 @@ public:
 
   /// @brief 読み出し可能なら true を返す．
   virtual
-  operator bool() const = 0;
+  bool
+  is_ready() const = 0;
 
   /// @brief オープン中のファイル情報を得る．
   virtual
