@@ -10,7 +10,7 @@ class RandGen {
 
 %TypeHeaderCode
 #include "utils/RandGen.h"
-using namespace nsYm;
+using nsYm::RandGen;
 %End
 
 public:

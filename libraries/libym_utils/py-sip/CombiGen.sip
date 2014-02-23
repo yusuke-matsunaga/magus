@@ -10,7 +10,8 @@ class CombiGen : public GenBase {
 
 %TypeHeaderCode
 #include "utils/CombiGen.h"
-using namespace nsYm;
+using nsYm::GenBase;
+using nsYm::CombiGen;
 %End
 
 public:

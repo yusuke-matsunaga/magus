@@ -10,7 +10,8 @@ class PermGen : public GenBase {
 
 %TypeHeaderCode
 #include "utils/PermGen.h"
-using namespace nsYm;
+using nsYm::GenBase;
+using nsYm::PermGen;
 %End
 
 public:

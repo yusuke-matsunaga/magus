@@ -10,7 +10,7 @@ class GenBase {
 
 %TypeHeaderCode
 #include "utils/GenBase.h"
-using namespace nsYm;
+using nsYm::GenBase;
 %End
 
 public:

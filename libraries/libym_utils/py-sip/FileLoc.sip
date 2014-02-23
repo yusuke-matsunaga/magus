@@ -10,7 +10,7 @@ class FileLoc {
 
 %TypeHeaderCode
 #include "utils/FileLoc.h"
-using namespace nsYm;
+using nsYm::FileLoc;
 %End
 
 public:
@@ -24,8 +24,8 @@ public:
   /// @param[in] line 行番号
   /// @param[in] column コラム番号
   FileLoc(FileInfo file_info,
-	  ymuint line,
-	  ymuint column);
+	  unsigned int line,
+	  unsigned int column);
 
   /// @brief データの妥当性のチェック
   /// @retval true 意味のある値を持っている時
@@ -53,17 +53,31 @@ public:
   /// @brief インクルード元のファイル位置の情報をすべてリストに積む．
   /// @param[out] loc_list ファイルの位置情報のリスト
   /// @note トップレベルのファイルが先頭になる．
-  void
-  parent_loc_list(list<FileLoc>& loc_list) const;
+  SIP_PYLIST
+  parent_loc_list() const;
+  %MethodCode
+  using std::list;
+  list<FileLoc> loc_list;
+  sipCpp->parent_loc_list(loc_list);
+  ymuint n = loc_list.size();
+  sipRes = PyList_New(n);
+  ymuint i = 0;
+  for (list<FileLoc>::iterator p = loc_list.begin();
+       p != loc_list.end(); ++ p, ++ i) {
+    FileLoc& fl = *p;
+    PyObject* obj = sipConvertFromNewType(&fl, sipType_FileLoc, NULL);
+    PyList_SetItem(sipRes, i, obj);
+  }
+  %End
 
   /// @brief 行番号の取得
   /// @return 行番号
-  ymuint
+  unsigned int
   line() const;
 
   /// @brief コラム位置の取得
   /// @return コラム位置
-  ymuint
+  unsigned int
   column() const;
 
 };

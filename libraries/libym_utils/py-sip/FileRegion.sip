@@ -10,7 +10,7 @@ class FileRegion {
 
 %TypeHeaderCode
 #include "utils/FileRegion.h"
-using namespace nsYm;
+using nsYm::FileRegion;
 %End
 
 public:
@@ -26,10 +26,10 @@ public:
   /// @param[in] end_line 末尾の行番号
   /// @param[in] end_column 末尾のコラム番号
   FileRegion(FileInfo file_info,
-	     ymuint start_line,
-	     ymuint start_column,
-	     ymuint end_line,
-	     ymuint end_column);
+	     unsigned int start_line,
+	     unsigned int start_column,
+	     unsigned int end_line,
+	     unsigned int end_column);
 
   /// @brief 内容を指定したコンストラクタ
   /// @param[in] start_file_info 先頭のファイル情報
@@ -39,11 +39,11 @@ public:
   /// @param[in] end_line 末尾の行番号
   /// @param[in] end_column 末尾のコラム番号
   FileRegion(FileInfo start_file_info,
-	     ymuint start_line,
-	     ymuint start_column,
+	     unsigned int start_line,
+	     unsigned int start_column,
 	     FileInfo end_file_info,
-	     ymuint end_line,
-	     ymuint end_column);
+	     unsigned int end_line,
+	     unsigned int end_column);
 
   /// @brief 内容を指定したコンストラクタ
   /// @param[in] file_loc ファイル上の位置
@@ -78,12 +78,12 @@ public:
 
   /// @brief 先頭の行番号の取得
   /// @return 行番号
-  ymuint
+  unsigned int
   start_line() const;
 
   /// @brief 先頭のコラム位置の取得
   /// @return コラム位置
-  ymuint
+  unsigned int
   start_column() const;
 
   /// @brief 末尾のファイル位置の取得
@@ -97,12 +97,12 @@ public:
 
   /// @brief 末尾の行番号の取得
   /// @return 行番号
-  ymuint
+  unsigned int
   end_line() const;
 
   /// @brief 末尾のコラム位置の取得
   /// @return コラム位置
-  ymuint
+  unsigned int
   end_column() const;
 
 };

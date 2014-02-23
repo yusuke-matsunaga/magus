@@ -10,7 +10,7 @@ class FileInfo {
 
 %TypeHeaderCode
 #include "utils/FileInfo.h"
-using namespace nsYm;
+using nsYm::FileInfo;
 %End
 
 public:
@@ -23,20 +23,10 @@ public:
   /// @param[in] filename ファイル名
   FileInfo(const char* filename);
 
-  /// @brief ファイル名を指定したコンストラクタ
-  /// @param[in] filename ファイル名
-  FileInfo(const string& filename);
-
   /// @brief ファイル名とインクルード元の親ファイルの情報
   /// @param[in] filename ファイル名
   /// @param[in] parent_loc インクルード元の親ファイルの情報
   FileInfo(const char* filename,
-	   const FileLoc& parent_loc);
-
-  /// @brief ファイル名とインクルード元の親ファイルの情報
-  /// @param[in] filename ファイル名
-  /// @param[in] parent_loc インクルード元の親ファイルの情報
-  FileInfo(const string& filename,
 	   const FileLoc& parent_loc);
 
   /// @brief 有効なデータを持っているときに true を返す．
@@ -45,12 +35,15 @@ public:
 
   /// @brief ID番号を得る．
   /// @note ほとんど等価比較演算子のための関数
-  ymuint
+  unsigned int
   id() const;
 
   /// @brief ファイル名を返す．
-  string
+  const char*
   filename() const;
+  %MethodCode
+  sipRes = sipCpp->filename().c_str();
+  %End
 
   /// @brief インクルード元のファイル位置を返す．
   /// @note インクルードされていないファイルの場合には無効なデータが返される．
@@ -60,8 +53,22 @@ public:
   /// @brief インクルード元のファイル位置の情報をすべてリストに積む．
   /// @param[out] loc_list ファイルの位置情報のリスト
   /// @note トップレベルのファイルが先頭になる．
-  void
-  parent_loc_list(list<FileLoc>& loc_list) const;
+  SIP_PYLIST
+  parent_loc_list() const;
+  %MethodCode
+  using std::list;
+  list<FileLoc> loc_list;
+  sipCpp->parent_loc_list(loc_list);
+  ymuint n = loc_list.size();
+  sipRes = PyList_New(n);
+  ymuint i = 0;
+  for (list<FileLoc>::iterator p = loc_list.begin();
+       p != loc_list.end(); ++ p, ++ i) {
+    FileLoc& fl = *p;
+    PyObject* obj = sipConvertFromNewType(&fl, sipType_FileLoc, NULL);
+    PyList_SetItem(sipRes, i, obj);
+  }
+  %End
 
 };
 
