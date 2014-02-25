@@ -52,7 +52,8 @@ noinst_PROGRAMS = \
 	ZDecoder_test \
 	StrListIDO_test \
 	Codec_test \
-	BtgMatch_test
+	BtgMatch_test \
+	gctest
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \
@@ -494,6 +495,19 @@ BtgMatch_test_LDADD = \
 	$(YMUTILS)
 
 BtgMatch_test_LDFLAGS =
+
+
+############################################################
+## Variables for building gctest
+############################################################
+
+gctest_SOURCES = \
+	gctest.cc
+
+gctest_LDADD = \
+	$(YMUTILS)
+
+gctest_LDFLAGS =
 
 
 ############################################################

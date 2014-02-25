@@ -12,6 +12,7 @@ SUBDIRS = \
 	alloc \
 	btg \
 	file \
+	gcsolver \
 	gen \
 	io \
 	itvl \
@@ -67,6 +68,7 @@ libym_utils_la_LIBADD = \
 	alloc/liballoc.la \
 	btg/libbtg.la \
 	file/libfile.la \
+	gcsolver/libgcsolver.la \
 	gen/libgen.la \
 	itvl/libitvl.la \
 	io/libio.la \
@@ -91,6 +93,7 @@ libym_utils_d_la_LIBADD = \
 	alloc/liballoc_d.la \
 	btg/libbtg_d.la \
 	file/libfile_d.la \
+	gcsolver/libgcsolver_d.la \
 	gen/libgen_d.la \
 	itvl/libitvl_d.la \
 	io/libio_d.la \
@@ -115,6 +118,7 @@ libym_utils_p_la_LIBADD = \
 	alloc/liballoc_p.la \
 	btg/libbtg_p.la \
 	file/libfile_p.la \
+	gcsolver/libgcsolver_p.la \
 	gen/libgen_p.la \
 	itvl/libitvl_p.la \
 	io/libio_p.la \

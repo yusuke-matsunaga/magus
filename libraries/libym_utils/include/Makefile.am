@@ -50,6 +50,7 @@ nobase_ym_HEADERS = \
 	utils/FileODO.h \
 	utils/FileRegion.h \
 	utils/FragAlloc.h \
+	utils/GcSolver.h \
 	utils/GenBase.h \
 	utils/HeapTree.h \
 	utils/IDO.h \
