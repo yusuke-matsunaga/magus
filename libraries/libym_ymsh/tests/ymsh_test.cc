@@ -1,5 +1,5 @@
 
-/// @file libym_ymsh/tests/ymsh_test.cc
+/// @file ymsh_test.cc
 /// @brief Ymsh のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_ymsh/Ymsh.h"
+#include "ymsh/Ymsh.h"
 
 
 int

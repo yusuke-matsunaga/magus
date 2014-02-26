@@ -1,17 +1,17 @@
-#ifndef LIBYM_TCLPP_EXAMPLES_OPTTESTCMD_H
-#define LIBYM_TCLPP_EXAMPLES_OPTTESTCMD_H
+#ifndef OPTTESTCMD_H
+#define OPTTESTCMD_H
 
 /// @file OptTestCmd.h
 /// @brief OptTestCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 // コマンドの製作例
 
 
-#include "ym_tclpp/TclCmd.h"
+#include "tclpp/TclCmd.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
@@ -65,4 +65,4 @@ private:
 
 END_NAMESPACE_YM_TCLPP
 
-#endif // LIBYM_TCLPP_EXAMPLES_OPTTESTCMD_H
+#endif // OPTTESTCMD_H

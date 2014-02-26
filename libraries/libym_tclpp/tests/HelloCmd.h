@@ -1,5 +1,5 @@
-#ifndef LIBYM_TCLPP_EXAMPLES_HELLOCMD_H
-#define LIBYM_TCLPP_EXAMPLES_HELLOCMD_H
+#ifndef HELLOCMD_H
+#define HELLOCMD_H
 
 /// @file HelloCmd.h
 /// @brief HelloCmd のヘッダファイル
@@ -11,7 +11,7 @@
 // コマンドの製作例
 
 
-#include "ym_tclpp/TclCmd.h"
+#include "tclpp/TclCmd.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
@@ -59,4 +59,4 @@ protected:
 
 END_NAMESPACE_YM_TCLPP
 
-#endif // LIBYM_TCLPP_EXAMPLES_HELLOCMD_H
+#endif // HELLOCMD_H

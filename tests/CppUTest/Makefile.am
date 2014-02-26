@@ -37,8 +37,9 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/libraries/libym_utils/include \
+	-I$(top_builddir)/libraries/libym_utils/include \
 	$(CPPUTEST_INCLUDES)
 
 
@@ -57,8 +58,7 @@ AM_CPPFLAGS += \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/tests
 
 run_all_test_LDADD += \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/tests/CppUTest/libym_logic_cpputest.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/tests/CppUTest/libym_logic_cpputest.la
 endif
 
 if YM_HAVE_LIBYM_UTILS
@@ -67,8 +67,7 @@ AM_CPPFLAGS += \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/tests
 
 run_all_test_LDADD += \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/tests/CppUTest/libym_utils_cpputest.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/tests/CppUTest/libym_utils_cpputest.la
 endif
 
 run_all_test_LDFLAGS = \

@@ -3,54 +3,16 @@
 /// @brief RandCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 // 乱数を発生させるコマンドクラス
 
 
-#include "ym_utils/random.h"
-
 #include "RandCmd.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
-
-//////////////////////////////////////////////////////////////////////
-// 乱数初期化コマンド
-//////////////////////////////////////////////////////////////////////
-
-// usage を出力する関数
-void
-RandInitCmd::usage()
-{
-  const char* usage =
-    "USAGE: random_init seed";
-  set_result(usage);
-}
-
-
-// 乱数初期化コマンド
-int
-RandInitCmd::cmd_proc(TclObjVector& objv)
-{
-  size_t objc = objv.size();
-  if ( objc != 2 ) {
-    usage();
-    return TCL_ERROR;
-  }
-
-  unsigned long seed = 0;
-  int stat = ulong_conv(objv[1], seed);
-  if ( stat != TCL_OK ) {
-    return stat;
-  }
-  init_random_seed(seed);
-
-  reset_result();
-
-  return TCL_OK;
-}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -84,7 +46,7 @@ RandCmd::cmd_proc(TclObjVector& objv)
       return stat;
     }
   }
-  long rand = random_num();
+  long rand = mRandGen.int32();
   if ( limit ) {
     rand = rand % limit;
   }

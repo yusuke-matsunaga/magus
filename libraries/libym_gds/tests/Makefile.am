@@ -39,8 +39,9 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
 
 
 ############################################################
@@ -48,8 +49,7 @@ AM_CPPFLAGS = \
 ############################################################
 
 LIBYM_GDS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_gds/libym_gds.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/libym_gds.la
 
 
 ############################################################

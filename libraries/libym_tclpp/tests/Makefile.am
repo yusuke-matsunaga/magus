@@ -39,8 +39,9 @@ noinst_PROGRAMS = \
 AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	$(TCLRL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -59,8 +60,7 @@ ym_tclsh_SOURCES = \
 	OptTestCmd.cc
 
 ym_tclsh_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(top_builddir)/src/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
 

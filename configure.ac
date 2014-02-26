@@ -126,10 +126,6 @@ YM_BUILD_LIBRARY([libym_utils], [yes],
 YM_BUILD_LIBRARY([libym_logic], [yes],
 		 [ym_libym_utils_enable])
 
-# libym_mincov
-YM_BUILD_LIBRARY([libym_mincov], [no],
-		 [ym_libym_utils_enable])
-
 # libym_cell
 YM_BUILD_LIBRARY([libym_cell], [yes],
 		 [ym_libym_utils_enable,
@@ -149,26 +145,6 @@ YM_BUILD_LIBRARY([libym_networks], [yes],
 YM_BUILD_LIBRARY([libym_gds], [no],
 		 [])
 
-# libym_cec
-YM_BUILD_LIBRARY([libym_cec], [yes],
-		 [ym_libym_networks_enable,
-		  ym_libym_logic_enable])
-
-# libym_techmap
-YM_BUILD_LIBRARY([libym_techmap], [yes],
-		 [ym_libym_utils_enable,
-		  ym_libym_logic_enable])
-
-# libym_gbm
-YM_BUILD_LIBRARY([libym_gbm], [no],
-		 [ym_libym_networks_enable,
-		  ym_libym_logic_enable])
-
-# libym_seal
-YM_BUILD_LIBRARY([libym_seal], [no],
-		 [ym_libym_logic_enable,
-		  ym_libym_networks_enable])
-
 # libym_tclpp
 YM_BUILD_LIBRARY([libym_tclpp], [yes],
 		 [])
@@ -177,6 +153,26 @@ YM_BUILD_LIBRARY([libym_tclpp], [yes],
 YM_BUILD_LIBRARY([libym_ymsh], [no],
 		 [])
 
+
+# libym_cec
+#YM_BUILD_LIBRARY([libym_cec], [yes],
+#		 [ym_libym_networks_enable,
+#		  ym_libym_logic_enable])
+
+# libym_techmap
+#YM_BUILD_LIBRARY([libym_techmap], [yes],
+#		 [ym_libym_utils_enable,
+#		  ym_libym_logic_enable])
+
+# libym_gbm
+#YM_BUILD_LIBRARY([libym_gbm], [no],
+#		 [ym_libym_networks_enable,
+#		  ym_libym_logic_enable])
+
+# libym_seal
+#YM_BUILD_LIBRARY([libym_seal], [no],
+#		 [ym_libym_logic_enable,
+#		  ym_libym_networks_enable])
 
 YM_FINISH_LIBRARIES_SUBDIRS
 

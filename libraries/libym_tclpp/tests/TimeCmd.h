@@ -1,5 +1,5 @@
-#ifndef LIBYM_TCLPP_EXAMPLES_TIMECMD_H
-#define LIBYM_TCLPP_EXAMPLES_TIMECMD_H
+#ifndef TIMECMD_H
+#define TIMECMD_H
 
 /// @file TimeCmd.h
 /// @brief TimeCmd のヘッダファイル
@@ -11,8 +11,8 @@
 // 時間計測を行うパッケージ
 
 
-#include "ym_tclpp/TclCmd.h"
-#include "ym_utils/StopWatch.h"
+#include "tclpp/TclCmd.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
@@ -111,4 +111,4 @@ private:
 
 END_NAMESPACE_YM_TCLPP
 
-#endif // LIBYM_TCLPP_EXAMPLES_TIMECMD_H
+#endif // TIMECMD_H

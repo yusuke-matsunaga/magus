@@ -196,7 +196,6 @@ Tcl_AppInit(Tcl_Interp* interp)
   TclCmdBinder<HelloCmd2>::reg(interp,   "ymtclpp::hello2");
   TclCmdBinder<StpwatchCls>::reg(interp, "ymtclpp::stopwatch");
   TclCmdBinder<TimeCmd>::reg(interp,     "ymtclpp::time");
-  TclCmdBinder<RandInitCmd>::reg(interp, "ymtclpp::random_init");
   TclCmdBinder<RandCmd>::reg(interp,     "ymtclpp::random");
   TclCmdBinder<OptTestCmd>::reg(interp,  "ymtclpp::opt_test");
 
