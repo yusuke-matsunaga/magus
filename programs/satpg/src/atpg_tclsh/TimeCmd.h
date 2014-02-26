@@ -1,7 +1,7 @@
 #ifndef TIMECMD_H
 #define TIMECMD_H
 
-/// @file src/atpg_tclsh/TimeCmd.h
+/// @file TimeCmd.h
 /// @brief TimeCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

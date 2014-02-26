@@ -1,20 +1,20 @@
 #ifndef ATPGMGR_H
 #define ATPGMGR_H
 
-/// @file include/AtpgMgr.h
+/// @file AtpgMgr.h
 /// @brief AtpgMgr のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
 #include "DtpgMode.h"
-#include "ym_cell/cell_nsdef.h"
-#include "ym_utils/Binder.h"
-#include "ym_utils/MStopWatch.h"
+#include "cell/cell_nsdef.h"
+#include "utils/Binder.h"
+#include "utils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

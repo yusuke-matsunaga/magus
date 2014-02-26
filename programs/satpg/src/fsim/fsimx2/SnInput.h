@@ -1,11 +1,11 @@
 #ifndef SNINPUT_H
 #define SNINPUT_H
 
-/// @file src/fsimx2/SnInput.h
+/// @file SnInput.h
 /// @brief SnInput のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

@@ -1,14 +1,14 @@
 
-/// @file src/atpg_tclsh/atpg_init.cc
+/// @file atpg_init.cc
 /// @brief satpg のパッケージ初期化
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include <tcl.h>
-#include "ym_tclpp/TclCmd.h"
+#include "tclpp/TclCmd.h"
 #include "AtpgMgr.h"
 #include "AtpgCmd.h"
 #include "NtwkIoCmd.h"

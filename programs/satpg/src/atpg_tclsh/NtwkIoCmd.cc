@@ -1,9 +1,9 @@
 
-/// @file src/atpg_tclsh/NtwkIoCmd.cc
+/// @file NtwkIoCmd.cc
 /// @brief TgNetwork 操作関連のコマンド
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "AtpgMsgHandler.h"
 #include "AtpgMgr.h"
 
-#include "ym_utils/MsgMgr.h"
+#include "utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

@@ -5,13 +5,13 @@
 /// @brief FaultMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2009, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "satpg_nsdef.h"
 #include "TpgFault.h"
-#include "ym_utils/SimpleAlloc.h"
-#include "ym_utils/UnitAlloc.h"
+#include "utils/SimpleAlloc.h"
+#include "utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

@@ -3,7 +3,7 @@
 /// @brief TpgNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,10 +11,10 @@
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "TpgFault.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
-#include "ym_networks/TgBlifReader.h"
-#include "ym_networks/TgIscas89Reader.h"
+#include "networks/TgNetwork.h"
+#include "networks/TgNode.h"
+#include "networks/TgBlifReader.h"
+#include "networks/TgIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

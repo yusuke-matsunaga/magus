@@ -3,7 +3,7 @@
 /// @brief SatEngineImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,8 +16,8 @@
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "InputLiteral.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatStats.h"
+#include "logic/SatSolver.h"
+#include "logic/SatStats.h"
 
 
 #define VERIFY_MAIMP 0

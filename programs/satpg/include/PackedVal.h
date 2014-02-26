@@ -5,9 +5,7 @@
 /// @brief 1ワードにパックしたビットベクタ型の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: PackedVal.h 2043 2009-02-21 07:08:48Z matsunaga $
-///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "satpg_nsdef.h"

@@ -5,12 +5,12 @@
 /// @brief BtJust2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BtJustBase.h"
-#include "ym_utils/UnitAlloc.h"
+#include "utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

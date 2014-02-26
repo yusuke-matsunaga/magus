@@ -1,14 +1,12 @@
 #ifndef FSIMX_H
 #define FSIMX_H
 
-/// @file src/fsimx/FsimX.h
+/// @file FsimX.h
 /// @brief FsimX のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: FsimX.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

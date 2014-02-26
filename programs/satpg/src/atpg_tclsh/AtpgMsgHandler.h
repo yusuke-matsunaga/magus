@@ -1,17 +1,17 @@
 #ifndef ATPGMSGHANDLER_H
 #define ATPGMSGHANDLER_H
 
-/// @file src/atpg_tclsh/AtpgMsgHandler.h
+/// @file AtpgMsgHandler.h
 /// @brief AtpgMsgHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_tclpp/TclObj.h"
+#include "utils/MsgHandler.h"
+#include "tclpp/TclObj.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

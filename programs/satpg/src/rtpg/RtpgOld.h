@@ -5,12 +5,12 @@
 /// @brief RtpgOld のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Rtpg.h"
-#include "ym_utils/RandGen.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

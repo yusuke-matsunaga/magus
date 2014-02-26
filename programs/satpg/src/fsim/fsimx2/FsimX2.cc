@@ -1,5 +1,5 @@
 
-/// @file src/fsimx/FsimX2.cc
+/// @file FsimX2.cc
 /// @brief FsimX2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -18,7 +18,7 @@
 #include "TestVector.h"
 #include "SimNode.h"
 #include "SimFFR.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

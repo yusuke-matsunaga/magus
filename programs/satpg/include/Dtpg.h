@@ -6,13 +6,13 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
 #include "DtpgMode.h"
-#include "ym_networks/tgnet.h"
+#include "networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

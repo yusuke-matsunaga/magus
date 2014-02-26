@@ -3,7 +3,7 @@
 /// @brief MinPatImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,8 +14,8 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "Fop2MinPat.h"
-#include "GcMgr.h"
-#include "ym_utils/RandGen.h"
+#include "utils/GcSolver.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -92,7 +92,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   }
   else {
     // 最小彩色問題を解くことで3値のパタンを圧縮する．
-    GcMgr gcmgr;
+    GcSolver gcmgr;
 
     ymuint n = tv3_list.size();
     gcmgr.init(n);

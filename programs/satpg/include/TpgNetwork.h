@@ -5,15 +5,15 @@
 /// @brief TpgNetwork のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "satpg_nsdef.h"
-#include "ym_networks/tgnet.h"
-#include "ym_cell/cell_nsdef.h"
-#include "ym_logic/lexp_nsdef.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "networks/tgnet.h"
+#include "cell/cell_nsdef.h"
+#include "logic/lexp_nsdef.h"
+#include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

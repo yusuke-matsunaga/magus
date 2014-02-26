@@ -3,7 +3,7 @@
 /// @brief DopTvList の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

@@ -3,12 +3,12 @@
 /// @brief BtZdd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BtZdd.h"
-#include "ym_logic/Zdd.h"
+#include "logic/Zdd.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

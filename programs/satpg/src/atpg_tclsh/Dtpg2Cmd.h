@@ -1,11 +1,11 @@
-#ifndef SRC_DTPG_DTPG2CMD_H
-#define SRC_DTPG_DTPG2CMD_H
+#ifndef DTPG2CMD_H
+#define DTPG2CMD_H
 
-/// @file src/atpg_tclsh/Dtpg2Cmd.h
+/// @file Dtpg2Cmd.h
 /// @brief Dtpg2Cmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -104,4 +104,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SRC_DTPG_DTPGCMD_H
+#endif // DTPG2CMD_H

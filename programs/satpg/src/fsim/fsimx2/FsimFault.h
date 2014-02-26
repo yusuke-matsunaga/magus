@@ -1,11 +1,11 @@
 #ifndef FSIMFAULT_H
 #define FSIMFAULT_H
 
-/// @file src/fsimx2/FsimFault.h
+/// @file FsimFault.h
 /// @brief FsimFault のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

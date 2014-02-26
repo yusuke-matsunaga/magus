@@ -3,7 +3,7 @@
 /// @brief Rtpg の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,7 +14,7 @@
 #include "TestVector.h"
 #include "FsimOld.h"
 #include "RtpgStats.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

@@ -1,11 +1,11 @@
 #ifndef NTWKIOCMD_H
 #define NTWKIOCMD_H
 
-/// @file src/atpg_tclsh/NtwkIoCmd.h
+/// @file NtwkIoCmd.h
 /// @brief NtwkIoCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

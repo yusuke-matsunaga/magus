@@ -1,7 +1,7 @@
 #ifndef FSIM2_H
 #define FSIM2_H
 
-/// @file src/fsim2/Fsim2.h
+/// @file Fsim2.h
 /// @brief Fsim2 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)

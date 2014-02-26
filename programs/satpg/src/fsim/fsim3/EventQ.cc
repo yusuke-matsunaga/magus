@@ -1,11 +1,9 @@
 
-/// @file src/fsim3/EventQ.cc
+/// @file EventQ.cc
 /// @brief EventQ の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EventQ.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

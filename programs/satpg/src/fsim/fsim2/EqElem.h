@@ -1,13 +1,11 @@
 #ifndef EQELEM_H
 #define EQELEM_H
 
-/// @file src/fsim2/EqElem.h
+/// @file EqElem.h
 /// @brief EqElem のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EqElem.h 2128 2009-03-12 07:25:33Z matsunaga $
-///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "fsim2_nsdef.h"

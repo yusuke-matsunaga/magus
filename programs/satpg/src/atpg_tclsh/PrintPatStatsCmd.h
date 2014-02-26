@@ -1,7 +1,7 @@
 #ifndef PRINTPATSTATSCMD_H
 #define PRINTPATSTATSCMD_H
 
-/// @file src/atpg_tclsh/PrintPatStatsCmd.h
+/// @file PrintPatStatsCmd.h
 /// @brief PrintPatStatsCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

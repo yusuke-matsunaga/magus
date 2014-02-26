@@ -1,12 +1,12 @@
 #ifndef FSIM3_H
 #define FSIM3_H
 
-/// @file src/fsim3/Fsim3.h
+/// @file Fsim3.h
 /// @brief Fsim3 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

@@ -1,9 +1,9 @@
 
-/// @file atpg/src/dtpg/DtpgSat.cc
+/// @file DtpgSat.cc
 /// @brief DtpgSat の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,7 +16,7 @@
 #include "DtpgNgMgr.h"
 #include "DtpgNodeGroup.h"
 #include "DtpgNgEdge.h"
-#include "ym_utils/HeapTree.h"
+#include "utils/HeapTree.h"
 
 
 #define VERIFY_MAIMP 0

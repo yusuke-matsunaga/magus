@@ -1,14 +1,14 @@
 
-/// @file src/atpg_tclsh/DtpgCmd.cc
+/// @file DtpgCmd.cc
 /// @brief DtpgCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "DtpgCmd.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 #include "AtpgMgr.h"
 #include "TpgNetwork.h"
 #include "DtpgStats.h"

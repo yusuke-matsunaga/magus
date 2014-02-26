@@ -1,13 +1,11 @@
 #ifndef SNGATE_H
 #define SNGATE_H
 
-/// @file src/fsim3/SnGate.h
+/// @file SnGate.h
 /// @brief SnGate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SnGate.h 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

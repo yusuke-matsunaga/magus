@@ -1,11 +1,11 @@
 #ifndef RTPGCMD_H
 #define RTPGCMD_H
 
-/// @file src/atpg_tclsh/RtpgCmd.h
+/// @file RtpgCmd.h
 /// @brief RtpgCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

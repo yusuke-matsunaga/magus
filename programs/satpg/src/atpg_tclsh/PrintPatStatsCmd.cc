@@ -1,16 +1,16 @@
 
-/// @file src/atpg_tclsh/PrintPatStatsCmd.cc
-/// @brief ランダムパタン生成を行うコマンド
+/// @file PrintPatStatsCmd.cc
+/// @brief PrintPatStatsCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "PrintPatStatsCmd.h"
 #include "AtpgMgr.h"
 #include "TestVector.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

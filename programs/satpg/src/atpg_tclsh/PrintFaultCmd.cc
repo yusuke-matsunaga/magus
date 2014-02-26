@@ -1,9 +1,9 @@
 
-/// @file src/atpg_tclsh/PrintFaultCmd.cc
+/// @file PrintFaultCmd.cc
 /// @brief PrintFaultCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,7 +11,7 @@
 #include "AtpgMgr.h"
 #include "TpgFault.h"
 #include "FaultMgr.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

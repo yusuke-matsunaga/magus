@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libatpg_sat_engine.la
+noinst_LTLIBRARIES = \
+	libatpg_sat_engine.la \
+	libatpg_sat_engine_d.la \
+	libatpg_sat_engine_p.la
 
 
 ############################################################

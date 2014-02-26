@@ -1,11 +1,11 @@
 #ifndef MINPATCMD_H
 #define MINPATCMD_H
 
-/// @file src/atpg_tclsh/MinPatCmd.h
+/// @file MinPatCmd.h
 /// @brief MinPatCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 

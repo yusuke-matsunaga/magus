@@ -5,12 +5,12 @@
 /// @brief TvMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2009, 2013 Yusuke Matsunaga
+/// Copyright (C) 2005-2009, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "satpg_nsdef.h"
 #include "TestVector.h"
-#include "ym_utils/UnitAlloc.h"
+#include "utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

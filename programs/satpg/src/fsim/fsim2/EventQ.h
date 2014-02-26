@@ -1,7 +1,7 @@
 #ifndef FSIM2_EVENTQ_H
 #define FSIM2_EVENTQ_H
 
-/// @file src/fsim2/EventQ.h
+/// @file EventQ.h
 /// @brief EventQ のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
