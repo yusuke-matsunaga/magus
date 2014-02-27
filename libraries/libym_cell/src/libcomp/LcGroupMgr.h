@@ -104,14 +104,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<TvFuncM, ymuint> FuncMIdMap;
+#else
+  typedef hash_map<TvFuncM, ymuint> FuncMIdMap;
+#endif
+
   // 親の LibComp
   LibComp& mLibComp;
 
   // 多出力論理関数をキーとしてグループ番号を保持するハッシュ表
-  hash_map<TvFuncM, ymuint> mGroupMap;
+  FuncMIdMap mGroupMap;
 
   // 代表関数をキーとしてクラス番号を保持するハッシュ表
-  hash_map<TvFuncM, ymuint> mClassMap;
+  FuncMIdMap mClassMap;
 
 };
 

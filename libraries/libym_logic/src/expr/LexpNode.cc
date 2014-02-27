@@ -399,8 +399,8 @@ LexpNode::soplit(bool inverted) const
     return SopLit(1, 1);
   }
 
-  if ( type() == kAnd && ! inverted ||
-       type() == kOr && inverted ) {
+  if ( (type() == kAnd && ! inverted) ||
+       (type() == kOr && inverted) ) {
     SopLit l(1, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
@@ -410,8 +410,8 @@ LexpNode::soplit(bool inverted) const
     return l;
   }
 
-  if ( type() == kOr && ! inverted ||
-       type() == kAnd && inverted ) {
+  if ( (type() == kOr && ! inverted) ||
+       (type() == kAnd && inverted) ) {
     SopLit l(0, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
@@ -455,8 +455,8 @@ LexpNode::soplit(bool inverted,
     }
   }
 
-  if ( type() == kAnd && ! inverted ||
-       type() == kOr  && inverted ) {
+  if ( (type() == kAnd && ! inverted) ||
+       (type() == kOr  && inverted) ) {
     SopLit l(1, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
@@ -466,8 +466,8 @@ LexpNode::soplit(bool inverted,
     return l;
   }
 
-  if ( type() == kOr && ! inverted ||
-       type() == kAnd && inverted ) {
+  if ( (type() == kOr && ! inverted) ||
+       (type() == kAnd && inverted) ) {
     SopLit l(0, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
@@ -512,8 +512,8 @@ LexpNode::soplit(bool inverted,
     }
   }
 
-  if ( type() == kAnd && ! inverted ||
-       type() == kOr && inverted ) {
+  if ( (type() == kAnd && ! inverted) ||
+       (type() == kOr && inverted) ) {
     SopLit l(1, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
@@ -523,8 +523,8 @@ LexpNode::soplit(bool inverted,
     return l;
   }
 
-  if ( type() == kOr && ! inverted ||
-       type() == kAnd && inverted ) {
+  if ( (type() == kOr && ! inverted) ||
+       (type() == kAnd && inverted) ) {
     SopLit l(0, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {

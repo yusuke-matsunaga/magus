@@ -74,13 +74,13 @@ private:
   mpz_class mAllCount1;
 
   // 演算結果を覚えておくハッシュ表(mpz_class版)
-  hash_map<BddEdge, mpz_class> mCompTbl1;
+  BddEdgeMpzMap mCompTbl1;
 
   // 全最小項数(ymint32版)
   ymint32 mAllCount2;
 
   // 演算結果を覚えておくハッシュ表(ymint32版)
-  hash_map<BddEdge, ymint32> mCompTbl2;
+  BddEdgeIntMap mCompTbl2;
 
 };
 

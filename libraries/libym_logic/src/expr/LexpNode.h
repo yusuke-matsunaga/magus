@@ -327,8 +327,8 @@ inline
 bool
 LexpNode::is_literal(tPol pol) const
 {
-  return pol == kPolPosi && type() == kPosiLiteral ||
-    pol == kPolNega && type() == kNegaLiteral;
+  return (pol == kPolPosi && type() == kPosiLiteral) ||
+    (pol == kPolNega && type() == kNegaLiteral);
 }
 
 inline

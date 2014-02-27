@@ -73,7 +73,7 @@ private:
   ostream& mStream;
 
   // 処理済の ZddEdge に印を付けておくためのハッシュ表
-  hash_set<ZddEdge> mMark;
+  ZddEdgeSet mMark;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;

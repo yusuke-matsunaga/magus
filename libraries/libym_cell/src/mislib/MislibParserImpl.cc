@@ -24,6 +24,14 @@ BEGIN_NAMESPACE_YM_MISLIB
 
 #include "mislib_grammer.hh"
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<ShString, const MislibNode*> StrNodeMap;
+typedef unordered_set<ShString> StrSet;
+#else
+typedef hash_map<ShString, const MislibNode*> StrNodeMap;
+typedef hash_set<ShString> StrSet;
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // クラス MislibParserImpl
 //////////////////////////////////////////////////////////////////////
@@ -46,7 +54,7 @@ BEGIN_NONAMESPACE
 // 論理式中に現れる名前を ipin_set に積む．
 void
 get_ipin_names(const MislibNode* expr_node,
-	       hash_set<ShString>& ipin_set)
+	       StrSet& ipin_set)
 {
   ShString name;
 
@@ -125,11 +133,11 @@ MislibParserImpl::read_file(const string& filename,
   // また，セル内のピン名が重複していないか，出力ピンの論理式に現れるピン名
   // と入力ピンに齟齬がないかもチェックする．
   const MislibNode* gate_list = mgr->gate_list();
-  hash_map<ShString, const MislibNode*> cell_map;
+  StrNodeMap cell_map;
   for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
     assert_cond( gate->type() == MislibNode::kGate, __FILE__, __LINE__);
     ShString name = gate->name()->str();
-    hash_map<ShString, const MislibNode*>::iterator p = cell_map.find(name);
+    StrNodeMap::iterator p = cell_map.find(name);
     if ( p != cell_map.end() ) {
       ostringstream buf;
       buf << "Cell name, " << name << " is defined more than once. "
@@ -149,11 +157,11 @@ MislibParserImpl::read_file(const string& filename,
     const MislibNode* ipin_list = gate->ipin_list();
     if ( ipin_list->type() == MislibNode::kList ) {
       // 通常の入力ピン定義の場合
-      hash_map<ShString, const MislibNode*> ipin_map;
+      StrNodeMap ipin_map;
       for (const MislibNode* ipin = ipin_list->top(); ipin; ipin = ipin->next()) {
 	assert_cond( ipin->type() == MislibNode::kPin, __FILE__, __LINE__);
 	ShString name = ipin->name()->str();
-	hash_map<ShString, const MislibNode*>::iterator p = ipin_map.find(name);
+	StrNodeMap::iterator p = ipin_map.find(name);
 	if ( p != ipin_map.end() ) {
 	  ostringstream buf;
 	  buf << "Pin name, " << name << " is defined more than once. "
@@ -170,9 +178,9 @@ MislibParserImpl::read_file(const string& filename,
 	}
       }
       // 論理式に現れる名前の集合を求める．
-      hash_set<ShString> ipin_set;
+      StrSet ipin_set;
       get_ipin_names(gate->opin_expr(), ipin_set);
-      for (hash_map<ShString, const MislibNode*>::iterator p = ipin_map.begin();
+      for (StrNodeMap::iterator p = ipin_map.begin();
 	   p != ipin_map.end(); ++ p) {
 	ShString name = p->first;
 	if ( ipin_set.count(name) == 0 ) {
@@ -189,7 +197,7 @@ MislibParserImpl::read_file(const string& filename,
 			  buf.str());
 	}
       }
-      for (hash_set<ShString>::iterator p = ipin_set.begin();
+      for (StrSet::iterator p = ipin_set.begin();
 	   p != ipin_set.end(); ++ p) {
 	ShString name = *p;
 	if ( ipin_map.count(name) == 0 ) {

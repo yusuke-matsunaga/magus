@@ -51,7 +51,7 @@ IdMgr::id(ZddEdge e)
   ZddEdge e_p(e);
   e_p.normalize();
   ymuint64 id;
-  hash_map<ZddEdge, ymuint64>::iterator p = mMap.find(e_p);
+  IdMap::iterator p = mMap.find(e_p);
   if ( p == mMap.end() ) {
     id = mNext;
     ++ mNext;

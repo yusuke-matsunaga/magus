@@ -12,12 +12,12 @@ commonconf="__YM__AUTOGEN_COMMON__"
 localconf="./autogen.local"
 
 # default values
-export CC=gcc
-export CFLAGS=
-export CXX=g++
-export CXXFLAGS
-export CPP=cpp
-export CPPFLAGS=
+CC=gcc
+CFLAGS=
+CXX=g++
+CXXFLAGS=
+CPP=cpp
+CPPFLAGS=
 optflags=""
 
 if test -r $commonconf; then
@@ -28,4 +28,10 @@ if test -r $localconf; then
   . $localconf
 fi
 
-$srcdir/configure $optflags
+env CC="$CC" \
+    CFLAGS="$CFLAGS" \
+    CXX="$CXX" \
+    CXXFLAGS="$CXXFLAGS" \
+    CPP="$CPP" \
+    CPPFLAGS="$CPPFLAGS" \
+    $srcdir/configure $optflags

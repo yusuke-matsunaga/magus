@@ -45,7 +45,8 @@ if test $enable_shared = no; then
 fi
 
 # GCC のバージョンを $ym_gnuc に入れておく．
-_AC_COMPUTE_INT([__GNUC__], ym_gnuc)
+AC_COMPUTE_INT(ym_gnuc, [__GNUC__], [], [ym_gnuc=0])
+AC_COMPUTE_INT(ym_gnuc_minor, [__GNUC_MINOR__], [], [ym_gnuc_minor=0])
 
 
 # ===================================================================
@@ -261,7 +262,15 @@ cat >> $ymtools << ___EOF___
 #include <list>
 ___EOF___
 
-if test $ym_gnuc -ge 3; then
+if test $ym_gnuc -ge 4 -a $ym_gnuc_minor -ge 6; then
+  cat >> $ymtools << ___EOF___
+#include <ext/algorithm>
+#include <functional>
+#include <unordered_set>
+#include <unordered_map>
+#define HASH_NAMESPACE std
+___EOF___
+elif test $ym_gnuc -ge 3; then
   cat >> $ymtools << ___EOF___
 #include <ext/algorithm>
 #include <ext/functional>
@@ -353,7 +362,8 @@ typedef $ymptrint ympuint;
 
 ___EOF___
 
-cat >> $ymtools << ___EOF___
+if test $ym_gnuc -lt 4 || test $ym_gnuc_minor -lt 6; then
+  cat >> $ymtools << ___EOF___
 
 BEGIN_NAMESPACE_HASH
 
@@ -399,7 +409,10 @@ hash<const std::string>
 #endif // __SGI_STL_STRING
 
 END_NAMESPACE_HASH
+___EOF___
+fi
 
+cat >> $ymtools << ___EOF___
 
 #endif // YMTOOLS_H
 ___EOF___
@@ -424,6 +437,7 @@ ym_have_math_h=$ym_have_math_h
 ym_have_sys_time_h=$ym_have_sys_time_h
 ym_have_sys_stat_h=$ym_have_sys_stat_h
 ym_gnuc=$ym_gnuc
+ym_gnuc_minor=$ym_gnuc_minor
 ymint8=char
 case 2 in
 $ac_cv_sizeof_short)
@@ -498,9 +512,9 @@ YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
 AC_SUBST([YMTOOLS_BUILDDIR])
 
-AC_SUBST([YM_CXXOPTFLAGS], ["-O3"])
-AC_SUBST([YM_CXXDBGFLAGS], ["-O3 -g"])
-AC_SUBST([YM_CXXPRFFLAGS], ["-O3 -pg"])
+AC_SUBST([YM_CXXOPTFLAGS], [""])
+AC_SUBST([YM_CXXDBGFLAGS], ["-g"])
+AC_SUBST([YM_CXXPRFFLAGS], ["-pg"])
 
 YM_INIT_EXTRA_SUBDIRS
 YM_INIT_TESTS_SUBDIRS

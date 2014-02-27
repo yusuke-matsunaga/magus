@@ -95,7 +95,7 @@ Parser::add_port(PtiPort* port)
 bool
 Parser::check_PortArray(PtIOHeadArray iohead_array)
 {
-  hash_set<string> portref_dic;
+  StrSet portref_dic;
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* head = iohead_array[i];
     for (ymuint j = 0; j < head->item_num(); ++ j) {

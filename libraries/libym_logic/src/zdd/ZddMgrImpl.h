@@ -353,7 +353,7 @@ private:
   /// @brief count の下請関数
   mpz_class
   count_step(ZddEdge e,
-	     hash_map<ZddEdge, mpz_class>& mc_map);
+	     ZddEdgeMpzMap& mc_map);
 
   /// @brief サポート変数に印をつける．
   void

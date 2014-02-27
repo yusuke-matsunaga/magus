@@ -20,6 +20,12 @@ BEGIN_NAMESPACE_YM_NETWORKS
 
 BEGIN_NONAMESPACE
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_set<TvFunc> FuncSet;
+#else
+typedef hash_set<TvFunc> FuncSet;
+#endif
+
 // 実は要らない．
 #if 0
 ymuint16
@@ -406,9 +412,9 @@ s_RwtAigSubgraphs[] =
 // 同値類のなかで，真理値表ベクタを辞書順で比較したときに最小となる関数を
 // 代表関数と定めた場合の代表関数集合を求める．
 void
-init_repfunc(hash_set<TvFunc>& rep_func)
+init_repfunc(FuncSet& rep_func)
 {
-  hash_set<TvFunc> nonrep;
+  FuncSet nonrep;
   NpnMap map(4, kPolPosi);
   for (ymuint32 p = 0U; p < 0x10000; ++ p) {
     vector<int> vals(16);
@@ -451,7 +457,7 @@ void
 set_abc_table(RwtPatGen& pg)
 {
   // 代表関数を読み込む．
-  hash_set<TvFunc> rep_func;
+  FuncSet rep_func;
   init_repfunc(rep_func);
 
 #ifdef DEBUG
@@ -484,7 +490,7 @@ set_abc_table(RwtPatGen& pg)
     func_array[i + 1] = TvFunc::posi_literal(4, VarId(i));
   }
 
-  hash_set<TvFunc> rep_func2;
+  FuncSet rep_func2;
   for (ymuint i = 0; i < n_nodes; ++ i) {
     ymuint16 v0 = s_RwtAigSubgraphs[i * 2 + 0];
     ymuint16 v1 = s_RwtAigSubgraphs[i * 2 + 1];

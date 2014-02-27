@@ -86,7 +86,7 @@ McOp::count_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    hash_map<BddEdge, mpz_class>::iterator p = mCompTbl1.find(e);
+    BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       return p->second;
     }
@@ -124,7 +124,7 @@ McOp::count_sub2(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    hash_map<BddEdge, ymuint32>::iterator p = mCompTbl2.find(e);
+    BddEdgeUint32Map::iterator p = mCompTbl2.find(e);
     if ( p != mCompTbl2.end() ) {
       return p->second;
     }

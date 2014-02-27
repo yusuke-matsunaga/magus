@@ -172,7 +172,7 @@ TclCmd::parse_opt(TclObjVector& objv,
 	return TCL_OK;
       }
     }
-    hash_map<string, TclPopt*>::iterator p = mPoptTable.find(opt_str);
+    StrPoptMap::iterator p = mPoptTable.find(opt_str);
     if ( p == mPoptTable.end() ) {
       string emsg = opt_str + ": unknown option";
       set_result(emsg);

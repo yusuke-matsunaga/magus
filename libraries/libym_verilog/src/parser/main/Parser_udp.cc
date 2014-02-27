@@ -78,7 +78,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
   // の確認を行う．
   // まず portdecl_list の各要素を名前をキーにした連想配列に格納する．
   // ついでに output の数を数える．
-  hash_map<string, const PtIOItem*> iomap;
+  StrIOMap iomap;
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io = iohead_array[i];
     if ( io->type() == kPtIO_Output ) {
@@ -125,7 +125,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
   for (ymuint i = 0; i < port_array.size(); ++ i) {
     const PtiPort* port = port_array[i];
     const char* port_name = port->ext_name();
-    hash_map<string, const PtIOItem*>::iterator q = iomap.find(port_name);
+    StrIOMap::iterator q = iomap.find(port_name);
     if ( q == iomap.end() ) {
       ostringstream buf;
       buf << "\"" << port_name << "\" undefined.";
@@ -157,8 +157,8 @@ Parser::new_Udp1995(const FileRegion& file_region,
 
   if ( !iomap.empty() ) {
     // iolist 中のみに現れる要素がある．
-    for (hash_map<string, const PtIOItem*>::const_iterator q
-	   = iomap.begin(); q != iomap.end(); ++ q) {
+    for (StrIOMap::const_iterator q = iomap.begin();
+	 q != iomap.end(); ++ q) {
       const PtIOItem* ioelem = q->second;
       ostringstream buf;
       buf << "\"" << ioelem->name() << "\" does not appear in portlist.";

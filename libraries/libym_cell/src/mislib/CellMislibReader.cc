@@ -36,7 +36,7 @@ BEGIN_NONAMESPACE
 void
 dfs(const MislibNode* node,
     vector<ShString>& name_list,
-    hash_map<ShString, ymuint>& name_map)
+    NameMap& name_map)
 {
   switch ( node->type() ) {
   case MislibNode::kConst0:
@@ -101,7 +101,7 @@ gen_library(const string& lib_name,
     const MislibNode* ipin_list = gate->ipin_list();
     vector<const MislibNode*> ipin_array;
     vector<ShString> ipin_name_list;
-    hash_map<ShString, ymuint> ipin_name_map;
+    NameMap ipin_name_map;
     if ( ipin_list->type() == MislibNode::kList ) {
       // 通常の入力ピン定義がある場合
       // ipin_list の順に入力ピンを作る．

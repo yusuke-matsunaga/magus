@@ -86,11 +86,17 @@ private:
 
   CutHash mCutHash;
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_set<TvFunc> FuncSet;
+#else
+  typedef hash_set<TvFunc> FuncSet;
+#endif
+
   // 関数のハッシュ表
-  hash_set<TvFunc> mAllFunc;
+  FuncSet mAllFunc;
 
   // 代表関数のハッシュ表
-  hash_set<TvFunc> mRepFunc;
+  FuncSet mRepFunc;
 
   // 全カットのリスト
   list<Cut*> mCutList;

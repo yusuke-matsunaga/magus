@@ -342,7 +342,7 @@ private:
   /// @brief count の下請関数
   mpz_class
   count_step(CNFddEdge e,
-	     hash_map<CNFddEdge, mpz_class>& mc_map);
+	     CNFddEdgeMpzMap& mc_map);
 
   /// @brief サポート変数に印をつける．
   void

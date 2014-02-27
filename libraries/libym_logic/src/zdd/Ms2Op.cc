@@ -63,7 +63,7 @@ Ms2Op::apply_step(ZddEdge e,
   assert_cond( !e.is_zero(), __FILE__, __LINE__);
 
   // この時点で e は終端ではない．
-  hash_map<ZddEdge, pair<ZddEdge, ymuint32> >::iterator p = mHash.find(e);
+  MinimumSetMap::iterator p = mHash.find(e);
   if ( p != mHash.end() ) {
     nelem = p->second.second;
     return p->second.first;

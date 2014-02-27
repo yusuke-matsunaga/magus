@@ -11,7 +11,6 @@
 #include "verilog/BitVector.h"
 
 using namespace std;
-using HASH_NAMESPACE::hash_map;
 using nsYm::nsVerilog::BitVector;
 
 extern
@@ -28,7 +27,13 @@ extern string cur_text;
 
 #define YYSTYPE BitVector
 
-hash_map<string, BitVector> id_table;
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef std::unordered_map<string, BitVector> IdTable;
+#else
+typedef HASH_NAMESPACE::hash_map<string, BitVector> IdTable;
+#endif
+
+IdTable id_table;
 string lname;
 
 %}
@@ -246,7 +251,7 @@ expr
 variable
 : ID
 {
-  hash_map<string, BitVector>::iterator p = id_table.find(cur_text);
+  IdTable::iterator p = id_table.find(cur_text);
   if ( p == id_table.end() ) {
     cerr << cur_text << " : not defined" << endl;
     YYERROR;

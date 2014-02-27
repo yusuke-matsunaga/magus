@@ -29,6 +29,12 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<string, int> StrIntMap;
+#else
+typedef hash_map<string, int> StrIntMap;
+#endif
+
 BEGIN_NONAMESPACE
 
 // 英語の序数の接尾語を作る関数
@@ -336,7 +342,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 
   // YACC の文法から一つでも named_con なら全部そう
   bool conn_by_name = (pt_inst->port(0)->name() != NULL);
-  hash_map<string, int> port_index;
+  StrIntMap port_index;
   if ( conn_by_name ) {
     // ポート名とインデックスの辞書を作る．
     ymuint n = pt_module->port_num();
@@ -364,7 +370,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
-      hash_map<string, int>::iterator p = port_index.find(port_name);
+      StrIntMap::iterator p = port_index.find(port_name);
       if ( p == port_index.end() ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";
@@ -553,7 +559,7 @@ ItemGen::link_module(ElbModule* module,
 
   // YACC の文法から一つでも named_con なら全部そう
   bool conn_by_name = (pt_inst->port(0)->name() != NULL);
-  hash_map<string, int> port_index;
+  StrIntMap port_index;
   if ( conn_by_name ) {
     // ポート名とインデックスの辞書を作る．
     ymuint n = pt_module->port_num();
@@ -581,7 +587,7 @@ ItemGen::link_module(ElbModule* module,
       // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
-      hash_map<string, int>::iterator p = port_index.find(port_name);
+      StrIntMap::iterator p = port_index.find(port_name);
       if ( p == port_index.end() ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";

@@ -88,8 +88,7 @@ ElbMgr::udp_list() const
 const ElbUdpDefn*
 ElbMgr::find_udp(const char* name) const
 {
-  hash_map<string, const ElbUdpDefn*>::const_iterator p;
-  p = mUdpHash.find(name);
+  UdpDict::const_iterator p = mUdpHash.find(name);
   if ( p == mUdpHash.end() ) {
     return NULL;
   }
@@ -128,8 +127,7 @@ ElbMgr::topmodule_list() const
 const ElbUserSystf*
 ElbMgr::find_user_systf(const char* name) const
 {
-  hash_map<string, const ElbUserSystf*>::const_iterator p;
-  p = mSystfHash.find(name);
+  SystfDict::const_iterator p = mSystfHash.find(name);
   if ( p == mSystfHash.end() ) {
     return NULL;
   }

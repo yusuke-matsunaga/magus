@@ -27,7 +27,13 @@ BEGIN_NAMESPACE_YM_BDD
 
 #define YYSTYPE Bdd
 
-hash_map<string, Bdd> id_table;
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<string, Bdd> StrBddMap;
+#else
+typedef hash_map<string, Bdd> StrBddMap;
+#endif
+
+StrBddMap id_table;
 string lname;
 
 BddMgr mgr("bmc", "Bdd Manager");
@@ -218,7 +224,7 @@ pred
 variable
 : ID
 {
-  hash_map<string, Bdd>::iterator p = id_table.find(cur_text);
+  StrBddMap::iterator p = id_table.find(cur_text);
   if ( p == id_table.end() ) {
     cerr << cur_text << " : not defined" << endl;
     YYERROR;

@@ -387,6 +387,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<string, const ElbUdpDefn*> UdpDict;
+  typedef unordered_map<string, const ElbUserSystf*> SystfDict;
+#else
+  typedef hash_map<string, const ElbUdpDefn*> UdpDict;
+  typedef hash_map<string, const ElbUserSystf*> SystfDict;
+#endif
+
   // メモリ確保用のアロケータ
   Alloc& mAlloc;
 
@@ -394,13 +402,13 @@ private:
   list<const VlUdpDefn*> mUdpList;
 
   // UDP の辞書
-  hash_map<string, const ElbUdpDefn*> mUdpHash;
+  UdpDict mUdpHash;
 
   // topmodule のリスト
   list<const VlModule*> mTopmoduleList;
 
   // UserSystf の辞書
-  hash_map<string, const ElbUserSystf*> mSystfHash;
+  SystfDict mSystfHash;
 
   // 名前をキーにしたオブジェクトの辞書
   ObjDict mObjDict;

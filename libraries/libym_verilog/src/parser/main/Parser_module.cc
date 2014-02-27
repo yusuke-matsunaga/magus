@@ -97,7 +97,7 @@ Parser::new_Module1995(const FileRegion& file_region,
 
   // port_array をスキャンして中で用いられている名前を portref_dic
   // に登録する．
-  hash_set<string> portref_dic;
+  StrSet portref_dic;
   for (ymuint i = 0; i < port_array.size(); ++ i) {
     PtiPort* port = port_array[i];
     ymuint n = port->portref_size();
@@ -111,7 +111,7 @@ Parser::new_Module1995(const FileRegion& file_region,
   // 入出力ポート宣言に現れる名前を iodecl_names に入れる．
   // ポート宣言が型を持つ場合にはモジュール内部の宣言要素を生成する．
   // 持たない場合にはデフォルトタイプのネットを生成する．
-  hash_map<string, tVlDirection> iodecl_dirs;
+  StrDirMap iodecl_dirs;
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io_head = iohead_array[i];
     // 名前をキーにして方向を記録しておく
@@ -169,7 +169,7 @@ Parser::new_Module1995(const FileRegion& file_region,
     for (ymuint j = 0; j < n; ++ j) {
       const PtExpr* portref = port->portref_elem(j);
       const char* name = portref->name();
-      hash_map<string, tVlDirection>::iterator p = iodecl_dirs.find(name);
+      StrDirMap::iterator p = iodecl_dirs.find(name);
       if ( p == iodecl_dirs.end() ) {
 	// name は IOH リストに存在しない．
 	ostringstream buf;

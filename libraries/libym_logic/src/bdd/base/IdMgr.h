@@ -53,8 +53,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<BddEdge, ymuint64> EdgeIdMap;
+#else
+  typedef hash_map<BddEdge, ymuint64> EdgeIdMap;
+#endif
+
   // BddEdge と ID 番号の対応表
-  hash_map<BddEdge, ymuint64> mMap;
+  EdgeIdMap mMap;
 
   // 次に割り当てるID番号
   ymuint64 mNext;

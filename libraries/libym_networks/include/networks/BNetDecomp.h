@@ -132,8 +132,8 @@ private:
   // ネットワークを変更するためのオブジェクト
   BNetManip* mManip;
 
-  // type1 で用いる深さ保持用の連想配列
-  hash_map<ymuint32, int> mDepthMap;
+  // type1 で用いる深さ保持用の配列
+  vector<int> mDepthMap;
 
   // type2 で用いる乱数発生器
   RandGen* mRandGen;

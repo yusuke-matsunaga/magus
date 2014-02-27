@@ -503,7 +503,7 @@ SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
 const SmtFunValidator*
 SmtSolverImpl::get_fun_validator(tSmtFunType fun_type)
 {
-  hash_map<ymuint32, const SmtFunValidator*>::const_iterator p = mFunValidatorMap.find(fun_type);
+  FunValidatorMap::const_iterator p = mFunValidatorMap.find(fun_type);
   if ( p == mFunValidatorMap.end() ) {
     return NULL;
   }

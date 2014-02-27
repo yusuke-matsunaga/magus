@@ -82,7 +82,7 @@ LcGroupMgr::find_group(const TvFuncM& f,
 		       bool builtin)
 {
   LcGroup* fgroup = NULL;
-  hash_map<TvFuncM, ymuint>::iterator p = mGroupMap.find(f);
+  FuncMIdMap::iterator p = mGroupMap.find(f);
   if ( p == mGroupMap.end() ) {
     // なかったので新たに作る．
     fgroup = mLibComp.new_group();
@@ -94,7 +94,7 @@ LcGroupMgr::find_group(const TvFuncM& f,
     find_repfunc(f, repfunc, xmap);
 
     LcClass* fclass = NULL;
-    hash_map<TvFuncM, ymuint>::iterator q = mClassMap.find(repfunc);
+    FuncMIdMap::iterator q = mClassMap.find(repfunc);
     if ( q == mClassMap.end() ) {
       // まだ登録されていない．
       fclass = mLibComp.new_class(repfunc, builtin);

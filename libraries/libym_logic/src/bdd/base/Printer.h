@@ -72,7 +72,7 @@ private:
   ostream& mStream;
 
   // 処理済の BddEdge に印を付けておくためのハッシュ表
-  hash_set<BddEdge> mMark;
+  BddEdgeSet mMark;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;

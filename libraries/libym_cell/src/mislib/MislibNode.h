@@ -18,6 +18,12 @@
 
 BEGIN_NAMESPACE_YM_MISLIB
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<ShString, ymuint> NameMap;
+#else
+typedef hash_map<ShString, ymuint> NameMap;
+#endif
+
 //////////////////////////////////////////////////////////////////////
 /// @class MislibNode MislibNode.h "MislibNode.h"
 /// @brief トークンを表す基底クラス
@@ -134,7 +140,7 @@ public:
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
   LogExpr
-  to_expr(const hash_map<ShString, ymuint>& name_map) const = 0;
+  to_expr(const NameMap& name_map) const = 0;
 
 
 public:

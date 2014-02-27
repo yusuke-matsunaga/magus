@@ -140,7 +140,7 @@ FuncMgr::rep_func_list(vector<TvFunc>& func_list) const
 {
   func_list.clear();
   func_list.reserve(mRepHash.size());
-  for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
+  for (FuncSet::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     func_list.push_back(*p);
   }
@@ -153,7 +153,7 @@ FuncMgr::rep_func_list(ymuint ni,
 {
   // 数を数える．
   ymuint n = 0;
-  for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
+  for (FuncSet::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     const TvFunc& f = *p;
     if ( f.input_num() == ni ) {
@@ -162,7 +162,7 @@ FuncMgr::rep_func_list(ymuint ni,
   }
   func_list.clear();
   func_list.reserve(n);
-  for (hash_set<TvFunc>::const_iterator p = mRepHash.begin();
+  for (FuncSet::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     const TvFunc& f = *p;
     if ( f.input_num() == ni ) {
@@ -191,7 +191,7 @@ FuncMgr::dump_rep(ODO& s) const
 {
 #if 0
   NpnMgr npn_mgr;
-  hash_set<TvFunc> rep_hash;
+  FuncSet rep_hash;
   for (ymuint i = 0; i < mTableSize; ++ i) {
     for (FuncData* data = mTable[i]; data; data = data->mLink) {
       const TvFunc& f = data->mFunc;
@@ -206,7 +206,7 @@ FuncMgr::dump_rep(ODO& s) const
 
   ymuint32 n = rep_hash.size();
   s << n;
-  for (hash_set<TvFunc>::iterator p = rep_hash.begin();
+  for (FuncSet::iterator p = rep_hash.begin();
        p != rep_hash.end(); ++ p) {
     const TvFunc& f = *p;
     s << f;
@@ -214,7 +214,7 @@ FuncMgr::dump_rep(ODO& s) const
 #else
   ymuint32 n = mRepHash.size();
   s << n;
-  for (hash_set<TvFunc>::iterator p = mRepHash.begin();
+  for (FuncSet::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     const TvFunc& f = *p;
     s << f;

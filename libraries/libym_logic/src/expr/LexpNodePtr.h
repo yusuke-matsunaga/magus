@@ -64,7 +64,11 @@ private:
 typedef vector<LexpNodePtr> LexpNodeList;
 typedef vector<LexpNodePtr>::iterator LexpNode_itr;
 typedef vector<LexpNodePtr>::const_iterator LexpNode_citr;
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<VarId, LexpNodePtr> VarLexpNodeMap;
+#else
 typedef hash_map<VarId, LexpNodePtr> VarLexpNodeMap;
+#endif
 
 
 

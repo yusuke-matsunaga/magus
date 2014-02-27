@@ -57,8 +57,14 @@ BtZdd::operator()(TpgNode* fnode,
 {
   Zdd ans = mMgr.make_empty();
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<ymuint, TpgNode*> IdNodeMap;
+#else
+  typedef hash_map<ymuint, TpgNode*> IdNodeMap;
+#endif
+
   // 入力に対応する変数を作る．
-  hash_map<ymuint, TpgNode*> input_map;
+  IdNodeMap input_map;
   for (vector<TpgNode*>::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     TpgNode* node = *p;
@@ -85,7 +91,7 @@ BtZdd::operator()(TpgNode* fnode,
   while ( !ans.is_one() ) {
     assert_cond( ans.edge0().is_zero(), __FILE__, __LINE__);
     VarId vid = ans.root_var();
-    hash_map<ymuint, TpgNode*>::iterator p = input_map.find(vid.val());
+    IdNodeMap::iterator p = input_map.find(vid.val());
     assert_cond( p != input_map.end(), __FILE__, __LINE__);
     TpgNode* node = p->second;
     record_value(node, model);

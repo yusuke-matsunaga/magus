@@ -351,11 +351,19 @@ private:
   // 論理ノードのリスト
   CmnNodeList mLogicList;
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<const Cell*, const CmnDffCell*> CellDffMap;
+  typedef unordered_map<const Cell*, const CmnLatchCell*> CellLatchMap;
+#else
+  typedef hash_map<const Cell*, const CmnDffCell*> CellDffMap;
+  typedef hash_map<const Cell*, const CmnLatchCell*> CellLatchMap;
+#endif
+
   // cell のアドレスをキーにして CmnDffCell を記憶するハッシュ表
-  hash_map<const Cell*, const CmnDffCell*> mDffCellMap;
+  CellDffMap mDffCellMap;
 
   // cell のアドレスをキーにして CmnLatchCell を記憶するハッシュ表
-  hash_map<const Cell*, const CmnLatchCell*> mLatchCellMap;
+  CellLatchMap mLatchCellMap;
 
 };
 

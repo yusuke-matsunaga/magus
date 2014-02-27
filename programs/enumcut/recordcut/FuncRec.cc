@@ -77,12 +77,18 @@ FuncRec::node_init(const BdnNode* node)
 
 BEGIN_NONAMESPACE
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<ymuint, TvFunc> IdFuncMap;
+#else
+typedef IdFuncMap IdFuncMap;
+#endif
+
 // cut_to_func の下請け関数
 TvFunc
 make_func(const BdnNode* node,
-	  hash_map<ymuint, TvFunc>& f_map)
+	  IdFuncMap& f_map)
 {
-  hash_map<ymuint, TvFunc>::const_iterator p = f_map.find(node->id());
+  IdFuncMap::const_iterator p = f_map.find(node->id());
   if ( p != f_map.end() ) {
     return p->second;
   }
@@ -118,7 +124,7 @@ cut_to_func(const BdnNode* root,
 	    ymuint ni,
 	    const BdnNode** inputs)
 {
-  hash_map<ymuint, TvFunc> f_map;
+  IdFuncMap f_map;
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* node = inputs[i];
     TvFunc f = TvFunc::posi_literal(ni, VarId(i));

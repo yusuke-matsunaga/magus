@@ -16,6 +16,12 @@
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<ymuint, ymuint> UintUintMap;
+#else
+typedef hash_map<ymuint, ymuint> UintUintMap;
+#endif
+
 //////////////////////////////////////////////////////////////////////
 /// @class LcPatMgr LcPatMgr.h "LcPatMgr.h"
 /// @brief パタングラフを生成するクラス
@@ -113,8 +119,8 @@ private:
   bool
   ceq_sub(LcPatNode* node1,
 	  LcPatNode* node2,
-	  hash_map<ymuint, ymuint>& map1,
-	  hash_map<ymuint, ymuint>& map2);
+	  UintUintMap& map1,
+	  UintUintMap& map2);
 
   /// @brief パタングラフを生成する再帰関数
   /// @param[in] expr 元になる論理式

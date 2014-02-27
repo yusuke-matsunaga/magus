@@ -72,7 +72,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算結果テーブル
-  hash_map<BddEdge, BddEdge> mCompTbl;
+  BddEdgeEdgeMap mCompTbl;
 
 };
 
@@ -87,7 +87,7 @@ inline
 BddEdge
 BddUniOp::get(BddEdge e1)
 {
-  hash_map<BddEdge, BddEdge>::iterator p = mCompTbl.find(e1);
+  BddEdgeEdgeMap::iterator p = mCompTbl.find(e1);
   if ( p == mCompTbl.end() ) {
     return BddEdge::make_error();
   }

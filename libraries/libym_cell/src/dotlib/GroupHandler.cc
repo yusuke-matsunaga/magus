@@ -157,7 +157,7 @@ GroupHandler::reg_handler(const ShString& attr_name,
 DotlibHandler*
 GroupHandler::find_handler(const ShString& attr_name)
 {
-  hash_map<ShString, DotlibHandler*>::const_iterator p
+  StrHandlerMap::const_iterator p
     = mHandlerMap.find(attr_name);
   if ( p == mHandlerMap.end() ) {
     return NULL;

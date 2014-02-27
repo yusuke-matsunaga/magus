@@ -54,8 +54,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<CNFddEdge, ymuint64> IdMap;
+#else
+  typedef hash_map<CNFddEdge, ymuint64> IdMap;
+#endif
+
   // CNFddEdge と ID 番号の対応表
-  hash_map<CNFddEdge, ymuint64> mMap;
+  IdMap mMap;
 
   // 次に割り当てるID番号
   ymuint64 mNext;

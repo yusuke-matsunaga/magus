@@ -285,8 +285,7 @@ CmnMgrImpl::clear()
 const CmnDffCell*
 CmnMgrImpl::dff_cell(const Cell* cell) const
 {
-  hash_map<const Cell*, const CmnDffCell*>::const_iterator p
-    = mDffCellMap.find(cell);
+  CellDffMap::const_iterator p = mDffCellMap.find(cell);
   if ( p == mDffCellMap.end() ) {
     return NULL;
   }
@@ -299,8 +298,7 @@ CmnMgrImpl::dff_cell(const Cell* cell) const
 const CmnLatchCell*
 CmnMgrImpl::latch_cell(const Cell* cell) const
 {
-  hash_map<const Cell*, const CmnLatchCell*>::const_iterator p
-    = mLatchCellMap.find(cell);
+  CellLatchMap::const_iterator p = mLatchCellMap.find(cell);
   if ( p == mLatchCellMap.end() ) {
     return NULL;
   }

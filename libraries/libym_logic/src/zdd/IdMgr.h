@@ -55,7 +55,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ZddEdge と ID 番号の対応表
-  hash_map<ZddEdge, ymuint64> mMap;
+  IdMap mMap;
 
   // 次に割り当てるID番号
   ymuint64 mNext;

@@ -44,7 +44,7 @@ MislibConst0::is_expr() const
 // @brief 対応する論理式を生成する．
 // @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
 LogExpr
-MislibConst0::to_expr(const hash_map<ShString, ymuint>& name_map) const
+MislibConst0::to_expr(const NameMap& name_map) const
 {
   return LogExpr::make_zero();
 }
@@ -92,7 +92,7 @@ MislibConst1::is_expr() const
 // @brief 対応する論理式を生成する．
 // @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
 LogExpr
-MislibConst1::to_expr(const hash_map<ShString, ymuint>& name_map) const
+MislibConst1::to_expr(const NameMap& name_map) const
 {
   return LogExpr::make_one();
 }

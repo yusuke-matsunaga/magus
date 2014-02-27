@@ -51,7 +51,7 @@ IdMgr::id(BddEdge e)
   BddEdge e_p(e);
   e_p.normalize();
   ymuint64 id;
-  hash_map<BddEdge, ymuint64>::iterator p = mMap.find(e_p);
+  EdgeIdMap::iterator p = mMap.find(e_p);
   if ( p == mMap.end() ) {
     id = mNext;
     ++ mNext;

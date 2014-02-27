@@ -113,7 +113,7 @@ private:
 
   // ハッシュ表を拡大するときに使われる定数
   static
-  const double kHashCapacity = 1.8;
+  constexpr double kHashCapacity = 1.8;
 
   // Cell の配列
   vector<Cell*> mCellArray;

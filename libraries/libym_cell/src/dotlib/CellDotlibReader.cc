@@ -40,6 +40,12 @@ BEGIN_NAMESPACE_YM_DOTLIB
 
 BEGIN_NONAMESPACE
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<ShString, ymuint> PinMap;
+#else
+typedef hash_map<ShString, ymuint> PinMap;
+#endif
+
 // 文字列を空白で区切る
 void
 split(const string& src_str,
@@ -60,7 +66,7 @@ split(const string& src_str,
 // DotlibNode から　LogExpr を作る．
 LogExpr
 dot2expr(const DotlibNode* node,
-	 const hash_map<ShString, ymuint>& pin_map)
+	 const PinMap& pin_map)
 {
   // 特例
   if ( node == NULL ) {
@@ -80,7 +86,7 @@ dot2expr(const DotlibNode* node,
   }
   if ( node->is_string() ) {
     ShString name = node->string_value();
-    hash_map<ShString, ymuint>::const_iterator p = pin_map.find(name);
+    PinMap::const_iterator p = pin_map.find(name);
     if ( p == pin_map.end() ) {
       ostringstream buf;
       buf << name << ": No such pin-name.";
@@ -184,7 +190,7 @@ gen_lut(CellLibrary* library,
 // 論理式を生成する．
 void
 gen_expr(const DotlibPin& pin_info,
-	 const hash_map<ShString, ymuint>& pin_map,
+	 const PinMap& pin_map,
 	 vector<bool>& output_array,
 	 vector<LogExpr>& logic_array,
 	 vector<LogExpr>& tristate_array)
@@ -321,7 +327,7 @@ gen_timing(CellLibrary* library,
 	   const list<const DotlibNode*>& timing_list,
 	   ymuint cell_id,
 	   ymuint& timing_id,
-	   const hash_map<ShString, ymuint>& pin_map,
+	   const PinMap& pin_map,
 	   vector<vector<ymuint> >& tid_list)
 {
   const Cell* cell = library->cell(cell_id);
@@ -713,7 +719,7 @@ gen_library(const DotlibNode* dt_library)
     vector<DotlibPin> pin_info_array(npg);
 
     // ピン名とピン番号の連想配列
-    hash_map<ShString, ymuint> pin_map;
+    PinMap pin_map;
 
     // ピン情報の読み出し
     ymuint ni = 0;

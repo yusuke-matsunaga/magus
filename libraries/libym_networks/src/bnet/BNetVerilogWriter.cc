@@ -138,7 +138,7 @@ BNetVerilogWriter::dump(ostream& s,
     for (ymuint i = 0; i < n; i ++) {
       BNode* inode = node->fanin(i);
       assert_cond( inode != 0, __FILE__, __LINE__);
-      fanin_name.insert(make_pair(i, inode->name()));
+      fanin_name.insert(make_pair(VarId(i), inode->name()));
     }
     const LogExpr& f = node->func();
     vlw_assign.put_rhs(f, fanin_name);

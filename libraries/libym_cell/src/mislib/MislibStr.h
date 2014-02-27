@@ -56,7 +56,7 @@ public:
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
   LogExpr
-  to_expr(const hash_map<ShString, ymuint>& name_map) const;
+  to_expr(const NameMap& name_map) const;
 
   /// @brief 内容を出力する．
   /// デバッグ用

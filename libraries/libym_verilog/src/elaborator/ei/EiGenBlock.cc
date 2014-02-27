@@ -166,7 +166,7 @@ EiGfRoot::add(int index,
 const VlNamedObj*
 EiGfRoot::elem_by_index(int index)
 {
-  hash_map<int, const VlNamedObj*>::iterator p = mTable.find(index);
+  IntNamedObjMap::iterator p = mTable.find(index);
   if ( p != mTable.end() ) {
     return p->second;
   }

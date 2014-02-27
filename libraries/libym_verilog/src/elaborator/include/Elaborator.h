@@ -213,8 +213,14 @@ private:
   // constant function の辞書
   CfDict mCfDict;
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<string, const PtModule*> ModuleDict;
+#else
+  typedef hash_map<string, const PtModule*> ModuleDict;
+#endif
+
   // モジュールテンプレートの辞書
-  hash_map<string, const PtModule*> mModuleDict;
+  ModuleDict mModuleDict;
 
   // attribute instance の辞書
   AttrDict mAttrDict;

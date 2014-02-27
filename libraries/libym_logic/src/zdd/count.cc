@@ -56,7 +56,7 @@ ZddMgrImpl::count(ZddEdge e)
     return 0;
   }
 
-  hash_map<ZddEdge, mpz_class> mc_map;
+  ZddEdgeMpzMap mc_map;
   mpz_class ans = count_step(e, mc_map);
   return ans;
 }
@@ -64,7 +64,7 @@ ZddMgrImpl::count(ZddEdge e)
 // count の下請関数
 mpz_class
 ZddMgrImpl::count_step(ZddEdge e,
-		       hash_map<ZddEdge, mpz_class>& mc_map)
+		       ZddEdgeMpzMap& mc_map)
 {
   bool zattr = e.zattr();
   e.normalize();
@@ -79,7 +79,7 @@ ZddMgrImpl::count_step(ZddEdge e,
     ymuint ref = vp->refcount();
     bool found = false;
     if ( ref != 1 ) {
-      hash_map<ZddEdge, mpz_class>::iterator p = mc_map.find(e);
+      ZddEdgeMpzMap::iterator p = mc_map.find(e);
       if ( p != mc_map.end() ) {
 	found = true;
 	ans = p->second;

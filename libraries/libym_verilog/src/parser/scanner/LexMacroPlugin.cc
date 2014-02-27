@@ -20,6 +20,12 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<string, ymuint> StrPosMap;
+#else
+typedef hash_map<string, ymuint> StrPosMap;
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // @class LpDefine
 // @ingroup VlParser
@@ -73,7 +79,7 @@ LpDefine::parse()
   FileRegion macro_loc = cur_token_loc();
 
   // パラメータ名をキーにして位置番号を格納する連想配列
-  hash_map<string, ymuint> param_dic;
+  StrPosMap param_dic;
 
   // ここは空白が重要なので get_raw_token() を呼ぶ．
   int id = get_raw_token();
@@ -148,7 +154,7 @@ LpDefine::parse()
     for (int id = get_nospace_token();
 	 id != NL && id != EOF;
 	 id = get_nospace_token()) {
-      hash_map<string, ymuint>::iterator p;
+      StrPosMap::iterator p;
       if ( id == IDENTIFIER &&
 	   (p = param_dic.find(cur_string())) != param_dic.end() ) {
 	// 置き換え対象のパラメータ

@@ -55,7 +55,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ZddEdge と ID 番号の対応表
-  hash_map<ZddEdge, ymuint64> mMap;
+  IdMap mMap;
 
   // 次に割り当てるID番号
   ymuint64 mNext;
@@ -120,7 +120,7 @@ private:
   ostream& mStream;
 
   // 処理済の ZddEdge に印を付けておくためのハッシュ表
-  hash_set<ZddEdge> mMark;
+  ZddEdgeSet mMark;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;

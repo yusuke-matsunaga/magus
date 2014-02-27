@@ -950,7 +950,7 @@ tSmtSortId
 ShellImpl::make_sort(const SmtId* name_id,
 		     const vector<tSmtSortId>& elem_list)
 {
-  hash_map<ymuint32, tSmtSortId>::iterator p = mBuiltinSortMap.find(name_id->id());
+  SortMap::iterator p = mBuiltinSortMap.find(name_id->id());
   if ( p != mBuiltinSortMap.end() ) {
     return p->second;
   }
@@ -1045,7 +1045,7 @@ ShellImpl::eval_as_sort(const SmtLibNode* node)
   if ( id == NULL ) {
     if ( node->type() != kListToken ) {
       mErrBuf << "syntax error : " << node->loc();
-      return NULL;
+      return kSmtSort_None;
     }
 
     elem_list.reserve(node->child_num() - 1);
@@ -1054,7 +1054,7 @@ ShellImpl::eval_as_sort(const SmtLibNode* node)
     id = eval_as_id(node1);
     if ( id == NULL ) {
       mErrBuf << "expected identifier at " << node1->loc();
-      return NULL;
+      return kSmtSort_None;
     }
 
     for (const SmtLibNode* node2 = node1->sibling();
@@ -1062,13 +1062,13 @@ ShellImpl::eval_as_sort(const SmtLibNode* node)
       tSmtSortId sort1 = eval_as_sort(node2);
       if ( sort1 == kSmtSort_None ) {
 	mErrBuf << "not a registered sort: " << node2->loc();
-	return NULL;
+	return kSmtSort_None;
       }
       elem_list.push_back(sort1);
     }
     if ( elem_list.empty() ) {
       mErrBuf << "at least one sort required: " << node1->loc();
-      return NULL;
+      return kSmtSort_None;
     }
   }
 

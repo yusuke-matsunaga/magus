@@ -38,7 +38,7 @@ DotlibAttrMap::get(const char* name,
 		   vector<const DotlibNode*>& node_list) const
 {
   node_list.clear();
-  hash_map<ShString, list<const DotlibNode*> >::const_iterator p
+  StrNodeListMap::const_iterator p
     = mHash.find(ShString(name));
   if ( p == mHash.end() ) {
     return false;
@@ -88,7 +88,7 @@ bool
 DotlibAttrMap::get_singleton_or_null(const char* name,
 				     const DotlibNode*& node) const
 {
-  hash_map<ShString, list<const DotlibNode*> >::const_iterator p
+  StrNodeListMap::const_iterator p
     = mHash.find(ShString(name));
   if ( p == mHash.end() ) {
     node = NULL;
@@ -128,7 +128,7 @@ void
 DotlibAttrMap::add(const ShString& name,
 		   const DotlibNode* node)
 {
-  hash_map<ShString, list<const DotlibNode*> >::iterator p = mHash.find(name);
+  StrNodeListMap::iterator p = mHash.find(name);
   if ( p == mHash.end() ) {
     mHash.insert(make_pair(name, list<const DotlibNode*>()));
     p = mHash.find(name);

@@ -68,13 +68,14 @@ sort_nodes(const BNetwork* network,
   vector<ElimElem> work;
   work.reserve(n);
 
-  hash_map<BNode*, int> level_map;
+  ymuint max_id = network->max_node_id();
+  vector<ymuint> level_map(max_id, 0);
 
   // 外部入力のレベルは 0
   for (BNodeList::const_iterator p = network->inputs().begin();
        p != network->inputs().end(); ++ p) {
     BNode* node = *p;
-    level_map.insert(pair<BNode*, int>(node, 0));
+    level_map[node->id()] = 0;
   }
 
   // まず，トポロジカル順にノードとその情報を work に入れる．
@@ -86,15 +87,13 @@ sort_nodes(const BNetwork* network,
     int level = 0;
     for (ymuint j = 0; j < ni; j ++) {
       BNode* fanin = node->fanin(j);
-      hash_map<BNode*, int>::iterator p = level_map.find(fanin);
-      assert_cond(p != level_map.end(), __FILE__, __LINE__);
-      int ilevel = p->second;
+      int ilevel = level_map[fanin->id()];
       if ( level < ilevel ) {
 	level = ilevel;
       }
     }
     level ++;
-    level_map.insert(pair<BNode*, int>(node, level));
+    level_map[node->id()] = level;
     int ovalue = 0;
     for (BNodeFoList::const_iterator p = node->fanouts_begin();
 	 p != node->fanouts_end(); ++ p) {

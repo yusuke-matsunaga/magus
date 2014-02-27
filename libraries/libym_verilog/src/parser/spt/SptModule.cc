@@ -335,8 +335,7 @@ SptModule::cell() const
 const PtItem*
 SptModule::find_function(const char* name) const
 {
-  hash_map<string, const PtItem*>::const_iterator p
-    = mFuncDic.find(name);
+  StrItemMap::const_iterator p = mFuncDic.find(name);
   if ( p == mFuncDic.end() ) {
     return NULL;
   }

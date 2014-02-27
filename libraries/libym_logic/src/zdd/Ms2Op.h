@@ -66,8 +66,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<ZddEdge, pair<ZddEdge, ymuint32> > MinimumSetMap;
+#else
+  typedef hash_map<ZddEdge, pair<ZddEdge, ymuint32> > MinimumSetMap;
+#endif
+
   // 枝をキーとしてminimum set を保持するハッシュ表
-  hash_map<ZddEdge, pair<ZddEdge, ymuint32> > mHash;
+  MinimumSetMap mHash;
 
 };
 

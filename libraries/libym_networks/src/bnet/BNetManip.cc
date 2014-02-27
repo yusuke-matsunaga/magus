@@ -326,10 +326,10 @@ BNetManip::change_logic(BNode* node,
   if ( new_ni < orig_ni ) {
     // 式のリテラルの置き換えを行う．
     mTmpMap.clear();
-    for (size_t i = 0; i < orig_ni; i ++) {
+    for (ymuint i = 0; i < orig_ni; i ++) {
       int pos = mTmpPos[i];
       if ( pos >= 0 ) {
-	mTmpMap.insert(make_pair(i, pos));
+	mTmpMap.insert(make_pair(VarId(i), VarId(pos)));
       }
     }
     // リテラルを付け替えたファクタードフォームを作る．

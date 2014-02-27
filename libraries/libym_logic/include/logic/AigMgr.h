@@ -179,7 +179,7 @@ public:
   /// @param[in] input_map 入力とAIGの対応表
   Aig
   make_logic(const LogExpr& expr,
-	     const hash_map<VarId, Aig>& input_map);
+	     const VarAigMap& input_map);
 
   /// @brief コファクターを計算する．
   /// @param[in] aig 対象の AIG ハンドル

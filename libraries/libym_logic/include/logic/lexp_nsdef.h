@@ -56,7 +56,11 @@ typedef list<LogExpr> LogExprList;
 
 /// @ingroup LexpGroup
 /// @brief 変数番号から LogExpr への写像 (連想配列)
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<VarId, LogExpr> VarLogExprMap;
+#else
 typedef hash_map<VarId, LogExpr> VarLogExprMap;
+#endif
 
 
 END_NAMESPACE_YM_LEXP

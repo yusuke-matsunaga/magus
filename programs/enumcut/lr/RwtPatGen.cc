@@ -206,7 +206,7 @@ RwtPatGen::new_pat(const PgNode* root,
     f.negate();
   }
 
-  hash_map<TvFunc, ymuint32>::iterator r = mFuncHash.find(f);
+  FuncMap::iterator r = mFuncHash.find(f);
   if ( r == mFuncHash.end() ) {
     ymuint id = mFuncList.size();
     mFuncList.push_back(f);

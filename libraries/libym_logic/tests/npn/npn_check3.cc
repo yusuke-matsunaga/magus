@@ -21,6 +21,12 @@
 using namespace std;
 using namespace nsYm;
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_set<TvFunc> TvFuncSet;
+#else
+typedef hash_set<TvFunc> TvFuncSet;
+#endif
+
 bool verbose = false;
 
 int check_count = 0;
@@ -66,7 +72,7 @@ gen(ymuint ni,
     int algorithm,
     int dump)
 {
-  hash_set<TvFunc> repfunc_set;
+  TvFuncSet repfunc_set;
 
   ymuint nerr = 0;
 
@@ -163,7 +169,7 @@ gen(ymuint ni,
        << "AVE. CPU time(usec):     " << usec << endl;
 
   if ( dump ) {
-    for (hash_set<TvFunc>::iterator p = repfunc_set.begin();
+    for (TvFuncSet::iterator p = repfunc_set.begin();
 	 p != repfunc_set.end(); ++ p) {
       cout << ni << " " << *p << endl;
     }
@@ -179,7 +185,7 @@ rgen(ymuint ni,
      ymuint flow,
      int algorithm)
 {
-  hash_set<TvFunc> repfunc_set;
+  TvFuncSet repfunc_set;
 
   ymuint nerr = 0;
 
@@ -264,7 +270,7 @@ rgen_walsh(ymuint ni,
 	   int rseed,
 	   ymuint num)
 {
-  hash_set<TvFunc> repfunc_set;
+  TvFuncSet repfunc_set;
 
   ymuint ni_exp = 1 << ni;
   vector<int> buff(ni_exp);

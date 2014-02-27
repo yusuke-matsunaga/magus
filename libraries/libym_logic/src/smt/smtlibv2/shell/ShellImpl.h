@@ -383,8 +383,14 @@ private:
   // SMT ソルバ
   SmtSolver* mSolver;
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<ymuint32, tSmtSortId> SortMap;
+#else
+  typedef hash_map<ymuint32, tSmtSortId> SortMap;
+#endif
+
   // 組み込み型を保持するハッシュ表
-  hash_map<ymuint32, tSmtSortId> mBuiltinSortMap;
+  SortMap mBuiltinSortMap;
 
   // スタック
   vector<StackPage*> mStack;

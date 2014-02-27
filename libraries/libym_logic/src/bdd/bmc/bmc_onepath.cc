@@ -56,14 +56,14 @@ BddMgrClassic::shortest_onepath(BddEdge e)
     return BddEdge::make_overflow();
   }
 
-  hash_map<BddEdge, BddEdge> sp_assoc;
+  BddEdgeEdgeMap sp_assoc;
   return sp_step(e, sp_assoc);
 }
 
 // shortest_onepath 用の下請関数
 BddEdge
 BddMgrClassic::sp_step(BddEdge e,
-		       hash_map<BddEdge, BddEdge>& sp_assoc)
+		       BddEdgeEdgeMap& sp_assoc)
 {
   if ( e.is_one() ) {
     return BddEdge::make_one();
@@ -73,7 +73,7 @@ BddMgrClassic::sp_step(BddEdge e,
   }
 
   BddEdge result;
-  hash_map<BddEdge, BddEdge>::iterator p = sp_assoc.find(e);
+  BddEdgeEdgeMap::iterator p = sp_assoc.find(e);
   if ( p == sp_assoc.end() ) {
     BddNode* vp = e.get_node();
     tPol pol = e.pol();
@@ -126,7 +126,7 @@ BddMgrClassic::shortest_onepath_len(BddEdge e)
   if ( e.is_invalid() ) {
     return 0;
   }
-  hash_map<BddEdge, ymint> assoc;
+  BddEdgeIntMap assoc;
   ymint tmp = spl_step(e, assoc);
   assert_cond(tmp >= 0, __FILE__, __LINE__);
   return static_cast<ymuint>(tmp);
@@ -135,7 +135,7 @@ BddMgrClassic::shortest_onepath_len(BddEdge e)
 // shortest_onepath_len() 中で用いられる下請関数
 ymint
 BddMgrClassic::spl_step(BddEdge e,
-			hash_map<BddEdge, ymint>& assoc)
+			BddEdgeIntMap& assoc)
 {
   if ( e.is_one() ) {
     return 0;
@@ -145,7 +145,7 @@ BddMgrClassic::spl_step(BddEdge e,
   }
 
   ymint result;
-  hash_map<BddEdge, ymint>::iterator p = assoc.find(e);
+  BddEdgeIntMap::iterator p = assoc.find(e);
   if ( p == assoc.end() ) {
     BddNode* vp = e.get_node();
     tPol pol = e.pol();

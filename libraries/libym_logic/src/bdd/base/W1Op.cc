@@ -96,7 +96,7 @@ W1Op::w1_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    hash_map<BddEdge, mpz_class>::iterator p = mCompTbl1.find(e);
+    BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       mpz_class ans = p->second;
       if ( pol == kPolNega ) {
@@ -158,7 +158,7 @@ W1Op::w1_sub2(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    hash_map<BddEdge, ymint32>::iterator p = mCompTbl2.find(e);
+    BddEdgeIntMap::iterator p = mCompTbl2.find(e);
     if ( p != mCompTbl2.end() ) {
       ymint32 ans = p->second;
       if ( pol == kPolNega ) {
@@ -218,7 +218,7 @@ W1Op::w0_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    hash_map<BddEdge, mpz_class>::iterator p = mCompTbl1.find(e);
+    BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       mpz_class ans = p->second;
       if ( pol == kPolNega ) {
@@ -269,7 +269,7 @@ W1Op::w0_sub2(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    hash_map<BddEdge, ymint32>::iterator p = mCompTbl2.find(e);
+    BddEdgeIntMap::iterator p = mCompTbl2.find(e);
     if ( p != mCompTbl2.end() ) {
       ymint32 ans = p->second;
       if ( pol == kPolNega ) {

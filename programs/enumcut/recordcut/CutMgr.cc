@@ -44,11 +44,17 @@ CutMgr::clear()
 
 BEGIN_NONAMESPACE
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<ymuint, TvFunc> IdFuncMap;
+#else
+typedef IdFuncMap IdFuncMap;
+#endif
+
 TvFunc
 make_func(const BdnNode* node,
-	  hash_map<ymuint, TvFunc>& f_map)
+	  IdFuncMap& f_map)
 {
-  hash_map<ymuint, TvFunc>::const_iterator p = f_map.find(node->id());
+  IdFuncMap::const_iterator p = f_map.find(node->id());
   if ( p != f_map.end() ) {
     return p->second;
   }
@@ -78,6 +84,7 @@ make_func(const BdnNode* node,
   return func;
 }
 
+#if 0
 Aig
 make_aig(const BdnNode* node,
 	 AigMgr& aigmgr,
@@ -114,6 +121,7 @@ make_aig(const BdnNode* node,
 
   return aig;
 }
+#endif
 
 END_NONAMESPACE
 
@@ -125,7 +133,7 @@ CutMgr::new_cut(const BdnNode* root,
 		const BdnNode** inputs)
 {
   // 関数を作る．
-  hash_map<ymuint, TvFunc> f_map;
+  IdFuncMap f_map;
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* node = inputs[i];
     TvFunc f = TvFunc::posi_literal(ni, VarId(i));

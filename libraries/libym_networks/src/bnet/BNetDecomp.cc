@@ -75,17 +75,18 @@ BNetDecomp::operator()(BNetwork& network,
   network.sweep();
 
   mDepthMap.clear();
+  mDepthMap.resize(network.max_node_id());
 
   // 入力ノードとFFノードの深さを0とする．
   for (BNodeList::const_iterator p = network.inputs_begin();
        p != network.inputs_end(); ++ p) {
     BNode* node = *p;
-    mDepthMap.insert(make_pair(node->id(), 0));
+    mDepthMap[node->id()] = 0;
   }
   for (BNodeList::const_iterator p = network.latch_nodes_begin();
        p != network.latch_nodes_end(); ++ p) {
     BNode* node = *p;
-    mDepthMap.insert(make_pair(node->id(), 0));
+    mDepthMap[node->id()] = 0;
   }
 
   mManip = new BNetManip(&network);
@@ -187,9 +188,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       decomp_type1_sub(orig_node, max_fanin, opr1, node1, no_xor);
       pol1 = kPolPosi;
     }
-    hash_map<ymuint32, int>::const_iterator q = mDepthMap.find(node1->id());
-    assert_cond(q != mDepthMap.end(), __FILE__, __LINE__);
-    work.put(Node(node1, pol1, q->second));
+    work.put(Node(node1, pol1, mDepthMap[node1->id()]));
   }
 
   // 高さ最小の論理木を作る．
@@ -419,14 +418,13 @@ BNetDecomp::calc_depth(BNode* node)
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     BNode* inode = node->fanin(i);
-    hash_map<ymuint32, int>::iterator p = mDepthMap.find(inode->id());
-    assert_cond(p != mDepthMap.end(), __FILE__, __LINE__);
-    if ( d < p->second ) {
-      d = p->second;
+    int level = mDepthMap[inode->id()];
+    if ( d < level ) {
+      d = level;
     }
   }
   ++ d;
-  mDepthMap.insert(make_pair(node->id(), d));
+  mDepthMap[node->id()] = d;
   return d;
 }
 

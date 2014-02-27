@@ -60,7 +60,11 @@ class BddList;
 
 /// @brief 変数番号をキートして BDD を値とする連想配列
 /// @ingroup Bdd
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+typedef unordered_map<VarId, Bdd> VarBddMap;
+#else
 typedef hash_map<VarId, Bdd> VarBddMap;
+#endif
 
 /// @}
 //////////////////////////////////////////////////////////////////////

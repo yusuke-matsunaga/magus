@@ -88,8 +88,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
+  typedef unordered_map<ShString, list<const DotlibNode*> > StrNodeListMap;
+#else
+  typedef hash_map<ShString, list<const DotlibNode*> > StrNodeListMap;
+#endif
+
   // ハッシュ表
-  hash_map<ShString, list<const DotlibNode*> > mHash;
+  StrNodeListMap mHash;
 
 };
 

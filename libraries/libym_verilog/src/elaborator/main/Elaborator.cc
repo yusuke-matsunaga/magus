@@ -281,8 +281,7 @@ Elaborator::add_phase3stub(ElbStub* stub)
 const PtModule*
 Elaborator::find_moduledef(const char* name) const
 {
-  hash_map<string, const PtModule*>::const_iterator p;
-  p = mModuleDict.find(name);
+  ModuleDict::const_iterator p = mModuleDict.find(name);
   if ( p != mModuleDict.end() ) {
     return p->second;
   }
