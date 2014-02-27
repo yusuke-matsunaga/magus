@@ -76,7 +76,7 @@ COMMON_SOURCES = \
 ## libvlparser_main.la 用の変数の定義
 ############################################################
 
-libvlparser_main_la_CXXFLAGS = -O2
+libvlparser_main_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libvlparser_main_la_SOURCES = $(COMMON_SOURCES)
 
@@ -89,7 +89,7 @@ libvlparser_main_la_LDFLAGS =
 ## libvlparser_main_d.la 用の変数の定義
 ############################################################
 
-libvlparser_main_d_la_CXXFLAGS = -O2 -g
+libvlparser_main_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libvlparser_main_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -102,7 +102,7 @@ libvlparser_main_d_la_LDFLAGS =
 ## libvlparser_main_p.la 用の変数の定義
 ############################################################
 
-libvlparser_main_p_la_CXXFLAGS = -O2 -pg
+libvlparser_main_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libvlparser_main_p_la_SOURCES = $(COMMON_SOURCES)
 

@@ -74,7 +74,7 @@ COMMON_SOURCES = \
 ## libbnet.la 用の変数の定義
 ############################################################
 
-libbnet_la_CXXFLAGS = -O2
+libbnet_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libbnet_la_SOURCES = $(COMMON_SOURCES)
 
@@ -89,7 +89,7 @@ libbnet_la_LDFLAGS =
 ## libbnet_d.la 用の変数の定義
 ############################################################
 
-libbnet_d_la_CXXFLAGS = -O2 -g
+libbnet_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libbnet_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -104,7 +104,7 @@ libbnet_d_la_LDFLAGS =
 ## libbnet_p.la 用の変数の定義
 ############################################################
 
-libbnet_p_la_CXXFLAGS = -O2 -pg
+libbnet_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libbnet_p_la_SOURCES = $(COMMON_SOURCES)
 

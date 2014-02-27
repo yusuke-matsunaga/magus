@@ -63,7 +63,7 @@ COMMON_SOURCES = \
 ## libgen.la 用の変数の定義
 ############################################################
 
-libgen_la_CXXFLAGS = -O2
+libgen_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libgen_la_SOURCES = $(COMMON_SOURCES)
 
@@ -76,7 +76,7 @@ libgen_la_LDFLAGS =
 ## libgen_d.la 用の変数の定義
 ############################################################
 
-libgen_d_la_CXXFLAGS = -O2 -g
+libgen_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libgen_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -89,7 +89,7 @@ libgen_d_la_LDFLAGS =
 ## libgen_p.la 用の変数の定義
 ############################################################
 
-libgen_p_la_CXXFLAGS = -O2 -pg
+libgen_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libgen_p_la_SOURCES = $(COMMON_SOURCES)
 

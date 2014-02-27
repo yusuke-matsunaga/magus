@@ -67,7 +67,7 @@ COMMON_SOURCES = \
 ## libexpr.la 用の変数指定
 ############################################################
 
-libexpr_la_CXXFLAGS = -O2
+libexpr_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libexpr_la_SOURCES = $(COMMON_SOURCES)
 
@@ -80,7 +80,7 @@ libexpr_la_LDFLAGS =
 ## libexpr_d.la 用の変数指定
 ############################################################
 
-libexpr_d_la_CXXFLAGS = -O2 -g
+libexpr_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libexpr_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -93,7 +93,7 @@ libexpr_d_la_LDFLAGS =
 ## libexpr_p.la 用の変数指定
 ############################################################
 
-libexpr_p_la_CXXFLAGS = -O2 -pg
+libexpr_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libexpr_p_la_SOURCES = $(COMMON_SOURCES)
 

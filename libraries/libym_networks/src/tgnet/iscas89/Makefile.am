@@ -60,7 +60,7 @@ COMMON_SOURCES = \
 ## libtg_iscas89.la 用の変数の定義
 ############################################################
 
-libtg_iscas89_la_CXXFLAGS = -O2
+libtg_iscas89_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libtg_iscas89_la_SOURCES = $(COMMON_SOURCES)
 
@@ -73,7 +73,7 @@ libtg_iscas89_la_LDFLAGS =
 ## libtg_iscas89_d.la 用の変数の定義
 ############################################################
 
-libtg_iscas89_d_la_CXXFLAGS = -O2 -g
+libtg_iscas89_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libtg_iscas89_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -86,7 +86,7 @@ libtg_iscas89_d_la_LDFLAGS =
 ## libtg_iscas89_p.la 用の変数の定義
 ############################################################
 
-libtg_iscas89_p_la_CXXFLAGS = -O2 -pg
+libtg_iscas89_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libtg_iscas89_p_la_SOURCES = $(COMMON_SOURCES)
 

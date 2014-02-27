@@ -62,7 +62,7 @@ COMMON_SOURCES = \
 ## libym_vl_parser.la
 ############################################################
 
-libvlparser_pt_mgr_la_CXXFLAGS = -O2
+libvlparser_pt_mgr_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libvlparser_pt_mgr_la_SOURCES = $(COMMON_SOURCES)
 
@@ -75,7 +75,7 @@ libvlparser_pt_mgr_la_LDFLAGS =
 ## libym_vl_parser_d.la
 ############################################################
 
-libvlparser_pt_mgr_d_la_CXXFLAGS = -O2 -g
+libvlparser_pt_mgr_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libvlparser_pt_mgr_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -88,7 +88,7 @@ libvlparser_pt_mgr_d_la_LDFLAGS =
 ## libym_vl_parser_p.la
 ############################################################
 
-libvlparser_pt_mgr_p_la_CXXFLAGS = -O2 -pg
+libvlparser_pt_mgr_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libvlparser_pt_mgr_p_la_SOURCES = $(COMMON_SOURCES)
 

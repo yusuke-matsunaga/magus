@@ -107,7 +107,7 @@ COMMON_SOURCES = \
 ## libzdd.la 用の変数の指定
 ############################################################
 
-libzdd_la_CXXFLAGS = -O2
+libzdd_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libzdd_la_SOURCES = $(COMMON_SOURCES)
 
@@ -120,7 +120,7 @@ libzdd_la_LDFLAGS =
 ## libzdd_d.la 用の変数の指定
 ############################################################
 
-libzdd_d_la_CXXFLAGS = -O2 -g
+libzdd_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libzdd_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -133,7 +133,7 @@ libzdd_d_la_LDFLAGS =
 ## libzdd_p.la 用の変数の指定
 ############################################################
 
-libzdd_p_la_CXXFLAGS = -O2 -pg
+libzdd_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libzdd_p_la_SOURCES = $(COMMON_SOURCES)
 

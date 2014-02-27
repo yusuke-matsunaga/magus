@@ -58,7 +58,7 @@ COMMON_SOURCES = \
 ## libtvfunc.la 用の変数の指定
 ############################################################
 
-libtvfunc_la_CXXFLAGS = -O2
+libtvfunc_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libtvfunc_la_SOURCES = $(COMMON_SOURCES)
 
@@ -71,7 +71,7 @@ libtvfunc_la_LDFLAGS =
 ## libtvfunc_d.la 用の変数の指定
 ############################################################
 
-libtvfunc_d_la_CXXFLAGS = -O2 -g
+libtvfunc_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libtvfunc_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -84,7 +84,7 @@ libtvfunc_d_la_LDFLAGS =
 ## libtvfunc_p.la 用の変数の指定
 ############################################################
 
-libtvfunc_p_la_CXXFLAGS = -O2 -pg
+libtvfunc_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libtvfunc_p_la_SOURCES = $(COMMON_SOURCES)
 

@@ -63,7 +63,7 @@ COMMON_SOURCES = \
 ## libtgnet.la 用の変数の定義
 ############################################################
 
-libtgnet_la_CXXFLAGS = -O2
+libtgnet_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libtgnet_la_SOURCES = $(COMMON_SOURCES)
 
@@ -78,7 +78,7 @@ libtgnet_la_LDFLAGS =
 ## libtgnet_d.la 用の変数の定義
 ############################################################
 
-libtgnet_d_la_CXXFLAGS = -O2 -g
+libtgnet_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libtgnet_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -93,7 +93,7 @@ libtgnet_d_la_LDFLAGS =
 ## libtgnet_p.la 用の変数の定義
 ############################################################
 
-libtgnet_p_la_CXXFLAGS = -O2 -pg
+libtgnet_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libtgnet_p_la_SOURCES = $(COMMON_SOURCES)
 

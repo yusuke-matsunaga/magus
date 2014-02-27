@@ -60,7 +60,7 @@ COMMON_SOURCES = \
 ## libbnet_iscas89.la 用の変数の定義
 ############################################################
 
-libbnet_iscas89_la_CXXFLAGS = -O2
+libbnet_iscas89_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libbnet_iscas89_la_SOURCES = $(COMMON_SOURCES)
 
@@ -73,7 +73,7 @@ libbnet_iscas89_la_LDFLAGS =
 ## libbnet_iscas89_d.la 用の変数の定義
 ############################################################
 
-libbnet_iscas89_d_la_CXXFLAGS = -O2 -g
+libbnet_iscas89_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libbnet_iscas89_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -86,7 +86,7 @@ libbnet_iscas89_d_la_LDFLAGS =
 ## libbnet_iscas89_p.la 用の変数の定義
 ############################################################
 
-libbnet_iscas89_p_la_CXXFLAGS = -O2 -pg
+libbnet_iscas89_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libbnet_iscas89_p_la_SOURCES = $(COMMON_SOURCES)
 

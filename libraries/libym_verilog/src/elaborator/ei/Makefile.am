@@ -137,7 +137,7 @@ COMMON_SOURCES = \
 ## libvlelab_ei.la 用の変数の定義
 ############################################################
 
-libvlelab_ei_la_CXXFLAGS = -O2
+libvlelab_ei_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libvlelab_ei_la_SOURCES = $(COMMON_SOURCES)
 
@@ -150,7 +150,7 @@ libvlelab_ei_la_LDFLAGS =
 ## libvlelab_ei_d.la 用の変数の定義
 ############################################################
 
-libvlelab_ei_d_la_CXXFLAGS = -O2 -g
+libvlelab_ei_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libvlelab_ei_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -163,7 +163,7 @@ libvlelab_ei_d_la_LDFLAGS =
 ## libvlelab_ei_p.la 用の変数の定義
 ############################################################
 
-libvlelab_ei_p_la_CXXFLAGS = -O2 -pg
+libvlelab_ei_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libvlelab_ei_p_la_SOURCES = $(COMMON_SOURCES)
 

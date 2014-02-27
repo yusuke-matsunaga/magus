@@ -86,7 +86,7 @@ COMMON_SOURCES = \
 ## libvlparser_scanner.la
 ############################################################
 
-libvlparser_scanner_la_CXXFLAGS = -O2
+libvlparser_scanner_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libvlparser_scanner_la_SOURCES = $(COMMON_SOURCES)
 
@@ -99,7 +99,7 @@ libvlparser_scanner_la_LDFLAGS =
 ## libvlparser_scanner.la
 ############################################################
 
-libvlparser_scanner_d_la_CXXFLAGS = -O2 -g
+libvlparser_scanner_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libvlparser_scanner_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -112,7 +112,7 @@ libvlparser_scanner_d_la_LDFLAGS =
 ## libvlparser_scanner_p.la
 ############################################################
 
-libvlparser_scanner_p_la_CXXFLAGS = -O2 -pg
+libvlparser_scanner_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libvlparser_scanner_p_la_SOURCES = $(COMMON_SOURCES)
 

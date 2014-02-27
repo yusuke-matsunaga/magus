@@ -64,7 +64,7 @@ COMMON_SOURCES = \
 ## libminisat.la 用の変数の指定
 ############################################################
 
-libminisat_la_CXXFLAGS = -O2
+libminisat_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libminisat_la_SOURCES = $(COMMON_SOURCES)
 
@@ -77,7 +77,7 @@ libminisat_la_LDFLAGS =
 ## libminisat_d.la 用の変数の指定
 ############################################################
 
-libminisat_d_la_CXXFLAGS = -O2 -g
+libminisat_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libminisat_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -90,7 +90,7 @@ libminisat_d_la_LDFLAGS =
 ## libminisat_p.la 用の変数の指定
 ############################################################
 
-libminisat_p_la_CXXFLAGS = -O2 -pg
+libminisat_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libminisat_p_la_SOURCES = $(COMMON_SOURCES)
 

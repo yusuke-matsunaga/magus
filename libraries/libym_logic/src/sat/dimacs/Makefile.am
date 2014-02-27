@@ -61,7 +61,7 @@ COMMON_SOURCES = \
 ## libdimacs.la 用の変数の指定
 ############################################################
 
-libdimacs_la_CXXFLAGS = -O2
+libdimacs_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libdimacs_la_SOURCES = $(COMMON_SOURCES)
 
@@ -74,7 +74,7 @@ libdimacs_la_LDFLAGS =
 ## libdimacs_d.la 用の変数の指定
 ############################################################
 
-libdimacs_d_la_CXXFLAGS = -O2 -g
+libdimacs_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libdimacs_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -87,7 +87,7 @@ libdimacs_d_la_LDFLAGS =
 ## libdimacs_p.la 用の変数の指定
 ############################################################
 
-libdimacs_p_la_CXXFLAGS = -O2 -pg
+libdimacs_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libdimacs_p_la_SOURCES = $(COMMON_SOURCES)
 

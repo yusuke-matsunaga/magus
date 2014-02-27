@@ -65,7 +65,7 @@ COMMON_SOURCES = \
 ## libym_tclpp.la 用の変数の定義
 ############################################################
 
-libym_tclpp_la_CXXFLAGS = -O2
+libym_tclpp_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libym_tclpp_la_SOURCES = $(COMMON_SOURCES)
 
@@ -80,7 +80,7 @@ libym_tclpp_la_LDFLAGS = \
 ## libym_tclpp_d.la 用の変数の定義
 ############################################################
 
-libym_tclpp_d_la_CXXFLAGS = -O2 -g
+libym_tclpp_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libym_tclpp_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -95,7 +95,7 @@ libym_tclpp_d_la_LDFLAGS = \
 ## libym_tclpp_p.la 用の変数の定義
 ############################################################
 
-libym_tclpp_p_la_CXXFLAGS = -O2 -pg
+libym_tclpp_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libym_tclpp_p_la_SOURCES = $(COMMON_SOURCES)
 

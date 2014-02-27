@@ -71,7 +71,7 @@ COMMON_SOURCES = \
 ## libymsat.la 用の変数の指定
 ############################################################
 
-libymsat_la_CXXFLAGS = -O2
+libymsat_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libymsat_la_SOURCES = $(COMMON_SOURCES)
 
@@ -84,7 +84,7 @@ libymsat_la_LDFLAGS =
 ## libymsat_d.la 用の変数の指定
 ############################################################
 
-libymsat_d_la_CXXFLAGS = -O2 -g
+libymsat_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libymsat_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -97,7 +97,7 @@ libymsat_d_la_LDFLAGS =
 ## libymsat_p.la 用の変数の指定
 ############################################################
 
-libymsat_p_la_CXXFLAGS = -O2 -pg
+libymsat_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libymsat_p_la_SOURCES = $(COMMON_SOURCES)
 

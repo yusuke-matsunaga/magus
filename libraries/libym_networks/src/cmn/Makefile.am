@@ -81,7 +81,7 @@ COMMON_SOURCES = \
 ## libcmn.la 用の変数の定義
 ############################################################
 
-libcmn_la_CXXFLAGS = -O2
+libcmn_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libcmn_la_SOURCES = $(COMMON_SOURCES)
 
@@ -94,7 +94,7 @@ libcmn_la_LDFLAGS =
 ## libcmn_d.la 用の変数の定義
 ############################################################
 
-libcmn_d_la_CXXFLAGS = -O2 -g
+libcmn_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libcmn_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -107,7 +107,7 @@ libcmn_d_la_LDFLAGS =
 ## libcmn_p.la 用の変数の定義
 ############################################################
 
-libcmn_p_la_CXXFLAGS = -O2 -pg
+libcmn_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libcmn_p_la_SOURCES = $(COMMON_SOURCES)
 

@@ -63,7 +63,7 @@ COMMON_SOURCES = \
 ## libatpg_sat_engine.la 用の変数の定義
 ############################################################
 
-libatpg_sat_engine_la_CXXFLAGS = -O2
+libatpg_sat_engine_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libatpg_sat_engine_la_SOURCES = $(COMMON_SOURCES)
 
@@ -76,7 +76,7 @@ libatpg_sat_engine_la_LDFLAGS =
 ## libatpg_sat_engine.la 用の変数の定義
 ############################################################
 
-libatpg_sat_engine_d_la_CXXFLAGS = -O2 -g
+libatpg_sat_engine_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libatpg_sat_engine_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -89,7 +89,7 @@ libatpg_sat_engine_d_la_LDFLAGS =
 ## libatpg_sat_engine_p.la 用の変数の定義
 ############################################################
 
-libatpg_sat_engine_p_la_CXXFLAGS = -O2 -pg
+libatpg_sat_engine_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libatpg_sat_engine_p_la_SOURCES = $(COMMON_SOURCES)
 

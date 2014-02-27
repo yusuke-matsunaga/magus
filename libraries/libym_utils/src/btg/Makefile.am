@@ -59,7 +59,7 @@ COMMON_SOURCES = \
 ## libbtg.la 用の変数の定義
 ############################################################
 
-libbtg_la_CXXFLAGS = -O2
+libbtg_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libbtg_la_SOURCES = $(COMMON_SOURCES)
 
@@ -72,7 +72,7 @@ libbtg_la_LDFLAGS =
 ## libbtg_d.la 用の変数の定義
 ############################################################
 
-libbtg_d_la_CXXFLAGS = -O2 -g
+libbtg_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libbtg_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -85,7 +85,7 @@ libbtg_d_la_LDFLAGS =
 ## libbtg_p.la 用の変数の定義
 ############################################################
 
-libbtg_p_la_CXXFLAGS = -O2 -pg
+libbtg_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libbtg_p_la_SOURCES = $(COMMON_SOURCES)
 

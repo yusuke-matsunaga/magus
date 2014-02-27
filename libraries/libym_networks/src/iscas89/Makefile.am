@@ -79,7 +79,7 @@ COMMON_SOURCES = \
 ## libiscas89.la 用の変数の定義
 ############################################################
 
-libiscas89_la_CXXFLAGS = -O2
+libiscas89_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libiscas89_la_SOURCES = $(COMMON_SOURCES)
 
@@ -92,7 +92,7 @@ libiscas89_la_LDFLAGS =
 ## libiscas89_d.la 用の変数の定義
 ############################################################
 
-libiscas89_d_la_CXXFLAGS = -O2 -g
+libiscas89_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libiscas89_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -105,7 +105,7 @@ libiscas89_d_la_LDFLAGS =
 ## libiscas89_p.la 用の変数の定義
 ############################################################
 
-libiscas89_p_la_CXXFLAGS = -O2 -pg
+libiscas89_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libiscas89_p_la_SOURCES = $(COMMON_SOURCES)
 

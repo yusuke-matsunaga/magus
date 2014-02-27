@@ -70,7 +70,7 @@ COMMON_SOURCES = \
 ## libvlw.la 用の変数の定義
 ############################################################
 
-libvlw_la_CXXFLAGS = -O2
+libvlw_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libvlw_la_SOURCES = $(COMMON_SOURCES)
 
@@ -83,7 +83,7 @@ libvlw_la_LDFLAGS =
 ## libvlw_d.la 用の変数の定義
 ############################################################
 
-libvlw_d_la_CXXFLAGS = -O2 -g
+libvlw_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libvlw_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -96,7 +96,7 @@ libvlw_d_la_LDFLAGS =
 ## libvlw_p.la 用の変数の定義
 ############################################################
 
-libvlw_p_la_CXXFLAGS = -O2 -pg
+libvlw_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libvlw_p_la_SOURCES = $(COMMON_SOURCES)
 

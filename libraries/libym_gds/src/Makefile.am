@@ -90,7 +90,7 @@ COMMON_SOURCES = \
 ## libym_gds.la 用の変数の指定
 ############################################################
 
-libym_gds_la_CXXFLAGS = -O2
+libym_gds_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libym_gds_la_SOURCES = $(COMMON_SOURCES)
 
@@ -104,7 +104,7 @@ libym_gds_la_LDFLAGS = \
 ## libym_gds_d.la 用の変数の指定
 ############################################################
 
-libym_gds_d_la_CXXFLAGS = -O2 -g
+libym_gds_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libym_gds_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -118,7 +118,7 @@ libym_gds_d_la_LDFLAGS = \
 ## libym_gds_p.la 用の変数の指定
 ############################################################
 
-libym_gds_p_la_CXXFLAGS = -O2 -pg
+libym_gds_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libym_gds_p_la_SOURCES = $(COMMON_SOURCES)
 

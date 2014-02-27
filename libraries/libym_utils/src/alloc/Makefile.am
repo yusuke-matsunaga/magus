@@ -58,7 +58,7 @@ COMMON_SOURCES = \
 ## liballoc.la 用の変数の定義
 ############################################################
 
-liballoc_la_CXXFLAGS = -O2
+liballoc_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 liballoc_la_SOURCES = $(COMMON_SOURCES)
 
@@ -71,11 +71,11 @@ liballoc_la_LDFLAGS =
 ## liballoc_d.la 用の変数の定義
 ############################################################
 
-liballoc_d_la_CXXFLAGS = -O2 -g
+liballoc_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 liballoc_d_la_SOURCES = $(COMMON_SOURCES)
 
-liballoc_d_la_LIBADD =
+liballoc_d_la_LIBADD = $(YM_CXXDBGFLAGS)
 
 liballoc_d_la_LDFLAGS =
 
@@ -84,7 +84,7 @@ liballoc_d_la_LDFLAGS =
 ## liballoc_p.la 用の変数の定義
 ############################################################
 
-liballoc_p_la_CXXFLAGS = -O2 -pg
+liballoc_p_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 liballoc_p_la_SOURCES = $(COMMON_SOURCES)
 

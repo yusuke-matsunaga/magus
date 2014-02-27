@@ -58,7 +58,7 @@ COMMON_SOURCES = \
 ## libmsg.la 用の変数の定義
 ############################################################
 
-libmsg_la_CXXFLAGS = -O2
+libmsg_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libmsg_la_SOURCES = $(COMMON_SOURCES)
 
@@ -71,7 +71,7 @@ libmsg_la_LDFLAGS =
 ## libmsg_d.la 用の変数の定義
 ############################################################
 
-libmsg_d_la_CXXFLAGS = -O2 -g
+libmsg_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libmsg_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -84,7 +84,7 @@ libmsg_d_la_LDFLAGS =
 ## libmsg_p.la 用の変数の定義
 ############################################################
 
-libmsg_p_la_CXXFLAGS = -O2 -pg
+libmsg_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libmsg_p_la_SOURCES = $(COMMON_SOURCES)
 

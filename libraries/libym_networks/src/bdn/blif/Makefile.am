@@ -61,7 +61,7 @@ COMMON_SOURCES = \
 ## libbdn_blif.la 用の変数の定義
 ############################################################
 
-libbdn_blif_la_CXXFLAGS = -O2
+libbdn_blif_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libbdn_blif_la_SOURCES = $(COMMON_SOURCES)
 
@@ -74,7 +74,7 @@ libbdn_blif_la_LDFLAGS =
 ## libbdn_blif_d.la 用の変数の定義
 ############################################################
 
-libbdn_blif_d_la_CXXFLAGS = -O2 -g
+libbdn_blif_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libbdn_blif_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -87,7 +87,7 @@ libbdn_blif_d_la_LDFLAGS =
 ## libbdn_blif_p.la 用の変数の定義
 ############################################################
 
-libbdn_blif_p_la_CXXFLAGS = -O2 -pg
+libbdn_blif_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libbdn_blif_p_la_SOURCES = $(COMMON_SOURCES)
 

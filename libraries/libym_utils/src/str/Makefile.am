@@ -57,7 +57,7 @@ COMMON_SOURCES = \
 ## libstr.la 用の変数の定義
 ############################################################
 
-libstr_la_CXXFLAGS = -O2
+libstr_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libstr_la_SOURCES = $(COMMON_SOURCES)
 
@@ -70,7 +70,7 @@ libstr_la_LDFLAGS =
 ## libstr_d.la 用の変数の定義
 ############################################################
 
-libstr_d_la_CXXFLAGS = -O2 -g
+libstr_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libstr_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -83,7 +83,7 @@ libstr_d_la_LDFLAGS =
 ## libstr_p.la 用の変数の定義
 ############################################################
 
-libstr_p_la_CXXFLAGS = -O2 -pg
+libstr_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libstr_p_la_SOURCES = $(COMMON_SOURCES)
 

@@ -73,7 +73,7 @@ COMMON_SOURCES = \
 ## libvlelab_mgr.la
 ############################################################
 
-libvlelab_mgr_la_CXXFLAGS = -O2
+libvlelab_mgr_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libvlelab_mgr_la_SOURCES = $(COMMON_SOURCES)
 
@@ -86,7 +86,7 @@ libvlelab_mgr_la_LDFLAGS =
 ## libvlelab_mgr_d.la
 ############################################################
 
-libvlelab_mgr_d_la_CXXFLAGS = -O2 -g
+libvlelab_mgr_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libvlelab_mgr_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -99,7 +99,7 @@ libvlelab_mgr_d_la_LDFLAGS =
 ## libvlelab_mgr_p.la
 ############################################################
 
-libvlelab_mgr_p_la_CXXFLAGS = -O2 -pg
+libvlelab_mgr_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libvlelab_mgr_p_la_SOURCES = $(COMMON_SOURCES)
 

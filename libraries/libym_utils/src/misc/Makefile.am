@@ -65,7 +65,7 @@ COMMON_LDFLAGS = \
 ## libmisc.la 用の変数の定義
 ############################################################
 
-libmisc_la_CXXFLAGS = -O2
+libmisc_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libmisc_la_SOURCES = $(COMMON_SOURCES)
 
@@ -78,7 +78,7 @@ libmisc_la_LDFLAGS = $(COMMON_LDFLAGS)
 ## libmisc_d.la 用の変数の定義
 ############################################################
 
-libmisc_d_la_CXXFLAGS = -O2 -g
+libmisc_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libmisc_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -91,7 +91,7 @@ libmisc_d_la_LDFLAGS = $(COMMON_LDFLAGS)
 ## libmisc_p.la 用の変数の定義
 ############################################################
 
-libmisc_p_la_CXXFLAGS = -O2 -pg
+libmisc_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libmisc_p_la_SOURCES = $(COMMON_SOURCES)
 

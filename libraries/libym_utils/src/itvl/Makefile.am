@@ -59,7 +59,7 @@ COMMON_SOURCES = \
 ## libitvl.la 用の変数の定義
 ############################################################
 
-libitvl_la_CXXFLAGS = -O2
+libitvl_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libitvl_la_SOURCES = $(COMMON_SOURCES)
 
@@ -72,7 +72,7 @@ libitvl_la_LDFLAGS =
 ## libitvl_d.la 用の変数の定義
 ############################################################
 
-libitvl_d_la_CXXFLAGS = -O2 -g
+libitvl_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libitvl_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -85,7 +85,7 @@ libitvl_d_la_LDFLAGS =
 ## libitvl_p.la 用の変数の定義
 ############################################################
 
-libitvl_p_la_CXXFLAGS = -O2 -pg
+libitvl_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libitvl_p_la_SOURCES = $(COMMON_SOURCES)
 

@@ -75,7 +75,7 @@ COMMON_SOURCES = \
 ## libblif.la 用の変数の定義
 ############################################################
 
-libblif_la_CXXFLAGS = -O2
+libblif_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libblif_la_SOURCES = $(COMMON_SOURCES)
 
@@ -88,7 +88,7 @@ libblif_la_LDFLAGS =
 ## libblif_d.la 用の変数の定義
 ############################################################
 
-libblif_d_la_CXXFLAGS = -O2 -g
+libblif_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libblif_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -101,7 +101,7 @@ libblif_d_la_LDFLAGS =
 ## libblif_p.la 用の変数の定義
 ############################################################
 
-libblif_p_la_CXXFLAGS = -O2 -pg
+libblif_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libblif_p_la_SOURCES = $(COMMON_SOURCES)
 

@@ -61,7 +61,7 @@ COMMON_SOURCES = \
 ## libsat.la 用の変数の指定
 ############################################################
 
-libsat_la_CXXFLAGS = -O2
+libsat_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libsat_la_SOURCES = $(COMMON_SOURCES)
 
@@ -77,7 +77,7 @@ libsat_la_LDFLAGS =
 ## libsat_d.la 用の変数の指定
 ############################################################
 
-libsat_d_la_CXXFLAGS = -O2 -g
+libsat_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libsat_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -93,7 +93,7 @@ libsat_d_la_LDFLAGS =
 ## libsat_p.la 用の変数の指定
 ############################################################
 
-libsat_p_la_CXXFLAGS = -O2 -pg
+libsat_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libsat_p_la_SOURCES = $(COMMON_SOURCES)
 

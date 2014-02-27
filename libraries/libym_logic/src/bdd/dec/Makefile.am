@@ -62,7 +62,7 @@ COMMON_SOURCES = \
 ## libym_bdd_dec.la 用の変数の指定
 ############################################################
 
-libym_bdd_dec_la_CXXFLAGS = -O2
+libym_bdd_dec_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libym_bdd_dec_la_SOURCES = $(COMMON_SOURCES)
 
@@ -75,7 +75,7 @@ libym_bdd_dec_la_LDFLAGS =
 ## libym_bdd_dec_d.la 用の変数の指定
 ############################################################
 
-libym_bdd_dec_d_la_CXXFLAGS = -O2 -g
+libym_bdd_dec_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libym_bdd_dec_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -88,7 +88,7 @@ libym_bdd_dec_d_la_LDFLAGS =
 ## libym_bdd_dec_p.la 用の変数の指定
 ############################################################
 
-libym_bdd_dec_p_la_CXXFLAGS = -O2 -pg
+libym_bdd_dec_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libym_bdd_dec_p_la_SOURCES = $(COMMON_SOURCES)
 

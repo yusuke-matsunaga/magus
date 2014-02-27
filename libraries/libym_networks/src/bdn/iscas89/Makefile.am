@@ -59,7 +59,7 @@ COMMON_SOURCES = \
 ## libbdn_iscas89.la 用の変数の定義
 ############################################################
 
-libbdn_iscas89_la_CXXFLAGS = -O2
+libbdn_iscas89_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libbdn_iscas89_la_SOURCES = $(COMMON_SOURCES)
 
@@ -72,7 +72,7 @@ libbdn_iscas89_la_LDFLAGS =
 ## libbdn_iscas89_d.la 用の変数の定義
 ############################################################
 
-libbdn_iscas89_d_la_CXXFLAGS = -O2 -g
+libbdn_iscas89_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libbdn_iscas89_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -85,7 +85,7 @@ libbdn_iscas89_d_la_LDFLAGS =
 ## libbdn_iscas89_p.la 用の変数の定義
 ############################################################
 
-libbdn_iscas89_p_la_CXXFLAGS = -O2 -pg
+libbdn_iscas89_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libbdn_iscas89_p_la_SOURCES = $(COMMON_SOURCES)
 

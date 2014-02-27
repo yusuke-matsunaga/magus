@@ -113,7 +113,7 @@ COMMON_SOURCES = \
 ## libym_cell_dotlib.la 用の変数の指定
 ############################################################
 
-libym_cell_dotlib_la_CXXFLAGS = -O2
+libym_cell_dotlib_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libym_cell_dotlib_la_SOURCES = $(COMMON_SOURCES)
 
@@ -126,7 +126,7 @@ libym_cell_dotlib_la_LIBADD =
 ## libym_cell_dotlib_d.la 用の変数の指定
 ############################################################
 
-libym_cell_dotlib_d_la_CXXFLAGS = -O2 -g
+libym_cell_dotlib_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libym_cell_dotlib_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -139,7 +139,7 @@ libym_cell_dotlib_d_la_LIBADD =
 ## libym_cell_dotlib_p.la 用の変数の指定
 ############################################################
 
-libym_cell_dotlib_p_la_CXXFLAGS = -O2 -pg
+libym_cell_dotlib_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libym_cell_dotlib_p_la_SOURCES = $(COMMON_SOURCES)
 

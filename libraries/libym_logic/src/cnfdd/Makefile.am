@@ -111,7 +111,7 @@ COMMON_SOURCES = \
 ## libcnfdd.la 用の変数の指定
 ############################################################
 
-libcnfdd_la_CXXFLAGS = -O2
+libcnfdd_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libcnfdd_la_SOURCES = $(COMMON_SOURCES)
 
@@ -124,7 +124,7 @@ libcnfdd_la_LDFLAGS =
 ## libcnfdd_d.la 用の変数の指定
 ############################################################
 
-libcnfdd_d_la_CXXFLAGS = -O2 -g
+libcnfdd_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libcnfdd_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -137,7 +137,7 @@ libcnfdd_d_la_LDFLAGS =
 ## libcnfdd_p.la 用の変数の指定
 ############################################################
 
-libcnfdd_p_la_CXXFLAGS = -O2 -pg
+libcnfdd_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libcnfdd_p_la_SOURCES = $(COMMON_SOURCES)
 

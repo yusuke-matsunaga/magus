@@ -82,7 +82,7 @@ COMMON_SOURCES = \
 ## libmvn.la 用の変数の定義
 ############################################################
 
-libmvn_la_CXXFLAGS = -O2
+libmvn_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libmvn_la_SOURCES = $(COMMON_SOURCES)
 
@@ -96,7 +96,7 @@ libmvn_la_LDFLAGS =
 ## libmvn_d.la 用の変数の定義
 ############################################################
 
-libmvn_d_la_CXXFLAGS = -O2 -g
+libmvn_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libmvn_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -110,7 +110,7 @@ libmvn_d_la_LDFLAGS =
 ## libmvn_p.la 用の変数の定義
 ############################################################
 
-libmvn_p_la_CXXFLAGS = -O2 -pg
+libmvn_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libmvn_p_la_SOURCES = $(COMMON_SOURCES)
 

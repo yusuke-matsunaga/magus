@@ -68,7 +68,7 @@ COMMON_SOURCES = \
 ## libbdn.la 用の変数の定義
 ############################################################
 
-libbdn_la_CXXFLAGS = -O2
+libbdn_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libbdn_la_SOURCES = $(COMMON_SOURCES)
 
@@ -83,7 +83,7 @@ libbdn_la_LDFLAGS =
 ## libbdn_d.la 用の変数の定義
 ############################################################
 
-libbdn_d_la_CXXFLAGS = -O2 -g
+libbdn_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libbdn_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -98,7 +98,7 @@ libbdn_d_la_LDFLAGS =
 ## libbdn_p.la 用の変数の定義
 ############################################################
 
-libbdn_p_la_CXXFLAGS = -O2 -pg
+libbdn_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libbdn_p_la_SOURCES = $(COMMON_SOURCES)
 

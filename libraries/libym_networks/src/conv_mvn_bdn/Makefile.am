@@ -112,7 +112,7 @@ COMMON_SOURCES = \
 ## libconv_mvn_bdn.la 用の変数の定義
 ############################################################
 
-libconv_mvn_bdn_la_CXXFLAGS = -O2
+libconv_mvn_bdn_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libconv_mvn_bdn_la_SOURCES = $(COMMON_SOURCES)
 
@@ -125,7 +125,7 @@ libconv_mvn_bdn_la_LDFLAGS =
 ## libconv_mvn_bdn_d.la 用の変数の定義
 ############################################################
 
-libconv_mvn_bdn_d_la_CXXFLAGS = -O2 -g
+libconv_mvn_bdn_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libconv_mvn_bdn_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -138,7 +138,7 @@ libconv_mvn_bdn_d_la_LDFLAGS =
 ## libconv_mvn_bdn_p.la 用の変数の定義
 ############################################################
 
-libconv_mvn_bdn_p_la_CXXFLAGS = -O2 -pg
+libconv_mvn_bdn_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libconv_mvn_bdn_p_la_SOURCES = $(COMMON_SOURCES)
 

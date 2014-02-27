@@ -71,7 +71,7 @@ COMMON_SOURCES = \
 ## libym_ymsh.la 用の変数の定義
 ############################################################
 
-libym_ymsh_la_CXXFLAGS = -O2
+libym_ymsh_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libym_ymsh_la_SOURCES = $(COMMON_SOURCES)
 
@@ -86,7 +86,7 @@ libym_ymsh_la_LDFLAGS = \
 ## libym_ymsh_d.la 用の変数の定義
 ############################################################
 
-libym_ymsh_d_la_CXXFLAGS = -O2 -g
+libym_ymsh_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libym_ymsh_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -101,7 +101,7 @@ libym_ymsh_d_la_LDFLAGS = \
 ## libym_ymsh_p.la 用の変数の定義
 ############################################################
 
-libym_ymsh_p_la_CXXFLAGS = -O2 -pg
+libym_ymsh_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libym_ymsh_p_la_SOURCES = $(COMMON_SOURCES)
 

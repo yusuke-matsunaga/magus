@@ -67,7 +67,7 @@ COMMON_SOURCES = \
 ## libsmtcore.la 用の変数の指定
 ############################################################
 
-libsmtcore_la_CXXFLAGS = -O2
+libsmtcore_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libsmtcore_la_SOURCES = $(COMMON_SOURCES)
 
@@ -80,7 +80,7 @@ libsmtcore_la_LDFLAGS =
 ## libsmtcore_d.la 用の変数の指定
 ############################################################
 
-libsmtcore_d_la_CXXFLAGS = -O2 -g
+libsmtcore_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libsmtcore_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -93,7 +93,7 @@ libsmtcore_d_la_LDFLAGS =
 ## libsmtcore_p.la 用の変数の指定
 ############################################################
 
-libsmtcore_p_la_CXXFLAGS = -O2 -pg
+libsmtcore_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libsmtcore_p_la_SOURCES = $(COMMON_SOURCES)
 

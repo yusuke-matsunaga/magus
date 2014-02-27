@@ -77,7 +77,7 @@ COMMON_SOURCES = \
 ## libmvn_verilog.la 用の変数の定義
 ############################################################
 
-libmvn_verilog_la_CXXFLAGS = -O2
+libmvn_verilog_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libmvn_verilog_la_SOURCES = $(COMMON_SOURCES)
 
@@ -90,7 +90,7 @@ libmvn_verilog_la_LDFLAGS =
 ## libmvn_verilog_d.la 用の変数の定義
 ############################################################
 
-libmvn_verilog_d_la_CXXFLAGS = -O2 -g
+libmvn_verilog_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libmvn_verilog_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -103,7 +103,7 @@ libmvn_verilog_d_la_LDFLAGS =
 ## libmvn_verilog_p.la 用の変数の定義
 ############################################################
 
-libmvn_verilog_p_la_CXXFLAGS = -O2 -pg
+libmvn_verilog_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libmvn_verilog_p_la_SOURCES = $(COMMON_SOURCES)
 

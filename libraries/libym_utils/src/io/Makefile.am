@@ -109,7 +109,7 @@ endif
 ## libio.la 用の変数の定義
 ############################################################
 
-libio_la_CXXFLAGS = -O2
+libio_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libio_la_SOURCES = $(COMMON_SOURCES)
 
@@ -122,7 +122,7 @@ libio_la_LDFLAGS = $(COMMON_LDFLAGS)
 ## libio_d.la 用の変数の定義
 ############################################################
 
-libio_d_la_CXXFLAGS = -O2 -g
+libio_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libio_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -135,7 +135,7 @@ libio_d_la_LDFLAGS = $(COMMON_LDFLAGS)
 ## libio_p.la 用の変数の定義
 ############################################################
 
-libio_p_la_CXXFLAGS = -O2 -pg
+libio_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libio_p_la_SOURCES = $(COMMON_SOURCES)
 

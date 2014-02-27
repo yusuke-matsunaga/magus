@@ -55,7 +55,7 @@ COMMON_SOURCES = \
 ## libmfset.la 用の変数の定義
 ############################################################
 
-libmfset_la_CXXFLAGS = -O2
+libmfset_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
 libmfset_la_SOURCES = $(COMMON_SOURCES)
 
@@ -68,7 +68,7 @@ libmfset_la_LDFLAGS =
 ## libmfset_d.la 用の変数の定義
 ############################################################
 
-libmfset_d_la_CXXFLAGS = -O2 -g
+libmfset_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
 libmfset_d_la_SOURCES = $(COMMON_SOURCES)
 
@@ -81,7 +81,7 @@ libmfset_d_la_LDFLAGS =
 ## libmfset_p.la 用の変数の定義
 ############################################################
 
-libmfset_p_la_CXXFLAGS = -O2 -pg
+libmfset_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
 
 libmfset_p_la_SOURCES = $(COMMON_SOURCES)
 
