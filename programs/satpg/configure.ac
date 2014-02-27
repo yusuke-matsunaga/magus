@@ -184,8 +184,8 @@ AC_CONFIG_FILES([tclsrc/Makefile])
 YM_EXTRA_SUBDIRS=""
 
 if test "$ym_have_python" = yes; then
-  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
-  AC_CONFIG_FILES([src/python/Makefile])
+#  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
+#  AC_CONFIG_FILES([src/python/Makefile])
 fi
 
 AC_SUBST([YM_EXTRA_SUBDIRS])

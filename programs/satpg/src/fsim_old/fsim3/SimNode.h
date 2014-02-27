@@ -12,7 +12,7 @@
 #include "fsim3_nsdef.h"
 #include "EqElem.h"
 #include "Val3.h"
-#include "ym_networks/tgnet.h"
+#include "networks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM3

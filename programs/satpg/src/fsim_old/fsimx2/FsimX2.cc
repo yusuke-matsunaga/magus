@@ -16,7 +16,7 @@
 #include "TestVector.h"
 #include "SimNode.h"
 #include "SimFFR.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

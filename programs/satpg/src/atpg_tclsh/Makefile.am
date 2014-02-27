@@ -48,6 +48,7 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
 	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	-I$(top_srcdir)/include
 
