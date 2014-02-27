@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
+#include "networks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -8,7 +8,7 @@
 
 
 #include "TopDown2.h"
-#include "ym_networks/BdnMgr.h"
+#include "networks/BdnMgr.h"
 
 
 //#define DEBUG_ENUM_RECUR 1

@@ -9,9 +9,9 @@
 
 #include "GbmSatNaiveBinary.h"
 #include "GbmSatEngineBinary.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatStats.h"
-#include "ym_logic/SatMsgHandlerImpl1.h"
+#include "logic/SatSolver.h"
+#include "logic/SatStats.h"
+#include "logic/SatMsgHandlerImpl1.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -10,7 +10,7 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/TvFunc.h"
+#include "logic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM

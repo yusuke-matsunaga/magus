@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
-#include "ym_logic/TvFunc.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "networks/bdn.h"
+#include "logic/TvFunc.h"
+#include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

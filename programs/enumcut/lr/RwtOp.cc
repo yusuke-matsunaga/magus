@@ -13,12 +13,12 @@
 #include "RwtPat.h"
 #include "RwtNode.h"
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnNode.h"
 
-#include "ym_logic/TvFunc.h"
-#include "ym_logic/NpnMgr.h"
-#include "ym_logic/NpnMap.h"
+#include "logic/TvFunc.h"
+#include "logic/NpnMgr.h"
+#include "logic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

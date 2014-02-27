@@ -8,7 +8,7 @@
 
 
 #include "FuncMgr.h"
-#include "ym_logic/NpnMgr.h"
+#include "logic/NpnMgr.h"
 
 
 BEGIN_NAMESPACE_YM

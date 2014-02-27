@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
-#include "ym_logic/NpnMap.h"
+#include "networks/bdn.h"
+#include "logic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

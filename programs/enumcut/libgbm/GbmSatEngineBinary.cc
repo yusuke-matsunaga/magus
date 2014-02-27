@@ -126,17 +126,17 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
       ymuint base_j = pred * mIorderBitWidth;
       Literal em_lit(em, kPolPosi);
       Literal xm_lit(mIorderVarArray[base_i + mIorderBitWidth - 1], kPolPosi);
-      Literal ym_lit(mIorderVarArray[base_j + mIorderBitWidth - 1], kPolPosi);
+      Literal lit(mIorderVarArray[base_j + mIorderBitWidth - 1], kPolPosi);
       add_clause(~gm_lit,  xm_lit);
-      add_clause(~gm_lit, ~ym_lit);
+      add_clause(~gm_lit, ~lit);
 
-      add_clause( gm_lit, ~xm_lit,  ym_lit);
+      add_clause( gm_lit, ~xm_lit,  lit);
 
-      add_clause(~em_lit,  xm_lit, ~ym_lit);
-      add_clause(~em_lit, ~xm_lit,  ym_lit);
+      add_clause(~em_lit,  xm_lit, ~lit);
+      add_clause(~em_lit, ~xm_lit,  lit);
 
-      add_clause( em_lit,  xm_lit,  ym_lit);
-      add_clause( em_lit, ~xm_lit, ~ym_lit);
+      add_clause( em_lit,  xm_lit,  lit);
+      add_clause( em_lit, ~xm_lit, ~lit);
       for (ymuint k = mIorderBitWidth - 2; ; -- k) {
 	Literal xk_lit(mIorderVarArray[base_i + k], kPolPosi);
 	Literal yk_lit(mIorderVarArray[base_j + k], kPolPosi);

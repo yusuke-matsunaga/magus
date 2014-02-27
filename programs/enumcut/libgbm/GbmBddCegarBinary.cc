@@ -9,7 +9,7 @@
 
 #include "GbmBddCegarBinary.h"
 #include "GbmBddEngineBinary.h"
-#include "ym_logic/BddMgr.h"
+#include "logic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM

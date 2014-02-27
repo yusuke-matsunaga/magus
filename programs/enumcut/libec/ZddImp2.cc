@@ -9,8 +9,8 @@
 
 #include "ZddImp2.h"
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM

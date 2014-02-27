@@ -8,7 +8,7 @@
 
 
 #include "GbmBddEngineEnum.h"
-#include "ym_logic/BddLitSet.h"
+#include "logic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM

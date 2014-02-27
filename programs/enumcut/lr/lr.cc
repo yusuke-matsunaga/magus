@@ -13,11 +13,11 @@
 #error "<popt.h> not found."
 #endif
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnIscas89Reader.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnDumper.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnBlifReader.h"
+#include "networks/BdnIscas89Reader.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnDumper.h"
 
 #include "TopDown2.h"
 
@@ -27,10 +27,10 @@
 #include "RwtPat.h"
 #include "RwtNode.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

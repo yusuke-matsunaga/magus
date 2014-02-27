@@ -9,9 +9,9 @@
 
 #include "RwtPatGen.h"
 #include "PgNode.h"
-#include "ym_utils/PermGen.h"
-#include "ym_logic/TvFunc.h"
-#include "ym_logic/NpnMap.h"
+#include "utils/PermGen.h"
+#include "logic/TvFunc.h"
+#include "logic/NpnMap.h"
 
 
 #define DEBUG

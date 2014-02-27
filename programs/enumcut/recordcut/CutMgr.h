@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
-#include "ym_logic/AigMgr.h"
-#include "ym_logic/TvFunc.h"
-#include "ym_logic/NpnMgr.h"
-#include "ym_utils/IDO.h"
-#include "ym_utils/ODO.h"
+#include "networks/bdn.h"
+#include "logic/AigMgr.h"
+#include "logic/TvFunc.h"
+#include "logic/NpnMgr.h"
+#include "utils/IDO.h"
+#include "utils/ODO.h"
 #include "CutHash.h"
 
 

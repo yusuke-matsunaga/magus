@@ -9,9 +9,9 @@
 
 #include "GbmSatCegarEnum.h"
 #include "GbmSatEngineEnum.h"
-#include "ym_logic/SatStats.h"
-#include "ym_logic/SatMsgHandler.h"
-#include "ym_utils/PermGen.h"
+#include "logic/SatStats.h"
+#include "logic/SatMsgHandler.h"
+#include "utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM

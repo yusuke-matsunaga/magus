@@ -10,9 +10,9 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/Bool3.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "logic/Bool3.h"
 #include "RcfNetwork.h"
 #include "RcfNode.h"
 
