@@ -12,13 +12,15 @@ build_file = "PyYmUtils.sbf"
 config = sipconfig.Configuration()
 
 macros = config.build_macros()
-macros['CC'] = '/proj/eda/bin/gcc'
-macros['CFLAGS'] = '-O3'
-macros['CXX'] = '/proj/eda/bin/g++ -std=c++0x'
-macros['CXXFLAGS'] = '-O3'
-macros['CPP'] = '/proj/eda/bin/cpp'
-macros['CPPFLAGS'] = ''
-macros['LINK'] = '/proj/eda/bin/g++'
+macros['CC'] = '@CC@'
+macros['CFLAGS'] = '@CFLAGS@'
+macros['CXX'] = '@CXX@'
+macros['CXXFLAGS'] = '@CXXFLAGS@'
+macros['CPP'] = '@CPP@'
+macros['CPPFLAGS'] = '@CPPFLAGS@'
+macros['LINK'] = '@CXX@'
+macros['LDFLAGS'] = '@LDFLAGS@'
+
 config.set_build_macros(macros)
 
 # Get the extra SIP flags needed by the imported PyQt modules.  Note that
@@ -41,19 +43,27 @@ installs = []
 
 mod_sip_dir = os.path.join(prefix_dir, "share", "py-sip", "YmUtils")
 sip_src_list = [
-    "YmUtils_mod.sip",
-    "RandGen.sip",
-    "GenBase.sip",
-    "PermGen.sip",
+    "BtgMatch.sip",
+    "CodecType.sip",
     "CombiGen.sip",
+    "FileIDO.sip",
     "FileInfo.sip",
     "FileLoc.sip",
+    "FileODO.sip",
     "FileRegion.sip",
+    "GenBase.sip",
     "IDO.sip",
+    "MFSet.sip",
+    "MStopWatch.sip",
+    "MsgMgr.sip",
+    "MsgType.sip",
     "ODO.sip",
-    "CodecType.sip",
-    "FileIDO.sip",
-    "FileODO.sip"]
+    "PermGen.sip",
+    "RandGen.sip",
+    "StopWatch.sip",
+    "USTime.sip",
+    "YmUtils_mod.sip"]
+
 for sip_src in sip_src_list :
     path = os.path.join(src_dir, sip_src)
     installs.append([path, mod_sip_dir])

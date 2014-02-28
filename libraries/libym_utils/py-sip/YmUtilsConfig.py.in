@@ -26,7 +26,7 @@ class Configuration(sipconfig.Configuration):
         pyqtconfig.Configuration.__init__(self, cfg)
 
 class YmUtilsModuleMakefile(sipconfig.PythonModuleMakefile):
-    """The Makefile class for modules that %Import OthCore.
+    """The Makefile class for modules that %Import PyYmUtils.
     """
     def finalise(self):
         """Finalise the macros.

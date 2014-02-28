@@ -74,7 +74,7 @@ libbdd_d_la_LIBADD = \
 	bmc/libbdd_bmc_d.la \
 	bmm/libbdd_bmm_d.la
 
-libbdd_la_LDFLAGS =
+libbdd_d_la_LDFLAGS =
 
 
 ############################################################

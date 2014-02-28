@@ -49,36 +49,6 @@ public:
   ymuint
   val() const;
 
-  /// @brief 等価比較
-  /// @param[in] right 比較対象の変数
-  bool
-  operator==(const VarId& right) const;
-
-  /// @brief 非等価比較
-  /// @param[in] right 比較対象の変数
-  bool
-  operator!=(const VarId& right) const;
-
-  /// @brief 小なり比較
-  /// @param[in] right 比較対象の変数
-  bool
-  operator<(const VarId& right) const;
-
-  /// @brief 大なり比較
-  /// @param[in] right 比較対象の変数
-  bool
-  operator>(const VarId& right) const;
-
-  /// @brief 小なりイコール比較
-  /// @param[in] right 比較対象の変数
-  bool
-  operator<=(const VarId& right) const;
-
-  /// @brief 大なりイコール比較
-  /// @param[in] right 比較対象の変数
-  bool
-  operator>=(const VarId& right) const;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -105,6 +75,41 @@ private:
 
 };
 
+/// @brief 等価比較
+/// @param[in] left, right 比較対象の変数
+bool
+operator==(const VarId& left,
+	   const VarId& right) const;
+
+/// @brief 非等価比較
+/// @param[in] left, right 比較対象の変数
+bool
+operator!=(const VarId& left,
+	   const VarId& right) const;
+
+/// @brief 小なり比較
+/// @param[in] left, right 比較対象の変数
+bool
+operator<(const VarId& left,
+	  const VarId& right) const;
+
+/// @brief 大なり比較
+/// @param[in] left, right 比較対象の変数
+bool
+operator>(const VarId& left,
+	  const VarId& right) const;
+
+/// @brief 小なりイコール比較
+/// @param[in] left, right 比較対象の変数
+bool
+operator<=(const VarId& left,
+	   const VarId& right) const;
+
+/// @brief 大なりイコール比較
+/// @param[in] left, right 比較対象の変数
+bool
+operator>=(const VarId& left,
+	   const VarId& right) const;
 
 /// @relates VarId
 /// @brief ストリームに対する出力
@@ -211,57 +216,63 @@ VarId::val() const
 }
 
 // @brief 等価比較
-// @param[in] right 比較対象の変数
+// @param[in] left, right 比較対象の変数
 inline
 bool
-VarId::operator==(const VarId& right) const
+VarId::operator==(const VarId& left,
+		  const VarId& right) const
 {
-  return mVal == right.mVal;
+  return compare(left, right) == 0;
 }
 
 // @brief 非等価比較
-// @param[in] right 比較対象の変数
+// @param[in] left, right 比較対象の変数
 inline
 bool
-VarId::operator!=(const VarId& right) const
+VarId::operator!=(const VarId& left,
+		  const VarId& right) const
 {
-  return mVal != right.mVal;
+  return !operator==(left, right);
 }
 
 // @brief 小なり比較
-// @param[in] right 比較対象の変数
+// @param[in] left, right 比較対象の変数
 inline
 bool
-VarId::operator<(const VarId& right) const
+VarId::operator<(const VarId& left,
+		 const VarId& right) const
 {
-  return mVal < right.mVal;
+  return compare(left, right) == -1;
 }
 
 // @brief 大なり比較
-// @param[in] right 比較対象の変数
-inline
+// @param[in] left, right 比較対象の変数
+inlinen
 bool
-VarId::operator>(const VarId& right) const
+VarId::operator>(const VarId& left,
+		 const VarId& right) const
 {
-  return mVal > right.mVal;
+  return operator<(right, left);
 }
 
 // @brief 小なりイコール比較
-// @param[in] right 比較対象の変数
+// @param[in] left, right 比較対象の変数
 inline
 bool
-VarId::operator<=(const VarId& right) const
+VarId::operator<=(const VarId& left,
+		  const VarId& right) const
 {
-  return mVal <= right.mVal;
+  return !operator<(right, left);
 }
 
 // @brief 大なりイコール比較
-// @param[in] right 比較対象の変数
+// @param[in] left, right 比較対象の変数
 inline
 bool
-VarId::operator>=(const VarId& right) const
+VarId::operator>=(const VarId& left,
+		  const VarId& right) const
 {
-  return mVal >= right.mVal;
+  return !operator<(left, right);
 }
 
 // @brief バイナリファイルに出力する．
