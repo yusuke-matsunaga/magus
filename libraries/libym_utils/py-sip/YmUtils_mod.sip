@@ -20,6 +20,13 @@
 %Include CodecType.sip
 %Include FileIDO.sip
 %Include FileODO.sip
+%Include MFSet.sip
+%Include BtgMatch.sip
+%Include USTime.sip
+%Include StopWatch.sip
+%Include MStopWatch.sip
+%Include MsgType.sip
+%Include MsgMgr.sip
 
 %ModuleHeaderCode
 #include "utils/CodecType.h"
@@ -28,4 +35,12 @@ using nsYm::kCodecZ;
 using nsYm::kCodecGzip;
 using nsYm::kCodecBzip2;
 using nsYm::kCodecLzma;
+
+#include "utils/msg_type.h"
+using nsYm::tMsgType;
+using nsYm::kMsgError;
+using nsYm::kMsgWarning;
+using nsYm::kMsgFailure;
+using nsYm::kMsgInfo;
+using nsYm::kMsgDebug;
 %End

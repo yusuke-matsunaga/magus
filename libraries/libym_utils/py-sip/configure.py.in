@@ -11,6 +11,16 @@ build_file = "PyYmUtils.sbf"
 # Get the sip configuration information.
 config = sipconfig.Configuration()
 
+macros = config.build_macros()
+macros['CC'] = '/proj/eda/bin/gcc'
+macros['CFLAGS'] = '-O3'
+macros['CXX'] = '/proj/eda/bin/g++ -std=c++0x'
+macros['CXXFLAGS'] = '-O3'
+macros['CPP'] = '/proj/eda/bin/cpp'
+macros['CPPFLAGS'] = ''
+macros['LINK'] = '/proj/eda/bin/g++'
+config.set_build_macros(macros)
+
 # Get the extra SIP flags needed by the imported PyQt modules.  Note that
 # this normally only includes those flags (-x and -t) that relate to SIP's
 # versioning system.
