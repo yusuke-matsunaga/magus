@@ -63,7 +63,8 @@ mislib_parser_test_SOURCES = \
 mislib_parser_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-mislib_parser_test_LDFLAGS =
+mislib_parser_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -76,7 +77,8 @@ mislib_reader_test_SOURCES = \
 mislib_reader_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-mislib_reader_test_LDFLAGS =
+mislib_reader_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -89,7 +91,8 @@ dotlib_reader_test_SOURCES = \
 dotlib_reader_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-dotlib_reader_test_LDFLAGS =
+dotlib_reader_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -102,7 +105,8 @@ luttest_SOURCES = \
 luttest_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-luttest_LDFLAGS =
+luttest_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -119,7 +123,8 @@ lcpatmgr_test_SOURCES = \
 lcpatmgr_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-lcpatmgr_test_LDFLAGS =
+lcpatmgr_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -132,7 +137,8 @@ dotlib_parser_test_SOURCES = \
 dotlib_parser_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-dotlib_parser_test_LDFLAGS =
+dotlib_parser_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -145,7 +151,8 @@ dump_restore_test_SOURCES = \
 dump_restore_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-dump_restore_test_LDFLAGS =
+dump_restore_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -158,7 +165,8 @@ cell_mgr_test_SOURCES = \
 cell_mgr_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
 
-cell_mgr_test_LDFLAGS =
+cell_mgr_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -170,6 +178,9 @@ cell_dump_test_SOURCES = \
 
 cell_dump_test_LDADD = \
 	$(top_builddir)/src/libym_cell.la
+
+cell_dump_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 #libdump_test_SOURCES = \

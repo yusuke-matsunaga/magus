@@ -61,36 +61,48 @@ COMMON_SOURCES = \
 ## libsmtparser.la 用の変数の指定
 ############################################################
 
-libsmtparser_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libsmtparser_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtparser_la_SOURCES = $(COMMON_SOURCES)
+libsmtparser_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtparser_la_LIBADD =
 
-libsmtparser_la_LDFLAGS =
+libsmtparser_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libsmtparser_d.la 用の変数の指定
 ############################################################
 
-libsmtparser_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libsmtparser_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtparser_d_la_SOURCES = $(COMMON_SOURCES)
+libsmtparser_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtparser_d_la_LIBADD =
 
-libsmtparser_d_la_LDFLAGS =
+libsmtparser_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libsmtparser_p.la 用の変数の指定
 ############################################################
 
-libsmtparser_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libsmtparser_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtparser_p_la_SOURCES = $(COMMON_SOURCES)
+libsmtparser_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtparser_p_la_LIBADD =
 
-libsmtparser_p_la_LDFLAGS =
+libsmtparser_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

@@ -59,13 +59,17 @@ COMMON_SOURCES = PoptMainApp.cc
 ## libym_popt.la 用の変数の定義
 ############################################################
 
-libym_popt_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libym_popt_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libym_popt_la_SOURCES = $(COMMON_SOURCES)
+libym_popt_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libym_popt_la_LIBADD =
 
 libym_popt_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
 	@POPT_LIBS@
 
 
@@ -73,13 +77,17 @@ libym_popt_la_LDFLAGS = \
 ## libym_popt_d.la 用の変数の定義
 ############################################################
 
-libym_popt_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libym_popt_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libym_popt_d_la_SOURCES = $(COMMON_SOURCES)
+libym_popt_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libym_popt_d_la_LIBADD =
 
 libym_popt_d_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
 	@POPT_LIBS@
 
 
@@ -87,11 +95,15 @@ libym_popt_d_la_LDFLAGS = \
 ## libym_popt_p.la 用の変数の定義
 ############################################################
 
-libym_popt_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libym_popt_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libym_popt_p_la_SOURCES = $(COMMON_SOURCES)
+libym_popt_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libym_popt_p_la_LIBADD =
 
 libym_popt_p_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
 	@POPT_LIBS@

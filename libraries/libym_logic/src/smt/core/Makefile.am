@@ -67,36 +67,48 @@ COMMON_SOURCES = \
 ## libsmtcore.la 用の変数の指定
 ############################################################
 
-libsmtcore_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libsmtcore_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtcore_la_SOURCES = $(COMMON_SOURCES)
+libsmtcore_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtcore_la_LIBADD =
 
-libsmtcore_la_LDFLAGS =
+libsmtcore_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libsmtcore_d.la 用の変数の指定
 ############################################################
 
-libsmtcore_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libsmtcore_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtcore_d_la_SOURCES = $(COMMON_SOURCES)
+libsmtcore_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtcore_d_la_LIBADD =
 
-libsmtcore_d_la_LDFLAGS =
+libsmtcore_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libsmtcore_p.la 用の変数の指定
 ############################################################
 
-libsmtcore_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libsmtcore_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtcore_p_la_SOURCES = $(COMMON_SOURCES)
+libsmtcore_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtcore_p_la_LIBADD =
 
-libsmtcore_p_la_LDFLAGS =
+libsmtcore_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

@@ -67,36 +67,48 @@ COMMON_SOURCES = \
 ## libexpr.la 用の変数指定
 ############################################################
 
-libexpr_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libexpr_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libexpr_la_SOURCES = $(COMMON_SOURCES)
+libexpr_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libexpr_la_LIBADD =
 
-libexpr_la_LDFLAGS =
+libexpr_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libexpr_d.la 用の変数指定
 ############################################################
 
-libexpr_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libexpr_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libexpr_d_la_SOURCES = $(COMMON_SOURCES)
+libexpr_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libexpr_d_la_LIBADD =
 
-libexpr_d_la_LDFLAGS =
+libexpr_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libexpr_p.la 用の変数指定
 ############################################################
 
-libexpr_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libexpr_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libexpr_p_la_SOURCES = $(COMMON_SOURCES)
+libexpr_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libexpr_p_la_LIBADD =
 
-libexpr_p_la_LDFLAGS =
+libexpr_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

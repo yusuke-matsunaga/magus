@@ -72,7 +72,8 @@ libym_logic_la_LIBADD = \
 
 libym_logic_la_LDFLAGS = \
 	$(utils_dir)/libym_utils.la \
-	$(GMP_LIBS)
+	$(GMP_LIBS) \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -97,7 +98,8 @@ libym_logic_d_la_LIBADD = \
 
 libym_logic_d_la_LDFLAGS = \
 	$(utils_dir)/libym_utils_d.la \
-	$(GMP_LIBS)
+	$(GMP_LIBS) \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -122,4 +124,5 @@ libym_logic_p_la_LIBADD = \
 
 libym_logic_p_la_LDFLAGS = \
 	$(utils_dir)/libym_utils_p.la \
-	$(GMP_LIBS)
+	$(GMP_LIBS) \
+	$(AM_LDFLAGS)

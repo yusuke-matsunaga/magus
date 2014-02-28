@@ -107,36 +107,48 @@ COMMON_SOURCES = \
 ## libzdd.la 用の変数の指定
 ############################################################
 
-libzdd_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libzdd_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libzdd_la_SOURCES = $(COMMON_SOURCES)
+libzdd_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libzdd_la_LIBADD =
 
-libzdd_la_LDFLAGS =
+libzdd_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libzdd_d.la 用の変数の指定
 ############################################################
 
-libzdd_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libzdd_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libzdd_d_la_SOURCES = $(COMMON_SOURCES)
+libzdd_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libzdd_d_la_LIBADD =
 
-libzdd_d_la_LDFLAGS =
+libzdd_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libzdd_p.la 用の変数の指定
 ############################################################
 
-libzdd_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libzdd_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libzdd_p_la_SOURCES = $(COMMON_SOURCES)
+libzdd_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libzdd_p_la_LIBADD =
 
-libzdd_p_la_LDFLAGS =
+libzdd_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

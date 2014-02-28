@@ -119,36 +119,48 @@ COMMON_SOURCES = \
 ## libbdd_base.la 用の変数の指定
 ############################################################
 
-libbdd_base_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libbdd_base_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libbdd_base_la_SOURCES = $(COMMON_SOURCES)
+libbdd_base_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libbdd_base_la_LIBADD =
 
-libbdd_base_la_LDFLAGS =
+libbdd_base_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libbdd_base_d.la 用の変数の指定
 ############################################################
 
-libbdd_base_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libbdd_base_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libbdd_base_d_la_SOURCES = $(COMMON_SOURCES)
+libbdd_base_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libbdd_base_d_la_LIBADD =
 
-libbdd_base_d_la_LDFLAGS =
+libbdd_base_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libbdd_base_p.la 用の変数の指定
 ############################################################
 
-libbdd_base_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libbdd_base_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libbdd_base_p_la_SOURCES = $(COMMON_SOURCES)
+libbdd_base_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libbdd_base_p_la_LIBADD =
 
-libbdd_base_p_la_LDFLAGS =
+libbdd_base_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

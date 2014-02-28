@@ -72,36 +72,51 @@ COMMON_SOURCES = \
 ## libsmtshell.la 用の変数の指定
 ############################################################
 
-libsmtshell_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libsmtshell_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtshell_la_SOURCES = $(COMMON_SOURCES)
+libsmtshell_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtshell_la_LIBADD =
 
-libsmtshell_la_LDFLAGS = -lreadline -lcurses
+libsmtshell_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-lreadline -lcurses
 
 
 ############################################################
 ## libsmtshell_d.la 用の変数の指定
 ############################################################
 
-libsmtshell_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libsmtshell_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtshell_d_la_SOURCES = $(COMMON_SOURCES)
+libsmtshell_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtshell_d_la_LIBADD =
 
-libsmtshell_d_la_LDFLAGS = -lreadline -lcurses
+libsmtshell_d_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-lreadline -lcurses
 
 
 ############################################################
 ## libsmtshell_p.la 用の変数の指定
 ############################################################
 
-libsmtshell_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libsmtshell_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libsmtshell_p_la_SOURCES = $(COMMON_SOURCES)
+libsmtshell_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libsmtshell_p_la_LIBADD =
 
-libsmtshell_p_la_LDFLAGS = -lreadline -lcurses
+libsmtshell_p_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-lreadline -lcurses

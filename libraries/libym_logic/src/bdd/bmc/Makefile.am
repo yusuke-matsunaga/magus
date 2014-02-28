@@ -66,36 +66,48 @@ COMMON_SOURCES = \
 ## libbdd_bmc.la 用の変数の指定
 ############################################################
 
-libbdd_bmc_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libbdd_bmc_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libbdd_bmc_la_SOURCES = $(COMMON_SOURCES)
+libbdd_bmc_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libbdd_bmc_la_LIBADD =
 
-libbdd_bmc_la_LDFLAGS =
+libbdd_bmc_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libbdd_bmc_d.la 用の変数の指定
 ############################################################
 
-libbdd_bmc_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libbdd_bmc_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libbdd_bmc_d_la_SOURCES = $(COMMON_SOURCES)
+libbdd_bmc_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libbdd_bmc_d_la_LIBADD =
 
-libbdd_bmc_d_la_LDFLAGS =
+libbdd_bmc_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libbdd_bmc_p.la 用の変数の指定
 ############################################################
 
-libbdd_bmc_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libbdd_bmc_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libbdd_bmc_p_la_SOURCES = $(COMMON_SOURCES)
+libbdd_bmc_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libbdd_bmc_p_la_LIBADD =
 
-libbdd_bmc_p_la_LDFLAGS =
+libbdd_bmc_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

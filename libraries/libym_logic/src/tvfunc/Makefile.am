@@ -58,36 +58,48 @@ COMMON_SOURCES = \
 ## libtvfunc.la 用の変数の指定
 ############################################################
 
-libtvfunc_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libtvfunc_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libtvfunc_la_SOURCES = $(COMMON_SOURCES)
+libtvfunc_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libtvfunc_la_LIBADD =
 
-libtvfunc_la_LDFLAGS =
+libtvfunc_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libtvfunc_d.la 用の変数の指定
 ############################################################
 
-libtvfunc_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libtvfunc_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libtvfunc_d_la_SOURCES = $(COMMON_SOURCES)
+libtvfunc_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libtvfunc_d_la_LIBADD =
 
-libtvfunc_d_la_LDFLAGS =
+libtvfunc_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libtvfunc_p.la 用の変数の指定
 ############################################################
 
-libtvfunc_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libtvfunc_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libtvfunc_p_la_SOURCES = $(COMMON_SOURCES)
+libtvfunc_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libtvfunc_p_la_LIBADD =
 
-libtvfunc_p_la_LDFLAGS =
+libtvfunc_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

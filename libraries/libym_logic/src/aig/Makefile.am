@@ -66,36 +66,48 @@ COMMON_SOURCES = \
 ## libym_aig.la 用の変数の指定
 ############################################################
 
-libaig_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libaig_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libaig_la_SOURCES = $(COMMON_SOURCES)
+libaig_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libaig_la_LIBADD =
 
-libaig_la_LDFLAGS =
+libaig_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libym_aig_d.la 用の変数の指定
 ############################################################
 
-libaig_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libaig_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-libaig_d_la_SOURCES = $(COMMON_SOURCES)
+libaig_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libaig_d_la_LIBADD =
 
-libaig_d_la_LDFLAGS =
+libaig_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libym_aig_p.la 用の変数の指定
 ############################################################
 
-libaig_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libaig_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libaig_p_la_SOURCES = $(COMMON_SOURCES)
+libaig_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libaig_p_la_LIBADD =
 
-libaig_p_la_LDFLAGS =
+libaig_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

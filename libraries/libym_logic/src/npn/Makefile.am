@@ -68,36 +68,47 @@ COMMON_SOURCES = \
 ## libnpn.la 用の変数の指定
 ############################################################
 
-libnpn_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libnpn_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-libnpn_la_SOURCES = $(COMMON_SOURCES)
+libnpn_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libnpn_la_LIBADD =
 
-libnpn_la_LDFLAGS =
+libnpn_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libnpn.la 用の変数の指定
 ############################################################
 
-libnpn_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libnpn_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS)
 
-libnpn_d_la_SOURCES = $(COMMON_SOURCES)
+libnpn_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libnpn_d_la_LIBADD =
 
-libnpn_d_la_LDFLAGS =
+libnpn_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libnpn_p.la 用の変数の指定
 ############################################################
 
-libnpn_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libnpn_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-libnpn_p_la_SOURCES = $(COMMON_SOURCES)
+libnpn_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
 libnpn_p_la_LIBADD =
 
-libnpn_p_la_LDFLAGS =
+libnpn_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

@@ -50,7 +50,8 @@ libsmtlibv2_la_LIBADD = \
 	shell/libsmtshell.la \
 	parser/libsmtparser.la
 
-libsmtlibv2_la_LDFLAGS =
+libsmtlibv2_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -66,7 +67,8 @@ libsmtlibv2_d_la_LIBADD = \
 	shell/libsmtshell_d.la \
 	parser/libsmtparser_d.la
 
-libsmtlibv2_d_la_LDFLAGS =
+libsmtlibv2_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -82,4 +84,5 @@ libsmtlibv2_p_la_LIBADD = \
 	shell/libsmtshell_p.la \
 	parser/libsmtparser_p.la
 
-libsmtlibv2_p_la_LDFLAGS =
+libsmtlibv2_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

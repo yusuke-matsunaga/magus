@@ -56,7 +56,8 @@ libsmt_la_LIBADD = \
 	core/libsmtcore.la \
 	smtlibv2/libsmtlibv2.la
 
-libsmt_la_LDFLAGS =
+libsmt_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -72,7 +73,8 @@ libsmt_d_la_LIBADD = \
 	core/libsmtcore_d.la \
 	smtlibv2/libsmtlibv2_d.la
 
-libsmt_d_la_LDFLAGS =
+libsmt_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -88,4 +90,5 @@ libsmt_p_la_LIBADD = \
 	core/libsmtcore_p.la \
 	smtlibv2/libsmtlibv2_p.la
 
-libsmt_p_la_LDFLAGS =
+libsmt_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)
