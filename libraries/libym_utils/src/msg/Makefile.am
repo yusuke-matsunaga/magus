@@ -58,36 +58,48 @@ COMMON_SOURCES = \
 ## libmsg.la 用の変数の定義
 ############################################################
 
-libmsg_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libmsg_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
 libmsg_la_SOURCES = $(COMMON_SOURCES)
 
-libmsg_la_LIBADD =
+libmsg_la_LIBADD = \
+	$(AM_LIBADD)
 
-libmsg_la_LDFLAGS =
+libmsg_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libmsg_d.la 用の変数の定義
 ############################################################
 
-libmsg_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libmsg_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
 libmsg_d_la_SOURCES = $(COMMON_SOURCES)
 
-libmsg_d_la_LIBADD =
+libmsg_d_la_LIBADD = \
+	$(AM_LIBADD)
 
-libmsg_d_la_LDFLAGS =
+libmsg_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libmsg_p.la 用の変数の定義
 ############################################################
 
-libmsg_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libmsg_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
 libmsg_p_la_SOURCES = $(COMMON_SOURCES)
 
-libmsg_p_la_LIBADD =
+libmsg_p_la_LIBADD = \
+	$(AM_LIBADD)
 
-libmsg_p_la_LDFLAGS =
+libmsg_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

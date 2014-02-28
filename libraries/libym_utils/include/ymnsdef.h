@@ -108,8 +108,8 @@ using std::vector;
 using std::list;
 
 using HASH_NAMESPACE::hash;
-using HASH_NAMESPACE::hash_set;
-using HASH_NAMESPACE::hash_map;
+using HASH_NAMESPACE::unordered_set;
+using HASH_NAMESPACE::unordered_map;
 
 END_NAMESPACE_YM
 

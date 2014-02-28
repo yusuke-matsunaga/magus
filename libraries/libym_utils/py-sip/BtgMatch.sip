@@ -92,20 +92,4 @@ public:
   sipRes = sipBuildResult(NULL, "(iR)", w_total, py_list);
   %End
 
-  /// @brief 節点グループ1のノードに対するマッチの相手を得る．
-  /// @param[in] node1_id 節点グループ1のノード番号 ( 0 <= node1_id < node1_num() )
-  /// @return node1_id の節点に対するマッチ相手のノード番号
-  /// @note マッチした節点がない場合には node2_num() を返す．
-  /// @note この関数を呼ぶ前に calc_match() を呼んでいる必要がある．
-  unsigned int
-  node1_match(unsigned int node1_id) const;
-
-  /// @brief 節点グループ2のノードに対するマッチの相手を得る．
-  /// @param[in] node2_id 節点グループ2のノード番号 ( 0 <= node2_id < node2_num() )
-  /// @return node2_id の節点に対するマッチ相手のノード番号
-  /// @note マッチした節点がない場合には node1_num() を返す．
-  /// @note この関数を呼ぶ前に calc_match() を呼んでいる必要がある．
-  unsigned int
-  node2_match(unsigned int node2_id) const;
-
 };

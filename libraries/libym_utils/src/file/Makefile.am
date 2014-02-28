@@ -59,36 +59,48 @@ COMMON_SOURCES = \
 ## libfile.la 用の変数の定義
 ############################################################
 
-libfile_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libfile_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
 libfile_la_SOURCES = $(COMMON_SOURCES)
 
-libfile_la_LIBADD =
+libfile_la_LIBADD = \
+	$(AM_LIBADD)
 
-libfile_la_LDFLAGS =
+libfile_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libfile_d.la 用の変数の定義
 ############################################################
 
-libfile_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libfile_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
 libfile_d_la_SOURCES = $(COMMON_SOURCES)
 
-libfile_d_la_LIBADD =
+libfile_d_la_LIBADD = \
+	$(AM_LIBADD)
 
-libfile_d_la_LDFLAGS =
+libfile_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libfile_p.la 用の変数の定義
 ############################################################
 
-libfile_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libfile_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
 libfile_p_la_SOURCES = $(COMMON_SOURCES)
 
-libfile_p_la_LIBADD =
+libfile_p_la_LIBADD = \
+	$(AM_LIBADD)
 
-libfile_p_la_LDFLAGS =
+libfile_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

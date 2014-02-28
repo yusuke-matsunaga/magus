@@ -55,36 +55,48 @@ COMMON_SOURCES = \
 ## libmfset.la 用の変数の定義
 ############################################################
 
-libmfset_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libmfset_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
 libmfset_la_SOURCES = $(COMMON_SOURCES)
 
-libmfset_la_LIBADD =
+libmfset_la_LIBADD = \
+	$(AM_LIBADD)
 
-libmfset_la_LDFLAGS =
+libmfset_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libmfset_d.la 用の変数の定義
 ############################################################
 
-libmfset_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libmfset_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
 libmfset_d_la_SOURCES = $(COMMON_SOURCES)
 
-libmfset_d_la_LIBADD =
+libmfset_d_la_LIBADD = \
+	$(AM_LIBADD)
 
-libmfset_d_la_LDFLAGS =
+libmfset_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libmfset_p.la 用の変数の定義
 ############################################################
 
-libmfset_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libmfset_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
 libmfset_p_la_SOURCES = $(COMMON_SOURCES)
 
-libmfset_p_la_LIBADD =
+libmfset_p_la_LIBADD = \
+	$(AM_LIBADD)
 
-libmfset_p_la_LDFLAGS =
+libmfset_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

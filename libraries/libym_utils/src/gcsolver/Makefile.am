@@ -59,36 +59,48 @@ COMMON_SOURCES = \
 ## libgcsolver.la 用の変数の定義
 ############################################################
 
-libgcsolver_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libgcsolver_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
 libgcsolver_la_SOURCES = $(COMMON_SOURCES)
 
-libgcsolver_la_LIBADD =
+libgcsolver_la_LIBADD = \
+	$(AM_LIBADD)
 
-libgcsolver_la_LDFLAGS =
+libgcsolver_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libgcsolver.la 用の変数の定義
 ############################################################
 
-libgcsolver_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libgcsolver_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
 libgcsolver_d_la_SOURCES = $(COMMON_SOURCES)
 
-libgcsolver_d_la_LIBADD =
+libgcsolver_d_la_LIBADD = \
+	$(AM_LIBADD)
 
-libgcsolver_d_la_LDFLAGS =
+libgcsolver_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libgcsolver_p.la 用の変数の定義
 ############################################################
 
-libgcsolver_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libgcsolver_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
 libgcsolver_p_la_SOURCES = $(COMMON_SOURCES)
 
-libgcsolver_p_la_LIBADD =
+libgcsolver_p_la_LIBADD = \
+	$(AM_LIBADD)
 
-libgcsolver_p_la_LDFLAGS =
+libgcsolver_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

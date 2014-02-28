@@ -65,8 +65,6 @@ COMMON_SOURCES = \
 	ThruDecoder.h \
 	ThruDecoder.cc
 
-COMMON_LDFLAGS =
-
 if YM_HAVE_ZLIB
 COMMON_SOURCES += \
 	zstream.h \
@@ -76,7 +74,7 @@ COMMON_SOURCES += \
 	GzDecoder.h \
 	GzDecoder.cc
 
-COMMON_LDFLAGS += \
+AM_LDFLAGS += \
 	-lz
 endif
 
@@ -88,7 +86,8 @@ COMMON_SOURCES += \
 	BzDecoder.h \
 	BzDecoder.cc
 
-COMMON_LDFLAGS += \
+
+AM_LDFLAGS += \
 	-lbz2
 endif
 
@@ -100,7 +99,7 @@ COMMON_SOURCES += \
 	LzmaDecoder.h \
 	LzmaDecoder.cc
 
-COMMON_LDFLAGS += \
+AM_LDFLAGS += \
 	-llzma
 endif
 
@@ -109,36 +108,48 @@ endif
 ## libio.la 用の変数の定義
 ############################################################
 
-libio_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libio_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
 libio_la_SOURCES = $(COMMON_SOURCES)
 
-libio_la_LIBADD =
+libio_la_LIBADD = \
+	$(AM_LIBADD)
 
-libio_la_LDFLAGS = $(COMMON_LDFLAGS)
+libio_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libio_d.la 用の変数の定義
 ############################################################
 
-libio_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
+libio_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
 libio_d_la_SOURCES = $(COMMON_SOURCES)
 
-libio_d_la_LIBADD =
+libio_d_la_LIBADD = \
+	$(AM_LIBADD)
 
-libio_d_la_LDFLAGS = $(COMMON_LDFLAGS)
+libio_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## libio_p.la 用の変数の定義
 ############################################################
 
-libio_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libio_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
 libio_p_la_SOURCES = $(COMMON_SOURCES)
 
-libio_p_la_LIBADD =
+libio_p_la_LIBADD = \
+	$(AM_LIBADD)
 
-libio_p_la_LDFLAGS = $(COMMON_LDFLAGS)
+libio_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)
