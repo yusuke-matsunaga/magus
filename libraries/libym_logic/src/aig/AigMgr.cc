@@ -46,11 +46,7 @@ AigMgr::node_num() const
 
 BEGIN_NONAMESPACE
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_set<ymuint> IdSet;
-#else
-typedef hash_set<ymuint> IdSet;
-#endif
 
 void
 dfs(ostream& s,

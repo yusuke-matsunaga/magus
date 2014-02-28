@@ -13,24 +13,21 @@
 #include "utils/MsgMgr.h"
 
 
+BEGIN_NAMESPACE_YM_MISLIB
+
+#include "mislib_grammer.hh"
+
+
 BEGIN_NONAMESPACE
+
+typedef unordered_map<ShString, const MislibNode*> StrNodeMap;
+typedef unordered_set<ShString> StrSet;
 
 // MislibScanner::read_token() をデバッグする時に true にする．
 bool debug_read_token = false;
 
 END_NONAMESPACE
 
-BEGIN_NAMESPACE_YM_MISLIB
-
-#include "mislib_grammer.hh"
-
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef unordered_map<ShString, const MislibNode*> StrNodeMap;
-typedef unordered_set<ShString> StrSet;
-#else
-typedef hash_map<ShString, const MislibNode*> StrNodeMap;
-typedef hash_set<ShString> StrSet;
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス MislibParserImpl

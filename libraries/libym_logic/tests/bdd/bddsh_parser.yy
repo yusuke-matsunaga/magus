@@ -27,11 +27,7 @@ BEGIN_NAMESPACE_YM_BDD
 
 #define YYSTYPE Bdd
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<string, Bdd> StrBddMap;
-#else
-typedef hash_map<string, Bdd> StrBddMap;
-#endif
 
 StrBddMap id_table;
 string lname;

@@ -225,17 +225,10 @@ private:
 
 };
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<ZddEdge, mpz_class> ZddEdgeMpzMap;
 typedef unordered_map<ZddEdge, ZddEdge> ZddEdgeEdgeMap;
 typedef unordered_map<ZddEdge, ymuint64> IdMap;
 typedef unordered_set<ZddEdge> ZddEdgeSet;
-#else
-typedef hash_map<ZddEdge, mpz_class> ZddEdgeMpzMap;
-typedef hash_map<ZddEdge, ZddEdge> ZddEdgeEdgeMap;
-typedef hash_map<ZddEdge, ymuint64> IdMap;
-typedef hash_set<ZddEdge> ZddEdgeSet;
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

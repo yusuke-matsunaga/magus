@@ -21,11 +21,7 @@
 using namespace std;
 using namespace nsYm;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_set<TvFunc> TvFuncSet;
-#else
-typedef hash_set<TvFunc> TvFuncSet;
-#endif
 
 bool verbose = false;
 
@@ -487,6 +483,8 @@ int
 main(int argc,
      const char** argv)
 {
+
+  ymuint nerr = 0;
 #if HAVE_POPT
   int algorithm = 0;
   int mode = 0;
@@ -616,8 +614,6 @@ main(int argc,
     flow |= 1024;
   }
 
-  ymuint nerr = 0;
-
 #if !defined(YM_DEBUG)
   try {
 #endif
@@ -655,7 +651,9 @@ main(int argc,
 #endif
 #else
 
+#if 0
   int base = 1;
+  bool dump_flag = false;
   ymuint flow_end = 1024;
   for ( ; base < argc; ++ base) {
     if ( argv[base][0] != '-' ) {
@@ -775,6 +773,7 @@ main(int argc,
   catch ( nsYm::AssertError x ) {
     cerr << x;
   }
+#endif
 #endif
 
   return nerr;

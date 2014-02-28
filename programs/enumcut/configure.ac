@@ -47,11 +47,15 @@ AC_CHECK_PROG([DOXYGEN],
 	      [@echo \"You'll need to install 'doxygen'\"])
 AC_SUBST(DOXYGEN)
 
-if test $enable_shared = no; then
-  AC_DEFINE(BUILD_STATIC, 1, [Define for doing static link])
-  AM_LDFLAGS="-static"
-  AC_SUBST(AM_LDFLAGS)
-fi
+#if test $enable_shared = no; then
+#  AC_DEFINE(BUILD_STATIC, 1, [Define for doing static link])
+#  AM_LDFLAGS="-static"
+#  AC_SUBST(AM_LDFLAGS)
+#fi
+
+AC_DEFINE(BUILD_STATIC, 1, [Define for doing static link])
+AM_LDFLAGS="-static"
+AC_SUBST(AM_LDFLAGS)
 
 
 # ===================================================================

@@ -65,7 +65,8 @@ libym_popt_la_SOURCES = $(COMMON_SOURCES)
 
 libym_popt_la_LIBADD =
 
-libym_popt_la_LDFLAGS =
+libym_popt_la_LDFLAGS = \
+	@POPT_LIBS@
 
 
 ############################################################
@@ -78,7 +79,8 @@ libym_popt_d_la_SOURCES = $(COMMON_SOURCES)
 
 libym_popt_d_la_LIBADD =
 
-libym_popt_d_la_LDFLAGS =
+libym_popt_d_la_LDFLAGS = \
+	@POPT_LIBS@
 
 
 ############################################################
@@ -91,4 +93,5 @@ libym_popt_p_la_SOURCES = $(COMMON_SOURCES)
 
 libym_popt_p_la_LIBADD =
 
-libym_popt_p_la_LDFLAGS =
+libym_popt_p_la_LDFLAGS = \
+	@POPT_LIBS@

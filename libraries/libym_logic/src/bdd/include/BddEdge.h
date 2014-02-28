@@ -264,19 +264,11 @@ private:
 
 };
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<BddEdge, BddEdge> BddEdgeEdgeMap;
 typedef unordered_map<BddEdge, ymint> BddEdgeIntMap;
 typedef unordered_map<BddEdge, ymuint32> BddEdgeUint32Map;
 typedef unordered_map<BddEdge, mpz_class> BddEdgeMpzMap;
 typedef unordered_set<BddEdge> BddEdgeSet;
-#else
-typedef hash_map<BddEdge, BddEdge> BddEdgeEdgeMap;
-typedef hash_map<BddEdge, ymint> BddEdgeIntMap;
-typedef hash_map<BddEdge, ymuint32> BddEdgeUint32Map;
-typedef hash_map<BddEdge, mpz_class> BddEdgeMpzMap;
-typedef hash_set<BddEdge> BddEdgeSet;
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

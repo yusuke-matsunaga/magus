@@ -27,11 +27,7 @@ extern string cur_text;
 
 #define YYSTYPE BitVector
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef std::unordered_map<string, BitVector> IdTable;
-#else
-typedef HASH_NAMESPACE::hash_map<string, BitVector> IdTable;
-#endif
+typedef HASH_NAMESPACE::unordered_map<string, BitVector> IdTable;
 
 IdTable id_table;
 string lname;

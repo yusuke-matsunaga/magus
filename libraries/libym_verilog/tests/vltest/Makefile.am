@@ -39,13 +39,13 @@ bin_PROGRAMS = \
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_srcdir)/../libym_popt/include \
 	-I$(top_srcdir)/../libym_logic/include \
 	-I$(top_srcdir)/../libym_cell/include \
 	-I$(top_srcdir)/src/parser/include \
 	-I$(top_srcdir)/src/parser/scanner \
 	-I$(top_builddir)/../libym_utils/include \
-	-I$(top_builddir)/src/parser/main \
-	@POPT_INCLUDES@
+	-I$(top_builddir)/src/parser/main
 
 
 #############################################################
@@ -72,7 +72,7 @@ vltest_SOURCES = \
 	vltest_main.cc
 
 vltest_LDADD = \
-	$(top_builddir)/src/libym_verilog.la
+	$(top_builddir)/src/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la
 
-vltest_LDFLAGS = \
-	@POPT_LIBS@
+vltest_LDFLAGS =

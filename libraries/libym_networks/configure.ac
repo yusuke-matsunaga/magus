@@ -72,9 +72,6 @@ AC_TYPE_SIZE_T
 # Checks for other packages
 # ===================================================================
 
-# Check for popt
-YM_CHECK_POPT
-
 
 # ===================================================================
 # Check for C++ language

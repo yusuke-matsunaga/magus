@@ -7,25 +7,22 @@
 /// All rights reserved.
 
 
-#if HAVE_POPT
-#include <popt.h>
-#endif
-
 #include "verilog/verilog.h"
 #include "cell/CellDotlibReader.h"
 #include "cell/CellMislibReader.h"
+#include "utils/PoptMainApp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
 
 void
-rawlex_mode(const list<string>& filename_list,
+rawlex_mode(const vector<string>& filename_list,
 	    const char* spath,
 	    int watch_line,
 	    bool verbose,
 	    bool dump_token);
 void
-lex_mode(const list<string>& filename_list,
+lex_mode(const vector<string>& filename_list,
 	 const char* spath,
 	 int watch_line,
 	 bool verbose,
@@ -33,7 +30,7 @@ lex_mode(const list<string>& filename_list,
 	 bool dump_token);
 
 void
-parse_mode(const list<string>& filename_list,
+parse_mode(const vector<string>& filename_list,
 	   const char* spath,
 	   int watch_line,
 	   bool verbose,
@@ -42,7 +39,7 @@ parse_mode(const list<string>& filename_list,
 	   bool dump_pt);
 
 void
-elaborate_mode(const list<string>& filename_list,
+elaborate_mode(const vector<string>& filename_list,
 	       bool all_msg,
 	       const char* spath,
 	       const CellLibrary* cell_library,
@@ -67,14 +64,101 @@ main(int argc,
   int dump = 0;
   int bit_expand = 0;
   int all_msg = 0;
-  char* spath = NULL;
+  const char* spath = NULL;
   int watch_line = 0;
   int loop = 0;
   int use_cpt = false;
   int profile = 0;
-  char* liberty_name = NULL;
-  char* mislib_name = NULL;
+  const char* liberty_name = NULL;
+  const char* mislib_name = NULL;
 
+  PoptMainApp popt;
+
+  PoptNone popt_verbose("verbose", 'v', "enable verbose mode");
+  PoptNone popt_rawlex("rawlex", '1', "enable rawlex mode");
+  PoptNone popt_lex("lex", '2', "enable lex mode");
+  PoptNone popt_yacc("yacc", '3', "enable yacc mode");
+  PoptNone popt_elab("elaborate", '4', "enable elaborate mode");
+  PoptNone popt_dump("dump", 'd', "set dump-flag");
+  PoptNone popt_allmsg("all-msg", 'a', "display all kind of messages");
+  PoptStr popt_path("search-path", 'p', "set search path", "\"path list \"");
+  PoptInt popt_loop("loop", 'l', "loop test", "loop count");
+  PoptInt popt_watch("watch-line", 'w', "enable line watcher", "line number");
+  PoptNone popt_prof("profile", 'q', "show memory profile");
+  PoptStr popt_dotlib("liberty", 0, "specify liberty library", "\"file name\"");
+  PoptStr popt_mislib("mislib", 0, "specify mislib library", "\"file name\"");
+
+  popt.add_option(&popt_verbose);
+  popt.add_option(&popt_rawlex);
+  popt.add_option(&popt_lex);
+  popt.add_option(&popt_yacc);
+  popt.add_option(&popt_elab);
+  popt.add_option(&popt_dump);
+  popt.add_option(&popt_allmsg);
+  popt.add_option(&popt_path);
+  popt.add_option(&popt_loop);
+  popt.add_option(&popt_watch);
+  popt.add_option(&popt_prof);
+  popt.add_option(&popt_dotlib);
+  popt.add_option(&popt_mislib);
+
+  popt.set_other_option_help("[OPTIONS]* <file-name> ...");
+
+  tPoptStat popt_stat = popt.parse_options(argc, argv, 0);
+  if ( popt_stat == kPoptAbort ) {
+    return -1;
+  }
+
+  // 残りの引数はすべてファイル名と見なす
+  vector<string> filename_list;
+  ymuint n_files = popt.get_args(filename_list);
+
+  if ( n_files == 0 ) {
+    popt.print_usage(stderr, 0);
+    return 1;
+  }
+
+  if ( popt_verbose.is_specified() ) {
+    verbose = true;
+  }
+  if ( popt_rawlex.is_specified() ) {
+    mode = 1;
+  }
+  if ( popt_lex.is_specified() ) {
+    mode = 2;
+  }
+  if ( popt_yacc.is_specified() ) {
+    mode = 3;
+  }
+  if ( popt_elab.is_specified() ) {
+    mode = 4;
+  }
+  if ( popt_dump.is_specified() ) {
+    dump = 1;
+  }
+  if ( popt_allmsg.is_specified() ) {
+    all_msg = 1;
+  }
+  if ( popt_path.is_specified() ) {
+    spath = popt_path.val().c_str();
+  }
+  if ( popt_loop.is_specified() ) {
+    loop = popt_loop.val();
+  }
+  if ( popt_watch.is_specified() ) {
+    watch_line = popt_watch.val();
+  }
+  if ( popt_prof.is_specified() ) {
+    profile = 1;
+  }
+  if ( popt_dotlib.is_specified() ) {
+    liberty_name = popt_dotlib.val().c_str();
+  }
+  if ( popt_mislib.is_specified() ) {
+    mislib_name = popt_mislib.val().c_str();
+  }
+
+#if 0
 #if HAVE_POPT
   // オプション解析用のデータ
   const struct poptOption options[] = {
@@ -131,7 +215,7 @@ main(int argc,
 
   // オプション解析用のコンテキストを生成する．
   poptContext popt_context = poptGetContext(NULL, argc, argv, options, 0);
-  poptSetOtherOptionHelp(popt_context, "[OPTIONS]* <file-name> ...");
+  poptSetOtherOptionHelp(popt_context, "<file-name> ...");
 
   // オプション解析を行う．
   for ( ; ; ) {
@@ -197,6 +281,7 @@ main(int argc,
       filename_list.push_back(argv[i]);
     }
   }
+#endif
 #endif
 
   const CellLibrary* cell_library = NULL;

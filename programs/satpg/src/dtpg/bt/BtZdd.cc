@@ -57,11 +57,7 @@ BtZdd::operator()(TpgNode* fnode,
 {
   Zdd ans = mMgr.make_empty();
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<ymuint, TpgNode*> IdNodeMap;
-#else
-  typedef hash_map<ymuint, TpgNode*> IdNodeMap;
-#endif
 
   // 入力に対応する変数を作る．
   IdNodeMap input_map;

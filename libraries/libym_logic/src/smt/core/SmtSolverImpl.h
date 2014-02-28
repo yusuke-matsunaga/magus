@@ -349,11 +349,7 @@ private:
   // SmtVar の次の ID番号
   ymuint32 mVarId;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<ymuint32, const SmtFunValidator*> FunValidatorMap;
-#else
-  typedef hash_map<ymuint32, const SmtFunValidator*> FunValidatorMap;
-#endif
 
   // SmtFunValidator 用のハッシュ表
   FunValidatorMap mFunValidatorMap;

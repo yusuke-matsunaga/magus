@@ -50,11 +50,7 @@ UdpGen::~UdpGen()
 void
 UdpGen::instantiate_udp(const PtUdp* pt_udp)
 {
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<string, pair<const PtIOHead*, const PtIOItem*> > IODict;
-#else
-  typedef hash_map<string, pair<const PtIOHead*, const PtIOItem*> > IODict;
-#endif
 
   const FileRegion& file_region = pt_udp->file_region();
   const char* def_name = pt_udp->name();

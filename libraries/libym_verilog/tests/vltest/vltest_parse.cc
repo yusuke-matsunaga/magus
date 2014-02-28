@@ -19,7 +19,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 void
-parse_mode(const list<string>& filename_list,
+parse_mode(const vector<string>& filename_list,
 	   const char* spath,
 	   int watch_line,
 	   bool verbose,
@@ -47,7 +47,7 @@ parse_mode(const list<string>& filename_list,
       StopWatch timer;
       timer.start();
       VlMgr vlmgr;
-      for (list<string>::const_iterator p = filename_list.begin();
+      for (vector<string>::const_iterator p = filename_list.begin();
 	   p != filename_list.end(); ++ p) {
 	const string& name = *p;
 	if ( verbose ) {

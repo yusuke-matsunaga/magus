@@ -268,11 +268,7 @@ private:
   // 要素のリスト
   PtItemArray mItemArray;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<string, const PtItem*> StrItemMap;
-#else
-  typedef hash_map<string, const PtItem*> StrItemMap;
-#endif
 
   // 関数定義の辞書
   StrItemMap mFuncDic;

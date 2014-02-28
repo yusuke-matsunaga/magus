@@ -29,15 +29,9 @@ class PuHierName;
 
 union YYSTYPE;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_set<string> StrSet;
 typedef unordered_map<string, tVlDirection> StrDirMap;
 typedef unordered_map<string, const PtIOItem*> StrIOMap;
-#else
-typedef hash_set<string> StrSet;
-typedef hash_map<string, tVlDirection> StrDirMap;
-typedef hash_map<string, const PtIOItem*> StrIOMap;
-#endif
 
 //////////////////////////////////////////////////////////////////////
 /// @class Parser Parser.h "Parser.h"

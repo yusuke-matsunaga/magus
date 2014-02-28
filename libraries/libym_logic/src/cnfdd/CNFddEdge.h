@@ -225,15 +225,9 @@ private:
 
 };
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<CNFddEdge, mpz_class> CNFddEdgeMpzMap;
 typedef unordered_map<CNFddEdge, CNFddEdge> CNFddEdgeEdgeMap;
 typedef unordered_set<CNFddEdge> CNFddEdgeSet;
-#else
-typedef hash_map<CNFddEdge, mpz_class> CNFddEdgeMpzMap;
-typedef hash_map<CNFddEdge, CNFddEdge> CNFddEdgeEdgeMap;
-typedef hash_set<CNFddEdge> CNFddEdgeSet;
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

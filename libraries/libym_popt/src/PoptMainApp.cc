@@ -9,6 +9,13 @@
 
 #include "utils/PoptMainApp.h"
 
+// このクラスは絶対に popt が必要
+#if HAVE_POPT
+#include <popt.h>
+#else
+#error "<popt.h> not found."
+#endif
+
 
 BEGIN_NAMESPACE_YM
 
@@ -25,7 +32,6 @@ PoptMainApp::PoptMainApp(const char* name,
   mName = name;
   mAutoHelp = auto_help;
   mDone = false;
-  mOptionTable = NULL;
   mCon = 0;
   mHelpText = NULL;
 }
@@ -33,8 +39,7 @@ PoptMainApp::PoptMainApp(const char* name,
 // @brief デストラクタ
 PoptMainApp::~PoptMainApp()
 {
-  delete [] mOptionTable;
-  poptFreeContext(mCon);
+  poptFreeContext(reinterpret_cast<poptContext>(mCon));
 }
 
 // @brief オプションを追加する．
@@ -57,7 +62,7 @@ PoptMainApp::set_other_option_help(const char* text)
 void
 PoptMainApp::reset()
 {
-  poptResetContext(mCon);
+  poptResetContext(reinterpret_cast<poptContext>(mCon));
 }
 
 // @brief オプション解析を行なう．
@@ -81,9 +86,9 @@ PoptMainApp::parse_options(int argc,
     ++ n1;
   }
   // end-marker の分を1つ足す必要がある．
-  mOptionTable = new poptOption[n1 + 1];
+  poptOption* option_table = new poptOption[n1 + 1];
   for (ymuint i = 0; i < n; ++ i) {
-    poptOption& option = mOptionTable[i];
+    poptOption& option = option_table[i];
     Popt* opt = mOptionList[i];
     option.longName = opt->opt_str();
     option.shortName = opt->opt_char();
@@ -94,7 +99,7 @@ PoptMainApp::parse_options(int argc,
     option.argDescrip = opt->arg_desc();
   }
   if ( mAutoHelp ) {
-    poptOption& option = mOptionTable[n];
+    poptOption& option = option_table[n];
     option.longName = NULL;
     option.shortName = '\0';
     option.argInfo = POPT_ARG_INCLUDE_TABLE;
@@ -105,7 +110,7 @@ PoptMainApp::parse_options(int argc,
     ++ n;
   }
   { // end-markder
-    poptOption& option = mOptionTable[n1];
+    poptOption& option = option_table[n1];
     option.longName = NULL;
     option.shortName = '\0';
     option.argInfo = 0;
@@ -116,21 +121,23 @@ PoptMainApp::parse_options(int argc,
   }
 
   // poptContext を作る．
-  mCon = poptGetContext(mName, argc, argv, mOptionTable, flags);
+  mCon = poptGetContext(mName, argc, argv, option_table, flags);
+
+  delete [] option_table;
 
   if ( mHelpText != NULL ) {
-    poptSetOtherOptionHelp(mCon, mHelpText);
+    poptSetOtherOptionHelp(reinterpret_cast<poptContext>(mCon), mHelpText);
   }
 
   // オプション解析行う．
   for ( ; ; ) {
-    int rc = poptGetNextOpt(mCon);
+    int rc = poptGetNextOpt(reinterpret_cast<poptContext>(mCon));
     if ( rc == -1 ) {
       break;
     }
     if ( rc < -1 ) {
       // エラーが起きた．
-      cerr << poptBadOption(mCon, POPT_BADOPTION_NOALIAS)
+      cerr << poptBadOption(reinterpret_cast<poptContext>(mCon), POPT_BADOPTION_NOALIAS)
 	   << ": " << poptStrerror(rc) << endl;
       return kPoptAbort;
     }
@@ -158,7 +165,7 @@ PoptMainApp::get_args(vector<string>& args)
 {
   args.clear();
   for ( ; ; ) {
-    const char* arg = poptGetArg(mCon);
+    const char* arg = poptGetArg(reinterpret_cast<poptContext>(mCon));
     if ( arg == NULL ) {
       break;
     }
@@ -174,7 +181,7 @@ void
 PoptMainApp::print_help(FILE* fp,
 			int flags)
 {
-  poptPrintHelp(mCon, fp, flags);
+  poptPrintHelp(reinterpret_cast<poptContext>(mCon), fp, flags);
 }
 
 // @brief ユーセージ(ショートヘルプ)メッセージを出力する．
@@ -184,7 +191,7 @@ void
 PoptMainApp::print_usage(FILE* fp,
 			 int flags)
 {
-  poptPrintUsage(mCon, fp, flags);
+  poptPrintUsage(reinterpret_cast<poptContext>(mCon), fp, flags);
 }
 
 // @brief usage を出力して終了する．
@@ -216,7 +223,7 @@ PoptMainApp::popt_strerror(const int error)
 const char*
 PoptMainApp::bad_option(int flags)
 {
-  return poptBadOption(mCon, flags);
+  return poptBadOption(reinterpret_cast<poptContext>(mCon), flags);
 }
 
 // @brief alias 用のデフォルト設定を読み込む．
@@ -225,7 +232,7 @@ PoptMainApp::bad_option(int flags)
 int
 PoptMainApp::read_default_config(int flags)
 {
-  return poptReadDefaultConfig(mCon, flags);
+  return poptReadDefaultConfig(reinterpret_cast<poptContext>(mCon), flags);
 }
 
 // @brief alias 用の設定ファイルを読み込む．
@@ -233,17 +240,28 @@ PoptMainApp::read_default_config(int flags)
 int
 PoptMainApp::read_config_file(const char* filename)
 {
-  return poptReadConfigFile(mCon, filename);
+  return poptReadConfigFile(reinterpret_cast<poptContext>(mCon), filename);
 }
 
 // @brief alias を追加する．
-// @param[in] alias alias 構造体
+// @param[in] long_name 長い名前 (--xxxx)
+// @param[in] short_name 短い名前 (-x)
+// @param[in] alias 本体の引数の数
+// @param[in] alias 本体の文字列の配列()
 // @param[in] flags フラグ(現時点では未使用)
 int
-PoptMainApp::add_alias(struct poptAlias alias,
+PoptMainApp::add_alias(const char* long_name,
+		       char short_name,
+		       int argc,
+		       const char** argv,
 		       int flags)
 {
-  return poptAddAlias(mCon, alias, flags);
+  struct poptAlias alias;
+  alias.longName = long_name;
+  alias.shortName = short_name;
+  alias.argc = argc;
+  alias.argv = argv;
+  return poptAddAlias(reinterpret_cast<poptContext>(mCon), alias, flags);
 }
 
 

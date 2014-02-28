@@ -7,12 +7,6 @@
 /// All rights reserved.
 
 
-#if HAVE_POPT
-#include <popt.h>
-#else
-#error "<popt.h> not found."
-#endif
-
 #include "networks/BdnMgr.h"
 #include "networks/BdnBlifReader.h"
 #include "networks/BdnIscas89Reader.h"
@@ -26,13 +20,14 @@
 
 #include "logic/ZddMgr.h"
 
+#include "utils/PoptMainApp.h"
 #include "utils/MsgMgr.h"
 #include "utils/MsgHandler.h"
 
 #include "utils/StopWatch.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS
+BEGIN_NAMESPACE_YM
 
 class SimpleOp :
   public EnumCutOp2
@@ -221,7 +216,7 @@ enumcut(const string& filename,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS
+END_NAMESPACE_YM
 
 
 int
@@ -229,13 +224,65 @@ main(int argc,
      const char** argv)
 {
   using namespace std;
-  using namespace nsYm::nsNetworks;
+  using namespace nsYm;
 
-  const char* method_str = "bottom_up";
+  string method = "bottom_up";
   bool blif = false;
   bool iscas = false;
   int cut_size = 4;
 
+  PoptMainApp popt;
+
+  PoptStr popt_method("method", 'm', "specify evaluation method", "bottom_up|top_down|zdd");
+  PoptNone popt_blif("blif", 0, "blif mode");
+  PoptNone popt_iscas89("iscas89", 0, "iscas89 mode");
+  PoptInt popt_cutsize("cut_size", 'c', "specify cut size", NULL);
+
+  popt.add_option(&popt_method);
+  popt.add_option(&popt_blif);
+  popt.add_option(&popt_iscas89);
+  popt.add_option(&popt_cutsize);
+
+  popt.set_other_option_help("<file-name> ...");
+
+  tPoptStat stat = popt.parse_options(argc, argv, 0);
+  if ( stat == kPoptAbort ) {
+    return -1;
+  }
+
+  if ( popt_method.is_specified() ) {
+    method = popt_method.val();
+  }
+  if ( popt_blif.is_specified() ) {
+    blif = true;
+  }
+  else if ( popt_iscas89.is_specified() ) {
+    iscas = true;
+  }
+  else {
+    // fall back
+    blif = true;
+  }
+
+  if ( popt_cutsize.is_specified() ) {
+    cut_size = popt_cutsize.val();
+  }
+
+  // 残りの引数はファイル名とみなす．
+  vector<string> file_list;
+  ymuint n_files = popt.get_args(file_list);
+  if ( n_files == 0 ) {
+    popt.print_usage(stderr, 0);
+    return 1;
+  }
+
+  for (vector<string>::iterator p = file_list.begin();
+       p != file_list.end(); ++ p) {
+    string filename = *p;
+    enumcut(filename, blif, iscas, cut_size, method);
+  }
+
+#if 0
   // オプション解析用のデータ
   const struct poptOption options[] = {
     // long-option
@@ -300,6 +347,7 @@ main(int argc,
 
   string filename(str);
   enumcut(filename, blif, iscas, cut_size, method_str);
+#endif
 
   return 0;
 }

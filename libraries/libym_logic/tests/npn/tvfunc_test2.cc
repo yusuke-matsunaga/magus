@@ -242,6 +242,8 @@ main(int argc,
 
 #else
 
+  bool verbose = true;
+  bool dump_flag = true;
   int base = 1;
   for ( ; base < argc; ++ base) {
     if ( argv[base][0] != '-' ) {
@@ -254,7 +256,7 @@ main(int argc,
       dump_flag = true;
     }
     else if ( strcmp(argv[base], "--signature") == 0 ) {
-      flow_end = 0;
+      //flow_end = 0;
     }
   }
   if ( argc - base <= 1 ) {

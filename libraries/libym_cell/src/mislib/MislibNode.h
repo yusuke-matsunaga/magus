@@ -18,18 +18,16 @@
 
 BEGIN_NAMESPACE_YM_MISLIB
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef unordered_map<ShString, ymuint> NameMap;
-#else
-typedef hash_map<ShString, ymuint> NameMap;
-#endif
-
 //////////////////////////////////////////////////////////////////////
 /// @class MislibNode MislibNode.h "MislibNode.h"
 /// @brief トークンを表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class MislibNode
 {
+public:
+
+  typedef unordered_map<ShString, ymuint> NameMap;
+
 public:
 
   /// @brief ノードの種類

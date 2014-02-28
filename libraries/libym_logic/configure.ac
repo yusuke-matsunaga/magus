@@ -83,14 +83,6 @@ AC_CHECK_SIZEOF(size_t)
 # Check for gmp
 YM_CHECK_GMP
 
-# Check for popt
-YM_CHECK_POPT
-
-# Check for TCL environment
-YM_CHECK_TCL
-
-# Check for tclreadline
-YM_CHECK_TCLREADLINE
 
 AC_CACHE_SAVE
 

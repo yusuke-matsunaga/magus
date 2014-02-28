@@ -20,12 +20,6 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef unordered_map<string, ymuint> StrPosMap;
-#else
-typedef hash_map<string, ymuint> StrPosMap;
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // @class LpDefine
 // @ingroup VlParser
@@ -51,6 +45,8 @@ LpDefine::~LpDefine()
 bool
 LpDefine::parse()
 {
+  typedef unordered_map<string, ymuint> StrPosMap;
+
   // 次の非空白文字が IDENTIFIER でなければエラー
   if ( !expect(IDENTIFIER) ) {
     MsgMgr::put_msg(__FILE__, __LINE__,

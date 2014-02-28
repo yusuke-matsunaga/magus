@@ -104,11 +104,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<TvFuncM, ymuint> FuncMIdMap;
-#else
-  typedef hash_map<TvFuncM, ymuint> FuncMIdMap;
-#endif
 
   // 親の LibComp
   LibComp& mLibComp;

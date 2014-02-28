@@ -79,9 +79,6 @@ YM_CHECK_QT([ym_have_qt=yes], [ym_have_qt=no])
 # Checks for other packages
 # ===================================================================
 
-# Check for popt
-YM_CHECK_POPT
-
 
 # ===================================================================
 # Check for C++ language

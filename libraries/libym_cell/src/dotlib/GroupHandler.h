@@ -145,11 +145,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<ShString, DotlibHandler*> StrHandlerMap;
-#else
-  typedef hash_map<ShString, DotlibHandler*> StrHandlerMap;
-#endif
 
   // ハンドラの連想配列
   StrHandlerMap mHandlerMap;

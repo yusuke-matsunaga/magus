@@ -145,27 +145,15 @@ typedef list<VarId> VarList;
 
 /// @ingroup LogicGroup
 /// @brief 変数番号から変数番号への写像 (連想配列)
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<VarId, VarId> VarVarMap;
-#else
-typedef hash_map<VarId, VarId> VarVarMap;
-#endif
 
 /// @ingroup LogicGroup
 /// @brief 文字列から変数番号への写像 (連想配列)
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<string, VarId> StrVarMap;
-#else
-typedef hash_map<string, VarId> StrVarMap;
-#endif
 
 /// @ingroup LogicGroup
 /// @brief 変数番号から文字列への写像 (連想配列)
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<VarId, string> VarStrMap;
-#else
-typedef hash_map<VarId, string> VarStrMap;
-#endif
 
 
 //////////////////////////////////////////////////////////////////////
