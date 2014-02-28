@@ -68,7 +68,6 @@ nobase_ym_HEADERS = \
 	utils/NameMgr.h \
 	utils/ODO.h \
 	utils/PermGen.h \
-	utils/PoptMainApp.h \
 	utils/RandCombiGen.h \
 	utils/RandGen.h \
 	utils/RandPermGen.h \

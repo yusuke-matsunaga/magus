@@ -122,6 +122,10 @@ YM_INIT_LIBRARIES_SUBDIRS
 YM_BUILD_LIBRARY([libym_utils], [yes],
 		 [])
 
+# libym_popt
+YM_BUILD_LIBRARY([libym_popt], [yes],
+		 [])
+
 # libym_logic
 YM_BUILD_LIBRARY([libym_logic], [yes],
 		 [ym_libym_utils_enable])

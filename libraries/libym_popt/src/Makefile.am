@@ -1,4 +1,7 @@
 ## Process this file with automake to produce Makefile.in
+##
+## Copyright (C) 2014 Yusuke Matsunaga
+## All rights reserved.
 
 
 ############################################################
@@ -28,10 +31,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
-	libmisc.la \
-	libmisc_d.la \
-	libmisc_p.la
+lib_LTLIBRARIES = \
+	libym_popt.la \
+	libym_popt_d.la \
+	libym_popt_p.la
 
 
 ############################################################
@@ -40,59 +43,52 @@ noinst_LTLIBRARIES = \
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
-	-I$(top_builddir)/include
+	-I$(top_srcdir)/../libym_utils/include \
+	-I$(top_builddir)/../libym_utils/include \
+	@POPT_INCLUDES@
 
 
 ############################################################
 ## 共通の変数定義
 ############################################################
 
-COMMON_SOURCES = \
-	Binder.cc \
-	DlList.cc \
-	RandGen.cc \
-	RefCount.cc \
-	Scanner.cc \
-	StopWatch.cc
-
-COMMON_LDFLAGS = \
-	@POPT_LIBS@
+COMMON_SOURCES = PoptMainApp.cc
 
 
 ############################################################
-## libmisc.la 用の変数の定義
+## libym_popt.la 用の変数の定義
 ############################################################
 
-libmisc_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
+libym_popt_la_CXXFLAGS = $(YM_CXXOPTFLAGS)
 
-libmisc_la_SOURCES = $(COMMON_SOURCES)
+libym_popt_la_SOURCES = $(COMMON_SOURCES)
 
-libmisc_la_LIBADD =
+libym_popt_la_LIBADD =
 
-libmisc_la_LDFLAGS = $(COMMON_LDFLAGS)
-
-
-############################################################
-## libmisc_d.la 用の変数の定義
-############################################################
-
-libmisc_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
-
-libmisc_d_la_SOURCES = $(COMMON_SOURCES)
-
-libmisc_d_la_LIBADD =
-
-libmisc_d_la_LDFLAGS = $(COMMON_LDFLAGS)
+libym_popt_la_LDFLAGS =
 
 
 ############################################################
-## libmisc_p.la 用の変数の定義
+## libym_popt_d.la 用の変数の定義
 ############################################################
 
-libmisc_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+libym_popt_d_la_CXXFLAGS = $(YM_CXXDBGFLAGS)
 
-libmisc_p_la_SOURCES = $(COMMON_SOURCES)
+libym_popt_d_la_SOURCES = $(COMMON_SOURCES)
 
-libmisc_p_la_LIBADD =
+libym_popt_d_la_LIBADD =
 
-libmisc_p_la_LDFLAGS = $(COMMON_LDFLAGS)
+libym_popt_d_la_LDFLAGS =
+
+
+############################################################
+## libym_popt_p.la 用の変数の定義
+############################################################
+
+libym_popt_p_la_CXXFLAGS = $(YM_CXXPRFFLAGS)
+
+libym_popt_p_la_SOURCES = $(COMMON_SOURCES)
+
+libym_popt_p_la_LIBADD =
+
+libym_popt_p_la_LDFLAGS =
