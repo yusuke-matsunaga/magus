@@ -40,11 +40,7 @@ BEGIN_NAMESPACE_YM_DOTLIB
 
 BEGIN_NONAMESPACE
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<ShString, ymuint> PinMap;
-#else
-typedef hash_map<ShString, ymuint> PinMap;
-#endif
 
 // 文字列を空白で区切る
 void

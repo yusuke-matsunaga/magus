@@ -276,11 +276,7 @@ ymuint32 npn5rep[] = {
 #endif
 };
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<ymuint32, size_t> PatMap;
-#else
-typedef hash_map<ymuint32, size_t> PatMap;
-#endif
 
 PatMap npn4map;
 

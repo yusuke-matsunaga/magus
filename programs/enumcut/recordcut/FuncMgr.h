@@ -137,11 +137,7 @@ private:
   // ハッシュ表
   FuncData** mTable;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef unordered_set<TvFunc> FuncSet;
-#else
-typedef hash_set<TvFunc> FuncSet;
-#endif
+  typedef unordered_set<TvFunc> FuncSet;
 
   // 代表関数のハッシュ
   FuncSet mRepHash;

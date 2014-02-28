@@ -44,11 +44,7 @@ CutMgr::clear()
 
 BEGIN_NONAMESPACE
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<ymuint, TvFunc> IdFuncMap;
-#else
-typedef IdFuncMap IdFuncMap;
-#endif
 
 TvFunc
 make_func(const BdnNode* node,

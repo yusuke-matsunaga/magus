@@ -29,6 +29,8 @@ BEGIN_NAMESPACE_YM_MISLIB
 
 BEGIN_NONAMESPACE
 
+typedef unordered_map<ShString, ymuint> NameMap;
+
 // 論理式を表すパース木をスキャンして端子名のリストを作る．
 // param[in] node パース木の根のノード
 // param[out] name_list 名前が現れた順に格納されたリスト

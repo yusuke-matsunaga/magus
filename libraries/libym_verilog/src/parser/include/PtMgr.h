@@ -87,11 +87,7 @@ private:
   // モジュール定義のリスト
   list<const PtModule*> mModuleList;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_set<string> StrSet;
-#else
-  typedef hash_set<string> StrSet;
-#endif
 
   // インスタンス記述で用いられている名前
   // たぶんモジュール名か UDP名のはず

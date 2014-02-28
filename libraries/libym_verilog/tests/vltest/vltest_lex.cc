@@ -23,7 +23,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 void
-lex_mode(const list<string>& filename_list,
+lex_mode(const vector<string>& filename_list,
 	 const char* spath,
 	 int watch_line,
 	 bool verbose,
@@ -58,7 +58,7 @@ lex_mode(const list<string>& filename_list,
     int nt_rn = 0;
     int nt_s = 0;
     int ns = 0;
-    for (list<string>::const_iterator p = filename_list.begin();
+    for (vector<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
       const string& filename = *p;
       if ( !lex.open_file(filename) ) {

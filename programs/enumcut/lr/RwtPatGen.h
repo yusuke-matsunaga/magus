@@ -168,11 +168,7 @@ private:
   // 関数のリスト
   vector<TvFunc> mFuncList;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<TvFunc, ymuint32> FuncMap;
-#else
-  typedef hash_map<TvFunc, ymuint32> FuncMap;
-#endif
 
   // 関数のハッシュ表
   FuncMap mFuncHash;

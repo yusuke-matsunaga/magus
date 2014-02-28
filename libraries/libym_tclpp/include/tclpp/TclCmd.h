@@ -225,11 +225,7 @@ protected:
   // オプション解析用オブジェクトのリスト
   list<TclPopt*> mPoptList;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<string, TclPopt*> StrPoptMap;
-#else
-  typedef hash_map<string, TclPopt*> StrPoptMap;
-#endif
 
   // オプション文字列をキーとして TclPopt を要素とするハッシュ表
   StrPoptMap mPoptTable;

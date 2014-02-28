@@ -29,13 +29,9 @@
 
 BEGIN_NAMESPACE_YM_VERILOG
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef unordered_map<string, int> StrIntMap;
-#else
-typedef hash_map<string, int> StrIntMap;
-#endif
-
 BEGIN_NONAMESPACE
+
+typedef unordered_map<string, int> StrIntMap;
 
 // 英語の序数の接尾語を作る関数
 const char*

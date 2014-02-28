@@ -156,11 +156,7 @@ operator<<(ostream& s,
 
 /// @relates Aig
 /// @brief 変数番号をキーにして AIG を保持するハッシュ表
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<VarId, Aig> VarAigMap;
-#else
-typedef hash_map<VarId, Aig> VarAigMap;
-#endif
 
 
 //////////////////////////////////////////////////////////////////////

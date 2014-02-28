@@ -81,7 +81,7 @@ rec_LDFLAGS =
 
 recordcut_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
-	@POPT_INCLUDES@
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_popt/include
 
 recordcut_SOURCES = \
 	recordcut.cc \
@@ -102,10 +102,12 @@ recordcut_LDADD = \
 	$(top_builddir)/libec/libec.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
+	$(AM_LDADD)
 
 recordcut_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################

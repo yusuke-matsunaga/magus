@@ -107,15 +107,9 @@ using std::string;
 using std::vector;
 using std::list;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-using std::hash;
-using std::unordered_set;
-using std::unordered_map;
-#else
 using HASH_NAMESPACE::hash;
 using HASH_NAMESPACE::hash_set;
 using HASH_NAMESPACE::hash_map;
-#endif
 
 END_NAMESPACE_YM
 

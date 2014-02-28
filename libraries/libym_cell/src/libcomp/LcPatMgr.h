@@ -16,12 +16,6 @@
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
-typedef unordered_map<ymuint, ymuint> UintUintMap;
-#else
-typedef hash_map<ymuint, ymuint> UintUintMap;
-#endif
-
 //////////////////////////////////////////////////////////////////////
 /// @class LcPatMgr LcPatMgr.h "LcPatMgr.h"
 /// @brief パタングラフを生成するクラス
@@ -29,6 +23,8 @@ typedef hash_map<ymuint, ymuint> UintUintMap;
 //////////////////////////////////////////////////////////////////////
 class LcPatMgr
 {
+  typedef unordered_map<ymuint, ymuint> UintUintMap;
+
 public:
 
   /// @brief コンストラクタ

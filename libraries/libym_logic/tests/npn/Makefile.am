@@ -44,8 +44,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/../libym_utils/include \
 	-I$(top_builddir)/../libym_utils/include \
-	$(TCL_INCLUDES) \
-	@POPT_INCLUDES@
+	$(TCL_INCLUDES)
 
 
 ############################################################
@@ -64,7 +63,7 @@ tvfunc_test_SOURCES = \
 
 tvfunc_test_LDADD = \
 	$(top_builddir)/src/libym_logic.la \
-	@POPT_LIBS@
+	$(top_builddir)/../libym_popt/src/libym_popt.la
 
 tvfunc_test_LDFLAGS =
 
@@ -78,7 +77,7 @@ tvfunc_test2_SOURCES = \
 
 tvfunc_test2_LDADD = \
 	$(top_builddir)/src/libym_logic.la \
-	@POPT_LIBS@
+	$(top_builddir)/../libym_popt/src/libym_popt.la
 
 tvfunc_test2_LDFLAGS =
 
@@ -106,8 +105,7 @@ npn_check3_SOURCES = \
 	npn_check3.cc
 
 npn_check3_LDADD = \
-	$(top_builddir)/src/libym_logic.la \
-	@POPT_LIBS@
+	$(top_builddir)/src/libym_logic.la
 
 npn_check3_LDFLAGS =
 

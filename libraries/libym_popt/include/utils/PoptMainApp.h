@@ -11,13 +11,6 @@
 
 #include "ymtools.h"
 
-// このクラスは絶対に popt が必要
-#if HAVE_POPT
-#include <popt.h>
-#else
-#error "<popt.h> not found."
-#endif
-
 
 BEGIN_NAMESPACE_YM
 
@@ -629,10 +622,16 @@ public:
   read_config_file(const char* filename);
 
   /// @brief alias を追加する．
-  /// @param[in] alias alias 構造体
+  /// @param[in] long_name 長い名前 (--xxxx)
+  /// @param[in] short_name 短い名前 (-x)
+  /// @param[in] alias 本体の引数の数
+  /// @param[in] alias 本体の文字列の配列()
   /// @param[in] flags フラグ(現時点では未使用)
   int
-  add_alias(struct poptAlias alias,
+  add_alias(const char* long_name,
+	    char short_name,
+	    int argc,
+	    const char** argv,
 	    int flags);
 
 
@@ -651,11 +650,9 @@ private:
   // popt の処理は1度しか行なえない．
   bool mDone;
 
-  // poptContext を生成するのに用いるオプションテーブル
-  poptOption* mOptionTable;
-
   // poptContext 本体
-  poptContext mCon;
+  // あえて opaque オブジェクトにしている．
+  void* mCon;
 
   // ヘルプ文字列
   const char* mHelpText;

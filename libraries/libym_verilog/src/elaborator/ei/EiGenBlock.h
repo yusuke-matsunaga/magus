@@ -170,11 +170,7 @@ private:
   // 対応するパース木の要素
   const PtItem* mPtItem;
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
   typedef unordered_map<int, const VlNamedObj*> IntNamedObjMap;
-#else
-  typedef hash_map<int, const VlNamedObj*> IntNamedObjMap;
-#endif
 
   // 子供のスコープのハッシュ表
   IntNamedObjMap mTable;

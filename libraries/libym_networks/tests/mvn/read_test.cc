@@ -7,13 +7,6 @@
 /// All rights reserved.
 
 
-#if HAVE_POPT
-#include <popt.h>
-#else
-#error "No <popt.h>"
-#endif
-
-
 #include "networks/MvnMgr.h"
 #include "networks/MvnVerilogReader.h"
 #include "networks/MvnVlMap.h"
@@ -23,6 +16,7 @@
 #include "cell/CellDotlibReader.h"
 #include "cell/CellMislibReader.h"
 
+#include "utils/PoptMainApp.h"
 #include "utils/MsgMgr.h"
 #include "utils/MsgHandler.h"
 
@@ -34,9 +28,48 @@ main(int argc,
   using namespace std;
   using namespace nsYm;
 
-  char* liberty_name = NULL;
-  char* mislib_name = NULL;
+  PoptMainApp popt;
 
+  PoptStr popt_dotlib("liberty", 0, "specify liverty(dotlib) library", "\"file name\"");
+  PoptStr popt_mislib("mislib", 0, "specify mislib library", "\"file name\"");
+  PoptNone popt_dump("dump", 'd', "dump network");
+  PoptNone popt_verilog("verilog", 'V', "dump verilog");
+
+  popt.add_option(&popt_dotlib);
+  popt.add_option(&popt_mislib);
+  popt.add_option(&popt_dump);
+  popt.add_option(&popt_verilog);
+
+  popt.set_other_option_help("<file-name> ...");
+
+  tPoptStat stat = popt.parse_options(argc, argv, 0);
+  if ( stat == kPoptAbort ) {
+    return -1;
+  }
+
+  // 残りの引数はすべてファイル名と見なす
+  vector<string> filename_list;
+  ymuint n_files = popt.get_args(filename_list);
+
+  const CellLibrary* cell_library = NULL;
+  if ( popt_dotlib.is_specified() ) {
+    CellDotlibReader read;
+    cell_library = read(popt_dotlib.val());
+  }
+  else if ( popt_mislib.is_specified() ) {
+    CellMislibReader read;
+    cell_library = read(popt_mislib.val());
+  }
+
+  int mode = 0;
+  if ( popt_dump.is_specified() ) {
+    mode = 1;
+  }
+  else if ( popt_verilog.is_specified() ) {
+    mode = 2;
+  }
+
+#if 0
   // オプション解析用のデータ
   const struct poptOption options[] = {
     // long-option
@@ -101,6 +134,7 @@ main(int argc,
     CellMislibReader read;
     cell_library = read(mislib_name);
   }
+#endif
 
 #if !defined(YM_DEBUG)
   try {
@@ -113,7 +147,7 @@ main(int argc,
 
     MvnVerilogReader reader;
 
-    for (list<string>::const_iterator p = filename_list.begin();
+    for (vector<string>::const_iterator p = filename_list.begin();
 	 p != filename_list.end(); ++ p) {
       const string& name = *p;
       cerr << "Reading " << name;

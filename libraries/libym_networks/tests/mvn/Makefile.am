@@ -43,8 +43,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/../libym_logic/include \
 	-I$(top_srcdir)/../libym_cell/include \
 	-I$(top_srcdir)/../libym_verilog/include \
-	-I$(top_builddir)/../libym_utils/include \
-	@POPT_INCLUDES@
+	-I$(top_builddir)/../libym_utils/include
 
 
 ############################################################
@@ -64,11 +63,15 @@ makenode_test_LDFLAGS =
 ## read_test 用の変数の定義
 ############################################################
 
+read_test_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	-I$(top_srcdir)/../libym_popt/include
+
 read_test_SOURCES = \
 	read_test.cc
 
 read_test_LDADD = \
-	$(top_builddir)/src/libym_networks.la
+	$(top_builddir)/src/libym_networks.la \
+	$(top_builddir)/../libym_popt/src/libym_popt.la
 
-read_test_LDFLAGS = \
-	@POPT_LIBS@
+read_test_LDFLAGS =

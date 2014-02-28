@@ -77,11 +77,7 @@ FuncRec::node_init(const BdnNode* node)
 
 BEGIN_NONAMESPACE
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 6
 typedef unordered_map<ymuint, TvFunc> IdFuncMap;
-#else
-typedef IdFuncMap IdFuncMap;
-#endif
 
 // cut_to_func の下請け関数
 TvFunc
