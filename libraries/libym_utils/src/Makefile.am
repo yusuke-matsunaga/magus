@@ -77,7 +77,8 @@ libym_utils_la_LIBADD = \
 	msg/libmsg.la \
 	str/libstr.la
 
-libym_utils_la_LDFLAGS =
+libym_utils_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -102,7 +103,8 @@ libym_utils_d_la_LIBADD = \
 	msg/libmsg_d.la \
 	str/libstr_d.la
 
-libym_utils_d_la_LDFLAGS =
+libym_utils_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -127,4 +129,5 @@ libym_utils_p_la_LIBADD = \
 	msg/libmsg_p.la \
 	str/libstr_p.la
 
-libym_utils_p_la_LDFLAGS =
+libym_utils_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

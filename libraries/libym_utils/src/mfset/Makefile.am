@@ -59,10 +59,10 @@ libmfset_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libmfset_la_SOURCES = $(COMMON_SOURCES)
+libmfset_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libmfset_la_LIBADD = \
-	$(AM_LIBADD)
+libmfset_la_LIBADD =
 
 libmfset_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -76,10 +76,10 @@ libmfset_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libmfset_d_la_SOURCES = $(COMMON_SOURCES)
+libmfset_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libmfset_d_la_LIBADD = \
-	$(AM_LIBADD)
+libmfset_d_la_LIBADD =
 
 libmfset_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -93,10 +93,10 @@ libmfset_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libmfset_p_la_SOURCES = $(COMMON_SOURCES)
+libmfset_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libmfset_p_la_LIBADD = \
-	$(AM_LIBADD)
+libmfset_p_la_LIBADD =
 
 libmfset_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

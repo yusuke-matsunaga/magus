@@ -67,10 +67,10 @@ libgen_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libgen_la_SOURCES = $(COMMON_SOURCES)
+libgen_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libgen_la_LIBADD = \
-	$(AM_LIBADD)
+libgen_la_LIBADD =
 
 libgen_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -84,10 +84,10 @@ libgen_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libgen_d_la_SOURCES = $(COMMON_SOURCES)
+libgen_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libgen_d_la_LIBADD = \
-	$(AM_LIBADD)
+libgen_d_la_LIBADD =
 
 libgen_d_la_LDFLAGS = \
 	$(AM_LDADD)
@@ -101,10 +101,10 @@ libgen_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libgen_p_la_SOURCES = $(COMMON_SOURCES)
+libgen_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libgen_p_la_LIBADD = \
-	$(AM_LIBADD)
+libgen_p_la_LIBADD =
 
 libgen_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

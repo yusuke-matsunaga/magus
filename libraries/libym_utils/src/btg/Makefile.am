@@ -63,10 +63,10 @@ libbtg_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libbtg_la_SOURCES = $(COMMON_SOURCES)
+libbtg_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libbtg_la_LIBADD = \
-	$(AM_LIBADD)
+libbtg_la_LIBADD =
 
 libbtg_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -80,10 +80,10 @@ libbtg_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libbtg_d_la_SOURCES = $(COMMON_SOURCES)
+libbtg_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libbtg_d_la_LIBADD = \
-	$(AM_LIBADD)
+libbtg_d_la_LIBADD =
 
 libbtg_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -97,10 +97,10 @@ libbtg_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libbtg_p_la_SOURCES = $(COMMON_SOURCES)
+libbtg_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libbtg_p_la_LIBADD = \
-	$(AM_LIBADD)
+libbtg_p_la_LIBADD =
 
 libbtg_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

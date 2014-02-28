@@ -68,7 +68,7 @@ public:
   /// @brief バイナリファイルに出力する．
   /// @param[in] s 出力先のストリーム
   void
-  dump(ODO& s) const;
+  store(ODO& s) const;
 
   /// @brief バイナリファイルを読み込む．
   void
@@ -296,7 +296,7 @@ operator>=(const VarId& left,
 // @param[in] s 出力先のストリーム
 inline
 void
-VarId::dump(ODO& s) const
+VarId::store(ODO& s) const
 {
   s << mVal;
 }
@@ -330,7 +330,7 @@ ODO&
 operator<<(ODO& s,
 	   const VarId& varid)
 {
-  varid.dump(s);
+  varid.store(s);
   return s;
 }
 

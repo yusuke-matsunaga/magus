@@ -64,10 +64,10 @@ libmisc_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libmisc_la_SOURCES = $(COMMON_SOURCES)
+libmisc_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libmisc_la_LIBADD = \
-	$(AM_LIBADD)
+libmisc_la_LIBADD =
 
 libmisc_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -81,10 +81,10 @@ libmisc_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libmisc_d_la_SOURCES = $(COMMON_SOURCES)
+libmisc_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libmisc_d_la_LIBADD = \
-	$(AM_LDFLAGS)
+libmisc_d_la_LIBADD =
 
 libmisc_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -98,10 +98,10 @@ libmisc_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libmisc_p_la_SOURCES = $(COMMON_SOURCES)
+libmisc_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libmisc_p_la_LIBADD = \
-	$(AM_LIBADD)
+libmisc_p_la_LIBADD =
 
 libmisc_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

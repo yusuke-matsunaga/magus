@@ -62,10 +62,10 @@ liballoc_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-liballoc_la_SOURCES = $(COMMON_SOURCES)
+liballoc_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-liballoc_la_LIBADD = \
-	$(AM_LIBADD)
+liballoc_la_LIBADD =
 
 liballoc_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -79,10 +79,10 @@ liballoc_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-liballoc_d_la_SOURCES = $(COMMON_SOURCES)
+liballoc_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-liballoc_d_la_LIBADD = \
-	$(AM_LIBADD)
+liballoc_d_la_LIBADD =
 
 liballoc_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -93,12 +93,13 @@ liballoc_d_la_LDFLAGS = \
 ############################################################
 
 liballoc_p_la_CXXFLAGS = \
-	$(YM_CXXDBGFLAGS)
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-liballoc_p_la_SOURCES = $(COMMON_SOURCES)
+liballoc_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-liballoc_p_la_LIBADD = \
-	$(AM_LIBADD)
+liballoc_p_la_LIBADD =
 
 liballoc_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

@@ -61,10 +61,10 @@ libstr_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libstr_la_SOURCES = $(COMMON_SOURCES)
+libstr_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libstr_la_LIBADD = \
-	$(AM_LIBADD)
+libstr_la_LIBADD =
 
 libstr_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -78,10 +78,10 @@ libstr_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libstr_d_la_SOURCES = $(COMMON_SOURCES)
+libstr_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libstr_d_la_LIBADD = \
-	$(AM_LIBADD)
+libstr_d_la_LIBADD =
 
 libstr_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -95,10 +95,10 @@ libstr_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libstr_p_la_SOURCES = $(COMMON_SOURCES)
+libstr_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libstr_p_la_LIBADD = \
-	$(AM_LIBADD)
+libstr_p_la_LIBADD =
 
 libstr_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

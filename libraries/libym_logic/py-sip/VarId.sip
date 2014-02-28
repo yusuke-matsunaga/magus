@@ -36,6 +36,15 @@ public:
   void
   restore(IDO& s);
 
+  const char*
+  __repr__() const;
+  %MethodCode
+  using std::ostringstream;
+  ostringstream buf;
+  buf << *sipCpp;
+  sipRes = buf.str().c_str();
+  %End
+
 };
 
 bool

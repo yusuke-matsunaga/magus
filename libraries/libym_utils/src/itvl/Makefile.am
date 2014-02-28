@@ -63,10 +63,10 @@ libitvl_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libitvl_la_SOURCES = $(COMMON_SOURCES)
+libitvl_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libitvl_la_LIBADD = \
-	$(AM_LIBADD)
+libitvl_la_LIBADD =
 
 libitvl_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -80,10 +80,10 @@ libitvl_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libitvl_d_la_SOURCES = $(COMMON_SOURCES)
+libitvl_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libitvl_d_la_LIBADD = \
-	$(AM_LIBADD)
+libitvl_d_la_LIBADD =
 
 libitvl_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -97,10 +97,10 @@ libitvl_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libitvl_p_la_SOURCES = $(COMMON_SOURCES)
+libitvl_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libitvl_p_la_LIBADD = \
-	$(AM_LIBADD)
+libitvl_p_la_LIBADD =
 
 libitvl_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

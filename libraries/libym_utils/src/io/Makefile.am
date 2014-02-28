@@ -112,10 +112,10 @@ libio_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libio_la_SOURCES = $(COMMON_SOURCES)
+libio_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libio_la_LIBADD = \
-	$(AM_LIBADD)
+libio_la_LIBADD =
 
 libio_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -129,10 +129,10 @@ libio_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libio_d_la_SOURCES = $(COMMON_SOURCES)
+libio_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libio_d_la_LIBADD = \
-	$(AM_LIBADD)
+libio_d_la_LIBADD =
 
 libio_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -146,10 +146,10 @@ libio_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libio_p_la_SOURCES = $(COMMON_SOURCES)
+libio_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libio_p_la_LIBADD = \
-	$(AM_LIBADD)
+libio_p_la_LIBADD =
 
 libio_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

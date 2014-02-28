@@ -46,6 +46,25 @@ public:
   // コピーコンストラクタ,代入演算子,デストラクタはデフォルト
   // のものがそのまま使える．
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容をセットする関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を設定する．
+  /// @param[in] varid 変数番号
+  /// @param[in] pol 極性
+  void
+  set(VarId varid,
+      tPol pol);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を取得する関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 変数番号を得る．
   /// @return 変数番号
   VarId
@@ -56,12 +75,13 @@ public:
   tPol
   pol() const;
 
-  /// @brief 内容を設定する．
-  /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
-  void
-  set(VarId varid,
-      tPol pol);
+  /// @brief 正極性のリテラルの時 true を返す．
+  bool
+  is_positive() const;
+
+  /// @brief 負極性のリテラルの時 true を返す．
+  bool
+  is_negative() const;
 
   /// @brief 極性の反転
   /// @return 極性を反転させたリテラルを返す．
@@ -75,18 +95,6 @@ public:
   /// @brief 同じ変数の負極性リテラルを返す．
   Literal
   make_negative() const;
-
-  // 等価比較
-  friend
-  bool
-  operator==(Literal lit1,
-	     Literal lit2);
-
-  // 大小比較
-  friend
-  bool
-  operator<(Literal lit1,
-	    Literal lit2);
 
   /// @brief ハッシュ用の関数
   ymuint
@@ -105,7 +113,7 @@ public:
   /// @brief バイナリファイルに出力する．
   /// @param[in] s 出力先のストリーム
   void
-  dump(ODO& s) const;
+  store(ODO& s) const;
 
   /// @brief バイナリファイルから読み込む．
   /// @param[in] s 入力元のストリーム
@@ -114,6 +122,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部でのみ用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内部でのみ用いるコンストラクタ
   explicit
@@ -134,6 +145,16 @@ private:
 /// @brief 未定義リテラル
 extern
 const Literal kLiteralX;
+
+/// @relates Literal
+/// @brief 比較関数
+/// @param[in] lit1, lit2 比較対象のリテラル
+/// @retval -1 lit1 < lit2
+/// @retval  0 lit1 = lit2
+/// @retval  1 lit1 > lit2
+int
+compare(Literal lit1,
+	Literal lit2);
 
 /// @relates Literal
 /// @brief 等価比較
@@ -281,6 +302,22 @@ Literal::pol() const
   return static_cast<tPol>(mBody & 1);
 }
 
+// @brief 正極性のリテラルの時 true を返す．
+inline
+bool
+Literal::is_positive() const
+{
+  return !is_negative();
+}
+
+// @brief 負極性のリテラルの時 true を返す．
+inline
+bool
+Literal::is_negative() const
+{
+  return static_cast<bool>(mBody & 1U);
+}
+
 // 極性を反転させたリテラルを返す．
 inline
 Literal
@@ -309,7 +346,7 @@ Literal::make_negative() const
 // @param[in] s 出力先のストリーム
 inline
 void
-Literal::dump(ODO& s) const
+Literal::store(ODO& s) const
 {
   s << mBody;
 }
@@ -323,13 +360,32 @@ Literal::restore(IDO& s)
   s >> mBody;
 }
 
+// @brief 比較関数
+// @param[in] lit1, lit2 比較対象のリテラル
+// @retval -1 lit1 < lit2
+// @retval  0 lit1 = lit2
+// @retval  1 lit1 > lit2
+inline
+int
+compare(Literal lit1,
+	Literal lit2)
+{
+  if ( lit1.index() < lit2.index() ) {
+    return -1;
+  }
+  if ( lit1.index() > lit2.index() ) {
+    return 1;
+  }
+  return 0;
+}
+
 // 等価比較
 inline
 bool
 operator==(Literal lit1,
 	   Literal lit2)
 {
-  return lit1.mBody == lit2.mBody;
+  return compare(lit1, lit2) == 0;
 }
 inline
 bool
@@ -345,7 +401,7 @@ bool
 operator<(Literal lit1,
 	  Literal lit2)
 {
-  return lit1.mBody < lit2.mBody;
+  return compare(lit1, lit2) == -1;
 }
 
 // @brief 大なり比較
@@ -384,7 +440,7 @@ ODO&
 operator<<(ODO& s,
 	   const Literal& lit)
 {
-  lit.dump(s);
+  lit.store(s);
   return s;
 }
 
