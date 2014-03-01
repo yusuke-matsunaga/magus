@@ -65,7 +65,7 @@ LogicSim::operator()(ymuint input_vector,
 
   for (BNodeVector::iterator p = mNodeArray.begin(); p != mNodeArray.end(); ++ p) {
     BNode* node = *p;
-    LogExpr node_func = node->func();
+    Expr node_func = node->func();
     ymuint ni = node->fanin_num();
     vector<ymulong> fanin_vals(ni);
     for (ymuint i = 0; i < ni; ++ i) {

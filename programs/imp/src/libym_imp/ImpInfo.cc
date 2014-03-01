@@ -9,7 +9,7 @@
 
 #include "ImpInfo.h"
 #include "ImpMgr.h"
-#include "ym_logic/SatSolver.h"
+#include "logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -21,7 +21,7 @@ Literal
 to_literal(ymuint id,
 	   ymuint val)
 {
-  return Literal(VarId(id), (val == 0) ? kPolNega : kPolPosi);
+  return Literal(VarId(id), (val == 0));
 }
 
 END_NONAMESPACE
@@ -290,17 +290,20 @@ verify(const ImpMgr& imp_mgr,
     if ( node == NULL ) continue;
     if ( node->is_input() ) continue;
 
-    Literal lit(VarId(id), kPolPosi);
+    VarId v(id);
+    Literal lit(v);
 
     const ImpEdge& e0 = node->fanin0();
     ImpNode* node0 = e0.src_node();
+    VarId v0(node0->id());
     bool inv0 = e0.src_inv();
-    Literal lit0(VarId(node0->id()), inv0 ? kPolNega : kPolPosi);
+    Literal lit0(v0, inv0);
 
     const ImpEdge& e1 = node->fanin1();
     ImpNode* node1 = e1.src_node();
+    VarId v1(node1->id());
     bool inv1 = e1.src_inv();
-    Literal lit1(VarId(node1->id()), inv1 ? kPolNega : kPolPosi);
+    Literal lit1(v1, inv1);
 
     solver1.add_clause(lit0, ~lit);
     solver1.add_clause(lit1, ~lit);

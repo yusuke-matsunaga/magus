@@ -9,8 +9,8 @@
 
 #include "pyigf.h"
 #include "FuncVect.h"
-#include "ym_utils/pyutils.h"
-#include "ym_utils/RandGen.h"
+#include "utils/pyutils.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_utils/PermGen.h"
+#include "utils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM

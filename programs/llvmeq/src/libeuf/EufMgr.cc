@@ -12,7 +12,7 @@
 #include "EufFuncMgr.h"
 #include "EufVarMgr.h"
 #include "EufNode.h"
-#include "ym_utils/MFSet.h"
+#include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
@@ -81,17 +81,17 @@ END_NONAMESPACE
 // @brief 関数を生成する．
 // @param[in] name 関数名
 // @param[in] arg_list 引数のリスト
-// @param[in] sym_flag 対称関数の時 true にするフラグ
-// @note sym_flag が true の時は arg_list の順番を正規化する．
+// @param[in] sflag 対称関数の時 true にするフラグ
+// @note sflag が true の時は arg_list の順番を正規化する．
 EufNode*
 EufMgr::new_function(const string& name,
 		     const vector<EufNode*>& arg_list,
-		     bool sym_flag)
+		     bool sflag)
 {
   // ソートするかもしれないのでローカルな変数にコピーする．
   vector<EufNode*> tmp_list(arg_list.begin(), arg_list.end());
 
-  if ( sym_flag ) {
+  if ( sflag ) {
     // ID番号でソートする．
     sort(tmp_list.begin(), tmp_list.end(), Lt());
   }
@@ -158,9 +158,9 @@ EufMgr::new_conjunction(EufNode* left,
     node = mBinMgr->new_conjunction(mLastId, vid, left, right);
     ++ mLastId;
 
-    Literal olit(vid, kPolPosi);
-    Literal llit(left->var_id(), kPolPosi);
-    Literal rlit(right->var_id(), kPolPosi);
+    Literal olit(vid);
+    Literal llit(left->var_id());
+    Literal rlit(right->var_id());
     mSolver.add_clause(~llit, ~rlit, olit);
     mSolver.add_clause( llit, ~olit);
     mSolver.add_clause( rlit, ~olit);
@@ -191,9 +191,9 @@ EufMgr::new_disjunction(EufNode* left,
     node = mBinMgr->new_disjunction(mLastId, vid, left, right);
     ++ mLastId;
 
-    Literal olit(vid, kPolPosi);
-    Literal llit(left->var_id(), kPolPosi);
-    Literal rlit(right->var_id(), kPolPosi);
+    Literal olit(vid);
+    Literal llit(left->var_id());
+    Literal rlit(right->var_id());
     mSolver.add_clause( llit,  rlit, ~olit);
     mSolver.add_clause(~llit,  olit);
     mSolver.add_clause(~rlit,  olit);
@@ -214,8 +214,8 @@ EufMgr::new_negation(EufNode* operand)
     node = mBinMgr->new_negation(mLastId, vid, operand);
     ++ mLastId;
 
-    Literal olit(vid, kPolPosi);
-    Literal llit(operand->var_id(), kPolPosi);
+    Literal olit(vid);
+    Literal llit(operand->var_id());
     mSolver.add_clause( llit,  olit);
     mSolver.add_clause(~llit, ~olit);
   }
@@ -237,9 +237,9 @@ EufMgr::check_validity(const vector<EufNode*>& node_assumption,
   for (vector<EufNode*>::const_iterator p = node_assumption.begin();
        p != node_assumption.end(); ++ p) {
     EufNode* node = *p;
-    assumption.push_back(Literal(node->var_id(), kPolPosi));
+    assumption.push_back(Literal(node->var_id()));
   }
-  Literal vlit(node->var_id(), kPolPosi);
+  Literal vlit(node->var_id());
   assumption.push_back(~vlit);
 
   vector<Bool3> model;
@@ -338,12 +338,12 @@ EufMgr::check_validity(const vector<EufNode*>& node_assumption,
 	for (vector<EufNode*>::iterator q = eq_list.begin();
 	     q != eq_list.end(); ++ q) {
 	  EufNode* eq_node = *q;
-	  Literal eq_lit(eq_node->var_id(), kPolPosi);
+	  Literal eq_lit(eq_node->var_id());
 	  tmp_list.push_back(~eq_lit);
 	  cout << plus << ~eq_lit;
 	  plus = " + ";
 	}
-	Literal neq_lit(neq_node->var_id(), kPolPosi);
+	Literal neq_lit(neq_node->var_id());
 	tmp_list.push_back(neq_lit);
 	cout << " + " << neq_lit << endl;
 	mSolver.add_clause(tmp_list);

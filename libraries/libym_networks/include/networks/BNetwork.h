@@ -14,7 +14,7 @@
 #include "utils/ItvlMgr.h"
 #include "utils/NameMgr.h"
 #include "utils/Binder.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 // Glossary
 //   ネットワーク: 複数の入力，複数の出力を持つ論理ネットワーク
@@ -395,7 +395,7 @@ public:
   fanouts_end() const;
 
   /// @brief 論理式を取り出す．
-  LogExpr
+  Expr
   func() const;
 
   /// @brief latch ノードの時の初期値を取り出す．
@@ -526,7 +526,7 @@ private:
   DlList<BNodeEdge> mFanouts;
 
   // 機能を表す論理式
-  LogExpr mFunc;
+  Expr mFunc;
 
   // この節点の属しているネットワーク
   BNetwork* mParent;
@@ -1034,7 +1034,7 @@ private:
   // ノードの論理式をセットする．
   void
   set_node_func(BNode* node,
-		const LogExpr& lexp);
+		const Expr& lexp);
 
   // ノードのリセット値をセットする．
   // latch ノードの場合のみ意味を持つ．
@@ -1362,7 +1362,7 @@ BNode::fanouts_end() const
 
 // 論理式を取り出す．
 inline
-LogExpr
+Expr
 BNode::func() const
 {
   return mFunc;

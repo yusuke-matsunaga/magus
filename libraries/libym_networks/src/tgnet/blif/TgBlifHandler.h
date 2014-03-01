@@ -11,7 +11,7 @@
 
 #include "networks/tgnet.h"
 #include "BlifHandler.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
@@ -175,8 +175,8 @@ private:
   TgNetwork* mNetwork;
 
   // cubepat2expr で用いる作業領域
-  vector<LogExpr> mChd1;
-  vector<LogExpr> mChd2;
+  vector<Expr> mChd1;
+  vector<Expr> mChd2;
 
   // 後で接続する要素のリスト
   vector<Connection> mConList;

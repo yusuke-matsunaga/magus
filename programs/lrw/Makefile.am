@@ -48,8 +48,11 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	@POPT_INCLUDES@
 
 
@@ -63,7 +66,7 @@ npngen_SOURCES = \
 	NpnXform.cc
 
 npngen_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 npngen_LDFLAGS =
 
@@ -128,7 +131,7 @@ read_table_SOURCES = \
 	NpnXform.cc
 
 read_table_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 read_table_LDFLAGS =
 
@@ -155,7 +158,7 @@ npntest_SOURCES = \
 	npntest.cc
 
 npntest_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 npntest_LDFLAGS =
 
@@ -173,7 +176,7 @@ npnnodemgr_test_SOURCES = \
 	npnnodemgr_test.cc
 
 npnnodemgr_test_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 npnnodemgr_test_LDFLAGS =
 
@@ -204,7 +207,7 @@ genpat_SOURCES = \
 	npn4rep.h
 
 genpat_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 genpat_LDFLAGS = \
 	@POPT_LIBS@
@@ -224,8 +227,8 @@ lrw_SOURCES = \
 	lrw.cc
 
 lrw_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 lrw_LDFLAGS = \
 	@POPT_LIBS@

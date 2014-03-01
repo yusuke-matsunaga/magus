@@ -1,20 +1,20 @@
 
-/// @file LogExprWriter.cc
-/// @brief LogExprWriter の実装ファイル
+/// @file ExprWriter.cc
+/// @brief ExprWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/LogExprWriter.h"
-#include "logic/LogExpr.h"
+#include "logic/ExprWriter.h"
+#include "logic/Expr.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 // @brief コンストラクタ
-LogExprWriter::LogExprWriter()
+ExprWriter::ExprWriter()
 {
   mOpStrArray[0] = "~";
   mOpStrArray[1] = "&";
@@ -23,15 +23,15 @@ LogExprWriter::LogExprWriter()
 }
 
 // @brief デストラクタ
-LogExprWriter::~LogExprWriter()
+ExprWriter::~ExprWriter()
 {
 }
 
 // ostream に対する書出し
 ostream&
-LogExprWriter::dump(ostream& s,
-		    const LogExpr& expr,
-		    const VarStrMap& var_names) const
+ExprWriter::dump(ostream& s,
+		 const Expr& expr,
+		 const VarStrMap& var_names) const
 {
   dump_sub(s, expr, var_names);
   return s;
@@ -43,8 +43,8 @@ LogExprWriter::dump(ostream& s,
 // @note varid 番目の変数名として var_names[varid] を用いる．
 // 登録されていなければデフォルトの表記を用いる．
 string
-LogExprWriter::dump_string(const LogExpr& expr,
-			   const VarStrMap& var_names) const
+ExprWriter::dump_string(const Expr& expr,
+			const VarStrMap& var_names) const
 {
   ostringstream buf;
   dump(buf, expr, var_names);
@@ -53,7 +53,7 @@ LogExprWriter::dump_string(const LogExpr& expr,
 
 // 演算子文字列を設定する．
 void
-LogExprWriter::set_opstr(const vector<string>& op)
+ExprWriter::set_opstr(const vector<string>& op)
 {
   for (ymuint i = 0; i < 4; i ++) {
     mOpStrArray[i] = op[i];
@@ -62,7 +62,7 @@ LogExprWriter::set_opstr(const vector<string>& op)
 
 // 演算子文字列を取得する．
 void
-LogExprWriter::opstr(vector<string>& op) const
+ExprWriter::opstr(vector<string>& op) const
 {
   op.resize(4);
   for (ymuint i = 0; i < 4; i ++) {
@@ -72,28 +72,28 @@ LogExprWriter::opstr(vector<string>& op) const
 
 // NOT演算子の文字列を得る．
 const string&
-LogExprWriter::not_str() const
+ExprWriter::not_str() const
 {
   return mOpStrArray[0];
 }
 
 // AND演算子の文字列を得る．
 const string&
-LogExprWriter::and_str() const
+ExprWriter::and_str() const
 {
   return mOpStrArray[1];
 }
 
 // OR演算子の文字列を得る．
 const string&
-LogExprWriter::or_str() const
+ExprWriter::or_str() const
 {
   return mOpStrArray[2];
 }
 
 // XOR演算子の文字列を得る．
 const string&
-LogExprWriter::xor_str() const
+ExprWriter::xor_str() const
 {
   return mOpStrArray[3];
 }
@@ -101,9 +101,9 @@ LogExprWriter::xor_str() const
 // 論理式の内容を ostream に書出す．
 ostream&
 operator<<(ostream& s,
-	   const LogExpr& expr)
+	   const Expr& expr)
 {
-  LogExprWriter writer;
+  ExprWriter writer;
   // 空の map を渡す
   return writer.dump(s, expr, VarStrMap());
 }
@@ -111,9 +111,9 @@ operator<<(ostream& s,
 
 // dump() のサブルーティン
 void
-LogExprWriter::dump_sub(ostream& s,
-			const LogExpr& expr,
-			const VarStrMap& var_names) const
+ExprWriter::dump_sub(ostream& s,
+		     const Expr& expr,
+		     const VarStrMap& var_names) const
 {
   if ( expr.is_zero() ) {
     s << "0";
@@ -160,4 +160,4 @@ LogExprWriter::dump_sub(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR

@@ -268,7 +268,7 @@ PtMgr::str2id(const char* name)
 {
   string str(name);
   ymuint id = 0;
-  hash_map<string, ymuint32>::iterator p = mIdMap.find(str);
+  unordered_map<string, ymuint32>::iterator p = mIdMap.find(str);
   if ( p == mIdMap.end() ) {
     id = mLastId;
     ++ mLastId;

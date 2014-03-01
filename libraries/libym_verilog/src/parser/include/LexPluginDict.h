@@ -1,5 +1,5 @@
-#ifndef LEXPLUGINDICT_H
-#define LEXPLUGINDICT_H
+#ifndef EXPRLUGINDICT_H
+#define EXPRLUGINDICT_H
 
 /// @file LexPluginDict.h
 /// @brief LexPlugin のヘッダファイル
@@ -91,4 +91,4 @@ private:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LEXPLUGINDICT_H
+#endif // EXPRLUGINDICT_H

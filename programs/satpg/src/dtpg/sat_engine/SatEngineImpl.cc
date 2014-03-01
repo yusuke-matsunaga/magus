@@ -51,9 +51,9 @@ make_flt_cnf(SatSolver& solver,
 	     VarId ovar,
 	     int vval)
 {
-  Literal l0(ivar, kPolPosi);
-  Literal l1(fvar, kPolPosi);
-  Literal l2(ovar, kPolPosi);
+  Literal l0(ivar, false);
+  Literal l1(fvar, false);
+  Literal l2(ovar, false);
   if ( vval == 0 ) {
     solver.add_clause( l0, ~l2);
     solver.add_clause(~l1, ~l2);
@@ -313,11 +313,11 @@ make_gnode_cnf(SatSolver& solver,
     return;
   }
 
-  Literal output(node->gvar(), kPolPosi);
+  Literal output(node->gvar(), false);
 
   if ( node->is_output() ) {
     TpgNode* inode = node->fanin(0);
-    Literal input(inode->gvar(), kPolPosi);
+    Literal input(inode->gvar(), false);
     solver.add_clause( input, ~output);
     solver.add_clause(~input,  output);
     return;
@@ -334,25 +334,25 @@ make_gnode_cnf(SatSolver& solver,
 	// 対応する TpgNode の変数を持ってくる．
 	ymuint ipos = prim->input_id();
 	TpgNode* inode = node->fanin(ipos);
-	olit = Literal(inode->gvar(), kPolPosi);;
+	olit = Literal(inode->gvar(), false);;
       }
       else if ( prim->is_not_input() ) {
 	// 否定付き入力プリミティブの場合
 	// 対応する TpgNode の変数を持ってきて否定する．
 	ymuint ipos = prim->input_id();
 	TpgNode* inode = node->fanin(ipos);
-	olit = Literal(inode->gvar(), kPolNega);
+	olit = Literal(inode->gvar(), true);
       }
       else {
 	if ( i == n - 1 ) {
 	  // 根のプリミティブの場合
 	  // node の変数を使う．
-	  olit = Literal(node->gvar(), kPolPosi);
+	  olit = Literal(node->gvar(), false);
 	}
 	else {
 	  // それ以外の場合
 	  // 新たな変数を割り当てる．
-	  olit = Literal(solver.new_var(), kPolPosi);
+	  olit = Literal(solver.new_var(), false);
 	}
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
@@ -380,17 +380,17 @@ make_fnode_cnf(SatSolver& solver,
     return;
   }
 
-  Literal output(node->fvar(), kPolPosi);
-  Literal dlit(node->dvar(), kPolPosi);
+  Literal output(node->fvar(), false);
+  Literal dlit(node->dvar(), false);
 
   if ( node->is_output() ) {
     TpgNode* inode = node->fanin(0);
-    Literal input(inode->fvar(), kPolPosi);
+    Literal input(inode->fvar(), false);
     solver.add_clause( input, ~output);
     solver.add_clause(~input,  output);
 
     // dlit 用の節の追加
-    Literal idlit(inode->dvar(), kPolPosi);
+    Literal idlit(inode->dvar(), false);
     solver.add_clause(idlit, ~dlit);
 
     return;
@@ -405,7 +405,7 @@ make_fnode_cnf(SatSolver& solver,
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
     if ( inode->has_fvar() ) {
-      dep.push_back(Literal(inode->dvar(), kPolPosi));
+      dep.push_back(Literal(inode->dvar(), false));
     }
   }
   solver.add_clause(dep);
@@ -421,25 +421,25 @@ make_fnode_cnf(SatSolver& solver,
 	// 対応する TpgNode の fvar を用いる．
 	ymuint ipos = prim->input_id();
 	TpgNode* inode = node->fanin(ipos);
-	olit = Literal(inode->fvar(), kPolPosi);
+	olit = Literal(inode->fvar(), false);
       }
       else if ( prim->is_not_input() ) {
 	// 否定付き入力プリミティブの場合
 	// 対応する TpgNode の fvar を用いる．
 	ymuint ipos = prim->input_id();
 	TpgNode* inode = node->fanin(ipos);
-	olit = Literal(inode->fvar(), kPolNega);
+	olit = Literal(inode->fvar(), true);
       }
       else {
 	if ( i == n - 1 ) {
 	  // 根のプリミティブの場合
 	  // node の fvar を用いる．
-	  olit = Literal(node->fvar(), kPolPosi);
+	  olit = Literal(node->fvar(), false);
 	}
 	else {
 	  // それ以外の場合
 	  // 新たな変数を割り当てる．
-	  olit = Literal(solver.new_var(), kPolPosi);
+	  olit = Literal(solver.new_var(), false);
 	}
 
 	// プリミティブの入出力の関係を表す CNF 式を作る．
@@ -692,7 +692,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 	  ivar = tmp_var[fid];
 	}
       }
-      inputs[i] = Literal(ivar, kPolPosi);
+      inputs[i] = Literal(ivar, false);
     }
 
     // ovar に出力変数を入れる．
@@ -708,9 +708,9 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
       }
     }
 
-    Literal glit(node->gvar(), kPolPosi);
-    Literal flit(node->fvar(), kPolPosi);
-    Literal dlit(node->dvar(), kPolPosi);
+    Literal glit(node->gvar(), false);
+    Literal flit(node->fvar(), false);
+    Literal dlit(node->dvar(), false);
 
     // XOR(glit, flit, dlit) を追加する．
     // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
@@ -719,7 +719,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
     solver.add_clause( glit, ~flit,  dlit);
     solver.add_clause( glit,  flit, ~dlit);
 
-    Literal gate_output(ovar, kPolPosi);
+    Literal gate_output(ovar, false);
     if ( node->is_input() ) {
       solver.add_clause(~glit,  gate_output);
       solver.add_clause( glit, ~gate_output);
@@ -776,36 +776,36 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
       // - 出力に故障がある．
       dep.clear();
       dep.reserve(ni * 3 + 3);
-      Literal dlit(node->dvar(), kPolNega);
+      Literal dlit(node->dvar(), true);
       dep.push_back(dlit);
       for (ymuint j = 0; j < ni; ++ j) {
 	TpgNode* inode = node->fanin(j);
 	if ( inode->has_fvar() ) {
-	  dep.push_back(Literal(inode->dvar(), kPolPosi));
+	  dep.push_back(Literal(inode->dvar(), false));
 	}
 	TpgFault* fi0 = node->input_fault(0, j);
 	if ( is_valid(fi0, flist) ) {
 	  ymuint fid = fi0->tmp_id();
-	  dep.push_back(Literal(flt_var[fid], kPolPosi));
+	  dep.push_back(Literal(flt_var[fid], false));
 	}
 
 	TpgFault* fi1 = node->input_fault(1, j);
 	if ( is_valid(fi1, flist) ) {
 	  ymuint fid = fi1->tmp_id();
-	  dep.push_back(Literal(flt_var[fid], kPolPosi));
+	  dep.push_back(Literal(flt_var[fid], false));
 	}
       }
 
       TpgFault* fo0 = node->output_fault(0);
       if ( is_valid(fo0, flist) ) {
 	ymuint fid = fo0->tmp_id();
-	dep.push_back(Literal(flt_var[fid], kPolPosi));
+	dep.push_back(Literal(flt_var[fid], false));
       }
 
       TpgFault* fo1 = node->output_fault(1);
       if ( is_valid(fo1, flist) ) {
 	ymuint fid = fo1->tmp_id();
-	dep.push_back(Literal(flt_var[fid], kPolPosi));
+	dep.push_back(Literal(flt_var[fid], false));
       }
 
       solver.add_clause(dep);
@@ -821,7 +821,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
   for (vector<TpgNode*>::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
     TpgNode* node = *p;
-    Literal dlit(node->dvar(), kPolPosi);
+    Literal dlit(node->dvar(), false);
     odiff.push_back(dlit);
   }
   solver.add_clause(odiff);
@@ -846,8 +846,8 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 
     // 該当の故障に対する変数のみ1にする．
     for (ymuint j = 0; j < nf; ++ j) {
-      tPol pol = (j == i) ? kPolPosi : kPolNega;
-      mAssumptions.push_back(Literal(flt_var[j], pol));
+      bool inv = (j != i);
+      mAssumptions.push_back(Literal(flt_var[j], inv));
     }
 
     // 故障ノードの TFO 以外の dlit を0にする．
@@ -870,7 +870,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 	 p != mTfoList.end(); ++ p) {
       TpgNode* node = *p;
       if ( node->has_fvar() && !tmp_mark(node) ) {
-	Literal dlit(node->dvar(), kPolNega);
+	Literal dlit(node->dvar(), true);
 	mAssumptions.push_back(dlit);
       }
     }
@@ -883,7 +883,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), kPolPosi);
+      Literal dlit(node->dvar(), false);
       mAssumptions.push_back(dlit);
     }
 
@@ -891,8 +891,8 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
     if ( f->is_input_fault() ) {
       fnode = fnode->fanin(f->pos());
     }
-    tPol pol = (f->val() == 0) ? kPolPosi : kPolNega;
-    mAssumptions.push_back(Literal(fnode->gvar(), pol));
+    bool inv = (f->val() != 0);
+    mAssumptions.push_back(Literal(fnode->gvar(), inv));
 
     solve(solver, f, bt);
   }

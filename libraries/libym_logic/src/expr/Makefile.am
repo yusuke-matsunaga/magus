@@ -49,17 +49,17 @@ AM_CPPFLAGS = \
 ############################################################
 
 COMMON_SOURCES = \
-	lexp_types.h \
-	LexpMgr.h \
-	LexpNode.h \
-	LexpNodePtr.h \
-	LexpParser.h \
-	LexpMgr.cc \
-	LexpNode.cc \
-	LexpParser.cc \
+	expr_types.h \
+	Expr.cc \
+	ExprMgr.h \
+	ExprMgr.cc \
+	ExprNode.h \
+	ExprNode.cc \
+	ExprNodePtr.h \
+	ExprParser.h \
+	ExprParser.cc \
+	ExprWriter.cc \
 	Literal.cc \
-	LogExpr.cc \
-	LogExprWriter.cc \
 	SopLit.h
 
 

@@ -115,7 +115,7 @@ tgnet2aig(const TgNetwork& network,
       fanins[j] = node_map[inode->gid()];
     }
     if ( node->is_cplx_logic() ) {
-      LogExpr expr = network.get_lexp(node);
+      Expr expr = network.get_lexp(node);
       node_map[node->gid()] = aig_mgr.make_logic(expr, fanins);
     }
     else {

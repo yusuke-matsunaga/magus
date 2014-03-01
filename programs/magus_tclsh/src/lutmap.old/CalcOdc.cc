@@ -57,7 +57,7 @@ public:
   /// @param[in] alloc メモリアロケータ
   static
   OdcNode*
-  make_tree(const LogExpr& expr,
+  make_tree(const Expr& expr,
 	    const vector<Bdd>& leaf_gf,
 	    BddMgrRef& bddmgr,
 	    AllocBase& alloc);
@@ -115,7 +115,7 @@ OdcNode::~OdcNode()
 // @param[in] bddmgr BddMgr
 // @param[in] alloc メモリアロケータ
 OdcNode*
-OdcNode::make_tree(const LogExpr& expr,
+OdcNode::make_tree(const Expr& expr,
 		   const vector<Bdd>& leaf_gf,
 		   BddMgrRef& bddmgr,
 		   AllocBase& alloc)
@@ -331,7 +331,7 @@ check_odc_sub(BddMgrRef bddmgr,
 	      
 // CalcOdc の検算を行う．
 bool
-check_odc(const LogExpr& expr,
+check_odc(const Expr& expr,
 	  Bdd root_odc,
 	  const vector<Bdd>& leaf_gf,
 	  const vector<Bdd>& leaf_odc)
@@ -372,7 +372,7 @@ CalcOdc::~CalcOdc()
 // @param[in] leaf_gf 葉の global function の配列
 // @param[out] leaf_odc 葉の ODC
 void
-CalcOdc::operator()(const LogExpr& expr,
+CalcOdc::operator()(const Expr& expr,
 		    Bdd root_odc,
 		    const vector<Bdd>& leaf_gf,
 		    vector<Bdd>& leaf_odc)

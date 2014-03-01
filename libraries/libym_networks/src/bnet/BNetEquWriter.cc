@@ -9,7 +9,7 @@
 
 #include "networks/BNetEquWriter.h"
 #include "networks/BNetwork.h"
-#include "logic/LogExprWriter.h"
+#include "logic/ExprWriter.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET
@@ -18,8 +18,8 @@ BEGIN_NONAMESPACE
 
 // 論理式を出力する．
 void
-write_expr(const LogExpr& f,
-	   const LogExprWriter& writer,
+write_expr(const Expr& f,
+	   const ExprWriter& writer,
 	   const BNode* node,
 	   ostream& s)
 {
@@ -107,7 +107,7 @@ BNetEquWriter::dump(ostream& s,
   }
   s << endl;
 
-  LogExprWriter writer;
+  ExprWriter writer;
   for (BNodeList::const_iterator p = network.logic_nodes_begin();
        p != network.logic_nodes_end(); ++p) {
     BNode* node = *p;

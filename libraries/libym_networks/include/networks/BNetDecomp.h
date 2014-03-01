@@ -10,7 +10,7 @@
 
 
 #include "networks/bnet.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/RandGen.h"
 
 
@@ -87,7 +87,7 @@ private:
   void
   decomp_type1_sub(BNode* orig_node,
 		   ymuint max_fanin,
-		   const LogExpr& expr,
+		   const Expr& expr,
 		   BNode* root_node,
 		   bool no_xor);
 
@@ -99,7 +99,7 @@ private:
   void
   decomp_type2_sub(BNode* orig_node,
 		   ymuint max_fanin,
-		   const LogExpr& expr,
+		   const Expr& expr,
 		   BNode* root_node,
 		   bool no_xor);
 
@@ -114,7 +114,7 @@ private:
 	     ymuint ni,
 	     const vector<pair<BNode*, bool> >& tmp_fanins,
 	     ymuint max_fanin,
-	     const LogExpr& type_node,
+	     const Expr& type_node,
 	     BNode* root_node,
 	     bool no_xor);
 

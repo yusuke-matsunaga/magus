@@ -45,11 +45,11 @@ CiLatchCell::CiLatchCell(CiLibrary* library,
 			 ymuint nb,
 			 ymuint nc,
 			 const vector<bool>& output_array,
-			 const vector<LogExpr>& logic_array,
-			 const vector<LogExpr>& tristate_array,
-			 const LogExpr& data_in,
-			 const LogExpr& enable,
-			 const LogExpr& enable_also,
+			 const vector<Expr>& logic_array,
+			 const vector<Expr>& tristate_array,
+			 const Expr& data_in,
+			 const Expr& enable,
+			 const Expr& enable_also,
 			 Alloc& alloc) :
   CiCell(library, id, name, area,
 	 ni, no, nio, 0, nb, nc,
@@ -77,7 +77,7 @@ CiLatchCell::is_latch() const
 
 // @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiLatchCell::data_in_expr() const
 {
   return mDataIn;
@@ -85,7 +85,7 @@ CiLatchCell::data_in_expr() const
 
 // @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiLatchCell::enable_expr() const
 {
   return mEnable;
@@ -93,7 +93,7 @@ CiLatchCell::enable_expr() const
 
 // @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiLatchCell::enable2_expr() const
 {
   return mEnable2;
@@ -134,12 +134,12 @@ CiLatchRCell::CiLatchRCell(CiLibrary* library,
 			   ymuint nb,
 			   ymuint nc,
 			   const vector<bool>& output_array,
-			   const vector<LogExpr>& logic_array,
-			   const vector<LogExpr>& tristate_array,
-			   const LogExpr& data_in,
-			   const LogExpr& enable,
-			   const LogExpr& enable_also,
-			   const LogExpr& clear,
+			   const vector<Expr>& logic_array,
+			   const vector<Expr>& tristate_array,
+			   const Expr& data_in,
+			   const Expr& enable,
+			   const Expr& enable_also,
+			   const Expr& clear,
 			   Alloc& alloc) :
   CiLatchCell(library, id, name, area,
 	      ni, no, nio, nb, nc,
@@ -168,7 +168,7 @@ CiLatchRCell::has_clear() const
 
 // @brief ラッチセルの場合にクリア条件を表す論理式を返す．
 // @note クリア端子がない場合の返り値は不定
-LogExpr
+Expr
 CiLatchRCell::clear_expr() const
 {
   return mClear;
@@ -209,12 +209,12 @@ CiLatchSCell::CiLatchSCell(CiLibrary* library,
 			   ymuint nb,
 			   ymuint nc,
 			   const vector<bool>& output_array,
-			   const vector<LogExpr>& logic_array,
-			   const vector<LogExpr>& tristate_array,
-			   const LogExpr& data_in,
-			   const LogExpr& enable,
-			   const LogExpr& enable_also,
-			   const LogExpr& preset,
+			   const vector<Expr>& logic_array,
+			   const vector<Expr>& tristate_array,
+			   const Expr& data_in,
+			   const Expr& enable,
+			   const Expr& enable_also,
+			   const Expr& preset,
 			   Alloc& alloc) :
   CiLatchCell(library, id, name, area,
 	      ni, no, nio, nb, nc,
@@ -243,7 +243,7 @@ CiLatchSCell::has_preset() const
 
 // @brief ラッチセルの場合にプリセット条件を表す論理式を返す．
 // @note プリセット端子がない場合の返り値は不定
-LogExpr
+Expr
 CiLatchSCell::preset_expr() const
 {
   return mPreset;
@@ -287,13 +287,13 @@ CiLatchSRCell::CiLatchSRCell(CiLibrary* library,
 			     ymuint nb,
 			     ymuint nc,
 			     const vector<bool>& output_array,
-			     const vector<LogExpr>& logic_array,
-			     const vector<LogExpr>& tristate_array,
-			     const LogExpr& data_in,
-			     const LogExpr& enable,
-			     const LogExpr& enable_also,
-			     const LogExpr& clear,
-			     const LogExpr& preset,
+			     const vector<Expr>& logic_array,
+			     const vector<Expr>& tristate_array,
+			     const Expr& data_in,
+			     const Expr& enable,
+			     const Expr& enable_also,
+			     const Expr& clear,
+			     const Expr& preset,
 			     ymuint clear_preset_var1,
 			     ymuint clear_preset_var2,
 			     Alloc& alloc) :
@@ -327,7 +327,7 @@ CiLatchSRCell::has_preset() const
 
 // @brief ラッチセルの場合にプリセット条件を表す論理式を返す．
 // @note プリセット端子がない場合の返り値は不定
-LogExpr
+Expr
 CiLatchSRCell::preset_expr() const
 {
   return mPreset;

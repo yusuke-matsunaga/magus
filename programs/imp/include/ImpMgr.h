@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BdnMgr.h"
+#include "networks/BNetwork.h"
+#include "networks/BdnMgr.h"
 #include "ImpNode.h"
 #include "ImpVal.h"
 #include "BNodeMap.h"
-#include "ym_utils/RandGen.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -120,7 +120,7 @@ public:
 
   /// @brief 論理式に対応したノードの木を作る．
   ImpNodeHandle
-  make_tree(const LogExpr& expr,
+  make_tree(const Expr& expr,
 	    const vector<ImpNodeHandle>& fanins);
 
   /// @brief AND ノードの木を作る．

@@ -92,7 +92,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
   network.tsort(node_list);
   for (BNodeVector::iterator p = node_list.begin(); p != node_list.end(); ++ p) {
     BNode* node = *p;
-    LogExpr expr = node->func();
+    Expr expr = node->func();
     if ( expr.is_literal() || expr.is_constant() ) {
       continue;
     }
@@ -285,28 +285,28 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       new_fanins[i] = new_node;
     }
 
-    LogExprVector lit_array(ni);
+    ExprVector lit_array(ni);
     for (ymuint i = 0; i < ni;  ++ i) {
-      lit_array[i] = LogExpr::make_posiliteral(VarId(i));
+      lit_array[i] = Expr::make_posiliteral(VarId(i));
     }
-    LogExpr new_expr;
+    Expr new_expr;
     if ( best_type == kAnd ) {
-      new_expr = LogExpr::make_and(lit_array);
+      new_expr = Expr::make_and(lit_array);
     }
     else if ( best_type == kNand ) {
-      new_expr = ~LogExpr::make_and(lit_array);
+      new_expr = ~Expr::make_and(lit_array);
     }
     else if ( best_type == kOr ) {
-      new_expr = LogExpr::make_or(lit_array);
+      new_expr = Expr::make_or(lit_array);
     }
     else if ( best_type == kNor ) {
-      new_expr = ~LogExpr::make_or(lit_array);
+      new_expr = ~Expr::make_or(lit_array);
     }
     else if ( best_type == kXor ) {
-      new_expr = LogExpr::make_xor(lit_array);
+      new_expr = Expr::make_xor(lit_array);
     }
     else if ( best_type == kXnor ) {
-      new_expr = ~LogExpr::make_xor(lit_array);
+      new_expr = ~Expr::make_xor(lit_array);
     }
     else {
       assert_cond(__FILE__, __LINE__);
@@ -333,7 +333,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
 
 // expr の子供がすべてリテラルだと仮定して必要となるインバーターの数を数える．
 ymuint
-BNetGateDecomp::count_inv(const LogExpr& expr,
+BNetGateDecomp::count_inv(const Expr& expr,
 			  BNode* node,
 			  bool phase,
 			  vector<bool>& iinv_array)
@@ -341,7 +341,7 @@ BNetGateDecomp::count_inv(const LogExpr& expr,
   ymuint nc = expr.child_num();
   ymuint c = 0;
   for (ymuint i = 0; i < nc; ++ i) {
-    LogExpr expr1 = expr.child(i);
+    Expr expr1 = expr.child(i);
     VarId var = expr1.varid();
     ymuint pos = var.val();
     BNode* node1 = node->fanin(pos);

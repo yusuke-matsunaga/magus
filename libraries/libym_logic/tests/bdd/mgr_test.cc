@@ -257,7 +257,7 @@ test_isop()
 {
   Bdd bdd1 = str2bdd(mgr1, "0 & 1 & 2 | ~0 & 1 & 3 | ~1 & ~2 & ~3");
   Bdd bdd4 = str2bdd(mgr2, "0 & 2 | 1 & 3 | ~1 & ~3 | ~0 & ~2 & ~3");
-  LogExpr cover2;
+  Expr cover2;
   Bdd bdd5 = isop(bdd1, bdd4, cover2);
   if ( !bdd5.is_error() ) {
     bdd1.print(cout);
@@ -266,7 +266,7 @@ test_isop()
     return false;
   }
 
-  LogExpr ans_cover2 = prime_cover(bdd1, bdd4);
+  Expr ans_cover2 = prime_cover(bdd1, bdd4);
   if ( !ans_cover2.is_zero() ) {
     bdd1.print(cout);
     bdd4.print(cout);

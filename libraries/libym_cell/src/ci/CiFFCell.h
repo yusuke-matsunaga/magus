@@ -54,11 +54,11 @@ protected:
 	   ymuint nb,
 	   ymuint nc,
 	   const vector<bool>& output_array,
-	   const vector<LogExpr>& logic_array,
-	   const vector<LogExpr>& tristate_array,
-	   const LogExpr& next_state,
-	   const LogExpr& clocked_on,
-	   const LogExpr& clocked_on_also,
+	   const vector<Expr>& logic_array,
+	   const vector<Expr>& tristate_array,
+	   const Expr& next_state,
+	   const Expr& clocked_on,
+	   const Expr& clocked_on_also,
 	   Alloc& alloc);
 
   /// @brief デストラクタ
@@ -79,19 +79,19 @@ public:
   /// @brief FFセルの場合に次状態関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   next_state_expr() const;
 
   /// @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clock_expr() const;
 
   /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clock2_expr() const;
 
 
@@ -101,13 +101,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // next_state 論理式
-  LogExpr mNextState;
+  Expr mNextState;
 
   // clock 論理式
-  LogExpr mClock;
+  Expr mClock;
 
   // clock2 論理式
-  LogExpr mClock2;
+  Expr mClock2;
 
 };
 
@@ -153,12 +153,12 @@ protected:
 	    ymuint nb,
 	    ymuint nc,
 	    const vector<bool>& output_array,
-	    const vector<LogExpr>& logic_array,
-	    const vector<LogExpr>& tristate_array,
-	    const LogExpr& next_state,
-	    const LogExpr& clocked_on,
-	    const LogExpr& clocked_on_also,
-	    const LogExpr& clear,
+	    const vector<Expr>& logic_array,
+	    const vector<Expr>& tristate_array,
+	    const Expr& next_state,
+	    const Expr& clocked_on,
+	    const Expr& clocked_on_also,
+	    const Expr& clear,
 	    Alloc& alloc);
 
   /// @brief デストラクタ
@@ -179,7 +179,7 @@ public:
   /// @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
   /// @note クリア端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clear_expr() const;
 
 
@@ -189,7 +189,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // clear 論理式
-  LogExpr mClear;
+  Expr mClear;
 
 };
 
@@ -235,12 +235,12 @@ protected:
 	    ymuint nb,
 	    ymuint nc,
 	    const vector<bool>& output_array,
-	    const vector<LogExpr>& logic_array,
-	    const vector<LogExpr>& tristate_array,
-	    const LogExpr& next_state,
-	    const LogExpr& clocked_on,
-	    const LogExpr& clocked_on_also,
-	    const LogExpr& preset,
+	    const vector<Expr>& logic_array,
+	    const vector<Expr>& tristate_array,
+	    const Expr& next_state,
+	    const Expr& clocked_on,
+	    const Expr& clocked_on_also,
+	    const Expr& preset,
 	    Alloc& alloc);
 
   /// @brief デストラクタ
@@ -261,7 +261,7 @@ public:
   /// @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
   /// @note プリセット端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   preset_expr() const;
 
 
@@ -271,7 +271,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // preset 論理式
-  LogExpr mPreset;
+  Expr mPreset;
 
 };
 
@@ -320,13 +320,13 @@ protected:
 	     ymuint nb,
 	     ymuint nc,
 	     const vector<bool>& output_array,
-	     const vector<LogExpr>& logic_array,
-	     const vector<LogExpr>& tristate_array,
-	     const LogExpr& next_state,
-	     const LogExpr& clocked_on,
-	     const LogExpr& clocked_on_also,
-	     const LogExpr& clear,
-	     const LogExpr& preset,
+	     const vector<Expr>& logic_array,
+	     const vector<Expr>& tristate_array,
+	     const Expr& next_state,
+	     const Expr& clocked_on,
+	     const Expr& clocked_on_also,
+	     const Expr& clear,
+	     const Expr& preset,
 	     ymuint clear_preset_var1,
 	     ymuint clear_preset_var2,
 	     Alloc& alloc);
@@ -349,7 +349,7 @@ public:
   /// @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
   /// @note プリセット端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   preset_expr() const;
 
   /// @brief clear_preset_var1 の取得
@@ -375,7 +375,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // preset 論理式
-  LogExpr mPreset;
+  Expr mPreset;
 
   // clear_preser_var1/var2
   ymuint8 mClearPresetVal[2];

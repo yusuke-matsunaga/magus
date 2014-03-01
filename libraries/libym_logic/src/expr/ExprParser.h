@@ -1,18 +1,18 @@
-#ifndef LEXPPARSER_H
-#define LEXPPARSER_H
+#ifndef EXPRPARSER_H
+#define EXPRPARSER_H
 
-/// @file LexpParser.h
-/// @brief LexpParser のヘッダファイル
+/// @file ExprParser.h
+/// @brief ExprParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 //////////////////////////////////////////////////////////////////////
 /// @brief トークンの種類を表す列挙型．
@@ -48,7 +48,7 @@ ostream& operator<<(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SyntaxError LexpParser.h "LexpParser.h"
+/// @class SyntaxError ExprParser.h "ExprParser.h"
 /// @brief パーズ中のシンタックスエラーを表すクラス
 //////////////////////////////////////////////////////////////////////
 class SyntaxError :
@@ -65,19 +65,19 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LexpParser LexpParser.h "LexpParser.h"
+/// @class ExprParser ExprParser.h "ExprParser.h"
 /// @brief 論理式をパーズするためのクラス
 //////////////////////////////////////////////////////////////////////
-class LexpParser
+class ExprParser
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] input 入力ファイルストリーム
-  LexpParser(istream* input);
+  ExprParser(istream* input);
 
   /// @brief デストラクタ
-  ~LexpParser();
+  ~ExprParser();
 
 
 public:
@@ -98,16 +98,16 @@ public:
   bool
   get_and_token();
 
-  /// @brief リテラル(もしくは括弧で囲まれた単位)を読み出し LogExpr に変換する
-  LogExpr
+  /// @brief リテラル(もしくは括弧で囲まれた単位)を読み出し Expr に変換する
+  Expr
   get_literal();
 
-  /// @brief AND でつながった単位を読み出し LogExpr に変換する．
-  LogExpr
+  /// @brief AND でつながった単位を読み出し Expr に変換する．
+  Expr
   get_product();
 
-  /// @brief end_token で終わる論理式を読み出し LogExpr に変換する．
-  LogExpr
+  /// @brief end_token で終わる論理式を読み出し Expr に変換する．
+  Expr
   get_expr(tToken end_token);
 
 
@@ -121,6 +121,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
-#endif // LEXPPARSER_H
+#endif // EXPRPARSER_H

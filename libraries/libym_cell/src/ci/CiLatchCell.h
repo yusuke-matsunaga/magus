@@ -54,11 +54,11 @@ protected:
 	      ymuint nb,
 	      ymuint nc,
 	      const vector<bool>& output_array,
-	      const vector<LogExpr>& logic_array,
-	      const vector<LogExpr>& tristate_array,
-	      const LogExpr& data_in,
-	      const LogExpr& enable,
-	      const LogExpr& enable_also,
+	      const vector<Expr>& logic_array,
+	      const vector<Expr>& tristate_array,
+	      const Expr& data_in,
+	      const Expr& enable,
+	      const Expr& enable_also,
 	      Alloc& alloc);
 
   /// @brief デストラクタ
@@ -79,19 +79,19 @@ public:
   /// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   data_in_expr() const;
 
   /// @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   enable_expr() const;
 
   /// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   enable2_expr() const;
 
 
@@ -101,13 +101,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // data_in 論理式
-  LogExpr mDataIn;
+  Expr mDataIn;
 
   // enable 論理式
-  LogExpr mEnable;
+  Expr mEnable;
 
   // enable2 論理式
-  LogExpr mEnable2;
+  Expr mEnable2;
 
 };
 
@@ -153,12 +153,12 @@ protected:
 	       ymuint nb,
 	       ymuint nc,
 	       const vector<bool>& output_array,
-	       const vector<LogExpr>& logic_array,
-	       const vector<LogExpr>& tristate_array,
-	       const LogExpr& data_in,
-	       const LogExpr& enable,
-	       const LogExpr& enable_also,
-	       const LogExpr& clear,
+	       const vector<Expr>& logic_array,
+	       const vector<Expr>& tristate_array,
+	       const Expr& data_in,
+	       const Expr& enable,
+	       const Expr& enable_also,
+	       const Expr& clear,
 	       Alloc& alloc);
 
   /// @brief デストラクタ
@@ -179,7 +179,7 @@ public:
   /// @brief ラッチセルの場合にクリア条件を表す論理式を返す．
   /// @note クリア端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clear_expr() const;
 
 
@@ -189,7 +189,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // clear 論理式
-  LogExpr mClear;
+  Expr mClear;
 
 };
 
@@ -235,12 +235,12 @@ protected:
 	       ymuint nb,
 	       ymuint nc,
 	       const vector<bool>& output_array,
-	       const vector<LogExpr>& logic_array,
-	       const vector<LogExpr>& tristate_array,
-	       const LogExpr& data_in,
-	       const LogExpr& enable,
-	       const LogExpr& enable_also,
-	       const LogExpr& preset,
+	       const vector<Expr>& logic_array,
+	       const vector<Expr>& tristate_array,
+	       const Expr& data_in,
+	       const Expr& enable,
+	       const Expr& enable_also,
+	       const Expr& preset,
 	       Alloc& alloc);
 
   /// @brief デストラクタ
@@ -261,7 +261,7 @@ public:
   /// @brief ラッチセルの場合にプリセット条件を表す論理式を返す．
   /// @note プリセット端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   preset_expr() const;
 
 
@@ -271,7 +271,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // preset 論理式
-  LogExpr mPreset;
+  Expr mPreset;
 
 };
 
@@ -320,13 +320,13 @@ protected:
 		ymuint nb,
 		ymuint nc,
 		const vector<bool>& output_array,
-		const vector<LogExpr>& logic_array,
-		const vector<LogExpr>& tristate_array,
-		const LogExpr& data_in,
-		const LogExpr& enable,
-		const LogExpr& enable_also,
-		const LogExpr& clear,
-		const LogExpr& preset,
+		const vector<Expr>& logic_array,
+		const vector<Expr>& tristate_array,
+		const Expr& data_in,
+		const Expr& enable,
+		const Expr& enable_also,
+		const Expr& clear,
+		const Expr& preset,
 		ymuint clear_preset_var1,
 		ymuint clear_preset_var2,
 		Alloc& alloc);
@@ -349,7 +349,7 @@ public:
   /// @brief ラッチセルの場合にプリセット条件を表す論理式を返す．
   /// @note プリセット端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   preset_expr() const;
 
   /// @brief clear_preset_var1 の取得
@@ -375,7 +375,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // preset 論理式
-  LogExpr mPreset;
+  Expr mPreset;
 
   // clear_preser_var1/var2
   ymuint8 mClearPresetVal[2];

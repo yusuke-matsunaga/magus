@@ -11,14 +11,14 @@
 
 #include "CompTbl.h"
 #include "BddEdge.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
 
 //////////////////////////////////////////////////////////////////////
 /// @class CompTbl2e CompTbl2e.h "CompTbl2e.h"
-/// @brief 2つのBDDの枝をキーとしてBDDの枝とLogExprを結果として格納するハッシュ表
+/// @brief 2つのBDDの枝をキーとしてBDDの枝とExprを結果として格納するハッシュ表
 //////////////////////////////////////////////////////////////////////
 class CompTbl2e :
   public CompTbl
@@ -44,7 +44,7 @@ public:
   BddEdge
   get(BddEdge e1,
       BddEdge e2,
-      LogExpr& ans_cov);
+      Expr& ans_cov);
 
   /// @brief 結果を登録する
   /// @param[in] e1, e2 オペランドの枝
@@ -54,7 +54,7 @@ public:
   put(BddEdge e1,
       BddEdge e2,
       BddEdge ans_e,
-      const LogExpr& ans_cov);
+      const Expr& ans_cov);
 
   /// @brief ガーベージコレクションが起きた時の処理を行なう．
   /// 参照されていないノードに関連したエントリを削除する．
@@ -93,7 +93,7 @@ private:
     BddEdge mKey1;
     BddEdge mKey2;
     BddEdge mAnsBdd;
-    LogExpr* mAnsCov;
+    Expr* mAnsCov;
   };
 
 
@@ -132,7 +132,7 @@ inline
 BddEdge
 CompTbl2e::get(BddEdge id1,
 	       BddEdge id2,
-	       LogExpr& ans_cov)
+	       Expr& ans_cov)
 {
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 ) {
@@ -150,7 +150,7 @@ void
 CompTbl2e::put(BddEdge id1,
 	       BddEdge id2,
 	       BddEdge ans_bdd,
-	       const LogExpr& ans_cov)
+	       const Expr& ans_cov)
 {
   if ( id1.is_invalid() || id2.is_invalid() || ans_bdd.is_invalid() ) {
     return;
@@ -166,7 +166,7 @@ CompTbl2e::put(BddEdge id1,
   tmp->mKey2 = id2;
   tmp->mAnsBdd = ans_bdd;
   delete tmp->mAnsCov;
-  tmp->mAnsCov = new LogExpr(ans_cov);
+  tmp->mAnsCov = new Expr(ans_cov);
 }
 
 END_NAMESPACE_YM_BDD

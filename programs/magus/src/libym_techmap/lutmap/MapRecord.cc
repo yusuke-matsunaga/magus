@@ -240,7 +240,7 @@ BEGIN_NONAMESPACE
 // 論理式から真理値表を作る．
 void
 make_tv(ymuint ni,
-	const LogExpr& expr,
+	const Expr& expr,
 	vector<int>& tv)
 {
   ymuint np = 1 << ni;
@@ -346,7 +346,7 @@ MapRecord::back_trace(const BdnNode* node,
 
   ymuint np = 1 << ni;
   vector<int> tv(np);
-  LogExpr expr = cut->expr();
+  Expr expr = cut->expr();
   if ( inv ) {
     expr = ~expr;
   }

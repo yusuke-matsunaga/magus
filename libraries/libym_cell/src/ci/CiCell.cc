@@ -50,8 +50,8 @@ CiCell::CiCell(CiLibrary* library,
 	       ymuint nb,
 	       ymuint nc,
 	       const vector<bool>& output_array,
-	       const vector<LogExpr>& logic_array,
-	       const vector<LogExpr>& tristate_array,
+	       const vector<Expr>& logic_array,
+	       const vector<Expr>& tristate_array,
 	       Alloc& alloc)
 {
   mLibrary = library;
@@ -108,11 +108,11 @@ CiCell::CiCell(CiLibrary* library,
   void* x = alloc.get_memory(sizeof(ymuint8) * no2);
   mLTArray = new (x) ymuint8[no2];
 
-  void* t = alloc.get_memory(sizeof(LogExpr) * no2);
-  mLogicArray = new (t) LogExpr[no2];
+  void* t = alloc.get_memory(sizeof(Expr) * no2);
+  mLogicArray = new (t) Expr[no2];
 
-  void* u = alloc.get_memory(sizeof(LogExpr) * no2);
-  mTristateArray = new (u) LogExpr[no2];
+  void* u = alloc.get_memory(sizeof(Expr) * no2);
+  mTristateArray = new (u) Expr[no2];
 
   for (ymuint i = 0; i < no2; ++ i) {
     ymuint8 val = 0U;
@@ -429,7 +429,7 @@ CiCell::has_logic() const
 // @brief 論理セルの場合に出力の論理式を返す．
 // @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
 // @note 論理式中の変数番号は入力ピン番号に対応する．
-LogExpr
+Expr
 CiCell::logic_expr(ymuint pin_id) const
 {
   return mLogicArray[pin_id];
@@ -447,7 +447,7 @@ CiCell::has_tristate(ymuint pin_id) const
 // @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
 // @note 論理式中の変数番号は入力ピン番号に対応する．
 // @note 通常の論理セルの場合には定数0を返す．
-LogExpr
+Expr
 CiCell::tristate_expr(ymuint pin_id) const
 {
   return mTristateArray[pin_id];
@@ -455,50 +455,50 @@ CiCell::tristate_expr(ymuint pin_id) const
 
 // @brief FFセルの場合に次状態関数を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiCell::next_state_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiCell::clock_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiCell::clock2_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiCell::data_in_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiCell::enable_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiCell::enable2_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
@@ -510,10 +510,10 @@ CiCell::has_clear() const
 
 // @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
 // @note クリア端子がない場合の返り値は不定
-LogExpr
+Expr
 CiCell::clear_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
@@ -525,10 +525,10 @@ CiCell::has_preset() const
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
 // @note プリセット端子がない場合の返り値は不定
-LogExpr
+Expr
 CiCell::preset_expr() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief clear_preset_var1 の取得

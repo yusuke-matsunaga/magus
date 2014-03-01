@@ -9,7 +9,7 @@
 
 #include "LcLogicMgr.h"
 #include "LcGroup.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/TvFunc.h"
 #include "logic/NpnMgr.h"
 #include "cell/Cell.h"
@@ -94,15 +94,15 @@ LcLogicMgr::gen_signature(const Cell* cell,
     }
   }
   if ( no2 == 1 && !has_tristate ) {
-    LogExpr expr = cell->logic_expr(0);
+    Expr expr = cell->logic_expr(0);
     f = TvFuncM(expr.make_tv(ni2));
   }
   else {
     vector<TvFunc> f_list(no2 * 2);
     for (ymuint i = 0; i < no2; ++ i) {
-      LogExpr lexpr = cell->logic_expr(i);
+      Expr lexpr = cell->logic_expr(i);
       f_list[i * 2 + 0] = lexpr.make_tv(ni2);
-      LogExpr texpr = cell->tristate_expr(i);
+      Expr texpr = cell->tristate_expr(i);
       f_list[i * 2 + 1] = texpr.make_tv(ni2);
     }
     f = TvFuncM(f_list);

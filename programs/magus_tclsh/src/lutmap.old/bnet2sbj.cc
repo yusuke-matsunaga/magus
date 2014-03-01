@@ -151,7 +151,7 @@ bnet2sbj(const BNetwork& network,
       }
     }
     else if ( ni == 2 ) {
-      LogExpr expr = bnode->func();
+      Expr expr = bnode->func();
       assert_cond(expr.child(0).is_literal(), __FILE__, __LINE__);
       assert_cond(expr.child(1).is_literal(), __FILE__, __LINE__);
       

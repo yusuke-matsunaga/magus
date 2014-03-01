@@ -1,5 +1,5 @@
 
-/// @file libym_logic/test/bdd/makebdd.cc
+/// @file liblogic/test/bdd/makebdd.cc
 /// @brief 論理回路の BDD を作るプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -7,16 +7,16 @@
 /// All rights reserved.
 
 
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnNode.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnBlifReader.h"
+#include "networks/BdnNode.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

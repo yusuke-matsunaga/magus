@@ -459,7 +459,7 @@ BddsimCmd::make_logic(const TgNode* node)
     inputs[i] = mNodeArray[inode->gid()];
   }
   if ( node->is_cplx_logic() ) {
-    LogExpr lexp = _network().get_lexp(node);
+    Expr lexp = _network().get_lexp(node);
     simnode = new SimNode(id, node->type(), lexp, inputs);
   }
   else {

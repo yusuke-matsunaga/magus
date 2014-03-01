@@ -12,7 +12,7 @@
 #include "ym_cell/CellCapacitance.h"
 #include "ym_cell/CellTime.h"
 #include "ym_logic/pylogic.h"
-#include "ym_logic/LogExpr.h"
+#include "ym_logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -127,7 +127,7 @@ CellPin_function(CellPinObject* self,
     PyErr_SetString(PyExc_ValueError, "No function.");
     return NULL;
   }
-  return PyLogExpr_FromLogExpr(self->mPin->function());
+  return PyExpr_FromExpr(self->mPin->function());
 }
 
 // has_three_state 関数
@@ -147,7 +147,7 @@ CellPin_three_state(CellPinObject* self,
     PyErr_SetString(PyExc_ValueError, "No three state condition");
     return NULL;
   }
-  return PyLogExpr_FromLogExpr(self->mPin->three_state());
+  return PyExpr_FromExpr(self->mPin->three_state());
 }
 
 // max_fanout 関数

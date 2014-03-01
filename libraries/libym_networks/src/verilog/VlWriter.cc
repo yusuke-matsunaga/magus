@@ -8,7 +8,7 @@
 
 
 #include "VlWriter.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -399,7 +399,7 @@ VlWriter::put_num(int num)
 // @param[in] name_map 変数名の対応表
 // @note expr 中の i 番めの変数の名前が name_map[i] に入っている．
 void
-VlWriter::put_expr(const LogExpr& expr,
+VlWriter::put_expr(const Expr& expr,
 		  const VarStrMap& name_map)
 {
   if ( expr.is_zero() ) {

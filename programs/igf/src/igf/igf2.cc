@@ -8,12 +8,12 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/PoptMainApp.h"
+#include "utils/PoptMainApp.h"
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "Variable.h"
 #include "IguGen2.h"
-#include "ym_utils/CombiGen.h"
+#include "utils/CombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

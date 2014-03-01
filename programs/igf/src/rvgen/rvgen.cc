@@ -8,8 +8,8 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/PoptMainApp.h"
-#include "ym_utils/RandGen.h"
+#include "utils/PoptMainApp.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -96,7 +96,7 @@ gen_vectors(ymuint n,
 {
   s << n << " " << k << endl;
   // k 個のベクタを出力
-  hash_set<string> patterns;
+  unordered_set<string> patterns;
   for (ymuint i = 0; i < k; ++ i) {
     ostringstream buf;
     for (ymuint j = 0; j < n; ++ j) {

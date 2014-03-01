@@ -32,8 +32,10 @@ EXTRA_DIST =
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/bb/include
 
@@ -57,7 +59,7 @@ bb_LDADD = \
 	../libym_imp/libym_imp.la \
 	parser/libbb_parser.la \
 	pt/libbb_pt.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la
 
 bb_LDFLAGS =

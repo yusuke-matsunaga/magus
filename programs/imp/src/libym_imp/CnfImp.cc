@@ -11,9 +11,9 @@
 #include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpListRec2.h"
-#include "ym_logic/CNFdd.h"
-#include "ym_logic/CNFddMgr.h"
-#include "ym_utils/StopWatch.h"
+#include "logic/CNFdd.h"
+#include "logic/CNFddMgr.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -122,8 +122,9 @@ CnfImp::learning(ImpMgr& imp_mgr,
 	for (vector<ImpVal>::iterator p = imp_list.begin();
 	     p != imp_list.end(); ++ p) {
 	  ymuint id = p->id();
+	  VarId v(id);
 	  ymuint val = p->val();
-	  Literal lit(VarId(id), val ? kPolPosi : kPolNega);
+	  Literal lit(v, (val == 0));
 	  CNFdd elem = cnfddmgr.make_base();
 	  elem.add_literal(lit);
 	  dst |= elem;

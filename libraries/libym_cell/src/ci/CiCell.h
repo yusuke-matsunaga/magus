@@ -10,7 +10,7 @@
 
 
 #include "cell/Cell.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/ShString.h"
 #include "utils/Alloc.h"
 #include "utils/ODO.h"
@@ -70,8 +70,8 @@ protected:
 	 ymuint nb,
 	 ymuint nc,
 	 const vector<bool>& output_array,
-	 const vector<LogExpr>& logic_array,
-	 const vector<LogExpr>& tristate_array,
+	 const vector<Expr>& logic_array,
+	 const vector<Expr>& tristate_array,
 	 Alloc& alloc);
 
   /// @brief デストラクタ
@@ -306,7 +306,7 @@ public:
   /// @param[in] pin_id 出力ピン番号 ( 0 <= pin_id < output_num2() )
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
   virtual
-  LogExpr
+  Expr
   logic_expr(ymuint pin_id) const;
 
   /// @brief 出力がトライステート条件を持っている時に true を返す．
@@ -320,43 +320,43 @@ public:
   /// @note 論理式中の変数番号は入力ピン番号に対応する．
   /// @note 通常の論理セルの場合には定数0を返す．
   virtual
-  LogExpr
+  Expr
   tristate_expr(ymuint pin_id) const;
 
   /// @brief FFセルの場合に次状態関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   next_state_expr() const;
 
   /// @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clock_expr() const;
 
   /// @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clock2_expr() const;
 
   /// @brief ラッチセルの場合にデータ入力関数を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   data_in_expr() const;
 
   /// @brief ラッチセルの場合にイネーブル条件を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   enable_expr() const;
 
   /// @brief ラッチセルの場合に2つめのイネーブル条件を表す論理式を返す．
   /// @note それ以外の型の場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   enable2_expr() const;
 
   /// @brief FFセル/ラッチセルの場合にクリア端子を持っていたら true を返す．
@@ -367,7 +367,7 @@ public:
   /// @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
   /// @note クリア端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   clear_expr() const;
 
   /// @brief FFセル/ラッチセルの場合にプリセット端子を持っていたら true を返す．
@@ -378,7 +378,7 @@ public:
   /// @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
   /// @note プリセット端子がない場合の返り値は不定
   virtual
-  LogExpr
+  Expr
   preset_expr() const;
 
   /// @brief clear_preset_var1 の取得
@@ -496,11 +496,11 @@ private:
 
   // 出力の論理式を格納する配列
   // サイズは output_num2()
-  LogExpr* mLogicArray;
+  Expr* mLogicArray;
 
   // 出力のトライステート条件を格納する配列
   // サイズは output_num2()
-  LogExpr* mTristateArray;
+  Expr* mTristateArray;
 
 };
 

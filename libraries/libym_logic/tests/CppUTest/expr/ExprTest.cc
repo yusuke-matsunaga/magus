@@ -1,6 +1,6 @@
 
-/// @file LogExprTest.cc
-/// @brief LogExpr のテストプログラム
+/// @file ExprTest.cc
+/// @brief Expr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013 Yusuke Matsunaga
@@ -9,32 +9,32 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 using namespace nsYm;
 
 
-TEST_GROUP(libym_logic_LogExprTestGroup)
+TEST_GROUP(libym_logic_ExprTestGroup)
 {
   TEST_SETUP() {
   }
 
   TEST_TEARDOWN() {
-    LogExpr::clear_memory();
+    Expr::clear_memory();
   }
 
 };
 
 
 // 空のテスト
-TEST(libym_logic_LogExprTestGroup, empty)
+TEST(libym_logic_ExprTestGroup, empty)
 {
 }
 
 // 定数0ノードの検査
-TEST(libym_logic_LogExprTestGroup, const0)
+TEST(libym_logic_ExprTestGroup, const0)
 {
-  LogExpr expr = LogExpr::make_zero();
+  Expr expr = Expr::make_zero();
   CHECK( expr.is_zero() );
   CHECK( !expr.is_one() );
   CHECK( expr.is_constant() );
@@ -58,9 +58,9 @@ TEST(libym_logic_LogExprTestGroup, const0)
 }
 
 // 定数1ノードの検査
-TEST(libym_logic_LogExprTestGroup, const1)
+TEST(libym_logic_ExprTestGroup, const1)
 {
-  LogExpr expr = LogExpr::make_one();
+  Expr expr = Expr::make_one();
   CHECK( !expr.is_zero() );
   CHECK( expr.is_one() );
   CHECK( expr.is_constant() );
@@ -84,12 +84,12 @@ TEST(libym_logic_LogExprTestGroup, const1)
 }
 
 // リテラルノードの検査(1)
-TEST(libym_logic_LogExprTestGroup, literal1)
+TEST(libym_logic_ExprTestGroup, literal1)
 {
   const ymuint vnum = 1;
   const VarId vid(vnum);
   const bool inv = false;
-  LogExpr expr = LogExpr::make_literal(vid, inv);
+  Expr expr = Expr::make_literal(vid, inv);
 
   CHECK( !expr.is_zero() );
   CHECK( !expr.is_one() );
@@ -115,13 +115,13 @@ TEST(libym_logic_LogExprTestGroup, literal1)
 }
 
 // リテラルノードの検査(2)
-TEST(libym_logic_LogExprTestGroup, literal2)
+TEST(libym_logic_ExprTestGroup, literal2)
 {
   const ymuint vnum = 2;
   const VarId vid(vnum);
   const bool inv = false;
   const Literal lit(vid, inv);
-  LogExpr expr = LogExpr::make_literal(lit);
+  Expr expr = Expr::make_literal(lit);
 
   CHECK( !expr.is_zero() );
   CHECK( !expr.is_one() );
@@ -147,11 +147,11 @@ TEST(libym_logic_LogExprTestGroup, literal2)
 }
 
 // リテラルノードの検査(3)
-TEST(libym_logic_LogExprTestGroup, literal3)
+TEST(libym_logic_ExprTestGroup, literal3)
 {
   const ymuint vnum = 3;
   const VarId vid(vnum);
-  LogExpr expr = LogExpr::make_posiliteral(vid);
+  Expr expr = Expr::make_posiliteral(vid);
 
   CHECK( !expr.is_zero() );
   CHECK( !expr.is_one() );
@@ -177,11 +177,11 @@ TEST(libym_logic_LogExprTestGroup, literal3)
 }
 
 // リテラルノードの検査(4)
-TEST(libym_logic_LogExprTestGroup, literal4)
+TEST(libym_logic_ExprTestGroup, literal4)
 {
   const ymuint vnum = 4;
   const VarId vid(vnum);
-  LogExpr expr = LogExpr::make_negaliteral(vid);
+  Expr expr = Expr::make_negaliteral(vid);
 
   CHECK( !expr.is_zero() );
   CHECK( !expr.is_one() );
@@ -207,23 +207,23 @@ TEST(libym_logic_LogExprTestGroup, literal4)
 }
 
 // make_andの検査(1)
-TEST(libym_logic_LogExprTestGroup, make_and1)
+TEST(libym_logic_ExprTestGroup, make_and1)
 {
   Literal lit0(VarId(0), false);
-  LogExpr expr0 = LogExpr::make_literal(lit0);
+  Expr expr0 = Expr::make_literal(lit0);
 
   Literal lit1(VarId(1), true);
-  LogExpr expr1 = LogExpr::make_literal(lit1);
+  Expr expr1 = Expr::make_literal(lit1);
 
   Literal lit2(VarId(2), true);
-  LogExpr expr2 = LogExpr::make_literal(lit2);
+  Expr expr2 = Expr::make_literal(lit2);
 
-  LogExprVector child_list(3);
+  ExprVector child_list(3);
   child_list[0] = expr0;
   child_list[1] = expr1;
   child_list[2] = expr2;
 
-  LogExpr expr = LogExpr::make_and(child_list);
+  Expr expr = Expr::make_and(child_list);
 
   CHECK( !expr.is_zero() );
   CHECK( !expr.is_one() );

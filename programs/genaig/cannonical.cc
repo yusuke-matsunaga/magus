@@ -123,7 +123,7 @@ ymuint32
 cannonical3(ymuint32 func,
 	    ymuint8 cperm[])
 {
-  hash_set<ymuint32> npn_hash;
+  unordered_set<ymuint32> npn_hash;
   for (ymuint i = 0; npn3rep[i] != 0xFF; ++ i) {
     npn_hash.insert(npn3rep[i]);
   }
@@ -148,7 +148,7 @@ ymuint32
 cannonical4(ymuint32 func,
 	    ymuint8 cperm[])
 {
-  hash_set<ymuint32> npn_hash;
+  unordered_set<ymuint32> npn_hash;
   for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
     npn_hash.insert(npn4rep[i]);
   }

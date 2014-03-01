@@ -111,7 +111,7 @@ TgBlifHandler::names(ymuint32 onode_id,
 
   mChd2.reserve(ni);
 
-  LogExpr expr;
+  Expr expr;
   mChd1.clear();
   if ( opat == '1' ) {
     for (ymuint32 c = 0; c < nc; ++ c) {
@@ -119,19 +119,19 @@ TgBlifHandler::names(ymuint32 onode_id,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  mChd2.push_back(LogExpr::make_negaliteral(VarId(i)));
+	  mChd2.push_back(Expr::make_negaliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  mChd2.push_back(LogExpr::make_posiliteral(VarId(i)));
+	  mChd2.push_back(Expr::make_posiliteral(VarId(i)));
 	}
       }
-      mChd1.push_back(LogExpr::make_and(mChd2));
+      mChd1.push_back(Expr::make_and(mChd2));
     }
     if ( mChd1.empty() ) {
-      expr = LogExpr::make_one();
+      expr = Expr::make_one();
     }
     else {
-      expr = LogExpr::make_or(mChd1);
+      expr = Expr::make_or(mChd1);
     }
   }
   else {
@@ -140,19 +140,19 @@ TgBlifHandler::names(ymuint32 onode_id,
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  mChd2.push_back(LogExpr::make_posiliteral(VarId(i)));
+	  mChd2.push_back(Expr::make_posiliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  mChd2.push_back(LogExpr::make_negaliteral(VarId(i)));
+	  mChd2.push_back(Expr::make_negaliteral(VarId(i)));
 	}
       }
-      mChd1.push_back(LogExpr::make_or(mChd2));
+      mChd1.push_back(Expr::make_or(mChd2));
     }
     if ( mChd1.empty() ) {
-      expr = LogExpr::make_zero();
+      expr = Expr::make_zero();
     }
     else {
-      expr = LogExpr::make_and(mChd1);
+      expr = Expr::make_and(mChd1);
     }
   }
 

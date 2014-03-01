@@ -10,7 +10,7 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

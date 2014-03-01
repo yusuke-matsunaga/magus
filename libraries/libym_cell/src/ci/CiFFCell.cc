@@ -45,11 +45,11 @@ CiFFCell::CiFFCell(CiLibrary* library,
 		   ymuint nb,
 		   ymuint nc,
 		   const vector<bool>& output_array,
-		   const vector<LogExpr>& logic_array,
-		   const vector<LogExpr>& tristate_array,
-		   const LogExpr& next_state,
-		   const LogExpr& clocked_on,
-		   const LogExpr& clocked_on_also,
+		   const vector<Expr>& logic_array,
+		   const vector<Expr>& tristate_array,
+		   const Expr& next_state,
+		   const Expr& clocked_on,
+		   const Expr& clocked_on_also,
 		   Alloc& alloc) :
   CiCell(library, id, name, area,
 	 ni, no, nio, 0, nb, nc,
@@ -77,7 +77,7 @@ CiFFCell::is_ff() const
 
 // @brief FFセルの場合に次状態関数を表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiFFCell::next_state_expr() const
 {
   return mNextState;
@@ -85,7 +85,7 @@ CiFFCell::next_state_expr() const
 
 // @brief FFセルの場合にクロックのアクティブエッジを表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiFFCell::clock_expr() const
 {
   return mClock;
@@ -93,7 +93,7 @@ CiFFCell::clock_expr() const
 
 // @brief FFセルの場合にスレーブクロックのアクティブエッジを表す論理式を返す．
 // @note それ以外の型の場合の返り値は不定
-LogExpr
+Expr
 CiFFCell::clock2_expr() const
 {
   return mClock2;
@@ -134,12 +134,12 @@ CiFFRCell::CiFFRCell(CiLibrary* library,
 		     ymuint nb,
 		     ymuint nc,
 		     const vector<bool>& output_array,
-		     const vector<LogExpr>& logic_array,
-		     const vector<LogExpr>& tristate_array,
-		     const LogExpr& next_state,
-		     const LogExpr& clocked_on,
-		     const LogExpr& clocked_on_also,
-		     const LogExpr& clear,
+		     const vector<Expr>& logic_array,
+		     const vector<Expr>& tristate_array,
+		     const Expr& next_state,
+		     const Expr& clocked_on,
+		     const Expr& clocked_on_also,
+		     const Expr& clear,
 		     Alloc& alloc) :
   CiFFCell(library, id, name, area,
 	   ni, no, nio, nb, nc,
@@ -168,7 +168,7 @@ CiFFRCell::has_clear() const
 
 // @brief FFセル/ラッチセルの場合にクリア条件を表す論理式を返す．
 // @note クリア端子がない場合の返り値は不定
-LogExpr
+Expr
 CiFFRCell::clear_expr() const
 {
   return mClear;
@@ -209,12 +209,12 @@ CiFFSCell::CiFFSCell(CiLibrary* library,
 		     ymuint nb,
 		     ymuint nc,
 		     const vector<bool>& output_array,
-		     const vector<LogExpr>& logic_array,
-		     const vector<LogExpr>& tristate_array,
-		     const LogExpr& next_state,
-		     const LogExpr& clocked_on,
-		     const LogExpr& clocked_on_also,
-		     const LogExpr& preset,
+		     const vector<Expr>& logic_array,
+		     const vector<Expr>& tristate_array,
+		     const Expr& next_state,
+		     const Expr& clocked_on,
+		     const Expr& clocked_on_also,
+		     const Expr& preset,
 		     Alloc& alloc) :
   CiFFCell(library, id, name, area,
 	   ni, no, nio, nb, nc,
@@ -243,7 +243,7 @@ CiFFSCell::has_preset() const
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
 // @note プリセット端子がない場合の返り値は不定
-LogExpr
+Expr
 CiFFSCell::preset_expr() const
 {
   return mPreset;
@@ -287,13 +287,13 @@ CiFFSRCell::CiFFSRCell(CiLibrary* library,
 		       ymuint nb,
 		       ymuint nc,
 		       const vector<bool>& output_array,
-		       const vector<LogExpr>& logic_array,
-		       const vector<LogExpr>& tristate_array,
-		       const LogExpr& next_state,
-		       const LogExpr& clocked_on,
-		       const LogExpr& clocked_on_also,
-		       const LogExpr& clear,
-		       const LogExpr& preset,
+		       const vector<Expr>& logic_array,
+		       const vector<Expr>& tristate_array,
+		       const Expr& next_state,
+		       const Expr& clocked_on,
+		       const Expr& clocked_on_also,
+		       const Expr& clear,
+		       const Expr& preset,
 		       ymuint clear_preset_var1,
 		       ymuint clear_preset_var2,
 		       Alloc& alloc) :
@@ -327,7 +327,7 @@ CiFFSRCell::has_preset() const
 
 // @brief FFセル/ラッチセルの場合にプリセット条件を表す論理式を返す．
 // @note プリセット端子がない場合の返り値は不定
-LogExpr
+Expr
 CiFFSRCell::preset_expr() const
 {
   return mPreset;

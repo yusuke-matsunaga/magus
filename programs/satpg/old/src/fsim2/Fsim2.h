@@ -15,7 +15,7 @@
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
-#include "ym_logic/LogExpr.h"
+#include "ym_logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM2
@@ -138,7 +138,7 @@ private:
 
   /// @brief logic ノードを作る．
   SimNode*
-  make_logic(const LogExpr& lexp,
+  make_logic(const Expr& lexp,
 	     const vector<SimNode*>& inputs,
 	     const vector<EdgeMap*>& emap);
 

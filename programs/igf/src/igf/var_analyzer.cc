@@ -8,7 +8,7 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/PoptMainApp.h"
+#include "utils/PoptMainApp.h"
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "RandHashGen.h"

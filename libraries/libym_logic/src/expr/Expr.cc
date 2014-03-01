@@ -1,54 +1,54 @@
 
-/// @file LogExpr.cc
-/// @brief LogExpr の実装ファイル
+/// @file Expr.cc
+/// @brief Expr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
-#include "LexpMgr.h"
-#include "LexpNode.h"
-#include "LexpParser.h"
+#include "ExprMgr.h"
+#include "ExprNode.h"
+#include "ExprParser.h"
 #include "SopLit.h"
 #include "logic/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 // 根のノードを指定したコンストラクタ
-LogExpr::LogExpr(const LexpNode* node) :
+Expr::Expr(const ExprNode* node) :
   mRootPtr(NULL)
 {
   set_root(node);
 }
 
 // デフォルトコンストラクタ
-LogExpr::LogExpr() :
+Expr::Expr() :
   mRootPtr(NULL)
 {
-  set_root(LexpMgr::the_obj().make_zero());
+  set_root(ExprMgr::the_obj().make_zero());
 }
 
 // コピーコンストラクタ
-LogExpr::LogExpr(const LogExpr& src) :
+Expr::Expr(const Expr& src) :
   mRootPtr(NULL)
 {
   set_root(src.root());
 }
 
 // @brief 根のノートのスマートポインタを得る．
-const LexpNode*
-LogExpr::root() const
+const ExprNode*
+Expr::root() const
 {
   return mRootPtr;
 }
 
 // 根のノードをセットする．
 void
-LogExpr::set_root(const LexpNode* node)
+Expr::set_root(const ExprNode* node)
 {
   if ( node ) {
     node->inc_ref();
@@ -60,160 +60,160 @@ LogExpr::set_root(const LexpNode* node)
 }
 
 // 代入演算子
-const LogExpr&
-LogExpr::operator=(const LogExpr& src)
+const Expr&
+Expr::operator=(const Expr& src)
 {
   set_root(src.root());
   return *this;
 }
 
 // デストラクタ
-LogExpr::~LogExpr()
+Expr::~Expr()
 {
   set_root(NULL);
 }
 
 // 定数 0 の論理式を作る
-LogExpr
-LogExpr::make_zero()
+Expr
+Expr::make_zero()
 {
-  return LogExpr(LexpMgr::the_obj().make_zero());
+  return Expr(ExprMgr::the_obj().make_zero());
 }
 
 // 定数 1 の論理式を作る
-LogExpr
-LogExpr::make_one()
+Expr
+Expr::make_one()
 {
-  return LogExpr(LexpMgr::the_obj().make_one());
+  return Expr(ExprMgr::the_obj().make_one());
 }
 
 // 肯定のリテラルを作る．
-LogExpr
-LogExpr::make_posiliteral(VarId varid)
+Expr
+Expr::make_posiliteral(VarId varid)
 {
-  return LogExpr(LexpMgr::the_obj().make_posiliteral(varid));
+  return Expr(ExprMgr::the_obj().make_posiliteral(varid));
 }
 
 // 否定のリテラルを作る．
-LogExpr
-LogExpr::make_negaliteral(VarId varid)
+Expr
+Expr::make_negaliteral(VarId varid)
 {
-  return LogExpr(LexpMgr::the_obj().make_negaliteral(varid));
+  return Expr(ExprMgr::the_obj().make_negaliteral(varid));
 }
 
 // 与えられた論理式を部分論理式に持つ n 入力ANDの論理式を作るクラス・メソッド
-LogExpr
-LogExpr::make_and(const LogExprVector& chd_list)
+Expr
+Expr::make_and(const ExprVector& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
-  for (LogExprVector::const_iterator p = chd_list.begin();
+  for (ExprVector::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
   }
-  return LogExpr(mgr.make_and(begin));
+  return Expr(mgr.make_and(begin));
 }
 
-LogExpr
-LogExpr::make_and(const LogExprList& chd_list)
+Expr
+Expr::make_and(const ExprList& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
-  for (LogExprList::const_iterator p = chd_list.begin();
+  for (ExprList::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
   }
-  return LogExpr(mgr.make_and(begin));
+  return Expr(mgr.make_and(begin));
 }
 
 // 与えられた論理式を部分論理式に持つ n 入力ORの論理式を作るクラス・メソッド
-LogExpr
-LogExpr::make_or(const LogExprVector& chd_list)
+Expr
+Expr::make_or(const ExprVector& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
-  for (LogExprVector::const_iterator p = chd_list.begin();
+  for (ExprVector::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
   }
-  return LogExpr(mgr.make_or(begin));
+  return Expr(mgr.make_or(begin));
 }
 
-LogExpr
-LogExpr::make_or(const LogExprList& chd_list)
+Expr
+Expr::make_or(const ExprList& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
-  for (LogExprList::const_iterator p = chd_list.begin();
+  for (ExprList::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
   }
-  return LogExpr(mgr.make_or(begin));
+  return Expr(mgr.make_or(begin));
 }
 
 // 与えられた論理式を部分論理式に持つ n 入力XORの論理式を作るクラス・メソッド
-LogExpr
-LogExpr::make_xor(const LogExprVector& chd_list)
+Expr
+Expr::make_xor(const ExprVector& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
-  for (LogExprVector::const_iterator p = chd_list.begin();
+  for (ExprVector::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
   }
-  return LogExpr(mgr.make_xor(begin));
+  return Expr(mgr.make_xor(begin));
 }
 
-LogExpr
-LogExpr::make_xor(const LogExprList& chd_list)
+Expr
+Expr::make_xor(const ExprList& chd_list)
 {
   assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
-  for (LogExprList::const_iterator p = chd_list.begin();
+  for (ExprList::const_iterator p = chd_list.begin();
        p != chd_list.end(); ++ p) {
     mgr.nodestack_push((*p).root());
   }
-  return LogExpr(mgr.make_xor(begin));
+  return Expr(mgr.make_xor(begin));
 }
 
 // @brief 確保していたメモリを開放する．
 // @note メモリリークチェックのための関数なので通常は使用しない．
 void
-LogExpr::clear_memory()
+Expr::clear_memory()
 {
-  LexpMgr::clear_memory();
+  ExprMgr::clear_memory();
 }
 
 // 否定の論理式を与える演算子
-LogExpr
-LogExpr::operator~() const
+Expr
+Expr::operator~() const
 {
-  return LogExpr(LexpMgr::the_obj().complement(root()));
+  return Expr(ExprMgr::the_obj().complement(root()));
 }
 
 // src1 の論理式と src2 の論理式の論理積を計算する．
-LogExpr
-operator&(const LogExpr& src1,
-	  const LogExpr& src2)
+Expr
+operator&(const Expr& src1,
+	  const Expr& src2)
 {
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(src1.root());
   mgr.nodestack_push(src2.root());
-  return LogExpr(mgr.make_and(begin));
+  return Expr(mgr.make_and(begin));
 }
 
 // 自分の論理式と src の論理式の論理積を計算し自分に代入する．
-const LogExpr&
-LogExpr::operator&=(const LogExpr& src)
+const Expr&
+Expr::operator&=(const Expr& src)
 {
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(root());
   mgr.nodestack_push(src.root());
@@ -222,22 +222,22 @@ LogExpr::operator&=(const LogExpr& src)
 }
 
 // src1 の論理式と src2 の論理式の論理和を計算する．
-LogExpr
-operator|(const LogExpr& src1,
-	  const LogExpr& src2)
+Expr
+operator|(const Expr& src1,
+	  const Expr& src2)
 {
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(src1.root());
   mgr.nodestack_push(src2.root());
-  return LogExpr(mgr.make_or(begin));
+  return Expr(mgr.make_or(begin));
 }
 
 // 自分の論理式と src の論理式の論理和を計算し自分に代入する．
-const LogExpr&
-LogExpr::operator|=(const LogExpr& src)
+const Expr&
+Expr::operator|=(const Expr& src)
 {
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(root());
   mgr.nodestack_push(src.root());
@@ -246,23 +246,23 @@ LogExpr::operator|=(const LogExpr& src)
 }
 
 // src1 の論理式と src2 の論理式の排他的論理和を計算する．
-LogExpr
-operator^(const LogExpr& src1,
-	  const LogExpr& src2)
+Expr
+operator^(const Expr& src1,
+	  const Expr& src2)
 {
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(src1.root());
   mgr.nodestack_push(src2.root());
-  return LogExpr(mgr.make_xor(begin));
-  LexpNodeList node_list;
+  return Expr(mgr.make_xor(begin));
+  ExprNodeList node_list;
 }
 
 // 自分の論理式と src の論理式の排他的論理和を計算し自分に代入する．
-const LogExpr&
-LogExpr::operator^=(const LogExpr& src)
+const Expr&
+Expr::operator^=(const Expr& src)
 {
-  LexpMgr& mgr = LexpMgr::the_obj();
+  ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   mgr.nodestack_push(root());
   mgr.nodestack_push(src.root());
@@ -271,25 +271,25 @@ LogExpr::operator^=(const LogExpr& src)
 }
 
 // pos 番目のリテラルを src の論理式に置き換える．
-LogExpr
-LogExpr::compose(VarId varid,
-		 const LogExpr& src) const
+Expr
+Expr::compose(VarId varid,
+		 const Expr& src) const
 {
-  return LogExpr(LexpMgr::the_obj().compose(root(), varid, src.root()));
+  return Expr(ExprMgr::the_obj().compose(root(), varid, src.root()));
 }
 
 // comp_map にしたがって複数のリテラルの置き換えを行う．
-LogExpr
-LogExpr::compose(const VarLogExprMap& comp_map) const
+Expr
+Expr::compose(const VarExprMap& comp_map) const
 {
-  return LogExpr(LexpMgr::the_obj().compose(root(), comp_map));
+  return Expr(ExprMgr::the_obj().compose(root(), comp_map));
 }
 
 // 与えられた論理式のリテラル番号を再マップする．
-LogExpr
-LogExpr::remap_var(const VarVarMap& varmap) const
+Expr
+Expr::remap_var(const VarVarMap& varmap) const
 {
-  return LogExpr(LexpMgr::the_obj().remap_var(root(), varmap));
+  return Expr(ExprMgr::the_obj().remap_var(root(), varmap));
 }
 
 // 重複した式を取り除く
@@ -297,10 +297,10 @@ LogExpr::remap_var(const VarVarMap& varmap) const
 // expr + ~expr = 1 のようなもの
 // 自分自身が簡単化された式に置き換わる．
 // 新しい式を返す．
-const LogExpr&
-LogExpr::simplify()
+const Expr&
+Expr::simplify()
 {
-  set_root(LexpMgr::the_obj().simplify(root()));
+  set_root(ExprMgr::the_obj().simplify(root()));
   return *this;
 }
 
@@ -308,7 +308,7 @@ LogExpr::simplify()
 // @param[in] vals 変数の値割り当て
 // @return 評価値
 ymulong
-LogExpr::eval(const vector<ymulong>& vals,
+Expr::eval(const vector<ymulong>& vals,
 	      ymulong mask) const
 {
   return root()->eval(vals, mask);
@@ -316,7 +316,7 @@ LogExpr::eval(const vector<ymulong>& vals,
 
 // @brief 真理値表の作成
 TvFunc
-LogExpr::make_tv(ymuint ni) const
+Expr::make_tv(ymuint ni) const
 {
   ymuint ni2 = input_size();
   if ( ni < ni2 ) {
@@ -333,7 +333,7 @@ LogExpr::make_tv(ymuint ni) const
   tv.clear();
   tv.resize(nt);
 
-  const LexpNode* node = root();
+  const ExprNode* node = root();
   ymuint b = 0;
   ymulong s = 1UL;
   ymulong mask = 0UL;
@@ -363,42 +363,42 @@ LogExpr::make_tv(ymuint ni) const
 
 // 恒偽関数を表している時に真となる．
 bool
-LogExpr::is_zero() const
+Expr::is_zero() const
 {
   return root()->is_zero();
 }
 
 // 恒真関数を表している時に真となる．
 bool
-LogExpr::is_one() const
+Expr::is_one() const
 {
   return root()->is_one();
 }
 
 // 定数関数を表している時に真となる．
 bool
-LogExpr::is_constant() const
+Expr::is_constant() const
 {
   return root()->is_constant();
 }
 
 // 肯定のリテラルを表している時に真となる．
 bool
-LogExpr::is_posiliteral() const
+Expr::is_posiliteral() const
 {
   return root()->is_posiliteral();
 }
 
 // 否定のリテラルを表している時に真となる．
 bool
-LogExpr::is_negaliteral() const
+Expr::is_negaliteral() const
 {
   return root()->is_negaliteral();
 }
 
 // リテラルを表している時に真となる．
 bool
-LogExpr::is_literal() const
+Expr::is_literal() const
 {
   return root()->is_literal();
 }
@@ -406,43 +406,43 @@ LogExpr::is_literal() const
 // リテラルの時に変数番号を返す．
 // リテラルでなければ kVarMaxId を返す．
 VarId
-LogExpr::varid() const
+Expr::varid() const
 {
   return root()->varid();
 }
 
 // トップがANDの時に真となる．
 bool
-LogExpr::is_and() const
+Expr::is_and() const
 {
   return root()->is_and();
 }
 
 // トップがORの時に真となる．
 bool
-LogExpr::is_or() const
+Expr::is_or() const
 {
   return root()->is_or();
 }
 
 // トップがXORの時に真となる．
 bool
-LogExpr::is_xor() const
+Expr::is_xor() const
 {
   return root()->is_xor();
 }
 
 // トップが演算子の時に真となる．
 bool
-LogExpr::is_op() const
+Expr::is_op() const
 {
   return root()->is_op();
 }
 
 // src1 と src2 の根のタイプが同じとき true を返す．
 bool
-compare_type(const LogExpr& src1,
-	     const LogExpr& src2)
+compare_type(const Expr& src1,
+	     const Expr& src2)
 {
   return src1.root()->type() == src2.root()->type();
 }
@@ -450,72 +450,72 @@ compare_type(const LogExpr& src1,
 // AND/OR/XOR の時に子供の項の数を返す．
 // それ以外のノードの時には 0 を返す．
 ymuint
-LogExpr::child_num() const
+Expr::child_num() const
 {
   return root()->child_num();
 }
 
 // pos 番目の子供を返す．
-LogExpr
-LogExpr::child(ymuint pos) const
+Expr
+Expr::child(ymuint pos) const
 {
-  return LogExpr(root()->child(pos));
+  return Expr(root()->child(pos));
 }
 
 // 一種類の演算子のみからなる式のとき true を返す．
 // より具体的には zero, one, literal とすべての子供が
 // リテラルの and, or, xor
 bool
-LogExpr::is_simple() const
+Expr::is_simple() const
 {
   return root()->is_simple();
 }
 
 // is_simple() && is_and()
 bool
-LogExpr::is_simple_and() const
+Expr::is_simple_and() const
 {
   return root()->is_simple_and();
 }
 
 // is_simple() && is_or()
 bool
-LogExpr::is_simple_or() const
+Expr::is_simple_or() const
 {
   return root()->is_simple_or();
 }
 
 // is_simple() && is_xor()
 bool
-LogExpr::is_simple_xor() const
+Expr::is_simple_xor() const
 {
   return root()->is_simple_xor();
 }
 
 // SOP形式の時 true を返す．
 bool
-LogExpr::is_sop() const
+Expr::is_sop() const
 {
   return root()->is_sop();
 }
 
 // リテラル数を得る．
 ymuint
-LogExpr::litnum() const
+Expr::litnum() const
 {
   return root()->litnum();
 }
 
 // 特定の変数のリテラル数を得る．
 ymuint
-LogExpr::litnum(VarId varid) const
+Expr::litnum(VarId varid) const
 {
   return root()->litnum(varid);
 }
 
 // 特定の変数の特定の極性のリテラル数を得る．
 ymuint
-LogExpr::litnum(VarId varid,
+Expr::litnum(VarId varid,
 		bool inv) const
 {
   return root()->litnum(varid, inv);
@@ -523,14 +523,14 @@ LogExpr::litnum(VarId varid,
 
 // @brief 使われている変数の最大の番号を得る．
 ymuint
-LogExpr::input_size() const
+Expr::input_size() const
 {
   return root()->input_size();
 }
 
 // SOP形式に展開したときのキューブ数を得る．
 ymuint
-LogExpr::sop_cubenum() const
+Expr::sop_cubenum() const
 {
   SopLit l = root()->soplit(false);
   return l.np();
@@ -538,7 +538,7 @@ LogExpr::sop_cubenum() const
 
 // SOP形式に展開した時のリテラル数を見積もる．
 ymuint
-LogExpr::sop_litnum() const
+Expr::sop_litnum() const
 {
   SopLit l = root()->soplit(false);
   return l.nl();
@@ -546,7 +546,7 @@ LogExpr::sop_litnum() const
 
 // SOP形式に展開した時の varid 番めの変数のリテラルの出現回数を得る．
 ymuint
-LogExpr::sop_litnum(VarId varid) const
+Expr::sop_litnum(VarId varid) const
 {
   SopLit l = root()->soplit(false, varid);
   return l.nl();
@@ -555,7 +555,7 @@ LogExpr::sop_litnum(VarId varid) const
 // SOP形式に展開した時の varid 番めの変数の極性が pol のリテラル
 // の出現回数を得る．
 ymuint
-LogExpr::sop_litnum(VarId varid,
+Expr::sop_litnum(VarId varid,
 		    bool inv) const
 {
   SopLit l = root()->soplit(false, varid, inv);
@@ -564,60 +564,60 @@ LogExpr::sop_litnum(VarId varid,
 
 // @brief 使用されているメモリ量を返す．
 ymuint
-LogExpr::used_size()
+Expr::used_size()
 {
-  return LexpMgr::the_obj().used_size();
+  return ExprMgr::the_obj().used_size();
 }
 
 // 現在使用中のノード数を返す．
 ymuint
-LogExpr::node_num()
+Expr::node_num()
 {
-  return LexpMgr::the_obj().node_num();
+  return ExprMgr::the_obj().node_num();
 }
 
 // @brief used_size() の最大値を返す．
 ymuint
-LogExpr::max_used_size()
+Expr::max_used_size()
 {
-  return LexpMgr::the_obj().max_used_size();
+  return ExprMgr::the_obj().max_used_size();
 }
 
 // @brief nodenum() の最大値を返す．
 ymuint
-LogExpr::max_node_num()
+Expr::max_node_num()
 {
-  return LexpMgr::the_obj().max_node_num();
+  return ExprMgr::the_obj().max_node_num();
 }
 
 // @brief 実際に確保したメモリ量を返す．
 ymuint
-LogExpr::allocated_size()
+Expr::allocated_size()
 {
-  return LexpMgr::the_obj().allocated_size();
+  return ExprMgr::the_obj().allocated_size();
 }
 
 // @brief 実際に確保した回数を返す．
 ymuint
-LogExpr::allocated_count()
+Expr::allocated_count()
 {
-  return LexpMgr::the_obj().allocated_count();
+  return ExprMgr::the_obj().allocated_count();
 }
 
 // @brief 内部状態を出力する．
 void
-LogExpr::print_stats(ostream& s)
+Expr::print_stats(ostream& s)
 {
-  LexpMgr::the_obj().print_stats(s);
+  ExprMgr::the_obj().print_stats(s);
 }
 
 // 論理式をパーズしてファクタードフォームを作る．
 // エラーが起きたら msg にエラーメッセージをセットし, false を返す．
 bool
-LogExpr::read_from_stream(istream& in,
+Expr::read_from_stream(istream& in,
 			  string& err_msg)
 {
-  LogExpr expr = stream_to_expr(in, err_msg);
+  Expr expr = stream_to_expr(in, err_msg);
   if ( err_msg != string() ) {
     return false;
   }
@@ -629,13 +629,13 @@ LogExpr::read_from_stream(istream& in,
 
 // 論理式をパーズしてファクタードフォームを作る．
 // エラーが起きたら msg にエラーメッセージをセットする．
-LogExpr
-LogExpr::stream_to_expr(istream& in,
+Expr
+Expr::stream_to_expr(istream& in,
 			string& err_msg)
 {
   err_msg = string();
   try {
-    LexpParser p(&in);
+    ExprParser p(&in);
     return p.get_expr(kTokenEND);
   }
   catch ( SyntaxError e ) {
@@ -650,7 +650,7 @@ BEGIN_NONAMESPACE
 // 論理式をバイナリダンプする．
 void
 write_expr(ODO& s,
-	   const LogExpr& expr)
+	   const Expr& expr)
 {
   if ( expr.is_zero() ) {
     s << static_cast<ymuint8>(0);
@@ -695,85 +695,85 @@ write_expr(ODO& s,
 }
 
 // バイナリストリームから論理式を作る．
-LogExpr
+Expr
 read_expr(IDO& s)
 {
   ymuint8 type;
   s >> type;
   switch ( type ) {
   case 0:
-    return LogExpr::make_zero();
+    return Expr::make_zero();
 
   case 1:
-    return LogExpr::make_one();
+    return Expr::make_one();
 
   case 2:
     {
       VarId var;
       s >> var;
-      return LogExpr::make_posiliteral(var);
+      return Expr::make_posiliteral(var);
     }
 
   case 3:
     {
       VarId var;
       s >> var;
-      return LogExpr::make_negaliteral(var);
+      return Expr::make_negaliteral(var);
     }
   }
 
   // 残りは論理演算
   ymuint32 nc;
   s >> nc;
-  vector<LogExpr> child_list(nc);
+  vector<Expr> child_list(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     child_list[i] = read_expr(s);
   }
 
   switch ( type ) {
   case 4:
-    return LogExpr::make_and(child_list);
+    return Expr::make_and(child_list);
 
   case 5:
-    return LogExpr::make_or(child_list);
+    return Expr::make_or(child_list);
 
   case 6:
-    return LogExpr::make_xor(child_list);
+    return Expr::make_xor(child_list);
 
   default:
     assert_not_reached(__FILE__, __LINE__);
   }
 
   // ダミー
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 END_NONAMESPACE
 
-// @relates LogExpr
+// @relates Expr
 // @brief 論理式の内容のバイナリ出力
 // @param[in] s 出力ストリーム
 // @param[in] expr 論理式
 // @return s
 ODO&
 operator<<(ODO& s,
-	   const LogExpr& expr)
+	   const Expr& expr)
 {
   write_expr(s, expr);
   return s;
 }
 
-// @relates LogExpr
+// @relates Expr
 // @brief 論理式の内容のバイナリ入力
 // @param[in] s 入力ストリーム
 // @param[out] expr 論理式
 // @return s
 IDO&
 operator>>(IDO& s,
-	   LogExpr& expr)
+	   Expr& expr)
 {
   expr = read_expr(s);
   return s;
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR

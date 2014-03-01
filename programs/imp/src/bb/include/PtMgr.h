@@ -10,8 +10,8 @@
 
 
 #include "bb_nsdef.h"
-#include "ym_utils/FileRegion.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "utils/FileRegion.h"
+#include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_BB
@@ -213,7 +213,7 @@ private:
   SimpleAlloc mAlloc;
 
   // 名前と ID 番号の辞書
-  hash_map<string, ymuint32> mIdMap;
+  unordered_map<string, ymuint32> mIdMap;
 
   // 次に割り当てる ID 番号
   ymuint32 mLastId;

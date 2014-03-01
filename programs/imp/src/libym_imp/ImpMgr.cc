@@ -11,7 +11,7 @@
 #include "ImpInput.h"
 #include "ImpAnd.h"
 #include "ImpRec.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -197,7 +197,7 @@ ImpMgr::make_fanouts()
 
 // @brief 論理式に対応したノードの木を作る．
 ImpNodeHandle
-ImpMgr::make_tree(const LogExpr& expr,
+ImpMgr::make_tree(const Expr& expr,
 		  const vector<ImpNodeHandle>& fanins)
 {
   if ( expr.is_zero() ) {

@@ -8,7 +8,7 @@
 
 
 #include "LsimNaive.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -33,7 +33,7 @@ LsimNaive::~LsimNaive()
 // @param[in] order_map 順序マップ
 void
 LsimNaive::set_network(const BdnMgr& bdn,
-		       const hash_map<string, ymuint>& order_map)
+		       const unordered_map<string, ymuint>& order_map)
 {
   mBdnMgr = &bdn;
 

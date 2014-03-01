@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_networks/bdn.h"
-#include "ym_tclpp/TclCmd.h"
+#include "networks/bdn.h"
+#include "tclpp/TclCmd.h"
 #include "ImpMgr.h"
 
 

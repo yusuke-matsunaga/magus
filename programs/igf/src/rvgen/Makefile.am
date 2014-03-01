@@ -43,10 +43,11 @@ bin_PROGRAMS = \
 AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	@POPT_INCLUDES@
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_popt/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
+	-I$(top_srcdir)/include
 
 
 ############################################################
@@ -57,14 +58,13 @@ rvgen_SOURCES = \
 	rvgen.cc
 
 rvgen_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YM_LIBS_LIBTCLREADLINE) \
-	$(TCL_LDADD)
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp.la
 
 rvgen_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -75,10 +75,11 @@ tseconv_SOURCES = \
 	tseconv.cc
 
 tseconv_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 tseconv_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -89,11 +90,12 @@ k_of_n_gen_SOURCES = \
 	k_of_n_gen.cc
 
 k_of_n_gen_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 k_of_n_gen_LDFLAGS = \
 	@GMP_LIBS@ \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -104,11 +106,12 @@ dist_sim_SOURCES = \
 	dist_sim.cc
 
 dist_sim_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 dist_sim_LDFLAGS = \
 	@GMP_LIBS@ \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -120,9 +123,10 @@ phf_sim_SOURCES = \
 
 phf_sim_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_sim_LDFLAGS = \
 	@GMP_LIBS@ \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)

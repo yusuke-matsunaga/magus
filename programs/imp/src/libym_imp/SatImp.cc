@@ -13,9 +13,9 @@
 #include "ImpHash.h"
 #include "ImpMgr.h"
 #include "ImpListRec.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_utils/RandGen.h"
-#include "ym_utils/StopWatch.h"
+#include "logic/SatSolver.h"
+#include "utils/RandGen.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -72,8 +72,8 @@ check(SatSolver& solver,
   }
   vector<Literal> tmp(2);
   vector<Bool3> model;
-  Literal lit0(VarId(src_id), src_val ? kPolPosi : kPolNega);
-  Literal lit1(VarId(dst_id), dst_val ? kPolPosi : kPolNega);
+  Literal lit0(VarId(src_id), src_val == 0);
+  Literal lit1(VarId(dst_id), dst_val == 0);
   tmp[0] = lit0;
   tmp[1] = ~lit1;
   if ( solver.solve(tmp, model) != kB3False ) {
@@ -164,19 +164,19 @@ make_cnf(SatSolver& solver,
 
   if ( node->is_and() ) {
     VarId vid(node->id());
-    Literal lit(vid, kPolPosi);
+    Literal lit(vid);
 
     const ImpEdge& e0 = node->fanin0();
     ImpNode* node0 = e0.src_node();
     VarId vid0(node0->id());
     bool inv0 = e0.src_inv();
-    Literal lit0(vid0, inv0 ? kPolNega : kPolPosi);
+    Literal lit0(vid0, inv0);
 
     const ImpEdge& e1 = node->fanin1();
     ImpNode* node1 = e1.src_node();
     VarId vid1(node1->id());
     bool inv1 = e1.src_inv();
-    Literal lit1(vid1, inv1 ? kPolNega : kPolPosi);
+    Literal lit1(vid1, inv1);
     if ( node->is_and() ) {
       solver.add_clause(lit0, ~lit);
       solver.add_clause(lit1, ~lit);
@@ -478,18 +478,18 @@ SatImp::learning(ImpMgr& imp_mgr,
       VarId vid = solver.new_var();
       assert_cond( vid.val() == id, __FILE__, __LINE__);
       if ( imp_mgr.is_const0(id) ) {
-	Literal lit(vid, kPolNega);
+	Literal lit(vid, true);
 	solver.add_clause(lit);
       }
       else if ( imp_mgr.is_const1(id) ) {
-	Literal lit(vid, kPolPosi);
+	Literal lit(vid);
 	solver.add_clause(lit);
       }
     }
     make_cnf(solver, node, cnf_mark);
 
     for (ymuint src_val = 0; src_val < 2; ++ src_val) {
-      Literal lit0(VarId(src_id), src_val == 0 ? kPolNega : kPolPosi);
+      Literal lit0(VarId(src_id), src_val == 0);
       const list<ImpDst>& imp_list = cand_info[src_id * 2 + src_val];
       for (list<ImpDst>::const_iterator p = imp_list.begin();
 	   p != imp_list.end(); ++ p) {
@@ -502,7 +502,7 @@ SatImp::learning(ImpMgr& imp_mgr,
 	ImpNode* node1 = p->node();
 	ymuint dst_id = node1->id();
 	ymuint dst_val = p->val();
-	Literal lit1(VarId(dst_id), dst_val == 0 ? kPolNega : kPolPosi);
+	Literal lit1(VarId(dst_id), dst_val == 0);
 
 	if ( imp_mgr.is_const(dst_id) ) {
 	  continue;

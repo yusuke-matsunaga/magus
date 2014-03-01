@@ -10,8 +10,8 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/AigMgr.h"
-#include "ym_logic/Aig.h"
+#include "logic/AigMgr.h"
+#include "logic/Aig.h"
 #include "AigPat.h"
 
 
@@ -127,7 +127,7 @@ private:
   ymuint32 mSlack;
 
   // 登録されている AIG のハッシュ
-  hash_set<Aig> mAigHash;
+  unordered_set<Aig> mAigHash;
 
 };
 

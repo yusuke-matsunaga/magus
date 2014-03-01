@@ -11,7 +11,7 @@
 
 #include "ym_cec/cec_nsdef.h"
 #include "FraigHandle.h"
-#include "ym_logic/LogExpr.h"
+#include "ym_logic/Expr.h"
 #include "ym_logic/Bool3.h"
 
 
@@ -105,7 +105,7 @@ public:
   /// @param[in] expr 対象の論理式
   /// @param[in] inputs 入力に対応する AIG ハンドル
   FraigHandle
-  make_logic(const LogExpr& expr,
+  make_logic(const Expr& expr,
 	     const vector<FraigHandle>& inputs);
 
   /// @brief コファクターを計算する．

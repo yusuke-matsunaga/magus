@@ -10,7 +10,7 @@
 
 
 #include "ymtools.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "utils/SimpleAlloc.h"
 #include "NpnXform.h"
 
 
@@ -168,7 +168,7 @@ private:
 
   /// @brief ハッシュ関数
   ymuint32
-  hash_func(NpnHandle fanin0,
+  unordered_func(NpnHandle fanin0,
 	    NpnHandle fanin1,
 	    bool xor_flag);
 
@@ -179,19 +179,19 @@ private:
   /// @brief count() の下請け関数
   ymuint
   count_sub(NpnHandle handle,
-	    hash_set<ymuint32>& hash1) const;
+	    unordered_set<ymuint32>& hash1) const;
 
   /// @brief dump_handle() の下請け関数
   void
   dh_sub(ostream& s,
 	 ymuint id,
-	 hash_set<ymuint32>& node_hash) const;
+	 unordered_set<ymuint32>& node_hash) const;
 
   /// @brief dump_handle() の下請け関数
   void
   dh2_sub(ostream& s,
 	  NpnHandle handle,
-	  hash_set<ymuint32>& node_hash) const;
+	  unordered_set<ymuint32>& node_hash) const;
 
 
 private:

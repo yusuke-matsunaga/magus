@@ -36,8 +36,9 @@ public:
   /// @param[in] inv 極性
   ///                - false: 反転なし (正極性)
   ///                - true:  反転あり (負極性)
+  explicit
   Literal(VarId varid,
-	  bool inv);
+	  bool inv = false);
 
   /// @brief index からの変換関数
   /// @param[in] index 変数番号を極性をエンコードしたもの
@@ -61,7 +62,7 @@ public:
   ///                - true:  反転あり (負極性)
   void
   set(VarId varid,
-      bool inv);
+      bool inv = false);
 
 
 public:

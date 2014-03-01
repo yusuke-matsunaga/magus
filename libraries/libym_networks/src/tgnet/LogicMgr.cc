@@ -48,7 +48,7 @@ BEGIN_NONAMESPACE
 
 // 組み込み型のチェック
 tTgGateType
-check_builtin(const LogExpr& lexp,
+check_builtin(const Expr& lexp,
 	      ymuint ni,
 	      const TvFunc& tmp_func)
 {
@@ -143,7 +143,7 @@ END_NONAMESPACE
 // @param[out] id ID番号
 // @return 論理関数の型を返す．
 tTgGateType
-LogicMgr::reg_logic(const LogExpr& lexp,
+LogicMgr::reg_logic(const Expr& lexp,
 		    ymuint32& id)
 {
   // 真理値ベクタに変換する．
@@ -164,8 +164,8 @@ LogicMgr::reg_logic(const LogExpr& lexp,
     if ( cell->mTvFunc == tmp_func ) {
       // 同じ関数が登録されていた．
       // もしもリテラル数が少なかったら論理式を変更する．
-      if ( cell->mLexp.litnum() > lexp.litnum() ) {
-	cell->mLexp = lexp;
+      if ( cell->mExpr.litnum() > lexp.litnum() ) {
+	cell->mExpr = lexp;
       }
       id = cell->mId;
       return kTgGateCplx;
@@ -180,7 +180,7 @@ LogicMgr::reg_logic(const LogExpr& lexp,
 
   Cell* new_cell = new Cell;
   new_cell->mId = logic_num();
-  new_cell->mLexp = lexp;
+  new_cell->mExpr = lexp;
   new_cell->mTvFunc = tmp_func;
   new_cell->mLink = mHashTable[pos];
   mCellArray.push_back(new_cell);

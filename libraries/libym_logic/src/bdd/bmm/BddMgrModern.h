@@ -167,11 +167,11 @@ public:
   BddEdge
   isop(BddEdge l,
        BddEdge u,
-       LogExpr& cover);
+       Expr& cover);
 
   // lower と upper で指定された不完全指定論理関数の主項カバーを求める．
   virtual
-  LogExpr
+  Expr
   prime_cover(BddEdge l,
 	      BddEdge u);
 
@@ -372,13 +372,13 @@ public:
   BddEdge
   isop_step(BddEdge l,
 	    BddEdge u,
-	    LogExpr& cov);
+	    Expr& cov);
 
   // prime cover を求める．
   BddEdge
   pc_step(BddEdge l,
 	  BddEdge u,
-	  LogExpr& cov);
+	  Expr& cov);
 
   // minimal support を求める演算
   BddEdge

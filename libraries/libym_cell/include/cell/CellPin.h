@@ -10,7 +10,7 @@
 
 
 #include "cell/cell_nsdef.h"
-#include "logic/lexp_nsdef.h"
+#include "logic/expr_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -121,7 +121,7 @@ public:
 
   /// @brief 機能を表す論理式を返す．
   virtual
-  LogExpr
+  Expr
   function() const = 0;
 
   /// @brief three_state 属性を持っているときに true を返す．
@@ -131,7 +131,7 @@ public:
 
   /// @brief three_state 論理式を返す．
   virtual
-  LogExpr
+  Expr
   three_state() const = 0;
 
   /// @brief 最大ファンアウト容量を返す．

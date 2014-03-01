@@ -13,7 +13,7 @@
 
 #include "utils/ShString.h"
 #include "utils/FileRegion.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
@@ -137,7 +137,7 @@ public:
   /// @brief 対応する論理式を生成する．
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  LogExpr
+  Expr
   to_expr(const NameMap& name_map) const = 0;
 
 

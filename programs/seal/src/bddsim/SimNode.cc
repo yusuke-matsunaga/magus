@@ -70,7 +70,7 @@ SimNode::SimNode(ymuint32 id,
 // この状態ではファンアウトになにもつながっていない．
 SimNode::SimNode(ymuint32 id,
 		 tTgGateType type,
-		 const LogExpr& lexp,
+		 const Expr& lexp,
 		 const vector<SimNode*>& inputs) :
   mId(id),
   mGateType(type),
@@ -84,7 +84,7 @@ SimNode::SimNode(ymuint32 id,
   mLink(NULL)
 {
   assert_cond(type >= kTgUsrDef, __FILE__, __LINE__);
-  mLexp = lexp;
+  mExpr = lexp;
   
   size_t max_level = 0;
   for (size_t i = 0; i < mNfi; ++ i) {
@@ -283,7 +283,7 @@ SimNode::calc_gfunc()
 	varmap.insert(make_pair(i, mFanins[i]->mGfunc));
       }
       BddMgrRef mgr = mFanins[0]->mGfunc.mgr();
-      new_func = mgr.expr_to_bdd(mLexp, varmap);
+      new_func = mgr.expr_to_bdd(mExpr, varmap);
     }
     break;
   }
@@ -440,7 +440,7 @@ SimNode::calc_ffunc()
 	varmap.insert(make_pair(i, mFanins[i]->mFfunc));
       }
       BddMgrRef mgr = mFanins[0]->mFfunc.mgr();
-      new_func = mgr.expr_to_bdd(mLexp, varmap);
+      new_func = mgr.expr_to_bdd(mExpr, varmap);
     }
     break;
   }
@@ -612,7 +612,7 @@ SimNode::calc_iobs(const Bdd& obs,
       }
       for (size_t i = 0; i < mNfi; ++ i) {
 	varmap.insert(make_pair(i, ~mFanins[i]->get_gfunc()));
-	Bdd tmp = mgr.expr_to_bdd(mLexp, varmap);
+	Bdd tmp = mgr.expr_to_bdd(mExpr, varmap);
 	iobs[i]->calc_iobs(obs & (tmp ^ mGfunc));
 	varmap.insert(make_pair(i, mFanins[i]->get_gfunc()));
       }

@@ -12,7 +12,7 @@
 
 #include "logic/bdd_nsdef.h"
 #include "logic/VarId.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
 #include "gmpxx.h"
@@ -330,7 +330,7 @@ public:
 
   /// @brief BDD の内容を積和形論理式に変換する．
   /// @return 等価な積和形論理式
-  LogExpr
+  Expr
   sop() const;
 
   /// @}
@@ -566,14 +566,14 @@ public:
   Bdd
   isop(const Bdd& lower,
        const Bdd& upper,
-       LogExpr& cover);
+       Expr& cover);
 
   /// @brief 主項を求める．
   /// @param[in] lower 下限(on set)
   /// @param[in] upper 上限(on set + don't care set)
   /// @return すべての主項からなる論理式を返す．
   friend
-  LogExpr
+  Expr
   prime_cover(const Bdd& lower,
 	      const Bdd& upper);
 
@@ -790,13 +790,13 @@ and_exist(const Bdd& src1,
 Bdd
 isop(const Bdd& lower,
      const Bdd& upper,
-     LogExpr& cover);
+     Expr& cover);
 
 /// @brief 主項を求める．
 /// @param[in] lower 下限(on set)
 /// @param[in] upper 上限(on set + don't care set)
 /// @return すべての主項からなる論理式を返す．
-LogExpr
+Expr
 prime_cover(const Bdd& lower,
 	    const Bdd& upper);
 

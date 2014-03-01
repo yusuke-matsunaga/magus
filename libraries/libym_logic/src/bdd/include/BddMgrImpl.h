@@ -319,14 +319,14 @@ public:
   BddEdge
   isop(BddEdge l,
        BddEdge u,
-       LogExpr& cover) = 0;
+       Expr& cover) = 0;
 
   /// @brief 不完全指定論理関数の主項カバーを求める．
   /// @param[in] l オンセットを表す関数
   /// @param[in] u オンセット＋ドントケアセットを表す関数
   /// @return 結果の論理式を返す．
   virtual
-  LogExpr
+  Expr
   prime_cover(BddEdge l,
 	      BddEdge u) = 0;
 

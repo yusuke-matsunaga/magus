@@ -102,7 +102,7 @@ public:
   /// @brief 対応する論理式を生成する．
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  LogExpr
+  Expr
   to_expr(const NameMap& name_map) const;
 
   /// @brief 内容を出力する．
@@ -148,7 +148,7 @@ public:
   /// @brief 対応する論理式を生成する．
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  LogExpr
+  Expr
   to_expr(const NameMap& name_map) const;
 
   /// @brief 内容を出力する．
@@ -194,7 +194,7 @@ public:
   /// @brief 対応する論理式を生成する．
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
-  LogExpr
+  Expr
   to_expr(const NameMap& name_map) const;
 
   /// @brief 内容を出力する．

@@ -99,7 +99,7 @@ BNetDecomp::operator()(BNetwork& network,
     BNode* node = node_list[i];
 
     ymuint max_fanin1 = ( max_fanin < 2 ) ? node->fanin_num() : max_fanin;
-    const LogExpr& expr = node->func();
+    const Expr& expr = node->func();
     if ( !expr.is_simple() || expr.litnum() > max_fanin || no_xor && expr.is_xor() ) {
       // ここに来ているということは expr の根のタイプは二項演算子
       decomp_type1_sub(node, max_fanin1, expr, node, no_xor);
@@ -142,7 +142,7 @@ BNetDecomp::operator()(BNetwork& network,
     BNode* node = node_list[i];
 
     ymuint max_fanin1 = ( max_fanin < 2 ) ? node->fanin_num() : max_fanin;
-    const LogExpr& expr = node->func();
+    const Expr& expr = node->func();
     if ( !expr.is_simple() || expr.litnum() > max_fanin1 || no_xor && expr.is_xor() ) {
       // ここに来ているということは expr の根のタイプは二項演算子
       decomp_type2_sub(node, max_fanin1, expr, node, no_xor);
@@ -161,7 +161,7 @@ BNetDecomp::operator()(BNetwork& network,
 void
 BNetDecomp::decomp_type1_sub(BNode* orig_node,
 			     ymuint max_fanin,
-			     const LogExpr& expr,
+			     const Expr& expr,
 			     BNode* root_node,
 			     bool no_xor)
 {
@@ -172,7 +172,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
 
   ymuint ni = expr.child_num();
   for (ymuint i = 0; i < ni; i ++) {
-    LogExpr opr1 = expr.child(i);
+    Expr opr1 = expr.child(i);
     assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
 
     BNode* node1;
@@ -201,7 +201,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
   }
 
   vector<BNode*> fanins;
-  vector<LogExpr> literals;
+  vector<Expr> literals;
   fanins.reserve(max_fanin);
   literals.reserve(max_fanin);
   for ( ; ; ) {
@@ -212,21 +212,21 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       Node tmp1 = work.getmin();
       work.popmin();
       fanins.push_back(tmp1.mNode);
-      literals.push_back(LogExpr::make_literal(VarId(new_ni), tmp1.mInv));
+      literals.push_back(Expr::make_literal(VarId(new_ni), tmp1.mInv));
     }
 
-    LogExpr tmp_expr;
+    Expr tmp_expr;
     if ( expr.is_and() ) {
-      tmp_expr = LogExpr::make_and(literals);
+      tmp_expr = Expr::make_and(literals);
     }
     else if ( expr.is_or() ) {
-      tmp_expr = LogExpr::make_or(literals);
+      tmp_expr = Expr::make_or(literals);
     }
     else if ( expr.is_xor() ) {
       if ( no_xor ) {
 	assert_cond(max_fanin == 2, __FILE__, __LINE__);
-	LogExpr lit1 = literals[0];
-	LogExpr lit2 = literals[1];
+	Expr lit1 = literals[0];
+	Expr lit2 = literals[1];
 	BNode* and1 = mManip->new_logic();
 	bool stat1 = mManip->change_logic(and1, lit1 & ~lit2, fanins);
 	assert_cond(stat1, __FILE__, __LINE__);
@@ -238,7 +238,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
 	tmp_expr = lit1 | lit2;
       }
       else {
-	tmp_expr = LogExpr::make_xor(literals);
+	tmp_expr = Expr::make_xor(literals);
       }
     }
     else {
@@ -271,7 +271,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
 void
 BNetDecomp::decomp_type2_sub(BNode* orig_node,
 			     ymuint max_fanin,
-			     const LogExpr& expr,
+			     const Expr& expr,
 			     BNode* root_node,
 			     bool no_xor)
 {
@@ -281,7 +281,7 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
   ymuint ni = expr.child_num();
   vector<pair<BNode*, bool> > tmp_fanins(ni);
   for (ymuint i = 0; i < ni; i ++) {
-    LogExpr opr1 = expr.child(i);
+    Expr opr1 = expr.child(i);
     assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
 
     BNode* node1;
@@ -329,7 +329,7 @@ BNetDecomp::build_tree(ymuint b,
 		       ymuint ni,
 		       const vector<pair<BNode*, bool> >& tmp_fanins,
 		       ymuint max_fanin,
-		       const LogExpr& type_expr,
+		       const Expr& type_expr,
 		       BNode* root_node,
 		       bool no_xor)
 {
@@ -347,7 +347,7 @@ BNetDecomp::build_tree(ymuint b,
   }
 
   vector<BNode*> fanins(real_fanin);
-  vector<LogExpr> literals(real_fanin);
+  vector<Expr> literals(real_fanin);
 
   ymuint b0 = b;
   for (ymuint i = 0; i < real_fanin; ++ i) {
@@ -367,21 +367,21 @@ BNetDecomp::build_tree(ymuint b,
 			     type_expr, NULL, no_xor);
       inv = false;
     }
-    literals[i] = LogExpr::make_literal(VarId(i), inv);
+    literals[i] = Expr::make_literal(VarId(i), inv);
   }
 
-  LogExpr expr;
+  Expr expr;
   if ( type_expr.is_and() ) {
-    expr = LogExpr::make_and(literals);
+    expr = Expr::make_and(literals);
   }
   else if ( type_expr.is_or() ) {
-    expr = LogExpr::make_or(literals);
+    expr = Expr::make_or(literals);
   }
   else if ( type_expr.is_xor() ) {
     if ( no_xor ) {
       assert_cond(real_fanin == 2, __FILE__, __LINE__);
-      LogExpr lit1 = literals[0];
-      LogExpr lit2 = literals[1];
+      Expr lit1 = literals[0];
+      Expr lit2 = literals[1];
       BNode* and1 = mManip->new_logic();
       bool stat1 = mManip->change_logic(and1, lit1 & ~lit2, fanins);
       assert_cond(stat1, __FILE__, __LINE__);
@@ -393,7 +393,7 @@ BNetDecomp::build_tree(ymuint b,
       expr = lit1 | lit2;
     }
     else {
-      expr = LogExpr::make_xor(literals);
+      expr = Expr::make_xor(literals);
     }
   }
   else {

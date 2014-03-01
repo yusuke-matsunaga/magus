@@ -697,8 +697,8 @@ CiLibrary::new_logic_cell(ymuint cell_id,
 			  ymuint nb,
 			  ymuint nc,
 			  const vector<bool>& output_array,
-			  const vector<LogExpr>& logic_array,
-			  const vector<LogExpr>& tristate_array)
+			  const vector<Expr>& logic_array,
+			  const vector<Expr>& tristate_array)
 {
   void* p = mAlloc.get_memory(sizeof(CiLogicCell));
   CiCell* cell = new (p) CiLogicCell(this, cell_id, ShString(name), area,
@@ -739,13 +739,13 @@ CiLibrary::new_ff_cell(ymuint cell_id,
 		       ymuint nb,
 		       ymuint nc,
 		       const vector<bool>& output_array,
-		       const vector<LogExpr>& logic_array,
-		       const vector<LogExpr>& tristate_array,
-		       const LogExpr& next_state,
-		       const LogExpr& clocked_on,
-		       const LogExpr& clocked_on_also,
-		       const LogExpr& clear,
-		       const LogExpr& preset,
+		       const vector<Expr>& logic_array,
+		       const vector<Expr>& tristate_array,
+		       const Expr& next_state,
+		       const Expr& clocked_on,
+		       const Expr& clocked_on_also,
+		       const Expr& clear,
+		       const Expr& preset,
 		       ymuint clear_preset_var1,
 		       ymuint clear_preset_var2)
 {
@@ -847,13 +847,13 @@ CiLibrary::new_latch_cell(ymuint cell_id,
 			  ymuint nb,
 			  ymuint nc,
 			  const vector<bool>& output_array,
-			  const vector<LogExpr>& logic_array,
-			  const vector<LogExpr>& tristate_array,
-			  const LogExpr& data_in,
-			  const LogExpr& enable,
-			  const LogExpr& enable_also,
-			  const LogExpr& clear,
-			  const LogExpr& preset,
+			  const vector<Expr>& logic_array,
+			  const vector<Expr>& tristate_array,
+			  const Expr& data_in,
+			  const Expr& enable,
+			  const Expr& enable_also,
+			  const Expr& clear,
+			  const Expr& preset,
 			  ymuint clear_preset_var1,
 			  ymuint clear_preset_var2)
 {
@@ -950,8 +950,8 @@ CiLibrary::new_fsm_cell(ymuint cell_id,
 			ymuint nb,
 			ymuint nc,
 			const vector<bool>& output_array,
-			const vector<LogExpr>& logic_array,
-			const vector<LogExpr>& tristate_array)
+			const vector<Expr>& logic_array,
+			const vector<Expr>& tristate_array)
 {
   void* p = mAlloc.get_memory(sizeof(CiFsmCell));
   CiCell* cell = new (p) CiFsmCell(this, cell_id, ShString(name), area,
@@ -1012,8 +1012,8 @@ CiLibrary::new_cell_output(ymuint cell_id,
 			   ymuint output_id,
 			   const string& name,
 			   bool has_logic,
-			   const LogExpr& logic_expr,
-			   const LogExpr& tristate_expr,
+			   const Expr& logic_expr,
+			   const Expr& tristate_expr,
 			   CellCapacitance max_fanout,
 			   CellCapacitance min_fanout,
 			   CellCapacitance max_capacitance,
@@ -1061,8 +1061,8 @@ CiLibrary::new_cell_inout(ymuint cell_id,
 			  ymuint output_id,
 			  const string& name,
 			  bool has_logic,
-			  const LogExpr& logic_expr,
-			  const LogExpr& tristate_expr,
+			  const Expr& logic_expr,
+			  const Expr& tristate_expr,
 			  CellCapacitance capacitance,
 			  CellCapacitance rise_capacitance,
 			  CellCapacitance fall_capacitance,
@@ -1140,7 +1140,7 @@ void
 CiLibrary::new_timing_generic(ymuint cell_id,
 			      ymuint tid,
 			      tCellTimingType type,
-			      const LogExpr& cond,
+			      const Expr& cond,
 			      CellTime intrinsic_rise,
 			      CellTime intrinsic_fall,
 			      CellTime slope_rise,
@@ -1173,7 +1173,7 @@ void
 CiLibrary::new_timing_piecewise(ymuint cell_id,
 				ymuint tid,
 				tCellTimingType timing_type,
-				const LogExpr& cond,
+				const Expr& cond,
 				CellTime intrinsic_rise,
 				CellTime intrinsic_fall,
 				CellTime slope_rise,
@@ -1204,7 +1204,7 @@ void
 CiLibrary::new_timing_lut1(ymuint cell_id,
 			   ymuint tid,
 			   tCellTimingType timing_type,
-			   const LogExpr& cond,
+			   const Expr& cond,
 			   CellLut* cell_rise,
 			   CellLut* cell_fall,
 			   CellLut* rise_transition,
@@ -1233,7 +1233,7 @@ void
 CiLibrary::new_timing_lut2(ymuint cell_id,
 			   ymuint tid,
 			   tCellTimingType timing_type,
-			   const LogExpr& cond,
+			   const Expr& cond,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition,
 			   CellLut* rise_propagation,
@@ -1665,8 +1665,8 @@ CiLibrary::restore(IDO& s)
 
     ymuint no2 = no + nio;
     vector<bool> has_logic(no2);
-    vector<LogExpr> logic_array(no2);
-    vector<LogExpr> tristate_array(no2);
+    vector<Expr> logic_array(no2);
+    vector<Expr> tristate_array(no2);
     for (ymuint opos = 0; opos < no2; ++ opos) {
       bool tmp;
       s >> tmp
@@ -1686,11 +1686,11 @@ CiLibrary::restore(IDO& s)
 
     case 1: // kFF
       {
-	LogExpr next_state;
-	LogExpr clocked_on;
-	LogExpr clocked_on_also;
-	LogExpr clear;
-	LogExpr preset;
+	Expr next_state;
+	Expr clocked_on;
+	Expr clocked_on_also;
+	Expr clear;
+	Expr preset;
 	ymuint8 clear_preset_var1;
 	ymuint8 clear_preset_var2;
 	s >> next_state
@@ -1715,11 +1715,11 @@ CiLibrary::restore(IDO& s)
 
     case 2: // kLatch
       {
-	LogExpr data_in;
-	LogExpr enable;
-	LogExpr enable_also;
-	LogExpr clear;
-	LogExpr preset;
+	Expr data_in;
+	Expr enable;
+	Expr enable_also;
+	Expr clear;
+	Expr preset;
 	ymuint8 clear_preset_var1;
 	ymuint8 clear_preset_var2;
 	s >> data_in
@@ -1845,7 +1845,7 @@ CiLibrary::restore(IDO& s)
     for (ymuint tid = 0; tid < nt; ++ tid) {
       ymuint8 ttype;
       ymuint8 tmp;
-      LogExpr cond;
+      Expr cond;
       s >> ttype
 	>> tmp
 	>> cond;

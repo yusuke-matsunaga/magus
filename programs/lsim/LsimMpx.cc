@@ -8,9 +8,9 @@
 
 
 #include "LsimMpx.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnPort.h"
-#include "ym_logic/BddVector.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnPort.h"
+#include "logic/BddVector.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -77,12 +77,12 @@ END_NONAMESPACE
 // @param[in] order_map 順序マップ
 void
 LsimMpx::set_network(const BdnMgr& bdn,
-		     const hash_map<string, ymuint>& order_map)
+		     const unordered_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
 
-  hash_map<Bdd, ympuint> mpx_map;
+  unordered_map<Bdd, ympuint> mpx_map;
 
   const BdnNodeList& input_list = bdn.input_list();
   ymuint ni = input_list.size();
@@ -106,7 +106,7 @@ LsimMpx::set_network(const BdnMgr& bdn,
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
       string name = node->port()->name();
-      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      unordered_map<string, ymuint>::const_iterator q = order_map.find(name);
       if ( q == order_map.end() ) {
 	cerr << "No map for " << name << endl;
 	abort();
@@ -195,7 +195,7 @@ LsimMpx::set_network(const BdnMgr& bdn,
 
 ympuint
 LsimMpx::make_mpx(Bdd bdd,
-		  hash_map<Bdd, ympuint>& mpx_map)
+		  unordered_map<Bdd, ympuint>& mpx_map)
 {
   if ( bdd.is_zero() ) {
     return 0UL;
@@ -203,7 +203,7 @@ LsimMpx::make_mpx(Bdd bdd,
   if ( bdd.is_one() ) {
     return 1UL;
   }
-  hash_map<Bdd, ympuint>::iterator p = mpx_map.find(bdd);
+  unordered_map<Bdd, ympuint>::iterator p = mpx_map.find(bdd);
   if ( p != mpx_map.end() ) {
     return p->second;
   }

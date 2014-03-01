@@ -10,7 +10,7 @@
 
 
 #include "networks/tgnet.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/TvFunc.h"
 
 
@@ -52,7 +52,7 @@ public:
   /// @param[out] id kTgGateCplx の場合はID番号を格納する．
   /// @return 論理関数の型を返す．
   tTgGateType
-  reg_logic(const LogExpr& lexp,
+  reg_logic(const Expr& lexp,
 	    ymuint32& id);
 
   /// @brief 登録されている論理式の数を返す．
@@ -61,7 +61,7 @@ public:
 
   /// @brief 論理式を返す．
   /// @param[in] id ID番号 ( 0 <= id < logic_num() )
-  LogExpr
+  Expr
   get_expr(ymuint32 id) const;
 
   /// @brief 論理関数を返す．
@@ -96,7 +96,7 @@ private:
     ymuint32 mId;
 
     // 論理式
-    LogExpr mLexp;
+    Expr mExpr;
 
     // 真理値表
     TvFunc mTvFunc;
@@ -145,11 +145,11 @@ LogicMgr::logic_num() const
 // @brief 論理式を返す．
 // @param[in] id ID番号 ( 0 <= id < logic_num() )
 inline
-LogExpr
+Expr
 LogicMgr::get_expr(ymuint32 id) const
 {
   assert_cond( id < logic_num(), __FILE__, __LINE__);
-  return mCellArray[id]->mLexp;
+  return mCellArray[id]->mExpr;
 }
 
 // @brief 論理関数を返す．

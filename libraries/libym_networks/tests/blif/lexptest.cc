@@ -1,6 +1,6 @@
 
 /// @file lexptest.cc
-/// @brief blif ファイルの読み込みに置ける LogExpr の性能テスト
+/// @brief blif ファイルの読み込みに置ける Expr の性能テスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -11,26 +11,26 @@
 #include "BlifHandler.h"
 #include "utils/MsgMgr.h"
 #include "utils/MsgHandler.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
-/// @class LexpTestHandler parsertest.cc
+/// @class ExprTestHandler parsertest.cc
 /// @brief テスト用の BlifHandler
 //////////////////////////////////////////////////////////////////////
-class LexpTestHandler :
+class ExprTestHandler :
   public BlifHandler
 {
 public:
 
   /// @brief コンストラクタ
-  LexpTestHandler();
+  ExprTestHandler();
 
   /// @brief デストラクタ
   virtual
-  ~LexpTestHandler();
+  ~ExprTestHandler();
 
 
 public:
@@ -140,27 +140,27 @@ private:
   int opol;
 
   // cubepat2expr で用いる作業領域
-  vector<LogExpr> mChd1;
-  vector<LogExpr> mChd2;
+  vector<Expr> mChd1;
+  vector<Expr> mChd2;
 
-  list<LogExpr*> mPageList;
+  list<Expr*> mPageList;
 
   size_t mCount;
-  LogExpr* mPage;
+  Expr* mPage;
 };
 
 
 // @brief コンストラクタ
-LexpTestHandler::LexpTestHandler()
+ExprTestHandler::ExprTestHandler()
 {
   mCount = 0;
   mPage = NULL;
 }
 
 // @brief デストラクタ
-LexpTestHandler::~LexpTestHandler()
+ExprTestHandler::~ExprTestHandler()
 {
-  for (list<LogExpr*>::iterator p = mPageList.begin();
+  for (list<Expr*>::iterator p = mPageList.begin();
        p != mPageList.end(); ++ p) {
     delete [] *p;
   }
@@ -171,7 +171,7 @@ LexpTestHandler::~LexpTestHandler()
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::init()
+ExprTestHandler::init()
 {
   return true;
 }
@@ -183,7 +183,7 @@ LexpTestHandler::init()
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::model(const FileRegion& loc1,
+ExprTestHandler::model(const FileRegion& loc1,
 		       const FileRegion& loc2,
 		       const char* name)
 {
@@ -195,7 +195,7 @@ LexpTestHandler::model(const FileRegion& loc1,
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::inputs_elem(ymuint32 name_id)
+ExprTestHandler::inputs_elem(ymuint32 name_id)
 {
   return true;
 }
@@ -205,7 +205,7 @@ LexpTestHandler::inputs_elem(ymuint32 name_id)
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::outputs_elem(ymuint32 name_id)
+ExprTestHandler::outputs_elem(ymuint32 name_id)
 {
   return true;
 }
@@ -222,61 +222,61 @@ LexpTestHandler::outputs_elem(ymuint32 name_id)
 // 各要素のとりうる値は '0', '1', '-' を表す．
 // @note opat は '0' か '1' のどちらか
 bool
-LexpTestHandler::names(ymuint32 onode_id,
+ExprTestHandler::names(ymuint32 onode_id,
 		       const vector<ymuint32>& inode_id_array,
 		       ymuint32 nc,
 		       const char* cover_pat,
 		       char opat)
 {
   ymuint32 ni = inode_id_array.size();
-  LogExpr expr;
+  Expr expr;
   if ( opat == '1' ) {
-    vector<LogExpr> or_expr;
+    vector<Expr> or_expr;
     for (ymuint32 c = 0; c < nc; ++ c) {
-      vector<LogExpr> and_expr;
+      vector<Expr> and_expr;
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  and_expr.push_back(LogExpr::make_negaliteral(VarId(i)));
+	  and_expr.push_back(Expr::make_negaliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  and_expr.push_back(LogExpr::make_posiliteral(VarId(i)));
+	  and_expr.push_back(Expr::make_posiliteral(VarId(i)));
 	}
       }
-      or_expr.push_back(LogExpr::make_and(and_expr));
+      or_expr.push_back(Expr::make_and(and_expr));
     }
     if ( or_expr.empty() ) {
-      expr = LogExpr::make_one();
+      expr = Expr::make_one();
     }
     else {
-      expr = LogExpr::make_or(or_expr);
+      expr = Expr::make_or(or_expr);
     }
   }
   else {
-    vector<LogExpr> and_expr;
+    vector<Expr> and_expr;
     for (ymuint32 c = 0; c < nc; ++ c) {
-      vector<LogExpr> or_expr;
+      vector<Expr> or_expr;
       for (ymuint32 i = 0; i < ni; ++ i) {
 	char v = cover_pat[c * ni + i];
 	if ( v == '0' ) {
-	  or_expr.push_back(LogExpr::make_posiliteral(VarId(i)));
+	  or_expr.push_back(Expr::make_posiliteral(VarId(i)));
 	}
 	else if ( v == '1' ) {
-	  or_expr.push_back(LogExpr::make_negaliteral(VarId(i)));
+	  or_expr.push_back(Expr::make_negaliteral(VarId(i)));
 	}
       }
-      and_expr.push_back(LogExpr::make_or(or_expr));
+      and_expr.push_back(Expr::make_or(or_expr));
     }
     if ( and_expr.empty() ) {
-      expr = LogExpr::make_zero();
+      expr = Expr::make_zero();
     }
     else {
-      expr = LogExpr::make_and(and_expr);
+      expr = Expr::make_and(and_expr);
     }
   }
 
   if ( mPage == NULL || mCount >= 1024 ) {
-    mPage = new LogExpr[1024];
+    mPage = new Expr[1024];
     mCount = 0;
     mPageList.push_back(mPage);
   }
@@ -293,7 +293,7 @@ LexpTestHandler::names(ymuint32 onode_id,
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::gate(ymuint32 onode_id,
+ExprTestHandler::gate(ymuint32 onode_id,
 		      const vector<ymuint32>& inode_id_array,
 		      const Cell* cell)
 {
@@ -308,7 +308,7 @@ LexpTestHandler::gate(ymuint32 onode_id,
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::latch(ymuint32 onode_id,
+ExprTestHandler::latch(ymuint32 onode_id,
 		       ymuint32 inode_id,
 		       const FileRegion& loc4,
 		       char rval)
@@ -321,20 +321,20 @@ LexpTestHandler::latch(ymuint32 onode_id,
 // @retval true 処理が成功した．
 // @retval false エラーが起こった．
 bool
-LexpTestHandler::end(const FileRegion& loc)
+ExprTestHandler::end(const FileRegion& loc)
 {
   return true;
 }
 
 // @brief 通常終了時の処理
 void
-LexpTestHandler::normal_exit()
+ExprTestHandler::normal_exit()
 {
 }
 
 // @brief エラー終了時の処理
 void
-LexpTestHandler::error_exit()
+ExprTestHandler::error_exit()
 {
 }
 
@@ -356,12 +356,12 @@ main(int argc,
 
   try {
     cout << "BEFORE LOOP" << endl;
-    LogExpr::print_stats(cout);
+    Expr::print_stats(cout);
     string filename = argv[1];
     for (size_t i = 0; i < 10; ++ i) {
       BlifParser parser;
       {
-	LexpTestHandler* handler = new LexpTestHandler;
+	ExprTestHandler* handler = new ExprTestHandler;
 	parser.add_handler(handler);
 	StreamMsgHandler* msg_handler = new StreamMsgHandler(&cerr);
 	MsgMgr::reg_handler(msg_handler);
@@ -371,10 +371,10 @@ main(int argc,
 	  return 4;
 	}
 	cout << "END_OF_READ" << endl;
-	LogExpr::print_stats(cout);
+	Expr::print_stats(cout);
       }
       cout << "END_OF_LOOP" << endl;
-      LogExpr::print_stats(cout);
+      Expr::print_stats(cout);
     }
   }
   catch ( AssertError x) {

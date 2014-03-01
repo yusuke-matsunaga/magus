@@ -91,7 +91,7 @@ disp_id(ostream& s,
 void
 dfs(ostream& s,
     const EufNode* node,
-    hash_set<ymuint>& mark)
+    unordered_set<ymuint>& mark)
 {
   if ( mark.count(node->id()) > 0 ) {
     return;
@@ -184,7 +184,7 @@ display(ostream& s,
 	const vector<const EufNode*>& node_list)
 {
   // 処理したノードを覚えておくためのハッシュ
-  hash_set<ymuint> mark;
+  unordered_set<ymuint> mark;
 
   for (vector<const EufNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {

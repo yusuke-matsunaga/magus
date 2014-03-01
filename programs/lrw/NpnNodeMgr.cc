@@ -402,7 +402,7 @@ NpnNodeMgr::new_node(bool is_xor,
   oxf *= post_oxf;
 
   ymuint type_pat = is_xor ? 3U : 2U;
-  ymuint pos = hash_func(fanin0, fanin1, is_xor);
+  ymuint pos = unordered_func(fanin0, fanin1, is_xor);
   ymuint idx = pos % mHashSize;
   NpnNode* node = NULL;
   for (node = mHashTable[idx]; node; node = node->mSlink) {
@@ -914,14 +914,14 @@ NpnNodeMgr::xform_handle(NpnHandle handle,
 ymuint
 NpnNodeMgr::count(NpnHandle handle) const
 {
-  hash_set<ymuint32> hash1;
+  unordered_set<ymuint32> hash1;
   return count_sub(handle, hash1);
 }
 
 // @brief count() の下請け関数
 ymuint
 NpnNodeMgr::count_sub(NpnHandle handle,
-		      hash_set<ymuint32>& hash1) const
+		      unordered_set<ymuint32>& hash1) const
 {
   NpnNode* node = mNodeList[handle.node_id()];
   if ( !node->is_logic() ) {
@@ -989,7 +989,7 @@ NpnNodeMgr::dump_handle(ostream& s,
   }
   s << "----------------------------------------" << endl;
 
-  hash_set<ymuint32> node_hash;
+  unordered_set<ymuint32> node_hash;
   for (vector<NpnHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p) {
     NpnHandle handle = *p;
@@ -1002,7 +1002,7 @@ NpnNodeMgr::dump_handle(ostream& s,
 void
 NpnNodeMgr::dh_sub(ostream& s,
 		   ymuint id,
-		   hash_set<ymuint32>& node_hash) const
+		   unordered_set<ymuint32>& node_hash) const
 {
   if ( node_hash.count(id) > 0 ) {
     return;
@@ -1059,7 +1059,7 @@ NpnNodeMgr::dump_handle2(ostream& s,
   }
   s << "----------------------------------------" << endl;
 
-  hash_set<ymuint32> node_hash;
+  unordered_set<ymuint32> node_hash;
   for (vector<NpnHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p) {
     NpnHandle handle = *p;
@@ -1072,7 +1072,7 @@ NpnNodeMgr::dump_handle2(ostream& s,
 void
 NpnNodeMgr::dh2_sub(ostream& s,
 		    NpnHandle handle,
-		    hash_set<ymuint32>& node_hash) const
+		    unordered_set<ymuint32>& node_hash) const
 {
   ymuint id = handle.node_id();
   NpnNode* node = mNodeList[id];
@@ -1123,7 +1123,7 @@ NpnNodeMgr::dh2_sub(ostream& s,
 
 // @brief ハッシュ関数
 ymuint32
-NpnNodeMgr::hash_func(NpnHandle fanin0,
+NpnNodeMgr::unordered_func(NpnHandle fanin0,
 		      NpnHandle fanin1,
 		      bool xor_flag)
 {
@@ -1153,7 +1153,7 @@ NpnNodeMgr::alloc_table(ymuint req_size)
       NpnNode* next = NULL;
       for (NpnNode* node = old_table[i]; node; node = next) {
 	next = node->mSlink;
-	ymuint pos = hash_func(node->fanin0(), node->fanin1(), node->is_xor());
+	ymuint pos = unordered_func(node->fanin0(), node->fanin1(), node->is_xor());
 	ymuint idx = pos % mHashSize;
 	node->mSlink = mHashTable[idx];
 	mHashTable[idx] = node;

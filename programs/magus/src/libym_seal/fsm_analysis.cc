@@ -179,7 +179,7 @@ fsm_analysis(const BNetwork& bnetwork,
   for (BNodeVector::iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     BNode* node = *p;
-    LogExpr expr = node->func();
+    Expr expr = node->func();
     ymuint ni = node->fanin_num();
     VarBddMap fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {

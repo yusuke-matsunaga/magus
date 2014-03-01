@@ -228,9 +228,9 @@ FaultMgr::reg_faults(const TgNode* node)
 
   case kTgGateCplx:
     {
-      LogExpr ofunc = mNetwork->get_lexp(node->func_id());
+      Expr ofunc = mNetwork->get_lexp(node->func_id());
       for (ymuint j = 0; j < ni; ++ j) {
-	LogExpr tmp = ofunc.compose(VarId(j), LogExpr::make_zero());
+	Expr tmp = ofunc.compose(VarId(j), Expr::make_zero());
 	SaFault* rep = NULL;
 	if ( tmp.is_zero() ) {
 	  rep = f0;
@@ -239,7 +239,7 @@ FaultMgr::reg_faults(const TgNode* node)
 	  rep = f1;
 	}
 	add_ifault(node, j, 0, rep);
-	tmp = ofunc.compose(VarId(j), LogExpr::make_one());
+	tmp = ofunc.compose(VarId(j), Expr::make_one());
 	rep = NULL;
 	if ( tmp.is_zero() ) {
 	  rep = f0;

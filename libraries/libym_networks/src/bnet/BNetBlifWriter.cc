@@ -16,10 +16,10 @@ BEGIN_NAMESPACE_YM_NETWORKS_BNET
 
 BEGIN_NONAMESPACE
 
-// LogExpr から積和形論理式に変換し出力する．
+// Expr から積和形論理式に変換し出力する．
 bool
 write_cover(ymuint ni,
-	    const LogExpr& f,
+	    const Expr& f,
 	    ostream& s)
 {
   if ( f.is_zero() ) {
@@ -65,7 +65,7 @@ write_cover(ymuint ni,
     }
     ymuint nc = f.child_num();
     for (ymuint i = 0; i < nc; i ++) {
-      LogExpr opr1 = f.child(i);
+      Expr opr1 = f.child(i);
       if ( !opr1.is_literal() ) {
 	return false;
       }
@@ -91,7 +91,7 @@ write_cover(ymuint ni,
   if ( f.is_or() ) {
     ymuint nc = f.child_num();
     for (ymuint i = 0; i < nc; i ++) {
-      LogExpr opr1 = f.child(i);
+      Expr opr1 = f.child(i);
       bool stat = write_cover(ni, opr1, s);
       if ( !stat ) {
 	return false;
@@ -119,7 +119,7 @@ write_names(const BNode* node,
   s << " " << node->name() << endl;
 
   // factored form をカバーに変換して出力する．
-  const LogExpr& ff = node->func();
+  const Expr& ff = node->func();
   bool stat = write_cover(ni, ff, s);
   assert_cond(stat, __FILE__, __LINE__);
 }

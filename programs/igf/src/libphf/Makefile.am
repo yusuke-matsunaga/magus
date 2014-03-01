@@ -37,8 +37,9 @@ noinst_LTLIBRARIES = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	-I$(top_srcdir)/include \
 	$(GMP_INCLUDES)
 
@@ -46,6 +47,9 @@ AM_CPPFLAGS = \
 ############################################################
 ## libphf.la 用の変数の定義
 ############################################################
+
+libphf_la_CXXFLAGS = \
+	$(AM_CXXFLAGS)
 
 libphf_la_SOURCES = \
 	RvMgr.cc \
@@ -71,4 +75,5 @@ libphf_la_SOURCES = \
 
 libphf_la_LIBADD =
 
-libphf_la_LDFLAGS =
+libphf_la_LDFLAGS = \
+	$(AM_LDFLAGS)

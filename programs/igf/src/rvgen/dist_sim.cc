@@ -8,7 +8,7 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/RandGen.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

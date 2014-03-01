@@ -11,13 +11,13 @@
 #include "cellmap/patgen/PgFuncMgr.h"
 #include "cellmap/patgen/PgFuncRep.h"
 #include "cellmap/patgen/PgFunc.h"
-#include "ym_lexp/LogExpr.h"
+#include "ym_lexp/Expr.h"
 #include "cellmap/PatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP_PATGEN
 
-LogExpr
+Expr
 str_to_expr(char* str,
 	    ymuint& pos)
 {
@@ -30,32 +30,32 @@ str_to_expr(char* str,
   ymuint end;
   for (end = pos + 1; str[end] != '\0' && !isspace(str[end]); ++ pos) { }
 
-  LogExpr expr;
+  Expr expr;
   if ( end == pos + 1 ) {
     char op = str[pos];
     ++ pos;
     if ( op == '~' || op == '!' ) {
-      LogExpr expr1 = str_to_expr(str, pos);
+      Expr expr1 = str_to_expr(str, pos);
       expr = ~expr1;
     }
     else if ( op == '&' || op == '*' ) {
-      LogExpr expr1 = str_to_expr(str, pos);
-      LogExpr expr2 = str_to_expr(str, pos);
+      Expr expr1 = str_to_expr(str, pos);
+      Expr expr2 = str_to_expr(str, pos);
       expr = expr1 & expr2;
     }
     else if ( op == '|' || op == '+' ) {
-      LogExpr expr1 = str_to_expr(str, pos);
-      LogExpr expr2 = str_to_expr(str, pos);
+      Expr expr1 = str_to_expr(str, pos);
+      Expr expr2 = str_to_expr(str, pos);
       expr = expr1 | expr2;
     }
     else if ( op == '^' ) {
-      LogExpr expr1 = str_to_expr(str, pos);
-      LogExpr expr2 = str_to_expr(str, pos);
+      Expr expr1 = str_to_expr(str, pos);
+      Expr expr2 = str_to_expr(str, pos);
       expr = expr1 ^ expr2;
     }
     else if ( '0' <= op && op <= '9' ) {
       int v = static_cast<int>(op) - '0';
-      expr = LogExpr::make_posiliteral(v);
+      expr = Expr::make_posiliteral(v);
     }
   }
   else {
@@ -63,7 +63,7 @@ str_to_expr(char* str,
     char oc = str[end];
     str[end] = '\0';
     int v = atoi(str);
-    expr = LogExpr::make_posiliteral(v);
+    expr = Expr::make_posiliteral(v);
     str[end] = oc;
   }
 
@@ -75,19 +75,19 @@ test(istream& s)
 {
 #if 0
   // s の各行が逆ポーランド式の論理式だと思う．
-  vector<LogExpr> expr_list;
+  vector<Expr> expr_list;
   char buff[4096];
   while ( s.getline(buff, sizeof(buff), '\n') ) {
     ymuint pos = 0;
-    LogExpr expr = str_to_expr(buff, pos);
+    Expr expr = str_to_expr(buff, pos);
     expr_list.push_back(expr);
   }
 
   PgFuncMgr pgf_mgr;
 
-  for (vector<LogExpr>::iterator p = expr_list.begin();
+  for (vector<Expr>::iterator p = expr_list.begin();
        p != expr_list.end(); ++ p) {
-    LogExpr expr = *p;
+    Expr expr = *p;
     ymuint fid = pgf_mgr.reg_expr(expr);
     cout << "Function ID for " << expr << " = " << fid << endl;
   }

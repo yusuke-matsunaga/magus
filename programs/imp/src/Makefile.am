@@ -41,8 +41,11 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/libym_imp \
 	@GMP_INCLUDES@
@@ -57,9 +60,9 @@ imp_SOURCES = \
 
 imp_LDADD = \
 	libym_imp/libym_imp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 imp_LDFLAGS = \
 	$(POPT_LIBS) \
@@ -71,6 +74,7 @@ imp_LDFLAGS = \
 ############################################################
 
 impsh_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
 	$(AM_CPPFLAGS) \
 	@TCL_INCLUDES@
 
@@ -81,10 +85,10 @@ impsh_SOURCES = \
 
 impsh_LDADD = \
 	libym_imp/libym_imp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
 

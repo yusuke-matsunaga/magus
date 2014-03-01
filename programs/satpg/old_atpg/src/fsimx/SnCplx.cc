@@ -26,7 +26,7 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 SnCplx::SnCplx(ymuint32 id,
-	       const LogExpr& lexp,
+	       const Expr& lexp,
 	       const vector<SimNode*>& inputs) :
   SnGate(id, inputs)
 {

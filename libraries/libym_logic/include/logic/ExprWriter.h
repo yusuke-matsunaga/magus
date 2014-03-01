@@ -1,35 +1,35 @@
-#ifndef LOGIC_LOGEXPRWRITER_H
-#define LOGIC_LOGEXPRWRITER_H
+#ifndef LOGIC_EXPRWRITER_H
+#define LOGIC_EXPRWRITER_H
 
-/// @file logic/LogExprWriter.h
-/// @brief LogExprWriter のヘッダファイル
+/// @file logic/ExprWriter.h
+/// @brief ExprWriter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/lexp_nsdef.h"
+#include "logic/expr_nsdef.h"
 #include "logic/VarId.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 //////////////////////////////////////////////////////////////////////
-/// @class LogExprWriter LogExprWriter.h "logic/LogExprWriter.h"
+/// @class ExprWriter ExprWriter.h "logic/ExprWriter.h"
 /// @ingroup LexpGroup
-/// @brief LogExpr を出力するためのクラス
-/// @sa LogExpr
+/// @brief Expr を出力するためのクラス
+/// @sa Expr
 //////////////////////////////////////////////////////////////////////
-class LogExprWriter
+class ExprWriter
 {
 public:
 
   /// @brief コンストラクタ
-  LogExprWriter();
+  ExprWriter();
 
   /// @brief デストラクタ
-  ~LogExprWriter();
+  ~ExprWriter();
 
 
 public:
@@ -43,7 +43,7 @@ public:
   /// @return s
   ostream&
   dump(ostream& s,
-       const LogExpr& expr,
+       const Expr& expr,
        const VarStrMap& var_names = VarStrMap()) const;
 
   /// @brief 内容を文字列にする．
@@ -52,7 +52,7 @@ public:
   /// @note varid 番目の変数名として var_names[varid] を用いる．
   /// 登録されていなければデフォルトの表記を用いる．
   string
-  dump_string(const LogExpr& expr,
+  dump_string(const Expr& expr,
 	      const VarStrMap& var_names = VarStrMap()) const;
 
 
@@ -99,7 +99,7 @@ private:
   // dump() のサブルーティン
   void
   dump_sub(ostream& s,
-	   const LogExpr& expr,
+	   const Expr& expr,
 	   const VarStrMap& var_names) const;
 
 
@@ -113,6 +113,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
 #endif // LOGIC_LOGEXPRWRITER_H

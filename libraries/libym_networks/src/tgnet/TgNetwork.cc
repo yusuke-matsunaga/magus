@@ -118,7 +118,7 @@ TgNetwork::get_func(ymuint id) const
 
 // @brief 関数の論理式を取り出す．
 // @note param[in] id 関数番号 ( 0 <= id < func_num() )
-LogExpr
+Expr
 TgNetwork::get_lexp(ymuint id) const
 {
   return mLogicMgr->get_expr(id);
@@ -179,7 +179,7 @@ TgNetwork::set_to_output(TgNode* node)
 // @param[in] expr 論理式
 void
 TgNetwork::set_to_logic(TgNode* node,
-			const LogExpr& expr)
+			const Expr& expr)
 {
   ymuint ni = expr.input_size();
   ymuint32 id;
@@ -447,7 +447,7 @@ dump(ostream& s,
     << "Functions" << endl;
   ymuint nf = network.func_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    LogExpr expr = network.get_lexp(i);
+    Expr expr = network.get_lexp(i);
     s << "Func#" << i << ": " << expr << endl;
   }
 

@@ -16,7 +16,7 @@
 #endif
 
 #include "lutmap.h"
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 #include <ym_bdd/Bdd.h>
 #include <ym_utils/Alloc.h>
 
@@ -49,7 +49,7 @@ public:
   /// @param[in] leaf_gf 葉の global function の配列
   /// @param[out] leaf_odc 葉の ODC
   void
-  operator()(const LogExpr& expr,
+  operator()(const Expr& expr,
 	     Bdd root_odc,
 	     const vector<Bdd>& leaf_gf,
 	     vector<Bdd>& leaf_odc);

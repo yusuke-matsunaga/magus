@@ -194,7 +194,7 @@ BNetwork::eliminate(int threshold,
       // 1. 外部出力にファンアウトしている．
       // 2. 消去するとファンアウト先のノードのSOPのキューブ数が
       //    sop_limit を越える．
-      const LogExpr& func = node->func();
+      const Expr& func = node->func();
       // 肯定のSOPのキューブ数 - 1 (増分)
       ymuint pc = func.sop_cubenum() - 1;
       // 否定のSOPのキューブ数 - 1 (増分)
@@ -209,7 +209,7 @@ BNetwork::eliminate(int threshold,
 	  check = false;
 	  break;
 	}
-	const LogExpr& ofunc = onode->func();
+	const Expr& ofunc = onode->func();
 	// SOP形式で肯定のリテラルの現れる回数
 	ymuint pa = ofunc.sop_litnum(VarId(edge->pos()), false);
 	// SOP形式で否定のリテラルの現れる回数

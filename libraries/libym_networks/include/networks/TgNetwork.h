@@ -13,7 +13,7 @@
 ///
 /// ni 入力(ni >= 0), 1出力の論理要素 (TgNode) のネットワーク
 /// 個々の TgNode は ni 入力 1 出力の論理関数を実現している．
-/// 実装としては論理式 (LogExpr) で表されるが，個々の TgNode
+/// 実装としては論理式 (Expr) で表されるが，個々の TgNode
 /// はその実体を持たず，論理関数 ID のみを保持する．
 /// TgNetwork 中に論理関数 ID と論理式ベクタの対応表を持つ．
 /// ただし典型的な関数は別途 tGateType で定義しておく．
@@ -22,7 +22,7 @@
 
 
 #include "networks/tgnet.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/SimpleAlloc.h"
 
 
@@ -128,7 +128,7 @@ public:
 
   /// @brief 関数の論理式を取り出す．
   /// @note param[in] id 関数番号 ( 0 <= id < func_num() )
-  LogExpr
+  Expr
   get_lexp(ymuint id) const;
 
 
@@ -168,7 +168,7 @@ public:
   /// @param[in] expr 論理式
   void
   set_to_logic(TgNode* node,
-	       const LogExpr& expr);
+	       const Expr& expr);
 
   /// @brief ノードを論理ノードに設定する．
   /// @param[in] node 対象のノード

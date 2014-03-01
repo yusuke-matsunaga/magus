@@ -81,18 +81,18 @@ Ln2BNet::operator()(const LnGraph& src_network,
 	assert_cond(dst_inode, __FILE__, __LINE__);
 	dst_inodes[i] = dst_inode;
       }
-      LogExpr expr = LogExpr::make_zero();
+      Expr expr = Expr::make_zero();
       ymuint np = 1U << ni;
       for (ymuint p = 0; p < np; ++ p) {
 	if ( tv[p] ) {
-	  LogExpr prd = LogExpr::make_one();
+	  Expr prd = Expr::make_one();
 	  for (ymuint i = 0; i < ni; ++ i) {
 	    VarId var(i);
 	    if ( p & (1U << i) ) {
-	      prd &= LogExpr::make_posiliteral(var);
+	      prd &= Expr::make_posiliteral(var);
 	    }
 	    else {
-	      prd &= LogExpr::make_negaliteral(var);
+	      prd &= Expr::make_negaliteral(var);
 	    }
 	  }
 	  expr |= prd;

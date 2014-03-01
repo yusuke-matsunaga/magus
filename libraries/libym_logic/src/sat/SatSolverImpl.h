@@ -11,7 +11,6 @@
 
 #include "logic/sat_nsdef.h"
 #include "logic/Bool3.h"
-#include "logic/lexp_nsdef.h"
 #include "logic/Literal.h"
 
 

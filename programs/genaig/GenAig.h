@@ -10,8 +10,8 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/AigMgr.h"
-#include "ym_logic/Aig.h"
+#include "logic/AigMgr.h"
+#include "logic/Aig.h"
 #include "AigPat.h"
 #include "FuncXform.h"
 
@@ -140,7 +140,7 @@ private:
   /// @brief count2 の下請け関数
   ymuint
   count2_sub(Aig aig,
-	     hash_set<Aig>& hash);
+	     unordered_set<Aig>& hash);
 
   /// @brief 3入力関数の情報をセットアップする．
   void
@@ -161,7 +161,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // NPN同値類代表関数を表すハッシュ表
-  hash_map<ymuint32, vector<FuncXform> > mNpnHash;
+  unordered_map<ymuint32, vector<FuncXform> > mNpnHash;
 
   // AIGMGR
   AigMgr mMgr;
@@ -208,10 +208,10 @@ private:
   ymuint32 mSlack;
 
   // 登録されている AIG のハッシュ
-  hash_set<Aig> mAigHash;
+  unordered_set<Aig> mAigHash;
 
   // count 用の AIG のハッシュ
-  hash_set<Aig> mCountHash;
+  unordered_set<Aig> mCountHash;
 
 };
 

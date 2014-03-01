@@ -16,7 +16,7 @@
 #include <ym_networks/TgNode.h>
 #include "EventQ.h"
 #include "TestVector.h"
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 #include <ym_utils/Alloc.h>
 #include "SimFFR.h"
 
@@ -101,7 +101,7 @@ private:
 
   /// @brief logic ノードを作る．
   SimNode*
-  make_logic(const LogExpr& lexp,
+  make_logic(const Expr& lexp,
 	     const vector<SimNode*>& inputs);
 
   /// @brief logic ノードを作る．

@@ -47,10 +47,11 @@ bin_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(top_srcdir)/include \
-	@POPT_INCLUDES@
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_popt/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
+	-I$(top_srcdir)/include
 
 
 ############################################################
@@ -62,12 +63,13 @@ igf_SOURCES = \
 
 igf_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 igf_LDFLAGS = \
 	-lrt \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -79,12 +81,13 @@ migf_SOURCES = \
 
 migf_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 migf_LDFLAGS = \
 	-lrt \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -96,12 +99,13 @@ igf2_SOURCES = \
 
 igf2_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 igf2_LDFLAGS = \
 	-lrt \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -113,12 +117,13 @@ var_analyzer_SOURCES = \
 
 var_analyzer_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 var_analyzer_LDFLAGS = \
 	-lrt \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -130,11 +135,12 @@ phf_SOURCES = \
 
 phf_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -146,12 +152,13 @@ phf_fixed_SOURCES = \
 
 phf_fixed_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_fixed_LDFLAGS = \
 	-lrt \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -163,12 +170,13 @@ phf_fixed3_SOURCES = \
 
 phf_fixed3_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_fixed3_LDFLAGS = \
 	-lrt \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -180,11 +188,12 @@ phf_igu_SOURCES = \
 
 phf_igu_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_igu_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -196,11 +205,12 @@ phf_eval_SOURCES = \
 
 phf_eval_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_eval_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -212,11 +222,12 @@ phf_eval2_SOURCES = \
 
 phf_eval2_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_eval2_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)
 
 
 ############################################################
@@ -228,8 +239,9 @@ phf_eval3_SOURCES = \
 
 phf_eval3_LDADD = \
 	../libphf/libphf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 phf_eval3_LDFLAGS = \
-	@POPT_LIBS@
+	$(AM_LDFLAGS)

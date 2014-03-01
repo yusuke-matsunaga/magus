@@ -11,7 +11,7 @@
 
 #include "logic/Aig.h"
 #include "logic/VarId.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
@@ -178,7 +178,7 @@ public:
   /// @param[in] expr 対象の論理式
   /// @param[in] input_map 入力とAIGの対応表
   Aig
-  make_logic(const LogExpr& expr,
+  make_logic(const Expr& expr,
 	     const VarAigMap& input_map);
 
   /// @brief コファクターを計算する．

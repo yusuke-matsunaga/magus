@@ -81,7 +81,7 @@ PyObject*
 CellTiming_timing_cond(CellTimingObject* self,
 		       PyObject* args)
 {
-  return PyLogExpr_FromLogExpr(self->mTiming->timing_cond());
+  return PyExpr_FromExpr(self->mTiming->timing_cond());
 }
 
 // intrinsic_rise 関数

@@ -7,14 +7,8 @@
 /// All rights reserved.
 
 
-#if HAVE_POPT
-#include <popt.h>
-#else
-#error "<popt.h> not found."
-#endif
-
 #include "igf_nsdef.h"
-#include "ym_utils/PoptMainApp.h"
+#include "utils/PoptMainApp.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

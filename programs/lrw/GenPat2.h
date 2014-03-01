@@ -109,7 +109,7 @@ private:
   /// @brief count2 の下請け関数
   ymuint
   count2_sub(NpnHandle handle,
-	     hash_set<ymuint32>& hash);
+	     unordered_set<ymuint32>& hash);
 
   /// @brief 4入力関数の情報をセットアップする．
   void
@@ -131,7 +131,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // NPN同値類代表関数を表すハッシュ表
-  hash_map<ymuint32, vector<FuncXform> > mNpnHash;
+  unordered_map<ymuint32, vector<FuncXform> > mNpnHash;
 
   // NpnNode を管理するオブジェクト
   NpnNodeMgr mMgr;
@@ -161,10 +161,10 @@ private:
   ymuint32 mSlack;
 
   // 登録されている NpnHandle のハッシュ
-  hash_set<NpnHandle> mNpnHandleHash;
+  unordered_set<NpnHandle> mNpnHandleHash;
 
   // count 用の AIG のハッシュ
-  hash_set<ymuint32> mCountHash;
+  unordered_set<ymuint32> mCountHash;
 
   // 関数ごとのレベルの上限を入れる配列
   vector<ymuint32> mUpperLevel;

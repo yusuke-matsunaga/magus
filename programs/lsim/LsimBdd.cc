@@ -8,8 +8,8 @@
 
 
 #include "LsimBdd.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -35,7 +35,7 @@ LsimBdd::~LsimBdd()
 // @param[in] order_map 順序マップ
 void
 LsimBdd::set_network(const BdnMgr& bdn,
-		     const hash_map<string, ymuint>& order_map)
+		     const unordered_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
@@ -56,7 +56,7 @@ LsimBdd::set_network(const BdnMgr& bdn,
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
       string name = node->port()->name();
-      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      unordered_map<string, ymuint>::const_iterator q = order_map.find(name);
       if ( q == order_map.end() ) {
 	cerr << "No map for " << name << endl;
 	abort();

@@ -51,8 +51,8 @@ private:
 	      ymuint nb,
 	      ymuint nc,
 	      const vector<bool>& output_array,
-	      const vector<LogExpr>& logic_array,
-	      const vector<LogExpr>& tristate_array,
+	      const vector<Expr>& logic_array,
+	      const vector<Expr>& tristate_array,
 	      Alloc& alloc);
 
   /// @brief デストラクタ

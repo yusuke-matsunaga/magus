@@ -257,7 +257,7 @@ print_handle(ostream& s,
 void
 dh_sub(ostream& s,
        GpNode* node,
-       hash_set<ymuint32>& h_hash)
+       unordered_set<ymuint32>& h_hash)
 {
   if ( h_hash.count(node->id()) > 0 ) {
     return;
@@ -306,7 +306,7 @@ GpMgr::dump_handle(ostream& s,
   }
   s << "----------------------------------------" << endl;
 
-  hash_set<ymuint32> tmp_hash;
+  unordered_set<ymuint32> tmp_hash;
   for (vector<GpHandle>::const_iterator p = handle_list.begin();
        p != handle_list.end(); ++ p) {
     GpHandle handle = *p;

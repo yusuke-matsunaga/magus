@@ -42,7 +42,7 @@ BNetManip::eliminate_node(BNode* node)
   BNodeEdgeList fanouts(node->fanouts());
 
   size_t old_ni = node->fanin_num();
-  const LogExpr& orig_f = node->func();
+  const Expr& orig_f = node->func();
   for (BNodeEdgeList::const_iterator it = fanouts.begin();
        it != fanouts.end(); it ++) {
     BNodeEdge* edge = *it;
@@ -56,8 +56,8 @@ BNetManip::eliminate_node(BNode* node)
       for (size_t i = 0; i < old_ni; i ++) {
 	vvmap.insert(make_pair(VarId(i), VarId(i + oni)));
       }
-      LogExpr tmp = orig_f.remap_var(vvmap);
-      LogExpr new_expr = fo_node->func().compose(VarId(edge->pos()), tmp);
+      Expr tmp = orig_f.remap_var(vvmap);
+      Expr new_expr = fo_node->func().compose(VarId(edge->pos()), tmp);
 
       // 新しいファンインの配列を作る．
       size_t new_ni = oni + old_ni;
@@ -266,7 +266,7 @@ BNetManip::change_output(BNode* onode,
 // エラーが起きたら false を返す．
 bool
 BNetManip::change_logic(BNode* node,
-			const LogExpr& expr,
+			const Expr& expr,
 			const BNodeVector& fanins,
 			bool tfo_check)
 {
@@ -290,7 +290,7 @@ BNetManip::change_logic(BNode* node,
   // Phase-1: 重複したファンインを一つにまとめる処理を行う．
   size_t orig_ni = fanins.size();
   size_t new_ni = 0;
-  LogExpr new_expr = expr;
+  Expr new_expr = expr;
 
   // 新しいファンインを mNodes に入れる．
   // もとのファンイン番号をキーにして新しいファンイン番号を
@@ -461,7 +461,7 @@ BNetManip::get_TFO(BNode* node)
 //  - 論理式中に現われる変数の数とファンイン数が異なる場合
 bool
 BNetManip::change_logic(BNode* node,
-			const LogExpr& expr)
+			const Expr& expr)
 {
   size_t ni = node->fanin_num();
   vector<BNode*> fanins(ni);
@@ -536,7 +536,7 @@ BNetManip::change_to_const(BNode* node,
 			   int cval)
 {
   // 定数式を表すファクタードフォームを作る．
-  LogExpr expr = (cval == 0) ? LogExpr::make_zero() : LogExpr::make_one();
+  Expr expr = (cval == 0) ? Expr::make_zero() : Expr::make_one();
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(0));
@@ -550,7 +550,7 @@ BNetManip::change_to_buffer(BNode* node,
 			    BNode* src_node)
 {
   // BUF を表すファクタードフォームを作る．
-  LogExpr expr = LogExpr::make_posiliteral(VarId(0));
+  Expr expr = Expr::make_posiliteral(VarId(0));
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(1, src_node));
@@ -564,7 +564,7 @@ BNetManip::change_to_inverter(BNode* node,
 			      BNode* src_node)
 {
   // NOT を表すファクタードフォームを作る．
-  LogExpr expr = LogExpr::make_negaliteral(VarId(0));
+  Expr expr = Expr::make_negaliteral(VarId(0));
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, vector<BNode*>(1, src_node));
@@ -579,11 +579,11 @@ BNetManip::change_to_and(BNode* node,
 {
   // AND を表すファクタードフォームを作る．
   size_t n = fanins.size();
-  LogExprVector leaves(n);
+  ExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(VarId(i));
+    leaves[i] = Expr::make_posiliteral(VarId(i));
   }
-  LogExpr expr = LogExpr::make_and(leaves);
+  Expr expr = Expr::make_and(leaves);
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, fanins);
@@ -598,11 +598,11 @@ BNetManip::change_to_nand(BNode* node,
 {
   // NAND を表すファクタードフォームを作る．
   size_t n = fanins.size();
-  LogExprVector leaves(n);
+  ExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(VarId(i));
+    leaves[i] = Expr::make_posiliteral(VarId(i));
   }
-  LogExpr expr = ~LogExpr::make_and(leaves);
+  Expr expr = ~Expr::make_and(leaves);
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, fanins);
@@ -617,11 +617,11 @@ BNetManip::change_to_or(BNode* node,
 {
   // OR を表すファクタードフォームを作る．
   size_t n = fanins.size();
-  LogExprVector leaves(n);
+  ExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(VarId(i));
+    leaves[i] = Expr::make_posiliteral(VarId(i));
   }
-  LogExpr expr = LogExpr::make_or(leaves);
+  Expr expr = Expr::make_or(leaves);
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, fanins);
@@ -636,11 +636,11 @@ BNetManip::change_to_nor(BNode* node,
 {
   // OR を表すファクタードフォームを作る．
   size_t n = fanins.size();
-  LogExprVector leaves(n);
+  ExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(VarId(i));
+    leaves[i] = Expr::make_posiliteral(VarId(i));
   }
-  LogExpr expr = ~LogExpr::make_or(leaves);
+  Expr expr = ~Expr::make_or(leaves);
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, fanins);
@@ -655,11 +655,11 @@ BNetManip::change_to_xor(BNode* node,
 {
   // XOR を表すファクタードフォームを作る．
   size_t n = fanins.size();
-  LogExprVector leaves(n);
+  ExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(VarId(i));
+    leaves[i] = Expr::make_posiliteral(VarId(i));
   }
-  LogExpr expr = LogExpr::make_xor(leaves);
+  Expr expr = Expr::make_xor(leaves);
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, fanins);
@@ -674,11 +674,11 @@ BNetManip::change_to_xnor(BNode* node,
 {
   // XOR を表すファクタードフォームを作る．
   size_t n = fanins.size();
-  LogExprVector leaves(n);
+  ExprVector leaves(n);
   for (size_t i = 0; i < n; i ++) {
-    leaves[i] = LogExpr::make_posiliteral(VarId(i));
+    leaves[i] = Expr::make_posiliteral(VarId(i));
   }
-  LogExpr expr = ~LogExpr::make_xor(leaves);
+  Expr expr = ~Expr::make_xor(leaves);
 
   // ノードの内容を設定する．
   bool stat = change_logic(node, expr, fanins);

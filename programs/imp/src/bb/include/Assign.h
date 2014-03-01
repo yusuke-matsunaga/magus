@@ -11,7 +11,7 @@
 
 #include "bb_nsdef.h"
 #include "PtNode.h"
-#include "ym_utils/FileRegion.h"
+#include "utils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_BB

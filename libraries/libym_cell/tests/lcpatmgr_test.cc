@@ -8,7 +8,7 @@
 
 
 #include "libcomp/LcPatMgr.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -27,7 +27,7 @@ lcpatmgr_test(int argc,
   mgr.init();
 
   istringstream is(argv[1]);
-  LogExpr expr;
+  Expr expr;
   string error_msg;
   if ( !expr.read_from_stream(is, error_msg) ) {
     cerr << error_msg << endl;

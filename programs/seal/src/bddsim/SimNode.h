@@ -12,7 +12,7 @@
 
 #include "nsdef.h"
 #include <ym_networks/TgGateTemplate.h>
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 #include <ym_bdd/Bdd.h>
 
 
@@ -41,7 +41,7 @@ private:
   /// @brief logic 用のノードのコンストラクタ
   SimNode(ymuint32 id,
 	  tTgGateType type,
-	  const LogExpr& lexp,
+	  const Expr& lexp,
 	  const vector<SimNode*>& inputs);
   
   /// @brief デストラクタ
@@ -199,7 +199,7 @@ private:
   tTgGateType mGateType;
 
   // 論理式
-  LogExpr mLexp;
+  Expr mExpr;
   
   // ファンイン数
   size_t mNfi;

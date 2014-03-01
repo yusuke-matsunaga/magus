@@ -11,3 +11,4 @@
 %Module YmLogic
 
 %Include VarId.sip
+%Include Literal.sip

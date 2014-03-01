@@ -8,8 +8,8 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
 #include "ThBddGen.h"
 
 

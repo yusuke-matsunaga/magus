@@ -11,7 +11,7 @@
 #include "LcGroup.h"
 #include "LcClass.h"
 #include "cell/Cell.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/NpnMapM.h"
 
 
@@ -127,25 +127,25 @@ LcFFMgr::gen_signature(const Cell* cell,
 
   vector<TvFunc> f_list(no2 * 2 + 4);
   {
-    LogExpr expr = cell->next_state_expr();
+    Expr expr = cell->next_state_expr();
     f_list[0] = expr.make_tv(ni2);
   }
   {
-    LogExpr expr = cell->clock_expr();
+    Expr expr = cell->clock_expr();
     f_list[1] = expr.make_tv(ni2);
   }
   {
-    LogExpr expr = cell->clear_expr();
+    Expr expr = cell->clear_expr();
     f_list[2] = expr.make_tv(ni2);
   }
   {
-    LogExpr expr = cell->preset_expr();
+    Expr expr = cell->preset_expr();
     f_list[3] = expr.make_tv(ni2);
   }
   for (ymuint i = 0; i < no2; ++ i) {
-    LogExpr lexpr = cell->logic_expr(i);
+    Expr lexpr = cell->logic_expr(i);
     f_list[i * 2 + 4] = lexpr.make_tv(ni2);
-    LogExpr texpr = cell->tristate_expr(i);
+    Expr texpr = cell->tristate_expr(i);
     f_list[i * 2 + 5] = texpr.make_tv(ni2);
   }
   f = TvFuncM(f_list);

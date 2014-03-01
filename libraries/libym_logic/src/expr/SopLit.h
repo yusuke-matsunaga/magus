@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 //////////////////////////////////////////////////////////////////////
 /// リテラル数見積り用のクラス
@@ -129,6 +129,6 @@ operator*(const SopLit& src1,
 		src1.mNl * src2.mNp + src2.mNl * src1.mNp);
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
 #endif // SOPLIT_H

@@ -8,10 +8,10 @@
 
 
 #include "CnfImp2.h"
-#include "ym_logic/CNFdd.h"
-#include "ym_logic/CNFddMgr.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
+#include "logic/CNFdd.h"
+#include "logic/CNFddMgr.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
@@ -53,15 +53,16 @@ CnfImp2::learning(const BdnMgr& network,
        p != node_list.end(); ++ p) {
     const BdnNode* bnode = *p;
     ymuint id = bnode->id();
-    Literal lit(VarId(id), kPolPosi);
+    VarId v(id);
+    Literal lit(v);
 
     const BdnNode* bnode0 = bnode->fanin0();
     bool inv0 = bnode->fanin0_inv();
-    Literal lit0(VarId(bnode0->id()), inv0 ? kPolNega : kPolPosi);
+    Literal lit0(VarId(bnode0->id()), inv0);
 
     const BdnNode* bnode1 = bnode->fanin1();
     bool inv1 = bnode->fanin1_inv();
-    Literal lit1(VarId(bnode1->id()), inv1 ? kPolNega : kPolPosi);
+    Literal lit1(VarId(bnode1->id()), inv1);
 
     if ( bnode->is_and() ) {
       CNFdd cnf0 = mgr.make_base();
@@ -116,10 +117,11 @@ CnfImp2::learning(const BdnMgr& network,
 
   for (ymuint i = 0; i < n; ++ i) {
     // i の肯定と否定のリテラルを含む節を求める．
-    Literal p_lit(VarId(i), kPolPosi);
-    Literal n_lit(VarId(i), kPolNega);
-    CNFdd p_list = cnf.cofactor_p(VarId(i));
-    CNFdd n_list = cnf.cofactor_n(VarId(i));
+    VarId v(i);
+    Literal p_lit(v);
+    Literal n_lit(~p_lit);
+    CNFdd p_list = cnf.cofactor_p(v);
+    CNFdd n_list = cnf.cofactor_n(v);
     cout << "Var#" << i << ": "
 	 << p_list.count() << " x " << n_list.count() << endl;
 #if 0

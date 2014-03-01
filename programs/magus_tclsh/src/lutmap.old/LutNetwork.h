@@ -13,7 +13,7 @@
 #include <ym_utils/Alloc.h>
 #include <ym_utils/DlList.h>
 #include <ym_utils/ItvlMgr.h>
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 
 #include "lutmap.h"
 #include "PatVect.h"
@@ -271,7 +271,7 @@ public:
   pomark() const;
   
   /// @brief LUT ノードの場合に論理式を得る．
-  LogExpr
+  Expr
   expr() const;
   
   /// @brief LUTノードの場合に真理値ベクタを得る．
@@ -361,7 +361,7 @@ private:
   LnEdgeList mFanoutList;
   
   // 論理式
-  LogExpr mExpr;
+  Expr mExpr;
   
   // 真理値ベクタ
   vector<int> mTv;
@@ -526,7 +526,7 @@ public:
   LnNode*
   new_lut(const string& name,
 	  const vector<LnNode*>& inodes,
-	  const LogExpr& expr,
+	  const Expr& expr,
 	  const vector<int>& tv);
 
   /// @brief 入力ノードの削除
@@ -561,7 +561,7 @@ public:
   void
   change_lut(LnNode* node,
 	     const vector<LnNode*>& inodes,
-	     const LogExpr& expr,
+	     const Expr& expr,
 	     const vector<int>& tv);
   
   /// @brief LUT ノードのファンインのみ変更する．
@@ -819,7 +819,7 @@ LnNode::name() const
   
 // @brief LUT ノードの場合に論理式を得る．
 inline
-LogExpr
+Expr
 LnNode::expr() const
 {
   return mExpr;

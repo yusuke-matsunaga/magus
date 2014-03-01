@@ -43,10 +43,10 @@ MislibConst0::is_expr() const
 
 // @brief 対応する論理式を生成する．
 // @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
-LogExpr
+Expr
 MislibConst0::to_expr(const NameMap& name_map) const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // 内容を出力する．
@@ -91,10 +91,10 @@ MislibConst1::is_expr() const
 
 // @brief 対応する論理式を生成する．
 // @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
-LogExpr
+Expr
 MislibConst1::to_expr(const NameMap& name_map) const
 {
-  return LogExpr::make_one();
+  return Expr::make_one();
 }
 
 // 内容を出力する．

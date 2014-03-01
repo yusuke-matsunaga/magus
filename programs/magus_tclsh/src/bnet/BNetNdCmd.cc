@@ -11,7 +11,7 @@
 
 #include "BNetNdCmd.h"
 #include "ym_tclpp/TclPopt.h"
-#include "ym_logic/LogExprWriter.h"
+#include "ym_logic/ExprWriter.h"
 #include "ym_networks/BNetManip.h"
 
 
@@ -99,7 +99,7 @@ NodeInfo::cmd_proc(TclObjVector& objv)
     }
   }
   else if ( attr == "func" ) {
-    LogExprWriter writer;
+    ExprWriter writer;
     result = writer.dump_string(node->func());
   }
   else if ( attr == "value" ) {

@@ -1,5 +1,5 @@
-#ifndef LEXPLUGIN_H
-#define LEXPLUGIN_H
+#ifndef EXPRLUGIN_H
+#define EXPRLUGIN_H
 
 /// @file LexPlugin.h
 /// @brief LexPlugin のヘッダファイル
@@ -229,4 +229,4 @@ LexPlugin::debug() const
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // LEXPLUGIN_H
+#endif // EXPRLUGIN_H

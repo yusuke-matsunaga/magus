@@ -10,9 +10,9 @@
 
 
 #include "bb_nsdef.h"
-#include "ym_utils/FileRegion.h"
-#include "ym_logic/AigMgr.h"
-#include "ym_logic/Aig.h"
+#include "utils/FileRegion.h"
+#include "logic/AigMgr.h"
+#include "logic/Aig.h"
 
 
 BEGIN_NAMESPACE_YM_BB

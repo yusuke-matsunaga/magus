@@ -8,8 +8,8 @@
 
 
 #include "LsimBdd2.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -34,14 +34,14 @@ BEGIN_NONAMESPACE
 
 void
 put_bdd(Bdd bdd,
-	hash_map<Bdd, ymuint32>& idmap,
+	unordered_map<Bdd, ymuint32>& idmap,
 	vector<Bdd>& bdd_array)
 {
   if ( bdd.is_const() ) {
     return;
   }
 
-  hash_map<Bdd, ymuint32>::iterator p = idmap.find(bdd);
+  unordered_map<Bdd, ymuint32>::iterator p = idmap.find(bdd);
   if ( p == idmap.end() ) {
     ymuint id = bdd_array.size();
     bdd_array.push_back(bdd);
@@ -57,7 +57,7 @@ put_bdd(Bdd bdd,
 
 void
 write_bdd(Bdd bdd,
-	  const hash_map<Bdd, ymuint32>& idmap)
+	  const unordered_map<Bdd, ymuint32>& idmap)
 {
   if ( bdd.is_zero() ) {
     cout << "    return 0;" << endl;
@@ -66,7 +66,7 @@ write_bdd(Bdd bdd,
     cout << "    return 1;" << endl;
   }
   else {
-    hash_map<Bdd, ymuint32>::const_iterator p = idmap.find(bdd);
+    unordered_map<Bdd, ymuint32>::const_iterator p = idmap.find(bdd);
     assert_cond( p != idmap.end(), __FILE__, __LINE__);
     cout << "    goto BDD" << p->second << ";" << endl;
   }
@@ -79,7 +79,7 @@ END_NONAMESPACE
 // @param[in] order_map 順序マップ
 void
 LsimBdd2::set_network(const BdnMgr& bdn,
-		      const hash_map<string, ymuint>& order_map)
+		      const unordered_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
@@ -102,7 +102,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
       string name = node->port()->name();
-      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      unordered_map<string, ymuint>::const_iterator q = order_map.find(name);
       if ( q == order_map.end() ) {
 	cerr << "No order for " << name << endl;
 	abort();
@@ -150,7 +150,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 
   mBddMgr.disable_gc();
 
-  hash_map<Bdd, ymuint32> idmap;
+  unordered_map<Bdd, ymuint32> idmap;
   vector<Bdd> bdd_array;
 
   const BdnNodeList& output_list = bdn.output_list();
@@ -173,7 +173,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
     }
     put_bdd(bdd, idmap, bdd_array);
 
-    hash_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
+    unordered_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
     assert_cond( q != idmap.end(), __FILE__, __LINE__);
 
     output_id.push_back(q->second);
@@ -203,7 +203,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
   for (vector<Bdd>::iterator p = bdd_array.begin();
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
-    hash_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
+    unordered_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
     assert_cond( q != idmap.end(), __FILE__, __LINE__);
     ymuint32 id = q->second;
     Bdd bdd0;

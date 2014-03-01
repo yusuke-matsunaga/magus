@@ -14,11 +14,11 @@
 #include "Constr.h"
 #include "PtNode.h"
 
-#include "ym_logic/AigMgr.h"
-//#include "ym_logic/AigSatMgr.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_utils/StopWatch.h"
-#include "ym_utils/MsgHandler.h"
+#include "logic/AigMgr.h"
+//#include "logic/AigSatMgr.h"
+#include "logic/SatSolver.h"
+#include "utils/StopWatch.h"
+#include "utils/MsgHandler.h"
 
 #include "ImpMgr.h"
 #include "ImpInfo.h"
@@ -37,9 +37,9 @@ using nsYm::nsNetworks::ImpBase;
 ImpNodeHandle
 make_node(ImpMgr& imp_mgr,
 	  Aig aig,
-	  hash_map<Aig, ImpNodeHandle>& node_map)
+	  unordered_map<Aig, ImpNodeHandle>& node_map)
 {
-  hash_map<Aig, ImpNodeHandle>::iterator p = node_map.find(aig);
+  unordered_map<Aig, ImpNodeHandle>::iterator p = node_map.find(aig);
   if ( p != node_map.end() ) {
     return p->second;
   }
@@ -209,7 +209,7 @@ bb(const char* file_name,
       }
 #else
       ImpMgr imp_mgr;
-      hash_map<Aig, ImpNodeHandle> node_map;
+      unordered_map<Aig, ImpNodeHandle> node_map;
       vector<ImpNodeHandle> node_list;
       node_list.reserve(root_list.size());
       for (vector<Aig>::iterator p = root_list.begin();

@@ -8,8 +8,8 @@
 
 
 #include "LrMgr.h"
-#include "ym_logic/Aig.h"
-#include "ym_logic/AigMgr.h"
+#include "logic/Aig.h"
+#include "logic/AigMgr.h"
 
 
 #if defined(YM_DEBUG)
@@ -324,7 +324,7 @@ LrMgr::find_aig(ymuint ni,
   if ( ni == 4 ) {
     ymuint16 perm;
     ymuint16 cpat = cannonical4(pat, perm);
-    hash_map<ymuint32, ymuint8>::const_iterator p = npn4map.find(cpat);
+    unordered_map<ymuint32, ymuint8>::const_iterator p = npn4map.find(cpat);
     assert_cond(p != npn4map.end(), __FILE__, __LINE__);
     ymuint id = p->second;
     templ = aig4table[id];

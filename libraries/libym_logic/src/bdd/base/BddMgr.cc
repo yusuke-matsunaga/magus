@@ -192,7 +192,7 @@ BddMgr::tvec_to_bdd(const vector<int>& v,
 // 論理式中に現れるリテラルを置き換えるBDDを varmap に入れる．
 // varmap に登録されていないリテラルはそのまま使う．
 Bdd
-BddMgr::expr_to_bdd(const LogExpr& expr,
+BddMgr::expr_to_bdd(const Expr& expr,
 		    const VarBddMap& varmap)
 {
   // 定数0の場合
@@ -242,11 +242,11 @@ BddMgr::expr_to_bdd(const LogExpr& expr,
   return make_error();
 }
 
-// LogExpr から対応するBDDを作り出す．
+// Expr から対応するBDDを作り出す．
 // 論理式中に現れるリテラルを置き換えるリテラル番号を varmap に入れる．
 // varmap に登録されていないリテラルはそのまま使う．
 Bdd
-BddMgr::expr_to_bdd(const LogExpr& expr,
+BddMgr::expr_to_bdd(const Expr& expr,
 		    const VarVarMap& varmap)
 {
   VarBddMap vbmap;
@@ -266,7 +266,7 @@ Bdd
 BddMgr::expr_to_bdd(istream& in,
 		    string& err_msg)
 {
-  LogExpr expr = LogExpr::stream_to_expr(in, err_msg);
+  Expr expr = Expr::stream_to_expr(in, err_msg);
   if ( err_msg == string() ) {
     return expr_to_bdd(expr);
   }

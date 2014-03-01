@@ -9,7 +9,7 @@
 
 #include "networks/BNetVerilogWriter.h"
 #include "networks/BNetwork.h"
-#include "logic/LogExprWriter.h"
+#include "logic/ExprWriter.h"
 
 #include "VlwModule.h"
 #include "VlwModuleHeader.h"
@@ -140,7 +140,7 @@ BNetVerilogWriter::dump(ostream& s,
       assert_cond( inode != 0, __FILE__, __LINE__);
       fanin_name.insert(make_pair(VarId(i), inode->name()));
     }
-    const LogExpr& f = node->func();
+    const Expr& f = node->func();
     vlw_assign.put_rhs(f, fanin_name);
   }
 }

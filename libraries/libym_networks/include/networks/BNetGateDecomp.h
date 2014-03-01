@@ -10,7 +10,7 @@
 
 
 #include "networks/bnet.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/RandGen.h"
 
 
@@ -105,7 +105,7 @@ private:
 
   /// @brief 必要となるインバーターの数を数える．
   ymuint
-  count_inv(const LogExpr& expr,
+  count_inv(const Expr& expr,
 	    BNode* node,
 	    bool phase,
 	    vector<bool>& iinv_array);

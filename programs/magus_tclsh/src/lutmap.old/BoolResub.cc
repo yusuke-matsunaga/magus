@@ -233,7 +233,7 @@ BoolResub::calc_gf()
   for (vector<LnNode*>::const_iterator p = mNodeList.begin();
        p != mNodeList.end(); ++ p) {
     LnNode* node = *p;
-    const LogExpr& expr = node->expr();
+    const Expr& expr = node->expr();
     ymuint ni = node->ni();
     vector<PatVect*> ipat(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -265,7 +265,7 @@ BoolResub::calc_odc()
     LnNode* node = *p;
     
     // ノードのファンインの枝の ODC (にせMSPF)を計算する．
-    const LogExpr& expr = node->expr();
+    const Expr& expr = node->expr();
     ymuint ni = node->ni();
     vector<PatVect*> ipat(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -291,7 +291,7 @@ BoolResub::update_patvect(LnNode* node)
   for (vector<LnNode*>::const_iterator p = mNodeList.begin();
        p != mNodeList.end(); ++ p) {
     LnNode* node = *p;
-    const LogExpr& expr = node->expr();
+    const Expr& expr = node->expr();
     ymuint ni = node->ni();
     vector<PatVect*> ipat(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -317,7 +317,7 @@ BoolResub::update_patvect(LnNode* node)
     LnNode* node = *p;
     
     // ノードのファンインの枝の CODC を計算する．
-    const LogExpr& expr = node->expr();
+    const Expr& expr = node->expr();
     ymuint ni = node->ni();
     vector<PatVect*> ipat(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -458,7 +458,7 @@ BoolResub::check_node_subst(LnNode* node1,
       inputs[i] = gval_lit(inode);
     }
     Literal output = gval_lit(node);
-    const LogExpr& expr = node->expr();
+    const Expr& expr = node->expr();
     make_cnf(solver, expr, output, inputs);
   }
   ymuint npo = mLutNetwork->n_outputs();
@@ -500,7 +500,7 @@ BoolResub::check_node_subst(LnNode* node1,
       solver->add_clause( inputs[0], ~flit);
     }
     else {
-      const LogExpr& expr = node->expr();
+      const Expr& expr = node->expr();
       make_cnf(solver, expr, flit, inputs);
     }
     
@@ -714,7 +714,7 @@ BoolResub::check_node_merge(LnNode* node1,
       inputs[i] = gval_lit(inode);
     }
     Literal output = gval_lit(node);
-    const LogExpr& expr = node->expr();
+    const Expr& expr = node->expr();
     make_cnf(solver, expr, output, inputs);
   }
   ymuint npo = mLutNetwork->n_outputs();
@@ -818,7 +818,7 @@ BoolResub::check_node_merge(LnNode* node1,
       solver->add_clause( inputs[0], ~flit);
     }
     else {
-      const LogExpr& expr = node->expr();
+      const Expr& expr = node->expr();
       make_cnf(solver, expr, flit, inputs);
     }
     
@@ -966,7 +966,7 @@ BoolResub::check_node_merge(LnNode* node1,
   }
   
   // node1, node2 を tv の内容で置き換える．
-  LogExpr expr = tv2expr(support1.size(), tv);
+  Expr expr = tv2expr(support1.size(), tv);
   LnNode* new_node = mLutNetwork->new_lut(string(), support1, expr, tv);
   new_node->init_pat(mNpat);
   
@@ -1063,7 +1063,7 @@ BoolResub::delete_tfi(LnNode* node)
 /// @param[in] ipos_end 入力リテラルの終了位置
 void
 BoolResub::make_cnf(SatSolver* solver,
-		    const LogExpr& lexp,
+		    const Expr& lexp,
 		    Literal output,
 		    const vector<Literal>& inputs)
 {
@@ -1083,7 +1083,7 @@ BoolResub::make_cnf(SatSolver* solver,
   ymuint nc = lexp.child_num();
   vector<Literal> local_inputs(nc);
   for (ymuint i = 0; i < nc; ++ i) {
-    LogExpr lexp1 = lexp.child(i);
+    Expr lexp1 = lexp.child(i);
     if ( lexp1.is_posiliteral() ) {
       local_inputs[i] = inputs[lexp1.varid()];
     }
@@ -1186,23 +1186,23 @@ BoolResub::find_support(const vector<LnNode*>& support,
 }
   
 // @brief 真理値表から論理式を得る．
-LogExpr
+Expr
 BoolResub::tv2expr(ymuint ni,
 		   const vector<int>& tv)
 {
   ymuint np = 1U << ni;
   assert_cond(np == tv.size(), __FILE__, __LINE__);
 
-  LogExpr ans = LogExpr::make_zero();
+  Expr ans = Expr::make_zero();
   for (ymuint p = 0U; p < np; ++ p) {
     if ( tv[p] ) {
-      LogExpr prd = LogExpr::make_one();
+      Expr prd = Expr::make_one();
       for (ymuint i = 0; i < ni; ++ i) {
 	if ( p & (1U << i) ) {
-	  prd &= LogExpr::make_posiliteral(i);
+	  prd &= Expr::make_posiliteral(i);
 	}
 	else {
-	  prd &= LogExpr::make_negaliteral(i);
+	  prd &= Expr::make_negaliteral(i);
 	}
       }
       ans |= prd;

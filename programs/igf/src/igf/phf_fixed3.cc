@@ -8,7 +8,7 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/PoptMainApp.h"
+#include "utils/PoptMainApp.h"
 #include "RvMgr.h"
 #include "RegVect.h"
 
@@ -19,10 +19,10 @@
 
 #include "Variable.h"
 #include "IguGen.h"
-#include "ym_utils/CombiGen.h"
-#include "ym_utils/RandGen.h"
-#include "ym_utils/RandPermGen.h"
-#include "ym_utils/RandCombiGen.h"
+#include "utils/CombiGen.h"
+#include "utils/RandGen.h"
+#include "utils/RandPermGen.h"
+#include "utils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

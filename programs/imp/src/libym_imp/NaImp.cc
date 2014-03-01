@@ -13,7 +13,7 @@
 #include "ImpNode.h"
 #include "ImpListRec3.h"
 #include "ImpValList.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

@@ -39,7 +39,7 @@ END_NONAMESPACE
 // @param[in] cond タイミング条件を表す式
 CiTiming::CiTiming(ymuint id,
 		   tCellTimingType type,
-		   const LogExpr& cond) :
+		   const Expr& cond) :
   mId(id),
   mType(type),
   mCond(cond)
@@ -68,7 +68,7 @@ CiTiming::type() const
 
 // @brief タイミング条件式の取得
 // @note ない場合には定数1の式が返される．
-LogExpr
+Expr
 CiTiming::timing_cond() const
 {
   return mCond;
@@ -213,7 +213,7 @@ CiTiming::dump_common(ODO& s,
 // @param[in] slope_fall 立ち下がりスロープ遅延
 CiTimingGP::CiTimingGP(ymuint id,
 		       tCellTimingType timing_type,
-		       const LogExpr& cond,
+		       const Expr& cond,
 		       CellTime intrinsic_rise,
 		       CellTime intrinsic_fall,
 		       CellTime slope_rise,
@@ -276,7 +276,7 @@ CiTimingGP::slope_fall() const
 // @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
 CiTimingGeneric::CiTimingGeneric(ymuint id,
 				 tCellTimingType timing_type,
-				 const LogExpr& cond,
+				 const Expr& cond,
 				 CellTime intrinsic_rise,
 				 CellTime intrinsic_fall,
 				 CellTime slope_rise,
@@ -341,7 +341,7 @@ CiTimingGeneric::dump(ODO& s) const
 // @param[in] slope_fall 立ち下がりスロープ遅延
 CiTimingPiecewise::CiTimingPiecewise(ymuint id,
 				     tCellTimingType timing_type,
-				     const LogExpr& cond,
+				     const Expr& cond,
 				     CellTime intrinsic_rise,
 				     CellTime intrinsic_fall,
 				     CellTime slope_rise,
@@ -419,7 +419,7 @@ CiTimingPiecewise::dump(ODO& s) const
 // @param[in] fall_transition 立ち下がり遷移遅延テーブル
 CiTimingLut1::CiTimingLut1(ymuint id,
 			   tCellTimingType timing_type,
-			   const LogExpr& cond,
+			   const Expr& cond,
 			   CellLut* cell_rise,
 			   CellLut* cell_fall,
 			   CellLut* rise_transition,
@@ -493,7 +493,7 @@ CiTimingLut1::dump(ODO& s) const
 // @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
 CiTimingLut2::CiTimingLut2(ymuint id,
 			   tCellTimingType timing_type,
-			   const LogExpr& cond,
+			   const Expr& cond,
 			   CellLut* rise_transition,
 			   CellLut* fall_transition,
 			   CellLut* rise_propagation,

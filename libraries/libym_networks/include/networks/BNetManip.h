@@ -203,7 +203,7 @@ public:
   /// ただし，簡単化しているわけではないので，冗長な場合もある．
   bool
   change_logic(BNode* node,
-	       const LogExpr& expr,
+	       const Expr& expr,
 	       const BNodeVector& fanins,
 	       bool tfo_check = true);
 
@@ -217,7 +217,7 @@ public:
   ///  - 論理式中に現われる変数の数とファンイン数が異なる場合
   bool
   change_logic(BNode* node,
-	       const LogExpr& expr);
+	       const Expr& expr);
 
   /// @brief latch ノードの変更
   /// @param[in] node 対象のノード

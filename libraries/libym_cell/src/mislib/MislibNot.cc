@@ -52,7 +52,7 @@ MislibNot::child1() const
 
 // @brief 対応する論理式を生成する．
 // @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
-LogExpr
+Expr
 MislibNot::to_expr(const NameMap& name_map) const
 {
   return ~child1()->to_expr(name_map);

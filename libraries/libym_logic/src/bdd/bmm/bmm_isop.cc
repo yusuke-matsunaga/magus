@@ -16,8 +16,8 @@ BEGIN_NAMESPACE_YM_BDD
 BEGIN_NONAMESPACE
 
 // cov を積和形論理式と見なして各キューブにリテラルを追加する
-LogExpr
-sop_litand(const LogExpr& cov,
+Expr
+sop_litand(const Expr& cov,
 	   VarId varid,
 	   bool inv)
 {
@@ -26,7 +26,7 @@ sop_litand(const LogExpr& cov,
     return cov;
   }
 
-  LogExpr lit = LogExpr::make_literal(varid, inv);
+  Expr lit = Expr::make_literal(varid, inv);
   if ( cov.is_one() ) {
     // 1なら lit を返せばよい
     return lit;
@@ -39,9 +39,9 @@ sop_litand(const LogExpr& cov,
 
   // あとはカバーの場合のみ
   ymuint n = cov.child_num();
-  LogExpr ans = LogExpr::make_zero();
+  Expr ans = Expr::make_zero();
   for (ymuint i = 0; i < n; i ++) {
-    LogExpr child = cov.child(i);
+    Expr child = cov.child(i);
     ans |= child & lit;
   }
   return ans;
@@ -55,7 +55,7 @@ END_NONAMESPACE
 BddEdge
 BddMgrModern::isop(BddEdge l,
 		   BddEdge u,
-		   LogExpr& cover)
+		   Expr& cover)
 {
   if ( l.is_error() || u.is_error() ) {
     return BddEdge::make_error();
@@ -70,15 +70,15 @@ BddMgrModern::isop(BddEdge l,
 
 // l と u をそれぞれ下限,上限した不完全指定論理関数
 // のすべての prime implicants からなる prime cover を求める．
-LogExpr
+Expr
 BddMgrModern::prime_cover(BddEdge l,
 			  BddEdge u)
 {
   if ( l.is_invalid() || u.is_invalid() ) {
-    return LogExpr();
+    return Expr();
   }
 
-  LogExpr cover;
+  Expr cover;
   (void) pc_step(l, u, cover);
   mPcTable->clear();
   return cover;
@@ -132,17 +132,17 @@ BddMgrModern::minimal_support(BddEdge l,
 BddEdge
 BddMgrModern::isop_step(BddEdge l,
 			BddEdge u,
-			LogExpr& cov)
+			Expr& cov)
 {
   if ( l.is_zero() ) {
     // 0 がもっとも簡単な答え
-    cov = LogExpr::make_zero();
+    cov = Expr::make_zero();
     return BddEdge::make_zero();
   }
 
   if ( u.is_one() ) {
     // 1 がもっとも簡単な答え
-    cov = LogExpr::make_one();
+    cov = Expr::make_one();
     return BddEdge::make_one();
   }
 
@@ -156,13 +156,13 @@ BddMgrModern::isop_step(BddEdge l,
     BddEdge var_edge = new_node(level, BddEdge::make_zero(), BddEdge::make_one());
     VarId vid = varid(level);
     BddEdge z_0 = and_op(l_0, ~u_1);
-    LogExpr p_0;
+    Expr p_0;
     BddEdge c_0 = isop_step(z_0, u_0, p_0);
     BddEdge cc_0 = and_op(c_0, ~var_edge);
     p_0 = sop_litand(p_0, vid, true);
 
     BddEdge z_1 = and_op(l_1, ~u_0);
-    LogExpr p_1;
+    Expr p_1;
     BddEdge c_1 = isop_step(z_1, u_1, p_1);
     BddEdge cc_1 = and_op(c_1, var_edge);
     p_1 = sop_litand(p_1, vid, false);
@@ -171,7 +171,7 @@ BddMgrModern::isop_step(BddEdge l,
     BddEdge h_02 = and_op(l_1, ~c_1);
     BddEdge h_0  = or_op(h_01, h_02);
     BddEdge h_1  = and_op(u_0, u_1);
-    LogExpr p_2;
+    Expr p_2;
     BddEdge r_0 = isop_step(h_0, h_1, p_2);
 
     result = or_op(or_op(cc_0, cc_1), r_0);
@@ -186,17 +186,17 @@ BddMgrModern::isop_step(BddEdge l,
 BddEdge
 BddMgrModern::pc_step(BddEdge l,
 		      BddEdge u,
-		      LogExpr& cov)
+		      Expr& cov)
 {
   if ( l.is_zero() ) {
     // 0 がもっとも簡単な答え
-    cov = LogExpr::make_zero();
+    cov = Expr::make_zero();
     return BddEdge::make_zero();
   }
 
   if ( u.is_one() ) {
     // 1 がもっとも簡単な答え
-    cov = LogExpr::make_one();
+    cov = Expr::make_one();
     return BddEdge::make_one();
   }
 
@@ -212,14 +212,14 @@ BddMgrModern::pc_step(BddEdge l,
 
     // \bar{x} を含む prime implicants の生成
     BddEdge z_0 = and_op(l_0, ~u_1);
-    LogExpr p_0;
+    Expr p_0;
     BddEdge c_0 = pc_step(z_0, u_0, p_0);
     BddEdge cc_0 = and_op(c_0, ~var_edge);
     p_0 = sop_litand(p_0, vid, true);
 
     // x を含む prime implicatns の生成
     BddEdge z_1 = and_op(l_1, ~u_0);
-    LogExpr p_1;
+    Expr p_1;
     BddEdge c_1 = pc_step(z_1, u_1, p_1);
     BddEdge cc_1 = and_op(c_1, var_edge);
     p_1 = sop_litand(p_1, vid, false);
@@ -229,7 +229,7 @@ BddMgrModern::pc_step(BddEdge l,
     BddEdge h_02 = and_op(l_1, ~c_1);
     BddEdge h_0  = or_op(h_01, h_02);
     BddEdge h_1  = and_op(u_0, u_1);
-    LogExpr p_2;
+    Expr p_2;
     BddEdge r_0 = pc_step(h_0, h_1, p_2);
 
     result = or_op(or_op(cc_0, cc_1), r_0);

@@ -54,7 +54,7 @@ Literal
 GvarInputLiteral::operator[](ymuint pos) const
 {
   const TpgNode* inode = mNode->fanin(pos);
-  return Literal(inode->gvar(), kPolPosi);
+  return Literal(inode->gvar(), false);
 }
 
 // @brief 入力数を返す．
@@ -80,7 +80,7 @@ Literal
 FvarInputLiteral::operator[](ymuint pos) const
 {
   const TpgNode* inode = mNode->fanin(pos);
-  return Literal(inode->fvar(), kPolPosi);
+  return Literal(inode->fvar(), false);
 }
 
 // @brief 入力数を返す．

@@ -13,16 +13,16 @@
 #error "<popt.h> not found."
 #endif
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnIscas89Reader.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnBlifReader.h"
+#include "networks/BdnIscas89Reader.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
-#include "ym_utils/RandGen.h"
+#include "utils/RandGen.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 #include "LsimNaive.h"
 #include "LsimNaive2.h"
@@ -57,7 +57,7 @@ read_name(istream& s)
 
 bool
 read_order(const char* filename,
-	   hash_map<string, ymuint>& order_map)
+	   unordered_map<string, ymuint>& order_map)
 {
   ifstream fs;
 
@@ -83,7 +83,7 @@ void
 do_lsim(Lsim& lsim,
 	ymuint nloop,
 	BdnMgr& network,
-	hash_map<string, ymuint>& order_map)
+	unordered_map<string, ymuint>& order_map)
 {
   StopWatch sw;
   sw.start();
@@ -148,7 +148,7 @@ lsim(const string& filename,
     }
   }
 
-  hash_map<string, ymuint> order_map;
+  unordered_map<string, ymuint> order_map;
   if ( order_file ) {
     if ( !read_order(order_file, order_map) ) {
       cerr << "Error in reading " << order_file << endl;

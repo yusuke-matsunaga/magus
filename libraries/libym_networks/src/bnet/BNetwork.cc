@@ -366,7 +366,7 @@ BNetwork::lexp_simplify_node(BNode* node)
     return;
   }
 
-  LogExpr expr = node->func();
+  Expr expr = node->func();
   expr.simplify();
   if ( expr.litnum() != node->func().litnum() ) {
     BNetManip manip(this);
@@ -819,7 +819,7 @@ BNetwork::change_edge_fanin(BNodeEdge* edge,
 // ノードの論理式をセットする．
 void
 BNetwork::set_node_func(BNode* node,
-			const LogExpr& lexp)
+			const Expr& lexp)
 {
   if ( node->parent() != this ) {
     // 他のネットワークのノードなのでエラー

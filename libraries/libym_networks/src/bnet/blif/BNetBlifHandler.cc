@@ -112,51 +112,51 @@ BNetBlifHandler::names(ymuint32 onode_id,
 
   ymuint ni = inode_id_array.size();
 
-  LogExpr expr;
+  Expr expr;
   if ( opat == '1' ) {
     if ( ni == 0 ) {
-      expr = LogExpr::make_one();
+      expr = Expr::make_one();
     }
     else {
-      vector<LogExpr> or_expr;
+      vector<Expr> or_expr;
       for (ymuint32 c = 0; c < nc; ++ c) {
-	vector<LogExpr> and_expr;
+	vector<Expr> and_expr;
 	for (ymuint32 i = 0; i < ni; ++ i) {
 	  VarId var(i);
 	  char v = cover_pat[c * ni + i];
 	  if ( v == '0' ) {
-	    and_expr.push_back(LogExpr::make_negaliteral(var));
+	    and_expr.push_back(Expr::make_negaliteral(var));
 	  }
 	  else if ( v == '1' ) {
-	    and_expr.push_back(LogExpr::make_posiliteral(var));
+	    and_expr.push_back(Expr::make_posiliteral(var));
 	  }
 	}
-	or_expr.push_back(LogExpr::make_and(and_expr));
+	or_expr.push_back(Expr::make_and(and_expr));
       }
-      expr = LogExpr::make_or(or_expr);
+      expr = Expr::make_or(or_expr);
     }
   }
   else {
     if ( ni == 0 ) {
-      expr = LogExpr::make_zero();
+      expr = Expr::make_zero();
     }
     else {
-      vector<LogExpr> or_expr;
+      vector<Expr> or_expr;
       for (ymuint32 c = 0; c < nc; ++ c) {
-	vector<LogExpr> and_expr;
+	vector<Expr> and_expr;
 	for (ymuint32 i = 0; i < ni; ++ i) {
 	  VarId var(i);
 	  char v = cover_pat[c * ni + i];
 	  if ( v == '0' ) {
-	    and_expr.push_back(LogExpr::make_posiliteral(var));
+	    and_expr.push_back(Expr::make_posiliteral(var));
 	  }
 	  else if ( v == '1' ) {
-	    and_expr.push_back(LogExpr::make_negaliteral(var));
+	    and_expr.push_back(Expr::make_negaliteral(var));
 	  }
 	}
-	or_expr.push_back(LogExpr::make_or(and_expr));
+	or_expr.push_back(Expr::make_or(and_expr));
       }
-      expr = LogExpr::make_and(or_expr);
+      expr = Expr::make_and(or_expr);
     }
   }
   BNodeVector fanins(ni);
@@ -179,7 +179,7 @@ BNetBlifHandler::gate(ymuint32 onode_id,
 		      const vector<ymuint32>& inode_id_array,
 		      const Cell* cell)
 {
-  LogExpr expr = cell->logic_expr(0);
+  Expr expr = cell->logic_expr(0);
   BNode* onode = get_node(onode_id);
   ymuint ni = inode_id_array.size();
   BNodeVector fanins(ni);

@@ -10,8 +10,8 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/Bdd.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "logic/Bdd.h"
+#include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM

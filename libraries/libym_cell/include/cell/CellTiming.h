@@ -12,7 +12,7 @@
 #include "cell/cell_nsdef.h"
 #include "cell/CellTime.h"
 #include "cell/CellResistance.h"
-#include "logic/LogExpr.h"
+#include "logic/expr_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -52,7 +52,7 @@ public:
   /// @brief タイミング条件式の取得
   /// @note ない場合には定数1の式が返される．
   virtual
-  LogExpr
+  Expr
   timing_cond() const = 0;
 
 

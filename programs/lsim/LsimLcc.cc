@@ -8,7 +8,7 @@
 
 
 #include "LsimLcc.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -32,7 +32,7 @@ LsimLcc::~LsimLcc()
 // @param[in] order_map 順序マップ
 void
 LsimLcc::set_network(const BdnMgr& bdn,
-		     const hash_map<string, ymuint>& order_map)
+		     const unordered_map<string, ymuint>& order_map)
 {
   vector<const BdnNode*> node_list;
   bdn.sort(node_list);

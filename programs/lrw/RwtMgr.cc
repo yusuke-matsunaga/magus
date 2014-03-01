@@ -37,7 +37,7 @@ BEGIN_NONAMESPACE
 
 ymuint
 count_sub(RwtNode* node,
-	  hash_set<ymuint>& node_hash)
+	  unordered_set<ymuint>& node_hash)
 {
   if ( node_hash.count(node->id()) > 0 ) {
     return 0;
@@ -60,7 +60,7 @@ ymuint
 count_volume(RwtNode* node0,
 	     RwtNode* node1)
 {
-  hash_set<ymuint> node_hash;
+  unordered_set<ymuint> node_hash;
   ymuint v0 = count_sub(node0, node_hash);
   ymuint v1 = count_sub(node1, node_hash);
   return v0 + v1;
@@ -189,7 +189,7 @@ RwtMgr::set_node(ymuint id,
 RwtNode*
 RwtMgr::find_node(ymuint16 func) const
 {
-  hash_map<ymuint16, RwtNode*>::const_iterator p = mFuncHash.find(func);
+  unordered_map<ymuint16, RwtNode*>::const_iterator p = mFuncHash.find(func);
   if ( p == mFuncHash.end() ) {
     return NULL;
   }
@@ -216,7 +216,7 @@ RwtMgr::node(ymuint pos) const
 void
 RwtMgr::dump(ostream& s) const
 {
-  for (hash_map<ymuint16, RwtNode*>::const_iterator p = mFuncHash.begin();
+  for (unordered_map<ymuint16, RwtNode*>::const_iterator p = mFuncHash.begin();
        p != mFuncHash.end(); ++ p) {
     ymuint16 func = p->first;
     RwtNode* node = p->second;

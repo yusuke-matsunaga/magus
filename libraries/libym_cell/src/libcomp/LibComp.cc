@@ -15,7 +15,7 @@
 #include "cell/CellLibrary.h"
 #include "cell/Cell.h"
 #include "cell/CellPin.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/NpnMap.h"
 
 
@@ -24,22 +24,22 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 BEGIN_NONAMESPACE
 
 // 論理式の変数を map にしたがって変換する．
-LogExpr
-xform_expr(const LogExpr& expr,
+Expr
+xform_expr(const Expr& expr,
 	   const NpnMapM& map)
 {
   ymuint ni = map.input_num();
   ymuint no = map.output_num();
   assert_cond( no == 1, __FILE__, __LINE__);
-  VarLogExprMap vlm;
+  VarExprMap vlm;
   for (ymuint i = 0; i < ni; ++ i) {
     VarId src_var(i);
     NpnVmap imap = map.imap(src_var);
     VarId dst_var = imap.var();
-    LogExpr expr = LogExpr::make_literal(dst_var, imap.inv());
+    Expr expr = Expr::make_literal(dst_var, imap.inv());
     vlm.insert(make_pair(src_var, expr));
   }
-  LogExpr cexpr = expr.compose(vlm);
+  Expr cexpr = expr.compose(vlm);
   if ( map.omap(VarId(0)).inv() ) {
     cexpr = ~cexpr;
   }
@@ -116,40 +116,40 @@ LibComp::compile(CellLibrary& library)
 
   // AND2 〜 AND8 のパタンを登録しておく．
   for (ymuint ni = 2; ni <= 8; ++ ni) {
-    LogExpr and_expr = LogExpr::make_posiliteral(VarId(0));
+    Expr and_expr = Expr::make_posiliteral(VarId(0));
     for (ymuint i = 1; i < ni; ++ i) {
-      and_expr &= LogExpr::make_posiliteral(VarId(i));
+      and_expr &= Expr::make_posiliteral(VarId(i));
     }
     reg_expr(and_expr, true);
   }
 
   // XOR2 〜 XOR4 のパタンを登録しておく．
   for (ymuint ni = 2; ni <= 4; ++ ni) {
-    LogExpr xor_expr = LogExpr::make_posiliteral(VarId(0));
+    Expr xor_expr = Expr::make_posiliteral(VarId(0));
     for (ymuint i = 1; i < ni; ++ i) {
-      xor_expr ^= LogExpr::make_posiliteral(VarId(i));
+      xor_expr ^= Expr::make_posiliteral(VarId(i));
     }
     reg_expr(xor_expr, true);
   }
 
   // MUX2 のパタンを登録しておく．
   {
-    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
-    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
-    LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
-    LogExpr mux2_ex = lit0 & ~lit2 | lit1 & lit2;
+    Expr lit0 = Expr::make_posiliteral(VarId(0));
+    Expr lit1 = Expr::make_posiliteral(VarId(1));
+    Expr lit2 = Expr::make_posiliteral(VarId(2));
+    Expr mux2_ex = lit0 & ~lit2 | lit1 & lit2;
     reg_expr(mux2_ex, true);
   }
 
   // MUX4 のパタンを登録しておく．
   {
-    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
-    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
-    LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
-    LogExpr lit3 = LogExpr::make_posiliteral(VarId(3));
-    LogExpr lit4 = LogExpr::make_posiliteral(VarId(4));
-    LogExpr lit5 = LogExpr::make_posiliteral(VarId(5));
-    LogExpr mux4_ex =
+    Expr lit0 = Expr::make_posiliteral(VarId(0));
+    Expr lit1 = Expr::make_posiliteral(VarId(1));
+    Expr lit2 = Expr::make_posiliteral(VarId(2));
+    Expr lit3 = Expr::make_posiliteral(VarId(3));
+    Expr lit4 = Expr::make_posiliteral(VarId(4));
+    Expr lit5 = Expr::make_posiliteral(VarId(5));
+    Expr mux4_ex =
       lit0 & ~lit4 & ~lit5 |
       lit1 &  lit4 & ~lit5 |
       lit2 & ~lit4 &  lit5 |
@@ -159,18 +159,18 @@ LibComp::compile(CellLibrary& library)
 
   // MUX8 のパタンを登録しておく．
   if ( 0 ) {
-    LogExpr lit0 = LogExpr::make_posiliteral(VarId(0));
-    LogExpr lit1 = LogExpr::make_posiliteral(VarId(1));
-    LogExpr lit2 = LogExpr::make_posiliteral(VarId(2));
-    LogExpr lit3 = LogExpr::make_posiliteral(VarId(3));
-    LogExpr lit4 = LogExpr::make_posiliteral(VarId(4));
-    LogExpr lit5 = LogExpr::make_posiliteral(VarId(5));
-    LogExpr lit6 = LogExpr::make_posiliteral(VarId(6));
-    LogExpr lit7 = LogExpr::make_posiliteral(VarId(7));
-    LogExpr lit8 = LogExpr::make_posiliteral(VarId(8));
-    LogExpr lit9 = LogExpr::make_posiliteral(VarId(9));
-    LogExpr lit10 = LogExpr::make_posiliteral(VarId(10));
-    LogExpr mux8_ex =
+    Expr lit0 = Expr::make_posiliteral(VarId(0));
+    Expr lit1 = Expr::make_posiliteral(VarId(1));
+    Expr lit2 = Expr::make_posiliteral(VarId(2));
+    Expr lit3 = Expr::make_posiliteral(VarId(3));
+    Expr lit4 = Expr::make_posiliteral(VarId(4));
+    Expr lit5 = Expr::make_posiliteral(VarId(5));
+    Expr lit6 = Expr::make_posiliteral(VarId(6));
+    Expr lit7 = Expr::make_posiliteral(VarId(7));
+    Expr lit8 = Expr::make_posiliteral(VarId(8));
+    Expr lit9 = Expr::make_posiliteral(VarId(9));
+    Expr lit10 = Expr::make_posiliteral(VarId(10));
+    Expr mux8_ex =
       lit0 & ~lit8 & ~lit9 & ~lit10 |
       lit1 &  lit8 & ~lit9 & ~lit10 |
       lit2 & ~lit8 &  lit9 & ~lit10 |
@@ -204,7 +204,7 @@ LibComp::compile(CellLibrary& library)
 	continue;
       }
 
-      LogExpr expr = cell->logic_expr(0);
+      Expr expr = cell->logic_expr(0);
       reg_expr(expr, false);
     }
     else if ( cell->is_ff() ) {
@@ -292,7 +292,7 @@ LibComp::latch_class(ymuint id) const
 // @param[in] expr 論理式
 // @param[in] builtin 組み込みクラスの時 true にするフラグ
 void
-LibComp::reg_expr(const LogExpr& expr,
+LibComp::reg_expr(const Expr& expr,
 		  bool builtin)
 {
   // expr に対応する LcGroup を求める．
@@ -316,7 +316,7 @@ LibComp::reg_expr(const LogExpr& expr,
   }
 
   // expr を変換したパタンを登録する．
-  LogExpr cexpr = xform_expr(expr, fgroup->map());
+  Expr cexpr = xform_expr(expr, fgroup->map());
   assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
 
   if ( ni <= 8 ) {

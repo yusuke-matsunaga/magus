@@ -328,7 +328,7 @@ test_bddlist(BddMgr& bddmgr)
   return stat;
 }
 
-// LogExpr や文字列からBDDを作る関数の検査
+// Expr や文字列からBDDを作る関数の検査
 bool
 test_make_bdd(BddMgr& bddmgr)
 {
@@ -337,16 +337,16 @@ test_make_bdd(BddMgr& bddmgr)
   bool stat = true;
 
   {
-    LogExpr expr1 = LogExpr::make_posiliteral(VarId(0)) & LogExpr::make_negaliteral(VarId(1));
+    Expr expr1 = Expr::make_posiliteral(VarId(0)) & Expr::make_negaliteral(VarId(1));
     Bdd bdd1 = bddmgr.expr_to_bdd(expr1);
     if ( !check_bddv(bddmgr, bdd1, "0 & ~1", "0, 1|0010" ) ) {
       stat = false;
     }
   }
 
-  LogExpr expr1 =
-    (LogExpr::make_posiliteral(VarId(0)) & LogExpr::make_negaliteral(VarId(1))) |
-    (LogExpr::make_posiliteral(VarId(2)) & LogExpr::make_posiliteral(VarId(1)));
+  Expr expr1 =
+    (Expr::make_posiliteral(VarId(0)) & Expr::make_negaliteral(VarId(1))) |
+    (Expr::make_posiliteral(VarId(2)) & Expr::make_posiliteral(VarId(1)));
   Bdd bdd1 = bddmgr.expr_to_bdd(expr1);
   if ( !check_bddv(bddmgr, bdd1, "0 & ~1 | 2 & 1", "0, 1, 2|00011101" ) ) {
     stat = false;
@@ -557,14 +557,14 @@ test_isop(BddMgr& bddmgr)
   Bdd bdd1 = str2bdd(bddmgr, "0 & 1 & 2 | ~0 & 1 & 3 | ~1 & ~2 & ~3");
 
   Bdd bdd2 = str2bdd(bddmgr, str);
-  LogExpr cover1;
+  Expr cover1;
   Bdd bdd3 = isop(bdd1, bdd2, cover1);
   if ( !check_bdde(bddmgr, bdd3, "isop(bdd1, bdd2, cover1)",
 		   "0 & 2 | 1 & 3 | ~1 & ~3") ) {
     stat = false;
   }
 
-  LogExpr ans_cover1 = prime_cover(bdd1, bdd2);
+  Expr ans_cover1 = prime_cover(bdd1, bdd2);
   Bdd bdd6 = bddmgr.expr_to_bdd(ans_cover1);
   if ( !check_bdde(bddmgr, bdd6, "prime_cover(bdd1, bdd2)",
 		   "0 & 2 | 1 & 3 | ~1 & ~3") ) {

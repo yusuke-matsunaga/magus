@@ -8,8 +8,8 @@
 
 
 #include "LsimBdd3.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -34,14 +34,14 @@ BEGIN_NONAMESPACE
 
 void
 put_bdd(Bdd bdd,
-	hash_map<Bdd, ymuint32>& idmap,
+	unordered_map<Bdd, ymuint32>& idmap,
 	vector<Bdd>& bdd_array)
 {
   if ( bdd.is_const() ) {
     return;
   }
 
-  hash_map<Bdd, ymuint32>::iterator p = idmap.find(bdd);
+  unordered_map<Bdd, ymuint32>::iterator p = idmap.find(bdd);
   if ( p == idmap.end() ) {
     ymuint id = bdd_array.size();
     bdd_array.push_back(bdd);
@@ -58,14 +58,14 @@ put_bdd(Bdd bdd,
 ymuint
 make_lut(Bdd bdd,
 	 const vector<ymuint>& cut_points,
-	 hash_map<Bdd, ymuint32>& lutmap,
+	 unordered_map<Bdd, ymuint32>& lutmap,
 	 ymuint& nlut);
 
 void
 make_lut_sub(Bdd bdd,
 	     const vector<ymuint>& cut_points,
 	     ymuint limit,
-	     hash_map<Bdd, ymuint32>& lutmap,
+	     unordered_map<Bdd, ymuint32>& lutmap,
 	     ymuint& nlut)
 {
   if ( bdd.is_leaf() ) {
@@ -88,11 +88,11 @@ make_lut_sub(Bdd bdd,
 ymuint
 make_lut(Bdd bdd,
 	 const vector<ymuint>& cut_points,
-	 hash_map<Bdd, ymuint32>& lutmap,
+	 unordered_map<Bdd, ymuint32>& lutmap,
 	 ymuint& nlut)
 {
   {
-    hash_map<Bdd, ymuint32>::iterator p = lutmap.find(bdd);
+    unordered_map<Bdd, ymuint32>::iterator p = lutmap.find(bdd);
     if ( p != lutmap.end() ) {
     return p->second;
     }
@@ -126,7 +126,7 @@ void
 make_lut2(Bdd bdd,
 	  const vector<ymuint>& cut_points,
 	  ymuint32* lut,
-	  const hash_map<Bdd, ymuint32>& lutmap)
+	  const unordered_map<Bdd, ymuint32>& lutmap)
 {
 #if 0
   Bdd bdd0;
@@ -143,7 +143,7 @@ make_lut2(Bdd bdd,
   if ( limit - base == 10 ) {
     for (ymuint b = 0U; b < 1024U; ++ b) {
       Bdd leaf = eval_bdd(bdd, base, p);
-      hash_map<Bdd, ymuint32>::const_iterator p = lutmap.find(leaf);
+      unordered_map<Bdd, ymuint32>::const_iterator p = lutmap.find(leaf);
       assert_cond( p != lutmap.end(), __FILE__, __LINE__);
     }
   }
@@ -159,7 +159,7 @@ END_NONAMESPACE
 // @param[in] order_map 順序マップ
 void
 LsimBdd3::set_network(const BdnMgr& bdn,
-		      const hash_map<string, ymuint>& order_map)
+		      const unordered_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
@@ -182,7 +182,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
       string name = node->port()->name();
-      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      unordered_map<string, ymuint>::const_iterator q = order_map.find(name);
       if ( q == order_map.end() ) {
 	cerr << "No map for " << name << endl;
 	abort();
@@ -230,7 +230,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
 
   mBddMgr.disable_gc();
 
-  hash_map<Bdd, ymuint32> idmap;
+  unordered_map<Bdd, ymuint32> idmap;
   vector<Bdd> bdd_array;
 
   const BdnNodeList& output_list = bdn.output_list();
@@ -238,7 +238,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
   vector<int> output_id;
   output_id.reserve(no);
 
-  hash_map<Bdd, ymuint32> lutmap;
+  unordered_map<Bdd, ymuint32> lutmap;
 
   vector<ymuint> cut_points;
   for (ymuint i = 0; i < ni; ) {
@@ -263,7 +263,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
     }
     put_bdd(bdd, idmap, bdd_array);
 
-    hash_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
+    unordered_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
     assert_cond( q != idmap.end(), __FILE__, __LINE__);
 
     output_id.push_back(q->second);
@@ -274,7 +274,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
 
   mLUT = new ymuint32[nlut * 1024];
 
-  for (hash_map<Bdd, ymuint32>::iterator p = lutmap.begin();
+  for (unordered_map<Bdd, ymuint32>::iterator p = lutmap.begin();
        p != lutmap.end(); ++ p) {
     Bdd bdd = p->first;
     ymuint32 addr = p->second;

@@ -18,7 +18,7 @@
 #include "cell/CellCapacitance.h"
 #include "cell/CellTime.h"
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/NpnMapM.h"
 
 

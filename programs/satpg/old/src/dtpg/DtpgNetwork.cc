@@ -69,7 +69,7 @@ struct Lt
 
 // 論理式から必要なノード数を数える．
 ymuint
-primitive_count(const LogExpr& expr)
+primitive_count(const Expr& expr)
 {
   if ( expr.is_posiliteral() ) {
     return 1;
@@ -81,7 +81,7 @@ primitive_count(const LogExpr& expr)
   ymuint n = 1;
   ymuint nc = expr.child_num();
   for (ymuint i = 0; i < nc; ++ i) {
-    LogExpr expr1 = expr.child(i);
+    Expr expr1 = expr.child(i);
     n += primitive_count(expr1);
   }
   return n;
@@ -154,7 +154,7 @@ DtpgNetwork::DtpgNetwork(const TgNetwork& tgnetwork,
     DtpgNode* node = make_node(id, tgnode);
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
-      LogExpr expr = tgnetwork.get_lexp(fid);
+      Expr expr = tgnetwork.get_lexp(fid);
       // プリミティブ数を数える．
       ymuint np = primitive_count(expr);
       node->mPrimitiveNum = np;
@@ -489,7 +489,7 @@ DtpgNetwork::make_node(ymuint id,
 // @param[inout] id プリミティブID
 // @note id は内部でインクリメントされる．
 DtpgPrimitive*
-DtpgNetwork::make_primitive(const LogExpr& expr,
+DtpgNetwork::make_primitive(const Expr& expr,
 			    const TgNode* tgnode,
 			    DtpgPrimitive* primitive_list,
 			    ymuint& id)
@@ -520,7 +520,7 @@ DtpgNetwork::make_primitive(const LogExpr& expr,
   vector<DtpgPrimitive*> fanin(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     // 子供の論理式に対するプリミティブを作る．
-    LogExpr expr1 = expr.child(i);
+    Expr expr1 = expr.child(i);
     DtpgPrimitive* inode = make_primitive(expr1, tgnode, primitive_list, id);
     fanin[i] = inode;
   }

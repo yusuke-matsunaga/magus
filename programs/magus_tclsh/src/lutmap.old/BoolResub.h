@@ -12,7 +12,7 @@
 
 #include <ym_utils/RandGen.h>
 #include <ym_utils/Alloc.h>
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 #include <ym_sat/sat_nsdef.h>
 
 #include "lutmap.h"
@@ -114,7 +114,7 @@ private:
   /// @param[in] ipos_end 入力リテラルの終了位置
   void
   make_cnf(SatSolver* solver,
-	   const LogExpr& lexp,
+	   const Expr& lexp,
 	   Literal output,
 	   const vector<Literal>& inputs);
 
@@ -132,7 +132,7 @@ private:
   
   /// @brief 真理値表から論理式を得る．
   static
-  LogExpr
+  Expr
   tv2expr(ymuint ni,
 	  const vector<int>& tv);
   

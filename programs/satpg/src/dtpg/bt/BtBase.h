@@ -208,7 +208,7 @@ BtBase::read_value(Literal lit,
 		   const vector<Bool3>& model)
 {
   Bool3 val = read_value(lit.varid(), model);
-  if ( lit.pol() == kPolNega ) {
+  if ( lit.is_negative() ) {
     val = ~val;
   }
   return val;

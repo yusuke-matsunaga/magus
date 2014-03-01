@@ -1,5 +1,5 @@
-#ifndef STDLEXPLUGIN_H
-#define STDLEXPLUGIN_H
+#ifndef STDEXPRLUGIN_H
+#define STDEXPRLUGIN_H
 
 /// @file StdLexPlugin.h
 /// @brief 標準のプラグインのヘッダファイル
@@ -148,4 +148,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // STDLEXPLUGIN_H
+#endif // STDEXPRLUGIN_H

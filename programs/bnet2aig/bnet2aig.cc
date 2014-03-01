@@ -7,21 +7,21 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetBlifReader.h"
-#include "ym_logic/AigMgr.h"
-#include "ym_logic/Aig.h"
+#include "networks/BNetwork.h"
+#include "networks/BNetBlifReader.h"
+#include "logic/AigMgr.h"
+#include "logic/Aig.h"
 
-//#include "ym_aig/AigSatMgr.h"
-//#include "ym_sat/SatSolver.h"
+//#include "aig/AigSatMgr.h"
+//#include "sat/SatSolver.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM
 
-typedef hash_map<BNode*, Aig> BNodeMap;
+typedef unordered_map<BNode*, Aig> BNodeMap;
 
 BEGIN_NONAMESPACE
 
@@ -63,7 +63,7 @@ bnet2aig(const BNetwork& network,
   for (size_t i = 0; i < nv; ++ i) {
     BNode* bnode = node_list[i];
     ymuint ni = bnode->fanin_num();
-    hash_map<VarId, Aig> input_map;
+    unordered_map<VarId, Aig> input_map;
     for (ymuint pos = 0; pos < ni; ++ pos) {
       Aig iaig = find_node(bnode->fanin(pos), assoc);
       input_map.insert(make_pair(VarId(pos), iaig));

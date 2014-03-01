@@ -8,8 +8,8 @@
 
 
 #include "LsimBdd2.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -61,7 +61,7 @@ END_NONAMESPACE
 // @param[in] order_map 順序マップ
 void
 LsimBdd2::set_network(const BdnMgr& bdn,
-		      const hash_map<string, ymuint>& order_map)
+		      const unordered_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
@@ -83,7 +83,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
       string name = node->port()->name();
-      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      unordered_map<string, ymuint>::const_iterator q = order_map.find(name);
       if ( q == order_map.end() ) {
 	cerr << "No order for " << name << endl;
 	abort();
@@ -131,7 +131,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 
   mBddMgr.disable_gc();
 
-  hash_map<Bdd, ympuint> node_map;
+  unordered_map<Bdd, ympuint> node_map;
 
   const BdnNodeList& output_list = bdn.output_list();
   ymuint no = output_list.size();
@@ -161,7 +161,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
 
 ympuint
 LsimBdd2::make_node(Bdd bdd,
-		    hash_map<Bdd, ympuint>& node_map)
+		    unordered_map<Bdd, ympuint>& node_map)
 {
   if ( bdd.is_zero() ) {
     return 0UL;
@@ -170,7 +170,7 @@ LsimBdd2::make_node(Bdd bdd,
     return 1UL;
   }
 
-  hash_map<Bdd, ympuint>::iterator p = node_map.find(bdd);
+  unordered_map<Bdd, ympuint>::iterator p = node_map.find(bdd);
   if ( p != node_map.end() ) {
     return p->second;
   }

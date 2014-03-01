@@ -74,7 +74,7 @@ struct Lt
 
 // 論理式から必要なプリミティブ数を数える．
 ymuint
-primitive_count(const LogExpr& expr)
+primitive_count(const Expr& expr)
 {
   if ( expr.is_posiliteral() ) {
     // 肯定のリテラルは入力プリミティブ1つ
@@ -93,7 +93,7 @@ primitive_count(const LogExpr& expr)
   // あとは子供の論理式に対するプリミティブ数を足し合わせる．
   ymuint nc = expr.child_num();
   for (ymuint i = 0; i < nc; ++ i) {
-    LogExpr expr1 = expr.child(i);
+    Expr expr1 = expr.child(i);
     n += primitive_count(expr1);
   }
 
@@ -203,7 +203,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     if ( tgnode->is_cplx_logic() ) {
       // 論理式をとってくる．
       ymuint fid = tgnode->func_id();
-      LogExpr expr = tgnetwork.get_lexp(fid);
+      Expr expr = tgnetwork.get_lexp(fid);
 
       // プリミティブ数を数え，必要なメモリ領域を確保する．
       ymuint np = primitive_count(expr);
@@ -539,7 +539,7 @@ TpgNetwork::make_node(ymuint id,
 // @param[inout] id プリミティブID
 // @note id は内部でインクリメントされる．
 TpgPrimitive*
-TpgNetwork::make_primitive(const LogExpr& expr,
+TpgNetwork::make_primitive(const Expr& expr,
 			   const TgNode* tgnode,
 			   TpgPrimitive* primitive_list,
 			   ymuint& id)
@@ -565,7 +565,7 @@ TpgNetwork::make_primitive(const LogExpr& expr,
   vector<TpgPrimitive*> fanin(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     // 子供の論理式に対するプリミティブを作る．
-    LogExpr expr1 = expr.child(i);
+    Expr expr1 = expr.child(i);
     TpgPrimitive* inode = make_primitive(expr1, tgnode, primitive_list, id);
     fanin[i] = inode;
   }

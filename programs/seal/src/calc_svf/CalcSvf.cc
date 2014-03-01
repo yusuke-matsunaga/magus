@@ -157,7 +157,7 @@ CalcSvf::set_network(const TgNetwork& network,
     // 出力の論理を表す SimNode を作る．
     SimNode* simnode = NULL;
     if ( tgnode->is_cplx_logic() ) {
-      LogExpr lexp = mNetwork->get_lexp(tgnode);
+      Expr lexp = mNetwork->get_lexp(tgnode);
       simnode = make_logic(lexp, inputs);
     }
     else {
@@ -224,7 +224,7 @@ CalcSvf::set_network(const TgNetwork& network,
       // 出力の論理を表す SimNode を作る．
       SimNode* simnode = NULL;
       if ( tgnode->is_cplx_logic() ) {
-	LogExpr lexp = mNetwork->get_lexp(tgnode);
+	Expr lexp = mNetwork->get_lexp(tgnode);
 	simnode = make_logic(lexp, inputs);
       }
       else {
@@ -586,7 +586,7 @@ CalcSvf::find_dss()
 
 // @brief logic ノードを作る．
 SimNode*
-CalcSvf::make_logic(const LogExpr& lexp,
+CalcSvf::make_logic(const Expr& lexp,
 		    const vector<SimNode*>& inputs)
 {
   SimNode* node = NULL;

@@ -8,7 +8,7 @@
 
 
 #include "GenPat.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -210,7 +210,7 @@ GenPat::operator()(ymuint slack)
   }
 #if 0
   {
-    hash_map<ymuint16, vector<GpHandle> > pat_list;
+    unordered_map<ymuint16, vector<GpHandle> > pat_list;
     vector<ymuint16> flist;
     for (ymuint i = 0; i < n1; ++ i) {
       GpHandle handle = src_list1[i];
@@ -224,7 +224,7 @@ GenPat::operator()(ymuint slack)
     }
     sort(flist.begin(), flist.end());
     for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
-      hash_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
+      unordered_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
       assert_cond( q != pat_list.end(), __FILE__, __LINE__);
       vector<GpHandle>& handle_list = q->second;
       cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
@@ -401,7 +401,7 @@ GenPat::add_pat(GpHandle handle,
     mGpList[level].push_back(chandle);
     mRepList[level].push_back(chandle);
 
-    hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+    unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(chandle.func());
     assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
     const vector<FuncXform>& xf_list = p->second;
@@ -452,14 +452,14 @@ GenPat::count1(GpHandle handle)
 ymuint
 GenPat::count2(GpHandle handle)
 {
-  hash_set<ymuint32> hash1;
+  unordered_set<ymuint32> hash1;
   return count2_sub(handle.node(), hash1);
 }
 
 // @brief count2 の下請け関数
 ymuint
 GenPat::count2_sub(GpNode* node,
-		   hash_set<ymuint32>& hash)
+		   unordered_set<ymuint32>& hash)
 {
   if ( node == NULL ) {
     return 0;
@@ -539,7 +539,7 @@ GenPat::init_npn4rep()
     ymuint32 fv = npn4rep[i];
 
     vector<FuncXform> tmp_list;
-    hash_set<ymuint32> func_hash;
+    unordered_set<ymuint32> func_hash;
     for (ymuint p = 0; p < 768; ++ p) {
       NpnXform xf(npn4perm[p]);
       ymuint16 fv1 = xform_func4(fv, xf);

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_logic/AigMgr.h"
+#include "logic/AigMgr.h"
 #include "AigTemplate.h"
 
 
@@ -81,7 +81,7 @@ private:
   AigTemplate aig4table[222];
 
   // NPN同値類の代表関数のパタンから aig4table の番号を得るためのハッシュ表
-  hash_map<ymuint32, ymuint8> npn4map;
+  unordered_map<ymuint32, ymuint8> npn4map;
 
   // ログレベル
   int mLogLevel;

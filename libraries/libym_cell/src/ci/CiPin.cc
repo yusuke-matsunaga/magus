@@ -118,10 +118,10 @@ CiPin::has_function() const
 }
 
 // @brief 機能を表す論理式を返す．
-LogExpr
+Expr
 CiPin::function() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief three_state 属性を持っているときに true を返す．
@@ -132,10 +132,10 @@ CiPin::has_three_state() const
 }
 
 // @brief three_state 論理式を返す．
-LogExpr
+Expr
 CiPin::three_state() const
 {
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // @brief 最大ファンアウト容量を返す．
@@ -299,8 +299,8 @@ CiInputPin::dump(ODO& s) const
 CiOutputPinBase::CiOutputPinBase(CiCell* cell,
 				 const ShString& name,
 				 bool has_logic,
-				 const LogExpr& logic_expr,
-				 const LogExpr& tristate_expr,
+				 const Expr& logic_expr,
+				 const Expr& tristate_expr,
 				 CellCapacitance max_fanout,
 				 CellCapacitance min_fanout,
 				 CellCapacitance max_capacitance,
@@ -349,7 +349,7 @@ CiOutputPinBase::has_function() const
 }
 
 // @brief 機能を表す論理式を返す．
-LogExpr
+Expr
 CiOutputPinBase::function() const
 {
   return mFunction;
@@ -363,7 +363,7 @@ CiOutputPinBase::has_three_state() const
 }
 
 // @brief three_state 論理式を返す．
-LogExpr
+Expr
 CiOutputPinBase::three_state() const
 {
   return mThreeState;
@@ -431,8 +431,8 @@ CiOutputPinBase::min_transition() const
 CiOutputPin::CiOutputPin(CiCell* cell,
 			 const ShString& name,
 			 bool has_logic,
-			 const LogExpr& logic_expr,
-			 const LogExpr& tristate_expr,
+			 const Expr& logic_expr,
+			 const Expr& tristate_expr,
 			 CellCapacitance max_fanout,
 			 CellCapacitance min_fanout,
 			 CellCapacitance max_capacitance,
@@ -504,8 +504,8 @@ CiOutputPin::dump(ODO& s) const
 CiInoutPin::CiInoutPin(CiCell* cell,
 		       const ShString& name,
 		       bool has_logic,
-		       const LogExpr& logic_expr,
-		       const LogExpr& tristate_expr,
+		       const Expr& logic_expr,
+		       const Expr& tristate_expr,
 		       CellCapacitance capacitance,
 		       CellCapacitance rise_capacitance,
 		       CellCapacitance fall_capacitance,

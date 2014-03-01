@@ -12,7 +12,7 @@
 #include "dtpg_nsdef.h"
 #include "SaFault.h"
 #include "ym_networks/tgnet.h"
-#include "ym_logic/lexp_nsdef.h"
+#include "ym_logic/expr_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -137,7 +137,7 @@ private:
 
   /// @brief 複雑な論理式に対応するプリミティブを作る．
   DtpgPrimitive*
-  make_primitive(const LogExpr& expr,
+  make_primitive(const Expr& expr,
 		 const TgNode* tgnode,
 		 DtpgPrimitive* primitive_list,
 		 ymuint& id);

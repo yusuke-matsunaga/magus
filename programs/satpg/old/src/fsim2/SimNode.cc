@@ -50,7 +50,7 @@ SimNode::new_input(ymuint32 id)
 SimNode*
 SimNode::new_node(ymuint32 id,
 		  tTgGateType type,
-		  const LogExpr& lexp,
+		  const Expr& lexp,
 		  const vector<SimNode*>& inputs)
 {
   SimNode* node = NULL;

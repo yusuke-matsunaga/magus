@@ -1,53 +1,53 @@
-#ifndef LEXPNODEPTR_H
-#define LEXPNODEPTR_H
+#ifndef EXPRNODEPTR_H
+#define EXPRNODEPTR_H
 
-/// @file LexpNodePtr.h
-/// @brief LexpNodePtr のヘッダファイル
+/// @file ExprNodePtr.h
+/// @brief ExprNodePtr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 //////////////////////////////////////////////////////////////////////
-/// @class LexpNodePtr LexpNode.h "LexpNode.h*
-/// @brief LexpNode 用のスマートポインタ
+/// @class ExprNodePtr ExprNode.h "ExprNode.h*
+/// @brief ExprNode 用のスマートポインタ
 //////////////////////////////////////////////////////////////////////
-class LexpNodePtr
+class ExprNodePtr
 {
-  friend class LexpNodePtrList;
+  friend class ExprNodePtrList;
 
 public:
 
   /// @brief コンストラクタ
   /// @param[in] ptr Cポインタ
-  LexpNodePtr(const LexpNode* ptr = NULL);
+  ExprNodePtr(const ExprNode* ptr = NULL);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
-  LexpNodePtr(const LexpNodePtr& src);
+  ExprNodePtr(const ExprNodePtr& src);
 
   /// @brief 代入演算子
   /// @param[in] src 代入元のオブジェクト
-  const LexpNodePtr&
-  operator=(const LexpNodePtr& src);
+  const ExprNodePtr&
+  operator=(const ExprNodePtr& src);
 
   /// @brief デストラクタ
-  ~LexpNodePtr();
+  ~ExprNodePtr();
 
 
 public:
 
   /// @brief 中身を取り出す演算子
-  operator const LexpNode*() const;
+  operator const ExprNode*() const;
 
   /// @brief 中身を取り出す演算子
-  const LexpNode*
+  const ExprNode*
   operator->() const;
 
 
@@ -57,14 +57,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際のポインタ
-  const LexpNode* mPtr;
+  const ExprNode* mPtr;
 
 };
 
-typedef vector<LexpNodePtr> LexpNodeList;
-typedef vector<LexpNodePtr>::iterator LexpNode_itr;
-typedef vector<LexpNodePtr>::const_iterator LexpNode_citr;
-typedef unordered_map<VarId, LexpNodePtr> VarLexpNodeMap;
+typedef vector<ExprNodePtr> ExprNodeList;
+typedef vector<ExprNodePtr>::iterator ExprNode_itr;
+typedef vector<ExprNodePtr>::const_iterator ExprNode_citr;
+typedef unordered_map<VarId, ExprNodePtr> VarExprNodeMap;
 
 
 
@@ -75,7 +75,7 @@ typedef unordered_map<VarId, LexpNodePtr> VarLexpNodeMap;
 // @brief コンストラクタ
 // @param[in] ptr Cポインタ
 inline
-LexpNodePtr::LexpNodePtr(const LexpNode* ptr) :
+ExprNodePtr::ExprNodePtr(const ExprNode* ptr) :
   mPtr(ptr)
 {
   if ( mPtr ) {
@@ -86,7 +86,7 @@ LexpNodePtr::LexpNodePtr(const LexpNode* ptr) :
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 inline
-LexpNodePtr::LexpNodePtr(const LexpNodePtr& src) :
+ExprNodePtr::ExprNodePtr(const ExprNodePtr& src) :
   mPtr(src.mPtr)
 {
   if ( mPtr ) {
@@ -97,8 +97,8 @@ LexpNodePtr::LexpNodePtr(const LexpNodePtr& src) :
 // @brief 代入演算子
 // @param[in] src 代入元のオブジェクト
 inline
-const LexpNodePtr&
-LexpNodePtr::operator=(const LexpNodePtr& src)
+const ExprNodePtr&
+ExprNodePtr::operator=(const ExprNodePtr& src)
 {
   if ( src.mPtr ) {
     src.mPtr->inc_ref();
@@ -112,7 +112,7 @@ LexpNodePtr::operator=(const LexpNodePtr& src)
 
 // @brief デストラクタ
 inline
-LexpNodePtr::~LexpNodePtr()
+ExprNodePtr::~ExprNodePtr()
 {
   if ( mPtr ) {
     mPtr->dec_ref();
@@ -121,19 +121,19 @@ LexpNodePtr::~LexpNodePtr()
 
 // @brief 中身を取り出す演算子
 inline
-LexpNodePtr::operator const LexpNode*() const
+ExprNodePtr::operator const ExprNode*() const
 {
   return mPtr;
 }
 
 // @brief 中身を取り出す演算子
 inline
-const LexpNode*
-LexpNodePtr::operator->() const
+const ExprNode*
+ExprNodePtr::operator->() const
 {
   return mPtr;
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
-#endif // LEXPNODEPTR_H
+#endif // EXPRNODEPTR_H

@@ -12,8 +12,8 @@
 #include "PhfNode.h"
 #include "PhfEdge.h"
 #include "FuncVect.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_utils/CombiGen.h"
+#include "logic/SatSolver.h"
+#include "utils/CombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

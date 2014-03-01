@@ -10,7 +10,7 @@
 
 
 #include "llvmeq_nsdef.h"
-#include "ym_logic/SatSolver.h"
+#include "logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ
@@ -54,12 +54,12 @@ public:
   /// @brief 関数を生成する．
   /// @param[in] name 関数名
   /// @param[in] arg_list 引数のリスト
-  /// @param[in] sym_flag 対称関数の時 true にするフラグ
-  /// @note sym_flag が true の時は arg_list の順番を正規化する．
+  /// @param[in] sflag 対称関数の時 true にするフラグ
+  /// @note sflag が true の時は arg_list の順番を正規化する．
   EufNode*
   new_function(const string& name,
 	       const vector<EufNode*>& arg_list,
-	       bool sym_flag = false);
+	       bool sflag = false);
 
   /// @brief 等価演算子を生成する．
   /// @param[in] left 左辺式

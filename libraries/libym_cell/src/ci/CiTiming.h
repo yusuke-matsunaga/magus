@@ -12,6 +12,7 @@
 #include "cell/CellTiming.h"
 #include "cell/CellTime.h"
 #include "cell/CellResistance.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL
@@ -33,7 +34,7 @@ protected:
   /// @param[in] cond タイミング条件を表す式
   CiTiming(ymuint id,
 	   tCellTimingType type,
-	   const LogExpr& cond);
+	   const Expr& cond);
 
   /// @brief デストラクタ
   ~CiTiming();
@@ -58,7 +59,7 @@ public:
   /// @brief タイミング条件式の取得
   /// @note ない場合には定数1の式が返される．
   virtual
-  LogExpr
+  Expr
   timing_cond() const;
 
 
@@ -191,7 +192,7 @@ private:
   tCellTimingType mType;
 
   // タイミング条件
-  LogExpr mCond;
+  Expr mCond;
 
 };
 
@@ -215,7 +216,7 @@ protected:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   CiTimingGP(ymuint id,
 	     tCellTimingType timing_type,
-	     const LogExpr& cond,
+	     const Expr& cond,
 	     CellTime intrinsic_rise,
 	     CellTime intrinsic_fall,
 	     CellTime slope_rise,
@@ -295,7 +296,7 @@ private:
   /// @param[in] fall_resistance 立ち下がり遷移遅延パラメータ
   CiTimingGeneric(ymuint id,
 		  tCellTimingType timing_type,
-		  const LogExpr& cond,
+		  const Expr& cond,
 		  CellTime intrinsic_rise,
 		  CellTime intrinsic_fall,
 		  CellTime slope_rise,
@@ -371,7 +372,7 @@ private:
   /// @param[in] slope_fall 立ち下がりスロープ遅延
   CiTimingPiecewise(ymuint id,
 		    tCellTimingType timing_type,
-		    const LogExpr& cond,
+		    const Expr& cond,
 		    CellTime intrinsic_rise,
 		    CellTime intrinsic_fall,
 		    CellTime slope_rise,
@@ -455,7 +456,7 @@ private:
   /// @param[in] cell_fall 立ち下がりセル遅延テーブル
   CiTimingLut1(ymuint id,
 	       tCellTimingType timing_type,
-	       const LogExpr& cond,
+	       const Expr& cond,
 	       CellLut* cell_rise,
 	       CellLut* cell_fall,
 	       CellLut* rise_transition,
@@ -546,7 +547,7 @@ private:
   /// @param[in] fall_propagation 立ち下がり伝搬遅延テーブル
   CiTimingLut2(ymuint id,
 	       tCellTimingType timing_type,
-	       const LogExpr& cond,
+	       const Expr& cond,
 	       CellLut* rise_transition,
 	       CellLut* fall_transition,
 	       CellLut* rise_propagation,

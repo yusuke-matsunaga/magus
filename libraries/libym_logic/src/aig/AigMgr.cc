@@ -223,8 +223,8 @@ AigMgr::make_xor(const list<Aig>& edge_list)
 // @param[in] expr 対象の論理式
 // @param[in] input_map 入力とAIGの対応表
 Aig
-AigMgr::make_logic(const LogExpr& expr,
-		     const VarAigMap& input_map)
+AigMgr::make_logic(const Expr& expr,
+		   const VarAigMap& input_map)
 {
   if ( expr.is_zero() ) {
     return make_zero();

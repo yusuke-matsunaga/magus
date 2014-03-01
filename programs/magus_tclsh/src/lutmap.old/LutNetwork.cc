@@ -160,7 +160,7 @@ LnGraph::copy(const LnGraph& src,
     LnNode* src_node = node_list[i];
     ymuint ni = src_node->ni();
     vector<LnNode*> dst_inputs(ni);
-    LogExpr expr = src_node->expr();
+    Expr expr = src_node->expr();
     vector<int> tv;
     for (ymuint j = 0; j < ni; ++ j) {
       LnNode* src_inode = src_node->fanin(j);
@@ -378,7 +378,7 @@ LnGraph::new_output(const string& name,
 LnNode*
 LnGraph::new_lut(const string& name,
 		 const vector<LnNode*>& inodes,
-		 const LogExpr& expr,
+		 const Expr& expr,
 		 const vector<int>& tv)
 {
   ymuint ni = inodes.size();
@@ -499,7 +499,7 @@ LnGraph::change_output(LnNode* node,
 void
 LnGraph::change_lut(LnNode* node,
 		    const vector<LnNode*>& inodes,
-		    const LogExpr& expr,
+		    const Expr& expr,
 		    const vector<int>& tv)
 {
   node->set_lut();

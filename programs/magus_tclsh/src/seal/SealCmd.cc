@@ -38,10 +38,10 @@ SealCmd::cmd_proc(TclObjVector& objv)
   BNetManip manip(&network);
 
   vector<BNode*> fanins;
-  LogExpr l0 = LogExpr::make_posiliteral(VarId(0));
-  LogExpr l1 = LogExpr::make_posiliteral(VarId(1));
-  LogExpr l2 = LogExpr::make_posiliteral(VarId(2));
-  LogExpr maj_exp = (l0 & l1) | (l1 & l2) | (l2 & l0);
+  Expr l0 = Expr::make_posiliteral(VarId(0));
+  Expr l1 = Expr::make_posiliteral(VarId(1));
+  Expr l2 = Expr::make_posiliteral(VarId(2));
+  Expr maj_exp = (l0 & l1) | (l1 & l2) | (l2 & l0);
   for (BNodeList::const_iterator p = network.outputs_begin();
        p != network.outputs_end(); ++ p) {
     // 外部出力
@@ -55,7 +55,7 @@ SealCmd::cmd_proc(TclObjVector& objv)
     for (size_t i = 0; i < ni; ++ i) {
       fanins[i] = ibnode->fanin(i);
     }
-    LogExpr lexp = ibnode->func();
+    Expr lexp = ibnode->func();
     BNode* ibnode0 = manip.new_logic();
     bool stat = manip.change_logic(ibnode0, lexp, fanins);
     assert_cond(stat, __FILE__, __LINE__);

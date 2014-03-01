@@ -47,36 +47,36 @@ add_fanin(BNetManip& manip,
     fanins[i] = onode->fanin(i);
   }
   fanins[ni] = new_node;
-  LogExpr expr = onode->func();
-  LogExpr new_expr;
+  Expr expr = onode->func();
+  Expr new_expr;
   if ( expr.is_posiliteral() ) {
     assert_cond(ipos == 0 && ni == 1, __FILE__, __LINE__);
-    new_expr = LogExpr::make_posiliteral(VarId(0)) &
-      LogExpr::make_posiliteral(VarId(1));
+    new_expr = Expr::make_posiliteral(VarId(0)) &
+      Expr::make_posiliteral(VarId(1));
   }
   else if ( expr.is_negaliteral() ) {
     assert_cond(ipos == 0 && ni == 1, __FILE__, __LINE__);
-    new_expr = LogExpr::make_negaliteral(VarId(0)) &
-      LogExpr::make_negaliteral(VarId(1));
+    new_expr = Expr::make_negaliteral(VarId(0)) &
+      Expr::make_negaliteral(VarId(1));
   }
   else if ( expr.is_and() ) {
     int phase = 0;
-    new_expr = LogExpr::make_one();
+    new_expr = Expr::make_one();
     for (ymuint i = 0; i < ni; ++ i) {
-      LogExpr i_expr = expr.child(i);
+      Expr i_expr = expr.child(i);
       if ( i_expr.is_posiliteral() ) {
 	if ( phase == -1 ) {
 	  return;
 	}
 	phase = 1;
-	new_expr &= LogExpr::make_posiliteral(VarId(i));
+	new_expr &= Expr::make_posiliteral(VarId(i));
       }
       else if ( i_expr.is_negaliteral() ) {
 	if ( phase == 1 ) {
 	  return;
 	}
 	phase = -1;
-	new_expr &= LogExpr::make_negaliteral(VarId(i));
+	new_expr &= Expr::make_negaliteral(VarId(i));
       }
       else {
 	return;
@@ -84,30 +84,30 @@ add_fanin(BNetManip& manip,
     }
     assert_cond( phase != 0 , __FILE__, __LINE__);
     if ( phase > 0 ) {
-      new_expr &= LogExpr::make_posiliteral(VarId(ni));
+      new_expr &= Expr::make_posiliteral(VarId(ni));
     }
     else {
-      new_expr &= LogExpr::make_negaliteral(VarId(ni));
+      new_expr &= Expr::make_negaliteral(VarId(ni));
     }
   }
   else if ( expr.is_or() ) {
     int phase = 0;
-    new_expr = LogExpr::make_zero();
+    new_expr = Expr::make_zero();
     for (ymuint i = 0; i < ni; ++ i) {
-      LogExpr i_expr = expr.child(i);
+      Expr i_expr = expr.child(i);
       if ( i_expr.is_posiliteral() ) {
 	if ( phase == -1 ) {
 	  return;
 	}
 	phase = 1;
-	new_expr |= LogExpr::make_posiliteral(VarId(i));
+	new_expr |= Expr::make_posiliteral(VarId(i));
       }
       else if ( i_expr.is_negaliteral() ) {
 	if ( phase == 1 ) {
 	  return;
 	}
 	phase = -1;
-	new_expr |= LogExpr::make_negaliteral(VarId(i));
+	new_expr |= Expr::make_negaliteral(VarId(i));
       }
       else {
 	return;
@@ -115,10 +115,10 @@ add_fanin(BNetManip& manip,
     }
     assert_cond( phase != 0 , __FILE__, __LINE__);
     if ( phase > 0 ) {
-      new_expr |= LogExpr::make_posiliteral(VarId(ni));
+      new_expr |= Expr::make_posiliteral(VarId(ni));
     }
     else {
-      new_expr |= LogExpr::make_negaliteral(VarId(ni));
+      new_expr |= Expr::make_negaliteral(VarId(ni));
     }
   }
   else {
@@ -178,7 +178,7 @@ DupCmd::cmd_proc(TclObjVector& objv)
     for (ymuint i = 0; i < ni; ++ i) {
       fanins[i] = node->fanin(i);
     }
-    LogExpr lexp = node->func();
+    Expr lexp = node->func();
 
     // node の複製を作る．
     BNode* node1 = manip.new_logic();

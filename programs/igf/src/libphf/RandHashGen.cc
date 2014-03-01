@@ -9,7 +9,7 @@
 
 #include "RandHashGen.h"
 #include "XorFunc.h"
-#include "ym_utils/RandCombiGen.h"
+#include "utils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

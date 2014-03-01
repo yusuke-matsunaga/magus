@@ -16,7 +16,7 @@
 // インポートするテストグループをここに列挙する．
 //////////////////////////////////////////////////////////////////////
 
-IMPORT_TEST_GROUP(libym_logic_LogExprTestGroup);
+IMPORT_TEST_GROUP(libym_logic_ExprTestGroup);
 IMPORT_TEST_GROUP(libym_logic_SmtSolverTestGroup);
 IMPORT_TEST_GROUP(libym_logic_IdMgrTestGroup);
 IMPORT_TEST_GROUP(libym_logic_NameMgrTestGroup);

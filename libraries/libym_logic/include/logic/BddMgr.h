@@ -12,7 +12,7 @@
 
 #include "logic/bdd_nsdef.h"
 #include "logic/VarId.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/Binder.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
@@ -186,7 +186,7 @@ public:
   /// への写像を表す．
   /// varmap に登録されていない場合には恒等変換だと思う．
   Bdd
-  expr_to_bdd(const LogExpr& expr,
+  expr_to_bdd(const Expr& expr,
 	      const VarVarMap& varmap = VarVarMap());
 
   /// @brief 論理式からBDDを作る(compose版)．
@@ -197,7 +197,7 @@ public:
   /// 写像を表す．
   /// map に登録されていない場合には恒等変換だと思う．
   Bdd
-  expr_to_bdd(const LogExpr& expr,
+  expr_to_bdd(const Expr& expr,
 	      const VarBddMap& varmap);
 
   /// @brief ストリームを論理式と見なしてBDDを作る．

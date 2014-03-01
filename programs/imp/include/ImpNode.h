@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_logic/Bool3.h"
+#include "networks/BdnMgr.h"
+#include "logic/Bool3.h"
 #include "ImpInfo.h"
 #include "ImpDst.h"
 #include "ImpVal.h"

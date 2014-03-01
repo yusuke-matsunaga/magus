@@ -182,7 +182,7 @@ make_cnf_from_type(SatSolver& solver,
 /// @param[in] inputs 入力リテラル
 void
 make_cnf_from_lexp(SatSolver& solver,
-		   const LogExpr& lexp,
+		   const Expr& lexp,
 		   Literal output,
 		   const vector<Literal>& inputs)
 {
@@ -194,7 +194,7 @@ make_cnf_from_lexp(SatSolver& solver,
   ymuint nc = lexp.child_num();
   vector<Literal> local_inputs(nc);
   for (ymuint i = 0; i < nc; ++ i) {
-    LogExpr lexp1 = lexp.child(i);
+    Expr lexp1 = lexp.child(i);
     if ( lexp1.is_posiliteral() ) {
       local_inputs[i] = inputs[lexp1.varid().val()];
     }
@@ -266,7 +266,7 @@ make_node_cnf(SatSolver& solver,
 	      const vector<Literal>& inputs)
 {
   if ( node->is_cplx_logic() ) {
-    LogExpr lexp = network.get_lexp(node->func_id());
+    Expr lexp = network.get_lexp(node->func_id());
     make_cnf_from_lexp(solver, lexp, output, inputs);
   }
   else {

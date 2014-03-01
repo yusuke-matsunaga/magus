@@ -11,8 +11,8 @@
 
 #include "igf_nsdef.h"
 #include "RegVect.h"
-#include "ym_logic/bdd_nsdef.h"
-#include "ym_logic/Bdd.h"
+#include "logic/bdd_nsdef.h"
+#include "logic/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

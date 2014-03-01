@@ -8,13 +8,13 @@
 
 
 #include "ImpCmd.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnIscas89Reader.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/StopWatch.h"
-#include "ym_tclpp/TclObjMsgHandler.h"
-#include "ym_tclpp/TclPopt.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnBlifReader.h"
+#include "networks/BdnIscas89Reader.h"
+#include "utils/MsgMgr.h"
+#include "utils/StopWatch.h"
+#include "tclpp/TclObjMsgHandler.h"
+#include "tclpp/TclPopt.h"
 
 #include "StrImp.h"
 #include "ContraImp.h"

@@ -49,8 +49,8 @@ nobase_ym_HEADERS = \
 	logic/DimacsParser.h \
 	logic/DimacsVerifier.h \
 	logic/Literal.h \
-	logic/LogExpr.h \
-	logic/LogExprWriter.h \
+	logic/Expr.h \
+	logic/ExprWriter.h \
 	logic/NpnMap.h \
 	logic/NpnMapM.h \
 	logic/NpnMgr.h \
@@ -76,7 +76,7 @@ nobase_ym_HEADERS = \
 	logic/aig_nsdef.h \
 	logic/bdd_nsdef.h \
 	logic/cnfdd_nsdef.h \
-	logic/lexp_nsdef.h \
+	logic/expr_nsdef.h \
 	logic/npn_nsdef.h \
 	logic/sat_nsdef.h \
 	logic/smt_nsdef.h \

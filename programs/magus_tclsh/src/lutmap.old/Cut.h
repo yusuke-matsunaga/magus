@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 #include "lutmap.h"
 
 
@@ -58,7 +58,7 @@ public:
   fo_check() const;
 
   /// @brief 内容を表す論理式を得る．
-  LogExpr
+  Expr
   expr() const;
 
   /// @brief デバッグ用の表示ルーティン

@@ -12,7 +12,7 @@
 #include "cell/CellPin.h"
 #include "cell/CellTime.h"
 #include "cell/CellCapacitance.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/ShString.h"
 
 
@@ -124,7 +124,7 @@ public:
 
   /// @brief 機能を表す論理式を返す．
   virtual
-  LogExpr
+  Expr
   function() const;
 
   /// @brief three_state 属性を持っているときに true を返す．
@@ -134,7 +134,7 @@ public:
 
   /// @brief three_state 論理式を返す．
   virtual
-  LogExpr
+  Expr
   three_state() const;
 
   /// @brief 最大ファンアウト容量を返す．
@@ -339,8 +339,8 @@ protected:
   CiOutputPinBase(CiCell* cell,
 		  const ShString& name,
 		  bool has_logic,
-		  const LogExpr& logic_expr,
-		  const LogExpr& tristate_expr,
+		  const Expr& logic_expr,
+		  const Expr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -371,7 +371,7 @@ public:
 
   /// @brief 機能を表す論理式を返す．
   virtual
-  LogExpr
+  Expr
   function() const;
 
   /// @brief three_state 属性を持っているときに true を返す．
@@ -381,7 +381,7 @@ public:
 
   /// @brief three_state 論理式を返す．
   virtual
-  LogExpr
+  Expr
   three_state() const;
 
   /// @brief 最大ファンアウト容量を返す．
@@ -427,10 +427,10 @@ private:
   ymuint32 mHasFunction;
 
   // 出力の論理式
-  LogExpr mFunction;
+  Expr mFunction;
 
   // three_state 属性の論理式
-  LogExpr mThreeState;
+  Expr mThreeState;
 
   // ファンアウトの負荷
   CellCapacitance mFanoutLoad;
@@ -482,8 +482,8 @@ private:
   CiOutputPin(CiCell* cell,
 	      const ShString& name,
 	      bool has_logic,
-	      const LogExpr& logic_expr,
-	      const LogExpr& tristate_expr,
+	      const Expr& logic_expr,
+	      const Expr& tristate_expr,
 	      CellCapacitance max_fanout,
 	      CellCapacitance min_fanout,
 	      CellCapacitance max_capacitance,
@@ -556,8 +556,8 @@ private:
   CiInoutPin(CiCell* cell,
 	     const ShString& name,
 	     bool has_logic,
-	     const LogExpr& logic_expr,
-	     const LogExpr& tristate_expr,
+	     const Expr& logic_expr,
+	     const Expr& tristate_expr,
 	     CellCapacitance capacitance,
 	     CellCapacitance rise_capacitance,
 	     CellCapacitance fall_capacitance,

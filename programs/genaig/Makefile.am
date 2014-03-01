@@ -41,8 +41,9 @@ noinst_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	@POPT_INCLUDES@
 
 
@@ -68,7 +69,7 @@ genaig_SOURCES = \
 	GenAigDj.cc
 
 genaig_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la
 
 genaig_LDFLAGS = \
 	@POPT_LIBS@
@@ -82,7 +83,7 @@ npngen_SOURCES = \
 	npngen.cc
 
 npngen_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 npngen_LDFLAGS =
 
@@ -95,6 +96,6 @@ cannonical_SOURCES = \
 	cannonical.cc
 
 cannonical_LDADD = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 cannonical_LDFLAGS =

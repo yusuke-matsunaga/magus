@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BdnMgr.h"
+#include "networks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -38,7 +38,7 @@ public:
   virtual
   void
   set_network(const BdnMgr& bdn,
-	      const hash_map<string, ymuint>& order_map) = 0;
+	      const unordered_map<string, ymuint>& order_map) = 0;
 
   /// @brief 論理シミュレーションを行う．
   /// @param[in] iv 入力ベクタ

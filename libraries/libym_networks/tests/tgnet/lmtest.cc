@@ -13,7 +13,7 @@
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
 void
-test1(const LogExpr& expr,
+test1(const Expr& expr,
       LogicMgr& lm)
 {
   cout << "Registering: " << expr << endl;
@@ -44,27 +44,27 @@ main(int argc,
   using namespace nsYm::nsNetworks::nsTgnet;
 
   try {
-    LogExpr v0 = LogExpr::make_posiliteral(VarId(0));
-    LogExpr v1 = LogExpr::make_posiliteral(VarId(1));
-    LogExpr v2 = LogExpr::make_posiliteral(VarId(2));
-    LogExpr v3 = LogExpr::make_posiliteral(VarId(3));
-    LogExpr v4 = LogExpr::make_posiliteral(VarId(4));
-    LogExpr v5 = LogExpr::make_posiliteral(VarId(5));
-    LogExpr v6 = LogExpr::make_posiliteral(VarId(6));
-    LogExpr v7 = LogExpr::make_posiliteral(VarId(7));
+    Expr v0 = Expr::make_posiliteral(VarId(0));
+    Expr v1 = Expr::make_posiliteral(VarId(1));
+    Expr v2 = Expr::make_posiliteral(VarId(2));
+    Expr v3 = Expr::make_posiliteral(VarId(3));
+    Expr v4 = Expr::make_posiliteral(VarId(4));
+    Expr v5 = Expr::make_posiliteral(VarId(5));
+    Expr v6 = Expr::make_posiliteral(VarId(6));
+    Expr v7 = Expr::make_posiliteral(VarId(7));
 
     LogicMgr lm;
 
-    LogExpr tmp0 = v0;
+    Expr tmp0 = v0;
     test1(tmp0, lm);
 
-    LogExpr tmp1 = (v0 & v1) | ~v1;
+    Expr tmp1 = (v0 & v1) | ~v1;
     test1(tmp1, lm);
 
-    LogExpr tmp2 = v0 | ~v1;
+    Expr tmp2 = v0 | ~v1;
     test1(tmp2, lm);
 
-    LogExpr tmp3 = v0 & v1 | v2 & v3 | v4 & v5 | v6 & v7;
+    Expr tmp3 = v0 & v1 | v2 & v3 | v4 & v5 | v6 & v7;
     test1(tmp3, lm);
   }
   catch ( AssertError x) {

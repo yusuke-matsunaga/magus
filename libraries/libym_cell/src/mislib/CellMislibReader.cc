@@ -20,7 +20,7 @@
 #include "MislibMgr.h"
 #include "MislibNode.h"
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/TvFunc.h"
 #include "utils/MsgMgr.h"
 
@@ -129,10 +129,10 @@ gen_library(const string& lib_name,
     }
 
     ymuint ni = ipin_name_list.size();
-    LogExpr function = opin_expr->to_expr(ipin_name_map);
+    Expr function = opin_expr->to_expr(ipin_name_map);
     vector<bool> output_array(1, true);
-    vector<LogExpr> logic_array(1, function);
-    vector<LogExpr> tristate_array(1, LogExpr::make_zero());
+    vector<Expr> logic_array(1, function);
+    vector<Expr> tristate_array(1, Expr::make_zero());
     library->new_logic_cell(cell_id, name, area,
 			    ni, 1, 0, 0, 0,
 			    output_array,
@@ -148,7 +148,7 @@ gen_library(const string& lib_name,
     // 出力ピンの設定
     library->new_cell_output(cell_id, ni, 0, opin_name,
 			     true, function,
-			     LogExpr::make_zero(),
+			     Expr::make_zero(),
 			     CellCapacitance::infty(),
 			     CellCapacitance(0.0),
 			     CellCapacitance::infty(),
@@ -168,7 +168,7 @@ gen_library(const string& lib_name,
 	CellResistance f_r(pt_pin->fall_fanout_delay()->num());
 	library->new_timing_generic(cell_id, i,
 				    kCellTimingCombinational,
-				    LogExpr::make_one(),
+				    Expr::make_one(),
 				    r_i, f_i,
 				    CellTime(0.0), CellTime(0.0),
 				    r_r, f_r);
@@ -184,7 +184,7 @@ gen_library(const string& lib_name,
       CellResistance f_r(pt_pin->fall_fanout_delay()->num());
       library->new_timing_generic(cell_id, 0,
 				  kCellTimingCombinational,
-				  LogExpr::make_one(),
+				  Expr::make_one(),
 				  r_i, f_i,
 				  CellTime(0.0), CellTime(0.0),
 				  r_r, f_r);

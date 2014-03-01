@@ -13,7 +13,7 @@
 
 #include "ym_techmap/lutmap_nsdef.h"
 #include "ym_networks/bdn.h"
-#include "ym_logic/LogExpr.h"
+#include "ym_logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -53,7 +53,7 @@ public:
   input(ymuint pos) const;
 
   /// @brief 内容を表す論理式を得る．
-  LogExpr
+  Expr
   expr() const;
 
   /// @brief デバッグ用の表示ルーティン

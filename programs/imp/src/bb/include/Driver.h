@@ -10,7 +10,7 @@
 
 
 #include "bb_nsdef.h"
-#include "ym_utils/MsgMgr.h"
+#include "utils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_BB

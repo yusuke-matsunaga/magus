@@ -8,8 +8,8 @@
 
 
 #include "igf_nsdef.h"
-#include "ym_utils/PoptMainApp.h"
-#include "ym_utils/CombiGen.h"
+#include "utils/PoptMainApp.h"
+#include "utils/CombiGen.h"
 #include <gmpxx.h>
 
 
@@ -116,4 +116,3 @@ main(int argc,
 
   return k_of_n_gen(argc, argv);
 }
-

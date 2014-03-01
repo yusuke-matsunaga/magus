@@ -71,24 +71,24 @@ BEGIN_NONAMESPACE
 
 // inputs に登録されているノードを終端と見なしたときの node の表す論理式
 // を返す．
-LogExpr
+Expr
 calc_expr_for_node(const SbjNode* node,
-		   const hash_map<ymuint, LogExpr>& logmap)
+		   const hash_map<ymuint, Expr>& logmap)
 {
-  LogExpr ans;
+  Expr ans;
   if ( node == NULL ) {
-    ans =  LogExpr::make_zero();
+    ans =  Expr::make_zero();
   }
   else {
-    hash_map<ymuint, LogExpr>::const_iterator p = logmap.find(node->id());
+    hash_map<ymuint, Expr>::const_iterator p = logmap.find(node->id());
     if ( p != logmap.end() ) {
       ans = p->second;
     }
     else {
       assert_cond( node->is_logic(), __FILE__, __LINE__);
 
-      LogExpr cexp0 = calc_expr_for_node(node->fanin(0), logmap);
-      LogExpr cexp1 = calc_expr_for_node(node->fanin(1), logmap);
+      Expr cexp0 = calc_expr_for_node(node->fanin(0), logmap);
+      Expr cexp1 = calc_expr_for_node(node->fanin(1), logmap);
       ymuint fcode = node->fcode();
 
       // 単純なコード
@@ -140,18 +140,18 @@ calc_expr_for_node(const SbjNode* node,
 END_NONAMESPACE
 
 // @brief 内容を表す論理式を得る．
-LogExpr
+Expr
 Cut::expr() const
 {
   if ( root() == NULL ) {
-    return LogExpr::make_zero();
+    return Expr::make_zero();
   }
 
-  hash_map<ymuint, LogExpr> logmap;
+  hash_map<ymuint, Expr> logmap;
   for (ymuint i = 0; i < ni(); i ++) {
     const SbjNode* node = mInputs[i];
     ymuint id = node->id();
-    logmap.insert(make_pair(id, LogExpr::make_posiliteral(i)));
+    logmap.insert(make_pair(id, Expr::make_posiliteral(i)));
   }
   return calc_expr_for_node(root(), logmap);
 }

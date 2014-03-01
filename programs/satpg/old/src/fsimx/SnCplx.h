@@ -27,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   SnCplx(ymuint32 id,
-	 const LogExpr& lexp,
+	 const Expr& lexp,
 	 const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
@@ -64,7 +64,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 論理式
-  LogExpr mExpr[2];
+  Expr mExpr[2];
 
 };
 

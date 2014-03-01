@@ -10,7 +10,7 @@
 
 
 #include "libcomp_nsdef.h"
-#include "logic/lexp_nsdef.h"
+#include "logic/expr_nsdef.h"
 #include "utils/UnitAlloc.h"
 
 
@@ -47,7 +47,7 @@ public:
   /// @param[in] expr パタンの元となる論理式
   /// @param[in] rep_id このパタンが属する代表関数番号
   void
-  reg_pat(const LogExpr& expr,
+  reg_pat(const Expr& expr,
 	  ymuint rep_id);
 
   /// @brief 内容を出力する．(デバッグ用)
@@ -101,8 +101,8 @@ private:
   /// @brief 2つの論理式が等しいかどうか調べる．
   static
   bool
-  check_equivalent(const LogExpr& expr1,
-		   const LogExpr& expr2);
+  check_equivalent(const Expr& expr1,
+		   const Expr& expr2);
 
   /// @brief 2つのパタンが同型かどうか調べる．
   static
@@ -122,7 +122,7 @@ private:
   /// @param[in] expr 元になる論理式
   /// @param[out] pg_list パタングラフ番号のリスト
   void
-  pg_sub(const LogExpr& expr,
+  pg_sub(const Expr& expr,
 	 vector<LcPatHandle>& pg_list);
 
   /// @brief テンプレートにしたがって2分木を作る．
@@ -131,7 +131,7 @@ private:
   /// @param[in] pat 2分木の形を表す配列
   /// @param[inout] pos pat[] 中の位置を示す変数
   LcPatHandle
-  make_bintree(const LogExpr& expr,
+  make_bintree(const Expr& expr,
 	       const vector<LcPatHandle>& input,
 	       int pat[],
 	       ymuint& pos);
@@ -146,7 +146,7 @@ private:
   /// @param[in] expr 論理式 (演算の種類を表すのに用いる)
   /// @param[in] l_handle, r_handle 左右の子供のパタン
   LcPatHandle
-  make_node(const LogExpr& expr,
+  make_node(const Expr& expr,
 	    LcPatHandle l_handle,
 	    LcPatHandle r_handle);
 
@@ -251,7 +251,7 @@ private:
 
   // 処理済みの論理式を収めたリストの配列
   // 配列のキーは代表関数番号
-  vector<vector<LogExpr> > mExprList;
+  vector<vector<Expr> > mExprList;
 
 };
 

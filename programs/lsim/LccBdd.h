@@ -10,8 +10,8 @@
 
 
 #include "Lsim.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -44,7 +44,7 @@ public:
   virtual
   void
   set_network(const BdnMgr& bdn,
-	      const hash_map<string, ymuint>& order_map);
+	      const unordered_map<string, ymuint>& order_map);
 
   /// @brief 論理シミュレーションを行う．
   /// @param[in] iv 入力ベクタ

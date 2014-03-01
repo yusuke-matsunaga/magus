@@ -11,7 +11,7 @@
 #include "LcPatNode.h"
 #include "LcPatHandle.h"
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "utils/MFSet.h"
 #include "utils/PermGen.h"
 #include "utils/MultiCombiGen.h"
@@ -102,18 +102,18 @@ LcPatMgr::rep_id(ymuint id) const
 // @param[in] expr パタンの元となる論理式
 // @param[in] rep_id このパタンが属する代表関数番号
 void
-LcPatMgr::reg_pat(const LogExpr& expr,
+LcPatMgr::reg_pat(const Expr& expr,
 		  ymuint rep_id)
 {
   if ( mExprList.size() <= rep_id ) {
-    mExprList.resize(rep_id + 1, vector<LogExpr>());
+    mExprList.resize(rep_id + 1, vector<Expr>());
   }
 
   { // 同じ論理式を処理済みならなにもしない．
-    vector<LogExpr>& expr_list = mExprList[rep_id];
-    for (vector<LogExpr>::iterator p = expr_list.begin();
+    vector<Expr>& expr_list = mExprList[rep_id];
+    for (vector<Expr>::iterator p = expr_list.begin();
 	 p != expr_list.end(); ++ p) {
-      const LogExpr& expr1 = *p;
+      const Expr& expr1 = *p;
       if ( check_equivalent(expr, expr1) ) {
 	return;
       }
@@ -148,8 +148,8 @@ LcPatMgr::reg_pat(const LogExpr& expr,
 
 // @brief 2つの論理式が同形かどうか調べる．
 bool
-LcPatMgr::check_equivalent(const LogExpr& expr1,
-			   const LogExpr& expr2)
+LcPatMgr::check_equivalent(const Expr& expr1,
+			   const Expr& expr2)
 {
   if ( expr1.is_zero() ) {
     if ( expr2.is_zero() ) {
@@ -280,7 +280,7 @@ LcPatMgr::ceq_sub(LcPatNode* node1,
 // @param[in] expr 元になる論理式
 // @param[out] pg_list パタングラフのリスト
 void
-LcPatMgr::pg_sub(const LogExpr& expr,
+LcPatMgr::pg_sub(const Expr& expr,
 		 vector<LcPatHandle>& pg_list)
 {
   if ( expr.is_literal() ) {
@@ -421,7 +421,7 @@ LcPatMgr::pg_sub(const LogExpr& expr,
 // @param[in] pat 2分木の形を表す配列
 // @param[inout] pos pat[] 中の位置を示す変数
 LcPatHandle
-LcPatMgr::make_bintree(const LogExpr& expr,
+LcPatMgr::make_bintree(const Expr& expr,
 		       const vector<LcPatHandle>& input,
 		       int pat[],
 		       ymuint& pos)
@@ -464,7 +464,7 @@ LcPatMgr::make_input(VarId var)
 // @param[in] expr 論理式 (演算の種類を表すのに用いる)
 // @param[in] l_handle, r_handle 左右の子供のパタン
 LcPatHandle
-LcPatMgr::make_node(const LogExpr& expr,
+LcPatMgr::make_node(const Expr& expr,
 		    LcPatHandle l_handle,
 		    LcPatHandle r_handle)
 {

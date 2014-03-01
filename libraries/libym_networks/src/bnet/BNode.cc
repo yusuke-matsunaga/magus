@@ -45,12 +45,12 @@ BNode::set_type(tType type)
   case kPI:
     break;
   case kPO:
-    mFunc = LogExpr::make_posiliteral(VarId(0));
+    mFunc = Expr::make_posiliteral(VarId(0));
     break;
   case kLO:
     break;
   case kFF:
-    mFunc = LogExpr::make_zero();
+    mFunc = Expr::make_zero();
     break;
   default:
     assert_not_reached(__FILE__, __LINE__);

@@ -85,7 +85,7 @@ private:
   RwtNode* mNodeArray;
 
   // 関数ベクタをキーにしてノードを納めた連想配列
-  hash_map<ymuint16, RwtNode*> mFuncHash;
+  unordered_map<ymuint16, RwtNode*> mFuncHash;
 
 };
 

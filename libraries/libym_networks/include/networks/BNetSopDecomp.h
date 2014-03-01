@@ -10,7 +10,7 @@
 
 
 #include "networks/bnet.h"
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET
@@ -63,7 +63,7 @@ private:
   // 保証すること．
   void
   sop_decomp_sub(BNode* orig_node,
-		 const LogExpr& expr,
+		 const Expr& expr,
 		 BNode* root_node);
 
   // tmp_fanins[b: b + ni - 1] を入力とする XOR をあらわす

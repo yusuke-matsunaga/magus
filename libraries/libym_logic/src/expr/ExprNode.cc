@@ -1,28 +1,28 @@
 
-/// @file LexpNode.cc
-/// @brief LexpNode の実装ファイル
+/// @file ExprNode.cc
+/// @brief ExprNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LexpNode.h"
-#include "LexpMgr.h"
+#include "ExprNode.h"
+#include "ExprMgr.h"
 #include "SopLit.h"
 #include "logic/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 //////////////////////////////////////////////////////////////////////
-// クラス LexpNode
+// クラス ExprNode
 //////////////////////////////////////////////////////////////////////
 
 // 同一の式を表していたら true を返す．
 bool
-posi_equiv(const LexpNode* node0,
-	   const LexpNode* node1)
+posi_equiv(const ExprNode* node0,
+	   const ExprNode* node1)
 {
   if ( node0->type() != node1->type() ||
        node0->child_num() != node1->child_num() ) {
@@ -31,8 +31,8 @@ posi_equiv(const LexpNode* node0,
 
   ymuint n = node0->child_num();
   for (ymuint i = 0; i < n; i ++) {
-    const LexpNode* chd0 = node0->child(i);
-    const LexpNode* chd1 = node1->child(i);
+    const ExprNode* chd0 = node0->child(i);
+    const ExprNode* chd1 = node1->child(i);
     if ( !posi_equiv(chd0, chd1) ) {
       return false;
     }
@@ -48,8 +48,8 @@ posi_equiv(const LexpNode* node0,
 
 // 互いに否定の関係にある式を表していたら true を返す．
 bool
-nega_equiv(const LexpNode* node0,
-	   const LexpNode* node1)
+nega_equiv(const ExprNode* node0,
+	   const ExprNode* node1)
 {
   if ( node0->is_one() ) {
     return node0->is_zero();
@@ -70,8 +70,8 @@ nega_equiv(const LexpNode* node0,
     }
     ymuint n = node0->child_num();
     for (ymuint i = 0; i < n; i ++) {
-      const LexpNode* chd0 = node0->child(i);
-      const LexpNode* chd1 = node1->child(i);
+      const ExprNode* chd0 = node0->child(i);
+      const ExprNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
 	return false;
       }
@@ -84,8 +84,8 @@ nega_equiv(const LexpNode* node0,
     }
     ymuint n = node0->child_num();
     for (ymuint i = 0; i < n; i ++) {
-      const LexpNode* chd0 = node0->child(i);
-      const LexpNode* chd1 = node1->child(i);
+      const ExprNode* chd0 = node0->child(i);
+      const ExprNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
 	return false;
       }
@@ -99,8 +99,8 @@ nega_equiv(const LexpNode* node0,
     ymuint n = node0->child_num();
     bool inv = false;
     for (ymuint i = 0; i < n; i ++) {
-      const LexpNode* chd0 = node0->child(i);
-      const LexpNode* chd1 = node1->child(i);
+      const ExprNode* chd0 = node0->child(i);
+      const ExprNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
 	inv = !inv;
       }
@@ -118,7 +118,7 @@ nega_equiv(const LexpNode* node0,
 
 // @brief vals の値にしたがった評価を行う．
 ymulong
-LexpNode::eval(const vector<ymulong>& vals,
+ExprNode::eval(const vector<ymulong>& vals,
 	       ymulong mask) const
 {
   if ( is_zero() ) {
@@ -163,7 +163,7 @@ LexpNode::eval(const vector<ymulong>& vals,
 // @brief 真理値表を作成する．
 // @param[in] ni 入力数
 TvFunc
-LexpNode::make_tv(ymuint ni) const
+ExprNode::make_tv(ymuint ni) const
 {
   if ( is_zero() ) {
     return TvFunc::const_zero(ni);
@@ -207,7 +207,7 @@ LexpNode::make_tv(ymuint ni) const
 
 // 定数,リテラルもしくは子供がリテラルのノードの時に true を返す．
 bool
-LexpNode::is_simple() const
+ExprNode::is_simple() const
 {
   if ( !is_op() ) {
     return true;
@@ -224,7 +224,7 @@ LexpNode::is_simple() const
 
 // 子供がすべてリテラルの AND ノードの時に true を返す．
 bool
-LexpNode::is_simple_and() const
+ExprNode::is_simple_and() const
 {
   if ( !is_and() ) {
     return false;
@@ -241,7 +241,7 @@ LexpNode::is_simple_and() const
 
 // 子供がすべてリテラルの OR ノードの時に true を返す．
 bool
-LexpNode::is_simple_or() const
+ExprNode::is_simple_or() const
 {
   if ( !is_or() ) {
     return false;
@@ -258,7 +258,7 @@ LexpNode::is_simple_or() const
 
 // 子供がすべてリテラルの XOR ノードの時に true を返す．
 bool
-LexpNode::is_simple_xor() const
+ExprNode::is_simple_xor() const
 {
   if ( !is_xor() ) {
     return false;
@@ -275,7 +275,7 @@ LexpNode::is_simple_xor() const
 
 // SOP 形式の時 true を返す．
 bool
-LexpNode::is_sop() const
+ExprNode::is_sop() const
 {
   if ( is_xor() ) {
     return false;
@@ -289,7 +289,7 @@ LexpNode::is_sop() const
 
   ymuint n = child_num();
   for (ymuint i = 0; i < n; ++ i) {
-    const LexpNode* chd = child(i);
+    const ExprNode* chd = child(i);
     if ( !chd->is_literal() && !chd->is_simple_and() ) {
       return false;
     }
@@ -299,7 +299,7 @@ LexpNode::is_sop() const
 
 // リテラル数を返す．
 ymuint
-LexpNode::litnum() const
+ExprNode::litnum() const
 {
   if ( is_literal() ) {
     // リテラルならリテラル数は1
@@ -322,7 +322,7 @@ LexpNode::litnum() const
 
 // 特定の変数のリテラル数を返す．
 ymuint
-LexpNode::litnum(VarId id) const
+ExprNode::litnum(VarId id) const
 {
   if ( is_literal() && varid() == id ) {
     // リテラルならリテラル数は1
@@ -345,7 +345,7 @@ LexpNode::litnum(VarId id) const
 
 // 特定の変数の特定の極性のリテラル数を返す．
 ymuint
-LexpNode::litnum(VarId id,
+ExprNode::litnum(VarId id,
 		 bool inv) const
 {
   if ( is_literal(inv) && varid() == id ) {
@@ -369,7 +369,7 @@ LexpNode::litnum(VarId id,
 
 // @brief 使われている変数の最大の番号 + 1を得る．
 ymuint
-LexpNode::input_size() const
+ExprNode::input_size() const
 {
   if ( is_literal() ) {
     return varid().val() + 1;
@@ -393,7 +393,7 @@ LexpNode::input_size() const
 
 // SOP形式の積項数とリテラル数を計算する．
 SopLit
-LexpNode::soplit(bool inverted) const
+ExprNode::soplit(bool inverted) const
 {
   if ( is_literal() ) {
     return SopLit(1, 1);
@@ -423,11 +423,11 @@ LexpNode::soplit(bool inverted) const
 
   if ( type() == kXor ) {
     ymuint n = child_num();
-    const LexpNode* chd = child(0);
+    const ExprNode* chd = child(0);
     SopLit lp = chd->soplit(inverted);
     SopLit ln = chd->soplit(inverted);
     for (ymuint i = 1; i < n; ++ i) {
-      const LexpNode* chd = child(i);
+      const ExprNode* chd = child(i);
       SopLit l1p = lp;
       SopLit l1n = ln;
       SopLit l2p = chd->soplit(false);
@@ -443,7 +443,7 @@ LexpNode::soplit(bool inverted) const
 
 // SOP形式の積項数とリテラル数を計算する．
 SopLit
-LexpNode::soplit(bool inverted,
+ExprNode::soplit(bool inverted,
 		 VarId id) const
 {
   if ( is_literal() ) {
@@ -479,11 +479,11 @@ LexpNode::soplit(bool inverted,
 
   if ( type() == kXor ) {
     ymuint n = child_num();
-    const LexpNode* chd = child(0);
+    const ExprNode* chd = child(0);
     SopLit lp = chd->soplit(inverted);
     SopLit ln = chd->soplit(inverted);
     for (ymuint i = 1; i < n; ++ i) {
-      const LexpNode* chd = child(i);
+      const ExprNode* chd = child(i);
       SopLit l1p = lp;
       SopLit l1n = ln;
       SopLit l2p = chd->soplit(false, id);
@@ -499,7 +499,7 @@ LexpNode::soplit(bool inverted,
 
 // SOP形式の積項数とリテラル数を計算する．
 SopLit
-LexpNode::soplit(bool inverted,
+ExprNode::soplit(bool inverted,
 		 VarId id,
 		 bool inv) const
 {
@@ -536,11 +536,11 @@ LexpNode::soplit(bool inverted,
 
   if ( type() == kXor ) {
     ymuint n = child_num();
-    const LexpNode* chd = child(0);
+    const ExprNode* chd = child(0);
     SopLit lp = chd->soplit(inverted);
     SopLit ln = chd->soplit(inverted);
     for (ymuint i = 1; i < n; ++ i) {
-      const LexpNode* chd = child(i);
+      const ExprNode* chd = child(i);
       SopLit l1p = lp;
       SopLit l1n = ln;
       SopLit l2p = chd->soplit(false, id);
@@ -556,12 +556,12 @@ LexpNode::soplit(bool inverted,
 
 // 自殺する．
 void
-LexpNode::suicide()
+ExprNode::suicide()
 {
   // なんでこれだけのコードを別の関数にするかというと，
-  // これを LexpNode.h に書くと LexpMgr.h をインクルードしなければ
+  // これを ExprNode.h に書くと ExprMgr.h をインクルードしなければ
   // ならなくなるので．
-  LexpMgr::the_obj().free_node(this);
+  ExprMgr::the_obj().free_node(this);
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR

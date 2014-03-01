@@ -42,7 +42,7 @@ public:
   virtual
   void
   set_network(const BdnMgr& bdn,
-	      const hash_map<string, ymuint>& order_map);
+	      const unordered_map<string, ymuint>& order_map);
 
   /// @brief 論理シミュレーションを行う．
   /// @param[in] iv 入力ベクタ

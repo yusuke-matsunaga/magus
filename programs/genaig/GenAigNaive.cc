@@ -141,7 +141,7 @@ BEGIN_NONAMESPACE
 
 ymuint
 count_sub(Aig aig,
-	  hash_set<Aig>& aig_hash)
+	  unordered_set<Aig>& aig_hash)
 {
   if ( aig.inv() ) {
     aig = ~aig;
@@ -163,7 +163,7 @@ ymuint
 count(Aig aig1,
       Aig aig2)
 {
-  hash_set<Aig> aig_hash;
+  unordered_set<Aig> aig_hash;
   ymuint ans;
   ans = count_sub(aig1, aig_hash);
   ans += count_sub(aig2, aig_hash);
@@ -292,7 +292,7 @@ GenAigNaive::sanity_check(AigPat aigpat)
     cout << "Error:  aigpat.mAig != aigpat.mFunc" << endl;
     return false;
   }
-  hash_set<Aig> aig_hash;
+  unordered_set<Aig> aig_hash;
   ymuint level = count_sub(aigpat.mAig, aig_hash);
   if ( aigpat.mLevel != level ) {
     cout << "Error: level of aigpat.mAig != aigpat.mLevel" << endl;

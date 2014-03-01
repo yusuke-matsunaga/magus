@@ -1,33 +1,33 @@
-#ifndef LEXPNODE_H
-#define LEXPNODE_H
+#ifndef EXPRNODE_H
+#define EXPRNODE_H
 
-/// @file LexpNode.h
-/// @brief LexpNode のヘッダファイル
+/// @file ExprNode.h
+/// @brief ExprNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/LogExpr.h"
-#include "lexp_types.h"
+#include "logic/Expr.h"
+#include "expr_types.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 class SopLit;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LexpNode LexpNode.h "LexpNode.h"
+/// @class ExprNode ExprNode.h "ExprNode.h"
 /// @brief 論理式を形作るノードのクラス
 /// 効率化のためにコピーはポインタのコピーを用いる．
 /// そのために参照回数を持つ．
 //////////////////////////////////////////////////////////////////////
-class LexpNode
+class ExprNode
 {
-  friend class LogExpr;
-  friend class LexpNodePtr;
-  friend class LexpMgr;
+  friend class Expr;
+  friend class ExprNodePtr;
+  friend class ExprMgr;
 
 public:
 
@@ -98,7 +98,7 @@ public:
   /// @param[in] pos 取り出す子供の位置
   /// @note 演算子ノード以外の場合と pos が範囲外の場合には定数0を返す．
   /// 通常は定数ノードが子供に含まれることはないのでエラーとわかる．
-  const LexpNode*
+  const ExprNode*
   child(ymuint pos) const;
 
   /// @brief vals の値にしたがった評価を行う．
@@ -206,10 +206,10 @@ private:
 public:
 
   // コンストラクタ
-  LexpNode();
+  ExprNode();
 
   // デストラクタ
-  ~LexpNode();
+  ~ExprNode();
 
 
 private:
@@ -239,22 +239,22 @@ private:
   ymuint32 mNc;
 
   // 子を指すポインタの配列
-  const LexpNode* mChildArray[1];
+  const ExprNode* mChildArray[1];
 
 };
 
-/// @relates LexpNode
+/// @relates ExprNode
 /// @brief node0 と node1 が式として等価のときに true を返す．
 bool
-posi_equiv(const LexpNode* node0,
-	   const LexpNode* node1);
+posi_equiv(const ExprNode* node0,
+	   const ExprNode* node1);
 
 
-/// @relates LexpNode
+/// @relates ExprNode
 /// @brief node0 と node1 が式として否定の関係にあるときに true を返す．
 bool
-nega_equiv(const LexpNode* node0,
-	   const LexpNode* node1);
+nega_equiv(const ExprNode* node0,
+	   const ExprNode* node1);
 
 
 
@@ -264,40 +264,40 @@ nega_equiv(const LexpNode* node0,
 
 // コンストラクタ
 inline
-LexpNode::LexpNode()
+ExprNode::ExprNode()
 {
 }
 
 // デストラクタ
 inline
-LexpNode::~LexpNode()
+ExprNode::~ExprNode()
 {
 }
 
 inline
 tType
-LexpNode::type() const
+ExprNode::type() const
 {
   return static_cast<tType>(mRefType & 7U);
 }
 
 inline
 bool
-LexpNode::is_zero() const
+ExprNode::is_zero() const
 {
   return type() == kConst0;
 }
 
 inline
 bool
-LexpNode::is_one() const
+ExprNode::is_one() const
 {
   return type() == kConst1;
 }
 
 inline
 bool
-LexpNode::is_constant() const
+ExprNode::is_constant() const
 {
   // ちょっとキタナイコード．
   return (int(type()) & ~1) == kConst0;
@@ -305,21 +305,21 @@ LexpNode::is_constant() const
 
 inline
 bool
-LexpNode::is_posiliteral() const
+ExprNode::is_posiliteral() const
 {
   return type() == kPosiLiteral;
 }
 
 inline
 bool
-LexpNode::is_negaliteral() const
+ExprNode::is_negaliteral() const
 {
   return type() == kNegaLiteral;
 }
 
 inline
 bool
-LexpNode::is_literal() const
+ExprNode::is_literal() const
 {
   // ちょっとキタナイコード．
   return (static_cast<int>(type()) & ~1) == kPosiLiteral;
@@ -327,56 +327,56 @@ LexpNode::is_literal() const
 
 inline
 bool
-LexpNode::is_literal(bool inv) const
+ExprNode::is_literal(bool inv) const
 {
   return inv ? is_negaliteral() : is_posiliteral();
 }
 
 inline
 VarId
-LexpNode::varid() const
+ExprNode::varid() const
 {
   return is_literal() ? VarId(mNc) : VarId();
 }
 
 inline
 bool
-LexpNode::is_and() const
+ExprNode::is_and() const
 {
   return type() == kAnd;
 }
 
 inline
 bool
-LexpNode::is_or() const
+ExprNode::is_or() const
 {
   return type() == kOr;
 }
 
 inline
 bool
-LexpNode::is_xor() const
+ExprNode::is_xor() const
 {
   return type() == kXor;
 }
 
 inline
 bool
-LexpNode::is_op() const
+ExprNode::is_op() const
 {
   return type() >= kAnd;
 }
 
 inline
 ymuint
-LexpNode::child_num() const
+ExprNode::child_num() const
 {
   return is_op() ? mNc : 0;
 }
 
 inline
-const LexpNode*
-LexpNode::child(ymuint pos) const
+const ExprNode*
+ExprNode::child(ymuint pos) const
 {
   assert_cond(pos < child_num(), __FILE__, __LINE__);
   return mChildArray[pos];
@@ -384,16 +384,16 @@ LexpNode::child(ymuint pos) const
 
 inline
 ymuint
-LexpNode::ref() const
+ExprNode::ref() const
 {
   return static_cast<ymuint>(mRefType >> 3);
 }
 
 inline
 void
-LexpNode::ref(ymuint ref) const
+ExprNode::ref(ymuint ref) const
 {
-  LexpNode* node = const_cast<LexpNode*>(this);
+  ExprNode* node = const_cast<ExprNode*>(this);
   // 昔の参照回数を落とす．
   node->mRefType &= 7;
   // ref をセットする．
@@ -402,23 +402,23 @@ LexpNode::ref(ymuint ref) const
 
 inline
 void
-LexpNode::inc_ref() const
+ExprNode::inc_ref() const
 {
   // MAX の時は増やさない．
   if ( ref() < kRefMax ) {
-    LexpNode* node = const_cast<LexpNode*>(this);
+    ExprNode* node = const_cast<ExprNode*>(this);
     node->mRefType += 8;
   }
 }
 
 inline
 void
-LexpNode::dec_ref() const
+ExprNode::dec_ref() const
 {
   ymuint r = ref();
   // MAX の時は減らさない．
   if ( r < kRefMax ) {
-    LexpNode* node = const_cast<LexpNode*>(this);
+    ExprNode* node = const_cast<ExprNode*>(this);
     node->mRefType -= 8;
     if ( r == 1 ) {
       node->suicide();
@@ -426,6 +426,6 @@ LexpNode::dec_ref() const
   }
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
-#endif // LEXPNODE_H
+#endif // EXPRNODE_H

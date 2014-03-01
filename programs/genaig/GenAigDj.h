@@ -10,8 +10,8 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/AigMgr.h"
-#include "ym_logic/Aig.h"
+#include "logic/AigMgr.h"
+#include "logic/Aig.h"
 #include "AigPat.h"
 
 

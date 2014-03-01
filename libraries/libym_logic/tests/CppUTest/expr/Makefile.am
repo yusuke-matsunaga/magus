@@ -48,7 +48,7 @@ AM_CPPFLAGS = \
 ############################################################
 
 libym_logic_cpputest_expr_la_SOURCES = \
-	LogExprTest.cc
+	ExprTest.cc
 
 libym_logic_cpputest_expr_la_LIBADD =
 

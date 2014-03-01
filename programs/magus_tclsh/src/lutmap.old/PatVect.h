@@ -13,7 +13,7 @@
 #include "lutmap.h"
 
 #include <ym_utils/RandGen.h>
-#include <ym_lexp/LogExpr.h>
+#include <ym_lexp/Expr.h>
 
 
 BEGIN_NAMESPACE_MAGUS_LUTMAP
@@ -181,7 +181,7 @@ eq_with_dc(const PatVect& opr1,
 /// @param[in] ipat 論理式の入力変数のパタン
 /// @param[out] opat 論理式の出力のパタン
 void
-calc_pat(const LogExpr& expr,
+calc_pat(const Expr& expr,
 	 const vector<PatVect*>& ipat,
 	 PatVect& opat);
 

@@ -10,7 +10,7 @@
 
 
 #include "ymtools.h"
-#include "ym_logic/Aig.h"
+#include "logic/Aig.h"
 
 
 BEGIN_NAMESPACE_YM

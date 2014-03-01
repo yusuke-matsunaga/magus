@@ -66,7 +66,7 @@ public:
   /// @param[in] name_map 変数名の対応表
   /// @note expr 中の i 番めの変数の名前が name_map[i] に入っている．
   void
-  put_rhs(const LogExpr& expr,
+  put_rhs(const Expr& expr,
 	  const VarStrMap& name_map);
 
 };

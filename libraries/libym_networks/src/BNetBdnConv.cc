@@ -150,7 +150,7 @@ BEGIN_NONAMESPACE
 
 BdnNodeHandle
 make_node_sub(BdnMgr& bdn,
-	      LogExpr func,
+	      Expr func,
 	      const vector<BdnNodeHandle>& fanins)
 {
   if ( func.is_zero() ) {
@@ -199,7 +199,7 @@ BNetBdnConv::make_node(const BNode* bnode)
       fanins[i] = make_node(bnode->fanin(i));
     }
 
-    LogExpr func = bnode->func();
+    Expr func = bnode->func();
     node_handle = make_node_sub(*mNetwork, func, fanins);
     put_node(bnode, node_handle);
   }

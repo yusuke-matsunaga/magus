@@ -648,11 +648,11 @@ Bdd::edge1() const
 }
 
 // @brief BDD の内容を積和形論理式に変換する．
-LogExpr
+Expr
 Bdd::sop() const
 {
   BddEdge e(mRoot);
-  LogExpr ans_expr;
+  Expr ans_expr;
   mMgr->isop(e, e, ans_expr);
   return ans_expr;
 }
@@ -826,7 +826,7 @@ and_exist(const Bdd& src1,
 Bdd
 isop(const Bdd& lower,
      const Bdd& upper,
-     LogExpr& cover)
+     Expr& cover)
 {
   BddEdge ans;
   if ( lower.mMgr != upper.mMgr ) {
@@ -845,13 +845,13 @@ isop(const Bdd& lower,
 // @param[in] lower 不完全指定論理関数の下限
 // @param[in] upper 不完全指定論理関数の上限
 // @return 計算された prime cover
-LogExpr
+Expr
 prime_cover(const Bdd& lower,
 	    const Bdd& upper)
 {
   if ( lower.mMgr != upper.mMgr ) {
     // マネージャが異なる．
-    return LogExpr();
+    return Expr();
   }
   BddEdge e1(lower.mRoot);
   BddEdge e2(upper.mRoot);

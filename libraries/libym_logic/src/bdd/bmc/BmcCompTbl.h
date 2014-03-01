@@ -257,7 +257,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-// 2つのBDDの枝をキーとしてBDDの枝とLogExprを結果として格納する
+// 2つのBDDの枝をキーとしてBDDの枝とExprを結果として格納する
 // ハッシュ表
 //////////////////////////////////////////////////////////////////////
 class BmcIsopTbl :
@@ -270,7 +270,7 @@ class BmcIsopTbl :
     BddEdge mKey1;
     BddEdge mKey2;
     BddEdge mAnsBdd;
-    LogExpr* mAnsCov;
+    Expr* mAnsCov;
   };
 
 public:
@@ -279,14 +279,14 @@ public:
   BddEdge
   get(BddEdge id1,
       BddEdge id2,
-      LogExpr& ans_cov);
+      Expr& ans_cov);
 
   // 結果を登録する
   void
   put(BddEdge id1,
       BddEdge id2,
       BddEdge ans_bdd,
-      const LogExpr& ans_cov);
+      const Expr& ans_cov);
 
 
 private:
@@ -533,7 +533,7 @@ inline
 BddEdge
 BmcIsopTbl::get(BddEdge id1,
 		BddEdge id2,
-		LogExpr& ans_cov)
+		Expr& ans_cov)
 {
   Cell* tmp = mTable + hash_func(id1, id2);
   if ( tmp->mKey1 != id1 || tmp->mKey2 != id2 ) {
@@ -551,7 +551,7 @@ void
 BmcIsopTbl::put(BddEdge id1,
 		BddEdge id2,
 		BddEdge ans_bdd,
-		const LogExpr& ans_cov)
+		const Expr& ans_cov)
 {
   if ( id1.is_invalid() || id2.is_invalid() || ans_bdd.is_invalid() ) {
     return;
@@ -567,7 +567,7 @@ BmcIsopTbl::put(BddEdge id1,
   tmp->mKey2 = id2;
   tmp->mAnsBdd = ans_bdd;
   delete tmp->mAnsCov;
-  tmp->mAnsCov = new LogExpr(ans_cov);
+  tmp->mAnsCov = new Expr(ans_cov);
 }
 
 // ハッシュ関数

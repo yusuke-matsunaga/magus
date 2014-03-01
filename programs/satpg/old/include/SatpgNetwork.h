@@ -12,7 +12,7 @@
 #include "dtpg_nsdef.h"
 #include "SaFault.h"
 #include "ym_networks/tgnet.h"
-#include "ym_logic/lexp_nsdef.h"
+#include "ym_logic/expr_nsdef.h"
 #include "ym_utils/SimpleAlloc.h"
 
 
@@ -142,7 +142,7 @@ private:
   /// @param[inout] id プリミティブID
   /// @note id は内部でインクリメントされる．
   DtpgPrimitive*
-  make_primitive(const LogExpr& expr,
+  make_primitive(const Expr& expr,
 		 const TgNode* tgnode,
 		 DtpgPrimitive* primitive_list,
 		 ymuint& id);

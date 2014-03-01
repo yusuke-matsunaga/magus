@@ -31,7 +31,7 @@
 #include "DotlibTemplate.h"
 #include "DotlibLut.h"
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 #include "logic/TvFunc.h"
 #include "utils/MsgMgr.h"
 
@@ -59,26 +59,26 @@ split(const string& src_str,
   }
 }
 
-// DotlibNode から　LogExpr を作る．
-LogExpr
+// DotlibNode から　Expr を作る．
+Expr
 dot2expr(const DotlibNode* node,
 	 const PinMap& pin_map)
 {
   // 特例
   if ( node == NULL ) {
-    return LogExpr::make_zero();
+    return Expr::make_zero();
   }
 
   if ( node->is_int() ) {
     int v = node->int_value();
     if ( v == 0 ) {
-      return LogExpr::make_zero();
+      return Expr::make_zero();
     }
     if ( v == 1 ) {
-      return LogExpr::make_one();
+      return Expr::make_one();
     }
     assert_not_reached(__FILE__, __LINE__);
-    return LogExpr();
+    return Expr();
   }
   if ( node->is_string() ) {
     ShString name = node->string_value();
@@ -91,19 +91,19 @@ dot2expr(const DotlibNode* node,
 		      kMsgError,
 		      "DOTLIB_PARSER",
 		      buf.str());
-      return LogExpr();
+      return Expr();
     }
     ymuint id = p->second;
-    return LogExpr::make_posiliteral(VarId(id));
+    return Expr::make_posiliteral(VarId(id));
   }
   if ( node->is_opr() ) {
     if ( node->type() == DotlibNode::kNot ) {
-      LogExpr expr1 = dot2expr(node->opr1(), pin_map);
+      Expr expr1 = dot2expr(node->opr1(), pin_map);
       return ~expr1;
     }
     else {
-      LogExpr expr1 = dot2expr(node->opr1(), pin_map);
-      LogExpr expr2 = dot2expr(node->opr2(), pin_map);
+      Expr expr1 = dot2expr(node->opr1(), pin_map);
+      Expr expr2 = dot2expr(node->opr2(), pin_map);
       switch ( node->type() ) {
       case DotlibNode::kAnd: return expr1 & expr2;
       case DotlibNode::kOr:  return expr1 | expr2;
@@ -111,11 +111,11 @@ dot2expr(const DotlibNode* node,
       default: break;
       }
       assert_not_reached(__FILE__, __LINE__);
-      return LogExpr();
+      return Expr();
     }
   }
   assert_not_reached(__FILE__, __LINE__);
-  return LogExpr();
+  return Expr();
 }
 
 // LUT を読み込む．
@@ -188,27 +188,27 @@ void
 gen_expr(const DotlibPin& pin_info,
 	 const PinMap& pin_map,
 	 vector<bool>& output_array,
-	 vector<LogExpr>& logic_array,
-	 vector<LogExpr>& tristate_array)
+	 vector<Expr>& logic_array,
+	 vector<Expr>& tristate_array)
 {
   for (ymuint i = 0; i < pin_info.num(); ++ i) {
     const DotlibNode* func_node = pin_info.function();
     if ( func_node ) {
-      LogExpr expr = dot2expr(func_node, pin_map);
+      Expr expr = dot2expr(func_node, pin_map);
       logic_array.push_back(expr);
       output_array.push_back(true);
     }
     else {
-      logic_array.push_back(LogExpr::make_zero());
+      logic_array.push_back(Expr::make_zero());
       output_array.push_back(false);
     }
     const DotlibNode* three_state = pin_info.three_state();
     if ( three_state ) {
-      LogExpr expr = dot2expr(three_state, pin_map);
+      Expr expr = dot2expr(three_state, pin_map);
       tristate_array.push_back(expr);
     }
     else {
-      tristate_array.push_back(LogExpr::make_zero());
+      tristate_array.push_back(Expr::make_zero());
     }
   }
 }
@@ -219,8 +219,8 @@ gen_pin(CellLibrary* library,
 	const vector<DotlibPin>& pin_info_array,
 	ymuint cell_id,
 	const vector<bool>& output_array,
-	const vector<LogExpr>& logic_array,
-	const vector<LogExpr>& tristate_array)
+	const vector<Expr>& logic_array,
+	const vector<Expr>& tristate_array)
 {
   ymuint i_pos = 0;
   ymuint o_pos = 0;
@@ -336,12 +336,12 @@ gen_timing(CellLibrary* library,
     }
     tCellTimingType timing_type = timing_info.timing_type();
     const DotlibNode* when_node = timing_info.when();
-    LogExpr cond;
+    Expr cond;
     if ( when_node ) {
       cond = dot2expr(when_node, pin_map);
     }
     else {
-      cond = LogExpr::make_one();
+      cond = Expr::make_one();
     }
 
     switch ( library->delay_model() ) {
@@ -830,8 +830,8 @@ gen_library(const DotlibNode* dt_library)
 
     // 出力ピン(入出力ピン)の論理式を作る．
     vector<bool> output_array;
-    vector<LogExpr> logic_array;
-    vector<LogExpr> tristate_array;
+    vector<Expr> logic_array;
+    vector<Expr> tristate_array;
     ymuint no2 = no + nio;
     output_array.reserve(no2);
     logic_array.reserve(no2);
@@ -860,11 +860,11 @@ gen_library(const DotlibNode* dt_library)
 
     // セルの生成
     if ( dt_ff ) {
-      LogExpr next_state = dot2expr(ff_info.next_state(), pin_map);
-      LogExpr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
-      LogExpr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
-      LogExpr clear = dot2expr(ff_info.clear(), pin_map);
-      LogExpr preset = dot2expr(ff_info.preset(), pin_map);
+      Expr next_state = dot2expr(ff_info.next_state(), pin_map);
+      Expr clocked_on = dot2expr(ff_info.clocked_on(), pin_map);
+      Expr clocked_on_also = dot2expr(ff_info.clocked_on_also(), pin_map);
+      Expr clear = dot2expr(ff_info.clear(), pin_map);
+      Expr preset = dot2expr(ff_info.preset(), pin_map);
       ymuint v1 = ff_info.clear_preset_var1();
       ymuint v2 = ff_info.clear_preset_var2();
       library->new_ff_cell(cell_id, cell_name, area,
@@ -879,11 +879,11 @@ gen_library(const DotlibNode* dt_library)
 
     }
     else if ( dt_latch ) {
-      LogExpr data_in = dot2expr(latch_info.data_in(), pin_map);
-      LogExpr enable = dot2expr(latch_info.enable(), pin_map);
-      LogExpr enable_also = dot2expr(latch_info.enable_also(), pin_map);
-      LogExpr clear = dot2expr(latch_info.clear(), pin_map);
-      LogExpr preset = dot2expr(latch_info.preset(), pin_map);
+      Expr data_in = dot2expr(latch_info.data_in(), pin_map);
+      Expr enable = dot2expr(latch_info.enable(), pin_map);
+      Expr enable_also = dot2expr(latch_info.enable_also(), pin_map);
+      Expr clear = dot2expr(latch_info.clear(), pin_map);
+      Expr preset = dot2expr(latch_info.preset(), pin_map);
       ymuint v1 = latch_info.clear_preset_var1();
       ymuint v2 = latch_info.clear_preset_var2();
       library->new_latch_cell(cell_id, cell_name, area,
@@ -945,7 +945,7 @@ gen_library(const DotlibNode* dt_library)
 	bool has_logic = cell->has_logic(oid);
 	TvFunc tv_function;
 	if ( has_logic ) {
-	  LogExpr expr = cell->logic_expr(oid);
+	  Expr expr = cell->logic_expr(oid);
 	  tv_function = expr.make_tv(ni2);
 	}
 	for (ymuint iid = 0; iid < ni2; ++ iid) {

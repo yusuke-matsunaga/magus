@@ -1,16 +1,16 @@
 
-/// @file LexpParser.cc
-/// @brief LexpParser の実装ファイル
+/// @file ExprParser.cc
+/// @brief ExprParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LexpParser.h"
+#include "ExprParser.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 // 字句解析ルール
 // "(double-quote) で囲まれた文字列はいかなるコードであろうと
@@ -20,19 +20,19 @@ BEGIN_NAMESPACE_YM_LEXP
 
 // @brief コンストラクタ
 // @param[in] input 入力ファイルストリーム
-LexpParser::LexpParser(istream* input) :
+ExprParser::ExprParser(istream* input) :
   mInput(input)
 {
 }
 
 // @brief デストラクタ
-LexpParser::~LexpParser()
+ExprParser::~ExprParser()
 {
 }
 
 // str からリテラル番号を得る．
 VarId
-LexpParser::str_to_literal(const string& str)
+ExprParser::str_to_literal(const string& str)
 {
   ymuint id = 0;
   for (string::const_iterator p = str.begin(); p != str.end(); ++p) {
@@ -45,7 +45,7 @@ LexpParser::str_to_literal(const string& str)
 
 // トークンを一つ読み出す．
 tToken
-LexpParser::get_token(VarId& lit_id)
+ExprParser::get_token(VarId& lit_id)
 {
   string str;
   char c;
@@ -146,7 +146,7 @@ LexpParser::get_token(VarId& lit_id)
 // 次のトークンが AND ならそれを読み出し true を返す．
 // そうでなければなにもしないで false を返す．
 bool
-LexpParser::get_and_token()
+ExprParser::get_and_token()
 {
   for ( ; ; ) {
     char c;
@@ -161,8 +161,8 @@ LexpParser::get_and_token()
 
 // リテラルをとって来る．
 // ただし，LP expr RP もリテラルと見なす．
-LogExpr
-LexpParser::get_literal()
+Expr
+ExprParser::get_literal()
 {
   // ここに来る可能性のあるのは NUM, NOT, LP のみ
   // それ以外はエラー
@@ -170,16 +170,16 @@ LexpParser::get_literal()
   tToken token = get_token(id);
 
   if ( token == kTokenZERO ) {
-    return LogExpr::make_zero();
+    return Expr::make_zero();
   }
 
   if ( token == kTokenONE ) {
-    return LogExpr::make_one();
+    return Expr::make_one();
   }
 
   if ( token == kTokenNUM ) {
     // id 番目の肯定のリテラルを作る．
-    return LogExpr::make_posiliteral(id);
+    return Expr::make_posiliteral(id);
   }
 
   if ( token == kTokenNOT ) {
@@ -190,7 +190,7 @@ LexpParser::get_literal()
       throw SyntaxError("NUMBER is expected after NOT");
     }
     // id 番目の否定のリテラルを作る．
-    return LogExpr::make_negaliteral(id);
+    return Expr::make_negaliteral(id);
   }
 
   if ( token == kTokenLP ) {
@@ -202,15 +202,15 @@ LexpParser::get_literal()
   throw SyntaxError("syntax error");
 
   // ダミー
-  return LogExpr::make_zero();
+  return Expr::make_zero();
 }
 
 // AND でつながった積項をとって来る．
-LogExpr
-LexpParser::get_product()
+Expr
+ExprParser::get_product()
 {
   // まず第一項めを取り出す．
-  LogExpr expr = get_literal();
+  Expr expr = get_literal();
 
   for ( ; ; ) {
     // 次のトークンが AND かどうかを調べる．
@@ -219,7 +219,7 @@ LexpParser::get_product()
       return expr;
     }
     // 次のリテラルを取り出す．
-    LogExpr expr1 = get_literal();
+    Expr expr1 = get_literal();
 
     // 積項を作る．
     expr &= expr1;
@@ -229,11 +229,11 @@ LexpParser::get_product()
 
 // OR もしくは XOR でつながった積項をとって来る．
 // 最後は end_token で終らなければ false を返す．
-LogExpr
-LexpParser::get_expr(tToken end_token)
+Expr
+ExprParser::get_expr(tToken end_token)
 {
   // まず第一項めを取り出す．
-  LogExpr expr = get_product();
+  Expr expr = get_product();
 
   for ( ; ; ) {
     // 次のトークンを調べる．
@@ -248,7 +248,7 @@ LexpParser::get_expr(tToken end_token)
       throw SyntaxError("syntax error");
     }
     // 次の積項を取り出す．
-    LogExpr expr1 = get_product();
+    Expr expr1 = get_product();
 
     if ( token == kTokenOR ) {
       // 和項を作る．
@@ -283,4 +283,4 @@ operator<<(ostream& s,
   return s;
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR

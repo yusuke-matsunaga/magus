@@ -12,7 +12,7 @@
 #include "satpg_nsdef.h"
 #include "networks/tgnet.h"
 #include "cell/cell_nsdef.h"
-#include "logic/lexp_nsdef.h"
+#include "logic/expr_nsdef.h"
 #include "utils/SimpleAlloc.h"
 
 
@@ -166,7 +166,7 @@ private:
   /// @param[inout] id プリミティブID
   /// @note id は内部でインクリメントされる．
   TpgPrimitive*
-  make_primitive(const LogExpr& expr,
+  make_primitive(const Expr& expr,
 		 const TgNode* tgnode,
 		 TpgPrimitive* primitive_list,
 		 ymuint& id);

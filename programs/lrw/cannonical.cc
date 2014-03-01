@@ -74,7 +74,7 @@ xform_func4(ymuint16 fv,
 
 ymuint16
 cannonical4(ymuint16 func,
-	    const hash_set<ymuint32>& rep_hash,
+	    const unordered_set<ymuint32>& rep_hash,
 	    ymuint16& cperm)
 {
   // ベタなやり方
@@ -95,7 +95,7 @@ void
 cannonical(bool debug)
 {
   // 代表関数を記録するハッシュ表
-  hash_set<ymuint32> rep_hash;
+  unordered_set<ymuint32> rep_hash;
   for (ymuint i = 0; npn4rep[i] != 0xFFFF; ++ i) {
     rep_hash.insert(npn4rep[i]);
   }

@@ -9,7 +9,7 @@
 
 #include "GenPat2.h"
 #include "NpnNode.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -140,7 +140,7 @@ GenPat2::operator()(ymuint slack)
     const vector<NpnHF>& src_list1 = mRepList[level];
     ymuint n1 = src_list1.size();
 
-    hash_map<ymuint16, vector<NpnHandle> > pat_list;
+    unordered_map<ymuint16, vector<NpnHandle> > pat_list;
     vector<ymuint16> flist;
     for (ymuint i = 0; i < n1; ++ i) {
       NpnHandle handle = src_list1[i].mHandle;
@@ -154,7 +154,7 @@ GenPat2::operator()(ymuint slack)
     }
     sort(flist.begin(), flist.end());
     for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
-      hash_map<ymuint16, vector<NpnHandle> >::iterator q = pat_list.find(*p);
+      unordered_map<ymuint16, vector<NpnHandle> >::iterator q = pat_list.find(*p);
       assert_cond( q != pat_list.end(), __FILE__, __LINE__);
       vector<NpnHandle>& handle_list = q->second;
       cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
@@ -251,7 +251,7 @@ GenPat2::npn_expand(NpnHandle handle,
 		    ymuint16 func,
 		    ymuint32 level)
 {
-  hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+  unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
   p = mNpnHash.find(func);
   assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
   const vector<FuncXform>& xf_list = p->second;
@@ -589,14 +589,14 @@ GenPat2::count1(NpnHandle handle)
 ymuint
 GenPat2::count2(NpnHandle handle)
 {
-  hash_set<ymuint32> hash1;
+  unordered_set<ymuint32> hash1;
   return count2_sub(handle, hash1);
 }
 
 // @brief count2 の下請け関数
 ymuint
 GenPat2::count2_sub(NpnHandle handle,
-		    hash_set<ymuint32>& hash)
+		    unordered_set<ymuint32>& hash)
 {
   NpnNode* node = mMgr.node(handle.node_id());
   if ( !node->is_logic() ) {
@@ -688,7 +688,7 @@ GenPat2::init_npn4rep()
 
     // fv の NPN 同値類の重複のない変換のリストを作る．
     vector<FuncXform> tmp_list;
-    hash_set<ymuint32> func_hash;
+    unordered_set<ymuint32> func_hash;
     for (ymuint p = 0; p < 768; ++ p) {
       NpnXform xf(npn4perm[p]);
       ymuint16 fv1 = xform_func4(fv, xf);

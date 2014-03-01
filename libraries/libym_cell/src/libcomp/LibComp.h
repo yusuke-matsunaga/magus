@@ -126,7 +126,7 @@ private:
   /// @param[in] expr 論理式
   /// @param[in] builtin 組み込みクラスの時 true にするフラグ
   void
-  reg_expr(const LogExpr& expr,
+  reg_expr(const Expr& expr,
 	   bool builtin);
 
   /// @brief 新しいグループを作る．

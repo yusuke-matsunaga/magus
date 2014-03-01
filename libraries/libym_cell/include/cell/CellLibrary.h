@@ -10,7 +10,7 @@
 
 
 #include "cell/cell_nsdef.h"
-#include "logic/lexp_nsdef.h"
+#include "logic/expr_nsdef.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
 
@@ -487,8 +487,8 @@ public:
 		 ymuint nb,
 		 ymuint nc,
 		 const vector<bool>& output_array,
-		 const vector<LogExpr>& logic_array,
-		 const vector<LogExpr>& tristate_array) = 0;
+		 const vector<Expr>& logic_array,
+		 const vector<Expr>& tristate_array) = 0;
 
   /// @brief FFセルを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
@@ -522,13 +522,13 @@ public:
 	      ymuint nb,
 	      ymuint nc,
 	      const vector<bool>& output_array,
-	      const vector<LogExpr>& logic_array,
-	      const vector<LogExpr>& tristate_array,
-	      const LogExpr& next_state,
-	      const LogExpr& clocked_on,
-	      const LogExpr& clocked_on_also,
-	      const LogExpr& clear,
-	      const LogExpr& preset,
+	      const vector<Expr>& logic_array,
+	      const vector<Expr>& tristate_array,
+	      const Expr& next_state,
+	      const Expr& clocked_on,
+	      const Expr& clocked_on_also,
+	      const Expr& clear,
+	      const Expr& preset,
 	      ymuint clear_preset_var1,
 	      ymuint clear_preset_var2) = 0;
 
@@ -564,13 +564,13 @@ public:
 		 ymuint nb,
 		 ymuint nc,
 		 const vector<bool>& output_array,
-		 const vector<LogExpr>& logic_array,
-		 const vector<LogExpr>& tristate_array,
-		 const LogExpr& data_in,
-		 const LogExpr& enable,
-		 const LogExpr& enable_also,
-		 const LogExpr& clear,
-		 const LogExpr& preset,
+		 const vector<Expr>& logic_array,
+		 const vector<Expr>& tristate_array,
+		 const Expr& data_in,
+		 const Expr& enable,
+		 const Expr& enable_also,
+		 const Expr& clear,
+		 const Expr& preset,
 		 ymuint clear_preset_var1,
 		 ymuint clear_preset_var2) = 0;
 
@@ -601,8 +601,8 @@ public:
 	       ymuint nb,
 	       ymuint nc,
 	       const vector<bool>& output_array,
-	       const vector<LogExpr>& logic_array,
-	       const vector<LogExpr>& tristate_array) = 0;
+	       const vector<Expr>& logic_array,
+	       const vector<Expr>& tristate_array) = 0;
 
   /// @brief セルの入力ピンを生成する．
   /// @param[in] cell_id セル番号 ( 0 <= cell_id < cell_num() )
@@ -643,8 +643,8 @@ public:
 		  ymuint output_id,
 		  const string& name,
 		  bool has_logic,
-		  const LogExpr& logic_expr,
-		  const LogExpr& tristate_expr,
+		  const Expr& logic_expr,
+		  const Expr& tristate_expr,
 		  CellCapacitance max_fanout,
 		  CellCapacitance min_fanout,
 		  CellCapacitance max_capacitance,
@@ -678,8 +678,8 @@ public:
 		 ymuint output_id,
 		 const string& name,
 		 bool has_logic,
-		 const LogExpr& logic_expr,
-		 const LogExpr& tristate_expr,
+		 const Expr& logic_expr,
+		 const Expr& tristate_expr,
 		 CellCapacitance capacitance,
 		 CellCapacitance rise_capacitance,
 		 CellCapacitance fall_capacitance,
@@ -726,7 +726,7 @@ public:
   new_timing_generic(ymuint cell_id,
 		     ymuint tid,
 		     tCellTimingType type,
-		     const LogExpr& cond,
+		     const Expr& cond,
 		     CellTime intrinsic_rise,
 		     CellTime intrinsic_fall,
 		     CellTime slope_rise,
@@ -750,7 +750,7 @@ public:
   new_timing_piecewise(ymuint cell_id,
 		       ymuint tid,
 		       tCellTimingType timing_type,
-		       const LogExpr& cond,
+		       const Expr& cond,
 		       CellTime intrinsic_rise,
 		       CellTime intrinsic_fall,
 		       CellTime slope_rise,
@@ -772,7 +772,7 @@ public:
   new_timing_lut1(ymuint cell_id,
 		  ymuint tid,
 		  tCellTimingType timing_type,
-		  const LogExpr& cond,
+		  const Expr& cond,
 		  CellLut* cell_rise,
 		  CellLut* cell_fall,
 		  CellLut* rise_transition,
@@ -792,7 +792,7 @@ public:
   new_timing_lut2(ymuint cell_id,
 		  ymuint tid,
 		  tCellTimingType timing_type,
-		  const LogExpr& cond,
+		  const Expr& cond,
 		  CellLut* rise_transition,
 		  CellLut* fall_transition,
 		  CellLut* rise_propagation,

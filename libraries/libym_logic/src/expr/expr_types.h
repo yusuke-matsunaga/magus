@@ -1,5 +1,5 @@
-#ifndef LEXP_TYPES_H
-#define LEXP_TYPES_H
+#ifndef EXPR_TYPES_H
+#define EXPR_TYPES_H
 
 /// @file lexp_types.h
 /// @brief libym_lexp で内部的に用いる型定義
@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "logic/LogExpr.h"
+#include "logic/Expr.h"
 
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 /// @brief 演算子の種類を表す列挙型
 ///
@@ -31,6 +31,6 @@ enum tType {
 /// @brief 参照回数の最大値
 const ymuint32 kRefMax = 1UL << (sizeof(ymuint32) * 8 - 4);
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
-#endif // LEXP_TYPES_H
+#endif // EXPR_TYPES_H

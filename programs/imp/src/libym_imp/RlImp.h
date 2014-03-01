@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BNetwork.h"
+#include "networks/BNetwork.h"
 #include "ImpVal.h"
 
 

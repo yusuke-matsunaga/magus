@@ -1,5 +1,5 @@
-#ifndef VERILOG_VL_VLEXPR_H
-#define VERILOG_VL_VLEXPR_H
+#ifndef VERILOG_VL_VEXPRR_H
+#define VERILOG_VL_VEXPRR_H
 
 /// @file verilog/vl/VlExpr.h
 /// @brief VlExpr のヘッダファイル
@@ -310,4 +310,4 @@ public:
 
 END_NAMESPACE_YM_VERILOG
 
-#endif // VERILOG_VL_VLEXPR_H
+#endif // VERILOG_VL_VEXPRR_H

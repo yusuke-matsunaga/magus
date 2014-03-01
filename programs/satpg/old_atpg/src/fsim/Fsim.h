@@ -16,7 +16,7 @@
 #include "ModBase.h"
 #include "PackedVal.h"
 #include "ym_networks/tgnet.h"
-#include "ym_logic/LogExpr.h"
+#include "ym_logic/Expr.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 
@@ -153,7 +153,7 @@ private:
 
   /// @brief logic ノードを作る．
   SimNode*
-  make_logic(const LogExpr& lexp,
+  make_logic(const Expr& lexp,
 	     const vector<SimNode*>& inputs,
 	     const vector<EdgeMap*>& emap);
 

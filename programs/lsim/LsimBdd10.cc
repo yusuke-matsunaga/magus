@@ -8,8 +8,8 @@
 
 
 #include "LsimBdd10.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -61,7 +61,7 @@ END_NONAMESPACE
 // @param[in] order_map 順序マップ
 void
 LsimBdd10::set_network(const BdnMgr& bdn,
-		      const hash_map<string, ymuint>& order_map)
+		      const unordered_map<string, ymuint>& order_map)
 {
   ymuint n = bdn.max_node_id();
   vector<Bdd> bddmap(n);
@@ -83,7 +83,7 @@ LsimBdd10::set_network(const BdnMgr& bdn,
 	 p != input_list.end(); ++ p) {
       const BdnNode* node = *p;
       string name = node->port()->name();
-      hash_map<string, ymuint>::const_iterator q = order_map.find(name);
+      unordered_map<string, ymuint>::const_iterator q = order_map.find(name);
       if ( q == order_map.end() ) {
 	cerr << "No order for " << name << endl;
 	abort();
@@ -131,7 +131,7 @@ LsimBdd10::set_network(const BdnMgr& bdn,
 
   mBddMgr.disable_gc();
 
-  hash_map<Bdd, ympuint> node_map;
+  unordered_map<Bdd, ympuint> node_map;
 
   const BdnNodeList& output_list = bdn.output_list();
   ymuint no = output_list.size();
@@ -161,7 +161,7 @@ LsimBdd10::set_network(const BdnMgr& bdn,
 
 ympuint
 LsimBdd10::make_node(Bdd bdd,
-		     hash_map<Bdd, ympuint>& node_map)
+		     unordered_map<Bdd, ympuint>& node_map)
 {
   if ( bdd.is_zero() ) {
     return 0UL;
@@ -170,7 +170,7 @@ LsimBdd10::make_node(Bdd bdd,
     return 1UL;
   }
 
-  hash_map<Bdd, ympuint>::iterator p = node_map.find(bdd);
+  unordered_map<Bdd, ympuint>::iterator p = node_map.find(bdd);
   if ( p != node_map.end() ) {
     return p->second;
   }
@@ -195,7 +195,7 @@ LsimBdd10::make_node(Bdd bdd,
     node->mId[i] = 0;
   }
   for (ymuint addr = 0U; addr < 1024; ++ addr) {
-    hash_map<VarId, ymuint> var_map;
+    unordered_map<VarId, ymuint> var_map;
     for (ymuint i = 0; i < 10; ++ i) {
       if ( addr & (1U << i) ) {
 	var_map.insert(make_pair(sup_list[i], 1));
@@ -209,7 +209,7 @@ LsimBdd10::make_node(Bdd bdd,
       Bdd bdd0;
       Bdd bdd1;
       VarId id = tmp_bdd.root_decomp(bdd0, bdd1);
-      hash_map<VarId, ymuint>::iterator p = var_map.find(id);
+      unordered_map<VarId, ymuint>::iterator p = var_map.find(id);
       if ( p == var_map.end() ) {
 	break;
       }

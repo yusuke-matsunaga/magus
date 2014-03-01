@@ -1,15 +1,15 @@
-#ifndef LOGIC_LOGEXPR_H
-#define LOGIC_LOGEXPR_H
+#ifndef LOGIC_EXPR_H
+#define LOGIC_EXPR_H
 
-/// @file logic/LogExpr.h
-/// @brief LogExpr のヘッダファイル
+/// @file logic/Expr.h
+/// @brief Expr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "logic/lexp_nsdef.h"
+#include "logic/expr_nsdef.h"
 #include "logic/Literal.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
@@ -22,14 +22,14 @@ class TvFunc;
 
 END_NAMESPACE_YM
 
-BEGIN_NAMESPACE_YM_LEXP
+BEGIN_NAMESPACE_YM_EXPR
 
 // クラス名の先行宣言
-class LexpNode;
+class ExprNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LogExpr LogExpr.h "logic/LogExpr.h"
-/// @ingroup LexpGroup
+/// @class Expr Expr.h "logic/Expr.h"
+/// @ingroup ExprGroup
 /// @brief 論理式を表すクラス
 ///
 /// 論理式は
@@ -42,9 +42,9 @@ class LexpNode;
 /// 処理は行っていない．
 /// @sa VarId, Literal
 //////////////////////////////////////////////////////////////////////
-class LogExpr
+class Expr
 {
-  friend class LexpMgr;
+  friend class ExprMgr;
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -55,20 +55,20 @@ public:
   ///
   /// - 値は定数0になる
   /// - ただし意識して定数0を作りたいなら MakeConst0() を使うこと．
-  LogExpr();
+  Expr();
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
-  LogExpr(const LogExpr& src);
+  Expr(const Expr& src);
 
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   /// @return 自分自身
-  const LogExpr&
-  operator=(const LogExpr& src);
+  const Expr&
+  operator=(const Expr& src);
 
   /// @brief デストラクタ
-  ~LogExpr();
+  ~Expr();
 
   /// @brief 入力ストリームを読んで論理式に変換する．
   /// @param[in] istr 入力ストリーム
@@ -80,27 +80,27 @@ public:
   read_from_stream(istream& istr,
 		   string& err_msg);
 
-  /// @brief 論理式をパーズして LogExpr オブジェクトを作る．
+  /// @brief 論理式をパーズして Expr オブジェクトを作る．
   /// @param[in] in 入力ストリーム
   /// @param[out] err_msg エラーメッセージを格納する文字列
-  /// @return 変換された LogExpr オブジェクト
+  /// @return 変換された Expr オブジェクト
   /// @note エラーが起きたら msg にエラーメッセージをセットする．
   /// @note このインターフェイスでは err_msg が空かどうかでエラーを判断するしかない．
   static
-  LogExpr
+  Expr
   stream_to_expr(istream& in,
 		 string& err_msg);
 
   /// @brief 恒偽関数の生成
   /// @return 生成したオブジェクト
   static
-  LogExpr
+  Expr
   make_zero();
 
   /// @brief 恒真関数の生成
   /// @return 生成したオブジェクト
   static
-  LogExpr
+  Expr
   make_one();
 
   /// @brief リテラル式の生成
@@ -110,7 +110,7 @@ public:
   ///                - true:  反転あり (負極性)
   /// @return 生成したオブジェクト
   static
-  LogExpr
+  Expr
   make_literal(VarId varid,
 	       bool inv);
 
@@ -118,43 +118,43 @@ public:
   /// @param[in] lit リテラル
   /// @return 生成したオブジェクト
   static
-  LogExpr
+  Expr
   make_literal(const Literal& lit);
 
   /// @brief 正(肯定)リテラル式の生成
   /// @param[in] varid 変数番号
   /// @return 生成したオブジェクト
   static
-  LogExpr
+  Expr
   make_posiliteral(VarId varid);
 
   /// @brief 負(否定)リテラル式の生成
   /// @param[in] varid 変数番号
   /// @return 生成したオブジェクト
   static
-  LogExpr
+  Expr
   make_negaliteral(VarId varid);
 
   /// @brief AND 式の生成
   /// @param[in] chd_list オペランドのベクタ
   /// @return chd_list を部分論理式に持つ AND 式を生成し，返す．
   static
-  LogExpr
-  make_and(const LogExprVector& chd_list);
+  Expr
+  make_and(const ExprVector& chd_list);
 
   /// @brief AND 式の生成
   /// @param[in] chd_list オペランドのリスト
   /// @return chd_list を部分論理式に持つ AND 式を生成し，返す．
   static
-  LogExpr
-  make_and(const LogExprList& chd_list);
+  Expr
+  make_and(const ExprList& chd_list);
 
   /// @brief OR 式の生成
   /// @param[in] chd_list オペランドのベクタ
   /// @return chd_list を部分論理式に持つ OR 式を生成し，返す．
   static
-  LogExpr
-  make_or(const LogExprVector& chd_list);
+  Expr
+  make_or(const ExprVector& chd_list);
 
   /// @brief OR 式の生成
   ///
@@ -162,22 +162,22 @@ public:
   /// @param[in] chd_list オペランドのリスト
   /// @return chd_list を部分論理式に持つ OR 式を生成し，返す．
   static
-  LogExpr
-  make_or(const LogExprList& chd_list);
+  Expr
+  make_or(const ExprList& chd_list);
 
   /// @brief XOR 式の生成
   /// @param[in] chd_list オペランドのベクタ
   /// @return chd_list を部分論理式に持つ XOR 式を生成し，返す．
   static
-  LogExpr
-  make_xor(const LogExprVector& chd_list);
+  Expr
+  make_xor(const ExprVector& chd_list);
 
   /// @brief XOR 式の生成
   /// @param[in] chd_list オペランドのリスト
   /// @return chd_list を部分論理式に持つ XOR 式を生成し，返す．
   static
-  LogExpr
-  make_xor(const LogExprList& chd_list);
+  Expr
+  make_xor(const ExprList& chd_list);
 
   /// @brief 確保していたメモリを開放する．
   /// @note メモリリークチェックのための関数なので通常は使用しない．
@@ -195,7 +195,7 @@ public:
 
   /// @brief 論理否定
   /// @return 自分自身を否定した形の論理式を返す．
-  LogExpr
+  Expr
   operator~() const;
 
   /// @brief AND つき代入
@@ -203,24 +203,24 @@ public:
   /// @return 自分自身
   ///
   /// 自分の論理式と src の論理式の AND を計算し自分に代入する．
-  const LogExpr&
-  operator&=(const LogExpr& src);
+  const Expr&
+  operator&=(const Expr& src);
 
   /// @brief OR つき代入
   /// @param[in] src オペランド
   /// @return 自分自身
   ///
   /// 自分の論理式と src の論理式の OR を計算し自分に代入する．
-  const LogExpr&
-  operator|=(const LogExpr& src);
+  const Expr&
+  operator|=(const Expr& src);
 
   /// @brief XOR つき代入
   /// @param[in] src オペランド
   /// @return 自分自身
   ///
   /// 自分の論理式と src の論理式の XOR を計算し自分に代入する．
-  const LogExpr&
-  operator^=(const LogExpr& src);
+  const Expr&
+  operator^=(const Expr& src);
 
   /// @brief compose 演算
   /// @param[in] varid 置き換え対象の変数番号
@@ -231,9 +231,9 @@ public:
   /// 展開はされない．
   /// -もしも自分自身の論理式の中に varid 番目のリテラル
   /// が含まれない場合にはなにも変わらない．
-  LogExpr
+  Expr
   compose(VarId varid,
-	  const LogExpr& sub) const;
+	  const Expr& sub) const;
 
   /// @brief 複数変数の compose 演算
   /// @param[in] comp_map 置き換える変数をキーにして置き換える先の
@@ -241,8 +241,8 @@ public:
   /// @return comp_map にしたがって置き換えを行った論理式
   ///
   /// 一度に複数の置き換えを行う
-  LogExpr
-  compose(const VarLogExprMap& comp_map) const;
+  Expr
+  compose(const VarExprMap& comp_map) const;
 
   /// @brief 変数番号を再マップする．
   /// @param[in] varmap 置き換え元の変数番号をキーとして
@@ -250,7 +250,7 @@ public:
   /// @return 置き換えた論理式
   ///
   /// varmap に登録されていない場合には不変とする．
-  LogExpr
+  Expr
   remap_var(const VarVarMap& varmap) const;
 
   /// @brief 簡単化
@@ -259,7 +259,7 @@ public:
   /// のような簡単なルールで簡単かを行う
   /// 自分自身が簡単化された式に置き換わる．
   /// @return 自分自身
-  const LogExpr&
+  const Expr&
   simplify();
 
   /// @brief 値の評価
@@ -352,7 +352,7 @@ public:
   /// @return pos 番目のオペランドを返す．
   /// ただし pos が範囲外の場合と演算子ノードでなかった場合には
   /// 0を表す式を返す．
-  LogExpr
+  Expr
   child(ymuint pos) const;
 
   /// @brief "シンプル"な論理式のチェック
@@ -515,24 +515,24 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   friend
-  LogExpr
-  operator&(const LogExpr& src1,
-	    const LogExpr& src2);
+  Expr
+  operator&(const Expr& src1,
+	    const Expr& src2);
 
   friend
-  LogExpr
-  operator|(const LogExpr& src1,
-	    const LogExpr& src2);
+  Expr
+  operator|(const Expr& src1,
+	    const Expr& src2);
 
   friend
-  LogExpr
-  operator^(const LogExpr& src1,
-	    const LogExpr& src2);
+  Expr
+  operator^(const Expr& src1,
+	    const Expr& src2);
 
   friend
   bool
-  compare_type(const LogExpr& src1,
-	       const LogExpr& src2);
+  compare_type(const Expr& src1,
+	       const Expr& src2);
 
 
 private:
@@ -540,14 +540,14 @@ private:
   // @brief 内部で用いるコンストラクタ
   // @param[in] node 根のノード
   // node が 0 の場合には abort する．
-  LogExpr(const LexpNode* node);
+  Expr(const ExprNode* node);
 
   // 根のノードをセットする．
   void
-  set_root(const LexpNode* node);
+  set_root(const ExprNode* node);
 
   /// @brief 根のノートを得る．
-  const LexpNode*
+  const ExprNode*
   root() const;
 
 
@@ -557,7 +557,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 根のノード
-  const LexpNode* mRootPtr;
+  const ExprNode* mRootPtr;
 
 };
 
@@ -569,66 +569,66 @@ private:
 /// @name 論理演算
 /// @{
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief AND 演算
 /// @param[in] src1, src2 オペランド
 /// @return src1 の論理式と src2 の論理式の AND を返す．
-LogExpr
-operator&(const LogExpr& src1,
-	  const LogExpr& src2);
+Expr
+operator&(const Expr& src1,
+	  const Expr& src2);
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief OR 演算
 /// @param[in] src1, src2 オペランド
 /// @return src1 の論理式と src2 の論理式の OR を返す．
-LogExpr
-operator|(const LogExpr& src1,
-	  const LogExpr& src2);
+Expr
+operator|(const Expr& src1,
+	  const Expr& src2);
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief XOR 演算
 /// @param[in] src1, src2 オペランド
 /// @return src1 の論理式と src2 の論理式の XOR を返す．
-LogExpr
-operator^(const LogExpr& src1,
-	  const LogExpr& src2);
+Expr
+operator^(const Expr& src1,
+	  const Expr& src2);
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief 根の演算タイプの比較
 /// @param[in] src1, src2 オペランド
 /// @return src1 と src2 の根のタイプが同じとき true を返す．
 bool
-compare_type(const LogExpr& src1,
-	     const LogExpr& src2);
+compare_type(const Expr& src1,
+	     const Expr& src2);
 
 /// @}
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief 論理式の内容のストリーム出力
 /// @param[in] s 出力ストリーム
 /// @param[in] expr 論理式
 /// @return s
 ostream&
 operator<<(ostream& s,
-	   const LogExpr& expr);
+	   const Expr& expr);
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief 論理式の内容のバイナリ出力
 /// @param[in] s 出力ストリーム
 /// @param[in] expr 論理式
 /// @return s
 ODO&
 operator<<(ODO& s,
-	   const LogExpr& expr);
+	   const Expr& expr);
 
-/// @relates LogExpr
+/// @relates Expr
 /// @brief 論理式の内容のバイナリ入力
 /// @param[in] s 入力ストリーム
 /// @param[out] expr 論理式
 /// @return s
 IDO&
 operator>>(IDO& s,
-	   LogExpr& expr);
+	   Expr& expr);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -636,34 +636,34 @@ operator>>(IDO& s,
 //////////////////////////////////////////////////////////////////////
 
 inline
-LogExpr
-LogExpr::make_literal(VarId varid,
+Expr
+Expr::make_literal(VarId varid,
 		      bool inv)
 {
   return inv ? make_negaliteral(varid) : make_posiliteral(varid);
 }
 
 inline
-LogExpr
-LogExpr::make_literal(const Literal& lit)
+Expr
+Expr::make_literal(const Literal& lit)
 {
   return make_literal(lit.varid(), lit.is_negative());
 }
 
 inline
 ymuint
-LogExpr::litnum(const Literal& lit) const
+Expr::litnum(const Literal& lit) const
 {
   return litnum(lit.varid(), lit.is_negative());
 }
 
 inline
 ymuint
-LogExpr::sop_litnum(const Literal& lit) const
+Expr::sop_litnum(const Literal& lit) const
 {
   return sop_litnum(lit.varid(), lit.is_negative());
 }
 
-END_NAMESPACE_YM_LEXP
+END_NAMESPACE_YM_EXPR
 
-#endif // LOGIC_LOGEXPR_H
+#endif // LOGIC_EXPR_H

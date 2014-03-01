@@ -11,8 +11,8 @@
 #include "IgVar.h"
 #include "RegVect.h"
 #include "Variable.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
 #include <signal.h>
 
 BEGIN_NAMESPACE_YM_IGF

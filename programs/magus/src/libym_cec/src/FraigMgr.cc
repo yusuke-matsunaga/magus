@@ -120,7 +120,7 @@ FraigMgr::make_and(FraigHandle edge1,
 // @param[in] expr 対象の論理式
 // @param[in] inputs 入力に対応する AIG ハンドル
 FraigHandle
-FraigMgr::make_logic(const LogExpr& expr,
+FraigMgr::make_logic(const Expr& expr,
 		     const vector<FraigHandle>& inputs)
 {
   if ( expr.is_zero() ) {

@@ -10,8 +10,8 @@
 
 
 #include "llvmeq_nsdef.h"
-#include "ym_utils/UnitAlloc.h"
-#include "ym_logic/VarId.h"
+#include "utils/UnitAlloc.h"
+#include "logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ

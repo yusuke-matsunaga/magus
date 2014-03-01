@@ -82,7 +82,7 @@ VlwAssign::put_lhs(const string& name,
 // @param[in] name_map 変数名の対応表
 // @note expr 中の i 番めの変数の名前が name_map[i] に入っている．
 void
-VlwAssign::put_rhs(const LogExpr& expr,
+VlwAssign::put_rhs(const Expr& expr,
 		   const VarStrMap& name_map)
 {
   writer().put_expr(expr, name_map);

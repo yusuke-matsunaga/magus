@@ -102,7 +102,7 @@ FsimX::set_network(const TgNetwork& network,
     mEdgeMap[tgnode->gid()].resize(ni);
     if ( tgnode->is_cplx_logic() ) {
       vector<SimNode*> inputs2(ni * 2);
-      LogExpr lexp = mNetwork->get_lexp(tgnode->func_id());
+      Expr lexp = mNetwork->get_lexp(tgnode->func_id());
       vector<EdgeMap*> emap(ni, NULL);
       for (ymuint i = 0; i < ni; ++ i) {
 	// 各変数の使われ方をチェック
@@ -826,7 +826,7 @@ FsimX::make_input()
 
 // @brief logic ノードを作る．
 SimNode*
-FsimX::make_logic(const LogExpr& lexp,
+FsimX::make_logic(const Expr& lexp,
 		  const vector<SimNode*>& inputs,
 		  const vector<EdgeMap*>& emap)
 {
@@ -882,7 +882,7 @@ FsimX::make_node(tTgGateType type,
 		 const vector<SimNode*>& inputs)
 {
   ymuint32 id = mNodeArray.size();
-  SimNode* node = SimNode::new_node(id, type, LogExpr(), inputs);
+  SimNode* node = SimNode::new_node(id, type, Expr(), inputs);
   mNodeArray.push_back(node);
   mLogicArray.push_back(node);
   return node;

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "logic/Bdd.h"
 
 #include "Weight.h"
 #include "ItvlList.h"

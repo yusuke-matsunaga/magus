@@ -263,7 +263,7 @@ GenAig::npn_expand(ymuint32 fv,
 		   ymuint32 level)
 {
   if ( mNi == 3 ) {
-    hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+    unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(fv);
     assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
     const vector<FuncXform>& xf_list = p->second;
@@ -276,7 +276,7 @@ GenAig::npn_expand(ymuint32 fv,
     }
   }
   else {
-    hash_map<ymuint32, vector<FuncXform> >::const_iterator p;
+    unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(fv);
     assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
     const vector<FuncXform>& xf_list = p->second;
@@ -472,14 +472,14 @@ GenAig::count1(Aig aig)
 ymuint
 GenAig::count2(Aig aig)
 {
-  hash_set<Aig> hash1;
+  unordered_set<Aig> hash1;
   return count2_sub(aig, hash1);
 }
 
 // @brief count2 の下請け関数
 ymuint
 GenAig::count2_sub(Aig aig,
-		   hash_set<Aig>& hash)
+		   unordered_set<Aig>& hash)
 {
   if ( aig.inv() ) {
     aig = ~aig;
@@ -532,7 +532,7 @@ aig_to_func(Aig aig)
 
 ymuint
 count_sub(Aig aig,
-	  hash_set<Aig>& aig_hash)
+	  unordered_set<Aig>& aig_hash)
 {
   if ( aig.inv() ) {
     aig = ~aig;
@@ -561,7 +561,7 @@ GenAig::sanity_check(AigPat aigpat)
     cout << "Error:  aigpat.mAig != aigpat.mFunc" << endl;
     return false;
   }
-  hash_set<Aig> aig_hash;
+  unordered_set<Aig> aig_hash;
   ymuint level = count_sub(aigpat.mAig, aig_hash);
   if ( aigpat.mLevel != level ) {
     cout << "Error: level of aigpat.mAig != aigpat.mLevel" << endl;
@@ -577,7 +577,7 @@ GenAig::init_npn3rep()
     ymuint32 fv = npn3rep[i];
 
     vector<FuncXform> tmp_list;
-    hash_set<ymuint32> func_hash;
+    unordered_set<ymuint32> func_hash;
     for (ymuint p = 0; p < 96; ++ p) {
       ymuint8* perm = npn3perm[p];
       ymuint32 fv1 = xform_func3(fv, perm);
@@ -599,7 +599,7 @@ GenAig::init_npn4rep()
     ymuint32 fv = npn4rep[i];
 
     vector<FuncXform> tmp_list;
-    hash_set<ymuint32> func_hash;
+    unordered_set<ymuint32> func_hash;
     for (ymuint p = 0; p < 768; ++ p) {
       ymuint8* perm = npn4perm[p];
       ymuint32 fv1 = xform_func4(fv, perm);

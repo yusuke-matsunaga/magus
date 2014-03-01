@@ -108,14 +108,14 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       }
     }
     else {
-      LogExpr expr;
+      Expr expr;
       vector<int> tv(1);
       if ( inv ) {
-	expr = LogExpr::make_one();
+	expr = Expr::make_one();
 	tv[0] = 1;
       }
       else {
-	expr = LogExpr::make_zero();
+	expr = Expr::make_zero();
 	tv[0] = 0;
       }
       mapnode = mapgraph.new_lut(name, vector<LnNode*>(0), expr, tv);
@@ -131,7 +131,7 @@ BEGIN_NONAMESPACE
 // 論理式から真理値表を作る．
 void
 make_tv(ymuint ni,
-	const LogExpr& expr,
+	const Expr& expr,
 	vector<int>& tv)
 {
   ymuint np = 1 << ni;
@@ -204,7 +204,7 @@ MapRecord::back_trace(SbjNode* node,
     assert_cond(inv, __FILE__, __LINE__);
     // NOT ゲートを表す LUT を作る．
     vector<LnNode*> inputs(1, node_info.mMapNode[0]);
-    LogExpr expr; // ダミー
+    Expr expr; // ダミー
     vector<int> tv(2);
     tv[0] = 1;
     tv[1] = 0;
@@ -239,7 +239,7 @@ MapRecord::back_trace(SbjNode* node,
 
   ymuint np = 1 << ni;
   vector<int> tv(np);
-  LogExpr expr = cut->expr();
+  Expr expr = cut->expr();
   if ( inv ) {
     expr = ~expr;
   }

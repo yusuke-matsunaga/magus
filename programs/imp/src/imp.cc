@@ -13,10 +13,10 @@
 #error "<popt.h> not found."
 #endif
 
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnIscas89Reader.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnNode.h"
+#include "networks/BdnBlifReader.h"
+#include "networks/BdnIscas89Reader.h"
 
 #include "ImpMgr.h"
 #include "ImpInfo.h"
@@ -31,12 +31,12 @@
 #include "NaImp.h"
 #include "NaImp2.h"
 
-#include "ym_logic/ZddMgr.h"
+#include "logic/ZddMgr.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS
