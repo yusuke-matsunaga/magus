@@ -1,7 +1,5 @@
 #! /bin/sh
 
-# $Id: mk.subr 2507 2009-10-17 16:24:02Z matsunaga $
-#
 # Copyright (C) 2005-2010 Yusuke Matsunaga
 # All rights reserved
 
@@ -106,31 +104,6 @@ mk_autogen() {
 	-e s!__YM__AUTOGEN_COMMON__!$AUTOGEN_COMMON! \
 	$srcdir/etc/autogen.tmpl > $builddir/autogen
     chmod +x $builddir/autogen
-    echo "  done" | tee -a $MK_LOG
-}
-
-# compile ディレクトリに configure.py ファイルを作る．
-#
-# USAGE: mk_configure_py <source-dir> <build-dir> <prefix>
-mk_configure_py() {
-    case $# in
-	3) ;;
-	*)
-	    echo "$0: # of args mismatch"
-	    exit 1
-    esac
-
-    src_dir=$1
-    build_dir=$2
-    prefix=$3
-
-    echo "Making sip directory $build_dir for source tree $src_dir ..." | tee -a $MK_LOG
-    echo "mkdir -p $build_dir" | tee -a $MK_LOG
-    mkdir -p $build_dir 2>> $MK_LOG
-
-    sed -e s!__YM_SRC_DIR__!$src_dir! \
-	-e s!__YM_PREFIX_DIR__!$prefix! \
-	$src_dir/configure.py.in > $build_dir/configure.py
     echo "  done" | tee -a $MK_LOG
 }
 

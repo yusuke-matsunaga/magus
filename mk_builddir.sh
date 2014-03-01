@@ -83,10 +83,4 @@ chmod +x $build_dir/update
 sed -e s!__YM_PREFIX_DIR__!$prefix_dir! \
     etc/autogen.local.tmpl > $build_dir/autogen.local
 
-
-# py-sip の configure.py スクリプトを生成する．
-for dir in utils; do
-    mk_configure_py $BASEDIR/py-sip/$dir $build_dir/py-sip/$dir $prefix_dir
-done
-
 # end of mk_builddir.sh
