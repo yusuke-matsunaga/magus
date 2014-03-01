@@ -12,3 +12,5 @@
 
 %Include VarId.sip
 %Include Literal.sip
+%Include Expr.sip
+%Include TvFunc.sip

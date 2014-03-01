@@ -4197,7 +4197,6 @@ walsh_w0_8(ymulong* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
-  int ans;
   switch ( w ) {
   case 0: return walsh_w0_8_0(src_vec, ibits);
   case 1: return walsh_w0_8_1(src_vec, ibits);
@@ -4345,7 +4344,6 @@ walsh_w0_9(ymulong* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
-  int ans;
   switch ( w ) {
   case 0: return walsh_w0_9_0(src_vec, ibits);
   case 1: return walsh_w0_9_1(src_vec, ibits);
@@ -4507,7 +4505,6 @@ walsh_w0_10(ymulong* src_vec,
 	    ymuint ibits,
 	    ymuint w)
 {
-  int ans;
   switch ( w ) {
   case 0: return walsh_w0_10_0(src_vec, ibits);
   case 1: return walsh_w0_10_1(src_vec, ibits);
