@@ -70,9 +70,9 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
       if ( opr1.is_literal() ) {
 	VarId var = opr1.varid();
 	ymuint pos = var.val();
-	tPol pol = opr1.is_posiliteral() ? kPolPosi : kPolNega;
+	bool inv = opr1.is_negaliteral();
 	fanin_list.push_back(orig_node->fanin(pos));
-	new_expr &= LogExpr::make_literal(VarId(i), pol);
+	new_expr &= LogExpr::make_literal(VarId(i), inv);
       }
       else {
 	BNode* node1 = mManip->new_logic();
@@ -96,10 +96,10 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
       if ( opr1.is_literal() ) {
 	VarId var = opr1.varid();
 	ymuint pos = var.val();
-	tPol pol = opr1.is_posiliteral() ? kPolPosi : kPolNega;
+	bool inv = opr1.is_negaliteral();
 	fanin_list.push_back(orig_node->fanin(pos));
 	VarId new_var(fanin_list.size() - 1);
-	new_expr |= LogExpr::make_literal(new_var, pol);
+	new_expr |= LogExpr::make_literal(new_var, inv);
       }
       else if ( opr1.is_and() ) {
 	LogExpr prd = LogExpr::make_one();
@@ -110,10 +110,10 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
 	  if ( opr2.is_literal() ) {
 	    VarId var= opr2.varid();
 	    ymuint pos= var.val();
-	    tPol pol = opr2.is_posiliteral() ? kPolPosi : kPolNega;
+	    bool inv = opr2.is_negaliteral();
 	    fanin_list.push_back(orig_node->fanin(pos));
 	    VarId new_var(fanin_list.size() - 1);
-	    prd &= LogExpr::make_literal(new_var, pol);
+	    prd &= LogExpr::make_literal(new_var, inv);
 	  }
 	  else {
 	    BNode* node1 = mManip->new_logic();
@@ -140,7 +140,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
   else if ( expr.is_xor() ) {
     // まず2入力XORに分解してそれを SOP 形式で表す．
     BNodeVector fanin_list;
-    tPol pol = kPolPosi;
+    bool inv = false;
 
     ymuint ni = expr.child_num();
     for (ymuint i = 0; i < ni; i ++) {
@@ -150,7 +150,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
 	VarId var = opr1.varid();
 	ymuint pos = var.val();
 	if ( opr1.is_negaliteral() ) {
-	  pol = ~pol;
+	  inv = !inv;
 	}
 	fanin_list.push_back(orig_node->fanin(pos));
       }
@@ -160,7 +160,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
 	fanin_list.push_back(node1);
       }
     }
-    build_xorsop_tree(0, ni, fanin_list, pol, root_node);
+    build_xorsop_tree(0, ni, fanin_list, inv, root_node);
   }
 }
 
@@ -173,7 +173,7 @@ BNode*
 BNetSopDecomp::build_xorsop_tree(ymuint b,
 				 ymuint ni,
 				 const BNodeVector& tmp_fanins,
-				 tPol pol,
+				 bool inv,
 				 BNode* root_node)
 {
   assert_cond(ni > 1, __FILE__, __LINE__);
@@ -186,7 +186,7 @@ BNetSopDecomp::build_xorsop_tree(ymuint b,
     fanins[0] = tmp_fanins[b1];
   }
   else {
-    fanins[0] = build_xorsop_tree(b1, ni1, tmp_fanins, kPolPosi, NULL);
+    fanins[0] = build_xorsop_tree(b1, ni1, tmp_fanins, false, NULL);
   }
 
   ymuint b2 = b1 + ni1;
@@ -195,7 +195,7 @@ BNetSopDecomp::build_xorsop_tree(ymuint b,
     fanins[1] = tmp_fanins[b2];
   }
   else {
-    fanins[1] = build_xorsop_tree(b2, ni2, tmp_fanins, kPolPosi, NULL);
+    fanins[1] = build_xorsop_tree(b2, ni2, tmp_fanins, false, NULL);
   }
 
   LogExpr plit0 = LogExpr::make_posiliteral(VarId(0));
@@ -203,13 +203,13 @@ BNetSopDecomp::build_xorsop_tree(ymuint b,
   LogExpr plit1 = LogExpr::make_posiliteral(VarId(1));
   LogExpr nlit1 = LogExpr::make_negaliteral(VarId(1));
   LogExpr expr;
-  if ( pol == kPolPosi ) {
-    // XOR を表す積和形論理式
-    expr = plit0 & nlit1 | plit1 & nlit0;
-  }
-  else {
+  if ( inv ) {
     // XNOR を表す積和形論理式
     expr = plit0 & plit1 | nlit0 & nlit1;
+  }
+  else {
+    // XOR を表す積和形論理式
+    expr = plit0 & nlit1 | plit1 & nlit0;
   }
   if ( root_node == NULL ) {
     root_node = mManip->new_logic();

@@ -71,9 +71,9 @@ SmoothOp::apply_step(BddEdge e,
 
   BddEdge result = get(e, s);
   if ( result.is_error() ) {
-    tPol pol = e.pol();
-    BddEdge e0 = node->edge0(pol);
-    BddEdge e1 = node->edge1(pol);
+    bool inv = e.inv();
+    BddEdge e0 = node->edge0(inv);
+    BddEdge e1 = node->edge1(inv);
     if ( level == slevel ) {
       // 消去対象の変数だった．
       BddEdge r_0 = apply_step(e0, snode->edge1());

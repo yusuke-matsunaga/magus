@@ -11,7 +11,6 @@
 
 #include "logic/npn_nsdef.h"
 #include "logic/VarId.h"
-#include "logic/Pol.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
 
@@ -23,7 +22,7 @@ BEGIN_NAMESPACE_YM_NPN
 /// @ingroup NpnGroup
 /// @brief 変数の変換を表すクラス
 ///
-/// @sa NpnMap, NpnMapM, tPol
+/// @sa NpnMap, NpnMapM
 //////////////////////////////////////////////////////////////////////
 class NpnVmap
 {
@@ -35,10 +34,12 @@ public:
 
   /// @brief 変数番号と極性を指定したコンストラクタ
   /// @param[in] var 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 反転属性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   explicit
   NpnVmap(VarId var,
-	  tPol pol = kPolPosi);
+	  bool inv = false);
 
   /// @brief 不正な値を返すクラス関数
   static
@@ -55,9 +56,9 @@ public:
   VarId
   var() const;
 
-  /// @brief 極性を得る．
-  tPol
-  pol() const;
+  /// @brief 反転属性を取り出す．
+  bool
+  inv() const;
 
   /// @brief 不正な値の時に true を返す．
   bool
@@ -121,11 +122,13 @@ NpnVmap::NpnVmap() :
 
 // @brief 変数番号と極性を指定したコンストラクタ
 // @param[in] var 変数番号
-// @param[in] pol 極性
+// @param[in] inv 極性
+//                - false: 反転なし (正極性)
+//                - true:  反転あり (負極性)
 inline
 NpnVmap::NpnVmap(VarId var,
-		 tPol pol) :
-  mPosPol((var.val() << 1) | static_cast<ymuint8>(pol))
+		 bool inv) :
+  mPosPol((var.val() << 1) | static_cast<ymuint8>(inv))
 {
 }
 
@@ -147,12 +150,12 @@ NpnVmap::var() const
   return VarId(mPosPol >> 1);
 }
 
-// @brief 極性を得る．
+// @brief 反転属性を取り出す．
 inline
-tPol
-NpnVmap::pol() const
+bool
+NpnVmap::inv() const
 {
-  return static_cast<tPol>(mPosPol & 1U);
+  return static_cast<bool>(mPosPol & 1U);
 }
 
 // @brief 不正な値の時に true を返す．

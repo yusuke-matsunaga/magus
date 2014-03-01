@@ -115,8 +115,8 @@ Printer::print_name(BddEdge e)
   else {
     mStream << " ";
     print_id(e);
-    tPol p = e.pol();
-    mStream << ((p == kPolPosi) ? ' ' : '~');
+    bool inv = e.inv();
+    mStream << (inv ? '~' : ' ');
   }
 }
 

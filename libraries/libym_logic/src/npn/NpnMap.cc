@@ -31,8 +31,8 @@ NpnMap::NpnMap() :
 // 入力数(と出力極性)を指定したコンストラクタ
 // 各入力の変換内容は kImapBad になっている．
 NpnMap::NpnMap(ymuint ni,
-	       tPol pol) :
-  mNiPol((ni << 1) | static_cast<ymuint32>(pol))
+	       bool inv) :
+  mNiPol((ni << 1) | static_cast<ymuint32>(inv))
 {
   for (ymuint i = 0; i < ni; ++ i) {
     mImap[i] = NpnVmap::invalid();
@@ -92,7 +92,7 @@ NpnMap::set_identity(ymuint new_ni)
 {
   mNiPol = new_ni << 1;
   for (ymuint i = 0; i < new_ni; ++ i) {
-    mImap[i] = NpnVmap(VarId(i), kPolPosi);
+    mImap[i] = NpnVmap(VarId(i), false);
   }
 }
 
@@ -112,13 +112,13 @@ NpnMap::set(VarId var,
 
 // 出力極性を設定する．
 void
-NpnMap::set_opol(tPol pol)
+NpnMap::set_oinv(bool inv)
 {
-  if ( pol == kPolPosi ) {
-    mNiPol &= ~(1UL);
+  if ( inv ) {
+    mNiPol |= 1UL;
   }
   else {
-    mNiPol |= 1UL;
+    mNiPol &= ~(1UL);
   }
 }
 
@@ -148,7 +148,7 @@ inverse(const NpnMap& src)
   }
 
   ymuint src_ni = src.input_num();
-  NpnMap dst_map(src_ni, src.opol());
+  NpnMap dst_map(src_ni, src.oinv());
   for (ymuint i = 0; i < src_ni; ++ i) {
     VarId src_var(i);
     NpnVmap imap = src.imap(src_var);
@@ -160,8 +160,8 @@ inverse(const NpnMap& src)
 	}
 	return NpnMap(src_ni);
       }
-      tPol pol = imap.pol();
-      dst_map.set(dst_var, src_var, pol);
+      bool inv = imap.inv();
+      dst_map.set(dst_var, src_var, inv);
     }
   }
 
@@ -191,7 +191,7 @@ operator*(const NpnMap& src1,
   }
 
   ymuint ni1 = src1.input_num();
-  NpnMap dst_map(ni1, src1.opol() * src2.opol());
+  NpnMap dst_map(ni1, src1.oinv() ^ src2.oinv());
   for (ymuint i1 = 0; i1 < ni1; ++ i1) {
     VarId var1(i1);
     NpnVmap imap1 = src1.imap(var1);
@@ -200,7 +200,7 @@ operator*(const NpnMap& src1,
     }
     else {
       VarId var2 = imap1.var();
-      tPol pol2 = imap1.pol();
+      bool inv2 = imap1.inv();
       NpnVmap imap2 = src2.imap(var2);
       if ( imap2.is_invalid() ) {
 	if ( debug_npn_map ) {
@@ -209,8 +209,8 @@ operator*(const NpnMap& src1,
       }
       else {
 	VarId var3 = imap2.var();
-	tPol pol3 = imap2.pol();
-	dst_map.set(var1, var3, pol2 * pol3);
+	bool inv3 = imap2.inv();
+	dst_map.set(var1, var3, inv2 ^ inv3);
       }
     }
   }
@@ -284,8 +284,8 @@ operator<<(ostream& s,
     }
     else {
       VarId dst_var = imap.var();
-      tPol pol = imap.pol();
-      if ( pol == kPolNega ) {
+      bool inv = imap.inv();
+      if ( inv ) {
 	s << '~';
       }
       s << dst_var;
@@ -293,7 +293,7 @@ operator<<(ostream& s,
   }
   s << ")";
   s << " OUTPUT(0 ==> ";
-  if ( map.opol() == kPolNega ) {
+  if ( map.oinv() ) {
     s << '~';
   }
   s << "0)";
@@ -312,7 +312,7 @@ operator<<(ODO& bos,
     NpnVmap vmap = map.imap(VarId(i));
     bos << vmap;
   }
-  bos << (map.opol() == kPolNega);
+  bos << map.oinv();
 
   return bos;
 }
@@ -332,8 +332,7 @@ operator>>(IDO& bis,
   }
   bool inv;
   bis >> inv;
-  tPol opol = inv ? kPolNega : kPolPosi;
-  map.set_opol(opol);
+  map.set_oinv(inv);
 
   return bis;
 }

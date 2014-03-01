@@ -81,11 +81,13 @@ public:
 
   /// @brief コファクターを計算し自分に代入する．
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @return 自身への参照を返す．
   const TvFuncM&
   set_cofactor(VarId varid,
-	       tPol pol);
+	       bool inv);
 
 
 public:
@@ -126,12 +128,14 @@ public:
   /// @brief コファクターを計算し自分に代入する．
   /// @param[in] ovar 出力番号
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @return 自身への参照を返す．
   const TvFuncM&
   set_cofactor(VarId ovar,
 	       VarId varid,
-	       tPol pol);
+	       bool inv);
 
 
 public:
@@ -167,11 +171,13 @@ public:
 
   /// @brief pos1 番目と pos2 番目の変数が対称のとき true を返す．
   /// @param[in] pos1, pos2 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   bool
   check_sym(VarId pos1,
 	    VarId pos2,
-	    tPol pol = kPolPosi) const;
+	    bool inv = false) const;
 
   /// @brief ハッシュ値を返す．
   ymuint
@@ -216,10 +222,12 @@ public:
 
   /// @brief コファクターを返す．
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   TvFuncM
   cofactor(VarId varid,
-	   tPol pol) const;
+	   bool inv) const;
 
   /// @brief npnmap に従った変換を行う．
   /// @param[in] npnmap 変換マップ
@@ -570,13 +578,15 @@ operator^(const TvFuncM& left,
 
 // @brief コファクターを返す．
 // @param[in] varid 変数番号
-// @param[in] pol 極性
+// @param[in] inv 極性
+//                - false: 反転なし (正極性)
+//                - true:  反転あり (負極性)
 inline
 TvFuncM
 TvFuncM::cofactor(VarId varid,
-		  tPol pol) const
+		  bool inv) const
 {
-  return TvFuncM(*this).set_cofactor(varid, pol);
+  return TvFuncM(*this).set_cofactor(varid, inv);
 }
 
 // 等価比較

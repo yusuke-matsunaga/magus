@@ -19,14 +19,14 @@ BEGIN_NONAMESPACE
 LogExpr
 sop_litand(const LogExpr& cov,
 	   VarId varid,
-	   tPol pol)
+	   bool inv)
 {
   if ( cov.is_zero() ) {
     // 0ならそのまま
     return cov;
   }
 
-  LogExpr lit = LogExpr::make_literal(varid, pol);
+  LogExpr lit = LogExpr::make_literal(varid, inv);
   if ( cov.is_one() ) {
     // 1なら lit を返せばよい
     return lit;
@@ -164,7 +164,7 @@ BddMgrClassic::isop_step(BddEdge l,
       if ( !c_0.is_invalid() ) {
 	cc_0 = and_op(c_0, ~var_edge);
 	if ( !cc_0.is_invalid() ) {
-	  p_0 = sop_litand(p_0, var, kPolNega);
+	  p_0 = sop_litand(p_0, var, true);
 	}
       }
     }
@@ -177,7 +177,7 @@ BddMgrClassic::isop_step(BddEdge l,
       if ( !c_1.is_invalid() ) {
 	cc_1 = and_op(c_1, var_edge);
 	if ( !cc_1.is_invalid() ) {
-	  p_1 = sop_litand(p_1, var, kPolPosi);
+	  p_1 = sop_litand(p_1, var, false);
 	}
       }
     }
@@ -245,7 +245,7 @@ BddMgrClassic::pc_step(BddEdge l,
       if ( !c_0.is_invalid() ) {
 	cc_0 = and_op(c_0, ~var_edge);
 	if ( !cc_0.is_invalid() ) {
-	  p_0 = sop_litand(p_0, var, kPolNega);
+	  p_0 = sop_litand(p_0, var, true);
 	}
       }
     }
@@ -261,7 +261,7 @@ BddMgrClassic::pc_step(BddEdge l,
 	cc_1 = and_op(c_1, var_edge);
       }
     }
-    p_1 = sop_litand(p_1, var, kPolPosi);
+    p_1 = sop_litand(p_1, var, false);
 
     // x/\bar{x} を含まない prime implicants の生成
     LogExpr p_2;

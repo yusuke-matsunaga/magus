@@ -281,11 +281,11 @@ VarAigMap::const_iterator p = input_map.find(id);
 // @brief コファクターを計算する．
 // @param[in] edge 対象の AIG ハンドル
 // @param[in] id コファクターをとる変数番号
-// @param[in] pol 極性
+// @param[in] inv 極性
 Aig
 AigMgr::make_cofactor(Aig edge,
 		      VarId id,
-		      tPol pol)
+		      bool inv)
 {
   if ( edge.is_const() ) {
     // edge が定数の時は変更なし
@@ -296,11 +296,11 @@ AigMgr::make_cofactor(Aig edge,
   if ( edge.is_input() ) {
     // 入力ノード時は番号が id どうかで処理が変わる．
     if ( edge.input_id() == id ) {
-      if ( pol == kPolPosi ) {
-	ans = make_one();
+      if ( inv ) {
+	ans = make_zero();
       }
       else {
-	ans = make_zero();
+	ans = make_one();
       }
     }
     else {
@@ -310,8 +310,8 @@ AigMgr::make_cofactor(Aig edge,
   else {
     // AND ノードの場合
     // 2つの子供に再帰的な処理を行って結果の AND を計算する．
-    Aig new_handle0 = make_cofactor(edge.fanin0(), id, pol);
-    Aig new_handle1 = make_cofactor(edge.fanin1(), id, pol);
+    Aig new_handle0 = make_cofactor(edge.fanin0(), id, inv);
+    Aig new_handle1 = make_cofactor(edge.fanin1(), id, inv);
     Aig ans = make_and(new_handle0, new_handle1);
   }
   if ( edge.inv() ) {

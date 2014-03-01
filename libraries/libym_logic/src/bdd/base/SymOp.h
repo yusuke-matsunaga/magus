@@ -49,7 +49,7 @@ public:
   apply(BddEdge e,
 	VarId id1,
 	VarId id2,
-	tPol pol);
+	bool pol);
 
   /// @brief 次の GC で回収されるノードに関連した情報を削除する．
   virtual
@@ -88,7 +88,7 @@ private:
   ymuint32 mY;
 
   // 極性
-  tPol mPol;
+  bool mInv;
 
   // 演算結果テーブル用に mX, mY を表す BDD
   BddEdge mXYedge;

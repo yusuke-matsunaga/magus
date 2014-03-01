@@ -83,12 +83,12 @@ Printer2::print_step(CNFddEdge e)
   VarId var = mMgr->varid(level);
 
   CNFddEdge e_p = node->edge_p();
-  mElemList.push_back(Literal(var, kPolPosi));
+  mElemList.push_back(Literal(var, false));
   print_step(e_p);
   mElemList.pop_back();
 
   CNFddEdge e_n = node->edge_n();
-  mElemList.push_back(Literal(var, kPolNega));
+  mElemList.push_back(Literal(var, true));
   print_step(e_n);
   mElemList.pop_back();
 

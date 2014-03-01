@@ -141,7 +141,7 @@ public:
   /// @param[in] func 検査対象の論理関数
   /// @param[in] ibits 入力の極性反転パタン
   ///
-  /// TvFunc::walsh_w0(size_t w, tPol opol, size_t ibits)
+  /// TvFunc::walsh_w0(size_t w, bool oinv, size_t ibits)
   /// のテストを行う．
   void
   check_walsh_w0(const TvFunc& func,
@@ -152,7 +152,7 @@ public:
   /// @param[in] pos 入力番号
   /// @param[in] ibits 入力の極性反転パタン
   ///
-  /// TvFunc::walsh_w1(size_t pos, size_t w, tPol opol, size_t ibits)
+  /// TvFunc::walsh_w1(size_t pos, size_t w, bool oinv, size_t ibits)
   /// のテストを行う．
   void
   check_walsh_w1(const TvFunc& func,
@@ -162,11 +162,11 @@ public:
   /// @brief cofactor() のテスト
   /// @param[in] func 検査対象の論理関数
   /// @param[in] pos 入力番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   void
   check_cofactor(const TvFunc& func,
 		 VarId pos,
-		 tPol pol);
+		 bool inv);
 
   /// @brief エラー回数を得る．
   /// @return エラー回数を返す．

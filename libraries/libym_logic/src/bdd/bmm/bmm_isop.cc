@@ -19,14 +19,14 @@ BEGIN_NONAMESPACE
 LogExpr
 sop_litand(const LogExpr& cov,
 	   VarId varid,
-	   tPol pol)
+	   bool inv)
 {
   if ( cov.is_zero() ) {
     // 0ならそのまま
     return cov;
   }
 
-  LogExpr lit = LogExpr::make_literal(varid, pol);
+  LogExpr lit = LogExpr::make_literal(varid, inv);
   if ( cov.is_one() ) {
     // 1なら lit を返せばよい
     return lit;
@@ -159,13 +159,13 @@ BddMgrModern::isop_step(BddEdge l,
     LogExpr p_0;
     BddEdge c_0 = isop_step(z_0, u_0, p_0);
     BddEdge cc_0 = and_op(c_0, ~var_edge);
-    p_0 = sop_litand(p_0, vid, kPolNega);
+    p_0 = sop_litand(p_0, vid, true);
 
     BddEdge z_1 = and_op(l_1, ~u_0);
     LogExpr p_1;
     BddEdge c_1 = isop_step(z_1, u_1, p_1);
     BddEdge cc_1 = and_op(c_1, var_edge);
-    p_1 = sop_litand(p_1, vid, kPolPosi);
+    p_1 = sop_litand(p_1, vid, false);
 
     BddEdge h_01 = and_op(l_0, ~c_0);
     BddEdge h_02 = and_op(l_1, ~c_1);
@@ -215,14 +215,14 @@ BddMgrModern::pc_step(BddEdge l,
     LogExpr p_0;
     BddEdge c_0 = pc_step(z_0, u_0, p_0);
     BddEdge cc_0 = and_op(c_0, ~var_edge);
-    p_0 = sop_litand(p_0, vid, kPolNega);
+    p_0 = sop_litand(p_0, vid, true);
 
     // x を含む prime implicatns の生成
     BddEdge z_1 = and_op(l_1, ~u_0);
     LogExpr p_1;
     BddEdge c_1 = pc_step(z_1, u_1, p_1);
     BddEdge cc_1 = and_op(c_1, var_edge);
-    p_1 = sop_litand(p_1, vid, kPolPosi);
+    p_1 = sop_litand(p_1, vid, false);
 
     // x/\bar{x} を含まない prime implicants の生成
     BddEdge h_01 = and_op(l_0, ~c_0);

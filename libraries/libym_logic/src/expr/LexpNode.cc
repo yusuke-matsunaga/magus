@@ -97,18 +97,18 @@ nega_equiv(const LexpNode* node0,
       return false;
     }
     ymuint n = node0->child_num();
-    tPol pol = kPolPosi;
+    bool inv = false;
     for (ymuint i = 0; i < n; i ++) {
       const LexpNode* chd0 = node0->child(i);
       const LexpNode* chd1 = node1->child(i);
       if ( !nega_equiv(chd0, chd1) ) {
-	pol = pol * kPolNega;
+	inv = !inv;
       }
       else if ( !posi_equiv(chd0, chd1) ) {
 	return false;
       }
     }
-    return pol == kPolNega;
+    return inv;
   }
 
   assert_not_reached(__FILE__, __LINE__);
@@ -346,9 +346,9 @@ LexpNode::litnum(VarId id) const
 // 特定の変数の特定の極性のリテラル数を返す．
 ymuint
 LexpNode::litnum(VarId id,
-		 tPol pol) const
+		 bool inv) const
 {
-  if ( is_literal(pol) && varid() == id ) {
+  if ( is_literal(inv) && varid() == id ) {
     // リテラルならリテラル数は1
     return 1;
   }
@@ -358,7 +358,7 @@ LexpNode::litnum(VarId id,
     ymuint num = 0;
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
-      num += child(i)->litnum(id, pol);
+      num += child(i)->litnum(id, inv);
     }
     return num;
   }
@@ -501,10 +501,10 @@ LexpNode::soplit(bool inverted,
 SopLit
 LexpNode::soplit(bool inverted,
 		 VarId id,
-		 tPol pol) const
+		 bool inv) const
 {
   if ( is_literal() ) {
-    if ( varid() == id && is_literal(pol) ) {
+    if ( varid() == id && is_literal(inv) ) {
       return SopLit(1, 1);
     }
     else {
@@ -517,7 +517,7 @@ LexpNode::soplit(bool inverted,
     SopLit l(1, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
-      SopLit l1 = child(i)->soplit(inverted, id, pol);
+      SopLit l1 = child(i)->soplit(inverted, id, inv);
       l *= l1;
     }
     return l;
@@ -528,7 +528,7 @@ LexpNode::soplit(bool inverted,
     SopLit l(0, 0);
     ymuint n = child_num();
     for (ymuint i = 0; i < n; ++ i) {
-      SopLit l1 = child(i)->soplit(inverted, id, pol);
+      SopLit l1 = child(i)->soplit(inverted, id, inv);
       l += l1;
     }
     return l;

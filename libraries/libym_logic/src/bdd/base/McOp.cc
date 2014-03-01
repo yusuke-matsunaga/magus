@@ -82,7 +82,7 @@ McOp::count_sub1(BddEdge e)
   }
 
   BddNode* node = e.get_node();
-  tPol pol = e.pol();
+  bool inv = e.inv();
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
@@ -93,8 +93,8 @@ McOp::count_sub1(BddEdge e)
   }
 
   // 子ノードが表す関数のminterm数を計算する
-  mpz_class n0 = count_sub1(node->edge0(pol));
-  mpz_class n1 = count_sub1(node->edge1(pol));
+  mpz_class n0 = count_sub1(node->edge0(inv));
+  mpz_class n1 = count_sub1(node->edge1(inv));
 
   // 子ノードが表す関数の minterm 数を足して半分にしたものが
   // 親ノードが表す関数の minterm 数
@@ -120,7 +120,7 @@ McOp::count_sub2(BddEdge e)
   }
 
   BddNode* node = e.get_node();
-  tPol pol = e.pol();
+  bool inv = e.inv();
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
@@ -131,8 +131,8 @@ McOp::count_sub2(BddEdge e)
   }
 
   // 子ノードが表す関数のminterm数を計算する
-  ymuint32 n0 = count_sub2(node->edge0(pol));
-  ymuint32 n1 = count_sub2(node->edge1(pol));
+  ymuint32 n0 = count_sub2(node->edge0(inv));
+  ymuint32 n1 = count_sub2(node->edge1(inv));
 
   // 子ノードが表す関数の minterm 数を足して半分にしたものが
   // 親ノードが表す関数の minterm 数

@@ -176,13 +176,13 @@ SupOp::scc_step(BddEdge e,
       scc_step(e, spos);
     }
     else {
-      tPol pol = e.pol();
-      BddEdge e0 = node->edge0(pol);
+      bool inv = e.inv();
+      BddEdge e0 = node->edge0(inv);
       if ( !e0.is_zero() ) {
 	mMarks[level] |= 1;
 	scc_step(e0, spos);
       }
-      BddEdge e1 = node->edge1(pol);
+      BddEdge e1 = node->edge1(inv);
       if ( !e1.is_zero() ) {
 	mMarks[level] |= 2;
 	scc_step(e1, spos);

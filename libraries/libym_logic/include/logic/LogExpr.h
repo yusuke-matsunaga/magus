@@ -40,7 +40,7 @@ class LexpNode;
 ///
 /// このクラスでは表現としての論理式を扱っているので論理関数としての
 /// 処理は行っていない．
-/// @sa VarId, tPol, Literal
+/// @sa VarId, Literal
 //////////////////////////////////////////////////////////////////////
 class LogExpr
 {
@@ -105,12 +105,14 @@ public:
 
   /// @brief リテラル式の生成
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] int 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @return 生成したオブジェクト
   static
   LogExpr
   make_literal(VarId varid,
-	       tPol pol);
+	       bool inv);
 
   /// @brief リテラル式の生成
   /// @param[in] lit リテラル
@@ -406,11 +408,13 @@ public:
 
   /// @brief リテラルの出現回数の取得
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
-  /// @return varid 番めの変数の極性が pol のリテラルの出現回数を得る．
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
+  /// @return varid 番めの変数の極性が inv のリテラルの出現回数を得る．
   ymuint
   litnum(VarId varid,
-	 tPol pol) const;
+	 bool inv) const;
 
   /// @brief リテラルの出現回数の取得
   /// @param[in] lit リテラル
@@ -440,12 +444,14 @@ public:
 
   /// @brief SOP形式に展開した時のテラルの出現回数の見積もり
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @return SOP形式に展開した時の varid 番めの変数の極性が
-  /// pol のリテラルの出現回数
+  /// inv のリテラルの出現回数
   ymuint
   sop_litnum(VarId varid,
-	     tPol pol) const;
+	     bool inv) const;
 
   /// @brief SOP形式に展開したときのリテラルの出現回数の見積もり
   /// @param[in] lit リテラル
@@ -632,30 +638,30 @@ operator>>(IDO& s,
 inline
 LogExpr
 LogExpr::make_literal(VarId varid,
-		      tPol pol)
+		      bool inv)
 {
-  return pol == kPolPosi ? make_posiliteral(varid) : make_negaliteral(varid);
+  return inv ? make_negaliteral(varid) : make_posiliteral(varid);
 }
 
 inline
 LogExpr
 LogExpr::make_literal(const Literal& lit)
 {
-  return make_literal(lit.varid(), lit.pol());
+  return make_literal(lit.varid(), lit.is_negative());
 }
 
 inline
 ymuint
 LogExpr::litnum(const Literal& lit) const
 {
-  return litnum(lit.varid(), lit.pol());
+  return litnum(lit.varid(), lit.is_negative());
 }
 
 inline
 ymuint
 LogExpr::sop_litnum(const Literal& lit) const
 {
-  return sop_litnum(lit.varid(), lit.pol());
+  return sop_litnum(lit.varid(), lit.is_negative());
 }
 
 END_NAMESPACE_YM_LEXP

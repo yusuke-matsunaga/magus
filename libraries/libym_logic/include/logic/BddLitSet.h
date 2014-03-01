@@ -102,10 +102,12 @@ public:
   /// @brief リテラル1つだけを要素とする集合を作るコンストラクタ
   /// @param[in] mgr BddMgr
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] int 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   BddLitSet(BddMgr& mgr,
 	    VarId varid,
-	    tPol pol);
+	    bool inv);
 
   /// @brief リテラル1つだけを要素とする集合を作るコンストラクタ
   /// @param[in] mgr BddMgr

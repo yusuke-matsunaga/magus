@@ -184,11 +184,13 @@ public:
   /// @brief コファクターを計算する．
   /// @param[in] aig 対象の AIG ハンドル
   /// @param[in] id コファクターをとる変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   Aig
   make_cofactor(Aig aig,
 		VarId id,
-		tPol pol);
+		bool inv);
 
 
 private:

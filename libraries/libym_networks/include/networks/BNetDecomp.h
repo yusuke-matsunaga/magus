@@ -112,7 +112,7 @@ private:
   BNode*
   build_tree(ymuint b,
 	     ymuint ni,
-	     const vector<pair<BNode*, tPol> >& tmp_fanins,
+	     const vector<pair<BNode*, bool> >& tmp_fanins,
 	     ymuint max_fanin,
 	     const LogExpr& type_node,
 	     BNode* root_node,

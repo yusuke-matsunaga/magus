@@ -11,7 +11,6 @@
 
 #include "ymtools.h"
 #include "logic/VarId.h"
-#include "logic/Pol.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
 
@@ -22,7 +21,7 @@ BEGIN_NAMESPACE_YM
 /// @ingroup LogicGroup
 /// @class Literal Literal.h "logic/Literal.h"
 /// @brief リテラル(変数番号＋極性)を表すクラス
-/// @sa VarId, tPol
+/// @sa VarId
 //////////////////////////////////////////////////////////////////////
 class Literal
 {
@@ -34,11 +33,14 @@ public:
 
   /// @brief 変数番号と極性を指定したコンストラクタ
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   Literal(VarId varid,
-	  tPol pol);
+	  bool inv);
 
   /// @brief index からの変換関数
+  /// @param[in] index 変数番号を極性をエンコードしたもの
   static
   Literal
   index2literal(ymuint index);
@@ -54,10 +56,12 @@ public:
 
   /// @brief 内容を設定する．
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   void
   set(VarId varid,
-      tPol pol);
+      bool inv);
 
 
 public:
@@ -69,11 +73,6 @@ public:
   /// @return 変数番号
   VarId
   varid() const;
-
-  /// @brief 極性を得る．
-  /// @return 極性
-  tPol
-  pol() const;
 
   /// @brief 正極性のリテラルの時 true を返す．
   bool
@@ -251,9 +250,9 @@ typedef list<Literal> LiteralList;
 inline
 void
 Literal::set(VarId varid,
-	     tPol pol)
+	     bool inv)
 {
-  mBody = (varid.val() << 1) + static_cast<ymuint32>(pol);
+  mBody = (varid.val() << 1) + static_cast<ymuint32>(inv);
 }
 
 // デフォルトコンストラクタ
@@ -266,9 +265,9 @@ Literal::Literal() :
 // 変数番号と極性を指定したコンストラクタ
 inline
 Literal::Literal(VarId varid,
-		 tPol pol)
+		 bool inv)
 {
-  set(varid, pol);
+  set(varid, inv);
 }
 
 // 内部でのみ用いるコンストラクタ
@@ -292,14 +291,6 @@ VarId
 Literal::varid() const
 {
   return VarId(mBody >> 1);
-}
-
-// 極性を得る．
-inline
-tPol
-Literal::pol() const
-{
-  return static_cast<tPol>(mBody & 1);
 }
 
 // @brief 正極性のリテラルの時 true を返す．

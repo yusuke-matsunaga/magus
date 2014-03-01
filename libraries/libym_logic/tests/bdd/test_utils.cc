@@ -80,24 +80,24 @@ str2litset(BddMgr& bddmgr,
 {
   BddLitSet ls(bddmgr);
   string buf;
-  tPol pol = kPolPosi;
+  bool inv = false;
   for (const char* s = ls_str; ; ++ s) {
     char c = *s;
     if ( c == '~' ) {
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	cout << "ERROR[str2varset]: syntax error in " << ls_str << endl;
 	exit(exit_code);
       }
-      pol = kPolNega;
+      inv = true;
     }
     else if ( c == ',' || c == '\0' ) {
       int d = atoi(buf.c_str());
       VarId var(d);
-      ls += BddLitSet(bddmgr, var, pol);
+      ls += BddLitSet(bddmgr, var, inv);
       if ( c == '\0' ) {
 	return ls;
       }
-      pol = kPolPosi;
+      inv = false;
       buf = "";
     }
     else if ( isspace(c) ) {
@@ -248,8 +248,8 @@ check_support(BddMgr& bddmgr,
   BddVarSet ref_vs(bddmgr);
   for (ymuint i = 0; i < 10; ++ i) {
     VarId var(i);
-    Bdd bdd0 = bdd.cofactor(var, kPolNega);
-    Bdd bdd1 = bdd.cofactor(var, kPolPosi);
+    Bdd bdd0 = bdd.cofactor(var, true);
+    Bdd bdd1 = bdd.cofactor(var, false);
     if ( bdd0 != bdd1 ) {
       ref_vs += BddVarSet(bddmgr, var);
     }

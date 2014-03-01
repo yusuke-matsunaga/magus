@@ -31,10 +31,10 @@ public:
 
   /// @brief 変数と極性を指定するコンストラクタ
   /// @param[in] var_id 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   /// @note キャスト演算子でもある．
   GbmLit(VarId var_id,
-	 tPol pol = kPolPosi);
+	 bool inv = false);
 
   /// @brief リテラルを指定するコンストラクタ
   /// @param[in] lit リテラル
@@ -74,9 +74,9 @@ public:
   VarId
   var_id() const;
 
-  /// @brief 極性を返す．
-  tPol
-  pol() const;
+  /// @brief 反転属性を返す．
+  bool
+  inv() const;
 
   /// @brief 定数0を表している時 true を返す．
   bool
@@ -105,10 +105,10 @@ private:
 
   /// @brief 値をセットする．
   /// @param[in] var_id 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 反転属性
   void
   set(VarId var_id,
-      tPol pol);
+      bool inv);
 
 
 private:
@@ -145,13 +145,13 @@ GbmLit::GbmLit()
 
 // @brief 変数を指定するコンストラクタ
 // @param[in] var_id 変数番号
-// @param[in] pol 極性
+// @param[in] inv 反転属性
 // @note キャスト演算子でもある．
 inline
 GbmLit::GbmLit(VarId var_id,
-	       tPol pol)
+	       bool inv)
 {
-  set(var_id, pol);
+  set(var_id, inv);
 }
 
 // @brief リテラルを指定するコンストラクタ
@@ -160,18 +160,18 @@ GbmLit::GbmLit(VarId var_id,
 inline
 GbmLit::GbmLit(Literal lit)
 {
-  set(lit.varid(), lit.pol());
+  set(lit.varid(), lit.is_negative());
 }
 
 // @brief 値をセットする．
 // @param[in] var_id 変数番号
-// @param[in] pol 極性
+// @param[in] inv 反転属性
 inline
 void
 GbmLit::set(VarId var_id,
-	    tPol pol)
+	    bool inv)
 {
-  mVal = ((var_id.val() + 1) << 1) | (static_cast<ymuint32>(pol) & 1U);
+  mVal = ((var_id.val() + 1) << 1) | (static_cast<ymuint32>(inv) & 1U);
 }
 
 // @brief 値を直接指定するコンストラクタ
@@ -219,15 +219,15 @@ inline
 Literal
 GbmLit::literal() const
 {
-  return Literal(var_id(), pol());
+  return Literal(var_id(), inv());
 }
 
-// @brief 極性を返す．
+// @brief 反転属性を返す．
 inline
-tPol
-GbmLit::pol() const
+bool
+GbmLit::inv() const
 {
-  return static_cast<tPol>(mVal & 1U);
+  return static_cast<bool>(mVal & 1U);
 }
 
 // @brief 変数番号を返す．

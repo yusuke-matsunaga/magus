@@ -134,16 +134,16 @@ BddBinOp::split(BddEdge f,
 {
   BddNode* f_vp = f.get_node();
   BddNode* g_vp = g.get_node();
-  tPol f_pol = f.pol();
-  tPol g_pol = g.pol();
+  bool f_inv = f.inv();
+  bool g_inv = g.inv();
   ymuint f_level = f_vp->level();
   ymuint g_level = g_vp->level();
   ymuint level = f_level;
   if ( g_level < level ) {
     level = g_level;
   }
-  split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
-  split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
+  split1(level, f_level, f, f_vp, f_inv, f_0, f_1);
+  split1(level, g_level, g, g_vp, g_inv, g_0, g_1);
   return level;
 }
 

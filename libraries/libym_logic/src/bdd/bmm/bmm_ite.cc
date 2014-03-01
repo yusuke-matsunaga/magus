@@ -69,7 +69,7 @@ BddMgrModern::compose_step(BddEdge f)
   }
 
   // 極性の反転に関して線形性を有するので極性は取り除く．
-  tPol f_pol = f.pol();
+  bool f_inv = f.inv();
   f.normalize();
 
   BddEdge result = mCmpTable->get(f);
@@ -90,7 +90,7 @@ BddMgrModern::compose_step(BddEdge f)
     mCmpTable->put(f, result);
   }
 
-  return BddEdge(result, f_pol);
+  return BddEdge(result, f_inv);
 }
 
 // x_level の変数を y_level まで「押し込む」．
@@ -99,7 +99,7 @@ BddEdge
 BddMgrModern::push_down(BddEdge e,
 			ymuint x_level,
 			ymuint y_level,
-			tPol pol)
+			bool inv)
 {
   if ( e.is_error() ) {
     return BddEdge::make_error();

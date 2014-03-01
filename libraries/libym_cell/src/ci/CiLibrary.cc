@@ -1394,7 +1394,7 @@ CiLibrary::compile()
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
 	ymuint pos = imap.var().val();
-	ymuint pol = (imap.pol() == kPolNega) ? 16U : 8U;
+	ymuint pol = imap.inv() ? 16U : 8U;
 	pos_array[pos] = i | pol;
       }
       pos_array[4] = 0;
@@ -1417,7 +1417,7 @@ CiLibrary::compile()
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
 	ymuint pos = imap.var().val();
-	ymuint pol = (imap.pol() == kPolNega) ? 16U : 8U;
+	ymuint pol = imap.inv() ? 16U : 8U;
 	pos_array[pos] = i | pol;
       }
       pos_array[4] = 0;

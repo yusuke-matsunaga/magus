@@ -119,11 +119,13 @@ public:
 
   /// @brief リテラル関数を表すBDDを作る
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @return 生成された BDD
   Bdd
   make_literal(VarId varid,
-	       tPol pol);
+	       bool inv);
 
   /// @brief リテラル関数を表すBDDを作る
   /// @param[in] lit リテラル

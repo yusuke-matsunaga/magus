@@ -211,9 +211,9 @@ BNetwork::eliminate(int threshold,
 	}
 	const LogExpr& ofunc = onode->func();
 	// SOP形式で肯定のリテラルの現れる回数
-	ymuint pa = ofunc.sop_litnum(VarId(edge->pos()), kPolPosi);
+	ymuint pa = ofunc.sop_litnum(VarId(edge->pos()), false);
 	// SOP形式で否定のリテラルの現れる回数
-	ymuint na = ofunc.sop_litnum(VarId(edge->pos()), kPolNega);
+	ymuint na = ofunc.sop_litnum(VarId(edge->pos()), true);
 	// それらに肯定および否定のSOPのキューブ数をかける．
 	ymuint c = pa * pc + na * nc;
 	if ( ofunc.sop_cubenum() + c > sop_limit ) {

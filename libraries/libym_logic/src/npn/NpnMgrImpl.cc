@@ -223,7 +223,7 @@ NpnMgrImpl::cannonical(const TvFunc& func,
     else {
       // 定数1関数
       cmap.set_identity(0);
-      cmap.set_opol(kPolNega);
+      cmap.set_oinv(true);
       return;
     }
   }
@@ -244,13 +244,13 @@ NpnMgrImpl::cannonical(const TvFunc& func,
       if ( func.value(1) == 0 ) {
 	// 否定のリテラル関数
 	cmap.set_identity(1);
-	cmap.set_opol(kPolNega);
+	cmap.set_oinv(true);
 	return;
       }
       else {
 	// 1入力の定数1関数
 	cmap.set_identity(1);
-	cmap.set_opol(kPolNega);
+	cmap.set_oinv(true);
 	return;
       }
     }

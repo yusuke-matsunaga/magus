@@ -62,10 +62,10 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
       for (ymuint k = 0; k < mIorderBitWidth; ++ k) {
 	VarId kvar = mIorderVarArray[base_i + k];
 	if ( b & (1U << k) ) {
-	  tmp_lits2[k] = Literal(kvar, kPolNega);
+	  tmp_lits2[k] = Literal(kvar, true);
 	}
 	else {
-	  tmp_lits2[k] = Literal(kvar, kPolPosi);
+	  tmp_lits2[k] = Literal(kvar, false);
 	}
       }
       add_clause(tmp_lits2);
@@ -79,16 +79,16 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
       if ( debug() ) {
 	cout << "diff[" << i << ", " << j << "][0] = " << d0 << endl;
       }
-      Literal d0_lit(d0, kPolPosi);
-      Literal xi0_lit(mIorderVarArray[base_i + 0], kPolPosi);
-      Literal xj0_lit(mIorderVarArray[base_j + 0], kPolPosi);
+      Literal d0_lit(d0, false);
+      Literal xi0_lit(mIorderVarArray[base_i + 0], false);
+      Literal xj0_lit(mIorderVarArray[base_j + 0], false);
       add_clause(~d0_lit,  xi0_lit,  xj0_lit);
       add_clause(~d0_lit, ~xi0_lit, ~xj0_lit);
       add_clause( d0_lit,  xi0_lit, ~xj0_lit);
       add_clause( d0_lit, ~xi0_lit,  xj0_lit);
       for (ymuint k = 1; k < mIorderBitWidth; ++ k) {
-	Literal xik_lit(mIorderVarArray[base_i + k], kPolPosi);
-	Literal xjk_lit(mIorderVarArray[base_j + k], kPolPosi);
+	Literal xik_lit(mIorderVarArray[base_i + k], false);
+	Literal xjk_lit(mIorderVarArray[base_j + k], false);
 	if ( k == mIorderBitWidth - 1 ) {
 	  add_clause( d0_lit,  xik_lit,  xjk_lit);
 	  add_clause( d0_lit, ~xik_lit, ~xjk_lit);
@@ -98,7 +98,7 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
 	  if ( debug() ) {
 	    cout << "diff[" << i << ", " << j << "][" << k << "] = " << dk << endl;
 	  }
-	  Literal dk_lit(dk, kPolPosi);
+	  Literal dk_lit(dk, false);
 	  add_clause(~dk_lit,  d0_lit,  xik_lit,  xjk_lit);
 	  add_clause(~dk_lit,  d0_lit, ~xik_lit, ~xjk_lit);
 
@@ -117,16 +117,16 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
       if ( debug() ) {
 	cout << "gt[" << i << ", " << pred << "][" << (mIorderBitWidth - 1) << "] = " << gm << endl;
       }
-      Literal gm_lit(gm, kPolPosi);
+      Literal gm_lit(gm, false);
       // 最上位ビットが等しい条件
       VarId em = new_var();
       if ( debug() ) {
 	cout << "eq[" << i << ", " << pred << "][" << (mIorderBitWidth - 1) << "] = " << em << endl;
       }
       ymuint base_j = pred * mIorderBitWidth;
-      Literal em_lit(em, kPolPosi);
-      Literal xm_lit(mIorderVarArray[base_i + mIorderBitWidth - 1], kPolPosi);
-      Literal lit(mIorderVarArray[base_j + mIorderBitWidth - 1], kPolPosi);
+      Literal em_lit(em, false);
+      Literal xm_lit(mIorderVarArray[base_i + mIorderBitWidth - 1], false);
+      Literal lit(mIorderVarArray[base_j + mIorderBitWidth - 1], false);
       add_clause(~gm_lit,  xm_lit);
       add_clause(~gm_lit, ~lit);
 
@@ -138,8 +138,8 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
       add_clause( em_lit,  xm_lit,  lit);
       add_clause( em_lit, ~xm_lit, ~lit);
       for (ymuint k = mIorderBitWidth - 2; ; -- k) {
-	Literal xk_lit(mIorderVarArray[base_i + k], kPolPosi);
-	Literal yk_lit(mIorderVarArray[base_j + k], kPolPosi);
+	Literal xk_lit(mIorderVarArray[base_i + k], false);
+	Literal yk_lit(mIorderVarArray[base_j + k], false);
 	if ( k == 0 ) {
 	  add_clause( gm_lit,  em_lit);
 	  add_clause( gm_lit,  xk_lit);
@@ -152,13 +152,13 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
 	  if ( debug() ) {
 	    cout << "gt[" << i << ", " << pred << "][" << k << "] = " << gk << endl;
 	  }
-	  Literal gk_lit(gk, kPolPosi);
+	  Literal gk_lit(gk, false);
 	  // k ビット以上で Vi = Vj となる条件
 	  VarId ek = new_var();
 	  if ( debug() ) {
 	    cout << "eq[" << i << ", " << pred << "][" << k << "] = " << ek << endl;
 	  }
-	  Literal ek_lit(ek, kPolPosi);
+	  Literal ek_lit(ek, false);
 	  add_clause(~gk_lit,  gm_lit,  em_lit);
 	  add_clause(~gk_lit,  gm_lit,  xk_lit);
 	  add_clause(~gk_lit,  gm_lit, ~yk_lit);
@@ -193,8 +193,8 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
 	pos_array[k] = 0;
       }
       for (ymuint l = 0; l < mIorderBitWidth; ++ l) {
-	tPol pol = (j & (1U << l)) ? kPolPosi : kPolNega;
-	Literal lit(mIorderVarArray[i * mIorderBitWidth + l], pol);
+	bool inv = (j & (1U << l)) ? false : true;
+	Literal lit(mIorderVarArray[i * mIorderBitWidth + l], inv);
 	tmp_lits[i + l] = ~lit;
       }
       // 全部展開するとオーバーヘッドが大きい様なので mIorderBitWidth 個だけ展開する．
@@ -202,8 +202,8 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
 #if 1
       for (ymuint l = 0; l < mIorderBitWidth; ++ l) {
 	for (ymuint k = 0; k < i; ++ k) {
-	  tPol pol = (cur_rep & (1U << l)) ? kPolPosi : kPolNega;
-	  Literal lit(mIorderVarArray[k * mIorderBitWidth + l], pol);
+	  bool inv = (cur_rep & (1U << l)) ? false : true;
+	  Literal lit(mIorderVarArray[k * mIorderBitWidth + l], inv);
 	  tmp_lits[k] = lit;
 	}
 	add_clause(tmp_lits);
@@ -212,8 +212,8 @@ GbmSatEngineBinary::init_vars(const RcfNetwork& network,
       for ( ; ; ) {
 	for (ymuint k = 0; k < i; ++ k) {
 	  ymuint pos = pos_array[k];
-	  tPol pol = (cur_rep & (1U << pos)) ? kPolPosi : kPolNega;
-	  Literal lit(mIorderVarArray[k * mIorderBitWidth + pos], pol);
+	  bool inv = (cur_rep & (1U << pos)) ? false : true;
+	  Literal lit(mIorderVarArray[k * mIorderBitWidth + pos], inv);
 	  tmp_lits[k] = lit;
 	}
 	add_clause(tmp_lits);
@@ -263,17 +263,17 @@ GbmSatEngineBinary::make_cnf(const RcfNetwork& network,
 	VarId kvar = mIorderVarArray[base_i + k];
 	// こちらは含意の左辺なので否定する．
 	if ( j & (1U << k) ) {
-	  tmp_lits[k] = Literal(kvar, kPolNega);
+	  tmp_lits[k] = Literal(kvar, true);
 	}
 	else {
-	  tmp_lits[k] = Literal(kvar, kPolPosi);
+	  tmp_lits[k] = Literal(kvar, false);
 	}
       }
       if ( bit_pat & (1U << j) ) {
-	tmp_lits[mIorderBitWidth] = Literal(vid, kPolPosi);
+	tmp_lits[mIorderBitWidth] = Literal(vid, false);
       }
       else {
-	tmp_lits[mIorderBitWidth] = Literal(vid, kPolNega);
+	tmp_lits[mIorderBitWidth] = Literal(vid, true);
       }
       add_clause(tmp_lits);
     }

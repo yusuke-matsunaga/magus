@@ -59,8 +59,8 @@ public:
   /// @brief 重み別 Walsh の 0次係数を得る．
   int
   walsh_w0(ymuint w,
-	   tPol opol,
-	   tPol ipol[]) const;
+	   bool oinv,
+	   bool iinv[]) const;
 
   /// @brief Walsh の 1次係数を得る．
   /// @param[in] pos 入力番号

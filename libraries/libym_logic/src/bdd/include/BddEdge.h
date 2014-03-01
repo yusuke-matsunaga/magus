@@ -11,7 +11,6 @@
 
 
 #include "logic/bdd_nsdef.h"
-#include "logic/Pol.h"
 #include <gmpxx.h>
 
 
@@ -45,9 +44,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] node ノード
-  /// @param[in] pol 極性
+  /// @param[in] inv 反転属性
   BddEdge(void* node,
-	  tPol pol);
+	  bool inv);
 
   /// @brief コンストラクタ
   /// @param[in] src コピー元の枝
@@ -55,9 +54,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] src コピー元の枝
-  /// @param[in] pol 極性
+  /// @param[in] inv 反転属性
   BddEdge(const BddEdge& src,
-	  tPol pol);
+	  bool inv);
 
   /// @brief 定数0の枝を返す．
   static
@@ -97,14 +96,14 @@ public:
   /// @brief 極性を付加する．
   /// @return 自分自身への参照を返す．
   const BddEdge&
-  addpol(tPol pol);
+  add_inv(bool inv);
 
-  /// @brief 極性情報を取り去る．
+  /// @brief 反転属性を取り去る．
   /// @return 自分自身への参照を返す．
   const BddEdge&
   normalize();
 
-  /// @brief 極性情報を取り去った枝を返す．
+  /// @brief 反転属性を取り去った枝を返す．
   BddEdge
   get_normal() const;
 
@@ -112,9 +111,9 @@ public:
   BddNode*
   get_node() const;
 
-  /// @brief 極性を取り出す．
-  tPol
-  pol() const;
+  /// @brief 反転属性を取り出す．
+  bool
+  inv() const;
 
   /// @brief 生の情報を取り出す．
   operator ympuint() const;
@@ -304,11 +303,11 @@ BddEdge::BddEdge(BddNode* node) :
 
 // @brief コンストラクタ
 // @param[in] node ノード
-// @param[in] pol 極性
+// @param[in] inv 反転属性
 inline
 BddEdge::BddEdge(void* node,
-		 tPol pol) :
-  mBody(reinterpret_cast<ympuint>(node) | static_cast<ympuint>(pol))
+		 bool inv) :
+  mBody(reinterpret_cast<ympuint>(node) | static_cast<ympuint>(inv))
 {
 }
 
@@ -322,13 +321,13 @@ BddEdge::BddEdge(const BddEdge& src) :
 
 // @brief コンストラクタ
 // @param[in] src コピー元の枝
-// @param[in] pol 極性
+// @param[in] inv 反転属性
 inline
 BddEdge::BddEdge(const BddEdge& src,
-		 tPol pol) :
+		 bool inv) :
   mBody(src.mBody)
 {
-  mBody ^= (static_cast<ympuint>(pol) ^ ((mBody & kEdgeInvalid) >> 1));
+  mBody ^= (static_cast<ympuint>(inv) ^ ((mBody & kEdgeInvalid) >> 1));
 }
 
 // @brief コンストラクタ
@@ -388,17 +387,17 @@ BddEdge::operator~() const
   return BddEdge(mBody ^ 1UL ^ ((mBody & kEdgeInvalid) >> 1));
 }
 
-// @brief 極性を付加する．
+// @brief 反転属性を付加する．
 // @return 自分自身への参照を返す．
 inline
 const BddEdge&
-BddEdge::addpol(tPol pol)
+BddEdge::add_inv(bool inv)
 {
-  mBody ^= (pol ^ ((mBody & kEdgeInvalid) >> 1));
+  mBody ^= (inv ^ ((mBody & kEdgeInvalid) >> 1));
   return *this;
 }
 
-// @brief 極性情報を取り去る．
+// @brief 反転属性を取り去る．
 // @return 自分自身への参照を返す．
 inline
 const BddEdge&
@@ -408,7 +407,7 @@ BddEdge::normalize()
   return *this;
 }
 
-// @brief 極性情報を取り去った枝を返す．
+// @brief 反転属性を取り去った枝を返す．
 inline
 BddEdge
 BddEdge::get_normal() const
@@ -424,12 +423,12 @@ BddEdge::get_node() const
   return reinterpret_cast<BddNode*>(mBody & ~3UL);
 }
 
-// @brief 極性を取り出す．
+// @brief 反転属性を取り出す．
 inline
-tPol
-BddEdge::pol() const
+bool
+BddEdge::inv() const
 {
-  return static_cast<tPol>(mBody & 1UL);
+  return static_cast<bool>(mBody & 1UL);
 }
 
 // @brief 等価比較

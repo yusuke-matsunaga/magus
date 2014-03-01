@@ -151,7 +151,7 @@ GbmBddEngineEnum::get_model(vector<Bool3>& model)
   for (LiteralVector::iterator p = lv.begin();
        p != lv.end(); ++ p) {
     Literal l = *p;
-    if ( l.pol() == kPolPosi ) {
+    if ( l.is_positive() ) {
       model[l.varid().val()] = kB3True;
     }
     else {

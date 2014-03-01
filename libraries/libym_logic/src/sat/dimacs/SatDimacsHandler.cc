@@ -62,16 +62,15 @@ SatDimacsHandler::read_clause(const FileRegion& loc,
        p != lits.end(); ++ p) {
     int i = *p;
     VarId vid;
-    tPol pol;
+    bool inv = false;
     if ( i > 0 ) {
       vid = VarId(i - 1);
-      pol = kPolPosi;
     }
     else {
       vid = VarId(- i - 1);
-      pol = kPolNega;
+      inv = true;
     }
-    tmp.push_back(Literal(vid, pol));
+    tmp.push_back(Literal(vid, inv));
   }
   mSolver.add_clause(tmp);
 

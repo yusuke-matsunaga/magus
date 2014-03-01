@@ -65,7 +65,7 @@ protected:
 	 ymuint level,
 	 BddEdge e,
 	 const BddNode* vp,
-	 tPol pol,
+	 bool inv,
 	 BddEdge& e_0,
 	 BddEdge& e_1);
 
@@ -119,13 +119,13 @@ BddOp::split1(ymuint top,
 	      ymuint level,
 	      BddEdge e,
 	      const BddNode* vp,
-	      tPol pol,
+	      bool inv,
 	      BddEdge& e_0,
 	      BddEdge& e_1)
 {
   if ( level == top ) {
-    e_0 = vp->edge0(pol);
-    e_1 = vp->edge1(pol);
+    e_0 = vp->edge0(inv);
+    e_1 = vp->edge1(inv);
   }
   else {
     e_0 = e_1 = e;

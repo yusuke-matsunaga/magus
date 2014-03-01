@@ -21,16 +21,16 @@ BEGIN_NONAMESPACE
 struct Node
 {
   BNode* mNode;
-  tPol mPol;
+  bool mInv;
   int mDepth;
 
   Node() { }
 
   Node(BNode* node,
-       tPol pol,
+       bool inv,
        int depth) :
     mNode(node),
-    mPol(pol),
+    mInv(inv),
     mDepth(depth)
   {
   }
@@ -176,19 +176,19 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
     assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
 
     BNode* node1;
-    tPol pol1;
+    bool inv1;
     if ( opr1.is_literal() ) {
       VarId var = opr1.varid();
       ymuint pos = var.val();
       node1 = orig_node->fanin(pos);
-      pol1 = opr1.is_posiliteral() ? kPolPosi : kPolNega;
+      inv1 = opr1.is_negaliteral();
     }
     else {
       node1 = mManip->new_logic();
       decomp_type1_sub(orig_node, max_fanin, opr1, node1, no_xor);
-      pol1 = kPolPosi;
+      inv1 = false;
     }
-    work.put(Node(node1, pol1, mDepthMap[node1->id()]));
+    work.put(Node(node1, inv1, mDepthMap[node1->id()]));
   }
 
   // 高さ最小の論理木を作る．
@@ -212,7 +212,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       Node tmp1 = work.getmin();
       work.popmin();
       fanins.push_back(tmp1.mNode);
-      literals.push_back(LogExpr::make_literal(VarId(new_ni), tmp1.mPol));
+      literals.push_back(LogExpr::make_literal(VarId(new_ni), tmp1.mInv));
     }
 
     LogExpr tmp_expr;
@@ -259,7 +259,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
     if ( work.empty() ) {
       return;
     }
-    work.put(Node(node, kPolPosi, d));
+    work.put(Node(node, false, d));
   }
 }
 
@@ -279,25 +279,25 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
 	      __FILE__, __LINE__);
 
   ymuint ni = expr.child_num();
-  vector<pair<BNode*, tPol> > tmp_fanins(ni);
+  vector<pair<BNode*, bool> > tmp_fanins(ni);
   for (ymuint i = 0; i < ni; i ++) {
     LogExpr opr1 = expr.child(i);
     assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
 
     BNode* node1;
-    tPol pol1;
+    bool inv1;
     if ( opr1.is_literal() ) {
       VarId var = opr1.varid();
       ymuint pos = var.val();
       node1 = orig_node->fanin(pos);
-      pol1 = opr1.is_posiliteral() ? kPolPosi : kPolNega;
+      inv1 = opr1.is_negaliteral();
     }
     else {
       node1 = mManip->new_logic();
       decomp_type2_sub(orig_node, max_fanin, opr1, node1, no_xor);
-      pol1 = kPolPosi;
+      inv1 = false;
     }
-    tmp_fanins[i] = make_pair(node1,pol1);
+    tmp_fanins[i] = make_pair(node1, inv1);
   }
 
   if ( no_xor && expr.is_xor() ) {
@@ -310,7 +310,7 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
   // tmp_fanins をランダムに並べ替える．
   RandPermGen permgen(ni);
   permgen.generate(*mRandGen);
-  vector<pair<BNode*, tPol> > tmp_fanins2(ni);
+  vector<pair<BNode*, bool> > tmp_fanins2(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     ymuint pos = permgen.elem(i);
     tmp_fanins2[i] = tmp_fanins[pos];
@@ -327,7 +327,7 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
 BNode*
 BNetDecomp::build_tree(ymuint b,
 		       ymuint ni,
-		       const vector<pair<BNode*, tPol> >& tmp_fanins,
+		       const vector<pair<BNode*, bool> >& tmp_fanins,
 		       ymuint max_fanin,
 		       const LogExpr& type_expr,
 		       BNode* root_node,
@@ -357,17 +357,17 @@ BNetDecomp::build_tree(ymuint b,
     if ( i < nodd ) {
       ++ ni1;
     }
-    tPol pol;
+    bool inv;
     if ( ni1 == 1 ) {
       fanins[i] = tmp_fanins[b1].first;
-      pol = tmp_fanins[b1].second;
+      inv = tmp_fanins[b1].second;
     }
     else {
       fanins[i] = build_tree(b1, ni1, tmp_fanins, max_fanin,
 			     type_expr, NULL, no_xor);
-      pol = kPolPosi;
+      inv = false;
     }
-    literals[i] = LogExpr::make_literal(VarId(i), pol);
+    literals[i] = LogExpr::make_literal(VarId(i), inv);
   }
 
   LogExpr expr;

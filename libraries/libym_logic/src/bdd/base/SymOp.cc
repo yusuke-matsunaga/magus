@@ -34,14 +34,14 @@ SymOp::~SymOp()
 // @brief 演算を行う関数
 // @param[in] e オペランド
 // @param[in] id1, id2 対称性を調べる変数番号
-// @param[in] pol 極性
+// @param[in] inv 極性
 // @retval true 対称だった．
 // @retval false 対称でなかった．
 bool
 SymOp::apply(BddEdge e,
 	     VarId id1,
 	     VarId id2,
-	     tPol pol)
+	     bool inv)
 {
   // エラー状態のチェック
   if ( e.is_invalid() ) {
@@ -49,7 +49,7 @@ SymOp::apply(BddEdge e,
   }
 
   if ( id1 == id2 ) {
-    return pol == kPolPosi;
+    return !inv;
   }
 
   // 小さい方を mX，大きい方を mY とする．
@@ -63,16 +63,16 @@ SymOp::apply(BddEdge e,
     id1 = id2;
     id2 = tmp_var;
   }
-  mPol = pol;
+  mInv = inv;
 
   // 演算結果テーブル用に mX, mY を表す BDD を作る．
   BddEdge x_edge = mgr()->make_posiliteral(id1);
   mYedge = mgr()->make_posiliteral(id2);
-  if ( pol == kPolPosi ) {
-    mXYedge = mgr()->and_op(x_edge, mYedge);
+  if ( inv ) {
+    mXYedge = mgr()->and_op(x_edge, ~mYedge);
   }
   else {
-    mXYedge = mgr()->and_op(x_edge, ~mYedge);
+    mXYedge = mgr()->and_op(x_edge, mYedge);
   }
 
   // 実際の演算を行なう．
@@ -170,17 +170,17 @@ SymOp::apply_step2(BddEdge e0,
     BddEdge e10;
     BddEdge e11;
     if ( level0 == top_level ) {
-      tPol pol0 = e0.pol();
-      e00 = node0->edge0(pol0);
-      e01 = node0->edge1(pol0);
+      bool inv0 = e0.inv();
+      e00 = node0->edge0(inv0);
+      e01 = node0->edge1(inv0);
     }
     else {
       e00 = e01 = e0;
     }
     if ( level1 == top_level ) {
-      tPol pol1 = e1.pol();
-      e10 = node1->edge0(pol1);
-      e11 = node1->edge1(pol1);
+      bool inv1 = e1.inv();
+      e10 = node1->edge0(inv1);
+      e11 = node1->edge1(inv1);
     }
     else {
       e10 = e11 = e1;
@@ -193,11 +193,11 @@ SymOp::apply_step2(BddEdge e0,
       }
     }
     else { // top_level == mY
-      if ( mPol == kPolPosi ) {
-	result = (e01 == e10) ? BddEdge::make_one() : BddEdge::make_zero();
+      if ( mInv ) {
+	result = (e00 == e11) ? BddEdge::make_one() : BddEdge::make_zero();
       }
       else {
-	result = (e00 == e11) ? BddEdge::make_one() : BddEdge::make_zero();
+	result = (e01 == e10) ? BddEdge::make_one() : BddEdge::make_zero();
       }
     }
 

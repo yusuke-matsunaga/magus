@@ -614,9 +614,9 @@ BddMgrModern::new_node(ymuint level,
   }
 
   // 否定枝に関する正規化ルール
-  tPol ans_pol = e0.pol();
-  e0.addpol(ans_pol);
-  e1.addpol(ans_pol);
+  bool ans_inv = e0.inv();
+  e0.add_inv(ans_inv);
+  e1.add_inv(ans_inv);
 
   BddNode* temp;
   ymuint64 pos;
@@ -673,7 +673,7 @@ BddMgrModern::new_node(ymuint level,
 
  already_exist:
 
-  BddEdge ans(temp, ans_pol);
+  BddEdge ans(temp, ans_inv);
 
   return ans;
 }

@@ -133,11 +133,11 @@ test_literal(BddMgr& bddmgr)
   if ( !check_bddv(bddmgr, var0bar, "make_negaliteral(0)", "0|10") )
     stat = false;
 
-  Bdd var2 = bddmgr.make_literal(VarId(2), kPolPosi);
-  if ( !check_bddv(bddmgr, var2, "make_literal(2, kPolPosi)", "2|01") )
+  Bdd var2 = bddmgr.make_literal(VarId(2), false);
+  if ( !check_bddv(bddmgr, var2, "make_literal(2, false)", "2|01") )
     stat = false;
 
-  Bdd var3bar = bddmgr.make_literal(VarId(3), kPolNega);
+  Bdd var3bar = bddmgr.make_literal(VarId(3), true);
   if ( !check_bddv(bddmgr, var3bar, "make_literal(3, kPolNega)", "3|10") )
     stat = false;
 
@@ -476,27 +476,27 @@ test_scofactor(BddMgr& bddmgr)
 
   Bdd bdd = str2bdd(bddmgr, "0 & 1 | ~2 & 3");
 
-  Bdd bdd0_0 = bdd.cofactor(VarId(0), kPolNega);
+  Bdd bdd0_0 = bdd.cofactor(VarId(0), true);
   if ( !check_bdde(bddmgr, bdd0_0, "(0 & 1 | ~2 & 3) / ~0", "~2 & 3") )
     stat = false;
 
-  Bdd bdd0_1 = bdd.cofactor(VarId(0), kPolPosi);
+  Bdd bdd0_1 = bdd.cofactor(VarId(0), false);
   if ( !check_bdde(bddmgr, bdd0_1, "(0 & 1 | ~2 & 3) / 0", "1 | ~2 & 3") )
     stat = false;
 
-  Bdd bdd1_0 = bdd.cofactor(VarId(1), kPolNega);
+  Bdd bdd1_0 = bdd.cofactor(VarId(1), true);
   if ( !check_bdde(bddmgr, bdd1_0, "(0 & 1 | ~2 & 3) / ~1", "~2 & 3") )
     stat = false;
 
-  Bdd bdd1_1 = bdd.cofactor(VarId(1), kPolPosi);
+  Bdd bdd1_1 = bdd.cofactor(VarId(1), false);
   if ( !check_bdde(bddmgr, bdd1_1, "(0 & 1 | ~2 & 3) / 1", "0 | ~2 & 3") )
     stat = false;
 
-  Bdd bdd2_0 = bdd.cofactor(VarId(2), kPolNega);
+  Bdd bdd2_0 = bdd.cofactor(VarId(2), true);
   if ( !check_bdde(bddmgr, bdd2_0, "(0 & 1 | ~2 & 3) / ~2", "0 & 1 | 3") )
     stat = false;
 
-  Bdd bdd2_1 = bdd.cofactor(VarId(2), kPolPosi);
+  Bdd bdd2_1 = bdd.cofactor(VarId(2), false);
   if ( !check_bdde(bddmgr, bdd2_1, "(0 & 1 | ~2 & 3) / 2", "0 & 1") )
     stat = false;
 
@@ -657,14 +657,14 @@ check_sym(BddMgr& bddmgr,
 
   for (ymuint i = 0; i < ni - 1; ++ i) {
     VarId pos1 = sup[i];
-    Bdd bdd_0 = bdd.cofactor(pos1, kPolNega);
-    Bdd bdd_1 = bdd.cofactor(pos1, kPolPosi);
+    Bdd bdd_0 = bdd.cofactor(pos1, true);
+    Bdd bdd_1 = bdd.cofactor(pos1, false);
     for (ymuint j = i + 1; j < ni; ++ j) {
       VarId pos2 = sup[j];
-      Bdd bdd_01 = bdd_0.cofactor(pos2, kPolPosi);
-      Bdd bdd_10 = bdd_1.cofactor(pos2, kPolNega);
+      Bdd bdd_01 = bdd_0.cofactor(pos2, false);
+      Bdd bdd_10 = bdd_1.cofactor(pos2, true);
       bool expected_result1 = (bdd_01 == bdd_10);
-      if ( bdd.check_symmetry(pos1, pos2, kPolPosi) != expected_result1 ) {
+      if ( bdd.check_symmetry(pos1, pos2, false) != expected_result1 ) {
 	cout << "ERROR[test_symmetry(positive)]" << endl;
 	bdd.print(cout);
 	cout << "pos1 : " << pos1 << ", pos2 : " << pos2 << endl;
@@ -677,10 +677,10 @@ check_sym(BddMgr& bddmgr,
 	}
 	stat = false;
       }
-      Bdd bdd_00 = bdd_0.cofactor(pos2, kPolNega);
-      Bdd bdd_11 = bdd_1.cofactor(pos2, kPolPosi);
+      Bdd bdd_00 = bdd_0.cofactor(pos2, true);
+      Bdd bdd_11 = bdd_1.cofactor(pos2, false);
       bool expected_result2 = (bdd_00 == bdd_11);
-      if ( bdd.check_symmetry(pos1, pos2, kPolNega) != expected_result2 ) {
+      if ( bdd.check_symmetry(pos1, pos2, true) != expected_result2 ) {
 	cout << "ERROR[test_invsymmetry(negative)]" << endl;
 	bdd.print(cout);
 	cout << "pos1 : " << pos1 << ", pos2 : " << pos2 << endl;
@@ -847,8 +847,8 @@ check_walsh1(const Bdd& bdd,
 {
   for (ymuint i = 0; i < nvar; ++ i) {
     mpz_class w1 = bdd.walsh1(VarId(i), nvar);
-    Bdd bdd0 = bdd.cofactor(VarId(i), kPolNega);
-    Bdd bdd1 = bdd.cofactor(VarId(i), kPolPosi);
+    Bdd bdd0 = bdd.cofactor(VarId(i), true);
+    Bdd bdd1 = bdd.cofactor(VarId(i), false);
     mpz_class n0 = bdd0.walsh0(nvar - 1);
     mpz_class n1 = bdd1.walsh0(nvar - 1);
     mpz_class w1_expected = n0 - n1;

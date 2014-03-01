@@ -42,13 +42,13 @@ public:
   /// @brief 演算を行う関数
   /// @param[in] left オペランド
   /// @param[in] id コファクタをとる変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   /// @return 演算結果を返す．
   virtual
   BddEdge
   apply(BddEdge left,
 	VarId id,
-	tPol pol);
+	bool inv);
 
 
 private:
@@ -70,7 +70,7 @@ private:
   ymuint32 mLevel;
 
   // コファクターの極性
-  tPol mPol;
+  bool mInv;
 
 };
 

@@ -300,7 +300,7 @@ GbmSatEngine::make_AND(const vector<GbmLit>& input_vars,
       return false;
     }
     // 出力は0になる．
-    mSolver.add_clause(Literal(output_var.var_id(), kPolNega));
+    mSolver.add_clause(Literal(output_var.var_id(), false));
     return true;
   }
 

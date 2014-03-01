@@ -74,7 +74,7 @@ GcOp::apply_step(BddEdge f,
   // この時点で f,g は終端ではない．
 
   // (~f) / c の結果は ~(f / c) なので f を正規化する．
-  tPol f_pol = f.pol();
+  bool f_inv = f.inv();
   f.normalize();
 
   BddEdge result = get(f, g);
@@ -82,7 +82,7 @@ GcOp::apply_step(BddEdge f,
     // 演算結果テーブルには登録されていない
     BddNode* f_v = f.get_node();
     BddNode* g_v = g.get_node();
-    tPol g_p = g.pol();
+    bool g_inv = g.inv();
     ymuint f_level = f_v->level();
     ymuint g_level = g_v->level();
 
@@ -107,8 +107,8 @@ GcOp::apply_step(BddEdge f,
       result = new_node(f_level, r_0, r_1);
     }
     else { // f_level >= g_level
-      BddEdge g_0 = g_v->edge0(g_p);
-      BddEdge g_1 = g_v->edge1(g_p);
+      BddEdge g_0 = g_v->edge0(g_inv);
+      BddEdge g_1 = g_v->edge1(g_inv);
       if ( g_0.is_zero() ) {
 	result = apply_step(f_1, g_1);
       }
@@ -131,7 +131,7 @@ GcOp::apply_step(BddEdge f,
   }
 
   // 極性を元に戻す．
-  result.addpol(f_pol);
+  result.add_inv(f_inv);
 
   return result;
 }

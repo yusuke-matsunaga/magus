@@ -67,17 +67,17 @@ cofactor_test(int argc,
 
   TvFunc func = str2func(argv[1]);
   ymuint pos = atoi(argv[2]);
-  tPol pol;
+  bool inv = false;
   if ( strcmp(argv[3], "p") == 0 ) {
-    pol = kPolPosi;
+    inv = false;
   }
   else {
-    pol = kPolNega;
+    inv = true;
   }
 
   VarId var(pos);
 
-  test.check_cofactor(func, var, pol);
+  test.check_cofactor(func, var, inv);
 
   cout << test.nerr() << " error(s)." << endl;
 }

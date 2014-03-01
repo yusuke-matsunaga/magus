@@ -198,8 +198,8 @@ gen_library(const string& lib_name,
       // タイミング情報の設定
       VarId var(i);
       const MislibNode* pt_pin = ipin_array[i];
-      TvFunc p_func = tv_function.cofactor(var, kPolPosi);
-      TvFunc n_func = tv_function.cofactor(var, kPolNega);
+      TvFunc p_func = tv_function.cofactor(var, false);
+      TvFunc n_func = tv_function.cofactor(var, true);
       tCellTimingSense sense_real = kCellNonUnate;
       bool redundant = false;
       if ( ~p_func && n_func ) {

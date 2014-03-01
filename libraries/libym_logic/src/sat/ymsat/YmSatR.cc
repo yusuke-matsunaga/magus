@@ -54,7 +54,7 @@ YmSatR::add_clause(const vector<Literal>& lits)
        p != lits.end(); ++ p) {
     Literal l = *p;
     mOut << " " << l.varid();
-    if ( l.pol() == kPolPosi ) {
+    if ( l.is_positive() ) {
       mOut << "P";
     }
     else {
@@ -82,7 +82,7 @@ YmSatR::solve(const vector<Literal>& assumptions,
        p != assumptions.end(); ++ p) {
     Literal l = *p;
     mOut << " " << l.varid();
-    if ( l.pol() == kPolPosi ) {
+    if ( l.is_positive() ) {
       mOut << "P";
     }
     else {

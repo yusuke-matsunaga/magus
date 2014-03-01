@@ -949,8 +949,8 @@ gen_library(const DotlibNode* dt_library)
 	  tv_function = expr.make_tv(ni2);
 	}
 	for (ymuint iid = 0; iid < ni2; ++ iid) {
-	  TvFunc p_func = tv_function.cofactor(VarId(iid), kPolPosi);
-	  TvFunc n_func = tv_function.cofactor(VarId(iid), kPolNega);
+	  TvFunc p_func = tv_function.cofactor(VarId(iid), false);
+	  TvFunc n_func = tv_function.cofactor(VarId(iid), true);
 
 	  const vector<ymuint>& tid_list_p = tid_list[iid * 2 + 0];
 	  if ( !tid_list_p.empty() ) {

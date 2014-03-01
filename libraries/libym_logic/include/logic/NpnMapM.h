@@ -11,7 +11,6 @@
 
 #include "logic/npn_nsdef.h"
 #include "logic/VarId.h"
-#include "logic/Pol.h"
 #include "logic/NpnVmap.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
@@ -24,7 +23,7 @@ BEGIN_NAMESPACE_YM_NPN
 /// @ingroup NpnGroup
 /// @brief NPN変換の情報を入れるクラス
 ///
-/// @sa tPol, tNpnImap
+/// @sa tNpnImap
 //////////////////////////////////////////////////////////////////////
 class NpnMapM
 {
@@ -88,11 +87,13 @@ public:
   /// @brief 入力の変換内容の設定
   /// @param[in] src_var 入力番号
   /// @param[in] dst_var 変換先の入力番号
-  /// @param[in] pol 極性
+  /// @param[in] int 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   void
   set_imap(VarId src_var,
 	   VarId dst_var,
-	   tPol pol);
+	   bool inv);
 
   /// @brief 入力の変換内容の設定
   /// @param[in] var 入力番号
@@ -105,11 +106,13 @@ public:
   /// @brief 出力の変換内容の設定
   /// @param[in] src_var 出力番号
   /// @param[in] dst_var 変換先の出力番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   void
   set_omap(VarId src_var,
 	   VarId dst_var,
-	   tPol pol);
+	   bool inv);
 
   /// @brief 出力の変換内容の設定
   /// @param[in] var 出力番号
@@ -286,27 +289,31 @@ NpnMapM::omap(VarId var) const
 // @brief 入力の変換内容の設定
 // @param[in] src_var 入力番号
 // @param[in] dst_var 変換先の入力番号
-// @param[in] pol 極性
+// @param[in] inv 極性
+//                - false: 反転なし (正極性)
+//                - true:  反転あり (負極性)
 inline
 void
 NpnMapM::set_imap(VarId src_var,
 		  VarId dst_var,
-		  tPol pol)
+		  bool inv)
 {
-  set_imap(src_var, NpnVmap(dst_var, pol));
+  set_imap(src_var, NpnVmap(dst_var, inv));
 }
 
 // @brief 出力の変換内容の設定
 // @param[in] src_var 出力番号
 // @param[in] dst_var 変換先の出力番号
-// @param[in] pol 極性
+// @param[in] inv 極性
+//                - false: 反転なし (正極性)
+//                - true:  反転あり (負極性)
 inline
 void
 NpnMapM::set_omap(VarId src_var,
 		  VarId dst_var,
-		  tPol pol)
+		  bool inv)
 {
-  set_omap(src_var, NpnVmap(dst_var, pol));
+  set_omap(src_var, NpnVmap(dst_var, inv));
 }
 
 END_NAMESPACE_YM_NPN

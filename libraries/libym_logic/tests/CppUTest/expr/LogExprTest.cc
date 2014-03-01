@@ -88,8 +88,8 @@ TEST(libym_logic_LogExprTestGroup, literal1)
 {
   const ymuint vnum = 1;
   const VarId vid(vnum);
-  const tPol pol = kPolPosi;
-  LogExpr expr = LogExpr::make_literal(vid, pol);
+  const bool inv = false;
+  LogExpr expr = LogExpr::make_literal(vid, inv);
 
   CHECK( !expr.is_zero() );
   CHECK( !expr.is_one() );
@@ -119,8 +119,8 @@ TEST(libym_logic_LogExprTestGroup, literal2)
 {
   const ymuint vnum = 2;
   const VarId vid(vnum);
-  const tPol pol = kPolPosi;
-  const Literal lit(vid, pol);
+  const bool inv = false;
+  const Literal lit(vid, inv);
   LogExpr expr = LogExpr::make_literal(lit);
 
   CHECK( !expr.is_zero() );
@@ -209,13 +209,13 @@ TEST(libym_logic_LogExprTestGroup, literal4)
 // make_andの検査(1)
 TEST(libym_logic_LogExprTestGroup, make_and1)
 {
-  Literal lit0(VarId(0), kPolPosi);
+  Literal lit0(VarId(0), false);
   LogExpr expr0 = LogExpr::make_literal(lit0);
 
-  Literal lit1(VarId(1), kPolNega);
+  Literal lit1(VarId(1), true);
   LogExpr expr1 = LogExpr::make_literal(lit1);
 
-  Literal lit2(VarId(2), kPolNega);
+  Literal lit2(VarId(2), true);
   LogExpr expr2 = LogExpr::make_literal(lit2);
 
   LogExprVector child_list(3);

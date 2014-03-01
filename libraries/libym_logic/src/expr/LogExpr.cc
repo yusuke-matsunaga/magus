@@ -516,9 +516,9 @@ LogExpr::litnum(VarId varid) const
 // 特定の変数の特定の極性のリテラル数を得る．
 ymuint
 LogExpr::litnum(VarId varid,
-		tPol pol) const
+		bool inv) const
 {
-  return root()->litnum(varid, pol);
+  return root()->litnum(varid, inv);
 }
 
 // @brief 使われている変数の最大の番号を得る．
@@ -556,9 +556,9 @@ LogExpr::sop_litnum(VarId varid) const
 // の出現回数を得る．
 ymuint
 LogExpr::sop_litnum(VarId varid,
-		    tPol pol) const
+		    bool inv) const
 {
-  SopLit l = root()->soplit(false, varid, pol);
+  SopLit l = root()->soplit(false, varid, inv);
   return l.nl();
 }
 

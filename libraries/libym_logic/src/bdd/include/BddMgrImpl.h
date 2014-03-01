@@ -151,11 +151,11 @@ public:
 
   /// @brief リテラル関数を表すBDDを作る
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   /// @return 生成された BDD
   BddEdge
   make_literal(VarId varid,
-	       tPol pol);
+	       bool inv);
 
   /// @brief 肯定のリテラル関数を作る
   /// @param[in] varid 変数番号
@@ -221,12 +221,12 @@ public:
   /// @brief 一つの変数に対する cofactor を計算する．
   /// @param[in] e 演算対象の枝
   /// @param[in] id 展開対象の変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   /// @return 演算結果を返す．
   BddEdge
   scofactor(BddEdge e,
 	    VarId id,
-	    tPol pol);
+	    bool inv);
 
   /// @brief Davio展開のモーメント項を求める処理
   /// @param[in] e 演算対象の枝
@@ -274,12 +274,12 @@ public:
   /// @brief 変数 xと y が対称(交換可能)な時にtrueを返す．
   /// @param[in] e 演算対象の枝
   /// @param[in] x, y 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   bool
   check_symmetry(BddEdge e,
 		 VarId x,
 		 VarId y,
-		 tPol pol);
+		 bool inv);
 
   /// @brief multiple compose 演算を行うために最初に呼ばれる関数．
   virtual
@@ -302,13 +302,13 @@ public:
   compose(BddEdge e) = 0;
 
   /// @brief x_level の変数を y_level まで「押し込む」．
-  /// @note pol が kPolNega の時は 0-枝と 1-枝を取り替える．
+  /// @note inv が true の時は 0-枝と 1-枝を取り替える．
   virtual
   BddEdge
   push_down(BddEdge e,
 	    ymuint x_level,
 	    ymuint y_level,
-	    tPol pol = kPolPosi) = 0;
+	    bool inv = false) = 0;
 
   /// @brief 不完全指定論理関数の非冗長積和形を求める．
   /// @param[in] l オンセットを表す関数
@@ -903,15 +903,15 @@ BddMgrImpl::mem_limit() const
 
 // @brief リテラル関数を表すBDDを作る
 // @param[in] varid 変数番号
-// @param[in] pol 極性
+// @param[in] inv 極性
 // @return 生成された BDD
 inline
 BddEdge
 BddMgrImpl::make_literal(VarId varid,
-			 tPol pol)
+			 bool inv)
 {
   BddEdge ans = make_posiliteral(varid);
-  return ans.addpol(pol);
+  return ans.add_inv(inv);
 }
 
 // 否定のリテラル関数を作る．

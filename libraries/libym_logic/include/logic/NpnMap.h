@@ -11,7 +11,6 @@
 
 #include "logic/npn_nsdef.h"
 #include "logic/VarId.h"
-#include "logic/Pol.h"
 #include "logic/NpnVmap.h"
 #include "logic/TvFunc.h"
 #include "utils/IDO.h"
@@ -25,7 +24,7 @@ BEGIN_NAMESPACE_YM_NPN
 /// @ingroup NpnGroup
 /// @brief NPN変換の情報を入れるクラス
 ///
-/// @sa tPol, NpnVmap
+/// @sa NpnVmap
 //////////////////////////////////////////////////////////////////////
 class NpnMap
 {
@@ -37,11 +36,13 @@ public:
 
   /// @brief 入力数(と出力極性)を指定したコンストラクタ
   /// @param[in] ni 入力数
-  /// @param[in] pol 出力極性
+  /// @param[in] oinv 出力極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @note 各入力の変換内容は不正な値になっている．
   explicit
   NpnMap(ymuint ni,
-	 tPol pol = kPolPosi);
+	 bool oinv = false);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
@@ -82,11 +83,13 @@ public:
   /// @brief 入力の変換内容の設定
   /// @param[in] src_var 入力変数
   /// @param[in] dst_var 変換先の入力変数
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   void
   set(VarId src_var,
       VarId dst_var,
-      tPol pol);
+      bool inv);
 
   /// @brief 入力の変換内容の設定
   /// @param[in] src_var 入力変数
@@ -97,9 +100,11 @@ public:
       NpnVmap imap);
 
   /// @brief 出力極性を設定する．
-  /// @param[in] pol 出力極性
+  /// @param[in] inv 出力極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   void
-  set_opol(tPol pol);
+  set_oinv(bool inv);
 
 
 public:
@@ -121,9 +126,10 @@ public:
   imap(VarId var) const;
 
   /// @brief 出力極性を返す．
-  /// @return 出力極性
-  tPol
-  opol() const;
+  /// @retval false 反転なし
+  /// @retval true 反転あり
+  bool
+  oinv() const;
 
   /// @brief 内容が等しいか調べる．
   /// @param[in] src 比較対象のマップ
@@ -224,23 +230,23 @@ NpnMap::imap(VarId var) const
 
 // 出力極性を返す．
 inline
-tPol
-NpnMap::opol() const
+bool
+NpnMap::oinv() const
 {
-  return (mNiPol & 1) ? kPolNega : kPolPosi;
+  return static_cast<bool>(mNiPol & 1U);
 }
 
 // @brief 入力の変換内容の設定
 // @param[in] src_var 入力変数
 // @param[in] dst_var 変換先の入力変数
-// @param[in] pol 極性
+// @param[in] inv 極性
 inline
 void
 NpnMap::set(VarId src_var,
 	    VarId dst_var,
-	    tPol pol)
+	    bool inv)
 {
-  set(src_var, NpnVmap(dst_var, pol));
+  set(src_var, NpnVmap(dst_var, inv));
 }
 
 END_NAMESPACE_YM_NPN

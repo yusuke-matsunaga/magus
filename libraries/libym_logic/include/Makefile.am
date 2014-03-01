@@ -55,7 +55,6 @@ nobase_ym_HEADERS = \
 	logic/NpnMapM.h \
 	logic/NpnMgr.h \
 	logic/NpnVmap.h \
-	logic/Pol.h \
 	logic/SatDimacsHandler.h \
 	logic/SatMsgHandler.h \
 	logic/SatMsgHandlerImpl1.h \

@@ -82,7 +82,7 @@ W0Op::count_sub1(BddEdge e)
   }
 
   BddNode* node = e.get_node();
-  tPol pol = e.pol();
+  bool inv = e.inv();
   // 極性違いは符号反転で表せるので正規化する．
   e.normalize();
 
@@ -92,7 +92,7 @@ W0Op::count_sub1(BddEdge e)
     BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       mpz_class ans = p->second;
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	ans = -ans;
       }
       return ans;
@@ -113,7 +113,7 @@ W0Op::count_sub1(BddEdge e)
   }
 
   // 極性を考慮して補正する．
-  if ( pol == kPolNega ) {
+  if ( inv ) {
     ans = -ans;
   }
 
@@ -132,7 +132,7 @@ W0Op::count_sub2(BddEdge e)
   }
 
   BddNode* node = e.get_node();
-  tPol pol = e.pol();
+  bool inv = e.inv();
 
   // 極性違いは符号反転で表せるので正規化する．
   e.normalize();
@@ -143,7 +143,7 @@ W0Op::count_sub2(BddEdge e)
     BddEdgeIntMap::iterator p = mCompTbl2.find(e);
     if ( p != mCompTbl2.end() ) {
       ymint32 ans = p->second;
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	ans = -ans;
       }
       return ans;
@@ -164,7 +164,7 @@ W0Op::count_sub2(BddEdge e)
   }
 
   // 極性を考慮して補正する．
-  if ( pol == kPolNega ) {
+  if ( inv ) {
     ans = -ans;
   }
 

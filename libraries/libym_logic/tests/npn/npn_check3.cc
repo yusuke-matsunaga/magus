@@ -400,16 +400,16 @@ verify(ymuint ni,
     // おなじ代表関数になるかチェックする．
     ymuint ni_pow = 2 << ni;
     for (ymuint bits = 0; bits < ni_pow; ++ bits) {
-      tPol opol = (bits & 1) ? kPolNega : kPolPosi;
+      bool oinv = (bits & 1) ? true : false;
       ymuint ibits = bits >> 1;
 
-      NpnMap pol_map(ni, opol);
+      NpnMap pol_map(ni, oinv);
       for (ymuint i = 0; i < ni; ++ i) {
 	if ( ibits & (1 << i) ) {
-	  pol_map.set(VarId(i), VarId(i), kPolNega);
+	  pol_map.set(VarId(i), VarId(i), true);
 	}
 	else {
-	  pol_map.set(VarId(i), VarId(i), kPolPosi);
+	  pol_map.set(VarId(i), VarId(i), false);
 	}
       }
 
@@ -417,7 +417,7 @@ verify(ymuint ni,
 	NpnMap perm_map(ni);
 	for (ymuint i = 0; i < ni; ++ i) {
 	  ymuint j = pg(i);
-	  perm_map.set(VarId(i), VarId(j), kPolPosi);
+	  perm_map.set(VarId(i), VarId(j), false);
 	}
 
 	NpnMap tmpmap = pol_map * perm_map;

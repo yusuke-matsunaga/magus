@@ -75,7 +75,7 @@ private:
   build_xorsop_tree(ymuint b,
 		    ymuint ni,
 		    const BNodeVector& tmp_fanins,
-		    tPol pol,
+		    bool inv,
 		    BNode* root_node);
 
 

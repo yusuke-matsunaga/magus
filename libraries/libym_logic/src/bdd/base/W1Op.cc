@@ -89,7 +89,7 @@ W1Op::w1_sub1(BddEdge e)
     return mpz_class(0);
   }
 
-  tPol pol = e.pol();
+  bool inv = e.inv();
   // 極性違いは符号反転で表せるので正規化する．
   e.normalize();
 
@@ -99,7 +99,7 @@ W1Op::w1_sub1(BddEdge e)
     BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       mpz_class ans = p->second;
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	ans = -ans;
       }
       return ans;
@@ -129,7 +129,7 @@ W1Op::w1_sub1(BddEdge e)
   }
 
   // 極性を考慮して補正する．
-  if ( pol == kPolNega ) {
+  if ( inv ) {
     result = -result;
   }
 
@@ -151,7 +151,7 @@ W1Op::w1_sub2(BddEdge e)
     return 0;
   }
 
-  tPol pol = e.pol();
+  bool inv = e.inv();
   // 極性違いは符号反転で表せるので正規化する．
   e.normalize();
 
@@ -161,7 +161,7 @@ W1Op::w1_sub2(BddEdge e)
     BddEdgeIntMap::iterator p = mCompTbl2.find(e);
     if ( p != mCompTbl2.end() ) {
       ymint32 ans = p->second;
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	ans = -ans;
       }
       return ans;
@@ -191,7 +191,7 @@ W1Op::w1_sub2(BddEdge e)
   }
 
   // 極性を考慮して補正する．
-  if ( pol == kPolNega ) {
+  if ( inv ) {
     result = -result;
   }
 
@@ -211,7 +211,7 @@ W1Op::w0_sub1(BddEdge e)
 
   BddNode* node = e.get_node();
 
-  tPol pol = e.pol();
+  bool inv = e.inv();
   // 極性違いは符号反転で表せるので正規化する．
   e.normalize();
 
@@ -221,7 +221,7 @@ W1Op::w0_sub1(BddEdge e)
     BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       mpz_class ans = p->second;
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	ans = -ans;
       }
       return ans;
@@ -242,7 +242,7 @@ W1Op::w0_sub1(BddEdge e)
   }
 
   // 極性を考慮して補正する．
-  if ( pol == kPolNega ) {
+  if ( inv ) {
     result = -result;
   }
 
@@ -262,7 +262,7 @@ W1Op::w0_sub2(BddEdge e)
 
   BddNode* node = e.get_node();
 
-  tPol pol = e.pol();
+  bool inv = e.inv();
   // 極性違いは符号反転で表せるので正規化する．
   e.normalize();
 
@@ -272,7 +272,7 @@ W1Op::w0_sub2(BddEdge e)
     BddEdgeIntMap::iterator p = mCompTbl2.find(e);
     if ( p != mCompTbl2.end() ) {
       ymint32 ans = p->second;
-      if ( pol == kPolNega ) {
+      if ( inv ) {
 	ans = -ans;
       }
       return ans;
@@ -293,7 +293,7 @@ W1Op::w0_sub2(BddEdge e)
   }
 
   // 極性を考慮して補正する．
-  if ( pol == kPolNega ) {
+  if ( inv ) {
     result = -result;
   }
 

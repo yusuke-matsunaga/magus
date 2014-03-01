@@ -142,8 +142,8 @@ Dumper::dump_edge(BddEdge e)
   }
   else {
     type = 4;
-    tPol p = e.pol();
-    if ( p == kPolNega ) {
+    bool inv = e.inv();
+    if ( inv ) {
       type = 5;
     }
   }

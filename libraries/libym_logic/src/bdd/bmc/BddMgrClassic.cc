@@ -502,16 +502,16 @@ BddMgrClassic::new_node(ymuint level,
   }
 
   // 否定枝に関する正規化ルール
-  tPol ans_pol = e0.pol();
-  e0.addpol(ans_pol);
-  e1.addpol(ans_pol);
+  bool ans_inv = e0.inv();
+  e0.add_inv(ans_inv);
+  e1.add_inv(ans_inv);
 
   // 節点テーブルを探す．
   ymuint64 pos = hash_func3(e0, e1, level);
   for (BddNode* temp = mNodeTable[pos & mTableSize_1]; temp; temp = temp->mLink) {
     if ( temp->edge0() == e0 && temp->edge1() == e1 && temp->level() == level ) {
       // 同一の節点がすでに登録されている
-      return BddEdge(temp, ans_pol);
+      return BddEdge(temp, ans_inv);
     }
   }
 
@@ -541,7 +541,7 @@ BddMgrClassic::new_node(ymuint level,
     entry = temp;
   }
 
-  return BddEdge(temp, ans_pol);
+  return BddEdge(temp, ans_inv);
 }
 
 // e の参照回数を増やす．

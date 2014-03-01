@@ -75,7 +75,7 @@ BddMgrClassic::ite_op(BddEdge f,
   }
 
   // さらに g に否定属性を付けないように正規化する．
-  tPol ans_pol = g.pol();
+  bool ans_inv = g.pol();
   g.addpol(ans_pol);
   h.addpol(ans_pol);
 

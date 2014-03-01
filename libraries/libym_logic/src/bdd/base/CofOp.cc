@@ -36,7 +36,7 @@ CofOp::~CofOp()
 BddEdge
 CofOp::apply(BddEdge left,
 	     VarId id,
-	     tPol pol)
+	     bool inv)
 {
   // エラー状態のチェック
   if ( left.is_error() ) {
@@ -49,7 +49,7 @@ CofOp::apply(BddEdge left,
   }
 
   mLevel = mgr()->level(id);
-  mPol = pol;
+  mInv = inv;
   clear();
   return apply_step(left);
 }
@@ -65,7 +65,7 @@ CofOp::apply_step(BddEdge f)
 
   // この時点で fは終端ではない．
 
-  tPol f_pol = f.pol();
+  bool f_inv = f.inv();
   BddNode* node = f.get_node();
   ymuint level = node->level();
   if ( level > mLevel ) {
@@ -73,11 +73,11 @@ CofOp::apply_step(BddEdge f)
     return f;
   }
   else if ( level == mLevel ) {
-    if ( mPol == kPolPosi ) {
-      return node->edge1(f_pol);
+    if ( mInv ) {
+      return node->edge0(f_inv);
     }
-    else { // pol == kPolNega
-      return node->edge0(f_pol);
+    else {
+      return node->edge1(f_inv);
     }
   }
 
@@ -105,7 +105,7 @@ CofOp::apply_step(BddEdge f)
   }
 
   // 極性をもとに戻す．
-  result.addpol(f_pol);
+  result.add_inv(f_inv);
 
   return result;
 }

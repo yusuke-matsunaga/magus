@@ -85,7 +85,7 @@ NpnMapM::NpnMapM(const NpnMap& src) :
   for (ymuint i = 0; i < mInputNum; ++ i) {
     mMapArray[i] = src.imap(VarId(i));
   }
-  set_omap(VarId(0), VarId(0), src.opol());
+  set_omap(VarId(0), VarId(0), src.oinv());
 }
 
 // @brief デストラクタ
@@ -132,10 +132,10 @@ NpnMapM::set_identity(ymuint ni,
 {
   resize(ni, no);
   for (ymuint i = 0; i < ni; ++ i) {
-    set_imap(VarId(i), VarId(i), kPolPosi);
+    set_imap(VarId(i), VarId(i), false);
   }
   for (ymuint i = 0; i < no; ++ i) {
-    set_omap(VarId(i), VarId(i), kPolPosi);
+    set_omap(VarId(i), VarId(i), false);
   }
 }
 
@@ -205,8 +205,8 @@ inverse(const NpnMapM& src)
       return NpnMapM(ni, no);
     }
     VarId dst_var = imap.var();
-    tPol pol = imap.pol();
-    ans.set_imap(dst_var, src_var, pol);
+    bool inv = imap.inv();
+    ans.set_imap(dst_var, src_var, inv);
   }
   for (ymuint i = 0; i < no; ++ i) {
     VarId src_var(i);
@@ -216,8 +216,8 @@ inverse(const NpnMapM& src)
       return NpnMapM(ni, no);
     }
     VarId dst_var = omap.var();
-    tPol pol = omap.pol();
-    ans.set_omap(dst_var, src_var, pol);
+    bool inv = omap.inv();
+    ans.set_omap(dst_var, src_var, inv);
   }
 
   return ans;
@@ -248,14 +248,14 @@ operator*(const NpnMapM& src1,
       return NpnMapM(ni, no);
     }
     VarId var2 = imap1.var();
-    tPol pol2 = imap1.pol();
+    bool inv2 = imap1.inv();
     NpnVmap imap2 = src2.imap(var2);
     if ( imap2.is_invalid() ) {
       return NpnMapM(ni, no);
     }
     VarId var3 = imap2.var();
-    tPol pol3 = imap2.pol();
-    ans.set_imap(var1, var3, pol2 * pol3);
+    bool inv3 = imap2.inv();
+    ans.set_imap(var1, var3, inv2 ^ inv3);
   }
 
   for (ymuint i = 0; i < no; ++ i) {
@@ -265,14 +265,14 @@ operator*(const NpnMapM& src1,
       return NpnMapM(ni, no);
     }
     VarId var2 = omap1.var();
-    tPol pol2 = omap1.pol();
+    bool inv2 = omap1.inv();
     NpnVmap omap2 = src2.omap(var2);
     if ( omap2.is_invalid() ) {
       return NpnMapM(ni, no);
     }
     VarId var3 = omap2.var();
-    tPol pol3 = omap2.pol();
-    ans.set_omap(var1, var3, pol2 * pol3);
+    bool inv3 = omap2.inv();
+    ans.set_omap(var1, var3, inv2 ^ inv3);
   }
 
   return ans;
@@ -299,8 +299,8 @@ operator<<(ostream& s,
     }
     else {
       VarId dst_var = imap.var();
-      tPol pol = imap.pol();
-      if ( pol == kPolNega ) {
+      bool inv = imap.inv();
+      if ( inv ) {
 	s << "~";
       }
       s << dst_var;
@@ -320,8 +320,8 @@ operator<<(ostream& s,
     }
     else {
       VarId dst_var = omap.var();
-      tPol pol = omap.pol();
-      if ( pol == kPolNega ) {
+      bool inv = omap.inv();
+      if ( inv ) {
 	s << "~";
       }
       s << dst_var;

@@ -321,22 +321,22 @@ TvFuncM::operator^=(const TvFuncM& src1)
 // @return 自身への参照を返す．
 const TvFuncM&
 TvFuncM::set_cofactor(VarId varid,
-		      tPol pol)
+		      bool inv)
 {
   ymuint pos = varid.val();
   if ( pos < NIPW ) {
     ymulong mask = c_masks[pos];
-    if ( pol == kPolNega ) {
+    if ( inv ) {
       mask = ~mask;
     }
     int shift = 1 << pos;
     for (ymuint i = 0; i < mBlockNum; ++ i) {
       ymulong pat = mVector[i] & mask;
-      if ( pol == kPolPosi ) {
-	pat |= (pat >> shift);
+      if ( inv ) {
+	pat |= (pat << shift);
       }
       else {
-	pat |= (pat << shift);
+	pat |= (pat >> shift);
       }
       mVector[i] = pat;
     }
@@ -347,13 +347,13 @@ TvFuncM::set_cofactor(VarId varid,
     for (ymuint j = 0; j < mOutputNum; ++ j) {
       ymuint offset = j * mBlockNum1;
       for (ymuint i = 0; i < mBlockNum1; ++ i) {
-	if ( pol == kPolPosi ) {
-	  if ( (i & bit) == 0U ) {
+	if ( inv ) {
+	  if ( (i & bit) == bit ) {
 	    mVector[i + offset] = mVector[(i ^ bit) + offset];
 	  }
 	}
 	else {
-	  if ( (i & bit) == bit ) {
+	  if ( (i & bit) == 0U ) {
 	    mVector[i + offset] = mVector[(i ^ bit) + offset];
 	  }
 	}
@@ -368,7 +368,7 @@ TvFuncM::set_cofactor(VarId varid,
 TvFunc
 TvFuncM::output(VarId ovar) const
 {
-  #warning "効率が悪い仮のコード"
+#warning "効率が悪い仮のコード"
 
   ymuint np = 1U << input_num();
   vector<int> tmp(np);
@@ -415,7 +415,7 @@ TvFuncM::check_sup(VarId var) const
 bool
 TvFuncM::check_sym(VarId var1,
 		   VarId var2,
-		   tPol pol) const
+		   bool inv) const
 {
   ymuint i = var1.val();
   ymuint j = var2.val();
@@ -436,13 +436,7 @@ TvFuncM::check_sym(VarId var1,
     ymuint mask_i = (1U << (i - NIPW));
     ymuint mask_j = (1U << (j - NIPW));
     ymuint mask_all = mask_i | mask_j;
-    ymuint cond;
-    if ( pol == kPolPosi ) {
-      cond = mask_j;
-    }
-    else {
-      cond = 0UL;
-    }
+    ymuint cond = inv ? 0UL : mask_j;
     for (ymuint i = 0; i < mOutputNum; ++ i) {
       ymuint offset = i * mBlockNum1;
       for (ymuint v = 0; v < mBlockNum1; ++ v) {
@@ -458,13 +452,7 @@ TvFuncM::check_sym(VarId var1,
     // i >= NIPW
     // j < NIPW
     ymuint mask_i = (1U << (i - NIPW));
-    ymuint cond;
-    if ( pol == kPolPosi ) {
-      cond = mask_i;
-    }
-    else {
-      cond = 0UL;
-    }
+    ymuint cond = inv ? 0UL : mask_i;
     ymulong mask2 = ~c_masks[j];
     ymuint s = 1U << j;
     for (ymuint i = 0; i < mOutputNum; ++ i) {
@@ -481,9 +469,9 @@ TvFuncM::check_sym(VarId var1,
   else {
     // i < NIPW
     // j < NIPW
-    if ( pol == kPolPosi ) {
-      ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
-      ymuint s = (1U << i) - (1U << j);
+    if ( inv ) {
+      ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
+      ymuint s = (1U << i) + (1U << j);
       for (ymuint i = 0; i < mBlockNum; ++ i) {
 	ymulong word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
@@ -493,8 +481,8 @@ TvFuncM::check_sym(VarId var1,
       }
     }
     else {
-      ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
-      ymuint s = (1U << i) + (1U << j);
+      ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
+      ymuint s = (1U << i) - (1U << j);
       for (ymuint i = 0; i < mBlockNum; ++ i) {
 	ymulong word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
@@ -524,7 +512,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
   for (ymuint i = 0; i < mInputNum; ++ i) {
     VarId src_var(i);
     NpnVmap imap = npnmap.imap(src_var);
-    if ( imap.pol() == kPolNega ) {
+    if ( imap.inv() ) {
       imask |= (1UL << i);
     }
     VarId dst_var = imap.var();
@@ -539,7 +527,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
     NpnVmap omap = npnmap.omap(src_var);
     VarId dst_var = omap.var();
     ymuint dst_pos = dst_var.val();
-    ymulong omask = omap.pol() == kPolPosi ? 0UL : 1UL;
+    ymulong omask = omap.inv() ? 1UL : 0UL;
     for (ymuint i = 0; i < ni_pow; ++ i) {
       ymuint new_i = 0;
       ymuint tmp = i;

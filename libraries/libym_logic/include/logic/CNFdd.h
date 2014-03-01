@@ -572,7 +572,7 @@ inline
 const CNFdd&
 CNFdd::add_literal(Literal literal)
 {
-  if ( literal.pol() == kPolPosi ) {
+  if ( literal.is_positive() ) {
     return add_posiliteral(literal.varid());
   }
   else {

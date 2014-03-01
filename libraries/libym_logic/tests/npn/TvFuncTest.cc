@@ -449,8 +449,8 @@ TvFuncTest::check_check_sym(const TvFunc& func,
   ymuint ni = func.input_num();
   ymuint ni_pow = 1 << ni;
 
-  bool stat_p = func.check_sym(pos1, pos2, kPolPosi);
-  bool stat_n = func.check_sym(pos1, pos2, kPolNega);
+  bool stat_p = func.check_sym(pos1, pos2, false);
+  bool stat_n = func.check_sym(pos1, pos2, true);
   ymuint check1 = 1 << pos1.val();
   ymuint check2 = 1 << pos2.val();
   ymuint mask_00 = 0;
@@ -477,7 +477,7 @@ TvFuncTest::check_check_sym(const TvFunc& func,
   if ( stat_p != stat_p_true ) {
     mOut << "Error: TvFunc::check_sym()" << endl
 	 << "  func: " << func << endl
-	 << "  func.check_sym(" << pos1 << ", " << pos2 << ", kPolPosi) = "
+	 << "  func.check_sym(" << pos1 << ", " << pos2 << ", false) = "
 	 << stat_p << endl
 	 << "  true answer = " << stat_p_true << endl;
     ++ mNerr;
@@ -485,7 +485,7 @@ TvFuncTest::check_check_sym(const TvFunc& func,
   if ( stat_n != stat_n_true ) {
     mOut << "Error: TvFunc::check_sym()" << endl
 	 << "  func: " << func << endl
-	 << "  func.check_sym(" << pos1 << ", " << pos2 << ", kPolNega) = "
+	 << "  func.check_sym(" << pos1 << ", " << pos2 << ", true) = "
 	 << stat_n << endl
 	 << "  true answer = " << stat_n_true << endl;
     ++ mNerr;
@@ -501,8 +501,8 @@ TvFuncTest::check_walsh_w0(const TvFunc& func,
   ymuint ni_pow = 1 << ni;
 
   for (ymuint w = 0; w <= ni; ++ w) {
-    int w0_p = func.walsh_w0(w, kPolPosi, ibits);
-    int w0_n = func.walsh_w0(w, kPolNega, ibits);
+    int w0_p = func.walsh_w0(w, false, ibits);
+    int w0_n = func.walsh_w0(w, true, ibits);
 
     int ans1 = 0;
     for (ymuint i = 0; i < ni_pow; ++ i) {
@@ -518,7 +518,7 @@ TvFuncTest::check_walsh_w0(const TvFunc& func,
     if ( w0_p != ans1 ) {
       mOut << "Error: TvFunc::walsh_w0()" << endl
 	   << "  func: " << func << endl
-	   << "  func.walsh_w0(" << w << ", kPolPosi, ";
+	   << "  func.walsh_w0(" << w << ", false, ";
       for (size_t i = 0; i < ni; ++ i) {
 	if ( ibits & (1 << (ni - 1 - i)) ) {
 	  mOut << "1";
@@ -534,7 +534,7 @@ TvFuncTest::check_walsh_w0(const TvFunc& func,
     if ( w0_n != -ans1 ) {
       mOut << "Error: TvFunc::walsh_w0()" << endl
 	   << "  func: " << func << endl
-	   << "  func.walsh_w0(" << w << ", kPolNega, ";
+	   << "  func.walsh_w0(" << w << ", true, ";
       for (size_t i = 0; i < ni; ++ i) {
 	if ( ibits & (1 << (ni - 1 - i)) ) {
 	  mOut << "1";
@@ -561,8 +561,8 @@ TvFuncTest::check_walsh_w1(const TvFunc& func,
 
   ymuint pos = var.val();
   for (ymuint w = 0; w <= ni; ++ w) {
-    int w1_p = func.walsh_w1(var, w, kPolPosi, ibits);
-    int w1_n = func.walsh_w1(var, w, kPolNega, ibits);
+    int w1_p = func.walsh_w1(var, w, false, ibits);
+    int w1_n = func.walsh_w1(var, w, true, ibits);
     int ans1 = 0;
     ymuint check = 1 << pos;
     for (ymuint b = 0; b < ni_pow; ++ b) {
@@ -588,7 +588,7 @@ TvFuncTest::check_walsh_w1(const TvFunc& func,
     if ( w1_p != ans1 ) {
       mOut << "Error: TvFunc::walsh_w1()" << endl
 	   << "  func: " << func << endl
-	   << "  func.walsh_w1(" << w << ", " << pos << ", kPolPosi, ";
+	   << "  func.walsh_w1(" << w << ", " << pos << ", false, ";
       for (ymuint j = 0; j < ni; ++ j) {
 	if ( ibits & (1 << (ni - 1 - j)) ) {
 	  mOut << "1";
@@ -604,7 +604,7 @@ TvFuncTest::check_walsh_w1(const TvFunc& func,
     if ( w1_n != -ans1 ) {
       mOut << "Error: TvFunc::walsh_w1()" << endl
 	   << "  func: " << func << endl
-	   << "  func.walsh_w1(" << w << ", " << pos << ", kPolNega, ";
+	   << "  func.walsh_w1(" << w << ", " << pos << ", true, ";
       for (ymuint j = 0; j < ni; ++ j) {
 	if ( ibits & (1 << (ni - 1 - j)) ) {
 	  mOut << "1";
@@ -627,17 +627,17 @@ TvFuncTest::check_walsh_w1(const TvFunc& func,
 void
 TvFuncTest::check_cofactor(const TvFunc& func,
 			   VarId var,
-			   tPol pol)
+			   bool inv)
 {
   ymuint ni = func.input_num();
   ymuint ni_pow = 1UL << ni;
 
   TvFunc cfunc = func;
-  cfunc.cofactor(var, pol);
+  cfunc.cofactor(var, inv);
 
   ymuint pos = var.val();
   ymuint bit = 1U << pos;
-  ymuint mask = (pol == kPolPosi) ? 0U : bit;
+  ymuint mask = inv ? bit : 0U;
   vector<int> vec(ni_pow);
   for (ymuint i = 0; i < ni_pow; ++ i) {
     ymuint idx = i;
@@ -658,11 +658,11 @@ TvFuncTest::check_cofactor(const TvFunc& func,
     mOut << "Error: TvFunc::cofactor" << endl
 	 << "  func: " << func << endl
 	 << "  func.cofactor(" << pos << ", ";
-    if ( pol == kPolPosi ) {
-      mOut << "Posi";
+    if ( inv ) {
+      mOut << "Nega";
     }
     else {
-      mOut << "Nega";
+      mOut << "Posi";
     }
     mOut << "): " << cfunc << endl
 	 << "golden: " << gfunc << endl;

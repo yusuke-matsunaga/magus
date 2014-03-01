@@ -117,12 +117,12 @@ AeOp::apply_step(BddEdge f,
 
   BddEdge result = get(f, g, s);
   if ( result.is_error() ) {
-    tPol f_pol = f.pol();
-    tPol g_pol = g.pol();
+    bool f_inv = f.inv();
+    bool g_inv = g.inv();
     BddEdge f_0, f_1;
     BddEdge g_0, g_1;
-    split1(top, f_level, f, f_vp, f_pol, f_0, f_1);
-    split1(top, g_level, g, g_vp, g_pol, g_0, g_1);
+    split1(top, f_level, f, f_vp, f_inv, f_0, f_1);
+    split1(top, g_level, g, g_vp, g_inv, g_0, g_1);
     if ( s_level == top ) {
       // top は消去対象の変数
       BddEdge r_0 = apply_step(f_0, g_0, s_vp->edge1());

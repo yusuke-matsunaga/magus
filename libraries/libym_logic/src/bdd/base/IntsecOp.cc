@@ -34,7 +34,7 @@ IntsecOp::~IntsecOp()
 // @return 演算結果を返す．
 BddEdge
 IntsecOp::apply(BddEdge left,
-	     BddEdge right)
+		BddEdge right)
 {
   // エラー状態のチェック
   if ( left.is_error() || right.is_error() ) {
@@ -52,7 +52,7 @@ IntsecOp::apply(BddEdge left,
 // @brief 実際の演算を行う関数
 BddEdge
 IntsecOp::apply_step(BddEdge f,
-		  BddEdge g)
+		     BddEdge g)
 {
   // 特別な場合の処理
   // 1: 片方が0なら絶対に交わらないので 0 を返す．
@@ -71,9 +71,9 @@ IntsecOp::apply_step(BddEdge f,
   // ので f も g も正極性のときは f(0,0,...,0) = g(0,0,...,0) = 0
   // つまりすべての入力を 0 にしたときの関数値は 0 であるので
   // 交わっていることがわかる．
-  tPol f_pol = f.pol();
-  tPol g_pol = g.pol();
-  if ( f_pol == kPolPosi && g_pol == kPolPosi ) {
+  bool f_inv = f.inv();
+  bool g_inv = g.inv();
+  if ( !f_inv && !g_inv ) {
     return BddEdge::make_one();
   }
 

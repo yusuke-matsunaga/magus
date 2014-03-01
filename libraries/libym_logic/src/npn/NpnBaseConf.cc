@@ -137,14 +137,14 @@ NpnBaseConf::normalize(const TvFunc& func)
       // 対称性のチェックを行う．
       VarId var(i);
       VarId var1(pos1);
-      tPol poldiff = (mIpols[pos1] * mIpols[i] == 2) ? kPolNega : kPolPosi;
-      bool stat = mFunc.check_sym(var, var1, poldiff);
+      bool inv = (mIpols[pos1] * mIpols[i] == 2);
+      bool stat = mFunc.check_sym(var, var1, inv);
       if ( stat ) {
 	// 対称だった
 	found = true;
 	if ( mW1[pos1] == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
-	  bool stat = mFunc.check_sym(var, var1, ~poldiff);
+	  bool stat = mFunc.check_sym(var, var1, !inv);
 	  if ( stat ) {
 	    set_bisym(pos1);
 	  }
@@ -158,8 +158,8 @@ NpnBaseConf::normalize(const TvFunc& func)
       }
       if ( mW1[i] == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
-	// この場合，最初の要素の極性は常に kPolPosi のはず
-	bool stat = mFunc.check_sym(var, var1, kPolNega);
+	// この場合，最初の要素の極性は常に false のはず
+	bool stat = mFunc.check_sym(var, var1, true);
 	if ( stat ) {
 	  // 逆相で対称だった．
 	  found = true;

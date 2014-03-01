@@ -43,12 +43,14 @@ public:
   edge1() const;
 
   /// @brief 中間ノードの場合に0枝を得る．
+  /// @param[in] inv 反転属性
   BddEdge
-  edge0(tPol p) const;
+  edge0(bool inv) const;
 
   /// @brief 中間ノードの場合に1枝を得る．
+  /// @param[in] inv 反転属性
   BddEdge
-  edge1(tPol p) const;
+  edge1(bool inv) const;
 
   /// @brief レベルを得る．
   ymuint
@@ -171,15 +173,15 @@ BddNode::edge1() const
 }
 inline
 BddEdge
-BddNode::edge0(tPol p) const
+BddNode::edge0(bool inv) const
 {
-  return BddEdge(mEdge0, p);
+  return BddEdge(mEdge0, inv);
 }
 inline
 BddEdge
-BddNode::edge1(tPol p) const
+BddNode::edge1(bool inv) const
 {
-  return BddEdge(mEdge1, p);
+  return BddEdge(mEdge1, inv);
 }
 
 // レベルを得る

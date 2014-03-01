@@ -220,7 +220,7 @@ TvFunc::TvFunc(ymuint ni,
 // リテラル関数を作るコンストラクタ
 TvFunc::TvFunc(ymuint ni,
 	       VarId varid,
-	       tPol pol) :
+	       bool inv) :
   mInputNum(ni),
   mBlockNum(nblock(ni)),
   mVector(new ymulong[mBlockNum])
@@ -228,31 +228,31 @@ TvFunc::TvFunc(ymuint ni,
   assert_cond( varid.val() < ni, __FILE__, __LINE__);
   switch ( ni ) {
   case 1:
-    if ( pol == kPolPosi ) {
-      mVector[0] = 0x2;
+    if ( inv ) {
+      mVector[0] = 0x1;
     }
     else {
-      mVector[0] = 0x1;
+      mVector[0] = 0x2;
     }
     break;
 
   case 2:
     switch ( varid.val() ) {
     case 0:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xA;
+      if ( inv ) {
+	mVector[0] = 0x5;
       }
       else {
-	mVector[0] = 0x5;
+	mVector[0] = 0xA;
       }
       break;
 
     case 1:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xC;
+      if ( inv ) {
+	mVector[0] = 0x3;
       }
       else {
-	mVector[0] = 0x3;
+	mVector[0] = 0xC;
       }
       break;
 
@@ -265,29 +265,29 @@ TvFunc::TvFunc(ymuint ni,
   case 3:
     switch ( varid.val() ) {
     case 0:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xAA;
+      if ( inv ) {
+	mVector[0] = 0x55;
       }
       else {
-	mVector[0] = 0x55;
+	mVector[0] = 0xAA;
       }
       break;
 
     case 1:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xCC;
+      if ( inv ) {
+	mVector[0] = 0x33;
       }
       else {
-	mVector[0] = 0x33;
+	mVector[0] = 0xCC;
       }
       break;
 
     case 2:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xF0;
+      if ( inv ) {
+	mVector[0] = 0x0F;
       }
       else {
-	mVector[0] = 0x0F;
+	mVector[0] = 0xF0;
       }
       break;
 
@@ -300,38 +300,38 @@ TvFunc::TvFunc(ymuint ni,
   case 4:
     switch ( varid.val() ) {
     case 0:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xAAAA;
+      if ( inv ) {
+	mVector[0] = 0x5555;
       }
       else {
-	mVector[0] = 0x5555;
+	mVector[0] = 0xAAAA;
       }
       break;
 
     case 1:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xCCCC;
+      if ( inv ) {
+	mVector[0] = 0x3333;
       }
       else {
-	mVector[0] = 0x3333;
+	mVector[0] = 0xCCCC;
       }
       break;
 
     case 2:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xF0F0;
+      if ( inv ) {
+	mVector[0] = 0x0F0F;
       }
       else {
-	mVector[0] = 0x0F0F;
+	mVector[0] = 0xF0F0;
       }
       break;
 
     case 3:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xFF00;
+      if ( inv ) {
+	mVector[0] = 0x00FF;
       }
       else {
-	mVector[0] = 0x00FF;
+	mVector[0] = 0xFF00;
       }
       break;
 
@@ -344,47 +344,47 @@ TvFunc::TvFunc(ymuint ni,
   case 5:
     switch ( varid.val() ) {
     case 0:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xAAAAAAAA;
+      if ( inv ) {
+	mVector[0] = 0x55555555;
       }
       else {
-	mVector[0] = 0x55555555;
+	mVector[0] = 0xAAAAAAAA;
       }
       break;
 
     case 1:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xCCCCCCCC;
+      if ( inv ) {
+	mVector[0] = 0x33333333;
       }
       else {
-	mVector[0] = 0x33333333;
+	mVector[0] = 0xCCCCCCCC;
       }
       break;
 
     case 2:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xF0F0F0F0;
+      if ( inv ) {
+	mVector[0] = 0x0F0F0F0F;
       }
       else {
-	mVector[0] = 0x0F0F0F0F;
+	mVector[0] = 0xF0F0F0F0;
       }
       break;
 
     case 3:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xFF00FF00;
+      if ( inv ) {
+	mVector[0] = 0x00FF00FF;
       }
       else {
-	mVector[0] = 0x00FF00FF;
+	mVector[0] = 0xFF00FF00;
       }
       break;
 
     case 4:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xFFFF0000;
+      if ( inv ) {
+	mVector[0] = 0x0000FFFF;
       }
       else {
-	mVector[0] = 0x0000FFFF;
+	mVector[0] = 0xFFFF0000;
       }
       break;
 
@@ -398,56 +398,56 @@ TvFunc::TvFunc(ymuint ni,
   case 6:
     switch ( varid.val() ) {
     case 0:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xAAAAAAAAAAAAAAAA;
+      if ( inv ) {
+	mVector[0] = 0x5555555555555555;
       }
       else {
-	mVector[0] = 0x5555555555555555;
+	mVector[0] = 0xAAAAAAAAAAAAAAAA;
       }
       break;
 
     case 1:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xCCCCCCCCCCCCCCCC;
+      if ( inv ) {
+	mVector[0] = 0x3333333333333333;
       }
       else {
-	mVector[0] = 0x3333333333333333;
+	mVector[0] = 0xCCCCCCCCCCCCCCCC;
       }
       break;
 
     case 2:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xF0F0F0F0F0F0F0F0;
+      if ( inv ) {
+	mVector[0] = 0x0F0F0F0F0F0F0F0F;
       }
       else {
-	mVector[0] = 0x0F0F0F0F0F0F0F0F;
+	mVector[0] = 0xF0F0F0F0F0F0F0F0;
       }
       break;
 
     case 3:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xFF00FF00FF00FF00;
+      if ( inv ) {
+	mVector[0] = 0x00FF00FF00FF00FF;
       }
       else {
-	mVector[0] = 0x00FF00FF00FF00FF;
+	mVector[0] = 0xFF00FF00FF00FF00;
       }
       break;
 
     case 4:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xFFFF0000FFFF0000;
+      if ( inv ) {
+	mVector[0] = 0x0000FFFF0000FFFF;
       }
       else {
-	mVector[0] = 0x0000FFFF0000FFFF;
+	mVector[0] = 0xFFFF0000FFFF0000;
       }
       break;
 
     case 5:
-      if ( pol == kPolPosi ) {
-	mVector[0] = 0xFFFFFFFF00000000;
+      if ( inv ) {
+	mVector[0] = 0x00000000FFFFFFFF;
       }
       else {
-	mVector[0] = 0x00000000FFFFFFFF;
+	mVector[0] = 0xFFFFFFFF00000000;
       }
       break;
 
@@ -460,12 +460,9 @@ TvFunc::TvFunc(ymuint ni,
 
   default:
     if ( varid.val() < NIPW ) {
-      ymulong pat;
-      if ( pol == kPolPosi ) {
-	pat = c_masks[varid.val()];
-      }
-      else {
-	pat = ~c_masks[varid.val()];
+      ymulong pat = c_masks[varid.val()];
+      if ( inv ) {
+	pat = ~pat;
       }
       for (ymuint b = 0; b < mBlockNum; ++ b) {
 	mVector[b] = pat;
@@ -475,11 +472,11 @@ TvFunc::TvFunc(ymuint ni,
       ymuint i5 = varid.val() - NIPW;
       ymuint check = 1U << i5;
       ymulong pat0;
-      if ( pol == kPolPosi ) {
-	pat0 = ~(0UL);
+      if ( inv ) {
+	pat0 = 0UL;
       }
       else {
-	pat0 = 0UL;
+	pat0 = ~(0UL);
       }
       ymulong pat1 = ~pat0;
       for (ymuint b = 0; b < mBlockNum; ++ b) {
@@ -582,7 +579,7 @@ TvFunc
 TvFunc::posi_literal(ymuint ni,
 		     VarId varid)
 {
-  return TvFunc(ni, varid, kPolPosi);
+  return TvFunc(ni, varid, false);
 }
 
 // 否定のリテラル関数を作る．
@@ -590,7 +587,7 @@ TvFunc
 TvFunc::nega_literal(ymuint ni,
 		     VarId varid)
 {
-  return TvFunc(ni, varid, kPolNega);
+  return TvFunc(ni, varid, true);
 }
 
 // 自分自身を否定する．
@@ -673,22 +670,22 @@ TvFunc::operator^=(const TvFunc& src1)
 // @return 自身への参照を返す．
 const TvFunc&
 TvFunc::set_cofactor(VarId varid,
-		     tPol pol)
+		     bool inv)
 {
   ymuint pos = varid.val();
   if ( pos < NIPW ) {
     ymulong mask = c_masks[pos];
-    if ( pol == kPolNega ) {
+    if ( inv ) {
       mask = ~mask;
     }
     int shift = 1 << pos;
     for (ymuint b = 0; b < mBlockNum; ++ b) {
       ymulong pat = mVector[b] & mask;
-      if ( pol == kPolPosi ) {
-	pat |= (pat >> shift);
+      if ( inv ) {
+	pat |= (pat << shift);
       }
       else {
-	pat |= (pat << shift);
+	pat |= (pat >> shift);
       }
       mVector[b] = pat;
     }
@@ -697,13 +694,13 @@ TvFunc::set_cofactor(VarId varid,
     pos -= NIPW;
     ymuint bit = 1U << pos;
     for (ymuint i = 0; i < mBlockNum; ++ i) {
-      if ( pol == kPolPosi ) {
-	if ( (i & bit) == 0U ) {
+      if ( inv ) {
+	if ( (i & bit) == bit ) {
 	  mVector[i] = mVector[i ^ bit];
 	}
       }
       else {
-	if ( (i & bit) == bit ) {
+	if ( (i & bit) == 0U ) {
 	  mVector[i] = mVector[i ^ bit];
 	}
       }
@@ -3485,7 +3482,6 @@ BEGIN_NONAMESPACE
 inline
 int
 walsh_w0_2(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -3512,18 +3508,12 @@ walsh_w0_2(ymulong* src_vec,
     c = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return nall - c * 2;
-  }
-  else {
-    return c * 2 - nall;
-  }
+  return nall - c * 2;
 }
 
 inline
 int
 walsh_w0_3(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -3557,18 +3547,12 @@ walsh_w0_3(ymulong* src_vec,
     c = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return nall - c * 2;
-  }
-  else {
-    return c * 2 - nall;
-  }
+  return nall - c * 2;
 }
 
 inline
 int
 walsh_w0_4(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -3613,12 +3597,7 @@ walsh_w0_4(ymulong* src_vec,
     c = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return nall - c * 2;
-  }
-  else {
-    return c * 2 - nall;
-  }
+  return nall - c * 2;
 }
 
 inline
@@ -3716,41 +3695,21 @@ walsh_w0_5_5(ymulong* src_vec,
 inline
 int
 walsh_w0_5(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
-  int ans;
   switch ( w ) {
-  case 0:
-    ans = walsh_w0_5_0(src_vec, ibits);
-    break;
-  case 1:
-    ans = walsh_w0_5_1(src_vec, ibits);
-    break;
-  case 2:
-    ans = walsh_w0_5_2(src_vec, ibits);
-    break;
-  case 3:
-    ans = walsh_w0_5_3(src_vec, ibits);
-    break;
-  case 4:
-    ans = walsh_w0_5_4(src_vec, ibits);
-    break;
-  case 5:
-    ans = walsh_w0_5_5(src_vec, ibits);
-    break;
+  case 0: return walsh_w0_5_0(src_vec, ibits);
+  case 1: return walsh_w0_5_1(src_vec, ibits);
+  case 2: return walsh_w0_5_2(src_vec, ibits);
+  case 3: return walsh_w0_5_3(src_vec, ibits);
+  case 4: return walsh_w0_5_4(src_vec, ibits);
+  case 5: return walsh_w0_5_5(src_vec, ibits);
   default:
     assert_not_reached(__FILE__, __LINE__);
-    ans = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return ans;
-  }
-  else {
-    return -ans;
-  }
+  return 0;
 }
 
 #if WORD64
@@ -3983,44 +3942,22 @@ walsh_w0_6_6(ymulong* src_vec,
 inline
 int
 walsh_w0_6(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
-  int ans;
   switch ( w ) {
-  case 0:
-    ans = walsh_w0_6_0(src_vec, ibits);
-    break;
-  case 1:
-    ans = walsh_w0_6_1(src_vec, ibits);
-    break;
-  case 2:
-    ans = walsh_w0_6_2(src_vec, ibits);
-    break;
-  case 3:
-    ans = walsh_w0_6_3(src_vec, ibits);
-    break;
-  case 4:
-    ans = walsh_w0_6_4(src_vec, ibits);
-    break;
-  case 5:
-    ans = walsh_w0_6_5(src_vec, ibits);
-    break;
-  case 6:
-    ans = walsh_w0_6_6(src_vec, ibits);
-    break;
+  case 0: return walsh_w0_6_0(src_vec, ibits);
+  case 1: return walsh_w0_6_1(src_vec, ibits);
+  case 2: return walsh_w0_6_2(src_vec, ibits);
+  case 3: return walsh_w0_6_3(src_vec, ibits);
+  case 4: return walsh_w0_6_4(src_vec, ibits);
+  case 5: return walsh_w0_6_5(src_vec, ibits);
+  case 6: return walsh_w0_6_6(src_vec, ibits);
   default:
     assert_not_reached(__FILE__, __LINE__);
-    ans = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return ans;
-  }
-  else {
-    return -ans;
-  }
+  return 0;
 }
 
 inline
@@ -4124,47 +4061,23 @@ walsh_w0_7_7(ymulong* src_vec,
 inline
 int
 walsh_w0_7(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
-  int ans;
   switch ( w ) {
-  case 0:
-    ans = walsh_w0_7_0(src_vec, ibits);
-    break;
-  case 1:
-    ans = walsh_w0_7_1(src_vec, ibits);
-    break;
-  case 2:
-    ans = walsh_w0_7_2(src_vec, ibits);
-    break;
-  case 3:
-    ans = walsh_w0_7_3(src_vec, ibits);
-    break;
-  case 4:
-    ans = walsh_w0_7_4(src_vec, ibits);
-    break;
-  case 5:
-    ans = walsh_w0_7_5(src_vec, ibits);
-    break;
-  case 6:
-    ans = walsh_w0_7_6(src_vec, ibits);
-    break;
-  case 7:
-    ans = walsh_w0_7_7(src_vec, ibits);
-    break;
+  case 0: return walsh_w0_7_0(src_vec, ibits);
+  case 1: return walsh_w0_7_1(src_vec, ibits);
+  case 2: return walsh_w0_7_2(src_vec, ibits);
+  case 3: return walsh_w0_7_3(src_vec, ibits);
+  case 4: return walsh_w0_7_4(src_vec, ibits);
+  case 5: return walsh_w0_7_5(src_vec, ibits);
+  case 6: return walsh_w0_7_6(src_vec, ibits);
+  case 7: return walsh_w0_7_7(src_vec, ibits);
   default:
     assert_not_reached(__FILE__, __LINE__);
-    ans = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return ans;
-  }
-  else {
-    return -ans;
-  }
+  return 0;
 }
 
 inline
@@ -4281,50 +4194,25 @@ walsh_w0_8_8(ymulong* src_vec,
 inline
 int
 walsh_w0_8(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
   int ans;
   switch ( w ) {
-  case 0:
-    ans = walsh_w0_8_0(src_vec, ibits);
-    break;
-  case 1:
-    ans = walsh_w0_8_1(src_vec, ibits);
-    break;
-  case 2:
-    ans = walsh_w0_8_2(src_vec, ibits);
-    break;
-  case 3:
-    ans = walsh_w0_8_3(src_vec, ibits);
-    break;
-  case 4:
-    ans = walsh_w0_8_4(src_vec, ibits);
-    break;
-  case 5:
-    ans = walsh_w0_8_5(src_vec, ibits);
-    break;
-  case 6:
-    ans = walsh_w0_8_6(src_vec, ibits);
-    break;
-  case 7:
-    ans = walsh_w0_8_7(src_vec, ibits);
-    break;
-  case 8:
-    ans = walsh_w0_8_8(src_vec, ibits);
-    break;
+  case 0: return walsh_w0_8_0(src_vec, ibits);
+  case 1: return walsh_w0_8_1(src_vec, ibits);
+  case 2: return walsh_w0_8_2(src_vec, ibits);
+  case 3: return walsh_w0_8_3(src_vec, ibits);
+  case 4: return walsh_w0_8_4(src_vec, ibits);
+  case 5: return walsh_w0_8_5(src_vec, ibits);
+  case 6: return walsh_w0_8_6(src_vec, ibits);
+  case 7: return walsh_w0_8_7(src_vec, ibits);
+  case 8: return walsh_w0_8_8(src_vec, ibits);
   default:
     assert_not_reached(__FILE__, __LINE__);
-    ans = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return ans;
-  }
-  else {
-    return -ans;
-  }
+  return 0;
 }
 
 inline
@@ -4454,53 +4342,26 @@ walsh_w0_9_9(ymulong* src_vec,
 inline
 int
 walsh_w0_9(ymulong* src_vec,
-	   tPol opol,
 	   ymuint ibits,
 	   ymuint w)
 {
   int ans;
   switch ( w ) {
-  case 0:
-    ans = walsh_w0_9_0(src_vec, ibits);
-    break;
-  case 1:
-    ans = walsh_w0_9_1(src_vec, ibits);
-    break;
-  case 2:
-    ans = walsh_w0_9_2(src_vec, ibits);
-    break;
-  case 3:
-    ans = walsh_w0_9_3(src_vec, ibits);
-    break;
-  case 4:
-    ans = walsh_w0_9_4(src_vec, ibits);
-    break;
-  case 5:
-    ans = walsh_w0_9_5(src_vec, ibits);
-    break;
-  case 6:
-    ans = walsh_w0_9_6(src_vec, ibits);
-    break;
-  case 7:
-    ans = walsh_w0_9_7(src_vec, ibits);
-    break;
-  case 8:
-    ans = walsh_w0_9_8(src_vec, ibits);
-    break;
-  case 9:
-    ans = walsh_w0_9_9(src_vec, ibits);
-    break;
+  case 0: return walsh_w0_9_0(src_vec, ibits);
+  case 1: return walsh_w0_9_1(src_vec, ibits);
+  case 2: return walsh_w0_9_2(src_vec, ibits);
+  case 3: return walsh_w0_9_3(src_vec, ibits);
+  case 4: return walsh_w0_9_4(src_vec, ibits);
+  case 5: return walsh_w0_9_5(src_vec, ibits);
+  case 6: return walsh_w0_9_6(src_vec, ibits);
+  case 7: return walsh_w0_9_7(src_vec, ibits);
+  case 8: return walsh_w0_9_8(src_vec, ibits);
+  case 9: return walsh_w0_9_9(src_vec, ibits);
   default:
     assert_not_reached(__FILE__, __LINE__);
-    ans = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return ans;
-  }
-  else {
-    return -ans;
-  }
+  return 0;
 }
 
 inline
@@ -4643,56 +4504,27 @@ walsh_w0_10_10(ymulong* src_vec,
 inline
 int
 walsh_w0_10(ymulong* src_vec,
-	    tPol opol,
 	    ymuint ibits,
 	    ymuint w)
 {
   int ans;
   switch ( w ) {
-  case 0:
-    ans = walsh_w0_10_0(src_vec, ibits);
-    break;
-  case 1:
-    ans = walsh_w0_10_1(src_vec, ibits);
-    break;
-  case 2:
-    ans = walsh_w0_10_2(src_vec, ibits);
-    break;
-  case 3:
-    ans = walsh_w0_10_3(src_vec, ibits);
-    break;
-  case 4:
-    ans = walsh_w0_10_4(src_vec, ibits);
-    break;
-  case 5:
-    ans = walsh_w0_10_5(src_vec, ibits);
-    break;
-  case 6:
-    ans = walsh_w0_10_6(src_vec, ibits);
-    break;
-  case 7:
-    ans = walsh_w0_10_7(src_vec, ibits);
-    break;
-  case 8:
-    ans = walsh_w0_10_8(src_vec, ibits);
-    break;
-  case 9:
-    ans = walsh_w0_10_9(src_vec, ibits);
-    break;
-  case 10:
-    ans = walsh_w0_10_10(src_vec, ibits);
-    break;
+  case 0: return walsh_w0_10_0(src_vec, ibits);
+  case 1: return walsh_w0_10_1(src_vec, ibits);
+  case 2: return walsh_w0_10_2(src_vec, ibits);
+  case 3: return walsh_w0_10_3(src_vec, ibits);
+  case 4: return walsh_w0_10_4(src_vec, ibits);
+  case 5: return walsh_w0_10_5(src_vec, ibits);
+  case 6: return walsh_w0_10_6(src_vec, ibits);
+  case 7: return walsh_w0_10_7(src_vec, ibits);
+  case 8: return walsh_w0_10_8(src_vec, ibits);
+  case 9: return walsh_w0_10_9(src_vec, ibits);
+  case 10: return walsh_w0_10_10(src_vec, ibits);
   default:
     assert_not_reached(__FILE__, __LINE__);
-    ans = 0;
   }
 
-  if ( opol == kPolPosi ) {
-    return ans;
-  }
-  else {
-    return -ans;
-  }
+  return 0;
 }
 
 
@@ -4701,291 +4533,293 @@ END_NONAMESPACE
 // 重み別の 0 次の Walsh 係数を求める．
 int
 TvFunc::walsh_w0(ymuint w,
-		 tPol opol,
+		 bool oinv,
 		 ymuint ibits) const
 {
+  int ans;
   switch ( input_num() ) {
-  case  2: return walsh_w0_2(mVector, opol, ibits, w);
-  case  3: return walsh_w0_3(mVector, opol, ibits, w);
-  case  4: return walsh_w0_4(mVector, opol, ibits, w);
-  case  5: return walsh_w0_5(mVector, opol, ibits, w);
-  case  6: return walsh_w0_6(mVector, opol, ibits, w);
-  case  7: return walsh_w0_7(mVector, opol, ibits, w);
-  case  8: return walsh_w0_8(mVector, opol, ibits, w);
-  case  9: return walsh_w0_9(mVector, opol, ibits, w);
-  case 10: return walsh_w0_10(mVector, opol, ibits, w);
+  case  2: ans = walsh_w0_2(mVector, ibits, w); break;
+  case  3: ans = walsh_w0_3(mVector, ibits, w); break;
+  case  4: ans = walsh_w0_4(mVector, ibits, w); break;
+  case  5: ans = walsh_w0_5(mVector, ibits, w); break;
+  case  6: ans = walsh_w0_6(mVector, ibits, w); break;
+  case  7: ans = walsh_w0_7(mVector, ibits, w); break;
+  case  8: ans = walsh_w0_8(mVector, ibits, w); break;
+  case  9: ans = walsh_w0_9(mVector, ibits, w); break;
+  case 10: ans = walsh_w0_10(mVector, ibits, w); break;
 
 #if 0
   case 11:
     switch ( w ) {
-    case 0: return walsh_w0_11_0(mVector, opol, ibits);
-    case 1: return walsh_w0_11_1(mVector, opol, ibits);
-    case 2: return walsh_w0_11_2(mVector, opol, ibits);
-    case 3: return walsh_w0_11_3(mVector, opol, ibits);
-    case 4: return walsh_w0_11_4(mVector, opol, ibits);
-    case 5: return walsh_w0_11_5(mVector, opol, ibits);
-    case 6: return walsh_w0_11_6(mVector, opol, ibits);
-    case 7: return walsh_w0_11_7(mVector, opol, ibits);
-    case 8: return walsh_w0_11_8(mVector, opol, ibits);
-    case 9: return walsh_w0_11_9(mVector, opol, ibits);
-    case 10: return walsh_w0_11_10(mVector, opol, ibits);
-    case 11: return walsh_w0_11_11(mVector, opol, ibits);
+    case 0: ans = walsh_w0_11_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_11_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_11_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_11_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_11_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_11_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_11_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_11_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_11_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_11_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_11_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_11_11(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 12:
     switch ( w ) {
-    case 0: return walsh_w0_12_0(mVector, opol, ibits);
-    case 1: return walsh_w0_12_1(mVector, opol, ibits);
-    case 2: return walsh_w0_12_2(mVector, opol, ibits);
-    case 3: return walsh_w0_12_3(mVector, opol, ibits);
-    case 4: return walsh_w0_12_4(mVector, opol, ibits);
-    case 5: return walsh_w0_12_5(mVector, opol, ibits);
-    case 6: return walsh_w0_12_6(mVector, opol, ibits);
-    case 7: return walsh_w0_12_7(mVector, opol, ibits);
-    case 8: return walsh_w0_12_8(mVector, opol, ibits);
-    case 9: return walsh_w0_12_9(mVector, opol, ibits);
-    case 10: return walsh_w0_12_10(mVector, opol, ibits);
-    case 11: return walsh_w0_12_11(mVector, opol, ibits);
-    case 12: return walsh_w0_12_12(mVector, opol, ibits);
+    case 0: ans = walsh_w0_12_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_12_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_12_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_12_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_12_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_12_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_12_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_12_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_12_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_12_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_12_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_12_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_12_12(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 13:
     switch ( w ) {
-    case 0: return walsh_w0_13_0(mVector, opol, ibits);
-    case 1: return walsh_w0_13_1(mVector, opol, ibits);
-    case 2: return walsh_w0_13_2(mVector, opol, ibits);
-    case 3: return walsh_w0_13_3(mVector, opol, ibits);
-    case 4: return walsh_w0_13_4(mVector, opol, ibits);
-    case 5: return walsh_w0_13_5(mVector, opol, ibits);
-    case 6: return walsh_w0_13_6(mVector, opol, ibits);
-    case 7: return walsh_w0_13_7(mVector, opol, ibits);
-    case 8: return walsh_w0_13_8(mVector, opol, ibits);
-    case 9: return walsh_w0_13_9(mVector, opol, ibits);
-    case 10: return walsh_w0_13_10(mVector, opol, ibits);
-    case 11: return walsh_w0_13_11(mVector, opol, ibits);
-    case 12: return walsh_w0_13_12(mVector, opol, ibits);
-    case 13: return walsh_w0_13_13(mVector, opol, ibits);
+    case 0: ans = walsh_w0_13_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_13_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_13_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_13_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_13_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_13_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_13_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_13_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_13_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_13_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_13_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_13_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_13_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_13_13(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 14:
     switch ( w ) {
-    case 0: return walsh_w0_14_0(mVector, opol, ibits);
-    case 1: return walsh_w0_14_1(mVector, opol, ibits);
-    case 2: return walsh_w0_14_2(mVector, opol, ibits);
-    case 3: return walsh_w0_14_3(mVector, opol, ibits);
-    case 4: return walsh_w0_14_4(mVector, opol, ibits);
-    case 5: return walsh_w0_14_5(mVector, opol, ibits);
-    case 6: return walsh_w0_14_6(mVector, opol, ibits);
-    case 7: return walsh_w0_14_7(mVector, opol, ibits);
-    case 8: return walsh_w0_14_8(mVector, opol, ibits);
-    case 9: return walsh_w0_14_9(mVector, opol, ibits);
-    case 10: return walsh_w0_14_10(mVector, opol, ibits);
-    case 11: return walsh_w0_14_11(mVector, opol, ibits);
-    case 12: return walsh_w0_14_12(mVector, opol, ibits);
-    case 13: return walsh_w0_14_13(mVector, opol, ibits);
-    case 14: return walsh_w0_14_14(mVector, opol, ibits);
+    case 0: ans = walsh_w0_14_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_14_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_14_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_14_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_14_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_14_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_14_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_14_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_14_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_14_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_14_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_14_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_14_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_14_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_14_14(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 15:
     switch ( w ) {
-    case 0: return walsh_w0_15_0(mVector, opol, ibits);
-    case 1: return walsh_w0_15_1(mVector, opol, ibits);
-    case 2: return walsh_w0_15_2(mVector, opol, ibits);
-    case 3: return walsh_w0_15_3(mVector, opol, ibits);
-    case 4: return walsh_w0_15_4(mVector, opol, ibits);
-    case 5: return walsh_w0_15_5(mVector, opol, ibits);
-    case 6: return walsh_w0_15_6(mVector, opol, ibits);
-    case 7: return walsh_w0_15_7(mVector, opol, ibits);
-    case 8: return walsh_w0_15_8(mVector, opol, ibits);
-    case 9: return walsh_w0_15_9(mVector, opol, ibits);
-    case 10: return walsh_w0_15_10(mVector, opol, ibits);
-    case 11: return walsh_w0_15_11(mVector, opol, ibits);
-    case 12: return walsh_w0_15_12(mVector, opol, ibits);
-    case 13: return walsh_w0_15_13(mVector, opol, ibits);
-    case 14: return walsh_w0_15_14(mVector, opol, ibits);
-    case 15: return walsh_w0_15_15(mVector, opol, ibits);
+    case 0: ans = walsh_w0_15_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_15_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_15_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_15_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_15_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_15_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_15_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_15_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_15_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_15_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_15_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_15_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_15_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_15_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_15_14(mVector, ibits); break;
+    case 15: ans = walsh_w0_15_15(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 16:
     switch ( w ) {
-    case 0: return walsh_w0_16_0(mVector, opol, ibits);
-    case 1: return walsh_w0_16_1(mVector, opol, ibits);
-    case 2: return walsh_w0_16_2(mVector, opol, ibits);
-    case 3: return walsh_w0_16_3(mVector, opol, ibits);
-    case 4: return walsh_w0_16_4(mVector, opol, ibits);
-    case 5: return walsh_w0_16_5(mVector, opol, ibits);
-    case 6: return walsh_w0_16_6(mVector, opol, ibits);
-    case 7: return walsh_w0_16_7(mVector, opol, ibits);
-    case 8: return walsh_w0_16_8(mVector, opol, ibits);
-    case 9: return walsh_w0_16_9(mVector, opol, ibits);
-    case 10: return walsh_w0_16_10(mVector, opol, ibits);
-    case 11: return walsh_w0_16_11(mVector, opol, ibits);
-    case 12: return walsh_w0_16_12(mVector, opol, ibits);
-    case 13: return walsh_w0_16_13(mVector, opol, ibits);
-    case 14: return walsh_w0_16_14(mVector, opol, ibits);
-    case 15: return walsh_w0_16_15(mVector, opol, ibits);
-    case 16: return walsh_w0_16_16(mVector, opol, ibits);
+    case 0: ans = walsh_w0_16_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_16_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_16_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_16_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_16_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_16_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_16_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_16_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_16_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_16_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_16_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_16_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_16_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_16_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_16_14(mVector, ibits); break;
+    case 15: ans = walsh_w0_16_15(mVector, ibits); break;
+    case 16: ans = walsh_w0_16_16(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 17:
     switch ( w ) {
-    case 0: return walsh_w0_17_0(mVector, opol, ibits);
-    case 1: return walsh_w0_17_1(mVector, opol, ibits);
-    case 2: return walsh_w0_17_2(mVector, opol, ibits);
-    case 3: return walsh_w0_17_3(mVector, opol, ibits);
-    case 4: return walsh_w0_17_4(mVector, opol, ibits);
-    case 5: return walsh_w0_17_5(mVector, opol, ibits);
-    case 6: return walsh_w0_17_6(mVector, opol, ibits);
-    case 7: return walsh_w0_17_7(mVector, opol, ibits);
-    case 8: return walsh_w0_17_8(mVector, opol, ibits);
-    case 9: return walsh_w0_17_9(mVector, opol, ibits);
-    case 10: return walsh_w0_17_10(mVector, opol, ibits);
-    case 11: return walsh_w0_17_11(mVector, opol, ibits);
-    case 12: return walsh_w0_17_12(mVector, opol, ibits);
-    case 13: return walsh_w0_17_13(mVector, opol, ibits);
-    case 14: return walsh_w0_17_14(mVector, opol, ibits);
-    case 15: return walsh_w0_17_15(mVector, opol, ibits);
-    case 16: return walsh_w0_17_16(mVector, opol, ibits);
-    case 17: return walsh_w0_17_17(mVector, opol, ibits);
+    case 0: ans = walsh_w0_17_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_17_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_17_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_17_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_17_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_17_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_17_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_17_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_17_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_17_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_17_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_17_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_17_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_17_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_17_14(mVector, ibits); break;
+    case 15: ans = walsh_w0_17_15(mVector, ibits); break;
+    case 16: ans = walsh_w0_17_16(mVector, ibits); break;
+    case 17: ans = walsh_w0_17_17(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 18:
     switch ( w ) {
-    case 0: return walsh_w0_18_0(mVector, opol, ibits);
-    case 1: return walsh_w0_18_1(mVector, opol, ibits);
-    case 2: return walsh_w0_18_2(mVector, opol, ibits);
-    case 3: return walsh_w0_18_3(mVector, opol, ibits);
-    case 4: return walsh_w0_18_4(mVector, opol, ibits);
-    case 5: return walsh_w0_18_5(mVector, opol, ibits);
-    case 6: return walsh_w0_18_6(mVector, opol, ibits);
-    case 7: return walsh_w0_18_7(mVector, opol, ibits);
-    case 8: return walsh_w0_18_8(mVector, opol, ibits);
-    case 9: return walsh_w0_18_9(mVector, opol, ibits);
-    case 10: return walsh_w0_18_10(mVector, opol, ibits);
-    case 11: return walsh_w0_18_11(mVector, opol, ibits);
-    case 12: return walsh_w0_18_12(mVector, opol, ibits);
-    case 13: return walsh_w0_18_13(mVector, opol, ibits);
-    case 14: return walsh_w0_18_14(mVector, opol, ibits);
-    case 15: return walsh_w0_18_15(mVector, opol, ibits);
-    case 16: return walsh_w0_18_16(mVector, opol, ibits);
-    case 17: return walsh_w0_18_17(mVector, opol, ibits);
-    case 18: return walsh_w0_18_18(mVector, opol, ibits);
+    case 0: ans = walsh_w0_18_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_18_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_18_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_18_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_18_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_18_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_18_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_18_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_18_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_18_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_18_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_18_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_18_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_18_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_18_14(mVector, ibits); break;
+    case 15: ans = walsh_w0_18_15(mVector, ibits); break;
+    case 16: ans = walsh_w0_18_16(mVector, ibits); break;
+    case 17: ans = walsh_w0_18_17(mVector, ibits); break;
+    case 18: ans = walsh_w0_18_18(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 19:
     switch ( w ) {
-    case 0: return walsh_w0_19_0(mVector, opol, ibits);
-    case 1: return walsh_w0_19_1(mVector, opol, ibits);
-    case 2: return walsh_w0_19_2(mVector, opol, ibits);
-    case 3: return walsh_w0_19_3(mVector, opol, ibits);
-    case 4: return walsh_w0_19_4(mVector, opol, ibits);
-    case 5: return walsh_w0_19_5(mVector, opol, ibits);
-    case 6: return walsh_w0_19_6(mVector, opol, ibits);
-    case 7: return walsh_w0_19_7(mVector, opol, ibits);
-    case 8: return walsh_w0_19_8(mVector, opol, ibits);
-    case 9: return walsh_w0_19_9(mVector, opol, ibits);
-    case 10: return walsh_w0_19_10(mVector, opol, ibits);
-    case 11: return walsh_w0_19_11(mVector, opol, ibits);
-    case 12: return walsh_w0_19_12(mVector, opol, ibits);
-    case 13: return walsh_w0_19_13(mVector, opol, ibits);
-    case 14: return walsh_w0_19_14(mVector, opol, ibits);
-    case 15: return walsh_w0_19_15(mVector, opol, ibits);
-    case 16: return walsh_w0_19_16(mVector, opol, ibits);
-    case 17: return walsh_w0_19_17(mVector, opol, ibits);
-    case 18: return walsh_w0_19_18(mVector, opol, ibits);
-    case 19: return walsh_w0_19_19(mVector, opol, ibits);
+    case 0: ans = walsh_w0_19_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_19_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_19_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_19_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_19_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_19_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_19_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_19_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_19_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_19_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_19_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_19_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_19_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_19_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_19_14(mVector, ibits); break;
+    case 15: ans = walsh_w0_19_15(mVector, ibits); break;
+    case 16: ans = walsh_w0_19_16(mVector, ibits); break;
+    case 17: ans = walsh_w0_19_17(mVector, ibits); break;
+    case 18: ans = walsh_w0_19_18(mVector, ibits); break;
+    case 19: ans = walsh_w0_19_19(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    assert_not_reached(__FILE__, __LINE__); break;
     break;
 
   case 20:
     switch ( w ) {
-    case 0: return walsh_w0_20_0(mVector, opol, ibits);
-    case 1: return walsh_w0_20_1(mVector, opol, ibits);
-    case 2: return walsh_w0_20_2(mVector, opol, ibits);
-    case 3: return walsh_w0_20_3(mVector, opol, ibits);
-    case 4: return walsh_w0_20_4(mVector, opol, ibits);
-    case 5: return walsh_w0_20_5(mVector, opol, ibits);
-    case 6: return walsh_w0_20_6(mVector, opol, ibits);
-    case 7: return walsh_w0_20_7(mVector, opol, ibits);
-    case 8: return walsh_w0_20_8(mVector, opol, ibits);
-    case 9: return walsh_w0_20_9(mVector, opol, ibits);
-    case 10: return walsh_w0_20_10(mVector, opol, ibits);
-    case 11: return walsh_w0_20_11(mVector, opol, ibits);
-    case 12: return walsh_w0_20_12(mVector, opol, ibits);
-    case 13: return walsh_w0_20_13(mVector, opol, ibits);
-    case 14: return walsh_w0_20_14(mVector, opol, ibits);
-    case 15: return walsh_w0_20_15(mVector, opol, ibits);
-    case 16: return walsh_w0_20_16(mVector, opol, ibits);
-    case 17: return walsh_w0_20_17(mVector, opol, ibits);
-    case 18: return walsh_w0_20_18(mVector, opol, ibits);
-    case 19: return walsh_w0_20_19(mVector, opol, ibits);
-    case 20: return walsh_w0_20_20(mVector, opol, ibits);
+    case 0: ans = walsh_w0_20_0(mVector, ibits); break;
+    case 1: ans = walsh_w0_20_1(mVector, ibits); break;
+    case 2: ans = walsh_w0_20_2(mVector, ibits); break;
+    case 3: ans = walsh_w0_20_3(mVector, ibits); break;
+    case 4: ans = walsh_w0_20_4(mVector, ibits); break;
+    case 5: ans = walsh_w0_20_5(mVector, ibits); break;
+    case 6: ans = walsh_w0_20_6(mVector, ibits); break;
+    case 7: ans = walsh_w0_20_7(mVector, ibits); break;
+    case 8: ans = walsh_w0_20_8(mVector, ibits); break;
+    case 9: ans = walsh_w0_20_9(mVector, ibits); break;
+    case 10: ans = walsh_w0_20_10(mVector, ibits); break;
+    case 11: ans = walsh_w0_20_11(mVector, ibits); break;
+    case 12: ans = walsh_w0_20_12(mVector, ibits); break;
+    case 13: ans = walsh_w0_20_13(mVector, ibits); break;
+    case 14: ans = walsh_w0_20_14(mVector, ibits); break;
+    case 15: ans = walsh_w0_20_15(mVector, ibits); break;
+    case 16: ans = walsh_w0_20_16(mVector, ibits); break;
+    case 17: ans = walsh_w0_20_17(mVector, ibits); break;
+    case 18: ans = walsh_w0_20_18(mVector, ibits); break;
+    case 19: ans = walsh_w0_20_19(mVector, ibits); break;
+    case 20: ans = walsh_w0_20_20(mVector, ibits); break;
     }
     assert_not_reached(__FILE__, __LINE__);
     break;
 #endif
-  default: // input_num() > 5
-    ;
-  }
-  int nall = 0;
-  int c = 0;
-  ymuint ibits1 = ibits >> NIPW;
-  ymuint ibits2 = ibits & 0x001F;
-  for (ymuint u = 0; u <= w; ++ u ) {
-    ymuint v = w - u;
-    if ( v > NIPW ) continue;
-    // u: ブロック番号中の1の重み
-    // v: ブロックの中の1の重み
-    ymuint start1 = pidx[u];
-    ymuint end1 = pidx[u + 1];
-    ymuint start2 = s_pidx[v];
-    ymuint end2 = s_pidx[v + 1];
-    ymuint n2 = end2 - start2;
-    ymuint pat = 0;
-    ymuint* endp2 = &s_plist[end2];
-    for (ymuint* p2 = &s_plist[start2]; p2 != endp2; ++ p2) {
-      ymuint pos2 = *p2 ^ ibits2;
-      pat |= (1UL << pos2);
+  default: // input_num() > 20
+    {
+      int nall = 0;
+      int c = 0;
+      ymuint ibits1 = ibits >> NIPW;
+      ymuint ibits2 = ibits & 0x001F;
+      for (ymuint u = 0; u <= w; ++ u ) {
+	ymuint v = w - u;
+	if ( v > NIPW ) continue;
+	// u: ブロック番号中の1の重み
+	// v: ブロックの中の1の重み
+	ymuint start1 = pidx[u];
+	ymuint end1 = pidx[u + 1];
+	ymuint start2 = s_pidx[v];
+	ymuint end2 = s_pidx[v + 1];
+	ymuint n2 = end2 - start2;
+	ymuint pat = 0;
+	ymuint* endp2 = &s_plist[end2];
+	for (ymuint* p2 = &s_plist[start2]; p2 != endp2; ++ p2) {
+	  ymuint pos2 = *p2 ^ ibits2;
+	  pat |= (1UL << pos2);
+	}
+	ymuint* endp1 = &plist[end1];
+	for (ymuint* p1 = &plist[start1]; p1 != endp1; ++ p1) {
+	  ymuint pos0 = *p1;
+	  if ( pos0 >= mBlockNum ) break;
+	  ymuint pos1 = pos0 ^ ibits1;
+	  c += count_onebits(mVector[pos1] & pat);
+	  nall += n2;
+	}
+      }
+      ans = nall - c * 2;
     }
-    ymuint* endp1 = &plist[end1];
-    for (ymuint* p1 = &plist[start1]; p1 != endp1; ++ p1) {
-      ymuint pos0 = *p1;
-      if ( pos0 >= mBlockNum ) break;
-      ymuint pos1 = pos0 ^ ibits1;
-      c += count_onebits(mVector[pos1] & pat);
-      nall += n2;
-    }
   }
-  if ( opol == kPolPosi ) {
-    return nall - c * 2;
+
+  if ( oinv ) {
+    ans = -ans;
   }
-  else {
-    return c * 2 - nall;
-  }
+  return ans;
 }
 
 // 重み別の 1 次の Walsh 係数を求める．
 int
 TvFunc::walsh_w1(VarId var,
 		 ymuint w,
-		 tPol opol,
+		 bool oinv,
 		 ymuint ibits) const
 {
   ymuint idx = var.val();
@@ -4993,7 +4827,7 @@ TvFunc::walsh_w1(VarId var,
   case 2:
     {
       int tmp = mVector[0];
-      if ( opol == kPolNega ) {
+      if ( oinv ) {
 	tmp ^= 0x0000000F;
       }
       if ( ibits & (1 << idx) ) {
@@ -5019,7 +4853,7 @@ TvFunc::walsh_w1(VarId var,
   case 3:
     {
       int tmp = mVector[0];
-      if ( opol == kPolNega ) {
+      if ( oinv ) {
 	tmp ^= 0x000000FF;
       }
       if ( ibits & (1 << idx) ) {
@@ -5048,7 +4882,7 @@ TvFunc::walsh_w1(VarId var,
   case 4:
     {
       int tmp = mVector[0];
-      if ( opol == kPolNega ) {
+      if ( oinv ) {
 	tmp ^= 0x0000FFFF;
       }
       if ( ibits & (1 << idx) ) {
@@ -5086,7 +4920,7 @@ TvFunc::walsh_w1(VarId var,
   case 5:
     {
       int tmp;
-      if ( opol == kPolNega ) {
+      if ( oinv ) {
 	tmp = ~mVector[0];
       }
       else {
@@ -5233,12 +5067,11 @@ TvFunc::walsh_w1(VarId var,
     }
   }
 
-  if ( opol == kPolPosi ) {
-    return n - c * 2;
+  int ans = n - c * 2;
+  if ( oinv ) {
+    ans = -ans;
   }
-  else {
-    return c * 2 - n;
-  }
+  return ans;
 }
 
 // 変数がサポートの時 true を返す．
@@ -5274,7 +5107,7 @@ TvFunc::check_sup(VarId var) const
 bool
 TvFunc::check_sym(VarId var1,
 		  VarId var2,
-		  tPol pol) const
+		  bool inv) const
 {
   ymuint i = var1.val();
   ymuint j = var2.val();
@@ -5296,11 +5129,11 @@ TvFunc::check_sym(VarId var1,
     ymuint mask_j = (1 << (j - NIPW));
     ymuint mask_all = mask_i | mask_j;
     ymuint cond;
-    if ( pol == kPolPosi ) {
-      cond = mask_j;
+    if ( inv ) {
+      cond = 0UL;
     }
     else {
-      cond = 0UL;
+      cond = mask_j;
     }
     for (ymuint v = 0; v < mBlockNum; ++ v) {
       if ( (v & mask_all) == cond &&
@@ -5315,11 +5148,11 @@ TvFunc::check_sym(VarId var1,
     // j < NIPW
     ymuint mask_i = (1 << (i - NIPW));
     ymuint cond;
-    if ( pol == kPolPosi ) {
-      cond = mask_i;
+    if ( inv ) {
+      cond = 0UL;
     }
     else {
-      cond = 0UL;
+      cond = mask_i;
     }
     ymulong mask2 = ~c_masks[j];
     ymuint s = 1 << j;
@@ -5334,9 +5167,9 @@ TvFunc::check_sym(VarId var1,
   else {
     // i < NIPW
     // j < NIPW
-    if ( pol == kPolPosi ) {
-      ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
-      ymuint s = (1 << i) - (1 << j);
+    if ( inv ) {
+      ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
+      ymuint s = (1 << i) + (1 << j);
       for (ymuint b = 0; b < mBlockNum; ++ b) {
 	ymulong word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
@@ -5346,8 +5179,8 @@ TvFunc::check_sym(VarId var1,
       }
     }
     else {
-      ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
-      ymuint s = (1 << i) + (1 << j);
+      ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
+      ymuint s = (1 << i) - (1 << j);
       for (ymuint b = 0; b < mBlockNum; ++ b) {
 	ymulong word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
@@ -5377,14 +5210,14 @@ TvFunc::xform(const NpnMap& npnmap) const
   for (ymuint i = 0; i < mInputNum; ++ i) {
     VarId src_var(i);
     NpnVmap imap = npnmap.imap(src_var);
-    if ( imap.pol() == kPolNega ) {
+    if ( imap.inv() ) {
       imask |= (1UL << i);
     }
     VarId dst_var = imap.var();
     ymuint j = dst_var.val();
     ipat[i] = 1UL << j;
   }
-  ymuint omask = npnmap.opol() == kPolPosi ? 0U : 1U;
+  ymuint omask = npnmap.oinv() ? 1U : 0U;
 
   TvFunc ans(mInputNum);
   for (ymuint i = 0; i < ni_pow; ++ i) {
@@ -5417,43 +5250,25 @@ TvFunc::hash() const
   return ans + mInputNum;
 }
 
-// 等価比較
-bool
-operator==(const TvFunc& func1,
-	   const TvFunc& func2)
+// 比較関数
+int
+compare(const TvFunc& func1,
+	const TvFunc& func2)
 {
-  if ( func1.mInputNum != func2.mInputNum ) {
-    return false;
-  }
-  ymuint n = func1.mBlockNum;
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( func1.mVector[i] != func2.mVector[i] ) {
-      return false;
-    }
-  }
-  return true;
-}
+  assert_cond( func1.mInputNum == func2.mInputNum, __FILE__, __LINE__);
 
-// 大小比較
-bool
-operator<(const TvFunc& func1,
-	  const TvFunc& func2)
-{
-  if ( func1.mInputNum != func2.mInputNum ) {
-    return false;
-  }
   ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     ymulong w1 = func1.mVector[n - i - 1];
     ymulong w2 = func2.mVector[n - i - 1];
-    if ( w1 > w2 ) {
-      return false;
-    }
     if ( w1 < w2 ) {
-      return true;
+      return -1;
+    }
+    if ( w1 > w2 ) {
+      return 1;
     }
   }
-  return false;
+  return 0;
 }
 
 // @relates TvFunc

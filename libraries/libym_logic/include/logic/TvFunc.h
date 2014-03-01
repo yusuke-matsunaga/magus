@@ -10,7 +10,6 @@
 
 
 #include "logic/VarId.h"
-#include "logic/Pol.h"
 #include "logic/npn_nsdef.h"
 #include "utils/IDO.h"
 #include "utils/ODO.h"
@@ -121,11 +120,13 @@ public:
 
   /// @brief コファクターを計算し自分に代入する．
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   /// @return 自身への参照を返す．
   const TvFunc&
   set_cofactor(VarId varid,
-	       tPol pol);
+	       bool inv);
 
 
 public:
@@ -179,18 +180,18 @@ public:
 
   /// @brief 重み別の 0 次の Walsh 係数を求める．
   /// @param[in] w
-  /// @param[in] opol
+  /// @param[in] oinv
   /// @param[in] ibits
   int
   walsh_w0(ymuint w,
-	   tPol opol,
+	   bool oinv,
 	   ymuint ibits) const;
 
   /// @brief 重み別の 1 次の Walsh 係数を求める．
   int
   walsh_w1(VarId i,
 	   ymuint w,
-	   tPol opol,
+	   bool oinv,
 	   ymuint ibits) const;
 
   /// @brief pos 番目の変数がサポートの時 true を返す．
@@ -200,11 +201,11 @@ public:
 
   /// @brief pos1 番目と pos2 番目の変数が対称のとき true を返す．
   /// @param[in] pos1, pos2 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   bool
   check_sym(VarId pos1,
 	    VarId pos2,
-	    tPol pol = kPolPosi) const;
+	    bool inv = false) const;
 
   /// @brief ハッシュ値を返す．
   ymuint
@@ -249,10 +250,12 @@ public:
 
   /// @brief コファクターを返す．
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   TvFunc
   cofactor(VarId varid,
-	   tPol pol) const;
+	   bool inv) const;
 
   /// @brief npnmap に従った変換を行う．
   /// @param[in] npnmap 変換マップ
@@ -294,14 +297,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   friend
-  bool
-  operator==(const TvFunc& left,
-	     const TvFunc& right);
-
-  friend
-  bool
-  operator<(const TvFunc& left,
-	    const TvFunc& right);
+  int
+  compare(const TvFunc& left,
+	  const TvFunc& right);
 
   friend
   bool
@@ -324,10 +322,12 @@ private:
   /// @brief リテラル関数を作るコンストラクタ
   /// @param[in] ni 入力数
   /// @param[in] varid 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
+  ///                - false: 反転なし (正極性)
+  ///                - true:  反転あり (負極性)
   TvFunc(ymuint ni,
 	 VarId varid,
-	 tPol pol);
+	 bool inv);
 
   /// @brief 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
   /// @param[in] ni 入力数
@@ -395,6 +395,16 @@ operator|(const TvFunc& left,
 TvFunc
 operator^(const TvFunc& left,
 	  const TvFunc& right);
+
+/// @relates TvFunc
+/// @brief 比較関数
+/// @param[in] left, right オペランド
+/// @retval -1 left < right
+/// @retval  0 left = right
+/// @retval  1 left > right
+int
+compare(const TvFunc& left,
+	const TvFunc& right);
 
 /// @relates TvFunc
 /// @brief 等価比較
@@ -575,9 +585,18 @@ operator^(const TvFunc& left,
 inline
 TvFunc
 TvFunc::cofactor(VarId varid,
-		 tPol pol) const
+		 bool inv) const
 {
-  return TvFunc(*this).set_cofactor(varid, pol);
+  return TvFunc(*this).set_cofactor(varid, inv);
+}
+
+/// @brief 等価比較
+inline
+bool
+operator==(const TvFunc& left,
+	   const TvFunc& right)
+{
+  return compare(left, right) == 0;
 }
 
 // 等価比較
@@ -590,6 +609,14 @@ operator!=(const TvFunc& left,
 }
 
 // 大小比較のバリエーション
+inline
+bool
+operator<(const TvFunc& left,
+	  const TvFunc& right)
+{
+  return compare(left, right) == -1;
+}
+
 inline
 bool
 operator>(const TvFunc& left,

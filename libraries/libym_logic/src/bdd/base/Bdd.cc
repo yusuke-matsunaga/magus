@@ -384,10 +384,10 @@ Bdd::remap_var(const VarVarMap& var_map) const
 // @brief コファクター演算
 Bdd
 Bdd::cofactor(VarId var,
-	      tPol pol) const
+	      bool inv) const
 {
   BddEdge e(mRoot);
-  BddEdge ans = mMgr->scofactor(e, var, pol);
+  BddEdge ans = mMgr->scofactor(e, var, inv);
   return Bdd(mMgr, ans);
 }
 
@@ -494,17 +494,17 @@ Bdd::is_cube() const
 bool
 Bdd::check_symmetry(VarId x,
 		    VarId y,
-		    tPol pol) const
+		    bool inv) const
 {
   if ( x == y ) {
-    return pol == kPolPosi;
+    return !inv;
   }
 #if defined(VERIFY_CHECK_SYMMETRY)
-  bool result = mMgr->check_symmetry(mRoot, x, y, pol);
+  bool result = mMgr->check_symmetry(mRoot, x, y, inv);
   Bdd f0 = cofactor(x, kPolNega);
   Bdd f1 = cofactor(x, kPolPosi);
   bool result2;
-  if ( pol == kPolPosi ) {
+  if ( !inv ) {
     Bdd f2 = f0.cofactor(y, kPolPosi);
     Bdd f3 = f1.cofactor(y, kPolNega);
     result2 = f2 == f3;
@@ -517,7 +517,7 @@ Bdd::check_symmetry(VarId x,
   if ( result != result2 ) {
     cout << "ERROR @ check_symmetry("
 	 << x << ", " << y << ", ";
-    if ( pol == kPolPosi ) {
+    if ( !inv ) {
       cout << "positive";
     }
     else {
@@ -538,7 +538,7 @@ Bdd::check_symmetry(VarId x,
   return result2;
 #else
   BddEdge e(mRoot);
-  return mMgr->check_symmetry(e, x, y, pol);
+  return mMgr->check_symmetry(e, x, y, inv);
 #endif
 }
 
@@ -568,13 +568,13 @@ Bdd::asmooth(const BddVarSet& svars) const
 Bdd
 Bdd::push_down(ymuint x_level,
 	       ymuint y_level,
-	       tPol pol) const
+	       bool inv) const
 {
   if ( x_level >= y_level ) {
     return Bdd(mMgr, BddEdge::make_error());
   }
   BddEdge e(mRoot);
-  BddEdge ans = mMgr->push_down(e, x_level, y_level, pol);
+  BddEdge ans = mMgr->push_down(e, x_level, y_level, inv);
   return Bdd(mMgr, ans);
 }
 
@@ -584,12 +584,12 @@ Bdd::root_decomp(Bdd& f0,
 		 Bdd& f1) const
 {
   BddEdge e(mRoot);
-  tPol pol = e.pol();
+  bool inv = e.inv();
   BddNode* node = e.get_node();
   if ( node ) {
-    BddEdge e0 = node->edge0(pol);
+    BddEdge e0 = node->edge0(inv);
     f0 = Bdd(mMgr, e0);
-    BddEdge e1 = node->edge1(pol);
+    BddEdge e1 = node->edge1(inv);
     f1 = Bdd(mMgr, e1);
     ymuint level = node->level();
     return mMgr->varid(level);
@@ -620,10 +620,10 @@ Bdd
 Bdd::edge0() const
 {
   BddEdge e(mRoot);
-  tPol pol = e.pol();
+  bool inv = e.inv();
   BddNode* node = e.get_node();
   if ( node ) {
-    BddEdge e0 = node->edge0(pol);
+    BddEdge e0 = node->edge0(inv);
     return Bdd(mMgr, e0);
   }
   else {
@@ -636,10 +636,10 @@ Bdd
 Bdd::edge1() const
 {
   BddEdge e(mRoot);
-  tPol pol = e.pol();
+  bool inv = e.inv();
   BddNode* node = e.get_node();
   if ( node ) {
-    BddEdge e1 = node->edge1(pol);
+    BddEdge e1 = node->edge1(inv);
     return Bdd(mMgr, e1);
   }
   else {

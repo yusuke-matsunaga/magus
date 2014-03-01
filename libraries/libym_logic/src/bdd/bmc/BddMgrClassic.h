@@ -143,7 +143,7 @@ public:
   push_down(BddEdge e,
 	    ymuint x_level,
 	    ymuint y_level,
-	    tPol pol);
+	    bool inv);
 
 #if 0
   // smoothing(elimination)
@@ -328,7 +328,7 @@ private:
   pd_step(BddEdge e,
 	  ymuint x_level,
 	  ymuint y_level,
-	  tPol pol);
+	  bool inv);
   BddEdge
   pd_step2(BddEdge e,
 	   ymuint y_level);
@@ -336,7 +336,7 @@ private:
   pd_step3(BddEdge e0,
 	   BddEdge e1,
 	   ymuint y_level,
-	   tPol pol);
+	   bool inv);
 
 #if 0
   // existential qualification を行う．
@@ -514,7 +514,7 @@ private:
 	 ymuint level,
 	 BddEdge e,
 	 const BddNode* vp,
-	 tPol pol,
+	 bool inv,
 	 BddEdge& e_0,
 	 BddEdge& e_1);
 
@@ -669,13 +669,13 @@ BddMgrClassic::split1(ymuint top,
 		      ymuint level,
 		      BddEdge e,
 		      const BddNode* vp,
-		      tPol pol,
+		      bool inv,
 		      BddEdge& e_0,
 		      BddEdge& e_1)
 {
   if ( level == top ) {
-    e_0 = vp->edge0(pol);
-    e_1 = vp->edge1(pol);
+    e_0 = vp->edge0(inv);
+    e_1 = vp->edge1(inv);
   }
   else {
     e_0 = e_1 = e;
@@ -694,16 +694,16 @@ BddMgrClassic::split(BddEdge f,
 {
   BddNode* f_vp = f.get_node();
   BddNode* g_vp = g.get_node();
-  tPol f_pol = f.pol();
-  tPol g_pol = g.pol();
+  bool f_inv = f.inv();
+  bool g_inv = g.inv();
   ymuint f_level = f_vp->level();
   ymuint g_level = g_vp->level();
   ymuint level = f_level;
   if ( g_level < level ) {
     level = g_level;
   }
-  split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
-  split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
+  split1(level, f_level, f, f_vp, f_inv, f_0, f_1);
+  split1(level, g_level, g, g_vp, g_inv, g_0, g_1);
   return level;
 }
 

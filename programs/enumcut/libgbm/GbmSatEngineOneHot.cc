@@ -58,24 +58,24 @@ GbmSatEngineOneHot::init_vars(const RcfNetwork& network,
 
     // 2つの変数が同時に true になってはいけないというルール
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      Literal lit0(mIorderVarArray[base + j], kPolNega);
+      Literal lit0(mIorderVarArray[base + j], true);
       for (ymuint k = j + 1; k < mInputNum; ++ k) {
-	Literal lit1(mIorderVarArray[base + k], kPolNega);
+	Literal lit1(mIorderVarArray[base + k], true);
 	add_clause(lit0, lit1);
       }
     }
     // 最低1つの変数が true にならなければならないというルール
     vector<Literal> tmp_lits(mInputNum);
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      tmp_lits[j] = Literal(mIorderVarArray[base + j], kPolPosi);
+      tmp_lits[j] = Literal(mIorderVarArray[base + j], false);
     }
     add_clause(tmp_lits);
 
     // 異なる LUT 入力におなじ入力が接続してはいけないというルール
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      Literal lit0(mIorderVarArray[base + j], kPolNega);
+      Literal lit0(mIorderVarArray[base + j], true);
       for (ymuint k = 0; k < i; ++ k) {
-	Literal lit1(mIorderVarArray[k * mInputNum + j], kPolNega);
+	Literal lit1(mIorderVarArray[k * mInputNum + j], true);
 	add_clause(lit0, lit1);
       }
     }
@@ -84,9 +84,9 @@ GbmSatEngineOneHot::init_vars(const RcfNetwork& network,
     ymuint pred;
     if ( network.get_pred(i, pred) ) {
       for (ymuint j = 0; j < mInputNum; ++ j) {
-	Literal lit0(mIorderVarArray[base + j], kPolNega);
+	Literal lit0(mIorderVarArray[base + j], true);
 	for (ymuint k = j + 1; k < mInputNum; ++ k) {
-	  Literal lit1(mIorderVarArray[pred * mInputNum + k], kPolNega);
+	  Literal lit1(mIorderVarArray[pred * mInputNum + k], true);
 	  add_clause(lit0, lit1);
 	}
       }
@@ -97,9 +97,9 @@ GbmSatEngineOneHot::init_vars(const RcfNetwork& network,
       ymuint cur_rep = rep[j];
       if ( cur_rep != j ) {
 	vector<Literal> tmp_lits(i + 1);
-	Literal lit0(mIorderVarArray[i * mInputNum + j], kPolNega);
+	Literal lit0(mIorderVarArray[i * mInputNum + j], true);
 	for (ymuint k = 0; k < i; ++ k) {
-	  Literal lit1(mIorderVarArray[k * mInputNum + cur_rep], kPolPosi);
+	  Literal lit1(mIorderVarArray[k * mInputNum + cur_rep], false);
 	  tmp_lits[k] = lit1;
 	}
 	tmp_lits[i] = lit0;
@@ -131,9 +131,9 @@ GbmSatEngineOneHot::make_cnf(const RcfNetwork& network,
 
     // 入力と外部入力の間の関係式を作る．
     for (ymuint j = 0; j < mInputNum; ++ j) {
-      Literal lit0(mIorderVarArray[i * mInputNum + j], kPolNega);
-      tPol pol = ( bit_pat & (1U << j) ) ? kPolPosi : kPolNega;
-      Literal lit1(vid, pol);
+      Literal lit0(mIorderVarArray[i * mInputNum + j], true);
+      bool inv = ( bit_pat & (1U << j) ) ? false : true;
+      Literal lit1(vid, inv);
       add_clause(lit0, lit1);
     }
   }

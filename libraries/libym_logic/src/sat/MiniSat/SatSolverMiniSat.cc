@@ -53,7 +53,7 @@ SatSolverMiniSat::add_clause(const vector<Literal>& lits)
   for (vector<Literal>::const_iterator p = lits.begin();
        p != lits.end(); ++ p) {
     Literal l = *p;
-    Lit lit(l.varid().val(), l.pol() == kPolNega);
+    Lit lit(l.varid().val(), l.is_negative());
     tmp.push(lit);
   }
   mSolver.addClause(tmp);
@@ -69,7 +69,7 @@ SatSolverMiniSat::add_clause(ymuint lit_num,
   vec<Lit> tmp;
   for (ymuint i = 0; i < lit_num; ++ i) {
     Literal l = lits[i];
-    Lit lit(l.varid().val(), l.pol() == kPolNega);
+    Lit lit(l.varid().val(), l.is_negative());
     tmp.push(lit);
   }
   mSolver.addClause(tmp);
@@ -90,7 +90,7 @@ SatSolverMiniSat::solve(const vector<Literal>& assumptions,
   for (vector<Literal>::const_iterator p = assumptions.begin();
        p != assumptions.end(); ++ p) {
     Literal l = *p;
-    Lit lit(l.varid().val(), l.pol() == kPolNega);
+    Lit lit(l.varid().val(), l.is_negative());
     tmp.push(lit);
   }
   bool ans = mSolver.solve(tmp);

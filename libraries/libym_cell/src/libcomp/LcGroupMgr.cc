@@ -164,14 +164,14 @@ gen_maxmap(const TvFuncM& f,
   for (PermGen pg(ni1, ni1); !pg.is_end(); ++ pg) {
     NpnMapM map1(ni, no);
     for (ymuint i = 0; i < no; ++ i) {
-      map1.set_omap(VarId(i), VarId(i), kPolPosi);
+      map1.set_omap(VarId(i), VarId(i), false);
     }
     for (ymuint x = 0U; x < nip; ++ x) {
       for (ymuint i = 0; i < ni1; ++ i) {
-	tPol pol = (x & (1U << i)) ? kPolPosi : kPolNega;
+	bool inv = (x & (1U << i)) ? false : true;
 	VarId src_var = i_list[i];
 	VarId dst_var(pg(i) + offset);
-	map1.set_imap(src_var, dst_var, pol);
+	map1.set_imap(src_var, dst_var, inv);
       }
       TvFuncM f1 = f.xform(map1);
       if ( first || repfunc < f1 ) {

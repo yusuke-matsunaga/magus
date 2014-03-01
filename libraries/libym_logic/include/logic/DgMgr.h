@@ -104,7 +104,7 @@ private:
 	   const BddVarSet& sup,
 	   tType type,
 	   const vector<tDgEdge>& inputs,
-	   tPol opol = kPolPosi);
+	   bool oinv = false);
 
   // 定数ノード(枝)を作る．
   // val == 0 の時0 それ以外の時1となる．
@@ -115,95 +115,95 @@ private:
   // リテラル番号および極性を指定する．
   tDgEdge
   make_literal(tVarId varid,
-	       tPol pol);
+	       bool inv);
 
   // 複数の入力を持つORノードを作る．
   // 入力は inputs を参照する．
   // inputs[i] も OR ノードの場合には併合する．
   tDgEdge
   make_or(const vector<tDgEdge>& inputs,
-	  tPol opol = kPolPosi);
+	  bool oinv = false);
 
   // ノード v の部分的な入力を持つ OR ノードを作る．
   // InputFlag が flag に一致するもののみを使う．
   tDgEdge
   make_or(DgNode* v,
 	  int flag,
-	  tPol opol = kPolPosi);
+	  bool oinv = false);
 
   // 複数の入力を持つXORノードを作る．
   // 入力は inputs を参照する．
   // inputs[i] も OR ノードの場合には併合する．
   tDgEdge
   make_xor(const vector<tDgEdge>& inputs,
-	   tPol opol = kPolPosi);
+	   bool oinv = false);
 
   // ノード v の部分的な入力を持つ XOR ノードを作る．
   // InputFlag が flag に一致するもののみを使う．
   tDgEdge
   make_xor(DgNode* v,
 	   int flag,
-	   tPol opol = kPolPosi);
+	   bool oinv = false);
 
   // Cplx ノードを作る．
   // 入力は inputs を参照する．
   tDgEdge
   make_cplx(const Bdd& f,
 	    const vector<DgNode*>& inputs,
-	    tPol opol = kPolPosi);
+	    bool oinv = false);
 
   // Cplx ノードを作る．
   // こちらは入力がリテラルの時．ノード配列は必要ない．
   tDgEdge
   make_cplx(const Bdd& f,
 	    const BddVarSet& support,
-	    tPol opol = kPolPosi);
+	    bool oinv = false);
 
   // 2つの入力を持つORノードを作る．
   tDgEdge
   make_or(tDgEdge src1,
 	  tDgEdge src2,
-	  tPol opol = kPolPosi);
+	  bool oinv = false);
 
   // 2つの入力を持つXORノードを作る．
   tDgEdge
   make_xor(tDgEdge src1,
 	   tDgEdge src2,
-	   tPol opol = kPolPosi);
+	   bool oinv = false);
 
   // 2つの入力を持つANDノード(実際にはORノードの否定)を作る．
   tDgEdge
   make_and(tDgEdge src1,
 	   tDgEdge src2,
-	   tPol opol = kPolPosi);
+	   bool oinv = false);
 
   // 複数の入力を持つノードを作る．
   // type には kDgOr か kDgXor を指定する．
   tDgEdge
   make_node(tType type,
 	    const vector<tDgEdge>& inputs,
-	    tPol opol = kPolPosi);
+	    bool oinv = false);
 
   // リテラルとのORノードをつくる．
   tDgEdge
   make_litOr(tVarId varid,
-	     tPol lit_pol,
+	     bool lit_inv,
 	     tDgEdge src2,
-	     tPol opol = kPolPosi);
+	     bool oinv = false);
 
   // リテラルとのXORノードをつくる．
   tDgEdge
   make_litXor(tVarId varid,
-	      tPol lit_pol,
+	      bool lit_inv,
 	      tDgEdge src2,
-	      tPol opol = kPolPosi);
+	      bool oinv = false);
 
   // リテラルとのANDノードをつくる．
   tDgEdge
   make_litAnd(tVarId varid,
-	      tPol lit_pol,
+	      bool lit_inv,
 	      tDgEdge src2,
-	      tPol opol = kPolPosi);
+	      bool oinv = false);
 
 
 public:
@@ -219,7 +219,7 @@ public:
   case1or(tVarId varid,
 	  DgNode* v0,
 	  DgNode* v1,
-	  tPol pol0,
+	  bool inv0,
 	  ymuint nc);
 
   // v0, v1 がともにXORノードで共通の入力を持つ場合の処理．
@@ -230,28 +230,28 @@ public:
   case1xor(tVarId varid,
 	   DgNode* v0,
 	   DgNode* v1,
-	   tPol pol0,
-	   tPol pol1,
+	   bool inv0,
+	   bool inv1,
 	   ymuint nc);
 
   // v0 が OR で，r1 を入力として持つ．
   tDgEdge
   case2or(tVarId varid,
 	  DgNode* v0,
-	  tPol pol0,
+	  bool inv0,
 	  ymuint pos,
 	  tDgEdge r1,
-	  tPol ipol);
+	  bool iinv);
 
   // v0 が XR で，r1 を入力として持つ．
   tDgEdge
   case2xor(tVarId varid,
 	   DgNode* v0,
-	   tPol pol0,
+	   bool inv0,
 	   ymuint pos,
 	   DgNode* v1,
-	   tPol pol1,
-	   tPol ipol);
+	   bool inv1,
+	   bool iinv);
 
   // v0, v1 がともにCPLXノードでただ1組の入力を除いて共通な入力
   // を持つ場合の処理．
@@ -263,7 +263,7 @@ public:
 	    DgNode* v1,
 	    ymuint d0,
 	    ymuint d1,
-	    tPol xpol);
+	    bool xinv);
 
   // v0, v1 がともにCPLXノードですべての入力が共通な場合．
   tDgEdge
@@ -278,7 +278,7 @@ public:
   case2cplx(const Bdd& F,
 	    tVarId varid,
 	    DgNode* c_node,
-	    tPol lit_pol,
+	    bool lit_inv,
 	    int or_and,
 	    DgNode* v);
 

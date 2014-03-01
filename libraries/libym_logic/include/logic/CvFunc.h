@@ -144,7 +144,7 @@ public:
   /// @brief コファクターを返す．
   CvFunc
   cofactor(size_t pos,
-	   tPol pol) const;
+	   bool inv) const;
 
   /// @brief 0 次と 1 次の Walsh 係数を求める．
   int
@@ -153,13 +153,13 @@ public:
 #if 0
   // 重み別の 0 次の Walsh 係数を求める．
   int walsh_w0(size_t w,
-	       tPol opol,
+	       bool oinv,
 	       size_t ibits) const;
 
   // 重み別の 1 次の Walsh 係数を求める．
   int walsh_w1(size_t i,
 	       size_t w,
-	       tPol opol,
+	       bool oinv,
 	       size_t ibits) const;
 
   // i 番目の変数がサポートの時 true を返す．
@@ -168,7 +168,7 @@ public:
   // i 番目と j 番目の変数が対称のとき true を返す．
   bool check_sym(tVarId i,
 		 tVarId j,
-		 tPol pol = kPolPosi) const;
+		 bool inv = false) const;
 
   // npnmap に従った変換を行う．
   CvFunc xform(const NpnMap& npnmap) const;
@@ -210,7 +210,7 @@ private:
   // リテラルを作るコンストラクタ
   CvFunc(size_t ni,
 	 size_t pos,
-	 tPol pol);
+	 bool inv);
 
   // i 番目のキューブの情報ワードのブロック番号を返す．
   size_t
@@ -228,12 +228,12 @@ private:
   // コファクターを計算し，残されたキューブにマークをつける．
   void
   set_cofactor_mark(size_t pos,
-		    tPol pol) const;
+		    bool inv) const;
 
   // set_cofactor_mark の逆の処理
   void
   clear_cofactor_mark(size_t pos,
-		      tPol pol) const;
+		      bool inv) const;
 
   size_t
   co_sub() const;

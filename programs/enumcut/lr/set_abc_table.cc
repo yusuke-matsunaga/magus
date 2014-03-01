@@ -411,7 +411,7 @@ void
 init_repfunc(FuncSet& rep_func)
 {
   FuncSet nonrep;
-  NpnMap map(4, kPolPosi);
+  NpnMap map(4, false);
   for (ymuint32 p = 0U; p < 0x10000; ++ p) {
     vector<int> vals(16);
     for (ymuint i = 0; i < 16; ++ i) {
@@ -431,15 +431,15 @@ init_repfunc(FuncSet& rep_func)
     for (ymuint pols = 0U; pols < 16; ++ pols) {
       for (PermGen pg(4, 4); !pg.is_end(); ++ pg) {
 	for (ymuint i = 0; i < 4; ++ i) {
-	  tPol pol = (pols & (1U << i)) ? kPolNega : kPolPosi;
-	  map.set(VarId(i), VarId(pg(i)), pol);
+	  bool inv = (pols & (1U << i)) ? true : false;
+	  map.set(VarId(i), VarId(pg(i)), inv);
 	}
-	map.set_opol(kPolPosi);
+	map.set_oinv(false);
 	TvFunc f1 = f.xform(map);
 	if ( f != f1 ) {
 	  nonrep.insert(f1);
 	}
-	map.set_opol(kPolNega);
+	map.set_oinv(true);
 	f1 = f.xform(map);
 	nonrep.insert(f1);
       }

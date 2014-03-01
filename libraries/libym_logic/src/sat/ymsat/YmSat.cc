@@ -915,11 +915,11 @@ YmSat::next_decision()
     if ( mVal[vindex] == kB3X ) {
       // Watcher の多い方の極性を(わざと)選ぶ
       ymuint v2 = vindex * 2;
-      tPol pol = kPolNega;
+      bool inv = true;
       if ( mWatcherList[v2 + 0].num() >= mWatcherList[v2 + 1].num() ) {
-	pol = kPolPosi;
+	inv = false;
       }
-      return Literal(VarId(vindex), pol);
+      return Literal(VarId(vindex), inv);
     }
   }
   return kLiteralX;

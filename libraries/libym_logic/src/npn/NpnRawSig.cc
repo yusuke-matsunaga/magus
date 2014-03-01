@@ -118,14 +118,14 @@ NpnRawSig::normalize(NpnConf& conf)
       VarId var1(pos1);
       // 1次係数が等しい場合
       // 対称性のチェックを行う．
-      tPol poldiff = (mIpols[pos1] * ipol == -1) ? kPolNega : kPolPosi;
-      bool stat = mFunc.check_sym(var, var1, poldiff);
+      bool inv = (mIpols[pos1] * ipol == -1);
+      bool stat = mFunc.check_sym(var, var1, inv);
       if ( stat ) {
 	// 対称だった
 	found = true;
 	if ( w1 == 0 && ic_num(pos1) == 1 ) {
 	  // bi-symmetry かどうかチェックする
-	  bool stat = mFunc.check_sym(var, var1, ~poldiff);
+	  bool stat = mFunc.check_sym(var, var1, !inv);
 	  if ( stat ) {
 	    set_bisym(pos1);
 	  }
@@ -135,8 +135,8 @@ NpnRawSig::normalize(NpnConf& conf)
       }
       if ( w1 == 0 ) {
 	// w1 == 0 の時には逆相での対称性もチェックする．
-	// この場合，最初の要素の極性は常に kPolPosi のはず
-	bool stat = mFunc.check_sym(var, var1, kPolNega);
+	// この場合，最初の要素の極性は常に false のはず
+	bool stat = mFunc.check_sym(var, var1, true);
 	if ( stat ) {
 	  // 逆相で対称だった．
 	  found = true;
@@ -290,19 +290,19 @@ NpnRawSig::invert_w2(ymuint pos1,
 // @brief 重み別 Walsh の 0次係数を得る．
 int
 NpnRawSig::walsh_w0(ymuint w,
-		    tPol opol,
-		    tPol ipol[]) const
+		    bool opol,
+		    bool ipol[]) const
 {
   if ( mOpol == -1 ) {
-    opol = ~opol;
+    opol = !opol;
   }
   ymuint32 ibits = 0UL;
   for (ymuint i = 0; i < input_num(); ++ i) {
-    tPol ip = ipol[i];
+    bool ip = ipol[i];
     if ( mIpols[i] == -1 ) {
-      ip = ~ip;
+      ip = !ip;
     }
-    if ( ip == kPolNega ) {
+    if ( ip ) {
       ibits |= (1UL << i);
     }
   }

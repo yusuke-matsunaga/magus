@@ -59,11 +59,11 @@ bool
 BddEdge::mark() const
 {
   BddNode* node = get_node();
-  if ( pol() == kPolPosi ) {
-    return node->pmark();
+  if ( inv() ) {
+    return node->nmark();
   }
   else {
-    return node->nmark();
+    return node->pmark();
   }
 }
 
@@ -72,11 +72,11 @@ void
 BddEdge::set_mark()
 {
   BddNode* node = get_node();
-  if ( pol() == kPolPosi ) {
-    node->pmark(1);
+  if ( inv() ) {
+    node->nmark(1);
   }
   else {
-    node->nmark(1);
+    node->pmark(1);
   }
 }
 
@@ -345,14 +345,14 @@ BddMgrImpl::ite_op(BddEdge e1,
 // @brief 一つの変数に対する cofactor を計算する．
 // @param[in] e 演算対象の枝
 // @param[in] id 展開対象の変数番号
-// @param[in] pol 極性
+// @param[in] inv 反転属性
 // @return 演算結果を返す．
 BddEdge
 BddMgrImpl::scofactor(BddEdge e,
 		      VarId id,
-		      tPol pol)
+		      bool inv)
 {
-  return mCofOp->apply(e, id, pol);
+  return mCofOp->apply(e, id, inv);
 }
 
 // @brief Davio展開のモーメント項を求める処理
@@ -421,9 +421,9 @@ BddMgrImpl::check_posi_cube(BddEdge e)
 
   for ( ; ; ) {
     BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    BddEdge e0 = vp->edge0(pol);
-    BddEdge e1 = vp->edge1(pol);
+    bool inv = e.inv();
+    BddEdge e0 = vp->edge0(inv);
+    BddEdge e1 = vp->edge1(inv);
     if ( !e0.is_zero() || e1.is_zero() ) {
       return false;
     }
@@ -455,9 +455,9 @@ BddMgrImpl::check_cube(BddEdge e)
 
   for ( ; ; ) {
     BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    BddEdge e0 = vp->edge0(pol);
-    BddEdge e1 = vp->edge1(pol);
+    bool inv = e.inv();
+    BddEdge e0 = vp->edge0(inv);
+    BddEdge e1 = vp->edge1(inv);
     if ( e0.is_zero() ) {
       e = e1;
     }
@@ -476,14 +476,14 @@ BddMgrImpl::check_cube(BddEdge e)
 // @brief 変数 xと y が対称(交換可能)な時にtrueを返す．
 // @param[in] e 演算対象の枝
 // @param[in] x, y 変数番号
-// @param[in] pol 極性
+// @param[in] inv 反転属性
 bool
 BddMgrImpl::check_symmetry(BddEdge e,
 			   VarId x,
 			   VarId y,
-			   tPol pol)
+			   bool inv)
 {
-  return mSymOp->apply(e, x, y, pol);
+  return mSymOp->apply(e, x, y, inv);
 }
 
 // @brief edge_list に登録されたBDDのノード数を数える．

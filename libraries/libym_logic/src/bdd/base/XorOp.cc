@@ -81,9 +81,7 @@ XorOp::apply_step(BddEdge f,
   // この時点で f, g は終端ではない．
 
   // 極性情報は落してしまう．
-  tPol f_pol = f.pol();
-  tPol g_pol = g.pol();
-  tPol ans_pol = f_pol * g_pol;
+  bool ans_inv = f.inv() ^ g.inv();
   f.normalize();
   g.normalize();
 
@@ -97,10 +95,10 @@ XorOp::apply_step(BddEdge f,
   }
 
   BddEdge f_0, f_1;
-  split1(level, f_level, f, f_vp, f_pol, f_0, f_1);
+  split1(level, f_level, f, f_vp, false, f_0, f_1);
 
   BddEdge g_0, g_1;
-  split1(level, g_level, g, g_vp, g_pol, g_0, g_1);
+  split1(level, g_level, g, g_vp, false, g_0, g_1);
 
   BddEdge result;
   if ( f_0.is_zero() && f_1.is_one() ) {
@@ -141,7 +139,7 @@ XorOp::apply_step(BddEdge f,
     }
   }
 
-  return BddEdge(result, ans_pol);
+  return BddEdge(result, ans_inv);
 }
 
 END_NAMESPACE_YM_BDD

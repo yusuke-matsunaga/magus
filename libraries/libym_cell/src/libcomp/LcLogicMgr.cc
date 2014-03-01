@@ -172,7 +172,7 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
       for (ymuint i = 0; i < ni; ++ i) {
 	VarId src_var(i);
 	NpnVmap vmap = map.imap(src_var);
-	if ( vmap.var() != src_var || vmap.pol() != kPolPosi ) {
+	if ( vmap.var() != src_var || vmap.inv() ) {
 	  ident = false;
 	  break;
 	}

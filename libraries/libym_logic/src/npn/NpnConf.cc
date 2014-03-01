@@ -206,7 +206,7 @@ NpnConf::is_resolved(ymuint g0) const
 int
 NpnConf::walsh_w0(ymuint w) const
 {
-  tPol op = (opol() == 2) ? kPolNega : kPolPosi;
+  bool op = (opol() == 2);
   ymuint32 ibits = 0UL;
   for (ymuint i = 0; i < input_num(); ++ i) {
     if ( ipol(i) == 2 ) {
@@ -254,16 +254,16 @@ void
 NpnConf::set_map(NpnMap& map) const
 {
   map.resize(mBaseConf->input_num());
-  tPol op = (opol() == 2) ? kPolNega : kPolPosi;
-  map.set_opol(op);
+  bool oinv = (opol() == 2);
+  map.set_oinv(oinv);
 
   ymuint k = 0;
   for (ymuint i = 0; i < nc(); ++ i) {
     ymuint rep = ic_rep(i);
     ymuint n = mBaseConf->ic_num(rep);
     for (ymuint j = 0; j < n; ++ j) {
-      tPol pol = (ipol(rep) == 2) ? kPolNega : kPolPosi;
-      map.set(VarId(rep), VarId(k), pol);
+      bool inv = (ipol(rep) == 2);
+      map.set(VarId(rep), VarId(k), inv);
       ++ k;
       rep = mBaseConf->ic_link(rep);
     }
@@ -271,7 +271,7 @@ NpnConf::set_map(NpnMap& map) const
   ymuint rep = mBaseConf->indep_rep();
   ymuint n = mBaseConf->indep_num();
   for (ymuint j = 0; j < n; ++ j) {
-    map.set(VarId(rep), VarId(k), kPolPosi);
+    map.set(VarId(rep), VarId(k), false);
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }

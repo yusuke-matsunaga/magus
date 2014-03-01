@@ -29,7 +29,7 @@ operator<<(ostream& s,
   }
   else {
     s << "v_" << lit.varid();
-    if ( lit.pol() == kPolNega ) {
+    if ( lit.is_negative() ) {
       s << "'";
     }
   }

@@ -28,10 +28,10 @@ BddMgrModern::onepath(BddEdge e)
   }
 
   BddNode* vp = e.get_node();
-  tPol pol = e.pol();
+  bool inv = e.inv();
   ymuint level = vp->level();
-  BddEdge l = vp->edge0(pol);
-  BddEdge h = vp->edge1(pol);
+  BddEdge l = vp->edge0(inv);
+  BddEdge h = vp->edge1(inv);
   BddEdge result;
   if ( h.is_zero() ) {
     BddEdge chd = onepath(l);
@@ -75,9 +75,9 @@ BddMgrModern::sp_step(BddEdge e,
   BddEdgeEdgeMap::iterator p = sp_assoc.find(e);
   if ( p == sp_assoc.end() ) {
     BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    BddEdge l = sp_step(vp->edge0(pol), sp_assoc);
-    BddEdge h = sp_step(vp->edge1(pol), sp_assoc);
+    bool inv = e.inv();
+    BddEdge l = sp_step(vp->edge0(inv), sp_assoc);
+    BddEdge h = sp_step(vp->edge1(inv), sp_assoc);
     ymint llen = sp_len(l);
     ymint hlen = sp_len(h);
     if ( hlen != -1 && llen > hlen + 1 ) {
@@ -105,11 +105,11 @@ BddMgrModern::sp_len(BddEdge e)
   int len = 0;
   while ( !e.is_one() ) {
     BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    BddEdge l = vp->edge0(pol);
+    bool inv = e.inv();
+    BddEdge l = vp->edge0(inv);
     if ( l.is_zero() ) {
       len ++;
-      e = vp->edge1(pol);
+      e = vp->edge1(inv);
     }
     else {
       e = l;
@@ -147,9 +147,9 @@ BddMgrModern::spl_step(BddEdge e,
   BddEdgeIntMap::iterator p = assoc.find(e);
   if ( p == assoc.end() ) {
     BddNode* vp = e.get_node();
-    tPol pol = e.pol();
-    ymint ans1 = spl_step(vp->edge0(pol), assoc);
-    ymint ans2 = spl_step(vp->edge1(pol), assoc) + 1;
+    bool inv = e.inv();
+    ymint ans1 = spl_step(vp->edge0(inv), assoc);
+    ymint ans2 = spl_step(vp->edge1(inv), assoc) + 1;
     if ( ans1 != -1 && ans1 < ans2 ) {
       result = ans1;
     }

@@ -127,14 +127,14 @@ public:
 
   /// @brief 対称性のチェック
   /// @param[in] x, y 変数番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 極性
   /// @return 変数xとyが対称(交換可能)な時に true を返す．
-  /// ただし pol = kPolNega の時には x(または y) を反転して
+  /// ただし inv = true の時には x(または y) を反転して
   /// 交換したときに等しくなるかどうかチェックする．
   bool
   check_symmetry(VarId x,
 		 VarId y,
-		 tPol pol = kPolPosi) const;
+		 bool inv = false) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -259,11 +259,11 @@ public:
 
   /// @brief コファクター演算
   /// @param[in] var 変数番号
-  /// @param[in] pol 極性
-  /// @return 変数 var の極性 pol 側のコファクターを返す．
+  /// @param[in] inv 極性
+  /// @return 変数 var の極性 inv 側のコファクターを返す．
   Bdd
   cofactor(VarId var,
-	   tPol pol) const;
+	   bool inv) const;
 
   /// @brief コファクター演算
   /// @param[in] literal リテラル
@@ -318,15 +318,15 @@ public:
   /// @brief x_level の変数を y_level まで「押し込む」
   /// @param[in] x_level 元の変数のレベル
   /// @param[in] y_level 移動先の変数のレベル
-  /// @param[in] pol 極性
+  /// @param[in] inv 反転属性
   /// @return 演算結果
-  /// @note pol が kPolNega の場合には 0-枝と 1-枝を取り替える．
+  /// @note inv が true の場合には 0-枝と 1-枝を取り替える．
   /// @note 他の関数と異なり変数番号ではなくレベルで指定する．
   /// @warning x_level < y_level でないときはエラーとなる．
   Bdd
   push_down(ymuint x_level,
 	    ymuint y_level,
-	    tPol pol = kPolPosi) const;
+	    bool inv = false) const;
 
   /// @brief BDD の内容を積和形論理式に変換する．
   /// @return 等価な積和形論理式
@@ -868,7 +868,7 @@ inline
 Bdd
 Bdd::cofactor(const Literal& literal) const
 {
-  return cofactor(literal.varid(), literal.pol());
+  return cofactor(literal.varid(), literal.is_negative());
 }
 
 // @brief ハッシュ関数

@@ -96,16 +96,16 @@ BddMgr::make_overflow()
 // リテラル関数を表すBDDを作る．
 Bdd
 BddMgr::make_literal(VarId index,
-		     tPol pol)
+		     bool inv)
 {
-  return Bdd(mImpl, mImpl->make_literal(index, pol));
+  return Bdd(mImpl, mImpl->make_literal(index, inv));
 }
 
 // リテラル関数を表すBDDを作る
 Bdd
 BddMgr::make_literal(const Literal& lit)
 {
-  return make_literal(lit.varid(), lit.pol());
+  return make_literal(lit.varid(), lit.is_negative());
 }
 
 // 肯定のリテラル関数を作る

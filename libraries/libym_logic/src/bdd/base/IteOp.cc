@@ -116,9 +116,9 @@ IteOp::apply_step(BddEdge f,
   }
 
   // さらに g に否定属性を付けないように正規化する．
-  tPol ans_pol = g.pol();
-  g.addpol(ans_pol);
-  h.addpol(ans_pol);
+  bool ans_inv = g.inv();
+  g.add_inv(ans_inv);
+  h.add_inv(ans_inv);
 
   BddNode* f_vp = f.get_node();
   BddNode* g_vp = g.get_node();
@@ -134,17 +134,17 @@ IteOp::apply_step(BddEdge f,
     top_level = h_level;
   }
 
-  tPol f_pol = f.pol();
+  bool f_inv = f.inv();
   BddEdge f_0, f_1;
-  split1(top_level, f_level, f, f_vp, f_pol, f_0, f_1);
+  split1(top_level, f_level, f, f_vp, f_inv, f_0, f_1);
 
-  tPol g_pol = g.pol();
+  bool g_inv = g.inv();
   BddEdge g_0, g_1;
-  split1(top_level, g_level, g, g_vp, g_pol, g_0, g_1);
+  split1(top_level, g_level, g, g_vp, g_inv, g_0, g_1);
 
-  tPol h_pol = h.pol();
+  bool h_inv = h.inv();
   BddEdge h_0, h_1;
-  split1(top_level, h_level, h, h_vp, h_pol, h_0, h_1);
+  split1(top_level, h_level, h, h_vp, h_inv, h_0, h_1);
 
   BddEdge result;
 
@@ -172,7 +172,7 @@ IteOp::apply_step(BddEdge f,
       put(f, g, h, result);
     }
   }
-  return BddEdge(result, ans_pol);
+  return BddEdge(result, ans_inv);
 }
 
 END_NAMESPACE_YM_BDD

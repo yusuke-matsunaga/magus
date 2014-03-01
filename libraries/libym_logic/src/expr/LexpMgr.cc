@@ -223,7 +223,7 @@ LexpMgr::make_or(ymuint begin)
 LexpNodePtr
 LexpMgr::make_xor(ymuint begin)
 {
-  tPol pol = kPolPosi;
+  bool inv = false;
   ymuint end = nodestack_top();
   mTmpNodeList.clear();
   mTmpNodeList.reserve(end - begin);
@@ -231,14 +231,14 @@ LexpMgr::make_xor(ymuint begin)
     LexpNodePtr node = mNodeStack[i];
     tType type = node->type();
     if ( type == kConst1 ) {
-      pol = ~pol;
+      inv = !inv;
     }
     else if ( type == kXor ) {
       ymuint ni = node->child_num();
       for (ymuint j = 0; j < ni; ++ j) {
 	const LexpNode* node1 = node->child(j);
 	if ( check_node2(node1) ) {
-	  pol = ~pol;
+	  inv = !inv;
 	}
       }
     }
@@ -246,7 +246,7 @@ LexpMgr::make_xor(ymuint begin)
       ; // 無視
     } else {
       if ( check_node2(node) ) {
-	pol = ~pol;
+	inv = !inv;
       }
     }
   }
@@ -265,11 +265,11 @@ LexpMgr::make_xor(ymuint begin)
       node = alloc_node(kXor);
     }
   }
-  if ( pol == kPolPosi ) {
-    return node;
+  if ( inv ) {
+    return complement(node);
   }
   else {
-    return complement(node);
+    return node;
   }
 }
 

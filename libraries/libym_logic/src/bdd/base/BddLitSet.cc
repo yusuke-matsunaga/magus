@@ -35,8 +35,8 @@ BddLitSet::iterator::operator*() const
 {
   Bdd f0, f1;
   VarId varid = mCur.root_decomp(f0, f1);
-  tPol pol1 = f0.is_zero() ? kPolPosi : kPolNega;
-  return Literal(varid, pol1);
+  bool inv1 = f0.is_one();
+  return Literal(varid, inv1);
 }
 
 // ひとつ先に進める．
@@ -124,8 +124,8 @@ BddLitSet::operator=(const BddLitSet& src)
 // リテラル1つだけを要素とする集合を作るコンストラクタ
 BddLitSet::BddLitSet(BddMgr& mgr,
 		     VarId varid,
-		     tPol pol) :
-  mBody(mgr.make_literal(varid, pol)),
+		     bool inv) :
+  mBody(mgr.make_literal(varid, inv)),
   mSize(0U)
 {
   set_size(1);

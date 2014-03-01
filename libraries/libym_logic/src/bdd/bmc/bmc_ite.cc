@@ -76,7 +76,7 @@ BddMgrClassic::compose_step(BddEdge f)
   }
 
   // 極性の反転に関して線形性を有するので極性は取り除く．
-  tPol f_pol = f.pol();
+  bool f_inv = f.inv();
   f.normalize();
 
   BddEdge result = mCmpTable->get(f);
@@ -101,7 +101,7 @@ BddMgrClassic::compose_step(BddEdge f)
     }
   }
 
-  return BddEdge(result, f_pol);
+  return BddEdge(result, f_inv);
 }
 
 // x_level の変数を y_level まで「押し込む」．
@@ -110,7 +110,7 @@ BddEdge
 BddMgrClassic::push_down(BddEdge e,
 			 ymuint x_level,
 			 ymuint y_level,
-			 tPol pol)
+			 bool inv)
 {
   if ( e.is_error() ) {
     return BddEdge::make_error();
@@ -123,7 +123,7 @@ BddMgrClassic::push_down(BddEdge e,
   BddEdge x_edge = make_posiliteral(varid(x_level));
   xy_edge = and_op(x_edge, y_edge);
   activate(xy_edge);
-  BddEdge ans = pd_step(e, x_level, y_level, pol);
+  BddEdge ans = pd_step(e, x_level, y_level, inv);
   deactivate(xy_edge);
   return ans;
 }
@@ -132,7 +132,7 @@ BddEdge
 BddMgrClassic::pd_step(BddEdge e,
 		       ymuint x_level,
 		       ymuint y_level,
-		       tPol pol)
+		       bool inv)
 {
   if ( e.is_leaf() ) {
     return e;
@@ -149,21 +149,21 @@ BddMgrClassic::pd_step(BddEdge e,
   }
 
   // 極性を正規化しておく．
-  tPol e_pol = e.pol();
+  bool e_inv = e.inv();
   e.normalize();
   BddEdge result = mPushDownTable->get(e, xy_edge);
   if ( result.is_error() ) {
     if ( vp->level() == x_level ) {
       BddEdge e0 = vp->edge0();
       BddEdge e1 = vp->edge1();
-      result = pd_step3(e0, e1, y_level, pol);
+      result = pd_step3(e0, e1, y_level, inv);
     }
     else {
       BddEdge e0 = vp->edge0();
       BddEdge e1 = vp->edge1();
-      BddEdge r0 = pd_step(e0, x_level, y_level, pol);
+      BddEdge r0 = pd_step(e0, x_level, y_level, inv);
       if ( !r0.is_invalid() ) {
-	BddEdge r1 = pd_step(e1, x_level, y_level, pol);
+	BddEdge r1 = pd_step(e1, x_level, y_level, inv);
 	if ( !r1.is_invalid() ) {
 	  result = new_node(vp->level(), r0, r1);
 	  mPushDownTable->put(e, xy_edge, result);
@@ -171,7 +171,7 @@ BddMgrClassic::pd_step(BddEdge e,
       }
     }
   }
-  return BddEdge(result, e_pol);
+  return BddEdge(result, e_inv);
 }
 
 BddEdge
@@ -188,7 +188,7 @@ BddMgrClassic::pd_step2(BddEdge e,
   }
 
   // 極性を正規化しておく．
-  tPol e_pol = e.pol();
+  bool e_inv = e.inv();
   e.normalize();
   BddEdge result = mPushDownTable2->get(e, xy_edge);
   if ( result.is_error() ) {
@@ -208,19 +208,19 @@ BddMgrClassic::pd_step2(BddEdge e,
       }
     }
   }
-  return BddEdge(result, e_pol);
+  return BddEdge(result, e_inv);
 }
 
 BddEdge
 BddMgrClassic::pd_step3(BddEdge e0,
 			BddEdge e1,
 			ymuint y_level,
-			tPol pol)
+			bool inv)
 {
   BddNode* vp0 = e0.get_node();
   BddNode* vp1 = e1.get_node();
-  tPol pol0 = e0.pol();
-  tPol pol1 = e1.pol();
+  bool inv0 = e0.inv();
+  bool inv1 = e1.inv();
   ymuint top_level = kLevelMax;
   if ( vp0 && top_level > vp0->level() ) {
     top_level = vp0->level();
@@ -237,33 +237,33 @@ BddMgrClassic::pd_step3(BddEdge e0,
       if ( !var ) {
 	var = alloc_var(vid);
       }
-      if ( pol == kPolPosi ) {
-	result = new_node(y_level, e0, e1);
+      if ( inv ) {
+	result = new_node(y_level, e1, e0);
       }
       else {
-	result = new_node(y_level, e1, e0);
+	result = new_node(y_level, e0, e1);
       }
     }
     else {
       BddEdge e00, e01;
       BddEdge e10, e11;
       if ( vp0 && top_level == vp0->level() ) {
-	e00 = vp0->edge0(pol0);
-	e01 = vp0->edge1(pol0);
+	e00 = vp0->edge0(inv0);
+	e01 = vp0->edge1(inv0);
       }
       else {
 	e00 = e01 = e0;
       }
       if ( vp1 && top_level == vp1->level() ) {
-	e10 = vp1->edge0(pol1);
-	e11 = vp1->edge1(pol1);
+	e10 = vp1->edge0(inv1);
+	e11 = vp1->edge1(inv1);
       }
       else {
 	e10 = e11 = e1;
       }
-      BddEdge r0 = pd_step3(e00, e10, y_level, pol);
+      BddEdge r0 = pd_step3(e00, e10, y_level, inv);
       if ( !r0.is_invalid() ) {
-	BddEdge r1 = pd_step3(e01, e11, y_level, pol);
+	BddEdge r1 = pd_step3(e01, e11, y_level, inv);
 	if ( !r1.is_invalid() ) {
 	  VarId vid = varid(top_level - 1);
 	  Var* var = var_of(vid);

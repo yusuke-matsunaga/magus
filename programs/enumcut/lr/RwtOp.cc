@@ -111,7 +111,7 @@ RwtOp::found_cut(BdnNode* root,
       ymuint iid = pat_node->input_id();
       NpnVmap vmap = cmap.imap(VarId(iid));
       BdnNode* inode = inputs[vmap.var().val()];
-      node_map[pat_node->id()] = BdnNodeHandle(inode, vmap.pol());
+      node_map[pat_node->id()] = BdnNodeHandle(inode, vmap.inv());
       pat_mark[pat_node->id()] = true;
       mNodeInfo[inode->id()].mMark = 2U;
     }
