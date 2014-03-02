@@ -34,6 +34,7 @@ sipsrc="YmCell_mod.sip"
 os.system(" ".join([config.sip_bin, "-c", ".", "-b", build_file,
                     "-I", config.default_sip_dir,
                     "-I", src_dir,
+                    "-I", os.path.join(prefix_dir, "share", "py-sip"),
                     "-s", ".cc",
                     sip_flags, sipsrc]))
 
@@ -44,7 +45,7 @@ installs = []
 mod_sip_dir = os.path.join(prefix_dir, "share", "py-sip", "YmCell")
 sip_src_list = [
     "YmCell_mod.sip",
-    "FileODO.sip"]
+]
 for sip_src in sip_src_list :
     path = os.path.join(src_dir, sip_src)
     installs.append([path, mod_sip_dir])
