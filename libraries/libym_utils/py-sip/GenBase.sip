@@ -38,11 +38,17 @@ public:
   void
   init();
 
-  /// @brief 要素の取得
-  /// @param[in] pos 取り出す要素の位置 (最初の位置は 0)
-  /// @return pos 番目の要素
-  unsigned int
-  operator()(unsigned int pos) const;
+  /// @brief 要素の取得(リスト型)
+  SIP_PYLIST
+  get() const;
+  %MethodCode
+  ymuint num = sipCpp->k();
+  sipRes = PyList_New(num);
+  for (ymuint i = 0; i < num; ++ i) {
+    PyObject* obj1 = PyLong_FromUnsignedLong(sipCpp->operator()(i));
+    PyList_SetItem(sipRes, i, obj1);
+  }
+  %End
 
   /// @brief 末尾のチェック
   /// @return 末尾の時に true を返す．
