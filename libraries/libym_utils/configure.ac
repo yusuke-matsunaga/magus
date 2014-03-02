@@ -522,7 +522,9 @@ AM_CONDITIONAL([YM_HAVE_BZLIB], [test $ym_have_bz2 = yes])
 AM_CONDITIONAL([YM_HAVE_LZMA],  [test $ym_have_lzma = yes])
 
 if test $ym_have_python = yes; then
+   YM_ADD_TESTS_SUBDIRS([PyUnit])
    AC_CONFIG_FILES([py-sip/configure.py])
+   AC_CONFIG_FILES([tests/PyUnit/Makefile])
 fi
 
 if test $ym_have_cpputest = yes; then

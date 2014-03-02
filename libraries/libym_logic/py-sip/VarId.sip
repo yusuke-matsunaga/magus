@@ -20,7 +20,6 @@ public:
   VarId();
 
   /// @brief 値を指定したコンストラクタ
-  explicit
   VarId(unsigned int val);
 
   /// @brief 値を取り出す．
