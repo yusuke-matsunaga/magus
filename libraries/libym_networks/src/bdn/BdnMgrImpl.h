@@ -175,7 +175,7 @@ public:
   /// @brief 名前を設定する．
   /// @param[in] name 新しい名前
   void
-  set_name(const string& name);
+  set_name(const char* name);
 
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
@@ -190,20 +190,20 @@ public:
   /// - 2 : 出力のみ
   /// - 3 : 入力と出力
   BdnPort*
-  new_port(const string& name,
+  new_port(const char* name,
 	   const vector<ymuint>& iovect);
 
   /// @brief D-FF を作る．
   /// @param[in] name 名前
   /// @return 生成されたD-FFを返す．
   BdnDff*
-  new_dff(const string& name = string());
+  new_dff(const char* name);
 
   /// @brief ラッチを作る．
   /// @param[in] name 名前
   /// @return 生成されたラッチを返す．
   BdnLatch*
-  new_latch(const string& name = string());
+  new_latch(const char* name);
 
 
 public:

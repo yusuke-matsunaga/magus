@@ -53,7 +53,7 @@ BdnMgrImpl::copy(const BdnMgr& src)
     ymuint bw = src_port->bit_width();
     vector<ymuint> iovect(bw);
     src_port->get_iovect(iovect);
-    BdnPort* dst_port = new_port(src_port->name(), iovect);
+    BdnPort* dst_port = new_port(src_port->name().c_str(), iovect);
     for (ymuint j = 0; j < bw; ++ j) {
       const BdnNode* src_input = src_port->input(j);
       if ( src_input ) {
@@ -71,7 +71,7 @@ BdnMgrImpl::copy(const BdnMgr& src)
   for (BdnDffList::const_iterator p = src_dff_list.begin();
        p != src_dff_list.end(); ++ p) {
     const BdnDff* src_dff = *p;
-    BdnDff* dst_dff = new_dff(src_dff->name());
+    BdnDff* dst_dff = new_dff(src_dff->name().c_str());
 
     const BdnNode* src_output = src_dff->output();
     BdnNode* dst_output = dst_dff->_output();
@@ -99,7 +99,7 @@ BdnMgrImpl::copy(const BdnMgr& src)
   for (BdnLatchList::const_iterator p = src_latch_list.begin();
        p != src_latch_list.end(); ++ p) {
     const BdnLatch* src_latch = *p;
-    BdnLatch* dst_latch = new_latch(src_latch->name());
+    BdnLatch* dst_latch = new_latch(src_latch->name().c_str());
 
     const BdnNode* src_output = src_latch->output();
     BdnNode* dst_output = dst_latch->_output();
@@ -351,7 +351,7 @@ BdnMgrImpl::rsort(vector<const BdnNode*>& node_list) const
 
 // @brief 名前を設定する．
 void
-BdnMgrImpl::set_name(const string& name)
+BdnMgrImpl::set_name(const char* name)
 {
   mName = name;
 }
@@ -372,7 +372,7 @@ BdnMgrImpl::clean_up()
 // - 2 : 出力のみ
 // - 3 : 入力と出力
 BdnPort*
-BdnMgrImpl::new_port(const string& name,
+BdnMgrImpl::new_port(const char* name,
 		     const vector<ymuint>& iovect)
 {
   void* p = mAlloc.get_memory(sizeof(BdnPort));
@@ -426,7 +426,7 @@ BdnMgrImpl::new_port(const string& name,
 // @param[in] name 名前
 // @return 生成されたD-FFを返す．
 BdnDff*
-BdnMgrImpl::new_dff(const string& name)
+BdnMgrImpl::new_dff(const char* name)
 {
   // 空いているIDを探して配列へ登録
   int id = mDffItvlMgr.avail_num();
@@ -507,7 +507,7 @@ BdnMgrImpl::delete_dff(BdnDff* dff)
 // @param[in] name 名前
 // @return 生成されたラッチを返す．
 BdnLatch*
-BdnMgrImpl::new_latch(const string& name)
+BdnMgrImpl::new_latch(const char* name)
 {
   // 空いているIDを探して配列へ登録する．
   int id = mLatchItvlMgr.avail_num();
@@ -709,7 +709,7 @@ hash_func(ymuint fcode,
 	  const BdnNode* node1,
 	  const BdnNode* node2)
 {
-  return (node1->id() * 3 + node2->id() << 3) ^ fcode;
+  return ((node1->id() * 3) + (node2->id() << 3)) ^ fcode;
 }
 
 END_NONAMESPACE

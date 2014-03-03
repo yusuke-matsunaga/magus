@@ -261,6 +261,14 @@ BdnMgr::clear()
 void
 BdnMgr::set_name(const string& name)
 {
+  mImpl->set_name(name.c_str());
+}
+
+// @brief 名前を設定する．
+// @param[in] name 新しい名前
+void
+BdnMgr::set_name(const char* name)
+{
   mImpl->set_name(name);
 }
 
@@ -278,6 +286,16 @@ BdnPort*
 BdnMgr::new_input_port(const string& name,
 		       ymuint bit_width)
 {
+  return mImpl->new_port(name.c_str(), vector<ymuint>(bit_width, 1U));
+}
+
+// @brief 入力ポートを作る．
+// @param[in] name 名前
+// @param[in] bit_width ビット幅
+BdnPort*
+BdnMgr::new_input_port(const char* name,
+		       ymuint bit_width)
+{
   return mImpl->new_port(name, vector<ymuint>(bit_width, 1U));
 }
 
@@ -286,6 +304,16 @@ BdnMgr::new_input_port(const string& name,
 // @param[in] bit_width ビット幅
 BdnPort*
 BdnMgr::new_output_port(const string& name,
+			ymuint bit_width)
+{
+  return mImpl->new_port(name.c_str(), vector<ymuint>(bit_width, 2U));
+}
+
+// @brief 出力ポートを作る．
+// @param[in] name 名前
+// @param[in] bit_width ビット幅
+BdnPort*
+BdnMgr::new_output_port(const char* name,
 			ymuint bit_width)
 {
   return mImpl->new_port(name, vector<ymuint>(bit_width, 2U));
@@ -303,6 +331,21 @@ BdnPort*
 BdnMgr::new_port(const string& name,
 		 const vector<ymuint>& iovect)
 {
+  return mImpl->new_port(name.c_str(), iovect);
+}
+
+// @brief ポートを作る．
+// @param[in] name 名前
+// @param[in] iovect ビットごとの方向を指定する配列
+// @note iovect の要素の値の意味は以下の通り
+// - 0 : なし
+// - 1 : 入力のみ
+// - 2 : 出力のみ
+// - 3 : 入力と出力
+BdnPort*
+BdnMgr::new_port(const char* name,
+		 const vector<ymuint>& iovect)
+{
   return mImpl->new_port(name, iovect);
 }
 
@@ -312,6 +355,15 @@ BdnMgr::new_port(const string& name,
 BdnDff*
 BdnMgr::new_dff(const string& name)
 {
+  return mImpl->new_dff(name.c_str());
+}
+
+// @brief D-FF を作る．
+// @param[in] name 名前
+// @return 生成されたD-FFを返す．
+BdnDff*
+BdnMgr::new_dff(const char* name)
+{
   return mImpl->new_dff(name);
 }
 
@@ -320,6 +372,15 @@ BdnMgr::new_dff(const string& name)
 // @return 生成されたラッチを返す．
 BdnLatch*
 BdnMgr::new_latch(const string& name)
+{
+  return mImpl->new_latch(name.c_str());
+}
+
+// @brief ラッチを作る．
+// @param[in] name 名前
+// @return 生成されたラッチを返す．
+BdnLatch*
+BdnMgr::new_latch(const char* name)
 {
   return mImpl->new_latch(name);
 }

@@ -260,6 +260,8 @@ BdnVerilogWriter::operator()(ostream& s,
       << "  end" << endl;
   }
 
+#warning "TODO: latch_list の処理"
+
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;

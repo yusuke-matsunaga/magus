@@ -20,8 +20,11 @@ public:
   BdnMgr();
 
   /// @brief 名前の取得
-  string
+  const char*
   name() const;
+  %MethodCode
+  sipRes = sipCpp->name().c_str();
+  %End
 
   /// @brief ポート数の取得
   ymuint
@@ -46,10 +49,6 @@ public:
   ymuint
   dff_num() const;
 
-  /// @brief D-FF のリストの取得
-  const BdnDffList&
-  dff_list() const;
-
   /// @brief ラッチのIDの最大値 + 1 の取得
   ymuint
   max_latch_id() const;
@@ -63,10 +62,6 @@ public:
   /// @brief ラッチ数の取得
   ymuint
   latch_num() const;
-
-  /// @brief ラッチのリストの取得
-  const BdnLatchList&
-  latch_list() const;
 
   /// @brief ノードIDの最大値 + 1 の取得
   /// @return ノードIDの最大値 + 1 を返す．
@@ -82,45 +77,29 @@ public:
   ymuint
   input_num() const;
 
-  /// @brief 入力ノードのリストを得る．
-  const BdnNodeList&
-  input_list() const;
-
   /// @brief 出力ノード数を得る．
   ymuint
   output_num() const;
-
-  /// @brief 出力ノードのリストを得る．
-  const BdnNodeList&
-  output_list() const;
 
   /// @brief 論理ノード数を得る．
   ymuint
   lnode_num() const;
 
-  /// @brief 論理ノードのリストを得る．
-  const BdnNodeList&
-  lnode_list() const;
-
   /// @brief 指定されたANDタイプの論理ノードが存在するか調べる．
   /// @param[in] inode1_handle 1番目の入力ノード+極性
   /// @param[in] inode2_handle 2番目の入力ノード+極性
-  /// @param[out] onode_handle 該当のノード+極性
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 該当のノードのハンドルを返す．
+  BdnNodeHandle
   find_and(BdnNodeHandle inode1_handle,
-	   BdnNodeHandle inode2_handle,
-	   BdnNodeHandle& onode_handle);
+	   BdnNodeHandle inode2_handle);
 
   /// @brief 指定されたXORタイプの論理ノードが存在するか調べる．
   /// @param[in] inode1_handle 1番目の入力ノード+極性
   /// @param[in] inode2_handle 2番目の入力ノード+極性
-  /// @param[out] onode_handle 該当のノード+極性
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 該当のノードのハンドルを返す．
+  BdnNodeHandle
   find_xor(BdnNodeHandle inode1_handle,
-	   BdnNodeHandle inode2_handle,
-	   BdnNodeHandle& onode_handle);
+	   BdnNodeHandle inode2_handle);
 
   /// @brief ソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
@@ -152,7 +131,7 @@ public:
   /// @brief 名前を設定する．
   /// @param[in] name 新しい名前
   void
-  set_name(const string& name);
+  set_name(const char* name);
 
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
@@ -162,14 +141,14 @@ public:
   /// @param[in] name 名前
   /// @param[in] bit_width ビット幅
   BdnPort*
-  new_input_port(const string& name,
+  new_input_port(const char* name,
 		 ymuint bit_width);
 
   /// @brief 出力ポートを作る．
   /// @param[in] name 名前
   /// @param[in] bit_width ビット幅
   BdnPort*
-  new_output_port(const string& name,
+  new_output_port(const char* name,
 		  ymuint bit_width);
 
   /// @brief ポートを作る．
@@ -181,7 +160,7 @@ public:
   /// - 2 : 出力のみ
   /// - 3 : 入力と出力
   BdnPort*
-  new_port(const string& name,
+  new_port(const char* name,
 	   const vector<ymuint>& iovect);
 
   /// @brief D-FF を作る．

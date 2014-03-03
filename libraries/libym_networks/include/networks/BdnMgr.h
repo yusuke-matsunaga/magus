@@ -198,6 +198,11 @@ public:
   void
   set_name(const string& name);
 
+  /// @brief 名前を設定する．
+  /// @param[in] name 新しい名前
+  void
+  set_name(const char* name);
+
   /// @brief どこにもファンアウトしていないノードを削除する．
   void
   clean_up();
@@ -209,11 +214,25 @@ public:
   new_input_port(const string& name,
 		 ymuint bit_width);
 
+  /// @brief 入力ポートを作る．
+  /// @param[in] name 名前
+  /// @param[in] bit_width ビット幅
+  BdnPort*
+  new_input_port(const char* name,
+		 ymuint bit_width);
+
   /// @brief 出力ポートを作る．
   /// @param[in] name 名前
   /// @param[in] bit_width ビット幅
   BdnPort*
   new_output_port(const string& name,
+		  ymuint bit_width);
+
+  /// @brief 出力ポートを作る．
+  /// @param[in] name 名前
+  /// @param[in] bit_width ビット幅
+  BdnPort*
+  new_output_port(const char* name,
 		  ymuint bit_width);
 
   /// @brief ポートを作る．
@@ -228,17 +247,41 @@ public:
   new_port(const string& name,
 	   const vector<ymuint>& iovect);
 
+  /// @brief ポートを作る．
+  /// @param[in] name 名前
+  /// @param[in] iovect ビットごとの方向を指定する配列
+  /// @note iovect の要素の値の意味は以下の通り
+  /// - 0 : なし
+  /// - 1 : 入力のみ
+  /// - 2 : 出力のみ
+  /// - 3 : 入力と出力
+  BdnPort*
+  new_port(const char* name,
+	   const vector<ymuint>& iovect);
+
   /// @brief D-FF を作る．
   /// @param[in] name 名前
   /// @return 生成されたD-FFを返す．
   BdnDff*
-  new_dff(const string& name = string());
+  new_dff(const string& name);
+
+  /// @brief D-FF を作る．
+  /// @param[in] name 名前
+  /// @return 生成されたD-FFを返す．
+  BdnDff*
+  new_dff(const char* name = NULL);
 
   /// @brief ラッチを作る．
   /// @param[in] name 名前
   /// @return 生成されたラッチを返す．
   BdnLatch*
-  new_latch(const string& name = string());
+  new_latch(const string& name);
+
+  /// @brief ラッチを作る．
+  /// @param[in] name 名前
+  /// @return 生成されたラッチを返す．
+  BdnLatch*
+  new_latch(const char* name = NULL);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
