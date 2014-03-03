@@ -152,11 +152,6 @@ public:
   sipRes = new Expr(Expr::make_xor(chd_list));
   %End
 
-  /// @brief 論理否定
-  /// @return 自分自身を否定した形の論理式を返す．
-  Expr
-  operator~() const;
-
   /// @brief compose 演算
   /// @param[in] varid 置き換え対象の変数番号
   /// @param[in] sub varid を置き換える先の論理式
@@ -433,16 +428,18 @@ public:
   unsigned int
   sop_litnum(const Literal& lit) const;
 
+  /// @brief 論理否定
+  /// @return 自分自身を否定した形の論理式を返す．
+  Expr
+  operator~() const;
+
+  Expr
+  operator&(const Expr& src2);
+
+  Expr
+  operator|(const Expr& src2);
+
+  Expr
+  operator^(const Expr& src2);
+
 };
-
-Expr
-operator&(const Expr& src1,
-	  const Expr& src2);
-
-Expr
-operator|(const Expr& src1,
-	  const Expr& src2);
-
-Expr
-operator^(const Expr& src1,
-	  const Expr& src2);
