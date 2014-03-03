@@ -25,11 +25,8 @@ public:
   /// @retval true 正常に読み込めた
   /// @retval false 読み込み中にエラーが起こった．
   bool
-  __call__(const char* filename,
-	   BdnMgr& network,
-	   const CellLibrary* cell_library = NULL);
-  %TypeHeaderCode
-  sipRes = sipCpp->operator()(a0, a1, a2);
-  %End
+  operator()(const char* filename,
+	     BdnMgr& network,
+	     const CellLibrary* cell_library = NULL);
 
 };

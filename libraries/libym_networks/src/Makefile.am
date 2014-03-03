@@ -37,7 +37,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
+lib_LTLIBRARIES = \
 	libym_networks.la \
 	libym_networks_d.la \
 	libym_networks_p.la

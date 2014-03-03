@@ -31,6 +31,11 @@ public:
   set(BdnNode* node,
       bool inv);
 
+  /// @brief エラー値を返す．
+  static
+  BdnNodeHandle
+  make_error();
+
   /// @brief 定数0を返す．
   static
   BdnNodeHandle
@@ -54,9 +59,13 @@ public:
   bool
   inv() const;
 
+  /// @brief エラー値を表している時 true を返す．
+  bool
+  is_error() const;
+
   /// @brief 定数0を指しているとき true を返す．
   bool
-  is_zero();
+  is_zero() const;
 
   /// @brief 定数1を指しているとき true を返す．
   bool

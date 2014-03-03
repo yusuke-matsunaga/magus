@@ -16,15 +16,18 @@ using nsYm::BdnPort;
 public:
 
   /// @brief ID 番号を得る．
-  ymuint
+  unsigned int
   id() const;
 
   /// @brief 名前を得る．
-  string
+  const char*
   name() const;
+  %MethodCode
+  sipRes = sipCpp->name().c_str();
+  %End
 
   /// @brief ビット幅を得る．
-  ymuint
+  unsigned int
   bit_width() const;
 
   /// @brief ビットごとの方向を得る．
@@ -34,19 +37,36 @@ public:
   ///  - 1 : 入力のみ
   ///  - 2 : 出力のみ
   ///  - 3 : 入力と出力
-  void
-  get_iovect(vector<ymuint>& iovect) const;
+  SIP_PYLIST
+  get_iovect() const;
+  %MethodCode
+  ymuint n = sipCpp->bit_width();
+  std::vector<ymuint> iovect(n);
+  sipCpp->get_iovect(iovect);
+  sipRes = PyList_New(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    PyObject* obj1 = PyInt_FromLong(iovect[i]);
+    PyList_SetItem(sipRes, i, obj1);
+  }
+  %End
 
   /// @brief 入力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
   /// @note 出力ポートの場合には NULL を返す．
   const BdnNode*
-  input(ymuint pos) const;
+  input(unsigned int pos) const;
 
   /// @brief 出力ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < bit_width )
   /// @note 入力ポートの場合には NULL を返す．
   const BdnNode*
-  output(ymuint pos) const;
+  output(unsigned int pos) const;
+
+
+private:
+
+  BdnPort();
+
+  ~BdnPort();
 
 };

@@ -45,6 +45,11 @@ public:
   set(const BdnNode* node,
       bool inv);
 
+  /// @brief エラーハンドルを返す．
+  static
+  BdnConstNodeHandle
+  make_error();
+
   /// @brief 定数0を返す．
   static
   BdnConstNodeHandle
@@ -74,9 +79,13 @@ public:
   bool
   inv() const;
 
+  /// @brief エラーハンドルを指しているとき true を返す．
+  bool
+  is_error() const;
+
   /// @brief 定数0を指しているとき true を返す．
   bool
-  is_zero();
+  is_zero() const;
 
   /// @brief 定数1を指しているとき true を返す．
   bool
@@ -154,12 +163,20 @@ BdnConstNodeHandle::set(const BdnNode* node,
   mData = reinterpret_cast<ympuint>(node) | inv;
 }
 
+// @brief エラーハンドルを返す．
+inline
+BdnConstNodeHandle
+BdnConstNodeHandle::make_error()
+{
+  return BdnConstNodeHandle(static_cast<ympuint>(0UL));
+}
+
 // @brief 定数0を返す．
 inline
 BdnConstNodeHandle
 BdnConstNodeHandle::make_zero()
 {
-  return BdnConstNodeHandle(static_cast<ympuint>(0UL));
+  return BdnConstNodeHandle(static_cast<ympuint>(2UL));
 }
 
 // @brief 定数1を返す．
@@ -167,7 +184,7 @@ inline
 BdnConstNodeHandle
 BdnConstNodeHandle::make_one()
 {
-  return BdnConstNodeHandle(static_cast<ympuint>(1UL));
+  return BdnConstNodeHandle(static_cast<ympuint>(3UL));
 }
 
 // @brief 極性を否定したハンドルを返す．
@@ -175,7 +192,11 @@ inline
 BdnConstNodeHandle
 BdnConstNodeHandle::operator~() const
 {
-  return BdnConstNodeHandle(mData ^ 1UL);
+  ympuint val = mData;
+  if ( val != 0UL ) {
+    val ^= 1UL;
+  }
+  return BdnConstNodeHandle(val);
 }
 
 // @brief ノードを得る．
@@ -195,12 +216,20 @@ BdnConstNodeHandle::inv() const
   return static_cast<bool>(mData & 1UL);
 }
 
+// @brief エラーハンドルを指しているとき true を返す．
+inline
+bool
+BdnConstNodeHandle::is_error() const
+{
+  return mData == 0UL;
+}
+
 // @brief 定数0を指しているとき true を返す．
 inline
 bool
-BdnConstNodeHandle::is_zero()
+BdnConstNodeHandle::is_zero() const
 {
-  return mData == 0UL;
+  return mData == 2UL;
 }
 
 // @brief 定数1を指しているとき true を返す．
@@ -208,7 +237,7 @@ inline
 bool
 BdnConstNodeHandle::is_one() const
 {
-  return mData == 1UL;
+  return mData == 3UL;
 }
 
 // @brief 定数を指しているとき true を返す．

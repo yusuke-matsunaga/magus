@@ -31,6 +31,11 @@ public:
   set(const BdnNode* node,
       bool inv);
 
+  /// @brief エラーハンドルを返す．
+  static
+  BdnConstNodeHandle
+  make_error();
+
   /// @brief 定数0を返す．
   static
   BdnConstNodeHandle
@@ -53,6 +58,10 @@ public:
   /// @return 反転している時 true を返す．
   bool
   inv() const;
+
+  /// @brief エラーハンドルを指しているとき true を返す．
+  bool
+  is_error();
 
   /// @brief 定数0を指しているとき true を返す．
   bool

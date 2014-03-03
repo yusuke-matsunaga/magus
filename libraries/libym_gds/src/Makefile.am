@@ -32,7 +32,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
+lib_LTLIBRARIES = \
 	libym_gds.la \
 	libym_gds_d.la \
 	libym_gds_p.la

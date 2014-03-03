@@ -19,12 +19,15 @@ public:
   /// @return ID番号を返す．
   /// @note ID番号はラッチの生成時に BdnMgr により自動的に割り振られる．
   /// @sa BdnMgr
-  ymuint
+  unsigned int
   id() const;
 
   /// @brief 名前を返す．
-  string
+  const char*
   name() const;
+  %MethodCode
+  sipRes = sipCpp->name().c_str();
+  %End
 
   /// @brief データ出力ノードを返す．
   const BdnNode*
@@ -69,5 +72,12 @@ public:
   /// @note NULL の場合もある．
   BdnNode*
   _preset();
+
+
+private:
+
+  BdnLatch();
+
+  ~BdnLatch();
 
 };

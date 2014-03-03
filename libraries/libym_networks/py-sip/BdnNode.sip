@@ -11,15 +11,59 @@ class BdnNode
 %TypeHeaderCode
 #include "networks/BdnNode.h"
 using nsYm::BdnNode;
+using nsYm::BdnFanoutList;
+using nsYm::BdnEdge;
 %End
 
 public:
+
+  /// @brief ノードの型
+  enum tType {
+    /// @brief 論理ノード
+    kLOGIC        = 0,
+    /// @brief 外部入力ノード
+    kINPUT        = 1,
+    /// @brief 外部出力ノード
+    kOUTPUT       = 2,
+  };
+
+  /// @brief 入力ノードのサブタイプ
+  enum tInputType {
+    /// @brief 外部入力
+    kPRIMARY_INPUT  = 0,
+    /// @brief D-FFの出力
+    kDFF_OUTPUT     = 1,
+    /// @brief ラッチの出力
+    kLATCH_OUTPUT   = 2
+  };
+
+  /// @brief 出力ノードのサブタイプ
+  enum tOutputType {
+    /// @brief 外部出力
+    kPRIMARY_OUTPUT = 0,
+    /// @brief D-FFのデータ
+    kDFF_DATA       = 1,
+    /// @brief D-FFのクロック
+    kDFF_CLOCK      = 2,
+    /// @brief D-FFのクリア信号
+    kDFF_CLEAR      = 3,
+    /// @brief D-FFのプリセット信号
+    kDFF_PRESET     = 4,
+    /// @brief ラッチのデータ
+    kLATCH_DATA     = 5,
+    /// @brief ラッチのイネーブル
+    kLATCH_ENABLE   = 6,
+    /// @brief ラッチのクリア信号
+    kLATCH_CLEAR    = 7,
+    /// @brief ラッチのプリセット信号
+    kLATCH_PRESET   = 8
+  };
 
   /// @brief ID 番号の取得
   /// @return ID 番号を返す．
   /// @note ID 番号はノードの生成時に BdnMgr により自動的に割り振られる．
   /// @sa BdnMgr
-  ymuint
+  unsigned int
   id() const;
 
   /// @brief タイプを得る．
@@ -39,19 +83,31 @@ public:
   is_logic() const;
 
   /// @brief ファンアウト数を得る．
-  ymuint
+  unsigned int
   fanout_num() const;
 
   /// @brief ファンアウトリストを得る．
-  const BdnFanoutList&
+  SIP_PYLIST
   fanout_list() const;
+  %MethodCode
+  const BdnFanoutList& fo_list = sipCpp->fanout_list();
+  ymuint n = fo_list.size();
+  sipRes = PyList_New(n);
+  ymuint i = 0;
+  for (BdnFanoutList::const_iterator p = fo_list.begin();
+       p != fo_list.end(); ++ p, ++ i) {
+    BdnEdge* e = const_cast<BdnEdge*>(*p);
+    PyObject* obj = sipConvertFromNewType(e, sipType_BdnEdge, NULL);
+    PyList_SetItem(sipRes, i, obj);
+  }
+  %End
 
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
   pomark() const;
 
   /// @brief レベルを得る．
-  ymuint
+  unsigned int
   level() const;
 
   /// @brief 入力ノードのサブタイプを得る．
@@ -71,7 +127,7 @@ public:
   /// @brief ポート中のビット位置を返す．
   /// @note kPRIMARY_INPUT および kPRIMARY_OUTPUT の時のみ意味を持つ．
   /// @note それ以外では 0 を返す．
-  ymuint
+  unsigned int
   port_bitpos() const;
 
   /// @brief 入出力ノードの場合に相方のノードを返す．
@@ -94,11 +150,6 @@ public:
   const BdnNode*
   output_fanin() const;
 
-  /// @brief ファンインのノードを得る．
-  /// @note 出力ノードの場合のみ意味を持つ．
-  BdnNode*
-  output_fanin();
-
   /// @brief ファンインの極性を得る．
   /// @note 出力ノードの場合のみ意味を持つ．
   bool
@@ -107,10 +158,6 @@ public:
   /// @brief ファンインのハンドルを得る．
   BdnConstNodeHandle
   output_fanin_handle() const;
-
-  /// @brief ファンインのハンドルを得る．
-  BdnNodeHandle
-  output_fanin_handle();
 
   /// @brief AND タイプのときに true を返す．
   bool
@@ -125,31 +172,18 @@ public:
   /// @return pos 番めのファンインのノード
   /// @note 該当するファンインがなければ NULL を返す．
   const BdnNode*
-  fanin(ymuint pos) const;
-
-  /// @brief ファンインのノードを得る．
-  /// @param[in] pos 入力番号(0 or 1)
-  /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
-  BdnNode*
-  fanin(ymuint pos);
+  fanin(unsigned int pos) const;
 
   /// @brief ファンインの反転属性を得る．
   /// @param[in] pos 入力番号(0 or 1)
   bool
-  fanin_inv(ymuint pos) const;
+  fanin_inv(unsigned int pos) const;
 
   /// @brief ファンインのハンドルを得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのハンドルを返す．
   BdnConstNodeHandle
-  fanin_handle(ymuint pos) const;
-
-  /// @brief ファンインのハンドルを得る．
-  /// @param[in] pos 入力番号(0 or 1)
-  /// @return pos 番めのファンインのハンドルを返す．
-  BdnNodeHandle
-  fanin_handle(ymuint pos);
+  fanin_handle(unsigned int pos) const;
 
   /// @brief ファンイン0のノードを得る．
   /// @return 0番めのファンインのノード
@@ -159,15 +193,6 @@ public:
   /// @brief ファンイン0のハンドルを得る．
   BdnConstNodeHandle
   fanin0_handle() const;
-
-  /// @brief ファンイン0のハンドルを得る．
-  BdnNodeHandle
-  fanin0_handle();
-
-  /// @brief ファンイン0のノードを得る．
-  /// @return 0番めのファンインのノード
-  BdnNode*
-  fanin0();
 
   /// @brief ファンイン0の反転属性を得る．
   bool
@@ -179,12 +204,6 @@ public:
   const BdnNode*
   fanin1() const;
 
-  /// @brief ファンイン1のノードを得る．
-  /// @return 1番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
-  BdnNode*
-  fanin1();
-
   /// @brief ファンイン1の反転属性を得る．
   bool
   fanin1_inv() const;
@@ -193,8 +212,11 @@ public:
   BdnConstNodeHandle
   fanin1_handle() const;
 
-  /// @brief ファンイン1のハンドルを得る．
-  BdnNodeHandle
-  fanin1_handle();
+
+private:
+
+  BdnNode();
+
+  ~BdnNode();
 
 };

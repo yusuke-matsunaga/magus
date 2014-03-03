@@ -31,7 +31,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
+lib_LTLIBRARIES = \
 	libym_verilog.la \
 	libym_verilog_d.la \
 	libym_verilog_p.la
