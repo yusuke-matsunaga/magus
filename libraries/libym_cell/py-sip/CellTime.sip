@@ -30,4 +30,26 @@ public:
   double
   value() const;
 
+  /// @brief 加算
+  CellTime
+  operator+(const CellTime& src) const;
+
+  /// @brief 減算
+  CellTime
+  operator-(const CellTime& src) const;
+
 };
+
+/// @brief 等価比較演算子
+/// @param[in] left, right オペランド
+/// @relates CellTime
+bool
+operator==(const CellTime& left,
+	   const CellTime& right);
+
+/// @brief 大小比較演算子
+/// @param[in] left, right オペランド
+/// @relates CellTime
+bool
+operator<(const CellTime& left,
+	  const CellTime& right);

@@ -17,6 +17,7 @@
 #include "CiFsmCell.h"
 #include "CiPin.h"
 #include "CiTiming.h"
+#include "CiLutTemplate.h"
 #include "CiLut.h"
 
 #include "libcomp/LibComp.h"
@@ -414,7 +415,7 @@ CiLibrary::pg_edge_from(ymuint id) const
 // @brief 枝のファンアウト先のノード番号を返す．
 // @param[in] id 枝番号 ( 0 <= id < pg_edge_num() )
 ymuint
-CiLibrary::pg_edge_to(ymint id) const
+CiLibrary::pg_edge_to(ymuint id) const
 {
   return mPatMgr.edge_to(id);
 }

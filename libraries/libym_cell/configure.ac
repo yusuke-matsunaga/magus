@@ -97,7 +97,10 @@ AC_CONFIG_FILES([src/ci/Makefile])
 AC_CONFIG_FILES([src/mislib/Makefile])
 AC_CONFIG_FILES([src/dotlib/Makefile])
 AC_CONFIG_FILES([src/libcomp/Makefile])
+AC_CONFIG_FILES([py-sip/configure.py])
 AC_CONFIG_FILES([tests/Makefile])
+AC_CONFIG_FILES([tests/misc/Makefile])
+AC_CONFIG_FILES([tests/PyUnit/Makefile])
 
 
 # ===================================================================

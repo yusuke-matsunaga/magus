@@ -18,6 +18,7 @@
 #include "cell/CellCapacitance.h"
 #include "cell/CellTime.h"
 #include "cell/CellLut.h"
+#include "cell/CellLutTemplate.h"
 
 #include "DotlibParser.h"
 #include "DotlibMgr.h"
@@ -1019,6 +1020,23 @@ CellDotlibReader::~CellDotlibReader()
 // @note エラーが起きたら NULL を返す．
 const CellLibrary*
 CellDotlibReader::operator()(const string& filename)
+{
+  using namespace nsDotlib;
+
+  DotlibMgr mgr;
+  DotlibParser parser;
+  if ( !parser.read_file(filename, mgr, false) ) {
+    return NULL;
+  }
+  return gen_library(mgr.root_node());
+}
+
+// @brief dotlib ファイルを読み込む
+// @param[in] filename ファイル名
+// @return 読み込んで作成したセルライブラリを返す．
+// @note エラーが起きたら NULL を返す．
+const CellLibrary*
+CellDotlibReader::operator()(const char* filename)
 {
   using namespace nsDotlib;
 

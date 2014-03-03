@@ -72,6 +72,39 @@ class CellLatchInfo;
 class CellPatGraph;
 class CellPat2Graph;
 
+END_NAMESPACE_YM_CELL
+
+
+BEGIN_NAMESPACE_YM
+
+using nsCell::CellArea;
+using nsCell::CellTime;
+using nsCell::CellCapacitance;
+using nsCell::CellResistance;
+
+using nsCell::CellLibrary;
+using nsCell::Cell;
+using nsCell::CellPin;
+using nsCell::CellBusType;
+using nsCell::CellBus;
+using nsCell::CellBundle;
+using nsCell::CellTiming;
+using nsCell::CellLutTemplate;
+using nsCell::CellLut;
+
+using nsCell::CellReader;
+using nsCell::CellMislibReader;
+using nsCell::CellDotlibReader;
+
+using nsCell::CellDumper;
+using nsCell::CellRestorer;
+
+using nsCell::CellGroup;
+using nsCell::CellClass;
+using nsCell::CellFFInfo;
+using nsCell::CellLatchInfo;
+using nsCell::CellPatGraph;
+
 
 //////////////////////////////////////////////////////////////////////
 /// @brief テクノロジを表す列挙型
@@ -196,7 +229,6 @@ enum tCellPatType {
   kCellPatXor   = 3
 };
 
-
 /// @brief ストリーム出力演算子
 /// @param[in] s 出力先のストリーム
 /// @param[in] delay_model 遅延モデル
@@ -230,113 +262,6 @@ ostream&
 operator<<(ostream& s,
 	   tCellVarType var_type);
 
-
-END_NAMESPACE_YM_CELL
-
-
-BEGIN_NAMESPACE_YM
-
-using nsCell::CellArea;
-using nsCell::CellTime;
-using nsCell::CellCapacitance;
-using nsCell::CellResistance;
-
-using nsCell::CellLibrary;
-using nsCell::Cell;
-using nsCell::CellPin;
-using nsCell::CellBusType;
-using nsCell::CellBus;
-using nsCell::CellBundle;
-using nsCell::CellTiming;
-using nsCell::CellLutTemplate;
-using nsCell::CellLut;
-
-using nsCell::CellReader;
-using nsCell::CellMislibReader;
-using nsCell::CellDotlibReader;
-
-using nsCell::CellDumper;
-using nsCell::CellRestorer;
-
-using nsCell::CellGroup;
-using nsCell::CellClass;
-using nsCell::CellFFInfo;
-using nsCell::CellLatchInfo;
-using nsCell::CellPatGraph;
-
-using nsCell::tCellTechnology;
-using nsCell::kCellTechCmos;
-using nsCell::kCellTechFpga;
-
-using nsCell::tCellDelayModel;
-using nsCell::kCellDelayGenericCmos;
-using nsCell::kCellDelayTableLookup;
-using nsCell::kCellDelayPiecewiseCmos;
-using nsCell::kCellDelayCmos2;
-using nsCell::kCellDelayDcm;
-
-using nsCell::tCellPinDirection;
-using nsCell::kCellPinInput;
-using nsCell::kCellPinOutput;
-using nsCell::kCellPinInout;
-using nsCell::kCellPinInternal;
-
-using nsCell::tCellTimingSense;
-using nsCell::kCellPosiUnate;
-using nsCell::kCellNegaUnate;
-using nsCell::kCellNonUnate;
-
-using nsCell::tCellTimingType;
-using nsCell::kCellTimingCombinational;
-using nsCell::kCellTimingCombinationalRise;
-using nsCell::kCellTimingCombinationalFall;
-using nsCell::kCellTimingThreeStateEnable;
-using nsCell::kCellTimingThreeStateDisable;
-using nsCell::kCellTimingThreeStateEnableRise;
-using nsCell::kCellTimingThreeStateEnableFall;
-using nsCell::kCellTimingThreeStateDisableRise;
-using nsCell::kCellTimingThreeStateDisableFall;
-using nsCell::kCellTimingRisingEdge;
-using nsCell::kCellTimingFallingEdge;
-using nsCell::kCellTimingPreset;
-using nsCell::kCellTimingClear;
-using nsCell::kCellTimingHoldRising;
-using nsCell::kCellTimingHoldFalling;
-using nsCell::kCellTimingSetupRising;
-using nsCell::kCellTimingSetupFalling;
-using nsCell::kCellTimingRecoveryRising;
-using nsCell::kCellTimingRecoveryFalling;
-using nsCell::kCellTimingSkewRising;
-using nsCell::kCellTimingSkewFalling;
-using nsCell::kCellTimingRemovalRising;
-using nsCell::kCellTimingRemovalFalling;
-using nsCell::kCellTimingNonSeqSetupRising;
-using nsCell::kCellTimingNonSeqSetupFalling;
-using nsCell::kCellTimingNonSeqHoldRising;
-using nsCell::kCellTimingNonSeqHoldFalling;
-using nsCell::kCellTimingNochangeHighHigh;
-using nsCell::kCellTimingNochangeHighLow;
-using nsCell::kCellTimingNochangeLowHigh;
-using nsCell::kCellTimingNochangeLowLow;
-
-using nsCell::tCellVarType;
-using nsCell::kCellVarInputNetTransition;
-using nsCell::kCellVarTotalOutputNetCapacitance;
-using nsCell::kCellVarOutputNetLength;
-using nsCell::kCellVarOutputNetWireCap;
-using nsCell::kCellVarOutputNetPinCap;
-using nsCell::kCellVarRelatedOutTotalOutputNetCapacitance;
-using nsCell::kCellVarRelatedOutOutputNetLength;
-using nsCell::kCellVarRelatedOutOutputNetWireCap;
-using nsCell::kCellVarRelatedOutOutputNetPinCap;
-using nsCell::kCellVarConstrainedPinTransition;
-using nsCell::kCellVarRelatedPinTransition;
-using nsCell::kCellVarNone;
-
-using nsCell::tCellPatType;
-using nsCell::kCellPatInput;
-using nsCell::kCellPatAnd;
-using nsCell::kCellPatXor;
 
 END_NAMESPACE_YM
 

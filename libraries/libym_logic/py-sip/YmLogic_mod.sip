@@ -14,3 +14,6 @@
 %Include Literal.sip
 %Include Expr.sip
 %Include TvFunc.sip
+%Include NpnVmap.sip
+%Include NpnMap.sip
+%Include NpnMapM.sip

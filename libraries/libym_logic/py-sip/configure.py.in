@@ -48,7 +48,10 @@ sip_src_list = [
     "VarId.sip",
     "Literal.sip",
     "Expr.sip",
-    "TvFunc.sip"
+    "TvFunc.sip",
+    "NpnMap.sip",
+    "NpnMapM.sip",
+    "NpnVmap.sip"
 ]
 for sip_src in sip_src_list :
     path = os.path.join(src_dir, sip_src)

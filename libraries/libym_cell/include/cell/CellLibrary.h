@@ -318,7 +318,7 @@ public:
   /// @param[in] id 枝番号 ( 0 <= id < edge_num() )
   virtual
   ymuint
-  pg_edge_to(ymint id) const = 0;
+  pg_edge_to(ymuint id) const = 0;
 
   /// @brief 枝のファンアウト先の入力位置( 0 or 1 ) を返す．
   /// @param[in] id 枝番号 ( 0 <= id < edge_num() )

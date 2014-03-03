@@ -54,6 +54,8 @@ COMMON_SOURCES = \
 	CiBundle.cc \
 	CiBus.h \
 	CiBus.cc \
+	CiBusType.h \
+	CiBusType.cc \
 	CiClass.h \
 	CiClass.cc \
 	CiCell.h \
@@ -76,6 +78,8 @@ COMMON_SOURCES = \
 	CiLut.cc \
 	CiLutHash.h \
 	CiLutHash.cc \
+	CiLutTemplate.h \
+	CiLutTemplate.cc \
 	CiPatGraph.h \
 	CiPatGraph.cc \
 	CiPatMgr.h \

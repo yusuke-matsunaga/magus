@@ -1,8 +1,8 @@
-#ifndef CELL_CELLLUT_H
-#define CELL_CELLLUT_H
+#ifndef CELL_CELLLUTTEMPLATE_H
+#define CELL_CELLLUTTEMPLATE_H
 
-/// @file cell/CellLut.h
-/// @brief CellLut のヘッダファイル
+/// @file cell/CellLutTemplate.h
+/// @brief CellLutTemplate のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -16,16 +16,16 @@
 BEGIN_NAMESPACE_YM_CELL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellLut CellLut.h "cell/CellLut.h"
-/// @brief ルックアップテーブルを表すクラス
+/// @class CellLutTemplate CellLutTemplate.h "cell/CellLutTemplate.h"
+/// @brief ルックアップテーブルのテンプレートを表すクラス
 //////////////////////////////////////////////////////////////////////
-class CellLut
+class CellLutTemplate
 {
 protected:
 
   /// @brief デストラクタ
   virtual
-  ~CellLut() { }
+  ~CellLutTemplate() { }
 
 
 public:
@@ -33,15 +33,10 @@ public:
   // 属性の取得
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief テンプレートの取得
-  virtual
-  const CellLutTemplate*
-  lut_template() const = 0;
-
-  /// @brief テンプレート名の取得
+  /// @brief 名前の取得
   virtual
   const char*
-  template_name() const = 0;
+  name() const = 0;
 
   /// @brief 次元数の取得
   virtual
@@ -60,27 +55,13 @@ public:
   ymuint32
   index_num(ymuint32 var) const = 0;
 
-  /// @brief インデックス値の取得
+  /// @brief デフォルトインデックス値の取得
   /// @param[in] var 変数番号 ( 0 <= var < dimension() )
   /// @param[in] pos 位置番号 ( 0 <= pos < index_num(var) )
   virtual
   double
   index(ymuint32 var,
 	ymuint32 pos) const = 0;
-
-  /// @brief 格子点の値の取得
-  /// @param[in] pos_array 格子点座標
-  /// @note pos_array のサイズは dimension() と同じ
-  virtual
-  double
-  grid_value(const vector<ymuint32>& pos_array) const = 0;
-
-  /// @brief 値の取得
-  /// @param[in] val_array 入力の値の配列
-  /// @note val_array のサイズは dimension() と同じ
-  virtual
-  double
-  value(const vector<double>& val_array) const = 0;
 
 
 public:
@@ -98,4 +79,4 @@ public:
 
 END_NAMESPACE_YM_CELL
 
-#endif // CELL_CELLLUT_H
+#endif // CELL_CELLLUTTEMPLATE_H

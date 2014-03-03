@@ -67,13 +67,6 @@ AC_TYPE_SIZE_T
 # ===================================================================
 # Check for size of built-in types
 # ===================================================================
-AC_CHECK_SIZEOF(char)
-AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(long long)
-AC_CHECK_SIZEOF(void*)
-AC_CHECK_SIZEOF(size_t)
 
 
 # ===================================================================

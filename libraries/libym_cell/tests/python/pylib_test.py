@@ -1,10 +1,10 @@
 # coding=UTF-8
 
 import sys
-import cell_lib
+import YmCell
 
 
-#delay_model = cell_lib.kCellDelayGenericCmos
+#delay_model = YmCell.kCellDelayGenericCmos
 
 def print_pin(pin) :
   dir = pin.direction()
@@ -88,12 +88,12 @@ def print_lut(lut) :
 def print_timing(timing) :
   print '        Type: {}'.format(timing.type())
   print '        Condition: {}'.format(str(timing.timing_cond()))
-  if delay_model == cell_lib.kCellDelayGenericCmos :
+  if delay_model == YmCell.kCellDelayGenericCmos :
     print '        Rise Intrinsic  = {}'.format(timing.intrinsic_rise())
     print '        Rise Resistance = {}'.format(timing.rise_resistance())
     print '        Fall Intrinsic  = {}'.format(timing.intrinsic_fall())
     print '        Fall Resistance = {}'.format(timing.fall_resistance())
-  elif delay_model == cell_lib.kCellDelayTableLookup :
+  elif delay_model == YmCell.kCellDelayTableLookup :
     if timing.cell_rise() :
       print '        Cell Rise'
       print_lut(timing.cell_rise())
@@ -135,8 +135,8 @@ def print_cell(cell) :
 
   ipin_list = cell.input_pin_list()
   opin_list = cell.output_pin_list()
-  ts_posi = cell_lib.kCellPosiUnate
-  ts_nega = cell_lib.kCellNegaUnate
+  ts_posi = YmCell.kCellPosiUnate
+  ts_nega = YmCell.kCellNegaUnate
   for opin in opin_list :
     for ipin in ipin_list :
       print_timing_list(cell, ipin, opin, ts_posi)
@@ -170,7 +170,7 @@ def print_pat(pat, id) :
 
 def print_node(type, input_id, id) :
   iid_str = ''
-  if type == cell_lib.kCellPatInput :
+  if type == YmCell.kCellPatInput :
     iid_str = '[{}]'.format(input_id)
   print '  Node#{}: {}{}'.format(id, type, iid_str)
 
@@ -183,7 +183,7 @@ def print_edge(edge, id) :
 
 path = "/home/matsunaga/data/private/dot-libs/TSMC/tcb670tc.lib"
 
-lib = cell_lib.CellLibrary(path)
+lib = YmCell.CellLibrary(path)
 delay_model = lib.delay_model()
 
 class_list = lib.npn_class_list()

@@ -1,29 +1,29 @@
 
-/// @file CellCapacitance.sip
-/// @brief CellCapacitance の sip ファイル
+/// @file CellResistance.sip
+/// @brief CellResistance の sip ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-class CellCapacitance
+class CellResistance
 {
 %TypeHeaderCode
-#include "cell/CellCapacitance.h"
-using nsYm::CellCapacitance;
+#include "cell/CellResistance.h"
+using nsYm::CellResistance;
 %End
 
 public:
 
   /// @brief 空のコンストラクタ
-  CellCapacitance();
+  CellResistance();
 
   /// @brief double からの変換コンストラクタ
-  CellCapacitance(double v);
+  CellResistance(double v);
 
   /// @brief 無限大の値を作る．
   static
-  CellCapacitance
+  CellResistance
   infty();
 
   /// @brief 値を得る．
@@ -31,25 +31,25 @@ public:
   value() const;
 
   /// @brief 加算
-  CellCapacitance
-  operator+(const CellCapacitance& src) const;
+  CellResistance
+  operator+(const CellResistance& src) const;
 
   /// @brief 減算
-  CellCapacitance
-  operator-(const CellCapacitance& src) const;
+  CellResistance
+  operator-(const CellResistance& src) const;
 
 };
 
 /// @brief 等価比較演算子
 /// @param[in] left, right オペランド
-/// @relates CellCapacitance
+/// @relates CellResistance
 bool
-operator==(const CellCapacitance& left,
-	   const CellCapacitance& right);
+operator==(const CellResistance& left,
+	   const CellResistance& right);
 
 /// @brief 大小比較演算子
 /// @param[in] left, right オペランド
-/// @relates CellCapacitance
+/// @relates CellResistance
 bool
-operator<(const CellCapacitance& left,
-	  const CellCapacitance& right);
+operator<(const CellResistance& left,
+	  const CellResistance& right);

@@ -10,6 +10,7 @@
 #include "cell/CellLibrary.h"
 #include "cell/Cell.h"
 #include "cell/CellLut.h"
+#include "cell/CellLutTemplate.h"
 #include "cell/CellPin.h"
 #include "cell/CellTiming.h"
 #include "cell/CellClass.h"
@@ -22,7 +23,7 @@
 #include "logic/NpnMapM.h"
 
 
-BEGIN_NAMESPACE_YM_CELL
+BEGIN_NAMESPACE_YM
 
 // @brief ストリーム出力演算子
 // @param[in] s 出力先のストリーム
@@ -178,6 +179,11 @@ operator<<(ostream& s,
   }
   return s;
 }
+
+END_NAMESPACE_YM
+
+
+BEGIN_NAMESPACE_YM_CELL
 
 BEGIN_NONAMESPACE
 

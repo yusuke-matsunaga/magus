@@ -8,7 +8,7 @@
 
 
 #include "CiLutHash.h"
-#include "CiLut.h"
+#include "CiLutTemplate.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

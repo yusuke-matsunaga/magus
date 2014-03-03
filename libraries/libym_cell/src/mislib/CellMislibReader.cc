@@ -318,4 +318,21 @@ CellMislibReader::operator()(const string& filename)
   return gen_library(filename, mgr.gate_list());
 }
 
+// @brief mislib ファイルを読み込む
+// @param[in] filename ファイル名
+// @return 読み込んで作成したセルライブラリを返す．
+// @note エラーが起きたら NULL を返す．
+const CellLibrary*
+CellMislibReader::operator()(const char* filename)
+{
+  using namespace nsMislib;
+
+  MislibMgr mgr;
+  MislibParser parser;
+  if ( !parser.read_file(filename, mgr) ) {
+    return NULL;
+  }
+  return gen_library(filename, mgr.gate_list());
+}
+
 END_NAMESPACE_YM_CELL

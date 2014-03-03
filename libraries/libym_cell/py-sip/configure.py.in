@@ -45,6 +45,24 @@ installs = []
 mod_sip_dir = os.path.join(prefix_dir, "share", "py-sip", "YmCell")
 sip_src_list = [
     "YmCell_mod.sip",
+    "CellArea.sip",
+    "CellCapacitance.sip",
+    "CellResistance.sip",
+    "CellTime.sip",
+    "CellClass.sip",
+    "CellGroup.sip",
+    "Cell.sip",
+    "CellPin.sip",
+    "CellBus.sip",
+    "CellBusType.sip",
+    "CellBundle.sip",
+    "CellTiming.sip",
+    "CellLut.sip",
+    "CellLutTemplate.sip",
+    "CellLibrary.sip",
+    "CellPatGraph.sip",
+    "CellMislibReader.sip",
+    "CellDotlibReader.sip"
 ]
 for sip_src in sip_src_list :
     path = os.path.join(src_dir, sip_src)
