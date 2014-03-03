@@ -75,14 +75,21 @@ public:
   Expr
   make_and(SIP_PYLIST);
   %MethodCode
-  if ( !PySequence_Check(a0) ) {
-    // エラー
-  }
-  ymuint n = PySequence_Size(a0);
+  ymuint n = PyList_Size(a0);
   ExprVector chd_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = PySequence_GetItem(a0, i);
-    void* p = sipConvertToType(obj1, sipType_Expr, NULL, 0, NULL, NULL);
+    PyObject* obj1 = PyList_GetItem(a0, i);
+    if ( !sipCanConvertToType(obj1, sipType_Expr, 0) ) {
+      // エラー
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    void* p = sipConvertToType(obj1, sipType_Expr, NULL, 0, NULL, &sipIsErr);
+    if ( sipIsErr ) {
+      // エラー
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
     Expr* expr = reinterpret_cast<Expr*>(p);
     chd_list[i] = *expr;
   }
@@ -96,14 +103,21 @@ public:
   Expr
   make_or(SIP_PYLIST);
   %MethodCode
-  if ( !PySequence_Check(a0) ) {
-    // エラー
-  }
-  ymuint n = PySequence_Size(a0);
+  ymuint n = PyList_Size(a0);
   ExprVector chd_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = PySequence_GetItem(a0, i);
-    void* p = sipConvertToType(obj1, sipType_Expr, NULL, 0, NULL, NULL);
+    PyObject* obj1 = PyList_GetItem(a0, i);
+    if ( !sipCanConvertToType(obj1, sipType_Expr, 0) ) {
+      // エラー
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    void* p = sipConvertToType(obj1, sipType_Expr, NULL, 0, NULL, &sipIsErr);
+    if ( sipIsErr ) {
+      // エラー
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
     Expr* expr = reinterpret_cast<Expr*>(p);
     chd_list[i] = *expr;
   }
@@ -117,14 +131,21 @@ public:
   Expr
   make_xor(SIP_PYLIST);
   %MethodCode
-  if ( !PySequence_Check(a0) ) {
-    // エラー
-  }
-  ymuint n = PySequence_Size(a0);
+  ymuint n = PyList_Size(a0);
   ExprVector chd_list(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = PySequence_GetItem(a0, i);
-    void* p = sipConvertToType(obj1, sipType_Expr, NULL, 0, NULL, NULL);
+    PyObject* obj1 = PyList_GetItem(a0, i);
+    if ( !sipCanConvertToType(obj1, sipType_Expr, 0) ) {
+      // エラー
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    void* p = sipConvertToType(obj1, sipType_Expr, NULL, 0, NULL, &sipIsErr);
+    if ( sipIsErr ) {
+      // エラー
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
     Expr* expr = reinterpret_cast<Expr*>(p);
     chd_list[i] = *expr;
   }
@@ -158,14 +179,11 @@ public:
   Expr
   compose(SIP_PYDICT) const;
   %MethodCode
-  if ( !PyMapping_Check(a0) ) {
-    // エラー
-  }
   PyObject* item_list = PyMapping_Items(a0);
-  ymuint n = PySequence_Size(item_list);
+  ymuint n = PyList_Size(item_list);
   VarExprMap varmap;
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* tuple = PySequence_GetItem(item_list, i);
+    PyObject* tuple = PyList_GetItem(item_list, i);
     PyObject* obj1;
     PyObject* obj2;
     if ( !PyArg_ParseTuple(tuple, "(O!O!)",
@@ -173,9 +191,9 @@ public:
 			   &sipType_Expr, &obj2) ) {
       // エラー
     }
-    void* p = sipConvertToType(obj1, sipType_VarId, NULL, 0, NULL, NULL);
+    void* p = sipConvertToType(obj1, sipType_VarId, NULL, 0, NULL, &sipIsErr);
     VarId& var = *reinterpret_cast<VarId*>(p);
-    void* q = sipConvertToType(obj2, sipType_Expr, NULL, 0, NULL, NULL);
+    void* q = sipConvertToType(obj2, sipType_Expr, NULL, 0, NULL, &sipIsErr);
     Expr& expr = *reinterpret_cast<Expr*>(q);
     varmap.insert(make_pair(var, expr));
   }
@@ -189,16 +207,13 @@ public:
   ///
   /// varmap に登録されていない場合には不変とする．
   Expr
-  remap_var(SIP_PYLIST) const;
+  remap_var(SIP_PYDICT) const;
   %MethodCode
-  if ( !PyMapping_Check(a0) ) {
-    // エラー
-  }
   PyObject* item_list = PyMapping_Items(a0);
-  ymuint n = PySequence_Size(item_list);
+  ymuint n = PyList_Size(item_list);
   VarVarMap varmap;
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* tuple = PySequence_GetItem(item_list, i);
+    PyObject* tuple = PyList_GetItem(item_list, i);
     PyObject* obj1;
     PyObject* obj2;
     if ( !PyArg_ParseTuple(tuple, "(O!O!)",
@@ -206,8 +221,8 @@ public:
 			   &sipType_VarId, &obj2) ) {
       // エラー
     }
-    void* p1 = sipConvertToType(obj1, sipType_VarId, NULL, 0, NULL, NULL);
-    void* p2 = sipConvertToType(obj2, sipType_VarId, NULL, 0, NULL, NULL);
+    void* p1 = sipConvertToType(obj1, sipType_VarId, NULL, 0, NULL, &sipIsErr);
+    void* p2 = sipConvertToType(obj2, sipType_VarId, NULL, 0, NULL, &sipIsErr);
     VarId& var1 = *reinterpret_cast<VarId*>(p1);
     VarId& var2 = *reinterpret_cast<VarId*>(p2);
     varmap.insert(make_pair(var1, var2));
@@ -233,10 +248,10 @@ public:
   eval(SIP_PYLIST lib_obj,
        unsigned long maskL) const;
   %MethodCode
-  ymuint n = PySequence_Size(a0);
+  ymuint n = PyList_Size(a0);
   std::vector<ymulong> vals(n);
   for (ymuint i = 0; i < n; ++ i) {
-    PyObject* obj1 = PySequence_GetItem(a0, i);
+    PyObject* obj1 = PyList_GetItem(a0, i);
     unsigned long val;
     if ( !PyArg_ParseTuple(obj1, "l", &val) ) {
       // エラー

@@ -130,8 +130,8 @@ namemgr_test_SOURCES = \
 namemgr_test_LDADD = \
 	$(YMUTILS)
 
-namemgr_test_LDFLAGS  \
-	$(AM_LDFLAGS)=
+namemgr_test_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
