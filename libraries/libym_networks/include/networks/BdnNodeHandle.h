@@ -26,6 +26,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 空のコンストラクタ
+  /// @note エラー値に設定される．
   BdnNodeHandle();
 
   /// @brief 内容を設定したコンストラクタ
@@ -44,6 +45,11 @@ public:
   void
   set(BdnNode* node,
       bool inv);
+
+  /// @brief エラー値を返す．
+  static
+  BdnNodeHandle
+  make_error();
 
   /// @brief 定数0を返す．
   static
@@ -74,9 +80,13 @@ public:
   bool
   inv() const;
 
+  /// @brief エラー値を表している時 true を返す．
+  bool
+  is_error() const;
+
   /// @brief 定数0を指しているとき true を返す．
   bool
-  is_zero();
+  is_zero() const;
 
   /// @brief 定数1を指しているとき true を返す．
   bool
@@ -157,12 +167,20 @@ BdnNodeHandle::set(BdnNode* node,
   mData = reinterpret_cast<ympuint>(node) | inv;
 }
 
+// @brief エラー値を返す．
+inline
+BdnNodeHandle
+BdnNodeHandle::make_error()
+{
+  return BdnNodeHandle(static_cast<ympuint>(0UL));
+}
+
 // @brief 定数0を返す．
 inline
 BdnNodeHandle
 BdnNodeHandle::make_zero()
 {
-  return BdnNodeHandle(static_cast<ympuint>(0UL));
+  return BdnNodeHandle(static_cast<ympuint>(2UL));
 }
 
 // @brief 定数1を返す．
@@ -170,7 +188,7 @@ inline
 BdnNodeHandle
 BdnNodeHandle::make_one()
 {
-  return BdnNodeHandle(static_cast<ympuint>(1UL));
+  return BdnNodeHandle(static_cast<ympuint>(3UL));
 }
 
 // @brief 極性を否定したハンドルを返す．
@@ -178,7 +196,11 @@ inline
 BdnNodeHandle
 BdnNodeHandle::operator~() const
 {
-  return BdnNodeHandle(mData ^ 1UL);
+  ympuint val = mData;
+  if ( val != 0UL ) {
+    val ^= 1UL;
+  }
+  return BdnNodeHandle(val);
 }
 
 // @brief ノードを得る．
@@ -186,7 +208,7 @@ inline
 BdnNode*
 BdnNodeHandle::node() const
 {
-  return reinterpret_cast<BdnNode*>(mData & ~1UL);
+  return reinterpret_cast<BdnNode*>(mData & ~3UL);
 }
 
 // @brief 極性を得る．
@@ -198,12 +220,20 @@ BdnNodeHandle::inv() const
   return static_cast<bool>(mData & 1UL);
 }
 
+// @brief エラー値を表している時 true を返す．
+inline
+bool
+BdnNodeHandle::is_error() const
+{
+  return mData == 0UL;
+}
+
 // @brief 定数0を指しているとき true を返す．
 inline
 bool
-BdnNodeHandle::is_zero()
+BdnNodeHandle::is_zero() const
 {
-  return mData == 0UL;
+  return mData == 2UL;
 }
 
 // @brief 定数1を指しているとき true を返す．
@@ -211,7 +241,7 @@ inline
 bool
 BdnNodeHandle::is_one() const
 {
-  return mData == 1UL;
+  return mData == 3UL;
 }
 
 // @brief 定数を指しているとき true を返す．
@@ -219,7 +249,7 @@ inline
 bool
 BdnNodeHandle::is_const() const
 {
-  return (mData & ~1UL) == 0UL;
+  return (mData & 2UL) == 2UL;
 }
 
 // @brief 等価比較演算子

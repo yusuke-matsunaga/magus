@@ -102,11 +102,9 @@ base_test()
   }
 
   // 0 & 1 を探す．
-  BdnNodeHandle new_handle;
-  bool stat1 = network.find_and(BdnNodeHandle(input0, false),
-				BdnNodeHandle(input1, false),
-				new_handle);
-  if ( !stat1 ) {
+  BdnNodeHandle new_handle = network.find_and(BdnNodeHandle(input0, false),
+					      BdnNodeHandle(input1, false));
+  if ( new_handle.is_error() ) {
     cout << "ERROR[find_and_test]: and11_h not found." << endl;
     result = false;
   }
@@ -202,11 +200,9 @@ base_test()
   }
 
   // 0 & ~1 を探す(見つからないはず)
-  BdnNodeHandle and10_h;
-  bool stat2 = network.find_and(BdnNodeHandle(input0, false),
-				BdnNodeHandle(input1, true),
-				and10_h);
-  if ( stat2 ) {
+  BdnNodeHandle and10_h = network.find_and(BdnNodeHandle(input0, false),
+					   BdnNodeHandle(input1, true));
+  if ( !and10_h.is_error() ) {
     cout << "ERROR[find_and_test]: and10_h found." << endl;
     result = false;
   }

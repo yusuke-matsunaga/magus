@@ -194,29 +194,25 @@ BdnMgr::lnode_list() const
 // @brief 指定されたANDタイプの論理ノードが存在するか調べる．
 // @param[in] inode1_handle 1番目の入力ノード+極性
 // @param[in] inode2_handle 2番目の入力ノード+極性
-// @param[out] onode_handle 該当のノード+極性
-// @return 見つかったら true を返す．
-bool
+// @return 該当のノード+極性を表すハンドルを返す．
+// @note 見つからなかったらエラーハンドルを返す．
+BdnNodeHandle
 BdnMgr::find_and(BdnNodeHandle inode1_handle,
-		 BdnNodeHandle inode2_handle,
-		 BdnNodeHandle& onode_handle)
+		 BdnNodeHandle inode2_handle) const
 {
-  return mImpl->find_logic(false, inode1_handle, inode2_handle,
-			   onode_handle);
+  return mImpl->find_logic(false, inode1_handle, inode2_handle);
 }
 
 // @brief 指定されたXORタイプの論理ノードが存在するか調べる．
 // @param[in] inode1_handle 1番目の入力ノード+極性
 // @param[in] inode2_handle 2番目の入力ノード+極性
-// @param[out] onode_handle 該当のノード+極性
-// @return 見つかったら true を返す．
-bool
+// @return 該当のノード+極性を表すハンドルを返す．
+// @note 見つからなかったらエラーハンドルを返す．
+BdnNodeHandle
 BdnMgr::find_xor(BdnNodeHandle inode1_handle,
-		 BdnNodeHandle inode2_handle,
-		 BdnNodeHandle& onode_handle)
+		 BdnNodeHandle inode2_handle) const
 {
-  return mImpl->find_logic(true, inode1_handle, inode2_handle,
-			   onode_handle);
+  return mImpl->find_logic(true, inode1_handle, inode2_handle);
 }
 
 // @brief ソートされたノードのリストを得る．

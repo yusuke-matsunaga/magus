@@ -128,13 +128,12 @@ public:
   /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
-  /// @param[out] onode_handle 該当のノード+極性
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 該当のノード+極性を表すハンドルを返す．
+  /// @note 見つからなかったらエラーハンドルを返す．
+  BdnNodeHandle
   find_logic(bool is_xor,
 	     BdnNodeHandle inode1_handle,
-	     BdnNodeHandle inode2_handle,
-	     BdnNodeHandle& onode_handle);
+	     BdnNodeHandle inode2_handle) const;
 
   /// @brief ソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
@@ -329,13 +328,12 @@ private:
   /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
   /// @param[in] inode1_handle 1番めの入力ノード+極性
   /// @param[in] inode2_handle 2番めの入力ノード+極性
-  /// @param[out] onode_handle 該当のノード+極性
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 該当のノード+極性を表すハンドルを返す．
+  /// @note 見つからなかったらエラーハンドルを返す．
+  BdnNodeHandle
   is_trivial(bool is_xor,
 	     BdnNodeHandle inode1_handle,
-	     BdnNodeHandle inode2_handle,
-	     BdnNodeHandle& onode_handle);
+	     BdnNodeHandle inode2_handle) const;
 
   /// @brief 論理ノードに設定する情報の正規化を行う．
   /// @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
@@ -355,7 +353,7 @@ private:
 		BdnNodeHandle inode2_handle,
 		BdnNode*& inode1,
 		BdnNode*& inode2,
-		bool& oinv);
+		bool& oinv) const;
 
   /// @brief ノードを探索する．
   /// @param[in] fcode 機能コード

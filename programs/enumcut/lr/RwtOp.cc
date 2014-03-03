@@ -135,8 +135,8 @@ RwtOp::found_cut(BdnNode* root,
 	  inode1 = ~inode1;
 	}
 	if ( pat_node->is_and() ) {
-	  BdnNodeHandle onode;
-	  if ( mNetwork->find_and(inode0, inode1, onode) ) {
+	  BdnNodeHandle onode = mNetwork->find_and(inode0, inode1);
+	  if ( !onode.is_error() ) {
 	    node_map[pat_node->id()] = onode;
 	    pat_mark[pat_node->id()] = true;
 	    const BdnNode* on = onode.node();
@@ -144,8 +144,8 @@ RwtOp::found_cut(BdnNode* root,
 	  }
 	}
 	else {
-	  BdnNodeHandle onode;
-	  if ( mNetwork->find_xor(inode0, inode1, onode) ) {
+	  BdnNodeHandle onode = mNetwork->find_xor(inode0, inode1);
+	  if ( !onode.is_error() ) {
 	    node_map[pat_node->id()] = onode;
 	    pat_mark[pat_node->id()] = true;
 	    const BdnNode* on = onode.node();

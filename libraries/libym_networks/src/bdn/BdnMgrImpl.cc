@@ -719,21 +719,16 @@ END_NONAMESPACE
 // @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
 // @param[in] inode1_handle 1番めの入力ノード+極性
 // @param[in] inode2_handle 2番めの入力ノード+極性
-// @param[out] onode_handle 該当のノード+極性
-// @return 見つかったら true を返す．
-// @note fcode の各ビットの意味は以下のとおり，
-//  - 0bit: ファンイン0の反転属性
-//  - 1bit: ファンイン1の反転属性
-//  - 2bit: XOR/AND フラグ( 0: AND, 1: XOR)
-bool
+// @return 該当のノード+極性を表すハンドルを返す．
+// @note 見つからなかったらエラーハンドルを返す．
+BdnNodeHandle
 BdnMgrImpl::find_logic(bool is_xor,
 		       BdnNodeHandle inode1_handle,
-		       BdnNodeHandle inode2_handle,
-		       BdnNodeHandle& onode_handle)
+		       BdnNodeHandle inode2_handle) const
 {
-  bool stat = is_trivial(is_xor, inode1_handle, inode2_handle, onode_handle);
-  if ( stat ) {
-    return true;
+  BdnNodeHandle onode_handle = is_trivial(is_xor, inode1_handle, inode2_handle);
+  if ( !onode_handle.is_error() ) {
+    return onode_handle;
   }
 
   BdnNode* inode1;
@@ -746,11 +741,10 @@ BdnMgrImpl::find_logic(bool is_xor,
   BdnNode* node = find_node(fcode, inode1, inode2);
   if ( node ) {
     // 同じノードがあった．
-    onode_handle = BdnNodeHandle(node, oinv);
-    return true;
+    return BdnNodeHandle(node, oinv);
   }
 
-  return false;
+  return BdnNodeHandle::make_error();
 }
 
 // @brief 論理ノードの内容を設定する．
@@ -768,9 +762,8 @@ BdnMgrImpl::set_logic(BdnNode* node,
 		      BdnNodeHandle inode1_handle,
 		      BdnNodeHandle inode2_handle)
 {
-  BdnNodeHandle onode_handle;
-  bool found = is_trivial(is_xor, inode1_handle, inode2_handle, onode_handle);
-  if ( found ) {
+  BdnNodeHandle onode_handle = is_trivial(is_xor, inode1_handle, inode2_handle);
+  if ( !onode_handle.is_error() ) {
     return onode_handle;
   }
 
@@ -862,84 +855,71 @@ BdnMgrImpl::connect(BdnNode* from,
 // @param[in] is_xor XOR の時 true にするフラグ(false なら AND)
 // @param[in] inode1_handle 1番めの入力ノード+極性
 // @param[in] inode2_handle 2番めの入力ノード+極性
-// @param[out] onode_handle 該当のノード+極性
-// @return 見つかったら true を返す．
-bool
+// @return 該当のノード+極性を表すハンドルを返す．
+// @note 見つからなかったらエラーハンドルを返す．
+BdnNodeHandle
 BdnMgrImpl::is_trivial(bool is_xor,
 		       BdnNodeHandle inode1_handle,
-		       BdnNodeHandle inode2_handle,
-		       BdnNodeHandle& onode_handle)
+		       BdnNodeHandle inode2_handle) const
 {
   // 境界条件の検査
   if ( is_xor ) {
     // XOR の場合
     if ( inode1_handle.is_zero() ) {
       // 入力0が定数0だった．
-      onode_handle = inode2_handle;
-      return true;
+      return inode2_handle;
     }
     else if ( inode1_handle.is_one() ) {
       // 入力0が定数1だった．
-      onode_handle = ~inode2_handle;
-      return true;
+      return ~inode2_handle;
     }
     else if ( inode2_handle.is_zero() ) {
       // 入力1が定数0だった．
-      onode_handle = inode1_handle;
-      return true;
+      return inode1_handle;
     }
     else if ( inode2_handle.is_one() ) {
       // 入力1が定数1だった．
-      onode_handle = ~inode1_handle;
-      return true;
+      return ~inode1_handle;
     }
     else if ( inode1_handle == inode2_handle ) {
       // 2つの入力が同一だった．
-      onode_handle = inode1_handle;
-      return true;
+      return inode1_handle;
     }
     else if ( inode1_handle == ~inode2_handle ) {
       // 2つの入力が極性違いだった．
-      onode_handle = BdnNodeHandle::make_zero();
-      return true;
+      return BdnNodeHandle::make_zero();
     }
   }
   else {
     // AND の場合
     if ( inode1_handle.is_one() ) {
       // 入力0が定数1だった．
-      onode_handle = inode2_handle;
-      return true;
+      return inode2_handle;
     }
     else if ( inode1_handle.is_zero() ) {
       // 入力0が定数0だった．
-      onode_handle = BdnNodeHandle::make_zero();
-      return true;
+      return BdnNodeHandle::make_zero();
     }
     else if ( inode2_handle.is_one() ) {
       // 入力1が定数1だった．
-      onode_handle = inode1_handle;
-      return true;
+      return inode1_handle;
     }
     else if ( inode2_handle.is_zero() ) {
       // 入力1が定数0だった．
-      onode_handle = BdnNodeHandle::make_zero();
-      return true;
+      return BdnNodeHandle::make_zero();
     }
     else if ( inode1_handle == inode2_handle ) {
       // 2つの入力が同じだった．
-      onode_handle = inode1_handle;
-      return true;
+      return inode1_handle;
     }
     else if ( inode1_handle == ~inode2_handle ) {
       // 2つの入力が極性違いだった．
-      onode_handle = BdnNodeHandle::make_zero();
-      return true;
+      return BdnNodeHandle::make_zero();
     }
   }
 
   // ここまで来たら自明な簡単化は行えなかったということ．
-  return false;
+  return BdnNodeHandle::make_error();
 }
 
 // @brief 論理ノードに設定する情報の正規化を行う．
@@ -960,7 +940,7 @@ BdnMgrImpl::cannonicalize(bool is_xor,
 			  BdnNodeHandle inode2_handle,
 			  BdnNode*& inode1,
 			  BdnNode*& inode2,
-			  bool& oinv)
+			  bool& oinv) const
 {
   // 入力の反転属性
   bool inv1 = inode1_handle.inv();

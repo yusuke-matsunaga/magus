@@ -140,22 +140,20 @@ public:
   /// @brief 指定されたANDタイプの論理ノードが存在するか調べる．
   /// @param[in] inode1_handle 1番目の入力ノード+極性
   /// @param[in] inode2_handle 2番目の入力ノード+極性
-  /// @param[out] onode_handle 該当のノード+極性
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 該当のノード+極性を表すハンドルを返す．
+  /// @note 見つからなかったらエラーハンドルを返す．
+  BdnNodeHandle
   find_and(BdnNodeHandle inode1_handle,
-	   BdnNodeHandle inode2_handle,
-	   BdnNodeHandle& onode_handle);
+	   BdnNodeHandle inode2_handle) const;
 
   /// @brief 指定されたXORタイプの論理ノードが存在するか調べる．
   /// @param[in] inode1_handle 1番目の入力ノード+極性
   /// @param[in] inode2_handle 2番目の入力ノード+極性
-  /// @param[out] onode_handle 該当のノード+極性
-  /// @return 見つかったら true を返す．
-  bool
+  /// @return 該当のノード+極性を表すハンドルを返す．
+  /// @note 見つからなかったらエラーハンドルを返す．
+  BdnNodeHandle
   find_xor(BdnNodeHandle inode1_handle,
-	   BdnNodeHandle inode2_handle,
-	   BdnNodeHandle& onode_handle);
+	   BdnNodeHandle inode2_handle) const;
 
   /// @brief ソートされた論理ノードのリストを得る．
   /// @param[out] node_list ノードのリストの格納先
