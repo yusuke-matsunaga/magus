@@ -68,6 +68,8 @@ AC_TYPE_SIZE_T
 # Check for size of built-in types
 # ===================================================================
 
+AC_CHECK_SIZEOF(unsigned long)
+
 
 # ===================================================================
 # Checks for other packages

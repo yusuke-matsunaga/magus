@@ -11,7 +11,7 @@
 #include "logic/NpnMap.h"
 
 
-#if SIZEOF_SIZE_T == 8
+#if SIZEOF_UNSIGNED_LONG == 8
 // 1 ワード 64 ビットの時 1 となるマクロ
 #define WORD64 1
 // 1 ワード当たりの入力数
@@ -5295,7 +5295,7 @@ TvFunc::print(ostream& s,
 	      int mode) const
 {
   ymuint ni_pow = 1UL << mInputNum;
-  const ymuint wordsize = SIZEOF_SIZE_T * 8;
+  const ymuint wordsize = SIZEOF_UNSIGNED_LONG * 8;
   if ( mode == 2 ) {
     ymulong* bp = mVector;
     ymuint offset = 0;
