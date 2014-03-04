@@ -84,7 +84,7 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mPropagationNum(0),
   mConflictLimit(0),
   mLearntLimit(0),
-  mMaxConflict(1024 * 100)
+  mMaxConflict(1024 * 10)
 {
   mAnalyzer->set_solver(this);
 
@@ -457,21 +457,17 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   // パラメータの初期化
   double confl_limit = 100;
-#if 0
   double learnt_limit = mConstrClause.size() / 3.0;
-#else
-  double learnt_limit = clause_num() / 3.0;
-#endif
   mVarDecay = mParams.mVarDecay;
   mClauseDecay = mParams.mClauseDecay;
 
-  Bool3 stat = kB3X;
+  Bool3 sat_stat = kB3X;
 
   // 自明な簡単化を行う．
   simplifyDB();
   if ( !mSane ) {
     // その時点で充足不可能なら終わる．
-    stat = kB3False;
+    sat_stat = kB3False;
     goto end;
   }
 
@@ -502,7 +498,7 @@ YmSat::solve(const vector<Literal>& assumptions,
       // 矛盾が起こった．
       backtrack(0);
 
-      stat = kB3False;
+      sat_stat = kB3False;
       goto end;
     }
   }
@@ -531,8 +527,8 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
 
     ++ mRestart;
-    stat = search();
-    if ( stat != kB3X ) {
+    sat_stat = search();
+    if ( sat_stat != kB3X ) {
       // 結果が求められた．
       break;
     }
@@ -546,7 +542,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit * 1.1;
   }
-  if ( stat == kB3True ) {
+  if ( sat_stat == kB3True ) {
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
     model.resize(mVarNum);
     for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -575,7 +571,7 @@ YmSat::solve(const vector<Literal>& assumptions,
   }
 
   if ( debug & debug_solve ) {
-    switch ( stat ) {
+    switch ( sat_stat ) {
     case kB3True:  cout << "SAT" << endl; break;
     case kB3False: cout << "UNSAT" << endl; break;
     case kB3X:     cout << "UNKNOWN" << endl; break;
@@ -583,7 +579,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
 
-  return stat;
+  return sat_stat;
 }
 
 // @brief 学習節の整理を行なう．
