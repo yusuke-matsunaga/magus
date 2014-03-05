@@ -402,6 +402,7 @@ operator^(const TvFunc& left,
 /// @retval -1 left < right
 /// @retval  0 left = right
 /// @retval  1 left > right
+/// @note 入力数の異なる関数間の比較はまず入力数で比較する．
 int
 compare(const TvFunc& left,
 	const TvFunc& right);
@@ -409,6 +410,7 @@ compare(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 等価比較
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較は false となる．
 bool
 operator==(const TvFunc& left,
 	   const TvFunc& right);
@@ -416,6 +418,7 @@ operator==(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 非等価比較
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較は true となる．
 bool
 operator!=(const TvFunc& left,
 	   const TvFunc& right);
@@ -423,6 +426,7 @@ operator!=(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 大小比較(小なり)
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較はまず入力数で比較する．
 bool
 operator<(const TvFunc& left,
 	  const TvFunc& right);
@@ -430,6 +434,7 @@ operator<(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 大小比較(大なり)
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較はまず入力数で比較する．
 bool
 operator>(const TvFunc& left,
 	  const TvFunc& right);
@@ -437,6 +442,7 @@ operator>(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 大小比較(小なりイコール)
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較はまず入力数で比較する．
 bool
 operator<=(const TvFunc& left,
 	   const TvFunc& right);
@@ -444,6 +450,7 @@ operator<=(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 大小比較(大なりイコール)
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較はまず入力数で比較する．
 bool
 operator>=(const TvFunc& left,
 	   const TvFunc& right);
@@ -451,6 +458,7 @@ operator>=(const TvFunc& left,
 /// @relates TvFunc
 /// @brief 交差チェック
 /// @param[in] left, right オペランド
+/// @note 入力数の異なる関数間の比較は false を返す．
 bool
 operator&&(const TvFunc& left,
 	   const TvFunc& right);

@@ -5252,8 +5252,15 @@ int
 compare(const TvFunc& func1,
 	const TvFunc& func2)
 {
-  assert_cond( func1.mInputNum == func2.mInputNum, __FILE__, __LINE__);
+  // まず入力数を比較する．
+  if ( func1.mInputNum < func2.mInputNum ) {
+    return -1;
+  }
+  if ( func1.mInputNum > func2.mInputNum ) {
+    return 1;
+  }
 
+  // 以降は入力数が等しい場合
   ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     ymulong w1 = func1.mVector[n - i - 1];

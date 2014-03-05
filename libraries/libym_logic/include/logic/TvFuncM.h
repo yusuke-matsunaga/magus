@@ -269,29 +269,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   friend
-  bool
-  operator==(const TvFuncM& left,
-	     const TvFuncM& right);
-
-  friend
-  bool
-  operator<(const TvFuncM& left,
-	    const TvFuncM& right);
-
-  friend
-  bool
-  operator>(const TvFuncM& left,
-	    const TvFuncM& right);
-
-  friend
-  bool
-  operator<=(const TvFuncM& left,
-	    const TvFuncM& right);
-
-  friend
-  bool
-  operator>=(const TvFuncM& left,
-	    const TvFuncM& right);
+  int
+  compare(const TvFuncM& left,
+	  const TvFuncM& right);
 
   friend
   bool
@@ -303,16 +283,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で使われる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 大小比較を実際に行う関数
-  bool
-  lt(const TvFuncM& right) const;
-
-  /// @brief 2つの関数の入出力が等しいかチェックする．
-  static
-  bool
-  check_nio(const TvFuncM& f1,
-	    const TvFuncM& f2);
 
   /// @brief 入力数 ni のベクタを納めるのに必要なブロック数を計算する．
   static
@@ -384,9 +354,21 @@ TvFuncM
 operator^(const TvFuncM& left,
 	  const TvFuncM& right);
 
+/// @relates TvFunc
+/// @brief 比較関数
+/// @param[in] left, right オペランド
+/// @retval -1 left < right
+/// @retval  0 left = right
+/// @retval  1 left > right
+/// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
+int
+compare(const TvFuncM& left,
+	const TvFuncM& right);
+
 /// @relates TvFuncM
 /// @brief 等価比較
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較は false を返す．
 bool
 operator==(const TvFuncM& left,
 	   const TvFuncM& right);
@@ -394,6 +376,7 @@ operator==(const TvFuncM& left,
 /// @relates TvFuncM
 /// @brief 非等価比較
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較は true を返す．
 bool
 operator!=(const TvFuncM& left,
 	   const TvFuncM& right);
@@ -401,6 +384,7 @@ operator!=(const TvFuncM& left,
 /// @relates TvFuncM
 /// @brief 大小比較(小なり)
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
 bool
 operator<(const TvFuncM& left,
 	  const TvFuncM& right);
@@ -408,6 +392,7 @@ operator<(const TvFuncM& left,
 /// @relates TvFuncM
 /// @brief 大小比較(大なり)
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
 bool
 operator>(const TvFuncM& left,
 	  const TvFuncM& right);
@@ -415,6 +400,7 @@ operator>(const TvFuncM& left,
 /// @relates TvFuncM
 /// @brief 大小比較(小なりイコール)
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
 bool
 operator<=(const TvFuncM& left,
 	   const TvFuncM& right);
@@ -422,6 +408,7 @@ operator<=(const TvFuncM& left,
 /// @relates TvFuncM
 /// @brief 大小比較(大なりイコール)
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
 bool
 operator>=(const TvFuncM& left,
 	   const TvFuncM& right);
@@ -429,6 +416,7 @@ operator>=(const TvFuncM& left,
 /// @relates TvFuncM
 /// @brief 交差チェック
 /// @param[in] left, right オペランド
+/// @note 入力数/出力数の異なる関数間の比較は false を返す．
 bool
 operator&&(const TvFuncM& left,
 	   const TvFuncM& right);
@@ -503,15 +491,6 @@ ymulong
 TvFuncM::raw_data(ymuint blk) const
 {
   return mVector[blk];
-}
-
-// @brief 2つの関数の入出力が等しいかチェックする．
-inline
-bool
-TvFuncM::check_nio(const TvFuncM& f1,
-		   const TvFuncM& f2)
-{
-  return  (f1.mInputNum == f2.mInputNum) && (f1.mOutputNum == f2.mOutputNum);
 }
 
 // 入力数 ni, 出力数 no のベクタを納めるのに必要なブロック数を計算する．
@@ -589,6 +568,18 @@ TvFuncM::cofactor(VarId varid,
   return TvFuncM(*this).set_cofactor(varid, inv);
 }
 
+// @relates TvFuncM
+// @brief 等価比較
+// @param[in] left, right オペランド
+// @note 入力数/出力数の異なる関数間の比較は false を返す．
+inline
+bool
+operator==(const TvFuncM& left,
+	   const TvFuncM& right)
+{
+  return compare(left, right) == 0;
+}
+
 // 等価比較
 inline
 bool
@@ -598,16 +589,16 @@ operator!=(const TvFuncM& left,
   return !operator==(left, right);
 }
 
-// 大小比較のバリエーション
+// @relates TvFuncM
+// @brief 大小比較(小なり)
+// @param[in] left, right オペランド
+// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
 inline
 bool
 operator<(const TvFuncM& left,
 	  const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(left, right) ) {
-    return false;
-  }
-  return left.lt(right);
+  return compare(left, right) == -1;
 }
 
 inline
@@ -615,10 +606,7 @@ bool
 operator>(const TvFuncM& left,
 	  const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(left, right) ) {
-    return false;
-  }
-  return right.lt(left);
+  return operator<(right, left);
 }
 
 inline
@@ -626,10 +614,7 @@ bool
 operator<=(const TvFuncM& left,
 	   const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(left, right) ) {
-    return false;
-  }
-  return !right.lt(left);
+  return !operator<(right, left);
 }
 
 inline
@@ -637,10 +622,7 @@ bool
 operator>=(const TvFuncM& left,
 	   const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(left, right) ) {
-    return false;
-  }
-  return !left.lt(right);
+  return !operator<(left, right);
 }
 
 // ストリームに対する出力

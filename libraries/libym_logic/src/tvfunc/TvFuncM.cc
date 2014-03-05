@@ -559,39 +559,44 @@ TvFuncM::hash() const
   return ans + mInputNum + (mOutputNum << 8);
 }
 
-// 等価比較
-bool
-operator==(const TvFuncM& func1,
-	   const TvFuncM& func2)
+// @relates TvFunc
+// @brief 比較関数
+// @param[in] left, right オペランド
+// @retval -1 left < right
+// @retval  0 left = right
+// @retval  1 left > right
+// @note 入力数/出力数の異なる関数間の比較はまず入力数つぎに出力数で比較する．
+int
+compare(const TvFuncM& left,
+	const TvFuncM& right)
 {
-  if ( !TvFuncM::check_nio(func1, func2) ) {
-    return false;
+  if ( left.mInputNum < right.mInputNum ) {
+    return -1;
   }
-  ymuint n = func1.mBlockNum;
+  if ( left.mInputNum > right.mInputNum ) {
+    return 1;
+  }
+
+  if ( left.mOutputNum < right.mOutputNum ) {
+    return -1;
+  }
+  if ( left.mOutputNum > right.mOutputNum ) {
+    return 1;
+  }
+
+  ymuint n = left.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
-    if ( func1.mVector[i] != func2.mVector[i] ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-
-// @brief 大小比較を実際に行う関数
-bool
-TvFuncM::lt(const TvFuncM& right) const
-{
-  for (ymuint i = 0; i < mBlockNum; ++ i) {
-    ymulong w1 = mVector[mBlockNum - i - 1];
-    ymulong w2 = right.mVector[mBlockNum - i - 1];
-    if ( w1 > w2 ) {
-      return false;
-    }
+    ymulong w1 = left.mVector[i];
+    ymulong w2 = right.mVector[i];
     if ( w1 < w2 ) {
-      return true;
+      return -1;
+    }
+    if ( w1 > w2 ) {
+      return 1;
     }
   }
-  return false;
+
+  return 0;
 }
 
 // @relates TvFuncM
@@ -600,9 +605,11 @@ bool
 operator&&(const TvFuncM& func1,
 	   const TvFuncM& func2)
 {
-  if ( !TvFuncM::check_nio(func1, func2) ) {
+  if ( func1.mInputNum != func2.mInputNum ||
+       func1.mOutputNum != func2.mOutputNum ) {
     return false;
   }
+
   ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
     ymulong w1 = func1.mVector[i];
