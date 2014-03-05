@@ -51,11 +51,13 @@ GbmSatCegarOneHot::_solve(const RcfNetwork& network,
   SatSolver solver;
 #endif
 
+#if 0
   SatMsgHandlerImpl1 satmsghandler(cout);
   solver.reg_msg_handler(&satmsghandler);
   solver.timer_on(true);
 
   solver.set_max_conflict(100 * 1024);
+#endif
 
   ymuint nc = network.conf_var_num();
   ymuint ni = network.input_num();
