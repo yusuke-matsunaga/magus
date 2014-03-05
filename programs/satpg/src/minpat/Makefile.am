@@ -56,10 +56,7 @@ libatpg_minpat_la_SOURCES = \
 	MinPatImpl.h \
 	MinPatImpl.cc \
 	Fop2MinPat.h \
-	Fop2MinPat.cc \
-	GcNode.h \
-	GcMgr.h \
-	GcMgr.cc
+	Fop2MinPat.cc
 
 libatpg_minpat_la_LIBADD =
 

@@ -14,7 +14,8 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "Fop2MinPat.h"
-#include "GcMgr.h"
+//#include "GcMgr.h"
+#include "utils/GcSolver.h"
 #include "utils/RandGen.h"
 
 
@@ -27,6 +28,7 @@ new_MinPat(AtpgMgr& mgr)
   return new MinPatImpl(mgr._tv_mgr(), mgr._fault_mgr(),
 			mgr._fsim(), mgr._fsimx());
 }
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MinPatImpl
@@ -92,7 +94,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   }
   else {
     // 最小彩色問題を解くことで3値のパタンを圧縮する．
-    GcMgr gcmgr;
+    GcSolver gcmgr;
 
     ymuint n = tv3_list.size();
     gcmgr.init(n);

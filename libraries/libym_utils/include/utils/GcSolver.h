@@ -1,7 +1,7 @@
-#ifndef GCSOLVER_H
-#define GCSOLVER_H
+#ifndef UTILS_GCSOLVER_H
+#define UTILS_GCSOLVER_H
 
-/// @file GcSolver.h
+/// @file utils/GcSolver.h
 /// @brief GcSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -73,7 +73,8 @@ private:
 
   /// @brief saturation degree を再計算する．
   void
-  update_sat_degree(GcNode* node);
+  update_sat_degree(GcNode* node,
+		    ymuint color);
 
   /// @brief mCountArray をクリアする．
   void
@@ -132,4 +133,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // GCSOLVER_H
+#endif // UTILS_GCSOLVER_H

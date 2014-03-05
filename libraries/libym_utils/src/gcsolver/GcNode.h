@@ -5,7 +5,7 @@
 /// @brief GcNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -71,6 +71,9 @@ private:
 
   // 隣接するノードのリスト
   vector<GcNode*> mLinkList;
+
+  // 隣接するノードの色の集合
+  unordered_set<ymuint32> mColorSet;
 
   // SAT degree
   ymuint32 mSatDegree;
