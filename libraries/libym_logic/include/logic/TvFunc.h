@@ -531,7 +531,7 @@ inline
 ymuint
 TvFunc::block(ymuint pos)
 {
-  const ymuint wsize = sizeof(size_t) * 8;
+  const ymuint wsize = sizeof(ymulong) * 8;
   return pos / wsize;
 }
 
@@ -540,7 +540,7 @@ inline
 ymuint
 TvFunc::shift(ymuint pos)
 {
-  const ymuint wsize = sizeof(size_t) * 8;
+  const ymuint wsize = sizeof(ymulong) * 8;
   return pos % wsize;
 }
 

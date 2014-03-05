@@ -959,8 +959,8 @@ TvFunc::walsh_1(VarId varid) const
   }
   else {
     ymuint i5 = pos - NIPW;
-    // size_t check = 1 << i5;
-    // for (size_t b = 0; b < mBlockNum; ++ b) {
+    // ymuint check = 1 << i5;
+    // for (ymuint b = 0; b < mBlockNum; ++ b) {
     //   if ( b & check ) {
     //     c += count_onebits(~mVector[b]);
     //   } else {
@@ -1029,10 +1029,10 @@ TvFunc::walsh_2(VarId var1,
     }
   }
   else if ( j < NIPW ) {
-    // size_t check = 1 << (i - 5);
-    // size_t mask1 = c_masks[j];
-    // size_t mask0 = ~mask1;
-    // for (size_t b = 0; b < mBlockNum; ++ b) {
+    // ymuint check = 1 << (i - 5);
+    // ymuint mask1 = c_masks[j];
+    // ymuint mask0 = ~mask1;
+    // for (ymuint b = 0; b < mBlockNum; ++ b) {
     //   if ( b & check ) {
     //     c += count_onebits(mVector[b] ^ mask0);
     //   } else {
@@ -1047,11 +1047,11 @@ TvFunc::walsh_2(VarId var1,
     }
   }
   else {
-    // size_t check1 = 1 << (i - 5);
-    // size_t check2 = 1 << (j - 5);
-    // size_t check = check1 | check2;
-    // for (size_t b = 0; b < mBlockNum; ++ b) {
-    //   size_t tmp = b & check;
+    // ymuint check1 = 1 << (i - 5);
+    // ymuint check2 = 1 << (j - 5);
+    // ymuint check = check1 | check2;
+    // for (ymuint b = 0; b < mBlockNum; ++ b) {
+    //   ymuint tmp = b & check;
     //   if ( tmp == check1 || tmp == check2 ) {
     //     c += count_onebits(~mVector[b]);
     //   } else {
