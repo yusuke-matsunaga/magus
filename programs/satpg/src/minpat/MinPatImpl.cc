@@ -12,9 +12,10 @@
 #include "AtpgMgr.h"
 #include "TvMgr.h"
 #include "TestVector.h"
+#include "FaultMgr.h"
 #include "Fsim.h"
+#include "FsimOp1.h"
 #include "Fop2MinPat.h"
-//#include "GcMgr.h"
 #include "utils/GcSolver.h"
 #include "utils/RandGen.h"
 
@@ -53,6 +54,53 @@ MinPatImpl::MinPatImpl(TvMgr& tvmgr,
 // @brief デストラクタ
 MinPatImpl::~MinPatImpl()
 {
+}
+
+class RvFsimOp1 :
+  public FsimOp1
+{
+public:
+
+  RvFsimOp1(ymuint nall) :
+    mDetArray(nall)
+  {
+  }
+
+  void
+  init()
+  {
+    ymuint n = mDetArray.size();
+    for (ymuint i = 0; i < n; ++ i) {
+      mDetArray[i] = false;
+    }
+    mCount = 0;
+  }
+
+  virtual
+  void
+  operator()(TpgFault* f);
+
+  ymuint
+  det_count()
+  {
+    return mCount;
+  }
+
+private:
+
+  vector<bool> mDetArray;
+
+  ymuint32 mCount;
+
+};
+
+void
+RvFsimOp1::operator()(TpgFault* f)
+{
+  if ( !mDetArray[f->id()] ) {
+    mDetArray[f->id()] = true;
+    ++ mCount;
+  }
 }
 
 // @brief テストベクタの最小化を行なう．
@@ -158,12 +206,17 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     cur_array.clear();
   }
 
+  cout << "Graph Coloring End: " << tv2_list.size() << endl;
+
+  // 最小被覆問題を解く．
   tv_list = tv2_list;
+
+  cout << "Minimum Covering End: " << tv_list.size() << endl;
 
   local_timer.stop();
   USTime time = local_timer.time();
 
-  stats.set(orig_num, tv2_list.size(), time);
+  stats.set(orig_num, tv_list.size(), time);
 }
 
 

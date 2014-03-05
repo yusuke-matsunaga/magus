@@ -55,6 +55,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			"po-split mode");
   mPoptRpo = new TclPopt(this, "rpo",
 			 "po-split (reverse order) mode");
+  mPoptFaultAnalysis = new TclPopt(this, "fault_analysis",
+				   "analize fault dominace");
   mPoptSkip = new TclPoptInt(this, "skip",
 			     "specify skip count <INT>");
   mPoptX = new TclPoptInt(this, "x",
@@ -132,6 +134,8 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mode = kDtpgAll;
   }
 
+  bool fault_analysis = mPoptFaultAnalysis->is_specified();
+
   vector<DetectOp*> dop_list;
   vector<UntestOp*> uop_list;
 
@@ -188,7 +192,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgStats stats;
 
-  mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, *bt, dop_list, uop_list, stats);
+  mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, fault_analysis, *bt, dop_list, uop_list, stats);
 
   for (vector<DetectOp*>::iterator p = dop_list.begin();
        p != dop_list.end(); ++ p) {

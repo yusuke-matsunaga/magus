@@ -87,6 +87,10 @@ public:
   TpgFault*
   rep_fault() const;
 
+  /// @brief 支配故障のリストを返す．
+  const vector<TpgFault*>&
+  dom_list() const;
+
   /// @brief 作業用に用いられる一時的なID番号を設定する．
   void
   set_tmp_id(ymuint id);
@@ -118,6 +122,11 @@ public:
   /// @brief POモードで検出不能と判定された回数をクリアする．
   void
   clear_untest_num();
+
+  /// @brief 故障の支配関係を設定する．
+  /// @param[in] dom_f 支配する故障
+  void
+  set_dominance(TpgFault* dom_f);
 
 
 private:
@@ -166,6 +175,9 @@ private:
 
   // POモードで検出不能と判定された回数
   ymuint32 mUntestNum;
+
+  // 支配故障のリスト
+  vector<TpgFault*> mDomList;
 
 };
 
@@ -281,6 +293,14 @@ TpgFault::rep_fault() const
   return mRepFault;
 }
 
+// @brief 支配故障のリストを返す．
+inline
+const vector<TpgFault*>&
+TpgFault::dom_list() const
+{
+  return mDomList;
+}
+
 // @brief 作業用に用いられる一時的なID番号を設定する．
 inline
 void
@@ -346,6 +366,15 @@ void
 TpgFault::clear_untest_num()
 {
   mUntestNum = 0;
+}
+
+// @brief 故障の支配関係を設定する．
+// @param[in] dom_f 支配する故障
+inline
+void
+TpgFault::set_dominance(TpgFault* dom_f)
+{
+  mDomList.push_back(dom_f);
 }
 
 END_NAMESPACE_YM_SATPG

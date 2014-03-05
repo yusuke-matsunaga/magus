@@ -55,6 +55,7 @@ public:
   /// @brief テスト生成を行なう．
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
+  /// @param[in] fault_analysis 故障の支配関係を解析する．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop_list DetectOp のリスト
   /// @param[in] uop_list UntestOp のリスト
@@ -63,6 +64,7 @@ public:
   void
   run(DtpgMode mode,
       tDtpgPoMode po_mode,
+      bool fault_analysis,
       BackTracer& bt,
       const vector<DetectOp*>& dop_list,
       const vector<UntestOp*>& uop_list,
@@ -96,6 +98,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief MFFC 単位で故障差関数を作り，支配関係をもとにした順序付けを行う．
+  void
+  fault_analyze();
 
   /// @brief activate された部分回路に大してテスト生成を行う．
   /// @param[in] mode メインモード

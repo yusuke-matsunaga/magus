@@ -30,9 +30,6 @@ EXTRA_DIST =
 
 noinst_LTLIBRARIES = libatpg_minpat.la
 
-noinst_PROGRAMS = \
-	gctest
-
 
 ############################################################
 ## 汎用のプリプロセッサ用フラグの指定
@@ -61,16 +58,3 @@ libatpg_minpat_la_SOURCES = \
 libatpg_minpat_la_LIBADD =
 
 libatpg_minpat_la_LDFLAGS =
-
-
-############################################################
-## gctest 用の変数の定義
-############################################################
-
-gctest_SOURCES = \
-	gctest.cc
-
-gctest_LDADD = \
-	libatpg_minpat.la
-
-gctest_LDFLAGS =

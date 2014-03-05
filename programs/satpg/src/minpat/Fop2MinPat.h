@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 /// @class Fop2MinPat Fop2MinPat.h "Fop2MinPat.h"
-/// @brief MinPat で用いる FsimOp1
+/// @brief MinPat で用いる FsimOp2
 //////////////////////////////////////////////////////////////////////
 class Fop2MinPat :
   public FsimOp2
@@ -67,6 +67,25 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  // １つの故障に関連した情報
+  struct FaultInfo {
+
+    FaultInfo() { }
+
+    // 検出回数
+    ymuint32 mDetCount;
+
+    // 検出するパタンのリスト
+    vector<TestVector*> mPatList;
+
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -79,11 +98,9 @@ private:
   // 現在のパタンリスト
   vector<TestVector*> mCurPatList;
 
-  // 故障の検出回数
-  vector<ymuint32> mDetCount;
-
-  // 故障を検出するパタンのリスト
-  vector<vector<TestVector*> > mPatListArray;
+  // 故障に関連した情報の配列
+  // 故障のIDでインデクシングされている．
+  vector<FaultInfo> mFinfoArray;
 
 };
 

@@ -26,8 +26,7 @@ Fop2MinPat::Fop2MinPat(Fsim& fsim,
 		       FaultMgr& fmgr) :
   mFsim(fsim),
    mLimit(1),
-  mDetCount(fmgr.all_num()),
-  mPatListArray(fmgr.all_num())
+  mFinfoArray(fmgr.all_num())
 {
 }
 
@@ -44,13 +43,15 @@ Fop2MinPat::operator()(TpgFault* f,
 		       PackedVal dpat)
 {
   ymuint f_id = f->id();
+  FaultInfo& finfo = mFinfoArray[f_id];
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     if ( dpat & (1UL << i) ) {
-      ++ mDetCount[f_id];
-      mPatListArray[f_id].push_back(mCurPatList[i]);
+      finfo.mPatList.push_back(mCurPatList[i]);
+      ++ finfo.mDetCount;
     }
   }
-  if ( mDetCount[f_id] >= mLimit ) {
+  if ( finfo.mDetCount >= mLimit ) {
+    // 規定回数以上検出されたので以後のシミュレーションではスキップする．
     mFsim.set_skip(f);
   }
 }
@@ -59,10 +60,11 @@ Fop2MinPat::operator()(TpgFault* f,
 void
 Fop2MinPat::clear_count()
 {
-  ymuint n = mDetCount.size();
+  ymuint n = mFinfoArray.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mDetCount[i] = 0;
-    mPatListArray[i].clear();
+    FaultInfo& finfo = mFinfoArray[i];
+    finfo.mDetCount = 0;
+    finfo.mPatList.clear();
   }
 }
 
@@ -85,7 +87,7 @@ Fop2MinPat::set_pattern(const vector<TestVector*>& pat_list)
 const vector<TestVector*>&
 Fop2MinPat::pat_list(ymuint f_id)
 {
-  return mPatListArray[f_id];
+  return mFinfoArray[f_id].mPatList;
 }
 
 END_NAMESPACE_YM_SATPG

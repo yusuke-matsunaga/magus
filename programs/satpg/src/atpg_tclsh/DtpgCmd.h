@@ -85,6 +85,9 @@ private:
   // rpo オプションの解析用オブジェクト
   TclPopt* mPoptRpo;
 
+  // fault_analysis オプションの解析用オブジェクト
+  TclPopt* mPoptFaultAnalysis;
+
   // skip オプションの解析用オブジェクト
   TclPoptInt* mPoptSkip;
 

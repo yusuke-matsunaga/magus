@@ -145,12 +145,14 @@ public:
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
   /// @param[in] bt バックトレーサー
+  /// @param[in] fault_analysis 故障の支配関係を解析する．
   /// @param[in] dop_list DetectOp のリスト
   /// @param[in] uop_list UntestOp のリスト
   /// @param[in] stats 結果を格納する構造体
   void
   dtpg(DtpgMode mode,
        tDtpgPoMode po_mode,
+       bool fault_analysis,
        BackTracer& bt,
        const vector<DetectOp*>& dop_list,
        const vector<UntestOp*>& uop_list,
