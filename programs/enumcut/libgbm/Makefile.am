@@ -22,7 +22,9 @@ MAINTAINERCLEANFILES = Makefile.in
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libgbm.la
+	libgbm.la \
+	libgbm_d.la \
+	libgbm_p.la
 
 
 ############################################################
@@ -49,10 +51,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libgbm.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libgbm_la_SOURCES = \
+COMMON_SOURCES = \
 	GbmSatEngine.h \
 	GbmSatEngine.cc \
 	GbmSatEngineWithEncoder.h \
@@ -92,9 +94,56 @@ libgbm_la_SOURCES = \
 	RcfNodeImpl.h \
 	RcfNodeImpl.cc
 
+
+############################################################
+## libgbm.la 用の変数の定義
+############################################################
+
+libgbm_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libgbm_la_SOURCES = \
+	$(COMMON_SOURCES)
+
 libgbm_la_LIBADD =
 
-libgbm_la_LDFLAGS =
+libgbm_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libgbm_d.la 用の変数の定義
+############################################################
+
+libgbm_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libgbm_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libgbm_d_la_LIBADD =
+
+libgbm_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libgbm_p.la 用の変数の定義
+############################################################
+
+libgbm_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libgbm_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libgbm_p_la_LIBADD =
+
+libgbm_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################

@@ -29,7 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libec.la
+	libec.la \
+	libec_d.la \
+	libec_p.la
 
 
 ############################################################
@@ -47,10 +49,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libec.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libec_la_SOURCES = \
+COMMON_SOURCES = \
 	EnumCut.cc \
 	EnumCut2.cc \
 	BottomUp.cc \
@@ -60,6 +62,53 @@ libec_la_SOURCES = \
 	ZddImp2.cc \
 	ZddTopDown.cc
 
+
+############################################################
+## libec.la 用の変数の定義
+############################################################
+
+libec_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libec_la_SOURCES = \
+	$(COMMON_SOURCES)
+
 libec_la_LIBADD =
 
-libec_la_LDFLAGS =
+libec_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libec_d.la 用の変数の定義
+############################################################
+
+libec_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libec_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libec_d_la_LIBADD =
+
+libec_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libec_p.la 用の変数の定義
+############################################################
+
+libec_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libec_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libec_p_la_LIBADD =
+
+libec_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

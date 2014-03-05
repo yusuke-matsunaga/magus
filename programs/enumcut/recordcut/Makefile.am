@@ -24,7 +24,8 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_PROGRAMS = \
 	rec \
 	Lut443MatchTest \
-	recordcut
+	recordcut \
+	recordcut_d
 
 
 ############################################################
@@ -83,6 +84,10 @@ recordcut_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_popt/include
 
+recordcut_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
 recordcut_SOURCES = \
 	recordcut.cc \
 	Cut.h \
@@ -103,10 +108,47 @@ recordcut_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
-	$(AM_LDADD)
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 recordcut_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## recordcut_d 用の変数の定義
+############################################################
+
+recordcut_d_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_popt/include
+
+recordcut_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+recordcut_d_SOURCES = \
+	recordcut.cc \
+	Cut.h \
+	CutHash.h \
+	CutHash.cc \
+	CutMgr.h \
+	CutMgr.cc \
+	FuncMgr.h \
+	FuncMgr.cc \
+	FuncRec.h \
+	FuncRec.cc \
+	Lut443Match.h \
+	Lut443Match.cc
+
+recordcut_d_LDADD = \
+	$(top_builddir)/libgbm/libgbm_d.la \
+	$(top_builddir)/libec/libec_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt_d.la
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la
+
+recordcut_d_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 

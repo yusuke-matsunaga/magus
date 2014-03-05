@@ -139,6 +139,10 @@ AC_LANG_CPLUSPLUS
 # Local definitions
 # ===================================================================
 
+AC_SUBST([YM_CXXOPTFLAGS], [""])
+AC_SUBST([YM_CXXDBGFLAGS], ["-g"])
+AC_SUBST([YM_CXXPRFFLAGS], ["-pg"])
+
 YMTOOLS_SRCDIR="\$(top_srcdir)/../.."
 YMTOOLS_BUILDDIR="\$(top_builddir)/../.."
 AC_SUBST([YMTOOLS_SRCDIR])
