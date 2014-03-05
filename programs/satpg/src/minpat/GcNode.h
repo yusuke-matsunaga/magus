@@ -72,6 +72,9 @@ private:
   // 隣接するノードのリスト
   vector<GcNode*> mLinkList;
 
+  // 隣接するノードの色の集合
+  unordered_set<ymuint32> mColorSet;
+
   // SAT degree
   ymuint32 mSatDegree;
 

@@ -14,7 +14,7 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "Fop2MinPat.h"
-#include "utils/GcSolver.h"
+#include "GcMgr.h"
 #include "utils/RandGen.h"
 
 
@@ -92,7 +92,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   }
   else {
     // 最小彩色問題を解くことで3値のパタンを圧縮する．
-    GcSolver gcmgr;
+    GcMgr gcmgr;
 
     ymuint n = tv3_list.size();
     gcmgr.init(n);
@@ -131,7 +131,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   }
 
   // tv2_list のパタンを用いて故障シミュレーションを行なう．
-  cout << "Fault Simulation Start" << endl;
   Fop2MinPat op(mFsim2, mFaultMgr);
   vector<FsimOp2*> op_list(1, &op);
 
@@ -156,7 +155,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     mFsim2.ppsfp(cur_array, op_list);
     cur_array.clear();
   }
-  cout << "Fault Simulation End" << endl;
 
   tv_list = tv2_list;
 

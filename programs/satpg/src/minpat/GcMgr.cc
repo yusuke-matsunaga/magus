@@ -115,26 +115,31 @@ GcMgr::coloring(vector<vector<ymuint> >& color_group)
   GcNode* max_node = pop_node();
   color_node(max_node, mMaxColor);
 
-
   // 2: saturation degree が最大の未彩色ノードを選び最小の色番号で彩色する．
   while ( mHeapNum > 0 ) {
     GcNode* max_node = pop_node();
-
     // max_node につけることのできる最小の色番号を求める．
     clear_count();
+    ymuint cnum = 0;
     const vector<GcNode*>& node_list = max_node->mLinkList;
     for (vector<GcNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       GcNode* node1 = *p;
       ymuint c = node1->color();
       if ( c > 0 ) {
-	mCountArray[c - 1] = true;
+	if ( !mCountArray[c - 1] ) {
+	  mCountArray[c - 1] = true;
+	  ++ cnum;
+	  if ( cnum == mMaxColor ) {
+	    break;
+	  }
+	}
       }
     }
     ymuint min_col = 0;
-    for (ymuint i = 0; i < mMaxColor; ++ i) {
-      if ( !mCountArray[i] ) {
-	min_col = i + 1;
+    for (ymuint c = 0; c < mMaxColor; ++ c) {
+      if ( !mCountArray[c] ) {
+	min_col = c + 1;
 	break;
       }
     }
@@ -146,7 +151,10 @@ GcMgr::coloring(vector<vector<ymuint> >& color_group)
   }
 
   // 検証
-  if ( 0 ) {
+  // もちろん最小色数ではないが，同じ色が隣接していないことを確認する．
+  // また，未彩色のノードがないことも確認する．
+  // 違反が見つかったら例外を送出する．
+  if ( true ) {
     for (ymuint i = 0; i < mNodeNum; ++ i) {
       GcNode* node = &mNodeArray[i];
       ymuint c0 = node->color();
@@ -156,12 +164,12 @@ GcMgr::coloring(vector<vector<ymuint> >& color_group)
 	   p != node_list.end(); ++ p) {
 	GcNode* node1 = *p;
 	ymuint c1 = node1->color();
-	assert_cond( c1 > 0, __FILE__, __LINE__);
 	assert_cond( c0 != c1, __FILE__, __LINE__);
       }
     }
   }
 
+  // 結果を color_group に入れる．
   color_group.clear();
   color_group.resize(mMaxColor);
   for (ymuint i = 0; i < mNodeNum; ++ i) {
@@ -204,31 +212,20 @@ GcMgr::color_node(GcNode* node,
   for (vector<GcNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     GcNode* node1 = *p;
-    update_sat_degree(node1);
+    if ( node1->mColor == 0 ) {
+      update_sat_degree(node1, col);
+    }
   }
 }
 
 // @brief saturation degree を再計算する．
 void
-GcMgr::update_sat_degree(GcNode* node)
+GcMgr::update_sat_degree(GcNode* node,
+			 ymuint color)
 {
-  clear_count();
-  const vector<GcNode*>& node_list = node->link_list();
-  ymuint sd = 0;
-  for (vector<GcNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    GcNode* node1 = *p;
-    ymuint c = node1->color();
-    if ( c > 0 ) {
-      if ( !mCountArray[c - 1] ) {
-	mCountArray[c - 1] = true;
-	++ sd;
-      }
-    }
-  }
-  if ( node->mSatDegree != sd ) {
-    node->mSatDegree = sd;
-
+  if ( node->mColorSet.count(color) == 0 ) {
+    node->mColorSet.insert(color);
+    ++ node->mSatDegree;
     ymuint pos = node->mHeapPos;
     while ( pos > 0 ) {
       GcNode* node = mNodeHeap[pos];

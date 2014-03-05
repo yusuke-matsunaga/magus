@@ -73,7 +73,8 @@ private:
 
   /// @brief saturation degree を再計算する．
   void
-  update_sat_degree(GcNode* node);
+  update_sat_degree(GcNode* node,
+		    ymuint color);
 
   /// @brief mCountArray をクリアする．
   void
