@@ -27,7 +27,7 @@ public:
   /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim 故障シミュレータ
   DopDrop(FaultMgr& fmgr,
-	  FsimOld& fsim);
+	  Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
@@ -57,7 +57,7 @@ private:
   FaultMgr& mMgr;
 
   // 故障シミュレータ
-  FsimOld& mFsim;
+  Fsim& mFsim;
 
   // 検出された故障を入れるリスト
   vector<TpgFault*> mDetFaults;

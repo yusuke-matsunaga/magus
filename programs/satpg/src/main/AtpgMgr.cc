@@ -14,7 +14,6 @@
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
-#include "FsimOld.h"
 #include "Dtpg.h"
 #include "Rtpg.h"
 #include "MinPat.h"
@@ -70,50 +69,6 @@ FsimNetBinder::event_proc(const TpgNetwork& network,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス FsimOldNetBinder
-//////////////////////////////////////////////////////////////////////
-class FsimOldNetBinder :
-  public T2Binder<const TpgNetwork&, FaultMgr&>
-{
-public:
-
-  /// @brief コンストラクタ
-  FsimOldNetBinder(FsimOld* fsim);
-
-  /// @brief イベント処理関数
-  virtual
-  void
-  event_proc(const TpgNetwork& network,
-	     FaultMgr& fault_mgr);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // Fsim
-  FsimOld* mFsim;
-
-};
-
-
-// @brief コンストラクタ
-FsimOldNetBinder::FsimOldNetBinder(FsimOld* fsim) :
-  mFsim(fsim)
-{
-}
-
-// @brief イベント処理関数
-void
-FsimOldNetBinder::event_proc(const TpgNetwork& network,
-			     FaultMgr& fault_mgr)
-{
-  mFsim->set_network(network, fault_mgr);
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // AtpgMgr
 //////////////////////////////////////////////////////////////////////
 
@@ -126,11 +81,8 @@ AtpgMgr::AtpgMgr() :
 
   mFsim = new_Fsim2();
   mFsim3 = new_FsimX2();
-  mFsimOld = new_FsimOld2();
-  mFsimOld3 = new_FsimOldX2();
 
   mRtpg = new_Rtpg(*this);
-  mRtpgOld = new_RtpgOld(*this);
   mDtpg = new_DtpgSat();
   mMinPat = new_MinPat(*this);
 
@@ -138,9 +90,6 @@ AtpgMgr::AtpgMgr() :
 
   reg_network_handler(new FsimNetBinder(mFsim));
   reg_network_handler(new FsimNetBinder(mFsim3));
-
-  reg_network_handler(new FsimOldNetBinder(mFsimOld));
-  reg_network_handler(new FsimOldNetBinder(mFsimOld3));
 
   set_dtpg_mode();
 }
@@ -152,10 +101,7 @@ AtpgMgr::~AtpgMgr()
   delete mTvMgr;
   delete mFsim;
   delete mFsim3;
-  delete mFsimOld;
-  delete mFsimOld3;
   delete mRtpg;
-  delete mRtpgOld;
   delete mDtpg;
   delete mMinPat;
   delete mNetwork;
@@ -227,25 +173,6 @@ AtpgMgr::rtpg(ymuint min_f,
   mTimer.change(TM_FSIM);
 
   mRtpg->run(min_f, max_i, max_pat, stats);
-
-  mTimer.change(old_id);
-}
-
-// @brief 乱数パタンを用いた故障シミュレーションを行なう．
-// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
-// @param[in] max_i 故障検出できないシミュレーション回数の上限
-// @param[in] max_pat 最大のパタン数
-// @param[in] stats 実行結果の情報を格納する変数
-void
-AtpgMgr::rtpg_old(ymuint min_f,
-		  ymuint max_i,
-		  ymuint max_pat,
-		  RtpgStats& stats)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_FSIM);
-
-  mRtpgOld->run(min_f, max_i, max_pat, stats);
 
   mTimer.change(old_id);
 }

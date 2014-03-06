@@ -35,8 +35,6 @@ RtpgCmd::RtpgCmd(AtpgMgr* mgr) :
 			     "specify the file name containg patterns");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
-  mPoptOld = new TclPopt(this, "old",
-			 "old mode");
 }
 
 // @brief デストラクタ
@@ -89,12 +87,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
 
   RtpgStats stats;
 
-  if ( mPoptOld->is_specified() ) {
-    mgr().rtpg_old(min_f, max_i, max_pat, stats);
-  }
-  else {
-    mgr().rtpg(min_f, max_i, max_pat, stats);
-  }
+  mgr().rtpg(min_f, max_i, max_pat, stats);
 
   after_update_faults();
 

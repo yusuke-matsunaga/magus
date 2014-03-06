@@ -63,6 +63,7 @@ public:
   Fsim&
   _fsimx();
 
+#if 0
   /// @brief 2値の故障シミュレータを取り出す．
   FsimOld&
   _fsimold();
@@ -70,7 +71,7 @@ public:
   /// @brief 3値の故障シミュレータを返す．
   FsimOld&
   _fsimoldx();
-
+#endif
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -113,17 +114,6 @@ public:
        ymuint max_i,
        ymuint max_pat,
        RtpgStats& stats);
-
-  /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
-  /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
-  /// @param[in] max_i 故障検出できないシミュレーション回数の上限
-  /// @param[in] max_pat 最大のパタン数
-  /// @param[in] stats 実行結果の情報を格納する変数
-  void
-  rtpg_old(ymuint min_f,
-	   ymuint max_i,
-	   ymuint max_pat,
-	   RtpgStats& stats);
 
 
 public:
@@ -238,17 +228,8 @@ private:
   // 3値の故障シミュレータ
   Fsim* mFsim3;
 
-  // 故障シミュレータ
-  FsimOld* mFsimOld;
-
-  // 3値の故障シミュレータ
-  FsimOld* mFsimOld3;
-
   // RTPG
   Rtpg* mRtpg;
-
-  // RTPG
-  Rtpg* mRtpgOld;
 
   // テストパタン生成器
   Dtpg* mDtpg;
@@ -315,22 +296,6 @@ Fsim&
 AtpgMgr::_fsimx()
 {
   return *mFsim3;
-}
-
-// @brief 2値の故障シミュレータを取り出す．
-inline
-FsimOld&
-AtpgMgr::_fsimold()
-{
-  return *mFsimOld;
-}
-
-// @brief 3値の故障シミュレータを返す．
-inline
-FsimOld&
-AtpgMgr::_fsimoldx()
-{
-  return *mFsimOld3;
 }
 
 // @brief ネットワークの変更に関するハンドラを登録する．

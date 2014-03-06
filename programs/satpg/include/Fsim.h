@@ -44,22 +44,6 @@ public:
   void
   clear_skip() = 0;
 
-  /// @brief ひとつのパタンで故障シミュレーションを行う．
-  /// @param[in] tv テストベクタ
-  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type1)
-  virtual
-  void
-  sppfp(TestVector* tv,
-	FsimOp1& op) = 0;
-
-  /// @brief 複数のパタンで故障シミュレーションを行う．
-  /// @param[in] tv_array テストベクタの配列
-  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
-  virtual
-  void
-  ppsfp(const vector<TestVector*>& tv_array,
-	FsimOp2& op) = 0;
-
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] f 対象の故障
@@ -69,6 +53,22 @@ public:
   bool
   spsfp(TestVector* tv,
 	TpgFault* f) = 0;
+
+  /// @brief ひとつのパタンで故障シミュレーションを行う．
+  /// @param[in] tv テストベクタ
+  /// @param[in] det_faults このパタンで検出された故障のリスト
+  virtual
+  void
+  sppfp(TestVector* tv,
+	vector<TpgFault*>& det_faults) = 0;
+
+  /// @brief 複数のパタンで故障シミュレーションを行う．
+  /// @param[in] tv_array テストベクタの配列
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
+  virtual
+  void
+  ppsfp(const vector<TestVector*>& tv_array,
+	FsimOp2& op) = 0;
 
 };
 

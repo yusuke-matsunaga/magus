@@ -312,10 +312,10 @@ Fsim3::clear_skip()
 
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
-// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type1)
+// @param[in] det_faults このパタンで検出された故障のリスト
 void
 Fsim3::sppfp(TestVector* tv,
-	     FsimOp1& op)
+	     vector<TpgFault*>& det_faults)
 {
 }
 

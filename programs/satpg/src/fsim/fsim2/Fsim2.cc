@@ -318,11 +318,13 @@ Fsim2::clear_skip()
 
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
-// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type1)
+// @param[in] det_faults このパタンで検出された故障のリスト
 void
 Fsim2::sppfp(TestVector* tv,
-	     FsimOp1& op)
+	     vector<TpgFault*>& det_faults)
 {
+  det_faults.clear();
+
   ymuint npi = mNetwork->input_num2();
 
   // tv を全ビットにセットしていく．
@@ -361,7 +363,7 @@ Fsim2::sppfp(TestVector* tv,
     SimNode* root = ffr->root();
     if ( root->is_output() ) {
       // 常に観測可能
-      fault_sweep(ffr, op);
+      fault_sweep(ffr, det_faults);
       continue;
     }
 
@@ -383,7 +385,7 @@ Fsim2::sppfp(TestVector* tv,
       PackedVal obs = eventq_simulate();
       for (ymuint i = 0; i < kPvBitLen; ++ i, obs >>= 1) {
 	if ( obs & 1UL ) {
-	  fault_sweep(ffr_buff[i], op);
+	  fault_sweep(ffr_buff[i], det_faults);
 	}
       }
       bitpos = 0;
@@ -393,7 +395,7 @@ Fsim2::sppfp(TestVector* tv,
     PackedVal obs = eventq_simulate();
     for (ymuint i = 0; i < bitpos; ++ i, obs >>= 1) {
       if ( obs & 1UL ) {
-	fault_sweep(ffr_buff[i], op);
+	fault_sweep(ffr_buff[i], det_faults);
       }
     }
   }
@@ -673,7 +675,7 @@ Fsim2::eventq_simulate()
 // @brief ffr 内の故障が検出可能か調べる．
 void
 Fsim2::fault_sweep(SimFFR* ffr,
-		   FsimOp1& op)
+		   vector<TpgFault*>& det_faults)
 {
   vector<FsimFault*>& flist = ffr->fault_list();
   for (vector<FsimFault*>::const_iterator p = flist.begin();
@@ -681,7 +683,7 @@ Fsim2::fault_sweep(SimFFR* ffr,
     FsimFault* ff = *p;
     if ( !ff->mSkip && ff->mObsMask != kPvAll0 ) {
       TpgFault* f = ff->mOrigF;
-      op(f);
+      det_faults.push_back(f);
     }
   }
 }

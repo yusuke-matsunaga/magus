@@ -50,8 +50,6 @@ AM_CPPFLAGS = \
 ############################################################
 
 libatpg_rtpg_la_SOURCES = \
-	RtpgOld.h \
-	RtpgOld.cc \
 	RtpgImpl.h \
 	RtpgImpl.cc \
 	Fop2Rtpg.h \
