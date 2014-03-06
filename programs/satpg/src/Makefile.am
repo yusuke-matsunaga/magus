@@ -6,7 +6,6 @@ SUBDIRS = \
 	base \
 	main \
 	fsim \
-	fsim_old \
 	dtpg \
 	rtpg \
 	minpat \

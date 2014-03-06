@@ -38,7 +38,7 @@ noinst_HEADERS = \
 	FaultMgr.h \
 	FaultStatus.h \
 	Fsim.h \
-	FsimOld.h \
+	FsimOp2.h \
 	PackedVal.h \
 	Rtpg.h \
 	RtpgStats.h \

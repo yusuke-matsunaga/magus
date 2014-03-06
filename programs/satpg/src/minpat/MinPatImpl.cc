@@ -14,7 +14,6 @@
 #include "TestVector.h"
 #include "FaultMgr.h"
 #include "Fsim.h"
-#include "FsimOp1.h"
 #include "Fop2MinPat.h"
 #include "Fop2Rofsim.h"
 #include "utils/GcSolver.h"
@@ -57,53 +56,6 @@ MinPatImpl::MinPatImpl(TvMgr& tvmgr,
 // @brief デストラクタ
 MinPatImpl::~MinPatImpl()
 {
-}
-
-class RvFsimOp1 :
-  public FsimOp1
-{
-public:
-
-  RvFsimOp1(ymuint nall) :
-    mDetArray(nall)
-  {
-  }
-
-  void
-  init()
-  {
-    ymuint n = mDetArray.size();
-    for (ymuint i = 0; i < n; ++ i) {
-      mDetArray[i] = false;
-    }
-    mCount = 0;
-  }
-
-  virtual
-  void
-  operator()(TpgFault* f);
-
-  ymuint
-  det_count()
-  {
-    return mCount;
-  }
-
-private:
-
-  vector<bool> mDetArray;
-
-  ymuint32 mCount;
-
-};
-
-void
-RvFsimOp1::operator()(TpgFault* f)
-{
-  if ( !mDetArray[f->id()] ) {
-    mDetArray[f->id()] = true;
-    ++ mCount;
-  }
 }
 
 // @brief テストベクタの最小化を行なう．

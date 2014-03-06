@@ -8,7 +8,6 @@
 
 
 #include "FsimX2.h"
-#include "FsimOp1.h"
 #include "FsimOp2.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
