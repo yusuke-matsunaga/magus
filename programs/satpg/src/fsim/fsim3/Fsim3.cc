@@ -304,6 +304,12 @@ Fsim3::set_skip(TpgFault* f)
 {
 }
 
+// @brief すべての故障のスキップマークを消す．
+void
+Fsim3::clear_skip()
+{
+}
+
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] op_list FsimOp のリスト

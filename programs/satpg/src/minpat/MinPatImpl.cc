@@ -16,8 +16,11 @@
 #include "Fsim.h"
 #include "FsimOp1.h"
 #include "Fop2MinPat.h"
+#include "Fop2Rofsim.h"
 #include "utils/GcSolver.h"
 #include "utils/RandGen.h"
+#include "utils/RandPermGen.h"
+#include "Verifier.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -118,20 +121,121 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
   ymuint orig_num = tv_list.size();
 
+  Verifier ver(mFaultMgr, mFsim3);
+
+  if ( 0 ) {
+    if ( ver.check(tv_list) ) {
+      cout << "No Errors(1)" << endl;
+    }
+  }
+
   // 3値のパタンを抜き出し tv3_list に入れる．
   // 2値のパタンは tv2_list に入れる．
   vector<TestVector*> tv2_list;
-  vector<TestVector*> tv3_list;
+  vector<TestVector*> tv3_tmp_list;
   tv2_list.reserve(orig_num);
-  tv3_list.reserve(orig_num);
+  tv3_tmp_list.reserve(orig_num);
   for (vector<TestVector*>::iterator p = tv_list.begin();
        p != tv_list.end(); ++ p) {
     TestVector* tv = *p;
     if ( tv->x_num() > 0 ) {
-      tv3_list.push_back(tv);
+      tv3_tmp_list.push_back(tv);
     }
     else {
       tv2_list.push_back(tv);
+    }
+  }
+
+  vector<TestVector*> tv3_list;
+  tv3_list.reserve(tv3_tmp_list.size());
+  {
+    Fop2Rofsim op(mFsim3, mFaultMgr);
+    vector<FsimOp2*> op_list(1, &op);
+
+    op.clear_count();
+
+    // tv3_list のパタンを用いて逆順故障シミュレーションを行なう．
+    vector<TestVector*> cur_array;
+    cur_array.reserve(kPvBitLen);
+    for (vector<TestVector*>::reverse_iterator p = tv3_tmp_list.rbegin();
+	 p != tv3_tmp_list.rend(); ++ p) {
+      TestVector* tv = *p;
+      cur_array.push_back(tv);
+      if ( cur_array.size() == kPvBitLen ) {
+	mFsim3.ppsfp(cur_array, op_list);
+	PackedVal d = op.det_bits();
+	for (ymuint i = 0; i < kPvBitLen; ++ i) {
+	  if ( d & (1UL << i) ) {
+	    tv3_list.push_back(cur_array[i]);
+	  }
+	}
+	cur_array.clear();
+      }
+    }
+    if ( cur_array.size() > 0 ) {
+      mFsim3.ppsfp(cur_array, op_list);
+      PackedVal d = op.det_bits();
+      for (ymuint i = 0; i < cur_array.size(); ++ i) {
+	if ( d & (1UL << i) ) {
+	  tv3_list.push_back(cur_array[i]);
+	}
+      }
+    }
+  }
+
+  // ランダムに順序を入れ替えて故障シミュレーションを行う．
+  RandGen rg;
+  for ( ; ; ) {
+    ymuint orig_num = tv3_list.size();
+    vector<TestVector*> tv3_tmp_list(tv3_list);
+    tv3_list.clear();
+    ymuint n = tv3_tmp_list.size();
+    RandPermGen rpg(n);
+    rpg.generate(rg);
+
+    Fop2Rofsim op(mFsim3, mFaultMgr);
+    vector<FsimOp2*> op_list(1, &op);
+
+    op.clear_count();
+
+    vector<TestVector*> cur_array;
+    cur_array.reserve(kPvBitLen);
+    for (ymuint i = 0; i < n; ++ i) {
+      TestVector* tv = tv3_tmp_list[rpg.elem(i)];
+      cur_array.push_back(tv);
+      if ( cur_array.size() == kPvBitLen ) {
+	mFsim3.ppsfp(cur_array, op_list);
+	PackedVal d = op.det_bits();
+	for (ymuint i = 0; i < kPvBitLen; ++ i) {
+	  if ( d & (1UL << i) ) {
+	    tv3_list.push_back(cur_array[i]);
+	  }
+	}
+	cur_array.clear();
+      }
+    }
+    if ( cur_array.size() > 0 ) {
+      mFsim3.ppsfp(cur_array, op_list);
+      PackedVal d = op.det_bits();
+      for (ymuint i = 0; i < cur_array.size(); ++ i) {
+	if ( d & (1UL << i) ) {
+	  tv3_list.push_back(cur_array[i]);
+	}
+      }
+    }
+    if ( 0 ) {
+      cout << "  " << tv3_list.size() << endl;
+    }
+
+    if ( orig_num == tv3_list.size() ) {
+      break;
+    }
+  }
+  cout << "Reverse Order Fault Simulation end: " << tv3_list.size() << " / " << tv3_tmp_list.size() << endl;
+  if ( 0 ) {
+    // 検証しておく．
+    if ( ver.check(tv3_list) ) {
+      cout << "No Errors(2)" << endl;
     }
   }
 
@@ -179,13 +283,20 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       tv2_list.push_back(new_tv);
     }
   }
+  if ( 0 ) {
+    // 検証しておく．
+    if ( ver.check(tv2_list) ) {
+      cout << "No Errors(3)" << endl;
+    }
+  }
 
+#if 0
   // tv2_list のパタンを用いて故障シミュレーションを行なう．
   Fop2MinPat op(mFsim2, mFaultMgr);
   vector<FsimOp2*> op_list(1, &op);
 
   op.clear_count();
-  op.set_limit(10);
+  op.set_limit(100);
 
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
@@ -205,13 +316,110 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     mFsim2.ppsfp(cur_array, op_list);
     cur_array.clear();
   }
-
+#endif
   cout << "Graph Coloring End: " << tv2_list.size() << endl;
 
   // 最小被覆問題を解く．
   tv_list = tv2_list;
+#if 1
+  {
+    vector<TestVector*> tv_tmp_list(tv_list);
+    tv_list.clear();
+    ymuint n = tv_tmp_list.size();
+    RandPermGen rpg(n);
+    rpg.generate(rg);
+
+    Fop2Rofsim op(mFsim2, mFaultMgr);
+    vector<FsimOp2*> op_list(1, &op);
+
+    op.clear_count();
+
+    vector<TestVector*> cur_array;
+    cur_array.reserve(kPvBitLen);
+    for (ymuint i = 0; i < n; ++ i) {
+      TestVector* tv = tv_tmp_list[n - i - 1];
+      cur_array.push_back(tv);
+      if ( cur_array.size() == kPvBitLen ) {
+	mFsim2.ppsfp(cur_array, op_list);
+	PackedVal d = op.det_bits();
+	for (ymuint i = 0; i < kPvBitLen; ++ i) {
+	  if ( d & (1UL << i) ) {
+	    tv_list.push_back(cur_array[i]);
+	  }
+	}
+	cur_array.clear();
+      }
+    }
+    if ( !cur_array.empty() ) {
+      mFsim2.ppsfp(cur_array, op_list);
+      PackedVal d = op.det_bits();
+      for (ymuint i = 0; i < cur_array.size(); ++ i) {
+	if ( d & (1UL << i) ) {
+	  tv_list.push_back(cur_array[i]);
+	}
+      }
+    }
+    cout << "  " << tv_list.size() << endl;
+  }
+  ymuint s_count = 0;
+  for ( ; ; ) {
+    ymuint orig_num = tv_list.size();
+    vector<TestVector*> tv_tmp_list(tv_list);
+    tv_list.clear();
+    ymuint n = tv_tmp_list.size();
+    RandPermGen rpg(n);
+    rpg.generate(rg);
+
+    Fop2Rofsim op(mFsim2, mFaultMgr);
+    vector<FsimOp2*> op_list(1, &op);
+
+    op.clear_count();
+
+    vector<TestVector*> cur_array;
+    cur_array.reserve(kPvBitLen);
+    for (ymuint i = 0; i < n; ++ i) {
+      TestVector* tv = tv_tmp_list[rpg.elem(i)];
+      cur_array.push_back(tv);
+      if ( cur_array.size() == kPvBitLen ) {
+	mFsim2.ppsfp(cur_array, op_list);
+	PackedVal d = op.det_bits();
+	for (ymuint i = 0; i < kPvBitLen; ++ i) {
+	  if ( d & (1UL << i) ) {
+	    tv_list.push_back(cur_array[i]);
+	  }
+	}
+	cur_array.clear();
+      }
+    }
+    if ( !cur_array.empty() ) {
+      mFsim2.ppsfp(cur_array, op_list);
+      PackedVal d = op.det_bits();
+      for (ymuint i = 0; i < cur_array.size(); ++ i) {
+	if ( d & (1UL << i) ) {
+	  tv_list.push_back(cur_array[i]);
+	}
+      }
+    }
+    if ( orig_num == tv_list.size() ) {
+      ++ s_count;
+      if ( s_count == 5 ) {
+	break;
+      }
+    }
+    else {
+      s_count = 0;
+    }
+    cout << "  " << tv_list.size() << endl;
+  }
 
   cout << "Minimum Covering End: " << tv_list.size() << endl;
+#endif
+  {
+    // 検証しておく．
+    if ( ver.check(tv_list) ) {
+      cout << "No Errors(4)" << endl;
+    }
+  }
 
   local_timer.stop();
   USTime time = local_timer.time();

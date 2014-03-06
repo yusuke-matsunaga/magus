@@ -33,10 +33,17 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 根のノードをセットする．
   void
   set_root(SimNode* root);
+
+  /// @brief undet_list をもとにもどす．
+  void
+  init_undet_list();
 
   /// @brief 根のノードを得る．
   SimNode*
@@ -45,6 +52,10 @@ public:
   /// @brief この FFR に属する故障のリストを返す．
   vector<FsimFault*>&
   fault_list();
+
+  /// @brief この FFR に属する未検出の故障のリストを返す．
+  vector<FsimFault*>&
+  undet_list();
 
 
 private:
@@ -57,6 +68,9 @@ private:
 
   // この FFR に属する故障のリスト
   vector<FsimFault*> mFaultList;
+
+  // 未検出の故障のリスト
+  vector<FsimFault*> mUndetList;
 
 };
 
@@ -85,6 +99,14 @@ SimFFR::set_root(SimNode* root)
   mRoot = root;
 }
 
+// @brief undet_list をもとにもどす．
+inline
+void
+SimFFR::init_undet_list()
+{
+  mUndetList = mFaultList;
+}
+
 // @brief 根のノードを得る．
 inline
 SimNode*
@@ -99,6 +121,14 @@ vector<FsimFault*>&
 SimFFR::fault_list()
 {
   return mFaultList;
+}
+
+// @brief この FFR に属する未検出の故障のリストを返す．
+inline
+vector<FsimFault*>&
+SimFFR::undet_list()
+{
+  return mUndetList;
 }
 
 END_NAMESPACE_YM_SATPG_FSIMX2

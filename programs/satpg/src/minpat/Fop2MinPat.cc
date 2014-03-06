@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_SATPG
 Fop2MinPat::Fop2MinPat(Fsim& fsim,
 		       FaultMgr& fmgr) :
   mFsim(fsim),
-   mLimit(1),
+  mLimit(1),
   mFinfoArray(fmgr.all_num())
 {
 }
@@ -48,11 +48,12 @@ Fop2MinPat::operator()(TpgFault* f,
     if ( dpat & (1UL << i) ) {
       finfo.mPatList.push_back(mCurPatList[i]);
       ++ finfo.mDetCount;
+      if ( finfo.mDetCount >= mLimit ) {
+	// 規定回数以上検出されたので以後のシミュレーションではスキップする．
+	mFsim.set_skip(f);
+	break;
+      }
     }
-  }
-  if ( finfo.mDetCount >= mLimit ) {
-    // 規定回数以上検出されたので以後のシミュレーションではスキップする．
-    mFsim.set_skip(f);
   }
 }
 
@@ -66,6 +67,7 @@ Fop2MinPat::clear_count()
     finfo.mDetCount = 0;
     finfo.mPatList.clear();
   }
+  mFsim.clear_skip();
 }
 
 // @brief 検出回数のしきい値をセットする．

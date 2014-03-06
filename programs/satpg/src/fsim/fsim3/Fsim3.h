@@ -56,6 +56,11 @@ public:
   void
   set_skip(TpgFault* f);
 
+  /// @brief すべての故障のスキップマークを消す．
+  virtual
+  void
+  clear_skip();
+
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] op_list FsimOp1 のリスト

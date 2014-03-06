@@ -304,6 +304,18 @@ Fsim2::set_skip(TpgFault* f)
   mFaultArray[f->id()]->mSkip = true;
 }
 
+// @brief すべての故障のスキップマークを消す．
+void
+Fsim2::clear_skip()
+{
+  ymuint n = mFaultArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( mFaultArray[i] ) {
+      mFaultArray[i]->mSkip = false;
+    }
+  }
+}
+
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
 // @param[in] op_list FsimOp1 のリスト
