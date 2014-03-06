@@ -55,6 +55,48 @@ Fop1Ver::is_detected(TpgFault* f)
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス Fop2Ver
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] fsim 故障シミュレータ
+Fop2Ver::Fop2Ver(Fsim& fsim) :
+  mFsim(fsim)
+{
+}
+
+// @brief デeストラクタ
+Fop2Ver::~Fop2Ver()
+{
+}
+
+// @brief 故障を検出したときの処理
+// @param[in] f 故障
+void
+Fop2Ver::operator()(TpgFault* f,
+		    PackedVal dpat)
+{
+  mFsim.set_skip(f);
+  mDetSet.insert(f);
+}
+
+// @brief det_flag を下ろす．
+void
+Fop2Ver::clear_det_flag()
+{
+  mFsim.clear_skip();
+  mDetSet.clear();
+}
+
+// @brief 故障が見つかったら true を返す．
+bool
+Fop2Ver::is_detected(TpgFault* f)
+{
+  return mDetSet.count(f) > 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス Verifier
 //////////////////////////////////////////////////////////////////////
 
@@ -65,7 +107,8 @@ Verifier::Verifier(FaultMgr& fault_mgr,
 		   Fsim& fsim) :
   mFaultMgr(fault_mgr),
   mFsim(fsim),
-  mOp(fsim)
+  mOp(fsim),
+  mOp2(fsim)
 {
 }
 
@@ -79,13 +122,13 @@ Verifier::~Verifier()
 bool
 Verifier::check(const vector<TestVector*>& pat_list)
 {
-  vector<FsimOp1*> op_list(1, &mOp);
+#if 1
   mOp.clear_det_flag();
   mFsim.clear_skip();
   for (vector<TestVector*>::const_iterator p = pat_list.begin();
        p != pat_list.end(); ++ p) {
     TestVector* tv = *p;
-    mFsim.sppfp(tv, op_list);
+    mFsim.sppfp(tv, mOp);
   }
 
   bool no_error = true;
@@ -98,7 +141,35 @@ Verifier::check(const vector<TestVector*>& pat_list)
       no_error = false;
     }
   }
+#else
+  mOp2.clear_det_flag();
+  mFsim.clear_skip();
+  vector<TestVector*> cur_array;
+  cur_array.reserve(kPvBitLen);
+  for (vector<TestVector*>::const_iterator p = pat_list.begin();
+       p != pat_list.end(); ++ p) {
+    TestVector* tv = *p;
+    cur_array.push_back(tv);
+    if ( cur_array.size() == kPvBitLen ) {
+      mFsim.ppsfp(cur_array, mOp2);
+      cur_array.clear();
+    }
+  }
+  if ( !cur_array.empty() ) {
+    mFsim.ppsfp(cur_array, mOp2);
+  }
 
+  bool no_error = true;
+  const vector<TpgFault*>& f_list = mFaultMgr.det_list();
+  for (vector<TpgFault*>::const_iterator p = f_list.begin();
+       p != f_list.end(); ++ p) {
+    TpgFault* f = *p;
+    if ( !mOp2.is_detected(f) ) {
+      cout << "Error: " << f << " has no patterns" << endl;
+      no_error = false;
+    }
+  }
+#endif
   return no_error;
 }
 

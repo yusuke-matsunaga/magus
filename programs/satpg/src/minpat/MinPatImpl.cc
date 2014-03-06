@@ -150,7 +150,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   tv3_list.reserve(tv3_tmp_list.size());
   {
     Fop2Rofsim op(mFsim3, mFaultMgr);
-    vector<FsimOp2*> op_list(1, &op);
 
     op.clear_count();
 
@@ -162,7 +161,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       TestVector* tv = *p;
       cur_array.push_back(tv);
       if ( cur_array.size() == kPvBitLen ) {
-	mFsim3.ppsfp(cur_array, op_list);
+	mFsim3.ppsfp(cur_array, op);
 	PackedVal d = op.det_bits();
 	for (ymuint i = 0; i < kPvBitLen; ++ i) {
 	  if ( d & (1UL << i) ) {
@@ -173,7 +172,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       }
     }
     if ( cur_array.size() > 0 ) {
-      mFsim3.ppsfp(cur_array, op_list);
+      mFsim3.ppsfp(cur_array, op);
       PackedVal d = op.det_bits();
       for (ymuint i = 0; i < cur_array.size(); ++ i) {
 	if ( d & (1UL << i) ) {
@@ -194,7 +193,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     rpg.generate(rg);
 
     Fop2Rofsim op(mFsim3, mFaultMgr);
-    vector<FsimOp2*> op_list(1, &op);
 
     op.clear_count();
 
@@ -204,7 +202,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       TestVector* tv = tv3_tmp_list[rpg.elem(i)];
       cur_array.push_back(tv);
       if ( cur_array.size() == kPvBitLen ) {
-	mFsim3.ppsfp(cur_array, op_list);
+	mFsim3.ppsfp(cur_array, op);
 	PackedVal d = op.det_bits();
 	for (ymuint i = 0; i < kPvBitLen; ++ i) {
 	  if ( d & (1UL << i) ) {
@@ -215,7 +213,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       }
     }
     if ( cur_array.size() > 0 ) {
-      mFsim3.ppsfp(cur_array, op_list);
+      mFsim3.ppsfp(cur_array, op);
       PackedVal d = op.det_bits();
       for (ymuint i = 0; i < cur_array.size(); ++ i) {
 	if ( d & (1UL << i) ) {
@@ -293,7 +291,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 #if 0
   // tv2_list のパタンを用いて故障シミュレーションを行なう．
   Fop2MinPat op(mFsim2, mFaultMgr);
-  vector<FsimOp2*> op_list(1, &op);
 
   op.clear_count();
   op.set_limit(100);
@@ -307,13 +304,13 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
       op.set_pattern(cur_array);
-      mFsim2.ppsfp(cur_array, op_list);
+      mFsim2.ppsfp(cur_array, op);
       cur_array.clear();
     }
   }
   if ( !cur_array.empty() ) {
     op.set_pattern(cur_array);
-    mFsim2.ppsfp(cur_array, op_list);
+    mFsim2.ppsfp(cur_array, op);
     cur_array.clear();
   }
 #endif
@@ -321,7 +318,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
   // 最小被覆問題を解く．
   tv_list = tv2_list;
-#if 1
+
   {
     vector<TestVector*> tv_tmp_list(tv_list);
     tv_list.clear();
@@ -330,7 +327,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     rpg.generate(rg);
 
     Fop2Rofsim op(mFsim2, mFaultMgr);
-    vector<FsimOp2*> op_list(1, &op);
 
     op.clear_count();
 
@@ -340,7 +336,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       TestVector* tv = tv_tmp_list[n - i - 1];
       cur_array.push_back(tv);
       if ( cur_array.size() == kPvBitLen ) {
-	mFsim2.ppsfp(cur_array, op_list);
+	mFsim2.ppsfp(cur_array, op);
 	PackedVal d = op.det_bits();
 	for (ymuint i = 0; i < kPvBitLen; ++ i) {
 	  if ( d & (1UL << i) ) {
@@ -351,7 +347,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       }
     }
     if ( !cur_array.empty() ) {
-      mFsim2.ppsfp(cur_array, op_list);
+      mFsim2.ppsfp(cur_array, op);
       PackedVal d = op.det_bits();
       for (ymuint i = 0; i < cur_array.size(); ++ i) {
 	if ( d & (1UL << i) ) {
@@ -359,7 +355,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 	}
       }
     }
-    cout << "  " << tv_list.size() << endl;
   }
   ymuint s_count = 0;
   for ( ; ; ) {
@@ -371,7 +366,6 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     rpg.generate(rg);
 
     Fop2Rofsim op(mFsim2, mFaultMgr);
-    vector<FsimOp2*> op_list(1, &op);
 
     op.clear_count();
 
@@ -381,7 +375,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       TestVector* tv = tv_tmp_list[rpg.elem(i)];
       cur_array.push_back(tv);
       if ( cur_array.size() == kPvBitLen ) {
-	mFsim2.ppsfp(cur_array, op_list);
+	mFsim2.ppsfp(cur_array, op);
 	PackedVal d = op.det_bits();
 	for (ymuint i = 0; i < kPvBitLen; ++ i) {
 	  if ( d & (1UL << i) ) {
@@ -392,7 +386,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       }
     }
     if ( !cur_array.empty() ) {
-      mFsim2.ppsfp(cur_array, op_list);
+      mFsim2.ppsfp(cur_array, op);
       PackedVal d = op.det_bits();
       for (ymuint i = 0; i < cur_array.size(); ++ i) {
 	if ( d & (1UL << i) ) {
@@ -409,11 +403,10 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     else {
       s_count = 0;
     }
-    cout << "  " << tv_list.size() << endl;
   }
 
   cout << "Minimum Covering End: " << tv_list.size() << endl;
-#endif
+
   {
     // 検証しておく．
     if ( ver.check(tv_list) ) {

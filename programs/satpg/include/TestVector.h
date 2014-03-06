@@ -22,6 +22,10 @@ class SaFault;
 //////////////////////////////////////////////////////////////////////
 /// @class TestVector TestVector.h "TestVector.h"
 /// @brief テストベクタを表すクラス
+///
+/// 基本的には3値(0, 1, X)のベクタを表している．
+/// 生成/破壊は TvMgr のみが行う．
+/// おなじ TvMgr が扱うテストベクタのサイズはすべて同じ．
 //////////////////////////////////////////////////////////////////////
 class TestVector
 {
@@ -37,7 +41,7 @@ public:
   input_num() const;
 
   /// @brief pos 番めの値を得る．
-  /// @param[in] pos 入力の位置番号
+  /// @param[in] pos 入力の位置番号 ( 0 <= pos < input_num() )
   Val3
   val3(ymuint pos) const;
 
@@ -46,6 +50,9 @@ public:
   x_num() const;
 
   /// @brief 2つのベクタが両立しないとき true を返す．
+  /// @param[in] tv1, tv2 対象のテストベクタ
+  ///
+  /// 同じビット位置にそれぞれ 0 と 1 を持つ場合が両立しない場合．
   static
   bool
   is_conflict(const TestVector& tv1,
@@ -72,21 +79,14 @@ public:
   bool
   operator<=(const TestVector& right) const;
 
-  /// @brief 内容を BIN 形式で出力する．
-  /// @param[in] s 出力先のストリーム
-  void
-  dump_bin(ostream& s) const;
+  /// @brief 内容を BIN 形式で表す．
+  string
+  bin_str() const;
 
-  /// @brief 内容を HEX 形式で出力する．
+  /// @brief 内容を HEX 形式で表す．
   /// @note X を含む場合の出力は不定
-  /// @param[in] s 出力先のストリーム
-  void
-  dump_hex(ostream& s) const;
-
-  /// @brief 暫定的に用意する関数
-  /// @param[in] fp ファイルポインタ
-  void
-  dump(FILE* fp) const;
+  string
+  hex_str() const;
 
 
 public:
@@ -99,7 +99,7 @@ public:
   init();
 
   /// @breif pos 番めの値を設定する．
-  /// @param[in] pos 入力の位置番号
+  /// @param[in] pos 入力の位置番号 ( 0 <= pos < input_num() )
   /// @param[in] val 値
   void
   set_val(ymuint pos,
@@ -189,12 +189,12 @@ private:
   const TestVector&
   operator=(const TestVector& src);
 
-
+#if 0
 public:
 
   // 暫定的に用意するメンバ
   int det_count;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -361,8 +361,7 @@ ostream&
 operator<<(ostream& s,
 	   const TestVector& tv)
 {
-  tv.dump_bin(s);
-  return s;
+  return s << tv.bin_str();
 }
 
 // @brief 内容を出力する．
@@ -371,8 +370,7 @@ ostream&
 operator<<(ostream& s,
 	   const TestVector* tvp)
 {
-  tvp->dump_bin(s);
-  return s;
+  return s << tvp->bin_str();
 }
 
 END_NAMESPACE_YM_SATPG

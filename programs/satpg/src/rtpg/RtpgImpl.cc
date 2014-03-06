@@ -90,7 +90,6 @@ RtpgImpl::run(ymuint min_f,
   cur_array.reserve(kPvBitLen);
 
   Fop2Rtpg op(mFsim, mFaultMgr);
-  vector<FsimOp2*> op_list(1, &op);
 
   ymuint pat_num = 0;
   for ( ; ; ) {
@@ -109,7 +108,7 @@ RtpgImpl::run(ymuint min_f,
 
     op.clear_count();
 
-    mFsim.ppsfp(cur_array, op_list);
+    mFsim.ppsfp(cur_array, op);
 
     ymuint det_count = 0;
     for (ymuint i = 0; i < cur_array.size(); ++ i) {

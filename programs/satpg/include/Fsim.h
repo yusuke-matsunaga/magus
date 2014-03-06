@@ -46,19 +46,19 @@ public:
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[in] op_list FsimOp1 のリスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type1)
   virtual
   void
   sppfp(TestVector* tv,
-	const vector<FsimOp1*>& op_list) = 0;
+	FsimOp1& op) = 0;
 
   /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
-  /// @param[in] op_list FsimOp2 のリスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,
-	const vector<FsimOp2*>& dop_list) = 0;
+	FsimOp2& op) = 0;
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -77,6 +77,7 @@ public:
 // Fsim の派生クラスのインスタンスを生成する関数
 //////////////////////////////////////////////////////////////////////
 
+/// @brief 2値版の故障シミュレータ
 extern
 Fsim*
 new_Fsim2();

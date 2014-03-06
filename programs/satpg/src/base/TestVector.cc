@@ -267,28 +267,31 @@ TestVector::merge(const TestVector& src)
   return true;
 }
 
-// @brief 内容を BIN 形式で出力する．
-void
-TestVector::dump_bin(ostream& s) const
+// @brief 内容を BIN 形式で表す．
+string
+TestVector::bin_str() const
 {
   // よく問題になるが，ここでは最下位ビット側から出力する．
+  string ans;
   for (ymuint i = 0; i < input_num(); ++ i) {
     switch ( val3(i) ) {
-    case kVal0: s << '0'; break;
-    case kVal1: s << '1'; break;
-    case kValX: s << 'X'; break;
-    default:    s << '-'; break;
+    case kVal0: ans += '0'; break;
+    case kVal1: ans += '1'; break;
+    case kValX: ans += 'X'; break;
+    default:    ans += '-'; break; // ありえないけどバグで起こりうる．
     }
   }
+  return ans;
 }
 
 // @brief 内容を HEX 形式で出力する．
-void
-TestVector::dump_hex(ostream& s) const
+string
+TestVector::hex_str() const
 {
   // よく問題になるが，ここでは最下位ビット側から出力する．
   ymuint tmp = 0U;
   ymuint bit = 1U;
+  string ans;
   for (ymuint i = 0; ; ++ i) {
     if ( i < input_num() ) {
       if ( val3(i) == kVal1 ) {
@@ -305,24 +308,15 @@ TestVector::dump_hex(ostream& s) const
     }
 
     if ( tmp <= 9 ) {
-      s << static_cast<char>('0' + tmp);
+      ans += static_cast<char>('0' + tmp);
     }
     else {
-      s << static_cast<char>('A' + tmp - 10);
+      ans += static_cast<char>('A' + tmp - 10);
     }
     bit = 1U;
     tmp = 0U;
   }
-}
-
-// 暫定的に用意する関数
-void
-TestVector::dump(FILE* fp) const
-{
-  for (ymuint i = 0; i < input_num(); ++ i) {
-    putc((val3(i) == kVal1 ? '1' : '0'), fp);
-  }
-  putc('\n', fp);
+  return ans;
 }
 
 END_NAMESPACE_YM_SATPG

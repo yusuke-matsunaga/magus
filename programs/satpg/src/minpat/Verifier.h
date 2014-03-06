@@ -12,6 +12,7 @@
 #include "FaultMgr.h"
 #include "TestVector.h"
 #include "FsimOp1.h"
+#include "FsimOp2.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -40,6 +41,54 @@ public:
   virtual
   void
   operator()(TpgFault* f);
+
+  /// @brief det_flag を下ろす．
+  void
+  clear_det_flag();
+
+  /// @brief 故障が見つかったら true を返す．
+  bool
+  is_detected(TpgFault* f);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 故障シミュレータ
+  Fsim& mFsim;
+
+  // 検出済みの故障を入れるハッシュ
+  unordered_set<TpgFault*> mDetSet;
+
+};
+
+class Fop2Ver :
+  public FsimOp2
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] fsim 故障シミュレータ
+  Fop2Ver(Fsim& fsim);
+
+  /// @brief デストラクタ
+  virtual
+  ~Fop2Ver();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 故障を検出したときの処理
+  /// @param[in] f 故障
+  virtual
+  void
+  operator()(TpgFault* f,
+	     PackedVal dpat);
 
   /// @brief det_flag を下ろす．
   void
@@ -106,6 +155,7 @@ private:
 
   Fop1Ver mOp;
 
+  Fop2Ver mOp2;
 };
 
 END_NAMESPACE_YM_SATPG

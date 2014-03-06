@@ -64,19 +64,19 @@ public:
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[in] op_list FsimOp1 のリスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type1)
   virtual
   void
   sppfp(TestVector* tv,
-	const vector<FsimOp1*>& op_list);
+	FsimOp1& op);
 
   /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
-  /// @param[in] op_list FsimOp2 のリスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,
-	const vector<FsimOp2*>& dop_list);
+	FsimOp2& op);
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -105,7 +105,7 @@ private:
   /// @brief ffr 内の故障が検出可能か調べる．
   void
   fault_sweep(SimFFR* ffr,
-	      const vector<FsimOp1*>& op_list);
+	      FsimOp1& op);
 
 
 private:

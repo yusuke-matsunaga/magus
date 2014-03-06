@@ -333,10 +333,10 @@ FsimX2::clear_skip()
 
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
-// @param[in] op_list FsimOp1 のリスト
+// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type1)
 void
 FsimX2::sppfp(TestVector* tv,
-	      const vector<FsimOp1*>& op_list)
+	      FsimOp1& op)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -383,7 +383,7 @@ FsimX2::sppfp(TestVector* tv,
 
     if ( root->is_output() ) {
       // 常に観測可能
-      fault_sweep(ffr, op_list);
+      fault_sweep(ffr, op);
       continue;
     }
 
@@ -404,7 +404,7 @@ FsimX2::sppfp(TestVector* tv,
       PackedVal obs = calc_fval();
       for (ymuint i = 0; i < bitpos; ++ i, obs >>= 1) {
 	if ( obs & 1UL ) {
-	  fault_sweep(ffr_buff[i], op_list);
+	  fault_sweep(ffr_buff[i], op);
 	}
       }
       bitpos = 0;
@@ -415,7 +415,7 @@ FsimX2::sppfp(TestVector* tv,
     PackedVal obs = calc_fval();
     for (ymuint i = 0; i < bitpos; ++ i, obs >>= 1) {
       if ( obs & 1UL ) {
-	fault_sweep(ffr_buff[i], op_list);
+	fault_sweep(ffr_buff[i], op);
       }
     }
   }
@@ -426,10 +426,10 @@ FsimX2::sppfp(TestVector* tv,
 
 // @brief 複数のパタンで故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
-// @param[in] op_list FsimOp2 のリスト
+// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
 void
 FsimX2::ppsfp(const vector<TestVector*>& tv_array,
-	      const vector<FsimOp2*>& op_list)
+	      FsimOp2& op)
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
@@ -536,11 +536,7 @@ FsimX2::ppsfp(const vector<TestVector*>& tv_array,
       PackedVal dbits = obs & ff->mObsMask;
       if ( dbits ) {
 	TpgFault* f = ff->mOrigF;
-	for (vector<FsimOp2*>::const_iterator q = op_list.begin();
-	     q != op_list.end(); ++ q) {
-	  FsimOp2& op = **q;
-	  op(f, dbits);
-	}
+	op(f, dbits);
       }
     }
   }
@@ -798,7 +794,7 @@ FsimX2::calc_fval()
 // @brief ffr 内の故障が検出可能か調べる．
 void
 FsimX2::fault_sweep(SimFFR* ffr,
-		    const vector<FsimOp1*>& op_list)
+		    FsimOp1& op)
 {
   const vector<FsimFault*>& flist = ffr->undet_list();
   for (vector<FsimFault*>::const_iterator p = flist.begin();
@@ -809,11 +805,7 @@ FsimX2::fault_sweep(SimFFR* ffr,
     }
     if ( ff->mObsMask ) {
       TpgFault* f = ff->mOrigF;
-      for (vector<FsimOp1*>::const_iterator p_op = op_list.begin();
-	   p_op != op_list.end(); ++ p_op) {
-	FsimOp1& op = **p_op;
-	op(f);
-      }
+      op(f);
     }
   }
 }

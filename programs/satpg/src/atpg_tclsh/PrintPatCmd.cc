@@ -55,10 +55,10 @@ PrintPatCmd::cmd_proc(TclObjVector& objv)
       cout << setw(5) << setfill('0') << (i + 1) << ": ";
     }
     if ( hex_flag ) {
-      tv->dump_hex(cout);
+      cout << tv->hex_str();
     }
     else {
-      tv->dump_bin(cout);
+      cout << tv->bin_str();
     }
     cout << endl;
   }
