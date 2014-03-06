@@ -1,8 +1,8 @@
-#ifndef FSIMOP2_H
-#define FSIMOP2_H
+#ifndef FSIMOP_H
+#define FSIMOP_H
 
-/// @file FsimOp2.h
-/// @brief FsimOp2 のヘッダファイル
+/// @file FsimOp.h
+/// @brief FsimOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
@@ -16,16 +16,16 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class FsimOp2 FsimOp2.h "FsimOp2.h"
-/// @brief Fsim で故障を検出した時の処理を行なうファンクタ
+/// @class FsimOp FsimOp.h "FsimOp.h"
+/// @brief Fsim::ppsfp() で故障を検出した時の処理を行なうファンクタ
 //////////////////////////////////////////////////////////////////////
-class FsimOp2
+class FsimOp
 {
 public:
 
   /// @brief デストラクタ
   virtual
-  ~FsimOp2() { }
+  ~FsimOp() { }
 
 
 public:

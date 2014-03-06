@@ -8,7 +8,7 @@
 
 
 #include "FsimX2.h"
-#include "FsimOp2.h"
+#include "FsimOp.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
@@ -428,7 +428,7 @@ FsimX2::sppfp(TestVector* tv,
 // @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
 void
 FsimX2::ppsfp(const vector<TestVector*>& tv_array,
-	      FsimOp2& op)
+	      FsimOp& op)
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();

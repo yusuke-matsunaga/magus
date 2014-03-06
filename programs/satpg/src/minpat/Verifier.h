@@ -11,23 +11,28 @@
 #include "Fsim.h"
 #include "FaultMgr.h"
 #include "TestVector.h"
-#include "FsimOp2.h"
+#include "FsimOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-class Fop2Ver :
-  public FsimOp2
+//////////////////////////////////////////////////////////////////////
+/// @class FopVer Verifier.h "Verifier.h"
+/// @brief Verifier で用いられる FsimOp
+//////////////////////////////////////////////////////////////////////
+
+class FopVer :
+  public FsimOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] fsim 故障シミュレータ
-  Fop2Ver(Fsim& fsim);
+  FopVer(Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
-  ~Fop2Ver();
+  ~FopVer();
 
 
 public:
@@ -105,7 +110,7 @@ private:
   // 故障シミュレータ
   Fsim& mFsim;
 
-  Fop2Ver mOp2;
+  FopVer mOp;
 };
 
 END_NAMESPACE_YM_SATPG

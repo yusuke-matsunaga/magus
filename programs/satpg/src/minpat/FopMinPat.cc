@@ -1,13 +1,13 @@
 
-/// @file Fop2MinPat.cc
-/// @brief Fop2MinPat の実装ファイル
+/// @file FopMinPat.cc
+/// @brief FopMinPat の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Fop2MinPat.h"
+#include "FopMinPat.h"
 #include "Fsim.h"
 #include "FaultMgr.h"
 #include "TpgFault.h"
@@ -16,14 +16,14 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス Fop2MinPat
+// クラス FopMinPat
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
 // @param[in] fmgr 故障マネージャ
-Fop2MinPat::Fop2MinPat(Fsim& fsim,
-		       FaultMgr& fmgr) :
+FopMinPat::FopMinPat(Fsim& fsim,
+		     FaultMgr& fmgr) :
   mFsim(fsim),
   mLimit(1),
   mFinfoArray(fmgr.all_num())
@@ -31,7 +31,7 @@ Fop2MinPat::Fop2MinPat(Fsim& fsim,
 }
 
 // @brief デストラクタ
-Fop2MinPat::~Fop2MinPat()
+FopMinPat::~FopMinPat()
 {
 }
 
@@ -39,8 +39,8 @@ Fop2MinPat::~Fop2MinPat()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-Fop2MinPat::operator()(TpgFault* f,
-		       PackedVal dpat)
+FopMinPat::operator()(TpgFault* f,
+		      PackedVal dpat)
 {
   ymuint f_id = f->id();
   FaultInfo& finfo = mFinfoArray[f_id];
@@ -59,7 +59,7 @@ Fop2MinPat::operator()(TpgFault* f,
 
 // @brief 検出回数をクリアする．
 void
-Fop2MinPat::clear_count()
+FopMinPat::clear_count()
 {
   ymuint n = mFinfoArray.size();
   for (ymuint i = 0; i < n; ++ i) {
@@ -72,14 +72,14 @@ Fop2MinPat::clear_count()
 
 // @brief 検出回数のしきい値をセットする．
 void
-Fop2MinPat::set_limit(ymuint limit)
+FopMinPat::set_limit(ymuint limit)
 {
   mLimit = limit;
 }
 
 // @brief パタンをセットする．
 void
-Fop2MinPat::set_pattern(const vector<TestVector*>& pat_list)
+FopMinPat::set_pattern(const vector<TestVector*>& pat_list)
 {
   mCurPatList = pat_list;
 }
@@ -87,7 +87,7 @@ Fop2MinPat::set_pattern(const vector<TestVector*>& pat_list)
 // @brief 故障に対するパタンのリストを返す．
 // @param[in] f_id 故障の ID
 const vector<TestVector*>&
-Fop2MinPat::pat_list(ymuint f_id)
+FopMinPat::pat_list(ymuint f_id)
 {
   return mFinfoArray[f_id].mPatList;
 }

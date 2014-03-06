@@ -1,37 +1,37 @@
-#ifndef FOP2MINPAT_H
-#define FOP2MINPAT_H
+#ifndef FOPROFSIM_H
+#define FOPROFSIM_H
 
-/// @file Fop2MinPat.h
-/// @brief Fop2MinPat のヘッダファイル
+/// @file FopRofsim.h
+/// @brief FopRofsim のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "FsimOp2.h"
+#include "FsimOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class Fop2MinPat Fop2MinPat.h "Fop2MinPat.h"
-/// @brief MinPat で用いる FsimOp2
+/// @class FopRofsim FopRofsim.h "FopRofsim.h"
+/// @brief Rofsim で用いる FsimOp2
 //////////////////////////////////////////////////////////////////////
-class Fop2MinPat :
-  public FsimOp2
+class FopRofsim :
+  public FsimOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] fsim 故障シミュレータ
   /// @param[in] fmgr 故障マネージャ
-  Fop2MinPat(Fsim& fsim,
+  FopRofsim(Fsim& fsim,
 	     FaultMgr& fmgr);
 
   /// @brief デストラクタ
   virtual
-  ~Fop2MinPat();
+  ~FopRofsim();
 
 
 public:
@@ -51,37 +51,9 @@ public:
   void
   clear_count();
 
-  /// @brief 検出回数のしきい値をセットする．
-  void
-  set_limit(ymuint limit);
-
-  /// @brief パタンをセットする．
-  void
-  set_pattern(const vector<TestVector*>& pat_list);
-
-  /// @brief 故障に対するパタンのリストを返す．
-  /// @param[in] f_id 故障の ID
-  const vector<TestVector*>&
-  pat_list(ymuint f_id);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // １つの故障に関連した情報
-  struct FaultInfo {
-
-    FaultInfo() { }
-
-    // 検出回数
-    ymuint32 mDetCount;
-
-    // 検出するパタンのリスト
-    vector<TestVector*> mPatList;
-
-  };
+  /// @brief 今のパタンで新たに故障検出が行えたかを表すビットベクタを返す．
+  PackedVal
+  det_bits();
 
 
 private:
@@ -92,18 +64,15 @@ private:
   // 故障シミュレータ
   Fsim& mFsim;
 
-  // しきい値
-  ymuint32 mLimit;
-
-  // 現在のパタンリスト
-  vector<TestVector*> mCurPatList;
-
-  // 故障に関連した情報の配列
+  // 故障の検出状態を示すフラグの配列
   // 故障のIDでインデクシングされている．
-  vector<FaultInfo> mFinfoArray;
+  vector<bool> mDetArray;
+
+  // 故障検出を行ったビット位置を表すビットベクタ
+  PackedVal mDetBits;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // FOP1MINPAT_H
+#endif // FOP1ROFSIM_H

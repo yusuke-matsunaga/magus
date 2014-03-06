@@ -14,7 +14,7 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "RtpgStats.h"
-#include "Fop2Rtpg.h"
+#include "FopRtpg.h"
 #include "utils/StopWatch.h"
 
 
@@ -89,7 +89,7 @@ RtpgImpl::run(ymuint min_f,
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  Fop2Rtpg op(mFsim, mFaultMgr);
+  FopRtpg op(mFsim, mFaultMgr);
 
   ymuint pat_num = 0;
   for ( ; ; ) {

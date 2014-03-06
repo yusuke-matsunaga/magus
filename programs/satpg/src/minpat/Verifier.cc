@@ -13,26 +13,26 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス Fop2Ver
+// クラス FopVer
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
-Fop2Ver::Fop2Ver(Fsim& fsim) :
+FopVer::FopVer(Fsim& fsim) :
   mFsim(fsim)
 {
 }
 
 // @brief デeストラクタ
-Fop2Ver::~Fop2Ver()
+FopVer::~FopVer()
 {
 }
 
 // @brief 故障を検出したときの処理
 // @param[in] f 故障
 void
-Fop2Ver::operator()(TpgFault* f,
-		    PackedVal dpat)
+FopVer::operator()(TpgFault* f,
+		   PackedVal dpat)
 {
   mFsim.set_skip(f);
   mDetSet.insert(f);
@@ -40,7 +40,7 @@ Fop2Ver::operator()(TpgFault* f,
 
 // @brief det_flag を下ろす．
 void
-Fop2Ver::clear_det_flag()
+FopVer::clear_det_flag()
 {
   mFsim.clear_skip();
   mDetSet.clear();
@@ -48,7 +48,7 @@ Fop2Ver::clear_det_flag()
 
 // @brief 故障が見つかったら true を返す．
 bool
-Fop2Ver::is_detected(TpgFault* f)
+FopVer::is_detected(TpgFault* f)
 {
   return mDetSet.count(f) > 0;
 }
@@ -65,7 +65,7 @@ Verifier::Verifier(FaultMgr& fault_mgr,
 		   Fsim& fsim) :
   mFaultMgr(fault_mgr),
   mFsim(fsim),
-  mOp2(fsim)
+  mOp(fsim)
 {
 }
 
@@ -79,7 +79,7 @@ Verifier::~Verifier()
 bool
 Verifier::check(const vector<TestVector*>& pat_list)
 {
-  mOp2.clear_det_flag();
+  mOp.clear_det_flag();
   mFsim.clear_skip();
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
@@ -88,12 +88,12 @@ Verifier::check(const vector<TestVector*>& pat_list)
     TestVector* tv = *p;
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
-      mFsim.ppsfp(cur_array, mOp2);
+      mFsim.ppsfp(cur_array, mOp);
       cur_array.clear();
     }
   }
   if ( !cur_array.empty() ) {
-    mFsim.ppsfp(cur_array, mOp2);
+    mFsim.ppsfp(cur_array, mOp);
   }
 
   bool no_error = true;
@@ -101,7 +101,7 @@ Verifier::check(const vector<TestVector*>& pat_list)
   for (vector<TpgFault*>::const_iterator p = f_list.begin();
        p != f_list.end(); ++ p) {
     TpgFault* f = *p;
-    if ( !mOp2.is_detected(f) ) {
+    if ( !mOp.is_detected(f) ) {
       cout << "Error: " << f << " has no patterns" << endl;
       no_error = false;
     }

@@ -14,8 +14,8 @@
 #include "TestVector.h"
 #include "FaultMgr.h"
 #include "Fsim.h"
-#include "Fop2MinPat.h"
-#include "Fop2Rofsim.h"
+#include "FopMinPat.h"
+#include "FopRofsim.h"
 #include "utils/GcSolver.h"
 #include "utils/RandGen.h"
 #include "utils/RandPermGen.h"
@@ -101,7 +101,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   vector<TestVector*> tv3_list;
   tv3_list.reserve(tv3_tmp_list.size());
   {
-    Fop2Rofsim op(mFsim3, mFaultMgr);
+    FopRofsim op(mFsim3, mFaultMgr);
 
     op.clear_count();
 
@@ -144,7 +144,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     RandPermGen rpg(n);
     rpg.generate(rg);
 
-    Fop2Rofsim op(mFsim3, mFaultMgr);
+    FopRofsim op(mFsim3, mFaultMgr);
 
     op.clear_count();
 
@@ -242,7 +242,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
 #if 0
   // tv2_list のパタンを用いて故障シミュレーションを行なう．
-  Fop2MinPat op(mFsim2, mFaultMgr);
+  FopMinPat op(mFsim2, mFaultMgr);
 
   op.clear_count();
   op.set_limit(100);
@@ -278,7 +278,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     RandPermGen rpg(n);
     rpg.generate(rg);
 
-    Fop2Rofsim op(mFsim2, mFaultMgr);
+    FopRofsim op(mFsim2, mFaultMgr);
 
     op.clear_count();
 
@@ -317,7 +317,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     RandPermGen rpg(n);
     rpg.generate(rg);
 
-    Fop2Rofsim op(mFsim2, mFaultMgr);
+    FopRofsim op(mFsim2, mFaultMgr);
 
     op.clear_count();
 

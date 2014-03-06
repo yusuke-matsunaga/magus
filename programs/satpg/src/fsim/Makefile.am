@@ -7,8 +7,6 @@
 
 SUBDIRS = \
 	fsim2 \
-	fsim3 \
-	fsimx \
 	fsimx2
 
 
@@ -43,8 +41,6 @@ libatpg_fsim_la_SOURCES =
 
 libatpg_fsim_la_LIBADD = \
 	fsim2/libatpg_fsim2.la \
-	fsim3/libatpg_fsim3.la \
-	fsimx/libatpg_fsimx.la \
 	fsimx2/libatpg_fsimx2.la
 
 libatpg_fsim_la_LDFLAGS =

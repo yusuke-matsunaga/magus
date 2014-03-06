@@ -68,7 +68,7 @@ public:
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,
-	FsimOp2& op) = 0;
+	FsimOp& op) = 0;
 
 };
 
@@ -81,14 +81,6 @@ public:
 extern
 Fsim*
 new_Fsim2();
-
-extern
-Fsim*
-new_Fsim3();
-
-extern
-Fsim*
-new_FsimX();
 
 extern
 Fsim*

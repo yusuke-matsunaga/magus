@@ -86,7 +86,7 @@ public:
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,
-	FsimOp2& op);
+	FsimOp& op);
 
 
 private:

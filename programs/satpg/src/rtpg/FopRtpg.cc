@@ -1,13 +1,13 @@
 
-/// @file Fop2Rtpg.cc
-/// @brief Fop2Rtpg の実装ファイル
+/// @file FopRtpg.cc
+/// @brief FopRtpg の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Fop2Rtpg.h"
+#include "FopRtpg.h"
 #include "Fsim.h"
 #include "FaultMgr.h"
 #include "TpgFault.h"
@@ -22,8 +22,8 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
 // @param[in] fmgr 故障マネージャ
-Fop2Rtpg::Fop2Rtpg(Fsim& fsim,
-		   FaultMgr& fmgr) :
+FopRtpg::FopRtpg(Fsim& fsim,
+		 FaultMgr& fmgr) :
   mFsim(fsim),
   mFaultMgr(fmgr)
 {
@@ -31,7 +31,7 @@ Fop2Rtpg::Fop2Rtpg(Fsim& fsim,
 }
 
 // @brief デストラクタ
-Fop2Rtpg::~Fop2Rtpg()
+FopRtpg::~FopRtpg()
 {
 }
 
@@ -39,8 +39,8 @@ Fop2Rtpg::~Fop2Rtpg()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-Fop2Rtpg::operator()(TpgFault* f,
-		     PackedVal dpat)
+FopRtpg::operator()(TpgFault* f,
+		    PackedVal dpat)
 {
   if ( f->status() == kFsUndetected ) {
     mFaultMgr.set_status(f, kFsDetected);
@@ -56,7 +56,7 @@ Fop2Rtpg::operator()(TpgFault* f,
 
 // @brief 検出回数をクリアする．
 void
-Fop2Rtpg::clear_count()
+FopRtpg::clear_count()
 {
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     mCount[i] = 0;
@@ -66,7 +66,7 @@ Fop2Rtpg::clear_count()
 /// @brief 検出回数を得る．
 /// @param[in] bitpos ビット位置
 ymuint
-Fop2Rtpg::count(ymuint bitpos)
+FopRtpg::count(ymuint bitpos)
 {
   return mCount[bitpos];
 }
