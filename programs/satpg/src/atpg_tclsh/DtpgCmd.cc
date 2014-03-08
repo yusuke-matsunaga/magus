@@ -170,7 +170,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptDrop->is_specified() ) {
-    dop_list.push_back(new_DopDrop(mgr()));
+    dop_list.push_back(new_DopDropNew(mgr()));
   }
   if ( mPoptVerify->is_specified() ) {
     dop_list.push_back(new_DopVerify(mgr()));

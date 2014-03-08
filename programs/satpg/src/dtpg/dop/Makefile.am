@@ -53,6 +53,8 @@ libatpg_dop_la_SOURCES = \
 	DopBase.cc \
 	DopDrop.h \
 	DopDrop.cc \
+	DopDropNew.h \
+	DopDropNew.cc \
 	DopTvList.h \
 	DopTvList.cc \
 	DopVerify.h \

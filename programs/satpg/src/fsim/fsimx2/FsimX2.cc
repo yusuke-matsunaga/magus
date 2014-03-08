@@ -784,17 +784,25 @@ void
 FsimX2::fault_sweep(SimFFR* ffr,
 		    vector<TpgFault*>& det_faults)
 {
-  const vector<FsimFault*>& flist = ffr->fault_list();
-  for (vector<FsimFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    FsimFault* ff = *p;
-    if ( ff->mSkip ) {
-      continue;
+  vector<FsimFault*>& flist = ffr->fault_list();
+  ymuint fnum = flist.size();
+  ymuint wpos = 0;
+  for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
+    FsimFault* ff = flist[rpos];
+    TpgFault* f = ff->mOrigF;
+    FaultStatus fs = f->status();
+    if ( fs == kFsUndetected || fs == kFsAborted ) {
+      if ( ff->mObsMask ) {
+	det_faults.push_back(f);
+      }
+      else if ( wpos != rpos ) {
+	flist[wpos] = ff;
+      }
+      ++ wpos;
     }
-    if ( ff->mObsMask ) {
-      TpgFault* f = ff->mOrigF;
-      det_faults.push_back(f);
-    }
+  }
+  if ( wpos < fnum ) {
+    flist.erase(flist.begin() + wpos, flist.end());
   }
 }
 

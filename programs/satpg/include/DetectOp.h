@@ -52,6 +52,11 @@ new_DopBase(AtpgMgr& mgr);
 DetectOp*
 new_DopDrop(AtpgMgr& mgr);
 
+/// @brief 'drop' タイプを生成する．
+/// @param[in] mgr AtpgMgr
+DetectOp*
+new_DopDropNew(AtpgMgr& mgr);
+
 /// @brief 'tvlist' タイプを生成する．
 /// @param[in] mgr AtpgMgr
 DetectOp*
