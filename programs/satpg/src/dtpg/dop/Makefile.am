@@ -28,7 +28,11 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libatpg_dop.la
+noinst_LTLIBRARIES = \
+	libatpg_dop.la \
+	libatpg_dop_d.la \
+	libatpg_dop_p.la
+
 
 
 ############################################################
@@ -45,10 +49,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libatpg_dop.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libatpg_dop_la_SOURCES = \
+COMMON_SOURCES = \
 	DopBase.h \
 	DopBase.cc \
 	DopDrop.h \
@@ -60,6 +64,53 @@ libatpg_dop_la_SOURCES = \
 	DopVerify.h \
 	DopVerify.cc
 
+
+############################################################
+## libatpg_dop.la 用の変数の定義
+############################################################
+
+libatpg_dop_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_dop_la_SOURCES = \
+	$(COMMON_SOURCES)
+
 libatpg_dop_la_LIBADD =
 
-libatpg_dop_la_LDFLAGS =
+libatpg_dop_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_dop_d.la 用の変数の定義
+############################################################
+
+libatpg_dop_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_dop_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_dop_d_la_LIBADD =
+
+libatpg_dop_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_dop_p.la 用の変数の定義
+############################################################
+
+libatpg_dop_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_dop_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_dop_p_la_LIBADD =
+
+libatpg_dop_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

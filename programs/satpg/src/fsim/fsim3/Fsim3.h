@@ -1,8 +1,8 @@
-#ifndef FSIMX2_H
-#define FSIMX2_H
+#ifndef FSIM3_H
+#define FSIM3_H
 
-/// @file FsimX2.h
-/// @brief FsimX のヘッダファイル
+/// @file Fsim3.h
+/// @brief Fsim3 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,34 +10,34 @@
 /// All rights reserved.
 
 
-#include "fsimx2_nsdef.h"
+#include "fsim3_nsdef.h"
 #include "Fsim.h"
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 class SimFFR;
 class SimNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class FsimX2 FsimX2.h "FsimX2.h"
+/// @class Fsim3 Fsim3.h "Fsim3.h"
 /// @brief 故障シミュレーションを行うモジュール
 /// @sa ModBase
 //////////////////////////////////////////////////////////////////////
-class FsimX2 :
+class Fsim3 :
   public Fsim
 {
 public:
 
   /// @brief コンストラクタ
-  FsimX2();
+  Fsim3();
 
   /// @brief デストラクタ
   virtual
-  ~FsimX2();
+  ~Fsim3();
 
 
 public:
@@ -235,7 +235,7 @@ private:
 // @brief 正常値が更新されたときの処理を行なう．
 inline
 void
-FsimX2::update_gval(SimNode* node)
+Fsim3::update_gval(SimNode* node)
 {
   mGvalClearArray.push_back(node);
   ymuint no = node->nfo();
@@ -246,7 +246,7 @@ FsimX2::update_gval(SimNode* node)
 
 // @brief 故障値が更新されたときの処理を行なう．
 void
-FsimX2::update_fval(SimNode* node)
+Fsim3::update_fval(SimNode* node)
 {
   mFvalClearArray.push_back(node);
   ymuint no = node->nfo();
@@ -255,6 +255,6 @@ FsimX2::update_fval(SimNode* node)
   }
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM
 
-#endif // FSIMX2_H
+#endif // FSIM3_H

@@ -70,6 +70,50 @@ FsimNetBinder::event_proc(const TpgNetwork& network,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス FsimNewNetBinder
+//////////////////////////////////////////////////////////////////////
+class FsimNewNetBinder :
+  public T2Binder<const TpgNetwork&, FaultMgr&>
+{
+public:
+
+  /// @brief コンストラクタ
+  FsimNewNetBinder(FsimNew* fsim);
+
+  /// @brief イベント処理関数
+  virtual
+  void
+  event_proc(const TpgNetwork& network,
+	     FaultMgr& fault_mgr);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // FsimNew
+  FsimNew* mFsim;
+
+};
+
+
+// @brief コンストラクタ
+FsimNewNetBinder::FsimNewNetBinder(FsimNew* fsim) :
+  mFsim(fsim)
+{
+}
+
+// @brief イベント処理関数
+void
+FsimNewNetBinder::event_proc(const TpgNetwork& network,
+			     FaultMgr& fault_mgr)
+{
+  mFsim->set_network(network, fault_mgr);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // AtpgMgr
 //////////////////////////////////////////////////////////////////////
 
@@ -81,10 +125,10 @@ AtpgMgr::AtpgMgr() :
   mTvMgr = new TvMgr();
 
   mFsim = new_Fsim2();
-  mFsim3 = new_FsimX2();
+  mFsim3 = new_Fsim3();
 
   mFsimNew = new_FsimNew2();
-  mFsimNew3 = new_FsimNewX2();
+  mFsimNew3 = new_FsimNew3();
 
   mRtpg = new_Rtpg(*this);
   mDtpg = new_DtpgSat();
@@ -94,6 +138,9 @@ AtpgMgr::AtpgMgr() :
 
   reg_network_handler(new FsimNetBinder(mFsim));
   reg_network_handler(new FsimNetBinder(mFsim3));
+
+  reg_network_handler(new FsimNewNetBinder(mFsimNew));
+  reg_network_handler(new FsimNewNetBinder(mFsimNew3));
 
   set_dtpg_mode();
 }

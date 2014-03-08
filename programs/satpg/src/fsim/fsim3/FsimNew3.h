@@ -1,8 +1,8 @@
-#ifndef FSIMNEWX2_H
-#define FSIMNEWX2_H
+#ifndef FSIMNEW3_H
+#define FSIMNEW3_H
 
-/// @file FsimNewX2.h
-/// @brief FsimNewX2 のヘッダファイル
+/// @file FsimNew3.h
+/// @brief FsimNew3 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,34 +10,34 @@
 /// All rights reserved.
 
 
-#include "fsimx2_nsdef.h"
+#include "fsim3_nsdef.h"
 #include "FsimNew.h"
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 class SimFFR;
 class SimNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class FsimNewX2 FsimNewX2.h "FsimNewX2.h"
+/// @class FsimNew3 FsimNew3.h "FsimNew3.h"
 /// @brief 故障シミュレーションを行うモジュール
 /// @sa ModBase
 //////////////////////////////////////////////////////////////////////
-class FsimNewX2 :
+class FsimNew3 :
   public FsimNew
 {
 public:
 
   /// @brief コンストラクタ
-  FsimNewX2();
+  FsimNew3();
 
   /// @brief デストラクタ
   virtual
-  ~FsimNewX2();
+  ~FsimNew3();
 
 
 public:
@@ -47,9 +47,11 @@ public:
 
   /// @brief ネットワークをセットする．
   /// @param[in] network ネットワーク
+  /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(const TpgNetwork& network);
+  set_network(const TpgNetwork& network,
+	      FaultMgr& fault_mgr);
 
   /// @brief 故障にスキップマークをつける．
   virtual
@@ -154,10 +156,6 @@ private:
   void
   clear_faults();
 
-  /// @brief FsimFault を設定する．
-  void
-  set_faults(const vector<TpgFault*>& fault_list);
-
   /// @brief node に対応する SimNode を得る．
   SimNode*
   find_simnode(const TpgNode* node) const;
@@ -243,7 +241,7 @@ private:
 // @brief 正常値が更新されたときの処理を行なう．
 inline
 void
-FsimNewX2::update_gval(SimNode* node)
+FsimNew3::update_gval(SimNode* node)
 {
   mGvalClearArray.push_back(node);
   ymuint no = node->nfo();
@@ -254,7 +252,7 @@ FsimNewX2::update_gval(SimNode* node)
 
 // @brief 故障値が更新されたときの処理を行なう．
 void
-FsimNewX2::update_fval(SimNode* node)
+FsimNew3::update_fval(SimNode* node)
 {
   mFvalClearArray.push_back(node);
   ymuint no = node->nfo();
@@ -263,6 +261,6 @@ FsimNewX2::update_fval(SimNode* node)
   }
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM
 
-#endif // FSIMX2_H
+#endif // FSIMNEW3_H

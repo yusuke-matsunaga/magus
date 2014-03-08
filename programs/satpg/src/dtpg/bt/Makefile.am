@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libatpg_bt.la
+noinst_LTLIBRARIES = \
+	libatpg_bt.la \
+	libatpg_bt_d.la \
+	libatpg_bt_p.la
 
 
 ############################################################
@@ -46,10 +49,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libatpg_bt.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libatpg_bt_la_SOURCES = \
+COMMON_SOURCES = \
 	BtBase.h \
 	BtBase.cc \
 	BtSimple.h \
@@ -63,6 +66,53 @@ libatpg_bt_la_SOURCES = \
 	BtZdd.h \
 	BtZdd.cc
 
+
+############################################################
+## libatpg_bt.la 用の変数の定義
+############################################################
+
+libatpg_bt_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_bt_la_SOURCES = \
+	$(COMMON_SOURCES)
+
 libatpg_bt_la_LIBADD =
 
-libatpg_bt_la_LDFLAGS =
+libatpg_bt_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_bt_d.la 用の変数の定義
+############################################################
+
+libatpg_bt_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_bt_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_bt_d_la_LIBADD =
+
+libatpg_bt_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_bt_p.la 用の変数の定義
+############################################################
+
+libatpg_bt_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_bt_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_bt_p_la_LIBADD =
+
+libatpg_bt_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

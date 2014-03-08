@@ -1,35 +1,35 @@
-#ifndef SNOR_H
-#define SNOR_H
+#ifndef SNAND_H
+#define SNAND_H
 
-/// @file SnOr.h
-/// @brief SnOr のヘッダファイル
+/// @file SnAnd.h
+/// @brief SnAnd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SnGate.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnOr SimNode.h
-/// @brief ORノード
+/// @class SnAnd SimNode.h
+/// @brief ANDノード
 //////////////////////////////////////////////////////////////////////
-class SnOr :
+class SnAnd :
   public SnGate
 {
 public:
 
   /// @brief コンストラクタ
-  SnOr(ymuint32 id,
-       const vector<SimNode*>& inputs);
+  SnAnd(ymuint32 id,
+	const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnOr();
+  ~SnAnd();
 
 
 public:
@@ -61,21 +61,21 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnOr2 SimNode.h
-/// @brief 2入力ORノード
+/// @class SnAnd2 SimNode.h
+/// @brief 2入力ANDノード
 //////////////////////////////////////////////////////////////////////
-class SnOr2 :
+class SnAnd2 :
   public SnGate2
 {
 public:
 
   /// @brief コンストラクタ
-  SnOr2(ymuint32 id,
-	const vector<SimNode*>& inputs);
+  SnAnd2(ymuint32 id,
+	 const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnOr2();
+  ~SnAnd2();
 
 
 public:
@@ -107,21 +107,21 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnOr3 SimNode.h
-/// @brief 3入力ORノード
+/// @class SnAnd3 SimNode.h
+/// @brief 3入力ANDノード
 //////////////////////////////////////////////////////////////////////
-class SnOr3 :
+class SnAnd3 :
   public SnGate3
 {
 public:
 
   /// @brief コンストラクタ
-  SnOr3(ymuint32 id,
-	const vector<SimNode*>& inputs);
+  SnAnd3(ymuint32 id,
+	 const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnOr3();
+  ~SnAnd3();
 
 
 public:
@@ -153,21 +153,21 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnOr4 SimNode.h
-/// @brief 4入力ORノード
+/// @class SnAnd4 SimNode.h
+/// @brief 4入力ANDノード
 //////////////////////////////////////////////////////////////////////
-class SnOr4 :
+class SnAnd4 :
   public SnGate4
 {
 public:
 
   /// @brief コンストラクタ
-  SnOr4(ymuint32 id,
-	const vector<SimNode*>& inputs);
+  SnAnd4(ymuint32 id,
+	 const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnOr4();
+  ~SnAnd4();
 
 
 public:
@@ -199,62 +199,21 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnNor SimNode.h
-/// @brief NORノード
+/// @class SnNand SimNode.h
+/// @brief NANDノード
 //////////////////////////////////////////////////////////////////////
-class SnNor :
-  public SnOr
+class SnNand :
+  public SnAnd
 {
 public:
 
   /// @brief コンストラクタ
-  SnNor(ymuint32 id,
-	const vector<SimNode*>& inputs);
-
-  /// @brief デストラクタ
-  virtual
-  ~SnNor();
-
-
-public:
-
-  /// @brief 正常値の計算を行う．(3値版)
-  /// @note 結果は mGval0, mGval1 に格納される．
-  virtual
-  void
-  _calc_gval3();
-
-  /// @brief 故障値の計算を行う．(3値版)
-  /// @param[in] mask マスク
-  /// @note 結果は mFval0, mFval1 に格納される．
-  virtual
-  void
-  _calc_fval3(PackedVal mask);
-
-  /// @brief 内容をダンプする．
-  virtual
-  void
-  dump(ostream& s) const;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class SnNor2 SimNode.h
-/// @brief 2入力NORノード
-//////////////////////////////////////////////////////////////////////
-class SnNor2 :
-  public SnOr2
-{
-public:
-
-  /// @brief コンストラクタ
-  SnNor2(ymuint32 id,
+  SnNand(ymuint32 id,
 	 const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnNor2();
+  ~SnNand();
 
 
 public:
@@ -281,21 +240,21 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnNor3 SimNode.h
-/// @brief 3入力NORノード
+/// @class SnNand2 SimNode.h
+/// @brief 2入力NANDノード
 //////////////////////////////////////////////////////////////////////
-class SnNor3 :
-  public SnOr3
+class SnNand2 :
+  public SnAnd2
 {
 public:
 
   /// @brief コンストラクタ
-  SnNor3(ymuint32 id,
-	 const vector<SimNode*>& inputs);
+  SnNand2(ymuint32 id,
+	  const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnNor3();
+  ~SnNand2();
 
 
 public:
@@ -322,21 +281,21 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SnNor2 SimNode.h
-/// @brief 2入力NORノード
+/// @class SnNand3 SimNode.h
+/// @brief 3入力NANDノード
 //////////////////////////////////////////////////////////////////////
-class SnNor4 :
-  public SnOr4
+class SnNand3 :
+  public SnAnd3
 {
 public:
 
   /// @brief コンストラクタ
-  SnNor4(ymuint32 id,
-	 const vector<SimNode*>& inputs);
+  SnNand3(ymuint32 id,
+	  const vector<SimNode*>& inputs);
 
   /// @brief デストラクタ
   virtual
-  ~SnNor4();
+  ~SnNand3();
 
 
 public:
@@ -361,6 +320,47 @@ public:
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIMX2
 
-#endif // SNOR_H
+//////////////////////////////////////////////////////////////////////
+/// @class SnNand4 SimNode.h
+/// @brief 4入力NANDノード
+//////////////////////////////////////////////////////////////////////
+class SnNand4 :
+  public SnAnd4
+{
+public:
+
+  /// @brief コンストラクタ
+  SnNand4(ymuint32 id,
+	  const vector<SimNode*>& inputs);
+
+  /// @brief デストラクタ
+  virtual
+  ~SnNand4();
+
+
+public:
+
+  /// @brief 正常値の計算を行う．(3値版)
+  /// @note 結果は mGval0, mGval1 に格納される．
+  virtual
+  void
+  _calc_gval3();
+
+  /// @brief 故障値の計算を行う．(3値版)
+  /// @param[in] mask マスク
+  /// @note 結果は mFval0, mFval1 に格納される．
+  virtual
+  void
+  _calc_fval3(PackedVal mask);
+
+  /// @brief 内容をダンプする．
+  virtual
+  void
+  dump(ostream& s) const;
+
+};
+
+END_NAMESPACE_YM_SATPG_FSIM
+
+#endif // SNAND_H

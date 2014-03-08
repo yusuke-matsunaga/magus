@@ -63,6 +63,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "X-extract mode [0-2]");
   mPoptDrop = new TclPopt(this, "drop",
 			  "with fault drop");
+  mPoptDropNew = new TclPopt(this, "drop_new",
+			     "with fault drop");
   mPoptVerify = new TclPopt(this, "verify",
 			    "verify generated pattern");
   mPoptTimer = new TclPopt(this, "timer",
@@ -71,6 +73,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
   new_popt_group(mPoptSingle, mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
   new_popt_group(mPoptPo, mPoptRpo);
+  new_popt_group(mPoptDrop, mPoptDropNew);
 }
 
 // @brief デストラクタ
@@ -170,6 +173,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptDrop->is_specified() ) {
+    dop_list.push_back(new_DopDrop(mgr()));
+  }
+  if ( mPoptDropNew->is_specified() ) {
     dop_list.push_back(new_DopDropNew(mgr()));
   }
   if ( mPoptVerify->is_specified() ) {

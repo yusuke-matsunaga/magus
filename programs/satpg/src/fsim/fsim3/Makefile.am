@@ -29,7 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libatpg_fsimx2.la
+	libatpg_fsim3.la \
+	libatpg_fsim3_d.la \
+	libatpg_fsim3_p.la
 
 noinst_PROGRAMS = \
 	simnode_test
@@ -49,11 +51,11 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libatpg_fsimx2.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libatpg_fsimx2_la_SOURCES = \
-	fsimx2_nsdef.h \
+COMMON_SOURCES = \
+	fsim3_nsdef.h \
 	EqElem.h \
 	SimNode.h \
 	SimNode.cc \
@@ -71,24 +73,75 @@ libatpg_fsimx2_la_SOURCES = \
 	EventQ.h \
 	EventQ.cc \
 	FsimFault.h \
-	FsimX2.h \
-	FsimX2.cc \
-	FsimNewX2.h \
-	FsimNewX2.cc
+	Fsim3.h \
+	Fsim3.cc \
+	FsimNew3.h \
+	FsimNew3.cc
 
-libatpg_fsimx2_la_LIBADD =
 
-libatpg_fsimx2_la_LDFLAGS =
+############################################################
+## libatpg_fsim3.la 用の変数の定義
+############################################################
+
+libatpg_fsim3_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_fsim3_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_fsim3_la_LIBADD =
+
+libatpg_fsim3_la_LDFLAGS =
+
+
+############################################################
+## libatpg_fsim3_d.la 用の変数の定義
+############################################################
+
+libatpg_fsim3_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_fsim3_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_fsim3_d_la_LIBADD =
+
+libatpg_fsim3_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_fsim3_p.la 用の変数の定義
+############################################################
+
+libatpg_fsim3_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_fsim3_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_fsim3_p_la_LIBADD =
+
+libatpg_fsim3_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
 ## simnode_test 用の変数の定義
 ############################################################
 
+simnode_test_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
 simnode_test_SOURCES = \
 	simnode_test.cc
 
 simnode_test_LDADD = \
-	libatpg_fsimx2.la
+	libatpg_fsim3_d.la
 
-simnode_test_LDFLAGS =
+simnode_test_LDFLAGS = \
+	$(AM_LDFLAGS)

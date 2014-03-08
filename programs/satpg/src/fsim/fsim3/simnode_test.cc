@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "fsimx2_nsdef.h"
+#include "fsim3_nsdef.h"
 #include "PackedVal.h"
 #include "SimNode.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 PackedVal
 val_0(ymuint val)
@@ -999,14 +999,14 @@ simnode_test()
   return has_error;
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM
 
 
 int
 main(int argc,
      const char** argv)
 {
-  if ( nsYm::nsSatpg::nsFsimX2:: simnode_test() ) {
+  if ( nsYm::nsSatpg::nsFsim3:: simnode_test() ) {
     return 1;
   }
   return 0;

@@ -10,7 +10,7 @@
 #include "SnOr.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 //////////////////////////////////////////////////////////////////////
 // SnOr
@@ -508,4 +508,4 @@ SnNor4::dump(ostream& s) const
   s << ")" << endl;
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM

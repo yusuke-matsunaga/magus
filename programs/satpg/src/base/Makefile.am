@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libatpg_base.la
+noinst_LTLIBRARIES = \
+	libatpg_base.la \
+	libatpg_base_d.la \
+	libatpg_base_p.la
 
 
 ############################################################
@@ -45,10 +48,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libatpg_base.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libatpg_base_la_SOURCES = \
+COMMON_SOURCES = \
 	FaultMgr.cc \
 	TestVector.cc \
 	TpgNetwork.cc \
@@ -56,6 +59,53 @@ libatpg_base_la_SOURCES = \
 	TpgFault.cc \
 	TvMgr.cc
 
+
+############################################################
+## libatpg_base.la 用の変数の定義
+############################################################
+
+libatpg_base_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_base_la_SOURCES = \
+	$(COMMON_SOURCES)
+
 libatpg_base_la_LIBADD =
 
-libatpg_base_la_LDFLAGS =
+libatpg_base_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_base_d.la 用の変数の定義
+############################################################
+
+libatpg_base_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_base_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_base_d_la_LIBADD =
+
+libatpg_base_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_base_p.la 用の変数の定義
+############################################################
+
+libatpg_base_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_base_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_base_p_la_LIBADD =
+
+libatpg_base_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

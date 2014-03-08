@@ -31,6 +31,10 @@ EXTRA_DIST =
 bin_PROGRAMS = \
 	atpg_tclsh
 
+noinst_PROGRAMS = \
+	atpg_tclsh_d \
+	atpg_tclsh_p
+
 
 ############################################################
 ## 汎用のプリプロセッサ用フラグの指定
@@ -54,10 +58,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## atpg_tclsh 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-atpg_tclsh_SOURCES = \
+COMMON_SOURCES = \
 	tclAppInit.cc \
 	atpg_init.cc \
 	AtpgCmd.h \
@@ -81,13 +85,24 @@ atpg_tclsh_SOURCES = \
 	MinPatCmd.h \
 	MinPatCmd.cc
 
+
+############################################################
+## atpg_tclsh 用の変数の定義
+############################################################
+
+atpg_tclsh_SOURCES = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+atpg_tclsh_SOURCES = \
+	$(COMMON_SOURCES)
+
 atpg_tclsh_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \
 	$(top_builddir)/src/dtpg/libatpg_dtpg.la \
 	$(top_builddir)/src/rtpg/libatpg_rtpg.la \
 	$(top_builddir)/src/minpat/libatpg_minpat.la \
 	$(top_builddir)/src/fsim/libatpg_fsim.la \
-	$(top_builddir)/src/fsim_old/libatpg_fsim_old.la \
 	$(top_builddir)/src/base/libatpg_base.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
@@ -96,4 +111,63 @@ atpg_tclsh_LDADD = \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
 
-atpg_tclsh_LDFLAGS =
+atpg_tclsh_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## atpg_tclsh_d 用の変数の定義
+############################################################
+
+atpg_tclsh_d_SOURCES = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+atpg_tclsh_d_SOURCES = \
+	$(COMMON_SOURCES)
+
+atpg_tclsh_d_LDADD = \
+	$(top_builddir)/src/main/libatpg_main_d.la \
+	$(top_builddir)/src/dtpg/libatpg_dtpg_d.la \
+	$(top_builddir)/src/rtpg/libatpg_rtpg_d.la \
+	$(top_builddir)/src/minpat/libatpg_minpat_d.la \
+	$(top_builddir)/src/fsim/libatpg_fsim_d.la \
+	$(top_builddir)/src/base/libatpg_base_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp_d.la \
+	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCL_LDADD)
+
+atpg_tclsh_d_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## atpg_tclsh_p 用の変数の定義
+############################################################
+
+atpg_tclsh_p_SOURCES = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+atpg_tclsh_p_SOURCES = \
+	$(COMMON_SOURCES)
+
+atpg_tclsh_p_LDADD = \
+	$(top_builddir)/src/main/libatpg_main_p.la \
+	$(top_builddir)/src/dtpg/libatpg_dtpg_p.la \
+	$(top_builddir)/src/rtpg/libatpg_rtpg_p.la \
+	$(top_builddir)/src/minpat/libatpg_minpat_p.la \
+	$(top_builddir)/src/fsim/libatpg_fsim_p.la \
+	$(top_builddir)/src/base/libatpg_base_p.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks_p.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_p.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_p.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp_p.la \
+	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCL_LDADD)
+
+atpg_tclsh_p_LDFLAGS = \
+	$(AM_LDFLAGS)

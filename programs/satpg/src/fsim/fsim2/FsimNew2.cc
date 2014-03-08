@@ -64,8 +64,10 @@ FsimNew2::~FsimNew2()
 
 // @brief ネットワークをセットする関数
 // @param[in] network ネットワーク
+// @param[in] fault_mgr 故障マネージャ
 void
-FsimNew2::set_network(const TpgNetwork& network)
+FsimNew2::set_network(const TpgNetwork& network,
+		      FaultMgr& fault_mgr)
 {
   clear();
 

@@ -1,5 +1,5 @@
-#ifndef FSIMX2_SIMNODE_H
-#define FSIMX2_SIMNODE_H
+#ifndef SIMNODE_H
+#define SIMNODE_H
 
 /// @file SimNode.h
 /// @brief SimNode のヘッダファイル
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "fsimx2_nsdef.h"
+#include "fsim3_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal.h"
 #include "networks/tgnet.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 class SimFFR;
 
@@ -478,6 +478,6 @@ SimNode::set_ffr(SimFFR* ffr)
   mFFR = ffr;
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM
 
-#endif // FSIMX2_SIMNODE_H
+#endif // SIMNODE_H

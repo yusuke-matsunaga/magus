@@ -82,9 +82,10 @@ extern
 Fsim*
 new_Fsim2();
 
+/// @brief 3値版の故障シミュレータ
 extern
 Fsim*
-new_FsimX2();
+new_Fsim3();
 
 END_NAMESPACE_YM_SATPG
 

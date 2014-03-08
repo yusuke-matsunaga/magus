@@ -1,13 +1,13 @@
 
-/// @file FsimX2.cc
-/// @brief FsimX2 の実装ファイル
+/// @file Fsim3.cc
+/// @brief Fsim3 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "FsimNewX2.h"
+#include "Fsim3.h"
 #include "FsimOp.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
@@ -22,15 +22,15 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-FsimNew*
-new_FsimNewX2()
+Fsim*
+new_Fsim3()
 {
-  return new nsFsimX2::FsimNewX2();
+  return new nsFsim3::Fsim3();
 }
 
 END_NAMESPACE_YM_SATPG
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 BEGIN_NONAMESPACE
 
@@ -50,20 +50,22 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-FsimNewX2::FsimNewX2()
+Fsim3::Fsim3()
 {
 }
 
 // @brief デストラクタ
-FsimNewX2::~FsimNewX2()
+Fsim3::~Fsim3()
 {
   clear();
 }
 
 // @brief ネットワークをセットする．
 // @param[in] network ネットワーク
+// @param[in] fault_mgr 故障マネージャ
 void
-FsimNewX2::set_network(const TpgNetwork& network)
+Fsim3::set_network(const TpgNetwork& network,
+		   FaultMgr& fault_mgr)
 {
   clear();
 
@@ -266,26 +268,66 @@ FsimNewX2::set_network(const TpgNetwork& network)
     SimNode* simnode = *p;
     simnode->set_gval(kPvAll0, kPvAll0);
   }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障リストの設定
+  //////////////////////////////////////////////////////////////////////
+
+  clear_faults();
+
+  ymuint nf = fault_mgr.rep_num();
+  mFsimFaults.resize(nf);
+  mFaultArray.resize(fault_mgr.all_num());
+  for (ymuint i = 0; i < nf; ++ i) {
+    TpgFault* f = fault_mgr.rep_fault(i);
+    const TpgNode* node = f->node();
+    SimNode* simnode = NULL;
+    ymuint ipos = 0;
+    SimNode* isimnode = NULL;
+    if ( f->is_input_fault() ) {
+      find_simedge(node, f->pos(), simnode, ipos);
+      const TpgNode* inode = node->fanin(f->pos());
+      isimnode = find_simnode(inode);
+    }
+    else {
+      simnode = find_simnode(node);
+      isimnode = simnode;
+    }
+    mFsimFaults[i].set(f, simnode, ipos, isimnode);
+    SimFFR* ffr = simnode->ffr();
+    FsimFault* ff = &mFsimFaults[i];
+    ffr->fault_list().push_back(ff);
+    mFaultArray[f->id()] = ff;
+  }
 }
 
 // @brief 故障にスキップマークをつける．
 void
-FsimNewX2::set_skip(TpgFault* f)
+Fsim3::set_skip(TpgFault* f)
 {
   mFaultArray[f->id()]->mSkip = true;
 }
 
+// @brief すべての故障のスキップマークを消す．
+void
+Fsim3::clear_skip()
+{
+  ymuint n = mFaultArray.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    if ( mFaultArray[i] ) {
+      mFaultArray[i]->mSkip = false;
+    }
+  }
+}
+
 // @brief ひとつのパタンで故障シミュレーションを行う．
 // @param[in] tv テストベクタ
-// @param[in] fault_list 対象の故障のリスト
 // @param[in] det_faults このパタンで検出された故障のリスト
 void
-FsimNewX2::sppfp(TestVector* tv,
-		 const vector<TpgFault*>& fault_list,
-		 vector<TpgFault*>& det_faults)
+Fsim3::sppfp(TestVector* tv,
+	     vector<TpgFault*>& det_faults)
 {
-  set_faults(fault_list);
-
   ymuint npi = mNetwork->input_num2();
 
   // tv を全ビットにセットしていく．
@@ -319,7 +361,7 @@ FsimNewX2::sppfp(TestVector* tv,
     if ( (gval0 | gval1) == kPvAll0 ) continue;
 
     // FFR 内の故障伝搬を行う．
-    // 結果は FsimX2Fault.mObsMask に保存される．
+    // 結果は Fsim3Fault.mObsMask に保存される．
     // FFR 内の全ての obs マスクの OR を ffr_req に入れる．
     PackedVal ffr_req = ffr_simulate(ffr);
 
@@ -373,38 +415,10 @@ FsimNewX2::sppfp(TestVector* tv,
 
 // @brief 複数のパタンで故障シミュレーションを行う．
 // @param[in] tv_array テストベクタの配列
-// @param[in] fault_list 対象の故障のリスト
 // @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
 void
-FsimNewX2::ppsfp(const vector<TestVector*>& tv_array,
-		 const vector<TpgFault*>& fault_list,
-		 FsimOp& op)
-{
-  set_faults(fault_list);
-
-  vector<TestVector*> cur_array;
-  cur_array.reserve(kPvBitLen);
-
-  ymuint n = tv_array.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    TestVector* tv = tv_array[i];
-    cur_array.push_back(tv);
-    if ( cur_array.size() == kPvBitLen ) {
-      _ppsfp(cur_array, op);
-      cur_array.clear();
-    }
-  }
-  if ( !cur_array.empty() ) {
-    _ppsfp(cur_array, op);
-  }
-}
-
-// @brief 1ワード分の ppsfp
-// @param[in] tv_array テストベクタの配列
-// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
-void
-FsimNewX2::_ppsfp(const vector<TestVector*>& tv_array,
-		  FsimOp& op)
+Fsim3::ppsfp(const vector<TestVector*>& tv_array,
+	     FsimOp& op)
 {
   ymuint npi = mNetwork->input_num2();
   ymuint nb = tv_array.size();
@@ -471,7 +485,7 @@ FsimNewX2::_ppsfp(const vector<TestVector*>& tv_array,
     if ( (gval0 | gval1) == kPvAll0 ) continue;
 
     // FFR 内の故障伝搬を行う．
-    // 結果は FsimX2Fault.mObsMask に保存される．
+    // 結果は Fsim3Fault.mObsMask に保存される．
     // FFR 内の全ての obs マスクの OR を ffr_req に入れる．
     PackedVal ffr_req = ffr_simulate(ffr);
 
@@ -525,8 +539,8 @@ FsimNewX2::_ppsfp(const vector<TestVector*>& tv_array,
 // @retval true 故障の検出が行えた．
 // @retval false 故障の検出が行えなかった．
 bool
-FsimNewX2::spsfp(TestVector* tv,
-		 TpgFault* f)
+Fsim3::spsfp(TestVector* tv,
+	     TpgFault* f)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -598,7 +612,7 @@ FsimNewX2::spsfp(TestVector* tv,
 
 // @brief 現在保持している SimNode のネットワークを破棄する．
 void
-FsimNewX2::clear()
+Fsim3::clear()
 {
   clear_faults();
 
@@ -626,7 +640,7 @@ FsimNewX2::clear()
 
 // @brief FsimFault を破棄する．
 void
-FsimNewX2::clear_faults()
+Fsim3::clear_faults()
 {
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
@@ -637,53 +651,10 @@ FsimNewX2::clear_faults()
   mFaultArray.clear();
 }
 
-// @brief FsimFault を設定する．
-void
-FsimNewX2::set_faults(const vector<TpgFault*>& fault_list)
-{
-  //////////////////////////////////////////////////////////////////////
-  // 故障リストの設定
-  //////////////////////////////////////////////////////////////////////
-
-  clear_faults();
-
-  ymuint nf = fault_list.size();
-  mFsimFaults.resize(nf);
-  ymuint max_id = 0;
-  for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = fault_list[i];
-    if ( max_id < f->id() ) {
-      max_id = f->id();
-    }
-  }
-  mFaultArray.resize(max_id + 1);
-  for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = fault_list[i];
-    const TpgNode* node = f->node();
-    SimNode* simnode = NULL;
-    ymuint ipos = 0;
-    SimNode* isimnode = NULL;
-    if ( f->is_input_fault() ) {
-      find_simedge(node, f->pos(), simnode, ipos);
-      const TpgNode* inode = node->fanin(f->pos());
-      isimnode = find_simnode(inode);
-    }
-    else {
-      simnode = find_simnode(node);
-      isimnode = simnode;
-    }
-    mFsimFaults[i].set(f, simnode, ipos, isimnode);
-    SimFFR* ffr = simnode->ffr();
-    FsimFault* ff = &mFsimFaults[i];
-    ffr->fault_list().push_back(ff);
-    mFaultArray[f->id()] = ff;
-  }
-}
-
 // @brief 正常値の計算を行う．
 // @note 値の変わったノードは mGvalClearArray に積まれる．
 void
-FsimNewX2::calc_gval()
+Fsim3::calc_gval()
 {
   for ( ; ; ) {
     SimNode* node = mEventQ.get();
@@ -697,7 +668,7 @@ FsimNewX2::calc_gval()
 // @brief 正常値をクリアする．
 // @note mGvalClearArray を使う．
 void
-FsimNewX2::clear_gval()
+Fsim3::clear_gval()
 {
   for (vector<SimNode*>::iterator p = mGvalClearArray.begin();
        p != mGvalClearArray.end(); ++ p) {
@@ -708,7 +679,7 @@ FsimNewX2::clear_gval()
 
 // @brief FFR 内の故障シミュレーションを行う．
 PackedVal
-FsimNewX2::ffr_simulate(SimFFR* ffr)
+Fsim3::ffr_simulate(SimFFR* ffr)
 {
   PackedVal ffr_req = kPvAll0;
   vector<FsimFault*>& flist = ffr->fault_list();
@@ -772,7 +743,7 @@ FsimNewX2::ffr_simulate(SimFFR* ffr)
 
 // @brief イベントキューを用いてシミュレーションを行う．
 PackedVal
-FsimNewX2::calc_fval()
+Fsim3::calc_fval()
 {
   PackedVal obs = kPvAll0;
   for ( ; ; ) {
@@ -810,26 +781,34 @@ FsimNewX2::calc_fval()
 
 // @brief ffr 内の故障が検出可能か調べる．
 void
-FsimNewX2::fault_sweep(SimFFR* ffr,
-		       vector<TpgFault*>& det_faults)
+Fsim3::fault_sweep(SimFFR* ffr,
+		   vector<TpgFault*>& det_faults)
 {
-  const vector<FsimFault*>& flist = ffr->fault_list();
-  for (vector<FsimFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    FsimFault* ff = *p;
-    if ( ff->mSkip ) {
-      continue;
+  vector<FsimFault*>& flist = ffr->fault_list();
+  ymuint fnum = flist.size();
+  ymuint wpos = 0;
+  for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
+    FsimFault* ff = flist[rpos];
+    TpgFault* f = ff->mOrigF;
+    FaultStatus fs = f->status();
+    if ( fs == kFsUndetected || fs == kFsAborted ) {
+      if ( ff->mObsMask ) {
+	det_faults.push_back(f);
+      }
+      else if ( wpos != rpos ) {
+	flist[wpos] = ff;
+      }
+      ++ wpos;
     }
-    if ( ff->mObsMask ) {
-      TpgFault* f = ff->mOrigF;
-      det_faults.push_back(f);
-    }
+  }
+  if ( wpos < fnum ) {
+    flist.erase(flist.begin() + wpos, flist.end());
   }
 }
 
 // @brief 外部入力ノードを作る．
 SimNode*
-FsimNewX2::make_input()
+Fsim3::make_input()
 {
   ymuint32 id = mNodeArray.size();
   SimNode* node = SimNode::new_input(id);
@@ -843,9 +822,9 @@ FsimNewX2::make_input()
 // @param[in] emap もとのノードの枝の対応関係を記録する配列
 // @note inputs のサイズはノードの入力数 x 2
 SimNode*
-FsimNewX2::make_primitive(const TpgPrimitive* prim,
-			  const vector<SimNode*>& inputs,
-			  const vector<EdgeMap*>& emap)
+Fsim3::make_primitive(const TpgPrimitive* prim,
+		      const vector<SimNode*>& inputs,
+		      const vector<EdgeMap*>& emap)
 {
   if ( prim->is_input() ) {
     // 入力の場合 inputs に登録されているノードを返す．
@@ -889,8 +868,8 @@ FsimNewX2::make_primitive(const TpgPrimitive* prim,
 
 // @brief 単純な logic ノードを作る．
 SimNode*
-FsimNewX2::make_node(tTgGateType type,
-		     const vector<SimNode*>& inputs)
+Fsim3::make_node(tTgGateType type,
+		 const vector<SimNode*>& inputs)
 {
   ymuint32 id = mNodeArray.size();
   SimNode* node = SimNode::new_node(id, type, inputs);
@@ -901,21 +880,21 @@ FsimNewX2::make_node(tTgGateType type,
 
 // @brief node に対応する SimNode* を得る．
 SimNode*
-FsimNewX2::find_simnode(const TpgNode* node) const
+Fsim3::find_simnode(const TpgNode* node) const
 {
   return mSimMap[node->id()];
 }
 
 // @brief node の pos 番めの入力に対応する枝を得る．
 void
-FsimNewX2::find_simedge(const TpgNode* node,
-			ymuint pos,
-			SimNode*& simnode,
-			ymuint& ipos) const
+Fsim3::find_simedge(const TpgNode* node,
+		    ymuint pos,
+		    SimNode*& simnode,
+		    ymuint& ipos) const
 {
   const EdgeMap& edge_map = mEdgeMap[node->id()][pos];
   simnode = edge_map.mNode;
   ipos = edge_map.mPos;
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM

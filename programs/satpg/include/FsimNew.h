@@ -31,7 +31,8 @@ public:
   /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(const TpgNetwork& network) = 0;
+  set_network(const TpgNetwork& network,
+	      FaultMgr& fault_mgr) = 0;
 
   /// @brief 故障にスキップマークをつける．
   virtual
@@ -80,9 +81,10 @@ extern
 FsimNew*
 new_FsimNew2();
 
+/// @brief 3値版の故障シミュレータ
 extern
 FsimNew*
-new_FsimNewX2();
+new_FsimNew3();
 
 END_NAMESPACE_YM_SATPG
 

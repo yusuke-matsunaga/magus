@@ -11,7 +11,7 @@
 #include "SimNode.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIMX2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 //////////////////////////////////////////////////////////////////////
 // 故障シミュレーション用のイベントキューを表すクラス
@@ -50,4 +50,4 @@ EventQ::init(ymuint max_level)
   mNum = 0;
 }
 
-END_NAMESPACE_YM_SATPG_FSIMX2
+END_NAMESPACE_YM_SATPG_FSIM

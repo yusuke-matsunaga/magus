@@ -28,7 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libatpg_fsim2.la
+noinst_LTLIBRARIES = \
+	libatpg_fsim2.la \
+	libatpg_fsim2_d.la \
+	libatpg_fsim2_p.la
 
 
 ############################################################
@@ -45,10 +48,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libatpg_fsim2.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libatpg_fsim2_la_SOURCES = \
+COMMON_SOURCES = \
 	fsim2_nsdef.h \
 	EqElem.h \
 	SimNode.h \
@@ -72,6 +75,53 @@ libatpg_fsim2_la_SOURCES = \
 	FsimNew2.h \
 	FsimNew2.cc
 
+
+############################################################
+## libatpg_fsim2.la 用の変数の定義
+############################################################
+
+libatpg_fsim2_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_fsim2_la_SOURCES = \
+	$(COMMON_SOURCES)
+
 libatpg_fsim2_la_LIBADD =
 
-libatpg_fsim2_la_LDFLAGS =
+libatpg_fsim2_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_fsim2_d.la 用の変数の定義
+############################################################
+
+libatpg_fsim2_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_fsim2_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_fsim2_d_la_LIBADD =
+
+libatpg_fsim2_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libatpg_fsim2_p.la 用の変数の定義
+############################################################
+
+libatpg_fsim2_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
+
+libatpg_fsim2_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libatpg_fsim2_p_la_LIBADD =
+
+libatpg_fsim2_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)
