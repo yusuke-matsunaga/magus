@@ -14,6 +14,7 @@
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
+#include "FsimNew.h"
 #include "Dtpg.h"
 #include "Rtpg.h"
 #include "MinPat.h"
@@ -82,6 +83,9 @@ AtpgMgr::AtpgMgr() :
   mFsim = new_Fsim2();
   mFsim3 = new_FsimX2();
 
+  mFsimNew = new_FsimNew2();
+  mFsimNew3 = new_FsimNewX2();
+
   mRtpg = new_Rtpg(*this);
   mDtpg = new_DtpgSat();
   mMinPat = new_MinPat(*this);
@@ -101,6 +105,8 @@ AtpgMgr::~AtpgMgr()
   delete mTvMgr;
   delete mFsim;
   delete mFsim3;
+  delete mFsimNew;
+  delete mFsimNew3;
   delete mRtpg;
   delete mDtpg;
   delete mMinPat;

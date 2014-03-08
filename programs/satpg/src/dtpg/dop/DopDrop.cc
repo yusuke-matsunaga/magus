@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SATPG
 DetectOp*
 new_DopDrop(AtpgMgr& mgr)
 {
-  return new DopDrop(mgr._fault_mgr(), mgr._fsimx());
+  return new DopDrop(mgr._fault_mgr(), mgr._fsim3());
 }
 
 

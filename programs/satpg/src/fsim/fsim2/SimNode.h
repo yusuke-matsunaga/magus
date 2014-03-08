@@ -325,7 +325,7 @@ inline
 bool
 SimNode::check_lobs() const
 {
-  return (mFanoutIpos >> 1) & 1U == 1U;
+  return ((mFanoutIpos >> 1) & 1U) == 1U;
 }
 
 // @brief lobs が計算済みの印をつける．

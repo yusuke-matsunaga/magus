@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_SATPG
 DetectOp*
 new_DopVerify(AtpgMgr& mgr)
 {
-  return new DopVerify(mgr._fsimx());
+  return new DopVerify(mgr._fsim3());
 }
 
 

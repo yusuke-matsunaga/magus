@@ -29,7 +29,7 @@ MinPat*
 new_MinPat(AtpgMgr& mgr)
 {
   return new MinPatImpl(mgr._tv_mgr(), mgr._fault_mgr(),
-			mgr._fsim(), mgr._fsimx());
+			mgr._fsim(), mgr._fsim3());
 }
 
 

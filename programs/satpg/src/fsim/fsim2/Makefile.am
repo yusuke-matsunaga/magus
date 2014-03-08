@@ -68,7 +68,9 @@ libatpg_fsim2_la_SOURCES = \
 	EventQ.cc \
 	FsimFault.h \
 	Fsim2.h \
-	Fsim2.cc
+	Fsim2.cc \
+	FsimNew2.h \
+	FsimNew2.cc
 
 libatpg_fsim2_la_LIBADD =
 
