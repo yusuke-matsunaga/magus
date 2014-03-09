@@ -1,11 +1,11 @@
-#ifndef YM_MINCOV_MINCOV_NSDEF_H
-#define YM_MINCOV_MINCOV_NSDEF_H
+#ifndef UTILS_MINCOV_NSDEF_H
+#define UTILS_MINCOV_NSDEF_H
 
-/// @file ym_mincov/mincov_nsdef.h
+/// @file utils/mincov_nsdef.h
 /// @brief Mincov Solver 用の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup MincovGroup Mincov Solver
@@ -16,12 +16,12 @@
 #include "ymtools.h"
 
 
-/// @brief ym_mincov 用の名前空間の開始
+/// @brief mincov 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_MINCOV \
 BEGIN_NAMESPACE_YM \
 BEGIN_NAMESPACE(nsMincov)
 
-/// @brief ym_mincov 用の名前空間の終了
+/// @brief mincov 用の名前空間の終了
 #define END_NAMESPACE_YM_MINCOV \
 END_NAMESPACE(nsMincov) \
 END_NAMESPACE_YM
@@ -50,4 +50,4 @@ using nsMincov::MincovMsgHandler;
 
 END_NAMESPACE_YM
 
-#endif // YM_MINCOV_MINCOV_NSDEF_H
+#endif // UTILS_MINCOV_NSDEF_H

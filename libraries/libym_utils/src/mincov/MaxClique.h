@@ -1,14 +1,14 @@
-#ifndef LIBYM_MINCOV_MAXCLIQUE_H
-#define LIBYM_MINCOV_MAXCLIQUE_H
+#ifndef MAXCLIQUE_H
+#define MAXCLIQUE_H
 
-/// @file libym_mincov/MaxClique.h
+/// @file MaxClique.h
 /// @brief MaxClique のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_mincov/mincov_nsdef.h"
+#include "utils/mincov_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -32,6 +32,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コストを設定する．
   void
@@ -65,4 +68,4 @@ private:
 
 END_NAMESPACE_YM_MINCOV
 
-#endif // LIBYM_MINCOV_MAXCLIQUE_H
+#endif // MAXCLIQUE_H

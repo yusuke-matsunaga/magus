@@ -1,11 +1,11 @@
-#ifndef FOPKDET_H
-#define FOPKDET_H
+#ifndef KDETOP_H
+#define KDETOP_H
 
-/// @file FopKDet.h
-/// @brief FopKDet のヘッダファイル
+/// @file KDetOp.h
+/// @brief KDetOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class FopKDet FopKDet.h "FopKDet.h"
-/// @brief 定められた回数分のパタンを記録する FsimOp
+/// @class KDetOp KDetOp.h "KDetOp.h"
+/// brief KDet 用の FsimOp
 //////////////////////////////////////////////////////////////////////
-class FopKDet :
+class KDetOp :
   public FsimOp
 {
 public:
@@ -26,12 +26,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] fsim 故障シミュレータ
   /// @param[in] fmgr 故障マネージャ
-  FopKDet(Fsim& fsim,
-	  FaultMgr& fmgr);
+  KDetOp(Fsim& fsim,
+	 FaultMgr& fmgr);
 
   /// @brief デストラクタ
   virtual
-  ~FopKDet();
+  ~KDetOp();
 
 
 public:
@@ -55,14 +55,13 @@ public:
   void
   set_limit(ymuint limit);
 
-  /// @brief パタンをセットする．
-  void
-  set_pattern(const vector<TestVector*>& pat_list);
+  /// @brief 検出された故障のID番号のリストを返す．
+  const vector<ymuint>&
+  det_list(ymuint pos);
 
-  /// @brief 故障に対するパタンのリストを返す．
-  /// @param[in] f_id 故障の ID
-  const vector<TestVector*>&
-  pat_list(ymuint f_id);
+  /// @brief det_list をクリアする．
+  void
+  clear_det_list();
 
 
 private:
@@ -70,21 +69,21 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 故障シミュレータ
+  // 故障シュミレータ
   Fsim& mFsim;
 
   // しきい値
   ymuint32 mLimit;
 
-  // 現在のパタンリスト
-  vector<TestVector*> mCurPatList;
+  // 各故障の検出回数
+  vector<ymuint> mDetCount;
 
-  // 個々の故障を検出するパタンのリストの配列
-  // 故障のIDでインデクシングされている．
-  vector<vector<TestVector*> > mPatListArray;
+  // 検出された故障番号のリスト
+  vector<ymuint> mDetListArray[kPvBitLen];
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // FOPKDET_H
+
+#endif // KDETOP_H

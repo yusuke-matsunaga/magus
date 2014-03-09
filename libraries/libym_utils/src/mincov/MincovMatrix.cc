@@ -1,16 +1,14 @@
 
-/// @file libym_mincov/MincovMatrix.cc
+/// @file MincovMatrix.cc
 /// @brief MincovMatrix の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovMatrix.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mincov/MincovMatrix.h"
-#include "ym_mincov/MincovCost.h"
+#include "utils/MincovMatrix.h"
+#include "utils/MincovCost.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -78,7 +76,7 @@ MincovRowHead::search_insert_pos(MincovCell* cell)
   }
   cell->mLeftLink = pcell;
   cell->mRightLink = ncell;
-  
+
   return true;
 }
 
@@ -132,7 +130,7 @@ MincovColHead::search_insert_pos(MincovCell* cell)
   }
   cell->mUpLink = pcell;
   cell->mDownLink = ncell;
-  
+
   return true;
 }
 
@@ -157,7 +155,7 @@ MincovMatrix::MincovMatrix(ymuint32 row_size,
 {
   resize(row_size, col_size, cost_size);
 }
-  
+
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 MincovMatrix::MincovMatrix(const MincovMatrix& src) :
@@ -171,7 +169,7 @@ MincovMatrix::MincovMatrix(const MincovMatrix& src) :
   resize(src.row_size(), src.col_size(), src.cost_size());
   copy(src);
 }
-  
+
 // @brief 代入演算子
 // @param[in] src コピー元のオブジェクト
 const MincovMatrix&
@@ -222,14 +220,14 @@ MincovMatrix::resize(ymuint32 row_size,
       delete mColCostArray[i];
     }
     delete [] mColCostArray;
-    
+
     mRowSize = row_size;
     mColSize = col_size;
     mCostSize = cost_size;
     mRowArray = new MincovRowHead[mRowSize];
     mColArray = new MincovColHead[mColSize];
     mColCostArray = new MincovCost*[mColSize];
-    
+
     mRowHead.mNext = &mRowHead;
     mRowHead.mPrev = &mRowHead;
     mRowHead.clear();
@@ -239,7 +237,7 @@ MincovMatrix::resize(ymuint32 row_size,
       row->mPos = i;
       row->clear();
     }
-    
+
     mColHead.mNext = &mColHead;
     mColHead.mPrev = &mColHead;
     mColHead.clear();
@@ -266,7 +264,7 @@ MincovMatrix::copy(const MincovMatrix& src)
   assert_cond(row_size() == src.row_size(), __FILE__, __LINE__);
   assert_cond(col_size() == src.col_size(), __FILE__, __LINE__);
   assert_cond(cost_size() == src.cost_size(), __FILE__, __LINE__);
-  
+
   for (ymuint i = 0; i < row_size(); ++ i) {
     const MincovRowHead* src_row = src.row(i);
     for (const MincovCell* src_cell = src_row->front();
@@ -278,7 +276,7 @@ MincovMatrix::copy(const MincovMatrix& src)
     *mColCostArray[i] = src.col_cost(i);
   }
 }
-  
+
 // @brief 要素を追加する．
 // @param[in] row_pos 追加する要素の行番号
 // @param[in] col_pos 追加する要素の列番号
@@ -290,7 +288,7 @@ MincovMatrix::insert_elem(ymuint32 row_pos,
   MincovCell* cell = alloc_cell();
   cell->mRowPos = row_pos;
   cell->mColPos = col_pos;
-  
+
   MincovRowHead* row = &mRowArray[row_pos];
   bool stat1 = row->search_insert_pos(cell);
   if ( !stat1 ) {
@@ -327,7 +325,7 @@ MincovMatrix::insert_elem(ymuint32 row_pos,
     row->mNext = next;
     next->mPrev = row;
   }
-  
+
   col->insert_elem(cell);
   if ( col->num() == 1 ) {
     MincovColHead* prev = mColHead.mPrev; // 末尾
@@ -352,10 +350,10 @@ MincovMatrix::insert_elem(ymuint32 row_pos,
     col->mNext = next;
     next->mPrev = col;
   }
-  
+
   return cell;
 }
-  
+
 // @brief 列のコストを設定する．
 // @param[in] col_pos 列番号
 // @param[in] val_pos 値の位置番号
@@ -371,7 +369,7 @@ MincovMatrix::set_col_cost(ymuint32 col_pos,
   mColCostArray[col_pos]->operator[](val_pos) = value;
 #endif
 }
-  
+
 // @brief 列を選択し，被覆される行を削除する．
 void
 MincovMatrix::select_col(ymuint32 col_pos)
@@ -388,7 +386,7 @@ MincovMatrix::select_col(ymuint32 col_pos)
   }
   delete_col(col_pos);
 }
-    
+
 // @brief 削除スタックにマーカーを書き込む．
 void
 MincovMatrix::backup()
@@ -441,7 +439,7 @@ MincovMatrix::delete_row(ymuint32 row_pos)
 
   mDelStack.push_back((row_pos << 2) | 1U);
 }
-  
+
 // @brief 行を復元する．
 void
 MincovMatrix::restore_row(ymuint32 row_pos)
@@ -451,7 +449,7 @@ MincovMatrix::restore_row(ymuint32 row_pos)
   MincovRowHead* next = row->mNext;
   prev->mNext = row;
   next->mPrev = row;
-  
+
   for (MincovCell* cell = row->mDummy.mRightLink;
        !row->is_end(cell); cell = cell->mRightLink) {
     mColArray[cell->col_pos()].insert_elem(cell);
@@ -477,7 +475,7 @@ MincovMatrix::delete_col(ymuint32 col_pos)
       delete_row(row_pos);
     }
   }
-  
+
   mDelStack.push_back((col_pos << 2) | 3U);
 }
 

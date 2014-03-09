@@ -1,15 +1,15 @@
-#ifndef YM_MINCOV_MINCOVSOLVER_H
-#define YM_MINCOV_MINCOVSOLVER_H
+#ifndef UTILS_MINCOVSOLVER_H
+#define UTILS_MINCOVSOLVER_H
 
-/// @file ym_mincov/MincovSolver.h
+/// @file utils/MincovSolver.h
 /// @brief MincovSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mincov/mincov_nsdef.h"
+#include "utils/mincov_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 class MincovCost;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovSolver MincovSolver.h "ym_mincov/MincovSolver.h"
+/// @class MincovSolver MincovSolver.h "utils/MincovSolver.h"
 /// @brief 最小被覆問題を解くクラス
 //////////////////////////////////////////////////////////////////////
 class MincovSolver
@@ -32,6 +32,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 最小被覆問題を解く．
   /// @param[in] matrix 対象の行列
@@ -43,6 +46,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 解を求める再帰関数
   /// @param[in] matrix 対象の行列
@@ -102,4 +108,4 @@ private:
 
 END_NAMESPACE_YM_MINCOV
 
-#endif // YM_MINCOV_MINCOVMATRIX_H
+#endif // UTILS_MINCOVMATRIX_H

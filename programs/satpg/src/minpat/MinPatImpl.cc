@@ -14,6 +14,7 @@
 #include "TestVector.h"
 #include "FaultMgr.h"
 #include "Fsim.h"
+#include "KDet.h"
 #include "FopRofsim.h"
 #include "utils/GcSolver.h"
 #include "utils/RandGen.h"
@@ -79,6 +80,54 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
       cout << "No Errors(1)" << endl;
     }
   }
+
+  KDet kdet(mFsim3, mFaultMgr);
+
+  vector<vector<ymuint> > det_list_array;
+  ymuint k = 200;
+  kdet.run(tv_list, k, det_list_array);
+  vector<bool> fmark(mFaultMgr.all_num());
+
+  ymuint orig_size = tv_list.size();
+  for ( ; ; ) {
+    vector<TestVector*> tv_tmp_list;
+    tv_tmp_list.reserve(tv_list.size());
+    ymuint fnum = 0;
+    for (ymuint i = 0; i < tv_list.size(); ++ i) {
+      const vector<ymuint>& det_list = det_list_array[i];
+      for (ymuint j = 0; j < det_list.size(); ++ j) {
+	if ( !fmark[det_list[j]] ) {
+	  ++ fnum;
+	  fmark[det_list[j]] = true;
+	}
+      }
+    }
+    RandPermGen rpg(tv_list.size());
+    rpg.generate(randgen);
+    for (ymuint i = 0; i < tv_list.size(); ++ i) {
+      ymuint pos = rpg.elem(i);
+      const vector<ymuint>& det_list = det_list_array[pos];
+      ymuint n = 0;
+      for (ymuint j = 0; j < det_list.size(); ++ j) {
+	if ( fmark[det_list[j]] ) {
+	  fmark[det_list[j]] = false;
+	  ++ n;
+	}
+      }
+      if ( n > 0 ) {
+	tv_tmp_list.push_back(tv_list[pos]);
+	fnum -= n;
+	if ( fnum == 0 ) {
+	  break;
+	}
+      }
+    }
+    if ( tv_list.size() == tv_tmp_list.size() ) {
+      break;
+    }
+    tv_list = tv_tmp_list;
+  }
+  cout << " min cover: " << tv_list.size() << " / " << orig_size << endl;
 
   // 3値のパタンを抜き出し tv3_list に入れる．
   // 2値のパタンは tv2_list に入れる．

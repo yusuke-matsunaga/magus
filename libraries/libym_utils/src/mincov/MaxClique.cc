@@ -1,16 +1,14 @@
 
-/// @file libym_mincov/MaxClique.cc
+/// @file MaxClique.cc
 /// @brief MaxClique の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MaxClique.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MaxClique.h"
-#include "ym_mincov/MincovCost.h"
+#include "utils/MincovCost.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -26,7 +24,7 @@ MaxClique::MaxClique(ymuint size) :
   mNlistArray(size)
 {
 }
-  
+
 // @brief デストラクタ
 MaxClique::~MaxClique()
 {
@@ -39,7 +37,7 @@ MaxClique::set_cost(ymuint32 id,
 {
   mCostArray[id] = cost;
 }
-  
+
 // @brief 2つのノードを隣接させる．
 // @param[in] id1, id2 ノード番号
 void
@@ -92,6 +90,7 @@ merge_nlist(vector<ymuint32>& left,
 
 END_NONAMESPACE
 
+
 // @brief 最大クリークを求める．
 // @param[out] ans 解のノード番号を入れる配列
 MincovCost
@@ -103,7 +102,7 @@ MaxClique::solve(vector<ymuint32>& ans)
     vector<ymuint32>& nlist = *p;
     sort(nlist.begin(), nlist.end());
   }
-  
+
   ans.clear();
 
   MincovCost cost(MincovCost::zero());

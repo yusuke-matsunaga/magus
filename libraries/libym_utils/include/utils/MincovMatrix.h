@@ -1,16 +1,16 @@
-#ifndef YM_MINCOV_MINCOVMATRIX_H
-#define YM_MINCOV_MINCOVMATRIX_H
+#ifndef UTILS_MINCOVMATRIX_H
+#define UTILS_MINCOVMATRIX_H
 
-/// @file ym_mincov/MincovMatrix.h
+/// @file utils/MincovMatrix.h
 /// @brief MincovMatrix のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mincov/mincov_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "utils/mincov_nsdef.h"
+#include "utils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 class MincovCost;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovCell MincovMatrix.h "ym_mincov/MincovMatrix.h"
+/// @class MincovCell MincovMatrix.h "utils/MincovMatrix.h"
 /// @brief Mincov 用の行列要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovCell
@@ -37,6 +37,9 @@ private:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 行番号を返す．
   ymuint32
@@ -143,7 +146,7 @@ MincovCell::col_next() const
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovRowHead MincovMatrix.h "ym_mincov/MincovMatrix.h"
+/// @class MincovRowHead MincovMatrix.h "utils/MincovMatrix.h"
 /// @brief Mincov 用の行の先頭要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovRowHead
@@ -160,6 +163,9 @@ private:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 行番号を返す．
   ymuint32
@@ -193,6 +199,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 接続している要素をクリアする．
   void
@@ -344,7 +353,7 @@ MincovRowHead::delete_elem(MincovCell* cell)
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovColHead MincovMatrix.h "ym_mincov/MincovMatrix.h"
+/// @class MincovColHead MincovMatrix.h "utils/MincovMatrix.h"
 /// @brief Mincov 用の列の先頭要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovColHead
@@ -361,6 +370,9 @@ private:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 列番号を返す．
   ymuint32
@@ -394,6 +406,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 接続している要素をクリアする．
   void
@@ -545,7 +560,7 @@ MincovColHead::delete_elem(MincovCell* cell)
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovMatrix MincovMatrix.h "ym_mincov/MincovMatrix.h"
+/// @class MincovMatrix MincovMatrix.h "utils/MincovMatrix.h"
 /// @brief Mincov 用の行列を表すクラス
 //////////////////////////////////////////////////////////////////////
 class MincovMatrix
@@ -867,4 +882,4 @@ MincovMatrix::col_cost(ymuint32 col_pos) const
 
 END_NAMESPACE_YM_MINCOV
 
-#endif // YM_MINCOV_MINCOVMATRIX_H
+#endif // UTILS_MINCOVMATRIX_H

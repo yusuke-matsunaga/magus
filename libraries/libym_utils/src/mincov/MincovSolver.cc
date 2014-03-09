@@ -1,19 +1,17 @@
 
-/// @file libym_mincov/MincovSolver.cc
+/// @file MincovSolver.cc
 /// @brief MincovSolver の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovSolver.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mincov/MincovSolver.h"
-#include "ym_mincov/MincovCost.h"
-#include "ym_mincov/MincovMatrix.h"
+#include "utils/MincovSolver.h"
+#include "utils/MincovCost.h"
+#include "utils/MincovMatrix.h"
 #include "MaxClique.h"
-#include "ym_utils/MFSet.h"
+#include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -31,7 +29,7 @@ MincovSolver::MincovSolver()
 MincovSolver::~MincovSolver()
 {
 }
-  
+
 // @brief 最小被覆問題を解く．
 // @param[in] matrix 対象の行列
 // @param[out] solution 選ばれた列集合
@@ -44,7 +42,7 @@ MincovSolver::operator()(const MincovMatrix& matrix,
   MincovCost dummy_best = MincovCost::zero();
   return solve(work, dummy_best, solution);
 }
-  
+
 // @brief 解を求める再帰関数
 // @param[in] matrix 対象の行列
 // @param[in] best_sofar 現時点の最良解
@@ -56,9 +54,9 @@ MincovSolver::solve(MincovMatrix& matrix,
 		    vector<ymuint32>& solution)
 {
   MincovCost best(best_sofar);
-  
+
   vector<ymuint32> tmp_solution;
-  
+
   reduce(matrix, tmp_solution);
 
   MincovCost lb = lower_bound(matrix);
@@ -86,7 +84,7 @@ MincovSolver::solve(MincovMatrix& matrix,
     solution = tmp_solution;
     solution.insert(solution.end(), tmp_solution1.begin(), tmp_solution1.end());
   }
-  
+
   return best;
 }
 
@@ -208,7 +206,7 @@ bool
 MincovSolver::row_dominance(MincovMatrix& matrix)
 {
   bool change = false;
-  
+
   // 削除された行番号に印をつけるための配列
   vector<bool> del_mark(matrix.row_size(), false);
 
@@ -285,7 +283,7 @@ MincovSolver::row_dominance(MincovMatrix& matrix)
 	tmp_rows.erase(tmp_rows.begin() + wpos, tmp_rows.end());
       }
     }
-    
+
     // tmp_rows に残った行は row_pos に支配されている．
     for (vector<ymuint32>::iterator p = tmp_rows.begin();
 	 p != tmp_rows.end(); ++ p) {
@@ -330,7 +328,7 @@ bool
 MincovSolver::col_dominance(MincovMatrix& matrix)
 {
   bool change = false;
-  
+
   // 残っている列のリストを作る．
   vector<const MincovColHead*> col_list;
   col_list.reserve(matrix.col_size());
@@ -399,7 +397,7 @@ MincovSolver::col_dominance(MincovMatrix& matrix)
       }
     }
   }
-  
+
   return change;
 }
 

@@ -17,6 +17,7 @@ SUBDIRS = \
 	io \
 	itvl \
 	mfset \
+	mincov \
 	misc \
 	msg \
 	str

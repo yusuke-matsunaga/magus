@@ -1,15 +1,13 @@
 
-/// @file libym_mincov/MincovCost.cc
+/// @file MincovCost.cc
 /// @brief MincovCost の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
-/// $Id: MincovCost.cc 2507 2009-10-17 16:24:02Z matsunaga $
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mincov/MincovCost.h"
+#include "utils/MincovCost.h"
 
 
 #ifdef USE_MINCOVCOST
@@ -30,7 +28,7 @@ MincovCost::MincovCost(ymuint size) :
     mValArray[i] = 0.0;
   }
 }
-  
+
 // @brief コピーコンストラクタ
 // @param[in] src コピー元のオブジェクト
 MincovCost::MincovCost(const MincovCost& src) :
@@ -66,7 +64,7 @@ MincovCost::zero(ymuint size)
 {
   return MincovCost(size);
 }
-  
+
 // @brief デストラクタ
 MincovCost::~MincovCost()
 {
@@ -84,7 +82,7 @@ MincovCost::operator+=(const MincovCost& right)
   }
   return *this;
 }
-  
+
 // @brief 減算付き代入演算子
 // @param[in] right 右のオペランド
 const MincovCost&

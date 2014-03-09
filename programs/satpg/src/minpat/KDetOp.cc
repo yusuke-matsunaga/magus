@@ -1,38 +1,37 @@
 
-/// @file FopKDet.cc
-/// @brief FopKDet の実装ファイル
+/// @file KDetOp.cc
+/// @brief KDetOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "FopKDet.h"
+#include "KDetOp.h"
 #include "Fsim.h"
 #include "FaultMgr.h"
-#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス FopKDet
+// クラス KDetOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
 // @param[in] fmgr 故障マネージャ
-FopKDet::FopKDet(Fsim& fsim,
-		 FaultMgr& fmgr) :
+KDetOp::KDetOp(Fsim& fsim,
+	       FaultMgr& fmgr) :
   mFsim(fsim),
   mLimit(1),
-  mPatListArray(fmgr.all_num())
+  mDetCount(fmgr.all_num())
 {
   mFsim.set_faults(fmgr.det_list());
 }
 
 // @brief デストラクタ
-FopKDet::~FopKDet()
+KDetOp::~KDetOp()
 {
 }
 
@@ -40,16 +39,15 @@ FopKDet::~FopKDet()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-FopKDet::operator()(TpgFault* f,
-		      PackedVal dpat)
+KDetOp::operator()(TpgFault* f,
+		   PackedVal dpat)
 {
   ymuint f_id = f->id();
-  vector<TestVector*>& pat_list = mPatListArray[f_id];
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     if ( dpat & (1UL << i) ) {
-      pat_list.push_back(mCurPatList[i]);
-      if ( pat_list.size() >= mLimit ) {
-	// 規定回数以上検出されたので以後のシミュレーションではスキップする．
+      mDetListArray[i].push_back(f_id);
+      ++ mDetCount[f_id];
+      if ( mDetCount[f_id] >= mLimit ) {
 	mFsim.set_skip(f);
 	break;
       }
@@ -59,34 +57,35 @@ FopKDet::operator()(TpgFault* f,
 
 // @brief 検出回数をクリアする．
 void
-FopKDet::clear_count()
+KDetOp::clear_count()
 {
-  ymuint n = mPatListArray.size();
+  ymuint n = mDetCount.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mPatListArray[i].clear();
+    mDetCount[i] = 0;
   }
 }
 
 // @brief 検出回数のしきい値をセットする．
 void
-FopKDet::set_limit(ymuint limit)
+KDetOp::set_limit(ymuint limit)
 {
   mLimit = limit;
 }
 
-// @brief パタンをセットする．
-void
-FopKDet::set_pattern(const vector<TestVector*>& pat_list)
+// @brief 検出された故障のID番号のリストを返す．
+const vector<ymuint>&
+KDetOp::det_list(ymuint pos)
 {
-  mCurPatList = pat_list;
+  return mDetListArray[pos % kPvBitLen];
 }
 
-// @brief 故障に対するパタンのリストを返す．
-// @param[in] f_id 故障の ID
-const vector<TestVector*>&
-FopKDet::pat_list(ymuint f_id)
+// @brief det_list をクリアする．
+void
+KDetOp::clear_det_list()
 {
-  return mPatListArray[f_id];
+  for (ymuint i = 0; i < kPvBitLen; ++ i) {
+    mDetListArray[i].clear();
+  }
 }
 
 END_NAMESPACE_YM_SATPG

@@ -1,21 +1,21 @@
-#ifndef YM_MINCOV_MINCOVCOST2_H
-#define YM_MINCOV_MINCOVOCST2_H
+#ifndef UTILS_MINCOVCOST2_H
+#define UTILS_MINCOVOCST2_H
 
-/// @file ym_mincov/MincovCost.h
+/// @file utils/MincovCost.h
 /// @brief MincovCost のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ym_mincov/mincov_nsdef.h"
+#include "utils/mincov_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovCost MincovCost2.h "ym_mincov/MincovCost2.h"
+/// @class MincovCost MincovCost2.h "utils/MincovCost2.h"
 /// @brief Mincov 用のコストを表すクラス(2次元バージョン)
 //////////////////////////////////////////////////////////////////////
 class MincovCost
@@ -392,4 +392,4 @@ operator>=(const MincovCost& left,
 
 END_NAMESPACE_YM_MINCOV
 
-#endif // YM_MINCOV_MINCOVCOST2_H
+#endif // UTILS_MINCOVCOST2_H
