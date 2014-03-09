@@ -119,7 +119,6 @@ class RtpgStats;
 class MinPat;
 class MinPatStats;
 class Fsim;
-class FsimNew;
 class FsimOp;
 
 END_NAMESPACE_YM_SATPG

@@ -63,14 +63,6 @@ public:
   Fsim&
   _fsim3();
 
-  /// @brief 2値の故障シミュレータを取り出す．
-  FsimNew&
-  _fsimnew();
-
-  /// @brief 3値の故障シミュレータを返す．
-  FsimNew&
-  _fsimnew3();
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -227,12 +219,6 @@ private:
   // 3値の故障シミュレータ
   Fsim* mFsim3;
 
-  // 故障シミュレータ
-  FsimNew* mFsimNew;
-
-  // 3値の故障シミュレータ
-  FsimNew* mFsimNew3;
-
   // RTPG
   Rtpg* mRtpg;
 
@@ -301,22 +287,6 @@ Fsim&
 AtpgMgr::_fsim3()
 {
   return *mFsim3;
-}
-
-// @brief 2値の故障シミュレータを取り出す．
-inline
-FsimNew&
-AtpgMgr::_fsimnew()
-{
-  return *mFsimNew;
-}
-
-// @brief 3値の故障シミュレータを返す．
-inline
-FsimNew&
-AtpgMgr::_fsimnew3()
-{
-  return *mFsimNew3;
 }
 
 // @brief ネットワークの変更に関するハンドラを登録する．

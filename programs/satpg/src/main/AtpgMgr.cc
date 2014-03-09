@@ -14,7 +14,6 @@
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
-#include "FsimNew.h"
 #include "Dtpg.h"
 #include "Rtpg.h"
 #include "MinPat.h"
@@ -70,50 +69,6 @@ FsimNetBinder::event_proc(const TpgNetwork& network,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス FsimNewNetBinder
-//////////////////////////////////////////////////////////////////////
-class FsimNewNetBinder :
-  public T2Binder<const TpgNetwork&, FaultMgr&>
-{
-public:
-
-  /// @brief コンストラクタ
-  FsimNewNetBinder(FsimNew* fsim);
-
-  /// @brief イベント処理関数
-  virtual
-  void
-  event_proc(const TpgNetwork& network,
-	     FaultMgr& fault_mgr);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // FsimNew
-  FsimNew* mFsim;
-
-};
-
-
-// @brief コンストラクタ
-FsimNewNetBinder::FsimNewNetBinder(FsimNew* fsim) :
-  mFsim(fsim)
-{
-}
-
-// @brief イベント処理関数
-void
-FsimNewNetBinder::event_proc(const TpgNetwork& network,
-			     FaultMgr& fault_mgr)
-{
-  mFsim->set_network(network, fault_mgr);
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // AtpgMgr
 //////////////////////////////////////////////////////////////////////
 
@@ -127,9 +82,6 @@ AtpgMgr::AtpgMgr() :
   mFsim = new_Fsim2();
   mFsim3 = new_Fsim3();
 
-  mFsimNew = new_FsimNew2();
-  mFsimNew3 = new_FsimNew3();
-
   mRtpg = new_Rtpg(*this);
   mDtpg = new_DtpgSat();
   mMinPat = new_MinPat(*this);
@@ -138,9 +90,6 @@ AtpgMgr::AtpgMgr() :
 
   reg_network_handler(new FsimNetBinder(mFsim));
   reg_network_handler(new FsimNetBinder(mFsim3));
-
-  reg_network_handler(new FsimNewNetBinder(mFsimNew));
-  reg_network_handler(new FsimNewNetBinder(mFsimNew3));
 
   set_dtpg_mode();
 }
@@ -152,8 +101,6 @@ AtpgMgr::~AtpgMgr()
   delete mTvMgr;
   delete mFsim;
   delete mFsim3;
-  delete mFsimNew;
-  delete mFsimNew3;
   delete mRtpg;
   delete mDtpg;
   delete mMinPat;
@@ -315,7 +262,7 @@ AtpgMgr::after_set_network()
   mTvMgr->clear();
   mTvMgr->init(mNetwork->input_num2());
 
-  mDtpg->set_network(*mNetwork);
+  mDtpg->set_network(*mNetwork, *mFaultMgr);
 
   mNtwkBindMgr.prop_event(*mNetwork, *mFaultMgr);
 }

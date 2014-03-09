@@ -12,6 +12,7 @@
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "TpgFault.h"
+#include "FaultMgr.h"
 #include "DetectOp.h"
 #include "UntestOp.h"
 #include "DtpgNgMgr.h"
@@ -61,10 +62,13 @@ DtpgSat::set_mode(const string& type,
 
 // @brief 回路と故障リストを設定する．
 // @param[in] tgnetwork 対象のネットワーク
+// @param[in] fault_mgr 故障マネージャ
 void
-DtpgSat::set_network(TpgNetwork& tgnetwork)
+DtpgSat::set_network(TpgNetwork& tgnetwork,
+		     FaultMgr& fault_mgr)
 {
   mNetwork = &tgnetwork;
+  mFaultMgr = &fault_mgr;
   mMaxId = mNetwork->node_num();
 }
 
@@ -87,6 +91,12 @@ DtpgSat::run(DtpgMode mode,
 {
   mDetectOpList = dop_list;
   mUntestOpList = uop_list;
+
+  for (vector<DetectOp*>::const_iterator p = dop_list.begin();
+       p != dop_list.end(); ++ p) {
+    DetectOp* dop = *p;
+    dop->set_faults(mFaultMgr->remain_list());
+  }
 
   mSatEngine->clear_stats();
 

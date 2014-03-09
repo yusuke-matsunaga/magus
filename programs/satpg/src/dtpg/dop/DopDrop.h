@@ -39,6 +39,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障リストを設定する．
+  /// @param[in] fault_list 故障リスト
+  virtual
+  void
+  set_faults(const vector<TpgFault*>& fault_list);
+
   /// @brief テストパタンが見つかった時の処理
   /// @param[in] f 故障
   /// @param[in] tv テストパタン
@@ -58,9 +64,6 @@ private:
 
   // 故障シミュレータ
   Fsim& mFsim;
-
-  // 検出された故障を入れるリスト
-  vector<TpgFault*> mDetFaults;
 
 };
 

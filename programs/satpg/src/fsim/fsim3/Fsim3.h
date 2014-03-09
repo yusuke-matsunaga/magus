@@ -58,10 +58,13 @@ public:
   void
   set_skip(TpgFault* f);
 
-  /// @brief すべての故障のスキップマークを消す．
+  /// @brief 故障リストを設定する．
+  /// @param[in] fault_list 対象の故障リスト
+  ///
+  /// スキップマークは消される．
   virtual
   void
-  clear_skip();
+  set_faults(const vector<TpgFault*>& fault_list);
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -96,6 +99,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief FFR 内の故障シミュレーションを行う．
+  /// @param[in] ffr 対象のFFR
+  ///
+  /// ffr 内の対象故障に対して故障が伝搬するかを調べる．
+  /// 結果は各故障の mObsMask に設定される．
+  /// また，すべての mObsMask の bitwise-OR を返す．
+  ///
+  /// 故障は SimFFR::fault_list() に格納されているが，
+  /// スキップフラグが立った故障はリストから取り除かれる．
   PackedVal
   ffr_simulate(SimFFR* ffr);
 
@@ -123,6 +134,10 @@ private:
   update_fval(SimNode* node);
 
   /// @brief ffr 内の故障が検出可能か調べる．
+  /// @param[in] ffr 対象の FFR
+  /// @param[in] det_faults 検出された故障を入れるベクタ
+  ///
+  /// ここでは各FFR の fault_list() は変化しない．
   void
   fault_sweep(SimFFR* ffr,
 	      vector<TpgFault*>& det_faults);
@@ -140,15 +155,13 @@ private:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // SimNode/FsimFault 関係の設定関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 現在保持している SimNode のネットワークを破棄する．
-  /// 内部で clear_faults() を呼ぶ．
   void
   clear();
-
-  /// @brief FsimFault を破棄する．
-  void
-  clear_faults();
 
   /// @brief node に対応する SimNode を得る．
   SimNode*

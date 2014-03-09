@@ -32,6 +32,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障リストを設定する．
+  /// @param[in] fault_list 故障リスト
+  virtual
+  void
+  set_faults(const vector<TpgFault*>& fault_list) = 0;
+
   /// @brief テストパタンが見つかった時の処理
   /// @param[in] f 故障
   /// @param[in] tv テストパタン
@@ -51,11 +57,6 @@ new_DopBase(AtpgMgr& mgr);
 /// @param[in] mgr AtpgMgr
 DetectOp*
 new_DopDrop(AtpgMgr& mgr);
-
-/// @brief 'drop' タイプを生成する．
-/// @param[in] mgr AtpgMgr
-DetectOp*
-new_DopDropNew(AtpgMgr& mgr);
 
 /// @brief 'tvlist' タイプを生成する．
 /// @param[in] mgr AtpgMgr

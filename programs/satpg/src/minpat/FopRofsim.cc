@@ -28,6 +28,7 @@ FopRofsim::FopRofsim(Fsim& fsim,
   mDetArray(fmgr.all_num())
 {
   mDetBits = 0UL;
+  mFsim.set_faults(fmgr.det_list());
 }
 
 // @brief デストラクタ
@@ -64,7 +65,6 @@ FopRofsim::clear_count()
   for (ymuint i = 0; i < n; ++ i) {
     mDetArray[i] = false;
   }
-  mFsim.clear_skip();
 }
 
 // @brief 今のパタンで新たに故障検出が行えたかを表すビットベクタを返す．

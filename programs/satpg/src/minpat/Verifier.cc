@@ -42,7 +42,6 @@ FopVer::operator()(TpgFault* f,
 void
 FopVer::clear_det_flag()
 {
-  mFsim.clear_skip();
   mDetSet.clear();
 }
 
@@ -80,7 +79,8 @@ bool
 Verifier::check(const vector<TestVector*>& pat_list)
 {
   mOp.clear_det_flag();
-  mFsim.clear_skip();
+  const vector<TpgFault*>& f_list = mFaultMgr.det_list();
+  mFsim.set_faults(f_list);
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
   for (vector<TestVector*>::const_iterator p = pat_list.begin();
@@ -97,7 +97,6 @@ Verifier::check(const vector<TestVector*>& pat_list)
   }
 
   bool no_error = true;
-  const vector<TpgFault*>& f_list = mFaultMgr.det_list();
   for (vector<TpgFault*>::const_iterator p = f_list.begin();
        p != f_list.end(); ++ p) {
     TpgFault* f = *p;

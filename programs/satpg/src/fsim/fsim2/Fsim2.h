@@ -57,10 +57,13 @@ public:
   void
   set_skip(TpgFault* f);
 
-  /// @brief すべての故障のスキップマークを消す．
+  /// @brief 故障リストを設定する．
+  /// @param[in] fault_list 対象の故障リスト
+  ///
+  /// スキップマークは消される．
   virtual
   void
-  clear_skip();
+  set_faults(const vector<TpgFault*>& fault_list);
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -125,10 +128,6 @@ private:
   /// 内部で clear_faults() を呼ぶ．
   void
   clear();
-
-  /// @brief FsimFault を破棄する．
-  void
-  clear_faults();
 
   /// @brief node に対応する SimNode を得る．
   SimNode*

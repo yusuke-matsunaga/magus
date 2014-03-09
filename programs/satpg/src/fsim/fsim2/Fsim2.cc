@@ -267,9 +267,6 @@ Fsim2::set_network(const TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 故障リストの設定
   //////////////////////////////////////////////////////////////////////
-
-  clear_faults();
-
   ymuint nf = fault_mgr.rep_num();
   mFsimFaults.resize(nf);
   mFaultArray.resize(fault_mgr.all_num());
@@ -289,9 +286,7 @@ Fsim2::set_network(const TpgNetwork& network,
       isimnode = simnode;
     }
     mFsimFaults[i].set(f, simnode, ipos, isimnode);
-    SimFFR* ffr = simnode->ffr();
     FsimFault* ff = &mFsimFaults[i];
-    ffr->fault_list().push_back(ff);
     mFaultArray[f->id()] = ff;
   }
 }
@@ -303,14 +298,34 @@ Fsim2::set_skip(TpgFault* f)
   mFaultArray[f->id()]->mSkip = true;
 }
 
-// @brief すべての故障のスキップマークを消す．
+// @brief 故障リストを設定する．
+// @param[in] fault_list 対象の故障リスト
+//
+// スキップマークは消される．
 void
-Fsim2::clear_skip()
+Fsim2::set_faults(const vector<TpgFault*>& fault_list)
 {
-  ymuint n = mFaultArray.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    if ( mFaultArray[i] ) {
-      mFaultArray[i]->mSkip = false;
+  unordered_set<ymuint> fault_set;
+  for (ymuint i = 0; i < fault_list.size(); ++ i) {
+    fault_set.insert(fault_list[i]->id());
+  }
+
+  // 同時に各 SimFFR 内の fault_list() も再構築する．
+  for (vector<SimFFR>::iterator p = mFFRArray.begin();
+       p != mFFRArray.end(); ++ p) {
+    p->fault_list().clear();
+  }
+  ymuint nf = mFsimFaults.size();
+  for (ymuint i = 0; i < nf; ++ i) {
+    FsimFault* ff = &mFsimFaults[i];
+    if ( fault_set.count(ff->mOrigF->id()) > 0 ) {
+      ff->mSkip = false;
+      SimNode* simnode = ff->mNode;
+      SimFFR* ffr = simnode->ffr();
+      ffr->fault_list().push_back(ff);
+    }
+    else {
+      ff->mSkip = true;
     }
   }
 }
@@ -561,8 +576,6 @@ Fsim2::spsfp(TestVector* tv,
 void
 Fsim2::clear()
 {
-  clear_faults();
-
   mSimMap.clear();
 
   // mNodeArray が全てのノードを持っている
@@ -579,14 +592,6 @@ Fsim2::clear()
 
   mClearArray.clear();
 
-  // 念のため
-  mNetwork = NULL;
-}
-
-// @brief FsimFault を破棄する．
-void
-Fsim2::clear_faults()
-{
   for (vector<SimFFR>::iterator p = mFFRArray.begin();
        p != mFFRArray.end(); ++ p) {
     (*p).fault_list().clear();
@@ -594,6 +599,9 @@ Fsim2::clear_faults()
 
   mFsimFaults.clear();
   mFaultArray.clear();
+
+  // 念のため
+  mNetwork = NULL;
 }
 
 // @brief FFR 内の故障シミュレーションを行う．

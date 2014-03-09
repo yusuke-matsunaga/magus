@@ -74,9 +74,7 @@ COMMON_SOURCES = \
 	EventQ.cc \
 	FsimFault.h \
 	Fsim3.h \
-	Fsim3.cc \
-	FsimNew3.h \
-	FsimNew3.cc
+	Fsim3.cc
 
 
 ############################################################

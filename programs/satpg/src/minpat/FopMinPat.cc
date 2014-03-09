@@ -28,6 +28,7 @@ FopMinPat::FopMinPat(Fsim& fsim,
   mLimit(1),
   mFinfoArray(fmgr.all_num())
 {
+  mFsim.set_faults(fmgr.det_list());
 }
 
 // @brief デストラクタ
@@ -67,7 +68,6 @@ FopMinPat::clear_count()
     finfo.mDetCount = 0;
     finfo.mPatList.clear();
   }
-  mFsim.clear_skip();
 }
 
 // @brief 検出回数のしきい値をセットする．
