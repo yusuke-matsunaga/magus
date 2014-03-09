@@ -67,15 +67,15 @@ public:
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[in] det_faults このパタンで検出された故障のリスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
   virtual
   void
   sppfp(TestVector* tv,
-	vector<TpgFault*>& det_faults) = 0;
+	FsimOp& op) = 0;
 
   /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
-  /// @param[in] op 検出した時に起動されるファンクタオブジェクト(Type2)
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
   virtual
   void
   ppsfp(const vector<TestVector*>& tv_array,

@@ -1,38 +1,37 @@
-#ifndef OPDETECT_H
-#define OPDETECT_H
+#ifndef FOPDROP_H
+#define FOPDROP_H
 
-/// @file DopDrop.h
-/// @brief DopDrop のヘッダファイル
+/// @file FopDrop.h
+/// @brief FopDrop のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DetectOp.h"
-#include "FopDrop.h"
+#include "FsimOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DopDrop DopDrop.h "DopDrop.h"
-/// @brief 故障シミュレーションを行なった故障ドロップを行なうクラス
+/// @class FopDrop FopDrop.h "FopDrop.h"
+/// @brief DopDrop 用の FsimOp
 //////////////////////////////////////////////////////////////////////
-class DopDrop :
-  public DetectOp
+class FopDrop :
+  public FsimOp
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim 故障シミュレータ
-  DopDrop(FaultMgr& fmgr,
+  FopDrop(FaultMgr& fmgr,
 	  Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
-  ~DopDrop();
+  ~FopDrop();
 
 
 public:
@@ -40,19 +39,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 故障リストを設定する．
-  /// @param[in] fault_list 故障リスト
-  virtual
-  void
-  set_faults(const vector<TpgFault*>& fault_list);
-
-  /// @brief テストパタンが見つかった時の処理
+  /// @brief 故障を検出したときの処理
   /// @param[in] f 故障
-  /// @param[in] tv テストパタン
+  /// @param[in] dpat 検出したパタンを表すビットベクタ
   virtual
   void
   operator()(TpgFault* f,
-	     TestVector* tv);
+	     PackedVal dpat);
 
 
 private:
@@ -66,11 +59,9 @@ private:
   // 故障シミュレータ
   Fsim& mFsim;
 
-  // Fsim 用のファンクタ
-  FopDrop mOp;
-
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // OPDETECT_H
+
+#endif // FOPDROP_H

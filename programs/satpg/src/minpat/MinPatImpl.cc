@@ -14,7 +14,6 @@
 #include "TestVector.h"
 #include "FaultMgr.h"
 #include "Fsim.h"
-#include "FopMinPat.h"
 #include "FopRofsim.h"
 #include "utils/GcSolver.h"
 #include "utils/RandGen.h"
@@ -103,6 +102,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   {
     FopRofsim op(mFsim3, mFaultMgr);
 
+    mFsim3.set_faults(mFaultMgr.det_list());
     op.clear_count();
 
     // tv3_list のパタンを用いて逆順故障シミュレーションを行なう．
@@ -146,6 +146,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
     FopRofsim op(mFsim3, mFaultMgr);
 
+    mFsim3.set_faults(mFaultMgr.det_list());
     op.clear_count();
 
     vector<TestVector*> cur_array;
@@ -280,6 +281,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
     FopRofsim op(mFsim2, mFaultMgr);
 
+    mFsim3.set_faults(mFaultMgr.det_list());
     op.clear_count();
 
     vector<TestVector*> cur_array;
@@ -319,6 +321,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
     FopRofsim op(mFsim2, mFaultMgr);
 
+    mFsim3.set_faults(mFaultMgr.det_list());
     op.clear_count();
 
     vector<TestVector*> cur_array;

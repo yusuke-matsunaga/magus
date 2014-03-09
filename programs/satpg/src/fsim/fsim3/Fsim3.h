@@ -78,11 +78,11 @@ public:
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
-  /// @param[in] det_faults このパタンで検出された故障のリスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
   virtual
   void
   sppfp(TestVector* tv,
-	vector<TpgFault*>& det_faults);
+	FsimOp& op);
 
   /// @brief 複数のパタンで故障シミュレーションを行う．
   /// @param[in] tv_array テストベクタの配列
@@ -135,12 +135,12 @@ private:
 
   /// @brief ffr 内の故障が検出可能か調べる．
   /// @param[in] ffr 対象の FFR
-  /// @param[in] det_faults 検出された故障を入れるベクタ
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
   ///
   /// ここでは各FFR の fault_list() は変化しない．
   void
   fault_sweep(SimFFR* ffr,
-	      vector<TpgFault*>& det_faults);
+	      FsimOp& op);
 
 
 private:

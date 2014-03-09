@@ -54,8 +54,6 @@ AM_CPPFLAGS = \
 COMMON_SOURCES = \
 	MinPatImpl.h \
 	MinPatImpl.cc \
-	FopMinPat.h \
-	FopMinPat.cc \
 	FopRofsim.h \
 	FopRofsim.cc \
 	Verifier.h \

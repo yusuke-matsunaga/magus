@@ -7,7 +7,8 @@
 
 SUBDIRS = \
 	fsim2 \
-	fsim3
+	fsim3 \
+	fop
 
 
 ############################################################
@@ -46,7 +47,8 @@ nodist_EXTRA_libatpg_fsim_la_SOURCES = dummy.cc
 
 libatpg_fsim_la_LIBADD = \
 	fsim2/libatpg_fsim2.la \
-	fsim3/libatpg_fsim3.la
+	fsim3/libatpg_fsim3.la \
+	fop/libatpg_fop.la
 
 libatpg_fsim_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -62,7 +64,8 @@ nodist_EXTRA_libatpg_fsim_d_la_SOURCES = dummy.cc
 
 libatpg_fsim_d_la_LIBADD = \
 	fsim2/libatpg_fsim2_d.la \
-	fsim3/libatpg_fsim3_d.la
+	fsim3/libatpg_fsim3_d.la \
+	fop/libatpg_fop_d.la
 
 libatpg_fsim_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -78,7 +81,8 @@ nodist_EXTRA_libatpg_fsim_p_la_SOURCES = dummy.cc
 
 libatpg_fsim_p_la_LIBADD = \
 	fsim2/libatpg_fsim2_p.la \
-	fsim3/libatpg_fsim3_p.la
+	fsim3/libatpg_fsim3_p.la \
+	fop/libatpg_fop_p.la
 
 libatpg_fsim_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

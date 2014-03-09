@@ -34,7 +34,8 @@ new_DopDrop(AtpgMgr& mgr)
 DopDrop::DopDrop(FaultMgr& fmgr,
 		 Fsim& fsim) :
   mMgr(fmgr),
-  mFsim(fsim)
+  mFsim(fsim),
+  mOp(fmgr, fsim)
 {
 }
 
@@ -58,14 +59,7 @@ void
 DopDrop::operator()(TpgFault* f,
 		    TestVector* tv)
 {
-  vector<TpgFault*> det_faults;
-  mFsim.sppfp(tv, det_faults);
-  for (vector<TpgFault*>::iterator p = det_faults.begin();
-       p != det_faults.end(); ++ p) {
-    TpgFault* f = *p;
-    mMgr.set_status(f, kFsDetected);
-    mFsim.set_skip(f);
-  }
+  mFsim.sppfp(tv, mOp);
 }
 
 END_NAMESPACE_YM_SATPG

@@ -1,8 +1,8 @@
-#ifndef FOPMINPAT_H
-#define FOPMINPAT_H
+#ifndef FOPKDET_H
+#define FOPKDET_H
 
-/// @file FopMinPat.h
-/// @brief FopMinPat のヘッダファイル
+/// @file FopKDet.h
+/// @brief FopKDet のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class FopMinPat FopMinPat.h "FopMinPat.h"
-/// @brief MinPat で用いる FsimOp
+/// @class FopKDet FopKDet.h "FopKDet.h"
+/// @brief 定められた回数分のパタンを記録する FsimOp
 //////////////////////////////////////////////////////////////////////
-class FopMinPat :
+class FopKDet :
   public FsimOp
 {
 public:
@@ -26,12 +26,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] fsim 故障シミュレータ
   /// @param[in] fmgr 故障マネージャ
-  FopMinPat(Fsim& fsim,
+  FopKDet(Fsim& fsim,
 	    FaultMgr& fmgr);
 
   /// @brief デストラクタ
   virtual
-  ~FopMinPat();
+  ~FopKDet();
 
 
 public:
@@ -67,25 +67,6 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // 1つの故障に関連した情報
-  struct FaultInfo {
-
-    FaultInfo() { }
-
-    // 検出回数
-    ymuint32 mDetCount;
-
-    // 検出するパタンのリスト
-    vector<TestVector*> mPatList;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -98,12 +79,12 @@ private:
   // 現在のパタンリスト
   vector<TestVector*> mCurPatList;
 
-  // 故障に関連した情報の配列
+  // 個々の故障を検出するパタンのリストの配列
   // 故障のIDでインデクシングされている．
-  vector<FaultInfo> mFinfoArray;
+  vector<vector<TestVector*> > mPatListArray;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // FOPMINPAT_H
+#endif // FOPKDET_H

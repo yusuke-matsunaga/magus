@@ -29,10 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libatpg_dop.la \
-	libatpg_dop_d.la \
-	libatpg_dop_p.la
-
+	libatpg_fop.la \
+	libatpg_fop_d.la \
+	libatpg_fop_p.la
 
 
 ############################################################
@@ -53,64 +52,56 @@ AM_CPPFLAGS = \
 ############################################################
 
 COMMON_SOURCES = \
-	DopBase.h \
-	DopBase.cc \
-	DopDrop.h \
-	DopDrop.cc \
-	FopDrop.h \
-	FopDrop.cc \
-	DopTvList.h \
-	DopTvList.cc \
-	DopVerify.h \
-	DopVerify.cc
+	FopKDet.h \
+	FopKDet.cc
 
 
 ############################################################
-## libatpg_dop.la 用の変数の定義
+## libatpg_fop.la 用の変数の定義
 ############################################################
 
-libatpg_dop_la_CXXFLAGS = \
+libatpg_fop_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_dop_la_SOURCES = \
+libatpg_fop_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_dop_la_LIBADD =
+libatpg_fop_la_LIBADD =
 
-libatpg_dop_la_LDFLAGS = \
+libatpg_fop_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_dop_d.la 用の変数の定義
+## libatpg_fop_d.la 用の変数の定義
 ############################################################
 
-libatpg_dop_d_la_CXXFLAGS = \
+libatpg_fop_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_dop_d_la_SOURCES = \
+libatpg_fop_d_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_dop_d_la_LIBADD =
+libatpg_fop_d_la_LIBADD =
 
-libatpg_dop_d_la_LDFLAGS = \
+libatpg_fop_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_dop_p.la 用の変数の定義
+## libatpg_fop_p.la 用の変数の定義
 ############################################################
 
-libatpg_dop_p_la_CXXFLAGS = \
+libatpg_fop_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_dop_p_la_SOURCES = \
+libatpg_fop_p_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_dop_p_la_LIBADD =
+libatpg_fop_p_la_LIBADD =
 
-libatpg_dop_p_la_LDFLAGS = \
+libatpg_fop_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)
