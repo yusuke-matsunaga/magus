@@ -1,25 +1,26 @@
-#ifndef FSIMFAULT_H
-#define FSIMFAULT_H
+#ifndef SIMFAULT_H
+#define SIMFAULT_H
 
-/// @file FsimFault.h
-/// @brief FsimFault のヘッダファイル
+/// @file SimFault.h
+/// @brief SimFault のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fsim2_nsdef.h"
+
+#include "fsim3_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_FSIM2
+BEGIN_NAMESPACE_YM_SATPG_FSIM
 
 class SimNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class FsimFault FsimFault.h "FsimFault.h"
+/// @class SimFault SimFault.h "SimFault.h"
 /// @brief 故障シミュレーション用の故障関係のデータ構造
 //////////////////////////////////////////////////////////////////////
-struct FsimFault
+struct SimFault
 {
   /// @brief 内容を設定する便利関数
   /// @param[in] f オリジナルの故障
@@ -60,6 +61,6 @@ struct FsimFault
 
 };
 
-END_NAMESPACE_YM_SATPG_FSIM2
+END_NAMESPACE_YM_SATPG_FSIM
 
-#endif // FSIMFAULT_H
+#endif // SIMFAULT_H

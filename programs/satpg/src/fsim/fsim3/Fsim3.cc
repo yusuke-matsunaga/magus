@@ -274,7 +274,7 @@ Fsim3::set_network(const TpgNetwork& network,
   // 故障リストの設定
   //////////////////////////////////////////////////////////////////////
   ymuint nf = fault_mgr.rep_num();
-  mFsimFaults.resize(nf);
+  mSimFaults.resize(nf);
   mFaultArray.resize(fault_mgr.all_num());
   for (ymuint i = 0; i < nf; ++ i) {
     TpgFault* f = fault_mgr.rep_fault(i);
@@ -291,8 +291,8 @@ Fsim3::set_network(const TpgNetwork& network,
       simnode = find_simnode(node);
       isimnode = simnode;
     }
-    mFsimFaults[i].set(f, simnode, ipos, isimnode);
-    FsimFault* ff = &mFsimFaults[i];
+    mSimFaults[i].set(f, simnode, ipos, isimnode);
+    SimFault* ff = &mSimFaults[i];
     mFaultArray[f->id()] = ff;
   }
 }
@@ -321,9 +321,9 @@ Fsim3::set_faults(const vector<TpgFault*>& fault_list)
        p != mFFRArray.end(); ++ p) {
     p->fault_list().clear();
   }
-  ymuint nf = mFsimFaults.size();
+  ymuint nf = mSimFaults.size();
   for (ymuint i = 0; i < nf; ++ i) {
-    FsimFault* ff = &mFsimFaults[i];
+    SimFault* ff = &mSimFaults[i];
     if ( fault_set.count(ff->mOrigF->id()) > 0 ) {
       ff->mSkip = false;
       SimNode* simnode = ff->mNode;
@@ -608,10 +608,10 @@ Fsim3::ppsfp(const vector<TestVector*>& tv_array,
     // obs と各々の故障の mObsMask との AND が 0 でなければ故障検出
     // できたということ．対応するテストベクタを記録する．
     // また，検出済みとなった故障をリストから取り除く
-    const vector<FsimFault*>& flist = ffr->fault_list();
-    for (vector<FsimFault*>::const_iterator p_ff = flist.begin();
+    const vector<SimFault*>& flist = ffr->fault_list();
+    for (vector<SimFault*>::const_iterator p_ff = flist.begin();
 	 p_ff != flist.end(); ++ p_ff) {
-      FsimFault* ff = *p_ff;
+      SimFault* ff = *p_ff;
       PackedVal dbits = obs & ff->mObsMask;
       if ( dbits ) {
 	TpgFault* f = ff->mOrigF;
@@ -650,7 +650,7 @@ Fsim3::clear()
     p->fault_list().clear();
   }
 
-  mFsimFaults.clear();
+  mSimFaults.clear();
   mFaultArray.clear();
 
 
@@ -671,11 +671,11 @@ PackedVal
 Fsim3::ffr_simulate(SimFFR* ffr)
 {
   PackedVal ffr_req = kPvAll0;
-  vector<FsimFault*>& flist = ffr->fault_list();
+  vector<SimFault*>& flist = ffr->fault_list();
   ymuint fnum = flist.size();
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
-    FsimFault* ff = flist[rpos];
+    SimFault* ff = flist[rpos];
     TpgFault* f = ff->mOrigF;
     if ( ff->mSkip ) {
       continue;
@@ -715,7 +715,7 @@ Fsim3::ffr_simulate(SimFFR* ffr)
   }
 
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
-    FsimFault* ff = flist[rpos];
+    SimFault* ff = flist[rpos];
     SimNode* node = ff->mNode;
     clear_lobs(node);
   }
@@ -792,10 +792,10 @@ void
 Fsim3::fault_sweep(SimFFR* ffr,
 		   vector<TpgFault*>& det_faults)
 {
-  const vector<FsimFault*>& flist = ffr->fault_list();
+  const vector<SimFault*>& flist = ffr->fault_list();
   ymuint fnum = flist.size();
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
-    FsimFault* ff = flist[rpos];
+    SimFault* ff = flist[rpos];
     if ( ff->mObsMask ) {
       TpgFault* f = ff->mOrigF;
       det_faults.push_back(f);

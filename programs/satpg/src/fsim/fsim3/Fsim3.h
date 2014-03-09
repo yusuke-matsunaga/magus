@@ -14,7 +14,7 @@
 #include "Fsim.h"
 #include "PackedVal.h"
 #include "EventQ.h"
-#include "FsimFault.h"
+#include "SimFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM
@@ -156,7 +156,7 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // SimNode/FsimFault 関係の設定関数
+  // SimNode/SimFault 関係の設定関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 現在保持している SimNode のネットワークを破棄する．
@@ -233,10 +233,10 @@ private:
   vector<SimNode*> mFvalClearArray;
 
   // 故障シミュレーション用の故障の配列
-  vector<FsimFault> mFsimFaults;
+  vector<SimFault> mSimFaults;
 
-  // TpgFault::id() をキーにして FsimFault を格納する配列
-  vector<FsimFault*> mFaultArray;
+  // TpgFault::id() をキーにして SimFault を格納する配列
+  vector<SimFault*> mFaultArray;
 
 };
 

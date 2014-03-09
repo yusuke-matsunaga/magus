@@ -14,7 +14,7 @@
 #include "Fsim.h"
 #include "PackedVal.h"
 #include "EventQ.h"
-#include "FsimFault.h"
+#include "SimFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM2
@@ -196,10 +196,10 @@ private:
   vector<SimNode*> mClearArray;
 
   // 故障シミュレーション用の故障の配列
-  vector<FsimFault> mFsimFaults;
+  vector<SimFault> mSimFaults;
 
-  // TpgFault::id() をキーとして FsimFault を格納する配列
-  vector<FsimFault*> mFaultArray;
+  // TpgFault::id() をキーとして SimFault を格納する配列
+  vector<SimFault*> mFaultArray;
 
 };
 

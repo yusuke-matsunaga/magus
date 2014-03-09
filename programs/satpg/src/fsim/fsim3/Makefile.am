@@ -72,7 +72,7 @@ COMMON_SOURCES = \
 	SimFFR.h \
 	EventQ.h \
 	EventQ.cc \
-	FsimFault.h \
+	SimFault.h \
 	Fsim3.h \
 	Fsim3.cc
 

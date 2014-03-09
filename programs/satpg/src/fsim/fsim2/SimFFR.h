@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_SATPG_FSIM2
 
 class SimNode;
-class FsimFault;
+class SimFault;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SimFFR SimFFR.h "SimFFR.h"
@@ -43,7 +43,7 @@ public:
   root() const;
 
   /// @brief この FFR に属する故障のリストを返す．
-  vector<FsimFault*>&
+  vector<SimFault*>&
   fault_list();
 
 
@@ -56,7 +56,7 @@ private:
   SimNode* mRoot;
 
   // この FFR に属する故障のリスト
-  vector<FsimFault*> mFaultList;
+  vector<SimFault*> mFaultList;
 
 };
 
@@ -95,7 +95,7 @@ SimFFR::root() const
 
 // @brief この FFR に属する故障のリストを返す．
 inline
-vector<FsimFault*>&
+vector<SimFault*>&
 SimFFR::fault_list()
 {
   return mFaultList;
