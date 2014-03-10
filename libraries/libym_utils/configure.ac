@@ -153,6 +153,12 @@ AC_LANG_CPLUSPLUS
 
 
 # ===================================================================
+# Check for CppUnit
+# ===================================================================
+AM_PATH_CPPUNIT([1.12], [ym_have_cppunit=yes], [ym_have_cppunit=no])
+
+
+# ===================================================================
 # Check for CppUTest
 # ===================================================================
 YM_CHECK_CPPUTEST([ym_have_cpputest=yes], [ym_have_cpputest=no])
@@ -527,6 +533,23 @@ if test $ym_have_python = yes; then
    YM_ADD_TESTS_SUBDIRS([PyUnit])
    AC_CONFIG_FILES([py-sip/configure.py])
    AC_CONFIG_FILES([tests/PyUnit/Makefile])
+fi
+
+if test $ym_have_cppunit = yes; then
+   YM_ADD_TESTS_SUBDIRS([cppunit])
+   AC_CONFIG_FILES([tests/cppunit/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/alloc/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/btg/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/file/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/gcsolver/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/gen/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/io/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/itvl/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/mfset/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/mincov/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/misc/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/msg/Makefile])
+   AC_CONFIG_FILES([tests/cppunit/str/Makefile])
 fi
 
 if test $ym_have_cpputest = yes; then

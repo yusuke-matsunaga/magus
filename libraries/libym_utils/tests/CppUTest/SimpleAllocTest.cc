@@ -39,5 +39,7 @@ TEST(libym_utils_SimpleAllocTestGroup, simple_alloc)
 {
   void* p = mAlloc->get_memory(16);
 
+  CHECK( p != NULL );
+
   // ちなみに mAlloc->put_memory() を呼ばなくてもメモリリークは発生しない．
 }

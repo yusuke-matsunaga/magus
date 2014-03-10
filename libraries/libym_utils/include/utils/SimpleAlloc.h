@@ -27,7 +27,7 @@ public:
   /// @param[in] page_size このオブジェクトが管理するメモリ量の単位
   /// @note page_size 以上のメモリ領域はデフォルトのアロケーターを
   /// 使用する．
-  SimpleAlloc(ymuint64 page_size);
+  SimpleAlloc(ymuint64 page_size = 4096);
 
   /// @brief デストラクタ
   virtual
