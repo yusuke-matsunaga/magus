@@ -56,6 +56,7 @@ noinst_LTLIBRARIES = \
 
 AM_CPPFLAGS = \
 	-I $(top_srcdir)/include \
+	-I $(top_srcdir)/tests/cppunit \
 	-I $(top_builddir)/include
 
 
@@ -86,7 +87,9 @@ libym_utils_cppunit_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libym_utils_cppunit_la_SOURCES =
+libym_utils_cppunit_la_SOURCES = \
+	YmUtilsTestRegistry.h \
+	YmUtilsTestRegistry.cc
 
 nodist_EXTRA_libym_utils_cppunit_la_SOURCES = dummy.cc
 

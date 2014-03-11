@@ -17,9 +17,15 @@ BEGIN_NAMESPACE_YM
 
 using namespace CppUnit;
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class SimpleAllocTest SimpleAllocTest.h
+/// @brief SimpleAlloc 用のテストフィクスチャクラス
+//////////////////////////////////////////////////////////////////////
 class SimpleAllocTest :
   public TestFixture
 {
+  // テストスイートの登録
   CPPUNIT_TEST_SUITE( SimpleAllocTest );
   CPPUNIT_TEST( test_alloc );
   CPPUNIT_TEST( test_destroy );

@@ -9,16 +9,17 @@
 
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
-#include "alloc/SimpleAllocTest.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( nsYm::SimpleAllocTest );
+#include "YmUtilsTestRegistry.h"
 
 
 int
 main(int argc,
      char** argv)
 {
-  CppUnit::Test* suite = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
+  static YmUtilsTestRegistry ym_utils_test;
+
+  CppUnit::Test* suite = CppUnit::TestFactoryRegistry::getRegistry("ym_utils").makeTest();
 
   CppUnit::TextTestRunner runner;
   runner.addTest(suite);

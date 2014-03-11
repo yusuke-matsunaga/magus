@@ -54,6 +54,9 @@ liballoc_cppunit_la_CXXFLAGS = \
 	$(CPPUNIT_CFLAGS)
 
 liballoc_cppunit_la_SOURCES = \
+	AllocTestRegistry.h \
+	AllocTestRegistry.cc \
+	SimpleAllocTest.h \
 	SimpleAllocTest.cc
 
 liballoc_cppunit_la_LIBADD =

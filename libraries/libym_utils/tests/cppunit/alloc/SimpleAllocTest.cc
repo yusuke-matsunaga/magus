@@ -10,8 +10,6 @@
 #include "SimpleAllocTest.h"
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION( nsYm::SimpleAllocTest );
-
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
