@@ -23,6 +23,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 ymuint
 Selector::operator()(const McMatrix& matrix)
 {
+#if 0
   ymuint max_num = 0;
   ymuint max_col = 0;
   for (const McColHead* col = matrix.col_front();
@@ -33,6 +34,31 @@ Selector::operator()(const McMatrix& matrix)
     }
   }
   return max_col;
+#else
+  ymuint nr = matrix.row_size();
+  vector<double> row_weights(nr);
+  for (const McRowHead* row = matrix.row_front();
+       !matrix.is_row_end(row); row = row->next()) {
+    ymuint row_pos = row->pos();
+    assert_cond( row->num() > 1, __FILE__, __LINE__);
+    row_weights[row_pos] = 1.0 / (row->num() - 1);
+  }
+  double max_weight = 0.0;
+  ymuint max_col = 0;
+  for (const McColHead* col = matrix.col_front();
+       !matrix.is_col_end(col); col = col->next()) {
+    double weight = 0.0;
+    for (const McCell* cell = col->front();
+	 !col->is_end(cell); cell = cell->col_next()) {
+      weight += row_weights[cell->row_pos()];
+    }
+    if ( max_weight < weight ) {
+      max_weight = weight;
+      max_col = col->pos();
+    }
+  }
+  return max_col;
+#endif
 }
 
 END_NAMESPACE_YM_MINCOV
