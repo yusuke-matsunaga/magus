@@ -102,6 +102,7 @@ libym_utils_cppunit_la_LIBADD = \
 	itvl/libitvl_cppunit.la \
 	io/libio_cppunit.la \
 	mfset/libmfset_cppunit.la \
+	mincov/libmincov_cppunit.la \
 	misc/libmisc_cppunit.la \
 	msg/libmsg_cppunit.la \
 	str/libstr_cppunit.la

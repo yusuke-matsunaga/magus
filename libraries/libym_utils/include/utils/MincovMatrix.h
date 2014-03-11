@@ -574,7 +574,7 @@ public:
   /// @note 要素を持たない行列となる．
   MincovMatrix(ymuint32 row_size,
 	       ymuint32 col_size,
-	       ymuint32 cost_size);
+	       ymuint32 cost_size = 1);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト

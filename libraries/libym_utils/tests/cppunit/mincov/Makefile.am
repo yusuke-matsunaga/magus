@@ -50,9 +50,14 @@ AM_CPPFLAGS = \
 
 libmincov_cppunit_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
-	$(AM_CXXFLAGS)
+	$(AM_CXXFLAGS) \
+	$(CPPUNIT_CFLAGS)
 
-libmincov_cppunit_la_SOURCES =
+libmincov_cppunit_la_SOURCES = \
+	MincovTestRegistry.h \
+	MincovTestRegistry.cc \
+	MincovMatrixTest.h \
+	MincovMatrixTest.cc
 
 libmincov_cppunit_la_LIBADD =
 

@@ -74,6 +74,7 @@ libym_utils_la_LIBADD = \
 	itvl/libitvl.la \
 	io/libio.la \
 	mfset/libmfset.la \
+	mincov/libmincov.la \
 	misc/libmisc.la \
 	msg/libmsg.la \
 	str/libstr.la
