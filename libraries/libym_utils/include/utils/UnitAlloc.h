@@ -26,6 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] unit_size メモリ割り当ての単位となるサイズ
   /// @param[in] block_size 一度に確保する個数
+  explicit
   UnitAlloc(ymuint64 unit_size,
 	    ymuint64 block_size = 1024);
 
