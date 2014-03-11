@@ -56,9 +56,9 @@ MincovMatrixTest::conv_matrix(const MincovMatrix& matrix,
   ymuint nc = matrix.col_size();
   bitvector.clear();
   bitvector.resize(nr * nc, false);
-  for (ymuint r = 0; r < nr; ++ r) {
-    const nsMincov::MincovRowHead* rh = matrix.row(r);
-    CPPUNIT_ASSERT_EQUAL( r, rh->pos() );
+  for (const nsMincov::MincovRowHead* rh = matrix.row_front();
+       !matrix.is_row_end(rh); rh = rh->next()) {
+    ymuint r = rh->pos();
     ymuint n = 0;
     const nsMincov::MincovCell* prev = NULL;
     for (const nsMincov::MincovCell* cell = rh->front();
@@ -74,9 +74,9 @@ MincovMatrixTest::conv_matrix(const MincovMatrix& matrix,
   }
 
   vector<bool> bitvector2(nr * nc, false);
-  for (ymuint c = 0; c < nc; ++ c) {
-    const nsMincov::MincovColHead* ch = matrix.col(c);
-    CPPUNIT_ASSERT_EQUAL( c, ch->pos() );
+  for (const nsMincov::MincovColHead* ch = matrix.col_front();
+       !matrix.is_col_end(ch); ch = ch->next()) {
+    ymuint c = ch->pos();
     ymuint n = 0;
     const nsMincov::MincovCell* prev = NULL;
     for (const nsMincov::MincovCell* cell = ch->front();
@@ -269,6 +269,51 @@ MincovMatrixTest::test_delete_row()
 void
 MincovMatrixTest::test_delete_col()
 {
+  ymuint row_num = 10;
+  ymuint col_num = 10;
+  MincovMatrix* matrix = new MincovMatrix(row_num, col_num);
+  CPPUNIT_ASSERT( matrix != NULL );
+  vector<bool> ver_matrix(row_num * col_num, false);
+
+  ymuint32 pos_pair[] = {
+    0, 0,
+    0, 3,
+    1, 2,
+    1, 1,
+    2, 4,
+    0, 5,
+    4, 0,
+    4, 4,
+    3, 1,
+    3, 3,
+    5, 0,
+    2, 1,
+    4, 4
+  };
+  ymuint nd = sizeof(pos_pair) / (sizeof(ymuint32) * 2);
+  for (ymuint i = 0; i < nd; ++ i) {
+    ymuint r = pos_pair[i * 2 + 0];
+    ymuint c = pos_pair[i * 2 + 1];
+    matrix->insert_elem(r, c);
+    ver_matrix[r * col_num + c] = true;
+  }
+
+  matrix->delete_col(2);
+  matrix->delete_col(4);
+
+  for (ymuint r = 0; r < row_num; ++ r) {
+    ver_matrix[r * col_num + 2] = false;
+    ver_matrix[r * col_num + 4] = false;
+  }
+
+  vector<bool> bitvector;
+  conv_matrix(*matrix, bitvector);
+
+  for (ymuint i = 0; i < row_num * col_num; ++ i) {
+    CPPUNIT_ASSERT_EQUAL( bitvector[i], ver_matrix[i] );
+  }
+
+  delete matrix;
 }
 
 END_NAMESPACE_YM
