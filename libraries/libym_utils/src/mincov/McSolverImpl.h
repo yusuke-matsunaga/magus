@@ -1,34 +1,32 @@
-#ifndef UTILS_MINCOVSOLVER_H
-#define UTILS_MINCOVSOLVER_H
+#ifndef MCSOLVERIMPL_H
+#define MCSOLVERIMPL_H
 
-/// @file utils/MincovSolver.h
-/// @brief MincovSolver のヘッダファイル
+/// @file McSolverImpl.h
+/// @brief McSolverImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "utils/mincov_nsdef.h"
+#include "mincov_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
 
-class MincovCost;
-
 //////////////////////////////////////////////////////////////////////
-/// @class MincovSolver MincovSolver.h "utils/MincovSolver.h"
-/// @brief 最小被覆問題を解くクラス
+/// @class McSolverImpl McSolverImpl.h "McSolverImpl.h"
+/// @brief McSolver の実際の処理を行うクラス
 //////////////////////////////////////////////////////////////////////
-class MincovSolver
+class McSolverImpl
 {
 public:
 
   /// @brief コンストラクタ
-  MincovSolver();
+  McSolverImpl();
 
   /// @brief デストラクタ
-  ~MincovSolver();
+  ~McSolverImpl();
 
 
 public:
@@ -36,13 +34,32 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 問題のサイズを設定する．
+  /// @param[in] row_size 行数
+  /// @param[in] col_size 列数
+  void
+  set_size(ymuint32 row_size,
+	   ymuint32 col_size);
+
+  /// @brief 列のコストを設定する
+  /// @param[in] col_pos 追加する要素の列番号
+  /// @param[in] cost コスト
+  void
+  set_col_cost(ymuint32 col_pos,
+	       double cost);
+
+  /// @brief 要素を追加する．
+  /// @param[in] row_pos 追加する要素の行番号
+  /// @param[in] col_pos 追加する要素の列番号
+  void
+  insert_elem(ymuint32 row_pos,
+	      ymuint32 col_pos);
+
   /// @brief 最小被覆問題を解く．
-  /// @param[in] matrix 対象の行列
   /// @param[out] solution 選ばれた列集合
-  /// @return 最良解
-  MincovCost
-  operator()(const MincovMatrix& matrix,
-	     vector<ymuint32>& solution);
+  /// @return 解のコスト
+  double
+  solve(vector<ymuint32>& solution);
 
 
 private:
@@ -54,43 +71,43 @@ private:
   /// @param[in] matrix 対象の行列
   /// @param[in] best_sofar 現時点の最良解
   /// @param[out] solution 選ばれた列集合
-  /// @return 最良解
-  MincovCost
-  solve(MincovMatrix& matrix,
-	const MincovCost& best_sofar,
+  /// @return 解のコスト
+  double
+  solve(McMatrix& matrix,
+	double best_sofar,
 	vector<ymuint32>& solution);
 
   /// @brief 下限を求める．
   /// @param[in] matrix 対象の行列
   /// @return 下限値
-  MincovCost
-  lower_bound(MincovMatrix& matrix);
+  double
+  lower_bound(McMatrix& matrix);
 
   /// @brief 簡単化を行う．
   /// @param[in] matrix 対象の行列
   /// @param[out] selected_cols 簡単化中で選択された列の集合
   void
-  reduce(MincovMatrix& matrix,
+  reduce(McMatrix& matrix,
 	 vector<ymuint32>& selected_cols);
 
   /// @brief 行支配を探し，行を削除する．
   /// @param[in] matrix 対象の行列
   /// @return 削除された行があったら true を返す．
   bool
-  row_dominance(MincovMatrix& matrix);
+  row_dominance(McMatrix& matrix);
 
   /// @brief 列支配を探し，列を削除する．
   /// @param[in] matrix 対象の行列
   /// @return 削除された列があったら true を返す．
   bool
-  col_dominance(MincovMatrix& matrix);
+  col_dominance(McMatrix& matrix);
 
   /// @brief 必須列を探し，列を選択する．
   /// @param[in] matrix 対象の行列
   /// @param[out] selected_cols 選択された列を追加する列集合
   /// @return 選択された列があったら true を返す．
   bool
-  essential_col(MincovMatrix& matrix,
+  essential_col(McMatrix& matrix,
 		vector<ymuint32>& selected_cols);
 
 
@@ -98,6 +115,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 問題を表す行列
+  McMatrix* mMatrix;
 
 };
 
@@ -108,4 +128,4 @@ private:
 
 END_NAMESPACE_YM_MINCOV
 
-#endif // UTILS_MINCOVMATRIX_H
+#endif // MCSOLVERIMPL_H

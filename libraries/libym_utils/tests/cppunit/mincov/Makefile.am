@@ -41,7 +41,8 @@ noinst_LTLIBRARIES = \
 
 AM_CPPFLAGS = \
 	-I $(top_srcdir)/include \
-	-I $(top_builddir)/include
+	-I $(top_builddir)/include \
+	-I $(top_srcdir)/src/mincov
 
 
 ############################################################
@@ -56,8 +57,8 @@ libmincov_cppunit_la_CXXFLAGS = \
 libmincov_cppunit_la_SOURCES = \
 	MincovTestRegistry.h \
 	MincovTestRegistry.cc \
-	MincovMatrixTest.h \
-	MincovMatrixTest.cc
+	McMatrixTest.h \
+	McMatrixTest.cc
 
 libmincov_cppunit_la_LIBADD =
 

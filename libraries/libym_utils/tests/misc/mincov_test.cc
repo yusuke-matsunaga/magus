@@ -7,9 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/MincovMatrix.h"
-#include "utils/MincovCost.h"
-#include "utils/MincovSolver.h"
+#include "utils/McSolver.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -127,17 +125,18 @@ mincov_test(int argc,
     }
   }
 
-  MincovMatrix matrix(max_r + 1, max_c + 1);
+  McSolver solver;
+
+  solver.set_size(max_r + 1, max_c + 1);
   for (vector<pair<int, int> >::iterator p = pair_list.begin();
        p != pair_list.end(); ++ p) {
-    matrix.insert_elem(p->second, p->first);
+    solver.insert_elem(p->second, p->first);
   }
 
-  MincovSolver solver;
-
   vector<ymuint32> solution;
-  MincovCost cost = solver(matrix, solution);
+  double cost = solver.solve(solution);
 
+  cout << "Cost = " << cost << endl;
   for (vector<ymuint32>::iterator p = solution.begin();
        p != solution.end(); ++ p) {
     cout << " " << *p;

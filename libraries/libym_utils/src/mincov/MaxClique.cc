@@ -8,7 +8,6 @@
 
 
 #include "MaxClique.h"
-#include "utils/MincovCost.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -33,7 +32,7 @@ MaxClique::~MaxClique()
 // @brief コストを設定する．
 void
 MaxClique::set_cost(ymuint32 id,
-		    const MincovCost* cost)
+		    double cost)
 {
   mCostArray[id] = cost;
 }
@@ -93,7 +92,7 @@ END_NONAMESPACE
 
 // @brief 最大クリークを求める．
 // @param[out] ans 解のノード番号を入れる配列
-MincovCost
+double
 MaxClique::solve(vector<ymuint32>& ans)
 {
   // mNlistArray を整列させる．
@@ -105,18 +104,18 @@ MaxClique::solve(vector<ymuint32>& ans)
 
   ans.clear();
 
-  MincovCost cost(MincovCost::zero());
+  double cost = 0.0;
   ymuint32 n = mCostArray.size();
   vector<ymuint32> v_list;
   { // 種となるノードを求める．
-    MincovCost max_cost(0.0, 0.0);
+    double max_cost = 0.0;
     ymuint32 max_id = 0;
     for (ymuint i = 0; i < n; ++ i) {
-      MincovCost tmp_cost = *mCostArray[i];
+      double tmp_cost = mCostArray[i];
       vector<ymuint32>& nlist = mNlistArray[i];
       for (vector<ymuint32>::iterator p = nlist.begin();
 	   p != nlist.end(); ++ p) {
-	tmp_cost += *mCostArray[*p];
+	tmp_cost += mCostArray[*p];
       }
       if ( max_cost < tmp_cost ) {
 	max_cost = tmp_cost;
@@ -124,7 +123,7 @@ MaxClique::solve(vector<ymuint32>& ans)
       }
     }
     ans.push_back(max_id);
-    cost = *mCostArray[max_id];
+    cost = mCostArray[max_id];
     v_list = mNlistArray[max_id];
     for (vector<ymuint32>::iterator p = v_list.begin();
 	 p != v_list.end(); ++ p) {
@@ -133,16 +132,16 @@ MaxClique::solve(vector<ymuint32>& ans)
     }
   }
   while ( !v_list.empty() ) {
-    MincovCost max_cost(0.0, 0.0);
+    double max_cost = 0.0;
     ymuint32 max_id = 0;
     for (vector<ymuint32>::iterator p = v_list.begin();
 	 p != v_list.end(); ++ p) {
       ymuint32 id = *p;
-      MincovCost tmp_cost = *mCostArray[id];
+      double tmp_cost = mCostArray[id];
       vector<ymuint32>& nlist = mNlistArray[id];
       for (vector<ymuint32>::iterator q = nlist.begin();
 	   q != nlist.end(); ++ q) {
-	tmp_cost += *mCostArray[*q];
+	tmp_cost += mCostArray[*q];
       }
       if ( max_cost < tmp_cost ) {
 	max_cost = tmp_cost;
@@ -150,7 +149,7 @@ MaxClique::solve(vector<ymuint32>& ans)
       }
     }
     ans.push_back(max_id);
-    cost += *mCostArray[max_id];
+    cost += mCostArray[max_id];
     merge_nlist(v_list, mNlistArray[max_id]);
     for (vector<ymuint32>::iterator p = v_list.begin();
 	 p != v_list.end(); ++ p) {

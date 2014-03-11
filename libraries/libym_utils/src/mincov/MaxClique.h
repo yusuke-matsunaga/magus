@@ -8,12 +8,10 @@
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "utils/mincov_nsdef.h"
+#include "mincov_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
-
-class MincovCost;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MaxClique MaxClique.h "MaxClique.h"
@@ -39,7 +37,7 @@ public:
   /// @brief コストを設定する．
   void
   set_cost(ymuint32 id,
-	   const MincovCost* cost);
+	   double cost);
 
   /// @brief 2つのノードを隣接させる．
   /// @param[in] id1, id2 ノード番号
@@ -49,7 +47,7 @@ public:
 
   /// @brief 最大クリークを求める．
   /// @param[out] ans 解のノード番号を入れる配列
-  MincovCost
+  double
   solve(vector<ymuint32>& ans);
 
 
@@ -59,7 +57,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // コストの配列
-  vector<const MincovCost*> mCostArray;
+  vector<double> mCostArray;
 
   // 隣接ノードリストの配列
   vector<vector<ymuint32> > mNlistArray;

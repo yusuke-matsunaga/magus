@@ -1,8 +1,8 @@
-#ifndef MINCOVMATRIXTEST_H
-#define MINCOVMATRIXTEST_H
+#ifndef MCMATRIXTEST_H
+#define MCMATRIXTEST_H
 
-/// @file MincovMatrixTest.h
-/// @brief MincovMatrixTest のヘッダファイル
+/// @file McMatrixTest.h
+/// @brief McMatrixTest のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -11,22 +11,22 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "utils/MincovMatrix.h"
+#include "McMatrix.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_MINCOV
 
 using namespace CppUnit;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MincovMatrixTest MincovMatrixTest.h
-/// @brief MincovMatrix のテストフィクスチャクラス
+/// @class McMatrixTest McMatrixTest.h
+/// @brief McMatrix のテストフィクスチャクラス
 //////////////////////////////////////////////////////////////////////
-class MincovMatrixTest :
+class McMatrixTest :
   public TestFixture
 {
   // テストスイートの登録
-  CPPUNIT_TEST_SUITE( MincovMatrixTest );
+  CPPUNIT_TEST_SUITE( McMatrixTest );
   CPPUNIT_TEST( test_empty_matrix );
   CPPUNIT_TEST( test_resize );
   CPPUNIT_TEST( test_clear );
@@ -85,9 +85,9 @@ private:
   new_matrix(ymuint row_num,
 	     ymuint col_num);
 
-  /// @brief MincovMatrix の内容を一次元ベクタに変換する．
+  /// @brief McMatrix の内容を一次元ベクタに変換する．
   void
-  conv_matrix(const MincovMatrix& matrix,
+  conv_matrix(const McMatrix& matrix,
 	      vector<bool>& bitvector);
 
 
@@ -97,7 +97,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本物の配列
-  MincovMatrix* mMatrix1;
+  McMatrix* mMatrix1;
 
   // 行数
   ymuint32 mRowNum;
@@ -111,6 +111,6 @@ private:
 
 };
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_MINCOV
 
-#endif // MINCOVMATRIXTEST_H
+#endif // MCMATRIXTEST_H

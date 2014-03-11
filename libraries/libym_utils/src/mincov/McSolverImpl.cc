@@ -1,15 +1,17 @@
 
-/// @file MincovSolver.cc
-/// @brief MincovSolver の実装ファイル
+/// @file McSolverImpl.cc
+/// @brief McSolverImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "utils/MincovSolver.h"
-#include "utils/MincovCost.h"
-#include "utils/MincovMatrix.h"
+#include "McSolverImpl.h"
+#include "McMatrix.h"
+#include "McRowHead.h"
+#include "McColHead.h"
+#include "McCell.h"
 #include "MaxClique.h"
 #include "utils/MFSet.h"
 
@@ -17,29 +19,60 @@
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-// クラス MincovSolver
+// クラス McSolverImpl
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MincovSolver::MincovSolver()
+McSolverImpl::McSolverImpl()
 {
+  mMatrix = NULL;
 }
 
 // @brief デストラクタ
-MincovSolver::~MincovSolver()
+McSolverImpl::~McSolverImpl()
 {
+  delete mMatrix;
+}
+
+// @brief 問題のサイズを設定する．
+// @param[in] row_size 行数
+// @param[in] col_size 列数
+void
+McSolverImpl::set_size(ymuint32 row_size,
+		       ymuint32 col_size)
+{
+  delete mMatrix;
+  mMatrix = new McMatrix(row_size, col_size);
+}
+
+// @brief 列のコストを設定する
+// @param[in] col_pos 追加する要素の列番号
+// @param[in] cost コスト
+void
+McSolverImpl::set_col_cost(ymuint32 col_pos,
+			   double cost)
+{
+  mMatrix->set_col_cost(col_pos, cost);
+}
+
+// @brief 要素を追加する．
+// @param[in] row_pos 追加する要素の行番号
+// @param[in] col_pos 追加する要素の列番号
+void
+McSolverImpl::insert_elem(ymuint32 row_pos,
+			  ymuint32 col_pos)
+{
+  mMatrix->insert_elem(row_pos, col_pos);
 }
 
 // @brief 最小被覆問題を解く．
-// @param[in] matrix 対象の行列
 // @param[out] solution 選ばれた列集合
-// @return 最良解
-MincovCost
-MincovSolver::operator()(const MincovMatrix& matrix,
-			 vector<ymuint32>& solution)
+// @return 解のコスト
+double
+McSolverImpl::solve(vector<ymuint32>& solution)
 {
-  MincovMatrix work(matrix);
-  MincovCost dummy_best = MincovCost::zero();
+  McMatrix work(*mMatrix);
+  double dummy_best = DBL_MAX;
   return solve(work, dummy_best, solution);
 }
 
@@ -48,22 +81,22 @@ MincovSolver::operator()(const MincovMatrix& matrix,
 // @param[in] best_sofar 現時点の最良解
 // @param[out] solution 選ばれた列集合
 // @return 最良解
-MincovCost
-MincovSolver::solve(MincovMatrix& matrix,
-		    const MincovCost& best_sofar,
+double
+McSolverImpl::solve(McMatrix& matrix,
+		    double best_sofar,
 		    vector<ymuint32>& solution)
 {
   {
     ymuint nr = 0;
-    for (const MincovRowHead* rh = matrix.row_front();
+    for (const McRowHead* rh = matrix.row_front();
 	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
     ymuint nc = 0;
-    for (const MincovColHead* ch = matrix.col_front();
+    for (const McColHead* ch = matrix.col_front();
 	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
     cout << "solve(" << nr << " x " << nc << ")" << endl;
   }
 
-  MincovCost best(best_sofar);
+  double best = best_sofar;
 
   vector<ymuint32> tmp_solution;
 
@@ -71,15 +104,15 @@ MincovSolver::solve(MincovMatrix& matrix,
 
   {
     ymuint nr = 0;
-    for (const MincovRowHead* rh = matrix.row_front();
+    for (const McRowHead* rh = matrix.row_front();
 	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
     ymuint nc = 0;
-    for (const MincovColHead* ch = matrix.col_front();
+    for (const McColHead* ch = matrix.col_front();
 	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
     cout << "after reduce(" << nr << " x " << nc << ")" << endl;
   }
 
-  MincovCost lb = lower_bound(matrix);
+  double lb = lower_bound(matrix);
   if ( lb >= best ) {
     return lb;
   }
@@ -88,7 +121,7 @@ MincovSolver::solve(MincovMatrix& matrix,
 
   // その列を選択したときの最良解を求める．
   vector<ymuint32> tmp_solution1;
-  MincovCost v1 = solve(matrix, best, tmp_solution1);
+  double v1 = solve(matrix, best, tmp_solution1);
   if ( best > v1 ) {
     best = v1;
     solution = tmp_solution;
@@ -98,7 +131,7 @@ MincovSolver::solve(MincovMatrix& matrix,
 
   // その列を選択しなかったときの最良解を求める．
   tmp_solution1.clear();
-  MincovCost v2 = solve(matrix, best, tmp_solution1);
+  double v2 = solve(matrix, best, tmp_solution1);
   if ( best > v2 ) {
     best = v2;
     solution = tmp_solution;
@@ -111,17 +144,17 @@ MincovSolver::solve(MincovMatrix& matrix,
 // @brief 下限を求める．
 // @param[in] matrix 対象の行列
 // @return 下限値
-MincovCost
-MincovSolver::lower_bound(MincovMatrix& matrix)
+double
+McSolverImpl::lower_bound(McMatrix& matrix)
 {
   // MIS を用いた下限
 
   // まず，列を共有する行のグループを求める．
   ymuint32 rs = matrix.row_size();
   MFSet rset(rs);
-  for (const MincovColHead* col = matrix.col_front();
+  for (const McColHead* col = matrix.col_front();
        !matrix.is_col_end(col); col = col->next()) {
-    const MincovCell* cell = col->front();
+    const McCell* cell = col->front();
     ymuint32 rpos0 = cell->row_pos();
     for (cell = cell->col_next();
 	 !col->is_end(cell); cell = cell->col_next()) {
@@ -132,7 +165,7 @@ MincovSolver::lower_bound(MincovMatrix& matrix)
 
   vector<ymuint32> row_list;
   row_list.reserve(rs);
-  for (const MincovRowHead* row = matrix.row_front();
+  for (const McRowHead* row = matrix.row_front();
        !matrix.is_row_end(row); row = row->next()) {
     row_list.push_back(row->pos());
   }
@@ -147,20 +180,19 @@ MincovSolver::lower_bound(MincovMatrix& matrix)
 	mc.connect(j, i);
       }
     }
-    const MincovRowHead* row = matrix.row(rpos1);
-    const MincovCost* min_cost = NULL;
-    for (const MincovCell* cell = row->front();
+    const McRowHead* row = matrix.row(rpos1);
+    double min_cost = DBL_MAX;
+    for (const McCell* cell = row->front();
 	 !row->is_end(cell); cell = cell->row_next()) {
       ymuint32 cpos = cell->col_pos();
-      if ( min_cost == NULL || *min_cost > matrix.col_cost(cpos) ) {
-	min_cost = &matrix.col_cost(cpos);
+      if ( min_cost > matrix.col_cost(cpos) ) {
+	min_cost = matrix.col_cost(cpos);
       }
     }
-    assert_cond(min_cost, __FILE__, __LINE__);
     mc.set_cost(i, min_cost);
   }
   vector<ymuint32> mis;
-  MincovCost cost1 = mc.solve(mis);
+  double cost1 = mc.solve(mis);
   return cost1;
 }
 
@@ -168,7 +200,7 @@ MincovSolver::lower_bound(MincovMatrix& matrix)
 // @param[in] matrix 対象の行列
 // @param[out] selected_cols 簡単化中で選択された列の集合
 void
-MincovSolver::reduce(MincovMatrix& matrix,
+McSolverImpl::reduce(McMatrix& matrix,
 		     vector<ymuint32>& selected_cols)
 {
   for ( ; ; ) {
@@ -200,17 +232,9 @@ BEGIN_NONAMESPACE
 
 struct RowLt
 {
-  RowLt()
-  {
-  }
-
-  ~RowLt()
-  {
-  }
-
   bool
-  operator()(const MincovRowHead* a,
-	     const MincovRowHead* b)
+  operator()(const McRowHead* a,
+	     const McRowHead* b)
   {
     return a->num() < b->num();
   }
@@ -223,7 +247,7 @@ END_NONAMESPACE
 // @param[in] matrix 対象の行列
 // @return 削除された行があったら true を返す．
 bool
-MincovSolver::row_dominance(MincovMatrix& matrix)
+McSolverImpl::row_dominance(McMatrix& matrix)
 {
   bool change = false;
 
@@ -231,9 +255,9 @@ MincovSolver::row_dominance(MincovMatrix& matrix)
   vector<bool> del_mark(matrix.row_size(), false);
 
   // 残っている行のリストを作る．
-  vector<const MincovRowHead*> row_list;
+  vector<const McRowHead*> row_list;
   row_list.reserve(matrix.row_size());
-  for (const MincovRowHead* row = matrix.row_front();
+  for (const McRowHead* row = matrix.row_front();
        !matrix.is_row_end(row); row = row->next()) {
     row_list.push_back(row);
   }
@@ -241,18 +265,18 @@ MincovSolver::row_dominance(MincovMatrix& matrix)
   // 要素数の少ない順にソートする．
   sort(row_list.begin(), row_list.end(), RowLt());
 
-  for (vector<const MincovRowHead*>::iterator p = row_list.begin();
+  for (vector<const McRowHead*>::iterator p = row_list.begin();
        p != row_list.end(); ++ p) {
-    const MincovRowHead* row = *p;
+    const McRowHead* row = *p;
     if ( del_mark[row->pos()] ) continue;
 
     // row の行に要素を持つ列で要素数が最小のものを求める．
     ymuint32 min_num = matrix.row_size() + 1;
-    const MincovColHead* min_col = NULL;
-    for (const MincovCell* cell = row->front();
+    const McColHead* min_col = NULL;
+    for (const McCell* cell = row->front();
 	 !row->is_end(cell); cell = cell->row_next()) {
       ymuint32 col_pos = cell->col_pos();
-      const MincovColHead* col = matrix.col(col_pos);
+      const McColHead* col = matrix.col(col_pos);
       ymuint32 col_num = col->num();
       if ( min_num > col_num ) {
 	min_num = col_num;
@@ -263,7 +287,7 @@ MincovSolver::row_dominance(MincovMatrix& matrix)
     // min_col の列に要素を持つ行を tmp_rows に入れる．
     vector<ymuint32> tmp_rows;
     tmp_rows.reserve(min_num);
-    for (const MincovCell* cell = min_col->front();
+    for (const McCell* cell = min_col->front();
 	 !min_col->is_end(cell); cell = cell->col_next()) {
       ymuint32 row_pos = cell->row_pos();
       if ( matrix.row(row_pos)->num() > row->num() ) {
@@ -273,15 +297,15 @@ MincovSolver::row_dominance(MincovMatrix& matrix)
     }
 
     // min_col 以外の列に含まれない行を tmp_rows から落とす．
-    for (const MincovCell* cell = row->front();
+    for (const McCell* cell = row->front();
 	 !row->is_end(cell); cell = cell->row_next()) {
       ymuint32 col_pos = cell->col_pos();
-      const MincovColHead* col = matrix.col(col_pos);
+      const McColHead* col = matrix.col(col_pos);
       if ( col == min_col ) continue;
       ymuint rpos = 0;
       ymuint wpos = 0;
       ymuint32 row1 = tmp_rows[rpos];
-      const MincovCell* cell = col->front();
+      const McCell* cell = col->front();
       ymuint32 row2 = cell->row_pos();
       while ( rpos < tmp_rows.size() && !col->is_end(cell) ) {
 	if ( row1 == row2 ) {
@@ -323,17 +347,9 @@ BEGIN_NONAMESPACE
 
 struct ColLt
 {
-  ColLt()
-  {
-  }
-
-  ~ColLt()
-  {
-  }
-
   bool
-  operator()(const MincovColHead* a,
-	     const MincovColHead* b)
+  operator()(const McColHead* a,
+	     const McColHead* b)
   {
     return a->num() < b->num();
   }
@@ -346,31 +362,31 @@ END_NONAMESPACE
 // @param[in] matrix 対象の行列
 // @return 削除された列があったら true を返す．
 bool
-MincovSolver::col_dominance(MincovMatrix& matrix)
+McSolverImpl::col_dominance(McMatrix& matrix)
 {
   bool change = false;
 
   // 残っている列のリストを作る．
-  vector<const MincovColHead*> col_list;
+  vector<const McColHead*> col_list;
   col_list.reserve(matrix.col_size());
-  for (const MincovColHead* col = matrix.col_front();
+  for (const McColHead* col = matrix.col_front();
        !matrix.is_col_end(col); col = col->next()) {
     col_list.push_back(col);
   }
   // 要素数の少ない順にソートする．
   sort(col_list.begin(), col_list.end(), ColLt());
 
-  for (vector<const MincovColHead*>::iterator p = col_list.begin();
+  for (vector<const McColHead*>::iterator p = col_list.begin();
        p != col_list.end(); ++ p) {
-    const MincovColHead* col = *p;
+    const McColHead* col = *p;
 
     // col の列に要素を持つ行で要素数が最小のものを求める．
     ymuint32 min_num = matrix.col_size() + 1;
-    const MincovRowHead* min_row = NULL;
-    for (const MincovCell* cell = col->front();
+    const McRowHead* min_row = NULL;
+    for (const McCell* cell = col->front();
 	 !col->is_end(cell); cell = cell->col_next()) {
       ymuint32 row_pos = cell->row_pos();
-      const MincovRowHead* row = matrix.row(row_pos);
+      const McRowHead* row = matrix.row(row_pos);
       ymuint32 row_num = row->num();
       if ( min_num > row_num ) {
 	min_num = row_num;
@@ -379,16 +395,16 @@ MincovSolver::col_dominance(MincovMatrix& matrix)
     }
 
     // min_row の行に要素を持つ列を対象にして支配関係のチェックを行う．
-    for (const MincovCell* cell = min_row->front();
+    for (const McCell* cell = min_row->front();
 	 !min_row->is_end(cell); cell = cell->row_next()) {
-      const MincovColHead* col2 = matrix.col(cell->col_pos());
+      const McColHead* col2 = matrix.col(cell->col_pos());
       if ( col2->num() <= col->num() ) {
 	// ただし col よりも要素数の多くない列は調べる必要はない．
 	continue;
       }
-      const MincovCell* cell1 = col->front();
+      const McCell* cell1 = col->front();
       ymuint32 pos1 = cell1->row_pos();
-      const MincovCell* cell2 = col2->front();
+      const McCell* cell2 = col2->front();
       ymuint32 pos2 = cell2->row_pos();
       bool found = false;
       for ( ; ; ) {
@@ -427,15 +443,15 @@ MincovSolver::col_dominance(MincovMatrix& matrix)
 // @param[out] selected_cols 選択された列を追加する列集合
 // @return 選択された列があったら true を返す．
 bool
-MincovSolver::essential_col(MincovMatrix& matrix,
+McSolverImpl::essential_col(McMatrix& matrix,
 			    vector<ymuint32>& selected_cols)
 {
   vector<ymuint32> tmp_list;
   tmp_list.reserve(matrix.col_size());
-  for (const MincovRowHead* row = matrix.row_front();
+  for (const McRowHead* row = matrix.row_front();
        !matrix.is_row_end(row); row = row->next()) {
     if ( row->num() == 1 ) {
-      const MincovCell* cell = row->front();
+      const McCell* cell = row->front();
       ymuint32 col_pos = cell->col_pos();
       selected_cols.push_back(col_pos);
       tmp_list.push_back(col_pos);

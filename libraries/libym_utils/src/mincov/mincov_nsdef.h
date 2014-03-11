@@ -1,7 +1,7 @@
-#ifndef UTILS_MINCOV_NSDEF_H
-#define UTILS_MINCOV_NSDEF_H
+#ifndef MINCOV_NSDEF_H
+#define MINCOV_NSDEF_H
 
-/// @file utils/mincov_nsdef.h
+/// @file mincov_nsdef.h
 /// @brief Mincov Solver 用の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -28,28 +28,16 @@ END_NAMESPACE_YM
 
 /// @namespace nsYm::nsMincov
 /// @brief MINCOV ソルバ関係のクラスが属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
-/// 実装用のローカルな要素だけがこの名前空間に存在する．
 
 BEGIN_NAMESPACE_YM_MINCOV
 
-class MincovSolver;
-class MincovSolverFactory;
-class MincovMatrix;
-class MincovCost;
-class MincovMsgHandler;
+class McSolverImpl;
+class McCell;
+class McRowHead;
+class McColHead;
+class McMatrix;
+class McMsgHandler;
 
 END_NAMESPACE_YM_MINCOV
 
-BEGIN_NAMESPACE_YM
-
-using nsMincov::MincovSolver;
-using nsMincov::MincovSolverFactory;
-using nsMincov::MincovMatrix;
-using nsMincov::MincovCost;
-using nsMincov::MincovMsgHandler;
-
-END_NAMESPACE_YM
-
-#endif // UTILS_MINCOV_NSDEF_H
+#endif // MINCOV_NSDEF_H

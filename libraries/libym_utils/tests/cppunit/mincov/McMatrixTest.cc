@@ -7,18 +7,18 @@
 /// All rights reserved.
 
 
-#include "MincovMatrixTest.h"
+#include "McMatrixTest.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-// クラス MincovMatrixTest
+// クラス McMatrixTest
 //////////////////////////////////////////////////////////////////////
 
 // @brief setup 関数
 void
-MincovMatrixTest::setUp()
+McMatrixTest::setUp()
 {
   mMatrix1 = NULL;
   mRowNum = 0;
@@ -28,7 +28,7 @@ MincovMatrixTest::setUp()
 
 // @brief teardown 関数
 void
-MincovMatrixTest::tearDown()
+McMatrixTest::tearDown()
 {
   delete mMatrix1;
   mVerMatrix.clear();
@@ -38,30 +38,30 @@ MincovMatrixTest::tearDown()
 // @param[in] row_num 行数
 // @param[in] col_num 列数
 void
-MincovMatrixTest::new_matrix(ymuint row_num,
+McMatrixTest::new_matrix(ymuint row_num,
 			     ymuint col_num)
 {
-  mMatrix1 = new MincovMatrix(row_num, col_num);
+  mMatrix1 = new McMatrix(row_num, col_num);
   mRowNum = row_num;
   mColNum = col_num;
   mVerMatrix.resize(mRowNum * mColNum, false);
 }
 
-// @brief MincovMatrix の内容を一次元ベクタに変換する．
+// @brief McMatrix の内容を一次元ベクタに変換する．
 void
-MincovMatrixTest::conv_matrix(const MincovMatrix& matrix,
+McMatrixTest::conv_matrix(const McMatrix& matrix,
 			      vector<bool>& bitvector)
 {
   ymuint nr = matrix.row_size();
   ymuint nc = matrix.col_size();
   bitvector.clear();
   bitvector.resize(nr * nc, false);
-  for (const nsMincov::MincovRowHead* rh = matrix.row_front();
+  for (const McRowHead* rh = matrix.row_front();
        !matrix.is_row_end(rh); rh = rh->next()) {
     ymuint r = rh->pos();
     ymuint n = 0;
-    const nsMincov::MincovCell* prev = NULL;
-    for (const nsMincov::MincovCell* cell = rh->front();
+    const McCell* prev = NULL;
+    for (const McCell* cell = rh->front();
 	 !rh->is_end(cell); cell = cell->row_next(), ++ n) {
       CPPUNIT_ASSERT_EQUAL( r, cell->row_pos() );
       bitvector[r * nc + cell->col_pos()] = true;
@@ -74,12 +74,12 @@ MincovMatrixTest::conv_matrix(const MincovMatrix& matrix,
   }
 
   vector<bool> bitvector2(nr * nc, false);
-  for (const nsMincov::MincovColHead* ch = matrix.col_front();
+  for (const McColHead* ch = matrix.col_front();
        !matrix.is_col_end(ch); ch = ch->next()) {
     ymuint c = ch->pos();
     ymuint n = 0;
-    const nsMincov::MincovCell* prev = NULL;
-    for (const nsMincov::MincovCell* cell = ch->front();
+    const McCell* prev = NULL;
+    for (const McCell* cell = ch->front();
 	 !ch->is_end(cell); cell = cell->col_next(), ++ n) {
       CPPUNIT_ASSERT_EQUAL( c, cell->col_pos() );
       bitvector2[cell->row_pos() * nc + c] = true;
@@ -97,12 +97,12 @@ MincovMatrixTest::conv_matrix(const MincovMatrix& matrix,
 
 // @brief 空の行列のテスト
 void
-MincovMatrixTest::test_empty_matrix()
+McMatrixTest::test_empty_matrix()
 {
   ymuint row_num = 10;
   ymuint col_num = 20;
   ymuint cost_dim = 3;
-  MincovMatrix* matrix = new MincovMatrix(row_num, col_num, cost_dim);
+  McMatrix* matrix = new McMatrix(row_num, col_num, cost_dim);
   CPPUNIT_ASSERT( matrix != NULL );
   CPPUNIT_ASSERT_EQUAL( row_num, matrix->row_size() );
   CPPUNIT_ASSERT_EQUAL( col_num, matrix->col_size() );
@@ -120,9 +120,9 @@ MincovMatrixTest::test_empty_matrix()
 
 // @brief resize のテスト
 void
-MincovMatrixTest::test_resize()
+McMatrixTest::test_resize()
 {
-  MincovMatrix* matrix = new MincovMatrix(5, 5, 1);
+  McMatrix* matrix = new McMatrix(5, 5, 1);
   CPPUNIT_ASSERT( matrix != NULL );
   ymuint row_num = 10;
   ymuint col_num = 20;
@@ -135,11 +135,11 @@ MincovMatrixTest::test_resize()
 
 // @brief clear のテスト
 void
-MincovMatrixTest::test_clear()
+McMatrixTest::test_clear()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  MincovMatrix* matrix = new MincovMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num);
   CPPUNIT_ASSERT( matrix != NULL );
 
   ymuint32 pos_pair[] = {
@@ -174,11 +174,11 @@ MincovMatrixTest::test_clear()
 
 // @brief 簡単な行列のテスト
 void
-MincovMatrixTest::test_simple_matrix()
+McMatrixTest::test_simple_matrix()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  MincovMatrix* matrix = new MincovMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num);
   CPPUNIT_ASSERT( matrix != NULL );
   vector<bool> ver_matrix(row_num * col_num, false);
 
@@ -216,11 +216,11 @@ MincovMatrixTest::test_simple_matrix()
 
 // @breif delete_row のテスト
 void
-MincovMatrixTest::test_delete_row()
+McMatrixTest::test_delete_row()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  MincovMatrix* matrix = new MincovMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num);
   CPPUNIT_ASSERT( matrix != NULL );
   vector<bool> ver_matrix(row_num * col_num, false);
 
@@ -267,11 +267,11 @@ MincovMatrixTest::test_delete_row()
 
 // @brief delete_col のテスト
 void
-MincovMatrixTest::test_delete_col()
+McMatrixTest::test_delete_col()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  MincovMatrix* matrix = new MincovMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num);
   CPPUNIT_ASSERT( matrix != NULL );
   vector<bool> ver_matrix(row_num * col_num, false);
 
@@ -316,4 +316,4 @@ MincovMatrixTest::test_delete_col()
   delete matrix;
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_MINCOV

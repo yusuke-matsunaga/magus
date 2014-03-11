@@ -8,14 +8,14 @@
 
 
 #include "MincovTestRegistry.h"
-#include "MincovMatrixTest.h"
+#include "McMatrixTest.h"
 
 
 // @brief コンストラクタ
 MincovTestRegistry::MincovTestRegistry() :
   CppUnit::TestFactoryRegistry("mincov")
 {
-  CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( nsYm::MincovMatrixTest, "mincov" );
+  CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( nsYm::nsMincov::McMatrixTest, "mincov" );
 }
 
 // @brief デストラクタ

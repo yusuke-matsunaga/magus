@@ -50,9 +50,14 @@ AM_CPPFLAGS = \
 COMMON_SOURCES = \
 	MaxClique.cc \
 	MaxClique.h \
-	MincovCost.cc \
-	MincovMatrix.cc \
-	MincovSolver.cc
+	McCell.h \
+	McRowHead.h \
+	McColHead.h \
+	McMatrix.h \
+	McMatrix.cc \
+	McSolverImpl.h \
+	McSolverImpl.cc \
+	McSolver.cc
 
 
 ############################################################

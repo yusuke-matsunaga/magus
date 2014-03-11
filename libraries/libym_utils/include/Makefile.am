@@ -57,11 +57,7 @@ nobase_ym_HEADERS = \
 	utils/ItvlMgr.h \
 	utils/MFSet.h \
 	utils/MStopWatch.h \
-	utils/MincovCost.h \
-	utils/MincovCost1.h \
-	utils/MincovCost2.h \
-	utils/MincovMatrix.h \
-	utils/MincovSolver.h \
+	utils/McSolver.h \
 	utils/MsgHandler.h \
 	utils/MsgMgr.h \
 	utils/MultiCombiGen.h \
