@@ -27,7 +27,7 @@ public:
   /// @param[in] max_size このオブジェクトが管理する最大サイズ
   /// @note max_size 以上のメモリ領域はデフォルトのアロケーターを
   /// 使用する．
-  explict
+  explicit
   FragAlloc(ymuint64 max_size = 4096);
 
   /// @brief デストラクタ
