@@ -57,7 +57,9 @@ COMMON_SOURCES = \
 	McMatrix.cc \
 	McSolverImpl.h \
 	McSolverImpl.cc \
-	McSolver.cc
+	McSolver.cc \
+	Selector.h \
+	Selector.cc
 
 
 ############################################################

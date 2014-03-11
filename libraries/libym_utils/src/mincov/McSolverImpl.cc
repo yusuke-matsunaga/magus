@@ -13,10 +13,13 @@
 #include "McColHead.h"
 #include "McCell.h"
 #include "MaxClique.h"
+#include "Selector.h"
 #include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
+
+bool mincov_debug = false;
 
 //////////////////////////////////////////////////////////////////////
 // クラス McSolverImpl
@@ -73,7 +76,7 @@ McSolverImpl::solve(vector<ymuint32>& solution)
 {
   McMatrix work(*mMatrix);
   double dummy_best = DBL_MAX;
-  return solve(work, dummy_best, solution);
+  return solve(work, dummy_best, 0.0, solution);
 }
 
 // @brief 解を求める再帰関数
@@ -84,59 +87,116 @@ McSolverImpl::solve(vector<ymuint32>& solution)
 double
 McSolverImpl::solve(McMatrix& matrix,
 		    double best_sofar,
+		    double cur_cost,
 		    vector<ymuint32>& solution)
 {
-  {
+  if ( mincov_debug ) {
     ymuint nr = 0;
     for (const McRowHead* rh = matrix.row_front();
 	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
     ymuint nc = 0;
     for (const McColHead* ch = matrix.col_front();
 	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
-    cout << "solve(" << nr << " x " << nc << ")" << endl;
+    cout << "solve(" << nr << " x " << nc << "): " << best_sofar << " : " << cur_cost << endl;
   }
 
   double best = best_sofar;
 
-  vector<ymuint32> tmp_solution;
+  vector<ymuint32> e_solution;
+  reduce(matrix, e_solution);
 
-  reduce(matrix, tmp_solution);
-
-  {
+  if ( mincov_debug ) {
     ymuint nr = 0;
     for (const McRowHead* rh = matrix.row_front();
 	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
     ymuint nc = 0;
     for (const McColHead* ch = matrix.col_front();
 	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
-    cout << "after reduce(" << nr << " x " << nc << ")" << endl;
+    cout << "  after reduce(" << nr << " x " << nc << ")" << endl;
   }
 
-  double lb = lower_bound(matrix);
+  double e_cost = cur_cost;
+  for (vector<ymuint32>::iterator p = e_solution.begin();
+       p != e_solution.end(); ++ p) {
+    e_cost += matrix.col_cost(*p);
+  }
+
+  if ( matrix.is_row_end(matrix.row_front()) ) {
+    solution = e_solution;
+    return e_cost;
+  }
+
+  double lb = lower_bound(matrix) + e_cost;
   if ( lb >= best ) {
     return lb;
   }
 
-  // 次の分岐のための列をとってくる．
+  Selector sel;
 
+  // 次の分岐のための列をとってくる．
+  ymuint col = sel(matrix);
+
+#if 1
   // その列を選択したときの最良解を求める．
-  vector<ymuint32> tmp_solution1;
-  double v1 = solve(matrix, best, tmp_solution1);
+  matrix.backup();
+  matrix.select_col(col);
+  vector<ymuint32> tmp_solution;
+  double v1 = solve(matrix, best, e_cost + matrix.col_cost(col), tmp_solution);
   if ( best > v1 ) {
     best = v1;
-    solution = tmp_solution;
-    solution.insert(solution.end(), tmp_solution1.begin(), tmp_solution1.end());
+    solution = e_solution;
+    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
     // + 選んだ列
+    solution.push_back(col);
   }
+  matrix.restore();
 
   // その列を選択しなかったときの最良解を求める．
-  tmp_solution1.clear();
-  double v2 = solve(matrix, best, tmp_solution1);
+  matrix.backup();
+  matrix.delete_col(col);
+
+  tmp_solution.clear();
+  double v2 = solve(matrix, best, e_cost, tmp_solution);
   if ( best > v2 ) {
     best = v2;
-    solution = tmp_solution;
-    solution.insert(solution.end(), tmp_solution1.begin(), tmp_solution1.end());
+    solution = e_solution;
+    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
   }
+  matrix.restore();
+#else
+  McMatrix matrix1(matrix);
+  matrix1.select_col(col);
+
+  if ( mincov_debug ) {
+    cout << "select column#" << col << endl;
+  }
+
+  // その列を選択したときの最良解を求める．
+  vector<ymuint32> tmp_solution;
+  double v1 = solve(matrix1, best, e_cost + matrix1.col_cost(col), tmp_solution);
+  if ( best > v1 ) {
+    best = v1;
+    solution = e_solution;
+    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
+    // + 選んだ列
+    solution.push_back(col);
+  }
+
+  McMatrix matrix2(matrix);
+  matrix2.delete_col(col);
+
+  if ( mincov_debug ) {
+    cout << "delete column#" << col << endl;
+  }
+  // その列を選択しなかったときの最良解を求める．
+  tmp_solution.clear();
+  double v2 = solve(matrix2, best, e_cost, tmp_solution);
+  if ( best > v2 ) {
+    best = v2;
+    solution = e_solution;
+    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
+  }
+#endif
 
   return best;
 }
@@ -180,6 +240,9 @@ McSolverImpl::lower_bound(McMatrix& matrix)
 	mc.connect(j, i);
       }
     }
+  }
+  for (ymuint i = 0; i < nr; ++ i) {
+    ymuint32 rpos1 = row_list[i];
     const McRowHead* row = matrix.row(rpos1);
     double min_cost = DBL_MAX;
     for (const McCell* cell = row->front();
@@ -193,6 +256,7 @@ McSolverImpl::lower_bound(McMatrix& matrix)
   }
   vector<ymuint32> mis;
   double cost1 = mc.solve(mis);
+  assert_cond( cost1 > 0.0, __FILE__, __LINE__);
   return cost1;
 }
 
@@ -339,7 +403,7 @@ McSolverImpl::row_dominance(McMatrix& matrix)
     }
   }
 
-  return true;
+  return change;
 }
 
 
@@ -379,6 +443,8 @@ McSolverImpl::col_dominance(McMatrix& matrix)
   for (vector<const McColHead*>::iterator p = col_list.begin();
        p != col_list.end(); ++ p) {
     const McColHead* col = *p;
+
+    if ( col->num() == 0 ) continue;
 
     // col の列に要素を持つ行で要素数が最小のものを求める．
     ymuint32 min_num = matrix.col_size() + 1;

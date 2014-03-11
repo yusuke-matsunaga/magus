@@ -75,6 +75,7 @@ private:
   double
   solve(McMatrix& matrix,
 	double best_sofar,
+	double cur_cost,
 	vector<ymuint32>& solution);
 
   /// @brief 下限を求める．

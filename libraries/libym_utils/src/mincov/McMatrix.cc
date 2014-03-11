@@ -243,8 +243,8 @@ McMatrix::copy(const McMatrix& src)
   assert_cond(col_size() == src.col_size(), __FILE__, __LINE__);
   assert_cond(cost_size() == src.cost_size(), __FILE__, __LINE__);
 
-  for (ymuint i = 0; i < row_size(); ++ i) {
-    const McRowHead* src_row = src.row(i);
+  for (const McRowHead* src_row = src.row_front();
+       !src.is_row_end(src_row); src_row = src_row->next()) {
     for (const McCell* src_cell = src_row->front();
 	 !src_row->is_end(src_cell); src_cell = src_cell->row_next()) {
       insert_elem(src_cell->row_pos(), src_cell->col_pos());
