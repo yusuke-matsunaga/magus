@@ -101,6 +101,7 @@ libym_utils_d_la_LIBADD = \
 	itvl/libitvl_d.la \
 	io/libio_d.la \
 	mfset/libmfset_d.la \
+	mincov/libmincov_d.la \
 	misc/libmisc_d.la \
 	msg/libmsg_d.la \
 	str/libstr_d.la
@@ -127,6 +128,7 @@ libym_utils_p_la_LIBADD = \
 	itvl/libitvl_p.la \
 	io/libio_p.la \
 	mfset/libmfset_p.la \
+	mincov/libmincov_p.la \
 	misc/libmisc_p.la \
 	msg/libmsg_p.la \
 	str/libstr_p.la

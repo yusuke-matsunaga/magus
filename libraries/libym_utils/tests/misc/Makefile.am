@@ -51,7 +51,8 @@ noinst_PROGRAMS = \
 	StrListIDO_test \
 	Codec_test \
 	BtgMatch_test \
-	gctest
+	gctest \
+	mincov_test
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \
@@ -84,12 +85,15 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/include \
 	-I$(top_srcdir)/src
 
+AC_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS)
+
 
 ############################################################
 ## Common Variables
 ############################################################
 
-YMUTILS = $(top_builddir)/src/libym_utils.la
+YMUTILS = $(top_builddir)/src/libym_utils_d.la
 
 
 ############################################################
@@ -537,6 +541,20 @@ gctest_LDADD = \
 	$(YMUTILS)
 
 gctest_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## Variables for building mincov_test
+############################################################
+
+mincov_test_SOURCES = \
+	mincov_test.cc
+
+mincov_test_LDADD = \
+	$(YMUTILS)
+
+mincov__test_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 

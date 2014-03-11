@@ -37,6 +37,7 @@ BEGIN_NAMESPACE_YM_MINCOV
 class MincovSolver;
 class MincovSolverFactory;
 class MincovMatrix;
+class MincovCost;
 class MincovMsgHandler;
 
 END_NAMESPACE_YM_MINCOV
@@ -46,6 +47,7 @@ BEGIN_NAMESPACE_YM
 using nsMincov::MincovSolver;
 using nsMincov::MincovSolverFactory;
 using nsMincov::MincovMatrix;
+using nsMincov::MincovCost;
 using nsMincov::MincovMsgHandler;
 
 END_NAMESPACE_YM

@@ -53,11 +53,31 @@ MincovSolver::solve(MincovMatrix& matrix,
 		    const MincovCost& best_sofar,
 		    vector<ymuint32>& solution)
 {
+  {
+    ymuint nr = 0;
+    for (const MincovRowHead* rh = matrix.row_front();
+	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
+    ymuint nc = 0;
+    for (const MincovColHead* ch = matrix.col_front();
+	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
+    cout << "solve(" << nr << " x " << nc << ")" << endl;
+  }
+
   MincovCost best(best_sofar);
 
   vector<ymuint32> tmp_solution;
 
   reduce(matrix, tmp_solution);
+
+  {
+    ymuint nr = 0;
+    for (const MincovRowHead* rh = matrix.row_front();
+	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
+    ymuint nc = 0;
+    for (const MincovColHead* ch = matrix.col_front();
+	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
+    cout << "after reduce(" << nr << " x " << nc << ")" << endl;
+  }
 
   MincovCost lb = lower_bound(matrix);
   if ( lb >= best ) {
@@ -192,7 +212,7 @@ struct RowLt
   operator()(const MincovRowHead* a,
 	     const MincovRowHead* b)
   {
-    return a->num() <= b->num();
+    return a->num() < b->num();
   }
 };
 
@@ -217,6 +237,7 @@ MincovSolver::row_dominance(MincovMatrix& matrix)
        !matrix.is_row_end(row); row = row->next()) {
     row_list.push_back(row);
   }
+
   // 要素数の少ない順にソートする．
   sort(row_list.begin(), row_list.end(), RowLt());
 
@@ -314,7 +335,7 @@ struct ColLt
   operator()(const MincovColHead* a,
 	     const MincovColHead* b)
   {
-    return a->num() <= b->num();
+    return a->num() < b->num();
   }
 };
 
