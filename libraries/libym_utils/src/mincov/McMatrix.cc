@@ -12,6 +12,8 @@
 
 BEGIN_NAMESPACE_YM_MINCOV
 
+bool mcmatrix_debug = false;
+
 //////////////////////////////////////////////////////////////////////
 // クラス McRowHead
 //////////////////////////////////////////////////////////////////////
@@ -138,7 +140,11 @@ McMatrix::McMatrix(ymuint32 row_size,
   mColSize(0),
   mRowArray(NULL),
   mColArray(NULL),
-  mColCostArray(NULL)
+  mColCostArray(NULL),
+  mDelStack(NULL),
+  mMarkArray(NULL),
+  mRowIdList(NULL),
+  mColIdList(NULL)
 {
   resize(row_size, col_size, cost_size);
 }
@@ -151,7 +157,11 @@ McMatrix::McMatrix(const McMatrix& src) :
   mColSize(0),
   mRowArray(NULL),
   mColArray(NULL),
-  mColCostArray(NULL)
+  mColCostArray(NULL),
+  mDelStack(NULL),
+  mMarkArray(NULL),
+  mRowIdList(NULL),
+  mColIdList(NULL)
 {
   resize(src.row_size(), src.col_size(), src.cost_size());
   copy(src);
@@ -174,7 +184,6 @@ McMatrix::operator=(const McMatrix& src)
 McMatrix::~McMatrix()
 {
   clear();
-  resize(0, 0, 0);
 }
 
 // @brief 内容をクリアする．
@@ -189,6 +198,14 @@ McMatrix::clear()
   for (ymuint i = 0; i < col_size(); ++ i) {
     mColArray[i].clear();
   }
+
+  delete [] mRowArray;
+  delete [] mColArray;
+  delete [] mColCostArray;
+  delete [] mDelStack;
+  delete [] mMarkArray;
+  delete [] mRowIdList;
+  delete [] mColIdList;
 }
 
 // @brief サイズを変更する．
@@ -201,9 +218,7 @@ McMatrix::resize(ymuint32 row_size,
 		 ymuint32 cost_size)
 {
   if ( mRowSize != row_size || mColSize != col_size ) {
-    delete [] mRowArray;
-    delete [] mColArray;
-    delete [] mColCostArray;
+    clear();
 
     mRowSize = row_size;
     mColSize = col_size;
@@ -233,7 +248,16 @@ McMatrix::resize(ymuint32 row_size,
       mColCostArray[i] = 1.0;
     }
 
-    mDelStack.reserve(row_size + col_size);
+    delete [] mDelStack;
+    mDelStack = new ymuint32[row_size + col_size];
+    mStackTop = 0;
+
+    ymuint rc = row_size > col_size ? row_size : col_size;
+    mMarkArray = new bool[rc];
+
+    mRowIdList = new ymuint32[row_size];
+    mColIdList = new ymuint32[col_size];
+
   }
 }
 
@@ -383,45 +407,35 @@ McMatrix::set_col_cost(ymuint32 col_pos,
 void
 McMatrix::select_col(ymuint32 col_pos)
 {
-  {
-    bool found = false;
-    for (const McColHead* col = col_front();
-	 !is_col_end(col); col = col->next()) {
-      if ( col->pos() == col_pos ) {
-	found = true;
-	break;
-      }
-    }
-    assert_cond( found, __FILE__, __LINE__);
-  }
   McColHead* col = &mColArray[col_pos];
-  vector<ymuint32> row_list;
-  row_list.reserve(col->num());
+  assert_cond( !col->mDeleted, __FILE__, __LINE__);
+
+  mRowIdListNum = 0;
   for (const McCell* cell = col->front();
        !col->is_end(cell); cell = cell->col_next()) {
-    row_list.push_back(cell->row_pos());
+    mRowIdList[mRowIdListNum] = cell->row_pos();
+    ++ mRowIdListNum;
   }
   delete_col(col_pos);
-  for (vector<ymuint32>::iterator p = row_list.begin();
-       p != row_list.end(); ++ p) {
-    delete_row(*p);
+  for (ymuint i = 0; i < mRowIdListNum; ++ i) {
+    ymuint32 r = mRowIdList[i];
+    delete_row(r);
   }
 }
 
 // @brief 削除スタックにマーカーを書き込む．
 void
-McMatrix::backup()
+McMatrix::save()
 {
-  mDelStack.push_back(0U);
+  push_marker();
 }
 
 // @brief 直前のマーカーまで処理を戻す．
 void
 McMatrix::restore()
 {
-  while ( !mDelStack.empty() ) {
-    ymuint32 tmp = mDelStack.back();
-    mDelStack.pop_back();
+  while ( !stack_empty() ) {
+    ymuint32 tmp = pop();
     if ( tmp == 0U ) {
       break;
     }
@@ -463,7 +477,7 @@ McMatrix::delete_row(ymuint32 row_pos)
     }
   }
 
-  mDelStack.push_back((row_pos << 2) | 1U);
+  push_row(row_pos);
 }
 
 // @brief 行を復元する．
@@ -520,7 +534,7 @@ McMatrix::delete_col(ymuint32 col_pos)
     }
   }
 
-  mDelStack.push_back((col_pos << 2) | 3U);
+  push_col(col_pos);
 }
 
 // @brief 列を復元する．
@@ -550,6 +564,291 @@ McMatrix::restore_col(ymuint32 col_pos)
       row->mNum = n;
     }
   }
+}
+
+// @brief 簡単化を行う．
+// @param[out] selected_cols 簡単化中で選択された列の集合
+void
+McMatrix::reduce(vector<ymuint32>& selected_cols)
+{
+  for ( ; ; ) {
+    bool change = false;
+
+    // 行支配を探し，行の削除を行う．
+    if ( row_dominance() ) {
+      change = true;
+    }
+
+    // 列支配を探し，列の削除を行う．
+    if ( col_dominance() ) {
+      change = true;
+    }
+
+    // 必須列を探し，列の選択を行う．
+    if ( essential_col(selected_cols) ) {
+      change = true;
+    }
+
+    if ( !change ) {
+      break;
+    }
+  }
+}
+
+
+BEGIN_NONAMESPACE
+
+struct RowLt
+{
+  bool
+  operator()(const McRowHead* a,
+	     const McRowHead* b)
+  {
+    return a->num() < b->num();
+  }
+};
+
+END_NONAMESPACE
+
+
+// @brief 行支配を探し，行を削除する．
+// @return 削除された行があったら true を返す．
+bool
+McMatrix::row_dominance()
+{
+  bool change = false;
+
+  // 削除された行番号に印をつけるための配列
+  for (ymuint i = 0; i < row_size(); ++ i) {
+    mMarkArray[i] = false;
+  }
+
+  // 残っている行のリストを作る．
+  vector<const McRowHead*> row_list;
+  row_list.reserve(row_size());
+  for (const McRowHead* row = row_front();
+       !is_row_end(row); row = row->next()) {
+    row_list.push_back(row);
+  }
+
+  // 要素数の少ない順にソートする．
+  sort(row_list.begin(), row_list.end(), RowLt());
+
+  for (vector<const McRowHead*>::iterator p = row_list.begin();
+       p != row_list.end(); ++ p) {
+    const McRowHead* row = *p;
+    if ( mMarkArray[row->pos()] ) continue;
+
+    // row の行に要素を持つ列で要素数が最小のものを求める．
+    ymuint32 min_num = row_size() + 1;
+    const McColHead* min_col = NULL;
+    for (const McCell* cell = row->front();
+	 !row->is_end(cell); cell = cell->row_next()) {
+      ymuint32 col_pos = cell->col_pos();
+      const McColHead* col = this->col(col_pos);
+      ymuint32 col_num = col->num();
+      if ( min_num > col_num ) {
+	min_num = col_num;
+	min_col = col;
+      }
+    }
+
+    // min_col の列に要素を持つ行の番号を mRowIdList に入れる．
+    mRowIdListNum = 0;
+    for (const McCell* cell = min_col->front();
+	 !min_col->is_end(cell); cell = cell->col_next()) {
+      ymuint32 row_pos = cell->row_pos();
+      if ( this->row(row_pos)->num() > row->num() ) {
+	// ただし row よりも要素数の多いもののみを対象にする．
+	mRowIdList[mRowIdListNum] = row_pos;
+	++ mRowIdListNum;
+      }
+    }
+
+    // min_col 以外の列に含まれない行を tmp_rows から落とす．
+    for (const McCell* cell = row->front();
+	 !row->is_end(cell); cell = cell->row_next()) {
+      ymuint32 col_pos = cell->col_pos();
+      const McColHead* col = this->col(col_pos);
+      if ( col == min_col ) continue;
+      ymuint rpos = 0;
+      ymuint wpos = 0;
+      ymuint32 row1 = mRowIdList[rpos];
+      const McCell* cell = col->front();
+      ymuint32 row2 = cell->row_pos();
+      while ( rpos < mRowIdListNum && !col->is_end(cell) ) {
+	if ( row1 == row2 ) {
+	  if ( wpos != rpos ) {
+	    mRowIdList[wpos] = row1;
+	  }
+	  ++ wpos;
+	  ++ rpos;
+	  row1 = mRowIdList[rpos];
+	}
+	else if ( row1 < row2 ) {
+	  // row1 を削除
+	  ++ rpos;
+	}
+	else {
+	  cell = cell->col_next();
+	}
+      }
+      mRowIdListNum = wpos;
+    }
+
+    // mRowIdList に残った行は row に支配されている．
+    for (ymuint i = 0; i < mRowIdListNum; ++ i) {
+      ymuint row_pos = mRowIdList[i];
+      delete_row(row_pos);
+      mMarkArray[row_pos] = true;
+      change = true;
+      if ( mcmatrix_debug ) {
+	cout << "Row#" << row_pos << " is dominated by Row#" << row->pos() << endl;
+      }
+    }
+  }
+
+  return change;
+}
+
+
+BEGIN_NONAMESPACE
+
+struct ColLt
+{
+  bool
+  operator()(const McColHead* a,
+	     const McColHead* b)
+  {
+    return a->num() < b->num();
+  }
+};
+
+END_NONAMESPACE
+
+
+// @brief 列支配を探し，列を削除する．
+// @return 削除された列があったら true を返す．
+bool
+McMatrix::col_dominance()
+{
+  bool change = false;
+
+  // 残っている列のリストを作る．
+  vector<const McColHead*> col_list;
+  col_list.reserve(col_size());
+  for (const McColHead* col = col_front();
+       !is_col_end(col); col = col->next()) {
+    col_list.push_back(col);
+  }
+  // 要素数の少ない順にソートする．
+  sort(col_list.begin(), col_list.end(), ColLt());
+
+  for (vector<const McColHead*>::iterator p = col_list.begin();
+       p != col_list.end(); ++ p) {
+    const McColHead* col = *p;
+
+    if ( col->num() == 0 ) continue;
+
+    // col の列に要素を持つ行で要素数が最小のものを求める．
+    ymuint32 min_num = col_size() + 1;
+    const McRowHead* min_row = NULL;
+    for (const McCell* cell = col->front();
+	 !col->is_end(cell); cell = cell->col_next()) {
+      ymuint32 row_pos = cell->row_pos();
+      const McRowHead* row = this->row(row_pos);
+      ymuint32 row_num = row->num();
+      if ( min_num > row_num ) {
+	min_num = row_num;
+	min_row = row;
+      }
+    }
+
+    // min_row の行に要素を持つ列を対象にして支配関係のチェックを行う．
+    for (const McCell* cell = min_row->front();
+	 !min_row->is_end(cell); cell = cell->row_next()) {
+      const McColHead* col2 = this->col(cell->col_pos());
+      if ( col2->num() <= col->num() ) {
+	// ただし col よりも要素数の多くない列は調べる必要はない．
+	continue;
+      }
+      if ( col_cost(col2->pos()) > col_cost(col->pos()) ) {
+	// col2 のコストが col のコストより高ければ調べる必要はない．
+	continue;
+      }
+
+      const McCell* cell1 = col->front();
+      ymuint32 pos1 = cell1->row_pos();
+      const McCell* cell2 = col2->front();
+      ymuint32 pos2 = cell2->row_pos();
+      bool found = false;
+      for ( ; ; ) {
+	if ( pos1 < pos2 ) {
+	  // col に含まれていて col2 に含まれない行があるので
+	  // col2 は col を支配しない．
+	  break;
+	}
+	if ( pos1 == pos2 ) {
+	  cell1 = cell1->col_next();
+	  if ( col->is_end(cell1) ) {
+	    found = true;
+	    break;
+	  }
+	}
+	cell2 = cell2->col_next();
+	if ( col2->is_end(cell2) ) {
+	  break;
+	}
+      }
+      if ( found ) {
+	// col2 は col を支配している．
+	delete_col(col->pos());
+	if ( mcmatrix_debug ) {
+	  cout << "Col#" << col->pos() << " is dominated by Col#"
+	       << col2->pos() << endl;
+	}
+	change = true;
+	break;
+      }
+    }
+  }
+
+  return change;
+}
+
+// @brief 必須列を探し，列を選択する．
+// @param[out] selected_cols 選択された列を追加する列集合
+// @return 選択された列があったら true を返す．
+bool
+McMatrix::essential_col(vector<ymuint32>& selected_cols)
+{
+  for (ymuint i = 0; i < col_size(); ++ i) {
+    mMarkArray[i] = false;
+  }
+
+  mColIdListNum = 0;
+  for (const McRowHead* row = row_front();
+       !is_row_end(row); row = row->next()) {
+    if ( row->num() == 1 ) {
+      const McCell* cell = row->front();
+      ymuint32 col_pos = cell->col_pos();
+      assert_cond( !col(col_pos)->mDeleted, __FILE__, __LINE__);
+      if ( !mMarkArray[col_pos] ) {
+	mMarkArray[col_pos] = true;
+	mColIdList[mColIdListNum] = col_pos;
+	++ mColIdListNum;
+      }
+    }
+  }
+  for (ymuint i = 0; i < mColIdListNum; ++ i) {
+    ymuint32 col_pos = mColIdList[i];
+    if ( mcmatrix_debug ) {
+      cout << "Col#" << col_pos << " is essential" << endl;
+    }
+    selected_cols.push_back(col_pos);
+    select_col(col_pos);
+  }
+  return mColIdListNum > 0;
 }
 
 // @brief セルの生成

@@ -74,44 +74,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 解を求める再帰関数
-  /// @param[in] matrix 対象の行列
-  /// @param[in] best_sofar 現時点の最良解
   void
-  solve(McMatrix& matrix,
-	const vector<ymuint32>& cur_solution);
+  solve();
 
   /// @brief 下限を求める．
   /// @param[in] matrix 対象の行列
   /// @return 下限値
   double
   lower_bound(McMatrix& matrix);
-
-  /// @brief 簡単化を行う．
-  /// @param[in] matrix 対象の行列
-  /// @param[out] selected_cols 簡単化中で選択された列の集合を追加する配列
-  void
-  reduce(McMatrix& matrix,
-	 vector<ymuint32>& selected_cols);
-
-  /// @brief 行支配を探し，行を削除する．
-  /// @param[in] matrix 対象の行列
-  /// @return 削除された行があったら true を返す．
-  bool
-  row_dominance(McMatrix& matrix);
-
-  /// @brief 列支配を探し，列を削除する．
-  /// @param[in] matrix 対象の行列
-  /// @return 削除された列があったら true を返す．
-  bool
-  col_dominance(McMatrix& matrix);
-
-  /// @brief 必須列を探し，列を選択する．
-  /// @param[in] matrix 対象の行列
-  /// @param[out] selected_cols 選択された列を追加する列集合
-  /// @return 選択された列があったら true を返す．
-  bool
-  essential_col(McMatrix& matrix,
-		vector<ymuint32>& selected_cols);
 
   /// @brief 検証する．
   bool
@@ -132,8 +102,8 @@ private:
   // 現在のベスト解
   vector<ymuint32> mBestSolution;
 
-  // 探索を行わないフラグ
-  bool mNoBranch;
+  // 現在の解
+  vector<ymuint32> mCurSolution;
 
 };
 

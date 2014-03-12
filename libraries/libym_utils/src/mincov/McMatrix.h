@@ -169,9 +169,30 @@ public:
   void
   delete_col(ymuint32 col_pos);
 
+  /// @brief 簡単化を行う．
+  /// @param[out] selected_cols 簡単化中で選択された列の集合を追加する配列
+  void
+  reduce(vector<ymuint32>& selected_cols);
+
+  /// @brief 行支配を探し，行を削除する．
+  /// @return 削除された行があったら true を返す．
+  bool
+  row_dominance();
+
+  /// @brief 列支配を探し，列を削除する．
+  /// @return 削除された列があったら true を返す．
+  bool
+  col_dominance();
+
+  /// @brief 必須列を探し，列を選択する．
+  /// @param[out] selected_cols 選択された列を追加する列集合
+  /// @return 選択された列があったら true を返す．
+  bool
+  essential_col(vector<ymuint32>& selected_cols);
+
   /// @brief 削除スタックにマーカーを書き込む．
   void
-  backup();
+  save();
 
   /// @brief 直前のマーカーまで処理を戻す．
   void
@@ -202,6 +223,30 @@ private:
   /// @brief セルの解放
   void
   free_cell(McCell* cell);
+
+  /// @brief スタックが空の時 true を返す．
+  bool
+  stack_empty();
+
+  /// @brief スタックに境界マーカーを書き込む．
+  void
+  push_marker();
+
+  /// @brief スタックに行削除の印を書き込む．
+  void
+  push_row(ymuint32 row_pos);
+
+  /// @brief スタックに列削除の印を書き込む．
+  void
+  push_col(ymuint32 col_pos);
+
+  /// @brief スタックに値を積む．
+  void
+  push(ymuint32 val);
+
+  /// @brief スタックから取り出す．
+  ymuint32
+  pop();
 
 
 private:
@@ -237,7 +282,25 @@ private:
   double* mColCostArray;
 
   // 削除の履歴を覚えておくスタック
-  vector<ymuint32> mDelStack;
+  ymuint32* mDelStack;
+
+  // mDelStack のポインタ
+  ymuint32 mStackTop;
+
+  // マーク用のブール配列
+  bool* mMarkArray;
+
+  // 行番号のリスト
+  ymuint32* mRowIdList;
+
+  // mRowIdList の要素数
+  ymuint32 mRowIdListNum;
+
+  // 列番号のリスト
+  ymuint32* mColIdList;
+
+  // mColIdList の要素数
+  ymuint32 mColIdListNum;
 
 };
 
@@ -347,6 +410,56 @@ double
 McMatrix::col_cost(ymuint32 col_pos) const
 {
   return mColCostArray[col_pos];
+}
+
+// @brief スタックが空の時 true を返す．
+inline
+bool
+McMatrix::stack_empty()
+{
+  return mStackTop == 0;
+}
+
+// @brief スタックに境界マーカーを書き込む．
+inline
+void
+McMatrix::push_marker()
+{
+  push(0U);
+}
+
+// @brief スタックに行削除の印を書き込む．
+inline
+void
+McMatrix::push_row(ymuint32 row_pos)
+{
+  push((row_pos << 2) | 1U);
+}
+
+// @brief スタックに列削除の印を書き込む．
+inline
+void
+McMatrix::push_col(ymuint32 col_pos)
+{
+  push((col_pos << 2) | 3U);
+}
+
+// @brief スタックに値を積む．
+inline
+void
+McMatrix::push(ymuint32 val)
+{
+  mDelStack[mStackTop] = val;
+  ++ mStackTop;
+}
+
+// @brief スタックから取り出す．
+inline
+ymuint32
+McMatrix::pop()
+{
+  -- mStackTop;
+  return mDelStack[mStackTop];
 }
 
 END_NAMESPACE_YM_MINCOV
