@@ -76,13 +76,9 @@ private:
   /// @brief 解を求める再帰関数
   /// @param[in] matrix 対象の行列
   /// @param[in] best_sofar 現時点の最良解
-  /// @param[out] solution 選ばれた列集合
-  /// @return 解のコスト
-  double
+  void
   solve(McMatrix& matrix,
-	double best_sofar,
-	const vector<ymuint32>& cur_solution,
-	vector<ymuint32>& solution);
+	const vector<ymuint32>& cur_solution);
 
   /// @brief 下限を求める．
   /// @param[in] matrix 対象の行列
@@ -92,7 +88,7 @@ private:
 
   /// @brief 簡単化を行う．
   /// @param[in] matrix 対象の行列
-  /// @param[out] selected_cols 簡単化中で選択された列の集合
+  /// @param[out] selected_cols 簡単化中で選択された列の集合を追加する配列
   void
   reduce(McMatrix& matrix,
 	 vector<ymuint32>& selected_cols);
@@ -117,6 +113,10 @@ private:
   essential_col(McMatrix& matrix,
 		vector<ymuint32>& selected_cols);
 
+  /// @brief 検証する．
+  bool
+  verify(const vector<ymuint32>& solution) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -125,6 +125,12 @@ private:
 
   // 問題を表す行列
   McMatrix* mMatrix;
+
+  // 現在のベスト
+  double mBest;
+
+  // 現在のベスト解
+  vector<ymuint32> mBestSolution;
 
   // 探索を行わないフラグ
   bool mNoBranch;

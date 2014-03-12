@@ -118,6 +118,8 @@ private:
   // 直後の列を指すリンク
   McColHead* mNext;
 
+  // 削除フラグ
+  bool mDeleted;
 };
 
 

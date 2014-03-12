@@ -18,7 +18,8 @@ BEGIN_NAMESPACE_YM_MINCOV
 
 // @brief コンストラクタ
 McRowHead::McRowHead() :
-  mNum(0)
+  mNum(0),
+  mDeleted(false)
 {
 }
 
@@ -72,7 +73,8 @@ McRowHead::search_insert_pos(McCell* cell)
 
 // @brief コンストラクタ
 McColHead::McColHead() :
-  mNum(0)
+  mNum(0),
+  mDeleted(false)
 {
 }
 
@@ -255,6 +257,40 @@ McMatrix::copy(const McMatrix& src)
   }
 }
 
+// @brief 実効的な行数を返す．
+ymuint32
+McMatrix::remain_row_size() const
+{
+  ymuint nr = 0;
+  for (const McRowHead* rh = row_front();
+       !is_row_end(rh); rh = rh->next()) ++ nr;
+  return nr;
+}
+
+// @brief 実効的な列数を返す．
+ymuint32
+McMatrix::remain_col_size() const
+{
+  ymuint nc = 0;
+  for (const McColHead* ch = col_front();
+       !is_col_end(ch); ch = ch->next()) ++ nc;
+  return nc;
+}
+
+// @brief 列集合のコストを返す．
+// @param[in] col_list 列のリスト
+double
+McMatrix::cost(const vector<ymuint32>& col_list) const
+{
+  double cur_cost = 0.0;
+  for (vector<ymuint32>::const_iterator p = col_list.begin();
+       p != col_list.end(); ++ p) {
+    ymuint32 col = *p;
+    cur_cost += col_cost(col);
+  }
+  return cur_cost;
+}
+
 // @brief 要素を追加する．
 // @param[in] row_pos 追加する要素の行番号
 // @param[in] col_pos 追加する要素の列番号
@@ -347,17 +383,29 @@ McMatrix::set_col_cost(ymuint32 col_pos,
 void
 McMatrix::select_col(ymuint32 col_pos)
 {
+  {
+    bool found = false;
+    for (const McColHead* col = col_front();
+	 !is_col_end(col); col = col->next()) {
+      if ( col->pos() == col_pos ) {
+	found = true;
+	break;
+      }
+    }
+    assert_cond( found, __FILE__, __LINE__);
+  }
   McColHead* col = &mColArray[col_pos];
-  list<ymuint32> row_list;
+  vector<ymuint32> row_list;
+  row_list.reserve(col->num());
   for (const McCell* cell = col->front();
        !col->is_end(cell); cell = cell->col_next()) {
     row_list.push_back(cell->row_pos());
   }
-  for (list<ymuint32>::iterator p = row_list.begin();
+  delete_col(col_pos);
+  for (vector<ymuint32>::iterator p = row_list.begin();
        p != row_list.end(); ++ p) {
     delete_row(*p);
   }
-  delete_col(col_pos);
 }
 
 // @brief 削除スタックにマーカーを書き込む．
@@ -395,6 +443,11 @@ void
 McMatrix::delete_row(ymuint32 row_pos)
 {
   McRowHead* row = &mRowArray[row_pos];
+  if ( row->mDeleted ) {
+    return;
+  }
+  row->mDeleted = true;
+
   McRowHead* prev = row->mPrev;
   McRowHead* next = row->mNext;
   prev->mNext = next;
@@ -418,6 +471,9 @@ void
 McMatrix::restore_row(ymuint32 row_pos)
 {
   McRowHead* row = &mRowArray[row_pos];
+  assert_cond( row->mDeleted, __FILE__, __LINE__);
+  row->mDeleted = false;
+
   McRowHead* prev = row->mPrev;
   McRowHead* next = row->mNext;
   prev->mNext = row;
@@ -427,6 +483,16 @@ McMatrix::restore_row(ymuint32 row_pos)
        !row->is_end(cell); cell = cell->mRightLink) {
     mColArray[cell->col_pos()].insert_elem(cell);
   }
+
+  {
+    for (McColHead* col = mColHead.mNext;
+	 !is_col_end(col); col = col->mNext) {
+      ymuint n = 0;
+      for (const McCell* cell = col->front();
+	   !col->is_end(cell); cell = cell->col_next()) ++ n;
+      col->mNum = n;
+    }
+  }
 }
 
 // @brief 列を削除する．
@@ -434,6 +500,11 @@ void
 McMatrix::delete_col(ymuint32 col_pos)
 {
   McColHead* col = &mColArray[col_pos];
+  if ( col->mDeleted ) {
+    return;
+  }
+  col->mDeleted = true;
+
   McColHead* prev = col->mPrev;
   McColHead* next = col->mNext;
   prev->mNext = next;
@@ -457,6 +528,9 @@ void
 McMatrix::restore_col(ymuint32 col_pos)
 {
   McColHead* col = &mColArray[col_pos];
+  assert_cond( col->mDeleted, __FILE__, __LINE__);
+  col->mDeleted = false;
+
   McColHead* prev = col->mPrev;
   McColHead* next = col->mNext;
   prev->mNext = col;
@@ -465,6 +539,16 @@ McMatrix::restore_col(ymuint32 col_pos)
   for (McCell* cell = col->mDummy.mDownLink;
        !col->is_end(cell); cell = cell->mDownLink) {
     mRowArray[cell->row_pos()].insert_elem(cell);
+  }
+
+  {
+    for (McRowHead* row = mRowHead.mNext;
+	 !is_row_end(row); row = row->mNext) {
+      ymuint n = 0;
+      for (const McCell* cell = row->front();
+	   !row->is_end(cell); cell = cell->row_next()) ++ n;
+      row->mNum = n;
+    }
   }
 }
 

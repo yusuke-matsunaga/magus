@@ -21,6 +21,64 @@ BEGIN_NAMESPACE_YM_MINCOV
 
 bool mincov_debug = false;
 
+void
+verify_matrix(McMatrix& a,
+	      McMatrix& b)
+{
+  assert_cond( a.remain_row_size() == b.remain_row_size(), __FILE__, __LINE__);
+  assert_cond( a.remain_col_size() == b.remain_col_size(), __FILE__, __LINE__);
+  const McRowHead* row_a = a.row_front();
+  const McRowHead* row_b = b.row_front();
+  for ( ; ; ) {
+    assert_cond( row_a->pos() == row_b->pos(), __FILE__, __LINE__);
+    assert_cond( row_a->num() == row_b->num(), __FILE__, __LINE__);
+    const McCell* cell_a = row_a->front();
+    const McCell* cell_b = row_b->front();
+    for ( ; ; ) {
+      assert_cond( cell_a->row_pos() == row_a->pos(), __FILE__, __LINE__);
+      assert_cond( cell_b->row_pos() == row_b->pos(), __FILE__, __LINE__);
+      assert_cond( cell_a->col_pos() == cell_b->col_pos(), __FILE__, __LINE__);
+      cell_a = cell_a->row_next();
+      cell_b = cell_b->row_next();
+      if ( row_a->is_end(cell_a) ) {
+	assert_cond( row_b->is_end(cell_b), __FILE__, __LINE__);
+	break;
+      }
+    }
+    row_a = row_a->next();
+    row_b = row_b->next();
+    if ( a.is_row_end(row_a) ) {
+      assert_cond( b.is_row_end(row_b), __FILE__, __LINE__);
+      break;
+    }
+  }
+  const McColHead* col_a = a.col_front();
+  const McColHead* col_b = b.col_front();
+  for ( ; ; ) {
+    assert_cond( col_a->pos() == col_b->pos(), __FILE__, __LINE__);
+    assert_cond( col_a->num() == col_b->num(), __FILE__, __LINE__);
+    const McCell* cell_a = col_a->front();
+    const McCell* cell_b = col_b->front();
+    for ( ; ; ) {
+      assert_cond( cell_a->col_pos() == col_a->pos(), __FILE__, __LINE__);
+      assert_cond( cell_b->col_pos() == col_b->pos(), __FILE__, __LINE__);
+      assert_cond( cell_a->row_pos() == cell_b->row_pos(), __FILE__, __LINE__);
+      cell_a = cell_a->col_next();
+      cell_b = cell_b->col_next();
+      if ( col_a->is_end(cell_a) ) {
+	assert_cond( col_b->is_end(cell_b), __FILE__, __LINE__);
+	break;
+      }
+    }
+    col_a = col_a->next();
+    col_b = col_b->next();
+    if ( a.is_col_end(col_a) ) {
+      assert_cond( b.is_col_end(col_b), __FILE__, __LINE__);
+      break;
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////
 // クラス McSolverImpl
 //////////////////////////////////////////////////////////////////////
@@ -76,7 +134,11 @@ McSolverImpl::exact(vector<ymuint32>& solution)
 {
   McMatrix work(*mMatrix);
   mNoBranch = false;
-  return solve(work, DBL_MAX, vector<ymuint32>(), solution);
+  mBest = DBL_MAX;
+  solve(work, vector<ymuint32>());
+  solution = mBestSolution;
+  assert_cond( verify(solution), __FILE__, __LINE__);
+  return mBest;
 }
 
 // @brief ヒューリスティックで最小被覆問題を解く．
@@ -85,72 +147,68 @@ McSolverImpl::exact(vector<ymuint32>& solution)
 double
 McSolverImpl::heuristic(vector<ymuint32>& solution)
 {
+  Selector sel;
   McMatrix work(*mMatrix);
-  mNoBranch = true;
-  return solve(work, DBL_MAX, vector<ymuint32>(), solution);
+
+  solution.clear();
+  for ( ; ; ) {
+    reduce(work, solution);
+
+    if ( work.remain_row_size() == 0 ) {
+      assert_cond( verify(solution), __FILE__, __LINE__);
+      double cost = work.cost(solution);
+      return cost;
+    }
+
+    // 次の分岐のための列をとってくる．
+    ymuint col = sel(work);
+
+    // その列を選択する．
+    work.select_col(col);
+    solution.push_back(col);
+
+    if ( mincov_debug ) {
+      cout << "Col#" << col << " is selected heuristically" << endl;
+    }
+  }
 }
 
 // @brief 解を求める再帰関数
 // @param[in] matrix 対象の行列
 // @param[in] best_sofar 現時点の最良解
-// @param[out] solution 選ばれた列集合
-// @return 最良解
-double
+void
 McSolverImpl::solve(McMatrix& matrix,
-		    double best_sofar,
-		    const vector<ymuint32>& cur_solution,
-		    vector<ymuint32>& solution)
+		    const vector<ymuint32>& cur_solution)
 {
   if ( mincov_debug ) {
-    ymuint nr = 0;
-    for (const McRowHead* rh = matrix.row_front();
-	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
-    ymuint nc = 0;
-    for (const McColHead* ch = matrix.col_front();
-	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
-    unordered_set<ymuint32> col_set;
-    double cur_cost = 0.0;
-    for (vector<ymuint32>::const_iterator p = cur_solution.begin();
-	 p != cur_solution.end(); ++ p) {
-      ymuint32 col = *p;
-      if ( col_set.count(col) > 0 ) {
-	cout << " Error: " << col << " is duplicated" << endl;
-      }
-      col_set.insert(col);
-      cur_cost += matrix.col_cost(col);
-    }
-    cout << "solve(" << nr << " x " << nc << "): " << best_sofar << " : " << cur_cost << endl;
+    ymuint nr = matrix.remain_row_size();
+    ymuint nc = matrix.remain_col_size();
+    double cur_cost = matrix.cost(cur_solution);
+    cout << "solve(" << nr << " x " << nc << "): " << mBest << " : " << cur_cost << endl;
   }
 
-  double best = best_sofar;
-
-  vector<ymuint32> e_solution(cur_solution);
-  reduce(matrix, e_solution);
+  vector<ymuint32> tmp_solution(cur_solution);
+  reduce(matrix, tmp_solution);
 
   if ( mincov_debug ) {
-    ymuint nr = 0;
-    for (const McRowHead* rh = matrix.row_front();
-	 !matrix.is_row_end(rh); rh = rh->next()) ++ nr;
-    ymuint nc = 0;
-    for (const McColHead* ch = matrix.col_front();
-	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
+    ymuint nr = matrix.remain_row_size();
+    ymuint nc = matrix.remain_col_size();
     cout << "  after reduce(" << nr << " x " << nc << ")" << endl;
   }
 
-  double e_cost = 0.0;
-  for (vector<ymuint32>::iterator p = e_solution.begin();
-       p != e_solution.end(); ++ p) {
-    e_cost += matrix.col_cost(*p);
+  double tmp_cost = matrix.cost(tmp_solution);
+
+  if ( matrix.remain_row_size() == 0 ) {
+    if ( mBest > tmp_cost ) {
+      mBest = tmp_cost;
+      mBestSolution = tmp_solution;
+    }
+    return;
   }
 
-  if ( matrix.is_row_end(matrix.row_front()) ) {
-    solution = e_solution;
-    return e_cost;
-  }
-
-  double lb = lower_bound(matrix) + e_cost;
-  if ( lb >= best ) {
-    return lb;
+  double lb = lower_bound(matrix) + tmp_cost;
+  if ( lb >= mBest ) {
+    return;
   }
 
   Selector sel;
@@ -158,66 +216,32 @@ McSolverImpl::solve(McMatrix& matrix,
   // 次の分岐のための列をとってくる．
   ymuint col = sel(matrix);
 
-#if 0
   // その列を選択したときの最良解を求める．
+  McMatrix orig_matrix(matrix);
   matrix.backup();
   matrix.select_col(col);
-  vector<ymuint32> tmp_solution;
-  double v1 = solve(matrix, best, e_cost + matrix.col_cost(col), tmp_solution);
-  if ( best > v1 ) {
-    best = v1;
-    solution = e_solution;
-    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
-    // + 選んだ列
-    solution.push_back(col);
-  }
-  matrix.restore();
-
-  // その列を選択しなかったときの最良解を求める．
-  matrix.backup();
-  matrix.delete_col(col);
-
-  tmp_solution.clear();
-  double v2 = solve(matrix, best, e_cost, tmp_solution);
-  if ( best > v2 ) {
-    best = v2;
-    solution = e_solution;
-    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
-  }
-  matrix.restore();
-#else
-  McMatrix matrix1(matrix);
-  matrix1.select_col(col);
+  tmp_solution.push_back(col);
 
   if ( mincov_debug ) {
     cout << "select column#" << col << endl;
   }
 
-  // その列を選択したときの最良解を求める．
-  e_solution.push_back(col);
-  double v1 = solve(matrix1, best, e_solution, solution);
-  if ( best > v1 ) {
-    best = v1;
-    if ( mNoBranch ) {
-      return best;
-    }
+  solve(matrix, tmp_solution);
+  matrix.restore();
+
+  if ( mincov_debug ) {
+    verify_matrix(orig_matrix, matrix);
   }
 
-  McMatrix matrix2(matrix);
-  matrix2.delete_col(col);
+  // その列を選択しなかったときの最良解を求める．
+  matrix.delete_col(col);
+  tmp_solution.pop_back();
 
   if ( mincov_debug ) {
     cout << "delete column#" << col << endl;
   }
-  // その列を選択しなかったときの最良解を求める．
-  e_solution.pop_back();
-  double v2 = solve(matrix2, best, e_solution, solution);
-  if ( best > v2 ) {
-    best = v2;
-  }
-#endif
 
-  return best;
+  solve(matrix, tmp_solution);
 }
 
 // @brief 下限を求める．
@@ -411,13 +435,16 @@ McSolverImpl::row_dominance(McMatrix& matrix)
       }
     }
 
-    // tmp_rows に残った行は row_pos に支配されている．
+    // tmp_rows に残った行は row に支配されている．
     for (vector<ymuint32>::iterator p = tmp_rows.begin();
 	 p != tmp_rows.end(); ++ p) {
       ymuint row_pos = *p;
       matrix.delete_row(row_pos);
       del_mark[row_pos] = true;
       change = true;
+      if ( mincov_debug ) {
+	cout << "Row#" << row_pos << " is dominated by Row#" << row->pos() << endl;
+      }
     }
   }
 
@@ -486,6 +513,11 @@ McSolverImpl::col_dominance(McMatrix& matrix)
 	// ただし col よりも要素数の多くない列は調べる必要はない．
 	continue;
       }
+      if ( matrix.col_cost(col2->pos()) > matrix.col_cost(col->pos()) ) {
+	// col2 のコストが col のコストより高ければ調べる必要はない．
+	continue;
+      }
+
       const McCell* cell1 = col->front();
       ymuint32 pos1 = cell1->row_pos();
       const McCell* cell2 = col2->front();
@@ -509,10 +541,12 @@ McSolverImpl::col_dominance(McMatrix& matrix)
 	  break;
 	}
       }
-      if ( found &&
-	   matrix.col_cost(col2->pos()) <= matrix.col_cost(col->pos()) ) {
+      if ( found ) {
 	// col2 は col を支配している．
 	matrix.delete_col(col->pos());
+	if ( mincov_debug ) {
+	  cout << "Col#" << col->pos() << " is dominated by Col#" << col2->pos() << endl;
+	}
 	change = true;
 	break;
       }
@@ -554,6 +588,38 @@ McSolverImpl::essential_col(McMatrix& matrix,
     }
   }
   return !tmp_list.empty();
+}
+
+// @brief 検証する．
+bool
+McSolverImpl::verify(const vector<ymuint32>& solution) const
+{
+  vector<bool> row_mark(mMatrix->row_size(), false);
+  for (ymuint i = 0; i < solution.size(); ++ i) {
+    ymuint32 col_pos = solution[i];
+    const McColHead* col = mMatrix->col(col_pos);
+    for (const McCell* cell = col->front();
+	 !col->is_end(cell); cell = cell->col_next()) {
+      ymuint32 row_pos = cell->row_pos();
+      row_mark[row_pos] = true;
+    }
+  }
+  bool status = true;
+  for (const McRowHead* row = mMatrix->row_front();
+       !mMatrix->is_row_end(row); row = row->next()) {
+    ymuint32 row_pos = row->pos();
+    if ( !row_mark[row_pos] ) {
+      cerr << "Row#" << row_pos << " is not covered" << endl;
+      status = false;
+    }
+  }
+  if ( !status ) {
+    for (ymuint i = 0; i < solution.size(); ++ i) {
+      cerr << " " << solution[i];
+    }
+    cerr << endl;
+  }
+  return status;
 }
 
 END_NAMESPACE_YM_MINCOV

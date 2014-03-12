@@ -83,6 +83,10 @@ public:
   bool
   is_row_end(const McRowHead* row) const;
 
+  /// @brief 実効的な行数を返す．
+  ymuint32
+  remain_row_size() const;
+
   /// @brief 列を取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
   const McColHead*
@@ -102,10 +106,19 @@ public:
   bool
   is_col_end(const McColHead* col) const;
 
+  /// @brief 実効的な列数を返す．
+  ymuint32
+  remain_col_size() const;
+
   /// @brief 列のコストを取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
   double
   col_cost(ymuint32 col_pos) const;
+
+  /// @brief 列集合のコストを返す．
+  /// @param[in] col_list 列のリスト
+  double
+  cost(const vector<ymuint32>& col_list) const;
 
 
 public:
