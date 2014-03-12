@@ -8,6 +8,8 @@
 
 %Module YmUtils
 
+%Include GcSolver.sip
+%Include McSolver.sip
 %Include GenBase.sip
 %Include CombiGen.sip
 %Include PermGen.sip
