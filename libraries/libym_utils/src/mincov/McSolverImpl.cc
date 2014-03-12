@@ -72,11 +72,22 @@ McSolverImpl::insert_elem(ymuint32 row_pos,
 // @param[out] solution 選ばれた列集合
 // @return 解のコスト
 double
-McSolverImpl::solve(vector<ymuint32>& solution)
+McSolverImpl::exact(vector<ymuint32>& solution)
 {
   McMatrix work(*mMatrix);
-  double dummy_best = DBL_MAX;
-  return solve(work, dummy_best, 0.0, solution);
+  mNoBranch = false;
+  return solve(work, DBL_MAX, vector<ymuint32>(), solution);
+}
+
+// @brief ヒューリスティックで最小被覆問題を解く．
+// @param[out] solution 選ばれた列集合
+// @return 解のコスト
+double
+McSolverImpl::heuristic(vector<ymuint32>& solution)
+{
+  McMatrix work(*mMatrix);
+  mNoBranch = true;
+  return solve(work, DBL_MAX, vector<ymuint32>(), solution);
 }
 
 // @brief 解を求める再帰関数
@@ -87,7 +98,7 @@ McSolverImpl::solve(vector<ymuint32>& solution)
 double
 McSolverImpl::solve(McMatrix& matrix,
 		    double best_sofar,
-		    double cur_cost,
+		    const vector<ymuint32>& cur_solution,
 		    vector<ymuint32>& solution)
 {
   if ( mincov_debug ) {
@@ -97,12 +108,23 @@ McSolverImpl::solve(McMatrix& matrix,
     ymuint nc = 0;
     for (const McColHead* ch = matrix.col_front();
 	 !matrix.is_col_end(ch); ch = ch->next()) ++ nc;
+    unordered_set<ymuint32> col_set;
+    double cur_cost = 0.0;
+    for (vector<ymuint32>::const_iterator p = cur_solution.begin();
+	 p != cur_solution.end(); ++ p) {
+      ymuint32 col = *p;
+      if ( col_set.count(col) > 0 ) {
+	cout << " Error: " << col << " is duplicated" << endl;
+      }
+      col_set.insert(col);
+      cur_cost += matrix.col_cost(col);
+    }
     cout << "solve(" << nr << " x " << nc << "): " << best_sofar << " : " << cur_cost << endl;
   }
 
   double best = best_sofar;
 
-  vector<ymuint32> e_solution;
+  vector<ymuint32> e_solution(cur_solution);
   reduce(matrix, e_solution);
 
   if ( mincov_debug ) {
@@ -115,7 +137,7 @@ McSolverImpl::solve(McMatrix& matrix,
     cout << "  after reduce(" << nr << " x " << nc << ")" << endl;
   }
 
-  double e_cost = cur_cost;
+  double e_cost = 0.0;
   for (vector<ymuint32>::iterator p = e_solution.begin();
        p != e_solution.end(); ++ p) {
     e_cost += matrix.col_cost(*p);
@@ -136,7 +158,7 @@ McSolverImpl::solve(McMatrix& matrix,
   // 次の分岐のための列をとってくる．
   ymuint col = sel(matrix);
 
-#if 1
+#if 0
   // その列を選択したときの最良解を求める．
   matrix.backup();
   matrix.select_col(col);
@@ -172,14 +194,13 @@ McSolverImpl::solve(McMatrix& matrix,
   }
 
   // その列を選択したときの最良解を求める．
-  vector<ymuint32> tmp_solution;
-  double v1 = solve(matrix1, best, e_cost + matrix1.col_cost(col), tmp_solution);
+  e_solution.push_back(col);
+  double v1 = solve(matrix1, best, e_solution, solution);
   if ( best > v1 ) {
     best = v1;
-    solution = e_solution;
-    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
-    // + 選んだ列
-    solution.push_back(col);
+    if ( mNoBranch ) {
+      return best;
+    }
   }
 
   McMatrix matrix2(matrix);
@@ -189,12 +210,10 @@ McSolverImpl::solve(McMatrix& matrix,
     cout << "delete column#" << col << endl;
   }
   // その列を選択しなかったときの最良解を求める．
-  tmp_solution.clear();
-  double v2 = solve(matrix2, best, e_cost, tmp_solution);
+  e_solution.pop_back();
+  double v2 = solve(matrix2, best, e_solution, solution);
   if ( best > v2 ) {
     best = v2;
-    solution = e_solution;
-    solution.insert(solution.end(), tmp_solution.begin(), tmp_solution.end());
   }
 #endif
 
@@ -237,7 +256,6 @@ McSolverImpl::lower_bound(McMatrix& matrix)
       ymuint32 rpos2 = row_list[j];
       if ( rset.find(rpos1) != rset.find(rpos2) ) {
 	mc.connect(i, j);
-	mc.connect(j, i);
       }
     }
   }
@@ -513,20 +531,27 @@ McSolverImpl::essential_col(McMatrix& matrix,
 			    vector<ymuint32>& selected_cols)
 {
   vector<ymuint32> tmp_list;
+  vector<bool> col_mark(matrix.col_size(), false);
   tmp_list.reserve(matrix.col_size());
   for (const McRowHead* row = matrix.row_front();
        !matrix.is_row_end(row); row = row->next()) {
     if ( row->num() == 1 ) {
       const McCell* cell = row->front();
       ymuint32 col_pos = cell->col_pos();
-      selected_cols.push_back(col_pos);
-      tmp_list.push_back(col_pos);
+      if ( !col_mark[col_pos] ) {
+	col_mark[col_pos] = true;
+	tmp_list.push_back(col_pos);
+      }
     }
   }
   for (vector<ymuint32>::iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     ymuint32 col_pos = *p;
+    selected_cols.push_back(col_pos);
     matrix.select_col(col_pos);
+    if ( mincov_debug ) {
+      cout << "Col#" << col_pos << " is essential" << endl;
+    }
   }
   return !tmp_list.empty();
 }

@@ -63,7 +63,13 @@ public:
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
   double
-  solve(vector<ymuint32>& solution);
+  exact(vector<ymuint32>& solution);
+
+  /// @brief ヒューリスティックで最小被覆問題を解く．
+  /// @param[out] solution 選ばれた列集合
+  /// @return 解のコスト
+  double
+  heuristic(vector<ymuint32>& solution);
 
 
 private:

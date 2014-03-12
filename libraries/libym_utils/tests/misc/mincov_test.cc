@@ -89,22 +89,19 @@ parse_line(char* buff,
   return 1;
 }
 
-int
-mincov_test(int argc,
-	    char** argv)
+bool
+parse_data(istream& s,
+	   vector<pair<int, int> >& pair_list)
 {
   char buff[1024];
   bool go_on = true;
-  int max_r = 0;
-  int max_c = 0;
-  vector<pair<int, int> > pair_list;
-  while ( go_on && cin.getline(buff, 1024, '\n') ) {
+  while ( go_on && s.getline(buff, 1024, '\n') ) {
     int num1;
     int num2;
     int stat = parse_line(buff, num1, num2);
     if ( stat == -1 ) {
       cerr << "Error: " << buff << endl;
-      return 1;
+      return false;
     }
     else if ( stat == 0 ) {
       // コメント行
@@ -114,14 +111,55 @@ mincov_test(int argc,
 	go_on = false;
       }
       else {
-	if ( max_r < num2 ) {
-	  max_r = num2;
-	}
-	if ( max_c < num1 ) {
-	  max_c = num1;
-	}
 	pair_list.push_back(make_pair(num1, num2));
       }
+    }
+  }
+  return true;
+}
+
+int
+mincov_test(int argc,
+	    char** argv)
+{
+  bool heuristic = false;
+  ymuint base = 1;
+  if ( argc > base && argv[base][0] == '-' ) {
+    if ( strcmp(argv[1], "-h") == 0 ) {
+      heuristic = true;
+      ++ base;
+    }
+    else {
+      cerr << argv[1] << " : invalid option" << endl;
+      return 1;
+    }
+  }
+
+  vector<pair<int, int> > pair_list;
+
+  if ( argc > base ) {
+    ifstream s(argv[base]);
+    if ( !s ) {
+      cerr << argv[base] << " : no such file" << endl;
+      return 1;
+    }
+    parse_data(s, pair_list);
+  }
+  else {
+    parse_data(cin, pair_list);
+  }
+
+  ymuint max_r = 0;
+  ymuint max_c = 0;
+  for (vector<pair<int, int> >::iterator p = pair_list.begin();
+       p != pair_list.end(); ++ p) {
+    ymuint r = p->second;
+    ymuint c = p->first;
+    if ( max_r < r ) {
+      max_r = r;
+    }
+    if ( max_c < c ) {
+      max_c = c;
     }
   }
 
@@ -134,7 +172,13 @@ mincov_test(int argc,
   }
 
   vector<ymuint32> solution;
-  double cost = solver.solve(solution);
+  double cost = DBL_MAX;
+  if ( heuristic ) {
+    cost = solver.heuristic(solution);
+  }
+  else {
+    cost = solver.exact(solution);
+  }
 
   cout << "Cost = " << cost << endl;
   for (vector<ymuint32>::iterator p = solution.begin();

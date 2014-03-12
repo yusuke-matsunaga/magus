@@ -63,9 +63,18 @@ McSolver::insert_elem(ymuint32 row_pos,
 // @param[out] solution 選ばれた列集合
 // @return 解のコスト
 double
-McSolver::solve(vector<ymuint32>& solution)
+McSolver::exact(vector<ymuint32>& solution)
 {
-  return mImpl->solve(solution);
+  return mImpl->exact(solution);
+}
+
+// @brief ヒューリスティックで最小被覆問題を解く．
+// @param[out] solution 選ばれた列集合
+// @return 解のコスト
+double
+McSolver::heuristic(vector<ymuint32>& solution)
+{
+  return mImpl->heuristic(solution);
 }
 
 END_NAMESPACE_YM

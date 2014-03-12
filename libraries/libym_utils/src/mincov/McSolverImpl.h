@@ -59,7 +59,13 @@ public:
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
   double
-  solve(vector<ymuint32>& solution);
+  exact(vector<ymuint32>& solution);
+
+  /// @brief ヒューリスティックで最小被覆問題を解く．
+  /// @param[out] solution 選ばれた列集合
+  /// @return 解のコスト
+  double
+  heuristic(vector<ymuint32>& solution);
 
 
 private:
@@ -75,7 +81,7 @@ private:
   double
   solve(McMatrix& matrix,
 	double best_sofar,
-	double cur_cost,
+	const vector<ymuint32>& cur_solution,
 	vector<ymuint32>& solution);
 
   /// @brief 下限を求める．
@@ -119,6 +125,9 @@ private:
 
   // 問題を表す行列
   McMatrix* mMatrix;
+
+  // 探索を行わないフラグ
+  bool mNoBranch;
 
 };
 
