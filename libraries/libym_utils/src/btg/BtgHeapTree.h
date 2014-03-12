@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "btg_nsdef.h"
 #include "BtgNode.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_BTG
 
 //////////////////////////////////////////////////////////////////////
 /// @class BtgHeapTree BtgHeapTree.h "BtgHeapTree.h"
@@ -209,6 +209,6 @@ BtgHeapTree::set(ymuint pos,
   node->mPos = pos + 1;
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_BTG
 
 #endif // BTGHEAPTREE_H

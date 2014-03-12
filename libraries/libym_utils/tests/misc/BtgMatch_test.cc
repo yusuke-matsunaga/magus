@@ -133,7 +133,7 @@ BtgMatch_test(int argc,
       }
       if ( first_line ) {
 	first_line = false;
-	bm.resize(num1, num2);
+	bm.set_size(num1, num2);
       }
       else {
 	bm.add_edge(num1, num2);

@@ -18,19 +18,17 @@ public:
   /// @brief 空のコンストラクタ
   BtgMatch();
 
-  /// @brief コンストラクタ
-  /// @param[in] node1_num 節点グループ1の要素数
-  /// @param[in] node2_num 節点グループ2の要素数
-  BtgMatch(unsigned int node1_num,
-	   unsigned int node2_num);
+  /// @brief 設定した内容をクリアする．
+  void
+  clear();
 
   /// @brief 節点数を設定する．
   /// @param[in] node1_num 節点グループ1の要素数
   /// @param[in] node2_num 節点グループ2の要素数
   /// @note 以前の内容はクリアされる．
   void
-  resize(unsigned int node1_num,
-	 unsigned int node2_num);
+  set_size(unsigned int node1_num,
+	   unsigned int node2_num);
 
   /// @brief 節点グループ1の要素数を返す．
   unsigned int
@@ -39,10 +37,6 @@ public:
   /// @brief 節点グループ2の要素数を返す．
   unsigned int
   node2_num() const;
-
-  /// @brief 枝をすべて取り除く
-  void
-  clear_edge();
 
   /// @brief 枝を追加する．
   /// @param[in] node1_id 節点グループ1のノード番号 ( 0 <= node1_id < node1_num() )

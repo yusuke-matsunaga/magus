@@ -9,12 +9,10 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "btg_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM
-
-class BtgEdge;
+BEGIN_NAMESPACE_YM_BTG
 
 //////////////////////////////////////////////////////////////////////
 /// @class BtgNode BtgNode.h "BtgNode.h"
@@ -22,7 +20,7 @@ class BtgEdge;
 //////////////////////////////////////////////////////////////////////
 class BtgNode
 {
-  friend class BtgMatch;
+  friend class BtgMatchImpl;
   friend class BtgHeapTree;
 
 public:
@@ -171,6 +169,6 @@ BtgNode::weight() const
   return mWeight;
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_BTG
 
 #endif // BTGNODE_H

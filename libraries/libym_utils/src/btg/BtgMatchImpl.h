@@ -1,36 +1,32 @@
-#ifndef UTILS_BTGMATCH_H
-#define UTILS_BTGMATCH_H
+#ifndef BTGMATCHIMPL_H
+#define BTGMATCHIMPL_H
 
-/// @file utils/BtgMatch.h
-/// @brief BtgMatch のヘッダファイル
+/// @file BtgMatchImpl.h
+/// @brief BtgMatchImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "btg_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM
-
-namespace nsBtg {
-  class BtgMatchImpl;
-}
+BEGIN_NAMESPACE_YM_BTG
 
 //////////////////////////////////////////////////////////////////////
-/// @class BtgMatch BtgMatch.h "ym_utils/BtgMatch.h"
-/// @brief 2部グラフの最大マッチングを求めるためのクラス
+/// @class BtgMatchImpl BtgMatchImpl.h "BtgMatchImpl.h"
+/// @brief BtgMatch の実際の処理を行うクラス
 //////////////////////////////////////////////////////////////////////
-class BtgMatch
+class BtgMatchImpl
 {
 public:
 
   /// @brief 空のコンストラクタ
-  BtgMatch();
+  BtgMatchImpl();
 
   /// @brief デストラクタ
-  ~BtgMatch();
+  ~BtgMatchImpl();
 
 
 public:
@@ -92,14 +88,77 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 節点グループ1でまわす calc_match()
+  void
+  calc_match1();
+
+  /// @brief 節点グループ2でまわす calc_match()
+  void
+  calc_match2();
+
+  /// @brief 節点グループ1でまわす calc_wmatch()
+  void
+  calc_wmatch1();
+
+  /// @brief 節点グループ2でまわす calc_wmatch()
+  void
+  calc_wmatch2();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の処理を行う実装クラス
-  nsBtg::BtgMatchImpl* mImpl;
+  // 節点グループ1の要素数
+  ymuint32 mNode1Num;
+
+  // 節点グループ1のノードの配列
+  BtgNode* mNode1Array;
+
+  // 節点グループ2の要素数
+  ymuint32 mNode2Num;
+
+  // 節点グループ2のノードの配列
+  BtgNode* mNode2Array;
+
+  // 枝のリスト
+  vector<BtgEdge*> mEdgeList;
 
 };
 
-END_NAMESPACE_YM
 
-#endif // DSA_BTGMATCH_H
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 節点グループ1 の要素数を返す．
+inline
+ymuint
+BtgMatchImpl::node1_num() const
+{
+  return mNode1Num;
+}
+
+// @brief 節点グループ2 の要素数を返す．
+inline
+ymuint
+BtgMatchImpl::node2_num() const
+{
+  return mNode2Num;
+}
+
+// @brief 枝数を返す．
+inline
+ymuint
+BtgMatchImpl::edge_num() const
+{
+  return mEdgeList.size();
+}
+
+END_NAMESPACE_YM_BTG
+
+#endif // BTGMATCHIMPL_H

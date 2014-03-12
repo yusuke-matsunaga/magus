@@ -52,6 +52,8 @@ COMMON_SOURCES = \
 	BtgHeapTree.h \
 	BtgHeapTree.cc \
 	BtgMatch.cc \
+	BtgMatchImpl.h \
+	BtgMatchImpl.cc \
 	BtgNode.h
 
 

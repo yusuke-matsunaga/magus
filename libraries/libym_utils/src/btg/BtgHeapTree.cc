@@ -10,7 +10,7 @@
 #include "BtgHeapTree.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_BTG
 
 //////////////////////////////////////////////////////////////////////
 // クラス BtgHeapTree
@@ -116,4 +116,4 @@ BtgHeapTree::move_up(BtgNode* node)
   }
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_BTG
