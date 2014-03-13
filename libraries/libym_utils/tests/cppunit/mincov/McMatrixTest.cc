@@ -39,7 +39,7 @@ McMatrixTest::tearDown()
 // @param[in] col_num 列数
 void
 McMatrixTest::new_matrix(ymuint row_num,
-			     ymuint col_num)
+			 ymuint col_num)
 {
   mMatrix1 = new McMatrix(row_num, col_num);
   mRowNum = row_num;
@@ -50,7 +50,7 @@ McMatrixTest::new_matrix(ymuint row_num,
 // @brief McMatrix の内容を一次元ベクタに変換する．
 void
 McMatrixTest::conv_matrix(const McMatrix& matrix,
-			      vector<bool>& bitvector)
+			  vector<bool>& bitvector)
 {
   ymuint nr = matrix.row_size();
   ymuint nc = matrix.col_size();
@@ -101,12 +101,10 @@ McMatrixTest::test_empty_matrix()
 {
   ymuint row_num = 10;
   ymuint col_num = 20;
-  ymuint cost_dim = 3;
-  McMatrix* matrix = new McMatrix(row_num, col_num, cost_dim);
+  McMatrix* matrix = new McMatrix(row_num, col_num);
   CPPUNIT_ASSERT( matrix != NULL );
   CPPUNIT_ASSERT_EQUAL( row_num, matrix->row_size() );
   CPPUNIT_ASSERT_EQUAL( col_num, matrix->col_size() );
-  CPPUNIT_ASSERT_EQUAL( cost_dim, matrix->cost_size() );
 
   vector<bool> bitvector;
   conv_matrix(*matrix, bitvector);
@@ -122,15 +120,13 @@ McMatrixTest::test_empty_matrix()
 void
 McMatrixTest::test_resize()
 {
-  McMatrix* matrix = new McMatrix(5, 5, 1);
+  McMatrix* matrix = new McMatrix(5, 5);
   CPPUNIT_ASSERT( matrix != NULL );
   ymuint row_num = 10;
   ymuint col_num = 20;
-  ymuint cost_dim = 3;
-  matrix->resize(row_num, col_num, cost_dim);
+  matrix->resize(row_num, col_num);
   CPPUNIT_ASSERT_EQUAL( row_num, matrix->row_size() );
   CPPUNIT_ASSERT_EQUAL( col_num, matrix->col_size() );
-  CPPUNIT_ASSERT_EQUAL( cost_dim, matrix->cost_size() );
 }
 
 // @brief clear のテスト

@@ -222,6 +222,42 @@ McSolverImpl::solve()
     return;
   }
 
+  vector<McSolverImpl*> solver_list;
+  if ( false && mMatrix->block_partition(solver_list) ) {
+    double cost = 0.0;
+    vector<ymuint32> solution;
+    vector<vector<ymuint32> > solution_list;
+    for (vector<McSolverImpl*>::iterator p = solver_list.begin();
+	 p != solver_list.end(); ++ p) {
+      McSolverImpl* solver = *p;
+      vector<ymuint32> solution1;
+      cost += solver->exact(solution1);
+      solution.insert(solution.end(), solution1.begin(), solution1.end());
+      solution_list.push_back(solution1);
+    }
+    {
+      cout << "BLOCK PARTITION" << endl;
+      print_matrix(cout);
+      for (ymuint i = 0; i < solver_list.size(); ++ i) {
+	McSolverImpl* solver = solver_list[i];
+	cout << endl;
+	cout << "Matrix#" << i << endl;
+	solver->print_matrix(cout);
+	const vector<ymuint32>& solution1 = solution_list[i];
+	cout << "Solution:";
+	for (ymuint j = 0; j < solution1.size(); ++ j) {
+	  cout << " " << solution1[j];
+	}
+	cout << endl;
+      }
+    }
+    if ( mBest > cost ) {
+      mBest = cost;
+      mBestSolution = solution;
+    }
+    return;
+  }
+
   Selector sel;
 
   // 次の分岐のための列をとってくる．
@@ -319,6 +355,14 @@ McSolverImpl::lower_bound(McMatrix& matrix)
   return cost1;
 }
 
+// @brief 内部の行列の内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+McSolverImpl::print_matrix(ostream& s)
+{
+  mMatrix->print(s);
+}
+
 // @brief 検証する．
 bool
 McSolverImpl::verify(const vector<ymuint32>& solution) const
@@ -347,6 +391,7 @@ McSolverImpl::verify(const vector<ymuint32>& solution) const
       cerr << " " << solution[i];
     }
     cerr << endl;
+    mMatrix->print(cerr);
   }
   return status;
 }

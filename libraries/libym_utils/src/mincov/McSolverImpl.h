@@ -67,6 +67,11 @@ public:
   double
   heuristic(vector<ymuint32>& solution);
 
+  /// @brief 内部の行列の内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print_matrix(ostream& s);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

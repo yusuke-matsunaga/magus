@@ -28,11 +28,9 @@ public:
   /// @brief コンストラクタ
   /// @param[in] row_size 行数
   /// @param[in] col_size 列数
-  /// @param[in] cost_size コストの次元
   /// @note 要素を持たない行列となる．
   McMatrix(ymuint32 row_size,
-	   ymuint32 col_size,
-	   ymuint32 cost_size = 1);
+	   ymuint32 col_size);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
@@ -59,10 +57,6 @@ public:
   /// @brief 列数を返す．
   ymuint32
   col_size() const;
-
-  /// @brief コストの次元を返す．
-  ymuint32
-  cost_size() const;
 
   /// @brief 行を取り出す．
   /// @param[in] row_pos 行位置 ( 0 <= row_pos < row_size() )
@@ -120,6 +114,11 @@ public:
   double
   cost(const vector<ymuint32>& col_list) const;
 
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print(ostream& s) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -134,12 +133,10 @@ public:
   /// @brief サイズを変更する．
   /// @param[in] row_size 行数
   /// @param[in] col_size 列数
-  /// @param[in] cost_size コストの次元
   /// @note 内容はクリアされる．
   void
   resize(ymuint32 row_size,
-	 ymuint32 col_size,
-	 ymuint32 cost_size);
+	 ymuint32 col_size);
 
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
@@ -189,6 +186,10 @@ public:
   /// @return 選択された列があったら true を返す．
   bool
   essential_col(vector<ymuint32>& selected_cols);
+
+  /// @brief ブロック分割を行う．
+  bool
+  block_partition(vector<McSolverImpl*>& solver_list) const;
 
   /// @brief 削除スタックにマーカーを書き込む．
   void
@@ -263,9 +264,6 @@ private:
   // 列数
   ymuint32 mColSize;
 
-  // コストの次元
-  ymuint32 mCostSize;
-
   // 行の先頭の配列
   McRowHead* mRowArray;
 
@@ -323,14 +321,6 @@ ymuint32
 McMatrix::col_size() const
 {
   return mColSize;
-}
-
-// @brief コストの次元を返す．
-inline
-ymuint32
-McMatrix::cost_size() const
-{
-  return mCostSize;
 }
 
 // @brief 行の先頭を取り出す．

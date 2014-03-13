@@ -8,6 +8,8 @@
 
 
 #include "McMatrix.h"
+#include "McSolverImpl.h"
+#include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -131,10 +133,8 @@ McColHead::search_insert_pos(McCell* cell)
 // @brief コンストラクタ
 // @param[in] row_size 行数
 // @param[in] col_size 列数
-// @param[in] cost_size コストの次元
 McMatrix::McMatrix(ymuint32 row_size,
-		   ymuint32 col_size,
-		   ymuint32 cost_size) :
+		   ymuint32 col_size) :
   mCellAlloc(sizeof(McCell), 1024),
   mRowSize(0),
   mColSize(0),
@@ -146,7 +146,7 @@ McMatrix::McMatrix(ymuint32 row_size,
   mRowIdList(NULL),
   mColIdList(NULL)
 {
-  resize(row_size, col_size, cost_size);
+  resize(row_size, col_size);
 }
 
 // @brief コピーコンストラクタ
@@ -163,7 +163,7 @@ McMatrix::McMatrix(const McMatrix& src) :
   mRowIdList(NULL),
   mColIdList(NULL)
 {
-  resize(src.row_size(), src.col_size(), src.cost_size());
+  resize(src.row_size(), src.col_size());
   copy(src);
 }
 
@@ -174,7 +174,7 @@ McMatrix::operator=(const McMatrix& src)
 {
   if ( this != &src ) {
     clear();
-    resize(src.row_size(), src.col_size(), src.cost_size());
+    resize(src.row_size(), src.col_size());
     copy(src);
   }
   return *this;
@@ -211,18 +211,15 @@ McMatrix::clear()
 // @brief サイズを変更する．
 // @param[in] row_size 行数
 // @param[in] col_size 列数
-// @param[in] cost_size コストの次元
 void
 McMatrix::resize(ymuint32 row_size,
-		 ymuint32 col_size,
-		 ymuint32 cost_size)
+		 ymuint32 col_size)
 {
   if ( mRowSize != row_size || mColSize != col_size ) {
     clear();
 
     mRowSize = row_size;
     mColSize = col_size;
-    mCostSize = cost_size;
     mRowArray = new McRowHead[mRowSize];
     mColArray = new McColHead[mColSize];
     mColCostArray = new double[mColSize];
@@ -267,7 +264,6 @@ McMatrix::copy(const McMatrix& src)
 {
   assert_cond(row_size() == src.row_size(), __FILE__, __LINE__);
   assert_cond(col_size() == src.col_size(), __FILE__, __LINE__);
-  assert_cond(cost_size() == src.cost_size(), __FILE__, __LINE__);
 
   for (const McRowHead* src_row = src.row_front();
        !src.is_row_end(src_row); src_row = src_row->next()) {
@@ -420,6 +416,85 @@ McMatrix::select_col(ymuint32 col_pos)
   for (ymuint i = 0; i < mRowIdListNum; ++ i) {
     ymuint32 r = mRowIdList[i];
     delete_row(r);
+  }
+}
+
+// @brief ブロック分割を行う．
+bool
+McMatrix::block_partition(vector<McSolverImpl*>& solver_list) const
+{
+  ymuint nr = remain_row_size();
+  ymuint nc = remain_col_size();
+
+  if ( true || nr < nc ) {
+    MFSet mfset(row_size());
+    for (const McColHead* col = col_front();
+	 !is_col_end(col); col = col->next()) {
+      vector<ymuint> row_list;
+      row_list.reserve(col->num());
+      for (const McCell* cell = col->front();
+	   !col->is_end(cell); cell = cell->col_next()) {
+	row_list.push_back(cell->row_pos());
+      }
+      ymuint n = row_list.size();
+      for (ymuint i1 = 0; i1 < n; ++ i1) {
+	ymuint r1 = row_list[i1];
+	for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
+	  ymuint r2 = row_list[i2];
+	  mfset.merge(r1, r2);
+	}
+      }
+    }
+    vector<ymuint> rep_list;
+    for (const McRowHead* row = row_front();
+	 !is_row_end(row); row = row->next()) {
+      ymuint row_pos = row->pos();
+      ymuint rep = mfset.find(row_pos);
+      if ( rep == row_pos ) {
+	rep_list.push_back(rep);
+      }
+    }
+    if ( rep_list.size() == 1 ) {
+      return false;
+    }
+
+    for (vector<ymuint>::iterator p = rep_list.begin();
+	 p != rep_list.end(); ++ p) {
+      ymuint rep = *p;
+      McSolverImpl* solver = new McSolverImpl();
+      solver->set_size(row_size(), col_size());
+      for (const McRowHead* row = row_front();
+	   !is_row_end(row); row = row->next()) {
+	ymuint row_pos = row->pos();
+	if ( mfset.find(row_pos) != rep ) {
+	  continue;
+	}
+	for (const McCell* cell = row->front();
+	     !row->is_end(cell); cell = cell->row_next()) {
+	  ymuint col_pos = cell->col_pos();
+	  solver->insert_elem(row_pos, col_pos);
+	}
+      }
+      for (ymuint i = 0; i < col_size(); ++ i) {
+	solver->set_col_cost(i, col_cost(i));
+      }
+      solver_list.push_back(solver);
+    }
+    if ( 0 ) {
+      cout << "BLOCK PARTITION" << endl;
+      print(cout);
+      cout << endl;
+      ymuint id = 0;
+      for (vector<McSolverImpl*>::iterator p = solver_list.begin();
+	   p != solver_list.end(); ++ p, ++ id) {
+	McSolverImpl* solver = *p;
+	cout << "Matrix#" << id << endl;
+	solver->print_matrix(cout);
+      }
+    }
+    return true;
+  }
+  else {
   }
 }
 
@@ -864,6 +939,27 @@ void
 McMatrix::free_cell(McCell* cell)
 {
   mCellAlloc.put_memory(sizeof(McCell), cell);
+}
+
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+McMatrix::print(ostream& s) const
+{
+  for (ymuint i = 0; i < col_size(); ++ i) {
+    if ( col_cost(i) != 1.0 ) {
+      s << "Col#" << i << ": " << col_cost(i) << endl;
+    }
+  }
+  for (const McRowHead* row = row_front();
+       !is_row_end(row); row = row->next()) {
+    s << "Row#" << row->pos() << ":";
+    for (const McCell* cell = row->front();
+	 !row->is_end(cell); cell = cell->row_next()) {
+      s << " " << cell->col_pos();
+    }
+    s << endl;
+  }
 }
 
 END_NAMESPACE_YM_MINCOV
