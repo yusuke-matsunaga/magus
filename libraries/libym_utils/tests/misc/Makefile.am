@@ -85,15 +85,14 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/include \
 	-I$(top_srcdir)/src
 
-AC_CXXFLAGS = \
-	$(YM_CXXDBGFLAGS)
-
 
 ############################################################
 ## Common Variables
 ############################################################
 
-YMUTILS = $(top_builddir)/src/libym_utils_d.la
+YMUTILS = $(top_builddir)/src/libym_utils.la
+
+YMUTILS_D = $(top_builddir)/src/libym_utils_d.la
 
 
 ############################################################

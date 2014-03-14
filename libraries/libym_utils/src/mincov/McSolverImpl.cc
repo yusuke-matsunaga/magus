@@ -21,6 +21,11 @@ BEGIN_NAMESPACE_YM_MINCOV
 
 bool mincov_debug = false;
 
+static
+ymuint solve_id = 0;
+
+// 2つの行列が等しいかをチェックする関数
+// 等しくなければ例外を送出する．
 void
 verify_matrix(McMatrix& a,
 	      McMatrix& b)
@@ -135,6 +140,10 @@ McSolverImpl::exact(vector<ymuint32>& solution)
   McMatrix orig_matrix(*mMatrix);
   mMatrix->save();
 
+  solve_id = 0;
+
+  double lb = lower_bound(*mMatrix);
+
   mBest = DBL_MAX;
   mCurSolution.clear();
   solve();
@@ -155,31 +164,27 @@ McSolverImpl::heuristic(vector<ymuint32>& solution)
 {
   Selector sel;
 
-  McMatrix orig_matrix(*mMatrix);
-  mMatrix->save();
+  McMatrix cur_matrix(*mMatrix);
 
   solution.clear();
   for ( ; ; ) {
-    mMatrix->reduce(solution);
+    cur_matrix.reduce(solution);
 
-    if ( mMatrix->remain_row_size() == 0 ) {
+    if ( cur_matrix.remain_row_size() == 0 ) {
       break;
     }
 
     // 次の分岐のための列をとってくる．
-    ymuint col = sel(*mMatrix);
+    ymuint col = sel(cur_matrix);
 
     // その列を選択する．
-    mMatrix->select_col(col);
+    cur_matrix.select_col(col);
     solution.push_back(col);
 
     if ( mincov_debug ) {
       cout << "Col#" << col << " is selected heuristically" << endl;
     }
   }
-
-  mMatrix->restore();
-  verify_matrix(*mMatrix, orig_matrix);
 
   assert_cond( verify(solution), __FILE__, __LINE__);
   double cost = mMatrix->cost(solution);
@@ -191,11 +196,13 @@ McSolverImpl::heuristic(vector<ymuint32>& solution)
 void
 McSolverImpl::solve()
 {
+  ymuint cur_id = solve_id;
+  ++ solve_id;
   if ( mincov_debug ) {
     ymuint nr = mMatrix->remain_row_size();
     ymuint nc = mMatrix->remain_col_size();
     double cur_cost = mMatrix->cost(mCurSolution);
-    cout << "solve(" << nr << " x " << nc << "): "
+    cout << "solve[#" << cur_id << "](" << nr << " x " << nc << "): "
 	 << mBest << " : " << cur_cost << endl;
   }
 
@@ -204,7 +211,8 @@ McSolverImpl::solve()
   if ( mincov_debug ) {
     ymuint nr = mMatrix->remain_row_size();
     ymuint nc = mMatrix->remain_col_size();
-    cout << "  after reduce(" << nr << " x " << nc << ")" << endl;
+    cout << "  after reduce(" << nr << " x " << nc << ")"
+	 << ": " << mMatrix->cost(mCurSolution) << endl;
   }
 
   double tmp_cost = mMatrix->cost(mCurSolution);
@@ -214,46 +222,51 @@ McSolverImpl::solve()
       mBest = tmp_cost;
       mBestSolution = mCurSolution;
     }
+    if ( mincov_debug ) {
+      cout << "solve[#" << cur_id << "] end: " << mBest << endl
+	   << endl;
+    }
     return;
   }
 
   double lb = lower_bound(*mMatrix) + tmp_cost;
   if ( lb >= mBest ) {
+    if ( mincov_debug ) {
+      cout << "solve[#" << cur_id << "] end: bounded" << endl
+	   << endl;
+    }
     return;
   }
 
   vector<McSolverImpl*> solver_list;
-  if ( false && mMatrix->block_partition(solver_list) ) {
+  if ( mMatrix->block_partition(solver_list) ) {
     double cost = 0.0;
-    vector<ymuint32> solution;
-    vector<vector<ymuint32> > solution_list;
-    for (vector<McSolverImpl*>::iterator p = solver_list.begin();
-	 p != solver_list.end(); ++ p) {
-      McSolverImpl* solver = *p;
-      vector<ymuint32> solution1;
-      cost += solver->exact(solution1);
-      solution.insert(solution.end(), solution1.begin(), solution1.end());
-      solution_list.push_back(solution1);
-    }
-    {
+    vector<ymuint32> solution(mCurSolution);
+    if ( mincov_debug ) {
       cout << "BLOCK PARTITION" << endl;
       print_matrix(cout);
       for (ymuint i = 0; i < solver_list.size(); ++ i) {
 	McSolverImpl* solver = solver_list[i];
-	cout << endl;
 	cout << "Matrix#" << i << endl;
 	solver->print_matrix(cout);
-	const vector<ymuint32>& solution1 = solution_list[i];
-	cout << "Solution:";
-	for (ymuint j = 0; j < solution1.size(); ++ j) {
-	  cout << " " << solution1[j];
-	}
-	cout << endl;
       }
     }
+    for (vector<McSolverImpl*>::iterator p = solver_list.begin();
+	 p != solver_list.end(); ++ p) {
+      McSolverImpl* solver = *p;
+      vector<ymuint32> solution1;
+      solver->exact(solution1);
+      solution.insert(solution.end(), solution1.begin(), solution1.end());
+      delete solver;
+    }
+    cost = mMatrix->cost(solution);
     if ( mBest > cost ) {
       mBest = cost;
       mBestSolution = solution;
+    }
+    if ( mincov_debug ) {
+      cout << "solve[#" << cur_id << "] end: " << mBest << endl
+	   << endl;
     }
     return;
   }
@@ -295,6 +308,11 @@ McSolverImpl::solve()
   }
 
   solve();
+
+  if ( mincov_debug ) {
+    cout << "solve[#" << cur_id << "] end: " << mBest << endl
+	 << endl;
+  }
 }
 
 // @brief 下限を求める．
@@ -352,6 +370,26 @@ McSolverImpl::lower_bound(McMatrix& matrix)
   vector<ymuint32> mis;
   double cost1 = mc.solve(mis);
   assert_cond( cost1 > 0.0, __FILE__, __LINE__);
+
+  // オリジナルの下界
+  double cost2 = 0.0;
+  for (const McRowHead* row = matrix.row_front();
+       !matrix.is_row_end(row); row = row->next()) {
+    double min_cost = DBL_MAX;
+    for (const McCell* cell = row->front();
+	 !row->is_end(cell); cell = cell->row_next()) {
+      const McColHead* col = matrix.col(cell->col_pos());
+      double col_cost = matrix.col_cost(col->pos()) / col->num();
+      if ( min_cost > col_cost ) {
+	min_cost = col_cost;
+      }
+    }
+    cost2 += min_cost;
+  }
+  if ( cost2 > cost1 ) {
+    cost1 = cost2;
+  }
+
   return cost1;
 }
 

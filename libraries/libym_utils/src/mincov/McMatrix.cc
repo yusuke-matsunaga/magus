@@ -699,86 +699,81 @@ McMatrix::row_dominance()
   }
 
   // 残っている行のリストを作る．
-  vector<const McRowHead*> row_list;
-  row_list.reserve(row_size());
-  for (const McRowHead* row = row_front();
-       !is_row_end(row); row = row->next()) {
-    row_list.push_back(row);
+  mRowVector.clear();
+  mRowVector.reserve(row_size());
+  for (const McRowHead* row1 = row_front();
+       !is_row_end(row1); row1 = row1->next()) {
+    mRowVector.push_back(row1);
   }
 
   // 要素数の少ない順にソートする．
-  sort(row_list.begin(), row_list.end(), RowLt());
+  sort(mRowVector.begin(), mRowVector.end(), RowLt());
 
-  for (vector<const McRowHead*>::iterator p = row_list.begin();
-       p != row_list.end(); ++ p) {
-    const McRowHead* row = *p;
-    if ( mMarkArray[row->pos()] ) continue;
+  for (vector<const McRowHead*>::iterator p = mRowVector.begin();
+       p != mRowVector.end(); ++ p) {
+    const McRowHead* row1 = *p;
+    if ( mMarkArray[row1->pos()] ) continue;
 
-    // row の行に要素を持つ列で要素数が最小のものを求める．
+    // row1 の行に要素を持つ列で要素数が最小のものを求める．
     ymuint32 min_num = row_size() + 1;
     const McColHead* min_col = NULL;
-    for (const McCell* cell = row->front();
-	 !row->is_end(cell); cell = cell->row_next()) {
+    for (const McCell* cell = row1->front();
+	 !row1->is_end(cell); cell = cell->row_next()) {
       ymuint32 col_pos = cell->col_pos();
-      const McColHead* col = this->col(col_pos);
-      ymuint32 col_num = col->num();
+      const McColHead* col1 = col(col_pos);
+      ymuint32 col_num = col1->num();
       if ( min_num > col_num ) {
 	min_num = col_num;
-	min_col = col;
+	min_col = col1;
       }
     }
-
-    // min_col の列に要素を持つ行の番号を mRowIdList に入れる．
-    mRowIdListNum = 0;
+    // min_col に要素を持つ行のうち row1 に支配されている行を求める．
     for (const McCell* cell = min_col->front();
 	 !min_col->is_end(cell); cell = cell->col_next()) {
-      ymuint32 row_pos = cell->row_pos();
-      if ( this->row(row_pos)->num() > row->num() ) {
-	// ただし row よりも要素数の多いもののみを対象にする．
-	mRowIdList[mRowIdListNum] = row_pos;
-	++ mRowIdListNum;
+      const McRowHead* row2 = row(cell->row_pos());
+      if ( row2 == row1 ) {
+	// 自分自身は比較しない．
+	continue;
       }
-    }
-
-    // min_col 以外の列に含まれない行を tmp_rows から落とす．
-    for (const McCell* cell = row->front();
-	 !row->is_end(cell); cell = cell->row_next()) {
-      ymuint32 col_pos = cell->col_pos();
-      const McColHead* col = this->col(col_pos);
-      if ( col == min_col ) continue;
-      ymuint rpos = 0;
-      ymuint wpos = 0;
-      ymuint32 row1 = mRowIdList[rpos];
-      const McCell* cell = col->front();
-      ymuint32 row2 = cell->row_pos();
-      while ( rpos < mRowIdListNum && !col->is_end(cell) ) {
-	if ( row1 == row2 ) {
-	  if ( wpos != rpos ) {
-	    mRowIdList[wpos] = row1;
+      if ( row2->num() < row1->num() ) {
+	// 要素数が少ない行も比較しない．
+	continue;
+      }
+      // row1 が row2 を支配しているか調べる．
+      const McCell* cell1 = row1->front();
+      ymuint32 pos1 = cell1->col_pos();
+      const McCell* cell2 = row2->front();
+      ymuint32 pos2 = cell2->col_pos();
+      bool found = false;
+      for ( ; ; ) {
+	if ( pos1 < pos2 ) {
+	  // row1 に含まれていて row2 に含まれていない列があるので
+	  // row1 は row2 を支配しない．
+	  break;
+	}
+	else if ( pos1 == pos2 ) {
+	  cell1 = cell1->row_next();
+	  if ( row1->is_end(cell1) ) {
+	    found = true;
+	    break;
 	  }
-	  ++ wpos;
-	  ++ rpos;
-	  row1 = mRowIdList[rpos];
+	  pos1 = cell1->col_pos();
 	}
-	else if ( row1 < row2 ) {
-	  // row1 を削除
-	  ++ rpos;
+	cell2 = cell2->row_next();
+	if ( row2->is_end(cell2) ) {
+	  break;
 	}
-	else {
-	  cell = cell->col_next();
-	}
+	pos2 = cell2->col_pos();
       }
-      mRowIdListNum = wpos;
-    }
-
-    // mRowIdList に残った行は row に支配されている．
-    for (ymuint i = 0; i < mRowIdListNum; ++ i) {
-      ymuint row_pos = mRowIdList[i];
-      delete_row(row_pos);
-      mMarkArray[row_pos] = true;
-      change = true;
-      if ( mcmatrix_debug ) {
-	cout << "Row#" << row_pos << " is dominated by Row#" << row->pos() << endl;
+      if ( found ) {
+	// row1 は row2 を支配している．
+	ymuint row_pos = row2->pos();
+	delete_row(row_pos);
+	mMarkArray[row_pos] = true;
+	change = true;
+	if ( mcmatrix_debug ) {
+	  cout << "Row#" << row_pos << " is dominated by Row#" << row1->pos() << endl;
+	}
       }
     }
   }
@@ -810,76 +805,82 @@ McMatrix::col_dominance()
   bool change = false;
 
   // 残っている列のリストを作る．
-  vector<const McColHead*> col_list;
-  col_list.reserve(col_size());
-  for (const McColHead* col = col_front();
-       !is_col_end(col); col = col->next()) {
-    col_list.push_back(col);
+  mColVector.clear();
+  mColVector.reserve(col_size());
+  for (const McColHead* col1 = col_front();
+       !is_col_end(col1); col1 = col1->next()) {
+    mColVector.push_back(col1);
   }
   // 要素数の少ない順にソートする．
-  sort(col_list.begin(), col_list.end(), ColLt());
+  sort(mColVector.begin(), mColVector.end(), ColLt());
 
-  for (vector<const McColHead*>::iterator p = col_list.begin();
-       p != col_list.end(); ++ p) {
-    const McColHead* col = *p;
+  for (vector<const McColHead*>::iterator p = mColVector.begin();
+       p != mColVector.end(); ++ p) {
+    const McColHead* col1 = *p;
 
-    if ( col->num() == 0 ) continue;
+    if ( col1->num() == 0 ) continue;
 
-    // col の列に要素を持つ行で要素数が最小のものを求める．
+    // col1 の列に要素を持つ行で要素数が最小のものを求める．
     ymuint32 min_num = col_size() + 1;
     const McRowHead* min_row = NULL;
-    for (const McCell* cell = col->front();
-	 !col->is_end(cell); cell = cell->col_next()) {
+    for (const McCell* cell = col1->front();
+	 !col1->is_end(cell); cell = cell->col_next()) {
       ymuint32 row_pos = cell->row_pos();
-      const McRowHead* row = this->row(row_pos);
-      ymuint32 row_num = row->num();
+      const McRowHead* row1 = row(row_pos);
+      ymuint32 row_num = row1->num();
       if ( min_num > row_num ) {
 	min_num = row_num;
-	min_row = row;
+	min_row = row1;
       }
     }
 
     // min_row の行に要素を持つ列を対象にして支配関係のチェックを行う．
     for (const McCell* cell = min_row->front();
 	 !min_row->is_end(cell); cell = cell->row_next()) {
-      const McColHead* col2 = this->col(cell->col_pos());
-      if ( col2->num() <= col->num() ) {
-	// ただし col よりも要素数の多くない列は調べる必要はない．
+      const McColHead* col2 = col(cell->col_pos());
+      if ( col2 == col1 ) {
+	// 自分自身は比較しない．
 	continue;
       }
-      if ( col_cost(col2->pos()) > col_cost(col->pos()) ) {
+      if ( col2->num() < col1->num() ) {
+	// ただし col1 よりも要素数の少ない列は調べる必要はない．
+	continue;
+      }
+      if ( col_cost(col2->pos()) > col_cost(col1->pos()) ) {
 	// col2 のコストが col のコストより高ければ調べる必要はない．
 	continue;
       }
 
-      const McCell* cell1 = col->front();
+      const McCell* cell1 = col1->front();
       ymuint32 pos1 = cell1->row_pos();
       const McCell* cell2 = col2->front();
       ymuint32 pos2 = cell2->row_pos();
       bool found = false;
       for ( ; ; ) {
 	if ( pos1 < pos2 ) {
-	  // col に含まれていて col2 に含まれない行があるので
-	  // col2 は col を支配しない．
+	  // col1 に含まれていて col2 に含まれない行があるので
+	  // col2 は col1 を支配しない．
 	  break;
 	}
 	if ( pos1 == pos2 ) {
 	  cell1 = cell1->col_next();
-	  if ( col->is_end(cell1) ) {
+	  if ( col1->is_end(cell1) ) {
 	    found = true;
 	    break;
 	  }
+	  pos1 = cell1->row_pos();
 	}
 	cell2 = cell2->col_next();
 	if ( col2->is_end(cell2) ) {
 	  break;
 	}
+	pos2 = cell2->row_pos();
       }
       if ( found ) {
-	// col2 は col を支配している．
-	delete_col(col->pos());
+	// col2 は col1 を支配している．
+	delete_col(col1->pos());
 	if ( mcmatrix_debug ) {
-	  cout << "Col#" << col->pos() << " is dominated by Col#"
+	  cout << "Col#" << col1->pos() << " is dominated by Col#"
 	       << col2->pos() << endl;
 	}
 	change = true;

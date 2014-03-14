@@ -300,6 +300,12 @@ private:
   // mColIdList の要素数
   ymuint32 mColIdListNum;
 
+  // row_dominance で用いるベクタ
+  vector<const McRowHead*> mRowVector;
+
+  // col_dominance で用いるベクタ
+  vector<const McColHead*> mColVector;
+
 };
 
 
