@@ -46,7 +46,7 @@ public:
   /// @param[in] cost コスト
   void
   set_col_cost(ymuint32 col_pos,
-	       double cost);
+	       ymuint32 cost);
 
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
@@ -58,13 +58,13 @@ public:
   /// @brief 最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
-  double
+  ymuint32
   exact(vector<ymuint32>& solution);
 
   /// @brief ヒューリスティックで最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
-  double
+  ymuint32
   heuristic(vector<ymuint32>& solution);
 
   /// @brief 内部の行列の内容を出力する．
@@ -85,7 +85,7 @@ private:
   /// @brief 下限を求める．
   /// @param[in] matrix 対象の行列
   /// @return 下限値
-  double
+  ymuint32
   lower_bound(McMatrix& matrix);
 
   /// @brief 検証する．
@@ -102,7 +102,7 @@ private:
   McMatrix* mMatrix;
 
   // 現在のベスト
-  double mBest;
+  ymuint32 mBest;
 
   // 現在のベスト解
   vector<ymuint32> mBestSolution;

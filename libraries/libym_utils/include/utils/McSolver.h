@@ -50,7 +50,7 @@ public:
   /// @param[in] cost コスト
   void
   set_col_cost(ymuint32 col_pos,
-	       double cost);
+	       ymuint32 cost);
 
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
@@ -62,13 +62,13 @@ public:
   /// @brief 最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
-  double
+  ymuint32
   exact(vector<ymuint32>& solution);
 
   /// @brief ヒューリスティックで最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
-  double
+  ymuint32
   heuristic(vector<ymuint32>& solution);
 
 

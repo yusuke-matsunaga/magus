@@ -106,12 +106,12 @@ public:
 
   /// @brief 列のコストを取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
-  double
+  ymuint32
   col_cost(ymuint32 col_pos) const;
 
   /// @brief 列集合のコストを返す．
   /// @param[in] col_list 列のリスト
-  double
+  ymuint32
   cost(const vector<ymuint32>& col_list) const;
 
   /// @brief 内容を出力する．
@@ -151,7 +151,7 @@ public:
   /// @param[in] value 設定する値
   void
   set_col_cost(ymuint32 col_pos,
-	       double value);
+	       ymuint32 value);
 
   /// @brief 列を選択し，被覆される行を削除する．
   /// @param[in] col_pos 選択した列
@@ -277,7 +277,7 @@ private:
   McColHead mColHead;
 
   // 列のコストの配列
-  double* mColCostArray;
+  ymuint32* mColCostArray;
 
   // 削除の履歴を覚えておくスタック
   ymuint32* mDelStack;
@@ -402,7 +402,7 @@ McMatrix::is_col_end(const McColHead* col) const
 // @brief 列のコストを取り出す．
 // @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
 inline
-double
+ymuint32
 McMatrix::col_cost(ymuint32 col_pos) const
 {
   return mColCostArray[col_pos];

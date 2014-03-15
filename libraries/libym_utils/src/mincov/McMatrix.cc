@@ -222,7 +222,7 @@ McMatrix::resize(ymuint32 row_size,
     mColSize = col_size;
     mRowArray = new McRowHead[mRowSize];
     mColArray = new McColHead[mColSize];
-    mColCostArray = new double[mColSize];
+    mColCostArray = new ymuint32[mColSize];
 
     mRowHead.mNext = &mRowHead;
     mRowHead.mPrev = &mRowHead;
@@ -242,7 +242,7 @@ McMatrix::resize(ymuint32 row_size,
       col->clear();
       col->mPos = i;
       col->clear();
-      mColCostArray[i] = 1.0;
+      mColCostArray[i] = 1;
     }
 
     delete [] mDelStack;
@@ -299,10 +299,10 @@ McMatrix::remain_col_size() const
 
 // @brief 列集合のコストを返す．
 // @param[in] col_list 列のリスト
-double
+ymuint32
 McMatrix::cost(const vector<ymuint32>& col_list) const
 {
-  double cur_cost = 0.0;
+  ymuint32 cur_cost = 0;
   for (vector<ymuint32>::const_iterator p = col_list.begin();
        p != col_list.end(); ++ p) {
     ymuint32 col = *p;
@@ -394,7 +394,7 @@ McMatrix::insert_elem(ymuint32 row_pos,
 // @param[in] value 設定する値
 void
 McMatrix::set_col_cost(ymuint32 col_pos,
-		       double value)
+		       ymuint32 value)
 {
   mColCostArray[col_pos] = value;
 }
@@ -948,7 +948,7 @@ void
 McMatrix::print(ostream& s) const
 {
   for (ymuint i = 0; i < col_size(); ++ i) {
-    if ( col_cost(i) != 1.0 ) {
+    if ( col_cost(i) != 1 ) {
       s << "Col#" << i << ": " << col_cost(i) << endl;
     }
   }

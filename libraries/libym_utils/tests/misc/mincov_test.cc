@@ -172,7 +172,7 @@ mincov_test(int argc,
   }
 
   vector<ymuint32> solution;
-  double cost = DBL_MAX;
+  ymuint cost = 0;
   if ( heuristic ) {
     cost = solver.heuristic(solution);
   }

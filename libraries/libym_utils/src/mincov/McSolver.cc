@@ -44,7 +44,7 @@ McSolver::set_size(ymuint32 row_size,
 // @param[in] cost コスト
 void
 McSolver::set_col_cost(ymuint32 col_pos,
-		       double cost)
+		       ymuint32 cost)
 {
   mImpl->set_col_cost(col_pos, cost);
 }
@@ -62,7 +62,7 @@ McSolver::insert_elem(ymuint32 row_pos,
 // @brief 最小被覆問題を解く．
 // @param[out] solution 選ばれた列集合
 // @return 解のコスト
-double
+ymuint32
 McSolver::exact(vector<ymuint32>& solution)
 {
   return mImpl->exact(solution);
@@ -71,7 +71,7 @@ McSolver::exact(vector<ymuint32>& solution)
 // @brief ヒューリスティックで最小被覆問題を解く．
 // @param[out] solution 選ばれた列集合
 // @return 解のコスト
-double
+ymuint32
 McSolver::heuristic(vector<ymuint32>& solution)
 {
   return mImpl->heuristic(solution);
