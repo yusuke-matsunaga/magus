@@ -276,9 +276,6 @@ private:
   // 列の先頭をつなぐリンクトリストのダミー
   McColHead mColHead;
 
-  // 列のコストの配列
-  ymuint32* mColCostArray;
-
   // 削除の履歴を覚えておくスタック
   ymuint32* mDelStack;
 
@@ -405,7 +402,18 @@ inline
 ymuint32
 McMatrix::col_cost(ymuint32 col_pos) const
 {
-  return mColCostArray[col_pos];
+  return col(col_pos)->cost();
+}
+
+// @brief 列のコストを設定する．
+// @param[in] col_pos 列番号
+// @param[in] value 設定する値
+inline
+void
+McMatrix::set_col_cost(ymuint32 col_pos,
+		       ymuint32 value)
+{
+  mColArray[col_pos].set_cost(value);
 }
 
 // @brief スタックが空の時 true を返す．

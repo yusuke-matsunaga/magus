@@ -140,7 +140,6 @@ McMatrix::McMatrix(ymuint32 row_size,
   mColSize(0),
   mRowArray(NULL),
   mColArray(NULL),
-  mColCostArray(NULL),
   mDelStack(NULL),
   mMarkArray(NULL),
   mRowIdList(NULL),
@@ -157,7 +156,6 @@ McMatrix::McMatrix(const McMatrix& src) :
   mColSize(0),
   mRowArray(NULL),
   mColArray(NULL),
-  mColCostArray(NULL),
   mDelStack(NULL),
   mMarkArray(NULL),
   mRowIdList(NULL),
@@ -201,7 +199,6 @@ McMatrix::clear()
 
   delete [] mRowArray;
   delete [] mColArray;
-  delete [] mColCostArray;
   delete [] mDelStack;
   delete [] mMarkArray;
   delete [] mRowIdList;
@@ -222,7 +219,6 @@ McMatrix::resize(ymuint32 row_size,
     mColSize = col_size;
     mRowArray = new McRowHead[mRowSize];
     mColArray = new McColHead[mColSize];
-    mColCostArray = new ymuint32[mColSize];
 
     mRowHead.mNext = &mRowHead;
     mRowHead.mPrev = &mRowHead;
@@ -242,7 +238,7 @@ McMatrix::resize(ymuint32 row_size,
       col->clear();
       col->mPos = i;
       col->clear();
-      mColCostArray[i] = 1;
+      col->set_cost(1);
     }
 
     delete [] mDelStack;
@@ -273,7 +269,7 @@ McMatrix::copy(const McMatrix& src)
     }
   }
   for (ymuint i = 0; i < col_size(); ++ i) {
-    mColCostArray[i] = src.col_cost(i);
+    set_col_cost(i, src.col_cost(i));
   }
 }
 
@@ -386,17 +382,6 @@ McMatrix::insert_elem(ymuint32 row_pos,
   }
 
   return cell;
-}
-
-// @brief 列のコストを設定する．
-// @param[in] col_pos 列番号
-// @param[in] val_pos 値の位置番号
-// @param[in] value 設定する値
-void
-McMatrix::set_col_cost(ymuint32 col_pos,
-		       ymuint32 value)
-{
-  mColCostArray[col_pos] = value;
 }
 
 // @brief 列を選択し，被覆される行を削除する．

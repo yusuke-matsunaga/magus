@@ -42,6 +42,15 @@ public:
   ymuint32
   pos() const;
 
+  /// @brief コストを返す．
+  ymuint32
+  cost() const;
+
+  /// @brief コストを設定する．
+  /// @param[in] value 設定する値
+  void
+  set_cost(ymuint value);
+
   /// @brief 要素数を返す．
   ymuint32
   num() const;
@@ -106,6 +115,9 @@ private:
   // 列番号
   ymuint32 mPos;
 
+  // コスト
+  ymuint32 mCost;
+
   // 要素数
   ymuint32 mNum;
 
@@ -133,6 +145,23 @@ ymuint32
 McColHead::pos() const
 {
   return mPos;
+}
+
+// @brief コストを返す．
+inline
+ymuint32
+McColHead::cost() const
+{
+  return mCost;
+}
+
+// @brief コストを設定する．
+// @param[in] value 設定する値
+inline
+void
+McColHead::set_cost(ymuint value)
+{
+  mCost = value;
 }
 
 // @brief 要素数を返す．

@@ -46,7 +46,7 @@ public:
   exact();
   %MethodCode
   std::vector<ymuint32> solution;
-  double cost = sipCpp->exact(solution);
+  ymuint cost = sipCpp->exact(solution);
   ymuint n = solution.size();
   PyObject* py_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
@@ -64,7 +64,7 @@ public:
   heuristic();
   %MethodCode
   std::vector<ymuint32> solution;
-  double cost = sipCpp->heuristic(solution);
+  ymuint cost = sipCpp->heuristic(solution);
   ymuint n = solution.size();
   PyObject* py_list = PyList_New(n);
   for (ymuint i = 0; i < n; ++ i) {
