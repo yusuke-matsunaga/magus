@@ -296,6 +296,10 @@ McSolverImpl::solve()
     mCurSolution.pop_back();
   }
 
+  if ( lb >= mBest ) {
+    return;
+  }
+
   if ( mincov_debug ) {
     //verify_matrix(orig_matrix, *mMatrix);
   }
@@ -386,6 +390,7 @@ McSolverImpl::lower_bound(McMatrix& matrix)
     }
     cost2 += min_cost;
   }
+  cost2 = ceil(cost2);
   if ( cost2 > cost1 ) {
     cost1 = cost2;
   }
