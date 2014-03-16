@@ -1,32 +1,28 @@
-#ifndef SELECTOR_H
-#define SELECTOR_H
+#ifndef SELNAIVE_H
+#define SELNAIVE_H
 
-/// @file Selector.h
-/// @brief Selector のヘッダファイル
+/// @file SelNaive.h
+/// @brief SelNaive のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "mincov_nsdef.h"
+#include "Selector.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class Selector Selector.h "Selector.h"
-/// @brief 列を選ぶファンクタ
+/// @class SelNaive SelNaive.h "SelNaive.h"
+/// @brief 単純な Selector
+///
+/// 最もカバーしている行の多い列を選ぶ
 //////////////////////////////////////////////////////////////////////
-class Selector
+class SelNaive :
+  public Selector
 {
-public:
-
-  /// @brief デストラクタ
-  virtual
-  ~Selector() { }
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
@@ -37,7 +33,7 @@ public:
   /// @return 選ばれた列番号を返す．
   virtual
   ymuint
-  operator()(const McMatrix& matrix) = 0;
+  operator()(const McMatrix& matrix);
 
 };
 

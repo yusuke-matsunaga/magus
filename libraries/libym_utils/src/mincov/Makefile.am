@@ -48,6 +48,11 @@ AM_CPPFLAGS = \
 ############################################################
 
 COMMON_SOURCES = \
+	LbCalc.h \
+	LbCS.h \
+	LbCS.cc \
+	LbMIS.h \
+	LbMIS.cc \
 	MaxClique.cc \
 	MaxClique.h \
 	McCell.h \
@@ -55,11 +60,18 @@ COMMON_SOURCES = \
 	McColHead.h \
 	McMatrix.h \
 	McMatrix.cc \
+	McSolver.h \
+	McSolver.cc \
 	McSolverImpl.h \
 	McSolverImpl.cc \
-	McSolver.cc \
+	MinCov.cc \
 	Selector.h \
-	Selector.cc
+	SelNaive.h \
+	SelNaive.cc \
+	SelSimple.h \
+	SelSimple.cc \
+	SelCS.h \
+	SelCS.cc
 
 
 ############################################################

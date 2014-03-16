@@ -10,6 +10,8 @@
 
 
 #include "mincov_nsdef.h"
+#include "LbCalc.h"
+#include "Selector.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -23,7 +25,10 @@ class McSolverImpl
 public:
 
   /// @brief コンストラクタ
-  McSolverImpl();
+  /// @param[in] lb_calc 下界の計算クラス
+  /// @param[in] selector 列を選択するクラス
+  McSolverImpl(LbCalc& lb_calc,
+	       Selector& selector);
 
   /// @brief デストラクタ
   ~McSolverImpl();
@@ -34,38 +39,27 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 問題のサイズを設定する．
-  /// @param[in] row_size 行数
-  /// @param[in] col_size 列数
+  /// @brief 問題の行列をコピーする．
+  /// @param[in] matrix コピー元の行列
   void
-  set_size(ymuint32 row_size,
-	   ymuint32 col_size);
+  set_matrix(const McMatrix& matrix);
 
-  /// @brief 列のコストを設定する
-  /// @param[in] col_pos 追加する要素の列番号
-  /// @param[in] cost コスト
+  /// @brief 問題の行列をコピーする．
+  /// @param[in] matrix コピー元の行列
+  /// @param[in] row_list 行のリスト
+  ///
+  /// block_partition で用いられる．
+  /// row_list はブロック分割の1つのグループである
+  /// 必要がある．
   void
-  set_col_cost(ymuint32 col_pos,
-	       ymuint32 cost);
-
-  /// @brief 要素を追加する．
-  /// @param[in] row_pos 追加する要素の行番号
-  /// @param[in] col_pos 追加する要素の列番号
-  void
-  insert_elem(ymuint32 row_pos,
-	      ymuint32 col_pos);
+  set_matrix(const McMatrix& matrix,
+	     const vector<const McRowHead*>& row_list);
 
   /// @brief 最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
   /// @return 解のコスト
   ymuint32
   exact(vector<ymuint32>& solution);
-
-  /// @brief ヒューリスティックで最小被覆問題を解く．
-  /// @param[out] solution 選ばれた列集合
-  /// @return 解のコスト
-  ymuint32
-  heuristic(vector<ymuint32>& solution);
 
   /// @brief 内部の行列の内容を出力する．
   /// @param[in] s 出力先のストリーム
@@ -82,21 +76,24 @@ private:
   void
   solve();
 
-  /// @brief 下限を求める．
-  /// @param[in] matrix 対象の行列
-  /// @return 下限値
-  ymuint32
-  lower_bound(McMatrix& matrix);
-
-  /// @brief 検証する．
+  /// @brief ブロック分割を行う．
+  /// @param[in] solver_list 分割された小問題のソルバーのリスト
+  /// @retval true ブロック分割が行われた．
+  /// @retval false ブロック分割が行えなかった．
   bool
-  verify(const vector<ymuint32>& solution) const;
+  block_partition(vector<McSolverImpl*>& solver_list);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 下界の計算クラス
+  LbCalc& mLbCalc;
+
+  // 列を選択するクラス
+  Selector& mSelector;
 
   // 問題を表す行列
   McMatrix* mMatrix;
@@ -111,11 +108,6 @@ private:
   vector<ymuint32> mCurSolution;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE_YM_MINCOV
 

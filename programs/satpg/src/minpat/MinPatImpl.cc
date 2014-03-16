@@ -16,7 +16,7 @@
 #include "Fsim.h"
 #include "KDet.h"
 #include "utils/GcSolver.h"
-#include "utils/McSolver.h"
+#include "utils/MinCov.h"
 #include "utils/RandGen.h"
 #include "utils/RandPermGen.h"
 #include "Verifier.h"
@@ -90,7 +90,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     vector<bool> fmark(mFaultMgr.all_num());
     vector<ymuint> fmap(mFaultMgr.all_num());
 
-    McSolver mincov;
+    MinCov mincov;
 
     ymuint fnum = 0;
     ymuint pnum = tv_list.size();
@@ -216,7 +216,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     vector<bool> fmark(mFaultMgr.all_num());
     vector<ymuint> fmap(mFaultMgr.all_num());
 
-    McSolver mincov;
+    MinCov mincov;
 
     ymuint fnum = 0;
     ymuint pnum = tv_list.size();

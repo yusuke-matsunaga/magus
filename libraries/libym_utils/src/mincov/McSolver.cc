@@ -3,15 +3,21 @@
 /// @brief McSolver の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "utils/McSolver.h"
+#include "McSolver.h"
 #include "McSolverImpl.h"
+#include "McMatrix.h"
+#include "LbCalc.h"
+#include "LbCS.h"
+#include "SelSimple.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_MINCOV
+
+bool McSolver_debug = false;
 
 //////////////////////////////////////////////////////////////////////
 // クラス McSolver
@@ -20,13 +26,17 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 McSolver::McSolver()
 {
-  mImpl = new nsMincov::McSolverImpl();
+  mLbCalc = new LbCS();
+  mSelector = new SelSimple();
+  mMatrix = NULL;
 }
 
 // @brief デストラクタ
 McSolver::~McSolver()
 {
-  delete mImpl;
+  delete mLbCalc;
+  delete mSelector;
+  delete mMatrix;
 }
 
 // @brief 問題のサイズを設定する．
@@ -36,7 +46,8 @@ void
 McSolver::set_size(ymuint32 row_size,
 		   ymuint32 col_size)
 {
-  mImpl->set_size(row_size, col_size);
+  delete mMatrix;
+  mMatrix = new McMatrix(row_size, col_size);
 }
 
 // @brief 列のコストを設定する
@@ -46,7 +57,7 @@ void
 McSolver::set_col_cost(ymuint32 col_pos,
 		       ymuint32 cost)
 {
-  mImpl->set_col_cost(col_pos, cost);
+  mMatrix->set_col_cost(col_pos, cost);
 }
 
 // @brief 要素を追加する．
@@ -56,7 +67,7 @@ void
 McSolver::insert_elem(ymuint32 row_pos,
 		      ymuint32 col_pos)
 {
-  mImpl->insert_elem(row_pos, col_pos);
+  mMatrix->insert_elem(row_pos, col_pos);
 }
 
 // @brief 最小被覆問題を解く．
@@ -65,7 +76,14 @@ McSolver::insert_elem(ymuint32 row_pos,
 ymuint32
 McSolver::exact(vector<ymuint32>& solution)
 {
-  return mImpl->exact(solution);
+  McSolverImpl* impl = new McSolverImpl(*mLbCalc, *mSelector);
+  impl->set_matrix(*mMatrix);
+
+  ymuint32 cost = impl->exact(solution);
+
+  delete impl;
+
+  return cost;
 }
 
 // @brief ヒューリスティックで最小被覆問題を解く．
@@ -74,7 +92,40 @@ McSolver::exact(vector<ymuint32>& solution)
 ymuint32
 McSolver::heuristic(vector<ymuint32>& solution)
 {
-  return mImpl->heuristic(solution);
+  McMatrix cur_matrix(*mMatrix);
+
+  solution.clear();
+  for ( ; ; ) {
+    cur_matrix.reduce(solution);
+
+    if ( cur_matrix.remain_row_size() == 0 ) {
+      break;
+    }
+
+    // 次の分岐のための列をとってくる．
+    ymuint col = (*mSelector)(cur_matrix);
+
+    // その列を選択する．
+    cur_matrix.select_col(col);
+    solution.push_back(col);
+
+    if ( McSolver_debug ) {
+      cout << "Col#" << col << " is selected heuristically" << endl;
+    }
+  }
+
+  assert_cond( mMatrix->verify(solution), __FILE__, __LINE__);
+  ymuint32 cost = mMatrix->cost(solution);
+
+  return cost;
 }
 
-END_NAMESPACE_YM
+// @brief 内部の行列の内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+McSolver::print_matrix(ostream& s)
+{
+  mMatrix->print(s);
+}
+
+END_NAMESPACE_YM_MINCOV

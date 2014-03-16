@@ -9,7 +9,6 @@
 
 #include "McMatrix.h"
 #include "McSolverImpl.h"
-#include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -307,6 +306,36 @@ McMatrix::cost(const vector<ymuint32>& col_list) const
   return cur_cost;
 }
 
+// @brief 列集合がカバーになっているか検証する．
+// @param[in] col_list 列のリスト
+// @retval true col_list がカバーになっている．
+// @retval false col_list でカバーされていない行がある．
+bool
+McMatrix::verify(const vector<ymuint32>& col_list) const
+{
+  for (ymuint i = 0; i < row_size(); ++ i) {
+    mMarkArray[i] = false;
+  }
+  for (ymuint i = 0; i < col_list.size(); ++ i) {
+    ymuint32 col_pos = col_list[i];
+    const McColHead* col1 = col(col_pos);
+    for (const McCell* cell = col1->front();
+	 !col1->is_end(cell); cell = cell->col_next()) {
+      ymuint32 row_pos = cell->row_pos();
+      mMarkArray[row_pos] = true;
+    }
+  }
+  bool status = true;
+  for (const McRowHead* row1 = row_front();
+       !is_row_end(row1); row1 = row1->next()) {
+    ymuint32 row_pos = row1->pos();
+    if ( !mMarkArray[row_pos] ) {
+      status = false;
+    }
+  }
+  return status;
+}
+
 // @brief 要素を追加する．
 // @param[in] row_pos 追加する要素の行番号
 // @param[in] col_pos 追加する要素の列番号
@@ -401,85 +430,6 @@ McMatrix::select_col(ymuint32 col_pos)
   for (ymuint i = 0; i < mRowIdListNum; ++ i) {
     ymuint32 r = mRowIdList[i];
     delete_row(r);
-  }
-}
-
-// @brief ブロック分割を行う．
-bool
-McMatrix::block_partition(vector<McSolverImpl*>& solver_list) const
-{
-  ymuint nr = remain_row_size();
-  ymuint nc = remain_col_size();
-
-  if ( true || nr < nc ) {
-    MFSet mfset(row_size());
-    for (const McColHead* col = col_front();
-	 !is_col_end(col); col = col->next()) {
-      vector<ymuint> row_list;
-      row_list.reserve(col->num());
-      for (const McCell* cell = col->front();
-	   !col->is_end(cell); cell = cell->col_next()) {
-	row_list.push_back(cell->row_pos());
-      }
-      ymuint n = row_list.size();
-      for (ymuint i1 = 0; i1 < n; ++ i1) {
-	ymuint r1 = row_list[i1];
-	for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
-	  ymuint r2 = row_list[i2];
-	  mfset.merge(r1, r2);
-	}
-      }
-    }
-    vector<ymuint> rep_list;
-    for (const McRowHead* row = row_front();
-	 !is_row_end(row); row = row->next()) {
-      ymuint row_pos = row->pos();
-      ymuint rep = mfset.find(row_pos);
-      if ( rep == row_pos ) {
-	rep_list.push_back(rep);
-      }
-    }
-    if ( rep_list.size() == 1 ) {
-      return false;
-    }
-
-    for (vector<ymuint>::iterator p = rep_list.begin();
-	 p != rep_list.end(); ++ p) {
-      ymuint rep = *p;
-      McSolverImpl* solver = new McSolverImpl();
-      solver->set_size(row_size(), col_size());
-      for (const McRowHead* row = row_front();
-	   !is_row_end(row); row = row->next()) {
-	ymuint row_pos = row->pos();
-	if ( mfset.find(row_pos) != rep ) {
-	  continue;
-	}
-	for (const McCell* cell = row->front();
-	     !row->is_end(cell); cell = cell->row_next()) {
-	  ymuint col_pos = cell->col_pos();
-	  solver->insert_elem(row_pos, col_pos);
-	}
-      }
-      for (ymuint i = 0; i < col_size(); ++ i) {
-	solver->set_col_cost(i, col_cost(i));
-      }
-      solver_list.push_back(solver);
-    }
-    if ( 0 ) {
-      cout << "BLOCK PARTITION" << endl;
-      print(cout);
-      cout << endl;
-      ymuint id = 0;
-      for (vector<McSolverImpl*>::iterator p = solver_list.begin();
-	   p != solver_list.end(); ++ p, ++ id) {
-	McSolverImpl* solver = *p;
-	cout << "Matrix#" << id << endl;
-	solver->print_matrix(cout);
-      }
-    }
-    return true;
-  }
-  else {
   }
 }
 

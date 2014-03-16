@@ -1,47 +1,39 @@
-#ifndef SELECTOR_H
-#define SELECTOR_H
+#ifndef LBMIS_H
+#define LBMIS_H
 
-/// @file Selector.h
-/// @brief Selector のヘッダファイル
+/// @file LbMIS.h
+/// @brief LbMIS のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "mincov_nsdef.h"
+#include "LbCalc.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class Selector Selector.h "Selector.h"
-/// @brief 列を選ぶファンクタ
+/// @class LbMIS LbMIS.h "LbMIS.h"
+/// @brief MIS(maximum independent set) を用いた下界の計算クラス
 //////////////////////////////////////////////////////////////////////
-class Selector
+class LbMIS :
+  LbCalc
 {
-public:
-
-  /// @brief デストラクタ
-  virtual
-  ~Selector() { }
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 次の列を選ぶ．
-  /// @param[in] matrix 対象の行列
-  /// @return 選ばれた列番号を返す．
+  /// @brief 下界の計算をする
   virtual
-  ymuint
-  operator()(const McMatrix& matrix) = 0;
+  ymuint32
+  operator()(const McMatrix& matrix);
 
 };
 
 END_NAMESPACE_YM_MINCOV
 
 
-#endif // SELECTOR_H
+#endif // LBMIS_H

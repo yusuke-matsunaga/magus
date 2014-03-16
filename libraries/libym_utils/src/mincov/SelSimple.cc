@@ -1,40 +1,30 @@
 
-/// @file Selector.cc
-/// @brief Selector の実装ファイル
+/// @file SelSimple.cc
+/// @brief SelSimple の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Selector.h"
+#include "SelSimple.h"
 #include "McMatrix.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-// クラス Selector
+// クラス SelSimple
 //////////////////////////////////////////////////////////////////////
 
 // @brief 次の列を選ぶ．
 // @param[in] matrix 対象の行列
 // @return 選ばれた列番号を返す．
 ymuint
-Selector::operator()(const McMatrix& matrix)
+SelSimple::operator()(const McMatrix& matrix)
 {
-#if 0
-  ymuint max_num = 0;
-  ymuint max_col = 0;
-  for (const McColHead* col = matrix.col_front();
-       !matrix.is_col_end(col); col = col->next()) {
-    if ( max_num < col->num() ) {
-      max_num = col->num();
-      max_col = col->pos();
-    }
-  }
-  return max_col;
-#else
+  // 各行にカバーしている列数に応じた重みをつけ，
+  // その重みの和が最大となる列を選ぶ．
   ymuint nr = matrix.row_size();
   vector<double> row_weights(nr);
   for (const McRowHead* row = matrix.row_front();
@@ -52,13 +42,13 @@ Selector::operator()(const McMatrix& matrix)
 	 !col->is_end(cell); cell = cell->col_next()) {
       weight += row_weights[cell->row_pos()];
     }
+
     if ( max_weight < weight ) {
       max_weight = weight;
       max_col = col->pos();
     }
   }
   return max_col;
-#endif
 }
 
 END_NAMESPACE_YM_MINCOV

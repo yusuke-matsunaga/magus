@@ -114,6 +114,13 @@ public:
   ymuint32
   cost(const vector<ymuint32>& col_list) const;
 
+  /// @brief 列集合がカバーになっているか検証する．
+  /// @param[in] col_list 列のリスト
+  /// @retval true col_list がカバーになっている．
+  /// @retval false col_list でカバーされていない行がある．
+  bool
+  verify(const vector<ymuint32>& col_list) const;
+
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
   void
@@ -186,10 +193,6 @@ public:
   /// @return 選択された列があったら true を返す．
   bool
   essential_col(vector<ymuint32>& selected_cols);
-
-  /// @brief ブロック分割を行う．
-  bool
-  block_partition(vector<McSolverImpl*>& solver_list) const;
 
   /// @brief 削除スタックにマーカーを書き込む．
   void

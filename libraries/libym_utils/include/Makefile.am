@@ -57,7 +57,7 @@ nobase_ym_HEADERS = \
 	utils/ItvlMgr.h \
 	utils/MFSet.h \
 	utils/MStopWatch.h \
-	utils/McSolver.h \
+	utils/MinCov.h \
 	utils/MsgHandler.h \
 	utils/MsgMgr.h \
 	utils/MultiCombiGen.h \

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/McSolver.h"
+#include "utils/MinCov.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -163,21 +163,21 @@ mincov_test(int argc,
     }
   }
 
-  McSolver solver;
+  MinCov mincov;
 
-  solver.set_size(max_r + 1, max_c + 1);
+  mincov.set_size(max_r + 1, max_c + 1);
   for (vector<pair<int, int> >::iterator p = pair_list.begin();
        p != pair_list.end(); ++ p) {
-    solver.insert_elem(p->second, p->first);
+    mincov.insert_elem(p->second, p->first);
   }
 
   vector<ymuint32> solution;
   ymuint cost = 0;
   if ( heuristic ) {
-    cost = solver.heuristic(solution);
+    cost = mincov.heuristic(solution);
   }
   else {
-    cost = solver.exact(solution);
+    cost = mincov.exact(solution);
   }
 
   cout << "Cost = " << cost << endl;

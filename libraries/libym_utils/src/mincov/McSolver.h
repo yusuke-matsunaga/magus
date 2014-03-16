@@ -1,7 +1,7 @@
-#ifndef UTILS_MCSOLVER_H
-#define UTILS_MCSOLVER_H
+#ifndef MCSOLVER_H
+#define MCSOLVER_H
 
-/// @file utils/McSolver.h
+/// @file McSolver.h
 /// @brief McSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,18 +9,14 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "mincov_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM
-
-namespace nsMincov {
-  class McSolverImpl;
-}
+BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class McSolver McSolver.h "utils/McSolver.h"
-/// @brief 最小被覆問題を解くクラス
+/// @class McSolver McSolver.h "McSolver.h"
+/// @brief Minimum Covering 問題を解くクラス
 //////////////////////////////////////////////////////////////////////
 class McSolver
 {
@@ -71,17 +67,28 @@ public:
   ymuint32
   heuristic(vector<ymuint32>& solution);
 
+  /// @brief 内部の行列の内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print_matrix(ostream& s);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 実際の処理を行うオブジェクト
-  nsMincov::McSolverImpl* mImpl;
+  // 下界を計算するクラス
+  LbCalc* mLbCalc;
+
+  // 列を選ぶクラス
+  Selector* mSelector;
+
+  // 問題を表す行列
+  McMatrix* mMatrix;
 
 };
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_MINCOV
 
-#endif // UTILS_MCSOLVER_H
+#endif // MCSOLVER_H

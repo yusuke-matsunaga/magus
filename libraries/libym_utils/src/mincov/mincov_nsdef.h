@@ -31,12 +31,14 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_MINCOV
 
+class LbCalc;
+class Selector;
+class McSolver;
 class McSolverImpl;
 class McCell;
 class McRowHead;
 class McColHead;
 class McMatrix;
-class McMsgHandler;
 
 END_NAMESPACE_YM_MINCOV
 
