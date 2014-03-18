@@ -5,8 +5,7 @@
 ## サブディレクトリの指定
 ############################################################
 
-SUBDIRS = \
-	espresso
+SUBDIRS =
 
 
 ############################################################
@@ -29,10 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_PROGRAMS = \
-	mincov_test \
-	mincov_test_d \
-	mincov_test_p
+noinst_LTLIBRARIES = \
+	libesp.la \
+	libesp_d.la \
+	libesp_p.la
 
 
 ############################################################
@@ -49,70 +48,76 @@ AM_CPPFLAGS = \
 ## Common Variables
 ############################################################
 
-LIBS = \
-	$(top_builddir)/src/libym_utils.la \
-	espresso/libesp.la
-
-LIBS_D = \
-	$(top_builddir)/src/libym_utils_d.la \
-	espresso/libesp_d.la
-
-LIBS_P = \
-	$(top_builddir)/src/libym_utils_p.la \
-	espresso/libesp_p.la
+COMMON_SOURCES = \
+	ansi.h \
+	cols.c \
+	copyright.h \
+	cpu_time.c \
+	dominate.c \
+	espresso.h \
+	gimpel.c \
+	indep.c \
+	matrix.c \
+	mincov.c \
+	mincov.h \
+	mincov_int.h \
+	part.c \
+	port.h \
+	prtime.c \
+	rows.c \
+	solution.c \
+	sparse.c \
+	sparse.h \
+	sparse_int.h \
+	utility.h
 
 
 ############################################################
 ## Variables for building mincov_test
 ############################################################
 
-mincov_test_CXXFLAGS = \
+libesp_la_CFLAGS = \
 	$(YM_CXXOPTFLAGS) \
-	$(AM_CXXFLAGS)
+	$(AM_CFLAGS)
 
-mincov_test_SOURCES = \
-	mincov_test.cc
+libesp_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-mincov_test_LDADD = \
-	$(YMUTILS)
+libesp_la_LIBADD =
 
-mincov_test_LDFLAGS = \
+libesp_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## Variables for building mincov_test
+## Variables for building libesp_la
 ############################################################
 
-mincov_test_d_CXXFLAGS = \
+libesp_d_la_CFLAGS = \
 	$(YM_CXXDBGFLAGS) \
-	$(AM_CXXFLAGS)
+	$(AM_CFLAGS)
 
-mincov_test_d_SOURCES = \
-	mincov_test.cc
+libesp_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-mincov_test_d_LDADD = \
-	$(YMUTILS_D)
+libesp_d_la_LIBADD =
 
-mincov_test_d_LDFLAGS = \
-	$(AM_LDFLAGS) \
-	-static
+libesp_d_la_LDFLAGS = \
+	$(AM_LDFLAGS)
 
 
 ############################################################
-## Variables for building mincov_test
+## Variables for building libesp_la
 ############################################################
 
-mincov_test_p_CXXFLAGS = \
+libesp_p_la_CFLAGS = \
 	$(YM_CXXPRFFLAGS) \
-	$(AM_CXXFLAGS)
+	$(AM_CFLAGS)
 
-mincov_test_p_SOURCES = \
-	mincov_test.cc
+libesp_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-mincov_test_p_LDADD = \
-	$(YMUTILS_P)
+libesp_p_la_LIBADD =
 
-mincov_test_p_LDFLAGS = \
-	$(AM_LDFLAGS) \
-	-static
+libesp_p_la_LDFLAGS = \
+	$(AM_LDFLAGS)

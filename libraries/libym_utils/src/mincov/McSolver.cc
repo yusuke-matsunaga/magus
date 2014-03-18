@@ -10,7 +10,7 @@
 #include "McSolver.h"
 #include "McSolverImpl.h"
 #include "McMatrix.h"
-#include "LbCalc.h"
+#include "LbMIS.h"
 #include "LbCS.h"
 #include "SelSimple.h"
 #include "SelCS.h"
@@ -27,7 +27,8 @@ bool McSolver_debug = false;
 // @brief コンストラクタ
 McSolver::McSolver()
 {
-  mLbCalc = new LbCS();
+  //mLbCalc = new LbCS();
+  mLbCalc = new LbMIS();
   mSelector = new SelSimple();
   //mSelector = new SelCS();
   mMatrix = NULL;

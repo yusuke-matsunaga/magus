@@ -37,7 +37,7 @@ LbMIS::operator()(const McMatrix& matrix)
     for (cell = cell->col_next();
 	 !col->is_end(cell); cell = cell->col_next()) {
       ymuint32 rpos = cell->row_pos();
-      rset.merge(rpos0, rpos);
+      rpos0 = rset.merge(rpos0, rpos);
     }
   }
 
@@ -49,12 +49,16 @@ LbMIS::operator()(const McMatrix& matrix)
   }
 
   ymuint32 nr = row_list.size();
+  for (ymuint i = 0; i < nr - 1; ++ i) {
+    ymuint32 rpos1 = row_list[i];
+    row_list[i] = rset.find(rpos1);
+  }
   MaxClique mc(nr);
   for (ymuint i = 0; i < nr - 1; ++ i) {
     ymuint32 rpos1 = row_list[i];
     for (ymuint j = i + 1; j < nr; ++ j) {
       ymuint32 rpos2 = row_list[j];
-      if ( rset.find(rpos1) != rset.find(rpos2) ) {
+      if ( rpos1 != rpos2 ) {
 	mc.connect(i, j);
       }
     }

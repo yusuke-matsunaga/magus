@@ -8,7 +8,10 @@
 
 
 #include "utils/MinCov.h"
-
+extern "C" {
+#include "espresso/sparse.h"
+#include "espresso/mincov.h"
+}
 
 BEGIN_NAMESPACE_YM
 
@@ -127,6 +130,7 @@ mincov_test(int argc,
   bool debug = false;
   bool lp_solve = false;
   bool ilp_solve = false;
+  bool espresso = false;
   ymuint base = 1;
   while ( argc > base && argv[base][0] == '-' ) {
     if ( strcmp(argv[1], "-h") == 0 ) {
@@ -151,6 +155,10 @@ mincov_test(int argc,
     }
     else if ( strcmp(argv[base], "-ilp") == 0 ) {
       ilp_solve = true;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-espresso") == 0 ) {
+      espresso = true;
       ++ base;
     }
     else {
@@ -231,6 +239,32 @@ mincov_test(int argc,
 	}
       }
       return 0;
+    }
+    if ( espresso ) {
+      vector<vector<ymuint> > row_list(max_r + 1);
+      for (vector<pair<int, int> >::iterator p = pair_list.begin();
+	   p != pair_list.end(); ++ p) {
+	ymuint r = p->second;
+	ymuint c = p->first;
+	row_list[r].push_back(c);
+      }
+      sm_matrix* A = sm_alloc();
+      ymuint rownum = 0;
+      for (ymuint i = 0; i <= max_r; ++ i) {
+	const vector<ymuint>& rows = row_list[i];
+	if ( rows.empty() ) {
+	  continue;
+	}
+	for (ymuint j = 0; j < rows.size(); ++ j) {
+	  sm_insert(A, rownum, rows[j]);
+	}
+	++ rownum;
+      }
+      sm_row* solution = sm_minimum_cover(A, NULL, 0, 0);
+      sm_element* pe;
+      sm_foreach_row_element(solution, pe) {
+	cout << " " << pe->col_num;
+      }
     }
 
     MinCov mincov;
