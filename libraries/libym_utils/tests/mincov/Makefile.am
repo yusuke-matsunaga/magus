@@ -28,10 +28,9 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
-	liballoc.la \
-	liballoc_d.la \
-	liballoc_p.la
+noinst_PROGRAMS = \
+	mincov_test \
+	mincov_test_p
 
 
 ############################################################
@@ -40,66 +39,49 @@ noinst_LTLIBRARIES = \
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
-	-I$(top_builddir)/include
+	-I$(top_builddir)/include \
+	-I$(top_srcdir)/src
 
 
 ############################################################
-## 共通の変数定義
+## Common Variables
 ############################################################
 
-COMMON_SOURCES = \
-	Alloc.cc \
-	FragAlloc.cc \
-	SimpleAlloc.cc \
-	UnitAlloc.cc
+YMUTILS = $(top_builddir)/src/libym_utils.la
+
+YMUTILS_D = $(top_builddir)/src/libym_utils_d.la
+
+YMUTILS_P = $(top_builddir)/src/libym_utils_p.la
 
 
 ############################################################
-## liballoc.la 用の変数の定義
+## Variables for building mincov_test
 ############################################################
 
-liballoc_la_CXXFLAGS = \
-	$(YM_CXXOPTFLAGS) \
-	$(AM_CXXFLAGS)
+mincov_test_SOURCES = \
+	mincov_test.cc
 
-liballoc_la_SOURCES = \
-	$(COMMON_SOURCES)
+mincov_test_LDADD = \
+	$(YMUTILS)
 
-liballoc_la_LIBADD =
-
-liballoc_la_LDFLAGS = \
+mincov_test_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## liballoc_d.la 用の変数の定義
+## Variables for building mincov_test
 ############################################################
 
-liballoc_d_la_CXXFLAGS = \
-	$(YM_CXXDBGFLAGS) \
-	$(AM_CXXFLAGS)
-
-liballoc_d_la_SOURCES = \
-	$(COMMON_SOURCES)
-
-liballoc_d_la_LIBADD =
-
-liballoc_d_la_LDFLAGS = \
-	$(AM_LDFLAGS)
-
-
-############################################################
-## liballoc_p.la 用の変数の定義
-############################################################
-
-liballoc_p_la_CXXFLAGS = \
+mincov_test_p_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-liballoc_p_la_SOURCES = \
-	$(COMMON_SOURCES)
+mincov_test_p_SOURCES = \
+	mincov_test.cc
 
-liballoc_p_la_LIBADD =
+mincov_test_p_LDADD = \
+	$(YMUTILS_P)
 
-liballoc_p_la_LDFLAGS = \
-	$(AM_LDFLAGS)
+mincov_test_p_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-static

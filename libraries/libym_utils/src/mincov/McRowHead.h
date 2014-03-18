@@ -206,9 +206,12 @@ McRowHead::insert_elem(McCell* cell)
   McCell* prev = cell->mLeftLink;
   McCell* next = cell->mRightLink;
 
+  if ( prev->mRightLink != cell ) {
+    ++ mNum;
+  }
+
   prev->mRightLink = cell;
   next->mLeftLink = cell;
-  ++ mNum;
 }
 
 // @brief 要素を削除する．

@@ -234,9 +234,12 @@ McColHead::insert_elem(McCell* cell)
   McCell* prev = cell->mUpLink;
   McCell* next = cell->mDownLink;
 
+  if ( prev->mDownLink != cell ) {
+    ++ mNum;
+  }
+
   prev->mDownLink = cell;
   next->mUpLink = cell;
-  ++ mNum;
 }
 
 // @brief 要素を削除する．

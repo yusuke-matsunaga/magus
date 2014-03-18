@@ -11,6 +11,9 @@
 #include "McSolverImpl.h"
 
 
+//#define VERIFY_MCMATRIX 1
+
+
 BEGIN_NAMESPACE_YM_MINCOV
 
 bool mcmatrix_debug = false;
@@ -505,17 +508,8 @@ McMatrix::restore_row(ymuint32 row_pos)
 
   for (McCell* cell = row->mDummy.mRightLink;
        !row->is_end(cell); cell = cell->mRightLink) {
-    mColArray[cell->col_pos()].insert_elem(cell);
-  }
-
-  {
-    for (McColHead* col = mColHead.mNext;
-	 !is_col_end(col); col = col->mNext) {
-      ymuint n = 0;
-      for (const McCell* cell = col->front();
-	   !col->is_end(cell); cell = cell->col_next()) ++ n;
-      col->mNum = n;
-    }
+    McColHead* col = &mColArray[cell->col_pos()];
+    col->insert_elem(cell);
   }
 }
 
@@ -562,17 +556,8 @@ McMatrix::restore_col(ymuint32 col_pos)
 
   for (McCell* cell = col->mDummy.mDownLink;
        !col->is_end(cell); cell = cell->mDownLink) {
-    mRowArray[cell->row_pos()].insert_elem(cell);
-  }
-
-  {
-    for (McRowHead* row = mRowHead.mNext;
-	 !is_row_end(row); row = row->mNext) {
-      ymuint n = 0;
-      for (const McCell* cell = row->front();
-	   !row->is_end(cell); cell = cell->row_next()) ++ n;
-      row->mNum = n;
-    }
+    McRowHead* row = &mRowArray[cell->row_pos()];
+    row->insert_elem(cell);
   }
 }
 
@@ -581,26 +566,39 @@ McMatrix::restore_col(ymuint32 col_pos)
 void
 McMatrix::reduce(vector<ymuint32>& selected_cols)
 {
+  ymuint no_change = 0;
   for ( ; ; ) {
-    bool change = false;
-
     // 行支配を探し，行の削除を行う．
     if ( row_dominance() ) {
-      change = true;
+      no_change = 0;
+    }
+    else {
+      ++ no_change;
+      if ( no_change >= 3 ) {
+	break;
+      }
     }
 
     // 列支配を探し，列の削除を行う．
     if ( col_dominance() ) {
-      change = true;
+      no_change = 0;
+    }
+    else {
+      ++ no_change;
+      if ( no_change >= 3 ) {
+	break;
+      }
     }
 
     // 必須列を探し，列の選択を行う．
     if ( essential_col(selected_cols) ) {
-      change = true;
+      no_change = 0;
     }
-
-    if ( !change ) {
-      break;
+    else {
+      ++ no_change;
+      if ( no_change >= 3 ) {
+	break;
+      }
     }
   }
 }
@@ -617,6 +615,53 @@ struct RowLt
     return a->num() < b->num();
   }
 };
+
+#if defined(VERIFY_MCMATRIX)
+
+bool
+check_row_dominance(const McRowHead* row1,
+		    const McRowHead* row2)
+{
+  vector<ymuint32> row1_list;
+  ymuint n1 = row1->num();
+  row1_list.reserve(n1);
+  for (const McCell* cell = row1->front();
+       !row1->is_end(cell); cell = cell->row_next()) {
+    row1_list.push_back(cell->col_pos());
+  }
+  vector<ymuint32> row2_list;
+  ymuint n2 = row2->num();
+  row2_list.reserve(n2);
+  for (const McCell* cell = row2->front();
+       !row2->is_end(cell); cell = cell->row_next()) {
+    row2_list.push_back(cell->col_pos());
+  }
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  for ( ; ; ) {
+    if ( row1_list[i1] < row2_list[i2] ) {
+      break;
+    }
+    else if ( row1_list[i1] > row2_list[i2] ) {
+      ++ i2;
+      if ( i2 >= n2 ) {
+	break;
+      }
+    }
+    else {
+      ++ i1;
+      if ( i1 >= n1 ) {
+	return true;
+      }
+      ++ i2;
+      if ( i2 >= n2 ) {
+	break;
+      }
+    }
+  }
+  return false;
+}
+#endif
 
 END_NONAMESPACE
 
@@ -643,6 +688,29 @@ McMatrix::row_dominance()
 
   // 要素数の少ない順にソートする．
   sort(mRowVector.begin(), mRowVector.end(), RowLt());
+
+#if defined(VERIFY_MCMATRIX)
+  McMatrix backup(*this);
+  ymuint nr = mRowVector.size();
+  vector<int> del_rows(row_size(), -1);
+  for (ymuint i = 0; i < nr; ++ i) {
+    const McRowHead* row1 = mRowVector[i];
+    if ( del_rows[row1->pos()] >= 0 ) {
+      continue;
+    }
+    for (ymuint j = i + 1; j < nr; ++ j) {
+      const McRowHead* row2 = mRowVector[j];
+      if ( del_rows[row2->pos()] >= 0 ) {
+	continue;
+      }
+      if ( check_row_dominance(row1, row2) ) {
+	// row2 は row1 に支配されている．
+	del_rows[row2->pos()] = row1->pos();
+      }
+    }
+  }
+  vector<int> del_rows2(row_size(), -1);
+#endif
 
   for (vector<const McRowHead*>::iterator p = mRowVector.begin();
        p != mRowVector.end(); ++ p) {
@@ -674,6 +742,10 @@ McMatrix::row_dominance()
 	// 要素数が少ない行も比較しない．
 	continue;
       }
+      if ( mMarkArray[row2->pos()] ) {
+	continue;
+      }
+
       // row1 が row2 を支配しているか調べる．
       const McCell* cell1 = row1->front();
       ymuint32 pos1 = cell1->col_pos();
@@ -705,6 +777,9 @@ McMatrix::row_dominance()
 	ymuint row_pos = row2->pos();
 	delete_row(row_pos);
 	mMarkArray[row_pos] = true;
+#if defined(VERIFY_MCMATRIX)
+	del_rows2[row_pos] = row1->pos();
+#endif
 	change = true;
 	if ( mcmatrix_debug ) {
 	  cout << "Row#" << row_pos << " is dominated by Row#" << row1->pos() << endl;
@@ -712,6 +787,98 @@ McMatrix::row_dominance()
       }
     }
   }
+
+#if defined(VERIFY_MCMATRIX)
+  bool ok = true;
+  for (ymuint i = 0; i < nr; ++ i) {
+    if ( del_rows[i] != del_rows2[i] ) {
+      ok = false;
+      break;
+    }
+  }
+  if ( !ok ) {
+    backup.print(cout);
+    cout << "del_rows = ";
+    for (ymuint i = 0; i < nr; ++ i) {
+      if ( del_rows[i] >= 0 ) {
+	cout << " " << i << ":" << del_rows[i];
+      }
+    }
+    cout << endl;
+    cout << "del_rows2 = ";
+    for (ymuint i = 0; i < nr; ++ i) {
+      if ( del_rows2[i] >= 0 ) {
+	cout << " " << i << ":" << del_rows2[i];
+      }
+    }
+    cout << endl;
+
+    for (ymuint i = 0; i < nr; ++ i) {
+      if ( del_rows[i] == -1 && del_rows2[i] >= 0 ) {
+	vector<ymuint32> row1_list;
+	const McRowHead* row1 = backup.row(del_rows2[i]);
+	ymuint n1 = row1->num();
+	row1_list.reserve(n1);
+	for (const McCell* cell = row1->front();
+	     !row1->is_end(cell); cell = cell->row_next()) {
+	  row1_list.push_back(cell->col_pos());
+	}
+	vector<ymuint32> row2_list;
+	const McRowHead* row2 = backup.row(i);
+	ymuint n2 = row2->num();
+	row2_list.reserve(n2);
+	for (const McCell* cell = row2->front();
+	     !row2->is_end(cell); cell = cell->row_next()) {
+	  row2_list.push_back(cell->col_pos());
+	}
+	cout << "Row#" << row1->pos() << ":";
+	for (ymuint i = 0; i < n1; ++ i) {
+	  cout << " " << row1_list[i];
+	}
+	cout << endl;
+	cout << "Row#" << row2->pos() << ":";
+	for (ymuint i = 0; i < n2; ++ i) {
+	  cout << " " << row2_list[i];
+	}
+	cout << endl;
+	{
+	  ymuint i1 = 0;
+	  ymuint i2 = 0;
+	  bool found = false;
+	  for ( ; ; ) {
+	    cout << "row1_list[" << i1 << "] = " << row1_list[i1] << endl;
+	    cout << "row2_list[" << i2 << "] = " << row2_list[i2] << endl;
+	    if ( row1_list[i1] < row2_list[i2] ) {
+	      cout << " not found" << endl;
+	      break;
+	    }
+	    else if ( row1_list[i1] > row2_list[i2] ) {
+	      ++ i2;
+	      if ( i2 >= n2 ) {
+		cout << " not found" << endl;
+		break;
+	      }
+	    }
+	    else {
+	      ++ i1;
+	      if ( i1 >= n1 ) {
+		found = true;
+		cout << " found" << endl;
+		break;
+	      }
+	      ++ i2;
+	      if ( i2 >= n2 ) {
+		cout << " not found" << endl;
+		break;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    assert_not_reached(__FILE__, __LINE__);
+  }
+#endif
 
   return change;
 }

@@ -7,6 +7,7 @@
 
 SUBDIRS = \
 	misc \
+	mincov \
 	$(YM_TESTS_SUBDIRS)
 
 

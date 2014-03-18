@@ -125,6 +125,8 @@ mincov_test(int argc,
   bool heuristic = false;
   bool block_partition = true;
   bool debug = false;
+  bool lp_solve = false;
+  bool ilp_solve = false;
   ymuint base = 1;
   while ( argc > base && argv[base][0] == '-' ) {
     if ( strcmp(argv[1], "-h") == 0 ) {
@@ -141,6 +143,14 @@ mincov_test(int argc,
     }
     else if ( strcmp(argv[base], "-d") == 0 ) {
       debug = true;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-lp") == 0 ) {
+      lp_solve = true;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-ilp") == 0 ) {
+      ilp_solve = true;
       ++ base;
     }
     else {
@@ -178,6 +188,51 @@ mincov_test(int argc,
   }
 
   try {
+    if ( lp_solve || ilp_solve ) {
+      cout << "min: ";
+      const char* plus = "";
+      for (ymuint i = 0; i <= max_c; ++ i) {
+	cout << plus << "1 x" << i;
+	plus = " + ";
+      }
+      cout << ";" << endl;
+      vector<vector<ymuint> > row_list(max_r + 1);
+      for (vector<pair<int, int> >::iterator p = pair_list.begin();
+	   p != pair_list.end(); ++ p) {
+	ymuint r = p->second;
+	ymuint c = p->first;
+	row_list[r].push_back(c);
+      }
+      ymuint cnum = 1;
+      for (ymuint i = 0; i <= max_r; ++ i) {
+	const vector<ymuint>& row = row_list[i];
+	ymuint n = row.size();
+	if ( n == 0 ) {
+	  continue;
+	}
+	cout << "C" << cnum << ": ";
+	++ cnum;
+	const char* plus = "";
+	for (ymuint j = 0; j < n; ++ j) {
+	  cout << plus << "1 x" << row[j];
+	  plus = " + ";
+	}
+	cout << " >= 1;" << endl;
+      }
+      for (ymuint i = 0; i <= max_c; ++ i) {
+	cout << "C" << cnum << ": x" << i << " >= 0;" << endl;
+	++ cnum;
+	cout << "C" << cnum << ": x" << i << " <= 1;" << endl;
+	++ cnum;
+      }
+      if ( ilp_solve ) {
+	for (ymuint i = 0; i <= max_c; ++ i) {
+	  cout << "int x" << i << ";" << endl;
+	}
+      }
+      return 0;
+    }
+
     MinCov mincov;
 
     mincov.set_partition(block_partition);

@@ -60,6 +60,10 @@ AM_CPPFLAGS =
 ## libym_utils.la 用の変数の定義
 ############################################################
 
+libym_utils_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
 libym_utils_la_SOURCES =
 
 # Dummy C++ source to cause C++ linking.
@@ -87,6 +91,10 @@ libym_utils_la_LDFLAGS = \
 ## libym_utils_d.la 用の変数の定義
 ############################################################
 
+libym_utils_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
 libym_utils_d_la_SOURCES =
 
 # Dummy C++ source to cause C++ linking.
@@ -113,6 +121,10 @@ libym_utils_d_la_LDFLAGS = \
 ############################################################
 ## libym_utils_p.la 用の変数の定義
 ############################################################
+
+libym_utils_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
 libym_utils_p_la_SOURCES =
 

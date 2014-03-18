@@ -507,6 +507,7 @@ AC_CONFIG_FILES([src/msg/Makefile])
 AC_CONFIG_FILES([src/str/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/misc/Makefile])
+AC_CONFIG_FILES([tests/mincov/Makefile])
 
 
 # ===================================================================
