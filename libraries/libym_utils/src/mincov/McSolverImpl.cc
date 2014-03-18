@@ -19,8 +19,6 @@
 
 BEGIN_NAMESPACE_YM_MINCOV
 
-bool mincov_debug = false;
-
 static
 ymuint solve_id = 0;
 
@@ -155,30 +153,38 @@ McSolverImpl::set_matrix(const McMatrix& matrix,
 ymuint32
 McSolverImpl::exact(vector<ymuint32>& solution)
 {
+  // 検証用にもとの行列をコピーしておく．
   McMatrix orig_matrix(*mMatrix);
+  // こちらは McMatrix 自身が持つ復元機能
   mMatrix->save();
 
   solve_id = 0;
 
   mBest = UINT_MAX;
   mCurSolution.clear();
-  solve();
+  bool stat = solve();
+  assert_cond( stat, __FILE__, __LINE__);
   solution = mBestSolution;
 
+  // 復元が正しいかチェックする．
   mMatrix->restore();
   verify_matrix(*mMatrix, orig_matrix);
 
+  // solution がカバーになっているかチェックする．
   assert_cond( mMatrix->verify(solution), __FILE__, __LINE__);
+
+  cout << "Total branch: " << solve_id << endl;
+
   return mBest;
 }
 
 // @brief 解を求める再帰関数
-void
+bool
 McSolverImpl::solve()
 {
   ymuint cur_id = solve_id;
   ++ solve_id;
-  if ( mincov_debug ) {
+  if ( mDebug ) {
     ymuint nr = mMatrix->remain_row_size();
     ymuint nc = mMatrix->remain_col_size();
     ymuint32 cur_cost = mMatrix->cost(mCurSolution);
@@ -188,7 +194,7 @@ McSolverImpl::solve()
 
   mMatrix->reduce(mCurSolution);
 
-  if ( mincov_debug ) {
+  if ( mDebug ) {
     ymuint nr = mMatrix->remain_row_size();
     ymuint nc = mMatrix->remain_col_size();
     cout << "  after reduce(" << nr << " x " << nc << ")"
@@ -201,27 +207,32 @@ McSolverImpl::solve()
     if ( mBest > tmp_cost ) {
       mBest = tmp_cost;
       mBestSolution = mCurSolution;
+      if ( mDebug ) {
+	cout << "solve[#" << cur_id << "] end: " << mBest << endl
+	     << endl;
+      }
+      return true;
     }
-    if ( mincov_debug ) {
-      cout << "solve[#" << cur_id << "] end: " << mBest << endl
+    if ( mDebug ) {
+      cout << "solve[#" << cur_id << "] end: bounded" << endl
 	   << endl;
     }
-    return;
+    return false;
   }
 
   ymuint32 lb = mLbCalc(*mMatrix) + tmp_cost;
   if ( lb >= mBest ) {
-    if ( mincov_debug ) {
-      cout << "solve[#" << cur_id << "] end: bounded" << endl
+    if ( mDebug ) {
+      cout << "solve[#" << cur_id << "] end: best = " << mBest << ", lb = " << lb << ", bounded" << endl
 	   << endl;
     }
-    return;
+    return false;
   }
 
   vector<McSolverImpl*> solver_list;
-  if ( false && block_partition(solver_list) ) {
-    vector<ymuint32> solution(mCurSolution);
-    if ( mincov_debug ) {
+  if ( mDoPartition && block_partition(solver_list) ) {
+    // ブロック分割を行う．
+    if ( mDebug ) {
       cout << "BLOCK PARTITION" << endl;
       matrix().print(cout);
       for (ymuint i = 0; i < solver_list.size(); ++ i) {
@@ -230,31 +241,61 @@ McSolverImpl::solve()
 	solver->matrix().print(cout);
       }
     }
-    for (vector<McSolverImpl*>::iterator p = solver_list.begin();
-	 p != solver_list.end(); ++ p) {
-      McSolverImpl* solver = *p;
-      vector<ymuint32> solution1;
-      solver->exact(solution1);
-      solution.insert(solution.end(), solution1.begin(), solution1.end());
+    ymuint32 best_so_far = mMatrix->cost(mCurSolution);
+    ymuint ns = solver_list.size();
+    vector<ymuint32> lb_array(ns);
+    lb_array[ns - 1] = 0;
+    for (ymuint i = 1; i < ns; ++ i) {
+      ymuint idx = ns - i - 1;
+      McSolverImpl* solver = solver_list[idx + 1];
+      ymuint lb = mLbCalc(solver->matrix());
+      lb_array[idx] = lb_array[idx + 1] + lb;
+    }
+    bool bounded = false;
+    for (ymuint i = 0; i < ns; ++ i) {
+      McSolverImpl* solver = solver_list[i];
+      ymuint32 lb_rest = lb_array[i];
+      solver->mBest = mBest - best_so_far - lb_rest;
+      solver->mCurSolution.clear();
+      bool stat = solver->solve();
+      if ( stat ) {
+	mCurSolution.insert(mCurSolution.end(), solver->mBestSolution.begin(), solver->mBestSolution.end());
+      }
+      else {
+	bounded = true;
+	break;
+      }
+      best_so_far += solver->mBest;
+    }
+    for (ymuint i = 0; i < ns; ++ i) {
+      McSolverImpl* solver = solver_list[i];
       delete solver;
     }
-    ymuint32 cost = mMatrix->cost(solution);
-    if ( mBest > cost ) {
-      mBest = cost;
-      mBestSolution = solution;
+    if ( !bounded ) {
+      assert_cond( mMatrix->verify(mCurSolution), __FILE__, __LINE__);
+      ymuint32 cost = mMatrix->cost(mCurSolution);
+      if ( mBest > cost ) {
+	mBest = cost;
+	mBestSolution = mCurSolution;
+	if ( mDebug ) {
+	  cout << "solve[#" << cur_id << "] end: " << mBest << endl
+	       << endl;
+	}
+	return true;
+      }
     }
-    if ( mincov_debug ) {
-      cout << "solve[#" << cur_id << "] end: " << mBest << endl
+    if ( mDebug ) {
+      cout << "solve[#" << cur_id << "] end: bounded" << endl
 	   << endl;
     }
-    return;
+    return false;
   }
 
   // 次の分岐のための列をとってくる．
   ymuint col = mSelector(*mMatrix);
 
 #if defined(VERIFY_MINCOV)
-  McMatrix orig_matrix(*mMtrix);
+  McMatrix orig_matrix(*mMatrix);
   vector<ymuint32> orig_solution(mCurSolution);
 #endif
 
@@ -265,11 +306,11 @@ McSolverImpl::solve()
   mMatrix->select_col(col);
   mCurSolution.push_back(col);
 
-  if ( mincov_debug ) {
+  if ( mDebug ) {
     cout << "select column#" << col << endl;
   }
 
-  solve();
+  bool stat1 = solve();
 
   mMatrix->restore();
   ymuint c = mCurSolution.size() - cur_n;
@@ -284,22 +325,26 @@ McSolverImpl::solve()
 
   // 今得た最良解が下界と等しかったら探索を続ける必要はない．
   if ( lb >= mBest ) {
-    return;
+    if ( mDebug ) {
+      cout << "solve[#" << cur_id << "] end: best = " << mBest << ", lb = " << lb << endl;
+    }
+    return true;
   }
 
   // その列を選択しなかったときの最良解を求める．
   mMatrix->delete_col(col);
 
-  if ( mincov_debug ) {
+  if ( mDebug ) {
     cout << "delete column#" << col << endl;
   }
 
-  solve();
+  bool stat2 = solve();
 
-  if ( mincov_debug ) {
-    cout << "solve[#" << cur_id << "] end: " << mBest << endl
-	 << endl;
+  if ( mDebug ) {
+    cout << "solve[#" << cur_id << "] end: " << mBest << endl;
   }
+
+  return stat1 || stat2;
 }
 
 
@@ -394,5 +439,25 @@ McSolverImpl::matrix() const
 {
   return *mMatrix;
 }
+
+// @brief partition フラグを設定する．
+void
+McSolverImpl::set_partition(bool flag)
+{
+  mDoPartition = flag;
+}
+
+// @brief デバッグフラグを設定する．
+void
+McSolverImpl::set_debug(bool flag)
+{
+  mDebug = flag;
+}
+
+bool
+McSolverImpl::mDoPartition = true;
+
+bool
+McSolverImpl::mDebug = false;
 
 END_NAMESPACE_YM_MINCOV

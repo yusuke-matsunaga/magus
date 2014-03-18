@@ -123,10 +123,24 @@ mincov_test(int argc,
 	    char** argv)
 {
   bool heuristic = false;
+  bool block_partition = true;
+  bool debug = false;
   ymuint base = 1;
-  if ( argc > base && argv[base][0] == '-' ) {
+  while ( argc > base && argv[base][0] == '-' ) {
     if ( strcmp(argv[1], "-h") == 0 ) {
       heuristic = true;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-b") == 0 ) {
+      block_partition = true;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-nb") == 0 ) {
+      block_partition = false;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-d") == 0 ) {
+      debug = true;
       ++ base;
     }
     else {
@@ -163,29 +177,40 @@ mincov_test(int argc,
     }
   }
 
-  MinCov mincov;
+  try {
+    MinCov mincov;
 
-  mincov.set_size(max_r + 1, max_c + 1);
-  for (vector<pair<int, int> >::iterator p = pair_list.begin();
-       p != pair_list.end(); ++ p) {
-    mincov.insert_elem(p->second, p->first);
-  }
+    mincov.set_partition(block_partition);
 
-  vector<ymuint32> solution;
-  ymuint cost = 0;
-  if ( heuristic ) {
-    cost = mincov.heuristic(solution);
-  }
-  else {
-    cost = mincov.exact(solution);
-  }
+    if ( debug ) {
+      mincov.set_debug(true);
+    }
 
-  cout << "Cost = " << cost << endl;
-  for (vector<ymuint32>::iterator p = solution.begin();
-       p != solution.end(); ++ p) {
-    cout << " " << *p;
+    mincov.set_size(max_r + 1, max_c + 1);
+    for (vector<pair<int, int> >::iterator p = pair_list.begin();
+	 p != pair_list.end(); ++ p) {
+      mincov.insert_elem(p->second, p->first);
+    }
+
+    vector<ymuint32> solution;
+    ymuint cost = 0;
+    if ( heuristic ) {
+      cost = mincov.heuristic(solution);
+    }
+    else {
+      cost = mincov.exact(solution);
+    }
+
+    cout << "Cost = " << cost << endl;
+    for (vector<ymuint32>::iterator p = solution.begin();
+	 p != solution.end(); ++ p) {
+      cout << " " << *p;
+    }
+    cout << endl;
   }
-  cout << endl;
+  catch ( AssertError& x ) {
+    cerr << x;
+  }
 }
 
 END_NAMESPACE_YM

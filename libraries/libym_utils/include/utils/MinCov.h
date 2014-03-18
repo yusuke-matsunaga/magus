@@ -71,6 +71,14 @@ public:
   ymuint32
   heuristic(vector<ymuint32>& solution);
 
+  /// @brief partition フラグを設定する．
+  void
+  set_partition(bool flag);
+
+  /// @brief デバッグフラグを設定する．
+  void
+  set_debug(bool flag);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

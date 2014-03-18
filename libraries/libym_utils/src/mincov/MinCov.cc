@@ -9,6 +9,7 @@
 
 #include "utils/MinCov.h"
 #include "McSolver.h"
+#include "McSolverImpl.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -75,6 +76,20 @@ ymuint32
 MinCov::heuristic(vector<ymuint32>& solution)
 {
   return mSolver->heuristic(solution);
+}
+
+// @brief partition フラグを設定する．
+void
+MinCov::set_partition(bool flag)
+{
+  nsMincov::McSolverImpl::set_partition(flag);
+}
+
+// @brief デバッグフラグを設定する．
+void
+MinCov::set_debug(bool flag)
+{
+  nsMincov::McSolverImpl::set_debug(flag);
 }
 
 END_NAMESPACE_YM

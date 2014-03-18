@@ -65,6 +65,16 @@ public:
   const McMatrix&
   matrix() const;
 
+  /// @brief partition フラグを設定する．
+  static
+  void
+  set_partition(bool flag);
+
+  /// @brief デバッグフラグを設定する．
+  static
+  void
+  set_debug(bool flag);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -72,7 +82,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 解を求める再帰関数
-  void
+  bool
   solve();
 
   /// @brief ブロック分割を行う．
@@ -105,6 +115,14 @@ private:
 
   // 現在の解
   vector<ymuint32> mCurSolution;
+
+  // block_partition を行うとき true にするフラグ
+  static
+  bool mDoPartition;
+
+  // デバッグフラグ
+  static
+  bool mDebug;
 
 };
 
