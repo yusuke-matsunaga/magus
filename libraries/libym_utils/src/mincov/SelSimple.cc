@@ -25,14 +25,6 @@ SelSimple::operator()(const McMatrix& matrix)
 {
   // 各行にカバーしている列数に応じた重みをつけ，
   // その重みの和が最大となる列を選ぶ．
-  ymuint nr = matrix.row_size();
-  vector<double> row_weights(nr);
-  for (const McRowHead* row = matrix.row_front();
-       !matrix.is_row_end(row); row = row->next()) {
-    ymuint row_pos = row->pos();
-    assert_cond( row->num() > 1, __FILE__, __LINE__);
-    row_weights[row_pos] = 1.0 / (row->num() - 1);
-  }
   double max_weight = 0.0;
   ymuint max_col = 0;
   for (const McColHead* col = matrix.col_front();
@@ -40,8 +32,10 @@ SelSimple::operator()(const McMatrix& matrix)
     double weight = 0.0;
     for (const McCell* cell = col->front();
 	 !col->is_end(cell); cell = cell->col_next()) {
-      weight += row_weights[cell->row_pos()];
+      const McRowHead* row = matrix.row(cell->row_pos());
+      weight += (1.0 / (row->num() - 1.0));
     }
+    weight /= matrix.col_cost(col->pos());
 
     if ( max_weight < weight ) {
       max_weight = weight;

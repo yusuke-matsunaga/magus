@@ -30,6 +30,7 @@ EXTRA_DIST =
 
 noinst_PROGRAMS = \
 	mincov_test \
+	mincov_test_d \
 	mincov_test_p
 
 
@@ -58,6 +59,10 @@ YMUTILS_P = $(top_builddir)/src/libym_utils_p.la
 ## Variables for building mincov_test
 ############################################################
 
+mincov_test_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
 mincov_test_SOURCES = \
 	mincov_test.cc
 
@@ -66,6 +71,25 @@ mincov_test_LDADD = \
 
 mincov_test_LDFLAGS = \
 	$(AM_LDFLAGS)
+
+
+############################################################
+## Variables for building mincov_test
+############################################################
+
+mincov_test_d_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+mincov_test_d_SOURCES = \
+	mincov_test.cc
+
+mincov_test_d_LDADD = \
+	$(YMUTILS_D)
+
+mincov_test_d_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-static
 
 
 ############################################################

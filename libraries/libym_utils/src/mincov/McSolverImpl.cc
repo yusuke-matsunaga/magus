@@ -382,6 +382,46 @@ struct Gt
   }
 };
 
+void
+mark_rows(const McMatrix& matrix,
+	  const McColHead* col,
+	  vector<bool>& row_marks,
+	  vector<bool>& col_marks);
+
+void
+mark_cols(const McMatrix& matrix,
+	  const McRowHead* row,
+	  vector<bool>& row_marks,
+	  vector<bool>& col_marks)
+{
+  for (const McCell* cell = row->front();
+       !row->is_end(cell); cell = cell->row_next()) {
+    ymuint col_pos = cell->col_pos();
+    if ( col_marks[col_pos] ) {
+      continue;
+    }
+    col_marks[col_pos] = true;
+    mark_rows(matrix, matrix.col(col_pos), row_marks, col_marks);
+  }
+}
+
+void
+mark_rows(const McMatrix& matrix,
+	  const McColHead* col,
+	  vector<bool>& row_marks,
+	  vector<bool>& col_marks)
+{
+  for (const McCell* cell = col->front();
+       !col->is_end(cell); cell = cell->col_next()) {
+    ymuint row_pos = cell->row_pos();
+    if ( row_marks[row_pos] ) {
+      continue;
+    }
+    row_marks[row_pos] = true;
+    mark_cols(matrix, matrix.row(row_pos), row_marks, col_marks);
+  }
+}
+
 END_NONAMESPACE
 
 // @brief ブロック分割を行う．
@@ -391,60 +431,45 @@ END_NONAMESPACE
 bool
 McSolverImpl::block_partition(vector<McSolverImpl*>& solver_list)
 {
-  ymuint nr = mMatrix->remain_row_size();
-  ymuint nc = mMatrix->remain_col_size();
+  vector<bool> row_marks(mMatrix->row_size(), false);
+  vector<bool> col_marks(mMatrix->col_size(), false);
+  const McRowHead* row0 = mMatrix->row_front();
+  mark_cols(*mMatrix, row0, row_marks, col_marks);
 
-  MFSet mfset(mMatrix->row_size());
-  for (const McColHead* col = mMatrix->col_front();
-       !mMatrix->is_col_end(col); col = col->next()) {
-    vector<ymuint> row_list;
-    row_list.reserve(col->num());
-    for (const McCell* cell = col->front();
-	 !col->is_end(cell); cell = cell->col_next()) {
-      row_list.push_back(cell->row_pos());
-    }
-    ymuint n = row_list.size();
-    for (ymuint i1 = 0; i1 < n; ++ i1) {
-      ymuint r1 = row_list[i1];
-      for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
-	ymuint r2 = row_list[i2];
-	mfset.merge(r1, r2);
-      }
-    }
-  }
-  vector<ymuint> rep_list;
+  ymuint nr = mMatrix->remain_row_size();
+  vector<const McRowHead*> row_list1;
+  row_list1.reserve(nr);
+  vector<const McRowHead*> row_list2;
+  row_list2.reserve(nr);
   for (const McRowHead* row = mMatrix->row_front();
        !mMatrix->is_row_end(row); row = row->next()) {
-    ymuint row_pos = row->pos();
-    ymuint rep = mfset.find(row_pos);
-    if ( rep == row_pos ) {
-      rep_list.push_back(rep);
+    if ( row_marks[row->pos()] ) {
+      row_list1.push_back(row);
+    }
+    else {
+      row_list2.push_back(row);
     }
   }
-  if ( rep_list.size() == 1 ) {
+  if ( row_list2.empty() ) {
     return false;
   }
 
-  vector<const McRowHead*> row_list;
-  row_list.reserve(mMatrix->remain_row_size());
-  for (vector<ymuint>::iterator p = rep_list.begin();
-       p != rep_list.end(); ++ p) {
-    ymuint rep = *p;
-    row_list.clear();
-    for (const McRowHead* row = mMatrix->row_front();
-	 !mMatrix->is_row_end(row); row = row->next()) {
-      ymuint row_pos = row->pos();
-      if ( mfset.find(row_pos) == rep ) {
-	row_list.push_back(row);
-      }
-    }
-    McSolverImpl* solver = new McSolverImpl(mLbCalc, mSelector);
-    solver->set_matrix(*mMatrix, row_list);
-    solver_list.push_back(solver);
-  }
+  solver_list.clear();
 
-  // サイズの昇順に整列
-  sort(solver_list.begin(), solver_list.end(), Gt());
+  McSolverImpl* solver1 = new McSolverImpl(mLbCalc, mSelector);
+  solver1->set_matrix(*mMatrix, row_list1);
+
+  McSolverImpl* solver2 = new McSolverImpl(mLbCalc, mSelector);
+  solver2->set_matrix(*mMatrix, row_list2);
+
+  if ( solver1->matrix().remain_col_size() < solver2->matrix().remain_col_size() ) {
+    solver_list.push_back(solver1);
+    solver_list.push_back(solver2);
+  }
+  else {
+    solver_list.push_back(solver2);
+    solver_list.push_back(solver1);
+  }
 
   return true;
 }

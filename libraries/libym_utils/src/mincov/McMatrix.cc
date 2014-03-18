@@ -568,17 +568,6 @@ McMatrix::reduce(vector<ymuint32>& selected_cols)
 {
   ymuint no_change = 0;
   for ( ; ; ) {
-    // 行支配を探し，行の削除を行う．
-    if ( row_dominance() ) {
-      no_change = 0;
-    }
-    else {
-      ++ no_change;
-      if ( no_change >= 3 ) {
-	break;
-      }
-    }
-
     // 列支配を探し，列の削除を行う．
     if ( col_dominance() ) {
       no_change = 0;
@@ -592,6 +581,17 @@ McMatrix::reduce(vector<ymuint32>& selected_cols)
 
     // 必須列を探し，列の選択を行う．
     if ( essential_col(selected_cols) ) {
+      no_change = 0;
+    }
+    else {
+      ++ no_change;
+      if ( no_change >= 3 ) {
+	break;
+      }
+    }
+
+    // 行支配を探し，行の削除を行う．
+    if ( row_dominance() ) {
       no_change = 0;
     }
     else {
@@ -673,17 +673,13 @@ McMatrix::row_dominance()
 {
   bool change = false;
 
-  // 削除された行番号に印をつけるための配列
-  for (ymuint i = 0; i < row_size(); ++ i) {
-    mMarkArray[i] = false;
-  }
-
   // 残っている行のリストを作る．
   mRowVector.clear();
-  mRowVector.reserve(row_size());
+  mRowVector.reserve(remain_row_size());
   for (const McRowHead* row1 = row_front();
        !is_row_end(row1); row1 = row1->next()) {
     mRowVector.push_back(row1);
+    mMarkArray[row1->pos()] = false;
   }
 
   // 要素数の少ない順にソートする．
@@ -712,6 +708,7 @@ McMatrix::row_dominance()
   vector<int> del_rows2(row_size(), -1);
 #endif
 
+  mRowIdListNum = 0;
   for (vector<const McRowHead*>::iterator p = mRowVector.begin();
        p != mRowVector.end(); ++ p) {
     const McRowHead* row1 = *p;
@@ -743,6 +740,7 @@ McMatrix::row_dominance()
 	continue;
       }
       if ( mMarkArray[row2->pos()] ) {
+	// 削除された行も比較しない.
 	continue;
       }
 
@@ -775,7 +773,8 @@ McMatrix::row_dominance()
       if ( found ) {
 	// row1 は row2 を支配している．
 	ymuint row_pos = row2->pos();
-	delete_row(row_pos);
+	mRowIdList[mRowIdListNum] = row_pos;
+	++ mRowIdListNum;
 	mMarkArray[row_pos] = true;
 #if defined(VERIFY_MCMATRIX)
 	del_rows2[row_pos] = row1->pos();
@@ -786,6 +785,10 @@ McMatrix::row_dominance()
 	}
       }
     }
+  }
+  for (ymuint i = 0; i < mRowIdListNum; ++ i) {
+    ymuint row_pos = mRowIdList[i];
+    delete_row(row_pos);
   }
 
 #if defined(VERIFY_MCMATRIX)
@@ -1000,15 +1003,16 @@ McMatrix::col_dominance()
 bool
 McMatrix::essential_col(vector<ymuint32>& selected_cols)
 {
-  for (ymuint i = 0; i < col_size(); ++ i) {
-    mMarkArray[i] = false;
+  for (const McColHead* col1 = col_front();
+       !is_col_end(col1); col1 = col1->next()) {
+    mMarkArray[col1->pos()] = false;
   }
 
   mColIdListNum = 0;
-  for (const McRowHead* row = row_front();
-       !is_row_end(row); row = row->next()) {
-    if ( row->num() == 1 ) {
-      const McCell* cell = row->front();
+  for (const McRowHead* row1 = row_front();
+       !is_row_end(row1); row1 = row1->next()) {
+    if ( row1->num() == 1 ) {
+      const McCell* cell = row1->front();
       ymuint32 col_pos = cell->col_pos();
       assert_cond( !col(col_pos)->mDeleted, __FILE__, __LINE__);
       if ( !mMarkArray[col_pos] ) {
