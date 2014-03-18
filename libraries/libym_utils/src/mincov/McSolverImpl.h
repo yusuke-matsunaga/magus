@@ -61,10 +61,9 @@ public:
   ymuint32
   exact(vector<ymuint32>& solution);
 
-  /// @brief 内部の行列の内容を出力する．
-  /// @param[in] s 出力先のストリーム
-  void
-  print_matrix(ostream& s);
+  /// @brief 内部の行列を返す．
+  const McMatrix&
+  matrix() const;
 
 
 private:

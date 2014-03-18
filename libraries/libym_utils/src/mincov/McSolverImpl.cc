@@ -219,15 +219,15 @@ McSolverImpl::solve()
   }
 
   vector<McSolverImpl*> solver_list;
-  if ( block_partition(solver_list) ) {
+  if ( false && block_partition(solver_list) ) {
     vector<ymuint32> solution(mCurSolution);
     if ( mincov_debug ) {
       cout << "BLOCK PARTITION" << endl;
-      print_matrix(cout);
+      matrix().print(cout);
       for (ymuint i = 0; i < solver_list.size(); ++ i) {
 	McSolverImpl* solver = solver_list[i];
 	cout << "Matrix#" << i << endl;
-	solver->print_matrix(cout);
+	solver->matrix().print(cout);
       }
     }
     for (vector<McSolverImpl*>::iterator p = solver_list.begin();
@@ -253,12 +253,15 @@ McSolverImpl::solve()
   // 次の分岐のための列をとってくる．
   ymuint col = mSelector(*mMatrix);
 
-  // その列を選択したときの最良解を求める．
-  //McMatrix orig_matrix(matrix);
-
+#if defined(VERIFY_MINCOV)
+  McMatrix orig_matrix(*mMtrix);
   vector<ymuint32> orig_solution(mCurSolution);
+#endif
+
   ymuint cur_n = mCurSolution.size();
   mMatrix->save();
+
+  // その列を選択したときの最良解を求める．
   mMatrix->select_col(col);
   mCurSolution.push_back(col);
 
@@ -267,18 +270,21 @@ McSolverImpl::solve()
   }
 
   solve();
+
   mMatrix->restore();
   ymuint c = mCurSolution.size() - cur_n;
   for (ymuint i = 0; i < c; ++ i) {
     mCurSolution.pop_back();
   }
 
+#if defined(VERIFYY_MINCOV)
+  verify_matrix(orig_matrix, *mMatrix);
+  assert_cond( orig_solution == mCurSlution, __FILE__, __LINE__);
+#endif
+
+  // 今得た最良解が下界と等しかったら探索を続ける必要はない．
   if ( lb >= mBest ) {
     return;
-  }
-
-  if ( mincov_debug ) {
-    //verify_matrix(orig_matrix, *mMatrix);
   }
 
   // その列を選択しなかったときの最良解を求める．
@@ -295,6 +301,27 @@ McSolverImpl::solve()
 	 << endl;
   }
 }
+
+
+BEGIN_NONAMESPACE
+
+struct Lt
+{
+  bool
+  operator()(McSolverImpl* left,
+	     McSolverImpl* right)
+  {
+    if ( left->matrix().remain_col_size() < right->matrix().remain_col_size() ) {
+      return true;
+    }
+    if ( left->matrix().remain_col_size() > right->matrix().remain_col_size() ) {
+      return false;
+    }
+    return left->matrix().remain_row_size() < right->matrix().remain_row_size();
+  }
+};
+
+END_NONAMESPACE
 
 // @brief ブロック分割を行う．
 // @param[in] solver_list 分割された小問題のソルバーのリスト
@@ -354,15 +381,18 @@ McSolverImpl::block_partition(vector<McSolverImpl*>& solver_list)
     solver->set_matrix(*mMatrix, row_list);
     solver_list.push_back(solver);
   }
+
+  // サイズの昇順に整列
+  //sort(solver_list.begin(), solver_list.end(), Lt());
+
   return true;
 }
 
-// @brief 内部の行列の内容を出力する．
-// @param[in] s 出力先のストリーム
-void
-McSolverImpl::print_matrix(ostream& s)
+// @brief 内部の行列を返す．
+const McMatrix&
+McSolverImpl::matrix() const
 {
-  mMatrix->print(s);
+  return *mMatrix;
 }
 
 END_NAMESPACE_YM_MINCOV

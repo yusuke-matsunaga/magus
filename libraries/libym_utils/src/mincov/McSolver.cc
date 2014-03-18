@@ -13,6 +13,7 @@
 #include "LbCalc.h"
 #include "LbCS.h"
 #include "SelSimple.h"
+#include "SelCS.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -28,6 +29,7 @@ McSolver::McSolver()
 {
   mLbCalc = new LbCS();
   mSelector = new SelSimple();
+  //mSelector = new SelCS();
   mMatrix = NULL;
 }
 

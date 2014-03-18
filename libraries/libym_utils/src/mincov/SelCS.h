@@ -1,8 +1,8 @@
-#ifndef SELSIMPLE_H
-#define SELSIMPLE_H
+#ifndef SELCS_H
+#define SELCS_H
 
-/// @file Selector.h
-/// @brief Selector のヘッダファイル
+/// @file SelCS.h
+/// @brief SelCS のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -41,4 +41,4 @@ public:
 END_NAMESPACE_YM_MINCOV
 
 
-#endif // SELSIMPLE_H
+#endif // SELCS_H
