@@ -241,7 +241,7 @@ McSolverImpl::solve()
 	solver->matrix().print(cout);
       }
     }
-    ymuint32 best_so_far = mMatrix->cost(mCurSolution);
+    ymuint32 cost_so_far = mMatrix->cost(mCurSolution);
     ymuint ns = solver_list.size();
     vector<ymuint32> lb_array(ns);
     lb_array[ns - 1] = 0;
@@ -255,7 +255,7 @@ McSolverImpl::solve()
     for (ymuint i = 0; i < ns; ++ i) {
       McSolverImpl* solver = solver_list[i];
       ymuint32 lb_rest = lb_array[i];
-      solver->mBest = mBest - best_so_far - lb_rest;
+      solver->mBest = mBest - cost_so_far - lb_rest;
       solver->mCurSolution.clear();
       bool stat = solver->solve();
       if ( stat ) {
@@ -265,7 +265,7 @@ McSolverImpl::solve()
 	bounded = true;
 	break;
       }
-      best_so_far += solver->mBest;
+      cost_so_far += solver->mBest;
     }
     for (ymuint i = 0; i < ns; ++ i) {
       McSolverImpl* solver = solver_list[i];
@@ -366,6 +366,22 @@ struct Lt
   }
 };
 
+struct Gt
+{
+  bool
+  operator()(McSolverImpl* left,
+	     McSolverImpl* right)
+  {
+    if ( left->matrix().remain_col_size() > right->matrix().remain_col_size() ) {
+      return true;
+    }
+    if ( left->matrix().remain_col_size() < right->matrix().remain_col_size() ) {
+      return false;
+    }
+    return left->matrix().remain_row_size() > right->matrix().remain_row_size();
+  }
+};
+
 END_NONAMESPACE
 
 // @brief ブロック分割を行う．
@@ -428,7 +444,7 @@ McSolverImpl::block_partition(vector<McSolverImpl*>& solver_list)
   }
 
   // サイズの昇順に整列
-  //sort(solver_list.begin(), solver_list.end(), Lt());
+  sort(solver_list.begin(), solver_list.end(), Gt());
 
   return true;
 }
