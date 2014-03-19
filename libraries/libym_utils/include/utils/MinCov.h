@@ -79,6 +79,10 @@ public:
   void
   set_debug(bool flag);
 
+  /// @brief デバッグで表示する最大深さを設定する．
+  void
+  set_max_depth(ymuint depth);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

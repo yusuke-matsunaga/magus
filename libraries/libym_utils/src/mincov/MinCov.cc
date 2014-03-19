@@ -92,4 +92,11 @@ MinCov::set_debug(bool flag)
   nsMincov::McSolverImpl::set_debug(flag);
 }
 
+// @brief デバッグで表示する最大深さを設定する．
+void
+MinCov::set_max_depth(ymuint depth)
+{
+  nsMincov::McSolverImpl::set_max_depth(depth);
+}
+
 END_NAMESPACE_YM

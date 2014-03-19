@@ -51,6 +51,8 @@ COMMON_SOURCES = \
 	LbCalc.h \
 	LbCS.h \
 	LbCS.cc \
+	LbMAX.h \
+	LbMAX.cc \
 	LbMIS.h \
 	LbMIS.cc \
 	MaxClique.cc \

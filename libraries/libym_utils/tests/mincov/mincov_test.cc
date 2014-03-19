@@ -129,6 +129,7 @@ mincov_test(int argc,
   bool lp_solve = false;
   bool ilp_solve = false;
   bool espresso = false;
+  ymuint depth = 0;
   ymuint base = 1;
   while ( argc > base && argv[base][0] == '-' ) {
     if ( strcmp(argv[1], "-h") == 0 ) {
@@ -145,6 +146,8 @@ mincov_test(int argc,
     }
     else if ( strcmp(argv[base], "-d") == 0 ) {
       debug = true;
+      ++ base;
+      depth = atoi(argv[base]);
       ++ base;
     }
     else if ( strcmp(argv[base], "-lp") == 0 ) {
@@ -258,7 +261,7 @@ mincov_test(int argc,
 	}
 	++ rownum;
       }
-      sm_row* solution = sm_minimum_cover(A, NULL, 0, 5);
+      sm_row* solution = sm_minimum_cover(A, NULL, 0, depth);
       sm_element* pe;
       sm_foreach_row_element(solution, pe) {
 	cout << " " << pe->col_num;
@@ -272,6 +275,7 @@ mincov_test(int argc,
 
     if ( debug ) {
       mincov.set_debug(true);
+      mincov.set_max_depth(depth);
     }
 
     mincov.set_size(max_r + 1, max_c + 1);

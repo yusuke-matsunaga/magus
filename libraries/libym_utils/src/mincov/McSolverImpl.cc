@@ -162,7 +162,7 @@ McSolverImpl::exact(vector<ymuint32>& solution)
 
   mBest = UINT_MAX;
   mCurSolution.clear();
-  bool stat = solve();
+  bool stat = solve(0);
   assert_cond( stat, __FILE__, __LINE__);
   solution = mBestSolution;
 
@@ -180,59 +180,51 @@ McSolverImpl::exact(vector<ymuint32>& solution)
 
 // @brief 解を求める再帰関数
 bool
-McSolverImpl::solve()
+McSolverImpl::solve(ymuint depth)
 {
   ymuint cur_id = solve_id;
   ++ solve_id;
-  if ( mDebug ) {
-    ymuint nr = mMatrix->remain_row_size();
-    ymuint nc = mMatrix->remain_col_size();
-    ymuint32 cur_cost = mMatrix->cost(mCurSolution);
-    cout << "solve[#" << cur_id << "](" << nr << " x " << nc << "): "
-	 << mBest << " : " << cur_cost << endl;
-  }
 
   mMatrix->reduce(mCurSolution);
 
-  if ( mDebug ) {
-    ymuint nr = mMatrix->remain_row_size();
-    ymuint nc = mMatrix->remain_col_size();
-    cout << "  after reduce(" << nr << " x " << nc << ")"
-	 << ": " << mMatrix->cost(mCurSolution) << endl;
-  }
-
   ymuint32 tmp_cost = mMatrix->cost(mCurSolution);
 
-  if ( mMatrix->remain_row_size() == 0 ) {
-    if ( mBest > tmp_cost ) {
-      mBest = tmp_cost;
-      mBestSolution = mCurSolution;
-      if ( mDebug ) {
-	cout << "solve[#" << cur_id << "] end: " << mBest << endl
-	     << endl;
-      }
-      return true;
-    }
-    if ( mDebug ) {
-      cout << "solve[#" << cur_id << "] end: bounded" << endl
-	   << endl;
+  ymuint32 lb = mLbCalc(*mMatrix) + tmp_cost;
+
+  bool cur_debug = mDebug;
+  if (depth > mMaxDepth) {
+    cur_debug = false;
+  }
+
+  if ( cur_debug ) {
+    ymuint nr = mMatrix->remain_row_size();
+    ymuint nc = mMatrix->remain_col_size();
+    cout << "[" << depth << "] " << nr << "x" << nc
+	 << " sel=" << tmp_cost << " bnd=" << mBest
+	 << " lb=" << lb;
+  }
+
+  if ( lb >= mBest ) {
+    if ( cur_debug ) {
+      cout << " bounded" << endl;
     }
     return false;
   }
 
-  ymuint32 lb = mLbCalc(*mMatrix) + tmp_cost;
-  if ( lb >= mBest ) {
-    if ( mDebug ) {
-      cout << "solve[#" << cur_id << "] end: best = " << mBest << ", lb = " << lb << ", bounded" << endl
-	   << endl;
+  if ( mMatrix->remain_row_size() == 0 ) {
+    mBest = tmp_cost;
+    mBestSolution = mCurSolution;
+    if ( cur_debug ) {
+      cout << " best" << endl;
     }
-    return false;
+    return true;
   }
+
 
   vector<McSolverImpl*> solver_list;
   if ( mDoPartition && block_partition(solver_list) ) {
     // ブロック分割を行う．
-    if ( mDebug ) {
+    if ( cur_debug ) {
       cout << "BLOCK PARTITION" << endl;
       matrix().print(cout);
       for (ymuint i = 0; i < solver_list.size(); ++ i) {
@@ -257,7 +249,7 @@ McSolverImpl::solve()
       ymuint32 lb_rest = lb_array[i];
       solver->mBest = mBest - cost_so_far - lb_rest;
       solver->mCurSolution.clear();
-      bool stat = solver->solve();
+      bool stat = solver->solve(depth + 1);
       if ( stat ) {
 	mCurSolution.insert(mCurSolution.end(), solver->mBestSolution.begin(), solver->mBestSolution.end());
       }
@@ -277,14 +269,14 @@ McSolverImpl::solve()
       if ( mBest > cost ) {
 	mBest = cost;
 	mBestSolution = mCurSolution;
-	if ( mDebug ) {
+	if ( cur_debug ) {
 	  cout << "solve[#" << cur_id << "] end: " << mBest << endl
 	       << endl;
 	}
 	return true;
       }
     }
-    if ( mDebug ) {
+    if ( cur_debug ) {
       cout << "solve[#" << cur_id << "] end: bounded" << endl
 	   << endl;
     }
@@ -306,11 +298,11 @@ McSolverImpl::solve()
   mMatrix->select_col(col);
   mCurSolution.push_back(col);
 
-  if ( mDebug ) {
+  if ( cur_debug ) {
     cout << "select column#" << col << endl;
   }
 
-  bool stat1 = solve();
+  bool stat1 = solve(depth + 1);
 
   mMatrix->restore();
   ymuint c = mCurSolution.size() - cur_n;
@@ -325,7 +317,7 @@ McSolverImpl::solve()
 
   // 今得た最良解が下界と等しかったら探索を続ける必要はない．
   if ( lb >= mBest ) {
-    if ( mDebug ) {
+    if ( cur_debug ) {
       cout << "solve[#" << cur_id << "] end: best = " << mBest << ", lb = " << lb << endl;
     }
     return true;
@@ -334,13 +326,13 @@ McSolverImpl::solve()
   // その列を選択しなかったときの最良解を求める．
   mMatrix->delete_col(col);
 
-  if ( mDebug ) {
+  if ( cur_debug ) {
     cout << "delete column#" << col << endl;
   }
 
-  bool stat2 = solve();
+  bool stat2 = solve(depth + 1);
 
-  if ( mDebug ) {
+  if ( cur_debug ) {
     cout << "solve[#" << cur_id << "] end: " << mBest << endl;
   }
 
@@ -495,10 +487,20 @@ McSolverImpl::set_debug(bool flag)
   mDebug = flag;
 }
 
+// @brief mMaxDepth を設定する．
+void
+McSolverImpl::set_max_depth(ymuint depth)
+{
+  mMaxDepth = depth;
+}
+
 bool
 McSolverImpl::mDoPartition = true;
 
 bool
 McSolverImpl::mDebug = false;
+
+ymuint32
+McSolverImpl::mMaxDepth = 0;
 
 END_NAMESPACE_YM_MINCOV

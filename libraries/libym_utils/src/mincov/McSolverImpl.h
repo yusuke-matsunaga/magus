@@ -75,6 +75,11 @@ public:
   void
   set_debug(bool flag);
 
+  /// @brief mMaxDepth を設定する．
+  static
+  void
+  set_max_depth(ymuint depth);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -83,7 +88,7 @@ private:
 
   /// @brief 解を求める再帰関数
   bool
-  solve();
+  solve(ymuint depth);
 
   /// @brief ブロック分割を行う．
   /// @param[in] solver_list 分割された小問題のソルバーのリスト
@@ -123,6 +128,10 @@ private:
   // デバッグフラグ
   static
   bool mDebug;
+
+  // デバッグで表示する最大深さ
+  static
+  ymuint32 mMaxDepth;
 
 };
 
