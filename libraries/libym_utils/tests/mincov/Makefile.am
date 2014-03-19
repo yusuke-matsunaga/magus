@@ -74,7 +74,7 @@ mincov_test_SOURCES = \
 	mincov_test.cc
 
 mincov_test_LDADD = \
-	$(YMUTILS)
+	$(LIBS)
 
 mincov_test_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -92,7 +92,7 @@ mincov_test_d_SOURCES = \
 	mincov_test.cc
 
 mincov_test_d_LDADD = \
-	$(YMUTILS_D)
+	$(LIBS_D)
 
 mincov_test_d_LDFLAGS = \
 	$(AM_LDFLAGS) \
@@ -111,7 +111,7 @@ mincov_test_p_SOURCES = \
 	mincov_test.cc
 
 mincov_test_p_LDADD = \
-	$(YMUTILS_P)
+	$(LIBS_P)
 
 mincov_test_p_LDFLAGS = \
 	$(AM_LDFLAGS) \
