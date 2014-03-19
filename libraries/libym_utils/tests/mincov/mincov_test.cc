@@ -196,7 +196,9 @@ mincov_test(int argc,
     }
   }
 
+#if 0
   try {
+#endif
     if ( lp_solve || ilp_solve ) {
       cout << "min: ";
       const char* plus = "";
@@ -299,10 +301,12 @@ mincov_test(int argc,
       cout << " " << *p;
     }
     cout << endl;
+#if 0
   }
   catch ( AssertError& x ) {
     cerr << x;
   }
+#endif
 }
 
 END_NAMESPACE_YM

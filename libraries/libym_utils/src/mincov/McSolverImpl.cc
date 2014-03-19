@@ -28,8 +28,8 @@ void
 verify_matrix(McMatrix& a,
 	      McMatrix& b)
 {
-  assert_cond( a.remain_row_size() == b.remain_row_size(), __FILE__, __LINE__);
-  assert_cond( a.remain_col_size() == b.remain_col_size(), __FILE__, __LINE__);
+  assert_cond( a.row_num() == b.row_num(), __FILE__, __LINE__);
+  assert_cond( a.col_num() == b.col_num(), __FILE__, __LINE__);
   const McRowHead* row_a = a.row_front();
   const McRowHead* row_b = b.row_front();
   for ( ; ; ) {
@@ -162,7 +162,7 @@ McSolverImpl::exact(vector<ymuint32>& solution)
 
   mBest = UINT_MAX;
   mCurSolution.clear();
-  bool stat = solve(0);
+  bool stat = solve(0, 0);
   assert_cond( stat, __FILE__, __LINE__);
   solution = mBestSolution;
 
@@ -180,7 +180,8 @@ McSolverImpl::exact(vector<ymuint32>& solution)
 
 // @brief 解を求める再帰関数
 bool
-McSolverImpl::solve(ymuint depth)
+McSolverImpl::solve(ymuint lb,
+		    ymuint depth)
 {
   ymuint cur_id = solve_id;
   ++ solve_id;
@@ -189,7 +190,10 @@ McSolverImpl::solve(ymuint depth)
 
   ymuint32 tmp_cost = mMatrix->cost(mCurSolution);
 
-  ymuint32 lb = mLbCalc(*mMatrix) + tmp_cost;
+  ymuint32 tmp_lb = mLbCalc(*mMatrix) + tmp_cost;
+  if ( lb < tmp_lb ) {
+    lb = tmp_lb;
+  }
 
   bool cur_debug = mDebug;
   if (depth > mMaxDepth) {
@@ -197,8 +201,8 @@ McSolverImpl::solve(ymuint depth)
   }
 
   if ( cur_debug ) {
-    ymuint nr = mMatrix->remain_row_size();
-    ymuint nc = mMatrix->remain_col_size();
+    ymuint nr = mMatrix->row_num();
+    ymuint nc = mMatrix->col_num();
     cout << "[" << depth << "] " << nr << "x" << nc
 	 << " sel=" << tmp_cost << " bnd=" << mBest
 	 << " lb=" << lb;
@@ -211,7 +215,7 @@ McSolverImpl::solve(ymuint depth)
     return false;
   }
 
-  if ( mMatrix->remain_row_size() == 0 ) {
+  if ( mMatrix->row_num() == 0 ) {
     mBest = tmp_cost;
     mBestSolution = mCurSolution;
     if ( cur_debug ) {
@@ -220,12 +224,12 @@ McSolverImpl::solve(ymuint depth)
     return true;
   }
 
-
   vector<McSolverImpl*> solver_list;
   if ( mDoPartition && block_partition(solver_list) ) {
     // ブロック分割を行う．
     if ( cur_debug ) {
-      cout << "BLOCK PARTITION" << endl;
+      cout << endl
+	   << "BLOCK PARTITION" << endl;
       matrix().print(cout);
       for (ymuint i = 0; i < solver_list.size(); ++ i) {
 	McSolverImpl* solver = solver_list[i];
@@ -249,7 +253,7 @@ McSolverImpl::solve(ymuint depth)
       ymuint32 lb_rest = lb_array[i];
       solver->mBest = mBest - cost_so_far - lb_rest;
       solver->mCurSolution.clear();
-      bool stat = solver->solve(depth + 1);
+      bool stat = solver->solve(0, depth + 1);
       if ( stat ) {
 	mCurSolution.insert(mCurSolution.end(), solver->mBestSolution.begin(), solver->mBestSolution.end());
       }
@@ -269,16 +273,8 @@ McSolverImpl::solve(ymuint depth)
       if ( mBest > cost ) {
 	mBest = cost;
 	mBestSolution = mCurSolution;
-	if ( cur_debug ) {
-	  cout << "solve[#" << cur_id << "] end: " << mBest << endl
-	       << endl;
-	}
 	return true;
       }
-    }
-    if ( cur_debug ) {
-      cout << "solve[#" << cur_id << "] end: bounded" << endl
-	   << endl;
     }
     return false;
   }
@@ -299,10 +295,10 @@ McSolverImpl::solve(ymuint depth)
   mCurSolution.push_back(col);
 
   if ( cur_debug ) {
-    cout << "select column#" << col << endl;
+    cout << " select column#" << col << endl;
   }
 
-  bool stat1 = solve(depth + 1);
+  bool stat1 = solve(lb, depth + 1);
 
   mMatrix->restore();
   ymuint c = mCurSolution.size() - cur_n;
@@ -317,9 +313,6 @@ McSolverImpl::solve(ymuint depth)
 
   // 今得た最良解が下界と等しかったら探索を続ける必要はない．
   if ( lb >= mBest ) {
-    if ( cur_debug ) {
-      cout << "solve[#" << cur_id << "] end: best = " << mBest << ", lb = " << lb << endl;
-    }
     return true;
   }
 
@@ -330,11 +323,7 @@ McSolverImpl::solve(ymuint depth)
     cout << "delete column#" << col << endl;
   }
 
-  bool stat2 = solve(depth + 1);
-
-  if ( cur_debug ) {
-    cout << "solve[#" << cur_id << "] end: " << mBest << endl;
-  }
+  bool stat2 = solve(lb, depth + 1);
 
   return stat1 || stat2;
 }
@@ -348,13 +337,13 @@ struct Lt
   operator()(McSolverImpl* left,
 	     McSolverImpl* right)
   {
-    if ( left->matrix().remain_col_size() < right->matrix().remain_col_size() ) {
+    if ( left->matrix().col_num() < right->matrix().col_num() ) {
       return true;
     }
-    if ( left->matrix().remain_col_size() > right->matrix().remain_col_size() ) {
+    if ( left->matrix().col_num() > right->matrix().col_num() ) {
       return false;
     }
-    return left->matrix().remain_row_size() < right->matrix().remain_row_size();
+    return left->matrix().row_num() < right->matrix().row_num();
   }
 };
 
@@ -364,13 +353,13 @@ struct Gt
   operator()(McSolverImpl* left,
 	     McSolverImpl* right)
   {
-    if ( left->matrix().remain_col_size() > right->matrix().remain_col_size() ) {
+    if ( left->matrix().col_num() > right->matrix().col_num() ) {
       return true;
     }
-    if ( left->matrix().remain_col_size() < right->matrix().remain_col_size() ) {
+    if ( left->matrix().col_num() < right->matrix().col_num() ) {
       return false;
     }
-    return left->matrix().remain_row_size() > right->matrix().remain_row_size();
+    return left->matrix().row_num() > right->matrix().row_num();
   }
 };
 
@@ -428,7 +417,7 @@ McSolverImpl::block_partition(vector<McSolverImpl*>& solver_list)
   const McRowHead* row0 = mMatrix->row_front();
   mark_cols(*mMatrix, row0, row_marks, col_marks);
 
-  ymuint nr = mMatrix->remain_row_size();
+  ymuint nr = mMatrix->row_num();
   vector<const McRowHead*> row_list1;
   row_list1.reserve(nr);
   vector<const McRowHead*> row_list2;
@@ -454,7 +443,7 @@ McSolverImpl::block_partition(vector<McSolverImpl*>& solver_list)
   McSolverImpl* solver2 = new McSolverImpl(mLbCalc, mSelector);
   solver2->set_matrix(*mMatrix, row_list2);
 
-  if ( solver1->matrix().remain_col_size() < solver2->matrix().remain_col_size() ) {
+  if ( solver1->matrix().col_num() < solver2->matrix().col_num() ) {
     solver_list.push_back(solver1);
     solver_list.push_back(solver2);
   }

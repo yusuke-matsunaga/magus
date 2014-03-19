@@ -55,6 +55,21 @@ void
 merge_nlist(vector<ymuint32>& left,
 	    const vector<ymuint32>& right)
 {
+#if 0
+  cout << "mrege_nlist" << endl;
+  cout << " left = ";
+  for (vector<ymuint32>::iterator p = left.begin();
+       p != left.end(); ++ p) {
+    cout << " " << *p;
+  }
+  cout << endl;
+  cout << " right = ";
+  for (vector<ymuint32>::const_iterator p = right.begin();
+       p != right.end(); ++ p) {
+    cout << " " << *p;
+  }
+  cout << endl;
+#endif
   vector<ymuint32>::iterator l_rpos = left.begin();
   vector<ymuint32>::iterator l_wpos = left.begin();
   vector<ymuint32>::iterator l_end = left.end();
@@ -62,12 +77,12 @@ merge_nlist(vector<ymuint32>& left,
   vector<ymuint32>::const_iterator r_end = right.end();
   for ( ; ; ) {
     if ( l_rpos == l_end ) {
-      return;
+      break;
     }
     ymuint32 l_id = *l_rpos;
     if ( r_rpos == r_end ) {
       left.erase(l_wpos, l_end);
-      return;
+      break;
     }
     ymuint32 r_id = *r_rpos;
     if ( l_id < r_id ) {
@@ -85,6 +100,14 @@ merge_nlist(vector<ymuint32>& left,
       ++ r_rpos;
     }
   }
+#if 0
+  cout << " result = ";
+  for (vector<ymuint32>::iterator p = left.begin();
+       p != left.end(); ++ p) {
+    cout << " " << *p;
+  }
+  cout << endl;
+#endif
 }
 
 END_NONAMESPACE
@@ -95,66 +118,39 @@ END_NONAMESPACE
 double
 MaxClique::solve(vector<ymuint32>& ans)
 {
-  // mNlistArray を整列させる．
-  for (vector<vector<ymuint32> >::iterator p = mNlistArray.begin();
-       p != mNlistArray.end(); ++ p) {
-    vector<ymuint32>& nlist = *p;
-    sort(nlist.begin(), nlist.end());
-  }
-
   ans.clear();
 
   double cost = 0.0;
   ymuint32 n = mCostArray.size();
-  vector<ymuint32> v_list;
-  { // 種となるノードを求める．
-    double max_cost = 0.0;
-    ymuint32 max_id = 0;
+  vector<bool> mark(n, false);
+  for ( ; ; ) {
+    ymuint min_num = UINT_MAX;
+    ymuint min_row = 0;
+    bool found = false;
     for (ymuint i = 0; i < n; ++ i) {
-      double tmp_cost = mCostArray[i];
-      vector<ymuint32>& nlist = mNlistArray[i];
-      for (vector<ymuint32>::iterator p = nlist.begin();
-	   p != nlist.end(); ++ p) {
-	tmp_cost += mCostArray[*p];
+      if ( mark[i] ) {
+	continue;
       }
-      if ( max_cost < tmp_cost ) {
-	max_cost = tmp_cost;
-	max_id = i;
-      }
-    }
-    ans.push_back(max_id);
-    cost = mCostArray[max_id];
-    v_list = mNlistArray[max_id];
-    for (vector<ymuint32>::iterator p = v_list.begin();
-	 p != v_list.end(); ++ p) {
-      ymuint32 id = *p;
-      merge_nlist(mNlistArray[id], v_list);
-    }
-  }
-  while ( !v_list.empty() ) {
-    double max_cost = 0.0;
-    ymuint32 max_id = 0;
-    for (vector<ymuint32>::iterator p = v_list.begin();
-	 p != v_list.end(); ++ p) {
-      ymuint32 id = *p;
-      double tmp_cost = mCostArray[id];
-      vector<ymuint32>& nlist = mNlistArray[id];
-      for (vector<ymuint32>::iterator q = nlist.begin();
-	   q != nlist.end(); ++ q) {
-	tmp_cost += mCostArray[*q];
-      }
-      if ( max_cost < tmp_cost ) {
-	max_cost = tmp_cost;
-	max_id = id;
+      ymuint num = mNlistArray[i].size();
+      if ( min_num > num ) {
+	min_num = num;
+	min_row = i;
+	found = true;
       }
     }
-    ans.push_back(max_id);
-    cost += mCostArray[max_id];
-    merge_nlist(v_list, mNlistArray[max_id]);
-    for (vector<ymuint32>::iterator p = v_list.begin();
-	 p != v_list.end(); ++ p) {
-      merge_nlist(mNlistArray[*p], mNlistArray[max_id]);
+    if ( !found ) {
+      break;
     }
+
+    ans.push_back(min_row);
+    mark[min_row] = true;
+
+    for (vector<ymuint32>::iterator p = mNlistArray[min_row].begin();
+	 p != mNlistArray[min_row].end(); ++ p) {
+      ymuint row = *p;
+      mark[row] = true;
+    }
+    cost += mCostArray[min_row];
   }
   return cost;
 }

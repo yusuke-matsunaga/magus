@@ -9,8 +9,6 @@
 
 #include "LbMIS.h"
 #include "McMatrix.h"
-#include "MaxClique.h"
-#include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -25,48 +23,52 @@ BEGIN_NAMESPACE_YM_MINCOV
 ymuint32
 LbMIS::operator()(const McMatrix& matrix)
 {
+  if ( matrix.row_num() == 0 ) {
+    return 0;
+  }
+
   // MIS を用いた下限
 
-  // まず，列を共有する行のグループを求める．
+  // まず，列を共有する行の関係を表す行列を作る．
   ymuint32 rs = matrix.row_size();
-  MFSet rset(rs);
-  for (const McColHead* col = matrix.col_front();
-       !matrix.is_col_end(col); col = col->next()) {
-    const McCell* cell = col->front();
-    ymuint32 rpos0 = cell->row_pos();
-    for (cell = cell->col_next();
-	 !col->is_end(cell); cell = cell->col_next()) {
-      ymuint32 rpos = cell->row_pos();
-      rpos0 = rset.merge(rpos0, rpos);
+  McMatrix M(rs, rs);
+  for (const McRowHead* row1 = matrix.row_front();
+       !matrix.is_row_end(row1); row1 = row1->next()) {
+    for (const McCell* cell1 = row1->front();
+	 !row1->is_end(cell1); cell1 = cell1->row_next()) {
+      const McColHead* col1 = matrix.col(cell1->col_pos());
+      for (const McCell* cell2 = col1->front();
+	   !col1->is_end(cell2); cell2 = cell2->col_next()) {
+	ymuint row_pos = cell2->row_pos();
+	matrix.row(row_pos)->mWork = 0;
+      }
     }
-  }
-
-  vector<ymuint32> row_list;
-  row_list.reserve(rs);
-  for (const McRowHead* row = matrix.row_front();
-       !matrix.is_row_end(row); row = row->next()) {
-    row_list.push_back(row->pos());
-  }
-
-  ymuint32 nr = row_list.size();
-  for (ymuint i = 0; i < nr - 1; ++ i) {
-    ymuint32 rpos1 = row_list[i];
-    row_list[i] = rset.find(rpos1);
-  }
-  MaxClique mc(nr);
-  for (ymuint i = 0; i < nr - 1; ++ i) {
-    ymuint32 rpos1 = row_list[i];
-    for (ymuint j = i + 1; j < nr; ++ j) {
-      ymuint32 rpos2 = row_list[j];
-      if ( rpos1 != rpos2 ) {
-	mc.connect(i, j);
+    for (const McCell* cell1 = row1->front();
+	 !row1->is_end(cell1); cell1 = cell1->row_next()) {
+      const McColHead* col1 = matrix.col(cell1->col_pos());
+      for (const McCell* cell2 = col1->front();
+	   !col1->is_end(cell2); cell2 = cell2->col_next()) {
+	ymuint row_pos = cell2->row_pos();
+	if ( matrix.row(row_pos)->mWork == 0 ) {
+	  matrix.row(row_pos)->mWork = 1;
+	  M.insert_elem(row1->pos(), row_pos);
+	}
       }
     }
   }
-  for (ymuint i = 0; i < nr; ++ i) {
-    ymuint32 rpos1 = row_list[i];
-    const McRowHead* row = matrix.row(rpos1);
+
+  vector<ymuint32> del_list;
+  ymuint32 cost = 0;
+  while ( M.row_num() > 0 ) {
+    const McRowHead* best_row = M.row_front();
+    for (const McRowHead* row1 = best_row->next(); !M.is_row_end(row1);
+	 row1 = row1->next()) {
+      if ( best_row->num() > row1->num() ) {
+	best_row = row1;
+      }
+    }
     ymuint32 min_cost = UINT_MAX;
+    const McRowHead* row = matrix.row(best_row->pos());
     for (const McCell* cell = row->front();
 	 !row->is_end(cell); cell = cell->row_next()) {
       ymuint32 cpos = cell->col_pos();
@@ -74,10 +76,20 @@ LbMIS::operator()(const McMatrix& matrix)
 	min_cost = matrix.col_cost(cpos);
       }
     }
-    mc.set_cost(i, min_cost);
+    cost += min_cost;
+
+    del_list.clear();
+    del_list.reserve(best_row->num());
+    for (const McCell* cell = best_row->front();
+	 !best_row->is_end(cell); cell = cell->row_next()) {
+      del_list.push_back(cell->col_pos());
+    }
+    for (ymuint i = 0; i < del_list.size(); ++ i) {
+      ymuint pos = del_list[i];
+      M.delete_row(pos);
+      M.delete_col(pos);
+    }
   }
-  vector<ymuint32> mis;
-  ymuint32 cost = mc.solve(mis);
 
   return cost;
 }

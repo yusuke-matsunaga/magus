@@ -28,13 +28,12 @@ bool McSolver_debug = false;
 // @brief コンストラクタ
 McSolver::McSolver()
 {
-  //LbCalc* calc1 = new LbCS();
+  LbCalc* calc1 = new LbCS();
   LbCalc* calc2 = new LbMIS();
-  //LbMAX* calc3 = new LbMAX();
-  //calc3->add_calc(calc1);
-  //calc3->add_calc(calc2);
-  //mLbCalc = calc3;
-  mLbCalc = calc2;
+  LbMAX* calc3 = new LbMAX();
+  calc3->add_calc(calc1);
+  calc3->add_calc(calc2);
+  mLbCalc = calc3;
 
   mSelector = new SelSimple();
   //mSelector = new SelCS();
@@ -108,7 +107,7 @@ McSolver::heuristic(vector<ymuint32>& solution)
   for ( ; ; ) {
     cur_matrix.reduce(solution);
 
-    if ( cur_matrix.remain_row_size() == 0 ) {
+    if ( cur_matrix.row_num() == 0 ) {
       break;
     }
 

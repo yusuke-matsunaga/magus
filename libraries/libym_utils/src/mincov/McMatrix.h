@@ -79,7 +79,11 @@ public:
 
   /// @brief 実効的な行数を返す．
   ymuint32
-  remain_row_size() const;
+  _remain_row_size() const;
+
+  /// @brief 実効的な行数を返す．
+  ymuint32
+  row_num() const;
 
   /// @brief 列を取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
@@ -102,7 +106,11 @@ public:
 
   /// @brief 実効的な列数を返す．
   ymuint32
-  remain_col_size() const;
+  _remain_col_size() const;
+
+  /// @brief 実効的な列数を返す．
+  ymuint32
+  col_num() const;
 
   /// @brief 列のコストを取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
@@ -273,11 +281,17 @@ private:
   // 行の先頭をつなぐリンクトリストのダミー
   McRowHead mRowHead;
 
+  // 実際の行数
+  ymuint32 mRowNum;
+
   // 列の先頭の配列
   McColHead* mColArray;
 
   // 列の先頭をつなぐリンクトリストのダミー
   McColHead mColHead;
+
+  // 実際の列数
+  ymuint32 mColNum;
 
   // 削除の履歴を覚えておくスタック
   ymuint32* mDelStack;
@@ -299,12 +313,6 @@ private:
 
   // mColIdList の要素数
   ymuint32 mColIdListNum;
-
-  // row_dominance で用いるベクタ
-  vector<const McRowHead*> mRowVector;
-
-  // col_dominance で用いるベクタ
-  vector<const McColHead*> mColVector;
 
 };
 
@@ -364,6 +372,15 @@ McMatrix::is_row_end(const McRowHead* row) const
   return row == &mRowHead;
 }
 
+// @brief 実効的な行数を返す．
+inline
+ymuint32
+McMatrix::row_num() const
+{
+  //assert_cond( mRowNum == _remain_row_size(), __FILE__, __LINE__);
+  return mRowNum;
+}
+
 // @brief 列の先頭を取り出す．
 // @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
 inline
@@ -397,6 +414,15 @@ bool
 McMatrix::is_col_end(const McColHead* col) const
 {
   return col == &mColHead;
+}
+
+// @brief 実効的な列数を返す．
+inline
+ymuint32
+McMatrix::col_num() const
+{
+  //assert_cond( mColNum == _remain_col_size(), __FILE__, __LINE__);
+  return mColNum;
 }
 
 // @brief 列のコストを取り出す．

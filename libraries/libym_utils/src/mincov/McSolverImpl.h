@@ -88,7 +88,8 @@ private:
 
   /// @brief 解を求める再帰関数
   bool
-  solve(ymuint depth);
+  solve(ymuint lb,
+	ymuint depth);
 
   /// @brief ブロック分割を行う．
   /// @param[in] solver_list 分割された小問題のソルバーのリスト
