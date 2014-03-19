@@ -22,18 +22,6 @@ bool mcmatrix_debug = false;
 // クラス McRowHead
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-McRowHead::McRowHead() :
-  mNum(0),
-  mDeleted(false)
-{
-}
-
-/// @brief デストラクタ
-McRowHead::~McRowHead()
-{
-}
-
 // @brief 要素を追加する位置を探す．
 // @param[in] cell 追加する要素
 // @retval true 追加が成功した．
@@ -76,18 +64,6 @@ McRowHead::search_insert_pos(McCell* cell)
 //////////////////////////////////////////////////////////////////////
 // クラス McColHead
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-McColHead::McColHead() :
-  mNum(0),
-  mDeleted(false)
-{
-}
-
-/// @brief デストラクタ
-McColHead::~McColHead()
-{
-}
 
 // @brief 要素を追加する位置を探す．
 // @param[in] cell 追加する要素
@@ -236,7 +212,6 @@ McMatrix::resize(ymuint32 row_size,
       McRowHead* row = &mRowArray[i];
       row->clear();
       row->mPos = i;
-      row->clear();
     }
 
     mColHead.mNext = &mColHead;
@@ -246,7 +221,6 @@ McMatrix::resize(ymuint32 row_size,
       McColHead* col = &mColArray[i];
       col->clear();
       col->mPos = i;
-      col->clear();
       col->set_cost(1);
     }
 

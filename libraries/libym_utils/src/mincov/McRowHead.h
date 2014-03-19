@@ -134,6 +134,20 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+inline
+McRowHead::McRowHead() :
+  mNum(0),
+  mDeleted(false)
+{
+}
+
+/// @brief デストラクタ
+inline
+McRowHead::~McRowHead()
+{
+}
+
 // @brief 行番号を返す．
 inline
 ymuint32

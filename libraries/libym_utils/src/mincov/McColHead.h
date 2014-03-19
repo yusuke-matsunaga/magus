@@ -144,6 +144,20 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+inline
+McColHead::McColHead() :
+  mNum(0),
+  mDeleted(false)
+{
+}
+
+/// @brief デストラクタ
+inline
+McColHead::~McColHead()
+{
+}
+
 // @brief 列番号を返す．
 inline
 ymuint32
