@@ -20,8 +20,10 @@
 
 #include "espresso.h"
 
-pcover make_sparse(F, D, R)
-pcover F, D, R;
+pcover
+make_sparse(pcover F,
+	    pcover D,
+	    pcvoer R)
 {
     cost_t cost, best_cost;
 

@@ -50,23 +50,22 @@ AM_CPPFLAGS = \
 
 COMMON_SOURCES = \
 	ansi.h \
-	cols.c \
+	cols.cc \
 	copyright.h \
-	cpu_time.c \
-	dominate.c \
+	cpu_time.cc \
+	dominate.cc \
 	espresso.h \
-	gimpel.c \
-	indep.c \
-	matrix.c \
-	mincov.c \
+	gimpel.cc \
+	indep.cc \
+	matrix.cc \
+	mincov.cc \
 	mincov.h \
 	mincov_int.h \
-	part.c \
+	part.cc \
 	port.h \
-	prtime.c \
-	rows.c \
-	solution.c \
-	sparse.c \
+	prtime.cc \
+	rows.cc \
+	solution.cc \
 	sparse.h \
 	sparse_int.h \
 	utility.h
@@ -76,9 +75,9 @@ COMMON_SOURCES = \
 ## Variables for building mincov_test
 ############################################################
 
-libesp_la_CFLAGS = \
+libesp_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
-	$(AM_CFLAGS)
+	$(AM_CXXFLAGS)
 
 libesp_la_SOURCES = \
 	$(COMMON_SOURCES)
@@ -93,9 +92,9 @@ libesp_la_LDFLAGS = \
 ## Variables for building libesp_la
 ############################################################
 
-libesp_d_la_CFLAGS = \
+libesp_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
-	$(AM_CFLAGS)
+	$(AM_CXXFLAGS)
 
 libesp_d_la_SOURCES = \
 	$(COMMON_SOURCES)
@@ -110,9 +109,9 @@ libesp_d_la_LDFLAGS = \
 ## Variables for building libesp_la
 ############################################################
 
-libesp_p_la_CFLAGS = \
+libesp_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
-	$(AM_CFLAGS)
+	$(AM_CXXFLAGS)
 
 libesp_p_la_SOURCES = \
 	$(COMMON_SOURCES)

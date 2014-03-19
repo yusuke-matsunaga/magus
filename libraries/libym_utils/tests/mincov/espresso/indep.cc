@@ -9,17 +9,16 @@
  */
 #include "mincov_int.h"
 
-static sm_matrix *build_intersection_matrix();
+static sm_matrix *build_intersection_matrix(sm_matrix*);
 
 
 #if 0
 /*
  *  verify that all rows in 'indep' are actually independent !
  */
-static int 
-verify_indep_set(A, indep)
-sm_matrix *A;
-sm_row *indep;
+static int
+verify_indep_set(sm_matrix* A,
+		 sm_row* indep)
 {
     register sm_row *prow, *prow1;
     register sm_element *p, *p1;
@@ -37,10 +36,9 @@ sm_row *indep;
 }
 #endif
 
-solution_t * 
-sm_maximal_independent_set(A, weight)
-sm_matrix *A;
-int *weight;
+solution_t *
+sm_maximal_independent_set(sm_matrix* A,
+			   int* weight)
 {
     register sm_row *best_row, *prow;
     register sm_element *p;
@@ -95,9 +93,9 @@ int *weight;
     return indep;
 }
 
-static sm_matrix *
-build_intersection_matrix(A)
-sm_matrix *A;
+static
+sm_matrix *
+build_intersection_matrix(sm_matrix* A)
 {
     register sm_row *prow, *prow1;
     register sm_element *p, *p1;

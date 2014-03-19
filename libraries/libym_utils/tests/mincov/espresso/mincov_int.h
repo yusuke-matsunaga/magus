@@ -38,16 +38,23 @@ struct solution_struct {
 
 
 extern solution_t *solution_alloc();
-extern void solution_free();
-extern solution_t *solution_dup();
-extern void solution_accept();
-extern void solution_reject();
-extern void solution_add();
-extern solution_t *solution_choose_best();
+extern void solution_free(solution_t*);
+extern solution_t *solution_dup(solution_t*);
+extern void solution_accept(solution_t*, sm_matrix*, int*, int);
+extern void solution_reject(solution_t*, sm_matrix*, int*, int);
+extern void solution_add(solution_t*, int*, int);
+extern solution_t *solution_choose_best(solution_t*, solution_t*);
 
-extern solution_t *sm_maximal_independent_set();
-extern solution_t *sm_mincov();
-extern int gimpel_reduce();
+extern solution_t *sm_maximal_independent_set(sm_matrix*, int*);
+extern solution_t *sm_mincov(sm_matrix*, solution_t*, int*, int, int , int, stats_t*);
+extern int gimpel_reduce(sm_matrix*,
+			 solution_t*,
+			 int*,
+			 int,
+			 int,
+			 int,
+			 stats_t*,
+			 solution_t**);
 
 
 #define WEIGHT(weight, col)	(weight == NIL(int) ? 1 : weight[col])

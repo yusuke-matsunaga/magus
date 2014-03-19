@@ -8,10 +8,8 @@
 
 
 #include "utils/MinCov.h"
-extern "C" {
 #include "espresso/sparse.h"
 #include "espresso/mincov.h"
-}
 
 BEGIN_NAMESPACE_YM
 
@@ -260,11 +258,12 @@ mincov_test(int argc,
 	}
 	++ rownum;
       }
-      sm_row* solution = sm_minimum_cover(A, NULL, 0, 0);
+      sm_row* solution = sm_minimum_cover(A, NULL, 0, 5);
       sm_element* pe;
       sm_foreach_row_element(solution, pe) {
 	cout << " " << pe->col_num;
       }
+      return 0;
     }
 
     MinCov mincov;

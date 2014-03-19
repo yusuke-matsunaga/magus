@@ -13,12 +13,17 @@
  *  mincov.c
  */
 
-#define USE_GIMPEL
+//#define USE_GIMPEL
 #define USE_INDEP_SET
 
-static int select_column();
-static void select_essential();
-static int verify_cover();
+static int select_column(sm_matrix* A,
+			 int* weight,
+			 solution_t* indep);
+static void select_essential(sm_matrix* A,
+			     solution_t* select,
+			     int* weight,
+			     int bound);
+static int verify_cover(sm_matrix*, sm_row*);
 
 #define fail(why) {\
     (void) fprintf(stderr, "Fatal error: file %s, line %d\n%s\n",\
@@ -28,11 +33,10 @@ static int verify_cover();
 }
 
 sm_row *
-sm_minimum_cover(A, weight, heuristic, debug_level)
-sm_matrix *A;
-int *weight;
-int heuristic;		/* set to 1 for a heuristic covering */
-int debug_level;	/* how deep in the recursion to provide info */
+sm_minimum_cover(sm_matrix* A,
+		 int* weight,
+		 int heuristic,	/* set to 1 for a heuristic covering */
+		 int debug_level)/* how deep in the recursion to provide info */
 {
     stats_t stats;
     solution_t *best, *select;
@@ -87,7 +91,7 @@ int debug_level;	/* how deep in the recursion to provide info */
 		A->nrows, A->ncols, nelem, sparsity * 100.0);
 	(void) printf("cover size = %d elements\n", best->row->length);
 	(void) printf("cover cost = %d\n", best->cost);
-	(void) printf("time       = %s\n", 
+	(void) printf("time       = %s\n",
 			util_print_time(util_cpu_time() - stats.start_time));
 	(void) printf("components = %d\n", stats.comp_count);
 	(void) printf("gimpel     = %d\n", stats.gimpel_count);
@@ -112,15 +116,14 @@ int debug_level;	/* how deep in the recursion to provide info */
  *      and can be returned without further work.
  */
 
-solution_t * 
-sm_mincov(A, select, weight, lb, bound, depth, stats)
-sm_matrix *A;
-solution_t *select;
-int *weight;
-int lb;
-int bound;
-int depth;
-stats_t *stats;
+solution_t *
+sm_mincov(sm_matrix* A,
+	  solution_t* select,
+	  int* weight,
+	  int lb,
+	  int bound,
+	  int depth,
+	  stats_t* stats)
 {
     sm_matrix *A1, *A2, *L, *R;
     sm_element *p;
@@ -167,8 +170,8 @@ stats_t *stats;
     if (debug) {
         (void) printf("ABSMIN[%2d]%s", depth, stats->component ? "*" : " ");
         (void) printf(" %3dx%3d sel=%3d bnd=%3d lb=%3d %12s ",
-            A->nrows, A->ncols, select->cost + stats->gimpel, 
-	    bound + stats->gimpel, lb_new + stats->gimpel, 
+            A->nrows, A->ncols, select->cost + stats->gimpel,
+	    bound + stats->gimpel, lb_new + stats->gimpel,
 	    util_print_time(util_cpu_time()-stats->start_time));
     }
 
@@ -183,8 +186,8 @@ stats_t *stats;
 	best = solution_dup(select);
 	if (debug) (void) printf("BEST\n");
 	if (stats->debug && stats->component == 0) {
-            (void) printf("new 'best' solution %d at level %d (time is %s)\n", 
-		best->cost + stats->gimpel, depth, 
+            (void) printf("new 'best' solution %d at level %d (time is %s)\n",
+		best->cost + stats->gimpel, depth,
 		util_print_time(util_cpu_time() - stats->start_time));
         }
 
@@ -203,7 +206,7 @@ stats_t *stats;
 	/* Solve problem for L */
 	select1 = solution_alloc();
 	stats->component++;
-	best1 = sm_mincov(L, select1, weight, 0, 
+	best1 = sm_mincov(L, select1, weight, 0,
 				    bound-select->cost, depth+1, stats);
 	stats->component--;
 	solution_free(select1);
@@ -264,11 +267,11 @@ stats_t *stats;
     return best;
 }
 
-static int 
-select_column(A, weight, indep)
-sm_matrix *A;
-int *weight;
-solution_t *indep;
+static
+int
+select_column(sm_matrix* A,
+	      int* weight,
+	      solution_t* indep)
 {
     register sm_col *pcol;
     register sm_row *prow, *indep_cols;
@@ -321,12 +324,11 @@ solution_t *indep;
     return best_col;
 }
 
-static void 
-select_essential(A, select, weight, bound)
-sm_matrix *A;
-solution_t *select;
-int *weight;
-int bound;			/* must beat this solution */
+static void
+select_essential(sm_matrix* A,
+		 solution_t* select,
+		 int* weight,
+		 int bound)/* must beat this solution */
 {
     register sm_element *p;
     register sm_row *prow, *essen;
@@ -334,45 +336,44 @@ int bound;			/* must beat this solution */
 
     do {
 	/*  Check for dominated columns  */
-	delcols = sm_col_dominance(A, weight);
+      delcols = sm_col_dominance(A, weight);
 
-	/*  Find the rows with only 1 element (the essentials) */
-	essen = sm_row_alloc();
-	sm_foreach_row(A, prow) {
-	    if (prow->length == 1) {
-		(void) sm_row_insert(essen, prow->first_col->col_num);
-	    }
+      /*  Find the rows with only 1 element (the essentials) */
+      essen = sm_row_alloc();
+      sm_foreach_row(A, prow) {
+	if (prow->length == 1) {
+	  (void) sm_row_insert(essen, prow->first_col->col_num);
 	}
+      }
 
-	/* Select all of the elements */
-	sm_foreach_row_element(essen, p) {
-	    solution_accept(select, A, weight, p->col_num);
-	    /* Make sure solution still looks good */
-	    if (select->cost >= bound) {
-		sm_row_free(essen);
-		return;
-	    }
+      /* Select all of the elements */
+      sm_foreach_row_element(essen, p) {
+	solution_accept(select, A, weight, p->col_num);
+	/* Make sure solution still looks good */
+	if (select->cost >= bound) {
+	  sm_row_free(essen);
+	  return;
 	}
-	essen_count = essen->length;
-	sm_row_free(essen);
+      }
+      essen_count = essen->length;
+      sm_row_free(essen);
 
-	/*  Check for dominated rows  */
-	delrows = sm_row_dominance(A);
+      /*  Check for dominated rows  */
+      delrows = sm_row_dominance(A);
 
     } while (delcols > 0 || delrows > 0 || essen_count > 0);
 }
 
-static int 
-verify_cover(A, cover)
-sm_matrix *A;
-sm_row *cover;
+static int
+verify_cover(sm_matrix* A,
+	     sm_row* cover)
 {
-    sm_row *prow;
+  sm_row *prow;
 
-    sm_foreach_row(A, prow) {
-	if (! sm_row_intersects(prow, cover)) {
-	    return 0;
-	}
+  sm_foreach_row(A, prow) {
+    if (! sm_row_intersects(prow, cover)) {
+      return 0;
     }
-    return 1;
+  }
+  return 1;
 }

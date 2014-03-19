@@ -27,8 +27,8 @@ bool McSolver_debug = false;
 // @brief コンストラクタ
 McSolver::McSolver()
 {
-  //mLbCalc = new LbCS();
-  mLbCalc = new LbMIS();
+  mLbCalc = new LbCS();
+  //mLbCalc = new LbMIS();
   mSelector = new SelSimple();
   //mSelector = new SelCS();
   mMatrix = NULL;

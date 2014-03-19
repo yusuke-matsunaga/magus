@@ -135,9 +135,59 @@ extern int sm_row_dominance(), sm_col_dominance(), sm_block_partition();
 #else
 sm_matrix* sm_alloc();
 sm_matrix* sm_alloc_size(int r, int c);
+void sm_free(sm_matrix*);
+sm_matrix* sm_dup(sm_matrix*);
+void sm_resize(sm_matrix*, int, int);
 sm_element* sm_insert(sm_matrix* A, int r, int c);
-sm_element* sm_col_insert(sm_col* pcol, int row);
+sm_element* sm_find(sm_matrix*, int, int);
+void sm_remove(sm_matrix*, int, int);
+void sm_remove_element(sm_matrix*, sm_element*);
+void sm_delrow(sm_matrix*, int);
+void sm_delcol(sm_matrix*, int);
+void sm_copy_row(sm_matrix*, int, sm_row*);
+void sm_copy_col(sm_matrix*, int, sm_col*);
+sm_row* sm_longest_row(sm_matrix*);
+sm_col* sm_longest_col(sm_matrix*);
+int sm_num_elements(sm_matrix*);
+int sm_read(FILE*, sm_matrix**);
+int sm_read_compressed(FILE*, sm_matrix**);
+void sm_write(FILE*, sm_matrix*);
+void sm_print(FILE*, sm_matrix*);
+void sm_dump(sm_matrix*, char*, int);
+void sm_cleanup();
+
+sm_row* sm_row_alloc();
+void sm_row_free(sm_row*);
+sm_row* sm_row_dup(sm_row*);
 sm_element* sm_row_insert(sm_row* prow, int col);
+void sm_row_remove(sm_row*, int);
+sm_element* sm_row_find(sm_row*, int);
+int sm_row_contains(sm_row*, sm_row*);
+int sm_row_intersects(sm_row*, sm_row*);
+int sm_row_compare(sm_row*, sm_row*);
+sm_row* sm_row_and(sm_row*, sm_row*);
+int sm_row_hash(sm_row*, int);
+void sm_row_remove_element(sm_row*, sm_element*);
+void sm_row_print(FILE*, sm_row*);
+
+sm_col* sm_col_alloc();
+void sm_col_free(sm_col*);
+sm_col* sm_col_dup(sm_col*);
+sm_element* sm_col_insert(sm_col* pcol, int row);
+void sm_col_remove(sm_col*, int);
+sm_element* sm_col_find(sm_col*, int);
+int sm_col_contains(sm_col*, sm_col*);
+int sm_col_intersects(sm_col*, sm_col*);
+int sm_col_compare(sm_col*, sm_col*);
+sm_col* sm_col_and(sm_col*, sm_col*);
+int sm_col_hash(sm_row*, int);
+void sm_col_remove_element(sm_col*, sm_element*);
+void sm_col_print(FILE*, sm_col*);
+
+int sm_row_dominance(sm_matrix*);
+int sm_col_dominance(sm_matrix*, int*);
+int
+sm_block_partition(sm_matrix*, sm_matrix**, sm_matrix**);
 #endif
 
 #endif
