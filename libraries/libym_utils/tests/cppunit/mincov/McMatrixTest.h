@@ -28,7 +28,6 @@ class McMatrixTest :
   // テストスイートの登録
   CPPUNIT_TEST_SUITE( McMatrixTest );
   CPPUNIT_TEST( test_empty_matrix );
-  CPPUNIT_TEST( test_resize );
   CPPUNIT_TEST( test_clear );
   CPPUNIT_TEST( test_simple_matrix );
   CPPUNIT_TEST( test_delete_row );
@@ -51,10 +50,6 @@ public:
   /// @brief 空の行列のテスト
   void
   test_empty_matrix();
-
-  /// @brief resize のテスト
-  void
-  test_resize();
 
   /// @brief clear のテスト
   void

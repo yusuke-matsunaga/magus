@@ -41,7 +41,7 @@ void
 McMatrixTest::new_matrix(ymuint row_num,
 			 ymuint col_num)
 {
-  mMatrix1 = new McMatrix(row_num, col_num);
+  mMatrix1 = new McMatrix(row_num, col_num, NULL);
   mRowNum = row_num;
   mColNum = col_num;
   mVerMatrix.resize(mRowNum * mColNum, false);
@@ -101,7 +101,7 @@ McMatrixTest::test_empty_matrix()
 {
   ymuint row_num = 10;
   ymuint col_num = 20;
-  McMatrix* matrix = new McMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num, NULL);
   CPPUNIT_ASSERT( matrix != NULL );
   CPPUNIT_ASSERT_EQUAL( row_num, matrix->row_size() );
   CPPUNIT_ASSERT_EQUAL( col_num, matrix->col_size() );
@@ -116,26 +116,13 @@ McMatrixTest::test_empty_matrix()
   delete matrix;
 }
 
-// @brief resize のテスト
-void
-McMatrixTest::test_resize()
-{
-  McMatrix* matrix = new McMatrix(5, 5);
-  CPPUNIT_ASSERT( matrix != NULL );
-  ymuint row_num = 10;
-  ymuint col_num = 20;
-  matrix->resize(row_num, col_num);
-  CPPUNIT_ASSERT_EQUAL( row_num, matrix->row_size() );
-  CPPUNIT_ASSERT_EQUAL( col_num, matrix->col_size() );
-}
-
 // @brief clear のテスト
 void
 McMatrixTest::test_clear()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  McMatrix* matrix = new McMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num, NULL);
   CPPUNIT_ASSERT( matrix != NULL );
 
   ymuint32 pos_pair[] = {
@@ -174,7 +161,7 @@ McMatrixTest::test_simple_matrix()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  McMatrix* matrix = new McMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num, NULL);
   CPPUNIT_ASSERT( matrix != NULL );
   vector<bool> ver_matrix(row_num * col_num, false);
 
@@ -216,7 +203,7 @@ McMatrixTest::test_delete_row()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  McMatrix* matrix = new McMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num, NULL);
   CPPUNIT_ASSERT( matrix != NULL );
   vector<bool> ver_matrix(row_num * col_num, false);
 
@@ -267,7 +254,7 @@ McMatrixTest::test_delete_col()
 {
   ymuint row_num = 10;
   ymuint col_num = 10;
-  McMatrix* matrix = new McMatrix(row_num, col_num);
+  McMatrix* matrix = new McMatrix(row_num, col_num, NULL);
   CPPUNIT_ASSERT( matrix != NULL );
   vector<bool> ver_matrix(row_num * col_num, false);
 

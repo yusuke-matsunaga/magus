@@ -52,8 +52,9 @@ public:
   /// row_list はブロック分割の1つのグループである
   /// 必要がある．
   void
-  set_matrix(const McMatrix& matrix,
-	     const vector<const McRowHead*>& row_list);
+  set_matrix(McMatrix& matrix,
+	     const vector<ymuint32>& row_list,
+	     const vector<ymuint32>& col_list);
 
   /// @brief 最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
@@ -92,11 +93,12 @@ private:
 	ymuint depth);
 
   /// @brief ブロック分割を行う．
-  /// @param[in] solver_list 分割された小問題のソルバーのリスト
+  /// @param[in] solver1, solver2 分割された小問題のソルバー
   /// @retval true ブロック分割が行われた．
   /// @retval false ブロック分割が行えなかった．
   bool
-  block_partition(vector<McSolverImpl*>& solver_list);
+  block_partition(McSolverImpl& solver1,
+		  McSolverImpl& solver2);
 
 
 private:

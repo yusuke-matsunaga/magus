@@ -28,9 +28,11 @@ public:
   /// @brief コンストラクタ
   /// @param[in] row_size 行数
   /// @param[in] col_size 列数
+  /// @param[in] cost_array コストの配列
   /// @note 要素を持たない行列となる．
   McMatrix(ymuint32 row_size,
-	   ymuint32 col_size);
+	   ymuint32 col_size,
+	   const ymuint32* cost_array);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
@@ -63,6 +65,11 @@ public:
   const McRowHead*
   row(ymuint32 row_pos) const;
 
+  /// @brief 行を取り出す．
+  /// @param[in] row_pos 行位置 ( 0 <= row_pos < row_size() )
+  McRowHead*
+  row(ymuint32 row_pos);
+
   /// @brief 行の先頭を取り出す．
   const McRowHead*
   row_front() const;
@@ -79,16 +86,17 @@ public:
 
   /// @brief 実効的な行数を返す．
   ymuint32
-  _remain_row_size() const;
-
-  /// @brief 実効的な行数を返す．
-  ymuint32
   row_num() const;
 
   /// @brief 列を取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
   const McColHead*
   col(ymuint32 col_pos) const;
+
+  /// @brief 列を取り出す．
+  /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
+  McColHead*
+  col(ymuint32 col_pos);
 
   /// @brief 列の先頭を取り出す．
   const McColHead*
@@ -106,16 +114,16 @@ public:
 
   /// @brief 実効的な列数を返す．
   ymuint32
-  _remain_col_size() const;
-
-  /// @brief 実効的な列数を返す．
-  ymuint32
   col_num() const;
 
   /// @brief 列のコストを取り出す．
   /// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
   ymuint32
   col_cost(ymuint32 col_pos) const;
+
+  /// @brief 列のコストの配列を取り出す．
+  const ymuint32*
+  col_cost_array() const;
 
   /// @brief 列集合のコストを返す．
   /// @param[in] col_list 列のリスト
@@ -145,13 +153,15 @@ public:
   void
   clear();
 
-  /// @brief サイズを変更する．
-  /// @param[in] row_size 行数
-  /// @param[in] col_size 列数
-  /// @note 内容はクリアされる．
+  /// @brief 行と列をセットする．
   void
-  resize(ymuint32 row_size,
-	 ymuint32 col_size);
+  set(const vector<McRowHead*>& row_list,
+      const vector<McColHead*>& col_list);
+
+  /// @brief 分割した行列をもとに戻す．
+  void
+  merge(McMatrix* matrix1,
+	McMatrix* matrix2);
 
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
@@ -160,13 +170,6 @@ public:
   McCell*
   insert_elem(ymuint32 row_pos,
 	      ymuint32 col_pos);
-
-  /// @brief 列のコストを設定する．
-  /// @param[in] col_pos 列番号
-  /// @param[in] value 設定する値
-  void
-  set_col_cost(ymuint32 col_pos,
-	       ymuint32 value);
 
   /// @brief 列を選択し，被覆される行を削除する．
   /// @param[in] col_pos 選択した列
@@ -215,6 +218,22 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 実効的な行数を返す．
+  ymuint32
+  _remain_row_size() const;
+
+  /// @brief 実効的な列数を返す．
+  ymuint32
+  _remain_col_size() const;
+
+  /// @brief サイズを変更する．
+  /// @param[in] row_size 行数
+  /// @param[in] col_size 列数
+  /// @note 内容はクリアされる．
+  void
+  resize(ymuint32 row_size,
+	 ymuint32 col_size);
 
   /// @brief 内容をコピーする．
   void
@@ -276,7 +295,7 @@ private:
   ymuint32 mColSize;
 
   // 行の先頭の配列
-  McRowHead* mRowArray;
+  McRowHead** mRowArray;
 
   // 行の先頭をつなぐリンクトリストのダミー
   McRowHead mRowHead;
@@ -285,7 +304,7 @@ private:
   ymuint32 mRowNum;
 
   // 列の先頭の配列
-  McColHead* mColArray;
+  McColHead** mColArray;
 
   // 列の先頭をつなぐリンクトリストのダミー
   McColHead mColHead;
@@ -293,26 +312,15 @@ private:
   // 実際の列数
   ymuint32 mColNum;
 
+  // コストの配列
+  // サイズは mColSize;
+  const ymuint32* mCostArray;
+
   // 削除の履歴を覚えておくスタック
   ymuint32* mDelStack;
 
   // mDelStack のポインタ
   ymuint32 mStackTop;
-
-  // マーク用のブール配列
-  bool* mMarkArray;
-
-  // 行番号のリスト
-  ymuint32* mRowIdList;
-
-  // mRowIdList の要素数
-  ymuint32 mRowIdListNum;
-
-  // 列番号のリスト
-  ymuint32* mColIdList;
-
-  // mColIdList の要素数
-  ymuint32 mColIdListNum;
 
 };
 
@@ -343,7 +351,22 @@ inline
 const McRowHead*
 McMatrix::row(ymuint32 row_pos) const
 {
-  return &mRowArray[row_pos];
+  if ( mRowArray[row_pos] == NULL ) {
+    mRowArray[row_pos] = new McRowHead(row_pos);
+  }
+  return mRowArray[row_pos];
+}
+
+// @brief 行の先頭を取り出す．
+// @param[in] row_pos 行位置 ( 0 <= row_pos < row_size() )
+inline
+McRowHead*
+McMatrix::row(ymuint32 row_pos)
+{
+  if ( mRowArray[row_pos] == NULL ) {
+    mRowArray[row_pos] = new McRowHead(row_pos);
+  }
+  return mRowArray[row_pos];
 }
 
 // @brief 行の先頭を取り出す．
@@ -387,7 +410,22 @@ inline
 const McColHead*
 McMatrix::col(ymuint32 col_pos) const
 {
-  return &mColArray[col_pos];
+  if ( mColArray[col_pos] == NULL ) {
+    mColArray[col_pos] = new McColHead(col_pos);
+  }
+  return mColArray[col_pos];
+}
+
+// @brief 列の先頭を取り出す．
+// @param[in] col_pos 列位置 ( 0 <= col_pos < col_size() )
+inline
+McColHead*
+McMatrix::col(ymuint32 col_pos)
+{
+  if ( mColArray[col_pos] == NULL ) {
+    mColArray[col_pos] = new McColHead(col_pos);
+  }
+  return mColArray[col_pos];
 }
 
 // @brief 列の先頭を取り出す．
@@ -431,18 +469,15 @@ inline
 ymuint32
 McMatrix::col_cost(ymuint32 col_pos) const
 {
-  return col(col_pos)->cost();
+  return mCostArray[col_pos];
 }
 
-// @brief 列のコストを設定する．
-// @param[in] col_pos 列番号
-// @param[in] value 設定する値
+// @brief 列のコストの配列を取り出す．
 inline
-void
-McMatrix::set_col_cost(ymuint32 col_pos,
-		       ymuint32 value)
+const ymuint32*
+McMatrix::col_cost_array() const
 {
-  mColArray[col_pos].set_cost(value);
+  return mCostArray;
 }
 
 // @brief スタックが空の時 true を返す．

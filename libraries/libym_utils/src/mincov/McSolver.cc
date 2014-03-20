@@ -38,6 +38,7 @@ McSolver::McSolver()
   mSelector = new SelSimple();
   //mSelector = new SelCS();
   mMatrix = NULL;
+  mCostArray = NULL;
 }
 
 // @brief デストラクタ
@@ -46,6 +47,7 @@ McSolver::~McSolver()
   delete mLbCalc;
   delete mSelector;
   delete mMatrix;
+  delete mCostArray;
 }
 
 // @brief 問題のサイズを設定する．
@@ -56,7 +58,12 @@ McSolver::set_size(ymuint32 row_size,
 		   ymuint32 col_size)
 {
   delete mMatrix;
-  mMatrix = new McMatrix(row_size, col_size);
+  delete mCostArray;
+  mCostArray = new ymuint32[col_size];
+  for (ymuint i = 0; i < col_size; ++ i) {
+    mCostArray[i] = 1;
+  }
+  mMatrix = new McMatrix(row_size, col_size, mCostArray);
 }
 
 // @brief 列のコストを設定する
@@ -66,7 +73,7 @@ void
 McSolver::set_col_cost(ymuint32 col_pos,
 		       ymuint32 cost)
 {
-  mMatrix->set_col_cost(col_pos, cost);
+  mCostArray[col_pos] = cost;
 }
 
 // @brief 要素を追加する．

@@ -31,7 +31,7 @@ LbMIS::operator()(const McMatrix& matrix)
 
   // まず，列を共有する行の関係を表す行列を作る．
   ymuint32 rs = matrix.row_size();
-  McMatrix M(rs, rs);
+  McMatrix M(rs, rs, NULL);
   for (const McRowHead* row1 = matrix.row_front();
        !matrix.is_row_end(row1); row1 = row1->next()) {
     for (const McCell* cell1 = row1->front();

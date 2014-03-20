@@ -27,7 +27,8 @@ class McRowHead
 private:
 
   /// @brief コンストラクタ
-  McRowHead();
+  /// @param[in] pos 行番号
+  McRowHead(ymuint pos);
 
   /// @brief デストラクタ
   ~McRowHead();
@@ -135,11 +136,17 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] pos 行番号
 inline
-McRowHead::McRowHead() :
+McRowHead::McRowHead(ymuint pos) :
+  mPos(pos),
   mNum(0),
+  mPrev(NULL),
+  mNext(NULL),
   mDeleted(false)
 {
+  mDummy.mLeftLink = &mDummy;
+  mDummy.mRightLink = &mDummy;
 }
 
 /// @brief デストラクタ

@@ -87,6 +87,9 @@ private:
   // 問題を表す行列
   McMatrix* mMatrix;
 
+  // コストの配列
+  ymuint32* mCostArray;
+
 };
 
 END_NAMESPACE_YM_MINCOV
