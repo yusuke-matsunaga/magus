@@ -10,6 +10,7 @@
 
 
 #include "mincov_nsdef.h"
+#include "McMatrix.h"
 #include "LbCalc.h"
 #include "Selector.h"
 
@@ -25,9 +26,23 @@ class McSolverImpl
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] matrix 問題の行列
   /// @param[in] lb_calc 下界の計算クラス
   /// @param[in] selector 列を選択するクラス
-  McSolverImpl(LbCalc& lb_calc,
+  McSolverImpl(const McMatrix& matrix,
+	       LbCalc& lb_calc,
+	       Selector& selector);
+
+  /// @brief コンストラクタ
+  /// @param[in] matrix 問題の行列
+  /// @param[in] row_list 注目する行番号のリスト
+  /// @param[in] col_list 注目する列番号のリスト
+  /// @param[in] lb_calc 下界の計算クラス
+  /// @param[in] selector 列を選択するクラス
+  McSolverImpl(McMatrix& matrix,
+	       const vector<ymuint32>& row_list,
+	       const vector<ymuint32>& col_list,
+	       LbCalc& lb_calc,
 	       Selector& selector);
 
   /// @brief デストラクタ
@@ -38,23 +53,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 問題の行列をコピーする．
-  /// @param[in] matrix コピー元の行列
-  void
-  set_matrix(const McMatrix& matrix);
-
-  /// @brief 問題の行列をコピーする．
-  /// @param[in] matrix コピー元の行列
-  /// @param[in] row_list 行のリスト
-  ///
-  /// block_partition で用いられる．
-  /// row_list はブロック分割の1つのグループである
-  /// 必要がある．
-  void
-  set_matrix(McMatrix& matrix,
-	     const vector<ymuint32>& row_list,
-	     const vector<ymuint32>& col_list);
 
   /// @brief 最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
@@ -92,14 +90,6 @@ private:
   solve(ymuint lb,
 	ymuint depth);
 
-  /// @brief ブロック分割を行う．
-  /// @param[in] solver1, solver2 分割された小問題のソルバー
-  /// @retval true ブロック分割が行われた．
-  /// @retval false ブロック分割が行えなかった．
-  bool
-  block_partition(McSolverImpl& solver1,
-		  McSolverImpl& solver2);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -113,7 +103,7 @@ private:
   Selector& mSelector;
 
   // 問題を表す行列
-  McMatrix* mMatrix;
+  McMatrix mMatrix;
 
   // 現在のベスト
   ymuint32 mBest;

@@ -92,12 +92,9 @@ McSolver::insert_elem(ymuint32 row_pos,
 ymuint32
 McSolver::exact(vector<ymuint32>& solution)
 {
-  McSolverImpl* impl = new McSolverImpl(*mLbCalc, *mSelector);
-  impl->set_matrix(*mMatrix);
+  McSolverImpl impl(*mMatrix, *mLbCalc, *mSelector);
 
-  ymuint32 cost = impl->exact(solution);
-
-  delete impl;
+  ymuint32 cost = impl.exact(solution);
 
   return cost;
 }

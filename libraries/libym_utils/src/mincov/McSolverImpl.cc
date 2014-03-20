@@ -87,60 +87,38 @@ verify_matrix(McMatrix& a,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] matrix 問題の行列
 // @param[in] lb_calc 下界の計算クラス
 // @param[in] selector 列を選択するクラス
-McSolverImpl::McSolverImpl(LbCalc& lb_calc,
+McSolverImpl::McSolverImpl(const McMatrix& matrix,
+			   LbCalc& lb_calc,
 			   Selector& selector) :
+  mMatrix(matrix),
   mLbCalc(lb_calc),
   mSelector(selector)
 {
-  mMatrix = NULL;
+}
+
+// @brief コンストラクタ
+// @param[in] matrix 問題の行列
+// @param[in] row_list 注目する行番号のリスト
+// @param[in] col_list 注目する列番号のリスト
+// @param[in] lb_calc 下界の計算クラス
+// @param[in] selector 列を選択するクラス
+McSolverImpl::McSolverImpl(McMatrix& matrix,
+			   const vector<ymuint32>& row_list,
+			   const vector<ymuint32>& col_list,
+			   LbCalc& lb_calc,
+			   Selector& selector) :
+  mMatrix(matrix, row_list, col_list),
+  mLbCalc(lb_calc),
+  mSelector(selector)
+{
 }
 
 // @brief デストラクタ
 McSolverImpl::~McSolverImpl()
 {
-  delete mMatrix;
-}
-
-// @brief 問題の行列をコピーする．
-void
-McSolverImpl::set_matrix(const McMatrix& matrix)
-{
-  delete mMatrix;
-  mMatrix = new McMatrix(matrix.row_size(), matrix.col_size(), matrix.col_cost_array());
-
-  for (const McRowHead* row = matrix.row_front();
-       !matrix.is_row_end(row); row = row->next()) {
-    ymuint row_pos = row->pos();
-    for (const McCell* cell = row->front();
-	 !row->is_end(cell); cell = cell->row_next()) {
-      ymuint col_pos = cell->col_pos();
-      mMatrix->insert_elem(row_pos, col_pos);
-    }
-  }
-}
-
-// @brief 問題の行列をコピーする．
-void
-McSolverImpl::set_matrix(McMatrix& src_matrix,
-			 const vector<ymuint32>& row_pos_list,
-			 const vector<ymuint32>& col_pos_list)
-{
-  delete mMatrix;
-  mMatrix = new McMatrix(src_matrix.row_size(), src_matrix.col_size(), src_matrix.col_cost_array());
-
-  ymuint nr = row_pos_list.size();
-  vector<McRowHead*> row_list(nr);
-  for (ymuint i = 0; i < nr; ++ i) {
-    row_list[i] = src_matrix.row(row_pos_list[i]);
-  }
-  ymuint nc = col_pos_list.size();
-  vector<McColHead*> col_list(nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    col_list[i] = src_matrix.col(col_pos_list[i]);
-  }
-  mMatrix->set(row_list, col_list);
 }
 
 // @brief 最小被覆問題を解く．
@@ -150,9 +128,9 @@ ymuint32
 McSolverImpl::exact(vector<ymuint32>& solution)
 {
   // 検証用にもとの行列をコピーしておく．
-  McMatrix orig_matrix(*mMatrix);
+  McMatrix orig_matrix(mMatrix);
   // こちらは McMatrix 自身が持つ復元機能
-  mMatrix->save();
+  mMatrix.save();
 
   solve_id = 0;
 
@@ -163,11 +141,11 @@ McSolverImpl::exact(vector<ymuint32>& solution)
   solution = mBestSolution;
 
   // 復元が正しいかチェックする．
-  mMatrix->restore();
-  verify_matrix(*mMatrix, orig_matrix);
+  mMatrix.restore();
+  verify_matrix(mMatrix, orig_matrix);
 
   // solution がカバーになっているかチェックする．
-  assert_cond( mMatrix->verify(solution), __FILE__, __LINE__);
+  assert_cond( mMatrix.verify(solution), __FILE__, __LINE__);
 
   cout << "Total branch: " << solve_id << endl;
 
@@ -182,11 +160,11 @@ McSolverImpl::solve(ymuint lb,
   ymuint cur_id = solve_id;
   ++ solve_id;
 
-  mMatrix->reduce(mCurSolution);
+  mMatrix.reduce(mCurSolution);
 
-  ymuint32 tmp_cost = mMatrix->cost(mCurSolution);
+  ymuint32 tmp_cost = mMatrix.cost(mCurSolution);
 
-  ymuint32 tmp_lb = mLbCalc(*mMatrix) + tmp_cost;
+  ymuint32 tmp_lb = mLbCalc(mMatrix) + tmp_cost;
   if ( lb < tmp_lb ) {
     lb = tmp_lb;
   }
@@ -197,8 +175,8 @@ McSolverImpl::solve(ymuint lb,
   }
 
   if ( cur_debug ) {
-    ymuint nr = mMatrix->row_num();
-    ymuint nc = mMatrix->col_num();
+    ymuint nr = mMatrix.row_num();
+    ymuint nc = mMatrix.col_num();
     cout << "[" << depth << "] " << nr << "x" << nc
 	 << " sel=" << tmp_cost << " bnd=" << mBest
 	 << " lb=" << lb;
@@ -211,7 +189,7 @@ McSolverImpl::solve(ymuint lb,
     return false;
   }
 
-  if ( mMatrix->row_num() == 0 ) {
+  if ( mMatrix.row_num() == 0 ) {
     mBest = tmp_cost;
     mBestSolution = mCurSolution;
     if ( cur_debug ) {
@@ -220,10 +198,14 @@ McSolverImpl::solve(ymuint lb,
     return true;
   }
 
-  McSolverImpl solver1(mLbCalc, mSelector);
-  McSolverImpl solver2(mLbCalc, mSelector);
-  if ( mDoPartition && block_partition(solver1, solver2) ) {
+  vector<ymuint32> row_list1;
+  vector<ymuint32> row_list2;
+  vector<ymuint32> col_list1;
+  vector<ymuint32> col_list2;
+  if ( mDoPartition && mMatrix.block_partition(row_list1, row_list2, col_list1, col_list2) ) {
     // ブロック分割を行う．
+    McSolverImpl solver1(mMatrix, row_list1, col_list1, mLbCalc, mSelector);
+    McSolverImpl solver2(mMatrix, row_list2, col_list2, mLbCalc, mSelector);
     if ( cur_debug ) {
       cout << endl
 	   << "BLOCK PARTITION" << endl;
@@ -233,9 +215,9 @@ McSolverImpl::solve(ymuint lb,
       cout << "Matrix#2" << endl;
       solver2.matrix().print(cout);
     }
-    solver1.mMatrix->save();
-    solver2.mMatrix->save();
-    ymuint32 cost_so_far = mMatrix->cost(mCurSolution);
+    solver1.mMatrix.save();
+    solver2.mMatrix.save();
+    ymuint32 cost_so_far = mMatrix.cost(mCurSolution);
     ymuint lb_rest = mLbCalc(solver2.matrix());
     solver1.mBest = mBest - cost_so_far - lb_rest;
     solver1.mCurSolution.clear();
@@ -251,12 +233,12 @@ McSolverImpl::solve(ymuint lb,
 	cost_so_far += solver2.mBest;
       }
     }
-    solver1.mMatrix->restore();
-    solver2.mMatrix->restore();
-    mMatrix->merge(solver1.mMatrix, solver2.mMatrix);
+    solver1.mMatrix.restore();
+    solver2.mMatrix.restore();
+    mMatrix.merge(solver1.mMatrix, solver2.mMatrix);
 
     if ( stat1 ) {
-      assert_cond( mMatrix->verify(mCurSolution), __FILE__, __LINE__);
+      assert_cond( mMatrix.verify(mCurSolution), __FILE__, __LINE__);
       if ( mBest > cost_so_far ) {
 	mBest = cost_so_far;
 	mBestSolution = mCurSolution;
@@ -267,18 +249,18 @@ McSolverImpl::solve(ymuint lb,
   }
 
   // 次の分岐のための列をとってくる．
-  ymuint col = mSelector(*mMatrix);
+  ymuint col = mSelector(mMatrix);
 
 #if defined(VERIFY_MINCOV)
-  McMatrix orig_matrix(*mMatrix);
+  McMatrix orig_matrix(mMatrix);
   vector<ymuint32> orig_solution(mCurSolution);
 #endif
 
   ymuint cur_n = mCurSolution.size();
-  mMatrix->save();
+  mMatrix.save();
 
   // その列を選択したときの最良解を求める．
-  mMatrix->select_col(col);
+  mMatrix.select_col(col);
   mCurSolution.push_back(col);
 
   if ( cur_debug ) {
@@ -287,14 +269,14 @@ McSolverImpl::solve(ymuint lb,
 
   bool stat1 = solve(lb, depth + 1);
 
-  mMatrix->restore();
+  mMatrix.restore();
   ymuint c = mCurSolution.size() - cur_n;
   for (ymuint i = 0; i < c; ++ i) {
     mCurSolution.pop_back();
   }
 
 #if defined(VERIFYY_MINCOV)
-  verify_matrix(orig_matrix, *mMatrix);
+  verify_matrix(orig_matrix, mMatrix);
   assert_cond( orig_solution == mCurSlution, __FILE__, __LINE__);
 #endif
 
@@ -304,7 +286,7 @@ McSolverImpl::solve(ymuint lb,
   }
 
   // その列を選択しなかったときの最良解を求める．
-  mMatrix->delete_col(col);
+  mMatrix.delete_col(col);
 
   if ( cur_debug ) {
     cout << "delete column#" << col << endl;
@@ -315,123 +297,11 @@ McSolverImpl::solve(ymuint lb,
   return stat1 || stat2;
 }
 
-
-BEGIN_NONAMESPACE
-
-ymuint
-mark_rows(const McMatrix& matrix,
-	  const McColHead* col);
-
-ymuint
-mark_cols(const McMatrix& matrix,
-	  const McRowHead* row)
-{
-  ymuint nr = 0;
-  for (const McCell* cell = row->front();
-       !row->is_end(cell); cell = cell->row_next()) {
-    ymuint col_pos = cell->col_pos();
-    const McColHead* col = matrix.col(col_pos);
-    if ( col->mWork == 0 ) {
-      col->mWork = 1;
-      nr += mark_rows(matrix, col);
-    }
-  }
-  return nr;
-}
-
-ymuint
-mark_rows(const McMatrix& matrix,
-	  const McColHead* col)
-{
-  ymuint nr = 0;
-  for (const McCell* cell = col->front();
-       !col->is_end(cell); cell = cell->col_next()) {
-    ymuint row_pos = cell->row_pos();
-    const McRowHead* row = matrix.row(row_pos);
-    if ( row->mWork == 0 ) {
-      row->mWork = 1;
-      ++ nr;
-      nr += mark_cols(matrix, row);
-    }
-  }
-  return nr;
-}
-
-END_NONAMESPACE
-
-// @brief ブロック分割を行う．
-// @param[in] solver1, solver2 分割された小問題のソルバー
-// @retval true ブロック分割が行われた．
-// @retval false ブロック分割が行えなかった．
-bool
-McSolverImpl::block_partition(McSolverImpl& solver1,
-			      McSolverImpl& solver2)
-{
-  // マークを消す．
-  for (const McRowHead* row = mMatrix->row_front();
-       !mMatrix->is_row_end(row); row = row->next()) {
-    row->mWork = 0;
-  }
-  for (const McColHead* col = mMatrix->col_front();
-       !mMatrix->is_col_end(col); col = col->next()) {
-    col->mWork = 0;
-  }
-
-  // 最初の行から到達可能な行と列にマークをつける．
-  const McRowHead* row0 = mMatrix->row_front();
-  ymuint nr1 = mark_cols(*mMatrix, row0);
-
-  ymuint nr = mMatrix->row_num();
-  if ( nr == nr1 ) {
-    return false;
-  }
-
-  vector<ymuint32> row_list1;
-  vector<ymuint32> row_list2;
-  row_list1.reserve(nr1);
-  row_list2.reserve(nr - nr1);
-  for (const McRowHead* row = mMatrix->row_front();
-       !mMatrix->is_row_end(row); row = row->next()) {
-    if ( row->mWork ) {
-      row_list1.push_back(row->pos());
-    }
-    else {
-      row_list2.push_back(row->pos());
-    }
-  }
-
-  ymuint nc = mMatrix->col_num();
-  vector<ymuint32> col_list1;
-  vector<ymuint32> col_list2;
-  col_list1.reserve(nc);
-  col_list2.reserve(nc);
-  for (const McColHead* col = mMatrix->col_front();
-       !mMatrix->is_col_end(col); col = col->next()) {
-    if ( col->mWork ) {
-      col_list1.push_back(col->pos());
-    }
-    else {
-      col_list2.push_back(col->pos());
-    }
-  }
-
-  if ( col_list1.size() < col_list2.size() ) {
-    solver1.set_matrix(*mMatrix, row_list1, col_list1);
-    solver2.set_matrix(*mMatrix, row_list2, col_list2);
-  }
-  else {
-    solver1.set_matrix(*mMatrix, row_list2, col_list2);
-    solver2.set_matrix(*mMatrix, row_list1, col_list1);
-  }
-
-  return true;
-}
-
 // @brief 内部の行列を返す．
 const McMatrix&
 McSolverImpl::matrix() const
 {
-  return *mMatrix;
+  return mMatrix;
 }
 
 // @brief partition フラグを設定する．

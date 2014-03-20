@@ -38,6 +38,14 @@ public:
   /// @param[in] src コピー元のオブジェクト
   McMatrix(const McMatrix& src);
 
+  /// @brief 部分的なコピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  /// @param[in] row_list コピーする行番号のリスト
+  /// @param[in] col_list コピーする列番号のリスト
+  McMatrix(McMatrix& src,
+	   const vector<ymuint32>& row_list,
+	   const vector<ymuint32>& col_list);
+
   /// @brief 代入演算子
   /// @param[in] src コピー元のオブジェクト
   const McMatrix&
@@ -130,6 +138,19 @@ public:
   ymuint32
   cost(const vector<ymuint32>& col_list) const;
 
+  /// @brief ブロック分割を行う．
+  /// @param[in] row_list1 1つめのブロックの行番号のリスト
+  /// @param[in] row_list2 2つめのブロックの行番号のリスト
+  /// @param[in] col_list1 1つめのブロックの列番号のリスト
+  /// @param[in] col_list2 2つめのブロックの列番号のリスト
+  /// @retval true ブロック分割が行われた．
+  /// @retval false ブロック分割が行えなかった．
+  bool
+  block_partition(vector<ymuint32>& row_list1,
+		  vector<ymuint32>& row_list2,
+		  vector<ymuint32>& col_list1,
+		  vector<ymuint32>& col_list2) const;
+
   /// @brief 列集合がカバーになっているか検証する．
   /// @param[in] col_list 列のリスト
   /// @retval true col_list がカバーになっている．
@@ -153,15 +174,10 @@ public:
   void
   clear();
 
-  /// @brief 行と列をセットする．
-  void
-  set(const vector<McRowHead*>& row_list,
-      const vector<McColHead*>& col_list);
-
   /// @brief 分割した行列をもとに戻す．
   void
-  merge(McMatrix* matrix1,
-	McMatrix* matrix2);
+  merge(McMatrix& matrix1,
+	McMatrix& matrix2);
 
   /// @brief 要素を追加する．
   /// @param[in] row_pos 追加する要素の行番号
@@ -234,6 +250,18 @@ private:
   void
   resize(ymuint32 row_size,
 	 ymuint32 col_size);
+
+  /// @brief col に接続している行をマークする．
+  /// @param[in] col 対象の列
+  /// @return マークされた列数を返す．
+  ymuint
+  mark_rows(const McColHead* col) const;
+
+  /// @brief row に接続している列をマークする．
+  /// @param[in] row 対象の行
+  /// @return マークされた列数を返す．
+  ymuint
+  mark_cols(const McRowHead* row) const;
 
   /// @brief 内容をコピーする．
   void
