@@ -14,7 +14,6 @@
 #include "McCell.h"
 #include "LbCalc.h"
 #include "Selector.h"
-#include "utils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -319,70 +318,43 @@ McSolverImpl::solve(ymuint lb,
 
 BEGIN_NONAMESPACE
 
-struct Lt
-{
-  bool
-  operator()(McSolverImpl* left,
-	     McSolverImpl* right)
-  {
-    if ( left->matrix().col_num() < right->matrix().col_num() ) {
-      return true;
-    }
-    if ( left->matrix().col_num() > right->matrix().col_num() ) {
-      return false;
-    }
-    return left->matrix().row_num() < right->matrix().row_num();
-  }
-};
-
-struct Gt
-{
-  bool
-  operator()(McSolverImpl* left,
-	     McSolverImpl* right)
-  {
-    if ( left->matrix().col_num() > right->matrix().col_num() ) {
-      return true;
-    }
-    if ( left->matrix().col_num() < right->matrix().col_num() ) {
-      return false;
-    }
-    return left->matrix().row_num() > right->matrix().row_num();
-  }
-};
-
-void
+ymuint
 mark_rows(const McMatrix& matrix,
 	  const McColHead* col);
 
-void
+ymuint
 mark_cols(const McMatrix& matrix,
 	  const McRowHead* row)
 {
+  ymuint nr = 0;
   for (const McCell* cell = row->front();
        !row->is_end(cell); cell = cell->row_next()) {
     ymuint col_pos = cell->col_pos();
     const McColHead* col = matrix.col(col_pos);
     if ( col->mWork == 0 ) {
       col->mWork = 1;
-      mark_rows(matrix, col);
+      nr += mark_rows(matrix, col);
     }
   }
+  return nr;
 }
 
-void
+ymuint
 mark_rows(const McMatrix& matrix,
 	  const McColHead* col)
 {
+  ymuint nr = 0;
   for (const McCell* cell = col->front();
        !col->is_end(cell); cell = cell->col_next()) {
     ymuint row_pos = cell->row_pos();
     const McRowHead* row = matrix.row(row_pos);
     if ( row->mWork == 0 ) {
       row->mWork = 1;
-      mark_cols(matrix, row);
+      ++ nr;
+      nr += mark_cols(matrix, row);
     }
   }
+  return nr;
 }
 
 END_NONAMESPACE
@@ -407,14 +379,17 @@ McSolverImpl::block_partition(McSolverImpl& solver1,
 
   // 最初の行から到達可能な行と列にマークをつける．
   const McRowHead* row0 = mMatrix->row_front();
-  mark_cols(*mMatrix, row0);
+  ymuint nr1 = mark_cols(*mMatrix, row0);
 
   ymuint nr = mMatrix->row_num();
+  if ( nr == nr1 ) {
+    return false;
+  }
+
   vector<ymuint32> row_list1;
   vector<ymuint32> row_list2;
-  row_list1.reserve(nr);
-  row_list2.reserve(nr);
-  bool partitioned = false;
+  row_list1.reserve(nr1);
+  row_list2.reserve(nr - nr1);
   for (const McRowHead* row = mMatrix->row_front();
        !mMatrix->is_row_end(row); row = row->next()) {
     if ( row->mWork ) {
@@ -422,11 +397,7 @@ McSolverImpl::block_partition(McSolverImpl& solver1,
     }
     else {
       row_list2.push_back(row->pos());
-      partitioned = true;
     }
-  }
-  if ( !partitioned ) {
-    return false;
   }
 
   ymuint nc = mMatrix->col_num();
