@@ -59,9 +59,9 @@ BtgHeapTree::move_down(BtgNode* node)
 	// 逆転
 	set(l_pos, p_node);
 	set(pos, l_node);
-	// これ以上子供はいない．
-	break;
       }
+      // これ以上子供はいない．
+      break;
     }
     else {
       // 左右の子供がいる場合
