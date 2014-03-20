@@ -11,7 +11,8 @@
 #include "McSolverImpl.h"
 #include "McMatrix.h"
 #include "LbMAX.h"
-#include "LbMIS.h"
+#include "LbMIS1.h"
+#include "LbMIS2.h"
 #include "LbCS.h"
 #include "SelSimple.h"
 #include "SelCS.h"
@@ -29,7 +30,7 @@ bool McSolver_debug = false;
 McSolver::McSolver()
 {
   LbCalc* calc1 = new LbCS();
-  LbCalc* calc2 = new LbMIS();
+  LbCalc* calc2 = new LbMIS1();
   LbMAX* calc3 = new LbMAX();
   calc3->add_calc(calc1);
   calc3->add_calc(calc2);

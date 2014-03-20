@@ -1,8 +1,8 @@
-#ifndef LBMIS_H
-#define LBMIS_H
+#ifndef LBMIS2_H
+#define LBMIS2_H
 
-/// @file LbMIS.h
-/// @brief LbMIS のヘッダファイル
+/// @file LbMIS2.h
+/// @brief LbMIS2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,10 +15,12 @@
 BEGIN_NAMESPACE_YM_MINCOV
 
 //////////////////////////////////////////////////////////////////////
-/// @class LbMIS LbMIS.h "LbMIS.h"
+/// @class LbMIS2 LbMIS2.h "LbMIS2.h"
 /// @brief MIS(maximum independent set) を用いた下界の計算クラス
+///
+/// ヒープを使って最小要素を取り出す．
 //////////////////////////////////////////////////////////////////////
-class LbMIS :
+class LbMIS2 :
   public LbCalc
 {
 public:
@@ -34,6 +36,5 @@ public:
 };
 
 END_NAMESPACE_YM_MINCOV
-
 
 #endif // LBMIS_H

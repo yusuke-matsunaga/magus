@@ -53,8 +53,10 @@ COMMON_SOURCES = \
 	LbCS.cc \
 	LbMAX.h \
 	LbMAX.cc \
-	LbMIS.h \
-	LbMIS.cc \
+	LbMIS1.h \
+	LbMIS1.cc \
+	LbMIS2.h \
+	LbMIS2.cc \
 	MaxClique.cc \
 	MaxClique.h \
 	McCell.h \
@@ -67,6 +69,9 @@ COMMON_SOURCES = \
 	McSolverImpl.h \
 	McSolverImpl.cc \
 	MinCov.cc \
+	MisNode.h \
+	MisNodeHeap.h \
+	MisNodeHeap.cc \
 	Selector.h \
 	SelNaive.h \
 	SelNaive.cc \
