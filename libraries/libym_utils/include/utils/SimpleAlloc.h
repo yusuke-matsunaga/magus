@@ -95,6 +95,17 @@ private:
 
   };
 
+  struct BigBlock
+  {
+    // サイズ
+    ymuint64 mSize;
+
+    // 次のブロックを指すリンク
+    BigBlock* mNext;
+
+    // 実際にはこの後に確保したメモリ領域がある．
+    char mDummy[1];
+  };
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -109,6 +120,9 @@ private:
 
   // 使用中のメモリ領域のリスト
   list<Page> mUsedList;
+
+  // BigBlock の先頭
+  BigBlock* mBlockTop;
 
 };
 

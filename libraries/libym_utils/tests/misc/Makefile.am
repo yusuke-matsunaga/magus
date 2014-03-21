@@ -51,7 +51,8 @@ noinst_PROGRAMS = \
 	StrListIDO_test \
 	Codec_test \
 	BtgMatch_test \
-	gctest
+	gctest \
+	SimpleAllocTest
 
 if YM_HAVE_ZLIB
 noinst_PROGRAMS += \
@@ -539,6 +540,20 @@ gctest_LDADD = \
 	$(YMUTILS)
 
 gctest_LDFLAGS = \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## Variables for building SimpleAllocTest
+############################################################
+
+SimpleAllocTest_SOURCES = \
+	SimpleAllocTest.cc
+
+SimpleAllocTest_LDADD = \
+	$(YMUTILS)
+
+SimpleAllocTest_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 

@@ -228,17 +228,28 @@ McMatrix::clear()
 
   for (ymuint i = 0; i < row_size(); ++ i) {
     delete mRowArray[i];
+    mRowArray[i] = NULL;
   }
   for (ymuint i = 0; i < col_size(); ++ i) {
     delete mColArray[i];
+    mColArray[i] = NULL;
   }
-
-  mRowNum = 0;
-  mColNum = 0;
 
   delete [] mRowArray;
   delete [] mColArray;
   delete [] mDelStack;
+
+  mRowArray = NULL;
+  mColArray = NULL;
+
+  mRowNum = 0;
+  mColNum = 0;
+
+  mRowHead.mNext = mRowHead.mPrev = &mRowHead;
+  mColHead.mNext = mColHead.mPrev = &mColHead;
+
+  mDelStack = NULL;
+  mStackTop = 0;
 }
 
 // @brief サイズを変更する．

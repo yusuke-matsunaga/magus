@@ -129,6 +129,7 @@ mincov_test(int argc,
   bool lp_solve = false;
   bool ilp_solve = false;
   bool espresso = false;
+  bool cs_lp = false;
   ymuint depth = 0;
   ymuint base = 1;
   while ( argc > base && argv[base][0] == '-' ) {
@@ -160,6 +161,10 @@ mincov_test(int argc,
     }
     else if ( strcmp(argv[base], "-espresso") == 0 ) {
       espresso = true;
+      ++ base;
+    }
+    else if ( strcmp(argv[base], "-cs_lp") == 0 ) {
+      cs_lp = true;
       ++ base;
     }
     else {
@@ -268,6 +273,100 @@ mincov_test(int argc,
       sm_foreach_row_element(solution, pe) {
 	cout << " " << pe->col_num;
       }
+      return 0;
+    }
+    if ( cs_lp ) {
+      vector<vector<ymuint> > row_list(max_r + 1);
+      vector<vector<ymuint> > col_list(max_c + 1);
+      for (vector<pair<int, int> >::iterator p = pair_list.begin();
+	   p != pair_list.end(); ++ p) {
+	ymuint r = p->second;
+	ymuint c = p->first;
+	row_list[r].push_back(c);
+	col_list[c].push_back(r);
+      }
+
+      // 各行の最小重みを表す変数
+      vector<ymuint> row_weights(max_r + 1);
+
+      // 分割された列の重みを表す変数
+      vector<ymuint> subcol_weights_top(max_c + 1);
+      vector<ymuint> subcol_num(max_c + 1);
+
+      ymuint vid = 0;
+      for (ymuint i = 0; i <= max_r; ++ i) {
+	const vector<ymuint>& rows = row_list[i];
+	ymuint n = rows.size();
+	if ( n > 0 ) {
+	  row_weights[i] = vid;
+	  ++ vid;
+	}
+	else {
+	  row_weights[i] = -1;
+	}
+      }
+      for (ymuint i = 0; i <= max_c; ++ i) {
+	const vector<ymuint>& cols = col_list[i];
+	ymuint n = cols.size();
+	subcol_weights_top[i] = vid;
+	subcol_num[i] = n;
+	vid += n;
+      }
+
+      cout << "max: ";
+      const char* plus = "";
+      for (ymuint i = 0; i <= max_r; ++ i) {
+	if ( row_weights[i] == -1 ) {
+	  continue;
+	}
+	cout << plus << "x" << row_weights[i];
+	plus = " + ";
+      }
+      cout << ";" << endl;
+      vector<ymuint> subcol_idx(max_c + 1);
+      for (ymuint i = 0; i <= max_c; ++ i) {
+	subcol_idx[i] = 0;
+      }
+      ymuint cnum = 1;
+      for (ymuint i = 0; i <= max_r; ++ i) {
+	const vector<ymuint>& rows = row_list[i];
+	if ( rows.empty() ) {
+	  continue;
+	}
+	for (ymuint j = 0; j < rows.size(); ++ j) {
+	  ymuint col = rows[j];
+	  ymuint idx = subcol_idx[col];
+	  ++ subcol_idx[col];
+	  cout << "C" << cnum << ": ";
+	  ++ cnum;
+	  cout << "x" << subcol_weights_top[col] + idx;
+	  cout << " >= x" << row_weights[i] << ";" << endl;
+	}
+	cout << "C" << cnum << ": ";
+	++ cnum;
+	cout << "x" << row_weights[i] << " >= 0;" << endl;
+      }
+      for (ymuint i = 0; i <= max_c; ++ i) {
+	ymuint n = subcol_num[i];
+	if ( n == 0 ) {
+	  continue;
+	}
+	cout << "C" << cnum << ": ";
+	++ cnum;
+	const char* plus = "";
+	ymuint base = subcol_weights_top[i];
+	for (ymuint j = 0; j < n; ++ j) {
+	  cout << plus << "x" << base + j;
+	  plus = " + ";
+	}
+	cout << " = 1;" << endl;
+	for (ymuint j = 0; j < n; ++ j) {
+	  cout << "C" << cnum << ": ";
+	  ++ cnum;
+	  cout << "x" << base + j << " >= 0;" << endl;
+	}
+      }
+
       return 0;
     }
 

@@ -76,7 +76,8 @@ run_all_test_LDADD = \
 	libym_utils_cppunit.la
 
 run_all_test_LDFLAGS = \
-	$(AM_LDFLAGS)
+	$(AM_LDFLAGS) \
+	-static
 
 
 ############################################################
@@ -108,6 +109,6 @@ libym_utils_cppunit_la_LIBADD = \
 	str/libstr_cppunit.la
 
 libym_utils_cppunit_la_LDFLAGS = \
-	$(top_builddir)/src/libym_utils.la \
+	$(top_builddir)/src/libym_utils_d.la \
 	$(CPPUNIT_LIBS) \
 	$(AM_LDFLAGS)

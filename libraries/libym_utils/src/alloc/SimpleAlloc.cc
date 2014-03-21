@@ -21,6 +21,7 @@ SimpleAlloc::SimpleAlloc(ymuint64 page_size)
 {
   assert_cond(page_size > 0, __FILE__, __LINE__);
   mPageSize = align(page_size);
+  mBlockTop = NULL;
 }
 
 // デストラクタ
@@ -35,7 +36,13 @@ SimpleAlloc::_get_memory(ymuint64 n)
 {
   if ( n > mPageSize ) {
     // mPageSize を越えるものは普通にアロケートする．
-    return alloc(n);
+    ymuint64 n1 = n + sizeof(BigBlock) - sizeof(char);
+    void* p = alloc(n1);
+    BigBlock* block = new (p) BigBlock();
+    block->mSize = n;
+    block->mNext = mBlockTop;
+    mBlockTop = block;
+    return &block->mDummy[0];
   }
 
   // ワード境界に乗るようにサイズに整える．
@@ -76,11 +83,6 @@ void
 SimpleAlloc::_put_memory(ymuint64 n,
 			 void* block)
 {
-  if ( n > mPageSize ) {
-    // mPageSize を越えるものは普通に開放する．
-    free(n, block);
-  }
-
   // このクラスでは領域の再利用はしない．
   return;
 }
@@ -104,6 +106,13 @@ SimpleAlloc::_destroy()
     free(mPageSize, chunk);
   }
   mUsedList.clear();
+
+  for (BigBlock* block = mBlockTop; block; ) {
+    BigBlock* next = block->mNext;
+    free(block->mSize + sizeof(BigBlock) - sizeof(char), block);
+    block = next;
+  }
+  mBlockTop = NULL;
 }
 
 // @brief アラインメントを考慮してサイズを調節する．

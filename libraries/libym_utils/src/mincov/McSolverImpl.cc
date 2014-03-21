@@ -209,7 +209,6 @@ McSolverImpl::solve(ymuint lb,
     if ( cur_debug ) {
       cout << endl
 	   << "BLOCK PARTITION" << endl;
-      matrix().print(cout);
       cout << "Matrix#1" << endl;
       solver1.matrix().print(cout);
       cout << "Matrix#2" << endl;

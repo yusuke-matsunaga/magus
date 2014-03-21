@@ -42,8 +42,19 @@ SimpleAllocTest::test_alloc()
 void
 SimpleAllocTest::test_destroy()
 {
-  for (ymuint i = 0; i < 10000000; ++ i) {
+  for (ymuint i = 0; i < 10000; ++ i) {
     void* p = mAllocPtr->get_memory(1024);
+    CPPUNIT_ASSERT( p != NULL );
+    mAllocPtr->destroy();
+  }
+}
+
+// @brief destroy() のテスト2
+void
+SimpleAllocTest::test_destroy2()
+{
+  for (ymuint i = 0; i < 10000; ++ i) {
+    void* p = mAllocPtr->get_memory(1024 * 1024);
     CPPUNIT_ASSERT( p != NULL );
     mAllocPtr->destroy();
   }

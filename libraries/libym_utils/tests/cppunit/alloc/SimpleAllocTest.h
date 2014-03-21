@@ -29,6 +29,7 @@ class SimpleAllocTest :
   CPPUNIT_TEST_SUITE( SimpleAllocTest );
   CPPUNIT_TEST( test_alloc );
   CPPUNIT_TEST( test_destroy );
+  CPPUNIT_TEST( test_destroy2 );
   CPPUNIT_TEST( test_set_mem_limit1 );
   CPPUNIT_TEST( test_set_mem_limit2 );
   CPPUNIT_TEST_SUITE_END();
@@ -53,6 +54,10 @@ public:
   /// @brief destroy() のテスト
   void
   test_destroy();
+
+  /// @brief destroy() のテスト
+  void
+  test_destroy2();
 
   /// @brief set_mem_limit() -> mem_limit() のテスト
   void
