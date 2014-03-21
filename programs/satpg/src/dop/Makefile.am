@@ -62,7 +62,8 @@ COMMON_SOURCES = \
 	DopTvList.h \
 	DopTvList.cc \
 	DopVerify.h \
-	DopVerify.cc
+	DopVerify.cc \
+	DopList.cc
 
 
 ############################################################

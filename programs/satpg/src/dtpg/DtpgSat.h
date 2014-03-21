@@ -59,8 +59,8 @@ public:
   /// @param[in] po_mode PO分割モード
   /// @param[in] fault_analysis 故障の支配関係を解析する．
   /// @param[in] bt バックトレーサー
-  /// @param[in] dop_list DetectOp のリスト
-  /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
@@ -68,8 +68,8 @@ public:
       tDtpgPoMode po_mode,
       bool fault_analysis,
       BackTracer& bt,
-      const vector<DetectOp*>& dop_list,
-      const vector<UntestOp*>& uop_list,
+      DetectOp& dop,
+      UntestOp& uop,
       DtpgStats& stats);
 
   /// @breif 時間計測を制御する．
@@ -108,82 +108,102 @@ private:
   /// @brief activate された部分回路に大してテスト生成を行う．
   /// @param[in] mode メインモード
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   dtpg1(DtpgMode mode,
-	BackTracer& bt);
+	BackTracer& bt,
+	DetectOp& dop,
+	UntestOp& uop);
 
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  single_mode(BackTracer& bt);
+  single_mode(BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop);
 
   /// @brief dual モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  dual_mode(BackTracer& bt);
+  dual_mode(BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief node モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  node_mode(BackTracer& bt);
+  node_mode(BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief ffr モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  ffr_mode(BackTracer& bt);
+  ffr_mode(BackTracer& bt,
+	   DetectOp& dop,
+	   UntestOp& uop);
 
   /// @brief ffr2 モードでテスト生成を行なう．
   /// @param[in] size_limit サイズの上限
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   ffr2_mode(ymuint size_limit,
-	    BackTracer& bt);
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  mffc_mode(BackTracer& bt);
+  mffc_mode(BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief all モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  all_mode(BackTracer& bt);
-
-  /// @brief single モードの共通処理
-  void
-  single_sub(BackTracer& bt);
-
-  /// @brief dual モードの共通処理
-  void
-  dual_sub(BackTracer& bt);
-
-  /// @brief ffr モードの共通処理
-  void
-  ffr_sub(BackTracer& bt);
-
-  /// @brief mffc モードの共通処理
-  void
-  mffc_sub(BackTracer& bt);
-
-  /// @brief all モードの共通処理
-  void
-  all_sub(BackTracer& bt);
+  all_mode(BackTracer& bt,
+	   DetectOp& dop,
+	   UntestOp& uop);
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
-  /// @param[in] op テスト生成の結果を処理するファンクター
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   dtpg_single(TpgFault* f,
-	      BackTracer& bt);
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop);
 
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
   /// @param[in] f0 0縮退故障
   /// @param[in] f1 1縮退故障
-  /// @param[in] op テスト生成の結果を処理するファンクター
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   dtpg_dual(TpgFault* f0,
 	    TpgFault* f1,
-	    BackTracer& bt);
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief DFS で FFR を求める．
   void
@@ -208,7 +228,9 @@ private:
 
   /// @brief テストパタン生成を行なう．
   void
-  do_dtpg(BackTracer& bt);
+  do_dtpg(BackTracer& bt,
+	  DetectOp& dop,
+	  UntestOp& uop);
 
 
 private:
@@ -230,12 +252,6 @@ private:
 
   // do_dtpg() で用いる対象の故障リスト
   vector<TpgFault*> mFaultList;
-
-  // テストパタンが求められたときに実行するファンクタのリスト
-  vector<DetectOp*> mDetectOpList;
-
-  // 検出不能と判定されたときに実行するファンクタのリスト
-  vector<UntestOp*> mUntestOpList;
 
 };
 
@@ -276,10 +292,12 @@ DtpgSat::add_fault(TpgFault* fault)
 // @brief テストパタン生成を行なう．
 inline
 void
-DtpgSat::do_dtpg(BackTracer& bt)
+DtpgSat::do_dtpg(BackTracer& bt,
+		 DetectOp& dop,
+		 UntestOp& uop)
 {
   if ( !mFaultList.empty() ) {
-    mSatEngine->run(mFaultList, mMaxId, bt);
+    mSatEngine->run(mFaultList, mMaxId, bt, dop, uop);
   }
 }
 

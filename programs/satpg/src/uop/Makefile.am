@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libatpg_sat_engine.la \
-	libatpg_sat_engine_d.la \
-	libatpg_sat_engine_p.la
+	libatpg_uop.la \
+	libatpg_uop_d.la \
+	libatpg_uop_p.la
 
 
 ############################################################
@@ -52,59 +52,59 @@ AM_CPPFLAGS = \
 ############################################################
 
 COMMON_SOURCES = \
-	satpg_engine_nsdef.h \
-	InputLiteral.h \
-	InputLiteral.cc \
-	SatEngineImpl.h \
-	SatEngineImpl.cc
+	UopBase.h \
+	UopBase.cc \
+	UopSkip.h \
+	UopSkip.cc \
+	UopList.cc
 
 
 ############################################################
-## libatpg_sat_engine.la 用の変数の定義
+## libatpg_uop.la 用の変数の定義
 ############################################################
 
-libatpg_sat_engine_la_CXXFLAGS = \
+libatpg_uop_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_sat_engine_la_SOURCES = \
+libatpg_uop_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_sat_engine_la_LIBADD =
+libatpg_uop_la_LIBADD =
 
-libatpg_sat_engine_la_LDFLAGS = \
+libatpg_uop_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_sat_engine.la 用の変数の定義
+## libatpg_uop_d.la 用の変数の定義
 ############################################################
 
-libatpg_sat_engine_d_la_CXXFLAGS = \
+libatpg_uop_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_sat_engine_d_la_SOURCES = \
+libatpg_uop_d_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_sat_engine_d_la_LIBADD =
+libatpg_uop_d_la_LIBADD =
 
-libatpg_sat_engine_d_la_LDFLAGS = \
+libatpg_uop_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_sat_engine_p.la 用の変数の定義
+## libatpg_uop_p.la 用の変数の定義
 ############################################################
 
-libatpg_sat_engine_p_la_CXXFLAGS = \
+libatpg_uop_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_sat_engine_p_la_SOURCES = \
+libatpg_uop_p_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_sat_engine_p_la_LIBADD =
+libatpg_uop_p_la_LIBADD =
 
-libatpg_sat_engine_p_la_LDFLAGS = \
+libatpg_uop_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

@@ -9,7 +9,8 @@
 
 #include "SatEngineImpl.h"
 
-#include "../DtpgSat.h"
+#include "DetectOp.h"
+#include "UntestOp.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
@@ -27,14 +28,10 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief SatEngine の継承クラスを生成する．
 SatEngine*
-new_SatEngine(DtpgSat& dtpg)
+new_SatEngine()
 {
-  return new nsSatEngine::SatEngineImpl(dtpg);
+  return new SatEngineImpl();
 }
-
-END_NAMESPACE_YM_SATPG
-
-BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
 
 BEGIN_NONAMESPACE
 
@@ -460,8 +457,7 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-SatEngineImpl::SatEngineImpl(DtpgSat& dtpg) :
-  mDtpg(dtpg)
+SatEngineImpl::SatEngineImpl()
 {
   mTimerEnable = false;
 }
@@ -535,7 +531,9 @@ END_NONAMESPACE
 void
 SatEngineImpl::run(const vector<TpgFault*>& flist,
 		   ymuint max_id,
-		   BackTracer& bt)
+		   BackTracer& bt,
+		   DetectOp& dop,
+		   UntestOp& uop)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -894,7 +892,7 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
     bool inv = (f->val() != 0);
     mAssumptions.push_back(Literal(fnode->gvar(), inv));
 
-    solve(solver, f, bt);
+    solve(solver, f, bt, dop, uop);
   }
   clear_node_mark();
 
@@ -905,7 +903,9 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 void
 SatEngineImpl::solve(SatSolver& solver,
 		     TpgFault* f,
-		     BackTracer& bt)
+		     BackTracer& bt,
+		     DetectOp& dop,
+		     UntestOp& uop)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -920,7 +920,7 @@ SatEngineImpl::solve(SatSolver& solver,
     TestVector* tv = bt(f->node(), mModel, mInputList, mOutputList);
 
     // パタンの登録などを行う．
-    mDtpg.set_detected(f, tv);
+    dop(f, tv);
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -930,7 +930,7 @@ SatEngineImpl::solve(SatSolver& solver,
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    mDtpg.set_untestable(f);
+    uop(f);
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -1018,4 +1018,4 @@ SatEngineImpl::update_stats(SatSolver& solver,
   mPropagationNum += sat_stat.mPropagationNum;
 }
 
-END_NAMESPACE_YM_SATPG_SAT_ENGINE
+END_NAMESPACE_YM_SATPG

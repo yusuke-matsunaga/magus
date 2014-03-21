@@ -12,7 +12,7 @@
 #include "TpgPrimitive.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 // クラス VectorInputLiteral
@@ -142,4 +142,4 @@ PrimFvarInputLiteral::size() const
   return mPrim->fanin_num();
 }
 
-END_NAMESPACE_YM_SATPG_SAT_ENGINE
+END_NAMESPACE_YM_SATPG

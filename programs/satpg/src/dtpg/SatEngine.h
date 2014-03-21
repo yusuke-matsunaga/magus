@@ -45,12 +45,16 @@ public:
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   /// @param[in] max_id ノード番号の最大値 + 1
-  /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   virtual
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
-      BackTracer& bt) = 0;
+      BackTracer& bt,
+      DetectOp& dop,
+      UntestOp& uop) = 0;
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -78,7 +82,7 @@ public:
 /// @brief SatEngine の継承クラスを生成する．
 extern
 SatEngine*
-new_SatEngine(DtpgSat& dtpg);
+new_SatEngine();
 
 END_NAMESPACE_YM_SATPG
 

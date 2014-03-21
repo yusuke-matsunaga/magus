@@ -5,11 +5,7 @@
 ## サブディレクトリの指定
 ############################################################
 
-SUBDIRS = \
-	sat_engine \
-	bt \
-	dop \
-	uop
+SUBDIRS =
 
 
 ############################################################
@@ -60,12 +56,18 @@ AM_CPPFLAGS = \
 COMMON_SOURCES = \
 	DtpgSat.h \
 	DtpgSat.cc \
+	DtpgSat2.h \
+	DtpgSat2.cc \
 	DtpgNgMgr.h \
 	DtpgNgMgr.cc \
 	DtpgNodeGroup.h \
 	DtpgNgEdge.h \
 	DtpgNodeGroup.cc \
-	SatEngine.h
+	SatEngine.h \
+	SatEngineImpl.h \
+	SatEngineImpl.cc \
+	InputLiteral.h \
+	InputLiteral.cc
 
 
 ############################################################
@@ -79,11 +81,7 @@ libatpg_dtpg_la_CXXFLAGS = \
 libatpg_dtpg_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_dtpg_la_LIBADD = \
-	sat_engine/libatpg_sat_engine.la \
-	bt/libatpg_bt.la \
-	dop/libatpg_dop.la \
-	uop/libatpg_uop.la
+libatpg_dtpg_la_LIBADD =
 
 libatpg_dtpg_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -100,11 +98,7 @@ libatpg_dtpg_d_la_CXXFLAGS = \
 libatpg_dtpg_d_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_dtpg_d_la_LIBADD = \
-	sat_engine/libatpg_sat_engine_d.la \
-	bt/libatpg_bt_d.la \
-	dop/libatpg_dop_d.la \
-	uop/libatpg_uop_d.la
+libatpg_dtpg_d_la_LIBADD =
 
 libatpg_dtpg_la_LDFLAGS = \
 	$(AM_LDFLAGS)
@@ -121,11 +115,7 @@ libatpg_dtpg_p_la_CXXFLAGS = \
 libatpg_dtpg_p_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_dtpg_p_la_LIBADD = \
-	sat_engine/libatpg_sat_engine_p.la \
-	bt/libatpg_bt_p.la \
-	dop/libatpg_dop_p.la \
-	uop/libatpg_uop_p.la
+libatpg_dtpg_p_la_LIBADD =
 
 libatpg_dtpg_la_LDFLAGS = \
 	$(AM_LDFLAGS)

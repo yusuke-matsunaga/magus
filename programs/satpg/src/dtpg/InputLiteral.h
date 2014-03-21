@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "sat_engine_nsdef.h"
+#include "satpg_nsdef.h"
 #include "logic/Literal.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 /// @class InputLiteral InputLiteral.h "InputLiter.h"
@@ -204,6 +204,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_SATPG_SAT_ENGINE
+END_NAMESPACE_YM_SATPG
 
 #endif // INPUTLITERAL_H

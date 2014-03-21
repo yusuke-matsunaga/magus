@@ -14,7 +14,9 @@
 #include "DtpgStats.h"
 #include "BackTracer.h"
 #include "DetectOp.h"
+#include "DopList.h"
 #include "UntestOp.h"
+#include "UopList.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -136,11 +138,11 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   bool fault_analysis = mPoptFaultAnalysis->is_specified();
 
-  vector<DetectOp*> dop_list;
-  vector<UntestOp*> uop_list;
+  DopList dop_list;
+  UopList uop_list;
 
-  dop_list.push_back(new_DopTvList(mgr()));
-  dop_list.push_back(new_DopBase(mgr()));
+  dop_list.add(new_DopTvList(mgr()));
+  dop_list.add(new_DopBase(mgr()));
 
   bool po_flag = mPoptPo->is_specified();
   bool rpo_flag = mPoptRpo->is_specified();
@@ -149,10 +151,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     skip_count = mPoptSkip->val();
   }
   if ( skip_count > 0 ) {
-    uop_list.push_back(new_UopSkip(mgr(), skip_count));
+    uop_list.add(new_UopSkip(mgr(), skip_count));
   }
   else {
-    uop_list.push_back(new_UopBase(mgr()));
+    uop_list.add(new_UopBase(mgr()));
   }
 
   ymuint xmode = 0;
@@ -170,10 +172,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptDrop->is_specified() ) {
-    dop_list.push_back(new_DopDrop(mgr()));
+    dop_list.add(new_DopDrop(mgr()));
   }
   if ( mPoptVerify->is_specified() ) {
-    dop_list.push_back(new_DopVerify(mgr()));
+    dop_list.add(new_DopVerify(mgr()));
   }
 
 #if 0
@@ -193,15 +195,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   DtpgStats stats;
 
   mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, fault_analysis, *bt, dop_list, uop_list, stats);
-
-  for (vector<DetectOp*>::iterator p = dop_list.begin();
-       p != dop_list.end(); ++ p) {
-    delete *p;
-  }
-  for (vector<UntestOp*>::iterator p = uop_list.begin();
-       p != uop_list.end(); ++ p) {
-    delete *p;
-  }
 
   after_update_faults();
 

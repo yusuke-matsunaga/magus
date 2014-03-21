@@ -33,6 +33,7 @@ noinst_HEADERS = \
 	AtpgMgr.h \
 	BackTracer.h \
 	DetectOp.h \
+	DopList.h \
 	Dtpg.h \
 	DtpgStats.h \
 	FaultMgr.h \
@@ -51,5 +52,6 @@ noinst_HEADERS = \
 	TpgPrimitive.h \
 	TvMgr.h \
 	UntestOp.h \
+	UopList.h \
 	Val3.h \
 	pysatpg.h

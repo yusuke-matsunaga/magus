@@ -10,8 +10,7 @@
 /// All rights reserved.
 
 
-#include "../SatEngine.h"
-#include "sat_engine_nsdef.h"
+#include "SatEngine.h"
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "logic/Literal.h"
@@ -20,7 +19,7 @@
 #include "utils/StopWatch.h"
 
 
-BEGIN_NAMESPACE_YM_SATPG_SAT_ENGINE
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
 /// @class SatEngineImpl SatEngineImpl.h "SatEngineImpl.h"
@@ -32,8 +31,7 @@ class SatEngineImpl :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dtpg DtpgSat
-  SatEngineImpl(DtpgSat& dtpg);
+  SatEngineImpl();
 
   /// @brief デストラクタ
   virtual
@@ -55,12 +53,16 @@ public:
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   /// @param[in] max_id ノード番号の最大値 + 1
-  /// @param[in] op テスト生成後に呼ばれるファンクター
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   virtual
   void
   run(const vector<TpgFault*>& flist,
       ymuint max_id,
-      BackTracer& bt);
+      BackTracer& bt,
+      DetectOp& dop,
+      UntestOp& uop);
 
   /// @brief 統計情報をクリアする．
   virtual
@@ -94,7 +96,9 @@ private:
   void
   solve(SatSolver& solver,
 	TpgFault* f,
-	BackTracer& bt);
+	BackTracer& bt,
+	DetectOp& dop,
+	UntestOp& uop);
 
   /// @brief ノードの変数割り当てフラグを消す．
   void
@@ -140,9 +144,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // DtpgSat
-  DtpgSat& mDtpg;
 
   // SAT solver のタイプ
   string mType;
@@ -306,6 +307,6 @@ SatEngineImpl::tmp_mark(TpgNode* node)
   return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
 }
 
-END_NAMESPACE_YM_SATPG_SAT_ENGINE
+END_NAMESPACE_YM_SATPG
 
 #endif // SATENGINEIMPL_H

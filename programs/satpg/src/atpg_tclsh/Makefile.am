@@ -100,6 +100,9 @@ atpg_tclsh_SOURCES = \
 atpg_tclsh_LDADD = \
 	$(top_builddir)/src/main/libatpg_main.la \
 	$(top_builddir)/src/dtpg/libatpg_dtpg.la \
+	$(top_builddir)/src/bt/libatpg_bt.la \
+	$(top_builddir)/src/dop/libatpg_dop.la \
+	$(top_builddir)/src/uop/libatpg_uop.la \
 	$(top_builddir)/src/rtpg/libatpg_rtpg.la \
 	$(top_builddir)/src/minpat/libatpg_minpat.la \
 	$(top_builddir)/src/fsim/libatpg_fsim.la \
@@ -129,6 +132,9 @@ atpg_tclsh_d_SOURCES = \
 atpg_tclsh_d_LDADD = \
 	$(top_builddir)/src/main/libatpg_main_d.la \
 	$(top_builddir)/src/dtpg/libatpg_dtpg_d.la \
+	$(top_builddir)/src/bt/libatpg_bt_d.la \
+	$(top_builddir)/src/dop/libatpg_dop_d.la \
+	$(top_builddir)/src/uop/libatpg_uop_d.la \
 	$(top_builddir)/src/rtpg/libatpg_rtpg_d.la \
 	$(top_builddir)/src/minpat/libatpg_minpat_d.la \
 	$(top_builddir)/src/fsim/libatpg_fsim_d.la \
@@ -158,6 +164,9 @@ atpg_tclsh_p_SOURCES = \
 atpg_tclsh_p_LDADD = \
 	$(top_builddir)/src/main/libatpg_main_p.la \
 	$(top_builddir)/src/dtpg/libatpg_dtpg_p.la \
+	$(top_builddir)/src/bt/libatpg_bt_p.la \
+	$(top_builddir)/src/dop/libatpg_dop_p.la \
+	$(top_builddir)/src/uop/libatpg_uop_p.la \
 	$(top_builddir)/src/rtpg/libatpg_rtpg_p.la \
 	$(top_builddir)/src/minpat/libatpg_minpat_p.la \
 	$(top_builddir)/src/fsim/libatpg_fsim_p.la \

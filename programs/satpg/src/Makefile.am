@@ -7,6 +7,9 @@ SUBDIRS = \
 	main \
 	fsim \
 	dtpg \
+	bt \
+	dop \
+	uop \
 	rtpg \
 	minpat \
 	atpg_tclsh \

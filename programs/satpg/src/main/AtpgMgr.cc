@@ -199,14 +199,14 @@ AtpgMgr::dtpg(DtpgMode mode,
 	      tDtpgPoMode po_mode,
 	      bool fault_analysis,
 	      BackTracer& bt,
-	      const vector<DetectOp*>& dop_list,
-	      const vector<UntestOp*>& uop_list,
+	      DetectOp& dop,
+	      UntestOp& uop,
 	      DtpgStats& stats)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  mDtpg->run(mode, po_mode, fault_analysis, bt, dop_list, uop_list, stats);
+  mDtpg->run(mode, po_mode, fault_analysis, bt, dop, uop, stats);
 
   mTimer.change(old_id);
 }

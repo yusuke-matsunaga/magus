@@ -55,8 +55,8 @@ public:
   /// @param[in] po_mode PO分割モード
   /// @param[in] fault_analysis 故障の支配関係を解析する．
   /// @param[in] bt バックトレーサー
-  /// @param[in] dop_list DetectOp のリスト
-  /// @param[in] uop_list UntestOp のリスト
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
@@ -64,8 +64,8 @@ public:
       tDtpgPoMode po_mode,
       bool fault_analysis,
       BackTracer& bt,
-      const vector<DetectOp*>& dop_list,
-      const vector<UntestOp*>& uop_list,
+      DetectOp& dop,
+      UntestOp& uop,
       DtpgStats& stats) = 0;
 
   /// @breif 時間計測を制御する．

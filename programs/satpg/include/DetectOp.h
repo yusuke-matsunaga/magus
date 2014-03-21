@@ -67,7 +67,6 @@ new_DopTvList(AtpgMgr& mgr);
 DetectOp*
 new_DopVerify(AtpgMgr& mgr);
 
-
 END_NAMESPACE_YM_SATPG
 
 #endif // DETECTOP_H
