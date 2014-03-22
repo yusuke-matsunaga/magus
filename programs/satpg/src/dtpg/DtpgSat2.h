@@ -48,11 +48,9 @@ public:
 
   /// @brief 回路と故障リストを設定する．
   /// @param[in] tpgnetwork 対象のネットワーク
-  /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(TpgNetwork& tgnetwork,
-	      FaultMgr& fault_mgr);
+  set_network(TpgNetwork& tgnetwork);
 
   /// @brief テスト生成を行なう．
   /// @param[in] mode メインモード
@@ -110,13 +108,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // SAT エンジン
-  SatEngine* mSatEngine;
+  SatEngine mSatEngine;
 
   // 対象の回路
   TpgNetwork* mNetwork;
-
-  // 故障マネージャ
-  FaultMgr* mFaultMgr;
 
   // mNetwork のノード数
   ymuint32 mMaxId;
@@ -133,7 +128,7 @@ inline
 void
 DtpgSat2::timer_enable(bool enable)
 {
-  mSatEngine->timer_enable(enable);
+  mSatEngine.timer_enable(enable);
 }
 
 END_NAMESPACE_YM_SATPG

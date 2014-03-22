@@ -1,13 +1,13 @@
 
-/// @file SatEngineImpl.cc
-/// @brief SatEngineImpl の実装ファイル
+/// @file SatEngine.cc
+/// @brief SatEngine の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngineImpl.h"
+#include "SatEngine.h"
 
 #include "DetectOp.h"
 #include "UntestOp.h"
@@ -21,17 +21,7 @@
 #include "logic/SatStats.h"
 
 
-#define VERIFY_MAIMP 0
-
-
 BEGIN_NAMESPACE_YM_SATPG
-
-// @brief SatEngine の継承クラスを生成する．
-SatEngine*
-new_SatEngine()
-{
-  return new SatEngineImpl();
-}
 
 BEGIN_NONAMESPACE
 
@@ -457,21 +447,21 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-SatEngineImpl::SatEngineImpl()
+SatEngine::SatEngine()
 {
   mTimerEnable = false;
 }
 
 // @brief デストラクタ
-SatEngineImpl::~SatEngineImpl()
+SatEngine::~SatEngine()
 {
 }
 
 // @brief 使用する SAT エンジンを指定する．
 void
-SatEngineImpl::set_mode(const string& type,
-			const string& option,
-			ostream* outp)
+SatEngine::set_mode(const string& type,
+		    const string& option,
+		    ostream* outp)
 {
   mType = type;
   mOption = option;
@@ -480,7 +470,7 @@ SatEngineImpl::set_mode(const string& type,
 
 // @brief 統計情報をクリアする．
 void
-SatEngineImpl::clear_stats()
+SatEngine::clear_stats()
 {
   mRunCount = 0;
   mSatCount = 0;
@@ -529,11 +519,11 @@ END_NONAMESPACE
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
 void
-SatEngineImpl::run(const vector<TpgFault*>& flist,
-		   ymuint max_id,
-		   BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
+SatEngine::run(const vector<TpgFault*>& flist,
+	       ymuint max_id,
+	       BackTracer& bt,
+	       DetectOp& dop,
+	       UntestOp& uop)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -901,11 +891,11 @@ SatEngineImpl::run(const vector<TpgFault*>& flist,
 
 // @brief 一つの SAT問題を解く．
 void
-SatEngineImpl::solve(SatSolver& solver,
-		     TpgFault* f,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop)
+SatEngine::solve(SatSolver& solver,
+		 TpgFault* f,
+		 BackTracer& bt,
+		 DetectOp& dop,
+		 UntestOp& uop)
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -949,7 +939,7 @@ SatEngineImpl::solve(SatSolver& solver,
 
 // @brief ノードの変数割り当てフラグを消す．
 void
-SatEngineImpl::clear_node_mark()
+SatEngine::clear_node_mark()
 {
   for (vector<TpgNode*>::iterator p = mUsedNodeList.begin();
        p != mUsedNodeList.end(); ++ p) {
@@ -962,7 +952,7 @@ SatEngineImpl::clear_node_mark()
 // @brief 統計情報を得る．
 // @param[in] stats 結果を格納する構造体
 void
-SatEngineImpl::get_stats(DtpgStats& stats) const
+SatEngine::get_stats(DtpgStats& stats) const
 {
   stats.mCnfGenCount = mCnfCount;
   stats.mCnfGenTime = mCnfTime;
@@ -992,15 +982,15 @@ SatEngineImpl::get_stats(DtpgStats& stats) const
 
 // @breif 時間計測を制御する．
 void
-SatEngineImpl::timer_enable(bool enable)
+SatEngine::timer_enable(bool enable)
 {
   mTimerEnable = enable;
 }
 
 // @brief 統計情報を得る．
 void
-SatEngineImpl::update_stats(SatSolver& solver,
-			    ymuint n)
+SatEngine::update_stats(SatSolver& solver,
+			ymuint n)
 {
   SatStats sat_stat;
   solver.get_stats(sat_stat);

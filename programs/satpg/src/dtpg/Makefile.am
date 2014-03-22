@@ -64,8 +64,7 @@ COMMON_SOURCES = \
 	DtpgNgEdge.h \
 	DtpgNodeGroup.cc \
 	SatEngine.h \
-	SatEngineImpl.h \
-	SatEngineImpl.cc \
+	SatEngine.cc \
 	InputLiteral.h \
 	InputLiteral.cc
 

@@ -12,8 +12,6 @@
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "TpgFault.h"
-#include "FaultMgr.h"
-#include "DetectOp.h"
 #include "DtpgNgMgr.h"
 #include "DtpgNodeGroup.h"
 #include "DtpgNgEdge.h"
@@ -39,15 +37,12 @@ new_DtpgSat()
 // @brief コンストラクタ
 DtpgSat::DtpgSat()
 {
-  mSatEngine = new_SatEngine();
-
   mNetwork = NULL;
 }
 
 // @brief デストラクタ
 DtpgSat::~DtpgSat()
 {
-  delete mSatEngine;
 }
 
 // @brief 使用する SAT エンジンを指定する．
@@ -56,18 +51,15 @@ DtpgSat::set_mode(const string& type,
 		  const string& option,
 		  ostream* outp)
 {
-  mSatEngine->set_mode(type, option, outp);
+  mSatEngine.set_mode(type, option, outp);
 }
 
 // @brief 回路と故障リストを設定する．
 // @param[in] tgnetwork 対象のネットワーク
-// @param[in] fault_mgr 故障マネージャ
 void
-DtpgSat::set_network(TpgNetwork& tgnetwork,
-		     FaultMgr& fault_mgr)
+DtpgSat::set_network(TpgNetwork& tgnetwork)
 {
   mNetwork = &tgnetwork;
-  mFaultMgr = &fault_mgr;
   mMaxId = mNetwork->node_num();
 }
 
@@ -88,9 +80,7 @@ DtpgSat::run(DtpgMode mode,
 	     UntestOp& uop,
 	     DtpgStats& stats)
 {
-  dop.set_faults(mFaultMgr->remain_list());
-
-  mSatEngine->clear_stats();
+  mSatEngine.clear_stats();
 
   switch ( po_mode ) {
   case kDtpgPoNone:
@@ -130,7 +120,7 @@ DtpgSat::run(DtpgMode mode,
     break;
   }
 
-  mSatEngine->get_stats(stats);
+  mSatEngine.get_stats(stats);
 }
 
 BEGIN_NONAMESPACE

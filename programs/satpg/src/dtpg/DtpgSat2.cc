@@ -10,16 +10,7 @@
 #include "DtpgSat2.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
 #include "TpgFault.h"
-#include "FaultMgr.h"
-#include "DetectOp.h"
-
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
-
-
-#define VERIFY_MAIMP 0
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -35,15 +26,12 @@ new_DtpgSat2()
 // @brief コンストラクタ
 DtpgSat2::DtpgSat2()
 {
-  mSatEngine = new_SatEngine();
-
   mNetwork = NULL;
 }
 
 // @brief デストラクタ
 DtpgSat2::~DtpgSat2()
 {
-  delete mSatEngine;
 }
 
 // @brief 使用する SAT エンジンを指定する．
@@ -52,18 +40,16 @@ DtpgSat2::set_mode(const string& type,
 		   const string& option,
 		   ostream* outp)
 {
-  mSatEngine->set_mode(type, option, outp);
+  mSatEngine.set_mode(type, option, outp);
 }
 
 // @brief 回路と故障リストを設定する．
 // @param[in] tgnetwork 対象のネットワーク
 // @param[in] fault_mgr 故障マネージャ
 void
-DtpgSat2::set_network(TpgNetwork& tgnetwork,
-		      FaultMgr& fault_mgr)
+DtpgSat2::set_network(TpgNetwork& tgnetwork)
 {
   mNetwork = &tgnetwork;
-  mFaultMgr = &fault_mgr;
   mMaxId = mNetwork->node_num();
 }
 
@@ -84,9 +70,7 @@ DtpgSat2::run(DtpgMode mode,
 	      UntestOp& uop,
 	      DtpgStats& stats)
 {
-  dop.set_faults(mFaultMgr->remain_list());
-
-  mSatEngine->clear_stats();
+  mSatEngine.clear_stats();
 
   switch ( po_mode ) {
   case kDtpgPoNone:
@@ -122,7 +106,7 @@ DtpgSat2::run(DtpgMode mode,
     break;
   }
 
-  mSatEngine->get_stats(stats);
+  mSatEngine.get_stats(stats);
 }
 
 // @brief activate された部分回路に対してテスト生成を行う．
@@ -170,7 +154,7 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        fault->is_rep() &&
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
-    mSatEngine->run(vector<TpgFault*>(1, fault), mMaxId, bt, dop, uop);
+    mSatEngine.run(vector<TpgFault*>(1, fault), mMaxId, bt, dop, uop);
  }
 }
 
