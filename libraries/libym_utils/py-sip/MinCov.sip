@@ -1,22 +1,22 @@
 
-/// @file McSolver.sip
-/// @brief McSolver の sip ファイル
+/// @file MinCov.sip
+/// @brief MinCov の sip ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-class McSolver
+class MinCov
 {
 %TypeHeaderCode
-#include "utils/McSolver.h"
-using nsYm::McSolver;
+#include "utils/MinCov.h"
+using nsYm::MinCov;
 %End
 
 public:
 
   /// @brief コンストラクタ
-  McSolver();
+  MinCov();
 
   /// @brief 問題のサイズを設定する．
   /// @param[in] row_size 行数

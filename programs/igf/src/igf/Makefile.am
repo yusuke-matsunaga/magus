@@ -59,10 +59,12 @@ AM_CPPFLAGS = \
 ############################################################
 
 igf_SOURCES = \
+	VectSetList.h \
+	IguGen.cc \
 	igf.cc
 
 igf_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -77,10 +79,12 @@ igf_LDFLAGS = \
 ############################################################
 
 migf_SOURCES = \
+	VectSetList.h \
+	IguGen.cc \
 	migf.cc
 
 migf_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -95,10 +99,12 @@ migf_LDFLAGS = \
 ############################################################
 
 igf2_SOURCES = \
+	VectSetList.h \
+	IguGen2.cc \
 	igf2.cc
 
 igf2_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -116,7 +122,7 @@ var_analyzer_SOURCES = \
 	var_analyzer.cc
 
 var_analyzer_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -134,7 +140,7 @@ phf_SOURCES = \
 	phf.cc
 
 phf_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -148,10 +154,12 @@ phf_LDFLAGS = \
 ############################################################
 
 phf_fixed_SOURCES = \
+	VectSetList.h \
+	IguGen.cc \
 	phf_fixed.cc
 
 phf_fixed_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -166,10 +174,12 @@ phf_fixed_LDFLAGS = \
 ############################################################
 
 phf_fixed3_SOURCES = \
+	VectSetList.h \
+	IguGen.cc \
 	phf_fixed3.cc
 
 phf_fixed3_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -187,7 +197,7 @@ phf_igu_SOURCES = \
 	phf_igu.cc
 
 phf_igu_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -204,7 +214,7 @@ phf_eval_SOURCES = \
 	phf_eval.cc
 
 phf_eval_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -221,7 +231,7 @@ phf_eval2_SOURCES = \
 	phf_eval2.cc
 
 phf_eval2_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
@@ -238,7 +248,7 @@ phf_eval3_SOURCES = \
 	phf_eval3.cc
 
 phf_eval3_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la

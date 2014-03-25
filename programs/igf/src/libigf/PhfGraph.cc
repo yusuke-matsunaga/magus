@@ -11,9 +11,7 @@
 #include "PhfNode.h"
 #include "PhfEdge.h"
 #include "FuncVect.h"
-#include "BmGraph.h"
-#include "BmNode.h"
-#include "BmEdge.h"
+#include "utils/BtgMatch.h"
 
 
 #define VERIFY_ACYCLIC_CHECK 0
@@ -325,34 +323,36 @@ PhfGraph::cf_partition(vector<ymuint>& block_map)
   }
 
   // 残ったグラフを別の2部グラフに変換してマッチングを求める．
-  BmGraph bmg(ne, nn);
+  BtgMatch bm;
+
+  bm.set_size(ne, nn);
 
   for (ymuint i = 0; i < mEdgeListSize; ++ i) {
     PhfEdge* edge = mEdgeList[i];
     if ( !edge->mActive ) {
       continue;
     }
-    BmNode* v1 = bmg.v1_elem(edge_map[edge->id()]);
     for (ymuint j = 0; j < mDegree; ++ j) {
       PhfNode* node = edge->node(j);
-      BmNode* v2 = bmg.v2_elem(node_map[node->id()]);
-      bmg.new_edge(v1, v2);
+      bm.add_edge(edge_map[edge->id()], node_map[node->id()]);
     }
   }
 
-  vector<BmEdge*> bmedge_list;
-  bool stat = bmg.find_match(bmedge_list);
+  vector<ymuint> edge_list;
+  bool stat = bm.calc_match(edge_list);
   if ( !stat ) {
     return false;
   }
 
-  assert_cond( bmedge_list.size() == ne, __FILE__, __LINE__);
+  assert_cond( edge_list.size() == ne, __FILE__, __LINE__);
   for (ymuint i = 0; i < ne; ++ i) {
-    BmEdge* bm_edge = bmedge_list[i];
-    BmNode* v1 = bm_edge->v1();
-    BmNode* v2 = bm_edge->v2();
-    PhfEdge* phf_edge = redge_map[v1->id()];
-    PhfNode* phf_node = node_list[v2->id()];
+    ymuint eid = edge_list[i];
+    ymuint v1;
+    ymuint v2;
+    ymuint w;
+    bm.edge_info(eid, v1, v2, w);
+    PhfEdge* phf_edge = redge_map[v1];
+    PhfNode* phf_node = node_list[v2];
 
     for (ymuint j = 0; j < mDegree; ++ j) {
       PhfNode* node1 = phf_edge->node(j);

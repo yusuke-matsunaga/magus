@@ -6,7 +6,7 @@
 ############################################################
 
 SUBDIRS = \
-	libphf \
+	libigf \
 	rvgen \
 	igf \
 	$(YM_EXTRA_SUBDIRS)

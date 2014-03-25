@@ -25,14 +25,14 @@ class Configuration(sipconfig.Configuration):
 
         sipconfig.Configuration.__init__(self, cfg)
 
-class YmUtilsModuleMakefile(sipconfig.PythonModuleMakefile):
+class IgfModuleMakefile(sipconfig.PythonModuleMakefile):
     """The Makefile class for modules that %Import PyYmUtils.
     """
     def finalise(self):
         """Finalise the macros.
         """
         # Make sure our C++ library is linked.
-        self.extra_libs.append("ym_utils")
+        self.extra_libs.append("igf")
 
         # Let the super-class do what it needs to.
         sipconfig.PythonModuleMakefile.finalise(self)

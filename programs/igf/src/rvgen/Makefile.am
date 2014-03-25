@@ -122,7 +122,7 @@ phf_sim_SOURCES = \
 	phf_sim.cc
 
 phf_sim_LDADD = \
-	../libphf/libphf.la \
+	../libigf/libigf.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la

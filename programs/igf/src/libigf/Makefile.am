@@ -28,8 +28,10 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = \
-	libphf.la
+lib_LTLIBRARIES = \
+	libigf.la \
+	libigf_d.la \
+	libigf_p.la
 
 
 ############################################################
@@ -45,35 +47,72 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libphf.la 用の変数の定義
+## 共通の変数定義
 ############################################################
 
-libphf_la_CXXFLAGS = \
-	$(AM_CXXFLAGS)
-
-libphf_la_SOURCES = \
+COMMON_SOURCES = \
 	RvMgr.cc \
-	IguGen.cc \
-	IguGen2.cc \
-	VectSetList.h \
 	Variable.cc \
 	PhfGraph.h \
 	PhfGraph.cc \
 	PhfNode.h \
 	PhfEdge.h \
 	PhfGen.cc \
-	BmGraph.h \
-	BmGraph.cc \
-	BmNode.h \
-	BmNode.cc \
-	BmEdge.h \
-	BmEdge.cc \
 	IGU.cc \
 	VarFunc.cc \
 	XorFunc.cc \
 	RandHashGen.cc
 
-libphf_la_LIBADD =
 
-libphf_la_LDFLAGS = \
+############################################################
+## libigf.la 用の変数の定義
+############################################################
+
+libigf_la_CXXFLAGS = \
+	$(YM_CXXOPFLAGS) \
+	$(AM_CXXFLAGS)
+
+libigf_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libigf_la_LIBADD =
+
+libigf_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libigf_d.la 用の変数の定義
+############################################################
+
+libigf_d_la_CXXFLAGS = \
+	$(YM_CXXDBGLAGS) \
+	$(AM_CXXFLAGS)
+
+libigf_d_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libigf_d_la_LIBADD =
+
+libigf_d_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la \
+	$(AM_LDFLAGS)
+
+
+############################################################
+## libigf_p.la 用の変数の定義
+############################################################
+
+libigf_p_la_CXXFLAGS = \
+	$(YM_CXXPRFLAGS) \
+	$(AM_CXXFLAGS)
+
+libigf_p_la_SOURCES = \
+	$(COMMON_SOURCES)
+
+libigf_p_la_LIBADD =
+
+libigf_p_la_LDFLAGS = \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_p.la \
 	$(AM_LDFLAGS)

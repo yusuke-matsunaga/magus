@@ -136,7 +136,7 @@ AC_SUBST([YMTOOLS_BUILDDIR])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([src/libphf/Makefile])
+AC_CONFIG_FILES([src/libigf/Makefile])
 AC_CONFIG_FILES([src/rvgen/Makefile])
 AC_CONFIG_FILES([src/igf/Makefile])
 
@@ -146,6 +146,10 @@ YM_EXTRA_SUBDIRS=""
 #  YM_EXTRA_SUBDIRS="$YM_EXTRA_SUBDIRS python"
 #  AC_CONFIG_FILES([src/python/Makefile])
 #fi
+
+if test "$ym_have_python" = 1; then
+   AC_CONFIG_FILES([py-sip/configure.py])
+fi
 
 AC_SUBST([YM_EXTRA_SUBDIRS])
 
