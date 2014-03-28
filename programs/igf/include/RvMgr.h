@@ -57,6 +57,7 @@ public:
   index_size() const;
 
   /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
   void
   dump(ostream& s) const;
 

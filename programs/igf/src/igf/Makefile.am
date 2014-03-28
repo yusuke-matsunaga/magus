@@ -118,18 +118,22 @@ igf2_LDFLAGS = \
 ## var_analyzer 用の変数の定義
 ############################################################
 
+var_analyzer_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
 var_analyzer_SOURCES = \
 	var_analyzer.cc
 
 var_analyzer_LDADD = \
-	../libigf/libigf.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
+	../libigf/libigf_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la
 
 var_analyzer_LDFLAGS = \
-	-lrt \
-	$(AM_LDFLAGS)
+	$(AM_LDFLAGS) \
+	-static
 
 
 ############################################################

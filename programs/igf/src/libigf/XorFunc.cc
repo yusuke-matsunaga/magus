@@ -29,14 +29,15 @@ XorFunc::~XorFunc()
 {
 }
 
-// @brief 出力数を返す．
+// @brief 出力のビット幅を返す．
 ymuint
-XorFunc::output_num() const
+XorFunc::output_width() const
 {
   return mVarsList.size();
 }
 
 // @brief 関数値を求める．
+// @param[in] rv 登録ベクタ
 ymuint32
 XorFunc::eval(const RegVect* rv) const
 {
@@ -60,6 +61,7 @@ XorFunc::eval(const RegVect* rv) const
 }
 
 // @brief 内容を表示する．
+// @param[in] s 出力先のストリーム
 void
 XorFunc::dump(ostream& s) const
 {

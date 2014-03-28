@@ -182,6 +182,7 @@ RvMgr::delete_vector(RegVect* vec)
 }
 
 // @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
 void
 RvMgr::dump(ostream& s) const
 {
@@ -198,6 +199,7 @@ RvMgr::dump(ostream& s) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
 void
 RegVect::dump(ostream& s) const
 {
@@ -207,6 +209,5 @@ RegVect::dump(ostream& s) const
   }
   s << endl;
 }
-
 
 END_NAMESPACE_YM_IGF

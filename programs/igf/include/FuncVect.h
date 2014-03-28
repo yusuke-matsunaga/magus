@@ -17,6 +17,10 @@ BEGIN_NAMESPACE_YM_IGF
 //////////////////////////////////////////////////////////////////////
 /// @class FuncVect FuncVect.h "FuncVect.h"
 /// @brief 関数の値のベクタ
+///
+/// ここで言っている関数とは入力ハッシュ関数のこと
+/// ただし，実際の登録ベクタがどういうものかは一切関係ない．
+/// ただ単に pos 番めのベクタの関数値が何，という値をだけを保持する．
 //////////////////////////////////////////////////////////////////////
 class FuncVect
 {
@@ -25,6 +29,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] max_val 値の最大値
   /// @param[in] input_size 入力の要素数
+  ///
+  /// max_val は正確には最大値＋１
   FuncVect(ymuint max_val,
 	   ymuint input_size);
 

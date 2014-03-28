@@ -37,17 +37,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 出力数を返す．
+  /// @brief 出力のビット幅を返す．
   virtual
   ymuint
-  output_num() const;
+  output_width() const;
 
   /// @brief 関数値を求める．
+  /// @param[in] rv 登録ベクタ
   virtual
   ymuint32
   eval(const RegVect* rv) const;
 
   /// @brief 内容を表示する．
+  /// @param[in] s 出力先のストリーム
   virtual
   void
   dump(ostream& s) const;
