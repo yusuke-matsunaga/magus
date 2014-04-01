@@ -46,10 +46,13 @@ public:
 
   /// @brief ベクタを分類する．
   /// @param[in] vect 対象のベクタ
+  ///
+  /// 0 か 1 を返す．
   ymuint
   classify(const RegVect* vect) const;
 
   /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
   void
   dump(ostream& s) const;
 

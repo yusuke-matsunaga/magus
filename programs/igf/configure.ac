@@ -138,7 +138,8 @@ AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/libigf/Makefile])
 AC_CONFIG_FILES([src/rvgen/Makefile])
-AC_CONFIG_FILES([src/igf/Makefile])
+AC_CONFIG_FILES([src/old_igf/Makefile])
+AC_CONFIG_FILES([src/igugen/Makefile])
 
 YM_EXTRA_SUBDIRS=""
 

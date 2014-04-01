@@ -8,7 +8,8 @@
 SUBDIRS = \
 	libigf \
 	rvgen \
-	igf \
+	old_igf \
+	igugen \
 	$(YM_EXTRA_SUBDIRS)
 
 

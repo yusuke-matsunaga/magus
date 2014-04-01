@@ -18,6 +18,9 @@ BEGIN_NAMESPACE_YM_IGF
 //////////////////////////////////////////////////////////////////////
 /// @class RvMgr RvMgr.h "RvMgr.h"
 /// @brief RegVect を管理するクラス
+///
+/// ビット長が vect_size() のベクタの集合を表す．
+/// インデックスのサイズとはベクタ数の log の ceil
 //////////////////////////////////////////////////////////////////////
 class RvMgr
 {
@@ -45,6 +48,8 @@ public:
   read_data(istream& s);
 
   /// @brief ベクタのサイズを得る．
+  ///
+  /// ベクタのサイズとはベクタのビット長
   ymuint
   vect_size() const;
 
@@ -53,6 +58,9 @@ public:
   vect_list() const;
 
   /// @brief インデックスのサイズを得る．
+  ///
+  /// インデックスのサイズとはインデックスを2進符号化するのに
+  /// 必要なビット数 = ceil(log (k + 1)): k はベクタ数
   ymuint
   index_size() const;
 
