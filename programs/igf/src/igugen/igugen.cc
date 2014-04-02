@@ -10,7 +10,8 @@
 #include "IguGen.h"
 #include "RegVect.h"
 #include "Variable.h"
-#include "utils/HeapTree.h"
+//#include "utils/HeapTree.h"
+#include "VarHeap.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -52,9 +53,10 @@ igugen(int argc,
        << "# of vectors:    " << ig.vect_list().size() << endl
        << "# of index bits: " << ig.index_size() << endl;
 
-  HeapTree<pair<ymuint, Variable*>, Lt> var_set;
-  const vector<const RegVect*>& v_list = ig.vect_list();
+  //HeapTree<pair<ymuint, Variable*>, Lt> var_set;
   ymuint ni = ig.vect_size();
+  VarHeap var_set(ni);
+  const vector<const RegVect*>& v_list = ig.vect_list();
   for (ymuint i = 0; i < ni; ++ i) {
     Variable* var1 = new Variable(i);
     ymuint n0 = 0;
@@ -71,7 +73,7 @@ igugen(int argc,
     }
     if ( n0 > 0 && n1 > 0 ) {
       ymuint n2 = n0 * n1;
-      var_set.put(make_pair(n2, var1));
+      var_set.put(var1, n2);
       cout << "Var#" << i << ": " << n0 << " x " << n1 << " = " << (n0 * n1) << endl;
     }
     else {
@@ -80,9 +82,10 @@ igugen(int argc,
   }
 
   for ( ; ; ) {
-    pair<ymuint, Variable*> p = var_set.getmin();
-    ymuint n_old = p.first;
-    Variable* var_old = p.second;
+    cout << endl;
+    var_set.print(cout);
+    ymuint n_old = var_set.value(0);
+    Variable* var_old = var_set.var(0);
     cout << "min var = ";
     var_old->dump(cout);
     cout << " n = " << n_old << endl;
@@ -124,8 +127,8 @@ igugen(int argc,
       }
     }
     if ( max_n > n_old ) {
-      var_set.popmin();
-      var_set.put(make_pair(max_n, max_var));
+      var_set.get_min();
+      var_set.put(max_var, max_n);
       cout << "New Var:";
       max_var->dump(cout);
       cout << " n = " << max_n << endl;

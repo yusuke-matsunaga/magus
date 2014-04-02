@@ -29,7 +29,8 @@ EXTRA_DIST =
 ############################################################
 
 bin_PROGRAMS = \
-	igugen
+	igugen \
+	igugen_d
 
 
 ############################################################
@@ -45,12 +46,26 @@ AM_CPPFLAGS = \
 
 
 ############################################################
+## 共通の変数の定義
+############################################################
+
+COMMON_SOURCES = \
+	IguGen.cc \
+	igugen.cc \
+	VarHeap.h \
+	VarHeap.cc
+
+
+############################################################
 ## igugen 用の変数の定義
 ############################################################
 
+igugen_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
+
 igugen_SOURCES = \
-	IguGen.cc \
-	igugen.cc
+	$(COMMON_SOURCES)
 
 igugen_LDADD = \
 	../libigf/libigf.la \
@@ -60,3 +75,25 @@ igugen_LDADD = \
 
 igugen_LDFLAGS = \
 	$(AM_LDFLAGS)
+
+
+############################################################
+## igugen_d 用の変数の定義
+############################################################
+
+igugen_d_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
+igugen_d_SOURCES = \
+	$(COMMON_SOURCES)
+
+igugen_d_LDADD = \
+	../libigf/libigf_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_popt/src/libym_popt_d.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la
+
+igugen_d_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-static

@@ -9,8 +9,6 @@
 
 #include "Variable.h"
 #include "RegVect.h"
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
