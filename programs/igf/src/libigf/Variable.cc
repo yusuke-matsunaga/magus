@@ -29,6 +29,7 @@ Variable::Variable(ymuint vid) :
 Variable::Variable(const vector<ymuint>& vid_list) :
   mVidList(vid_list)
 {
+  sort(mVidList.begin(), mVidList.end());
 }
 
 // @brief デストラクタ

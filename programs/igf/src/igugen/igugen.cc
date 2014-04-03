@@ -95,14 +95,26 @@ igugen(int argc,
 	 p != vid_list0.end(); ++ p) {
       used[*p] = true;
     }
-    ymuint max_n = 0;
-    Variable* max_var =NULL;
+    ymuint max_n = n_old + 1;
+    vector<Variable*> max_vars;
     for (ymuint i = 0; i < ni; ++ i) {
       if ( used[i] ) {
 	continue;
       }
       vector<ymuint> vid_list1(vid_list0);
       vid_list1.push_back(i);
+      sort(vid_list1.begin(), vid_list1.end());
+      bool found = false;
+      for (ymuint j = 0; j < var_set.size(); ++ j) {
+	Variable* var1 = var_set.var(j);
+	if ( var1->vid_list() == vid_list1 ) {
+	  found = true;
+	  break;
+	}
+      }
+      if ( found ) {
+	continue;
+      }
       Variable* var1 = new Variable(vid_list1);
       ymuint n0 = 0;
       ymuint n1 = 0;
@@ -119,14 +131,69 @@ igugen(int argc,
       ymuint n2 = n0 * n1;
       if ( max_n < n2 ) {
 	max_n = n2;
-	delete max_var;
-	max_var = var1;
+	for (vector<Variable*>::iterator p = max_vars.begin();
+	     p != max_vars.end(); ++ p) {
+	  delete *p;
+	}
+	max_vars.clear();
+	max_vars.push_back(var1);
+      }
+      else if ( max_n == n2 ) {
+	max_vars.push_back(var1);
       }
       else {
 	delete var1;
       }
     }
-    if ( max_n > n_old ) {
+    if ( !max_vars.empty() ) {
+      ymuint max_min_n = 0;
+      Variable* max_var = NULL;
+      for (vector<Variable*>::iterator p = max_vars.begin();
+	   p != max_vars.end(); ++ p) {
+	Variable* var1 = *p;
+	ymuint n00 = 0;
+	ymuint n01 = 0;
+	ymuint n10 = 0;
+	ymuint n11 = 0;
+	for (ymuint j = 0; j < var_set.size(); ++ j) {
+	  Variable* var2 = var_set.var(j);
+	  for (vector<const RegVect*>::const_iterator p = v_list.begin();
+	       p != v_list.end(); ++ p) {
+	    const RegVect* rv = *p;
+	    if ( var1->classify(rv) ) {
+	      if ( var2->classify(rv) ) {
+		++ n11;
+	      }
+	      else {
+		++ n10;
+	      }
+	    }
+	    else {
+	      if ( var2->classify(rv) ) {
+		++ n01;
+	      }
+	      else {
+		++ n00;
+	      }
+	    }
+	  }
+	}
+	ymuint min_n = n00;
+	if ( min_n > n01 ) {
+	  min_n = n01;
+	}
+	if ( min_n > n10 ) {
+	  min_n = n10;
+	}
+	if ( min_n > n11 ) {
+	  min_n = n11;
+	}
+	if ( max_min_n < min_n ) {
+	  max_min_n = min_n;
+	  delete max_var;
+	  max_var = var1;
+	}
+      }
       var_set.get_min();
       var_set.put(max_var, max_n);
       cout << "New Var:";
