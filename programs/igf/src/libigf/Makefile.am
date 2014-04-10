@@ -87,7 +87,7 @@ libigf_la_LDFLAGS = \
 ############################################################
 
 libigf_d_la_CXXFLAGS = \
-	$(YM_CXXDBGLAGS) \
+	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
 libigf_d_la_SOURCES = \

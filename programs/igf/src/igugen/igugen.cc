@@ -10,8 +10,9 @@
 #include "IguGen.h"
 #include "RegVect.h"
 #include "Variable.h"
-//#include "utils/HeapTree.h"
 #include "VarHeap.h"
+#include "RandHashGen.h"
+#include "InputFunc.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -53,7 +54,7 @@ igugen(int argc,
        << "# of vectors:    " << ig.vect_list().size() << endl
        << "# of index bits: " << ig.index_size() << endl;
 
-  //HeapTree<pair<ymuint, Variable*>, Lt> var_set;
+#if 0
   ymuint ni = ig.vect_size();
   VarHeap var_set(ni);
   const vector<const RegVect*>& v_list = ig.vect_list();
@@ -204,6 +205,62 @@ igugen(int argc,
       break;
     }
   }
+#endif
+
+  ymuint comp = 8;
+  ymuint m = 4;
+  ymuint count_limit = 1000;
+
+  ymuint n = ig.vect_size();
+  ymuint p = ig.index_size();
+
+  ymuint p1 = p;
+  {
+    for (ymuint tmp_m = 1; tmp_m < m; ) {
+      -- p1;
+      tmp_m <<= 1;
+    }
+  }
+
+  RandHashGen rhg;
+  for ( ; ; ++ p1) {
+    bool found = false;
+    for (ymuint count = 0; count < count_limit; ++ count) {
+      vector<InputFunc*> h_funcs(m);
+      for (ymuint i = 0; i < m; ++ i) {
+	InputFunc* f = rhg.gen_func(n, p1, comp);
+	h_funcs[i] = f;
+      }
+
+      vector<vector<ymuint> > map_list;
+      bool stat = ig.cfp(h_funcs, map_list);
+      for (ymuint i = 0; i < m; ++ i) {
+	delete h_funcs[i];
+      }
+      if ( stat ) {
+	found = true;
+#if 0
+	ymuint exp_p = 1U << p1;
+	for (ymuint i = 0; i < m; ++ i) {
+	  cout << "Block#" << i << endl;
+	  for (ymuint j = 0; j < exp_p; ++ j) {
+	    cout << " " << map_list[i][j] << endl;
+	  }
+	}
+#endif
+	break;
+      }
+    }
+    if ( found ) {
+      break;
+    }
+  }
+
+  ymuint exp_p = 1U << p1;
+  ymuint q = ig.index_size();
+  cout << " p = " << p1 << endl
+       << "Total memory size = "
+       << (exp_p * (q + n - p1) * m) << endl;
 
   return 0;
 }

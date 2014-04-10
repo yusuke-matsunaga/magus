@@ -107,6 +107,34 @@ BtgMatchImpl::add_edge(ymuint node1_id,
   node2->mEdgeTop = edge;
 }
 
+// @brief 増加パスを見つける．
+bool
+find_alt_path(BtgNode* v1,
+	      vector<bool>& mark)
+{
+  if ( mark[v1->id()] ) {
+    return false;
+  }
+  mark[v1->id()] = true;
+  for (BtgEdge* edge = v1->edge_top(); edge; edge = edge->link1()) {
+    BtgNode* v2 = edge->node2();
+    BtgEdge* edge1 = v2->cur_edge();
+    if ( edge1 == NULL ) {
+      // 見つけた．
+      v1->set_cur_edge(edge);
+      v2->set_cur_edge(edge);
+      return true;
+    }
+    if ( find_alt_path(edge1->node1(), mark) ) {
+      // 見つけた．
+      v1->set_cur_edge(edge);
+      v2->set_cur_edge(edge);
+      return true;
+    }
+  }
+  return false;
+}
+
 // @brief 枝の情報を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < edge_num() )
 // @param[out] node1_id 節点グループ1のノード番号
@@ -162,11 +190,12 @@ BtgMatchImpl::calc_match(vector<ymuint>& edge_list)
     for (ymuint i = 0; i < mNode1Num; ++ i) {
       BtgNode* v1 = &mNode1Array[i];
       BtgEdge* edge = v1->cur_edge();
-      if ( edge != NULL ) {
-	assert_cond( edge->node2()->cur_edge() == edge, __FILE__, __LINE__);
-	edge_list.push_back(edge->id());
-	weight_sum += edge->weight();
+      if ( edge == NULL ) {
+	return 0;
       }
+      assert_cond( edge->node2()->cur_edge() == edge, __FILE__, __LINE__);
+      edge_list.push_back(edge->id());
+      weight_sum += edge->weight();
     }
   }
   else {
@@ -183,11 +212,12 @@ BtgMatchImpl::calc_match(vector<ymuint>& edge_list)
     for (ymuint i = 0; i < mNode2Num; ++ i) {
       BtgNode* v2 = &mNode2Array[i];
       BtgEdge* edge = v2->cur_edge();
-      if ( edge != NULL ) {
-	assert_cond( edge->node1()->cur_edge() == edge, __FILE__, __LINE__);
-	edge_list.push_back(edge->id());
-	weight_sum += edge->weight();
+      if ( edge == NULL ) {
+	return 0;
       }
+      assert_cond( edge->node1()->cur_edge() == edge, __FILE__, __LINE__);
+      edge_list.push_back(edge->id());
+      weight_sum += edge->weight();
     }
   }
 
@@ -220,6 +250,7 @@ BtgMatchImpl::calc_match1()
       ++ rpos;
 
       // v1 に隣接している節点でマッチしていないものを探す．
+      bool found = false;
       for (BtgEdge* edge = v1->edge_top();
 	   edge != NULL; edge = edge->link1()) {
 	BtgNode* v2 = edge->node2();
@@ -238,17 +269,28 @@ BtgMatchImpl::calc_match1()
 	    edge = parent[v2->id()];
 	    v1 = edge->node1();
 	  }
+	  found = true;
 	  break;
 	}
-	else {
-	  // すでにマッチしていた．
-	  // マッチ先のノードから探索する．
+      }
+      if ( !found ) {
+	// すでにマッチしていた．
+	// マッチ先のノードから探索する．
+	for (BtgEdge* edge = v1->edge_top(); edge; edge = edge->link1()) {
+	  BtgNode* v2 = edge->node2();
+	  BtgEdge* cur_edge = v2->cur_edge();
+	  assert_cond( cur_edge != NULL, __FILE__, __LINE__);
 	  BtgNode* v3 = cur_edge->node1();
 	  if ( !qmark[v3->id()] ) {
 	    qmark[v3->id()] = true;
 	    queue.push_back(v3);
 	    parent[v2->id()] = edge;
+	    found = true;
+	    break;
 	  }
+	}
+	if ( !found ) {
+	  return;
 	}
       }
     }
@@ -281,6 +323,7 @@ BtgMatchImpl::calc_match2()
       ++ rpos;
 
       // v2 に隣接している節点でマッチしていないものを探す．
+      bool found = false;
       for (BtgEdge* edge = v2->edge_top();
 	   edge != NULL; edge = edge->link2()) {
 	BtgNode* v1 = edge->node1();
@@ -299,17 +342,27 @@ BtgMatchImpl::calc_match2()
 	    edge = parent[v1->id()];
 	    v2 = edge->node2();
 	  }
+	  found = true;
 	  break;
 	}
-	else {
-	  // すでにマッチしていた．
-	  // マッチ先のノードから探索する．
+      }
+      if ( !found ) {
+	// すでにマッチしていた．
+	// マッチ先のノードから探索する．
+	for (BtgEdge* edge = v2->edge_top(); edge; edge = edge->link2()) {
+	  BtgNode* v1 = edge->node1();
+	  BtgEdge* cur_edge = v1->cur_edge();
+	  assert_cond( cur_edge != NULL, __FILE__, __LINE__);
 	  BtgNode* v3 = cur_edge->node2();
 	  if ( !qmark[v3->id()] ) {
 	    qmark[v3->id()] = true;
 	    queue.push_back(v3);
 	    parent[v1->id()] = edge;
+	    found = true;
 	  }
+	}
+	if ( !found ) {
+	  return;
 	}
       }
     }
@@ -394,7 +447,6 @@ BtgMatchImpl::calc_wmatch1()
       BtgEdge* old_edge = v1->cur_edge();
       v1->set_cur_edge(edge);
       v2->set_cur_edge(edge);
-      cout << "(" << v1->id() << ", " << v2->id() << ")" << endl;
       if ( old_edge == NULL ) {
 	break;
       }

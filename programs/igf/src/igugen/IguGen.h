@@ -59,6 +59,33 @@ public:
   ymuint
   index_size() const;
 
+  /// @brief conflict free 分割法で構成する．
+  /// @param[in] h_funcs 入力ハッシュ関数のリスト
+  /// @param[out] map_list IGUごとのベクタ番号のリスト
+  /// @retval true 構成できた．
+  /// @retval false 構成が失敗した．
+  bool
+  cfp(const vector<InputFunc*>& h_funcs,
+      vector<vector<ymuint> >& map_list) const;
+
+  /// @brief naive parallel 法で構成する．
+  /// @param[in] h_funcs 入力ハッシュ関数のリスト
+  /// @param[out] map_list IGUごとのベクタ番号のリスト
+  /// @retval true 構成できた．
+  /// @retval false 構成が失敗した．
+  bool
+  naive(const vector<InputFunc*>& h_funcs,
+	vector<vector<ymuint> >& map_list) const;
+
+  /// @brief minimum perfect hash 法で構成する．
+  /// @param[in] h_funcs 入力ハッシュ関数のリスト
+  /// @param[out] map_list IGUごとの G 関数のリスト
+  /// @retval true 構成できた．
+  /// @retval false 構成が失敗した．
+  bool
+  mphf(const vector<InputFunc*>& h_funcs,
+       vector<vector<ymuint> >& map_list) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
