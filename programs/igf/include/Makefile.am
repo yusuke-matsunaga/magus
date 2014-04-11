@@ -32,7 +32,6 @@ noinst_HEADERS = \
 	igf_nsdef.h \
 	IguGen.h \
 	InputFunc.h \
-	PhfGen.h \
 	RegVect.h \
 	RvMgr.h \
 	IGU.h \

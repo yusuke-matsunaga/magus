@@ -57,7 +57,6 @@ COMMON_SOURCES = \
 	PhfGraph.cc \
 	PhfNode.h \
 	PhfEdge.h \
-	PhfGen.cc \
 	IGU.cc \
 	IguGen.cc \
 	VarFunc.cc \

@@ -64,6 +64,12 @@ public:
   ymuint
   index_size() const;
 
+  /// @brief ベクタにハッシュ関数を適用した結果を作る．
+  /// @param[in] hash_func ハッシュ関数
+  /// @return ハッシュ値のベクタ
+  FuncVect*
+  gen_hash_vect(const InputFunc& hash_func) const;
+
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
   void

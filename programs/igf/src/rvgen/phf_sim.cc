@@ -9,7 +9,7 @@
 
 #include "igf_nsdef.h"
 #include "FuncVect.h"
-#include "PhfGen.h"
+#include "IguGen.h"
 #include "utils/CombiGen.h"
 #include "utils/RandGen.h"
 
@@ -33,7 +33,7 @@ set_random_func(FuncVect* fv,
 bool
 phf_sim1(const vector<const FuncVect*>& func_list)
 {
-  PhfGen pg;
+  IguGen pg;
 
   vector<vector<ymuint32> > g_list;
   return pg.mapping(func_list, g_list);
@@ -42,7 +42,7 @@ phf_sim1(const vector<const FuncVect*>& func_list)
 bool
 phf_sim2(const vector<const FuncVect*>& func_list)
 {
-  PhfGen pg;
+  IguGen pg;
 
   vector<ymuint> block_map;
   return pg.cf_partition(func_list, block_map);
@@ -51,7 +51,7 @@ phf_sim2(const vector<const FuncVect*>& func_list)
 bool
 phf_sim3(const vector<const FuncVect*>& func_list)
 {
-  PhfGen pg;
+  IguGen pg;
 
   vector<ymuint> d_map;
   return pg.displace_decomposition(func_list[0], func_list[1], d_map, false);
@@ -60,7 +60,7 @@ phf_sim3(const vector<const FuncVect*>& func_list)
 bool
 phf_sim4(const vector<const FuncVect*>& func_list)
 {
-  PhfGen pg;
+  IguGen pg;
 
   vector<ymuint> d_map;
   return pg.displace_decomposition(func_list[0], func_list[1], d_map, true);

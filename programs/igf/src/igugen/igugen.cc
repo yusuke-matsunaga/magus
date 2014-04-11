@@ -7,12 +7,14 @@
 /// All rights reserved.
 
 
-#include "IguGen.h"
+#include "RvMgr.h"
 #include "RegVect.h"
 #include "Variable.h"
 #include "VarHeap.h"
 #include "RandHashGen.h"
 #include "InputFunc.h"
+#include "FuncVect.h"
+#include "IguGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -32,7 +34,7 @@ int
 igugen(int argc,
        char** argv)
 {
-  IguGen ig;
+  RvMgr rv_mgr;
 
   if ( argc != 2 ) {
     cerr << "USAGE: " << argv[0] << " <filename>" << endl;
@@ -45,19 +47,19 @@ igugen(int argc,
     return 1;
   }
 
-  if ( !ig.read_data(ifs) ) {
+  if ( !rv_mgr.read_data(ifs) ) {
     cerr << "Error in reading " << argv[1] << endl;
     return 1;
   }
 
-  cout << "# of inputs:     " << ig.vect_size() << endl
-       << "# of vectors:    " << ig.vect_list().size() << endl
-       << "# of index bits: " << ig.index_size() << endl;
+  cout << "# of inputs:     " << rv_mgr.vect_size() << endl
+       << "# of vectors:    " << rv_mgr.vect_list().size() << endl
+       << "# of index bits: " << rv_mgr.index_size() << endl;
 
 #if 0
-  ymuint ni = ig.vect_size();
+  ymuint ni = rv_mgr.vect_size();
   VarHeap var_set(ni);
-  const vector<const RegVect*>& v_list = ig.vect_list();
+  const vector<const RegVect*>& v_list = rv_mgr.vect_list();
   for (ymuint i = 0; i < ni; ++ i) {
     Variable* var1 = new Variable(i);
     ymuint n0 = 0;
@@ -211,8 +213,8 @@ igugen(int argc,
   ymuint m = 4;
   ymuint count_limit = 1000;
 
-  ymuint n = ig.vect_size();
-  ymuint p = ig.index_size();
+  ymuint n = rv_mgr.vect_size();
+  ymuint p = rv_mgr.index_size();
 
   ymuint p1 = p;
   {
@@ -222,20 +224,23 @@ igugen(int argc,
     }
   }
 
+  IguGen pg;
+
   RandHashGen rhg;
   for ( ; ; ++ p1) {
     bool found = false;
     for (ymuint count = 0; count < count_limit; ++ count) {
-      vector<InputFunc*> h_funcs(m);
+      vector<const FuncVect*> fv_list(m);
       for (ymuint i = 0; i < m; ++ i) {
 	InputFunc* f = rhg.gen_func(n, p1, comp);
-	h_funcs[i] = f;
+	fv_list[i] = rv_mgr.gen_hash_vect(*f);
+	delete f;
       }
 
-      vector<vector<ymuint> > map_list;
-      bool stat = ig.cfp(h_funcs, map_list);
+      vector<ymuint> block_map;
+      bool stat = pg.cf_partition(fv_list, block_map);
       for (ymuint i = 0; i < m; ++ i) {
-	delete h_funcs[i];
+	delete fv_list[i];
       }
       if ( stat ) {
 	found = true;
@@ -257,7 +262,7 @@ igugen(int argc,
   }
 
   ymuint exp_p = 1U << p1;
-  ymuint q = ig.index_size();
+  ymuint q = rv_mgr.index_size();
   cout << " p = " << p1 << endl
        << "Total memory size = "
        << (exp_p * (q + n - p1) * m) << endl;

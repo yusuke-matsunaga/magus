@@ -12,7 +12,7 @@
 #include "RvMgr.h"
 #include "RegVect.h"
 #include "FuncVect.h"
-#include "PhfGen.h"
+#include "IguGen.h"
 #include "RandHashGen.h"
 #include "InputFunc.h"
 
@@ -121,7 +121,7 @@ phf(int argc,
 	delete f;
       }
 
-      PhfGen phfgen;
+      IguGen phfgen;
 
       vector<vector<ymuint32> > g_list(m);
       bool stat = phfgen.mapping(func_list, g_list);

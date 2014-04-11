@@ -9,6 +9,8 @@
 
 #include "RvMgr.h"
 #include "RegVect.h"
+#include "InputFunc.h"
+#include "FuncVect.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
@@ -93,7 +95,8 @@ RvMgr::read_data(istream& s)
 	return false;
       }
     }
-    RegVect* rv = new_vector(i + 1);
+    ymuint id = mVectList.size();
+    RegVect* rv = new_vector(id);
     for (ymuint j = 0; j < n; ++ j) {
       ymuint blk = j / 64;
       ymuint sft = j % 64;
@@ -179,6 +182,24 @@ void
 RvMgr::delete_vector(RegVect* vec)
 {
   mAlloc->put_memory(mRvSize, vec);
+}
+
+// @brief ベクタにハッシュ関数を適用した結果を作る．
+// @param[in] hash_func ハッシュ関数
+// @return ハッシュ値のベクタ
+FuncVect*
+RvMgr::gen_hash_vect(const InputFunc& hash_func) const
+{
+  ymuint nv = mVectList.size();
+  ymuint p = hash_func.output_width();
+  ymuint exp_p = 1U << p;
+
+  FuncVect* fv = new FuncVect(nv, exp_p);
+  for (ymuint i = 0; i < nv; ++ i) {
+    const RegVect* rv = mVectList[i];
+    fv->set_val(i, hash_func.eval(rv));
+  }
+  return fv;
 }
 
 // @brief 内容を出力する．
