@@ -5,20 +5,20 @@
 /// @brief IguGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "igf_nsdef.h"
+#include "RvMgr.h"
+#include "FuncVect.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
 
-class VectSetList;
-
 //////////////////////////////////////////////////////////////////////
 /// @class IguGen IguGen.h "IguGen.h"
-/// @brief IGU の入力を求めるクラス
+/// @brief IGU を合成するクラス
 //////////////////////////////////////////////////////////////////////
 class IguGen
 {
@@ -36,59 +36,71 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ベクタのリストをセットする．
-  void
-  set_vector_list(const vector<const RegVect*>& vector_list);
+  /// @brief 登録ベクタを読み込む．
+  /// @param[in] s 読み込み元のストリーム演算子
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  read_data(istream& s);
 
-  /// @brief 変数を求める．
-  /// @param[in] multi 多重度
-  /// @param[in] variable_list 変数のリスト
-  /// @param[in] best_so_far 今までに求められている最適解
-  /// @param[in] solution 解として選ばれた変数を格納するリスト
-  void
-  solve(ymuint multi,
-	const vector<const Variable*>& variable_list,
-	ymuint best_so_far,
-	vector<const Variable*>& solution);
+  /// @brief ベクタのサイズを得る．
+  ///
+  /// ベクタのサイズとはベクタのビット長
+  ymuint
+  vect_size() const;
 
-  /// @brief 再帰呼び出しの回数制限を設定する．
-  void
-  set_recur_limit(ymuint limit);
+  /// @brief ベクタのリストを得る．
+  const vector<const RegVect*>&
+  vect_list() const;
 
-  /// @brief 時間制限を設定する．
-  /// @param[in] limit_min 制限の分の部分
-  /// @param[in] limit_sec 制限の秒の部分
-  void
-  set_time_limit(ymuint32 limit_min,
-		 ymuint32 limit_sec = 0);
+  /// @brief インデックスのサイズを得る．
+  ///
+  /// インデックスのサイズとはインデックスを2進符号化するのに
+  /// 必要なビット数 = ceil(log (k + 1)): k はベクタ数
+  ymuint
+  index_size() const;
 
-  /// @brief 順序付けのヒューリスティックを指定する．
-  void
-  set_ordering_mode(ymuint id);
+  /// @brief conflict free 分割法で構成する．
+  /// @param[in] h_funcs 入力ハッシュ関数のリスト
+  /// @param[out] map_list IGUごとのベクタ番号のリスト
+  /// @retval true 構成できた．
+  /// @retval false 構成が失敗した．
+  bool
+  cfp(const vector<InputFunc*>& h_funcs,
+      vector<vector<ymuint> >& map_list) const;
 
-  /// @brief デバッグレベルを指定する．
-  void
-  set_debug_level(ymuint32 level);
+  /// @brief naive parallel 法で構成する．
+  /// @param[in] h_funcs 入力ハッシュ関数のリスト
+  /// @param[out] map_list IGUごとのベクタ番号のリスト
+  /// @retval true 構成できた．
+  /// @retval false 構成が失敗した．
+  bool
+  naive(const vector<InputFunc*>& h_funcs,
+	vector<vector<ymuint> >& map_list) const;
+
+  /// @brief minimum perfect hash 法で構成する．
+  /// @param[in] h_funcs 入力ハッシュ関数のリスト
+  /// @param[out] map_list IGUごとの G 関数のリスト
+  /// @retval true 構成できた．
+  /// @retval false 構成が失敗した．
+  bool
+  mphf(const vector<InputFunc*>& h_funcs,
+       vector<vector<ymuint> >& map_list) const;
 
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief solve() の下請け関数
-  /// @param[in] vector_list 分割されたベクタのリスト
-  /// @param[in] var_begin 使用可能な変数のリストの先頭の反復子
-  /// @param[in] var_end 使用可能な変数のリストの末尾の反復子
+  /// @brief InputFunc から FuncVect に変換する．
   void
-  solve_recur(const VectSetList& vector_list,
-	      vector<const Variable*>::const_iterator var_begin,
-	      vector<const Variable*>::const_iterator var_end);
+  convert(const vector<InputFunc*>& h_funcs,
+	  vector<const FuncVect*>& func_list) const;
 
-  /// @brief 下界を計算する．
-  /// @param[in] num 要素数
-  ymuint
-  lower_bound(ymuint num) const;
+  /// @brief func_list を削除する．
+  void
+  free_func_list(const vector<const FuncVect*>& func_list) const;
 
 
 private:
@@ -96,47 +108,10 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 多重度
-  ymuint32 mMulti;
-
-  // 現在のビットベクタ長
-  ymuint32 mVectorLength;
-
-  // 現在のベクターリスト
-  vector<const RegVect*> mVectorList;
-
-  // 現時点の最適値
-  ymuint32 mBestSoFar;
-
-  // mBestSorFar がセットされた．
-  bool mBeforeHasSolution;
-
-  // mBestSoFar が更新されていない回数
-  ymuint32 mNoChangeCount;
-
-  // mNoChangeCount の制限値
-  ymuint32 mNoChangeLimit;
-
-  // mNoChangeCount の最大値
-  ymuint32 mMaxNoChangeCount;
-
-  // 現時点の解
-  vector<const Variable*> mSolutionSoFar;
-
-  // 現時点で選ばれている変数のリスト
-  vector<const Variable*> mSelectedVariables;
-
-  // 順序づけのヒューリスティック
-  ymuint32 mOrderingMode;
-
-  // 時間制限
-  ymuint32 mTimeLimit;
-
-  // デバッグフラグ
-  ymuint32 mDebug;
+  // 登録ベクタを管理するクラス
+  RvMgr mRvMgr;
 
 };
-
 
 END_NAMESPACE_YM_IGF
 

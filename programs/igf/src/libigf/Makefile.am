@@ -59,6 +59,7 @@ COMMON_SOURCES = \
 	PhfEdge.h \
 	PhfGen.cc \
 	IGU.cc \
+	IguGen.cc \
 	VarFunc.cc \
 	XorFunc.cc \
 	RandHashGen.cc

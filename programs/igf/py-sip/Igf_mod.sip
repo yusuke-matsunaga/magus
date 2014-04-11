@@ -9,6 +9,8 @@
 %Module Igf
 
 %Include FuncVect.sip
-%Include PhfGen.sip
+%Include IguGen.sip
+%Include InputFunc.sip
+%Include RandHashGen.sip
 %Include RegVect.sip
 %Include RvMgr.sip

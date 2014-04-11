@@ -50,7 +50,6 @@ AM_CPPFLAGS = \
 ############################################################
 
 COMMON_SOURCES = \
-	IguGen.cc \
 	igugen.cc \
 	VarHeap.h \
 	VarHeap.cc

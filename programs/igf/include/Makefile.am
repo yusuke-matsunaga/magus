@@ -31,7 +31,6 @@ EXTRA_DIST =
 noinst_HEADERS = \
 	igf_nsdef.h \
 	IguGen.h \
-	IguGen2.h \
 	InputFunc.h \
 	PhfGen.h \
 	RegVect.h \

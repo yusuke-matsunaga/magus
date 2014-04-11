@@ -45,7 +45,14 @@ installs = []
 
 mod_sip_dir = os.path.join(prefix_dir, "share", "py-sip", "Igf")
 sip_src_list = [
-    "Igf_mod.sip"]
+    "Igf_mod.sip",
+    "FuncVect.sip",
+    "IguGen.sip",
+    "InputFunc.sip",
+    "RandHashGen.sip",
+    "RegVect.sip",
+    "RvMgr.sip",
+]
 
 for sip_src in sip_src_list :
     path = os.path.join(src_dir, sip_src)

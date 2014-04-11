@@ -61,6 +61,7 @@ AM_CPPFLAGS = \
 igf_SOURCES = \
 	VectSetList.h \
 	IguGen.cc \
+	IguGen.h \
 	igf.cc
 
 igf_LDADD = \
@@ -80,6 +81,7 @@ igf_LDFLAGS = \
 
 migf_SOURCES = \
 	VectSetList.h \
+	IguGen.h \
 	IguGen.cc \
 	migf.cc
 
@@ -100,6 +102,7 @@ migf_LDFLAGS = \
 
 igf2_SOURCES = \
 	VectSetList.h \
+	IguGen2.h \
 	IguGen2.cc \
 	igf2.cc
 
