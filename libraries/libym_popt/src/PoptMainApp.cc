@@ -81,12 +81,12 @@ PoptMainApp::parse_options(int argc,
 
   // オプションテーブルを作る．
   ymuint n = mOptionList.size();
-  ymuint n1 = n;
-  if ( mAutoHelp ) {
-    ++ n1;
-  }
   // end-marker の分を1つ足す必要がある．
-  poptOption* option_table = new poptOption[n1 + 1];
+  ymuint table_size = n + 1;
+  if ( mAutoHelp ) {
+    ++ table_size;
+  }
+  poptOption* option_table = new poptOption[table_size];
   for (ymuint i = 0; i < n; ++ i) {
     poptOption& option = option_table[i];
     Popt* opt = mOptionList[i];
@@ -110,7 +110,7 @@ PoptMainApp::parse_options(int argc,
     ++ n;
   }
   { // end-markder
-    poptOption& option = option_table[n1];
+    poptOption& option = option_table[n];
     option.longName = NULL;
     option.shortName = '\0';
     option.argInfo = 0;
@@ -122,8 +122,6 @@ PoptMainApp::parse_options(int argc,
 
   // poptContext を作る．
   mCon = poptGetContext(mName, argc, argv, option_table, flags);
-
-  delete [] option_table;
 
   if ( mHelpText != NULL ) {
     poptSetOtherOptionHelp(reinterpret_cast<poptContext>(mCon), mHelpText);
@@ -151,9 +149,12 @@ PoptMainApp::parse_options(int argc,
     bool stat = popt->action();
     if ( !stat ) {
       // 続行不可能なエラーが起きた．
+      delete [] option_table;
       return kPoptAbort;
     }
   }
+
+  delete [] option_table;
   return kPoptOk;
 }
 
