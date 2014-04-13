@@ -89,6 +89,38 @@ IguGen::cf_partition(const vector<const FuncVect*>& func_list,
   return pg.cf_partition(block_map);
 }
 
+// @brief naive 分割を行う．
+// @param[in] func_list 関数のリスト
+// @param[out] block_map 分割を表す配列
+bool
+IguGen::naive_partition(const vector<const FuncVect*>& func_list,
+			vector<ymuint>& block_map)
+{
+  ymuint m = func_list.size();
+  ymuint n = func_list[0]->max_val();
+  ymuint nv = func_list[0]->input_size();
+
+  block_map.clear();
+  block_map.resize(nv);
+
+  vector<bool> used(m * n);
+  for (ymuint i = 0; i < nv; ++ i) {
+    bool found = false;
+    for (ymuint j = 0; j < m; ++ j) {
+      ymuint val = func_list[j]->val(i);
+      if ( !used[j * n + val] ) {
+	used[j * n + val] = true;
+	block_map[i] = j;
+	found = true;
+	break;
+      }
+    }
+    if ( !found ) {
+      return false;
+    }
+  }
+}
+
 // @brief displace_decomposition を行う．
 bool
 IguGen::displace_decomposition(const FuncVect* func1,

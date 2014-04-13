@@ -19,7 +19,8 @@ class BinaryRandGen
 public:
 
   /// @brief コンストラクタ
-  BinaryRandGen();
+  /// @param[in] prob 1 になる確率
+  BinaryRandGen(double prob = 0.5);
 
   /// @brief デストラクタ
   ~BinaryRandGen();
@@ -45,6 +46,9 @@ private:
   // 乱数発生器
   RandGen mRandGen;
 
+  // 1になる確率
+  double mProb;
+
   // 一時バッファ
   ymuint32 mBuffer;
 
@@ -55,8 +59,10 @@ private:
 
 
 // @brief コンストラクタ
-BinaryRandGen::BinaryRandGen()
+// @param[in] prob 1になる確率
+BinaryRandGen::BinaryRandGen(double prob)
 {
+  mProb = prob;
   mNextPos = 32;
 }
 
@@ -77,6 +83,7 @@ BinaryRandGen::init(ymuint32 seed)
 bool
 BinaryRandGen::value()
 {
+#if 0
   if ( mNextPos >= 32 ) {
     mBuffer = mRandGen.int32();
     mNextPos = 0;
@@ -84,6 +91,15 @@ BinaryRandGen::value()
   bool ans = static_cast<bool>((mBuffer >> mNextPos) & 1U);
   ++ mNextPos;
   return ans;
+#else
+  double v = mRandGen.real2();
+  if ( v <= mProb ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+#endif
 }
 
 
@@ -117,8 +133,6 @@ int
 rvgen(int argc,
       const char** argv)
 {
-  BinaryRandGen rg;
-
   PoptMainApp main_app;
 
   // seed オプション
@@ -126,7 +140,13 @@ rvgen(int argc,
 		     "specify random seed",
 		     "<INT>");
 
+  // prob オプション
+  PoptDouble popt_prob("prob", 'p',
+		       "specify probability",
+		       "0.0 - 1.0");
+
   main_app.add_option(&popt_seed);
+  main_app.add_option(&popt_prob);
 
   main_app.set_other_option_help("<vector size> <vector num>");
 
@@ -134,10 +154,6 @@ rvgen(int argc,
   tPoptStat stat = main_app.parse_options(argc, argv, 0);
   if ( stat == kPoptAbort ) {
     return -1;
-  }
-
-  if ( popt_seed.is_specified() ) {
-    rg.init(popt_seed.val());
   }
 
   vector<string> args;
@@ -168,6 +184,16 @@ rvgen(int argc,
     return 3;
   }
 
+  double prob = 0.5;
+  if ( popt_prob.is_specified() ) {
+    prob = popt_prob.val();
+  }
+
+  BinaryRandGen rg(prob);
+
+  if ( popt_seed.is_specified() ) {
+    rg.init(popt_seed.val());
+  }
 
   //  n と k を出力
   gen_vectors(n, k, rg, cout);

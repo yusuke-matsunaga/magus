@@ -54,6 +54,10 @@ AM_CPPFLAGS = \
 ## rvgen 用の変数の定義
 ############################################################
 
+rvgen_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
+
 rvgen_SOURCES = \
 	rvgen.cc
 
@@ -64,7 +68,8 @@ rvgen_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp.la
 
 rvgen_LDFLAGS = \
-	$(AM_LDFLAGS)
+	$(AM_LDFLAGS) \
+	-static
 
 
 ############################################################

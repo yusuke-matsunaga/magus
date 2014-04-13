@@ -48,6 +48,13 @@ public:
   cf_partition(const vector<const FuncVect*>& func_list,
 	       vector<ymuint>& block_map);
 
+  /// @brief naive 分割を行う．
+  /// @param[in] func_list 関数のリスト
+  /// @param[out] block_map 分割を表す配列
+  bool
+  naive_partition(const vector<const FuncVect*>& func_list,
+		  vector<ymuint>& block_map);
+
   /// @brief displace_decomposition を行う．
   bool
   displace_decomposition(const FuncVect* func1,
