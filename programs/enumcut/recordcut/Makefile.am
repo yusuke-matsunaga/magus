@@ -100,7 +100,9 @@ recordcut_SOURCES = \
 	FuncRec.h \
 	FuncRec.cc \
 	Lut443Match.h \
-	Lut443Match.cc
+	Lut443Match.cc \
+	Lut444Match.h \
+	Lut444Match.cc
 
 recordcut_LDADD = \
 	$(top_builddir)/libgbm/libgbm.la \
@@ -138,7 +140,9 @@ recordcut_d_SOURCES = \
 	FuncRec.h \
 	FuncRec.cc \
 	Lut443Match.h \
-	Lut443Match.cc
+	Lut443Match.cc \
+	Lut444Match.h \
+	Lut444Match.cc
 
 recordcut_d_LDADD = \
 	$(top_builddir)/libgbm/libgbm_d.la \

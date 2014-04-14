@@ -64,76 +64,207 @@ Lut444Match::Lut444Match()
 {
   // LUT-A0 を作る．
   ymuint id_a0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-  make_lut444(mA0, 10, id_a0);
-  mA0.set_input_pred(1, 0);
-  mA0.set_input_pred(2, 1);
-  mA0.set_input_pred(3, 2);
-  mA0.set_input_pred(4, 0);
-  mA0.set_input_pred(5, 4);
-  mA0.set_input_pred(6, 5);
-  mA0.set_input_pred(7, 6);
+  make_lut444(mA0.mNetwork, 10, id_a0);
+  mA0.mNetwork.set_input_pred(1, 0);
+  mA0.mNetwork.set_input_pred(2, 1);
+  mA0.mNetwork.set_input_pred(3, 2);
+  mA0.mNetwork.set_input_pred(4, 0);
+  mA0.mNetwork.set_input_pred(5, 4);
+  mA0.mNetwork.set_input_pred(6, 5);
+  mA0.mNetwork.set_input_pred(7, 6);
+  mA0.mNetwork.set_input_pred(9, 8);
+
+  mN10list.push_back(&mA0);
 
   // LUT-A1 を作る．
-  ymuint id_a1[] = { 0, 1, 2, 3, 0, 4, 5, 6, 7 };
-  make_lut444(mA1, 8, id_a1);
-  mA1.set_input_pred(2, 1);
-  mA1.set_input_pred(3, 2);
-  mA1.set_input_pred(4, 1);
-  mA1.set_input_pred(5, 4);
-  mA1.set_input_pred(6, 5);
+  ymuint id_a1[] = { 0, 1, 2, 3, 0, 4, 5, 6, 7, 8 };
+  make_lut444(mA1.mNetwork, 9, id_a1);
+  mA1.mNetwork.set_input_pred(2, 1);
+  mA1.mNetwork.set_input_pred(3, 2);
+  mA1.mNetwork.set_input_pred(4, 1);
+  mA1.mNetwork.set_input_pred(5, 4);
+  mA1.mNetwork.set_input_pred(6, 5);
+  mA1.mNetwork.set_input_pred(8, 7);
+
+  mN9list.push_back(&mA1);
 
   // LUT-A2 を作る．
-  ymuint id_a2[] = { 0, 1, 2, 3, 0, 1, 4, 5, 6 };
-  make_lut444(mA2, 7, id_a2);
-  mA2.set_input_pred(1, 0);
-  mA2.set_input_pred(3, 2);
-  mA2.set_input_pred(4, 2);
-  mA2.set_input_pred(5, 4);
+  ymuint id_a2[] = { 0, 1, 2, 3, 0, 1, 4, 5, 6, 7 };
+  make_lut444(mA2.mNetwork, 8, id_a2);
+  mA2.mNetwork.set_input_pred(1, 0);
+  mA2.mNetwork.set_input_pred(3, 2);
+  mA2.mNetwork.set_input_pred(4, 2);
+  mA2.mNetwork.set_input_pred(5, 4);
+  mA2.mNetwork.set_input_pred(7, 6);
+
+  mN8list.push_back(&mA2);
 
   // LUT-A3 を作る．
-  ymuint id_a3[] = { 0, 1, 2, 3, 0, 1, 2, 4, 5 };
-  make_lut444(mA3, 6, id_a3);
-  mA3.set_input_pred(1, 0);
-  mA3.set_input_pred(2, 1);
-  mA3.set_input_pred(4, 3);
+  ymuint id_a3[] = { 0, 1, 2, 3, 0, 1, 2, 4, 5, 6 };
+  make_lut444(mA3.mNetwork, 7, id_a3);
+  mA3.mNetwork.set_input_pred(1, 0);
+  mA3.mNetwork.set_input_pred(2, 1);
+  mA3.mNetwork.set_input_pred(4, 3);
+  mA3.mNetwork.set_input_pred(6, 5);
+
+  mN7list.push_back(&mA3);
+
+  // LUT-A4 を作る．
+  ymuint id_a4[] = { 0, 1, 2, 3, 0, 1, 2, 3, 4, 5 };
+  make_lut444(mA4.mNetwork, 6, id_a4);
+  mA4.mNetwork.set_input_pred(1, 0);
+  mA4.mNetwork.set_input_pred(2, 1);
+  mA4.mNetwork.set_input_pred(3, 2);
+  mA4.mNetwork.set_input_pred(5, 4);
+
+  mN6list.push_back(&mA4);
 
   // LUT-B0 を作る．
-  ymuint id_b0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0 };
-  make_lut444(mB0, 8, id_b0);
-  mB0.set_input_pred(2, 1);
-  mB0.set_input_pred(3, 2);
-  mB0.set_input_pred(5, 4);
-  mB0.set_input_pred(6, 5);
-  mB0.set_input_pred(7, 6);
+  ymuint id_b0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 8 };
+  make_lut444(mB0.mNetwork, 9, id_b0);
+  mB0.mNetwork.set_input_pred(2, 1);
+  mB0.mNetwork.set_input_pred(3, 2);
+  mB0.mNetwork.set_input_pred(5, 4);
+  mB0.mNetwork.set_input_pred(6, 5);
+  mB0.mNetwork.set_input_pred(7, 6);
+
+  mN9list.push_back(&mB0);
 
   // LUT-B1 を作る．
-  ymuint id_b1[] = { 0, 1, 2, 3, 1, 4, 5, 6, 0 };
-  make_lut444(mB1, 7, id_b1);
-  mB1.set_input_pred(3, 2);
-  mB1.set_input_pred(5, 4);
-  mB1.set_input_pred(6, 5);
+  ymuint id_b1[] = { 0, 1, 2, 3, 1, 4, 5, 6, 0, 7 };
+  make_lut444(mB1.mNetwork, 8, id_b1);
+  mB1.mNetwork.set_input_pred(3, 2);
+  mB1.mNetwork.set_input_pred(5, 4);
+  mB1.mNetwork.set_input_pred(6, 5);
+
+  mN8list.push_back(&mB1);
 
   // LUT-B2 を作る．
-  ymuint id_b2[] = { 0, 1, 2, 3, 1, 2, 4, 5, 0 };
-  make_lut444(mB2, 6, id_b2);
-  mB2.set_input_pred(2, 1);
-  mB2.set_input_pred(5, 4);
+  ymuint id_b2[] = { 0, 1, 2, 3, 1, 2, 4, 5, 0, 6 };
+  make_lut444(mB2.mNetwork, 7, id_b2);
+  mB2.mNetwork.set_input_pred(2, 1);
+  mB2.mNetwork.set_input_pred(5, 4);
+
+  mN7list.push_back(&mB2);
+
+  // LUT-B3 を作る．
+  ymuint id_b3[] = { 0, 1, 2, 3, 1, 2, 3, 4, 0, 5 };
+  make_lut444(mB3.mNetwork, 6, id_b3);
+  mB2.mNetwork.set_input_pred(2, 1);
+  mB2.mNetwork.set_input_pred(3, 2);
+
+  mN6list.push_back(&mB3);
 
   // LUT-C0 を作る．
-  ymuint id_c0[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0 };
-  make_lut444(mC0, 7, id_c0);
-  mC0.set_input_pred(2, 1);
-  mC0.set_input_pred(3, 2);
-  mC0.set_input_pred(4, 1);
-  mC0.set_input_pred(5, 4);
-  mC0.set_input_pred(6, 5);
+  ymuint id_c0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 1 };
+  make_lut444(mC0.mNetwork, 8, id_c0);
+  mC0.mNetwork.set_input_pred(1, 0);
+  mC0.mNetwork.set_input_pred(3, 2);
+  mC0.mNetwork.set_input_pred(5, 4);
+  mC0.mNetwork.set_input_pred(6, 5);
+  mC0.mNetwork.set_input_pred(7, 6);
+
+  mN8list.push_back(&mC0);
 
   // LUT-C1 を作る．
-  ymuint id_c1[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0 };
-  make_lut444(mC1, 7, id_c1);
-  mC1.set_input_pred(3, 2);
-  mC1.set_input_pred(4, 2);
-  mC1.set_input_pred(5, 4);
+  ymuint id_c1[] = { 0, 1, 2, 3, 2, 4, 5, 6, 0, 1 };
+  make_lut444(mC1.mNetwork, 7, id_c1);
+  mC1.mNetwork.set_input_pred(1, 0);
+  mC1.mNetwork.set_input_pred(5, 4);
+  mC1.mNetwork.set_input_pred(6, 5);
+
+  mN7list.push_back(&mC1);
+
+  // LUT-C2 を作る．
+  ymuint id_c2[] = { 0, 1, 2, 3, 2, 3, 4, 5, 0, 1 };
+  make_lut444(mC2.mNetwork, 6, id_c2);
+  mC2.mNetwork.set_input_pred(1, 0);
+  mC2.mNetwork.set_input_pred(3, 2);
+  mC2.mNetwork.set_input_pred(5, 4);
+
+  mN6list.push_back(&mC2);
+
+  // LUT-D0 を作る．
+  ymuint id_d0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 4 };
+  make_lut444(mD0.mNetwork, 8, id_d0);
+  mD0.mNetwork.set_input_pred(2, 1);
+  mD0.mNetwork.set_input_pred(3, 2);
+  mD0.mNetwork.set_input_pred(4, 0);
+  mD0.mNetwork.set_input_pred(6, 5);
+  mD0.mNetwork.set_input_pred(7, 6);
+
+  mN8list.push_back(&mD0);
+
+  // LUT-D1 を作る．
+  ymuint id_d1[] = { 0, 1, 2, 3, 4, 1, 5, 6, 0, 4 };
+  make_lut444(mD1.mNetwork, 7, id_d1);
+  mD1.mNetwork.set_input_pred(3, 2);
+  mD1.mNetwork.set_input_pred(4, 0);
+  mD1.mNetwork.set_input_pred(6, 5);
+
+  mN7list.push_back(&mD1);
+
+  // LUT-D2 を作る．
+  ymuint id_d2[] = { 0, 1, 2, 3, 4, 1, 2, 5, 0, 4 };
+  make_lut444(mD2.mNetwork, 6, id_d2);
+  mD2.mNetwork.set_input_pred(2, 1);
+  mD2.mNetwork.set_input_pred(4, 0);
+
+  mN6list.push_back(&mD2);
+
+  // LUT-E0 を作る．
+  ymuint id_e0[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0, 7 };
+  make_lut444(mE0.mNetwork, 8, id_e0);
+  mE0.mNetwork.set_input_pred(2, 1);
+  mE0.mNetwork.set_input_pred(3, 2);
+  mE0.mNetwork.set_input_pred(4, 1);
+  mE0.mNetwork.set_input_pred(5, 4);
+  mE0.mNetwork.set_input_pred(6, 5);
+
+  mN8list.push_back(&mE0);
+
+  // LUT-E1 を作る．
+  ymuint id_e1[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0, 6 };
+  make_lut444(mE1.mNetwork, 7, id_e1);
+  mE1.mNetwork.set_input_pred(3, 2);
+  mE1.mNetwork.set_input_pred(4, 2);
+  mE1.mNetwork.set_input_pred(5, 4);
+
+  mN7list.push_back(&mE1);
+
+  // LUT-E2 を作る．
+  ymuint id_e2[] = { 0, 1, 2, 3, 0, 1, 2, 4, 0, 5 };
+  make_lut444(mE2.mNetwork, 6, id_e2);
+  mE2.mNetwork.set_input_pred(2, 1);
+  mE2.mNetwork.set_input_pred(4, 3);
+
+  mN6list.push_back(&mE2);
+
+  // LUT-F0 を作る．
+  ymuint id_f0[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0, 1 };
+  make_lut444(mF0.mNetwork, 7, id_f0);
+  mF0.mNetwork.set_input_pred(3, 2);
+  mF0.mNetwork.set_input_pred(5, 4);
+  mF0.mNetwork.set_input_pred(6, 5);
+
+  mN7list.push_back(&mF0);
+
+  // LUT-F1 を作る．
+  ymuint id_f1[] = { 0, 1, 2, 3, 0, 2, 4, 5, 0, 1 };
+  make_lut444(mF1.mNetwork, 6, id_f1);
+  mF1.mNetwork.set_input_pred(5, 4);
+
+  mN6list.push_back(&mF1);
+
+  // LUT-G0 を作る．
+  ymuint id_g0[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0, 1 };
+  make_lut444(mG0.mNetwork, 6, id_g0);
+  mG0.mNetwork.set_input_pred(1, 0);
+  mG0.mNetwork.set_input_pred(3, 2);
+  mG0.mNetwork.set_input_pred(4, 2);
+  mG0.mNetwork.set_input_pred(5, 4);
+
+  mN6list.push_back(&mG0);
 
   reset_count();
 }
@@ -192,136 +323,97 @@ Lut444Match::match(const TvFunc& func,
   vector<ymuint> iorder;
 
   if ( ni1 == 6 ) {
-    bool stat = solver.solve(mA3, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type A-3 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
+    for (ymuint i = 0; i < mN6list.size(); ++ i) {
+      RcfInfo& info = *mN6list[i];
+      bool stat = solver.solve(info.mNetwork, func1, conf_bits, iorder);
+      if ( stat ) {
+	if ( debug ) {
+	  cout << "Type A-4 Match" << endl;
+	  cout << "  iorder = ";
+	  for (ymuint i = 0; i < ni1; ++ i) {
+	    cout << " " << iorder[i];
+	  }
+	  cout << endl;
 	}
-	cout << endl;
+	++ info.mCount;
+	return true;
       }
-      ++ mA3Num;
-      return true;
-    }
-
-    stat = solver.solve(mB2, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type B-2 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
-	}
-	cout << endl;
-      }
-      ++ mB2Num;
-      return true;
-    }
-
-    stat = solver.solve(mC1, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type C-1 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
-	}
-	cout << endl;
-      }
-      ++ mC1Num;
-      return true;
     }
   }
 
   if ( ni1 == 7 ) {
-    bool stat = solver.solve(mA2, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type A-2 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
+    for (ymuint i = 0; i < mN7list.size(); ++ i) {
+      RcfInfo& info = *mN7list[i];
+      bool stat = solver.solve(info.mNetwork, func1, conf_bits, iorder);
+      if ( stat ) {
+	if ( debug ) {
+	  cout << "Type A-2 Match" << endl;
+	  cout << "  iorder = ";
+	  for (ymuint i = 0; i < ni1; ++ i) {
+	    cout << " " << iorder[i];
+	  }
+	  cout << endl;
 	}
-	cout << endl;
+	++ info.mCount;
+	return true;
       }
-      ++ mA2Num;
-      return true;
-    }
-
-    stat = solver.solve(mB1, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type B-1 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
-	}
-	cout << endl;
-      }
-      ++ mB1Num;
-      return true;
-    }
-
-    stat = solver.solve(mC0, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type C-0 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
-	}
-	cout << endl;
-      }
-      ++ mC0Num;
-      return true;
     }
   }
 
   if ( ni1 == 8 ) {
-    bool stat = solver.solve(mA1, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type A-1 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
+    for (ymuint i = 0; i < mN8list.size(); ++ i) {
+      RcfInfo& info = *mN8list[i];
+      bool stat = solver.solve(info.mNetwork, func1, conf_bits, iorder);
+      if ( stat ) {
+	if ( debug ) {
+	  cout << "Type A-1 Match" << endl;
+	  cout << "  iorder = ";
+	  for (ymuint i = 0; i < ni1; ++ i) {
+	    cout << " " << iorder[i];
+	  }
+	  cout << endl;
 	}
-	cout << endl;
+	++ info.mCount;
+	return true;
       }
-      ++ mA1Num;
-      return true;
-    }
-
-    stat = solver.solve(mB0, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type B-0 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
-	}
-	cout << endl;
-      }
-      ++ mB0Num;
-      return true;
     }
   }
 
   if ( ni1 == 9 ) {
-    bool stat = solver.solve(mA0, func1, conf_bits, iorder);
-    if ( stat ) {
-      if ( debug ) {
-	cout << "Type A-0 Match" << endl;
-	cout << "  iorder = ";
-	for (ymuint i = 0; i < ni1; ++ i) {
-	  cout << " " << iorder[i];
+    for (ymuint i = 0; i < mN9list.size(); ++ i) {
+      RcfInfo& info = *mN9list[i];
+      bool stat = solver.solve(info.mNetwork, func1, conf_bits, iorder);
+      if ( stat ) {
+	if ( debug ) {
+	  cout << "Type A-0 Match" << endl;
+	  cout << "  iorder = ";
+	  for (ymuint i = 0; i < ni1; ++ i) {
+	    cout << " " << iorder[i];
+	  }
+	  cout << endl;
 	}
-	cout << endl;
+	++ info.mCount;
+	return true;
       }
-      ++ mA0Num;
-      return true;
+    }
+  }
+
+  if ( ni1 == 10 ) {
+    for (ymuint i = 0; i < mN10list.size(); ++ i) {
+      RcfInfo& info = *mN10list[i];
+      bool stat = solver.solve(info.mNetwork, func1, conf_bits, iorder);
+      if ( stat ) {
+	if ( debug ) {
+	  cout << "Type A-0 Match" << endl;
+	  cout << "  iorder = ";
+	  for (ymuint i = 0; i < ni1; ++ i) {
+	    cout << " " << iorder[i];
+	  }
+	  cout << endl;
+	}
+	++ info.mCount;
+	return true;
+      }
     }
   }
 
@@ -337,16 +429,10 @@ void
 Lut444Match::reset_count()
 {
   mTrivialNum = 0;
-  mA0Num = 0;
-  mA1Num = 0;
-  mA2Num = 0;
-  mA3Num = 0;
-  mB0Num = 0;
-  mB1Num = 0;
-  mB2Num = 0;
-  mC0Num = 0;
-  mC1Num = 0;
   mFailNum = 0;
+  for (ymuint i = 0; i < mAllList.size(); ++ i) {
+    mAllList[i]->mCount = 0;
+  }
 }
 
 // @brief カウンタの値を得る．
@@ -356,23 +442,47 @@ Lut444Match::get_count(ymuint& trival_num,
 		       ymuint& a1_num,
 		       ymuint& a2_num,
 		       ymuint& a3_num,
+		       ymuint& a4_num,
 		       ymuint& b0_num,
 		       ymuint& b1_num,
 		       ymuint& b2_num,
+		       ymuint& b3_num,
 		       ymuint& c0_num,
 		       ymuint& c1_num,
+		       ymuint& c2_num,
+		       ymuint& d0_num,
+		       ymuint& d1_num,
+		       ymuint& d2_num,
+		       ymuint& e0_num,
+		       ymuint& e1_num,
+		       ymuint& e2_num,
+		       ymuint& f0_num,
+		       ymuint& f1_num,
+		       ymuint& g0_num,
 		       ymuint& fail_num)
 {
   trival_num = mTrivialNum;
-  a0_num = mA0Num;
-  a1_num = mA1Num;
-  a2_num = mA2Num;
-  a3_num = mA3Num;
-  b0_num = mB0Num;
-  b1_num = mB1Num;
-  b2_num = mB2Num;
-  c0_num = mC0Num;
-  c1_num = mC1Num;
+  a0_num = mA0.mCount;
+  a1_num = mA1.mCount;
+  a2_num = mA2.mCount;
+  a3_num = mA3.mCount;
+  a4_num = mA4.mCount;
+  b0_num = mB0.mCount;
+  b1_num = mB1.mCount;
+  b2_num = mB2.mCount;
+  b3_num = mB3.mCount;
+  c0_num = mC0.mCount;
+  c1_num = mC1.mCount;
+  c2_num = mC2.mCount;
+  d0_num = mD0.mCount;
+  d1_num = mD1.mCount;
+  d2_num = mD2.mCount;
+  e0_num = mE0.mCount;
+  e1_num = mE1.mCount;
+  e2_num = mE2.mCount;
+  f0_num = mF0.mCount;
+  f1_num = mF1.mCount;
+  g0_num = mG0.mCount;
   fail_num = mFailNum;
 }
 

@@ -54,12 +54,39 @@ public:
 	    ymuint& a1_num,
 	    ymuint& a2_num,
 	    ymuint& a3_num,
+	    ymuint& a4_num,
 	    ymuint& b0_num,
 	    ymuint& b1_num,
 	    ymuint& b2_num,
+	    ymuint& b3_num,
 	    ymuint& c0_num,
 	    ymuint& c1_num,
+	    ymuint& c2_num,
+	    ymuint& d0_num,
+	    ymuint& d1_num,
+	    ymuint& d2_num,
+	    ymuint& e0_num,
+	    ymuint& e1_num,
+	    ymuint& e2_num,
+	    ymuint& f0_num,
+	    ymuint& f1_num,
+	    ymuint& g0_num,
 	    ymuint& fail_num);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  struct RcfInfo
+  {
+    // LUT ネットワーク
+    RcfNetwork mNetwork;
+
+    // マッチした回数
+    ymuint32 mCount;
+  };
 
 
 private:
@@ -68,61 +95,82 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // A0
-  RcfNetwork mA0;
+  RcfInfo mA0;
 
   // A1
-  RcfNetwork mA1;
+  RcfInfo mA1;
 
   // A2
-  RcfNetwork mA2;
+  RcfInfo mA2;
 
   // A3
-  RcfNetwork mA3;
+  RcfInfo mA3;
+
+  // A$
+  RcfInfo mA4;
 
   // B0
-  RcfNetwork mB0;
+  RcfInfo mB0;
 
   // B1
-  RcfNetwork mB1;
+  RcfInfo mB1;
 
   // B2
-  RcfNetwork mB2;
+  RcfInfo mB2;
+
+  // B3
+  RcfInfo mB3;
 
   // C0
-  RcfNetwork mC0;
+  RcfInfo mC0;
 
   // C1
-  RcfNetwork mC1;
+  RcfInfo mC1;
+
+  // C2
+  RcfInfo mC2;
+
+  // D0
+  RcfInfo mD0;
+
+  // D1
+  RcfInfo mD1;
+
+  // D2
+  RcfInfo mD2;
+
+  // E0
+  RcfInfo mE0;
+
+  // E1
+  RcfInfo mE1;
+
+  // E2
+  RcfInfo mE2;
+
+  // F0
+  RcfInfo mF0;
+
+  // F1
+  RcfInfo mF1;
+
+  // G0
+  RcfInfo mG0;
+
+  vector<RcfInfo*> mN6list;
+
+  vector<RcfInfo*> mN7list;
+
+  vector<RcfInfo*> mN8list;
+
+  vector<RcfInfo*> mN9list;
+
+  vector<RcfInfo*> mN10list;
+
+  vector<RcfInfo*> mAllList;
 
   // 自明なマッチ (<= 5)の回数
   ymuint32 mTrivialNum;
-
-  // A0 の回数
-  ymuint32 mA0Num;
-
-  // A1 の回数
-  ymuint32 mA1Num;
-
-  // A2 の回数
-  ymuint32 mA2Num;
-
-  // A3 の回数
-  ymuint32 mA3Num;
-
-  // B0 の回数
-  ymuint32 mB0Num;
-
-  // B1 の回数
-  ymuint32 mB1Num;
-
-  // B2 の回数
-  ymuint32 mB2Num;
-
-  // C0 の回数
-  ymuint32 mC0Num;
-
-  // C1 の回数
-  ymuint32 mC1Num;
 
   // マッチしなかった回数
   ymuint32 mFailNum;
