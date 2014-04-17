@@ -12,6 +12,7 @@
 #include "RcfNetwork.h"
 #include "logic/TvFunc.h"
 #include "GbmSolver.h"
+#include "LnMatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -76,17 +77,13 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
+  // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  struct RcfInfo
-  {
-    // LUT ネットワーク
-    RcfNetwork mNetwork;
-
-    // マッチした回数
-    ymuint32 mCount;
-  };
+  void
+  make_lut444(ymuint input_num,
+	      ymuint iorder[],
+	      ymuint pred_list[]);
 
 
 private:
@@ -94,86 +91,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // A0
-  RcfInfo mA0;
-
-  // A1
-  RcfInfo mA1;
-
-  // A2
-  RcfInfo mA2;
-
-  // A3
-  RcfInfo mA3;
-
-  // A$
-  RcfInfo mA4;
-
-  // B0
-  RcfInfo mB0;
-
-  // B1
-  RcfInfo mB1;
-
-  // B2
-  RcfInfo mB2;
-
-  // B3
-  RcfInfo mB3;
-
-  // C0
-  RcfInfo mC0;
-
-  // C1
-  RcfInfo mC1;
-
-  // C2
-  RcfInfo mC2;
-
-  // D0
-  RcfInfo mD0;
-
-  // D1
-  RcfInfo mD1;
-
-  // D2
-  RcfInfo mD2;
-
-  // E0
-  RcfInfo mE0;
-
-  // E1
-  RcfInfo mE1;
-
-  // E2
-  RcfInfo mE2;
-
-  // F0
-  RcfInfo mF0;
-
-  // F1
-  RcfInfo mF1;
-
-  // G0
-  RcfInfo mG0;
-
-  vector<RcfInfo*> mN6list;
-
-  vector<RcfInfo*> mN7list;
-
-  vector<RcfInfo*> mN8list;
-
-  vector<RcfInfo*> mN9list;
-
-  vector<RcfInfo*> mN10list;
-
-  vector<RcfInfo*> mAllList;
-
-  // 自明なマッチ (<= 5)の回数
-  ymuint32 mTrivialNum;
-
-  // マッチしなかった回数
-  ymuint32 mFailNum;
+  LnMatch mMatcher;
 
 };
 

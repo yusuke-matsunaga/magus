@@ -99,6 +99,8 @@ recordcut_SOURCES = \
 	FuncMgr.cc \
 	FuncRec.h \
 	FuncRec.cc \
+	LnMatch.h \
+	LnMatch.cc \
 	Lut443Match.h \
 	Lut443Match.cc \
 	Lut444Match.h \
@@ -124,25 +126,12 @@ recordcut_d_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_popt/include
 
-recordcut_CXXFLAGS = \
-	$(YM_CXXOPTFLAGS) \
+recordcut_d_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
 recordcut_d_SOURCES = \
-	recordcut.cc \
-	Cut.h \
-	CutHash.h \
-	CutHash.cc \
-	CutMgr.h \
-	CutMgr.cc \
-	FuncMgr.h \
-	FuncMgr.cc \
-	FuncRec.h \
-	FuncRec.cc \
-	Lut443Match.h \
-	Lut443Match.cc \
-	Lut444Match.h \
-	Lut444Match.cc
+	$(recordcut_SOURCES)
 
 recordcut_d_LDADD = \
 	$(top_builddir)/libgbm/libgbm_d.la \
@@ -161,6 +150,8 @@ recordcut_d_LDFLAGS = \
 ############################################################
 
 Lut443MatchTest_SOURCES = \
+	LnMatch.h \
+	LnMatch.cc \
 	Lut443Match.h \
 	Lut443Match.cc \
 	Lut443MatchTest.cc

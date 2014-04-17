@@ -12,6 +12,7 @@
 #include "RcfNetwork.h"
 #include "logic/TvFunc.h"
 #include "GbmSolver.h"
+#include "LnMatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -64,68 +65,21 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  void
+  make_lut443(ymuint input_num,
+	      ymuint iorder[],
+	      ymuint pred_list[]);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // A0
-  RcfNetwork mA0;
-
-  // A1
-  RcfNetwork mA1;
-
-  // A2
-  RcfNetwork mA2;
-
-  // A3
-  RcfNetwork mA3;
-
-  // B0
-  RcfNetwork mB0;
-
-  // B1
-  RcfNetwork mB1;
-
-  // B2
-  RcfNetwork mB2;
-
-  // C0
-  RcfNetwork mC0;
-
-  // C1
-  RcfNetwork mC1;
-
-  // 自明なマッチ (<= 5)の回数
-  ymuint32 mTrivialNum;
-
-  // A0 の回数
-  ymuint32 mA0Num;
-
-  // A1 の回数
-  ymuint32 mA1Num;
-
-  // A2 の回数
-  ymuint32 mA2Num;
-
-  // A3 の回数
-  ymuint32 mA3Num;
-
-  // B0 の回数
-  ymuint32 mB0Num;
-
-  // B1 の回数
-  ymuint32 mB1Num;
-
-  // B2 の回数
-  ymuint32 mB2Num;
-
-  // C0 の回数
-  ymuint32 mC0Num;
-
-  // C1 の回数
-  ymuint32 mC1Num;
-
-  // マッチしなかった回数
-  ymuint32 mFailNum;
+  LnMatch mMatcher;
 
 };
 
