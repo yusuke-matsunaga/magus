@@ -33,186 +33,167 @@ Lut444Match::Lut444Match()
 
   // LUT-A0 を作る．
   ymuint id_a0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-  ymuint pred_a0[] = { 1, 0,
-		       2, 1,
-		       3, 2,
-		       4, 0,
-		       5, 4,
-		       6, 5,
-		       7, 6,
-		       9, 8,
-		       10, 10 };
-  make_lut444(10, id_a0, pred_a0);
+  ymuint sym_a0[] = { 0, 1, 2, 3, 0,
+		      4, 5, 6, 7, 4,
+		      0, 4, 0,
+		      8, 9, 8,
+		      10 };
+  make_lut444(10, id_a0, sym_a0);
 
   // LUT-A1 を作る．
   ymuint id_a1[] = { 0, 1, 2, 3, 0, 4, 5, 6, 7, 8 };
-  ymuint pred_a1[] = { 2, 1,
-		       3, 2,
-		       4, 1,
-		       5, 4,
-		       6, 5,
-		       8, 7,
-		       9, 9 };
-  make_lut444(9, id_a1, pred_a1);
+  ymuint sym_a1[] = { 1, 2, 3, 1,
+		      4, 5, 6, 4,
+		      1, 4, 1,
+		      7, 8, 7,
+		      9 };
+  make_lut444(9, id_a1, sym_a1);
 
   // LUT-A2 を作る．
   ymuint id_a2[] = { 0, 1, 2, 3, 0, 1, 4, 5, 6, 7 };
-  ymuint pred_a2[] = { 1, 0,
-		       3, 2,
-		       4, 2,
-		       5, 4,
-		       7, 6,
-		       8, 8 };
-  make_lut444(8, id_a2, pred_a2);
+  ymuint sym_a2[] = { 0, 1, 0,
+		      2, 3, 2,
+		      4, 5, 4,
+		      2, 4, 2,
+		      6, 7, 6,
+		      8 };
+  make_lut444(8, id_a2, sym_a2);
 
   // LUT-A3 を作る．
   ymuint id_a3[] = { 0, 1, 2, 3, 0, 1, 2, 4, 5, 6 };
-  ymuint pred_a3[] = { 1, 0,
-		       2, 1,
-		       4, 3,
-		       6, 5,
-		       7, 7 };
-  make_lut444(7, id_a3, pred_a3);
+  ymuint sym_a3[] = { 0, 1, 2, 0,
+		      3, 4, 3,
+		      5, 6, 5,
+		      7 };
+  make_lut444(7, id_a3, sym_a3);
 
   // LUT-A4 を作る．
   ymuint id_a4[] = { 0, 1, 2, 3, 0, 1, 2, 3, 4, 5 };
-  ymuint pred_a4[] = { 1, 0,
-		       2, 1,
-		       3, 2,
-		       5, 4,
-		       6, 6 };
-  make_lut444(6, id_a4, pred_a4);
+  ymuint sym_a4[] = { 0, 1, 2, 3, 0,
+		      4, 5, 4,
+		      6 };
+  make_lut444(6, id_a4, sym_a4);
 
   // LUT-B0 を作る．
   ymuint id_b0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 8 };
-  ymuint pred_b0[] = { 2, 1,
-		       3, 2,
-		       5, 4,
-		       6, 5,
-		       7, 6,
-		       9, 9 };
-  make_lut444(9, id_b0, pred_b0);
+  ymuint sym_b0[] = { 1, 2, 3, 1,
+		      4, 5, 6, 7, 4,
+		      9 };
+  make_lut444(9, id_b0, sym_b0);
 
   // LUT-B1 を作る．
   ymuint id_b1[] = { 0, 1, 2, 3, 1, 4, 5, 6, 0, 7 };
-  ymuint pred_b1[] = { 3, 2,
-		       5, 4,
-		       6, 5,
-		       8, 8 };
-  make_lut444(8, id_b1, pred_b1);
+  ymuint sym_b1[] = { 2, 3, 2,
+		      4, 5, 6, 4,
+		      8 };
+  make_lut444(8, id_b1, sym_b1);
 
   // LUT-B2 を作る．
   ymuint id_b2[] = { 0, 1, 2, 3, 1, 2, 4, 5, 0, 6 };
-  ymuint pred_b2[] = { 2, 1,
-		       5, 4,
-		       7, 7 };
-  make_lut444(7, id_b2, pred_b2);
+  ymuint sym_b2[] = { 1, 2, 1,
+		      4, 5, 4,
+		      7 };
+  make_lut444(7, id_b2, sym_b2);
 
   // LUT-B3 を作る．
   ymuint id_b3[] = { 0, 1, 2, 3, 1, 2, 3, 4, 0, 5 };
-  ymuint pred_b3[] = { 2, 1,
-		       3, 2,
-		       6, 6 };
-  make_lut444(6, id_b3, pred_b3);
+  ymuint sym_b3[] = { 1, 2, 3, 1,
+		      6 };
+  make_lut444(6, id_b3, sym_b3);
 
   // LUT-C0 を作る．
   ymuint id_c0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 1 };
-  ymuint pred_c0[] = { 1, 0,
-		       3, 2,
-		       5, 4,
-		       6, 5,
-		       7, 6,
-		       8, 8 };
-  make_lut444(8, id_c0, pred_c0);
+  ymuint sym_c0[] = { 0, 1, 0,
+		      2, 3, 2,
+		      4, 5, 6, 7, 4,
+		      8 };
+  make_lut444(8, id_c0, sym_c0);
 
   // LUT-C1 を作る．
   ymuint id_c1[] = { 0, 1, 2, 3, 2, 4, 5, 6, 0, 1 };
-  ymuint pred_c1[] = { 1, 0,
-			5, 4,
-			6, 5,
-			7, 7 };
-  make_lut444(7, id_c1, pred_c1);
+  ymuint sym_c1[] = { 0, 1, 0,
+		      4, 5, 6, 4,
+		      7 };
+  make_lut444(7, id_c1, sym_c1);
 
   // LUT-C2 を作る．
   ymuint id_c2[] = { 0, 1, 2, 3, 2, 3, 4, 5, 0, 1 };
-  ymuint pred_c2[] = { 1, 0,
-		       3, 2,
-		       5, 4,
-		       6, 6 };
-  make_lut444(6, id_c2, pred_c2);
+  ymuint sym_c2[] = { 0, 1, 0,
+		      2, 3, 2,
+		      4, 5, 4,
+		      6 };
+  make_lut444(6, id_c2, sym_c2);
 
   // LUT-D0 を作る．
   ymuint id_d0[] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 4 };
-  ymuint pred_d0[] = { 2, 1,
-		       3, 2,
-		       4, 0,
-		       6, 5,
-		       7, 6,
-		       8, 8 };
-  make_lut444(8, id_d0, pred_d0);
+  ymuint sym_d0[] = { 1, 2, 3, 1,
+		      5, 6, 7, 5,
+		      0, 4, 0,
+		      1, 5, 1,
+		      8 };
+  make_lut444(8, id_d0, sym_d0);
 
   // LUT-D1 を作る．
   ymuint id_d1[] = { 0, 1, 2, 3, 4, 1, 5, 6, 0, 4 };
-  ymuint pred_d1[] = { 3, 2,
-		       4, 0,
-		       6, 5,
-		       7, 7 };
-  make_lut444(7, id_d1, pred_d1);
+  ymuint sym_d1[] = { 2, 3, 2,
+		      5, 6, 5,
+		      0, 4, 0,
+		      2, 5, 2,
+		      7 };
+  make_lut444(7, id_d1, sym_d1);
 
   // LUT-D2 を作る．
   ymuint id_d2[] = { 0, 1, 2, 3, 4, 1, 2, 5, 0, 4 };
-  ymuint pred_d2[] = { 2, 1,
-		       4, 0,
-		       6, 6 };
-  make_lut444(6, id_d2, pred_d2);
+  ymuint sym_d2[] = { 1, 2, 1,
+		      0, 4, 0,
+		      3, 5, 3,
+		      6 };
+  make_lut444(6, id_d2, sym_d2);
 
   // LUT-E0 を作る．
   ymuint id_e0[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0, 7 };
-  ymuint pred_e0[] = { 2, 1,
-		       3, 2,
-		       4, 1,
-		       5, 4,
-		       6, 5,
-		       8, 8 };
-  make_lut444(8, id_e0, pred_e0);
+  ymuint sym_e0[] = { 1, 2, 3, 1,
+		      4, 5, 6, 4,
+		      1, 4, 1,
+		      8 };
+  make_lut444(8, id_e0, sym_e0);
 
   // LUT-E1 を作る．
   ymuint id_e1[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0, 6 };
-  ymuint pred_e1[] = { 3, 2,
-		       4, 2,
-		       5, 4,
-		       7, 7 };
-  make_lut444(7, id_e1, pred_e1);
+  ymuint sym_e1[] = { 2, 3, 2,
+		      4, 5, 4,
+		      2, 4, 2,
+		      7 };
+  make_lut444(7, id_e1, sym_e1);
 
   // LUT-E2 を作る．
   ymuint id_e2[] = { 0, 1, 2, 3, 0, 1, 2, 4, 0, 5 };
-  ymuint pred_e2[] = { 2, 1,
-		       4, 3,
-		       6, 6 };
-  make_lut444(6, id_e2, pred_e2);
+  ymuint sym_e2[] = { 1, 2, 1,
+		      3, 4, 3,
+		      6 };
+  make_lut444(6, id_e2, sym_e2);
 
   // LUT-F0 を作る．
   ymuint id_f0[] = { 0, 1, 2, 3, 0, 4, 5, 6, 0, 1 };
-  ymuint pred_f0[] = { 3, 2,
-		       5, 4,
-		       6, 5,
-		       7, 7 };
-  make_lut444(7, id_f0, pred_f0);
+  ymuint sym_f0[] = { 2, 3, 2,
+		      4, 5, 6, 4,
+		      7 };
+  make_lut444(7, id_f0, sym_f0);
 
   // LUT-F1 を作る．
   ymuint id_f1[] = { 0, 1, 2, 3, 0, 2, 4, 5, 0, 1 };
-  ymuint pred_f1[] = { 5, 4,
-		       6, 6 };
-  make_lut444(6, id_f1, pred_f1);
+  ymuint sym_f1[] = { 4, 5, 4,
+		      6 };
+  make_lut444(6, id_f1, sym_f1);
 
   // LUT-G0 を作る．
   ymuint id_g0[] = { 0, 1, 2, 3, 0, 1, 4, 5, 0, 1 };
-  ymuint pred_g0[] = { 1, 0,
-		       3, 2,
-		       4, 2,
-		       5, 4,
-		       6, 6 };
-  make_lut444(6, id_g0, pred_g0);
+  ymuint sym_g0[] = { 0, 1, 0,
+		      2, 3, 2,
+		      4, 5, 4,
+		      2, 4, 2,
+		      6 };
+  make_lut444(6, id_g0, sym_g0);
 
   reset_count();
 }
@@ -292,7 +273,7 @@ Lut444Match::get_count(ymuint& trivial_num,
 void
 Lut444Match::make_lut444(ymuint input_num,
 			 ymuint iorder[],
-			 ymuint pred_list[])
+			 ymuint sym_list[])
 {
   RcfNetwork* network = new RcfNetwork;
   vector<RcfNodeHandle> input_list(input_num);
@@ -322,13 +303,20 @@ Lut444Match::make_lut444(ymuint input_num,
 
   network->set_output(lut3);
 
-  for (ymuint i = 0; ; i += 2) {
-    ymuint pos = pred_list[i];
-    if ( pos == input_num ) {
+  for (ymuint i = 0; ; ++ i) {
+     ymuint pos0 = sym_list[i];
+    if ( pos0 == input_num ) {
       break;
     }
-    ymuint pred = pred_list[i + 1];
-    network->set_input_pred(pos, pred);
+    ymuint pred = pos0;
+    for (++ i; ; ++ i) {
+      ymuint pos = sym_list[i];
+      if ( pos == pos0 ) {
+	break;
+      }
+      network->set_input_pred(pos, pred);
+      pred = pos;
+    }
   }
 
   mMatcher.add_templ(input_num, network);

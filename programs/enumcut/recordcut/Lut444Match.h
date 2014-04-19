@@ -83,7 +83,7 @@ private:
   void
   make_lut444(ymuint input_num,
 	      ymuint iorder[],
-	      ymuint pred_list[]);
+	      ymuint sym_list[]);
 
 
 private:
