@@ -100,7 +100,8 @@ FuncMgr::func_list(ymuint ni,
 void
 FuncMgr::dump(ODO& s) const
 {
-  s << mRepHash.size();
+  ymuint32 n = mRepHash.size();
+  s << n;
   for (FuncSet::const_iterator p = mRepHash.begin();
        p != mRepHash.end(); ++ p) {
     const TvFunc& f = *p;
@@ -116,11 +117,9 @@ FuncMgr::restore(IDO& s)
   ymuint32 n;
   s >> n;
 
-  cout << "Total " << n << " functions" << endl;
   for (ymuint i = 0; i < n; ++ i) {
     TvFunc f;
     s >> f;
-    cout << "Func#" << i << ": " << f << endl;
     mRepHash.insert(f);
   }
 }
