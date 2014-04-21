@@ -334,7 +334,7 @@ DumpRepCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  mgr().dump_rep(bo);
+  mgr().dump(bo);
 
   return TCL_OK;
 }
@@ -451,51 +451,14 @@ PrintCmd::cmd_proc(TclObjVector& objv)
     }
   }
 
-#if 0
-  NpnMgr npn_mgr;
-
-  ymuint nfall = 0;
-  ymuint nrall = 0;
-  for (ymuint i = min_n; i <= max_n; ++ i) {
-    vector<TvFunc> func_list;
-    mgr().func_list(i, func_list);
-    hash_set<TvFunc> rep_hash;
-    ymuint nrep = 0;
-    for (vector<TvFunc>::const_iterator p = func_list.begin();
-	 p != func_list.end(); ++ p) {
-      const TvFunc& f = *p;
-      NpnMap cmap;
-      npn_mgr.cannonical(f, cmap);
-      TvFunc rep = f.xform(cmap);
-      if ( rep_hash.count(rep) == 0 ) {
-	rep_hash.insert(rep);
-	++ nrep;
-      }
-    }
-    *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions"
-	 << "      " << setw(10) << nrep << " representative functions" << endl;
-    nfall += func_list.size();
-    nrall += nrep;
-  }
-  *osp << "Total " << setw(12) << nfall << "          functions"
-       << "      " << setw(10) << nrall << " representative functions" << endl;
-#else
+  vector<TvFunc> rep_func_list;
+  mgr().func_list(rep_func_list);
   for (ymuint i = min_n; i <= max_n; ++ i) {
     vector<TvFunc> func_list;
     mgr().func_list(i, func_list);
     *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input functions" << endl;
   }
-  *osp << "Total " << setw(12) << func_list.size() << "          functions" << endl;
-
-  vector<TvFunc> rep_func_list;
-  mgr().rep_func_list(rep_func_list);
-  for (ymuint i = min_n; i <= max_n; ++ i) {
-    vector<TvFunc> func_list;
-    mgr().rep_func_list(i, func_list);
-    *osp << "Total " << setw(12) << func_list.size() << " " << setw(2) << i << " input representative functions" << endl;
-  }
-  *osp << "Total " << setw(12) << rep_func_list.size() << "          representative functions" << endl;
-#endif
+  *osp << "Total " << setw(12) << rep_func_list.size() << "          functions" << endl;
 
   return TCL_OK;
 }
