@@ -5350,8 +5350,7 @@ TvFunc::print(ostream& s,
 void
 TvFunc::dump(ODO& s) const
 {
-  s << mInputNum
-    << mBlockNum;
+  s << mInputNum;
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     s << mVector[i];
   }
@@ -5362,9 +5361,8 @@ TvFunc::dump(ODO& s) const
 void
 TvFunc::restore(IDO& s)
 {
-  ymuint32 nblk;
-  s >> mInputNum
-    >> nblk;
+  s >> mInputNum;
+  ymuint32 nblk = nblock(mInputNum);
   if ( mBlockNum != nblk ) {
     delete [] mVector;
     mBlockNum = nblk;
