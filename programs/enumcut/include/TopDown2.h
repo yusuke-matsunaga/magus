@@ -158,14 +158,6 @@ private:
   void
   mark_cnode(const BdnNode* node);
 
-  /// @brief node の TFI に c1mark をつける．
-  void
-  mark_cnode2(const BdnNode* node);
-
-  /// @brief node のカットになったノードに c1mark をつけ，mMarkedNodes に入れる．
-  void
-  mark_cnode3(const BdnNode* node);
-
   /// @brief cmark のついているノードを cnode_list に入れてcmarkを消す．
   void
   set_cur_node_list_recur(const BdnNode* node,

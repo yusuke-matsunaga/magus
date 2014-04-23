@@ -91,21 +91,19 @@ TopDown2::operator()(const BdnMgr& network,
 
     mMarkedNodesLast = 0;
 
-    // ファンインの footprint ノードに c1mark をつける．
+    // ファンインの footprint ノードに temp1mark をつける．
     mark_cnode(node->fanin0());
     mark_cnode(node->fanin1());
 
-    // 自身に c1mark がついており，ファンインに c1mark がついていない
-    // ノードに c2mark をつける．
-    // c2mark のついたノードが境界ノードとなる．
+    // 自身に temp1mark がついており，ファンインに temp1mark がついていない
+    // ノードに temp2mark をつける．
+    // temp2mark のついたノードが境界ノードとなる．
     for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
       const BdnNode* node = mMarkedNodes[i];
-      if ( temp1mark(node) ) {
-	if ( !node->is_logic() ||
-	     !temp1mark(node->fanin0()) ||
-	     !temp1mark(node->fanin1()) ) {
-	  set_temp2mark(node);
-	}
+      if ( !node->is_logic() ||
+	   !temp1mark(node->fanin0()) ||
+	   !temp1mark(node->fanin1()) ) {
+	set_temp2mark(node);
       }
     }
 
@@ -150,7 +148,12 @@ TopDown2::enum_recur()
 {
   if ( frontier_is_empty() ) {
 #if defined(DEBUG_ENUM_RECUR)
-    cout << "FRONTIER IS EMPTY" << endl;
+    cout << "FRONTIER IS EMPTY" << endl
+	 << "  CUTS: ";
+    for (ymuint i = 0; i < mInputPos; ++ i) {
+      cout << " " << mInputs[i]->id();
+    }
+    cout << endl;
 #endif
 
     for (ymuint i = 0; i < mInputPos; ++ i) {
@@ -171,6 +174,8 @@ TopDown2::enum_recur()
 
   const BdnNode* node = pop_node();
 
+  assert_cond( node->is_logic(), __FILE__, __LINE__);
+
 #if defined(DEBUG_ENUM_RECUR)
   cout << "POP[1] " << node->id() << endl;
 #endif
@@ -178,7 +183,7 @@ TopDown2::enum_recur()
   bool has_cuts = false;
 
   if ( mInputPos < mLimit &&
-       ( !node->is_logic() || node->fanout_num() > 1 ) ) {
+       ( !node->is_logic() || node == mRoot || node->fanout_num() > 1 ) ) {
     // node を入力に固定して再帰を続ける
     set_input(node);
 
@@ -199,9 +204,14 @@ TopDown2::enum_recur()
 
   const BdnNode** old_fs_pos = mFsPos;
   ymuint old_input_pos = mInputPos;
-  bool go = true;
+
   bool inode0_stat = false;
   const BdnNode* inode0 = node->fanin0();
+  bool inode1_stat = false;
+  const BdnNode* inode1 = node->fanin1();
+
+  bool go = true;
+
   if ( state(inode0) == 0 ) {
     // inode0 はまだ未処理
     if ( temp2mark(inode0) ) {
@@ -223,6 +233,8 @@ TopDown2::enum_recur()
       }
     }
     else {
+      assert_cond( !temp2mark(inode0), __FILE__, __LINE__);
+      assert_cond( inode0->is_logic(), __FILE__, __LINE__);
       // inode0 をフロンティアスタックに積む．
       push_node(inode0);
       inode0_stat = true;
@@ -234,8 +246,6 @@ TopDown2::enum_recur()
     }
   }
   if ( go ) {
-    bool inode1_stat = false;
-    const BdnNode* inode1 = node->fanin1();
     if ( state(inode1) == 0 ) {
       // inode1 はまだ未処理
       if ( temp2mark(inode1) ) {
@@ -257,6 +267,8 @@ TopDown2::enum_recur()
 	}
       }
       else {
+	assert_cond( !temp2mark(inode1), __FILE__, __LINE__);
+	assert_cond( inode1->is_logic(), __FILE__, __LINE__);
 	// inode1 をフロンティアスタックに積む．
 	push_node(inode1);
 	inode1_stat = true;
@@ -267,23 +279,24 @@ TopDown2::enum_recur()
 #endif
       }
     }
-    if ( go ) {
-      // node を内部ノードにして再帰を続ける．
-      bool has_cuts1 = enum_recur();
-      if ( has_cuts1 ) {
-	set_fpmark(node);
-	has_cuts = true;
-      }
-    }
-    if ( inode1_stat ) {
-      clear_state(inode1);
-      clear_edge_mark(node, 0);
-
-#if defined(DEBUG_ENUM_RECUR)
-      cout << "UNMARK[3] " << inode1->id() << endl;
-#endif
+  }
+  if ( go ) {
+    // node を内部ノードにして再帰を続ける．
+    bool has_cuts1 = enum_recur();
+    if ( has_cuts1 ) {
+      set_fpmark(node);
+      has_cuts = true;
     }
   }
+  if ( inode1_stat ) {
+    clear_state(inode1);
+    clear_edge_mark(node, 0);
+
+#if defined(DEBUG_ENUM_RECUR)
+    cout << "UNMARK[3] " << inode1->id() << endl;
+#endif
+  }
+
   if ( inode0_stat ) {
     clear_state(inode0);
     clear_edge_mark(node, 0);
@@ -316,40 +329,6 @@ TopDown2::mark_cnode(const BdnNode* node)
       set_temp1mark(node1);
       mMarkedNodes[mMarkedNodesLast] = node1;
       ++ mMarkedNodesLast;
-    }
-  }
-}
-
-// @brief node の TFI に c1mark をつける．
-void
-TopDown2::mark_cnode2(const BdnNode* node)
-{
-  if ( !temp1mark(node) ) {
-    set_temp1mark(node);
-    mMarkedNodes[mMarkedNodesLast] = node;
-    ++ mMarkedNodesLast;
-    if ( node->is_logic() ) {
-      mark_cnode2(node->fanin0());
-      mark_cnode2(node->fanin1());
-    }
-  }
-}
-
-// @brief node のカットになったノードに c1mark をつけ，mMarkedNodes に入れる．
-void
-TopDown2::mark_cnode3(const BdnNode* node)
-{
-  const vector<const BdnNode*>& fpnode_list1 = fpnode_list(node);
-  for (vector<const BdnNode*>::const_iterator p = fpnode_list1.begin();
-       p != fpnode_list1.end(); ++ p) {
-    const BdnNode* node = *p;
-    if ( !temp1mark(node) ) {
-      set_temp1mark(node);
-      mMarkedNodes[mMarkedNodesLast] = node;
-      ++ mMarkedNodesLast;
-      if ( node->fanout_num() > 1 ) {
-	set_temp2mark(node);
-      }
     }
   }
 }

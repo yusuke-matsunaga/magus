@@ -19,6 +19,7 @@
 #include "networks/BdnNode.h"
 
 #include "TopDown.h"
+#include "TopDown2.h"
 #include "FuncMgr.h"
 #include "FuncRec.h"
 
@@ -72,7 +73,7 @@ rec_func(FuncMgr& func_mgr,
   }
 
   FuncRec op(func_mgr);
-  TopDown enumcut;
+  TopDown2 enumcut;
 
   op.set_min_size(min_cut_size);
   op.set_debug_level(0);
