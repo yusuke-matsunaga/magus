@@ -6,7 +6,7 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "EnumCut2.h"
+#include "EnumCut.h"
 
 #include "RwtMgr.h"
 #include "RwtPat.h"
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS
 /// @brief local rewrting を行うための EnumCutOp
 //////////////////////////////////////////////////////////////////////
 class RwtOp :
-  public EnumCutOp2
+  public EnumCutOp
 {
 public:
 
@@ -40,32 +40,32 @@ public:
   /// @param[in] mode カット列挙モード
   virtual
   void
-  all_init(BdnMgr& sbjgraph,
+  all_init(const BdnMgr& sbjgraph,
 	   ymuint limit);
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_init(BdnNode* node);
+  node_init(const BdnNode* node);
 
   /// @brief カットを見つけたときに呼ばれる関数
   virtual
   void
-  found_cut(BdnNode* root,
+  found_cut(const BdnNode* root,
 	    ymuint ni,
-	    BdnNode** inputs);
+	    const BdnNode** inputs);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
   virtual
   void
-  node_end(BdnNode* node);
+  node_end(const BdnNode* node);
 
   /// @brief 処理の最後に呼ばれる関数
   virtual
   void
-  all_end(BdnMgr& sbjgraph,
+  all_end(const BdnMgr& sbjgraph,
 	  ymuint limit);
 
 
@@ -75,13 +75,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   void
-  calc_func(BdnNode* node);
+  calc_func(const BdnNode* node);
 
   void
-  clear_mark(BdnNode* node);
+  clear_mark(const BdnNode* node);
 
   ymuint
-  count_node(BdnNode* node);
+  count_node(const BdnNode* node);
 
 
 private:
@@ -107,7 +107,7 @@ private:
   RwtMgr& mMgr;
 
   // 対象のネットワーク
-  BdnMgr* mNetwork;
+  const BdnMgr* mNetwork;
 
   // 各ノードの作業領域
   vector<NodeInfo> mNodeInfo;

@@ -15,6 +15,7 @@
 
 #include "networks/BdnMgr.h"
 #include "networks/BdnNode.h"
+#include "networks/BdnConstNodeHandle.h"
 
 #include "logic/TvFunc.h"
 #include "logic/NpnMgr.h"
@@ -43,7 +44,7 @@ RwtOp::~RwtOp()
 // @param[in] limit カットサイズ
 // @param[in] mode カット列挙モード
 void
-RwtOp::all_init(BdnMgr& sbjgraph,
+RwtOp::all_init(const BdnMgr& sbjgraph,
 		ymuint limit)
 {
   mNetwork = &sbjgraph;
@@ -58,15 +59,15 @@ RwtOp::all_init(BdnMgr& sbjgraph,
 // @brief node を根とするカットを列挙する直前に呼ばれる関数
 // @param[in] node 根のノード
 void
-RwtOp::node_init(BdnNode* node)
+RwtOp::node_init(const BdnNode* node)
 {
 }
 
 // @brief カットを見つけたときに呼ばれる関数
 void
-RwtOp::found_cut(BdnNode* root,
+RwtOp::found_cut(const BdnNode* root,
 		 ymuint ni,
-		 BdnNode** inputs)
+		 const BdnNode** inputs)
 {
   if ( ni == 0 ) {
     return;
@@ -79,7 +80,7 @@ RwtOp::found_cut(BdnNode* root,
   cout << "}" << endl;
 
   for (ymuint i = 0; i < ni; ++ i) {
-    BdnNode* inode = inputs[i];
+    const BdnNode* inode = inputs[i];
     NodeInfo& node_info = mNodeInfo[inode->id()];
     node_info.mMark = 1U;
     node_info.mFunc = TvFunc::posi_literal(mMgr.input_num(), VarId(i));
@@ -110,7 +111,7 @@ RwtOp::found_cut(BdnNode* root,
       assert_cond( pat_node->is_input(), __FILE__, __LINE__);
       ymuint iid = pat_node->input_id();
       NpnVmap vmap = cmap.imap(VarId(iid));
-      BdnNode* inode = inputs[vmap.var().val()];
+      const BdnNode* inode = inputs[vmap.var().val()];
       node_map[pat_node->id()] = BdnNodeHandle(inode, vmap.inv());
       pat_mark[pat_node->id()] = true;
       mNodeInfo[inode->id()].mMark = 2U;
@@ -184,7 +185,7 @@ RwtOp::found_cut(BdnNode* root,
 }
 
 void
-RwtOp::calc_func(BdnNode* node)
+RwtOp::calc_func(const BdnNode* node)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   if ( node_info.mMark == 1U ) {
@@ -196,8 +197,8 @@ RwtOp::calc_func(BdnNode* node)
   node_info.mMark = 1U;
 
   assert_cond( node->is_logic(), __FILE__, __LINE__);
-  BdnNode* inode0 = node->fanin0();
-  BdnNode* inode1 = node->fanin1();
+  const BdnNode* inode0 = node->fanin0();
+  const BdnNode* inode1 = node->fanin1();
   calc_func(inode0);
   calc_func(inode1);
   bool inv0 = node->fanin0_inv();
@@ -219,7 +220,7 @@ RwtOp::calc_func(BdnNode* node)
 }
 
 void
-RwtOp::clear_mark(BdnNode* node)
+RwtOp::clear_mark(const BdnNode* node)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   if ( node_info.mMark == 0U ) {
@@ -237,7 +238,7 @@ RwtOp::clear_mark(BdnNode* node)
 }
 
 ymuint
-RwtOp::count_node(BdnNode* node)
+RwtOp::count_node(const BdnNode* node)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   if ( node_info.mMark & 2U ) {
@@ -269,13 +270,13 @@ RwtOp::count_node(BdnNode* node)
 // @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
 // @param[in] node 根のノード
 void
-RwtOp::node_end(BdnNode* node)
+RwtOp::node_end(const BdnNode* node)
 {
 }
 
 // @brief 処理の最後に呼ばれる関数
 void
-RwtOp::all_end(BdnMgr& sbjgraph,
+RwtOp::all_end(const BdnMgr& sbjgraph,
 	       ymuint limit)
 {
 }

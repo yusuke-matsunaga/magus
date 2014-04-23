@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM
 TopDown2::TopDown2()
 {
   mFsSize = 1024;
-  mFrontierStack = new BdnNode*[mFsSize];
+  mFrontierStack = new const BdnNode*[mFsSize];
   mFsPos = &mFrontierStack[0];
 }
 
@@ -38,9 +38,9 @@ TopDown2::~TopDown2()
 // @param[in] network 対象のネットワーク
 // @param[in] limit カットサイズの制限
 void
-TopDown2::operator()(BdnMgr& network,
+TopDown2::operator()(const BdnMgr& network,
 		     ymuint limit,
-		     EnumCutOp2* op)
+		     EnumCutOp* op)
 {
   mOp = op;
 
@@ -54,7 +54,7 @@ TopDown2::operator()(BdnMgr& network,
 
   mOp->all_init(network, limit);
 
-  mInputs = new BdnNode*[limit];
+  mInputs = new const BdnNode*[limit];
 
   mInodeStack = new ymuint32[network.lnode_num()];
   mIsPos = &mInodeStack[0];
@@ -68,7 +68,7 @@ TopDown2::operator()(BdnMgr& network,
   const BdnNodeList& input_list = network.input_list();
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
 
     mOp->node_init(node);
 
@@ -87,7 +87,7 @@ TopDown2::operator()(BdnMgr& network,
   network._sort(node_list);
   for (vector<BdnNode*>::iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
 
     mMarkedNodesLast = 0;
 
@@ -99,7 +99,7 @@ TopDown2::operator()(BdnMgr& network,
     // ノードに c2mark をつける．
     // c2mark のついたノードが境界ノードとなる．
     for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
-      BdnNode* node = mMarkedNodes[i];
+      const BdnNode* node = mMarkedNodes[i];
       if ( temp1mark(node) ) {
 	if ( !node->is_logic() ||
 	     !temp1mark(node->fanin0()) ||
@@ -125,7 +125,7 @@ TopDown2::operator()(BdnMgr& network,
     assert_cond( mInputPos == 0, __FILE__, __LINE__);
 
     // 今の列挙で使われたノードを footprint_node_list に格納する．
-    vector<BdnNode*>& fplist = fpnode_list(node);
+    vector<const BdnNode*>& fplist = fpnode_list(node);
     fplist.reserve(mMarkedNodesLast);
     set_cur_node_list_recur(node, fplist);
 
@@ -133,7 +133,7 @@ TopDown2::operator()(BdnMgr& network,
 
     // マークを消しておく．
     for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
-      BdnNode* node = mMarkedNodes[i];
+      const BdnNode* node = mMarkedNodes[i];
       clear_tempmark(node);
     }
   }
@@ -169,7 +169,7 @@ TopDown2::enum_recur()
     return true;
   }
 
-  BdnNode* node = pop_node();
+  const BdnNode* node = pop_node();
 
 #if defined(DEBUG_ENUM_RECUR)
   cout << "POP[1] " << node->id() << endl;
@@ -197,11 +197,11 @@ TopDown2::enum_recur()
 #endif
   }
 
-  BdnNode** old_fs_pos = mFsPos;
+  const BdnNode** old_fs_pos = mFsPos;
   ymuint old_input_pos = mInputPos;
   bool go = true;
   bool inode0_stat = false;
-  BdnNode* inode0 = node->fanin0();
+  const BdnNode* inode0 = node->fanin0();
   if ( state(inode0) == 0 ) {
     // inode0 はまだ未処理
     if ( temp2mark(inode0) ) {
@@ -235,7 +235,7 @@ TopDown2::enum_recur()
   }
   if ( go ) {
     bool inode1_stat = false;
-    BdnNode* inode1 = node->fanin1();
+    const BdnNode* inode1 = node->fanin1();
     if ( state(inode1) == 0 ) {
       // inode1 はまだ未処理
       if ( temp2mark(inode1) ) {
@@ -306,12 +306,12 @@ TopDown2::enum_recur()
 
 // @brief node のカットになったノードに c1mark をつけ，mMarkedNodes に入れる．
 void
-TopDown2::mark_cnode(BdnNode* node)
+TopDown2::mark_cnode(const BdnNode* node)
 {
-  const vector<BdnNode*>& fpnode_list1 = fpnode_list(node);
-  for (vector<BdnNode*>::const_iterator p = fpnode_list1.begin();
+  const vector<const BdnNode*>& fpnode_list1 = fpnode_list(node);
+  for (vector<const BdnNode*>::const_iterator p = fpnode_list1.begin();
        p != fpnode_list1.end(); ++ p) {
-    BdnNode* node1 = *p;
+    const BdnNode* node1 = *p;
     if ( !temp1mark(node1) ) {
       set_temp1mark(node1);
       mMarkedNodes[mMarkedNodesLast] = node1;
@@ -322,7 +322,7 @@ TopDown2::mark_cnode(BdnNode* node)
 
 // @brief node の TFI に c1mark をつける．
 void
-TopDown2::mark_cnode2(BdnNode* node)
+TopDown2::mark_cnode2(const BdnNode* node)
 {
   if ( !temp1mark(node) ) {
     set_temp1mark(node);
@@ -337,12 +337,12 @@ TopDown2::mark_cnode2(BdnNode* node)
 
 // @brief node のカットになったノードに c1mark をつけ，mMarkedNodes に入れる．
 void
-TopDown2::mark_cnode3(BdnNode* node)
+TopDown2::mark_cnode3(const BdnNode* node)
 {
-  const vector<BdnNode*>& fpnode_list1 = fpnode_list(node);
-  for (vector<BdnNode*>::const_iterator p = fpnode_list1.begin();
+  const vector<const BdnNode*>& fpnode_list1 = fpnode_list(node);
+  for (vector<const BdnNode*>::const_iterator p = fpnode_list1.begin();
        p != fpnode_list1.end(); ++ p) {
-    BdnNode* node = *p;
+    const BdnNode* node = *p;
     if ( !temp1mark(node) ) {
       set_temp1mark(node);
       mMarkedNodes[mMarkedNodesLast] = node;
@@ -356,8 +356,8 @@ TopDown2::mark_cnode3(BdnNode* node)
 
 // @brief cmark のついているノードを cnode_list に入れてcmarkを消す．
 void
-TopDown2::set_cur_node_list_recur(BdnNode* node,
-				  vector<BdnNode*>& cnode_list)
+TopDown2::set_cur_node_list_recur(const BdnNode* node,
+				  vector<const BdnNode*>& cnode_list)
 {
   if ( !fpmark(node) ) {
     return;

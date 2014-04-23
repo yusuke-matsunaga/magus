@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "EnumCut2.h"
+#include "EnumCut.h"
 #include "networks/BdnNode.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM
 /// @brief トップダウンのカット列挙を行うクラス
 //////////////////////////////////////////////////////////////////////
 class TopDown2 :
-  public EnumCut2
+  public EnumCut
 {
 public:
 
@@ -39,9 +39,9 @@ public:
   /// @param[in] limit カットサイズの制限
   virtual
   void
-  operator()(BdnMgr& network,
+  operator()(const BdnMgr& network,
 	     ymuint limit,
-	     EnumCutOp2* op);
+	     EnumCutOp* op);
 
 
 private:
@@ -123,11 +123,11 @@ private:
     clear_edge_mark(ymuint pos);
 
     /// @brief footprint ノードのリストを返す．
-    vector<BdnNode*>&
+    vector<const BdnNode*>&
     fpnode_list();
 
     /// @brief footprint ノードのリストを返す．
-    const vector<BdnNode*>&
+    const vector<const BdnNode*>&
     fpnode_list() const;
 
 
@@ -137,7 +137,7 @@ private:
     //////////////////////////////////////////////////////////////////////
 
     // このノードの footprint ノード
-    vector<BdnNode*> mFpNodeList;
+    vector<const BdnNode*> mFpNodeList;
 
     // 種々のマークをパックしたもの
     ymuint32 mMarks;
@@ -156,27 +156,27 @@ private:
 
   /// @brief node のカットになったノードに c1mark をつけ，mMarkedNodes に入れる．
   void
-  mark_cnode(BdnNode* node);
+  mark_cnode(const BdnNode* node);
 
   /// @brief node の TFI に c1mark をつける．
   void
-  mark_cnode2(BdnNode* node);
+  mark_cnode2(const BdnNode* node);
 
   /// @brief node のカットになったノードに c1mark をつけ，mMarkedNodes に入れる．
   void
-  mark_cnode3(BdnNode* node);
+  mark_cnode3(const BdnNode* node);
 
   /// @brief cmark のついているノードを cnode_list に入れてcmarkを消す．
   void
-  set_cur_node_list_recur(BdnNode* node,
-			  vector<BdnNode*>& cnode_list);
+  set_cur_node_list_recur(const BdnNode* node,
+			  vector<const BdnNode*>& cnode_list);
 
   /// @brief フロンティアスタックにプッシュする．
   void
-  push_node(BdnNode* node);
+  push_node(const BdnNode* node);
 
   /// @brief フロンティアスタックからノードをポップする．
-  BdnNode*
+  const BdnNode*
   pop_node();
 
   /// @brief フロンティアスタックが空のとき true を返す．
@@ -185,92 +185,92 @@ private:
 
   /// @brief ノードを入力に確定する．
   void
-  set_input(BdnNode* node);
+  set_input(const BdnNode* node);
 
   /// @brief ノードの作業領域を得る．
   NodeTemp&
-  node_temp(BdnNode* node);
+  node_temp(const BdnNode* node);
 
   /// @brief ノードの作業領域を得る．
   const NodeTemp&
-  node_temp(BdnNode* node) const;
+  node_temp(const BdnNode* node) const;
 
   /// @brief 状態を取り出す．
   /// - 0: 初期状態
   /// - 1: カットの内側
   /// - 2: カットの入力(境界)
   ymuint
-  state(BdnNode* node) const;
+  state(const BdnNode* node) const;
 
   /// @brief 内部の印をつける．
   void
-  set_inside_state(BdnNode* node);
+  set_inside_state(const BdnNode* node);
 
   /// @brief 入力の印をつける．
   void
-  set_input_state(BdnNode* node);
+  set_input_state(const BdnNode* node);
 
   /// @brief 状態を初期化する．
   void
-  clear_state(BdnNode* node);
+  clear_state(const BdnNode* node);
 
   /// @brief footprint マークを返す．
   bool
-  fpmark(BdnNode* node) const;
+  fpmark(const BdnNode* node) const;
 
   /// @brief footprint マークをつける．
   void
-  set_fpmark(BdnNode* node);
+  set_fpmark(const BdnNode* node);
 
   /// @brief footprint マークを消す．
   void
-  clear_fpmark(BdnNode* node);
+  clear_fpmark(const BdnNode* node);
 
   /// @brief テンポラリマーク1を取り出す．
   bool
-  temp1mark(BdnNode* node) const;
+  temp1mark(const BdnNode* node) const;
 
   /// @brief テンポラリマーク1をつける．
   void
-  set_temp1mark(BdnNode* node);
+  set_temp1mark(const BdnNode* node);
 
   /// @brief テンポラリマーク2を取り出す．
   bool
-  temp2mark(BdnNode* node) const;
+  temp2mark(const BdnNode* node) const;
 
   /// @brief テンポラリマーク2をつける．
   void
-  set_temp2mark(BdnNode* ndoe);
+  set_temp2mark(const BdnNode* ndoe);
 
   /// @brief テンポラリマーク1/2 を消す．
   void
-  clear_tempmark(BdnNode* node);
+  clear_tempmark(const BdnNode* node);
 
   /// @brief 枝のマークを取り出す．
   /// @param[in] pos 枝番号 ( 0 or 1 )
   bool
-  edge_mark(BdnNode* node,
+  edge_mark(const BdnNode* node,
 	    ymuint pos) const;
 
   /// @brief 枝のマークをつける．
   /// @param[in] pos 枝番号 ( 0 or 1 )
   void
-  set_edge_mark(BdnNode* node,
+  set_edge_mark(const BdnNode* node,
 		ymuint pos);
 
   /// @brief 枝のマークを消す．
   /// @param[in] pos 枝番号 ( 0 or 1 )
   void
-  clear_edge_mark(BdnNode* node,
+  clear_edge_mark(const BdnNode* node,
 		  ymuint pos);
 
   /// @brief footprint ノードのリストを返す．
-  vector<BdnNode*>&
-  fpnode_list(BdnNode* node);
+  vector<const BdnNode*>&
+  fpnode_list(const BdnNode* node);
 
   /// @brief footprint ノードのリストを返す．
-  const vector<BdnNode*>&
-  fpnode_list(BdnNode* node) const;
+  const vector<const BdnNode*>&
+  fpnode_list(const BdnNode* node) const;
 
 
 private:
@@ -279,7 +279,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // カットが見つかったときの処理を行うファンクター
-  EnumCutOp2* mOp;
+  EnumCutOp* mOp;
 
   // カットサイズの制限値
   ymuint32 mLimit;
@@ -294,19 +294,19 @@ private:
   ymuint32 mNcCur;
 
   // 現在処理中の根のノード
-  BdnNode* mRoot;
+  const BdnNode* mRoot;
 
   // mFrontierStack のサイズ
   ymuint32 mFsSize;
 
   // フロンティアノードのスタック
-  BdnNode** mFrontierStack;
+  const BdnNode** mFrontierStack;
 
   // mFrontierStack の先頭を指すポインタ
-  BdnNode** mFsPos;
+  const BdnNode** mFsPos;
 
   // 確定した境界ノードを入れる配列
-  BdnNode** mInputs;
+  const BdnNode** mInputs;
 
   // mInputs の次の書き込み位置
   ymuint32 mInputPos;
@@ -321,7 +321,7 @@ private:
   vector<NodeTemp> mNodeTemp;
 
   // マークのついたノードを入れておく配列
-  vector<BdnNode*> mMarkedNodes;
+  vector<const BdnNode*> mMarkedNodes;
 
   // mMarkedNodes の末尾
   ymuint32 mMarkedNodesLast;
@@ -470,7 +470,7 @@ TopDown2::NodeTemp::clear_edge_mark(ymuint pos)
 
 // @brief footprint ノードのリストを返す．
 inline
-vector<BdnNode*>&
+vector<const BdnNode*>&
 TopDown2::NodeTemp::fpnode_list()
 {
   return mFpNodeList;
@@ -478,7 +478,7 @@ TopDown2::NodeTemp::fpnode_list()
 
 // @brief footprint ノードのリストを返す．
 inline
-const vector<BdnNode*>&
+const vector<const BdnNode*>&
 TopDown2::NodeTemp::fpnode_list() const
 {
   return mFpNodeList;
@@ -487,7 +487,7 @@ TopDown2::NodeTemp::fpnode_list() const
 // @brief ノードの作業領域を得る．
 inline
 TopDown2::NodeTemp&
-TopDown2::node_temp(BdnNode* node)
+TopDown2::node_temp(const BdnNode* node)
 {
   return mNodeTemp[node->id()];
 }
@@ -495,7 +495,7 @@ TopDown2::node_temp(BdnNode* node)
 // @brief ノードの作業領域を得る．
 inline
 const TopDown2::NodeTemp&
-TopDown2::node_temp(BdnNode* node) const
+TopDown2::node_temp(const BdnNode* node) const
 {
   return mNodeTemp[node->id()];
 }
@@ -506,7 +506,7 @@ TopDown2::node_temp(BdnNode* node) const
 // - 2: カットの入力(境界)
 inline
 ymuint
-TopDown2::state(BdnNode* node) const
+TopDown2::state(const BdnNode* node) const
 {
   return node_temp(node).state();
 }
@@ -514,7 +514,7 @@ TopDown2::state(BdnNode* node) const
 // @brief 内部の印をつける．
 inline
 void
-TopDown2::set_inside_state(BdnNode* node)
+TopDown2::set_inside_state(const BdnNode* node)
 {
   node_temp(node).set_inside_state();
 }
@@ -522,7 +522,7 @@ TopDown2::set_inside_state(BdnNode* node)
 // @brief 入力の印をつける．
 inline
 void
-TopDown2::set_input_state(BdnNode* node)
+TopDown2::set_input_state(const BdnNode* node)
 {
   node_temp(node).set_input_state();
 }
@@ -530,7 +530,7 @@ TopDown2::set_input_state(BdnNode* node)
 // @brief 状態を初期化する．
 inline
 void
-TopDown2::clear_state(BdnNode* node)
+TopDown2::clear_state(const BdnNode* node)
 {
   node_temp(node).clear_state();
 }
@@ -538,7 +538,7 @@ TopDown2::clear_state(BdnNode* node)
 // @brief footprint マークを返す．
 inline
 bool
-TopDown2::fpmark(BdnNode* node) const
+TopDown2::fpmark(const BdnNode* node) const
 {
   return node_temp(node).fpmark();
 }
@@ -546,7 +546,7 @@ TopDown2::fpmark(BdnNode* node) const
 // @brief footprint マークをつける．
 inline
 void
-TopDown2::set_fpmark(BdnNode* node)
+TopDown2::set_fpmark(const BdnNode* node)
 {
   node_temp(node).set_fpmark();
 }
@@ -554,7 +554,7 @@ TopDown2::set_fpmark(BdnNode* node)
 // @brief footprint マークを消す．
 inline
 void
-TopDown2::clear_fpmark(BdnNode* node)
+TopDown2::clear_fpmark(const BdnNode* node)
 {
   node_temp(node).clear_fpmark();
 }
@@ -562,7 +562,7 @@ TopDown2::clear_fpmark(BdnNode* node)
 // @brief テンポラリマーク1を取り出す．
 inline
 bool
-TopDown2::temp1mark(BdnNode* node) const
+TopDown2::temp1mark(const BdnNode* node) const
 {
   return node_temp(node).temp1mark();
 }
@@ -570,7 +570,7 @@ TopDown2::temp1mark(BdnNode* node) const
 // @brief テンポラリマーク1をつける．
 inline
 void
-TopDown2::set_temp1mark(BdnNode* node)
+TopDown2::set_temp1mark(const BdnNode* node)
 {
   node_temp(node).set_temp1mark();
 }
@@ -578,7 +578,7 @@ TopDown2::set_temp1mark(BdnNode* node)
 // @brief テンポラリマーク2を取り出す．
 inline
 bool
-TopDown2::temp2mark(BdnNode* node) const
+TopDown2::temp2mark(const BdnNode* node) const
 {
   return node_temp(node).temp2mark();
 }
@@ -586,7 +586,7 @@ TopDown2::temp2mark(BdnNode* node) const
 // @brief テンポラリマーク2をつける．
 inline
 void
-TopDown2::set_temp2mark(BdnNode* node)
+TopDown2::set_temp2mark(const BdnNode* node)
 {
   node_temp(node).set_temp2mark();
 }
@@ -594,7 +594,7 @@ TopDown2::set_temp2mark(BdnNode* node)
 // @brief テンポラリマーク1/2 を消す．
 inline
 void
-TopDown2::clear_tempmark(BdnNode* node)
+TopDown2::clear_tempmark(const BdnNode* node)
 {
   node_temp(node).clear_tempmark();
 }
@@ -603,7 +603,7 @@ TopDown2::clear_tempmark(BdnNode* node)
 // @param[in] pos 枝番号 ( 0 or 1 )
 inline
 bool
-TopDown2::edge_mark(BdnNode* node,
+TopDown2::edge_mark(const BdnNode* node,
 		   ymuint pos) const
 {
   return node_temp(node).edge_mark(pos);
@@ -613,7 +613,7 @@ TopDown2::edge_mark(BdnNode* node,
 // @param[in] pos 枝番号 ( 0 or 1 )
 inline
 void
-TopDown2::set_edge_mark(BdnNode* node,
+TopDown2::set_edge_mark(const BdnNode* node,
 		       ymuint pos)
 {
   node_temp(node).set_edge_mark(pos);
@@ -623,7 +623,7 @@ TopDown2::set_edge_mark(BdnNode* node,
 // @param[in] pos 枝番号 ( 0 or 1 )
 inline
 void
-TopDown2::clear_edge_mark(BdnNode* node,
+TopDown2::clear_edge_mark(const BdnNode* node,
 			 ymuint pos)
 {
   node_temp(node).clear_edge_mark(pos);
@@ -631,16 +631,16 @@ TopDown2::clear_edge_mark(BdnNode* node,
 
 // @brief footprint ノードのリストを返す．
 inline
-vector<BdnNode*>&
-TopDown2::fpnode_list(BdnNode* node)
+vector<const BdnNode*>&
+TopDown2::fpnode_list(const BdnNode* node)
 {
   return node_temp(node).fpnode_list();
 }
 
 // @brief footprint ノードのリストを返す．
 inline
-const vector<BdnNode*>&
-TopDown2::fpnode_list(BdnNode* node) const
+const vector<const BdnNode*>&
+TopDown2::fpnode_list(const BdnNode* node) const
 {
   return node_temp(node).fpnode_list();
 }
@@ -648,14 +648,14 @@ TopDown2::fpnode_list(BdnNode* node) const
 // @brief フロンティアスタックにプッシュする．
 inline
 void
-TopDown2::push_node(BdnNode* node)
+TopDown2::push_node(const BdnNode* node)
 {
   if ( mFsPos == mFrontierStack + mFsSize ) {
-    BdnNode** old_stack = mFrontierStack;
+    const BdnNode** old_stack = mFrontierStack;
     mFsSize <<= 1;
-    mFrontierStack = new BdnNode*[mFsSize];
-    BdnNode** sp = old_stack;
-    BdnNode** dp = mFrontierStack;
+    mFrontierStack = new const BdnNode*[mFsSize];
+    const BdnNode** sp = old_stack;
+    const BdnNode** dp = mFrontierStack;
     for ( ; dp != mFsPos; ++ sp, ++ dp) {
       *dp = *sp;
     }
@@ -668,7 +668,7 @@ TopDown2::push_node(BdnNode* node)
 
 // @brief フロンティアスタックからノードをポップする．
 inline
-BdnNode*
+const BdnNode*
 TopDown2::pop_node()
 {
   -- mFsPos;
@@ -686,7 +686,7 @@ TopDown2::frontier_is_empty() const
 // @brief ノードを入力に確定する．
 inline
 void
-TopDown2::set_input(BdnNode* node)
+TopDown2::set_input(const BdnNode* node)
 {
   set_input_state(node);
   mInputs[mInputPos] = node;
