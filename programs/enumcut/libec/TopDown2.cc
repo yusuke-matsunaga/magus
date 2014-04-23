@@ -177,7 +177,8 @@ TopDown2::enum_recur()
 
   bool has_cuts = false;
 
-  if ( mInputPos < mLimit ) {
+  if ( mInputPos < mLimit &&
+       ( !node->is_logic() || node->fanout_num() > 1 ) ) {
     // node を入力に固定して再帰を続ける
     set_input(node);
 
@@ -202,7 +203,27 @@ TopDown2::enum_recur()
   bool inode0_stat = false;
   BdnNode* inode0 = node->fanin0();
   if ( state(inode0) == 0 ) {
-    if ( !temp2mark(inode0) ) {
+    // inode0 はまだ未処理
+    if ( temp2mark(inode0) ) {
+      // inode0 は内部ノードにはなれない．
+      if ( mInputPos < mLimit &&
+	   ( !inode0->is_logic() || inode0->fanout_num() > 1 ) ) {
+	// inode0 を入力にする．
+	set_input(inode0);
+	inode0_stat = true;
+	set_edge_mark(node, 0);
+
+#if defined(DEBUG_ENUM_RECUR)
+	cout << "MARK[2] " << inode0->id() << endl;
+#endif
+      }
+      else {
+	// 内部ノードにも入力にもなれないのでエラー
+	go = false;
+      }
+    }
+    else {
+      // inode0 をフロンティアスタックに積む．
       push_node(inode0);
       inode0_stat = true;
       set_edge_mark(node, 0);
@@ -211,24 +232,32 @@ TopDown2::enum_recur()
       cout << "PUSH[2] " << inode0->id() << endl;
 #endif
     }
-    else if ( mInputPos < mLimit ) {
-      set_input(inode0);
-      inode0_stat = true;
-      set_edge_mark(node, 0);
-
-#if defined(DEBUG_ENUM_RECUR)
-      cout << "MARK[2] " << inode0->id() << endl;
-#endif
-    }
-    else {
-      go = false;
-    }
   }
   if ( go ) {
     bool inode1_stat = false;
     BdnNode* inode1 = node->fanin1();
     if ( state(inode1) == 0 ) {
-      if ( !temp2mark(inode1) ) {
+      // inode1 はまだ未処理
+      if ( temp2mark(inode1) ) {
+	// inode1 は内部ノードになれない．
+	if ( mInputPos < mLimit &&
+	     ( !inode0->is_logic() || inode0->fanout_num() > 1 ) ) {
+	  // inode1 を入力にする．
+	  set_input(inode1);
+	  inode1_stat = true;
+	  set_edge_mark(node, 1);
+
+#if defined(DEBUG_ENUM_RECUR)
+	  cout << "MARK[3] " << inode0->id() << endl;
+#endif
+	}
+	else {
+	  // 内部ノードにも入力にもなれないのでエラー
+	  go = false;
+	}
+      }
+      else {
+	// inode1 をフロンティアスタックに積む．
 	push_node(inode1);
 	inode1_stat = true;
 	set_edge_mark(node, 1);
@@ -236,18 +265,6 @@ TopDown2::enum_recur()
 #if defined(DEBUG_ENUM_RECUR)
 	cout << "PUSH[3] " << inode1->id() << endl;
 #endif
-      }
-      else if ( mInputPos < mLimit ) {
-	set_input(inode1);
-	inode1_stat = true;
-	set_edge_mark(node, 1);
-
-#if defined(DEBUG_ENUM_RECUR)
-	cout << "MARK[3] " << inode0->id() << endl;
-#endif
-      }
-      else {
-	go = false;
       }
     }
     if ( go ) {
