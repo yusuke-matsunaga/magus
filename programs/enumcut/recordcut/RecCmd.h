@@ -54,60 +54,17 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ReadCmd RecCmd.h "RecCmd.h"
-/// @brief ReadBlif と ReadIscas89 に共通の基底クラス
-//////////////////////////////////////////////////////////////////////
-class ReadCmd :
-  public RecCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] func_mgr FuncMgr
-  ReadCmd(FuncMgr& func_mgr);
-
-  /// @brief デストラクタ
-  virtual
-  ~ReadCmd();
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief カット列挙を行い関数の登録を行う．
-  /// @param[in] network 対象のネットワーク
-  int
-  record(const BdnMgr& network);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // min_cut_size オプション
-  TclPoptInt* mMinCutSize;
-
-  // max_cut_size オプション
-  TclPoptInt* mMaxCutSize;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class ReadBlifCmd RecCmd.h "RecCmd.h"
 /// @brief blif 形式のファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 class ReadBlifCmd :
-  public ReadCmd
+  public TclCmd
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func_mgr FuncMgr
-  ReadBlifCmd(FuncMgr& func_mgr);
+  /// @param[in] network 対象のネットワーク
+  ReadBlifCmd(BdnMgr& network);
 
   /// @brief デストラクタ
   virtual
@@ -121,6 +78,15 @@ protected:
   int
   cmd_proc(TclObjVector& objv);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象のネットワーク
+  BdnMgr& mNetwork;
+
 };
 
 
@@ -129,13 +95,13 @@ protected:
 /// @brief iscas89 形式のファイルを読み込むコマンド
 //////////////////////////////////////////////////////////////////////
 class ReadIscas89Cmd :
-  public ReadCmd
+  public TclCmd
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func_mgr FuncMgr
-  ReadIscas89Cmd(FuncMgr& func_mgr);
+  /// @param[in] network 対象のネットワーク
+  ReadIscas89Cmd(BdnMgr& network);
 
   /// @brief デストラクタ
   virtual
@@ -148,6 +114,66 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象のネットワーク
+  BdnMgr& mNetwork;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EnumCutCmd RecCmd.h "RecCmd.h"
+/// @brief カット列挙を行うクラス
+//////////////////////////////////////////////////////////////////////
+class EnumCutCmd :
+  public RecCmd
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] network 対象のネットワーク
+  /// @param[in] func_mgr FuncMgr
+  EnumCutCmd(BdnMgr& network,
+	     FuncMgr& func_mgr);
+
+  /// @brief デストラクタ
+  virtual
+  ~EnumCutCmd();
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コマンドを実行する仮想関数
+  virtual
+  int
+  cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 対象のネットワーク
+  BdnMgr& mNetwork;
+
+  // min_cut_size オプション
+  TclPoptInt* mMinCutSize;
+
+  // max_cut_size オプション
+  TclPoptInt* mMaxCutSize;
+
+  // ffr オプション
+  TclPopt* mFFR;
 
 };
 
@@ -168,34 +194,6 @@ public:
   /// @brief デストラクタ
   virtual
   ~DumpCmd();
-
-
-protected:
-
-  /// @brief コマンドを実行する仮想関数
-  virtual
-  int
-  cmd_proc(TclObjVector& objv);
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class DumpRepCmd RecCmd.h "RecCmd.h"
-/// @brief ダンプコマンド
-//////////////////////////////////////////////////////////////////////
-class DumpRepCmd :
-  public RecCmd
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] func_mgr FuncMgr
-  DumpRepCmd(FuncMgr& func_mgr);
-
-  /// @brief デストラクタ
-  virtual
-  ~DumpRepCmd();
 
 
 protected:

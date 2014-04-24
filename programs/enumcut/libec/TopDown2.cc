@@ -16,6 +16,17 @@
 
 BEGIN_NAMESPACE_YM
 
+BEGIN_NONAMESPACE
+
+inline
+bool
+is_stem(const BdnNode* node)
+{
+  return !node->is_logic() || node->fanout_num() > 1;
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス TopDown2
 //////////////////////////////////////////////////////////////////////
@@ -107,27 +118,36 @@ TopDown2::operator()(const BdnMgr& network,
       }
     }
 
-    // カットの列挙を行う．ただし c2mark を越えてフロンティアを伸ばさない．
+    // カットの列挙を行う．ただし temp2mark を越えてフロンティアを伸ばさない．
+    if ( is_stem(node) ) {
+      mOp->node_init(node);
 
-    mOp->node_init(node);
+      mInputPos = 0;
+      mRoot = node;
 
-    mInputPos = 0;
-    mRoot = node;
+      push_node(node);
+      enum_recur();
+      pop_node();
+      clear_state(node);
 
-    push_node(node);
-    enum_recur();
-    pop_node();
-    clear_state(node);
+      assert_cond( frontier_is_empty(), __FILE__, __LINE__);
+      assert_cond( mInputPos == 0, __FILE__, __LINE__);
 
-    assert_cond( frontier_is_empty(), __FILE__, __LINE__);
-    assert_cond( mInputPos == 0, __FILE__, __LINE__);
+      // 今の列挙で使われたノードを footprint_node_list に格納する．
+      vector<const BdnNode*>& fplist = fpnode_list(node);
+      fplist.reserve(mMarkedNodesLast);
+      set_cur_node_list_recur(node, fplist);
 
-    // 今の列挙で使われたノードを footprint_node_list に格納する．
-    vector<const BdnNode*>& fplist = fpnode_list(node);
-    fplist.reserve(mMarkedNodesLast);
-    set_cur_node_list_recur(node, fplist);
-
-    mOp->node_end(node);
+      mOp->node_end(node);
+    }
+    else {
+      vector<const BdnNode*>& fplist = fpnode_list(node);
+      fplist.reserve(mMarkedNodesLast);
+      for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
+	const BdnNode* node = mMarkedNodes[i];
+	fplist.push_back(node);
+      }
+    }
 
     // マークを消しておく．
     for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
@@ -182,8 +202,7 @@ TopDown2::enum_recur()
 
   bool has_cuts = false;
 
-  if ( mInputPos < mLimit &&
-       ( !node->is_logic() || node == mRoot || node->fanout_num() > 1 ) ) {
+  if ( mInputPos < mLimit && is_stem(node) ) {
     // node を入力に固定して再帰を続ける
     set_input(node);
 
@@ -216,8 +235,7 @@ TopDown2::enum_recur()
     // inode0 はまだ未処理
     if ( temp2mark(inode0) ) {
       // inode0 は内部ノードにはなれない．
-      if ( mInputPos < mLimit &&
-	   ( !inode0->is_logic() || inode0->fanout_num() > 1 ) ) {
+      if ( mInputPos < mLimit && is_stem(inode0) ) {
 	// inode0 を入力にする．
 	set_input(inode0);
 	inode0_stat = true;
@@ -250,8 +268,7 @@ TopDown2::enum_recur()
       // inode1 はまだ未処理
       if ( temp2mark(inode1) ) {
 	// inode1 は内部ノードになれない．
-	if ( mInputPos < mLimit &&
-	     ( !inode0->is_logic() || inode0->fanout_num() > 1 ) ) {
+	if ( mInputPos < mLimit && is_stem(inode1) ) {
 	  // inode1 を入力にする．
 	  set_input(inode1);
 	  inode1_stat = true;

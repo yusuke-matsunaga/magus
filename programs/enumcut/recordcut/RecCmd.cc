@@ -22,6 +22,7 @@
 #include "utils/FileODO.h"
 
 #include "TopDown.h"
+#include "TopDown2.h"
 #include "FuncMgr.h"
 #include "FuncRec.h"
 
@@ -54,76 +55,13 @@ RecCmd::mgr()
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス ReadCmd
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] func_mgr FuncMgr
-ReadCmd::ReadCmd(FuncMgr& func_mgr) :
-  RecCmd(func_mgr)
-{
-  mMinCutSize = new TclPoptInt(this, "min_cut_size",
-			       "specify minimum cut size",
-			       "integer");
-  mMaxCutSize = new TclPoptInt(this, "max_cut_size",
-			       "specify maximum cut size",
-			       "integer");
-}
-
-// @brief デストラクタ
-ReadCmd::~ReadCmd()
-{
-}
-
-// @brief カット列挙を行い関数の登録を行う．
-// @param[in] network 対象のネットワーク
-int
-ReadCmd::record(const BdnMgr& network)
-{
-  ymuint min_cut_size = 0;
-  ymuint max_cut_size = 0;
-
-  if ( mMinCutSize->is_specified() ) {
-    min_cut_size = mMinCutSize->val();
-  }
-  if ( mMaxCutSize->is_specified() ) {
-    max_cut_size = mMaxCutSize->val();
-  }
-  if ( min_cut_size == 0 ) {
-    if ( max_cut_size == 0 ) {
-      min_cut_size = 4;
-      max_cut_size = 4;
-    }
-    else {
-      min_cut_size = max_cut_size;
-    }
-  }
-  else {
-    if ( max_cut_size == 0 ) {
-      max_cut_size = min_cut_size;
-    }
-  }
-
-  FuncRec op(mgr());
-  TopDown enumcut;
-
-  op.set_min_size(min_cut_size);
-  op.set_debug_level(1);
-
-  enumcut(network, max_cut_size, &op);
-
-  return TCL_OK;
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス ReadBlifCmd
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func_mgr FuncMgr
-ReadBlifCmd::ReadBlifCmd(FuncMgr& func_mgr) :
-  ReadCmd(func_mgr)
+// @param[in] network 対象のネットワーク
+ReadBlifCmd::ReadBlifCmd(BdnMgr& network) :
+  mNetwork(network)
 {
   set_usage_string("<filename>");
 }
@@ -159,19 +97,15 @@ ReadBlifCmd::cmd_proc(TclObjVector& objv)
   MsgMgr::reg_handler(&mh);
 
   // 実際の読み込みを行う．
-  BdnMgr bdn_network;
-
   BdnBlifReader bdn_read;
-  if ( !bdn_read(ex_file_name, bdn_network) ) {
+  if ( !bdn_read(ex_file_name, mNetwork) ) {
     TclObj emsg = mh.msg_obj();
     emsg << "Error occured in reading " << objv[1];
     set_result(emsg);
     return TCL_ERROR;
   }
 
-  int cmd_ok = record(bdn_network);
-
-  return cmd_ok;
+  return TCL_OK;
 }
 
 
@@ -180,9 +114,9 @@ ReadBlifCmd::cmd_proc(TclObjVector& objv)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func_mgr FuncMgr
-ReadIscas89Cmd::ReadIscas89Cmd(FuncMgr& func_mgr) :
-  ReadCmd(func_mgr)
+// @param[in] network 対象のネットワーク
+ReadIscas89Cmd::ReadIscas89Cmd(BdnMgr& network) :
+  mNetwork(network)
 {
   set_usage_string("<filename>");
 }
@@ -218,26 +152,102 @@ ReadIscas89Cmd::cmd_proc(TclObjVector& objv)
   MsgMgr::reg_handler(&mh);
 
   // 実際の読み込みを行う．
-  BdnMgr bdn_network;
-
   BdnIscas89Reader bdn_read;
-  if ( !bdn_read(ex_file_name, bdn_network) ) {
+  if ( !bdn_read(ex_file_name, mNetwork) ) {
     TclObj emsg = mh.msg_obj();
     emsg << "Error occured in reading " << objv[1];
     set_result(emsg);
     return TCL_ERROR;
   }
 
-  int cmd_ok = record(bdn_network);
+  return TCL_OK;
+}
 
-  return cmd_ok;
+
+//////////////////////////////////////////////////////////////////////
+// クラス EnumCutCmd
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] network 対象のネットワーク
+// @param[in] func_mgr FuncMgr
+EnumCutCmd::EnumCutCmd(BdnMgr& network,
+		       FuncMgr& func_mgr) :
+  RecCmd(func_mgr),
+  mNetwork(network)
+{
+  mMinCutSize = new TclPoptInt(this, "min_cut_size",
+			       "specify minimum cut size",
+			       "integer");
+  mMaxCutSize = new TclPoptInt(this, "max_cut_size",
+			       "specify maximum cut size",
+			       "integer");
+  mFFR = new TclPopt(this, "ffr",
+		     "FFR mode");
+}
+
+// @brief デストラクタ
+EnumCutCmd::~EnumCutCmd()
+{
+}
+
+// @brief カット列挙を行い関数の登録を行う．
+int
+EnumCutCmd::cmd_proc(TclObjVector& objv)
+{
+  ymuint objc = objv.size();
+
+  // このコマンドは引数を取らない．
+  if ( objc != 1 ) {
+    print_usage();
+    return TCL_ERROR;
+  }
+
+  ymuint min_cut_size = 0;
+  ymuint max_cut_size = 0;
+
+  if ( mMinCutSize->is_specified() ) {
+    min_cut_size = mMinCutSize->val();
+  }
+  if ( mMaxCutSize->is_specified() ) {
+    max_cut_size = mMaxCutSize->val();
+  }
+  if ( min_cut_size == 0 ) {
+    if ( max_cut_size == 0 ) {
+      min_cut_size = 4;
+      max_cut_size = 4;
+    }
+    else {
+      min_cut_size = max_cut_size;
+    }
+  }
+  else {
+    if ( max_cut_size == 0 ) {
+      max_cut_size = min_cut_size;
+    }
+  }
+
+  FuncRec op(mgr());
+
+  op.set_min_size(min_cut_size);
+  op.set_debug_level(1);
+
+  if ( mFFR->is_specified() ) {
+    TopDown2 enumcut;
+    enumcut(mNetwork, max_cut_size, &op);
+  }
+  else {
+    TopDown enumcut;
+    enumcut(mNetwork, max_cut_size, &op);
+  }
+
+  return TCL_OK;
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // クラス DumpCmd
 //////////////////////////////////////////////////////////////////////
-
 
 // @brief コンストラクタ
 // @param[in] func_mgr FuncMgr
@@ -254,59 +264,6 @@ DumpCmd::~DumpCmd()
 // @brief コマンドを実行する仮想関数
 int
 DumpCmd::cmd_proc(TclObjVector& objv)
-{
-  ymuint objc = objv.size();
-
-  // このコマンドはファイル名を引数としてとる．
-  if ( objc != 2 ) {
-    print_usage();
-    return TCL_ERROR;
-  }
-
-  // コマンド行を解析してファイル名を取って来て，ファイルを開く
-  string file_name = objv[1];
-  // ファイル名の展開を行う．
-  string ex_file_name;
-  bool stat = tilde_subst(file_name, ex_file_name);
-  if ( !stat ) {
-    // ファイル名文字列の中に誤りがあった．
-    return TCL_ERROR;
-  }
-
-  FileODO bo;
-  if ( !bo.open(ex_file_name) ) {
-    TclObj emsg;
-    emsg << "Could not create " << file_name;
-    set_result(emsg);
-    return TCL_ERROR;
-  }
-
-  mgr().dump(bo);
-
-  return TCL_OK;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス DumpRepCmd
-//////////////////////////////////////////////////////////////////////
-
-
-// @brief コンストラクタ
-// @param[in] func_mgr FuncMgr
-DumpRepCmd::DumpRepCmd(FuncMgr& func_mgr) :
-  RecCmd(func_mgr)
-{
-}
-
-// @brief デストラクタ
-DumpRepCmd::~DumpRepCmd()
-{
-}
-
-// @brief コマンドを実行する仮想関数
-int
-DumpRepCmd::cmd_proc(TclObjVector& objv)
 {
   ymuint objc = objv.size();
 
@@ -487,15 +444,14 @@ rec_init(Tcl_Interp* interp)
   // コマンドの登録
   //////////////////////////////////////////////////////////////////////
 
+  BdnMgr* network_p = new BdnMgr;
   FuncMgr* func_mgr_p = new FuncMgr;
-  FuncMgr& func_mgr = *func_mgr_p;
 
-  TclCmdBinder1<ReadBlifCmd, FuncMgr&>::reg(interp, func_mgr, "rec::read_blif");
-  TclCmdBinder1<ReadIscas89Cmd, FuncMgr&>::reg(interp, func_mgr, "rec::read_iscas89");
-  TclCmdBinder1<DumpCmd, FuncMgr&>::reg(interp, func_mgr, "rec::dump");
-  TclCmdBinder1<DumpRepCmd, FuncMgr&>::reg(interp, func_mgr, "rec::dump_rep");
-  TclCmdBinder1<RestoreCmd, FuncMgr&>::reg(interp, func_mgr, "rec::restore");
-  TclCmdBinder1<PrintCmd, FuncMgr&>::reg(interp, func_mgr, "rec::print");
+  TclCmdBinder1<ReadBlifCmd, BdnMgr&>::reg(interp, *network_p, "rec::read_blif");
+  TclCmdBinder1<ReadIscas89Cmd, BdnMgr&>::reg(interp, *network_p, "rec::read_iscas89");
+  TclCmdBinder1<DumpCmd, FuncMgr&>::reg(interp, *func_mgr_p, "rec::dump");
+  TclCmdBinder1<RestoreCmd, FuncMgr&>::reg(interp, *func_mgr_p, "rec::restore");
+  TclCmdBinder1<PrintCmd, FuncMgr&>::reg(interp, *func_mgr_p, "rec::print");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -508,7 +464,6 @@ rec_init(Tcl_Interp* interp)
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
     "proc complete(dump) { t s e l p m } { return \"\" }\n"
-    "proc complete(dump_rep) { t s e l p m } { return \"\" }\n"
     "proc complete(restore) { t s e l p m } { return \"\" }\n"
     "proc complete(print) { t s e l p m } { return \"\" }\n"
     "}\n"
