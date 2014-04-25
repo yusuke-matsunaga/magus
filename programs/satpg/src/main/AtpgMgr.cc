@@ -208,7 +208,7 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   dop.set_faults(mFaultMgr->remain_list());
 
-  mDtpg->run(mode, po_mode, fault_analysis, bt, dop, uop, stats);
+  mDtpg->run(*mNetwork, mode, po_mode, fault_analysis, bt, dop, uop, stats);
 
   mTimer.change(old_id);
 }
@@ -263,8 +263,6 @@ AtpgMgr::after_set_network()
 
   mTvMgr->clear();
   mTvMgr->init(mNetwork->input_num2());
-
-  mDtpg->set_network(*mNetwork);
 
   mNtwkBindMgr.prop_event(*mNetwork, *mFaultMgr);
 }

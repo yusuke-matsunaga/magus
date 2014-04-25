@@ -42,13 +42,8 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL) = 0;
 
-  /// @brief 回路と故障リストを設定する．
-  /// @param[in] tpgnetwork 対象のネットワーク
-  virtual
-  void
-  set_network(TpgNetwork& tgnetwork) = 0;
-
   /// @brief テスト生成を行なう．
+  /// @param[in] tpgnetwork 対象のネットワーク
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
   /// @param[in] fault_analysis 故障の支配関係を解析する．
@@ -58,7 +53,8 @@ public:
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run(DtpgMode mode,
+  run(TpgNetwork& tgnetwork,
+      DtpgMode mode,
       tDtpgPoMode po_mode,
       bool fault_analysis,
       BackTracer& bt,

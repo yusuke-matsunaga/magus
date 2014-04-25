@@ -43,17 +43,8 @@ DtpgSat2::set_mode(const string& type,
   mSatEngine.set_mode(type, option, outp);
 }
 
-// @brief 回路と故障リストを設定する．
-// @param[in] tgnetwork 対象のネットワーク
-// @param[in] fault_mgr 故障マネージャ
-void
-DtpgSat2::set_network(TpgNetwork& tgnetwork)
-{
-  mNetwork = &tgnetwork;
-  mMaxId = mNetwork->node_num();
-}
-
 // @brief テスト生成を行なう．
+// @param[in] tpgnetwork 対象のネットワーク
 // @param[in] mode メインモード
 // @param[in] po_mode PO分割モード
 // @param[in] fault_analysis 故障の支配関係を解析する．
@@ -62,7 +53,8 @@ DtpgSat2::set_network(TpgNetwork& tgnetwork)
 // @param[in] uop_list UntestOp のリスト
 // @param[in] stats 結果を格納する構造体
 void
-DtpgSat2::run(DtpgMode mode,
+DtpgSat2::run(TpgNetwork& tgnetwork,
+	      DtpgMode mode,
 	      tDtpgPoMode po_mode,
 	      bool fault_analysis,
 	      BackTracer& bt,
@@ -71,6 +63,9 @@ DtpgSat2::run(DtpgMode mode,
 	      DtpgStats& stats)
 {
   mSatEngine.clear_stats();
+
+  mNetwork = &tgnetwork;
+  mMaxId = mNetwork->node_num();
 
   switch ( po_mode ) {
   case kDtpgPoNone:
