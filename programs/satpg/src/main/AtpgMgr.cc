@@ -84,6 +84,7 @@ AtpgMgr::AtpgMgr() :
 
   mRtpg = new_Rtpg(*this);
   mDtpg = new_DtpgSat();
+  mDtpg2 = new_DtpgSat2();
   mMinPat = new_MinPat(*this);
 
   mNetwork = NULL;
@@ -103,6 +104,7 @@ AtpgMgr::~AtpgMgr()
   delete mFsim3;
   delete mRtpg;
   delete mDtpg;
+  delete mDtpg2;
   delete mMinPat;
   delete mNetwork;
 }
@@ -184,6 +186,7 @@ AtpgMgr::set_dtpg_mode(const string& type,
 		       ostream* outp)
 {
   mDtpg->set_mode(type, option, outp);
+  mDtpg2->set_mode(type, option, outp);
 }
 
 // @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
@@ -191,6 +194,7 @@ void
 AtpgMgr::set_dtpg_timer(bool enable)
 {
   mDtpg->timer_enable(enable);
+  mDtpg2->timer_enable(enable);
 }
 
 // @brief テストパタン生成を行なう．
@@ -208,7 +212,12 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   dop.set_faults(mFaultMgr->remain_list());
 
-  mDtpg->run(*mNetwork, mode, po_mode, fault_analysis, bt, dop, uop, stats);
+  if ( mode.mode() == kDtpgSingle2 ) {
+    mDtpg2->run(*mNetwork, mode, po_mode, fault_analysis, bt, dop, uop, stats);
+  }
+  else {
+    mDtpg->run(*mNetwork, mode, po_mode, fault_analysis, bt, dop, uop, stats);
+  }
 
   mTimer.change(old_id);
 }

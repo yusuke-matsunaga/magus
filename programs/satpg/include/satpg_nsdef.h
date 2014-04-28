@@ -80,7 +80,9 @@ enum tDtpgMode {
   /// @brief mffc モード
   kDtpgMFFC,
   /// @brief all モード
-  kDtpgAll
+  kDtpgAll,
+  /// @brief single2 モード
+  kDtpgSingle2
 };
 
 

@@ -15,8 +15,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-bool debug_fault_analysis = false;
-
 Dtpg*
 new_DtpgSat2()
 {
@@ -149,7 +147,7 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        fault->is_rep() &&
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
-    mSatEngine.run(vector<TpgFault*>(1, fault), mMaxId, bt, dop, uop);
+    mSatEngine.run(fault, mMaxId, bt, dop, uop);
  }
 }
 

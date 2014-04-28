@@ -40,7 +40,9 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
   mPoptSingle = new TclPopt(this, "single",
-			    "dual mode");
+			    "single mode");
+  mPoptSingle2 = new TclPopt(this, "single2",
+			     "single2 mode");
   mPoptDual = new TclPopt(this, "dual",
 			  "dual mode");
   mPoptNode = new TclPopt(this, "node",
@@ -71,7 +73,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			   "enable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
-  new_popt_group(mPoptSingle, mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
+  TclPoptGroup* mode_group = new_popt_group(mPoptSingle, mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
+  add_popt(mode_group, mPoptSingle2);
   new_popt_group(mPoptPo, mPoptRpo);
 }
 
@@ -115,6 +118,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   ymuint ffr2_limit = 0;
   if ( mPoptSingle->is_specified() ) {
     mode = kDtpgSingle;
+  }
+  else if ( mPoptSingle2->is_specified() ) {
+    mode = kDtpgSingle2;
   }
   else if ( mPoptDual->is_specified() ) {
     mode = kDtpgDual;

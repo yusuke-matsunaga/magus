@@ -61,6 +61,9 @@ private:
   // single オプションの解析用オブジェクト
   TclPopt* mPoptSingle;
 
+  // single2 オプションの解析用オブジェクト
+  TclPopt* mPoptSingle2;
+
   // dual オプションの解析用オブジェクト
   TclPopt* mPoptDual;
 
