@@ -449,6 +449,7 @@ rec_init(Tcl_Interp* interp)
 
   TclCmdBinder1<ReadBlifCmd, BdnMgr&>::reg(interp, *network_p, "rec::read_blif");
   TclCmdBinder1<ReadIscas89Cmd, BdnMgr&>::reg(interp, *network_p, "rec::read_iscas89");
+  TclCmdBinder2<EnumCutCmd, BdnMgr&, FuncMgr&>::reg(interp, *network_p, *func_mgr_p, "rec::enum_cut");
   TclCmdBinder1<DumpCmd, FuncMgr&>::reg(interp, *func_mgr_p, "rec::dump");
   TclCmdBinder1<RestoreCmd, FuncMgr&>::reg(interp, *func_mgr_p, "rec::restore");
   TclCmdBinder1<PrintCmd, FuncMgr&>::reg(interp, *func_mgr_p, "rec::print");
