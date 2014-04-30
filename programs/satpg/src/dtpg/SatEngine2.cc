@@ -481,10 +481,8 @@ SatEngine2::run(TpgFault* f_tgt,
   mTfiList.clear();
   mTfiList.reserve(max_id);
 
-  // 故障に一時的なID番号を割り振る．
   // 故障のあるノードの TFO を mTfoList に入れる．
   // TFO の TFI のノードを mTfiList に入れる．
-  f_tgt->set_tmp_id(0);
   TpgNode* fnode = f_tgt->node();
   if ( !tfo_mark(fnode) ) {
     set_tfo_mark(fnode);
@@ -595,7 +593,7 @@ SatEngine2::run(TpgFault* f_tgt,
   for (ymuint i = 0; i < mTfoList.size(); ++ i) {
     TpgNode* node = mTfoList[i];
 
-    bool has_fault = false;
+    bool has_fault = f_tgt->node() == node;
 
     // inputs[] に入力変数を表すリテラルを格納する．
     // ただし，入力の故障を仮定する場合には故障挿入回路の出力変数となる．
@@ -604,14 +602,6 @@ SatEngine2::run(TpgFault* f_tgt,
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* inode = node->fanin(i);
       VarId ivar = inode->fvar();
-      for (ymint val = 0; val < 2; ++ val) {
-	TpgFault* f = node->input_fault(val, i);
-	if ( f == f_tgt ) {
-	  make_flt_cnf(solver, fout_var, val);
-	  ivar = fout_var;
-	  has_fault = true;
-	}
-      }
       inputs[i] = Literal(ivar, false);
     }
 
@@ -619,12 +609,18 @@ SatEngine2::run(TpgFault* f_tgt,
     // こちらは入力の故障と異なり，故障挿入回路の出力が node->fvar() となる．
     // 逆に ovar はゲートの直接の出力変数となる．
     VarId ovar = node->fvar();
-    for (ymint val = 0; val < 2; ++ val) {
-      TpgFault* f = node->output_fault(val);
-      if ( f == f_tgt ) {
-	make_flt_cnf(solver, ovar, val);
-	ovar = fout_var;
-	has_fault = true;
+
+    if ( has_fault ) {
+      if ( f_tgt->is_input_fault() ) {
+	VarId fvar = solver.new_var();
+	make_flt_cnf(solver, fvar, f_tgt->val());
+	inputs[f_tgt->pos()] = Literal(fvar, false);
+      }
+      else {
+	VarId fvar = node->fvar();
+	make_flt_cnf(solver, fvar, f_tgt->val());
+	// ダミー
+	ovar = solver.new_var();
       }
     }
 
@@ -704,21 +700,6 @@ SatEngine2::run(TpgFault* f_tgt,
   bool inv = (f_tgt->val() != 0);
   mAssumptions.push_back(Literal(fnode->gvar(), inv));
 
-  solve(solver, f_tgt, bt, dop, uop);
-
-  clear_node_mark();
-
-  update_stats(solver);
-}
-
-// @brief 一つの SAT問題を解く．
-void
-SatEngine2::solve(SatSolver& solver,
-		  TpgFault* f,
-		  BackTracer& bt,
-		  DetectOp& dop,
-		  UntestOp& uop)
-{
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
@@ -729,10 +710,10 @@ SatEngine2::solve(SatSolver& solver,
     // パタンが求まった．
 
     // バックトレースを行う．
-    TestVector* tv = bt(f->node(), mModel, mInputList, mOutputList);
+    TestVector* tv = bt(f_tgt->node(), mModel, mInputList, mOutputList);
 
     // パタンの登録などを行う．
-    dop(f, tv);
+    dop(f_tgt, tv);
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -742,7 +723,7 @@ SatEngine2::solve(SatSolver& solver,
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    uop(f);
+    uop(f_tgt);
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -757,6 +738,10 @@ SatEngine2::solve(SatSolver& solver,
       ++ mAbortCount;
     }
   }
+
+  clear_node_mark();
+
+  update_stats(solver);
 }
 
 // @brief ノードの変数割り当てフラグを消す．

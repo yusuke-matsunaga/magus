@@ -85,14 +85,6 @@ private:
   void
   update_stats(SatSolver& solver);
 
-  /// @brief 一つの SAT問題を解く．
-  void
-  solve(SatSolver& solver,
-	TpgFault* f,
-	BackTracer& bt,
-	DetectOp& dop,
-	UntestOp& uop);
-
   /// @brief ノードの変数割り当てフラグを消す．
   void
   clear_node_mark();
