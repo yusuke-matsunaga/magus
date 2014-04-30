@@ -40,6 +40,8 @@ BtJustBase::clear_justified()
   for (vector<TpgNode*>::iterator p = mJustifiedNodeList.begin();
        p != mJustifiedNodeList.end(); ++ p) {
     TpgNode* node = *p;
+    cout << "clear_justfied(Node#" << node->id() << ")" << endl;
+    assert_cond( node->id() < mJustifiedMarkArray.size(), __FILE__, __LINE__);
     mJustifiedMarkArray[node->id()] = false;
     clear_justified_hook(node);
   }

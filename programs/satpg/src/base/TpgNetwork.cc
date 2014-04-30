@@ -23,7 +23,7 @@ BEGIN_NONAMESPACE
 
 // 全ての論理ノードを kTgGateCplx タイプとして登録する時に true にする．
 // TpgPrimitive 関係のコードのデバッグ用
-const bool FORCE_TO_CPLX_LOGIC = false;
+const bool FORCE_TO_CPLX_LOGIC = true;
 
 // 指定された型の配列を確保するテンプレート関数
 template <typename T>

@@ -342,12 +342,12 @@ make_gnode_cnf(SatSolver& solver,
       prim->set_glit(olit);
       prim->set_flit(olit);
     }
+    return;
   }
-  else {
-    // 単純な組み込み型の場合
-    make_gate_cnf(solver, node->gate_type(), output,
-		  GvarInputLiteral(node));
-  }
+
+  // 単純な組み込み型の場合
+  make_gate_cnf(solver, node->gate_type(), output,
+		GvarInputLiteral(node));
 }
 
 void
@@ -357,14 +357,16 @@ make_fnode_cnf(SatSolver& solver,
 	       const vector<Literal>& inputs)
 {
   if ( node->is_input() ) {
-    solver.add_clause(~inputs[0],  output);
-    solver.add_clause( inputs[0], ~output);
+    return;
   }
-  else if ( node->is_output() ) {
+
+  if ( node->is_output() ) {
     solver.add_clause( inputs[0], ~output);
     solver.add_clause(~inputs[0],  output);
+    return;
   }
-  else if ( node->is_cplx_logic() ) {
+
+  if ( node->is_cplx_logic() ) {
     ymuint n = node->primitive_num();
     ymuint n1 = n - 1;
     for (ymuint i = 0; i < n; ++ i) {
@@ -397,11 +399,12 @@ make_fnode_cnf(SatSolver& solver,
 		      VectorInputLiteral(inputs1));
       }
     }
+    return;
   }
-  else {
-    make_gate_cnf(solver, node->gate_type(), output,
-		  VectorInputLiteral(inputs));
-  }
+
+  // 残りは単純なゲート
+  make_gate_cnf(solver, node->gate_type(), output,
+		VectorInputLiteral(inputs));
 }
 
 END_NONAMESPACE
@@ -475,61 +478,61 @@ SatEngine2::run(TpgFault* f_tgt,
   mMarkArray.clear();
   mMarkArray.resize(max_id, 0U);
 
-  mTfoList.clear();
-  mTfoList.reserve(max_id);
+  vector<TpgNode*> tfo_list;
+  tfo_list.reserve(max_id);
 
-  mTfiList.clear();
-  mTfiList.reserve(max_id);
+  vector<TpgNode*> tfi_list;
+  tfi_list.reserve(max_id);
 
-  // 故障のあるノードの TFO を mTfoList に入れる．
-  // TFO の TFI のノードを mTfiList に入れる．
+  // 故障のあるノードの TFO を tfo_list に入れる．
+  // TFO の TFI のノードを tfi_list に入れる．
   TpgNode* fnode = f_tgt->node();
   if ( !tfo_mark(fnode) ) {
     set_tfo_mark(fnode);
-    mTfoList.push_back(fnode);
+    tfo_list.push_back(fnode);
   }
 
-  for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
-    TpgNode* node = mTfoList[rpos];
+  for (ymuint rpos = 0; rpos < tfo_list.size(); ++ rpos) {
+    TpgNode* node = tfo_list[rpos];
     ymuint nfo = node->active_fanout_num();
     for (ymuint i = 0; i < nfo; ++ i) {
       TpgNode* fonode = node->active_fanout(i);
       if ( !tfo_mark(fonode) ) {
 	set_tfo_mark(fonode);
-	mTfoList.push_back(fonode);
+	tfo_list.push_back(fonode);
       }
     }
   }
 
-  for (vector<TpgNode*>::iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
+  for (vector<TpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
     TpgNode* node = *p;
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* finode = node->fanin(i);
       if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
 	set_tfi_mark(finode);
-	mTfiList.push_back(finode);
+	tfi_list.push_back(finode);
       }
     }
   }
-  for (ymuint rpos = 0; rpos < mTfiList.size(); ++ rpos) {
-    TpgNode* node = mTfiList[rpos];
+  for (ymuint rpos = 0; rpos < tfi_list.size(); ++ rpos) {
+    TpgNode* node = tfi_list[rpos];
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* finode = node->fanin(i);
       if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
 	set_tfi_mark(finode);
-	mTfiList.push_back(finode);
+	tfi_list.push_back(finode);
       }
     }
   }
 
   // TFO マークのついたノード用の変数の生成
   mUsedNodeList.clear();
-  mUsedNodeList.reserve(mTfoList.size() + mTfiList.size());
-  for (vector<TpgNode*>::iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
+  mUsedNodeList.reserve(tfo_list.size() + tfi_list.size());
+  for (vector<TpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
     TpgNode* node = *p;
     set_gvar(solver, node);
     set_fvar(solver, node);
@@ -537,8 +540,8 @@ SatEngine2::run(TpgFault* f_tgt,
   }
 
   // TFI マークのついたノード用の変数の生成
-  for (vector<TpgNode*>::iterator p = mTfiList.begin();
-       p != mTfiList.end(); ++ p) {
+  for (vector<TpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
     TpgNode* node = *p;
     set_gvar(solver, node);
     mUsedNodeList.push_back(node);
@@ -546,8 +549,8 @@ SatEngine2::run(TpgFault* f_tgt,
 
   // mInputList を作る．
   mInputList.clear();
-  for (vector<TpgNode*>::iterator p = mTfiList.begin();
-       p != mTfiList.end(); ++ p) {
+  for (vector<TpgNode*>::iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
     TpgNode* node = *p;
     if ( node->is_input() ) {
       mInputList.push_back(node);
@@ -556,8 +559,8 @@ SatEngine2::run(TpgFault* f_tgt,
 
   // mOutputList を作る．
   mOutputList.clear();
-  for (vector<TpgNode*>::iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
+  for (vector<TpgNode*>::iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
     TpgNode* node = *p;
     if ( node->is_input() ) {
       mInputList.push_back(node);
@@ -567,31 +570,29 @@ SatEngine2::run(TpgFault* f_tgt,
     }
   }
 
-  // 故障挿入回路の出力に対応する変数．
-  VarId fout_var = solver.new_var();
-
 
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
 
-  for (vector<TpgNode*>::const_iterator p = mTfiList.begin();
-       p != mTfiList.end(); ++ p) {
+  for (vector<TpgNode*>::const_iterator p = tfi_list.begin();
+       p != tfi_list.end(); ++ p) {
     TpgNode* node = *p;
     make_gnode_cnf(solver, node);
   }
-  for (vector<TpgNode*>::const_iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
+  for (vector<TpgNode*>::const_iterator p = tfo_list.begin();
+       p != tfo_list.end(); ++ p) {
     TpgNode* node = *p;
     make_gnode_cnf(solver, node);
   }
+
 
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   vector<Literal> dep;
-  for (ymuint i = 0; i < mTfoList.size(); ++ i) {
-    TpgNode* node = mTfoList[i];
+  for (ymuint i = 0; i < tfo_list.size(); ++ i) {
+    TpgNode* node = tfo_list[i];
 
     bool has_fault = f_tgt->node() == node;
 
@@ -636,31 +637,25 @@ SatEngine2::run(TpgFault* f_tgt,
     solver.add_clause( glit,  flit, ~dlit);
 
     Literal gate_output(ovar, false);
-    if ( node->is_input() ) {
-      solver.add_clause(~glit,  gate_output);
-      solver.add_clause( glit, ~gate_output);
-    }
-    else {
-      make_fnode_cnf(solver, node, gate_output, inputs);
+    make_fnode_cnf(solver, node, gate_output, inputs);
 
-      // 出力の dlit が1になる条件を作る．
-      // - 入力の dlit のいずれかが 1
-      // - 入力のいずれかに故障がある．
-      // - 出力に故障がある．
-      if ( !has_fault ) {
-	dep.clear();
-	dep.reserve(ni + 1);
-	Literal dlit(node->dvar(), true);
-	dep.push_back(dlit);
-	for (ymuint j = 0; j < ni; ++ j) {
-	  TpgNode* inode = node->fanin(j);
-	  if ( inode->has_fvar() ) {
-	    dep.push_back(Literal(inode->dvar(), false));
-	  }
+    // 出力の dlit が1になる条件を作る．
+    // - 入力の dlit のいずれかが 1
+    // - 入力のいずれかに故障がある．
+    // - 出力に故障がある．
+    if ( !has_fault ) {
+      dep.clear();
+      dep.reserve(ni + 1);
+      Literal dlit(node->dvar(), true);
+      dep.push_back(dlit);
+      for (ymuint j = 0; j < ni; ++ j) {
+	TpgNode* inode = node->fanin(j);
+	if ( inode->has_fvar() ) {
+	  dep.push_back(Literal(inode->dvar(), false));
 	}
-
-	solver.add_clause(dep);
       }
+
+      solver.add_clause(dep);
     }
   }
 
@@ -686,7 +681,7 @@ SatEngine2::run(TpgFault* f_tgt,
 
   // 故障に対するテスト生成を行なう．
   mAssumptions.clear();
-  mAssumptions.reserve(mTfoList.size());
+  mAssumptions.reserve(tfo_list.size());
 
   // dominator ノードの dvar は1でなければならない．
   for (TpgNode* node = f_tgt->node(); node != NULL; node = node->imm_dom()) {

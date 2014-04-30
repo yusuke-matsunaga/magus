@@ -89,6 +89,7 @@ BtJust2::operator()(TpgNode* fnode,
 void
 BtJust2::clear_justified_hook(TpgNode* node)
 {
+  assert_cond( node->id() < mJustArray.size(), __FILE__, __LINE__);
   list_free(mJustArray[node->id()]);
   mJustArray[node->id()] = NULL;
 }
@@ -103,6 +104,8 @@ BtJust2::NodeList*
 BtJust2::justify(TpgNode* node,
 		 const vector<Bool3>& model)
 {
+  assert_cond( node->id() < mJustArray.size(), __FILE__, __LINE__);
+
   if ( justified_mark(node) ) {
     return mJustArray[node->id()];
   }
@@ -433,6 +436,10 @@ void
 BtJust2::list_merge(NodeList*& dst_list,
 		    NodeList* src_list)
 {
+  if ( dst_list == src_list ) {
+    return;
+  }
+
   NodeList** pdst = &dst_list;
   NodeList* src = src_list;
   while ( *pdst != NULL && src != NULL ) {

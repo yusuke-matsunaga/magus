@@ -86,6 +86,8 @@ inline
 void
 BtJustBase::set_justified(TpgNode* node)
 {
+  assert_cond( node->id() < mJustifiedMarkArray.size(), __FILE__, __LINE__);
+  cout << "set_justfieid(Node#" << node->id() << ")" << endl;
   mJustifiedMarkArray[node->id()] = true;
   mJustifiedNodeList.push_back(node);
 }
@@ -96,6 +98,7 @@ inline
 bool
 BtJustBase::justified_mark(TpgNode* node)
 {
+  assert_cond( node->id() < mJustifiedMarkArray.size(), __FILE__, __LINE__);
   return mJustifiedMarkArray[node->id()];
 }
 

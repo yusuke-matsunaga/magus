@@ -148,12 +148,6 @@ private:
   // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
 
-  // 故障の TFO のノードリスト
-  vector<TpgNode*> mTfoList;
-
-  // 故障の TFO の TFI のノードリスト
-  vector<TpgNode*> mTfiList;
-
   // 変数を割り当てたノードを格納するリスト
   vector<TpgNode*> mUsedNodeList;
 

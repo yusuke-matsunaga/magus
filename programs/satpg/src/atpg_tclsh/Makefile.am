@@ -147,6 +147,7 @@ atpg_tclsh_d_LDADD = \
 	$(TCL_LDADD)
 
 atpg_tclsh_d_LDFLAGS = \
+	-static \
 	$(AM_LDFLAGS)
 
 
