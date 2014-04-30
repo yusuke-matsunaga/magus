@@ -24,7 +24,6 @@ new_DtpgSat2()
 // @brief コンストラクタ
 DtpgSat2::DtpgSat2()
 {
-  mNetwork = NULL;
 }
 
 // @brief デストラクタ
@@ -62,56 +61,13 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
 {
   mSatEngine.clear_stats();
 
-  mNetwork = &tgnetwork;
-  mMaxId = mNetwork->node_num();
+  mMaxId = tgnetwork.node_num();
 
-  switch ( po_mode ) {
-  case kDtpgPoNone:
-    // PO 分割を行わないモード
+  tgnetwork.activate_all();
 
-    mNetwork->activate_all();
-
-    dtpg1(bt, dop, uop);
-
-    break;
-
-  case kDtpgPoInc:
-    { // 正順で PO を選び分割するモード
-      ymuint no = mNetwork->output_num2();
-      for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-	mNetwork->activate_po(po_pos);
-
-	dtpg1(bt, dop, uop);
-      }
-    }
-    break;
-
-  case kDtpgPoDec:
-    { // 逆順で PO を選び分割するモード
-      ymuint no = mNetwork->output_num2();
-      for (ymuint i = 0; i < no; ++ i) {
-	ymuint po_pos = no - i - 1;
-	mNetwork->activate_po(po_pos);
-
-	dtpg1(bt, dop, uop);
-      }
-    }
-    break;
-  }
-
-  mSatEngine.get_stats(stats);
-}
-
-// @brief activate された部分回路に対してテスト生成を行う．
-// @param[in] bt バックトレーサー
-void
-DtpgSat2::dtpg1(BackTracer& bt,
-		DetectOp& dop,
-		UntestOp& uop)
-{
-  ymuint nn = mNetwork->active_node_num();
+  ymuint nn = tgnetwork.active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
+    TpgNode* node = tgnetwork.active_node(i);
     if ( node->is_output() ) {
       continue;
     }
@@ -133,6 +89,9 @@ DtpgSat2::dtpg1(BackTracer& bt,
     TpgFault* f1 = node->output_fault(1);
     dtpg_single(f1, bt, dop, uop);
   }
+
+
+  mSatEngine.get_stats(stats);
 }
 
 // @brief 一つの故障に対してテストパタン生成を行う．

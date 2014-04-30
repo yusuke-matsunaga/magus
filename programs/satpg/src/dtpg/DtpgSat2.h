@@ -77,15 +77,6 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief activate された部分回路に大してテスト生成を行う．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  dtpg1(BackTracer& bt,
-	DetectOp& dop,
-	UntestOp& uop);
-
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] bt バックトレーサー
@@ -105,9 +96,6 @@ private:
 
   // SAT エンジン
   SatEngine2 mSatEngine;
-
-  // 対象の回路
-  TpgNetwork* mNetwork;
 
   // mNetwork のノード数
   ymuint32 mMaxId;
