@@ -16,78 +16,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-BEGIN_NONAMESPACE
-
-// ゲートタイプから代表故障を求める．
-void
-get_rep_faults(TpgNode* node,
-	       TpgFault* f0,
-	       TpgFault* f1,
-	       TpgFault*& rep0,
-	       TpgFault*& rep1)
-{
-  if ( node->is_input() ) {
-    // どうでもいい
-    return;
-  }
-  if ( node->is_output() ) {
-    // バッファと同じ
-    rep0 = f0;
-    rep1 = f1;
-    return;
-  }
-
-  tTgGateType type = node->gate_type();
-  switch ( type ) {
-  case kTgGateBuff:
-    rep0 = f0;
-    rep1 = f1;
-    break;
-
-  case kTgGateNot:
-    rep0 = f1;
-    rep1 = f0;
-    break;
-
-  case kTgGateAnd:
-    rep0 = f0;
-    rep1 = NULL;
-    break;
-
-  case kTgGateNand:
-    rep0 = f1;
-    rep1 = NULL;
-    break;
-
-  case kTgGateOr:
-    rep0 = NULL;
-    rep1 = f1;
-    break;
-
-  case kTgGateNor:
-    rep0 = NULL;
-    rep1 = f0;
-    break;
-
-  case kTgGateXor:
-    rep0 = NULL;
-    rep1 = NULL;
-    break;
-
-  case kTgGateCplx:
-    // 面倒くさいので
-    rep0 = NULL;
-    rep1 = NULL;
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-  }
-}
-
-END_NONAMESPACE
-
-
 // @brief コンストラクタ
 FaultMgr::FaultMgr()
 {
@@ -176,12 +104,26 @@ FaultMgr::set_ssa_fault(TpgNetwork& network)
     node->set_output_fault(0, f0);
     node->set_output_fault(1, f1);
 
-    // ノードタイプから代表故障(r0, r1)をもとめる．
-    get_rep_faults(node, f0, f1, rep0, rep1);
-
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
+      TpgFault* rep0 = NULL;
+      Bool3 oval0 = node->c_val(j, kB3False);
+      if ( oval0 == kB3False ) {
+	rep0 = f0;
+      }
+      else if ( oval0 == kB3True ) {
+	rep0 = f1;
+      }
       node->set_input_fault(0, j, new_ifault(node, j, 0, rep0, fid));
+
+      TpgFault* rep1 = NULL;
+      Bool3 oval1 = node->c_val(j, kB3True);
+      if ( oval1 == kB3False ) {
+	rep1 = f0;
+      }
+      else if ( oval1 == kB3True ) {
+	rep1 = f1;
+      }
       node->set_input_fault(1, j, new_ifault(node, j, 1, rep1, fid));
     }
   }

@@ -13,9 +13,187 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+// ゲートタイプに応じた制御値を返す．
+inline
+Bool3
+gate_c_val(tTgGateType type,
+	   Bool3 val)
+{
+  switch ( type ) {
+  case kTgGateBuff:
+    // そのまま返す．
+    return val;
+
+  case kTgGateNot:
+    // 反転して返す．
+    return ~val;
+
+  case kTgGateAnd:
+    // 0 の時のみ 0
+    return val == kB3False ? kB3False : kB3X;
+
+  case kTgGateNand:
+    // 0 の時のみ 1
+    return val == kB3False ? kB3True : kB3X;
+
+  case kTgGateOr:
+    // 1 の時のみ 1
+    return val == kB3True ? kB3True : kB3X;
+
+  case kTgGateNor:
+    // 1 の時のみ 0
+    return val == kB3True ? kB3False : kB3X;
+
+  case kTgGateXor:
+  case kTgGateXnor:
+    // 常に X
+    return kB3X;
+
+  case kTgGateCplx:
+    // これは使わない．
+    return kB3X;
+  }
+}
+
+Bool3
+prim_val(TpgPrimitive* prim,
+	 const vector<Bool3>& val_array)
+{
+  assert_cond( prim->is_logic(), __FILE__, __LINE__);
+  ymuint ni = prim->fanin_num();
+  bool has_x = false;
+  switch ( prim->gate_type() ) {
+  case kTgGateBuff:
+    return val_array[prim->fanin(0)->subid()];
+
+  case kTgGateNot:
+    return ~val_array[prim->fanin(0)->subid()];
+
+  case kTgGateAnd:
+    for (ymuint i = 0; i < ni; ++ i) {
+      Bool3 ival = val_array[prim->fanin(i)->subid()];
+      if ( ival == kB3False ) {
+	return kB3False;
+      }
+      if ( ival == kB3X ) {
+	has_x = true;
+      }
+    }
+    return has_x ? kB3X : kB3True;
+
+  case kTgGateNand:
+    for (ymuint i = 0; i < ni; ++ i) {
+      Bool3 ival = val_array[prim->fanin(i)->subid()];
+      if ( ival == kB3False ) {
+	return kB3True;
+      }
+      if ( ival == kB3X ) {
+	has_x = true;
+      }
+    }
+    return has_x ? kB3X : kB3False;
+
+  case kTgGateOr:
+    for (ymuint i = 0; i < ni; ++ i) {
+      Bool3 ival = val_array[prim->fanin(i)->subid()];
+      if ( ival == kB3True ) {
+	return kB3True;
+      }
+      if ( ival == kB3X ) {
+	has_x = true;
+      }
+    }
+    return has_x ? kB3X : kB3False;
+
+  case kTgGateNor:
+    for (ymuint i = 0; i < ni; ++ i) {
+      Bool3 ival = val_array[prim->fanin(i)->subid()];
+      if ( ival == kB3True ) {
+	return kB3False;
+      }
+      if ( ival == kB3X ) {
+	has_x = true;
+      }
+    }
+    return has_x ? kB3X : kB3True;
+
+  case kTgGateXor:
+    {
+      Bool3 val = kB3False;
+      for (ymuint i = 0; i < ni; ++ i) {
+	Bool3 ival = val_array[prim->fanin(i)->subid()];
+	val ^= ival;
+      }
+      return val;
+    }
+
+  case kTgGateXnor:
+    {
+      Bool3 val = kB3True;
+      for (ymuint i = 0; i < ni; ++ i) {
+	Bool3 ival = val_array[prim->fanin(i)->subid()];
+	val ^= ival;
+      }
+      return val;
+    }
+
+  case kTgGateCplx:
+    assert_not_reached(__FILE__, __LINE__);
+    return kB3X;
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス TpgNode
 //////////////////////////////////////////////////////////////////////
+
+// @brief ファンインを固定した時の出力の値を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < fanin_num() )
+// @param[in] val ファンインの値
+// @return 出力の値を返す．
+Bool3
+TpgNode::c_val(ymuint pos,
+	       Bool3 val) const
+{
+  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
+
+  if ( is_output() ) {
+    // そのまま返す．
+    return val;
+  }
+
+  if ( !is_cplx_logic() ) {
+    return gate_c_val(gate_type(), val);
+  }
+
+  // ここに来ているのは kTgGateCplx のみ．
+  ymuint np = primitive_num();
+  vector<Bool3> val_array(np, kB3X);
+  for (ymuint i = 0; i < np; ++ i) {
+    TpgPrimitive* prim = primitive(i);
+    if ( prim->is_input() ) {
+      if ( prim->input_id() == pos ) {
+	val_array[i] = val;
+      }
+    }
+    else if ( prim->is_not_input() ) {
+      if ( prim->input_id() == pos ) {
+	val_array[i] = ~val;
+      }
+    }
+    else if ( prim->is_logic() ) {
+      val_array[i] = prim_val(prim, val_array);
+    }
+    else {
+      assert_not_reached(__FILE__, __LINE__);
+    }
+  }
+  return val_array[np - 1];
+}
 
 // @brief cplx_logic タイプのときにプリミティブを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )

@@ -95,6 +95,14 @@ public:
   TpgNode*
   fanin(ymuint pos) const;
 
+  /// @brief ファンインを固定した時の出力の値を得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < fanin_num() )
+  /// @param[in] val ファンインの値
+  /// @return 出力の値を返す．
+  Bool3
+  c_val(ymuint pos,
+	Bool3 val) const;
+
   /// @brief ファンアウト数を得る．
   ymuint
   fanout_num() const;

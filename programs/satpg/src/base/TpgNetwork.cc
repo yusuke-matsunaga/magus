@@ -209,6 +209,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       ymuint np = primitive_count(expr);
       node->mPrimitiveNum = np;
       node->mPrimitiveList = alloc_array<TpgPrimitive>(mAlloc, np);
+      for (ymuint j = 0; j < np; ++ j) {
+	node->mPrimitiveList[j].mSubId = j;
+      }
 
       // expr の内容を表すプリミティブの木を作る．
       // 結果は node->mPrimitiveList に直接書き込まれる．
@@ -228,6 +231,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       ymuint np = ni + 1;
       node->mPrimitiveNum = np;
       node->mPrimitiveList = alloc_array<TpgPrimitive>(mAlloc, np);
+      for (ymuint j = 0; j < np; ++ j) {
+	node->mPrimitiveList[j].mSubId = j;
+      }
 
       // 入力プリミティブの設定
       for (ymuint i = 0; i < ni; ++ i) {

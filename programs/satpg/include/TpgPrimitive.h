@@ -38,6 +38,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ノード内で有効なID番号を返す．
+  ymuint
+  subid() const;
+
   /// @brief 外部入力タイプの時 true を返す．
   bool
   is_input() const;
@@ -89,6 +93,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ノード内のID番号
+  ymuint32 mSubId;
+
   // いくつかのデータをパックしたもの
   // - [0:1] ノードタイプ
   //   0: 外部入力
@@ -127,6 +134,14 @@ TpgPrimitive::TpgPrimitive()
 inline
 TpgPrimitive::~TpgPrimitive()
 {
+}
+
+// @brief ノード内で有効なID番号を返す．
+inline
+ymuint
+TpgPrimitive::subid() const
+{
+  return mSubId;
 }
 
 // @brief 外部入力タイプの時 true を返す．
