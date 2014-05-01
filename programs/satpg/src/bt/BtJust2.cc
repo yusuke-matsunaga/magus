@@ -275,7 +275,10 @@ BtJust2::justify_primitive(TpgPrimitive* prim,
   if ( prim->is_input() ) {
     ymuint ipos = prim->input_id();
     TpgNode* inode = node->fanin(ipos);
-    return justify(inode, model);
+    NodeList* node_list1 = justify(inode, model);
+    NodeList* node_list = NULL;
+    list_merge(node_list, node_list1);
+    return node_list;
   }
 
   Bool3 gval = primitive_gval(prim, model);
@@ -436,10 +439,6 @@ void
 BtJust2::list_merge(NodeList*& dst_list,
 		    NodeList* src_list)
 {
-  if ( dst_list == src_list ) {
-    return;
-  }
-
   NodeList** pdst = &dst_list;
   NodeList* src = src_list;
   while ( *pdst != NULL && src != NULL ) {
