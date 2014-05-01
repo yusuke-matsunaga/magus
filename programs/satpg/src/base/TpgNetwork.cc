@@ -72,6 +72,17 @@ struct Lt
 
 };
 
+// 追加で必要なノード数を数える．
+ymuint
+extra_node_count(const Expr& expr)
+{
+  if ( !tgnode->is_cplx_logic() ) {
+    return 0;
+  }
+
+  Expr expr = tgnode->
+}
+
 // 論理式から必要なプリミティブ数を数える．
 ymuint
 primitive_count(const Expr& expr)
@@ -161,7 +172,25 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
   // 要素数を数え，必要なメモリ領域を確保する．
   //////////////////////////////////////////////////////////////////////
 
-  mNodeNum = tgnetwork.node_num();
+  ymuint nn = tgnetwork.node_num();
+  ymuint nl = tgnetwork.logic_num();
+  mNodeNum = nn;
+  hash_set<ymuint, ymuint> en_hash;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* tgnode = tgnetwork.logic(i);
+    if ( tgnode->is_cplx_logic() ) {
+      ymuint fid = tgnode->func_id();
+      if ( en_hash.count(fid) > 0 ) {
+	mNodeNum += en_hash[fid];
+      }
+      else {
+	ymuint n = extra_node_count(tgnetwork.get_lexp(fid));
+	en_hash.insert(make_pair(fid, n));
+	mNodeNum += n;
+      }
+    }
+  }
+
   mInputNum = tgnetwork.input_num1();
   mOutputNum = tgnetwork.output_num1();
   mFFNum = tgnetwork.ff_num();
@@ -226,7 +255,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
       // 念のため計算どおりのプリミティブ数か確かめる．
       assert_cond( subid == np, __FILE__, __LINE__);
     }
-    else if ( force_to_cplx_logic ) {
+    else {
       // デバッグ用のコード
       // 組み込み型のゲートも TpgPrimitive を用いて表す．
       ymuint ni = tgnode->fanin_num();

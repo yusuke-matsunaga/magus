@@ -20,6 +20,12 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 /// @class TpgNode TpgNode.h "TpgNode.h"
 /// @brief SATPG 用のノードを表すクラス
+///
+/// 基本的には TgNetwork の TgNode に対応しているが，
+/// もとの TgNode が組み込み型でない場合には複数の TpgNode を組み合わ
+/// せてもとの TgNode を表す．
+/// そのため，場合によってはファンインの故障を表すための仮想的な
+/// ノードを挿入する場合もある．
 //////////////////////////////////////////////////////////////////////
 class TpgNode
 {
@@ -53,6 +59,8 @@ public:
   is_input() const;
 
   /// @brief 外部入力タイプの時に入力番号を返す．
+  ///
+  /// is_input() が false の場合の返り値は不定
   ymuint
   input_id() const;
 
@@ -62,6 +70,8 @@ public:
   is_output() const;
 
   /// @brief 外部出力タイプの時に出力番号を返す．
+  ///
+  /// is_output() が false の場合の返り値は不定
   ymuint
   output_id() const;
 
@@ -70,21 +80,22 @@ public:
   is_logic() const;
 
   /// @brief ゲートタイプを得る．
+  ///
+  /// is_logic() が false の場合の返り値は不定
   tTgGateType
   gate_type() const;
 
-  /// @brief 組み込み型でない logic タイプ (cplx_logic タイプ)の時 true を返す．
+  /// @brief 値のノードの時 true を返す．
+  ///
+  /// is_logic() が true の時のみ意味を持つ．
   bool
-  is_cplx_logic() const;
+  is_root() const;
 
-  /// @brief cplx_logic タイプのときにプリミティブ数を返す．
-  ymuint
-  primitive_num() const;
-
-  /// @brief cplx_logic タイプのときにプリミティブを返す．
-  /// @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
-  TpgPrimitive*
-  primitive(ymuint pos) const;
+  /// @brief 内部ノードの時 true を返す．
+  ///
+  /// is_logic() が true の時のみ意味を持つ．
+  bool
+  is_internal() const;
 
   /// @brief ファンイン数を得る．
   ymuint
@@ -138,6 +149,8 @@ public:
   /// @brief 出力の故障を設定する．
   /// @param[in] val 故障値
   /// @param[in] f 故障
+  ///
+  /// is_internal() = true のノードには設定できない．
   void
   set_output_fault(int val,
 		   TpgFault* f);
@@ -146,6 +159,8 @@ public:
   /// @param[in] val 故障値
   /// @param[in] pos 入力の位置番号
   /// @param[in] f 故障
+  ///
+  /// is_internal() = true のノードには設定できない．
   void
   set_input_fault(int val,
 		  ymuint pos,
@@ -153,12 +168,16 @@ public:
 
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
+  ///
+  /// is_internal() = true のノードでは意味をもたない．
   TpgFault*
   output_fault(int val) const;
 
   /// @brief 入力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
   /// @param[in] pos 入力の位置番号
+  ///
+  /// is_internal() = true のノードでは意味をもたない．
   TpgFault*
   input_fault(int val,
 	      ymuint pos) const;
@@ -336,21 +355,15 @@ private:
   const char* mName;
 
   // いくつかのデータをパックしたもの
-  // - [0:1] ノードタイプ
+  // - [0:2] ノードタイプ
   //   0: 未使用
   //   1: 外部入力
   //   2: 外部出力
-  //   3: 論理ノード
-  // - [2:31] 入力/出力ノードの場合の通し番号
+  //   4: 論理ノード(外部ノード)
+  //   5: 論理ノード(内部ノード)
+  // - [3:31] 入力/出力ノードの場合の通し番号
   //          or ゲートタイプ
   ymuint32 mTypeId;
-
-  // プリミティブ数
-  ymuint32 mPrimitiveNum;
-
-  // プリミティブのリスト
-  // 入力からのトポロジカル順に格納する．
-  TpgPrimitive* mPrimitiveList;
 
   // ファンイン数
   ymuint32 mFaninNum;
@@ -451,7 +464,7 @@ ymuint
 TpgNode::input_id() const
 {
   assert_cond( is_input(), __FILE__, __LINE__);
-  return (mTypeId >> 2);
+  return (mTypeId >> 3);
 }
 
 // @brief 外部出力タイプの時 true を返す．
@@ -469,7 +482,7 @@ ymuint
 TpgNode::output_id() const
 {
   assert_cond( is_output(), __FILE__, __LINE__);
-  return (mTypeId >> 2);
+  return (mTypeId >> 3);
 }
 
 // @brief logic タイプの時 true を返す．
@@ -477,7 +490,7 @@ inline
 bool
 TpgNode::is_logic() const
 {
-  return (mTypeId & 3U) == 3U;
+  return (mTypeId & 4U) == 4U;
 }
 
 // @brief ゲートタイプを得る．
@@ -486,23 +499,29 @@ tTgGateType
 TpgNode::gate_type() const
 {
   assert_cond( is_logic(), __FILE__, __LINE__);
-  return static_cast<tTgGateType>((mTypeId >> 2) & 15U);
+  return static_cast<tTgGateType>((mTypeId >> 3) & 15U);
 }
 
-// @brief 組み込み型でない logic タイプの時 true を返す．
+// @brief 値のノードの時 true を返す．
+//
+// is_logic() が true の時のみ意味を持つ．
 inline
 bool
-TpgNode::is_cplx_logic() const
+TpgNode::is_root() const
 {
-  return is_logic() && gate_type() == kTgGateCplx;
+  assert_cond( is_logic(), __FILE__, __LINE__);
+  return (mTypeId & 1U) == 0U;
 }
 
-// @brief cplx_logic タイプのときにプリミティブ数を返す．
+// @brief 内部ノードの時 true を返す．
+//
+// is_logic() が true の時のみ意味を持つ．
 inline
-ymuint
-TpgNode::primitive_num() const
+bool
+TpgNode::is_internal() const
 {
-  return mPrimitiveNum;
+  assert_cond( is_logic(), __FILE__, __LINE__);
+  return (mTypeId & 1U) == 1U;
 }
 
 // @brief ファンイン数を得る．
