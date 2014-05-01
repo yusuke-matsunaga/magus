@@ -10,6 +10,7 @@
 
 
 #include "AtpgCmd.h"
+#include "tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -37,6 +38,15 @@ protected:
   int
   cmd_proc(TclObjVector& objv);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // -cplx_logic オプション
+  TclPopt* mCplxLogic;
+
 };
 
 
@@ -62,6 +72,15 @@ protected:
   virtual
   int
   cmd_proc(TclObjVector& objv);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // -cplx_logic オプション
+  TclPopt* mCplxLogic;
 
 };
 

@@ -71,19 +71,23 @@ public:
 
   /// @brief blif 形式のファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
   /// @param[in] cell_library セルライブラリ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
   read_blif(const string& filename,
+	    bool force_to_cplx_logic,
 	    const CellLibrary* cell_library = NULL);
 
   /// @brief iscas89 形式のファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
   /// @retval true 読み込みが成功した．
   /// @retval false 読み込みが失敗した．
   bool
-  read_iscas89(const string& filename);
+  read_iscas89(const string& filename,
+	       bool force_to_cplx_logic);
 
 
 public:

@@ -109,10 +109,12 @@ END_NONAMESPACE
 
 // @brief blif ファイルを読み込んでインスタンスを作る．
 // @param[in] filename ファイル名
+// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
 // @param[in] cell_library セルライブラリ
 // @note エラーが起こったら NULL を返す．
 TpgNetwork*
 TpgNetwork::read_blif(const string& filename,
+		      bool force_to_cplx_logic,
 		      const CellLibrary* cell_library)
 {
   TgNetwork tgnetwork;
@@ -123,16 +125,18 @@ TpgNetwork::read_blif(const string& filename,
     return NULL;
   }
 
-  TpgNetwork* network = new TpgNetwork(tgnetwork);
+  TpgNetwork* network = new TpgNetwork(tgnetwork, force_to_cplx_logic);
 
   return network;
 }
 
 // @brief iscas89 形式のファイルを読み込む．
 // @param[in] filename ファイル名
+// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
 // @note エラーが起こったら NULL を返す．
 TpgNetwork*
-TpgNetwork::read_iscas89(const string& filename)
+TpgNetwork::read_iscas89(const string& filename,
+			 bool force_to_cplx_logic)
 {
   TgNetwork tgnetwork;
   TgIscas89Reader read;
@@ -142,14 +146,15 @@ TpgNetwork::read_iscas89(const string& filename)
     return NULL;
   }
 
-  TpgNetwork* network = new TpgNetwork(tgnetwork);
+  TpgNetwork* network = new TpgNetwork(tgnetwork, force_to_cplx_logic);
 
   return network;
 }
 
 // @brief コンストラクタ
 // @param[in] tgnetwork もとのネットワーク
-TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
+TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
+		       bool force_to_cplx_logic) :
   mAlloc(4096)
 {
   //////////////////////////////////////////////////////////////////////
@@ -221,7 +226,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       // 念のため計算どおりのプリミティブ数か確かめる．
       assert_cond( subid == np, __FILE__, __LINE__);
     }
-    else if ( FORCE_TO_CPLX_LOGIC ) {
+    else if ( force_to_cplx_logic ) {
       // デバッグ用のコード
       // 組み込み型のゲートも TpgPrimitive を用いて表す．
       ymuint ni = tgnode->fanin_num();

@@ -31,19 +31,23 @@ public:
 
   /// @brief blif ファイルを読み込んでインスタンスを作る．
   /// @param[in] filename ファイル名
+  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
   /// @param[in] cell_library セルライブラリ
   /// @note エラーが起こったら NULL を返す．
   static
   TpgNetwork*
   read_blif(const string& filename,
+	    bool force_to_cplx_logic,
 	    const CellLibrary* cell_library);
 
   /// @brief iscas89 形式のファイルを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
   /// @note エラーが起こったら NULL を返す．
   static
   TpgNetwork*
-  read_iscas89(const string& filename);
+  read_iscas89(const string& filename,
+	       bool force_to_cplx_logic);
 
   /// @brief デストラクタ
   ~TpgNetwork();
@@ -218,7 +222,9 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] tgnetwork もとのネットワーク
-  TpgNetwork(const TgNetwork& tgnetwork);
+  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
+  TpgNetwork(const TgNetwork& tgnetwork,
+	     bool force_to_cplx_logic);
 
   /// @brief コピーコンストラクタは実装しない．
   TpgNetwork(const TpgNetwork& src);
