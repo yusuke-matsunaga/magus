@@ -21,10 +21,6 @@ BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
-// 全ての論理ノードを kTgGateCplx タイプとして登録する時に true にする．
-// TpgPrimitive 関係のコードのデバッグ用
-const bool FORCE_TO_CPLX_LOGIC = false;
-
 // 指定された型の配列を確保するテンプレート関数
 template <typename T>
 T*
@@ -74,13 +70,27 @@ struct Lt
 
 // 追加で必要なノード数を数える．
 ymuint
-extra_node_count(const Expr& expr)
+extra_node_count(const Expr& expr,
+		 ymuint ni)
 {
-  if ( !tgnode->is_cplx_logic() ) {
-    return 0;
+  ymuint n = 0;
+  for (ymuint i = 0; i < ni; ++ i) {
+    ymuint p_num = expr.litnum(VarId(i), false);
+    ymuint n_num = expr.litnum(VarId(i), true);
+    assert_cond( p_num > 0 || n_num > 0, __FILE__, __LINE__);
+    if ( n_num == 0 ) {
+      if ( p_num > 1 ) {
+	n = 1;
+      }
+    }
+    else {
+      n = 1;
+      if ( p_num > 1 ) {
+	++ n;
+      }
+    }
   }
-
-  Expr expr = tgnode->
+  return n;
 }
 
 // 論理式から必要なプリミティブ数を数える．
@@ -120,12 +130,10 @@ END_NONAMESPACE
 
 // @brief blif ファイルを読み込んでインスタンスを作る．
 // @param[in] filename ファイル名
-// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
 // @param[in] cell_library セルライブラリ
 // @note エラーが起こったら NULL を返す．
 TpgNetwork*
 TpgNetwork::read_blif(const string& filename,
-		      bool force_to_cplx_logic,
 		      const CellLibrary* cell_library)
 {
   TgNetwork tgnetwork;
@@ -136,18 +144,16 @@ TpgNetwork::read_blif(const string& filename,
     return NULL;
   }
 
-  TpgNetwork* network = new TpgNetwork(tgnetwork, force_to_cplx_logic);
+  TpgNetwork* network = new TpgNetwork(tgnetwork);
 
   return network;
 }
 
 // @brief iscas89 形式のファイルを読み込む．
 // @param[in] filename ファイル名
-// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
 // @note エラーが起こったら NULL を返す．
 TpgNetwork*
-TpgNetwork::read_iscas89(const string& filename,
-			 bool force_to_cplx_logic)
+TpgNetwork::read_iscas89(const string& filename)
 {
   TgNetwork tgnetwork;
   TgIscas89Reader read;
@@ -157,15 +163,14 @@ TpgNetwork::read_iscas89(const string& filename,
     return NULL;
   }
 
-  TpgNetwork* network = new TpgNetwork(tgnetwork, force_to_cplx_logic);
+  TpgNetwork* network = new TpgNetwork(tgnetwork);
 
   return network;
 }
 
 // @brief コンストラクタ
 // @param[in] tgnetwork もとのネットワーク
-TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
-		       bool force_to_cplx_logic) :
+TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   mAlloc(4096)
 {
   //////////////////////////////////////////////////////////////////////
@@ -184,7 +189,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
 	mNodeNum += en_hash[fid];
       }
       else {
-	ymuint n = extra_node_count(tgnetwork.get_lexp(fid));
+	ymuint n = extra_node_count(tgnetwork.get_lexp(fid), tgnode->fanin_num());
 	en_hash.insert(make_pair(fid, n));
 	mNodeNum += n;
       }
@@ -221,7 +226,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
   ymuint npi = input_num2();
   for (ymuint i = 0; i < npi; ++ i, ++ id) {
     const TgNode* tgnode = tgnetwork.input(i);
-    TpgNode* node = make_node(id, tgnode);
+    TpgNode* node = make_input_node(tgnode, id);
     mInputArray[i] = node;
   }
 
@@ -233,58 +238,20 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
   ymuint nl = tgnetwork.logic_num();
   for (ymuint i = 0; i < nl; ++ i, ++ id) {
     const TgNode* tgnode = tgnetwork.sorted_logic(i);
-    TpgNode* node = make_node(id, tgnode);
+    TpgNode* node = NULL;
     if ( tgnode->is_cplx_logic() ) {
       // 論理式をとってくる．
       ymuint fid = tgnode->func_id();
       Expr expr = tgnetwork.get_lexp(fid);
 
-      // プリミティブ数を数え，必要なメモリ領域を確保する．
-      ymuint np = primitive_count(expr);
-      node->mPrimitiveNum = np;
-      node->mPrimitiveList = alloc_array<TpgPrimitive>(mAlloc, np);
-      for (ymuint j = 0; j < np; ++ j) {
-	node->mPrimitiveList[j].mSubId = j;
-      }
-
-      // expr の内容を表すプリミティブの木を作る．
-      // 結果は node->mPrimitiveList に直接書き込まれる．
-      ymuint subid = 0;
-      make_primitive(expr, tgnode, node->mPrimitiveList, subid);
-
-      // 念のため計算どおりのプリミティブ数か確かめる．
-      assert_cond( subid == np, __FILE__, __LINE__);
+      // expr の内容を表す TpgNode の木を作る．
+      node = make_cplx_nodes(expr, tgnode, id);
     }
     else {
-      // デバッグ用のコード
-      // 組み込み型のゲートも TpgPrimitive を用いて表す．
-      ymuint ni = tgnode->fanin_num();
-      tTgGateType gate_type = tgnode->gate_type();
-
-      // プリミティブ数はファンイン数＋1
-      ymuint np = ni + 1;
-      node->mPrimitiveNum = np;
-      node->mPrimitiveList = alloc_array<TpgPrimitive>(mAlloc, np);
-      for (ymuint j = 0; j < np; ++ j) {
-	node->mPrimitiveList[j].mSubId = j;
-      }
-
-      // 入力プリミティブの設定
-      for (ymuint i = 0; i < ni; ++ i) {
-	TpgPrimitive* prim = &node->mPrimitiveList[i];
-	set_input_primitive(prim, i);
-      }
-
-      // 演算子(AND/OR/XOR)プリミティブの設定
-      TpgPrimitive* prim = &node->mPrimitiveList[ni];
-      set_logic_primitive(prim, gate_type, ni);
-      for (ymuint i = 0; i < ni; ++ i) {
-	prim->mFanins[i] = &node->mPrimitiveList[i];
-      }
-
-      // cplx_logic マークにつけ直す．
-      node->mTypeId = 3U | (kTgGateCplx << 2);
+      // 組み込み型のゲート
+      node = make_logic_node(tgnode->gate_type(), tgnode->fanin_num(), id);
     }
+    bind(node, tgnode);
   }
 
 
@@ -294,7 +261,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork,
   ymuint npo = output_num2();
   for (ymuint i = 0; i < npo; ++ i, ++ id) {
     const TgNode* tgnode = tgnetwork.output(i);
-    TpgNode* node = make_node(id, tgnode);
+    TpgNode* node = make_output_node(tgnode, id);
     mOutputArray[i] = node;
   }
 
@@ -470,18 +437,10 @@ TpgNetwork::node(ymuint pos) const
   return &mNodeArray[pos];
 }
 
-// @brief TpgNode の内容を設定する．
-// @param[in] id ID番号
-// @param[in] tgnode もととなる TgNode
-// @param[in] type ノードタイプ
-// @param[in] sub_id サブID
-TpgNode*
-TpgNetwork::make_node(ymuint id,
-		      const TgNode* tgnode)
+void
+TpgNetwork::bind(TpgNode* node,
+		 const TgNode* tgnode)
 {
-  TpgNode* node = &mNodeArray[id];
-  node->mId = id;
-
   const char* src_name = tgnode->name();
   if ( tgnode->is_output() ) {
     src_name = tgnode->fanin(0)->name();
@@ -499,45 +458,124 @@ TpgNetwork::make_node(ymuint id,
   }
 
   mNodeMap[tgnode->gid()] = node;
+}
 
-  node->mCval = kB3X;
-  node->mNval = kB3X;
-  node->mMaVal = kB3X;
+TpgNode*
+TpgNetwork::make_input_node(const TgNode* tgnode,
+			    ymuint id)
+{
+  TpgNode* node = make_node(0, tgnode->fanout_num(), id);
+  node->mTypeId = 1U | (tgnode->lid() << 3);
 
-  if ( tgnode->is_input() ) {
-    node->mTypeId = 1U | (tgnode->lid() << 2);
+  bind(node, tgnode);
+
+  return node;
+}
+
+TpgNode*
+TpgNetwork::make_output_node(const TgNode* tgnode,
+			     ymuint id)
+{
+  TpgNode* node = make_node(1, 0, id);
+  node->mTypeId = 2U | (tgnode->lid() << 3);
+
+  const TgNode* itgnode = tgnode->fanin(0);
+  TpgNode* inode = mNodeMap[itgnode->gid()];
+  node->mFanins[0] = inode;
+
+  bind(node, tgnode);
+
+  retur node;
+}
+
+TpgNode*
+TpgNetwork::make_cplx_node(const Expr& expr,
+			   const TgNode* tgnode,
+			   ymuint id)
+{
+  if ( expr.is_posiliteral() ) {
+    return leaf_nodes[expr.varid().val() * 2 + 0];
   }
-  else if ( tgnode->is_output() ) {
-    node->mTypeId = 2U | (tgnode->lid() << 2);
+  if ( expr.is_negaliteral() ) {
+    return leaf_nodes[expr.varid().val() * 2 + 1];
   }
-  else if ( tgnode->is_logic() ) {
-    node->mTypeId = 3U | (static_cast<ymuint>(tgnode->gate_type()) << 2);
 
-    switch ( tgnode->gate_type() ) {
-    case kTgGateAnd:
-    case kTgGateNand:
-      node->mCval = kB3False;
-      node->mNval = kB3True;
-      break;
+  ymuint nc = expr.child_num();
+  vector<TpgNode*> fanin(nc);
+  for (ymuint i = 0; i < nc; ++ i) {
+    const Expr& expr1 = expr.child(i);
+    TpgNode* inode = make_cplx_node(expr1, tgnode, id);
+    fanin[i] = inode;
+  }
 
-    case kTgGateOr:
-    case kTgGateNor:
-      node->mCval = kB3True;
-      node->mNval = kB3False;
-      break;
-
-    default:
-      break;
-    }
+  tTgGateType gate_type;
+  if ( expr.is_and() ) {
+    gate_type = kTgGateAnd;
+  }
+  else if ( expr.is_or() ) {
+    gate_type = kTgGateOr;
+  }
+  else if ( expr.is_xor() ) {
+    gate_type = kTgGateXor;
   }
   else {
     assert_not_reached(__FILE__, __LINE__);
   }
 
-  node->mPrimitiveNum = 0;
-  node->mPrimitiveList = NULL;
+  TpgNode* node = make_logic_node(gate_type, nc, 1, id);
 
-  ymuint ni = tgnode->fanin_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    node->mFanins[i] = fanin[i];
+  }
+
+  return node;
+}
+
+TpgNode*
+TpgNetwork::make_logic_node(tGateType type,
+			    ymuint ni,
+			    ymuint nfo,
+			    ymuint id)
+{
+  TpgNode* node = make_node(ni, nfo, id);
+  node->mTypeId = 4U | (static_cast<ymuint>(type) << 3);
+
+  switch ( type ) {
+  case kTgGateAnd:
+  case kTgGateNand:
+    node->mCval = kB3False;
+    node->mNval = kB3True;
+    break;
+
+  case kTgGateOr:
+  case kTgGateNor:
+    node->mCval = kB3True;
+    node->mNval = kB3False;
+    break;
+
+  default:
+    break;
+  }
+
+  retur node;
+}
+
+// @brief TpgNode の内容を設定する．
+// @param[in] id ID番号
+// @param[in] ni
+TpgNode*
+TpgNetwork::make_node(ymuint ni,
+		      ymuint nfo,
+		      ymuint id)
+
+{
+  TpgNode* node = &mNodeArray[id];
+  node->mId = id;
+
+  node->mCval = kB3X;
+  node->mNval = kB3X;
+  node->mMaVal = kB3X;
+
   node->mFaninNum = ni;
   if ( ni > 0 ) {
     node->mFanins = alloc_array<TpgNode*>(mAlloc, ni);
@@ -554,11 +592,10 @@ TpgNetwork::make_node(ymuint id,
     node->mFanins[i] = inode;
   }
 
-  ymuint no = tgnode->fanout_num();
-  node->mFanoutNum = no;
-  node->mFanouts = alloc_array<TpgNode*>(mAlloc, no);
+  node->mFanoutNum = nfo;
+  node->mFanouts = alloc_array<TpgNode*>(mAlloc, nfo);
   node->mActFanoutNum = 0;
-  node->mActFanouts = alloc_array<TpgNode*>(mAlloc, no);
+  node->mActFanouts = alloc_array<TpgNode*>(mAlloc, nfo);
 
   for (ymuint i = 0; i < ni; ++ i) {
     node->mInputFault[i * 2 + 0] = NULL;
