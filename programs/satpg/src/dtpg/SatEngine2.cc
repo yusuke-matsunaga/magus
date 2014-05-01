@@ -625,6 +625,9 @@ SatEngine2::run(TpgFault* f_tgt,
       }
     }
 
+    Literal gate_output(ovar, false);
+    make_fnode_cnf(solver, node, gate_output, inputs);
+
     Literal glit(node->gvar(), false);
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
@@ -636,13 +639,11 @@ SatEngine2::run(TpgFault* f_tgt,
     solver.add_clause( glit, ~flit,  dlit);
     solver.add_clause( glit,  flit, ~dlit);
 
-    Literal gate_output(ovar, false);
-    make_fnode_cnf(solver, node, gate_output, inputs);
-
     // 出力の dlit が1になる条件を作る．
-    // - 入力の dlit のいずれかが 1
-    // - 入力のいずれかに故障がある．
-    // - 出力に故障がある．
+    // - 1) 入力の dlit のいずれかが 1
+    // - 2) 入力のいずれかに故障がある．
+    // - 3) 出力に故障がある．
+    // このうち，2) と 3) の場合は has_fault = true となっている．
     if ( !has_fault ) {
       dep.clear();
       dep.reserve(ni + 1);
