@@ -25,9 +25,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] fsm 故障シミュレータ
-  /// @param[in] fmgr 故障マネージャ
+  /// @param[in] f_list 故障のリスト
+  /// @param[in] max_fault_id 故障IDの最大値+1
   KDet(Fsim& fsim,
-       FaultMgr& fmgr);
+       const vector<TpgFault*>& f_list,
+       ymuint max_fault_id);
 
   /// @brief デストラクタ
   ~KDet();

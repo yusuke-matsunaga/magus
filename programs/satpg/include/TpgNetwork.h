@@ -12,11 +12,30 @@
 #include "satpg_nsdef.h"
 #include "networks/tgnet.h"
 #include "cell/cell_nsdef.h"
+#include "logic/Bool3.h"
 #include "logic/expr_nsdef.h"
 #include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
+
+class TpgMap;
+
+//////////////////////////////////////////////////////////////////////
+/// @class CplxInfo TpgNetwork.h "TpgNetwork.h"
+/// @brief cplx_logic 用の情報を格納するクラス
+//////////////////////////////////////////////////////////////////////
+struct CplxInfo
+{
+  // 根のノード以外に必要となるノード数
+  ymuint32 mExtraNodeCount;
+
+  // 制御値を納める配列
+  // pos 番目の 0 が mCVal[pos * 2 + 0] に対応する．
+  vector<Bool3> mCVal;
+
+};
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class TpgNetwork TpgNetwork.h "TpgNetwork.h"
@@ -100,6 +119,14 @@ public:
   TpgNode*
   output2(ymuint pos) const;
 
+  /// @brief 代表故障のリストを得る．
+  const vector<TpgFault*>&
+  rep_faults() const;
+
+  /// @brief 故障IDの最大値+1を返す．
+  ymuint
+  max_fault_id() const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -178,6 +205,7 @@ private:
   /// @param[in] expr 式
   /// @param[in] nfo 根のノードのファンアウト数
   /// @param[in] leaf_nodes 式のリテラルに対応するノードの配列
+  /// @param[in] input_map ファンインの対応関係を収める配列
   /// @return 生成したノードを返す．
   ///
   /// leaf_nodes は 変数番号 * 2 + (0/1) に
@@ -185,15 +213,18 @@ private:
   TpgNode*
   make_cplx_node(const Expr& expr,
 		 ymuint nfo,
-		 const vector<TpgNode*>& leaf_nodes);
+		 const vector<TpgNode*>& leaf_nodes,
+		 vector<pair<TpgNode*, ymuint> >& input_map);
 
   /// @brief 組み込み型の論理ゲートを生成する．
   /// @param[in] type ゲートの型
+  /// @param[in] root 根のノードの時 true
   /// @param[in] ni ファンイン数
   /// @param[in] nfo ファンアウト数
   /// @return 生成したノードを返す．
   TpgNode*
   make_prim_node(tTgGateType type,
+		 bool root,
 		 ymuint ni,
 		 ymuint nfo);
 
@@ -216,10 +247,53 @@ private:
 
   /// @brief TpgNode と TpgNode の対応付けを行う．
   /// @param[in] node TpgNode
-  /// @param[in] tgnode もととなる TgNodep
+  /// @param[in] tgnode もととなる TgNode
   void
   bind(TpgNode* node,
        const TgNode* tgnode);
+
+  /// @brief ノードの入力と出力の故障を作る．
+  /// @param[in] tgnode もととなる TgNode
+  void
+  make_faults(const TgNode* tgnode,
+	      const unordered_map<ymuint, CplxInfo>& en_hash);
+
+  /// @brief 出力の故障を作る．
+  /// @param[in] node 故障位置のノード
+  /// @param[in] val 故障値 ( 0 / 1 )
+  /// @param[in] rep 代表故障
+  ///
+  /// 自分自身が代表故障の場合には rep に NULL を入れる．
+  TpgFault*
+  new_ofault(TpgNode* node,
+	     ymuint val,
+	     TpgFault* rep);
+
+  /// @brief 入力の故障を作る．
+  /// @param[in] node 故障位置のノード
+  /// @param[in] ipos ファンイン番号 ( 0 <= ipos < node->fanin_num() )
+  /// @param[in] val 故障値
+  /// @param[in] rep 代表故障
+  ///
+  /// 自分自身が代表故障の場合には rep に NULL を入れる．
+  TpgFault*
+  new_ifault(TpgNode* ode,
+	     ymuint ipos,
+	     ymuint val,
+	     TpgFault* rep);
+
+  /// @brief 故障を生成する．
+  /// @param[in] node 対象のノード
+  /// @param[in] is_output 出力の故障のときに true とするフラグ
+  /// @param[in] ipos 入力の故障の時に入力番号を表す
+  /// @param[in] val 縮退している値
+  /// @param[in] rep 代表故障
+  TpgFault*
+  new_fault(TpgNode* node,
+	    bool is_output,
+	    ymuint ipos,
+	    ymuint val,
+	    TpgFault* rep);
 
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
@@ -278,7 +352,7 @@ private:
   // ノードの本体の配列
   TpgNode* mNodeArray;
 
-  // TgNode->gid() をキーにしたノードの配列
+  // TgNode->gid() をキーにした TpgMap の配列
   TpgNode** mNodeMap;
 
   // 外部入力ノードの配列
@@ -306,6 +380,15 @@ private:
 
   // mTmpNodeList の見かけのサイズ
   ymuint32 mTmpNodeNum;
+
+  // 全故障数
+  ymuint32 mFaultNum;
+
+  // 故障の配列
+  TpgFault* mFaultChunk;
+
+  // 代表故障のリスト
+  vector<TpgFault*> mRepFaults;
 
 };
 
@@ -381,6 +464,22 @@ TpgNetwork::output2(ymuint pos) const
 {
   assert_cond( pos < output_num2(), __FILE__, __LINE__);
   return mOutputArray2[pos];
+}
+
+// @brief 代表故障のリストを得る．
+inline
+const vector<TpgFault*>&
+TpgNetwork::rep_faults() const
+{
+  return mRepFaults;
+}
+
+// @brief 故障IDの最大値+1を返す．
+inline
+ymuint
+TpgNetwork::max_fault_id() const
+{
+  return mFaultNum;
 }
 
 // @brief アクティブなノード数を得る．

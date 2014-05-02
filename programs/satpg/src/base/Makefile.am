@@ -57,6 +57,8 @@ COMMON_SOURCES = \
 	TpgNetwork.cc \
 	TpgNode.cc \
 	TpgFault.cc \
+	TpgMap.h \
+	TpgMap.cc \
 	TvMgr.cc
 
 

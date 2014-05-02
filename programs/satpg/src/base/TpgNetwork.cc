@@ -10,6 +10,7 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "TpgMap.h"
 #include "networks/TgNetwork.h"
 #include "networks/TgNode.h"
 #include "networks/TgBlifReader.h"
@@ -30,6 +31,179 @@ alloc_array(Alloc& alloc,
   return new (p) T[n];
 }
 
+// 論理式中の演算子の数を数える．
+ymuint
+count_expr(const Expr& expr)
+{
+  if ( !expr.is_op() ) {
+    return 0;
+  }
+
+  ymuint n = 1;
+  ymuint nc = expr.child_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    n += count_expr(expr.child(i));
+  }
+  return n;
+}
+
+// 追加で必要なノード数を数える．
+ymuint
+extra_node_count(const Expr& expr,
+		 ymuint ni)
+{
+  // まず入力部分に挿入されるノード数を数える．
+  ymuint n = 0;
+  for (ymuint i = 0; i < ni; ++ i) {
+    ymuint p_num = expr.litnum(VarId(i), false);
+    ymuint n_num = expr.litnum(VarId(i), true);
+    assert_cond( p_num > 0 || n_num > 0, __FILE__, __LINE__);
+    if ( n_num == 0 ) {
+      if ( p_num > 1 ) {
+	n = 1;
+      }
+    }
+    else {
+      n = 1;
+      if ( p_num > 0 ) {
+	++ n;
+      }
+    }
+  }
+
+  // 次に論理式自体で必要となるノード数を数える．
+  // ただし，根のノードはカウント済みなので1つ減らす．
+  n += count_expr(expr) - 1;
+
+  cout << "Extra Node Count: " << expr << " ==> " << n << endl;
+
+  return n;
+}
+
+// calc_c_val の下請け関数
+Bool3
+ccv_sub(const Expr& expr,
+	const vector<Bool3>& ivals)
+{
+  if ( expr.is_zero() ) {
+    return kB3False;
+  }
+  if ( expr.is_one() ) {
+    return kB3True;
+  }
+  if ( expr.is_posiliteral() ) {
+    ymuint iid = expr.varid().val();
+    return ivals[iid];
+  }
+  if ( expr.is_negaliteral() ) {
+    ymuint iid = expr.varid().val();
+    return ~ivals[iid];
+  }
+
+  ymuint nc = expr.child_num();
+  if ( expr.is_and() ) {
+    bool has_x = false;
+    for (ymuint i = 0; i < nc; ++ i) {
+      Bool3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kB3False ) {
+	return kB3False;
+      }
+      if ( ival == kB3X ) {
+	has_x = true;
+      }
+    }
+    if ( has_x ) {
+      return kB3X;
+    }
+    return kB3True;
+  }
+
+  if ( expr.is_or() ) {
+    bool has_x = false;
+    for (ymuint i = 0; i < nc; ++ i) {
+      Bool3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kB3True ) {
+	return kB3True;
+      }
+      if ( ival == kB3X ) {
+	has_x = true;
+      }
+    }
+    if ( has_x ) {
+      return kB3X;
+    }
+    return kB3False;
+  }
+
+  if ( expr.is_or() ) {
+    Bool3 val = kB3False;
+    for (ymuint i = 0; i < nc; ++ i) {
+      Bool3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kB3X ) {
+	return kB3X;
+      }
+      val ^= ival;
+    }
+    return val;
+  }
+
+  assert_not_reached(__FILE__, __LINE__);
+  return kB3X;
+}
+
+// 制御値の計算を行う．
+Bool3
+calc_c_val(const Expr& expr,
+	   ymuint ni,
+	   ymuint ipos,
+	   Bool3 val)
+{
+  vector<Bool3> ivals(ni, kB3X);
+  ivals[ipos] = val;
+  return ccv_sub(expr, ivals);
+}
+
+// 制御値の計算を行う．
+Bool3
+c_val(tTgGateType type,
+      Bool3 ival)
+{
+  switch ( type ) {
+  case kTgGateBuff:
+    // そのまま返す．
+    return ival;
+
+  case kTgGateNot:
+    // 反転して返す．
+    return ~ival;
+
+  case kTgGateAnd:
+    // 0 の時のみ 0
+    return ival == kB3False ? kB3False : kB3X;
+
+  case kTgGateNand:
+    // 0 の時のみ 1
+    return ival == kB3False ? kB3True : kB3X;
+
+  case kTgGateOr:
+    // 1 の時のみ 1
+    return ival == kB3True ? kB3True : kB3X;
+
+  case kTgGateNor:
+    // 1 の時のみ 0
+    return ival == kB3True ? kB3False : kB3X;
+
+  case kTgGateXor:
+  case kTgGateXnor:
+    // 常に X
+    return kB3X;
+
+  case kTgGateCplx:
+    // これは使わない．
+    assert_not_reached(__FILE__, __LINE__);
+    return kB3X;
+  }
+}
 
 // immediate dominator リストをマージする．
 TpgNode*
@@ -66,31 +240,6 @@ struct Lt
   }
 
 };
-
-// 追加で必要なノード数を数える．
-ymuint
-extra_node_count(const Expr& expr,
-		 ymuint ni)
-{
-  ymuint n = 0;
-  for (ymuint i = 0; i < ni; ++ i) {
-    ymuint p_num = expr.litnum(VarId(i), false);
-    ymuint n_num = expr.litnum(VarId(i), true);
-    assert_cond( p_num > 0 || n_num > 0, __FILE__, __LINE__);
-    if ( n_num == 0 ) {
-      if ( p_num > 1 ) {
-	n = 1;
-      }
-    }
-    else {
-      n = 1;
-      if ( p_num > 0 ) {
-	++ n;
-      }
-    }
-  }
-  return n;
-}
 
 END_NONAMESPACE
 
@@ -151,17 +300,26 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   ymuint nn_orig = tgnetwork.node_num();
   ymuint nl = tgnetwork.logic_num();
   ymuint nn = nn_orig;
-  unordered_map<ymuint, ymuint> en_hash;
+  unordered_map<ymuint, CplxInfo> en_hash;
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.logic(i);
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
       if ( en_hash.count(fid) > 0 ) {
-	nn += en_hash[fid];
+	nn += en_hash[fid].mExtraNodeCount;
       }
       else {
-	ymuint n = extra_node_count(tgnetwork.get_lexp(fid), tgnode->fanin_num());
-	en_hash.insert(make_pair(fid, n));
+	Expr expr = tgnetwork.get_lexp(fid);
+	ymuint ni = tgnode->fanin_num();
+	ymuint n = extra_node_count(expr, ni);
+	en_hash.insert(make_pair(fid, CplxInfo()));
+	CplxInfo& cinfo = en_hash[fid];
+	cinfo.mExtraNodeCount = n;
+	cinfo.mCVal.resize(ni * 2);
+	for (ymuint j = 0; j < ni; ++ j) {
+	  cinfo.mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kB3False);
+	  cinfo.mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kB3True);
+	}
 	nn += n;
       }
     }
@@ -224,10 +382,53 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   assert_cond( nn == mNodeNum, __FILE__, __LINE__);
 
 
+  //////////////////////////////////////////////////////////////////////
+  // 故障を作る．
+  //////////////////////////////////////////////////////////////////////
+
+  // 全故障数を数える．
+  ymuint nfault = 0;
+  for (ymuint i = 0; i < nn_orig; ++ i) {
+    const TgNode* tgnode = tgnetwork.node(i);
+    if ( !tgnode->is_output() ) {
+      nfault += (tgnode->fanin_num() + 1) * 2;
+    }
+  }
+
+  // 故障を生成する．
+  mFaultChunk = alloc_array<TpgFault>(mAlloc, nfault);
+  mFaultNum = 0;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const TgNode* tgnode = tgnetwork.sorted_logic(nl - i - 1);
+    make_faults(tgnode, en_hash);
+  }
+  for (ymuint i = 0; i < npi; ++ i) {
+    const TgNode* tgnode = tgnetwork.input(i);
+    make_faults(tgnode, en_hash);
+  }
+
+  assert_cond( mFaultNum == nfault, __FILE__, __LINE__);
+
+  // 代表故障のリストを作る．
+  ymuint nrep = 0;
+  for (ymuint i = 0; i < mFaultNum; ++ i) {
+    TpgFault* f = &mFaultChunk[i];
+    if ( f->is_rep() ) {
+      ++ nrep;
+    }
+  }
+  mRepFaults.reserve(nrep);
+  for (ymuint i = 0; i < mFaultNum; ++ i) {
+    TpgFault* f = &mFaultChunk[i];
+    if ( f->is_rep() ) {
+      mRepFaults.push_back(f);
+    }
+  }
+
   // 全部アクティブにしておく．
   activate_all();
 
-  // TFI のサイズの昇順に並べ方出力順を
+  // TFI のサイズの昇順に並べた出力順を
   // mOutputArray2 に記録する．
   vector<pair<ymuint, ymuint> > tmp_list(output_num2());
   for (ymuint i = 0; i < output_num2(); ++ i) {
@@ -432,6 +633,7 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
 
     // expr の内容を表す TpgNode の木を作る．
     vector<TpgNode*> leaf_nodes(ni * 2, NULL);
+    vector<pair<TpgNode*, ymuint> > input_map(ni);
     for (ymuint i = 0; i < ni; ++ i) {
       ymuint p_num = expr.litnum(VarId(i), false);
       ymuint n_num = expr.litnum(VarId(i), true);
@@ -440,30 +642,48 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
       if ( n_num == 0 ) {
 	if ( p_num == 1 ) {
 	  leaf_nodes[i * 2 + 0] = inode;
+	  // ダミー
+	  input_map[i] = make_pair(static_cast<TpgNode*>(NULL), 0);
 	}
 	else {
-	  TpgNode* dummy_buff = make_prim_node(kTgGateBuff, 1, p_num);
+	  TpgNode* dummy_buff = make_prim_node(kTgGateBuff, false, 1, p_num);
 	  connect(inode, dummy_buff, 0);
 	  leaf_nodes[i * 2 + 0] = dummy_buff;
+	  input_map[i] = make_pair(dummy_buff, 0);
 	}
       }
       else {
 	if ( p_num > 0 ) {
-	  TpgNode* dummy_buff = make_prim_node(kTgGateBuff, 1, p_num + 1);
+	  TpgNode* dummy_buff = make_prim_node(kTgGateBuff, false, 1, p_num + 1);
 	  connect(inode, dummy_buff, 0);
 	  inode = dummy_buff;
 	}
 
-	TpgNode* not_gate = make_prim_node(kTgGateNot, 1, n_num);
+	TpgNode* not_gate = make_prim_node(kTgGateNot, false, 1, n_num);
 	connect(inode, not_gate, 0);
 	leaf_nodes[i * 2 + 1] = not_gate;
+
+	if ( p_num > 0 ) {
+	  input_map[i] = make_pair(inode, 0);
+	}
+	else {
+	  input_map[i] = make_pair(not_gate, 0);
+	}
       }
     }
-    node = make_cplx_node(expr, nfo, leaf_nodes);
+    node = make_cplx_node(expr, nfo, leaf_nodes, input_map);
+    TpgCplxMap* tmap = new TpgCplxMap();
+    tmap->mInputNodeArray = alloc_array<TpgNode*>(mAlloc, ni);
+    tmap->mInputPosArray = alloc_array<ymuint32>(mAlloc, ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      tmap->mInputNodeArray[i] = input_map[i].first;
+      tmap->mInputPosArray[i] = input_map[i].second;
+    }
+    node->mInputMap = tmap;
   }
   else {
     // 組み込み型のゲート
-    node = make_prim_node(tgnode->gate_type(), ni, nfo);
+    node = make_prim_node(tgnode->gate_type(), true, ni, nfo);
     for (ymuint i = 0; i < ni; ++ i) {
       const TgNode* itgnode = tgnode->fanin(i);
       TpgNode* inode = mNodeMap[itgnode->gid()];
@@ -479,6 +699,7 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
 // @param[in] expr 式
 // @param[in] nfo 根のノードのファンアウト数
 // @param[in] leaf_nodes 式のリテラルに対応するノードの配列
+// @param[in] input_map ファンインの対応関係を収める配列
 // @return 生成したノードを返す．
 //
 // leaf_nodes は 変数番号 * 2 + (0/1) に
@@ -486,13 +707,16 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
 TpgNode*
 TpgNetwork::make_cplx_node(const Expr& expr,
 			   ymuint nfo,
-			   const vector<TpgNode*>& leaf_nodes)
+			   const vector<TpgNode*>& leaf_nodes,
+			   vector<pair<TpgNode*, ymuint> >& input_map)
 {
   if ( expr.is_posiliteral() ) {
-    return leaf_nodes[expr.varid().val() * 2 + 0];
+    ymuint iid = expr.varid().val();
+    return leaf_nodes[iid * 2 + 0];
   }
   if ( expr.is_negaliteral() ) {
-    return leaf_nodes[expr.varid().val() * 2 + 1];
+    ymuint iid = expr.varid().val();
+    return leaf_nodes[iid * 2 + 1];
   }
 
   tTgGateType gate_type;
@@ -510,12 +734,19 @@ TpgNetwork::make_cplx_node(const Expr& expr,
   }
 
   ymuint nc = expr.child_num();
-  TpgNode* node = make_prim_node(gate_type, nc, nfo);
+  TpgNode* node = make_prim_node(gate_type, false, nc, nfo);
 
   for (ymuint i = 0; i < nc; ++ i) {
     const Expr& expr1 = expr.child(i);
-    TpgNode* inode = make_cplx_node(expr1, 1, leaf_nodes);
+    TpgNode* inode = make_cplx_node(expr1, 1, leaf_nodes, input_map);
     connect(inode, node, i);
+    // 美しくないけどスマートなやり方を思いつかない．
+    if ( expr1.is_posiliteral() ) {
+      ymuint iid = expr1.varid().val();
+      if ( input_map[iid].first == NULL ) {
+	input_map[iid] = make_pair(node, i);
+      }
+    }
   }
 
   return node;
@@ -523,16 +754,21 @@ TpgNetwork::make_cplx_node(const Expr& expr,
 
 // @brief 組み込み型の論理ゲートを生成する．
 // @param[in] type ゲートの型
+// @param[in] root 根のノードの時 true
 // @param[in] ni ファンイン数
 // @param[in] nfo ファンアウト数
 // @return 生成したノードを返す．
 TpgNode*
 TpgNetwork::make_prim_node(tTgGateType type,
+			   bool root,
 			   ymuint ni,
 			   ymuint nfo)
 {
   TpgNode* node = make_node(ni, nfo);
   node->mTypeId = 4U | (static_cast<ymuint>(type) << 3);
+  if ( !root ) {
+    node->mTypeId |= 1U;
+  }
 
   switch ( type ) {
   case kTgGateAnd:
@@ -561,7 +797,6 @@ TpgNetwork::make_prim_node(tTgGateType type,
 TpgNode*
 TpgNetwork::make_node(ymuint ni,
 		      ymuint nfo)
-
 {
   TpgNode* node = &mNodeArray[mNodeNum];
   node->mId = mNodeNum;
@@ -623,19 +858,149 @@ TpgNetwork::bind(TpgNode* node,
   if ( tgnode->is_output() ) {
     src_name = tgnode->fanin(0)->name();
   }
+
+  char* dst_name = NULL;
   if ( src_name != NULL ) {
     ymuint len = strlen(src_name) + 1;
     char* dst_name = alloc_array<char>(mAlloc, len);
     for (ymuint i = 0; i < len; ++ i) {
       dst_name[i] = src_name[i];
     }
-    node->mName = dst_name;
   }
-  else {
-    node->mName = NULL;
-  }
+  node->mName = dst_name;
 
   mNodeMap[tgnode->gid()] = node;
+}
+
+void
+TpgNetwork::make_faults(const TgNode* tgnode,
+			const unordered_map<ymuint, CplxInfo>& en_hash)
+{
+  TpgFault* rep0 = NULL;
+  TpgFault* rep1 = NULL;
+
+  if ( tgnode->fanout_num() == 1 &&
+       !tgnode->fanout(0)->is_output() ) {
+    // 唯一のファンアウト先が外部出力でなければ
+    // そのファンインブランチの故障と出力の故障
+    // は等価
+    const TgNode* tgonode = tgnode->fanout(0);
+    ymuint ni = tgonode->fanin_num();
+    ymuint ipos = ni;
+    for (ymuint i = 0; i < ni; ++ i) {
+      if ( tgonode->fanin(i) == tgnode ) {
+	ipos = i;
+	break;
+      }
+    }
+    assert_cond( ipos < ni, __FILE__, __LINE__);
+    TpgNode* onode = mNodeMap[tgonode->gid()];
+    TpgNode* inode = onode->input_map(ipos);
+    ymuint tpg_ipos = onode->ipos_map(ipos);
+    rep0 = inode->input_fault(0, tpg_ipos);
+    rep1 = inode->input_fault(1, tpg_ipos);
+  }
+
+  TpgNode* node = mNodeMap[tgnode->gid()];
+
+  // 出力の故障を生成
+  TpgFault* of0 = new_ofault(node, 0, rep0);
+  TpgFault* of1 = new_ofault(node, 1, rep1);
+
+  ymuint ni = tgnode->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    Bool3 oval0;
+    Bool3 oval1;
+    if ( tgnode->is_cplx_logic() ) {
+      ymuint fid = tgnode->func_id();
+      unordered_map<ymuint, CplxInfo>::const_iterator p = en_hash.find(fid);
+      assert_cond( p != en_hash.end(), __FILE__, __LINE__);
+      const CplxInfo& cinfo = p->second;
+      oval0 = cinfo.mCVal[i * 2 + 0];
+      oval1 = cinfo.mCVal[i * 2 + 1];
+    }
+    else {
+      oval0 = c_val(tgnode->gate_type(), kB3False);
+      oval1 = c_val(tgnode->gate_type(), kB3True);
+    }
+
+    TpgFault* rep0 = NULL;
+    if ( oval0 == kB3False ) {
+      rep0 = of0;
+    }
+    else if ( oval0 == kB3True ) {
+      rep0 = of1;
+    }
+
+    TpgFault* rep1 = NULL;
+    if ( oval1 == kB3False ) {
+      rep1 = of0;
+    }
+    else if ( oval1 == kB3True ) {
+      rep1 = of1;
+    }
+
+    TpgNode* inode = node->input_map(i);
+    ymuint ipos = node->ipos_map(i);
+    TpgFault* if0 = new_ifault(inode, ipos, 0, rep0);
+    TpgFault* if1 = new_ifault(inode, ipos, 1, rep1);
+  }
+}
+
+// @brief 出力の故障を作る．
+// @param[in] node 故障位置のノード
+// @param[in] val 故障値 ( 0 / 1 )
+// @param[in] rep 代表故障
+//
+// 自分自身が代表故障の場合には rep に NULL を入れる．
+TpgFault*
+TpgNetwork::new_ofault(TpgNode* node,
+		       ymuint val,
+		       TpgFault* rep)
+{
+  TpgFault* f = new_fault(node, true, 0, val, rep);
+  node->set_output_fault(val, f);
+
+  return f;
+}
+
+// @brief 入力の故障を作る．
+// @param[in] node 故障位置のノード
+// @param[in] ipos ファンイン番号 ( 0 <= ipos < node->fanin_num() )
+// @param[in] val 故障値
+// @param[in] rep 代表故障
+//
+// 自分自身が代表故障の場合には rep に NULL を入れる．
+TpgFault*
+TpgNetwork::new_ifault(TpgNode* node,
+		       ymuint ipos,
+		       ymuint val,
+		       TpgFault* rep)
+{
+  TpgFault* f = new_fault(node, false, ipos, val, rep);
+  node->set_input_fault(val, ipos, f);
+
+  return f;
+}
+
+// @brief 故障を生成する．
+// @param[in] node 対象のノード
+// @param[in] is_output 出力の故障のときに true とするフラグ
+// @param[in] ipos 入力の故障の時に入力番号を表す
+// @param[in] val 縮退している値
+// @param[in] rep 代表故障
+TpgFault*
+TpgNetwork::new_fault(TpgNode* node,
+		      bool is_output,
+		      ymuint ipos,
+		      ymuint val,
+		      TpgFault* rep)
+{
+  TpgFault* f = &mFaultChunk[mFaultNum];
+  f->set(mFaultNum, node, is_output, ipos, val, rep);
+  ++ mFaultNum;
+
+  return f;
 }
 
 

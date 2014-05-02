@@ -17,6 +17,8 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+class TpgMap;
+
 //////////////////////////////////////////////////////////////////////
 /// @class TpgNode TpgNode.h "TpgNode.h"
 /// @brief SATPG 用のノードを表すクラス
@@ -91,6 +93,20 @@ public:
   bool
   is_root() const;
 
+  /// @brief TgNode のファンインに対応するノードを返す．
+  /// @param[in] pos もとの TgNode の入力の位置番号 (!!!)
+  ///
+  /// is_root() が true の時のみ意味を持つ．
+  TpgNode*
+  input_map(ymuint pos) const;
+
+  /// @brief TgNode のファンインに対応するノードのファンイン番号を返す．
+  /// @param[in] pos もとの TgNode の入力の位置番号 (!!!)
+  ///
+  /// is_root() が true の時のみ意味を持つ．
+  ymuint
+  ipos_map(ymuint pos) const;
+
   /// @brief 内部ノードの時 true を返す．
   ///
   /// is_logic() が true の時のみ意味を持つ．
@@ -105,14 +121,6 @@ public:
   /// @param[in] pos 位置番号 ( 0 <= pos < fanin_num() )
   TpgNode*
   fanin(ymuint pos) const;
-
-  /// @brief ファンインを固定した時の出力の値を得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < fanin_num() )
-  /// @param[in] val ファンインの値
-  /// @return 出力の値を返す．
-  Bool3
-  c_val(ymuint pos,
-	Bool3 val) const;
 
   /// @brief ファンアウト数を得る．
   ymuint
@@ -149,8 +157,6 @@ public:
   /// @brief 出力の故障を設定する．
   /// @param[in] val 故障値
   /// @param[in] f 故障
-  ///
-  /// is_internal() = true のノードには設定できない．
   void
   set_output_fault(int val,
 		   TpgFault* f);
@@ -159,8 +165,6 @@ public:
   /// @param[in] val 故障値
   /// @param[in] pos 入力の位置番号
   /// @param[in] f 故障
-  ///
-  /// is_internal() = true のノードには設定できない．
   void
   set_input_fault(int val,
 		  ymuint pos,
@@ -168,16 +172,12 @@ public:
 
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
-  ///
-  /// is_internal() = true のノードでは意味をもたない．
   TpgFault*
   output_fault(int val) const;
 
   /// @brief 入力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
   /// @param[in] pos 入力の位置番号
-  ///
-  /// is_internal() = true のノードでは意味をもたない．
   TpgFault*
   input_fault(int val,
 	      ymuint pos) const;
@@ -382,6 +382,9 @@ private:
 
   // アクティブなファンアウトの配列
   TpgNode** mActFanouts;
+
+  // TgNode のファンインに対するマッピング
+  TpgMap* mInputMap;
 
   // 出力の故障
   TpgFault* mOutputFault[2];

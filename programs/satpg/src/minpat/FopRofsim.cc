@@ -21,14 +21,16 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
-// @param[in] fmgr 故障マネージャ
+// @param[in] f_list 故障のリスト
+// @param[in] max_fault_id 故障IDの最大値+1
 FopRofsim::FopRofsim(Fsim& fsim,
-		     FaultMgr& fmgr) :
+		     const vector<TpgFault*>& f_list,
+		     ymuint max_fault_id) :
   mFsim(fsim),
-  mDetArray(fmgr.all_num())
+  mDetArray(max_fault_id)
 {
   mDetBits = 0UL;
-  mFsim.set_faults(fmgr.det_list());
+  mFsim.set_faults(f_list);
 }
 
 // @brief デストラクタ

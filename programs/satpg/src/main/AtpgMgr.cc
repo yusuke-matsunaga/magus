@@ -64,7 +64,7 @@ void
 FsimNetBinder::event_proc(const TpgNetwork& network,
 			  FaultMgr& fault_mgr)
 {
-  mFsim->set_network(network, fault_mgr);
+  mFsim->set_network(network);
 }
 
 

@@ -9,7 +9,7 @@
 
 #include "KDetOp.h"
 #include "Fsim.h"
-#include "FaultMgr.h"
+#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,14 +20,16 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
-// @param[in] fmgr 故障マネージャ
+// @param[in] f_list 故障のリスト
+// @param[in] max_fault_id 故障IDの最大値+1
 KDetOp::KDetOp(Fsim& fsim,
-	       FaultMgr& fmgr) :
+	       const vector<TpgFault*>& f_list,
+	       ymuint max_fault_id) :
   mFsim(fsim),
   mLimit(1),
-  mDetCount(fmgr.all_num())
+  mDetCount(max_fault_id)
 {
-  mFsim.set_faults(fmgr.det_list());
+  mFsim.set_faults(f_list);
 }
 
 // @brief デストラクタ

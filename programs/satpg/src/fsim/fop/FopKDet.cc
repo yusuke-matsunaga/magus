@@ -9,7 +9,6 @@
 
 #include "FopKDet.h"
 #include "Fsim.h"
-#include "FaultMgr.h"
 #include "TpgFault.h"
 
 
@@ -21,14 +20,16 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
-// @param[in] fmgr 故障マネージャ
+// @param[in] f_list 故障のリスト
+// @param[in] max_fault_id 故障IDの最大値+1
 FopKDet::FopKDet(Fsim& fsim,
-		 FaultMgr& fmgr) :
+		 const vector<TpgFault*>& f_list,
+		 ymuint max_fault_id) :
   mFsim(fsim),
   mLimit(1),
-  mPatListArray(fmgr.all_num())
+  mPatListArray(max_fault_id)
 {
-  mFsim.set_faults(fmgr.det_list());
+  mFsim.set_faults(f_list);
 }
 
 // @brief デストラクタ
@@ -41,7 +42,7 @@ FopKDet::~FopKDet()
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
 FopKDet::operator()(TpgFault* f,
-		      PackedVal dpat)
+		    PackedVal dpat)
 {
   ymuint f_id = f->id();
   vector<TestVector*>& pat_list = mPatListArray[f_id];

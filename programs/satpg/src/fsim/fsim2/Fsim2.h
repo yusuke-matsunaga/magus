@@ -46,11 +46,9 @@ public:
 
   /// @brief ネットワークをセットする．
   /// @param[in] network ネットワーク
-  /// @param[in] fault_mgr 故障マネージャ
   virtual
   void
-  set_network(const TpgNetwork& network,
-	      FaultMgr& fault_mgr);
+  set_network(const TpgNetwork& network);
 
   /// @brief 故障にスキップマークをつける．
   virtual

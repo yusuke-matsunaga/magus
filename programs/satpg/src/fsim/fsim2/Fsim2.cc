@@ -13,7 +13,6 @@
 #include "TpgNode.h"
 #include "TpgPrimitive.h"
 #include "TpgFault.h"
-#include "FaultMgr.h"
 #include "TestVector.h"
 #include "DetectOp.h"
 #include "SimNode.h"
@@ -64,10 +63,8 @@ Fsim2::~Fsim2()
 
 // @brief ネットワークをセットする関数
 // @param[in] network ネットワーク
-// @param[in] fault_mgr 故障マネージャ
 void
-Fsim2::set_network(const TpgNetwork& network,
-		   FaultMgr& fault_mgr)
+Fsim2::set_network(const TpgNetwork& network)
 {
   clear();
 
@@ -191,11 +188,12 @@ Fsim2::set_network(const TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 故障リストの設定
   //////////////////////////////////////////////////////////////////////
-  ymuint nf = fault_mgr.rep_num();
+  const vector<TpgFault*>& rep_faults = network.rep_faults();
+  ymuint nf = rep_faults.size();
   mSimFaults.resize(nf);
-  mFaultArray.resize(fault_mgr.all_num());
+  mFaultArray.resize(network.max_fault_id());
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = fault_mgr.rep_fault(i);
+    TpgFault* f = rep_faults[i];
     const TpgNode* node = f->node();
     SimNode* simnode = NULL;
     ymuint ipos = 0;

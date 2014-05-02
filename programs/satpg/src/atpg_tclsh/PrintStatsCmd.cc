@@ -9,6 +9,7 @@
 
 #include "PrintStatsCmd.h"
 #include "AtpgMgr.h"
+#include "TpgNetwork.h"
 #include "FaultMgr.h"
 
 
@@ -51,7 +52,7 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
   FaultMgr& fmgr = _fault_mgr();
   ymuint num = mgr()._tv_list().size();
 
-  fprintf(stdout, "#A: # of total faults       = %7d\n", fmgr.rep_num());
+  fprintf(stdout, "#A: # of total faults       = %7d\n", _network().rep_faults().size());
   fprintf(stdout, "#B: # of detected faults    = %7d\n", fmgr.det_list().size());
   fprintf(stdout, "#C: # of redundant faults   = %7d\n", fmgr.untest_list().size());
   fprintf(stdout, "#D: # of undetected faults  = %7d\n", fmgr.remain_list().size());

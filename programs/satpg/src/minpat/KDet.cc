@@ -19,11 +19,14 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] fsm 故障シミュレータ
-// @param[in] fmgr 故障マネージャ
+// @param[in] f_list 故障のリスト
+// @param[in] max_fault_id 故障IDの最大値+1
 KDet::KDet(Fsim& fsim,
-	   FaultMgr& fmgr) :
+	   const vector<TpgFault*>& f_list,
+	   ymuint max_fault_id) :
+
   mFsim(fsim),
-  mOp(fsim, fmgr)
+  mOp(fsim, f_list, max_fault_id)
 {
 }
 

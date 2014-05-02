@@ -13,6 +13,7 @@
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "FaultMgr.h"
+#include "TpgFault.h"
 #include "Fsim.h"
 #include "KDet.h"
 #include "utils/GcSolver.h"
@@ -81,14 +82,25 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
     }
   }
 
+
+  ymuint max_fault_id = 0;
+  const vector<TpgFault*>& f_list = mFaultMgr.det_list();
+  for (ymuint i = 0; i < f_list.size(); ++ i) {
+    TpgFault* f = f_list[i];
+    if ( max_fault_id < f->id() ) {
+      max_fault_id = f->id();
+    }
+  }
+  ++ max_fault_id;
   {
-    KDet kdet(mFsim3, mFaultMgr);
+
+    KDet kdet(mFsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 200;
     kdet.run(tv_list, k, det_list_array);
-    vector<bool> fmark(mFaultMgr.all_num());
-    vector<ymuint> fmap(mFaultMgr.all_num());
+    vector<bool> fmark(max_fault_id);
+    vector<ymuint> fmap(max_fault_id);
 
     MinCov mincov;
 
@@ -208,13 +220,13 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   tv_list = tv2_list;
 
   {
-    KDet kdet(mFsim3, mFaultMgr);
+    KDet kdet(mFsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 400;
     kdet.run(tv_list, k, det_list_array);
-    vector<bool> fmark(mFaultMgr.all_num());
-    vector<ymuint> fmap(mFaultMgr.all_num());
+    vector<bool> fmark(max_fault_id);
+    vector<ymuint> fmap(max_fault_id);
 
     MinCov mincov;
 
