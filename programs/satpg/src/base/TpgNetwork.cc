@@ -9,7 +9,6 @@
 
 #include "TpgNetwork.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
 #include "TpgFault.h"
 #include "networks/TgNetwork.h"
 #include "networks/TgNode.h"
@@ -85,39 +84,11 @@ extra_node_count(const Expr& expr,
     }
     else {
       n = 1;
-      if ( p_num > 1 ) {
+      if ( p_num > 0 ) {
 	++ n;
       }
     }
   }
-  return n;
-}
-
-// 論理式から必要なプリミティブ数を数える．
-ymuint
-primitive_count(const Expr& expr)
-{
-  if ( expr.is_posiliteral() ) {
-    // 肯定のリテラルは入力プリミティブ1つ
-    // 同じ入力番号のリテラルがあったとしても共有しない．
-    return 1;
-  }
-  if ( expr.is_negaliteral() ) {
-    // 否定のリテラルはNOT入力プリミティブ1つ
-    // 同じ入力番号のリテラルがあったとしても共有しない．
-    return 1;
-  }
-
-  // 演算子のプリミティブが1つ
-  ymuint n = 1;
-
-  // あとは子供の論理式に対するプリミティブ数を足し合わせる．
-  ymuint nc = expr.child_num();
-  for (ymuint i = 0; i < nc; ++ i) {
-    Expr expr1 = expr.child(i);
-    n += primitive_count(expr1);
-  }
-
   return n;
 }
 
@@ -180,7 +151,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   ymuint nn = tgnetwork.node_num();
   ymuint nl = tgnetwork.logic_num();
   mNodeNum = nn;
-  hash_set<ymuint, ymuint> en_hash;
+  unordered_map<ymuint, ymuint> en_hash;
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.logic(i);
     if ( tgnode->is_cplx_logic() ) {
@@ -224,7 +195,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   // 外部入力を作成する．
   //////////////////////////////////////////////////////////////////////
   ymuint npi = input_num2();
-  for (ymuint i = 0; i < npi; ++ i, ++ id) {
+  for (ymuint i = 0; i < npi; ++ i) {
     const TgNode* tgnode = tgnetwork.input(i);
     TpgNode* node = make_input_node(tgnode, id);
     mInputArray[i] = node;
@@ -235,9 +206,10 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   // 論理ノードを作成する．
   // ただし mNodeArray は入力からのトポロジカル順になる．
   //////////////////////////////////////////////////////////////////////
-  ymuint nl = tgnetwork.logic_num();
-  for (ymuint i = 0; i < nl; ++ i, ++ id) {
+  for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.sorted_logic(i);
+    ymuint ni = tgnode->fanin_num();
+    ymuint nfo = tgnode->fanout_num();
     TpgNode* node = NULL;
     if ( tgnode->is_cplx_logic() ) {
       // 論理式をとってくる．
@@ -245,11 +217,47 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       Expr expr = tgnetwork.get_lexp(fid);
 
       // expr の内容を表す TpgNode の木を作る．
-      node = make_cplx_nodes(expr, tgnode, id);
+      vector<TpgNode*> leaf_nodes(ni * 2, NULL);
+      for (ymuint i = 0; i < ni; ++ i) {
+	ymuint p_num = expr.litnum(VarId(i), false);
+	ymuint n_num = expr.litnum(VarId(i), true);
+	const TgNode* itgnode = tgnode->fanin(i);
+	TpgNode* inode = mNodeMap[itgnode->gid()];
+	if ( n_num == 0 ) {
+	  if ( p_num == 1 ) {
+	    leaf_nodes[i * 2 + 0] = inode;
+	  }
+	  else {
+	    TpgNode* dummy_buff = make_logic_node(kTgGateBuff, 1, p_num, id);
+	    connect(inode, dummy_buff, 0);
+	    leaf_nodes[i * 2 + 0] = dummy_buff;
+	  }
+	}
+	else {
+	  if ( p_num == 0 ) {
+	    TpgNode* not_gate = make_logic_node(kTgGateNot, 1, n_num, id);
+	    connect(inode, not_gate, 0);
+	    leaf_nodes[i * 2 + 1] = not_gate;
+	  }
+	  else {
+	    TpgNode* dummy_buff = make_logic_node(kTgGateBuff, 1, p_num + 1, id);
+	    connect(inode, dummy_buff, 0);
+	    TpgNode* not_gate = make_logic_node(kTgGateNot, 1, n_num, id);
+	    connect(dummy_buff, not_gate, 0);
+	    leaf_nodes[i * 2 + 1] = not_gate;
+	  }
+	}
+      }
+      node = make_cplx_node(expr, nfo, leaf_nodes, id);
     }
     else {
       // 組み込み型のゲート
-      node = make_logic_node(tgnode->gate_type(), tgnode->fanin_num(), id);
+      node = make_logic_node(tgnode->gate_type(), ni, nfo, id);
+      for (ymuint i = 0; i < ni; ++ i) {
+	const TgNode* itgnode = tgnode->fanin(i);
+	TpgNode* inode = mNodeMap[itgnode->gid()];
+	connect(inode, node, i);
+      }
     }
     bind(node, tgnode);
   }
@@ -259,7 +267,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   // 外部出力ノードを作成する．
   //////////////////////////////////////////////////////////////////////
   ymuint npo = output_num2();
-  for (ymuint i = 0; i < npo; ++ i, ++ id) {
+  for (ymuint i = 0; i < npo; ++ i) {
     const TgNode* tgnode = tgnetwork.output(i);
     TpgNode* node = make_output_node(tgnode, id);
     mOutputArray[i] = node;
@@ -267,20 +275,6 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
 
   assert_cond( id == mNodeNum, __FILE__, __LINE__);
 
-
-  //////////////////////////////////////////////////////////////////////
-  // ファンアウトの情報をコピーする．
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    const TgNode* tgnode = tgnetwork.node(i);
-    ymuint nfo = tgnode->fanout_num();
-    TpgNode* node = mNodeMap[tgnode->gid()];
-    for (ymuint i = 0; i < nfo; ++ i) {
-      const TgNode* otgnode = tgnode->fanout(i);
-      TpgNode* onode = mNodeMap[otgnode->gid()];
-      node->mFanouts[i] = onode;
-    }
-  }
 
   // 全部アクティブにしておく．
   activate_all();
@@ -437,32 +431,15 @@ TpgNetwork::node(ymuint pos) const
   return &mNodeArray[pos];
 }
 
-void
-TpgNetwork::bind(TpgNode* node,
-		 const TgNode* tgnode)
-{
-  const char* src_name = tgnode->name();
-  if ( tgnode->is_output() ) {
-    src_name = tgnode->fanin(0)->name();
-  }
-  if ( src_name != NULL ) {
-    ymuint len = strlen(src_name) + 1;
-    char* dst_name = alloc_array<char>(mAlloc, len);
-    for (ymuint i = 0; i < len; ++ i) {
-      dst_name[i] = src_name[i];
-    }
-    node->mName = dst_name;
-  }
-  else {
-    node->mName = NULL;
-  }
-
-  mNodeMap[tgnode->gid()] = node;
-}
-
+// @brief 入力ノードを生成する．
+// @param[in] tgnode もととなる TgNode
+// @param[in] id 通し番号への参照
+// @return 生成したノードを返す．
+//
+// id は1つインクリメントされる．
 TpgNode*
 TpgNetwork::make_input_node(const TgNode* tgnode,
-			    ymuint id)
+			    ymuint& id)
 {
   TpgNode* node = make_node(0, tgnode->fanout_num(), id);
   node->mTypeId = 1U | (tgnode->lid() << 3);
@@ -472,40 +449,50 @@ TpgNetwork::make_input_node(const TgNode* tgnode,
   return node;
 }
 
+// @brief 出力ノードを生成する．
+// @param[in] tgnode もととなる TgNode
+// @param[in] id 通し番号への参照
+// @return 生成したノードを返す．
+//
+// id は1つインクリメントされる．
 TpgNode*
 TpgNetwork::make_output_node(const TgNode* tgnode,
-			     ymuint id)
+			     ymuint& id)
 {
   TpgNode* node = make_node(1, 0, id);
   node->mTypeId = 2U | (tgnode->lid() << 3);
 
   const TgNode* itgnode = tgnode->fanin(0);
   TpgNode* inode = mNodeMap[itgnode->gid()];
-  node->mFanins[0] = inode;
+  connect(inode, node, 0);
 
   bind(node, tgnode);
 
-  retur node;
+  return node;
 }
 
+// @brief 論理式から TpgNode の木を生成する．
+// @param[in] expr 式
+// @param[in] nfo 根のノードのファンアウト数
+// @param[in] leaf_nodes 式のリテラルに対応するノードの配列
+// @param[in] id 通し番号への参照
+// @return 生成したノードを返す．
+//
+// leaf_nodes は 変数番号 * 2 + (0/1) に
+// 該当する変数の肯定/否定のリテラルが入っている．
+//
+// id は生成したノード数分だけインクリメントされる．
 TpgNode*
 TpgNetwork::make_cplx_node(const Expr& expr,
-			   const TgNode* tgnode,
-			   ymuint id)
+			   ymuint nfo,
+			   const vector<TpgNode*>& leaf_nodes,
+			   ymuint& id)
 {
   if ( expr.is_posiliteral() ) {
     return leaf_nodes[expr.varid().val() * 2 + 0];
   }
   if ( expr.is_negaliteral() ) {
     return leaf_nodes[expr.varid().val() * 2 + 1];
-  }
-
-  ymuint nc = expr.child_num();
-  vector<TpgNode*> fanin(nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    const Expr& expr1 = expr.child(i);
-    TpgNode* inode = make_cplx_node(expr1, tgnode, id);
-    fanin[i] = inode;
   }
 
   tTgGateType gate_type;
@@ -522,20 +509,31 @@ TpgNetwork::make_cplx_node(const Expr& expr,
     assert_not_reached(__FILE__, __LINE__);
   }
 
-  TpgNode* node = make_logic_node(gate_type, nc, 1, id);
+  ymuint nc = expr.child_num();
+  TpgNode* node = make_logic_node(gate_type, nc, nfo, id);
 
   for (ymuint i = 0; i < nc; ++ i) {
-    node->mFanins[i] = fanin[i];
+    const Expr& expr1 = expr.child(i);
+    TpgNode* inode = make_cplx_node(expr1, 1, leaf_nodes, id);
+    connect(inode, node, i);
   }
 
   return node;
 }
 
+// @brief 組み込み型の論理ゲートを生成する．
+// @param[in] type ゲートの型
+// @param[in] ni ファンイン数
+// @param[in] nfo ファンアウト数
+// @param[in] id 通し番号への参照
+// @return 生成したノードを返す．
+//
+// id は1つインクリメントされる．
 TpgNode*
-TpgNetwork::make_logic_node(tGateType type,
+TpgNetwork::make_logic_node(tTgGateType type,
 			    ymuint ni,
 			    ymuint nfo,
-			    ymuint id)
+			    ymuint& id)
 {
   TpgNode* node = make_node(ni, nfo, id);
   node->mTypeId = 4U | (static_cast<ymuint>(type) << 3);
@@ -557,20 +555,25 @@ TpgNetwork::make_logic_node(tGateType type,
     break;
   }
 
-  retur node;
+  return node;
 }
 
-// @brief TpgNode の内容を設定する．
-// @param[in] id ID番号
-// @param[in] ni
+// @brief TpgNode を生成する．
+// @param[in] ni ファンイン数
+// @param[in] nfo ファンアウト数
+// @param[in] id 通し番号への参照
+// @return 生成したノードを返す．
+//
+// id は1つインクリメントされる．
 TpgNode*
 TpgNetwork::make_node(ymuint ni,
 		      ymuint nfo,
-		      ymuint id)
+		      ymuint& id)
 
 {
   TpgNode* node = &mNodeArray[id];
   node->mId = id;
+  ++ id;
 
   node->mCval = kB3X;
   node->mNval = kB3X;
@@ -586,13 +589,7 @@ TpgNetwork::make_node(ymuint ni,
     node->mInputFault = NULL;
   }
 
-  for (ymuint i = 0; i < ni; ++ i) {
-    const TgNode* itgnode = tgnode->fanin(i);
-    TpgNode* inode = mNodeMap[itgnode->gid()];
-    node->mFanins[i] = inode;
-  }
-
-  node->mFanoutNum = nfo;
+  node->mFanoutNum = 0;
   node->mFanouts = alloc_array<TpgNode*>(mAlloc, nfo);
   node->mActFanoutNum = 0;
   node->mActFanouts = alloc_array<TpgNode*>(mAlloc, nfo);
@@ -609,103 +606,44 @@ TpgNetwork::make_node(ymuint ni,
   return node;
 }
 
-// @brief 複雑な論理式に対応するプリミティブを作る．
-// @param[in] expr 論理式
-// @param[in] tgnode もととなる TgNode
-// @param[in] primitive_list プリミティブを設定する領域
-// @param[inout] id プリミティブID
-// @note id は内部でインクリメントされる．
-TpgPrimitive*
-TpgNetwork::make_primitive(const Expr& expr,
-			   const TgNode* tgnode,
-			   TpgPrimitive* primitive_list,
-			   ymuint& id)
+// @brief ノード間の接続を行う．
+// @param[in] src ソースノード
+// @param[in] dst ディスティネーションノード
+// @param[in] ipos ファンイン番号
+void
+TpgNetwork::connect(TpgNode* src,
+		    TpgNode* dst,
+		    ymuint ipos)
 {
-  if ( expr.is_posiliteral() ) {
-    // 肯定のリテラル
-    ymuint ipos = expr.varid().val();
-    TpgPrimitive* input = &primitive_list[id];
-    ++ id;
-    set_input_primitive(input, ipos);
-    return input;
-  }
-  if ( expr.is_negaliteral() ) {
-    // 否定のリテラル
-    ymuint ipos = expr.varid().val();
-    TpgPrimitive* input = &primitive_list[id];
-    ++ id;
-    set_not_input_primitive(input, ipos);
-    return input;
-  }
+  dst->mFanins[ipos] = src;
+  src->mFanouts[src->mFanoutNum] = dst;
+  ++ src->mFanoutNum;
+}
 
-  ymuint nc = expr.child_num();
-  vector<TpgPrimitive*> fanin(nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    // 子供の論理式に対するプリミティブを作る．
-    Expr expr1 = expr.child(i);
-    TpgPrimitive* inode = make_primitive(expr1, tgnode, primitive_list, id);
-    fanin[i] = inode;
+// @brief TpgNode と TpgNode の対応付けを行う．
+// @param[in] node TpgNode
+// @param[in] tgnode もととなる TgNodep
+void
+TpgNetwork::bind(TpgNode* node,
+		 const TgNode* tgnode)
+{
+  const char* src_name = tgnode->name();
+  if ( tgnode->is_output() ) {
+    src_name = tgnode->fanin(0)->name();
   }
-
-  TpgPrimitive* prim = &primitive_list[id];
-  ++ id;
-
-  tTgGateType gate_type;
-  if ( expr.is_and() ) {
-    gate_type = kTgGateAnd;
-  }
-  else if ( expr.is_or() ) {
-    gate_type = kTgGateOr;
-  }
-  else if ( expr.is_xor() ) {
-    gate_type = kTgGateXor;
+  if ( src_name != NULL ) {
+    ymuint len = strlen(src_name) + 1;
+    char* dst_name = alloc_array<char>(mAlloc, len);
+    for (ymuint i = 0; i < len; ++ i) {
+      dst_name[i] = src_name[i];
+    }
+    node->mName = dst_name;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    node->mName = NULL;
   }
-  set_logic_primitive(prim, gate_type, nc);
-  for (ymuint i = 0; i < nc; ++ i) {
-    prim->mFanins[i] = fanin[i];
-  }
-  return prim;
-}
 
-// @brief 入力プリミティブの設定を行なう．
-// @param[in] prim プリミティブ
-// @param[in] id 入力番号
-void
-TpgNetwork::set_input_primitive(TpgPrimitive* prim,
-				ymuint id)
-{
-  prim->mTypeId = 0U | (id << 2);
-  prim->mFaninNum = 0;
-  prim->mFanins = NULL;
-}
-
-// @brief 否定付き入力プリミティブの設定を行なう．
-// @param[in] prim プリミティブ
-// @param[in] id 入力番号
-void
-TpgNetwork::set_not_input_primitive(TpgPrimitive* prim,
-				    ymuint id)
-{
-  prim->mTypeId = 1U | (id << 2);
-  prim->mFaninNum = 0;
-  prim->mFanins = NULL;
-}
-
-// @brief 論理プリミティブの設定を行なう．
-// @param[in] prim プリミティブ
-// @param[in] gate_type ゲートタイプ
-// @param[in] ni 入力数
-void
-TpgNetwork::set_logic_primitive(TpgPrimitive* prim,
-				tTgGateType gate_type,
-				ymuint ni)
-{
-  prim->mTypeId = 2U | (static_cast<ymuint32>(gate_type) << 2);
-  prim->mFaninNum = ni;
-  prim->mFanins = alloc_array<TpgPrimitive*>(mAlloc, ni);
+  mNodeMap[tgnode->gid()] = node;
 }
 
 

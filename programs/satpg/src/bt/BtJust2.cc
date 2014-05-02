@@ -126,73 +126,65 @@ BtJust2::justify(TpgNode* node,
     return just_sub1(node, model);
   }
 
-  if ( node->is_cplx_logic() ) {
-    ymuint np = node->primitive_num();
-    TpgPrimitive* prim = node->primitive(np - 1);
-    mJustArray[node->id()] = justify_primitive(prim, node, model);
-    return mJustArray[node->id()];
-  }
-  else {
-    switch ( node->gate_type() ) {
-    case kTgGateBuff:
-    case kTgGateNot:
-      // 無条件で唯一のファンインをたどる．
-      return just_sub1(node, model);
+  switch ( node->gate_type() ) {
+  case kTgGateBuff:
+  case kTgGateNot:
+    // 無条件で唯一のファンインをたどる．
+    return just_sub1(node, model);
 
-    case kTgGateAnd:
-      if ( gval == kB3True ) {
-	// すべてのファンインノードをたどる．
-	return just_sub1(node, model);
-      }
-      else if ( gval == kB3False ) {
-	// 0の値を持つ最初のノードをたどる．
-	return just_sub2(node, model, kB3False);
-      }
-      break;
-
-    case kTgGateNand:
-      if ( gval == kB3True ) {
-	// 0の値を持つ最初のノードをたどる．
-	return just_sub2(node, model, kB3False);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインノードをたどる．
-	return just_sub1(node, model);
-      }
-      break;
-
-    case kTgGateOr:
-      if ( gval == kB3True ) {
-	// 1の値を持つ最初のノードをたどる．
-	return just_sub2(node, model, kB3True);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインノードをたどる．
-	return just_sub1(node, model);
-      }
-      break;
-
-    case kTgGateNor:
-      if ( gval == kB3True ) {
-	// すべてのファンインノードをたどる．
-	return just_sub1(node, model);
-      }
-      else if ( gval == kB3False ) {
-	// 1の値を持つ最初のノードをたどる．
-	return just_sub2(node, model, kB3True);
-      }
-      break;
-
-    case kTgGateXor:
-    case kTgGateXnor:
+  case kTgGateAnd:
+    if ( gval == kB3True ) {
       // すべてのファンインノードをたどる．
       return just_sub1(node, model);
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
     }
+    else if ( gval == kB3False ) {
+      // 0の値を持つ最初のノードをたどる．
+      return just_sub2(node, model, kB3False);
+    }
+    break;
+
+  case kTgGateNand:
+    if ( gval == kB3True ) {
+      // 0の値を持つ最初のノードをたどる．
+      return just_sub2(node, model, kB3False);
+    }
+    else if ( gval == kB3False ) {
+      // すべてのファンインノードをたどる．
+      return just_sub1(node, model);
+    }
+    break;
+
+  case kTgGateOr:
+    if ( gval == kB3True ) {
+      // 1の値を持つ最初のノードをたどる．
+      return just_sub2(node, model, kB3True);
+    }
+    else if ( gval == kB3False ) {
+      // すべてのファンインノードをたどる．
+      return just_sub1(node, model);
+    }
+    break;
+
+  case kTgGateNor:
+    if ( gval == kB3True ) {
+      // すべてのファンインノードをたどる．
+      return just_sub1(node, model);
+    }
+    else if ( gval == kB3False ) {
+      // 1の値を持つ最初のノードをたどる．
+      return just_sub2(node, model, kB3True);
+    }
+    break;
+
+  case kTgGateXor:
+  case kTgGateXnor:
+    // すべてのファンインノードをたどる．
+    return just_sub1(node, model);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
 
   return NULL;
@@ -258,167 +250,6 @@ BtJust2::just_sub2(TpgNode* node,
   list_merge(node_list, mJustArray[node->fanin(gpos)->id()]);
   if ( gpos != fpos ) {
     list_merge(node_list, mJustArray[node->fanin(fpos)->id()]);
-  }
-  return node_list;
-}
-
-// @brief justify の下請け関数
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
-// @note node の値割り当てを正当化する．
-BtJust2::NodeList*
-BtJust2::justify_primitive(TpgPrimitive* prim,
-			   TpgNode* node,
-			   const vector<Bool3>& model)
-{
-  if ( prim->is_input() ) {
-    ymuint ipos = prim->input_id();
-    TpgNode* inode = node->fanin(ipos);
-    NodeList* node_list1 = justify(inode, model);
-    NodeList* node_list = NULL;
-    list_merge(node_list, node_list1);
-    return node_list;
-  }
-
-  Bool3 gval = primitive_gval(prim, model);
-  Bool3 fval = primitive_fval(prim, model);
-  if ( gval != fval ) {
-    // すべてのファンインノードをたどる．
-    return jp_sub1(prim, node, model);
-  }
-
-  switch ( prim->gate_type() ) {
-  case kTgGateBuff:
-  case kTgGateNot:
-    // 唯一のファンインをたどる．
-    return justify_primitive(prim->fanin(0), node, model);
-
-  case kTgGateAnd:
-    if ( gval == kB3True ) {
-      // すべてのファンインをたどる．
-      return jp_sub1(prim, node, model);
-    }
-    else if ( gval == kB3False ) {
-      // 0 の値を持つ最初のファンインをたどる．
-      return jp_sub2(prim, node, model, kB3False);
-    }
-    break;
-
-  case kTgGateNand:
-    if ( gval == kB3True ) {
-      // 0 の値を持つ最初のファンインをたどる．
-      return jp_sub2(prim, node, model, kB3False);
-    }
-    else if ( gval == kB3False ) {
-      // すべてのファンインをたどる．
-      return jp_sub1(prim, node, model);
-    }
-    break;
-
-  case kTgGateOr:
-    if ( gval == kB3True ) {
-      // 1の値をもつ最初のファンインをたどる．
-      return jp_sub2(prim, node, model, kB3True);
-    }
-    else if ( gval == kB3False ) {
-      // すべてのファンインをたどる．
-      return jp_sub1(prim, node, model);
-    }
-    break;
-
-  case kTgGateNor:
-    if ( gval == kB3True ) {
-      // すべてのファンインをたどる．
-      return jp_sub1(prim, node, model);
-    }
-    else if ( gval == kB3False ) {
-      // 1の値をもつすべてのファンインをたどる．
-      return jp_sub2(prim, node, model, kB3True);
-    }
-    break;
-
-  case kTgGateXor:
-  case kTgGateXnor:
-    // すべてのファンインをたどる．
-    return jp_sub1(prim, node, model);
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-
-  return NULL;
-}
-
-// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
-BtJust2::NodeList*
-BtJust2::jp_sub1(TpgPrimitive* prim,
-		 TpgNode* node,
-		 const vector<Bool3>& model)
-{
-  NodeList* node_list = NULL;
-  ymuint ni = prim->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgPrimitive* iprim = prim->fanin(i);
-    NodeList* node_list1 = justify_primitive(iprim, node, model);
-    list_merge(node_list, node_list1);
-  }
-  return node_list;
-}
-
-// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
-// @param[in] val 値
-BtJust2::NodeList*
-BtJust2::jp_sub2(TpgPrimitive* prim,
-		 TpgNode* node,
-		 const vector<Bool3>& model,
-		 Bool3 val)
-{
-  ymuint ni = prim->fanin_num();
-  ymuint gpos = ni;
-  ymuint gmin = 0;
-  ymuint fpos = ni;
-  ymuint fmin = 0;
-  vector<NodeList*> node_list_array(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgPrimitive* iprim = prim->fanin(i);
-    Bool3 igval = primitive_gval(iprim, model);
-    Bool3 ifval = primitive_fval(iprim, model);
-    if ( igval != val && ifval != val ) {
-      continue;
-    }
-    node_list_array[i] = justify_primitive(iprim, node, model);
-    ymuint n = list_size(node_list_array[i]);
-    if ( igval == val ) {
-      if ( gmin == 0 || gmin > n ) {
-	gpos = i;
-	gmin = n;
-      }
-    }
-    if ( ifval == val ) {
-      if ( fmin == 0 || fmin > n ) {
-	fpos = i;
-	fmin = n;
-      }
-    }
-  }
-  assert_cond( fpos < ni, __FILE__, __LINE__);
-  assert_cond( gpos < ni, __FILE__, __LINE__);
-  NodeList* node_list = NULL;
-  list_merge(node_list, node_list_array[gpos]);
-  if ( gpos != fpos ) {
-    list_merge(node_list, node_list_array[fpos]);
-  }
-  for (ymuint i = 0; i < ni; ++ i) {
-    list_free(node_list_array[i]);
   }
   return node_list;
 }

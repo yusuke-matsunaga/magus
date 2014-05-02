@@ -302,50 +302,6 @@ make_gnode_cnf(SatSolver& solver,
     return;
   }
 
-  if ( node->is_cplx_logic() ) {
-    // 複数のプリミティブで構成されたノードの場合
-    ymuint n = node->primitive_num();
-    for (ymuint i = 0; i < n; ++ i) {
-      TpgPrimitive* prim = node->primitive(i);
-      Literal olit;
-      if ( prim->is_input() ) {
-	// 入力プリミティブの場合
-	// 対応する TpgNode の変数を持ってくる．
-	ymuint ipos = prim->input_id();
-	TpgNode* inode = node->fanin(ipos);
-	olit = Literal(inode->gvar(), false);;
-      }
-      else if ( prim->is_not_input() ) {
-	// 否定付き入力プリミティブの場合
-	// 対応する TpgNode の変数を持ってきて否定する．
-	ymuint ipos = prim->input_id();
-	TpgNode* inode = node->fanin(ipos);
-	olit = Literal(inode->gvar(), true);
-      }
-      else {
-	if ( i == n - 1 ) {
-	  // 根のプリミティブの場合
-	  // node の変数を使う．
-	  olit = Literal(node->gvar(), false);
-	}
-	else {
-	  // それ以外の場合
-	  // 新たな変数を割り当てる．
-	  olit = Literal(solver.new_var(), false);
-	}
-
-	// プリミティブの入出力の関係を表す CNF 式を作る．
-	make_gate_cnf(solver, prim->gate_type(), olit,
-		      PrimGvarInputLiteral(prim));
-      }
-      // prim の glit と flit の両方に登録しておく
-      prim->set_glit(olit);
-      prim->set_flit(olit);
-    }
-    return;
-  }
-
-  // 単純な組み込み型の場合
   make_gate_cnf(solver, node->gate_type(), output,
 		GvarInputLiteral(node));
 }
@@ -366,43 +322,6 @@ make_fnode_cnf(SatSolver& solver,
     return;
   }
 
-  if ( node->is_cplx_logic() ) {
-    ymuint n = node->primitive_num();
-    ymuint n1 = n - 1;
-    for (ymuint i = 0; i < n; ++ i) {
-      TpgPrimitive* prim = node->primitive(i);
-      if ( !prim->is_input() ) {
-	ymuint ni1 = prim->fanin_num();
-	vector<Literal> inputs1(ni1);
-	for (ymuint j = 0; j < ni1; ++ j) {
-	  const TpgPrimitive* iprim = prim->fanin(j);
-	  if ( iprim->is_input() ) {
-	    ymuint ipos = iprim->input_id();
-	    inputs1[j] = inputs[ipos];
-	  }
-	  else if ( iprim->is_not_input() ) {
-	    ymuint ipos = iprim->input_id();
-	    inputs1[j] = ~inputs[ipos];
-	  }
-	  else {
-	    inputs1[j] = iprim->flit();
-	  }
-	}
-	Literal output1;
-	if ( i == n1 ) {
-	  output1 = output;
-	}
-	else {
-	  output1 = prim->flit();
-	}
-	make_gate_cnf(solver, prim->gate_type(), output1,
-		      VectorInputLiteral(inputs1));
-      }
-    }
-    return;
-  }
-
-  // 残りは単純なゲート
   make_gate_cnf(solver, node->gate_type(), output,
 		VectorInputLiteral(inputs));
 }

@@ -111,20 +111,18 @@ AtpgMgr::~AtpgMgr()
 
 // @brief blif 形式のファイルを読み込む．
 // @param[in] filename ファイル名
-// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
 // @param[in] cell_library セルライブラリ
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
 AtpgMgr::read_blif(const string& filename,
-		   bool force_to_cplx_logic,
 		   const CellLibrary* cell_library)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_READ);
 
   delete mNetwork;
-  mNetwork = TpgNetwork::read_blif(filename, force_to_cplx_logic, cell_library);
+  mNetwork = TpgNetwork::read_blif(filename, cell_library);
   if ( mNetwork != NULL ) {
     after_set_network();
   }
@@ -136,18 +134,16 @@ AtpgMgr::read_blif(const string& filename,
 
 // @brief iscas89 形式のファイルを読み込む．
 // @param[in] filename ファイル名
-// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
 // @retval true 読み込みが成功した．
 // @retval false 読み込みが失敗した．
 bool
-AtpgMgr::read_iscas89(const string& filename,
-		      bool force_to_cplx_logic)
+AtpgMgr::read_iscas89(const string& filename)
 {
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_READ);
 
   delete mNetwork;
-  mNetwork = TpgNetwork::read_iscas89(filename, force_to_cplx_logic);
+  mNetwork = TpgNetwork::read_iscas89(filename);
   if ( mNetwork != NULL ) {
     after_set_network();
   }

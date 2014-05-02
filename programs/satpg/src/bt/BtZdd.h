@@ -91,35 +91,6 @@ private:
 	    const vector<Bool3>& model,
 	    Bool3 val);
 
-  /// @brief プリミティブの値を正当化する入力の組み合わせを求める．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] model SATの値の割り当て結果を収めた配列
-  Zdd
-  justify_primitive(TpgPrimitive* prim,
-		    TpgNode* node,
-		    const vector<Bool3>& model);
-
-  /// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] model SATの値の割り当て結果を収めた配列
-  Zdd
-  jp_sub1(TpgPrimitive* prim,
-	  TpgNode* node,
-	  const vector<Bool3>& model);
-
-  /// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] model SATの値の割り当て結果を収めた配列
-  /// @param[in] val 値
-  Zdd
-  jp_sub2(TpgPrimitive* prim,
-	  TpgNode* node,
-	  const vector<Bool3>& model,
-	  Bool3 val);
-
 
 private:
   //////////////////////////////////////////////////////////////////////

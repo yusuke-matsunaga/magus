@@ -259,13 +259,7 @@ calc_node_bdd(TpgNode* node,
   for (ymuint i = 0; i < ni; ++ i) {
     input_bdd[i] = f_array[node->fanin(i)->id()];
   }
-  if ( node->is_cplx_logic() ) {
-    return calc_prim_bdd(node->primitive(node->primitive_num() - 1),
-			 input_bdd);
-  }
-  else {
-    return calc_bdd(node->gate_type(), input_bdd);
-  }
+  return calc_bdd(node->gate_type(), input_bdd);
 }
 
 Bdd
@@ -303,13 +297,7 @@ calc_faulty_bdd(TpgNode* node,
 
   assert_cond( node->is_logic(), __FILE__, __LINE__);
 
-  if ( node->is_cplx_logic() ) {
-    return calc_prim_bdd(node->primitive(node->primitive_num() - 1),
-			 input_bdd);
-  }
-  else {
-    return calc_bdd(node->gate_type(), input_bdd);
-  }
+  return calc_bdd(node->gate_type(), input_bdd);
 }
 
 inline

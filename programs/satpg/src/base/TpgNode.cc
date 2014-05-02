@@ -166,9 +166,8 @@ TpgNode::c_val(ymuint pos,
     return val;
   }
 
-  if ( !is_cplx_logic() ) {
-    return gate_c_val(gate_type(), val);
-  }
+  return gate_c_val(gate_type(), val);
+#if 0
 
   // ここに来ているのは kTgGateCplx のみ．
   ymuint np = primitive_num();
@@ -193,15 +192,7 @@ TpgNode::c_val(ymuint pos,
     }
   }
   return val_array[np - 1];
-}
-
-// @brief cplx_logic タイプのときにプリミティブを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < primitive_num() )
-TpgPrimitive*
-TpgNode::primitive(ymuint pos) const
-{
-  assert_cond( pos < primitive_num(), __FILE__, __LINE__);
-  return &mPrimitiveList[pos];
+#endif
 }
 
 // @brief 後方含意で出力に値を割り当てる．
@@ -276,12 +267,6 @@ TpgNode::bwd_imp(Bool3 val,
   if ( is_output() ) {
     TpgNode* inode = fanin(0);
     return inode->bwd_prop(this, val, node_list);
-  }
-
-  if ( is_cplx_logic() ) {
-    // 未完
-    assert_not_reached(__FILE__, __LINE__);
-    return false;
   }
 
   switch ( gate_type() ) {
@@ -382,12 +367,6 @@ TpgNode::fwd_imp(TpgNode* from_node,
       return false;
     }
     return true;
-  }
-
-  if ( is_cplx_logic() ) {
-    // 未完
-    assert_not_reached(__FILE__, __LINE__);
-    return false;
   }
 
   switch ( gate_type() ) {

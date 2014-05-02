@@ -113,88 +113,12 @@ Fsim3::set_network(const TpgNetwork& network,
 
       // 出力の論理を表す SimNode を作る．
       mEdgeMap[tpgnode->id()].resize(ni);
-      if ( tpgnode->is_cplx_logic() ) {
-	// 複数のプリミティブで構成されるノードの場合
-	// 基本的にはプリミティブを SimNode に対応させればよいが，
-	// ノードとしてのファンインの枝に対応するプリミティブのファンインが
-	// 複数存在する時に対応付けができないので，ダミーのバッファノードを
-	// 挿入する．
-	ymuint np = tpgnode->primitive_num();
-	vector<ymuint> input_count(ni * 2, 0);
-	for (ymuint pid = 0; pid < np; ++ pid) {
-	  const TpgPrimitive* prim = tpgnode->primitive(pid);
-	  if ( prim->is_input() ) {
-	    // 入力プリミティブの場合
-	    ymuint iid = prim->input_id();
-	    ++ input_count[iid * 2 + 0];
-	  }
-	  else if ( prim->is_not_input() ) {
-	    // 否定付き入力プリミティブの場合
-	    ymuint iid = prim->input_id();
-	    ++ input_count[iid * 2 + 1];
-	  }
-	}
-
-	// 各入力の使われ方をチェック
-	vector<SimNode*> inputs2(ni * 2);
-	vector<EdgeMap*> emap(ni, NULL);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  ymuint np = input_count[i * 2 + 0];
-	  ymuint nn = input_count[i * 2 + 1];
-	  EdgeMap& edge_map = mEdgeMap[tpgnode->id()][i];
-	  if ( np == 1 && nn == 0 ) {
-	    // - A) 肯定リテラルが 1 つ．
-	    inputs2[i * 2 + 0] = inputs[i];
-	    emap[i] = &edge_map;
-	  }
-	  else if ( np > 1 && nn == 0 ) {
-	    // - B) 肯定リテラルが 2 つ以上
-	    // ダミーのバッファノードを作る．
-	    vector<SimNode*> tmp(1, inputs[i]);
-	    SimNode* buf = make_node(kTgGateBuff, tmp);
-	    inputs2[i * 2 + 0] = buf;
-	    edge_map.mNode = buf;
-	    edge_map.mPos = 0;
-	  }
-	  else if ( np == 0 && nn > 0 ) {
-	    // - C) 否定リテラルのみ．数は問わない．
-	    // NOTノードを作る．
-	    vector<SimNode*> tmp(1, inputs[i]);
-	    SimNode* inv = make_node(kTgGateNot, tmp);
-	    inputs2[i * 2 + 1] = inv;
-	    edge_map.mNode = inv;
-	    edge_map.mPos = 0;
-	  }
-	  else if ( np > 0 && nn > 0 ) {
-	    // - D) 肯定と否定リテラルが各々 1 つ以上
-	    // ダミーのバッファとNOTノードを作る．
-	    vector<SimNode*> tmp(1, inputs[i]);
-	    SimNode* buf = make_node(kTgGateBuff, tmp);
-	    tmp[0] = buf;
-	    SimNode* inv = make_node(kTgGateNot, tmp);
-	    inputs2[i * 2 + 0] = buf;
-	    inputs2[i * 2 + 1] = inv;
-	    edge_map.mNode = buf;
-	    edge_map.mPos = 0;
-	  }
-	  else {
-	    cout << "np = " << np << endl
-		 << "nn = " << nn << endl;
-	    assert_not_reached(__FILE__, __LINE__);
-	  }
-	}
-
-	// 各プリミティブに対応したノードを作る．
-	node = make_primitive(tpgnode->primitive(np - 1), inputs2, emap);
-      }
-      else {
-	tTgGateType type = tpgnode->gate_type();
-	node = make_node(type, inputs);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  EdgeMap& edge_map = mEdgeMap[tpgnode->id()][i];
-	  edge_map.mNode = node;
-	  edge_map.mPos = i;
-	}
+      tTgGateType type = tpgnode->gate_type();
+      node = make_node(type, inputs);
+      for (ymuint i = 0; i < ni; ++ i) {
+	EdgeMap& edge_map = mEdgeMap[tpgnode->id()][i];
+	edge_map.mNode = node;
+	edge_map.mPos = i;
       }
     }
     // 対応表に登録しておく

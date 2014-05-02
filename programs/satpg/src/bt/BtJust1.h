@@ -82,38 +82,6 @@ protected:
 	    const vector<Bool3>& model,
 	    Bool3 val);
 
-  /// @brief justify の下請け関数
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] model SATの値の割り当て結果を収めた配列
-  /// @note node の値割り当てを正当化する．
-  /// @note 正当化に用いられているノードには mark3 がつく．
-  /// @note mark3 がついたノードは mBwdNodeList に格納される．
-  void
-  justify_primitive(TpgPrimitive* prim,
-		    TpgNode* node,
-		    const vector<Bool3>& model);
-
-  /// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] model SATの値の割り当て結果を収めた配列
-  void
-  jp_sub1(TpgPrimitive* prim,
-	  TpgNode* node,
-	  const vector<Bool3>& model);
-
-  /// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] node 対象のノード
-  /// @param[in] model SATの値の割り当て結果を収めた配列
-  /// @param[in] val 値
-  void
-  jp_sub2(TpgPrimitive* prim,
-	  TpgNode* node,
-	  const vector<Bool3>& model,
-	  Bool3 val);
-
 };
 
 END_NAMESPACE_YM_SATPG

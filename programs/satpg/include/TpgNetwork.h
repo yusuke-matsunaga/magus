@@ -31,23 +31,19 @@ public:
 
   /// @brief blif ファイルを読み込んでインスタンスを作る．
   /// @param[in] filename ファイル名
-  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
   /// @param[in] cell_library セルライブラリ
   /// @note エラーが起こったら NULL を返す．
   static
   TpgNetwork*
   read_blif(const string& filename,
-	    bool force_to_cplx_logic,
 	    const CellLibrary* cell_library);
 
   /// @brief iscas89 形式のファイルを読み込む．
   /// @param[in] filename ファイル名
-  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
   /// @note エラーが起こったら NULL を返す．
   static
   TpgNetwork*
-  read_iscas89(const string& filename,
-	       bool force_to_cplx_logic);
+  read_iscas89(const string& filename);
 
   /// @brief デストラクタ
   ~TpgNetwork();
@@ -156,47 +152,84 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief TpgNode の内容を設定する．
-  /// @param[in] id ID番号
+  /// @brief 入力ノードを生成する．
   /// @param[in] tgnode もととなる TgNode
+  /// @param[in] id 通し番号への参照
+  /// @return 生成したノードを返す．
+  ///
+  /// id は1つインクリメントされる．
   TpgNode*
-  make_node(ymuint id,
-	    const TgNode* tgnode);
+  make_input_node(const TgNode* tgnode,
+		  ymuint& id);
 
-  /// @brief 複雑な論理式に対応するプリミティブを作る．
-  /// @param[in] expr 論理式
+  /// @brief 出力ノードを生成する．
   /// @param[in] tgnode もととなる TgNode
-  /// @param[in] primitive_list プリミティブを設定する領域
-  /// @param[inout] id プリミティブID
-  /// @note id は内部でインクリメントされる．
-  TpgPrimitive*
-  make_primitive(const Expr& expr,
-		 const TgNode* tgnode,
-		 TpgPrimitive* primitive_list,
+  /// @param[in] id 通し番号への参照
+  /// @return 生成したノードを返す．
+  ///
+  /// id は1つインクリメントされる．
+  TpgNode*
+  make_output_node(const TgNode* tgnode,
+		   ymuint& id);
+
+  /// @brief 論理式から TpgNode の木を生成する．
+  /// @param[in] expr 式
+  /// @param[in] nfo 根のノードのファンアウト数
+  /// @param[in] leaf_nodes 式のリテラルに対応するノードの配列
+  /// @param[in] id 通し番号への参照
+  /// @return 生成したノードを返す．
+  ///
+  /// leaf_nodes は 変数番号 * 2 + (0/1) に
+  /// 該当する変数の肯定/否定のリテラルが入っている．
+  ///
+  /// id は生成したノード数分だけインクリメントされる．
+  TpgNode*
+  make_cplx_node(const Expr& expr,
+		 ymuint nfo,
+		 const vector<TpgNode*>& leaf_nodes,
 		 ymuint& id);
 
-  /// @brief 入力プリミティブの設定を行なう．
-  /// @param[in] prim プリミティブ
-  /// @param[in] id 入力番号
-  void
-  set_input_primitive(TpgPrimitive* prim,
-		      ymuint id);
+  /// @brief 組み込み型の論理ゲートを生成する．
+  /// @param[in] type ゲートの型
+  /// @param[in] ni ファンイン数
+  /// @param[in] nfo ファンアウト数
+  /// @param[in] id 通し番号への参照
+  /// @return 生成したノードを返す．
+  ///
+  /// id は1つインクリメントされる．
+  TpgNode*
+  make_logic_node(tTgGateType type,
+		  ymuint ni,
+		  ymuint nfo,
+		  ymuint& id);
 
-  /// @brief 否定付き入力プリミティブの設定を行なう．
-  /// @param[in] prim プリミティブ
-  /// @param[in] id 入力番号
-  void
-  set_not_input_primitive(TpgPrimitive* prim,
-			  ymuint id);
+  /// @brief TpgNode を生成する．
+  /// @param[in] ni ファンイン数
+  /// @param[in] nfo ファンアウト数
+  /// @param[in] id 通し番号への参照
+  /// @return 生成したノードを返す．
+  ///
+  /// id は1つインクリメントされる．
+  TpgNode*
+  make_node(ymuint ni,
+	    ymuint nfo,
+	    ymuint& id);
 
-  /// @brief 論理プリミティブの設定を行なう．
-  /// @param[in] prim プリミティブ
-  /// @param[in] gate_type ゲートタイプ
-  /// @param[in] ni 入力数
+  /// @brief ノード間の接続を行う．
+  /// @param[in] src ソースノード
+  /// @param[in] dst ディスティネーションノード
+  /// @param[in] ipos ファンイン番号
   void
-  set_logic_primitive(TpgPrimitive* prim,
-		      tTgGateType gate_type,
-		      ymuint ni);
+  connect(TpgNode* src,
+	  TpgNode* dst,
+	  ymuint ipos);
+
+  /// @brief TpgNode と TpgNode の対応付けを行う．
+  /// @param[in] node TpgNode
+  /// @param[in] tgnode もととなる TgNodep
+  void
+  bind(TpgNode* node,
+       const TgNode* tgnode);
 
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
@@ -222,9 +255,7 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] tgnetwork もとのネットワーク
-  /// @param[in] force_to_cplx_logic 組み込み型を使わない時に true にするフラグ
-  TpgNetwork(const TgNetwork& tgnetwork,
-	     bool force_to_cplx_logic);
+  TpgNetwork(const TgNetwork& tgnetwork);
 
   /// @brief コピーコンストラクタは実装しない．
   TpgNetwork(const TpgNetwork& src);

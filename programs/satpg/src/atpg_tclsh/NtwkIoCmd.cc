@@ -24,9 +24,6 @@ BEGIN_NAMESPACE_YM_SATPG
 ReadBlif::ReadBlif(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
-  mCplxLogic = new TclPopt(this, "cplx_logic",
-			   "force to cplx_logic");
-
   set_usage_string("filename");
 }
 
@@ -59,7 +56,7 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   AtpgMsgHandler mh;
   MsgMgr::reg_handler(&mh);
 
-  bool stat = mgr().read_blif(ex_filename, mCplxLogic->is_specified());
+  bool stat = mgr().read_blif(ex_filename);
 
   MsgMgr::unreg_handler(&mh);
 
@@ -82,9 +79,6 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 ReadIscas89::ReadIscas89(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
-  mCplxLogic = new TclPopt(this, "cplx_logic",
-			   "force to cplx_logic");
-
   set_usage_string("filename");
 }
 
@@ -117,7 +111,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   AtpgMsgHandler mh;
   MsgMgr::reg_handler(&mh);
 
-  bool stat = mgr().read_iscas89(ex_filename, mCplxLogic->is_specified());
+  bool stat = mgr().read_iscas89(ex_filename);
 
   MsgMgr::unreg_handler(&mh);
 

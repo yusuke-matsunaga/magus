@@ -106,73 +106,66 @@ BtJust1::justify(TpgNode* node,
     return;
   }
 
-  if ( node->is_cplx_logic() ) {
-    ymuint np = node->primitive_num();
-    TpgPrimitive* prim = node->primitive(np - 1);
-    justify_primitive(prim, node, model);
-  }
-  else {
-    switch ( node->gate_type() ) {
-    case kTgGateBuff:
-    case kTgGateNot:
-      // 無条件で唯一のファンインをたどる．
-      justify(node->fanin(0), model);
-      break;
+  switch ( node->gate_type() ) {
+  case kTgGateBuff:
+  case kTgGateNot:
+    // 無条件で唯一のファンインをたどる．
+    justify(node->fanin(0), model);
+    break;
 
-    case kTgGateAnd:
-      if ( gval == kB3True ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node, model);
-      }
-      else if ( gval == kB3False ) {
-	// 0の値を持つ最初のノードをたどる．
-	just_sub2(node, model, kB3False);
-      }
-      break;
-
-    case kTgGateNand:
-      if ( gval == kB3True ) {
-	// 0の値を持つ最初のノードをたどる．
-	just_sub2(node, model, kB3False);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node, model);
-      }
-      break;
-
-    case kTgGateOr:
-      if ( gval == kB3True ) {
-	// 1の値を持つ最初のノードをたどる．
-	just_sub2(node, model, kB3True);
-      }
-      else if ( gval == kB3False ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node, model);
-      }
-      break;
-
-    case kTgGateNor:
-      if ( gval == kB3True ) {
-	// すべてのファンインノードをたどる．
-	just_sub1(node, model);
-      }
-      else if ( gval == kB3False ) {
-	// 1の値を持つ最初のノードをたどる．
-	just_sub2(node, model, kB3True);
-      }
-      break;
-
-    case kTgGateXor:
-    case kTgGateXnor:
+  case kTgGateAnd:
+    if ( gval == kB3True ) {
       // すべてのファンインノードをたどる．
       just_sub1(node, model);
-      break;
-
-    default:
-      assert_not_reached(__FILE__, __LINE__);
-      break;
     }
+    else if ( gval == kB3False ) {
+      // 0の値を持つ最初のノードをたどる．
+      just_sub2(node, model, kB3False);
+    }
+    break;
+
+  case kTgGateNand:
+    if ( gval == kB3True ) {
+      // 0の値を持つ最初のノードをたどる．
+      just_sub2(node, model, kB3False);
+    }
+    else if ( gval == kB3False ) {
+      // すべてのファンインノードをたどる．
+      just_sub1(node, model);
+    }
+    break;
+
+  case kTgGateOr:
+    if ( gval == kB3True ) {
+      // 1の値を持つ最初のノードをたどる．
+      just_sub2(node, model, kB3True);
+    }
+    else if ( gval == kB3False ) {
+      // すべてのファンインノードをたどる．
+      just_sub1(node, model);
+    }
+    break;
+
+  case kTgGateNor:
+    if ( gval == kB3True ) {
+      // すべてのファンインノードをたどる．
+      just_sub1(node, model);
+    }
+    else if ( gval == kB3False ) {
+      // 1の値を持つ最初のノードをたどる．
+      just_sub2(node, model, kB3True);
+    }
+    break;
+
+  case kTgGateXor:
+  case kTgGateXnor:
+    // すべてのファンインノードをたどる．
+    just_sub1(node, model);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
 }
 
@@ -215,145 +208,6 @@ BtJust1::just_sub2(TpgNode* node,
     }
     else if ( !ffound && ifval == val ) {
       justify(inode, model);
-      ffound = true;
-    }
-    if ( gfound && ffound ) {
-      break;
-    }
-  }
-}
-
-// @brief justify の下請け関数
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
-// @note node の値割り当てを正当化する．
-void
-BtJust1::justify_primitive(TpgPrimitive* prim,
-			   TpgNode* node,
-			   const vector<Bool3>& model)
-{
-  if ( prim->is_input() ) {
-    ymuint ipos = prim->input_id();
-    TpgNode* inode = node->fanin(ipos);
-    justify(inode, model);
-    return;
-  }
-
-  Bool3 gval = primitive_gval(prim, model);
-  Bool3 fval = primitive_fval(prim, model);
-  if ( gval != fval ) {
-    // すべてのファンインノードをたどる．
-    jp_sub1(prim, node, model);
-    return;
-  }
-
-  switch ( prim->gate_type() ) {
-  case kTgGateBuff:
-  case kTgGateNot:
-    // 唯一のファンインをたどる．
-    justify_primitive(prim->fanin(0), node, model);
-    break;
-
-  case kTgGateAnd:
-    if ( gval == kB3True ) {
-      // すべてのファンインをたどる．
-      jp_sub1(prim, node, model);
-    }
-    else if ( gval == kB3False ) {
-      // 0 の値を持つ最初のファンインをたどる．
-      jp_sub2(prim, node, model, kB3False);
-    }
-    break;
-
-  case kTgGateNand:
-    if ( gval == kB3True ) {
-      // 0 の値を持つ最初のファンインをたどる．
-      jp_sub2(prim, node, model, kB3False);
-    }
-    else if ( gval == kB3False ) {
-      // すべてのファンインをたどる．
-      jp_sub1(prim, node, model);
-    }
-    break;
-
-  case kTgGateOr:
-    if ( gval == kB3True ) {
-      // 1の値をもつ最初のファンインをたどる．
-      jp_sub2(prim, node, model, kB3True);
-    }
-    else if ( gval == kB3False ) {
-      // すべてのファンインをたどる．
-      jp_sub1(prim, node, model);
-    }
-    break;
-
-  case kTgGateNor:
-    if ( gval == kB3True ) {
-      // すべてのファンインをたどる．
-      jp_sub1(prim, node, model);
-    }
-    else if ( gval == kB3False ) {
-      // 1の値をもつすべてのファンインをたどる．
-      jp_sub2(prim, node, model, kB3True);
-    }
-    break;
-
-  case kTgGateXor:
-  case kTgGateXnor:
-    // すべてのファンインをたどる．
-    jp_sub1(prim, node, model);
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-}
-
-// @brief すべてのファンインに対して justify_primitive() を呼ぶ．
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
-void
-BtJust1::jp_sub1(TpgPrimitive* prim,
-		 TpgNode* node,
-		 const vector<Bool3>& model)
-{
-  ymuint ni = prim->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgPrimitive* iprim = prim->fanin(i);
-    justify_primitive(iprim, node, model);
-  }
-}
-
-// @brief 指定した値を持つファンインに対して justify_primitive() を呼ぶ．
-// @param[in] prim 対象のプリミティブ
-// @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
-// @param[in] val 値
-void
-BtJust1::jp_sub2(TpgPrimitive* prim,
-		 TpgNode* node,
-		 const vector<Bool3>& model,
-		 Bool3 val)
-{
-  bool gfound = false;
-  bool ffound = false;
-  ymuint ni = prim->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgPrimitive* iprim = prim->fanin(i);
-    Bool3 igval = primitive_gval(iprim, model);
-    Bool3 ifval = primitive_fval(iprim, model);
-    if ( !gfound && igval == val ) {
-      justify_primitive(iprim, node, model);
-      gfound = true;
-      if ( ifval == val ) {
-	break;
-      }
-    }
-    else if ( !ffound && ifval == val ) {
-      justify_primitive(iprim, node, model);
       ffound = true;
     }
     if ( gfound && ffound ) {
