@@ -75,8 +75,6 @@ extra_node_count(const Expr& expr,
   // ただし，根のノードはカウント済みなので1つ減らす．
   n += count_expr(expr) - 1;
 
-  cout << "Extra Node Count: " << expr << " ==> " << n << endl;
-
   return n;
 }
 
@@ -689,6 +687,7 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
       TpgNode* inode = mNodeMap[itgnode->gid()];
       connect(inode, node, i);
     }
+    node->mInputMap = new TpgPrimMap(node);
   }
   bind(node, tgnode);
 
@@ -801,6 +800,8 @@ TpgNetwork::make_node(ymuint ni,
   TpgNode* node = &mNodeArray[mNodeNum];
   node->mId = mNodeNum;
   ++ mNodeNum;
+
+  node->mName = NULL;
 
   node->mCval = kB3X;
   node->mNval = kB3X;

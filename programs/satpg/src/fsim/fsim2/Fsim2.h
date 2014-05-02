@@ -111,17 +111,6 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // TgNode と SimNode の対応関係を表すためのデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct EdgeMap {
-    SimNode* mNode;
-    ymuint32 mPos;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // SimNode / SimFault の設定に関する関数
   //////////////////////////////////////////////////////////////////////
 
@@ -134,26 +123,9 @@ private:
   SimNode*
   find_simnode(const TpgNode* node) const;
 
-  /// @brief node の pos 番めの入力に対応する枝を得る．
-  void
-  find_simedge(const TpgNode* node,
-	       ymuint pos,
-	       SimNode*& simnode,
-	       ymuint& ipos) const;
-
   /// @brief 外部入力ノードを作る．
   SimNode*
   make_input();
-
-  /// @brief プリミティブに対応したノードを作る．
-  /// @param[in] prim プリミティブ
-  /// @param[in] inputs もとのノードの入力の SimNode
-  /// @param[in] emap もとのノードの枝の対応関係を記録する配列
-  /// @note inputs のサイズはノードの入力数 x 2
-  SimNode*
-  make_primitive(const TpgPrimitive* prim,
-		 const vector<SimNode*>& inputs,
-		 const vector<EdgeMap*>& emap);
 
   /// @brief logic ノードを作る．
   SimNode*
@@ -171,9 +143,6 @@ private:
 
   // TpgNode の id をキーにして SimNode を入れる配列
   vector<SimNode*> mSimMap;
-
-  // TpgNode の id と入力位置番号から枝の情報を取り出す配列
-  vector<vector<EdgeMap> > mEdgeMap;
 
   // 全ての SimNode を納めた配列
   vector<SimNode*> mNodeArray;

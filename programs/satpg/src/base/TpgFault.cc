@@ -72,7 +72,13 @@ string
 TpgFault::str() const
 {
   ostringstream ans;
-  ans << node()->name() << ":";
+  if ( node()->name() == NULL ) {
+    ans << "Node#" << node()->id();
+  }
+  else {
+    ans << node()->name();
+  }
+  ans << ":";
   if ( is_input_fault() ) {
     ans << "I" << pos();
   }

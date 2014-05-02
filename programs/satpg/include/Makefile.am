@@ -49,7 +49,6 @@ noinst_HEADERS = \
 	TpgFault.h \
 	TpgNetwork.h \
 	TpgNode.h \
-	TpgPrimitive.h \
 	TvMgr.h \
 	UntestOp.h \
 	UopList.h \

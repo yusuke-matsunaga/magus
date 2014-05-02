@@ -9,7 +9,6 @@
 
 #include "InputLiteral.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -88,58 +87,6 @@ ymuint
 FvarInputLiteral::size() const
 {
   return mNode->fanin_num();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス PrimGvarInputLiteral
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-PrimGvarInputLiteral::PrimGvarInputLiteral(const TpgPrimitive* prim) :
-  mPrim(prim)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-PrimGvarInputLiteral::operator[](ymuint pos) const
-{
-  const TpgPrimitive* iprim = mPrim->fanin(pos);
-  return iprim->glit();
-}
-
-// @brief 入力数を返す．
-ymuint
-PrimGvarInputLiteral::size() const
-{
-  return mPrim->fanin_num();
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス PrimFvarInputLiteral
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-PrimFvarInputLiteral::PrimFvarInputLiteral(const TpgPrimitive* prim) :
-  mPrim(prim)
-{
-}
-
-// @brief リテラルを返す．
-Literal
-PrimFvarInputLiteral::operator[](ymuint pos) const
-{
-  const TpgPrimitive* iprim = mPrim->fanin(pos);
-  return iprim->flit();
-}
-
-// @brief 入力数を返す．
-ymuint
-PrimFvarInputLiteral::size() const
-{
-  return mPrim->fanin_num();
 }
 
 END_NAMESPACE_YM_SATPG

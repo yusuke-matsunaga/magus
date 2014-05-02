@@ -12,7 +12,6 @@
 
 #include "satpg_nsdef.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
 #include "logic/Literal.h"
 #include "logic/Bool3.h"
 #include "logic/sat_nsdef.h"

@@ -10,7 +10,6 @@
 #include "DtpgSat.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
 #include "TpgFault.h"
 #include "DtpgNgMgr.h"
 #include "DtpgNodeGroup.h"
@@ -227,25 +226,6 @@ calc_bdd(tTgGateType gate_type,
   }
 
   return Bdd();
-}
-
-Bdd
-calc_prim_bdd(TpgPrimitive* prim,
-	      const vector<Bdd>& input_bdd)
-{
-  if ( prim->is_input() ) {
-    return input_bdd[prim->input_id()];
-  }
-  if ( prim->is_not_input() ) {
-    return ~input_bdd[prim->input_id()];
-  }
-
-  ymuint ni = prim->fanin_num();
-  vector<Bdd> fanin_bdd(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    fanin_bdd[i] = calc_prim_bdd(prim->fanin(i), input_bdd);
-  }
-  return calc_bdd(prim->gate_type(), fanin_bdd);
 }
 
 Bdd
@@ -515,7 +495,7 @@ DtpgSat::single_mode(BackTracer& bt,
 		     UntestOp& uop)
 {
   ymuint nn = mNetwork->active_node_num();
-#if 1
+#if 0
   for ( ; ; ) {
     bool skipped = false;
     bool update = false;

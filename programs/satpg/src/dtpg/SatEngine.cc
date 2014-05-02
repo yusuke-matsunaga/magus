@@ -13,7 +13,6 @@
 #include "UntestOp.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "InputLiteral.h"

@@ -11,7 +11,7 @@
 
 #include "BackTracer.h"
 #include "TpgNode.h"
-#include "TpgPrimitive.h"
+#include "logic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -75,22 +75,6 @@ protected:
   Bool3
   node_dval(TpgNode* node,
 	    const vector<Bool3>& model);
-
-  /// @brief プリミティブの正常値を読み出す．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] model SAT の割り当て結果
-  static
-  Bool3
-  primitive_gval(TpgPrimitive* prim,
-		 const vector<Bool3>& model);
-
-  /// @brief プリミティブの故障値を読み出す．
-  /// @param[in] prim 対象のプリミティブ
-  /// @param[in] model SAT の割り当て結果
-  static
-  Bool3
-  primitive_fval(TpgPrimitive* prim,
-		 const vector<Bool3>& model);
 
 
 private:
@@ -164,28 +148,6 @@ BtBase::node_dval(TpgNode* node,
 		  const vector<Bool3>& model)
 {
   return read_value(node->dvar(), model);
-}
-
-// @brief プリミティブの正常値を読み出す．
-// @param[in] prim 対象のプリミティブ
-// @param[in] model SAT の割り当て結果
-inline
-Bool3
-BtBase::primitive_gval(TpgPrimitive* prim,
-		       const vector<Bool3>& model)
-{
-  return read_value(prim->glit(), model);
-}
-
-// @brief プリミティブの故障値を読み出す．
-// @param[in] prim 対象のプリミティブ
-// @param[in] model SAT の割り当て結果
-inline
-Bool3
-BtBase::primitive_fval(TpgPrimitive* prim,
-		       const vector<Bool3>& model)
-{
-  return read_value(prim->flit(), model);
 }
 
 // @brief 変数番号に対応する値を読み出す．
