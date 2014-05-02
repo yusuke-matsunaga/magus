@@ -154,66 +154,56 @@ private:
 
   /// @brief 入力ノードを生成する．
   /// @param[in] tgnode もととなる TgNode
-  /// @param[in] id 通し番号への参照
   /// @return 生成したノードを返す．
-  ///
-  /// id は1つインクリメントされる．
   TpgNode*
-  make_input_node(const TgNode* tgnode,
-		  ymuint& id);
+  make_input_node(const TgNode* tgnode);
 
   /// @brief 出力ノードを生成する．
   /// @param[in] tgnode もととなる TgNode
-  /// @param[in] id 通し番号への参照
+  /// @return 生成したノードを返す．
+  TpgNode*
+  make_output_node(const TgNode* tgnode);
+
+  /// @brief 論理ノードを生成する．
+  /// @param[in] tgnode もととなる TgNode
+  /// @param[in] tgnetwork もととなるネットワーク
   /// @return 生成したノードを返す．
   ///
-  /// id は1つインクリメントされる．
+  /// 場合によっては複数の TpgNode を生成する．
   TpgNode*
-  make_output_node(const TgNode* tgnode,
-		   ymuint& id);
+  make_logic_node(const TgNode* tgnode,
+		  const TgNetwork& tgnetwork);
 
   /// @brief 論理式から TpgNode の木を生成する．
   /// @param[in] expr 式
   /// @param[in] nfo 根のノードのファンアウト数
   /// @param[in] leaf_nodes 式のリテラルに対応するノードの配列
-  /// @param[in] id 通し番号への参照
   /// @return 生成したノードを返す．
   ///
   /// leaf_nodes は 変数番号 * 2 + (0/1) に
   /// 該当する変数の肯定/否定のリテラルが入っている．
-  ///
-  /// id は生成したノード数分だけインクリメントされる．
   TpgNode*
   make_cplx_node(const Expr& expr,
 		 ymuint nfo,
-		 const vector<TpgNode*>& leaf_nodes,
-		 ymuint& id);
+		 const vector<TpgNode*>& leaf_nodes);
 
   /// @brief 組み込み型の論理ゲートを生成する．
   /// @param[in] type ゲートの型
   /// @param[in] ni ファンイン数
   /// @param[in] nfo ファンアウト数
-  /// @param[in] id 通し番号への参照
   /// @return 生成したノードを返す．
-  ///
-  /// id は1つインクリメントされる．
   TpgNode*
-  make_logic_node(tTgGateType type,
-		  ymuint ni,
-		  ymuint nfo,
-		  ymuint& id);
+  make_prim_node(tTgGateType type,
+		 ymuint ni,
+		 ymuint nfo);
 
   /// @brief TpgNode を生成する．
   /// @param[in] ni ファンイン数
   /// @param[in] nfo ファンアウト数
-  /// @param[in] id 通し番号への参照
   /// @return 生成したノードを返す．
-  ///
-  /// id は1つインクリメントされる．
   TpgNode*
   make_node(ymuint ni,
-	    ymuint nfo,
-	    ymuint& id);
+	    ymuint nfo);
 
   /// @brief ノード間の接続を行う．
   /// @param[in] src ソースノード

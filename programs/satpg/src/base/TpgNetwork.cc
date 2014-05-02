@@ -148,21 +148,21 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   // 要素数を数え，必要なメモリ領域を確保する．
   //////////////////////////////////////////////////////////////////////
 
-  ymuint nn = tgnetwork.node_num();
+  ymuint nn_orig = tgnetwork.node_num();
   ymuint nl = tgnetwork.logic_num();
-  mNodeNum = nn;
+  ymuint nn = nn_orig;
   unordered_map<ymuint, ymuint> en_hash;
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.logic(i);
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
       if ( en_hash.count(fid) > 0 ) {
-	mNodeNum += en_hash[fid];
+	nn += en_hash[fid];
       }
       else {
 	ymuint n = extra_node_count(tgnetwork.get_lexp(fid), tgnode->fanin_num());
 	en_hash.insert(make_pair(fid, n));
-	mNodeNum += n;
+	nn += n;
       }
     }
   }
@@ -171,25 +171,24 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   mOutputNum = tgnetwork.output_num1();
   mFFNum = tgnetwork.ff_num();
 
-  mNodeArray = alloc_array<TpgNode>(mAlloc, mNodeNum);
+  mNodeNum = 0;
+  mNodeArray = alloc_array<TpgNode>(mAlloc, nn);
 
-  mNodeMap = alloc_array<TpgNode*>(mAlloc, mNodeNum);
+  mNodeMap = alloc_array<TpgNode*>(mAlloc, nn_orig);
   mInputArray = alloc_array<TpgNode*>(mAlloc, input_num2());
   mOutputArray = alloc_array<TpgNode*>(mAlloc, output_num2());
   mOutputArray2 = alloc_array<TpgNode*>(mAlloc, output_num2());
 
   mActNodeNum = 0;
-  mActNodeArray = alloc_array<TpgNode*>(mAlloc, mNodeNum);
+  mActNodeArray = alloc_array<TpgNode*>(mAlloc, nn);
 
   mTmpNodeNum = 0;
-  mTmpNodeList = alloc_array<TpgNode*>(mAlloc, mNodeNum);
+  mTmpNodeList = alloc_array<TpgNode*>(mAlloc, nn);
 
-  mTmpMark = alloc_array<bool>(mAlloc, mNodeNum);
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
+  mTmpMark = alloc_array<bool>(mAlloc, nn);
+  for (ymuint i = 0; i < nn; ++ i) {
     mTmpMark[i] = false;
   }
-
-  ymuint id = 0;
 
   //////////////////////////////////////////////////////////////////////
   // 外部入力を作成する．
@@ -197,7 +196,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   ymuint npi = input_num2();
   for (ymuint i = 0; i < npi; ++ i) {
     const TgNode* tgnode = tgnetwork.input(i);
-    TpgNode* node = make_input_node(tgnode, id);
+    TpgNode* node = make_input_node(tgnode);
     mInputArray[i] = node;
   }
 
@@ -208,58 +207,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.sorted_logic(i);
-    ymuint ni = tgnode->fanin_num();
-    ymuint nfo = tgnode->fanout_num();
-    TpgNode* node = NULL;
-    if ( tgnode->is_cplx_logic() ) {
-      // 論理式をとってくる．
-      ymuint fid = tgnode->func_id();
-      Expr expr = tgnetwork.get_lexp(fid);
-
-      // expr の内容を表す TpgNode の木を作る．
-      vector<TpgNode*> leaf_nodes(ni * 2, NULL);
-      for (ymuint i = 0; i < ni; ++ i) {
-	ymuint p_num = expr.litnum(VarId(i), false);
-	ymuint n_num = expr.litnum(VarId(i), true);
-	const TgNode* itgnode = tgnode->fanin(i);
-	TpgNode* inode = mNodeMap[itgnode->gid()];
-	if ( n_num == 0 ) {
-	  if ( p_num == 1 ) {
-	    leaf_nodes[i * 2 + 0] = inode;
-	  }
-	  else {
-	    TpgNode* dummy_buff = make_logic_node(kTgGateBuff, 1, p_num, id);
-	    connect(inode, dummy_buff, 0);
-	    leaf_nodes[i * 2 + 0] = dummy_buff;
-	  }
-	}
-	else {
-	  if ( p_num == 0 ) {
-	    TpgNode* not_gate = make_logic_node(kTgGateNot, 1, n_num, id);
-	    connect(inode, not_gate, 0);
-	    leaf_nodes[i * 2 + 1] = not_gate;
-	  }
-	  else {
-	    TpgNode* dummy_buff = make_logic_node(kTgGateBuff, 1, p_num + 1, id);
-	    connect(inode, dummy_buff, 0);
-	    TpgNode* not_gate = make_logic_node(kTgGateNot, 1, n_num, id);
-	    connect(dummy_buff, not_gate, 0);
-	    leaf_nodes[i * 2 + 1] = not_gate;
-	  }
-	}
-      }
-      node = make_cplx_node(expr, nfo, leaf_nodes, id);
-    }
-    else {
-      // 組み込み型のゲート
-      node = make_logic_node(tgnode->gate_type(), ni, nfo, id);
-      for (ymuint i = 0; i < ni; ++ i) {
-	const TgNode* itgnode = tgnode->fanin(i);
-	TpgNode* inode = mNodeMap[itgnode->gid()];
-	connect(inode, node, i);
-      }
-    }
-    bind(node, tgnode);
+    TpgNode* node = make_logic_node(tgnode, tgnetwork);
   }
 
 
@@ -269,11 +217,11 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   ymuint npo = output_num2();
   for (ymuint i = 0; i < npo; ++ i) {
     const TgNode* tgnode = tgnetwork.output(i);
-    TpgNode* node = make_output_node(tgnode, id);
+    TpgNode* node = make_output_node(tgnode);
     mOutputArray[i] = node;
   }
 
-  assert_cond( id == mNodeNum, __FILE__, __LINE__);
+  assert_cond( nn == mNodeNum, __FILE__, __LINE__);
 
 
   // 全部アクティブにしておく．
@@ -433,15 +381,11 @@ TpgNetwork::node(ymuint pos) const
 
 // @brief 入力ノードを生成する．
 // @param[in] tgnode もととなる TgNode
-// @param[in] id 通し番号への参照
 // @return 生成したノードを返す．
-//
-// id は1つインクリメントされる．
 TpgNode*
-TpgNetwork::make_input_node(const TgNode* tgnode,
-			    ymuint& id)
+TpgNetwork::make_input_node(const TgNode* tgnode)
 {
-  TpgNode* node = make_node(0, tgnode->fanout_num(), id);
+  TpgNode* node = make_node(0, tgnode->fanout_num());
   node->mTypeId = 1U | (tgnode->lid() << 3);
 
   bind(node, tgnode);
@@ -451,15 +395,11 @@ TpgNetwork::make_input_node(const TgNode* tgnode,
 
 // @brief 出力ノードを生成する．
 // @param[in] tgnode もととなる TgNode
-// @param[in] id 通し番号への参照
 // @return 生成したノードを返す．
-//
-// id は1つインクリメントされる．
 TpgNode*
-TpgNetwork::make_output_node(const TgNode* tgnode,
-			     ymuint& id)
+TpgNetwork::make_output_node(const TgNode* tgnode)
 {
-  TpgNode* node = make_node(1, 0, id);
+  TpgNode* node = make_node(1, 0);
   node->mTypeId = 2U | (tgnode->lid() << 3);
 
   const TgNode* itgnode = tgnode->fanin(0);
@@ -471,22 +411,82 @@ TpgNetwork::make_output_node(const TgNode* tgnode,
   return node;
 }
 
+// @brief 論理ノードを生成する．
+// @param[in] tgnode もととなる TgNode
+// @param[in] tgnetwork もととなるネットワーク
+// @return 生成したノードを返す．
+//
+/// 場合によっては複数の TpgNode を生成する．
+TpgNode*
+TpgNetwork::make_logic_node(const TgNode* tgnode,
+			    const TgNetwork& tgnetwork)
+{
+  ymuint ni = tgnode->fanin_num();
+  ymuint nfo = tgnode->fanout_num();
+
+  TpgNode* node = NULL;
+  if ( tgnode->is_cplx_logic() ) {
+    // 論理式をとってくる．
+    ymuint fid = tgnode->func_id();
+    Expr expr = tgnetwork.get_lexp(fid);
+
+    // expr の内容を表す TpgNode の木を作る．
+    vector<TpgNode*> leaf_nodes(ni * 2, NULL);
+    for (ymuint i = 0; i < ni; ++ i) {
+      ymuint p_num = expr.litnum(VarId(i), false);
+      ymuint n_num = expr.litnum(VarId(i), true);
+      const TgNode* itgnode = tgnode->fanin(i);
+      TpgNode* inode = mNodeMap[itgnode->gid()];
+      if ( n_num == 0 ) {
+	if ( p_num == 1 ) {
+	  leaf_nodes[i * 2 + 0] = inode;
+	}
+	else {
+	  TpgNode* dummy_buff = make_prim_node(kTgGateBuff, 1, p_num);
+	  connect(inode, dummy_buff, 0);
+	  leaf_nodes[i * 2 + 0] = dummy_buff;
+	}
+      }
+      else {
+	if ( p_num > 0 ) {
+	  TpgNode* dummy_buff = make_prim_node(kTgGateBuff, 1, p_num + 1);
+	  connect(inode, dummy_buff, 0);
+	  inode = dummy_buff;
+	}
+
+	TpgNode* not_gate = make_prim_node(kTgGateNot, 1, n_num);
+	connect(inode, not_gate, 0);
+	leaf_nodes[i * 2 + 1] = not_gate;
+      }
+    }
+    node = make_cplx_node(expr, nfo, leaf_nodes);
+  }
+  else {
+    // 組み込み型のゲート
+    node = make_prim_node(tgnode->gate_type(), ni, nfo);
+    for (ymuint i = 0; i < ni; ++ i) {
+      const TgNode* itgnode = tgnode->fanin(i);
+      TpgNode* inode = mNodeMap[itgnode->gid()];
+      connect(inode, node, i);
+    }
+  }
+  bind(node, tgnode);
+
+  return node;
+}
+
 // @brief 論理式から TpgNode の木を生成する．
 // @param[in] expr 式
 // @param[in] nfo 根のノードのファンアウト数
 // @param[in] leaf_nodes 式のリテラルに対応するノードの配列
-// @param[in] id 通し番号への参照
 // @return 生成したノードを返す．
 //
 // leaf_nodes は 変数番号 * 2 + (0/1) に
 // 該当する変数の肯定/否定のリテラルが入っている．
-//
-// id は生成したノード数分だけインクリメントされる．
 TpgNode*
 TpgNetwork::make_cplx_node(const Expr& expr,
 			   ymuint nfo,
-			   const vector<TpgNode*>& leaf_nodes,
-			   ymuint& id)
+			   const vector<TpgNode*>& leaf_nodes)
 {
   if ( expr.is_posiliteral() ) {
     return leaf_nodes[expr.varid().val() * 2 + 0];
@@ -510,11 +510,11 @@ TpgNetwork::make_cplx_node(const Expr& expr,
   }
 
   ymuint nc = expr.child_num();
-  TpgNode* node = make_logic_node(gate_type, nc, nfo, id);
+  TpgNode* node = make_prim_node(gate_type, nc, nfo);
 
   for (ymuint i = 0; i < nc; ++ i) {
     const Expr& expr1 = expr.child(i);
-    TpgNode* inode = make_cplx_node(expr1, 1, leaf_nodes, id);
+    TpgNode* inode = make_cplx_node(expr1, 1, leaf_nodes);
     connect(inode, node, i);
   }
 
@@ -525,17 +525,13 @@ TpgNetwork::make_cplx_node(const Expr& expr,
 // @param[in] type ゲートの型
 // @param[in] ni ファンイン数
 // @param[in] nfo ファンアウト数
-// @param[in] id 通し番号への参照
 // @return 生成したノードを返す．
-//
-// id は1つインクリメントされる．
 TpgNode*
-TpgNetwork::make_logic_node(tTgGateType type,
-			    ymuint ni,
-			    ymuint nfo,
-			    ymuint& id)
+TpgNetwork::make_prim_node(tTgGateType type,
+			   ymuint ni,
+			   ymuint nfo)
 {
-  TpgNode* node = make_node(ni, nfo, id);
+  TpgNode* node = make_node(ni, nfo);
   node->mTypeId = 4U | (static_cast<ymuint>(type) << 3);
 
   switch ( type ) {
@@ -561,19 +557,15 @@ TpgNetwork::make_logic_node(tTgGateType type,
 // @brief TpgNode を生成する．
 // @param[in] ni ファンイン数
 // @param[in] nfo ファンアウト数
-// @param[in] id 通し番号への参照
 // @return 生成したノードを返す．
-//
-// id は1つインクリメントされる．
 TpgNode*
 TpgNetwork::make_node(ymuint ni,
-		      ymuint nfo,
-		      ymuint& id)
+		      ymuint nfo)
 
 {
-  TpgNode* node = &mNodeArray[id];
-  node->mId = id;
-  ++ id;
+  TpgNode* node = &mNodeArray[mNodeNum];
+  node->mId = mNodeNum;
+  ++ mNodeNum;
 
   node->mCval = kB3X;
   node->mNval = kB3X;
