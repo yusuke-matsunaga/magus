@@ -458,7 +458,7 @@ inline
 bool
 TpgNode::is_input() const
 {
-  return (mTypeId & 3U) == 1U;
+  return (mTypeId & 7U) == 1U;
 }
 
 // @brief 外部入力タイプの時に入力番号を返す．
@@ -476,7 +476,7 @@ inline
 bool
 TpgNode::is_output() const
 {
-  return (mTypeId & 3U) == 2U;
+  return (mTypeId & 7U) == 2U;
 }
 
 // @brief 外部出力タイプの時に出力番号を返す．
@@ -493,7 +493,7 @@ inline
 bool
 TpgNode::is_logic() const
 {
-  return (mTypeId & 4U) == 4U;
+  return (mTypeId & 6U) == 4U;
 }
 
 // @brief ゲートタイプを得る．
@@ -512,8 +512,7 @@ inline
 bool
 TpgNode::is_root() const
 {
-  assert_cond( is_logic(), __FILE__, __LINE__);
-  return (mTypeId & 1U) == 0U;
+  return (mTypeId & 7U) == 4U;
 }
 
 // @brief 内部ノードの時 true を返す．
@@ -523,8 +522,7 @@ inline
 bool
 TpgNode::is_internal() const
 {
-  assert_cond( is_logic(), __FILE__, __LINE__);
-  return (mTypeId & 1U) == 1U;
+  return (mTypeId & 7U) == 5U;
 }
 
 // @brief ファンイン数を得る．

@@ -106,7 +106,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mgr().set_dtpg_mode("", "classic");
   }
   else if ( mPoptSatRec->is_specified() ) {
-    mgr().set_dtpg_mode("satrec");
+    mgr().set_dtpg_mode("satrec", string(), &cout);
   }
   else if ( mPoptMiniSat->is_specified() ) {
     mgr().set_dtpg_mode("minisat");
