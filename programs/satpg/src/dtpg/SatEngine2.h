@@ -147,9 +147,6 @@ private:
   // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
 
-  // 変数を割り当てたノードを格納するリスト
-  vector<TpgNode*> mUsedNodeList;
-
   // 故障に関係する入力ノードのリスト
   vector<TpgNode*> mInputList;
 
@@ -238,6 +235,10 @@ void
 SatEngine2::set_tfo_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 1U;
+  mTfoList.push_back(node);
+  if ( node->is_output() ) {
+    mOutputList.push_back(node);
+  }
 }
 
 // @brief tfo マークを読む．
@@ -254,6 +255,10 @@ void
 SatEngine2::set_tfi_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 2U;
+  mTfiList.push_back(node);
+  if ( node->is_input() ) {
+    mInputList.push_back(node);
+  }
 }
 
 // @brief tfi マークを読む．
