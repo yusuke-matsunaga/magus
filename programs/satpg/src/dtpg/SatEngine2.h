@@ -138,11 +138,11 @@ private:
   // SAT solver の記録用ストリーム
   ostream* mOutP;
 
-  // SAT 用の assumption を格納するベクタ
-  vector<Literal> mAssumptions;
+  // 故障箇所の TFO ノードを入れるリスト
+  vector<TpgNode*> mTfoList;
 
-  // SAT の結果を格納する配列
-  vector<Bool3> mModel;
+  // TFO の TFI ノードを入れるリスト
+  vector<TpgNode*> mTfiList;
 
   // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
@@ -150,14 +150,17 @@ private:
   // 変数を割り当てたノードを格納するリスト
   vector<TpgNode*> mUsedNodeList;
 
-  // 現在の故障に関係のありそうな外部入力のリスト
+  // 故障に関係する入力ノードのリスト
   vector<TpgNode*> mInputList;
 
-  // 現在の故障に関係ありそうな外部出力のリスト
+  // 故障に関係する出力ノードのリスト
   vector<TpgNode*> mOutputList;
 
-  // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
+  // SAT に与える仮説のリスト
+  vector<Literal> mAssumptions;
+
+  // SAT のモデル．
+  vector<Bool3> mModel;
 
   // CNF の生成回数
   ymuint32 mRunCount;
