@@ -323,6 +323,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     }
   }
 
+  // ダミーノードの分
+  ++ nn;
+
   mInputNum = tgnetwork.input_num1();
   mOutputNum = tgnetwork.output_num1();
   mFFNum = tgnetwork.ff_num();
@@ -376,6 +379,14 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     TpgNode* node = make_output_node(tgnode);
     mOutputArray[i] = node;
   }
+
+
+  //////////////////////////////////////////////////////////////////////
+  // ダミーノードを作成する．
+  //////////////////////////////////////////////////////////////////////
+
+  // 見かけはバッファ
+  mDummyNode = make_prim_node(kTgGateBuff, false, 1, 1);
 
   assert_cond( nn == mNodeNum, __FILE__, __LINE__);
 
@@ -449,6 +460,75 @@ TpgNetwork::~TpgNetwork()
 {
   // このオブジェクトが確保したメモリは mAlloc のデストラクタが
   // 開放してくれる．
+}
+
+// @brief ブランチの故障用のダミーノードを挿入する．
+// @param[in] node 対象のノード
+// @param[in] ipos 入力位置
+// @return 挿入したノードを返す．
+TpgNode*
+TpgNetwork::inject_fnode(TpgNode* node,
+			 ymuint ipos)
+{
+  if ( node->fanin_num() == 1 ) {
+    assert_cond( ipos == 0, __FILE__, __LINE__);
+    return node;
+  }
+
+  TpgNode* src_node = node->fanin(ipos);
+  node->mFanins[ipos] = mDummyNode;
+  mDummyNode->mFanoutNum = 1;
+  mDummyNode->mFanouts[0] = node;
+  mDummyNode->mActFanoutNum = 1;
+  mDummyNode->mActFanouts[0] = node;
+
+  for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
+    if ( src_node->mFanouts[i] == node ) {
+      src_node->mFanouts[i] = mDummyNode;
+      break;
+    }
+  }
+  for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
+    if ( src_node->mActFanouts[i] == node ) {
+      src_node->mActFanouts[i] = mDummyNode;
+      break;
+    }
+  }
+  mDummyNode->mFanins[0] = src_node;
+  mDummyNode->mImmDom = node;
+
+  return mDummyNode;
+}
+
+// @brief 挿入したダミーノードを削除する．
+// @param[in] fnode 挿入したダミーノード
+void
+TpgNetwork::remove_fnode(TpgNode* node)
+{
+  if ( node == mDummyNode ) {
+    TpgNode* src_node = mDummyNode->fanin(0);
+    TpgNode* dst_node = mDummyNode->fanout(0);
+    for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
+      if ( src_node->mActFanouts[i] == mDummyNode ) {
+	src_node->mActFanouts[i] = dst_node;
+	break;
+      }
+    }
+    for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
+      if ( src_node->mFanouts[i] = mDummyNode ) {
+	src_node->mFanouts[i] = dst_node;
+	break;
+      }
+    }
+    for (ymuint i = 0; i < dst_node->mFaninNum; ++ i) {
+      if ( dst_node->mFanins[i] == mDummyNode ) {
+	dst_node->mFanins[i] = src_node;
+	break;
+      }
+    }
+    mDummyNode->mFanoutNum = 0;
+    mDummyNode->mActFanoutNum = 0;
+  }
 }
 
 // @brief 一つの外部出力に関係するノードのみをアクティブにする．

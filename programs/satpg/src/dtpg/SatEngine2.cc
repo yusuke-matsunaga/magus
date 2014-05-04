@@ -382,7 +382,9 @@ SatEngine2::clear_stats()
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
 void
-SatEngine2::run(TpgFault* f_tgt,
+SatEngine2::run(TpgFault* fault,
+		TpgNode* fnode,
+		int fval,
 		ymuint max_id,
 		BackTracer& bt,
 		DetectOp& dop,
@@ -407,7 +409,6 @@ SatEngine2::run(TpgFault* f_tgt,
   // 故障のあるノードの TFO を mTfoList に入れる．
   // TFO の TFI のノードを mTfoList の後半に追加する．
   // TFO の部分の最後の位置を tfo_end に記憶する．
-  TpgNode* fnode = f_tgt->node();
   if ( !tfo_mark(fnode) ) {
     set_tfo_mark(fnode);
     if ( fnode->is_input() ) {
@@ -443,11 +444,6 @@ SatEngine2::run(TpgFault* f_tgt,
     }
   }
 
-  if ( f_tgt->is_input_fault() ) {
-    TpgNode* node = f_tgt->source_node();
-    set_fvar(solver, node);
-  }
-
 
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
@@ -466,22 +462,16 @@ SatEngine2::run(TpgFault* f_tgt,
   for (ymuint i = 0; i < tfo_end; ++ i) {
     TpgNode* node = mTfoList[i];
 
-    bool has_fault = f_tgt->node() == node;
+    bool has_fault = fnode == node;
 
 #if 1
     if ( has_fault ) {
-      if ( f_tgt->is_input_fault() ) {
-	VarId fvar = f_tgt->source_node()->fvar();
-	make_flt_cnf(solver, fvar, f_tgt->val());
-      }
-      else {
-	VarId fvar = node->fvar();
-	make_flt_cnf(solver, fvar, f_tgt->val());
-      }
+      VarId fvar = node->fvar();
+      make_flt_cnf(solver, fvar, fval);
     }
 #endif
 
-    if ( !has_fault || f_tgt->is_input_fault() ) {
+    if ( !has_fault ) {
       make_fnode_cnf(solver, node);
     }
 
@@ -541,15 +531,12 @@ SatEngine2::run(TpgFault* f_tgt,
   mTmpLits.clear();
 
   // dominator ノードの dvar は1でなければならない．
-  for (TpgNode* node = f_tgt->node(); node != NULL; node = node->imm_dom()) {
+  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
     Literal dlit(node->dvar(), false);
     mTmpLits.push_back(dlit);
   }
 
-  if ( f_tgt->is_input_fault() ) {
-    fnode = fnode->fanin(f_tgt->pos());
-  }
-  bool inv = (f_tgt->val() != 0);
+  bool inv = (fval != 0);
   mTmpLits.push_back(Literal(fnode->gvar(), inv));
 
   if ( mTimerEnable ) {
@@ -562,10 +549,10 @@ SatEngine2::run(TpgFault* f_tgt,
     // パタンが求まった．
 
     // バックトレースを行う．
-    TestVector* tv = bt(f_tgt->node(), mModel, mInputList, mOutputList);
+    TestVector* tv = bt(fnode, mModel, mInputList, mOutputList);
 
     // パタンの登録などを行う．
-    dop(f_tgt, tv);
+    dop(fault, tv);
 
     if ( mTimerEnable ) {
       mTimer.stop();
@@ -575,7 +562,7 @@ SatEngine2::run(TpgFault* f_tgt,
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    uop(f_tgt);
+    uop(fault);
 
     if ( mTimerEnable ) {
       mTimer.stop();

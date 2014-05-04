@@ -80,6 +80,10 @@ Fsim2::set_network(const TpgNetwork& network)
   mOutputArray.resize(no);
 
   for (ymuint i = 0; i < nn; ++ i) {
+    if ( i == nn - 1 ) {
+      continue;
+    }
+
     const TpgNode* tpgnode = mNetwork->node(i);
     SimNode* node = NULL;
 

@@ -55,6 +55,8 @@ public:
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   run(TpgFault* f_tgt,
+      TpgNode* fnode,
+      int val,
       ymuint max_id,
       BackTracer& bt,
       DetectOp& dop,
