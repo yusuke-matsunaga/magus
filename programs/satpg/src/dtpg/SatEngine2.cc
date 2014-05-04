@@ -405,7 +405,8 @@ SatEngine2::run(TpgFault* f_tgt,
   mOutputList.clear();
 
   // 故障のあるノードの TFO を mTfoList に入れる．
-  // TFO の TFI のノードを mTfiList に入れる．
+  // TFO の TFI のノードを mTfoList の後半に追加する．
+  // TFO の部分の最後の位置を tfo_end に記憶する．
   TpgNode* fnode = f_tgt->node();
   if ( !tfo_mark(fnode) ) {
     set_tfo_mark(fnode);
