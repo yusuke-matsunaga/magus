@@ -960,7 +960,7 @@ TpgNetwork::new_ofault(TpgNode* node,
 		       TpgFault* rep)
 {
   TpgFault* f = new_fault(node, true, 0, val, rep);
-  node->set_output_fault(val, f);
+  node->mOutputFault[val % 2] = f;
 
   return f;
 }
@@ -979,7 +979,7 @@ TpgNetwork::new_ifault(TpgNode* node,
 		       TpgFault* rep)
 {
   TpgFault* f = new_fault(node, false, ipos, val, rep);
-  node->set_input_fault(val, ipos, f);
+  node->mInputFault[ipos * 2 + (val % 2)] = f;
 
   return f;
 }

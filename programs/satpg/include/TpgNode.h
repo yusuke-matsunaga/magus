@@ -52,6 +52,8 @@ public:
   id() const;
 
   /// @brief 名前を得る．
+  ///
+  /// NULL が返される場合もある．
   const char*
   name() const;
 
@@ -153,22 +155,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 故障に関する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 出力の故障を設定する．
-  /// @param[in] val 故障値
-  /// @param[in] f 故障
-  void
-  set_output_fault(int val,
-		   TpgFault* f);
-
-  /// @brief 入力の故障を設定する．
-  /// @param[in] val 故障値
-  /// @param[in] pos 入力の位置番号
-  /// @param[in] f 故障
-  void
-  set_input_fault(int val,
-		  ymuint pos,
-		  TpgFault* f);
 
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
@@ -577,31 +563,6 @@ TpgNode::active_fanout(ymuint pos) const
 {
   assert_cond( pos < mActFanoutNum, __FILE__, __LINE__);
   return mActFanouts[pos];
-}
-
-// @brief 出力の故障を設定する．
-// @param[in] val 故障値
-// @param[in] f 故障
-inline
-void
-TpgNode::set_output_fault(int val,
-			  TpgFault* f)
-{
-  mOutputFault[val % 2] = f;
-}
-
-// @brief 入力の故障を設定する．
-// @param[in] val 故障値
-// @param[in] pos 入力の位置番号
-// @param[in] f 故障
-inline
-void
-TpgNode::set_input_fault(int val,
-			 ymuint pos,
-			 TpgFault* f)
-{
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
-  mInputFault[pos * 2 + (val % 2)] = f;
 }
 
 // @brief 出力の故障を得る．
