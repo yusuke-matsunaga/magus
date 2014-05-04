@@ -476,6 +476,10 @@ TpgNetwork::inject_fnode(TpgNode* node,
   }
 
   TpgNode* src_node = node->fanin(ipos);
+  if ( src_node->mActFanoutNum == 1 ) {
+    return src_node;
+  }
+
   node->mFanins[ipos] = mDummyNode;
   mDummyNode->mFanoutNum = 1;
   mDummyNode->mFanouts[0] = node;
