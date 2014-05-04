@@ -153,8 +153,8 @@ private:
   // 故障に関係する出力ノードのリスト
   vector<TpgNode*> mOutputList;
 
-  // SAT に与える仮説のリスト
-  vector<Literal> mAssumptions;
+  // 作業領域として使うリテラルのリスト
+  vector<Literal> mTmpLits;
 
   // SAT のモデル．
   vector<Bool3> mModel;

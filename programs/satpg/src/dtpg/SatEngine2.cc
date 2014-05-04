@@ -415,10 +415,8 @@ SatEngine2::run(TpgFault* f_tgt,
     if ( fnode->is_input() ) {
       mInputList.push_back(fnode);
     }
-#if 1
     set_gvar(solver, fnode);
     set_fvar(solver, fnode);
-#endif
   }
 
   for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
@@ -428,10 +426,8 @@ SatEngine2::run(TpgFault* f_tgt,
       TpgNode* fonode = node->active_fanout(i);
       if ( !tfo_mark(fonode) ) {
 	set_tfo_mark(fonode);
-#if 1
 	set_gvar(solver, fonode);
 	set_fvar(solver, fonode);
-#endif
       }
     }
   }
@@ -444,9 +440,7 @@ SatEngine2::run(TpgFault* f_tgt,
       TpgNode* finode = node->fanin(i);
       if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
 	set_tfi_mark(finode);
-#if 1
 	set_gvar(solver, finode);
-#endif
       }
     }
   }
@@ -457,29 +451,10 @@ SatEngine2::run(TpgFault* f_tgt,
       TpgNode* finode = node->fanin(i);
       if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
 	set_tfi_mark(finode);
-#if 1
 	set_gvar(solver, finode);
-#endif
       }
     }
   }
-
-#if 0
-  // TFO マークのついたノード用の変数の生成
-  for (vector<TpgNode*>::iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
-    TpgNode* node = *p;
-    set_gvar(solver, node);
-    set_fvar(solver, node);
-  }
-
-  // TFI マークのついたノード用の変数の生成
-  for (vector<TpgNode*>::iterator p = mTfiList.begin();
-       p != mTfiList.end(); ++ p) {
-    TpgNode* node = *p;
-    set_gvar(solver, node);
-  }
-#endif
 
   if ( f_tgt->is_input_fault() ) {
     TpgNode* node = f_tgt->source_node();
@@ -506,17 +481,12 @@ SatEngine2::run(TpgFault* f_tgt,
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  vector<Literal> dep;
   for (ymuint i = 0; i < mTfoList.size(); ++ i) {
     TpgNode* node = mTfoList[i];
 
     bool has_fault = f_tgt->node() == node;
 
-    // ovar に出力変数を入れる．
-    // こちらは入力の故障と異なり，故障挿入回路の出力が node->fvar() となる．
-    // 逆に ovar はゲートの直接の出力変数となる．
-    VarId ovar = node->fvar();
-
+#if 1
     if ( has_fault ) {
       if ( f_tgt->is_input_fault() ) {
 	VarId fvar = f_tgt->source_node()->fvar();
@@ -525,10 +495,9 @@ SatEngine2::run(TpgFault* f_tgt,
       else {
 	VarId fvar = node->fvar();
 	make_flt_cnf(solver, fvar, f_tgt->val());
-	// ダミー
-	ovar = solver.new_var();
       }
     }
+#endif
 
     if ( !has_fault || f_tgt->is_input_fault() ) {
       make_fnode_cnf(solver, node);
@@ -552,18 +521,17 @@ SatEngine2::run(TpgFault* f_tgt,
     // このうち，2) と 3) の場合は has_fault = true となっている．
     if ( !has_fault ) {
       ymuint ni = node->fanin_num();
-      dep.clear();
-      dep.reserve(ni + 1);
+      mTmpLits.clear();
+      mTmpLits.reserve(ni + 1);
       Literal dlit(node->dvar(), true);
-      dep.push_back(dlit);
+      mTmpLits.push_back(dlit);
       for (ymuint j = 0; j < ni; ++ j) {
 	TpgNode* inode = node->fanin(j);
 	if ( inode->has_fvar() ) {
-	  dep.push_back(Literal(inode->dvar(), false));
+	  mTmpLits.push_back(Literal(inode->dvar(), false));
 	}
       }
-
-      solver.add_clause(dep);
+      solver.add_clause(mTmpLits);
     }
   }
 
@@ -571,15 +539,15 @@ SatEngine2::run(TpgFault* f_tgt,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  vector<Literal> odiff;
-  odiff.reserve(mOutputList.size());
+  mTmpLits.clear();
+  mTmpLits.reserve(mOutputList.size());
   for (vector<TpgNode*>::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
     TpgNode* node = *p;
     Literal dlit(node->dvar(), false);
-    odiff.push_back(dlit);
+    mTmpLits.push_back(dlit);
   }
-  solver.add_clause(odiff);
+  solver.add_clause(mTmpLits);
 
   if ( mTimerEnable ) {
     mTimer.stop();
@@ -588,27 +556,26 @@ SatEngine2::run(TpgFault* f_tgt,
   }
 
   // 故障に対するテスト生成を行なう．
-  mAssumptions.clear();
-  mAssumptions.reserve(mTfoList.size());
+  mTmpLits.clear();
 
   // dominator ノードの dvar は1でなければならない．
   for (TpgNode* node = f_tgt->node(); node != NULL; node = node->imm_dom()) {
     Literal dlit(node->dvar(), false);
-    mAssumptions.push_back(dlit);
+    mTmpLits.push_back(dlit);
   }
 
   if ( f_tgt->is_input_fault() ) {
     fnode = fnode->fanin(f_tgt->pos());
   }
   bool inv = (f_tgt->val() != 0);
-  mAssumptions.push_back(Literal(fnode->gvar(), inv));
+  mTmpLits.push_back(Literal(fnode->gvar(), inv));
 
   if ( mTimerEnable ) {
     mTimer.reset();
     mTimer.start();
   }
 
-  Bool3 ans = solver.solve(mAssumptions, mModel);
+  Bool3 ans = solver.solve(mTmpLits, mModel);
   if ( ans == kB3True ) {
     // パタンが求まった．
 
