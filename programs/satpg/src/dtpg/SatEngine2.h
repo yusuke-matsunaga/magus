@@ -141,9 +141,6 @@ private:
   // 故障箇所の TFO ノードを入れるリスト
   vector<TpgNode*> mTfoList;
 
-  // TFO の TFI ノードを入れるリスト
-  vector<TpgNode*> mTfiList;
-
   // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
 
@@ -255,7 +252,7 @@ void
 SatEngine2::set_tfi_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 2U;
-  mTfiList.push_back(node);
+  mTfoList.push_back(node);
   if ( node->is_input() ) {
     mInputList.push_back(node);
   }

@@ -401,9 +401,6 @@ SatEngine2::run(TpgFault* f_tgt,
   mTfoList.clear();
   mTfoList.reserve(max_id);
 
-  mTfiList.clear();
-  mTfiList.reserve(max_id);
-
   mInputList.clear();
   mOutputList.clear();
 
@@ -432,20 +429,9 @@ SatEngine2::run(TpgFault* f_tgt,
     }
   }
 
-  for (vector<TpgNode*>::iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
-    TpgNode* node = *p;
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* finode = node->fanin(i);
-      if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
-	set_tfi_mark(finode);
-	set_gvar(solver, finode);
-      }
-    }
-  }
-  for (ymuint rpos = 0; rpos < mTfiList.size(); ++ rpos) {
-    TpgNode* node = mTfiList[rpos];
+  ymuint tfo_end = mTfoList.size();
+  for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
+    TpgNode* node = mTfoList[rpos];
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* finode = node->fanin(i);
@@ -466,11 +452,6 @@ SatEngine2::run(TpgFault* f_tgt,
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
 
-  for (vector<TpgNode*>::const_iterator p = mTfiList.begin();
-       p != mTfiList.end(); ++ p) {
-    TpgNode* node = *p;
-    make_gnode_cnf(solver, node);
-  }
   for (vector<TpgNode*>::const_iterator p = mTfoList.begin();
        p != mTfoList.end(); ++ p) {
     TpgNode* node = *p;
@@ -481,7 +462,7 @@ SatEngine2::run(TpgFault* f_tgt,
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < mTfoList.size(); ++ i) {
+  for (ymuint i = 0; i < tfo_end; ++ i) {
     TpgNode* node = mTfoList[i];
 
     bool has_fault = f_tgt->node() == node;
@@ -624,12 +605,6 @@ SatEngine2::clear_node_mark()
     node->clear_var();
   }
   mTfoList.clear();
-  for (vector<TpgNode*>::iterator p = mTfiList.begin();
-       p != mTfiList.end(); ++ p) {
-    TpgNode* node = *p;
-    node->clear_var();
-  }
-  mTfiList.clear();
 }
 
 // @brief 統計情報を得る．
