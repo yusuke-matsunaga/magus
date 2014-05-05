@@ -24,26 +24,6 @@ BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar 故障変数
-// @param[in] ovar 出力の変数
-// @param[in] fval 故障値
-void
-make_flt_cnf(SatSolver& solver,
-	     VarId ovar,
-	     int vval)
-{
-  Literal l2(ovar, false);
-  if ( vval == 0 ) {
-    solver.add_clause(~l2);
-  }
-  else {
-    solver.add_clause(l2);
-  }
-}
-
 // @brief ノードに正常回路用の変数を設定する．
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
@@ -462,19 +442,6 @@ SatEngine2::run(TpgFault* fault,
   for (ymuint i = 0; i < tfo_end; ++ i) {
     TpgNode* node = mTfoList[i];
 
-    bool has_fault = fnode == node;
-
-#if 1
-    if ( has_fault ) {
-      VarId fvar = node->fvar();
-      make_flt_cnf(solver, fvar, fval);
-    }
-#endif
-
-    if ( !has_fault ) {
-      make_fnode_cnf(solver, node);
-    }
-
     Literal glit(node->gvar(), false);
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
@@ -486,17 +453,16 @@ SatEngine2::run(TpgFault* fault,
     solver.add_clause( glit, ~flit,  dlit);
     solver.add_clause( glit,  flit, ~dlit);
 
-    // 出力の dlit が1になる条件を作る．
-    // - 1) 入力の dlit のいずれかが 1
-    // - 2) 入力のいずれかに故障がある．
-    // - 3) 出力に故障がある．
-    // このうち，2) と 3) の場合は has_fault = true となっている．
-    if ( !has_fault ) {
+    if ( node != fnode ) {
+      // 故障回路のゲートの入出力関係を表すCNFを作る．
+      make_fnode_cnf(solver, node);
+
+      // 出力の dlit が1になる条件を作る．
+      // - 入力の dlit のいずれかが 1
       ymuint ni = node->fanin_num();
       mTmpLits.clear();
       mTmpLits.reserve(ni + 1);
-      Literal dlit(node->dvar(), true);
-      mTmpLits.push_back(dlit);
+      mTmpLits.push_back(~dlit);
       for (ymuint j = 0; j < ni; ++ j) {
 	TpgNode* inode = node->fanin(j);
 	if ( inode->has_fvar() ) {
@@ -536,8 +502,10 @@ SatEngine2::run(TpgFault* fault,
     mTmpLits.push_back(dlit);
   }
 
-  bool inv = (fval != 0);
-  mTmpLits.push_back(Literal(fnode->gvar(), inv));
+  // fnode の dlit を1と仮定しているので
+  // ここでは fvar か gvar のどちらかを仮定すればよい．
+  bool inv = (fval == 0);
+  mTmpLits.push_back(Literal(fnode->fvar(), inv));
 
   if ( mTimerEnable ) {
     mTimer.reset();
