@@ -147,9 +147,6 @@ private:
   // SAT solver の記録用ストリーム
   ostream* mOutP;
 
-  // SAT 用の assumption を格納するベクタ
-  vector<Literal> mAssumptions;
-
   // SAT の結果を格納する配列
   vector<Bool3> mModel;
 
@@ -159,17 +156,14 @@ private:
   // 故障の TFO のノードリスト
   vector<TpgNode*> mTfoList;
 
-  // 故障の TFO の TFI のノードリスト
-  vector<TpgNode*> mTfiList;
-
-  // 変数を割り当てたノードを格納するリスト
-  vector<TpgNode*> mUsedNodeList;
-
   // 現在の故障に関係のありそうな外部入力のリスト
   vector<TpgNode*> mInputList;
 
   // 現在の故障に関係ありそうな外部出力のリスト
   vector<TpgNode*> mOutputList;
+
+  // 作業用のリテラルのリスト
+  vector<Literal> mTmpLits;
 
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
@@ -250,6 +244,10 @@ void
 SatEngine::set_tfo_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 1U;
+  mTfoList.push_back(node);
+  if ( node->is_output() ) {
+    mOutputList.push_back(node);
+  }
 }
 
 // @brief tfo マークを読む．
@@ -266,6 +264,10 @@ void
 SatEngine::set_tfi_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 2U;
+  mTfoList.push_back(node);
+  if ( node->is_input() ) {
+    mInputList.push_back(node);
+  }
 }
 
 // @brief tfi マークを読む．
