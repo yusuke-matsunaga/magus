@@ -89,6 +89,12 @@ public:
   const TpgNode*
   node(ymuint id) const;
 
+  /// @brief ノード番号の最大値を得る．
+  ///
+  /// ダミーノードがあるので上の node_num() とは異なる．
+  ymuint
+  max_node_id() const;
+
   /// @brief 外部入力数を得る．
   ymuint
   input_num() const;
@@ -247,13 +253,27 @@ private:
 		 ymuint ni,
 		 ymuint nfo);
 
-  /// @brief TpgNode を生成する．
+  /// @brief ダミーノード用の TpgNode を生成する．
+  /// @return 生成したノードを返す．
+  TpgNode*
+  make_dummy_node();
+
+  /// @brief TpgNode を初期化する．
+  /// @param[in] node 対象のノード
   /// @param[in] ni ファンイン数
   /// @param[in] nfo ファンアウト数
   /// @return 生成したノードを返す．
-  TpgNode*
-  make_node(ymuint ni,
+  void
+  init_node(TpgNode* node,
+	    ymuint ni,
 	    ymuint nfo);
+
+  /// @brief TpgNode を生成する．
+  /// @return 生成したノードを返す．
+  ///
+  /// 実際には mNodeChunk で確保した領域から返す．
+  TpgNode*
+  new_node();
 
   /// @brief ノード間の接続を行う．
   /// @param[in] src ソースノード
@@ -356,9 +376,6 @@ private:
   // TpgNetwork 関係のメモリ確保を行なうオブジェクト
   SimpleAlloc mAlloc;
 
-  // 全ノード数
-  ymuint32 mNodeNum;
-
   // 外部入力数
   ymuint32 mInputNum;
 
@@ -368,8 +385,14 @@ private:
   // FF数
   ymuint32 mFFNum;
 
+  // ノード数(mNodeArrayの要素数)
+  ymuint32 mNodeNum;
+
   // ノードの本体の配列
   TpgNode* mNodeArray;
+
+  // ノード番号の最大値
+  ymuint32 mMaxNodeId;
 
   // TgNode->gid() をキーにした TpgMap の配列
   TpgNode** mNodeMap;
@@ -409,8 +432,8 @@ private:
   // 代表故障のリスト
   vector<TpgFault*> mRepFaults;
 
-  // ブランチの故障用のダミーノード
-  TpgNode* mDummyNode;
+  // 未使用のブランチの故障用のダミーノードのリスト
+  vector<TpgNode*> mDummyNodeList;
 
 };
 
@@ -425,6 +448,16 @@ ymuint
 TpgNetwork::node_num() const
 {
   return mNodeNum;
+}
+
+// @brief ノード番号の最大値を得る．
+//
+// ダミーノードがあるので上の node_num() とは異なる．
+inline
+ymuint
+TpgNetwork::max_node_id() const
+{
+  return mMaxNodeId;
 }
 
 // @brief 外部入力数を得る．

@@ -115,6 +115,10 @@ public:
   bool
   is_internal() const;
 
+  /// @brief ダミーノードの時 true を返す．
+  bool
+  is_dummy_node() const;
+
   /// @brief ファンイン数を得る．
   ymuint
   fanin_num() const;
@@ -347,6 +351,7 @@ private:
   //   2: 外部出力
   //   4: 論理ノード(外部ノード)
   //   5: 論理ノード(内部ノード)
+  //   6: 論理ノード(ダミーノード)
   // - [3:31] 入力/出力ノードの場合の通し番号
   //          or ゲートタイプ
   ymuint32 mTypeId;
@@ -479,7 +484,7 @@ inline
 bool
 TpgNode::is_logic() const
 {
-  return (mTypeId & 6U) == 4U;
+  return (mTypeId & 4U) == 4U;
 }
 
 // @brief ゲートタイプを得る．
@@ -509,6 +514,14 @@ bool
 TpgNode::is_internal() const
 {
   return (mTypeId & 7U) == 5U;
+}
+
+// @brief ダミーノードの時 true を返す．
+inline
+bool
+TpgNode::is_dummy_node() const
+{
+  return (mTypeId & 7U) == 6U;
 }
 
 // @brief ファンイン数を得る．

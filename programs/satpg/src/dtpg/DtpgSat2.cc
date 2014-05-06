@@ -61,7 +61,7 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
 {
   mSatEngine.clear_stats();
 
-  mMaxId = tgnetwork.node_num();
+  mMaxId = tgnetwork.max_node_id();
 
   tgnetwork.activate_all();
 
@@ -124,7 +124,7 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
     TpgNode* fnode = network.inject_fnode(fault->node(), fault->pos());
-    mSatEngine.run(fault, fnode, fault->val(), mMaxId, bt, dop, uop);
+    mSatEngine.run(fault, fnode, fault->val(), network.max_node_id(), bt, dop, uop);
     network.remove_fnode(fnode);
  }
 }

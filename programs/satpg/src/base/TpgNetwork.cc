@@ -323,14 +323,11 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     }
   }
 
-  // ダミーノードの分
-  ++ nn;
-
   mInputNum = tgnetwork.input_num1();
   mOutputNum = tgnetwork.output_num1();
   mFFNum = tgnetwork.ff_num();
 
-  mNodeNum = 0;
+  mNodeNum = nn;
   mNodeArray = alloc_array<TpgNode>(mAlloc, nn);
 
   mNodeMap = alloc_array<TpgNode*>(mAlloc, nn_orig);
@@ -348,6 +345,8 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   for (ymuint i = 0; i < nn; ++ i) {
     mTmpMark[i] = false;
   }
+
+  mMaxNodeId = 0;
 
   //////////////////////////////////////////////////////////////////////
   // 外部入力を作成する．
@@ -380,15 +379,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     mOutputArray[i] = node;
   }
 
-
-  //////////////////////////////////////////////////////////////////////
-  // ダミーノードを作成する．
-  //////////////////////////////////////////////////////////////////////
-
-  // 見かけはバッファ
-  mDummyNode = make_prim_node(kTgGateBuff, false, 1, 1);
-
-  assert_cond( nn == mNodeNum, __FILE__, __LINE__);
+  assert_cond( mNodeNum == nn, __FILE__, __LINE__);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -471,67 +462,77 @@ TpgNetwork::inject_fnode(TpgNode* node,
 			 ymuint ipos)
 {
   if ( node->fanin_num() == 1 ) {
+    // 自明なパタンその1
+    // ファンイン数が1のノードの入力の故障は
+    // 出力の故障と等価
     assert_cond( ipos == 0, __FILE__, __LINE__);
+    assert_cond( node->gate_type() == kTgGateBuff, __FILE__, __LINE__);
     return node;
   }
 
   TpgNode* src_node = node->fanin(ipos);
   if ( src_node->mActFanoutNum == 1 ) {
+    // 自明なパタンその2
+    // 入力のソースとなるノードが自分にしかファンアウトしていない
+    // 場合にはソースの出力と等価
     return src_node;
   }
 
-  node->mFanins[ipos] = mDummyNode;
-  mDummyNode->mFanoutNum = 1;
-  mDummyNode->mFanouts[0] = node;
-  mDummyNode->mActFanoutNum = 1;
-  mDummyNode->mActFanouts[0] = node;
+  // そうでなければダミーノードを挿入する．
+  TpgNode* dummy_node = make_dummy_node();
+  node->mFanins[ipos] = dummy_node;
+  dummy_node->mFanoutNum = 1;
+  dummy_node->mFanouts[0] = node;
+  dummy_node->mActFanoutNum = 1;
+  dummy_node->mActFanouts[0] = node;
 
   for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
     if ( src_node->mFanouts[i] == node ) {
-      src_node->mFanouts[i] = mDummyNode;
+      src_node->mFanouts[i] = dummy_node;
       break;
     }
   }
   for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
     if ( src_node->mActFanouts[i] == node ) {
-      src_node->mActFanouts[i] = mDummyNode;
+      src_node->mActFanouts[i] = dummy_node;
       break;
     }
   }
-  mDummyNode->mFanins[0] = src_node;
-  mDummyNode->mImmDom = node;
+  dummy_node->mFanins[0] = src_node;
+  dummy_node->mImmDom = node;
 
-  return mDummyNode;
+  return dummy_node;
 }
 
 // @brief 挿入したダミーノードを削除する．
-// @param[in] fnode 挿入したダミーノード
+// @param[in] node 挿入したダミーノード
 void
 TpgNetwork::remove_fnode(TpgNode* node)
 {
-  if ( node == mDummyNode ) {
-    TpgNode* src_node = mDummyNode->fanin(0);
-    TpgNode* dst_node = mDummyNode->fanout(0);
+  if ( node->is_dummy_node() ) {
+    TpgNode* src_node = node->fanin(0);
+    TpgNode* dst_node = node->fanout(0);
     for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
-      if ( src_node->mActFanouts[i] == mDummyNode ) {
+      if ( src_node->mActFanouts[i] == node ) {
 	src_node->mActFanouts[i] = dst_node;
 	break;
       }
     }
     for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
-      if ( src_node->mFanouts[i] = mDummyNode ) {
+      if ( src_node->mFanouts[i] = node ) {
 	src_node->mFanouts[i] = dst_node;
 	break;
       }
     }
     for (ymuint i = 0; i < dst_node->mFaninNum; ++ i) {
-      if ( dst_node->mFanins[i] == mDummyNode ) {
+      if ( dst_node->mFanins[i] == node ) {
 	dst_node->mFanins[i] = src_node;
 	break;
       }
     }
-    mDummyNode->mFanoutNum = 0;
-    mDummyNode->mActFanoutNum = 0;
+    node->mFanoutNum = 0;
+    node->mActFanoutNum = 0;
+    mDummyNodeList.push_back(node);
   }
 }
 
@@ -668,7 +669,8 @@ TpgNetwork::node(ymuint pos) const
 TpgNode*
 TpgNetwork::make_input_node(const TgNode* tgnode)
 {
-  TpgNode* node = make_node(0, tgnode->fanout_num());
+  TpgNode* node = new_node();
+  init_node(node, 0, tgnode->fanout_num());
   node->mTypeId = 1U | (tgnode->lid() << 3);
 
   bind(node, tgnode);
@@ -682,7 +684,8 @@ TpgNetwork::make_input_node(const TgNode* tgnode)
 TpgNode*
 TpgNetwork::make_output_node(const TgNode* tgnode)
 {
-  TpgNode* node = make_node(1, 0);
+  TpgNode* node = new_node();
+  init_node(node, 1, 0);
   node->mTypeId = 2U | (tgnode->lid() << 3);
 
   const TgNode* itgnode = tgnode->fanin(0);
@@ -847,7 +850,8 @@ TpgNetwork::make_prim_node(tTgGateType type,
 			   ymuint ni,
 			   ymuint nfo)
 {
-  TpgNode* node = make_node(ni, nfo);
+  TpgNode* node = new_node();
+  init_node(node, ni, nfo);
   node->mTypeId = 4U | (static_cast<ymuint>(type) << 3);
   if ( !root ) {
     node->mTypeId |= 1U;
@@ -873,18 +877,34 @@ TpgNetwork::make_prim_node(tTgGateType type,
   return node;
 }
 
-// @brief TpgNode を生成する．
-// @param[in] ni ファンイン数
-// @param[in] nfo ファンアウト数
+// @brief ダミーノード用の TpgNode を生成する．
 // @return 生成したノードを返す．
 TpgNode*
-TpgNetwork::make_node(ymuint ni,
+TpgNetwork::make_dummy_node()
+{
+  // new_node() は使わない．
+  if ( mDummyNodeList.empty() ) {
+    void* p = mAlloc.get_memory(sizeof(TpgNode));
+    TpgNode* node = new (p) TpgNode();
+    node->mId = mMaxNodeId;
+    ++ mMaxNodeId;
+    init_node(node, 1, 1);
+    node->mTypeId = 6U | (static_cast<ymuint>(kTgGateBuff) << 3);
+    return node;
+  }
+  TpgNode* node = mDummyNodeList.back();
+  mDummyNodeList.pop_back();
+  return node;
+}
+
+// @brief TpgNode を初期化する．
+// @param[in] ni ファンイン数
+// @param[in] nfo ファンアウト数
+void
+TpgNetwork::init_node(TpgNode* node,
+		      ymuint ni,
 		      ymuint nfo)
 {
-  TpgNode* node = &mNodeArray[mNodeNum];
-  node->mId = mNodeNum;
-  ++ mNodeNum;
-
   node->mName = NULL;
 
   node->mCval = kB3X;
@@ -914,6 +934,19 @@ TpgNetwork::make_node(ymuint ni,
   node->mOutputFault[1] = NULL;
 
   node->mMarks = 0U;
+}
+
+// @brief TpgNode を生成する．
+// @return 生成したノードを返す．
+//
+// 実際には mNodeChunk で確保した領域から返す．
+TpgNode*
+TpgNetwork::new_node()
+{
+  assert_cond( mMaxNodeId < mNodeNum, __FILE__, __LINE__);
+  TpgNode* node = &mNodeArray[mMaxNodeId];
+  node->mId = mMaxNodeId;
+  ++ mMaxNodeId;
 
   return node;
 }
