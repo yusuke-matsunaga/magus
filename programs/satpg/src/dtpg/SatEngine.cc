@@ -525,15 +525,6 @@ SatEngine::run(const vector<TpgFault*>& flist,
   for (ymuint i = 0; i < tfo_end; ++ i) {
     TpgNode* node = mTfoList[i];
 
-    // inputs[] に入力変数を表すリテラルを格納する．
-    ymuint ni = node->fanin_num();
-    vector<Literal> inputs(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      VarId ivar = inode->fvar();
-      inputs[i] = Literal(ivar, false);
-    }
-
     // ovar に出力変数を入れる．
     // こちらは入力の故障と異なり，故障挿入回路の出力が node->fvar() となる．
     // 逆に ovar はゲートの直接の出力変数となる．
@@ -556,25 +547,28 @@ SatEngine::run(const vector<TpgFault*>& flist,
     solver.add_clause( glit, ~flit,  dlit);
     solver.add_clause( glit,  flit, ~dlit);
 
-    Literal gate_output(ovar, false);
+    Literal olit(ovar, false);
     if ( node->is_input() ) {
-      solver.add_clause(~glit,  gate_output);
-      solver.add_clause( glit, ~gate_output);
+      solver.add_clause(~glit,  olit);
+      solver.add_clause( glit, ~olit);
     }
     else {
       if ( node->is_output() ) {
-	solver.add_clause( inputs[0], ~gate_output);
-	solver.add_clause(~inputs[0],  gate_output);
+	TpgNode* inode = node->fanin(0);
+	Literal ilit(inode->fvar(), false);
+	solver.add_clause( ilit, ~olit);
+	solver.add_clause(~ilit,  olit);
       }
       else {
-	make_gate_cnf(solver, node->gate_type(), gate_output,
-		      VectorInputLiteral(inputs));
+	make_gate_cnf(solver, node->gate_type(), olit,
+		      FvarInputLiteral(node));
       }
 
       // 出力の dlit が1になる条件を作る．
       // - 入力の dlit のいずれかが 1
       // - 入力のいずれかに故障がある．
       // - 出力に故障がある．
+      ymuint ni = node->fanin_num();
       mTmpLits.clear();
       mTmpLits.reserve(ni + 3);
       Literal dlit(node->dvar(), true);
@@ -586,9 +580,9 @@ SatEngine::run(const vector<TpgFault*>& flist,
 	}
       }
 
-      for (ymuint i = 0; i < nf; ++ i) {
-	if ( fnode_list[i] == node ) {
-	  mTmpLits.push_back(Literal(flt_var[i], false));
+      for (ymuint fid = 0; fid < nf; ++ fid) {
+	if ( fnode_list[fid] == node ) {
+	  mTmpLits.push_back(Literal(flt_var[fid], false));
 	}
       }
 
