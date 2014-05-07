@@ -123,9 +123,10 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        fault->is_rep() &&
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
+    network.begin_fault_injection();
     TpgNode* fnode = network.inject_fnode(fault->node(), fault->pos());
     mSatEngine.run(fault, fnode, fault->val(), network.max_node_id(), bt, dop, uop);
-    network.remove_fnode(fnode);
+    network.end_fault_injection();
  }
 }
 

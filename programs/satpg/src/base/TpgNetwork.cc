@@ -453,6 +453,13 @@ TpgNetwork::~TpgNetwork()
   // 開放してくれる．
 }
 
+// @brief 故障挿入の開始
+void
+TpgNetwork::begin_fault_injection()
+{
+  mFnodeList.clear();
+}
+
 // @brief ブランチの故障用のダミーノードを挿入する．
 // @param[in] node 対象のノード
 // @param[in] ipos 入力位置
@@ -480,6 +487,7 @@ TpgNetwork::inject_fnode(TpgNode* node,
 
   // そうでなければダミーノードを挿入する．
   TpgNode* dummy_node = make_dummy_node();
+  mFnodeList.push_back(dummy_node);
   node->mFanins[ipos] = dummy_node;
   dummy_node->mFanoutNum = 1;
   dummy_node->mFanouts[0] = node;
@@ -505,11 +513,12 @@ TpgNetwork::inject_fnode(TpgNode* node,
 }
 
 // @brief 挿入したダミーノードを削除する．
-// @param[in] node 挿入したダミーノード
 void
-TpgNetwork::remove_fnode(TpgNode* node)
+TpgNetwork::end_fault_injection()
 {
-  if ( node->is_dummy_node() ) {
+  for (vector<TpgNode*>::iterator p = mFnodeList.begin();
+       p != mFnodeList.end(); ++ p) {
+    TpgNode* node = *p;
     TpgNode* src_node = node->fanin(0);
     TpgNode* dst_node = node->fanout(0);
     for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
@@ -534,6 +543,7 @@ TpgNetwork::remove_fnode(TpgNode* node)
     node->mActFanoutNum = 0;
     mDummyNodeList.push_back(node);
   }
+  mFnodeList.clear();
 }
 
 // @brief 一つの外部出力に関係するノードのみをアクティブにする．
@@ -820,13 +830,20 @@ TpgNetwork::make_cplx_node(const Expr& expr,
   }
 
   ymuint nc = expr.child_num();
-  TpgNode* node = make_prim_node(gate_type, false, nc, nfo);
-
+  vector<TpgNode*> fanins(nc);
   for (ymuint i = 0; i < nc; ++ i) {
     const Expr& expr1 = expr.child(i);
     TpgNode* inode = make_cplx_node(expr1, 1, leaf_nodes, input_map);
+    fanins[i] = inode;
+  }
+  // fanins[] を確保するオーバーヘッドがあるが，
+  // 子供のノードよりも先に親のノードを確保するわけには行かない．
+  TpgNode* node = make_prim_node(gate_type, false, nc, nfo);
+  for (ymuint i = 0; i < nc; ++ i) {
+    TpgNode* inode = fanins[i];
     connect(inode, node, i);
     // 美しくないけどスマートなやり方を思いつかない．
+    const Expr& expr1 = expr.child(i);
     if ( expr1.is_posiliteral() ) {
       ymuint iid = expr1.varid().val();
       if ( input_map[iid].first == NULL ) {

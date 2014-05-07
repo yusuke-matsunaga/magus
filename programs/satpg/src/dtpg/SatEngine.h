@@ -55,6 +55,7 @@ public:
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   run(const vector<TpgFault*>& flist,
+      const vector<TpgNode*>& fnode_list,
       ymuint max_id,
       BackTracer& bt,
       DetectOp& dop,

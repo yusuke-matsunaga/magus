@@ -280,18 +280,6 @@ DtpgSat::add_fault(TpgFault* fault)
   }
 }
 
-// @brief テストパタン生成を行なう．
-inline
-void
-DtpgSat::do_dtpg(BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop)
-{
-  if ( !mFaultList.empty() ) {
-    mSatEngine.run(mFaultList, mMaxId, bt, dop, uop);
-  }
-}
-
 END_NAMESPACE_YM_SATPG
 
 #endif // DTPGSAT_H

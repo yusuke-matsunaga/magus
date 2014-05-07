@@ -139,6 +139,10 @@ public:
   // 故障挿入に関する関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障挿入の開始
+  void
+  begin_fault_injection();
+
   /// @brief ブランチの故障用のダミーノードを挿入する．
   /// @param[in] node 対象のノード
   /// @param[in] ipos 入力位置
@@ -148,9 +152,8 @@ public:
 	       ymuint ipos);
 
   /// @brief 挿入したダミーノードを削除する．
-  /// @param[in] fnode 挿入したダミーノード
   void
-  remove_fnode(TpgNode* node);
+  end_fault_injection();
 
 
 public:
@@ -434,6 +437,9 @@ private:
 
   // 未使用のブランチの故障用のダミーノードのリスト
   vector<TpgNode*> mDummyNodeList;
+
+  // 現在挿入中のダミーノードのリスト
+  vector<TpgNode*> mFnodeList;
 
 };
 
