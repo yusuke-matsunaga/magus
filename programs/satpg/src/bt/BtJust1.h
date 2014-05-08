@@ -25,9 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] tvmgr TvMgr
-  /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtJust1(TvMgr& tvmgr,
-	  ymuint max_id);
+  BtJust1(TvMgr& tvmgr);
 
   /// @brief デストラクタ
   virtual

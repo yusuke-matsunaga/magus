@@ -14,12 +14,10 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Just1' タイプの生成を行なう．
 // @param[in] tvmgr TvMgr
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust1(TvMgr& tvmgr,
-	    ymuint max_id)
+new_BtJust1(TvMgr& tvmgr)
 {
-  return new BtJust1(tvmgr, max_id);
+  return new BtJust1(tvmgr);
 }
 
 
@@ -29,10 +27,8 @@ new_BtJust1(TvMgr& tvmgr,
 
 // @brief コンストラクタ
 // @param[in] tvmgr TvMgr
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtJust1::BtJust1(TvMgr& tvmgr,
-		 ymuint max_id) :
-  BtJustBase(tvmgr, max_id)
+BtJust1::BtJust1(TvMgr& tvmgr) :
+  BtJustBase(tvmgr)
 {
 }
 

@@ -26,9 +26,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] tvmgr TvMgr
-  /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtZdd(TvMgr& tvmgr,
-	ymuint max_id);
+  BtZdd(TvMgr& tvmgr);
 
   /// @brief デストラクタ
   virtual
@@ -39,6 +37,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // BackTracer の仮想関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードID番号の最大値を設定する．
+  /// @param[in] max_id ID番号の最大値
+  virtual
+  void
+  set_max_id(ymuint max_id);
 
   /// @brief バックトレースを行なう．
   /// @param[in] fnode 故障のあるノード

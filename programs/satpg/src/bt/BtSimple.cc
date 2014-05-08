@@ -14,10 +14,8 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Simple' タイプの生成を行なう．
 // @param[in] tvmgr TvMgr
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtSimple(TvMgr& tvmgr,
-	     ymuint max_id)
+new_BtSimple(TvMgr& tvmgr)
 {
   return new BtSimple(tvmgr);
 }

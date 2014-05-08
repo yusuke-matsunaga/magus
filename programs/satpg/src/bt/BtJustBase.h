@@ -26,13 +26,25 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] tvmgr TvMgr
-  /// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-  BtJustBase(TvMgr& tvmgr,
-	     ymuint max_id);
+  BtJustBase(TvMgr& tvmgr);
 
   /// @brief デストラクタ
   virtual
   ~BtJustBase();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // Backtracer の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードID番号の最大値を設定する．
+  /// @param[in] max_id ID番号の最大値
+  ///
+  /// このクラスの実装ではなにもしない．
+  virtual
+  void
+  set_max_id(ymuint max_id);
 
 
 protected:

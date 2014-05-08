@@ -15,12 +15,10 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Zdd' タイプの生成を行なう．
 // @param[in] tvmgr TvMgr
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtZdd(TvMgr& tvmgr,
-	  ymuint max_id)
+new_BtZdd(TvMgr& tvmgr)
 {
-  return new BtZdd(tvmgr, max_id);
+  return new BtZdd(tvmgr);
 }
 
 
@@ -30,18 +28,24 @@ new_BtZdd(TvMgr& tvmgr,
 
 // @brief コンストラクタ
 // @param[in] tvmgr TvMgr
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtZdd::BtZdd(TvMgr& tvmgr,
-	     ymuint max_id) :
-  BtJustBase(tvmgr, max_id),
-  mMgr(""),
-  mJustArray(max_id)
+BtZdd::BtZdd(TvMgr& tvmgr) :
+  BtJustBase(tvmgr),
+  mMgr("")
 {
 }
 
 // @brief デストラクタ
 BtZdd::~BtZdd()
 {
+}
+
+// @brief ノードID番号の最大値を設定する．
+// @param[in] max_id ID番号の最大値
+void
+BtZdd::set_max_id(ymuint max_id)
+{
+  mJustArray.resize(max_id);
+  BtJustBase::set_max_id(max_id);
 }
 
 // @brief バックトレースを行なう．

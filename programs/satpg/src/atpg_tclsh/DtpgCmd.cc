@@ -168,13 +168,12 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     xmode = mPoptX->val();
   }
   TvMgr& tvmgr = mgr()._tv_mgr();
-  ymuint max_id = mgr()._network().node_num();
   BackTracer* bt = NULL;
   switch ( xmode ) {
-  case 1: bt = new_BtJust1(tvmgr, max_id); break;
-  case 2: bt = new_BtJust2(tvmgr, max_id); break;
-  case 3: bt = new_BtZdd(tvmgr, max_id); break;
-  default: bt = new_BtSimple(tvmgr, max_id); break;
+  case 1: bt = new_BtJust1(tvmgr); break;
+  case 2: bt = new_BtJust2(tvmgr); break;
+  case 3: bt = new_BtZdd(tvmgr); break;
+  default: bt = new_BtSimple(tvmgr); break;
   }
 
   if ( mPoptDrop->is_specified() ) {

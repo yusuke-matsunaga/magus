@@ -30,6 +30,15 @@ BtBase::~BtBase()
 {
 }
 
+// @brief ノードID番号の最大値を設定する．
+/// @param[in] max_id ID番号の最大値
+//
+// このクラスの実装ではなにもしない．
+void
+BtBase::set_max_id(ymuint max_id)
+{
+}
+
 // @brief テストベクタを生成する．
 // @note 結果は mCurPattern に格納される．
 TestVector*

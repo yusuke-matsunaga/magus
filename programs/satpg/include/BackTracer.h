@@ -33,6 +33,12 @@ public:
   // 継承クラスが実装する仮想関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ノードID番号の最大値を設定する．
+  /// @param[in] max_id ID番号の最大値
+  virtual
+  void
+  set_max_id(ymuint max_id) = 0;
+
   /// @brief バックトレースを行なう．
   /// @param[in] fnode 故障のあるノード
   /// @param[in] model SATの値の割り当て結果を収めた配列
@@ -50,31 +56,23 @@ public:
 
 /// @brief 'Simple' タイプの生成を行なう．
 /// @param[in] tvmgr TvMgr
-/// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtSimple(TvMgr& tvmgr,
-	     ymuint max_id);
+new_BtSimple(TvMgr& tvmgr);
 
 /// @brief 'Just1' タイプの生成を行なう．
 /// @param[in] tvmgr TvMgr
-/// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust1(TvMgr& tvmgr,
-	    ymuint max_id);
+new_BtJust1(TvMgr& tvmgr);
 
 /// @brief 'Just2' タイプの生成を行なう．
 /// @param[in] tvmgr TvMgr
-/// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtJust2(TvMgr& tvmgr,
-	    ymuint max_id);
+new_BtJust2(TvMgr& tvmgr);
 
 /// @brief 'Zdd' タイプの生成を行なう．
 /// @param[in] tvmgr TvMgr
-/// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
 BackTracer*
-new_BtZdd(TvMgr& tvmgr,
-	  ymuint max_id);
+new_BtZdd(TvMgr& tvmgr);
 
 END_NAMESPACE_YM_SATPG
 

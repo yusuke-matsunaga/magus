@@ -67,8 +67,8 @@ COMMON_SOURCES = \
 	SatEngine.cc \
 	SatEngine2.h \
 	SatEngine2.cc \
-	InputLiteral.h \
-	InputLiteral.cc
+	LitMap.h \
+	LitMap.cc
 
 
 ############################################################

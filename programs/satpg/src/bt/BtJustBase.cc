@@ -18,18 +18,26 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] tvmgr TvMgr
-// @param[in] max_id ノードの最大 ID + 1 ( = TpgNetwork::node_num() )
-BtJustBase::BtJustBase(TvMgr& tvmgr,
-		       ymuint max_id) :
-  BtBase(tvmgr),
-  mJustifiedMarkArray(max_id)
+BtJustBase::BtJustBase(TvMgr& tvmgr) :
+  BtBase(tvmgr)
 {
-  mJustifiedNodeList.reserve(max_id);
 }
 
 // @brief デストラクタ
 BtJustBase::~BtJustBase()
 {
+}
+
+// @brief ノードID番号の最大値を設定する．
+// @param[in] max_id ID番号の最大値
+//
+// このクラスの実装ではなにもしない．
+void
+BtJustBase::set_max_id(ymuint max_id)
+{
+  mJustifiedMarkArray.clear();
+  mJustifiedMarkArray.resize(max_id, false);
+  mJustifiedNodeList.reserve(max_id);
 }
 
 // @brief justified マークを消す．
