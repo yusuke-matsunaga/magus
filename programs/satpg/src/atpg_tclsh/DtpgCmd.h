@@ -55,6 +55,9 @@ private:
   // minisat モードオプションの解析用オブジェクト
   TclPopt* mPoptMiniSat;
 
+  // minisat2 モードオプションの解析用オブジェクト
+  TclPopt* mPoptMiniSat2;
+
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
 

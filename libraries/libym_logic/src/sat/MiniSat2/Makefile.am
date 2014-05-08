@@ -5,12 +5,7 @@
 ## サブディレクトリの指定
 ############################################################
 
-SUBDIRS = \
-	ymsat \
-	MiniSat \
-	MiniSat2 \
-	dimacs \
-	.
+SUBDIRS =
 
 
 ############################################################
@@ -34,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libsat.la \
-	libsat_d.la \
-	libsat_p.la
+	libminisat2.la \
+	libminisat2_d.la \
+	libminisat2_p.la
 
 
 ############################################################
@@ -54,68 +49,73 @@ AM_CPPFLAGS = \
 ############################################################
 
 COMMON_SOURCES = \
-	SatSolver.cc \
-	SatMsgHandlerImpl1.cc
+	SatSolverMiniSat2.h \
+	SatSolverMiniSat2.cc \
+	Alg.h \
+	Alloc.h \
+	Heap.h \
+	IntTypes.h \
+	Map.h \
+	Options.h \
+	Options.cc \
+	ParseUtils.h \
+	Queue.h \
+	Solver.cc \
+	Solver.h \
+	SolverTypes.h \
+	Sort.h \
+	System.cc \
+	System.h \
+	Vec.h \
+	XAlloc.h
 
 
 ############################################################
-## libsat.la 用の変数の指定
+## libminisat2.la 用の変数の指定
 ############################################################
 
-libsat_la_CXXFLAGS = \
+libminisat2_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libsat_la_SOURCES = \
+libminisat2_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libsat_la_LIBADD = \
-	ymsat/libymsat.la \
-	MiniSat/libminisat.la \
-	MiniSat2/libminisat2.la \
-	dimacs/libdimacs.la
+libminisat2_la_LIBADD =
 
-libsat_la_LDFLAGS = \
+libminisat2_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libsat_d.la 用の変数の指定
+## libminisat2_d.la 用の変数の指定
 ############################################################
 
-libsat_d_la_CXXFLAGS = \
+libminisat2_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libsat_d_la_SOURCES = \
+libminisat2_d_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libsat_d_la_LIBADD = \
-	ymsat/libymsat_d.la \
-	MiniSat/libminisat_d.la \
-	MiniSat2/libminisat2_d.la \
-	dimacs/libdimacs_d.la
+libminisat2_d_la_LIBADD =
 
-libsat_d_la_LDFLAGS = \
+libminisat2_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libsat_p.la 用の変数の指定
+## libminisat2_p.la 用の変数の指定
 ############################################################
 
-libsat_p_la_CXXFLAGS = \
+libminisat2_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libsat_p_la_SOURCES = \
+libminisat2_p_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libsat_p_la_LIBADD = \
-	ymsat/libymsat_p.la \
-	MiniSat/libminisat_p.la \
-	MiniSat2/libminisat2_p.la \
-	dimacs/libdimacs_p.la
+libminisat2_p_la_LIBADD =
 
-libsat_p_la_LDFLAGS = \
+libminisat2_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

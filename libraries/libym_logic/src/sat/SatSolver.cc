@@ -13,6 +13,7 @@
 #include "ymsat/YmSatR.h"
 #include "ymsat/SatAnalyzer.h"
 #include "MiniSat/SatSolverMiniSat.h"
+#include "MiniSat2/SatSolverMiniSat2.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -31,6 +32,9 @@ SatSolver::SatSolver(const string& type,
 {
   if ( type == "minisat" ) {
     mImpl = new SatSolverMiniSat;
+  }
+  else if ( type == "minisat2" ) {
+    mImpl = new SatSolverMiniSat2;
   }
   else {
     SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);

@@ -37,6 +37,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			 "SATREC mode");
   mPoptMiniSat = new TclPopt(this, "minisat",
 			     "MINISAT mode");
+  mPoptMiniSat2 = new TclPopt(this, "minisat2",
+			     "MINISAT-2 mode");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
   mPoptSingle = new TclPopt(this, "single",
@@ -72,7 +74,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
   mPoptTimer = new TclPopt(this, "timer",
 			   "enable timer");
 
-  new_popt_group(mPoptSat, mPoptMiniSat, mPoptSatRec);
+  new_popt_group(mPoptSat, mPoptMiniSat, mPoptMiniSat2, mPoptSatRec);
   TclPoptGroup* mode_group = new_popt_group(mPoptSingle, mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
   add_popt(mode_group, mPoptSingle2);
   new_popt_group(mPoptPo, mPoptRpo);
@@ -110,6 +112,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( mPoptMiniSat->is_specified() ) {
     mgr().set_dtpg_mode("minisat");
+  }
+  else if ( mPoptMiniSat2->is_specified() ) {
+    mgr().set_dtpg_mode("minisat2");
   }
 
   bool print_stats = mPoptPrintStats->is_specified();
