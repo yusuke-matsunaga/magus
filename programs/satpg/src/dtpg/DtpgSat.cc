@@ -899,7 +899,9 @@ DtpgSat::do_dtpg(BackTracer& bt,
       fnode_list.push_back(node);
     }
   }
+
   mSatEngine.run(mFaultList, fnode_list, mNetwork->max_node_id(), bt, dop, uop);
+
   mNetwork->end_fault_injection();
 }
 

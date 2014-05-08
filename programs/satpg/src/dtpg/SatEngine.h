@@ -12,6 +12,7 @@
 
 #include "satpg_nsdef.h"
 #include "TpgNode.h"
+#include "LitMap.h"
 #include "logic/Literal.h"
 #include "logic/Bool3.h"
 #include "logic/sat_nsdef.h"
@@ -75,16 +76,89 @@ public:
   timer_enable(bool enable);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる下請け関数
+  // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 統計情報を得る．
-  /// @param[in] solver SatSolver
+  /// @brief SATソルバのタイプを得る．
+  string
+  sat_type() const;
+
+  /// @brief SATソルバのオプションを得る．
+  string
+  sat_option() const;
+
+  /// @brief SATソルバのログ出力を得る．
+  ostream*
+  sat_outp() const;
+
+  /// @brief CNF 作成を開始する．
   void
-  update_stats(SatSolver& solver,
-	       ymuint n);
+  cnf_begin();
+
+  /// @brief CNF 作成を終了する．
+  void
+  cnf_end();
+
+  /// @brief 故障位置を与えてその TFO の TFI リストを作る．
+  /// @param[in] solver SAT ソルバ
+  /// @param[in] fnode_list 故障位置のノードのリスト
+  /// @param[in] max_id ノード番号の最大値
+  ///
+  /// 結果は mTfoList に格納される．
+  /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
+  void
+  mark_region(SatSolver& solver,
+	      const vector<TpgNode*>& fnode_list,
+	      ymuint max_id);
+
+  /// @brief TFO ノードの数を得る．
+  ymuint
+  tfo_size() const;
+
+  /// @brief TFI ノードの数を得る．
+  ymuint
+  tfi_size() const;
+
+  /// @brief TFO ノードと TFI ノードの総数を得る．
+  ymuint
+  tfo_tfi_size() const;
+
+  /// @brief TFO/TFI ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < tfo_tfi_size() )
+  ///
+  /// pos が tfo_size() 未満のときは TFO ノード
+  /// それ以上は TFI ノードとなっている．
+  TpgNode*
+  tfo_tfi_node(ymuint pos) const;
+
+  /// @brief 出力のノードのリストを返す．
+  const vector<TpgNode*>&
+  output_list() const;
+
+  /// @brief 節の作成用の作業領域の使用を開始する．
+  /// @param[in] exp_size 予想されるサイズ
+  void
+  tmp_lits_begin(ymuint exp_size = 0);
+
+  /// @brief 作業領域にリテラルを追加する．
+  void
+  tmp_lits_add(Literal lit);
+
+  /// @brief 作業領域の冊を SAT ソルバに加える．
+  void
+  tmp_lits_end(SatSolver& solver);
+
+  /// @brief ノードの入出力の関係を表す CNF を作る．
+  /// @param[in] solver SATソルバ
+  /// @param[in] node 対象のノード
+  /// @param[in] litmap 入出力のリテラルを保持するクラス
+  static
+  void
+  make_node_cnf(SatSolver& solver,
+		TpgNode* node,
+		const LitMap& litmap);
 
   /// @brief 一つの SAT問題を解く．
   void
@@ -94,9 +168,36 @@ private:
 	DetectOp& dop,
 	UntestOp& uop);
 
+  /// @brief 統計情報を得る．
+  /// @param[in] solver SatSolver
+  void
+  update_stats(SatSolver& solver,
+	       ymuint n);
+
   /// @brief ノードの変数割り当てフラグを消す．
   void
   clear_node_mark();
+
+  /// @brief tmp マークをつける．
+  /// @param[in] node 対象のノード
+  void
+  set_tmp_mark(TpgNode* node);
+
+  /// @brief tmp マークを消す．
+  /// @param[in] node 対象のノード
+  void
+  clear_tmp_mark(TpgNode* node);
+
+  /// @brief tmp マークを読む．
+  /// @param[in] node 対象のノード
+  bool
+  tmp_mark(TpgNode* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる下請け関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief tfo マークをつける．
   /// @param[in] node 対象のノード
@@ -117,21 +218,6 @@ private:
   /// @param[in] node 対象のノード
   bool
   tfi_mark(TpgNode* node);
-
-  /// @brief tmp マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tmp_mark(TpgNode* node);
-
-  /// @brief tmp マークを消す．
-  /// @param[in] node 対象のノード
-  void
-  clear_tmp_mark(TpgNode* node);
-
-  /// @brief tmp マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tmp_mark(TpgNode* node);
 
 
 private:
@@ -157,6 +243,9 @@ private:
   // 故障の TFO のノードリスト
   vector<TpgNode*> mTfoList;
 
+  // TFO ノードの最後の位置
+  ymuint32 mTfoEnd;
+
   // 現在の故障に関係のありそうな外部入力のリスト
   vector<TpgNode*> mInputList;
 
@@ -165,9 +254,6 @@ private:
 
   // 作業用のリテラルのリスト
   vector<Literal> mTmpLits;
-
-  // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
 
   // CNF の生成回数
   ymuint32 mRunCount;
@@ -238,6 +324,96 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief SATソルバのタイプを得る．
+inline
+string
+SatEngine::sat_type() const
+{
+  return mType;
+}
+
+// @brief SATソルバのオプションを得る．
+inline
+string
+SatEngine::sat_option() const
+{
+  return mOption;
+}
+
+// @brief SATソルバのログ出力を得る．
+inline
+ostream*
+SatEngine::sat_outp() const
+{
+  return mOutP;
+}
+
+// @brief タイマーをスタートする．
+inline
+void
+SatEngine::cnf_begin()
+{
+  if ( mTimerEnable ) {
+    mTimer.start();
+  }
+}
+
+// @brief タイマーを止めて CNF 作成時間に加える．
+inline
+void
+SatEngine::cnf_end()
+{
+  if ( mTimerEnable ) {
+    mTimer.stop();
+    mCnfTime += mTimer.time();
+    ++ mCnfCount;
+  }
+}
+
+// @brief TFO ノードの数を得る．
+inline
+ymuint
+SatEngine::tfo_size() const
+{
+  return mTfoEnd;
+}
+
+// @brief TFI ノードの数を得る．
+inline
+ymuint
+SatEngine::tfi_size() const
+{
+  return mTfoList.size() - mTfoEnd;
+}
+
+// @brief TFO ノードと TFI ノードの総数を得る．
+inline
+ymuint
+SatEngine::tfo_tfi_size() const
+{
+  return mTfoList.size();
+}
+
+// @brief TFO/TFI ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < tfo_tfi_size() )
+//
+// pos が tfo_size() 未満のときは TFO ノード
+// それ以上は TFI ノードとなっている．
+inline
+TpgNode*
+SatEngine::tfo_tfi_node(ymuint pos) const
+{
+  return mTfoList[pos];
+}
+
+// @brief 出力のノードのリストを返す．
+inline
+const vector<TpgNode*>&
+SatEngine::output_list() const
+{
+  return mOutputList;
+}
 
 // tfo マークをつける．
 inline

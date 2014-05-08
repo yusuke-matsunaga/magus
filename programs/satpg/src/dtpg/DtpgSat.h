@@ -12,7 +12,7 @@
 
 #include "Dtpg.h"
 #include "TpgFault.h"
-#include "SatEngine.h"
+#include "SatEngineMulti.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -233,7 +233,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // SAT エンジン
-  SatEngine mSatEngine;
+  SatEngineMulti mSatEngine;
 
   // 対象の回路
   TpgNetwork* mNetwork;
