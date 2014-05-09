@@ -66,6 +66,7 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mOldVarNum(0),
   mVarSize(0),
   mVal(NULL),
+  mValCache(NULL),
   mDecisionLevel(NULL),
   mReason(NULL),
   mHeapPos(NULL),
@@ -107,6 +108,7 @@ YmSat::~YmSat()
 
   delete mAnalyzer;
   delete [] mVal;
+  delete [] mValCache;
   delete [] mDecisionLevel;
   delete [] mReason;
   delete [] mHeapPos;
@@ -148,6 +150,7 @@ YmSat::expand_var()
 {
   ymuint old_size = mVarSize;
   Bool3* old_val = mVal;
+  Bool3* old_val_cache = mValCache;
   int* old_decision_level = mDecisionLevel;
   SatReason* old_reason = mReason;
   ymint32* old_heap_pos = mHeapPos;
@@ -161,6 +164,7 @@ YmSat::expand_var()
     mVarSize <<= 1;
   }
   mVal = new Bool3[mVarSize];
+  mValCache = new Bool3[mVarSize];
   mDecisionLevel = new int[mVarSize];
   mReason = new SatReason[mVarSize];
   mHeapPos = new ymint32[mVarSize];
@@ -169,6 +173,7 @@ YmSat::expand_var()
   mHeap = new ymuint32[mVarSize];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
     mVal[i] = old_val[i];
+    mValCache[i] = old_val_cache[i];
     mDecisionLevel[i] = old_decision_level[i];
     mReason[i] = old_reason[i];
     mHeapPos[i] = old_heap_pos[i];
@@ -183,6 +188,7 @@ YmSat::expand_var()
   }
   if ( old_size > 0 ) {
     delete [] old_val;
+    delete [] old_val_cache;
     delete [] old_decision_level;
     delete [] old_reason;
     delete [] old_heap_pos;
@@ -801,7 +807,8 @@ YmSat::implication()
 	ymuint n = c->lit_num();
 	for (ymuint i = 2; i < n; ++ i) {
 	  Literal l2 = c->lit(i);
-	  if ( eval(l2) != kB3False ) {
+	  Bool3 v = eval(l2);
+	  if ( v != kB3False ) {
 	    // l2 を 1番めの watch literal にする．
 	    c->insert(i, 1);
 	    if ( debug & debug_implication ) {
@@ -909,11 +916,19 @@ YmSat::next_decision()
   while ( !heap_empty() ) {
     ymuint vindex = heap_pop_top();
     if ( mVal[vindex] == kB3X ) {
-      // Watcher の多い方の極性を(わざと)選ぶ
-      ymuint v2 = vindex * 2;
-      bool inv = true;
-      if ( mWatcherList[v2 + 0].num() >= mWatcherList[v2 + 1].num() ) {
-	inv = false;
+      bool inv = false;
+      if ( mValCache[vindex] != kB3X ) {
+	// 以前割り当てた極性を選ぶ
+	if ( mValCache[vindex] == kB3False ) {
+	  inv = true;
+	}
+      }
+      else {
+	// Watcher の多い方の極性を(わざと)選ぶ
+	ymuint v2 = vindex * 2;
+	if ( mWatcherList[v2 + 1].num() >= mWatcherList[v2 + 0].num() ) {
+	  inv = true;
+	}
       }
       return Literal(VarId(vindex), inv);
     }

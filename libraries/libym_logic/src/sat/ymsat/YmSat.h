@@ -436,6 +436,9 @@ private:
   // サイズは mVarSize
   Bool3* mVal;
 
+  // 前回割り当てた値
+  Bool3* mValCache;
+
   // 値が割り当てられたときのレベルの配列
   // サイズは mVarSize
   int* mDecisionLevel;
@@ -620,6 +623,7 @@ YmSat::assign(Literal lit,
   ymuint lindex = lit.index();
   ymuint vindex = lindex / 2;
   mVal[vindex] = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
+  mValCache[vindex] = mVal[vindex];
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
 
