@@ -57,7 +57,7 @@ SatSolverMiniSat2::add_clause(const vector<Literal>& lits)
     Lit lit = mkLit(static_cast<Var>(l.varid().val()), l.is_negative());
     tmp.push(lit);
   }
-  mSolver.addClause(tmp);
+  mSolver.addClause_(tmp);
 }
 
 // @brief 節を追加する．
@@ -73,7 +73,7 @@ SatSolverMiniSat2::add_clause(ymuint lit_num,
     Lit lit = mkLit(l.varid().val(), l.is_negative());
     tmp.push(lit);
   }
-  mSolver.addClause(tmp);
+  mSolver.addClause_(tmp);
 }
 
 // @brief SAT 問題を解く．
