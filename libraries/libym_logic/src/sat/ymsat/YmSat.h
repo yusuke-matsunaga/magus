@@ -38,21 +38,27 @@ struct Params
   /// @brief 学習節の decay 値
   double mClauseDecay;
 
+  /// @brief phase-cache ヒューリスティックを使うとき true
+  bool mPhaseCache;
+
   /// @brief コンストラクタ
   Params() :
     mVarDecay(1.0),
     mVarFreq(0.0),
-    mClauseDecay(1.0)
+    mClauseDecay(1.0),
+    mPhaseCache(true)
   {
   }
 
   /// @brief 値を指定したコンストラクタ
   Params(double var_decay,
 	 double var_freq,
-	 double clause_decay) :
+	 double clause_decay,
+	 bool phase_cache) :
     mVarDecay(var_decay),
     mVarFreq(var_freq),
-    mClauseDecay(clause_decay)
+    mClauseDecay(clause_decay),
+    mPhaseCache(phase_cache)
   {
   }
 

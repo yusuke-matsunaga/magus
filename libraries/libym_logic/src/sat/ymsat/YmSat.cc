@@ -45,7 +45,7 @@ END_NONAMESPACE
 
 
 const
-Params kDefaultParams(0.95, 0.02, 0.999);
+Params kDefaultParams(0.95, 0.02, 0.999, true);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -97,6 +97,8 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mRestart = 0;
 
   mTimerOn = false;
+
+  mParams.mPhaseCache = false;
 }
 
 // @brief デストラクタ
@@ -918,7 +920,7 @@ YmSat::next_decision()
     if ( mVal[vindex] == conv_from_Bool3(kB3X) ) {
       bool inv = false;
       ymuint8 vc = mValCache[vindex];
-      if ( vc != kB3X ) {
+      if ( mParams.mPhaseCache && vc != kB3X ) {
 	// 以前割り当てた極性を選ぶ
 	if ( vc == kB3False ) {
 	  inv = true;
