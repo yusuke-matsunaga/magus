@@ -355,6 +355,7 @@ void
 SatEngine::cnf_begin()
 {
   if ( mTimerEnable ) {
+    mTimer.reset();
     mTimer.start();
   }
 }
