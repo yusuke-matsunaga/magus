@@ -434,10 +434,10 @@ private:
 
   // 値の配列
   // サイズは mVarSize
-  Bool3* mVal;
+  ymuint8* mVal;
 
   // 前回割り当てた値
-  Bool3* mValCache;
+  ymuint8* mValCache;
 
   // 値が割り当てられたときのレベルの配列
   // サイズは mVarSize
@@ -581,12 +581,24 @@ YmSat::add_watcher(Literal watch_lit,
   watcher_list(watch_lit).add(Watcher(reason), mAlloc);
 }
 
+BEGIN_NONAMESPACE
+
+inline
+Bool3
+conv_to_Bool3(ymuint8 x)
+{
+  int tmp = static_cast<int>(x) - 1;
+  return static_cast<Bool3>(tmp);
+}
+
+END_NONAMESPACE
+
 // 変数の評価を行う．
 inline
 Bool3
 YmSat::eval(VarId id) const
 {
-  return mVal[id.val()];
+  return conv_to_Bool3(mVal[id.val()]);
 }
 
 // literal の評価を行う．
@@ -595,7 +607,7 @@ Bool3
 YmSat::eval(Literal l) const
 {
   ymuint index = l.index();
-  Bool3 val = mVal[index / 2];
+  Bool3 val = conv_to_Bool3(mVal[index / 2]);
   int d = 1 - (index & 1U) * 2;
   return static_cast<Bool3>(static_cast<int>(val) * d);
 }
@@ -614,6 +626,18 @@ YmSat::check_and_assign(Literal lit)
   return true;
 }
 
+BEGIN_NONAMESPACE
+
+inline
+ymuint8
+conv_from_Bool3(Bool3 b)
+{
+  int tmp = static_cast<int>(b) + 1;
+  return static_cast<ymuint8>(tmp);
+}
+
+END_NONAMESPACE
+
 // 値の割当てを行う．
 inline
 void
@@ -622,8 +646,10 @@ YmSat::assign(Literal lit,
 {
   ymuint lindex = lit.index();
   ymuint vindex = lindex / 2;
-  mVal[vindex] = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
-  mValCache[vindex] = mVal[vindex];
+  Bool3 b = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
+  ymuint8 x = conv_from_Bool3(b);
+  mVal[vindex] = x;
+  mValCache[vindex] = x;
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
 
@@ -686,7 +712,8 @@ YmSat::alloc_var()
       expand_var();
     }
     for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
-      mVal[i] = kB3X;
+      mVal[i] = conv_from_Bool3(kB3X);
+      mValCache[i] = conv_from_Bool3(kB3X);
       mActivity[i] = 0.0;
       heap_add_var(i);
     }

@@ -149,8 +149,8 @@ void
 YmSat::expand_var()
 {
   ymuint old_size = mVarSize;
-  Bool3* old_val = mVal;
-  Bool3* old_val_cache = mValCache;
+  ymuint8* old_val = mVal;
+  ymuint8* old_val_cache = mValCache;
   int* old_decision_level = mDecisionLevel;
   SatReason* old_reason = mReason;
   ymint32* old_heap_pos = mHeapPos;
@@ -163,8 +163,8 @@ YmSat::expand_var()
   while ( mVarSize < mVarNum ) {
     mVarSize <<= 1;
   }
-  mVal = new Bool3[mVarSize];
-  mValCache = new Bool3[mVarSize];
+  mVal = new ymuint8[mVarSize];
+  mValCache = new ymuint8[mVarSize];
   mDecisionLevel = new int[mVarSize];
   mReason = new SatReason[mVarSize];
   mHeapPos = new ymint32[mVarSize];
@@ -552,7 +552,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
     model.resize(mVarNum);
     for (ymuint i = 0; i < mVarNum; ++ i) {
-      Bool3 val = mVal[i];
+      Bool3 val = conv_to_Bool3(mVal[i]);
       assert_cond(val != kB3X, __FILE__, __LINE__);
       model[i] = val;
     }
@@ -885,7 +885,7 @@ YmSat::backtrack(int level)
       Literal p = mAssignList.get_prev();
       VarId varid = p.varid();
       ymuint vindex = varid.val();
-      mVal[vindex] = kB3X;
+      mVal[vindex] = conv_from_Bool3(kB3X);
       heap_push(vindex);
       if ( debug & debug_assign ) {
 	cout << "\tdeassign " << p << endl;
@@ -915,11 +915,12 @@ YmSat::next_decision()
 #endif
   while ( !heap_empty() ) {
     ymuint vindex = heap_pop_top();
-    if ( mVal[vindex] == kB3X ) {
+    if ( mVal[vindex] == conv_from_Bool3(kB3X) ) {
       bool inv = false;
-      if ( mValCache[vindex] != kB3X ) {
+      ymuint8 vc = mValCache[vindex];
+      if ( vc != kB3X ) {
 	// 以前割り当てた極性を選ぶ
-	if ( mValCache[vindex] == kB3False ) {
+	if ( vc == kB3False ) {
 	  inv = true;
 	}
       }
@@ -1157,7 +1158,7 @@ YmSat::heap_dump(ostream& s) const
 		__FILE__, __LINE__);
     if ( i > 0 ) {
       ymint p = (i - 1) >> 1;
-      assert_cond(mVal[mHeap[p]] >= mVal[vindex], __FILE__, __LINE__);
+      assert_cond(mActivity[mHeap[p]] >= mActivity[vindex], __FILE__, __LINE__);
     }
     s << spc << vindex << "("
       << mActivity[vindex]
