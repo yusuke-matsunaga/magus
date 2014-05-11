@@ -33,6 +33,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 				"specify verbose level (0, 1, 2, ...)");
   mPoptSat = new TclPopt(this, "sat",
 			 "SAT mode");
+  mPoptSatOption = new TclPoptStr(this, "sat-option",
+			 "SAT option <STRING>");
   mPoptSatRec = new TclPopt(this, "satrec",
 			 "SATREC mode");
   mPoptMiniSat = new TclPopt(this, "minisat",
@@ -104,17 +106,24 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   // SAT mode の設定
+  string sat_option;
+  if ( mPoptSatOption->is_specified() ) {
+    sat_option = mPoptSatOption->val();
+  }
   if ( mPoptSat->is_specified() ) {
-    mgr().set_dtpg_mode("", "classic");
+    mgr().set_dtpg_mode("", sat_option);
   }
   else if ( mPoptSatRec->is_specified() ) {
-    mgr().set_dtpg_mode("satrec", string(), &cout);
+    mgr().set_dtpg_mode("satrec", sat_option, &cout);
   }
   else if ( mPoptMiniSat->is_specified() ) {
     mgr().set_dtpg_mode("minisat");
   }
   else if ( mPoptMiniSat2->is_specified() ) {
     mgr().set_dtpg_mode("minisat2");
+  }
+  else {
+    mgr().set_dtpg_mode("", sat_option);
   }
 
   bool print_stats = mPoptPrintStats->is_specified();

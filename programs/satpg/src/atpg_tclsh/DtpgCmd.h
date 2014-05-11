@@ -49,6 +49,9 @@ private:
   // sat モードオプションの解析用オブジェクト
   TclPopt* mPoptSat;
 
+  // sat-option オプションの解析用オブジェクト
+  TclPoptStr* mPoptSatOption;
+
   // satrec モードオプションの解析用オブジェクト
   TclPopt* mPoptSatRec;
 
