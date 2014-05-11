@@ -98,7 +98,9 @@ YmSat::YmSat(SatAnalyzer* analyzer,
 
   mTimerOn = false;
 
-  mParams.mPhaseCache = false;
+  if ( option == "no_phase_cache" ) {
+    mParams.mPhaseCache = false;
+  }
 }
 
 // @brief デストラクタ
