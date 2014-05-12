@@ -64,7 +64,7 @@ SatSolverMiniSat::add_clause(const vector<Literal>& lits)
 // @param[in] lits リテラルの配列
 void
 SatSolverMiniSat::add_clause(ymuint lit_num,
-			     Literal* lits)
+			     const Literal* lits)
 {
   vec<Lit> tmp;
   for (ymuint i = 0; i < lit_num; ++ i) {

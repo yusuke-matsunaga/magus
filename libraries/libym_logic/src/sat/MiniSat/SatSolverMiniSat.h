@@ -62,7 +62,7 @@ public:
   virtual
   void
   add_clause(ymuint lit_num,
-	     Literal* lits);
+	     const Literal* lits);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト

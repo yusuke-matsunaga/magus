@@ -116,7 +116,7 @@ public:
   virtual
   void
   add_clause(ymuint lit_num,
-	     Literal* lits);
+	     const Literal* lits);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -239,6 +239,7 @@ private:
 	     bool learnt = false);
 
   /// @brief mTmpLits を確保する．
+  /// @param[in] lit_num リテラル数
   void
   alloc_lits(ymuint lit_num);
 
@@ -439,11 +440,10 @@ private:
   ymuint32 mVarSize;
 
   // 値の配列
-  // サイズは mVarSize
+  // サイズは mVarSize * 2
+  // 偶数には本当の値，
+  // 奇数には以前の値が入る．
   ymuint8* mVal;
-
-  // 前回割り当てた値
-  ymuint8* mValCache;
 
   // 値が割り当てられたときのレベルの配列
   // サイズは mVarSize
@@ -604,7 +604,7 @@ inline
 Bool3
 YmSat::eval(VarId id) const
 {
-  return conv_to_Bool3(mVal[id.val()]);
+  return conv_to_Bool3(mVal[id.val() * 2 + 0]);
 }
 
 // literal の評価を行う．
@@ -613,7 +613,7 @@ Bool3
 YmSat::eval(Literal l) const
 {
   ymuint index = l.index();
-  Bool3 val = conv_to_Bool3(mVal[index / 2]);
+  Bool3 val = conv_to_Bool3(mVal[(index / 2) * 2 + 0]);
   int d = 1 - (index & 1U) * 2;
   return static_cast<Bool3>(static_cast<int>(val) * d);
 }
@@ -654,8 +654,8 @@ YmSat::assign(Literal lit,
   ymuint vindex = lindex / 2;
   Bool3 b = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
   ymuint8 x = conv_from_Bool3(b);
-  mVal[vindex] = x;
-  mValCache[vindex] = x;
+  mVal[vindex * 2 + 0] = x;
+  mVal[vindex * 2 + 1] = x;
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
 
@@ -718,8 +718,8 @@ YmSat::alloc_var()
       expand_var();
     }
     for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
-      mVal[i] = conv_from_Bool3(kB3X);
-      mValCache[i] = conv_from_Bool3(kB3X);
+      mVal[i * 2 + 0] = conv_from_Bool3(kB3X);
+      mVal[i * 2 + 1] = conv_from_Bool3(kB3X);
       mActivity[i] = 0.0;
       heap_add_var(i);
     }

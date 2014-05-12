@@ -66,7 +66,6 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mOldVarNum(0),
   mVarSize(0),
   mVal(NULL),
-  mValCache(NULL),
   mDecisionLevel(NULL),
   mReason(NULL),
   mHeapPos(NULL),
@@ -112,7 +111,6 @@ YmSat::~YmSat()
 
   delete mAnalyzer;
   delete [] mVal;
-  delete [] mValCache;
   delete [] mDecisionLevel;
   delete [] mReason;
   delete [] mHeapPos;
@@ -154,7 +152,6 @@ YmSat::expand_var()
 {
   ymuint old_size = mVarSize;
   ymuint8* old_val = mVal;
-  ymuint8* old_val_cache = mValCache;
   int* old_decision_level = mDecisionLevel;
   SatReason* old_reason = mReason;
   ymint32* old_heap_pos = mHeapPos;
@@ -167,8 +164,7 @@ YmSat::expand_var()
   while ( mVarSize < mVarNum ) {
     mVarSize <<= 1;
   }
-  mVal = new ymuint8[mVarSize];
-  mValCache = new ymuint8[mVarSize];
+  mVal = new ymuint8[mVarSize * 2];
   mDecisionLevel = new int[mVarSize];
   mReason = new SatReason[mVarSize];
   mHeapPos = new ymint32[mVarSize];
@@ -176,8 +172,8 @@ YmSat::expand_var()
   mWatcherList = new WatcherList[mVarSize * 2];
   mHeap = new ymuint32[mVarSize];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
-    mVal[i] = old_val[i];
-    mValCache[i] = old_val_cache[i];
+    mVal[i * 2 + 0] = old_val[i * 2 + 0];
+    mVal[i * 2 + 1] = old_val[i * 2 + 1];
     mDecisionLevel[i] = old_decision_level[i];
     mReason[i] = old_reason[i];
     mHeapPos[i] = old_heap_pos[i];
@@ -192,7 +188,6 @@ YmSat::expand_var()
   }
   if ( old_size > 0 ) {
     delete [] old_val;
-    delete [] old_val_cache;
     delete [] old_decision_level;
     delete [] old_reason;
     delete [] old_heap_pos;
@@ -209,11 +204,14 @@ YmSat::expand_var()
 void
 YmSat::add_clause(const vector<Literal>& lits)
 {
+  // add_clause_sub() 中でリテラルの並び替えを行うので
+  // 一旦 mTmpLits にコピーする．
   ymuint n = lits.size();
   alloc_lits(n);
   for (ymuint i = 0; i < n; ++ i) {
     mTmpLits[i] = lits[i];
   }
+  // 節を追加する本体
   add_clause_sub(n);
 }
 
@@ -222,12 +220,15 @@ YmSat::add_clause(const vector<Literal>& lits)
 // @param[in] lits リテラルの配列
 void
 YmSat::add_clause(ymuint lit_num,
-		  Literal* lits)
+		  const Literal* lits)
 {
+  // add_clause_sub() 中でリテラルの並び替えを行うので
+  // 一旦 mTmpLits にコピーする．
   alloc_lits(lit_num);
   for (ymuint i = 0; i < lit_num; ++ i) {
     mTmpLits[i] = lits[i];
   }
+  // 節を追加する本体
   add_clause_sub(lit_num);
 }
 
@@ -246,18 +247,52 @@ YmSat::add_clause_sub(ymuint lit_num)
     return;
   }
 
+  // 変数領域の確保を行う．
   alloc_var();
 
+  // mTmpLits をソートする．
+  // たぶん要素数が少ないので挿入ソートが速いはず．
+  for (ymuint i = 1; i < lit_num; ++ i) {
+    // この時点で [0 : i - 1] までは整列している．
+    Literal l = mTmpLits[i];
+    if ( mTmpLits[i - 1] <= l ) {
+      // このままで [0 : i] まで整列していることになる．
+      continue;
+    }
+
+    // l の挿入位置を探す．
+    ymuint j = i;
+    for ( ; ; ) {
+      mTmpLits[j] = mTmpLits[j - 1];
+      -- j;
+      if ( j == 0 || mTmpLits[j - 1] <= l ) {
+	// 先頭に達するか，l よりも小さい要素があった．
+	break;
+      }
+    }
+    mTmpLits[j] = l;
+  }
+
   // - 重複したリテラルの除去
+  //   整列したのでおなじリテラルは並んでいるはず．
   // - false literal の除去
   // - true literal を持つかどうかのチェック
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < lit_num; ++ rpos) {
     Literal l = mTmpLits[rpos];
-    if ( wpos != 0 && mTmpLits[wpos - 1] == l ) {
-      // 重複している．
-      continue;
+    if ( wpos != 0 ) {
+      Literal l1 = mTmpLits[wpos - 1];
+      if ( l1 == l ) {
+	// 重複している．
+	continue;
+      }
+      if ( l1.varid() == l.varid() ) {
+	// 同じ変数の相反するリテラル
+	// この節は常に充足する．
+	return;
+      }
     }
+
     Bool3 v = eval(l);
     if ( v == kB3False ) {
       // false literal は追加しない．
@@ -269,6 +304,9 @@ YmSat::add_clause_sub(ymuint lit_num)
     }
     if ( l.varid().val() >= mVarNum ) {
       // 範囲外
+      // new_var() で確保した変数番号よりも大きい変数番号が
+      // 使われていた．
+      // TODO: エラー対策．
       cout << "Error![YmSat]: literal(" << l << "): out of range"
 	   << endl;
       return;
@@ -313,6 +351,7 @@ YmSat::add_clause_sub(ymuint lit_num)
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
 
+    // binary clause は watcher-list に登録するだけで実体はない．
     ++ mConstrBinNum;
   }
   else {
@@ -330,6 +369,10 @@ YmSat::add_clause_sub(ymuint lit_num)
 void
 YmSat::add_learnt_clause()
 {
+  // 学習節の内容は mLeartLits に格納されている．
+  // 結果，0 番目のリテラルに値の割り当てが生じる．
+  // 残りのリテラルがその割り当ての原因となる．
+
   ymuint n = mLearntLits.size();
   mLearntLitNum += n;
 
@@ -361,6 +404,7 @@ YmSat::add_learnt_clause()
   SatReason reason;
   Literal l1 = mLearntLits[1];
   if ( n == 2 ) {
+    // binary-clause の場合
     reason = SatReason(l1);
 
     // watcher-list の設定
@@ -402,6 +446,11 @@ void
 YmSat::del_watcher(Literal watch_lit,
 		   SatReason reason)
 {
+  // watch_lit に関係する watcher リストから
+  // reason を探して削除する．
+  // watcher リストを配列で実装しているので
+  // あたまからスキャンして該当の要素以降を
+  // 1つづつ前に詰める．
   Watcher w0(reason);
   WatcherList& wlist = watcher_list(watch_lit);
   ymuint n = wlist.num();
@@ -556,7 +605,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
     model.resize(mVarNum);
     for (ymuint i = 0; i < mVarNum; ++ i) {
-      Bool3 val = conv_to_Bool3(mVal[i]);
+      Bool3 val = conv_to_Bool3(mVal[i * 2 + 0]);
       assert_cond(val != kB3X, __FILE__, __LINE__);
       model[i] = val;
     }
@@ -889,7 +938,7 @@ YmSat::backtrack(int level)
       Literal p = mAssignList.get_prev();
       VarId varid = p.varid();
       ymuint vindex = varid.val();
-      mVal[vindex] = conv_from_Bool3(kB3X);
+      mVal[vindex * 2 + 0] = conv_from_Bool3(kB3X);
       heap_push(vindex);
       if ( debug & debug_assign ) {
 	cout << "\tdeassign " << p << endl;
@@ -918,25 +967,30 @@ YmSat::next_decision()
   }
 #endif
   while ( !heap_empty() ) {
+    // activity の高い変数を取り出す．
     ymuint vindex = heap_pop_top();
-    if ( mVal[vindex] == conv_from_Bool3(kB3X) ) {
-      bool inv = false;
-      ymuint8 vc = mValCache[vindex];
-      if ( mParams.mPhaseCache && vc != kB3X ) {
-	// 以前割り当てた極性を選ぶ
-	if ( vc == kB3False ) {
-	  inv = true;
-	}
-      }
-      else {
-	// Watcher の多い方の極性を(わざと)選ぶ
-	ymuint v2 = vindex * 2;
-	if ( mWatcherList[v2 + 1].num() >= mWatcherList[v2 + 0].num() ) {
-	  inv = true;
-	}
-      }
-      return Literal(VarId(vindex), inv);
+    if ( mVal[vindex * 2 + 0] != conv_from_Bool3(kB3X) ) {
+      // すでに確定していたらスキップする．
+      // もちろん，ヒープからも取り除く．
+      continue;
     }
+
+    bool inv = false;
+    ymuint8 vc = mVal[vindex * 2 + 1];
+    if ( mParams.mPhaseCache && vc != kB3X ) {
+      // 以前割り当てた極性を選ぶ
+      if ( vc == kB3False ) {
+	inv = true;
+      }
+    }
+    else {
+      // Watcher の多い方の極性を(わざと)選ぶ
+      ymuint v2 = vindex * 2;
+      if ( mWatcherList[v2 + 1].num() >= mWatcherList[v2 + 0].num() ) {
+	inv = true;
+      }
+    }
+    return Literal(VarId(vindex), inv);
   }
   return kLiteralX;
 }
