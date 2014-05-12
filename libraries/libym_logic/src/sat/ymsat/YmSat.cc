@@ -45,7 +45,7 @@ END_NONAMESPACE
 
 
 const
-Params kDefaultParams(0.95, 0.02, 0.999, true);
+Params kDefaultParams(0.95, 0.02, 0.999, true, false);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -73,6 +73,8 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mWatcherList(NULL),
   mHeap(NULL),
   mHeapNum(0),
+  mLbdTmp(NULL),
+  mLbdTmpSize(0),
   mRootLevel(0),
   mVarBump(1.0),
   mVarDecay(1.0),
@@ -87,6 +89,9 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mMaxConflict(1024 * 10)
 {
   mAnalyzer->set_solver(this);
+
+  mLbdTmpSize = 1024;
+  mLbdTmp = new bool[mLbdTmpSize];
 
   mTmpLitsSize = 1024;
   mTmpLits = new Literal[mTmpLitsSize];
@@ -117,6 +122,7 @@ YmSat::~YmSat()
   delete [] mActivity;
   delete [] mWatcherList;
   delete [] mHeap;
+  delete [] mLbdTmp;
   delete [] mTmpLits;
 }
 
@@ -356,7 +362,7 @@ YmSat::add_clause_sub(ymuint lit_num)
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(lit_num, mTmpLits);
+    SatClause* clause = new_clause(lit_num);
     mConstrClause.push_back(clause);
 
     // watcher-list の設定
@@ -420,6 +426,13 @@ YmSat::add_learnt_clause()
       mTmpLits[i] = mLearntLits[i];
     }
     SatClause* clause = new_clause(n, true);
+
+    if ( mParams.mUseLbd ) {
+      // LBD の計算
+      ymuint lbd = calc_lbd(clause);
+      clause->set_lbd(lbd);
+    }
+
     mLearntClause.push_back(clause);
 
     reason = SatReason(clause);
@@ -892,6 +905,13 @@ YmSat::implication()
 		 << " from " << w << endl;
 	  }
 	  assign(l0, w);
+
+	  if ( mParams.mUseLbd ) {
+	    ymuint lbd = calc_lbd(c) + 1;
+	    if ( c->lbd() > lbd ) {
+	      c->set_lbd(lbd);
+	    }
+	  }
 	}
 	else {
 	  // 矛盾がおこった．
@@ -1074,6 +1094,45 @@ YmSat::new_clause(ymuint lit_num,
   SatClause* clause = new (p) SatClause(lit_num, mTmpLits, learnt);
 
   return clause;
+}
+
+// @brief LBD を計算する．
+ymuint
+YmSat::calc_lbd(const SatClause* clause)
+{
+  ymuint max_level = decision_level() + 1;
+  ymuint32 old_size = mLbdTmpSize;
+  while ( mLbdTmpSize < max_level ) {
+    mLbdTmpSize <<= 1;
+  }
+  if ( mLbdTmpSize != old_size ) {
+    delete [] mLbdTmp;
+    mLbdTmp = new bool[mLbdTmpSize];
+  }
+
+  ymuint n = clause->lit_num();
+
+  // mLbdTmp をクリア
+  for (ymuint i = 0; i < n; ++ i) {
+    Literal l = clause->lit(i);
+    VarId v = l.varid();
+    ymuint level = decision_level(v);
+    mLbdTmp[level] = false;
+  }
+
+  // 異なる決定レベルの個数を数える．
+  ymuint c = 0;
+  for (ymuint i = 0; i < n; ++ i) {
+    Literal l = clause->lit(i);
+    VarId v = l.varid();
+    ymuint level = decision_level(v);
+    if ( !mLbdTmp[level] ) {
+      mLbdTmp[level] = true;
+      ++ c;
+    }
+  }
+
+  return c;
 }
 
 // @brief mTmpLits を確保する．

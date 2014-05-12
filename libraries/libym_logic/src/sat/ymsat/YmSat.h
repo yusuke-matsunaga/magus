@@ -41,12 +41,16 @@ struct Params
   /// @brief phase-cache ヒューリスティックを使うとき true
   bool mPhaseCache;
 
+  /// @brief LBD ヒューリスティックを使うとき true
+  bool mUseLbd;
+
   /// @brief コンストラクタ
   Params() :
     mVarDecay(1.0),
     mVarFreq(0.0),
     mClauseDecay(1.0),
-    mPhaseCache(true)
+    mPhaseCache(true),
+    mUseLbd(false)
   {
   }
 
@@ -54,11 +58,13 @@ struct Params
   Params(double var_decay,
 	 double var_freq,
 	 double clause_decay,
-	 bool phase_cache) :
+	 bool phase_cache,
+	 bool use_lbd) :
     mVarDecay(var_decay),
     mVarFreq(var_freq),
     mClauseDecay(clause_decay),
-    mPhaseCache(phase_cache)
+    mPhaseCache(phase_cache),
+    mUseLbd(use_lbd)
   {
   }
 
@@ -233,6 +239,7 @@ private:
   /// @brief 新しい節を生成する．
   /// @param[in] lit_num リテラル数
   /// @param[in] learnt 学習節のとき true とするフラグ
+  /// @param[in] lbd 学習節のときの literal block distance
   /// @note リテラルは mTmpLits に格納されている．
   SatClause*
   new_clause(ymuint lit_num,
@@ -285,6 +292,10 @@ private:
   /// @param[in] varid 変数番号
   int
   decision_level(VarId varid) const;
+
+  /// @brief LBD を計算する．
+  ymuint
+  calc_lbd(const SatClause* clause);
 
   /// @brief 変数の割り当て理由を返す．
   /// @param[in] varid 変数番号
@@ -471,6 +482,13 @@ private:
 
   // ヒープの要素数
   ymuint32 mHeapNum;
+
+  // calc_lbd() 用の作業領域
+  // サイズは decision_level()
+  bool* mLbdTmp;
+
+  // mLbdTmp のサイズ．
+  ymuint32 mLbdTmpSize;
 
   // 矛盾の解析時にテンポラリに使用される節
   SatClause* mTmpBinClause;

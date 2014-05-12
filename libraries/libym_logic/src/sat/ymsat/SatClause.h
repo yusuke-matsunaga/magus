@@ -74,6 +74,10 @@ public:
   insert(ymuint src_pos,
 	 ymuint dst_pos);
 
+  /// @brief literal block distance を設定する．
+  void
+  set_lbd(ymuint lbd);
+
   /// @brief アクティビティを増加させる．
   void
   increase_activity(double delta);
@@ -109,6 +113,10 @@ public:
   bool
   is_learnt() const;
 
+  /// @brief Literal Block Distance を返す．
+  ymuint
+  lbd() const;
+
   /// @brief 学習節の場合にアクティビティを返す．
   double
   activity() const;
@@ -121,6 +129,9 @@ private:
 
   // サイズと learnt フラグをパックしたもの
   ymuint32 mSizeLearnt;
+
+  // リテラルブロック距離
+  ymuint32 mLBD;
 
   // activity
   double mActivity;
@@ -202,6 +213,14 @@ SatClause::insert(ymuint src_pos,
   mLits[dst_pos] = tmp;
 }
 
+// @brief literal block distance を設定する．
+inline
+void
+SatClause::set_lbd(ymuint lbd)
+{
+  mLBD = lbd;
+}
+
 // @brief リテラル数の取得
 inline
 ymuint
@@ -240,6 +259,14 @@ bool
 SatClause::is_learnt() const
 {
   return static_cast<bool>(mSizeLearnt & 1UL);
+}
+
+// @brief Literal Block Distance を返す．
+inline
+ymuint
+SatClause::lbd() const
+{
+  return mLBD;
 }
 
 // @brief 学習節の場合にアクティビティを返す．
