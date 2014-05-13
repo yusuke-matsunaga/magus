@@ -16,6 +16,7 @@
 #include "logic/Literal.h"
 #include "logic/Bool3.h"
 #include "logic/sat_nsdef.h"
+#include "logic/SatStats.h"
 #include "utils/StopWatch.h"
 
 
@@ -261,32 +262,8 @@ private:
   // SAT の実行回数
   ymuint32 mSatCount;
 
-  // restart の回数の総和
-  ymuint64 mRestart;
-
-  // 変数の数の総和
-  ymuint64 mVarNum;
-
-  // 制約節の数の総和
-  ymuint64 mConstrClauseNum;
-
-  // 制約節のリテラル数の総和
-  ymuint64 mConstrLitNum;
-
-  // 学習節の数の総和
-  ymuint64 mLearntClauseNum;
-
-  // 学習節のリテラル数の総和
-  ymuint64 mLearntLitNum;
-
-  // コンフリクト数の総和
-  ymuint64 mConflictNum;
-
-  // decision 数の総和
-  ymuint64 mDecisionNum;
-
-  // implication数の総和
-  ymuint64 mPropagationNum;
+  // SAT ソルバの統計情報の和
+  SatStats mSatStats;
 
   // 時間計測を行なうかどうかの制御フラグ
   bool mTimerEnable;

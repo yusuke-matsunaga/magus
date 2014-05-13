@@ -12,6 +12,7 @@
 
 #include "satpg_nsdef.h"
 #include "utils/USTime.h"
+#include "logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -45,6 +46,15 @@ struct DtpgStats
 
   /// @brief アボートした時の SAT に要した時間
   USTime mAbortTime;
+
+  /// @brief
+  ymuint32 mRunCount;
+
+  /// @brief SATソルバの起動回数
+  ymuint32 mSatCount;
+
+  /// @brief SATソルバの統計情報
+  SatStats mSatStats;
 
 };
 

@@ -108,15 +108,15 @@ SatEngine::clear_stats()
 {
   mRunCount = 0;
   mSatCount = 0;
-  mRestart = 0;
-  mVarNum = 0;
-  mConstrClauseNum = 0;
-  mConstrLitNum = 0;
-  mLearntClauseNum = 0;
-  mLearntLitNum = 0;
-  mConflictNum = 0;
-  mDecisionNum = 0;
-  mPropagationNum = 0;
+  mSatStats.mRestart = 0;
+  mSatStats.mVarNum = 0;
+  mSatStats.mConstrClauseNum = 0;
+  mSatStats.mConstrLitNum = 0;
+  mSatStats.mLearntClauseNum = 0;
+  mSatStats.mLearntLitNum = 0;
+  mSatStats.mConflictNum = 0;
+  mSatStats.mDecisionNum = 0;
+  mSatStats.mPropagationNum = 0;
 
   mCnfCount = 0;
   mCnfTime.set(0.0, 0.0, 0.0);
@@ -141,6 +141,9 @@ SatEngine::get_stats(DtpgStats& stats) const
   stats.mRedTime = mUndetTime;
   stats.mAbortCount = mAbortCount;
   stats.mAbortTime = mAbortTime;
+  stats.mRunCount = mRunCount;
+  stats.mSatCount = mSatCount;
+  stats.mSatStats = mSatStats;
 
 #if 0
   if ( mRunCount > 0 ) {
@@ -537,15 +540,15 @@ SatEngine::update_stats(SatSolver& solver,
 
   ++ mRunCount;
   mSatCount += n;
-  mRestart += sat_stat.mRestart;
-  mVarNum += sat_stat.mVarNum;
-  mConstrClauseNum += sat_stat.mConstrClauseNum;
-  mConstrLitNum += sat_stat.mConstrLitNum;
-  mLearntClauseNum += sat_stat.mLearntClauseNum;
-  mLearntLitNum += sat_stat.mLearntLitNum;
-  mConflictNum += sat_stat.mConflictNum;
-  mDecisionNum += sat_stat.mDecisionNum;
-  mPropagationNum += sat_stat.mPropagationNum;
+  mSatStats.mRestart += sat_stat.mRestart;
+  mSatStats.mVarNum += sat_stat.mVarNum;
+  mSatStats.mConstrClauseNum += sat_stat.mConstrClauseNum;
+  mSatStats.mConstrLitNum += sat_stat.mConstrLitNum;
+  mSatStats.mLearntClauseNum += sat_stat.mLearntClauseNum;
+  mSatStats.mLearntLitNum += sat_stat.mLearntLitNum;
+  mSatStats.mConflictNum += sat_stat.mConflictNum;
+  mSatStats.mDecisionNum += sat_stat.mDecisionNum;
+  mSatStats.mPropagationNum += sat_stat.mPropagationNum;
 }
 
 // @brief ノードの変数割り当てフラグを消す．

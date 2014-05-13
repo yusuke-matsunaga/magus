@@ -256,6 +256,19 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 	   << "  " << setw(8) << stats.mAbortTime.sys_time_usec() / stats.mAbortCount
 	   << "s usec" << endl;
     }
+    {
+      cout << "# of runs:                       " << stats.mRunCount << endl
+	   << "# of problems:                   " << stats.mSatCount << endl
+	   << "Ave. # of restarts:              " << (double) stats.mSatStats.mRestart / stats.mSatCount << endl
+	   << "Ave. # of variables:             " << (double) stats.mSatStats.mVarNum / stats.mRunCount << endl
+	   << "Ave. # of constraint clauses:    " << (double) stats.mSatStats.mConstrClauseNum / stats.mRunCount << endl
+	   << "Ave. # of constraint literals:   " << (double) stats.mSatStats.mConstrLitNum / stats.mRunCount << endl
+	   << "Ave. # of learnt clauses:        " << (double) stats.mSatStats.mLearntClauseNum / stats.mRunCount << endl
+	   << "Ave. # of learnt literals:       " << (double) stats.mSatStats.mLearntLitNum / stats.mRunCount << endl
+	   << "Ave. # of conflicts:             " << (double) stats.mSatStats.mConflictNum / stats.mSatCount << endl
+	   << "Ave. # of decisions:             " << (double) stats.mSatStats.mDecisionNum / stats.mSatCount << endl
+	   << "Ave. # of implications:          " << (double) stats.mSatStats.mPropagationNum / stats.mSatCount << endl;
+    }
     cout.flags(save);
 
 #if 0
