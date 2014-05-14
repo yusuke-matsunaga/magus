@@ -31,9 +31,11 @@ SatSolver::SatSolver(const string& type,
 		     ostream* outp)
 {
   if ( type == "minisat" ) {
+    // minisat-1.4
     mImpl = new SatSolverMiniSat;
   }
   else if ( type == "minisat2" ) {
+    // minisat-2.2
     mImpl = new SatSolverMiniSat2;
   }
   else {

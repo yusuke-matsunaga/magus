@@ -46,11 +46,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief solver をセットする．
-  /// @param[in] solver YmSat のポインタ
-  void
-  set_solver(YmSat* solver);
-
   /// @brief 解析を行う．
   /// @param[in] creason 矛盾の原因
   /// @param[out] learnt 学習された節を表すリテラルのベクタ
@@ -71,31 +66,36 @@ protected:
   // 派生クラスに直接 YmSat をアクセスさせないための代理関数
   //////////////////////////////////////////////////////////////////////
 
-  // 現在の decision level を取り出す．
+  /// @brief 現在の decision level を取り出す．
   int
   decision_level() const;
 
-  // 割り当てリストの末尾を得る．
+  /// @brief 割り当てリストの末尾の位置を得る．
   ymuint
   last_assign();
 
-  // 割り当てリストの pos 番めの要素を得る．
+  /// @brief 割り当てリストの pos 番めの要素を得る．
+  /// @param[in] pos 位置番号
   Literal
   get_assign(ymuint pos);
 
-  // 変数の decision level を得る．
+  /// @brief 変数の decision level を得る．
+  /// @param[in] varid 対象の変数
   int
   decision_level(VarId varid) const;
 
-  // 変数の割り当て理由を得る．
+  /// @brief 変数の割り当て理由を得る．
+  /// @param[in] varid 対象の変数
   SatReason
   reason(VarId varid) const;
 
-  // 変数のアクティビティを増加させる．
+  /// @brief 変数のアクティビティを増加させる．
+  /// @param[in] varid 対象の変数
   void
   bump_var_activity(VarId varid);
 
-  // 節のアクティビティを上げる．
+  /// @brief 節のアクティビティを上げる．
+  /// @param[in] clause 対象の節
   void
   bump_clause_activity(SatClause* clause);
 
@@ -131,15 +131,6 @@ public:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief solver をセットする．
-// @param[in] solver YmSat のポインタ
-inline
-void
-SatAnalyzer::set_solver(YmSat* solver)
-{
-  mSolver = solver;
-}
 
 // 現在の decision level を取り出す．
 inline

@@ -30,7 +30,7 @@ SaSimple::analyze(SatReason creason,
 		  vector<Literal>& learnt)
 {
   capture(creason, learnt);
-  simplify(learnt);
+  make_minimal(learnt);
   clear_marks();
   return reorder(learnt);
 }

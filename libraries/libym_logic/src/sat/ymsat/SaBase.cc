@@ -32,48 +32,47 @@ SaBase::alloc_var(ymuint size)
 }
 
 // 再帰的なチェックを行う簡単化
-// learnt に含まれるリテラルのうち，その理由となっている割り当て，
+// lit_list に含まれるリテラルのうち，その理由となっている割り当て，
 // もしくはそのまた理由となっている割り当てを再帰的にたどり，
 // そのなかに一つでもマークの付いていない決定割り当て(理由をもたない割り当て)
 // があればそのリテラルを残す．
 // 要するに，矛盾の起きた割り当てに対する極小セパレーター集合を求めている．
 void
-SaBase::simplify(vector<Literal>& learnt)
+SaBase::make_minimal(vector<Literal>& lit_list)
 {
-  ymuint nl = learnt.size();
+  ymuint nl = lit_list.size();
 
-  // learnt に含まれているリテラルのレベルのビットマップ
+  // lit_list に含まれているリテラルのレベルのビットマップ
   // ただし 64 のモジュロをとっている．
   ymuint64 lmask = 0UL;
   for (ymuint i = 0; i < nl; ++ i) {
-    Literal p = learnt[i];
+    Literal p = lit_list[i];
     int level = decision_level(p.varid());
     lmask |= (1UL << (level & 63));
   }
 
   ymuint wpos = 0;
   for (ymuint i = 0; i < nl; ++ i) {
-    Literal p = learnt[i];
+    Literal p = lit_list[i];
     VarId var = p.varid();
-    mClearQueue2.clear();
+    ymuint top = mClearQueue.size();
     if ( check_recur(var, lmask) ) {
       if ( wpos != i ) {
-	learnt[wpos] = p;
+	lit_list[wpos] = p;
       }
       ++ wpos;
     }
-    for (vector<VarId>::iterator p = mClearQueue2.begin();
-	 p != mClearQueue2.end(); ++ p) {
-      VarId var = *p;
-      set_mark(var, false);
+    for (ymuint j = top; j < mClearQueue.size(); ++ j) {
+      set_mark(mClearQueue[j], false);
     }
+    mClearQueue.erase(mClearQueue.begin() + top, mClearQueue.end());
   }
   if ( wpos < nl ) {
-    learnt.erase(learnt.begin() + wpos, learnt.end());
+    lit_list.erase(lit_list.begin() + wpos, lit_list.end());
   }
 }
 
-// simplify_recur のサブルーティン
+// make_minimal のサブルーティン
 // varid が極小セパレータの要素であるとき true を返す．
 // 探索でたどったノードにはマークを付け，mClearQueue2 に積む．
 // マークの付いたノードは2度と探索する必要はない．
@@ -83,64 +82,58 @@ bool
 SaBase::check_recur(VarId varid,
 		    ymuint64 lmask)
 {
-  SatReason r = reason(varid);
-  if ( r == kNullSatReason ) {
-    // varid は決定ノードだった．
-    return true;
-  }
+  mVarStack.clear();
+  mVarStack.push_back(varid);
 
-  if ( ((1UL << (decision_level(varid) & 63)) & lmask) == 0UL ) {
-    // varid の割り当てレベルと同じレベルの割り当ては learnt に含まれていない．
-    // ということはこのまま再帰を続けると varid と同じレベルの決定ノード
-    // に到達可能であることがわかる．
-    return true;
-  }
+  while ( !mVarStack.empty() ) {
+    varid = mVarStack.back();
+    mVarStack.pop_back();
+    SatReason r = reason(varid);
+    if ( r == kNullSatReason ) {
+      // varid は決定ノードだった．
+      return true;
+    }
 
-  if ( r.is_clause() ) {
-    SatClause* clause = r.clause();
-    ymuint n = clause->lit_num();
-    Literal p = clause->wl0();
-    for (ymuint i = 0; i < n; ++ i) {
-      Literal q = clause->lit(i);
-      if ( q == p ) continue;
-      VarId var1 = q.varid();
-      if ( !get_mark(var1) && decision_level(var1) > 0 ) {
-	set_mark(var1, true);
-	mClearQueue2.push_back(var1);
-	if ( check_recur(var1, lmask) ) {
-	  return true;
+    if ( ((1UL << (decision_level(varid) & 63)) & lmask) == 0UL ) {
+      // varid の割り当てレベルと同じレベルの割り当ては lit_list に含まれていない．
+      // ということはこのまま再帰を続けても，lit_list の他のリテラルには
+      // 到達不可能であることがわかる．
+      return true;
+    }
+
+    if ( r.is_clause() ) {
+      SatClause* clause = r.clause();
+      ymuint n = clause->lit_num();
+      Literal p = clause->wl0();
+      for (ymuint i = 0; i < n; ++ i) {
+	Literal q = clause->lit(i);
+	if ( q != p ) {
+	  put_var(q);
 	}
       }
     }
-  }
-  else {
-    Literal q = r.literal();
-    VarId var1 = q.varid();
-    if ( !get_mark(var1) && decision_level(var1) > 0 ) {
-      set_mark(var1, true);
-      mClearQueue2.push_back(var1);
-      if ( check_recur(var1, lmask) ) {
-	return true;
-      }
+    else {
+      Literal q = r.literal();
+      put_var(q);
     }
   }
   return false;
 }
 
-// decision level の高いリテラルを 2番め (learnt[1] の位置) に持ってくる
+// decision level の高いリテラルを 2番め (lit_list[1] の位置) に持ってくる
 // 2番めのリテラルのレベルを返す．
 int
-SaBase::reorder(vector<Literal>& learnt)
+SaBase::reorder(vector<Literal>& lit_list)
 {
-  ymuint n = learnt.size();
+  ymuint n = lit_list.size();
   if ( n < 2 ) {
     return 0;
   }
-  Literal lit1 = learnt[1];
+  Literal lit1 = lit_list[1];
   int level = decision_level(lit1.varid());
   ymuint pos = 1;
   for (ymuint i = 2; i < n; ++ i) {
-    Literal lit2 = learnt[i];
+    Literal lit2 = lit_list[i];
     int level2 = decision_level(lit2.varid());
     if ( level < level2 ) {
       level = level2;
@@ -148,8 +141,8 @@ SaBase::reorder(vector<Literal>& learnt)
     }
   }
   if ( pos != 1 ) {
-    learnt[1] = learnt[pos];
-    learnt[pos] = lit1;
+    lit_list[1] = lit_list[pos];
+    lit_list[pos] = lit1;
   }
   return level;
 }

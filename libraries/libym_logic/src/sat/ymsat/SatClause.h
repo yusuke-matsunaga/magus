@@ -13,10 +13,6 @@
 #include "logic/Literal.h"
 
 
-// リテラルの並び替え時に挿入ではなく置き換えを行う．
-#define SWAP_LITERALS 0
-
-
 BEGIN_NAMESPACE_YM_SAT
 
 //////////////////////////////////////////////////////////////////////
@@ -73,6 +69,15 @@ public:
   void
   insert(ymuint src_pos,
 	 ymuint dst_pos);
+
+  /// @brief src_pos 番めのリテラルを dst_pos に移動する．
+  /// @param[in] src_pos もとの位置
+  /// @param[in] dst_pos 移動先
+  /// @note 互いに位置を交換する．
+  /// @note 間のリテラルは不変
+  void
+  xchange(ymuint src_pos,
+	  ymuint dst_pos);
 
   /// @brief literal block distance を設定する．
   void
@@ -191,9 +196,7 @@ inline
 void
 SatClause::xchange_wl()
 {
-  Literal tmp = mLits[0];
-  mLits[0] = mLits[1];
-  mLits[1] = tmp;
+  xchange(0, 1);
 }
 
 // @brief src_pos 番めのリテラルを dst_pos に移動する．
@@ -210,6 +213,21 @@ SatClause::insert(ymuint src_pos,
   for (ymuint i = src_pos; i > dst_pos; -- i) {
     mLits[i] = mLits[i - 1];
   }
+  mLits[dst_pos] = tmp;
+}
+
+// @brief src_pos 番めのリテラルを dst_pos に移動する．
+// @param[in] src_pos もとの位置
+// @param[in] dst_pos 移動先
+// @note 互いに位置を交換する．
+// @note 間のリテラルは不変
+inline
+void
+SatClause::xchange(ymuint src_pos,
+		   ymuint dst_pos)
+{
+  Literal tmp = mLits[src_pos];
+  mLits[src_pos] = mLits[dst_pos];
   mLits[dst_pos] = tmp;
 }
 

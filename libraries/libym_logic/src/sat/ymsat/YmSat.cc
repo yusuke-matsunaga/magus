@@ -92,7 +92,7 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mLearntLimit(0),
   mMaxConflict(1024 * 10)
 {
-  mAnalyzer->set_solver(this);
+  mAnalyzer->mSolver = this;
 
   mLbdTmpSize = 1024;
   mLbdTmp = new bool[mLbdTmpSize];
@@ -886,12 +886,15 @@ YmSat::implication()
 	// は問題でない．
 	bool found = false;
 	ymuint n = c->lit_num();
-	for (ymuint i = 2; i < n; ++ i) {
+	for (ymuint i = 0; i < n; ++ i) {
 	  Literal l2 = c->lit(i);
+	  if ( l2 == l0 || l2 == nl ) continue;
 	  Bool3 v = eval(l2);
 	  if ( v != kB3False ) {
 	    // l2 を 1番めの watch literal にする．
-	    c->insert(i, 1);
+	    //c->insert(i, 1);
+	    c->xchange(i, 1);
+	    //c->set_wl1(l2);
 	    if ( debug & debug_implication ) {
 	      cout << "\t\t\tsecond watching literal becomes "
 		   << l2 << endl;
