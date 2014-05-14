@@ -102,30 +102,111 @@ SatEngine::set_mode(const string& type,
   mOutP = outp;
 }
 
+
+BEGIN_NONAMESPACE
+
+// SatStats をクリアする．
+void
+clear_sat_stats(SatStats& stats)
+{
+  stats.mRestart = 0;
+  stats.mVarNum = 0;
+  stats.mConstrClauseNum = 0;
+  stats.mConstrLitNum = 0;
+  stats.mLearntClauseNum = 0;
+  stats.mLearntLitNum = 0;
+  stats.mConflictNum = 0;
+  stats.mDecisionNum = 0;
+  stats.mPropagationNum = 0;
+}
+
+// SatStats をたす．
+void
+add_sat_stats(SatStats& dst_stats,
+	      const SatStats& src_stats)
+{
+  dst_stats.mRestart += src_stats.mRestart;
+  dst_stats.mVarNum += src_stats.mVarNum;
+  dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
+  dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
+  dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
+  dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
+  dst_stats.mConflictNum += src_stats.mConflictNum;
+  dst_stats.mDecisionNum += src_stats.mDecisionNum;
+  dst_stats.mPropagationNum += src_stats.mPropagationNum;
+}
+
+// SatStats を引く
+void
+sub_sat_stats(SatStats& dst_stats,
+	      const SatStats& src_stats)
+{
+  dst_stats.mRestart -= src_stats.mRestart;
+  dst_stats.mVarNum -= src_stats.mVarNum;
+  dst_stats.mConstrClauseNum -= src_stats.mConstrClauseNum;
+  dst_stats.mConstrLitNum -= src_stats.mConstrLitNum;
+  dst_stats.mLearntClauseNum -= src_stats.mLearntClauseNum;
+  dst_stats.mLearntLitNum -= src_stats.mLearntLitNum;
+  dst_stats.mConflictNum -= src_stats.mConflictNum;
+  dst_stats.mDecisionNum -= src_stats.mDecisionNum;
+  dst_stats.mPropagationNum -= src_stats.mPropagationNum;
+}
+
+// SatStats の各々の最大値をとる．
+void
+max_sat_stats(SatStats& dst_stats,
+	      const SatStats& src_stats)
+{
+  if ( dst_stats.mRestart < src_stats.mRestart ) {
+    dst_stats.mRestart = src_stats.mRestart;
+  }
+  if ( dst_stats.mVarNum < src_stats.mVarNum ) {
+    dst_stats.mVarNum += src_stats.mVarNum;
+  }
+  if ( dst_stats.mConstrClauseNum < src_stats.mConstrClauseNum ) {
+    dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
+  }
+  if ( dst_stats.mConstrLitNum < src_stats.mConstrLitNum ) {
+    dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
+  }
+  if ( dst_stats.mLearntClauseNum < src_stats.mLearntClauseNum ) {
+    dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
+  }
+  if ( dst_stats.mLearntLitNum < src_stats.mLearntLitNum ) {
+    dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
+  }
+  if ( dst_stats.mConflictNum < src_stats.mConflictNum ) {
+    dst_stats.mConflictNum += src_stats.mConflictNum;
+  }
+  if ( dst_stats.mDecisionNum < src_stats.mDecisionNum ) {
+    dst_stats.mDecisionNum += src_stats.mDecisionNum;
+  }
+  if ( dst_stats.mPropagationNum < src_stats.mPropagationNum ) {
+    dst_stats.mPropagationNum += src_stats.mPropagationNum;
+  }
+}
+
+END_NONAMESPACE
+
 // @brief 統計情報をクリアする．
 void
 SatEngine::clear_stats()
 {
-  mRunCount = 0;
-  mSatCount = 0;
-  mSatStats.mRestart = 0;
-  mSatStats.mVarNum = 0;
-  mSatStats.mConstrClauseNum = 0;
-  mSatStats.mConstrLitNum = 0;
-  mSatStats.mLearntClauseNum = 0;
-  mSatStats.mLearntLitNum = 0;
-  mSatStats.mConflictNum = 0;
-  mSatStats.mDecisionNum = 0;
-  mSatStats.mPropagationNum = 0;
+  mStats.mCnfGenCount = 0;
+  mStats.mCnfGenTime.set(0.0, 0.0, 0.0);
 
-  mCnfCount = 0;
-  mCnfTime.set(0.0, 0.0, 0.0);
-  mDetCount = 0;
-  mDetTime.set(0.0, 0.0, 0.0);
-  mUndetCount = 0;
-  mUndetTime.set(0.0, 0.0, 0.0);
-  mAbortCount = 0;
-  mAbortTime.set(0.0, 0.0, 0.0);
+  mStats.mDetCount = 0;
+  mStats.mDetTime.set(0.0, 0.0, 0.0);
+  clear_sat_stats(mStats.mDetStats);
+  clear_sat_stats(mStats.mDetStatsMax);
+
+  mStats.mRedCount = 0;
+  mStats.mRedTime.set(0.0, 0.0, 0.0);
+  clear_sat_stats(mStats.mRedStats);
+  clear_sat_stats(mStats.mRedStatsMax);
+
+  mStats.mAbortCount = 0;
+  mStats.mAbortTime.set(0.0, 0.0, 0.0);
 }
 
 // @brief 統計情報を得る．
@@ -133,33 +214,7 @@ SatEngine::clear_stats()
 void
 SatEngine::get_stats(DtpgStats& stats) const
 {
-  stats.mCnfGenCount = mCnfCount;
-  stats.mCnfGenTime = mCnfTime;
-  stats.mDetCount = mDetCount;
-  stats.mDetTime = mDetTime;
-  stats.mRedCount = mUndetCount;
-  stats.mRedTime = mUndetTime;
-  stats.mAbortCount = mAbortCount;
-  stats.mAbortTime = mAbortTime;
-  stats.mRunCount = mRunCount;
-  stats.mSatCount = mSatCount;
-  stats.mSatStats = mSatStats;
-
-#if 0
-  if ( mRunCount > 0 ) {
-    cout << "# of runs:                       " << mRunCount << endl
-	 << "# of problems:                   " << mSatCount << endl
-	 << "Ave. # of restarts:              " << (double) mRestart / mSatCount << endl
-	 << "Ave. # of variables:             " << (double) mVarNum / mRunCount << endl
-	 << "Ave. # of constraint clauses:    " << (double) mConstrClauseNum / mRunCount << endl
-	 << "Ave. # of constraint literals:   " << (double) mConstrLitNum / mRunCount << endl
-	 << "Ave. # of learnt clauses:        " << (double) mLearntClauseNum / mRunCount << endl
-	 << "Ave. # of learnt literals:       " << (double) mLearntLitNum / mRunCount << endl
-	 << "Ave. # of conflicts:             " << (double) mConflictNum / mSatCount << endl
-	 << "Ave. # of decisions:             " << (double) mDecisionNum / mSatCount << endl
-	 << "Ave. # of implications:          " << (double) mPropagationNum / mSatCount << endl;
-  }
-#endif
+  stats = mStats;
 }
 
 // @breif 時間計測を制御する．
@@ -256,6 +311,27 @@ void
 SatEngine::tmp_lits_end(SatSolver& solver)
 {
   solver.add_clause(mTmpLits);
+}
+
+// @brief タイマーをスタートする．
+void
+SatEngine::cnf_begin()
+{
+  if ( mTimerEnable ) {
+    mTimer.reset();
+    mTimer.start();
+  }
+}
+
+// @brief タイマーを止めて CNF 作成時間に加える．
+void
+SatEngine::cnf_end()
+{
+  if ( mTimerEnable ) {
+    mTimer.stop();
+    mStats.mCnfGenTime += mTimer.time();
+  }
+  ++ mStats.mCnfGenCount;
 }
 
 // @brief ノードの入出力の関係を表す CNF を作る．
@@ -495,7 +571,21 @@ SatEngine::solve(SatSolver& solver,
     mTimer.start();
   }
 
+  SatStats prev_stats;
+  solver.get_stats(prev_stats);
+
   Bool3 ans = solver.solve(mTmpLits, mModel);
+
+  SatStats sat_stats;
+  solver.get_stats(sat_stats);
+
+  sub_sat_stats(sat_stats, prev_stats);
+
+  USTime time;
+  if ( mTimerEnable ) {
+    mTimer.stop();
+    time = mTimer.time();
+  }
   if ( ans == kB3True ) {
     // パタンが求まった．
 
@@ -505,50 +595,24 @@ SatEngine::solve(SatSolver& solver,
     // パタンの登録などを行う．
     dop(f, tv);
 
-    if ( mTimerEnable ) {
-      mTimer.stop();
-      mDetTime += mTimer.time();
-      ++ mDetCount;
-    }
+    ++ mStats.mDetCount;
+    mStats.mDetTime += time;
+    add_sat_stats(mStats.mDetStats, sat_stats);
+    max_sat_stats(mStats.mDetStatsMax, sat_stats);
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
     uop(f);
 
-    if ( mTimerEnable ) {
-      mTimer.stop();
-      mUndetTime += mTimer.time();
-      ++ mUndetCount;
-    }
+    ++ mStats.mRedCount;
+    mStats.mRedTime += time;
+    add_sat_stats(mStats.mRedStats, sat_stats);
+    max_sat_stats(mStats.mRedStatsMax, sat_stats);
   }
   else { // ans == kB3X つまりアボート
-    if ( mTimerEnable ) {
-      mTimer.stop();
-      mAbortTime += mTimer.time();
-      ++ mAbortCount;
-    }
+    ++ mStats.mAbortCount;
+    mStats.mAbortTime += time;
   }
-}
-
-// @brief 統計情報を得る．
-void
-SatEngine::update_stats(SatSolver& solver,
-			ymuint n)
-{
-  SatStats sat_stat;
-  solver.get_stats(sat_stat);
-
-  ++ mRunCount;
-  mSatCount += n;
-  mSatStats.mRestart += sat_stat.mRestart;
-  mSatStats.mVarNum += sat_stat.mVarNum;
-  mSatStats.mConstrClauseNum += sat_stat.mConstrClauseNum;
-  mSatStats.mConstrLitNum += sat_stat.mConstrLitNum;
-  mSatStats.mLearntClauseNum += sat_stat.mLearntClauseNum;
-  mSatStats.mLearntLitNum += sat_stat.mLearntLitNum;
-  mSatStats.mConflictNum += sat_stat.mConflictNum;
-  mSatStats.mDecisionNum += sat_stat.mDecisionNum;
-  mSatStats.mPropagationNum += sat_stat.mPropagationNum;
 }
 
 // @brief ノードの変数割り当てフラグを消す．

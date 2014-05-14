@@ -1,5 +1,5 @@
 #ifndef DTPGSTATS_H
-#define DTPGTTATS_H
+#define DTPGSTATS_H
 
 /// @file DtpgStats.h
 /// @brief DtpgStats のヘッダファイル
@@ -35,26 +35,33 @@ struct DtpgStats
   /// @brief テスト生成に成功した時の SAT に要した時間
   USTime mDetTime;
 
+  /// @brief テスト生成に成功した時の SATソルバの統計情報の和
+  SatStats mDetStats;
+
+  /// @brief テスト生成に成功した時の SATソルバの統計情報の最大値
+  ///
+  /// 個々の値は同時に起こったわけではない．
+  SatStats mDetStatsMax;
+
   /// @brief 冗長故障と判定した回数
   ymuint32 mRedCount;
 
   /// @brief 冗長故障と判定した時の SAT に要した時間
   USTime mRedTime;
 
+  /// @brief 冗長故障と判定した時の SATソルバの統計情報の和
+  SatStats mRedStats;
+
+  /// @brief 冗長故障と判定した時の SATソルバの統計情報の最大値
+  ///
+  /// 個々の値は同時に起こったわけではない．
+  SatStats mRedStatsMax;
+
   /// @brief アボートした回数
   ymuint32 mAbortCount;
 
   /// @brief アボートした時の SAT に要した時間
   USTime mAbortTime;
-
-  /// @brief
-  ymuint32 mRunCount;
-
-  /// @brief SATソルバの起動回数
-  ymuint32 mSatCount;
-
-  /// @brief SATソルバの統計情報
-  SatStats mSatStats;
 
 };
 

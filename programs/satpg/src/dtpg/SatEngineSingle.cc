@@ -129,8 +129,6 @@ SatEngineSingle::run(TpgFault* fault,
   solve(solver, fault, bt, dop, uop);
 
   clear_node_mark();
-
-  update_stats(solver, 1);
 }
 
 END_NAMESPACE_YM_SATPG

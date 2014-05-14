@@ -12,6 +12,7 @@
 
 #include "satpg_nsdef.h"
 #include "TpgNode.h"
+#include "DtpgStats.h"
 #include "LitMap.h"
 #include "logic/Literal.h"
 #include "logic/Bool3.h"
@@ -169,12 +170,6 @@ protected:
 	DetectOp& dop,
 	UntestOp& uop);
 
-  /// @brief 統計情報を得る．
-  /// @param[in] solver SatSolver
-  void
-  update_stats(SatSolver& solver,
-	       ymuint n);
-
   /// @brief ノードの変数割り当てフラグを消す．
   void
   clear_node_mark();
@@ -256,44 +251,17 @@ private:
   // 作業用のリテラルのリスト
   vector<Literal> mTmpLits;
 
-  // CNF の生成回数
-  ymuint32 mRunCount;
-
-  // SAT の実行回数
-  ymuint32 mSatCount;
-
-  // SAT ソルバの統計情報の和
-  SatStats mSatStats;
-
   // 時間計測を行なうかどうかの制御フラグ
   bool mTimerEnable;
 
   // 時間計測用のタイマー
   StopWatch mTimer;
 
-  // CNF 式を生成した回数
-  ymuint32 mCnfCount;
+  // DTPG の統計情報
+  DtpgStats mStats;
 
-  // CNF 式を生成する時の時間
-  USTime mCnfTime;
-
-  // テスト生成が成功した回数
-  ymuint32 mDetCount;
-
-  // テスト生成が成功した場合の実行時間
-  USTime mDetTime;
-
-  // 冗長故障の判定回数
-  ymuint32 mUndetCount;
-
-  // 冗長故障の場合の実行時間
-  USTime mUndetTime;
-
-  // アボート回数
-  ymuint32 mAbortCount;
-
-  // アボートの場合の実行時間
-  USTime mAbortTime;
+  // SATソルバの前回の統計情報
+  SatStats mPrevStats;
 
 };
 
@@ -324,29 +292,6 @@ ostream*
 SatEngine::sat_outp() const
 {
   return mOutP;
-}
-
-// @brief タイマーをスタートする．
-inline
-void
-SatEngine::cnf_begin()
-{
-  if ( mTimerEnable ) {
-    mTimer.reset();
-    mTimer.start();
-  }
-}
-
-// @brief タイマーを止めて CNF 作成時間に加える．
-inline
-void
-SatEngine::cnf_end()
-{
-  if ( mTimerEnable ) {
-    mTimer.stop();
-    mCnfTime += mTimer.time();
-    ++ mCnfCount;
-  }
 }
 
 // @brief TFO ノードの数を得る．

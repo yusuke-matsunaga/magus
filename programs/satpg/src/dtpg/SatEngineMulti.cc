@@ -241,8 +241,6 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     solve(solver, f, bt, dop, uop);
   }
   clear_node_mark();
-
-  update_stats(solver, nf);
 }
 
 END_NAMESPACE_YM_SATPG

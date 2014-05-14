@@ -230,44 +230,68 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 	   << "s usec" << endl;
     }
     if ( stats.mDetCount > 0 ) {
-      cout << "SAT" << endl
-	   << "  " << setw(10) << stats.mDetCount
-	   << "  " << stats.mDetTime
-	   << "  " << setw(8) << stats.mDetTime.usr_time_usec() / stats.mDetCount
-	   << "u usec"
-	   << "  " << setw(8) << stats.mDetTime.sys_time_usec() / stats.mDetCount
-	   << "s usec" << endl;
+      cout << endl
+	   << "*** SAT instances (" << stats.mDetCount << ") ***" << endl
+	   << "Total CPU time  (s)            = " << setw(10) << stats.mDetTime.usr_time() << "u"
+	   << " " << setw(8) << stats.mDetTime.sys_time() << "s" << endl
+	   << "Ave. CPU time (usec)           = "
+	   << setw(10) << stats.mDetTime.usr_time_usec() / stats.mDetCount
+	   << "u"
+	   << " " << setw(8) << stats.mDetTime.sys_time_usec() / stats.mDetCount
+	   << "s" << endl
+
+	   << "# of restarts (Ave./Max)       = "
+	   << setw(10) << (double) stats.mDetStats.mRestart / stats.mDetCount
+	   << " / " << setw(8) << stats.mDetStatsMax.mRestart << endl
+
+	   << "# of conflicts (Ave./Max)      = "
+	   << setw(10) << (double) stats.mDetStats.mConflictNum / stats.mDetCount
+	   << " / " << setw(8) << stats.mDetStatsMax.mConflictNum << endl
+
+	   << "# of decisions (Ave./Max)      = "
+	   << setw(10) << (double) stats.mDetStats.mDecisionNum / stats.mDetCount
+	   << " / " << setw(8) << stats.mDetStatsMax.mDecisionNum << endl
+
+	   << "# of implications (Ave./Max)   = "
+	   << setw(10) << (double) stats.mDetStats.mPropagationNum / stats.mDetCount
+	   << " / " << setw(8) << stats.mDetStatsMax.mPropagationNum << endl;
     }
     if ( stats.mRedCount > 0 ) {
-      cout << "UNSAT" << endl
-	   << "  " << setw(10) << stats.mRedCount
-	   << "  " << stats.mRedTime
-	   << "  " << setw(8) << stats.mRedTime.usr_time_usec() / stats.mRedCount
-	   << "u usec"
-	   << "  " << setw(8) << stats.mRedTime.sys_time_usec() / stats.mRedCount
-	   << "s usec" << endl;
+      cout << endl
+	   << "*** UNSAT instances (" << stats.mRedCount << ") ***" << endl
+	   << "Total CPU time  (s)            = " << setw(10) << stats.mRedTime.usr_time() << "u"
+	   << " " << setw(8) << stats.mRedTime.sys_time() << "s" << endl
+	   << "Ave. CPU time (usec)           = "
+	   << setw(10) << stats.mRedTime.usr_time_usec() / stats.mRedCount
+	   << "u"
+	   << " " << setw(8) << stats.mRedTime.sys_time_usec() / stats.mRedCount
+	   << "s" << endl
+
+	   << "# of restarts (Ave./Max)       = "
+	   << setw(10) << (double) stats.mRedStats.mRestart / stats.mRedCount
+	   << " / " << setw(8) << stats.mRedStatsMax.mRestart << endl
+
+	   << "# of conflicts (Ave./Max)      = "
+	   << setw(10) << (double) stats.mRedStats.mConflictNum / stats.mRedCount
+	   << " / " << setw(8) << stats.mRedStatsMax.mConflictNum << endl
+
+	   << "# of decisions (Ave./Max)      = "
+	   << setw(10) << (double) stats.mRedStats.mDecisionNum / stats.mRedCount
+	   << " / " << setw(8) << stats.mRedStatsMax.mDecisionNum << endl
+
+	   << "# of implications (Ave./Max)   = "
+	   << setw(10) << (double) stats.mRedStats.mPropagationNum / stats.mRedCount
+	   << " / " << setw(8) << stats.mRedStatsMax.mPropagationNum << endl;
     }
     if ( stats.mAbortCount > 0 ) {
-      cout << "ABORT" << endl
+      cout << endl
+	   << "*** ABORT instances ***" << endl
 	   << "  " << setw(10) << stats.mAbortCount
 	   << "  " << stats.mAbortTime
 	   << "  " << setw(8) << stats.mAbortTime.usr_time_usec() / stats.mAbortCount
 	   << "u usec"
 	   << "  " << setw(8) << stats.mAbortTime.sys_time_usec() / stats.mAbortCount
 	   << "s usec" << endl;
-    }
-    {
-      cout << "# of runs:                       " << stats.mRunCount << endl
-	   << "# of problems:                   " << stats.mSatCount << endl
-	   << "Ave. # of restarts:              " << (double) stats.mSatStats.mRestart / stats.mSatCount << endl
-	   << "Ave. # of variables:             " << (double) stats.mSatStats.mVarNum / stats.mRunCount << endl
-	   << "Ave. # of constraint clauses:    " << (double) stats.mSatStats.mConstrClauseNum / stats.mRunCount << endl
-	   << "Ave. # of constraint literals:   " << (double) stats.mSatStats.mConstrLitNum / stats.mRunCount << endl
-	   << "Ave. # of learnt clauses:        " << (double) stats.mSatStats.mLearntClauseNum / stats.mRunCount << endl
-	   << "Ave. # of learnt literals:       " << (double) stats.mSatStats.mLearntLitNum / stats.mRunCount << endl
-	   << "Ave. # of conflicts:             " << (double) stats.mSatStats.mConflictNum / stats.mSatCount << endl
-	   << "Ave. # of decisions:             " << (double) stats.mSatStats.mDecisionNum / stats.mSatCount << endl
-	   << "Ave. # of implications:          " << (double) stats.mSatStats.mPropagationNum / stats.mSatCount << endl;
     }
     cout.flags(save);
 
