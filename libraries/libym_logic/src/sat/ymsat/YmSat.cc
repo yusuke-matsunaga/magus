@@ -44,9 +44,13 @@ const ymuint debug = debug_none;
 END_NONAMESPACE
 
 
+#if 0
 const
-Params kDefaultParams(0.95, 0.02, 0.999, true, false);
-
+Params kDefaultParams(0.95, 0.02, 0.999, true, false, false, false);
+#else
+const
+Params kDefaultParams(0.95, 0.00, 0.999, true, false, false, false);
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // YmSat
@@ -178,8 +182,9 @@ YmSat::expand_var()
   mWatcherList = new WatcherList[mVarSize * 2];
   mHeap = new ymuint32[mVarSize];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
-    mVal[i * 2 + 0] = old_val[i * 2 + 0];
-    mVal[i * 2 + 1] = old_val[i * 2 + 1];
+    ymuint i2 = i * 2;
+    mVal[i2 + 0] = old_val[i2 + 0];
+    mVal[i2 + 1] = old_val[i2 + 1];
     mDecisionLevel[i] = old_decision_level[i];
     mReason[i] = old_reason[i];
     mHeapPos[i] = old_heap_pos[i];
@@ -658,7 +663,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 void
 YmSat::reduce_learnt_clause()
 {
-  reduceDB();
+  cut_down();
 }
 
 // @brief conflict_limit の最大値
@@ -716,11 +721,13 @@ YmSat::search()
 	// トップレベルで矛盾が起きたら充足不可能
 	return kB3False;
       }
+#if 0
       if ( n_confl > mConflictLimit ) {
 	// 矛盾の回数が制限値を越えた．
 	backtrack(mRootLevel);
 	return kB3X;
       }
+#endif
 
       // 今の矛盾の解消に必要な条件を「学習」する．
       int bt_level = mAnalyzer->analyze(conflict, mLearntLits);
@@ -751,11 +758,19 @@ YmSat::search()
       decay_clause_activity();
     }
     else {
+#if 1
+      if ( n_confl > mConflictLimit ) {
+	// 矛盾の回数が制限値を越えた．
+	backtrack(mRootLevel);
+	return kB3X;
+      }
+#endif
       if ( decision_level() == 0 ) {
 	simplifyDB();
       }
       if ( mLearntClause.size() > mLearntLimit ) {
-	reduceDB();
+	// 学習節の数が制限値を超えたら整理する．
+	cut_down();
       }
 
       // 次の割り当てを選ぶ．
@@ -770,11 +785,11 @@ YmSat::search()
       // バックトラックポイントを記録
       mAssignList.set_marker();
 
-      // 未割り当ての変数を選んでいるのでエラーになるはずはない．
       if ( debug & (debug_assign | debug_decision) ) {
 	cout << endl
 	     << "choose " << lit << " @" << decision_level() << endl;
       }
+      // 未割り当ての変数を選んでいるのでエラーになるはずはない．
       assign(lit);
     }
   }
@@ -958,7 +973,9 @@ YmSat::backtrack(int level)
       Literal p = mAssignList.get_prev();
       VarId varid = p.varid();
       ymuint vindex = varid.val();
-      mVal[vindex * 2 + 0] = conv_from_Bool3(kB3X);
+      ymuint v2 = vindex * 2;
+      mVal[v2 + 1] = mVal[v2 + 0];
+      mVal[v2 + 0] = conv_from_Bool3(kB3X);
       heap_push(vindex);
       if ( debug & debug_assign ) {
 	cout << "\tdeassign " << p << endl;
@@ -975,39 +992,51 @@ YmSat::backtrack(int level)
 Literal
 YmSat::next_decision()
 {
-#if 0
   // 一定確率でランダムな変数を選ぶ．
   if ( mRandGen.real1() < mParams.mVarFreq && !heap_empty() ) {
     ymuint pos = mRandGen.int32() % mVarNum;
     VarId vid(pos);
-    tPol pol = kPolNega;
     if ( eval(VarId(vid)) == kB3X ) {
-      return Literal(vid, pol);
+      bool inv = mRandGen.real1() < 0.5;
+      return Literal(vid, inv);
     }
   }
-#endif
+
   while ( !heap_empty() ) {
     // activity の高い変数を取り出す．
     ymuint vindex = heap_pop_top();
-    if ( mVal[vindex * 2 + 0] != conv_from_Bool3(kB3X) ) {
+    ymuint v2 = vindex * 2;
+    if ( mVal[v2 + 0] != conv_from_Bool3(kB3X) ) {
       // すでに確定していたらスキップする．
       // もちろん，ヒープからも取り除く．
       continue;
     }
 
     bool inv = false;
-    ymuint8 vc = mVal[vindex * 2 + 1];
-    if ( mParams.mPhaseCache && vc != kB3X ) {
+    ymuint8 vc = mVal[v2 + 1];
+    if ( mParams.mPhaseCache && vc != conv_from_Bool3(kB3X) ) {
       // 以前割り当てた極性を選ぶ
-      if ( vc == kB3False ) {
+      if ( vc == conv_from_Bool3(kB3False) ) {
 	inv = true;
       }
     }
     else {
-      // Watcher の多い方の極性を(わざと)選ぶ
-      ymuint v2 = vindex * 2;
-      if ( mWatcherList[v2 + 1].num() >= mWatcherList[v2 + 0].num() ) {
-	inv = true;
+      if ( mParams.mWlPosi ) {
+	// Watcher の多い方の極性を(わざと)選ぶ
+	if ( mWatcherList[v2 + 1].num() >= mWatcherList[v2 + 0].num() ) {
+	  inv = true;
+	}
+      }
+      else if ( mParams.mWlNega ) {
+	// Watcher の少ない方の極性を選ぶ
+	ymuint v2 = vindex * 2;
+	if ( mWatcherList[v2 + 1].num() < mWatcherList[v2 + 0].num() ) {
+	  inv = true;
+	}
+      }
+      else {
+	// mWlPosi/mWlNega が指定されていなかったらランダムに選ぶ．
+	inv = mRandGen.real1() < 0.5;
       }
     }
     return Literal(VarId(vindex), inv);
@@ -1029,10 +1058,61 @@ YmSat::simplifyDB()
     return;
   }
 
+  vector<SatClause*>::iterator wpos = mLearntClause.begin();
+  ymuint n = mLearntClause.size();
+  for (ymuint rpos = 0; rpos < n; ++ rpos) {
+    SatClause* c = mLearntClause[rpos];
+    ymuint nl = c->lit_num();
+    bool satisfied = false;
+    for (ymuint i = 0; i < nl; ++ i) {
+      if ( eval(c->lit(i)) == kB3True ) {
+	satisfied = true;
+	break;
+      }
+    }
+    if ( satisfied ) {
+      // c を削除する．
+      delete_clause(c);
+    }
+    else {
+      *wpos = c;
+      ++ wpos;
+    }
+  }
+  if ( wpos != mLearntClause.end() ) {
+    mLearntClause.erase(wpos, mLearntClause.end());
+  }
+
+  if( 0 ) {
+    vector<SatClause*>::iterator wpos = mConstrClause.begin();
+    ymuint n = mConstrClause.size();
+    for (ymuint rpos = 0; rpos < n; ++ rpos) {
+      SatClause* c = mConstrClause[rpos];
+      ymuint nl = c->lit_num();
+      bool satisfied = false;
+      for (ymuint i = 0; i < nl; ++ i) {
+	if ( eval(c->lit(i)) == kB3True ) {
+	  satisfied = true;
+	  break;
+	}
+      }
+      if ( satisfied ) {
+	// c を削除する．
+	delete_clause(c);
+      }
+      else {
+	*wpos = c;
+	++ wpos;
+      }
+    }
+    if ( wpos != mConstrClause.end() ) {
+      mConstrClause.erase(wpos, mConstrClause.end());
+    }
+  }
 }
 
 BEGIN_NONAMESPACE
-// reduceDB で用いる SatClause の比較関数
+// cut_down で用いる SatClause の比較関数
 class SatClauseLess
 {
 public:
@@ -1047,7 +1127,7 @@ END_NONAMESPACE
 
 // 使われていない学習節を削除する．
 void
-YmSat::reduceDB()
+YmSat::cut_down()
 {
   ymuint n = mLearntClause.size();
   ymuint n2 = n / 2;
@@ -1153,13 +1233,18 @@ YmSat::alloc_lits(ymuint lit_num)
 void
 YmSat::delete_clause(SatClause* clause)
 {
-  assert_cond( clause->is_learnt(), __FILE__, __LINE__);
+  //assert_cond( clause->is_learnt(), __FILE__, __LINE__);
 
   // watch list を更新
   del_watcher(~clause->wl0(), SatReason(clause));
   del_watcher(~clause->wl1(), SatReason(clause));
 
-  mLearntLitNum -= clause->lit_num();
+  if ( clause->is_learnt() ) {
+    mLearntLitNum -= clause->lit_num();
+  }
+  else {
+    mConstrLitNum -= clause->lit_num();
+  }
 
   ymuint size = sizeof(SatClause) + sizeof(Literal) * (clause->lit_num() - 1);
   mAlloc.put_memory(size, static_cast<void*>(clause));

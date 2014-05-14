@@ -41,6 +41,12 @@ struct Params
   /// @brief phase-cache ヒューリスティックを使うとき true
   bool mPhaseCache;
 
+  /// @brief watcher list の多い極性を選ぶヒューリスティックを使うとき true
+  bool mWlPosi;
+
+  /// @brief watcher list の少ない極性を選ぶヒューリスティックを使うとき true
+  bool mWlNega;
+
   /// @brief LBD ヒューリスティックを使うとき true
   bool mUseLbd;
 
@@ -50,6 +56,8 @@ struct Params
     mVarFreq(0.0),
     mClauseDecay(1.0),
     mPhaseCache(true),
+    mWlPosi(false),
+    mWlNega(false),
     mUseLbd(false)
   {
   }
@@ -59,11 +67,15 @@ struct Params
 	 double var_freq,
 	 double clause_decay,
 	 bool phase_cache,
+	 bool wl_posi,
+	 bool wl_nega,
 	 bool use_lbd) :
     mVarDecay(var_decay),
     mVarFreq(var_freq),
     mClauseDecay(clause_decay),
     mPhaseCache(phase_cache),
+    mWlPosi(wl_posi),
+    mWlNega(!wl_posi && wl_nega),
     mUseLbd(use_lbd)
   {
   }
@@ -225,7 +237,7 @@ private:
 
   /// @brief 使われていない学習節を削除する．
   void
-  reduceDB();
+  cut_down();
 
   /// @brief 学習節を追加する．
   /// @note 追加するリテラルは mLearntLits に入れる．
@@ -673,7 +685,6 @@ YmSat::assign(Literal lit,
   Bool3 b = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
   ymuint8 x = conv_from_Bool3(b);
   mVal[vindex * 2 + 0] = x;
-  mVal[vindex * 2 + 1] = x;
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
 
@@ -736,8 +747,9 @@ YmSat::alloc_var()
       expand_var();
     }
     for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
-      mVal[i * 2 + 0] = conv_from_Bool3(kB3X);
-      mVal[i * 2 + 1] = conv_from_Bool3(kB3X);
+      ymuint i2 = i * 2;
+      mVal[i2 + 0] = conv_from_Bool3(kB3X);
+      mVal[i2 + 1] = conv_from_Bool3(kB3X);
       mActivity[i] = 0.0;
       heap_add_var(i);
     }
