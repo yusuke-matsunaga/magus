@@ -905,9 +905,8 @@ YmSat::implication()
 	// は問題でない．
 	bool found = false;
 	ymuint n = c->lit_num();
-	for (ymuint i = 0; i < n; ++ i) {
+	for (ymuint i = 2; i < n; ++ i) {
 	  Literal l2 = c->lit(i);
-	  if ( l2 == l0 || l2 == nl ) continue;
 	  Bool3 v = eval(l2);
 	  if ( v != kB3False ) {
 	    // l2 を 1番めの watch literal にする．
