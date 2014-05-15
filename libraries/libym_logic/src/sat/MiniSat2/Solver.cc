@@ -23,6 +23,11 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "Sort.h"
 #include "Solver.h"
 
+//#define DEBUG_ANALYZE 1
+//#define DEBUG_ASSIGN 1
+
+#include <iostream>
+
 using namespace Minisat;
 
 //=================================================================================================
@@ -43,6 +48,30 @@ static IntOption     opt_restart_first     (_cat, "rfirst",      "The base resta
 static DoubleOption  opt_restart_inc       (_cat, "rinc",        "Restart interval increase factor", 2, DoubleRange(1, false, HUGE_VAL, false));
 static DoubleOption  opt_garbage_frac      (_cat, "gc-frac",     "The fraction of wasted memory allowed before a garbage collection is triggered",  0.20, DoubleRange(0, false, HUGE_VAL, false));
 
+using namespace std;
+
+void
+print_lit(Lit l)
+{
+  cout << "v_" << var(l);
+  if ( sign(l) ) {
+    cout << "'";
+  }
+}
+
+void
+print_clause(Clause& c)
+{
+  cout << "(";
+  const char* plus = "";
+  for (int i = 0; i < c.size(); ++ i) {
+    Lit l = c[i];
+    cout << plus;
+    print_lit(l);
+    plus = " + ";
+  }
+  cout << ")" << endl;
+}
 
 //=================================================================================================
 // Constructor/Destructor:
@@ -458,6 +487,12 @@ CRef Solver::propagate()
         Watcher        *i, *j, *end;
         num_props++;
 
+#ifdef DEBUG_IMPLICATION
+	cout << "\tpick up ";
+	print_lit(p);
+	cout << endl;
+#endif
+
         for (i = j = (Watcher*)ws, end = i + ws.size();  i != end;){
             // Try to avoid inspecting the clause:
             Lit blocker = i->blocker;
@@ -479,9 +514,19 @@ CRef Solver::propagate()
             if (first != blocker && value(first) == l_True){
                 *j++ = w; continue; }
 
+#ifdef DEBUG_IMPLICATION
+	    cout << "\t\texamining watcher clause ";
+	    print_clause(c);
+	    cout << endl;
+#endif
             // Look for new watch:
             for (int k = 2; k < c.size(); k++)
-                if (value(c[k]) != l_False){
+	      if (value(c[k]) != l_False){
+#ifdef DEBUG_IMPLICATION
+		cout << "\t\t\tsecond watching literl becomes ";
+		print_lit(c[k]);
+		cout << endl;
+#endif
                     c[1] = c[k]; c[k] = false_lit;
                     watches[~c[1]].push(w);
                     goto NextClause; }
@@ -494,8 +539,17 @@ CRef Solver::propagate()
                 // Copy the remaining watches:
                 while (i < end)
                     *j++ = *i++;
-            }else
-                uncheckedEnqueue(first, cr);
+            }else {
+	      uncheckedEnqueue(first, cr);
+#ifdef DEBUG_ASSIGN
+	      cout << "\tassign ";
+	      print_lit(first);
+	      cout << " @" << decisionLevel()
+		   << " from ";
+	      print_clause(c);
+	      cout << endl;
+#endif
+	    }
 
         NextClause:;
         }
@@ -630,14 +684,46 @@ lbool Solver::search(int nof_conflicts)
             analyze(confl, learnt_clause, backtrack_level);
             cancelUntil(backtrack_level);
 
+#ifdef DEBUG_ANALYZE
+	    {
+	      using namespace std;
+
+	      cout << endl
+		   << "analyze for ";
+	      Clause& c = ca[confl];
+	      print_clause(c);
+	      cout << "learnt clause is ";
+	      const char* plus = "";
+	      for (int i = 0; i < learnt_clause.size(); ++ i) {
+		Lit l = learnt_clause[i];
+		cout << plus << var(l);
+		print_lit(l);
+		cout << " @" << level(var(l));
+		plus = " + ";
+	      }
+	      cout << endl;
+	    }
+#endif
             if (learnt_clause.size() == 1){
-                uncheckedEnqueue(learnt_clause[0]);
+	      uncheckedEnqueue(learnt_clause[0]);
+#ifdef DEBUG_ASSIGN
+	      cout << "\tassign ";
+	      print_lit(learnt_clause[0]);
+	      cout << " @" << decisionLevel()
+		   << endl;
+#endif
             }else{
                 CRef cr = ca.alloc(learnt_clause, true);
                 learnts.push(cr);
                 attachClause(cr);
                 claBumpActivity(ca[cr]);
                 uncheckedEnqueue(learnt_clause[0], cr);
+#ifdef DEBUG_ASSIGN
+		cout << "\tassign ";
+		print_lit(learnt_clause[0]);
+		cout << " @" << decisionLevel()
+		     << endl;
+#endif
             }
 
             varDecayActivity();
@@ -695,11 +781,24 @@ lbool Solver::search(int nof_conflicts)
                 if (next == lit_Undef)
                     // Model found:
                     return l_True;
+#ifdef DEBUG_ASSIGN
+		cout << endl
+		     << "choose ";
+		print_lit(next);
+		cout << " @" << decisionLevel()
+		     << endl;
+#endif
             }
 
             // Increase decision level and enqueue 'next'
             newDecisionLevel();
             uncheckedEnqueue(next);
+#ifdef DEBUG_ASSIGN
+	    cout << "\tassign ";
+	    print_lit(next);
+	    cout << " @" << decisionLevel()
+		 << endl;
+#endif
         }
     }
 }
