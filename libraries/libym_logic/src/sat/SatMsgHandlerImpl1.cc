@@ -34,7 +34,7 @@ SatMsgHandlerImpl1::print_header()
      << "|  Number of clauses:                                             |" << endl
      << "====================[ Search Statistics ] =========================" << endl
      << "| conflicts |       ORIGINAL      |             LEARNT            |" << endl
-     << "|           |   Clauses      Lits |     limit   Clauses      Lits |" << endl
+     << "|           |   Clauses      Lits |     limit   Clauses    Lit/Cl |" << endl
      << "===================================================================" << endl;
 }
 
@@ -52,9 +52,14 @@ SatMsgHandlerImpl1::print_message(const SatStats& stats)
      << setw(9) << stats.mLearntLimit
      << " "
      << setw(9) << stats.mLearntClauseNum
-     << " "
-     << setw(9) << stats.mLearntLitNum
-     << " |" << endl;
+     << " " << setw(9);
+  if ( stats.mLearntClauseNum == 0 ) {
+    mS << 0;
+  }
+  else {
+    mS << static_cast<int>(static_cast<double>(stats.mLearntLitNum) / stats.mLearntClauseNum);
+  }
+  mS << " |" << endl;
 }
 
 // @brief フッタの出力

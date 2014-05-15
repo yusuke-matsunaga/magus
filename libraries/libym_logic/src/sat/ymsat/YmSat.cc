@@ -621,6 +621,9 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
     mLearntLimit = static_cast<ymuint64>(learnt_limit);
 
+    ++ mRestart;
+    sat_stat = search();
+
     // メッセージ出力を行う．
     SatStats stats;
     get_stats(stats);
@@ -630,8 +633,6 @@ YmSat::solve(const vector<Literal>& assumptions,
       handler.print_message(stats);
     }
 
-    ++ mRestart;
-    sat_stat = search();
     if ( sat_stat != kB3X ) {
       // 結果が求められた．
       break;
