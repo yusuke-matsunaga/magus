@@ -157,6 +157,7 @@ SatClause::SatClause(ymuint lit_num,
 		     bool learnt)
 {
   mSizeLearnt = (lit_num << 1) | static_cast<ymuint>(learnt);
+  mLBD = lit_num;
   mActivity = 0.0;
   for (ymuint i = 0; i < lit_num; ++ i) {
     mLits[i] = lits[i];

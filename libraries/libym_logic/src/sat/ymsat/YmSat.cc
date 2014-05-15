@@ -490,6 +490,29 @@ YmSat::del_watcher(Literal watch_lit,
   wlist.erase(n);
 }
 
+BEGIN_NONAMESPACE
+
+// Luby restart strategy
+double
+luby(double y,
+     int x)
+{
+  // なんのこっちゃわかんないコード
+  int size;
+  int seq;
+  for (size = 1, seq = 0; size < x + 1; ++ seq, size = size * 2 + 1) ;
+
+  while ( size - 1 != x ) {
+    size = (size - 1) >> 1;
+    -- seq;
+    x = x % size;
+  }
+
+  return pow(y, seq);
+}
+
+END_NONAMESPACE
+
 // @brief SAT 問題を解く．
 // @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
 // @param[out] model 充足するときの値の割り当てを格納する配列．
@@ -536,6 +559,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   // パラメータの初期化
   double confl_limit = 100;
+  double restart_inc = 2;
   double learnt_limit = clause_num() / 3.0;
   mVarDecay = mParams.mVarDecay;
   mClauseDecay = mParams.mClauseDecay;
@@ -591,6 +615,7 @@ YmSat::solve(const vector<Literal>& assumptions,
   for ( ; ; ) {
     // 実際の探索を行う．
     mConflictLimit = static_cast<ymuint64>(confl_limit);
+    mConflictLimit = static_cast<ymuint64>(luby(restart_inc, mRestart)) * 100;
     if ( mConflictLimit > mMaxConflict ) {
       mConflictLimit = mMaxConflict;
     }
@@ -618,7 +643,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
     // 判定できなかったのでパラメータを更新して次のラウンドへ
     confl_limit = confl_limit * 1.5;
-    learnt_limit = learnt_limit * 1.1;
+    learnt_limit = learnt_limit + 100;
   }
   if ( sat_stat == kB3True ) {
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
@@ -1138,7 +1163,7 @@ YmSat::cut_down()
   vector<SatClause*>::iterator wpos = mLearntClause.begin();
   for (ymuint i = 0; i < n2; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->lit_num() > 2 && !is_locked(clause) ) {
+    if ( clause->lit_num() > 2 && clause->lbd() > 2 && !is_locked(clause) ) {
       delete_clause(clause);
     }
     else {
@@ -1148,7 +1173,7 @@ YmSat::cut_down()
   }
   for (ymuint i = n2; i < n; ++ i) {
     SatClause* clause = mLearntClause[i];
-    if ( clause->lit_num() > 2 && !is_locked(clause) &&
+    if ( clause->lit_num() > 2 && clause->lbd() > 2 && !is_locked(clause) &&
 	 clause->activity() < abs_limit ) {
       delete_clause(clause);
     }
