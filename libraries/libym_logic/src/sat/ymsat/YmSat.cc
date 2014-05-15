@@ -712,6 +712,12 @@ YmSat::search()
   // コンフリクトの起こった回数
   ymuint n_confl = 0;
   for ( ; ; ) {
+    if ( n_confl > mConflictLimit ) {
+      // 矛盾の回数が制限値を越えた．
+      backtrack(mRootLevel);
+      return kB3X;
+    }
+
     // キューにつまれている割り当てから含意される値の割り当てを行う．
     SatReason conflict = implication();
     if ( conflict != kNullSatReason ) {
@@ -722,13 +728,6 @@ YmSat::search()
 	// トップレベルで矛盾が起きたら充足不可能
 	return kB3False;
       }
-#if 0
-      if ( n_confl > mConflictLimit ) {
-	// 矛盾の回数が制限値を越えた．
-	backtrack(mRootLevel);
-	return kB3X;
-      }
-#endif
 
       // 今の矛盾の解消に必要な条件を「学習」する．
       int bt_level = mAnalyzer->analyze(conflict, mLearntLits);
@@ -759,13 +758,6 @@ YmSat::search()
       decay_clause_activity();
     }
     else {
-#if 1
-      if ( n_confl > mConflictLimit ) {
-	// 矛盾の回数が制限値を越えた．
-	backtrack(mRootLevel);
-	return kB3X;
-      }
-#endif
       if ( decision_level() == 0 ) {
 	simplifyDB();
       }
@@ -1062,8 +1054,8 @@ YmSat::simplifyDB()
     return;
   }
 
-  vector<SatClause*>::iterator wpos = mLearntClause.begin();
   ymuint n = mLearntClause.size();
+  ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < n; ++ rpos) {
     SatClause* c = mLearntClause[rpos];
     ymuint nl = c->lit_num();
@@ -1079,17 +1071,19 @@ YmSat::simplifyDB()
       delete_clause(c);
     }
     else {
-      *wpos = c;
+      if ( wpos != rpos ) {
+	mLearntClause[wpos] = c;
+      }
       ++ wpos;
     }
   }
-  if ( wpos != mLearntClause.end() ) {
-    mLearntClause.erase(wpos, mLearntClause.end());
+  if ( wpos != n ) {
+    mLearntClause.erase(mLearntClause.begin() + wpos, mLearntClause.end());
   }
 
-  if( 0 ) {
-    vector<SatClause*>::iterator wpos = mConstrClause.begin();
+  if( false ) {
     ymuint n = mConstrClause.size();
+    ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < n; ++ rpos) {
       SatClause* c = mConstrClause[rpos];
       ymuint nl = c->lit_num();
@@ -1105,12 +1099,14 @@ YmSat::simplifyDB()
 	delete_clause(c);
       }
       else {
-	*wpos = c;
+	if ( wpos != rpos ) {
+	  mConstrClause[wpos] = c;
+	}
 	++ wpos;
       }
     }
-    if ( wpos != mConstrClause.end() ) {
-      mConstrClause.erase(wpos, mConstrClause.end());
+    if ( wpos != n ) {
+      mConstrClause.erase(mConstrClause.begin() + wpos, mConstrClause.end());
     }
   }
 }
