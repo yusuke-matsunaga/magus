@@ -61,23 +61,12 @@ public:
   void
   xchange_wl();
 
-  /// @brief src_pos 番めのリテラルを dst_pos に移動する．
+  /// @brief src_pos 番めのリテラルを wl1 に移動する．
   /// @param[in] src_pos もとの位置
-  /// @param[in] dst_pos 移動先
-  /// @note src_pos < dst_pos でなければならない．
-  /// @note 間のリテラルは一つずつ右にずれる．
-  void
-  insert(ymuint src_pos,
-	 ymuint dst_pos);
-
-  /// @brief src_pos 番めのリテラルを dst_pos に移動する．
-  /// @param[in] src_pos もとの位置
-  /// @param[in] dst_pos 移動先
   /// @note 互いに位置を交換する．
   /// @note 間のリテラルは不変
   void
-  xchange(ymuint src_pos,
-	  ymuint dst_pos);
+  xchange_wl1(ymuint src_pos);
 
   /// @brief literal block distance を設定する．
   void
@@ -141,10 +130,6 @@ private:
   // activity
   double mActivity;
 
-  Literal mWl0;
-
-  Literal mWl1;
-
   // リテラルの配列
   // 実際にはこの後にリテラル数分の領域を確保する．
   Literal mLits[1];
@@ -176,8 +161,6 @@ SatClause::SatClause(ymuint lit_num,
   for (ymuint i = 0; i < lit_num; ++ i) {
     mLits[i] = lits[i];
   }
-  mWl0 = mLits[0];
-  mWl1 = mLits[1];
 }
 
 // @brief デストラクタ
@@ -195,8 +178,6 @@ SatClause::set(Literal lit0,
 {
   mLits[0] = lit0;
   mLits[1] = lit1;
-  mWl0 = lit0;
-  mWl1 = lit1;
 }
 
 // @brief watch literal を入れ替える．
@@ -207,50 +188,18 @@ SatClause::xchange_wl()
   Literal tmp = mLits[0];
   mLits[0] = mLits[1];
   mLits[1] = tmp;
-  mWl0 = mLits[0];
-  mWl1 = mLits[1];
 }
 
-// @brief src_pos 番めのリテラルを dst_pos に移動する．
+// @brief src_pos 番めのリテラルを wl1 に移動する．
 // @param[in] src_pos もとの位置
-// @param[in] dst_pos 移動先
-// @note src_pos < dst_pos でなければならない．
-// @note 間のリテラルは一つずつ右にずれる．
-inline
-void
-SatClause::insert(ymuint src_pos,
-		  ymuint dst_pos)
-{
-  Literal tmp = mLits[src_pos];
-  for (ymuint i = src_pos; i > dst_pos; -- i) {
-    mLits[i] = mLits[i - 1];
-  }
-  mLits[dst_pos] = tmp;
-  assert_cond( mWl0 == mLits[0], __FILE__, __LINE__);
-  assert_cond( mWl1 == mLits[1], __FILE__, __LINE__);
-}
-
-// @brief src_pos 番めのリテラルを dst_pos に移動する．
-// @param[in] src_pos もとの位置
-// @param[in] dst_pos 移動先
-// @note 互いに位置を交換する．
 // @note 間のリテラルは不変
 inline
 void
-SatClause::xchange(ymuint src_pos,
-		   ymuint dst_pos)
+SatClause::xchange_wl1(ymuint src_pos)
 {
   Literal tmp = mLits[src_pos];
-  mLits[src_pos] = mLits[dst_pos];
-  mLits[dst_pos] = tmp;
-  if ( src_pos == 1 ) {
-    mWl1 = mLits[src_pos];
-  }
-  if ( dst_pos == 1 ) {
-    mWl1 = mLits[dst_pos];
-  }
-  assert_cond( mWl0 == mLits[0], __FILE__, __LINE__);
-  assert_cond( mWl1 == mLits[1], __FILE__, __LINE__);
+  mLits[src_pos] = mLits[1];
+  mLits[1] = tmp;
 }
 
 // @brief literal block distance を設定する．
@@ -282,12 +231,7 @@ inline
 Literal
 SatClause::wl0() const
 {
-#if 1
-  assert_cond( mLits[0] == mWl0, __FILE__, __LINE__);
   return mLits[0];
-#else
-  return mWl0;
-#endif
 }
 
 // @brief 1番めの watch literal を得る．
@@ -295,12 +239,7 @@ inline
 Literal
 SatClause::wl1() const
 {
-#if 1
-  assert_cond( mLits[1] == mWl1, __FILE__, __LINE__);
   return mLits[1];
-#else
-  return mWl1;
-#endif
 }
 
 // @brief 学習節の場合 true を返す．

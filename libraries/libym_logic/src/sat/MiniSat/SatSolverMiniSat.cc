@@ -19,8 +19,12 @@ BEGIN_NAMESPACE_YM_SAT
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SatSolverMiniSat::SatSolverMiniSat()
+// @param[in] option オプション文字列
+SatSolverMiniSat::SatSolverMiniSat(const string& option)
 {
+  if ( option == "verbose" ) {
+    mSolver.verbosity = 1;
+  }
 }
 
 // @brief デストラクタ

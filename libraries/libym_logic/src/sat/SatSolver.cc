@@ -32,11 +32,11 @@ SatSolver::SatSolver(const string& type,
 {
   if ( type == "minisat" ) {
     // minisat-1.4
-    mImpl = new SatSolverMiniSat;
+    mImpl = new SatSolverMiniSat(option);
   }
   else if ( type == "minisat2" ) {
     // minisat-2.2
-    mImpl = new SatSolverMiniSat2;
+    mImpl = new SatSolverMiniSat2(option);
   }
   else {
     SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);

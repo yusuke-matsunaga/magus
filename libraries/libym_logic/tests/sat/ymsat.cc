@@ -27,6 +27,7 @@ main(int argc,
 
   int verbose = 0;
   bool minisat = false;
+  bool minisat2 = false;
 
   int wpos = 1;
   string opt;
@@ -39,6 +40,9 @@ main(int argc,
       }
       else if ( strcmp(argv[rpos], "--minisat") == 0 ) {
 	minisat = true;
+      }
+      else if ( strcmp(argv[rpos], "--minisat2") == 0 ) {
+	minisat2 = true;
       }
       else if ( strcmp(argv[rpos], "--analyzer-uip1") == 0 ) {
 	opt = "uip1";
@@ -72,6 +76,11 @@ main(int argc,
     string sat_type;
     if ( minisat ) {
       sat_type = "minisat";
+      opt = "verbose";
+    }
+    else if ( minisat2 ) {
+      sat_type = "minisat2";
+      opt = "verbose";
     }
     SatSolver solver(sat_type, opt);
 
@@ -87,8 +96,9 @@ main(int argc,
     }
     FileIDO ido(codec_type);
 
-    if ( ido.open(argv[1]) ) {
+    if ( !ido.open(argv[1]) ) {
       cerr << "Could not open " << argv[1] << endl;
+      return -1;
     }
 
     if ( !parser.read(ido) ) {
@@ -118,6 +128,16 @@ main(int argc,
 
     USTime ust = sw.time();
     cout << ust << endl;
+
+    SatStats stats;
+    solver.get_stats(stats);
+    cout << "restarts          : " << stats.mRestart << endl
+	 << "conflicts         : " << stats.mConflictNum << endl
+	 << "decisions         : " << stats.mDecisionNum << endl
+	 << "propagations      : " << stats.mPropagationNum << endl
+	 << "conflict literals : " << stats.mLearntLitNum << endl
+	 << "CPU time          : " << stats.mTime << endl;
+
   }
   catch ( AssertError x) {
     cout << x << endl;

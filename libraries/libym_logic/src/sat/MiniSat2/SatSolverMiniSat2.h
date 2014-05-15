@@ -25,7 +25,8 @@ class SatSolverMiniSat2 :
 public:
 
   /// @brief コンストラクタ
-  SatSolverMiniSat2();
+  /// @param[in] option オプション文字列
+  SatSolverMiniSat2(const string& option);
 
   /// @brief デストラクタ
   virtual

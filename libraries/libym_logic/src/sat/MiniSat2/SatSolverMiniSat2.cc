@@ -20,8 +20,12 @@ using namespace Minisat;
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SatSolverMiniSat2::SatSolverMiniSat2()
+// @param[in] option オプション文字列
+SatSolverMiniSat2::SatSolverMiniSat2(const string& option)
 {
+  if ( option == "verbose" ) {
+    mSolver.verbosity = 1;
+  }
 }
 
 // @brief デストラクタ

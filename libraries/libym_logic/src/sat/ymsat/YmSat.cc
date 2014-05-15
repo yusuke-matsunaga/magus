@@ -90,7 +90,7 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mPropagationNum(0),
   mConflictLimit(0),
   mLearntLimit(0),
-  mMaxConflict(1024 * 10)
+  mMaxConflict(1024 * 100)
 {
   mAnalyzer->mSolver = this;
 
@@ -536,7 +536,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
   // パラメータの初期化
   double confl_limit = 100;
-  double learnt_limit = mConstrClause.size() / 3.0;
+  double learnt_limit = clause_num() / 3.0;
   mVarDecay = mParams.mVarDecay;
   mClauseDecay = mParams.mClauseDecay;
 
@@ -885,9 +885,7 @@ YmSat::implication()
 	  Bool3 v = eval(l2);
 	  if ( v != kB3False ) {
 	    // l2 を 1番めの watch literal にする．
-	    //c->insert(i, 1);
-	    c->xchange(i, 1);
-	    //c->set_wl1(l2);
+	    c->xchange_wl1(i);
 	    if ( debug & debug_implication ) {
 	      cout << "\t\t\tsecond watching literal becomes "
 		   << l2 << endl;
