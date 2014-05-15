@@ -432,6 +432,8 @@ YmSat::add_learnt_clause()
     }
     SatClause* clause = new_clause(n, true);
 
+    bump_clause_activity(clause);
+
     if ( mParams.mUseLbd ) {
       // LBD の計算
       ymuint lbd = calc_lbd(clause);
@@ -615,7 +617,6 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
 
     // 判定できなかったのでパラメータを更新して次のラウンドへ
-    decay_var_activity2();
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit * 1.1;
   }
@@ -1277,18 +1278,6 @@ void
 YmSat::decay_var_activity()
 {
   mVarBump /= mVarDecay;
-}
-
-// リスタート時の変数のアクティビティの低減率
-void
-YmSat::decay_var_activity2()
-{
-#if 0
-  for (ymuint i = 0; i < mVarNum; ++ i) {
-    mActivity[i] /= mConflictNum;
-  }
-  mVarBump = 1.0;
-#endif
 }
 
 // 学習節のアクティビティを増加させる．

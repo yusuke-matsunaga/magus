@@ -328,10 +328,6 @@ private:
   void
   decay_var_activity();
 
-  /// @brief リスタート時の変数のアクティビティの低減率
-  void
-  decay_var_activity2();
-
   /// @brief 学習節のアクティビティを増加させる．
   /// @param[in] clause 対象の学習節
   void
