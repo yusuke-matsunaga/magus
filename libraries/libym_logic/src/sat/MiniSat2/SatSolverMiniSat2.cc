@@ -15,6 +15,17 @@ BEGIN_NAMESPACE_YM_SAT
 
 using namespace Minisat;
 
+BEGIN_NONAMESPACE
+
+inline
+Lit
+literal2lit(Literal l)
+{
+  return mkLit(static_cast<Var>(l.varid().val()), l.is_negative());
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // SatSolverMiniSat2
 //////////////////////////////////////////////////////////////////////
@@ -58,7 +69,7 @@ SatSolverMiniSat2::add_clause(const vector<Literal>& lits)
   for (vector<Literal>::const_iterator p = lits.begin();
        p != lits.end(); ++ p) {
     Literal l = *p;
-    Lit lit = mkLit(static_cast<Var>(l.varid().val()), l.is_negative());
+    Lit lit = literal2lit(l);
     tmp.push(lit);
   }
   mSolver.addClause_(tmp);
@@ -74,10 +85,34 @@ SatSolverMiniSat2::add_clause(ymuint lit_num,
   vec<Lit> tmp;
   for (ymuint i = 0; i < lit_num; ++ i) {
     Literal l = lits[i];
-    Lit lit = mkLit(l.varid().val(), l.is_negative());
+    Lit lit = literal2lit(l);
     tmp.push(lit);
   }
   mSolver.addClause_(tmp);
+}
+
+// @brief 1項の節(リテラル)を追加する．
+void
+SatSolverMiniSat2::add_clause(Literal lit1)
+{
+  mSolver.addClause(literal2lit(lit1));
+}
+
+// @brief 2項の節を追加する．
+void
+SatSolverMiniSat2::add_clause(Literal lit1,
+			      Literal lit2)
+{
+  mSolver.addClause(literal2lit(lit1), literal2lit(lit2));
+}
+
+// @brief 3項の節を追加する．
+void
+SatSolverMiniSat2::add_clause(Literal lit1,
+			      Literal lit2,
+			      Literal lit3)
+{
+  mSolver.addClause(literal2lit(lit1), literal2lit(lit2), literal2lit(lit3));
 }
 
 // @brief SAT 問題を解く．
@@ -95,7 +130,7 @@ SatSolverMiniSat2::solve(const vector<Literal>& assumptions,
   for (vector<Literal>::const_iterator p = assumptions.begin();
        p != assumptions.end(); ++ p) {
     Literal l = *p;
-    Lit lit = mkLit(l.varid().val(), l.is_negative());
+    Lit lit = literal2lit(l);
     tmp.push(lit);
   }
   bool ans = mSolver.solve(tmp);

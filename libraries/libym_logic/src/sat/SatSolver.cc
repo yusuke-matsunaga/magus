@@ -91,8 +91,7 @@ void
 SatSolver::add_clause(Literal lit1,
 		      Literal lit2)
 {
-  Literal tmp_lits[2] = {lit1, lit2};
-  mImpl->add_clause(2, tmp_lits);
+  mImpl->add_clause(lit1, lit2);
 }
 
 // @brief 3項の節を追加する．
@@ -101,8 +100,7 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit2,
 		      Literal lit3)
 {
-  Literal tmp_lits[3] = {lit1, lit2, lit3};
-  mImpl->add_clause(3, tmp_lits);
+  mImpl->add_clause(lit1, lit2, lit3);
 }
 
 // @brief 4項の節を追加する．
@@ -112,8 +110,7 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit3,
 		      Literal lit4)
 {
-  Literal tmp_lits[4] = {lit1, lit2, lit3, lit4};
-  mImpl->add_clause(4, tmp_lits);
+  mImpl->add_clause(lit1, lit2, lit3, lit4);
 }
 
 // @brief 5項の節を追加する．
@@ -124,8 +121,7 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit4,
 		      Literal lit5)
 {
-  Literal tmp_lits[5] = {lit1, lit2, lit3, lit4, lit5};
-  mImpl->add_clause(5, tmp_lits);
+  mImpl->add_clause(lit1, lit2, lit3, lit4, lit5);
 }
 
 // @brief SAT 問題を解く．
@@ -213,6 +209,63 @@ void
 SatSolver::timer_on(bool enable)
 {
   mImpl->timer_on(enable);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SatSolverImpl
+//
+// ここでは add_clause() のバリエーションのデフォルト実装を
+// 提供している．
+//////////////////////////////////////////////////////////////////////
+
+// @brief 1項の節を追加する．
+void
+SatSolverImpl::add_clause(Literal lit1)
+{
+  add_clause(1, &lit1);
+}
+
+// @brief 2項の節を追加する．
+void
+SatSolverImpl::add_clause(Literal lit1,
+			  Literal lit2)
+{
+  Literal tmp_lits[2] = {lit1, lit2};
+  add_clause(2, tmp_lits);
+}
+
+// @brief 3項の節を追加する．
+void
+SatSolverImpl::add_clause(Literal lit1,
+			  Literal lit2,
+			  Literal lit3)
+{
+  Literal tmp_lits[3] = {lit1, lit2, lit3};
+  add_clause(3, tmp_lits);
+}
+
+// @brief 4項の節を追加する．
+void
+SatSolverImpl::add_clause(Literal lit1,
+			  Literal lit2,
+			  Literal lit3,
+			  Literal lit4)
+{
+  Literal tmp_lits[4] = {lit1, lit2, lit3, lit4};
+  add_clause(4, tmp_lits);
+}
+
+// @brief 5項の節を追加する．
+void
+SatSolverImpl::add_clause(Literal lit1,
+			  Literal lit2,
+			  Literal lit3,
+			  Literal lit4,
+			  Literal lit5)
+{
+  Literal tmp_lits[5] = {lit1, lit2, lit3, lit4, lit5};
+  add_clause(5, tmp_lits);
 }
 
 END_NAMESPACE_YM_SAT

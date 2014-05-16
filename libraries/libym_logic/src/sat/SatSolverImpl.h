@@ -60,6 +60,41 @@ public:
   add_clause(ymuint lit_num,
 	     const Literal* lits) = 0;
 
+  /// @brief 1項の節(リテラル)を追加する．
+  virtual
+  void
+  add_clause(Literal lit1);
+
+  /// @brief 2項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2);
+
+  /// @brief 3項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3);
+
+  /// @brief 4項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4);
+
+  /// @brief 5項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4,
+	     Literal lit5);
+
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
   /// @param[out] model 充足するときの値の割り当てを格納する配列．
