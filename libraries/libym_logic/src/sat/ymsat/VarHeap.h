@@ -38,6 +38,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief アクティビティの低減率を設定する．
+  /// @param[in] decay 低減率
   void
   set_decay(double decay);
 
@@ -64,14 +65,14 @@ public:
   empty() const;
 
   /// @brief 変数を始めてヒープに追加する．
-  /// @param[in] vindex 追加する変数番号
+  /// @param[in] var 追加する変数
   void
-  add_var(ymuint vindex);
+  add_var(VarId var);
 
   /// @brief 変数を再びヒープに追加する．
-  /// @param[in] vindex 追加する変数番号
+  /// @param[in] var 追加する変数
   void
-  push(ymuint vindex);
+  push(VarId var);
 
   /// @brief アクティビティ最大の変数番号を取り出す．
   /// @note 該当の変数はヒープから取り除かれる．
@@ -79,8 +80,9 @@ public:
   pop_top();
 
   /// @brief 変数のアクティビティを返す．
+  /// @param[in] var 対象の変数
   double
-  activity(ymuint vindex) const;
+  activity(VarId var) const;
 
 
 private:
@@ -195,29 +197,32 @@ VarHeap::empty() const
 }
 
 // @brief 変数を始めてヒープに追加する．
-// @param[in] vindex 追加する変数番号
+// @param[in] var 変数番号
 inline
 void
-VarHeap::add_var(ymuint vindex)
+VarHeap::add_var(VarId var)
 {
+  ymuint vindex = var.val();
   set(vindex, mHeapNum);
   mActivity[vindex] = 0.0;
   ++ mHeapNum;
 }
 
 // @brief 変数のアクティビティを返す．
+// @param[in] var 変数番号
 inline
 double
-VarHeap::activity(ymuint vindex) const
+VarHeap::activity(VarId var) const
 {
-  return mActivity[vindex];
+  return mActivity[var.val()];
 }
 
 // @brief 要素を追加する．
 inline
 void
-VarHeap::push(ymuint vindex)
+VarHeap::push(VarId var)
 {
+  ymuint vindex = var.val();
   if ( mHeapPos[vindex] == -1 ) {
     ymuint pos = mHeapNum;
     ++ mHeapNum;

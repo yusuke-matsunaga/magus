@@ -137,6 +137,41 @@ public:
   add_clause(ymuint lit_num,
 	     const Literal* lits);
 
+  /// @brief 1項の節(リテラル)を追加する．
+  virtual
+  void
+  add_clause(Literal lit1);
+
+  /// @brief 2項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2);
+
+  /// @brief 3項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3);
+
+  /// @brief 4項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4);
+
+  /// @brief 5項の節を追加する．
+  virtual
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4,
+	     Literal lit5);
+
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
   /// @param[out] model 充足するときの値の割り当てを格納する配列．
@@ -200,14 +235,17 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 探索を行う本体の関数
+  /// @param[in] confl_limit 矛盾の制限値
+  ///
+  /// 矛盾の生起回数が confl_limit を越えたら kB3X を返す．
   Bool3
-  search();
+  search(ymuint confl_limit);
 
   /// @brief 割当てキューに基づいて implication を行う．
   SatReason
   implication();
 
-  /// @brief level までバックトラックする
+  /// @brief バックトラックする
   /// @param[in] level バックトラックするレベル
   void
   backtrack(int level);
@@ -220,34 +258,40 @@ private:
   /// @brief 値の割当てか可能かチェックする．
   /// @param[in] lit 割り当てるリテラル
   /// @return 矛盾が起きたら false を返す．
+  ///
+  /// すでに同じ値が割り当てられていたらなにもしない．
+  /// 割り当てには assign() を呼び出す．
   bool
   check_and_assign(Literal lit);
 
   /// @brief 値の割当てを行う．
   /// @param[in] lit 割り当てるリテラル
   /// @param[in] reason 割り当ての理由
-  /// @note 実際にはキューに積む．
-  /// @return 矛盾が起きたら false を返す．
   void
   assign(Literal lit,
 	 SatReason reason = SatReason());
 
   /// @brief CNF を簡単化する．
   void
-  simplifyDB();
+  sweep_clause();
 
   /// @brief 使われていない学習節を削除する．
   void
   cut_down();
+
+  /// @brief add_clause() の下請け関数
+  void
+  add_clause_sub(ymuint lit_num);
 
   /// @brief 学習節を追加する．
   /// @note 追加するリテラルは mLearntLits に入れる．
   void
   add_learnt_clause();
 
-  /// @brief add_clause() の下請け関数
+  /// @brief mTmpLits を確保する．
+  /// @param[in] lit_num リテラル数
   void
-  add_clause_sub(ymuint lit_num);
+  alloc_lits(ymuint lit_num);
 
   /// @brief 新しい節を生成する．
   /// @param[in] lit_num リテラル数
@@ -257,11 +301,6 @@ private:
   SatClause*
   new_clause(ymuint lit_num,
 	     bool learnt = false);
-
-  /// @brief mTmpLits を確保する．
-  /// @param[in] lit_num リテラル数
-  void
-  alloc_lits(ymuint lit_num);
 
   /// @brief 節を削除する．
   /// @param[in] clause 削除する節
@@ -389,9 +428,7 @@ private:
   ymuint32 mVarSize;
 
   // 値の配列
-  // サイズは mVarSize * 2
-  // 偶数には本当の値，
-  // 奇数には以前の値が入る．
+  // サイズは mVarSize
   ymuint8* mVal;
 
   // 値が割り当てられたときのレベルの配列
@@ -483,30 +520,6 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 変数の数を得る．
-inline
-ymuint
-YmSat::variable_num() const
-{
-  return mVarNum;
-}
-
-// @brief 制約節の数を得る．
-inline
-ymuint
-YmSat::clause_num() const
-{
-  return mConstrClause.size() + mConstrBinNum;
-}
-
-// @brief 制約節のリテラルの総数を得る．
-inline
-ymuint
-YmSat::literal_num() const
-{
-  return mConstrLitNum;
-}
-
 // watcher list を得る．
 inline
 WatcherList&
@@ -535,6 +548,13 @@ conv_to_Bool3(ymuint8 x)
   return static_cast<Bool3>(tmp);
 }
 
+inline
+Bool3
+cur_val(ymuint8 x)
+{
+  return conv_to_Bool3(x & 3U);
+}
+
 END_NONAMESPACE
 
 // 変数の評価を行う．
@@ -542,7 +562,7 @@ inline
 Bool3
 YmSat::eval(VarId id) const
 {
-  return conv_to_Bool3(mVal[id.val() * 2 + 0]);
+  return cur_val(mVal[id.val()]);
 }
 
 // literal の評価を行う．
@@ -551,9 +571,10 @@ Bool3
 YmSat::eval(Literal l) const
 {
   ymuint index = l.index();
-  Bool3 val = conv_to_Bool3(mVal[(index / 2) * 2 + 0]);
-  int d = 1 - (index & 1U) * 2;
-  return static_cast<Bool3>(static_cast<int>(val) * d);
+  ymuint x = mVal[index / 2] & 3U;
+  ymuint inv = index & 1U;
+  int d = 1 - (inv * 2);
+  return static_cast<Bool3>((static_cast<int>(x) - 1) * d);
 }
 
 // 値の割当てか可能かチェックする．
@@ -590,9 +611,9 @@ YmSat::assign(Literal lit,
 {
   ymuint lindex = lit.index();
   ymuint vindex = lindex / 2;
-  Bool3 b = static_cast<Bool3>(1 - static_cast<int>(lindex & 1U) * 2);
-  ymuint8 x = conv_from_Bool3(b);
-  mVal[vindex * 2 + 0] = x;
+  ymuint inv = lindex & 1U;
+  ymuint8 x = 2 - inv * 2;
+  mVal[vindex] = x;
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
 
@@ -635,14 +656,6 @@ YmSat::is_locked(SatClause* clause) const
   // どうかを調べれば clause が割り当て理由として用いられて
   // いるかわかる．
   return reason(clause->wl0().varid()) == SatReason(clause);
-}
-
-// @brief 時間計測機能を制御する
-inline
-void
-YmSat::timer_on(bool enable)
-{
-  mTimerOn = enable;
 }
 
 // @brief 変数のアクティビティを増加させる．
