@@ -785,6 +785,8 @@ YmSat::search()
     }
     else {
       if ( decision_level() == 0 ) {
+	// 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
+	// あるかもしれないのでそれを取り除く．
 	simplifyDB();
       }
       if ( mLearntClause.size() > mLearntLimit ) {
