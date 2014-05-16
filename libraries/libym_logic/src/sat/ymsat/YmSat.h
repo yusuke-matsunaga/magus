@@ -733,26 +733,6 @@ YmSat::timer_on(bool enable)
   mTimerOn = enable;
 }
 
-// 実際に変数に関するデータ構造を生成する．
-inline
-void
-YmSat::alloc_var()
-{
-  if ( mOldVarNum < mVarNum ) {
-    if ( mVarSize < mVarNum ) {
-      expand_var();
-    }
-    for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
-      ymuint i2 = i * 2;
-      mVal[i2 + 0] = conv_from_Bool3(kB3X);
-      mVal[i2 + 1] = conv_from_Bool3(kB3X);
-      mActivity[i] = 0.0;
-      heap_add_var(i);
-    }
-    mOldVarNum = mVarNum;
-  }
-}
-
 // @brief 空にする．
 inline
 void

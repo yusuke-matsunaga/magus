@@ -70,7 +70,7 @@ print_clause(Clause& c)
     print_lit(l);
     plus = " + ";
   }
-  cout << ")" << endl;
+  cout << ")";;
 }
 
 //=================================================================================================
@@ -234,10 +234,18 @@ bool Solver::satisfied(const Clause& c) const {
 // Revert to the state at given level (keeping all assignment at 'level' but not beyond).
 //
 void Solver::cancelUntil(int level) {
-    if (decisionLevel() > level){
+  if (decisionLevel() > level){
+#ifdef DEBUG_ASSIGN
+    cout << "backtrack until @" << level << endl;
+#endif
         for (int c = trail.size()-1; c >= trail_lim[level]; c--){
             Var      x  = var(trail[c]);
             assigns [x] = l_Undef;
+#ifdef DEBUG_ASSIGN
+	    cout << "\tdeassign ";
+	    print_lit(trail[c]);
+	    cout << endl;
+#endif
             if (phase_saving > 1 || (phase_saving == 1) && c > trail_lim.last())
                 polarity[x] = sign(trail[c]);
             insertVarOrder(x); }
@@ -692,11 +700,12 @@ lbool Solver::search(int nof_conflicts)
 		   << "analyze for ";
 	      Clause& c = ca[confl];
 	      print_clause(c);
+	      cout << endl;
 	      cout << "learnt clause is ";
 	      const char* plus = "";
 	      for (int i = 0; i < learnt_clause.size(); ++ i) {
 		Lit l = learnt_clause[i];
-		cout << plus << var(l);
+		cout << plus;
 		print_lit(l);
 		cout << " @" << level(var(l));
 		plus = " + ";
@@ -785,7 +794,7 @@ lbool Solver::search(int nof_conflicts)
 		cout << endl
 		     << "choose ";
 		print_lit(next);
-		cout << " @" << decisionLevel()
+		cout << " :" << activity[var(next)]
 		     << endl;
 #endif
             }

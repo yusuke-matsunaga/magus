@@ -156,6 +156,29 @@ YmSat::new_var()
   return VarId(n);
 }
 
+// 実際に変数に関するデータ構造を生成する．
+void
+YmSat::alloc_var()
+{
+  if ( mOldVarNum < mVarNum ) {
+    if ( mVarSize < mVarNum ) {
+      expand_var();
+    }
+    for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
+      ymuint i2 = i * 2;
+      mVal[i2 + 0] = conv_from_Bool3(kB3X);
+#if 0
+      mVal[i2 + 1] = conv_from_Bool3(kB3X);
+#else
+      mVal[i2 + 1] = conv_from_Bool3(kB3False);
+#endif
+      mActivity[i] = 0.0;
+      heap_add_var(i);
+    }
+    mOldVarNum = mVarNum;
+  }
+}
+
 // 変数に関する配列を拡張する．
 void
 YmSat::expand_var()
@@ -806,7 +829,7 @@ YmSat::search()
 
       if ( debug & (debug_assign | debug_decision) ) {
 	cout << endl
-	     << "choose " << lit << " @" << decision_level() << endl;
+	     << "choose " << lit << " :" << mActivity[lit.varid().val()] << endl;
       }
       // 未割り当ての変数を選んでいるのでエラーになるはずはない．
       assign(lit);
@@ -1341,7 +1364,7 @@ YmSat::heap_move_down(ymuint pos)
     if ( pos_r < mHeapNum ) {
       ymuint vindex_r = mHeap[pos_r];
       double val_r = mActivity[vindex_r];
-      if ( vindex_c < vindex_r ) {
+      if ( val_c < val_r ) {
 	pos_c = pos_r;
 	vindex_c = vindex_r;
 	val_c = val_r;
