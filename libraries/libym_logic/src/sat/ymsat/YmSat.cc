@@ -72,16 +72,10 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mVal(NULL),
   mDecisionLevel(NULL),
   mReason(NULL),
-  mHeapPos(NULL),
-  mActivity(NULL),
   mWatcherList(NULL),
-  mHeap(NULL),
-  mHeapNum(0),
   mLbdTmp(NULL),
   mLbdTmpSize(0),
   mRootLevel(0),
-  mVarBump(1.0),
-  mVarDecay(1.0),
   mClauseBump(1.0),
   mClauseDecay(1.0),
   mParams(kDefaultParams),
@@ -122,10 +116,7 @@ YmSat::~YmSat()
   delete [] mVal;
   delete [] mDecisionLevel;
   delete [] mReason;
-  delete [] mHeapPos;
-  delete [] mActivity;
   delete [] mWatcherList;
-  delete [] mHeap;
   delete [] mLbdTmp;
   delete [] mTmpLits;
 }
@@ -172,8 +163,7 @@ YmSat::alloc_var()
 #else
       mVal[i2 + 1] = conv_from_Bool3(kB3False);
 #endif
-      mActivity[i] = 0.0;
-      heap_add_var(i);
+      mVarHeap.add_var(i);
     }
     mOldVarNum = mVarNum;
   }
@@ -187,10 +177,7 @@ YmSat::expand_var()
   ymuint8* old_val = mVal;
   int* old_decision_level = mDecisionLevel;
   SatReason* old_reason = mReason;
-  ymint32* old_heap_pos = mHeapPos;
-  double* old_activity = mActivity;
   WatcherList* old_watcher_list = mWatcherList;
-  ymuint32* old_heap = mHeap;
   if ( mVarSize == 0 ) {
     mVarSize = 1024;
   }
@@ -200,36 +187,26 @@ YmSat::expand_var()
   mVal = new ymuint8[mVarSize * 2];
   mDecisionLevel = new int[mVarSize];
   mReason = new SatReason[mVarSize];
-  mHeapPos = new ymint32[mVarSize];
-  mActivity = new double[mVarSize];
   mWatcherList = new WatcherList[mVarSize * 2];
-  mHeap = new ymuint32[mVarSize];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
     ymuint i2 = i * 2;
     mVal[i2 + 0] = old_val[i2 + 0];
     mVal[i2 + 1] = old_val[i2 + 1];
     mDecisionLevel[i] = old_decision_level[i];
     mReason[i] = old_reason[i];
-    mHeapPos[i] = old_heap_pos[i];
-    mActivity[i] = old_activity[i];
   }
   ymuint n2 = mOldVarNum * 2;
   for (ymuint i = 0; i < n2; ++ i) {
     mWatcherList[i].move(old_watcher_list[i]);
   }
-  for (ymuint i = 0; i < mHeapNum; ++ i) {
-    mHeap[i] = old_heap[i];
-  }
   if ( old_size > 0 ) {
     delete [] old_val;
     delete [] old_decision_level;
     delete [] old_reason;
-    delete [] old_heap_pos;
-    delete [] old_activity;
     delete [] old_watcher_list;
-    delete [] old_heap;
   }
   mAssignList.reserve(mVarSize);
+  mVarHeap.alloc_var(mVarSize);
   mAnalyzer->alloc_var(mVarSize);
 }
 
@@ -584,7 +561,7 @@ YmSat::solve(const vector<Literal>& assumptions,
   double confl_limit = 100;
   double restart_inc = 2;
   double learnt_limit = clause_num() / 3.0;
-  mVarDecay = mParams.mVarDecay;
+  mVarHeap.set_decay(mParams.mVarDecay);
   mClauseDecay = mParams.mClauseDecay;
 
   Bool3 sat_stat = kB3X;
@@ -829,7 +806,7 @@ YmSat::search()
 
       if ( debug & (debug_assign | debug_decision) ) {
 	cout << endl
-	     << "choose " << lit << " :" << mActivity[lit.varid().val()] << endl;
+	     << "choose " << lit << " :" << mVarHeap.activity(lit.varid().val()) << endl;
       }
       // 未割り当ての変数を選んでいるのでエラーになるはずはない．
       assign(lit);
@@ -1018,7 +995,7 @@ YmSat::backtrack(int level)
       ymuint v2 = vindex * 2;
       mVal[v2 + 1] = mVal[v2 + 0];
       mVal[v2 + 0] = conv_from_Bool3(kB3X);
-      heap_push(vindex);
+      mVarHeap.push(vindex);
       if ( debug & debug_assign ) {
 	cout << "\tdeassign " << p << endl;
       }
@@ -1035,7 +1012,7 @@ Literal
 YmSat::next_decision()
 {
   // 一定確率でランダムな変数を選ぶ．
-  if ( mRandGen.real1() < mParams.mVarFreq && !heap_empty() ) {
+  if ( mRandGen.real1() < mParams.mVarFreq && !mVarHeap.empty() ) {
     ymuint pos = mRandGen.int32() % mVarNum;
     VarId vid(pos);
     if ( eval(VarId(vid)) == kB3X ) {
@@ -1044,9 +1021,9 @@ YmSat::next_decision()
     }
   }
 
-  while ( !heap_empty() ) {
+  while ( !mVarHeap.empty() ) {
     // activity の高い変数を取り出す．
-    ymuint vindex = heap_pop_top();
+    ymuint vindex = mVarHeap.pop_top();
     ymuint v2 = vindex * 2;
     if ( mVal[v2 + 0] != conv_from_Bool3(kB3X) ) {
       // すでに確定していたらスキップする．
@@ -1296,32 +1273,6 @@ YmSat::delete_clause(SatClause* clause)
   mAlloc.put_memory(size, static_cast<void*>(clause));
 }
 
-// 変数のアクティビティを増加させる．
-void
-YmSat::bump_var_activity(VarId varid)
-{
-  ymuint vindex = varid.val();
-  double& act = mActivity[vindex];
-  act += mVarBump;
-  if ( act > 1e+100 ) {
-    for (ymuint i = 0; i < mVarNum; ++ i) {
-      mActivity[i] *= 1e-100;
-    }
-    mVarBump *= 1e-100;
-  }
-  ymint pos = mHeapPos[vindex];
-  if ( pos >= 0 ) {
-    heap_move_up(pos);
-  }
-}
-
-// 変数のアクティビティを定率で減少させる．
-void
-YmSat::decay_var_activity()
-{
-  mVarBump /= mVarDecay;
-}
-
 // 学習節のアクティビティを増加させる．
 void
 YmSat::bump_clause_activity(SatClause* clause)
@@ -1342,77 +1293,6 @@ void
 YmSat::decay_clause_activity()
 {
   mClauseBump /= mClauseDecay;
-}
-
-// 引数の位置にある要素を適当な位置まで沈めてゆく
-void
-YmSat::heap_move_down(ymuint pos)
-{
-  ymuint vindex_p = mHeap[pos];
-  double val_p = mActivity[vindex_p];
-  for ( ; ; ) {
-    // ヒープ木の性質から親から子の位置がわかる
-    ymuint pos_l = heap_left(pos);
-    ymuint pos_r = pos_l + 1;
-    if ( pos_r > mHeapNum ) {
-      // 左右の子どもを持たない場合
-      break;
-    }
-    ymuint pos_c = pos_l;
-    ymuint vindex_c = mHeap[pos_c];
-    double val_c = mActivity[vindex_c];
-    if ( pos_r < mHeapNum ) {
-      ymuint vindex_r = mHeap[pos_r];
-      double val_r = mActivity[vindex_r];
-      if ( val_c < val_r ) {
-	pos_c = pos_r;
-	vindex_c = vindex_r;
-	val_c = val_r;
-      }
-    }
-    if ( val_c <= val_p ) {
-      break;
-    }
-    // 逆転
-    heap_set(vindex_p, pos_c);
-    heap_set(vindex_c, pos);
-    pos = pos_c;
-  }
-}
-
-// @brief 内容を出力する
-void
-YmSat::heap_dump(ostream& s) const
-{
-  s << "heap num = " << mHeapNum << endl;
-  ymuint j = 0;
-  ymuint nc = 1;
-  const char* spc = "";
-  for (ymuint i = 0; i < mHeapNum; ++ i) {
-    ymuint vindex = mHeap[i];
-    assert_cond(mHeapPos[vindex] == static_cast<ymint>(i),
-		__FILE__, __LINE__);
-    if ( i > 0 ) {
-      ymint p = (i - 1) >> 1;
-      assert_cond(mActivity[mHeap[p]] >= mActivity[vindex], __FILE__, __LINE__);
-    }
-    s << spc << vindex << "("
-      << mActivity[vindex]
-      << ")";
-    ++ j;
-    if ( j == nc ) {
-      j = 0;
-      nc <<= 1;
-      s << endl;
-      spc = "";
-    }
-    else {
-      spc = " ";
-    }
-  }
-  if ( j > 0 ) {
-    s << endl;
-  }
 }
 
 END_NAMESPACE_YM_SAT

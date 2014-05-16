@@ -61,6 +61,8 @@ COMMON_SOURCES = \
 	SatAnalyzer.h \
 	SatClause.h \
 	SatClause.cc \
+	VarHeap.h \
+	VarHeap.cc \
 	YmSat.h \
 	YmSat.cc \
 	YmSatR.h \

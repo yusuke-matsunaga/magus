@@ -17,6 +17,7 @@
 #include "SatReason.h"
 #include "AssignList.h"
 #include "Watcher.h"
+#include "VarHeap.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -348,77 +349,6 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // ヒープ用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 空にする．
-  void
-  heap_clear();
-
-  /// @brief 要素が空の時 true を返す．
-  bool
-  heap_empty() const;
-
-  /// @brief 変数を始めてヒープに追加する．
-  /// @param[in] vindex 追加する変数番号
-  void
-  heap_add_var(ymuint vindex);
-
-  /// @brief 変数を再びヒープに追加する．
-  /// @param[in] vindex 追加する変数番号
-  void
-  heap_push(ymuint vindex);
-
-  /// @brief アクティビティ最大の変数番号を取り出す．
-  /// @note 該当の変数はヒープから取り除かれる．
-  ymuint
-  heap_pop_top();
-
-  /// @brief 引数の位置にある要素を適当な位置まで沈めてゆく
-  /// @param[in] pos 対象の要素の位置
-  void
-  heap_move_down(ymuint pos);
-
-  /// @brief 引数の位置にある要素を適当な位置まで上げてゆく
-  /// @param[in] vindex 対象の変数番号
-  void
-  heap_move_up(ymuint vindex);
-
-  /// @brief 変数を配列にセットする．
-  /// @param[in] vindex 対象の変数番号
-  /// @param[in] pos 位置
-  /// @note mHeap と mHeapPos の一貫性を保つためにはこの関数を使うこと．
-  void
-  heap_set(ymuint vindex,
-	   ymuint pos);
-
-  /// @brief 左の子供の位置を計算する
-  /// @param[in] pos 親の位置
-  static
-  ymuint
-  heap_left(ymuint pos);
-
-  /// @brief 右の子供の位置を計算する．
-  /// @param[in] pos 親の位置
-  static
-  ymuint
-  heap_right(ymuint pos);
-
-  /// @brief 親の位置を計算する．
-  /// @param[in] pos 子供の位置
-  /// @note 左の子供でも右の子供でも同じ
-  static
-  ymuint
-  heap_parent(ymuint pos);
-
-  /// @brief 内容を出力する
-  /// @param[in] s 出力先のストリーム
-  void
-  heap_dump(ostream& s) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -472,24 +402,12 @@ private:
   // サイズは mVarSize
   SatReason* mReason;
 
-  // ヒープ上の位置の配列
-  // サイズは mVarSize
-  ymint32* mHeapPos;
-
-  // アクティビティ
-  // サイズは mVarSize
-  double* mActivity;
-
   // watcher list の配列
   // サイズは mVarSize * 2
   WatcherList* mWatcherList;
 
-  // ヒープ用の配列
-  // サイズは mVarSize
-  ymuint32* mHeap;
-
-  // ヒープの要素数
-  ymuint32 mHeapNum;
+  // 変数のヒープ木
+  VarHeap mVarHeap;
 
   // calc_lbd() 用の作業領域
   // サイズは decision_level()
@@ -506,12 +424,6 @@ private:
 
   // 値割り当てを保持するリスト
   AssignList mAssignList;
-
-  // 変数のアクティビティの増加量
-  double mVarBump;
-
-  // 変数のアクティビティの減衰量
-  double mVarDecay;
 
   // 学習節のアクティビティの増加量
   double mClauseBump;
@@ -733,115 +645,21 @@ YmSat::timer_on(bool enable)
   mTimerOn = enable;
 }
 
-// @brief 空にする．
+// @brief 変数のアクティビティを増加させる．
+// @param[in] var 変数番号
 inline
 void
-YmSat::heap_clear()
+YmSat::bump_var_activity(VarId var)
 {
-  mHeapNum = 0;
+  mVarHeap.bump_var_activity(var);
 }
 
-// @brief 要素が空の時 true を返す．
-inline
-bool
-YmSat::heap_empty() const
-{
-  return mHeapNum == 0;
-}
-
-// @brief 変数を始めてヒープに追加する．
-// @param[in] vindex 追加する変数番号
+// @brief 変数のアクティビティを定率で減少させる．
 inline
 void
-YmSat::heap_add_var(ymuint vindex)
+YmSat::decay_var_activity()
 {
-  heap_set(vindex, mHeapNum);
-  ++ mHeapNum;
-}
-
-// @brief 要素を追加する．
-inline
-void
-YmSat::heap_push(ymuint vindex)
-{
-  if ( mHeapPos[vindex] == -1 ) {
-    ymuint pos = mHeapNum;
-    ++ mHeapNum;
-    heap_set(vindex, pos);
-    heap_move_up(pos);
-  }
-}
-
-// @brief もっともアクティビティの高い変数を返す．
-inline
-ymuint
-YmSat::heap_pop_top()
-{
-  // この assert は重いのでコメントアウトしておく
-  //assert_cond(mHeapNum > 0, __FILE__, __LINE__);
-  ymuint ans = mHeap[0];
-  mHeapPos[ans] = -1;
-  -- mHeapNum;
-  if ( mHeapNum > 0 ) {
-    ymuint vindex = mHeap[mHeapNum];
-    heap_set(vindex, 0);
-    heap_move_down(0);
-  }
-  return ans;
-}
-
-// 引数の位置にある要素を適当な位置まで上げてゆく
-inline
-void
-YmSat::heap_move_up(ymuint pos)
-{
-  ymuint vindex = mHeap[pos];
-  double val = mActivity[vindex];
-  while ( pos > 0 ) {
-    ymuint pos_p = heap_parent(pos);
-    ymuint vindex_p = mHeap[pos_p];
-    double val_p = mActivity[vindex_p];
-    if ( val_p >= val ) {
-      break;
-    }
-    heap_set(vindex, pos_p);
-    heap_set(vindex_p, pos);
-    pos = pos_p;
-  }
-}
-
-// 変数を配列にセットする．
-inline
-void
-YmSat::heap_set(ymuint vindex,
-		ymuint pos)
-{
-  mHeap[pos] = vindex;
-  mHeapPos[vindex] = pos;
-}
-
-// @brief 左の子供の位置を計算する
-inline
-ymuint
-YmSat::heap_left(ymuint pos)
-{
-  return pos + pos + 1;
-}
-
-// @brief 右の子供の位置を計算する．
-inline
-ymuint
-YmSat::heap_right(ymuint pos)
-{
-  return pos + pos + 2;
-}
-
-// @brief 親の位置を計算する．
-inline
-ymuint
-YmSat::heap_parent(ymuint pos)
-{
-  return (pos - 1) >> 1;
+  mVarHeap.decay_var_activity();
 }
 
 END_NAMESPACE_YM_SAT
