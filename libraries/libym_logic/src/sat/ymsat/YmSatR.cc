@@ -18,9 +18,8 @@ BEGIN_NAMESPACE_YM_SAT
 
 // @brief コンストラクタ
 YmSatR::YmSatR(ostream& out,
-	       SatAnalyzer* analyzer,
 	       const string& option) :
-  YmSat(analyzer, option),
+  YmSat(option),
   mOut(out)
 {
 }

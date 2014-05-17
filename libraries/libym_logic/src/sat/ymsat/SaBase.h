@@ -26,7 +26,8 @@ class SaBase :
 public:
 
   /// @brief コンストラクタ
-  SaBase();
+  /// @param[in] solver SATソルバ
+  SaBase(YmSat* solver);
 
   /// @brief デストラクタ
   virtual

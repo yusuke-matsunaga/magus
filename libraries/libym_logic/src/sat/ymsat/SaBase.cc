@@ -15,7 +15,9 @@
 BEGIN_NAMESPACE_YM_SAT
 
 // @brief コンストラクタ
-SaBase::SaBase()
+// @param[in] solver SATソルバ
+SaBase::SaBase(YmSat* solver) :
+  SatAnalyzer(solver)
 {
 }
 

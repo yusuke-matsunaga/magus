@@ -96,10 +96,8 @@ class YmSat :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] analyzer 解析器のポインタ
   /// @param[in] option オプション文字列
-  YmSat(SatAnalyzer* analyzer,
-	const string& option = string());
+  YmSat(const string& option = string());
 
   /// @brief デストラクタ
   virtual

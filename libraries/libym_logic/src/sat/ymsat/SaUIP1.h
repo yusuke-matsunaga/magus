@@ -24,7 +24,8 @@ class SaUIP1 :
 public:
 
   /// @brief コンストラクタ
-  SaUIP1();
+  /// @param[in] solver SATソルバ
+  SaUIP1(YmSat* solver);
 
   /// @brief デストラクタ
   virtual

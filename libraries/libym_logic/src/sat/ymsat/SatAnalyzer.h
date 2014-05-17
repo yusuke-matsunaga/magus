@@ -32,9 +32,11 @@ class SatClause;
 //////////////////////////////////////////////////////////////////////
 class SatAnalyzer
 {
-  friend class YmSat;
+public:
 
-protected:
+  /// @brief コンストラクタ
+  /// @param[in] solver SATソルバ
+  SatAnalyzer(YmSat* solver);
 
   /// @brief デストラクタ
   virtual
@@ -120,10 +122,12 @@ class SaFactory
 public:
 
   /// @brief SatAnalyzerの派生クラスを生成する．
+  /// @param[in] solver SATソルバ
   /// @param[in] option どのクラスを生成するかを決めるオプション文字列
   static
   SatAnalyzer*
-  gen_analyzer(const string& option = string());
+  gen_analyzer(YmSat* solver,
+	       const string& option = string());
 
 };
 
@@ -131,6 +135,14 @@ public:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] solver SATソルバ
+inline
+SatAnalyzer::SatAnalyzer(YmSat* solver) :
+  mSolver(solver)
+{
+}
 
 // 現在の decision level を取り出す．
 inline

@@ -15,7 +15,9 @@
 BEGIN_NAMESPACE_YM_SAT
 
 // @brief コンストラクタ
-SaUIP1::SaUIP1()
+// @param[in] solver SATソルバ
+SaUIP1::SaUIP1(YmSat* solver) :
+  SaBase(solver)
 {
 }
 

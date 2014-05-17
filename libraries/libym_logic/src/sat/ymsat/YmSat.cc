@@ -57,9 +57,7 @@ Params kDefaultParams(0.95, 0.00, 0.999, true, false, false, false);
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmSat::YmSat(SatAnalyzer* analyzer,
-	     const string& option) :
-  mAnalyzer(analyzer),
+YmSat::YmSat(const string& option) :
   mSane(true),
   mAlloc(4096),
   mConstrBinNum(0),
@@ -86,7 +84,7 @@ YmSat::YmSat(SatAnalyzer* analyzer,
   mLearntLimit(0),
   mMaxConflict(1024 * 100)
 {
-  mAnalyzer->mSolver = this;
+  mAnalyzer = SaFactory::gen_analyzer(this, option);
 
   mLbdTmpSize = 1024;
   mLbdTmp = new bool[mLbdTmpSize];

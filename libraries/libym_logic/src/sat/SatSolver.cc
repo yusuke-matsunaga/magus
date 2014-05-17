@@ -11,7 +11,6 @@
 
 #include "ymsat/YmSat.h"
 #include "ymsat/YmSatR.h"
-#include "ymsat/SatAnalyzer.h"
 #include "MiniSat/SatSolverMiniSat.h"
 #include "MiniSat2/SatSolverMiniSat2.h"
 
@@ -39,12 +38,11 @@ SatSolver::SatSolver(const string& type,
     mImpl = new SatSolverMiniSat2(option);
   }
   else {
-    SatAnalyzer* analyzer = SaFactory::gen_analyzer(option);
     if ( outp ) {
-      mImpl = new YmSatR(*outp, analyzer, option);
+      mImpl = new YmSatR(*outp, option);
     }
     else {
-      mImpl = new YmSat(analyzer, option);
+      mImpl = new YmSat(option);
     }
   }
 }
