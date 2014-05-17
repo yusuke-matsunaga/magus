@@ -56,8 +56,8 @@ COMMON_SOURCES = \
 	SaFactory.cc \
 	SaUIP1.h \
 	SaUIP1.cc \
-	SaSimple.h \
-	SaSimple.cc \
+	SaUIP2.h \
+	SaUIP2.cc \
 	SatAnalyzer.h \
 	SatClause.h \
 	SatClause.cc \

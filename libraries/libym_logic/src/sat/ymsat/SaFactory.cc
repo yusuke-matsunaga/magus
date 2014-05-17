@@ -8,7 +8,7 @@
 
 
 #include "SaUIP1.h"
-#include "SaSimple.h"
+#include "SaUIP2.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -21,8 +21,8 @@ SaFactory::gen_analyzer(const string& option)
   if ( option == "uip1" ) {
     return new SaUIP1;
   }
-  if ( option == "simple" ) {
-    return new SaSimple;
+  if ( option == "uip2" ) {
+    return new SaUIP2;
   }
   // default fall-back
   return new SaUIP1;

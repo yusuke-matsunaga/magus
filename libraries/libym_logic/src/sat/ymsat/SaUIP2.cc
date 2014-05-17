@@ -1,13 +1,13 @@
 
-/// @file SaUIP1.cc
-/// @brief SaUIP1 の実装ファイル
+/// @file SaUIP2.cc
+/// @brief SaUIP2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SaUIP1.h"
+#include "SaUIP2.h"
 #include "YmSat.h"
 #include "SatClause.h"
 
@@ -15,18 +15,18 @@
 BEGIN_NAMESPACE_YM_SAT
 
 // @brief コンストラクタ
-SaUIP1::SaUIP1()
+SaUIP2::SaUIP2()
 {
 }
 
 // @brief デストラクタ
-SaUIP1::~SaUIP1()
+SaUIP2::~SaUIP2()
 {
 }
 
 // conflict を解析する．
 int
-SaUIP1::analyze(SatReason creason,
+SaUIP2::analyze(SatReason creason,
 		vector<Literal>& learnt)
 {
   capture(creason, learnt);
@@ -40,7 +40,7 @@ SaUIP1::analyze(SatReason creason,
 // - 現在のレベルよりも低いレベルの割り当て
 // からなるセパレータ集合を learnt に入れる．
 void
-SaUIP1::capture(SatReason creason,
+SaUIP2::capture(SatReason creason,
 		vector<Literal>& learnt)
 {
   learnt.clear();
@@ -74,7 +74,13 @@ SaUIP1::capture(SatReason creason,
 	  set_mark_and_putq(var);
 	  bump_var_activity(var);
 	  if ( var_level < decision_level() ) {
-	    learnt.push_back(q);
+	    SatReason cr1 = reason(q.varid());
+	    if ( cr1.is_literal() ) {
+	      learnt.push_back(cr1.literal());
+	    }
+	    else {
+	      learnt.push_back(q);
+	    }
 	  }
 	  else {
 	    ++ count;
@@ -91,7 +97,13 @@ SaUIP1::capture(SatReason creason,
 	set_mark_and_putq(var);
 	bump_var_activity(var);
 	if ( var_level < decision_level() ) {
-	    learnt.push_back(q);
+	    SatReason cr1 = reason(q.varid());
+	    if ( cr1.is_literal() ) {
+	      learnt.push_back(cr1.literal());
+	    }
+	    else {
+	      learnt.push_back(q);
+	    }
 	}
 	else {
 	  ++ count;

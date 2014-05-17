@@ -1,8 +1,8 @@
-#ifndef SASIMPLE_H
-#define SASIMPLE_H
+#ifndef SAUIP2_H
+#define SAUIP2_H
 
-/// @file SaSimple.h
-/// @brief SaSimple のヘッダファイル
+/// @file SaUIP2.h
+/// @brief SaUIP2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -15,20 +15,20 @@
 BEGIN_NAMESPACE_YM_SAT
 
 //////////////////////////////////////////////////////////////////////
-/// @class SaSimple SaSimple.h "SaSimple.h"
-/// @brief 単純な解析器
+/// @class SaUIP2 SaUIP2.h "SaUIP2.h"
+/// @brief first UIP ヒューリスティックを用いた解析器
 //////////////////////////////////////////////////////////////////////
-class SaSimple :
+class SaUIP2 :
   public SaBase
 {
 public:
 
   /// @brief コンストラクタ
-  SaSimple();
+  SaUIP2();
 
   /// @brief デストラクタ
   virtual
-  ~SaSimple();
+  ~SaUIP2();
 
 
 public:
@@ -48,7 +48,7 @@ public:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // 内部もしくは継承クラスから用いられる関数
+  // 内部もしくは継承クラスで用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   void
@@ -59,4 +59,4 @@ protected:
 
 END_NAMESPACE_YM_SAT
 
-#endif // SASIMPLE_H
+#endif // SAUIP1_H
