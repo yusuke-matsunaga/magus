@@ -71,6 +71,7 @@ YmSat::YmSat(const string& option) :
   mDecisionLevel(NULL),
   mReason(NULL),
   mWatcherList(NULL),
+  mWeightArray(NULL),
   mLbdTmp(NULL),
   mLbdTmpSize(0),
   mRootLevel(0),
@@ -115,6 +116,7 @@ YmSat::~YmSat()
   delete [] mDecisionLevel;
   delete [] mReason;
   delete [] mWatcherList;
+  delete [] mWeightArray;
   delete [] mLbdTmp;
   delete [] mTmpLits;
 }
@@ -849,6 +851,12 @@ YmSat::next_decision()
 	// mWlPosi/mWlNega が指定されていなかったらランダムに選ぶ．
 	inv = mRandGen.real1() < 0.5;
       }
+#if 1
+      //cout << mWeightArray[v2 + 0] << " : " << mWeightArray[v2 + 1] << endl;
+      if ( mWeightArray[v2 + 1] > mWeightArray[v2 + 0] ) {
+	inv = true;
+      }
+#endif
     }
     return Literal(VarId(vindex), inv);
   }
@@ -1089,6 +1097,12 @@ YmSat::add_clause_sub(ymuint lit_num)
       mSane = false;
     }
     return;
+  }
+
+  for (ymuint i = 0; i < lit_num; ++ i) {
+    Literal l = mTmpLits[i];
+    ymuint index = l.index();
+    mWeightArray[index] += 1.0 / static_cast<double>(lit_num - 1);
   }
 
   Literal l1 = mTmpLits[1];
@@ -1346,7 +1360,13 @@ YmSat::alloc_var()
       expand_var();
     }
     for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
+#if 0
       mVal[i] = conv_from_Bool3(kB3X) | (conv_from_Bool3(kB3False) << 2);
+#else
+      mVal[i] = conv_from_Bool3(kB3X) | (conv_from_Bool3(kB3X) << 2);
+#endif
+      mWeightArray[i * 2 + 0] = 0.0;
+      mWeightArray[i * 2 + 1] = 0.0;
       mVarHeap.add_var(VarId(i));
     }
     mOldVarNum = mVarNum;
@@ -1362,6 +1382,7 @@ YmSat::expand_var()
   int* old_decision_level = mDecisionLevel;
   SatReason* old_reason = mReason;
   WatcherList* old_watcher_list = mWatcherList;
+  double* old_weight_array = mWeightArray;
   if ( mVarSize == 0 ) {
     mVarSize = 1024;
   }
@@ -1372,6 +1393,7 @@ YmSat::expand_var()
   mDecisionLevel = new int[mVarSize];
   mReason = new SatReason[mVarSize];
   mWatcherList = new WatcherList[mVarSize * 2];
+  mWeightArray = new double[mVarSize * 2];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
     mVal[i] = old_val[i];
     mDecisionLevel[i] = old_decision_level[i];
@@ -1380,12 +1402,14 @@ YmSat::expand_var()
   ymuint n2 = mOldVarNum * 2;
   for (ymuint i = 0; i < n2; ++ i) {
     mWatcherList[i].move(old_watcher_list[i]);
+    mWeightArray[i] = old_weight_array[i];
   }
   if ( old_size > 0 ) {
     delete [] old_val;
     delete [] old_decision_level;
     delete [] old_reason;
     delete [] old_watcher_list;
+    delete [] old_weight_array;
   }
   mAssignList.reserve(mVarSize);
   mVarHeap.alloc_var(mVarSize);

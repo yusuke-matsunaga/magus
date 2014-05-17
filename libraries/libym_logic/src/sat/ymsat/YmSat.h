@@ -441,6 +441,10 @@ private:
   // サイズは mVarSize * 2
   WatcherList* mWatcherList;
 
+  // 変数の極性ごとの重み
+  // サイズは mVarSize * 2
+  double* mWeightArray;
+
   // 変数のヒープ木
   VarHeap mVarHeap;
 
