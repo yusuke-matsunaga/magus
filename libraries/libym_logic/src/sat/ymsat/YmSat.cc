@@ -851,11 +851,13 @@ YmSat::next_decision()
 	// mWlPosi/mWlNega が指定されていなかったらランダムに選ぶ．
 	inv = mRandGen.real1() < 0.5;
       }
-#if 1
+#if 0
       //cout << mWeightArray[v2 + 0] << " : " << mWeightArray[v2 + 1] << endl;
       if ( mWeightArray[v2 + 1] > mWeightArray[v2 + 0] ) {
 	inv = true;
       }
+#else
+      inv = false; // 意味はない．
 #endif
     }
     return Literal(VarId(vindex), inv);
@@ -1102,7 +1104,7 @@ YmSat::add_clause_sub(ymuint lit_num)
   for (ymuint i = 0; i < lit_num; ++ i) {
     Literal l = mTmpLits[i];
     ymuint index = l.index();
-    mWeightArray[index] += 1.0 / static_cast<double>(lit_num - 1);
+    mWeightArray[index] += 1.0 / static_cast<double>(lit_num);
   }
 
   Literal l1 = mTmpLits[1];
@@ -1360,11 +1362,7 @@ YmSat::alloc_var()
       expand_var();
     }
     for (ymuint i = mOldVarNum; i < mVarNum; ++ i) {
-#if 0
-      mVal[i] = conv_from_Bool3(kB3X) | (conv_from_Bool3(kB3False) << 2);
-#else
       mVal[i] = conv_from_Bool3(kB3X) | (conv_from_Bool3(kB3X) << 2);
-#endif
       mWeightArray[i * 2 + 0] = 0.0;
       mWeightArray[i * 2 + 1] = 0.0;
       mVarHeap.add_var(VarId(i));
