@@ -32,7 +32,7 @@ const ymuint debug_solve       = 0x10;
 
 const ymuint debug_all         = 0xffffffff;
 
-//const ymuint debug = debug_decision | debug_analyze | debug_assign;
+const ymuint debug = debug_decision | debug_analyze | debug_assign;
 //const ymuint debug = debug_assign;
 //const ymuint debug = debug_assign | debug_implication;
 //const ymuint debug = debug_assign | debug_analyze;
@@ -40,7 +40,7 @@ const ymuint debug_all         = 0xffffffff;
 //const ymuint debug = debug_solve | debug_assign;
 //const ymuint debug = debug_all;
 //const ymuint debug = debug_none;
-ymuint debug = debug_none;
+//ymuint debug = debug_none;
 
 bool debug_first = true;
 
@@ -607,18 +607,10 @@ YmSat::search(ymuint confl_limit)
 	cout << endl
 	     << "choose " << lit << " :"
 	     << mVarHeap.activity(lit.varid()) << endl;
-	cout << "debug = " << debug << endl;
       }
       // 未割り当ての変数を選んでいるのでエラーになるはずはない．
       if ( debug & debug_assign ) {
 	cout << "\tassign " << lit << " @" << decision_level() << endl;
-      }
-      if ( debug_first && lit.varid().val() == 348 && decision_level() == 49 ) {
-	debug = debug_assign | debug_analyze | debug_implication;
-	debug_first = false;
-      }
-      else {
-	debug = debug_none;
       }
       assign(lit);
     }
@@ -692,6 +684,9 @@ YmSat::implication()
 	SatClause* c = w.clause();
 	Literal l0 = c->wl0();
 	if ( l0 == nl ) {
+	  if ( eval(c->wl1()) == kB3True ) {
+	    continue;
+	  }
 	  // nl を 1番めのリテラルにする．
 	  c->xchange_wl();
 	  // 新しい wl0 を得る．
@@ -1282,6 +1277,10 @@ YmSat::new_clause(ymuint lit_num,
 void
 YmSat::delete_clause(SatClause* clause)
 {
+  if ( debug & debug_assign ) {
+    cout << " delete_clause: " << (*clause) << endl;
+  }
+
   // watch list を更新
   del_watcher(~clause->wl0(), SatReason(clause));
   del_watcher(~clause->wl1(), SatReason(clause));

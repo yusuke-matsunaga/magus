@@ -23,10 +23,6 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "Sort.h"
 #include "Solver.h"
 
-#define DEBUG_ANALYZE 1
-#define DEBUG_ASSIGN 1
-//#define DEBUG_IMPLICATION 1
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -47,7 +43,10 @@ const int debug_solve       = 0x10;
 
 const int debug_all         = 0xffffffff;
 
-int debug = debug_none;
+//int debug = debug_assign | debug_implication;
+int debug = debug_assign | debug_analyze | debug_decision;
+//int debug = debug_none;
+
 
 //=================================================================================================
 // Options:
@@ -255,7 +254,12 @@ void Solver::detachClause(CRef cr, bool strict) {
 
 
 void Solver::removeClause(CRef cr) {
-    Clause& c = ca[cr];
+  Clause& c = ca[cr];
+  if ( debug & debug_assign ) {
+    cout << " delete_clause: ";
+    print_clause(c);
+    cout << endl;
+  }
     detachClause(cr);
     // Don't leave pointers to free'd memory!
     if (locked(c)) vardata[var(c[0])].reason = CRef_Undef;
@@ -547,11 +551,12 @@ CRef Solver::propagate()
 	}
 
         for (i = j = (Watcher*)ws, end = i + ws.size();  i != end;){
+#if 0
             // Try to avoid inspecting the clause:
             Lit blocker = i->blocker;
             if (value(blocker) == l_True){
                 *j++ = *i++; continue; }
-
+#endif
             // Make sure the false literal is data[1]:
             CRef     cr        = i->cref;
             Clause&  c         = ca[cr];
@@ -564,7 +569,7 @@ CRef Solver::propagate()
             // If 0th watch is true, then clause is already satisfied.
             Lit     first = c[0];
             Watcher w     = Watcher(cr, first);
-            if (first != blocker && value(first) == l_True){
+            if (/*first != blocker && */value(first) == l_True){
                 *j++ = w; continue; }
 
 	if ( debug & debug_implication ) {
@@ -866,12 +871,6 @@ lbool Solver::search(int nof_conflicts)
 		  print_lit(next);
 		  cout << " :" << activity[var(next)]
 		       << endl;
-		}
-		if ( var(next) == 348 && decisionLevel() == 48 ) {
-		  debug |= debug_assign | debug_analyze | debug_implication;
-		}
-		else {
-		  debug = debug_none;
 		}
             }
 
