@@ -45,8 +45,8 @@ GbmSatCegarOneHot::_solve(const RcfNetwork& network,
 			  vector<bool>& conf_bits,
 			  vector<ymuint>& iorder)
 {
-#if 1
-  SatSolver solver("minisat");
+#if 0
+  SatSolver solver("minisat2");
 #else
   SatSolver solver;
 #endif
