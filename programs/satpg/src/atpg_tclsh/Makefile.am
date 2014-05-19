@@ -90,7 +90,7 @@ COMMON_SOURCES = \
 ## atpg_tclsh 用の変数の定義
 ############################################################
 
-atpg_tclsh_SOURCES = \
+atpg_tclsh_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
@@ -122,7 +122,7 @@ atpg_tclsh_LDFLAGS = \
 ## atpg_tclsh_d 用の変数の定義
 ############################################################
 
-atpg_tclsh_d_SOURCES = \
+atpg_tclsh_d_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
@@ -155,7 +155,7 @@ atpg_tclsh_d_LDFLAGS = \
 ## atpg_tclsh_p 用の変数の定義
 ############################################################
 
-atpg_tclsh_p_SOURCES = \
+atpg_tclsh_p_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
@@ -180,4 +180,5 @@ atpg_tclsh_p_LDADD = \
 	$(TCL_LDADD)
 
 atpg_tclsh_p_LDFLAGS = \
+	-static \
 	$(AM_LDFLAGS)
