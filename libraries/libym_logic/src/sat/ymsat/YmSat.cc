@@ -39,7 +39,10 @@ const ymuint debug_all         = 0xffffffff;
 //const ymuint debug = debug_solve | debug_decision;
 //const ymuint debug = debug_solve | debug_assign;
 //const ymuint debug = debug_all;
-const ymuint debug = debug_none;
+//const ymuint debug = debug_none;
+ymuint debug = debug_none;
+
+bool debug_first = true;
 
 END_NONAMESPACE
 
@@ -554,6 +557,7 @@ YmSat::search(ymuint confl_limit)
       if ( debug & debug_analyze ) {
 	cout << endl
 	     << "analyze for " << conflict << endl
+	     << endl
 	     << "learnt clause is ";
 	const char* plus = "";
 	for (ymuint i = 0; i < mLearntLits.size(); ++ i) {
@@ -603,8 +607,19 @@ YmSat::search(ymuint confl_limit)
 	cout << endl
 	     << "choose " << lit << " :"
 	     << mVarHeap.activity(lit.varid()) << endl;
+	cout << "debug = " << debug << endl;
       }
       // 未割り当ての変数を選んでいるのでエラーになるはずはない．
+      if ( debug & debug_assign ) {
+	cout << "\tassign " << lit << " @" << decision_level() << endl;
+      }
+      if ( debug_first && lit.varid().val() == 348 && decision_level() == 49 ) {
+	debug = debug_assign | debug_analyze | debug_implication;
+	debug_first = false;
+      }
+      else {
+	debug = debug_none;
+      }
       assign(lit);
     }
   }
@@ -638,14 +653,19 @@ YmSat::implication()
 	// 2-リテラル節の場合は相方のリテラルに基づく値の割り当てを行う．
 	Literal l0 = w.literal();
 	Bool3 val0 = eval(l0);
+	if ( val0 == kB3True ) {
+	  // すでに充足していた．
+	  continue;
+	}
+	if ( debug & debug_assign ) {
+	  cout << "\tassign " << l0 << " @" << decision_level()
+	       << " from (" << l0
+	       << " + " << ~l << "): " << l << endl;
+	}
 	if ( val0 == kB3X ) {
-	  if ( debug & debug_assign ) {
-	    cout << "\tassign " << l0 << " @" << decision_level()
-		 << " from " << l << endl;
-	  }
 	  assign(l0, SatReason(nl));
 	}
-	else if ( val0 == kB3False ) {
+	else { // val0 == kB3False
 	  // 矛盾がおこった．
 	  if ( debug & debug_assign ) {
 	    cout << "\t--> conflict with previous assignment" << endl
@@ -693,7 +713,7 @@ YmSat::implication()
 	}
 
 	if ( debug & debug_implication ) {
-	  cout << "\t\texamining watcher clause " << c << endl;
+	  cout << "\t\texamining watcher clause " << (*c) << endl;
 	}
 
 	// nl の替わりのリテラルを見つける．
@@ -729,11 +749,11 @@ YmSat::implication()
 	}
 
 	// 見付からなかったので l0 に従った割り当てを行う．
+	if ( debug & debug_assign ) {
+	  cout << "\tassign " << l0 << " @" << decision_level()
+	       << " from " << w << ": " << l << endl;
+	}
 	if ( val0 == kB3X ) {
-	  if ( debug & debug_assign ) {
-	    cout << "\tassign " << l0 << " @" << decision_level()
-		 << " from " << w << endl;
-	  }
 	  assign(l0, w);
 
 	  if ( mParams.mUseLbd ) {
@@ -857,7 +877,7 @@ YmSat::next_decision()
 	inv = true;
       }
 #else
-      inv = false; // 意味はない．
+      inv = true; // 意味はない．
 #endif
     }
     return Literal(VarId(vindex), inv);
@@ -1110,6 +1130,9 @@ YmSat::add_clause_sub(ymuint lit_num)
   Literal l1 = mTmpLits[1];
 
   if ( lit_num == 2 ) {
+    if ( debug & debug_assign ) {
+      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
+    }
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
@@ -1121,6 +1144,10 @@ YmSat::add_clause_sub(ymuint lit_num)
     // 節の生成
     SatClause* clause = new_clause(lit_num);
     mConstrClause.push_back(clause);
+
+    if ( debug & debug_assign ) {
+      cout << "add_clause: " << *clause << endl;
+    }
 
     // watcher-list の設定
     add_watcher(~l0, SatReason(clause));
@@ -1170,6 +1197,11 @@ YmSat::add_learnt_clause()
     // binary-clause の場合
     reason = SatReason(l1);
 
+    if ( debug & debug_assign ) {
+      cout << "add_learnt_clause: "
+	   << "(" << l0 << " + " << l1 << ")" << endl;
+    }
+
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
@@ -1183,6 +1215,10 @@ YmSat::add_learnt_clause()
       mTmpLits[i] = mLearntLits[i];
     }
     SatClause* clause = new_clause(n, true);
+
+    if ( debug & debug_assign ) {
+      cout << "add_learnt_clause: " << *clause << endl;
+    }
 
     bump_clause_activity(clause);
 

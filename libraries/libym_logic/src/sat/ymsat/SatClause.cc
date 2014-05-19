@@ -33,7 +33,7 @@ operator<<(ostream& s,
     for (ymuint i = 0; i < n; ++ i) {
       tmp[i] = c.lit(i);
     }
-    sort(tmp.begin() + 1, tmp.end());
+    //sort(tmp.begin() + 1, tmp.end());
 
     s << "(";
     const char* plus = "";

@@ -23,12 +23,31 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "Sort.h"
 #include "Solver.h"
 
-//#define DEBUG_ANALYZE 1
-//#define DEBUG_ASSIGN 1
+#define DEBUG_ANALYZE 1
+#define DEBUG_ASSIGN 1
+//#define DEBUG_IMPLICATION 1
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace Minisat;
+
+const int debug_none        = 0x00;
+
+const int debug_implication = 0x01;
+
+const int debug_analyze     = 0x02;
+
+const int debug_assign      = 0x04;
+
+const int debug_decision    = 0x08;
+
+const int debug_solve       = 0x10;
+
+const int debug_all         = 0xffffffff;
+
+int debug = debug_none;
 
 //=================================================================================================
 // Options:
@@ -62,15 +81,30 @@ print_lit(Lit l)
 void
 print_clause(Clause& c)
 {
-  cout << "(";
-  const char* plus = "";
-  for (int i = 0; i < c.size(); ++ i) {
-    Lit l = c[i];
-    cout << plus;
-    print_lit(l);
-    plus = " + ";
+  int n = c.size();
+  if ( n == 2 ) {
+    cout << "(";
+    print_lit(c[0]);
+    cout << " + ";
+    print_lit(c[1]);
+    cout << ")";
   }
-  cout << ")";;
+  else {
+    std::vector<Lit> tmp(n);
+    for (int i = 0; i < n; ++ i) {
+      tmp[i] = c[i];
+    }
+    //std::sort(tmp.begin() + 1, tmp.end());
+    cout << "(";
+    const char* plus = "";
+    for (int i = 0; i < n; ++ i) {
+      Lit l = tmp[i];
+      cout << plus;
+      print_lit(l);
+      plus = " + ";
+    }
+    cout << ")";
+  }
 }
 
 //=================================================================================================
@@ -182,6 +216,12 @@ bool Solver::addClause_(vec<Lit>& ps)
         CRef cr = ca.alloc(ps, false);
         clauses.push(cr);
         attachClause(cr);
+
+	if ( debug & debug_assign ) {
+	  cout << "add_clause: ";
+	  print_clause(ca[cr]);
+	  cout << endl;
+	}
     }
 
     return true;
@@ -235,24 +275,29 @@ bool Solver::satisfied(const Clause& c) const {
 //
 void Solver::cancelUntil(int level) {
   if (decisionLevel() > level){
-#ifdef DEBUG_ASSIGN
-    cout << "backtrack until @" << level << endl;
-#endif
+    if ( debug & debug_assign ) {
+      cout << endl
+	   << "backtrack until @" << level << endl;
+    }
         for (int c = trail.size()-1; c >= trail_lim[level]; c--){
             Var      x  = var(trail[c]);
             assigns [x] = l_Undef;
-#ifdef DEBUG_ASSIGN
-	    cout << "\tdeassign ";
-	    print_lit(trail[c]);
-	    cout << endl;
-#endif
+	    if ( debug & debug_assign ) {
+	      cout << "\tdeassign ";
+	      print_lit(trail[c]);
+	      cout << endl;
+	    }
             if (phase_saving > 1 || (phase_saving == 1) && c > trail_lim.last())
                 polarity[x] = sign(trail[c]);
             insertVarOrder(x); }
         qhead = trail_lim[level];
         trail.shrink(trail.size() - trail_lim[level]);
         trail_lim.shrink(trail_lim.size() - level);
-    } }
+  }
+  if ( debug & debug_assign ) {
+    cout << endl;
+  }
+}
 
 
 //=================================================================================================
@@ -495,11 +540,11 @@ CRef Solver::propagate()
         Watcher        *i, *j, *end;
         num_props++;
 
-#ifdef DEBUG_IMPLICATION
-	cout << "\tpick up ";
-	print_lit(p);
-	cout << endl;
-#endif
+	if ( debug & debug_implication ) {
+	  cout << "\tpick up ";
+	  print_lit(p);
+	  cout << endl;
+	}
 
         for (i = j = (Watcher*)ws, end = i + ws.size();  i != end;){
             // Try to avoid inspecting the clause:
@@ -522,26 +567,52 @@ CRef Solver::propagate()
             if (first != blocker && value(first) == l_True){
                 *j++ = w; continue; }
 
-#ifdef DEBUG_IMPLICATION
-	    cout << "\t\texamining watcher clause ";
-	    print_clause(c);
-	    cout << endl;
-#endif
+	if ( debug & debug_implication ) {
+	    if ( c.size() > 2 ) {
+	      cout << "\t\texamining watcher clause ";
+	      print_clause(c);
+	      cout << endl;
+	    }
+	}
             // Look for new watch:
-            for (int k = 2; k < c.size(); k++)
-	      if (value(c[k]) != l_False){
-#ifdef DEBUG_IMPLICATION
-		cout << "\t\t\tsecond watching literl becomes ";
+            for (int k = 2; k < c.size(); k++) {
+	      if (value(c[k]) != l_False) {
+	if ( debug & debug_implication ) {
+		cout << "\t\t\tsecond watching literal becomes ";
 		print_lit(c[k]);
 		cout << endl;
-#endif
-                    c[1] = c[k]; c[k] = false_lit;
-                    watches[~c[1]].push(w);
-                    goto NextClause; }
+	}
+		c[1] = c[k]; c[k] = false_lit;
+		watches[~c[1]].push(w);
+		goto NextClause;
+	      }
+	    }
 
             // Did not find watch -- clause is unit under assignment:
-            *j++ = w;
+	if ( debug & debug_implication ) {
+	    if ( c.size() > 2 ) {
+	  cout << "\t\tno other watching literals" << endl;
+	}
+	}
+           *j++ = w;
+	if ( debug & debug_assign ) {
+	    cout << "\tassign ";
+	    print_lit(first);
+	    cout << " @" << decisionLevel()
+		 << " from ";
+	    print_clause(c);
+	    cout << ": ";
+	    print_lit(p);
+	    cout << endl;
+	}
             if (value(first) == l_False){
+	if ( debug & debug_assign ) {
+	      cout << "\t--> conflict with previous assignment" << endl
+		   << "\t    ";
+	      print_lit(~first);
+	      cout << " was assigned at level "
+		   << level(var(first)) << endl;
+	}
                 confl = cr;
                 qhead = trail.size();
                 // Copy the remaining watches:
@@ -549,14 +620,6 @@ CRef Solver::propagate()
                     *j++ = *i++;
             }else {
 	      uncheckedEnqueue(first, cr);
-#ifdef DEBUG_ASSIGN
-	      cout << "\tassign ";
-	      print_lit(first);
-	      cout << " @" << decisionLevel()
-		   << " from ";
-	      print_clause(c);
-	      cout << endl;
-#endif
 	    }
 
         NextClause:;
@@ -690,18 +753,17 @@ lbool Solver::search(int nof_conflicts)
 
             learnt_clause.clear();
             analyze(confl, learnt_clause, backtrack_level);
-            cancelUntil(backtrack_level);
 
-#ifdef DEBUG_ANALYZE
-	    {
+	    if ( debug & debug_analyze ) {
 	      using namespace std;
 
 	      cout << endl
 		   << "analyze for ";
 	      Clause& c = ca[confl];
 	      print_clause(c);
-	      cout << endl;
-	      cout << "learnt clause is ";
+	      cout << endl
+		   << endl
+		   << "learnt clause is ";
 	      const char* plus = "";
 	      for (int i = 0; i < learnt_clause.size(); ++ i) {
 		Lit l = learnt_clause[i];
@@ -712,27 +774,35 @@ lbool Solver::search(int nof_conflicts)
 	      }
 	      cout << endl;
 	    }
-#endif
+            cancelUntil(backtrack_level);
+
             if (learnt_clause.size() == 1){
 	      uncheckedEnqueue(learnt_clause[0]);
-#ifdef DEBUG_ASSIGN
-	      cout << "\tassign ";
-	      print_lit(learnt_clause[0]);
-	      cout << " @" << decisionLevel()
-		   << endl;
-#endif
-            }else{
-                CRef cr = ca.alloc(learnt_clause, true);
-                learnts.push(cr);
-                attachClause(cr);
-                claBumpActivity(ca[cr]);
-                uncheckedEnqueue(learnt_clause[0], cr);
-#ifdef DEBUG_ASSIGN
+	      if ( debug & debug_assign ) {
 		cout << "\tassign ";
 		print_lit(learnt_clause[0]);
 		cout << " @" << decisionLevel()
 		     << endl;
-#endif
+	      }
+            }else{
+                CRef cr = ca.alloc(learnt_clause, true);
+		if ( debug & debug_assign ) {
+		  cout << "add_learnt_clause: ";
+		  print_clause(ca[cr]);
+		  cout << endl;
+		}
+                learnts.push(cr);
+                attachClause(cr);
+                claBumpActivity(ca[cr]);
+                uncheckedEnqueue(learnt_clause[0], cr);
+		if ( debug & debug_assign ) {
+		  cout << "\tassign ";
+		  print_lit(learnt_clause[0]);
+		  cout << " @" << decisionLevel()
+		       << " from ";
+		  print_clause(ca[cr]);
+		  cout << endl;
+		}
             }
 
             varDecayActivity();
@@ -790,24 +860,30 @@ lbool Solver::search(int nof_conflicts)
                 if (next == lit_Undef)
                     // Model found:
                     return l_True;
-#ifdef DEBUG_ASSIGN
-		cout << endl
-		     << "choose ";
-		print_lit(next);
-		cout << " :" << activity[var(next)]
-		     << endl;
-#endif
+		if ( debug & debug_assign ) {
+		  cout << endl
+		       << "choose ";
+		  print_lit(next);
+		  cout << " :" << activity[var(next)]
+		       << endl;
+		}
+		if ( var(next) == 348 && decisionLevel() == 48 ) {
+		  debug |= debug_assign | debug_analyze | debug_implication;
+		}
+		else {
+		  debug = debug_none;
+		}
             }
 
             // Increase decision level and enqueue 'next'
             newDecisionLevel();
             uncheckedEnqueue(next);
-#ifdef DEBUG_ASSIGN
-	    cout << "\tassign ";
-	    print_lit(next);
-	    cout << " @" << decisionLevel()
-		 << endl;
-#endif
+	    if ( debug & debug_assign ) {
+	      cout << "\tassign ";
+	      print_lit(next);
+	      cout << " @" << decisionLevel()
+		   << endl;
+	    }
         }
     }
 }
