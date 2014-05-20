@@ -44,8 +44,8 @@ const int debug_solve       = 0x10;
 const int debug_all         = 0xffffffff;
 
 //int debug = debug_assign | debug_implication;
-int debug = debug_assign | debug_analyze | debug_decision;
-//int debug = debug_none;
+//int debug = debug_assign | debug_analyze | debug_decision;
+int debug = debug_none;
 
 
 //=================================================================================================

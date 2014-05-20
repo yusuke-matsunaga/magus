@@ -32,7 +32,7 @@ const ymuint debug_solve       = 0x10;
 
 const ymuint debug_all         = 0xffffffff;
 
-const ymuint debug = debug_decision | debug_analyze | debug_assign;
+//const ymuint debug = debug_decision | debug_analyze | debug_assign;
 //const ymuint debug = debug_assign;
 //const ymuint debug = debug_assign | debug_implication;
 //const ymuint debug = debug_assign | debug_analyze;
@@ -40,7 +40,7 @@ const ymuint debug = debug_decision | debug_analyze | debug_assign;
 //const ymuint debug = debug_solve | debug_assign;
 //const ymuint debug = debug_all;
 //const ymuint debug = debug_none;
-//ymuint debug = debug_none;
+ymuint debug = debug_none;
 
 bool debug_first = true;
 
@@ -535,12 +535,6 @@ YmSat::search(ymuint confl_limit)
 {
   ymuint confl_num0 = mConflictNum;
   for ( ; ; ) {
-    if ( (mConflictNum - confl_num0) > confl_limit ) {
-      // 矛盾の回数が制限値を越えた．
-      backtrack(mRootLevel);
-      return kB3X;
-    }
-
     // キューにつまれている割り当てから含意される値の割り当てを行う．
     SatReason conflict = implication();
     if ( conflict != kNullSatReason ) {
@@ -581,6 +575,15 @@ YmSat::search(ymuint confl_limit)
       decay_clause_activity();
     }
     else {
+      if ( (mConflictNum - confl_num0) > confl_limit ) {
+	// 矛盾の回数が制限値を越えた．
+	if ( debug & debug_assign ) {
+	  cout << "restart" << endl;
+	}
+	backtrack(mRootLevel);
+	return kB3X;
+      }
+
       if ( decision_level() == 0 ) {
 	// 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
 	// あるかもしれないのでそれを取り除く．
@@ -866,7 +869,7 @@ YmSat::next_decision()
 	// mWlPosi/mWlNega が指定されていなかったらランダムに選ぶ．
 	inv = mRandGen.real1() < 0.5;
       }
-#if 0
+#if 1
       //cout << mWeightArray[v2 + 0] << " : " << mWeightArray[v2 + 1] << endl;
       if ( mWeightArray[v2 + 1] > mWeightArray[v2 + 0] ) {
 	inv = true;
