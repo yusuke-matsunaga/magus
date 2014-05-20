@@ -612,7 +612,7 @@ CRef Solver::propagate()
 	}
             if (value(first) == l_False){
 	if ( debug & debug_assign ) {
-	      cout << "\t--> conflict with previous assignment" << endl
+	  cout << "\t--> conflict(#" << conflicts << ") with previous assignment" << endl
 		   << "\t    ";
 	      print_lit(~first);
 	      cout << " was assigned at level "
@@ -829,7 +829,7 @@ lbool Solver::search(int nof_conflicts)
             // NO CONFLICT
             if (nof_conflicts >= 0 && conflictC >= nof_conflicts || !withinBudget()){
                 // Reached bound on number of conflicts:
-                progress_estimate = progressEstimate();
+	      progress_estimate = progressEstimate();
                 cancelUntil(0);
                 return l_Undef; }
 
@@ -956,6 +956,9 @@ lbool Solver::solve_()
     while (status == l_Undef){
         double rest_base = luby_restart ? luby(restart_inc, curr_restarts) : pow(restart_inc, curr_restarts);
         status = search(rest_base * restart_first);
+	if ( debug & debug_assign ) {
+	  cout << "restart" << endl;
+	}
         if (!withinBudget()) break;
         curr_restarts++;
     }

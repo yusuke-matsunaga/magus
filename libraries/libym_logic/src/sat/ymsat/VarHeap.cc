@@ -87,7 +87,7 @@ VarHeap::bump_var_activity(VarId varid)
     mVarBump *= 1e-100;
   }
   ymint pos = mHeapPos[vindex];
-  if ( pos >= 0 ) {
+  if ( pos > 0 ) {
     move_up(pos);
   }
 }

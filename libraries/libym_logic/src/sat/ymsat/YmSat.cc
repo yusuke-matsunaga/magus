@@ -412,6 +412,10 @@ YmSat::solve(const vector<Literal>& assumptions,
       break;
     }
 
+    if ( debug & debug_assign ) {
+      cout << "restart" << endl;
+    }
+
     // 判定できなかったのでパラメータを更新して次のラウンドへ
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit + 100;
@@ -533,13 +537,14 @@ YmSat::timer_on(bool enable)
 Bool3
 YmSat::search(ymuint confl_limit)
 {
-  ymuint confl_num0 = mConflictNum;
+  ymuint cur_confl_num = 0;
   for ( ; ; ) {
     // キューにつまれている割り当てから含意される値の割り当てを行う．
     SatReason conflict = implication();
     if ( conflict != kNullSatReason ) {
       // 矛盾が生じた．
       ++ mConflictNum;
+      ++ cur_confl_num;
       if ( decision_level() == mRootLevel ) {
 	// トップレベルで矛盾が起きたら充足不可能
 	return kB3False;
@@ -575,11 +580,8 @@ YmSat::search(ymuint confl_limit)
       decay_clause_activity();
     }
     else {
-      if ( (mConflictNum - confl_num0) > confl_limit ) {
+      if ( cur_confl_num >= confl_limit ) {
 	// 矛盾の回数が制限値を越えた．
-	if ( debug & debug_assign ) {
-	  cout << "restart" << endl;
-	}
 	backtrack(mRootLevel);
 	return kB3X;
       }
@@ -589,7 +591,7 @@ YmSat::search(ymuint confl_limit)
 	// あるかもしれないのでそれを取り除く．
 	sweep_clause();
       }
-      if ( mLearntClause.size() > mLearntLimit ) {
+      if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
 	// 学習節の数が制限値を超えたら整理する．
 	cut_down();
       }
@@ -663,7 +665,7 @@ YmSat::implication()
 	else { // val0 == kB3False
 	  // 矛盾がおこった．
 	  if ( debug & debug_assign ) {
-	    cout << "\t--> conflict with previous assignment" << endl
+	    cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
 		 << "\t    " << ~l0 << " was assigned at level "
 		 << decision_level(l0.varid()) << endl;
 	  }
@@ -764,7 +766,7 @@ YmSat::implication()
 	else {
 	  // 矛盾がおこった．
 	  if ( debug & debug_assign ) {
-	    cout << "\t--> conflict with previous assignment" << endl
+	    cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
 		 << "\t    " << ~l0 << " was assigned at level "
 		 << decision_level(l0.varid()) << endl;
 	  }
@@ -869,7 +871,7 @@ YmSat::next_decision()
 	// mWlPosi/mWlNega が指定されていなかったらランダムに選ぶ．
 	inv = mRandGen.real1() < 0.5;
       }
-#if 1
+#if 0
       //cout << mWeightArray[v2 + 0] << " : " << mWeightArray[v2 + 1] << endl;
       if ( mWeightArray[v2 + 1] > mWeightArray[v2 + 0] ) {
 	inv = true;

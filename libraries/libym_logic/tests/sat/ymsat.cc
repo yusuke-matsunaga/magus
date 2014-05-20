@@ -76,11 +76,15 @@ main(int argc,
     string sat_type;
     if ( minisat ) {
       sat_type = "minisat";
-      opt = "verbose";
+      if ( verbose ) {
+	opt = "verbose";
+      }
     }
     else if ( minisat2 ) {
       sat_type = "minisat2";
-      opt = "verbose";
+      if ( verbose ) {
+	opt = "verbose";
+      }
     }
     SatSolver solver(sat_type, opt);
 
@@ -106,9 +110,11 @@ main(int argc,
       return 4;
     }
 
-    SatMsgHandlerImpl1 satmsghandler(cout);
-    solver.reg_msg_handler(&satmsghandler);
-    solver.timer_on(true);
+    if ( verbose ) {
+      SatMsgHandlerImpl1 satmsghandler(cout);
+      solver.reg_msg_handler(&satmsghandler);
+      solver.timer_on(true);
+    }
 
     StopWatch sw;
     sw.start();
