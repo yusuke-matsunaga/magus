@@ -84,6 +84,15 @@ public:
   double
   activity(VarId var) const;
 
+  /// @brief 与えられた変数のリストからヒープ木を構成する．
+  void
+  build(const vector<VarId> var_list);
+
+  /// @brief 内容を出力する
+  /// @param[in] s 出力先のストリーム
+  void
+  dump(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -126,11 +135,6 @@ private:
   static
   ymuint
   parent(ymuint pos);
-
-  /// @brief 内容を出力する
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ostream& s) const;
 
 
 private:

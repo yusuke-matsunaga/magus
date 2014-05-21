@@ -90,6 +90,9 @@ YmSat::YmSat(const string& option) :
 {
   mAnalyzer = SaFactory::gen_analyzer(this, option);
 
+  mSweep_assigns = -1;
+  mSweep_props = 0;
+
   mLbdTmpSize = 1024;
   mLbdTmp = new bool[mLbdTmpSize];
 
@@ -630,6 +633,7 @@ YmSat::implication()
   while ( mAssignList.has_elem() ) {
     Literal l = mAssignList.get_next();
     ++ mPropagationNum;
+    -- mSweep_props;
 
     if ( debug & debug_implication ) {
       cout << "\tpick up " << l << endl;
@@ -899,6 +903,14 @@ YmSat::sweep_clause()
     return;
   }
 
+  cout << "sweep_clause(" << mAssignList.size()
+       << ", " << mSweep_assigns
+       << ", " << mSweep_props << ")" << endl;
+
+  if ( mAssignList.size() == mSweep_assigns /*|| mSweep_props > 0*/ ) {
+    return;
+  }
+
   ymuint n = mLearntClause.size();
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < n; ++ rpos) {
@@ -954,6 +966,17 @@ YmSat::sweep_clause()
       mConstrClause.erase(mConstrClause.begin() + wpos, mConstrClause.end());
     }
   }
+
+  vector<VarId> var_list;
+  var_list.reserve(mVarSize);
+  for (ymuint i = 0; i < mVarSize; ++ i) {
+    var_list.push_back(VarId(i));
+  }
+  mVarHeap.build(var_list);
+  mVarHeap.dump(cout);
+
+  mSweep_assigns = mAssignList.size();
+  mSweep_props = mConstrLitNum + mLearntLitNum;
 }
 
 BEGIN_NONAMESPACE

@@ -99,6 +99,29 @@ VarHeap::decay_var_activity()
   mVarBump /= mVarDecay;
 }
 
+// @brief 与えられた変数のリストからヒープ木を構成する．
+void
+VarHeap::build(const vector<VarId> var_list)
+{
+  for (ymuint i = 0; i < mVarSize; ++ i) {
+    mHeapPos[i] = -1;
+  }
+  mHeapNum = 0;
+  assert_cond( var_list.size() <= mVarSize, __FILE__, __LINE__);
+
+  for (ymuint i = 0; i < var_list.size(); ++ i) {
+    VarId var = var_list[i];
+    ymuint vindex = var.val();
+    ymuint pos = mHeapNum;
+    ++ mHeapNum;
+    set(vindex, pos);
+  }
+  for (ymuint i = (mHeapNum / 2) - 1; i > 0; ) {
+    -- i;
+    move_down(i);
+  }
+}
+
 // 引数の位置にある要素を適当な位置まで沈めてゆく
 void
 VarHeap::move_down(ymuint pos)

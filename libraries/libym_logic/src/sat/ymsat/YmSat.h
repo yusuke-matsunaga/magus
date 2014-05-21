@@ -464,6 +464,12 @@ private:
   // 値割り当てを保持するリスト
   AssignList mAssignList;
 
+  // 前回の sweep 時の割り当て数
+  ymuint64 mSweep_assigns;
+
+  // 前回の sweep 時のリテラル数
+  ymint64 mSweep_props;
+
   // 学習節のアクティビティの増加量
   double mClauseBump;
 

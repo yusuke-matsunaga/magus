@@ -711,6 +711,10 @@ bool Solver::simplify()
     if (!ok || propagate() != CRef_Undef)
         return ok = false;
 
+    cout << "sweep_clause(" << nAssigns()
+	 << ", " << simpDB_assigns
+	 << ", " << simpDB_props << ")" << endl;
+
     if (nAssigns() == simpDB_assigns || (simpDB_props > 0))
         return true;
 
