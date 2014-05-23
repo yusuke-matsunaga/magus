@@ -101,7 +101,7 @@ VarHeap::decay_var_activity()
 
 // @brief 与えられた変数のリストからヒープ木を構成する．
 void
-VarHeap::build(const vector<VarId> var_list)
+VarHeap::build(const vector<VarId>& var_list)
 {
   for (ymuint i = 0; i < mVarSize; ++ i) {
     mHeapPos[i] = -1;
@@ -112,11 +112,10 @@ VarHeap::build(const vector<VarId> var_list)
   for (ymuint i = 0; i < var_list.size(); ++ i) {
     VarId var = var_list[i];
     ymuint vindex = var.val();
-    ymuint pos = mHeapNum;
     ++ mHeapNum;
-    set(vindex, pos);
+    set(vindex, i);
   }
-  for (ymuint i = (mHeapNum / 2) - 1; i > 0; ) {
+  for (ymuint i = (mHeapNum / 2); i > 0; ) {
     -- i;
     move_down(i);
   }
@@ -171,8 +170,9 @@ VarHeap::dump(ostream& s) const
     assert_cond(mHeapPos[vindex] == static_cast<ymint>(i),
 		__FILE__, __LINE__);
     if ( i > 0 ) {
-      ymint p = (i - 1) >> 1;
-      assert_cond(mActivity[mHeap[p]] >= mActivity[vindex], __FILE__, __LINE__);
+      ymint p = parent(i);
+      ymuint pindex = mHeap[p];
+      assert_cond(mActivity[pindex] >= mActivity[vindex], __FILE__, __LINE__);
     }
     s << spc << vindex << "("
       << mActivity[vindex]

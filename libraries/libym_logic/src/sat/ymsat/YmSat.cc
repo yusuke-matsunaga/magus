@@ -903,10 +903,6 @@ YmSat::sweep_clause()
     return;
   }
 
-  cout << "sweep_clause(" << mAssignList.size()
-       << ", " << mSweep_assigns
-       << ", " << mSweep_props << ")" << endl;
-
   if ( mAssignList.size() == mSweep_assigns /*|| mSweep_props > 0*/ ) {
     return;
   }
@@ -973,7 +969,6 @@ YmSat::sweep_clause()
     var_list.push_back(VarId(i));
   }
   mVarHeap.build(var_list);
-  mVarHeap.dump(cout);
 
   mSweep_assigns = mAssignList.size();
   mSweep_props = mConstrLitNum + mLearntLitNum;

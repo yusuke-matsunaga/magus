@@ -86,7 +86,7 @@ public:
 
   /// @brief 与えられた変数のリストからヒープ木を構成する．
   void
-  build(const vector<VarId> var_list);
+  build(const vector<VarId>& var_list);
 
   /// @brief 内容を出力する
   /// @param[in] s 出力先のストリーム
