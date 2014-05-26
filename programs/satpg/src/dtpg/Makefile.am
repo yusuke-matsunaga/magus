@@ -69,6 +69,8 @@ COMMON_SOURCES = \
 	SatEngineMulti.cc \
 	SatEngineSingle.h \
 	SatEngineSingle.cc \
+	SatEngineSingle2.h \
+	SatEngineSingle2.cc \
 	LitMap.h \
 	LitMap.cc
 
