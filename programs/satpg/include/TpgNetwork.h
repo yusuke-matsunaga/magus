@@ -27,6 +27,14 @@ class TpgMap;
 //////////////////////////////////////////////////////////////////////
 struct CplxInfo
 {
+  /// @brief コンストラクタ
+  /// @param[in] node_num ノード数
+  /// @param[in] fanin_num ファンイン数
+  CplxInfo(ymuint node_num,
+	   ymuint fanin_num) :
+    mExtraNodeCount(node_num),
+    mCVal(fanin_num * 2) { }
+
   // 根のノード以外に必要となるノード数
   ymuint32 mExtraNodeCount;
 
@@ -43,6 +51,8 @@ struct CplxInfo
 //////////////////////////////////////////////////////////////////////
 class TpgNetwork
 {
+  typedef unordered_map<ymuint, CplxInfo> CplxInfoMap;
+
 public:
   //////////////////////////////////////////////////////////////////////
   // ファイルを読み込んでインスタンスを作るクラスメソッド
@@ -165,6 +175,11 @@ public:
   /// @param[in] po_pos 出力番号
   void
   activate_po(ymuint po_pos);
+
+  /// @brief 一つの外部出力に関係するノードのみをアクティブにする．
+  /// @param[in] po 出力ノード
+  void
+  activate_po(TpgNode* po);
 
   /// @brief 全てのノードをアクティブにする．
   void
