@@ -25,6 +25,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 SatEngineSingle::SatEngineSingle()
 {
+  mUseDominator = true;
 }
 
 // @brief デストラクタ
@@ -115,10 +116,15 @@ SatEngineSingle::run(TpgFault* fault,
   // 故障に対するテスト生成を行なう．
   tmp_lits_begin();
 
-  // dominator ノードの dvar は1でなければならない．
-  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(node->dvar(), false);
-    tmp_lits_add(dlit);
+  if ( mUseDominator ) {
+    // dominator ノードの dvar は1でなければならない．
+    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(node->dvar(), false);
+      tmp_lits_add(dlit);
+    }
+  }
+  else {
+    tmp_lits_add(Literal(fnode->dvar(), false));
   }
 
   // fnode の dlit を1と仮定しているので
