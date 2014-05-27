@@ -51,6 +51,7 @@ DtpgSat::set_mode(const string& type,
 		  ostream* outp)
 {
   mSatEngine.set_mode(type, option, outp);
+  mSatEngine2.set_mode(type, option, outp);
 }
 
 // @brief テスト生成を行なう．
@@ -72,8 +73,11 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 	     UntestOp& uop,
 	     DtpgStats& stats)
 {
-  mSatEngine.clear_stats();
   mSatEngine.set_option(option_str);
+  mSatEngine2.set_option(option_str);
+
+  mSatEngine.clear_stats();
+  mSatEngine2.clear_stats();
 
   mNetwork = &tgnetwork;
   mMaxId = mNetwork->node_num();
@@ -112,7 +116,12 @@ DtpgSat::run(TpgNetwork& tgnetwork,
     break;
   }
 
-  mSatEngine.get_stats(stats);
+  if ( mode.mode() == kDtpgSingle ) {
+    mSatEngine2.get_stats(stats);
+  }
+  else {
+    mSatEngine.get_stats(stats);
+  }
 }
 
 BEGIN_NONAMESPACE
@@ -492,62 +501,6 @@ DtpgSat::single_mode(BackTracer& bt,
 		     UntestOp& uop)
 {
   ymuint nn = mNetwork->active_node_num();
-#if 0
-  for ( ; ; ) {
-    bool skipped = false;
-    bool update = false;
-    for (ymuint i = 0; i < nn; ++ i) {
-      TpgNode* node = mNetwork->active_node(i);
-      if ( node->is_output() ) {
-	continue;
-      }
-
-      // 出力の故障
-      TpgFault* f0 = node->output_fault(0);
-      if ( check_dom(f0) ) {
-	skipped = true;
-      }
-      else {
-	dtpg_single(f0, bt, dop, uop);
-	update = true;
-      }
-
-      TpgFault* f1 = node->output_fault(1);
-      if ( check_dom(f1) ) {
-	skipped = true;
-      }
-      else {
-	dtpg_single(f1, bt, dop, uop);
-	update = true;
-      }
-
-      // 入力の故障
-      ymuint ni = node->fanin_num();
-      for (ymuint j = 0; j < ni; ++ j) {
-	TpgFault* f0 = node->input_fault(0, j);
-	if ( check_dom(f0) ) {
-	  skipped = true;
-	}
-	else {
-	  dtpg_single(f0, bt, dop, uop);
-	  update = true;
-	}
-
-	TpgFault* f1 = node->input_fault(1, j);
-	if ( check_dom(f1) ) {
-	  skipped = true;
-	}
-	else {
-	  dtpg_single(f1, bt, dop, uop);
-	  update = true;
-	}
-      }
-    }
-    if ( !update ) {
-      break;
-    }
-  }
-#endif
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = mNetwork->active_node(i);
     if ( node->is_output() ) {
@@ -565,10 +518,10 @@ DtpgSat::single_mode(BackTracer& bt,
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TpgFault* f0 = node->input_fault(0, j);
-      dtpg_single(f0, bt, dop, uop);
+      dtpg_single2(f0, bt, dop, uop);
 
       TpgFault* f1 = node->input_fault(1, j);
-      dtpg_single(f1, bt, dop, uop);
+      dtpg_single2(f1, bt, dop, uop);
     }
   }
 }
@@ -794,11 +747,32 @@ DtpgSat::dtpg_single(TpgFault* f,
 		     DetectOp& dop,
 		     UntestOp& uop)
 {
-  clear_faults();
+  if ( f != NULL &&
+       f->is_rep() &&
+       f->status() != kFsDetected &&
+       !f->is_skip() ) {
+    mSatEngine2.run(f, f->node(), f->val(), mNetwork->max_node_id(),
+		    bt, dop, uop);
+  }
+}
 
-  add_fault(f);
-
-  do_dtpg(bt, dop, uop);
+// @brief 一つの故障に対してテストパタン生成を行う．
+// @param[in] f 故障
+void
+DtpgSat::dtpg_single2(TpgFault* f,
+		      BackTracer& bt,
+		      DetectOp& dop,
+		      UntestOp& uop)
+{
+  if ( f != NULL &&
+       f->is_rep() &&
+       f->status() != kFsDetected &&
+       !f->is_skip() ) {
+    mNetwork->begin_fault_injection();
+    TpgNode* fnode = mNetwork->inject_fnode(f->node(), f->pos());
+    mSatEngine2.run(f, fnode, f->val(), mNetwork->max_node_id(), bt, dop, uop);
+    mNetwork->end_fault_injection();
+  }
 }
 
 // @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．

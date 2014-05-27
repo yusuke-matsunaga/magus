@@ -52,6 +52,9 @@ UntestOp*
 new_UopSkip(AtpgMgr& mgr,
 	    ymuint threshold);
 
+/// @brief 'dummy' タイプを生成する．
+UntestOp*
+new_UopDummy();
 
 END_NAMESPACE_YM_SATPG
 

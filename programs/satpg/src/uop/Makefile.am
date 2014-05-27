@@ -54,6 +54,8 @@ AM_CPPFLAGS = \
 COMMON_SOURCES = \
 	UopBase.h \
 	UopBase.cc \
+	UopDummy.h \
+	UopDummy.cc \
 	UopSkip.h \
 	UopSkip.cc \
 	UopList.cc

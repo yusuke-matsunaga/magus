@@ -25,11 +25,44 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 SatEngineSingle2::SatEngineSingle2()
 {
+  mUopDummy = new_UopDummy();
+  mTgGrasp = true;
+  mUseDominator = true;
 }
 
 // @brief デストラクタ
 SatEngineSingle2::~SatEngineSingle2()
 {
+  delete mUopDummy;
+}
+
+// @brief オプションを設定する．
+void
+SatEngineSingle2::set_option(const string& option_str)
+{
+  for (string::size_type next = 0; ; ++ next) {
+    string::size_type pos = option_str.find(':', next);
+    if ( pos == next ) {
+      continue;
+    }
+    string option = option_str.substr(next, pos - next);
+    if ( option == "TG-GRASP" ) {
+      mTgGrasp = true;
+    }
+    else if ( option == "NEMESIS" ) {
+      mTgGrasp = false;
+    }
+    else if ( option == "DOM" ) {
+      mUseDominator = true;
+    }
+    else if ( option == "NODOM" ) {
+      mUseDominator = false;
+    }
+    if ( pos == string::npos ) {
+      break;
+    }
+    next = pos;
+  }
 }
 
 // @brief テストパタン生成を行なう．
@@ -97,7 +130,7 @@ SatEngineSingle2::run(TpgFault* fault,
     }
   }
 
-
+#if 0
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
@@ -109,24 +142,42 @@ SatEngineSingle2::run(TpgFault* fault,
     tmp_lits_add(dlit);
   }
   tmp_lits_end(solver);
-
-  cnf_end();
-
-  // 故障に対するテスト生成を行なう．
-  tmp_lits_begin();
+#endif
 
   // dominator ノードの dvar は1でなければならない．
   for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
     Literal dlit(node->dvar(), false);
-    tmp_lits_add(dlit);
+    solver.add_clause(dlit);
   }
 
   // fnode の dlit を1と仮定しているので
   // ここでは fvar か gvar のどちらかを仮定すればよい．
   bool inv = (fval == 0);
-  tmp_lits_add(Literal(fnode->fvar(), inv));
+  solver.add_clause(Literal(fnode->fvar(), inv));
 
-  solve(solver, fault, bt, dop, uop);
+  cnf_end();
+
+  const vector<TpgNode*>& olist = output_list();
+  ymuint no = olist.size();
+  for (ymuint i = 0; i < no; ++ i) {
+    TpgNode* node = olist[i];
+    Literal dlit(node->dvar(), false);
+
+    // 故障に対するテスト生成を行なう．
+    tmp_lits_begin();
+
+    tmp_lits_add(dlit);
+
+    if ( i < no - 1 ) {
+      solve(solver, fault, bt, dop, *mUopDummy);
+      if ( fault->status() == kFsDetected ) {
+	break;
+      }
+    }
+    else {
+      solve(solver, fault, bt, dop, uop);
+    }
+  }
 
   clear_node_mark();
 }
