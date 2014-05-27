@@ -298,22 +298,29 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   ymuint nn_orig = tgnetwork.node_num();
   ymuint nl = tgnetwork.logic_num();
   ymuint nn = nn_orig;
-  unordered_map<ymuint, CplxInfo> en_hash;
+  CplxInfoMap en_hash;
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.logic(i);
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
       if ( en_hash.count(fid) > 0 ) {
-	nn += en_hash[fid].mExtraNodeCount;
+	// すでに同じ論理式を処理済みの場合は
+	// 以前の結果を利用する．
+	CplxInfoMap::iterator p = en_hash.find(fid);
+	nn += p->second.mExtraNodeCount;
       }
       else {
+	// 論理式を取り出す．
 	Expr expr = tgnetwork.get_lexp(fid);
 	ymuint ni = tgnode->fanin_num();
+	// 追加で必要となるノード数を計算する．
 	ymuint n = extra_node_count(expr, ni);
-	en_hash.insert(make_pair(fid, CplxInfo()));
-	CplxInfo& cinfo = en_hash[fid];
-	cinfo.mExtraNodeCount = n;
-	cinfo.mCVal.resize(ni * 2);
+	// ハッシュに登録する．
+	en_hash.insert(make_pair(fid, CplxInfo(n, ni)));
+	// 入力の制御値を計算する．
+	CplxInfoMap::iterator p = en_hash.find(fid);
+	assert_cond( p != en_hash.end(), __FILE__, __LINE__);
+	CplxInfo& cinfo = p->second;
 	for (ymuint j = 0; j < ni; ++ j) {
 	  cinfo.mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kB3False);
 	  cinfo.mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kB3True);
@@ -551,10 +558,21 @@ TpgNetwork::end_fault_injection()
 void
 TpgNetwork::activate_po(ymuint po_pos)
 {
+  // po_pos は output2() 上の位置
   TpgNode* onode = output2(po_pos);
 
-  // pos 番めの出力から到達可能なノードにマークをつける．
-  tfimark(onode);
+  activate_po(onode);
+}
+
+// @brief 一つの外部出力に関係するノードのみをアクティブにする．
+// @param[in] po 出力ノード
+void
+TpgNetwork::activate_po(TpgNode* po)
+{
+  assert_cond( po->is_output(), __FILE__, __LINE__);
+
+  // po から到達可能なノードにマークをつける．
+  tfimark(po);
 
   activate_sub();
 }
