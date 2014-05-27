@@ -71,6 +71,7 @@ SatEngineSingle::run(TpgFault* fault,
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
 
+#if 0
     // XOR(glit, flit, dlit) を追加する．
     // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
     solver.add_clause(~glit, ~flit, ~dlit);
@@ -95,9 +96,31 @@ SatEngineSingle::run(TpgFault* fault,
       }
       tmp_lits_end(solver);
     }
+#else
+    // XOR(glit, flit, dlit) を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause( glit,  flit, ~dlit);
+
+    if ( !node->is_output() ) {
+      ymuint nfo = node->active_fanout_num();
+      tmp_lits_begin(nfo + 1);
+      tmp_lits_add(~dlit);
+      for (ymuint j = 0; j < nfo; ++ j) {
+	TpgNode* onode = node->active_fanout(j);
+	tmp_lits_add(Literal(onode->dvar(), false));
+      }
+      tmp_lits_end(solver);
+    }
+
+    if ( node != fnode ) {
+      // 故障回路のゲートの入出力関係を表すCNFを作る．
+      make_node_cnf(solver, node, FvarLitMap(node));
+    }
+#endif
   }
 
-
+#if 0
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
@@ -109,22 +132,24 @@ SatEngineSingle::run(TpgFault* fault,
     tmp_lits_add(dlit);
   }
   tmp_lits_end(solver);
-
-  cnf_end();
-
-  // 故障に対するテスト生成を行なう．
-  tmp_lits_begin();
+#else
+#endif
 
   // dominator ノードの dvar は1でなければならない．
   for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
     Literal dlit(node->dvar(), false);
-    tmp_lits_add(dlit);
+    solver.add_clause(dlit);
   }
 
   // fnode の dlit を1と仮定しているので
   // ここでは fvar か gvar のどちらかを仮定すればよい．
   bool inv = (fval == 0);
-  tmp_lits_add(Literal(fnode->fvar(), inv));
+  solver.add_clause(Literal(fnode->fvar(), inv));
+
+  cnf_end();
+
+  // 故障に対するテスト生成を行なう．
+  tmp_lits_begin();
 
   solve(solver, fault, bt, dop, uop);
 

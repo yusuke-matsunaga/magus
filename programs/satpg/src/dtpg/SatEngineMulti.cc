@@ -125,6 +125,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
 
+#if 0
     // XOR(glit, flit, dlit) を追加する．
     // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
     solver.add_clause(~glit, ~flit, ~dlit);
@@ -163,9 +164,36 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
 
       tmp_lits_end(solver);
     }
+#else
+    // XOR(glit, flit, dlit) を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause( glit,  flit, ~dlit);
+
+    if ( !node->is_output() ) {
+      ymuint nfo = node->active_fanout_num();
+      tmp_lits_begin(nfo + 1);
+      tmp_lits_add(~dlit);
+      for (ymuint j = 0; j < nfo; ++ j) {
+	TpgNode* onode = node->active_fanout(j);
+	tmp_lits_add(Literal(onode->dvar(), false));
+      }
+      tmp_lits_end(solver);
+    }
+
+    Literal olit(ovar, false);
+    if ( node->is_input() ) {
+      solver.add_clause(~glit,  olit);
+      solver.add_clause( glit, ~olit);
+    }
+    else {
+      make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+    }
+#endif
   }
 
 
+#if 0
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
@@ -177,6 +205,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     tmp_lits_add(dlit);
   }
   tmp_lits_end(solver);
+#endif
 
   cnf_end();
 
