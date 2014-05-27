@@ -50,7 +50,7 @@ public:
   /// @param[in] tpgnetwork 対象のネットワーク
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
-  /// @param[in] fault_analysis 故障の支配関係を解析する．
+  /// @param[in] option_str オプション文字列
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -60,7 +60,7 @@ public:
   run(TpgNetwork& tgnetwork,
       DtpgMode mode,
       tDtpgPoMode po_mode,
-      bool fault_analysis,
+      const string& option_str,
       BackTracer& bt,
       DetectOp& dop,
       UntestOp& uop,

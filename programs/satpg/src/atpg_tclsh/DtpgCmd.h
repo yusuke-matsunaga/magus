@@ -106,6 +106,9 @@ private:
   // drop オプションの解析用オブジェクト
   TclPopt* mPoptDrop;
 
+  // オプション文字列オプションの解析用オブジェクト
+  TclPoptStr* mPoptOpt;
+
   // verify オプションの解析用オブジェクト
   TclPopt* mPoptVerify;
 

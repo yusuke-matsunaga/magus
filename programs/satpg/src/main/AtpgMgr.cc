@@ -201,7 +201,7 @@ AtpgMgr::set_dtpg_timer(bool enable)
 void
 AtpgMgr::dtpg(DtpgMode mode,
 	      tDtpgPoMode po_mode,
-	      bool fault_analysis,
+	      const string& option_str,
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop,
@@ -213,10 +213,10 @@ AtpgMgr::dtpg(DtpgMode mode,
   dop.set_faults(mFaultMgr->remain_list());
 
   if ( mode.mode() == kDtpgSingle2 ) {
-    mDtpg2->run(*mNetwork, mode, po_mode, fault_analysis, bt, dop, uop, stats);
+    mDtpg2->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
   }
   else {
-    mDtpg->run(*mNetwork, mode, po_mode, fault_analysis, bt, dop, uop, stats);
+    mDtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
   }
 
   mTimer.change(old_id);

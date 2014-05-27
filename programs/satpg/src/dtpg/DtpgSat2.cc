@@ -44,7 +44,7 @@ DtpgSat2::set_mode(const string& type,
 // @param[in] tpgnetwork 対象のネットワーク
 // @param[in] mode メインモード
 // @param[in] po_mode PO分割モード
-// @param[in] fault_analysis 故障の支配関係を解析する．
+// @param[in] option_str オプション文字列
 // @param[in] bt バックトレーサー
 // @param[in] dop_list DetectOp のリスト
 // @param[in] uop_list UntestOp のリスト
@@ -53,12 +53,13 @@ void
 DtpgSat2::run(TpgNetwork& tgnetwork,
 	      DtpgMode mode,
 	      tDtpgPoMode po_mode,
-	      bool fault_analysis,
+	      const string& option_str,
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop,
 	      DtpgStats& stats)
 {
+  mSatEngine.set_option(option_str);
   mSatEngine.clear_stats();
 
   mMaxId = tgnetwork.max_node_id();

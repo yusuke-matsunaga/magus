@@ -37,6 +37,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief オプションを設定する．
+  void
+  set_option(const string& option_str);
+
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   /// @param[in] max_id ノード番号の最大値 + 1
@@ -56,6 +60,12 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // TG-GRASP モード
+  bool mTgGrasp;
+
+  // unique sensitization を使う
+  bool mUseDominator;
 
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;

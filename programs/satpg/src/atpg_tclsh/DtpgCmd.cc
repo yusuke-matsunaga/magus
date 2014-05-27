@@ -71,6 +71,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "X-extract mode [0-2]");
   mPoptDrop = new TclPopt(this, "drop",
 			  "with fault drop");
+  mPoptOpt = new TclPoptStr(this, "option",
+			    "specify option string <STR>");
   mPoptVerify = new TclPopt(this, "verify",
 			    "verify generated pattern");
   mPoptTimer = new TclPopt(this, "timer",
@@ -156,7 +158,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mode = kDtpgAll;
   }
 
-  bool fault_analysis = mPoptFaultAnalysis->is_specified();
+  string option_str = mPoptOpt->val();
 
   DopList dop_list;
   UopList uop_list;
@@ -213,7 +215,8 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgStats stats;
 
-  mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, fault_analysis, *bt, dop_list, uop_list, stats);
+  mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, option_str,
+	     *bt, dop_list, uop_list, stats);
 
   after_update_faults();
 

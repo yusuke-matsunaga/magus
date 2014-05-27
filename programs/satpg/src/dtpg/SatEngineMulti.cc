@@ -58,11 +58,42 @@ END_NONAMESPACE
 // @brief コンストラクタ
 SatEngineMulti::SatEngineMulti()
 {
+  mTgGrasp = true;
+  mUseDominator = true;
 }
 
 // @brief デストラクタ
 SatEngineMulti::~SatEngineMulti()
 {
+}
+
+// @brief オプションを設定する．
+void
+SatEngineMulti::set_option(const string& option_str)
+{
+  for (string::size_type next = 0; ; ++ next) {
+    string::size_type pos = option_str.find(':', next);
+    if ( pos == next ) {
+      continue;
+    }
+    string option = option_str.substr(next, pos - next);
+    if ( option == "TG-GRASP" ) {
+      mTgGrasp = true;
+    }
+    else if ( option == "NEMESIS" ) {
+      mTgGrasp = false;
+    }
+    else if ( option == "DOM" ) {
+      mUseDominator = true;
+    }
+    else if ( option == "NODOM" ) {
+      mUseDominator = false;
+    }
+    if ( pos == string::npos ) {
+      break;
+    }
+    next = pos;
+  }
 }
 
 // @brief テストパタン生成を行なう．
@@ -125,87 +156,88 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
 
-#if 0
-    // XOR(glit, flit, dlit) を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-    solver.add_clause(~glit, ~flit, ~dlit);
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-    solver.add_clause( glit,  flit, ~dlit);
+    if ( mTgGrasp ) {
+      // XOR(glit, flit, dlit) を追加する．
+      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+      solver.add_clause(~glit, ~flit, ~dlit);
+      solver.add_clause(~glit,  flit,  dlit);
+      solver.add_clause( glit, ~flit,  dlit);
+      solver.add_clause( glit,  flit, ~dlit);
 
-    Literal olit(ovar, false);
-    if ( node->is_input() ) {
-      solver.add_clause(~glit,  olit);
-      solver.add_clause( glit, ~olit);
+      Literal olit(ovar, false);
+      if ( node->is_input() ) {
+	solver.add_clause(~glit,  olit);
+	solver.add_clause( glit, ~olit);
+      }
+      else {
+	make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+
+	// 出力の dlit が1になる条件を作る．
+	// - 入力の dlit のいずれかが 1
+	// - 入力のいずれかに故障がある．
+	// - 出力に故障がある．
+	ymuint ni = node->fanin_num();
+	tmp_lits_begin(ni + 3);
+	Literal dlit(node->dvar(), true);
+	tmp_lits_add(dlit);
+	for (ymuint j = 0; j < ni; ++ j) {
+	  TpgNode* inode = node->fanin(j);
+	  if ( inode->has_fvar() ) {
+	    tmp_lits_add(Literal(inode->dvar(), false));
+	  }
+	}
+
+	for (ymuint fid = 0; fid < nf; ++ fid) {
+	  if ( fnode_list[fid] == node ) {
+	    tmp_lits_add(Literal(flt_var[fid], false));
+	  }
+	}
+
+      tmp_lits_end(solver);
+      }
     }
     else {
-      make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+      // XOR(glit, flit, dlit) を追加する．
+      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+      solver.add_clause(~glit, ~flit, ~dlit);
+      solver.add_clause( glit,  flit, ~dlit);
 
-      // 出力の dlit が1になる条件を作る．
-      // - 入力の dlit のいずれかが 1
-      // - 入力のいずれかに故障がある．
-      // - 出力に故障がある．
-      ymuint ni = node->fanin_num();
-      tmp_lits_begin(ni + 3);
-      Literal dlit(node->dvar(), true);
+      if ( !node->is_output() ) {
+	ymuint nfo = node->active_fanout_num();
+	tmp_lits_begin(nfo + 1);
+	tmp_lits_add(~dlit);
+	for (ymuint j = 0; j < nfo; ++ j) {
+	  TpgNode* onode = node->active_fanout(j);
+	  tmp_lits_add(Literal(onode->dvar(), false));
+	}
+	tmp_lits_end(solver);
+      }
+
+      Literal olit(ovar, false);
+      if ( node->is_input() ) {
+	solver.add_clause(~glit,  olit);
+	solver.add_clause( glit, ~olit);
+      }
+      else {
+	make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+      }
+    }
+  }
+
+
+  if ( mTgGrasp ) {
+    //////////////////////////////////////////////////////////////////////
+    // 故障の検出条件
+    //////////////////////////////////////////////////////////////////////
+    tmp_lits_begin(output_list().size());
+    for (vector<TpgNode*>::const_iterator p = output_list().begin();
+	 p != output_list().end(); ++ p) {
+      TpgNode* node = *p;
+      Literal dlit(node->dvar(), false);
       tmp_lits_add(dlit);
-      for (ymuint j = 0; j < ni; ++ j) {
-	TpgNode* inode = node->fanin(j);
-	if ( inode->has_fvar() ) {
-	  tmp_lits_add(Literal(inode->dvar(), false));
-	}
-      }
-
-      for (ymuint fid = 0; fid < nf; ++ fid) {
-	if ( fnode_list[fid] == node ) {
-	  tmp_lits_add(Literal(flt_var[fid], false));
-	}
-      }
-
-      tmp_lits_end(solver);
     }
-#else
-    // XOR(glit, flit, dlit) を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-    solver.add_clause(~glit, ~flit, ~dlit);
-    solver.add_clause( glit,  flit, ~dlit);
-
-    if ( !node->is_output() ) {
-      ymuint nfo = node->active_fanout_num();
-      tmp_lits_begin(nfo + 1);
-      tmp_lits_add(~dlit);
-      for (ymuint j = 0; j < nfo; ++ j) {
-	TpgNode* onode = node->active_fanout(j);
-	tmp_lits_add(Literal(onode->dvar(), false));
-      }
-      tmp_lits_end(solver);
-    }
-
-    Literal olit(ovar, false);
-    if ( node->is_input() ) {
-      solver.add_clause(~glit,  olit);
-      solver.add_clause( glit, ~olit);
-    }
-    else {
-      make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
-    }
-#endif
+    tmp_lits_end(solver);
   }
-
-
-#if 0
-  //////////////////////////////////////////////////////////////////////
-  // 故障の検出条件
-  //////////////////////////////////////////////////////////////////////
-  tmp_lits_begin(output_list().size());
-  for (vector<TpgNode*>::const_iterator p = output_list().begin();
-       p != output_list().end(); ++ p) {
-    TpgNode* node = *p;
-    Literal dlit(node->dvar(), false);
-    tmp_lits_add(dlit);
-  }
-  tmp_lits_end(solver);
-#endif
 
   cnf_end();
 
@@ -258,14 +290,19 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     }
     mTmpNodeList.clear();
 
-    // dominator ノードの dvar は1でなければならない．
-    for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), false);
-      tmp_lits_add(dlit);
+    if ( mUseDominator ) {
+      // dominator ノードの dvar は1でなければならない．
+      for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+	Literal dlit(node->dvar(), false);
+	tmp_lits_add(dlit);
+      }
+    }
+    else {
+      tmp_lits_add(Literal(f->node()->dvar(), false));
     }
 
-    bool inv = (f->val() != 0);
-    tmp_lits_add(Literal(fnode->gvar(), inv));
+    bool inv = (f->val() == 0);
+    tmp_lits_add(Literal(fnode->fvar(), inv));
 
     solve(solver, f, bt, dop, uop);
   }
