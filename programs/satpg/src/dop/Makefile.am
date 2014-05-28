@@ -57,13 +57,15 @@ COMMON_SOURCES = \
 	DopBase.cc \
 	DopDrop.h \
 	DopDrop.cc \
-	FopDrop.h \
-	FopDrop.cc \
+	DopDummy.h \
+	DopDummy.cc \
 	DopTvList.h \
 	DopTvList.cc \
 	DopVerify.h \
 	DopVerify.cc \
-	DopList.cc
+	DopList.cc \
+	FopDrop.h \
+	FopDrop.cc
 
 
 ############################################################

@@ -559,7 +559,7 @@ SatEngine::make_node_cnf(SatSolver& solver,
 }
 
 // @brief 一つの SAT問題を解く．
-void
+Bool3
 SatEngine::solve(SatSolver& solver,
 		 TpgFault* f,
 		 BackTracer& bt,
@@ -613,6 +613,8 @@ SatEngine::solve(SatSolver& solver,
     ++ mStats.mAbortCount;
     mStats.mAbortTime += time;
   }
+
+  return ans;
 }
 
 // @brief ノードの変数割り当てフラグを消す．

@@ -67,6 +67,10 @@ new_DopTvList(AtpgMgr& mgr);
 DetectOp*
 new_DopVerify(AtpgMgr& mgr);
 
+/// @brief 'dummy' タイプを生成する．
+DetectOp*
+new_DopDummy();
+
 END_NAMESPACE_YM_SATPG
 
 #endif // DETECTOP_H

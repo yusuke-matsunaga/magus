@@ -163,7 +163,7 @@ protected:
 		const LitMap& litmap);
 
   /// @brief 一つの SAT問題を解く．
-  void
+  Bool3
   solve(SatSolver& solver,
 	TpgFault* f,
 	BackTracer& bt,
