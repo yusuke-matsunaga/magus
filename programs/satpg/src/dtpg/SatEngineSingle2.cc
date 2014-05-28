@@ -86,14 +86,8 @@ SatEngineSingle2::run(TpgFault* fault,
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
 
-  // fnode の dlit を1と仮定しているので
-  // ここでは fvar か gvar のどちらかを仮定すればよい．
-  bool inv = (fval == 0);
-  solver.add_clause(Literal(fnode->fvar(), inv));
-
-  vector<bool> mark(max_id, false);
+  vector<ymuint> mark(max_id, 0);
   for (ymuint opos = 0; opos < no; ++ opos) {
-    vector<bool> mark2(max_id, false);
 
     cnf_begin();
 
@@ -106,9 +100,8 @@ SatEngineSingle2::run(TpgFault* fault,
     queue.push_back(node);
     for (ymuint rpos = 0; rpos < queue.size(); ++ rpos) {
       TpgNode* node = queue[rpos];
-      if ( !mark[node->id()] ) {
-	mark[node->id()] = true;
-	mark2[node->id()] = true;
+      if ( mark[node->id()] == 0 ) {
+	mark[node->id()] = opos + 1;
 
 	make_node_cnf(solver, node, GvarLitMap(node));
 
@@ -125,7 +118,7 @@ SatEngineSingle2::run(TpgFault* fault,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( !mark2[node->id()] ) {
+      if ( mark[node->id()] != (opos + 1) ) {
 	continue;
       }
 
@@ -161,12 +154,16 @@ SatEngineSingle2::run(TpgFault* fault,
 
     cnf_end();
 
-    Literal dlit(node->dvar(), false);
-
     // 故障に対するテスト生成を行なう．
     tmp_lits_begin();
 
-    tmp_lits_add(dlit);
+    // fnode の dlit を1と仮定しているので
+    // ここでは fvar か gvar のどちらかを仮定すればよい．
+    bool inv = (fval == 0);
+    tmp_lits_add(Literal(fnode->fvar(), inv));
+    tmp_lits_add(Literal(fnode->dvar(), false));
+
+    tmp_lits_add(Literal(olist[opos]->dvar(), false));
 
     if ( opos < no - 1 ) {
       solve(solver, fault, bt, dop, *mUopDummy);
