@@ -1038,7 +1038,7 @@ YmSat::add_clause_sub(ymuint lit_num)
   }
 
   if ( !mSane ) {
-    cout << "Error![YmSat]: mSane == false" << endl;
+    //cout << "Error![YmSat]: mSane == false" << endl;
     return;
   }
 
