@@ -79,6 +79,10 @@ public:
   ymuint
   output_id() const;
 
+  /// @brief TFIサイズの昇順に並べた時の出力番号を返す．
+  ymuint
+  output_id2() const;
+
   /// @brief logic タイプの時 true を返す．
   bool
   is_logic() const;
@@ -479,6 +483,15 @@ TpgNode::output_id() const
   return (mTypeId >> 3);
 }
 
+// @brief TFIサイズの昇順に並べた時の出力番号を返す．
+inline
+ymuint
+TpgNode::output_id2() const
+{
+  assert_cond( is_output(), __FILE__, __LINE__);
+  return mFanoutNum;
+}
+
 // @brief logic タイプの時 true を返す．
 inline
 bool
@@ -547,6 +560,9 @@ inline
 ymuint
 TpgNode::fanout_num() const
 {
+  if ( is_output() ) {
+    return 0;
+  }
   return mFanoutNum;
 }
 
@@ -556,7 +572,7 @@ inline
 TpgNode*
 TpgNode::fanout(ymuint pos) const
 {
-  assert_cond( pos < mFanoutNum, __FILE__, __LINE__);
+  assert_cond( pos < fanout_num(), __FILE__, __LINE__);
   return mFanouts[pos];
 }
 

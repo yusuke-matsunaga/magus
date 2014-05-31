@@ -105,87 +105,6 @@ SatEngine::set_mode(const string& type,
 
 BEGIN_NONAMESPACE
 
-// SatStats をクリアする．
-void
-clear_sat_stats(SatStats& stats)
-{
-  stats.mRestart = 0;
-  stats.mVarNum = 0;
-  stats.mConstrClauseNum = 0;
-  stats.mConstrLitNum = 0;
-  stats.mLearntClauseNum = 0;
-  stats.mLearntLitNum = 0;
-  stats.mConflictNum = 0;
-  stats.mDecisionNum = 0;
-  stats.mPropagationNum = 0;
-}
-
-// SatStats をたす．
-void
-add_sat_stats(SatStats& dst_stats,
-	      const SatStats& src_stats)
-{
-  dst_stats.mRestart += src_stats.mRestart;
-  dst_stats.mVarNum += src_stats.mVarNum;
-  dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
-  dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
-  dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
-  dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
-  dst_stats.mConflictNum += src_stats.mConflictNum;
-  dst_stats.mDecisionNum += src_stats.mDecisionNum;
-  dst_stats.mPropagationNum += src_stats.mPropagationNum;
-}
-
-// SatStats を引く
-void
-sub_sat_stats(SatStats& dst_stats,
-	      const SatStats& src_stats)
-{
-  dst_stats.mRestart -= src_stats.mRestart;
-  dst_stats.mVarNum -= src_stats.mVarNum;
-  dst_stats.mConstrClauseNum -= src_stats.mConstrClauseNum;
-  dst_stats.mConstrLitNum -= src_stats.mConstrLitNum;
-  dst_stats.mLearntClauseNum -= src_stats.mLearntClauseNum;
-  dst_stats.mLearntLitNum -= src_stats.mLearntLitNum;
-  dst_stats.mConflictNum -= src_stats.mConflictNum;
-  dst_stats.mDecisionNum -= src_stats.mDecisionNum;
-  dst_stats.mPropagationNum -= src_stats.mPropagationNum;
-}
-
-// SatStats の各々の最大値をとる．
-void
-max_sat_stats(SatStats& dst_stats,
-	      const SatStats& src_stats)
-{
-  if ( dst_stats.mRestart < src_stats.mRestart ) {
-    dst_stats.mRestart = src_stats.mRestart;
-  }
-  if ( dst_stats.mVarNum < src_stats.mVarNum ) {
-    dst_stats.mVarNum += src_stats.mVarNum;
-  }
-  if ( dst_stats.mConstrClauseNum < src_stats.mConstrClauseNum ) {
-    dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
-  }
-  if ( dst_stats.mConstrLitNum < src_stats.mConstrLitNum ) {
-    dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
-  }
-  if ( dst_stats.mLearntClauseNum < src_stats.mLearntClauseNum ) {
-    dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
-  }
-  if ( dst_stats.mLearntLitNum < src_stats.mLearntLitNum ) {
-    dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
-  }
-  if ( dst_stats.mConflictNum < src_stats.mConflictNum ) {
-    dst_stats.mConflictNum += src_stats.mConflictNum;
-  }
-  if ( dst_stats.mDecisionNum < src_stats.mDecisionNum ) {
-    dst_stats.mDecisionNum += src_stats.mDecisionNum;
-  }
-  if ( dst_stats.mPropagationNum < src_stats.mPropagationNum ) {
-    dst_stats.mPropagationNum += src_stats.mPropagationNum;
-  }
-}
-
 END_NONAMESPACE
 
 // @brief 統計情報をクリアする．
@@ -223,6 +142,20 @@ SatEngine::timer_enable(bool enable)
 {
   mTimerEnable = enable;
 }
+
+BEGIN_NONAMESPACE
+
+struct Lt
+{
+  bool
+  operator()(TpgNode* left,
+	     TpgNode* right)
+  {
+    return left->output_id2() < right->output_id2();
+  }
+};
+
+END_NONAMESPACE
 
 // @brief 故障位置を与えてその TFO の TFI リストを作る．
 // @param[in] solver SAT ソルバ
@@ -286,6 +219,8 @@ SatEngine::mark_region(SatSolver& solver,
       }
     }
   }
+
+  sort(mOutputList.begin(), mOutputList.end(), Lt());
 }
 
 // @brief 節の作成用の作業領域の使用を開始する．
@@ -615,6 +550,138 @@ SatEngine::solve(SatSolver& solver,
   }
 
   return ans;
+}
+
+// @brief 一つの SAT問題を解く．
+Bool3
+SatEngine::_solve(SatSolver& solver,
+		  USTime& time)
+{
+  if ( mTimerEnable ) {
+    mTimer.reset();
+    mTimer.start();
+  }
+
+  Bool3 ans = solver.solve(mTmpLits, mModel);
+
+  if ( mTimerEnable ) {
+    mTimer.stop();
+    time += mTimer.time();
+  }
+
+  return ans;
+}
+
+// @brief 検出した場合の処理
+void
+SatEngine::stats_detect(const SatStats& sat_stats,
+			const USTime& time)
+{
+  ++ mStats.mDetCount;
+  mStats.mDetTime += time;
+  add_sat_stats(mStats.mDetStats, sat_stats);
+  max_sat_stats(mStats.mDetStatsMax, sat_stats);
+}
+
+// @brief 検出不能と判定した場合の処理
+void
+SatEngine::stats_undetect(const SatStats& sat_stats,
+			  const USTime& time)
+{
+  ++ mStats.mRedCount;
+  mStats.mRedTime += time;
+  add_sat_stats(mStats.mRedStats, sat_stats);
+  max_sat_stats(mStats.mRedStatsMax, sat_stats);
+}
+
+// @brief アボートした場合の処理
+void
+SatEngine::stats_abort(const SatStats& sat_stats,
+		       const USTime& time)
+{
+  ++ mStats.mAbortCount;
+  mStats.mAbortTime += time;
+}
+
+// SatStats をクリアする．
+void
+SatEngine::clear_sat_stats(SatStats& stats)
+{
+  stats.mRestart = 0;
+  stats.mVarNum = 0;
+  stats.mConstrClauseNum = 0;
+  stats.mConstrLitNum = 0;
+  stats.mLearntClauseNum = 0;
+  stats.mLearntLitNum = 0;
+  stats.mConflictNum = 0;
+  stats.mDecisionNum = 0;
+  stats.mPropagationNum = 0;
+}
+
+// SatStats をたす．
+void
+SatEngine::add_sat_stats(SatStats& dst_stats,
+			 const SatStats& src_stats)
+{
+  dst_stats.mRestart += src_stats.mRestart;
+  dst_stats.mVarNum += src_stats.mVarNum;
+  dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
+  dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
+  dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
+  dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
+  dst_stats.mConflictNum += src_stats.mConflictNum;
+  dst_stats.mDecisionNum += src_stats.mDecisionNum;
+  dst_stats.mPropagationNum += src_stats.mPropagationNum;
+}
+
+// SatStats を引く
+void
+SatEngine::sub_sat_stats(SatStats& dst_stats,
+			 const SatStats& src_stats)
+{
+  dst_stats.mRestart -= src_stats.mRestart;
+  dst_stats.mVarNum -= src_stats.mVarNum;
+  dst_stats.mConstrClauseNum -= src_stats.mConstrClauseNum;
+  dst_stats.mConstrLitNum -= src_stats.mConstrLitNum;
+  dst_stats.mLearntClauseNum -= src_stats.mLearntClauseNum;
+  dst_stats.mLearntLitNum -= src_stats.mLearntLitNum;
+  dst_stats.mConflictNum -= src_stats.mConflictNum;
+  dst_stats.mDecisionNum -= src_stats.mDecisionNum;
+  dst_stats.mPropagationNum -= src_stats.mPropagationNum;
+}
+
+// SatStats の各々の最大値をとる．
+void
+SatEngine::max_sat_stats(SatStats& dst_stats,
+			 const SatStats& src_stats)
+{
+  if ( dst_stats.mRestart < src_stats.mRestart ) {
+    dst_stats.mRestart = src_stats.mRestart;
+  }
+  if ( dst_stats.mVarNum < src_stats.mVarNum ) {
+    dst_stats.mVarNum += src_stats.mVarNum;
+  }
+  if ( dst_stats.mConstrClauseNum < src_stats.mConstrClauseNum ) {
+    dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
+  }
+  if ( dst_stats.mConstrLitNum < src_stats.mConstrLitNum ) {
+    dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
+  }
+  if ( dst_stats.mLearntClauseNum < src_stats.mLearntClauseNum ) {
+    dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
+  }
+  if ( dst_stats.mLearntLitNum < src_stats.mLearntLitNum ) {
+    dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
+  }
+  if ( dst_stats.mConflictNum < src_stats.mConflictNum ) {
+    dst_stats.mConflictNum += src_stats.mConflictNum;
+  }
+  if ( dst_stats.mDecisionNum < src_stats.mDecisionNum ) {
+    dst_stats.mDecisionNum += src_stats.mDecisionNum;
+  }
+  if ( dst_stats.mPropagationNum < src_stats.mPropagationNum ) {
+    dst_stats.mPropagationNum += src_stats.mPropagationNum;
+  }
 }
 
 // @brief ノードの変数割り当てフラグを消す．

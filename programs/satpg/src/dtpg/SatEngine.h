@@ -170,6 +170,26 @@ protected:
 	DetectOp& dop,
 	UntestOp& uop);
 
+  /// @brief 一つの SAT問題を解く．
+  Bool3
+  _solve(SatSolver& solver,
+	 USTime& time);
+
+  /// @brief 検出した場合の処理
+  void
+  stats_detect(const SatStats& sat_stats,
+	       const USTime& time);
+
+  /// @brief 検出不能と判定した場合の処理
+  void
+  stats_undetect(const SatStats& sat_stats,
+		 const USTime& time);
+
+  /// @brief アボートした場合の処理
+  void
+  stats_abort(const SatStats& sat_stats,
+	      const USTime& time);
+
   /// @brief ノードの変数割り当てフラグを消す．
   void
   clear_node_mark();
@@ -188,6 +208,25 @@ protected:
   /// @param[in] node 対象のノード
   bool
   tmp_mark(TpgNode* node);
+
+  static
+  void
+  clear_sat_stats(SatStats& stats);
+
+  static
+  void
+  add_sat_stats(SatStats& dst_stats,
+		const SatStats& src_stats);
+
+  static
+  void
+  sub_sat_stats(SatStats& dst_stats,
+		const SatStats& src_stats);
+
+  static
+  void
+  max_sat_stats(SatStats& dst_stats,
+		const SatStats& src_stats);
 
 
 private:
@@ -216,7 +255,7 @@ private:
   tfi_mark(TpgNode* node);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////

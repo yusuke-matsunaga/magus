@@ -449,7 +449,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   sort(tmp_list.begin(), tmp_list.end(), Lt());
 
   for (ymuint i = 0; i < output_num2(); ++ i) {
-    mOutputArray2[i] = mOutputArray[tmp_list[i].second];
+    TpgNode* onode = mOutputArray[tmp_list[i].second];
+    mOutputArray2[i] = onode;
+    onode->mFanoutNum = i;
   }
 }
 

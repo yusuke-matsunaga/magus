@@ -86,18 +86,37 @@ SatEngineSingle2::run(TpgFault* fault,
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
 
+  cnf_begin();
+
+  // fnode の dlit を1と仮定しているので
+  // ここでは fvar か gvar のどちらかを仮定すればよい．
+  bool inv = (fval == 0);
+  solver.add_clause(Literal(fnode->fvar(), inv));
+  solver.add_clause(Literal(fnode->dvar(), false));
+
+  // dominator ノードの dvar は1でなければならない．
+  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(node->dvar(), false);
+    solver.add_clause(dlit);
+  }
+
+  cnf_end();
+
+  USTime time(0, 0, 0);
+  Bool3 last_ans;
+
   vector<ymuint> mark(max_id, 0);
   for (ymuint opos = 0; opos < no; ++ opos) {
+    TpgNode* onode = olist[opos];
 
     cnf_begin();
 
     //////////////////////////////////////////////////////////////////////
     // 正常回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
-    TpgNode* node = olist[opos];
     vector<TpgNode*> queue;
     queue.reserve(tfo_tfi_size());
-    queue.push_back(node);
+    queue.push_back(onode);
     for (ymuint rpos = 0; rpos < queue.size(); ++ rpos) {
       TpgNode* node = queue[rpos];
       if ( mark[node->id()] == 0 ) {
@@ -154,34 +173,39 @@ SatEngineSingle2::run(TpgFault* fault,
 
     cnf_end();
 
-    // 故障に対するテスト生成を行なう．
+    //////////////////////////////////////////////////////////////////////
+    // 故障の検出条件
+    //////////////////////////////////////////////////////////////////////
     tmp_lits_begin();
+    tmp_lits_add(Literal(onode->dvar(), false));
 
-    // fnode の dlit を1と仮定しているので
-    // ここでは fvar か gvar のどちらかを仮定すればよい．
-    bool inv = (fval == 0);
-    tmp_lits_add(Literal(fnode->fvar(), inv));
-    tmp_lits_add(Literal(fnode->dvar(), false));
+    last_ans = _solve(solver, time);
 
-    tmp_lits_add(Literal(olist[opos]->dvar(), false));
-
-    if ( opos < no - 1 ) {
-      solve(solver, fault, bt, dop, *mUopDummy);
-      if ( fault->status() == kFsDetected ) {
-	break;
-      }
-    }
-    else {
-      solve(solver, fault, bt, dop, uop);
+    if ( last_ans != kB3False ) {
+      break;
     }
   }
-#if 0
-  // dominator ノードの dvar は1でなければならない．
-  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(node->dvar(), false);
-    solver.add_clause(dlit);
+
+  SatStats sat_stats;
+  solver.get_stats(sat_stats);
+
+  if ( last_ans == kB3True ) {
+
+    // バックトレースを行う．
+    TestVector* tv = bt(fault->node(), mModel, mInputList, mOutputList);
+
+    // パタンの登録などを行う．
+    dop(fault, tv);
+
+    stats_detect(sat_stats, time);
   }
-#endif
+  else if ( last_ans == kB3False ) {
+    uop(fault);
+    stats_undetect(sat_stats, time);
+  }
+  else {
+    stats_abort(sat_stats, time);
+  }
 
   clear_node_mark();
 }

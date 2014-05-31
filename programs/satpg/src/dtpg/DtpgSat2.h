@@ -12,7 +12,7 @@
 
 #include "Dtpg.h"
 #include "TpgFault.h"
-#include "SatEngineSingle3.h"
+#include "SatEngineSingle2.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -107,7 +107,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // SAT エンジン
-  SatEngineSingle3 mSatEngine;
+  SatEngineSingle2 mSatEngine;
 
   // mNetwork のノード数
   ymuint32 mMaxId;
