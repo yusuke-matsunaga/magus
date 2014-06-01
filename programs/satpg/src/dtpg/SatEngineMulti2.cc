@@ -122,6 +122,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
   for (ymuint i = 0; i < nf; ++ i) {
     flt_var[i] = solver.new_var();
     tmp_var[i] = solver.new_var();
+    TpgFault* f = flist[i];
+    f->clear_untest_num();
   }
 
   const vector<TpgNode*>& olist = output_list();
@@ -228,6 +230,11 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	continue;
       }
 
+      if ( f->untest_num() > 3 ) {
+	// 他の出力での検出不能回数がしきい値を越えたらスキップする．
+	continue;
+      }
+
       if ( mTimerEnable ) {
 	mTimer.reset();
 	mTimer.start();
@@ -318,6 +325,9 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	if ( opos == no - 1 ) {
 	  uop(f);
 	}
+	else {
+	  f->inc_untest_num();
+	}
 	stats_undetect(sat_stats, time);
       }
       else {
@@ -337,6 +347,91 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 
     if ( !faults_remain ) {
       break;
+    }
+  }
+
+  bool faults_remain = false;
+  for (ymuint fid = 0; fid < nf; ++ fid) {
+    TpgFault* f = flist[fid];
+
+    if ( f->status() != kFsDetected ) {
+      faults_remain = true;
+      break;
+    }
+  }
+
+  if ( faults_remain ) {
+    tmp_lits_begin(output_list().size());
+    for (vector<TpgNode*>::const_iterator p = output_list().begin();
+	 p != output_list().end(); ++ p) {
+      TpgNode* node = *p;
+      Literal dlit(node->dvar(), false);
+      tmp_lits_add(dlit);
+    }
+    tmp_lits_end(solver);
+
+    for (ymuint fid = 0; fid < nf; ++ fid) {
+      TpgFault* f = flist[fid];
+
+      if ( f->status() == kFsDetected ) {
+	continue;
+      }
+
+      tmp_lits_begin();
+
+      // 該当の故障に対する変数のみ1にする．
+      for (ymuint j = 0; j < nf; ++ j) {
+	bool inv = (j != fid);
+	tmp_lits_add(Literal(flt_var[j], inv));
+      }
+
+      TpgNode* fnode = fnode_list[fid];
+
+      // 故障ノードの TFO 以外の dlit を0にする．
+      mTmpNodeList.clear();
+      mTmpNodeList.reserve(tfo_tfi_size());
+      set_tmp_mark(fnode);
+      mTmpNodeList.push_back(fnode);
+      for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
+	TpgNode* node = mTmpNodeList[rpos];
+	ymuint nfo = node->active_fanout_num();
+	for (ymuint i = 0; i < nfo; ++ i) {
+	  TpgNode* fonode = node->active_fanout(i);
+	  if ( !tmp_mark(fonode) ) {
+	    set_tmp_mark(fonode);
+	    mTmpNodeList.push_back(fonode);
+	  }
+	}
+      }
+      for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+	TpgNode* node = tfo_tfi_node(i);
+	if ( node->has_fvar() && !tmp_mark(node) ) {
+	  Literal dlit(node->dvar(), true);
+	  tmp_lits_add(dlit);
+	}
+      }
+      for (vector<TpgNode*>::iterator p = mTmpNodeList.begin();
+	   p != mTmpNodeList.end(); ++ p) {
+	TpgNode* node = *p;
+	clear_tmp_mark(node);
+      }
+      mTmpNodeList.clear();
+
+      if ( mUseDominator ) {
+	// dominator ノードの dvar は1でなければならない．
+	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+	  Literal dlit(node->dvar(), false);
+	  tmp_lits_add(dlit);
+	}
+      }
+      else {
+	tmp_lits_add(Literal(f->node()->dvar(), false));
+      }
+
+      bool inv = (f->val() == 0);
+      tmp_lits_add(Literal(fnode->fvar(), inv));
+
+      solve(solver, f, bt, dop, uop);
     }
   }
 
