@@ -67,6 +67,9 @@ private:
   // unique sensitization を使う
   bool mUseDominator;
 
+  // skip threshold
+  ymuint32 mSkipThreshold;
+
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
 

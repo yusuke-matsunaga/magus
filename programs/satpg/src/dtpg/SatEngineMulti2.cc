@@ -60,6 +60,7 @@ SatEngineMulti2::SatEngineMulti2()
 {
   mTgGrasp = true;
   mUseDominator = true;
+  mSkipThreshold = 2;
 }
 
 // @brief デストラクタ
@@ -230,7 +231,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	continue;
       }
 
-      if ( f->untest_num() > 3 ) {
+      if ( f->untest_num() > mSkipThreshold ) {
 	// 他の出力での検出不能回数がしきい値を越えたらスキップする．
 	continue;
       }
