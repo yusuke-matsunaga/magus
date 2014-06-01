@@ -13,6 +13,7 @@
 #include "Dtpg.h"
 #include "TpgFault.h"
 #include "SatEngineSingle2.h"
+#include "SatEngineMulti2.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -77,6 +78,17 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief single モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  void
+  single_mode(TpgNetwork& tpgnetwork,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop,
+	      DtpgStats& stats);
+
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] bt バックトレーサー
@@ -100,6 +112,41 @@ private:
 	      DetectOp& dop,
 	      UntestOp& uop);
 
+  /// @brief mffc モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  void
+  mffc_mode(TpgNetwork& tpgnetwork,
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop,
+	    DtpgStats& stats);
+
+  /// @brief DFS で MFFC を求める．
+  void
+  dfs_mffc(TpgNode* node,
+	   vector<bool>& mark);
+
+  /// @brief 故障リストをクリアする．
+  void
+  clear_faults();
+
+  /// @brief ノードの故障を追加する．
+  void
+  add_node_faults(TpgNode* node);
+
+  /// @brief 故障を追加する．
+  void
+  add_fault(TpgFault* fault);
+
+  /// @brief テストパタン生成を行なう．
+  void
+  do_dtpg(TpgNetwork& tpgnetwork,
+	  BackTracer& bt,
+	  DetectOp& dop,
+	  UntestOp& uop);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -107,10 +154,15 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // SAT エンジン
-  SatEngineSingle2 mSatEngine;
+  SatEngineSingle2 mSatEngineSingle;
+
+  SatEngineMulti2 mSatEngineMulti;
 
   // mNetwork のノード数
   ymuint32 mMaxId;
+
+  // do_dtpg() で用いる対象の故障リスト
+  vector<TpgFault*> mFaultList;
 
 };
 
@@ -124,7 +176,29 @@ inline
 void
 DtpgSat2::timer_enable(bool enable)
 {
-  mSatEngine.timer_enable(enable);
+  mSatEngineSingle.timer_enable(enable);
+  mSatEngineMulti.timer_enable(enable);
+}
+
+// @brief 故障リストをクリアする．
+inline
+void
+DtpgSat2::clear_faults()
+{
+  mFaultList.clear();
+}
+
+// @brief 故障を追加する．
+inline
+void
+DtpgSat2::add_fault(TpgFault* fault)
+{
+  if ( fault != NULL &&
+       fault->is_rep() &&
+       fault->status() != kFsDetected &&
+       !fault->is_skip() ) {
+    mFaultList.push_back(fault);
+  }
 }
 
 END_NAMESPACE_YM_SATPG

@@ -37,7 +37,8 @@ DtpgSat2::set_mode(const string& type,
 		   const string& option,
 		   ostream* outp)
 {
-  mSatEngine.set_mode(type, option, outp);
+  mSatEngineSingle.set_mode(type, option, outp);
+  mSatEngineMulti.set_mode(type, option, outp);
 }
 
 // @brief テスト生成を行なう．
@@ -59,12 +60,36 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
 	      UntestOp& uop,
 	      DtpgStats& stats)
 {
-  mSatEngine.set_option(option_str);
-  mSatEngine.clear_stats();
+  mSatEngineSingle.set_option(option_str);
+  mSatEngineMulti.set_option(option_str);
 
   mMaxId = tgnetwork.max_node_id();
 
   tgnetwork.activate_all();
+
+  switch ( mode.mode() ) {
+  case kDtpgSingle2:
+    single_mode(tgnetwork, bt, dop, uop, stats);
+    break;
+
+  case kDtpgMFFC2:
+    mffc_mode(tgnetwork, bt, dop, uop, stats);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+}
+
+void
+DtpgSat2::single_mode(TpgNetwork& tgnetwork,
+		      BackTracer& bt,
+		      DetectOp& dop,
+		      UntestOp& uop,
+		      DtpgStats& stats)
+{
+  mSatEngineSingle.clear_stats();
 
   ymuint nn = tgnetwork.active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -91,8 +116,7 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
     dtpg_single(f1, bt, dop, uop);
   }
 
-
-  mSatEngine.get_stats(stats);
+  mSatEngineSingle.get_stats(stats);
 }
 
 // @brief 一つの故障に対してテストパタン生成を行う．
@@ -107,7 +131,8 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        fault->is_rep() &&
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
-    mSatEngine.run(fault, fault->node(), fault->val(), mMaxId, bt, dop, uop);
+    mSatEngineSingle.run(fault, fault->node(), fault->val(), mMaxId,
+			 bt, dop, uop);
  }
 }
 
@@ -126,9 +151,106 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        !fault->is_skip() ) {
     network.begin_fault_injection();
     TpgNode* fnode = network.inject_fnode(fault->node(), fault->pos());
-    mSatEngine.run(fault, fnode, fault->val(), network.max_node_id(), bt, dop, uop);
+    mSatEngineSingle.run(fault, fnode, fault->val(), network.max_node_id(),
+			 bt, dop, uop);
     network.end_fault_injection();
  }
+}
+
+void
+DtpgSat2::mffc_mode(TpgNetwork& tpgnetwork,
+		    BackTracer& bt,
+		    DetectOp& dop,
+		    UntestOp& uop,
+		    DtpgStats& stats)
+{
+  mSatEngineMulti.clear_stats();
+
+  ymuint n = tpgnetwork.active_node_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = tpgnetwork.active_node(i);
+    if ( node->imm_dom() == NULL ) {
+      clear_faults();
+
+      vector<bool> mark(tpgnetwork.node_num(), false);
+      dfs_mffc(node, mark);
+
+      do_dtpg(tpgnetwork, bt, dop, uop);
+    }
+  }
+
+  mSatEngineMulti.get_stats(stats);
+}
+
+void
+DtpgSat2::dfs_mffc(TpgNode* node,
+		   vector<bool>& mark)
+{
+  mark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( mark[inode->id()] == false && inode->imm_dom() != NULL ) {
+      dfs_mffc(inode, mark);
+    }
+  }
+
+  if ( !node->is_output() ) {
+    add_node_faults(node);
+  }
+}
+
+// @brief ノードの故障を追加する．
+void
+DtpgSat2::add_node_faults(TpgNode* node)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgFault* f0 = node->input_fault(0, i);
+    add_fault(f0);
+
+    TpgFault* f1 = node->input_fault(1, i);
+    add_fault(f1);
+  }
+  TpgFault* f0 = node->output_fault(0);
+  add_fault(f0);
+
+  TpgFault* f1 = node->output_fault(1);
+  add_fault(f1);
+}
+
+// @brief テストパタン生成を行なう．
+void
+DtpgSat2::do_dtpg(TpgNetwork& tpgnetwork,
+		  BackTracer& bt,
+		  DetectOp& dop,
+		  UntestOp& uop)
+{
+  if ( mFaultList.empty() ) {
+    return;
+  }
+
+  vector<TpgNode*> fnode_list;
+  fnode_list.reserve(mFaultList.size());
+  tpgnetwork.begin_fault_injection();
+  for (vector<TpgFault*>::iterator p = mFaultList.begin();
+       p != mFaultList.end(); ++ p) {
+    TpgFault* f = *p;
+    TpgNode* node = f->node();
+    if ( f->is_input_fault() ) {
+      TpgNode* fnode = tpgnetwork.inject_fnode(node, f->pos());
+      fnode_list.push_back(fnode);
+    }
+    else {
+      fnode_list.push_back(node);
+    }
+  }
+
+  mSatEngineMulti.run(mFaultList, fnode_list, tpgnetwork.max_node_id(),
+		      bt, dop, uop);
+
+  tpgnetwork.end_fault_injection();
 }
 
 END_NAMESPACE_YM_SATPG

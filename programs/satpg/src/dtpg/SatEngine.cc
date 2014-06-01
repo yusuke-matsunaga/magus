@@ -501,26 +501,17 @@ SatEngine::solve(SatSolver& solver,
 		 DetectOp& dop,
 		 UntestOp& uop)
 {
-  if ( mTimerEnable ) {
-    mTimer.reset();
-    mTimer.start();
-  }
-
   SatStats prev_stats;
   solver.get_stats(prev_stats);
 
-  Bool3 ans = solver.solve(mTmpLits, mModel);
+  USTime time(0, 0, 0);
+  Bool3 ans = _solve(solver, time);
 
   SatStats sat_stats;
   solver.get_stats(sat_stats);
 
   sub_sat_stats(sat_stats, prev_stats);
 
-  USTime time;
-  if ( mTimerEnable ) {
-    mTimer.stop();
-    time = mTimer.time();
-  }
   if ( ans == kB3True ) {
     // パタンが求まった．
 
@@ -530,23 +521,16 @@ SatEngine::solve(SatSolver& solver,
     // パタンの登録などを行う．
     dop(f, tv);
 
-    ++ mStats.mDetCount;
-    mStats.mDetTime += time;
-    add_sat_stats(mStats.mDetStats, sat_stats);
-    max_sat_stats(mStats.mDetStatsMax, sat_stats);
+    stats_detect(sat_stats, time);
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
     uop(f);
 
-    ++ mStats.mRedCount;
-    mStats.mRedTime += time;
-    add_sat_stats(mStats.mRedStats, sat_stats);
-    max_sat_stats(mStats.mRedStatsMax, sat_stats);
+    stats_undetect(sat_stats, time);
   }
   else { // ans == kB3X つまりアボート
-    ++ mStats.mAbortCount;
-    mStats.mAbortTime += time;
+    stats_abort(sat_stats, time);
   }
 
   return ans;

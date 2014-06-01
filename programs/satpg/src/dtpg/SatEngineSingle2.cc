@@ -77,16 +77,13 @@ SatEngineSingle2::run(TpgFault* fault,
 		      DetectOp& dop,
 		      UntestOp& uop)
 {
+  cnf_begin();
+
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
   bt.set_max_id(max_id);
 
   mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
-
-  const vector<TpgNode*>& olist = output_list();
-  ymuint no = olist.size();
-
-  cnf_begin();
 
   // fnode の dlit を1と仮定しているので
   // ここでは fvar か gvar のどちらかを仮定すればよい．
@@ -101,6 +98,9 @@ SatEngineSingle2::run(TpgFault* fault,
   }
 
   cnf_end();
+
+  const vector<TpgNode*>& olist = output_list();
+  ymuint no = olist.size();
 
   USTime time(0, 0, 0);
   Bool3 last_ans;

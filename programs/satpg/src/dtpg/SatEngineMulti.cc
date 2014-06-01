@@ -193,7 +193,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
 	  }
 	}
 
-      tmp_lits_end(solver);
+	tmp_lits_end(solver);
       }
     }
     else {
@@ -259,10 +259,11 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       tmp_lits_add(Literal(flt_var[j], inv));
     }
 
+    TpgNode* fnode = fnode_list[fid];
+
     // 故障ノードの TFO 以外の dlit を0にする．
     mTmpNodeList.clear();
     mTmpNodeList.reserve(tfo_tfi_size());
-    TpgNode* fnode = fnode_list[fid];
     set_tmp_mark(fnode);
     mTmpNodeList.push_back(fnode);
     for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {

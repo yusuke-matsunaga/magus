@@ -212,7 +212,7 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   dop.set_faults(mFaultMgr->remain_list());
 
-  if ( mode.mode() == kDtpgSingle2 ) {
+  if ( mode.mode() == kDtpgSingle2 || mode.mode() == kDtpgMFFC2 ) {
     mDtpg2->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
   }
   else {

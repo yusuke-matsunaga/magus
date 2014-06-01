@@ -51,7 +51,7 @@ DtpgSat::set_mode(const string& type,
 		  ostream* outp)
 {
   mSatEngine.set_mode(type, option, outp);
-  mSatEngine2.set_mode(type, option, outp);
+  mSatEngineSingle.set_mode(type, option, outp);
 }
 
 // @brief テスト生成を行なう．
@@ -74,10 +74,10 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 	     DtpgStats& stats)
 {
   mSatEngine.set_option(option_str);
-  mSatEngine2.set_option(option_str);
+  mSatEngineSingle.set_option(option_str);
 
   mSatEngine.clear_stats();
-  mSatEngine2.clear_stats();
+  mSatEngineSingle.clear_stats();
 
   mNetwork = &tgnetwork;
   mMaxId = mNetwork->node_num();
@@ -117,7 +117,7 @@ DtpgSat::run(TpgNetwork& tgnetwork,
   }
 
   if ( mode.mode() == kDtpgSingle ) {
-    mSatEngine2.get_stats(stats);
+    mSatEngineSingle.get_stats(stats);
   }
   else {
     mSatEngine.get_stats(stats);
@@ -751,8 +751,8 @@ DtpgSat::dtpg_single(TpgFault* f,
        f->is_rep() &&
        f->status() != kFsDetected &&
        !f->is_skip() ) {
-    mSatEngine2.run(f, f->node(), f->val(), mNetwork->max_node_id(),
-		    bt, dop, uop);
+    mSatEngineSingle.run(f, f->node(), f->val(), mNetwork->max_node_id(),
+			 bt, dop, uop);
   }
 }
 
@@ -770,7 +770,7 @@ DtpgSat::dtpg_single2(TpgFault* f,
        !f->is_skip() ) {
     mNetwork->begin_fault_injection();
     TpgNode* fnode = mNetwork->inject_fnode(f->node(), f->pos());
-    mSatEngine2.run(f, fnode, f->val(), mNetwork->max_node_id(), bt, dop, uop);
+    mSatEngineSingle.run(f, fnode, f->val(), mNetwork->max_node_id(), bt, dop, uop);
     mNetwork->end_fault_injection();
   }
 }

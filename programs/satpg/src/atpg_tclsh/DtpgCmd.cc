@@ -57,6 +57,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			     "FFR2 mode");
   mPoptMFFC = new TclPopt(this, "mffc",
 			  "MFFC mode");
+  mPoptMFFC2 = new TclPopt(this, "mffc2",
+			   "MFFC2 mode");
   mPoptAll = new TclPopt(this, "all",
 			 "all mode");
   mPoptPo = new TclPopt(this, "po",
@@ -79,8 +81,11 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			   "enable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptMiniSat2, mPoptSatRec);
-  TclPoptGroup* mode_group = new_popt_group(mPoptSingle, mPoptDual, mPoptNode, mPoptFFR, mPoptMFFC, mPoptAll);
+  TclPoptGroup* mode_group = new_popt_group(mPoptSingle, mPoptDual, mPoptNode,
+					    mPoptFFR, mPoptMFFC, mPoptAll);
   add_popt(mode_group, mPoptSingle2);
+  add_popt(mode_group, mPoptMFFC2);
+
   new_popt_group(mPoptPo, mPoptRpo);
 }
 
@@ -153,6 +158,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( mPoptMFFC->is_specified() ) {
     mode = kDtpgMFFC;
+  }
+  else if ( mPoptMFFC2->is_specified() ) {
+    mode = kDtpgMFFC2;
   }
   else if ( mPoptAll->is_specified() ) {
     mode = kDtpgAll;

@@ -85,6 +85,9 @@ private:
   // mffc オプションの解析用オブジェクト
   TclPopt* mPoptMFFC;
 
+  // mffc2 オプションの解析用オブジェクト
+  TclPopt* mPoptMFFC2;
+
   // all オプションの解析用オブジェクト
   TclPopt* mPoptAll;
 

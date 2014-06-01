@@ -247,7 +247,7 @@ private:
   // SAT エンジン
   SatEngineMulti mSatEngine;
 
-  SatEngineSingle mSatEngine2;
+  SatEngineSingle mSatEngineSingle;
 
   // 対象の回路
   TpgNetwork* mNetwork;
@@ -271,7 +271,7 @@ void
 DtpgSat::timer_enable(bool enable)
 {
   mSatEngine.timer_enable(enable);
-  mSatEngine2.timer_enable(enable);
+  mSatEngineSingle.timer_enable(enable);
 }
 
 // @brief 故障リストをクリアする．
