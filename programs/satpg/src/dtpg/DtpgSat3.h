@@ -13,6 +13,7 @@
 #include "Dtpg.h"
 #include "TpgFault.h"
 #include "SatEngineSingle.h"
+#include "SatEngineMulti.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -105,6 +106,16 @@ private:
 	      DetectOp& dop,
 	      UntestOp& uop);
 
+  /// @brief ffr モードでテスト生成を行なう．
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  void
+  ffr_mode(TpgNetwork& network,
+	   BackTracer& bt,
+	   DetectOp& dop,
+	   UntestOp& uop);
+
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] bt バックトレーサー
@@ -129,6 +140,29 @@ private:
 	       DetectOp& dop,
 	       UntestOp& uop);
 
+  /// @brief DFS で FFR を求める．
+  void
+  dfs_ffr(TpgNode* node);
+
+  /// @brief 故障リストをクリアする．
+  void
+  clear_faults();
+
+  /// @brief ノードの故障を追加する．
+  void
+  add_node_faults(TpgNode* node);
+
+  /// @brief 故障を追加する．
+  void
+  add_fault(TpgFault* fault);
+
+  /// @brief テストパタン生成を行なう．
+  void
+  do_dtpg(TpgNetwork& network,
+	  BackTracer& bt,
+	  DetectOp& dop,
+	  UntestOp& uop);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -136,7 +170,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // SAT エンジン
-  SatEngineSingle mSatEngine;
+  SatEngineSingle mSatEngineS;
+
+  SatEngineMulti mSatEngineM;
+
+  // do_dtpg() で用いる対象の故障リスト
+  vector<TpgFault*> mFaultList;
 
 };
 
@@ -150,7 +189,29 @@ inline
 void
 DtpgSat3::timer_enable(bool enable)
 {
-  mSatEngine.timer_enable(enable);
+  mSatEngineS.timer_enable(enable);
+  mSatEngineM.timer_enable(enable);
+}
+
+// @brief 故障リストをクリアする．
+inline
+void
+DtpgSat3::clear_faults()
+{
+  mFaultList.clear();
+}
+
+// @brief 故障を追加する．
+inline
+void
+DtpgSat3::add_fault(TpgFault* fault)
+{
+  if ( fault != NULL &&
+       fault->is_rep() &&
+       fault->status() != kFsDetected &&
+       !fault->is_skip() ) {
+    mFaultList.push_back(fault);
+  }
 }
 
 END_NAMESPACE_YM_SATPG

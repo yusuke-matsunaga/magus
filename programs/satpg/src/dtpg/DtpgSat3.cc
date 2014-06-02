@@ -37,7 +37,8 @@ DtpgSat3::set_mode(const string& type,
 		   const string& option,
 		   ostream* outp)
 {
-  mSatEngine.set_mode(type, option, outp);
+  mSatEngineS.set_mode(type, option, outp);
+  mSatEngineM.set_mode(type, option, outp);
 }
 
 // @brief テスト生成を行なう．
@@ -59,20 +60,41 @@ DtpgSat3::run(TpgNetwork& network,
 	      UntestOp& uop,
 	      DtpgStats& stats)
 {
-  mSatEngine.set_option(option_str);
-  mSatEngine.clear_stats();
-
   // 正順で PO を選び分割するモード
   ymuint no = network.output_num2();
-  for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
-    network.activate_po(po_pos);
 
-    single_mode(network, bt, dop, uop);
+  switch ( mode.mode() ) {
+  case kDtpgSingle:
+    mSatEngineS.set_option(option_str);
+    mSatEngineS.clear_stats();
+
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      network.activate_po(po_pos);
+
+      single_mode(network, bt, dop, uop);
+    }
+
+    mSatEngineS.get_stats(stats);
+    break;
+
+  case kDtpgFFR:
+    mSatEngineM.set_option(option_str);
+    mSatEngineM.clear_stats();
+
+    for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
+      network.activate_po(po_pos);
+
+      ffr_mode(network, bt, dop, uop);
+    }
+
+    mSatEngineM.get_stats(stats);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
   }
-
-  mSatEngine.get_stats(stats);
 }
-
 
 // @brief single モードでテスト生成を行なう．
 void
@@ -120,7 +142,7 @@ DtpgSat3::dtpg_single1(TpgNetwork& network,
        f->is_rep() &&
        f->status() != kFsDetected &&
        !f->is_skip() ) {
-    mSatEngine.run(f, f->node(), f->val(), network.max_node_id(),
+    mSatEngineS.run(f, f->node(), f->val(), network.max_node_id(),
 			 bt, dop, uop);
   }
 }
@@ -140,9 +162,95 @@ DtpgSat3::dtpg_single2(TpgNetwork& network,
        !f->is_skip() ) {
     network.begin_fault_injection();
     TpgNode* fnode = network.inject_fnode(f->node(), f->pos());
-    mSatEngine.run(f, fnode, f->val(), network.max_node_id(), bt, dop, uop);
+    mSatEngineS.run(f, fnode, f->val(), network.max_node_id(), bt, dop, uop);
     network.end_fault_injection();
   }
+}
+
+// @brief ffr モードでテスト生成を行なう．
+void
+DtpgSat3::ffr_mode(TpgNetwork& network,
+		   BackTracer& bt,
+		   DetectOp& dop,
+		   UntestOp& uop)
+{
+  ymuint nn = network.active_node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    TpgNode* node = network.active_node(i);
+    ymuint nfo = node->active_fanout_num();
+    if ( nfo > 1 || (nfo == 1 && node->active_fanout(0)->is_output()) ) {
+      clear_faults();
+
+      dfs_ffr(node);
+
+      do_dtpg(network, bt, dop, uop);
+    }
+  }
+}
+
+void
+DtpgSat3::dfs_ffr(TpgNode* node)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( inode->active_fanout_num() == 1 ) {
+      dfs_ffr(inode);
+    }
+  }
+
+  add_node_faults(node);
+}
+
+// @brief ノードの故障を追加する．
+void
+DtpgSat3::add_node_faults(TpgNode* node)
+{
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgFault* f0 = node->input_fault(0, i);
+    add_fault(f0);
+
+    TpgFault* f1 = node->input_fault(1, i);
+    add_fault(f1);
+  }
+  TpgFault* f0 = node->output_fault(0);
+  add_fault(f0);
+
+  TpgFault* f1 = node->output_fault(1);
+  add_fault(f1);
+}
+
+// @brief テストパタン生成を行なう．
+void
+DtpgSat3::do_dtpg(TpgNetwork& network,
+		  BackTracer& bt,
+		  DetectOp& dop,
+		  UntestOp& uop)
+{
+  if ( mFaultList.empty() ) {
+    return;
+  }
+
+  vector<TpgNode*> fnode_list;
+  fnode_list.reserve(mFaultList.size());
+  network.begin_fault_injection();
+  for (vector<TpgFault*>::iterator p = mFaultList.begin();
+       p != mFaultList.end(); ++ p) {
+    TpgFault* f = *p;
+    TpgNode* node = f->node();
+    if ( f->is_input_fault() ) {
+      TpgNode* fnode = network.inject_fnode(node, f->pos());
+      fnode_list.push_back(fnode);
+    }
+    else {
+      fnode_list.push_back(node);
+    }
+  }
+
+  mSatEngineM.run(mFaultList, fnode_list, network.max_node_id(), bt, dop, uop);
+
+  network.end_fault_injection();
 }
 
 END_NAMESPACE_YM_SATPG
