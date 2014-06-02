@@ -379,6 +379,8 @@ private:
   // ファンアウト数
   ymuint32 mFanoutNum;
 
+  ymuint32 mFanoutsSize;
+
   // ファンアウトの配列
   TpgNode** mFanouts;
 

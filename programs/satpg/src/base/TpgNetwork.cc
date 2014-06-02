@@ -1,5 +1,5 @@
 
-/// @file TpgNetwork.cc
+/// @File TpgNetwork.cc
 /// @brief TpgNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -295,6 +295,64 @@ TFIbits_or(ymuint64* dst_bits,
 
 END_NONAMESPACE
 
+BEGIN_NONAMESPACE
+
+void
+check_network_connection(const TpgNetwork& network)
+{
+  // fanin/fanout の sanity check
+  bool error = false;
+
+  ymuint nn = network.node_num();
+  for (ymuint i = 0; i < nn; ++ i) {
+    const TpgNode* node = network.node(i);
+    ymuint nfi = node->fanin_num();
+    for (ymuint j = 0; j < nfi; ++ j) {
+      const TpgNode* inode = node->fanin(j);
+      ymuint nfo = inode->fanout_num();
+      bool found = false;
+      for (ymuint k = 0; k < nfo; ++ k) {
+	if ( inode->fanout(k) == node ) {
+	  found = true;
+	  break;
+	}
+      }
+      if ( !found ) {
+	error = true;
+	cout << "Error: inode(" << inode->id() << ") is a fanin of "
+	     << "node(" << node->id() << "), but "
+	     << "node(" << node->id() << ") is not a fanout of "
+	     << "inode(" << inode->id() << ")" << endl;
+      }
+    }
+    ymuint nfo = node->fanout_num();
+    for (ymuint j = 0; j < nfo; ++ j) {
+      const TpgNode* onode = node->fanout(j);
+      ymuint nfi = onode->fanin_num();
+      bool found = false;
+      for (ymuint k = 0; k < nfi; ++ k) {
+	if ( onode->fanin(k) == node ) {
+	  found = true;
+	  break;
+	}
+      }
+      if ( !found ) {
+	error = true;
+	cout << "Error: onode(" << onode->id() << ") is a fanout of "
+	     << "node(" << node->id() << "), but "
+	     << "node(" << node->id() << ") is not a fanin of "
+	     << "onode(" << onode->id() << ")" << endl;
+      }
+    }
+  }
+  if ( error ) {
+    cout << "network connectivity check failed" << endl;
+    abort();
+  }
+}
+
+END_NONAMESPACE
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス TpgNetwork
@@ -486,8 +544,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     }
   }
 
-  // 全部アクティブにしておく．
-  activate_all();
+  check_network_connection(*this);
 
   // TFI のサイズの昇順に並べた出力順を
   // mOutputArray2 に記録する．
@@ -507,6 +564,9 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     mOutputArray2[i] = onode;
     onode->mFanoutNum = i;
   }
+
+  // 全部アクティブにしておく．
+  activate_all();
 
   // TFIbits を作る．
   // と同時に TFI ごとの immediate dominator を計算する．
@@ -671,7 +731,7 @@ TpgNetwork::end_fault_injection()
       }
     }
     for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
-      if ( src_node->mFanouts[i] = node ) {
+      if ( src_node->mFanouts[i] == node ) {
 	src_node->mFanouts[i] = dst_node;
 	break;
       }
@@ -1096,6 +1156,7 @@ TpgNetwork::init_node(TpgNode* node,
     node->mInputFault = NULL;
   }
 
+  node->mFanoutsSize = nfo;
   node->mFanoutNum = 0;
   node->mFanouts = alloc_array<TpgNode*>(mAlloc, nfo);
   node->mActFanoutNum = 0;
@@ -1137,6 +1198,7 @@ TpgNetwork::connect(TpgNode* src,
 		    TpgNode* dst,
 		    ymuint ipos)
 {
+  assert_cond( src->mFanoutNum < src->mFanoutsSize, __FILE__, __LINE__);
   dst->mFanins[ipos] = src;
   src->mFanouts[src->mFanoutNum] = dst;
   ++ src->mFanoutNum;

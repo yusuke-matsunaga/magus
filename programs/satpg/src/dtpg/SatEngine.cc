@@ -83,6 +83,7 @@ END_NONAMESPACE
 // @brief コンストラクタ
 SatEngine::SatEngine()
 {
+  mOutP = NULL;
   mTimerEnable = false;
 }
 

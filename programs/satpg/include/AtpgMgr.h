@@ -228,6 +228,9 @@ private:
   // テストパタン生成器
   Dtpg* mDtpg2;
 
+  // テストパタン生成器
+  Dtpg* mDtpg3;
+
   // パタン圧縮器
   MinPat* mMinPat;
 

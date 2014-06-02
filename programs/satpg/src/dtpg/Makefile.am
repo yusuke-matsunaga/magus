@@ -58,6 +58,8 @@ COMMON_SOURCES = \
 	DtpgSat.cc \
 	DtpgSat2.h \
 	DtpgSat2.cc \
+	DtpgSat3.h \
+	DtpgSat3.cc \
 	DtpgNgMgr.h \
 	DtpgNgMgr.cc \
 	DtpgNodeGroup.h \
