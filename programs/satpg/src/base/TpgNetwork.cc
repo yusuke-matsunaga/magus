@@ -249,6 +249,17 @@ TFIbits_clear(ymuint64* bits,
   }
 }
 
+// TFIbits をコピーする．
+void
+TFIbits_copy(ymuint64* dst_bits,
+	     const ymuint64* src_bits,
+	     ymuint size)
+{
+  for (ymuint i = 0; i < size; ++ i) {
+    dst_bits[i] = src_bits[i];
+  }
+}
+
 // TFIbits のすべてのビットをセットする．
 void
 TFIbits_set_all(ymuint64* bits,
@@ -623,6 +634,7 @@ TpgNetwork::inject_fnode(TpgNode* node,
   dummy_node->mFanouts[0] = node;
   dummy_node->mActFanoutNum = 1;
   dummy_node->mActFanouts[0] = node;
+  TFIbits_copy(dummy_node->mTFIbits, node->mTFIbits, tfibits_size());
 
   for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
     if ( src_node->mFanouts[i] == node ) {

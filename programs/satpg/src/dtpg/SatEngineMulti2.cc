@@ -138,35 +138,28 @@ SatEngineMulti2::run(TpgNetwork& network,
   vector<ymuint> mark(max_id, 0);
   for (ymuint opos = 0; opos < no; ++ opos) {
     TpgNode* onode = olist[opos];
+    ymuint oid = onode->output_id2();
 
     cnf_begin();
 
     //////////////////////////////////////////////////////////////////////
     // 正常回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
-    vector<TpgNode*> queue;
-    queue.reserve(tfo_tfi_size());
-    queue.push_back(onode);
-    for (ymuint rpos = 0; rpos < queue.size(); ++ rpos) {
-      TpgNode* node = queue[rpos];
-      if ( mark[node->id()] == 0 ) {
-	mark[node->id()] = opos + 1;
+    for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+      TpgNode* node = tfo_tfi_node(i);
+      if ( node->is_in_TFI_of(oid) && mark[node->id()] == 0 ) {
+	mark[node->id()] = oid + 1;
 
 	make_node_cnf(solver, node, GvarLitMap(node));
-
-	ymuint ni = node->fanin_num();
-	for (ymuint i = 0; i < ni; ++ i) {
-	  TpgNode* inode = node->fanin(i);
-	  queue.push_back(inode);
-	}
       }
     }
+
     //////////////////////////////////////////////////////////////////////
     // 故障回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( mark[node->id()] != (opos + 1) ) {
+      if ( mark[node->id()] != (oid + 1) ) {
 	continue;
       }
 
@@ -293,7 +286,6 @@ SatEngineMulti2::run(TpgNetwork& network,
 
       // dominator ノードの dvar は1でなければならない．
       if ( mUseLocalDominator ) {
-	ymuint oid = onode->output_id2();
 	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom(oid)) {
 	  Literal dlit(node->dvar(), false);
 	  tmp_lits_add(dlit);
