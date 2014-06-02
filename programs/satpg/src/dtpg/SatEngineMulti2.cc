@@ -60,6 +60,7 @@ SatEngineMulti2::SatEngineMulti2()
 {
   mTgGrasp = true;
   mUseDominator = true;
+  mUseLocalDominator = true;
   mSkipThreshold = 2;
 }
 
@@ -85,10 +86,13 @@ SatEngineMulti2::set_option(const string& option_str)
       mTgGrasp = false;
     }
     else if ( option == "DOM" ) {
-      mUseDominator = true;
+      mUseLocalDominator = false;
     }
     else if ( option == "NODOM" ) {
       mUseDominator = false;
+    }
+    else if ( option == "LOCALDOM" ) {
+      mUseLocalDominator = true;
     }
     if ( pos == string::npos ) {
       break;
@@ -101,7 +105,8 @@ SatEngineMulti2::set_option(const string& option_str)
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
 void
-SatEngineMulti2::run(const vector<TpgFault*>& flist,
+SatEngineMulti2::run(TpgNetwork& network,
+		     const vector<TpgFault*>& flist,
 		     const vector<TpgNode*>& fnode_list,
 		     ymuint max_id,
 		     BackTracer& bt,
@@ -287,9 +292,18 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       mTmpNodeList.clear();
 
       // dominator ノードの dvar は1でなければならない．
-      for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-	Literal dlit(node->dvar(), false);
-	tmp_lits_add(dlit);
+      if ( mUseLocalDominator ) {
+	ymuint oid = onode->output_id2();
+	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom(oid)) {
+	  Literal dlit(node->dvar(), false);
+	  tmp_lits_add(dlit);
+	}
+      }
+      else {
+	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+	  Literal dlit(node->dvar(), false);
+	  tmp_lits_add(dlit);
+	}
       }
 
       // 故障値を設定する．

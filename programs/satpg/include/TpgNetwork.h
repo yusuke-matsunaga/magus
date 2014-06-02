@@ -222,6 +222,10 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// TpgNode の TFIbits のサイズを計算する．
+  ymuint
+  tfibits_size() const;
+
   /// @brief 入力ノードを生成する．
   /// @param[in] tgnode もととなる TgNode
   /// @return 生成したノードを返す．
@@ -584,6 +588,14 @@ TpgNetwork::active_node(ymuint pos) const
 {
   assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
   return mActNodeArray[pos];
+}
+
+// TpgNode の TFIbits のサイズを計算する．
+inline
+ymuint
+TpgNetwork::tfibits_size() const
+{
+  return (output_num2() + 7) / 8;
 }
 
 END_NAMESPACE_YM_SATPG

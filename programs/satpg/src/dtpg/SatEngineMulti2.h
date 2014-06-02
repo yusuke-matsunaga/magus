@@ -48,7 +48,8 @@ public:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  run(const vector<TpgFault*>& flist,
+  run(TpgNetwork& network,
+      const vector<TpgFault*>& flist,
       const vector<TpgNode*>& fnode_list,
       ymuint max_id,
       BackTracer& bt,
@@ -66,6 +67,9 @@ private:
 
   // unique sensitization を使う
   bool mUseDominator;
+
+  // PO ごとの dominator を使う．
+  bool mUseLocalDominator;
 
   // skip threshold
   ymuint32 mSkipThreshold;

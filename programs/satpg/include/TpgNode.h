@@ -154,9 +154,19 @@ public:
   bool
   is_active() const;
 
+  /// @brief pos 番目のPOのTFIに含まれている時 true を返す．
+  bool
+  is_in_TFI_of(ymuint pos) const;
+
   /// @brief 直近の dominator を得る．
   TpgNode*
   imm_dom() const;
+
+  /// @brief pos 番目のPOのTFIに制限した場合の直近の dominator を得る．
+  ///
+  /// pos 番目のPOのTFIに含まれていない場合は NULL を返す．
+  TpgNode*
+  imm_dom(ymuint pos) const;
 
 
 public:
@@ -399,8 +409,32 @@ private:
   // 故障差の変数番号
   VarId mDid;
 
+  // TFIマークを表すビットアレイ
+  ymuint64* mTFIbits;
+
   // immediate dominator
   TpgNode* mImmDom;
+
+  // TFI ごとの immediate dominator を保持するための補助クラス
+  struct ImmDomMap
+  {
+    ImmDomMap() { }
+
+    ImmDomMap(ymuint64* bits,
+	      TpgNode* node) :
+      mBitMask(bits),
+      mImmDom(node) { }
+
+    // ビットマスク
+    ymuint64* mBitMask;
+
+    // immediate dominator
+    TpgNode* mImmDom;
+
+  };
+
+  // TFI ごとの immediate dominator の配列
+  ImmDomMap* mImmDomMap;
 
   // controling value
   Bool3 mCval;
@@ -711,6 +745,46 @@ TpgNode::clear_active()
   mMarks &= ~1U;
 }
 
+// @brief pos 番目のPOのTFIに含まれている時 true を返す．
+inline
+bool
+TpgNode::is_in_TFI_of(ymuint pos) const
+{
+  ymuint blk = pos / 64;
+  ymuint sft = pos % 64;
+  return static_cast<bool>((mTFIbits[blk] >> sft) & 1U);
+}
+
+// @brief 直近の dominator を得る．
+inline
+TpgNode*
+TpgNode::imm_dom() const
+{
+  return mImmDom;
+}
+
+// @brief pos 番目のPOのTFIに制限した場合の直近の dominator を得る．
+//
+// pos 番目のPOのTFIに含まれていない場合は NULL を返す．
+inline
+TpgNode*
+TpgNode::imm_dom(ymuint pos) const
+{
+  ymuint blk = pos / 64;
+  ymuint sft = pos % 64;
+  ymuint64 mask = (1UL << sft);
+  // かならずどれかのエントリにヒットするはずなので
+  // ループの終了条件はない．
+  // ちょっとギャンブルなコード
+  for (ymuint i = 0; ; ++ i) {
+    if ( mImmDomMap[i].mBitMask[blk] & mask ) {
+      return mImmDomMap[i].mImmDom;
+    }
+  }
+  assert_not_reached(__FILE__, __LINE__);
+  return NULL;
+}
+
 // @brief 正常回路用の変数番号をセットする．
 // @param[in] gvar 正常値を表す変数番号
 inline
@@ -773,14 +847,6 @@ VarId
 TpgNode::dvar() const
 {
   return mDid;
-}
-
-// @brief 直近の dominator を得る．
-inline
-TpgNode*
-TpgNode::imm_dom() const
-{
-  return mImmDom;
 }
 
 // @brief controling value を得る．

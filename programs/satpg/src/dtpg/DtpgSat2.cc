@@ -63,8 +63,6 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
   mSatEngineSingle.set_option(option_str);
   mSatEngineMulti.set_option(option_str);
 
-  mMaxId = tgnetwork.max_node_id();
-
   tgnetwork.activate_all();
 
   switch ( mode.mode() ) {
@@ -91,29 +89,29 @@ DtpgSat2::single_mode(TpgNetwork& tgnetwork,
 {
   mSatEngineSingle.clear_stats();
 
-  ymuint nn = tgnetwork.active_node_num();
+  ymuint nn = tgnetwork.node_num();
   for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = tgnetwork.active_node(i);
+    TpgNode* node = tgnetwork.node(i);
     if ( node->is_output() ) {
       continue;
     }
+
+    // 出力の故障
+    TpgFault* f0 = node->output_fault(0);
+    dtpg_single1(tgnetwork, f0, bt, dop, uop);
+
+    TpgFault* f1 = node->output_fault(1);
+    dtpg_single1(tgnetwork, f1, bt, dop, uop);
 
     // 入力の故障
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TpgFault* f0 = node->input_fault(0, j);
-      dtpg_single(f0, tgnetwork, bt, dop, uop);
+      dtpg_single2(tgnetwork, f0, bt, dop, uop);
 
       TpgFault* f1 = node->input_fault(1, j);
-      dtpg_single(f1, tgnetwork, bt, dop, uop);
+      dtpg_single2(tgnetwork, f1, bt, dop, uop);
     }
-
-    // 出力の故障
-    TpgFault* f0 = node->output_fault(0);
-    dtpg_single(f0, bt, dop, uop);
-
-    TpgFault* f1 = node->output_fault(1);
-    dtpg_single(f1, bt, dop, uop);
   }
 
   mSatEngineSingle.get_stats(stats);
@@ -122,16 +120,20 @@ DtpgSat2::single_mode(TpgNetwork& tgnetwork,
 // @brief 一つの故障に対してテストパタン生成を行う．
 // @param[in] f 故障
 void
-DtpgSat2::dtpg_single(TpgFault* fault,
-		      BackTracer& bt,
-		      DetectOp& dop,
-		      UntestOp& uop)
+DtpgSat2::dtpg_single1(TpgNetwork& network,
+		       TpgFault* fault,
+		       BackTracer& bt,
+		       DetectOp& dop,
+		       UntestOp& uop)
 {
   if ( fault != NULL &&
        fault->is_rep() &&
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
-    mSatEngineSingle.run(fault, fault->node(), fault->val(), mMaxId,
+    TpgNode* fnode = fault->node();
+    int fval = fault->val();
+    ymuint max_id = network.max_node_id();
+    mSatEngineSingle.run(network, fault, fnode, fval, max_id,
 			 bt, dop, uop);
  }
 }
@@ -139,11 +141,11 @@ DtpgSat2::dtpg_single(TpgFault* fault,
 // @brief 一つの故障に対してテストパタン生成を行う．
 // @param[in] f 故障
 void
-DtpgSat2::dtpg_single(TpgFault* fault,
-		      TpgNetwork& network,
-		      BackTracer& bt,
-		      DetectOp& dop,
-		      UntestOp& uop)
+DtpgSat2::dtpg_single2(TpgNetwork& network,
+		       TpgFault* fault,
+		       BackTracer& bt,
+		       DetectOp& dop,
+		       UntestOp& uop)
 {
   if ( fault != NULL &&
        fault->is_rep() &&
@@ -151,14 +153,16 @@ DtpgSat2::dtpg_single(TpgFault* fault,
        !fault->is_skip() ) {
     network.begin_fault_injection();
     TpgNode* fnode = network.inject_fnode(fault->node(), fault->pos());
-    mSatEngineSingle.run(fault, fnode, fault->val(), network.max_node_id(),
+    int fval = fault->val();
+    ymuint max_id = network.max_node_id();
+    mSatEngineSingle.run(network, fault, fnode, fval, max_id,
 			 bt, dop, uop);
     network.end_fault_injection();
  }
 }
 
 void
-DtpgSat2::mffc_mode(TpgNetwork& tpgnetwork,
+DtpgSat2::mffc_mode(TpgNetwork& network,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop,
@@ -166,17 +170,24 @@ DtpgSat2::mffc_mode(TpgNetwork& tpgnetwork,
 {
   mSatEngineMulti.clear_stats();
 
-  ymuint n = tpgnetwork.active_node_num();
+  vector<TpgNode*> node_list;
+  ymuint n = network.node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* node = tpgnetwork.active_node(i);
+    TpgNode* node = network.node(i);
     if ( node->imm_dom() == NULL ) {
-      clear_faults();
-
-      vector<bool> mark(tpgnetwork.node_num(), false);
-      dfs_mffc(node, mark);
-
-      do_dtpg(tpgnetwork, bt, dop, uop);
+      node_list.push_back(node);
     }
+  }
+
+  for (ymuint i = 0; i < node_list.size(); ++ i) {
+    TpgNode* node = node_list[i];
+
+    clear_faults();
+
+    vector<bool> mark(network.max_node_id(), false);
+    dfs_mffc(node, mark);
+
+    do_dtpg(network, bt, dop, uop);
   }
 
   mSatEngineMulti.get_stats(stats);
@@ -222,7 +233,7 @@ DtpgSat2::add_node_faults(TpgNode* node)
 
 // @brief テストパタン生成を行なう．
 void
-DtpgSat2::do_dtpg(TpgNetwork& tpgnetwork,
+DtpgSat2::do_dtpg(TpgNetwork& network,
 		  BackTracer& bt,
 		  DetectOp& dop,
 		  UntestOp& uop)
@@ -233,13 +244,13 @@ DtpgSat2::do_dtpg(TpgNetwork& tpgnetwork,
 
   vector<TpgNode*> fnode_list;
   fnode_list.reserve(mFaultList.size());
-  tpgnetwork.begin_fault_injection();
+  network.begin_fault_injection();
   for (vector<TpgFault*>::iterator p = mFaultList.begin();
        p != mFaultList.end(); ++ p) {
     TpgFault* f = *p;
     TpgNode* node = f->node();
     if ( f->is_input_fault() ) {
-      TpgNode* fnode = tpgnetwork.inject_fnode(node, f->pos());
+      TpgNode* fnode = network.inject_fnode(node, f->pos());
       fnode_list.push_back(fnode);
     }
     else {
@@ -247,10 +258,10 @@ DtpgSat2::do_dtpg(TpgNetwork& tpgnetwork,
     }
   }
 
-  mSatEngineMulti.run(mFaultList, fnode_list, tpgnetwork.max_node_id(),
+  mSatEngineMulti.run(network, mFaultList, fnode_list, network.max_node_id(),
 		      bt, dop, uop);
 
-  tpgnetwork.end_fault_injection();
+  network.end_fault_injection();
 }
 
 END_NAMESPACE_YM_SATPG

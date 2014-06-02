@@ -12,6 +12,7 @@
 #include "DetectOp.h"
 #include "UntestOp.h"
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
@@ -28,6 +29,7 @@ SatEngineSingle2::SatEngineSingle2()
   mUopDummy = new_UopDummy();
   mTgGrasp = true;
   mUseDominator = true;
+  mUseLocalDominator = true;
 }
 
 // @brief デストラクタ
@@ -54,9 +56,13 @@ SatEngineSingle2::set_option(const string& option_str)
     }
     else if ( option == "DOM" ) {
       mUseDominator = true;
+      mUseLocalDominator = false;
     }
     else if ( option == "NODOM" ) {
       mUseDominator = false;
+    }
+    else if ( option == "LOCALDOM" ) {
+      mUseLocalDominator = true;
     }
     if ( pos == string::npos ) {
       break;
@@ -69,7 +75,8 @@ SatEngineSingle2::set_option(const string& option_str)
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
 void
-SatEngineSingle2::run(TpgFault* fault,
+SatEngineSingle2::run(TpgNetwork& network,
+		      TpgFault* fault,
 		      TpgNode* fnode,
 		      int fval,
 		      ymuint max_id,
@@ -77,27 +84,11 @@ SatEngineSingle2::run(TpgFault* fault,
 		      DetectOp& dop,
 		      UntestOp& uop)
 {
-  cnf_begin();
-
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
   bt.set_max_id(max_id);
 
   mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
-
-  // fnode の dlit を1と仮定しているので
-  // ここでは fvar か gvar のどちらかを仮定すればよい．
-  bool inv = (fval == 0);
-  solver.add_clause(Literal(fnode->fvar(), inv));
-  solver.add_clause(Literal(fnode->dvar(), false));
-
-  // dominator ノードの dvar は1でなければならない．
-  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(node->dvar(), false);
-    solver.add_clause(dlit);
-  }
-
-  cnf_end();
 
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
@@ -177,7 +168,27 @@ SatEngineSingle2::run(TpgFault* fault,
     // 故障の検出条件
     //////////////////////////////////////////////////////////////////////
     tmp_lits_begin();
+
     tmp_lits_add(Literal(onode->dvar(), false));
+
+    if ( mUseLocalDominator ) {
+      ymuint oid = onode->output_id2();
+      // dominator ノードの dvar は1でなければならない．
+      for (TpgNode* node = fnode; node != NULL; node = node->imm_dom(oid)) {
+	tmp_lits_add(Literal(node->dvar(), false));
+      }
+    }
+    else {
+      // dominator ノードの dvar は1でなければならない．
+      for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+	tmp_lits_add(Literal(node->dvar(), false));
+      }
+    }
+
+    // fnode の dlit を1と仮定しているので
+    // ここでは fvar か gvar のどちらかを仮定すればよい．
+    bool inv = (fval == 0);
+    solver.add_clause(Literal(fnode->fvar(), inv));
 
     last_ans = _solve(solver, time);
 

@@ -43,12 +43,12 @@ public:
 
   /// @brief テスト生成を行なう．
   /// @param[in] f_tgt 対象の故障
-  /// @param[in] max_id ノード番号の最大値 + 1
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  run(TpgFault* f_tgt,
+  run(TpgNetwork& network,
+      TpgFault* f_tgt,
       TpgNode* fnode,
       int val,
       ymuint max_id,
@@ -76,6 +76,9 @@ private:
 
   // unique sensitization を使う
   bool mUseDominator;
+
+  // PO ごとの dominator を使う．
+  bool mUseLocalDominator;
 
 };
 

@@ -48,17 +48,17 @@ public:
 	   ostream* outp = NULL);
 
   /// @brief テスト生成を行なう．
-  /// @param[in] tpgnetwork 対象のネットワーク
+  /// @param[in] network 対象のネットワーク
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
   /// @param[in] option_str オプション文字列
-   /// @param[in] bt バックトレーサー
+  /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run(TpgNetwork& tgnetwork,
+  run(TpgNetwork& network,
       DtpgMode mode,
       tDtpgPoMode po_mode,
       const string& option_str,
@@ -83,7 +83,7 @@ private:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  single_mode(TpgNetwork& tpgnetwork,
+  single_mode(TpgNetwork& network,
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop,
@@ -95,10 +95,11 @@ private:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  dtpg_single(TpgFault* f,
-	      BackTracer& bt,
-	      DetectOp& dop,
-	      UntestOp& uop);
+  dtpg_single1(TpgNetwork& network,
+	       TpgFault* f,
+	       BackTracer& bt,
+	       DetectOp& dop,
+	       UntestOp& uop);
 
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
@@ -106,11 +107,11 @@ private:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  dtpg_single(TpgFault* f,
-	      TpgNetwork& network,
-	      BackTracer& bt,
-	      DetectOp& dop,
-	      UntestOp& uop);
+  dtpg_single2(TpgNetwork& network,
+	       TpgFault* f,
+	       BackTracer& bt,
+	       DetectOp& dop,
+	       UntestOp& uop);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
@@ -142,7 +143,7 @@ private:
 
   /// @brief テストパタン生成を行なう．
   void
-  do_dtpg(TpgNetwork& tpgnetwork,
+  do_dtpg(TpgNetwork& network,
 	  BackTracer& bt,
 	  DetectOp& dop,
 	  UntestOp& uop);
@@ -157,9 +158,6 @@ private:
   SatEngineSingle2 mSatEngineSingle;
 
   SatEngineMulti2 mSatEngineMulti;
-
-  // mNetwork のノード数
-  ymuint32 mMaxId;
 
   // do_dtpg() で用いる対象の故障リスト
   vector<TpgFault*> mFaultList;
