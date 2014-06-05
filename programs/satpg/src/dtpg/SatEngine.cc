@@ -494,6 +494,202 @@ SatEngine::make_node_cnf(SatSolver& solver,
   }
 }
 
+// @brief ノードの故障差関数を表すCNFを作る．
+void
+SatEngine::make_dlit_cnf(SatSolver& solver,
+			 TpgNode* node)
+{
+  if ( node->is_output() ) {
+    return;
+  }
+
+  Literal dlit(node->dvar());
+
+  // ゲートの種類ごとの処理
+  ymuint ni = node->fanin_num();
+  switch ( node->gate_type() ) {
+  case kTgGateBuff:
+  case kTgGateNot:
+    // なにもしない．
+    break;
+
+  case kTgGateAnd:
+  case kTgGateNand:
+    for (ymuint i = 0; i < ni; ++ i) {
+      TpgNode* inode = node->fanin(i);
+      if ( inode->has_fvar() ) {
+#if 0
+	// side input が 0 かつ故障差が伝搬していなければ dlit も 0
+	Literal iglit(inode->gvar(), false);
+	Literal idlit(inode->dvar(), false);
+	solver.add_clause(iglit, idlit, ~dlit);
+#endif
+      }
+      else {
+	// side input が 0 なら dlit も 0
+	Literal iglit(inode->gvar(), false);
+	solver.add_clause(iglit, ~dlit);
+      }
+    }
+    break;
+
+  case kTgGateOr:
+  case kTgGateNor:
+    for (ymuint i = 0; i < ni; ++ i) {
+      TpgNode* inode = node->fanin(i);
+      if ( inode->has_fvar() ) {
+#if 0
+	// side input が 1 かつ故障差が伝搬していなければ dlit も 0
+	Literal iglit(inode->gvar(), false);
+	Literal idlit(inode->dvar(), false);
+	solver.add_clause(~iglit, idlit, ~dlit);
+#endif
+      }
+      else {
+	// side input が 1 なら dlit も 0
+	Literal iglit(inode->gvar(), false);
+	solver.add_clause(~iglit, ~dlit);
+      }
+    }
+    break;
+
+  case kTgGateXor:
+  case kTgGateXnor:
+    // なにもしない．
+    break;
+  }
+
+  // 全ゲートタイプ共通
+  // 全てのファンインに故障差が伝搬していなければ
+  // このゲートの出力にも故障差は伝搬しない．
+  tmp_lits_begin(ni + 1);
+  tmp_lits_add(~dlit);
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( inode->has_fvar() ) {
+      Literal idlit(inode->dvar(), false);
+      tmp_lits_add(idlit);
+    }
+  }
+  tmp_lits_end(solver);
+}
+
+// @brief ノードの故障差関数を表すCNFを作る．
+void
+SatEngine::make_dlit_cnf(SatSolver& solver,
+			 TpgNode* node,
+			 const vector<TpgNode*>& fnode_list,
+			 const vector<VarId>& flt_var)
+{
+  if ( node->is_output() ) {
+    return;
+  }
+
+  ymuint nf = fnode_list.size();
+
+  Literal dlit(node->dvar());
+
+  // ゲートの種類ごとの処理
+  ymuint ni = node->fanin_num();
+  switch ( node->gate_type() ) {
+  case kTgGateBuff:
+  case kTgGateNot:
+    // なにもしない．
+    break;
+
+  case kTgGateAnd:
+  case kTgGateNand:
+    for (ymuint i = 0; i < ni; ++ i) {
+      TpgNode* inode = node->fanin(i);
+      if ( inode->has_fvar() ) {
+	// side input が 0 かつ故障差が伝搬していなければ dlit も 0
+	Literal iglit(inode->gvar(), false);
+	Literal idlit(inode->dvar(), false);
+
+	bool found = false;
+	for (ymuint fid = 0; fid < nf; ++ fid) {
+	  if ( fnode_list[fid] == inode ) {
+	    Literal flit(flt_var[fid], false);
+#if 0
+	    solver.add_clause(flit, iglit, idlit, ~dlit);
+#endif
+	    found = true;
+	    break;
+	  }
+	}
+	if ( !found ) {
+	  solver.add_clause(iglit, idlit, ~dlit);
+	}
+      }
+      else {
+	// side input が 0 なら dlit も 0
+	Literal iglit(inode->gvar(), false);
+	solver.add_clause(iglit, ~dlit);
+      }
+    }
+    break;
+
+  case kTgGateOr:
+  case kTgGateNor:
+    for (ymuint i = 0; i < ni; ++ i) {
+      TpgNode* inode = node->fanin(i);
+      if ( inode->has_fvar() ) {
+	// side input が 1 かつ故障差が伝搬していなければ dlit も 0
+	Literal iglit(inode->gvar(), false);
+	Literal idlit(inode->dvar(), false);
+
+	bool found = false;
+	for (ymuint fid = 0; fid < nf; ++ fid) {
+	  if ( fnode_list[fid] == inode ) {
+	    Literal flit(flt_var[fid], false);
+#if 0
+	    solver.add_clause(flit, ~iglit, idlit, ~dlit);
+#endif
+	    found = true;
+	    break;
+	  }
+	}
+	if ( !found ) {
+	  solver.add_clause(~iglit, idlit, ~dlit);
+	}
+      }
+      else {
+	// side input が 1 なら dlit も 0
+	Literal iglit(inode->gvar(), false);
+	solver.add_clause(~iglit, ~dlit);
+      }
+    }
+    break;
+
+  case kTgGateXor:
+  case kTgGateXnor:
+    // なにもしない．
+    break;
+  }
+
+  // 全てのファンインに故障差が伝搬していなければ
+  // このゲートの出力にも故障差は伝搬しない．
+  // ただし，このゲートの出力に故障がある場合を
+  // 考慮しなければならない．
+  tmp_lits_begin(ni + 1);
+  tmp_lits_add(~dlit);
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( inode->has_fvar() ) {
+      Literal idlit(inode->dvar(), false);
+      tmp_lits_add(idlit);
+    }
+  }
+
+  for (ymuint fid = 0; fid < nf; ++ fid) {
+    if ( fnode_list[fid] == node ) {
+      tmp_lits_add(Literal(flt_var[fid], false));
+    }
+  }
+
+  tmp_lits_end(solver);
+}
+
 // @brief 一つの SAT問題を解く．
 Bool3
 SatEngine::solve(SatSolver& solver,

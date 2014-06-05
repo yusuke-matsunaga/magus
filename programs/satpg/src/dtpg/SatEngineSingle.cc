@@ -114,18 +114,7 @@ SatEngineSingle::run(TpgFault* fault,
 	// 故障回路のゲートの入出力関係を表すCNFを作る．
 	make_node_cnf(solver, node, FvarLitMap(node));
 
-	// 出力の dlit が1になる条件を作る．
-	// - 入力の dlit のいずれかが 1
-	ymuint ni = node->fanin_num();
-	tmp_lits_begin(ni + 1);
-	tmp_lits_add(~dlit);
-	for (ymuint j = 0; j < ni; ++ j) {
-	  TpgNode* inode = node->fanin(j);
-	  if ( inode->has_fvar() ) {
-	    tmp_lits_add(Literal(inode->dvar(), false));
-	  }
-	}
-	tmp_lits_end(solver);
+	make_dlit_cnf(solver, node);
       }
     }
     else {

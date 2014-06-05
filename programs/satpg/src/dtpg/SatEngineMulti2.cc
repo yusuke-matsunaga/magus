@@ -193,28 +193,7 @@ SatEngineMulti2::run(TpgNetwork& network,
       else {
 	make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
 
-	// 出力の dlit が1になる条件を作る．
-	// - 入力の dlit のいずれかが 1
-	// - 入力のいずれかに故障がある．
-	// - 出力に故障がある．
-	ymuint ni = node->fanin_num();
-	tmp_lits_begin(ni + 3);
-	Literal dlit(node->dvar(), true);
-	tmp_lits_add(dlit);
-	for (ymuint j = 0; j < ni; ++ j) {
-	  TpgNode* inode = node->fanin(j);
-	  if ( inode->has_fvar() ) {
-	    tmp_lits_add(Literal(inode->dvar(), false));
-	  }
-	}
-
-	for (ymuint fid = 0; fid < nf; ++ fid) {
-	  if ( fnode_list[fid] == node ) {
-	    tmp_lits_add(Literal(flt_var[fid], false));
-	  }
-	}
-
-	tmp_lits_end(solver);
+	make_dlit_cnf(solver, node, fnode_list, flt_var);
       }
     }
 

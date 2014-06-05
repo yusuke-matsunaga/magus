@@ -145,10 +145,10 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     // こちらは入力の故障と異なり，故障挿入回路の出力が node->fvar() となる．
     // 逆に ovar はゲートの直接の出力変数となる．
     VarId ovar = node->fvar();
-    for (ymuint i = 0; i < nf; ++ i) {
-      if ( fnode_list[i] == node ) {
-	make_flt_cnf(solver, tmp_var[i], flt_var[i], ovar, flist[i]->val());
-	ovar = tmp_var[i];
+    for (ymuint fid = 0; fid < nf; ++ fid) {
+      if ( fnode_list[fid] == node ) {
+	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], ovar, flist[fid]->val());
+	ovar = tmp_var[fid];
       }
     }
 
@@ -172,28 +172,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       else {
 	make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
 
-	// 出力の dlit が1になる条件を作る．
-	// - 入力の dlit のいずれかが 1
-	// - 入力のいずれかに故障がある．
-	// - 出力に故障がある．
-	ymuint ni = node->fanin_num();
-	tmp_lits_begin(ni + 3);
-	Literal dlit(node->dvar(), true);
-	tmp_lits_add(dlit);
-	for (ymuint j = 0; j < ni; ++ j) {
-	  TpgNode* inode = node->fanin(j);
-	  if ( inode->has_fvar() ) {
-	    tmp_lits_add(Literal(inode->dvar(), false));
-	  }
-	}
-
-	for (ymuint fid = 0; fid < nf; ++ fid) {
-	  if ( fnode_list[fid] == node ) {
-	    tmp_lits_add(Literal(flt_var[fid], false));
-	  }
-	}
-
-	tmp_lits_end(solver);
+	make_dlit_cnf(solver, node, fnode_list, flt_var);
       }
     }
     else {

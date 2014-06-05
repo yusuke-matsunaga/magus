@@ -162,6 +162,18 @@ protected:
 		TpgNode* node,
 		const LitMap& litmap);
 
+  /// @brief ノードの故障差関数を表すCNFを作る．
+  void
+  make_dlit_cnf(SatSolver& solver,
+		TpgNode* node);
+
+  /// @brief ノードの故障差関数を表すCNFを作る．
+  void
+  make_dlit_cnf(SatSolver& solver,
+		TpgNode* node,
+		const vector<TpgNode*>& fnode_list,
+		const vector<VarId>& flt_var);
+
   /// @brief 一つの SAT問題を解く．
   Bool3
   solve(SatSolver& solver,
