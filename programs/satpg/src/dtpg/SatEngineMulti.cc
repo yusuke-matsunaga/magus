@@ -156,23 +156,26 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
 
+    Literal olit(ovar, false);
+    if ( node->is_input() ) {
+      solver.add_clause(~glit,  olit);
+      solver.add_clause( glit, ~olit);
+    }
+    else {
+      make_fnode_cnf(solver, node, ovar);
+    }
+
     if ( mTgGrasp ) {
       // XOR(glit, flit, dlit) を追加する．
       // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
       solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause(~glit,  flit,  dlit);
-      solver.add_clause( glit, ~flit,  dlit);
       solver.add_clause( glit,  flit, ~dlit);
 
-      Literal olit(ovar, false);
-      if ( node->is_input() ) {
-	solver.add_clause(~glit,  olit);
-	solver.add_clause( glit, ~olit);
-      }
-      else {
-	make_fnode_cnf(solver, node, ovar);
+      solver.add_clause(~glit,  flit,  dlit);
+      solver.add_clause( glit, ~flit,  dlit);
 
-	make_dlit_cnf(solver, node, fnode_list, flt_var);
+      if ( !node->is_input() ) {
+	//make_dlit_cnf(solver, node, fnode_list, flt_var);
       }
     }
     else {
@@ -191,35 +194,30 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
 	}
 	tmp_lits_end(solver);
       }
-
-      Literal olit(ovar, false);
-      if ( node->is_input() ) {
-	solver.add_clause(~glit,  olit);
-	solver.add_clause( glit, ~olit);
-      }
-      else {
-	make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
-      }
     }
   }
 
 
-  if ( mTgGrasp ) {
-    //////////////////////////////////////////////////////////////////////
-    // 故障の検出条件
-    //////////////////////////////////////////////////////////////////////
-    tmp_lits_begin(output_list().size());
-    for (vector<TpgNode*>::const_iterator p = output_list().begin();
-	 p != output_list().end(); ++ p) {
-      TpgNode* node = *p;
-      Literal dlit(node->dvar(), false);
-      tmp_lits_add(dlit);
-    }
-    tmp_lits_end(solver);
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = output_list().size();
+  tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    TpgNode* node = output_list()[i];
+    VarId ovar = solver.new_var();
+    Literal olit(ovar, false);
+    Literal glit(node->gvar(), false);
+    Literal flit(node->fvar(), false);
+    solver.add_clause( glit, ~flit,  olit);
+    solver.add_clause(~glit,  flit,  olit);
+    solver.add_clause( glit,  flit, ~olit);
+    solver.add_clause(~glit, ~flit, ~olit);
+    tmp_lits_add(olit);
   }
+  tmp_lits_end(solver);
 
   cnf_end();
-
 
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint fid = 0; fid < nf; ++ fid) {
