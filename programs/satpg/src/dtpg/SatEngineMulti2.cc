@@ -150,7 +150,7 @@ SatEngineMulti2::run(TpgNetwork& network,
       if ( node->is_in_TFI_of(oid) && mark[node->id()] == 0 ) {
 	mark[node->id()] = oid + 1;
 
-	make_node_cnf(solver, node, GvarLitMap(node));
+	make_gnode_cnf(solver, node);
       }
     }
 
@@ -191,7 +191,7 @@ SatEngineMulti2::run(TpgNetwork& network,
 	solver.add_clause( glit, ~olit);
       }
       else {
-	make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+	make_fnode_cnf(solver, node, ovar);
 
 	make_dlit_cnf(solver, node, fnode_list, flt_var);
       }

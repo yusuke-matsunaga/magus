@@ -3,19 +3,16 @@
 /// @brief SatEngineSingle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+nn/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "SatEngineSingle.h"
 
-#include "DetectOp.h"
-#include "UntestOp.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
-#include "LitMap.h"
 #include "logic/SatSolver.h"
 #include "logic/SatStats.h"
 
@@ -26,6 +23,7 @@ BEGIN_NAMESPACE_YM_SATPG
 SatEngineSingle::SatEngineSingle()
 {
   mTgGrasp = true;
+  mExtTgGrasp = true;
   mUseDominator = true;
 }
 
@@ -46,6 +44,11 @@ SatEngineSingle::set_option(const string& option_str)
     string option = option_str.substr(next, pos - next);
     if ( option == "TG-GRASP" ) {
       mTgGrasp = true;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "EXT-TG-GRASP" ) {
+      mTgGrasp = true;
+      mExtTgGrasp = true;
     }
     else if ( option == "NEMESIS" ) {
       mTgGrasp = false;
@@ -83,13 +86,12 @@ SatEngineSingle::run(TpgFault* fault,
 
   mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
 
-
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_node_cnf(solver, node, GvarLitMap(node));
+    make_gnode_cnf(solver, node);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -102,18 +104,23 @@ SatEngineSingle::run(TpgFault* fault,
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
 
+    if ( node != fnode ) {
+      // 故障回路のゲートの入出力関係を表すCNFを作る．
+      make_fnode_cnf(solver, node);
+    }
+
     if ( mTgGrasp ) {
-      // XOR(glit, flit, dlit) を追加する．
       // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+
+      // dlit -> XOR(glit, flit) を追加する．
       solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause(~glit,  flit,  dlit);
-      solver.add_clause( glit, ~flit,  dlit);
       solver.add_clause( glit,  flit, ~dlit);
 
-      if ( node != fnode ) {
-	// 故障回路のゲートの入出力関係を表すCNFを作る．
-	make_node_cnf(solver, node, FvarLitMap(node));
+      // XOR(glit, flit) -> dlit を追加する．
+      solver.add_clause(~glit,  flit,  dlit);
+      solver.add_clause( glit, ~flit,  dlit);
 
+      if ( node != fnode && mExtTgGrasp ) {
 	make_dlit_cnf(solver, node);
       }
     }
@@ -134,27 +141,25 @@ SatEngineSingle::run(TpgFault* fault,
 	}
 	tmp_lits_end(solver);
       }
-
-      if ( node != fnode ) {
-	// 故障回路のゲートの入出力関係を表すCNFを作る．
-	make_node_cnf(solver, node, FvarLitMap(node));
-      }
     }
   }
 
-  if ( mTgGrasp ) {
-    //////////////////////////////////////////////////////////////////////
-    // 故障の検出条件
-    //////////////////////////////////////////////////////////////////////
-    tmp_lits_begin(output_list().size());
-    for (vector<TpgNode*>::const_iterator p = output_list().begin();
-	 p != output_list().end(); ++ p) {
-      TpgNode* node = *p;
-      Literal dlit(node->dvar(), false);
-      tmp_lits_add(dlit);
-    }
-    tmp_lits_end(solver);
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = output_list().size();
+  tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    TpgNode* node = output_list()[i];
+    VarId ovar = solver.new_var();
+    Literal olit(ovar, false);
+    Literal glit(node->gvar(), false);
+    Literal flit(node->fvar(), false);
+    solver.add_clause( glit, ~flit, olit);
+    solver.add_clause(~glit,  flit, olit);
+    tmp_lits_add(olit);
   }
+  tmp_lits_end(solver);
 
   if ( mUseDominator ) {
     // dominator ノードの dvar は1でなければならない．

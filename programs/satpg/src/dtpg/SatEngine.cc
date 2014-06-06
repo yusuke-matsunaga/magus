@@ -270,6 +270,37 @@ SatEngine::cnf_end()
   ++ mStats.mCnfGenCount;
 }
 
+// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
+// @param[in] solver SATソルバ
+// @param[in] node 対象のノード
+void
+SatEngine::make_gnode_cnf(SatSolver& solver,
+			  TpgNode* node)
+{
+  make_node_cnf(solver, node, GvarLitMap(node));
+}
+
+// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+// @param[in] solver SATソルバ
+// @param[in] node 対象のノード
+void
+SatEngine::make_fnode_cnf(SatSolver& solver,
+			  TpgNode* node)
+{
+  make_node_cnf(solver, node, FvarLitMap(node));
+}
+
+// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+// @param[in] solver SATソルバ
+// @param[in] node 対象のノード
+void
+SatEngine::make_fnode_cnf(SatSolver& solver,
+			  TpgNode* node,
+			  VarId ovar)
+{
+  make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+}
+
 // @brief ノードの入出力の関係を表す CNF を作る．
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード

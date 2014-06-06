@@ -71,6 +71,9 @@ private:
   // TG-GRASP モード
   bool mTgGrasp;
 
+  // extended TG-GRASP モード
+  bool mExtTgGrasp;
+
   // unique sensitization を使う
   bool mUseDominator;
 

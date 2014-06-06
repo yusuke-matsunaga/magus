@@ -111,7 +111,7 @@ SatEngineSingle2::run(TpgNetwork& network,
       if ( node->is_in_TFI_of(oid) && mark[node->id()] == 0 ) {
 	mark[node->id()] = oid + 1;
 
-	make_node_cnf(solver, node, GvarLitMap(node));
+	make_gnode_cnf(solver, node);
       }
     }
 
@@ -137,7 +137,7 @@ SatEngineSingle2::run(TpgNetwork& network,
 
       if ( node != fnode ) {
 	// 故障回路のゲートの入出力関係を表すCNFを作る．
-	make_node_cnf(solver, node, FvarLitMap(node));
+	make_fnode_cnf(solver, node);
 
 	make_dlit_cnf(solver, node);
       }

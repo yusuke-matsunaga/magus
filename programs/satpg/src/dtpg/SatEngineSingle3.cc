@@ -91,7 +91,7 @@ SatEngineSingle3::run(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_node_cnf(solver, node, GvarLitMap(node));
+    make_gnode_cnf(solver, node);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ SatEngineSingle3::run(TpgFault* fault,
 
       if ( node != fnode ) {
 	// 故障回路のゲートの入出力関係を表すCNFを作る．
-	make_node_cnf(solver, node, FvarLitMap(node));
+	make_fnode_cnf(solver, node);
 
 	// 出力の dlit が1になる条件を作る．
 	// - 入力の dlit のいずれかが 1
