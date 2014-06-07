@@ -147,21 +147,16 @@ SatEngineSingle::run(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  ymuint npo = output_list().size();
-  tmp_lits_begin(npo);
-  for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = output_list()[i];
-    VarId ovar = solver.new_var();
-    Literal olit(ovar, false);
-    Literal glit(node->gvar(), false);
-    Literal flit(node->fvar(), false);
-    solver.add_clause( glit, ~flit,  olit);
-    solver.add_clause(~glit,  flit,  olit);
-    solver.add_clause( glit,  flit, ~olit);
-    solver.add_clause(~glit, ~flit, ~olit);
-    tmp_lits_add(olit);
+  if ( mTgGrasp ) {
+    ymuint npo = output_list().size();
+    tmp_lits_begin(npo);
+    for (ymuint i = 0; i < npo; ++ i) {
+      TpgNode* node = output_list()[i];
+      Literal dlit(node->dvar(), false);
+      tmp_lits_add(dlit);
+    }
+    tmp_lits_end(solver);
   }
-  tmp_lits_end(solver);
 
   if ( mUseDominator ) {
     // dominator ノードの dvar は1でなければならない．

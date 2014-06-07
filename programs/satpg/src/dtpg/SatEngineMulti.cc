@@ -59,6 +59,7 @@ END_NONAMESPACE
 SatEngineMulti::SatEngineMulti()
 {
   mTgGrasp = true;
+  mExtTgGrasp = true;
   mUseDominator = true;
 }
 
@@ -79,6 +80,11 @@ SatEngineMulti::set_option(const string& option_str)
     string option = option_str.substr(next, pos - next);
     if ( option == "TG-GRASP" ) {
       mTgGrasp = true;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "EXT-TG-GRASP" ) {
+      mTgGrasp = true;
+      mExtTgGrasp = true;
     }
     else if ( option == "NEMESIS" ) {
       mTgGrasp = false;
@@ -174,8 +180,8 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       solver.add_clause(~glit,  flit,  dlit);
       solver.add_clause( glit, ~flit,  dlit);
 
-      if ( !node->is_input() ) {
-	//make_dlit_cnf(solver, node, fnode_list, flt_var);
+      if ( mExtTgGrasp ) {
+	make_dlit_cnf(solver, node, fnode_list, flt_var);
       }
     }
     else {
@@ -197,25 +203,19 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     }
   }
 
-
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  ymuint npo = output_list().size();
-  tmp_lits_begin(npo);
-  for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = output_list()[i];
-    VarId ovar = solver.new_var();
-    Literal olit(ovar, false);
-    Literal glit(node->gvar(), false);
-    Literal flit(node->fvar(), false);
-    solver.add_clause( glit, ~flit,  olit);
-    solver.add_clause(~glit,  flit,  olit);
-    solver.add_clause( glit,  flit, ~olit);
-    solver.add_clause(~glit, ~flit, ~olit);
-    tmp_lits_add(olit);
+  if ( mTgGrasp ) {
+    ymuint npo = output_list().size();
+    tmp_lits_begin(npo);
+    for (ymuint i = 0; i < npo; ++ i) {
+      TpgNode* node = output_list()[i];
+      Literal dlit(node->dvar(), false);
+      tmp_lits_add(dlit);
+    }
+    tmp_lits_end(solver);
   }
-  tmp_lits_end(solver);
 
   cnf_end();
 

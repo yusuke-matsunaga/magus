@@ -530,64 +530,59 @@ void
 SatEngine::make_dlit_cnf(SatSolver& solver,
 			 TpgNode* node)
 {
-  if ( node->is_output() ) {
-    return;
-  }
-
   Literal dlit(node->dvar());
 
-  // ゲートの種類ごとの処理
   ymuint ni = node->fanin_num();
-  switch ( node->gate_type() ) {
-  case kTgGateBuff:
-  case kTgGateNot:
-    // なにもしない．
-    break;
 
-  case kTgGateAnd:
-  case kTgGateNand:
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      if ( inode->has_fvar() ) {
-#if 0
-	// side input が 0 かつ故障差が伝搬していなければ dlit も 0
-	Literal iglit(inode->gvar(), false);
-	Literal idlit(inode->dvar(), false);
-	solver.add_clause(iglit, idlit, ~dlit);
-#endif
+  if ( node->is_logic() ) {
+    // ゲートの種類ごとの処理
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
+      // なにもしない．
+      break;
+
+    case kTgGateAnd:
+    case kTgGateNand:
+      for (ymuint i = 0; i < ni; ++ i) {
+	TpgNode* inode = node->fanin(i);
+	if ( inode->has_fvar() ) {
+	  // side input が 0 かつ故障差が伝搬していなければ dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  Literal iflit(inode->fvar(), false);
+	  solver.add_clause(iglit, iflit, ~dlit);
+	}
+	else {
+	  // side input が 0 なら dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  solver.add_clause(iglit, ~dlit);
+	}
       }
-      else {
-	// side input が 0 なら dlit も 0
-	Literal iglit(inode->gvar(), false);
-	solver.add_clause(iglit, ~dlit);
+      break;
+
+    case kTgGateOr:
+    case kTgGateNor:
+      for (ymuint i = 0; i < ni; ++ i) {
+	TpgNode* inode = node->fanin(i);
+	if ( inode->has_fvar() ) {
+	  // side input が 1 かつ故障差が伝搬していなければ dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  Literal iflit(inode->fvar(), false);
+	  solver.add_clause(~iglit, ~iflit, ~dlit);
+	}
+	else {
+	  // side input が 1 なら dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  solver.add_clause(~iglit, ~dlit);
+	}
       }
+      break;
+
+    case kTgGateXor:
+    case kTgGateXnor:
+      // なにもしない．
+      break;
     }
-    break;
-
-  case kTgGateOr:
-  case kTgGateNor:
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      if ( inode->has_fvar() ) {
-#if 0
-	// side input が 1 かつ故障差が伝搬していなければ dlit も 0
-	Literal iglit(inode->gvar(), false);
-	Literal idlit(inode->dvar(), false);
-	solver.add_clause(~iglit, idlit, ~dlit);
-#endif
-      }
-      else {
-	// side input が 1 なら dlit も 0
-	Literal iglit(inode->gvar(), false);
-	solver.add_clause(~iglit, ~dlit);
-      }
-    }
-    break;
-
-  case kTgGateXor:
-  case kTgGateXnor:
-    // なにもしない．
-    break;
   }
 
   // 全ゲートタイプ共通
@@ -612,97 +607,95 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
 			 const vector<TpgNode*>& fnode_list,
 			 const vector<VarId>& flt_var)
 {
-  if ( node->is_output() ) {
-    return;
-  }
-
   ymuint nf = fnode_list.size();
+  ymuint ni = node->fanin_num();
 
   Literal dlit(node->dvar());
 
-  // ゲートの種類ごとの処理
-  ymuint ni = node->fanin_num();
-  switch ( node->gate_type() ) {
-  case kTgGateBuff:
-  case kTgGateNot:
-    // なにもしない．
-    break;
+  if ( node->is_logic() ) {
+    // ゲートの種類ごとの処理
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
+      // なにもしない．
+      break;
 
-  case kTgGateAnd:
-  case kTgGateNand:
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      if ( inode->has_fvar() ) {
-	// side input が 0 かつ故障差が伝搬していなければ dlit も 0
-	Literal iglit(inode->gvar(), false);
-	Literal idlit(inode->dvar(), false);
+    case kTgGateAnd:
+    case kTgGateNand:
+      for (ymuint i = 0; i < ni; ++ i) {
+	TpgNode* inode = node->fanin(i);
+	if ( inode->has_fvar() ) {
+	  // side input が 0 かつ故障差が伝搬していなければ dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  Literal idlit(inode->dvar(), false);
 
-	bool found = false;
-	for (ymuint fid = 0; fid < nf; ++ fid) {
-	  if ( fnode_list[fid] == inode ) {
-	    Literal flit(flt_var[fid], false);
+	  bool found = false;
+	  for (ymuint fid = 0; fid < nf; ++ fid) {
+	    if ( fnode_list[fid] == inode ) {
 #if 0
-	    solver.add_clause(flit, iglit, idlit, ~dlit);
+	      Literal flit(flt_var[fid], false);
+	      solver.add_clause(flit, iglit, idlit, ~dlit);
 #endif
-	    found = true;
-	    break;
+	      found = true;
+	      break;
+	    }
+	  }
+	  if ( !found ) {
+	    solver.add_clause(iglit, idlit, ~dlit);
 	  }
 	}
-	if ( !found ) {
-	  solver.add_clause(iglit, idlit, ~dlit);
+	else {
+	  // side input が 0 なら dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  solver.add_clause(iglit, ~dlit);
 	}
       }
-      else {
-	// side input が 0 なら dlit も 0
-	Literal iglit(inode->gvar(), false);
-	solver.add_clause(iglit, ~dlit);
-      }
-    }
-    break;
+      break;
 
-  case kTgGateOr:
-  case kTgGateNor:
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      if ( inode->has_fvar() ) {
-	// side input が 1 かつ故障差が伝搬していなければ dlit も 0
-	Literal iglit(inode->gvar(), false);
-	Literal idlit(inode->dvar(), false);
+    case kTgGateOr:
+    case kTgGateNor:
+      for (ymuint i = 0; i < ni; ++ i) {
+	TpgNode* inode = node->fanin(i);
+	if ( inode->has_fvar() ) {
+	  // side input が 1 かつ故障差が伝搬していなければ dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  Literal idlit(inode->dvar(), false);
 
-	bool found = false;
-	for (ymuint fid = 0; fid < nf; ++ fid) {
-	  if ( fnode_list[fid] == inode ) {
-	    Literal flit(flt_var[fid], false);
+	  bool found = false;
+	  for (ymuint fid = 0; fid < nf; ++ fid) {
+	    if ( fnode_list[fid] == inode ) {
 #if 0
-	    solver.add_clause(flit, ~iglit, idlit, ~dlit);
+	      Literal flit(flt_var[fid], false);
+	      solver.add_clause(flit, ~iglit, idlit, ~dlit);
 #endif
-	    found = true;
-	    break;
+	      found = true;
+	      break;
+	    }
+	  }
+	  if ( !found ) {
+	    solver.add_clause(~iglit, idlit, ~dlit);
 	  }
 	}
-	if ( !found ) {
-	  solver.add_clause(~iglit, idlit, ~dlit);
+	else {
+	  // side input が 1 なら dlit も 0
+	  Literal iglit(inode->gvar(), false);
+	  solver.add_clause(~iglit, ~dlit);
 	}
       }
-      else {
-	// side input が 1 なら dlit も 0
-	Literal iglit(inode->gvar(), false);
-	solver.add_clause(~iglit, ~dlit);
-      }
-    }
-    break;
+      break;
 
-  case kTgGateXor:
-  case kTgGateXnor:
-    // なにもしない．
-    break;
+    case kTgGateXor:
+    case kTgGateXnor:
+      // なにもしない．
+      break;
+    }
   }
 
   // 全てのファンインに故障差が伝搬していなければ
   // このゲートの出力にも故障差は伝搬しない．
   // ただし，このゲートの出力に故障がある場合を
   // 考慮しなければならない．
-  tmp_lits_begin(ni + 1);
+  tmp_lits_begin(ni + 3);
   tmp_lits_add(~dlit);
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
