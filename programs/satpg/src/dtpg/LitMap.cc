@@ -98,4 +98,38 @@ Fvar2LitMap::output() const
   return Literal(mOvar, false);
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス Fvar3LitMap
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+Fvar3LitMap::Fvar3LitMap(const vector<VarId>& ivars,
+			 VarId ovar) :
+  mIvars(ivars),
+  mOvar(ovar)
+{
+}
+
+// @brief 出力のリテラルを返す．
+Literal
+Fvar3LitMap::output() const
+{
+  return Literal(mOvar, false);
+}
+
+// @brief 入力のリテラルを返す．
+Literal
+Fvar3LitMap::input(ymuint pos) const
+{
+  return Literal(mIvars[pos], false);
+}
+
+// @brief 入力数を返す．
+ymuint
+Fvar3LitMap::input_size() const
+{
+  return mIvars.size();
+}
+
 END_NAMESPACE_YM_SATPG

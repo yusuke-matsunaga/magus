@@ -29,27 +29,63 @@ BEGIN_NONAMESPACE
 // @param[in] ivar 入力の変数
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
-// @param[in] fval 故障値
 void
-make_flt_cnf(SatSolver& solver,
-	     VarId ivar,
-	     VarId fvar,
-	     VarId ovar,
-	     int vval)
+make_flt0_cnf(SatSolver& solver,
+	      VarId ivar,
+	      VarId fvar,
+	      VarId ovar)
 {
-  Literal l0(ivar, false);
-  Literal l1(fvar, false);
-  Literal l2(ovar, false);
-  if ( vval == 0 ) {
-    solver.add_clause( l0, ~l2);
-    solver.add_clause(~l1, ~l2);
-    solver.add_clause(~l0,  l1, l2);
-  }
-  else {
-    solver.add_clause(~l0, l2);
-    solver.add_clause(~l1, l2);
-    solver.add_clause( l0, l1, ~l2);
-  }
+  Literal ilit(ivar, false);
+  Literal flit(fvar, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause( ilit,        ~olit);
+  solver.add_clause(       ~flit, ~olit);
+  solver.add_clause(~ilit,  flit,  olit);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar 故障変数
+// @param[in] ovar 出力の変数
+void
+make_flt1_cnf(SatSolver& solver,
+	      VarId ivar,
+	      VarId fvar,
+	      VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal flit(fvar, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause(~ilit,         olit);
+  solver.add_clause(       ~flit,  olit);
+  solver.add_clause( ilit,  flit, ~olit);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar0 故障変数
+// @param[in] fvar1 故障変数
+// @param[in] ovar 出力の変数
+void
+make_flt01_cnf(SatSolver& solver,
+	       VarId ivar,
+	       VarId fvar0,
+	       VarId fvar1,
+	       VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal f0lit(fvar0, false);
+  Literal f1lit(fvar1, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause(       ~f0lit,         ~olit);
+  solver.add_clause(               ~f1lit,  olit);
+  solver.add_clause( ilit,  f0lit,  f1lit, ~olit);
+  solver.add_clause(~ilit,  f0lit,  f1lit,  olit);
 }
 
 END_NONAMESPACE
@@ -102,18 +138,68 @@ SatEngineMulti::set_option(const string& option_str)
   }
 }
 
+BEGIN_NONAMESPACE
+
+struct FnodeInfo
+{
+  FnodeInfo(ymuint ni) :
+    mO0(0),
+    mO1(0),
+    mI0(ni, 0),
+    mI1(ni, 0)
+  {
+  }
+
+  ymuint32 mO0;
+  ymuint32 mO1;
+
+  vector<ymuint32> mI0;
+  vector<ymuint32> mI1;
+};
+
+END_NONAMESPACE
+
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
 void
 SatEngineMulti::run(const vector<TpgFault*>& flist,
-		    const vector<TpgNode*>& fnode_list,
 		    ymuint max_id,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop)
 {
   cnf_begin();
+
+  vector<FnodeInfo*> fnode_info(max_id, NULL);
+  vector<TpgNode*> fnode_list;
+  for (ymuint i = 0; i < flist.size(); ++ i) {
+    TpgFault* f = flist[i];
+    int fval = f->val();
+    TpgNode* node = f->node();
+    if ( fnode_info[node->id()] == NULL ) {
+      fnode_info[node->id()] = new FnodeInfo(node->fanin_num());
+      fnode_list.push_back(node);
+    }
+    FnodeInfo* finfo = fnode_info[node->id()];
+    if ( f->is_output_fault() ) {
+      if ( fval == 0 ) {
+	finfo->mO0 = i + 1;
+      }
+      else {
+	finfo->mO1 = i + 1;
+      }
+    }
+    else {
+      ymuint pos = f->pos();
+      if ( fval == 0 ) {
+	finfo->mI0[pos] = i + 1;
+      }
+      else {
+	finfo->mI1[pos] = i + 1;
+      }
+    }
+  }
 
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
@@ -125,11 +211,8 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
 
   // 故障を活性化するとき true にする変数．
   vector<VarId> flt_var(nf);
-  // 故障挿入回路の出力に対応する変数．
-  vector<VarId> tmp_var(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     flt_var[i] = solver.new_var();
-    tmp_var[i] = solver.new_var();
   }
 
 
@@ -147,29 +230,69 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
 
-    // ovar に出力変数を入れる．
-    // こちらは入力の故障と異なり，故障挿入回路の出力が node->fvar() となる．
-    // 逆に ovar はゲートの直接の出力変数となる．
-    VarId ovar = node->fvar();
-    for (ymuint fid = 0; fid < nf; ++ fid) {
-      if ( fnode_list[fid] == node ) {
-	make_flt_cnf(solver, tmp_var[fid], flt_var[fid], ovar, flist[fid]->val());
-	ovar = tmp_var[fid];
+    FnodeInfo* finfo = fnode_info[node->id()];
+    if ( finfo != NULL ) {
+      ymuint ni = node->fanin_num();
+      vector<VarId> ivars(ni);
+      for (ymuint i = 0; i < ni; ++ i) {
+	TpgNode* inode = node->fanin(i);
+	ymuint32 f0_id = finfo->mI0[i];
+	ymuint32 f1_id = finfo->mI1[i];
+	if ( f0_id == 0 ) {
+	  if ( f1_id == 0 ) {
+	    ivars[i] = inode->fvar();
+	  }
+	  else {
+	    VarId tmp_var = solver.new_var();
+	    make_flt1_cnf(solver, inode->fvar(), flt_var[f1_id - 1], tmp_var);
+	    ivars[i] = tmp_var;
+	  }
+	}
+	else {
+	  if ( f1_id == 0 ) {
+	    VarId tmp_var = solver.new_var();
+	    make_flt0_cnf(solver, inode->fvar(), flt_var[f0_id - 1], tmp_var);
+	    ivars[i] = tmp_var;
+	  }
+	  else {
+	    VarId tmp_var = solver.new_var();
+	    make_flt01_cnf(solver, inode->fvar(), flt_var[f0_id - 1], flt_var[f1_id - 1], tmp_var);
+	    ivars[i] = tmp_var;
+	  }
+	}
       }
+
+      ymuint32 f0_id = finfo->mO0;
+      ymuint32 f1_id = finfo->mO1;
+      VarId ovar = node->fvar();
+      if ( f0_id == 0 ) {
+	if ( f1_id == 0 ) {
+	  ;
+	}
+	else {
+	  ovar = solver.new_var();
+	  make_flt1_cnf(solver, ovar, flt_var[f1_id - 1], node->fvar());
+	}
+      }
+      else {
+	if ( f1_id == 0 ) {
+	  ovar = solver.new_var();
+	  make_flt0_cnf(solver, ovar, flt_var[f0_id - 1], node->fvar());
+	}
+	else {
+	  ovar = solver.new_var();
+	  make_flt01_cnf(solver, ovar, flt_var[f0_id - 1], flt_var[f1_id - 1], node->fvar());
+	}
+      }
+      make_node_cnf(solver, node, Fvar3LitMap(ivars, ovar));
+    }
+    else {
+      make_fnode_cnf(solver, node);
     }
 
     Literal glit(node->gvar(), false);
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
-
-    Literal olit(ovar, false);
-    if ( node->is_input() ) {
-      solver.add_clause(~glit,  olit);
-      solver.add_clause( glit, ~olit);
-    }
-    else {
-      make_fnode_cnf(solver, node, ovar);
-    }
 
     if ( mTgGrasp ) {
       // XOR(glit, flit, dlit) を追加する．
@@ -181,7 +304,39 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       solver.add_clause( glit, ~flit,  dlit);
 
       if ( mExtTgGrasp ) {
-	make_dlit_cnf(solver, node, fnode_list, flt_var);
+	FnodeInfo* finfo = fnode_info[node->id()];
+	if ( finfo != NULL ) {
+
+	  // 全てのファンインに故障差が伝搬していなければ
+	  // このゲートの出力にも故障差は伝搬しない．
+	  // ただし，このゲートの出力に故障がある場合を
+	  // 考慮しなければならない．
+	  ymuint ni = node->fanin_num();
+	  tmp_lits_begin(ni * 3 + 3);
+	  tmp_lits_add(~dlit);
+	  if ( finfo->mO0 > 0 ) {
+	    tmp_lits_add(Literal(flt_var[finfo->mO0 - 1], false));
+	  }
+	  if ( finfo->mO1 > 0 ) {
+	    tmp_lits_add(Literal(flt_var[finfo->mO1 - 1], false));
+	  }
+	  for (ymuint i = 0; i < ni; ++ i) {
+	    TpgNode* inode = node->fanin(i);
+	    if ( inode->has_fvar() ) {
+	      Literal idlit(inode->dvar(), false);
+	      tmp_lits_add(idlit);
+	    }
+	    if ( finfo->mI0[i] > 0 ) {
+	      tmp_lits_add(Literal(flt_var[finfo->mI0[i] - 1], false));
+	    }
+	    if ( finfo->mI1[i] > 0 ) {
+	      tmp_lits_add(Literal(flt_var[finfo->mI1[i] - 1], false));
+	    }
+	  }
+	}
+	else {
+	  make_dlit_cnf(solver, node);
+	}
       }
     }
     else {
@@ -236,7 +391,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       tmp_lits_add(Literal(flt_var[j], inv));
     }
 
-    TpgNode* fnode = fnode_list[fid];
+    TpgNode* fnode = flist[fid]->node();
 
     // 故障ノードの TFO 以外の dlit を0にする．
     mTmpNodeList.clear();
@@ -279,12 +434,13 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       tmp_lits_add(Literal(f->node()->dvar(), false));
     }
 
-    bool inv = (f->val() == 0);
-    tmp_lits_add(Literal(fnode->fvar(), inv));
-
     solve(solver, f, bt, dop, uop);
   }
   clear_node_mark();
+
+  for (ymuint i = 0; i < fnode_list.size(); ++ i) {
+    delete fnode_info[i];
+  }
 }
 
 END_NAMESPACE_YM_SATPG

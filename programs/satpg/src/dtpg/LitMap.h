@@ -147,6 +147,49 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class Fvar3LitMap LitMap.h "LitMap.h"
+/// @brief すべての変数を指定した FvarLitMap
+//////////////////////////////////////////////////////////////////////
+class Fvar3LitMap :
+  public LitMap
+{
+public:
+
+  /// @brief コンストラクタ
+  Fvar3LitMap(const vector<VarId>& ivars,
+	      VarId ovar);
+
+  /// @brief 出力のリテラルを返す．
+  virtual
+  Literal
+  output() const;
+
+  /// @brief 入力のリテラルを返す．
+  virtual
+  Literal
+  input(ymuint pos) const;
+
+  /// @brief 入力数を返す．
+  virtual
+  ymuint
+  input_size() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 入力の変数
+  vector<VarId> mIvars;
+
+  // 出力の変数
+  VarId mOvar;
+
+};
+
 END_NAMESPACE_YM_SATPG
 
 #endif // LITMAP_H

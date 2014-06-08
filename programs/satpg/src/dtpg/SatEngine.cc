@@ -298,7 +298,15 @@ SatEngine::make_fnode_cnf(SatSolver& solver,
 			  TpgNode* node,
 			  VarId ovar)
 {
-  make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+  if ( node->is_input() ) {
+    Literal glit(node->gvar(), false);
+    Literal olit(ovar, false);
+    solver.add_clause(~glit,  olit);
+    solver.add_clause( glit, ~olit);
+  }
+  else {
+    make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+  }
 }
 
 // @brief 故障ゲートの CNF を作る．
