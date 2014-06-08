@@ -77,13 +77,13 @@ SatEngineSingle2::set_option(const string& option_str)
 void
 SatEngineSingle2::run(TpgNetwork& network,
 		      TpgFault* fault,
-		      TpgNode* fnode,
-		      int fval,
-		      ymuint max_id,
 		      BackTracer& bt,
 		      DetectOp& dop,
 		      UntestOp& uop)
 {
+  TpgNode* fnode = fault->node();
+  int fval = fault->val();
+  ymuint max_id = network.max_node_id();
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
   bt.set_max_id(max_id);
@@ -135,8 +135,11 @@ SatEngineSingle2::run(TpgNetwork& network,
       solver.add_clause( glit, ~flit,  dlit);
       solver.add_clause( glit,  flit, ~dlit);
 
-      if ( node != fnode ) {
-	// 故障回路のゲートの入出力関係を表すCNFを作る．
+      // 故障回路のゲートの入出力関係を表すCNFを作る．
+      if ( node == fnode ) {
+	make_fault_cnf(solver, fault);
+      }
+      else {
 	make_fnode_cnf(solver, node);
 
 	make_dlit_cnf(solver, node);
@@ -164,11 +167,6 @@ SatEngineSingle2::run(TpgNetwork& network,
 	tmp_lits_add(Literal(node->dvar(), false));
       }
     }
-
-    // fnode の dlit を1と仮定しているので
-    // ここでは fvar か gvar のどちらかを仮定すればよい．
-    bool inv = (fval == 0);
-    solver.add_clause(Literal(fnode->fvar(), inv));
 
     last_ans = _solve(solver, time);
 

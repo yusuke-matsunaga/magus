@@ -71,20 +71,21 @@ SatEngineSingle::set_option(const string& option_str)
 // @param[in] max_id ノード番号の最大値 + 1
 void
 SatEngineSingle::run(TpgFault* fault,
-		     TpgNode* fnode,
-		     int fval,
 		     ymuint max_id,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop)
 {
-  cnf_begin();
+  TpgNode* fnode = fault->node();
+  int fval = fault->val();
 
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
   bt.set_max_id(max_id);
 
   mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
+
+  cnf_begin();
 
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
@@ -104,8 +105,11 @@ SatEngineSingle::run(TpgFault* fault,
     Literal flit(node->fvar(), false);
     Literal dlit(node->dvar(), false);
 
-    if ( node != fnode ) {
-      // 故障回路のゲートの入出力関係を表すCNFを作る．
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      make_fault_cnf(solver, fault);
+    }
+    else {
       make_fnode_cnf(solver, node);
     }
 
@@ -168,11 +172,6 @@ SatEngineSingle::run(TpgFault* fault,
   else {
     solver.add_clause(Literal(fnode->dvar(), false));
   }
-
-  // fnode の dlit を1と仮定しているので
-  // ここでは fvar か gvar のどちらかを仮定すればよい．
-  bool inv = (fval == 0);
-  solver.add_clause(Literal(fnode->fvar(), inv));
 
   cnf_end();
 

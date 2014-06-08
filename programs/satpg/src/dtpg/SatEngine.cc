@@ -301,6 +301,165 @@ SatEngine::make_fnode_cnf(SatSolver& solver,
   make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
 }
 
+// @brief 故障ゲートの CNF を作る．
+void
+SatEngine::make_fault_cnf(SatSolver& solver,
+			  TpgFault* fault)
+{
+  TpgNode* node = fault->node();
+  int fval = fault->val();
+
+  if ( fault->is_output_fault() ) {
+    Literal flit(node->fvar(), false);
+    if ( fval == 0 ) {
+      solver.add_clause(~flit);
+    }
+    else {
+      solver.add_clause(flit);
+    }
+  }
+  else {
+    ymuint fpos = fault->pos();
+
+    Literal output(node->fvar(), false);
+
+    ymuint ni = node->fanin_num();
+    vector<Literal> ilit;
+    ilit.reserve(ni - 1);
+    for (ymuint i = 0; i < ni; ++ i) {
+      if ( i == fpos ) {
+	continue;
+      }
+      TpgNode* inode = node->fanin(i);
+      ilit.push_back(Literal(inode->gvar(), false));
+    }
+
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+
+    case kTgGateNand:
+      output = ~output;
+      // わざと次に続く
+
+    case kTgGateAnd:
+      assert_cond( fval == 1, __FILE__, __LINE__);
+      switch ( ni ) {
+      case 2:
+	solver.add_clause(~ilit[0], output);
+	break;
+
+      case 3:
+	solver.add_clause(~ilit[0], ~ilit[1], output);
+	break;
+
+      case 4:
+	solver.add_clause(~ilit[0], ~ilit[1], ~ilit[2], output);
+	break;
+
+      default:
+	{
+	  vector<Literal> tmp(ni);
+	  for (ymuint i = 0; i < ni - 1; ++ i) {
+	    tmp[i] = ~ilit[i];
+	  }
+	  tmp[ni - 1] = output;
+	  solver.add_clause(tmp);
+	}
+	break;
+      }
+      for (ymuint i = 0; i < ni - 1; ++ i) {
+	solver.add_clause(ilit[i], ~output);
+      }
+      break;
+
+    case kTgGateNor:
+      output = ~output;
+      // わざと次に続く
+
+    case kTgGateOr:
+      assert_cond( fval == 0, __FILE__, __LINE__);
+      switch ( ni ) {
+      case 2:
+	solver.add_clause(ilit[0], ~output);
+	break;
+
+      case 3:
+	solver.add_clause(ilit[0], ilit[1], ~output);
+	break;
+
+      case 4:
+	solver.add_clause(ilit[0], ilit[1], ilit[2], ~output);
+	break;
+
+      default:
+	{
+	  vector<Literal> tmp(ni);
+	  for (ymuint i = 0; i < ni - 1; ++ i) {
+	    tmp[i] = ilit[i];
+	  }
+	  tmp[ni - 1] = ~output;
+	  solver.add_clause(tmp);
+	}
+	break;
+      }
+      for (ymuint i = 0; i < ni - 1; ++ i) {
+	solver.add_clause(~ilit[i], output);
+      }
+      break;
+
+    case kTgGateXnor:
+      output = ~output;
+      // わざと次に続く
+
+    case kTgGateXor:
+      if ( fval == 1 ) {
+	output = ~output;
+      }
+      if ( ni == 2 ) {
+	solver.add_clause(~ilit[0],  output);
+	solver.add_clause( ilit[0], ~output);
+      }
+      else if ( ni == 3 ) {
+	solver.add_clause(~ilit[0],  ilit[1],  output);
+	solver.add_clause( ilit[0], ~ilit[1],  output);
+	solver.add_clause( ilit[0],  ilit[1], ~output);
+	solver.add_clause(~ilit[0], ~ilit[1], ~output);
+      }
+      else {
+	vector<Literal> tmp(ni);
+	ymuint nip = (1U << (ni - 1));
+	for (ymuint p = 0; p < nip; ++ p) {
+	  ymuint c = 0;
+	  for (ymuint i = 0; i < ni - 1; ++ i) {
+	    if ( p & (1U << i) ) {
+	      tmp[i] = ilit[i];
+	    }
+	    else {
+	      tmp[i] = ~ilit[i];
+	      ++ c;
+	    }
+	  }
+	  if ( (c % 2) == 0 ) {
+	    tmp[ni - 1] = ~output;
+	  }
+	  else {
+	    tmp[ni - 1] = output;
+	  }
+	  solver.add_clause(tmp);
+	}
+      }
+      break;
+
+    default:
+      assert_not_reached(__FILE__, __LINE__);
+      break;
+    }
+  }
+}
+
 // @brief ノードの入出力の関係を表す CNF を作る．
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード
@@ -325,15 +484,18 @@ SatEngine::make_node_cnf(SatSolver& solver,
 
   ymuint ni = node->fanin_num();
   switch ( node->gate_type() ) {
+  case kTgGateNot:
+    output = ~output;
+    // わざと次に続く
+
   case kTgGateBuff:
     solver.add_clause( litmap.input(0), ~output);
     solver.add_clause(~litmap.input(0),  output);
     break;
 
-  case kTgGateNot:
-    solver.add_clause( litmap.input(0),  output);
-    solver.add_clause(~litmap.input(0), ~output);
-    break;
+  case kTgGateNand:
+    output = ~output;
+    // わざと次に続く
 
   case kTgGateAnd:
     switch ( ni ) {
@@ -365,35 +527,9 @@ SatEngine::make_node_cnf(SatSolver& solver,
     }
     break;
 
-  case kTgGateNand:
-    switch ( ni ) {
-    case 2:
-      solver.add_clause(~litmap.input(0), ~litmap.input(1), ~output);
-      break;
-
-    case 3:
-      solver.add_clause(~litmap.input(0), ~litmap.input(1), ~litmap.input(2), ~output);
-      break;
-
-    case 4:
-      solver.add_clause(~litmap.input(0), ~litmap.input(1), ~litmap.input(2), ~litmap.input(3), ~output);
-      break;
-
-    default:
-      {
-	vector<Literal> tmp(ni + 1);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  tmp[i] = ~litmap.input(i);
-	}
-	tmp[ni] = ~output;
-	solver.add_clause(tmp);
-      }
-      break;
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      solver.add_clause(litmap.input(i), output);
-    }
-    break;
+  case kTgGateNor:
+    output = ~output;
+    // わざと次に続く
 
   case kTgGateOr:
     switch ( ni ) {
@@ -425,35 +561,9 @@ SatEngine::make_node_cnf(SatSolver& solver,
     }
     break;
 
-  case kTgGateNor:
-    switch ( ni ) {
-    case 2:
-      solver.add_clause(litmap.input(0), litmap.input(1), output);
-      break;
-
-    case 3:
-      solver.add_clause(litmap.input(0), litmap.input(1), litmap.input(2), output);
-      break;
-
-    case 4:
-      solver.add_clause(litmap.input(0), litmap.input(1), litmap.input(2), litmap.input(3), output);
-      break;
-
-    default:
-      {
-	vector<Literal> tmp(ni + 1);
-	for (ymuint i = 0; i < ni; ++ i) {
-	  tmp[i] = litmap.input(i);
-	}
-	tmp[ni] = output;
-	solver.add_clause(tmp);
-      }
-      break;
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      solver.add_clause(~litmap.input(i), ~output);
-    }
-    break;
+  case kTgGateXnor:
+    output = ~output;
+    // わざと次に続く
 
   case kTgGateXor:
     if ( ni == 2 ) {
@@ -481,38 +591,6 @@ SatEngine::make_node_cnf(SatSolver& solver,
 	}
 	else {
 	  tmp[ni] = output;
-	}
-	solver.add_clause(tmp);
-      }
-    }
-    break;
-
-  case kTgGateXnor:
-    if ( ni == 2 ) {
-      solver.add_clause(~litmap.input(0),  litmap.input(1), ~output);
-      solver.add_clause( litmap.input(0), ~litmap.input(1), ~output);
-      solver.add_clause( litmap.input(0),  litmap.input(1),  output);
-      solver.add_clause(~litmap.input(0), ~litmap.input(1),  output);
-    }
-    else {
-      vector<Literal> tmp(ni + 1);
-      ymuint nip = (1U << ni);
-      for (ymuint p = 0; p < nip; ++ p) {
-	ymuint c = 0;
-	for (ymuint i = 0; i < ni; ++ i) {
-	  if ( p & (1U << i) ) {
-	    tmp[i] = litmap.input(i);
-	  }
-	  else {
-	    tmp[i] = ~litmap.input(i);
-	    ++ c;
-	  }
-	}
-	if ( (c % 2) == 0 ) {
-	  tmp[ni] = output;
-	}
-	else {
-	  tmp[ni] = ~output;
 	}
 	solver.add_clause(tmp);
       }

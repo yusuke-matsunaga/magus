@@ -95,23 +95,11 @@ private:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  dtpg_single1(TpgNetwork& network,
-	       TpgFault* f,
-	       BackTracer& bt,
-	       DetectOp& dop,
-	       UntestOp& uop);
-
-  /// @brief 一つの故障に対してテストパタン生成を行う．
-  /// @param[in] f 故障
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  dtpg_single2(TpgNetwork& network,
-	       TpgFault* f,
-	       BackTracer& bt,
-	       DetectOp& dop,
-	       UntestOp& uop);
+  dtpg_single(TpgNetwork& network,
+	      TpgFault* f,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー

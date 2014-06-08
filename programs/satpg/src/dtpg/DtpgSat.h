@@ -187,17 +187,6 @@ private:
 	      DetectOp& dop,
 	      UntestOp& uop);
 
-  /// @brief 一つの故障に対してテストパタン生成を行う．
-  /// @param[in] f 故障
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  dtpg_single2(TpgFault* f,
-	       BackTracer& bt,
-	       DetectOp& dop,
-	       UntestOp& uop);
-
   /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
   /// @param[in] f0 0縮退故障
   /// @param[in] f1 1縮退故障

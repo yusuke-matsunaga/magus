@@ -177,6 +177,12 @@ protected:
 		 TpgNode* node,
 		 VarId ovar);
 
+  /// @brief 故障ゲートの CNF を作る．
+  static
+  void
+  make_fault_cnf(SatSolver& solver,
+		 TpgFault* fault);
+
   /// @brief ノードの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
   /// @param[in] node 対象のノード

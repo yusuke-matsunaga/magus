@@ -49,9 +49,6 @@ public:
   void
   run(TpgNetwork& network,
       TpgFault* f_tgt,
-      TpgNode* fnode,
-      int val,
-      ymuint max_id,
       BackTracer& bt,
       DetectOp& dop,
       UntestOp& uop);

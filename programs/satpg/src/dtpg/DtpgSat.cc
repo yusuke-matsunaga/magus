@@ -518,10 +518,10 @@ DtpgSat::single_mode(BackTracer& bt,
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TpgFault* f0 = node->input_fault(0, j);
-      dtpg_single2(f0, bt, dop, uop);
+      dtpg_single(f0, bt, dop, uop);
 
       TpgFault* f1 = node->input_fault(1, j);
-      dtpg_single2(f1, bt, dop, uop);
+      dtpg_single(f1, bt, dop, uop);
     }
   }
 }
@@ -751,27 +751,7 @@ DtpgSat::dtpg_single(TpgFault* f,
        f->is_rep() &&
        f->status() != kFsDetected &&
        !f->is_skip() ) {
-    mSatEngineSingle.run(f, f->node(), f->val(), mNetwork->max_node_id(),
-			 bt, dop, uop);
-  }
-}
-
-// @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] f 故障
-void
-DtpgSat::dtpg_single2(TpgFault* f,
-		      BackTracer& bt,
-		      DetectOp& dop,
-		      UntestOp& uop)
-{
-  if ( f != NULL &&
-       f->is_rep() &&
-       f->status() != kFsDetected &&
-       !f->is_skip() ) {
-    mNetwork->begin_fault_injection();
-    TpgNode* fnode = mNetwork->inject_fnode(f->node(), f->pos());
-    mSatEngineSingle.run(f, fnode, f->val(), mNetwork->max_node_id(), bt, dop, uop);
-    mNetwork->end_fault_injection();
+    mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
   }
 }
 

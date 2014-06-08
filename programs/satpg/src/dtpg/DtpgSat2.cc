@@ -98,19 +98,19 @@ DtpgSat2::single_mode(TpgNetwork& tgnetwork,
 
     // 出力の故障
     TpgFault* f0 = node->output_fault(0);
-    dtpg_single1(tgnetwork, f0, bt, dop, uop);
+    dtpg_single(tgnetwork, f0, bt, dop, uop);
 
     TpgFault* f1 = node->output_fault(1);
-    dtpg_single1(tgnetwork, f1, bt, dop, uop);
+    dtpg_single(tgnetwork, f1, bt, dop, uop);
 
     // 入力の故障
     ymuint ni = node->fanin_num();
     for (ymuint j = 0; j < ni; ++ j) {
       TpgFault* f0 = node->input_fault(0, j);
-      dtpg_single2(tgnetwork, f0, bt, dop, uop);
+      dtpg_single(tgnetwork, f0, bt, dop, uop);
 
       TpgFault* f1 = node->input_fault(1, j);
-      dtpg_single2(tgnetwork, f1, bt, dop, uop);
+      dtpg_single(tgnetwork, f1, bt, dop, uop);
     }
   }
 
@@ -120,44 +120,17 @@ DtpgSat2::single_mode(TpgNetwork& tgnetwork,
 // @brief 一つの故障に対してテストパタン生成を行う．
 // @param[in] f 故障
 void
-DtpgSat2::dtpg_single1(TpgNetwork& network,
-		       TpgFault* fault,
-		       BackTracer& bt,
-		       DetectOp& dop,
-		       UntestOp& uop)
+DtpgSat2::dtpg_single(TpgNetwork& network,
+		      TpgFault* fault,
+		      BackTracer& bt,
+		      DetectOp& dop,
+		      UntestOp& uop)
 {
   if ( fault != NULL &&
        fault->is_rep() &&
        fault->status() != kFsDetected &&
        !fault->is_skip() ) {
-    TpgNode* fnode = fault->node();
-    int fval = fault->val();
-    ymuint max_id = network.max_node_id();
-    mSatEngineSingle.run(network, fault, fnode, fval, max_id,
-			 bt, dop, uop);
- }
-}
-
-// @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] f 故障
-void
-DtpgSat2::dtpg_single2(TpgNetwork& network,
-		       TpgFault* fault,
-		       BackTracer& bt,
-		       DetectOp& dop,
-		       UntestOp& uop)
-{
-  if ( fault != NULL &&
-       fault->is_rep() &&
-       fault->status() != kFsDetected &&
-       !fault->is_skip() ) {
-    network.begin_fault_injection();
-    TpgNode* fnode = network.inject_fnode(fault->node(), fault->pos());
-    int fval = fault->val();
-    ymuint max_id = network.max_node_id();
-    mSatEngineSingle.run(network, fault, fnode, fval, max_id,
-			 bt, dop, uop);
-    network.end_fault_injection();
+    mSatEngineSingle.run(network, fault, bt, dop, uop);
  }
 }
 
