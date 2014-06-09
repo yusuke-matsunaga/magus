@@ -24,34 +24,6 @@ BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar 故障変数
-// @param[in] ovar 出力の変数
-// @param[in] fval 故障値
-void
-make_flt_cnf(SatSolver& solver,
-	     VarId ivar,
-	     VarId fvar,
-	     VarId ovar,
-	     int vval)
-{
-  Literal l0(ivar, false);
-  Literal l1(fvar, false);
-  Literal l2(ovar, false);
-  if ( vval == 0 ) {
-    solver.add_clause( l0, ~l2);
-    solver.add_clause(~l1, ~l2);
-    solver.add_clause(~l0,  l1, l2);
-  }
-  else {
-    solver.add_clause(~l0, l2);
-    solver.add_clause(~l1, l2);
-    solver.add_clause( l0, l1, ~l2);
-  }
-}
-
 // @brief ノードに正常回路用の変数を設定する．
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
@@ -102,11 +74,6 @@ SatEngine::set_mode(const string& type,
   mOption = option;
   mOutP = outp;
 }
-
-
-BEGIN_NONAMESPACE
-
-END_NONAMESPACE
 
 // @brief 統計情報をクリアする．
 void
@@ -798,6 +765,70 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
   }
 
   tmp_lits_end(solver);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar 故障変数
+// @param[in] ovar 出力の変数
+void
+SatEngine::make_flt0_cnf(SatSolver& solver,
+			 VarId ivar,
+			 VarId fvar,
+			 VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal flit(fvar, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause( ilit,        ~olit);
+  solver.add_clause(       ~flit, ~olit);
+  solver.add_clause(~ilit,  flit,  olit);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar 故障変数
+// @param[in] ovar 出力の変数
+void
+SatEngine::make_flt1_cnf(SatSolver& solver,
+			 VarId ivar,
+			 VarId fvar,
+			 VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal flit(fvar, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause(~ilit,         olit);
+  solver.add_clause(       ~flit,  olit);
+  solver.add_clause( ilit,  flit, ~olit);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar0 故障変数
+// @param[in] fvar1 故障変数
+// @param[in] ovar 出力の変数
+void
+SatEngine::make_flt01_cnf(SatSolver& solver,
+			  VarId ivar,
+			  VarId fvar0,
+			  VarId fvar1,
+			  VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal f0lit(fvar0, false);
+  Literal f1lit(fvar1, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause(       ~f0lit,         ~olit);
+  solver.add_clause(               ~f1lit,  olit);
+  solver.add_clause( ilit,  f0lit,  f1lit, ~olit);
+  solver.add_clause(~ilit,  f0lit,  f1lit,  olit);
 }
 
 // @brief 一つの SAT問題を解く．

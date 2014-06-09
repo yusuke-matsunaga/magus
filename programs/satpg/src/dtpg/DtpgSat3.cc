@@ -211,25 +211,7 @@ DtpgSat3::do_dtpg(TpgNetwork& network,
     return;
   }
 
-  vector<TpgNode*> fnode_list;
-  fnode_list.reserve(mFaultList.size());
-  network.begin_fault_injection();
-  for (vector<TpgFault*>::iterator p = mFaultList.begin();
-       p != mFaultList.end(); ++ p) {
-    TpgFault* f = *p;
-    TpgNode* node = f->node();
-    if ( f->is_input_fault() ) {
-      TpgNode* fnode = network.inject_fnode(node, f->pos());
-      fnode_list.push_back(fnode);
-    }
-    else {
-      fnode_list.push_back(node);
-    }
-  }
-
-  mSatEngineM.run(mFaultList, fnode_list, network.max_node_id(), bt, dop, uop);
-
-  network.end_fault_injection();
+  mSatEngineM.run(mFaultList, network.max_node_id(), bt, dop, uop);
 }
 
 END_NAMESPACE_YM_SATPG

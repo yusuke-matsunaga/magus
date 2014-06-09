@@ -216,7 +216,7 @@ AtpgMgr::dtpg(DtpgMode mode,
   if ( mode.mode() == kDtpgSingle2 || mode.mode() == kDtpgMFFC2 ) {
     mDtpg2->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
   }
-  else if ( mode.mode() == kDtpgSingle && po_mode == kDtpgPoInc ) {
+  else if ( (mode.mode() == kDtpgSingle || mode.mode() == kDtpgFFR) && po_mode == kDtpgPoInc ) {
     mDtpg3->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
   }
   else {

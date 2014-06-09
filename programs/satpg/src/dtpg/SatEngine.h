@@ -205,6 +205,44 @@ protected:
 		const vector<TpgNode*>& fnode_list,
 		const vector<VarId>& flt_var);
 
+  /// @brief 故障挿入回路を表す CNF 式を作る．
+  /// @param[in] solver SAT ソルバー
+  /// @param[in] ivar 入力の変数
+  /// @param[in] fvar 故障変数
+  /// @param[in] ovar 出力の変数
+  static
+  void
+  make_flt0_cnf(SatSolver& solver,
+		VarId ivar,
+		VarId fvar,
+		VarId ovar);
+
+  /// @brief 故障挿入回路を表す CNF 式を作る．
+  /// @param[in] solver SAT ソルバー
+  /// @param[in] ivar 入力の変数
+  /// @param[in] fvar 故障変数
+  /// @param[in] ovar 出力の変数
+  static
+  void
+  make_flt1_cnf(SatSolver& solver,
+		VarId ivar,
+		VarId fvar,
+		VarId ovar);
+
+  /// @brief 故障挿入回路を表す CNF 式を作る．
+  /// @param[in] solver SAT ソルバー
+  /// @param[in] ivar 入力の変数
+  /// @param[in] fvar0 故障変数
+  /// @param[in] fvar1 故障変数
+  /// @param[in] ovar 出力の変数
+  static
+  void
+  make_flt01_cnf(SatSolver& solver,
+		 VarId ivar,
+		 VarId fvar0,
+		 VarId fvar1,
+		 VarId ovar);
+
   /// @brief 一つの SAT問題を解く．
   Bool3
   solve(SatSolver& solver,

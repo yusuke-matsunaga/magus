@@ -22,75 +22,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-BEGIN_NONAMESPACE
-
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar 故障変数
-// @param[in] ovar 出力の変数
-void
-make_flt0_cnf(SatSolver& solver,
-	      VarId ivar,
-	      VarId fvar,
-	      VarId ovar)
-{
-  Literal ilit(ivar, false);
-  Literal flit(fvar, false);
-  Literal olit(ovar, false);
-
-  solver.add_clause( ilit,        ~olit);
-  solver.add_clause(       ~flit, ~olit);
-  solver.add_clause(~ilit,  flit,  olit);
-}
-
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar 故障変数
-// @param[in] ovar 出力の変数
-void
-make_flt1_cnf(SatSolver& solver,
-	      VarId ivar,
-	      VarId fvar,
-	      VarId ovar)
-{
-  Literal ilit(ivar, false);
-  Literal flit(fvar, false);
-  Literal olit(ovar, false);
-
-  solver.add_clause(~ilit,         olit);
-  solver.add_clause(       ~flit,  olit);
-  solver.add_clause( ilit,  flit, ~olit);
-}
-
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar0 故障変数
-// @param[in] fvar1 故障変数
-// @param[in] ovar 出力の変数
-void
-make_flt01_cnf(SatSolver& solver,
-	       VarId ivar,
-	       VarId fvar0,
-	       VarId fvar1,
-	       VarId ovar)
-{
-  Literal ilit(ivar, false);
-  Literal f0lit(fvar0, false);
-  Literal f1lit(fvar1, false);
-  Literal olit(ovar, false);
-
-  solver.add_clause(       ~f0lit,         ~olit);
-  solver.add_clause(               ~f1lit,  olit);
-  solver.add_clause( ilit,  f0lit,  f1lit, ~olit);
-  solver.add_clause(~ilit,  f0lit,  f1lit,  olit);
-}
-
-END_NONAMESPACE
-
-
 // @brief コンストラクタ
 SatEngineMulti::SatEngineMulti()
 {
@@ -171,9 +102,16 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
 {
   cnf_begin();
 
+  SatSolver solver(sat_type(), sat_option(), sat_outp());
+
+  bt.set_max_id(max_id);
+
+  ymuint nf = flist.size();
+
   vector<FnodeInfo*> fnode_info(max_id, NULL);
   vector<TpgNode*> fnode_list;
-  for (ymuint i = 0; i < flist.size(); ++ i) {
+  fnode_list.reserve(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
     TpgFault* f = flist[i];
     int fval = f->val();
     TpgNode* node = f->node();
@@ -201,19 +139,13 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     }
   }
 
-  SatSolver solver(sat_type(), sat_option(), sat_outp());
-
-  bt.set_max_id(max_id);
-
-  mark_region(solver, fnode_list, max_id);
-
-  ymuint nf = flist.size();
-
   // 故障を活性化するとき true にする変数．
   vector<VarId> flt_var(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     flt_var[i] = solver.new_var();
   }
+
+  mark_region(solver, fnode_list, max_id);
 
 
   //////////////////////////////////////////////////////////////////////
