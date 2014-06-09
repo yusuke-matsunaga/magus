@@ -48,9 +48,7 @@ public:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  run(TpgNetwork& network,
-      const vector<TpgFault*>& flist,
-      const vector<TpgNode*>& fnode_list,
+  run(const vector<TpgFault*>& flist,
       ymuint max_id,
       BackTracer& bt,
       DetectOp& dop,
@@ -64,6 +62,9 @@ private:
 
   // TG-GRASP モード
   bool mTgGrasp;
+
+  // EXT-TG-GRASP モード
+  bool mExtTgGrasp;
 
   // unique sensitization を使う
   bool mUseDominator;

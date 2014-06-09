@@ -198,13 +198,6 @@ protected:
   make_dlit_cnf(SatSolver& solver,
 		TpgNode* node);
 
-  /// @brief ノードの故障差関数を表すCNFを作る．
-  void
-  make_dlit_cnf(SatSolver& solver,
-		TpgNode* node,
-		const vector<TpgNode*>& fnode_list,
-		const vector<VarId>& flt_var);
-
   /// @brief 故障挿入回路を表す CNF 式を作る．
   /// @param[in] solver SAT ソルバー
   /// @param[in] ivar 入力の変数

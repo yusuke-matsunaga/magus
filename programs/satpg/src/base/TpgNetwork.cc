@@ -645,6 +645,14 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       node->mImmDomMap = map_array;
     }
   }
+#if 0
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    TpgNode* node = &mNodeArray[i];
+    for (ymuint j = 0; j < output_num2(); ++ j) {
+      TpgNode* idom = node->imm_dom(j);
+    }
+  }
+#endif
 }
 
 // @brief デストラクタ
@@ -652,101 +660,6 @@ TpgNetwork::~TpgNetwork()
 {
   // このオブジェクトが確保したメモリは mAlloc のデストラクタが
   // 開放してくれる．
-}
-
-// @brief 故障挿入の開始
-void
-TpgNetwork::begin_fault_injection()
-{
-  mFnodeList.clear();
-}
-
-// @brief ブランチの故障用のダミーノードを挿入する．
-// @param[in] node 対象のノード
-// @param[in] ipos 入力位置
-// @return 挿入したノードを返す．
-TpgNode*
-TpgNetwork::inject_fnode(TpgNode* node,
-			 ymuint ipos)
-{
-  if ( node->fanin_num() == 1 ) {
-    // 自明なパタンその1
-    // ファンイン数が1のノードの入力の故障は
-    // 出力の故障と等価
-    assert_cond( ipos == 0, __FILE__, __LINE__);
-    assert_cond( node->gate_type() == kTgGateBuff, __FILE__, __LINE__);
-    return node;
-  }
-
-  TpgNode* src_node = node->fanin(ipos);
-  if ( src_node->mActFanoutNum == 1 ) {
-    // 自明なパタンその2
-    // 入力のソースとなるノードが自分にしかファンアウトしていない
-    // 場合にはソースの出力と等価
-    return src_node;
-  }
-
-  // そうでなければダミーノードを挿入する．
-  TpgNode* dummy_node = make_dummy_node();
-  mFnodeList.push_back(dummy_node);
-  node->mFanins[ipos] = dummy_node;
-  dummy_node->mFanoutNum = 1;
-  dummy_node->mFanouts[0] = node;
-  dummy_node->mActFanoutNum = 1;
-  dummy_node->mActFanouts[0] = node;
-  TFIbits_copy(dummy_node->mTFIbits, node->mTFIbits, tfibits_size());
-
-  for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
-    if ( src_node->mFanouts[i] == node ) {
-      src_node->mFanouts[i] = dummy_node;
-      break;
-    }
-  }
-  for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
-    if ( src_node->mActFanouts[i] == node ) {
-      src_node->mActFanouts[i] = dummy_node;
-      break;
-    }
-  }
-  dummy_node->mFanins[0] = src_node;
-  dummy_node->mImmDom = node;
-  dummy_node->mImmDomMap->mImmDom = node;
-
-  return dummy_node;
-}
-
-// @brief 挿入したダミーノードを削除する．
-void
-TpgNetwork::end_fault_injection()
-{
-  for (vector<TpgNode*>::iterator p = mFnodeList.begin();
-       p != mFnodeList.end(); ++ p) {
-    TpgNode* node = *p;
-    TpgNode* src_node = node->fanin(0);
-    TpgNode* dst_node = node->fanout(0);
-    for (ymuint i = 0; i < src_node->mActFanoutNum; ++ i) {
-      if ( src_node->mActFanouts[i] == node ) {
-	src_node->mActFanouts[i] = dst_node;
-	break;
-      }
-    }
-    for (ymuint i = 0; i < src_node->mFanoutNum; ++ i) {
-      if ( src_node->mFanouts[i] == node ) {
-	src_node->mFanouts[i] = dst_node;
-	break;
-      }
-    }
-    for (ymuint i = 0; i < dst_node->mFaninNum; ++ i) {
-      if ( dst_node->mFanins[i] == node ) {
-	dst_node->mFanins[i] = src_node;
-	break;
-      }
-    }
-    node->mFanoutNum = 0;
-    node->mActFanoutNum = 0;
-    mDummyNodeList.push_back(node);
-  }
-  mFnodeList.clear();
 }
 
 // @brief 一つの外部出力に関係するノードのみをアクティブにする．
@@ -1105,30 +1018,6 @@ TpgNetwork::make_prim_node(tTgGateType type,
     break;
   }
 
-  return node;
-}
-
-// @brief ダミーノード用の TpgNode を生成する．
-// @return 生成したノードを返す．
-TpgNode*
-TpgNetwork::make_dummy_node()
-{
-  // new_node() は使わない．
-  if ( mDummyNodeList.empty() ) {
-    void* p = mAlloc.get_memory(sizeof(TpgNode));
-    TpgNode* node = new (p) TpgNode();
-    node->mId = mMaxNodeId;
-    ++ mMaxNodeId;
-    init_node(node, 1, 1);
-    node->mTypeId = 6U | (static_cast<ymuint>(kTgGateBuff) << 3);
-    TpgNode::ImmDomMap* idmap = alloc_array<TpgNode::ImmDomMap>(mAlloc, 1);
-    idmap->mBitMask = alloc_array<ymuint64>(mAlloc, tfibits_size());
-    TFIbits_set_all(idmap->mBitMask, tfibits_size());
-    node->mImmDomMap = idmap;
-    return node;
-  }
-  TpgNode* node = mDummyNodeList.back();
-  mDummyNodeList.pop_back();
   return node;
 }
 
