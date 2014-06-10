@@ -50,20 +50,6 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
-  /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
-  /// @param[in] max_id ノード番号の最大値 + 1
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  run(const vector<TpgFault*>& flist,
-      const vector<TpgNode*>& fnode_list,
-      ymuint max_id,
-      BackTracer& bt,
-      DetectOp& dop,
-      UntestOp& uop);
-
   /// @brief 統計情報をクリアする．
   void
   clear_stats();
@@ -191,6 +177,16 @@ protected:
   void
   make_node_cnf(SatSolver& solver,
 		TpgNode* node,
+		const LitMap& litmap);
+
+  /// @brief ゲートの入出力の関係を表す CNF を作る．
+  /// @param[in] solver SATソルバ
+  /// @param[in] type ゲートの種類
+  /// @param[in] litmap 入出力のリテラルを保持するクラス
+  static
+  void
+  make_gate_cnf(SatSolver& solver,
+		tTgGateType type,
 		const LitMap& litmap);
 
   /// @brief ノードの故障差関数を表すCNFを作る．
