@@ -227,7 +227,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	make_flt01_cnf(solver, ovar, flt_var[f0_id - 1], flt_var[f1_id - 1], node->fvar());
       }
     }
-    make_node_cnf(solver, node, Fvar3LitMap(ivars, ovar));
+    Literal output(ovar, false);
+    make_node_cnf(solver, node, VectLitMap(ivars), output);
 
     Literal glit(node->gvar(), false);
     Literal flit(node->fvar(), false);

@@ -177,7 +177,8 @@ protected:
   void
   make_node_cnf(SatSolver& solver,
 		TpgNode* node,
-		const LitMap& litmap);
+		const LitMap& litmap,
+		Literal output);
 
   /// @brief ゲートの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
@@ -187,7 +188,8 @@ protected:
   void
   make_gate_cnf(SatSolver& solver,
 		tTgGateType type,
-		const LitMap& litmap);
+		const LitMap& litmap,
+		Literal output);
 
   /// @brief ノードの故障差関数を表すCNFを作る．
   void

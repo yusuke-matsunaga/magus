@@ -22,11 +22,6 @@ BEGIN_NAMESPACE_YM_SATPG
 struct LitMap
 {
 
-  /// @brief 出力のリテラルを返す．
-  virtual
-  Literal
-  output() const = 0;
-
   /// @brief 入力のリテラルを返す．
   virtual
   Literal
@@ -51,11 +46,6 @@ public:
 
   /// @brief コンストラクタ
   GvarLitMap(const TpgNode* node);
-
-  /// @brief 出力のリテラルを返す．
-  virtual
-  Literal
-  output() const;
 
   /// @brief 入力のリテラルを返す．
   virtual
@@ -91,11 +81,6 @@ public:
   /// @brief コンストラクタ
   FvarLitMap(const TpgNode* node);
 
-  /// @brief 出力のリテラルを返す．
-  virtual
-  Literal
-  output() const;
-
   /// @brief 入力のリテラルを返す．
   virtual
   Literal
@@ -119,52 +104,16 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class Fvar2LitMap LitMap.h "LitMap.h"
-/// @brief 出力の変数を指定した FvarLitMap
-//////////////////////////////////////////////////////////////////////
-class Fvar2LitMap :
-  public FvarLitMap
-{
-public:
-
-  /// @brief コンストラクタ
-  Fvar2LitMap(const TpgNode* node,
-	      VarId ovar);
-
-  /// @brief 出力のリテラルを返す．
-  virtual
-  Literal
-  output() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 出力の変数
-  VarId mOvar;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class Fvar3LitMap LitMap.h "LitMap.h"
+/// @class VectLitMap LitMap.h "LitMap.h"
 /// @brief すべての変数を指定した FvarLitMap
 //////////////////////////////////////////////////////////////////////
-class Fvar3LitMap :
+class VectLitMap :
   public LitMap
 {
 public:
 
   /// @brief コンストラクタ
-  Fvar3LitMap(const vector<VarId>& ivars,
-	      VarId ovar);
-
-  /// @brief 出力のリテラルを返す．
-  virtual
-  Literal
-  output() const;
+  VectLitMap(const vector<VarId>& ivars);
 
   /// @brief 入力のリテラルを返す．
   virtual
@@ -184,9 +133,6 @@ private:
 
   // 入力の変数
   vector<VarId> mIvars;
-
-  // 出力の変数
-  VarId mOvar;
 
 };
 

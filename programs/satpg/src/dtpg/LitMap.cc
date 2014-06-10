@@ -23,13 +23,6 @@ GvarLitMap::GvarLitMap(const TpgNode* node) :
 {
 }
 
-// @brief 出力のリテラルを返す．
-Literal
-GvarLitMap::output() const
-{
-  return Literal(mNode->gvar(), false);
-}
-
 // @brief 入力のリテラルを返す．
 Literal
 GvarLitMap::input(ymuint pos) const
@@ -56,13 +49,6 @@ FvarLitMap::FvarLitMap(const TpgNode* node) :
 {
 }
 
-// @brief 出力のリテラルを返す．
-Literal
-FvarLitMap::output() const
-{
-  return Literal(mNode->fvar(), false);
-}
-
 // @brief 入力のリテラルを返す．
 Literal
 FvarLitMap::input(ymuint pos) const
@@ -80,54 +66,25 @@ FvarLitMap::input_size() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス Fvar2LitMap
+// クラス VectLitMap
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Fvar2LitMap::Fvar2LitMap(const TpgNode* node,
-			 VarId ovar) :
-  FvarLitMap(node),
-  mOvar(ovar)
+VectLitMap::VectLitMap(const vector<VarId>& ivars) :
+  mIvars(ivars)
 {
-}
-
-// @brief 出力のリテラルを返す．
-Literal
-Fvar2LitMap::output() const
-{
-  return Literal(mOvar, false);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス Fvar3LitMap
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-Fvar3LitMap::Fvar3LitMap(const vector<VarId>& ivars,
-			 VarId ovar) :
-  mIvars(ivars),
-  mOvar(ovar)
-{
-}
-
-// @brief 出力のリテラルを返す．
-Literal
-Fvar3LitMap::output() const
-{
-  return Literal(mOvar, false);
 }
 
 // @brief 入力のリテラルを返す．
 Literal
-Fvar3LitMap::input(ymuint pos) const
+VectLitMap::input(ymuint pos) const
 {
   return Literal(mIvars[pos], false);
 }
 
 // @brief 入力数を返す．
 ymuint
-Fvar3LitMap::input_size() const
+VectLitMap::input_size() const
 {
   return mIvars.size();
 }

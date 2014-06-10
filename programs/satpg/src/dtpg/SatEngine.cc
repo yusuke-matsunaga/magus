@@ -109,33 +109,6 @@ make_and4_cnf(SatSolver& solver,
 inline
 void
 make_and_cnf(SatSolver& solver,
-	     const vector<Literal>& ilits,
-	     Literal o)
-{
-  ymuint n = ilits.size();
-
-  switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
-  case 1: make_buff_cnf(solver, ilits[0], o); return;
-  case 2: make_and2_cnf(solver, ilits[0], ilits[1], o); return;
-  case 3: make_and3_cnf(solver, ilits[0], ilits[1], ilits[2], o); return;
-  case 4: make_and4_cnf(solver, ilits[0], ilits[1], ilits[2], ilits[3], o); return;
-  default: break;
-  }
-
-  vector<Literal> tmp(n + 1);
-  for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(ilits[i], ~o);
-    tmp[i] = ~ilits[i];
-  }
-  tmp[n] = o;
-  solver.add_clause(tmp);
-}
-
-// 多入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
-inline
-void
-make_and_cnf(SatSolver& solver,
 	     const LitMap& litmap,
 	     Literal output)
 {
@@ -207,32 +180,6 @@ make_or4_cnf(SatSolver& solver,
 inline
 void
 make_or_cnf(SatSolver& solver,
-	    const vector<Literal>& ilits,
-	    Literal o)
-{
-  ymuint n = ilits.size();
-  switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
-  case 1: make_buff_cnf(solver, ilits[0], o); return;
-  case 2: make_or2_cnf(solver, ilits[0], ilits[1], o); return;
-  case 3: make_or3_cnf(solver, ilits[0], ilits[1], ilits[2], o); return;
-  case 4: make_or4_cnf(solver, ilits[0], ilits[1], ilits[2], ilits[3], o); return;
-  default: break;
-  }
-
-  vector<Literal> tmp(n + 1);
-  for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(~ilits[i], o);
-    tmp[i] = ilits[i];
-  }
-  tmp[n] = ~o;
-  solver.add_clause(tmp);
-}
-
-// 多入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
-inline
-void
-make_or_cnf(SatSolver& solver,
 	    const LitMap& litmap,
 	    Literal output)
 {
@@ -258,10 +205,10 @@ make_or_cnf(SatSolver& solver,
 // 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_xor_cnf(SatSolver& solver,
-	     Literal i0,
-	     Literal i1,
-	     Literal o)
+make_xor2_cnf(SatSolver& solver,
+	      Literal i0,
+	      Literal i1,
+	      Literal o)
 {
   solver.add_clause( i0, ~i1,  o);
   solver.add_clause(~i0,  i1,  o);
@@ -269,37 +216,23 @@ make_xor_cnf(SatSolver& solver,
   solver.add_clause(~i0, ~i1, ~o);
 }
 
-// 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// 3入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_xor_cnf(SatSolver& solver,
-	     const vector<Literal>& ilits,
-	     Literal output)
+make_xor3_cnf(SatSolver& solver,
+	      Literal i0,
+	      Literal i1,
+	      Literal i2,
+	      Literal o)
 {
-  ymuint n = ilits.size();
-  switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
-  case 1: make_buff_cnf(solver, ilits[0], output); return;
-  case 2: make_xor_cnf(solver, ilits[0], ilits[1], output); return;
-  default: break;
-  }
-
-  VarId tmp_var = solver.new_var();
-  Literal tmp_lit(tmp_var, false);
-  make_xor_cnf(solver, ilits[0], ilits[1], tmp_lit);
-
-  for (ymuint i = 2; i < n; ++ i) {
-    Literal tmp_out;
-    if ( i == n - 1 ) {
-      tmp_out = output;
-    }
-    else {
-      VarId new_var = solver.new_var();
-      tmp_out = Literal(new_var, false);
-    }
-    make_xor_cnf(solver, ilits[i], tmp_lit, tmp_out);
-    tmp_lit = tmp_out;
-  }
+  solver.add_clause(~i0,  i1,  i2,  o);
+  solver.add_clause( i0, ~i1,  i2,  o);
+  solver.add_clause( i0,  i1, ~i2,  o);
+  solver.add_clause( i0,  i1,  i2, ~o);
+  solver.add_clause( i0, ~i1, ~i2, ~o);
+  solver.add_clause(~i0,  i1, ~i2, ~o);
+  solver.add_clause(~i0, ~i1,  i2, ~o);
+  solver.add_clause(~i0, ~i1, ~i2,  o);
 }
 
 // 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
@@ -313,24 +246,25 @@ make_xor_cnf(SatSolver& solver,
   switch ( n ) {
   case 0: assert_not_reached(__FILE__, __LINE__); break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
-  case 2: make_xor_cnf(solver, litmap.input(0), litmap.input(1), litmap.output()); return;
+  case 2: make_xor2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
+  case 3: make_xor3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;
   default: break;
   }
 
   VarId tmp_var = solver.new_var();
   Literal tmp_lit(tmp_var, false);
-  make_xor_cnf(solver, litmap.input(0), litmap.input(1), tmp_lit);
+  make_xor2_cnf(solver, litmap.input(0), litmap.input(1), tmp_lit);
 
   for (ymuint i = 2; i < n; ++ i) {
     Literal tmp_out;
     if ( i == n - 1 ) {
-      tmp_out = litmap.output();
+      tmp_out = output;
     }
     else {
       VarId new_var = solver.new_var();
       tmp_out = Literal(new_var, false);
     }
-    make_xor_cnf(solver, litmap.input(i), tmp_lit, tmp_out);
+    make_xor2_cnf(solver, litmap.input(i), tmp_lit, tmp_out);
     tmp_lit = tmp_out;
   }
 }
@@ -529,7 +463,8 @@ void
 SatEngine::make_gnode_cnf(SatSolver& solver,
 			  TpgNode* node)
 {
-  make_node_cnf(solver, node, GvarLitMap(node));
+  Literal output(node->gvar(), false);
+  make_node_cnf(solver, node, GvarLitMap(node), output);
 }
 
 // @brief 故障回路のノードの入出力の関係を表す CNF を作る．
@@ -539,7 +474,8 @@ void
 SatEngine::make_fnode_cnf(SatSolver& solver,
 			  TpgNode* node)
 {
-  make_node_cnf(solver, node, FvarLitMap(node));
+  Literal output(node->fvar(), false);
+  make_node_cnf(solver, node, FvarLitMap(node), output);
 }
 
 // @brief 故障回路のノードの入出力の関係を表す CNF を作る．
@@ -550,13 +486,13 @@ SatEngine::make_fnode_cnf(SatSolver& solver,
 			  TpgNode* node,
 			  VarId ovar)
 {
+  Literal output(ovar, false);
   if ( node->is_input() ) {
     Literal glit(node->gvar(), false);
-    Literal olit(ovar, false);
-    make_buff_cnf(solver, glit, olit);
+    make_buff_cnf(solver, glit, output);
   }
   else {
-    make_node_cnf(solver, node, Fvar2LitMap(node, ovar));
+    make_node_cnf(solver, node, FvarLitMap(node), output);
   }
 }
 
@@ -584,14 +520,14 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 
     // fpos 以外の入力を ilit[] に入れる．
     ymuint ni = node->fanin_num();
-    vector<Literal> ilit;
-    ilit.reserve(ni - 1);
+    vector<VarId> ivars;
+    ivars.reserve(ni - 1);
     for (ymuint i = 0; i < ni; ++ i) {
       if ( i == fpos ) {
 	continue;
       }
       TpgNode* inode = node->fanin(i);
-      ilit.push_back(Literal(inode->gvar(), false));
+      ivars.push_back(node->gvar());
     }
 
     switch ( node->gate_type() ) {
@@ -606,7 +542,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 
     case kTgGateAnd:
       assert_cond( fval == 1, __FILE__, __LINE__);
-      make_and_cnf(solver, ilit, output);
+      make_and_cnf(solver, VectLitMap(ivars), output);
       break;
 
     case kTgGateNor:
@@ -615,7 +551,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 
     case kTgGateOr:
       assert_cond( fval == 0, __FILE__, __LINE__);
-      make_or_cnf(solver, ilit, output);
+      make_or_cnf(solver, VectLitMap(ivars), output);
       break;
 
     case kTgGateXnor:
@@ -626,7 +562,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
       if ( fval == 1 ) {
 	output = ~output;
       }
-      make_xor_cnf(solver, ilit, output);
+      make_xor_cnf(solver, VectLitMap(ivars), output);
       break;
 
     default:
@@ -643,7 +579,8 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 void
 SatEngine::make_node_cnf(SatSolver& solver,
 			 TpgNode* node,
-			 const LitMap& litmap)
+			 const LitMap& litmap,
+			 Literal output)
 {
   if ( node->is_input() ) {
     return;
@@ -651,13 +588,12 @@ SatEngine::make_node_cnf(SatSolver& solver,
 
   if ( node->is_output() ) {
     Literal input = litmap.input(0);
-    Literal output = litmap.output();
     make_buff_cnf(solver, input, output);
     return;
   }
 
   if ( node->is_logic() ) {
-    make_gate_cnf(solver, node->gate_type(), litmap);
+    make_gate_cnf(solver, node->gate_type(), litmap, output);
     return;
   }
 }
@@ -669,10 +605,9 @@ SatEngine::make_node_cnf(SatSolver& solver,
 void
 SatEngine::make_gate_cnf(SatSolver& solver,
 			 tTgGateType type,
-			 const LitMap& litmap)
+			 const LitMap& litmap,
+			 Literal output)
 {
-  Literal output = litmap.output();
-
   ymuint ni = litmap.input_size();
   switch ( type ) {
   case kTgGateNot:
