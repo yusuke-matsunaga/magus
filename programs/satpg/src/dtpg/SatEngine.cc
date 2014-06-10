@@ -123,11 +123,9 @@ make_and_cnf(SatSolver& solver,
   default: break;
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(ilits[i], ~o);
-  }
   vector<Literal> tmp(n + 1);
   for (ymuint i = 0; i < n; ++ i) {
+    solver.add_clause(ilits[i], ~o);
     tmp[i] = ~ilits[i];
   }
   tmp[n] = o;
@@ -151,11 +149,9 @@ make_and_cnf(SatSolver& solver,
   default: break;
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(litmap.input(i), ~output);
-  }
   vector<Literal> tmp(n + 1);
   for (ymuint i = 0; i < n; ++ i) {
+    solver.add_clause(litmap.input(i), ~output);
     tmp[i] = ~litmap.input(i);
   }
   tmp[n] = output;
@@ -224,11 +220,9 @@ make_or_cnf(SatSolver& solver,
   default: break;
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(~ilits[i], o);
-  }
   vector<Literal> tmp(n + 1);
   for (ymuint i = 0; i < n; ++ i) {
+    solver.add_clause(~ilits[i], o);
     tmp[i] = ilits[i];
   }
   tmp[n] = ~o;
@@ -252,11 +246,9 @@ make_or_cnf(SatSolver& solver,
   default: break;
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(~litmap.input(i), output);
-  }
   vector<Literal> tmp(n + 1);
   for (ymuint i = 0; i < n; ++ i) {
+    solver.add_clause(~litmap.input(i), output);
     tmp[i] = litmap.input(i);
   }
   tmp[n] = ~output;
@@ -440,7 +432,6 @@ SatEngine::mark_region(SatSolver& solver,
   mInputList.clear();
   mOutputList.clear();
 
-  // 故障に一時的なID番号を割り振る．
   // 故障のあるノードの TFO を mTfoList に入れる．
   // TFO の TFI のノードを mTfiList に入れる．
   ymuint nf = fnode_list.size();
@@ -591,6 +582,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 
     Literal output(node->fvar(), false);
 
+    // fpos 以外の入力を ilit[] に入れる．
     ymuint ni = node->fanin_num();
     vector<Literal> ilit;
     ilit.reserve(ni - 1);
