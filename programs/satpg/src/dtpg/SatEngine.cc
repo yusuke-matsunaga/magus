@@ -474,6 +474,11 @@ void
 SatEngine::make_fnode_cnf(SatSolver& solver,
 			  TpgNode* node)
 {
+  if ( !node->has_flt_var() ) {
+    Literal output(node->fvar(), false);
+    make_node_cnf(solver, node, FvarLitMap(node), output);
+    return;
+  }
   ymuint ni = node->fanin_num();
   vector<VarId> ivars(ni);
   for (ymuint i = 0; i < ni; ++ i) {
@@ -559,7 +564,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 
     Literal output(node->fvar(), false);
 
-    // fpos 以外の入力を ilit[] に入れる．
+    // fpos 以外の入力を ivars[] に入れる．
     ymuint ni = node->fanin_num();
     vector<VarId> ivars;
     ivars.reserve(ni - 1);
@@ -568,7 +573,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 	continue;
       }
       TpgNode* inode = node->fanin(i);
-      ivars.push_back(node->gvar());
+      ivars.push_back(inode->gvar());
     }
 
     switch ( node->gate_type() ) {
