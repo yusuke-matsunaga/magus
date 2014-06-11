@@ -645,14 +645,6 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
       node->mImmDomMap = map_array;
     }
   }
-#if 0
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    TpgNode* node = &mNodeArray[i];
-    for (ymuint j = 0; j < output_num2(); ++ j) {
-      TpgNode* idom = node->imm_dom(j);
-    }
-  }
-#endif
 }
 
 // @brief デストラクタ

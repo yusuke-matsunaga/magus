@@ -824,6 +824,8 @@ inline
 TpgNode*
 TpgNode::imm_dom(ymuint pos) const
 {
+  assert_cond( is_in_TFI_of(pos), __FILE__, __LINE__);
+
   ymuint blk = pos / 64;
   ymuint sft = pos % 64;
   ymuint64 mask = (1UL << sft);
