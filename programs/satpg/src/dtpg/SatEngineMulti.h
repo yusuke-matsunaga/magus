@@ -72,6 +72,9 @@ private:
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
 
+  // 作業用の配列
+  vector<bool> mDone;
+
 };
 
 END_NAMESPACE_YM_SATPG

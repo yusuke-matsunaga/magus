@@ -474,25 +474,66 @@ void
 SatEngine::make_fnode_cnf(SatSolver& solver,
 			  TpgNode* node)
 {
-  Literal output(node->fvar(), false);
-  make_node_cnf(solver, node, FvarLitMap(node), output);
-}
+  ymuint ni = node->fanin_num();
+  vector<VarId> ivars(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    VarId f0_var = node->if0var(i);
+    VarId f1_var = node->if1var(i);
+    if ( f0_var == kVarIdIllegal ) {
+      if ( f1_var == kVarIdIllegal ) {
+	ivars[i] = inode->fvar();
+      }
+      else {
+	VarId tmp_var = solver.new_var();
+	make_flt1_cnf(solver, inode->fvar(), f1_var, tmp_var);
+	ivars[i] = tmp_var;
+      }
+    }
+    else {
+      if ( f1_var == kVarIdIllegal ) {
+	VarId tmp_var = solver.new_var();
+	make_flt0_cnf(solver, inode->fvar(), f0_var, tmp_var);
+	ivars[i] = tmp_var;
+      }
+      else {
+	VarId tmp_var = solver.new_var();
+	make_flt01_cnf(solver, inode->fvar(), f0_var, f1_var, tmp_var);
+	ivars[i] = tmp_var;
+      }
+    }
+  }
 
-// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
-// @param[in] node 対象のノード
-void
-SatEngine::make_fnode_cnf(SatSolver& solver,
-			  TpgNode* node,
-			  VarId ovar)
-{
+  VarId f0_var = node->of0var();
+  VarId f1_var = node->of1var();
+  VarId ovar = node->fvar();
+  if ( f0_var == kVarIdIllegal ) {
+    if ( f1_var == kVarIdIllegal ) {
+      ;
+    }
+    else {
+      ovar = solver.new_var();
+      make_flt1_cnf(solver, ovar, f1_var, node->fvar());
+    }
+  }
+  else {
+    if ( f1_var == kVarIdIllegal ) {
+      ovar = solver.new_var();
+      make_flt0_cnf(solver, ovar, f0_var, node->fvar());
+    }
+    else {
+      ovar = solver.new_var();
+      make_flt01_cnf(solver, ovar, f0_var, f1_var, node->fvar());
+    }
+  }
   Literal output(ovar, false);
+
   if ( node->is_input() ) {
     Literal glit(node->gvar(), false);
     make_buff_cnf(solver, glit, output);
   }
   else {
-    make_node_cnf(solver, node, FvarLitMap(node), output);
+    make_node_cnf(solver, node, VectLitMap(ivars), output);
   }
 }
 

@@ -74,27 +74,6 @@ SatEngineMulti2::set_option(const string& option_str)
   }
 }
 
-BEGIN_NONAMESPACE
-
-struct FnodeInfo
-{
-  FnodeInfo(ymuint ni) :
-    mO0(0),
-    mO1(0),
-    mI0(ni, 0),
-    mI1(ni, 0)
-  {
-  }
-
-  ymuint32 mO0;
-  ymuint32 mO1;
-
-  vector<ymuint32> mI0;
-  vector<ymuint32> mI1;
-};
-
-END_NONAMESPACE
-
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 // @param[in] max_id ノード番号の最大値 + 1
@@ -111,43 +90,32 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 
   ymuint nf = flist.size();
 
-  vector<FnodeInfo*> fnode_info(max_id, NULL);
+  // 故障を活性化するとき true にする変数．
+  vector<VarId> flt_var(nf);
+  // FnodeInfo を持つノードのリスト
   vector<TpgNode*> fnode_list;
   fnode_list.reserve(nf);
+
+  mDone.clear();
+  mDone.resize(max_id, false);
   for (ymuint i = 0; i < nf; ++ i) {
+    VarId fvar = solver.new_var();
+    flt_var[i] = fvar;
     TpgFault* f = flist[i];
     int fval = f->val();
     TpgNode* node = f->node();
-    if ( fnode_info[node->id()] == NULL ) {
-      fnode_info[node->id()] = new FnodeInfo(node->fanin_num());
+    if ( !mDone[node->id()] ) {
+      mDone[node->id()] = true;
       fnode_list.push_back(node);
     }
-    FnodeInfo* finfo = fnode_info[node->id()];
+
     if ( f->is_output_fault() ) {
-      if ( fval == 0 ) {
-	finfo->mO0 = i + 1;
-      }
-      else {
-	finfo->mO1 = i + 1;
-      }
+      node->set_ofvar(fval, fvar);
     }
     else {
       ymuint pos = f->pos();
-      if ( fval == 0 ) {
-	finfo->mI0[pos] = i + 1;
-      }
-      else {
-	finfo->mI1[pos] = i + 1;
-      }
+      node->set_ifvar(pos, fval, fvar);
     }
-  }
-
-  // 故障を活性化するとき true にする変数．
-  vector<VarId> flt_var(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    flt_var[i] = solver.new_var();
-    TpgFault* f = flist[i];
-    f->clear_untest_num();
   }
 
   mark_region(solver, fnode_list, max_id);
@@ -172,63 +140,9 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < fnode_list.size(); ++ i) {
     TpgNode* node = fnode_list[i];
-    FnodeInfo* finfo = fnode_info[node->id()];
-    assert_cond( finfo != NULL, __FILE__, __LINE__);
+    assert_cond( node->has_flt_var(), __FILE__, __LINE__);
 
-    ymuint ni = node->fanin_num();
-    vector<VarId> ivars(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      ymuint32 f0_id = finfo->mI0[i];
-      ymuint32 f1_id = finfo->mI1[i];
-      if ( f0_id == 0 ) {
-	if ( f1_id == 0 ) {
-	  ivars[i] = inode->fvar();
-	}
-	else {
-	  VarId tmp_var = solver.new_var();
-	  make_flt1_cnf(solver, inode->fvar(), flt_var[f1_id - 1], tmp_var);
-	  ivars[i] = tmp_var;
-	}
-      }
-      else {
-	if ( f1_id == 0 ) {
-	  VarId tmp_var = solver.new_var();
-	  make_flt0_cnf(solver, inode->fvar(), flt_var[f0_id - 1], tmp_var);
-	  ivars[i] = tmp_var;
-	}
-	else {
-	  VarId tmp_var = solver.new_var();
-	  make_flt01_cnf(solver, inode->fvar(), flt_var[f0_id - 1], flt_var[f1_id - 1], tmp_var);
-	  ivars[i] = tmp_var;
-	}
-      }
-    }
-
-    ymuint32 f0_id = finfo->mO0;
-    ymuint32 f1_id = finfo->mO1;
-    VarId ovar = node->fvar();
-    if ( f0_id == 0 ) {
-      if ( f1_id == 0 ) {
-	;
-      }
-      else {
-	ovar = solver.new_var();
-	make_flt1_cnf(solver, ovar, flt_var[f1_id - 1], node->fvar());
-      }
-    }
-    else {
-      if ( f1_id == 0 ) {
-	ovar = solver.new_var();
-	make_flt0_cnf(solver, ovar, flt_var[f0_id - 1], node->fvar());
-      }
-      else {
-	ovar = solver.new_var();
-	make_flt01_cnf(solver, ovar, flt_var[f0_id - 1], flt_var[f1_id - 1], node->fvar());
-      }
-    }
-    Literal output(ovar, false);
-    make_node_cnf(solver, node, VectLitMap(ivars), output);
+    make_fnode_cnf(solver, node);
 
     Literal glit(node->gvar(), false);
     Literal flit(node->fvar(), false);
@@ -251,11 +165,11 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	ymuint ni = node->fanin_num();
 	tmp_lits_begin(ni * 3 + 3);
 	tmp_lits_add(~dlit);
-	if ( finfo->mO0 > 0 ) {
-	  tmp_lits_add(Literal(flt_var[finfo->mO0 - 1], false));
+	if ( node->of0var() != kVarIdIllegal ) {
+	  tmp_lits_add(Literal(node->of0var(), false));
 	}
-	if ( finfo->mO1 > 0 ) {
-	  tmp_lits_add(Literal(flt_var[finfo->mO1 - 1], false));
+	if ( node->of1var() != kVarIdIllegal ) {
+	  tmp_lits_add(Literal(node->of1var(), false));
 	}
 	for (ymuint i = 0; i < ni; ++ i) {
 	  TpgNode* inode = node->fanin(i);
@@ -263,11 +177,11 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	    Literal idlit(inode->dvar(), false);
 	    tmp_lits_add(idlit);
 	  }
-	  if ( finfo->mI0[i] > 0 ) {
-	    tmp_lits_add(Literal(flt_var[finfo->mI0[i] - 1], false));
+	  if ( node->if0var(i) != kVarIdIllegal ) {
+	    tmp_lits_add(Literal(node->if0var(i), false));
 	  }
-	  if ( finfo->mI1[i] > 0 ) {
-	    tmp_lits_add(Literal(flt_var[finfo->mI1[i] - 1], false));
+	  if ( node->if1var(i) != kVarIdIllegal ) {
+	    tmp_lits_add(Literal(node->if1var(i), false));
 	  }
 	}
       }
@@ -322,6 +236,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       if ( mark[node->id()] != (opos + 1) ) {
 	continue;
       }
+
+      assert_cond( !node->has_flt_var(), __FILE__, __LINE__);
 
       make_fnode_cnf(solver, node);
 
@@ -539,8 +455,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	continue;
       }
 
-      FnodeInfo* finfo = fnode_info[node->id()];
-      assert_cond( finfo == NULL, __FILE__, __LINE__);
+      assert_cond( !node->has_flt_var(), __FILE__, __LINE__);
 
       make_fnode_cnf(solver, node);
 
@@ -656,7 +571,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
   clear_node_mark();
 
   for (ymuint i = 0; i < fnode_list.size(); ++ i) {
-    delete fnode_info[i];
+    TpgNode* node = fnode_list[i];
+    node->clear_oifvar();
   }
 }
 

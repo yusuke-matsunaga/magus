@@ -1039,10 +1039,12 @@ TpgNetwork::init_node(TpgNode* node,
   if ( ni > 0 ) {
     node->mFanins = alloc_array<TpgNode*>(mAlloc, ni);
     node->mInputFault = alloc_array<TpgFault*>(mAlloc, ni * 2);
+    node->mIfVars = alloc_array<VarId>(mAlloc, ni * 2);
   }
   else {
     node->mFanins = NULL;
     node->mInputFault = NULL;
+    node->mIfVars = NULL;
   }
 
   node->mFanoutsSize = nfo;
@@ -1061,6 +1063,8 @@ TpgNetwork::init_node(TpgNode* node,
   node->mOutputFault[1] = NULL;
 
   node->mMarks = 0U;
+
+  node->clear_oifvar();
 }
 
 // @brief TpgNode を生成する．

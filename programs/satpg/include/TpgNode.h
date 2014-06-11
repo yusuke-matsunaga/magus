@@ -224,6 +224,52 @@ public:
   VarId
   dvar() const;
 
+  /// @brief 出力故障用の変数番号をセットする．
+  /// @param[in] val 縮退値 (0/1)
+  /// @param[in] var 変数番号
+  void
+  set_ofvar(int val,
+	    VarId var);
+
+  /// @brief 入力故障用の変数番号をセットする．
+  /// @param[in] pos 入力位置
+  /// @param[in] val 縮退値 (0/1)
+  /// @param[in] var 変数番号
+  void
+  set_ifvar(ymuint pos,
+	    int val,
+	    VarId var);
+
+  /// @brief 故障用の変数番号をクリアする．
+  void
+  clear_oifvar();
+
+  /// @brief 故障用の変数番号を持っている時に true を返す．
+  bool
+  has_flt_var() const;
+
+  /// @brief 出力の0縮退故障用の変数番号を得る．
+  /// 設定されていない場合には kVarIdIllegal を返す．
+  VarId
+  of0var() const;
+
+  /// @brief 出力の1縮退故障用の変数番号を得る．
+  /// 設定されていない場合には kVarIdIllegal を返す．
+  VarId
+  of1var() const;
+
+  /// @brief 入力の0縮退故障用の変数番号を得る．
+  /// @param[in] pos 入力位置
+  /// 設定されていない場合には kVarIdIllegal を返す．
+  VarId
+  if0var(ymuint pos) const;
+
+  /// @brief 入力の1縮退故障用の変数番号を得る．
+  /// @param[in] pos 入力位置
+  /// 設定されていない場合には kVarIdIllegal を返す．
+  VarId
+  if1var(ymuint pos) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -410,6 +456,12 @@ private:
 
   // 故障差の変数番号
   VarId mDid;
+
+  // 出力故障用の変数番号
+  VarId mOfVar[2];
+
+  // 入力故障用の変数番号の配列
+  VarId* mIfVars;
 
   // TFIマークを表すビットアレイ
   ymuint64* mTFIbits;
@@ -849,6 +901,93 @@ VarId
 TpgNode::dvar() const
 {
   return mDid;
+}
+
+// @brief 出力故障用の変数番号をセットする．
+// @param[in] val 縮退値 (0/1)
+// @param[in] var 変数番号
+inline
+void
+TpgNode::set_ofvar(int val,
+		   VarId var)
+{
+  mOfVar[val % 2] = var;
+  mMarks |= 64U;
+}
+
+// @brief 入力故障用の変数番号をセットする．
+// @param[in] pos 入力位置
+// @param[in] val 縮退値 (0/1)
+// @param[in] var 変数番号
+inline
+void
+TpgNode::set_ifvar(ymuint pos,
+		   int val,
+		   VarId var)
+{
+  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
+  mIfVars[pos * 2 + (val % 2)] = var;
+  mMarks |= 64U;
+}
+
+// @brief 故障用の変数番号をクリアする．
+inline
+void
+TpgNode::clear_oifvar()
+{
+  mOfVar[0] = kVarIdIllegal;
+  mOfVar[1] = kVarIdIllegal;
+  for (ymuint i = 0; i < fanin_num(); ++ i) {
+    mIfVars[i * 2 + 0] = kVarIdIllegal;
+    mIfVars[i * 2 + 1] = kVarIdIllegal;
+  }
+  mMarks &= ~64U;
+}
+
+// @brief 故障用の変数番号を持っている時に true を返す．
+inline
+bool
+TpgNode::has_flt_var() const
+{
+  return static_cast<bool>((mMarks >> 6) & 1U);
+}
+
+// @brief 出力の0縮退故障用の変数番号を得る．
+// 設定されていない場合には kVarIdIllegal を返す．
+inline
+VarId
+TpgNode::of0var() const
+{
+  return mOfVar[0];
+}
+
+// @brief 出力の1縮退故障用の変数番号を得る．
+// 設定されていない場合には kVarIdIllegal を返す．
+inline
+VarId
+TpgNode::of1var() const
+{
+  return mOfVar[1];
+}
+
+// @brief 入力の0縮退故障用の変数番号を得る．
+// @param[in] pos 入力位置
+// 設定されていない場合には kVarIdIllegal を返す．
+inline
+VarId
+TpgNode::if0var(ymuint pos) const
+{
+  return mIfVars[pos * 2 + 0];
+}
+
+// @brief 入力の1縮退故障用の変数番号を得る．
+// @param[in] pos 入力位置
+// 設定されていない場合には kVarIdIllegal を返す．
+inline
+VarId
+TpgNode::if1var(ymuint pos) const
+{
+  return mIfVars[pos * 2 + 1];
 }
 
 // @brief controling value を得る．
