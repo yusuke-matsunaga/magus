@@ -69,9 +69,6 @@ private:
   // unique sensitization を使う
   bool mUseDominator;
 
-  // PO ごとの dominator を使う．
-  bool mUseLocalDominator;
-
   // skip threshold
   ymuint32 mSkipThreshold;
 

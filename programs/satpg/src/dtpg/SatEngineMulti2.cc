@@ -28,7 +28,6 @@ SatEngineMulti2::SatEngineMulti2()
   mTgGrasp = true;
   mExtTgGrasp = true;
   mUseDominator = true;
-  mUseLocalDominator = false;
   mSkipThreshold = 3;
 }
 
@@ -59,13 +58,10 @@ SatEngineMulti2::set_option(const string& option_str)
       mTgGrasp = false;
     }
     else if ( option == "DOM" ) {
-      mUseLocalDominator = false;
+      mUseDominator = false;
     }
     else if ( option == "NODOM" ) {
       mUseDominator = false;
-    }
-    else if ( option == "LOCALDOM" ) {
-      mUseLocalDominator = true;
     }
     if ( pos == string::npos ) {
       break;
@@ -355,13 +351,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       }
 
       // dominator ノードの dvar は1でなければならない．
-      if ( mUseLocalDominator ) {
-	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom(oid)) {
-	  Literal dlit(node->dvar(), false);
-	  tmp_lits_add(dlit);
-	}
-      }
-      else {
+      if ( mUseDominator ) {
 	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
 	  Literal dlit(node->dvar(), false);
 	  tmp_lits_add(dlit);

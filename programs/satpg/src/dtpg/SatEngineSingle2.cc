@@ -29,7 +29,6 @@ SatEngineSingle2::SatEngineSingle2()
   mUopDummy = new_UopDummy();
   mTgGrasp = true;
   mUseDominator = true;
-  mUseLocalDominator = true;
 }
 
 // @brief デストラクタ
@@ -56,13 +55,9 @@ SatEngineSingle2::set_option(const string& option_str)
     }
     else if ( option == "DOM" ) {
       mUseDominator = true;
-      mUseLocalDominator = false;
     }
     else if ( option == "NODOM" ) {
       mUseDominator = false;
-    }
-    else if ( option == "LOCALDOM" ) {
-      mUseLocalDominator = true;
     }
     if ( pos == string::npos ) {
       break;
@@ -155,13 +150,7 @@ SatEngineSingle2::run(TpgNetwork& network,
 
     tmp_lits_add(Literal(onode->dvar(), false));
 
-    if ( mUseLocalDominator ) {
-      // dominator ノードの dvar は1でなければならない．
-      for (TpgNode* node = fnode; node != NULL; node = node->imm_dom(oid)) {
-	tmp_lits_add(Literal(node->dvar(), false));
-      }
-    }
-    else {
+    if ( mUseDominator ) {
       // dominator ノードの dvar は1でなければならない．
       for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
 	tmp_lits_add(Literal(node->dvar(), false));

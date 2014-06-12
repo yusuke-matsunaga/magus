@@ -74,9 +74,6 @@ private:
   // unique sensitization を使う
   bool mUseDominator;
 
-  // PO ごとの dominator を使う．
-  bool mUseLocalDominator;
-
 };
 
 

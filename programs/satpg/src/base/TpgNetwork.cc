@@ -569,20 +569,12 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   activate_all();
 
   // TFIbits を作る．
-  // と同時に TFI ごとの immediate dominator を計算する．
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     TpgNode* node = &mNodeArray[mNodeNum - i - 1];
     TFIbits_clear(node->mTFIbits, tfibits_size());
     if ( node->is_output() ) {
       // 外部出力の場合は自分自身の番号をセットする．
       TFIbits_set(node->mTFIbits, node->output_id2());
-
-      // immediate dominator は常に NULL
-      TpgNode::ImmDomMap* idmap = alloc_array<TpgNode::ImmDomMap>(mAlloc, 1);
-      idmap->mBitMask = alloc_array<ymuint64>(mAlloc, tfibits_size());
-      TFIbits_set_all(idmap->mBitMask, tfibits_size());
-      idmap->mImmDom = NULL;
-      node->mImmDomMap = idmap;
     }
     else {
       // ファンアウト先の TFIbits の OR をとる．
@@ -591,58 +583,6 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
 	TpgNode* onode = node->fanout(i);
 	TFIbits_or(node->mTFIbits, onode->mTFIbits, tfibits_size());
       }
-
-      // NULL のマップを登録しておく．
-      vector<TpgNode::ImmDomMap> tmp_list;
-      ymuint64* tmp_bits = alloc_array<ymuint64>(mAlloc, tfibits_size());
-      TFIbits_clear(tmp_bits, tfibits_size());
-      tmp_list.push_back(TpgNode::ImmDomMap(tmp_bits, NULL));
-
-      for (ymuint opos = 0; opos < output_num2(); ++ opos) {
-	TpgNode* imm1 = NULL;
-	if ( node->is_in_TFI_of(opos) ) {
-	  for (ymuint i = 0; i < nfo; ++ i) {
-	    TpgNode* onode = node->fanout(i);
-	    if ( onode->is_in_TFI_of(opos) ) {
-	      if ( imm1 == NULL ) {
-		imm1 = onode;
-	      }
-	      else {
-		imm1 = merge(imm1, onode);
-		if ( imm1 == NULL ) {
-		  break;
-		}
-	      }
-	    }
-	  }
-
-	  // imm1 を持つマップを探す．
-	  // なければ作る．
-	  TpgNode::ImmDomMap* idmap = NULL;
-	  for (ymuint i = 0; i < tmp_list.size(); ++ i) {
-	    if ( tmp_list[i].mImmDom == imm1 ) {
-	      idmap = &tmp_list[i];
-	      break;
-	    }
-	  }
-	  if ( idmap == NULL ) {
-	    ymuint64* tmp_bits = alloc_array<ymuint64>(mAlloc, tfibits_size());
-	    TFIbits_clear(tmp_bits, tfibits_size());
-	    tmp_list.push_back(TpgNode::ImmDomMap(tmp_bits, imm1));
-	    idmap = &(tmp_list.back());
-	  }
-	  TFIbits_set(idmap->mBitMask, opos);
-	}
-      }
-
-      // tmp_list を node に転写する．
-      ymuint n = tmp_list.size();
-      TpgNode::ImmDomMap* map_array = alloc_array<TpgNode::ImmDomMap>(mAlloc, n);
-      for (ymuint i = 0; i < n; ++ i) {
-	map_array[i].mBitMask = tmp_list[i].mBitMask;
-	map_array[i].mImmDom = tmp_list[i].mImmDom;
-      }
-      node->mImmDomMap = map_array;
     }
   }
 }

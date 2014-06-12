@@ -162,12 +162,6 @@ public:
   TpgNode*
   imm_dom() const;
 
-  /// @brief pos 番目のPOのTFIに制限した場合の直近の dominator を得る．
-  ///
-  /// pos 番目のPOのTFIに含まれていない場合は NULL を返す．
-  TpgNode*
-  imm_dom(ymuint pos) const;
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -468,27 +462,6 @@ private:
 
   // immediate dominator
   TpgNode* mImmDom;
-
-  // TFI ごとの immediate dominator を保持するための補助クラス
-  struct ImmDomMap
-  {
-    ImmDomMap() { }
-
-    ImmDomMap(ymuint64* bits,
-	      TpgNode* node) :
-      mBitMask(bits),
-      mImmDom(node) { }
-
-    // ビットマスク
-    ymuint64* mBitMask;
-
-    // immediate dominator
-    TpgNode* mImmDom;
-
-  };
-
-  // TFI ごとの immediate dominator の配列
-  ImmDomMap* mImmDomMap;
 
   // controling value
   Bool3 mCval;
@@ -815,30 +788,6 @@ TpgNode*
 TpgNode::imm_dom() const
 {
   return mImmDom;
-}
-
-// @brief pos 番目のPOのTFIに制限した場合の直近の dominator を得る．
-//
-// pos 番目のPOのTFIに含まれていない場合は NULL を返す．
-inline
-TpgNode*
-TpgNode::imm_dom(ymuint pos) const
-{
-  assert_cond( is_in_TFI_of(pos), __FILE__, __LINE__);
-
-  ymuint blk = pos / 64;
-  ymuint sft = pos % 64;
-  ymuint64 mask = (1UL << sft);
-  // かならずどれかのエントリにヒットするはずなので
-  // ループの終了条件はない．
-  // ちょっとギャンブルなコード
-  for (ymuint i = 0; ; ++ i) {
-    if ( mImmDomMap[i].mBitMask[blk] & mask ) {
-      return mImmDomMap[i].mImmDom;
-    }
-  }
-  assert_not_reached(__FILE__, __LINE__);
-  return NULL;
 }
 
 // @brief 正常回路用の変数番号をセットする．
