@@ -11,9 +11,6 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "DtpgNgMgr.h"
-#include "DtpgNodeGroup.h"
-#include "DtpgNgEdge.h"
 #include "utils/HeapTree.h"
 
 #include "logic/Bdd.h"
@@ -51,7 +48,7 @@ DtpgSat::set_mode(const string& type,
 		  ostream* outp)
 {
   mSatEngine.set_mode(type, option, outp);
-  mSatEngineSingle.set_mode(type, option, outp);
+  mSmtEngineSingle.set_mode(type, option, outp);
 }
 
 // @brief テスト生成を行なう．
@@ -74,10 +71,10 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 	     DtpgStats& stats)
 {
   mSatEngine.set_option(option_str);
-  mSatEngineSingle.set_option(option_str);
+  mSmtEngineSingle.set_option(option_str);
 
   mSatEngine.clear_stats();
-  mSatEngineSingle.clear_stats();
+  mSmtEngineSingle.clear_stats();
 
   mNetwork = &tgnetwork;
   mMaxId = mNetwork->node_num();
@@ -117,7 +114,7 @@ DtpgSat::run(TpgNetwork& tgnetwork,
   }
 
   if ( mode.mode() == kDtpgSingle ) {
-    mSatEngineSingle.get_stats(stats);
+    mSmtEngineSingle.get_stats(stats);
   }
   else {
     mSatEngine.get_stats(stats);
@@ -440,20 +437,8 @@ DtpgSat::dtpg1(DtpgMode mode,
     single_mode(bt, dop, uop);
     break;
 
-  case kDtpgDual:
-    dual_mode(bt, dop, uop);
-    break;
-
-  case kDtpgNode:
-    node_mode(bt, dop, uop);
-    break;
-
   case kDtpgFFR:
     ffr_mode(bt, dop, uop);
-    break;
-
-  case kDtpgFFR2:
-    ffr2_mode(mode.ffr2_limit(), bt, dop, uop);
     break;
 
   case kDtpgMFFC:
@@ -526,54 +511,6 @@ DtpgSat::single_mode(BackTracer& bt,
   }
 }
 
-// @brief dual モードでテスト生成を行なう．
-void
-DtpgSat::dual_mode(BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
-{
-  ymuint nn = mNetwork->active_node_num();
-  for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
-    if ( node->is_output() ) {
-      continue;
-    }
-
-    // 出力の故障
-    TpgFault* f0 = node->output_fault(0);
-    TpgFault* f1 = node->output_fault(1);
-    dtpg_dual(f0, f1, bt, dop, uop);
-
-    // 入力の故障
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      TpgFault* f0 = node->input_fault(0, j);
-      TpgFault* f1 = node->input_fault(1, j);
-      dtpg_dual(f0, f1, bt, dop, uop);
-    }
-  }
-}
-
-// @brief node モードでテスト生成を行なう．
-// @param[in] op テスト生成後に呼ばれるファンクター
-void
-DtpgSat::node_mode(BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
-{
-  ymuint nn = mNetwork->active_node_num();
-  for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
-    if ( node->is_output() ) {
-      continue;
-    }
-
-    add_node_faults(node);
-
-    do_dtpg(bt, dop, uop);
-  }
-}
-
 // @brief ffr モードでテスト生成を行なう．
 void
 DtpgSat::ffr_mode(BackTracer& bt,
@@ -594,110 +531,6 @@ DtpgSat::ffr_mode(BackTracer& bt,
   }
 }
 
-BEGIN_NONAMESPACE
-
-void
-get_ffr(TpgNode* node,
-	vector<TpgNode*>& node_list)
-{
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
-    if ( inode->active_fanout_num() == 1 ) {
-      get_ffr(inode, node_list);
-    }
-  }
-
-  node_list.push_back(node);
-}
-
-struct NgLt
-{
-  bool
-  operator()(DtpgNgEdge* left,
-	     DtpgNgEdge* right)
-  {
-    return left->size() < right->size();
-  }
-
-};
-
-END_NONAMESPACE
-
-// @brief ffr2 モードでテスト生成を行なう．
-// @param[in] size_limit サイズの上限
-// @param[in] bt バックトレーサー
-void
-DtpgSat::ffr2_mode(ymuint size_limit,
-		   BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
-{
-  ymuint n = mNetwork->active_node_num();
-
-  // FFR ごとに DtpgNodeGroup を作る．
-  DtpgNgMgr mgr;
-  vector<DtpgNodeGroup*> rep_map(n, NULL);
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
-    if ( node->is_output() ) {
-      continue;
-    }
-    ymuint nfo = node->active_fanout_num();
-    if ( nfo > 1 || (nfo == 1 && node->active_fanout(0)->is_output()) ) {
-      vector<TpgNode*> node_list;
-      get_ffr(node, node_list);
-
-      DtpgNodeGroup* ng = mgr.add_node_group(node_list);
-
-      for (vector<TpgNode*>::iterator p = node_list.begin();
-	   p != node_list.end(); ++ p) {
-	TpgNode* node1 = *p;
-	rep_map[node1->id()] = ng;
-      }
-    }
-  }
-
-  // DtpgNodeGroup 間の枝を作る．
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
-    if ( node->is_output() ) {
-      continue;
-    }
-    DtpgNodeGroup* dst_ng = rep_map[node->id()];
-    ymuint dst_size = dst_ng->size();
-    ymuint nfi = node->fanin_num();
-    for (ymuint i = 0; i < nfi; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      DtpgNodeGroup* src_ng = rep_map[inode->id()];
-      if ( dst_ng == src_ng ) {
-	continue;
-      }
-      ymuint size = dst_size + src_ng->size();
-      if ( size <= size_limit ) {
-	mgr.add_edge(src_ng, dst_ng);
-      }
-    }
-  }
-
-  mgr.merge(size_limit);
-
-#if 0
-  const vector<DtpgNodeGroup*>& ng_list = mgr.node_list();
-  for (vector<DtpgNodeGroup*>::const_iterator p = ng_list.begin();
-       p != ng_list.end(); ++ p) {
-    DtpgNodeGroup* ng = *p;
-    const vector<TpgNode*>& node_list = ng->node_list();
-    clear_faults();
-    for (vector<TpgNode*>::const_iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      TpgNode* node = *p;
-      add_node_faults(node);
-    }
-    do_dtpg(bt);
-  }
-#endif
-}
 
 
 // @brief mffc モードでテスト生成を行なう．
@@ -751,7 +584,7 @@ DtpgSat::dtpg_single(TpgFault* f,
        f->is_rep() &&
        f->status() != kFsDetected &&
        !f->is_skip() ) {
-    mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
+    mSmtEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
   }
 }
 

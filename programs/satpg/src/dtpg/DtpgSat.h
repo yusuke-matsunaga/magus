@@ -13,7 +13,7 @@
 #include "Dtpg.h"
 #include "TpgFault.h"
 #include "SatEngineMulti.h"
-#include "SatEngineSingle.h"
+#include "SmtEngineSingle.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -120,24 +120,6 @@ private:
 	      DetectOp& dop,
 	      UntestOp& uop);
 
-  /// @brief dual モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  dual_mode(BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
-
-  /// @brief node モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  node_mode(BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
-
   /// @brief ffr モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
@@ -146,17 +128,6 @@ private:
   ffr_mode(BackTracer& bt,
 	   DetectOp& dop,
 	   UntestOp& uop);
-
-  /// @brief ffr2 モードでテスト生成を行なう．
-  /// @param[in] size_limit サイズの上限
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  ffr2_mode(ymuint size_limit,
-	    BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
@@ -236,7 +207,7 @@ private:
   // SAT エンジン
   SatEngineMulti mSatEngine;
 
-  SatEngineSingle mSatEngineSingle;
+  SmtEngineSingle mSmtEngineSingle;
 
   // 対象の回路
   TpgNetwork* mNetwork;
@@ -260,7 +231,7 @@ void
 DtpgSat::timer_enable(bool enable)
 {
   mSatEngine.timer_enable(enable);
-  mSatEngineSingle.timer_enable(enable);
+  mSmtEngineSingle.timer_enable(enable);
 }
 
 // @brief 故障リストをクリアする．

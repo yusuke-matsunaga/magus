@@ -7,6 +7,7 @@ SUBDIRS = \
 	main \
 	fsim \
 	dtpg \
+	ymsat \
 	bt \
 	dop \
 	uop \
