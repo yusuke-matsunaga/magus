@@ -813,9 +813,11 @@ GraphSat::implication()
     }
   }
 
+#if 1
   if ( conflict == kNullSatReason ) {
     conflict = search_pgraph();
   }
+#endif
 
   return conflict;
 }

@@ -1,8 +1,8 @@
-#ifndef DTPGSAT_H
-#define DTPGSAT_H
+#ifndef DTPGSMT_H
+#define DTPGSMT_H
 
-/// @file DtpgSat.h
-/// @brief DtpgSat のヘッダファイル
+/// @file DtpgSmt.h
+/// @brief DtpgSmt のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,26 +13,26 @@
 #include "Dtpg.h"
 #include "TpgFault.h"
 #include "SatEngineMulti.h"
-#include "SatEngineSingle.h"
+#include "SmtEngineSingle.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DtpgSat DtpgSat.h "DtpgSat.h"
+/// @class DtpgSmt DtpgSmt.h "DtpgSmt.h"
 /// @brief SAT を用いたパタン生成器
 //////////////////////////////////////////////////////////////////////
-class DtpgSat :
+class DtpgSmt :
   public Dtpg
 {
 public:
 
   /// @brief コンストラクタ
-  DtpgSat();
+  DtpgSmt();
 
   /// @brief デストラクタ
   virtual
-  ~DtpgSat();
+  ~DtpgSmt();
 
 
 public:
@@ -95,10 +95,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief MFFC 単位で故障差関数を作り，支配関係をもとにした順序付けを行う．
-  void
-  fault_analyze();
 
   /// @brief activate された部分回路に大してテスト生成を行う．
   /// @param[in] mode メインモード
@@ -207,7 +203,7 @@ private:
   // SAT エンジン
   SatEngineMulti mSatEngine;
 
-  SatEngineSingle mSatEngineSingle;
+  SmtEngineSingle mSatEngineSingle;
 
   // 対象の回路
   TpgNetwork* mNetwork;
@@ -228,7 +224,7 @@ private:
 // @breif 時間計測を制御する．
 inline
 void
-DtpgSat::timer_enable(bool enable)
+DtpgSmt::timer_enable(bool enable)
 {
   mSatEngine.timer_enable(enable);
   mSatEngineSingle.timer_enable(enable);
@@ -237,7 +233,7 @@ DtpgSat::timer_enable(bool enable)
 // @brief 故障リストをクリアする．
 inline
 void
-DtpgSat::clear_faults()
+DtpgSmt::clear_faults()
 {
   mFaultList.clear();
 }
@@ -245,7 +241,7 @@ DtpgSat::clear_faults()
 // @brief 故障を追加する．
 inline
 void
-DtpgSat::add_fault(TpgFault* fault)
+DtpgSmt::add_fault(TpgFault* fault)
 {
   if ( fault != NULL &&
        fault->is_rep() &&
@@ -257,4 +253,4 @@ DtpgSat::add_fault(TpgFault* fault)
 
 END_NAMESPACE_YM_SATPG
 
-#endif // DTPGSAT_H
+#endif // DTPGSMT_H

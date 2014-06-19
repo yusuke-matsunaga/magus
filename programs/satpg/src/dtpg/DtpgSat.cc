@@ -48,7 +48,7 @@ DtpgSat::set_mode(const string& type,
 		  ostream* outp)
 {
   mSatEngine.set_mode(type, option, outp);
-  mSmtEngineSingle.set_mode(type, option, outp);
+  mSatEngineSingle.set_mode(type, option, outp);
 }
 
 // @brief テスト生成を行なう．
@@ -71,10 +71,10 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 	     DtpgStats& stats)
 {
   mSatEngine.set_option(option_str);
-  mSmtEngineSingle.set_option(option_str);
+  mSatEngineSingle.set_option(option_str);
 
   mSatEngine.clear_stats();
-  mSmtEngineSingle.clear_stats();
+  mSatEngineSingle.clear_stats();
 
   mNetwork = &tgnetwork;
   mMaxId = mNetwork->node_num();
@@ -114,7 +114,7 @@ DtpgSat::run(TpgNetwork& tgnetwork,
   }
 
   if ( mode.mode() == kDtpgSingle ) {
-    mSmtEngineSingle.get_stats(stats);
+    mSatEngineSingle.get_stats(stats);
   }
   else {
     mSatEngine.get_stats(stats);
@@ -584,7 +584,7 @@ DtpgSat::dtpg_single(TpgFault* f,
        f->is_rep() &&
        f->status() != kFsDetected &&
        !f->is_skip() ) {
-    mSmtEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
+    mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
   }
 }
 

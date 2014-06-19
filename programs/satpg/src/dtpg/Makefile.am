@@ -60,6 +60,8 @@ COMMON_SOURCES = \
 	DtpgSat2.cc \
 	DtpgSat3.h \
 	DtpgSat3.cc \
+	DtpgSmt.h \
+	DtpgSmt.cc \
 	SatEngine.h \
 	SatEngine.cc \
 	SatEngineMulti.h \

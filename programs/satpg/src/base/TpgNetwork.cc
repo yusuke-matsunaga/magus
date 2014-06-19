@@ -651,10 +651,43 @@ TpgNetwork::tfimark(TpgNode* node)
   }
 }
 
+BEGIN_NONAMESPACE
+
+class FoNodeLt
+{
+public:
+
+  // コンストラクタ
+  FoNodeLt(const vector<ymuint>& level_array) :
+    mLevelArray(level_array)
+  {
+  }
+
+  bool
+  operator()(TpgNode* left,
+	     TpgNode* right)
+  {
+    return mLevelArray[left->id()] < mLevelArray[right->id()];
+  }
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  const vector<ymuint>& mLevelArray;
+
+};
+
+END_NONAMESPACE
+
 // @brief activate_po(), activate_all() の下請け関数
 void
 TpgNetwork::activate_sub()
 {
+  vector<ymuint> level_array(mNodeNum);
+
   // マークにしたがってファンアウトなどの情報をセットする．
   mActNodeNum = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
@@ -666,17 +699,41 @@ TpgNetwork::activate_sub()
     node->set_active();
     mActNodeArray[mActNodeNum] = node;
     ++ mActNodeNum;
+  }
 
+  for (ymuint i = 0; i < mActNodeNum; ++ i) {
+    ymuint id = mActNodeNum - i - 1;
+    TpgNode* node = &mNodeArray[id];
+
+    // ファンアウトをPOまでのレベルの小さい順にならべる．
     ymuint nfo = node->fanout_num();
-    ymuint act_nfo = 0;
+    vector<TpgNode*> tmp_folist;
+    tmp_folist.reserve(nfo);
     for (ymuint i = 0; i < nfo; ++ i) {
       TpgNode* onode = node->fanout(i);
       if ( mTmpMark[onode->id()] ) {
-	node->mActFanouts[act_nfo] = onode;
-	++ act_nfo;
+	tmp_folist.push_back(onode);
       }
     }
-    node->mActFanoutNum = act_nfo;
+    if ( tmp_folist.empty() ) {
+      node->mActFanoutNum = 0;
+      level_array[node->id()] = 0;
+    }
+    else {
+      sort(tmp_folist.begin(), tmp_folist.end(), FoNodeLt(level_array));
+      ymuint act_nfo = tmp_folist.size();
+      ymuint min_level = level_array[tmp_folist[0]->id()];
+      for (ymuint i = 0; i < act_nfo; ++ i) {
+	TpgNode* onode = tmp_folist[i];
+	node->mActFanouts[i] = onode;
+	ymuint olevel = level_array[onode->id()];
+	if ( min_level > olevel ) {
+	  min_level = olevel;
+	}
+      }
+      node->mActFanoutNum = act_nfo;
+      level_array[node->id()] = min_level + 1;
+    }
   }
 
   // immediate dominator を求める．

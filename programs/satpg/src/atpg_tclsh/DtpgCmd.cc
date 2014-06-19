@@ -47,6 +47,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "single mode");
   mPoptSingle2 = new TclPopt(this, "single2",
 			     "single2 mode");
+  mPoptSingle3 = new TclPopt(this, "single3",
+			     "single3 mode");
   mPoptDual = new TclPopt(this, "dual",
 			  "dual mode");
   mPoptNode = new TclPopt(this, "node",
@@ -142,6 +144,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( mPoptSingle2->is_specified() ) {
     mode = kDtpgSingle2;
+  }
+  else if ( mPoptSingle3->is_specified() ) {
+    mode = kDtpgSingle3;
   }
   else if ( mPoptDual->is_specified() ) {
     mode = kDtpgDual;

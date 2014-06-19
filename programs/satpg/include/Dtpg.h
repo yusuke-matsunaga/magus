@@ -85,6 +85,11 @@ extern
 Dtpg*
 new_DtpgSat3();
 
+/// @brief DtpgSmt のインスタンスを生成する．
+extern
+Dtpg*
+new_DtpgSmt();
+
 END_NAMESPACE_YM_SATPG
 
 #endif // DTPG_H
