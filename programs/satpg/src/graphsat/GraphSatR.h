@@ -1,37 +1,37 @@
-#ifndef YMSATR_H
-#define YMSATR_H
+#ifndef GRAPHSATR_H
+#define GRAPHSATR_H
 
-/// @file YmSatR.h
-/// @brief YmSatR のヘッダファイル
+/// @file GraphSatR.h
+/// @brief GraphSatR のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmSat.h"
+#include "GraphSat.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmSatR YmSatR.h "YmSatR.h"
-/// @brief ログ記録機能付きの YmSat
+/// @class GraphSatR GraphSatR.h "GraphSatR.h"
+/// @brief ログ記録機能付きの GraphSat
 //////////////////////////////////////////////////////////////////////
-class YmSatR :
-  public YmSat
+class GraphSatR :
+  public GraphSat
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] out 出力ストリーム
   /// @param[in] option オプション文字列
-  YmSatR(ostream& out,
+  GraphSatR(ostream& out,
 	 const string& option = string());
 
   /// @brief デストラクタ
   virtual
-  ~YmSatR();
+  ~GraphSatR();
 
 
 public:
@@ -130,4 +130,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // YMSATR_H
+#endif // GRAPHSATR_H

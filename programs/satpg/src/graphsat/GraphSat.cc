@@ -1,13 +1,13 @@
 
-/// @file YmSat.cc
-/// @brief YmSat の実装ファイル
+/// @file GraphSat.cc
+/// @brief GraphSat の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmSat.h"
+#include "GraphSat.h"
 #include "logic/SatStats.h"
 #include "logic/SatMsgHandler.h"
 #include "SatAnalyzer.h"
@@ -57,11 +57,11 @@ Params kDefaultParams(0.95, 0.00, 0.999, true, false, false, false);
 #endif
 
 //////////////////////////////////////////////////////////////////////
-// YmSat
+// GraphSat
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmSat::YmSat(const string& option) :
+GraphSat::GraphSat(const string& option) :
   mSane(true),
   mAlloc(4096),
   mConstrBinNum(0),
@@ -112,7 +112,7 @@ YmSat::YmSat(const string& option) :
 }
 
 // @brief デストラクタ
-YmSat::~YmSat()
+GraphSat::~GraphSat()
 {
   for (ymuint i = 0; i < mVarSize * 2; ++ i) {
     mWatcherList[i].finish(mAlloc);
@@ -130,7 +130,7 @@ YmSat::~YmSat()
 
 // @brief 正しい状態のときに true を返す．
 bool
-YmSat::sane() const
+GraphSat::sane() const
 {
   return mSane;
 }
@@ -139,7 +139,7 @@ YmSat::sane() const
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
-YmSat::new_var()
+GraphSat::new_var()
 {
   if ( decision_level() != 0 ) {
     // エラー
@@ -157,7 +157,7 @@ YmSat::new_var()
 // @brief 節を追加する．
 // @param[in] lits リテラルのベクタ
 void
-YmSat::add_clause(const vector<Literal>& lits)
+GraphSat::add_clause(const vector<Literal>& lits)
 {
   // add_clause_sub() 中でリテラルの並び替えを行うので
   // 一旦 mTmpLits にコピーする．
@@ -175,8 +175,8 @@ YmSat::add_clause(const vector<Literal>& lits)
 // @param[in] lit_num リテラル数
 // @param[in] lits リテラルの配列
 void
-YmSat::add_clause(ymuint lit_num,
-		  const Literal* lits)
+GraphSat::add_clause(ymuint lit_num,
+		     const Literal* lits)
 {
   // add_clause_sub() 中でリテラルの並び替えを行うので
   // 一旦 mTmpLits にコピーする．
@@ -191,7 +191,7 @@ YmSat::add_clause(ymuint lit_num,
 
 // @brief 1項の節(リテラル)を追加する．
 void
-YmSat::add_clause(Literal lit1)
+GraphSat::add_clause(Literal lit1)
 {
   alloc_lits(1);
   mTmpLits[0] = lit1;
@@ -202,8 +202,8 @@ YmSat::add_clause(Literal lit1)
 
 // @brief 2項の節を追加する．
 void
-YmSat::add_clause(Literal lit1,
-		  Literal lit2)
+GraphSat::add_clause(Literal lit1,
+		     Literal lit2)
 {
   alloc_lits(2);
   mTmpLits[0] = lit1;
@@ -215,9 +215,9 @@ YmSat::add_clause(Literal lit1,
 
 // @brief 3項の節を追加する．
 void
-YmSat::add_clause(Literal lit1,
-		  Literal lit2,
-		  Literal lit3)
+GraphSat::add_clause(Literal lit1,
+		     Literal lit2,
+		     Literal lit3)
 {
   alloc_lits(3);
   mTmpLits[0] = lit1;
@@ -230,10 +230,10 @@ YmSat::add_clause(Literal lit1,
 
 // @brief 4項の節を追加する．
 void
-YmSat::add_clause(Literal lit1,
-		  Literal lit2,
-		  Literal lit3,
-		  Literal lit4)
+GraphSat::add_clause(Literal lit1,
+		     Literal lit2,
+		     Literal lit3,
+		     Literal lit4)
 {
   alloc_lits(4);
   mTmpLits[0] = lit1;
@@ -247,11 +247,11 @@ YmSat::add_clause(Literal lit1,
 
 // @brief 5項の節を追加する．
 void
-YmSat::add_clause(Literal lit1,
-		  Literal lit2,
-		  Literal lit3,
-		  Literal lit4,
-		  Literal lit5)
+GraphSat::add_clause(Literal lit1,
+		     Literal lit2,
+		     Literal lit3,
+		     Literal lit4,
+		     Literal lit5)
 {
   alloc_lits(5);
   mTmpLits[0] = lit1;
@@ -266,8 +266,9 @@ YmSat::add_clause(Literal lit1,
 
 // @brief PGraph の始点と終点をセットする．
 void
-YmSat::add_pgraph(TpgNode* source,
-		  const vector<TpgNode*>& sink_list)
+GraphSat::set_pgraph(TpgNode* source,
+		     const vector<TpgNode*>& sink_list,
+		     ymuint max_id)
 {
   if ( decision_level() != 0 ) {
     // エラー
@@ -277,6 +278,7 @@ YmSat::add_pgraph(TpgNode* source,
 
   mSource = source;
   mSinkList = sink_list;
+  mMaxId = max_id;
 }
 
 BEGIN_NONAMESPACE
@@ -310,11 +312,11 @@ END_NONAMESPACE
 // @retval kB3X わからなかった．
 // @note i 番めの変数の割り当て結果は model[i] に入る．
 Bool3
-YmSat::solve(const vector<Literal>& assumptions,
-	     vector<Bool3>& model)
+GraphSat::solve(const vector<Literal>& assumptions,
+		vector<Bool3>& model)
 {
   if ( debug & debug_solve ) {
-    cout << "YmSat::solve starts" << endl;
+    cout << "GraphSat::solve starts" << endl;
     cout << " Assumptions: ";
     const char* and_str = "";
     for (vector<Literal>::const_iterator p = assumptions.begin();
@@ -481,7 +483,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 
 // @brief 学習節の整理を行なう．
 void
-YmSat::reduce_learnt_clause()
+GraphSat::reduce_learnt_clause()
 {
   cut_down();
 }
@@ -489,7 +491,7 @@ YmSat::reduce_learnt_clause()
 // @brief 現在の内部状態を得る．
 // @param[out] stats 状態を格納する構造体
 void
-YmSat::get_stats(SatStats& stats) const
+GraphSat::get_stats(SatStats& stats) const
 {
   stats.mRestart = mRestart;
   stats.mVarNum = mVarNum;
@@ -507,21 +509,21 @@ YmSat::get_stats(SatStats& stats) const
 
 // @brief 変数の数を得る．
 ymuint
-YmSat::variable_num() const
+GraphSat::variable_num() const
 {
   return mVarNum;
 }
 
 // @brief 制約節の数を得る．
 ymuint
-YmSat::clause_num() const
+GraphSat::clause_num() const
 {
   return mConstrClause.size() + mConstrBinNum;
 }
 
 // @brief 制約節のリテラルの総数を得る．
 ymuint
-YmSat::literal_num() const
+GraphSat::literal_num() const
 {
   return mConstrLitNum;
 }
@@ -530,7 +532,7 @@ YmSat::literal_num() const
 // @param[in] val 設定する値
 // @return 以前の設定値を返す．
 ymuint64
-YmSat::set_max_conflict(ymuint64 val)
+GraphSat::set_max_conflict(ymuint64 val)
 {
   ymuint64 old_val = mMaxConflict;
   mMaxConflict = val;
@@ -540,21 +542,21 @@ YmSat::set_max_conflict(ymuint64 val)
 // @brief solve() 中のリスタートのたびに呼び出されるメッセージハンドラの登録
 // @param[in] msg_handler 登録するメッセージハンドラ
 void
-YmSat::reg_msg_handler(SatMsgHandler* msg_handler)
+GraphSat::reg_msg_handler(SatMsgHandler* msg_handler)
 {
   mMsgHandlerList.push_back(msg_handler);
 }
 
 // @brief 時間計測機能を制御する
 void
-YmSat::timer_on(bool enable)
+GraphSat::timer_on(bool enable)
 {
   mTimerOn = enable;
 }
 
 // 探索を行う本体の関数
 Bool3
-YmSat::search(ymuint confl_limit)
+GraphSat::search(ymuint confl_limit)
 {
   ymuint cur_confl_num = 0;
   for ( ; ; ) {
@@ -644,7 +646,7 @@ YmSat::search(ymuint confl_limit)
 
 // 割当てキューに基づいて implication を行う．
 SatReason
-YmSat::implication()
+GraphSat::implication()
 {
   SatReason conflict = kNullSatReason;
   while ( mAssignList.has_elem() ) {
@@ -820,7 +822,7 @@ YmSat::implication()
 
 // level までバックトラックする
 void
-YmSat::backtrack(int level)
+GraphSat::backtrack(int level)
 {
   if ( debug & (debug_assign | debug_decision) ) {
     cout << endl
@@ -848,7 +850,7 @@ YmSat::backtrack(int level)
 
 // 次の割り当てを選ぶ
 Literal
-YmSat::next_decision()
+GraphSat::next_decision()
 {
   Literal lit = find_path();
   if ( lit != kLiteralX ) {
@@ -917,7 +919,7 @@ YmSat::next_decision()
 
 // CNF を簡単化する．
 void
-YmSat::sweep_clause()
+GraphSat::sweep_clause()
 {
   if ( !mSane ) {
     return;
@@ -960,7 +962,7 @@ YmSat::sweep_clause()
     mLearntClause.erase(mLearntClause.begin() + wpos, mLearntClause.end());
   }
 
-  if( true ) {
+  if( false ) {
     ymuint n = mConstrClause.size();
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < n; ++ rpos) {
@@ -1016,7 +1018,7 @@ END_NONAMESPACE
 
 // 使われていない学習節を削除する．
 void
-YmSat::cut_down()
+GraphSat::cut_down()
 {
   ymuint n = mLearntClause.size();
   ymuint n2 = n / 2;
@@ -1055,16 +1057,16 @@ YmSat::cut_down()
 
 // @brief add_clause() の下請け関数
 void
-YmSat::add_clause_sub(ymuint lit_num)
+GraphSat::add_clause_sub(ymuint lit_num)
 {
   if ( decision_level() != 0 ) {
     // エラー
-    cout << "Error![YmSat]: decision_level() != 0" << endl;
+    cout << "Error![GraphSat]: decision_level() != 0" << endl;
     return;
   }
 
   if ( !mSane ) {
-    //cout << "Error![YmSat]: mSane == false" << endl;
+    //cout << "Error![GraphSat]: mSane == false" << endl;
     return;
   }
 
@@ -1128,7 +1130,7 @@ YmSat::add_clause_sub(ymuint lit_num)
       // new_var() で確保した変数番号よりも大きい変数番号が
       // 使われていた．
       // TODO: エラー対策．
-      cout << "Error![YmSat]: literal(" << l << "): out of range"
+      cout << "Error![GraphSat]: literal(" << l << "): out of range"
 	   << endl;
       return;
     }
@@ -1201,7 +1203,7 @@ YmSat::add_clause_sub(ymuint lit_num)
 
 // 学習節を追加する．
 void
-YmSat::add_learnt_clause()
+GraphSat::add_learnt_clause()
 {
   // 学習節の内容は mLeartLits に格納されている．
   // 結果，0 番目のリテラルに値の割り当てが生じる．
@@ -1293,7 +1295,7 @@ YmSat::add_learnt_clause()
 
 // @brief mTmpLits を確保する．
 void
-YmSat::alloc_lits(ymuint lit_num)
+GraphSat::alloc_lits(ymuint lit_num)
 {
   ymuint old_size = mTmpLitsSize;
   while ( mTmpLitsSize <= lit_num ) {
@@ -1311,7 +1313,7 @@ YmSat::alloc_lits(ymuint lit_num)
 // @param[in] lbd 学習節のときの literal block distance
 // @note リテラルは mTmpLits に格納されている．
 SatClause*
-YmSat::new_clause(ymuint lit_num,
+GraphSat::new_clause(ymuint lit_num,
 		  bool learnt)
 {
   ymuint size = sizeof(SatClause) + sizeof(Literal) * (lit_num - 1);
@@ -1324,7 +1326,7 @@ YmSat::new_clause(ymuint lit_num,
 // @brief 節を削除する．
 // @param[in] clause 削除する節
 void
-YmSat::delete_clause(SatClause* clause)
+GraphSat::delete_clause(SatClause* clause)
 {
   if ( debug & debug_assign ) {
     cout << " delete_clause: " << (*clause) << endl;
@@ -1349,8 +1351,8 @@ YmSat::delete_clause(SatClause* clause)
 // @param[in] watch_lit リテラル
 // @param[in] reason 理由
 void
-YmSat::del_watcher(Literal watch_lit,
-		   SatReason reason)
+GraphSat::del_watcher(Literal watch_lit,
+		      SatReason reason)
 {
   // watch_lit に関係する watcher リストから
   // reason を探して削除する．
@@ -1378,7 +1380,7 @@ YmSat::del_watcher(Literal watch_lit,
 
 // @brief LBD を計算する．
 ymuint
-YmSat::calc_lbd(const SatClause* clause)
+GraphSat::calc_lbd(const SatClause* clause)
 {
   ymuint max_level = decision_level() + 1;
   ymuint32 old_size = mLbdTmpSize;
@@ -1417,7 +1419,7 @@ YmSat::calc_lbd(const SatClause* clause)
 
 // 学習節のアクティビティを増加させる．
 void
-YmSat::bump_clause_activity(SatClause* clause)
+GraphSat::bump_clause_activity(SatClause* clause)
 {
   clause->increase_activity(mClauseBump);
   if ( clause->activity() > 1e+100 ) {
@@ -1432,14 +1434,14 @@ YmSat::bump_clause_activity(SatClause* clause)
 
 // 学習節のアクティビティを定率で減少させる．
 void
-YmSat::decay_clause_activity()
+GraphSat::decay_clause_activity()
 {
   mClauseBump /= mClauseDecay;
 }
 
 // 実際に変数に関するデータ構造を生成する．
 void
-YmSat::alloc_var()
+GraphSat::alloc_var()
 {
   if ( mOldVarNum < mVarNum ) {
     if ( mVarSize < mVarNum ) {
@@ -1457,7 +1459,7 @@ YmSat::alloc_var()
 
 // 変数に関する配列を拡張する．
 void
-YmSat::expand_var()
+GraphSat::expand_var()
 {
   ymuint old_size = mVarSize;
   ymuint8* old_val = mVal;
@@ -1500,12 +1502,12 @@ YmSat::expand_var()
 
 // @brief PGraph 上の mandatory assignment を求める．
 SatReason
-YmSat::search_pgraph()
+GraphSat::search_pgraph()
 {
   // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
   vector<TpgNode*> block_list;
   vector<TpgNode*> x_list;
-  vector<bool> mark(max_id, false);
+  vector<bool> mark(mMaxId, false);
   bool stat = dfs_pgraph(mSource, block_list, x_list, mark);
   if ( stat ) {
     // 終点に到達した．
@@ -1521,12 +1523,7 @@ YmSat::search_pgraph()
     // PGraph が空になった．
     // 現在の block_list を矛盾の原因としてバックトラックする．
     assert_cond( !block_list.empty(), __FILE__, __LINE__);
-    vector<Literal> tmp_list(block_list.size());
-    for (ymuint i = 0; i < block_list.size(); ++ i) {
-      TpgNode* node = block_list[i];
-      tmp_list[i] = Literal(node->dvar(), false);
-    }
-    SatClause* clause = add_pgraph_clause(tmp_list);
+    SatClause* clause = add_pgraph_clause(block_list);
     return SatReason(clause);
   }
 
@@ -1538,21 +1535,24 @@ YmSat::search_pgraph()
   if ( block_list.empty() ) {
     // 強制割り当て
     // dominator の時はこうなる．
-
+    assign(dlit);
   }
   else {
-
+    SatClause* clause = add_pgraph_clause(block_list, node);
+    assign(dlit, SatReason(clause));
   }
+
+  return kNullSatReason;
 }
 
 // @brief PGraph 上の optional assignment を求める．
 Literal
-YmSat::find_path()
+GraphSat::find_path()
 {
   // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
   vector<TpgNode*> block_list;
   vector<TpgNode*> x_list;
-  vector<bool> mark(max_id, false);
+  vector<bool> mark(mMaxId, false);
   bool stat = dfs_pgraph(mSource, block_list, x_list, mark);
   if ( stat ) {
     // 終点に到達した．
@@ -1568,10 +1568,10 @@ YmSat::find_path()
 
 // @brief PGraph を DFS でたどる．
 bool
-YmSat::dfs_pgraph(TpgNode* node,
-		  vector<TpgNode*>& block_list,
-		  vector<TpgNode*>& x_list,
-		  vector<bool>& mark)
+GraphSat::dfs_pgraph(TpgNode* node,
+		     vector<TpgNode*>& block_list,
+		     vector<TpgNode*>& x_list,
+		     vector<bool>& mark)
 {
   if ( mark[node->id()] ) {
     return false;
@@ -1607,6 +1607,93 @@ YmSat::dfs_pgraph(TpgNode* node,
   }
 
   return false;
+}
+
+// @brief PGraph 上のブロックリストから学習節を作る．
+SatClause*
+GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list)
+{
+  ymuint n = block_list.size();
+  assert_cond( n > 1, __FILE__, __LINE__);
+
+  alloc_lits(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = block_list[i];
+    mTmpLits[i] = Literal(node->dvar(), false);
+  }
+
+  Literal l0 = mTmpLits[0];
+  Literal l1 = mTmpLits[1];
+
+  if ( n == 2 ) {
+    if ( debug & debug_assign ) {
+      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
+    }
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(l1));
+    add_watcher(~l1, SatReason(l0));
+
+    // binary clause は watcher-list に登録するだけで実体はない．
+    ++ mConstrBinNum;
+  }
+  else {
+    // 節の生成
+    SatClause* clause = new_clause(n);
+    mConstrClause.push_back(clause);
+
+    if ( debug & debug_assign ) {
+      cout << "add_clause: " << *clause << endl;
+    }
+
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(clause));
+    add_watcher(~l1, SatReason(clause));
+  }
+}
+
+// @brief PGraph 上のブロックリストから学習節を作る．
+SatClause*
+GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
+			    TpgNode* free_node)
+{
+  ymuint n = block_list.size();
+  assert_cond( n > 0, __FILE__, __LINE__);
+
+  ymuint n1 = n + 1;
+  alloc_lits(n1);
+  mTmpLits[0] = Literal(free_node->dvar(), false);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = block_list[i];
+    mTmpLits[i + 1] = Literal(node->dvar(), false);
+  }
+
+  Literal l0 = mTmpLits[0];
+  Literal l1 = mTmpLits[1];
+
+  if ( n == 2 ) {
+    if ( debug & debug_assign ) {
+      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
+    }
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(l1));
+    add_watcher(~l1, SatReason(l0));
+
+    // binary clause は watcher-list に登録するだけで実体はない．
+    ++ mConstrBinNum;
+  }
+  else {
+    // 節の生成
+    SatClause* clause = new_clause(n);
+    mConstrClause.push_back(clause);
+
+    if ( debug & debug_assign ) {
+      cout << "add_clause: " << *clause << endl;
+    }
+
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(clause));
+    add_watcher(~l1, SatReason(clause));
+  }
 }
 
 END_NAMESPACE_YM_SATPG

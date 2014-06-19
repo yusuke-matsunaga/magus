@@ -1,8 +1,8 @@
-#ifndef YMSAT_H
-#define YMSAT_H
+#ifndef GRAPHSAT_H
+#define GRAPHSAT_H
 
-/// @file YmSat.h
-/// @brief YmSat のヘッダファイル
+/// @file GraphSat.h
+/// @brief GraphSat のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -28,8 +28,8 @@ BEGIN_NAMESPACE_YM_SATPG
 class SatAnalyzer;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Params YmSat.h "YmSat.h"
-/// @brief YmSat の挙動を制御するパラメータ
+/// @class Params GraphSat.h "GraphSat.h"
+/// @brief GraphSat の挙動を制御するパラメータ
 //////////////////////////////////////////////////////////////////////
 struct Params
 {
@@ -88,10 +88,10 @@ struct Params
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmSat YmSat.h "YmSat.h"
+/// @class GraphSat GraphSat.h "GraphSat.h"
 /// @brief SatSolver の実装クラス
 //////////////////////////////////////////////////////////////////////
-class YmSat
+class GraphSat
 {
   friend class SatAnalyzer;
 
@@ -99,11 +99,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] option オプション文字列
-  YmSat(const string& option = string());
+  GraphSat(const string& option = string());
 
   /// @brief デストラクタ
   virtual
-  ~YmSat();
+  ~GraphSat();
 
 
 public:
@@ -112,43 +112,51 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 正しい状態のときに true を返す．
+  virtual
   bool
   sane() const;
 
   /// @brief 変数を追加する．
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
+  virtual
   VarId
   new_var();
 
   /// @brief 節を追加する．
   /// @param[in] lits リテラルのベクタ
+  virtual
   void
   add_clause(const vector<Literal>& lits);
 
   /// @brief 節を追加する．
   /// @param[in] lit_num リテラル数
   /// @param[in] lits リテラルの配列
+  virtual
   void
   add_clause(ymuint lit_num,
 	     const Literal* lits);
 
   /// @brief 1項の節(リテラル)を追加する．
+  virtual
   void
   add_clause(Literal lit1);
 
   /// @brief 2項の節を追加する．
+  virtual
   void
   add_clause(Literal lit1,
 	     Literal lit2);
 
   /// @brief 3項の節を追加する．
+  virtual
   void
   add_clause(Literal lit1,
 	     Literal lit2,
 	     Literal lit3);
 
   /// @brief 4項の節を追加する．
+  virtual
   void
   add_clause(Literal lit1,
 	     Literal lit2,
@@ -156,6 +164,7 @@ public:
 	     Literal lit4);
 
   /// @brief 5項の節を追加する．
+  virtual
   void
   add_clause(Literal lit1,
 	     Literal lit2,
@@ -164,9 +173,11 @@ public:
 	     Literal lit5);
 
   /// @brief PGraph の始点と終点をセットする．
+  virtual
   void
-  add_pgraph(TpgNode* source,
-	     const vector<TpgNode*>& sink_list);
+  set_pgraph(TpgNode* source,
+	     const vector<TpgNode*>& sink_list,
+	     ymuint max_id);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -175,43 +186,52 @@ public:
   /// @retval kB3False 充足不能が判明した．
   /// @retval kB3X わからなかった．
   /// @note i 番めの変数の割り当て結果は model[i] に入る．
+  virtual
   Bool3
   solve(const vector<Literal>& assumptions,
 	vector<Bool3>& model);
 
   /// @brief 学習節の整理を行なう．
+  virtual
   void
   reduce_learnt_clause();
 
   /// @brief 現在の内部状態を得る．
   /// @param[out] stats 状態を格納する構造体
+  virtual
   void
   get_stats(SatStats& stats) const;
 
   /// @brief 変数の数を得る．
+  virtual
   ymuint
   variable_num() const;
 
   /// @brief 制約節の数を得る．
+  virtual
   ymuint
   clause_num() const;
 
   /// @brief 制約節のリテラルの総数を得る．
+  virtual
   ymuint
   literal_num() const;
 
   /// @brief conflict_limit の最大値
   /// @param[in] val 設定する値
   /// @return 以前の設定値を返す．
+  virtual
   ymuint64
   set_max_conflict(ymuint64 val);
 
   /// @brief solve() 中のリスタートのたびに呼び出されるメッセージハンドラの登録
   /// @param[in] msg_handler 登録するメッセージハンドラ
+  virtual
   void
   reg_msg_handler(SatMsgHandler* msg_handler);
 
   /// @brief 時間計測機能を制御する
+  virtual
   void
   timer_on(bool enable);
 
@@ -393,6 +413,15 @@ private:
 	     vector<TpgNode*>& x_list,
 	     vector<bool>& mark);
 
+  /// @brief PGraph 上のブロックリストから学習節を作る．
+  SatClause*
+  add_pgraph_clause(const vector<TpgNode*>& block_list);
+
+  /// @brief PGraph 上のブロックリストから学習節を作る．
+  SatClause*
+  add_pgraph_clause(const vector<TpgNode*>& block_list,
+		    TpgNode* free_node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -404,6 +433,9 @@ private:
 
   // PGraph の終点のリスト
   vector<TpgNode*> mSinkList;
+
+  // PGraph の節点番号の最大値 + 1
+  ymuint32 mMaxId;
 
   // 解析器
   SatAnalyzer* mAnalyzer;
@@ -547,7 +579,7 @@ private:
 // watcher list を得る．
 inline
 WatcherList&
-YmSat::watcher_list(Literal lit)
+GraphSat::watcher_list(Literal lit)
 {
   ymuint index = lit.index();
   return mWatcherList[index];
@@ -556,7 +588,7 @@ YmSat::watcher_list(Literal lit)
 // Watcher を追加する．
 inline
 void
-YmSat::add_watcher(Literal watch_lit,
+GraphSat::add_watcher(Literal watch_lit,
 		   SatReason reason)
 {
   watcher_list(watch_lit).add(Watcher(reason), mAlloc);
@@ -584,7 +616,7 @@ END_NONAMESPACE
 // 変数の評価を行う．
 inline
 Bool3
-YmSat::eval(VarId id) const
+GraphSat::eval(VarId id) const
 {
   return cur_val(mVal[id.val()]);
 }
@@ -592,7 +624,7 @@ YmSat::eval(VarId id) const
 // literal の評価を行う．
 inline
 Bool3
-YmSat::eval(Literal l) const
+GraphSat::eval(Literal l) const
 {
   ymuint index = l.index();
   ymuint x = mVal[index / 2] & 3U;
@@ -605,7 +637,7 @@ YmSat::eval(Literal l) const
 // 矛盾が起きたら false を返す．
 inline
 bool
-YmSat::check_and_assign(Literal lit)
+GraphSat::check_and_assign(Literal lit)
 {
   Bool3 old_val = eval(lit);
   if ( old_val != kB3X ) {
@@ -630,7 +662,7 @@ END_NONAMESPACE
 // 値の割当てを行う．
 inline
 void
-YmSat::assign(Literal lit,
+GraphSat::assign(Literal lit,
 	      SatReason reason)
 {
   ymuint lindex = lit.index();
@@ -648,7 +680,7 @@ YmSat::assign(Literal lit,
 // 現在の decision level を返す．
 inline
 int
-YmSat::decision_level() const
+GraphSat::decision_level() const
 {
   return mAssignList.cur_level();
 }
@@ -656,7 +688,7 @@ YmSat::decision_level() const
 // 変数の decision level を返す．
 inline
 int
-YmSat::decision_level(VarId varid) const
+GraphSat::decision_level(VarId varid) const
 {
   return mDecisionLevel[varid.val()];
 }
@@ -664,7 +696,7 @@ YmSat::decision_level(VarId varid) const
 // 変数の割り当て理由を返す．
 inline
 SatReason
-YmSat::reason(VarId varid) const
+GraphSat::reason(VarId varid) const
 {
   return mReason[varid.val()];
 }
@@ -672,7 +704,7 @@ YmSat::reason(VarId varid) const
 // @brief clase が含意の理由になっているか調べる．
 inline
 bool
-YmSat::is_locked(SatClause* clause) const
+GraphSat::is_locked(SatClause* clause) const
 {
   // 直感的には分かりにくいが，節の最初のリテラルは
   // 残りのリテラルによって含意されていることになっている．
@@ -686,7 +718,7 @@ YmSat::is_locked(SatClause* clause) const
 // @param[in] var 変数番号
 inline
 void
-YmSat::bump_var_activity(VarId var)
+GraphSat::bump_var_activity(VarId var)
 {
   mVarHeap.bump_var_activity(var);
 }
@@ -694,11 +726,11 @@ YmSat::bump_var_activity(VarId var)
 // @brief 変数のアクティビティを定率で減少させる．
 inline
 void
-YmSat::decay_var_activity()
+GraphSat::decay_var_activity()
 {
   mVarHeap.decay_var_activity();
 }
 
 END_NAMESPACE_YM_SATPG
 
-#endif // YMSAT_H
+#endif // GRAPHSAT_H

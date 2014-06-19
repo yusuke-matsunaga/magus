@@ -8,7 +8,7 @@
 
 
 #include "SaBase.h"
-#include "YmSat.h"
+#include "GraphSat.h"
 #include "SatClause.h"
 
 
@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-SaBase::SaBase(YmSat* solver) :
+SaBase::SaBase(GraphSat* solver) :
   SatAnalyzer(solver)
 {
 }

@@ -29,9 +29,9 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libatpg_ymsat.la \
-	libatpg_ymsat_p.la \
-	libatpg_ymsat_d.la
+	libatpg_graphsat.la \
+	libatpg_graphsat_p.la \
+	libatpg_graphsat_d.la
 
 
 ############################################################
@@ -65,58 +65,58 @@ COMMON_SOURCES = \
 	SatClause.cc \
 	VarHeap.h \
 	VarHeap.cc \
-	YmSat.h \
-	YmSat.cc \
-	YmSatR.h \
-	YmSatR.cc
+	GraphSat.h \
+	GraphSat.cc \
+	GraphSatR.h \
+	GraphSatR.cc
 
 
 ############################################################
-## libatpg_ymsat.la 用の変数の指定
+## libatpg_graphsat.la 用の変数の指定
 ############################################################
 
-libatpg_ymsat_la_CXXFLAGS = \
+libatpg_graphsat_la_CXXFLAGS = \
 	$(YM_CXXOPTFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_ymsat_la_SOURCES = \
+libatpg_graphsat_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_ymsat_la_LIBADD =
+libatpg_graphsat_la_LIBADD =
 
-libatpg_ymsat_la_LDFLAGS = \
+libatpg_graphsat_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_ymsat_d.la 用の変数の指定
+## libatpg_graphsat_d.la 用の変数の指定
 ############################################################
 
-libatpg_ymsat_d_la_CXXFLAGS = \
+libatpg_graphsat_d_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_ymsat_d_la_SOURCES = \
+libatpg_graphsat_d_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_ymsat_d_la_LIBADD =
+libatpg_graphsat_d_la_LIBADD =
 
-libatpg_ymsat_d_la_LDFLAGS = \
+libatpg_graphsat_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_ymsat_p.la 用の変数の指定
+## libatpg_graphsat_p.la 用の変数の指定
 ############################################################
 
-libatpg_ymsat_p_la_CXXFLAGS = \
+libatpg_graphsat_p_la_CXXFLAGS = \
 	$(YM_CXXPRFFLAGS) \
 	$(AM_CXXFLAGS)
 
-libatpg_ymsat_p_la_SOURCES = \
+libatpg_graphsat_p_la_SOURCES = \
 	$(COMMON_SOURCES)
 
-libatpg_ymsat_p_la_LIBADD =
+libatpg_graphsat_p_la_LIBADD =
 
-libatpg_ymsat_p_la_LDFLAGS = \
+libatpg_graphsat_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

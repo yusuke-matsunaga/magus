@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmSat.h"
+#include "GraphSat.h"
 #include "SatReason.h"
 
 
@@ -26,8 +26,8 @@ class SatClause;
 /// ただし，学習節の生成法は唯一ではないので，SatAnalyzer を純粋仮想
 /// 基底クラスにして派生クラスでさまざまな手法を実装できるようにしてい
 /// る．
-/// そのため，SatAnalyzer の大きな役割は YmSat とのインターフェイスを
-/// 提供することである．もう一つの仕事は，派生クラスが YmSat の
+/// そのため，SatAnalyzer の大きな役割は GraphSat とのインターフェイスを
+/// 提供することである．もう一つの仕事は，派生クラスが GraphSat の
 /// private メンバ関数にアクセスするための代理関数を提供することである．
 //////////////////////////////////////////////////////////////////////
 class SatAnalyzer
@@ -36,7 +36,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  SatAnalyzer(YmSat* solver);
+  SatAnalyzer(GraphSat* solver);
 
   /// @brief デストラクタ
   virtual
@@ -65,7 +65,7 @@ public:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // 派生クラスに直接 YmSat をアクセスさせないための代理関数
+  // 派生クラスに直接 GraphSat をアクセスさせないための代理関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 現在の decision level を取り出す．
@@ -107,8 +107,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // YmSat へのポインタ
-  YmSat* mSolver;
+  // GraphSat へのポインタ
+  GraphSat* mSolver;
 
 };
 
@@ -126,7 +126,7 @@ public:
   /// @param[in] option どのクラスを生成するかを決めるオプション文字列
   static
   SatAnalyzer*
-  gen_analyzer(YmSat* solver,
+  gen_analyzer(GraphSat* solver,
 	       const string& option = string());
 
 };
@@ -139,7 +139,7 @@ public:
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
 inline
-SatAnalyzer::SatAnalyzer(YmSat* solver) :
+SatAnalyzer::SatAnalyzer(GraphSat* solver) :
   mSolver(solver)
 {
 }

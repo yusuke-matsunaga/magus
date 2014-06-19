@@ -1,8 +1,8 @@
-#ifndef SAUIP2_H
-#define SAUIP2_H
+#ifndef SAUIP1_H
+#define SAUIP1_H
 
-/// @file SaUIP2.h
-/// @brief SaUIP2 のヘッダファイル
+/// @file SaUIP1.h
+/// @brief SaUIP1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SaUIP2 SaUIP2.h "SaUIP2.h"
+/// @class SaUIP1 SaUIP1.h "SaUIP1.h"
 /// @brief first UIP ヒューリスティックを用いた解析器
 //////////////////////////////////////////////////////////////////////
-class SaUIP2 :
+class SaUIP1 :
   public SaBase
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  SaUIP2(YmSat* solver);
+  SaUIP1(GraphSat* solver);
 
   /// @brief デストラクタ
   virtual
-  ~SaUIP2();
+  ~SaUIP1();
 
 
 public:

@@ -1,31 +1,31 @@
 
-/// @file YmSatR.cc
-/// @brief YmSatR の実装ファイル
+/// @file GraphSatR.cc
+/// @brief GraphSatR の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmSatR.h"
+#include "GraphSatR.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// YmSatR
+// GraphSatR
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmSatR::YmSatR(ostream& out,
-	       const string& option) :
-  YmSat(option),
+GraphSatR::GraphSatR(ostream& out,
+		     const string& option) :
+  GraphSat(option),
   mOut(out)
 {
 }
 
 // @brief デストラクタ
-YmSatR::~YmSatR()
+GraphSatR::~GraphSatR()
 {
 }
 
@@ -33,9 +33,9 @@ YmSatR::~YmSatR()
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
-YmSatR::new_var()
+GraphSatR::new_var()
 {
-  VarId id = YmSat::new_var();
+  VarId id = GraphSat::new_var();
 
   mOut << "N" << endl
        << "# varid = " << id << endl;
@@ -46,7 +46,7 @@ YmSatR::new_var()
 // @brief 節を追加する．
 // @param[in] lits リテラルのベクタ
 void
-YmSatR::add_clause(const vector<Literal>& lits)
+GraphSatR::add_clause(const vector<Literal>& lits)
 {
   mOut << "A";
   for (vector<Literal>::const_iterator p = lits.begin();
@@ -56,15 +56,15 @@ YmSatR::add_clause(const vector<Literal>& lits)
   }
   mOut << endl;
 
-  YmSat::add_clause(lits);
+  GraphSat::add_clause(lits);
 }
 
 // @brief 節を追加する．
 // @param[in] lit_num リテラル数
 // @param[in] lits リテラルの配列
 void
-YmSatR::add_clause(ymuint lit_num,
-		   const Literal* lits)
+GraphSatR::add_clause(ymuint lit_num,
+		      const Literal* lits)
 {
   mOut << "A";
   for (ymuint i = 0; i < lit_num; ++ i) {
@@ -73,38 +73,38 @@ YmSatR::add_clause(ymuint lit_num,
   }
   mOut << endl;
 
-  YmSat::add_clause(lit_num, lits);
+  GraphSat::add_clause(lit_num, lits);
 }
 
 // @brief 1項の節(リテラル)を追加する．
 void
-YmSatR::add_clause(Literal lit1)
+GraphSatR::add_clause(Literal lit1)
 {
   mOut << "A";
   put_lit(lit1);
   mOut << endl;
 
-  YmSat::add_clause(lit1);
+  GraphSat::add_clause(lit1);
 }
 
 // @brief 2項の節を追加する．
 void
-YmSatR::add_clause(Literal lit1,
-		   Literal lit2)
+GraphSatR::add_clause(Literal lit1,
+		      Literal lit2)
 {
   mOut << "A";
   put_lit(lit1);
   put_lit(lit2);
   mOut << endl;
 
-  YmSat::add_clause(lit1, lit2);
+  GraphSat::add_clause(lit1, lit2);
 }
 
 // @brief 3項の節を追加する．
 void
-YmSatR::add_clause(Literal lit1,
-		   Literal lit2,
-		   Literal lit3)
+GraphSatR::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3)
 {
   mOut << "A";
   put_lit(lit1);
@@ -112,15 +112,15 @@ YmSatR::add_clause(Literal lit1,
   put_lit(lit3);
   mOut << endl;
 
-  YmSat::add_clause(lit1, lit2, lit3);
+  GraphSat::add_clause(lit1, lit2, lit3);
 }
 
 // @brief 4項の節を追加する．
 void
-YmSatR::add_clause(Literal lit1,
-		   Literal lit2,
-		   Literal lit3,
-		   Literal lit4)
+GraphSatR::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4)
 {
   mOut << "A";
   put_lit(lit1);
@@ -129,16 +129,16 @@ YmSatR::add_clause(Literal lit1,
   put_lit(lit4);
   mOut << endl;
 
-  YmSat::add_clause(lit1, lit2, lit3, lit4);
+  GraphSat::add_clause(lit1, lit2, lit3, lit4);
 }
 
 // @brief 5項の節を追加する．
 void
-YmSatR::add_clause(Literal lit1,
-		   Literal lit2,
-		   Literal lit3,
-		   Literal lit4,
-		   Literal lit5)
+GraphSatR::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4,
+		      Literal lit5)
 {
   mOut << "A";
   put_lit(lit1);
@@ -148,7 +148,7 @@ YmSatR::add_clause(Literal lit1,
   put_lit(lit5);
   mOut << endl;
 
-  YmSat::add_clause(lit1, lit2, lit3, lit4, lit5);
+  GraphSat::add_clause(lit1, lit2, lit3, lit4, lit5);
 }
 
 // @brief SAT 問題を解く．
@@ -159,8 +159,8 @@ YmSatR::add_clause(Literal lit1,
 // @retval kB3X わからなかった．
 // @note i 番めの変数の割り当て結果は model[i] に入る．
 Bool3
-YmSatR::solve(const vector<Literal>& assumptions,
-		      vector<Bool3>& model)
+GraphSatR::solve(const vector<Literal>& assumptions,
+		 vector<Bool3>& model)
 {
   mOut << "S";
   for (vector<Literal>::const_iterator p = assumptions.begin();
@@ -170,7 +170,7 @@ YmSatR::solve(const vector<Literal>& assumptions,
   }
   mOut << endl;
 
-  Bool3 ans = YmSat::solve(assumptions, model);
+  Bool3 ans = GraphSat::solve(assumptions, model);
 
   mOut << "# " << ans << endl;
 
@@ -179,7 +179,7 @@ YmSatR::solve(const vector<Literal>& assumptions,
 
 // @brief リテラルを出力する．
 void
-YmSatR::put_lit(Literal lit)
+GraphSatR::put_lit(Literal lit)
 {
   mOut << " " << lit.varid();
   if ( lit.is_positive() ) {

@@ -27,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  SaBase(YmSat* solver);
+  SaBase(GraphSat* solver);
 
   /// @brief デストラクタ
   virtual

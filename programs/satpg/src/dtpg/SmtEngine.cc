@@ -16,7 +16,7 @@
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "LitMap.h"
-#include "../ymsat/YmSat.h"
+#include "../graphsat/GraphSat.h"
 #include "logic/SatStats.h"
 
 
@@ -28,7 +28,7 @@ BEGIN_NONAMESPACE
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
 void
-set_gvar(YmSat& solver,
+set_gvar(GraphSat& solver,
 	 TpgNode* node)
 {
   // ノードそのものに割り当てる．
@@ -40,7 +40,7 @@ set_gvar(YmSat& solver,
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
 void
-set_fvar(YmSat& solver,
+set_fvar(GraphSat& solver,
 	 TpgNode* node)
 {
   // ノードそのものに割り当てる．
@@ -52,7 +52,7 @@ set_fvar(YmSat& solver,
 // バッファの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_buff_cnf(YmSat& solver,
+make_buff_cnf(GraphSat& solver,
 	      Literal i,
 	      Literal o)
 {
@@ -63,7 +63,7 @@ make_buff_cnf(YmSat& solver,
 // 2入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_and2_cnf(YmSat& solver,
+make_and2_cnf(GraphSat& solver,
 	      Literal i0,
 	      Literal i1,
 	      Literal o)
@@ -76,7 +76,7 @@ make_and2_cnf(YmSat& solver,
 // 3入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_and3_cnf(YmSat& solver,
+make_and3_cnf(GraphSat& solver,
 	      Literal i0,
 	      Literal i1,
 	      Literal i2,
@@ -91,7 +91,7 @@ make_and3_cnf(YmSat& solver,
 // 4入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_and4_cnf(YmSat& solver,
+make_and4_cnf(GraphSat& solver,
 	      Literal i0,
 	      Literal i1,
 	      Literal i2,
@@ -108,7 +108,7 @@ make_and4_cnf(YmSat& solver,
 // 多入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_and_cnf(YmSat& solver,
+make_and_cnf(GraphSat& solver,
 	     const LitMap& litmap,
 	     Literal output)
 {
@@ -134,7 +134,7 @@ make_and_cnf(YmSat& solver,
 // 2入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_or2_cnf(YmSat& solver,
+make_or2_cnf(GraphSat& solver,
 	     Literal i0,
 	     Literal i1,
 	     Literal o)
@@ -147,7 +147,7 @@ make_or2_cnf(YmSat& solver,
 // 3入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_or3_cnf(YmSat& solver,
+make_or3_cnf(GraphSat& solver,
 	     Literal i0,
 	     Literal i1,
 	     Literal i2,
@@ -162,7 +162,7 @@ make_or3_cnf(YmSat& solver,
 // 4入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_or4_cnf(YmSat& solver,
+make_or4_cnf(GraphSat& solver,
 	     Literal i0,
 	     Literal i1,
 	     Literal i2,
@@ -179,7 +179,7 @@ make_or4_cnf(YmSat& solver,
 // 多入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_or_cnf(YmSat& solver,
+make_or_cnf(GraphSat& solver,
 	    const LitMap& litmap,
 	    Literal output)
 {
@@ -205,7 +205,7 @@ make_or_cnf(YmSat& solver,
 // 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_xor2_cnf(YmSat& solver,
+make_xor2_cnf(GraphSat& solver,
 	      Literal i0,
 	      Literal i1,
 	      Literal o)
@@ -219,7 +219,7 @@ make_xor2_cnf(YmSat& solver,
 // 3入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_xor3_cnf(YmSat& solver,
+make_xor3_cnf(GraphSat& solver,
 	      Literal i0,
 	      Literal i1,
 	      Literal i2,
@@ -238,7 +238,7 @@ make_xor3_cnf(YmSat& solver,
 // 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
 inline
 void
-make_xor_cnf(YmSat& solver,
+make_xor_cnf(GraphSat& solver,
 	     const LitMap& litmap,
 	     Literal output)
 {
@@ -353,7 +353,7 @@ END_NONAMESPACE
 // 結果は mTfoList に格納される．
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
-SmtEngine::mark_region(YmSat& solver,
+SmtEngine::mark_region(GraphSat& solver,
 		       const vector<TpgNode*>& fnode_list,
 		       ymuint max_id)
 {
@@ -430,7 +430,7 @@ SmtEngine::tmp_lits_add(Literal lit)
 
 // @brief 作業領域の冊を SAT ソルバに加える．
 void
-SmtEngine::tmp_lits_end(YmSat& solver)
+SmtEngine::tmp_lits_end(GraphSat& solver)
 {
   solver.add_clause(mTmpLits);
 }
@@ -460,7 +460,7 @@ SmtEngine::cnf_end()
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SmtEngine::make_gnode_cnf(YmSat& solver,
+SmtEngine::make_gnode_cnf(GraphSat& solver,
 			  TpgNode* node)
 {
   Literal output(node->gvar(), false);
@@ -471,7 +471,7 @@ SmtEngine::make_gnode_cnf(YmSat& solver,
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SmtEngine::make_fnode_cnf(YmSat& solver,
+SmtEngine::make_fnode_cnf(GraphSat& solver,
 			  TpgNode* node)
 {
   if ( !node->has_flt_var() ) {
@@ -544,7 +544,7 @@ SmtEngine::make_fnode_cnf(YmSat& solver,
 
 // @brief 故障ゲートの CNF を作る．
 void
-SmtEngine::make_fault_cnf(YmSat& solver,
+SmtEngine::make_fault_cnf(GraphSat& solver,
 			  TpgFault* fault)
 {
   TpgNode* node = fault->node();
@@ -623,7 +623,7 @@ SmtEngine::make_fault_cnf(YmSat& solver,
 // @param[in] node 対象のノード
 // @param[in] litmap 入出力のリテラルを保持するクラス
 void
-SmtEngine::make_node_cnf(YmSat& solver,
+SmtEngine::make_node_cnf(GraphSat& solver,
 			 TpgNode* node,
 			 const LitMap& litmap,
 			 Literal output)
@@ -649,7 +649,7 @@ SmtEngine::make_node_cnf(YmSat& solver,
 // @param[in] type ゲートの種類
 // @param[in] litmap 入出力のリテラルを保持するクラス
 void
-SmtEngine::make_gate_cnf(YmSat& solver,
+SmtEngine::make_gate_cnf(GraphSat& solver,
 			 tTgGateType type,
 			 const LitMap& litmap,
 			 Literal output)
@@ -695,7 +695,7 @@ SmtEngine::make_gate_cnf(YmSat& solver,
 
 // @brief ノードの故障差関数を表すCNFを作る．
 void
-SmtEngine::make_dlit_cnf(YmSat& solver,
+SmtEngine::make_dlit_cnf(GraphSat& solver,
 			 TpgNode* node)
 {
   Literal dlit(node->dvar());
@@ -774,7 +774,7 @@ SmtEngine::make_dlit_cnf(YmSat& solver,
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
 void
-SmtEngine::make_flt0_cnf(YmSat& solver,
+SmtEngine::make_flt0_cnf(GraphSat& solver,
 			 VarId ivar,
 			 VarId fvar,
 			 VarId ovar)
@@ -794,7 +794,7 @@ SmtEngine::make_flt0_cnf(YmSat& solver,
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
 void
-SmtEngine::make_flt1_cnf(YmSat& solver,
+SmtEngine::make_flt1_cnf(GraphSat& solver,
 			 VarId ivar,
 			 VarId fvar,
 			 VarId ovar)
@@ -815,7 +815,7 @@ SmtEngine::make_flt1_cnf(YmSat& solver,
 // @param[in] fvar1 故障変数
 // @param[in] ovar 出力の変数
 void
-SmtEngine::make_flt01_cnf(YmSat& solver,
+SmtEngine::make_flt01_cnf(GraphSat& solver,
 			  VarId ivar,
 			  VarId fvar0,
 			  VarId fvar1,
@@ -834,7 +834,7 @@ SmtEngine::make_flt01_cnf(YmSat& solver,
 
 // @brief 一つの SAT問題を解く．
 Bool3
-SmtEngine::solve(YmSat& solver,
+SmtEngine::solve(GraphSat& solver,
 		 TpgFault* f,
 		 BackTracer& bt,
 		 DetectOp& dop,
@@ -877,7 +877,7 @@ SmtEngine::solve(YmSat& solver,
 
 // @brief 一つの SAT問題を解く．
 Bool3
-SmtEngine::_solve(YmSat& solver,
+SmtEngine::_solve(GraphSat& solver,
 		  USTime& time)
 {
   if ( mTimerEnable ) {

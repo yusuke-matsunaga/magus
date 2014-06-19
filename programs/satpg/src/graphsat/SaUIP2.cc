@@ -8,7 +8,7 @@
 
 
 #include "SaUIP2.h"
-#include "YmSat.h"
+#include "GraphSat.h"
 #include "SatClause.h"
 
 
@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-SaUIP2::SaUIP2(YmSat* solver) :
+SaUIP2::SaUIP2(GraphSat* solver) :
   SaBase(solver)
 {
 }

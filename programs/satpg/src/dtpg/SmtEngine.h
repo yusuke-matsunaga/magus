@@ -14,7 +14,6 @@
 #include "TpgNode.h"
 #include "DtpgStats.h"
 #include "LitMap.h"
-#include "../ymsat/YmSat.h"
 #include "logic/Literal.h"
 #include "logic/Bool3.h"
 #include "logic/SatStats.h"
@@ -22,6 +21,8 @@
 
 
 BEGIN_NAMESPACE_YM_SATPG
+
+class GraphSat;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SmtEngine SmtEngine.h "SmtEngine.h"
@@ -97,7 +98,7 @@ protected:
   /// 結果は mTfoList に格納される．
   /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
   void
-  mark_region(YmSat& solver,
+  mark_region(GraphSat& solver,
 	      const vector<TpgNode*>& fnode_list,
 	      ymuint max_id);
 
@@ -136,14 +137,14 @@ protected:
 
   /// @brief 作業領域の冊を SAT ソルバに加える．
   void
-  tmp_lits_end(YmSat& solver);
+  tmp_lits_end(GraphSat& solver);
 
   /// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
   /// @param[in] node 対象のノード
   static
   void
-  make_gnode_cnf(YmSat& solver,
+  make_gnode_cnf(GraphSat& solver,
 		 TpgNode* node);
 
   /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
@@ -151,13 +152,13 @@ protected:
   /// @param[in] node 対象のノード
   static
   void
-  make_fnode_cnf(YmSat& solver,
+  make_fnode_cnf(GraphSat& solver,
 		 TpgNode* node);
 
   /// @brief 故障ゲートの CNF を作る．
   static
   void
-  make_fault_cnf(YmSat& solver,
+  make_fault_cnf(GraphSat& solver,
 		 TpgFault* fault);
 
   /// @brief ノードの入出力の関係を表す CNF を作る．
@@ -166,7 +167,7 @@ protected:
   /// @param[in] litmap 入出力のリテラルを保持するクラス
   static
   void
-  make_node_cnf(YmSat& solver,
+  make_node_cnf(GraphSat& solver,
 		TpgNode* node,
 		const LitMap& litmap,
 		Literal output);
@@ -177,14 +178,14 @@ protected:
   /// @param[in] litmap 入出力のリテラルを保持するクラス
   static
   void
-  make_gate_cnf(YmSat& solver,
+  make_gate_cnf(GraphSat& solver,
 		tTgGateType type,
 		const LitMap& litmap,
 		Literal output);
 
   /// @brief ノードの故障差関数を表すCNFを作る．
   void
-  make_dlit_cnf(YmSat& solver,
+  make_dlit_cnf(GraphSat& solver,
 		TpgNode* node);
 
   /// @brief 故障挿入回路を表す CNF 式を作る．
@@ -194,7 +195,7 @@ protected:
   /// @param[in] ovar 出力の変数
   static
   void
-  make_flt0_cnf(YmSat& solver,
+  make_flt0_cnf(GraphSat& solver,
 		VarId ivar,
 		VarId fvar,
 		VarId ovar);
@@ -206,7 +207,7 @@ protected:
   /// @param[in] ovar 出力の変数
   static
   void
-  make_flt1_cnf(YmSat& solver,
+  make_flt1_cnf(GraphSat& solver,
 		VarId ivar,
 		VarId fvar,
 		VarId ovar);
@@ -219,7 +220,7 @@ protected:
   /// @param[in] ovar 出力の変数
   static
   void
-  make_flt01_cnf(YmSat& solver,
+  make_flt01_cnf(GraphSat& solver,
 		 VarId ivar,
 		 VarId fvar0,
 		 VarId fvar1,
@@ -227,7 +228,7 @@ protected:
 
   /// @brief 一つの SAT問題を解く．
   Bool3
-  solve(YmSat& solver,
+  solve(GraphSat& solver,
 	TpgFault* f,
 	BackTracer& bt,
 	DetectOp& dop,
@@ -235,7 +236,7 @@ protected:
 
   /// @brief 一つの SAT問題を解く．
   Bool3
-  _solve(YmSat& solver,
+  _solve(GraphSat& solver,
 	 USTime& time);
 
   /// @brief 検出した場合の処理

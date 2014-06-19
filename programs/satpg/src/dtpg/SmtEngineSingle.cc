@@ -13,7 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
-#include "../ymsat/YmSat.h"
+#include "../graphsat/GraphSat.h"
 #include "logic/SatStats.h"
 
 
@@ -59,7 +59,7 @@ SmtEngineSingle::run(TpgFault* fault,
   TpgNode* fnode = fault->node();
   int fval = fault->val();
 
-  YmSat solver(sat_option());
+  GraphSat solver(sat_option());
 
   bt.set_max_id(max_id);
 
@@ -109,7 +109,7 @@ SmtEngineSingle::run(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  solver.add_pgraph(fnode, output_list());
+  solver.set_pgraph(fnode, output_list(), max_id);
 
   // 故障に対するテスト生成を行なう．
   tmp_lits_begin();

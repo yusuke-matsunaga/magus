@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] solver SATソルバ
 // @param[in] option どのクラスを生成するかを決めるオプション文字列
 SatAnalyzer*
-SaFactory::gen_analyzer(YmSat* solver,
+SaFactory::gen_analyzer(GraphSat* solver,
 			const string& option)
 {
   if ( option == "uip1" ) {
