@@ -108,7 +108,7 @@ libatpg_dtpg_d_la_SOURCES = \
 
 libatpg_dtpg_d_la_LIBADD =
 
-libatpg_dtpg_la_LDFLAGS = \
+libatpg_dtpg_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
@@ -125,5 +125,5 @@ libatpg_dtpg_p_la_SOURCES = \
 
 libatpg_dtpg_p_la_LIBADD =
 
-libatpg_dtpg_la_LDFLAGS = \
+libatpg_dtpg_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)
