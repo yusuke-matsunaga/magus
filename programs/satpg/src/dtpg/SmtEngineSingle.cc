@@ -59,7 +59,7 @@ SmtEngineSingle::run(TpgFault* fault,
   TpgNode* fnode = fault->node();
   int fval = fault->val();
 
-  GraphSat solver(sat_option());
+  Solver solver(sat_option());
 
   bt.set_max_id(max_id);
 
@@ -98,7 +98,7 @@ SmtEngineSingle::run(TpgFault* fault,
     // dlit -> XOR(glit, flit) を追加する．
     solver.add_clause(~glit, ~flit, ~dlit);
     solver.add_clause( glit,  flit, ~dlit);
-
+#if 0
     // XOR(glit, flit) -> dlit を追加する．
     solver.add_clause(~glit,  flit,  dlit);
     solver.add_clause( glit, ~flit,  dlit);
@@ -106,9 +106,20 @@ SmtEngineSingle::run(TpgFault* fault,
     if ( node != fnode ) {
       make_dlit_cnf(solver, node);
     }
+#else
+    if ( !node->is_output() ) {
+      // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
+      ymuint nfo = node->active_fanout_num();
+      tmp_lits_begin(nfo + 1);
+      tmp_lits_add(~dlit);
+      for (ymuint j = 0; j < nfo; ++ j) {
+	  TpgNode* onode = node->active_fanout(j);
+	  tmp_lits_add(Literal(onode->dvar(), false));
+      }
+      tmp_lits_end(solver);
+    }
+#endif
   }
-
-  cnf_end();
 
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
@@ -124,6 +135,14 @@ SmtEngineSingle::run(TpgFault* fault,
     }
     tmp_lits_end(solver);
   }
+
+  // dominator ノードの dvar は1でなければならない．
+  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(node->dvar(), false);
+    solver.add_clause(dlit);
+  }
+
+  cnf_end();
 
   // 故障に対するテスト生成を行なう．
   tmp_lits_begin();

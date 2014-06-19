@@ -813,7 +813,7 @@ GraphSat::implication()
     }
   }
 
-#if 1
+#if 0
   if ( conflict == kNullSatReason ) {
     conflict = search_pgraph();
   }
@@ -855,9 +855,11 @@ Literal
 GraphSat::next_decision()
 {
   Literal lit = find_path();
+#if 0
   if ( lit != kLiteralX ) {
     return lit;
   }
+#endif
 
   // 一定確率でランダムな変数を選ぶ．
   if ( mRandGen.real1() < mParams.mVarFreq && !mVarHeap.empty() ) {

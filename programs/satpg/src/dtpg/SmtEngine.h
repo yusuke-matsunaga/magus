@@ -17,6 +17,7 @@
 #include "logic/Literal.h"
 #include "logic/Bool3.h"
 #include "logic/SatStats.h"
+#include "logic/SatSolver.h"
 #include "utils/StopWatch.h"
 
 
@@ -30,6 +31,14 @@ class GraphSat;
 //////////////////////////////////////////////////////////////////////
 class SmtEngine
 {
+protected:
+
+#if 1
+  typedef GraphSat Solver;
+#else
+  typedef SatSolver Solver;
+#endif
+
 public:
 
   /// @brief コンストラクタ
@@ -98,7 +107,7 @@ protected:
   /// 結果は mTfoList に格納される．
   /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
   void
-  mark_region(GraphSat& solver,
+  mark_region(Solver& solver,
 	      const vector<TpgNode*>& fnode_list,
 	      ymuint max_id);
 
@@ -137,14 +146,14 @@ protected:
 
   /// @brief 作業領域の冊を SAT ソルバに加える．
   void
-  tmp_lits_end(GraphSat& solver);
+  tmp_lits_end(Solver& solver);
 
   /// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
   /// @param[in] node 対象のノード
   static
   void
-  make_gnode_cnf(GraphSat& solver,
+  make_gnode_cnf(Solver& solver,
 		 TpgNode* node);
 
   /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
@@ -152,13 +161,13 @@ protected:
   /// @param[in] node 対象のノード
   static
   void
-  make_fnode_cnf(GraphSat& solver,
+  make_fnode_cnf(Solver& solver,
 		 TpgNode* node);
 
   /// @brief 故障ゲートの CNF を作る．
   static
   void
-  make_fault_cnf(GraphSat& solver,
+  make_fault_cnf(Solver& solver,
 		 TpgFault* fault);
 
   /// @brief ノードの入出力の関係を表す CNF を作る．
@@ -167,7 +176,7 @@ protected:
   /// @param[in] litmap 入出力のリテラルを保持するクラス
   static
   void
-  make_node_cnf(GraphSat& solver,
+  make_node_cnf(Solver& solver,
 		TpgNode* node,
 		const LitMap& litmap,
 		Literal output);
@@ -178,14 +187,14 @@ protected:
   /// @param[in] litmap 入出力のリテラルを保持するクラス
   static
   void
-  make_gate_cnf(GraphSat& solver,
+  make_gate_cnf(Solver& solver,
 		tTgGateType type,
 		const LitMap& litmap,
 		Literal output);
 
   /// @brief ノードの故障差関数を表すCNFを作る．
   void
-  make_dlit_cnf(GraphSat& solver,
+  make_dlit_cnf(Solver& solver,
 		TpgNode* node);
 
   /// @brief 故障挿入回路を表す CNF 式を作る．
@@ -195,7 +204,7 @@ protected:
   /// @param[in] ovar 出力の変数
   static
   void
-  make_flt0_cnf(GraphSat& solver,
+  make_flt0_cnf(Solver& solver,
 		VarId ivar,
 		VarId fvar,
 		VarId ovar);
@@ -207,7 +216,7 @@ protected:
   /// @param[in] ovar 出力の変数
   static
   void
-  make_flt1_cnf(GraphSat& solver,
+  make_flt1_cnf(Solver& solver,
 		VarId ivar,
 		VarId fvar,
 		VarId ovar);
@@ -220,7 +229,7 @@ protected:
   /// @param[in] ovar 出力の変数
   static
   void
-  make_flt01_cnf(GraphSat& solver,
+  make_flt01_cnf(Solver& solver,
 		 VarId ivar,
 		 VarId fvar0,
 		 VarId fvar1,
@@ -228,7 +237,7 @@ protected:
 
   /// @brief 一つの SAT問題を解く．
   Bool3
-  solve(GraphSat& solver,
+  solve(Solver& solver,
 	TpgFault* f,
 	BackTracer& bt,
 	DetectOp& dop,
@@ -236,7 +245,7 @@ protected:
 
   /// @brief 一つの SAT問題を解く．
   Bool3
-  _solve(GraphSat& solver,
+  _solve(Solver& solver,
 	 USTime& time);
 
   /// @brief 検出した場合の処理
@@ -291,6 +300,127 @@ protected:
   void
   max_sat_stats(SatStats& dst_stats,
 		const SatStats& src_stats);
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる便利関数
+  //////////////////////////////////////////////////////////////////////
+
+  // @brief ノードに正常回路用の変数を設定する．
+  // @param[in] solver SAT ソルバー
+  // @param[in] node 対象のノード
+  static
+  void
+  set_gvar(Solver& solver,
+	   TpgNode* node);
+
+  // @brief ノードに正常回路用の変数を設定する．
+  // @param[in] solver SAT ソルバー
+  // @param[in] node 対象のノード
+  static
+  void
+  set_fvar(Solver& solver,
+	   TpgNode* node);
+
+  // バッファの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_buff_cnf(Solver& solver,
+		Literal i,
+		Literal o);
+
+  // 2入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_and2_cnf(Solver& solver,
+		Literal i0,
+		Literal i1,
+		Literal o);
+
+  // 3入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_and3_cnf(Solver& solver,
+		Literal i0,
+		Literal i1,
+		Literal i2,
+		Literal o);
+
+  // 4入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_and4_cnf(Solver& solver,
+		Literal i0,
+		Literal i1,
+		Literal i2,
+		Literal i3,
+		Literal o);
+
+  // 多入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_and_cnf(Solver& solver,
+	       const LitMap& litmap,
+	       Literal output);
+
+  // 2入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_or2_cnf(Solver& solver,
+	       Literal i0,
+	       Literal i1,
+	       Literal o);
+
+  // 3入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_or3_cnf(Solver& solver,
+	       Literal i0,
+	       Literal i1,
+	       Literal i2,
+	       Literal o);
+
+  // 4入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_or4_cnf(Solver& solver,
+	       Literal i0,
+	       Literal i1,
+	       Literal i2,
+	       Literal i3,
+	       Literal o);
+
+  // 多入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_or_cnf(Solver& solver,
+	      const LitMap& litmap,
+	      Literal output);
+
+  // 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_xor2_cnf(Solver& solver,
+		Literal i0,
+		Literal i1,
+		Literal o);
+
+  // 3入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_xor3_cnf(Solver& solver,
+		Literal i0,
+		Literal i1,
+		Literal i2,
+		Literal o);
+
+  // 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+  static
+  void
+  make_xor_cnf(Solver& solver,
+	       const LitMap& litmap,
+	       Literal output);
 
 
 private:
