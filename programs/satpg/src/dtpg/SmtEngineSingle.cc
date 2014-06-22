@@ -98,11 +98,12 @@ SmtEngineSingle::run(TpgFault* fault,
     // dlit -> XOR(glit, flit) を追加する．
     solver.add_clause(~glit, ~flit, ~dlit);
     solver.add_clause( glit,  flit, ~dlit);
-#if 0
     // XOR(glit, flit) -> dlit を追加する．
     solver.add_clause(~glit,  flit,  dlit);
     solver.add_clause( glit, ~flit,  dlit);
 
+#if 0
+#if 0
     if ( node != fnode ) {
       make_dlit_cnf(solver, node);
     }
@@ -119,13 +120,14 @@ SmtEngineSingle::run(TpgFault* fault,
       tmp_lits_end(solver);
     }
 #endif
+#endif
   }
 
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
   solver.set_pgraph(fnode, output_list(), max_id);
-  {
+  if ( 0 ) {
     ymuint npo = output_list().size();
     tmp_lits_begin(npo);
     for (ymuint i = 0; i < npo; ++ i) {

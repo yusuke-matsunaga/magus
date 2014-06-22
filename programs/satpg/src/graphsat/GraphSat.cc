@@ -279,6 +279,9 @@ GraphSat::set_pgraph(TpgNode* source,
   mSource = source;
   mSinkList = sink_list;
   mMaxId = max_id;
+  mMark.clear();
+  mMark.resize(mMaxId, 0);
+  mReached = false;
 }
 
 BEGIN_NONAMESPACE
@@ -599,48 +602,47 @@ GraphSat::search(ymuint confl_limit)
 
       decay_var_activity();
       decay_clause_activity();
+    }
+    else {
+      if ( cur_confl_num >= confl_limit ) {
+	// 矛盾の回数が制限値を越えた．
+	backtrack(mRootLevel);
+	return kB3X;
+      }
 
-      continue;
-    }
+      if ( decision_level() == 0 ) {
+	// 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
+	// あるかもしれないのでそれを取り除く．
+	sweep_clause();
+      }
+      if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
+	// 学習節の数が制限値を超えたら整理する．
+	cut_down();
+      }
 
-    if ( cur_confl_num >= confl_limit ) {
-      // 矛盾の回数が制限値を越えた．
-      backtrack(mRootLevel);
-      return kB3X;
-    }
+      // 次の割り当てを選ぶ．
+      Literal lit = next_decision();
+      if ( lit == kLiteralX ) {
+	// すべての変数を割り当てた．
+	// ということは充足しているはず．
+	return kB3True;
+      }
+      ++ mDecisionNum;
 
-    if ( decision_level() == 0 ) {
-      // 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
-      // あるかもしれないのでそれを取り除く．
-      sweep_clause();
-    }
-    if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
-      // 学習節の数が制限値を超えたら整理する．
-      cut_down();
-    }
+      // バックトラックポイントを記録
+      mAssignList.set_marker();
 
-    // 次の割り当てを選ぶ．
-    Literal lit = next_decision();
-    if ( lit == kLiteralX ) {
-      // すべての変数を割り当てた．
-      // ということは充足しているはず．
-      return kB3True;
+      if ( debug & (debug_assign | debug_decision) ) {
+	cout << endl
+	     << "choose " << lit << " :"
+	     << mVarHeap.activity(lit.varid()) << endl;
+      }
+      // 未割り当ての変数を選んでいるのでエラーになるはずはない．
+      if ( debug & debug_assign ) {
+	cout << "\tassign " << lit << " @" << decision_level() << endl;
+      }
+      assign(lit);
     }
-    ++ mDecisionNum;
-
-    // バックトラックポイントを記録
-    mAssignList.set_marker();
-
-    if ( debug & (debug_assign | debug_decision) ) {
-      cout << endl
-	   << "choose " << lit << " :"
-	   << mVarHeap.activity(lit.varid()) << endl;
-    }
-    // 未割り当ての変数を選んでいるのでエラーになるはずはない．
-    if ( debug & debug_assign ) {
-      cout << "\tassign " << lit << " @" << decision_level() << endl;
-    }
-    assign(lit);
   }
 }
 
@@ -649,6 +651,7 @@ SatReason
 GraphSat::implication()
 {
   SatReason conflict = kNullSatReason;
+  for ( ; ; ) {
   while ( mAssignList.has_elem() ) {
     Literal l = mAssignList.get_next();
     ++ mPropagationNum;
@@ -813,12 +816,56 @@ GraphSat::implication()
     }
   }
 
-#if 0
-  if ( conflict == kNullSatReason ) {
-    conflict = search_pgraph();
+  if ( conflict != kNullSatReason ) {
+    return conflict;
   }
-#endif
 
+  if ( mReached ) {
+    return kNullSatReason;
+  }
+
+  // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
+  mBlockList.clear();
+  mFrontierList.clear();
+  for (ymuint i = 0; i < mSinkList.size(); ++ i) {
+    TpgNode* node = mSinkList[i];
+    mMark[node->id()] = 2;
+  }
+  int stat = dfs_pgraph(mSource);
+  dfs_clear(mSource);
+  if ( stat == 2 ) {
+    // 終点に到達した．
+    mReached = true;
+    mReachedLevel = decision_level();
+    return kNullSatReason;
+  }
+
+  if ( stat == -1 ) {
+    // PGraph が空になった．
+    // 現在の block_list を矛盾の原因としてバックトラックする．
+    assert_cond( !mBlockList.empty(), __FILE__, __LINE__);
+    SatReason conflict = add_pgraph_clause(mBlockList);
+    return conflict;
+  }
+
+  if ( mFrontierList.size() > 1 ) {
+    // implication は起こらない．
+    return kNullSatReason;
+  }
+
+  // x_list.size() == 1
+  // x_list の要素が block_list によって割り当てられる．
+  TpgNode* node = mFrontierList[0];
+  Literal dlit(node->dvar(), false);
+  if ( mBlockList.empty() ) {
+    // 強制割り当て
+    // dominator の時はこうなる．
+    assign(dlit);
+  }
+  else {
+    add_pgraph_clause(mBlockList, node);
+  }
+  }
   return conflict;
 }
 
@@ -845,6 +892,10 @@ GraphSat::backtrack(int level)
     }
   }
 
+  if ( level <= mReachedLevel ) {
+    mReached = false;
+  }
+
   if ( debug & (debug_assign | debug_decision) ) {
     cout << endl;
   }
@@ -854,8 +905,8 @@ GraphSat::backtrack(int level)
 Literal
 GraphSat::next_decision()
 {
-  Literal lit = find_path();
 #if 0
+  Literal lit = find_path();
   if ( lit != kLiteralX ) {
     return lit;
   }
@@ -966,7 +1017,7 @@ GraphSat::sweep_clause()
     mLearntClause.erase(mLearntClause.begin() + wpos, mLearntClause.end());
   }
 
-  if( false ) {
+  if( true ) {
     ymuint n = mConstrClause.size();
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < n; ++ rpos) {
@@ -1318,7 +1369,7 @@ GraphSat::alloc_lits(ymuint lit_num)
 // @note リテラルは mTmpLits に格納されている．
 SatClause*
 GraphSat::new_clause(ymuint lit_num,
-		  bool learnt)
+		     bool learnt)
 {
   ymuint size = sizeof(SatClause) + sizeof(Literal) * (lit_num - 1);
   void* p = mAlloc.get_memory(size);
@@ -1335,6 +1386,8 @@ GraphSat::delete_clause(SatClause* clause)
   if ( debug & debug_assign ) {
     cout << " delete_clause: " << (*clause) << endl;
   }
+
+  assert_cond( clause->lit_num() > 2, __FILE__, __LINE__);
 
   // watch list を更新
   del_watcher(~clause->wl0(), SatReason(clause));
@@ -1504,45 +1557,52 @@ GraphSat::expand_var()
   mAnalyzer->alloc_var(mVarSize);
 }
 
+#if 0
 // @brief PGraph 上の mandatory assignment を求める．
 SatReason
 GraphSat::search_pgraph()
 {
   // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
-  vector<TpgNode*> block_list;
-  vector<TpgNode*> x_list;
-  vector<bool> mark(mMaxId, false);
-  bool stat = dfs_pgraph(mSource, block_list, x_list, mark);
-  if ( stat ) {
+  mBlockList.clear();
+  mFrontierList.clear();
+  for (ymuint i = 0; i < mSinkList.size(); ++ i) {
+    TpgNode* node = mSinkList[i];
+    mMark[node->id()] = 2;
+  }
+  int stat = dfs_pgraph(mSource);
+  dfs_clear(mSource);
+  if ( stat == 2 ) {
     // 終点に到達した．
+    mReached = true;
+    mReachedLevel = decision_level();
     return kNullSatReason;
   }
 
-  if ( x_list.size() > 1 ) {
+  if ( stat == -1 ) {
+    // PGraph が空になった．
+    // 現在の block_list を矛盾の原因としてバックトラックする．
+    assert_cond( !mBlockList.empty(), __FILE__, __LINE__);
+    SatClause* clause = add_pgraph_clause(mBlockList);
+    return SatReason(clause);
+  }
+
+  if ( mFrontierList.size() > 1 ) {
     // implication は起こらない．
     return kNullSatReason;
   }
 
-  if ( x_list.size() == 0 ) {
-    // PGraph が空になった．
-    // 現在の block_list を矛盾の原因としてバックトラックする．
-    assert_cond( !block_list.empty(), __FILE__, __LINE__);
-    SatClause* clause = add_pgraph_clause(block_list);
-    return SatReason(clause);
-  }
-
   // x_list.size() == 1
   // x_list の要素が block_list によって割り当てられる．
-  TpgNode* node = x_list[0];
+  TpgNode* node = mFrontierList[0];
   Literal dlit(node->dvar(), false);
 
-  if ( block_list.empty() ) {
+  if ( mBlockList.empty() ) {
     // 強制割り当て
     // dominator の時はこうなる．
     assign(dlit);
   }
   else {
-    SatClause* clause = add_pgraph_clause(block_list, node);
+    SatClause* clause = add_pgraph_clause(mBlockList, node);
     assign(dlit, SatReason(clause));
   }
 
@@ -1553,68 +1613,108 @@ GraphSat::search_pgraph()
 Literal
 GraphSat::find_path()
 {
-  // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
-  vector<TpgNode*> block_list;
-  vector<TpgNode*> x_list;
-  vector<bool> mark(mMaxId, false);
-  bool stat = dfs_pgraph(mSource, block_list, x_list, mark);
-  if ( stat ) {
-    // 終点に到達した．
+  if ( mReached ) {
     return kLiteralX;
   }
 
-  if ( x_list.size() > 1 ) {
-    return Literal(x_list[0]->dvar(), false);
+  // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
+  mBlockList.clear();
+  mFrontierList.clear();
+  for (ymuint i = 0; i < mSinkList.size(); ++ i) {
+    TpgNode* node = mSinkList[i];
+    mMark[node->id()] = 2;
   }
-
+  int stat = dfs_pgraph(mSource);
+  dfs_clear(mSource);
+  if ( stat == 2 ) {
+    mReached = true;
+    mReachedLevel = decision_level();
+    // 終点に到達した．
+    return kLiteralX;
+  }
+#if 0
+  if ( mFrontierList.size() > 0 ) {
+    return Literal(mFrontierList[0]->dvar(), false);
+  }
+#else
+  if ( mFrontierList.size() == 1 ) {
+    return Literal(mFrontierList[0]->dvar(), false);
+  }
+#endif
   return kLiteralX;
 }
+#endif
 
 // @brief PGraph を DFS でたどる．
-bool
-GraphSat::dfs_pgraph(TpgNode* node,
-		     vector<TpgNode*>& block_list,
-		     vector<TpgNode*>& x_list,
-		     vector<bool>& mark)
+// 返り値
+// - -1: 出力に到達不可能
+// -  1: 出力に X のノードを通って到達可能
+// -  2: 出力まで到達済み
+int
+GraphSat::dfs_pgraph(TpgNode* node)
 {
-  if ( mark[node->id()] ) {
-    return false;
+  int res = mMark[node->id()];
+  if ( res != 0 ) {
+    return res;
   }
-  mark[node->id()] = true;
+  mMark[node->id()] = -1;
 
-  switch ( eval(node->dvar()) ) {
-  case kB3X:
-    x_list.push_back(node);
-    return false;
-
-  case kB3True:
-    break;
-
-  case kB3False:
-    block_list.push_back(node);
-    return false;
-  }
-
-  for (ymuint i = 0; i < mSinkList.size(); ++ i) {
-    if ( node == mSinkList[i] ) {
-      return true;
-    }
+  bool x_flag = false;
+  Bool3 val = eval(node->dvar());
+  if ( val == kB3False ) {
+    mBlockList.push_back(node);
+    mMark[node->id()] = -1;
+    return -1;
   }
 
   ymuint no = node->active_fanout_num();
+  res = -1;
   for (ymuint i = 0; i < no; ++ i) {
     TpgNode* onode = node->active_fanout(i);
-    bool stat = dfs_pgraph(onode, block_list, x_list, mark);
-    if ( stat ) {
-      return true;
+    int res1 = dfs_pgraph(onode);
+    if ( res < res1 ) {
+      res = res1;
+      if ( res == 2 ) {
+	break;
+      }
+      if ( res == 1 && val == kB3X ) {
+	break;
+      }
     }
   }
 
-  return false;
+  if ( res == 2 ) {
+    if ( val == kB3X ) {
+      res = 1;
+      mFrontierList.push_back(node);
+    }
+  }
+  else if ( res == 1 ) {
+    if ( val == kB3X ) {
+      mFrontierList.push_back(node);
+    }
+  }
+
+  mMark[node->id()] = res;
+
+  return res;
+}
+
+void
+GraphSat::dfs_clear(TpgNode* node)
+{
+  if ( mMark[node->id()] != 0 ) {
+    mMark[node->id()] = 0;
+    ymuint no = node->active_fanout_num();
+    for (ymuint i = 0; i < no; ++ i) {
+      TpgNode* onode = node->active_fanout(i);
+      dfs_clear(onode);
+    }
+  }
 }
 
 // @brief PGraph 上のブロックリストから学習節を作る．
-SatClause*
+SatReason
 GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list)
 {
   ymuint n = block_list.size();
@@ -1639,24 +1739,31 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list)
 
     // binary clause は watcher-list に登録するだけで実体はない．
     ++ mConstrBinNum;
+
+    mTmpBinClause->set(l0, l1);
+    return SatReason(mTmpBinClause);
   }
   else {
     // 節の生成
     SatClause* clause = new_clause(n);
+    assert_cond( n > 2, __FILE__, __LINE__);
     mConstrClause.push_back(clause);
 
     if ( debug & debug_assign ) {
       cout << "add_clause: " << *clause << endl;
     }
 
+    SatReason conflict(clause);
+
     // watcher-list の設定
-    add_watcher(~l0, SatReason(clause));
-    add_watcher(~l1, SatReason(clause));
+    add_watcher(~l0, conflict);
+    add_watcher(~l1, conflict);
+    return conflict;
   }
 }
 
 // @brief PGraph 上のブロックリストから学習節を作る．
-SatClause*
+void
 GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
 			    TpgNode* free_node)
 {
@@ -1665,7 +1772,8 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
 
   ymuint n1 = n + 1;
   alloc_lits(n1);
-  mTmpLits[0] = Literal(free_node->dvar(), false);
+  Literal dlit(free_node->dvar(), false);
+  mTmpLits[0] = dlit;
   for (ymuint i = 0; i < n; ++ i) {
     TpgNode* node = block_list[i];
     mTmpLits[i + 1] = Literal(node->dvar(), false);
@@ -1674,7 +1782,8 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
   Literal l0 = mTmpLits[0];
   Literal l1 = mTmpLits[1];
 
-  if ( n == 2 ) {
+  SatReason reason;
+  if ( n1 == 2 ) {
     if ( debug & debug_assign ) {
       cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
     }
@@ -1684,20 +1793,24 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
 
     // binary clause は watcher-list に登録するだけで実体はない．
     ++ mConstrBinNum;
+    reason = SatReason(~l1);
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(n);
+    SatClause* clause = new_clause(n1);
+    assert_cond( n1 > 2, __FILE__, __LINE__);
     mConstrClause.push_back(clause);
 
     if ( debug & debug_assign ) {
       cout << "add_clause: " << *clause << endl;
     }
 
+    reason = SatReason(clause);
     // watcher-list の設定
-    add_watcher(~l0, SatReason(clause));
-    add_watcher(~l1, SatReason(clause));
+    add_watcher(~l0, reason);
+    add_watcher(~l1, reason);
   }
+  assign(dlit, reason);
 }
 
 END_NAMESPACE_YM_SATPG

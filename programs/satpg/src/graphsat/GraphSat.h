@@ -407,18 +407,19 @@ private:
   find_path();
 
   /// @brief PGraph を DFS でたどる．
-  bool
-  dfs_pgraph(TpgNode* node,
-	     vector<TpgNode*>& block_list,
-	     vector<TpgNode*>& x_list,
-	     vector<bool>& mark);
+  int
+  dfs_pgraph(TpgNode* node);
+
+  /// @brief mark を消す．
+  void
+  dfs_clear(TpgNode* node);
 
   /// @brief PGraph 上のブロックリストから学習節を作る．
-  SatClause*
+  SatReason
   add_pgraph_clause(const vector<TpgNode*>& block_list);
 
   /// @brief PGraph 上のブロックリストから学習節を作る．
-  SatClause*
+  void
   add_pgraph_clause(const vector<TpgNode*>& block_list,
 		    TpgNode* free_node);
 
@@ -436,6 +437,19 @@ private:
 
   // PGraph の節点番号の最大値 + 1
   ymuint32 mMaxId;
+
+  // PGraph 探索用のマーク
+  vector<int> mMark;
+
+  // block list
+  vector<TpgNode*> mBlockList;
+
+  // frontier list
+  vector<TpgNode*> mFrontierList;
+
+  bool mReached;
+
+  ymuint32 mReachedLevel;
 
   // 解析器
   SatAnalyzer* mAnalyzer;
