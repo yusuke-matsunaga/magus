@@ -22,9 +22,10 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 SatEngineSingle::SatEngineSingle()
 {
-  mTgGrasp = true;
-  mExtTgGrasp = true;
-  mUseDominator = true;
+  mNemesis = false;
+  mTgGrasp = false;
+  mExtTgGrasp = false;
+  mUseDominator = false;
 }
 
 // @brief デストラクタ
@@ -42,16 +43,20 @@ SatEngineSingle::set_option(const string& option_str)
       continue;
     }
     string option = option_str.substr(next, pos - next);
-    if ( option == "TG-GRASP" ) {
+    if ( option == "NEMESIS" ) {
+      mNemesis = true;
+      mTgGrasp = false;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "TG-GRASP" ) {
+      mNemesis = false;
       mTgGrasp = true;
       mExtTgGrasp = false;
     }
     else if ( option == "EXT-TG-GRASP" ) {
+      mNemesis = false;
       mTgGrasp = true;
       mExtTgGrasp = true;
-    }
-    else if ( option == "NEMESIS" ) {
-      mTgGrasp = false;
     }
     else if ( option == "DOM" ) {
       mUseDominator = true;
@@ -113,27 +118,12 @@ SatEngineSingle::run(TpgFault* fault,
       make_fnode_cnf(solver, node);
     }
 
-    if ( mTgGrasp ) {
-      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    // dlit -> XOR(glit, flit) を追加する．
+    // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
+    solver.add_clause(~glit, ~flit, ~dlit);
+    solver.add_clause( glit,  flit, ~dlit);
 
-      // dlit -> XOR(glit, flit) を追加する．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-
-      // XOR(glit, flit) -> dlit を追加する．
-      solver.add_clause(~glit,  flit,  dlit);
-      solver.add_clause( glit, ~flit,  dlit);
-
-      if ( node != fnode && mExtTgGrasp ) {
-	make_dlit_cnf(solver, node);
-      }
-    }
-    else {
-      // dlit -> XOR(glit, flit) を追加する．
-      // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-
+    if ( mNemesis ) {
       if ( !node->is_output() ) {
 	// dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
 	ymuint nfo = node->active_fanout_num();
@@ -146,12 +136,25 @@ SatEngineSingle::run(TpgFault* fault,
 	tmp_lits_end(solver);
       }
     }
+    if ( mTgGrasp ) {
+      // XOR(glit, flit) -> dlit を追加する．
+      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+      solver.add_clause(~glit,  flit,  dlit);
+      solver.add_clause( glit, ~flit,  dlit);
+
+      if ( mExtTgGrasp ) {
+	if ( node != fnode ) {
+	  make_dlit_cnf(solver, node);
+	}
+      }
+    }
   }
+
 
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  if ( mTgGrasp ) {
+  if ( !mNemesis ) {
     ymuint npo = output_list().size();
     tmp_lits_begin(npo);
     for (ymuint i = 0; i < npo; ++ i) {
