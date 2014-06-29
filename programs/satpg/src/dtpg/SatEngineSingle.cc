@@ -23,6 +23,7 @@ BEGIN_NAMESPACE_YM_SATPG
 SatEngineSingle::SatEngineSingle()
 {
   mNemesis = false;
+  mExtNemesis = false;
   mTgGrasp = false;
   mExtTgGrasp = false;
   mUseDominator = false;
@@ -45,6 +46,13 @@ SatEngineSingle::set_option(const string& option_str)
     string option = option_str.substr(next, pos - next);
     if ( option == "NEMESIS" ) {
       mNemesis = true;
+      mExtNemesis = false;
+      mTgGrasp = false;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "EXT-NEMESIS" ) {
+      mNemesis = true;
+      mExtNemesis = true;
       mTgGrasp = false;
       mExtTgGrasp = false;
     }
@@ -134,6 +142,14 @@ SatEngineSingle::run(TpgFault* fault,
 	  tmp_lits_add(Literal(onode->dvar(), false));
 	}
 	tmp_lits_end(solver);
+
+	if ( mExtNemesis ) {
+	  for (TpgNode* idom = node->imm_dom();
+	       idom != NULL; idom = idom->imm_dom() ) {
+	    Literal idlit(idom->dvar(), false);
+	    solver.add_clause(~dlit, idlit);
+	  }
+	}
       }
     }
     if ( mTgGrasp ) {

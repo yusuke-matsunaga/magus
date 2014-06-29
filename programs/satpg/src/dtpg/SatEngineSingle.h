@@ -69,6 +69,9 @@ private:
   // NEMESIS モード
   bool mNemesis;
 
+  // extected NEMESIS モード
+  bool mExtNemesis;
+
   // TG-GRASP モード
   bool mTgGrasp;
 

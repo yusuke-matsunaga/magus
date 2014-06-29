@@ -96,10 +96,6 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief MFFC 単位で故障差関数を作り，支配関係をもとにした順序付けを行う．
-  void
-  fault_analyze();
-
   /// @brief activate された部分回路に大してテスト生成を行う．
   /// @param[in] mode メインモード
   /// @param[in] bt バックトレーサー
@@ -138,15 +134,6 @@ private:
 	    DetectOp& dop,
 	    UntestOp& uop);
 
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  all_mode(BackTracer& bt,
-	   DetectOp& dop,
-	   UntestOp& uop);
-
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] bt バックトレーサー
@@ -157,19 +144,6 @@ private:
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop);
-
-  /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-  /// @param[in] f0 0縮退故障
-  /// @param[in] f1 1縮退故障
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  dtpg_dual(TpgFault* f0,
-	    TpgFault* f1,
-	    BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
 
   /// @brief DFS で FFR を求める．
   void
