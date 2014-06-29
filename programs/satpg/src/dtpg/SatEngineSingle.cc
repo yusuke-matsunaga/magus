@@ -112,10 +112,6 @@ SatEngineSingle::run(TpgFault* fault,
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
 
-    Literal glit(node->gvar(), false);
-    Literal flit(node->fvar(), false);
-    Literal dlit(node->dvar(), false);
-
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
       make_fault_cnf(solver, fault);
@@ -123,6 +119,10 @@ SatEngineSingle::run(TpgFault* fault,
     else {
       make_fnode_cnf(solver, node);
     }
+
+    Literal glit(node->gvar(), false);
+    Literal flit(node->fvar(), false);
+    Literal dlit(node->dvar(), false);
 
     // dlit -> XOR(glit, flit) を追加する．
     // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．

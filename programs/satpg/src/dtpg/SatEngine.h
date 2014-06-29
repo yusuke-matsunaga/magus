@@ -362,9 +362,6 @@ protected:
   // DTPG の統計情報
   DtpgStats mStats;
 
-  // SATソルバの前回の統計情報
-  SatStats mPrevStats;
-
 };
 
 

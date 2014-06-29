@@ -77,7 +77,6 @@ DtpgSat::run(TpgNetwork& tgnetwork,
   mSatEngineSingle.clear_stats();
 
   mNetwork = &tgnetwork;
-  mMaxId = mNetwork->node_num();
 
   switch ( po_mode ) {
   case kDtpgPoNone:

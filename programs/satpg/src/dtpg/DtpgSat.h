@@ -186,9 +186,6 @@ private:
   // 対象の回路
   TpgNetwork* mNetwork;
 
-  // mNetwork のノード数
-  ymuint32 mMaxId;
-
   // do_dtpg() で用いる対象の故障リスト
   vector<TpgFault*> mFaultList;
 
