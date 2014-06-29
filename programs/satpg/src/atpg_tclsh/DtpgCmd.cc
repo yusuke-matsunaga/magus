@@ -204,6 +204,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   case 3: bt = new_BtZdd(tvmgr); break;
   default: bt = new_BtSimple(tvmgr); break;
   }
+  if ( bt != NULL ) {
+    bt->set_max_id(mgr()._network().max_node_id());
+  }
 
   if ( mPoptDrop->is_specified() ) {
     dop_list.add(new_DopDrop(mgr()));

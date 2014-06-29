@@ -82,8 +82,6 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 {
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
-  bt.set_max_id(max_id);
-
   ymuint nf = flist.size();
 
   // 故障を活性化するとき true にする変数．

@@ -61,8 +61,6 @@ SmtEngineSingle::run(TpgFault* fault,
 
   Solver solver(sat_option());
 
-  bt.set_max_id(max_id);
-
   mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
 
   cnf_begin();

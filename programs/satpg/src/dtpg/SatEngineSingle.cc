@@ -94,8 +94,6 @@ SatEngineSingle::run(TpgFault* fault,
 
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
-  bt.set_max_id(max_id);
-
   mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
 
   cnf_begin();
