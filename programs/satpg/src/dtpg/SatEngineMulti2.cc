@@ -204,6 +204,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
   if ( no > mSkipThreshold ) {
     no = mSkipThreshold;
   }
+  no = 0;
   for (ymuint opos = 0; opos < no; ++ opos) {
     TpgNode* onode = olist[opos];
     ymuint oid = onode->output_id2();

@@ -1142,9 +1142,18 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
   TpgNode* node = mNodeMap[tgnode->gid()];
 
+
   // 出力の故障を生成
   TpgFault* of0 = new_ofault(node, 0, rep0);
   TpgFault* of1 = new_ofault(node, 1, rep1);
+
+  ymuint nf = 0;
+  if ( of0->is_rep() ) {
+    ++ nf;
+  }
+  if ( of1->is_rep() ) {
+    ++ nf;
+  }
 
   ymuint ni = tgnode->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -1183,7 +1192,35 @@ TpgNetwork::make_faults(const TgNode* tgnode,
     ymuint ipos = node->ipos_map(i);
     TpgFault* if0 = new_ifault(inode, ipos, 0, rep0);
     TpgFault* if1 = new_ifault(inode, ipos, 1, rep1);
+    if ( if0->is_rep() ) {
+      ++ nf;
+    }
+    if ( if1->is_rep() ) {
+      ++ nf;
+    }
   }
+
+  // 代表故障を mFaultList に入れる．
+  node->mFaultNum = nf;
+  node->mFaultList = alloc_array<TpgFault*>(mAlloc, nf);
+  ymuint pos = 0;
+  for (ymuint val = 0; val < 2; ++ val) {
+    TpgFault* f = node->mOutputFault[val];
+    if ( f->is_rep() ) {
+      node->mFaultList[pos] = f;
+      ++ pos;
+    }
+  }
+  for (ymuint i = 0; i < ni; ++ i) {
+    for (ymuint val = 0; val < 2; ++ val) {
+      TpgFault* f = node->mInputFault[i * 2 + val];
+      if ( f->is_rep() ) {
+	node->mFaultList[pos] = f;
+	++ pos;
+      }
+    }
+  }
+  assert_cond( nf == pos, __FILE__, __LINE__);
 }
 
 // @brief 出力の故障を作る．

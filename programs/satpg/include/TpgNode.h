@@ -119,10 +119,6 @@ public:
   bool
   is_internal() const;
 
-  /// @brief ダミーノードの時 true を返す．
-  bool
-  is_dummy_node() const;
-
   /// @brief ファンイン数を得る．
   ymuint
   fanin_num() const;
@@ -179,6 +175,15 @@ public:
   TpgFault*
   input_fault(int val,
 	      ymuint pos) const;
+
+  /// @brief このノードに関係する故障数を返す．
+  ymuint
+  fault_num() const;
+
+  /// @brief このノードに関係する故障を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < fault_num() )
+  TpgFault*
+  fault(ymuint pos) const;
 
 
 public:
@@ -439,6 +444,12 @@ private:
   // 入力の故障
   TpgFault** mInputFault;
 
+  // 故障リスト
+  TpgFault** mFaultList;
+
+  // 故障リストの要素数
+  ymuint32 mFaultNum;
+
   // いくつかのマークを納めるビットベクタ
   ymuint32 mMarks;
 
@@ -590,14 +601,6 @@ TpgNode::is_internal() const
   return (mTypeId & 7U) == 5U;
 }
 
-// @brief ダミーノードの時 true を返す．
-inline
-bool
-TpgNode::is_dummy_node() const
-{
-  return (mTypeId & 7U) == 6U;
-}
-
 // @brief ファンイン数を得る．
 inline
 ymuint
@@ -674,6 +677,24 @@ TpgNode::input_fault(int val,
 {
   assert_cond( pos < mFaninNum, __FILE__, __LINE__);
   return mInputFault[pos * 2 + (val % 2)];
+}
+
+// @brief このノードに関係する故障数を返す．
+inline
+ymuint
+TpgNode::fault_num() const
+{
+  return mFaultNum;
+}
+
+// @brief このノードに関係する故障を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < fault_num() )
+inline
+TpgFault*
+TpgNode::fault(ymuint pos) const
+{
+  assert_cond( pos < mFaultNum, __FILE__, __LINE__);
+  return mFaultList[pos];
 }
 
 // @brief mark1 を得る．

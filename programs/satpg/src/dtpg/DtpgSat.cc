@@ -159,21 +159,13 @@ DtpgSat::single_mode(BackTracer& bt,
       continue;
     }
 
-    // 出力の故障
-    TpgFault* f0 = node->output_fault(0);
-    dtpg_single(f0, bt, dop, uop);
-
-    TpgFault* f1 = node->output_fault(1);
-    dtpg_single(f1, bt, dop, uop);
-
-    // 入力の故障
-    ymuint ni = node->fanin_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      TpgFault* f0 = node->input_fault(0, j);
-      dtpg_single(f0, bt, dop, uop);
-
-      TpgFault* f1 = node->input_fault(1, j);
-      dtpg_single(f1, bt, dop, uop);
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      if ( f->status() != kFsDetected &&
+	   !f->is_skip() ) {
+	mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
+      }
     }
   }
 }
@@ -198,8 +190,6 @@ DtpgSat::ffr_mode(BackTracer& bt,
   }
 }
 
-
-
 // @brief mffc モードでテスト生成を行なう．
 void
 DtpgSat::mffc_mode(BackTracer& bt,
@@ -217,22 +207,6 @@ DtpgSat::mffc_mode(BackTracer& bt,
 
       do_dtpg(bt, dop, uop);
     }
-  }
-}
-
-// @brief 一つの故障に対してテストパタン生成を行う．
-// @param[in] f 故障
-void
-DtpgSat::dtpg_single(TpgFault* f,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop)
-{
-  if ( f != NULL &&
-       f->is_rep() &&
-       f->status() != kFsDetected &&
-       !f->is_skip() ) {
-    mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
   }
 }
 
@@ -273,19 +247,14 @@ DtpgSat::dfs_mffc(TpgNode* node,
 void
 DtpgSat::add_node_faults(TpgNode* node)
 {
-  ymuint ni = node->fanin_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    TpgFault* f0 = node->input_fault(0, i);
-    add_fault(f0);
-
-    TpgFault* f1 = node->input_fault(1, i);
-    add_fault(f1);
+  ymuint nf = node->fault_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    TpgFault* f = node->fault(i);
+    if ( f->status() != kFsDetected &&
+	 !f->is_skip() ) {
+      mFaultList.push_back(f);
+    }
   }
-  TpgFault* f0 = node->output_fault(0);
-  add_fault(f0);
-
-  TpgFault* f1 = node->output_fault(1);
-  add_fault(f1);
 }
 
 // @brief テストパタン生成を行なう．
