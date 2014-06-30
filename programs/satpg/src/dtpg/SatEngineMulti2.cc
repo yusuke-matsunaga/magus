@@ -28,7 +28,6 @@ SatEngineMulti2::SatEngineMulti2()
   mTgGrasp = true;
   mExtTgGrasp = true;
   mUseDominator = true;
-  mSkipThreshold = 3;
 }
 
 // @brief デストラクタ
@@ -75,6 +74,7 @@ SatEngineMulti2::set_option(const string& option_str)
 // @param[in] max_id ノード番号の最大値 + 1
 void
 SatEngineMulti2::run(const vector<TpgFault*>& flist,
+		     ymuint th_val,
 		     ymuint max_id,
 		     BackTracer& bt,
 		     DetectOp& dop,
@@ -201,10 +201,10 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 
   cnf_end();
 
-  if ( no > mSkipThreshold ) {
-    no = mSkipThreshold;
+  if ( th_val > no ) {
+    th_val = no;
   }
-  for (ymuint opos = 0; opos < no; ++ opos) {
+  for (ymuint opos = 0; opos < th_val; ++ opos) {
     TpgNode* onode = olist[opos];
     ymuint oid = onode->output_id2();
 
@@ -279,11 +279,6 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 
       if ( f->status() == kFsDetected ) {
 	// 他の故障のパタンで検出済みになっている場合がある．
-	continue;
-      }
-
-      if ( f->untest_num() > mSkipThreshold ) {
-	// 他の出力での検出不能回数がしきい値を越えたらスキップする．
 	continue;
       }
 
@@ -386,9 +381,6 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	if ( opos == no - 1 ) {
 	  uop(f);
 	}
-	else {
-	  f->inc_untest_num();
-	}
 	stats_undetect(sat_stats, time);
       }
       else {
@@ -485,7 +477,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 
     cnf_end();
 
-    tmp_lits_begin(output_list().size());
+    tmp_lits_begin(no);
     for (vector<TpgNode*>::const_iterator p = output_list().begin();
 	 p != output_list().end(); ++ p) {
       TpgNode* node = *p;

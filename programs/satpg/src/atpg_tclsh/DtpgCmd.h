@@ -73,12 +73,6 @@ private:
   // single3 オプションの解析用オブジェクト
   TclPopt* mPoptSingle3;
 
-  // dual オプションの解析用オブジェクト
-  TclPopt* mPoptDual;
-
-  // node オプションの解析用オブジェクト
-  TclPopt* mPoptNode;
-
   // ffr オプションの解析用オブジェクト
   TclPopt* mPoptFFR;
 
@@ -89,19 +83,13 @@ private:
   TclPopt* mPoptMFFC;
 
   // mffc2 オプションの解析用オブジェクト
-  TclPopt* mPoptMFFC2;
-
-  // all オプションの解析用オブジェクト
-  TclPopt* mPoptAll;
+  TclPoptInt* mPoptMFFC2;
 
   // po オプションの解析用オブジェクト
   TclPopt* mPoptPo;
 
   // rpo オプションの解析用オブジェクト
   TclPopt* mPoptRpo;
-
-  // fault_analysis オプションの解析用オブジェクト
-  TclPopt* mPoptFaultAnalysis;
 
   // skip オプションの解析用オブジェクト
   TclPoptInt* mPoptSkip;

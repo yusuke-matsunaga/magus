@@ -49,26 +49,18 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			     "single2 mode");
   mPoptSingle3 = new TclPopt(this, "single3",
 			     "single3 mode");
-  mPoptDual = new TclPopt(this, "dual",
-			  "dual mode");
-  mPoptNode = new TclPopt(this, "node",
-			  "node mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
   mPoptFFR2 = new TclPoptInt(this, "ffr2",
 			     "FFR2 mode");
   mPoptMFFC = new TclPopt(this, "mffc",
 			  "MFFC mode");
-  mPoptMFFC2 = new TclPopt(this, "mffc2",
-			   "MFFC2 mode");
-  mPoptAll = new TclPopt(this, "all",
-			 "all mode");
+  mPoptMFFC2 = new TclPoptInt(this, "mffc2",
+			      "MFFC2 mode <threshold-level>");
   mPoptPo = new TclPopt(this, "po",
 			"po-split mode");
   mPoptRpo = new TclPopt(this, "rpo",
 			 "po-split (reverse order) mode");
-  mPoptFaultAnalysis = new TclPopt(this, "fault_analysis",
-				   "analize fault dominace");
   mPoptSkip = new TclPoptInt(this, "skip",
 			     "specify skip count <INT>");
   mPoptX = new TclPoptInt(this, "x",
@@ -83,10 +75,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			   "enable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptMiniSat2, mPoptSatRec);
-  TclPoptGroup* mode_group = new_popt_group(mPoptSingle, mPoptDual, mPoptNode,
-					    mPoptFFR, mPoptMFFC, mPoptAll);
+  TclPoptGroup* mode_group = new_popt_group(mPoptSingle, mPoptFFR, mPoptMFFC, mPoptMFFC2);
   add_popt(mode_group, mPoptSingle2);
-  add_popt(mode_group, mPoptMFFC2);
 
   new_popt_group(mPoptPo, mPoptRpo);
 }
@@ -138,7 +128,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   bool print_stats = mPoptPrintStats->is_specified();
 
   tDtpgMode mode = kDtpgSingle;
-  ymuint ffr2_limit = 0;
+  ymuint mode_val = 0;
   if ( mPoptSingle->is_specified() ) {
     mode = kDtpgSingle;
   }
@@ -148,27 +138,19 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   else if ( mPoptSingle3->is_specified() ) {
     mode = kDtpgSingle3;
   }
-  else if ( mPoptDual->is_specified() ) {
-    mode = kDtpgDual;
-  }
-  else if ( mPoptNode->is_specified() ) {
-    mode = kDtpgNode;
-  }
   else if ( mPoptFFR->is_specified() ) {
     mode = kDtpgFFR;
   }
   else if ( mPoptFFR2->is_specified() ) {
     mode = kDtpgFFR2;
-    ffr2_limit = mPoptFFR2->val();
+    mode_val = mPoptFFR2->val();
   }
   else if ( mPoptMFFC->is_specified() ) {
     mode = kDtpgMFFC;
   }
   else if ( mPoptMFFC2->is_specified() ) {
     mode = kDtpgMFFC2;
-  }
-  else if ( mPoptAll->is_specified() ) {
-    mode = kDtpgAll;
+    mode_val = mPoptMFFC2->val();
   }
 
   string option_str = mPoptOpt->val();
@@ -231,7 +213,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgStats stats;
 
-  mgr().dtpg(DtpgMode(mode, ffr2_limit), po_mode, option_str,
+  mgr().dtpg(DtpgMode(mode, mode_val), po_mode, option_str,
 	     *bt, dop_list, uop_list, stats);
 
   after_update_faults();

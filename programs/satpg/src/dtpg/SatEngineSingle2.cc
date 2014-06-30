@@ -72,6 +72,7 @@ SatEngineSingle2::set_option(const string& option_str)
 void
 SatEngineSingle2::run(TpgNetwork& network,
 		      TpgFault* fault,
+		      ymuint th_val,
 		      BackTracer& bt,
 		      DetectOp& dop,
 		      UntestOp& uop)
@@ -90,7 +91,11 @@ SatEngineSingle2::run(TpgNetwork& network,
   Bool3 last_ans;
 
   vector<ymuint> mark(max_id, 0);
-  for (ymuint opos = 0; opos < no; ++ opos) {
+
+  if ( th_val > no ) {
+    th_val = no;
+  }
+  for (ymuint opos = 0; opos < th_val; ++ opos) {
     TpgNode* onode = olist[opos];
     ymuint oid = onode->output_id2();
 

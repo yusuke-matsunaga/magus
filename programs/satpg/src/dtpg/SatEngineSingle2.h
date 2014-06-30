@@ -49,6 +49,7 @@ public:
   void
   run(TpgNetwork& network,
       TpgFault* f_tgt,
+      ymuint th_val,
       BackTracer& bt,
       DetectOp& dop,
       UntestOp& uop);

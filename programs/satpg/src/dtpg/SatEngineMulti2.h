@@ -49,6 +49,7 @@ public:
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   run(const vector<TpgFault*>& flist,
+      ymuint th_val,
       ymuint max_id,
       BackTracer& bt,
       DetectOp& dop,
@@ -68,9 +69,6 @@ private:
 
   // unique sensitization を使う
   bool mUseDominator;
-
-  // skip threshold
-  ymuint32 mSkipThreshold;
 
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;

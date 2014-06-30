@@ -25,7 +25,7 @@ public:
   /// @brief コンストラクタ
   explicit
   DtpgMode(tDtpgMode mode,
-	   ymuint ffr2_limit = 0);
+	   ymuint val = 0);
 
   /// @brief デストラクタ
   ~DtpgMode();
@@ -40,9 +40,9 @@ public:
   tDtpgMode
   mode() const;
 
-  /// @brief FFR2 モードの時に制限値を返す．
+  /// @brief 値を返す．
   ymuint
-  ffr2_limit() const;
+  val() const;
 
 
 private:
@@ -52,7 +52,7 @@ private:
 
   tDtpgMode mMode;
 
-  ymuint32 mFfrLimit;
+  ymuint32 mVal;
 
 };
 
@@ -64,9 +64,9 @@ private:
 // @brief コンストラクタ
 inline
 DtpgMode::DtpgMode(tDtpgMode mode,
-		   ymuint ffr2_limit) :
+		   ymuint val) :
   mMode(mode),
-  mFfrLimit(ffr2_limit)
+  mVal(val)
 {
 }
 
@@ -84,12 +84,12 @@ DtpgMode::mode() const
   return mMode;
 }
 
-// @brief FFR2 モードの時に制限値を返す．
+// @brief 値を返す．
 inline
 ymuint
-DtpgMode::ffr2_limit() const
+DtpgMode::val() const
 {
-  return mFfrLimit;
+  return mVal;
 }
 
 END_NAMESPACE_YM_SATPG

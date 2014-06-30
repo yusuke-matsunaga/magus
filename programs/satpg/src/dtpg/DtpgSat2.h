@@ -84,6 +84,7 @@ private:
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   single_mode(TpgNetwork& network,
+	      ymuint th_val,
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop,
@@ -95,6 +96,7 @@ private:
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   mffc_mode(TpgNetwork& tpgnetwork,
+	    ymuint th_val,
 	    BackTracer& bt,
 	    DetectOp& dop,
 	    UntestOp& uop,
@@ -116,6 +118,7 @@ private:
   /// @brief テストパタン生成を行なう．
   void
   do_dtpg(TpgNetwork& network,
+	  ymuint th_val,
 	  BackTracer& bt,
 	  DetectOp& dop,
 	  UntestOp& uop);

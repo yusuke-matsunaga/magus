@@ -67,11 +67,11 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
 
   switch ( mode.mode() ) {
   case kDtpgSingle2:
-    single_mode(tgnetwork, bt, dop, uop, stats);
+    single_mode(tgnetwork, mode.val(), bt, dop, uop, stats);
     break;
 
   case kDtpgMFFC2:
-    mffc_mode(tgnetwork, bt, dop, uop, stats);
+    mffc_mode(tgnetwork, mode.val(), bt, dop, uop, stats);
     break;
 
   default:
@@ -82,6 +82,7 @@ DtpgSat2::run(TpgNetwork& tgnetwork,
 
 void
 DtpgSat2::single_mode(TpgNetwork& tgnetwork,
+		      ymuint th_val,
 		      BackTracer& bt,
 		      DetectOp& dop,
 		      UntestOp& uop,
@@ -101,7 +102,7 @@ DtpgSat2::single_mode(TpgNetwork& tgnetwork,
       TpgFault* fault = node->fault(i);
       if ( fault->status() != kFsDetected &&
 	   !fault->is_skip() ) {
-	mSatEngineSingle.run(tgnetwork, fault, bt, dop, uop);
+	mSatEngineSingle.run(tgnetwork, fault, th_val, bt, dop, uop);
       }
     }
   }
@@ -111,6 +112,7 @@ DtpgSat2::single_mode(TpgNetwork& tgnetwork,
 
 void
 DtpgSat2::mffc_mode(TpgNetwork& network,
+		    ymuint th_val,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop,
@@ -135,7 +137,7 @@ DtpgSat2::mffc_mode(TpgNetwork& network,
     vector<bool> mark(network.max_node_id(), false);
     dfs_mffc(node, mark);
 
-    do_dtpg(network, bt, dop, uop);
+    do_dtpg(network, th_val, bt, dop, uop);
   }
 
   mSatEngineMulti.get_stats(stats);
@@ -177,6 +179,7 @@ DtpgSat2::add_node_faults(TpgNode* node)
 // @brief テストパタン生成を行なう．
 void
 DtpgSat2::do_dtpg(TpgNetwork& network,
+		  ymuint th_val,
 		  BackTracer& bt,
 		  DetectOp& dop,
 		  UntestOp& uop)
@@ -185,7 +188,7 @@ DtpgSat2::do_dtpg(TpgNetwork& network,
     return;
   }
 
-  mSatEngineMulti.run(mFaultList, network.max_node_id(), bt, dop, uop);
+  mSatEngineMulti.run(mFaultList, th_val, network.max_node_id(), bt, dop, uop);
 }
 
 END_NAMESPACE_YM_SATPG
