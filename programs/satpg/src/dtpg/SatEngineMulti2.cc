@@ -117,94 +117,15 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
 
+  // 処理済みのノードのマーク
   vector<ymuint> mark(max_id, 0);
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < fnode_list.size(); ++ i) {
-    TpgNode* node = fnode_list[i];
-    make_gnode_cnf(solver, node);
-
-    mark[node->id()] = no + 1;
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < fnode_list.size(); ++ i) {
-    TpgNode* node = fnode_list[i];
-    assert_cond( node->has_flt_var(), __FILE__, __LINE__);
-
-    make_fnode_cnf(solver, node);
-
-    Literal glit(node->gvar(), false);
-    Literal flit(node->fvar(), false);
-    Literal dlit(node->dvar(), false);
-
-    if ( mTgGrasp ) {
-      // XOR(glit, flit, dlit) を追加する．
-      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-
-      solver.add_clause(~glit,  flit,  dlit);
-      solver.add_clause( glit, ~flit,  dlit);
-
-      if ( mExtTgGrasp ) {
-	// 全てのファンインに故障差が伝搬していなければ
-	// このゲートの出力にも故障差は伝搬しない．
-	// ただし，このゲートの出力に故障がある場合を
-	// 考慮しなければならない．
-	ymuint ni = node->fanin_num();
-	tmp_lits_begin(ni * 3 + 3);
-	tmp_lits_add(~dlit);
-	if ( node->of0var() != kVarIdIllegal ) {
-	  tmp_lits_add(Literal(node->of0var(), false));
-	}
-	if ( node->of1var() != kVarIdIllegal ) {
-	  tmp_lits_add(Literal(node->of1var(), false));
-	}
-	for (ymuint i = 0; i < ni; ++ i) {
-	  TpgNode* inode = node->fanin(i);
-	  if ( inode->has_fvar() ) {
-	    Literal idlit(inode->dvar(), false);
-	    tmp_lits_add(idlit);
-	  }
-	  if ( node->if0var(i) != kVarIdIllegal ) {
-	    tmp_lits_add(Literal(node->if0var(i), false));
-	  }
-	  if ( node->if1var(i) != kVarIdIllegal ) {
-	    tmp_lits_add(Literal(node->if1var(i), false));
-	  }
-	}
-      }
-    }
-    else {
-      // XOR(glit, flit, dlit) を追加する．
-      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-
-      if ( !node->is_output() ) {
-	ymuint nfo = node->active_fanout_num();
-	tmp_lits_begin(nfo + 1);
-	tmp_lits_add(~dlit);
-	for (ymuint j = 0; j < nfo; ++ j) {
-	  TpgNode* onode = node->active_fanout(j);
-	  tmp_lits_add(Literal(onode->dvar(), false));
-	}
-	tmp_lits_end(solver);
-      }
-    }
-  }
-
-  cnf_end();
 
   if ( th_val > no ) {
     th_val = no;
   }
+  bool faults_remain = false;
   for (ymuint opos = 0; opos < th_val; ++ opos) {
+    // onode に関係する部分の CNF を生成する．
     TpgNode* onode = olist[opos];
     ymuint oid = onode->output_id2();
 
@@ -231,8 +152,6 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	continue;
       }
 
-      assert_cond( !node->has_flt_var(), __FILE__, __LINE__);
-
       make_fnode_cnf(solver, node);
 
       Literal glit(node->gvar(), false);
@@ -249,7 +168,37 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	solver.add_clause( glit, ~flit,  dlit);
 
 	if ( mExtTgGrasp ) {
-	  make_dlit_cnf(solver, node);
+	  // 全てのファンインに故障差が伝搬していなければ
+	  // このゲートの出力にも故障差は伝搬しない．
+	  // ただし，このゲートの出力に故障がある場合を
+	  // 考慮しなければならない．
+	  if ( node->has_flt_var() ) {
+	    ymuint ni = node->fanin_num();
+	    tmp_lits_begin(ni * 3 + 3);
+	    tmp_lits_add(~dlit);
+	    if ( node->of0var() != kVarIdIllegal ) {
+	      tmp_lits_add(Literal(node->of0var(), false));
+	    }
+	    if ( node->of1var() != kVarIdIllegal ) {
+	      tmp_lits_add(Literal(node->of1var(), false));
+	    }
+	    for (ymuint i = 0; i < ni; ++ i) {
+	      TpgNode* inode = node->fanin(i);
+	      if ( inode->has_fvar() ) {
+		Literal idlit(inode->dvar(), false);
+		tmp_lits_add(idlit);
+	      }
+	      if ( node->if0var(i) != kVarIdIllegal ) {
+		tmp_lits_add(Literal(node->if0var(i), false));
+	      }
+	      if ( node->if1var(i) != kVarIdIllegal ) {
+		tmp_lits_add(Literal(node->if1var(i), false));
+	      }
+	    }
+	  }
+	  else {
+	    make_dlit_cnf(solver, node);
+	  }
 	}
       }
       else {
@@ -272,6 +221,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
     }
 
     cnf_end();
+
+    faults_remain = false;
 
     // 個々の故障に対するテスト生成を行なう．
     for (ymuint fid = 0; fid < nf; ++ fid) {
@@ -381,39 +332,23 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	if ( opos == no - 1 ) {
 	  uop(f);
 	}
+	else {
+	  faults_remain = true;
+	}
 	stats_undetect(sat_stats, time);
       }
       else {
 	stats_abort(sat_stats, time);
       }
     }
-
-    bool faults_remain = false;
-    for (ymuint fid = 0; fid < nf; ++ fid) {
-      TpgFault* f = flist[fid];
-
-      if ( f->status() != kFsDetected ) {
-	faults_remain = true;
-	break;
-      }
-    }
-
     if ( !faults_remain ) {
       break;
     }
   }
 
-  bool faults_remain = false;
-  for (ymuint fid = 0; fid < nf; ++ fid) {
-    TpgFault* f = flist[fid];
-
-    if ( f->status() != kFsDetected ) {
-      faults_remain = true;
-      break;
-    }
-  }
-
   if ( faults_remain ) {
+    // 最後に全部の出力を対象にしてテスト生成を実行する．
+
     cnf_begin();
 
     //////////////////////////////////////////////////////////////////////
@@ -435,8 +370,6 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	continue;
       }
 
-      assert_cond( !node->has_flt_var(), __FILE__, __LINE__);
-
       make_fnode_cnf(solver, node);
 
       Literal glit(node->gvar(), false);
@@ -453,7 +386,37 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	solver.add_clause( glit, ~flit,  dlit);
 
 	if ( mExtTgGrasp ) {
-	  make_dlit_cnf(solver, node);
+	  // 全てのファンインに故障差が伝搬していなければ
+	  // このゲートの出力にも故障差は伝搬しない．
+	  // ただし，このゲートの出力に故障がある場合を
+	  // 考慮しなければならない．
+	  if ( node->has_flt_var() ) {
+	    ymuint ni = node->fanin_num();
+	    tmp_lits_begin(ni * 3 + 3);
+	    tmp_lits_add(~dlit);
+	    if ( node->of0var() != kVarIdIllegal ) {
+	      tmp_lits_add(Literal(node->of0var(), false));
+	    }
+	    if ( node->of1var() != kVarIdIllegal ) {
+	      tmp_lits_add(Literal(node->of1var(), false));
+	    }
+	    for (ymuint i = 0; i < ni; ++ i) {
+	      TpgNode* inode = node->fanin(i);
+	      if ( inode->has_fvar() ) {
+		Literal idlit(inode->dvar(), false);
+		tmp_lits_add(idlit);
+	      }
+	      if ( node->if0var(i) != kVarIdIllegal ) {
+		tmp_lits_add(Literal(node->if0var(i), false));
+	      }
+	      if ( node->if1var(i) != kVarIdIllegal ) {
+		tmp_lits_add(Literal(node->if1var(i), false));
+	      }
+	    }
+	  }
+	  else {
+	    make_dlit_cnf(solver, node);
+	  }
 	}
       }
       else {
