@@ -27,43 +27,12 @@ BEGIN_NAMESPACE_YM_SATPG
 SatEngineSingle2::SatEngineSingle2()
 {
   mUopDummy = new_UopDummy();
-  mTgGrasp = true;
-  mUseDominator = true;
 }
 
 // @brief デストラクタ
 SatEngineSingle2::~SatEngineSingle2()
 {
   delete mUopDummy;
-}
-
-// @brief オプションを設定する．
-void
-SatEngineSingle2::set_option(const string& option_str)
-{
-  for (string::size_type next = 0; ; ++ next) {
-    string::size_type pos = option_str.find(':', next);
-    if ( pos == next ) {
-      continue;
-    }
-    string option = option_str.substr(next, pos - next);
-    if ( option == "TG-GRASP" ) {
-      mTgGrasp = true;
-    }
-    else if ( option == "NEMESIS" ) {
-      mTgGrasp = false;
-    }
-    else if ( option == "DOM" ) {
-      mUseDominator = true;
-    }
-    else if ( option == "NODOM" ) {
-      mUseDominator = false;
-    }
-    if ( pos == string::npos ) {
-      break;
-    }
-    next = pos;
-  }
 }
 
 // @brief テストパタン生成を行なう．
