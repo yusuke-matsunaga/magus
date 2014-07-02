@@ -334,4 +334,71 @@ else
   AC_DEFINE(HAVE_TCLREADLINE, 1, [Define if having built-in tclreadline])
 fi
 ])
+
+
+# ========================================================
+# YM_CHECK_TCLREADLINE2
+# ========================================================
+AC_DEFUN([YM_CHECK_TCLREADLINE2],[
+AC_MSG_CHECKING([for tclreadline header])
+arch=`uname -p`
+if test "X$arch" = "Xx86_64"; then
+  ym_tmp_lib_list="$ym_tmp_lib_list lib64"
+fi
+TCLRL_INCLUDES=
+TCLRL_LIBS=
+ym_tmp_found=no
+tclrl_found=no
+tclrl_prefix=
+AC_ARG_WITH([tclreadline],
+	AS_HELP_STRING([--with-tclreadline=DIR], [tclreadline.h is in DIR/include]),
+	[
+if test "x$withval" != x; then
+  tclrl_include=$withval/include
+  if test -f $tclrl_include/tclreadline.h; then
+    tclrl_prefix=$withval
+    TCLRL_INCLUDES="-I$tclrl_include";
+    ym_tmp_found=yes
+  fi
+fi],[
+  for dir in $prefix /usr /usr/local /opt; do
+    tclrl_include=$dir/include
+    if test -f $tclrl_include/tclreadline.h; then
+      tclrl_prefix=$dir
+      TCLRL_INCLUDES="-I$tclrl_include";
+      ym_tmp_found=yes
+      break
+    fi
+  done
+])
+if test $ym_tmp_found = yes; then
+  AC_MSG_RESULT([$TCLRL_INCLUDES])
+  libs_old=$LIBS
+  for libdir in $ym_tmp_lib_list; do
+    tclrl_libdir=$tclrl_prefix/$libdir
+#    LIBS="$libs_old -L$tclrl_libdir"
+    LIBS="-L$tclrl_libdir"
+    AC_MSG_NOTICE([LIBS = $LIBS])
+    AC_CHECK_LIB([tclreadline], [Tclreadline_Init],
+       	         [tclrl_found=yes
+  		 TCLRL_LIBS="-L$tclrl_libdir -ltclreadline"
+		 AC_DEFINE([HAVE_TCLRL], 1, [Define if you have tclreadline package])
+	         AC_SUBST([TCLRL_INCLUDES])
+	         AC_SUBST([TCLRL_LIBS])
+	         break
+	         ], [],
+	         [-ltcl86 -lc])
+    if test $tclrl_found = yes; then
+      AC_MSG_RESULT([$TCLRL_LIBS])
+      break
+    fi
+  done
+  LIBS=$libs_old
+fi
+
+if test $tclrl_found = no; then
+  AC_MSG_ERROR([tclreadline is not found. Use --with-tclreadline to specify the directory containing libtclreadline.la])
+fi
+])dnl
+
 # end of tcl.m4

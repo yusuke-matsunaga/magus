@@ -112,7 +112,7 @@ atpg_tclsh_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp.la \
-	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCLRL_LIBS) \
 	$(TCL_LDADD)
 
 atpg_tclsh_LDFLAGS = \
@@ -145,7 +145,7 @@ atpg_tclsh_d_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_d.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_d.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp_d.la \
-	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCLRL_LIBS) \
 	$(TCL_LDADD)
 
 atpg_tclsh_d_LDFLAGS = \
@@ -179,7 +179,7 @@ atpg_tclsh_p_LDADD = \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic_p.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils_p.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp_p.la \
-	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCLRL_LIBS) \
 	$(TCL_LDADD)
 
 atpg_tclsh_p_LDFLAGS = \

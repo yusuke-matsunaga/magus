@@ -26,7 +26,7 @@ SatEngineSingle::SatEngineSingle()
   mExtNemesis = false;
   mTgGrasp = false;
   mExtTgGrasp = false;
-  mUseDominator = false;
+  mUseDominator = true;
 }
 
 // @brief デストラクタ

@@ -61,7 +61,7 @@ ym_tclsh_SOURCES = \
 
 ym_tclsh_LDADD = \
 	$(top_builddir)/src/libym_tclpp.la \
-	$(YM_LIBS_LIBTCLREADLINE) \
+	$(TCLRL_LIBS) \
 	$(TCL_LDADD)
 
 ym_tclsh_LDFLAGS =
