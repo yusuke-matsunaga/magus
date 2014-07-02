@@ -22,11 +22,6 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 SatEngineSingle::SatEngineSingle()
 {
-  mNemesis = false;
-  mExtNemesis = false;
-  mTgGrasp = false;
-  mExtTgGrasp = false;
-  mUseDominator = false;
 }
 
 // @brief デストラクタ

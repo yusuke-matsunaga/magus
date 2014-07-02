@@ -190,26 +190,6 @@ DtpgSat::ffr_mode(BackTracer& bt,
   }
 }
 
-// @brief mffc モードでテスト生成を行なう．
-void
-DtpgSat::mffc_mode(BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
-{
-  ymuint n = mNetwork->active_node_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
-    if ( node->imm_dom() == NULL ) {
-      clear_faults();
-
-      vector<bool> mark(mNetwork->node_num(), false);
-      dfs_mffc(node, mark);
-
-      do_dtpg(bt, dop, uop);
-    }
-  }
-}
-
 void
 DtpgSat::dfs_ffr(TpgNode* node)
 {
@@ -222,6 +202,26 @@ DtpgSat::dfs_ffr(TpgNode* node)
   }
 
   add_node_faults(node);
+}
+
+// @brief mffc モードでテスト生成を行なう．
+void
+DtpgSat::mffc_mode(BackTracer& bt,
+		   DetectOp& dop,
+		   UntestOp& uop)
+{
+  ymuint n = mNetwork->active_node_num();
+  vector<bool> mark(mNetwork->max_node_id(), false);
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = mNetwork->active_node(i);
+    if ( node->imm_dom() == NULL ) {
+      clear_faults();
+
+      dfs_mffc(node, mark);
+
+      do_dtpg(bt, dop, uop);
+    }
+  }
 }
 
 void
