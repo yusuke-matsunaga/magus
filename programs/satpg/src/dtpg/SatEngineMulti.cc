@@ -25,48 +25,11 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 SatEngineMulti::SatEngineMulti()
 {
-  mTgGrasp = true;
-  mExtTgGrasp = true;
-  mUseDominator = true;
 }
 
 // @brief デストラクタ
 SatEngineMulti::~SatEngineMulti()
 {
-}
-
-// @brief オプションを設定する．
-void
-SatEngineMulti::set_option(const string& option_str)
-{
-  for (string::size_type next = 0; ; ++ next) {
-    string::size_type pos = option_str.find(':', next);
-    if ( pos == next ) {
-      continue;
-    }
-    string option = option_str.substr(next, pos - next);
-    if ( option == "TG-GRASP" ) {
-      mTgGrasp = true;
-      mExtTgGrasp = false;
-    }
-    else if ( option == "EXT-TG-GRASP" ) {
-      mTgGrasp = true;
-      mExtTgGrasp = true;
-    }
-    else if ( option == "NEMESIS" ) {
-      mTgGrasp = false;
-    }
-    else if ( option == "DOM" ) {
-      mUseDominator = true;
-    }
-    else if ( option == "NODOM" ) {
-      mUseDominator = false;
-    }
-    if ( pos == string::npos ) {
-      break;
-    }
-    next = pos;
-  }
 }
 
 // @brief テストパタン生成を行なう．
@@ -132,76 +95,13 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
 
     make_fnode_cnf(solver, node);
 
-    Literal glit(node->gvar(), false);
-    Literal flit(node->fvar(), false);
-    Literal dlit(node->dvar(), false);
-
-    if ( mTgGrasp ) {
-      // XOR(glit, flit, dlit) を追加する．
-      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-
-      solver.add_clause(~glit,  flit,  dlit);
-      solver.add_clause( glit, ~flit,  dlit);
-
-      if ( mExtTgGrasp ) {
-	// 全てのファンインに故障差が伝搬していなければ
-	// このゲートの出力にも故障差は伝搬しない．
-	// ただし，このゲートの出力に故障がある場合を
-	// 考慮しなければならない．
-	if ( node->has_flt_var() ) {
-	  ymuint ni = node->fanin_num();
-	  tmp_lits_begin(ni * 3 + 3);
-	  tmp_lits_add(~dlit);
-	  if ( node->of0var() != kVarIdIllegal ) {
-	    tmp_lits_add(Literal(node->of0var(), false));
-	  }
-	  if ( node->of1var() != kVarIdIllegal ) {
-	    tmp_lits_add(Literal(node->of1var(), false));
-	  }
-	  for (ymuint i = 0; i < ni; ++ i) {
-	    TpgNode* inode = node->fanin(i);
-	    if ( inode->has_fvar() ) {
-	      Literal idlit(inode->dvar(), false);
-	      tmp_lits_add(idlit);
-	    }
-	    if ( node->if0var(i) != kVarIdIllegal ) {
-	      tmp_lits_add(Literal(node->if0var(i), false));
-	    }
-	    if ( node->if1var(i) != kVarIdIllegal ) {
-	      tmp_lits_add(Literal(node->if1var(i), false));
-	    }
-	  }
-	}
-	else {
-	  make_dlit_cnf(solver, node);
-	}
-      }
-    }
-    else {
-      // XOR(glit, flit, dlit) を追加する．
-      // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-      solver.add_clause(~glit, ~flit, ~dlit);
-      solver.add_clause( glit,  flit, ~dlit);
-
-      if ( !node->is_output() ) {
-	ymuint nfo = node->active_fanout_num();
-	tmp_lits_begin(nfo + 1);
-	tmp_lits_add(~dlit);
-	for (ymuint j = 0; j < nfo; ++ j) {
-	  TpgNode* onode = node->active_fanout(j);
-	  tmp_lits_add(Literal(onode->dvar(), false));
-	}
-	tmp_lits_end(solver);
-      }
-    }
+    make_dchain_cnf(solver, node);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  if ( mTgGrasp ) {
+  if ( mNemesis ) {
     ymuint npo = output_list().size();
     tmp_lits_begin(npo);
     for (ymuint i = 0; i < npo; ++ i) {

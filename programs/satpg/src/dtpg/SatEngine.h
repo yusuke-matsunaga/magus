@@ -50,6 +50,10 @@ public:
 	   const string& option = string(),
 	   ostream* outp = NULL);
 
+  /// @brief オプションを設定する．
+  void
+  set_option(const string& option_str);
+
   /// @brief 統計情報をクリアする．
   void
   clear_stats();
@@ -159,6 +163,17 @@ protected:
   void
   make_fault_cnf(SatSolver& solver,
 		 TpgFault* fault);
+
+  /// @brief D-Chain 制約のCNFを作る．
+  void
+  make_dchain_cnf(SatSolver& solver,
+		  TpgNode* node,
+		  TpgFault* fault);
+
+  /// @brief D-Chain 制約のCNFを作る．
+  void
+  make_dchain_cnf(SatSolver& solver,
+		  TpgNode* node);
 
   /// @brief ノードの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
@@ -331,6 +346,21 @@ protected:
 
   // SAT solver の記録用ストリーム
   ostream* mOutP;
+
+  // NEMESIS モード
+  bool mNemesis;
+
+  // extected NEMESIS モード
+  bool mExtNemesis;
+
+  // TG-GRASP モード
+  bool mTgGrasp;
+
+  // extended TG-GRASP モード
+  bool mExtTgGrasp;
+
+  // unique sensitization を使う
+  bool mUseDominator;
 
   // SAT の結果を格納する配列
   vector<Bool3> mModel;

@@ -37,10 +37,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief オプションを設定する．
-  void
-  set_option(const string& option_str);
-
   /// @brief テスト生成を行なう．
   /// @param[in] f_tgt 対象の故障
   /// @param[in] bt バックトレーサー
@@ -68,12 +64,6 @@ private:
 
   // UopDummy
   UntestOp* mUopDummy;
-
-  // TG-GRASP モード
-  bool mTgGrasp;
-
-  // unique sensitization を使う
-  bool mUseDominator;
 
 };
 

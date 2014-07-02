@@ -276,6 +276,11 @@ END_NONAMESPACE
 SatEngine::SatEngine()
 {
   mOutP = NULL;
+  mNemesis = false;
+  mExtNemesis = false;
+  mTgGrasp = false;
+  mExtTgGrasp = false;
+  mUseDominator = false;
   mTimerEnable = false;
 }
 
@@ -293,6 +298,51 @@ SatEngine::set_mode(const string& type,
   mType = type;
   mOption = option;
   mOutP = outp;
+}
+
+// @brief オプションを設定する．
+void
+SatEngine::set_option(const string& option_str)
+{
+  for (string::size_type next = 0; ; ++ next) {
+    string::size_type pos = option_str.find(':', next);
+    if ( pos == next ) {
+      continue;
+    }
+    string option = option_str.substr(next, pos - next);
+    if ( option == "NEMESIS" ) {
+      mNemesis = true;
+      mExtNemesis = false;
+      mTgGrasp = false;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "EXT-NEMESIS" ) {
+      mNemesis = true;
+      mExtNemesis = true;
+      mTgGrasp = false;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "TG-GRASP" ) {
+      mNemesis = false;
+      mTgGrasp = true;
+      mExtTgGrasp = false;
+    }
+    else if ( option == "EXT-TG-GRASP" ) {
+      mNemesis = false;
+      mTgGrasp = true;
+      mExtTgGrasp = true;
+    }
+    else if ( option == "DOM" ) {
+      mUseDominator = true;
+    }
+    else if ( option == "NODOM" ) {
+      mUseDominator = false;
+    }
+    if ( pos == string::npos ) {
+      break;
+    }
+    next = pos;
+  }
 }
 
 // @brief 統計情報をクリアする．
@@ -614,6 +664,123 @@ SatEngine::make_fault_cnf(SatSolver& solver,
     default:
       assert_not_reached(__FILE__, __LINE__);
       break;
+    }
+  }
+}
+
+void
+SatEngine::make_dchain_cnf(SatSolver& solver,
+			   TpgNode* node,
+			   TpgFault* fault)
+{
+  Literal glit(node->gvar(), false);
+  Literal flit(node->fvar(), false);
+  Literal dlit(node->dvar(), false);
+
+  // dlit -> XOR(glit, flit) を追加する．
+  // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
+  solver.add_clause(~glit, ~flit, ~dlit);
+  solver.add_clause( glit,  flit, ~dlit);
+
+  if ( mNemesis ) {
+    if ( !node->is_output() ) {
+      // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
+      ymuint nfo = node->active_fanout_num();
+      tmp_lits_begin(nfo + 1);
+      tmp_lits_add(~dlit);
+      for (ymuint j = 0; j < nfo; ++ j) {
+	TpgNode* onode = node->active_fanout(j);
+	tmp_lits_add(Literal(onode->dvar(), false));
+      }
+      tmp_lits_end(solver);
+
+      if ( mExtNemesis ) {
+	for (TpgNode* idom = node->imm_dom();
+	     idom != NULL; idom = idom->imm_dom() ) {
+	  Literal idlit(idom->dvar(), false);
+	  solver.add_clause(~dlit, idlit);
+	}
+      }
+    }
+  }
+  if ( mTgGrasp ) {
+    // XOR(glit, flit) -> dlit を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+
+    if ( mExtTgGrasp ) {
+      if ( node != fault->node() ) {
+	make_dlit_cnf(solver, node);
+      }
+    }
+  }
+}
+
+void
+SatEngine::make_dchain_cnf(SatSolver& solver,
+			   TpgNode* node)
+{
+  Literal glit(node->gvar(), false);
+  Literal flit(node->fvar(), false);
+  Literal dlit(node->dvar(), false);
+
+  // 正常回路と故障回路で異なっているとき dlit が 1 となる．
+  solver.add_clause(~glit, ~flit, ~dlit);
+  solver.add_clause( glit,  flit, ~dlit);
+
+  if ( mTgGrasp ) {
+    // XOR(glit, flit, dlit) を追加する．
+    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
+
+    solver.add_clause(~glit,  flit,  dlit);
+    solver.add_clause( glit, ~flit,  dlit);
+
+    if ( mExtTgGrasp ) {
+      // 全てのファンインに故障差が伝搬していなければ
+      // このゲートの出力にも故障差は伝搬しない．
+      // ただし，このゲートの出力に故障がある場合を
+      // 考慮しなければならない．
+      if ( node->has_flt_var() ) {
+	ymuint ni = node->fanin_num();
+	tmp_lits_begin(ni * 3 + 3);
+	tmp_lits_add(~dlit);
+	if ( node->of0var() != kVarIdIllegal ) {
+	  tmp_lits_add(Literal(node->of0var(), false));
+	}
+	if ( node->of1var() != kVarIdIllegal ) {
+	  tmp_lits_add(Literal(node->of1var(), false));
+	}
+	for (ymuint i = 0; i < ni; ++ i) {
+	  TpgNode* inode = node->fanin(i);
+	  if ( inode->has_fvar() ) {
+	    Literal idlit(inode->dvar(), false);
+	    tmp_lits_add(idlit);
+	  }
+	  if ( node->if0var(i) != kVarIdIllegal ) {
+	    tmp_lits_add(Literal(node->if0var(i), false));
+	  }
+	  if ( node->if1var(i) != kVarIdIllegal ) {
+	    tmp_lits_add(Literal(node->if1var(i), false));
+	  }
+	}
+      }
+      else {
+	make_dlit_cnf(solver, node);
+      }
+    }
+  }
+
+  if ( mNemesis ) {
+    if ( !node->is_output() ) {
+      ymuint nfo = node->active_fanout_num();
+      tmp_lits_begin(nfo + 1);
+      tmp_lits_add(~dlit);
+      for (ymuint j = 0; j < nfo; ++ j) {
+	TpgNode* onode = node->active_fanout(j);
+	tmp_lits_add(Literal(onode->dvar(), false));
+      }
+      tmp_lits_end(solver);
     }
   }
 }
