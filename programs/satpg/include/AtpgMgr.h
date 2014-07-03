@@ -112,16 +112,6 @@ public:
   // DTPG を行なう関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 使用する SAT エンジンを指定する．
-  void
-  set_dtpg_mode(const string& type = string(),
-		const string& option = string(),
-		ostream* outp = NULL);
-
-  /// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
-  void
-  set_dtpg_timer(bool enable);
-
   /// @brief テストパタン生成を行なう．
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
@@ -134,6 +124,10 @@ public:
   dtpg(DtpgMode mode,
        tDtpgPoMode po_mode,
        const string& option_str,
+       const string& sat_type,
+       const string& sat_option,
+       ostream* outp,
+       bool timer_enable,
        BackTracer& bt,
        DetectOp& dop,
        UntestOp& uop,
@@ -221,18 +215,6 @@ private:
 
   // RTPG
   Rtpg* mRtpg;
-
-  // テストパタン生成器
-  Dtpg* mDtpg;
-
-  // テストパタン生成器
-  Dtpg* mDtpg2;
-
-  // テストパタン生成器
-  Dtpg* mDtpg3;
-
-  // テストパタン生成器
-  Dtpg* mDtpgG;
 
   // パタン圧縮器
   MinPat* mMinPat;

@@ -105,24 +105,27 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   // SAT mode の設定
+  string sat_type;
   string sat_option;
+  ostream* outp = NULL;
   if ( mPoptSatOption->is_specified() ) {
     sat_option = mPoptSatOption->val();
   }
   if ( mPoptSat->is_specified() ) {
-    mgr().set_dtpg_mode("", sat_option);
+    sat_type = "";
   }
   else if ( mPoptSatRec->is_specified() ) {
-    mgr().set_dtpg_mode("satrec", sat_option, &cout);
+    sat_type = "satrec";
+    outp = &cout;
   }
   else if ( mPoptMiniSat->is_specified() ) {
-    mgr().set_dtpg_mode("minisat");
+    sat_type = "minisat";
   }
   else if ( mPoptMiniSat2->is_specified() ) {
-    mgr().set_dtpg_mode("minisat2");
+    sat_type = "minisat2";
   }
   else {
-    mgr().set_dtpg_mode("", sat_option);
+    sat_type = "";
   }
 
   bool print_stats = mPoptPrintStats->is_specified();
@@ -197,10 +200,11 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     dop_list.add(new_DopVerify(mgr()));
   }
 
+  bool timer_enable;
 #if 0
-  mgr().set_dtpg_timer(mPoptTimer->is_specified());
+  timer_enable = mPoptTimer->is_specified();
 #else
-  mgr().set_dtpg_timer(print_stats);
+  timer_enable = print_stats;
 #endif
 
   tDtpgPoMode po_mode = kDtpgPoNone;
@@ -214,6 +218,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   DtpgStats stats;
 
   mgr().dtpg(DtpgMode(mode, mode_val), po_mode, option_str,
+	     sat_type, sat_option, outp, timer_enable,
 	     *bt, dop_list, uop_list, stats);
 
   after_update_faults();

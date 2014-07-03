@@ -83,18 +83,12 @@ AtpgMgr::AtpgMgr() :
   mFsim3 = new_Fsim3();
 
   mRtpg = new_Rtpg(*this);
-  mDtpg = new_DtpgSat();
-  mDtpg2 = new_DtpgSat2();
-  mDtpg3 = new_DtpgSat3();
-  mDtpgG = new_DtpgSmt();
   mMinPat = new_MinPat(*this);
 
   mNetwork = NULL;
 
   reg_network_handler(new FsimNetBinder(mFsim));
   reg_network_handler(new FsimNetBinder(mFsim3));
-
-  set_dtpg_mode();
 }
 
 // @brief デストラクタ
@@ -105,10 +99,6 @@ AtpgMgr::~AtpgMgr()
   delete mFsim;
   delete mFsim3;
   delete mRtpg;
-  delete mDtpg;
-  delete mDtpg2;
-  delete mDtpg3;
-  delete mDtpgG;
   delete mMinPat;
   delete mNetwork;
 }
@@ -183,33 +173,15 @@ AtpgMgr::rtpg(ymuint min_f,
   mTimer.change(old_id);
 }
 
-// @brief 使用する SAT エンジンを指定する．
-void
-AtpgMgr::set_dtpg_mode(const string& type,
-		       const string& option,
-		       ostream* outp)
-{
-  mDtpg->set_mode(type, option, outp);
-  mDtpg2->set_mode(type, option, outp);
-  mDtpg3->set_mode(type, option, outp);
-  mDtpgG->set_mode(type, option, outp);
-}
-
-// @brief テストパタン生成時に時間計測を行なうかどうかを指定する．
-void
-AtpgMgr::set_dtpg_timer(bool enable)
-{
-  mDtpg->timer_enable(enable);
-  mDtpg2->timer_enable(enable);
-  mDtpg3->timer_enable(enable);
-  mDtpgG->timer_enable(enable);
-}
-
 // @brief テストパタン生成を行なう．
 void
 AtpgMgr::dtpg(DtpgMode mode,
 	      tDtpgPoMode po_mode,
 	      const string& option_str,
+	      const string& sat_type,
+	      const string& sat_option,
+	      ostream* outp,
+	      bool timer_enable,
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop,
@@ -221,17 +193,33 @@ AtpgMgr::dtpg(DtpgMode mode,
   dop.set_faults(mFaultMgr->remain_list());
 
   if ( mode.mode() == kDtpgSingle2 || mode.mode() == kDtpgMFFC2 ) {
-    mDtpg2->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
+    Dtpg* dtpg = new_DtpgSat2();
+    dtpg->set_mode(sat_type, sat_option, outp);
+    dtpg->timer_enable(timer_enable);
+    dtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
+    delete dtpg;
   }
   else if ( (mode.mode() == kDtpgSingle || mode.mode() == kDtpgFFR) && po_mode == kDtpgPoInc ) {
-    mDtpg3->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
+    Dtpg* dtpg = new_DtpgSat3();
+    dtpg->set_mode(sat_type, sat_option, outp);
+    dtpg->timer_enable(timer_enable);
+    dtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
+    delete dtpg;
   }
   else if ( mode.mode() == kDtpgSingle3 ) {
-    mDtpgG->run(*mNetwork, DtpgMode(kDtpgSingle),
-		po_mode, option_str, bt, dop, uop, stats);
+    Dtpg* dtpg = new_DtpgSmt();
+    dtpg->set_mode(sat_type, sat_option, outp);
+    dtpg->timer_enable(timer_enable);
+    dtpg->run(*mNetwork, DtpgMode(kDtpgSingle),
+	      po_mode, option_str, bt, dop, uop, stats);
+    delete dtpg;
   }
   else {
-    mDtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
+    Dtpg* dtpg = new_DtpgSat();
+    dtpg->set_mode(sat_type, sat_option, outp);
+    dtpg->timer_enable(timer_enable);
+    dtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
+    delete dtpg;
   }
 
   mTimer.change(old_id);
