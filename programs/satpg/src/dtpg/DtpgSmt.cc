@@ -18,7 +18,8 @@ BEGIN_NAMESPACE_YM_SATPG
 Dtpg*
 new_DtpgSmt()
 {
-  return new DtpgSmt();
+  //return new DtpgSmt();
+  return NULL;
 }
 
 // @brief コンストラクタ
@@ -38,7 +39,6 @@ DtpgSmt::set_mode(const string& type,
 		  const string& option,
 		  ostream* outp)
 {
-  mSatEngine.set_mode(type, option, outp);
   mSatEngineSingle.set_mode(type, option, outp);
 }
 
@@ -61,10 +61,8 @@ DtpgSmt::run(TpgNetwork& tgnetwork,
 	     UntestOp& uop,
 	     DtpgStats& stats)
 {
-  mSatEngine.set_option(option_str);
   mSatEngineSingle.set_option(option_str);
 
-  mSatEngine.clear_stats();
   mSatEngineSingle.clear_stats();
 
   mNetwork = &tgnetwork;
@@ -104,12 +102,7 @@ DtpgSmt::run(TpgNetwork& tgnetwork,
     break;
   }
 
-  if ( mode.mode() == kDtpgSingle ) {
-    mSatEngineSingle.get_stats(stats);
-  }
-  else {
-    mSatEngine.get_stats(stats);
-  }
+  mSatEngineSingle.get_stats(stats);
 }
 
 // @brief activate された部分回路に大してテスト生成を行う．
@@ -134,10 +127,6 @@ DtpgSmt::dtpg1(DtpgMode mode,
 
   case kDtpgMFFC:
     mffc_mode(bt, dop, uop);
-    break;
-
-  case kDtpgAll:
-    all_mode(bt, dop, uop);
     break;
   }
 }
@@ -216,25 +205,6 @@ DtpgSmt::mffc_mode(BackTracer& bt,
   }
 }
 
-// @brief all モードでテスト生成を行なう．
-void
-DtpgSmt::all_mode(BackTracer& bt,
-		  DetectOp& dop,
-		  UntestOp& uop)
-{
-  clear_faults();
-
-  ymuint n = mNetwork->active_node_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* node = mNetwork->active_node(i);
-    if ( !node->is_output() ) {
-      add_node_faults(node);
-    }
-  }
-
-  do_dtpg(bt, dop, uop);
-}
-
 // @brief 一つの故障に対してテストパタン生成を行う．
 // @param[in] f 故障
 void
@@ -249,24 +219,6 @@ DtpgSmt::dtpg_single(TpgFault* f,
        !f->is_skip() ) {
     mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
   }
-}
-
-// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-// @param[in] f0 0縮退故障
-// @param[in] f1 1縮退故障
-void
-DtpgSmt::dtpg_dual(TpgFault* f0,
-		   TpgFault* f1,
-		   BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
-{
-  clear_faults();
-
-  add_fault(f0);
-  add_fault(f1);
-
-  do_dtpg(bt, dop, uop);
 }
 
 void
@@ -331,7 +283,7 @@ DtpgSmt::do_dtpg(BackTracer& bt,
     return;
   }
 
-  mSatEngine.run(mFaultList, mNetwork->max_node_id(), bt, dop, uop);
+  //mSatEngine.run(mFaultList, mNetwork->max_node_id(), bt, dop, uop);
 }
 
 END_NAMESPACE_YM_SATPG

@@ -1,13 +1,13 @@
 
-/// @file SatEngine.cc
-/// @brief SatEngine の実装ファイル
+/// @file SatEngineBase.cc
+/// @brief SatEngineBase の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "SatEngineBase.h"
 
 #include "DetectOp.h"
 #include "UntestOp.h"
@@ -273,9 +273,21 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
-SatEngine::SatEngine()
+SatEngineBase::SatEngineBase(const string& sat_type,
+			     const string& sat_option,
+			     ostream* sat_outp,
+			     ymuint max_id,
+			     BackTracer& bt,
+			     DetectOp& dop,
+			     UntestOp& uop) :
+  mSatType(sat_type),
+  mSatOption(sat_option),
+  mSatOutP(sat_outp),
+  mMaxNodeId(max_id),
+  mBackTracer(bt),
+  mDetectOp(dop),
+  mUntestOp(uop)
 {
-  mOutP = NULL;
   mNemesis = false;
   mExtNemesis = false;
   mTgGrasp = false;
@@ -285,24 +297,13 @@ SatEngine::SatEngine()
 }
 
 // @brief デストラクタ
-SatEngine::~SatEngine()
+SatEngineBase::~SatEngineBase()
 {
-}
-
-// @brief 使用する SAT エンジンを指定する．
-void
-SatEngine::set_mode(const string& type,
-		    const string& option,
-		    ostream* outp)
-{
-  mType = type;
-  mOption = option;
-  mOutP = outp;
 }
 
 // @brief オプションを設定する．
 void
-SatEngine::set_option(const string& option_str)
+SatEngineBase::set_option(const string& option_str)
 {
   for (string::size_type next = 0; ; ++ next) {
     string::size_type pos = option_str.find(':', next);
@@ -347,7 +348,7 @@ SatEngine::set_option(const string& option_str)
 
 // @brief 統計情報をクリアする．
 void
-SatEngine::clear_stats()
+SatEngineBase::clear_stats()
 {
   mStats.mCnfGenCount = 0;
   mStats.mCnfGenTime.set(0.0, 0.0, 0.0);
@@ -362,6 +363,11 @@ SatEngine::clear_stats()
   clear_sat_stats(mStats.mRedStats);
   clear_sat_stats(mStats.mRedStatsMax);
 
+  mStats.mPartRedCount = 0;
+  mStats.mPartRedTime.set(0.0, 0.0, 0.0);
+  clear_sat_stats(mStats.mPartRedStats);
+  clear_sat_stats(mStats.mPartRedStatsMax);
+
   mStats.mAbortCount = 0;
   mStats.mAbortTime.set(0.0, 0.0, 0.0);
 }
@@ -369,14 +375,14 @@ SatEngine::clear_stats()
 // @brief 統計情報を得る．
 // @param[in] stats 結果を格納する構造体
 void
-SatEngine::get_stats(DtpgStats& stats) const
+SatEngineBase::get_stats(DtpgStats& stats) const
 {
   stats = mStats;
 }
 
 // @breif 時間計測を制御する．
 void
-SatEngine::timer_enable(bool enable)
+SatEngineBase::timer_enable(bool enable)
 {
   mTimerEnable = enable;
 }
@@ -398,20 +404,18 @@ END_NONAMESPACE
 // @brief 故障位置を与えてその TFO の TFI リストを作る．
 // @param[in] solver SAT ソルバ
 // @param[in] fnode_list 故障位置のノードのリスト
-// @param[in] max_id ノード番号の最大値
 //
 // 結果は mTfoList に格納される．
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
-SatEngine::mark_region(SatSolver& solver,
-		       const vector<TpgNode*>& fnode_list,
-		       ymuint max_id)
+SatEngineBase::mark_region(SatSolver& solver,
+			   const vector<TpgNode*>& fnode_list)
 {
   mMarkArray.clear();
-  mMarkArray.resize(max_id, 0U);
+  mMarkArray.resize(mMaxNodeId, 0U);
 
   mTfoList.clear();
-  mTfoList.reserve(max_id);
+  mTfoList.reserve(mMaxNodeId);
 
   mInputList.clear();
   mOutputList.clear();
@@ -463,7 +467,7 @@ SatEngine::mark_region(SatSolver& solver,
 // @brief 節の作成用の作業領域の使用を開始する．
 // @param[in] exp_size 予想されるサイズ
 void
-SatEngine::tmp_lits_begin(ymuint exp_size)
+SatEngineBase::tmp_lits_begin(ymuint exp_size)
 {
   mTmpLits.clear();
   if ( exp_size > 0 ) {
@@ -473,21 +477,37 @@ SatEngine::tmp_lits_begin(ymuint exp_size)
 
 // @brief 作業領域にリテラルを追加する．
 void
-SatEngine::tmp_lits_add(Literal lit)
+SatEngineBase::tmp_lits_add(Literal lit)
 {
   mTmpLits.push_back(lit);
 }
 
 // @brief 作業領域の冊を SAT ソルバに加える．
 void
-SatEngine::tmp_lits_end(SatSolver& solver)
+SatEngineBase::tmp_lits_end(SatSolver& solver)
 {
   solver.add_clause(mTmpLits);
 }
 
 // @brief タイマーをスタートする．
 void
-SatEngine::cnf_begin()
+SatEngineBase::cnf_begin()
+{
+  timer_start();
+}
+
+// @brief タイマーを止めて CNF 作成時間に加える．
+void
+SatEngineBase::cnf_end()
+{
+  USTime time = timer_stop();
+  mStats.mCnfGenTime += time;
+  ++ mStats.mCnfGenCount;
+}
+
+// @brief 時間計測を開始する．
+void
+SatEngineBase::timer_start()
 {
   if ( mTimerEnable ) {
     mTimer.reset();
@@ -495,23 +515,24 @@ SatEngine::cnf_begin()
   }
 }
 
-// @brief タイマーを止めて CNF 作成時間に加える．
-void
-SatEngine::cnf_end()
+/// @brief 時間計測を終了する．
+USTime
+SatEngineBase::timer_stop()
 {
+  USTime time(0, 0, 0);
   if ( mTimerEnable ) {
     mTimer.stop();
-    mStats.mCnfGenTime += mTimer.time();
+    time = mTimer.time();
   }
-  ++ mStats.mCnfGenCount;
+  return time;
 }
 
 // @brief 正常回路のノードの入出力の関係を表す CNF を作る．
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SatEngine::make_gnode_cnf(SatSolver& solver,
-			  TpgNode* node)
+SatEngineBase::make_gnode_cnf(SatSolver& solver,
+			      TpgNode* node)
 {
   Literal output(node->gvar(), false);
   make_node_cnf(solver, node, GvarLitMap(node), output);
@@ -521,8 +542,8 @@ SatEngine::make_gnode_cnf(SatSolver& solver,
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SatEngine::make_fnode_cnf(SatSolver& solver,
-			  TpgNode* node)
+SatEngineBase::make_fnode_cnf(SatSolver& solver,
+			      TpgNode* node)
 {
   if ( !node->has_flt_var() ) {
     Literal output(node->fvar(), false);
@@ -594,8 +615,8 @@ SatEngine::make_fnode_cnf(SatSolver& solver,
 
 // @brief 故障ゲートの CNF を作る．
 void
-SatEngine::make_fault_cnf(SatSolver& solver,
-			  TpgFault* fault)
+SatEngineBase::make_fault_cnf(SatSolver& solver,
+			      TpgFault* fault)
 {
   TpgNode* node = fault->node();
   int fval = fault->val();
@@ -669,9 +690,9 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 }
 
 void
-SatEngine::make_dchain_cnf(SatSolver& solver,
-			   TpgNode* node,
-			   TpgFault* fault)
+SatEngineBase::make_dchain_cnf(SatSolver& solver,
+			       TpgNode* node,
+			       TpgFault* fault)
 {
   Literal glit(node->gvar(), false);
   Literal flit(node->fvar(), false);
@@ -718,8 +739,8 @@ SatEngine::make_dchain_cnf(SatSolver& solver,
 }
 
 void
-SatEngine::make_dchain_cnf(SatSolver& solver,
-			   TpgNode* node)
+SatEngineBase::make_dchain_cnf(SatSolver& solver,
+			       TpgNode* node)
 {
   Literal glit(node->gvar(), false);
   Literal flit(node->fvar(), false);
@@ -790,10 +811,10 @@ SatEngine::make_dchain_cnf(SatSolver& solver,
 // @param[in] node 対象のノード
 // @param[in] litmap 入出力のリテラルを保持するクラス
 void
-SatEngine::make_node_cnf(SatSolver& solver,
-			 TpgNode* node,
-			 const LitMap& litmap,
-			 Literal output)
+SatEngineBase::make_node_cnf(SatSolver& solver,
+			     TpgNode* node,
+			     const LitMap& litmap,
+			     Literal output)
 {
   if ( node->is_input() ) {
     return;
@@ -816,10 +837,10 @@ SatEngine::make_node_cnf(SatSolver& solver,
 // @param[in] type ゲートの種類
 // @param[in] litmap 入出力のリテラルを保持するクラス
 void
-SatEngine::make_gate_cnf(SatSolver& solver,
-			 tTgGateType type,
-			 const LitMap& litmap,
-			 Literal output)
+SatEngineBase::make_gate_cnf(SatSolver& solver,
+			     tTgGateType type,
+			     const LitMap& litmap,
+			     Literal output)
 {
   ymuint ni = litmap.input_size();
   switch ( type ) {
@@ -862,8 +883,8 @@ SatEngine::make_gate_cnf(SatSolver& solver,
 
 // @brief ノードの故障差関数を表すCNFを作る．
 void
-SatEngine::make_dlit_cnf(SatSolver& solver,
-			 TpgNode* node)
+SatEngineBase::make_dlit_cnf(SatSolver& solver,
+			     TpgNode* node)
 {
   Literal dlit(node->dvar());
 
@@ -941,10 +962,10 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
 void
-SatEngine::make_flt0_cnf(SatSolver& solver,
-			 VarId ivar,
-			 VarId fvar,
-			 VarId ovar)
+SatEngineBase::make_flt0_cnf(SatSolver& solver,
+			     VarId ivar,
+			     VarId fvar,
+			     VarId ovar)
 {
   Literal ilit(ivar, false);
   Literal flit(fvar, false);
@@ -961,10 +982,10 @@ SatEngine::make_flt0_cnf(SatSolver& solver,
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
 void
-SatEngine::make_flt1_cnf(SatSolver& solver,
-			 VarId ivar,
-			 VarId fvar,
-			 VarId ovar)
+SatEngineBase::make_flt1_cnf(SatSolver& solver,
+			     VarId ivar,
+			     VarId fvar,
+			     VarId ovar)
 {
   Literal ilit(ivar, false);
   Literal flit(fvar, false);
@@ -982,11 +1003,11 @@ SatEngine::make_flt1_cnf(SatSolver& solver,
 // @param[in] fvar1 故障変数
 // @param[in] ovar 出力の変数
 void
-SatEngine::make_flt01_cnf(SatSolver& solver,
-			  VarId ivar,
-			  VarId fvar0,
-			  VarId fvar1,
-			  VarId ovar)
+SatEngineBase::make_flt01_cnf(SatSolver& solver,
+			      VarId ivar,
+			      VarId fvar0,
+			      VarId fvar1,
+			      VarId ovar)
 {
   Literal ilit(ivar, false);
   Literal f0lit(fvar0, false);
@@ -1001,17 +1022,17 @@ SatEngine::make_flt01_cnf(SatSolver& solver,
 
 // @brief 一つの SAT問題を解く．
 Bool3
-SatEngine::solve(SatSolver& solver,
-		 TpgFault* f,
-		 BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop)
+SatEngineBase::solve(SatSolver& solver,
+		     TpgFault* f)
 {
   SatStats prev_stats;
   solver.get_stats(prev_stats);
 
-  USTime time(0, 0, 0);
-  Bool3 ans = _solve(solver, time);
+  timer_start();
+
+  Bool3 ans = solver.solve(mTmpLits, mModel);
+
+  USTime time = timer_stop();
 
   SatStats sat_stats;
   solver.get_stats(sat_stats);
@@ -1020,23 +1041,14 @@ SatEngine::solve(SatSolver& solver,
 
   if ( ans == kB3True ) {
     // パタンが求まった．
-
-    // バックトレースを行う．
-    TestVector* tv = bt(f->node(), mModel, mInputList, mOutputList);
-
-    // パタンの登録などを行う．
-    dop(f, tv);
-
-    stats_detect(sat_stats, time);
+    detect_op(f, sat_stats, time);
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    uop(f);
-
-    stats_undetect(sat_stats, time);
+    untest_op(f, sat_stats, time);
   }
   else { // ans == kB3X つまりアボート
-    stats_abort(sat_stats, time);
+    abort_op(f, sat_stats, time);
   }
 
   return ans;
@@ -1044,50 +1056,62 @@ SatEngine::solve(SatSolver& solver,
 
 // @brief 一つの SAT問題を解く．
 Bool3
-SatEngine::_solve(SatSolver& solver,
-		  USTime& time)
+SatEngineBase::_solve(SatSolver& solver)
 {
-  if ( mTimerEnable ) {
-    mTimer.reset();
-    mTimer.start();
-  }
-
   Bool3 ans = solver.solve(mTmpLits, mModel);
-
-  if ( mTimerEnable ) {
-    mTimer.stop();
-    time += mTimer.time();
-  }
 
   return ans;
 }
 
 // @brief 検出した場合の処理
 void
-SatEngine::stats_detect(const SatStats& sat_stats,
-			const USTime& time)
+SatEngineBase::detect_op(TpgFault* fault,
+			 const SatStats& sat_stats,
+			 const USTime& time)
 {
+  // バックトレースを行う．
+  TestVector* tv = mBackTracer(fault->node(), mModel, mInputList, mOutputList);
+
+  // パタンの登録などを行う．
+  mDetectOp(fault, tv);
+
   ++ mStats.mDetCount;
   mStats.mDetTime += time;
   add_sat_stats(mStats.mDetStats, sat_stats);
   max_sat_stats(mStats.mDetStatsMax, sat_stats);
 }
 
-// @brief 検出不能と判定した場合の処理
+// @brief 検出不能と判定した時の処理
 void
-SatEngine::stats_undetect(const SatStats& sat_stats,
-			  const USTime& time)
+SatEngineBase::untest_op(TpgFault* fault,
+			 const SatStats& sat_stats,
+			 const USTime& time)
 {
+  mUntestOp(fault);
+
   ++ mStats.mRedCount;
   mStats.mRedTime += time;
   add_sat_stats(mStats.mRedStats, sat_stats);
   max_sat_stats(mStats.mRedStatsMax, sat_stats);
 }
 
-// @brief アボートした場合の処理
+// @brief 部分的な検出不能と判定した時の処理
 void
-SatEngine::stats_abort(const SatStats& sat_stats,
-		       const USTime& time)
+SatEngineBase::partially_untest_op(TpgFault* fault,
+				   const SatStats& sat_stats,
+				   const USTime& time)
+{
+  ++ mStats.mPartRedCount;
+  mStats.mPartRedTime += time;
+  add_sat_stats(mStats.mPartRedStats, sat_stats);
+  max_sat_stats(mStats.mPartRedStatsMax, sat_stats);
+}
+
+// @brief アボートした時の処理
+void
+SatEngineBase::abort_op(TpgFault* fault,
+			const SatStats& sat_stats,
+			const USTime& time)
 {
   ++ mStats.mAbortCount;
   mStats.mAbortTime += time;
@@ -1095,7 +1119,7 @@ SatEngine::stats_abort(const SatStats& sat_stats,
 
 // SatStats をクリアする．
 void
-SatEngine::clear_sat_stats(SatStats& stats)
+SatEngineBase::clear_sat_stats(SatStats& stats)
 {
   stats.mRestart = 0;
   stats.mVarNum = 0;
@@ -1110,8 +1134,8 @@ SatEngine::clear_sat_stats(SatStats& stats)
 
 // SatStats をたす．
 void
-SatEngine::add_sat_stats(SatStats& dst_stats,
-			 const SatStats& src_stats)
+SatEngineBase::add_sat_stats(SatStats& dst_stats,
+			     const SatStats& src_stats)
 {
   dst_stats.mRestart += src_stats.mRestart;
   dst_stats.mVarNum += src_stats.mVarNum;
@@ -1126,8 +1150,8 @@ SatEngine::add_sat_stats(SatStats& dst_stats,
 
 // SatStats を引く
 void
-SatEngine::sub_sat_stats(SatStats& dst_stats,
-			 const SatStats& src_stats)
+SatEngineBase::sub_sat_stats(SatStats& dst_stats,
+			     const SatStats& src_stats)
 {
   dst_stats.mRestart -= src_stats.mRestart;
   dst_stats.mVarNum -= src_stats.mVarNum;
@@ -1142,8 +1166,8 @@ SatEngine::sub_sat_stats(SatStats& dst_stats,
 
 // SatStats の各々の最大値をとる．
 void
-SatEngine::max_sat_stats(SatStats& dst_stats,
-			 const SatStats& src_stats)
+SatEngineBase::max_sat_stats(SatStats& dst_stats,
+			     const SatStats& src_stats)
 {
   if ( dst_stats.mRestart < src_stats.mRestart ) {
     dst_stats.mRestart = src_stats.mRestart;
@@ -1176,13 +1200,29 @@ SatEngine::max_sat_stats(SatStats& dst_stats,
 
 // @brief ノードの変数割り当てフラグを消す．
 void
-SatEngine::clear_node_mark()
+SatEngineBase::clear_node_mark()
 {
   for (vector<TpgNode*>::iterator p = mTfoList.begin();
        p != mTfoList.end(); ++ p) {
     TpgNode* node = *p;
     node->clear_var();
   }
+}
+
+// @brief テスト生成を行なう．
+// @param[in] f_tgt 対象の故障
+void
+SatEngineBase::run(TpgFault* f_tgt)
+{
+  assert_not_reached(__FILE__, __LINE__);
+}
+
+// @brief テスト生成を行なう．
+// @param[in] flist 対象の故障リスト
+void
+SatEngineBase::run(const vector<TpgFault*>& flist)
+{
+  assert_not_reached(__FILE__, __LINE__);
 }
 
 END_NAMESPACE_YM_SATPG

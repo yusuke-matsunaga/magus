@@ -41,40 +41,19 @@ DtpgSat::~DtpgSat()
 {
 }
 
-// @brief 使用する SAT エンジンを指定する．
-void
-DtpgSat::set_mode(const string& type,
-		  const string& option,
-		  ostream* outp)
-{
-  mSatEngine.set_mode(type, option, outp);
-  mSatEngineSingle.set_mode(type, option, outp);
-}
-
 // @brief テスト生成を行なう．
 // @param[in] tpgnetwork 対象のネットワーク
 // @param[in] mode メインモード
 // @param[in] po_mode PO分割モード
-// @param[in] option_str オプション文字列
-// @param[in] bt バックトレーサー
-// @param[in] dop パタンが求められた時に実行されるファンクタ
-// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 // @param[in] stats 結果を格納する構造体
 void
 DtpgSat::run(TpgNetwork& tgnetwork,
 	     DtpgMode mode,
 	     tDtpgPoMode po_mode,
-	     const string& option_str,
-	     BackTracer& bt,
-	     DetectOp& dop,
-	     UntestOp& uop,
+	     SatEngine& sat_engine,
 	     DtpgStats& stats)
 {
-  mSatEngine.set_option(option_str);
-  mSatEngineSingle.set_option(option_str);
-
-  mSatEngine.clear_stats();
-  mSatEngineSingle.clear_stats();
+  sat_engine.clear_stats();
 
   mNetwork = &tgnetwork;
 
@@ -84,7 +63,7 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 
     mNetwork->activate_all();
 
-    dtpg1(mode, bt, dop, uop);
+    dtpg1(mode, sat_engine);
 
     break;
 
@@ -94,7 +73,7 @@ DtpgSat::run(TpgNetwork& tgnetwork,
       for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
 	mNetwork->activate_po(po_pos);
 
-	dtpg1(mode, bt, dop, uop);
+	dtpg1(mode, sat_engine);
       }
     }
     break;
@@ -106,51 +85,42 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 	ymuint po_pos = no - i - 1;
 	mNetwork->activate_po(po_pos);
 
-	dtpg1(mode, bt, dop, uop);
+	dtpg1(mode, sat_engine);
       }
     }
     break;
   }
 
-  if ( mode.mode() == kDtpgSingle ) {
-    mSatEngineSingle.get_stats(stats);
-  }
-  else {
-    mSatEngine.get_stats(stats);
-  }
+  sat_engine.get_stats(stats);
 }
 
 // @brief activate された部分回路に大してテスト生成を行う．
 // @param[in] mode メインモード
-// @param[in] bt バックトレーサー
-// @param[in] dop パタンが求められた時に実行されるファンクタ
-// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 void
 DtpgSat::dtpg1(DtpgMode mode,
-	       BackTracer& bt,
-	       DetectOp& dop,
-	       UntestOp& uop)
+	       SatEngine& sat_engine)
 {
   switch ( mode.mode() ) {
   case kDtpgSingle:
-    single_mode(bt, dop, uop);
+  case kDtpgSingle2:
+    single_mode(sat_engine);
     break;
 
   case kDtpgFFR:
-    ffr_mode(bt, dop, uop);
+  case kDtpgFFR2:
+    ffr_mode(sat_engine);
     break;
 
   case kDtpgMFFC:
-    mffc_mode(bt, dop, uop);
+  case kDtpgMFFC2:
+    mffc_mode(sat_engine);
     break;
   }
 }
 
 // @brief single モードでテスト生成を行なう．
 void
-DtpgSat::single_mode(BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop)
+DtpgSat::single_mode(SatEngine& sat_engine)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -164,7 +134,7 @@ DtpgSat::single_mode(BackTracer& bt,
       TpgFault* f = node->fault(i);
       if ( f->status() != kFsDetected &&
 	   !f->is_skip() ) {
-	mSatEngineSingle.run(f, mNetwork->max_node_id(), bt, dop, uop);
+	sat_engine.run(f);
       }
     }
   }
@@ -172,9 +142,7 @@ DtpgSat::single_mode(BackTracer& bt,
 
 // @brief ffr モードでテスト生成を行なう．
 void
-DtpgSat::ffr_mode(BackTracer& bt,
-		  DetectOp& dop,
-		  UntestOp& uop)
+DtpgSat::ffr_mode(SatEngine& sat_engine)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -185,7 +153,7 @@ DtpgSat::ffr_mode(BackTracer& bt,
 
       dfs_ffr(node);
 
-      do_dtpg(bt, dop, uop);
+      do_dtpg(sat_engine);
     }
   }
 }
@@ -206,9 +174,7 @@ DtpgSat::dfs_ffr(TpgNode* node)
 
 // @brief mffc モードでテスト生成を行なう．
 void
-DtpgSat::mffc_mode(BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop)
+DtpgSat::mffc_mode(SatEngine& sat_engine)
 {
   ymuint n = mNetwork->active_node_num();
   vector<bool> mark(mNetwork->max_node_id(), false);
@@ -219,7 +185,7 @@ DtpgSat::mffc_mode(BackTracer& bt,
 
       dfs_mffc(node, mark);
 
-      do_dtpg(bt, dop, uop);
+      do_dtpg(sat_engine);
     }
   }
 }
@@ -259,15 +225,13 @@ DtpgSat::add_node_faults(TpgNode* node)
 
 // @brief テストパタン生成を行なう．
 void
-DtpgSat::do_dtpg(BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop)
+DtpgSat::do_dtpg(SatEngine& sat_engine)
 {
   if ( mFaultList.empty() ) {
     return;
   }
 
-  mSatEngine.run(mFaultList, mNetwork->max_node_id(), bt, dop, uop);
+  sat_engine.run(mFaultList);
 }
 
 END_NAMESPACE_YM_SATPG

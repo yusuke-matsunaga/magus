@@ -56,14 +56,10 @@ AM_CPPFLAGS = \
 COMMON_SOURCES = \
 	DtpgSat.h \
 	DtpgSat.cc \
-	DtpgSat2.h \
-	DtpgSat2.cc \
-	DtpgSat3.h \
-	DtpgSat3.cc \
 	DtpgSmt.h \
 	DtpgSmt.cc \
-	SatEngine.h \
-	SatEngine.cc \
+	SatEngineBase.h \
+	SatEngineBase.cc \
 	SatEngineMulti.h \
 	SatEngineMulti.cc \
 	SatEngineMulti2.h \

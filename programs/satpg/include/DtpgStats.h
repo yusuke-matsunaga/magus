@@ -57,6 +57,20 @@ struct DtpgStats
   /// 個々の値は同時に起こったわけではない．
   SatStats mRedStatsMax;
 
+  /// @brief 部分的な冗長故障と判定した回数
+  ymuint32 mPartRedCount;
+
+  /// @brief 部分的な冗長故障と判定した時の SAT に要した時間
+  USTime mPartRedTime;
+
+  /// @brief 部分的な冗長故障と判定した時の SATソルバの統計情報の和
+  SatStats mPartRedStats;
+
+  /// @brief 部分的な冗長故障と判定した時の SATソルバの統計情報の最大値
+  ///
+  /// 個々の値は同時に起こったわけではない．
+  SatStats mPartRedStatsMax;
+
   /// @brief アボートした回数
   ymuint32 mAbortCount;
 

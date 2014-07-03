@@ -35,13 +35,6 @@ public:
   // パタン生成を行う関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 使用する SAT エンジンを指定する．
-  virtual
-  void
-  set_mode(const string& type = string(),
-	   const string& option = string(),
-	   ostream* outp = NULL) = 0;
-
   /// @brief テスト生成を行なう．
   /// @param[in] tpgnetwork 対象のネットワーク
   /// @param[in] mode メインモード
@@ -56,16 +49,8 @@ public:
   run(TpgNetwork& tgnetwork,
       DtpgMode mode,
       tDtpgPoMode po_mode,
-      const string& option_str,
-      BackTracer& bt,
-      DetectOp& dop,
-      UntestOp& uop,
+      SatEngine& sat_engine,
       DtpgStats& stats) = 0;
-
-  /// @breif 時間計測を制御する．
-  virtual
-  void
-  timer_enable(bool enable) = 0;
 
 };
 

@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "SatEngineBase.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,12 +20,25 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
 class SatEngineSingle :
-  public SatEngine
+  public SatEngineBase
 {
 public:
 
   /// @brief コンストラクタ
-  SatEngineSingle();
+  /// @param[in] sat_type SATソルバの種類を表す文字列
+  /// @param[in] sat_option SATソルバに渡すオプション文字列
+  /// @param[in] sat_outp SATソルバ用の出力ストリーム
+  /// @param[in] max_id ノード番号の最大値 + 1
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  SatEngineSingle(const string& sat_type,
+		  const string& sat_option,
+		  ostream* sat_outp,
+		  ymuint max_id,
+		  BackTracer& bt,
+		  DetectOp& dop,
+		  UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
@@ -39,35 +52,11 @@ public:
 
   /// @brief テスト生成を行なう．
   /// @param[in] f_tgt 対象の故障
-  /// @param[in] max_id ノード番号の最大値 + 1
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  virtual
   void
-  run(TpgFault* f_tgt,
-      ymuint max_id,
-      BackTracer& bt,
-      DetectOp& dop,
-      UntestOp& uop);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
+  run(TpgFault* f_tgt);
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE_YM_SATPG
 

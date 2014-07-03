@@ -113,6 +113,7 @@ class FaultMgr;
 class TpgNetwork;
 class TpgNode;
 class TpgPrimitive;
+class SatEngine;
 class BackTracer;
 class DetectOp;
 class UntestOp;

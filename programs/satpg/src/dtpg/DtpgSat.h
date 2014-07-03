@@ -40,55 +40,18 @@ public:
   // Dtpg の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 使用する SAT エンジンを指定する．
-  virtual
-  void
-  set_mode(const string& type = string(),
-	   const string& option = string(),
-	   ostream* outp = NULL);
-
   /// @brief テスト生成を行なう．
   /// @param[in] tpgnetwork 対象のネットワーク
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
-  /// @param[in] option_str オプション文字列
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
   run(TpgNetwork& tgnetwork,
       DtpgMode mode,
       tDtpgPoMode po_mode,
-      const string& option_str,
-      BackTracer& bt,
-      DetectOp& dop,
-      UntestOp& uop,
+      SatEngine& sat_engine,
       DtpgStats& stats);
-
-  /// @breif 時間計測を制御する．
-  virtual
-  void
-  timer_enable(bool enable);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 一つの故障に対する処理が終わったときに呼ばれる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief テストパタンが見つかった場合に呼ばれる関数
-  /// @param[in] f 故障
-  /// @param[in] tv テストパタン
-  void
-  set_detected(TpgFault* f,
-	       TestVector* tv);
-
-  /// @brief 検出不能のときに呼ばれる関数
-  /// @param[in] f 故障
-  void
-  set_untestable(TpgFault* f);
 
 
 private:
@@ -103,36 +66,28 @@ private:
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
   dtpg1(DtpgMode mode,
-	BackTracer& bt,
-	DetectOp& dop,
-	UntestOp& uop);
+	SatEngine& sat_engine);
 
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  single_mode(BackTracer& bt,
-	      DetectOp& dop,
-	      UntestOp& uop);
+  single_mode(SatEngine& sat_engine);
 
   /// @brief ffr モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  ffr_mode(BackTracer& bt,
-	   DetectOp& dop,
-	   UntestOp& uop);
+  ffr_mode(SatEngine& sat_engine);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  mffc_mode(BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
+  mffc_mode(SatEngine& sat_engine);
 
   /// @brief DFS で FFR を求める．
   void
@@ -153,20 +108,13 @@ private:
 
   /// @brief テストパタン生成を行なう．
   void
-  do_dtpg(BackTracer& bt,
-	  DetectOp& dop,
-	  UntestOp& uop);
+  do_dtpg(SatEngine& sat_engine);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // SAT エンジン
-  SatEngineMulti mSatEngine;
-
-  SatEngineSingle mSatEngineSingle;
 
   // 対象の回路
   TpgNetwork* mNetwork;
@@ -180,15 +128,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @breif 時間計測を制御する．
-inline
-void
-DtpgSat::timer_enable(bool enable)
-{
-  mSatEngine.timer_enable(enable);
-  mSatEngineSingle.timer_enable(enable);
-}
 
 // @brief 故障リストをクリアする．
 inline

@@ -45,8 +45,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 				"print statistics");
   mPoptSingle = new TclPopt(this, "single",
 			    "single mode");
-  mPoptSingle2 = new TclPopt(this, "single2",
-			     "single2 mode");
+  mPoptSingle2 = new TclPoptInt(this, "single2",
+				"single2 mode <INT>");
   mPoptSingle3 = new TclPopt(this, "single3",
 			     "single3 mode");
   mPoptFFR = new TclPopt(this, "ffr",
@@ -137,6 +137,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   }
   else if ( mPoptSingle2->is_specified() ) {
     mode = kDtpgSingle2;
+    mode_val = mPoptSingle2->val();
   }
   else if ( mPoptSingle3->is_specified() ) {
     mode = kDtpgSingle3;
@@ -288,6 +289,33 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 	   << "# of implications (Ave./Max)   = "
 	   << setw(10) << (double) stats.mRedStats.mPropagationNum / stats.mRedCount
 	   << " / " << setw(8) << stats.mRedStatsMax.mPropagationNum << endl;
+    }
+    if ( stats.mPartRedCount > 0 ) {
+      cout << endl
+	   << "*** Partial UNSAT instances (" << stats.mPartRedCount << ") ***" << endl
+	   << "Total CPU time  (s)            = " << setw(10) << stats.mPartRedTime.usr_time() << "u"
+	   << " " << setw(8) << stats.mPartRedTime.sys_time() << "s" << endl
+	   << "Ave. CPU time (usec)           = "
+	   << setw(10) << stats.mPartRedTime.usr_time_usec() / stats.mPartRedCount
+	   << "u"
+	   << " " << setw(8) << stats.mPartRedTime.sys_time_usec() / stats.mPartRedCount
+	   << "s" << endl
+
+	   << "# of restarts (Ave./Max)       = "
+	   << setw(10) << (double) stats.mPartRedStats.mRestart / stats.mPartRedCount
+	   << " / " << setw(8) << stats.mPartRedStatsMax.mRestart << endl
+
+	   << "# of conflicts (Ave./Max)      = "
+	   << setw(10) << (double) stats.mPartRedStats.mConflictNum / stats.mPartRedCount
+	   << " / " << setw(8) << stats.mPartRedStatsMax.mConflictNum << endl
+
+	   << "# of decisions (Ave./Max)      = "
+	   << setw(10) << (double) stats.mPartRedStats.mDecisionNum / stats.mPartRedCount
+	   << " / " << setw(8) << stats.mPartRedStatsMax.mDecisionNum << endl
+
+	   << "# of implications (Ave./Max)   = "
+	   << setw(10) << (double) stats.mPartRedStats.mPropagationNum / stats.mPartRedCount
+	   << " / " << setw(8) << stats.mPartRedStatsMax.mPropagationNum << endl;
     }
     if ( stats.mAbortCount > 0 ) {
       cout << endl

@@ -15,11 +15,12 @@
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "Dtpg.h"
+#include "SatEngine.h"
 #include "Rtpg.h"
 #include "MinPat.h"
-#include "BackTracer.h"
+//#include "BackTracer.h"
 #include "DetectOp.h"
-#include "UntestOp.h"
+//#include "UntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -192,35 +193,51 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   dop.set_faults(mFaultMgr->remain_list());
 
-  if ( mode.mode() == kDtpgSingle2 || mode.mode() == kDtpgMFFC2 ) {
-    Dtpg* dtpg = new_DtpgSat2();
-    dtpg->set_mode(sat_type, sat_option, outp);
-    dtpg->timer_enable(timer_enable);
-    dtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
-    delete dtpg;
-  }
-  else if ( (mode.mode() == kDtpgSingle || mode.mode() == kDtpgFFR) && po_mode == kDtpgPoInc ) {
-    Dtpg* dtpg = new_DtpgSat3();
-    dtpg->set_mode(sat_type, sat_option, outp);
-    dtpg->timer_enable(timer_enable);
-    dtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
-    delete dtpg;
-  }
-  else if ( mode.mode() == kDtpgSingle3 ) {
-    Dtpg* dtpg = new_DtpgSmt();
-    dtpg->set_mode(sat_type, sat_option, outp);
-    dtpg->timer_enable(timer_enable);
-    dtpg->run(*mNetwork, DtpgMode(kDtpgSingle),
-	      po_mode, option_str, bt, dop, uop, stats);
-    delete dtpg;
+  Dtpg* dtpg;
+  if ( mode.mode() == kDtpgSingle3 ) {
+    dtpg = new_DtpgSmt();
   }
   else {
-    Dtpg* dtpg = new_DtpgSat();
-    dtpg->set_mode(sat_type, sat_option, outp);
-    dtpg->timer_enable(timer_enable);
-    dtpg->run(*mNetwork, mode, po_mode, option_str, bt, dop, uop, stats);
-    delete dtpg;
+    dtpg = new_DtpgSat();
   }
+
+  ymuint max_id = mNetwork->max_node_id();
+
+  SatEngine* engine = NULL;
+  switch ( mode.mode() ) {
+  case kDtpgSingle:
+    engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);
+    break;
+
+  case kDtpgSingle2:
+    engine = new_SatEngineSingle2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
+    break;
+
+  case kDtpgSingle3:
+    break;
+
+  case kDtpgFFR:
+  case kDtpgMFFC:
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop);
+    break;
+
+  case kDtpgFFR2:
+  case kDtpgMFFC2:
+    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+
+  engine->set_option(option_str);
+  engine->timer_enable(timer_enable);
+
+  dtpg->run(*mNetwork, mode, po_mode, *engine, stats);
+
+  delete dtpg;
+  delete engine;
 
   mTimer.change(old_id);
 }

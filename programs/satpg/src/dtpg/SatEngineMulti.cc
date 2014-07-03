@@ -9,21 +9,44 @@
 
 #include "SatEngineMulti.h"
 
-#include "DetectOp.h"
-#include "UntestOp.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "BackTracer.h"
-#include "LitMap.h"
 #include "logic/SatSolver.h"
-#include "logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief Multi エンジンを作る．
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
+// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] bt バックトレーサー
+// @param[in] dop パタンが求められた時に実行されるファンクタ
+/// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SatEngine*
+new_SatEngineMulti(const string& sat_type,
+		   const string& sat_option,
+		   ostream* sat_outp,
+		   ymuint max_id,
+		   BackTracer& bt,
+		   DetectOp& dop,
+		   UntestOp& uop)
+{
+  return new SatEngineMulti(sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+}
+
 // @brief コンストラクタ
-SatEngineMulti::SatEngineMulti()
+SatEngineMulti::SatEngineMulti(const string& sat_type,
+			       const string& sat_option,
+			       ostream* sat_outp,
+			       ymuint max_id,
+			       BackTracer& bt,
+			       DetectOp& dop,
+			       UntestOp& uop) :
+  SatEngineBase(sat_type, sat_option, sat_outp, max_id, bt, dop, uop),
+  mDone(max_id, false)
 {
 }
 
@@ -34,13 +57,8 @@ SatEngineMulti::~SatEngineMulti()
 
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
-// @param[in] max_id ノード番号の最大値 + 1
 void
-SatEngineMulti::run(const vector<TpgFault*>& flist,
-		    ymuint max_id,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop)
+SatEngineMulti::run(const vector<TpgFault*>& flist)
 {
   cnf_begin();
 
@@ -53,8 +71,6 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
   // FnodeInfo を持つノードのリスト
   vector<TpgNode*> fnode_list;
 
-  mDone.clear();
-  mDone.resize(max_id, false);
   fnode_list.reserve(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     VarId fvar = solver.new_var();
@@ -76,7 +92,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     }
   }
 
-  mark_region(solver, fnode_list, max_id);
+  mark_region(solver, fnode_list);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -101,7 +117,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  if ( mNemesis ) {
+  if ( !nemesis_mode() ) {
     ymuint npo = output_list().size();
     tmp_lits_begin(npo);
     for (ymuint i = 0; i < npo; ++ i) {
@@ -163,7 +179,7 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
     }
     mTmpNodeList.clear();
 
-    if ( mUseDominator ) {
+    if ( use_dominator() ) {
       // dominator ノードの dvar は1でなければならない．
       for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
 	Literal dlit(node->dvar(), false);
@@ -174,13 +190,14 @@ SatEngineMulti::run(const vector<TpgFault*>& flist,
       tmp_lits_add(Literal(f->node()->dvar(), false));
     }
 
-    solve(solver, f, bt, dop, uop);
+    solve(solver, f);
   }
   clear_node_mark();
 
   for (ymuint i = 0; i < fnode_list.size(); ++ i) {
     TpgNode* node = fnode_list[i];
     node->clear_oifvar();
+    mDone[node->id()] = false;
   }
 }
 

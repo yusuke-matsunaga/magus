@@ -9,21 +9,49 @@
 
 #include "SatEngineMulti2.h"
 
-#include "DetectOp.h"
-#include "UntestOp.h"
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "BackTracer.h"
-#include "LitMap.h"
 #include "logic/SatSolver.h"
-#include "logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief Multi2 エンジンを作る．
+// @param[in] th_val しきい値
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
+// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] bt バックトレーサー
+// @param[in] dop パタンが求められた時に実行されるファンクタ
+// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SatEngine*
+new_SatEngineMulti2(ymuint th_val,
+		    const string& sat_type,
+		    const string& sat_option,
+		    ostream* sat_outp,
+		    ymuint max_id,
+		    BackTracer& bt,
+		    DetectOp& dop,
+		    UntestOp& uop)
+{
+  return new SatEngineMulti2(th_val, sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+}
+
 // @brief コンストラクタ
-SatEngineMulti2::SatEngineMulti2()
+SatEngineMulti2::SatEngineMulti2(ymuint th_val,
+				 const string& sat_type,
+				 const string& sat_option,
+				 ostream* sat_outp,
+				 ymuint max_id,
+				 BackTracer& bt,
+				 DetectOp& dop,
+				 UntestOp& uop) :
+  SatEngineBase(sat_type, sat_option, sat_outp, max_id, bt, dop, uop),
+  mThVal(th_val),
+  mDone(max_id, false),
+  mMark(max_id, 0)
 {
 }
 
@@ -34,14 +62,9 @@ SatEngineMulti2::~SatEngineMulti2()
 
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
-// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] th_val
 void
-SatEngineMulti2::run(const vector<TpgFault*>& flist,
-		     ymuint th_val,
-		     ymuint max_id,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop)
+SatEngineMulti2::run(const vector<TpgFault*>& flist)
 {
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
@@ -52,9 +75,6 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
   // FnodeInfo を持つノードのリスト
   vector<TpgNode*> fnode_list;
   fnode_list.reserve(nf);
-
-  mDone.clear();
-  mDone.resize(max_id, false);
   for (ymuint i = 0; i < nf; ++ i) {
     VarId fvar = solver.new_var();
     flt_var[i] = fvar;
@@ -75,14 +95,12 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
     }
   }
 
-  mark_region(solver, fnode_list, max_id);
+  mark_region(solver, fnode_list);
 
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
 
-  // 処理済みのノードのマーク
-  vector<ymuint> mark(max_id, 0);
-
+  ymuint th_val = mThVal;
   if ( th_val > no ) {
     th_val = no;
   }
@@ -99,8 +117,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( node->is_in_TFI_of(oid) && mark[node->id()] == 0 ) {
-	mark[node->id()] = opos + 1;
+      if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
+	mMark[node->id()] = opos + 1;
 
 	make_gnode_cnf(solver, node);
       }
@@ -111,7 +129,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( mark[node->id()] != (opos + 1) ) {
+      if ( mMark[node->id()] != (opos + 1) ) {
 	continue;
       }
 
@@ -133,10 +151,8 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	continue;
       }
 
-      if ( mTimerEnable ) {
-	mTimer.reset();
-	mTimer.start();
-      }
+
+      timer_start();
 
       tmp_lits_begin();
 
@@ -183,11 +199,11 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       }
       mTmpNodeList.clear();
 
-      if ( !mTgGrasp ) {
+      if ( !tg_grasp_mode() ) {
 	// まだ作っていない部分の dlit を 0 にする．
 	for (ymuint j = 0; j < tfo_size(); ++ j) {
 	  TpgNode* node = tfo_tfi_node(j);
-	  if ( mark[node->id()] == 0 ) {
+	  if ( mMark[node->id()] == 0 ) {
 	    Literal dlit(node->dvar(), false);
 	    tmp_lits_add(~dlit);
 	  }
@@ -195,7 +211,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       }
 
       // dominator ノードの dvar は1でなければならない．
-      if ( mUseDominator ) {
+      if ( use_dominator() ) {
 	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
 	  Literal dlit(node->dvar(), false);
 	  tmp_lits_add(dlit);
@@ -205,40 +221,29 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       SatStats prev_stats;
       solver.get_stats(prev_stats);
 
-      Bool3 ans = solver.solve(mTmpLits, mModel);
+      Bool3 ans = _solve(solver);
 
       SatStats sat_stats;
       solver.get_stats(sat_stats);
 
       sub_sat_stats(sat_stats, prev_stats);
 
-      USTime time(0, 0, 0);
-      if ( mTimerEnable ) {
-	mTimer.stop();
-	time = mTimer.time();
-      }
+      USTime time = timer_stop();
 
       if ( ans == kB3True ) {
-
-	// バックトレースを行う．
-	TestVector* tv = bt(f->node(), mModel, mInputList, mOutputList);
-
-	// パタンの登録などを行う．
-	dop(f, tv);
-
-	stats_detect(sat_stats, time);
+	detect_op(f, sat_stats, time);
       }
       else if ( ans == kB3False ) {
 	if ( opos == no - 1 ) {
-	  uop(f);
+	  untest_op(f, sat_stats, time);
 	}
 	else {
+	  partially_untest_op(f, sat_stats, time);
 	  faults_remain = true;
 	}
-	stats_undetect(sat_stats, time);
       }
       else {
-	stats_abort(sat_stats, time);
+	abort_op(f, sat_stats, time);
       }
     }
     if ( !faults_remain ) {
@@ -256,7 +261,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( mark[node->id()] == 0 ) {
+      if ( mMark[node->id()] == 0 ) {
 	make_gnode_cnf(solver, node);
       }
     }
@@ -266,88 +271,27 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( mark[node->id()] != 0 ) {
-	continue;
+      if ( mMark[node->id()] == 0 ) {
+	make_fnode_cnf(solver, node);
+	make_dchain_cnf(solver, node);
       }
+    }
 
-      make_fnode_cnf(solver, node);
-
-      Literal glit(node->gvar(), false);
-      Literal flit(node->fvar(), false);
-      Literal dlit(node->dvar(), false);
-
-      if ( mTgGrasp ) {
-	// XOR(glit, flit, dlit) を追加する．
-	// 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-	solver.add_clause(~glit, ~flit, ~dlit);
-	solver.add_clause( glit,  flit, ~dlit);
-
-	solver.add_clause(~glit,  flit,  dlit);
-	solver.add_clause( glit, ~flit,  dlit);
-
-	if ( mExtTgGrasp ) {
-	  // 全てのファンインに故障差が伝搬していなければ
-	  // このゲートの出力にも故障差は伝搬しない．
-	  // ただし，このゲートの出力に故障がある場合を
-	  // 考慮しなければならない．
-	  if ( node->has_flt_var() ) {
-	    ymuint ni = node->fanin_num();
-	    tmp_lits_begin(ni * 3 + 3);
-	    tmp_lits_add(~dlit);
-	    if ( node->of0var() != kVarIdIllegal ) {
-	      tmp_lits_add(Literal(node->of0var(), false));
-	    }
-	    if ( node->of1var() != kVarIdIllegal ) {
-	      tmp_lits_add(Literal(node->of1var(), false));
-	    }
-	    for (ymuint i = 0; i < ni; ++ i) {
-	      TpgNode* inode = node->fanin(i);
-	      if ( inode->has_fvar() ) {
-		Literal idlit(inode->dvar(), false);
-		tmp_lits_add(idlit);
-	      }
-	      if ( node->if0var(i) != kVarIdIllegal ) {
-		tmp_lits_add(Literal(node->if0var(i), false));
-	      }
-	      if ( node->if1var(i) != kVarIdIllegal ) {
-		tmp_lits_add(Literal(node->if1var(i), false));
-	      }
-	    }
-	  }
-	  else {
-	    make_dlit_cnf(solver, node);
-	  }
-	}
+    //////////////////////////////////////////////////////////////////////
+    // 故障の検出条件
+    //////////////////////////////////////////////////////////////////////
+    if ( !nemesis_mode() ) {
+      tmp_lits_begin(no);
+      for (vector<TpgNode*>::const_iterator p = olist.begin();
+	   p != olist.end(); ++ p) {
+	TpgNode* node = *p;
+	Literal dlit(node->dvar(), false);
+	tmp_lits_add(dlit);
       }
-      else {
-	// XOR(glit, flit, dlit) を追加する．
-	// 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-	solver.add_clause(~glit, ~flit, ~dlit);
-	solver.add_clause( glit,  flit, ~dlit);
-
-	if ( !node->is_output() ) {
-	  ymuint nfo = node->active_fanout_num();
-	  tmp_lits_begin(nfo + 1);
-	  tmp_lits_add(~dlit);
-	  for (ymuint j = 0; j < nfo; ++ j) {
-	    TpgNode* onode = node->active_fanout(j);
-	    tmp_lits_add(Literal(onode->dvar(), false));
-	  }
-	  tmp_lits_end(solver);
-	}
-      }
+      tmp_lits_end(solver);
     }
 
     cnf_end();
-
-    tmp_lits_begin(no);
-    for (vector<TpgNode*>::const_iterator p = output_list().begin();
-	 p != output_list().end(); ++ p) {
-      TpgNode* node = *p;
-      Literal dlit(node->dvar(), false);
-      tmp_lits_add(dlit);
-    }
-    tmp_lits_end(solver);
 
     for (ymuint fid = 0; fid < nf; ++ fid) {
       TpgFault* f = flist[fid];
@@ -396,7 +340,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
       }
       mTmpNodeList.clear();
 
-      if ( mUseDominator ) {
+      if ( use_dominator() ) {
 	// dominator ノードの dvar は1でなければならない．
 	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
 	  Literal dlit(node->dvar(), false);
@@ -407,15 +351,21 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist,
 	tmp_lits_add(Literal(f->node()->dvar(), false));
       }
 
-      solve(solver, f, bt, dop, uop);
+      solve(solver, f);
     }
   }
 
   clear_node_mark();
 
+  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    mMark[node->id()] = 0;
+  }
+
   for (ymuint i = 0; i < fnode_list.size(); ++ i) {
     TpgNode* node = fnode_list[i];
     node->clear_oifvar();
+    mDone[node->id()] = false;
   }
 }
 

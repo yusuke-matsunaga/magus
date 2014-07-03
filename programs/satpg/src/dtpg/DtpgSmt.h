@@ -73,24 +73,6 @@ public:
   timer_enable(bool enable);
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 一つの故障に対する処理が終わったときに呼ばれる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief テストパタンが見つかった場合に呼ばれる関数
-  /// @param[in] f 故障
-  /// @param[in] tv テストパタン
-  void
-  set_detected(TpgFault* f,
-	       TestVector* tv);
-
-  /// @brief 検出不能のときに呼ばれる関数
-  /// @param[in] f 故障
-  void
-  set_untestable(TpgFault* f);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
@@ -134,15 +116,6 @@ private:
 	    DetectOp& dop,
 	    UntestOp& uop);
 
-  /// @brief all モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  all_mode(BackTracer& bt,
-	   DetectOp& dop,
-	   UntestOp& uop);
-
   /// @brief 一つの故障に対してテストパタン生成を行う．
   /// @param[in] f 故障
   /// @param[in] bt バックトレーサー
@@ -153,19 +126,6 @@ private:
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop);
-
-  /// @brief 同じ位置の2つの出力故障に対してテストパタン生成を行なう．
-  /// @param[in] f0 0縮退故障
-  /// @param[in] f1 1縮退故障
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  void
-  dtpg_dual(TpgFault* f0,
-	    TpgFault* f1,
-	    BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
 
   /// @brief DFS で FFR を求める．
   void
@@ -200,9 +160,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SAT エンジン
-  SatEngineMulti mSatEngine;
-
   SmtEngineSingle mSatEngineSingle;
 
   // 対象の回路
@@ -226,7 +183,6 @@ inline
 void
 DtpgSmt::timer_enable(bool enable)
 {
-  mSatEngine.timer_enable(enable);
   mSatEngineSingle.timer_enable(enable);
 }
 

@@ -12,15 +12,40 @@
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "BackTracer.h"
 #include "logic/SatSolver.h"
-#include "logic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief Single エンジンを作る．
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
+// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] bt バックトレーサー
+// @param[in] dop パタンが求められた時に実行されるファンクタ
+// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SatEngine*
+new_SatEngineSingle(const string& sat_type,
+		    const string& sat_option,
+		    ostream* sat_outp,
+		    ymuint max_id,
+		    BackTracer& bt,
+		    DetectOp& dop,
+		    UntestOp& uop)
+{
+  return new SatEngineSingle(sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+}
+
 // @brief コンストラクタ
-SatEngineSingle::SatEngineSingle()
+SatEngineSingle::SatEngineSingle(const string& sat_type,
+				 const string& sat_option,
+				 ostream* sat_outp,
+				 ymuint max_id,
+				 BackTracer& bt,
+				 DetectOp& dop,
+				 UntestOp& uop) :
+  SatEngineBase(sat_type, sat_option, sat_outp, max_id, bt, dop, uop)
 {
 }
 
@@ -31,20 +56,15 @@ SatEngineSingle::~SatEngineSingle()
 
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
-// @param[in] max_id ノード番号の最大値 + 1
 void
-SatEngineSingle::run(TpgFault* fault,
-		     ymuint max_id,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop)
+SatEngineSingle::run(TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
   int fval = fault->val();
 
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
-  mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
+  mark_region(solver, vector<TpgNode*>(1, fnode));
 
   cnf_begin();
 
@@ -78,7 +98,7 @@ SatEngineSingle::run(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  if ( !mNemesis ) {
+  if ( !nemesis_mode() ) {
     ymuint npo = output_list().size();
     tmp_lits_begin(npo);
     for (ymuint i = 0; i < npo; ++ i) {
@@ -89,7 +109,7 @@ SatEngineSingle::run(TpgFault* fault,
     tmp_lits_end(solver);
   }
 
-  if ( mUseDominator ) {
+  if ( use_dominator() ) {
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
       Literal dlit(node->dvar(), false);
@@ -105,7 +125,7 @@ SatEngineSingle::run(TpgFault* fault,
   // 故障に対するテスト生成を行なう．
   tmp_lits_begin();
 
-  solve(solver, fault, bt, dop, uop);
+  solve(solver, fault);
 
   clear_node_mark();
 }
