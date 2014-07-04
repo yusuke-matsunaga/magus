@@ -883,7 +883,8 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
       }
     }
     node = make_cplx_node(expr, nfo, leaf_nodes, input_map);
-    TpgCplxMap* tmap = new TpgCplxMap();
+    void* p = mAlloc.get_memory(sizeof(TpgCplxMap));
+    TpgCplxMap* tmap = new (p) TpgCplxMap();
     tmap->mInputNodeArray = alloc_array<TpgNode*>(mAlloc, ni);
     tmap->mInputPosArray = alloc_array<ymuint32>(mAlloc, ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -900,7 +901,8 @@ TpgNetwork::make_logic_node(const TgNode* tgnode,
       TpgNode* inode = mNodeMap[itgnode->gid()];
       connect(inode, node, i);
     }
-    node->mInputMap = new TpgPrimMap(node);
+    void* p = mAlloc.get_memory(sizeof(TpgPrimMap));
+    node->mInputMap = new (p) TpgPrimMap(node);
   }
   bind(node, tgnode);
 
