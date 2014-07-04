@@ -69,22 +69,16 @@ enum tSimMode {
 enum tDtpgMode {
   /// @brief single モード
   kDtpgSingle,
-  /// @brief dual モード
-  kDtpgDual,
-  /// @brief node モード
-  kDtpgNode,
   /// @brief ffr モード
   kDtpgFFR,
-  /// @brief ffr2 モード
-  kDtpgFFR2,
   /// @brief mffc モード
   kDtpgMFFC,
-  /// @brief all モード
-  kDtpgAll,
   /// @brief single2 モード
   kDtpgSingle2,
   /// @brief single3 モード
   kDtpgSingle3,
+  /// @brief ffr2 モード
+  kDtpgFFR2,
   /// @brief mffc2 モード
   kDtpgMFFC2
 };
@@ -112,7 +106,6 @@ class TpgFault;
 class FaultMgr;
 class TpgNetwork;
 class TpgNode;
-class TpgPrimitive;
 class SatEngine;
 class BackTracer;
 class DetectOp;
