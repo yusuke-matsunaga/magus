@@ -98,16 +98,14 @@ SatEngineSingle::run(TpgFault* fault)
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  if ( !nemesis_mode() ) {
-    ymuint npo = output_list().size();
-    tmp_lits_begin(npo);
-    for (ymuint i = 0; i < npo; ++ i) {
-      TpgNode* node = output_list()[i];
-      Literal dlit(node->dvar(), false);
-      tmp_lits_add(dlit);
-    }
-    tmp_lits_end(solver);
+  ymuint npo = output_list().size();
+  tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    TpgNode* node = output_list()[i];
+    Literal dlit(node->dvar(), false);
+    tmp_lits_add(dlit);
   }
+  tmp_lits_end(solver);
 
   if ( use_dominator() ) {
     // dominator ノードの dvar は1でなければならない．

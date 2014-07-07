@@ -74,6 +74,18 @@ SatEngineSingle2::run(TpgFault* fault)
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
 
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  tmp_lits_begin(no);
+  for (vector<TpgNode*>::const_iterator p = olist.begin();
+       p != olist.end(); ++ p) {
+    TpgNode* node = *p;
+    Literal dlit(node->dvar(), false);
+    tmp_lits_add(dlit);
+  }
+  tmp_lits_end(solver);
+
   ymuint th_val = mThVal;
   if ( th_val > no ) {
     th_val = no;
@@ -122,21 +134,14 @@ SatEngineSingle2::run(TpgFault* fault)
 
     timer_start();
 
-    //////////////////////////////////////////////////////////////////////
-    // 故障の検出条件
-    //////////////////////////////////////////////////////////////////////
     tmp_lits_begin();
 
-    tmp_lits_add(Literal(onode->dvar(), false));
-
-    if ( !tg_grasp_mode() ) {
-      // まだ作っていない部分の dlit を 0 にする．
-      for (ymuint i = 0; i < tfo_size(); ++ i) {
-	TpgNode* node = tfo_tfi_node(i);
-	if ( mMark[node->id()] == 0 ) {
-	  Literal dlit(node->dvar(), false);
-	  tmp_lits_add(~dlit);
-	}
+    // まだ作っていない部分の dlit を 0 にする．
+    for (ymuint i = 0; i < tfo_size(); ++ i) {
+      TpgNode* node = tfo_tfi_node(i);
+      if ( mMark[node->id()] == 0 ) {
+	Literal dlit(node->dvar(), false);
+	tmp_lits_add(~dlit);
       }
     }
 
@@ -201,20 +206,6 @@ SatEngineSingle2::run(TpgFault* fault)
 	make_fnode_cnf(solver, node);
 	make_dchain_cnf(solver, node, fault);
       }
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    // 故障の検出条件
-    //////////////////////////////////////////////////////////////////////
-    if ( !nemesis_mode() ) {
-      tmp_lits_begin(no);
-      for (vector<TpgNode*>::const_iterator p = olist.begin();
-	   p != olist.end(); ++ p) {
-	TpgNode* node = *p;
-	Literal dlit(node->dvar(), false);
-	tmp_lits_add(dlit);
-      }
-      tmp_lits_end(solver);
     }
 
     cnf_end();
