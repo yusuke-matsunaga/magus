@@ -10,7 +10,7 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS

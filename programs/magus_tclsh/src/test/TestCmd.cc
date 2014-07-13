@@ -10,12 +10,12 @@
 
 
 #include "TestCmd.h"
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetBlifReader.h"
-#include "ym_networks/BNetVerilogWriter.h"
+#include "networks/BNetwork.h"
+#include "networks/BNetBlifReader.h"
+#include "networks/BNetVerilogWriter.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_MAGUS

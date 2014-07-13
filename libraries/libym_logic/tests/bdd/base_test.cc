@@ -353,9 +353,9 @@ test_make_bdd(BddMgr& bddmgr)
   }
 
   VarVarMap vvmap;
-  vvmap.insert(make_pair(VarId(0), 1));
-  vvmap.insert(make_pair(VarId(1), 2));
-  vvmap.insert(make_pair(VarId(2), 0));
+  vvmap.insert(make_pair(VarId(0), VarId(1)));
+  vvmap.insert(make_pair(VarId(1), VarId(2)));
+  vvmap.insert(make_pair(VarId(2), VarId(0)));
   Bdd bdd3 = bddmgr.expr_to_bdd(expr1, vvmap);
   if ( !check_bddv(bddmgr, bdd3, "(0 & ~1 | 2 & 1)(0->1, 1->2, 2->0)",
 		  "0, 1, 2|00100111") ) {
@@ -363,8 +363,8 @@ test_make_bdd(BddMgr& bddmgr)
   }
 
   VarVarMap vvmap2;
-  vvmap2.insert(make_pair(VarId(0), 1));
-  vvmap2.insert(make_pair(VarId(1), 0));
+  vvmap2.insert(make_pair(VarId(0), VarId(1)));
+  vvmap2.insert(make_pair(VarId(1), VarId(0)));
   Bdd bdd5 = bddmgr.expr_to_bdd(expr1, vvmap2);
   if ( !check_bddv(bddmgr, bdd5, "(0 & ~1 | 2 & 1)(0->1, 1->0)",
 		  "0, 1, 2|00110101") ) {

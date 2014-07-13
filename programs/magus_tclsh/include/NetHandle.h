@@ -11,9 +11,9 @@
 /// All rights reserved.
 
 #include "magus_nsdef.h"
-#include "ym_networks/bnet.h"
-#include "ym_networks/bdn.h"
-#include "ym_networks/mvn.h"
+#include "networks/bnet.h"
+#include "networks/bdn.h"
+#include "networks/mvn.h"
 
 
 BEGIN_NAMESPACE_MAGUS

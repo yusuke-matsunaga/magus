@@ -10,8 +10,8 @@
 
 
 #include "DumpSbjCmd.h"
-#include "ym_tclpp/TclPopt.h"
-#include "ym_sbj/SbjDumper.h"
+#include "tclpp/TclPopt.h"
+#include "sbj/SbjDumper.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

@@ -10,14 +10,14 @@
 
 
 #include "EquivCmd.h"
-#include "ym_cec/cec_nsdef.h"
-#include "ym_tclpp/TclPopt.h"
-#include "ym_networks/BdnPort.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/MvnMgr.h"
-#include "ym_networks/BNetBdnConv.h"
-#include "ym_networks/MvnBdnConv.h"
-#include "ym_networks/MvnBdnMap.h"
+#include "cec/cec_nsdef.h"
+#include "tclpp/TclPopt.h"
+#include "networks/BdnPort.h"
+#include "networks/BdnNode.h"
+#include "networks/MvnMgr.h"
+#include "networks/BNetBdnConv.h"
+#include "networks/MvnBdnConv.h"
+#include "networks/MvnBdnMap.h"
 
 
 #define DEBUG_OUTPUTS 1

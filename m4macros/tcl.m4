@@ -374,8 +374,8 @@ fi],[
 if test $ym_tmp_found = yes; then
   AC_MSG_RESULT([$TCLRL_INCLUDES])
   libs_old=$LIBS
-  for libdir in $ym_tmp_lib_list; do
-    tclrl_libdir=$tclrl_prefix/$libdir
+  for ym_tmp_libdir in $ym_tmp_lib_list; do
+    tclrl_libdir=$tclrl_prefix/$ym_tmp_libdir
 #    LIBS="$libs_old -L$tclrl_libdir"
     LIBS="-L$tclrl_libdir"
     AC_MSG_NOTICE([LIBS = $LIBS])

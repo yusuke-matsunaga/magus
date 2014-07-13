@@ -49,7 +49,7 @@ tSmtSortId
 SmtSortImpl::elem(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  return kSmtSort_None;
 }
 
 // @brief ハッシュ値を返す．

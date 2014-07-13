@@ -8,9 +8,9 @@
 
 
 #include "Ln2BNet.h"
-#include "ym_techmap/LnGraph.h"
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetManip.h"
+#include "techmap/LnGraph.h"
+#include "networks/BNetwork.h"
+#include "networks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_YM

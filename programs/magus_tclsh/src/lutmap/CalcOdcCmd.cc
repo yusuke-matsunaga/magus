@@ -10,9 +10,9 @@
 
 
 #include "CalcOdcCmd.h"
-#include "ym_tclpp/TclPopt.h"
-#include "ym_bdd/Bdd.h"
-#include "ym_bdd/BmcFactory.h"
+#include "tclpp/TclPopt.h"
+#include "bdd/Bdd.h"
+#include "bdd/BmcFactory.h"
 #include "OdcMgr.h"
 
 
@@ -32,13 +32,13 @@ CalcOdcCmd::CalcOdcCmd(MagMgr* mgr) :
 CalcOdcCmd::~CalcOdcCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 CalcOdcCmd::cmd_proc(TclObjVector& objv)
 {
   BddMgrRef bddmgr(nsBdd::BmcFactory(""));
-  
+
   BNetwork& network = *cur_network();
   OdcMgr odc_mgr;
 

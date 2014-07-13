@@ -10,11 +10,11 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_networks/BNet2Sbj.h"
-#include "ym_networks/MvnMgr.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/MvnBdnConv.h"
-#include "ym_networks/MvnBdnMap.h"
+#include "networks/BNet2Sbj.h"
+#include "networks/MvnMgr.h"
+#include "networks/BdnMgr.h"
+#include "networks/MvnBdnConv.h"
+#include "networks/MvnBdnMap.h"
 
 
 

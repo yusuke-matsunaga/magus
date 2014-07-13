@@ -13,8 +13,8 @@
 
 #include "NetCmd.h"
 
-#include "ym_networks/BNetIscas89Reader.h"
-#include "ym_networks/BdnIscas89Reader.h"
+#include "networks/BNetIscas89Reader.h"
+#include "networks/BdnIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_MAGUS

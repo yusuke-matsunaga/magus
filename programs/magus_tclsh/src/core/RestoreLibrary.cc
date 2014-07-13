@@ -8,8 +8,8 @@
 
 
 #include "RestoreLibrary.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_utils/FileIDO.h"
+#include "cell/CellLibrary.h"
+#include "utils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_MAGUS

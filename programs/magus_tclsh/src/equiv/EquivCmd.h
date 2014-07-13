@@ -12,7 +12,7 @@
 
 #include "MagCmd.h"
 #include "NetHandle.h"
-#include "ym_networks/BdnMgr.h"
+#include "networks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -10,7 +10,7 @@
 
 
 #include "NetCmd.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 #include "NetHandle.h"
 
 

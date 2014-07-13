@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/lutmap_nsdef.h"
-#include "ym_networks/bnet.h"
+#include "techmap/lutmap_nsdef.h"
+#include "networks/bnet.h"
 
 
 BEGIN_NAMESPACE_YM

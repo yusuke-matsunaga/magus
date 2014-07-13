@@ -10,9 +10,9 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_lutmap/LutNetwork.h"
+#include "lutmap/LutNetwork.h"
 #include "BoolResub.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -28,7 +28,7 @@ NodeSubstCmd::NodeSubstCmd(MagMgr* mgr,
 {
   mPoptNpat = new TclPoptInt(this, "npat",
 			     "specify pattern vector size");
-  
+
   set_usage_string("");
 }
 
@@ -36,7 +36,7 @@ NodeSubstCmd::NodeSubstCmd(MagMgr* mgr,
 NodeSubstCmd::~NodeSubstCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 NodeSubstCmd::cmd_proc(TclObjVector& objv)
@@ -63,7 +63,7 @@ NodeSubstCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 
@@ -79,7 +79,7 @@ NodeMergeCmd::NodeMergeCmd(MagMgr* mgr,
 {
   mPoptNpat = new TclPoptInt(this, "npat",
 			     "specify pattern vector size");
-  
+
   set_usage_string("<#inputs>[=INT]");
 }
 
@@ -87,7 +87,7 @@ NodeMergeCmd::NodeMergeCmd(MagMgr* mgr,
 NodeMergeCmd::~NodeMergeCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 NodeMergeCmd::cmd_proc(TclObjVector& objv)
@@ -97,7 +97,7 @@ NodeMergeCmd::cmd_proc(TclObjVector& objv)
     print_usage();
     return TCL_ERROR;
   }
-  
+
 #if 0
   try {
 #endif
@@ -123,7 +123,7 @@ NodeMergeCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 #endif
-  
+
   return TCL_OK;
 }
 

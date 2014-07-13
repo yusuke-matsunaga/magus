@@ -10,8 +10,8 @@
 
 
 #include "DupCmd.h"
-#include "ym_networks/BNetManip.h"
-#include "ym_utils/RandGen.h"
+#include "networks/BNetManip.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_MAGUS

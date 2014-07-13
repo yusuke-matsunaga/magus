@@ -10,7 +10,7 @@
 #include "TechmapCmd.h"
 #include "AreaMapCmd.h"
 #include "DumpCnCmd.h"
-#include "ym_networks/CmnMgr.h"
+#include "networks/CmnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

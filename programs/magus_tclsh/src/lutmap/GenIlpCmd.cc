@@ -10,8 +10,8 @@
 
 
 #include "LutmapCmd.h"
-#include "ym_lutmap/SbjGraph.h"
-#include "ym_lutmap/EnumCutOp.h"
+#include "lutmap/SbjGraph.h"
+#include "lutmap/EnumCutOp.h"
 #include "ILPGen.h"
 
 
@@ -67,7 +67,7 @@ ILPGenCut::root() const
 {
   return mRoot;
 }
-  
+
 // @brief 入力のサイズを得る．
 ymuint
 ILPGenCut::ni() const
@@ -262,7 +262,7 @@ GenIlpCmd::GenIlpCmd(MagMgr* mgr,
 GenIlpCmd::~GenIlpCmd()
 {
 }
-  
+
 // @brief コマンドを実行する仮想関数
 int
 GenIlpCmd::cmd_proc(TclObjVector& objv)
@@ -301,7 +301,7 @@ GenIlpCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-  
+
   return TCL_OK;
 }
 

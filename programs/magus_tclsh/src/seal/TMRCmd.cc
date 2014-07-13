@@ -10,7 +10,7 @@
 
 
 #include "TMRCmd.h"
-#include "ym_networks/BNetManip.h"
+#include "networks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS

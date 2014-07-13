@@ -8,7 +8,7 @@
 
 
 #include "ReadMislib.h"
-#include "ym_cell/CellMislibReader.h"
+#include "cell/CellMislibReader.h"
 
 
 BEGIN_NAMESPACE_MAGUS

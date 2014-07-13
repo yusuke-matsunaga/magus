@@ -14,8 +14,8 @@
 
 #include "magus_nsdef.h"
 
-#include "ym_tclpp/TclCmd.h"
-#include "ym_cell/cell_nsdef.h"
+#include "tclpp/TclCmd.h"
+#include "cell/cell_nsdef.h"
 #include "NetHandle.h"
 
 

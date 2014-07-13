@@ -8,7 +8,7 @@
 
 
 #include "MagMgr.h"
-#include "ym_cell/CellLibrary.h"
+#include "cell/CellLibrary.h"
 #include "NetHandle.h"
 #include "BNetHandle.h"
 #include "BdnHandle.h"

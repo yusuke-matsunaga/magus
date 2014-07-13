@@ -14,7 +14,7 @@
 
 #include "RandCmd.h"
 
-#include "ym_utils/random.h"
+#include "utils/random.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -45,7 +45,7 @@ RandInitCmd::cmd_proc(TclObjVector& objv)
     return stat;
   }
   init_random_seed(seed);
-  
+
   reset_result();
 
   return TCL_OK;
@@ -83,7 +83,7 @@ RandCmd::cmd_proc(TclObjVector& objv)
   if ( limit ) {
     rand = rand % limit;
   }
-  
+
   set_result(rand);
 
   return TCL_OK;

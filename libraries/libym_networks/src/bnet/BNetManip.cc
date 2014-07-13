@@ -354,7 +354,7 @@ BNetManip::change_logic(BNode* node,
 	if ( wpos < i ) {
 	  BNode* node = mTmpNodes[i];
 	  mTmpNodes[wpos] = node;
-	  mTmpMap.insert(make_pair(VarId(i), wpos));
+	  mTmpMap.insert(make_pair(VarId(i), VarId(wpos)));
 	}
 	++ wpos;
       }

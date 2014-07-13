@@ -10,16 +10,16 @@
 
 
 #include "AreaMapCmd.h"
-#include "ym_tclpp/TclPopt.h"
+#include "tclpp/TclPopt.h"
 
-#include "ym_techmap/LutMap.h"
+#include "techmap/LutMap.h"
 
-#include "ym_networks/BNetBdnConv.h"
+#include "networks/BNetBdnConv.h"
 
-#include "ym_networks/MvnMgr.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/MvnBdnConv.h"
-#include "ym_networks/MvnBdnMap.h"
+#include "networks/MvnMgr.h"
+#include "networks/BdnMgr.h"
+#include "networks/MvnBdnConv.h"
+#include "networks/MvnBdnMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS

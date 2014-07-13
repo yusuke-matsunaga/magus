@@ -8,8 +8,8 @@
 
 
 #include "BNetHandle.h"
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BdnMgr.h"
+#include "networks/BNetwork.h"
+#include "networks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS

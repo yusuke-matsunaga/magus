@@ -471,7 +471,7 @@ SmtFunTerm3::sort() const
   }
 
   assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  return kSmtSort_None;
 }
 
 // @brief kFunTerm 型の場合に関数の型を返す．

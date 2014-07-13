@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 #include "McaCmd2.h"
-#include "ym_seal/MCAnalysis.h"
-#include "ym_networks/BNetwork.h"
+#include "seal/MCAnalysis.h"
+#include "networks/BNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS

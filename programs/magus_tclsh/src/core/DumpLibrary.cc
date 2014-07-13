@@ -8,8 +8,8 @@
 
 
 #include "DumpLibrary.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_utils/FileODO.h"
+#include "cell/CellLibrary.h"
+#include "utils/FileODO.h"
 
 
 BEGIN_NAMESPACE_MAGUS

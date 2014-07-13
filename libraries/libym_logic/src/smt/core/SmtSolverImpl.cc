@@ -305,7 +305,7 @@ tSmtSortId
 SmtSolverImpl::make_sort()
 {
   if ( !check_logic() ) {
-    return NULL;
+    return kSmtSort_None;
   }
 
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
@@ -325,7 +325,7 @@ tSmtSortId
 SmtSolverImpl::make_sort(const vector<tSmtSortId>& elem_list)
 {
   if ( !check_logic() ) {
-    return NULL;
+    return kSmtSort_None;
   }
 
   ymuint n = elem_list.size();

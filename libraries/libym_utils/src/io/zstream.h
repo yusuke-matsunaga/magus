@@ -401,7 +401,7 @@ public:
   {
     mBuff = mBuff0;
     int wsize = mZbuf.decompress(byte_buff(), byte_size(mSize));
-    setg(mBuff, mBuff, mBuff + char_size(wsize));
+    this->setg(mBuff, mBuff, mBuff + char_size(wsize));
   }
 
   /// @brief 出力用のコンストラクタ
@@ -417,7 +417,7 @@ public:
   {
     mBuff = mBuff0;
     mOutFlush = Z_NO_FLUSH;
-    setp(mBuff, mBuff + mSize);
+    this->setp(mBuff, mBuff + mSize);
   }
 
   /// @brief デストラクタ
@@ -444,10 +444,10 @@ protected:
 	 ymuint size)
   {
     if ( mZbuf.in() ) {
-      setg(buf, buf, buf + size);
+      this->setg(buf, buf, buf + size);
     }
     if ( mZbuf.out() ) {
-      setp(buf, buf + size);
+      this->setp(buf, buf + size);
     }
     mBuff = buf;
     mSize = size;
@@ -460,7 +460,7 @@ protected:
   {
     // バッファに溜っているデータを圧縮する．
     mZbuf.compress(byte_buff(), byte_size(this->pptr() - mBuff), mOutFlush);
-    setp(mBuff, mBuff + mSize);
+    this->setp(mBuff, mBuff + mSize);
 
     if ( c == traits_type::eof() ) {
       return c;
@@ -480,7 +480,7 @@ protected:
     if ( this->egptr() <= this->gptr() ) {
       // データを伸長してバッファに入れる．
       int wsize = mZbuf.decompress(byte_buff(), byte_size(mSize));
-      setg(mBuff, mBuff, mBuff + char_size(wsize));
+      this->setg(mBuff, mBuff, mBuff + char_size(wsize));
       if ( wsize == 0 ) {
 	return traits_type::eof();
       }
@@ -496,7 +496,7 @@ protected:
   {
     if ( mZbuf.out() ) {
       mZbuf.compress(byte_buff(), byte_size(this->pptr() - mBuff), mOutFlush);
-      setp(mBuff, mBuff + mSize);
+      this->setp(mBuff, mBuff + mSize);
     }
     return 0;
   }

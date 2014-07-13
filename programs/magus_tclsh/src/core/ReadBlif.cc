@@ -11,8 +11,8 @@
 
 #include "ReadBlif.h"
 
-#include "ym_utils/MsgMgr.h"
-#include "ym_tclpp/TclObjMsgHandler.h"
+#include "utils/MsgMgr.h"
+#include "tclpp/TclObjMsgHandler.h"
 
 
 BEGIN_NAMESPACE_MAGUS

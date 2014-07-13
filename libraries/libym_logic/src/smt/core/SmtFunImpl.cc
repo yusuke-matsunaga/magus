@@ -42,7 +42,7 @@ tSmtSortId
 SmtFunImpl::input_sort(ymuint pos) const
 {
   assert_not_reached(__FILE__, __LINE__);
-  return NULL;
+  return kSmtSort_None;
 }
 
 // @brief 入力変数を返す．
