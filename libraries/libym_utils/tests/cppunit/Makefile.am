@@ -86,7 +86,8 @@ run_all_test_LDFLAGS = \
 
 libym_utils_cppunit_la_CXXFLAGS = \
 	$(YM_CXXDBGFLAGS) \
-	$(AM_CXXFLAGS)
+	$(AM_CXXFLAGS) \
+	$(CPPUNIT_CFLAGS)
 
 libym_utils_cppunit_la_SOURCES = \
 	YmUtilsTestRegistry.h \

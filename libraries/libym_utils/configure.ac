@@ -277,6 +277,9 @@ elif test $ym_gnuc -ge 3; then
 #include <ext/hash_set>
 #include <ext/hash_map>
 #define HASH_NAMESPACE __gnu_cxx
+#define unordered_set hash_set
+#define unordered_map hash_map
+#define constexpr const
 ___EOF___
 else
   cat >> $ymtools << ___EOF___
@@ -285,6 +288,9 @@ else
 #include <hash_set>
 #include <hash_map>
 #define HASH_NAMESPACE std
+#define unordered_set hash_set
+#define unordered_map hash_map
+#define constexpr const
 ___EOF___
 fi
 
@@ -364,10 +370,6 @@ ___EOF___
 
 if test $ym_gnuc -lt 4 || (test $ym_gnuc -eq 4 && test $ym_gnuc_minor -lt 6); then
   cat >> $ymtools << ___EOF___
-
-#define unordered_set hash_set
-#define unordered_map hash_map
-#define constexpr const
 
 BEGIN_NAMESPACE_HASH
 

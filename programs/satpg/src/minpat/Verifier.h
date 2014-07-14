@@ -12,6 +12,7 @@
 #include "FaultMgr.h"
 #include "TestVector.h"
 #include "FsimOp.h"
+#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
