@@ -79,6 +79,9 @@ private:
   // multi2 オプションの解析用オブジェクト
   TclPoptInt* mPoptMulti2;
 
+  // smt_single オプションの解析用オブジェクト
+  TclPopt* mPoptSmtSingle;
+
   // ffr オプションの解析用オブジェクト
   TclPopt* mPoptFFR;
 

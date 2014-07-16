@@ -208,6 +208,9 @@ AtpgMgr::dtpg(DtpgMode mode,
   else if ( mode.engine_type() == "multi2" ) {
     engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
   }
+  else if ( mode.engine_type() == "smt_single" ) {
+    engine = new_SmtEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);
+  }
   else {
     assert_not_reached(__FILE__, __LINE__);
   }

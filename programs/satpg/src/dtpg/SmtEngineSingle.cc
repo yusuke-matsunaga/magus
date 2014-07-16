@@ -19,8 +19,42 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+// @brief SmtSingle エンジンを作る．
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
+// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] bt バックトレーサー
+// @param[in] dop パタンが求められた時に実行されるファンクタ
+// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SatEngine*
+new_SmtEngineSingle(const string& sat_type,
+		    const string& sat_option,
+		    ostream* sat_outp,
+		    ymuint max_id,
+		    BackTracer& bt,
+		    DetectOp& dop,
+		    UntestOp& uop)
+{
+  return new SmtEngineSingle(sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+}
+
 // @brief コンストラクタ
-SmtEngineSingle::SmtEngineSingle()
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
+// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] bt バックトレーサー
+// @param[in] dop パタンが求められた時に実行されるファンクタ
+// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SmtEngineSingle::SmtEngineSingle(const string& sat_type,
+				 const string& sat_option,
+				 ostream* sat_outp,
+				 ymuint max_id,
+				 BackTracer& bt,
+				 DetectOp& dop,
+				 UntestOp& uop) :
+  SmtEngine(sat_type, sat_option, sat_outp, max_id, bt, dop, uop)
 {
 }
 
@@ -29,39 +63,17 @@ SmtEngineSingle::~SmtEngineSingle()
 {
 }
 
-// @brief オプションを設定する．
-void
-SmtEngineSingle::set_option(const string& option_str)
-{
-  for (string::size_type next = 0; ; ++ next) {
-    string::size_type pos = option_str.find(':', next);
-    if ( pos == next ) {
-      continue;
-    }
-    string option = option_str.substr(next, pos - next);
-    if ( pos == string::npos ) {
-      break;
-    }
-    next = pos;
-  }
-}
-
 // @brief テストパタン生成を行なう．
-// @param[in] flist 故障リスト
-// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] f_tgt 対象の故障
 void
-SmtEngineSingle::run(TpgFault* fault,
-		     ymuint max_id,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop)
+SmtEngineSingle::run(TpgFault* f_tgt)
 {
-  TpgNode* fnode = fault->node();
-  int fval = fault->val();
+  TpgNode* fnode = f_tgt->node();
+  int fval = f_tgt->val();
 
   Solver solver(sat_option());
 
-  mark_region(solver, vector<TpgNode*>(1, fnode), max_id);
+  mark_region(solver, vector<TpgNode*>(1, fnode), mMaxNodeId);
 
   cnf_begin();
 
@@ -85,7 +97,7 @@ SmtEngineSingle::run(TpgFault* fault,
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
-      make_fault_cnf(solver, fault);
+      make_fault_cnf(solver, f_tgt);
     }
     else {
       make_fnode_cnf(solver, node);
@@ -124,7 +136,7 @@ SmtEngineSingle::run(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  solver.set_pgraph(fnode, output_list(), max_id);
+  solver.set_pgraph(fnode, output_list(), mMaxNodeId);
   if ( 0 ) {
     ymuint npo = output_list().size();
     tmp_lits_begin(npo);
@@ -147,9 +159,21 @@ SmtEngineSingle::run(TpgFault* fault,
   // 故障に対するテスト生成を行なう．
   tmp_lits_begin();
 
-  solve(solver, fault, bt, dop, uop);
+  solve(solver, f_tgt, mBackTracer, mDetectOp, mUntestOp);
 
   clear_node_mark();
+}
+
+// @brief テスト生成を行なう．
+// @param[in] flist 対象の故障リスト
+void
+SmtEngineSingle::run(const vector<TpgFault*>& flist)
+{
+  for (vector<TpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    TpgFault* f = *p;
+    run(f);
+  }
 }
 
 END_NAMESPACE_YM_SATPG

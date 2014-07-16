@@ -47,12 +47,12 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "single mode");
   mPoptSingle2 = new TclPoptInt(this, "single2",
 				"single2 mode <INT>");
-  mPoptSingle3 = new TclPopt(this, "single3",
-			     "single3 mode");
   mPoptMulti = new TclPopt(this, "multi",
 			   "multi mode");
   mPoptMulti2 = new TclPoptInt(this, "multi2",
 			       "multi2 mode <INT>");
+  mPoptSmtSingle = new TclPopt(this, "smt_single",
+			       "smt_single mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
   mPoptMFFC = new TclPopt(this, "mffc",
@@ -75,7 +75,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			   "enable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptMiniSat2, mPoptSatRec);
-  new_popt_group(mPoptSingle, mPoptSingle2, mPoptMulti, mPoptMulti2);
+  new_popt_group(mPoptSingle, mPoptSingle2, mPoptMulti, mPoptMulti2, mPoptSmtSingle);
   new_popt_group(mPoptFFR, mPoptMFFC);
 
   new_popt_group(mPoptPo, mPoptRpo);
@@ -153,6 +153,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   else if ( mPoptMulti2->is_specified() ) {
     engine_type = "multi2";
     mode_val = mPoptMulti2->val();
+  }
+  else if ( mPoptSmtSingle->is_specified() ) {
+    engine_type = "smt_single";
   }
 
   string option_str = mPoptOpt->val();

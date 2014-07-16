@@ -25,7 +25,20 @@ class SmtEngineSingle :
 public:
 
   /// @brief コンストラクタ
-  SmtEngineSingle();
+  /// @param[in] sat_type SATソルバの種類を表す文字列
+  /// @param[in] sat_option SATソルバに渡すオプション文字列
+  /// @param[in] sat_outp SATソルバ用の出力ストリーム
+  /// @param[in] max_id ノード番号の最大値 + 1
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  SmtEngineSingle(const string& sat_type,
+		  const string& sat_option,
+		  ostream* sat_outp,
+		  ymuint max_id,
+		  BackTracer& bt,
+		  DetectOp& dop,
+		  UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
@@ -37,22 +50,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief オプションを設定する．
-  void
-  set_option(const string& option_str);
-
   /// @brief テスト生成を行なう．
   /// @param[in] f_tgt 対象の故障
-  /// @param[in] max_id ノード番号の最大値 + 1
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  virtual
   void
-  run(TpgFault* f_tgt,
-      ymuint max_id,
-      BackTracer& bt,
-      DetectOp& dop,
-      UntestOp& uop);
+  run(TpgFault* f_tgt);
+
+  /// @brief テスト生成を行なう．
+  /// @param[in] flist 対象の故障リスト
+  virtual
+  void
+  run(const vector<TpgFault*>& flist);
 
 
 private:

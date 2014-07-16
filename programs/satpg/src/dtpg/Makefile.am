@@ -56,8 +56,6 @@ AM_CPPFLAGS = \
 COMMON_SOURCES = \
 	DtpgDriver.h \
 	DtpgDriver.cc \
-	DtpgSmt.h \
-	DtpgSmt.cc \
 	SatEngineBase.h \
 	SatEngineBase.cc \
 	SatEngineMulti.h \

@@ -142,6 +142,23 @@ new_SatEngineMulti2(ymuint th_val,
 		    DetectOp& dop,
 		    UntestOp& uop);
 
+/// @brief SmtSingle エンジンを作る．
+/// @param[in] sat_type SATソルバの種類を表す文字列
+/// @param[in] sat_option SATソルバに渡すオプション文字列
+/// @param[in] sat_outp SATソルバ用の出力ストリーム
+/// @param[in] max_id ノード番号の最大値 + 1
+/// @param[in] bt バックトレーサー
+/// @param[in] dop パタンが求められた時に実行されるファンクタ
+/// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SatEngine*
+new_SmtEngineSingle(const string& sat_type,
+		    const string& sat_option,
+		    ostream* sat_outp,
+		    ymuint max_id,
+		    BackTracer& bt,
+		    DetectOp& dop,
+		    UntestOp& uop);
+
 END_NAMESPACE_YM_SATPG
 
 #endif // SATENGINE_H

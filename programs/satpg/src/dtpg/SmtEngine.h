@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "satpg_nsdef.h"
+#include "SatEngine.h"
 #include "TpgNode.h"
 #include "DtpgStats.h"
 #include "LitMap.h"
@@ -29,7 +29,8 @@ class GraphSat;
 /// @class SmtEngine SmtEngine.h "SmtEngine.h"
 /// @brief SAT ベースのATPGエンジン
 //////////////////////////////////////////////////////////////////////
-class SmtEngine
+class SmtEngine :
+  public SatEngine
 {
 protected:
 
@@ -42,7 +43,20 @@ protected:
 public:
 
   /// @brief コンストラクタ
-  SmtEngine();
+  /// @param[in] sat_type SATソルバの種類を表す文字列
+  /// @param[in] sat_option SATソルバに渡すオプション文字列
+  /// @param[in] sat_outp SATソルバ用の出力ストリーム
+  /// @param[in] max_id ノード番号の最大値 + 1
+  /// @param[in] bt バックトレーサー
+  /// @param[in] dop パタンが求められた時に実行されるファンクタ
+  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  SmtEngine(const string& sat_type,
+	    const string& sat_option,
+	    ostream* sat_outp,
+	    ymuint max_id,
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
@@ -54,22 +68,24 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 使用する SAT エンジンを指定する．
+  /// @brief オプションを設定する．
+  virtual
   void
-  set_mode(const string& type = string(),
-	   const string& option = string(),
-	   ostream* outp = NULL);
+  set_option(const string& option_str);
 
   /// @brief 統計情報をクリアする．
+  virtual
   void
   clear_stats();
 
   /// @brief 統計情報を得る．
   /// @param[in] stats 結果を格納する構造体
+  virtual
   void
   get_stats(DtpgStats& stats) const;
 
   /// @breif 時間計測を制御する．
+  virtual
   void
   timer_enable(bool enable);
 
@@ -455,13 +471,25 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   // SAT solver のタイプ
-  string mType;
+  string mSatType;
 
   // SAT solver のオプション
-  string mOption;
+  string mSatOption;
 
   // SAT solver の記録用ストリーム
-  ostream* mOutP;
+  ostream* mSatOutP;
+
+  // ノードのIDの最大値
+  ymuint32 mMaxNodeId;
+
+  // バックトレーサー
+  BackTracer& mBackTracer;
+
+  // 検出時に呼ばれるファンクタ
+  DetectOp& mDetectOp;
+
+  // 検出不能時に呼ばれるファンクタ
+  UntestOp& mUntestOp;
 
   // SAT の結果を格納する配列
   vector<Bool3> mModel;
@@ -508,7 +536,7 @@ inline
 string
 SmtEngine::sat_type() const
 {
-  return mType;
+  return mSatType;
 }
 
 // @brief SATソルバのオプションを得る．
@@ -516,7 +544,7 @@ inline
 string
 SmtEngine::sat_option() const
 {
-  return mOption;
+  return mSatOption;
 }
 
 // @brief SATソルバのログ出力を得る．
@@ -524,7 +552,7 @@ inline
 ostream*
 SmtEngine::sat_outp() const
 {
-  return mOutP;
+  return mSatOutP;
 }
 
 // @brief TFO ノードの数を得る．

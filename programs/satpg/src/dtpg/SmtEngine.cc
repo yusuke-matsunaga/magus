@@ -23,9 +23,28 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
-SmtEngine::SmtEngine()
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
+// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] bt バックトレーサー
+// @param[in] dop パタンが求められた時に実行されるファンクタ
+// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+SmtEngine::SmtEngine(const string& sat_type,
+		     const string& sat_option,
+		     ostream* sat_outp,
+		     ymuint max_id,
+		     BackTracer& bt,
+		     DetectOp& dop,
+		     UntestOp& uop) :
+  mSatType(sat_type),
+  mSatOption(sat_option),
+  mSatOutP(sat_outp),
+  mMaxNodeId(max_id),
+  mBackTracer(bt),
+  mDetectOp(dop),
+  mUntestOp(uop)
 {
-  mOutP = NULL;
   mTimerEnable = false;
 }
 
@@ -34,15 +53,10 @@ SmtEngine::~SmtEngine()
 {
 }
 
-// @brief 使用する SAT エンジンを指定する．
+// @brief オプションを設定する．
 void
-SmtEngine::set_mode(const string& type,
-		    const string& option,
-		    ostream* outp)
+SmtEngine::set_option(const string& option_str)
 {
-  mType = type;
-  mOption = option;
-  mOutP = outp;
 }
 
 // @brief 統計情報をクリアする．

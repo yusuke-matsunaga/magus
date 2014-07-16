@@ -1209,20 +1209,4 @@ SatEngineBase::clear_node_mark()
   }
 }
 
-// @brief テスト生成を行なう．
-// @param[in] f_tgt 対象の故障
-void
-SatEngineBase::run(TpgFault* f_tgt)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
-// @brief テスト生成を行なう．
-// @param[in] flist 対象の故障リスト
-void
-SatEngineBase::run(const vector<TpgFault*>& flist)
-{
-  assert_not_reached(__FILE__, __LINE__);
-}
-
 END_NAMESPACE_YM_SATPG
