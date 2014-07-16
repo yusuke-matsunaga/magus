@@ -1,8 +1,8 @@
-#ifndef DTPGSAT_H
-#define DTPGSAT_H
+#ifndef DTPGDRIVER_H
+#define DTPGDRIVEr_H
 
-/// @file DtpgSat.h
-/// @brief DtpgSat のヘッダファイル
+/// @file DtpgDriver.h
+/// @brief DtpgDriver のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -12,27 +12,25 @@
 
 #include "Dtpg.h"
 #include "TpgFault.h"
-#include "SatEngineMulti.h"
-#include "SatEngineSingle.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class DtpgSat DtpgSat.h "DtpgSat.h"
-/// @brief SAT を用いたパタン生成器
+/// @class DtpgDriver DtpgDriver.h "DtpgDriver.h"
+/// @brief DtpgEngine を駆動するクラス
 //////////////////////////////////////////////////////////////////////
-class DtpgSat :
+class DtpgDriver :
   public Dtpg
 {
 public:
 
   /// @brief コンストラクタ
-  DtpgSat();
+  DtpgDriver();
 
   /// @brief デストラクタ
   virtual
-  ~DtpgSat();
+  ~DtpgDriver();
 
 
 public:
@@ -132,11 +130,11 @@ private:
 // @brief 故障リストをクリアする．
 inline
 void
-DtpgSat::clear_faults()
+DtpgDriver::clear_faults()
 {
   mFaultList.clear();
 }
 
 END_NAMESPACE_YM_SATPG
 
-#endif // DTPGSAT_H
+#endif // DTPGDRIVER_H

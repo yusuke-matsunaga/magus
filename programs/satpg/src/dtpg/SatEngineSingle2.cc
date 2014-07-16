@@ -234,4 +234,16 @@ SatEngineSingle2::run(TpgFault* fault)
   }
 }
 
+// @brief テスト生成を行なう．
+// @param[in] flist 対象の故障リスト
+void
+SatEngineSingle2::run(const vector<TpgFault*>& flist)
+{
+  for (vector<TpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    TpgFault* f = *p;
+    run(f);
+  }
+}
+
 END_NAMESPACE_YM_SATPG

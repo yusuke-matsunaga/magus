@@ -56,6 +56,12 @@ public:
   void
   run(TpgFault* f_tgt);
 
+  /// @brief テスト生成を行なう．
+  /// @param[in] flist 対象の故障リスト
+  virtual
+  void
+  run(const vector<TpgFault*>& flist);
+
 };
 
 END_NAMESPACE_YM_SATPG

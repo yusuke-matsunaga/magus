@@ -55,20 +55,10 @@ public:
 };
 
 
-/// @brief DtpgSat のインスタンスを生成する．
+/// @brief DtpgDriver のインスタンスを生成する．
 extern
 Dtpg*
-new_DtpgSat();
-
-/// @brief DtpgSat2 のインスタンスを生成する．
-extern
-Dtpg*
-new_DtpgSat2();
-
-/// @brief DtpgSat3 のインスタンスを生成する．
-extern
-Dtpg*
-new_DtpgSat3();
+new_DtpgDriver();
 
 /// @brief DtpgSmt のインスタンスを生成する．
 extern

@@ -25,6 +25,7 @@ public:
   /// @brief コンストラクタ
   explicit
   DtpgMode(tDtpgMode mode,
+	   const string& engine_type,
 	   ymuint val = 0);
 
   /// @brief デストラクタ
@@ -40,6 +41,10 @@ public:
   tDtpgMode
   mode() const;
 
+  /// @brief Engine のタイプを表す文字列を返す．
+  string
+  engine_type() const;
+
   /// @brief 値を返す．
   ymuint
   val() const;
@@ -51,6 +56,8 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   tDtpgMode mMode;
+
+  string mEngineType;
 
   ymuint32 mVal;
 
@@ -64,8 +71,10 @@ private:
 // @brief コンストラクタ
 inline
 DtpgMode::DtpgMode(tDtpgMode mode,
+		   const string& engine_type,
 		   ymuint val) :
   mMode(mode),
+  mEngineType(engine_type),
   mVal(val)
 {
 }
@@ -82,6 +91,14 @@ tDtpgMode
 DtpgMode::mode() const
 {
   return mMode;
+}
+
+// @brief Engine のタイプを表す文字列を返す．
+inline
+string
+DtpgMode::engine_type() const
+{
+  return mEngineType;
 }
 
 // @brief 値を返す．

@@ -55,6 +55,14 @@ SatEngineMulti::~SatEngineMulti()
 {
 }
 
+// @brief テスト生成を行なう．
+// @param[in] f_tgt 対象の故障
+void
+SatEngineMulti::run(TpgFault* f_tgt)
+{
+  return run(vector<TpgFault*>(1, f_tgt));
+}
+
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 void

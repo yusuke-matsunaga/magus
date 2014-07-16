@@ -65,6 +65,10 @@ enum tSimMode {
 
 //////////////////////////////////////////////////////////////////////
 /// @brief DTPG モード
+///
+/// 故障をグループ化して DtpgEngine に渡すモードの指定
+/// DtpgEngine が一度に1つの故障しか扱えない場合には
+/// 内部で一つ一つの問題に切り分けられる．
 //////////////////////////////////////////////////////////////////////
 enum tDtpgMode {
   /// @brief single モード
@@ -72,15 +76,7 @@ enum tDtpgMode {
   /// @brief ffr モード
   kDtpgFFR,
   /// @brief mffc モード
-  kDtpgMFFC,
-  /// @brief single2 モード
-  kDtpgSingle2,
-  /// @brief single3 モード
-  kDtpgSingle3,
-  /// @brief ffr2 モード
-  kDtpgFFR2,
-  /// @brief mffc2 モード
-  kDtpgMFFC2
+  kDtpgMFFC
 };
 
 

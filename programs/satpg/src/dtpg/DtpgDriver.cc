@@ -1,43 +1,36 @@
 
-/// @file DtpgSat.cc
-/// @brief DtpgSat の実装ファイル
+/// @file DtpgDriver.cc
+/// @brief DtpgDriver の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "DtpgSat.h"
+#include "DtpgDriver.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "SatEngine.h"
 #include "utils/HeapTree.h"
-
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
-
-
-#define VERIFY_MAIMP 0
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-bool debug_fault_analysis = false;
-
 Dtpg*
-new_DtpgSat()
+new_DtpgDriver()
 {
-  return new DtpgSat();
+  return new DtpgDriver();
 }
 
 // @brief コンストラクタ
-DtpgSat::DtpgSat()
+DtpgDriver::DtpgDriver()
 {
   mNetwork = NULL;
 }
 
 // @brief デストラクタ
-DtpgSat::~DtpgSat()
+DtpgDriver::~DtpgDriver()
 {
 }
 
@@ -47,11 +40,11 @@ DtpgSat::~DtpgSat()
 // @param[in] po_mode PO分割モード
 // @param[in] stats 結果を格納する構造体
 void
-DtpgSat::run(TpgNetwork& tgnetwork,
-	     DtpgMode mode,
-	     tDtpgPoMode po_mode,
-	     SatEngine& sat_engine,
-	     DtpgStats& stats)
+DtpgDriver::run(TpgNetwork& tgnetwork,
+		DtpgMode mode,
+		tDtpgPoMode po_mode,
+		SatEngine& sat_engine,
+		DtpgStats& stats)
 {
   sat_engine.clear_stats();
 
@@ -97,22 +90,19 @@ DtpgSat::run(TpgNetwork& tgnetwork,
 // @brief activate された部分回路に大してテスト生成を行う．
 // @param[in] mode メインモード
 void
-DtpgSat::dtpg1(DtpgMode mode,
+DtpgDriver::dtpg1(DtpgMode mode,
 	       SatEngine& sat_engine)
 {
   switch ( mode.mode() ) {
   case kDtpgSingle:
-  case kDtpgSingle2:
     single_mode(sat_engine);
     break;
 
   case kDtpgFFR:
-  case kDtpgFFR2:
     ffr_mode(sat_engine);
     break;
 
   case kDtpgMFFC:
-  case kDtpgMFFC2:
     mffc_mode(sat_engine);
     break;
   }
@@ -120,7 +110,7 @@ DtpgSat::dtpg1(DtpgMode mode,
 
 // @brief single モードでテスト生成を行なう．
 void
-DtpgSat::single_mode(SatEngine& sat_engine)
+DtpgDriver::single_mode(SatEngine& sat_engine)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -142,7 +132,7 @@ DtpgSat::single_mode(SatEngine& sat_engine)
 
 // @brief ffr モードでテスト生成を行なう．
 void
-DtpgSat::ffr_mode(SatEngine& sat_engine)
+DtpgDriver::ffr_mode(SatEngine& sat_engine)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -159,7 +149,7 @@ DtpgSat::ffr_mode(SatEngine& sat_engine)
 }
 
 void
-DtpgSat::dfs_ffr(TpgNode* node)
+DtpgDriver::dfs_ffr(TpgNode* node)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -174,7 +164,7 @@ DtpgSat::dfs_ffr(TpgNode* node)
 
 // @brief mffc モードでテスト生成を行なう．
 void
-DtpgSat::mffc_mode(SatEngine& sat_engine)
+DtpgDriver::mffc_mode(SatEngine& sat_engine)
 {
   ymuint n = mNetwork->active_node_num();
   vector<bool> mark(mNetwork->max_node_id(), false);
@@ -191,7 +181,7 @@ DtpgSat::mffc_mode(SatEngine& sat_engine)
 }
 
 void
-DtpgSat::dfs_mffc(TpgNode* node,
+DtpgDriver::dfs_mffc(TpgNode* node,
 		  vector<bool>& mark)
 {
   mark[node->id()] = true;
@@ -211,7 +201,7 @@ DtpgSat::dfs_mffc(TpgNode* node,
 
 // @brief ノードの故障を追加する．
 void
-DtpgSat::add_node_faults(TpgNode* node)
+DtpgDriver::add_node_faults(TpgNode* node)
 {
   ymuint nf = node->fault_num();
   for (ymuint i = 0; i < nf; ++ i) {
@@ -225,7 +215,7 @@ DtpgSat::add_node_faults(TpgNode* node)
 
 // @brief テストパタン生成を行なう．
 void
-DtpgSat::do_dtpg(SatEngine& sat_engine)
+DtpgDriver::do_dtpg(SatEngine& sat_engine)
 {
   if ( mFaultList.empty() ) {
     return;

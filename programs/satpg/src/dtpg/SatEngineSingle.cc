@@ -128,4 +128,16 @@ SatEngineSingle::run(TpgFault* fault)
   clear_node_mark();
 }
 
+// @brief テスト生成を行なう．
+// @param[in] flist 対象の故障リスト
+void
+SatEngineSingle::run(const vector<TpgFault*>& flist)
+{
+  for (vector<TpgFault*>::const_iterator p = flist.begin();
+       p != flist.end(); ++ p) {
+    TpgFault* f = *p;
+    run(f);
+  }
+}
+
 END_NAMESPACE_YM_SATPG

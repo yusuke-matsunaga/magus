@@ -53,6 +53,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
+  /// @param[in] f_tgt 対象の故障
+  virtual
+  void
+  run(TpgFault* f_tgt);
+
+  /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   virtual
   void

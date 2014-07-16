@@ -18,9 +18,7 @@
 #include "SatEngine.h"
 #include "Rtpg.h"
 #include "MinPat.h"
-//#include "BackTracer.h"
 #include "DetectOp.h"
-//#include "UntestOp.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -193,42 +191,25 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   dop.set_faults(mFaultMgr->remain_list());
 
-  Dtpg* dtpg;
-  if ( mode.mode() == kDtpgSingle3 ) {
-    dtpg = new_DtpgSmt();
-  }
-  else {
-    dtpg = new_DtpgSat();
-  }
+  Dtpg* dtpg = new_DtpgDriver();
 
   ymuint max_id = mNetwork->max_node_id();
 
   SatEngine* engine = NULL;
-  switch ( mode.mode() ) {
-  case kDtpgSingle:
+  if ( mode.engine_type() == "single" ) {
     engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);
-    break;
-
-  case kDtpgSingle2:
+  }
+  else if ( mode.engine_type() == "single2" ) {
     engine = new_SatEngineSingle2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
-    break;
-
-  case kDtpgSingle3:
-    break;
-
-  case kDtpgFFR:
-  case kDtpgMFFC:
+  }
+  else if ( mode.engine_type() == "multi" ) {
     engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop);
-    break;
-
-  case kDtpgFFR2:
-  case kDtpgMFFC2:
+  }
+  else if ( mode.engine_type() == "multi2" ) {
     engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
-    break;
-
-  default:
+  }
+  else {
     assert_not_reached(__FILE__, __LINE__);
-    break;
   }
 
   engine->set_option(option_str);
