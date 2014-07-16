@@ -78,6 +78,8 @@ COMMON_SOURCES = \
 	PrintPatStatsCmd.cc \
 	PrintStatsCmd.h \
 	PrintStatsCmd.cc \
+	TimeCmd.h \
+	TimeCmd.cc \
 	RtpgCmd.h \
 	RtpgCmd.cc \
 	DtpgCmd.h \

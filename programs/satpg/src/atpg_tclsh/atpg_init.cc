@@ -19,6 +19,7 @@
 #include "PrintPatCmd.h"
 #include "PrintPatStatsCmd.h"
 #include "PrintStatsCmd.h"
+#include "TimeCmd.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -49,6 +50,8 @@ atpg_init(Tcl_Interp* interp)
   TclCmdBinder1<RtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::rtpg");
   TclCmdBinder1<DtpgCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::dtpg");
   TclCmdBinder1<MinPatCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::minpat");
+  TclCmdBinder<StopwatchCls>::reg(interp, "atpg::stopwatch");
+  TclCmdBinder<TimeCmd>::reg(interp,     "atpg::time");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -67,6 +70,8 @@ atpg_init(Tcl_Interp* interp)
       << "proc complete(rtpg) { t s e l p m } { return \"\" }" << endl
       << "proc complete(dtpg) { t s e l p m } { return \"\" }" << endl
       << "proc complete(minpat) { t s e l p m } { return \"\" }" << endl
+      << "proc complete(stopwatch) { t s e l p m } { return \"\" }" << endl
+      << "proc complete(time) { t s e l p m } { return \"\" }" << endl
       << "}" << endl
       << "}" << endl;
   string str = buf.str();

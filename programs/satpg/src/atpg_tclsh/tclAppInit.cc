@@ -219,7 +219,7 @@ Tcl_AppInit(Tcl_Interp* interp)
    * then no user-specific startup file will be run under any conditions.
    */
 
-  Tcl_SetVar(interp, "tcl_rcFileName", "~/.magusrc", TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, "tcl_rcFileName", "~/.atpgrc", TCL_GLOBAL_ONLY);
 
   return TCL_OK;
 }

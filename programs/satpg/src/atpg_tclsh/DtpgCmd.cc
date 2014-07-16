@@ -73,10 +73,13 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "verify generated pattern");
   mPoptTimer = new TclPopt(this, "timer",
 			   "enable timer");
+  mPoptNoTimer = new TclPopt(this, "notimer",
+			     "disable timer");
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptMiniSat2, mPoptSatRec);
   new_popt_group(mPoptSingle, mPoptSingle2, mPoptMulti, mPoptMulti2, mPoptSmtSingle);
   new_popt_group(mPoptFFR, mPoptMFFC);
+  new_popt_group(mPoptTimer, mPoptNoTimer);
 
   new_popt_group(mPoptPo, mPoptRpo);
 }
@@ -202,12 +205,10 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     dop_list.add(new_DopVerify(mgr()));
   }
 
-  bool timer_enable;
-#if 0
-  timer_enable = mPoptTimer->is_specified();
-#else
-  timer_enable = print_stats;
-#endif
+  bool timer_enable = true;
+  if ( mPoptNoTimer->is_specified() ) {
+    timer_enable = false;
+  }
 
   tDtpgPoMode po_mode = kDtpgPoNone;
   if ( po_flag ) {
@@ -219,12 +220,14 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgStats stats;
 
+  // DTPG の実行
   mgr().dtpg(DtpgMode(mode, engine_type, mode_val), po_mode, option_str,
 	     sat_type, sat_option, outp, timer_enable,
 	     *bt, dop_list, uop_list, stats);
 
   after_update_faults();
 
+  // -print_stats オプションの処理
   if ( print_stats ) {
     ios::fmtflags save = cout.flags();
     cout.setf(ios::fixed, ios::floatfield);
@@ -329,25 +332,34 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 	   << "s usec" << endl;
     }
     cout.flags(save);
-
-#if 0
-    const DtpgStats& stats = mDtpg.stats();
-    cout << "********** dtpg **********" << endl
-	 << setw(10) << stats.detected_faults()
-	 << ": # of detected faults" << endl
-	 << setw(10) << stats.untestable_faults()
-	 << ": # fo redundant faults" << endl
-	 << setw(10) << stats.aborted_faults()
-	 << ": # of aborted faults" << endl
-	 << setw(10) << stats.generated_patterns()
-	 << ": # of generated patterns" << endl
-	 << setw(10) << stats.call_count()
-	 << ": # of dtpg runs" << endl
-	 << setw(10) << stats.backtrack_count()
-	 << ": # of total backtracks" << endl
-	 << stats.time() << endl;
-#endif
   }
+
+  // stats の結果を TCL 変数にセットする．
+  TclObj base("::atpg::dtpg_stats");
+  set_var(base, "cnf_count",
+	  stats.mCnfGenCount,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "cnf_time",
+	  stats.mCnfGenTime.usr_time(),
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "det_count",
+	  stats.mDetCount,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "det_time",
+	  stats.mDetTime.usr_time(),
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "part_red_count",
+	  stats.mPartRedCount,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "part_red_time",
+	  stats.mPartRedTime.usr_time(),
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "red_count",
+	  stats.mRedCount,
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
+  set_var(base, "red_time",
+	  stats.mRedTime.usr_time(),
+	  TCL_NAMESPACE_ONLY | TCL_LEAVE_ERR_MSG);
 
   return TCL_OK;
 }

@@ -112,6 +112,9 @@ private:
   // timer オプションの解析用オブジェクト
   TclPopt* mPoptTimer;
 
+  // no-timer オプションの解析用オブジェクト
+  TclPopt* mPoptNoTimer;
+
 };
 
 END_NAMESPACE_YM_SATPG
