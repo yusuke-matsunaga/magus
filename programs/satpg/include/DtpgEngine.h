@@ -121,7 +121,8 @@ new_SatEngineMulti(const string& sat_type,
 		   ymuint max_id,
 		   BackTracer& bt,
 		   DetectOp& dop,
-		   UntestOp& uop);
+		   UntestOp& uop,
+		   bool forget);
 
 /// @brief Multi2 エンジンを作る．
 /// @param[in] th_val しきい値
@@ -140,7 +141,8 @@ new_SatEngineMulti2(ymuint th_val,
 		    ymuint max_id,
 		    BackTracer& bt,
 		    DetectOp& dop,
-		    UntestOp& uop);
+		    UntestOp& uop,
+		    bool forget);
 
 /// @brief SmtSingle エンジンを作る．
 /// @param[in] sat_type SATソルバの種類を表す文字列

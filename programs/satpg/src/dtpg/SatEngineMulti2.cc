@@ -34,9 +34,10 @@ new_SatEngineMulti2(ymuint th_val,
 		    ymuint max_id,
 		    BackTracer& bt,
 		    DetectOp& dop,
-		    UntestOp& uop)
+		    UntestOp& uop,
+		    bool forget)
 {
-  return new SatEngineMulti2(th_val, sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+  return new SatEngineMulti2(th_val, sat_type, sat_option, sat_outp, max_id, bt, dop, uop, forget);
 }
 
 // @brief コンストラクタ
@@ -47,12 +48,17 @@ SatEngineMulti2::SatEngineMulti2(ymuint th_val,
 				 ymuint max_id,
 				 BackTracer& bt,
 				 DetectOp& dop,
-				 UntestOp& uop) :
+				 UntestOp& uop,
+				 bool forget) :
   SatEngine(sat_type, sat_option, sat_outp, max_id, bt, dop, uop),
   mThVal(th_val),
   mDone(max_id, false),
-  mMark(max_id, 0)
+  mMark(max_id, 0),
+  mForget(forget)
 {
+  if ( mForget ) {
+    cout << "multi2_forget" << endl;
+  }
 }
 
 // @brief デストラクタ
@@ -174,6 +180,10 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
 
 
       timer_start();
+
+      if ( mForget ) {
+	solver.forget_learnt_clause();
+      }
 
       tmp_lits_begin();
 
@@ -298,6 +308,10 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
 
       if ( f->status() == kFsDetected ) {
 	continue;
+      }
+
+      if ( mForget ) {
+	solver.forget_learnt_clause();
       }
 
       tmp_lits_begin();

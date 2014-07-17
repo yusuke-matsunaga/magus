@@ -40,7 +40,8 @@ public:
 		  ymuint max_id,
 		  BackTracer& bt,
 		  DetectOp& dop,
-		  UntestOp& uop);
+		  UntestOp& uop,
+		  bool forget);
 
   /// @brief デストラクタ
   virtual
@@ -81,6 +82,9 @@ private:
 
   // 処理済みのノードのマーク
   vector<ymuint> mMark;
+
+  // forget フラグ
+  bool mForget;
 
 };
 

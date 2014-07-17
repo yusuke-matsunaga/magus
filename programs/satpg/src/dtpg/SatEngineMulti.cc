@@ -32,9 +32,10 @@ new_SatEngineMulti(const string& sat_type,
 		   ymuint max_id,
 		   BackTracer& bt,
 		   DetectOp& dop,
-		   UntestOp& uop)
+		   UntestOp& uop,
+		   bool forget)
 {
-  return new SatEngineMulti(sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+  return new SatEngineMulti(sat_type, sat_option, sat_outp, max_id, bt, dop, uop, forget);
 }
 
 // @brief コンストラクタ
@@ -44,9 +45,11 @@ SatEngineMulti::SatEngineMulti(const string& sat_type,
 			       ymuint max_id,
 			       BackTracer& bt,
 			       DetectOp& dop,
-			       UntestOp& uop) :
+			       UntestOp& uop,
+			       bool forget) :
   SatEngine(sat_type, sat_option, sat_outp, max_id, bt, dop, uop),
-  mDone(max_id, false)
+  mDone(max_id, false),
+  mForget(forget)
 {
 }
 
@@ -143,6 +146,10 @@ SatEngineMulti::run(const vector<TpgFault*>& flist)
     if ( f->status() == kFsDetected ) {
       // 他の故障のパタンで検出済みになっている場合がある．
       continue;
+    }
+
+    if ( mForget ) {
+      solver.forget_learnt_clause();
     }
 
     tmp_lits_begin();

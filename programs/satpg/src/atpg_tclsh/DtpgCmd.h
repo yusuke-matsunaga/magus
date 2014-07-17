@@ -82,6 +82,9 @@ private:
   // smt_single オプションの解析用オブジェクト
   TclPopt* mPoptSmtSingle;
 
+  // forget オプションの解析用オブジェクト
+  TclPopt* mPoptForget;
+
   // ffr オプションの解析用オブジェクト
   TclPopt* mPoptFFR;
 

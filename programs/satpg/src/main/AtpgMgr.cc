@@ -203,10 +203,16 @@ AtpgMgr::dtpg(DtpgMode mode,
     engine = new_SatEngineSingle2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
   }
   else if ( mode.engine_type() == "multi" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop);
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop, false);
+  }
+  else if ( mode.engine_type() == "multi_forget" ) {
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop, true);
   }
   else if ( mode.engine_type() == "multi2" ) {
-    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
+    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop, false);
+  }
+  else if ( mode.engine_type() == "multi2_forget" ) {
+    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop, true);
   }
   else if ( mode.engine_type() == "smt_single" ) {
     engine = new_SmtEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);

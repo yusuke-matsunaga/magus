@@ -53,6 +53,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			       "multi2 mode <INT>");
   mPoptSmtSingle = new TclPopt(this, "smt_single",
 			       "smt_single mode");
+  mPoptForget = new TclPopt(this, "forget",
+			    "forget mode");
   mPoptFFR = new TclPopt(this, "ffr",
 			  "FFR mode");
   mPoptMFFC = new TclPopt(this, "mffc",
@@ -151,10 +153,20 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     mode_val = mPoptSingle2->val();
   }
   else if ( mPoptMulti->is_specified() ) {
-    engine_type = "multi";
+    if ( mPoptForget->is_specified() ) {
+      engine_type = "multi_forget";
+    }
+    else {
+      engine_type = "multi";
+    }
   }
   else if ( mPoptMulti2->is_specified() ) {
-    engine_type = "multi2";
+    if ( mPoptForget->is_specified() ) {
+      engine_type = "multi2_forget";
+    }
+    else {
+      engine_type = "multi2";
+    }
     mode_val = mPoptMulti2->val();
   }
   else if ( mPoptSmtSingle->is_specified() ) {
