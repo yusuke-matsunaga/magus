@@ -1037,6 +1037,15 @@ YmSat::forget_learnt_clause()
     delete_clause(clause);
   }
   mLearntClause.clear();
+
+  mVarHeap.reset_activity();
+  vector<VarId> var_list;
+  var_list.reserve(mVarSize);
+  for (ymuint i = 0; i < mVarSize; ++ i) {
+    var_list.push_back(VarId(i));
+    mVal[i] = conv_from_Bool3(kB3X) | (conv_from_Bool3(kB3X) << 2);
+  }
+  mVarHeap.build(var_list);
 }
 
 // @brief add_clause() の下請け関数

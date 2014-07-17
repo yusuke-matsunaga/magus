@@ -99,6 +99,15 @@ VarHeap::decay_var_activity()
   mVarBump /= mVarDecay;
 }
 
+// @brief 変数のアクティビティを初期化する．
+void
+VarHeap::reset_activity()
+{
+  for (ymuint i = 0; i < mVarSize; ++ i) {
+    mActivity[i] = 0.0;
+  }
+}
+
 // @brief 与えられた変数のリストからヒープ木を構成する．
 void
 VarHeap::build(const vector<VarId>& var_list)

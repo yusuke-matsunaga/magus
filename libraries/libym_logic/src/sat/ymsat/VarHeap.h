@@ -84,6 +84,10 @@ public:
   double
   activity(VarId var) const;
 
+  /// @brief 変数のアクティビティを初期化する．
+  void
+  reset_activity();
+
   /// @brief 与えられた変数のリストからヒープ木を構成する．
   void
   build(const vector<VarId>& var_list);
