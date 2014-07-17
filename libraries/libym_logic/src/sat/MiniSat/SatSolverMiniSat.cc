@@ -122,6 +122,14 @@ SatSolverMiniSat::solve(const vector<Literal>& assumptions,
 void
 SatSolverMiniSat::reduce_learnt_clause()
 {
+  // 未実装
+}
+
+// @brief 学習節をすべて削除する．
+void
+SatSolverMiniSat::forget_learnt_clause()
+{
+  // 未実装
 }
 
 // @brief conflict_limit の最大値

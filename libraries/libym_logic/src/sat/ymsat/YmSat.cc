@@ -1027,6 +1027,18 @@ YmSat::cut_down()
   }
 }
 
+// @brief 学習節をすべて削除する．
+void
+YmSat::forget_learnt_clause()
+{
+  for (vector<SatClause*>::iterator p = mLearntClause.begin();
+       p != mLearntClause.end(); ++ p) {
+    SatClause* clause = *p;
+    delete_clause(clause);
+  }
+  mLearntClause.clear();
+}
+
 // @brief add_clause() の下請け関数
 void
 YmSat::add_clause_sub(ymuint lit_num)
