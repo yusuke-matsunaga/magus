@@ -24,50 +24,6 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス FsimNetBinder
-//////////////////////////////////////////////////////////////////////
-class FsimNetBinder :
-  public T2Binder<const TpgNetwork&, FaultMgr&>
-{
-public:
-
-  /// @brief コンストラクタ
-  FsimNetBinder(Fsim* fsim);
-
-  /// @brief イベント処理関数
-  virtual
-  void
-  event_proc(const TpgNetwork& network,
-	     FaultMgr& fault_mgr);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // Fsim
-  Fsim* mFsim;
-
-};
-
-
-// @brief コンストラクタ
-FsimNetBinder::FsimNetBinder(Fsim* fsim) :
-  mFsim(fsim)
-{
-}
-
-// @brief イベント処理関数
-void
-FsimNetBinder::event_proc(const TpgNetwork& network,
-			  FaultMgr& fault_mgr)
-{
-  mFsim->set_network(network);
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // AtpgMgr
 //////////////////////////////////////////////////////////////////////
 
@@ -85,9 +41,6 @@ AtpgMgr::AtpgMgr() :
   mMinPat = new_MinPat(*this);
 
   mNetwork = NULL;
-
-  reg_network_handler(new FsimNetBinder(mFsim));
-  reg_network_handler(new FsimNetBinder(mFsim3));
 }
 
 // @brief デストラクタ
@@ -167,6 +120,8 @@ AtpgMgr::rtpg(ymuint min_f,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_FSIM);
 
+  mFsim->set_faults(mFaultMgr->remain_list());
+
   mRtpg->run(min_f, max_i, max_pat, stats);
 
   mTimer.change(old_id);
@@ -189,7 +144,7 @@ AtpgMgr::dtpg(DtpgMode mode,
   ymuint old_id = mTimer.cur_id();
   mTimer.change(TM_DTPG);
 
-  dop.set_faults(mFaultMgr->remain_list());
+  mFsim3->set_faults(mFaultMgr->remain_list());
 
   Dtpg* dtpg = new_DtpgDriver();
 
@@ -278,12 +233,13 @@ AtpgMgr::misc_time() const
 void
 AtpgMgr::after_set_network()
 {
-  mFaultMgr->set_ssa_fault(*mNetwork);
+  mFaultMgr->set_faults(*mNetwork);
 
   mTvMgr->clear();
   mTvMgr->init(mNetwork->input_num2());
 
-  mNtwkBindMgr.prop_event(*mNetwork, *mFaultMgr);
+  mFsim->set_network(*mNetwork);
+  mFsim3->set_network(*mNetwork);
 }
 
 END_NAMESPACE_YM_SATPG

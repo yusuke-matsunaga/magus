@@ -9,7 +9,6 @@
 
 #include "FaultMgr.h"
 #include "TpgFault.h"
-#include "TestVector.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 
@@ -38,9 +37,9 @@ FaultMgr::clear()
   mChanged = true;
 }
 
-// @brief FaultMgr に全ての単一縮退故障を設定する．
+// @brief network の故障を設定する．
 void
-FaultMgr::set_ssa_fault(TpgNetwork& network)
+FaultMgr::set_faults(TpgNetwork& network)
 {
   clear();
 

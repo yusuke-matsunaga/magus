@@ -64,9 +64,9 @@ public:
   void
   clear();
 
-  /// @brief network の全ての単一縮退故障を設定する．
+  /// @brief network の故障を設定する．
   void
-  set_ssa_fault(TpgNetwork& network);
+  set_faults(TpgNetwork& network);
 
   /// @brief fault の状態を変更する．
   void
