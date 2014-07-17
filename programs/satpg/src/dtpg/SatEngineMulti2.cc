@@ -56,9 +56,6 @@ SatEngineMulti2::SatEngineMulti2(ymuint th_val,
   mMark(max_id, 0),
   mForget(forget)
 {
-  if ( mForget ) {
-    cout << "multi2_forget" << endl;
-  }
 }
 
 // @brief デストラクタ
