@@ -16,7 +16,7 @@
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "LitMap.h"
-#include "../graphsat/GraphSat.h"
+#include "../../graphsat/GraphSat.h"
 #include "logic/SatStats.h"
 
 

@@ -8,9 +8,6 @@ SUBDIRS = \
 	fsim \
 	dtpg \
 	graphsat \
-	bt \
-	dop \
-	uop \
 	rtpg \
 	minpat \
 	atpg_tclsh \

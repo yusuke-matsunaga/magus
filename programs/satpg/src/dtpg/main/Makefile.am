@@ -5,11 +5,7 @@
 ## サブディレクトリの指定
 ############################################################
 
-SUBDIRS = \
-	main \
-	bt \
-	dop \
-	uop
+SUBDIRS =
 
 
 ############################################################
@@ -33,70 +29,97 @@ EXTRA_DIST =
 ############################################################
 
 noinst_LTLIBRARIES = \
-	libatpg_dtpg.la \
-	libatpg_dtpg_d.la \
-	libatpg_dtpg_p.la
+	libatpg_dtpg_main.la \
+	libatpg_dtpg_main_d.la \
+	libatpg_dtpg_main_p.la
 
 
 ############################################################
 ## 汎用のプリプロセッサ用フラグの指定
 ############################################################
 
+AM_CPPFLAGS = \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
+	$(GMP_INCLUDES)
+
 
 ############################################################
 ## 共通の変数定義
 ############################################################
 
+COMMON_SOURCES = \
+	DtpgDriver.h \
+	DtpgDriver.cc \
+	SatEngine.h \
+	SatEngine.cc \
+	SatEngineMulti.h \
+	SatEngineMulti.cc \
+	SatEngineMulti2.h \
+	SatEngineMulti2.cc \
+	SatEngineSingle.h \
+	SatEngineSingle.cc \
+	SatEngineSingle2.h \
+	SatEngineSingle2.cc \
+	SmtEngine.h \
+	SmtEngine.cc \
+	SmtEngineSingle.h \
+	SmtEngineSingle.cc \
+	LitMap.h \
+	LitMap.cc
+
 
 ############################################################
-## libatpg_dtpg.la 用の変数の定義
+## libatpg_dtpg_main.la 用の変数の定義
 ############################################################
 
-libatpg_dtpg_la_SOURCES =
+libatpg_dtpg_main_la_CXXFLAGS = \
+	$(YM_CXXOPTFLAGS) \
+	$(AM_CXXFLAGS)
 
-nodist_EXTRA_libatpg_dtpg_la_SOURCES = dummy.cc
+libatpg_dtpg_main_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libatpg_dtpg_la_LIBADD = \
-	main/libatpg_dtpg_main.la \
-	bt/libatpg_bt.la \
-	dop/libatpg_dop.la \
-	uop/libatpg_uop.la
+libatpg_dtpg_main_la_LIBADD =
 
-libatpg_dtpg_la_LDFLAGS = \
+libatpg_dtpg_main_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_dtpg_d.la 用の変数の定義
+## libatpg_dtpg_main_d.la 用の変数の定義
 ############################################################
 
-libatpg_dtpg_d_la_SOURCES =
+libatpg_dtpg_main_d_la_CXXFLAGS = \
+	$(YM_CXXDBGFLAGS) \
+	$(AM_CXXFLAGS)
 
-nodist_EXTRA_libatpg_dtpg_d_la_SOURCES = dummy.cc
+libatpg_dtpg_main_d_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libatpg_dtpg_d_la_LIBADD = \
-	main/libatpg_dtpg_main_d.la \
-	bt/libatpg_bt_d.la \
-	dop/libatpg_dop_d.la \
-	uop/libatpg_uop_d.la
+libatpg_dtpg_main_d_la_LIBADD =
 
-libatpg_dtpg_d_la_LDFLAGS = \
+libatpg_dtpg_main_d_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 
 ############################################################
-## libatpg_dtpg_p.la 用の変数の定義
+## libatpg_dtpg_main_p.la 用の変数の定義
 ############################################################
 
-libatpg_dtpg_p_la_SOURCES =
+libatpg_dtpg_main_p_la_CXXFLAGS = \
+	$(YM_CXXPRFFLAGS) \
+	$(AM_CXXFLAGS)
 
-nodist_EXTRA_libatpg_dtpg_p_la_SOURCES = dummy.cc
+libatpg_dtpg_main_p_la_SOURCES = \
+	$(COMMON_SOURCES)
 
-libatpg_dtpg_p_la_LIBADD = \
-	main/libatpg_dtpg_main_p.la \
-	bt/libatpg_bt_p.la \
-	dop/libatpg_dop_p.la \
-	uop/libatpg_uop_p.la
+libatpg_dtpg_main_p_la_LIBADD =
 
-libatpg_dtpg_p_la_LDFLAGS = \
+libatpg_dtpg_main_p_la_LDFLAGS = \
 	$(AM_LDFLAGS)

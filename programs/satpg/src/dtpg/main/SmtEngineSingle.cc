@@ -13,7 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
-#include "../graphsat/GraphSat.h"
+#include "../../graphsat/GraphSat.h"
 #include "logic/SatStats.h"
 
 
