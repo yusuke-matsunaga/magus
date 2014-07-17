@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
-SatEngine*
+DtpgEngine*
 new_SatEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
@@ -45,7 +45,7 @@ SatEngineSingle::SatEngineSingle(const string& sat_type,
 				 BackTracer& bt,
 				 DetectOp& dop,
 				 UntestOp& uop) :
-  SatEngineBase(sat_type, sat_option, sat_outp, max_id, bt, dop, uop)
+  SatEngine(sat_type, sat_option, sat_outp, max_id, bt, dop, uop)
 {
 }
 

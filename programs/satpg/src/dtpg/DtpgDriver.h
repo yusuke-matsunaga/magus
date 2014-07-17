@@ -42,13 +42,14 @@ public:
   /// @param[in] tpgnetwork 対象のネットワーク
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
+  /// @param[in] engine DTPG エンジン
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
   run(TpgNetwork& tgnetwork,
-      DtpgMode mode,
+      tDtpgMode mode,
       tDtpgPoMode po_mode,
-      SatEngine& sat_engine,
+      DtpgEngine& engine,
       DtpgStats& stats);
 
 
@@ -63,29 +64,29 @@ private:
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  dtpg1(DtpgMode mode,
-	SatEngine& sat_engine);
+  dtpg1(tDtpgMode mode,
+	DtpgEngine& sat_engine);
 
   /// @brief single モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  single_mode(SatEngine& sat_engine);
+  single_mode(DtpgEngine& sat_engine);
 
   /// @brief ffr モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  ffr_mode(SatEngine& sat_engine);
+  ffr_mode(DtpgEngine& sat_engine);
 
   /// @brief mffc モードでテスト生成を行なう．
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   void
-  mffc_mode(SatEngine& sat_engine);
+  mffc_mode(DtpgEngine& sat_engine);
 
   /// @brief DFS で FFR を求める．
   void
@@ -106,7 +107,7 @@ private:
 
   /// @brief テストパタン生成を行なう．
   void
-  do_dtpg(SatEngine& sat_engine);
+  do_dtpg(DtpgEngine& sat_engine);
 
 
 private:

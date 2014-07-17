@@ -89,6 +89,8 @@ RtpgImpl::run(ymuint min_f,
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
+  mFsim.set_faults(mFaultMgr.remain_list());
+
   FopRtpg op(mFsim, mFaultMgr);
 
   ymuint pat_num = 0;

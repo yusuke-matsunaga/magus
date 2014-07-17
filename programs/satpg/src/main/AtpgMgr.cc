@@ -15,7 +15,7 @@
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "Dtpg.h"
-#include "SatEngine.h"
+#include "DtpgEngine.h"
 #include "Rtpg.h"
 #include "MinPat.h"
 #include "DetectOp.h"
@@ -195,7 +195,7 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   ymuint max_id = mNetwork->max_node_id();
 
-  SatEngine* engine = NULL;
+  DtpgEngine* engine = NULL;
   if ( mode.engine_type() == "single" ) {
     engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);
   }
@@ -218,7 +218,7 @@ AtpgMgr::dtpg(DtpgMode mode,
   engine->set_option(option_str);
   engine->timer_enable(timer_enable);
 
-  dtpg->run(*mNetwork, mode, po_mode, *engine, stats);
+  dtpg->run(*mNetwork, mode.mode(), po_mode, *engine, stats);
 
   delete dtpg;
   delete engine;

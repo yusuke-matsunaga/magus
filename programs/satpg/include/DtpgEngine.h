@@ -1,8 +1,8 @@
-#ifndef SATENGINE_H
-#define SATENGINE_H
+#ifndef DTPGENGINE_H
+#define DTPGENGINE_H
 
-/// @file SatEngine.h
-/// @brief SatEngine のヘッダファイル
+/// @file DtpgEngine.h
+/// @brief DtpgEngine のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -17,16 +17,16 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngine SatEngine.h "SatEngine.h"
-/// @brief SAT ベースのATPGエンジンの基底クラス
+/// @class DtpgEngine DtpgEngine.h "DtpgEngine.h"
+/// @brief DTPG の基本エンジン
 //////////////////////////////////////////////////////////////////////
-class SatEngine
+class DtpgEngine
 {
 public:
 
   /// @brief デストラクタ
   virtual
-  ~SatEngine() { }
+  ~DtpgEngine() { }
 
 
 public:
@@ -78,7 +78,7 @@ public:
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-SatEngine*
+DtpgEngine*
 new_SatEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
@@ -96,7 +96,7 @@ new_SatEngineSingle(const string& sat_type,
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-SatEngine*
+DtpgEngine*
 new_SatEngineSingle2(ymuint th_val,
 		     const string& sat_type,
 		     const string& sat_option,
@@ -114,7 +114,7 @@ new_SatEngineSingle2(ymuint th_val,
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-SatEngine*
+DtpgEngine*
 new_SatEngineMulti(const string& sat_type,
 		   const string& sat_option,
 		   ostream* sat_outp,
@@ -132,7 +132,7 @@ new_SatEngineMulti(const string& sat_type,
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-SatEngine*
+DtpgEngine*
 new_SatEngineMulti2(ymuint th_val,
 		    const string& sat_type,
 		    const string& sat_option,
@@ -150,7 +150,7 @@ new_SatEngineMulti2(ymuint th_val,
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-SatEngine*
+DtpgEngine*
 new_SmtEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
@@ -161,4 +161,4 @@ new_SmtEngineSingle(const string& sat_type,
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINE_H
+#endif // DTPGENGINE_H

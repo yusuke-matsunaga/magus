@@ -39,17 +39,14 @@ public:
   /// @param[in] tpgnetwork 対象のネットワーク
   /// @param[in] mode メインモード
   /// @param[in] po_mode PO分割モード
-  /// @param[in] option_str オプション文字列
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  /// @param[in] engine DTPG エンジン
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
   run(TpgNetwork& tgnetwork,
-      DtpgMode mode,
+      tDtpgMode mode,
       tDtpgPoMode po_mode,
-      SatEngine& sat_engine,
+      DtpgEngine& engine,
       DtpgStats& stats) = 0;
 
 };
@@ -59,11 +56,6 @@ public:
 extern
 Dtpg*
 new_DtpgDriver();
-
-/// @brief DtpgSmt のインスタンスを生成する．
-extern
-Dtpg*
-new_DtpgSmt();
 
 END_NAMESPACE_YM_SATPG
 

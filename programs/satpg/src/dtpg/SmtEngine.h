@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgEngine.h"
 #include "TpgNode.h"
 #include "DtpgStats.h"
 #include "LitMap.h"
@@ -30,7 +30,7 @@ class GraphSat;
 /// @brief SAT ベースのATPGエンジン
 //////////////////////////////////////////////////////////////////////
 class SmtEngine :
-  public SatEngine
+  public DtpgEngine
 {
 protected:
 

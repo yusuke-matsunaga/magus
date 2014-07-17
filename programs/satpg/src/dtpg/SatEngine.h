@@ -1,8 +1,8 @@
-#ifndef SATENGINEBASE_H
-#define SATENGINEBASE_H
+#ifndef SATENGINE_H
+#define SATENGINE_H
 
-/// @file SatEngineBase.h
-/// @brief SatEngineBase のヘッダファイル
+/// @file SatEngine.h
+/// @brief SatEngine のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgEngine.h"
 #include "TpgNode.h"
 #include "DtpgStats.h"
 #include "LitMap.h"
@@ -24,11 +24,11 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineBase SatEngineBase.h "SatEngineBase.h"
+/// @class SatEngine SatEngine.h "SatEngine.h"
 /// @brief SatEngine の実装用の基底クラス
 //////////////////////////////////////////////////////////////////////
-class SatEngineBase :
-  public SatEngine
+class SatEngine :
+  public DtpgEngine
 {
 public:
 
@@ -40,17 +40,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineBase(const string& sat_type,
-		const string& sat_option,
-		ostream* sat_outp,
-		ymuint max_id,
-		BackTracer& bt,
-		DetectOp& dop,
-		UntestOp& uop);
+  SatEngine(const string& sat_type,
+	    const string& sat_option,
+	    ostream* sat_outp,
+	    ymuint max_id,
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineBase();
+  ~SatEngine();
 
 
 public:
@@ -458,7 +458,7 @@ private:
 // @brief SATソルバのタイプを得る．
 inline
 string
-SatEngineBase::sat_type() const
+SatEngine::sat_type() const
 {
   return mSatType;
 }
@@ -466,7 +466,7 @@ SatEngineBase::sat_type() const
 // @brief SATソルバのオプションを得る．
 inline
 string
-SatEngineBase::sat_option() const
+SatEngine::sat_option() const
 {
   return mSatOption;
 }
@@ -474,7 +474,7 @@ SatEngineBase::sat_option() const
 // @brief SATソルバのログ出力を得る．
 inline
 ostream*
-SatEngineBase::sat_outp() const
+SatEngine::sat_outp() const
 {
   return mSatOutP;
 }
@@ -482,7 +482,7 @@ SatEngineBase::sat_outp() const
 // @brief NEMESIS モード(含む EXT-NEMESIS)の時 true を返す．
 inline
 bool
-SatEngineBase::nemesis_mode() const
+SatEngine::nemesis_mode() const
 {
   return mNemesis;
 }
@@ -490,7 +490,7 @@ SatEngineBase::nemesis_mode() const
 // @brief EXT-NEMESIS モードの時 true を返す．
 inline
 bool
-SatEngineBase::ext_nemesis_mode() const
+SatEngine::ext_nemesis_mode() const
 {
   return mExtNemesis;
 }
@@ -498,7 +498,7 @@ SatEngineBase::ext_nemesis_mode() const
 // @brief TG-GRASP モード(含む EXT-TG-GRASP)の時 true を返す．
 inline
 bool
-SatEngineBase::tg_grasp_mode() const
+SatEngine::tg_grasp_mode() const
 {
   return mTgGrasp;
 }
@@ -506,7 +506,7 @@ SatEngineBase::tg_grasp_mode() const
 // @brief EXT-TG-GRASP モードの時 true を返す．
 inline
 bool
-SatEngineBase::ext_tg_grasp_mode() const
+SatEngine::ext_tg_grasp_mode() const
 {
   return mExtTgGrasp;
 }
@@ -514,7 +514,7 @@ SatEngineBase::ext_tg_grasp_mode() const
 // @brief dominator を用いた unique sensitization を行う時 true を返す．
 inline
 bool
-SatEngineBase::use_dominator() const
+SatEngine::use_dominator() const
 {
   return mUseDominator;
 }
@@ -522,7 +522,7 @@ SatEngineBase::use_dominator() const
 // @brief TFO ノードの数を得る．
 inline
 ymuint
-SatEngineBase::tfo_size() const
+SatEngine::tfo_size() const
 {
   return mTfoEnd;
 }
@@ -530,7 +530,7 @@ SatEngineBase::tfo_size() const
 // @brief TFI ノードの数を得る．
 inline
 ymuint
-SatEngineBase::tfi_size() const
+SatEngine::tfi_size() const
 {
   return mTfoList.size() - mTfoEnd;
 }
@@ -538,7 +538,7 @@ SatEngineBase::tfi_size() const
 // @brief TFO ノードと TFI ノードの総数を得る．
 inline
 ymuint
-SatEngineBase::tfo_tfi_size() const
+SatEngine::tfo_tfi_size() const
 {
   return mTfoList.size();
 }
@@ -550,7 +550,7 @@ SatEngineBase::tfo_tfi_size() const
 // それ以上は TFI ノードとなっている．
 inline
 TpgNode*
-SatEngineBase::tfo_tfi_node(ymuint pos) const
+SatEngine::tfo_tfi_node(ymuint pos) const
 {
   return mTfoList[pos];
 }
@@ -558,7 +558,7 @@ SatEngineBase::tfo_tfi_node(ymuint pos) const
 // @brief 出力のノードのリストを返す．
 inline
 const vector<TpgNode*>&
-SatEngineBase::output_list() const
+SatEngine::output_list() const
 {
   return mOutputList;
 }
@@ -566,7 +566,7 @@ SatEngineBase::output_list() const
 // tfo マークをつける．
 inline
 void
-SatEngineBase::set_tfo_mark(TpgNode* node)
+SatEngine::set_tfo_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 1U;
   mTfoList.push_back(node);
@@ -578,7 +578,7 @@ SatEngineBase::set_tfo_mark(TpgNode* node)
 // @brief tfo マークを読む．
 inline
 bool
-SatEngineBase::tfo_mark(TpgNode* node)
+SatEngine::tfo_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 0) & 1U);
 }
@@ -586,7 +586,7 @@ SatEngineBase::tfo_mark(TpgNode* node)
 // tfi マークをつける．
 inline
 void
-SatEngineBase::set_tfi_mark(TpgNode* node)
+SatEngine::set_tfi_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 2U;
   mTfoList.push_back(node);
@@ -598,7 +598,7 @@ SatEngineBase::set_tfi_mark(TpgNode* node)
 // @brief tfi マークを読む．
 inline
 bool
-SatEngineBase::tfi_mark(TpgNode* node)
+SatEngine::tfi_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 1) & 1U);
 }
@@ -606,7 +606,7 @@ SatEngineBase::tfi_mark(TpgNode* node)
 // @brief tmp マークをつける．
 inline
 void
-SatEngineBase::set_tmp_mark(TpgNode* node)
+SatEngine::set_tmp_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 4U;
 }
@@ -614,7 +614,7 @@ SatEngineBase::set_tmp_mark(TpgNode* node)
 // @brief tmp マークを消す．
 inline
 void
-SatEngineBase::clear_tmp_mark(TpgNode* node)
+SatEngine::clear_tmp_mark(TpgNode* node)
 {
   mMarkArray[node->id()] &= ~4U;
 }
@@ -622,7 +622,7 @@ SatEngineBase::clear_tmp_mark(TpgNode* node)
 // @brief tmp マークを読む．
 inline
 bool
-SatEngineBase::tmp_mark(TpgNode* node)
+SatEngine::tmp_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
 }

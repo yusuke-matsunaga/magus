@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "SatEngineBase.h"
+#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
 class SatEngineSingle :
-  public SatEngineBase
+  public SatEngine
 {
 public:
 

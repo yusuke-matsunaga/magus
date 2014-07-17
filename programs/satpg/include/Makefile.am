@@ -35,16 +35,18 @@ noinst_HEADERS = \
 	DetectOp.h \
 	DopList.h \
 	Dtpg.h \
+	DtpgEngine.h \
+	DtpgMode.h \
 	DtpgStats.h \
 	FaultMgr.h \
 	FaultStatus.h \
 	Fsim.h \
 	FsimOp.h \
+	MinPat.h \
+	MinPatStats.h \
 	PackedVal.h \
 	Rtpg.h \
 	RtpgStats.h \
-	MinPat.h \
-	MinPatStats.h \
 	TestVector.h \
 	TpgFault.h \
 	TpgNetwork.h \

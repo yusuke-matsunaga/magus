@@ -11,7 +11,7 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "SatEngine.h"
+#include "DtpgEngine.h"
 #include "utils/HeapTree.h"
 
 
@@ -41,9 +41,9 @@ DtpgDriver::~DtpgDriver()
 // @param[in] stats 結果を格納する構造体
 void
 DtpgDriver::run(TpgNetwork& tgnetwork,
-		DtpgMode mode,
+		tDtpgMode mode,
 		tDtpgPoMode po_mode,
-		SatEngine& sat_engine,
+		DtpgEngine& sat_engine,
 		DtpgStats& stats)
 {
   sat_engine.clear_stats();
@@ -90,10 +90,10 @@ DtpgDriver::run(TpgNetwork& tgnetwork,
 // @brief activate された部分回路に大してテスト生成を行う．
 // @param[in] mode メインモード
 void
-DtpgDriver::dtpg1(DtpgMode mode,
-	       SatEngine& sat_engine)
+DtpgDriver::dtpg1(tDtpgMode mode,
+		  DtpgEngine& sat_engine)
 {
-  switch ( mode.mode() ) {
+  switch ( mode ) {
   case kDtpgSingle:
     single_mode(sat_engine);
     break;
@@ -110,7 +110,7 @@ DtpgDriver::dtpg1(DtpgMode mode,
 
 // @brief single モードでテスト生成を行なう．
 void
-DtpgDriver::single_mode(SatEngine& sat_engine)
+DtpgDriver::single_mode(DtpgEngine& sat_engine)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -132,7 +132,7 @@ DtpgDriver::single_mode(SatEngine& sat_engine)
 
 // @brief ffr モードでテスト生成を行なう．
 void
-DtpgDriver::ffr_mode(SatEngine& sat_engine)
+DtpgDriver::ffr_mode(DtpgEngine& sat_engine)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -164,7 +164,7 @@ DtpgDriver::dfs_ffr(TpgNode* node)
 
 // @brief mffc モードでテスト生成を行なう．
 void
-DtpgDriver::mffc_mode(SatEngine& sat_engine)
+DtpgDriver::mffc_mode(DtpgEngine& sat_engine)
 {
   ymuint n = mNetwork->active_node_num();
   vector<bool> mark(mNetwork->max_node_id(), false);
@@ -215,7 +215,7 @@ DtpgDriver::add_node_faults(TpgNode* node)
 
 // @brief テストパタン生成を行なう．
 void
-DtpgDriver::do_dtpg(SatEngine& sat_engine)
+DtpgDriver::do_dtpg(DtpgEngine& sat_engine)
 {
   if ( mFaultList.empty() ) {
     return;
