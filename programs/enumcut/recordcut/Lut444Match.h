@@ -13,6 +13,7 @@
 #include "logic/TvFunc.h"
 #include "GbmSolver.h"
 #include "LnMatch.h"
+#include "utils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -52,27 +53,50 @@ public:
   void
   get_count(ymuint& trivial_num,
 	    ymuint& a0_num,
+	    ymuint& a0_loop,
 	    ymuint& a1_num,
+	    ymuint& a1_loop,
 	    ymuint& a2_num,
+	    ymuint& a2_loop,
 	    ymuint& a3_num,
+	    ymuint& a3_loop,
 	    ymuint& a4_num,
+	    ymuint& a4_loop,
 	    ymuint& b0_num,
+	    ymuint& b0_loop,
 	    ymuint& b1_num,
+	    ymuint& b1_loop,
 	    ymuint& b2_num,
+	    ymuint& b2_loop,
 	    ymuint& b3_num,
+	    ymuint& b3_loop,
 	    ymuint& c0_num,
+	    ymuint& c0_loop,
 	    ymuint& c1_num,
+	    ymuint& c1_loop,
 	    ymuint& c2_num,
+	    ymuint& c2_loop,
 	    ymuint& d0_num,
+	    ymuint& d0_loop,
 	    ymuint& d1_num,
+	    ymuint& d1_loop,
 	    ymuint& d2_num,
+	    ymuint& d2_loop,
 	    ymuint& e0_num,
+	    ymuint& e0_loop,
 	    ymuint& e1_num,
+	    ymuint& e1_loop,
 	    ymuint& e2_num,
+	    ymuint& e2_loop,
 	    ymuint& f0_num,
+	    ymuint& f0_loop,
 	    ymuint& f1_num,
+	    ymuint& f1_loop,
 	    ymuint& g0_num,
-	    ymuint& fail_num);
+	    ymuint& g0_loop,
+	    ymuint& fail_num,
+	    USTime& ok_time,
+	    USTime& ng_time);
 
 
 private:
@@ -92,6 +116,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   LnMatch mMatcher;
+
+  USTime mOKTime;
+
+  USTime mNGTime;
 
 };
 

@@ -43,13 +43,16 @@ GbmSatNaiveOneHot::_solve(const RcfNetwork& network,
 			  const TvFunc& func,
 			  const vector<ymuint>& rep,
 			  vector<bool>& conf_bits,
-			  vector<ymuint>& iorder)
+			  vector<ymuint>& iorder,
+			  ymuint& loop_count)
 {
 #if 1
   SatSolver solver("minisat");
 #else
   SatSolver solver;
 #endif
+
+  loop_count = 1;
 
   SatMsgHandlerImpl1 satmsghandler(cout);
   solver.reg_msg_handler(&satmsghandler);

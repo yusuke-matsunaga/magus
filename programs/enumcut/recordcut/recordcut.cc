@@ -73,7 +73,11 @@ rec_func(FuncMgr& func_mgr,
   }
 
   FuncRec op(func_mgr);
+#if 0
   TopDown2 enumcut;
+#else
+  TopDown enumcut;
+#endif
 
   op.set_min_size(min_cut_size);
   op.set_debug_level(0);
@@ -120,60 +124,122 @@ rec_func(FuncMgr& func_mgr,
 
     ymuint t_num = 0;
     ymuint a0_num = 0;
+    ymuint a0_loop = 0;
     ymuint a1_num = 0;
+    ymuint a1_loop = 0;
     ymuint a2_num = 0;
+    ymuint a2_loop = 0;
     ymuint a3_num = 0;
+    ymuint a3_loop = 0;
     ymuint a4_num = 0;
+    ymuint a4_loop = 0;
     ymuint b0_num = 0;
+    ymuint b0_loop = 0;
     ymuint b1_num = 0;
+    ymuint b1_loop = 0;
     ymuint b2_num = 0;
+    ymuint b2_loop = 0;
     ymuint b3_num = 0;
+    ymuint b3_loop = 0;
     ymuint c0_num = 0;
+    ymuint c0_loop = 0;
     ymuint c1_num = 0;
+    ymuint c1_loop = 0;
     ymuint c2_num = 0;
+    ymuint c2_loop = 0;
     ymuint d0_num = 0;
+    ymuint d0_loop = 0;
     ymuint d1_num = 0;
+    ymuint d1_loop = 0;
     ymuint d2_num = 0;
+    ymuint d2_loop = 0;
     ymuint e0_num = 0;
+    ymuint e0_loop = 0;
     ymuint e1_num = 0;
+    ymuint e1_loop = 0;
     ymuint e2_num = 0;
+    ymuint e2_loop = 0;
     ymuint f0_num = 0;
+    ymuint f0_loop = 0;
     ymuint f1_num = 0;
+    ymuint f1_loop = 0;
     ymuint g0_num = 0;
+    ymuint g0_loop = 0;
     ymuint fail_num = 0;
+    USTime ok_time;
+    USTime ng_time;
     matcher.get_count(t_num,
-		      a0_num, a1_num, a2_num, a3_num, a4_num,
-		      b0_num, b1_num, b2_num, b3_num,
-		      c0_num, c1_num, c2_num,
-		      d0_num, d1_num, d2_num,
-		      e0_num, e1_num, e2_num,
-		      f0_num, f1_num,
+		      a0_num,
+		      a0_loop,
+		      a1_num,
+		      a1_loop,
+		      a2_num,
+		      a2_loop,
+		      a3_num,
+		      a3_loop,
+		      a4_num,
+		      a4_loop,
+		      b0_num,
+		      b0_loop,
+		      b1_num,
+		      b1_loop,
+		      b2_num,
+		      b2_loop,
+		      b3_num,
+		      b3_loop,
+		      c0_num,
+		      c0_loop,
+		      c1_num,
+		      c1_loop,
+		      c2_num,
+		      c2_loop,
+		      d0_num,
+		      d0_loop,
+		      d1_num,
+		      d1_loop,
+		      d2_num,
+		      d2_loop,
+		      e0_num,
+		      e0_loop,
+		      e1_num,
+		      e1_loop,
+		      e2_num,
+		      e2_loop,
+		      f0_num,
+		      f0_loop,
+		      f1_num,
+		      f1_loop,
 		      g0_num,
-		      fail_num);
+		      g0_loop,
+		      fail_num,
+		      ok_time,
+		      ng_time);
 
     cout << "Trivial: " << t_num << endl
-	 << "A-0    : " << a0_num << endl
-	 << "A-1    : " << a1_num << endl
-	 << "A-2    : " << a2_num << endl
-	 << "A-3    : " << a3_num << endl
-	 << "A-4    : " << a4_num << endl
-	 << "B-0    : " << b0_num << endl
-	 << "B-1    : " << b1_num << endl
-	 << "B-2    : " << b2_num << endl
-	 << "B-3    : " << b3_num << endl
-	 << "C-0    : " << c0_num << endl
-	 << "C-1    : " << c1_num << endl
-	 << "C-2    : " << c2_num << endl
-	 << "D-0    : " << d0_num << endl
-	 << "D-1    : " << d1_num << endl
-	 << "D-2    : " << d2_num << endl
-	 << "E-0    : " << e0_num << endl
-	 << "E-1    : " << e1_num << endl
-	 << "E-2    : " << e2_num << endl
-	 << "F-0    : " << f0_num << endl
-	 << "F-1    : " << f1_num << endl
-	 << "G-0    : " << g0_num << endl
-	 << "Fail   : " << fail_num << endl;
+	 << "A-0    : " << a0_num << ":  " << a0_loop << endl
+	 << "A-1    : " << a1_num << ":  " << a1_loop << endl
+	 << "A-2    : " << a2_num << ":  " << a2_loop << endl
+	 << "A-3    : " << a3_num << ":  " << a3_loop << endl
+	 << "A-4    : " << a4_num << ":  " << a4_loop << endl
+	 << "B-0    : " << b0_num << ":  " << b0_loop << endl
+	 << "B-1    : " << b1_num << ":  " << b1_loop << endl
+	 << "B-2    : " << b2_num << ":  " << b2_loop << endl
+	 << "B-3    : " << b3_num << ":  " << b3_loop << endl
+	 << "C-0    : " << c0_num << ":  " << c0_loop << endl
+	 << "C-1    : " << c1_num << ":  " << c1_loop << endl
+	 << "C-2    : " << c2_num << ":  " << c2_loop << endl
+	 << "D-0    : " << d0_num << ":  " << d0_loop << endl
+	 << "D-1    : " << d1_num << ":  " << d1_loop << endl
+	 << "D-2    : " << d2_num << ":  " << d2_loop << endl
+	 << "E-0    : " << e0_num << ":  " << e0_loop << endl
+	 << "E-1    : " << e1_num << ":  " << e1_loop << endl
+	 << "E-2    : " << e2_num << ":  " << e2_loop << endl
+	 << "F-0    : " << f0_num << ":  " << f0_loop << endl
+	 << "F-1    : " << f1_num << ":  " << f1_loop << endl
+	 << "G-0    : " << g0_num << ":  " << g0_loop << endl
+	 << "Fail   : " << fail_num << endl
+	 << "OK time: " << ok_time << endl
+	 << "NG time: " << ng_time << endl;
   }
   else {
     Lut443Match matcher;
@@ -205,24 +271,55 @@ rec_func(FuncMgr& func_mgr,
     ymuint b2_num = 0;
     ymuint c0_num = 0;
     ymuint c1_num = 0;
+    ymuint a0_loop = 0;
+    ymuint a1_loop = 0;
+    ymuint a2_loop = 0;
+    ymuint a3_loop = 0;
+    ymuint b0_loop = 0;
+    ymuint b1_loop = 0;
+    ymuint b2_loop = 0;
+    ymuint c0_loop = 0;
+    ymuint c1_loop = 0;
     ymuint fail_num = 0;
+    USTime ok_time;
+    USTime ng_time;
     matcher.get_count(t_num,
-		      a0_num, a1_num, a2_num, a3_num,
-		      b0_num, b1_num, b2_num,
-		      c0_num, c1_num,
-		      fail_num);
+		      a0_num,
+		      a0_loop,
+		      a1_num,
+		      a1_loop,
+		      a2_num,
+		      a2_loop,
+		      a3_num,
+		      a3_loop,
+		      b0_num,
+		      b0_loop,
+		      b1_num,
+		      b1_loop,
+		      b2_num,
+		      b2_loop,
+		      c0_num,
+		      c0_loop,
+		      c1_num,
+		      c1_loop,
+		      fail_num,
+		      ok_time,
+		      ng_time);
 
     cout << "Trivial: " << t_num << endl
-	 << "A-0    : " << a0_num << endl
-	 << "A-1    : " << a1_num << endl
-	 << "A-2    : " << a2_num << endl
-	 << "A-3    : " << a3_num << endl
-	 << "B-0    : " << b0_num << endl
-	 << "B-1    : " << b1_num << endl
-	 << "B-2    : " << b2_num << endl
-	 << "C-0    : " << c0_num << endl
-	 << "C-1    : " << c1_num << endl
-	 << "Fail   : " << fail_num << endl;
+	 << "A-0    : " << a0_num << ":     " << a0_loop << endl
+	 << "A-1    : " << a1_num << ":     " << a1_loop << endl
+	 << "A-2    : " << a2_num << ":     " << a2_loop << endl
+	 << "A-3    : " << a3_num << ":     " << a3_loop << endl
+	 << "B-0    : " << b0_num << ":     " << b0_loop << endl
+	 << "B-1    : " << b1_num << ":     " << b1_loop << endl
+	 << "B-2    : " << b2_num << ":     " << b2_loop << endl
+	 << "C-0    : " << c0_num << ":     " << c0_loop << endl
+	 << "C-1    : " << c1_num << ":     " << c1_loop << endl
+	 << "Fail   : " << fail_num << endl
+	 << "OK time: " << ok_time << endl
+	 << "NG time: " << ng_time << endl;
+
   }
 
   timer.stop();

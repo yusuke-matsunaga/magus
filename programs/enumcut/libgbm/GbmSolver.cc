@@ -128,7 +128,8 @@ bool
 GbmSolver::solve(const RcfNetwork& network,
 		 const TvFunc& func,
 		 vector<bool>& conf_bits,
-		 vector<ymuint>& iorder)
+		 vector<ymuint>& iorder,
+		 ymuint& loop_count)
 {
   ymuint ni = func.input_num();
   vector<ymuint> rep(ni);
@@ -144,7 +145,7 @@ GbmSolver::solve(const RcfNetwork& network,
     }
   }
 
-  bool stat = _solve(network, func, rep, conf_bits, iorder);
+  bool stat = _solve(network, func, rep, conf_bits, iorder, loop_count);
 
   if ( mVerify && stat ) {
     // 検証を行う．

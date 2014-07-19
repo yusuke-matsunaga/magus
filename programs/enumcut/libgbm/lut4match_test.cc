@@ -47,7 +47,8 @@ lut4match_test(int argc,
 
     vector<bool> conf_bits;
     vector<ymuint> iorder;
-    bool stat = solver.solve(network, f, conf_bits, iorder);
+    ymuint loop_count;
+    bool stat = solver.solve(network, f, conf_bits, iorder, loop_count);
     if ( !stat ) {
       cerr << "Failed" << endl
 	   << "f = " << f << endl;

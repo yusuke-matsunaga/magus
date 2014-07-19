@@ -42,10 +42,12 @@ GbmBddCegarEnum::_solve(const RcfNetwork& network,
 			const TvFunc& func,
 			const vector<ymuint>& rep,
 			vector<bool>& conf_bits,
-			vector<ymuint>& iorder)
+			vector<ymuint>& iorder,
+			ymuint& loop_count)
 {
   ymuint ni = network.input_num();
   ymuint np = 0;
+  loop_count = 0;
   for (PermGen pg(ni, ni); !pg.is_end(); ++ pg) {
     vector<ymuint> tmp_order(ni);
     bool skip = false;
@@ -77,7 +79,7 @@ GbmBddCegarEnum::_solve(const RcfNetwork& network,
       continue;
     }
     ++ np;
-    bool stat = _solve_with_order(network, func, tmp_order, conf_bits);
+    bool stat = _solve_with_order(network, func, tmp_order, conf_bits, loop_count);
     if ( stat ) {
       iorder.resize(ni, 0);
       for (ymuint i = 0; i < ni; ++ i) {
@@ -103,7 +105,8 @@ bool
 GbmBddCegarEnum::_solve_with_order(const RcfNetwork& network,
 				   const TvFunc& func,
 				   const vector<ymuint>& iorder,
-				   vector<bool>& conf_bits)
+				   vector<bool>& conf_bits,
+				   ymuint& loop_count)
 {
   BddMgr mgr("bmc", "gbm");
 
@@ -123,7 +126,7 @@ GbmBddCegarEnum::_solve_with_order(const RcfNetwork& network,
   ymuint ni_exp = 1U << ni;
   vector<bool> check(ni_exp, false);
   ymuint bit_pat = 0U;
-  for ( ; ; ) {
+  for ( ; ; ++ loop_count) {
     check[bit_pat] = true;
     // 入力に定数を割り当てたときの CNF 式を作る．
     ymuint oval = func.value(bit_pat);

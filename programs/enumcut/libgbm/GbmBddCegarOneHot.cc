@@ -42,7 +42,8 @@ GbmBddCegarOneHot::_solve(const RcfNetwork& network,
 			  const TvFunc& func,
 			  const vector<ymuint>& rep,
 			  vector<bool>& conf_bits,
-			  vector<ymuint>& iorder)
+			  vector<ymuint>& iorder,
+			  ymuint& loop_count)
 {
   ymuint nc = network.conf_var_num();
   ymuint ni = network.input_num();
@@ -64,7 +65,7 @@ GbmBddCegarOneHot::_solve(const RcfNetwork& network,
   vector<bool> check(ni_exp, false);
   Bool3 stat = kB3X;
   ymuint bit_pat = 0;
-  for ( ;; ) {
+  for (loop_count = 1; ; ++ loop_count) {
     check[bit_pat] = true;
     // 入力に定数を割り当てる．
     if ( debug() ) {

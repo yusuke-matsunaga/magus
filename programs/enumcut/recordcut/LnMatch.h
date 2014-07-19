@@ -56,6 +56,11 @@ public:
   ymuint
   get_templ_count(ymuint pos) const;
 
+  /// @brief テンプレートのループカウンタ値を得る．
+  /// @param[in] pos テンプレート番号 ( 0 <= pos < templ_num() )
+  ymuint
+  get_templ_loop_count(ymuint pos) const;
+
   /// @brief カウンタの値を得る．
   void
   get_count(ymuint& trivial_num,
@@ -100,6 +105,10 @@ private:
 
     // マッチした回数
     ymuint32 mCount;
+
+    // マッチ中のループ回数
+    ymuint64 mLoopCount;
+
   };
 
 

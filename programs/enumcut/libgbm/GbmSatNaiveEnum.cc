@@ -41,13 +41,16 @@ GbmSatNaiveEnum::~GbmSatNaiveEnum()
 //             関数の入力番号が入る．
 bool
 GbmSatNaiveEnum::_solve(const RcfNetwork& network,
-		     const TvFunc& func,
-		     const vector<ymuint>& rep,
-		     vector<bool>& conf_bits,
-		     vector<ymuint>& iorder)
+			const TvFunc& func,
+			const vector<ymuint>& rep,
+			vector<bool>& conf_bits,
+			vector<ymuint>& iorder,
+			ymuint& loop_count)
 {
+  loop_count = 0;
   ymuint ni = network.input_num();
   for (PermGen pg(ni, ni); !pg.is_end(); ++ pg) {
+    ++ loop_count;
     vector<ymuint> tmp_order(ni);
     bool skip = false;
     for (ymuint i = 0; i < ni; ++ i) {

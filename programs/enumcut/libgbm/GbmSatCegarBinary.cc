@@ -43,7 +43,8 @@ GbmSatCegarBinary::_solve(const RcfNetwork& network,
 			  const TvFunc& func,
 			  const vector<ymuint>& rep,
 			  vector<bool>& conf_bits,
-			  vector<ymuint>& iorder)
+			  vector<ymuint>& iorder,
+			  ymuint& loop_count)
 {
 #if 1
   SatSolver solver("minisat");
@@ -76,7 +77,7 @@ GbmSatCegarBinary::_solve(const RcfNetwork& network,
   Bool3 stat = kB3X;
   vector<Bool3> model;
   ymuint bit_pat = 0;
-  for ( ;; ) {
+  for (loop_count = 1; ; ++ loop_count) {
     check[bit_pat] = true;
     // 入力に定数を割り当てる．
     if ( debug() ) {

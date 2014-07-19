@@ -13,6 +13,7 @@
 #include "logic/TvFunc.h"
 #include "GbmSolver.h"
 #include "LnMatch.h"
+#include "utils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -52,15 +53,26 @@ public:
   void
   get_count(ymuint& trivial_num,
 	    ymuint& a0_num,
+	    ymuint& a0_loop,
 	    ymuint& a1_num,
+	    ymuint& a1_loop,
 	    ymuint& a2_num,
+	    ymuint& a2_loop,
 	    ymuint& a3_num,
+	    ymuint& a3_loop,
 	    ymuint& b0_num,
+	    ymuint& b0_loop,
 	    ymuint& b1_num,
+	    ymuint& b1_loop,
 	    ymuint& b2_num,
+	    ymuint& b2_loop,
 	    ymuint& c0_num,
+	    ymuint& c0_loop,
 	    ymuint& c1_num,
-	    ymuint& fail_num);
+	    ymuint& c1_loop,
+	    ymuint& fail_num,
+	    USTime& ok_time,
+	    USTime& ng_time);
 
 
 private:
@@ -80,6 +92,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   LnMatch mMatcher;
+
+  USTime mOKTime;
+
+  USTime mNGTime;
 
 };
 

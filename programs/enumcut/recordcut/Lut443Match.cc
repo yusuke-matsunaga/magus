@@ -8,6 +8,7 @@
 
 
 #include "Lut443Match.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -111,7 +112,17 @@ bool
 Lut443Match::match(const TvFunc& func,
 		   GbmSolver& solver)
 {
-  return mMatcher.match(func, solver);
+  StopWatch timer;
+  timer.start();
+  bool stat = mMatcher.match(func, solver);
+  timer.stop();
+  if ( stat ) {
+    mOKTime += timer.time();
+  }
+  else {
+    mNGTime += timer.time();
+  }
+  return stat;
 }
 
 // @brief カウンタをリセットする．
@@ -119,32 +130,56 @@ void
 Lut443Match::reset_count()
 {
   mMatcher.reset_count();
+  mOKTime.set(0.0, 0.0, 0.0);
+  mNGTime.set(0.0, 0.0, 0.0);
 }
 
 // @brief カウンタの値を得る．
 void
 Lut443Match::get_count(ymuint& trivial_num,
 		       ymuint& a0_num,
+		       ymuint& a0_loop,
 		       ymuint& a1_num,
+		       ymuint& a1_loop,
 		       ymuint& a2_num,
+		       ymuint& a2_loop,
 		       ymuint& a3_num,
+		       ymuint& a3_loop,
 		       ymuint& b0_num,
+		       ymuint& b0_loop,
 		       ymuint& b1_num,
+		       ymuint& b1_loop,
 		       ymuint& b2_num,
+		       ymuint& b2_loop,
 		       ymuint& c0_num,
+		       ymuint& c0_loop,
 		       ymuint& c1_num,
-		       ymuint& fail_num)
+		       ymuint& c1_loop,
+		       ymuint& fail_num,
+		       USTime& ok_time,
+		       USTime& ng_time)
 {
   mMatcher.get_count(trivial_num, fail_num);
   a0_num = mMatcher.get_templ_count(0);
+  a0_loop = mMatcher.get_templ_loop_count(0);
   a1_num = mMatcher.get_templ_count(1);
+  a1_loop = mMatcher.get_templ_loop_count(1);
   a2_num = mMatcher.get_templ_count(2);
+  a2_loop = mMatcher.get_templ_loop_count(2);
   a3_num = mMatcher.get_templ_count(3);
+  a3_loop = mMatcher.get_templ_loop_count(3);
   b0_num = mMatcher.get_templ_count(4);
+  b0_loop = mMatcher.get_templ_loop_count(4);
   b1_num = mMatcher.get_templ_count(5);
+  b1_loop = mMatcher.get_templ_loop_count(5);
   b2_num = mMatcher.get_templ_count(6);
+  b2_loop = mMatcher.get_templ_loop_count(6);
   c0_num = mMatcher.get_templ_count(7);
+  c0_loop = mMatcher.get_templ_loop_count(7);
   c1_num = mMatcher.get_templ_count(8);
+  c1_loop = mMatcher.get_templ_loop_count(8);
+  ok_time = mOKTime;
+  ng_time = mNGTime;
 }
 
 void

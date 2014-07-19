@@ -89,7 +89,9 @@ LnMatch::match(const TvFunc& func,
   const vector<RcfTempl*>& templ_list = mTemplList[ni1 - mMinInputs];
   for (ymuint i = 0; i < templ_list.size(); ++ i) {
     RcfTempl& templ = *templ_list[i];
-    bool stat = solver.solve(*templ.mNetwork, func1, conf_bits, iorder);
+    ymuint loop_count;
+    bool stat = solver.solve(*templ.mNetwork, func1, conf_bits, iorder, loop_count);
+    templ.mLoopCount += loop_count;
     if ( stat ) {
       if ( debug ) {
 	cout << "Type A-4 Match" << endl;
@@ -138,6 +140,15 @@ LnMatch::get_templ_count(ymuint pos) const
   return mAllList[pos]->mCount;
 }
 
+// @brief テンプレートのループカウンタ値を得る．
+// @param[in] pos テンプレート番号 ( 0 <= pos < templ_num() )
+ymuint
+LnMatch::get_templ_loop_count(ymuint pos) const
+{
+  assert_cond( pos < templ_num(), __FILE__, __LINE__);
+  return mAllList[pos]->mLoopCount;
+}
+
 // @brief カウンタの値を得る．
 void
 LnMatch::get_count(ymuint& trival_num,
@@ -169,6 +180,7 @@ LnMatch::add_templ(ymuint input_num,
   RcfTempl* templ = new RcfTempl;
   templ->mNetwork = network;
   templ->mCount = 0;
+  templ->mLoopCount = 0;
   mAllList.push_back(templ);
   mTemplList[input_num - mMinInputs].push_back(templ);
 }

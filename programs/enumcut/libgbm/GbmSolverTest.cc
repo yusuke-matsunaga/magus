@@ -53,7 +53,8 @@ and9_test()
   GbmSatNaiveBinary solver;
   vector<bool> conf_bits;
   vector<ymuint> iorder;
-  bool stat = solver.solve(network, and9, conf_bits, iorder);
+  ymuint loop_count;
+  bool stat = solver.solve(network, and9, conf_bits, iorder, loop_count);
   if ( stat ) {
     cout << "Match succeed" << endl;
     ymuint nc = network.conf_var_num();
@@ -64,6 +65,7 @@ and9_test()
   else {
     cout << "Match failed" << endl;
   }
+  cout << " loop count = " << loop_count << endl;
 
   return stat;
 }
@@ -104,7 +106,8 @@ GbmSolverTest(int argc,
   GbmSatNaiveBinary solver;
   vector<bool> conf_bits;
   vector<ymuint> iorder;
-  bool stat = solver.solve(network, func, conf_bits, iorder);
+  ymuint loop_count;
+  bool stat = solver.solve(network, func, conf_bits, iorder, loop_count);
   if ( stat ) {
     cout << "Match succeed" << endl;
     ymuint nc = network.conf_var_num();
@@ -119,6 +122,7 @@ GbmSolverTest(int argc,
   else {
     cout << "Match failed" << endl;
   }
+  cout << " loop count = " << loop_count << endl;
 
   return 0;
 }

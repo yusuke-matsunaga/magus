@@ -54,7 +54,8 @@ private:
 	 const TvFunc& func,
 	 const vector<ymuint>& rep,
 	 vector<bool>& conf_bits,
-	 vector<ymuint>& iorder);
+	 vector<ymuint>& iorder,
+	 ymuint& loop_count);
 
 
 private:
@@ -74,7 +75,8 @@ private:
   _solve_with_order(const RcfNetwork& network,
 		    const TvFunc& func,
 		    const vector<ymuint>& iorder,
-		    vector<bool>& conf_bits);
+		    vector<bool>& conf_bits,
+		    ymuint& loop_count);
 
 };
 

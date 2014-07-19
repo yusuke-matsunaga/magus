@@ -53,7 +53,8 @@ private:
 	 const TvFunc& func,
 	 const vector<ymuint>& rep,
 	 vector<bool>& conf_bits,
-	 vector<ymuint>& iorder);
+	 vector<ymuint>& iorder,
+	 ymuint& loop_count);
 
 };
 

@@ -75,7 +75,8 @@ public:
   solve(const RcfNetwork& network,
 	const TvFunc& func,
 	vector<bool>& conf_bits,
-	vector<ymuint>& iorder);
+	vector<ymuint>& iorder,
+	ymuint& loop_count);
 
 
 private:
@@ -99,7 +100,8 @@ private:
 	 const TvFunc& func,
 	 const vector<ymuint>& rep,
 	 vector<bool>& conf_bits,
-	 vector<ymuint>& iorder) = 0;
+	 vector<ymuint>& iorder,
+	 ymuint& loop_count) = 0;
 
   /// @brief 検証を行う．
   /// @param[in] network RcfNetwork
