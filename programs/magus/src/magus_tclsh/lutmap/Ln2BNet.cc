@@ -8,7 +8,7 @@
 
 
 #include "Ln2BNet.h"
-#include "techmap/LnGraph.h"
+#include "LnGraph.h"
 #include "networks/BNetwork.h"
 #include "networks/BNetManip.h"
 

@@ -9,6 +9,7 @@ SUBDIRS = \
 	cellmap \
 	lutmap \
 	lutmapx \
+	sbjgraph \
 	. \
 	tests
 

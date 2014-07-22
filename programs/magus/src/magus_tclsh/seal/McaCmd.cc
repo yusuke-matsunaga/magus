@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 #include "McaCmd.h"
-#include "seal/MCAnalysis.h"
+#include "MCAnalysis.h"
 #include "networks/BNetwork.h"
 
 

@@ -28,7 +28,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libmagus_test.la
+noinst_LTLIBRARIES = libmagus_test_tcl.la
 
 
 ############################################################
@@ -37,22 +37,24 @@ noinst_LTLIBRARIES = libmagus_test.la
 
 AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/src/magus_tclsh/include
 
 
 ############################################################
-## libmagus_test.la 用の変数の定義
+## libmagus_test_tcl.la 用の変数の定義
 ############################################################
 
-libmagus_test_la_SOURCES = \
+libmagus_test_tcl_la_SOURCES = \
 	TestCmd.h \
 	TestCmd.cc
 
-libmagus_test_la_LIBADD =
+libmagus_test_tcl_la_LIBADD =
 
-libmagus_test_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+libmagus_test_tcl_la_LDFLAGS =

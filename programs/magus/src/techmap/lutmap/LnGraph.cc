@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/LnGraph.h"
+#include "LnGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -237,7 +237,7 @@ LnGraph::port_pos(const LnNode* node) const
     return mOutputPortArray[node->subid()].mPos;
   }
   else {
-    return NULL;
+    return 0;
   }
 }
 

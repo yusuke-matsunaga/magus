@@ -13,7 +13,7 @@
 
 #include "ymtools.h"
 
-#include "ym_utils/DlList.h"
+#include "utils/DlList.h"
 
 
 /// @brief lutmap 用の名前空間の開始

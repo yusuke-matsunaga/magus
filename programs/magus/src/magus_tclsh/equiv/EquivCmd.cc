@@ -10,7 +10,7 @@
 
 
 #include "EquivCmd.h"
-#include "cec/cec_nsdef.h"
+#include "cec_nsdef.h"
 #include "tclpp/TclPopt.h"
 #include "networks/BdnPort.h"
 #include "networks/BdnNode.h"

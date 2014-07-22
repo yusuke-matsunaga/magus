@@ -28,9 +28,8 @@ misc_init(Tcl_Interp* interp)
   // 時間計測/乱数発生コマンド
   TclCmdBinder<StpwatchCls>::reg(interp, "magus::stopwatch");
   TclCmdBinder<TimeCmd>::reg(interp,     "magus::time");
-  TclCmdBinder<RandCmd>::reg(interp,     "magus::random");
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // tclreadline 用の処理
   // すごい手抜き
@@ -40,7 +39,6 @@ misc_init(Tcl_Interp* interp)
     "namespace eval magus {\n"
     "proc complete(stopwatch) { t s e l p m } { return \"\" }\n"
     "proc complete(time) { t s e l p m } { return \"\" }\n"
-    "proc complete(random) { t s e l p m } { return \"\" }\n"
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

@@ -12,7 +12,7 @@
 
 
 #include "ymtools.h"
-#include "ym_utils/DlList.h"
+#include "utils/DlList.h"
 
 
 /// @brief sbj 用の名前空間の開始

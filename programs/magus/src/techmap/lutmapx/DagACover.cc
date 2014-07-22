@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/DagACover.h"
-#include "ym_techmap/WeightCover.h"
+#include "DagACover.h"
+#include "WeightCover.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

@@ -10,7 +10,7 @@
 
 
 #include "LogicSim.h"
-#include "ym_seal/MCAnalysis.h"
+#include "MCAnalysis.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -22,7 +22,7 @@ enum_loop(LogicSim& logic_sim,
 	  ymuint input_num,
 	  const vector<State>& init_states,
 	  vector<State>& reachable_states,
-	  hash_map<State, ymuint>& state_map)
+	  unordered_map<State, ymuint>& state_map)
 {
   list<State> state_queue;
   reachable_states.clear();
@@ -61,7 +61,7 @@ enum_pair_loop(LogicSim& logic_sim,
 	       ymuint ff_num,
 	       const vector<State>& init_states,
 	       vector<State>& reachable_states,
-	       hash_map<State, ymuint>& state_map)
+	       unordered_map<State, ymuint>& state_map)
 {
   list<State> state_queue;
   reachable_states.clear();
@@ -122,27 +122,27 @@ fsm_analysis2(const BNetwork& bnetwork,
   ymuint input_num = bnetwork.input_num();
   ymuint ff_num = bnetwork.latch_node_num();
 
-  hash_map<State, ymuint> state_map1;
+  unordered_map<State, ymuint> state_map1;
   enum_loop(logic_sim, input_num, init_states, reachable_states1, state_map1);
-  
+
   ymuint n = reachable_states1.size();
-  
+
   ymuint sim_num = 1U << input_num;
   double m_weight = 1.0 / sim_num;
   trans_map1.clear();
   trans_map1.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     State cur_state = reachable_states1[i];
-    hash_map<ymuint, ymuint> count_map;
+    unordered_map<ymuint, ymuint> count_map;
     for (ymuint input_vector = 0U; input_vector < sim_num; ++ input_vector) {
       ymuint output_vector;
       State next_state;
       logic_sim(input_vector, cur_state, output_vector, next_state);
-      hash_map<State, ymuint>::iterator q = state_map1.find(next_state);
+      unordered_map<State, ymuint>::iterator q = state_map1.find(next_state);
       assert_cond( q != state_map1.end(), __FILE__, __LINE__);
 
       ymuint nid = q->second;
-      hash_map<ymuint, ymuint>::iterator p = count_map.find(nid);
+      unordered_map<ymuint, ymuint>::iterator p = count_map.find(nid);
       if ( p == count_map.end() ) {
 	count_map.insert(make_pair(nid, 1));
       }
@@ -150,8 +150,8 @@ fsm_analysis2(const BNetwork& bnetwork,
 	++ p->second;
       }
     }
-      
-    for (hash_map<ymuint, ymuint>::iterator p = count_map.begin();
+
+    for (unordered_map<ymuint, ymuint>::iterator p = count_map.begin();
 	 p != count_map.end(); ++ p) {
       ymuint nid = p->first;
       ymuint count = p->second;
@@ -175,11 +175,11 @@ fsm_analysis2(const BNetwork& bnetwork,
       init_states2.push_back(c_state + e_state);
     }
   }
-  
-  hash_map<State, ymuint> state_map2;
+
+  unordered_map<State, ymuint> state_map2;
   enum_pair_loop(logic_sim, input_num, ff_num, init_states2,
 		 reachable_states2, state_map2);
-  
+
   ymuint pair_num = reachable_states2.size();
   failure_prob.resize(pair_num);
   trans_map2.clear();
@@ -188,7 +188,7 @@ fsm_analysis2(const BNetwork& bnetwork,
     State p_pair = reachable_states2[i];
     State c_state = p_pair.substr(0, ff_num);
     State e_state = p_pair.substr(ff_num, ff_num);
-    hash_map<ymuint, ymuint> count_map;
+    unordered_map<ymuint, ymuint> count_map;
     ymuint fcount = 0;
     for (ymuint input_vector = 0U; input_vector < sim_num; ++ input_vector) {
       ymuint c_output;
@@ -202,10 +202,10 @@ fsm_analysis2(const BNetwork& bnetwork,
       }
       else if ( c_next != e_next ) {
 	State n_pair = c_next + e_next;
-	hash_map<State, ymuint>::iterator q = state_map2.find(n_pair);
+	unordered_map<State, ymuint>::iterator q = state_map2.find(n_pair);
 	assert_cond( q != state_map2.end(), __FILE__, __LINE__);
 	ymuint nid = q->second;
-	hash_map<ymuint, ymuint>::iterator p = count_map.find(nid);
+	unordered_map<ymuint, ymuint>::iterator p = count_map.find(nid);
 	if ( p == count_map.end() ) {
 	  count_map.insert(make_pair(nid, 1));
 	}
@@ -214,8 +214,8 @@ fsm_analysis2(const BNetwork& bnetwork,
 	}
       }
     }
-    
-    for (hash_map<ymuint, ymuint>::iterator p = count_map.begin();
+
+    for (unordered_map<ymuint, ymuint>::iterator p = count_map.begin();
 	 p != count_map.end(); ++ p) {
       ymuint nid = p->first;
       double prob = static_cast<double>(p->second) * m_weight;

@@ -9,7 +9,7 @@
 
 #include "SbjMinDepth.h"
 #include "SmdNode.h"
-#include "ym_techmap/SbjGraph.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ

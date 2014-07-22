@@ -12,7 +12,7 @@
 
 
 #include "MagCmd.h"
-#include "techmap/LnGraph.h"
+#include "LnGraph.h"
 
 
 BEGIN_NAMESPACE_MAGUS

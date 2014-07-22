@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_seal/seal_nsdef.h"
-#include "ym_networks/bnet.h"
+#include "seal_nsdef.h"
+#include "networks/bnet.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -120,7 +120,7 @@ private:
 
   // 正常回路の遷移確率を保持するハッシュ表
   // キーは '現状態番号' * 状態数 + '次状態番号'
-  //hash_map<ymuint, double> mTransProb1;
+  //unordered_map<ymuint, double> mTransProb1;
   vector<list<TransProb> > mTransProb1;
 
   // 正常回路の各状態の定常状態における存在確率
@@ -131,14 +131,14 @@ private:
 
   // 回路対の遷移確率を保持するハッシュ表
   // キーは '現状態番号' * 状態数 + '次状態番号'
-  //hash_map<ymuint, double> mTransProb2;
+  //unordered_map<ymuint, double> mTransProb2;
   vector<list<TransProb> > mTransProb2;
 
   // 回路対の一時状態から failure 状態への遷移確率
   vector<double> mFailureProb0;
 
   // 回路対の各状態の初期存在確率
-  hash_map<State, double> mInitialProb;
+  unordered_map<State, double> mInitialProb;
 
   // 回路対の各状態の failure 吸収確率
   vector<double> mFailureProb;

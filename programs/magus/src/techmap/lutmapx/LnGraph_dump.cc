@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/LnGraph.h"
+#include "LnGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -230,7 +230,7 @@ dump_verilog(ostream& s,
   const LnNodeList& dff_list = lngraph.dff_list();
   const LnNodeList& lut_list = lngraph.lnode_list();
 
-  hash_set<string> lut_name_set;
+  unordered_set<string> lut_name_set;
   ymuint n = lngraph.max_node_id();
   vector<string> lut_names(n);
 

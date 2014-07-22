@@ -8,9 +8,9 @@
 
 
 #include "PatMatcher.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/CellPatGraph.h"
+#include "networks/BdnNode.h"
+#include "cell/CellLibrary.h"
+#include "cell/CellPatGraph.h"
 #include "Match.h"
 
 
@@ -175,7 +175,7 @@ PatMatcher::bind(const BdnNode* sbj_node,
     mClearQueue.push_back(pat_id);
   }
 
-  hash_map<ymuint, ymuint>::iterator p = mPatMap.find(sbj_node->id());
+  unordered_map<ymuint, ymuint>::iterator p = mPatMap.find(sbj_node->id());
   if ( p != mPatMap.end() ) {
     if ( p->second != pat_id ) {
       // SbjNode が既に他のノードにバインドしていた．

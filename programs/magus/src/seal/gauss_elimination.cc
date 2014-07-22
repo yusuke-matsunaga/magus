@@ -11,7 +11,7 @@
 
 #include "Matrix.h"
 #include "SMatrix.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL

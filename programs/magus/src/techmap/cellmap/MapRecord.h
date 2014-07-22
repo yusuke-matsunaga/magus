@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/cellmap_nsdef.h"
-#include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellFFInfo.h"
-#include "ym_cell/CellLatchInfo.h"
-#include "ym_networks/cmn.h"
+#include "cellmap_nsdef.h"
+#include "cell/cell_nsdef.h"
+#include "cell/CellFFInfo.h"
+#include "cell/CellLatchInfo.h"
+#include "networks/cmn.h"
 #include "Match.h"
 
 

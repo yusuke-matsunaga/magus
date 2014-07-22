@@ -10,8 +10,8 @@
 
 
 #include "CutResub.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnNode.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"

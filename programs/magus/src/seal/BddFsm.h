@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_seal/seal_nsdef.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddVarSet.h"
-#include "ym_seal/MCAnalysis.h"
+#include "seal_nsdef.h"
+#include "logic/Bdd.h"
+#include "logic/BddVarSet.h"
+#include "MCAnalysis.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -129,7 +129,7 @@ private:
   /// @param[in] trans_prob_map 確率を収めるハッシュ表
   void
   rs_sub(Bdd rel,
-	 const hash_map<State, ymuint>& state_hash,
+	 const unordered_map<State, ymuint>& state_hash,
 	 vector<ymuint>& st_vec,
 	 vector<list<TransProb> >& trans_map);
 

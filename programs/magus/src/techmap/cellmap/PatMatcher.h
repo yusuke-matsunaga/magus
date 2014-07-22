@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/cellmap_nsdef.h"
-#include "ym_networks/bdn.h"
-#include "ym_cell/cell_nsdef.h"
+#include "cellmap_nsdef.h"
+#include "networks/bdn.h"
+#include "cell/cell_nsdef.h"
 #include "Match.h"
 
 
@@ -90,7 +90,7 @@ private:
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
-  hash_map<ymuint, ymuint> mPatMap;
+  unordered_map<ymuint, ymuint> mPatMap;
 
   // パタンノードの ID をキーとして極性を入れる配列
   vector<bool> mInvMap;

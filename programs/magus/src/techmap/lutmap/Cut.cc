@@ -10,7 +10,7 @@
 
 
 #include "Cut.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -33,14 +33,14 @@ BEGIN_NONAMESPACE
 // を返す．
 Expr
 calc_expr_for_node(const BdnNode* node,
-		   const hash_map<ymuint, Expr>& logmap)
+		   const unordered_map<ymuint, Expr>& logmap)
 {
   Expr ans;
   if ( node == NULL ) {
     ans =  Expr::make_zero();
   }
   else {
-    hash_map<ymuint, Expr>::const_iterator p = logmap.find(node->id());
+    unordered_map<ymuint, Expr>::const_iterator p = logmap.find(node->id());
     if ( p != logmap.end() ) {
       ans = p->second;
     }
@@ -77,7 +77,7 @@ Cut::expr() const
     return Expr::make_zero();
   }
 
-  hash_map<ymuint, Expr> logmap;
+  unordered_map<ymuint, Expr> logmap;
   for (ymuint i = 0; i < input_num(); i ++) {
     const BdnNode* node = mInputs[i];
     ymuint id = node->id();

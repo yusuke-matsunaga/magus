@@ -7,6 +7,7 @@
 
 SUBDIRS = \
 	cequiv \
+	seal \
 	techmap \
 	magus_tclsh
 

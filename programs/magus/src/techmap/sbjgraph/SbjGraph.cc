@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/SbjGraph.h"
+#include "SbjGraph.h"
 #include "SbjMinDepth.h"
 
 

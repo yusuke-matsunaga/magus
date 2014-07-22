@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_seal/seal_nsdef.h"
-#include "ym_utils/Alloc.h"
+#include "seal_nsdef.h"
+#include "utils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL

@@ -6,7 +6,6 @@
 ############################################################
 
 SUBDIRS = \
-	ym_seal \
 	. \
 	tests
 
@@ -24,16 +23,14 @@ MAINTAINERCLEANFILES = Makefile.in
 ## dist ターゲットの指定
 ############################################################
 
-EXTRA_DIST = \
-	configure \
-	configure.ac
+EXTRA_DIST =
 
 
 ############################################################
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_seal.la
+noinst_LTLIBRARIES = libseal.la
 
 
 ############################################################
@@ -42,15 +39,20 @@ noinst_LTLIBRARIES = libym_seal.la
 
 AM_CPPFLAGS = \
 	$(GMP_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
+	-I$(top_srcdir)/include
 
 
 ############################################################
-## libym_seal.la 用の変数の定義
+## libseal.la 用の変数の定義
 ############################################################
 
-libym_seal_la_SOURCES = \
+libseal_la_SOURCES = \
 	BddFsm.h \
 	BddFsm.cc \
 	IdxMapper.h \
@@ -68,9 +70,7 @@ libym_seal_la_SOURCES = \
 	lu_decomp.cc \
 	MCAnalysis.cc
 
-libym_seal_la_LIBADD =
+libseal_la_LIBADD =
 
-libym_seal_la_LDFLAGS = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la
+libseal_la_LDFLAGS = \
 	$(GMP_LIBS)

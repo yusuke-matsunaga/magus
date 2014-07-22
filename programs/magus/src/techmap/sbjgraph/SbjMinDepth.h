@@ -11,9 +11,9 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/sbj_nsdef.h"
-#include "ym_techmap/SbjGraph.h"
-#include "ym_utils/Alloc.h"
+#include "sbj_nsdef.h"
+#include "SbjGraph.h"
+#include "utils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ

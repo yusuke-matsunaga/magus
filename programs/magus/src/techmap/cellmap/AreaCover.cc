@@ -8,21 +8,21 @@
 
 
 #include "AreaCover.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnDff.h"
-#include "ym_networks/CmnMgr.h"
-#include "ym_cell/Cell.h"
-#include "ym_cell/CellLibrary.h"
-#include "ym_cell/CellPatGraph.h"
-#include "ym_cell/CellClass.h"
-#include "ym_cell/CellGroup.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnDff.h"
+#include "networks/CmnMgr.h"
+#include "cell/Cell.h"
+#include "cell/CellLibrary.h"
+#include "cell/CellPatGraph.h"
+#include "cell/CellClass.h"
+#include "cell/CellGroup.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
 
-#include "ym_logic/NpnMapM.h"
+#include "logic/NpnMapM.h"
 
-#include "ym_networks/BdnVerilogWriter.h"
-#include "ym_networks/BdnDumper.h"
+#include "networks/BdnVerilogWriter.h"
+#include "networks/BdnDumper.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -244,14 +244,14 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	    ymuint pos = dst_var.val();
 	    const BdnNode* inode = match.leaf_node(pos);
 	    bool iinv = match.leaf_inv(pos);
-	    if ( imap.pol() == kPolNega ) {
+	    if ( imap.inv() ) {
 	      iinv = !iinv;
 	    }
 	    c_match.set_leaf(i, inode, iinv);
 	    mLeafNum[inode->id()] = i;
 	  }
 	  bool root_inv = pat.root_inv();
-	  if ( npn_map.omap(VarId(0)).pol() == kPolNega ) {
+	  if ( npn_map.omap(VarId(0)).inv() ) {
 	    root_inv = !root_inv;
 	  }
 	  if ( debug ) {

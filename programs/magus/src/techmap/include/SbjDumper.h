@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/sbj_nsdef.h"
+#include "sbj_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ

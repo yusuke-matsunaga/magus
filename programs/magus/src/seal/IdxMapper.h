@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_seal/seal_nsdef.h"
+#include "seal_nsdef.h"
 
 BEGIN_NAMESPACE_YM_SEAL
 

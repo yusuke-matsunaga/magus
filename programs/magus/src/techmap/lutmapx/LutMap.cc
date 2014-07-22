@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/LutMap.h"
+#include "LutMap.h"
 #include "AreaCover.h"
 #include "DelayCover.h"
 
@@ -79,4 +79,3 @@ LutMap::delay_map(const BdnMgr& sbjgraph,
 }
 
 END_NAMESPACE_YM_LUTMAP
-

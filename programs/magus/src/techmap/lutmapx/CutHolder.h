@@ -13,7 +13,7 @@
 
 #include "EnumCutOp.h"
 #include "Cut.h"
-#include "ym_networks/BdnNode.h"
+#include "networks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

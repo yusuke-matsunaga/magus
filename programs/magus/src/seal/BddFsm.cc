@@ -10,10 +10,10 @@
 
 
 #include "BddFsm.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/BddLitSet.h"
+#include "logic/BddMgr.h"
+#include "logic/BddLitSet.h"
 
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -137,7 +137,7 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
 
   // 状態文字列から状態番号のハッシュ表を作る．
   ymuint ns = reachable_states.size();
-  hash_map<State, ymuint> state_hash;
+  unordered_map<State, ymuint> state_hash;
   for (ymuint i = 0; i < ns; ++ i) {
     state_hash.insert(make_pair(reachable_states[i], i));
   }
@@ -162,7 +162,7 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
 // @param[in] trans_prob_map 確率を収めるハッシュ表
 void
 BddFsm::rs_sub(Bdd rel,
-	       const hash_map<State, ymuint>& state_hash,
+	       const unordered_map<State, ymuint>& state_hash,
 	       vector<ymuint>& st_vec,
 	       vector<list<TransProb> >& trans_map)
 {
@@ -225,11 +225,11 @@ BddFsm::rs_sub(Bdd rel,
 	}
       }
       State cur_state = tmp.substr(0, ff_num());
-      hash_map<State, ymuint>::const_iterator q = state_hash.find(cur_state);
+      unordered_map<State, ymuint>::const_iterator q = state_hash.find(cur_state);
       assert_cond( q != state_hash.end(), __FILE__, __LINE__);
       ymuint cur_state_id = q->second;
       State next_state = tmp.substr(ff_num(), ff_num());
-      hash_map<State, ymuint>::const_iterator r = state_hash.find(next_state);
+      unordered_map<State, ymuint>::const_iterator r = state_hash.find(next_state);
       assert_cond( r != state_hash.end(), __FILE__, __LINE__);
       ymuint next_state_id = r->second;
       trans_map[cur_state_id].push_back(TransProb(next_state_id, prob));
@@ -282,7 +282,7 @@ BddFsm::bdd2cur_states(Bdd bdd_states,
     vector<ymuint> work(ff_num(), 0);
     for (ymuint i = 0; i < litvec.size(); ++ i) {
       Literal l = litvec[i];
-      int pat = (l.pol() == kPolNega) ? 1 : 3;
+      int pat = l.is_negative() ? 1 : 3;
       VarId id = l.varid();
       ymuint pos;
       bool stat = cur_varid2pos(id, pos);
@@ -341,7 +341,7 @@ BddFsm::bdd2next_states(Bdd bdd_states,
     vector<ymuint> work(ff_num(), 0);
     for (ymuint i = 0; i < litvec.size(); ++ i) {
       Literal l = litvec[i];
-      int pat = (l.pol() == kPolNega) ? 1 : 3;
+      int pat = l.is_negative() ? 1 : 3;
       VarId id = l.varid();
       ymuint pos;
       bool stat = next_varid2pos(id, pos);

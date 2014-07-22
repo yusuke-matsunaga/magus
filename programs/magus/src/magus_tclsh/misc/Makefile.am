@@ -38,8 +38,10 @@ noinst_LTLIBRARIES = libmagus_misc_tcl.la
 AM_CPPFLAGS = \
 	$(TCL_INCLUDES) \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
 	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/magus_tclsh/include
 
 
 ############################################################
@@ -49,8 +51,6 @@ AM_CPPFLAGS = \
 libmagus_misc_tcl_la_SOURCES = \
 	TimeCmd.h \
 	TimeCmd.cc \
-	RandCmd.h \
-	RandCmd.cc \
 	misc_init.cc
 
 libmagus_misc_tcl_la_LIBADD =

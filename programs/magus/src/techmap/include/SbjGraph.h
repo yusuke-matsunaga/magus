@@ -11,11 +11,12 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/sbj_nsdef.h"
+#include "sbj_nsdef.h"
 
-#include "ym_utils/Alloc.h"
-#include "ym_utils/DlList.h"
-#include "ym_utils/ItvlMgr.h"
+#include "utils/SimpleAlloc.h"
+#include "utils/FragAlloc.h"
+#include "utils/DlList.h"
+#include "utils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ

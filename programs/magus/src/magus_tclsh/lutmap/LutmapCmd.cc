@@ -12,7 +12,7 @@
 #include "LutmapCmd.h"
 #include "AreaMapCmd.h"
 #include "DelayMapCmd.h"
-#include "techmap/LnGraph.h"
+#include "LnGraph.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -37,9 +37,13 @@ bin_PROGRAMS = \
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
-	-I$(YMTOOLS_SRCDIR)/libraries/libym_techmap
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/techmap/include
 
 
 ############################################################
@@ -47,12 +51,12 @@ AM_CPPFLAGS = \
 ############################################################
 
 LIBYM_TECHMAP = \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la
+	$(top_builddir)/src/techmap/libtechmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/src/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/src/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la
 
 
 ############################################################

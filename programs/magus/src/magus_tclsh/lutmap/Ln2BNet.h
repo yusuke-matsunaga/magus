@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "techmap/lutmap_nsdef.h"
+#include "lutmap_nsdef.h"
 #include "networks/bnet.h"
 
 

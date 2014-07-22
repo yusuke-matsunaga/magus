@@ -10,7 +10,7 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ym_techmap/lutmap_nsdef.h"
+#include "lutmap_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

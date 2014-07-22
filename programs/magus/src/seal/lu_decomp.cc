@@ -10,7 +10,7 @@
 
 
 #include "Matrix.h"
-#include "ym_utils/StopWatch.h"
+#include "utils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -21,7 +21,7 @@ lu_decomp(const Matrix& src_matrix,
 	  vector<double>& solution)
 {
   ymuint32 nv = src_matrix.row_size();
-  
+
   if ( nv + 1 != src_matrix.col_size() ) {
     // 1列は右辺の定数だとして変数と数と方程式の数は等しくなければならない．
     cout << "nr + 1 != nc" << endl;
@@ -182,7 +182,7 @@ lu_decomp(const Matrix& src_matrix,
     solution[r] = v;
   }
   delete [] LU;
-    
+
 #if 1
 #if 0
   display(cout, src_matrix);
@@ -216,7 +216,7 @@ lu_decomp(const Matrix& src_matrix,
   }
   assert_cond(!error, __FILE__, __LINE__);
 #endif
-  
+
   return true;
 }
 

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/SbjDumper.h"
-#include "ym_techmap/SbjGraph.h"
+#include "SbjDumper.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ

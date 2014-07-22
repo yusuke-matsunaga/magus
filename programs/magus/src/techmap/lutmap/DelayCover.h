@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/lutmap_nsdef.h"
-#include "ym_networks/bdn.h"
+#include "lutmap_nsdef.h"
+#include "networks/bdn.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"

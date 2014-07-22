@@ -50,9 +50,14 @@ bin_PROGRAMS = \
 AM_CPPFLAGS = \
 	$(TCLRL_INCLUDES) \
 	$(TCL_INCLUDES) \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_cell/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
 	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/magus_tclsh/include \
 	-DMAGUS_LIBDIR='"$(MAGUS_LIBDIR)"' \
 	-DMAGUS_DATADIR='"$(MAGUS_DATADIR)"' \
 	-DMAGUS_BINDIR='"$(MAGUS_BINDIR)"'
@@ -70,20 +75,22 @@ magus_tclsh_LDADD = \
 	core/libmagus_core_tcl.la \
 	bnet/libmagus_bnet_tcl.la \
 	mvn/libmagus_mvn_tcl.la \
-	equiv/libmagus_equiv.la \
-	lutmap/libmagus_lutmap.la \
-	techmap/libmagus_techmap.la \
-	simplify/libmagus_siplify.la \
+	equiv/libmagus_equiv_tcl.la \
+	lutmap/libmagus_lutmap_tcl.la \
+	techmap/libmagus_techmap_tcl.la \
+	simplify/libmagus_simplify_tcl.la \
+	seal/libmagus_seal_tcl.la \
 	misc/libmagus_misc_tcl.la \
 	test/libmagus_test_tcl.la \
-	cequiv/libcequiv.la \
-	techmap/libtechmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/libym_logic.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/libym_utils.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/libym_tclpp.la \
+	../cequiv/libcequiv.la \
+	../seal/libseal.la \
+	../techmap/libtechmap.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/src/libym_networks.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/src/libym_verilog.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/src/libym_cell.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_logic/src/libym_logic.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_utils/src/libym_utils.la \
+	$(YMTOOLS_BUILDDIR)/libraries/libym_tclpp/src/libym_tclpp.la \
 	$(YM_LIBS_LIBTCLREADLINE) \
 	$(TCL_LDADD)
 

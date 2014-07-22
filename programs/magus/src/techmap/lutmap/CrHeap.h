@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/lutmap_nsdef.h"
+#include "lutmap_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

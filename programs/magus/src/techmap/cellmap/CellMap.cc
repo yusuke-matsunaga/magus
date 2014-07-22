@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/CellMap.h"
+#include "CellMap.h"
 #include "AreaCover.h"
 
 

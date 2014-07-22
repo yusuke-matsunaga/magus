@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/lutmap_nsdef.h"
-#include "ym_networks/BdnNode.h"
+#include "lutmap_nsdef.h"
+#include "networks/BdnNode.h"
 #include "EnumCutOp.h"
 
 

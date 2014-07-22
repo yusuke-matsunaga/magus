@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/cellmap_nsdef.h"
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/cmn.h"
-#include "ym_cell/cell_nsdef.h"
-#include "ym_cell/CellFFInfo.h"
+#include "cellmap_nsdef.h"
+#include "networks/BdnNode.h"
+#include "networks/cmn.h"
+#include "cell/cell_nsdef.h"
+#include "cell/CellFFInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

@@ -28,7 +28,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libmagus_simplify.la
+noinst_LTLIBRARIES = libmagus_simplify_tcl.la
 
 
 ############################################################
@@ -43,19 +43,20 @@ AM_CPPFLAGS = \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
 	-I$(YMTOOLS_SRCDIR)/libraries/libym_tclpp/include \
 	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src/magus_tclsh/include
 
 
 ############################################################
-## libmagus_simplify.la 用の変数の定義
+## libmagus_simplify_tcl.la 用の変数の定義
 ############################################################
 
-libmagus_simplify_la_SOURCES = \
+libmagus_simplify_tcl_la_SOURCES = \
 	simplify.h \
 	LrwCmd.h \
 	LrwCmd.cc
 	simplify_init.cc
 
-libmagus_simplify_la_LIBADD =
+libmagus_simplify_tcl_la_LIBADD =
 
-libmagus_simplify_la_LDFLAGS =
+libmagus_simplify_tcl_la_LDFLAGS =

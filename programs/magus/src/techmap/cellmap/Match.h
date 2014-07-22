@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/cellmap_nsdef.h"
-#include "ym_networks/bdn.h"
-#include "ym_logic/npn_nsdef.h"
+#include "cellmap_nsdef.h"
+#include "networks/bdn.h"
+#include "logic/npn_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

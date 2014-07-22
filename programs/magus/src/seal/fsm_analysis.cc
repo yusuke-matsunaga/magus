@@ -9,14 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_seal/MCAnalysis.h"
+#include "MCAnalysis.h"
 #include "BddFsm.h"
 #include "IdxMapper.h"
-#include "ym_utils/StopWatch.h"
-#include "ym_networks/BNetwork.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddMgr.h"
-#include "ym_logic/BddVarSet.h"
+#include "utils/StopWatch.h"
+#include "networks/BNetwork.h"
+#include "logic/Bdd.h"
+#include "logic/BddMgr.h"
+#include "logic/BddVarSet.h"
 
 
 BEGIN_NONAMESPACE
@@ -184,7 +184,7 @@ fsm_analysis(const BNetwork& bnetwork,
     VarBddMap fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {
       BNode* inode = node->fanin(i);
-      fanin_map.insert(make_pair(i, bdd_array[inode->id()]));
+      fanin_map.insert(make_pair(VarId(i), bdd_array[inode->id()]));
     }
     bdd_array[node->id()] = bddmgr.expr_to_bdd(expr, fanin_map);
   }

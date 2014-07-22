@@ -11,9 +11,9 @@
 /// All rights reserved.
 
 
-#include "ym_techmap/lutmap_nsdef.h"
-#include "ym_networks/bdn.h"
-#include "ym_logic/Expr.h"
+#include "lutmap_nsdef.h"
+#include "networks/bdn.h"
+#include "logic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

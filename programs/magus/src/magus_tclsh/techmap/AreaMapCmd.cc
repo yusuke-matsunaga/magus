@@ -10,8 +10,9 @@
 #include "AreaMapCmd.h"
 #include "tclpp/TclPopt.h"
 
+#include "CellMap.h"
+
 #include "networks/BNetBdnConv.h"
-#include "techmap/CellMap.h"
 #include "networks/MvnMgr.h"
 #include "networks/BdnMgr.h"
 #include "networks/MvnBdnConv.h"
