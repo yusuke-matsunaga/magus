@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
-#include "ym_logic/VarId.h"
+#include "cec_nsdef.h"
+#include "logic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -170,7 +170,7 @@ operator!=(CecHandle src1,
 /// @param[in] s 出力先のストリーム
 void
 dump_handle(CecHandle src,
-	    hash_set<ymuint>& mark,
+	    unordered_set<ymuint>& mark,
 	    ostream& s);
 
 /// @relates CecHandle

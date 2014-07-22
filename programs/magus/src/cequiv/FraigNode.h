@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
+#include "cec_nsdef.h"
 #include "FraigHandle.h"
-#include "ym_utils/RandGen.h"
+#include "utils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

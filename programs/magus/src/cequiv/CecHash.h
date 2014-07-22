@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
+#include "cec_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

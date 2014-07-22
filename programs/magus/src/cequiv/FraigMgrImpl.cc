@@ -12,8 +12,8 @@
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
 #include "FraigMgr.h"
-#include "ym_utils/StopWatch.h"
-#include "ym_logic/SatStats.h"
+#include "utils/StopWatch.h"
+#include "logic/SatStats.h"
 
 
 #if defined(YM_DEBUG)
@@ -33,14 +33,6 @@ BEGIN_NAMESPACE_YM_CEC
 BEGIN_NONAMESPACE
 
 const ymuint debug = DEBUG_FLAG;
-
-// boolean(inv) から tPol を得る．
-inline
-tPol
-inv2pol(bool inv)
-{
-  return inv ? kPolNega : kPolPosi;
-}
 
 END_NONAMESPACE
 
@@ -302,17 +294,19 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   mHashTable1.add_elem(pos1, node, node->mLink1);
 
   // 入出力の関係を表す CNF を作る．
-  VarId id = node->varid();
-  VarId id0 = handle1.varid();
-  VarId id1 = handle2.varid();
-  tPol pol0 = handle1.inv() ? kPolNega : kPolPosi;
-  tPol pol1 = handle2.inv() ? kPolNega : kPolPosi;
-  Literal lito(id, kPolPosi);
-  Literal lit1(id0, pol0);
-  Literal lit2(id1, pol1);
-  mSolver.add_clause(~lit1, ~lit2, lito);
-  mSolver.add_clause( lit1, ~lito);
-  mSolver.add_clause( lit2, ~lito);
+  {
+    VarId id = node->varid();
+    VarId id0 = handle1.varid();
+    VarId id1 = handle2.varid();
+    bool inv0 = handle1.inv();
+    bool inv1 = handle2.inv();
+    Literal lito(id, false);
+    Literal lit1(id0, inv0);
+    Literal lit2(id1, inv1);
+    mSolver.add_clause(~lit1, ~lit2, lito);
+    mSolver.add_clause( lit1, ~lito);
+    mSolver.add_clause( lit2, ~lito);
+  }
 
   // パタンハッシュで等しいノードがないか調べる．
   bool inv0 = node->pat_hash_inv();
@@ -594,8 +588,7 @@ FraigMgrImpl::check_const(FraigNode* node,
   StopWatch sw;
   sw.start();
 
-  tPol pol = inv2pol(inv);
-  Literal lit(id, pol);
+  Literal lit(id, inv);
 
   // この関数の戻り値
   Bool3 code = kB3X;
@@ -649,8 +642,8 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
   StopWatch sw;
   sw.start();
 
-  Literal lit1(id1, kPolPosi);
-  Literal lit2(id2, inv2pol(inv));
+  Literal lit1(id1, false);
+  Literal lit2(id2, inv);
 
   // この関数の戻り値
   Bool3 code = kB3X;
@@ -706,9 +699,9 @@ FraigMgrImpl::check_condition(Literal lit1)
     VarId id = solver.new_var();
     assert_cond(id == node->varid(), __FILE__, __LINE__);
     if ( node->is_and() ) {
-      Literal lito(id, kPolPosi);
-      Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
-      Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
+      Literal lito(id, false);
+      Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
+      Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause( lit1, ~lito);
       solver.add_clause( lit2, ~lito);
@@ -726,9 +719,9 @@ FraigMgrImpl::check_condition(Literal lit1)
       FraigNode* node = *p;
       if ( node->is_and() ) {
 	VarId id = node->varid();
-	Literal lito(id, kPolPosi);
-	Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
-	Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
+	Literal lito(id, false);
+	Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
+	Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -757,9 +750,9 @@ FraigMgrImpl::check_condition(Literal lit1,
     VarId id = solver.new_var();
     assert_cond(id == node->varid(), __FILE__, __LINE__);
     if ( node->is_and() ) {
-      Literal lito(id, kPolPosi);
-      Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
-      Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
+      Literal lito(id, false);
+      Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
+      Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause(lit1, ~lito);
       solver.add_clause(lit2, ~lito);
@@ -778,9 +771,9 @@ FraigMgrImpl::check_condition(Literal lit1,
       FraigNode* node = *p;
       if ( node->is_and() ) {
 	VarId id = node->varid();
-	Literal lito(id, kPolPosi);
-	Literal lit1(node->fanin0()->varid(), inv2pol(node->fanin0_inv()));
-	Literal lit2(node->fanin1()->varid(), inv2pol(node->fanin1_inv()));
+	Literal lito(id, false);
+	Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
+	Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -797,15 +790,11 @@ Literal
 FraigMgrImpl::fraig2literal(FraigHandle aig)
 {
   if ( aig.is_const() ) {
-    return Literal(VarId(0), kPolPosi);
+    return Literal(VarId(0), false);
   }
   VarId id = aig.node()->varid();
-  if ( aig.inv() ) {
-    return Literal(id, kPolNega);
-  }
-  else {
-    return Literal(id, kPolPosi);
-  }
+  bool inv = aig.inv();
+  return Literal(id, inv);
 }
 
 #if 0

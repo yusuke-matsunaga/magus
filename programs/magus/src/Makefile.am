@@ -6,9 +6,8 @@
 ############################################################
 
 SUBDIRS = \
-	libym_cec \
-	libym_seal \
-	libym_techmap \
+	cequiv \
+	techmap \
 	magus_tclsh
 
 

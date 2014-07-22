@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
+#include "cec_nsdef.h"
 #include "FraigHandle.h"
-#include "ym_logic/Expr.h"
-#include "ym_logic/Bool3.h"
+#include "logic/Expr.h"
+#include "logic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -111,11 +111,11 @@ public:
   /// @brief コファクターを計算する．
   /// @param[in] edge 対象の AIG ハンドル
   /// @param[in] input_id コファクターをとる入力番号
-  /// @param[in] pol 極性
+  /// @param[in] inv 反転フラグ
   FraigHandle
   make_cofactor(FraigHandle edge,
 		ymuint input_id,
-		tPol pol);
+		bool inv);
 
 
 public:

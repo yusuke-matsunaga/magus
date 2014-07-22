@@ -28,7 +28,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_techmap_cell.la
+noinst_LTLIBRARIES = libtechmap_cellmap.la
 
 
 ############################################################
@@ -41,10 +41,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_techmap_cell.la 用の変数の定義
+## libtechmap_cellmap.la 用の変数の定義
 ############################################################
 
-libym_techmap_cell_la_SOURCES = \
+libtechmap_cellmap_la_SOURCES = \
 	cellmap_nsdef.h \
 	AreaCover.h \
 	AreaCover.cc \
@@ -56,6 +56,6 @@ libym_techmap_cell_la_SOURCES = \
 	PatMatcher.h \
 	PatMatcher.cc
 
-libym_techmap_cell_la_LIBADD =
+libtechmap_cellmap_la_LIBADD =
 
-libym_techmap_cell_la_LDFLAGS =
+libtechmap_cellmap_la_LDFLAGS =

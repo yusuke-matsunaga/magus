@@ -179,7 +179,7 @@ FraigMgr::make_logic(const Expr& expr,
 FraigHandle
 FraigMgr::make_cofactor(FraigHandle edge,
 			ymuint input_id,
-			tPol pol)
+			bool inv)
 {
   if ( edge.is_const() ) {
     // edge が定数の時は変更なし
@@ -191,11 +191,11 @@ FraigMgr::make_cofactor(FraigHandle edge,
   if ( node->is_input() ) {
     // 入力ノード時は番号が input_id どうかで処理が変わる．
     if ( node->input_id() == input_id ) {
-      if ( pol == kPolPosi ) {
-	ans = make_one();
+      if ( inv ) {
+	ans = make_zero();
       }
       else {
-	ans = make_zero();
+	ans = make_one();
       }
     }
     else {
@@ -205,8 +205,8 @@ FraigMgr::make_cofactor(FraigHandle edge,
   else {
     // AND ノードの場合
     // 2つの子供に再帰的な処理を行って結果の AND を計算する．
-    FraigHandle new_handle0 = make_cofactor(node->fanin0_handle(), input_id, pol);
-    FraigHandle new_handle1 = make_cofactor(node->fanin1_handle(), input_id, pol);
+    FraigHandle new_handle0 = make_cofactor(node->fanin0_handle(), input_id, inv);
+    FraigHandle new_handle1 = make_cofactor(node->fanin1_handle(), input_id, inv);
     FraigHandle ans = make_and(new_handle0, new_handle1);
   }
   if ( edge.inv() ) {

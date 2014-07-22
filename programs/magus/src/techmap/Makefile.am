@@ -6,7 +6,6 @@
 ############################################################
 
 SUBDIRS = \
-	ym_techmap \
 	cellmap \
 	lutmap \
 	lutmapx \
@@ -27,16 +26,14 @@ MAINTAINERCLEANFILES = Makefile.in
 ## dist ターゲットの指定
 ############################################################
 
-EXTRA_DIST = \
-	configure \
-	configure.ac
+EXTRA_DIST =
 
 
 ############################################################
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_techmap.la
+noinst_LTLIBRARIES = libtechmap.la
 
 
 ############################################################
@@ -49,13 +46,17 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_techmap.la 用の変数の定義
+## libtechmap.la 用の変数の定義
 ############################################################
 
-libym_techmap_la_SOURCES =
+libtechmap_la_SOURCES =
 
-libym_techmap_la_LIBADD = \
-	cellmap/libym_techmap_cell.la \
-	lutmap/libym_techmap_lut.la
+# Dummy C++ source to cause C++ linking.
+nodist_EXTRA_libtechmap_la_SOURCES = dummy.cc
 
-libym_techmap_la_LDFLAGS =
+libtechmap_la_LIBADD = \
+	sbjgraph/libtechmap_sbjgraph.la \
+	cellmap/libtechmap_cellmap.la \
+	lutmap/libtechmap_lutmap.la
+
+libtechmap_la_LDFLAGS =

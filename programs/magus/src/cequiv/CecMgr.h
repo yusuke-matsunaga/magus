@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
+#include "cec_nsdef.h"
 #include "CecHandle.h"
 #include "CecHash.h"
-#include "ym_utils/SimpleAlloc.h"
-#include "ym_logic/SatSolver.h"
+#include "utils/SimpleAlloc.h"
+#include "logic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

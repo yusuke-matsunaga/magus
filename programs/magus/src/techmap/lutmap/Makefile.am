@@ -28,7 +28,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_techmap_lut.la
+noinst_LTLIBRARIES = libtechmap_lutmap.la
 
 
 ############################################################
@@ -41,10 +41,10 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_techmap_lut.la 用の変数の定義
+## libtechmap_lutmap.la 用の変数の定義
 ############################################################
 
-libym_techmap_lut_la_SOURCES = \
+libtechmap_lutmap_la_SOURCES = \
 	ADCost.h \
 	AreaCover.h \
 	AreaCover.cc \
@@ -72,6 +72,6 @@ libym_techmap_lut_la_SOURCES = \
 	MapRecord.h \
 	MapRecord.cc
 
-libym_techmap_lut_la_LIBADD =
+libtechmap_lutmap_la_LIBADD =
 
-libym_techmap_lut_la_LDFLAGS =
+libtechmap_lutmap_la_LDFLAGS =

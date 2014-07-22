@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_networks/BdnPort.h"
-#include "ym_networks/BdnNode.h"
+#include "cec_nsdef.h"
+#include "networks/BdnMgr.h"
+#include "networks/BdnPort.h"
+#include "networks/BdnNode.h"
 #include "FraigMgr.h"
 
 

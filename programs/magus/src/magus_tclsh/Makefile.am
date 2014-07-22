@@ -67,17 +67,17 @@ magus_tclsh_SOURCES = \
 	tclAppInit.cc
 
 magus_tclsh_LDADD = \
-	equiv/libmagus_equiv_tcl.la \
-	lutmap/libmagus_lutmap_tcl.la \
-	techmap/libmagus_techmap_tcl.la \
-	seal/libmagus_seal_tcl.la \
-	mvn/libmagus_mvn_tcl.la \
-	bnet/libmagus_bnet_tcl.la \
 	core/libmagus_core_tcl.la \
+	bnet/libmagus_bnet_tcl.la \
+	mvn/libmagus_mvn_tcl.la \
+	equiv/libmagus_equiv.la \
+	lutmap/libmagus_lutmap.la \
+	techmap/libmagus_techmap.la \
+	simplify/libmagus_siplify.la \
 	misc/libmagus_misc_tcl.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_seal/libym_seal.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_techmap/libym_techmap.la \
-	$(YMTOOLS_BUILDDIR)/libraries/libym_cec/libym_cec.la \
+	test/libmagus_test_tcl.la \
+	cequiv/libcequiv.la \
+	techmap/libtechmap.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_networks/libym_networks.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_verilog/libym_verilog.la \
 	$(YMTOOLS_BUILDDIR)/libraries/libym_cell/libym_cell.la \

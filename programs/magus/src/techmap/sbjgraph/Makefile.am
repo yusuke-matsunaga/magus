@@ -28,7 +28,7 @@ EXTRA_DIST =
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_techmap_sbj.la
+noinst_LTLIBRARIES = libtechmap_sbjgraph.la
 
 
 ############################################################
@@ -41,16 +41,16 @@ AM_CPPFLAGS = \
 
 
 ############################################################
-## libym_techmap_sbj.la 用の変数の定義
+## libtechmap_sbjgraph.la 用の変数の定義
 ############################################################
 
-libym_techmap_sbj_la_SOURCES = \
+libtechmap_sbjgraph_la_SOURCES = \
 	SbjDumper.cc \
 	SbjGraph.cc \
 	SbjMinDepth.h \
 	SbjMinDepth.cc \
 	SmdNode.h
 
-libym_techmap_sbj_la_LIBADD =
+libtechmap_sbjgraph_la_LIBADD =
 
-libym_techmap_sbj_la_LDFLAGS =
+libtechmap_sbjgraph_la_LDFLAGS =

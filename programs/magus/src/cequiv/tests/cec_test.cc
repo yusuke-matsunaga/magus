@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "ym_cec/cec_nsdef.h"
+#include "cec_nsdef.h"
 
-#include "ym_networks/BdnNode.h"
-#include "ym_networks/BNetBdnConv.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_networks/BdnBlifReader.h"
-#include "ym_networks/BdnIscas89Reader.h"
+#include "networks/BdnNode.h"
+#include "networks/BNetBdnConv.h"
+#include "utils/MsgMgr.h"
+#include "utils/MsgHandler.h"
+#include "networks/BdnBlifReader.h"
+#include "networks/BdnIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

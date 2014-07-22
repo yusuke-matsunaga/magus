@@ -10,8 +10,8 @@
 
 
 #include "ymtools.h"
-#include "ym_networks/BdnMgr.h"
-#include "ym_logic/Bool3.h"
+#include "networks/BdnMgr.h"
+#include "logic/Bool3.h"
 
 
 // 名前空間の定義

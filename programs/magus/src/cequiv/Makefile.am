@@ -6,7 +6,6 @@
 ############################################################
 
 SUBDIRS = \
-	ym_cec \
 	. \
 	tests
 
@@ -24,16 +23,14 @@ MAINTAINERCLEANFILES = Makefile.in
 ## dist ターゲットの指定
 ############################################################
 
-EXTRA_DIST = \
-	configure \
-	configure.ac
+EXTRA_DIST =
 
 
 ############################################################
 ## build ターゲットの指定
 ############################################################
 
-noinst_LTLIBRARIES = libym_cec.la
+noinst_LTLIBRARIES = libcequiv.la
 
 
 ############################################################
@@ -41,15 +38,18 @@ noinst_LTLIBRARIES = libym_cec.la
 ############################################################
 
 AM_CPPFLAGS = \
-	-I$(YMTOOLS_SRCDIR)/include \
-	-I$(YMTOOLS_BUILDDIR)/include
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_utils/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_logic/include \
+	-I$(YMTOOLS_SRCDIR)/libraries/libym_networks/include \
+	-I$(YMTOOLS_BUILDDIR)/libraries/libym_utils/include \
+	-I$(top_srcdir)/include
 
 
 ############################################################
-## libym_cec.la 用の変数の指定
+## libcequiv.la 用の変数の指定
 ############################################################
 
-libym_cec_la_SOURCES = \
+libcequiv_la_SOURCES = \
 	FraigHash.h \
 	FraigHandle.h \
 	FraigNode.h \
@@ -67,6 +67,6 @@ libym_cec_la_SOURCES = \
 	check_ceq2.cc \
 	make_miter.cc
 
-libym_cec_la_LIBADD =
+libcequiv_la_LIBADD =
 
-libym_cec_la_LDFLAGS =
+libcequiv_la_LDFLAGS =
