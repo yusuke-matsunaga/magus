@@ -1,5 +1,5 @@
-#ifndef MAGUS_MAGUS_NSDEF_H
-#define MAGUS_MAGUS_NSDEF_H
+#ifndef MAGUS_NSDEF_H
+#define MAGUS_NSDEF_H
 
 /// @file magus_nsdef.h
 /// @brief magus用名前空間の定義ファイル
@@ -30,4 +30,4 @@ class NetHandle;
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_MAGUS_NSDEF_H
+#endif // MAGUS_NSDEF_H
