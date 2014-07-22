@@ -14,7 +14,7 @@ AC_REVISION($Rev: 2507 $)dnl
 AC_PREREQ(2.57)dnl
 
 AC_COPYRIGHT([
-Copyright (C) 2007-2010 Yusuke Matsunaga
+Copyright (C) 2007-2014 Yusuke Matsunaga
 All rights reserved.
 ])dnl
 
@@ -134,16 +134,21 @@ AC_SUBST(MAGUS_BINDIR)dnl
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([src/core/Makefile])
-AC_CONFIG_FILES([src/bnet/Makefile])
-AC_CONFIG_FILES([src/mvn/Makefile])
-AC_CONFIG_FILES([src/equiv/Makefile])
-AC_CONFIG_FILES([src/lutmap/Makefile])
-AC_CONFIG_FILES([src/techmap/Makefile])
-AC_CONFIG_FILES([src/seal/Makefile])
-AC_CONFIG_FILES([src/simplify/Makefile])
-AC_CONFIG_FILES([src/misc/Makefile])
-AC_CONFIG_FILES([src/test/Makefile])
+AC_CONFIG_FILES([src/libym_cec/Makefile])
+AC_CONFIG_FILES([src/libym_seal/Makefile])
+AC_CONFIG_FILES([src/libym_techmap/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/include/Makefile/])
+AC_CONFIG_FILES([src/magus_tclsh/core/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/bnet/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/mvn/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/equiv/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/lutmap/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/techmap/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/seal/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/simplify/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/misc/Makefile])
+AC_CONFIG_FILES([src/magus_tclsh/test/Makefile])
 
 
 # ===================================================================

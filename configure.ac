@@ -187,9 +187,12 @@ YM_FINISH_LIBRARIES_SUBDIRS
 
 YM_INIT_PROGRAMS_SUBDIRS
 
-# magus_tclsh
-YM_BUILD_PROGRAM([magus_tclsh], [no],
-		 [ym_libym_tclpp_enable])
+# magus
+YM_BUILD_PROGRAM([magus], [no],
+		 [ym_libym_utils_enable,
+		  ym_libym_logic_enable,
+		  ym_libym_networks_enable,
+		  ym_libym_tclpp_enable])
 
 # satpg
 YM_BUILD_PROGRAM([satpg], [no],

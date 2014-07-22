@@ -201,7 +201,7 @@ set_program() {
 	       libraries/libym_tclpp
 	       libraries/libym_ymsh
 
-	       programs/magus_tclsh
+	       programs/magus
 	       programs/led
 	       programs/satpg
 	       programs/seal
