@@ -34,6 +34,7 @@ END_NONAMESPACE
 MislibParserImpl::MislibParserImpl()
 {
   mScanner = NULL;
+  mUngetToken = END;
 }
 
 // デストラクタ
@@ -270,7 +271,7 @@ MislibParserImpl::read_gate()
   }
 
   // 次は式
-  MislibNode* expr = read_expr();
+  MislibNode* expr = read_expr(SEMI);
   if ( expr == NULL ) {
     // エラー
     return NULL;
@@ -302,126 +303,88 @@ MislibParserImpl::read_gate()
 //
 // エラーが起きたら NULL を返す．
 MislibNode*
-MislibParserImpl::read_expr()
+MislibParserImpl::read_expr(MislibToken end_token)
 {
-  MislibNodeImpl* node;
-  FileRegion loc;
-  MislibToken tok = scan(node, loc);
-  switch ( tok ) {
-  case STR:
-    return node;
-
-  case LP:
-    return read_lp();
-
-  case CONST0:
-    return node;
-
-  case CONST1:
-    return node;
-
-  case NOT:
-    return read_not();
-
-  default:
-    // シンタックスエラー
-    return NULL;
-  }
-}
-
-// @brief LP を読み込んだ直後の式を読み込む．
-// @return 式を表す AST のノードを返す．
-//
-// エラーが起きたら NULL を返す．
-MislibNode*
-MislibParserImpl::read_lp()
-{
-  MislibNodeImpl* node;
-  FileRegion loc;
-  MislibToken tok = scan(node, loc);
-  MislibNode* expr1 = NULL;
-  switch ( tok ) {
-  case STR:
-    expr1 = node;
-    break;
-
-  case LP:
-    expr1 = read_lp();
-    break;
-
-  case CONST0:
-    expr1 = node;
-    break;
-
-  case CONST1:
-    expr1 = node;
-    break;
-
-  case NOT:
-    expr1 = read_not();
-    break;
-
-  default:
-    // シンタックスエラー
+  MislibNode* expr1 = read_product();
+  if ( expr1 == NULL ) {
     return NULL;
   }
 
-  tok = scan(node, loc);
-  switch ( tok ) {
-  case RP:
-    return expr1;
+  MislibToken tok = peek();
+  while ( tok != end_token ) {
+    if ( tok != PLUS && tok != HAT ) {
+      // シンタックスエラー
+      return NULL;
+    }
+    skip_token();
 
-  case HAT:
-
-  case PLUS:
-
-  case STAR:
-
-  default:
-    // シンタックスエラー
-    return NULL;
+    MislibNode* expr2 = read_product();
+    if ( expr2 == NULL ) {
+      return NULL;
+    }
+    if ( tok == PLUS ) {
+      expr1 = mMislibMgr->new_or(FileRegion(expr1->loc(), expr2->loc()), expr1, expr2);
+    }
+    else {
+      expr1 = mMislibMgr->new_xor(FileRegion(expr1->loc(), expr2->loc()), expr1, expr2);
+    }
   }
-}
-
-// @brief NOT を読み込んだ直後の式を読み込む．
-// @return 式を表す AST のノードを返す．
-//
-// エラーが起きたら NULL を返す．
-MislibNode*
-MislibParserImpl::read_not()
-{
-  MislibNodeImpl* node;
-  FileRegion loc;
-  MislibToken tok = scan(node, loc);
-  MislibNode* expr1 = NULL;
-  switch ( tok ) {
-  case STR:
-    expr1 = node;
-    break;
-
-  case LP:
-    expr1 = read_lp();
-    break;
-
-  case CONST0:
-    expr1 = node;
-    break;
-
-  case CONST1:
-    expr1 = node;
-    break;
-
-  case NOT:
-    expr1 = read_not();
-    break;
-
-  default:
-    // シンタックスエラー
-    return NULL;
-  }
-
-  MislibNode* expr = new_not(FileRegion(loc, expr1->loc()), expr1);
   return expr1;
+}
+
+// @brief 積項を読み込む．
+// @return 式を表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+MislibNode*
+MislibParserImpl::read_product()
+{
+  MislibNode* expr1 = read_literal();
+  if ( expr1 == NULL ) {
+    return NULL;
+  }
+  while ( peek() == STAR ) {
+    skip_token();
+
+    MislibNode* expr2 = read_literal();
+    if ( expr2 == NULL ) {
+      return NULL;
+    }
+    expr1 = mMislibMgr->new_and(FileRegion(expr1->loc(), expr2->loc()), expr1, expr2);
+  }
+  return expr1;
+}
+
+// @brief リテラルを読み込む．
+// @return 式を表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+MislibNode*
+MislibParserImpl::read_literal()
+{
+  MislibNodeImpl* node;
+  FileRegion loc;
+  MislibToken tok = scan(node, loc);
+  switch ( tok ) {
+  case STR:
+  case CONST0:
+  case CONST1:
+    return node;
+
+  case LP:
+    return read_expr(RP);
+
+  case NOT:
+    break;
+
+  default:
+    // シンタックスエラー
+    return NULL;
+  }
+
+  // ここに来るのは NOT のみ
+  MislibNode* expr = read_literal();
+  return mMislibMgr->new_not(FileRegion(loc, expr->loc()), expr);
 }
 
 // @brief ピンリスト記述を読み込む．
@@ -432,7 +395,7 @@ MislibParserImpl::read_not()
 MislibNode*
 MislibParserImpl::read_pin_list()
 {
-  MislibNodeImpl* pin_list = new_list();
+  MislibNodeImpl* pin_list = mMislibMgr->new_list();
   for ( ; ; ) {
     MislibNodeImpl* node;
     FileRegion loc;
@@ -503,6 +466,21 @@ MislibParserImpl::read_pin_list()
   return pin_list;
 }
 
+// @brief 次のトークンを盗み見る．
+MislibToken
+MislibParserImpl::peek()
+{
+  mUngetToken = mScanner->read_token(mUngetLoc);
+  return mUngetToken;
+}
+
+// @brief peek() で読んだトークンを捨てる．
+void
+MislibParserImpl::skip_token()
+{
+  mUngetToken = END;
+}
+
 // @brief 字句解析を行う．
 // @param[out] lval トークンの値を格納する変数
 // @return トークンの型を返す．
@@ -512,7 +490,12 @@ MislibToken
 MislibParserImpl::scan(MislibNodeImpl*& lval,
 		       FileRegion& lloc)
 {
-  MislibToken tok = mScanner->read_token(lloc);
+  MislibToken tok = mUngetToken;
+  lloc = mUngetLoc;
+  mUngetToken = END;
+  if ( tok == END ) {
+    tok = mScanner->read_token(lloc);
+  }
 
   if ( debug_read_token ) {
     cout << "MislibParserImpl::scan(): ";
