@@ -22,19 +22,19 @@ BEGIN_NAMESPACE_YM_MISLIB
 // @param[in] area 面積を表すパース木
 // @param[in] opin_name 出力ピン名を表すパース木
 // @param[in] opin_expr 出力の論理式を表すパース木
-// @param[in] ipin_list 入力ピンのリストを表すパース木
+// @param[in] ipin_top 先頭の入力ピンを表すパース木
 MislibGate::MislibGate(const FileRegion& loc,
 		       const MislibNode* name,
 		       const MislibNode* area,
 		       const MislibNode* opin_name,
 		       const MislibNode* opin_expr,
-		       const MislibNode* ipin_list) :
+		       const MislibNode* ipin_top) :
   MislibNodeImpl(loc),
   mName(name),
   mArea(area),
   mOpinName(opin_name),
   mOpinExpr(opin_expr),
-  mIpinList(ipin_list),
+  mIpinTop(ipin_top),
   mNext(NULL)
 {
 }
@@ -79,11 +79,11 @@ MislibGate::opin_expr() const
   return mOpinExpr;
 }
 
-// @brief 入力ピンのリストを表すオブジェクトを返す．
+// @brief 先頭の入力ピンのリストを表すオブジェクトを返す．
 const MislibNode*
-MislibGate::ipin_list() const
+MislibGate::ipin_top() const
 {
-  return mIpinList;
+  return mIpinTop;
 }
 
 // 次の要素を設定する．
@@ -124,7 +124,9 @@ MislibGate::dump(ostream& s) const
   s << "</OPIN_EXPR>" << endl;
 
   s << "<IPIN_LIST>" << endl;
-  ipin_list()->dump(s);
+  for (const MislibNode* pin = ipin_top(); pin != NULL; pin = pin->next()) {
+    pin->dump(s);
+  }
   s << "</IPIN_LIST>" << endl;
 
   s << "</GATE>" << endl;

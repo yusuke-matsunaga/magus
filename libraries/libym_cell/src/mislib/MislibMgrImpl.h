@@ -56,31 +56,12 @@ public:
   /// @brief GATE ノードを生成する．(通常版)
   /// @note 結果はゲートのリストに追加される．
   void
-  new_gate1(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr,
-	    const MislibNode* ipin_list);
-
-  /// @brief GATE ノードを生成する．(ワイルドカードの入力ピン)
-  /// @note 結果はゲートのリストに追加される．
-  void
-  new_gate2(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr,
-	    const MislibNode* ipin);
-
-  /// @brief GATE ノードを生成する．(入力ピンなし:定数ノード)
-  /// @note 結果はゲートのリストに追加される．
-  void
-  new_gate3(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr);
+  new_gate(const FileRegion& loc,
+	   const MislibNode* name,
+	   const MislibNode* area,
+	   const MislibNode* oname,
+	   const MislibNode* expr,
+	   const MislibNode* ipin_list);
 
   /// @brief PIN ノードを生成する．
   MislibNodeImpl*

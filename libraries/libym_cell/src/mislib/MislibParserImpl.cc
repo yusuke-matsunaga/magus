@@ -229,48 +229,214 @@ MislibParserImpl::read_file(const string& filename,
   return true;
 }
 
+// @brief ゲートを読み込む．
+// @return ゲートを表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+MislibNode*
+MislibParserImpl::read_gate()
+{
+  MislibNodeImpl* node;
+  FileRegion loc;
+
+  MislibToken tok = scan(node, loc);
+  if ( tok != GATE ) {
+    // シンタックスエラー
+  }
+
+  FileRegion loc0 = loc;
+  // 次は STR
+  tok = scan(node, loc);
+  if ( tok != STR ) {
+    // シンタックスエラー
+  }
+  MislibNode* name = node;
+
+  // 次は NUM
+  tok = scan(node, loc);
+  if ( tok != NUM ) {
+    // シンタックスエラー
+  }
+  MislibNode* area = node;
+
+  // 次は STR
+  tok = scan(node, loc);
+  if ( tok != STR ) {
+    // シンタックスエラー
+  }
+  MislibNode* opin = node;
+
+  // 次は EQ
+  tok = scan(node, loc);
+  if ( tok != EQ ) {
+    // シンタックスエラー
+  }
+
+  // 次は式
+  MislibNode* expr = read_expr();
+  if ( expr == NULL ) {
+    // エラー
+    return NULL;
+  }
+
+  // 次は SEMI
+  tok = scan(node, loc);
+  if ( tok != SEMI ) {
+    // シンタックスエラー
+  }
+
+  FileRegion loc1 = loc;
+
+  // 次はピンリスト
+  MislibNode* pin_list = read_pin_list();
+  if ( pin_list == NULL ) {
+    // エラー
+    return NULL;
+  }
+  for (const MislibNode* pin = pin_list->top(); pin != NULL; pin = pin->next()) {
+    loc1 = pin->loc();
+  }
+
+  MislibNode* gate = new_gate(FileRegion(loc0, loc1), name, area, opin, expr, pin_list);
+  return gate;
+}
+
+// @brief 式を読み込む．
+// @return 式を表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+MislibNode*
+MislibParserImpl::read_expr()
+{
+  FileRegion loc;
+  MislibToken tok = mScanner->read_token(loc);
+  switch ( tok ) {
+  case LP:
+    // read_expr();
+    // 次が RP なら OK
+    break;
+
+  case STR:
+    {
+      FileRegion loc0 = loc;
+      ShString name(mScanner->cur_str());
+      // 次を読む．
+      tok = mScanner->read_token(loc);
+      switch ( tok ) {
+      case STAR:
+      case PLUS:
+      case HAT:
+	// shift 一択
+	break;
+
+
+      }
+    }
+    break;
+
+  case NOT:
+    // shift 一択
+    // read_expr();
+
+  case CONST0:
+    // reduce 一択
+
+  case CONST1:
+    // reduce 一択
+
+  default:
+    // シンタックスエラー
+  }
+}
+
+// @brief ピンリスト記述を読み込む．
+// @return ピンリストを表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+// ピン名の代わりに * の場合があるので注意
+MislibNode*
+MislibParserImpl::read_pin_list()
+{
+  MislibNodeImpl* pin_list = new_list();
+  for ( ; ; ) {
+    MislibNodeImpl* node;
+    FileRegion loc;
+
+    // 最初は PIN
+    MislibToken tok = scan(node, loc);
+    if ( tok != PIN ) {
+      // 終わる．
+      break;
+    }
+
+    // 次は STR か STAR
+    FileRegion loc0 = loc;
+    tok = scan(node, loc);
+    MislibNode* name = NULL;
+    if ( tok == STR ) {
+      name = node;
+    }
+    else if ( tok == STAR ) {
+      // name は NULL のまま
+    }
+    else {
+      // シンタックスエラー
+
+      return NULL;
+    }
+
+    // 次は NONINV/INV/UNKNOWN のいずれか
+    tok = scan(node, loc);
+    if ( tok != NONINV && tok != INV && tok != UNKNOWN ) {
+      // シンタックスエラー
+
+      return NULL;
+    }
+    MislibNode* phase = node;
+
+    // あとは 6 個の NUM
+    MislibNode* val[6];
+    for (ymuint i = 0; i < 6; ++ i) {
+      tok = scan(node, loc);
+      if ( tok != NUM ) {
+	// シンタックスエラー
+
+	return NULL;
+      }
+      val[i] = node;
+    }
+
+    MislibNodeImpl* pin = new_pin(FileRegion(loc0, loc), name, phase,
+				  val[0], val[1], val[2], val[3], val[4], val[5]);
+    pin_list->push_back(pin);
+  }
+
+  // 名前が NULL (STAR) のピンがある場合はそれが唯一の要素である場合に限る．
+  ymuint npin = 0;
+  bool has_star = false;
+  for (const MislibNode* pin = pin_list->top(); pin != NULL; pin = pin->next(), ++ npin) {
+    if ( pin->name() == NULL ) {
+      has_star = true;
+    }
+  }
+  if ( npin > 1 && has_start ) {
+    // シンタックスエラー
+    return NULL;
+  }
+
+  return pin_list;
+}
+
 // @brief 字句解析を行う．
 // @param[out] lval トークンの値を格納する変数
-// @param[out] lloc トークンの位置を格納する変数
 // @return トークンの型を返す．
-int
+//
+// lval に値がセットされない場合もある．
+MislibToken
 MislibParserImpl::scan(MislibNodeImpl*& lval,
 		       FileRegion& lloc)
 {
   int tok = mScanner->read_token(lloc);
-
-  switch ( tok ) {
-  case STR:
-    lval = mMislibMgr->new_str(lloc, ShString(mScanner->cur_string()));
-    break;
-
-  case NUM:
-    lval = mMislibMgr->new_num(lloc, mScanner->cur_num());
-    break;
-
-  case NONINV:
-    lval = mMislibMgr->new_noninv(lloc);
-    break;
-
-  case INV:
-    lval = mMislibMgr->new_inv(lloc);
-    break;
-
-  case UNKNOWN:
-    lval = mMislibMgr->new_unknown(lloc);
-    break;
-
-  case CONST0:
-    lval = mMislibMgr->new_const0(lloc);
-    break;
-
-  case CONST1:
-    lval = mMislibMgr->new_const1(lloc);
-    break;
-
-  default:
-    break;
-  }
 
   if ( debug_read_token ) {
     cout << "MislibParserImpl::scan(): ";
@@ -355,6 +521,39 @@ MislibParserImpl::scan(MislibNodeImpl*& lval,
       cout << tok << endl;
       break;
     }
+  }
+
+  switch ( tok ) {
+  case STR:
+    lval =mMislibMgr->new_str(lloc, ShString(mScanner->cur_string()));
+    break;
+
+  case NUM:
+    lval = mMislibMgr->new_num(lloc, mScanner->cur_num());
+    break;
+
+  case NONINV:
+    lval = mMislibMgr->new_noninv(lloc);
+    break;
+
+  case INV:
+    lval = mMislibMgr->new_inv(lloc);
+    break;
+
+  case UNKNOWN:
+    lval = mMislibMgr->new_unknown(lloc);
+    break;
+
+  case CONST0:
+    lval = mMislibMgr->new_const0(lloc);
+    break;
+
+  case CONST1:
+    lval =mMislibMgr->new_const1(lloc);
+    break;
+
+  default:
+    break;
   }
 
   return tok;

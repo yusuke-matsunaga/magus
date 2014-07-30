@@ -179,12 +179,12 @@ MislibMgrImpl::new_pin(const FileRegion& loc,
 
 // GATE ノードを生成する．
 void
-MislibMgrImpl::new_gate1(const FileRegion& loc,
-			 const MislibNode* pt_name,
-			 const MislibNode* pt_area,
-			 const MislibNode* pt_oname,
-			 const MislibNode* pt_expr,
-			 const MislibNode* pt_ipin_list)
+MislibMgrImpl::new_gate(const FileRegion& loc,
+			const MislibNode* pt_name,
+			const MislibNode* pt_area,
+			const MislibNode* pt_oname,
+			const MislibNode* pt_expr,
+			const MislibNode* pt_ipin_list)
 {
   assert_cond(pt_name, __FILE__, __LINE__);
   assert_cond(pt_name->type() == MislibNode::kStr, __FILE__, __LINE__);
@@ -199,64 +199,8 @@ MislibMgrImpl::new_gate1(const FileRegion& loc,
 
   void* p = mAlloc.get_memory(sizeof(MislibGate));
   MislibNodeImpl* gate = new (p) MislibGate(loc, pt_name, pt_area,
-					    pt_oname, pt_expr, pt_ipin_list);
-  add_gate(gate);
-}
-
-// GATE ノードを生成する．
-void
-MislibMgrImpl::new_gate2(const FileRegion& loc,
-			 const MislibNode* pt_name,
-			 const MislibNode* pt_area,
-			 const MislibNode* pt_oname,
-			 const MislibNode* pt_expr,
-			 const MislibNode* pt_ipin)
-{
-  assert_cond(pt_name, __FILE__, __LINE__);
-  assert_cond(pt_name->type() == MislibNode::kStr, __FILE__, __LINE__);
-  assert_cond(pt_area, __FILE__, __LINE__);
-  assert_cond(pt_area->type() == MislibNode::kNum, __FILE__, __LINE__);
-  assert_cond(pt_oname, __FILE__, __LINE__);
-  assert_cond(pt_oname->type() == MislibNode::kStr, __FILE__, __LINE__);
-  assert_cond(pt_expr, __FILE__, __LINE__);
-  assert_cond(pt_expr->is_expr(), __FILE__, __LINE__);
-  assert_cond(pt_ipin, __FILE__, __LINE__);
-  assert_cond(pt_ipin->type() == MislibNode::kPin, __FILE__, __LINE__);
-  assert_cond(pt_ipin->name() == NULL, __FILE__, __LINE__);
-
-  void* p = mAlloc.get_memory(sizeof(MislibGate));
-  MislibNodeImpl* gate = new (p) MislibGate(loc, pt_name, pt_area,
-					    pt_oname, pt_expr, pt_ipin);
-  add_gate(gate);
-}
-
-// GATE ノードを生成する．
-void
-MislibMgrImpl::new_gate3(const FileRegion& loc,
-			 const MislibNode* pt_name,
-			 const MislibNode* pt_area,
-			 const MislibNode* pt_oname,
-			 const MislibNode* pt_expr)
-{
-  assert_cond(pt_name, __FILE__, __LINE__);
-  assert_cond(pt_name->type() == MislibNode::kStr, __FILE__, __LINE__);
-  assert_cond(pt_area, __FILE__, __LINE__);
-  assert_cond(pt_area->type() == MislibNode::kNum, __FILE__, __LINE__);
-  assert_cond(pt_oname, __FILE__, __LINE__);
-  assert_cond(pt_oname->type() == MislibNode::kStr, __FILE__, __LINE__);
-  assert_cond(pt_expr, __FILE__, __LINE__);
-  assert_cond(pt_expr->is_expr(), __FILE__, __LINE__);
-
-  void* p = mAlloc.get_memory(sizeof(MislibGate));
-  MislibNodeImpl* gate = new (p) MislibGate(loc, pt_name, pt_area,
-					    pt_oname, pt_expr, new_list());
-  add_gate(gate);
-}
-
-// @brief ゲートを追加する．
-void
-MislibMgrImpl::add_gate(MislibNodeImpl* gate)
-{
+					    pt_oname, pt_expr,
+					    pt_ipin_list->top());
   if ( mGateList == NULL ) {
     mGateList = new_list();
   }

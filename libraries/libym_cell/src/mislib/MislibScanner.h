@@ -10,6 +10,7 @@
 
 
 #include "mislib_nsdef.h"
+#include "MislibToken.h"
 
 #include "YmUtils/StrBuff.h"
 #include "YmUtils/Scanner.h"
@@ -41,7 +42,7 @@ public:
 
   /// @brief トークンを一つとってくる．
   /// @param[out] loc 対応するファイル上の位置を格納する変数
-  int
+  MislibToken
   read_token(FileRegion& loc);
 
   /// @brief 直前の read_token() に対応する文字列を返す．
@@ -60,7 +61,7 @@ private:
 
   /// @brief read_token の下請け関数
   /// @return トークンを返す．
-  int
+  MislibToken
   scan();
 
 

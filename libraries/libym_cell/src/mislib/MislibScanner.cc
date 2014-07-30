@@ -13,12 +13,6 @@
 
 BEGIN_NAMESPACE_YM_MISLIB
 
-// mislib_grammer.hh 中で 必要になる(bison-2.6)
-class MislibParserImpl;
-
-#include "mislib_grammer.hh"
-
-
 // コンストラクタ
 MislibScanner::MislibScanner(IDO& ido) :
   Scanner(ido)
@@ -32,17 +26,17 @@ MislibScanner::~MislibScanner()
 
 // トークンを一つとってくる．
 // @param[out] loc 対応するファイル上の位置を格納する変数
-int
+MislibToken
 MislibScanner::read_token(FileRegion& loc)
 {
-  int token = scan();
+  MislibToken token = scan();
   loc = cur_loc();
   return token;
 }
 
 // @brief read_token の下請け関数
 // @return トークンを返す．
-int
+MislibToken
 MislibScanner::scan()
 {
   int c = 0;

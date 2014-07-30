@@ -36,6 +36,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // メインの関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief mislib ファイルを読み込む．
   /// @param[in] filename ファイル名
@@ -47,39 +50,55 @@ public:
 	    MislibMgrImpl* mgr);
 
 
-public:
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ゲートを読み込む．
+  /// @return ゲートを表す AST のノードを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  MislibNode*
+  read_gate();
+
+  /// @brief 式を読み込む．
+  /// @return 式を表す AST のノードを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  MislibNode*
+  read_expt();
+
+  /// @brief ピンリスト記述を読み込む．
+  /// @return ピンリストを表す AST のノードを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  /// ピン名の代わりに * の場合があるので注意
+  MislibNode*
+  read_pin_list();
+
+  /// @brief ピン記述を読み込む．
+  /// @return ピンを表す AST のノードを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  MislibNode*
+  read_pin();
+
+
+private:
   //////////////////////////////////////////////////////////////////////
   // MislibNode を生成する関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief GATE ノードを生成する．(通常版)
+  /// @brief GATE ノードを生成する．
   /// @note 結果はゲートのリストに追加される．
   void
-  new_gate1(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr,
-	    const MislibNode* ipin_list);
-
-  /// @brief GATE ノードを生成する．(ワイルドカードの入力ピン)
-  /// @note 結果はゲートのリストに追加される．
-  void
-  new_gate2(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr,
-	    const MislibNode* ipin);
-
-  /// @brief GATE ノードを生成する．(入力ピンなし:定数ノード)
-  /// @note 結果はゲートのリストに追加される．
-  void
-  new_gate3(const FileRegion& loc,
-	    const MislibNode* name,
-	    const MislibNode* area,
-	    const MislibNode* oname,
-	    const MislibNode* expr);
+  new_gate(const FileRegion& loc,
+	   const MislibNode* name,
+	   const MislibNode* area,
+	   const MislibNode* oname,
+	   const MislibNode* expr,
+	   const MislibNode* ipin_list);
 
   /// @brief PIN ノードを生成する．
   MislibNodeImpl*
@@ -128,18 +147,6 @@ public:
   MislibNodeImpl*
   new_const1(const FileRegion& loc);
 
-  /// @brief NONINV ノードを生成する．
-  MislibNodeImpl*
-  new_noninv(const FileRegion& loc);
-
-  /// @brief INV ノードを生成する．
-  MislibNodeImpl*
-  new_inv(const FileRegion& loc);
-
-  /// @brief UNKNOWN ノードを生成する．
-  MislibNodeImpl*
-  new_unknown(const FileRegion& loc);
-
   /// @brief 文字列ノードを生成する．
   MislibNodeImpl*
   new_str(const FileRegion& loc,
@@ -151,16 +158,18 @@ public:
 	  double num);
 
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
   // mislib_grammer.yy で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 字句解析を行う．
   /// @param[out] lval トークンの値を格納する変数
-  /// @param[out] lloc トークンの位置を格納する変数
+  /// @param[out] lloc 場所を格納する変数
   /// @return トークンの型を返す．
-  int
+  ///
+  /// lval に値がセットされない場合もある．
+  MislibToken
   scan(MislibNodeImpl*& lval,
        FileRegion& lloc);
 
@@ -192,41 +201,14 @@ private:
 // @note 結果はゲートのリストに追加される．
 inline
 void
-MislibParserImpl::new_gate1(const FileRegion& loc,
-			    const MislibNode* name,
-			    const MislibNode* area,
-			    const MislibNode* oname,
-			    const MislibNode* expr,
-			    const MislibNode* ipin_list)
+MislibParserImpl::new_gate(const FileRegion& loc,
+			   const MislibNode* name,
+			   const MislibNode* area,
+			   const MislibNode* oname,
+			   const MislibNode* expr,
+			   const MislibNode* ipin_list)
 {
-  return mMislibMgr->new_gate1(loc, name, area, oname, expr, ipin_list);
-}
-
-// @brief GATE ノードを生成する．(ワイルドカードの入力ピン)
-// @note 結果はゲートのリストに追加される．
-inline
-void
-MislibParserImpl::new_gate2(const FileRegion& loc,
-			    const MislibNode* name,
-			    const MislibNode* area,
-			    const MislibNode* oname,
-			    const MislibNode* expr,
-			    const MislibNode* ipin)
-{
-  return mMislibMgr->new_gate2(loc, name, area, oname, expr, ipin);
-}
-
-// @brief GATE ノードを生成する．(入力ピンなし:定数ノード)
-// @note 結果はゲートのリストに追加される．
-inline
-void
-MislibParserImpl::new_gate3(const FileRegion& loc,
-			    const MislibNode* name,
-			    const MislibNode* area,
-			    const MislibNode* oname,
-			    const MislibNode* expr)
-{
-  return mMislibMgr->new_gate3(loc, name, area, oname, expr);
+  return mMislibMgr->new_gate(loc, name, area, oname, expr, ipin_list);
 }
 
 // @brief PIN ノードを生成する．
