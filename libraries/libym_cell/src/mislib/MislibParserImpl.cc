@@ -308,44 +308,120 @@ MislibParserImpl::read_expr()
   FileRegion loc;
   MislibToken tok = scan(node, loc);
   switch ( tok ) {
-  case LP:
-    // read_expr();
-    // 次が RP なら OK
-    break;
-
   case STR:
-    {
-      FileRegion loc0 = loc;
-      MislibNode* name = node;
+    return node;
 
-      // 次を読む．
-      tok = scan(node, loc);
-      switch ( tok ) {
-      case STAR:
-      case PLUS:
-      case HAT:
-	// shift 一択
-	break;
-
-
-      }
-    }
-    break;
-
-  case NOT:
-    // shift 一択
-    // read_expr();
+  case LP:
+    return read_lp();
 
   case CONST0:
-    // reduce 一択
+    return node;
 
   case CONST1:
-    // reduce 一択
+    return node;
+
+  case NOT:
+    return read_not();
 
   default:
     // シンタックスエラー
-    break;
+    return NULL;
   }
+}
+
+// @brief LP を読み込んだ直後の式を読み込む．
+// @return 式を表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+MislibNode*
+MislibParserImpl::read_lp()
+{
+  MislibNodeImpl* node;
+  FileRegion loc;
+  MislibToken tok = scan(node, loc);
+  MislibNode* expr1 = NULL;
+  switch ( tok ) {
+  case STR:
+    expr1 = node;
+    break;
+
+  case LP:
+    expr1 = read_lp();
+    break;
+
+  case CONST0:
+    expr1 = node;
+    break;
+
+  case CONST1:
+    expr1 = node;
+    break;
+
+  case NOT:
+    expr1 = read_not();
+    break;
+
+  default:
+    // シンタックスエラー
+    return NULL;
+  }
+
+  tok = scan(node, loc);
+  switch ( tok ) {
+  case RP:
+    return expr1;
+
+  case HAT:
+
+  case PLUS:
+
+  case STAR:
+
+  default:
+    // シンタックスエラー
+    return NULL;
+  }
+}
+
+// @brief NOT を読み込んだ直後の式を読み込む．
+// @return 式を表す AST のノードを返す．
+//
+// エラーが起きたら NULL を返す．
+MislibNode*
+MislibParserImpl::read_not()
+{
+  MislibNodeImpl* node;
+  FileRegion loc;
+  MislibToken tok = scan(node, loc);
+  MislibNode* expr1 = NULL;
+  switch ( tok ) {
+  case STR:
+    expr1 = node;
+    break;
+
+  case LP:
+    expr1 = read_lp();
+    break;
+
+  case CONST0:
+    expr1 = node;
+    break;
+
+  case CONST1:
+    expr1 = node;
+    break;
+
+  case NOT:
+    expr1 = read_not();
+    break;
+
+  default:
+    // シンタックスエラー
+    return NULL;
+  }
+
+  MislibNode* expr = new_not(FileRegion(loc, expr1->loc()), expr1);
+  return expr1;
 }
 
 // @brief ピンリスト記述を読み込む．

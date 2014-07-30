@@ -69,6 +69,20 @@ private:
   MislibNode*
   read_expr();
 
+  /// @brief LP を読み込んだ直後の式を読み込む．
+  /// @return 式を表す AST のノードを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  MislibNode*
+  read_lp();
+
+  /// @brief NOT を読み込んだ直後の式を読み込む．
+  /// @return 式を表す AST のノードを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  MislibNode*
+  read_not();
+
   /// @brief ピンリスト記述を読み込む．
   /// @return ピンリストを表す AST のノードを返す．
   ///
