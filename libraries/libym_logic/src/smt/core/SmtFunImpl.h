@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/SmtFun.h"
+#include "YmLogic/SmtFun.h"
 
 
 BEGIN_NAMESPACE_YM_SMT

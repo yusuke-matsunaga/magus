@@ -10,10 +10,10 @@
 
 #include "bddtest.h"
 
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
-#include "logic/BddVarSet.h"
-#include "logic/BddLitSet.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/BddVarSet.h"
+#include "YmLogic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/SmtSortInfo.h"
+#include "YmLogic/SmtSortInfo.h"
 
 
 BEGIN_NAMESPACE_YM_SMT

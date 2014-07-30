@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "logic/sat_nsdef.h"
-#include "utils/Scanner.h"
+#include "YmLogic/sat_nsdef.h"
+#include "YmUtils/Scanner.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

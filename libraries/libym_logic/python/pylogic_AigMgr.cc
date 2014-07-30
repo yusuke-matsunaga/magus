@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_logic/pylogic.h"
-#include "ym_logic/AigMgr.h"
+#include "ym_YmLogic/pylogic.h"
+#include "ym_YmLogic/AigMgr.h"
 
 
 BEGIN_NAMESPACE_YM

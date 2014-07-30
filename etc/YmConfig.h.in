@@ -1,0 +1,204 @@
+#ifndef YMCONFIG_H
+#define YMCONFIG_H
+
+//////////////////////////////////////////////////////////////////////
+// ymtools 用の設定ファイル
+//////////////////////////////////////////////////////////////////////
+
+// プロジェクトの major バージョン
+#define YMTOOLS_VERSION_MAJIR @YMTOOLS_VERSION_MAJOR@
+
+// プロジェクトの minor バージョン
+#define YMTOOLS_VERSION_MINOR @YMTOOLS_VERSION_MINOR@
+
+// プロジェクトの名前空間
+#define YMTOOLS_NAMESPACE @YMTOOLS_NAMESPACE@
+
+
+//////////////////////////////////////////////////////////////////////
+// システム検査の結果
+//////////////////////////////////////////////////////////////////////
+
+// <stdlib.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_STDLIB_H
+
+// <string.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_STRING_H
+
+// <strings.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_STRINGS_H
+
+// <unistd.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_UNISTD_H
+
+// <limits.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_LIMITS_H
+
+// <float.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_FLOAT_H
+
+// <math.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_MATH_H
+
+// <sys/time.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_SYS_TIME_H
+
+// <time.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_TIME_H
+
+// <sys/stat.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_SYS_STAT_H
+
+// <pwd.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_PWD_H
+
+// <sys/param.h> が存在する時定義されるマクロ
+#cmakedefine HAVE_SYS_PARAM_H
+
+// getrusage() が存在する時定義されるマクロ
+#cmakedefine HAVE_GETRUSAGE
+
+// times() が存在する時定義されるマクロ
+#cmakedefine HAVE_TIMES
+
+// zlib が使用可能の時定義されるマクロ
+#cmakedefine ZLIB_FOUND
+
+// bzip2 が使用可能の時定義されるマクロ
+#cmakedefine BZIP2_FOUND
+
+// lzma が使用可能の時定義されるマクロ
+#cmakedefine LIBLZMA_FOUND
+
+// Qt4 が使用可能の時定義されるマクロ
+#cmakedefine Qt4_FOUND
+
+// Python ライブラリが使用可能の時定義されるマクロ
+#cmakedefine PYTHONINTERP_FOUND
+
+// Tcl/Tk が使用可能の時定義されるマクロ
+#cmakedefine TCL_FOUND
+
+// <curses.h> があるとき定義されるマクロ
+#cmakedefine CURSES_HAVE_CURSES_H
+
+// <ncurses.h> があるとき定義されるマクロ
+#cmakedefine CURSES_HAVE_NCURSES_H
+
+// <ncurses/curses.h> があるとき定義されるマクロ
+#cmakedefine CURSES_HAVE_NCURSES_CURSES_H
+
+// <ncurses/ncurses.h> があるとき定義されるマクロ
+#cmakedefine CURSES_HAVE_NCURSES_NCURSES_H
+
+// UNIX の時 true となるマクロ
+#cmakedefine UNIX
+
+// WINDOWS の時 true となるマクロ
+#cmakedefine WIN32
+
+// MAC OS-X の時 true となるマクロ
+#cmakedefine APPLE
+
+
+//////////////////////////////////////////////////////////////////////
+// サイズ固定の組み込み型
+//////////////////////////////////////////////////////////////////////
+
+#define SIZEOF_SHORT @SHORT_SIZE@
+#define SIZEOF_INT @INT_SIZE@
+#define SIZEOF_LONG @LONG_SIZE@
+#define SIZEOF_LONG_LONG @LLONG_SIZE@
+
+/// @brief 符号付き整数型
+typedef int ymint;
+
+/// @brief 符号なし整数型
+typedef unsigned int ymuint;
+
+/// @brief 符号付きlong型
+typedef int ymlong;
+
+/// @brief 符号なしlong型
+typedef unsigned long ymulong;
+
+/// @brief 符号付き8ビット整数型
+typedef char ymint8;
+
+/// @brief 符号なし8ビット整数型
+typedef unsigned char ymuint8;
+
+#if @SHORT_SIZE@ == 2
+/// @brief 符号付き16ビット整数型
+typedef short ymint16;
+
+/// @brief 符号なし16ビット整数型
+typedef unsigned short ymuint16;
+#elif @INT_SIZE@ == 2
+/// @brief 符号付き16ビット整数型
+typedef int ymint16;
+
+/// @brief 符号なし16ビット整数型
+typedef unsigned int ymuint16;
+#else
+#error "No valid 16-bit integer type is avaliable"
+#endif
+
+#if @SHORT_SIZE@ == 4
+/// @brief 符号付き32ビット整数型
+typedef short ymint32;
+
+/// @brief 符号なし32ビット整数型
+typedef unsigned short ymuint32;
+#elif @INT_SIZE@ == 4
+/// @brief 符号付き32ビット整数型
+typedef int ymint32;
+
+/// @brief 符号なし32ビット整数型
+typedef unsigned int ymuint32;
+#elif @LONG_SIZE@ == 4
+/// @brief 符号付き32ビット整数型
+typedef long ymint32;
+
+/// @brief 符号なし32ビット整数型
+typedef unsigned long ymuint32;
+#else
+#error "No valid 32-bit integer type is avaliable"
+#endif
+
+#if @INT_SIZE@ == 8
+/// @brief 符号付き64ビット整数型
+typedef int ymint64;
+
+/// @brief 符号なし64ビット整数型
+typedef unsigned int ymuint64;
+#elif @LONG_SIZE@ == 8
+/// @brief 符号付き64ビット整数型
+typedef long ymint64;
+
+/// @brief 符号なし64ビット整数型
+typedef unsigned long ymuint64;
+#elif @LLONG_SIZE@ == 8
+/// @brief 符号付き64ビット整数型
+typedef long long ymint64;
+
+/// @brief 符号なし64ビット整数型
+typedef unsigned long long ymuint64;
+#else
+#error "No valid 64-bit integer type is avaliable"
+#endif
+
+#if @INT_SIZE@ == @VOIDP_SIZE@
+/// @brief ポインタと同サイズの符号なし整数型
+typedef unsigned int ympuint;
+#elif @LONG_SIZE@ == @VOIDP_SIZE@
+/// @brief ポインタと同サイズの符号なし整数型
+typedef unsigned long ympuint;
+#elif @LLONG_SIZE@ == @VOIDP_SIZE@
+/// @brief ポインタと同サイズの符号なし整数型
+typedef unsigned long long ympuint;
+#else
+#error "No valid pointer-size integer type is avaliable"
+#endif
+
+#endif // YMCONFIG_H

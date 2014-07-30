@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "logic/sat_nsdef.h"
-#include "logic/Bool3.h"
-#include "logic/Literal.h"
+#include "YmLogic/sat_nsdef.h"
+#include "YmLogic/Bool3.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -160,4 +160,4 @@ public:
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_LOGIC_SAT_INCLUDE_SATSOLVERIMPL_H
+#endif // LIBYM_YMYMLOGIC_SAT_INCLUDE_SATSOLVERIMPL_H

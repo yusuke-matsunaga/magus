@@ -10,8 +10,8 @@
 
 
 #include "dotlib_nsdef.h"
-#include "utils/ShString.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/ShString.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

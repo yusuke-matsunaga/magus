@@ -10,9 +10,9 @@
 
 
 #include "smtlibv2_nsdef.h"
-#include "utils/Scanner.h"
-#include "utils/FileRegion.h"
-#include "utils/StrBuff.h"
+#include "YmUtils/Scanner.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/StrBuff.h"
 
 #include "TokenType.h"
 

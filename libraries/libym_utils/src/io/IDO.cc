@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "utils/IDO.h"
-#include "utils/StreamIDO.h"
-#include "utils/StrListIDO.h"
-#include "utils/StrBuff.h"
-#include "utils/MsgMgr.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/StreamIDO.h"
+#include "YmUtils/StrListIDO.h"
+#include "YmUtils/StrBuff.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/FileRegion.h"
 
 #include <fcntl.h>
 

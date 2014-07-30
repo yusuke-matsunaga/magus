@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/CNFddMgr.h"
+#include "YmLogic/CNFddMgr.h"
 #include "CNFddMgrImpl.h"
 
 

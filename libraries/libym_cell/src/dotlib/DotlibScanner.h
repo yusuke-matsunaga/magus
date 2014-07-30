@@ -10,9 +10,9 @@
 
 
 #include "dotlib_int.h"
-#include "utils/Scanner.h"
-#include "utils/FileRegion.h"
-#include "utils/StrBuff.h"
+#include "YmUtils/Scanner.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

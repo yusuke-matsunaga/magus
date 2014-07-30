@@ -23,9 +23,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <signal.h>
 #include <zlib.h>
 
-#include "utils/System.h"
-#include "utils/ParseUtils.h"
-#include "utils/Options.h"
+#include "YmUtils/System.h"
+#include "YmUtils/ParseUtils.h"
+#include "YmUtils/Options.h"
 #include "core/Dimacs.h"
 #include "core/Solver.h"
 

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/FragAlloc.h"
+#include "YmUtils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -20,6 +20,8 @@ BEGIN_NAMESPACE_YM
 FragAlloc::FragAlloc(ymuint64 max_size) :
   mMaxSize(max_size)
 {
+  const int ALIGNOF_DOUBLE = __alignof__(double);
+
   mMinSize = 1;
   mMinLogSize = 0;
   for ( ; mMinSize < ALIGNOF_DOUBLE; mMinSize <<= 1, ++ mMinLogSize) ;

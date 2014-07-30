@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "utils/FileLoc.h"
-#include "utils/StrBuff.h"
+#include "YmTools.h"
+#include "YmUtils/FileLoc.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM

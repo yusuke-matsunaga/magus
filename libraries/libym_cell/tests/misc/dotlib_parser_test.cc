@@ -18,10 +18,10 @@
 #include "dotlib/DotlibLatch.h"
 #include "dotlib/DotlibPin.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

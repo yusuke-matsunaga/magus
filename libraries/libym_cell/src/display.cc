@@ -7,20 +7,20 @@
 /// All rights reserved.
 
 
-#include "cell/CellLibrary.h"
-#include "cell/Cell.h"
-#include "cell/CellLut.h"
-#include "cell/CellLutTemplate.h"
-#include "cell/CellPin.h"
-#include "cell/CellTiming.h"
-#include "cell/CellClass.h"
-#include "cell/CellGroup.h"
-#include "cell/CellPatGraph.h"
-#include "cell/CellCapacitance.h"
-#include "cell/CellTime.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellLut.h"
+#include "YmCell/CellLutTemplate.h"
+#include "YmCell/CellPin.h"
+#include "YmCell/CellTiming.h"
+#include "YmCell/CellClass.h"
+#include "YmCell/CellGroup.h"
+#include "YmCell/CellPatGraph.h"
+#include "YmCell/CellCapacitance.h"
+#include "YmCell/CellTime.h"
 
-#include "logic/Expr.h"
-#include "logic/NpnMapM.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/NpnMapM.h"
 
 
 BEGIN_NAMESPACE_YM

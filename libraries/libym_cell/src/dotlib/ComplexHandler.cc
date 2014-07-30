@@ -11,7 +11,7 @@
 #include "DotlibParserImpl.h"
 #include "GroupHandler.h"
 #include "DotlibNodeImpl.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

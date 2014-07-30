@@ -9,7 +9,7 @@
 
 #include "SmtLibNode.h"
 #include "SmtLibParser.h"
-#include "ym_utils/FileIDO.h"
+#include "ym_YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

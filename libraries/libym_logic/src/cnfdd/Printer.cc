@@ -8,10 +8,10 @@
 
 
 #include "Printer.h"
-#include "logic/CNFdd.h"
-//#include "logic/CNFddVector.h"
-//#include "logic/CNFddList.h"
-#include "logic/CNFddMgr.h"
+#include "YmLogic/CNFdd.h"
+//#include "YmLogic/CNFddVector.h"
+//#include "YmLogic/CNFddList.h"
+#include "YmLogic/CNFddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

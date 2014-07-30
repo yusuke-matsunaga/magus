@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "logic/ExprWriter.h"
-#include "logic/Expr.h"
+#include "YmLogic/ExprWriter.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_EXPR

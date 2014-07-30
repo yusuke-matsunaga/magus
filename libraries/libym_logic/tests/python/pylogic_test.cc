@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_utils/pyutils.h"
-#include "ym_logic/pylogic.h"
+#include "ym_YmUtils/pyutils.h"
+#include "ym_YmLogic/pylogic.h"
 
 int
 main(int argc,

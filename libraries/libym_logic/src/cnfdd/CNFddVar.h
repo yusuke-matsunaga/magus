@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/CNFdd.h"
+#include "YmLogic/CNFdd.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_cell/pycell.h"
-#include "ym_cell/CellPatGraph.h"
+#include "ym_YmCell/pycell.h"
+#include "ym_YmCell/CellPatGraph.h"
 
 
 BEGIN_NAMESPACE_YM

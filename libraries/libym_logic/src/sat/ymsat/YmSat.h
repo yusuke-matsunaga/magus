@@ -10,9 +10,9 @@
 
 
 #include "../SatSolverImpl.h"
-#include "utils/FragAlloc.h"
-#include "utils/RandGen.h"
-#include "utils/StopWatch.h"
+#include "YmUtils/FragAlloc.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/StopWatch.h"
 #include "SatClause.h"
 #include "SatReason.h"
 #include "AssignList.h"

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/GcSolver.h"
+#include "YmUtils/GcSolver.h"
 #include "GcNode.h"
 
 

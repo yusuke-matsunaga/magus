@@ -1,5 +1,5 @@
-#ifndef YM_LOGIC_CPPUTEST_H
-#define YM_LOGIC_CPPUTEST_H
+#ifndef YM_YMLOGIC_CPPUTEST_H
+#define YM_YMLOGIC_CPPUTEST_H
 
 /// @file ym_logic_CppUTest.h
 /// @brief libym_logic の CppUTest 用ヘッダ
@@ -23,4 +23,4 @@ IMPORT_TEST_GROUP(libym_logic_NameMgrTestGroup);
 IMPORT_TEST_GROUP(libym_logic_SmtLibScannerTestGroup);
 IMPORT_TEST_GROUP(libym_logic_SortMgrTestGroup);
 
-#endif // YM_LOGIC_CPPUTEST_H
+#endif // YM_YMLOGIC_CPPUTEST_H

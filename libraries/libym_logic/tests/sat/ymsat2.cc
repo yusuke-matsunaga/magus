@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logic/SatSolver.h"
-#include "logic/SatMsgHandlerImpl1.h"
-#include "logic/SatStats.h"
+#include "YmLogic/SatSolver.h"
+#include "YmLogic/SatMsgHandlerImpl1.h"
+#include "YmLogic/SatStats.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

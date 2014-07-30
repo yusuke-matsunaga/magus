@@ -8,9 +8,9 @@
 
 
 #include "SmtLibScanner.h"
-#include "ym_utils/FileIDO.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
+#include "ym_YmUtils/FileIDO.h"
+#include "ym_YmUtils/MsgMgr.h"
+#include "ym_YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

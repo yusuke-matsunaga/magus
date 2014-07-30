@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "cell/cell_nsdef.h"
-#include "utils/ShString.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

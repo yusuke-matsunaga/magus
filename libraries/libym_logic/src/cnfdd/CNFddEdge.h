@@ -10,8 +10,8 @@
 /// All rights reserved.
 
 
-#include "logic/cnfdd_nsdef.h"
-#include "logic/VarId.h"
+#include "YmLogic/cnfdd_nsdef.h"
+#include "YmLogic/VarId.h"
 #include <gmpxx.h>
 
 

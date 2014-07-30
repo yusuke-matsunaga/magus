@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "utils/CodecType.h"
+#include "YmTools.h"
+#include "YmUtils/CodecType.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -29,7 +29,7 @@ public:
   /// @note type が不正な値の場合は NULL を返す．
   static
   FileDecoder*
-  new_decoder(tCodecType type);
+  new_decoder(CodecType type);
 
   /// @brief thru decoder のインスタンスを作る関数
   /// @return 作成したインスタンスを返す．

@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_cell/pycell.h"
-#include "ym_cell/CellLut.h"
+#include "ym_YmCell/pycell.h"
+#include "ym_YmCell/CellLut.h"
 
 
 BEGIN_NAMESPACE_YM

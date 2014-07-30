@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/GenBase.h"
+#include "YmUtils/GenBase.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -10,7 +10,7 @@
 
 
 #include "smtlibv2_nsdef.h"
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/SimpleAlloc.h"
 #include "SortMgr.h"
 #include "NameMgr.h"
 

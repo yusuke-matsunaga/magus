@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/Alloc.h"
+#include "YmUtils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM

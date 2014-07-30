@@ -11,8 +11,8 @@
 
 #include "mislib_nsdef.h"
 
-#include "utils/StrBuff.h"
-#include "utils/Scanner.h"
+#include "YmUtils/StrBuff.h"
+#include "YmUtils/Scanner.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

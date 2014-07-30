@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "cell/CellPin.h"
-#include "cell/CellTime.h"
-#include "cell/CellCapacitance.h"
-#include "logic/Expr.h"
-#include "utils/ShString.h"
+#include "YmCell/CellPin.h"
+#include "YmCell/CellTime.h"
+#include "YmCell/CellCapacitance.h"
+#include "YmLogic/Expr.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

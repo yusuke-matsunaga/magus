@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/NpnMap.h"
+#include "YmLogic/NpnMap.h"
 
 
 //#define DEBUG_NPN_MAP

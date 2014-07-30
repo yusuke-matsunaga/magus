@@ -11,7 +11,7 @@
 
 #include "CNFddMgrImpl.h"
 #include "IdMgr.h"
-#include "utils/ODO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

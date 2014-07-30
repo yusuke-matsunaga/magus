@@ -9,8 +9,8 @@
 
 #include "MislibParserImpl.h"
 #include "MislibMgrImpl.h"
-#include "utils/FileIDO.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

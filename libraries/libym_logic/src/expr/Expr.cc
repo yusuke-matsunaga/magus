@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 
 #include "ExprMgr.h"
 #include "ExprNode.h"
 #include "ExprParser.h"
 #include "SopLit.h"
-#include "logic/TvFunc.h"
+#include "YmLogic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_EXPR

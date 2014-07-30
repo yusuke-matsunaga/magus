@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "cell/CellTiming.h"
-#include "cell/CellTime.h"
-#include "cell/CellResistance.h"
-#include "logic/Expr.h"
+#include "YmCell/CellTiming.h"
+#include "YmCell/CellTime.h"
+#include "YmCell/CellResistance.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

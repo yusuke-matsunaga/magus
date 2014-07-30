@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/RefCount.h"
+#include "YmUtils/RefCount.h"
 
 
 BEGIN_NAMESPACE_YM

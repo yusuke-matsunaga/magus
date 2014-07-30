@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/NameMgr.h"
+#include "YmUtils/NameMgr.h"
 
 
 BEGIN_NAMESPACE_YM

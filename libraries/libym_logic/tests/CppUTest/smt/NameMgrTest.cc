@@ -9,10 +9,10 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "logic/SmtSolver.h"
-#include "logic/SmtTerm.h"
-#include "logic/SmtVar.h"
-#include "logic/SmtFun.h"
+#include "YmLogic/SmtSolver.h"
+#include "YmLogic/SmtTerm.h"
+#include "YmLogic/SmtVar.h"
+#include "YmLogic/SmtFun.h"
 
 #include "SmtId.h"
 #include "IdMgr.h"
@@ -21,7 +21,7 @@
 #include "SortMgr.h"
 #include "SortElem.h"
 
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 using namespace nsYm;

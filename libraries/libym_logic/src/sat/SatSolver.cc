@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 #include "ymsat/YmSat.h"
 #include "ymsat/YmSatR.h"

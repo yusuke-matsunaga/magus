@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "ym_logic/pylogic.h"
-#include "ym_utils/pyutils.h"
-#include "ym_logic/Bdd.h"
-#include "ym_logic/BddLitSet.h"
-#include "ym_logic/BddVarSet.h"
-#include "ym_utils/FileIDO.h"
-#include "ym_utils/FileODO.h"
+#include "ym_YmLogic/pylogic.h"
+#include "ym_YmUtils/pyutils.h"
+#include "ym_YmLogic/Bdd.h"
+#include "ym_YmLogic/BddLitSet.h"
+#include "ym_YmLogic/BddVarSet.h"
+#include "ym_YmUtils/FileIDO.h"
+#include "ym_YmUtils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -3,18 +3,18 @@
 // NPN パッケージのテスト
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 #if HAVE_POPT
 #include <popt.h>
 #endif
 
-#include "utils/RandGen.h"
-#include "utils/PermGen.h"
-#include "logic/TvFunc.h"
-#include "logic/NpnMgr.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/PermGen.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/NpnMgr.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 //#define DEBUG
 

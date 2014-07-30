@@ -10,8 +10,8 @@
 /// All rights reserved.
 
 
-#include "logic/zdd_nsdef.h"
-#include "logic/VarId.h"
+#include "YmLogic/zdd_nsdef.h"
+#include "YmLogic/VarId.h"
 #include <gmpxx.h>
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_ZDD
 class ZddNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class ZddEdge ZddEdge.h "ym_logic/ZddEdge.h"
+/// @class ZddEdge ZddEdge.h "ym_YmLogic/ZddEdge.h"
 /// @brief ZDD の枝を表すクラス
 //////////////////////////////////////////////////////////////////////
 class ZddEdge

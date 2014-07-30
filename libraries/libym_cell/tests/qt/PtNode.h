@@ -1,7 +1,7 @@
 #ifndef PTNODE_H
 #define PTNODE_H
 
-/// @file libym_cell/tests/dotlib_ptview/PtNode.h
+/// @file libym_YmCell/tests/dotlib_ptview/PtNode.h
 /// @brief PtNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,7 +11,7 @@
 
 #include <QAbstractItemModel>
 #include "dotlib/dotlib_nsdef.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

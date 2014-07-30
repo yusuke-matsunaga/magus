@@ -9,7 +9,7 @@
 
 #include "BddMgrImpl.h"
 
-#include "logic/Bdd.h"
+#include "YmLogic/Bdd.h"
 #include "../bmc/BddMgrClassic.h"
 #include "../bmm/BddMgrModern.h"
 

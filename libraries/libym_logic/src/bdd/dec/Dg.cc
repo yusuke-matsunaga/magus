@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "logic/Dg.h"
-#include "logic/DgMgr.h"
-#include "logic/BddMgr.h"
+#include "YmLogic/Dg.h"
+#include "YmLogic/DgMgr.h"
+#include "YmLogic/BddMgr.h"
 
 #include "DgNode.h"
 

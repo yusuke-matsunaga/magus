@@ -10,7 +10,7 @@
 
 
 #include "tclpp/TclCmd.h"
-#include "logic/common.h"
+#include "YmLogic/common.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

@@ -10,9 +10,9 @@
 #include "LcFFMgr.h"
 #include "LcGroup.h"
 #include "LcClass.h"
-#include "cell/Cell.h"
-#include "logic/Expr.h"
-#include "logic/NpnMapM.h"
+#include "YmCell/Cell.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/NpnMapM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

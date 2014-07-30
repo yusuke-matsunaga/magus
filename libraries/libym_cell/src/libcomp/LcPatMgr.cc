@@ -11,11 +11,11 @@
 #include "LcPatNode.h"
 #include "LcPatHandle.h"
 
-#include "logic/Expr.h"
-#include "utils/MFSet.h"
-#include "utils/PermGen.h"
-#include "utils/MultiCombiGen.h"
-#include "utils/MultiSetPermGen.h"
+#include "YmLogic/Expr.h"
+#include "YmUtils/MFSet.h"
+#include "YmUtils/PermGen.h"
+#include "YmUtils/MultiCombiGen.h"
+#include "YmUtils/MultiSetPermGen.h"
 
 
 BEGIN_NONAMESPACE

@@ -9,14 +9,14 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 #if HAVE_POPT
 #include <popt.h>
 #endif
 
-#include "utils/RandGen.h"
-#include "logic/TvFunc.h"
+#include "YmUtils/RandGen.h"
+#include "YmLogic/TvFunc.h"
 
 #include "TvFuncTest.h"
 

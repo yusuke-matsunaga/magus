@@ -1,7 +1,7 @@
 #ifndef PARSETREEVIEW_H
 #define PARSETREEVIEW_H
 
-/// @file libym_cell/tests/dotlib_ptview/ParseTreeView.h
+/// @file libym_YmCell/tests/dotlib_ptview/ParseTreeView.h
 /// @brief ParseTreeView のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

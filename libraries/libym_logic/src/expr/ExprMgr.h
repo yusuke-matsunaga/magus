@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 #include "expr_types.h"
 #include "ExprNode.h"
 #include "ExprNodePtr.h"
 
-#include "utils/FragAlloc.h"
+#include "YmUtils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_EXPR

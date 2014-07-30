@@ -9,8 +9,8 @@
 
 #include "ZddMgrImpl.h"
 
-#include "logic/Zdd.h"
-#include "logic/ZddMgr.h"
+#include "YmLogic/Zdd.h"
+#include "YmLogic/ZddMgr.h"
 #include "ZddVar.h"
 
 #include "CapOp.h"

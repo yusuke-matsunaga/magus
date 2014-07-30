@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/DlList.h"
+#include "YmUtils/DlList.h"
 
 
 BEGIN_NAMESPACE_YM

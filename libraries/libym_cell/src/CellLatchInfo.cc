@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "cell/CellLatchInfo.h"
+#include "YmCell/CellLatchInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "cell/CellBus.h"
-#include "utils/ShString.h"
+#include "YmCell/CellBus.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

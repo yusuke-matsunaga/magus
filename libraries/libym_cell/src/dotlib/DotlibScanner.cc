@@ -8,7 +8,7 @@
 
 
 #include "DotlibScanner.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

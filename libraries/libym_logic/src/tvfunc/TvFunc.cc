@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "logic/TvFunc.h"
-#include "logic/NpnMap.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/NpnMap.h"
 
 
 #if SIZEOF_UNSIGNED_LONG == 8
@@ -5302,7 +5302,7 @@ TvFunc::print(ostream& s,
 	      int mode) const
 {
   ymuint ni_pow = 1UL << mInputNum;
-  const ymuint wordsize = SIZEOF_UNSIGNED_LONG * 8;
+  const ymuint wordsize = sizeof(ymulong) * 8;
   if ( mode == 2 ) {
     ymulong* bp = mVector;
     ymuint offset = 0;

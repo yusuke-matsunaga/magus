@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "utils/File.h"
+#include "YmUtils/File.h"
 
 
 /// @todo pwd.h や sys/param.h がないときの対処
-#if HAVE_PWD_H
+#if defined(HAVE_PWD_H)
 #  include <pwd.h>
 #endif
-#if HAVE_SYS_PARAM_H
+#if defined(HAVE_SYS_PARAM_H)
 #  include <sys/param.h>
 #endif
 

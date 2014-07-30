@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logic/Bdd.h"
-#include "logic/BddVarSet.h"
-#include "logic/BddLitSet.h"
-#include "logic/BddVector.h"
-#include "logic/BddList.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddVarSet.h"
+#include "YmLogic/BddLitSet.h"
+#include "YmLogic/BddVector.h"
+#include "YmLogic/BddList.h"
 
 #include "BddMgrImpl.h"
 

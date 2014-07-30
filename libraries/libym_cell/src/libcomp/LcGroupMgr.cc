@@ -11,9 +11,9 @@
 #include "LcClass.h"
 #include "LcGroup.h"
 #include "LibComp.h"
-#include "cell/Cell.h"
-#include "utils/MFSet.h"
-#include "utils/PermGen.h"
+#include "YmCell/Cell.h"
+#include "YmUtils/MFSet.h"
+#include "YmUtils/PermGen.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

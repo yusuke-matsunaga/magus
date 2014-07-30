@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/StrBuff.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM

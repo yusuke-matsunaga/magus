@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "logic/sat_nsdef.h"
-#include "logic/Literal.h"
+#include "YmLogic/sat_nsdef.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -245,4 +245,4 @@ AssignList::backtrack(int level)
 
 END_NAMESPACE_YM_SAT
 
-#endif // LIBYM_LOGIC_SAT_YMSAT_ASSIGNLIST_H
+#endif // LIBYM_YMYMLOGIC_SAT_YMSAT_ASSIGNLIST_H

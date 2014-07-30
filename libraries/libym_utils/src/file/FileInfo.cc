@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "utils/FileInfo.h"
-#include "utils/FileLoc.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/FileInfo.h"
+#include "YmUtils/FileLoc.h"
+#include "YmUtils/FileRegion.h"
 
 #include "FileInfoMgr.h"
 

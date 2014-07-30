@@ -1,7 +1,7 @@
 
 // NPN パッケージのテスト
 
-#include <ymtools/ymtools.h>
+#include <ymtools/YmTools.h>
 #include <ymtools/random.h>
 #include <ymtools/Generator.h>
 

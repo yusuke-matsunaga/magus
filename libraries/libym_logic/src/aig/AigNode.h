@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/Aig.h"
+#include "YmLogic/Aig.h"
 
 
 BEGIN_NAMESPACE_YM_AIG

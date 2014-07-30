@@ -1,7 +1,7 @@
 #ifndef BZENGINE_H
 #define BZENGINE_H
 
-/// @file utils/BzEngine.h
+/// @file BzEngine.h
 /// @brief BzEngine のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
-#if defined(HAVE_BZLIB)
+#if defined(BZIP2_FOUND)
 #include <bzlib.h>
 #else
-#error "\"utils/BzEngine.h\" requires <bzlib.h>"
+#error "\"BzEngine.h\" requires <bzlib.h>"
 #endif
 
 

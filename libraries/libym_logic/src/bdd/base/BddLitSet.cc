@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/BddLitSet.h"
+#include "YmLogic/BddLitSet.h"
 #include "BddMgrImpl.h"
 
 

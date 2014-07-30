@@ -8,7 +8,7 @@
 
 
 #include "CiTiming.h"
-#include "cell/CellLut.h"
+#include "YmCell/CellLut.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

@@ -10,9 +10,9 @@
 
 
 #include "mislib_nsdef.h"
-#include "utils/FileRegion.h"
-#include "utils/SimpleAlloc.h"
-#include "utils/ShString.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/ShString.h"
 
 #include "MislibNodeImpl.h"
 

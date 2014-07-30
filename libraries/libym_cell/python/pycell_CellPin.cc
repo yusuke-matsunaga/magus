@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "ym_cell/pycell.h"
-#include "ym_cell/CellPin.h"
-#include "ym_cell/CellCapacitance.h"
-#include "ym_cell/CellTime.h"
-#include "ym_logic/pylogic.h"
-#include "ym_logic/Expr.h"
+#include "ym_YmCell/pycell.h"
+#include "ym_YmCell/CellPin.h"
+#include "ym_YmCell/CellCapacitance.h"
+#include "ym_YmCell/CellTime.h"
+#include "ym_YmLogic/pylogic.h"
+#include "ym_YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM

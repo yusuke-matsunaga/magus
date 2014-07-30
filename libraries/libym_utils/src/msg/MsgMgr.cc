@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 #include "MsgMgrImpl.h"
 
 
@@ -20,12 +20,12 @@ MsgMgrImpl gTheMgr;
 END_NONAMESPACE
 
 
-// @brief tMsgType のストリーム出力演算子
+// @brief MsgType のストリーム出力演算子
 // @param[in] s 出力先のストリーム
 // @param[in] type メッセージの種類
 ostream&
 operator<<(ostream& s,
-	   tMsgType type)
+	   MsgType type)
 {
   switch ( type ) {
   case kMsgError:   s << "(ERROR  )"; break;
@@ -77,7 +77,7 @@ void
 MsgMgr::put_msg(const char* src_file,
 		int src_line,
 		const FileRegion& file_loc,
-		tMsgType type,
+		MsgType type,
 		const char* label,
 		const char* msg)
 {
@@ -93,7 +93,7 @@ MsgMgr::put_msg(const char* src_file,
 void
 MsgMgr::put_msg(const char* src_file,
 		int src_line,
-		tMsgType type,
+		MsgType type,
 		const char* label,
 		const char* msg)
 {

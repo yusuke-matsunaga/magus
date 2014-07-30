@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/NpnMgr.h"
+#include "YmLogic/NpnMgr.h"
 #include "NpnMgrImpl.h"
 
 

@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "logic/NpnMapM.h"
-#include "logic/NpnMap.h"
+#include "YmLogic/NpnMapM.h"
+#include "YmLogic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

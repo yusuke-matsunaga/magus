@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
-#if defined(HAVE_ZLIB)
+#if defined(ZLIB_FOUND)
 #include <zlib.h>
 #else
-#error "\"ym_utils/zstream.h\" requires <zlib.h>"
+#error "\"zstream.h\" requires <zlib.h>"
 #endif
 
 
@@ -269,7 +269,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class zstream_buff zstream.h "ym_utils/zstream.h"
+/// @class zstream_buff zstream.h "zstream.h"
 /// @brief バッファ付きの zstream クラス
 //////////////////////////////////////////////////////////////////////
 class zstream_buff :
@@ -369,7 +369,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class basic_zlib_streambuf zstream.h "ym_utils/zstream.h"
+/// @class basic_zlib_streambuf zstream.h "zstream.h"
 /// @brief zlib を使ったストリームバッファのテンプレート
 //////////////////////////////////////////////////////////////////////
 template <typename _CharT,
@@ -562,7 +562,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class basic_izstream zstream.h "ym_utils/zstream.h"
+/// @class basic_izstream zstream.h "zstream.h"
 /// @brief zlib を使った入力ストリームのテンプレート
 //////////////////////////////////////////////////////////////////////
 template <typename _CharT,
@@ -594,7 +594,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class basic_ozstream zstream.h "ym_utils/zstream.h"
+/// @class basic_ozstream zstream.h "zstream.h"
 /// @brief zlib を使った出力ストリームのテンプレート
 //////////////////////////////////////////////////////////////////////
 template <typename _CharT,

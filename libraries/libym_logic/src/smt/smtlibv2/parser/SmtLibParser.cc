@@ -10,8 +10,8 @@
 #include "SmtLibParser.h"
 #include "SmtLibScanner.h"
 #include "SmtLibNodeImpl.h"
-#include "utils/FileIDO.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

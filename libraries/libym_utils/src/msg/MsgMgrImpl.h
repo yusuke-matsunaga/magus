@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -65,7 +65,7 @@ public:
   put_msg(const char* src_file,
 	  int src_line,
 	  const FileRegion& file_loc,
-	  tMsgType type,
+	  MsgType type,
 	  const char* label,
 	  const char* msg);
 
@@ -78,7 +78,7 @@ public:
   void
   put_msg(const char* src_file,
 	  int src_line,
-	  tMsgType type,
+	  MsgType type,
 	  const char* label,
 	  const char* msg);
 
@@ -126,7 +126,7 @@ private:
   T6BindMgr<const char*,
 	    int,
 	    const FileRegion&,
-	    tMsgType,
+	    MsgType,
 	    const char*,
 	    const char*> mMgr;
 

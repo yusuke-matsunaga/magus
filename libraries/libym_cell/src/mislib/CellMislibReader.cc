@@ -7,22 +7,22 @@
 /// All rights reserved.
 
 
-#include "cell/CellMislibReader.h"
+#include "YmCell/CellMislibReader.h"
 
-#include "cell/CellLibrary.h"
-#include "cell/CellArea.h"
-#include "cell/CellCapacitance.h"
-#include "cell/CellResistance.h"
-#include "cell/CellTime.h"
-#include "cell/CellTiming.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellArea.h"
+#include "YmCell/CellCapacitance.h"
+#include "YmCell/CellResistance.h"
+#include "YmCell/CellTime.h"
+#include "YmCell/CellTiming.h"
 
 #include "MislibParser.h"
 #include "MislibMgr.h"
 #include "MislibNode.h"
 
-#include "logic/Expr.h"
-#include "logic/TvFunc.h"
-#include "utils/MsgMgr.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/TvFunc.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

@@ -2,14 +2,14 @@
 
 // TvFunc パッケージのテスト
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 #if HAVE_POPT
 #include <popt.h>
 #endif
 
-#include "utils/StopWatch.h"
-#include "logic/TvFunc.h"
+#include "YmUtils/StopWatch.h"
+#include "YmLogic/TvFunc.h"
 
 using namespace std;
 using namespace nsYm;

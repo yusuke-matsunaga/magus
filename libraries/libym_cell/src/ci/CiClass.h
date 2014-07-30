@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "cell/CellClass.h"
-#include "utils/Alloc.h"
-#include "utils/IDO.h"
-#include "utils/ODO.h"
+#include "YmCell/CellClass.h"
+#include "YmUtils/Alloc.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

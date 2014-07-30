@@ -10,7 +10,7 @@
 
 
 #include "CNFddMgrImpl.h"
-#include "utils/IDO.h"
+#include "YmUtils/IDO.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

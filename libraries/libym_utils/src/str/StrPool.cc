@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/ShString.h"
+#include "YmUtils/ShString.h"
 #include "StrPool.h"
 
 

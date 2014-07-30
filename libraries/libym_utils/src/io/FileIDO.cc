@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/FileIDO.h"
+#include "YmUtils/FileIDO.h"
 #include "FileDecoder.h"
 
 
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] codec_type Decoder の種類
-FileIDO::FileIDO(tCodecType codec_type)
+FileIDO::FileIDO(CodecType codec_type)
 {
   mDecoder = FileDecoder::new_decoder(codec_type);
 }

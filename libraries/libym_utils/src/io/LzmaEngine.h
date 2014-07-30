@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
-#if defined(HAVE_LZMA)
+#if defined(LIBLZMA_FOUND)
 #include <lzma.h>
 #else
-#error "\"ym_utils/LzmaEngine.h\" requires <lzma.h>"
+#error "\"LzmaEngine.h\" requires <lzma.h>"
 #endif
 
 

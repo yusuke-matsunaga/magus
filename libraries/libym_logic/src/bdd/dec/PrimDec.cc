@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/Dg.h"
+#include "YmLogic/Dg.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

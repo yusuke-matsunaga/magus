@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "utils/MsgHandler.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -46,7 +46,7 @@ MsgHandler::mask() const
 // @param[in] type 付加するメッセージタイプ
 // @note type はビットマスクではない．
 void
-MsgHandler::add_mask(tMsgType type)
+MsgHandler::add_mask(MsgType type)
 {
   mMask |= conv2bitmask(type);
 }
@@ -55,7 +55,7 @@ MsgHandler::add_mask(tMsgType type)
 // @param[in] type 削除するメッセージタイプ
 // @note type はビットマスクではない．
 void
-MsgHandler::delete_mask(tMsgType type)
+MsgHandler::delete_mask(MsgType type)
 {
   mMask &= ~(conv2bitmask(type));
 }
@@ -69,7 +69,7 @@ MsgHandler::delete_mask(tMsgType type)
 void
 MsgHandler::put_msg(const char* src_file,
 		    int src_line,
-		    tMsgType type,
+		    MsgType type,
 		    const char* label,
 		    const char* body)
 {
@@ -89,7 +89,7 @@ void
 MsgHandler::event_proc(const char* src_file,
 		       int src_line,
 		       const FileRegion& loc,
-		       tMsgType type,
+		       MsgType type,
 		       const char* label,
 		       const char* body)
 {
@@ -131,7 +131,7 @@ void
 StreamMsgHandler::put_msg(const char* src_file,
 			  int src_line,
 			  const FileRegion& loc,
-			  tMsgType type,
+			  MsgType type,
 			  const char* label,
 			  const char* body)
 {
@@ -147,7 +147,7 @@ StreamMsgHandler::put_msg(const char* src_file,
 void
 StreamMsgHandler::put_msg(const char* src_file,
 			  int src_line,
-			  tMsgType type,
+			  MsgType type,
 			  const char* label,
 			  const char* body)
 {

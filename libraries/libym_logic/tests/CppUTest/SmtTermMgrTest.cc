@@ -18,7 +18,7 @@
 #include "SmtSortMgr.h"
 #include "SmtNameMgr.h"
 #include "SmtTermMgr.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_YmUtils/SimpleAlloc.h"
 
 
 using namespace nsYm;

@@ -9,9 +9,9 @@
 
 #include "Dumper.h"
 
-#include "logic/Bdd.h"
-#include "logic/BddVector.h"
-#include "logic/BddList.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddVector.h"
+#include "YmLogic/BddList.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

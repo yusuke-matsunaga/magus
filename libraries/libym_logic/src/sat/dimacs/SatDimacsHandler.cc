@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/SatDimacsHandler.h"
+#include "YmLogic/SatDimacsHandler.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

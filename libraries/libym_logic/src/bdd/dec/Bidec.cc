@@ -8,8 +8,8 @@
 
 
 #include "dsa/MFSet.h"
-#include "logic/Dg.h"
-#include "logic/BddMgr.h"
+#include "YmLogic/Dg.h"
+#include "YmLogic/BddMgr.h"
 
 
 //#define DEBUG_MERGE_BIDEC

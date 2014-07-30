@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "utils/USTime.h"
-#include "utils/StopWatch.h"
-#include "utils/MStopWatch.h"
+#include "YmUtils/USTime.h"
+#include "YmUtils/StopWatch.h"
+#include "YmUtils/MStopWatch.h"
 
-#if HAVE_GETRUSAGE
+#if defined(HAVE_GETRUSAGE)
 #  include <sys/resource.h>
-#elif HAVE_TIMES
+#elif defined(HAVE_TIMES)
 // System V 系では rusage() の代りに times() を使う．
 #  include <sys/param.h>
 #  include <sys/times.h>
@@ -91,12 +91,12 @@ USTime
 StopWatch::cur_time()
 {
   double u, s, r;
-#if HAVE_GETRUSAGE
+#if defined(HAVE_GETRUSAGE)
   struct rusage ru;
   getrusage(RUSAGE_SELF, &ru);
   u = xchg(ru.ru_utime);
   s = xchg(ru.ru_stime);
-#elif HAVE_TIMES
+#elif defined(HAVE_TIMES)
   struct tms buffer;
   (void) times(&buffer);
   u = (double)buffer.tms_utime * 1000.0 * 1000.0 / (double)CLK_TCK;

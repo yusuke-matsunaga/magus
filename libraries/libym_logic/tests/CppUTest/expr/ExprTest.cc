@@ -9,7 +9,7 @@
 
 #include "CppUTest/TestHarness.h"
 
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 
 using namespace nsYm;
 

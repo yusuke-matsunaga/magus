@@ -9,8 +9,8 @@
 
 #include "NpnMgrImpl.h"
 
-#include "logic/TvFunc.h"
-#include "logic/NpnMgr.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/NpnMgr.h"
 #include "NpnBaseConf.h"
 #include "NpnConf.h"
 

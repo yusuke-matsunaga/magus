@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/FileODO.h"
+#include "YmUtils/FileODO.h"
 #include "FileCoder.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM
 
 // @brief コンストラクタ
 // @param[in] codec_type Coder の種類
-FileODO::FileODO(tCodecType codec_type)
+FileODO::FileODO(CodecType codec_type)
 {
   mCoder = FileCoder::new_coder(codec_type);
 }

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/Bdd.h"
+#include "YmLogic/Bdd.h"
 
 #include "BmmVar.h"
 

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "cell/CellFFInfo.h"
+#include "YmCell/CellFFInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

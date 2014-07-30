@@ -11,8 +11,8 @@
 #include "mislib/MislibMgr.h"
 #include "mislib/MislibNode.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

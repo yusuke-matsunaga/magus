@@ -10,9 +10,9 @@
 
 
 #include "smtlibv2_nsdef.h"
-#include "logic/SmtSolver.h"
-#include "utils/Alloc.h"
-#include "utils/StrBuff.h"
+#include "YmLogic/SmtSolver.h"
+#include "YmUtils/Alloc.h"
+#include "YmUtils/StrBuff.h"
 #include "IdMgr.h"
 
 

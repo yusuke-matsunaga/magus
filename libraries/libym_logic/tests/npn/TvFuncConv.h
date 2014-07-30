@@ -10,7 +10,7 @@
 
 
 #include "tclpp/TclObj.h"
-#include "logic/TvFunc.h"
+#include "YmLogic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_NPN
@@ -135,4 +135,4 @@ TvFuncConv::set_ptr(Tcl_Obj* obj,
 
 END_NAMESPACE_YM_NPN
 
-#endif // LIBYM_LOGIC_TESTS_NPN_TVFUNCCONV_H
+#endif // LIBYM_YMLOGIC_TESTS_NPN_TVFUNCCONV_H

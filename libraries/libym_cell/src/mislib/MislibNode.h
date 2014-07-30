@@ -11,9 +11,9 @@
 
 #include "mislib_nsdef.h"
 
-#include "utils/ShString.h"
-#include "utils/FileRegion.h"
-#include "logic/Expr.h"
+#include "YmUtils/ShString.h"
+#include "YmUtils/FileRegion.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB

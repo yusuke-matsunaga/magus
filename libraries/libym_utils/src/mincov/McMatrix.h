@@ -12,7 +12,7 @@
 #include "mincov_nsdef.h"
 #include "McRowHead.h"
 #include "McColHead.h"
-#include "utils/UnitAlloc.h"
+#include "YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV

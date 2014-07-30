@@ -6,7 +6,7 @@
 #include <ymconfig.h>
 #endif
 
-#include <ymtools/ymtools.h>
+#include <ymtools/YmTools.h>
 #include <ymtools/random.h>
 #include <ymtools/Generator.h>
 #include "TvFunc.h"

@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "cell/cell_nsdef.h"
-#include "utils/IDO.h"
-#include "utils/ODO.h"
-#include "utils/Alloc.h"
-#include "libcomp/libcomp_nsdef.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/ODO.h"
+#include "YmUtils/Alloc.h"
+#include "libcomp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

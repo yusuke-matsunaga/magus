@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "cell/CellLibrary.h"
-#include "cell/CellMislibReader.h"
-#include "cell/CellDotlibReader.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellMislibReader.h"
+#include "YmCell/CellDotlibReader.h"
 
-#include "utils/FileIDO.h"
-#include "utils/FileODO.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/FileODO.h"
 
 
 BEGIN_NAMESPACE_YM

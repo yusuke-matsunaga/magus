@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_logic/SatMsgHandler.h"
-#include "ym_logic/pylogic.h"
+#include "ym_YmLogic/SatMsgHandler.h"
+#include "ym_YmLogic/pylogic.h"
 
 
 BEGIN_NAMESPACE_YM

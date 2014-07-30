@@ -15,15 +15,15 @@
 #include "IdMgr.h"
 #include "NameObj.h"
 
-#include "logic/SmtTerm.h"
-#include "logic/SmtVar.h"
+#include "YmLogic/SmtTerm.h"
+#include "YmLogic/SmtVar.h"
 
 #include "SmtId.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include "utils/StrListIDO.h"
+#include "YmUtils/StrListIDO.h"
 
 
 BEGIN_NONAMESPACE

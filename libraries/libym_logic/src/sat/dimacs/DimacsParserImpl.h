@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/sat_nsdef.h"
+#include "YmLogic/sat_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 #include "expr_types.h"
 
 

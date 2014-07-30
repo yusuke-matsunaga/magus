@@ -9,9 +9,9 @@
 
 #include "CiPatMgr.h"
 #include "CiPatGraph.h"
-#include "libcomp/LcPatMgr.h"
-#include "libcomp/LcPatNode.h"
-#include "libcomp/LcPatHandle.h"
+#include "LcPatMgr.h"
+#include "LcPatNode.h"
+#include "LcPatHandle.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 
 /// @brief nsCompCommmon 名前空間の開始

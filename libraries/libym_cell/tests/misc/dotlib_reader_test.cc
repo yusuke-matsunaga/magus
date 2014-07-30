@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
-#include "cell/CellDotlibReader.h"
-#include "cell/CellLibrary.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmCell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

@@ -1,7 +1,7 @@
 #ifndef PTROOTNODE_H
 #define PTROOTNODE_H
 
-/// @file libym_cell/tests/dotlib_ptview/PtRootNode.h
+/// @file libym_YmCell/tests/dotlib_ptview/PtRootNode.h
 /// @brief PtRootNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

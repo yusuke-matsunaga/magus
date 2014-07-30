@@ -1,5 +1,5 @@
 /// @file mainpage.h
-/// @brief YMTOOLS のメインページ
+/// @brief YmTools のメインページ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
@@ -8,7 +8,7 @@
 
 /// @mainpage
 ///
-/// ymtools は以下のモジュールからなる．
+/// YmTools は以下のモジュールからなる．
 /// - libym_utils
 ///   \ref YmUtils
 ///   その他のモジュールに使われる基本的なクラス／関数を提供する

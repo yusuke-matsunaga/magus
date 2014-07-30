@@ -1,7 +1,7 @@
 #ifndef PTBASEIMPL_H
 #define PTBASEIMPL_H
 
-/// @file libym_cell/tests/dotlib_ptview/PtBaseNode.h
+/// @file libym_YmCell/tests/dotlib_ptview/PtBaseNode.h
 /// @brief PtBaseNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -10,8 +10,8 @@
 #include "SortMgr.h"
 #include "SortElem.h"
 #include "SmtId.h"
-#include "logic/SmtSolver.h"
-#include "logic/SmtSortInfo.h"
+#include "YmLogic/SmtSolver.h"
+#include "YmLogic/SmtSortInfo.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

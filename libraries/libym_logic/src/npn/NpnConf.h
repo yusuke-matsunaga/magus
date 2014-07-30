@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/NpnMap.h"
+#include "YmLogic/NpnMap.h"
 #include "NpnBaseConf.h"
 
 

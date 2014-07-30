@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "cell/Cell.h"
-#include "logic/Expr.h"
-#include "utils/ShString.h"
-#include "utils/Alloc.h"
-#include "utils/ODO.h"
+#include "YmCell/Cell.h"
+#include "YmLogic/Expr.h"
+#include "YmUtils/ShString.h"
+#include "YmUtils/Alloc.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

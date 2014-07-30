@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
-#include "cell/CellDotlibReader.h"
-#include "cell/CellLibrary.h"
-#include "cell/Cell.h"
-#include "cell/CellTiming.h"
-#include "cell/CellLut.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellTiming.h"
+#include "YmCell/CellLut.h"
 
 
 //#define ERROR_EPSILON 1.0e-10

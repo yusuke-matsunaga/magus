@@ -6,8 +6,8 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "utils/SimpleAlloc.h"
+#include "YmTools.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM

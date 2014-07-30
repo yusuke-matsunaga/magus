@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "utils/ODO.h"
-#include "utils/StreamODO.h"
+#include "YmUtils/ODO.h"
+#include "YmUtils/StreamODO.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/FileRegion.h"
 
 #include <fcntl.h>
 

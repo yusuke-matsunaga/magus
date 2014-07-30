@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logic/DimacsParser.h"
-#include "logic/DimacsHandler.h"
+#include "YmLogic/DimacsParser.h"
+#include "YmLogic/DimacsHandler.h"
 #include "DimacsParserImpl.h"
 #include "DimacsScanner.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

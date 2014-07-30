@@ -12,11 +12,11 @@
 #include "LcGroup.h"
 #include "LcPatNode.h"
 #include "LcPatHandle.h"
-#include "cell/CellLibrary.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
-#include "logic/Expr.h"
-#include "logic/NpnMap.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

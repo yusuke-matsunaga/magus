@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/ZddMgr.h"
+#include "YmLogic/ZddMgr.h"
 #include "ZddMgrImpl.h"
 
 

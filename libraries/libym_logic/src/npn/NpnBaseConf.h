@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "logic/NpnMap.h"
-#include "logic/TvFunc.h"
+#include "YmLogic/NpnMap.h"
+#include "YmLogic/TvFunc.h"
 
 
 #define USE_MALLOC 0

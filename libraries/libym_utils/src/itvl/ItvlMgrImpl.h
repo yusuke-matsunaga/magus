@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "utils/UnitAlloc.h"
-#include "utils/IDO.h"
-#include "utils/ODO.h"
+#include "YmUtils/UnitAlloc.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM

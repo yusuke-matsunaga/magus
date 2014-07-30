@@ -6,12 +6,12 @@
 /// All rights reserved.
 
 
-#include "logic/TvFunc.h"
-#include "logic/NpnMgr.h"
-#include "logic/NpnMap.h"
-#include "logic/AigMgr.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/NpnMgr.h"
+#include "YmLogic/NpnMap.h"
+#include "YmLogic/AigMgr.h"
 
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM

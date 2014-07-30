@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -120,6 +120,7 @@ inline
 ymuint64
 SimpleAlloc::align(ymuint64 req_size)
 {
+  const int ALIGNOF_DOUBLE = __alignof__(double);
   return ((req_size + ALIGNOF_DOUBLE - 1) / ALIGNOF_DOUBLE) * ALIGNOF_DOUBLE;
 }
 

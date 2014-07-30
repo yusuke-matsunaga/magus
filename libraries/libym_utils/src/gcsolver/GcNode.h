@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 
 BEGIN_NAMESPACE_YM

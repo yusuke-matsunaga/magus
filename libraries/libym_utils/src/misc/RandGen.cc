@@ -54,9 +54,9 @@
 */
 
 
-#include "utils/RandGen.h"
-#include "utils/RandPermGen.h"
-#include "utils/RandCombiGen.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/RandPermGen.h"
+#include "YmUtils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM

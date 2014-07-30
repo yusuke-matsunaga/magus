@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "cell/CellLibrary.h"
-#include "cell/CellDotlibReader.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 #include "libdump/LibDump.h"
 
 

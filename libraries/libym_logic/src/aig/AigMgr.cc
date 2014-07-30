@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/AigMgr.h"
+#include "YmLogic/AigMgr.h"
 #include "AigMgrImpl.h"
 
 

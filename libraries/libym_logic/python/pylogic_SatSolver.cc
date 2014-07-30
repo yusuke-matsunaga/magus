@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "ym_logic/pylogic.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatStats.h"
+#include "ym_YmLogic/pylogic.h"
+#include "ym_YmLogic/SatSolver.h"
+#include "ym_YmLogic/SatStats.h"
 #include "PySatMsgHandler.h"
-#include "ym_utils/pyutils.h"
+#include "ym_YmUtils/pyutils.h"
 
 
 BEGIN_NAMESPACE_YM

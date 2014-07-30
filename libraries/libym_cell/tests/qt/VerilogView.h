@@ -1,7 +1,7 @@
 #ifndef VERILOGVIEW_H
 #define VERILOGVIEW_H
 
-/// @file libym_cell/tests/dotlib_ptview/VerilogView.h
+/// @file libym_YmCell/tests/dotlib_ptview/VerilogView.h
 /// @brief VerilogView のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

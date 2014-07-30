@@ -11,14 +11,14 @@
 
 //#define DG_PROFILE
 
-#include "logic/DgMgr.h"
+#include "YmLogic/DgMgr.h"
 
 #include "DgNode.h"
 #include "bdd/base/BddMgrImpl.h"
 
 #if defined(DG_PROFILE)
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 BEGIN_NAMESPACE_YM_DEC
 BEGIN_NONAMESPACE

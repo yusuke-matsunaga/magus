@@ -9,7 +9,7 @@
 
 #include "DotlibFL.h"
 #include "DotlibAttr.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

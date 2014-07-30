@@ -8,7 +8,7 @@
 
 
 #include "MsgMgrImpl.h"
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -63,7 +63,7 @@ void
 MsgMgrImpl::put_msg(const char* src_file,
 		    int src_line,
 		    const FileRegion& file_loc,
-		    tMsgType type,
+		    MsgType type,
 		    const char* label,
 		    const char* msg)
 {
@@ -89,7 +89,7 @@ MsgMgrImpl::put_msg(const char* src_file,
 void
 MsgMgrImpl::put_msg(const char* src_file,
 		    int src_line,
-		    tMsgType type,
+		    MsgType type,
 		    const char* label,
 		    const char* msg)
 {

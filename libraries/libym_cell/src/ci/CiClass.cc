@@ -8,9 +8,9 @@
 
 
 #include "CiClass.h"
-#include "cell/CellLibrary.h"
-#include "cell/CellGroup.h"
-#include "logic/NpnMapM.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellGroup.h"
+#include "YmLogic/NpnMapM.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

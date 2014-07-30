@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "logic/Zdd.h"
-#include "utils/Binder.h"
+#include "YmLogic/Zdd.h"
+#include "YmUtils/Binder.h"
 #include "ZddEdge.h"
 #include "ZddNode.h"
 

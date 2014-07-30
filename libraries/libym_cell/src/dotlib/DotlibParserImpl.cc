@@ -11,9 +11,9 @@
 #include "DotlibMgrImpl.h"
 #include "DotlibHandler.h"
 #include "HandlerFactory.h"
-#include "utils/FileIDO.h"
-#include "utils/MsgMgr.h"
-#include "utils/ShString.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/ShString.h"
 #include "DotlibNodeImpl.h"
 
 

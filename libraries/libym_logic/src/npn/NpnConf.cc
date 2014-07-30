@@ -8,7 +8,7 @@
 
 
 #include "NpnConf.h"
-#include "logic/NpnMgr.h"
+#include "YmLogic/NpnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NPN

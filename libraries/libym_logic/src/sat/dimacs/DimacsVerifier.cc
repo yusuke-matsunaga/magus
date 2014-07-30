@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "logic/DimacsVerifier.h"
+#include "YmLogic/DimacsVerifier.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

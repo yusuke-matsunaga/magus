@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "logic/sat_nsdef.h"
+#include "YmLogic/sat_nsdef.h"
 #include "SatReason.h"
-#include "utils/Alloc.h"
+#include "YmUtils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SAT

@@ -10,8 +10,8 @@
 
 
 #include "mislib_nsdef.h"
-#include "utils/FileRegion.h"
-#include "utils/ShString.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/ShString.h"
 
 #include "MislibMgrImpl.h"
 #include "MislibNodeImpl.h"

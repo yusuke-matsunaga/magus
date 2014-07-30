@@ -11,7 +11,7 @@
 
 #include "BddMgrImpl.h"
 #include "IdMgr.h"
-#include "utils/ODO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

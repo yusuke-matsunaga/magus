@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "logic/SmtSolver.h"
-#include "logic/SmtFun.h"
-#include "utils/SimpleAlloc.h"
+#include "YmLogic/SmtSolver.h"
+#include "YmLogic/SmtFun.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMT

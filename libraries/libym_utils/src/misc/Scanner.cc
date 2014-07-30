@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/Scanner.h"
+#include "YmUtils/Scanner.h"
 
 
 BEGIN_NAMESPACE_YM

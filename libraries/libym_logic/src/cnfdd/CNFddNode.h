@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/CNFdd.h"
+#include "YmLogic/CNFdd.h"
 #include "CNFddEdge.h"
 
 

@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "logic/DimacsParser.h"
-#include "logic/DimacsHandler.h"
+#include "YmLogic/DimacsParser.h"
+#include "YmLogic/DimacsHandler.h"
 
-#include "utils/FileIDO.h"
+#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM

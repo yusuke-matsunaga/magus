@@ -11,15 +11,15 @@
 #include "ThruCoder.h"
 #include "ZCoder.h"
 
-#if defined(HAVE_ZLIB)
+#if defined(ZLIB_FOUND)
 #include "GzCoder.h"
 #endif
 
-#if defined(HAVE_BZLIB)
+#if defined(BZIP2_FOUND)
 #include "BzCoder.h"
 #endif
 
-#if defined(HAVE_LZMA)
+#if defined(LIBLZMA_FOUND)
 #include "LzmaCoder.h"
 #endif
 
@@ -35,7 +35,7 @@ BEGIN_NAMESPACE_YM
 // @return 作成したインスタンスを返す．
 // @note type が不正な値の場合は NULL を返す．
 FileCoder*
-FileCoder::new_coder(tCodecType type)
+FileCoder::new_coder(CodecType type)
 {
   FileCoder* coder = NULL;
 
@@ -46,7 +46,7 @@ FileCoder::new_coder(tCodecType type)
     coder = new ZCoder();
   }
   else if ( type == kCodecGzip ) {
-#if defined(HAVE_ZLIB)
+#if defined(ZLIB_FOUND)
     coder = new GzCoder();
 #else
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -56,7 +56,7 @@ FileCoder::new_coder(tCodecType type)
 #endif
   }
   else if ( type == kCodecBzip2 ) {
-#if defined(HAVE_BZLIB)
+#if defined(BZIP2_FOUND)
     coder = new BzCoder();
 #else
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -66,7 +66,7 @@ FileCoder::new_coder(tCodecType type)
 #endif
   }
   else if ( type == kCodecLzma ) {
-#if defined(HAVE_LZMA)
+#if defined(LIBLZMA_FOUND)
     coder = new LzmaCoder();
 #else
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -100,7 +100,7 @@ FileCoder::new_z_coder()
 FileCoder*
 FileCoder::new_gzip_coder()
 {
-#if defined(HAVE_ZLIB)
+#if defined(ZLIB_FOUND)
   return new GzCoder();
 #else
   MsgMgr::put_msg(__FILE__, __LINE__,
@@ -116,7 +116,7 @@ FileCoder::new_gzip_coder()
 FileCoder*
 FileCoder::new_bzip2_coder()
 {
-#if defined(HAVE_BZLIB)
+#if defined(BZIP2_FOUND)
   return new BzCoder();
 #else
   MsgMgr::put_msg(__FILE__, __LINE__,
@@ -132,7 +132,7 @@ FileCoder::new_bzip2_coder()
 FileCoder*
 FileCoder::new_xz_coder()
 {
-#if defined(HAVE_LZMA)
+#if defined(LIBLZMA_FOUND)
   return new LzmaCoder();
 #else
   MsgMgr::put_msg(__FILE__, __LINE__,

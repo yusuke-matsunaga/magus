@@ -2,8 +2,8 @@
 
 // NPN パッケージのテスト
 
-#include "ymtools.h"
-#include "utils/PermGen.h"
+#include "YmTools.h"
+#include "YmUtils/PermGen.h"
 
 //#define DEBUG
 

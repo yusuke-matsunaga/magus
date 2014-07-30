@@ -13,7 +13,7 @@
 #include "CiTiming.h"
 #include "CiBus.h"
 #include "CiBundle.h"
-#include "cell/CellGroup.h"
+#include "YmCell/CellGroup.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

@@ -8,7 +8,7 @@
 
 
 #include "SmtFunImpl.h"
-#include "logic/SmtVar.h"
+#include "YmLogic/SmtVar.h"
 
 
 BEGIN_NAMESPACE_YM_SMT

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "logic/NpnMap.h"
-#include "utils/UnitAlloc.h"
+#include "YmLogic/NpnMap.h"
+#include "YmUtils/UnitAlloc.h"
 #include "NpnBaseConf.h"
 
 

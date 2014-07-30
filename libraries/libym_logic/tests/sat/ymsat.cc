@@ -7,15 +7,15 @@
 /// All rights reserved.
 
 
-#include "logic/DimacsParser.h"
-#include "logic/SatDimacsHandler.h"
-#include "logic/DimacsVerifier.h"
-#include "logic/SatSolver.h"
-#include "logic/SatMsgHandlerImpl1.h"
-#include "logic/SatStats.h"
+#include "YmLogic/DimacsParser.h"
+#include "YmLogic/SatDimacsHandler.h"
+#include "YmLogic/DimacsVerifier.h"
+#include "YmLogic/SatSolver.h"
+#include "YmLogic/SatMsgHandlerImpl1.h"
+#include "YmLogic/SatStats.h"
 
-#include "utils/FileIDO.h"
-#include "utils/StopWatch.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/StopWatch.h"
 
 
 int

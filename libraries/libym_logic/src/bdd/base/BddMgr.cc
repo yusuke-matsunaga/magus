@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "logic/BddMgr.h"
-#include "logic/BddVector.h"
-#include "logic/BddList.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/BddVector.h"
+#include "YmLogic/BddList.h"
 
 #include "BddMgrImpl.h"
 
-#include "utils/HeapTree.h"
+#include "YmUtils/HeapTree.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

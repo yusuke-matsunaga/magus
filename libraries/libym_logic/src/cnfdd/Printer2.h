@@ -10,7 +10,7 @@
 
 
 #include "CNFddMgrImpl.h"
-#include "logic/Literal.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

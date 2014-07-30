@@ -10,8 +10,8 @@
 
 
 #include "DotlibAttrMap.h"
-#include "cell/CellLibrary.h"
-#include "utils/MsgMgr.h"
+#include "YmCell/CellLibrary.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

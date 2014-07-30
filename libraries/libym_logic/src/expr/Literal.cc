@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "logic/Literal.h"
-#include "logic/VarId.h"
+#include "YmLogic/Literal.h"
+#include "YmLogic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM

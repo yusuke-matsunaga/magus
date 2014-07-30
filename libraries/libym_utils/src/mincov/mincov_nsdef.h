@@ -13,7 +13,7 @@
 /// 最小被覆問題を解くためのライブラリ
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 
 /// @brief mincov 用の名前空間の開始

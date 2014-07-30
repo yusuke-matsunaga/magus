@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/MultiGenBase.h"
+#include "YmUtils/MultiGenBase.h"
 
 
 BEGIN_NAMESPACE_YM

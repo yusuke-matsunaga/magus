@@ -9,10 +9,10 @@
 
 #include "LcLogicMgr.h"
 #include "LcGroup.h"
-#include "logic/Expr.h"
-#include "logic/TvFunc.h"
-#include "logic/NpnMgr.h"
-#include "cell/Cell.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/NpnMgr.h"
+#include "YmCell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP

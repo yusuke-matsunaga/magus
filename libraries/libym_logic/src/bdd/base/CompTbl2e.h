@@ -11,7 +11,7 @@
 
 #include "CompTbl.h"
 #include "BddEdge.h"
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

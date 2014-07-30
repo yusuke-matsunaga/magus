@@ -20,11 +20,11 @@
 #include "CiLutTemplate.h"
 #include "CiLut.h"
 
-#include "libcomp/LibComp.h"
-#include "libcomp/LcGroupMgr.h"
-#include "libcomp/LcClass.h"
-#include "libcomp/LcGroup.h"
-#include "libcomp/LcPatMgr.h"
+#include "LibComp.h"
+#include "LcGroupMgr.h"
+#include "LcClass.h"
+#include "LcGroup.h"
+#include "LcPatMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

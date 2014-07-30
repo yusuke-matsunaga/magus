@@ -10,8 +10,6 @@
 
 
 // 実は define マクロのみなので名前空間の定義すらいらない．
-#include "ymtools.h"
-
 
 #define GZIP_MAGIC0	0x1F
 #define GZIP_MAGIC1	0x8B

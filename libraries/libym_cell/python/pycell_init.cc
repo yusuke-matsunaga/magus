@@ -11,7 +11,7 @@
 // pycell モジュール
 //////////////////////////////////////////////////////////////////////
 
-#include "ym_cell/pycell.h"
+#include "ym_YmCell/pycell.h"
 
 
 BEGIN_NAMESPACE_YM

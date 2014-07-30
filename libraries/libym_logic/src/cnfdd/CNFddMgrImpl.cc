@@ -9,8 +9,8 @@
 
 #include "CNFddMgrImpl.h"
 
-#include "logic/CNFdd.h"
-#include "logic/CNFddMgr.h"
+#include "YmLogic/CNFdd.h"
+#include "YmLogic/CNFddMgr.h"
 #include "CNFddVar.h"
 
 #include "ConOp.h"

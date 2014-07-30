@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "logic/CNFdd.h"
+#include "YmLogic/CNFdd.h"
 #include "CNFddEdge.h"
 #include "CNFddNode.h"
-#include "utils/Binder.h"
+#include "YmUtils/Binder.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

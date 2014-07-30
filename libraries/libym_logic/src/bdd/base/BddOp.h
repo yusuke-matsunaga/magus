@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/bdd_nsdef.h"
+#include "YmLogic/bdd_nsdef.h"
 #include "BddMgrImpl.h"
 
 

@@ -8,10 +8,10 @@
 
 
 #include "Dumper.h"
-#include "logic/Zdd.h"
-//#include "logic/ZddVector.h"
-//#include "logic/ZddList.h"
-#include "logic/ZddMgr.h"
+#include "YmLogic/Zdd.h"
+//#include "YmLogic/ZddVector.h"
+//#include "YmLogic/ZddList.h"
+#include "YmLogic/ZddMgr.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD

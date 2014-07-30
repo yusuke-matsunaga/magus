@@ -7,18 +7,18 @@
 /// All rights reserved.
 
 
-#include "cell/CellDotlibReader.h"
+#include "YmCell/CellDotlibReader.h"
 
-#include "cell/CellLibrary.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
-#include "cell/CellTiming.h"
-#include "cell/CellArea.h"
-#include "cell/CellResistance.h"
-#include "cell/CellCapacitance.h"
-#include "cell/CellTime.h"
-#include "cell/CellLut.h"
-#include "cell/CellLutTemplate.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
+#include "YmCell/CellTiming.h"
+#include "YmCell/CellArea.h"
+#include "YmCell/CellResistance.h"
+#include "YmCell/CellCapacitance.h"
+#include "YmCell/CellTime.h"
+#include "YmCell/CellLut.h"
+#include "YmCell/CellLutTemplate.h"
 
 #include "DotlibParser.h"
 #include "DotlibMgr.h"
@@ -32,9 +32,9 @@
 #include "DotlibTemplate.h"
 #include "DotlibLut.h"
 
-#include "logic/Expr.h"
-#include "logic/TvFunc.h"
-#include "utils/MsgMgr.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/TvFunc.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB

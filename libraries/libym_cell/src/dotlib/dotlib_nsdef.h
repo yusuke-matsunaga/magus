@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "cell/cell_nsdef.h"
+#include "YmCell/cell_nsdef.h"
 
 
 //////////////////////////////////////////////////////////////////////

@@ -8,8 +8,8 @@
 
 
 #include "PySatMsgHandler.h"
-#include "ym_logic/SatStats.h"
-#include "ym_utils/pyutils.h"
+#include "ym_YmLogic/SatStats.h"
+#include "ym_YmUtils/pyutils.h"
 
 
 BEGIN_NAMESPACE_YM

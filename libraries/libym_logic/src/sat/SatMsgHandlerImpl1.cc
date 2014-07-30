@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "logic/SatMsgHandlerImpl1.h"
-#include "logic/SatStats.h"
+#include "YmLogic/SatMsgHandlerImpl1.h"
+#include "YmLogic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM

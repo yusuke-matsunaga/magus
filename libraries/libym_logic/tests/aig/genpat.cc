@@ -8,7 +8,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 #include "GpNode.h"
 //#include <ym_npn/TvFunc.h>
 //#include <ym_npn/NpnMgr.h>

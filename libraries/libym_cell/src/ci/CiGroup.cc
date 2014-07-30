@@ -9,11 +9,11 @@
 
 #include "CiGroup.h"
 
-#include "cell/CellLibrary.h"
-#include "cell/CellClass.h"
-#include "cell/Cell.h"
-#include "cell/CellFFInfo.h"
-#include "cell/CellLatchInfo.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellClass.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellFFInfo.h"
+#include "YmCell/CellLatchInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

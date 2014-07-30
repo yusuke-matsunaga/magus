@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "logic/ZddList.h"
-#include "logic/Zdd.h"
-#include "logic/ZddMgr.h"
+#include "YmLogic/ZddList.h"
+#include "YmLogic/Zdd.h"
+#include "YmLogic/ZddMgr.h"
 #include "ZddMgrImpl.h"
-#include "utils/HeapTree.h"
+#include "YmUtils/HeapTree.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD

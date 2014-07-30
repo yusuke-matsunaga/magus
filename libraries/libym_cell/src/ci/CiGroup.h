@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "cell/CellGroup.h"
-#include "logic/NpnMapM.h"
-#include "utils/Alloc.h"
-#include "utils/IDO.h"
-#include "utils/ODO.h"
+#include "YmCell/CellGroup.h"
+#include "YmLogic/NpnMapM.h"
+#include "YmUtils/Alloc.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_CELL

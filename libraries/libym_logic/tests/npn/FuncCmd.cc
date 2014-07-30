@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "utils/random.h"
-#include "logic/TvFunc.h"
+#include "YmUtils/random.h"
+#include "YmLogic/TvFunc.h"
 
 #include "TvFuncConv.h"
 #include "FuncCmd.h"

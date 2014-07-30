@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "logic/Zdd.h"
+#include "YmLogic/Zdd.h"
 #include "ZddEdge.h"
 
 

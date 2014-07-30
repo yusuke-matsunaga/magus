@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "utils/ItvlMgr.h"
+#include "YmUtils/ItvlMgr.h"
 #include "ItvlMgrImpl.h"
 
 

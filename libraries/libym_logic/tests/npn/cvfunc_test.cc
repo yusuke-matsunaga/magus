@@ -2,13 +2,13 @@
 
 // CvFunc パッケージのテスト
 
-#include "ymtools.h"
+#include "YmTools.h"
 
-#include "ym_utils/random.h"
-#include "ym_utils/Generator.h"
+#include "ym_YmUtils/random.h"
+#include "ym_YmUtils/Generator.h"
 #include "ym_npn/CvFunc.h"
 
-#include "ym_utils/StopWatch.h"
+#include "ym_YmUtils/StopWatch.h"
 
 
 #if HAVE_POPT

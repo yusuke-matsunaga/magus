@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "logic/AigMgr.h"
+#include "YmLogic/AigMgr.h"
 #include "AigNode.h"
-#include "utils/SimpleAlloc.h"
-#include "utils/ItvlMgr.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
