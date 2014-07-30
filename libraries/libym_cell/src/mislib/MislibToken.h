@@ -26,16 +26,16 @@ enum MislibToken {
   EQ,
   GATE,
   PIN,
-  NOINV,
+  NONINV,
   INV,
   UNKNOWN,
-  CONST0
+  CONST0,
   CONST1,
   PLUS,
   HAT,
   STAR,
   NOT,
-  EOF,
+  END,
   ERROR
 };
 

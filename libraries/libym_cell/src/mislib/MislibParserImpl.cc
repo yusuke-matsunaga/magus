@@ -15,9 +15,6 @@
 
 BEGIN_NAMESPACE_YM_MISLIB
 
-#include "mislib_grammer.hh"
-
-
 BEGIN_NONAMESPACE
 
 typedef unordered_map<ShString, const MislibNode*> StrNodeMap;
@@ -297,8 +294,7 @@ MislibParserImpl::read_gate()
     loc1 = pin->loc();
   }
 
-  MislibNode* gate = new_gate(FileRegion(loc0, loc1), name, area, opin, expr, pin_list);
-  return gate;
+  mMislibMgr->new_gate(FileRegion(loc0, loc1), name, area, opin, expr, pin_list);
 }
 
 // @brief 式を読み込む．
@@ -308,8 +304,9 @@ MislibParserImpl::read_gate()
 MislibNode*
 MislibParserImpl::read_expr()
 {
+  MislibNodeImpl* node;
   FileRegion loc;
-  MislibToken tok = mScanner->read_token(loc);
+  MislibToken tok = scan(node, loc);
   switch ( tok ) {
   case LP:
     // read_expr();
@@ -319,9 +316,10 @@ MislibParserImpl::read_expr()
   case STR:
     {
       FileRegion loc0 = loc;
-      ShString name(mScanner->cur_str());
+      MislibNode* name = node;
+
       // 次を読む．
-      tok = mScanner->read_token(loc);
+      tok = scan(node, loc);
       switch ( tok ) {
       case STAR:
       case PLUS:
@@ -346,6 +344,7 @@ MislibParserImpl::read_expr()
 
   default:
     // シンタックスエラー
+    break;
   }
 }
 
@@ -406,8 +405,9 @@ MislibParserImpl::read_pin_list()
       val[i] = node;
     }
 
-    MislibNodeImpl* pin = new_pin(FileRegion(loc0, loc), name, phase,
-				  val[0], val[1], val[2], val[3], val[4], val[5]);
+    MislibNodeImpl* pin = mMislibMgr->new_pin(FileRegion(loc0, loc), name, phase,
+					      val[0], val[1], val[2],
+					      val[3], val[4], val[5]);
     pin_list->push_back(pin);
   }
 
@@ -419,7 +419,7 @@ MislibParserImpl::read_pin_list()
       has_star = true;
     }
   }
-  if ( npin > 1 && has_start ) {
+  if ( npin > 1 && has_star ) {
     // シンタックスエラー
     return NULL;
   }
@@ -436,7 +436,7 @@ MislibToken
 MislibParserImpl::scan(MislibNodeImpl*& lval,
 		       FileRegion& lloc)
 {
-  int tok = mScanner->read_token(lloc);
+  MislibToken tok = mScanner->read_token(lloc);
 
   if ( debug_read_token ) {
     cout << "MislibParserImpl::scan(): ";
@@ -513,7 +513,7 @@ MislibParserImpl::scan(MislibNodeImpl*& lval,
       cout << "NOT" << endl;
       break;
 
-    case EOF:
+    case END:
       cout << "EOF" << endl;
       break;
 

@@ -55,7 +55,7 @@ MislibScanner::scan()
     goto state3;
   }
   switch (c) {
-  case EOF: return EOF;
+  case EOF: return END;
   case ' ':
   case '\t': goto state1;
   case '\n': goto state1;

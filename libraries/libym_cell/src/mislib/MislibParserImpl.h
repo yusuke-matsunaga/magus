@@ -67,7 +67,7 @@ private:
   ///
   /// エラーが起きたら NULL を返す．
   MislibNode*
-  read_expt();
+  read_expr();
 
   /// @brief ピンリスト記述を読み込む．
   /// @return ピンリストを表す AST のノードを返す．
@@ -89,28 +89,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // MislibNode を生成する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief GATE ノードを生成する．
-  /// @note 結果はゲートのリストに追加される．
-  void
-  new_gate(const FileRegion& loc,
-	   const MislibNode* name,
-	   const MislibNode* area,
-	   const MislibNode* oname,
-	   const MislibNode* expr,
-	   const MislibNode* ipin_list);
-
-  /// @brief PIN ノードを生成する．
-  MislibNodeImpl*
-  new_pin(const FileRegion& loc,
-	  const MislibNode* name,
-	  const MislibNode* phase,
-	  const MislibNode* input_load,
-	  const MislibNode* max_load,
-	  const MislibNode* rise_block_delay,
-	  const MislibNode* rise_fanout_delay,
-	  const MislibNode* fall_block_delay,
-	  const MislibNode* fall_fanout_delay);
 
   /// @brief リストノードを生成する．
   MislibNodeImpl*
@@ -146,6 +124,18 @@ private:
   /// @brief 定数1ノードを生成する．
   MislibNodeImpl*
   new_const1(const FileRegion& loc);
+
+  /// @brief NONINV ノードを生成する．
+  MislibNodeImpl*
+  new_noninv(const FileRegion& loc);
+
+  /// @brief INV ノードを生成する．
+  MislibNodeImpl*
+  new_inv(const FileRegion& loc);
+
+  /// @brief UNKNOWN ノードを生成する．
+  MislibNodeImpl*
+  new_unknown(const FileRegion& loc);
 
   /// @brief 文字列ノードを生成する．
   MislibNodeImpl*
@@ -196,38 +186,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief GATE ノードを生成する．(通常版)
-// @note 結果はゲートのリストに追加される．
-inline
-void
-MislibParserImpl::new_gate(const FileRegion& loc,
-			   const MislibNode* name,
-			   const MislibNode* area,
-			   const MislibNode* oname,
-			   const MislibNode* expr,
-			   const MislibNode* ipin_list)
-{
-  return mMislibMgr->new_gate(loc, name, area, oname, expr, ipin_list);
-}
-
-// @brief PIN ノードを生成する．
-inline
-MislibNodeImpl*
-MislibParserImpl::new_pin(const FileRegion& loc,
-			  const MislibNode* name,
-			  const MislibNode* phase,
-			  const MislibNode* input_load,
-			  const MislibNode* max_load,
-			  const MislibNode* rise_block_delay,
-			  const MislibNode* rise_fanout_delay,
-			  const MislibNode* fall_block_delay,
-			  const MislibNode* fall_fanout_delay)
-{
-  return mMislibMgr->new_pin(loc, name, phase, input_load, max_load,
-			     rise_block_delay, rise_fanout_delay,
-			     fall_block_delay, fall_fanout_delay);
-}
 
 // @brief リストノードを生成する．
 inline
