@@ -203,7 +203,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   switch ( xmode ) {
   case 1: bt = new_BtJust1(tvmgr); break;
   case 2: bt = new_BtJust2(tvmgr); break;
+#if 0
   case 3: bt = new_BtZdd(tvmgr); break;
+#endif
   default: bt = new_BtSimple(tvmgr); break;
   }
   if ( bt != NULL ) {

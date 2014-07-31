@@ -79,7 +79,7 @@ atpg_init(Tcl_Interp* interp)
     return TCL_ERROR;
   }
 
-
+#if 0
   // もしも ATPG_LIBRARY という環境変数が定義されていたらそれを auto_path
   // に加える．そうでなければ configure 時に指定されたパスを auto_path
   // に加える．
@@ -106,11 +106,14 @@ atpg_init(Tcl_Interp* interp)
   if (Tcl_Eval(interp, script) != TCL_OK) {
     return TCL_ERROR;
   }
+#endif
+
+  const char* ATPG_VERSION = "1.0";
 
   //////////////////////////////////////////////////////////////////////
   // パッケージ宣言
   //////////////////////////////////////////////////////////////////////
-  if ( Tcl_PkgProvide(interp, "Atpg", SATPG_VERSION) != TCL_OK ) {
+  if ( Tcl_PkgProvide(interp, "Atpg", ATPG_VERSION) != TCL_OK ) {
     return TCL_ERROR;
   }
 

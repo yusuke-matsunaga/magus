@@ -34,7 +34,7 @@ void
 AtpgMsgHandler::put_msg(const char* src_file,
 			int src_line,
 			const FileRegion& loc,
-			tMsgType type,
+			MsgType type,
 			const char* label,
 			const char* body)
 {

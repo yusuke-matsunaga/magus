@@ -177,6 +177,18 @@ set (SOURCES
 
 set (SOURCES
   ${SOURCES}
+  src/tgnet/blif/TgBlifHandler.cc
+  src/tgnet/blif/TgBlifReader.cc
+  )
+
+set (SOURCES
+  ${SOURCES}
+  src/tgnet/iscas89/TgIscas89Handler.cc
+  src/tgnet/iscas89/TgIscas89Reader.cc
+  )
+
+set (SOURCES
+  ${SOURCES}
   src/verilog/VlWriter.cc
   src/verilog/VlwAssign.cc
   src/verilog/VlwBase.cc
