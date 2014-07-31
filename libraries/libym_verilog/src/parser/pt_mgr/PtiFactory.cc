@@ -8,7 +8,7 @@
 
 
 #include "PtiFactory.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtArray.h"
 #include "CptFactory.h"
 #include "SptFactory.h"
 

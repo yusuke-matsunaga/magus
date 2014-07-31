@@ -9,9 +9,9 @@
 
 #include "VlDumperImpl.h"
 
-#include "verilog/VlMgr.h"
-#include "verilog/vl/VlModule.h"
-#include "verilog/vl/VlPort.h"
+#include "YmVerilog/VlMgr.h"
+#include "YmVerilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlPort.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -11,7 +11,7 @@
 #include "ElbModule.h"
 #include "ElbExpr.h"
 
-#include "verilog/pt/PtPort.h"
+#include "YmVerilog/pt/PtPort.h"
 
 
 

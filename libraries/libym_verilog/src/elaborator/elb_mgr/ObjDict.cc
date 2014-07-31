@@ -9,7 +9,7 @@
 
 #include "ObjDict.h"
 
-#include "verilog/vl/VlNamedObj.h"
+#include "YmVerilog/vl/VlNamedObj.h"
 
 #include "ElbDecl.h"
 #include "ElbParameter.h"

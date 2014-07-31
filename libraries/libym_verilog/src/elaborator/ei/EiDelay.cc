@@ -11,7 +11,7 @@
 #include "EiDelay.h"
 #include "ElbExpr.h"
 
-#include "verilog/pt/PtBase.h"
+#include "YmVerilog/pt/PtBase.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

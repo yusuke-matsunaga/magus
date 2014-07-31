@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "verilog/vl/VlNamedObj.h"
+#include "YmVerilog/vl/VlNamedObj.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -12,10 +12,10 @@
 #include "ElbStmt.h"
 #include "ElbExpr.h"
 
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtExpr.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

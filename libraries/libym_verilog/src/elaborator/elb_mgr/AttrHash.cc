@@ -8,7 +8,7 @@
 
 
 #include "AttrHash.h"
-#include "verilog/vl/VlObj.h"
+#include "YmVerilog/vl/VlObj.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

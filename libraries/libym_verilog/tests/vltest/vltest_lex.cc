@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 #include "VlTestLineWatcher.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 #include "Lex.h"
 #include "print_token.h"

@@ -10,8 +10,8 @@
 
 
 #include "VmNode.h"
-#include "verilog/verilog.h"
-#include "verilog/vl/VlFwd.h"
+#include "YmVerilog/verilog.h"
+#include "YmVerilog/vl/VlFwd.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

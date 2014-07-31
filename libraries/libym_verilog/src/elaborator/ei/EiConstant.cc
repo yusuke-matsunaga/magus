@@ -10,8 +10,8 @@
 #include "EiFactory.h"
 #include "EiConstant.h"
 
-#include "verilog/VlValue.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

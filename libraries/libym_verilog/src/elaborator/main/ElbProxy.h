@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "verilog/VlValue.h"
-#include "verilog/pt/PtP.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/verilog.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/pt/PtP.h"
+#include "YmVerilog/pt/PtArray.h"
 #include "Elaborator.h"
 #include "ElbMgr.h"
 #include "ElbFactory.h"

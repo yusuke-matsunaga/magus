@@ -10,10 +10,10 @@
 #include "EiExpr.h"
 #include "EiOperation.h"
 
-#include "verilog/BitVector.h"
-#include "verilog/VlTime.h"
-#include "verilog/VlValue.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/VlTime.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

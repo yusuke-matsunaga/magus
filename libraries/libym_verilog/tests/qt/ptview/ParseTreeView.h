@@ -10,7 +10,7 @@
 
 
 #include <QTreeView>
-#include "verilog/verilog.h"
+#include "YmVerilog/verilog.h"
 #include "ParseTreeModel.h"
 
 class QItemSelection;

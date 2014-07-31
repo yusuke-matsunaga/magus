@@ -10,7 +10,7 @@
 #include "CptModule.h"
 #include "CptFactory.h"
 
-#include "verilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtItem.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

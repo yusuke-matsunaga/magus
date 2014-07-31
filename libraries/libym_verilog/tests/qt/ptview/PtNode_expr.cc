@@ -9,8 +9,8 @@
 
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

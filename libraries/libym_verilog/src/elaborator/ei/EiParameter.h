@@ -12,7 +12,7 @@
 #include "ElbParameter.h"
 #include "EiRange.h"
 
-#include "verilog/VlValue.h"
+#include "YmVerilog/VlValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

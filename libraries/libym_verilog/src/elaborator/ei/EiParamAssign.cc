@@ -12,9 +12,9 @@
 #include "ElbParameter.h"
 #include "ElbExpr.h"
 
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

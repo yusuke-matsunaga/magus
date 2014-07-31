@@ -11,8 +11,8 @@
 #include "EiCondStmt.h"
 #include "ElbExpr.h"
 
-#include "verilog/BitVector.h"
-#include "verilog/pt/PtStmt.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/pt/PtStmt.h"
 
 
 

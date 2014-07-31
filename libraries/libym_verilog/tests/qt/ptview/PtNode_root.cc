@@ -10,7 +10,7 @@
 #include "PtNode_root.h"
 #include "PtNode_udp.h"
 #include "PtNode_module.h"
-#include "verilog/VlMgr.h"
+#include "YmVerilog/VlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

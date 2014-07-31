@@ -12,8 +12,8 @@
 #include "PtNode_decl.h"
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
-#include "verilog/pt/PtUdp.h"
-#include "verilog/VlUdpVal.h"
+#include "YmVerilog/pt/PtUdp.h"
+#include "YmVerilog/VlUdpVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

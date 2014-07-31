@@ -8,7 +8,7 @@
 
 #include "Parser.h"
 
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 #include "PtMgr.h"
 #include "PtiFactory.h"

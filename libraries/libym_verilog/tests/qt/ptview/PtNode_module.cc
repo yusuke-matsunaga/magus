@@ -12,7 +12,7 @@
 #include "PtNode_decl.h"
 #include "PtNode_item.h"
 #include "PtNode_misc.h"
-#include "verilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtModule.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

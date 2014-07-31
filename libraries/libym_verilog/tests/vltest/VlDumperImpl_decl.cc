@@ -9,15 +9,15 @@
 
 #include "VlDumperImpl.h"
 
-#include "verilog/VlMgr.h"
-#include "verilog/VlValue.h"
-#include "verilog/vl/VlIODecl.h"
-#include "verilog/vl/VlDecl.h"
-#include "verilog/vl/VlDeclArray.h"
-#include "verilog/vl/VlParamAssign.h"
-#include "verilog/vl/VlModule.h"
-#include "verilog/vl/VlUdp.h"
-#include "verilog/vl/VlTaskFunc.h"
+#include "YmVerilog/VlMgr.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/vl/VlIODecl.h"
+#include "YmVerilog/vl/VlDecl.h"
+#include "YmVerilog/vl/VlDeclArray.h"
+#include "YmVerilog/vl/VlParamAssign.h"
+#include "YmVerilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlUdp.h"
+#include "YmVerilog/vl/VlTaskFunc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

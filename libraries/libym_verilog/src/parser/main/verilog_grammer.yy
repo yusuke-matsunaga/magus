@@ -8,12 +8,12 @@
 /// All rights reserved.
 
 
-#include "utils/MsgMgr.h"
-#include "utils/FileRegion.h"
-#include "verilog/pt/PtP.h"
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/FileRegion.h"
+#include "YmVerilog/pt/PtP.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtExpr.h"
 
 #include "Parser.h"
 

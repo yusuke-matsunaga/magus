@@ -10,12 +10,12 @@
 #include "ExprGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/pt/PtModule.h"
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
-#include "verilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlModule.h"
 
 #include "ElbIODecl.h"
 #include "ElbDecl.h"

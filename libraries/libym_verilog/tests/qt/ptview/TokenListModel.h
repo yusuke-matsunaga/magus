@@ -10,7 +10,7 @@
 
 
 #include <QAbstractTableModel>
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
 
 //////////////////////////////////////////////////////////////////////

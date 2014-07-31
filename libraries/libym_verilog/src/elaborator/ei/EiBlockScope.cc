@@ -9,7 +9,7 @@
 
 #include "EiFactory.h"
 #include "EiBlockScope.h"
-#include "verilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtStmt.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

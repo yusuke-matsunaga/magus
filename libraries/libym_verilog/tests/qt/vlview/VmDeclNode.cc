@@ -9,13 +9,13 @@
 
 #include "VmDeclNode.h"
 #include "VmMiscNode.h"
-#include "verilog/vl/VlModule.h"
-#include "verilog/vl/VlUdp.h"
-#include "verilog/vl/VlTaskFunc.h"
-#include "verilog/vl/VlIODecl.h"
-#include "verilog/vl/VlDecl.h"
-#include "verilog/vl/VlDeclArray.h"
-#include "verilog/vl/VlRange.h"
+#include "YmVerilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlUdp.h"
+#include "YmVerilog/vl/VlTaskFunc.h"
+#include "YmVerilog/vl/VlIODecl.h"
+#include "YmVerilog/vl/VlDecl.h"
+#include "YmVerilog/vl/VlDeclArray.h"
+#include "YmVerilog/vl/VlRange.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

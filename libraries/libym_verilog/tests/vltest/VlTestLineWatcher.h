@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "verilog/VlLineWatcher.h"
+#include "YmVerilog/VlLineWatcher.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

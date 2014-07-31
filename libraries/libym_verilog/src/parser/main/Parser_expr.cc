@@ -9,7 +9,7 @@
 #include "Parser.h"
 
 #include "PtiFactory.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtExpr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

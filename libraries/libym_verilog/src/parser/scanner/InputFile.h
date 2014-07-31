@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
+#include "YmVerilog/verilog.h"
 
-#include "utils/Scanner.h"
-#include "utils/FileIDO.h"
-#include "utils/FileRegion.h"
-#include "utils/FileInfo.h"
-#include "utils/StrBuff.h"
+#include "YmUtils/Scanner.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/FileInfo.h"
+#include "YmUtils/StrBuff.h"
 
 #include "RawLex.h"
 

@@ -13,10 +13,10 @@
 #include "ElbExpr.h"
 #include "ElbDelay.h"
 
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtMisc.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtMisc.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

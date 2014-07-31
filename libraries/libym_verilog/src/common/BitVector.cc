@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "verilog/BitVector.h"
+#include "YmVerilog/BitVector.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

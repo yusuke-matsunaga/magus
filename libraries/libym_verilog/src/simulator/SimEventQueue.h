@@ -1,7 +1,7 @@
 #ifndef LIBYM_VERILOG_SIMULATOR_SIMEVENTQUEUE_H
 #define LIBYM_VERILOG_SIMULATOR_SIMEVENTQUEUE_H
 
-/// @file libym_verilog/simulator/SimEventQueue.h
+/// @file libym_YmVerilog/simulator/SimEventQueue.h
 /// @brief イベントキューを表すクラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

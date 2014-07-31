@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "verilog/VlValue.h"
-#include "verilog/BitVector.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/BitVector.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

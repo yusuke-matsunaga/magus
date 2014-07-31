@@ -10,8 +10,8 @@
 
 
 #include "ElbDecl.h"
-#include "verilog/VlScalarVal.h"
-#include "verilog/pt/PtP.h"
+#include "YmVerilog/VlScalarVal.h"
+#include "YmVerilog/pt/PtP.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

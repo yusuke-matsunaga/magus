@@ -10,9 +10,9 @@
 #include "Parser_int.h"
 
 #include "PtiFactory.h"
-#include "verilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtItem.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -10,20 +10,20 @@
 #include "ItemGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/BitVector.h"
+#include "YmVerilog/BitVector.h"
 
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
 
 #include "ElbUdp.h"
 #include "ElbPrimitive.h"
 #include "ElbExpr.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

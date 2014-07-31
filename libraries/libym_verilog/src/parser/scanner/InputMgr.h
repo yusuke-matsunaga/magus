@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
+#include "YmVerilog/verilog.h"
 
-#include "utils/File.h"
-#include "utils/FileRegion.h"
-#include "utils/MsgHandler.h"
-#include "utils/StrBuff.h"
+#include "YmUtils/File.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmUtils/StrBuff.h"
 
 #include "InputFile.h"
 

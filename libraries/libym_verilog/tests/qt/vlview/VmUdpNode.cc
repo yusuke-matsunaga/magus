@@ -9,8 +9,8 @@
 
 #include "VmUdpNode.h"
 #include "VmMiscNode.h"
-#include "verilog/VlMgr.h"
-#include "verilog/vl/VlUdp.h"
+#include "YmVerilog/VlMgr.h"
+#include "YmVerilog/vl/VlUdp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

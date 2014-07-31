@@ -11,8 +11,8 @@
 #include "EiBitSelect.h"
 #include "ElbDecl.h"
 
-#include "verilog/BitVector.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/pt/PtExpr.h"
 
 
 

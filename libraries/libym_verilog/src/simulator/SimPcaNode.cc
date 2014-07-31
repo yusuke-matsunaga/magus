@@ -8,8 +8,8 @@
 
 #include "SimPcaNode.h"
 
-#include <ym_verilog/vpi/VpiExpr.h>
-#include <ym_verilog/vpi/VpiStmt.h>
+#include <ym_YmVerilog/vpi/VpiExpr.h>
+#include <ym_YmVerilog/vpi/VpiStmt.h>
 #include "SimEngine.h"
 #include "SimCaLink.h"
 

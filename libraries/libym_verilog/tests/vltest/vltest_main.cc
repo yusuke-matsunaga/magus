@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "cell/CellDotlibReader.h"
-#include "cell/CellMislibReader.h"
-#include "utils/PoptMainApp.h"
+#include "YmVerilog/verilog.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmCell/CellMislibReader.h"
+#include "YmUtils/PoptMainApp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

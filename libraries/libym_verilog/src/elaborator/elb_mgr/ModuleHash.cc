@@ -8,7 +8,7 @@
 
 
 #include "ModuleHash.h"
-#include "verilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlModule.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

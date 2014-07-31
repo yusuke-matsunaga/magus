@@ -8,8 +8,8 @@
 /// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "verilog/verilog.h"
-#include "utils/FileRegion.h"
+#include "YmVerilog/verilog.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

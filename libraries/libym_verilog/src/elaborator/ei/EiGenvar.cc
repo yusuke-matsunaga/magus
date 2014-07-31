@@ -9,8 +9,8 @@
 
 #include "EiFactory.h"
 #include "EiGenvar.h"
-#include "verilog/pt/PtDecl.h"
-#include "verilog/BitVector.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/BitVector.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

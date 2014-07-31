@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "utils/FileRegion.h"
-#include "verilog/pt/PtMisc.h"
-#include "verilog/VlValue.h"
+#include "YmVerilog/verilog.h"
+#include "YmUtils/FileRegion.h"
+#include "YmVerilog/pt/PtMisc.h"
+#include "YmVerilog/VlValue.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "verilog/pt/PtDecl.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtArray.h"
 
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
 #include "PtiDecl.h"
 

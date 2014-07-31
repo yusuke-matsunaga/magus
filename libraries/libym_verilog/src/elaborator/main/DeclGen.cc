@@ -10,12 +10,12 @@
 #include "DeclGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/pt/PtDecl.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtArray.h"
 
-#include "verilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlModule.h"
 
 #include "ElbParamAssign.h"
 #include "ElbContAssign.h"
@@ -27,7 +27,7 @@
 #include "ElbRange.h"
 #include "ElbExpr.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

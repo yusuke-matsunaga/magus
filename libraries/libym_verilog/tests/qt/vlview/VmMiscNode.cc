@@ -8,7 +8,7 @@
 
 
 #include "VmMiscNode.h"
-#include "verilog/vl/VlDelay.h"
+#include "YmVerilog/vl/VlDelay.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

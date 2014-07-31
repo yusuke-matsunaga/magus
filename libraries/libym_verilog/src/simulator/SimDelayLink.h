@@ -1,7 +1,7 @@
 #ifndef LIBYM_VERILOG_SIMULATOR_SIMDELAYLINK_H
 #define LIBYM_VERILOG_SIMULATOR_SIMDELAYLINK_H
 
-/// @file libym_verilog/simulator/SimDelayLink.h
+/// @file libym_YmVerilog/simulator/SimDelayLink.h
 /// @brief 遅延リンクを表すクラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include <ym_verilog/verilog.h>
-#include <ym_verilog/VlTime.h>
+#include <ym_YmVerilog/verilog.h>
+#include <ym_YmVerilog/VlTime.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG

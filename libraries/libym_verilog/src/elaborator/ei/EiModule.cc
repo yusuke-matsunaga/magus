@@ -13,9 +13,9 @@
 #include "EiIODecl.h"
 #include "EiExpr.h"
 
-#include "verilog/pt/PtModule.h"
-#include "verilog/pt/PtDecl.h"
-#include "verilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtItem.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

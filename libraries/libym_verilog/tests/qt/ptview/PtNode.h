@@ -10,8 +10,8 @@
 
 
 #include <QAbstractItemModel>
-#include "verilog/verilog.h"
-#include "utils/FileRegion.h"
+#include "YmVerilog/verilog.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

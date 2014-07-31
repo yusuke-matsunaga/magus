@@ -9,10 +9,10 @@
 
 #include "ExprGen.h"
 
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

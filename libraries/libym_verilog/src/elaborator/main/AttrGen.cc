@@ -9,7 +9,7 @@
 
 #include "AttrGen.h"
 
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 #include "ElbAttribute.h"
 

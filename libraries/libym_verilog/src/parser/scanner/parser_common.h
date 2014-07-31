@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "verilog/pt/PtP.h"
+#include "YmVerilog/pt/PtP.h"
 #include "PtiFwd.h"
 #include "PtrList.h"
 #include "Parser.h"

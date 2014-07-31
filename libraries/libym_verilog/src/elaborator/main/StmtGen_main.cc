@@ -10,9 +10,9 @@
 #include "StmtGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 #include "ElbStmt.h"
 #include "ElbTaskFunc.h"
@@ -20,7 +20,7 @@
 
 #include "ElbStub.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

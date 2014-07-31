@@ -8,7 +8,7 @@
 
 
 #include "VmRootNode.h"
-#include "verilog/VlMgr.h"
+#include "YmVerilog/VlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

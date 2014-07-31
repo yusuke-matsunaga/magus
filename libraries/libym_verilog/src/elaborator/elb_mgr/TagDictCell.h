@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "utils/Alloc.h"
+#include "YmVerilog/verilog.h"
+#include "YmUtils/Alloc.h"
 #include "ElbFwd.h"
 
 

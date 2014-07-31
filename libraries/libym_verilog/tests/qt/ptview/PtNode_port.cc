@@ -10,7 +10,7 @@
 #include "PtNode_port.h"
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
-#include "verilog/pt/PtPort.h"
+#include "YmVerilog/pt/PtPort.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

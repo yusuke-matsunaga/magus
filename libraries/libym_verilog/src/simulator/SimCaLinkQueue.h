@@ -1,7 +1,7 @@
 #ifndef LIBYM_VERILOG_SIMULATOR_SIMCALINKQUEUE_H
 #define LIBYM_VERILOG_SIMULATOR_SIMCALINKQUEUE_H
 
-/// @file libym_verilog/simulator/SimCaLinkQueue.h
+/// @file libym_YmVerilog/simulator/SimCaLinkQueue.h
 /// @brief simulator の部品クラスのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

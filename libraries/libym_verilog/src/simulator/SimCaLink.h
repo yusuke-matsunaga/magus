@@ -5,7 +5,7 @@
 
 // continuous assignment に対応するノード
 
-#include <ym_verilog/verilog.h>
+#include <ym_YmVerilog/verilog.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG

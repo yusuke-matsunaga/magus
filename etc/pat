@@ -4,3 +4,5 @@ logic/ YmLogic/
 utils/ YmUtils/
 cell/  YmCell/
 tclpp/ YmTclpp/
+verilog/ YmVerilog/
+networks/ YmNetworks/

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "verilog/vl/VlTaskFunc.h"
+#include "YmVerilog/verilog.h"
+#include "YmVerilog/vl/VlTaskFunc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -10,9 +10,9 @@
 
 
 #include "PtNode.h"
-#include "verilog/verilog.h"
-#include "verilog/pt/PtP.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/verilog.h"
+#include "YmVerilog/pt/PtP.h"
+#include "YmVerilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

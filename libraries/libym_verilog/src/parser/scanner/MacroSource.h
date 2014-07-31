@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "utils/StrBuff.h"
+#include "YmVerilog/verilog.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

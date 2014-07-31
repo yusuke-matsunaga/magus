@@ -17,8 +17,8 @@
 #include "AttrGen.h"
 
 #include "ElbExpr.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtArray.h"
 #include "PtDumper.h"
 
 

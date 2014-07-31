@@ -10,7 +10,7 @@
 
 
 #include "ElbGenvar.h"
-#include "verilog/pt/PtP.h"
+#include "YmVerilog/pt/PtP.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

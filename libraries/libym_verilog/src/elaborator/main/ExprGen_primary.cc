@@ -10,13 +10,13 @@
 #include "ExprGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/pt/PtModule.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
-#include "verilog/vl/VlModule.h"
-#include "verilog/vl/VlDeclArray.h"
-#include "verilog/vl/VlRange.h"
+#include "YmVerilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlDeclArray.h"
+#include "YmVerilog/vl/VlRange.h"
 
 #include "ElbDecl.h"
 #include "ElbParameter.h"
@@ -24,7 +24,7 @@
 #include "ElbExpr.h"
 #include "ElbGenvar.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

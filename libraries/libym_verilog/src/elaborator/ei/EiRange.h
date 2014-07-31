@@ -10,7 +10,7 @@
 
 
 #include "ElbRange.h"
-#include "verilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtDecl.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

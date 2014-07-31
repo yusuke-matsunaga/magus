@@ -14,10 +14,10 @@
 #include "PtMgr.h"
 #include "PtiFactory.h"
 #include "PtiDecl.h"
-#include "verilog/pt/PtUdp.h"
-#include "verilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtUdp.h"
+#include "YmVerilog/pt/PtExpr.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

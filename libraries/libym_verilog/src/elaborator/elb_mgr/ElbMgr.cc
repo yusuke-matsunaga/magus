@@ -9,8 +9,8 @@
 
 #include "ElbMgr.h"
 
-#include "verilog/pt/PtMisc.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtArray.h"
 
 #include "ElbUdp.h"
 #include "ElbModule.h"

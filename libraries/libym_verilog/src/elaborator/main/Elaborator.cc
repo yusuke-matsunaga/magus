@@ -16,16 +16,16 @@
 #include "ExprGen.h"
 #include "AttrGen.h"
 
-#include "verilog/pt/PtModule.h"
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtMisc.h"
 
-#include "cell/CellLibrary.h"
+#include "YmCell/CellLibrary.h"
 
 #include "PtMgr.h"
 #include "ElbModule.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

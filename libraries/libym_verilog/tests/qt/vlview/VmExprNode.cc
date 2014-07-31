@@ -8,12 +8,12 @@
 
 
 #include "VmExprNode.h"
-#include "verilog/VlValue.h"
-#include "verilog/vl/VlExpr.h"
-#include "verilog/vl/VlDecl.h"
-#include "verilog/vl/VlTaskFunc.h"
-#include "verilog/vl/VlUserSystf.h"
-#include "verilog/vl/VlPrimitive.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/vl/VlExpr.h"
+#include "YmVerilog/vl/VlDecl.h"
+#include "YmVerilog/vl/VlTaskFunc.h"
+#include "YmVerilog/vl/VlUserSystf.h"
+#include "YmVerilog/vl/VlPrimitive.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

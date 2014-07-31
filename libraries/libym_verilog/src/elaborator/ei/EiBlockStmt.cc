@@ -11,8 +11,8 @@
 #include "EiBlockStmt.h"
 #include "EiBlockScope.h"
 
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

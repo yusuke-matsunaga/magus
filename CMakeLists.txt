@@ -19,6 +19,7 @@ set (YMTOOLS_NAMESPACE "nsYm")
 # パッケージの検査
 # ===================================================================
 include (FindDoxygen)
+include (FindBISON)
 include (FindPythonInterp)
 include (FindPythonLibs)
 include (FindQt4)
@@ -142,6 +143,7 @@ check_type_size ("void *"    VOIDP_SIZE)
 add_subdirectory (libraries/libym_utils)
 add_subdirectory (libraries/libym_logic)
 add_subdirectory (libraries/libym_cell)
+add_subdirectory (libraries/libym_verilog)
 
 if (TCL_FOUND)
   add_subdirectory (libraries/libym_tclpp)

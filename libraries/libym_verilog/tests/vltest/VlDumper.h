@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
+#include "YmVerilog/verilog.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -18,7 +18,7 @@ class VlMgr;
 class VlDumperImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlDumper VlDumper.h <ym_verilog/vl/VlDumper.h>
+/// @class VlDumper VlDumper.h <ym_YmVerilog/vl/VlDumper.h>
 /// @ingroup Vlgroup
 /// @brief VlObj の出力用クラス
 //////////////////////////////////////////////////////////////////////

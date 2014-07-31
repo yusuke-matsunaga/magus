@@ -9,7 +9,7 @@
 
 #include "TagDict.h"
 #include "TagDictCell.h"
-#include "verilog/vl/VlObj.h"
+#include "YmVerilog/vl/VlObj.h"
 #include "ElbScope.h"
 #include "ElbModule.h"
 #include "ElbParamAssign.h"

@@ -10,9 +10,9 @@
 #include "StmtGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtStmt.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

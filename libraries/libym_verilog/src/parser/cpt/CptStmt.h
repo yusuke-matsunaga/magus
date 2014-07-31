@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtArray.h"
 
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

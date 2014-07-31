@@ -10,14 +10,14 @@
 #include "ItemGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/BitVector.h"
+#include "YmVerilog/BitVector.h"
 
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtArray.h"
 
-#include "verilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlModule.h"
 
 #include "ElbParameter.h"
 #include "ElbContAssign.h"
@@ -29,7 +29,7 @@
 
 #include "ElbStub.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

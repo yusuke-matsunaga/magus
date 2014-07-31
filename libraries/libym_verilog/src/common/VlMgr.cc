@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "verilog/VlMgr.h"
+#include "YmVerilog/VlMgr.h"
 
 #include "Parser.h"
 #include "PtMgr.h"

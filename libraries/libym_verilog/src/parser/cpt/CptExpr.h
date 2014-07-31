@@ -10,9 +10,9 @@
 
 
 #include "PtiExpr.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtArray.h"
 
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

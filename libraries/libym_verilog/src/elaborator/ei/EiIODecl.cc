@@ -13,7 +13,7 @@
 #include "ElbTaskFunc.h"
 #include "ElbDecl.h"
 
-#include "verilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtDecl.h"
 
 
 

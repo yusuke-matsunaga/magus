@@ -10,17 +10,17 @@
 #include "UdpGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/pt/PtUdp.h"
-#include "verilog/pt/PtPort.h"
-#include "verilog/pt/PtDecl.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtArray.h"
-#include "verilog/vl/VlExpr.h"
+#include "YmVerilog/pt/PtUdp.h"
+#include "YmVerilog/pt/PtPort.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtArray.h"
+#include "YmVerilog/vl/VlExpr.h"
 
 #include "ElbUdp.h"
 #include "ElbExpr.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

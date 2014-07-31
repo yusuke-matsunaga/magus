@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "utils/FileRegion.h"
+#include "YmUtils/FileRegion.h"
 
-#include "verilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtModule.h"
 #include "PtiDecl.h"
 
 

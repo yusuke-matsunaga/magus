@@ -9,8 +9,8 @@
 
 #include "ElbExpr.h"
 
-#include "verilog/BitVector.h"
-#include "verilog/VlTime.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/VlTime.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

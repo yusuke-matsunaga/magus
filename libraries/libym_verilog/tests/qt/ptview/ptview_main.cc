@@ -17,10 +17,10 @@
 #include "GoToLine.h"
 
 #include "Lex.h"
-#include "verilog/VlMgr.h"
+#include "YmVerilog/VlMgr.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

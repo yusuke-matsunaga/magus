@@ -11,8 +11,8 @@
 
 #include "ElbScope.h"
 #include "ElbGfRoot.h"
-#include "verilog/pt/PtP.h"
-#include "utils/StrBuff.h"
+#include "YmVerilog/pt/PtP.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

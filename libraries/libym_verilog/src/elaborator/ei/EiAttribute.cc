@@ -11,7 +11,7 @@
 #include "EiAttribute.h"
 #include "ElbExpr.h"
 
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

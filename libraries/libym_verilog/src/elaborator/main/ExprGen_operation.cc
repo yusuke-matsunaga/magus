@@ -10,9 +10,9 @@
 #include "ExprGen.h"
 #include "ElbEnv.h"
 
-#include "verilog/BitVector.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 #include "ElbExpr.h"
 

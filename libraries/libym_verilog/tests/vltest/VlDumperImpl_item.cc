@@ -9,12 +9,12 @@
 
 #include "VlDumperImpl.h"
 
-#include "verilog/VlMgr.h"
-#include "verilog/vl/VlUdp.h"
-#include "verilog/vl/VlPrimitive.h"
-#include "verilog/vl/VlTaskFunc.h"
-#include "verilog/vl/VlContAssign.h"
-#include "verilog/vl/VlModule.h"
+#include "YmVerilog/VlMgr.h"
+#include "YmVerilog/vl/VlUdp.h"
+#include "YmVerilog/vl/VlPrimitive.h"
+#include "YmVerilog/vl/VlTaskFunc.h"
+#include "YmVerilog/vl/VlContAssign.h"
+#include "YmVerilog/vl/VlModule.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

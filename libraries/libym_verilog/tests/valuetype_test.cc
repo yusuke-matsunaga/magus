@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "verilog/VlValueType.h"
+#include "YmVerilog/VlValueType.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

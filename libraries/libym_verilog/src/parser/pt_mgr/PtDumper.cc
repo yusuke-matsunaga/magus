@@ -9,18 +9,18 @@
 
 #include "PtDumper.h"
 
-#include "verilog/pt/PtModule.h"
-#include "verilog/pt/PtUdp.h"
-#include "verilog/pt/PtPort.h"
-#include "verilog/pt/PtDecl.h"
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtExpr.h"
-#include "verilog/pt/PtMisc.h"
-#include "verilog/pt/PtArray.h"
-#include "verilog/VlUdpVal.h"
+#include "YmVerilog/pt/PtModule.h"
+#include "YmVerilog/pt/PtUdp.h"
+#include "YmVerilog/pt/PtPort.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtArray.h"
+#include "YmVerilog/VlUdpVal.h"
 
-#include "utils/StrBuff.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

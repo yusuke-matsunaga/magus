@@ -11,8 +11,8 @@
 #include "PtNode_decl.h"
 #include "PtNode_expr.h"
 #include "PtNode_misc.h"
-#include "verilog/pt/PtStmt.h"
-#include "verilog/pt/PtArray.h"
+#include "YmVerilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtArray.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

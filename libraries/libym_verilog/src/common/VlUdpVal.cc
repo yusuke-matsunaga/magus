@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "verilog/VlUdpVal.h"
+#include "YmVerilog/VlUdpVal.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

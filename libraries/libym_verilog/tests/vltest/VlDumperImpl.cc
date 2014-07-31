@@ -9,11 +9,11 @@
 
 #include "VlDumperImpl.h"
 
-#include "utils/FileRegion.h"
-#include "verilog/VlMgr.h"
-#include "verilog/VlValue.h"
-#include "verilog/vl/VlModule.h"
-#include "verilog/vl/VlUdp.h"
+#include "YmUtils/FileRegion.h"
+#include "YmVerilog/VlMgr.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/vl/VlModule.h"
+#include "YmVerilog/vl/VlUdp.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -11,7 +11,7 @@
 
 #include "ElbModule.h"
 #include "EiRange.h"
-#include "utils/StrBuff.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

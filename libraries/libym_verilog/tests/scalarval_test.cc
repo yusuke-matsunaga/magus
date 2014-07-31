@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "verilog/VlScalarVal.h"
+#include "YmVerilog/VlScalarVal.h"
 
 
 BEGIN_NAMESPACE_YM

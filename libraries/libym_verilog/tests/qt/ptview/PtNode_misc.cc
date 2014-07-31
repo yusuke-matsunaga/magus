@@ -9,7 +9,7 @@
 
 #include "PtNode_misc.h"
 #include "PtNode_expr.h"
-#include "verilog/pt/PtMisc.h"
+#include "YmVerilog/pt/PtMisc.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

@@ -13,10 +13,10 @@
 #include "ElbStmt.h"
 #include "ElbDecl.h"
 
-#include "verilog/VlTime.h"
-#include "verilog/BitVector.h"
-#include "verilog/pt/PtDecl.h"
-#include "verilog/pt/PtItem.h"
+#include "YmVerilog/VlTime.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/pt/PtDecl.h"
+#include "YmVerilog/pt/PtItem.h"
 
 
 

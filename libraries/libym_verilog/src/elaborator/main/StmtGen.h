@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
-#include "verilog/pt/PtP.h"
+#include "YmVerilog/verilog.h"
+#include "YmVerilog/pt/PtP.h"
 #include "ElbProxy.h"
 
 

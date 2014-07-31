@@ -13,8 +13,8 @@
 #include "ElbParameter.h"
 #include "ElbPrimitive.h"
 
-#include "verilog/VlValue.h"
-#include "verilog/pt/PtDecl.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/pt/PtDecl.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

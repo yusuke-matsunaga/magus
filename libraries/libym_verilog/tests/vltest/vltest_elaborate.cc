@@ -7,15 +7,15 @@
 /// All rights reserved.
 
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 #include "VlTestLineWatcher.h"
-#include "verilog/VlMgr.h"
+#include "YmVerilog/VlMgr.h"
 #include "VlDumper.h"
 
-#include "cell/cell_nsdef.h"
+#include "YmCell/cell_nsdef.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

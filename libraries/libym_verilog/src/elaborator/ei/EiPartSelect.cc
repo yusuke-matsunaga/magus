@@ -10,8 +10,8 @@
 #include "EiFactory.h"
 #include "EiPartSelect.h"
 
-#include "verilog/pt/PtExpr.h"
-#include "verilog/BitVector.h"
+#include "YmVerilog/pt/PtExpr.h"
+#include "YmVerilog/BitVector.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG

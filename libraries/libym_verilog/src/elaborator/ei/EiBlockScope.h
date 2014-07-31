@@ -1,7 +1,7 @@
 #ifndef EIBLOCKSCOPE_H
 #define EIBLOCKSCOPE_H
 
-/// @file libym_verilog/elaborator/ei/EiBlockScope.h
+/// @file libym_YmVerilog/elaborator/ei/EiBlockScope.h
 /// @brief EiBlockScope のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "verilog/pt/PtP.h"
+#include "YmVerilog/pt/PtP.h"
 #include "ElbScope.h"
 
 

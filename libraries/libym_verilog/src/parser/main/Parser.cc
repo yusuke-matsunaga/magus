@@ -15,10 +15,10 @@
 #include "Lex.h"
 #include "PtMgr.h"
 
-#include "verilog/pt/PtItem.h"
-#include "verilog/pt/PtStmt.h"
+#include "YmVerilog/pt/PtItem.h"
+#include "YmVerilog/pt/PtStmt.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 const int debug = 0;

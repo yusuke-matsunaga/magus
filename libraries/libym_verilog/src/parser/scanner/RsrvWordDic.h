@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "verilog/verilog.h"
+#include "YmVerilog/verilog.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
