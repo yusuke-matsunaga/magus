@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/Bdd.h"
-#include "utils/SimpleAlloc.h"
+#include "YmTools.h"
+#include "YmLogic/Bdd.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM

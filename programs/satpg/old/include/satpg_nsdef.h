@@ -9,7 +9,7 @@
 /// Copyright (C) 2005-2010, 2012 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 
 // 名前空間の定義ファイル

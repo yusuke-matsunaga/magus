@@ -17,7 +17,7 @@
 #include "DtpgCmd.h"
 #include "matpg.h"
 #include "search_mgr.h"
-#include <ym_tclpp/TclPopt.h>
+#include <ym_YmTclpp/TclPopt.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

@@ -14,7 +14,7 @@
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "../../graphsat/GraphSat.h"
-#include "logic/SatStats.h"
+#include "YmLogic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

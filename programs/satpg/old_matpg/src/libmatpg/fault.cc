@@ -19,7 +19,7 @@
 #include "gate.h"
 #include "network.h"
 #include "fault.h"
-#include <ym_networks/TgNode.h>
+#include <ym_YmNetworks/TgNode.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

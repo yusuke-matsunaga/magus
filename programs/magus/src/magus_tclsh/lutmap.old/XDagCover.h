@@ -10,7 +10,7 @@
 /// Copyright (C) 2005-2007 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_utils/StopWatch.h>
+#include <ym_YmUtils/StopWatch.h>
 #include "DagACover.h"
 #include "MapRecord.h"
 

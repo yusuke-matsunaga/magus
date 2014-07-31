@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "logic/TvFunc.h"
-#include "utils/IDO.h"
-#include "utils/ODO.h"
+#include "YmLogic/TvFunc.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM

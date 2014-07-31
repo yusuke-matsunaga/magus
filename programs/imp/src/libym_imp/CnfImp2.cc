@@ -8,10 +8,10 @@
 
 
 #include "CnfImp2.h"
-#include "logic/CNFdd.h"
-#include "logic/CNFddMgr.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnNode.h"
+#include "YmLogic/CNFdd.h"
+#include "YmLogic/CNFddMgr.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

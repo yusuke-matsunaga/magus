@@ -10,7 +10,7 @@
 
 
 #include "ImpBase.h"
-#include "logic/Literal.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

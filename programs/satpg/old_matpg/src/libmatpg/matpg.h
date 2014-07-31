@@ -20,7 +20,7 @@
  */
 
 #include "matpg_nsdef.h"
-#include "ym_utils/MStopWatch.h"
+#include "ym_YmUtils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_MATPG

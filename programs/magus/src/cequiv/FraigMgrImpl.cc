@@ -12,8 +12,8 @@
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
 #include "FraigMgr.h"
-#include "utils/StopWatch.h"
-#include "logic/SatStats.h"
+#include "YmUtils/StopWatch.h"
+#include "YmLogic/SatStats.h"
 
 
 #if defined(YM_DEBUG)

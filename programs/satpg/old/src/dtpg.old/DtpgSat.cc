@@ -16,8 +16,8 @@
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
 #include "InputLiteral.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatStats.h"
+#include "ym_YmLogic/SatSolver.h"
+#include "ym_YmLogic/SatStats.h"
 
 
 #define VERIFY_MAIMP 0

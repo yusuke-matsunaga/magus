@@ -10,9 +10,9 @@
 
 
 #include "BNetNdCmd.h"
-#include "tclpp/TclPopt.h"
-#include "logic/ExprWriter.h"
-#include "networks/BNetManip.h"
+#include "YmTclpp/TclPopt.h"
+#include "YmLogic/ExprWriter.h"
+#include "YmNetworks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS

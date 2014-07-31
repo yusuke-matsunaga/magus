@@ -10,7 +10,7 @@
 
 #include "satpg_nsdef.h"
 #include "TestVector.h"
-#include "ym_utils/UnitAlloc.h"
+#include "ym_YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

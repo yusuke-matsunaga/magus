@@ -10,7 +10,7 @@
 
 
 #include "satpg_nsdef.h"
-#include "logic/Literal.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -245,4 +245,4 @@ AssignList::backtrack(int level)
 
 END_NAMESPACE_YM_SATPG
 
-#endif // LIBYM_LOGIC_SAT_YMSAT_ASSIGNLIST_H
+#endif // LIBYM_YMLOGIC_SAT_YMSAT_ASSIGNLIST_H

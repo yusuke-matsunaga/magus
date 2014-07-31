@@ -12,8 +12,8 @@
 #include "fsimx_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal3.h"
-#include "ym_networks/tgnet.h"
-#include "ym_logic/Expr.h"
+#include "ym_YmNetworks/tgnet.h"
+#include "ym_YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG_FSIMX

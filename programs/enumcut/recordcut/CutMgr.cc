@@ -9,7 +9,7 @@
 
 #include "CutMgr.h"
 #include "Cut.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM

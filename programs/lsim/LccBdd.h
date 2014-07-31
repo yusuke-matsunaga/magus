@@ -10,8 +10,8 @@
 
 
 #include "Lsim.h"
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddMgr.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -15,8 +15,8 @@
 
 
 #include "magus_nsdef.h"
-#include "tclpp/TclCmd.h"
-#include "utils/StopWatch.h"
+#include "YmTclpp/TclCmd.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_MAGUS

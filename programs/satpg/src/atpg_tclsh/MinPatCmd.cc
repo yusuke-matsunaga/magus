@@ -10,7 +10,7 @@
 #include "MinPatCmd.h"
 #include "AtpgMgr.h"
 #include "MinPatStats.h"
-#include "tclpp/TclPopt.h"
+#include "YmTclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

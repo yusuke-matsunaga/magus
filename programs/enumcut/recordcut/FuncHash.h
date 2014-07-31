@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "logic/TvFunc.h"
-#include "utils/UnitAlloc.h"
+#include "YmLogic/TvFunc.h"
+#include "YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM

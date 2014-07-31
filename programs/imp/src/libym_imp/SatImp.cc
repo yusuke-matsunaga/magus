@@ -13,9 +13,9 @@
 #include "ImpHash.h"
 #include "ImpMgr.h"
 #include "ImpListRec.h"
-#include "logic/SatSolver.h"
-#include "utils/RandGen.h"
-#include "utils/StopWatch.h"
+#include "YmLogic/SatSolver.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

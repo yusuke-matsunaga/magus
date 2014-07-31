@@ -14,7 +14,7 @@
 #endif
 
 #include <tcl.h>
-#include "ym_tclpp/TclCmd.h"
+#include "ym_YmTclpp/TclCmd.h"
 #include "BddsimCmd.h"
 
 

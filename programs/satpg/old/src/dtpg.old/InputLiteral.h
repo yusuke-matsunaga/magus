@@ -10,7 +10,7 @@
 
 
 #include "dtpg_nsdef.h"
-#include "ym_logic/Literal.h"
+#include "ym_YmLogic/Literal.h"
 #if 0
 #include "DtpgNetwork.h"
 #include "DtpgNode.h"
@@ -18,8 +18,8 @@
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
 #include "DtpgOperator.h"
-#include "ym_logic/SatSolver.h"
-#include "ym_logic/SatStats.h"
+#include "ym_YmLogic/SatSolver.h"
+#include "ym_YmLogic/SatStats.h"
 #endif
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG

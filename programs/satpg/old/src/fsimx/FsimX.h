@@ -15,7 +15,7 @@
 #include "Fsim.h"
 #include "fsimx_nsdef.h"
 #include "PackedVal.h"
-#include "ym_logic/Expr.h"
+#include "ym_YmLogic/Expr.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 

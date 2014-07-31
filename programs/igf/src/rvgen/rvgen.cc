@@ -8,8 +8,8 @@
 
 
 #include "igf_nsdef.h"
-#include "utils/PoptMainApp.h"
-#include "utils/RandGen.h"
+#include "YmUtils/PoptMainApp.h"
+#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

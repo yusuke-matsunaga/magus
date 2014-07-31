@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/Literal.h"
+#include "YmTools.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM

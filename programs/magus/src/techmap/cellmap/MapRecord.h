@@ -10,10 +10,10 @@
 
 
 #include "cellmap_nsdef.h"
-#include "cell/cell_nsdef.h"
-#include "cell/CellFFInfo.h"
-#include "cell/CellLatchInfo.h"
-#include "networks/cmn.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmCell/CellFFInfo.h"
+#include "YmCell/CellLatchInfo.h"
+#include "YmNetworks/cmn.h"
 #include "Match.h"
 
 

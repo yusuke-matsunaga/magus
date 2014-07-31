@@ -1,8 +1,8 @@
-#ifndef IDHASH_H
-#define IDHASH_H
+#ifndef ISCAS89IDHASH_H
+#define ISCAS89IDHASH_H
 
-/// @file IdHash.h
-/// @brief IdHash のヘッダファイル
+/// @file Iscas89IdHash.h
+/// @brief Iscas89IdHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -17,12 +17,12 @@
 BEGIN_NAMESPACE_YM_ISCAS89
 
 //////////////////////////////////////////////////////////////////////
-/// @class IdCell IdHash.h "IdHash.h"
+/// @class IdCell Iscas89IdHash.h "Iscas89IdHash.h"
 /// @brief 識別子に関する情報を表すデータ構造
 //////////////////////////////////////////////////////////////////////
 class IdCell
 {
-  friend class IdHash;
+  friend class Iscas89IdHash;
 
 private:
 
@@ -133,18 +133,18 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class IdHash IdHash.h "IdHash.h"
+/// @class Iscas89IdHash Iscas89IdHash.h "Iscas89IdHash.h"
 /// @brief 識別子を管理するハッシュ表
 //////////////////////////////////////////////////////////////////////
-class IdHash
+class Iscas89IdHash
 {
 public:
 
   /// @brief コンストラクタ
-  IdHash();
+  Iscas89IdHash();
 
   /// @brief デストラクタ
-  ~IdHash();
+  ~Iscas89IdHash();
 
 
 public:
@@ -315,7 +315,7 @@ IdCell::set_output()
 // @brief 登録されている要素数を返す．(= ID番号の最大値 + 1)
 inline
 size_t
-IdHash::num() const
+Iscas89IdHash::num() const
 {
   return mCellArray.size();
 }
@@ -323,7 +323,7 @@ IdHash::num() const
 // @brief ID 番号に対応する IdCell を得る．
 inline
 IdCell*
-IdHash::cell(ymuint32 id) const
+Iscas89IdHash::cell(ymuint32 id) const
 {
   return mCellArray[id];
 }
@@ -331,7 +331,7 @@ IdHash::cell(ymuint32 id) const
 // @brief ID 番号から文字列を得る．
 inline
 const char*
-IdHash::str(ymuint32 id) const
+Iscas89IdHash::str(ymuint32 id) const
 {
   return cell(id)->str();
 }
@@ -339,7 +339,7 @@ IdHash::str(ymuint32 id) const
 // @brief ID番号から位置情報を得る．
 inline
 const FileRegion&
-IdHash::loc(ymuint32 id) const
+Iscas89IdHash::loc(ymuint32 id) const
 {
   return cell(id)->loc();
 }
@@ -347,11 +347,11 @@ IdHash::loc(ymuint32 id) const
 // @brief ID番号からその識別子を定義している位置情報を得る．
 inline
 const FileRegion&
-IdHash::def_loc(ymuint32 id) const
+Iscas89IdHash::def_loc(ymuint32 id) const
 {
   return cell(id)->def_loc();
 }
 
 END_NAMESPACE_YM_ISCAS89
 
-#endif // IDHASH_H
+#endif // ISCAS89IDHASH_H

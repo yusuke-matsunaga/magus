@@ -13,7 +13,7 @@
 #include <magus_config.h>
 #endif
 
-#include <ym_utils/RandGen.h>
+#include <ym_YmUtils/RandGen.h>
 #include "TreeLB.h"
 #include "SbjGraph.h"
 #include "Cut.h"

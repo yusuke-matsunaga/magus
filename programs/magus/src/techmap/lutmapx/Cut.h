@@ -12,8 +12,8 @@
 
 
 #include "lutmap_nsdef.h"
-#include "networks/bdn.h"
-#include "logic/Expr.h"
+#include "YmNetworks/bdn.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

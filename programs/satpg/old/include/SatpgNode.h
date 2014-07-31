@@ -10,9 +10,9 @@
 
 
 #include "dtpg_nsdef.h"
-#include "ym_networks/tgnet.h"
-#include "ym_logic/VarId.h"
-#include "ym_logic/Bool3.h"
+#include "ym_YmNetworks/tgnet.h"
+#include "ym_YmLogic/VarId.h"
+#include "ym_YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG

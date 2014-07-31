@@ -15,8 +15,8 @@
 #include "fsim_nsdef.h"
 #include "ModBase.h"
 #include "PackedVal.h"
-#include "ym_networks/tgnet.h"
-#include "ym_logic/Expr.h"
+#include "ym_YmNetworks/tgnet.h"
+#include "ym_YmLogic/Expr.h"
 #include "EventQ.h"
 #include "FsimFault.h"
 

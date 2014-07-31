@@ -12,7 +12,7 @@
 
 
 #include "lutmap_nsdef.h"
-#include "networks/bdn.h"
+#include "YmNetworks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

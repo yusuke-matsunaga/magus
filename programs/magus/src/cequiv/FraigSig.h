@@ -10,7 +10,7 @@
 
 
 #include "ym_aig/aig_nsdef.h"
-#include "ym_utils/RandGen.h"
+#include "ym_YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_AIG

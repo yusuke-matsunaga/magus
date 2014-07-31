@@ -10,9 +10,9 @@
 
 
 #include "magus_nsdef.h"
-#include "cell/cell_nsdef.h"
-#include "utils/UnitAlloc.h"
-#include "utils/ItvlMgr.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmUtils/UnitAlloc.h"
+#include "YmUtils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS

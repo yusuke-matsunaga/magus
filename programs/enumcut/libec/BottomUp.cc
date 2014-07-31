@@ -9,8 +9,8 @@
 
 #include "BottomUp.h"
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM

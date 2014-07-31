@@ -10,7 +10,7 @@
 
 
 #include "NetHandle.h"
-#include "networks/MvnMgr.h"
+#include "YmNetworks/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -11,8 +11,8 @@
 
 #include "cec_nsdef.h"
 #include "FraigHandle.h"
-#include "logic/Expr.h"
-#include "logic/Bool3.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 #include "GbmLit.h"
 #include "RcfNetwork.h"
 #include "RcfNode.h"

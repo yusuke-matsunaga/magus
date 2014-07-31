@@ -12,7 +12,7 @@
 
 #include "satpg_nsdef.h"
 #include "DtpgMode.h"
-#include "networks/tgnet.h"
+#include "YmNetworks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

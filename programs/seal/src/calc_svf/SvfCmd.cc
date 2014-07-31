@@ -16,9 +16,9 @@
 
 #include "seal_utils.h"
 #include "SvfCmd.h"
-#include <ym_networks/TgNetwork.h>
+#include <ym_YmNetworks/TgNetwork.h>
 #include "TestVector.h"
-#include <ym_tclpp/TclPopt.h>
+#include <ym_YmTclpp/TclPopt.h>
 #include "CalcSvf.h"
 
 

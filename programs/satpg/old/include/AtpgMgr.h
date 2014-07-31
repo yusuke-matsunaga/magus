@@ -15,10 +15,10 @@
 #include "TvMgr.h"
 #include "Fsim.h"
 #include "Dtpg.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_cell/cell_nsdef.h"
-#include "ym_utils/Binder.h"
-#include "ym_utils/MStopWatch.h"
+#include "ym_YmNetworks/TgNetwork.h"
+#include "ym_YmCell/cell_nsdef.h"
+#include "ym_YmUtils/Binder.h"
+#include "ym_YmUtils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

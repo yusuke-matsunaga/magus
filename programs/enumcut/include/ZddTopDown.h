@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "logic/Zdd.h"
-#include "logic/ZddMgr.h"
-#include "networks/bdn.h"
+#include "YmLogic/Zdd.h"
+#include "YmLogic/ZddMgr.h"
+#include "YmNetworks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM

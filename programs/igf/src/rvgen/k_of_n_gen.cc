@@ -8,8 +8,8 @@
 
 
 #include "igf_nsdef.h"
-#include "utils/PoptMainApp.h"
-#include "utils/CombiGen.h"
+#include "YmUtils/PoptMainApp.h"
+#include "YmUtils/CombiGen.h"
 #include <gmpxx.h>
 
 

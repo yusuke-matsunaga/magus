@@ -12,11 +12,11 @@
 
 #include "BNetElimCmd.h"
 
-#include "networks/BNetManip.h"
-#include "networks/BNetDecomp.h"
-#include "networks/BNetGateDecomp.h"
-#include "networks/BNetSopDecomp.h"
-#include "tclpp/TclPopt.h"
+#include "YmNetworks/BNetManip.h"
+#include "YmNetworks/BNetDecomp.h"
+#include "YmNetworks/BNetGateDecomp.h"
+#include "YmNetworks/BNetSopDecomp.h"
+#include "YmTclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS

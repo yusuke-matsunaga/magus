@@ -41,7 +41,7 @@
 #include "f_sim.h"
 #include "sense.h"
 #include "cfna.h"
-#include <ym_utils/RandGen.h>
+#include <ym_YmUtils/RandGen.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

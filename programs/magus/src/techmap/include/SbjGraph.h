@@ -13,10 +13,10 @@
 
 #include "sbj_nsdef.h"
 
-#include "utils/SimpleAlloc.h"
-#include "utils/FragAlloc.h"
-#include "utils/DlList.h"
-#include "utils/ItvlMgr.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/FragAlloc.h"
+#include "YmUtils/DlList.h"
+#include "YmUtils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ

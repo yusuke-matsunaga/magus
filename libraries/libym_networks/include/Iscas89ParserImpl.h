@@ -14,7 +14,7 @@
 #include "Iscas89Scanner.h"
 
 #include "YmUtils/StrBuff.h"
-#include "IdHash.h"
+#include "Iscas89IdHash.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
@@ -129,7 +129,7 @@ private:
   list<Iscas89Handler*> mHandlerList;
 
   // 文字列のハッシュ
-  IdHash mIdHash;
+  Iscas89IdHash mIdHash;
 
   // 位置情報バッファ
   FileRegion mLoc1;

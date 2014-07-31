@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "networks/bdn.h"
-#include "logic/TvFunc.h"
-#include "utils/SimpleAlloc.h"
-#include "utils/IDO.h"
-#include "utils/ODO.h"
+#include "YmNetworks/bdn.h"
+#include "YmLogic/TvFunc.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/ODO.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

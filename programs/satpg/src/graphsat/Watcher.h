@@ -11,7 +11,7 @@
 
 #include "satpg_nsdef.h"
 #include "SatReason.h"
-#include "utils/Alloc.h"
+#include "YmUtils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

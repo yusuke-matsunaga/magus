@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
-#include "logic/Bool3.h"
+#include "YmTools.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/Bool3.h"
 #include "RcfNetwork.h"
 #include "RcfNode.h"
 

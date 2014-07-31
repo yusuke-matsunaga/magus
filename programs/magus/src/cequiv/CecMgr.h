@@ -12,8 +12,8 @@
 #include "cec_nsdef.h"
 #include "CecHandle.h"
 #include "CecHash.h"
-#include "utils/SimpleAlloc.h"
-#include "logic/SatSolver.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

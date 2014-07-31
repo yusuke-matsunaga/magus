@@ -8,7 +8,7 @@
 
 
 #include "Lut444Match.h"
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

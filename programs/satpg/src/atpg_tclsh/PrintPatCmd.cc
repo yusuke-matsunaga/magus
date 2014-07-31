@@ -10,7 +10,7 @@
 #include "PrintPatCmd.h"
 #include "AtpgMgr.h"
 #include "TestVector.h"
-#include "tclpp/TclPopt.h"
+#include "YmTclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

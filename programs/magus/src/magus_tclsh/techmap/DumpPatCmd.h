@@ -10,7 +10,7 @@
 
 
 #include "TechmapCmd.h"
-#include "tclpp/TclPopt.h"
+#include "YmTclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

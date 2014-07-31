@@ -17,7 +17,7 @@
 #include "PrintFaultCmd.h"
 #include "matpg.h"
 #include "fault.h"
-#include <ym_tclpp/TclPopt.h>
+#include <ym_YmTclpp/TclPopt.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

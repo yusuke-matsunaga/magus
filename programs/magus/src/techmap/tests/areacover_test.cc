@@ -7,17 +7,17 @@
 /// All rights reserved.
 
 
-#include "cell/CellLibrary.h"
-#include "cell/CellMislibReader.h"
-#include "cell/CellDotlibReader.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnDumper.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellMislibReader.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnDumper.h"
 #include "CellMap.h"
-#include "networks/CmnMgr.h"
-#include "networks/CmnDumper.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmNetworks/CmnMgr.h"
+#include "YmNetworks/CmnDumper.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NONAMESPACE

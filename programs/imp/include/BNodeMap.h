@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/bnet.h"
+#include "YmNetworks/bnet.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

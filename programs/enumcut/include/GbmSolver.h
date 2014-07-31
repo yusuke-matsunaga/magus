@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/TvFunc.h"
+#include "YmTools.h"
+#include "YmLogic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM

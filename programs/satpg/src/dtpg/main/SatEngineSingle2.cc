@@ -13,7 +13,7 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

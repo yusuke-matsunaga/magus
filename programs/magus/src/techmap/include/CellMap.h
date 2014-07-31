@@ -10,9 +10,9 @@
 
 
 #include "cellmap_nsdef.h"
-#include "networks/bdn.h"
-#include "networks/cmn.h"
-#include "cell/cell_nsdef.h"
+#include "YmNetworks/bdn.h"
+#include "YmNetworks/cmn.h"
+#include "YmCell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

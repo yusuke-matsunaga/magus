@@ -12,12 +12,12 @@
 
 #include "dtpg_nsdef.h"
 
-//#include "ym_networks/tgnet.h"
+//#include "ym_YmNetworks/tgnet.h"
 #include "DtpgNode.h"
-#include "ym_logic/Literal.h"
-#include "ym_logic/Bool3.h"
-#include "ym_logic/sat_nsdef.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_YmLogic/Literal.h"
+#include "ym_YmLogic/Bool3.h"
+#include "ym_YmLogic/sat_nsdef.h"
+#include "ym_YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG

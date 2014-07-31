@@ -8,9 +8,9 @@
 
 
 #include "LsimMpx2.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnPort.h"
-#include "logic/BddVector.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmLogic/BddVector.h"
 
 
 BEGIN_NAMESPACE_YM

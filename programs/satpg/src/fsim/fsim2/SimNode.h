@@ -12,7 +12,7 @@
 #include "fsim2_nsdef.h"
 #include "EqElem.h"
 #include "PackedVal.h"
-#include "networks/tgnet.h"
+#include "YmNetworks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM2

@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/bdn.h"
-#include "logic/TvFunc.h"
-#include "logic/Aig.h"
+#include "YmNetworks/bdn.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/Aig.h"
 
 
 BEGIN_NAMESPACE_YM

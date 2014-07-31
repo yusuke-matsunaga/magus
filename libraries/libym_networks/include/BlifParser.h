@@ -11,7 +11,7 @@
 
 #include "YmNetworks/blif_nsdef.h"
 #include "YmCell/cell_nsdef.h"
-#include "IdHash.h"
+#include "BlifIdHash.h"
 #include "BlifScanner.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 class BlifHandler;
 
 //////////////////////////////////////////////////////////////////////
-/// @class BlifParser BlifParser.h "blif/BlifParser.h"
+/// @class BlifParser BlifParser.h "BlifParser.h"
 /// @ingroup BlifGroup
 /// @brief blif形式のファイルを読み込むパーサークラス
 /// 適切なハンドラクラスを生成して add_handler() で登録して使う．
@@ -114,7 +114,7 @@ private:
   list<BlifHandler*> mHandlerList;
 
   // 識別子のハッシュ表
-  IdHash mIdHash;
+  BlifIdHash mIdHash;
 
   // 位置情報の配列
   vector<FileRegion> mLocArray;

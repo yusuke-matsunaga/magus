@@ -10,7 +10,7 @@
 
 
 #include "RcfNetwork.h"
-#include "logic/TvFunc.h"
+#include "YmLogic/TvFunc.h"
 #include "GbmSolver.h"
 
 

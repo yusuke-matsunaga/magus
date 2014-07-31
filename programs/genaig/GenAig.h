@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/AigMgr.h"
-#include "logic/Aig.h"
+#include "YmTools.h"
+#include "YmLogic/AigMgr.h"
+#include "YmLogic/Aig.h"
 #include "AigPat.h"
 #include "FuncXform.h"
 

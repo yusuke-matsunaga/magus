@@ -12,8 +12,8 @@
 
 
 #include "matpg_nsdef.h"
-#include <ym_tclpp/TclCmd.h>
-#include <ym_utils/StopWatch.h>
+#include <ym_YmTclpp/TclCmd.h>
+#include <ym_YmUtils/StopWatch.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

@@ -11,9 +11,9 @@
 #include "ImpMgr.h"
 #include "ImpInfo.h"
 #include "ImpListRec2.h"
-#include "logic/CNFdd.h"
-#include "logic/CNFddMgr.h"
-#include "utils/StopWatch.h"
+#include "YmLogic/CNFdd.h"
+#include "YmLogic/CNFddMgr.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

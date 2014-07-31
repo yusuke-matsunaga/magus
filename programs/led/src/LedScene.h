@@ -8,8 +8,8 @@
 /// Copyright(C) 2002, 2013 by Yusuke Matsunaga
 
 
-#include "ym_utils/DlList.h"
-#include "ym_utils/ItvlMgr.h"
+#include "ym_YmUtils/DlList.h"
+#include "ym_YmUtils/ItvlMgr.h"
 #include "GlvScene.h"
 #include "GateObj.h"
 

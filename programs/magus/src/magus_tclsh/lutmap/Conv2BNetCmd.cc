@@ -12,7 +12,7 @@
 #include "LutmapCmd.h"
 #include "NetHandle.h"
 #include "Ln2BNet.h"
-#include "tclpp/TclPopt.h"
+#include "YmTclpp/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS

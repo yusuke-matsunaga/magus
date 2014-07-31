@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 #include "GbmLit.h"
 #include "RcfNetwork.h"
 #include "RcfNode.h"
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM

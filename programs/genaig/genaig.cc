@@ -13,7 +13,7 @@
 #error "<popt.h> not found."
 #endif
 
-#include "ymtools.h"
+#include "YmTools.h"
 #include "GenAig.h"
 #include "GenAigNaive.h"
 #include "GenAigDj.h"

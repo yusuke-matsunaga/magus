@@ -10,7 +10,7 @@
 
 
 #include "llvmeq_nsdef.h"
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ

@@ -12,7 +12,7 @@
 
 #include "lutmap.h"
 
-#include <ym_utils/RandGen.h>
+#include <ym_YmUtils/RandGen.h>
 #include <ym_lexp/Expr.h>
 
 

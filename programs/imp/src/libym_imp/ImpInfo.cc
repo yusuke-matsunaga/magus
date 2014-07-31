@@ -9,7 +9,7 @@
 
 #include "ImpInfo.h"
 #include "ImpMgr.h"
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

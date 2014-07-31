@@ -9,9 +9,9 @@
 
 #include "DumpPatCmd.h"
 
-#include "cell/CellMislibReader.h"
-#include "cell/CellDotlibReader.h"
-#include "cell/CellLibrary.h"
+#include "YmCell/CellMislibReader.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmCell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

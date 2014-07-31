@@ -1,16 +1,17 @@
 
-/// @file IdHash.cc
-/// @brief IdHash の実装ファイル
+/// @file BlifIdHash.cc
+/// @brief BlifIdHash の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2012, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IdHash.h"
+#include "BlifIdHash.h"
+#include "IdCell.h"
 
 
-BEGIN_NAMESPACE_YM_ISCAS89
+BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 
 //////////////////////////////////////////////////////////////////////
 // クラス IdCell
@@ -35,11 +36,11 @@ IdCell::~IdCell()
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス IdHash
+// クラス BlifIdHash
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-IdHash::IdHash() :
+BlifIdHash::BlifIdHash() :
   mAlloc(4096),
   mTableSize(0)
 {
@@ -47,7 +48,7 @@ IdHash::IdHash() :
 }
 
 // @brief デストラクタ
-IdHash::~IdHash()
+BlifIdHash::~BlifIdHash()
 {
   clear();
   delete [] mTable;
@@ -55,9 +56,9 @@ IdHash::~IdHash()
 
 // @brief 内容をクリアする．
 void
-IdHash::clear()
+BlifIdHash::clear()
 {
-  for (size_t i = 0; i < mTableSize; ++ i) {
+  for (ymuint32 i = 0; i < mTableSize; ++ i) {
     mTable[i] = NULL;
   }
   mCellArray.clear();
@@ -85,12 +86,12 @@ END_NONAMESPACE
 // @param[in] create 存在しないときに新規生成するなら true
 // @return 対応する IdCell を返す．
 IdCell*
-IdHash::find(const char* str,
-	     bool create)
+BlifIdHash::find(const char* str,
+		 bool create)
 {
   assert_cond(str, __FILE__, __LINE__);
-  size_t pos0 = hash_func(str);
-  size_t pos = pos0 % mTableSize;
+  ymuint32 pos0 = hash_func(str);
+  ymuint32 pos = pos0 % mTableSize;
   for (IdCell* cell = mTable[pos]; cell; cell = cell->mLink) {
     if ( strcmp(cell->mStr, str) == 0 ) {
       return cell;
@@ -104,12 +105,12 @@ IdHash::find(const char* str,
   if ( mCellArray.size() >= mNextLimit ) {
     // テーブルを拡張する．
     IdCell** old_table = mTable;
-    size_t old_size = mTableSize;
+    ymuint32 old_size = mTableSize;
     alloc_table(old_size * 2);
-    for (size_t i = 0; i < old_size; ++ i) {
+    for (ymuint32 i = 0; i < old_size; ++ i) {
       for (IdCell* cell = old_table[i]; cell; ) {
 	IdCell* next = cell->mLink;
-	size_t pos1 = hash_func(cell->mStr) % mTableSize;
+	ymuint32 pos1 = hash_func(cell->mStr) % mTableSize;
 	cell->mLink = mTable[pos1];
 	mTable[pos1] = cell;
 	cell = next;
@@ -118,8 +119,8 @@ IdHash::find(const char* str,
   }
 
   // 新しいセルを確保する．
-  size_t l = strlen(str);
-  size_t reqsize = sizeof(IdCell) + l;
+  ymuint32 l = strlen(str);
+  ymuint32 reqsize = sizeof(IdCell) + l;
   void* p = mAlloc.get_memory(reqsize);
   IdCell* cell = new (p) IdCell(mCellArray.size(), str);
   mCellArray.push_back(cell);
@@ -133,14 +134,35 @@ IdHash::find(const char* str,
 
 // ハッシュ表を拡大する．
 void
-IdHash::alloc_table(size_t new_size)
+BlifIdHash::alloc_table(ymuint32 new_size)
 {
   mTable = new IdCell*[new_size];
   mTableSize = new_size;
-  mNextLimit = static_cast<size_t>(mTableSize * 1.8);
-  for (size_t i = 0; i < new_size; ++ i) {
+  mNextLimit = static_cast<ymuint32>(mTableSize * 1.8);
+  for (ymuint32 i = 0; i < new_size; ++ i) {
     mTable[i] = NULL;
   }
 }
 
-END_NAMESPACE_YM_ISCAS89
+// @brief ID 番号から文字列を得る．
+const char*
+BlifIdHash::str(ymuint32 id) const
+{
+  return cell(id)->str();
+}
+
+// @brief ID番号から位置情報を得る．
+const FileRegion&
+BlifIdHash::loc(ymuint32 id) const
+{
+  return cell(id)->loc();
+}
+
+// @brief この識別子を定義している位置情報を返す．
+const FileRegion&
+BlifIdHash::def_loc(ymuint32 id) const
+{
+  return cell(id)->def_loc();
+}
+
+END_NAMESPACE_YM_NETWORKS_BLIF

@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 #include "nsdef.h"
-#include <ym_networks/TgGateTemplate.h>
+#include <ym_YmNetworks/TgGateTemplate.h>
 #include <ym_lexp/Expr.h>
 #include <ym_bdd/Bdd.h>
 

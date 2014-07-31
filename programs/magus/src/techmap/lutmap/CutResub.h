@@ -12,9 +12,9 @@
 
 
 #include "lutmap_nsdef.h"
-#include "networks/bdn.h"
+#include "YmNetworks/bdn.h"
 
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/SimpleAlloc.h"
 #include "CrNode.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"

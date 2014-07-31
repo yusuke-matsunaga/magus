@@ -8,8 +8,8 @@
 
 
 #include "FuncMgr.h"
-#include "logic/TvFunc.h"
-#include "logic/NpnMgr.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/NpnMgr.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -12,7 +12,7 @@
 
 
 #include "atpg_nsdef.h"
-#include "ym_utils/MStopWatch.h"
+#include "ym_YmUtils/MStopWatch.h"
 
 
 // DtpgCl 用の名前空間の定義

@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnIscas89Reader.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnIscas89Reader.h"
+#include "YmNetworks/BdnNode.h"
 
 #include "TopDown.h"
 #include "BottomUp.h"
@@ -18,13 +18,13 @@
 #include "ZddImp2.h"
 #include "ZddTopDown.h"
 
-#include "logic/ZddMgr.h"
+#include "YmLogic/ZddMgr.h"
 
-#include "utils/PoptMainApp.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/PoptMainApp.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

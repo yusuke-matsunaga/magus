@@ -12,7 +12,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "DtpgEngine.h"
-#include "utils/HeapTree.h"
+#include "YmUtils/HeapTree.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

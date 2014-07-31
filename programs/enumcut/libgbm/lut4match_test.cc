@@ -10,7 +10,7 @@
 #include "GbmSatNaiveBinary.h"
 #include "GbmSatNaiveOneHot.h"
 #include "RcfNetwork.h"
-#include "utils/RandGen.h"
+#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM

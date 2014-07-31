@@ -10,9 +10,9 @@
 
 
 #include "Lsim.h"
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
-#include "logic/BddVector.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/BddVector.h"
 
 
 BEGIN_NAMESPACE_YM

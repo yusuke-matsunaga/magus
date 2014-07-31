@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 #include "NpnNodeMgr.h"
 #include "NpnXform.h"
 #include "NpnHandle.h"

@@ -10,8 +10,8 @@
 
 
 #include "dtpgcl_nsdef.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "ym_YmNetworks/TgNetwork.h"
+#include "ym_YmNetworks/TgNode.h"
 #include "ym_aig/AigMgr.h"
 
 

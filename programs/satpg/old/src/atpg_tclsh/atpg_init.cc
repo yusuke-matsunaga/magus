@@ -8,7 +8,7 @@
 
 
 #include <tcl.h>
-#include "ym_tclpp/TclCmd.h"
+#include "ym_YmTclpp/TclCmd.h"
 #include "AtpgMgr.h"
 #include "AtpgCmd.h"
 #include "NtwkIoCmd.h"

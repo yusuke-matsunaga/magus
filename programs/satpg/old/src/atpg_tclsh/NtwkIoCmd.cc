@@ -11,7 +11,7 @@
 #include "AtpgMsgHandler.h"
 #include "AtpgMgr.h"
 
-#include "ym_utils/MsgMgr.h"
+#include "ym_YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

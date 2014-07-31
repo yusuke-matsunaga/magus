@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/bdn.h"
-#include "utils/UnitAlloc.h"
+#include "YmNetworks/bdn.h"
+#include "YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

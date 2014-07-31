@@ -10,7 +10,7 @@
 
 
 #include "AtpgMsgHandler.h"
-#include "ym_utils/FileRegion.h"
+#include "ym_YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

@@ -13,10 +13,10 @@
 #error "<popt.h> not found."
 #endif
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnIscas89Reader.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnIscas89Reader.h"
+#include "YmNetworks/BdnNode.h"
 
 #include "TopDown.h"
 #include "TopDown2.h"
@@ -27,15 +27,15 @@
 #include "Lut443Match.h"
 #include "Lut444Match.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
-#include "utils/FileIDO.h"
-#include "utils/FileODO.h"
-#include "utils/StopWatch.h"
-#include "utils/RandGen.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/FileODO.h"
+#include "YmUtils/StopWatch.h"
+#include "YmUtils/RandGen.h"
 
 BEGIN_NAMESPACE_YM
 

@@ -8,11 +8,11 @@
 
 
 #include "cec_nsdef.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnNodeHandle.h"
-#include "networks/BdnConstNodeHandle.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnNodeHandle.h"
+#include "YmNetworks/BdnConstNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

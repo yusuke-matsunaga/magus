@@ -16,10 +16,10 @@
 #include "fsim_nsdef.h"
 #include "fsim3_nsdef.h"
 #include "fsimx_nsdef.h"
-#include "ym_networks/TgNetwork.h"
+#include "ym_YmNetworks/TgNetwork.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
-#include "ym_utils/MStopWatch.h"
+#include "ym_YmUtils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

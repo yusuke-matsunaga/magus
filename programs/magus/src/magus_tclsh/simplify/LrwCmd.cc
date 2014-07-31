@@ -11,7 +11,7 @@
 
 #include "LrwCmd.h"
 #include "NetHandle.h"
-#include "networks/BNetManip.h"
+#include "YmNetworks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS_SIMPLIFY

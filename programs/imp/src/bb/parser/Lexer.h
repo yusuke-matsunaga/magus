@@ -12,10 +12,10 @@
 
 
 #include "bb_nsdef.h"
-#include "utils/MsgMgr.h"
-#include "utils/FileInfo.h"
-#include "utils/FileRegion.h"
-#include "utils/StrBuff.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/FileInfo.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_BB

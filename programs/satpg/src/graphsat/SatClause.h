@@ -10,7 +10,7 @@
 
 
 #include "satpg_nsdef.h"
-#include "logic/Literal.h"
+#include "YmLogic/Literal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

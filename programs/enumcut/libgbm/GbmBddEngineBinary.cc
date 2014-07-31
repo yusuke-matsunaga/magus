@@ -8,7 +8,7 @@
 
 
 #include "GbmBddEngineBinary.h"
-#include "logic/BddLitSet.h"
+#include "YmLogic/BddLitSet.h"
 
 
 BEGIN_NAMESPACE_YM

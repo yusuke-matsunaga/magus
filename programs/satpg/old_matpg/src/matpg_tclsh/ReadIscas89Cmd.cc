@@ -16,10 +16,10 @@
 
 #include "ReadIscas89Cmd.h"
 #include "MatpgMsgHandler.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_tclpp/TclPopt.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_YmNetworks/TgNetwork.h"
+#include "ym_YmTclpp/TclPopt.h"
+#include "ym_YmUtils/MsgMgr.h"
+#include "ym_YmUtils/StopWatch.h"
 #include "matpg.h"
 #include "network.h"
 

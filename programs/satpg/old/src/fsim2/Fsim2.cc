@@ -8,13 +8,13 @@
 
 
 #include "Fsim2.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "ym_YmNetworks/TgNetwork.h"
+#include "ym_YmNetworks/TgNode.h"
 #include "SimNode.h"
 #include "SimFFR.h"
 #include "SaFault.h"
 #include "TestVector.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

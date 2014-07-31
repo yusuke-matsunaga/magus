@@ -14,8 +14,8 @@
 #endif
 
 #include "LutNetwork.h"
-#include <ym_networks/BNetwork.h>
-#include <ym_networks/BNetManip.h>
+#include <ym_YmNetworks/BNetwork.h>
+#include <ym_YmNetworks/BNetManip.h>
 
 
 BEGIN_NAMESPACE_MAGUS_LUTMAP

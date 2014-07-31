@@ -14,7 +14,7 @@
 
 #include "RandCmd.h"
 
-#include "utils/random.h"
+#include "YmUtils/random.h"
 
 
 BEGIN_NAMESPACE_MAGUS

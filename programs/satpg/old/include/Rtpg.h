@@ -11,8 +11,8 @@
 
 
 #include "satpg_nsdef.h"
-#include "ym_utils/USTime.h"
-#include "ym_utils/RandGen.h"
+#include "ym_YmUtils/USTime.h"
+#include "ym_YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

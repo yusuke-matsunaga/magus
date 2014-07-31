@@ -11,7 +11,7 @@
 
 #include "CrLevelQ.h"
 #include "CrNode.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

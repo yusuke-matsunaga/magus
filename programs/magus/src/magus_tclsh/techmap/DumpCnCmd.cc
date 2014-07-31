@@ -8,10 +8,10 @@
 
 
 #include "DumpCnCmd.h"
-#include "tclpp/TclPopt.h"
-#include "networks/CmnDumper.h"
-#include "networks/CmnBlifWriter.h"
-#include "networks/CmnVerilogWriter.h"
+#include "YmTclpp/TclPopt.h"
+#include "YmNetworks/CmnDumper.h"
+#include "YmNetworks/CmnBlifWriter.h"
+#include "YmNetworks/CmnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

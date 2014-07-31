@@ -8,8 +8,8 @@
 
 
 #include "Match.h"
-#include "networks/BdnNode.h"
-#include "logic/NpnMap.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmLogic/NpnMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

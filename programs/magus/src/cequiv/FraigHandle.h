@@ -10,7 +10,7 @@
 
 
 #include "cec_nsdef.h"
-#include "logic/VarId.h"
+#include "YmLogic/VarId.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

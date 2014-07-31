@@ -8,7 +8,7 @@
 
 
 #include "GenPat.h"
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

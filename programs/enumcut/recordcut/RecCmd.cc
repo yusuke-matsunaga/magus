@@ -8,18 +8,18 @@
 
 
 #include "RecCmd.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnIscas89Reader.h"
-#include "utils/MsgMgr.h"
-#include "utils/StopWatch.h"
-#include "tclpp/TclObjMsgHandler.h"
-#include "tclpp/TclPopt.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnIscas89Reader.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/StopWatch.h"
+#include "YmTclpp/TclObjMsgHandler.h"
+#include "YmTclpp/TclPopt.h"
 
-#include "logic/NpnMgr.h"
+#include "YmLogic/NpnMgr.h"
 
-#include "utils/FileIDO.h"
-#include "utils/FileODO.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/FileODO.h"
 
 #include "TopDown.h"
 #include "TopDown2.h"

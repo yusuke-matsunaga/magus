@@ -9,9 +9,9 @@
 
 #include "AtpgMgr.h"
 #include "Op1.h"
-#include "ym_networks/TgBlifReader.h"
-#include "ym_networks/TgIscas89Reader.h"
-#include "ym_networks/TgNode.h"
+#include "ym_YmNetworks/TgBlifReader.h"
+#include "ym_YmNetworks/TgIscas89Reader.h"
+#include "ym_YmNetworks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

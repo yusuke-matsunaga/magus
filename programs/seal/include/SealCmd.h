@@ -14,8 +14,8 @@
 // Magus のコマンドオブジェクトの基底クラス
 
 #include "seal_nsdef.h"
-#include <ym_tclpp/TclCmd.h>
-#include <ym_networks/tgnet.h>
+#include <ym_YmTclpp/TclCmd.h>
+#include <ym_YmNetworks/tgnet.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

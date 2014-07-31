@@ -15,7 +15,7 @@
 #include "fsim/Fsim.h"
 #include "fsim3/Fsim3.h"
 #include "fsimx/FsimX.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_YmUtils/StopWatch.h"
 
 #include "SaFault.h"
 #include "FaultMgr.h"
@@ -23,7 +23,7 @@
 #include "TvMgr.h"
 #include "TvBuff.h"
 
-#include "ym_networks/TgNode.h"
+#include "ym_YmNetworks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

@@ -9,14 +9,14 @@
 /// All rights reserved.
 
 
-#include "ym_networks/BNetwork.h"
-#include "ym_networks/BNetBlifReader.h"
-#include "ym_networks/BNetDecomp.h"
-#include "ym_networks/BNet2Sbj.h"
+#include "ym_YmNetworks/BNetwork.h"
+#include "ym_YmNetworks/BNetBlifReader.h"
+#include "ym_YmNetworks/BNetDecomp.h"
+#include "ym_YmNetworks/BNet2Sbj.h"
 #include "ym_sbj/SbjGraph.h"
-#include "ym_utils/MsgMgr.h"
-#include "ym_utils/MsgHandler.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_YmUtils/MsgMgr.h"
+#include "ym_YmUtils/MsgHandler.h"
+#include "ym_YmUtils/StopWatch.h"
 
 
 BEGIN_NONAMESPACE

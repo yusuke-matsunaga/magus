@@ -10,9 +10,9 @@
 /// Copyright (C) 2005-2007 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_utils/Alloc.h>
-#include <ym_utils/DlList.h>
-#include <ym_utils/ItvlMgr.h>
+#include <ym_YmUtils/Alloc.h>
+#include <ym_YmUtils/DlList.h>
+#include <ym_YmUtils/ItvlMgr.h>
 #include <ym_lexp/Expr.h>
 
 #include "lutmap.h"

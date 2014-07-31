@@ -10,9 +10,9 @@
 
 #include "atpg_nsdef.h"
 #include "SaFault.h"
-#include "ym_networks/tgnet.h"
-#include "ym_utils/SimpleAlloc.h"
-#include "ym_utils/UnitAlloc.h"
+#include "ym_YmNetworks/tgnet.h"
+#include "ym_YmUtils/SimpleAlloc.h"
+#include "ym_YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

@@ -10,9 +10,9 @@
 
 
 #include "MapRecord.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnNode.h"
 #include "LnGraph.h"
 #include "Cut.h"
 

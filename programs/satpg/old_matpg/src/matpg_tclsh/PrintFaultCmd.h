@@ -12,7 +12,7 @@
 
 
 #include "matpg_nsdef.h"
-#include <ym_tclpp/TclCmd.h>
+#include <ym_YmTclpp/TclCmd.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

@@ -12,12 +12,12 @@
 
 #include "seal_nsdef.h"
 #include "seal_utils.h"
-#include <ym_networks/TgGateTemplate.h>
-#include <ym_networks/TgNode.h>
+#include <ym_YmNetworks/TgGateTemplate.h>
+#include <ym_YmNetworks/TgNode.h>
 #include "EventQ.h"
 #include "TestVector.h"
 #include <ym_lexp/Expr.h>
-#include <ym_utils/Alloc.h>
+#include <ym_YmUtils/Alloc.h>
 #include "SimFFR.h"
 
 

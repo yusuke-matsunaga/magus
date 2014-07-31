@@ -10,11 +10,11 @@
 
 
 #include "satpg_nsdef.h"
-#include "networks/tgnet.h"
-#include "cell/cell_nsdef.h"
-#include "logic/Bool3.h"
-#include "logic/expr_nsdef.h"
-#include "utils/SimpleAlloc.h"
+#include "YmNetworks/tgnet.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmLogic/Bool3.h"
+#include "YmLogic/expr_nsdef.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

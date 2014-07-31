@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 #include "GpMgr.h"
 #include "GpNode.h"
 #include "NpnXform.h"

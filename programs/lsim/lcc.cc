@@ -13,16 +13,16 @@
 #error "<popt.h> not found."
 #endif
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnIscas89Reader.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnIscas89Reader.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
-#include "utils/RandGen.h"
+#include "YmUtils/RandGen.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 #include "LsimNaive.h"
 #include "LsimNaive2.h"

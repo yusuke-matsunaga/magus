@@ -13,8 +13,8 @@
 // ネットワークを操作するコマンド群
 
 #include "seal_nsdef.h"
-#include <ym_utils/MsgHandler.h>
-#include <ym_tclpp/TclObj.h>
+#include <ym_YmUtils/MsgHandler.h>
+#include <ym_YmTclpp/TclObj.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

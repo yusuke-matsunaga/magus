@@ -15,7 +15,7 @@
 #include "PackedVal.h"
 #include "EventQ.h"
 #include "FsimFault.h"
-#include "ym_logic/Expr.h"
+#include "ym_YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_FSIM2

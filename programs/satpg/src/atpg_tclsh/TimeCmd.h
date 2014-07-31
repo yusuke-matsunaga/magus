@@ -12,8 +12,8 @@
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
-#include "tclpp/TclCmd.h"
-#include "utils/StopWatch.h"
+#include "YmTclpp/TclCmd.h"
+#include "YmUtils/StopWatch.h"
 #include "satpg_nsdef.h"
 
 

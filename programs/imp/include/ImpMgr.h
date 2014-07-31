@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "networks/BNetwork.h"
-#include "networks/BdnMgr.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BdnMgr.h"
 #include "ImpNode.h"
 #include "ImpVal.h"
 #include "BNodeMap.h"
-#include "utils/RandGen.h"
+#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

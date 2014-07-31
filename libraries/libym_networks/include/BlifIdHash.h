@@ -1,8 +1,8 @@
-#ifndef IDHASH_H
-#define IDHASH_H
+#ifndef BLIFIDHASH_H
+#define BLIFIDHASH_H
 
-/// @file IdHash.h
-/// @brief IdHash のヘッダファイル
+/// @file BlifIdHash.h
+/// @brief BlifIdHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2012, 2014 Yusuke Matsunaga
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_NETWORKS_BLIF
 class IdCell;
 
 //////////////////////////////////////////////////////////////////////
-/// @class IdHash IdHash.h "IdHash.h"
+/// @class BlifIdHash BlifIdHash.h "BlifIdHash.h"
 /// @brief 識別子を管理するハッシュ表
 /// 同一の文字列に対しては同じ ID 番号を返す．
 /// 文字列領域はこのクラスが管理する．
 /// また，この文字列を定義している場所と参照している場所の位置情報も
 /// 持つ．
 //////////////////////////////////////////////////////////////////////
-class IdHash
+class BlifIdHash
 {
 public:
   //////////////////////////////////////////////////////////////////////
@@ -34,10 +34,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  IdHash();
+  BlifIdHash();
 
   /// @brief デストラクタ
-  ~IdHash();
+  ~BlifIdHash();
 
 
 public:
@@ -118,7 +118,7 @@ private:
 // @brief 登録されている要素数を返す．(= ID番号の最大値 + 1)
 inline
 ymuint32
-IdHash::num() const
+BlifIdHash::num() const
 {
   return mCellArray.size();
 }
@@ -126,7 +126,7 @@ IdHash::num() const
 // @brief ID 番号に対応する IdCell を得る．
 inline
 IdCell*
-IdHash::cell(ymuint32 id) const
+BlifIdHash::cell(ymuint32 id) const
 {
   return mCellArray[id];
 }

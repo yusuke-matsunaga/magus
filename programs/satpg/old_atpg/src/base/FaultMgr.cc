@@ -16,8 +16,8 @@
 #include "FaultMgr.h"
 #include "SaFault.h"
 #include "TestVector.h"
-#include <ym_networks/TgNetwork.h>
-#include <ym_networks/TgNode.h>
+#include <ym_YmNetworks/TgNetwork.h>
+#include <ym_YmNetworks/TgNode.h>
 
 
 BEGIN_NAMESPACE_YM_ATPG

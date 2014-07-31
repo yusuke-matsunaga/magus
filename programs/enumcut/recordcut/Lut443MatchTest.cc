@@ -9,8 +9,8 @@
 
 #include "Lut443Match.h"
 #include "GbmSolver.h"
-#include "utils/RandGen.h"
-#include "utils/RandPermGen.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM

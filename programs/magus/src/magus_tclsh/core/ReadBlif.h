@@ -12,8 +12,8 @@
 
 
 #include "NetCmd.h"
-#include "networks/BNetBlifReader.h"
-#include "networks/BdnBlifReader.h"
+#include "YmNetworks/BNetBlifReader.h"
+#include "YmNetworks/BdnBlifReader.h"
 
 
 BEGIN_NAMESPACE_MAGUS

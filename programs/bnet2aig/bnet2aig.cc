@@ -7,16 +7,16 @@
 /// All rights reserved.
 
 
-#include "networks/BNetwork.h"
-#include "networks/BNetBlifReader.h"
-#include "logic/AigMgr.h"
-#include "logic/Aig.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetBlifReader.h"
+#include "YmLogic/AigMgr.h"
+#include "YmLogic/Aig.h"
 
 //#include "aig/AigSatMgr.h"
 //#include "sat/SatSolver.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM

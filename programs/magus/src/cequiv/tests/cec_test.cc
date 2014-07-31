@@ -9,12 +9,12 @@
 
 #include "cec_nsdef.h"
 
-#include "networks/BdnNode.h"
-#include "networks/BNetBdnConv.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnIscas89Reader.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BNetBdnConv.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_CEC

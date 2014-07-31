@@ -10,10 +10,10 @@
 
 
 #include "cellmap_nsdef.h"
-#include "networks/BdnNode.h"
-#include "networks/cmn.h"
-#include "cell/cell_nsdef.h"
-#include "cell/CellFFInfo.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/cmn.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmCell/CellFFInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

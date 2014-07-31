@@ -8,7 +8,7 @@
 
 
 #include "DtpgCmd.h"
-#include "ym_tclpp/TclPopt.h"
+#include "ym_YmTclpp/TclPopt.h"
 #include "AtpgMgr.h"
 #include "DtpgStats.h"
 

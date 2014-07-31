@@ -9,7 +9,7 @@
 
 #include "GenPat2.h"
 #include "NpnNode.h"
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM

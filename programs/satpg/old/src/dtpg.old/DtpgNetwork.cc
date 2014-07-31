@@ -12,8 +12,8 @@
 #include "DtpgPrimitive.h"
 #include "DtpgFFR.h"
 #include "DtpgFault.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "ym_YmNetworks/TgNetwork.h"
+#include "ym_YmNetworks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG

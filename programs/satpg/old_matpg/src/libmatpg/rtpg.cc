@@ -24,7 +24,7 @@
 #include "fault.h"
 #include "testpat.h"
 #include "f_sim.h"
-#include <ym_utils/RandGen.h>
+#include <ym_YmUtils/RandGen.h>
 
 #define DEBUG 1
 

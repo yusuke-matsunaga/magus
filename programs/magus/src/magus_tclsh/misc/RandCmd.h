@@ -15,7 +15,7 @@
 
 
 #include "magus_nsdef.h"
-#include "tclpp/TclCmd.h"
+#include "YmTclpp/TclCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS

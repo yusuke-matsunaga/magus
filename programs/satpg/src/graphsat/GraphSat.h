@@ -10,12 +10,12 @@
 
 
 #include "satpg_nsdef.h"
-#include "logic/Bool3.h"
-#include "logic/Literal.h"
-#include "logic/SatStats.h"
-#include "utils/FragAlloc.h"
-#include "utils/RandGen.h"
-#include "utils/StopWatch.h"
+#include "YmLogic/Bool3.h"
+#include "YmLogic/Literal.h"
+#include "YmLogic/SatStats.h"
+#include "YmUtils/FragAlloc.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/StopWatch.h"
 #include "SatClause.h"
 #include "SatReason.h"
 #include "AssignList.h"

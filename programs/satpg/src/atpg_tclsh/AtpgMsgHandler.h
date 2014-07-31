@@ -10,8 +10,8 @@
 
 
 #include "satpg_nsdef.h"
-#include "utils/MsgHandler.h"
-#include "tclpp/TclObj.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmTclpp/TclObj.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

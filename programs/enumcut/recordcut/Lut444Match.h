@@ -10,10 +10,10 @@
 
 
 #include "RcfNetwork.h"
-#include "logic/TvFunc.h"
+#include "YmLogic/TvFunc.h"
 #include "GbmSolver.h"
 #include "LnMatch.h"
-#include "utils/USTime.h"
+#include "YmUtils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM

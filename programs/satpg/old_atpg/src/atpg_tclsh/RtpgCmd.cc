@@ -10,7 +10,7 @@
 
 
 #include "RtpgCmd.h"
-#include <ym_tclpp/TclPopt.h>
+#include <ym_YmTclpp/TclPopt.h>
 
 
 BEGIN_NAMESPACE_YM_ATPG

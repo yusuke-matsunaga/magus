@@ -10,8 +10,8 @@
 #include "igf_nsdef.h"
 #include "FuncVect.h"
 #include "IguGen.h"
-#include "utils/CombiGen.h"
-#include "utils/RandGen.h"
+#include "YmUtils/CombiGen.h"
+#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

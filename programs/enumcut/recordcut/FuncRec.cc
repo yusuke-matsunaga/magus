@@ -8,7 +8,7 @@
 
 
 #include "FuncRec.h"
-#include "networks/BdnNode.h"
+#include "YmNetworks/BdnNode.h"
 #include "FuncMgr.h"
 
 

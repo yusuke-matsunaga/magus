@@ -10,7 +10,7 @@
 /// Copyright (C) 2005-2006 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_utils/Alloc.h>
+#include <ym_YmUtils/Alloc.h>
 
 #include "lutmap.h"
 #include "CrNode.h"

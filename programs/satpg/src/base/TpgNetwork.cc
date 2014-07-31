@@ -11,10 +11,10 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TpgMap.h"
-#include "networks/TgNetwork.h"
-#include "networks/TgNode.h"
-#include "networks/TgBlifReader.h"
-#include "networks/TgIscas89Reader.h"
+#include "YmNetworks/TgNetwork.h"
+#include "YmNetworks/TgNode.h"
+#include "YmNetworks/TgBlifReader.h"
+#include "YmNetworks/TgIscas89Reader.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

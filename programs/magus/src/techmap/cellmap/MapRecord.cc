@@ -9,19 +9,19 @@
 
 #include "MapRecord.h"
 
-#include "cell/CellFFInfo.h"
-#include "cell/CellLatchInfo.h"
+#include "YmCell/CellFFInfo.h"
+#include "YmCell/CellLatchInfo.h"
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnDff.h"
-#include "networks/BdnLatch.h"
-#include "networks/BdnNode.h"
-#include "networks/CmnMgr.h"
-#include "networks/CmnPort.h"
-#include "networks/CmnDff.h"
-#include "networks/CmnDffCell.h"
-#include "networks/CmnLatch.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmNetworks/BdnLatch.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/CmnMgr.h"
+#include "YmNetworks/CmnPort.h"
+#include "YmNetworks/CmnDff.h"
+#include "YmNetworks/CmnDffCell.h"
+#include "YmNetworks/CmnLatch.h"
 
 #include "Match.h"
 

@@ -12,7 +12,7 @@
 #include "GbmSolver.h"
 #include "GbmLit.h"
 #include "RcfNode.h"
-#include "logic/SatSolver.h"
+#include "YmLogic/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM

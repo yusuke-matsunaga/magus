@@ -10,7 +10,7 @@
 
 
 #include "Lsim.h"
-#include "networks/BdnMgr.h"
+#include "YmNetworks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_YM

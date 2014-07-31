@@ -10,7 +10,7 @@
 
 #include "McaCmd.h"
 #include "MCAnalysis.h"
-#include "networks/BNetwork.h"
+#include "YmNetworks/BNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS

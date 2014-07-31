@@ -10,7 +10,7 @@
 
 
 #include "RcfNodeHandle.h"
-#include "logic/TvFunc.h"
+#include "YmLogic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM

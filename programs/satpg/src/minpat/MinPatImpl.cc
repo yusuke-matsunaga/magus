@@ -16,10 +16,10 @@
 #include "TpgFault.h"
 #include "Fsim.h"
 #include "KDet.h"
-#include "utils/GcSolver.h"
-#include "utils/MinCov.h"
-#include "utils/RandGen.h"
-#include "utils/RandPermGen.h"
+#include "YmUtils/GcSolver.h"
+#include "YmUtils/MinCov.h"
+#include "YmUtils/RandGen.h"
+#include "YmUtils/RandPermGen.h"
 #include "Verifier.h"
 
 

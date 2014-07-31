@@ -12,8 +12,8 @@
 
 
 #include "matpg_nsdef.h"
-#include <ym_utils/MsgHandler.h>
-#include <ym_tclpp/TclObj.h>
+#include <ym_YmUtils/MsgHandler.h>
+#include <ym_YmTclpp/TclObj.h>
 
 
 BEGIN_NAMESPACE_YM_MATPG

@@ -14,7 +14,7 @@
 #include "base/SaFault.h"
 #include "base/FaultMgr.h"
 #include "base/TvMgr.h"
-#include "ym_utils/StopWatch.h"
+#include "ym_YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

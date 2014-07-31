@@ -10,8 +10,8 @@
 
 
 #include "cellmap_nsdef.h"
-#include "networks/bdn.h"
-#include "cell/cell_nsdef.h"
+#include "YmNetworks/bdn.h"
+#include "YmCell/cell_nsdef.h"
 #include "Match.h"
 
 

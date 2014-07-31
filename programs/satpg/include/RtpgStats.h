@@ -11,7 +11,7 @@
 
 
 #include "satpg_nsdef.h"
-#include "utils/USTime.h"
+#include "YmUtils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

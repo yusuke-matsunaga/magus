@@ -11,7 +11,7 @@
 #include "satpg_nsdef.h"
 #include "Val3.h"
 #include "PackedVal.h"
-#include "utils/RandGen.h"
+#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

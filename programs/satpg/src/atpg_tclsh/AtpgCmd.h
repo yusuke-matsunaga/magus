@@ -11,8 +11,8 @@
 
 
 #include "satpg_nsdef.h"
-#include "tclpp/TclCmd.h"
-#include "networks/tgnet.h"
+#include "YmTclpp/TclCmd.h"
+#include "YmNetworks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

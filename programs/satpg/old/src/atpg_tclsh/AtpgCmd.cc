@@ -9,8 +9,8 @@
 
 #include "AtpgCmd.h"
 #include "AtpgMgr.h"
-#include "ym_networks/TgNetwork.h"
-#include "ym_networks/TgNode.h"
+#include "ym_YmNetworks/TgNetwork.h"
+#include "ym_YmNetworks/TgNode.h"
 #include "SaFault.h"
 
 

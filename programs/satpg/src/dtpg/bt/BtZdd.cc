@@ -8,7 +8,7 @@
 
 
 #include "BtZdd.h"
-#include "logic/Zdd.h"
+#include "YmLogic/Zdd.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

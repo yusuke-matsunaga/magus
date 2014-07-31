@@ -18,7 +18,7 @@
 #include "lutmap.h"
 #include <ym_lexp/Expr.h>
 #include <ym_bdd/Bdd.h>
-#include <ym_utils/Alloc.h>
+#include <ym_YmUtils/Alloc.h>
 
 
 BEGIN_NAMESPACE_MAGUS_LUTMAP

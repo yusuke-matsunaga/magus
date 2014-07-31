@@ -10,8 +10,8 @@
 
 
 #include "seal_nsdef.h"
-#include "logic/Bdd.h"
-#include "logic/BddVarSet.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddVarSet.h"
 #include "MCAnalysis.h"
 
 

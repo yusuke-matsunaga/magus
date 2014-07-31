@@ -10,7 +10,7 @@
 
 
 #include "DumpSbjCmd.h"
-#include "tclpp/TclPopt.h"
+#include "YmTclpp/TclPopt.h"
 #include "sbj/SbjDumper.h"
 
 

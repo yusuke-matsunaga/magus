@@ -10,7 +10,7 @@
 
 #include "atpg_nsdef.h"
 #include "TestVector.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

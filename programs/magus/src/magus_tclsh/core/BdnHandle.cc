@@ -8,9 +8,9 @@
 
 
 #include "BdnHandle.h"
-#include "networks/BdnMgr.h"
-#include "networks/BNetwork.h"
-#include "networks/BNetDecomp.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetDecomp.h"
 
 
 BEGIN_NAMESPACE_MAGUS

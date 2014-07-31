@@ -12,11 +12,11 @@
 #include "MCAnalysis.h"
 #include "BddFsm.h"
 #include "IdxMapper.h"
-#include "utils/StopWatch.h"
-#include "networks/BNetwork.h"
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
-#include "logic/BddVarSet.h"
+#include "YmUtils/StopWatch.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/BddVarSet.h"
 
 
 BEGIN_NONAMESPACE

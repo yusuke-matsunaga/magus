@@ -10,8 +10,8 @@
 
 
 #include "bb_nsdef.h"
-#include "utils/FileRegion.h"
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_BB

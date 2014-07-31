@@ -15,7 +15,7 @@
 #include "nsdef.h"
 #include "SealCmd.h"
 #include "EventQ.h"
-#include <ym_networks/tgnet.h>
+#include <ym_YmNetworks/tgnet.h>
 #include <ym_bdd/Bdd.h>
 
 

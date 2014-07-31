@@ -12,9 +12,9 @@
 
 #include "satpg_nsdef.h"
 #include "DtpgMode.h"
-#include "cell/cell_nsdef.h"
-#include "utils/Binder.h"
-#include "utils/MStopWatch.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmUtils/Binder.h"
+#include "YmUtils/MStopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

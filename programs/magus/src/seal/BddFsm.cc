@@ -10,10 +10,10 @@
 
 
 #include "BddFsm.h"
-#include "logic/BddMgr.h"
-#include "logic/BddLitSet.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/BddLitSet.h"
 
-#include "utils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL

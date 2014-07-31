@@ -13,7 +13,7 @@
 
 
 #include "NetCmd.h"
-#include "networks/bnet.h"
+#include "YmNetworks/bnet.h"
 
 
 BEGIN_NAMESPACE_MAGUS

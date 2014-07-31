@@ -29,15 +29,27 @@ set (SOURCES
 
 set (SOURCES
   ${SOURCES}
+  src/bdn/blif/BdnBlifReader.cc
+  src/bdn/blif/BlifBdnConv.cc
+  )
+
+set (SOURCES
+  ${SOURCES}
+  src/bdn/iscas89/BdnIscas89Reader.cc
+  src/bdn/iscas89/Iscas89BdnConv.cc
+  )
+
+set (SOURCES
+  ${SOURCES}
   src/blif/BlifDic.cc
   src/blif/BlifHandler.cc
+  src/blif/BlifIdHash.cc
   src/blif/BlifNetwork.cc
   src/blif/BlifNetworkHandler.cc
   src/blif/BlifNetworkImpl.cc
   src/blif/BlifNodeImpl.cc
   src/blif/BlifParser.cc
   src/blif/BlifScanner.cc
-  src/blif/IdHash.cc
   )
 
 set (SOURCES
@@ -54,6 +66,18 @@ set (SOURCES
   src/bnet/BNodeMgr.cc
   src/bnet/StrBNodeMap.cc
   src/bnet/eliminate.cc
+  )
+
+set (SOURCES
+  ${SOURCES}
+  src/bnet/blif/BNetBlifHandler.cc
+  src/bnet/blif/BNetBlifReader.cc
+  )
+
+set (SOURCES
+  ${SOURCES}
+  src/bnet/iscas89/BNetIscas89Handler.cc
+  src/bnet/iscas89/BNetIscas89Reader.cc
   )
 
 set (SOURCES
@@ -105,8 +129,8 @@ set (SOURCES
 
 set (SOURCES
   ${SOURCES}
-  src/iscas89/IdHash.cc
   src/iscas89/Iscas89Handler.cc
+  src/iscas89/Iscas89IdHash.cc
   src/iscas89/Iscas89Network.cc
   src/iscas89/Iscas89NetworkHandler.cc
   src/iscas89/Iscas89NetworkReader.cc
@@ -131,6 +155,17 @@ set (SOURCES
   src/mvn/MvnPort.cc
   src/mvn/MvnVerilogWriter.cc
   src/mvn/VerilogWriterImpl.cc
+  src/mvn/verilog/DeclHash.cc
+  src/mvn/verilog/DeclMap.cc
+  src/mvn/verilog/Env.cc
+  src/mvn/verilog/EnvMerger.cc
+  src/mvn/verilog/MvnVerilogReader.cc
+  src/mvn/verilog/MvnVlMap.cc
+  src/mvn/verilog/ReaderImpl.cc
+  src/mvn/verilog/ReaderImpl_expr.cc
+  src/mvn/verilog/ReaderImpl_item.cc
+  src/mvn/verilog/ReaderImpl_stmt.cc
+  src/mvn/verilog/Xmask.cc
   )
 
 set (SOURCES
@@ -181,4 +216,11 @@ set (SOURCES
 
 add_library(ym_networks SHARED
   ${SOURCES}
+  )
+
+target_link_libraries(ym_networks
+  ym_verilog
+  ym_cell
+  ym_logic
+  ym_utils
   )

@@ -8,21 +8,21 @@
 
 
 #include "AreaCover.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnDff.h"
-#include "networks/CmnMgr.h"
-#include "cell/Cell.h"
-#include "cell/CellLibrary.h"
-#include "cell/CellPatGraph.h"
-#include "cell/CellClass.h"
-#include "cell/CellGroup.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmNetworks/CmnMgr.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellPatGraph.h"
+#include "YmCell/CellClass.h"
+#include "YmCell/CellGroup.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
 
-#include "logic/NpnMapM.h"
+#include "YmLogic/NpnMapM.h"
 
-#include "networks/BdnVerilogWriter.h"
-#include "networks/BdnDumper.h"
+#include "YmNetworks/BdnVerilogWriter.h"
+#include "YmNetworks/BdnDumper.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP

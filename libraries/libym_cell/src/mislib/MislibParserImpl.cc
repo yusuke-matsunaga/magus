@@ -114,7 +114,7 @@ MislibParserImpl::read_file(const string& filename,
 
   // パース木を作る．
   // 結果は MislibMgrImpl が持っている．
-  yyparse(*this);
+  bool stat = read_gate();
 
   delete mScanner;
   mScanner = NULL;
@@ -228,74 +228,84 @@ MislibParserImpl::read_file(const string& filename,
 }
 
 // @brief ゲートを読み込む．
-// @return ゲートを表す AST のノードを返す．
-//
-// エラーが起きたら NULL を返す．
-MislibNode*
+// @return 読み込みが成功したら true を返す．
+bool
 MislibParserImpl::read_gate()
 {
-  MislibNodeImpl* node;
-  FileRegion loc;
+  for ( ; ; ) {
+    MislibNodeImpl* node;
+    FileRegion loc;
 
-  MislibToken tok = scan(node, loc);
-  if ( tok != GATE ) {
-    // シンタックスエラー
+    MislibToken tok = scan(node, loc);
+    if ( tok == END ) {
+      return true;
+    }
+
+    if ( tok != GATE ) {
+      // シンタックスエラー
+      return false;
+    }
+
+    FileRegion loc0 = loc;
+    // 次は STR
+    tok = scan(node, loc);
+    if ( tok != STR ) {
+      // シンタックスエラー
+      return false;
+    }
+    MislibNode* name = node;
+
+    // 次は NUM
+    tok = scan(node, loc);
+    if ( tok != NUM ) {
+      // シンタックスエラー
+      return false;
+    }
+    MislibNode* area = node;
+
+    // 次は STR
+    tok = scan(node, loc);
+    if ( tok != STR ) {
+      // シンタックスエラー
+      return false;
+    }
+    MislibNode* opin = node;
+
+    // 次は EQ
+    tok = scan(node, loc);
+    if ( tok != EQ ) {
+      // シンタックスエラー
+      return false;
+    }
+
+    // 次は式
+    MislibNode* expr = read_expr(SEMI);
+    if ( expr == NULL ) {
+      // エラー
+      return false;
+    }
+
+    // 次は SEMI
+    tok = scan(node, loc);
+    if ( tok != SEMI ) {
+      // シンタックスエラー
+      return false;
+    }
+
+    FileRegion loc1 = loc;
+
+    // 次はピンリスト
+    MislibNode* pin_list = read_pin_list();
+    if ( pin_list == NULL ) {
+      // エラー
+      return false;
+    }
+    for (const MislibNode* pin = pin_list->top(); pin != NULL; pin = pin->next()) {
+      loc1 = pin->loc();
+    }
+
+    mMislibMgr->new_gate(FileRegion(loc0, loc1), name, area, opin, expr, pin_list);
   }
-
-  FileRegion loc0 = loc;
-  // 次は STR
-  tok = scan(node, loc);
-  if ( tok != STR ) {
-    // シンタックスエラー
-  }
-  MislibNode* name = node;
-
-  // 次は NUM
-  tok = scan(node, loc);
-  if ( tok != NUM ) {
-    // シンタックスエラー
-  }
-  MislibNode* area = node;
-
-  // 次は STR
-  tok = scan(node, loc);
-  if ( tok != STR ) {
-    // シンタックスエラー
-  }
-  MislibNode* opin = node;
-
-  // 次は EQ
-  tok = scan(node, loc);
-  if ( tok != EQ ) {
-    // シンタックスエラー
-  }
-
-  // 次は式
-  MislibNode* expr = read_expr(SEMI);
-  if ( expr == NULL ) {
-    // エラー
-    return NULL;
-  }
-
-  // 次は SEMI
-  tok = scan(node, loc);
-  if ( tok != SEMI ) {
-    // シンタックスエラー
-  }
-
-  FileRegion loc1 = loc;
-
-  // 次はピンリスト
-  MislibNode* pin_list = read_pin_list();
-  if ( pin_list == NULL ) {
-    // エラー
-    return NULL;
-  }
-  for (const MislibNode* pin = pin_list->top(); pin != NULL; pin = pin->next()) {
-    loc1 = pin->loc();
-  }
-
-  mMislibMgr->new_gate(FileRegion(loc0, loc1), name, area, opin, expr, pin_list);
 }
 
 // @brief 式を読み込む．

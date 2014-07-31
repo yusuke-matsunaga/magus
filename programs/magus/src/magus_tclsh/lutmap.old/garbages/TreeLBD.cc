@@ -15,7 +15,7 @@
 
 
 #include <float.h>
-#include <ym_utils/RandGen.h>
+#include <ym_YmUtils/RandGen.h>
 
 #include "TreeLBD.h"
 #include "SbjGraph.h"

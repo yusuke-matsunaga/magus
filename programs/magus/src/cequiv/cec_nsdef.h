@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "networks/BdnMgr.h"
-#include "logic/Bool3.h"
+#include "YmTools.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmLogic/Bool3.h"
 
 
 // 名前空間の定義

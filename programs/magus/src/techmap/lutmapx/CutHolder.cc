@@ -11,7 +11,7 @@
 
 #include "CutHolder.h"
 #include "Cut.h"
-#include "networks/BdnMgr.h"
+#include "YmNetworks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

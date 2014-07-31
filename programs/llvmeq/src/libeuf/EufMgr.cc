@@ -12,7 +12,7 @@
 #include "EufFuncMgr.h"
 #include "EufVarMgr.h"
 #include "EufNode.h"
-#include "utils/MFSet.h"
+#include "YmUtils/MFSet.h"
 
 
 BEGIN_NAMESPACE_YM_LLVMEQ

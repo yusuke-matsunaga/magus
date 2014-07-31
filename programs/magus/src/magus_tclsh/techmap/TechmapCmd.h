@@ -10,7 +10,7 @@
 
 
 #include "MagCmd.h"
-#include "networks/CmnMgr.h"
+#include "YmNetworks/CmnMgr.h"
 
 
 /// @brief techmap 用の名前空間の開始

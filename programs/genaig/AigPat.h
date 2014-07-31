@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/Aig.h"
+#include "YmTools.h"
+#include "YmLogic/Aig.h"
 
 
 BEGIN_NAMESPACE_YM

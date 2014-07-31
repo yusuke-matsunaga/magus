@@ -8,8 +8,8 @@
 
 
 #include "LrMgr.h"
-#include "logic/Aig.h"
-#include "logic/AigMgr.h"
+#include "YmLogic/Aig.h"
+#include "YmLogic/AigMgr.h"
 
 
 #if defined(YM_DEBUG)

@@ -10,7 +10,7 @@
 
 
 #include "SealCmd.h"
-#include "networks/BNetManip.h"
+#include "YmNetworks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS

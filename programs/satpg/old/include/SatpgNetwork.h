@@ -11,9 +11,9 @@
 
 #include "dtpg_nsdef.h"
 #include "SaFault.h"
-#include "ym_networks/tgnet.h"
-#include "ym_logic/expr_nsdef.h"
-#include "ym_utils/SimpleAlloc.h"
+#include "ym_YmNetworks/tgnet.h"
+#include "ym_YmLogic/expr_nsdef.h"
+#include "ym_YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG_DTPG

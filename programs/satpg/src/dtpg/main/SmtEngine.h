@@ -14,11 +14,11 @@
 #include "TpgNode.h"
 #include "DtpgStats.h"
 #include "LitMap.h"
-#include "logic/Literal.h"
-#include "logic/Bool3.h"
-#include "logic/SatStats.h"
-#include "logic/SatSolver.h"
-#include "utils/StopWatch.h"
+#include "YmLogic/Literal.h"
+#include "YmLogic/Bool3.h"
+#include "YmLogic/SatStats.h"
+#include "YmLogic/SatSolver.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

@@ -10,8 +10,8 @@
 
 
 #include "MCAnalysis.h"
-#include "networks/BNetwork.h"
-#include "utils/StopWatch.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmUtils/StopWatch.h"
 #include "Matrix.h"
 #include "SMatrix.h"
 #include "Dfs.h"

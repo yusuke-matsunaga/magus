@@ -11,9 +11,9 @@
 
 #include "cec_nsdef.h"
 #include "FraigHandle.h"
-#include "utils/SimpleAlloc.h"
-#include "utils/RandGen.h"
-#include "logic/SatSolver.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/RandGen.h"
+#include "YmLogic/SatSolver.h"
 #include "FraigHash.h"
 
 

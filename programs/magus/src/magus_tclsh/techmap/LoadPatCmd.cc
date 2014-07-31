@@ -8,8 +8,8 @@
 
 
 #include "LoadPatCmd.h"
-#include "tclpp/TclPopt.h"
-#include "cell/CellLibrary.h"
+#include "YmTclpp/TclPopt.h"
+#include "YmCell/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP

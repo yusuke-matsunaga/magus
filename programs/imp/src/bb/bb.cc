@@ -14,11 +14,11 @@
 #include "Constr.h"
 #include "PtNode.h"
 
-#include "logic/AigMgr.h"
-//#include "logic/AigSatMgr.h"
-#include "logic/SatSolver.h"
-#include "utils/StopWatch.h"
-#include "utils/MsgHandler.h"
+#include "YmLogic/AigMgr.h"
+//#include "YmLogic/AigSatMgr.h"
+#include "YmLogic/SatSolver.h"
+#include "YmUtils/StopWatch.h"
+#include "YmUtils/MsgHandler.h"
 
 #include "ImpMgr.h"
 #include "ImpInfo.h"

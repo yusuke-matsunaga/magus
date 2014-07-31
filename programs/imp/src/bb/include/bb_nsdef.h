@@ -16,7 +16,7 @@
 
 // namespace でネストするのがいやなので define マクロでごまかす．
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 #define BEGIN_NAMESPACE_YM_BB \
 BEGIN_NAMESPACE_YM \

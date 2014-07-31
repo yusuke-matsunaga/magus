@@ -13,10 +13,10 @@
 
 
 #include "dtpgsat_nsdef.h"
-#include "ym_networks/tgnet.h"
-#include "ym_networks/TgNode.h"
-#include "ym_logic/VarId.h"
-#include "ym_logic/SatStats.h"
+#include "ym_YmNetworks/tgnet.h"
+#include "ym_YmNetworks/TgNode.h"
+#include "ym_YmLogic/VarId.h"
+#include "ym_YmLogic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_ATPG

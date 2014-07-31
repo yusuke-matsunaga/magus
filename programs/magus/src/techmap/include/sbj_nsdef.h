@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "utils/DlList.h"
+#include "YmTools.h"
+#include "YmUtils/DlList.h"
 
 
 /// @brief sbj 用の名前空間の開始

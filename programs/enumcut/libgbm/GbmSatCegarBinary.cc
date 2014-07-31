@@ -9,8 +9,8 @@
 
 #include "GbmSatCegarBinary.h"
 #include "GbmSatEngineBinary.h"
-#include "logic/SatStats.h"
-#include "logic/SatMsgHandlerImpl1.h"
+#include "YmLogic/SatStats.h"
+#include "YmLogic/SatMsgHandlerImpl1.h"
 
 
 BEGIN_NAMESPACE_YM

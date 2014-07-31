@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
-#include "logic/Bdd.h"
-#include "logic/BddMgr.h"
+#include "YmTools.h"
+#include "YmLogic/Bdd.h"
+#include "YmLogic/BddMgr.h"
 #include "ThBddGen.h"
 
 

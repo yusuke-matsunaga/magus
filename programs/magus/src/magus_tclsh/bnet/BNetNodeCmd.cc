@@ -10,8 +10,8 @@
 
 
 #include "BNetNodeCmd.h"
-#include "tclpp/TclPopt.h"
-#include "networks/BNetwork.h"
+#include "YmTclpp/TclPopt.h"
+#include "YmNetworks/BNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS

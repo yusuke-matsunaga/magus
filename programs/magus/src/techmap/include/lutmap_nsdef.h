@@ -11,9 +11,9 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
-#include "utils/DlList.h"
+#include "YmUtils/DlList.h"
 
 
 /// @brief lutmap 用の名前空間の開始

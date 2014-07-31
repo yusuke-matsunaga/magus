@@ -9,8 +9,8 @@
 
 #include "CecMgr.h"
 #include "CecNode.h"
-#include "utils/StopWatch.h"
-#include "logic/SatStats.h"
+#include "YmUtils/StopWatch.h"
+#include "YmLogic/SatStats.h"
 
 
 #if defined(YM_DEBUG)

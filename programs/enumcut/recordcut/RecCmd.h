@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/bdn.h"
-#include "tclpp/TclCmd.h"
+#include "YmNetworks/bdn.h"
+#include "YmTclpp/TclCmd.h"
 
 
 BEGIN_NAMESPACE_YM

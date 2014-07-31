@@ -8,8 +8,8 @@
 
 
 #include "LsimBdd1.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnPort.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnPort.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -8,7 +8,7 @@
 
 
 #include "ReadLiberty.h"
-#include "cell/CellDotlibReader.h"
+#include "YmCell/CellDotlibReader.h"
 
 
 BEGIN_NAMESPACE_MAGUS

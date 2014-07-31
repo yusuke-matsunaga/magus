@@ -10,9 +10,9 @@
 
 
 #include "igf_nsdef.h"
-#include "logic/BddMgr.h"
-#include "logic/Bdd.h"
-#include "utils/UnitAlloc.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/Bdd.h"
+#include "YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_IGF

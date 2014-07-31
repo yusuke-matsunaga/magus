@@ -16,8 +16,8 @@
 #include "XorFunc.h"
 #include "FuncVect.h"
 #include "IguGen.h"
-#include "utils/PoptMainApp.h"
-#include "utils/RandCombiGen.h"
+#include "YmUtils/PoptMainApp.h"
+#include "YmUtils/RandCombiGen.h"
 
 
 BEGIN_NAMESPACE_YM_IGF
