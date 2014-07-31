@@ -7,16 +7,16 @@
 /// All rights reserved.
 
 
-#include "networks/MvnDumper.h"
+#include "YmNetworks/MvnDumper.h"
 
-#include "networks/MvnMgr.h"
+#include "YmNetworks/MvnMgr.h"
 
-#include "networks/MvnModule.h"
-#include "networks/MvnPort.h"
-#include "networks/MvnNode.h"
-#include "networks/MvnInputPin.h"
+#include "YmNetworks/MvnModule.h"
+#include "YmNetworks/MvnPort.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmNetworks/MvnInputPin.h"
 
-#include "cell/Cell.h"
+#include "YmCell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

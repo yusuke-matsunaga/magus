@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/mvnbdnconv_nsdef.h"
-#include "networks/mvn.h"
-#include "networks/bdn.h"
+#include "YmNetworks/mvnbdnconv_nsdef.h"
+#include "YmNetworks/mvn.h"
+#include "YmNetworks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKSBDNCONV

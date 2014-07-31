@@ -10,7 +10,7 @@
 
 
 #include "iscas89_nsdef.h"
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89

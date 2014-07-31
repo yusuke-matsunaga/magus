@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnPort.h"
+#include "YmNetworks/CmnPort.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN

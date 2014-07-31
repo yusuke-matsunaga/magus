@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/mvn.h"
-#include "verilog/vl/VlFwd.h"
-#include "utils/UnitAlloc.h"
+#include "YmNetworks/mvn.h"
+#include "YmVerilog/vl/VlFwd.h"
+#include "YmUtils/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG

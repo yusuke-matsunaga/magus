@@ -8,10 +8,10 @@
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnNodeHandle.h"
-#include "utils/SimpleAlloc.h"
-#include "utils/ItvlMgr.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnNodeHandle.h"
+#include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BDN

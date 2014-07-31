@@ -13,16 +13,16 @@
 #include "EnvMerger.h"
 #include "Xmask.h"
 
-#include "networks/MvnMgr.h"
-#include "networks/MvnNode.h"
-#include "verilog/BitVector.h"
-#include "verilog/vl/VlDecl.h"
-#include "verilog/vl/VlDeclArray.h"
-#include "verilog/vl/VlStmt.h"
-#include "verilog/vl/VlExpr.h"
-#include "verilog/vl/VlRange.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/vl/VlDecl.h"
+#include "YmVerilog/vl/VlDeclArray.h"
+#include "YmVerilog/vl/VlStmt.h"
+#include "YmVerilog/vl/VlExpr.h"
+#include "YmVerilog/vl/VlRange.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NONAMESPACE

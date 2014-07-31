@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "networks/BNetSopDecomp.h"
-#include "networks/BNetManip.h"
+#include "YmNetworks/BNetSopDecomp.h"
+#include "YmNetworks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

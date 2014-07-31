@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "networks/BlifNetwork.h"
+#include "YmNetworks/BlifNetwork.h"
 
-#include "cell/CellMislibReader.h"
-#include "cell/CellLibrary.h"
+#include "YmCell/CellMislibReader.h"
+#include "YmCell/CellLibrary.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM

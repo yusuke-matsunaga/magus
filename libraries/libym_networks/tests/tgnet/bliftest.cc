@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "networks/TgNetwork.h"
-#include "networks/TgBlifReader.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmNetworks/TgNetwork.h"
+#include "YmNetworks/TgBlifReader.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

@@ -8,7 +8,7 @@
 
 
 #include "VlWriter.h"
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS

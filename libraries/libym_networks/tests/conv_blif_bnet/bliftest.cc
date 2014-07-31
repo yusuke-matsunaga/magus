@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "networks/BNetwork.h"
-#include "networks/BlifBNetConv.h"
-#include "networks/BNetBlifWriter.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BlifBNetConv.h"
+#include "YmNetworks/BNetBlifWriter.h"
 #include "blif/BlifNetwork.h"
 #include "blif/BlifNetworkReader.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

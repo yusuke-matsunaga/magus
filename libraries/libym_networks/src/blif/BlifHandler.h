@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/blif_nsdef.h"
-#include "cell/cell_nsdef.h"
-#include "utils/FileRegion.h"
+#include "YmNetworks/blif_nsdef.h"
+#include "YmCell/cell_nsdef.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

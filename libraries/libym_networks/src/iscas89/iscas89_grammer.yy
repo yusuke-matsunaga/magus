@@ -10,7 +10,7 @@
 
 #include "iscas89_nsdef.h"
 #include "Iscas89Handler.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Scanner.h"

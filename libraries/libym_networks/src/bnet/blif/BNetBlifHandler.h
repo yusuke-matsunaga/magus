@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/bnet.h"
-#include "cell/cell_nsdef.h"
+#include "YmNetworks/bnet.h"
+#include "YmCell/cell_nsdef.h"
 
 #include "BlifHandler.h"
 

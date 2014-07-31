@@ -8,10 +8,10 @@
 
 
 #include "ConstPartSelectConv.h"
-#include "networks/MvnNode.h"
-#include "networks/MvnBdnMap.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnNodeHandle.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmNetworks/MvnBdnMap.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKSBDNCONV

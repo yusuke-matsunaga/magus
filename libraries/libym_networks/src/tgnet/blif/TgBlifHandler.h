@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/tgnet.h"
+#include "YmNetworks/tgnet.h"
 #include "BlifHandler.h"
-#include "logic/Expr.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "networks/BNetwork.h"
-#include "networks/BNetManip.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetManip.h"
 
 
 int

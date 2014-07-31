@@ -8,9 +8,9 @@
 
 
 #include "MvnCellNode.h"
-#include "networks/MvnMgr.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

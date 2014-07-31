@@ -7,12 +7,12 @@
 /// All rights reserved.
 
 
-#include "networks/BdnNode.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnDff.h"
-#include "networks/BdnLatch.h"
-#include "networks/BdnNodeHandle.h"
-#include "networks/BdnConstNodeHandle.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmNetworks/BdnLatch.h"
+#include "YmNetworks/BdnNodeHandle.h"
+#include "YmNetworks/BdnConstNodeHandle.h"
 #include "BdnAuxData.h"
 
 

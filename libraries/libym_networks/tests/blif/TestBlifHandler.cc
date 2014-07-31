@@ -8,9 +8,9 @@
 
 
 #include "TestBlifHandler.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
-#include "utils/FileRegion.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

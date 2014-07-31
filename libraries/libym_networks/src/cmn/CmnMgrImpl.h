@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "networks/cmn.h"
-#include "cell/cell_nsdef.h"
+#include "YmNetworks/cmn.h"
+#include "YmCell/cell_nsdef.h"
 
-#include "utils/FragAlloc.h"
-#include "utils/DlList.h"
-#include "utils/ItvlMgr.h"
+#include "YmUtils/FragAlloc.h"
+#include "YmUtils/DlList.h"
+#include "YmUtils/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_HASH

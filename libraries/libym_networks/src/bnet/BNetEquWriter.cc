@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "networks/BNetEquWriter.h"
-#include "networks/BNetwork.h"
-#include "logic/ExprWriter.h"
+#include "YmNetworks/BNetEquWriter.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmLogic/ExprWriter.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

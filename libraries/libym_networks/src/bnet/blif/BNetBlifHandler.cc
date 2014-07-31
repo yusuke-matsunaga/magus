@@ -8,12 +8,12 @@
 
 
 #include "BNetBlifHandler.h"
-#include "networks/BNetwork.h"
-#include "networks/BNetManip.h"
-#include "cell/CellLibrary.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
-#include "utils/MsgMgr.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetManip.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

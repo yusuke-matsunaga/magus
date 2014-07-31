@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/BNetwork.h"
-#include "utils/UnitAlloc.h"
-#include "utils/FragAlloc.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmUtils/UnitAlloc.h"
+#include "YmUtils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

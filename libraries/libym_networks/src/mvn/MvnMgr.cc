@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "networks/MvnMgr.h"
+#include "YmNetworks/MvnMgr.h"
 
-#include "networks/MvnModule.h"
-#include "networks/MvnPort.h"
+#include "YmNetworks/MvnModule.h"
+#include "YmNetworks/MvnPort.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

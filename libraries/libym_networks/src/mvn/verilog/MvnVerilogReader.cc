@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/MvnVerilogReader.h"
+#include "YmNetworks/MvnVerilogReader.h"
 #include "ReaderImpl.h"
 
 

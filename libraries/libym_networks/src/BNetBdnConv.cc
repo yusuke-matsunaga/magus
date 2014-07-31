@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "networks/BNetBdnConv.h"
-#include "networks/BNetwork.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnNodeHandle.h"
-#include "networks/BdnDff.h"
+#include "YmNetworks/BNetBdnConv.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnNodeHandle.h"
+#include "YmNetworks/BdnDff.h"
 
 
 BEGIN_NAMESPACE_YM

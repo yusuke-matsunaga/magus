@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "networks/CmnNode.h"
-#include "networks/CmnPort.h"
-#include "networks/CmnEdge.h"
+#include "YmNetworks/CmnNode.h"
+#include "YmNetworks/CmnPort.h"
+#include "YmNetworks/CmnEdge.h"
 
 #include "CmnNodeInput.h"
 #include "CmnNodePI.h"

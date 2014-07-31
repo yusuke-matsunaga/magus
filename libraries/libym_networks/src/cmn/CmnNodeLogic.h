@@ -1,5 +1,5 @@
-#ifndef CMNNODELOGIC_H
-#define CMNNODELOGIC_H
+#ifndef CMNNODEYMLOGIC_H
+#define CMNNODEYMLOGIC_H
 
 /// @file CmnNodeLogic.h
 /// @brief CmnNodeLogic のヘッダファイル
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnNode.h"
+#include "YmNetworks/CmnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
@@ -103,4 +103,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_CMN
 
-#endif // CMNNODELOGIC_H
+#endif // CMNNODEYMLOGIC_H

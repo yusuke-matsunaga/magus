@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/BlifNetwork.h"
+#include "YmNetworks/BlifNetwork.h"
 #include "BlifNetworkImpl.h"
 
 

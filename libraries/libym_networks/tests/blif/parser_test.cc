@@ -10,8 +10,8 @@
 #include "BlifParser.h"
 #include "TestBlifHandler.h"
 #include "NullBlifHandler.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 void
 usage(const char* argv0)

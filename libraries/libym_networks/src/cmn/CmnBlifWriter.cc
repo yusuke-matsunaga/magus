@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnBlifWriter.h"
+#include "YmNetworks/CmnBlifWriter.h"
 
 #include "BlifWriterImpl.h"
 

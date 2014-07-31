@@ -8,8 +8,8 @@
 
 
 #include "DeclMap.h"
-#include "networks/MvnNode.h"
-#include "verilog/vl/VlDecl.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmVerilog/vl/VlDecl.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG

@@ -8,7 +8,7 @@
 
 
 #include "MvnDff.h"
-#include "networks/MvnMgr.h"
+#include "YmNetworks/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

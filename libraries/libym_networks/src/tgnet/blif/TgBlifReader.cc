@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/TgBlifReader.h"
+#include "YmNetworks/TgBlifReader.h"
 #include "BlifParser.h"
 #include "TgBlifHandler.h"
 

@@ -13,16 +13,16 @@
 #include "Env.h"
 #include "Xmask.h"
 
-#include "networks/MvnMgr.h"
-#include "networks/MvnModule.h"
-#include "networks/MvnNode.h"
-#include "verilog/BitVector.h"
-#include "verilog/VlValue.h"
-#include "verilog/vl/VlDecl.h"
-#include "verilog/vl/VlExpr.h"
-#include "verilog/vl/VlRange.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnModule.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmVerilog/BitVector.h"
+#include "YmVerilog/VlValue.h"
+#include "YmVerilog/vl/VlDecl.h"
+#include "YmVerilog/vl/VlExpr.h"
+#include "YmVerilog/vl/VlRange.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG

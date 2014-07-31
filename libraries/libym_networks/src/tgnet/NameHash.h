@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/tgnet.h"
-#include "utils/SimpleAlloc.h"
+#include "YmNetworks/tgnet.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET

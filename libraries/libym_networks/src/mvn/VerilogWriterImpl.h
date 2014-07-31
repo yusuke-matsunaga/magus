@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/mvn.h"
+#include "YmNetworks/mvn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

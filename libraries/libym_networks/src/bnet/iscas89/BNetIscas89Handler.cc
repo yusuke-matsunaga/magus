@@ -8,8 +8,8 @@
 
 
 #include "BNetIscas89Handler.h"
-#include "networks/BNetwork.h"
-#include "networks/BNetManip.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89

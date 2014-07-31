@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnDffCell.h"
+#include "YmNetworks/CmnDffCell.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN

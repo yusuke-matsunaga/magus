@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnVerilogWriter.h"
+#include "YmNetworks/CmnVerilogWriter.h"
 
 #include "VerilogWriterImpl.h"
 

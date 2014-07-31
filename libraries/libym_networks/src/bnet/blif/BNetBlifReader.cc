@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/BNetBlifReader.h"
+#include "YmNetworks/BNetBlifReader.h"
 #include "BlifParser.h"
 #include "BNetBlifHandler.h"
 

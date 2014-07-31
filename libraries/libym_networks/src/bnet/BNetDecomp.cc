@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "networks/BNetDecomp.h"
-#include "networks/BNetManip.h"
-#include "utils/HeapTree.h"
-#include "utils/RandPermGen.h"
+#include "YmNetworks/BNetDecomp.h"
+#include "YmNetworks/BNetManip.h"
+#include "YmUtils/HeapTree.h"
+#include "YmUtils/RandPermGen.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

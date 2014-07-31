@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "networks/MvnMgr.h"
-#include "networks/MvnModule.h"
-#include "networks/MvnNode.h"
-#include "networks/MvnDumper.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnModule.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmNetworks/MvnDumper.h"
 
 
 int

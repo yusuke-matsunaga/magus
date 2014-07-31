@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/mvn.h"
+#include "YmNetworks/mvn.h"
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN
 
@@ -145,7 +145,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] opr_str1, opr_str2 演算子を表す文字列
   TernaryOpDumper(const char* opr_str1,
-		  cosnt char* opr_str2);
+		  const char* opr_str2);
 
   /// @brief デストラクタ
   virtual

@@ -8,8 +8,8 @@
 
 
 #include "TgIscas89Handler.h"
-#include "networks/TgNetwork.h"
-#include "networks/TgNode.h"
+#include "YmNetworks/TgNetwork.h"
+#include "YmNetworks/TgNode.h"
 #include "../LogicMgr.h"
 
 

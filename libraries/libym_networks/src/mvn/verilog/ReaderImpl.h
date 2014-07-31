@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "networks/mvn.h"
-#include "networks/MvnVlMap.h"
-#include "verilog/VlMgr.h"
-#include "verilog/vl/VlFwd.h"
+#include "YmNetworks/mvn.h"
+#include "YmNetworks/MvnVlMap.h"
+#include "YmVerilog/VlMgr.h"
+#include "YmVerilog/vl/VlFwd.h"
 #include "DeclHash.h"
 #include "DeclMap.h"
 #include "Driver.h"

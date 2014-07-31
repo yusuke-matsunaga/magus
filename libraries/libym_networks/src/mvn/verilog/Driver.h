@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/mvn.h"
-#include "utils/FileRegion.h"
+#include "YmNetworks/mvn.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG

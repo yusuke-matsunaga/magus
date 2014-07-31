@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "networks/BdnBlifWriter.h"
-#include "networks/BdnMgr.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnDff.h"
-#include "utils/NameMgr.h"
+#include "YmNetworks/BdnBlifWriter.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmUtils/NameMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BDN

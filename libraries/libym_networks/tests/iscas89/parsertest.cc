@@ -9,8 +9,8 @@
 
 #include "Iscas89Parser.h"
 #include "Iscas89Handler.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89

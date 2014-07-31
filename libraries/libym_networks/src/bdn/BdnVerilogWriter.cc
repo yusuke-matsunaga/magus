@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "networks/BdnVerilogWriter.h"
+#include "YmNetworks/BdnVerilogWriter.h"
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnDff.h"
-#include "utils/NameMgr.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmUtils/NameMgr.h"
 
 #include "VlwModule.h"
 #include "VlwModuleHeader.h"

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnMgr.h"
+#include "YmNetworks/CmnMgr.h"
 #include "CmnMgrImpl.h"
 
 

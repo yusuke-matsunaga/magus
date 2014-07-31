@@ -10,7 +10,7 @@
 
 
 #include "Iscas89Handler.h"
-#include "networks/tgnet.h"
+#include "YmNetworks/tgnet.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89

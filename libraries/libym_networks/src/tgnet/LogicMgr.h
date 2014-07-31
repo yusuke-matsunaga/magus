@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/tgnet.h"
-#include "logic/Expr.h"
-#include "logic/TvFunc.h"
+#include "YmNetworks/tgnet.h"
+#include "YmLogic/Expr.h"
+#include "YmLogic/TvFunc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET

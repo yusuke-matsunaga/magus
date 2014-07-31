@@ -7,18 +7,18 @@
 /// All rights reserved.
 
 
-#include "networks/MvnMgr.h"
-#include "networks/MvnVerilogReader.h"
-#include "networks/MvnVlMap.h"
-#include "networks/MvnDumper.h"
-#include "networks/MvnVerilogWriter.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnVerilogReader.h"
+#include "YmNetworks/MvnVlMap.h"
+#include "YmNetworks/MvnDumper.h"
+#include "YmNetworks/MvnVerilogWriter.h"
 
-#include "cell/CellDotlibReader.h"
-#include "cell/CellMislibReader.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmCell/CellMislibReader.h"
 
-#include "utils/PoptMainApp.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/PoptMainApp.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

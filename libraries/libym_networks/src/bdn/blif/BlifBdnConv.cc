@@ -9,13 +9,13 @@
 
 #include "BlifBdnConv.h"
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnNodeHandle.h"
-#include "networks/BdnDff.h"
-#include "networks/BlifNetwork.h"
-#include "networks/BlifNode.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnNodeHandle.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmNetworks/BlifNetwork.h"
+#include "YmNetworks/BlifNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/BlifNode.h"
+#include "YmNetworks/BlifNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

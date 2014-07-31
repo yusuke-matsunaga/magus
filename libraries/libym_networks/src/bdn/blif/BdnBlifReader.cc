@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "networks/BdnBlifReader.h"
-#include "networks/BlifNetwork.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BlifNetwork.h"
 
 #include "BlifBdnConv.h"
 

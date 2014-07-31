@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/cmn.h"
+#include "YmNetworks/cmn.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN

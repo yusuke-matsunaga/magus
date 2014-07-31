@@ -10,11 +10,11 @@
 #include "BlifParser.h"
 #include "IdCell.h"
 #include "BlifHandler.h"
-#include "cell/CellLibrary.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
-#include "utils/FileIDO.h"
-#include "utils/MsgMgr.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

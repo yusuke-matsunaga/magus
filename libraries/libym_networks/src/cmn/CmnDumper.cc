@@ -7,16 +7,16 @@
 /// All rights reserved.
 
 
-#include "networks/CmnDumper.h"
-#include "networks/CmnMgr.h"
-#include "networks/CmnPort.h"
-#include "networks/CmnDff.h"
-#include "networks/CmnLatch.h"
-#include "networks/CmnNode.h"
-#include "networks/CmnDffCell.h"
-#include "networks/CmnLatchCell.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
+#include "YmNetworks/CmnDumper.h"
+#include "YmNetworks/CmnMgr.h"
+#include "YmNetworks/CmnPort.h"
+#include "YmNetworks/CmnDff.h"
+#include "YmNetworks/CmnLatch.h"
+#include "YmNetworks/CmnNode.h"
+#include "YmNetworks/CmnDffCell.h"
+#include "YmNetworks/CmnLatchCell.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN

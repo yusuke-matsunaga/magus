@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/blif_nsdef.h"
-#include "utils/Scanner.h"
-#include "utils/StrBuff.h"
+#include "YmNetworks/blif_nsdef.h"
+#include "YmUtils/Scanner.h"
+#include "YmUtils/StrBuff.h"
 #include "BlifDic.h"
 
 

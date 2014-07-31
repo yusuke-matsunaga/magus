@@ -7,18 +7,18 @@
 /// All rights reserved.
 
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnDumper.h"
-#include "networks/BdnVerilogWriter.h"
-#include "networks/MvnMgr.h"
-#include "networks/MvnVerilogReader.h"
-#include "networks/MvnVlMap.h"
-#include "networks/MvnDumper.h"
-#include "networks/MvnBdnConv.h"
-#include "networks/MvnBdnMap.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnDumper.h"
+#include "YmNetworks/BdnVerilogWriter.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnVerilogReader.h"
+#include "YmNetworks/MvnVlMap.h"
+#include "YmNetworks/MvnDumper.h"
+#include "YmNetworks/MvnBdnConv.h"
+#include "YmNetworks/MvnBdnMap.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

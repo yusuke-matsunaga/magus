@@ -9,10 +9,10 @@
 
 
 #include "TgBlifHandler.h"
-#include "networks/TgNetwork.h"
-#include "networks/TgNode.h"
+#include "YmNetworks/TgNetwork.h"
+#include "YmNetworks/TgNode.h"
 
-#include "utils/MsgMgr.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

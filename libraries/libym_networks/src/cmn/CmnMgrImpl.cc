@@ -9,13 +9,13 @@
 
 #include "CmnMgrImpl.h"
 
-#include "networks/CmnPort.h"
-#include "networks/CmnDff.h"
-#include "networks/CmnLatch.h"
-#include "networks/CmnNode.h"
-#include "networks/CmnEdge.h"
-#include "networks/CmnDffCell.h"
-#include "networks/CmnLatchCell.h"
+#include "YmNetworks/CmnPort.h"
+#include "YmNetworks/CmnDff.h"
+#include "YmNetworks/CmnLatch.h"
+#include "YmNetworks/CmnNode.h"
+#include "YmNetworks/CmnEdge.h"
+#include "YmNetworks/CmnDffCell.h"
+#include "YmNetworks/CmnLatchCell.h"
 
 #include "CmnNodePI.h"
 #include "CmnNodeDffOut.h"

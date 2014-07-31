@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "networks/BdnMgr.h"
+#include "YmNetworks/BdnMgr.h"
 #include "BdnMgrImpl.h"
-#include "networks/BdnNodeHandle.h"
+#include "YmNetworks/BdnNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BDN

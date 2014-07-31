@@ -9,8 +9,8 @@
 
 #include "Iscas89Network.h"
 #include "Iscas89NetworkReader.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

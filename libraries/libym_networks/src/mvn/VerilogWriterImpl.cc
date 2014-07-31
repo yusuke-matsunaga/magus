@@ -18,20 +18,20 @@
 
 #include "VerilogWriterImpl.h"
 
-#include "networks/MvnMgr.h"
-#include "networks/MvnModule.h"
-#include "networks/MvnPort.h"
-#include "networks/MvnNode.h"
-#include "networks/MvnInputPin.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnModule.h"
+#include "YmNetworks/MvnPort.h"
+#include "YmNetworks/MvnNode.h"
+#include "YmNetworks/MvnInputPin.h"
 
-#include "networks/MvnVlMap.h"
+#include "YmNetworks/MvnVlMap.h"
 
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
 
-#include "verilog/vl/VlDecl.h"
-#include "verilog/vl/VlDeclArray.h"
-#include "verilog/vl/VlRange.h"
+#include "YmVerilog/vl/VlDecl.h"
+#include "YmVerilog/vl/VlDeclArray.h"
+#include "YmVerilog/vl/VlRange.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

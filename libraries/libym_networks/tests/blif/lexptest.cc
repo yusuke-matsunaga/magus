@@ -9,9 +9,9 @@
 
 #include "BlifParser.h"
 #include "BlifHandler.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
-#include "logic/Expr.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

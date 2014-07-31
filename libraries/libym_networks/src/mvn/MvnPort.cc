@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "networks/MvnPort.h"
-#include "networks/MvnNode.h"
+#include "YmNetworks/MvnPort.h"
+#include "YmNetworks/MvnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN

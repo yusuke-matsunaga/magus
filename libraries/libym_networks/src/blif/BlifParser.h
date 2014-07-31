@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/blif_nsdef.h"
-#include "cell/cell_nsdef.h"
+#include "YmNetworks/blif_nsdef.h"
+#include "YmCell/cell_nsdef.h"
 #include "IdHash.h"
 #include "BlifScanner.h"
 

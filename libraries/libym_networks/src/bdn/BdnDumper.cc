@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "networks/BdnDumper.h"
+#include "YmNetworks/BdnDumper.h"
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnDff.h"
-#include "networks/BdnLatch.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnNodeHandle.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmNetworks/BdnLatch.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnNodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BDN

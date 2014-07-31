@@ -8,8 +8,8 @@
 
 
 #include "EnvMerger.h"
-#include "networks/MvnMgr.h"
-#include "networks/MvnNode.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG

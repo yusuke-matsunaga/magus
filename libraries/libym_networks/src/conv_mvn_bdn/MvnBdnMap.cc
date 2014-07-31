@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "networks/MvnBdnMap.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnNodeHandle.h"
-#include "networks/MvnMgr.h"
-#include "networks/MvnNode.h"
+#include "YmNetworks/MvnBdnMap.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnNodeHandle.h"
+#include "YmNetworks/MvnMgr.h"
+#include "YmNetworks/MvnNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKSBDNCONV

@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "networks/mvn.h"
-#include "verilog/vl/VlFwd.h"
+#include "YmNetworks/mvn.h"
+#include "YmVerilog/vl/VlFwd.h"
 #include "DeclHash.h"
 
 

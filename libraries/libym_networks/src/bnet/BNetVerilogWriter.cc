@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "networks/BNetVerilogWriter.h"
-#include "networks/BNetwork.h"
-#include "logic/ExprWriter.h"
+#include "YmNetworks/BNetVerilogWriter.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmLogic/ExprWriter.h"
 
 #include "VlwModule.h"
 #include "VlwModuleHeader.h"

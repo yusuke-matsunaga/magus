@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "networks/TgNetwork.h"
-#include "networks/TgNode.h"
+#include "YmNetworks/TgNetwork.h"
+#include "YmNetworks/TgNode.h"
 #include "NameHash.h"
 #include "LogicMgr.h"
 

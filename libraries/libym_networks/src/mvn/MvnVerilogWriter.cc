@@ -6,7 +6,7 @@
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "networks/MvnVerilogWriter.h"
+#include "YmNetworks/MvnVerilogWriter.h"
 
 #include "VerilogWriterImpl.h"
 

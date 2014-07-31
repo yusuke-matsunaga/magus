@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/TgIscas89Reader.h"
+#include "YmNetworks/TgIscas89Reader.h"
 #include "Iscas89Parser.h"
 #include "TgIscas89Handler.h"
 

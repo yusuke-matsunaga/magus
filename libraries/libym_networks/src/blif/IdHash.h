@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/blif_nsdef.h"
-#include "utils/FileRegion.h"
-#include "utils/SimpleAlloc.h"
+#include "YmNetworks/blif_nsdef.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

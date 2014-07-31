@@ -11,8 +11,8 @@
 #include "BlifNodeImpl.h"
 #include "BlifParser.h"
 #include "BlifNetworkHandler.h"
-#include "cell/Cell.h"
-#include "cell/CellPin.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BLIF

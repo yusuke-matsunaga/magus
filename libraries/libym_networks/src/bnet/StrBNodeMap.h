@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "networks/bnet.h"
-#include "networks/BNetwork.h"
-#include "utils/SimpleAlloc.h"
+#include "YmNetworks/bnet.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

@@ -8,7 +8,7 @@
 
 
 #include "NameHash.h"
-#include "networks/TgNode.h"
+#include "YmNetworks/TgNode.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET

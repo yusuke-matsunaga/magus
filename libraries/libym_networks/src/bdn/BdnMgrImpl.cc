@@ -8,11 +8,11 @@
 
 
 #include "BdnMgrImpl.h"
-#include "networks/BdnPort.h"
-#include "networks/BdnDff.h"
-#include "networks/BdnLatch.h"
-#include "networks/BdnNode.h"
-#include "networks/BdnNodeHandle.h"
+#include "YmNetworks/BdnPort.h"
+#include "YmNetworks/BdnDff.h"
+#include "YmNetworks/BdnLatch.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmNetworks/BdnNodeHandle.h"
 #include "BdnAuxData.h"
 
 

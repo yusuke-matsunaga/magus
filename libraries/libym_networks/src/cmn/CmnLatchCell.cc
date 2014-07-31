@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/CmnLatchCell.h"
+#include "YmNetworks/CmnLatchCell.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN

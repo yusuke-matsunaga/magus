@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "networks/BdnIscas89Reader.h"
+#include "YmNetworks/BdnIscas89Reader.h"
 
 #include "Iscas89Network.h"
 #include "Iscas89NetworkReader.h"

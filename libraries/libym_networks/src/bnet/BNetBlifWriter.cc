@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "networks/BNetBlifWriter.h"
-#include "networks/BNetwork.h"
-#include "networks/BNetSopDecomp.h"
+#include "YmNetworks/BNetBlifWriter.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetSopDecomp.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_BNET

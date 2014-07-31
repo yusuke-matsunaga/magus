@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "networks/BdnMgr.h"
-#include "networks/BdnBlifReader.h"
-#include "networks/BdnDumper.h"
-#include "networks/BdnBlifWriter.h"
-#include "networks/BdnVerilogWriter.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BdnBlifReader.h"
+#include "YmNetworks/BdnDumper.h"
+#include "YmNetworks/BdnBlifWriter.h"
+#include "YmNetworks/BdnVerilogWriter.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

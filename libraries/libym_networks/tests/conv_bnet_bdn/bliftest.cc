@@ -7,14 +7,14 @@
 /// All rights reserved.
 
 
-#include "networks/BNetwork.h"
-#include "networks/BNetBlifReader.h"
-#include "networks/BdnMgr.h"
-#include "networks/BNetBdnConv.h"
-#include "networks/BdnDumper.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetBlifReader.h"
+#include "YmNetworks/BdnMgr.h"
+#include "YmNetworks/BNetBdnConv.h"
+#include "YmNetworks/BdnDumper.h"
 
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "networks/TgNetwork.h"
-#include "networks/TgIscas89Reader.h"
-#include "utils/MsgMgr.h"
-#include "utils/MsgHandler.h"
+#include "YmNetworks/TgNetwork.h"
+#include "YmNetworks/TgIscas89Reader.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

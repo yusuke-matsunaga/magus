@@ -9,8 +9,8 @@
 
 #include "Iscas89ParserImpl.h"
 #include "Iscas89Handler.h"
-#include "utils/FileIDO.h"
-#include "utils/MsgMgr.h"
+#include "YmUtils/FileIDO.h"
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89

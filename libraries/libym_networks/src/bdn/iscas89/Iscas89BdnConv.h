@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "networks/bdn.h"
+#include "YmNetworks/bdn.h"
 #include "iscas89_nsdef.h"
 
 
