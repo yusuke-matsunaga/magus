@@ -41,7 +41,7 @@ class DlListConstIter;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlElem DlList.h "utils/DlList.h"
+/// @class DlElem DlList.h "YmUtils/DlList.h"
 /// @brief DlList の要素の基底クラス
 /// @ingroup DlListGroup
 /// @sa DlList DlListIter
@@ -83,7 +83,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlListBase DlList.h "ym_utils/DlList.h"
+/// @class DlListBase DlList.h "ym_YmUtils/DlList.h"
 /// @brief DlElem のリスト
 /// @ingroup DlListGroup
 /// @sa DlElem
@@ -198,7 +198,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlListIter DlList.h "ym_utils/DlList.h"
+/// @class DlListIter DlList.h "ym_YmUtils/DlList.h"
 /// @brief Doublly Linked List の反復子
 /// @ingroup DlListGroup
 /// @sa DlList DlElem
@@ -286,7 +286,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlListConstIter DlList.h "ym_utils/DlList.h"
+/// @class DlListConstIter DlList.h "ym_YmUtils/DlList.h"
 /// @brief Doublly Linked List の constant 反復子
 /// @ingroup DlListGroup
 /// @sa DlList DlElem
@@ -374,7 +374,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class DlList DlList.h "ym_utils/DlList.h"
+/// @class DlList DlList.h "ym_YmUtils/DlList.h"
 /// @brief Dl のリスト
 /// @ingroup DlListGroup
 /// @sa DlListIter

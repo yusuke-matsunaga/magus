@@ -7,14 +7,9 @@
 /// All rights reserved.
 
 
-#include "utils/PoptMainApp.h"
+#include "YmUtils/PoptMainApp.h"
 
-// このクラスは絶対に popt が必要
-#if HAVE_POPT
 #include <popt.h>
-#else
-#error "<popt.h> not found."
-#endif
 
 
 BEGIN_NAMESPACE_YM

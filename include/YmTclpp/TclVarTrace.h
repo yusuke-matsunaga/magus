@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLVARTRACE_H
 #define TCLPP_TCLVARTRACE_H
 
-/// @file tclpp/TclVarTrace.h
+/// @file YmTclpp/TclVarTrace.h
 /// @brief TclVarTrace のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,14 +9,14 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
-#include "tclpp/TclBase.h"
+#include "YmTclpp/tclpp_nsdef.h"
+#include "YmTclpp/TclBase.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclVarTrace TclVarTrace.h "tclpp/TclVarTrace.h"
+/// @class TclVarTrace TclVarTrace.h "YmTclpp/TclVarTrace.h"
 /// @ingroup Tclpp
 /// @brief Tcl変数のトレースを実行するためのハンドラオブジェクト
 //////////////////////////////////////////////////////////////////////

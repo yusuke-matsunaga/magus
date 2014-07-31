@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLPP_NSDEF_H
 #define TCLPP_TCLPP_NSDEF_H
 
-/// @file tclpp/tclpp_nsdef.h
+/// @file YmTclpp/tclpp_nsdef.h
 /// @brief Tclpp サブモジュール関係のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -17,7 +17,7 @@
 /// そこで Tcl_Obj に C++ のラッパをかぶせたクラスがこれ
 
 #include <tcl.h>
-#include "ymtools.h"
+#include "YmTools.h"
 
 // tcl8.4 で定義されている const マクロ
 #if !defined(CONST84)

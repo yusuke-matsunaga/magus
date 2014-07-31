@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLOBJMSGHANDLER_H
 #define TCLPP_TCLOBJMSGHANDLER_H
 
-/// @file tclpp/TclObjMsgHandler.h
+/// @file YmTclpp/TclObjMsgHandler.h
 /// @brief TclObjMsgHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,15 +9,15 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
-#include "utils/MsgHandler.h"
-#include "tclpp/TclObj.h"
+#include "YmTclpp/tclpp_nsdef.h"
+#include "YmUtils/MsgHandler.h"
+#include "YmTclpp/TclObj.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclObjMsgHandler TclObjMsgHandler.h "tclpp/TclObjMsgHandler.h"
+/// @class TclObjMsgHandler TclObjMsgHandler.h "YmTclpp/TclObjMsgHandler.h"
 /// @brief TclObj に出力するメッセージハンドラ
 //////////////////////////////////////////////////////////////////////
 class TclObjMsgHandler :
@@ -34,6 +34,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // MsgHandler の仮想関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief メッセージが登録されるたびに呼ばれる仮想関数
   /// @param[in] src_file この関数を読んでいるソースファイル名
@@ -47,16 +50,18 @@ public:
   put_msg(const char* src_file,
 	  int src_line,
 	  const FileRegion& loc,
-	  tMsgType type,
+	  MsgType type,
 	  const char* label,
 	  const char* body);
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容をクリアする．
   void
   clear();
-
-
-public:
 
   /// @brief メッセージオブジェクトを取り出す．
   TclObj

@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLPOPT_H
 #define TCLPP_TCLPOPT_H
 
-/// @file tclpp/TclPopt.h
+/// @file YmTclpp/TclPopt.h
 /// @brief TclPopt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
-#include "tclpp/TclBase.h"
-#include "tclpp/TclObj.h"
+#include "YmTclpp/tclpp_nsdef.h"
+#include "YmTclpp/TclBase.h"
+#include "YmTclpp/TclObj.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
@@ -30,7 +30,7 @@ enum tTclPoptStat {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPopt TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPopt TclPopt.h "YmTclpp/TclPopt.h"
 /// @ingroup Tclpp
 /// @brief Tcl コマンドのオプション解析時のアクション定義用基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptObj TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptObj TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<任意の引数\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptObj :
@@ -244,7 +244,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptStr TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptStr TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<引数文字列\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptStr :
@@ -320,7 +320,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptBool TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptBool TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<論理値\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptBool :
@@ -396,7 +396,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptInt TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptInt TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<整数\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptInt :
@@ -472,7 +472,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptUint TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptUint TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<符号なし整数\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptUint :
@@ -548,7 +548,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptLong TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptLong TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<long整数\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptLong :
@@ -624,7 +624,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptUlong TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptUlong TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<ulong整数\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptUlong :
@@ -700,7 +700,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPoptDouble TclPopt.h "tclpp/TclPopt.h"
+/// @class TclPoptDouble TclPopt.h "YmTclpp/TclPopt.h"
 /// @brief \<-オプション文字列\> \<double\>の形の解析を行うオブジェクト
 //////////////////////////////////////////////////////////////////////
 class TclPoptDouble :

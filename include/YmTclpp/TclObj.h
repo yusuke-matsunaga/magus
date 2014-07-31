@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLOBJ_H
 #define TCLPP_TCLOBJ_H
 
-/// @file tclpp/TclObj.h
+/// @file YmTclpp/TclObj.h
 /// @brief TclObj のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
+#include "YmTclpp/tclpp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclObj TclObj.h "tclpp/TclObj.h"
+/// @class TclObj TclObj.h "YmTclpp/TclObj.h"
 /// @ingroup Tclpp
 /// @brief Tcl_Obj への(スマート)ポインタ
 ///

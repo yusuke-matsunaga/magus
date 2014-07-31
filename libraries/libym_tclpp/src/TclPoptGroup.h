@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
+#include "YmTclpp/tclpp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP

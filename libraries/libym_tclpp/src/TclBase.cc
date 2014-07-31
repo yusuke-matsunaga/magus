@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "tclpp/TclBase.h"
-#include "tclpp/TclObj.h"
-#include "tclpp/TclVarTrace.h"
+#include "YmTclpp/TclBase.h"
+#include "YmTclpp/TclObj.h"
+#include "YmTclpp/TclVarTrace.h"
 
 #include "StrBuf.h"
 
@@ -171,7 +171,7 @@ TclBase::result() const
 // を返し，エラーメッセージをインタプリタにセットする．
 int
 TclBase::int_conv(const TclObj& obj,
-		  ymint& ans) const
+		  int& ans) const
 {
   return obj.get_int(ans, interp());
 }
@@ -191,7 +191,7 @@ TclBase::uint_conv(const TclObj& obj,
 // を返し，エラーメッセージをインタプリタにセットする．
 int
 TclBase::long_conv(const TclObj& obj,
-		   ymlong& ans) const
+		   long& ans) const
 {
   return obj.get_long(ans, interp());
 }

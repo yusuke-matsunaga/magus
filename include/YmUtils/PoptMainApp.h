@@ -1,7 +1,7 @@
 #ifndef UTILS_POPTMAINAPP_H
 #define UTILS_POPTMAINAPP_H
 
-/// @file utils/PoptMainApp.h
+/// @file YmUtils/PoptMainApp.h
 /// @brief PoptMainApp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -29,7 +29,7 @@ enum tPoptStat
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class Popt PoptMainApp.h "utils/PoptMainApp.h"
+/// @class Popt PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief popt の個々の要素を表すクラス
 //////////////////////////////////////////////////////////////////////
 class Popt
@@ -123,7 +123,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptNone PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptNone PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 引数をとらないオプションの処理を行なうオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
 class PoptNone :
@@ -163,7 +163,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptArg PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptArg PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 引数をとるオプションの処理を行なうオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
 class PoptArg :
@@ -209,7 +209,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptStr PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptStr PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 文字列を引数にとるオプションの処理を行なうオブジェクト
 //////////////////////////////////////////////////////////////////////
 class PoptStr :
@@ -270,7 +270,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptInt PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptInt PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 整数を引数にとるオプションを処理するクラス
 //////////////////////////////////////////////////////////////////////
 class PoptInt :
@@ -331,7 +331,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptBool PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptBool PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief ブール値を引数にとるオプションを処理するクラス
 //////////////////////////////////////////////////////////////////////
 class PoptBool :
@@ -367,7 +367,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptUint PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptUint PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 符号なし整数を引数にとるオプションを処理するクラス
 //////////////////////////////////////////////////////////////////////
 class PoptUint :
@@ -403,7 +403,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptFloat PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptFloat PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 単精度浮動小数点数を引数にとるオプションを処理するクラス
 //////////////////////////////////////////////////////////////////////
 class PoptFloat :
@@ -464,7 +464,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptDouble PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptDouble PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief 倍精度浮動小数点数を引数にとるオプションを処理するクラス
 //////////////////////////////////////////////////////////////////////
 class PoptDouble :
@@ -525,7 +525,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PoptMainApp PoptMainApp.h "utils/PoptMainApp.h"
+/// @class PoptMainApp PoptMainApp.h "YmUtils/PoptMainApp.h"
 /// @brief poptContext を用いる main 関数のクラス
 //////////////////////////////////////////////////////////////////////
 class PoptMainApp

@@ -79,6 +79,9 @@
 // Tcl/Tk が使用可能の時定義されるマクロ
 #cmakedefine TCL_FOUND
 
+// Popt が使用可能の時定義されるマクロ
+#cmakedefine POPT_FOUND
+
 // <curses.h> があるとき定義されるマクロ
 #cmakedefine CURSES_HAVE_CURSES_H
 
@@ -117,10 +120,10 @@ typedef int ymint;
 typedef unsigned int ymuint;
 
 /// @brief 符号付きlong型
-typedef int ymlong;
+typedef long int ymlong;
 
 /// @brief 符号なしlong型
-typedef unsigned long ymulong;
+typedef unsigned long int ymulong;
 
 /// @brief 符号付き8ビット整数型
 typedef char ymint8;
@@ -158,10 +161,10 @@ typedef int ymint32;
 typedef unsigned int ymuint32;
 #elif @LONG_SIZE@ == 4
 /// @brief 符号付き32ビット整数型
-typedef long ymint32;
+typedef long int ymint32;
 
 /// @brief 符号なし32ビット整数型
-typedef unsigned long ymuint32;
+typedef unsigned long int ymuint32;
 #else
 #error "No valid 32-bit integer type is avaliable"
 #endif
@@ -174,10 +177,10 @@ typedef int ymint64;
 typedef unsigned int ymuint64;
 #elif @LONG_SIZE@ == 8
 /// @brief 符号付き64ビット整数型
-typedef long ymint64;
+typedef long int ymint64;
 
 /// @brief 符号なし64ビット整数型
-typedef unsigned long ymuint64;
+typedef unsigned long int ymuint64;
 #elif @LLONG_SIZE@ == 8
 /// @brief 符号付き64ビット整数型
 typedef long long ymint64;

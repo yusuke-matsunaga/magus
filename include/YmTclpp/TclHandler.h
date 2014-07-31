@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLHANDLER_H
 #define TCLPP_TCLHANDLER_H
 
-/// @file tclpp/TclHandler.h
+/// @file YmTclpp/TclHandler.h
 /// @brief TclHandler のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
+#include "YmTclpp/tclpp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclHandler TclHandler.h "tclpp/TclHandler.h"
+/// @class TclHandler TclHandler.h "YmTclpp/TclHandler.h"
 /// @ingroup Tclpp
 /// @brief Tcl のさまざまなハンドラの基底クラス
 //////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclFileHandler TclHandler.h "tclpp/TclHandler.h"
+/// @class TclFileHandler TclHandler.h "YmTclpp/TclHandler.h"
 /// @ingroup Tclpp
 /// @brief Tcl のファイルイベントハンドラの純粋仮想クラス
 ///
@@ -179,7 +179,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclIdleHandler TclHandler.h "tclpp/Tclpp.h"
+/// @class TclIdleHandler TclHandler.h "YmTclpp/Tclpp.h"
 /// @ingroup Tclpp
 /// @brief Tcl のアイドルコールバックハンドラの純粋仮想クラス
 ///
@@ -235,7 +235,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclTimerHandler TclHandler.h "tclpp/Tclpp.h"
+/// @class TclTimerHandler TclHandler.h "YmTclpp/Tclpp.h"
 /// @ingroup Tclpp
 /// @brief Tcl のタイマハンドラを表す純粋仮想クラス
 ///
@@ -308,7 +308,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclPeriodicTimerHandler TclHandler.h "tclpp/TclHandler.h"
+/// @class TclPeriodicTimerHandler TclHandler.h "YmTclpp/TclHandler.h"
 /// @ingroup Tclpp
 /// @brief 周期的にイベント処理を行なうハンドラの純粋仮想クラス
 ///

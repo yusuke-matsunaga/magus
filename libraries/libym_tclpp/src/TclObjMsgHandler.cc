@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "tclpp/TclObjMsgHandler.h"
-#include "utils/FileRegion.h"
+#include "YmTclpp/TclObjMsgHandler.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
@@ -37,7 +37,7 @@ void
 TclObjMsgHandler::put_msg(const char* src_file,
 			  int src_line,
 			  const FileRegion& loc,
-			  tMsgType type,
+			  MsgType type,
 			  const char* label,
 			  const char* body)
 {

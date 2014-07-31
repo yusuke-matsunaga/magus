@@ -1,7 +1,7 @@
 #ifndef TCLPP_TCLBASE_H
 #define TCLPP_TCLBASE_H
 
-/// @file tclpp/TclBase.h
+/// @file YmTclpp/TclBase.h
 /// @brief TclBase のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,13 +9,13 @@
 /// All rights reserved.
 
 
-#include "tclpp/tclpp_nsdef.h"
+#include "YmTclpp/tclpp_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
 
 //////////////////////////////////////////////////////////////////////
-/// @class TclBase TclBase.h "tclpp/TclBase.h"
+/// @class TclBase TclBase.h "YmTclpp/TclBase.h"
 /// @ingroup Tclpp
 /// @brief Tcl インタープリタを持つクラス
 ///
@@ -189,7 +189,7 @@ public:
   /// エラーの場合にはエラーメッセージをインタプリタにセットする．
   int
   int_conv(const TclObj& obj,
-	   ymint& ans) const;
+	   int& ans) const;
 
   /// @brief オブジェクトから unsigned int への変換
   /// @param[in] obj 変換元のオブジェクト
@@ -209,7 +209,7 @@ public:
   /// エラーの場合にはエラーメッセージをインタプリタにセットする．
   int
   long_conv(const TclObj& obj,
-	    ymlong& ans) const;
+	    long& ans) const;
 
   /// @brief オブジェクトから unsigned long への変換
   /// @param[in] obj 変換元のオブジェクト

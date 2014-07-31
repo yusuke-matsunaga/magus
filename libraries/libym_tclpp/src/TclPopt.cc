@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "tclpp/TclPopt.h"
-#include "tclpp/TclCmd.h"
+#include "YmTclpp/TclPopt.h"
+#include "YmTclpp/TclCmd.h"
 #include "TclPoptGroup.h"
 
 

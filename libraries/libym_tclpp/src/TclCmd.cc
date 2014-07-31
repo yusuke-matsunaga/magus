@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "tclpp/TclCmd.h"
-#include "tclpp/TclPopt.h"
-#include "tclpp/TclObj.h"
+#include "YmTclpp/TclCmd.h"
+#include "YmTclpp/TclPopt.h"
+#include "YmTclpp/TclObj.h"
 
 #include "TclPoptGroup.h"
 #include "StrBuf.h"
