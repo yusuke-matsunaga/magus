@@ -19,8 +19,8 @@ simplify_init(Tcl_Interp* interp,
 	      MagMgr* mgr)
 {
   using nsSimplify::LrwCmd;
-  
-  TclCmdBinder1<nsSeal::LrCmd, MagMgr*>::reg(interp, mgr, "magus::local_rewrite");
+
+  TclCmdBinder1<nsSimplify::LrwCmd, MagMgr*>::reg(interp, mgr, "magus::local_rewrite");
 
   const char* init =
     "namespace eval tclreadline {\n"

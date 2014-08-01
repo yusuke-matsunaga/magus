@@ -8,9 +8,9 @@
 
 
 #include "Pat2Matcher.h"
-#include "ym_YmNetworks/BdnNode.h"
-#include "ym_YmCell/CellLibrary.h"
-#include "ym_YmCell/CellPat2Graph.h"
+#include "YmNetworks/BdnNode.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellPat2Graph.h"
 #include "Match.h"
 
 

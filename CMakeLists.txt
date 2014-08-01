@@ -200,6 +200,7 @@ endif (TCL_FOUND)
 add_subdirectory (programs/bnet2aig)
 add_subdirectory (programs/makebdd)
 add_subdirectory (programs/satpg)
+add_subdirectory (programs/magus)
 
 
 # ===================================================================

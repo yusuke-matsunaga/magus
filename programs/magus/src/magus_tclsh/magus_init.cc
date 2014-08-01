@@ -113,6 +113,7 @@ magus_init(Tcl_Interp* interp)
   }
 #endif
 
+#if 0
   // もしも MAGUS_LIBRARY という環境変数が定義されていたらそれを auto_path
   // に加える．そうでなければ configure 時に指定されたパスを auto_path
   // に加える．
@@ -139,7 +140,9 @@ magus_init(Tcl_Interp* interp)
   if (Tcl_Eval(interp, script) != TCL_OK) {
     return TCL_ERROR;
   }
+#endif
 
+  const char* MAGUS_VERSION = "1.0";
 
   //////////////////////////////////////////////////////////////////////
   // パッケージ宣言
