@@ -1,7 +1,7 @@
 #ifndef YMSH_YMSHCMD_H
 #define YMSH_YMSHCMD_H
 
-/// @file ymsh/YmshCmd.h
+/// @file Ymsh/YmshCmd.h
 /// @brief YmshCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ymsh/ymsh_nsdef.h"
-#include "utils/StrBuff.h"
+#include "Ymsh/ymsh_nsdef.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_YMSH
 class YmshImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmshCmd YmshCmd.h "ymsh/YmshCmd.h"
+/// @class YmshCmd YmshCmd.h "Ymsh/YmshCmd.h"
 /// @brief Ymsh のコマンドの基底クラス
 /// 実際にはこのクラスを継承したクラスを実装する必要がある．
 //////////////////////////////////////////////////////////////////////

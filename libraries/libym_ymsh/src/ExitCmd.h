@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymsh/YmshCmd.h"
+#include "Ymsh/YmshCmd.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH

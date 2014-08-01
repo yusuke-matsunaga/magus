@@ -13,15 +13,14 @@ include_directories(
 #  ソースファイルの設定
 # ===================================================================
 
-set (SOURCES
+set (common_SOURCES
   src/common/BitVector.cc
   src/common/VlMgr.cc
   src/common/VlUdpVal.cc
   src/common/VlValue.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (elaborator_SOURCES
   src/elaborator/ei/EiAssignment.cc
   src/elaborator/ei/EiAttribute.cc
   src/elaborator/ei/EiBinaryOp.cc
@@ -61,10 +60,7 @@ set (SOURCES
   src/elaborator/ei/EiToplevel.cc
   src/elaborator/ei/EiUdp.cc
   src/elaborator/ei/EiUnaryOp.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/elaborator/elb_mgr/AttrHash.cc
   src/elaborator/elb_mgr/ElbContAssign.cc
   src/elaborator/elb_mgr/ElbDecl.cc
@@ -81,10 +77,7 @@ set (SOURCES
   src/elaborator/elb_mgr/ObjDict.cc
   src/elaborator/elb_mgr/TagDict.cc
   src/elaborator/elb_mgr/VlNamedObj.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/elaborator/main/AttrDict.cc
   src/elaborator/main/AttrGen.cc
   src/elaborator/main/CfDict.cc
@@ -109,8 +102,7 @@ set (SOURCES
   src/elaborator/main/UdpGen.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (parser_SOURCES
   src/parser/cpt/CptDecl.cc
   src/parser/cpt/CptExpr.cc
   src/parser/cpt/CptFactory.cc
@@ -124,10 +116,7 @@ set (SOURCES
   src/parser/cpt/CptSpecItem.cc
   src/parser/cpt/CptStmt.cc
   src/parser/cpt/CptUdp.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/parser/main/Parser.cc
   src/parser/main/Parser_decl.cc
   src/parser/main/Parser_expr.cc
@@ -139,18 +128,12 @@ set (SOURCES
   src/parser/main/Parser_port.cc
   src/parser/main/Parser_stmt.cc
   src/parser/main/Parser_udp.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/parser/pt_mgr/PtDumper.cc
   src/parser/pt_mgr/PtMgr.cc
   src/parser/pt_mgr/PtiBase.cc
   src/parser/pt_mgr/PtiFactory.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/parser/scanner/InputFile.cc
   src/parser/scanner/InputMgr.cc
   src/parser/scanner/Lex.cc
@@ -167,10 +150,7 @@ set (SOURCES
   src/parser/scanner/StdLexPlugin.cc
   src/parser/scanner/TokenInfo.cc
   src/parser/scanner/TokenList.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/parser/spt/SptDecl.cc
   src/parser/spt/SptExpr.cc
   src/parser/spt/SptFactory.cc
@@ -198,7 +178,7 @@ set (SOURCES
    OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc)
 
 # Add verilog_grammer.cc to the list of sources
- SET(SOURCES ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc)
+set (parser_SOURCES ${parser_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc)
 
 # Since parser.c does not exists yet when cmake is run, mark
 # it as generated
@@ -207,10 +187,13 @@ set (SOURCES
 # Include binary directory to include lexer.c in parser.c
  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
+
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
 
 add_library(ym_verilog SHARED
-  ${SOURCES}
+  ${common_SOURCES}
+  ${elaborator_SOURCES}
+  ${parser_SOURCES}
   )

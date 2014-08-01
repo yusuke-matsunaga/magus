@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "ymsh/ymsh_nsdef.h"
-#include "utils/UnitAlloc.h"
-#include "utils/StrBuff.h"
+#include "Ymsh/ymsh_nsdef.h"
+#include "YmUtils/UnitAlloc.h"
+#include "YmUtils/StrBuff.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH

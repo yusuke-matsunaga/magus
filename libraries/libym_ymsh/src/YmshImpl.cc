@@ -8,7 +8,7 @@
 
 
 #include "YmshImpl.h"
-#include "ymsh/YmshCmd.h"
+#include "Ymsh/YmshCmd.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>

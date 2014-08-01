@@ -14,14 +14,13 @@ include_directories(
 # ===================================================================
 #  ソースファイルの設定
 # ===================================================================
-set (SOURCES
+set (aig_SOURCES
   src/aig/AigMgr.cc
   src/aig/AigMgrImpl.cc
   src/aig/AigNode.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (bdd_SOURCES
   src/bdd/base/AeOp.cc
   src/bdd/base/AndOp.cc
   src/bdd/base/Bdd.cc
@@ -55,10 +54,7 @@ set (SOURCES
   src/bdd/base/W1Op.cc
   src/bdd/base/XcOp.cc
   src/bdd/base/XorOp.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/bdd/bmc/BddMgrClassic.cc
   src/bdd/bmc/BmcCompTbl.cc
   src/bdd/bmc/bmc_isop.cc
@@ -66,10 +62,7 @@ set (SOURCES
   src/bdd/bmc/bmc_ls.cc
   src/bdd/bmc/bmc_onepath.cc
   src/bdd/bmc/bmc_vs.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/bdd/bmm/BddMgrModern.cc
   src/bdd/bmm/BmmCompTbl.cc
   src/bdd/bmm/BmmVar.cc
@@ -80,8 +73,7 @@ set (SOURCES
   src/bdd/bmm/bmm_vs.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (cnfbdd_SOURCES
   src/cnfdd/BinOp.cc
   src/cnfdd/CNFdd.cc
   src/cnfdd/CNFddMgr.cc
@@ -111,8 +103,7 @@ set (SOURCES
   src/cnfdd/count.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (expr_SOURCES
   src/expr/Expr.cc
   src/expr/ExprMgr.cc
   src/expr/ExprNode.cc
@@ -121,8 +112,7 @@ set (SOURCES
   src/expr/Literal.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (npn_SOURCES
   src/npn/NpnBaseConf.cc
   src/npn/NpnConf.cc
   src/npn/NpnMap.cc
@@ -132,37 +122,24 @@ set (SOURCES
   src/npn/NpnRawSig.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (sat_SOURCES
   src/sat/SatMsgHandlerImpl1.cc
   src/sat/SatSolver.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/sat/MiniSat/Main.C
   src/sat/MiniSat/SatSolverMiniSat.cc
   src/sat/MiniSat/Solver.C
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/sat/MiniSat2/Options.cc
   src/sat/MiniSat2/SatSolverMiniSat2.cc
   src/sat/MiniSat2/Solver.cc
   src/sat/MiniSat2/System.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/sat/dimacs/DimacsParser.cc
   src/sat/dimacs/DimacsScanner.cc
   src/sat/dimacs/DimacsVerifier.cc
   src/sat/dimacs/SatDimacsHandler.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/sat/ymsat/AssignList.cc
   src/sat/ymsat/SaBase.cc
   src/sat/ymsat/SaFactory.cc
@@ -174,18 +151,14 @@ set (SOURCES
   src/sat/ymsat/YmSatR.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (smt_SOURCES
   src/smt/core/SmtFunImpl.cc
   src/smt/core/SmtFunValidatorImpl.cc
   src/smt/core/SmtSolverImpl.cc
   src/smt/core/SmtSortImpl.cc
   src/smt/core/SmtTermImpl.cc
   src/smt/core/SmtVarImpl.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/smt/smtlibv2/parser/SmtLibNodeImpl.cc
   src/smt/smtlibv2/parser/SmtLibParser.cc
   src/smt/smtlibv2/parser/SmtLibScanner.cc
@@ -199,14 +172,12 @@ set (SOURCES
   src/smt/smtlibv2/shell/SortMgr.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (tvfunc_SOURCES
   src/tvfunc/TvFunc.cc
   src/tvfunc/TvFuncM.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (zdd_SOURCES
   src/zdd/CapOp.cc
   src/zdd/Cof0Op.cc
   src/zdd/Cof1Op.cc
@@ -240,7 +211,17 @@ set (SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(ym_logic SHARED ${SOURCES})
+add_library(ym_logic SHARED
+  ${aig_SOURCES}
+  ${bdd_SOURCES}
+  ${cnfdd_SOURCES}
+  ${expr_SOURCES}
+  ${npn_SOURCES}
+  ${sat_SOURCES}
+  ${smt_SOURCES}
+  ${tvfunc_SOURCES}
+  ${zdd_SOURCES}
+  )
 
 target_link_libraries(ym_logic
   ym_utils

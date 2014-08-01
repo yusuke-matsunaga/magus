@@ -6,3 +6,4 @@ cell/  YmCell/
 tclpp/ YmTclpp/
 verilog/ YmVerilog/
 networks/ YmNetworks/
+ymsh/ Ymsh/

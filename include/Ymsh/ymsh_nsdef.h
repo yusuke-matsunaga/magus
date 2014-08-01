@@ -1,7 +1,7 @@
 #ifndef YMSH_YMSH_NSDEF_H
 #define YMSH_YMSH_NSDEF_H
 
-/// @file ymsh/ymsh_nsdef.h
+/// @file Ymsh/ymsh_nsdef.h
 /// @brief Ymsh の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymtools.h"
+#include "YmTools.h"
 
 
 /// @brief ymsh 用の名前空間の開始

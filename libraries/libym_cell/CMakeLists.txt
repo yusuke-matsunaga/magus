@@ -10,111 +10,70 @@ include_directories(
 
 
 # ===================================================================
-#  ターゲットの設定
+#  ソースファイルの設定
 # ===================================================================
-add_library(ym_cell SHARED
+set (main_SOURCES
   src/CellFFInfo.cc
   src/CellLatchInfo.cc
   src/display.cc
+  )
+
+set (ci_SOURCES
   src/ci/CiBundle.cc
-  src/ci/CiBundle.h
   src/ci/CiBus.cc
-  src/ci/CiBus.h
   src/ci/CiBusType.cc
-  src/ci/CiBusType.h
   src/ci/CiCell.cc
-  src/ci/CiCell.h
   src/ci/CiCellHash.cc
-  src/ci/CiCellHash.h
   src/ci/CiClass.cc
-  src/ci/CiClass.h
   src/ci/CiFFCell.cc
-  src/ci/CiFFCell.h
   src/ci/CiFsmCell.cc
-  src/ci/CiFsmCell.h
   src/ci/CiGroup.cc
-  src/ci/CiGroup.h
   src/ci/CiLatchCell.cc
-  src/ci/CiLatchCell.h
   src/ci/CiLibrary.cc
-  src/ci/CiLibrary.h
   src/ci/CiLogicCell.cc
-  src/ci/CiLogicCell.h
   src/ci/CiLut.cc
-  src/ci/CiLut.h
   src/ci/CiLutHash.cc
-  src/ci/CiLutHash.h
   src/ci/CiLutTemplate.cc
-  src/ci/CiLutTemplate.h
   src/ci/CiPatGraph.cc
-  src/ci/CiPatGraph.h
   src/ci/CiPatMgr.cc
-  src/ci/CiPatMgr.h
   src/ci/CiPin.cc
-  src/ci/CiPin.h
   src/ci/CiPinHash.cc
-  src/ci/CiPinHash.h
   src/ci/CiTiming.cc
-  src/ci/CiTiming.h
+  )
+
+set (dotlib_SOURCES
   src/dotlib/CellDotlibReader.cc
   src/dotlib/ComplexHandler.cc
-  src/dotlib/ComplexHandler.h
   src/dotlib/DefineHandler.cc
-  src/dotlib/DefineHandler.h
   src/dotlib/DotlibAttr.cc
-  src/dotlib/DotlibAttr.h
   src/dotlib/DotlibAttrMap.cc
-  src/dotlib/DotlibAttrMap.h
   src/dotlib/DotlibCell.cc
-  src/dotlib/DotlibCell.h
   src/dotlib/DotlibFF.cc
-  src/dotlib/DotlibFF.h
   src/dotlib/DotlibFL.cc
-  src/dotlib/DotlibFL.h
   src/dotlib/DotlibHandler.cc
-  src/dotlib/DotlibHandler.h
   src/dotlib/DotlibLatch.cc
-  src/dotlib/DotlibLatch.h
   src/dotlib/DotlibLibrary.cc
-  src/dotlib/DotlibLibrary.h
   src/dotlib/DotlibLut.cc
-  src/dotlib/DotlibLut.h
   src/dotlib/DotlibMgr.cc
-  src/dotlib/DotlibMgr.h
   src/dotlib/DotlibMgrImpl.cc
-  src/dotlib/DotlibMgrImpl.h
   src/dotlib/DotlibNode.cc
-  src/dotlib/DotlibNode.h
   src/dotlib/DotlibNodeImpl.cc
-  src/dotlib/DotlibNodeImpl.h
   src/dotlib/DotlibParser.cc
-  src/dotlib/DotlibParser.h
   src/dotlib/DotlibParserImpl.cc
-  src/dotlib/DotlibParserImpl.h
   src/dotlib/DotlibPin.cc
-  src/dotlib/DotlibPin.h
   src/dotlib/DotlibScanner.cc
-  src/dotlib/DotlibScanner.h
 #  src/dotlib/DotlibStateTable.cc
-#  src/dotlib/DotlibStateTable.h
   src/dotlib/DotlibTemplate.cc
-  src/dotlib/DotlibTemplate.h
   src/dotlib/DotlibTiming.cc
-  src/dotlib/DotlibTiming.h
   src/dotlib/ExprHandler.cc
-  src/dotlib/ExprHandler.h
   src/dotlib/FhScanner.cc
-  src/dotlib/FhScanner.h
   src/dotlib/FuncHandler.cc
-  src/dotlib/FuncHandler.h
   src/dotlib/GroupHandler.cc
-  src/dotlib/GroupHandler.h
   src/dotlib/HandlerFactory.cc
-  src/dotlib/HandlerFactory.h
   src/dotlib/SimpleHandler.cc
-  src/dotlib/SimpleHandler.h
-  src/dotlib/dotlib_int.h
-  src/dotlib/dotlib_nsdef.h
+  )
+
+set (libcomp_SOURCES
   src/libcomp/LcClass.cc
   src/libcomp/LcFFMgr.cc
   src/libcomp/LcGroup.cc
@@ -123,38 +82,35 @@ add_library(ym_cell SHARED
   src/libcomp/LcLogicMgr.cc
   src/libcomp/LcPatMgr.cc
   src/libcomp/LibComp.cc
+  )
+
+set (mislib_SOURCES
   src/mislib/CellMislibReader.cc
   src/mislib/MislibBop.cc
-  src/mislib/MislibBop.h
   src/mislib/MislibConst.cc
-  src/mislib/MislibConst.h
   src/mislib/MislibGate.cc
-  src/mislib/MislibGate.h
   src/mislib/MislibList.cc
-  src/mislib/MislibList.h
   src/mislib/MislibMgr.cc
-  src/mislib/MislibMgr.h
   src/mislib/MislibMgrImpl.cc
-  src/mislib/MislibMgrImpl.h
   src/mislib/MislibNode.h
   src/mislib/MislibNodeImpl.cc
-  src/mislib/MislibNodeImpl.h
   src/mislib/MislibNot.cc
-  src/mislib/MislibNot.h
   src/mislib/MislibNum.cc
-  src/mislib/MislibNum.h
   src/mislib/MislibParser.cc
-  src/mislib/MislibParser.h
   src/mislib/MislibParserImpl.cc
-  src/mislib/MislibParserImpl.h
   src/mislib/MislibPin.cc
-  src/mislib/MislibPin.h
   src/mislib/MislibScanner.cc
-  src/mislib/MislibScanner.h
   src/mislib/MislibStr.cc
-  src/mislib/MislibStr.h
   src/mislib/MislibSymbol.cc
-  src/mislib/MislibSymbol.h
-#  src/mislib/mislib_grammer.yy
-  src/mislib/mislib_nsdef.h
+  )
+
+# ===================================================================
+#  ターゲットの設定
+# ===================================================================
+add_library(ym_cell SHARED
+  ${main_SOURCES}
+  ${ci_SOURCES}
+  ${dotlib_SOURCES}
+  ${libcomp_SOURCES}
+  ${mislib_SOURCES}
   )

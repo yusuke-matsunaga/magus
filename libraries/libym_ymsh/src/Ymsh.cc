@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "ymsh/Ymsh.h"
+#include "Ymsh/Ymsh.h"
 #include "YmshImpl.h"
 
 #include "SetCmd.h"

@@ -1,7 +1,7 @@
 #ifndef YMSH_YMSH_H
 #define YMSH_YMSH_H
 
-/// @file ymsh/Ymsh.h
+/// @file Ymsh/Ymsh.h
 /// @brief Ymsh のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ymsh/ymsh_nsdef.h"
+#include "Ymsh/ymsh_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_YMSH
@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_YMSH
 class YmshImpl;
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmshBase Ymsh.h "ymsh/Ymsh.h"
+/// @class YmshBase Ymsh.h "Ymsh/Ymsh.h"
 /// @brief 簡単なインタプリタを実現するクラス
 //////////////////////////////////////////////////////////////////////
 class YmshBase
@@ -63,7 +63,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class Ymsh Ymsh.h "ymsh/Ymsh.h"
+/// @class Ymsh Ymsh.h "Ymsh/Ymsh.h"
 /// @brief 標準的な機能を組み込んだインタプリタを実現するクラス
 //////////////////////////////////////////////////////////////////////
 class Ymsh :

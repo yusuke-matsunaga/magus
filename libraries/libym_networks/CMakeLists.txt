@@ -13,34 +13,26 @@ include_directories(
 #  ソースファイルの設定
 # ===================================================================
 
-set (SOURCES
+set (main_SOURCES
   src/BNetBdnConv.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (bdn_SOURCES
   src/bdn/BdnBlifWriter.cc
   src/bdn/BdnDumper.cc
   src/bdn/BdnMgr.cc
   src/bdn/BdnMgrImpl.cc
   src/bdn/BdnNode.cc
   src/bdn/BdnVerilogWriter.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/bdn/blif/BdnBlifReader.cc
   src/bdn/blif/BlifBdnConv.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/bdn/iscas89/BdnIscas89Reader.cc
   src/bdn/iscas89/Iscas89BdnConv.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (blif_SOURCES
   src/blif/BlifDic.cc
   src/blif/BlifHandler.cc
   src/blif/BlifIdHash.cc
@@ -52,8 +44,7 @@ set (SOURCES
   src/blif/BlifScanner.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (bnet_SOURCES
   src/bnet/BNetBlifWriter.cc
   src/bnet/BNetDecomp.cc
   src/bnet/BNetEquWriter.cc
@@ -66,22 +57,15 @@ set (SOURCES
   src/bnet/BNodeMgr.cc
   src/bnet/StrBNodeMap.cc
   src/bnet/eliminate.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/bnet/blif/BNetBlifHandler.cc
   src/bnet/blif/BNetBlifReader.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/bnet/iscas89/BNetIscas89Handler.cc
   src/bnet/iscas89/BNetIscas89Reader.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (cmn_SOURCES
   src/cmn/BlifWriterImpl.cc
   src/cmn/CmnBlifWriter.cc
   src/cmn/CmnDffCell.cc
@@ -95,8 +79,7 @@ set (SOURCES
   src/cmn/VerilogWriterImpl.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (conv_mvn_bdn_SOURCES
   src/conv_mvn_bdn/AddConv.cc
   src/conv_mvn_bdn/AndConv.cc
   src/conv_mvn_bdn/CaseEqConv.cc
@@ -127,8 +110,7 @@ set (SOURCES
   src/conv_mvn_bdn/XorConv.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (iscas89_SOURCES
   src/iscas89/Iscas89Handler.cc
   src/iscas89/Iscas89IdHash.cc
   src/iscas89/Iscas89Network.cc
@@ -139,8 +121,7 @@ set (SOURCES
   src/iscas89/Iscas89Scanner.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (mvn_SOURCES
   src/mvn/MvnCaseEq.cc
   src/mvn/MvnCellNode.cc
   src/mvn/MvnConst.cc
@@ -168,27 +149,19 @@ set (SOURCES
   src/mvn/verilog/Xmask.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (tgnet_SOURCES
   src/tgnet/LogicMgr.cc
   src/tgnet/NameHash.cc
   src/tgnet/TgNetwork.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/tgnet/blif/TgBlifHandler.cc
   src/tgnet/blif/TgBlifReader.cc
-  )
 
-set (SOURCES
-  ${SOURCES}
   src/tgnet/iscas89/TgIscas89Handler.cc
   src/tgnet/iscas89/TgIscas89Reader.cc
   )
 
-set (SOURCES
-  ${SOURCES}
+set (verilog_SOURCES
   src/verilog/VlWriter.cc
   src/verilog/VlwAssign.cc
   src/verilog/VlwBase.cc
@@ -213,7 +186,7 @@ set (SOURCES
    OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc)
 
 # Add iscas89_grammer.cc to the list of sources
- SET(SOURCES ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc)
+ SET(iscas89_SOURCES ${iscas89_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc)
 
 # Since parser.c does not exists yet when cmake is run, mark
 # it as generated
@@ -222,12 +195,22 @@ set (SOURCES
 # Include binary directory to include lexer.c in parser.c
  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
+
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
 
 add_library(ym_networks SHARED
-  ${SOURCES}
+  ${main_SOURCES}
+  ${bdn_SOURCES}
+  ${blif_SOURCES}
+  ${bnet_SOURCES}
+  ${cmn_SOURCES}
+  ${conv_mvn_bdn_SOURCES}
+  ${iscas89_SOURCES}
+  ${mvn_SOURCES}
+  ${tgnet_SOURCES}
+  ${verilog_SOURCES}
   )
 
 target_link_libraries(ym_networks

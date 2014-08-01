@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ymsh/ymsh_nsdef.h"
-#include "utils/StrBuff.h"
+#include "Ymsh/ymsh_nsdef.h"
+#include "YmUtils/StrBuff.h"
 #include "YmshCmdTable.h"
 #include "YmshObjTable.h"
 
