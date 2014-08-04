@@ -18,134 +18,31 @@ set (YMTOOLS_NAMESPACE "nsYm")
 # ===================================================================
 # パッケージの検査
 # ===================================================================
+list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 include (FindDoxygen)
-include (FindBISON)
+
+find_package(BISON REQUIRED)
 include (FindPythonInterp)
 include (FindPythonLibs)
+
 include (FindQt4)
 find_package(Qt4 4.8.0 REQUIRED QtCore QtGui QtXml)
 include(${QT_USE_FILE})
-include (FindTclsh)
-include (FindTclStub)
+find_package(TCL)
+#include (FindTclsh)
+#include (FindTclStub)
 include (FindBZip2)
 include (FindLibLZMA)
 include (FindZLIB)
 include (FindCurses)
 
-#include (FindGMP)
-# Copyright (c) 2008-2010 Kent State University
-# Copyright (c) 2011-2012 Texas A&M University
-#
-# This file is distributed under the MIT License. See the accompanying file
-# LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
-# and conditions.
+include (FindGMP)
 
-# FIXME: How do I find the version of GMP that I want to use?
-# What versions are available?
+include (FindPOPT)
 
-# NOTE: GMP prefix is understood to be the path to the root of the GMP
-# installation library.
-set(GMP_PREFIX "" CACHE PATH "The path to the prefix of a GMP installation")
+include (FindReadline)
 
-
-find_path(GMP_INCLUDE_DIR gmp.h
-	PATHS ${GMP_PREFIX}/include /usr/include /usr/local/include)
-
-find_library(GMP_LIBRARY NAMES gmp
-	PATHS ${GMP_PREFIX}/lib /usr/lib /usr/local/lib)
-
-
-if(GMP_INCLUDE_DIR AND GMP_LIBRARY)
-	get_filename_component(GMP_LIBRARY_DIR ${GMP_LIBRARY} PATH)
-	set(GMP_FOUND TRUE)
-endif()
-
-if(GMP_FOUND)
-   if(NOT GMP_FIND_QUIETLY)
-      MESSAGE(STATUS "Found GMP: ${GMP_LIBRARY}")
-   endif()
-elseif(GMP_FOUND)
-   if(GMP_FIND_REQUIRED)
-      message(FATAL_ERROR "Could not find GMP")
-   endif()
-endif()
-
-# FindPOPT
-find_package(PkgConfig QUIET)
-pkg_search_module(PC_POPT QUIET popt)
-
-# Find the include directories
-FIND_PATH(POPT_INCLUDE_DIR
-    NAMES popt.h
-    HINTS
-          ${PC_POPT_INCLUDEDIR}
-          ${PC_POPT_INCLUDE_DIRS}
-    DOC "Path containing the popt.h include file"
-    )
-
-FIND_LIBRARY(POPT_LIBRARY
-    NAMES popt
-    HINTS
-          ${PC_POPT_LIBRARYDIR}
-          ${PC_POPT_LIBRARY_DIRS}
-    DOC "popt library path"
-    )
-
-include(FindPackageHandleStandardArgs)
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(POPT
-  REQUIRED_VARS POPT_INCLUDE_DIR POPT_LIBRARY
-  VERSION_VAR PC_POPT_VERSION)
-
-MARK_AS_ADVANCED(POPT_INCLUDE_DIR POPT_LIBRARY)
-
-# - Try to find readline include dirs and libraries
-#
-# Usage of this module as follows:
-#
-# find_package(Readline)
-#
-# Variables used by this module, they can change the default behaviour and need
-# to be set before calling find_package:
-#
-# Readline_ROOT_DIR Set this variable to the root installation of
-# readline if the module has problems finding the
-# proper installation path.
-#
-# Variables defined by this module:
-#
-# READLINE_FOUND System has readline, include and lib dirs found
-# Readline_INCLUDE_DIR The readline include directories.
-# Readline_LIBRARY The readline library.
-
-find_path(Readline_ROOT_DIR
-    NAMES include/readline/readline.h
-)
-
-find_path(Readline_INCLUDE_DIR
-    NAMES readline/readline.h
-    HINTS ${Readline_ROOT_DIR}/include
-)
-
-find_library(Readline_LIBRARY
-    NAMES readline
-    HINTS ${Readline_ROOT_DIR}/lib
-)
-
-if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
-  set(READLINE_FOUND TRUE)
-else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
-  FIND_LIBRARY(Readline_LIBRARY NAMES readline)
-  include(FindPackageHandleStandardArgs)
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
-  MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
-endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
-
-mark_as_advanced(
-    Readline_ROOT_DIR
-    Readline_INCLUDE_DIR
-    Readline_LIBRARY
-)
 
 # ===================================================================
 # ヘッダファイルの検査

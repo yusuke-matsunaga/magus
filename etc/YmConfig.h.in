@@ -82,6 +82,12 @@
 // Popt が使用可能の時定義されるマクロ
 #cmakedefine POPT_FOUND
 
+// gmp(xx) が使用可能の時定義されるマクロ
+#cmakedefine GMP_FOUND
+
+// readline が使用可能の時定義されるマクロ
+#cmakedefine READLINE_FOUND
+
 // <curses.h> があるとき定義されるマクロ
 #cmakedefine CURSES_HAVE_CURSES_H
 

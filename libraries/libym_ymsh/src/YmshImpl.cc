@@ -10,8 +10,10 @@
 #include "YmshImpl.h"
 #include "Ymsh/YmshCmd.h"
 
+#if defined(READLINE_FOUND)
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
 
 
 BEGIN_NAMESPACE_YM_YMSH

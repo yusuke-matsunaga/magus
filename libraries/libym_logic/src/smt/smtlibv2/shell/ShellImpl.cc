@@ -20,8 +20,10 @@
 
 #include "SmtId.h"
 
+#if defined(READLINE_FOUND)
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
 
 #include "YmUtils/StrListIDO.h"
 

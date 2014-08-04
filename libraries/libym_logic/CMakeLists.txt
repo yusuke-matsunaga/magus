@@ -2,13 +2,19 @@
 # ===================================================================
 # インクルードパスの設定
 # ===================================================================
-include_directories(
+include_directories (
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}
   include
-  ${GMP_INCLUDE_DIR}
-  ${Readline_INCLUDE_DIR}
   )
+
+if (GMP_FOUND)
+  include_directories (${GMP_INCLUDE_DIR})
+endif (GMP_FOUND)
+
+if (READLINE_FOUND)
+  include_directories (${Readline_INCLUDE_DIR})
+endif (READLINE_FOUND)
 
 
 # ===================================================================
@@ -225,6 +231,16 @@ add_library(ym_logic SHARED
 
 target_link_libraries(ym_logic
   ym_utils
-  ${GMP_LIBRARY}
-  ${Readline_LIBRARY}
-  )
+)
+
+if (GMP_FOUND)
+  target_link_libraries(ym_logic
+    ${GMP_LIBRARY}
+    )
+endif (GMP_FOUND)
+
+if (READLINE_FOUND)
+  target_link_libraries(ym_logic
+    ${Readline_LIBRARY}
+    )
+endif (READLINE_FOUND)

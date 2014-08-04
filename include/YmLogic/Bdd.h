@@ -15,7 +15,10 @@
 #include "YmLogic/Expr.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
+
+#if defined(GMP_FOUND)
 #include "gmpxx.h"
+#endif
 
 
 BEGIN_NAMESPACE_YM_BDD
