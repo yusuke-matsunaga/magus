@@ -1,9 +1,0 @@
-LOGIC_ YMLOGIC_
-ymtools.h YmTools.h
-logic/ YmLogic/
-utils/ YmUtils/
-cell/  YmCell/
-tclpp/ YmTclpp/
-verilog/ YmVerilog/
-networks/ YmNetworks/
-ymsh/ Ymsh/
