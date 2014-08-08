@@ -39,6 +39,10 @@ public:
   // 内容を取り出す関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ネットワークを設定する．
+  void
+  set_network(TpgNetwork* network);
+
   /// @brief TgNetwork を取り出す．
   TpgNetwork&
   _network();

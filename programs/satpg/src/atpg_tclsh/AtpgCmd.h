@@ -13,6 +13,7 @@
 #include "satpg_nsdef.h"
 #include "YmTclpp/TclCmd.h"
 #include "YmNetworks/tgnet.h"
+#include "YmUtils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -51,15 +52,15 @@ protected:
   void
   after_update_faults();
 
-  /// @brief AtpgMgr を返す．
-  AtpgMgr&
-  mgr();
-
 
 protected:
 
+  /// @brief ネットワークを設定する．
+  void
+  set_network(TpgNetwork* network);
+
   /// @brief TgNetwork を取り出す．
-  const TpgNetwork&
+  TpgNetwork&
   _network();
 
   /// @brief FaultMgr を取り出す．
@@ -69,6 +70,38 @@ protected:
   /// @brief TvMgr を取り出す．
   TvMgr&
   _tv_mgr();
+
+  /// @brief テストベクタのリストを取り出す．
+  vector<TestVector*>&
+  _tv_list();
+
+  /// @brief 2値の故障シミュレータを取り出す．
+  Fsim&
+  _fsim();
+
+  /// @brief 3値の故障シミュレータを返す．
+  Fsim&
+  _fsim3();
+
+  /// @brief ファイル読み込みに関わる時間を得る．
+  USTime
+  read_time() const;
+
+  /// @brief DTPG に関わる時間を得る．
+  USTime
+  dtpg_time() const;
+
+  /// @brief 故障シミュレーションに関わる時間を得る．
+  USTime
+  fsim_time() const;
+
+  /// @brief SAT に関わる時間を得る．
+  USTime
+  sat_time() const;
+
+  /// @brief その他の時間を得る．
+  USTime
+  misc_time() const;
 
 
 private:
@@ -80,19 +113,6 @@ private:
   AtpgMgr* mMgr;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief AtpgMgr を返す．
-inline
-AtpgMgr&
-AtpgCmd::mgr()
-{
-  return *mMgr;
-}
 
 END_NAMESPACE_YM_SATPG
 

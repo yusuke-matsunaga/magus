@@ -8,7 +8,6 @@
 
 
 #include "DopDrop.h"
-#include "AtpgMgr.h"
 #include "Fsim.h"
 #include "FaultMgr.h"
 
@@ -16,11 +15,13 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'drop' タイプを生成する．
-// @param[in] mgr AtpgMgr
+// @param[in] fmgr 故障マネージャ
+// @param[in] fsim 故障シミュレータ
 DetectOp*
-new_DopDrop(AtpgMgr& mgr)
+new_DopDrop(FaultMgr& fmgr,
+	    Fsim& fsim)
 {
-  return new DopDrop(mgr._fault_mgr(), mgr._fsim3());
+  return new DopDrop(fmgr, fsim);
 }
 
 

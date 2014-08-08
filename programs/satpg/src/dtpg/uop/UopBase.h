@@ -24,7 +24,7 @@ class UopBase :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fmgr FaultMgr
+  /// @param[in] fmgr 故障マネージャ
   UopBase(FaultMgr& fmgr);
 
   /// @brief デストラクタ

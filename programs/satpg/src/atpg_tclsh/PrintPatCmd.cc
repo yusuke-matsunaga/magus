@@ -47,7 +47,7 @@ PrintPatCmd::cmd_proc(TclObjVector& objv)
   bool hex_flag = mPoptHex->is_specified();
   bool num_flag = mPoptNum->is_specified();
 
-  vector<TestVector*>& tvlist = mgr()._tv_list();
+  vector<TestVector*>& tvlist = _tv_list();
   ymuint n = tvlist.size();
   for (ymuint i = 0; i < n; ++ i) {
     TestVector* tv = tvlist[i];

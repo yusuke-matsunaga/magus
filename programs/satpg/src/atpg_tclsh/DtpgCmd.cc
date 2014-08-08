@@ -11,7 +11,11 @@
 #include "YmTclpp/TclPopt.h"
 #include "AtpgMgr.h"
 #include "TpgNetwork.h"
+#include "DtpgDriver.h"
 #include "DtpgStats.h"
+#include "DtpgEngine.h"
+#include "FaultMgr.h"
+#include "Fsim.h"
 #include "BackTracer.h"
 #include "DetectOp.h"
 #include "DopList.h"
@@ -178,8 +182,8 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   DopList dop_list;
   UopList uop_list;
 
-  dop_list.add(new_DopTvList(mgr()));
-  dop_list.add(new_DopBase(mgr()));
+  dop_list.add(new_DopTvList(_tv_list()));
+  dop_list.add(new_DopBase(_fault_mgr()));
 
   bool po_flag = mPoptPo->is_specified();
   bool rpo_flag = mPoptRpo->is_specified();
@@ -188,17 +192,17 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     skip_count = mPoptSkip->val();
   }
   if ( skip_count > 0 ) {
-    uop_list.add(new_UopSkip(mgr(), skip_count));
+    uop_list.add(new_UopSkip(skip_count));
   }
   else {
-    uop_list.add(new_UopBase(mgr()));
+    uop_list.add(new_UopBase(_fault_mgr()));
   }
 
   ymuint xmode = 0;
   if ( mPoptX->is_specified() ) {
     xmode = mPoptX->val();
   }
-  TvMgr& tvmgr = mgr()._tv_mgr();
+  TvMgr& tvmgr = _tv_mgr();
   BackTracer* bt = NULL;
   switch ( xmode ) {
   case 1: bt = new_BtJust1(tvmgr); break;
@@ -209,14 +213,14 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   default: bt = new_BtSimple(tvmgr); break;
   }
   if ( bt != NULL ) {
-    bt->set_max_id(mgr()._network().max_node_id());
+    bt->set_max_id(_network().max_node_id());
   }
 
   if ( mPoptDrop->is_specified() ) {
-    dop_list.add(new_DopDrop(mgr()));
+    dop_list.add(new_DopDrop(_fault_mgr(), _fsim3()));
   }
   if ( mPoptVerify->is_specified() ) {
-    dop_list.add(new_DopVerify(mgr()));
+    dop_list.add(new_DopVerify(_fsim3()));
   }
 
   bool timer_enable = true;
@@ -232,12 +236,47 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     po_mode = kDtpgPoDec;
   }
 
-  DtpgStats stats;
+  Fsim& fsim3 = _fsim3();
+  fsim3.set_faults(_fault_mgr().remain_list());
 
-  // DTPG の実行
-  mgr().dtpg(DtpgMode(mode, engine_type, mode_val), po_mode, option_str,
-	     sat_type, sat_option, outp, timer_enable,
-	     *bt, dop_list, uop_list, stats);
+  DtpgDriver* dtpg = new_DtpgDriver();
+
+  ymuint max_id = _network().max_node_id();
+
+  DtpgEngine* engine = NULL;
+  if ( engine_type == "single" ) {
+    engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+  }
+  else if ( engine_type == "single2" ) {
+    engine = new_SatEngineSingle2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+  }
+  else if ( engine_type == "multi" ) {
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, false);
+  }
+  else if ( engine_type == "multi_forget" ) {
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, true);
+  }
+  else if ( engine_type == "multi2" ) {
+    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, false);
+  }
+  else if ( engine_type == "multi2_forget" ) {
+    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, true);
+  }
+  else if ( engine_type == "smt_single" ) {
+    engine = new_SmtEngineSingle(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+  }
+  else {
+    assert_not_reached(__FILE__, __LINE__);
+  }
+
+  engine->set_option(option_str);
+  engine->timer_enable(timer_enable);
+
+  DtpgStats stats;
+  dtpg->run(_network(), mode, po_mode, *engine, stats);
+
+  delete dtpg;
+  delete engine;
 
   after_update_faults();
 

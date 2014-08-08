@@ -16,8 +16,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief 'skip' タイプを生成する．
 // @param[in] threshold しきい値
 UntestOp*
-new_UopSkip(AtpgMgr& mgr,
-	    ymuint threshold)
+new_UopSkip(ymuint threshold)
 {
   return new UopSkip(threshold);
 }

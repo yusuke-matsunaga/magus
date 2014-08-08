@@ -8,6 +8,7 @@
 
 
 #include "NtwkIoCmd.h"
+#include "TpgNetwork.h"
 #include "AtpgMsgHandler.h"
 #include "AtpgMgr.h"
 
@@ -56,7 +57,8 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   AtpgMsgHandler mh;
   MsgMgr::reg_handler(&mh);
 
-  bool stat = mgr().read_blif(ex_filename);
+  TpgNetwork* new_network = TpgNetwork::read_blif(ex_filename, NULL);
+  set_network(new_network);
 
   MsgMgr::unreg_handler(&mh);
 
@@ -111,7 +113,8 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   AtpgMsgHandler mh;
   MsgMgr::reg_handler(&mh);
 
-  bool stat = mgr().read_iscas89(ex_filename);
+  TpgNetwork* new_network = TpgNetwork::read_iscas89(ex_filename);
+  set_network(new_network);
 
   MsgMgr::unreg_handler(&mh);
 

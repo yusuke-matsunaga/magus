@@ -43,14 +43,14 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
 
   USTime lap = mStopWatch.time();
 
-  USTime r_time = mgr().read_time();
-  USTime d_time = mgr().dtpg_time();
-  USTime f_time = mgr().fsim_time();
-  USTime s_time = mgr().sat_time();
-  USTime m_time = mgr().misc_time();
+  USTime r_time = read_time();
+  USTime d_time = dtpg_time();
+  USTime f_time = fsim_time();
+  USTime s_time = sat_time();
+  USTime m_time = misc_time();
 
   FaultMgr& fmgr = _fault_mgr();
-  ymuint num = mgr()._tv_list().size();
+  ymuint num = _tv_list().size();
 
   fprintf(stdout, "#A: # of total faults       = %7d\n", _network().rep_faults().size());
   fprintf(stdout, "#B: # of detected faults    = %7d\n", fmgr.det_list().size());

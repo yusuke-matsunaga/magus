@@ -8,8 +8,6 @@
 
 
 #include "DopDummy.h"
-#include "AtpgMgr.h"
-#include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

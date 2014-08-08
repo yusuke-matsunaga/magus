@@ -8,18 +8,17 @@
 
 
 #include "DopBase.h"
-#include "AtpgMgr.h"
 #include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'base' タイプを生成する．
-// @param[in] mgr AtpgMgr
+// @param[in] fmgr FaultMgr
 DetectOp*
-new_DopBase(AtpgMgr& mgr)
+new_DopBase(FaultMgr& fmgr)
 {
-  return new DopBase(mgr._fault_mgr());
+  return new DopBase(fmgr);
 }
 
 

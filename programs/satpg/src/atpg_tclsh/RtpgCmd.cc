@@ -8,8 +8,10 @@
 
 
 #include "RtpgCmd.h"
-#include "AtpgMgr.h"
+#include "Rtpg.h"
 #include "RtpgStats.h"
+#include "FaultMgr.h"
+#include "Fsim.h"
 #include "YmTclpp/TclPopt.h"
 
 
@@ -52,6 +54,8 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
+  Rtpg* rtpg = new_Rtpg();
+
   bool n_flag = false;
   ymuint max_pat = 100000;
   ymuint max_i = 4;
@@ -71,7 +75,7 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
   }
 
   if ( mPoptSeed->is_specified() ) {
-    mgr().rtpg_init(mPoptSeed->val());
+    rtpg->init(mPoptSeed->val());
   }
 
   if ( mPoptFile->is_specified() ) {
@@ -85,11 +89,17 @@ RtpgCmd::cmd_proc(TclObjVector& objv)
     max_i = 0;
   }
 
+  FaultMgr& fmgr = _fault_mgr();
+  Fsim& fsim = _fsim();
+  TvMgr& tvmgr = _tv_mgr();
+  vector<TestVector*>& tv_list = _tv_list();
   RtpgStats stats;
-
-  mgr().rtpg(min_f, max_i, max_pat, stats);
+  fsim.set_faults(fmgr.remain_list());
+  rtpg->run(fmgr, tvmgr, fsim, min_f, max_i, max_pat, tv_list, stats);
 
   after_update_faults();
+
+  delete rtpg;
 
   if ( print_stats ) {
     cout << "********** rtpg **********" << endl

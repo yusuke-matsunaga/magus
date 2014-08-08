@@ -87,10 +87,6 @@ set (graphsat_SOURCES
   src/graphsat/VarHeap.cc
   )
 
-set (main_SOURCES
-  src/main/AtpgMgr.cc
-  )
-
 set (minpat_SOURCES
   src/minpat/FopRofsim.cc
   src/minpat/KDet.cc
@@ -108,6 +104,7 @@ set (atpg_tclsh_SOURCES
   src/atpg_tclsh/tclAppInit.cc
   src/atpg_tclsh/atpg_init.cc
   src/atpg_tclsh/AtpgCmd.cc
+  src/atpg_tclsh/AtpgMgr.cc
   src/atpg_tclsh/AtpgMsgHandler.cc
   src/atpg_tclsh/NtwkIoCmd.cc
   src/atpg_tclsh/PrintFaultCmd.cc
@@ -132,8 +129,6 @@ add_library(satpg_fsim STATIC ${fsim_SOURCES})
 
 add_library(satpg_graphsat STATIC ${graphsat_SOURCES})
 
-add_library(satpg_main STATIC ${main_SOURCES})
-
 add_library(satpg_minpat STATIC ${minpat_SOURCES})
 
 add_library(satpg_rtpg STATIC ${rtpg_SOURCES})
@@ -144,7 +139,6 @@ if (TCL_FOUND)
     )
 
   target_link_libraries(atpg_tclsh
-    satpg_main
     satpg_dtpg
     satpg_graphsat
     satpg_fsim

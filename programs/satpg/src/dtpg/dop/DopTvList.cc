@@ -8,18 +8,17 @@
 
 
 #include "DopTvList.h"
-#include "AtpgMgr.h"
 #include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'base' タイプを生成する．
-// @param[in] mgr AtpgMgr
+// @param[in] tvlist テストベクタのリスト
 DetectOp*
-new_DopTvList(AtpgMgr& mgr)
+new_DopTvList(vector<TestVector*>& tvlist)
 {
-  return new DopTvList(mgr._tv_list());
+  return new DopTvList(tvlist);
 }
 
 

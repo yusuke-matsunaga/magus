@@ -43,23 +43,26 @@ public:
 };
 
 /// @brief 'base' タイプを生成する．
-/// @param[in] mgr AtpgMgr
+/// @param[in] fmgr 故障マネージャ
 DetectOp*
-new_DopBase(AtpgMgr& mgr);
+new_DopBase(FaultMgr& fmgr);
 
 /// @brief 'drop' タイプを生成する．
-/// @param[in] mgr AtpgMgr
+/// @param[in] fmgr 故障マネージャ
+/// @param[in] fsim 故障シミュレータ
 DetectOp*
-new_DopDrop(AtpgMgr& mgr);
+new_DopDrop(FaultMgr& fmgr,
+	    Fsim& fsim);
 
 /// @brief 'tvlist' タイプを生成する．
-/// @param[in] mgr AtpgMgr
+/// @param[in] tvlist テストベクタのリスト
 DetectOp*
-new_DopTvList(AtpgMgr& mgr);
+new_DopTvList(vector<TestVector*>& tvlist);
 
 /// @brief 'verify' タイプを生成する．
+/// @param[in] fsim 故障シミュレータ
 DetectOp*
-new_DopVerify(AtpgMgr& mgr);
+new_DopVerify(Fsim& fsim);
 
 /// @brief 'dummy' タイプを生成する．
 DetectOp*

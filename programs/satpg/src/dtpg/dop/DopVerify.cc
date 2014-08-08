@@ -8,18 +8,17 @@
 
 
 #include "DopVerify.h"
-#include "AtpgMgr.h"
 #include "Fsim.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'verify' タイプを生成する．
-// @param[in] mgr AtpgMgr
+// @param[in] fsim 故障シミュレータ
 DetectOp*
-new_DopVerify(AtpgMgr& mgr)
+new_DopVerify(Fsim& fsim)
 {
-  return new DopVerify(mgr._fsim3());
+  return new DopVerify(fsim);
 }
 
 

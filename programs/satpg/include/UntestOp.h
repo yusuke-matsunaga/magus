@@ -41,16 +41,14 @@ public:
 };
 
 /// @brief 'base' タイプを生成する．
-/// @param[in] mgr AtpgMgr
+// @param[in] fmgr 故障マネージャ
 UntestOp*
-new_UopBase(AtpgMgr& mgr);
+new_UopBase(FaultMgr& fmgr);
 
 /// @brief 'skip' タイプを生成する．
-/// @param[in] mgr AtpgMgr
 /// @param[in] threshold しきい値
 UntestOp*
-new_UopSkip(AtpgMgr& mgr,
-	    ymuint threshold);
+new_UopSkip(ymuint threshold);
 
 /// @brief 'dummy' タイプを生成する．
 UntestOp*

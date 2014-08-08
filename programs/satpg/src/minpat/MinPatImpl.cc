@@ -9,18 +9,18 @@
 
 #include "MinPatImpl.h"
 #include "MinPatStats.h"
-#include "AtpgMgr.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "FaultMgr.h"
 #include "TpgFault.h"
 #include "Fsim.h"
 #include "KDet.h"
+#include "Verifier.h"
 #include "YmUtils/GcSolver.h"
 #include "YmUtils/MinCov.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/RandPermGen.h"
-#include "Verifier.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG

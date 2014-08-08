@@ -44,7 +44,7 @@ PrintPatStatsCmd::cmd_proc(TclObjVector& objv)
 
   bool hist_mode = mPoptHist->is_specified();
 
-  vector<TestVector*>& tvlist = mgr()._tv_list();
+  vector<TestVector*>& tvlist = _tv_list();
   ymuint n = tvlist.size();
   if ( n == 0 ) {
     cout << "No patterns" << endl;

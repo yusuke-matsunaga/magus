@@ -8,7 +8,7 @@
 
 
 #include "MinPatCmd.h"
-#include "AtpgMgr.h"
+#include "MinPat.h"
 #include "MinPatStats.h"
 #include "YmTclpp/TclPopt.h"
 
@@ -44,8 +44,12 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
+  MinPat* minpat = new_MinPat();
+
   MinPatStats stats;
-  mgr().minpat(stats);
+  minpat->run(_tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);
+
+  delete minpat;
 
   if ( print_stats ) {
     cout << "********** minpat **********" << endl

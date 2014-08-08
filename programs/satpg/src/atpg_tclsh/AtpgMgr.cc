@@ -55,6 +55,15 @@ AtpgMgr::~AtpgMgr()
   delete mNetwork;
 }
 
+// @brief ネットワークを設定する．
+void
+AtpgMgr::set_network(TpgNetwork* network)
+{
+  delete mNetwork;
+  mNetwork = network;
+}
+
+#if 0
 // @brief blif 形式のファイルを読み込む．
 // @param[in] filename ファイル名
 // @param[in] cell_library セルライブラリ
@@ -98,6 +107,7 @@ AtpgMgr::read_iscas89(const string& filename)
 
   return mNetwork != NULL;
 }
+#endif
 
 // @brief 乱数生成器を初期化する．
 void

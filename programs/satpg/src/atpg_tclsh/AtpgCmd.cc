@@ -253,25 +253,88 @@ AtpgCmd::after_update_faults()
 #endif
 }
 
+// @brief ネットワークを設定する．
+void
+AtpgCmd::set_network(TpgNetwork* network)
+{
+  mMgr->set_network(network);
+}
+
 // @brief TgNetwork を取り出す．
-const TpgNetwork&
+TpgNetwork&
 AtpgCmd::_network()
 {
-  return mgr()._network();
+  return mMgr->_network();
 }
 
 // @brief FaultMgr を取り出す．
 FaultMgr&
 AtpgCmd::_fault_mgr()
 {
-  return mgr()._fault_mgr();
+  return mMgr->_fault_mgr();
 }
 
 // @brief TvMgr を取り出す．
 TvMgr&
 AtpgCmd::_tv_mgr()
 {
-  return mgr()._tv_mgr();
+  return mMgr->_tv_mgr();
+}
+
+// @brief テストベクタのリストを取り出す．
+vector<TestVector*>&
+AtpgCmd::_tv_list()
+{
+  return mMgr->_tv_list();
+}
+
+// @brief 2値の故障シミュレータを取り出す．
+Fsim&
+AtpgCmd::_fsim()
+{
+  return mMgr->_fsim();
+}
+
+// @brief 3値の故障シミュレータを返す．
+Fsim&
+AtpgCmd::_fsim3()
+{
+  return mMgr->_fsim3();
+}
+
+// @brief ファイル読み込みに関わる時間を得る．
+USTime
+AtpgCmd::read_time() const
+{
+  return mMgr->read_time();
+}
+
+// @brief DTPG に関わる時間を得る．
+USTime
+AtpgCmd::dtpg_time() const
+{
+  return mMgr->dtpg_time();
+}
+
+// @brief 故障シミュレーションに関わる時間を得る．
+USTime
+AtpgCmd::fsim_time() const
+{
+  return mMgr->fsim_time();
+}
+
+// @brief SAT に関わる時間を得る．
+USTime
+AtpgCmd::sat_time() const
+{
+  return mMgr->sat_time();
+}
+
+// @brief その他の時間を得る．
+USTime
+AtpgCmd::misc_time() const
+{
+  return mMgr->misc_time();
 }
 
 END_NAMESPACE_YM_SATPG

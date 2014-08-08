@@ -8,7 +8,6 @@
 
 
 #include "RtpgImpl.h"
-#include "AtpgMgr.h"
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "TestVector.h"
