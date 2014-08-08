@@ -25,14 +25,7 @@ class RtpgImpl :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fmgr 故障マネージャ
-  /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] tvlist テストベクタのリスト
-  /// @param[in] fsim 故障シミュレータ
-  RtpgImpl(FaultMgr& fmgr,
-	  TvMgr& tvmgr,
-	  vector<TestVector*>& tvlist,
-	  Fsim& fsim);
+  RtpgImpl();
 
   /// @brief デストラクタ
   virtual
@@ -51,15 +44,23 @@ public:
   init(ymuint32 seed);
 
   /// @brief RTPGを行なう．
+  /// @param[in] fmgr 故障マネージャ
+  /// @param[in] tvmgr テストベクタマネージャ
+  /// @param[in] fsim 故障シミュレータ
   /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
   /// @param[in] max_i 故障検出できないシミュレーション回数の上限
   /// @param[in] max_pat 最大のパタン数
+  /// @param[in] tvlist テストベクタのリスト
   /// @param[in] stats 実行結果の情報を格納する変数
   virtual
   void
-  run(ymuint min_f,
+  run(FaultMgr& fmgr,
+      TvMgr& tvmgr,
+      Fsim& fsim,
+      ymuint min_f,
       ymuint max_i,
       ymuint max_pat,
+      vector<TestVector*>& tvlist,
       RtpgStats& stats);
 
 
@@ -67,18 +68,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 故障マネージャ
-  FaultMgr& mFaultMgr;
-
-  // テストベクタマネージャ
-  TvMgr& mTvMgr;
-
-  // テストベクタのリスト
-  vector<TestVector*>& mTvList;
-
-  // 故障シミュレータ
-  Fsim& mFsim;
 
   // 乱数生成器
   RandGen mRandGen;

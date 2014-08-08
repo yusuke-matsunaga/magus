@@ -21,10 +21,9 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 Rtpg*
-new_Rtpg(AtpgMgr& mgr)
+new_Rtpg()
 {
-  return new RtpgImpl(mgr._fault_mgr(), mgr._tv_mgr(),
-		      mgr._tv_list(), mgr._fsim());
+  return new RtpgImpl();
 }
 
 
@@ -33,18 +32,7 @@ new_Rtpg(AtpgMgr& mgr)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] fmgr 故障マネージャ
-// @param[in] tvmgr テストベクタマネージャ
-// @param[in] tvlist テストベクタのリスト
-// @param[in] fsim 故障シミュレータ
-RtpgImpl::RtpgImpl(FaultMgr& fmgr,
-		   TvMgr& tvmgr,
-		   vector<TestVector*>& tvlist,
-		   Fsim& fsim) :
-  mFaultMgr(fmgr),
-  mTvMgr(tvmgr),
-  mTvList(tvlist),
-  mFsim(fsim)
+RtpgImpl::RtpgImpl()
 {
 }
 
@@ -62,34 +50,42 @@ RtpgImpl::init(ymuint32 seed)
 }
 
 // @brief RTPGを行なう．
+// @param[in] fmgr 故障マネージャ
+// @param[in] tvmgr テストベクタマネージャ
+// @param[in] fsim 故障シミュレータ
 // @param[in] min_f 1回のシミュレーションで検出する故障数の下限
 // @param[in] max_i 故障検出できないシミュレーション回数の上限
 // @param[in] max_pat 最大のパタン数
+// @param[in] tvlist テストベクタのリスト
 // @param[in] stats 実行結果の情報を格納する変数
 void
-RtpgImpl::run(ymuint min_f,
+RtpgImpl::run(FaultMgr& fmgr,
+	      TvMgr& tvmgr,
+	      Fsim& fsim,
+	      ymuint min_f,
 	      ymuint max_i,
 	      ymuint max_pat,
+	      vector<TestVector*>& tvlist,
 	      RtpgStats& stats)
 {
   StopWatch local_timer;
 
   local_timer.start();
 
-  ymuint fnum = mFaultMgr.remain_list().size();
+  ymuint fnum = fmgr.remain_list().size();
   ymuint undet_i = 0;
   ymuint epat_num = 0;
   ymuint total_det_count = 0;
 
   TestVector* tv_array[kPvBitLen];
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    tv_array[i] = mTvMgr.new_vector();
+    tv_array[i] = tvmgr.new_vector();
   }
 
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  FopRtpg op(mFsim, mFaultMgr);
+  FopRtpg op(fsim, fmgr);
 
   ymuint pat_num = 0;
   for ( ; ; ) {
@@ -108,7 +104,7 @@ RtpgImpl::run(ymuint min_f,
 
     op.clear_count();
 
-    mFsim.ppsfp(cur_array, op);
+    fsim.ppsfp(cur_array, op);
 
     ymuint det_count = 0;
     for (ymuint i = 0; i < cur_array.size(); ++ i) {
@@ -116,8 +112,8 @@ RtpgImpl::run(ymuint min_f,
       if ( det_count1 > 0 ) {
 	det_count += det_count1;
 	TestVector* tv = cur_array[i];
-	mTvList.push_back(tv);
-	tv_array[i] = mTvMgr.new_vector();
+	tvlist.push_back(tv);
+	tv_array[i] = tvmgr.new_vector();
 	++ epat_num;
       }
     }
@@ -146,7 +142,7 @@ RtpgImpl::run(ymuint min_f,
   }
 
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    mTvMgr.delete_vector(tv_array[i]);
+    tvmgr.delete_vector(tv_array[i]);
   }
 
   local_timer.stop();

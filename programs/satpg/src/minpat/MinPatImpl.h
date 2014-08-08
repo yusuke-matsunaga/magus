@@ -24,14 +24,7 @@ class MinPatImpl :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim2 2値の故障シミュレータ
-  /// @param[in] fsim3 3値の故障シミュレータ
-  MinPatImpl(TvMgr& tvmgr,
-	     FaultMgr& fmgr,
-	     Fsim& fsim2,
-	     Fsim& fsim3);
+  MinPatImpl();
 
   /// @brief デストラクタ
   virtual
@@ -44,30 +37,20 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テストベクタの最小化を行なう．
-  /// @param[in] tv_list テストベクタのリスト
-  /// @param[in] stats 実行結果の情報を格納する変数
+  /// @param[in] tvmgr テストベクタマネージャ
+  /// @param[in] fmgr 故障マネージャ
+  /// @param[in] fsim2 2値の故障シミュレータ
+  /// @param[in] fsim3 3値の故障シミュレータ
+  /// @param[inout] tv_list テストベクタのリスト
+  /// @param[out] stats 実行結果の情報を格納する変数
   virtual
   void
-  run(vector<TestVector*>& tv_list,
+  run(TvMgr& tvmgr,
+      FaultMgr& fmgr,
+      Fsim& fsim2,
+      Fsim& fsim3,
+      vector<TestVector*>& tv_list,
       MinPatStats& stats);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // テストベクタマネージャ
-  TvMgr& mTvMgr;
-
-  // 故障マネージャ
-  FaultMgr& mFaultMgr;
-
-  // 2値の故障シミュレータ
-  Fsim& mFsim2;
-
-  // 3値の故障シミュレータ
-  Fsim& mFsim3;
 
 };
 

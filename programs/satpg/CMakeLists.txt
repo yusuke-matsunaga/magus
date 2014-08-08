@@ -39,15 +39,15 @@ set (dtpg_SOURCES
   src/dtpg/dop/DopTvList.cc
   src/dtpg/dop/DopVerify.cc
   src/dtpg/dop/FopDrop.cc
-  src/dtpg/main/DtpgDriver.cc
-  src/dtpg/main/LitMap.cc
-  src/dtpg/main/SatEngine.cc
-  src/dtpg/main/SatEngineMulti.cc
-  src/dtpg/main/SatEngineMulti2.cc
-  src/dtpg/main/SatEngineSingle.cc
-  src/dtpg/main/SatEngineSingle2.cc
-  src/dtpg/main/SmtEngine.cc
-  src/dtpg/main/SmtEngineSingle.cc
+  src/dtpg/driver/DtpgDriverImpl.cc
+  src/dtpg/engine/LitMap.cc
+  src/dtpg/engine/SatEngine.cc
+  src/dtpg/engine/SatEngineMulti.cc
+  src/dtpg/engine/SatEngineMulti2.cc
+  src/dtpg/engine/SatEngineSingle.cc
+  src/dtpg/engine/SatEngineSingle2.cc
+  src/dtpg/engine/SmtEngine.cc
+  src/dtpg/engine/SmtEngineSingle.cc
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc
   src/dtpg/uop/UopList.cc

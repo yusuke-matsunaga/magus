@@ -14,7 +14,7 @@
 #include "FaultMgr.h"
 #include "TvMgr.h"
 #include "Fsim.h"
-#include "Dtpg.h"
+#include "DtpgDriver.h"
 #include "DtpgEngine.h"
 #include "Rtpg.h"
 #include "MinPat.h"
@@ -37,8 +37,8 @@ AtpgMgr::AtpgMgr() :
   mFsim = new_Fsim2();
   mFsim3 = new_Fsim3();
 
-  mRtpg = new_Rtpg(*this);
-  mMinPat = new_MinPat(*this);
+  mRtpg = new_Rtpg();
+  mMinPat = new_MinPat();
 
   mNetwork = NULL;
 }
@@ -122,7 +122,7 @@ AtpgMgr::rtpg(ymuint min_f,
 
   mFsim->set_faults(mFaultMgr->remain_list());
 
-  mRtpg->run(min_f, max_i, max_pat, stats);
+  mRtpg->run(*mFaultMgr, *mTvMgr, *mFsim, min_f, max_i, max_pat, mTvList, stats);
 
   mTimer.change(old_id);
 }
@@ -146,7 +146,7 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   mFsim3->set_faults(mFaultMgr->remain_list());
 
-  Dtpg* dtpg = new_DtpgDriver();
+  DtpgDriver* dtpg = new_DtpgDriver();
 
   ymuint max_id = mNetwork->max_node_id();
 
@@ -191,7 +191,7 @@ AtpgMgr::dtpg(DtpgMode mode,
 void
 AtpgMgr::minpat(MinPatStats& stats)
 {
-  mMinPat->run(_tv_list(), stats);
+  mMinPat->run(*mTvMgr, *mFaultMgr, *mFsim, *mFsim3, _tv_list(), stats);
 }
 
 // @brief ファイル読み込みに関わる時間を得る．

@@ -27,10 +27,9 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 MinPat*
-new_MinPat(AtpgMgr& mgr)
+new_MinPat()
 {
-  return new MinPatImpl(mgr._tv_mgr(), mgr._fault_mgr(),
-			mgr._fsim(), mgr._fsim3());
+  return new MinPatImpl();
 }
 
 
@@ -39,18 +38,7 @@ new_MinPat(AtpgMgr& mgr)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] tvmgr テストベクタマネージャ
-// @param[in] fmgr 故障マネージャ
-// @param[in] fsim2 2値の故障シミュレータ
-// @param[in] fsim3 3値の故障シミュレータ
-MinPatImpl::MinPatImpl(TvMgr& tvmgr,
-		       FaultMgr& fmgr,
-		       Fsim& fsim2,
-		       Fsim& fsim3) :
-  mTvMgr(tvmgr),
-  mFaultMgr(fmgr),
-  mFsim2(fsim2),
-  mFsim3(fsim3)
+MinPatImpl::MinPatImpl()
 {
 }
 
@@ -60,10 +48,18 @@ MinPatImpl::~MinPatImpl()
 }
 
 // @brief テストベクタの最小化を行なう．
-// @param[in] tv_list テストベクタのリスト
-// @param[in] stats 実行結果の情報を格納する変数
+// @param[in] tvmgr テストベクタマネージャ
+// @param[in] fmgr 故障マネージャ
+// @param[in] fsim2 2値の故障シミュレータ
+// @param[in] fsim3 3値の故障シミュレータ
+// @param[inout] tv_list テストベクタのリスト
+// @param[out] stats 実行結果の情報を格納する変数
 void
-MinPatImpl::run(vector<TestVector*>& tv_list,
+MinPatImpl::run(TvMgr& tvmgr,
+		FaultMgr& fmgr,
+		Fsim& fsim2,
+		Fsim& fsim3,
+		vector<TestVector*>& tv_list,
 		MinPatStats& stats)
 {
   StopWatch local_timer;
@@ -74,7 +70,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
   ymuint orig_num = tv_list.size();
 
-  Verifier ver(mFaultMgr, mFsim3);
+  Verifier ver(fmgr, fsim3);
 
   if ( 0 ) {
     if ( ver.check(tv_list) ) {
@@ -84,7 +80,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
 
   ymuint max_fault_id = 0;
-  const vector<TpgFault*>& f_list = mFaultMgr.det_list();
+  const vector<TpgFault*>& f_list = fmgr.det_list();
   for (ymuint i = 0; i < f_list.size(); ++ i) {
     TpgFault* f = f_list[i];
     if ( max_fault_id < f->id() ) {
@@ -94,7 +90,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   ++ max_fault_id;
   {
 
-    KDet kdet(mFsim3, f_list, max_fault_id);
+    KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 200;
@@ -193,7 +189,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
 
     for (ymuint i = 0; i < nc; ++ i) {
       // 同じ色のグループのパタンを一つにマージする．
-      TestVector* new_tv = mTvMgr.new_vector();
+      TestVector* new_tv = tvmgr.new_vector();
       const vector<ymuint>& id_list = color_group[i];
       for (vector<ymuint>::const_iterator p = id_list.begin();
 	   p != id_list.end(); ++ p) {
@@ -220,7 +216,7 @@ MinPatImpl::run(vector<TestVector*>& tv_list,
   tv_list = tv2_list;
 
   {
-    KDet kdet(mFsim3, f_list, max_fault_id);
+    KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 400;
