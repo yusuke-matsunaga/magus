@@ -192,7 +192,6 @@ set (zdd_SOURCES
   src/zdd/DiffOp.cc
   src/zdd/Dumper.cc
   src/zdd/IdMgr.cc
-  src/zdd/Makefile.am
   src/zdd/MergeOp.cc
   src/zdd/MergeOp2.cc
   src/zdd/Ms2Op.cc
