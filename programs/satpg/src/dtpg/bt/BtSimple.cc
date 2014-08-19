@@ -1,4 +1,4 @@
-
+﻿
 /// @file BtSimple.cc
 /// @brief BtSimple の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

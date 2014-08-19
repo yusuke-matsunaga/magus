@@ -1,4 +1,4 @@
-
+﻿
 /// @file k_of_n_gen.cc
 /// @brief k_of_n_gen の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

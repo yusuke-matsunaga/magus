@@ -1,4 +1,4 @@
-#ifndef EICONCATOP_H
+﻿#ifndef EICONCATOP_H
 #define EICONCATOP_H
 
 /// @file EiConcatOp.h

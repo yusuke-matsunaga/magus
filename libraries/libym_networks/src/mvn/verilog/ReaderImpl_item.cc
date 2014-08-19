@@ -1,4 +1,4 @@
-
+﻿
 /// @file ReaderImpl.cc
 /// @brief ReaderImpl の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)

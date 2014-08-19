@@ -1,4 +1,4 @@
-#ifndef YM_SMTLIBV2_SMTLIBV2_NSDEF_H
+﻿#ifndef YM_SMTLIBV2_SMTLIBV2_NSDEF_H
 #define YM_SMTLIBV2_SMTLIBV2_NSDEF_H
 
 /// @file ym_smtlibv2/smtlibv2_nsdef.h

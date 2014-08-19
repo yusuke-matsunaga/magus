@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_DIMACSHANDLER_H
+﻿#ifndef YMYMLOGIC_DIMACSHANDLER_H
 #define YMYMLOGIC_DIMACSHANDLER_H
 
 /// @file YmLogic/DimacsHandler.h

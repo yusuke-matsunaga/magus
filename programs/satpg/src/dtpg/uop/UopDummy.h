@@ -1,4 +1,4 @@
-#ifndef UOPDUMMY_H
+﻿#ifndef UOPDUMMY_H
 #define UOPDUMMY_H
 
 /// @file UopDummy.h

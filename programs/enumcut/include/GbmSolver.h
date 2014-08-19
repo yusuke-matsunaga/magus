@@ -1,4 +1,4 @@
-#ifndef GBMSOLVER_H
+﻿#ifndef GBMSOLVER_H
 #define GBMSOLVER_H
 
 /// @file GbmSolver.h

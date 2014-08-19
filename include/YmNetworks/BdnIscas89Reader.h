@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNISCAS89READER_H
+﻿#ifndef NETWORKS_BDNISCAS89READER_H
 #define NETWORKS_BDNISCAS89READER_H
 
 /// @file YmNetworks/BdnIscas89Reader.h

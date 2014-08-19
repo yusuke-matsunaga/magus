@@ -1,4 +1,4 @@
-#ifndef REGVECT_H
+﻿#ifndef REGVECT_H
 #define REGVECT_H
 
 /// @file RegVect.h

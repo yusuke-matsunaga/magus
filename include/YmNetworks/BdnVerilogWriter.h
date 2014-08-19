@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNVERILOGWRITER_H
+﻿#ifndef NETWORKS_BDNVERILOGWRITER_H
 #define NETWORKS_BDNVERILOGWRITER_H
 
 /// @file YmNetworks/BdnVerilogWriter.h

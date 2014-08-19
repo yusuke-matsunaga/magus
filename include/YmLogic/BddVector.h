@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_BDDVECTOR_H
+﻿#ifndef YMYMLOGIC_BDDVECTOR_H
 #define YMYMLOGIC_BDDVECTOR_H
 
 /// @file YmLogic/BddVector.h

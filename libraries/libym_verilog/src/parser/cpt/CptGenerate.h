@@ -1,4 +1,4 @@
-#ifndef CPTGENERATE_H
+﻿#ifndef CPTGENERATE_H
 #define CPTGENERATE_H
 
 /// @file CptGenerate.h

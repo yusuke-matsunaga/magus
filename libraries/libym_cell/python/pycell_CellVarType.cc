@@ -1,4 +1,4 @@
-
+﻿
 /// @file pycell_CellVarType.cc
 /// @brief tCellVarType の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

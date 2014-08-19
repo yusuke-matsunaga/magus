@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_CECHASH_H
+﻿#ifndef LIBYM_CEC_CECHASH_H
 #define LIBYM_CEC_CECHASH_H
 
 /// @file libym_cec/CecHash.h

@@ -1,4 +1,4 @@
-/// @file libym_aig/tests/GpNode.h
+﻿/// @file libym_aig/tests/GpNode.h
 /// @brief GpNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

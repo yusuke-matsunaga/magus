@@ -1,4 +1,4 @@
-#ifndef EICONTASSIGN_H
+﻿#ifndef EICONTASSIGN_H
 #define EICONTASSIGN_H
 
 /// @file EiContAssign.h

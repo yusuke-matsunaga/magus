@@ -1,4 +1,4 @@
-#ifndef EIBITSELECT_H
+﻿#ifndef EIBITSELECT_H
 #define EIBITSELECT_H
 
 /// @file EiBitSelect.h

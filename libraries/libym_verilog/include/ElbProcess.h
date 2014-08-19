@@ -1,4 +1,4 @@
-#ifndef ELBPROCESS_H
+﻿#ifndef ELBPROCESS_H
 #define ELBPROCESS_H
 
 /// @file ElbProcess.h

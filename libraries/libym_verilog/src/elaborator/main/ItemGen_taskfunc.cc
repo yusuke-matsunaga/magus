@@ -1,4 +1,4 @@
-
+﻿
 /// @file ItemGen_taskfunc.cc
 /// @brief ElbMgr の実装ファイル(タスク/関数の実体化)
 /// @author Yusuke Matsunaga (松永 裕介)

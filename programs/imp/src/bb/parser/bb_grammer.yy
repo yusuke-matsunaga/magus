@@ -1,4 +1,4 @@
-%{
+﻿%{
 
 /// @file bb_grammer.yy
 /// @brief bbの構文解析用ソース

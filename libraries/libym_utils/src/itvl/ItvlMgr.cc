@@ -1,4 +1,4 @@
-
+﻿
 /// @file ItvlMgr.cc
 /// @brief ItvlMgrの実装ファイル
 /// @author Yusuke Matsunaga

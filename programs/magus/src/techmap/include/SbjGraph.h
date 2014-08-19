@@ -1,4 +1,4 @@
-#ifndef YM_TECHMAP_SBJGRAPH_H
+﻿#ifndef YM_TECHMAP_SBJGRAPH_H
 #define YM_TECHMAP_SBJGRAPH_H
 
 /// @file ym_techmap/SbjGraph.h

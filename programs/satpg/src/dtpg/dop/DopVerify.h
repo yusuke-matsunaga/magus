@@ -1,4 +1,4 @@
-#ifndef DOPVERIFY_H
+﻿#ifndef DOPVERIFY_H
 #define DOPVERIFY_H
 
 /// @file DopVerify.h

@@ -1,4 +1,4 @@
-#ifndef DTPGDRIVERIMPL_H
+﻿#ifndef DTPGDRIVERIMPL_H
 #define DTPGDRIVERIMPL_H
 
 /// @file DtpgDriverImpl.h

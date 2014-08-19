@@ -1,4 +1,4 @@
-#ifndef FUNCVECT_H
+﻿#ifndef FUNCVECT_H
 #define FUNCVECT_H
 
 /// @file FuncVect.h

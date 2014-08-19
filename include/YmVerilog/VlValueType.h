@@ -1,4 +1,4 @@
-#ifndef VERILOG_VLVALUETYPE_H
+﻿#ifndef VERILOG_VLVALUETYPE_H
 #define VERILOG_VLVALUETYPE_H
 
 /// @file YmVerilog/VlValueType.h

@@ -1,4 +1,4 @@
-#ifndef ELBDELAY_H
+﻿#ifndef ELBDELAY_H
 #define ELBDELAY_H
 
 /// @file ElbDelay.h

@@ -1,4 +1,4 @@
-#ifndef RANDCMD_H
+﻿#ifndef RANDCMD_H
 #define RANDCMD_H
 
 /// @file RandCmd.h

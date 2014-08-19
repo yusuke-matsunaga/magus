@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLFWD_H
+﻿#ifndef VERILOG_VL_VLFWD_H
 #define VERILOG_VL_VLFWD_H
 
 /// @file YmVerilog/vl/VlFwd.h

@@ -1,4 +1,4 @@
-#ifndef TECHMAP_CONV2SBJCMD_H
+﻿#ifndef TECHMAP_CONV2SBJCMD_H
 #define TECHMAP_CONV2SBJCMD_H
 
 /// @file magus/techmap/Conv2SbjCmd.h

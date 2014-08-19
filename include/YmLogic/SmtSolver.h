@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMTSOLVER_H
+﻿#ifndef YMYMLOGIC_SMTSOLVER_H
 #define YMYMLOGIC_SMTSOLVER_H
 
 /// @file YmLogic/SmtSolver.h

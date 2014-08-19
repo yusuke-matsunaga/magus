@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_DELNETWORK_H
+﻿#ifndef SRC_CORE_DELNETWORK_H
 #define SRC_CORE_DELNETWORK_H
 
 /// @file src/core/DelNetwork.h

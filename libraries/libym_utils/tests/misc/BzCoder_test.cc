@@ -1,4 +1,4 @@
-
+﻿
 /// @file BzCoder_test.cc
 /// @brief BzCoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

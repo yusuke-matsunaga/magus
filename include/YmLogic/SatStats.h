@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SATSTATS_H
+﻿#ifndef YMYMLOGIC_SATSTATS_H
 #define YMYMLOGIC_SATSTATS_H
 
 /// @file YmLogic/SatStats.h

@@ -1,4 +1,4 @@
-#ifndef PTNODE_DECL_H
+﻿#ifndef PTNODE_DECL_H
 #define PTNODE_DECL_H
 
 /// @file PtNode_decl.h

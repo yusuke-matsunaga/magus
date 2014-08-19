@@ -1,4 +1,4 @@
-#ifndef DOPLIST_H
+﻿#ifndef DOPLIST_H
 #define DOPLIST_H
 
 /// @file DopList.h

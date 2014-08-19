@@ -1,4 +1,4 @@
-#ifndef SMTLIBMGR_H
+﻿#ifndef SMTLIBMGR_H
 #define SMTLIBMGR_H
 
 /// @file SmtLibMgr.h

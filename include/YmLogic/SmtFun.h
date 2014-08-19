@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMTFUN_H
+﻿#ifndef YMYMLOGIC_SMTFUN_H
 #define YMYMLOGIC_SMTFUN_H
 
 

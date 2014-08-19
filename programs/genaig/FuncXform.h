@@ -1,4 +1,4 @@
-#ifndef FUNCXORM_H
+﻿#ifndef FUNCXORM_H
 #define FUNCXORM_h
 
 /// @file FuncXform.h

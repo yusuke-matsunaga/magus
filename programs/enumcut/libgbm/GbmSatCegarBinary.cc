@@ -1,4 +1,4 @@
-
+﻿
 /// @file GbmSatCegarBinary.cc
 /// @brief GbmSatCegarBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

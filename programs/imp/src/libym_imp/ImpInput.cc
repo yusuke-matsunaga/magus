@@ -1,4 +1,4 @@
-
+﻿
 /// @file ImpInput.cc
 /// @brief ImpInput の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

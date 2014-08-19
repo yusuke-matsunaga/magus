@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_seal/SMatrix.cc
 /// @brief SMatrix の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef UDPGEN_H
+﻿#ifndef UDPGEN_H
 #define UDPGEN_H
 
 /// @file UdpGen.h

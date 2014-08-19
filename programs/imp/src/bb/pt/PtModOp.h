@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTMODOP_H
+﻿#ifndef SRC_PT_PTMODOP_H
 #define SRC_PT_PTMODOP_H
 
 /// @file src/pt/PtModOp.h

@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_NEWBDNORK_H
+﻿#ifndef SRC_CORE_NEWBDNORK_H
 #define SRC_CORE_NEWBDNWORK_H
 
 /// @file src/core/NewBdn.h

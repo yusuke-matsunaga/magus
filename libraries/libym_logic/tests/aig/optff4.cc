@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_aig/tests/optff.cc
 /// @brief 最適ファクタードフォームを求めるプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

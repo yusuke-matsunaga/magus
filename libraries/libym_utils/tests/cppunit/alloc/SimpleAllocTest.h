@@ -1,4 +1,4 @@
-#ifndef SIMPLEALLOCTEST_H
+﻿#ifndef SIMPLEALLOCTEST_H
 #define SIMPLEALLOCTEST_H
 
 /// @file SimpleAllocTest.h

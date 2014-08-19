@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MULTISETCOMBIGEN_H
+﻿#ifndef YMUTILS_MULTISETCOMBIGEN_H
 #define YMUTILS_MULTISETCOMBIGEN_H
 
 /// @file YmUtils/MultiSetCombiGen.h

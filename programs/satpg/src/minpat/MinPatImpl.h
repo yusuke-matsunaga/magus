@@ -1,4 +1,4 @@
-#ifndef MINPATIMPL_H
+﻿#ifndef MINPATIMPL_H
 #define MINPATIMPL_H
 
 /// @file MinPatImpl.h

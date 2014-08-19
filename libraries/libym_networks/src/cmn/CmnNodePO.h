@@ -1,4 +1,4 @@
-#ifndef CMNNODEPO_H
+﻿#ifndef CMNNODEPO_H
 #define CMNNODEPO_H
 
 /// @file CmnNodePO.h

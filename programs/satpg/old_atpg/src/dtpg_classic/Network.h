@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_NETWORK_H
+﻿#ifndef DTPG_CLASSIC_NETWORK_H
 #define DTPG_CLASSIC_NETWORK_H
 
 /// @file src/dtpg_classic/Network.h

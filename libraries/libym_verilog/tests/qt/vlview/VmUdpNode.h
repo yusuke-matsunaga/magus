@@ -1,4 +1,4 @@
-#ifndef VMUDPNODE_H
+﻿#ifndef VMUDPNODE_H
 #define VMUDPNODE_H
 
 /// @file VmUdpNode.h

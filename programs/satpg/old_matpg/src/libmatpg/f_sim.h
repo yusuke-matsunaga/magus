@@ -1,4 +1,4 @@
-#ifndef H_MATPG_F_SIM
+﻿#ifndef H_MATPG_F_SIM
 #define H_MATPG_F_SIM
 
 /*

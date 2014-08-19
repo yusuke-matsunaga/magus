@@ -1,4 +1,4 @@
-#ifndef FLOWNODE_H
+﻿#ifndef FLOWNODE_H
 #define FLOWNODE_H
 
 /// @file FlowNode.h

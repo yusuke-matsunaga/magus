@@ -1,4 +1,4 @@
-#ifndef ATPG_MAIN_TIMECMD_H
+﻿#ifndef ATPG_MAIN_TIMECMD_H
 #define ATPG_MAIN_TIMECMD_H
 
 /// @file atpg/src/misc/TimeCmd.h

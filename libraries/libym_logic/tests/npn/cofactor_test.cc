@@ -1,4 +1,4 @@
-
+﻿
 /// @file cofactor_test.cc
 /// @brief TvFunc::cofactor() のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

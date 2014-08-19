@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_BDDLIST_H
+﻿#ifndef YMYMLOGIC_BDDLIST_H
 #define YMYMLOGIC_BDDLIST_H
 
 /// @file YmLogic/BddList.h

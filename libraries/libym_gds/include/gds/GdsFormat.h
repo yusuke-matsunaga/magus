@@ -1,4 +1,4 @@
-#ifndef GDS_GDSFORMAT_H
+﻿#ifndef GDS_GDSFORMAT_H
 #define GDS_GDSFORMAT_H
 
 /// @file gds/GdsFormat.h

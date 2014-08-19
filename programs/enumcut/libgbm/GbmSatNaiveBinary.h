@@ -1,4 +1,4 @@
-#ifndef GBMSATNAIVEBINARY_H
+﻿#ifndef GBMSATNAIVEBINARY_H
 #define GBMSATNAIVEBINARY_H
 
 /// @file GbmSatNaiveBinary.h

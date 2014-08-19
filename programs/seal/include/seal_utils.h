@@ -1,4 +1,4 @@
-#ifndef SEAL_UTILS_H
+﻿#ifndef SEAL_UTILS_H
 #define SEAL_UTILS_H
 
 /// @file seal_utils.h

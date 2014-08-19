@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/main/Rtpg.cc
 /// @brief Rtpg の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_DELAYCOVER_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_DELAYCOVER_H
 #define LIBYM_TECHMAP_LUTMAP_DELAYCOVER_H
 
 /// @file libym_techmap/lutmap/DelayCover.h

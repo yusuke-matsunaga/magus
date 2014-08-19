@@ -1,4 +1,4 @@
-
+﻿
 /// @file RwtOp.h
 /// @brief RwtOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)

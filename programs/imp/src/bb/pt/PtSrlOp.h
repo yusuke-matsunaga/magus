@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTSRLOP_H
+﻿#ifndef SRC_PT_PTSRLOP_H
 #define SRC_PT_PTSRLOP_H
 
 /// @file src/pt/PtSrlOp.h

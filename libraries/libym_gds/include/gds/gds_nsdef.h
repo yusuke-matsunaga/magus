@@ -1,4 +1,4 @@
-#ifndef GDS_GDS_NSDEF_H
+﻿#ifndef GDS_GDS_NSDEF_H
 #define GDS_GDS_NSDEF_H
 
 /// @file gds/gds_nsdef.h

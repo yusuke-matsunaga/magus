@@ -1,4 +1,4 @@
-#ifndef MVNCONSTBITSELECT_H
+﻿#ifndef MVNCONSTBITSELECT_H
 #define MVNCONSTBITSELECT_H
 
 /// @file MvnConstBitSelect.h

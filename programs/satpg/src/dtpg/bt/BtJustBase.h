@@ -1,4 +1,4 @@
-#ifndef BTJUSTBASE_H
+﻿#ifndef BTJUSTBASE_H
 #define BTJUSTBASE_H
 
 /// @file BtJustBase.h

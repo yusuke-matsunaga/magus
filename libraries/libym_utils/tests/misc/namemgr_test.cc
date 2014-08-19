@@ -1,4 +1,4 @@
-// $Id: namemgr_test.cc 958 2007-08-28 05:38:02Z matsunaga $
+﻿// $Id: namemgr_test.cc 958 2007-08-28 05:38:02Z matsunaga $
 
 // NameMgr のテスト
 

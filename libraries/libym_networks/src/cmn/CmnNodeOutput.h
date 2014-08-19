@@ -1,4 +1,4 @@
-#ifndef CMNNODEOUTPUT_H
+﻿#ifndef CMNNODEOUTPUT_H
 #define CMNNODEOUTPUT_H
 
 /// @file CmnNodeOutput.h

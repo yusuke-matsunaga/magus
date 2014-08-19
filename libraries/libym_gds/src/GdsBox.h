@@ -1,4 +1,4 @@
-#ifndef GDSBOX_H
+﻿#ifndef GDSBOX_H
 #define GDSBOX_H
 
 /// @file GdsBox.h

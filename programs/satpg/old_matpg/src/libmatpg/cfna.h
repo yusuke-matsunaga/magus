@@ -1,4 +1,4 @@
-#ifndef H_MATPG_CFNA
+﻿#ifndef H_MATPG_CFNA
 #define H_MATPG_CFNA
 
 /*

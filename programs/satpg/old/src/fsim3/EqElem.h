@@ -1,4 +1,4 @@
-#ifndef EQELEM_H
+﻿#ifndef EQELEM_H
 #define EQELEM_H
 
 /// @file src/fsim3/EqElem.h

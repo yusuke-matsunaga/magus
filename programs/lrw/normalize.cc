@@ -1,4 +1,4 @@
-
+﻿
 /// @file normalize.cc
 /// @brief 変数番号を詰めて正極性に整える変換テーブルを作るプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

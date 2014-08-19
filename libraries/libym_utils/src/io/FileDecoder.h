@@ -1,4 +1,4 @@
-#ifndef FILEDECODER_H
+﻿#ifndef FILEDECODER_H
 #define FILEDECODER_H
 
 /// @file FileDecoder.h

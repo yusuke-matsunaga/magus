@@ -1,4 +1,4 @@
-#ifndef ALIASCMD_H
+﻿#ifndef ALIASCMD_H
 #define ALIASCMD_H
 
 /// @file AliasCmd.h

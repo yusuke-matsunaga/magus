@@ -1,4 +1,4 @@
-
+﻿
 /// @file SptExpr.cc
 /// @brief SptExpr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

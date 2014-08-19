@@ -1,4 +1,4 @@
-#ifndef TPGNODE_H
+﻿#ifndef TPGNODE_H
 #define TPGNODE_H
 
 /// @file TpgNode.h

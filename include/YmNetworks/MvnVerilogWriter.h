@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVNVERILOGWRITER_H
+﻿#ifndef NETWORKS_MVNVERILOGWRITER_H
 #define NETWORKS_MVNVERILOGWRITER_H
 
 /// @file YmNetworks/MvnVerilogWriter.h

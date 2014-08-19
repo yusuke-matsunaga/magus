@@ -1,4 +1,4 @@
-#ifndef ELBCONTASSIGN_H
+﻿#ifndef ELBCONTASSIGN_H
 #define ELBCONTASSIGN_H
 
 /// @file ElbContAssign.h

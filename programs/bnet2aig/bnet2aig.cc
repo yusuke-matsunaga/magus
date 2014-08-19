@@ -1,4 +1,4 @@
-
+﻿
 /// @file bnet2aig.cc
 /// @brief bnet から aig を作るテスト
 /// @author Yusuke Matsunaga (松永 裕介)

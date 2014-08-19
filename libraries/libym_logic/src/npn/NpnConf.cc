@@ -1,4 +1,4 @@
-
+﻿
 /// @file NpnConf.cc
 /// @brief NpnConf の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

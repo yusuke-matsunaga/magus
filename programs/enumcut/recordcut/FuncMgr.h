@@ -1,4 +1,4 @@
-#ifndef FUNCMGR_H
+﻿#ifndef FUNCMGR_H
 #define FUNCMGR_H
 
 /// @file FuncMgr.h

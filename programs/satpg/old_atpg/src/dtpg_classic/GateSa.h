@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_GATESA_H
+﻿#ifndef DTPG_CLASSIC_GATESA_H
 #define DTPG_CLASSIC_GATESA_H
 
 /// @file src/dtpg_classic/GateSa.h

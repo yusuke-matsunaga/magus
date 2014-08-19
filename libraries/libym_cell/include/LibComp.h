@@ -1,4 +1,4 @@
-#ifndef LIBCOMP_H
+﻿#ifndef LIBCOMP_H
 #define LIBCOMP_H
 
 /// @file LibComp.h

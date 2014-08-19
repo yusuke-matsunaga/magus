@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLCONTASSIGN_H
+﻿#ifndef VERILOG_VL_VLCONTASSIGN_H
 #define VERILOG_VL_VLCONTASSIGN_H
 
 /// @file YmVerilog/vl/VlContAssign.h

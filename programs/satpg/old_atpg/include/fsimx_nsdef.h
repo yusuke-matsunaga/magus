@@ -1,4 +1,4 @@
-#ifndef ATPG_FSIMX_NSDEF_H
+﻿#ifndef ATPG_FSIMX_NSDEF_H
 #define ATPG_FSIMX_NSDEF_H
 
 /// @file include/fsimx_nsdef.h

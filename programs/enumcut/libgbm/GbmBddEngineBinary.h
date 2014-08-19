@@ -1,4 +1,4 @@
-#ifndef GBMBDDENGINEBINARY_H
+﻿#ifndef GBMBDDENGINEBINARY_H
 #define GBMBDDENGINEBINARY_H
 
 /// @file GbmBddEngineBinary.h

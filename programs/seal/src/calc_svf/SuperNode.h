@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_SUPERNODE_H
+﻿#ifndef CALC_SVF_SUPERNODE_H
 #define CALC_SVF_SUPERNODE_H
 
 /// @file calc_svf/SuperNode.h

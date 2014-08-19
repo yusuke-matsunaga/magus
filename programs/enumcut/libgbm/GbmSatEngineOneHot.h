@@ -1,4 +1,4 @@
-#ifndef GBMSATENGINEONEHOT_H
+﻿#ifndef GBMSATENGINEONEHOT_H
 #define GBMSATENGINEONEHOT_H
 
 /// @file GbmSatEngine.h

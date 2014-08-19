@@ -1,4 +1,4 @@
-#ifndef VLWASSIGN_H
+﻿#ifndef VLWASSIGN_H
 #define VLWASSIGN_H
 
 /// @file VlwAssign.h

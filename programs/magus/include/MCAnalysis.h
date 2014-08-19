@@ -1,4 +1,4 @@
-#ifndef YM_SEAL_MCANALYSIS_H
+﻿#ifndef YM_SEAL_MCANALYSIS_H
 #define YM_SEAL_MCANALYSIS_H
 
 /// @file ym_seal/MCAnalysis.h

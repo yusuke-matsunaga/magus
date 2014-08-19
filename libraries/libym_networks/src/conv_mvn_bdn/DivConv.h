@@ -1,4 +1,4 @@
-#ifndef DIVCONV_H
+﻿#ifndef DIVCONV_H
 #define DIVCONV_H
 
 /// @file DivConv.h

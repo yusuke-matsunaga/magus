@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_EQELEM_H
+﻿#ifndef CALC_CVF_EQELEM_H
 #define CALC_CVF_EQELEM_H
 
 /// @file EqElem.h

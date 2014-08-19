@@ -1,4 +1,4 @@
-#ifndef CONCATCONV_H
+﻿#ifndef CONCATCONV_H
 #define CONCATCONV_H
 
 /// @file ConcatConv.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file LcPatMgr.cc
 /// @brief LcPatMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

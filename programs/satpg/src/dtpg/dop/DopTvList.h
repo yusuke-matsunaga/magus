@@ -1,4 +1,4 @@
-#ifndef DOPTVLIST_H
+﻿#ifndef DOPTVLIST_H
 #define DOPTVLIST_H
 
 /// @file DopTvList.h

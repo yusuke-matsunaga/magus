@@ -1,4 +1,4 @@
-#ifndef SEALCMD_H
+﻿#ifndef SEALCMD_H
 #define SEALCMD_H
 
 /// @file include/SealCmd.h

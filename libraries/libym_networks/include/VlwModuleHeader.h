@@ -1,4 +1,4 @@
-#ifndef VLWMODULEHEADER_H
+﻿#ifndef VLWMODULEHEADER_H
 #define VLWMODULEHEADER_H
 
 /// @file VlwModuleHeader.h

@@ -1,4 +1,4 @@
-#ifndef VERIFIER_H
+﻿#ifndef VERIFIER_H
 #define VERIFIER_H
 
 /// @file Verifier.h

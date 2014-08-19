@@ -1,4 +1,4 @@
-
+﻿
 /// @file pylogic_VarId.cc
 /// @brief VarId の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

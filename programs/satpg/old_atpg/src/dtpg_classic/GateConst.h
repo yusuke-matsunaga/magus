@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_GATECONST_H
+﻿#ifndef DTPG_CLASSIC_GATECONST_H
 #define DTPG_CLASSIC_GATECONST_H
 
 /// @file src/dtpg_classic/GateConst.h

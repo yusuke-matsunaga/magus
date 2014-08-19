@@ -1,4 +1,4 @@
-#ifndef MSOP_H
+﻿#ifndef MSOP_H
 #define MSOP_H
 
 /// @file MsOp.h

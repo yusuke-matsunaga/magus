@@ -1,4 +1,4 @@
-#ifndef ELBATTRIBUTE_H
+﻿#ifndef ELBATTRIBUTE_H
 #define ELBATTRIBUTE_H
 
 /// @file ElbAttribute.h

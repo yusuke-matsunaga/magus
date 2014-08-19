@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLDELAY_H
+﻿#ifndef VERILOG_VL_VLDELAY_H
 #define VERILOG_VL_VLDELAY_H
 
 /// @file YmVerilog/vl/VlDelay.h

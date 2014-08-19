@@ -1,4 +1,4 @@
-#ifndef YMUTILS_ALLOC_H
+﻿#ifndef YMUTILS_ALLOC_H
 #define YMUTILS_ALLOC_H
 
 /// @file YmUtils/Alloc.h

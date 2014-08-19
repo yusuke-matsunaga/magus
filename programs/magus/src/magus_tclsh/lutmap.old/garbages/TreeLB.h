@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_TREELB_H
+﻿#ifndef MAGUS_LUTMAP_TREELB_H
 #define MAGUS_LUTMAP_TREELB_H
 
 /// @file magus/lutmap/TreeLB.h

@@ -1,4 +1,4 @@
-#ifndef H_MATPG_SA_NODE
+﻿#ifndef H_MATPG_SA_NODE
 #define H_MATPG_SA_NODE
 
 /*

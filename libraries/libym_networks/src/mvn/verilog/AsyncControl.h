@@ -1,4 +1,4 @@
-#ifndef ASYNCCONTROL_H
+﻿#ifndef ASYNCCONTROL_H
 #define ASYNCCONTROL_H
 
 /// @file AsyncControl.h

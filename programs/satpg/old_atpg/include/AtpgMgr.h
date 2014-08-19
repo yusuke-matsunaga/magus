@@ -1,4 +1,4 @@
-#ifndef MAIN_ATPGMGR_H
+﻿#ifndef MAIN_ATPGMGR_H
 #define MAIN_ATPGMGR_H
 
 /// @file src/main/AtpgMgr.h

@@ -1,4 +1,4 @@
-#ifndef H_MATPG_SENSE
+﻿#ifndef H_MATPG_SENSE
 #define H_MATPG_SENSE
 
 /*

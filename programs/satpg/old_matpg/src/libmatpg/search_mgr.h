@@ -1,4 +1,4 @@
-#ifndef H_MATPG_SEARCH_MGR
+﻿#ifndef H_MATPG_SEARCH_MGR
 #define H_MATPG_SEARCH_MGR
 
 /*

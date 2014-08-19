@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMNMGR_H
+﻿#ifndef NETWORKS_CMNMGR_H
 #define NETWORKS_CMNMGR_H
 
 /// @file YmNetworks/CmnMgr.h

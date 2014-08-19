@@ -1,4 +1,4 @@
-#ifndef DOTLIBLATCH_H
+﻿#ifndef DOTLIBLATCH_H
 #define DOTLIBLATCH_H
 
 /// @file ym_dotlib/DotlibLatch.h

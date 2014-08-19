@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BNETSOPDECOMP_H
+﻿#ifndef NETWORKS_BNETSOPDECOMP_H
 #define NETWORKS_BNETSOPDECOMP_H
 
 /// @file YmNetworks/BNetSopDecomp.h

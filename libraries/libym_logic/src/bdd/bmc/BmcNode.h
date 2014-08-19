@@ -1,4 +1,4 @@
-#ifndef BMCNODE_H
+﻿#ifndef BMCNODE_H
 #define BMCNODE_H
 
 /// @file BmcNode.h

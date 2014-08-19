@@ -1,4 +1,4 @@
-#ifndef IMPMGR_H
+﻿#ifndef IMPMGR_H
 #define IMPMGR_H
 
 /// @file ImpMgr.h

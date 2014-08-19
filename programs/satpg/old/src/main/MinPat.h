@@ -1,4 +1,4 @@
-#ifndef MAIN_MINPAT_H
+﻿#ifndef MAIN_MINPAT_H
 #define MAIN_MINPAT_H
 
 /// @file src/main/MinPat.h

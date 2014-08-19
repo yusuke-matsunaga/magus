@@ -1,4 +1,4 @@
-#ifndef MCROWHEAD_H
+﻿#ifndef MCROWHEAD_H
 #define MCROWHEAD_H
 
 /// @file McRowHead.h

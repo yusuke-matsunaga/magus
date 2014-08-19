@@ -1,4 +1,4 @@
-
+﻿
 /// @file CptItem.cc
 /// @brief CptItem の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef CILOGICCELL_H
+﻿#ifndef CILOGICCELL_H
 #define CILOGICCELL_H
 
 /// @file CiLogicCell.h

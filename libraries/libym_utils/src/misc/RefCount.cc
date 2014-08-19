@@ -1,4 +1,4 @@
-
+﻿
 /// @file RefCount.cc
 /// @brief RefCount の実装ファイル
 /// @author Yusuke Matsunaga

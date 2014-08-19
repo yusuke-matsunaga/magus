@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMNNODE_H
+﻿#ifndef NETWORKS_CMNNODE_H
 #define NETWORKS_CMNNODE_H
 
 /// @file YmNetworks/CmnNode.h

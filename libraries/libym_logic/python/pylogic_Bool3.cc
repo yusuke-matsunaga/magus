@@ -1,4 +1,4 @@
-
+﻿
 /// @file pylogic_Bool3.cc
 /// @brief Bool3 の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

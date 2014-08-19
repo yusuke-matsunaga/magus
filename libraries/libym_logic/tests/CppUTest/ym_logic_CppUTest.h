@@ -1,4 +1,4 @@
-#ifndef YM_YMLOGIC_CPPUTEST_H
+﻿#ifndef YM_YMLOGIC_CPPUTEST_H
 #define YM_YMLOGIC_CPPUTEST_H
 
 /// @file ym_logic_CppUTest.h

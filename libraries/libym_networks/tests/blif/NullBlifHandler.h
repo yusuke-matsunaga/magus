@@ -1,4 +1,4 @@
-#ifndef NULLBLIFHANDLER_H
+﻿#ifndef NULLBLIFHANDLER_H
 #define NULLBLIFHANDLER_H
 
 /// @file NullblifHandler.h

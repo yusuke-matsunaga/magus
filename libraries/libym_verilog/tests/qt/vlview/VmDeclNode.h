@@ -1,4 +1,4 @@
-#ifndef VMDECLNODE_H
+﻿#ifndef VMDECLNODE_H
 #define VMDECLNODE_H
 
 /// @file VmDeclNode.h

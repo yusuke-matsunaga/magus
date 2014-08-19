@@ -1,4 +1,4 @@
-#ifndef YMSHOBJTABLE_H
+﻿#ifndef YMSHOBJTABLE_H
 #define YMSHOBJTABLE_H
 
 /// @file YmshObjTable.h

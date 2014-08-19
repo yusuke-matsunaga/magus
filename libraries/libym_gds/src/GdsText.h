@@ -1,4 +1,4 @@
-#ifndef GDSTEXT_H
+﻿#ifndef GDSTEXT_H
 #define GDSTEXT_H
 
 /// @file GdsText.h

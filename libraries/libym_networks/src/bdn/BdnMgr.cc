@@ -1,4 +1,4 @@
-
+﻿
 /// @file BdnMgr.cc
 /// @brief BdnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

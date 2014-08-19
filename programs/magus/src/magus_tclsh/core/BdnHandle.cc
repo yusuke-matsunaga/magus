@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/logbase/BdnHandle.cc
 /// @brief BdnHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef CELL_CELLGROUP_H
+﻿#ifndef CELL_CELLGROUP_H
 #define CELL_CELLGROUP_H
 
 /// @file YmCell/CellGroup.h

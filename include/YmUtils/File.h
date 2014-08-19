@@ -1,4 +1,4 @@
-#ifndef YMUTILS_FILE_H
+﻿#ifndef YMUTILS_FILE_H
 #define YMUTILS_FILE_H
 
 /// @file YmUtils/File.h

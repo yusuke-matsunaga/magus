@@ -1,4 +1,4 @@
-
+﻿
 /// @file W1Op.cc
 /// @brief W1Op の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

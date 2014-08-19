@@ -1,4 +1,4 @@
-#ifndef GBMSATCEGARENUM_H
+﻿#ifndef GBMSATCEGARENUM_H
 #define GBMSATCEGARENUM_H
 
 /// @file GbmSatCegarEnum.h

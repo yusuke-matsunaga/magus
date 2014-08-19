@@ -1,4 +1,4 @@
-#ifndef ELBGENVAR_H
+﻿#ifndef ELBGENVAR_H
 #define ELBGENVAR_H
 
 /// @file ElbGenvar.h

@@ -1,4 +1,4 @@
-#ifndef CILATCHCELL_H
+﻿#ifndef CILATCHCELL_H
 #define CILATCHCELL_H
 
 /// @file CiLatchCell.h

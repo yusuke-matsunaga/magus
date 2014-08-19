@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_CURNETWORK_H
+﻿#ifndef SRC_CORE_CURNETWORK_H
 #define SRC_CoRE_CURNETWORK_H
 
 /// @file src/core/CurNetwork.h

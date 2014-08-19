@@ -1,4 +1,4 @@
-#ifndef RXORCONV_H
+﻿#ifndef RXORCONV_H
 #define RXORCONV_H
 
 /// @file RxorConv.h

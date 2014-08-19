@@ -1,4 +1,4 @@
-#ifndef LBCS_H
+﻿#ifndef LBCS_H
 #define LBCS_H
 
 /// @file LbCS.h

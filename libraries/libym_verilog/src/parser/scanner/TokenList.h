@@ -1,4 +1,4 @@
-#ifndef TOKENLIST_H
+﻿#ifndef TOKENLIST_H
 #define TOKENLIST_H
 
 /// @file TokenList.h

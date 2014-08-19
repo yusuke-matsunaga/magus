@@ -1,4 +1,4 @@
-#ifndef ORCONV_H
+﻿#ifndef ORCONV_H
 #define ORCONV_H
 
 /// @file OrConv.h

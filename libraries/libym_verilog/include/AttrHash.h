@@ -1,4 +1,4 @@
-#ifndef ATTRHASH_H
+﻿#ifndef ATTRHASH_H
 #define ATTRHASH_H
 
 /// @file AttrHash.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file McOp.cc
 /// @brief McOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

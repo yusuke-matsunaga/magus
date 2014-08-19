@@ -1,4 +1,4 @@
-
+﻿
 /// @file GenBase.cc
 /// @brief GenBase の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

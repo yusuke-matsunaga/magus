@@ -1,4 +1,4 @@
-#ifndef EUFDIS_H
+﻿#ifndef EUFDIS_H
 #define EUFDIS_H
 
 /// @file EufDis.h

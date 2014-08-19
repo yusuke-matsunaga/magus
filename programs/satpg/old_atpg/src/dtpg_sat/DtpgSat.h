@@ -1,4 +1,4 @@
-#ifndef DTPGSAT_H
+﻿#ifndef DTPGSAT_H
 #define DTPGSAT_H
 
 /// @file include/DtpgSat.h

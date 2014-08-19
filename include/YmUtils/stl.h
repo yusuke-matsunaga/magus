@@ -1,4 +1,4 @@
-#ifndef YMUTILS_STL_H
+﻿#ifndef YMUTILS_STL_H
 #define YMUTILS_STL_H
 
 /// @file YmUtils/stl.h

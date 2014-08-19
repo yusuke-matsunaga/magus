@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/WeightCover.cc
 /// @brief DAG covering のヒューリスティック
 /// @author Yusuke Matsunaga (松永 裕介)

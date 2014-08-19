@@ -1,4 +1,4 @@
-#ifndef ELBEXPR_H
+﻿#ifndef ELBEXPR_H
 #define ELBEXPR_H
 
 /// @file ElbExpr.h

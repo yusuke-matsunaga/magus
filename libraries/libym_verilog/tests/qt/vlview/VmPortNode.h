@@ -1,4 +1,4 @@
-#ifndef VMPORTNODE_H
+﻿#ifndef VMPORTNODE_H
 #define VMPORTNODE_H
 
 /// @file VmPortNode.h

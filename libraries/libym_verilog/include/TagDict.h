@@ -1,4 +1,4 @@
-#ifndef TAGDICT_H
+﻿#ifndef TAGDICT_H
 #define TAGDICT_H
 
 /// @file TagDict.h

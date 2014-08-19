@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/dtpg_classic/GateSa.cc
 /// @brief GateSa の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

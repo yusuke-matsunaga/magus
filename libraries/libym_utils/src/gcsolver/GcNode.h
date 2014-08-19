@@ -1,4 +1,4 @@
-#ifndef GCNODE_H
+﻿#ifndef GCNODE_H
 #define GCNODE_H
 
 /// @file GcNode.h

@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_PTARRAY_H
+﻿#ifndef VERILOG_PT_PTARRAY_H
 #define VERILOG_PT_PTARRAY_H
 
 /// @file YmVerilog/pt/PtArray.h

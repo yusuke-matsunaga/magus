@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_cec/check_ceq.cc
 /// @brief check_ceq の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

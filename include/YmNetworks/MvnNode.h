@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVNNODE_H
+﻿#ifndef NETWORKS_MVNNODE_H
 #define NETWORKS_MVNNODE_H
 
 /// @file YmNetworks/MvnNode.h

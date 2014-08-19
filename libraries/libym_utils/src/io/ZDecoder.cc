@@ -1,4 +1,4 @@
-
+﻿
 /// @file ZDecoder.cc
 /// @brief CpressDecoder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

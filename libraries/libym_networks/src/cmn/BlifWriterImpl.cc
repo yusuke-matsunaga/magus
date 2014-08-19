@@ -1,4 +1,4 @@
-
+﻿
 /// @file BlifWriterImpl.cc
 /// @brief BlifWriterImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

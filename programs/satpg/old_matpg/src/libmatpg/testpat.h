@@ -1,4 +1,4 @@
-#ifndef H_MATPG_TESTPAT
+﻿#ifndef H_MATPG_TESTPAT
 #define H_MATPG_TESTPAT
 
 /*

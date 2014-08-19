@@ -1,4 +1,4 @@
-#ifndef MISLIBMGRIMPL_H
+﻿#ifndef MISLIBMGRIMPL_H
 #define MISLIBMGRIMPL_H
 
 /// @file MislibMgrImpl.h

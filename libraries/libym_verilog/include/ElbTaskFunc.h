@@ -1,4 +1,4 @@
-#ifndef ELBTASKFUNC_H
+﻿#ifndef ELBTASKFUNC_H
 #define ELBTASKFUNC_H
 
 /// @file ElbTaskFunc.h

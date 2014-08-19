@@ -1,4 +1,4 @@
-#ifndef SELNAIVE_H
+﻿#ifndef SELNAIVE_H
 #define SELNAIVE_H
 
 /// @file SelNaive.h

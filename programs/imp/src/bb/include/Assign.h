@@ -1,4 +1,4 @@
-#ifndef INCLUDE_ASSIGN_H
+﻿#ifndef INCLUDE_ASSIGN_H
 #define INCLUDE_ASSIGN_H
 
 /// @file include/Assign.h

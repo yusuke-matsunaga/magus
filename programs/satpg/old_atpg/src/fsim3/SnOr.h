@@ -1,4 +1,4 @@
-#ifndef FSIM3_SNOR_H
+﻿#ifndef FSIM3_SNOR_H
 #define FSIM3_SNOR_H
 
 /// @file fsim/SnOr.h

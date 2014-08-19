@@ -1,4 +1,4 @@
-#ifndef TCLPP_TCLPP_NSDEF_H
+﻿#ifndef TCLPP_TCLPP_NSDEF_H
 #define TCLPP_TCLPP_NSDEF_H
 
 /// @file YmTclpp/tclpp_nsdef.h

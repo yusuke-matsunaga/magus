@@ -1,4 +1,4 @@
-// $Id: randpermgen_test.cc 1978 2009-02-06 12:29:16Z matsunaga $
+﻿// $Id: randpermgen_test.cc 1978 2009-02-06 12:29:16Z matsunaga $
 
 // RandPermGen のテスト
 

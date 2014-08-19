@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pt/PtAndOp.cc
 /// @brief PtAndOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef LUT444MATCH_H
+﻿#ifndef LUT444MATCH_H
 #define LUT444MATCH_H
 
 /// @file Lut444Match.h

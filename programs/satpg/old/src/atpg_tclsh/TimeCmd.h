@@ -1,4 +1,4 @@
-#ifndef TIMECMD_H
+﻿#ifndef TIMECMD_H
 #define TIMECMD_H
 
 /// @file src/atpg_tclsh/TimeCmd.h

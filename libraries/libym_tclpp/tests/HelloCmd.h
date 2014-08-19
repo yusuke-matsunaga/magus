@@ -1,4 +1,4 @@
-#ifndef HELLOCMD_H
+﻿#ifndef HELLOCMD_H
 #define HELLOCMD_H
 
 /// @file HelloCmd.h

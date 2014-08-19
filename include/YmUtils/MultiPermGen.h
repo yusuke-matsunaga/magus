@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MULTIPERMGEN_H
+﻿#ifndef YMUTILS_MULTIPERMGEN_H
 #define YMUTILS_MULTIPERMGEN_H
 
 /// @file YmUtils/MultiPermGen.h

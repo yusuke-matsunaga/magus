@@ -1,4 +1,4 @@
-
+﻿
 /// @file tests/enumcut/enumcut.cc
 /// @brief カットの列挙プログラム
 /// @author Yusuke Matsunaga (松永 裕介)

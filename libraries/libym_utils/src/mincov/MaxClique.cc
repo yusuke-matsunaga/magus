@@ -1,4 +1,4 @@
-
+﻿
 /// @file MaxClique.cc
 /// @brief MaxClique の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

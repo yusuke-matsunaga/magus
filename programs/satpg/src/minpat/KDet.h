@@ -1,4 +1,4 @@
-#ifndef KDET_H
+﻿#ifndef KDET_H
 #define KDET_H
 
 /// @file KDet.h

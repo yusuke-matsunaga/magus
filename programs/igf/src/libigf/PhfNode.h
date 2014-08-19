@@ -1,4 +1,4 @@
-#ifndef PHFNODE_H
+﻿#ifndef PHFNODE_H
 #define PFHNODE_H
 
 /// @file PhfNode.h

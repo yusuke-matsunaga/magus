@@ -1,4 +1,4 @@
-#ifndef IMPVALS_H
+﻿#ifndef IMPVALS_H
 #define IMPVALS_H
 
 /// @file ImpVals.h

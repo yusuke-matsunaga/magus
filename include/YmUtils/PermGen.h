@@ -1,4 +1,4 @@
-#ifndef YMUTILS_PERMGEN_H
+﻿#ifndef YMUTILS_PERMGEN_H
 #define YMUTILS_PERMGEN_H
 
 /// @file YmUtils/PermGen.h

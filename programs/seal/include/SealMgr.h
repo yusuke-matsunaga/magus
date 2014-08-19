@@ -1,4 +1,4 @@
-#ifndef SEALMGR_H
+﻿#ifndef SEALMGR_H
 #define SEALMGR_H
 
 /// @file include/SealMgr.h

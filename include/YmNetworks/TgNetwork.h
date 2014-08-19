@@ -1,4 +1,4 @@
-#ifndef NETWORKS_TGNETWORK_H
+﻿#ifndef NETWORKS_TGNETWORK_H
 #define NETWORKS_TGNETWORK_H
 
 /// @file YmNetworks/TgNetwork.h

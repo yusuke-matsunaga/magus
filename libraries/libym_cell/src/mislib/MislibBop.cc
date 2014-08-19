@@ -1,4 +1,4 @@
-
+﻿
 /// @file MislibBop.cc
 /// @brief MislibBop, MislibAnd, MislibOr, MislibXor の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

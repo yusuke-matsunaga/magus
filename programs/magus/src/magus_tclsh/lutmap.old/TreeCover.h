@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_TREECOVER_H
+﻿#ifndef MAGUS_LUTMAP_TREECOVER_H
 #define MAGUS_LUTMAP_TREECOVER_H
 
 /// @file matus/lutmap/TreeCover.h

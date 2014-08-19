@@ -1,4 +1,4 @@
-#ifndef CPTIO_H
+﻿#ifndef CPTIO_H
 #define CPTIO_H
 
 /// @file CptIO.h

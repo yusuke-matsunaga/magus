@@ -1,4 +1,4 @@
-#ifndef DTPGOLDCMD_H
+﻿#ifndef DTPGOLDCMD_H
 #define DTPGOLDCMD_H
 
 /// @file DtpgOldCmd.h

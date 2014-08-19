@@ -1,4 +1,4 @@
-#ifndef SRC_SEAL_DUPCMD_H
+﻿#ifndef SRC_SEAL_DUPCMD_H
 #define SRC_SEAL_DUPCMD_H
 
 /// @file src/seal/DupCmd.h

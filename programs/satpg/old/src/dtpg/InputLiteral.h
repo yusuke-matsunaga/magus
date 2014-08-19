@@ -1,4 +1,4 @@
-#ifndef INPUTLITERAL_H
+﻿#ifndef INPUTLITERAL_H
 #define INPUTLITERAL_H
 
 /// @file atpg/src/dtpg/InputLiteral.h

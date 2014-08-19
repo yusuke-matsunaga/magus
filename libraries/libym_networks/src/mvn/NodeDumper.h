@@ -1,4 +1,4 @@
-#ifndef NODEDUMPER_H
+﻿#ifndef NODEDUMPER_H
 #define NODEDUMPER_H
 
 /// @file NodeDumper.h

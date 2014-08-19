@@ -1,4 +1,4 @@
-#ifndef VLDUMPERIMPL_H
+﻿#ifndef VLDUMPERIMPL_H
 #define VLDUMPERIMPL_H
 
 /// @file VlDumperImpl.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/dtpg_classic/GateBuf.cc
 /// @brief GateBuf の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

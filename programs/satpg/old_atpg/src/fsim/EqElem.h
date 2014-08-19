@@ -1,4 +1,4 @@
-#ifndef FSIM_EQELEM_H
+﻿#ifndef FSIM_EQELEM_H
 #define FSIM_EQELEM_H
 
 /// @file fsim/EqElem.h

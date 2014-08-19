@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLPARAMASSIGN_H
+﻿#ifndef VERILOG_VL_VLPARAMASSIGN_H
 #define VERILOG_VL_VLPARAMASSIGN_H
 
 /// @file YmVerilog/vl/VlParamAssign.h

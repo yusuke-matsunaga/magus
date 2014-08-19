@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMT_NSDEF_H
+﻿#ifndef YMYMLOGIC_SMT_NSDEF_H
 #define YMYMLOGIC_SMT_NSDEF_H
 
 /// @file YmLogic/smt_nsdef.h

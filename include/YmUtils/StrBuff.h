@@ -1,4 +1,4 @@
-#ifndef YMUTILS_STRBUFF_H
+﻿#ifndef YMUTILS_STRBUFF_H
 #define YMUTILS_STRBUFF_H
 
 /// @file YmUtils/StrBuff.h

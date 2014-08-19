@@ -1,4 +1,4 @@
-#ifndef MISLIB_NSDEF_H
+﻿#ifndef MISLIB_NSDEF_H
 #define MISLIB_NSDEF_H
 
 /// @file mislib_nsdef.h

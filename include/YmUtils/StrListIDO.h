@@ -1,4 +1,4 @@
-#ifndef YMUTILS_STRLISTIDO_H
+﻿#ifndef YMUTILS_STRLISTIDO_H
 #define YMUTILS_STRLISTIDO_H
 
 /// @file YmUtils/StrListIDO.h

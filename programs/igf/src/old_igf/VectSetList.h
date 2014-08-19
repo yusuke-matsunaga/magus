@@ -1,4 +1,4 @@
-#ifndef VECTSETLIST_H
+﻿#ifndef VECTSETLIST_H
 #define VECTSETLIST_H
 
 /// @file VectSetList.h

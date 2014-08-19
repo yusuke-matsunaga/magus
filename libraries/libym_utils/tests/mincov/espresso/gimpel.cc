@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Revision Control Information
  *
  * $Source: /users/pchong/CVS/sis/espresso/gimpel.c,v $

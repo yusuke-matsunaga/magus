@@ -1,4 +1,4 @@
-#ifndef DOTLIBSCANNER_H
+﻿#ifndef DOTLIBSCANNER_H
 #define DOTLIBSCANNER_H
 
 /// @file DotlibScanner.h

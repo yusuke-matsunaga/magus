@@ -1,4 +1,4 @@
-
+﻿
 /// @file StrPool.cc
 /// @brief StrPool と ShString の実装ファイル
 /// @author Yusuke Matsunaga

@@ -1,4 +1,4 @@
-#ifndef LRMGR_H
+﻿#ifndef LRMGR_H
 #define LRMGR_H
 
 /// @file LrMgr.h

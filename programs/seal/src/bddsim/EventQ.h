@@ -1,4 +1,4 @@
-#ifndef BDDSIM_EVENTQ_H
+﻿#ifndef BDDSIM_EVENTQ_H
 #define BDDSIM_EVENTQ_H
 
 /// @file bddsim/EventQ.h

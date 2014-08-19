@@ -1,4 +1,4 @@
-#ifndef SRC_LOGBASE_BNETHANDLE_H
+﻿#ifndef SRC_LOGBASE_BNETHANDLE_H
 #define SRC_LOGBASE_BNETHANDLE_H
 
 /// @file src/logbase/BNetHandle.h

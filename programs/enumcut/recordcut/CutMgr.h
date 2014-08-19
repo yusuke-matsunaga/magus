@@ -1,4 +1,4 @@
-#ifndef CUTMGR_H
+﻿#ifndef CUTMGR_H
 #define CUTMGR_H
 
 /// @file CutMgr.h

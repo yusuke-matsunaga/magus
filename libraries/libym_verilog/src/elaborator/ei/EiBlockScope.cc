@@ -1,4 +1,4 @@
-
+﻿
 /// @file EiBlockScope.cc
 /// @brief EiBlockScope の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

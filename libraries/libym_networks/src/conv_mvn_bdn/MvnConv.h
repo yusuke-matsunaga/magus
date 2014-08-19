@@ -1,4 +1,4 @@
-#ifndef MVNCONV_H
+﻿#ifndef MVNCONV_H
 #define MVNCONV_H
 
 /// @file MvnConv.h

@@ -1,4 +1,4 @@
-#ifndef CELL_CELLFFINFO_H
+﻿#ifndef CELL_CELLFFINFO_H
 #define CELL_CELLFFINFO_H
 
 /// @file YmCell/CellFFInfo.h

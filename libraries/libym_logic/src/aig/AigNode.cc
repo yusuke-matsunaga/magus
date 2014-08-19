@@ -1,4 +1,4 @@
-
+﻿
 /// @file AigNode.cc
 /// @brief AigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

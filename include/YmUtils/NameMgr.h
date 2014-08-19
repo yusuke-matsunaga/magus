@@ -1,4 +1,4 @@
-#ifndef YMUTILS_NAMEMGR_H
+﻿#ifndef YMUTILS_NAMEMGR_H
 #define YMUTILS_NAMEMGR_H
 
 /// @file YmUtils/NameMgr.h

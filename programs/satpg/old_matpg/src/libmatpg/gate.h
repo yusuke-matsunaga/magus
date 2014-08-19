@@ -1,4 +1,4 @@
-#ifndef H_MATPG_GATE
+﻿#ifndef H_MATPG_GATE
 #define H_MATPG_GATE
 
 /*

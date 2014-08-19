@@ -1,4 +1,4 @@
-#ifndef GDS_GDSSTRING_H
+﻿#ifndef GDS_GDSSTRING_H
 #define GDS_GDSSTRING_H
 
 /// @file gds/GdsString.h

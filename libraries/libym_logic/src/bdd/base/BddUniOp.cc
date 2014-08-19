@@ -1,4 +1,4 @@
-
+﻿
 /// @file BddUniOp.cc
 /// @brief BddUniOp
 /// @author Yusuke Matsunaga (松永 裕介)

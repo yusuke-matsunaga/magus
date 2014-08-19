@@ -1,4 +1,4 @@
-#ifndef ZDDMGRIMPL_H
+﻿#ifndef ZDDMGRIMPL_H
 #define ZDDMGRIMPL_H
 
 /// @file ZddMgrImpl.h

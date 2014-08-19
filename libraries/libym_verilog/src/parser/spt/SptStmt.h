@@ -1,4 +1,4 @@
-#ifndef SPTSTMT_H
+﻿#ifndef SPTSTMT_H
 #define SPTSTMT_H
 
 /// @file SptStmt.h

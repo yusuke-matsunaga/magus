@@ -1,4 +1,4 @@
-#ifndef GBMLIT_H
+﻿#ifndef GBMLIT_H
 #define GBMLIT_H
 
 /// @file GbmLit.h

@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVNDUMPER_H
+﻿#ifndef NETWORKS_MVNDUMPER_H
 #define NETWORKS_MVNDUMPER_H
 
 /// @file YmNetworks/MvnDumper.h

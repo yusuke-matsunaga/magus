@@ -1,4 +1,4 @@
-#ifndef BDDNODE_H
+﻿#ifndef BDDNODE_H
 #define BDDNODE_H
 
 /// @file BddNode.h

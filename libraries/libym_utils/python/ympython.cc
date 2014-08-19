@@ -1,4 +1,4 @@
-
+﻿
 /// @file ympython.cc
 /// @brief ymtools の Python 用の拡張モジュールの実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

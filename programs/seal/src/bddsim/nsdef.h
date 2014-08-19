@@ -1,4 +1,4 @@
-#ifndef BDDSIM_NSDEF_H
+﻿#ifndef BDDSIM_NSDEF_H
 #define BDDSIM_NSDEF_H
 
 /// @file bddsim/nsdef.h

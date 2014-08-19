@@ -1,4 +1,4 @@
-
+﻿
 /// @file scalarval_test.cc
 /// @brief VlScalarVal のテスト
 /// @author Yusuke Matsunaga (松永 裕介)

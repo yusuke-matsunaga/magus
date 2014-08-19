@@ -1,4 +1,4 @@
-#ifndef CAPOP_H
+﻿#ifndef CAPOP_H
 #define CAPOP_H
 
 /// @file CapOp.h

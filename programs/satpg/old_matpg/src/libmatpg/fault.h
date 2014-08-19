@@ -1,4 +1,4 @@
-#ifndef H_MATPG_FAULT
+﻿#ifndef H_MATPG_FAULT
 #define H_MATPG_FAULT
 
 /*

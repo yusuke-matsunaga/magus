@@ -1,4 +1,4 @@
-#ifndef MISLIBNOT_H
+﻿#ifndef MISLIBNOT_H
 #define MISLIBNOT_H
 
 /// @file MislibNot.h

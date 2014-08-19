@@ -1,4 +1,4 @@
-#ifndef YM_BDD_WALSHSIG_H
+﻿#ifndef YM_BDD_WALSHSIG_H
 #define YM_BDD_WALSHSIG_H
 
 // $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_bdd/npn/WalshSig.h,v $

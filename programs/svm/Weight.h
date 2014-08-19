@@ -1,4 +1,4 @@
-#ifndef WEIGHT_H
+﻿#ifndef WEIGHT_H
 #define WEIGHT_H
 
 /// @file Weight.h

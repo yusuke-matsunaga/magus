@@ -1,4 +1,4 @@
-#ifndef LBMAX_H
+﻿#ifndef LBMAX_H
 #define LBMAX_H
 
 /// @file LbMax.h

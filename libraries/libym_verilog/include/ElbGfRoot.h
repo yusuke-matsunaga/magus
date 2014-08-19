@@ -1,4 +1,4 @@
-#ifndef ELBGFROOT_H
+﻿#ifndef ELBGFROOT_H
 #define ELBGFROOT_H
 
 /// @file ElbGfRoot.h

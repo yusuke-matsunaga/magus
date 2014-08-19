@@ -1,4 +1,4 @@
-#ifndef CNFIMP2_H
+﻿#ifndef CNFIMP2_H
 #define CNFIMP2_H
 
 /// @file CnfImp2.h

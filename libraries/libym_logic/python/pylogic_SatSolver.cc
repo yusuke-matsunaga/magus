@@ -1,4 +1,4 @@
-
+﻿
 /// @file pylogic_SatSolver.cc
 /// @brief SatSolver の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

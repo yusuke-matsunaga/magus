@@ -1,4 +1,4 @@
-#ifndef GRAPHSAT_H
+﻿#ifndef GRAPHSAT_H
 #define GRAPHSAT_H
 
 /// @file GraphSat.h

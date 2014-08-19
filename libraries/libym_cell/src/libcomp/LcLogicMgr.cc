@@ -1,4 +1,4 @@
-
+﻿
 /// @file LcLogicMgr.cc
 /// @brief LcLogicMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

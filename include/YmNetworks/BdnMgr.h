@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNMGR_H
+﻿#ifndef NETWORKS_BDNMGR_H
 #define NETWORKS_BDNMGR_H
 
 /// @file YmNetworks/BdnMgr.h

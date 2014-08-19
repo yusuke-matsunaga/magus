@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_SEARCHMGR_H
+﻿#ifndef DTPG_CLASSIC_SEARCHMGR_H
 #define DTPG_CLASSIC_SEARCHMGR_H
 
 /// @file src/dtpg_classic/SearchMgr.h

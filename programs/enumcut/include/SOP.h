@@ -1,4 +1,4 @@
-#ifndef SOP_H
+﻿#ifndef SOP_H
 #define SOP_H
 
 /// @file SOP.h

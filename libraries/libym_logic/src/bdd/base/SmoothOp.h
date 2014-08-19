@@ -1,4 +1,4 @@
-#ifndef SMOOTHOP_H
+﻿#ifndef SMOOTHOP_H
 #define SMOTTHOP_H
 
 /// @file SmoothOp.h

@@ -1,4 +1,4 @@
-#ifndef TESTBLIFHANDLER_H
+﻿#ifndef TESTBLIFHANDLER_H
 #define TESTBLIFHANDLER_H
 
 /// @file TestBlifHandler.h

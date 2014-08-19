@@ -1,4 +1,4 @@
-
+﻿
 /// @file recordcut.cc
 /// @brief カットを記録するプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

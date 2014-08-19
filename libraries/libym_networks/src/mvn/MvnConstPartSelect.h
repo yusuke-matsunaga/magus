@@ -1,4 +1,4 @@
-#ifndef MVNCONSTPARTSELECT_H
+﻿#ifndef MVNCONSTPARTSELECT_H
 #define MVNCONSTPARTSELECT_H
 
 /// @file MvnConstPartSelect.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file SptStmt.cc
 /// @brief SptStmt の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

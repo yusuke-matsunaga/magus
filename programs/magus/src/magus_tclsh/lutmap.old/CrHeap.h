@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CRHEAP_H
+﻿#ifndef MAGUS_LUTMAP_CRHEAP_H
 #define MAGUS_LUTMAP_CRHEAP_H
 
 /// @file magus/lutmap/CrHeap.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file TokenList.cc
 /// @brief TokenList の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef BLIFWRITERIMPL_H
+﻿#ifndef BLIFWRITERIMPL_H
 #define BLIFWRITERIMPL_H
 
 /// @file BlifWriterImpl.h

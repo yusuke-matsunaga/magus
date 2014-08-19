@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLUSERSYSTF_H
+﻿#ifndef VERILOG_VL_VLUSERSYSTF_H
 #define VERILOG_VL_VLUSERSYSTF_H
 
 /// @file YmVerilog/vl/VlUserSystf.h

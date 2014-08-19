@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/WeightLB.cc
 /// @brief WeightLB の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef GBMSATCEGARBINARY_H
+﻿#ifndef GBMSATCEGARBINARY_H
 #define GBMSATCEGARBINARY_H
 
 /// @file GbmSatCegarBinary.h

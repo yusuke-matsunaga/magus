@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTCONSTNODE_H
+﻿#ifndef SRC_PT_PTCONSTNODE_H
 #define SRC_PT_PTCONSTNODE_H
 
 /// @file src/pt/PtConstNode.h

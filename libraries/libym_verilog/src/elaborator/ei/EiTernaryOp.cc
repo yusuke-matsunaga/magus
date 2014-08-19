@@ -1,4 +1,4 @@
-
+﻿
 /// @file EiTernaryOp.cc
 /// @brief EiTernaryOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

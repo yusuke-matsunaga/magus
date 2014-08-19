@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNDUMPER_H
+﻿#ifndef NETWORKS_BDNDUMPER_H
 #define NETWORKS_BDNDUMPER_H
 
 /// @file YmNetworks/BdnDumper.h

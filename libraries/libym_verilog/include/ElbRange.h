@@ -1,4 +1,4 @@
-#ifndef ELBRANGE_H
+﻿#ifndef ELBRANGE_H
 #define ELBRANGE_H
 
 /// @file ElbRange.h

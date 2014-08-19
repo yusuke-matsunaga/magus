@@ -1,4 +1,4 @@
-#ifndef SMTENGINESINGLE_H
+﻿#ifndef SMTENGINESINGLE_H
 #define SMTENGINESINGLE_H
 
 /// @file SmtEngineSingle.h

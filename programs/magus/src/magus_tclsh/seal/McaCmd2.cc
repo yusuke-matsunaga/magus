@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/src/seal/McaCmd2.cc
 /// @brief McaCmd2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

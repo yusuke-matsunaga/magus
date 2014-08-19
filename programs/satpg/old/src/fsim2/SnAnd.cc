@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/fsim2/SnAnd.cc
 /// @brief SnAnd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

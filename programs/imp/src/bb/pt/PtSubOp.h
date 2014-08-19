@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTSUBOP_H
+﻿#ifndef SRC_PT_PTSUBOP_H
 #define SRC_PT_PTSUBOP_H
 
 /// @file src/pt/PtSubOp.h

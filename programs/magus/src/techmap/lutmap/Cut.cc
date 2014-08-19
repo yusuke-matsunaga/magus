@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_techmap/lutmap/Cut.cc
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

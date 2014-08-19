@@ -1,4 +1,4 @@
-#ifndef SATIMP_H
+﻿#ifndef SATIMP_H
 #define SATIMP_H
 
 /// @file SatImp.h

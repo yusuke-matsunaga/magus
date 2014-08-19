@@ -1,4 +1,4 @@
-#ifndef DIFFOP2_H
+﻿#ifndef DIFFOP2_H
 #define DIFFOP2_H
 
 /// @file DiffOp2.h

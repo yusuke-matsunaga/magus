@@ -1,4 +1,4 @@
-#ifndef GATETYPE_H
+﻿#ifndef GATETYPE_H
 #define GATETYPE_H
 
 /// @file GateType.h

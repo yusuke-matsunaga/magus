@@ -1,4 +1,4 @@
-#ifndef MINPATCMD_H
+﻿#ifndef MINPATCMD_H
 #define MINPATCMD_H
 
 /// @file MinPatCmd.h

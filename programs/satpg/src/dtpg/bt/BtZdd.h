@@ -1,4 +1,4 @@
-#ifndef BTZDD_H
+﻿#ifndef BTZDD_H
 #define BTZDD_H
 
 /// @file BtZdd.h

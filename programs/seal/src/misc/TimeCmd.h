@@ -1,4 +1,4 @@
-#ifndef SEAL_MAIN_TIMECMD_H
+﻿#ifndef SEAL_MAIN_TIMECMD_H
 #define SEAL_MAIN_TIMECMD_H
 
 /// @file seal/src/misc/TimeCmd.h

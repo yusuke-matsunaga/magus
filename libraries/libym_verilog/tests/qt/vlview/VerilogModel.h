@@ -1,4 +1,4 @@
-#ifndef VERILOGMODEL_H
+﻿#ifndef VERILOGMODEL_H
 #define VERILOGMODEL_H
 
 /// @file VerilogModel.h

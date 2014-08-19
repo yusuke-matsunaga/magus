@@ -1,4 +1,4 @@
-#ifndef TCLPP_TCLBASE_H
+﻿#ifndef TCLPP_TCLBASE_H
 #define TCLPP_TCLBASE_H
 
 /// @file YmTclpp/TclBase.h

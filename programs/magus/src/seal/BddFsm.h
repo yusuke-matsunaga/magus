@@ -1,4 +1,4 @@
-#ifndef LIBYM_SEAL_BDDFSM_H
+﻿#ifndef LIBYM_SEAL_BDDFSM_H
 #define LIBYM_SEAL_BDDFSM_H
 
 /// @file libym_seal/BddFsm.h

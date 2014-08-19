@@ -1,4 +1,4 @@
-#ifndef FLOWNODEHEAP_H
+﻿#ifndef FLOWNODEHEAP_H
 #define FLOWNODEHEAP_H
 
 /// @file FlowNodeHeap.h

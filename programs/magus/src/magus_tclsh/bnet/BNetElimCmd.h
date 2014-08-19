@@ -1,4 +1,4 @@
-#ifndef MAGUS_LOGBASE_ELIMCMD_H
+﻿#ifndef MAGUS_LOGBASE_ELIMCMD_H
 #define MAGUS_LOGBASE_ELIMCMD_H
 
 /// @file magus/logbase/ElimCmd.h

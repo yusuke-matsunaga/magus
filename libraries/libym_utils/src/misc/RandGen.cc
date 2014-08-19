@@ -1,4 +1,4 @@
-
+﻿
 /// @file RandGen.cc
 /// @brief RandGen の実装ファイル
 /// @author Yusuke Matsunaga

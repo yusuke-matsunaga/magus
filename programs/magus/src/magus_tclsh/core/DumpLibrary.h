@@ -1,4 +1,4 @@
-#ifndef DUMPLIBRARY_H
+﻿#ifndef DUMPLIBRARY_H
 #define DUMPLIBRARY_H
 
 /// @file DumpLibrary.h

@@ -1,4 +1,4 @@
-#ifndef LSIMMPX_H
+﻿#ifndef LSIMMPX_H
 #define LSIMMPX_H
 
 /// @file LsimMpx.h

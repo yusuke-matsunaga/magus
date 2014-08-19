@@ -1,4 +1,4 @@
-#ifndef YMUTILS_GCSOLVER_H
+﻿#ifndef YMUTILS_GCSOLVER_H
 #define YMUTILS_GCSOLVER_H
 
 /// @file YmUtils/GcSolver.h

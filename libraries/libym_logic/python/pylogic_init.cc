@@ -1,4 +1,4 @@
-
+﻿
 /// @file pylogic_init.cc
 /// @brief libym_logic の Python 用拡張モジュールの初期化
 /// @author Yusuke Matsunaga (松永 裕介)

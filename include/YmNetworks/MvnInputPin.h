@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVNINPUTPIN_H
+﻿#ifndef NETWORKS_MVNINPUTPIN_H
 #define NETWORKS_MVNINPUTPIN_H
 
 /// @file YmNetworks/MvnInputPin.h

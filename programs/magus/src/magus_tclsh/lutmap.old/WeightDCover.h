@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_WEIGHTDCOVER_H
+﻿#ifndef MAGUS_LUTMAP_WEIGHTDCOVER_H
 #define MAGUS_LUTMAP_WEIGHTDCOVER_H
 
 /// @file magus/lutmap/WeightDCover.h

@@ -1,4 +1,4 @@
-#ifndef YMUTILS_HEAPTREE_H
+﻿#ifndef YMUTILS_HEAPTREE_H
 #define YMUTILS_HEAPTREE_H
 
 /// @file YmUtils/HeapTree.h

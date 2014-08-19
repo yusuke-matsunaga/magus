@@ -1,4 +1,4 @@
-#ifndef MVNDFF_H
+﻿#ifndef MVNDFF_H
 #define MVNDFF_H
 
 /// @file MvnDff.h

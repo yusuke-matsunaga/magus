@@ -1,4 +1,4 @@
-#ifndef MAGUS_CORE_READISCAS89_H
+﻿#ifndef MAGUS_CORE_READISCAS89_H
 #define MAGUS_CORE_READISCAS89_H
 
 /// @file src/core/ReadIscas89.h

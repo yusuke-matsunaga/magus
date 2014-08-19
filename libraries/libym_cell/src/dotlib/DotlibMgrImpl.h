@@ -1,4 +1,4 @@
-#ifndef DOTLIBMGRIMPL_H
+﻿#ifndef DOTLIBMGRIMPL_H
 #define DOTLIBMGRIMPL_H
 
 /// @file DotlibMgrImpl.h

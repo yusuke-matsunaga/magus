@@ -1,4 +1,4 @@
-#ifndef SIMFAULT_H
+﻿#ifndef SIMFAULT_H
 #define SIMFAULT_H
 
 /// @file SimFault.h

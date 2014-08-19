@@ -1,4 +1,4 @@
-#ifndef NAIMP_H
+﻿#ifndef NAIMP_H
 #define NAIMP_H
 
 /// @file NaImp.h

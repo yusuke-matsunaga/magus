@@ -1,4 +1,4 @@
-#ifndef GDS_GDSUNITS_H
+﻿#ifndef GDS_GDSUNITS_H
 #define GDS_GDSUNITS_H
 
 /// @file gds/GdsUnits.h

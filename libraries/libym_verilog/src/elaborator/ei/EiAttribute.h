@@ -1,4 +1,4 @@
-#ifndef EIATTRIBUTE_H
+﻿#ifndef EIATTRIBUTE_H
 #define EIATTRIBUTE_H
 
 /// @file EiAttribute.h

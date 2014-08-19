@@ -1,4 +1,4 @@
-#ifndef EIOPERATION_H
+﻿#ifndef EIOPERATION_H
 #define EIOPERATION_H
 
 /// @file EiOperation.h

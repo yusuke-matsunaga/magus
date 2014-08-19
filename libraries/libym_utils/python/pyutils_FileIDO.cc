@@ -1,4 +1,4 @@
-
+﻿
 /// @file pyutils_FileIDO.cc
 /// @brief FileIDO の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

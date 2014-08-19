@@ -1,4 +1,4 @@
-#ifndef SRC_LOGBASE_MVNHANDLE_H
+﻿#ifndef SRC_LOGBASE_MVNHANDLE_H
 #define SRC_LOGBASE_MVNHANDLE_H
 
 /// @file src/logbase/MvnHandle.h

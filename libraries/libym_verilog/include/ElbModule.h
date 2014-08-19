@@ -1,4 +1,4 @@
-#ifndef ELBMODULE_H
+﻿#ifndef ELBMODULE_H
 #define ELBMODULE_H
 
 /// @file ElbModule.h

@@ -1,4 +1,4 @@
-#ifndef SATCLAUSE_H
+﻿#ifndef SATCLAUSE_H
 #define SATCLAUSE_H
 
 /// @file SatClause.h

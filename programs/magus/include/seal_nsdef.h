@@ -1,4 +1,4 @@
-#ifndef YM_SEAL_SEAL_NSDEF_H
+﻿#ifndef YM_SEAL_SEAL_NSDEF_H
 #define YM_SEAL_SEAL_NSDEF_H
 
 /// @file ym_seal/seal_nsdef.h

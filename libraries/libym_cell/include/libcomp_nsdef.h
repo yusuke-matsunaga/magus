@@ -1,4 +1,4 @@
-#ifndef LIBCOMP_NSDEF_H
+﻿#ifndef LIBCOMP_NSDEF_H
 #define LIBCOMP_NSDEF_H
 
 /// @file libcomp_nsdef.h

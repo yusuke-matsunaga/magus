@@ -1,4 +1,4 @@
-#ifndef TGISCAS89HANDLER_H
+﻿#ifndef TGISCAS89HANDLER_H
 #define TGISCAS89HANDLER_H
 
 /// @file TgIscas89Handler.h

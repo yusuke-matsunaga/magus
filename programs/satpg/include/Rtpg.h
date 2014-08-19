@@ -1,4 +1,4 @@
-#ifndef RTPG_H
+﻿#ifndef RTPG_H
 #define RTPG_H
 
 /// @file Rtpg.h

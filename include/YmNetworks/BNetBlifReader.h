@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BNETBLIFREADER_H
+﻿#ifndef NETWORKS_BNETBLIFREADER_H
 #define NETWORKS_BNETBLIFREADER_H
 
 /// @file YmNetworks/BNetBlifReader.h

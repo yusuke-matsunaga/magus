@@ -1,4 +1,4 @@
-
+﻿
 /// @file ConstImp.cc
 /// @brief ConstImp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

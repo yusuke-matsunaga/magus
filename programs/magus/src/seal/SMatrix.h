@@ -1,4 +1,4 @@
-#ifndef LIBYM_SEAL_SMATRIX_H
+﻿#ifndef LIBYM_SEAL_SMATRIX_H
 #define LIBYM_SEAL_SMATRIX_H
 
 /// @file libym_seal/SMatrix.h

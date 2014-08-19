@@ -1,4 +1,4 @@
-#ifndef PYSATMSGHANDLER_H
+﻿#ifndef PYSATMSGHANDLER_H
 #define PYSATMSGHANDLER_H
 
 /// @file PySatMsgHandler.h

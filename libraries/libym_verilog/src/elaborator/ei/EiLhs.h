@@ -1,4 +1,4 @@
-#ifndef EILHS_H
+﻿#ifndef EILHS_H
 #define EILHS_H
 
 /// @file EiLhs.h

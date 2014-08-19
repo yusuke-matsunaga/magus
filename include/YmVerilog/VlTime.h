@@ -1,4 +1,4 @@
-#ifndef VERILOG_VLTIME_H
+﻿#ifndef VERILOG_VLTIME_H
 #define VERILOG_VLTIME_H
 
 /// @file YmVerilog/VlTime.h

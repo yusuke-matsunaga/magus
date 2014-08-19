@@ -1,4 +1,4 @@
-#ifndef CMNNODEPI_H
+﻿#ifndef CMNNODEPI_H
 #define CMNNODEPI_H
 
 /// @file CmnNodePI.h

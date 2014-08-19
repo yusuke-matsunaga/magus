@@ -1,4 +1,4 @@
-#ifndef SMTVARTERM_H
+﻿#ifndef SMTVARTERM_H
 #define SMTVARTERM_H
 
 /// @file SmtVarTerm.h

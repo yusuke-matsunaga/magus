@@ -1,4 +1,4 @@
-#ifndef VMITEMNODE_H
+﻿#ifndef VMITEMNODE_H
 #define VMITEMNODE_H
 
 /// @file VmItemNode.h

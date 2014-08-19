@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/equiv/EquivCmd.cc
 /// @brief EquivCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

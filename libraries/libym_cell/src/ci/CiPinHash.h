@@ -1,4 +1,4 @@
-#ifndef CIPINHASH_H
+﻿#ifndef CIPINHASH_H
 #define CIPINHASH_H
 
 /// @file CiPinHash.h

@@ -1,4 +1,4 @@
-#ifndef OPDETECT_H
+﻿#ifndef OPDETECT_H
 #define OPDETECT_H
 
 /// @file DopDrop.h

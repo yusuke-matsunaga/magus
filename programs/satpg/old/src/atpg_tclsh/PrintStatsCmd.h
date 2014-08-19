@@ -1,4 +1,4 @@
-#ifndef PRINTSTATSCMD_H
+﻿#ifndef PRINTSTATSCMD_H
 #define PRINTSTATSCMD_H
 
 /// @file src/atpg_tclsh/PrintStatsCmd.h

@@ -1,4 +1,4 @@
-#ifndef TCLPP_TCLOBJMSGHANDLER_H
+﻿#ifndef TCLPP_TCLOBJMSGHANDLER_H
 #define TCLPP_TCLOBJMSGHANDLER_H
 
 /// @file YmTclpp/TclObjMsgHandler.h

@@ -1,4 +1,4 @@
-#ifndef SMTLIBSCANNER_H
+﻿#ifndef SMTLIBSCANNER_H
 #define SMTLIBSCANNER_H
 
 /// @file SmtLibScanner.h

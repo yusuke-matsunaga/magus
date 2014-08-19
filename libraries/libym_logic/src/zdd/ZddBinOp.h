@@ -1,4 +1,4 @@
-#ifndef ZDDBINOP_H
+﻿#ifndef ZDDBINOP_H
 #define ZDDBINOP_H
 
 /// @file ZddBinOp.h

@@ -1,4 +1,4 @@
-#ifndef PTROOTNODE_H
+﻿#ifndef PTROOTNODE_H
 #define PTROOTNODE_H
 
 /// @file libym_YmCell/tests/dotlib_ptview/PtRootNode.h

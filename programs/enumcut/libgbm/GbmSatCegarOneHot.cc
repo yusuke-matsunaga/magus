@@ -1,4 +1,4 @@
-
+﻿
 /// @file GbmSatCegarOneHot.cc
 /// @brief GbmSatCegarOneHot の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

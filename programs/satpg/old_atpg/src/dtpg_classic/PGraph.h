@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_PGRAPH_H
+﻿#ifndef DTPG_CLASSIC_PGRAPH_H
 #define DTPG_CLASSIC_PGRAPH_H
 
 /// @file src/dtpg_classic/PGraph.h

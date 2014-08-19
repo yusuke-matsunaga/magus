@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_BOOL3_H
+﻿#ifndef YMYMLOGIC_BOOL3_H
 #define YMYMLOGIC_BOOL3_H
 
 /// @file YmLogic/Bool3.h

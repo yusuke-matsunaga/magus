@@ -1,4 +1,4 @@
-#ifndef SRC_LEXER_H
+﻿#ifndef SRC_LEXER_H
 #define SRC_LEXER_H
 
 /// @file programs/bb/src/Lexer.h

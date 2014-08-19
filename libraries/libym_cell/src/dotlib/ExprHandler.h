@@ -1,4 +1,4 @@
-#ifndef EXPRHANDLER_H
+﻿#ifndef EXPRHANDLER_H
 #define EXPRHANDLER_H
 
 /// @file ExprHandler.h

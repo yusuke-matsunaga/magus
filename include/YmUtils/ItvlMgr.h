@@ -1,4 +1,4 @@
-#ifndef YMUTILS_ITVLMGR_H
+﻿#ifndef YMUTILS_ITVLMGR_H
 #define YMUTILS_ITVLMGR_H
 
 /// @file YmUtils/ItvlMgr.h

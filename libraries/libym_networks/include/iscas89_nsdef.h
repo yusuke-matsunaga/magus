@@ -1,4 +1,4 @@
-#ifndef ISCAS89_NSDEF_H
+﻿#ifndef ISCAS89_NSDEF_H
 #define ISCAS89_NSDEF_H
 
 /// @file iscas89_nsdef.h

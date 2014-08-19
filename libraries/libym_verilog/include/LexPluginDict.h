@@ -1,4 +1,4 @@
-#ifndef EXPRLUGINDICT_H
+﻿#ifndef EXPRLUGINDICT_H
 #define EXPRLUGINDICT_H
 
 /// @file LexPluginDict.h

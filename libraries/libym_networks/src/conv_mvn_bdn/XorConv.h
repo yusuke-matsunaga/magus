@@ -1,4 +1,4 @@
-#ifndef XORCONV_H
+﻿#ifndef XORCONV_H
 #define XORCONV_H
 
 /// @file XorConv.h

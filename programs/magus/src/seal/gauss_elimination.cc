@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_seal/gauss_elimination.cc
 /// @brief gauss_elimination の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

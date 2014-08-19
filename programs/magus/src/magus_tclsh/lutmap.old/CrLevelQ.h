@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CRLEVELQ_H
+﻿#ifndef MAGUS_LUTMAP_CRLEVELQ_H
 #define MAGUS_LUTMAP_CRLEVELQ_H
 
 /// @file magus/lutmap/CrLevelQ.h

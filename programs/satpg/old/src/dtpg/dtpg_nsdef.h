@@ -1,4 +1,4 @@
-#ifndef DTPG_NSDEF_H
+﻿#ifndef DTPG_NSDEF_H
 #define DTPG_NSDEF_H
 
 /// @file dtpg_nsdef.h

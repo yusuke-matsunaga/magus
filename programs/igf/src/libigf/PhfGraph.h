@@ -1,4 +1,4 @@
-#ifndef PHFGRAPH_H
+﻿#ifndef PHFGRAPH_H
 #define PHFGRAPH_H
 
 /// @file PhfGraph.h

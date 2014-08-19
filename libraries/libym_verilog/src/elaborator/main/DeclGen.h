@@ -1,4 +1,4 @@
-#ifndef DECLGEN_H
+﻿#ifndef DECLGEN_H
 #define DECLGEN_H
 
 /// @file DeclGen.h

@@ -1,4 +1,4 @@
-#ifndef DTPGPRIMITIVE_H
+﻿#ifndef DTPGPRIMITIVE_H
 #define DTPGPRIMITIVE_H
 
 /// @file DtpgPrimitive.h

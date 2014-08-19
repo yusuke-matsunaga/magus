@@ -1,4 +1,4 @@
-
+﻿
 /// @file MsgMgr.cc
 /// @brief MsgMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

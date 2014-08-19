@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CUTHOLDER_H
+﻿#ifndef MAGUS_LUTMAP_CUTHOLDER_H
 #define MAGUS_LUTMAP_CUTHOLDER_H
 
 /// @file magus/lutmap/CutHolder.h

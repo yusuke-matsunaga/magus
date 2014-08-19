@@ -1,4 +1,4 @@
-#ifndef PTRLIST_H
+﻿#ifndef PTRLIST_H
 #define PTRLIST_H
 
 /// @file PtrList.h

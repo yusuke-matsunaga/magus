@@ -1,4 +1,4 @@
-#ifndef STRPOOL_H
+﻿#ifndef STRPOOL_H
 #define STRPOOL_H
 
 /// @file StrPool.h

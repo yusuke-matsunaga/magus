@@ -1,4 +1,4 @@
-#ifndef YMSATR_H
+﻿#ifndef YMSATR_H
 #define YMSATR_H
 
 /// @file YmSatR.h

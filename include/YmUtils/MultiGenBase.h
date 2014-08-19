@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MULTIGENBASE_H
+﻿#ifndef YMUTILS_MULTIGENBASE_H
 #define YMUTILS_MULTIGENBASE_H
 
 /// @file YmUtils/MultiGenBase.h

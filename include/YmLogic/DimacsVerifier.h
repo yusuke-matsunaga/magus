@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_DIMACSVERIFIER_H
+﻿#ifndef YMYMLOGIC_DIMACSVERIFIER_H
 #define YMYMLOGIC_DIMACSVERIFIER_H
 
 /// @file YmLogic/DimacsVerifier.h

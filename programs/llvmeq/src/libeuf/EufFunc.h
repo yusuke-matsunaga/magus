@@ -1,4 +1,4 @@
-#ifndef EUFFUNC_H
+﻿#ifndef EUFFUNC_H
 #define EUFFUNC_H
 
 /// @file EufFunc.h

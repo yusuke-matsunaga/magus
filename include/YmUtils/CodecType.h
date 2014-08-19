@@ -1,4 +1,4 @@
-#ifndef YMUTILS_CODECTYPE_H
+﻿#ifndef YMUTILS_CODECTYPE_H
 #define YMUTILS_CODECTYPE_H
 
 /// @file YmUtils/CodecType.h

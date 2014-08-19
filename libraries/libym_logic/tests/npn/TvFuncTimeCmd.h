@@ -1,4 +1,4 @@
-#ifndef LIBYM_NPN_TESTS_TVFUNCTIMECMD_H
+﻿#ifndef LIBYM_NPN_TESTS_TVFUNCTIMECMD_H
 #define LIBYM_NPN_TESTS_TVFUNCTIMECMD_H
 
 /// @file libym_npn/tests/TvFuncTimeCmd.h

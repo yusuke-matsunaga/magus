@@ -1,4 +1,4 @@
-#ifndef CUT_H
+﻿#ifndef CUT_H
 #define CUT_H
 
 /// @file Cut.h

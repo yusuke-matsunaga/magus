@@ -1,4 +1,4 @@
-#ifndef BMMCOMPTBL_H
+﻿#ifndef BMMCOMPTBL_H
 #define BMMCOMPTBL_H
 
 /// @file BmmCompTbl.h

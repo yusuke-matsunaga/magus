@@ -1,4 +1,4 @@
-#ifndef ATPG_ATPG_NSDEF_H
+﻿#ifndef ATPG_ATPG_NSDEF_H
 #define ATPG_ATPG_NSDEF_H
 
 /// @file atpg/atpg_nsdef.h

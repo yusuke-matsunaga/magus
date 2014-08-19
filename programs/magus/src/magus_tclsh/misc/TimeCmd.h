@@ -1,4 +1,4 @@
-#ifndef MAGUS_MAIN_TIMECMD_H
+﻿#ifndef MAGUS_MAIN_TIMECMD_H
 #define MAGUS_MAIN_TIMECMD_H
 
 /// @file magus/main/TimeCmd.h

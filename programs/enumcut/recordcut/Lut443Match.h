@@ -1,4 +1,4 @@
-#ifndef LUT443MATCH_H
+﻿#ifndef LUT443MATCH_H
 #define LUT443MATCH_H
 
 /// @file Lut443Match.h

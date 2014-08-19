@@ -1,4 +1,4 @@
-#ifndef MAGUS_LOGBASE_BNETIOCMD_H
+﻿#ifndef MAGUS_LOGBASE_BNETIOCMD_H
 #define MAGUS_LOGBASE_BNETIOCMD_H
 
 /// @file magus/logbase/BNetIoCmd.h

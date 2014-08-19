@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_TVFUNCM_H
+﻿#ifndef YMYMLOGIC_TVFUNCM_H
 #define YMYMLOGIC_TVFUNCM_H
 
 /// @file YmLogic/TvFuncM.h

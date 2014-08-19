@@ -1,4 +1,4 @@
-#ifndef MAGUS_NETCMD_H
+﻿#ifndef MAGUS_NETCMD_H
 #define MAGUS_NETCMD_H
 
 /// @file NetCmd.h

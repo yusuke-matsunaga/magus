@@ -1,4 +1,4 @@
-#ifndef BDNMGRIMPL_H
+﻿#ifndef BDNMGRIMPL_H
 #define BDNMGRIMPL_H
 
 /// @file BdnMgrImpl.h

@@ -1,4 +1,4 @@
-#ifndef DOTLIBATTR_H
+﻿#ifndef DOTLIBATTR_H
 #define DOTLIBATTR_H
 
 /// @file DotlibAttr.h

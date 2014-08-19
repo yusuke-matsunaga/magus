@@ -1,4 +1,4 @@
-
+﻿
 /// @file bmc_isop.cc
 /// @brief ISOP を生成する関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

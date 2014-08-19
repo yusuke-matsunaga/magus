@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CALCODCCMD_H
+﻿#ifndef MAGUS_LUTMAP_CALCODCCMD_H
 #define MAGUS_LUTMAP_CALCODCCMD_H
 
 /// @file magus/lutmap/tcl_bindings/CalcOdcCmd.h

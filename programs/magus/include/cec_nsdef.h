@@ -1,4 +1,4 @@
-#ifndef YM_CEC_CEC_NSDEF
+﻿#ifndef YM_CEC_CEC_NSDEF
 #define YM_CEC_CEC_NSDEF
 
 /// @file ym_cec/cec_nsdef.h

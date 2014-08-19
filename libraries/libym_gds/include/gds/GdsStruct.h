@@ -1,4 +1,4 @@
-#ifndef GDS_GDSSTRUCT_H
+﻿#ifndef GDS_GDSSTRUCT_H
 #define GDS_GDSSTRUCT_H
 
 /// @file gds/GdsStruct.h

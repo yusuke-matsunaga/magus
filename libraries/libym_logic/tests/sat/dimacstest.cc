@@ -1,4 +1,4 @@
-
+﻿
 /// @file dimacstest.cc
 /// @brief DIMACS CNF ファイルの読み込みテスト
 /// @author Yusuke Matsunaga (松永 裕介)

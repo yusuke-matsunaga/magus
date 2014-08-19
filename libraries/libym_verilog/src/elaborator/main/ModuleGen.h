@@ -1,4 +1,4 @@
-#ifndef MODULEGEN_H
+﻿#ifndef MODULEGEN_H
 #define MODULEGEN_H
 
 /// @file ModuleGen.h

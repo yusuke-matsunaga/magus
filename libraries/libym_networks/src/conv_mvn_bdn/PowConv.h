@@ -1,4 +1,4 @@
-#ifndef POWCONV_H
+﻿#ifndef POWCONV_H
 #define POWCONV_H
 
 /// @file PowConv.h

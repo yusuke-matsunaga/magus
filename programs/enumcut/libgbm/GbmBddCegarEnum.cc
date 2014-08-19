@@ -1,4 +1,4 @@
-
+﻿
 /// @file GbmBddCegarEnum.cc
 /// @brief GbmBddCegarEnum の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

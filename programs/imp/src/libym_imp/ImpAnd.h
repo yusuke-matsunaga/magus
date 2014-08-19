@@ -1,4 +1,4 @@
-#ifndef IMPAND_H
+﻿#ifndef IMPAND_H
 #define IMPAND_H
 
 /// @file ImpAnd.h

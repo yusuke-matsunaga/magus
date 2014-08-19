@@ -1,4 +1,4 @@
-#ifndef BTGNODE_H
+﻿#ifndef BTGNODE_H
 #define BTGNODE_H
 
 /// @file BtgNode.h

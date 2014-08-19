@@ -1,4 +1,4 @@
-#ifndef GDS_GDSDATE_H
+﻿#ifndef GDS_GDSDATE_H
 #define GDS_GDSDATE_H
 
 /// @file gds/GdsDate.h

@@ -1,4 +1,4 @@
-#ifndef YMUTILS_RANDCOMBIGEN_H
+﻿#ifndef YMUTILS_RANDCOMBIGEN_H
 #define YMUTILS_RANDCOMBIGEN_H
 
 /// @file YmUtils/RandCombiGen.h

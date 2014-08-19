@@ -1,4 +1,4 @@
-#ifndef LEXMACROPLUGIN_H
+﻿#ifndef LEXMACROPLUGIN_H
 #define LEXMACROPLUGIN_H
 
 /// @file LexMacroPlugin.h

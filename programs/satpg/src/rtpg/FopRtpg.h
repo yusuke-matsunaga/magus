@@ -1,4 +1,4 @@
-#ifndef FOPRTPG_H
+﻿#ifndef FOPRTPG_H
 #define FOPRTPG_H
 
 /// @file FopRtpg.h

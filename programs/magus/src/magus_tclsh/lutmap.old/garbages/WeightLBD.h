@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_WEIGHTLBD_H
+﻿#ifndef MAGUS_LUTMAP_WEIGHTLBD_H
 #define MAGUS_LUTMAP_WEIGHTLBD_H
 
 /// @file magus/lutmap/WEIGHTLBD.h

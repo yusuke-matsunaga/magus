@@ -1,4 +1,4 @@
-#ifndef LUTMAP_H
+﻿#ifndef LUTMAP_H
 #define LUTMAP_H
 
 /// @file LutMap.h

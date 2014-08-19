@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BLIF_NSDEF_H
+﻿#ifndef NETWORKS_BLIF_NSDEF_H
 #define NETWORKS_BLIF_NSDEF_H
 
 /// @file YmNetworks/blif_nsdef.h

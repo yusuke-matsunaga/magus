@@ -1,4 +1,4 @@
-#ifndef YMUTILS_FILEODO_H
+﻿#ifndef YMUTILS_FILEODO_H
 #define YMUTILS_FILEODO_H
 
 /// @file YmUtils/FileODO.h

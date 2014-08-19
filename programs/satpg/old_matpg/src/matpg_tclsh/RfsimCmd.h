@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_RFSIMCMD_H
+﻿#ifndef SRC_MATPG_RFSIMCMD_H
 #define SRC_MATPG_RFSIMCMD_H
 
 /// @file src/matpg/RfsimCmd.h

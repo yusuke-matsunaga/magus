@@ -1,4 +1,4 @@
-/// @file libym_bdd/npn/NpnMap.cc
+﻿/// @file libym_bdd/npn/NpnMap.cc
 /// @brief NpnMap の実装ファイル
 ///
 /// @author Yusuke Matsunaga

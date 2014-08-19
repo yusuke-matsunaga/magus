@@ -1,4 +1,4 @@
-#ifndef UTILS_POPTMAINAPP_H
+﻿#ifndef UTILS_POPTMAINAPP_H
 #define UTILS_POPTMAINAPP_H
 
 /// @file YmUtils/PoptMainApp.h

@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_DIMACSPARSER_H
+﻿#ifndef YMYMLOGIC_DIMACSPARSER_H
 #define YMYMLOGIC_DIMACSPARSER_H
 
 /// @file YmLogic/DimacsParser.h

@@ -1,4 +1,4 @@
-#ifndef CELL_CELLDOTLIBREADER_H
+﻿#ifndef CELL_CELLDOTLIBREADER_H
 #define CELL_CELLDOTLIBREADER_H
 
 /// @file YmCell/CellDotlibReader.h

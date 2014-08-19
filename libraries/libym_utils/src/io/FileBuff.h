@@ -1,4 +1,4 @@
-#ifndef FILEBUFF_H
+﻿#ifndef FILEBUFF_H
 #define FILEBUFF_H
 
 /// @file FileBuff.h

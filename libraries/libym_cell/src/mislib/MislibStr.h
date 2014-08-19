@@ -1,4 +1,4 @@
-#ifndef MISLIBSTR_H
+﻿#ifndef MISLIBSTR_H
 #define MISLIBSTR_H
 
 /// @file MislibStr.h

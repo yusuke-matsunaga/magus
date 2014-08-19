@@ -1,4 +1,4 @@
-#ifndef FSIM3_SNAND_H
+﻿#ifndef FSIM3_SNAND_H
 #define FSIM3_SNAND_H
 
 /// @file fsim/SnAnd.h

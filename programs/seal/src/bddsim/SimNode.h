@@ -1,4 +1,4 @@
-#ifndef BDDSIM_SIMNODE_H
+﻿#ifndef BDDSIM_SIMNODE_H
 #define BDDSIM_SIMNODE_H
 
 /// @file bddsim/SimNode.h

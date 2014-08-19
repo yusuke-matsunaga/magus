@@ -1,4 +1,4 @@
-#ifndef VLVALUEREP_H
+﻿#ifndef VLVALUEREP_H
 #define VLVALUEREP_H
 
 /// @file VlValueRep.h

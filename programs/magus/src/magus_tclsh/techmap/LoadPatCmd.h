@@ -1,4 +1,4 @@
-#ifndef TECHMAP_LOADPATCMD_H
+﻿#ifndef TECHMAP_LOADPATCMD_H
 #define TECHMAP_LOADPATCMD_H
 
 /// @file LoadPatCmd.h

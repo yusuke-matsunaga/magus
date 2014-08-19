@@ -1,4 +1,4 @@
-#ifndef FSIM_SIMFFR_H
+﻿#ifndef FSIM_SIMFFR_H
 #define FSIM_SIMFFR_H
 
 /// @file fsim/SimFFR.h

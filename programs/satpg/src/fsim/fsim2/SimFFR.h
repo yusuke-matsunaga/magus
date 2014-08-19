@@ -1,4 +1,4 @@
-#ifndef SIMFFR_H
+﻿#ifndef SIMFFR_H
 #define SIMFFR_H
 
 /// @file SimFFR.h

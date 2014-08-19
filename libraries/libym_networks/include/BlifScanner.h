@@ -1,4 +1,4 @@
-#ifndef BLIFSCANNER_H
+﻿#ifndef BLIFSCANNER_H
 #define BLIFSCANNER_H
 
 /// @file BlifScanner.h

@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_NODESET_H
+﻿#ifndef CALC_CVF_NODESET_H
 #define CALC_CVF_NODESET_H
 
 /// @file calc_cvf/NodeSet.h

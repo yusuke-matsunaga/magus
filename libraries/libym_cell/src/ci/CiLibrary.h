@@ -1,4 +1,4 @@
-#ifndef CILIBRARY_H
+﻿#ifndef CILIBRARY_H
 #define CILIBRARY_H
 
 /// @file CiLibrary.h

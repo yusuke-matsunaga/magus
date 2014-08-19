@@ -1,4 +1,4 @@
-
+﻿
 /// @file StmtGen_assign.cc
 /// @brief ElbMgr の実装ファイル(assign statement の実体化)
 /// @author Yusuke Matsunaga (松永 裕介)

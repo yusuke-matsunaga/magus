@@ -1,4 +1,4 @@
-#ifndef ATTRDICT_H
+﻿#ifndef ATTRDICT_H
 #define ATTRDICT_H
 
 /// @file AttrDict.h

@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_NSDEF_H
+﻿#ifndef CALC_SVF_NSDEF_H
 #define CALC_SVF_NSDEF_H
 
 /// @file calc_svf/nsdef.h

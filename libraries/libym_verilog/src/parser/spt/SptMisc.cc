@@ -1,4 +1,4 @@
-
+﻿
 /// @file SptMisc.cc
 /// @brief その他の部品クラスの実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

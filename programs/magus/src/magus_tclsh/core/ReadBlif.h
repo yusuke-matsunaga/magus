@@ -1,4 +1,4 @@
-#ifndef MAGUS_CORE_READBLIF_H
+﻿#ifndef MAGUS_CORE_READBLIF_H
 #define MAGUS_CORE_READBLIF_H
 
 /// @file src/core/ReadBlif.h

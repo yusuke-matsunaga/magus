@@ -1,4 +1,4 @@
-#ifndef YM_BDD_REPINFO_H
+﻿#ifndef YM_BDD_REPINFO_H
 #define YM_BDD_REPINFO_H
 
 // $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_bdd/npn/RepInfo.h,v $

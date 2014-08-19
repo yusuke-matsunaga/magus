@@ -1,4 +1,4 @@
-#ifndef EIPARAMETER_H
+﻿#ifndef EIPARAMETER_H
 #define EIPARAMETER_H
 
 /// @file EiParameter.h

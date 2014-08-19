@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMN_CMNDFFCELL_H
+﻿#ifndef NETWORKS_CMN_CMNDFFCELL_H
 #define NETWORKS_CMN_CMNDFFCELL_H
 
 /// @file YmNetworks/CmnDffCell.h

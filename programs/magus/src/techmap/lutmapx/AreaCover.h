@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_AREACOVER_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_AREACOVER_H
 #define LIBYM_TECHMAP_LUTMAP_AREACOVER_H
 
 /// @file libym_techmap/AreaCover.h

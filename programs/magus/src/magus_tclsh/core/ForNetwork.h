@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_FORNETWORK_H
+﻿#ifndef SRC_CORE_FORNETWORK_H
 #define SRC_CoRE_FORNETWORK_H
 
 /// @file src/core/ForNetwork.h

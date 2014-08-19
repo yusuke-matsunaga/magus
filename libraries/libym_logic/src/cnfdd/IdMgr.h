@@ -1,4 +1,4 @@
-#ifndef IDMGR_H
+﻿#ifndef IDMGR_H
 #define IDMGR_H
 
 /// @file IdMgr.h

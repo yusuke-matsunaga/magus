@@ -1,4 +1,4 @@
-
+﻿
 /// @file CofOp.cc
 /// @brief CofOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

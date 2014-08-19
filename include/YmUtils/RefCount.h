@@ -1,4 +1,4 @@
-#ifndef YMUTILS_REFCOUNT_H
+﻿#ifndef YMUTILS_REFCOUNT_H
 #define YMUTILS_REFCOUNT_H
 
 /// @file YmUtils/RefCount.h

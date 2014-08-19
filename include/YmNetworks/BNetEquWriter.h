@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BNETEQUWRITER_H
+﻿#ifndef NETWORKS_BNETEQUWRITER_H
 #define NETWORKS_BNETEQUWRITER_H
 
 /// @file YmNetworks/BNetEquWriter.h

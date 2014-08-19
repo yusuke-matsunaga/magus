@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_techmap/lutmap/DelayCover.cc
 /// @brief DelayCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

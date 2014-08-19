@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_PATVECT_H
+﻿#ifndef MAGUS_LUTMAP_PATVECT_H
 #define MAGUS_LUTMAP_PATVECT_H
 
 /// @file magus/lutmap/PatVect.h

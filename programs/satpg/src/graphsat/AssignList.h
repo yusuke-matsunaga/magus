@@ -1,4 +1,4 @@
-#ifndef ASSIGNLIST_H
+﻿#ifndef ASSIGNLIST_H
 #define ASSIGNLIST_H
 
 /// @file AssignList.h

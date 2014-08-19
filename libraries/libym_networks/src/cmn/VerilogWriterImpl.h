@@ -1,4 +1,4 @@
-#ifndef VERILOGWRITERIMPL_H
+﻿#ifndef VERILOGWRITERIMPL_H
 #define VERILOGWRITERIMPL_H
 
 /// @file VerilogWriterImpl.h

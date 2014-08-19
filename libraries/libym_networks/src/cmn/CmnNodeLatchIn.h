@@ -1,4 +1,4 @@
-#ifndef CMNNODELATCHIN_H
+﻿#ifndef CMNNODELATCHIN_H
 #define CMNNODELATCHIN_H
 
 /// @file CmnNodeLatchIn.h

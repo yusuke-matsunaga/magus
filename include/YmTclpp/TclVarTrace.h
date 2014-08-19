@@ -1,4 +1,4 @@
-#ifndef TCLPP_TCLVARTRACE_H
+﻿#ifndef TCLPP_TCLVARTRACE_H
 #define TCLPP_TCLVARTRACE_H
 
 /// @file YmTclpp/TclVarTrace.h

@@ -1,4 +1,4 @@
-#ifndef NPNXFORM_H
+﻿#ifndef NPNXFORM_H
 #define NPNXFORM_H
 
 /// @file NpnXform.h

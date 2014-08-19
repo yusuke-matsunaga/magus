@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_EXPR_H
+﻿#ifndef YMYMLOGIC_EXPR_H
 #define YMYMLOGIC_EXPR_H
 
 /// @file YmLogic/Expr.h

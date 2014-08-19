@@ -1,4 +1,4 @@
-// $Id: randcombigen_test.cc 1978 2009-02-06 12:29:16Z matsunaga $
+﻿// $Id: randcombigen_test.cc 1978 2009-02-06 12:29:16Z matsunaga $
 
 // RandCombiGen のテスト
 

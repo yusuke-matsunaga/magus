@@ -1,4 +1,4 @@
-#ifndef LZMAENGINE_H
+﻿#ifndef LZMAENGINE_H
 #define LZMAENGINE_H
 
 /// @file LzmaEngine.h

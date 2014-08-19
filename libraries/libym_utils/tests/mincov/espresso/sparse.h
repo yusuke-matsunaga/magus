@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Revision Control Information
  *
  * $Source: /users/pchong/CVS/sis/espresso/sparse.h,v $

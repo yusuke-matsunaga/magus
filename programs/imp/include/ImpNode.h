@@ -1,4 +1,4 @@
-#ifndef IMPNODE_H
+﻿#ifndef IMPNODE_H
 #define IMPNODE_H
 
 /// @file ImpNode.h

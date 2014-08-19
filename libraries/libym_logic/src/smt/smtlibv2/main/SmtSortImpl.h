@@ -1,4 +1,4 @@
-#ifndef SMTSORTIMPL_H
+﻿#ifndef SMTSORTIMPL_H
 #define SMTSORTIMPL_H
 
 /// @file SmtSortImpl.h

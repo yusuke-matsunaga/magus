@@ -1,4 +1,4 @@
-#ifndef SABASE_H
+﻿#ifndef SABASE_H
 #define SABASE_H
 
 /// @file SaBase.h

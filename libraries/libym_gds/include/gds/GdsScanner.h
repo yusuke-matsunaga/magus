@@ -1,4 +1,4 @@
-#ifndef GDS_GDSSCANNER_H
+﻿#ifndef GDS_GDSSCANNER_H
 #define GDS_GDSSCANNER_H
 
 /// @file gds/GdsScanner.h

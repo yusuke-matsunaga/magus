@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_LITERAL_H
+﻿#ifndef YMYMLOGIC_LITERAL_H
 #define YMYMLOGIC_LITERAL_H
 
 /// @file YmLogic/Literal.h

@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_CUT_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_CUT_H
 #define LIBYM_TECHMAP_LUTMAP_CUT_H
 
 /// @file libym_techmap/lutmap/Cut.h

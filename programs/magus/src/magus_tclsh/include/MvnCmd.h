@@ -1,4 +1,4 @@
-#ifndef MAGUS_MVNCMD_H
+﻿#ifndef MAGUS_MVNCMD_H
 #define MAGUS_MVNCMD_H
 
 /// @file MvnCmd.h

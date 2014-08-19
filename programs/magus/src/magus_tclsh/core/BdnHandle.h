@@ -1,4 +1,4 @@
-#ifndef SRC_LOGBASE_BDNHANDLE_H
+﻿#ifndef SRC_LOGBASE_BDNHANDLE_H
 #define SRC_LOGBASE_BDNHANDLE_H
 
 /// @file src/logbase/BdnHandle.h

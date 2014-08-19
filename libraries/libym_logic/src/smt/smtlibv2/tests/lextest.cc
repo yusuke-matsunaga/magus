@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_smtlibv2/tests/lextest.cc
 /// @brief SmtLibLex のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

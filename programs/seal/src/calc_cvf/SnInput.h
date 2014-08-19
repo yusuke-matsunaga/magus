@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_SNINPUT_H
+﻿#ifndef CALC_CVF_SNINPUT_H
 #define CALC_CVF_SNINPUT_H
 
 /// @file calc_cvf/SnInput.h

@@ -1,4 +1,4 @@
-#ifndef YMPYTHON_H
+﻿#ifndef YMPYTHON_H
 #define YMPYTHON_H
 
 /// @file ympython.h

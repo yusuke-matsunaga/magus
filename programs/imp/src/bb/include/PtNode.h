@@ -1,4 +1,4 @@
-#ifndef INCLUDE_PTNODE_H
+﻿#ifndef INCLUDE_PTNODE_H
 #define INCLUDE_PTNODE_H
 
 /// @file include/PtNode.h

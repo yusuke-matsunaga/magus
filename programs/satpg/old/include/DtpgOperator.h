@@ -1,4 +1,4 @@
-#ifndef DTPGOPERATOR_H
+﻿#ifndef DTPGOPERATOR_H
 #define DTPGOPERATOR_H
 
 /// @file DtpgOperator.h

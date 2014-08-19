@@ -1,4 +1,4 @@
-#ifndef BMMNODE_H
+﻿#ifndef BMMNODE_H
 #define BMMNODE_H
 
 /// @file BmmNode.h

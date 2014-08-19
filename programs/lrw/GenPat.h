@@ -1,4 +1,4 @@
-#ifndef GENPAT_H
+﻿#ifndef GENPAT_H
 #define GENPAT_H
 
 /// @file GenPat.h

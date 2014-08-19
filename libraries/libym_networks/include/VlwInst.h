@@ -1,4 +1,4 @@
-#ifndef VLWINST_H
+﻿#ifndef VLWINST_H
 #define VLWINST_H
 
 /// @file VlwInst.h

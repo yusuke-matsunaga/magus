@@ -1,4 +1,4 @@
-
+﻿
 /// @file BzDecoder_test.cc
 /// @brief BzDecoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

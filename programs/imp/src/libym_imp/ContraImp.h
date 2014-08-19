@@ -1,4 +1,4 @@
-#ifndef CONTRAIMP_H
+﻿#ifndef CONTRAIMP_H
 #define CONTRAIMP_H
 
 /// @file ContraImp.h

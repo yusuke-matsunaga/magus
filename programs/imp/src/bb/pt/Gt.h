@@ -1,4 +1,4 @@
-#ifndef SRC_PT_GT_H
+﻿#ifndef SRC_PT_GT_H
 #define SRC_PT_GT_H
 
 /// @file src/pt/Gt.h

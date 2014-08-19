@@ -1,4 +1,4 @@
-#ifndef ELBFACTORY_H
+﻿#ifndef ELBFACTORY_H
 #define ELBFACTORY_H
 
 /// @file ElbFactory.h

@@ -1,4 +1,4 @@
-#ifndef IDCELL_H
+﻿#ifndef IDCELL_H
 #define IDCELL_H
 
 /// @file IdCell.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file CptMisc.cc
 /// @brief CptMisc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

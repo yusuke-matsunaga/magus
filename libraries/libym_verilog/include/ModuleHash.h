@@ -1,4 +1,4 @@
-#ifndef MODULEHASH_H
+﻿#ifndef MODULEHASH_H
 #define MODULEHASH_H
 
 /// @file ModuleHash.h

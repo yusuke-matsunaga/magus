@@ -1,4 +1,4 @@
-#ifndef CUPOP_H
+﻿#ifndef CUPOP_H
 #define CUPOP_H
 
 /// @file CupOp.h

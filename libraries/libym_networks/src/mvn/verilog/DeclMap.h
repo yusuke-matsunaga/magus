@@ -1,4 +1,4 @@
-#ifndef DECLMAP_H
+﻿#ifndef DECLMAP_H
 #define DECLMAP_H
 
 /// @file DeclMap.h

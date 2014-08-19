@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pt/PtSubOp.cc
 /// @brief PtSubOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

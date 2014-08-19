@@ -1,4 +1,4 @@
-#ifndef TVMGR_H
+﻿#ifndef TVMGR_H
 #define TVMGR_H
 
 /// @file TvMgr.h

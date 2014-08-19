@@ -1,4 +1,4 @@
-#ifndef PATMATCHER_H
+﻿#ifndef PATMATCHER_H
 #define PATMATCHER_H
 
 /// @file PatMatcher.h

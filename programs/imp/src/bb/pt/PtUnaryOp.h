@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTUNARYOP_H
+﻿#ifndef SRC_PT_PTUNARYOP_H
 #define SRC_PT_PTUNARYOP_H
 
 /// @file src/pt/PtUnaryOp.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file CellLatchInfo.cc
 /// @brief CellLatchInfo の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

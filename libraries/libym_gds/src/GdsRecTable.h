@@ -1,4 +1,4 @@
-#ifndef GDSLIB_GDSRECTABLE_H
+﻿#ifndef GDSLIB_GDSRECTABLE_H
 #define GDSLIB_GDSRECTABLE_H
 
 /// @file GdsRecTable.h

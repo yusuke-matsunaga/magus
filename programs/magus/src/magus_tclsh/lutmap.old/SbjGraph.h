@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_SBJGRAPH_H
+﻿#ifndef MAGUS_LUTMAP_SBJGRAPH_H
 #define MAGUS_LUTMAP_SBJGRAPH_H
 
 /// @file magus/lutmap/SbjGraph.h 

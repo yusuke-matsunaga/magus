@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/fsim2/SnXor.cc
 /// @brief SnXor の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef LCCLASS_H
+﻿#ifndef LCCLASS_H
 #define LCCLASS_H
 
 /// @file LcClass.h

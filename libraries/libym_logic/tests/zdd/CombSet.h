@@ -1,4 +1,4 @@
-#ifndef COMBSET_H
+﻿#ifndef COMBSET_H
 #define COMBSET_H
 
 /// @file CombSet.h

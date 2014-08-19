@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_PTEXPR_H
+﻿#ifndef VERILOG_PT_PTEXPR_H
 #define VERILOG_PT_PTEXPR_H
 
 /// @file YmVerilog/pt/PtExpr.h

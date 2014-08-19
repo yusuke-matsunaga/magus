@@ -1,4 +1,4 @@
-#ifndef MACROSOURCE_H
+﻿#ifndef MACROSOURCE_H
 #define MACROSOURCE_H
 
 /// @file MacroSource.h

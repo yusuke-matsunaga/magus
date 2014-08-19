@@ -1,4 +1,4 @@
-#ifndef BLIFNETWORKHANDLER_H
+﻿#ifndef BLIFNETWORKHANDLER_H
 #define BLIFNETWORKHANDLER_H
 
 /// @file BlifNetworkHandler.h

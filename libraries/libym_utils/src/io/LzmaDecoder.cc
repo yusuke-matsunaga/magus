@@ -1,4 +1,4 @@
-
+﻿
 /// @file LzmaDecoder.cc
 /// @brief LzmaDecoder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

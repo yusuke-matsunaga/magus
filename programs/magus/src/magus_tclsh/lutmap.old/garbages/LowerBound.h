@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_LOWERBOUND_H
+﻿#ifndef MAGUS_LUTMAP_LOWERBOUND_H
 #define MAGUS_LUTMAP_LOWERBOUND_H
 
 /// @file magus/lutmap/LowerBound.cc

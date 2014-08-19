@@ -1,4 +1,4 @@
-
+﻿
 /// @file LrMgr.cc
 /// @brief LrMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

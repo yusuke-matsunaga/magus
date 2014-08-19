@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/logbase/BNetNodeCmd.cc
 /// @brief BNetNodeCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

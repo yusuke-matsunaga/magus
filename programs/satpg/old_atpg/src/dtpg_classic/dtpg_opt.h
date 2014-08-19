@@ -1,4 +1,4 @@
-#ifndef ATPG_DTPG_OPT_H
+﻿#ifndef ATPG_DTPG_OPT_H
 #define ATPG_DTPG_OPT_H
 
 /// @file include/dtpg_opt.h

@@ -1,4 +1,4 @@
-#ifndef AIGTEMPLATE_H
+﻿#ifndef AIGTEMPLATE_H
 #define AIGTEMPLATE_H
 
 /// @file AigTemplate.h

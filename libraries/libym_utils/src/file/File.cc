@@ -1,4 +1,4 @@
-
+﻿
 /// @file File.cc
 /// @brief ファイル操作関係のクラスの実装ファイル
 /// @author Yusuke Matsunaga

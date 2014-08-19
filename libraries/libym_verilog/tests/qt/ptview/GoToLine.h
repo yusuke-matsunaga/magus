@@ -1,4 +1,4 @@
-#ifndef GOTOLINE_H
+﻿#ifndef GOTOLINE_H
 #define GOTOLINE_H
 
 /// @file GoToLine.h

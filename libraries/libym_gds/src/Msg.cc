@@ -1,4 +1,4 @@
-
+﻿
 /// @file Msg.cc
 /// @brief メッセージ出力用のクラス
 /// @author Yusuke Matsunaga (松永 裕介)

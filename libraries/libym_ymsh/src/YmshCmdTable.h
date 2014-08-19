@@ -1,4 +1,4 @@
-#ifndef YMSHCMDTABLE_H
+﻿#ifndef YMSHCMDTABLE_H
 #define YMSHCMDTABLE_H
 
 /// @file YmshCmdTable.h

@@ -1,4 +1,4 @@
-#ifndef ELBMGR_H
+﻿#ifndef ELBMGR_H
 #define ELBMGR_H
 
 /// @file ElbMgr.h

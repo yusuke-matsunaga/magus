@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMNDFF_H
+﻿#ifndef NETWORKS_CMNDFF_H
 #define NETWORKS_CMNDFF_H
 
 /// @file YmNetworks/CmnDff.h

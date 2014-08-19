@@ -1,4 +1,4 @@
-#ifndef RSRVWORDDIC_H
+﻿#ifndef RSRVWORDDIC_H
 #define RSRVWORDDIC_H
 
 /// @file RsrvWordDic.h

@@ -1,4 +1,4 @@
-#ifndef TGBLIFHANDLER_H
+﻿#ifndef TGBLIFHANDLER_H
 #define TGBLIFHANDLER_H
 
 /// @file TgBlifHandler.h

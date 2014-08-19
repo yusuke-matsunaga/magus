@@ -1,4 +1,4 @@
-
+﻿
 /// @file BddVarSet.cc
 /// @brief BddVarSet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

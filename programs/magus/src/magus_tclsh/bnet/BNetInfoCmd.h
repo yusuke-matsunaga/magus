@@ -1,4 +1,4 @@
-#ifndef MAGUS_LOGBASE_BNETINFOCMD_H
+﻿#ifndef MAGUS_LOGBASE_BNETINFOCMD_H
 #define MAGUS_LOGBASE_BNETINFOCMD_H
 
 /// @file magus/logbase/BNetInfoCmd.h

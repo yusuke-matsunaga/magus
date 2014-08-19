@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTIDNODE_H
+﻿#ifndef SRC_PT_PTIDNODE_H
 #define SRC_PT_PTIDNODE_H
 
 /// @file src/pt/PtIdNode.h

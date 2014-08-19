@@ -1,4 +1,4 @@
-#ifndef YMUTILSTESTREGISTRY_H
+﻿#ifndef YMUTILSTESTREGISTRY_H
 #define YMUTILSTESTREGISTRY_H
 
 /// @file YmUtilsTestRegistry.h

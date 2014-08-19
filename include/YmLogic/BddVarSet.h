@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_BDDVARSET_H
+﻿#ifndef YMYMLOGIC_BDDVARSET_H
 #define YMYMLOGIC_BDDVARSET_H
 
 /// @file YmLogic/BddVarSet.h

@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTANDOP_H
+﻿#ifndef SRC_PT_PTANDOP_H
 #define SRC_PT_PTANDOP_H
 
 /// @file src/pt/PtAndOp.h

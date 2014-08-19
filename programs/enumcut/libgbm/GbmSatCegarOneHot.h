@@ -1,4 +1,4 @@
-#ifndef GBMCEGARONEHOT_H
+﻿#ifndef GBMCEGARONEHOT_H
 #define GBMCEGARONEHOT_H
 
 /// @file GbmSatCegarOneHot.h

@@ -1,4 +1,4 @@
-#ifndef VLVIEW_H
+﻿#ifndef VLVIEW_H
 #define VLVIEW_H
 
 /// @file VlView.h

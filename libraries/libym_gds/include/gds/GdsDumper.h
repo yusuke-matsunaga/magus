@@ -1,4 +1,4 @@
-#ifndef GDS_GDSDUMPER_H
+﻿#ifndef GDS_GDSDUMPER_H
 #define GDS_GDSDUMPER_H
 
 /// @file gds/GdsDumper.h

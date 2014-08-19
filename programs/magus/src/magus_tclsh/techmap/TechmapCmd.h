@@ -1,4 +1,4 @@
-#ifndef TECHMAP_TECHMAPCMD_H
+﻿#ifndef TECHMAP_TECHMAPCMD_H
 #define TECHMAP_TECHMAPCMD_H
 
 /// @file TechmapCmd.h

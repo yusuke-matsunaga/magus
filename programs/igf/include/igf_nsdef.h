@@ -1,4 +1,4 @@
-#ifndef IGF_NSDEF_H
+﻿#ifndef IGF_NSDEF_H
 #define IGF_NSDEF_H
 
 /// @file igf_nsdef.h

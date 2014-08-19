@@ -1,4 +1,4 @@
-#ifndef ADDCONV_H
+﻿#ifndef ADDCONV_H
 #define ADDCONV_H
 
 /// @file AddConv.h

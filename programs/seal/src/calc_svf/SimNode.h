@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_SIMNODE_H
+﻿#ifndef CALC_SVF_SIMNODE_H
 #define CALC_SVF_SIMNODE_H
 
 /// @file calc_svf/SimNode.h

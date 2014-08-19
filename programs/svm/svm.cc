@@ -1,4 +1,4 @@
-
+﻿
 /// @file svm.cc
 /// @brief svm のメインファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLDECLARRAY_H
+﻿#ifndef VERILOG_VL_VLDECLARRAY_H
 #define VERILOG_VL_VLDECLARRAY_H
 
 /// @file YmVerilog/vl/VlDeclArray.h

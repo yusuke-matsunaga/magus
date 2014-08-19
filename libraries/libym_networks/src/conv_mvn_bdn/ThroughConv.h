@@ -1,4 +1,4 @@
-#ifndef THROUGHCONV_H
+﻿#ifndef THROUGHCONV_H
 #define THROUGHCONV_H
 
 /// @file ThroughConv.h

@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MFSET_H
+﻿#ifndef YMUTILS_MFSET_H
 #define YMUTILS_MFSET_H
 
 /// @file YmUtils/MFSet.h

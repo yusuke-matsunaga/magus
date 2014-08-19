@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MATH_H
+﻿#ifndef YMUTILS_MATH_H
 #define YMUTILS_MATH_H
 
 /// @file YmUtils/math.h

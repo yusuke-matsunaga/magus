@@ -1,4 +1,4 @@
-
+﻿
 /// @file Printer2.cc
 /// @brief Printer2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-
+﻿
 /// @file lmtest.cc
 /// @brief LogicMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

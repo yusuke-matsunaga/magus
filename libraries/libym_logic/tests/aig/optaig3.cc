@@ -1,4 +1,4 @@
-/// @file libym_aig/tests/optaig3.cc
+﻿/// @file libym_aig/tests/optaig3.cc
 /// @brief 3入力の最適AIGを求めるプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

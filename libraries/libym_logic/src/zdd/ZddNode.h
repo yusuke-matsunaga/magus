@@ -1,4 +1,4 @@
-#ifndef ZDDNODE_H
+﻿#ifndef ZDDNODE_H
 #define ZDDNODE_H
 
 /// @file ZddNode.h

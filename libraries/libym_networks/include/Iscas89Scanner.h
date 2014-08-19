@@ -1,4 +1,4 @@
-#ifndef ISCAS89SCANNER_H
+﻿#ifndef ISCAS89SCANNER_H
 #define ISCAS89SCANNER_H
 
 /// @file Iscas89Scanner.h

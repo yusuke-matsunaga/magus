@@ -1,4 +1,4 @@
-
+﻿
 /// @file ItemGen.cc
 /// @brief ElbMgr の実装ファイル(要素の実体化)
 /// @author Yusuke Matsunaga (松永 裕介)

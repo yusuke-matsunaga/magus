@@ -1,4 +1,4 @@
-#ifndef YMSH_YMSHCMD_H
+﻿#ifndef YMSH_YMSHCMD_H
 #define YMSH_YMSHCMD_H
 
 /// @file Ymsh/YmshCmd.h

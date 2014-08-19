@@ -1,4 +1,4 @@
-#ifndef ZDDEDGE_H
+﻿#ifndef ZDDEDGE_H
 #define ZDDEDGE_H
 
 /// @file ZddEdge.h

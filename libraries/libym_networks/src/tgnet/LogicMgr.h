@@ -1,4 +1,4 @@
-#ifndef LOGICMGR_H
+﻿#ifndef LOGICMGR_H
 #define LOGICMGR_H
 
 /// @file LogicMgr.h

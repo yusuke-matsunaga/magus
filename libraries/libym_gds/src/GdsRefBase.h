@@ -1,4 +1,4 @@
-#ifndef GDSREFBASE_H
+﻿#ifndef GDSREFBASE_H
 #define GDSREFBASE_H
 
 /// @file GdsRefBase.h

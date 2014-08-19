@@ -1,4 +1,4 @@
-#ifndef FAULTSTATUS_H
+﻿#ifndef FAULTSTATUS_H
 #define FAULTSTATUS_H
 
 /// @file FaultStatus.h

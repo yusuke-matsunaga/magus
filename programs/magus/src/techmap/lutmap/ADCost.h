@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_ADCOST_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_ADCOST_H
 #define LIBYM_TECHMAP_LUTMAP_ADCOST_H
 
 /// @file libym_techmap/lutmap/ADCost.h

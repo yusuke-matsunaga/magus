@@ -1,4 +1,4 @@
-#ifndef SMTNAMEMGR_H
+﻿#ifndef SMTNAMEMGR_H
 #define SMTNAMEMGR_H
 
 /// @file SmtNameMgr.h

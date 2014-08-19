@@ -1,4 +1,4 @@
-#ifndef MCCELL_H
+﻿#ifndef MCCELL_H
 #define MCCELL_H
 
 /// @file McCell.h

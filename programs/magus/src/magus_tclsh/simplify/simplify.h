@@ -1,4 +1,4 @@
-#ifndef MAGUS_SIMPLIFY_SIMPLIFY_H
+﻿#ifndef MAGUS_SIMPLIFY_SIMPLIFY_H
 #define MAGUS_SIMPLIFY_SIMPLIFY_H
 
 /// @file magus/simplify/simplify.h

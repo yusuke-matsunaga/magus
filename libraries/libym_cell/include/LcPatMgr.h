@@ -1,4 +1,4 @@
-#ifndef LCPATMGR_H
+﻿#ifndef LCPATMGR_H
 #define LCPATMGR_H
 
 /// @file LcPatMgr.h

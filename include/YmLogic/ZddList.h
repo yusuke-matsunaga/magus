@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_ZDDLIST_H
+﻿#ifndef YMYMLOGIC_ZDDLIST_H
 #define YMYMLOGIC_ZDDLIST_H
 
 /// @file YmLogic/ZddList.h

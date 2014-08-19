@@ -1,4 +1,4 @@
-#ifndef CUTHASH_H
+﻿#ifndef CUTHASH_H
 #define CUTHASH_H
 
 /// @file CutHash.h

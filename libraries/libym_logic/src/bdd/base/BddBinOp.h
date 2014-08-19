@@ -1,4 +1,4 @@
-#ifndef BDDBINOP_H
+﻿#ifndef BDDBINOP_H
 #define BDDBINOP_H
 
 /// @file BddBinOp.h

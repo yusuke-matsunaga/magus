@@ -1,4 +1,4 @@
-#ifndef BLIFPARSER_H
+﻿#ifndef BLIFPARSER_H
 #define BLIFPARSER_H
 
 /// @file BlifParser.h

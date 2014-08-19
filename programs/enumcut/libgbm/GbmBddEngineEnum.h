@@ -1,4 +1,4 @@
-#ifndef GBMBDDENGINEENUM_H
+﻿#ifndef GBMBDDENGINEENUM_H
 #define GBMBDDENGINEENUM_H
 
 /// @file GbmBddEngineEnum.h

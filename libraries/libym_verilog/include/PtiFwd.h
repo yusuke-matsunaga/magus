@@ -1,4 +1,4 @@
-#ifndef PTIFWD_H
+﻿#ifndef PTIFWD_H
 #define PTIFWD_H
 
 /// @file PtiFwd.h

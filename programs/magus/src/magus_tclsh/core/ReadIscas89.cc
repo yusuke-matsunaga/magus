@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/core/ReadIscas89.cc
 /// @brief ReadIscas89 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

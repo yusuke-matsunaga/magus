@@ -1,4 +1,4 @@
-#ifndef MISNODEHEAP_H
+﻿#ifndef MISNODEHEAP_H
 #define MISNODEHEAP_H
 
 /// @file MisNodeHeap.h

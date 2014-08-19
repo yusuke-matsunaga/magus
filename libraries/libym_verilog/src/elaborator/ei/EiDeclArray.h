@@ -1,4 +1,4 @@
-#ifndef EIDECLARRAY_H
+﻿#ifndef EIDECLARRAY_H
 #define EIDECLARRAY_H
 
 /// @file EiDeclArray.h

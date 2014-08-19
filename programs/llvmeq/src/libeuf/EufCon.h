@@ -1,4 +1,4 @@
-#ifndef EUFCON_H
+﻿#ifndef EUFCON_H
 #define EUFCON_H
 
 /// @file EufCon.h

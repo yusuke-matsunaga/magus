@@ -1,4 +1,4 @@
-#ifndef LSIMNAIVE2_H
+﻿#ifndef LSIMNAIVE2_H
 #define LSIMNAIVE2_H
 
 /// @file LsimNaive2.h

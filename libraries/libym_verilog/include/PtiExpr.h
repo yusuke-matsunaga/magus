@@ -1,4 +1,4 @@
-#ifndef PTIEXPR_H
+﻿#ifndef PTIEXPR_H
 #define PTIEXPR_H
 
 /// @file PtiExpr.h

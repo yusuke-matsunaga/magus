@@ -1,4 +1,4 @@
-#ifndef EIMODULE_H
+﻿#ifndef EIMODULE_H
 #define EIMODULE_H
 
 /// @file EiModule.h

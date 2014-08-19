@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_lutmap/Ln2BNet.cc
 /// @brief Ln2BNet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

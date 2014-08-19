@@ -1,4 +1,4 @@
-#ifndef LEXCONDPLUGIN_H
+﻿#ifndef LEXCONDPLUGIN_H
 #define LEXCONDPLUGIN_H
 
 /// @file LexCondPlugin.h

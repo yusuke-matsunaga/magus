@@ -1,4 +1,4 @@
-#ifndef EIPROCESS_H
+﻿#ifndef EIPROCESS_H
 #define EIPROCESS_H
 
 /// @file EiProcess.h

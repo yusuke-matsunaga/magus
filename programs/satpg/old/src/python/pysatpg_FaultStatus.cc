@@ -1,4 +1,4 @@
-
+﻿
 /// @file pysatpg_FaultStatus.cc
 /// @brief FaultStatus の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

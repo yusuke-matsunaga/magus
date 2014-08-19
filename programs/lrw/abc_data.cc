@@ -1,4 +1,4 @@
-
+﻿
 /// @file abc_data.cc
 /// @brief abc:rwtUtil.c のデータ
 /// @author Yusuke Matsunaga (松永 裕介)

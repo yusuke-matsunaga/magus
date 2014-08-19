@@ -1,4 +1,4 @@
-#ifndef CMNNODEDFFIN_H
+﻿#ifndef CMNNODEDFFIN_H
 #define CMNNODEDFFIN_H
 
 /// @file CmnNodeDffIn.h

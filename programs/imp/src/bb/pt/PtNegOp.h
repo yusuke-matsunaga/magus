@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTNEGOP_H
+﻿#ifndef SRC_PT_PTNEGOP_H
 #define SRC_PT_PTNEGOP_H
 
 /// @file src/pt/PtNegOp.h

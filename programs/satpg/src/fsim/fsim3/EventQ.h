@@ -1,4 +1,4 @@
-#ifndef EVENTQ_H
+﻿#ifndef EVENTQ_H
 #define EVENTQ_H
 
 /// @file EventQ.h

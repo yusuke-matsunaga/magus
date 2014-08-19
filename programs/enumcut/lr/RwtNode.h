@@ -1,4 +1,4 @@
-#ifndef RWTNODE_H
+﻿#ifndef RWTNODE_H
 #define RWTNODE_H
 
 /// @file RwtNode.h

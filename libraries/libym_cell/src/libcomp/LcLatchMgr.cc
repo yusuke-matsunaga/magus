@@ -1,4 +1,4 @@
-
+﻿
 /// @file LcLatchMgr.cc
 /// @brief LcLatchMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

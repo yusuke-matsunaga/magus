@@ -1,4 +1,4 @@
-#ifndef YM_NPN_CVFUNC_H
+﻿#ifndef YM_NPN_CVFUNC_H
 #define YM_NPN_CVFUNC_H
 
 /// @file YmLogic/CvFunc.h

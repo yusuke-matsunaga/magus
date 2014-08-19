@@ -1,4 +1,4 @@
-#ifndef IGUGEN_H
+﻿#ifndef IGUGEN_H
 #define IGUGEN_H
 
 /// @file IguGen.h

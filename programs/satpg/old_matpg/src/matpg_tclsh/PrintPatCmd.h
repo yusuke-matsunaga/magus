@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_PRINTPATCMD_H
+﻿#ifndef SRC_MATPG_PRINTPATCMD_H
 #define SRC_MATPG_PRINTPATCMD_H
 
 /// @file src/matpg/PrintPatCmd.h

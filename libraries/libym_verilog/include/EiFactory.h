@@ -1,4 +1,4 @@
-#ifndef EIFACTORY_H
+﻿#ifndef EIFACTORY_H
 #define EIFACTORY_H
 
 /// @file EiFactory.h

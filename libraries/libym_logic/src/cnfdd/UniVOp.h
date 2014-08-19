@@ -1,4 +1,4 @@
-#ifndef UNIVOP_H
+﻿#ifndef UNIVOP_H
 #define UNIVOP_H
 
 /// @file UniVOp.h

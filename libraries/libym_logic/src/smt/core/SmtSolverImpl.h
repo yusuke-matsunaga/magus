@@ -1,4 +1,4 @@
-#ifndef SMTSOLVERIMPL_H
+﻿#ifndef SMTSOLVERIMPL_H
 #define SMTSOLVERIMPL_H
 
 /// @file SmtSolverImpl.h

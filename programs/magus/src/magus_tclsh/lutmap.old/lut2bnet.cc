@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/lut2bnet.cc
 /// @brief lut2bnet() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

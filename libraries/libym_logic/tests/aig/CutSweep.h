@@ -1,4 +1,4 @@
-#ifndef LIBYM_AIG_CUTSWEEP_H
+﻿#ifndef LIBYM_AIG_CUTSWEEP_H
 #define LIBYM_AIG_CUTSWEEP_H
 
 /// @file libym_aig/tests/CutSweep.h

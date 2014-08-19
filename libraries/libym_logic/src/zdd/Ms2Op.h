@@ -1,4 +1,4 @@
-#ifndef MS2OP_H
+﻿#ifndef MS2OP_H
 #define MS2OP_H
 
 /// @file Ms2Op.h

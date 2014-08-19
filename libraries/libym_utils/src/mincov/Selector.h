@@ -1,4 +1,4 @@
-#ifndef SELECTOR_H
+﻿#ifndef SELECTOR_H
 #define SELECTOR_H
 
 /// @file Selector.h

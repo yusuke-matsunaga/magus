@@ -1,4 +1,4 @@
-#ifndef ELBFWD_H
+﻿#ifndef ELBFWD_H
 #define ELBFWD_H
 
 /// @file ElbFwd.h

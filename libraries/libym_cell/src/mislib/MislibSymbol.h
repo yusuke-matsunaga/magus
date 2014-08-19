@@ -1,4 +1,4 @@
-#ifndef MISLIBSYMBOL_H
+﻿#ifndef MISLIBSYMBOL_H
 #define MISLIBSYMBOL_H
 
 /// @file MislibSymbol.h

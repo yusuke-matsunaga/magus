@@ -1,4 +1,4 @@
-#ifndef SATENGINEMULTI2_H
+﻿#ifndef SATENGINEMULTI2_H
 #define SATENGINEMULTI2_H
 
 /// @file SatEngineMulti2.h

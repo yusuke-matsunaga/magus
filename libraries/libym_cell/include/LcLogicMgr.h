@@ -1,4 +1,4 @@
-#ifndef LCLOGICMGR_H
+﻿#ifndef LCLOGICMGR_H
 #define LCLOGICMGR_H
 
 /// @file LcLogicMgr.h

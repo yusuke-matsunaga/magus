@@ -1,4 +1,4 @@
-
+﻿
 /// @file TagDict.cc
 /// @brief TagDict の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

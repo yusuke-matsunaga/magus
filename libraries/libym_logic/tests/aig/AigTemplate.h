@@ -1,4 +1,4 @@
-#ifndef LIBYM_AIG_TESTS_AIGTEMPLATE_H
+﻿#ifndef LIBYM_AIG_TESTS_AIGTEMPLATE_H
 #define LIBYM_AIG_TESTS_AIGTEMPLATE_H
 
 /// @file AigTemplate.h

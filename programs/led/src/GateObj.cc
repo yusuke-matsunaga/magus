@@ -1,4 +1,4 @@
-
+﻿
 /// @file led/GateObj.cc
 /// @brief GateObj の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

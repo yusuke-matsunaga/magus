@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLMODULE_H
+﻿#ifndef VERILOG_VL_VLMODULE_H
 #define VERILOG_VL_VLMODULE_H
 
 /// @file YmVerilog/vl/VlModule.h

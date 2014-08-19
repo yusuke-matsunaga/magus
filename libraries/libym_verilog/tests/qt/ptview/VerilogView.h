@@ -1,4 +1,4 @@
-#ifndef VERILOGVIEW_H
+﻿#ifndef VERILOGVIEW_H
 #define VERILOGVIEW_H
 
 /// @file VerilogView.h

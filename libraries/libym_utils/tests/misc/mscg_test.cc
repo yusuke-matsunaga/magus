@@ -1,4 +1,4 @@
-
+﻿
 /// @file mscg_test.cc
 /// @brief MultiSetCombiGen のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

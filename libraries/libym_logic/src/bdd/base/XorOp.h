@@ -1,4 +1,4 @@
-#ifndef XOROP_H
+﻿#ifndef XOROP_H
 #define XOROP_H
 
 /// @file XorOp.h

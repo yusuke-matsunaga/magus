@@ -1,4 +1,4 @@
-#ifndef PTNODE_H
+﻿#ifndef PTNODE_H
 #define PTNODE_H
 
 /// @file libym_YmCell/tests/dotlib_ptview/PtNode.h

@@ -1,4 +1,4 @@
-#ifndef H_MATPG_VAL
+﻿#ifndef H_MATPG_VAL
 #define H_MATPG_VAL
 
 /*

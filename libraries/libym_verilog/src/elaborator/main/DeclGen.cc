@@ -1,4 +1,4 @@
-
+﻿
 /// @file DeclGen.cc
 /// @brief ElbMgr の実装ファイル(宣言要素の elaboration)
 /// @author Yusuke Matsunaga (松永 裕介)

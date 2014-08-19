@@ -1,4 +1,4 @@
-
+﻿
 /// @file GateColor.cc
 /// @brief GateColor の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef EIPRIMARY_H
+﻿#ifndef EIPRIMARY_H
 #define EIPRIMARY_H
 
 /// @file EiPrimary.h

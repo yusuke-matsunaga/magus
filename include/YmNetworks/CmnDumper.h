@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMNDUMPER_H
+﻿#ifndef NETWORKS_CMNDUMPER_H
 #define NETWORKS_CMNDUMPER_H
 
 /// @file YmNetworks/CmnDumper.h

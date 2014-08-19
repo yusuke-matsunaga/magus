@@ -1,4 +1,4 @@
-#ifndef CONSTPARTSELECTCONV_H
+﻿#ifndef CONSTPARTSELECTCONV_H
 #define CONSTPARTSELECTCONV_H
 
 /// @file ConstPartSelectConv.h

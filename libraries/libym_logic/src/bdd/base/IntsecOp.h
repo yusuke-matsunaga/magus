@@ -1,4 +1,4 @@
-#ifndef INTSECOP_H
+﻿#ifndef INTSECOP_H
 #define INTSECOP_H
 
 /// @file IntsecOp.h

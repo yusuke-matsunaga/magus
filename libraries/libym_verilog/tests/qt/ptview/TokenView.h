@@ -1,4 +1,4 @@
-#ifndef TOKENVIEW_H
+﻿#ifndef TOKENVIEW_H
 #define TOKENVIEW_H
 
 /// @file TokenView.h

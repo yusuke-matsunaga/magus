@@ -1,4 +1,4 @@
-#ifndef MAGUS_MAGCMD_H
+﻿#ifndef MAGUS_MAGCMD_H
 #define MAGUS_MAGCMD_H
 
 /// @file MagCmd.h

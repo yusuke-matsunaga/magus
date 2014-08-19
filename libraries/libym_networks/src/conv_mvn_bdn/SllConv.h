@@ -1,4 +1,4 @@
-#ifndef SLLCONV_H
+﻿#ifndef SLLCONV_H
 #define SLLCONV_H
 
 /// @file SllConv.h

@@ -1,4 +1,4 @@
-#ifndef ELBCONTROL_H
+﻿#ifndef ELBCONTROL_H
 #define ELBCONTROL_H
 
 /// @file ElbControl.h

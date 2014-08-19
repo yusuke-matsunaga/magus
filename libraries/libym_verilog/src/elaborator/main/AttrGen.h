@@ -1,4 +1,4 @@
-#ifndef ATTRGEN_H
+﻿#ifndef ATTRGEN_H
 #define ATTRGEN_H
 
 /// @file AttrGen.h

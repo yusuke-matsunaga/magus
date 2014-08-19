@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_CNFDD_NSDEF_H
+﻿#ifndef YMYMLOGIC_CNFDD_NSDEF_H
 #define YMYMLOGIC_CNFDD_NSDEF_H
 
 /// @file YmLogic/cnfdd_nsdef.h

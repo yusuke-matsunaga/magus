@@ -1,4 +1,4 @@
-#ifndef BDDTRIOP_H
+﻿#ifndef BDDTRIOP_H
 #define BDDTRIOP_H
 
 /// @file BddTriOp.h

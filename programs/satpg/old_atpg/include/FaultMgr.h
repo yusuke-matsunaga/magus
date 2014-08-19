@@ -1,4 +1,4 @@
-#ifndef FAULTMGR_H
+﻿#ifndef FAULTMGR_H
 #define FAULTMGR_H
 
 /// @file FaultMgr.h

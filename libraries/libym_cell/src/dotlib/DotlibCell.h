@@ -1,4 +1,4 @@
-#ifndef DOTLIBCELL_H
+﻿#ifndef DOTLIBCELL_H
 #define DOTLIBCELL_H
 
 /// @file DotlibCell.h

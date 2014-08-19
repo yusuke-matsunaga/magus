@@ -1,4 +1,4 @@
-#ifndef INPUTFILE_H
+﻿#ifndef INPUTFILE_H
 #define INPUTFILE_H
 
 /// @file InputFile.h

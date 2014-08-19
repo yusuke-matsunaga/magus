@@ -1,4 +1,4 @@
-#ifndef PTBASEIMPL_H
+﻿#ifndef PTBASEIMPL_H
 #define PTBASEIMPL_H
 
 /// @file libym_YmCell/tests/dotlib_ptview/PtBaseNode.h

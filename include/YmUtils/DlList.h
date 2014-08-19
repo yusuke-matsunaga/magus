@@ -1,4 +1,4 @@
-#ifndef YMUTILS_DLLIST_H
+﻿#ifndef YMUTILS_DLLIST_H
 #define YMUTILS_DLLIST_H
 
 /// @file YmUtils/DlList.h

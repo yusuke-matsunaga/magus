@@ -1,4 +1,4 @@
-#ifndef SMTCONSTTERM_H
+﻿#ifndef SMTCONSTTERM_H
 #define SMTCONSTTERM_H
 
 /// @file SmtConstTerm.h

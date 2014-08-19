@@ -1,4 +1,4 @@
-
+﻿
 /// @file VerilogSyntaxHighlighter.cc
 /// @brief VerilogSyntaxHighlighter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

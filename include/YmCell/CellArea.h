@@ -1,4 +1,4 @@
-#ifndef CELL_CELLAREA_H
+﻿#ifndef CELL_CELLAREA_H
 #define CELL_CELLAREA_H
 
 /// @file YmCell/CellArea.h

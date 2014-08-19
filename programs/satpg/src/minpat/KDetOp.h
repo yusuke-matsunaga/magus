@@ -1,4 +1,4 @@
-#ifndef KDETOP_H
+﻿#ifndef KDETOP_H
 #define KDETOP_H
 
 /// @file KDetOp.h

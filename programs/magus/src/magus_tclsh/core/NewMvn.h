@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_NEWMVN_H
+﻿#ifndef SRC_CORE_NEWMVN_H
 #define SRC_CORE_NEWMVN_H
 
 /// @file src/core/NewMvn.h

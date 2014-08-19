@@ -1,4 +1,4 @@
-#ifndef DOTLIBPIN_H
+﻿#ifndef DOTLIBPIN_H
 #define DOTLIBPIN_H
 
 /// @file DotlibPin.h

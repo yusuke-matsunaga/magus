@@ -1,4 +1,4 @@
-#ifndef TCLPOPTGROUP_H
+﻿#ifndef TCLPOPTGROUP_H
 #define TCLPOPTGROUP_H
 
 /// @file TclPoptGroup.h

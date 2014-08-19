@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/core/NewBdn.cc
 /// @brief NewBdn の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

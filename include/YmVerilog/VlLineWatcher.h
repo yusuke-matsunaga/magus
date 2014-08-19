@@ -1,4 +1,4 @@
-#ifndef VERILOG_VLLINEWATCHER_H
+﻿#ifndef VERILOG_VLLINEWATCHER_H
 #define VERILOG_VLLINEWATCHER_H
 
 /// @file YmVerilog/VlLineWatcher.h

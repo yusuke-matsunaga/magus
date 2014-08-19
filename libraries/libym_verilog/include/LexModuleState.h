@@ -1,4 +1,4 @@
-#ifndef LEXMODULESTATE_H
+﻿#ifndef LEXMODULESTATE_H
 #define LEXMODULESTATE_H
 
 /// @file LexModuleState.h

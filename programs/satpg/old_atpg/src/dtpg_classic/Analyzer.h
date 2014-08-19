@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_ANALYZER_H
+﻿#ifndef DTPG_CLASSIC_ANALYZER_H
 #define DTPG_CLASSIC_ANALYZER_H
 
 /// @file src/dtpg_classic/Analyzer.h

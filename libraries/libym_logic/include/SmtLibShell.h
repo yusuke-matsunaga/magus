@@ -1,4 +1,4 @@
-#ifndef YM_SMTLiBV2_SMTLIBSHELL_H
+﻿#ifndef YM_SMTLiBV2_SMTLIBSHELL_H
 #define YM_SMTLiBV2_SMTLIBSHELL_H
 
 /// @file SmtLibShell.h

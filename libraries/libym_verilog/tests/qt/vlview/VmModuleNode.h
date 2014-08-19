@@ -1,4 +1,4 @@
-#ifndef VMMODULEMODE_H
+﻿#ifndef VMMODULEMODE_H
 #define VMMODULEMODE_H
 
 /// @file VmModuleNode.h

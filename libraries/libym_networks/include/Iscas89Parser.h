@@ -1,4 +1,4 @@
-#ifndef ISCAS89PARSER_H
+﻿#ifndef ISCAS89PARSER_H
 #define ISCAS89PARSER_H
 
 /// @file Iscas89Parser.h

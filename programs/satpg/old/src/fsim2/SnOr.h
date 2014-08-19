@@ -1,4 +1,4 @@
-#ifndef SNOR_H
+﻿#ifndef SNOR_H
 #define SNOR_H
 
 /// @file src/fsim2/SnOr.h

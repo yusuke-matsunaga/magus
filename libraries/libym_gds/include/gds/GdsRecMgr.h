@@ -1,4 +1,4 @@
-#ifndef GDS_GDSRECMGR_H
+﻿#ifndef GDS_GDSRECMGR_H
 #define GDS_GDSRECMGR_H
 
 /// @file gds/GdsRecMgr.h

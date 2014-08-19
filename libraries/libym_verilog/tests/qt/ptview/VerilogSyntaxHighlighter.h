@@ -1,4 +1,4 @@
-#ifndef VERILOGSYNTAXHIGHLIGTHER_H
+﻿#ifndef VERILOGSYNTAXHIGHLIGTHER_H
 #define VERILOGSYNTAXHIGHLIGTHER_H
 
 /// @file VerilogSyntaxHighlighter.h

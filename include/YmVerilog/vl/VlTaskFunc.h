@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLTASKFUNC_H
+﻿#ifndef VERILOG_VL_VLTASKFUNC_H
 #define VERILOG_VL_VLTASKFUNC_H
 
 /// @file YmVerilog/vl/VlTaskFunc.h

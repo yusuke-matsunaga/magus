@@ -1,4 +1,4 @@
-#ifndef LIBYM_SEAL_LOGICSIM_H
+﻿#ifndef LIBYM_SEAL_LOGICSIM_H
 #define LIBYM_SEAL_LOGICSIM_H
 
 /// @file libym_seal/LogicSim.h

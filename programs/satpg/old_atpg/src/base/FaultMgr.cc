@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/base/FaultMgr.cc
 /// @brief FaultMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

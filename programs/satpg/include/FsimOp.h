@@ -1,4 +1,4 @@
-#ifndef FSIMOP_H
+﻿#ifndef FSIMOP_H
 #define FSIMOP_H
 
 /// @file FsimOp.h

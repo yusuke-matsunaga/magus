@@ -1,4 +1,4 @@
-
+﻿
 /// @file AigSatData.h
 /// @brief AigSatData のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)

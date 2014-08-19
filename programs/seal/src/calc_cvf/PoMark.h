@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_POMARK_H
+﻿#ifndef CALC_CVF_POMARK_H
 #define CALC_CVF_POMARK_H
 
 /// @file calc_cvf/PoMark.h

@@ -1,4 +1,4 @@
-#ifndef RECCMD_H
+﻿#ifndef RECCMD_H
 #define RECCMD_H
 
 /// @file RecCmd.h

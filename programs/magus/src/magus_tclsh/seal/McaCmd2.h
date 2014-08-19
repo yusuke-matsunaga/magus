@@ -1,4 +1,4 @@
-#ifndef SRC_SEAL_MCACMD2_H
+﻿#ifndef SRC_SEAL_MCACMD2_H
 #define SRC_SEAL_MCACMD2_H
 
 /// @file src/seal/McaCmd2.h

@@ -1,4 +1,4 @@
-#ifndef FSIM3_SNINPUT_H
+﻿#ifndef FSIM3_SNINPUT_H
 #define FSIM3_SNINPUT_H
 
 /// @file fsim/SnInput.h

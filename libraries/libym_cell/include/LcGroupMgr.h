@@ -1,4 +1,4 @@
-#ifndef LCGROUPMGR_H
+﻿#ifndef LCGROUPMGR_H
 #define LCGROUPMGR_H
 
 /// @file LcGroupMgr.h

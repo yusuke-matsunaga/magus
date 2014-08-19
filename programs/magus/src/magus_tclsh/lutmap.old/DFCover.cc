@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/DFCover.cc
 /// @brief duplicaton free covering を行うクラス
 /// @author Yusuke Matsunaga (松永 裕介)

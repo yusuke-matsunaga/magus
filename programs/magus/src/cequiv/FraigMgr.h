@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_FRAIGMGR_H
+﻿#ifndef LIBYM_CEC_FRAIGMGR_H
 #define LIBYM_CEC_FRAIGMGR_H
 
 /// @file ym_cec/FraigMgr.h

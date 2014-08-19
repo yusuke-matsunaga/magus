@@ -1,4 +1,4 @@
-#ifndef COMPLEXHANDLER_H
+﻿#ifndef COMPLEXHANDLER_H
 #define COMPLEXHANDLER_H
 
 /// @file ComplexHandler.h

@@ -1,4 +1,4 @@
-// $Id: cvfunc_test.cc 1594 2008-07-18 10:26:12Z matsunaga $
+﻿// $Id: cvfunc_test.cc 1594 2008-07-18 10:26:12Z matsunaga $
 
 // CvFunc パッケージのテスト
 

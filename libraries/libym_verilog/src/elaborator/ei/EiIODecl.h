@@ -1,4 +1,4 @@
-#ifndef EIIODECL_H
+﻿#ifndef EIIODECL_H
 #define EIIODECL_H
 
 /// @file EiIODecl.h

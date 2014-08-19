@@ -1,4 +1,4 @@
-#ifndef GBMSATNAIVEONEHOT_H
+﻿#ifndef GBMSATNAIVEONEHOT_H
 #define GBMSATNAIVEONEHOT_H
 
 /// @file GbmSatNaiveOneHot.h

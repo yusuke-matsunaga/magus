@@ -1,4 +1,4 @@
-#ifndef MAGUS_MAGBNETCMD_H
+﻿#ifndef MAGUS_MAGBNETCMD_H
 #define MAGUS_MAGBNETCMD_H
 
 /// @file BNetCmd.h

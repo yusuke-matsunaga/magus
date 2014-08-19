@@ -1,4 +1,4 @@
-
+﻿
 /// @file atpg/src/dtpg_sat/tgnet2aig.cc
 /// @brief TgNetwork から AIG を作る関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef AIGMGRIMPL_H
+﻿#ifndef AIGMGRIMPL_H
 #define AIGMGRIMPL_H
 
 /// @file AigMgrImpl.h

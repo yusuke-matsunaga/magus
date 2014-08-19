@@ -1,4 +1,4 @@
-
+﻿
 /// @file SptSpecItem.cc
 /// @brief SptSpecItem の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

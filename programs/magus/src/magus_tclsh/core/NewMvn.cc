@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/core/NewMvn.cc
 /// @brief NewMvn の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pt/PtUnaryOp.cc
 /// @brief PtUnaryOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

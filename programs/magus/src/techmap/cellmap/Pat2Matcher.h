@@ -1,4 +1,4 @@
-#ifndef PAT2MATCHER_H
+﻿#ifndef PAT2MATCHER_H
 #define PAT2MATCHER_H
 
 /// @file Pat2Matcher.h

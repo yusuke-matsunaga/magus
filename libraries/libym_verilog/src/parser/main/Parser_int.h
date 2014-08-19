@@ -1,4 +1,4 @@
-#ifndef PARSER_INT_H
+﻿#ifndef PARSER_INT_H
 #define PARSER_INT_H
 
 /// @file Parser_int.h

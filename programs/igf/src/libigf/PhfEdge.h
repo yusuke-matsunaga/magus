@@ -1,4 +1,4 @@
-#ifndef PHFEDGE_H
+﻿#ifndef PHFEDGE_H
 #define PHFEDGE_H
 
 /// @file PhfEdge.h

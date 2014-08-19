@@ -1,4 +1,4 @@
-#ifndef FOPROFSIM_H
+﻿#ifndef FOPROFSIM_H
 #define FOPROFSIM_H
 
 /// @file FopRofsim.h

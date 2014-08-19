@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_PUSHNETWORK_H
+﻿#ifndef SRC_CORE_PUSHNETWORK_H
 #define SRC_CORE_PUSHNETWORK_H
 
 /// @file src/core/PushNetwork.h

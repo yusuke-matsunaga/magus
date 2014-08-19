@@ -1,4 +1,4 @@
-#ifndef EUFNODE_H
+﻿#ifndef EUFNODE_H
 #define EUFNODE_H
 
 /// @file EufNode.h

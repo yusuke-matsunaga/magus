@@ -1,4 +1,4 @@
-#ifndef INCLUDE_PTMGR_H
+﻿#ifndef INCLUDE_PTMGR_H
 #define INCLUDE_PTMGR_H
 
 /// @file include/PtMgr.h

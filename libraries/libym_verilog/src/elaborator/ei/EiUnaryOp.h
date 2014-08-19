@@ -1,4 +1,4 @@
-#ifndef EIUNARYOP_H
+﻿#ifndef EIUNARYOP_H
 #define EIUNARYOP_H
 
 /// @file EiUnaryOp.h

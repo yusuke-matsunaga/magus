@@ -1,4 +1,4 @@
-
+﻿
 /// @file VlDumperImpl_scope.cc
 /// @brief VlDumperImpl の実装ファイル (scope担当)
 /// @author Yusuke Matsunaga (松永 裕介)

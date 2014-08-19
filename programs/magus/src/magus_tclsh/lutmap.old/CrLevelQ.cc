@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/CrLevelQ.cc
 /// @brief CrLevelQ の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

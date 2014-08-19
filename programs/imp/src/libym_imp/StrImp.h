@@ -1,4 +1,4 @@
-#ifndef STRIMP_H
+﻿#ifndef STRIMP_H
 #define STRIMP_H
 
 /// @file StrImp.h

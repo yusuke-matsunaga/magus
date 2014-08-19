@@ -1,4 +1,4 @@
-#ifndef CICELLHASH_H
+﻿#ifndef CICELLHASH_H
 #define CICELLHASH_H
 
 /// @file CiCellHash.h

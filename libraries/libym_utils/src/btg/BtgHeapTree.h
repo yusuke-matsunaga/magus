@@ -1,4 +1,4 @@
-#ifndef BTGHEAPTREE_H
+﻿#ifndef BTGHEAPTREE_H
 #define BTGHEAPTREE_H
 
 /// @file BtgHeapTree.h

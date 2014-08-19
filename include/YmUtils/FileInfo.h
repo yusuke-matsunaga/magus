@@ -1,4 +1,4 @@
-#ifndef YMUTILS_FILEINFO_H
+﻿#ifndef YMUTILS_FILEINFO_H
 #define YMUTILS_FILEINFO_H
 
 /// @file YmUtils/FileInfo.h

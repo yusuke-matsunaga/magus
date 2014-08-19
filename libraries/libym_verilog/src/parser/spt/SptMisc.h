@@ -1,4 +1,4 @@
-#ifndef SPTMISC_H
+﻿#ifndef SPTMISC_H
 #define SPTMISC_H
 
 /// @file SptMisc.h

@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNBLIFWRITER_H
+﻿#ifndef NETWORKS_BDNBLIFWRITER_H
 #define NETWORKS_BDNBLIFWRITER_H
 
 /// @file YmNetworks/BdnBlifWriter.h

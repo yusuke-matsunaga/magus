@@ -1,4 +1,4 @@
-#ifndef ZDDVAR_H
+﻿#ifndef ZDDVAR_H
 #define ZDDVAR_H
 
 /// @file ZddVar.h

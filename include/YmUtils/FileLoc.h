@@ -1,4 +1,4 @@
-#ifndef YMUTILS_FILELOC_H
+﻿#ifndef YMUTILS_FILELOC_H
 #define YMUTILS_FILELOC_H
 
 /// @file YmUtils/FileLoc.h

@@ -1,4 +1,4 @@
-#ifndef CELL_CELLLATCHINFO_H
+﻿#ifndef CELL_CELLLATCHINFO_H
 #define CELL_CELLLATCHINFO_H
 
 /// @file YmCell/CellLatchInfo.h

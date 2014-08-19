@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_RTPGCMD_H
+﻿#ifndef SRC_MATPG_RTPGCMD_H
 #define SRC_MATPG_RTPGCMD_H
 
 /// @file src/matpg/RtpgCmd.h

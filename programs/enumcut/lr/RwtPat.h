@@ -1,4 +1,4 @@
-#ifndef RWTPAT_H
+﻿#ifndef RWTPAT_H
 #define RWTPAT_H
 
 /// @file RwtPat.h

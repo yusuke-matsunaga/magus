@@ -1,4 +1,4 @@
-#ifndef EUFEQ_H
+﻿#ifndef EUFEQ_H
 #define EUFEQ_H
 
 /// @file EufEq.h

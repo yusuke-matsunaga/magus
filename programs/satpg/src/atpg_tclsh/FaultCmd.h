@@ -1,4 +1,4 @@
-#ifndef FAULTCMD_H
+﻿#ifndef FAULTCMD_H
 #define FAULTCMD_H
 
 /// @file FaultCmd.h

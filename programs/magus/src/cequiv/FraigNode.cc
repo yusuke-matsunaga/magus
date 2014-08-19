@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_cec/FraigNode.cc
 /// @brief FraigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

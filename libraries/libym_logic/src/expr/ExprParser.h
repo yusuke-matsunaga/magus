@@ -1,4 +1,4 @@
-#ifndef EXPRPARSER_H
+﻿#ifndef EXPRPARSER_H
 #define EXPRPARSER_H
 
 /// @file ExprParser.h

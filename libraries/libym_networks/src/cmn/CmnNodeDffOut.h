@@ -1,4 +1,4 @@
-#ifndef CMNNODEDFFOUT_H
+﻿#ifndef CMNNODEDFFOUT_H
 #define CMNNODEDFFOUT_H
 
 /// @file CmnNodeDffOut.h

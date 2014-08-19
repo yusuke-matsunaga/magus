@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMNPORT_H
+﻿#ifndef NETWORKS_CMNPORT_H
 #define NETWORKS_CMNPORT_H
 
 /// @file YmNetworks/CmnPort.h

@@ -1,4 +1,4 @@
-#ifndef RANDHASHGEN_H
+﻿#ifndef RANDHASHGEN_H
 #define RANDHASHGEN_H
 
 /// @file RandHashGen.h

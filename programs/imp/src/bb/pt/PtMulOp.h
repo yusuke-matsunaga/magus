@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTMULOP_H
+﻿#ifndef SRC_PT_PTMULOP_H
 #define SRC_PT_PTMULOP_H
 
 /// @file src/pt/PtMulOp.h

@@ -1,4 +1,4 @@
-#ifndef BINOP_H
+﻿#ifndef BINOP_H
 #define BINOP_H
 
 /// @file BinOp.h

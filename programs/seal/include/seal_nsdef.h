@@ -1,4 +1,4 @@
-#ifndef SEAL_SEAL_NSDEF_H
+﻿#ifndef SEAL_SEAL_NSDEF_H
 #define SEAL_SEAL_NSDEF_H
 
 /// @file seal/seal_nsdef.h

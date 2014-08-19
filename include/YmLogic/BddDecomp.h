@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_BDDDECOMP_H
+﻿#ifndef YMYMLOGIC_BDDDECOMP_H
 #define YMYMLOGIC_BDDDECOMP_H
 
 /// @file YmLogic/BddDecomp.h

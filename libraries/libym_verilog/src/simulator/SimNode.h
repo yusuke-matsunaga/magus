@@ -1,4 +1,4 @@
-#ifndef LIBYM_VERILOG_SIMULATOR_SIMNODE_H
+﻿#ifndef LIBYM_VERILOG_SIMULATOR_SIMNODE_H
 #define LIBYM_VERILOG_SIMULATOR_SIMNODE_H
 
 /// @file libym_YmVerilog/simulator/SimNode.h

@@ -1,4 +1,4 @@
-#ifndef BTSIMPLE_H
+﻿#ifndef BTSIMPLE_H
 #define BTSIMPLE_H
 
 /// @file BtSimple.h

@@ -1,4 +1,4 @@
-#ifndef ALLOCTESTREGISTRY_H
+﻿#ifndef ALLOCTESTREGISTRY_H
 #define ALLOCTESTREGISTRY_H
 
 /// @file AllocTestRegistry.h

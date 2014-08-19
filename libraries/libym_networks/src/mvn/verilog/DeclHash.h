@@ -1,4 +1,4 @@
-#ifndef DECLHASH_H
+﻿#ifndef DECLHASH_H
 #define DECLHASH_H
 
 /// @file DeclHash.h

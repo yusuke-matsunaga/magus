@@ -1,4 +1,4 @@
-#ifndef BTJUST2_H
+﻿#ifndef BTJUST2_H
 #define BTJUST2_H
 
 /// @file BtJust2.h

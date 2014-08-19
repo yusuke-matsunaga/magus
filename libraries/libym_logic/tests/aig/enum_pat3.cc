@@ -1,4 +1,4 @@
-/// @file enum_pat3.cc
+﻿/// @file enum_pat3.cc
 /// @brief 3入力関数のパタンを列挙するプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

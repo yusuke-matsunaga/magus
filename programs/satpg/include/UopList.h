@@ -1,4 +1,4 @@
-#ifndef UOPLIST_H
+﻿#ifndef UOPLIST_H
 #define UOPLIST_H
 
 /// @file UopList.h

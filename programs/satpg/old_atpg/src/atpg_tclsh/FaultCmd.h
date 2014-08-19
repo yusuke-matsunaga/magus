@@ -1,4 +1,4 @@
-#ifndef SRC_TGNET_FAULTCMD_H
+﻿#ifndef SRC_TGNET_FAULTCMD_H
 #define SRC_TGNET_FAULTCMD_H
 
 /// @file src/tgnet/NtwkCmd.h

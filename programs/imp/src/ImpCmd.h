@@ -1,4 +1,4 @@
-#ifndef IMPCMD_H
+﻿#ifndef IMPCMD_H
 #define IMPCMD_H
 
 /// @file ImpCmd.h

@@ -1,4 +1,4 @@
-#ifndef DOTLIB_NSDEF_H
+﻿#ifndef DOTLIB_NSDEF_H
 #define DOTLIB_NSDEF_H
 
 /// @file dotlib_nsdef.h

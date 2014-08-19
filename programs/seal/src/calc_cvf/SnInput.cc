@@ -1,4 +1,4 @@
-
+﻿
 /// @file calc_cvf/SnInput.cc
 /// @brief SnInput の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef COMPTBL_H
+﻿#ifndef COMPTBL_H
 #define COMPTBL_H
 
 /// @file CompTbl.h

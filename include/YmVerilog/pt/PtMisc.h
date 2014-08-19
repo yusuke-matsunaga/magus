@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_PTMISC_H
+﻿#ifndef VERILOG_PT_PTMISC_H
 #define VERILOG_PT_PTMISC_H
 
 /// @file YmVerilog/pt/PtMisc.h

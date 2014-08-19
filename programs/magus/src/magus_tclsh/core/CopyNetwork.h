@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_COPYNETWORK_H
+﻿#ifndef SRC_CORE_COPYNETWORK_H
 #define SRC_CORE_COPYNETWORK_H
 
 /// @file src/core/CopyNetwork.h

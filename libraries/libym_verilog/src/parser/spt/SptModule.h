@@ -1,4 +1,4 @@
-#ifndef SPTMODULE_H
+﻿#ifndef SPTMODULE_H
 #define SPTMODULE_H
 
 /// @file SptModule.h

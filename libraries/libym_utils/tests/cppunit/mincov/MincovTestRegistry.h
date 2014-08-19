@@ -1,4 +1,4 @@
-#ifndef MINCOVTESTREGISTRY_H
+﻿#ifndef MINCOVTESTREGISTRY_H
 #define MINCOVTESTREGISTRY_H
 
 /// @file MincovTestRegistry.h

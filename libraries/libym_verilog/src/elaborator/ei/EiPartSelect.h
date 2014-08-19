@@ -1,4 +1,4 @@
-#ifndef EIPARTSELECT_H
+﻿#ifndef EIPARTSELECT_H
 #define EIPARTSELECT_H
 
 /// @file EiPartSelect.h

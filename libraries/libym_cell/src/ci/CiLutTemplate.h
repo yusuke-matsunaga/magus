@@ -1,4 +1,4 @@
-#ifndef CILUTTEMPLATE_H
+﻿#ifndef CILUTTEMPLATE_H
 #define CILUTTEMPLATE_H
 
 /// @file　CiLutTemplate.h

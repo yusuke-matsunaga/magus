@@ -1,4 +1,4 @@
-#ifndef EITERNARYOP_H
+﻿#ifndef EITERNARYOP_H
 #define EITERNARYOP_H
 
 /// @file EiTernaryOp.h

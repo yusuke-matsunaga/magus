@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_CNFDDMGR_H
+﻿#ifndef YMYMLOGIC_CNFDDMGR_H
 #define YMYMLOGIC_CNFDDMGR_H
 
 /// @file YmLogic/CNFddMgr.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file DimacsParser.cc
 /// @brief DimacsParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

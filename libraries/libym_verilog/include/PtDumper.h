@@ -1,4 +1,4 @@
-#ifndef PTDUMPER_H
+﻿#ifndef PTDUMPER_H
 #define PTDUMPER_H
 
 /// @file PtDumper.h

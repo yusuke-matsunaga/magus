@@ -1,4 +1,4 @@
-
+﻿
 /// @file LcClass.cc
 /// @brief LcClass の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

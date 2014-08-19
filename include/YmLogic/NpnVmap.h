@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_NPNVMAP_H
+﻿#ifndef YMYMLOGIC_NPNVMAP_H
 #define YMYMLOGIC_NPNVMAP_H
 
 /// @file YmLogic/NpnVmap.h

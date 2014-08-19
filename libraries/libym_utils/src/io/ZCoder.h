@@ -1,4 +1,4 @@
-#ifndef ZCODER_H
+﻿#ifndef ZCODER_H
 #define ZCODER_H
 
 /// @file ZCoder.h

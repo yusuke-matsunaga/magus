@@ -1,4 +1,4 @@
-#ifndef EXPRLUGIN_H
+﻿#ifndef EXPRLUGIN_H
 #define EXPRLUGIN_H
 
 /// @file LexPlugin.h

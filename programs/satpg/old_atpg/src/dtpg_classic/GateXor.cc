@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/dtpg_classic/GateXor.cc
 /// @brief GateXor の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

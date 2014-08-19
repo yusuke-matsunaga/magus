@@ -1,4 +1,4 @@
-#ifndef TPGNETWORK_H
+﻿#ifndef TPGNETWORK_H
 #define TPGNETWORK_H
 
 /// @file TpgNetwork.h

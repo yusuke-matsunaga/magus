@@ -1,4 +1,4 @@
-
+﻿
 /// @file LbMIS2.cc
 /// @brief LbMIS2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

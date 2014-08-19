@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/LutNetwork.cc
 /// @brief LutNetwork の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

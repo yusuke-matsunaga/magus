@@ -1,4 +1,4 @@
-#ifndef EXPRMGR_H
+﻿#ifndef EXPRMGR_H
 #define EXPRMGR_H
 
 /// @file ExprMgr.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_aig/tests/iscas89test.cc
 /// @brief iscas89 ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)

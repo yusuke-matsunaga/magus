@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/KfnMapperX.cc
 /// @brief KfnMapperX の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

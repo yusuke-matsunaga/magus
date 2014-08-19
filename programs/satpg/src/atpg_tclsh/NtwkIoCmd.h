@@ -1,4 +1,4 @@
-#ifndef NTWKIOCMD_H
+﻿#ifndef NTWKIOCMD_H
 #define NTWKIOCMD_H
 
 /// @file NtwkIoCmd.h

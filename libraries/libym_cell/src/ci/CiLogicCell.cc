@@ -1,4 +1,4 @@
-
+﻿
 /// @file CiLogicCell.cc
 /// @brief CiLogicCell の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef ELBSTUB_H
+﻿#ifndef ELBSTUB_H
 #define ELBSTUB_H
 
 /// @file ElbStub.h

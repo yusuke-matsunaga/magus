@@ -1,4 +1,4 @@
-#ifndef TCLPP_TCLOBJ_H
+﻿#ifndef TCLPP_TCLOBJ_H
 #define TCLPP_TCLOBJ_H
 
 /// @file YmTclpp/TclObj.h

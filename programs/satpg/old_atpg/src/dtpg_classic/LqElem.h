@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_LQELEM_H
+﻿#ifndef DTPG_CLASSIC_LQELEM_H
 #define DTPG_CLASSIC_LQELEM_H
 
 /// @file src/dtpg_classic/LqElem.h

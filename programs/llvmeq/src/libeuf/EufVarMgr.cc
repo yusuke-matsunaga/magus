@@ -1,4 +1,4 @@
-
+﻿
 /// @file EufVarMgr.cc
 /// @brief EufVarMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

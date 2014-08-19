@@ -1,4 +1,4 @@
-#ifndef ITVLMGRIMPL_H
+﻿#ifndef ITVLMGRIMPL_H
 #define ITVLMGRIMPL_H
 
 /// @file ItvlMgrImpl.h

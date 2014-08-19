@@ -1,4 +1,4 @@
-#ifndef VERILOG_VERILOG_H
+﻿#ifndef VERILOG_VERILOG_H
 #define VERILOG_VERILOG_H
 
 /// @file YmVerilog/verilog.h

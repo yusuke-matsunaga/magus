@@ -1,4 +1,4 @@
-
+﻿
 /// @file xform_comp_gen.cc
 /// @brief NpnXform の comp_table を作るためのプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

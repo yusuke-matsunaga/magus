@@ -1,4 +1,4 @@
-#ifndef CELL_CELLLUT_H
+﻿#ifndef CELL_CELLLUT_H
 #define CELL_CELLLUT_H
 
 /// @file YmCell/CellLut.h

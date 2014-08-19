@@ -1,4 +1,4 @@
-#ifndef LED_GATETEMPLATE_H
+﻿#ifndef LED_GATETEMPLATE_H
 #define LED_GATETEMPLATE_H
 
 /// @file led/GateTemplate.h

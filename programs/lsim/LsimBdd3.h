@@ -1,4 +1,4 @@
-#ifndef LSIMBDD3_H
+﻿#ifndef LSIMBDD3_H
 #define LSIMBDD3_H
 
 /// @file LsimBdd3.h

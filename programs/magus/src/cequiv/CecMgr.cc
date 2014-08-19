@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_cec/CecMgr.cc
 /// @brief CecMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

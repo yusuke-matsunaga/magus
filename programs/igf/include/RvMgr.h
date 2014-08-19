@@ -1,4 +1,4 @@
-#ifndef RVMGR_H
+﻿#ifndef RVMGR_H
 #define RVMGR_H
 
 /// @file RvMgr.h

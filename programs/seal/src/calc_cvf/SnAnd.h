@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_SNAND_H
+﻿#ifndef CALC_CVF_SNAND_H
 #define CALC_CVF_SNAND_H
 
 /// @file calc_cvf/SnAnd.h

@@ -1,4 +1,4 @@
-#ifndef SPTUDP_H
+﻿#ifndef SPTUDP_H
 #define SPTUDP_H
 
 /// @file SptUdp.h

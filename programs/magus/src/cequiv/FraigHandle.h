@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_FRAIGHANDLE_H
+﻿#ifndef LIBYM_CEC_FRAIGHANDLE_H
 #define LIBYM_CEC_FRAIGHANDLE_H
 
 /// @file libym_cec/FraigHandle.h

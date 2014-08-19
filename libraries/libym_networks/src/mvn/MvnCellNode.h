@@ -1,4 +1,4 @@
-#ifndef MVNCELLNODE_H
+﻿#ifndef MVNCELLNODE_H
 #define MVNCELLNODE_H
 
 /// @file MvnCellNode.h

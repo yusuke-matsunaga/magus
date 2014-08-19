@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/logbase/BNetIoCmd.cc
 /// @brief BNetIoCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

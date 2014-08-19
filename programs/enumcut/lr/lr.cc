@@ -1,4 +1,4 @@
-
+﻿
 /// @file tests/enumcut/lr.cc
 /// @brief local rewritingプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

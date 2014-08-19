@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_GATEINPUT_H
+﻿#ifndef DTPG_CLASSIC_GATEINPUT_H
 #define DTPG_CLASSIC_GATEINPUT_H
 
 /// @file src/dtpg_classic/GateInput.h

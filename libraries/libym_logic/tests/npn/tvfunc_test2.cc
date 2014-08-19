@@ -1,4 +1,4 @@
-// $Id: tvfunc_test2.cc 1594 2008-07-18 10:26:12Z matsunaga $
+﻿// $Id: tvfunc_test2.cc 1594 2008-07-18 10:26:12Z matsunaga $
 
 // TvFunc パッケージのテスト
 

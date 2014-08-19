@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_CFNA_H
+﻿#ifndef DTPG_CLASSIC_CFNA_H
 #define DTPG_CLASSIC_CFNA_H
 
 /// @file src/dtpg_classic/Cfna.h

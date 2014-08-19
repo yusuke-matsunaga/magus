@@ -1,4 +1,4 @@
-#ifndef EXPRNODEPTR_H
+﻿#ifndef EXPRNODEPTR_H
 #define EXPRNODEPTR_H
 
 /// @file ExprNodePtr.h

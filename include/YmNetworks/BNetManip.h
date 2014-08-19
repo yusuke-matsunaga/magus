@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BNETMANIP_H
+﻿#ifndef NETWORKS_BNETMANIP_H
 #define NETWORKS_BNETMANIP_H
 
 /// @file YmNetworks/BNetManip.h

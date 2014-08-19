@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTDIVOP_H
+﻿#ifndef SRC_PT_PTDIVOP_H
 #define SRC_PT_PTDIVOP_H
 
 /// @file src/pt/PtDivOp.h

@@ -1,4 +1,4 @@
-#ifndef DISCONOP_H
+﻿#ifndef DISCONOP_H
 #define DISCONOP_H
 
 /// @file DisOp.h

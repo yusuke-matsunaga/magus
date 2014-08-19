@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_CELLMAP_MATCH_H
+﻿#ifndef LIBYM_TECHMAP_CELLMAP_MATCH_H
 #define LIBYM_TECHMAP_CELLMAP_MATCH_H
 
 /// @file libym_techmap/cellmap/Match.h

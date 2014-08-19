@@ -1,4 +1,4 @@
-#ifndef NPNNODEMGR_H
+﻿#ifndef NPNNODEMGR_H
 #define NPNNODEMGR_H
 
 /// @file NpnNodeMgr.h

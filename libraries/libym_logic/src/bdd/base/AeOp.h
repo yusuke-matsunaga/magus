@@ -1,4 +1,4 @@
-#ifndef AEOP_H
+﻿#ifndef AEOP_H
 #define AEOP_H
 
 /// @file AeOp.h

@@ -1,4 +1,4 @@
-#ifndef SAFAULT_H
+﻿#ifndef SAFAULT_H
 #define SAFAULT_H
 
 /// @file src/base/SaFault.h

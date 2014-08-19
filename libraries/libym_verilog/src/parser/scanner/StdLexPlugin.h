@@ -1,4 +1,4 @@
-#ifndef STDEXPRLUGIN_H
+﻿#ifndef STDEXPRLUGIN_H
 #define STDEXPRLUGIN_H
 
 /// @file StdLexPlugin.h

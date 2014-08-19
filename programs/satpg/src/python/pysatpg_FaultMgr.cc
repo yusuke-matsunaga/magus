@@ -1,4 +1,4 @@
-
+﻿
 /// @file pysatpg_FaultMgr.cc
 /// @brief FaultMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

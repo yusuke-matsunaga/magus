@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/io_cmds/SealMsgHandler.cc
 /// @brief SealMsgHandler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

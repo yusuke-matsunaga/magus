@@ -1,4 +1,4 @@
-#ifndef YMUTILS_STREAMIDO_H
+﻿#ifndef YMUTILS_STREAMIDO_H
 #define YMUTILS_STREAMIDO_H
 
 /// @file YmUtils/StreamIDO.h

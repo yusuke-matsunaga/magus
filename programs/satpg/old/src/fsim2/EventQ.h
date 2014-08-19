@@ -1,4 +1,4 @@
-#ifndef FSIM2_EVENTQ_H
+﻿#ifndef FSIM2_EVENTQ_H
 #define FSIM2_EVENTQ_H
 
 /// @file src/fsim2/EventQ.h

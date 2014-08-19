@@ -1,4 +1,4 @@
-#ifndef DTPG_H
+﻿#ifndef DTPG_H
 #define DTPG_H
 
 /// @file Dtpg.h

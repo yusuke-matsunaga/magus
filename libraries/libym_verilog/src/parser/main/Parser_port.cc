@@ -1,4 +1,4 @@
-/// @file Parser_port.cc
+﻿/// @file Parser_port.cc
 /// @brief Parser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

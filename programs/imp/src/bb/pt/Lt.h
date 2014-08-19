@@ -1,4 +1,4 @@
-#ifndef SRC_PT_LT_H
+﻿#ifndef SRC_PT_LT_H
 #define SRC_PT_LT_H
 
 /// @file src/pt/Lt.h

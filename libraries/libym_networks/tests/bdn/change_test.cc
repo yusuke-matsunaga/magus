@@ -1,4 +1,4 @@
-
+﻿
 /// @file change_test.cc
 /// @brief BdnMgr::change_logic() のテスト
 /// @author Yusuke Matsunaga (松永 裕介)

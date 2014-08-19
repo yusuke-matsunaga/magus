@@ -1,4 +1,4 @@
-#ifndef TOKENTYPE_H
+﻿#ifndef TOKENTYPE_H
 #define TOKENTYPE_H
 
 /// @file TokenType.h

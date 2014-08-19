@@ -1,4 +1,4 @@
-#ifndef CNFDDEDGE_H
+﻿#ifndef CNFDDEDGE_H
 #define CNFDDEDGE_H
 
 /// @file CNFddEdge.h

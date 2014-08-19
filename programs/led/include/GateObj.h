@@ -1,4 +1,4 @@
-#ifndef GATEOBJ_H
+﻿#ifndef GATEOBJ_H
 #define GATEOBJ_H
 
 /// @file GateObj.h

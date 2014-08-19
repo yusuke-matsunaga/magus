@@ -1,4 +1,4 @@
-#ifndef YMUTILS_ASSERT_H
+﻿#ifndef YMUTILS_ASSERT_H
 #define YMUTILS_ASSERT_H
 
 /// @file YmUtils/assert.h

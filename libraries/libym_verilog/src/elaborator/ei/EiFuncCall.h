@@ -1,4 +1,4 @@
-#ifndef EIFUNCCALL_H
+﻿#ifndef EIFUNCCALL_H
 #define EIFUNCCALL_H
 
 /// @file EiFuncCall.h

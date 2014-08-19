@@ -1,4 +1,4 @@
-
+﻿
 /// @file SmoothOp.cc
 /// @brief SmoothOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

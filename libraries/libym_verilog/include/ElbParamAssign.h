@@ -1,4 +1,4 @@
-#ifndef ELBPARAMASSIGN_H
+﻿#ifndef ELBPARAMASSIGN_H
 #define ELBPARAMASSIGN_H
 
 /// @file ElbParamAssign.h

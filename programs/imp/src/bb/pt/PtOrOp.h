@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTOROP_H
+﻿#ifndef SRC_PT_PTOROP_H
 #define SRC_PT_PTOROP_H
 
 /// @file src/pt/PtOrOp.h

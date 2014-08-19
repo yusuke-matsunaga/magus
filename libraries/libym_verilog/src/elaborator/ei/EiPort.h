@@ -1,4 +1,4 @@
-#ifndef EIPORT_H
+﻿#ifndef EIPORT_H
 #define EIPORT_H
 
 /// @file EiPort.h

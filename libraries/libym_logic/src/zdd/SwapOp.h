@@ -1,4 +1,4 @@
-#ifndef SWAPOP_H
+﻿#ifndef SWAPOP_H
 #define SWAPOP_H
 
 /// @file SwapOp.h

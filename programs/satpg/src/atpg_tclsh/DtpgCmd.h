@@ -1,4 +1,4 @@
-#ifndef DTPGCMD_H
+﻿#ifndef DTPGCMD_H
 #define DTPGCMD_H
 
 /// @file DtpgCmd.h

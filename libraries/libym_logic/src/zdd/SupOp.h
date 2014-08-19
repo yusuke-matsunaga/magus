@@ -1,4 +1,4 @@
-#ifndef SUPOP_H
+﻿#ifndef SUPOP_H
 #define SUPOP_H
 
 /// @file SupOp.h

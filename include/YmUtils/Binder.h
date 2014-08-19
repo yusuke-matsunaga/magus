@@ -1,4 +1,4 @@
-#ifndef YMUTILS_BINDER_H
+﻿#ifndef YMUTILS_BINDER_H
 #define YMUTILS_BINDER_H
 
 /// @file YmUtils/Binder.h

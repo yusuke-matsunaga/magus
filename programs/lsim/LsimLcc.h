@@ -1,4 +1,4 @@
-#ifndef LSIMLCC_H
+﻿#ifndef LSIMLCC_H
 #define LSIMLCC_H
 
 /// @file LsimLcc.h

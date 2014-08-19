@@ -1,4 +1,4 @@
-
+﻿
 // NPN パッケージのテスト
 
 #include <ymtools/YmTools.h>

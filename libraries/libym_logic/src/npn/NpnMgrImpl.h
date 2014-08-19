@@ -1,4 +1,4 @@
-#ifndef NPNMGRIMPL_H
+﻿#ifndef NPNMGRIMPL_H
 #define NPNMGRIMPL_H
 
 /// @file NpnMgrImpl.h

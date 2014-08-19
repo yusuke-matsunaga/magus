@@ -1,4 +1,4 @@
-#ifndef MINOP_H
+﻿#ifndef MINOP_H
 #define MINOP_H
 
 /// @file MinOp.h

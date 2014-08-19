@@ -1,4 +1,4 @@
-
+﻿
 /// @file libYmLogic/test/bdd/makebdd.cc
 /// @brief 論理回路の BDD を作るプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

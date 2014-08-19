@@ -1,4 +1,4 @@
-#ifndef AIGPAT_H
+﻿#ifndef AIGPAT_H
 #define AIGPAT_H
 
 /// @file AigPat.h

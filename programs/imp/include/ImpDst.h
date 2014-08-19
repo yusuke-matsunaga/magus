@@ -1,4 +1,4 @@
-#ifndef IMPDST_H
+﻿#ifndef IMPDST_H
 #define IMPDST_H
 
 /// @file ImpDst.h

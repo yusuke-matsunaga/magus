@@ -1,4 +1,4 @@
-#ifndef ANDOP_H
+﻿#ifndef ANDOP_H
 #define ANDOP_H
 
 /// @file AndOp.h

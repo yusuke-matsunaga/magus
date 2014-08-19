@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H
+﻿#ifndef LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H
 #define LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H
 
 /// @file libym_techmap/sbjgraph/SmdNode.h

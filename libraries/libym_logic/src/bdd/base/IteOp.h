@@ -1,4 +1,4 @@
-#ifndef ITEOP_H
+﻿#ifndef ITEOP_H
 #define ITEOP_H
 
 /// @file IteOp.h

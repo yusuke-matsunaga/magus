@@ -1,4 +1,4 @@
-#ifndef SMTLIBPARSER_H
+﻿#ifndef SMTLIBPARSER_H
 #define SMTLIBPARSER_H
 
 /// @file SmtLibParser.h

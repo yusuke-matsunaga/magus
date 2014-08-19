@@ -1,4 +1,4 @@
-
+﻿
 /// @file Codec_test.cc
 /// @brief FileCoder/FileDecoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

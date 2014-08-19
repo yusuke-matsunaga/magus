@@ -1,4 +1,4 @@
-
+﻿
 /// @file ImpListRec2.cc
 /// @brief ImpListRec2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

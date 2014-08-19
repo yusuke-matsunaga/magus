@@ -1,4 +1,4 @@
-#ifndef EIDECL_H
+﻿#ifndef EIDECL_H
 #define EIDECL_H
 
 /// @file EiDecl.h

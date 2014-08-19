@@ -1,4 +1,4 @@
-#ifndef DOTLIBLUT_H
+﻿#ifndef DOTLIBLUT_H
 #define DOTLIBLUT_H
 
 /// @file DotlibLut.h

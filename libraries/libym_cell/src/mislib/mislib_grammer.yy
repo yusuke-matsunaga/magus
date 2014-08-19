@@ -1,4 +1,4 @@
-%{ // C++ 宣言部
+﻿%{ // C++ 宣言部
 
 /// @file mislib_grammer.yy
 /// @brief MIS-II/SIS用セルライブラリのパーザ

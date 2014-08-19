@@ -1,4 +1,4 @@
-#ifndef RTPGCMD_H
+﻿#ifndef RTPGCMD_H
 #define RTPGCMD_H
 
 /// @file src/atpg_tclsh/RtpgCmd.h

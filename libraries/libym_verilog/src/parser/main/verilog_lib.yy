@@ -1,4 +1,4 @@
-%{
+﻿%{
 
 /// @file libym_verilog/parser/verilog_parser.yy
 /// @brief Verilog-HDL (IEEE1364-2001) パーサ

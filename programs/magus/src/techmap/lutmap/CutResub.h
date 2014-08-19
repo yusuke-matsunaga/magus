@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_CUTRESUB_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_CUTRESUB_H
 #define LIBYM_TECHMAP_LUTMAP_CUTRESUB_H
 
 /// @file libym_techmap/lutmap/CutResub.h

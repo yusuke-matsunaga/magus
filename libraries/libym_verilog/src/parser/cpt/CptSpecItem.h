@@ -1,4 +1,4 @@
-#ifndef CPTSPECITEM_H
+﻿#ifndef CPTSPECITEM_H
 #define CPTSPECITEM_H
 
 /// @file CptSpecItem.h

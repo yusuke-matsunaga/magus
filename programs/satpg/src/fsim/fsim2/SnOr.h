@@ -1,4 +1,4 @@
-#ifndef SNOR_H
+﻿#ifndef SNOR_H
 #define SNOR_H
 
 /// @file SnOr.h

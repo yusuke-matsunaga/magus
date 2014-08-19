@@ -1,4 +1,4 @@
-#ifndef YM_TECHMAP_CELLMAP_H
+﻿#ifndef YM_TECHMAP_CELLMAP_H
 #define YM_TECHMAP_CELLMAP_H
 
 /// @file ym_techmap/CellMap.h

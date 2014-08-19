@@ -1,4 +1,4 @@
-#ifndef DTPGFFR_H
+﻿#ifndef DTPGFFR_H
 #define DTPGFFR_H
 
 /// @file DtpgFFR.h

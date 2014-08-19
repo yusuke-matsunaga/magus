@@ -1,4 +1,4 @@
-#ifndef GBMBDDCEGARBINARY_H
+﻿#ifndef GBMBDDCEGARBINARY_H
 #define GBMBDDCEGARBINARY_H
 
 /// @file GbmCegarBinary.h

@@ -1,4 +1,4 @@
-#ifndef EXPRGEN_H
+﻿#ifndef EXPRGEN_H
 #define EXPRGEN_H
 
 /// @file ExprGen.h

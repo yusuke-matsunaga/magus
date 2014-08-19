@@ -1,4 +1,4 @@
-#ifndef FOPKDET_H
+﻿#ifndef FOPKDET_H
 #define FOPKDET_H
 
 /// @file FopKDet.h

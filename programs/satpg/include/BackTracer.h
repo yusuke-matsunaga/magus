@@ -1,4 +1,4 @@
-#ifndef BACKTRACER_H
+﻿#ifndef BACKTRACER_H
 #define BACKTRACER_H
 
 /// @file BackTracer.h

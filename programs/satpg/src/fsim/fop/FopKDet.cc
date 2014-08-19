@@ -1,4 +1,4 @@
-
+﻿
 /// @file FopKDet.cc
 /// @brief FopKDet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

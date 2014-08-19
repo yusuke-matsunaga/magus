@@ -1,4 +1,4 @@
-#ifndef RESTORELIBRARY_H
+﻿#ifndef RESTORELIBRARY_H
 #define RESTORELIBRARY_H
 
 /// @file RestoreLibrary.h

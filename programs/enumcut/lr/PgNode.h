@@ -1,4 +1,4 @@
-#ifndef PGNODE_H
+﻿#ifndef PGNODE_H
 #define PGNODE_H
 
 /// @file PgNode.h

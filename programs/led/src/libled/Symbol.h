@@ -1,4 +1,4 @@
-#ifndef SYMBOL_H
+﻿#ifndef SYMBOL_H
 #define SYMBOL_H
 
 /// @file Symbol.h

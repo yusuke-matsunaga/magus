@@ -1,4 +1,4 @@
-#ifndef ZDDUNIOP_H
+﻿#ifndef ZDDUNIOP_H
 #define ZDDUNIOP_H
 
 /// @file ZddUniOp.h

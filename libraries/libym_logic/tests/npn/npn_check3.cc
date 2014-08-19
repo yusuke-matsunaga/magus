@@ -1,4 +1,4 @@
-// $Id: npn_check3.cc 1594 2008-07-18 10:26:12Z matsunaga $
+﻿// $Id: npn_check3.cc 1594 2008-07-18 10:26:12Z matsunaga $
 
 // NPN パッケージのテスト
 

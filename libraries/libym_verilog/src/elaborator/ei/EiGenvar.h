@@ -1,4 +1,4 @@
-#ifndef EIGENVAR_H
+﻿#ifndef EIGENVAR_H
 #define EIGENVAR_H
 
 /// @file EiGenvar.h

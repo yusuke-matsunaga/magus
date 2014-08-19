@@ -1,4 +1,4 @@
-#ifndef CMPLCONV_H
+﻿#ifndef CMPLCONV_H
 #define CMPLCONV_H
 
 /// @file CmplConv.h

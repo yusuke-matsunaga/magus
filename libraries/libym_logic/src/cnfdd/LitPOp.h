@@ -1,4 +1,4 @@
-#ifndef LITPOP_H
+﻿#ifndef LITPOP_H
 #define LITPOP_H
 
 /// @file LitPOp.h

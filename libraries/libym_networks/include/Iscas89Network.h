@@ -1,4 +1,4 @@
-#ifndef ISCAS89NETWORK_H
+﻿#ifndef ISCAS89NETWORK_H
 #define ISCAS89NETWORK_H
 
 /// @file Iscas89Network.h

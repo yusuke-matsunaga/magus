@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_CLRNETWORK_H
+﻿#ifndef SRC_CORE_CLRNETWORK_H
 #define SRC_CORE_CLRNETWORK_H
 
 /// @file src/core/ClrNetwork.h

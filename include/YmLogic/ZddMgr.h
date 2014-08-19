@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_ZDDMGR_H
+﻿#ifndef YMYMLOGIC_ZDDMGR_H
 #define YMYMLOGIC_ZDDMGR_H
 
 /// @file YmLogic/ZddMgr.h

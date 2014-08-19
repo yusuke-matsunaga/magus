@@ -1,4 +1,4 @@
-#ifndef ISCAS89NETWORKHANDLER_H
+﻿#ifndef ISCAS89NETWORKHANDLER_H
 #define ISCAS89NETWORKHANDLER_H
 
 /// @file Iscas89NetworkHandler.h

@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_READBLIFCMD_H
+﻿#ifndef SRC_MATPG_READBLIFCMD_H
 #define SRC_MATPG_READBLIFCMD_H
 
 /// @file src/matpg/ReadBlifCmd.h

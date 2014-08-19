@@ -1,4 +1,4 @@
-#ifndef EIDELAY_H
+﻿#ifndef EIDELAY_H
 #define EIDELAY_H
 
 /// @file EiDelay.h

@@ -1,4 +1,4 @@
-#ifndef FSIM3_SIMNODE_H
+﻿#ifndef FSIM3_SIMNODE_H
 #define FSIM3_SIMNODE_H
 
 /// @file fsim3/SimNode.h

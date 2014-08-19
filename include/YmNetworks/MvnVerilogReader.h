@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVNVERILOGREADER_H
+﻿#ifndef NETWORKS_MVNVERILOGREADER_H
 #define NETWORKS_MVNVERILOGREADER_H
 
 /// @file YmNetworks/MvnVerilogReader.h

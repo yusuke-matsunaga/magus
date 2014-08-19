@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLSTMT_H
+﻿#ifndef VERILOG_VL_VLSTMT_H
 #define VERILOG_VL_VLSTMT_H
 
 /// @file YmVerilog/vl/VlStmt.h

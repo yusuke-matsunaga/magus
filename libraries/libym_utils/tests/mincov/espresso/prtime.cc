@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Revision Control Information
  *
  * $Source: /users/pchong/CVS/sis/utility/prtime.c,v $

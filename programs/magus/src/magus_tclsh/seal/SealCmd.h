@@ -1,4 +1,4 @@
-#ifndef SRC_SEAL_SEALCMD_H
+﻿#ifndef SRC_SEAL_SEALCMD_H
 #define SRC_SEAL_SEALCMD_H
 
 /// @file src/seal/SealCmd.h

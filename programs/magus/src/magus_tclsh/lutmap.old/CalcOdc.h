@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CALCODC_H
+﻿#ifndef MAGUS_LUTMAP_CALCODC_H
 #define MAGUS_LUTMAP_CALCODC_H
 
 /// @file magus/src/lutmap/CalcOdc.h

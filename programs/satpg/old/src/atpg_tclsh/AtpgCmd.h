@@ -1,4 +1,4 @@
-#ifndef ATPGCMD_H
+﻿#ifndef ATPGCMD_H
 #define ATPGCMD_H
 
 /// @file include/AtpgCmd.h

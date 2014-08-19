@@ -1,4 +1,4 @@
-#ifndef CIBUS_H
+﻿#ifndef CIBUS_H
 #define CIBUS_H
 
 /// @file CiBus.h

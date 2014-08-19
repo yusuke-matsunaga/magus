@@ -1,4 +1,4 @@
-#ifndef BNETBLIFHANDLER_H
+﻿#ifndef BNETBLIFHANDLER_H
 #define BNETBLIFHANDLER_H
 
 /// @file BNetBlifHandler.h

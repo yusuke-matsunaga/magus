@@ -1,4 +1,4 @@
-#ifndef CICLASS_H
+﻿#ifndef CICLASS_H
 #define CICLASS_H
 
 /// @file CiClass.h

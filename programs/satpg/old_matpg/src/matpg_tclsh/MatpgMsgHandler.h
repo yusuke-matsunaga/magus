@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_MATPGMSGHANDLER_H
+﻿#ifndef SRC_MATPG_MATPGMSGHANDLER_H
 #define SRC_MATPG_MATPGMSGHANDLER_H
 
 /// @file src/matpg/MatpgMsgHandler.h

@@ -1,4 +1,4 @@
-#ifndef NAMEOBJIMPL_H
+﻿#ifndef NAMEOBJIMPL_H
 #define NAMEOBJIMPL_H
 
 /// @file NameObjImpl.h

@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_GATEXOR_H
+﻿#ifndef DTPG_CLASSIC_GATEXOR_H
 #define DTPG_CLASSIC_GATEXOR_H
 
 /// @file src/dtpg_classic/GateXor.h

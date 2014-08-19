@@ -1,4 +1,4 @@
-#ifndef SATREASON_H
+﻿#ifndef SATREASON_H
 #define SATREASON_H
 
 /// @file SatReason.h

@@ -1,4 +1,4 @@
-#ifndef DUMPER_H
+﻿#ifndef DUMPER_H
 #define DUMPER_H
 
 /// @file Dumper.h

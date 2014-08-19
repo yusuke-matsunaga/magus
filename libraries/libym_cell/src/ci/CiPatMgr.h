@@ -1,4 +1,4 @@
-#ifndef CIPATMGR_H
+﻿#ifndef CIPATMGR_H
 #define CIPATMGR_H
 
 /// @file CiPatMgr.h

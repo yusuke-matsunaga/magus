@@ -1,4 +1,4 @@
-#ifndef CPTITEM_H
+﻿#ifndef CPTITEM_H
 #define CPTITEM_H
 
 /// @file CptItem.h

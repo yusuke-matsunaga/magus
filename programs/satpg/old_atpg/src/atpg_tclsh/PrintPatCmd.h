@@ -1,4 +1,4 @@
-#ifndef SRC_ATPG_TCLSH_PRINTPATCMD_H
+﻿#ifndef SRC_ATPG_TCLSH_PRINTPATCMD_H
 #define SRC_ATPG_TCLSH_PRINTPATCMD_H
 
 /// @file src/atpg_tclsh/PrintPatCmd.h

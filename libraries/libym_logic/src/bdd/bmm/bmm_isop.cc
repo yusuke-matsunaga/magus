@@ -1,4 +1,4 @@
-
+﻿
 /// @file bmm_isop.cc
 /// @brief ISOP を求める関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

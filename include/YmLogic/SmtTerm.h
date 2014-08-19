@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMTTERM_H
+﻿#ifndef YMYMLOGIC_SMTTERM_H
 #define YMYMLOGIC_SMTTERM_H
 
 /// @file YmLogic/SmtTerm.h

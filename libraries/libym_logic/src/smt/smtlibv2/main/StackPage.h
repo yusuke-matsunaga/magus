@@ -1,4 +1,4 @@
-#ifndef STACK_PAGE_H
+﻿#ifndef STACK_PAGE_H
 #define STACK_PAGE_H
 
 /// @file StackPage.h

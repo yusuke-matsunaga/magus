@@ -1,4 +1,4 @@
-#ifndef RFSIMCMD_H
+﻿#ifndef RFSIMCMD_H
 #define RFSIMCMD_H
 
 /// @file src/atpg_tclsh/RfsimCmd.h

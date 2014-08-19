@@ -1,4 +1,4 @@
-#ifndef SMTVARFUNIMPL_H
+﻿#ifndef SMTVARFUNIMPL_H
 #define SMTFVARUNIMPL_H
 
 /// @file SmtVarFunImpl.h

@@ -1,4 +1,4 @@
-#ifndef DOPBASE_H
+﻿#ifndef DOPBASE_H
 #define DOPBASE_H
 
 /// @file DopBase.h

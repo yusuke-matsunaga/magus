@@ -1,4 +1,4 @@
-
+﻿
 /// @file seal/src/bddsim/BddsimCmd.cc
 /// @brief 故障シミュレーションを行うコマンド
 /// @author Yusuke Matsunaga (松永 裕介)

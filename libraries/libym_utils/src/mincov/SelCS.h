@@ -1,4 +1,4 @@
-#ifndef SELCS_H
+﻿#ifndef SELCS_H
 #define SELCS_H
 
 /// @file SelCS.h

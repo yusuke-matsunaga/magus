@@ -1,4 +1,4 @@
-#ifndef BDDMGRMODERN_H
+﻿#ifndef BDDMGRMODERN_H
 #define BDDMGRMODERN_H
 
 /// @file BddMgrModern.h

@@ -1,4 +1,4 @@
-#ifndef TOKENLISTMODEL_H
+﻿#ifndef TOKENLISTMODEL_H
 #define TOKENLISTMODEL_H
 
 /// @file TokenListModel.h

@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMN_CMNLATCH_H
+﻿#ifndef NETWORKS_CMN_CMNLATCH_H
 #define NETWORKS_CMN_CMNLATCH_H
 
 /// @file YmNetworks/CmnLatch.h

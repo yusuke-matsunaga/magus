@@ -1,4 +1,4 @@
-#ifndef MAGUS_LOGBASE_NTWKNDCMD_H
+﻿#ifndef MAGUS_LOGBASE_NTWKNDCMD_H
 #define MAGUS_LOGBASE_NTWKNDCMD_H
 
 /// @file magus/logbase/NtwkNdCmd.h

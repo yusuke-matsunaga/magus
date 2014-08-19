@@ -1,4 +1,4 @@
-/// @file mainpage.h
+﻿/// @file mainpage.h
 /// @brief YmTools のメインページ
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

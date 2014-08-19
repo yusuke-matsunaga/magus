@@ -1,4 +1,4 @@
-#ifndef BZENGINE_H
+﻿#ifndef BZENGINE_H
 #define BZENGINE_H
 
 /// @file BzEngine.h

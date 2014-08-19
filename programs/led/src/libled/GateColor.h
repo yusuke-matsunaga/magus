@@ -1,4 +1,4 @@
-#ifndef GATECOLOR_H
+﻿#ifndef GATECOLOR_H
 #define GATECOLOR_H
 
 /// @file GateColor.h

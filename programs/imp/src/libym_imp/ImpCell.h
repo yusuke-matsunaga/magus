@@ -1,4 +1,4 @@
-#ifndef IMPCELL_H
+﻿#ifndef IMPCELL_H
 #define IMPCELL_H
 
 /// @file ImpCell.h

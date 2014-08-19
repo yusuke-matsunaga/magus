@@ -1,4 +1,4 @@
-#ifndef FSIM_SNXOR_H
+﻿#ifndef FSIM_SNXOR_H
 #define FSIM_SNXOR_H
 
 /// @file fsim/SnXor.h

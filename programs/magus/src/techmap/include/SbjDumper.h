@@ -1,4 +1,4 @@
-#ifndef YM_TECHMAP_SBJDUMPER_H
+﻿#ifndef YM_TECHMAP_SBJDUMPER_H
 #define YM_TECHMAP_SBJDUMPER_H
 
 /// @file ym_techmap/SbjDumper.h

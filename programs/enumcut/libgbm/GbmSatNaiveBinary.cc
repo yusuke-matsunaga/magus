@@ -1,4 +1,4 @@
-
+﻿
 /// @file GbmSatNaiveBinary.cc
 /// @brief GbmSatNaiveBinary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-
+﻿
 /// @file pyigf_RvMgr.cc
 /// @brief RvMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

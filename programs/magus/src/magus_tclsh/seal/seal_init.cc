@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/src/seal/seal_init.cc
 /// @brief Seal パッケージの初期化ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

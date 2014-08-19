@@ -1,4 +1,4 @@
-#ifndef EIRANGE_H
+﻿#ifndef EIRANGE_H
 #define EIRANGE_H
 
 /// @file EiRange.h

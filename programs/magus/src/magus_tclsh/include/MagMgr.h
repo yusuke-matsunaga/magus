@@ -1,4 +1,4 @@
-#ifndef MAGMGR_H
+﻿#ifndef MAGMGR_H
 #define MAGMGR_H
 
 /// @file MagMgr.h

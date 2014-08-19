@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_PTITEM_H
+﻿#ifndef VERILOG_PT_PTITEM_H
 #define VERILOG_PT_PTITEM_H
 
 /// @file YmVerilog/pt/PtItem.h

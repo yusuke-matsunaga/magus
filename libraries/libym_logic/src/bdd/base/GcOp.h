@@ -1,4 +1,4 @@
-#ifndef GCOP_H
+﻿#ifndef GCOP_H
 #define GCOP_H
 
 /// @file GcOp.h

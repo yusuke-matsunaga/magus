@@ -1,4 +1,4 @@
-#ifndef ELBLHS_H
+﻿#ifndef ELBLHS_H
 #define ELBLHS_H
 
 /// @file ElbLhs.h

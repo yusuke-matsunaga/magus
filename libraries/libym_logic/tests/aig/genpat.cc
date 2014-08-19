@@ -1,4 +1,4 @@
-/// @file libym_aig/tests/genpat.cc
+﻿/// @file libym_aig/tests/genpat.cc
 /// @brief N 入力関数を実現するパタンを生成するプログラム
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

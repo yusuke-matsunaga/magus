@@ -1,4 +1,4 @@
-
+﻿
 /// @file MinCov.cc
 /// @brief MinCov の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef TCLPP_TCLHANDLER_H
+﻿#ifndef TCLPP_TCLHANDLER_H
 #define TCLPP_TCLHANDLER_H
 
 /// @file YmTclpp/TclHandler.h

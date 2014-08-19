@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_CHGNETWORK_H
+﻿#ifndef SRC_CORE_CHGNETWORK_H
 #define SRC_CORE_CHGNETWORK_H
 
 /// @file src/core/ChgNetwork.h

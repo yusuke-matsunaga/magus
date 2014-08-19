@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/core/core_init.cc
 /// @brief コアパッケージの初期化を行う．
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CUTRESUB_H
+﻿#ifndef MAGUS_LUTMAP_CUTRESUB_H
 #define MAGUS_LUTMAP_CUTRESUB_H
 
 /// @file magus/lutmap/CutResub.h

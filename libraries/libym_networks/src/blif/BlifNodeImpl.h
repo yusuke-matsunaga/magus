@@ -1,4 +1,4 @@
-#ifndef BLIFNODEIMPL_H
+﻿#ifndef BLIFNODEIMPL_H
 #define BLIFNODEIMPL_H
 
 /// @file BlifNodeImpl.h

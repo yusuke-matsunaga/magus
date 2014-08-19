@@ -1,4 +1,4 @@
-#ifndef DOTLIB_DOTLIBTEMPLATE_H
+﻿#ifndef DOTLIB_DOTLIBTEMPLATE_H
 #define DOTLIB_DOTLIBTEMPLATE_H
 
 /// @file DotlibTemplate.h

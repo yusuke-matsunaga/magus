@@ -1,4 +1,4 @@
-#ifndef TPGFAULT_H
+﻿#ifndef TPGFAULT_H
 #define TPGFAULT_H
 
 /// @file TpgFault.h

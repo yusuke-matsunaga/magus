@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTADDOP_H
+﻿#ifndef SRC_PT_PTADDOP_H
 #define SRC_PT_PTADDOP_H
 
 /// @file src/pt/PtAddOp.h

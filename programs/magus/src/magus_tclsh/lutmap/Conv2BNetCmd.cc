@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/Conv2BNetCmd.cc
 /// @brief Conv2BNetCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

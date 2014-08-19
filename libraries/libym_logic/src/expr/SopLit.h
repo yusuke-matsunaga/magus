@@ -1,4 +1,4 @@
-#ifndef SOPLIT_H
+﻿#ifndef SOPLIT_H
 #define SOPLIT_H
 
 /// @file SopLit.h

@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BNET_H
+﻿#ifndef NETWORKS_BNET_H
 #define NETWORKS_BNET_H
 
 /// @file YmNetworks/bnet.h

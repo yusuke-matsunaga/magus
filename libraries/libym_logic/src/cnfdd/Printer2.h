@@ -1,4 +1,4 @@
-#ifndef PRINTER2_H
+﻿#ifndef PRINTER2_H
 #define PRINTER2_H
 
 /// @file Printer2.h

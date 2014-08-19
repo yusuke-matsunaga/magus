@@ -1,4 +1,4 @@
-#ifndef GDSNODE_H
+﻿#ifndef GDSNODE_H
 #define GDSNODE_H
 
 /// @file GdsNode.h

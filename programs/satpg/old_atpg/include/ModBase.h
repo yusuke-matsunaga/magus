@@ -1,4 +1,4 @@
-#ifndef MAIN_MODBASE_H
+﻿#ifndef MAIN_MODBASE_H
 #define MAIN_MODBASE_H
 
 /// @file src/main/ModBase.h

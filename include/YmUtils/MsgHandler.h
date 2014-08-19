@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MSGHANDLER_H
+﻿#ifndef YMUTILS_MSGHANDLER_H
 #define YMUTILS_MSGHANDLER_H
 
 /// @file YmUtils/MsgHandler.h

@@ -1,4 +1,4 @@
-#ifndef SRC_CALC_CVF_CVFCMD_H
+﻿#ifndef SRC_CALC_CVF_CVFCMD_H
 #define SRC_CALC_CVF_CVFCMD_H
 
 /// @file src/calc_cvf/CvfCmd.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file AigMgrImpl.cc
 /// @brief AigMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

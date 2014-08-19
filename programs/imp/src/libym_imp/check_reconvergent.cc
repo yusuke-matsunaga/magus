@@ -1,4 +1,4 @@
-
+﻿
 /// @file check_reconvergent.cc
 /// @brief 再収斂のチェックを行う
 /// @author Yusuke Matsunaga (松永 裕介)

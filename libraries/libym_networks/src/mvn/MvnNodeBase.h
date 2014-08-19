@@ -1,4 +1,4 @@
-#ifndef MVNNODEBASE_H
+﻿#ifndef MVNNODEBASE_H
 #define MVNNODEBASE_H
 
 /// @file MvnNodeBase.h

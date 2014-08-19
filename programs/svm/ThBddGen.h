@@ -1,4 +1,4 @@
-#ifndef THBDDGEN_H
+﻿#ifndef THBDDGEN_H
 #define THBDDGEN_H
 
 /// @file ThBddGen.h

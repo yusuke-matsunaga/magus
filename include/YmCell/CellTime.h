@@ -1,4 +1,4 @@
-#ifndef CELL_CELLTIME_H
+﻿#ifndef CELL_CELLTIME_H
 #define CELL_CELLTIME_H
 
 /// @file YmCell/CellTime.h

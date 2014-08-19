@@ -1,4 +1,4 @@
-
+﻿
 /// @file GenPat2.cc
 /// @brief GenPat2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

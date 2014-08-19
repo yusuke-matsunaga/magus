@@ -1,4 +1,4 @@
-#ifndef VAL3_H
+﻿#ifndef VAL3_H
 #define VAL3_H
 
 /// @file Val3.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/CrNode.cc
 /// @brief CrNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

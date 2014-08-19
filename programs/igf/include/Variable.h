@@ -1,4 +1,4 @@
-#ifndef VARIABLE_H
+﻿#ifndef VARIABLE_H
 #define VARIABLE_H
 
 /// @file Variable.h

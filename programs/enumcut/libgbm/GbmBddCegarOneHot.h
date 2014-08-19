@@ -1,4 +1,4 @@
-#ifndef GBMBDDCEGARONEHOT_H
+﻿#ifndef GBMBDDCEGARONEHOT_H
 #define GBMBDDCEGARONEHOT_H
 
 /// @file GbmBddCegarOneHot.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/src/lutmap/OdcMgr.cc
 /// @brief OdcMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

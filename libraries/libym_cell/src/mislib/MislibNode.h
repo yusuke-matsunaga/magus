@@ -1,4 +1,4 @@
-#ifndef MISLIBNODE_H
+﻿#ifndef MISLIBNODE_H
 #define MISLIBNODE_H
 
 /// @file MislibNode.h

@@ -1,4 +1,4 @@
-#ifndef PACKEDVAL3_H
+﻿#ifndef PACKEDVAL3_H
 #define PACKEDVAL3_H
 
 /// @file PackedVal3.h

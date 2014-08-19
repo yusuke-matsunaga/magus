@@ -1,4 +1,4 @@
-#ifndef SETCMD_H
+﻿#ifndef SETCMD_H
 #define SETCMD_H
 
 /// @file SetCmd.h

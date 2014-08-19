@@ -1,4 +1,4 @@
-#ifndef ITEMGEN_H
+﻿#ifndef ITEMGEN_H
 #define ITEMGEN_H
 
 /// @file ItemGen.h

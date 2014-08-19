@@ -1,4 +1,4 @@
-
+﻿
 /// @file genaig.cc
 /// @brief N 入力関数を実現する AIG  を生成するプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

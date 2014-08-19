@@ -1,4 +1,4 @@
-#ifndef H_MATPG_LEARN
+﻿#ifndef H_MATPG_LEARN
 #define H_MATPG_LEARN
 
 /*

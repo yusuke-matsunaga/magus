@@ -1,4 +1,4 @@
-#ifndef IMPINFO_H
+﻿#ifndef IMPINFO_H
 #define IMPINFO_H
 
 /// @file ImpInfo.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file ItemGen_primitive.cc
 /// @brief ElbMgr の実装ファイル(UDP インスタンスの実体化)
 /// @author Yusuke Matsunaga (松永 裕介)

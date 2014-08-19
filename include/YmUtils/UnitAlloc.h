@@ -1,4 +1,4 @@
-#ifndef YMUTILS_UNITALLOC_H
+﻿#ifndef YMUTILS_UNITALLOC_H
 #define YMUTILS_UNITALLOC_H
 
 /// @file YmUtils/UnitAlloc.h

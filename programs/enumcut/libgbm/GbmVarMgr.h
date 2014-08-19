@@ -1,4 +1,4 @@
-#ifndef GBMVARMGR_H
+﻿#ifndef GBMVARMGR_H
 #define GBMVARMGR_H
 
 /// @file GbmVarMgr.h

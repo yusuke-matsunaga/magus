@@ -1,4 +1,4 @@
-#ifndef NAMEMGR_H
+﻿#ifndef NAMEMGR_H
 #define NAMEMGR_H
 
 /// @file NameMgr.h

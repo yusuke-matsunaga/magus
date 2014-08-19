@@ -1,4 +1,4 @@
-#ifndef SPTDECL_H
+﻿#ifndef SPTDECL_H
 #define SPTDECL_H
 
 /// @file SptDecl.h

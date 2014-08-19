@@ -1,4 +1,4 @@
-#ifndef ZDDIMP2_H
+﻿#ifndef ZDDIMP2_H
 #define ZDDIMP2_H
 
 /// @file ZddImp2.h

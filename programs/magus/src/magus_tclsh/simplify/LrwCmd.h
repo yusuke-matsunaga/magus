@@ -1,4 +1,4 @@
-#ifndef SRC_SIMPLIFY_LRWCMD_H
+﻿#ifndef SRC_SIMPLIFY_LRWCMD_H
 #define SRC_SIMPLIFY_LRWCMD_H
 
 /// @file src/simplify/LrwCmd.h

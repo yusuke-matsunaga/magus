@@ -1,4 +1,4 @@
-
+﻿
 /// @file BinOp.cc
 /// @brief BinOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

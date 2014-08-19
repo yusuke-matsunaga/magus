@@ -1,4 +1,4 @@
-
+﻿
 /// @file atpg/src/dtpg/InputLiteral.cc
 /// @brief InputLiteral の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef RLIMP_H
+﻿#ifndef RLIMP_H
 #define RLIMP_H
 
 /// @file RlImp.h

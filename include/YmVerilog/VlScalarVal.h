@@ -1,4 +1,4 @@
-#ifndef VERILOG_VLSCALARVAL_H
+﻿#ifndef VERILOG_VLSCALARVAL_H
 #define VERILOG_VLSCALARVAL_H
 
 /// @file YmVerilog/VlScalarVal.h

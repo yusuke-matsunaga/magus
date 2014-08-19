@@ -1,4 +1,4 @@
-#ifndef READLIBRARY_H
+﻿#ifndef READLIBRARY_H
 #define READLIBRARY_H
 
 /// @file ReadLibrary.h

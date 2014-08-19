@@ -1,4 +1,4 @@
-#ifndef LNMATCH_H
+﻿#ifndef LNMATCH_H
 #define LNMATCH_H
 
 /// @file LnMatch.h

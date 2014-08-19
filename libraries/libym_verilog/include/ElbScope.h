@@ -1,4 +1,4 @@
-#ifndef ELBSCOPE_H
+﻿#ifndef ELBSCOPE_H
 #define ELBSCOPE_H
 
 /// @file ElbScope.h

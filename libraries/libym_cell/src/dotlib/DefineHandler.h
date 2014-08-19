@@ -1,4 +1,4 @@
-#ifndef DEFINEHANDLER_H
+﻿#ifndef DEFINEHANDLER_H
 #define DEFINEHANDLER_H
 
 /// @file DefineHandler.h

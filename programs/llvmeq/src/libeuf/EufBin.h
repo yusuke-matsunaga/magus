@@ -1,4 +1,4 @@
-#ifndef EUFBIN_H
+﻿#ifndef EUFBIN_H
 #define EUFBIN_H
 
 /// @file EufBin.h

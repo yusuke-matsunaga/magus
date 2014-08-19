@@ -1,4 +1,4 @@
-#ifndef MODCONV_H
+﻿#ifndef MODCONV_H
 #define MODCONV_H
 
 /// @file ModConv.h

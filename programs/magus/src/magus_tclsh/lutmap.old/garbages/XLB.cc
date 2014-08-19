@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/XLB.cc
 /// @brief eXact DAG covering algorithm
 /// @author Yusuke Matsunaga (松永 裕介)

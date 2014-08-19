@@ -1,4 +1,4 @@
-#ifndef RESTORE_H
+﻿#ifndef RESTORE_H
 #define RESTORE_H
 
 /// @file Restorer.h

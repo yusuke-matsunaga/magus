@@ -1,4 +1,4 @@
-#ifndef XORFUNC_H
+﻿#ifndef XORFUNC_H
 #define XORFUNC_H
 
 /// @file XorFunc.h

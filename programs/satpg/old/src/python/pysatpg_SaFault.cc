@@ -1,4 +1,4 @@
-
+﻿
 /// @file pysatpg_SaFault.cc
 /// @brief SaFault の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

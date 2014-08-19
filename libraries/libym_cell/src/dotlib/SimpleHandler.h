@@ -1,4 +1,4 @@
-#ifndef SIMPLEHANDLER_H
+﻿#ifndef SIMPLEHANDLER_H
 #define SIMPLEHANDLER_H
 
 /// @file SimpleHandler.h

@@ -1,4 +1,4 @@
-#ifndef SMTLIBNODEIMPL_H
+﻿#ifndef SMTLIBNODEIMPL_H
 #define SMTLIBNODEIMPL_H
 
 /// @file SmtLibNodeImpl.h

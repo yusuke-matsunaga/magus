@@ -1,4 +1,4 @@
-#ifndef MISLIBCONST_H
+﻿#ifndef MISLIBCONST_H
 #define MISLIBCONST_H
 
 /// @file MislibConst.h

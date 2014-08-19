@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_BDDLITSET_H
+﻿#ifndef YMYMLOGIC_BDDLITSET_H
 #define YMYMLOGIC_BDDLITSET_H
 
 /// @file YmLogic/BddLitSet.h

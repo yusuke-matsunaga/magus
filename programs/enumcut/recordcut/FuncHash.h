@@ -1,4 +1,4 @@
-#ifndef FUNCHASH_H
+﻿#ifndef FUNCHASH_H
 #define FUNCHASH_H
 
 /// @file FuncHash.h

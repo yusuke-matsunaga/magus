@@ -1,4 +1,4 @@
-#ifndef CICELL_H
+﻿#ifndef CICELL_H
 #define CICELL_H
 
 /// @file CiCelll.h

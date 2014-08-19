@@ -1,4 +1,4 @@
-#ifndef SMTID_H
+﻿#ifndef SMTID_H
 #define SMTID_H
 
 /// @file SmtId.h

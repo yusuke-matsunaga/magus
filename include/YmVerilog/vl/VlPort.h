@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLPORT_H
+﻿#ifndef VERILOG_VL_VLPORT_H
 #define VERILOG_VL_VLPORT_H
 
 /// @file YmVerilog/vl/VlPort.h

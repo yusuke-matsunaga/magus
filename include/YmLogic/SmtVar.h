@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMTVAR_H
+﻿#ifndef YMYMLOGIC_SMTVAR_H
 #define YMYMLOGIC_SMTVAR_H
 
 /// @file YmLogic/SmtVar.h

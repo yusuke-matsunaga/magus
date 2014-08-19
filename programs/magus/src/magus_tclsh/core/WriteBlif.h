@@ -1,4 +1,4 @@
-#ifndef MAGUS_CORE_WRITEBLIF_H
+﻿#ifndef MAGUS_CORE_WRITEBLIF_H
 #define MAGUS_CORE_WRITEBLIF_H
 
 /// @file src/core/WriteBlif.h

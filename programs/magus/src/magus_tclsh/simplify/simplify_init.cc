@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/src/simplify/simplify_init.cc
 /// @brief Simplify パッケージの初期化ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

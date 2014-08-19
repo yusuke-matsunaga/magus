@@ -1,4 +1,4 @@
-#ifndef LZMADECODER_H
+﻿#ifndef LZMADECODER_H
 #define LZMADECODER_H
 
 /// @file LzmaDecoder.h

@@ -1,4 +1,4 @@
-#ifndef PARSETREEMODEL_H
+﻿#ifndef PARSETREEMODEL_H
 #define PARSETREEMODEL_H
 
 /// @file ParseTreeModel.h

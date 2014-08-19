@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/GenIlpCmd.cc
 /// @brief GenIlpCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

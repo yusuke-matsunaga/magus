@@ -1,4 +1,4 @@
-#ifndef LIBYM_VERILOG_SIMULATOR_SIMENGINE_H
+﻿#ifndef LIBYM_VERILOG_SIMULATOR_SIMENGINE_H
 #define LIBYM_VERILOG_SIMULATOR_SIMENGINE_H
 
 /// @file libym_YmVerilog/simulator/SimEngine.h

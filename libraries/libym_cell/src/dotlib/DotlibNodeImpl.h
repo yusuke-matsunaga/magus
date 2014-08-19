@@ -1,4 +1,4 @@
-#ifndef DOTLIBNODEIMPL_H
+﻿#ifndef DOTLIBNODEIMPL_H
 #define DOTLIBNODEIMPL_H
 
 /// @file DotlibNodeImpl.h

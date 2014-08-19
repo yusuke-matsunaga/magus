@@ -1,4 +1,4 @@
-#ifndef CUTOP_H
+﻿#ifndef CUTOP_H
 #define CUTOP_H
 
 /// @file CutOp.h

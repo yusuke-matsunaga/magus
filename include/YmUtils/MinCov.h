@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MINCOV_H
+﻿#ifndef YMUTILS_MINCOV_H
 #define YMUTILS_MINCOV_H
 
 /// @file YmUtils/MinCov.h

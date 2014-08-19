@@ -1,4 +1,4 @@
-/// @file Gphandle.h
+﻿/// @file Gphandle.h
 /// @brief GpHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

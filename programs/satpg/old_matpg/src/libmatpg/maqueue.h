@@ -1,4 +1,4 @@
-#ifndef H_MATPG_MASTACK
+﻿#ifndef H_MATPG_MASTACK
 #define H_MATPG_MASTACK
 
 /*

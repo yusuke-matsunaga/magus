@@ -1,4 +1,4 @@
-#ifndef FSIMX_FSIMX_H
+﻿#ifndef FSIMX_FSIMX_H
 #define FSIMX_FSIMX_H
 
 /// @file src/fsim/Fsim.h

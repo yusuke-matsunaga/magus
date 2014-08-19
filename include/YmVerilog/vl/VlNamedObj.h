@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLNAMEDOBJ_H
+﻿#ifndef VERILOG_VL_VLNAMEDOBJ_H
 #define VERILOG_VL_VLNAMEDOBJ_H
 
 /// @file YmVerilog/vl/VlNamedObj.h

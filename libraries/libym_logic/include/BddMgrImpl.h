@@ -1,4 +1,4 @@
-#ifndef BDDMGRIMPL_H
+﻿#ifndef BDDMGRIMPL_H
 #define BDDMGRIMPL_H
 
 /// @file BddMgrImpl.h

@@ -1,4 +1,4 @@
-#ifndef BLIFIDHASH_H
+﻿#ifndef BLIFIDHASH_H
 #define BLIFIDHASH_H
 
 /// @file BlifIdHash.h

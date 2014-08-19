@@ -1,4 +1,4 @@
-#ifndef EUFFUNCMGR_H
+﻿#ifndef EUFFUNCMGR_H
 #define EUFFUNCMGR_H
 
 /// @file EufFuncMgr.h

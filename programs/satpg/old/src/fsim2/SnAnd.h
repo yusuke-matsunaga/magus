@@ -1,4 +1,4 @@
-#ifndef SNAND_H
+﻿#ifndef SNAND_H
 #define SNAND_H
 
 /// @file src/fsim2/SnAnd.h

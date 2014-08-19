@@ -1,4 +1,4 @@
-#ifndef H_MATPG_T_ANALYZE
+﻿#ifndef H_MATPG_T_ANALYZE
 #define H_MATPG_T_ANALYZE
 
 /*

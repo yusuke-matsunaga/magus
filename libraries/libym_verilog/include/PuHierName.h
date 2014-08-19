@@ -1,4 +1,4 @@
-#ifndef LIBYM_VERILOG_PARSER_PUHIERNAME_H
+﻿#ifndef LIBYM_VERILOG_PARSER_PUHIERNAME_H
 #define LIBYM_VERILOG_PARSER_PUHIERNAME_H
 
 /// @file libym_YmVerilog/parser/PuHierName.h

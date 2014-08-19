@@ -1,4 +1,4 @@
-#ifndef SATENGINESINGLE_H
+﻿#ifndef SATENGINESINGLE_H
 #define SATENGINESINGLE_H
 
 /// @file SatEngineSingle.h

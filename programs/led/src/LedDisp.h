@@ -1,4 +1,4 @@
-#ifndef LEDDISP_H
+﻿#ifndef LEDDISP_H
 #define LEDDISP_H
 
 /// @file LedDisp.h

@@ -1,4 +1,4 @@
-#ifndef UOPBASE_H
+﻿#ifndef UOPBASE_H
 #define UOPBASE_H
 
 /// @file UopBase.h

@@ -1,4 +1,4 @@
-#ifndef PYSATPG_H
+﻿#ifndef PYSATPG_H
 #define PYSATPG_H
 
 /// @file pysatpg.h

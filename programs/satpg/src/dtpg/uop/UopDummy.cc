@@ -1,4 +1,4 @@
-
+﻿
 /// @file UopDummy.cc
 /// @brief UopDummy の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

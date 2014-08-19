@@ -1,4 +1,4 @@
-#ifndef DTPGNODE_H
+﻿#ifndef DTPGNODE_H
 #define DTPGNODE_H
 
 /// @file DtpgNode.h

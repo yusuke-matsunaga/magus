@@ -1,4 +1,4 @@
-
+﻿
 /// @file ident.cc
 /// @brief 恒等変換を求めるプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

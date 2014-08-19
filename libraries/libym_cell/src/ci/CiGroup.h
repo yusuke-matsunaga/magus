@@ -1,4 +1,4 @@
-#ifndef CIGROUP_H
+﻿#ifndef CIGROUP_H
 #define CIGROUP_H
 
 /// @file CiGroup.h

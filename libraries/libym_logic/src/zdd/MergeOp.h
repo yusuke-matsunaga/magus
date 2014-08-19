@@ -1,4 +1,4 @@
-#ifndef MERGEOP_H
+﻿#ifndef MERGEOP_H
 #define MERGEOP_H
 
 /// @file MergeOp.h

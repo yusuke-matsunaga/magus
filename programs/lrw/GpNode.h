@@ -1,4 +1,4 @@
-#ifndef GPNODE_H
+﻿#ifndef GPNODE_H
 #define GPNODE_H
 
 /// @file GpNode.h

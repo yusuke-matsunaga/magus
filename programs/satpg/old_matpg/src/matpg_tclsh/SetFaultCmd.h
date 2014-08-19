@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_SETFAULTCMD_H
+﻿#ifndef SRC_MATPG_SETFAULTCMD_H
 #define SRC_MATPG_SETFAULTCMD_H
 
 /// @file src/matpg/SetFaultCmd.h

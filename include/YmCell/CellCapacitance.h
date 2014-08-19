@@ -1,4 +1,4 @@
-#ifndef CELL_CELLCAPACITANCE_H
+﻿#ifndef CELL_CELLCAPACITANCE_H
 #define CELL_CELLCAPACITANCE_H
 
 /// @file YmCell/CellCapacitance.h

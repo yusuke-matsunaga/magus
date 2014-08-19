@@ -1,4 +1,4 @@
-#ifndef CIBUNDLE_H
+﻿#ifndef CIBUNDLE_H
 #define CIBUNDLE_H
 
 /// @file CiBundle.h

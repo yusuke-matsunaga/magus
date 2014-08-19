@@ -1,4 +1,4 @@
-
+﻿
 /// @file GdsText.cc
 /// @brief GdsText の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

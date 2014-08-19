@@ -1,4 +1,4 @@
-#ifndef SORTELEM_H
+﻿#ifndef SORTELEM_H
 #define SORTELEM_H
 
 /// @file SortElem.h

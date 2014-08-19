@@ -1,4 +1,4 @@
-#ifndef SMTTERMIMPL_H
+﻿#ifndef SMTTERMIMPL_H
 #define SMTTERMIMPL_H
 
 /// @file SmtTermImpl.h

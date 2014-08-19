@@ -1,4 +1,4 @@
-#ifndef NPNNODE_H
+﻿#ifndef NPNNODE_H
 #define NPNNODE_H
 
 /// @file NpnNode.h

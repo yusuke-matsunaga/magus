@@ -1,4 +1,4 @@
-#ifndef DOTLIBFF_H
+﻿#ifndef DOTLIBFF_H
 #define DOTLIBFF_H
 
 /// @file DotlibFF.h

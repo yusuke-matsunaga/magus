@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SATSOLVER_H
+﻿#ifndef YMYMLOGIC_SATSOLVER_H
 #define YMYMLOGIC_SATSOLVER_H
 
 /// @file YmLogic/SatSolver.h

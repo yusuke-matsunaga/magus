@@ -1,4 +1,4 @@
-#ifndef FUNCCMD_H
+﻿#ifndef FUNCCMD_H
 #define FUNCCMD_H
 
 /// @file FuncCmd.h

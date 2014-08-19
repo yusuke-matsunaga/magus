@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_ILPGEN_H
+﻿#ifndef MAGUS_LUTMAP_ILPGEN_H
 #define MAGUS_LUTMAP_ILPGEN_H
 
 /// @file magus/lutmap/ILPGen.cc

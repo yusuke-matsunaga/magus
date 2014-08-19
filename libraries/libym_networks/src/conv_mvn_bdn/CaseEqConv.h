@@ -1,4 +1,4 @@
-#ifndef CASEEQCONV_H
+﻿#ifndef CASEEQCONV_H
 #define CASEEQCONV_H
 
 /// @file CaseEqConv.h

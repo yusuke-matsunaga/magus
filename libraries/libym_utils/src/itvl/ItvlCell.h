@@ -1,4 +1,4 @@
-#ifndef ITVLCELL_H
+﻿#ifndef ITVLCELL_H
 #define ITVLCELL_H
 
 /// @file ItvlCell.h

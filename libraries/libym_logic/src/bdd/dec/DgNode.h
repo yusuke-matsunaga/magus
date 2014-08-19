@@ -1,4 +1,4 @@
-#ifndef DGNODE_H
+﻿#ifndef DGNODE_H
 #define DGNODE_H
 
 /// @file DgNode.h

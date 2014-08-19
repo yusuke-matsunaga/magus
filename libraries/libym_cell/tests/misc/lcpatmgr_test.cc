@@ -1,4 +1,4 @@
-
+﻿
 /// @file lcpatmgr_test.cc
 /// @brief LcPatMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

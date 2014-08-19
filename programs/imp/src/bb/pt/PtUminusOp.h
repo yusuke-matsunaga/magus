@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTUMINUSOP_H
+﻿#ifndef SRC_PT_PTUMINUSOP_H
 #define SRC_PT_PTUMINUSOP_H
 
 /// @file src/pt/PtUminusOp.h

@@ -1,4 +1,4 @@
-#ifndef YMUTILS_SIMPLEALLOC_H
+﻿#ifndef YMUTILS_SIMPLEALLOC_H
 #define YMUTILS_SIMPLEALLOC_H
 
 /// @file YmUtils/SimpleAlloc.h

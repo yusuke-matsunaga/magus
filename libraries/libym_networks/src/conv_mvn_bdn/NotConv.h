@@ -1,4 +1,4 @@
-#ifndef NOTCONV_H
+﻿#ifndef NOTCONV_H
 #define NOTCONV_H
 
 /// @file NotConv.h

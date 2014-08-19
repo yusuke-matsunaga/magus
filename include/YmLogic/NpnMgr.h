@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_NPNMGR_H
+﻿#ifndef YMYMLOGIC_NPNMGR_H
 #define YMYMLOGIC_NPNMGR_H
 
 /// @file YmLogic/NpnMgr.h

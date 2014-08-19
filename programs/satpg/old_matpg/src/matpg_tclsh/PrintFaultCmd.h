@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_PRINTFAULTCMD_H
+﻿#ifndef SRC_MATPG_PRINTFAULTCMD_H
 #define SRC_MATPG_PRINTFAULTCMD_H
 
 /// @file src/matpg/PrintFaultCmd.h

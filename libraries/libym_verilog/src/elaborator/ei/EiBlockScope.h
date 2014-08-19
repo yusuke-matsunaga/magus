@@ -1,4 +1,4 @@
-#ifndef EIBLOCKSCOPE_H
+﻿#ifndef EIBLOCKSCOPE_H
 #define EIBLOCKSCOPE_H
 
 /// @file libym_YmVerilog/elaborator/ei/EiBlockScope.h

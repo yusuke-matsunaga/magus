@@ -1,4 +1,4 @@
-#ifndef MAIN_RTPG_H
+﻿#ifndef MAIN_RTPG_H
 #define MAIN_RTPG_H
 
 /// @file src/main/Rtpg.h

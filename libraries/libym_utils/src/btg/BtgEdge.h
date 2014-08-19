@@ -1,4 +1,4 @@
-#ifndef BTGEDGE_H
+﻿#ifndef BTGEDGE_H
 #define BTGEDGE_H
 
 /// @file BtgEdge.h

@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNNODEHANDLE_H
+﻿#ifndef NETWORKS_BDNNODEHANDLE_H
 #define NETWORKS_BDNNODEHANDLE_H
 
 /// @file YmNetworks/BdnNodeHandle.h

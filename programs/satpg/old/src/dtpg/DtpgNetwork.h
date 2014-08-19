@@ -1,4 +1,4 @@
-#ifndef DTPGNETWORK_H
+﻿#ifndef DTPGNETWORK_H
 #define DTPGNETWORK_H
 
 /// @file DtpgNetwork.h

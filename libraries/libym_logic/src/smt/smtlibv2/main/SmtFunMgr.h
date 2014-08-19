@@ -1,4 +1,4 @@
-#ifndef SMTFUNMGR_H
+﻿#ifndef SMTFUNMGR_H
 #define SMTFUNMGR_H
 
 /// @file SmtFunMgr.h

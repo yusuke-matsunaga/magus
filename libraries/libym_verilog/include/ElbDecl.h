@@ -1,4 +1,4 @@
-#ifndef ELBDECL_H
+﻿#ifndef ELBDECL_H
 #define ELBDECL_H
 
 /// @file ElbDecl.h

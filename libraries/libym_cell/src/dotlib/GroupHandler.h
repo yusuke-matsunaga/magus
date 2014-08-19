@@ -1,4 +1,4 @@
-#ifndef GROUPHANDLER_H
+﻿#ifndef GROUPHANDLER_H
 #define GROUPHANDLER_H
 
 /// @file GroupHandler.h

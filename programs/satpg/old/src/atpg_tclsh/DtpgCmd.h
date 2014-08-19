@@ -1,4 +1,4 @@
-#ifndef SRC_DTPG_DTPGCMD_H
+﻿#ifndef SRC_DTPG_DTPGCMD_H
 #define SRC_DTPG_DTPGCMD_H
 
 /// @file src/atpg_tclsh/DtpgCmd.h

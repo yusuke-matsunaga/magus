@@ -1,4 +1,4 @@
-
+﻿
 /// @file bmm_vs.cc
 /// @brief 変数集合を扱う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

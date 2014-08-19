@@ -1,4 +1,4 @@
-
+﻿
 /// @file CutHash.cc
 /// @brief CutHash の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

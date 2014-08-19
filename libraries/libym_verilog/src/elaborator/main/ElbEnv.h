@@ -1,4 +1,4 @@
-#ifndef ELBENV_H
+﻿#ifndef ELBENV_H
 #define ELBENV_H
 
 /// @file ElbEnv.h

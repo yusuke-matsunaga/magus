@@ -1,4 +1,4 @@
-#ifndef LIBYM_SEAL_MATRIX_H
+﻿#ifndef LIBYM_SEAL_MATRIX_H
 #define LIBYM_SEAL_MATRIX_H
 
 /// @file libym_seal/Matrix.h

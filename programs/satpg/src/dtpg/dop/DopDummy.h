@@ -1,4 +1,4 @@
-#ifndef DOPDUMMY_H
+﻿#ifndef DOPDUMMY_H
 #define DOPDUMMY_H
 
 /// @file DopDummy.h

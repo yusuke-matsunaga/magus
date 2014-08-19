@@ -1,4 +1,4 @@
-#ifndef MAGUS_EQUIV_EQUIVCMD_H
+﻿#ifndef MAGUS_EQUIV_EQUIVCMD_H
 #define MAGUS_EQUIV_EQUIVCMD_H
 
 /// @file magus/equiv/EquivCmd.h

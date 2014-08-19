@@ -1,4 +1,4 @@
-#ifndef NAMEHASH_H
+﻿#ifndef NAMEHASH_H
 #define NAMEHASH_H
 
 /// @file NameHash.h

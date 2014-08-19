@@ -1,4 +1,4 @@
-#ifndef CMNNODEINPUT_H
+﻿#ifndef CMNNODEINPUT_H
 #define CMNNODEINPUT_H
 
 /// @file CmnNodeInput.h

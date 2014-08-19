@@ -1,4 +1,4 @@
-#ifndef BNETISCAS89HANDLER_H
+﻿#ifndef BNETISCAS89HANDLER_H
 #define BNETISCAS89HANDLER_H
 
 /// @file BNetIscas89Handler.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file pycell_CellPatType.cc
 /// @brief tCellPatType の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

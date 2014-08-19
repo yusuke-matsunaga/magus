@@ -1,4 +1,4 @@
-#ifndef DOTLIBTIMING_H
+﻿#ifndef DOTLIBTIMING_H
 #define DOTLIBTIMING_H
 
 /// @file DotlibTiming.h

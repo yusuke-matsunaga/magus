@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_FRAIGHASH_H
+﻿#ifndef LIBYM_CEC_FRAIGHASH_H
 #define LIBYM_CEC_FRAIGHASH_H
 
 /// @file libym_cec/FraigHash.h

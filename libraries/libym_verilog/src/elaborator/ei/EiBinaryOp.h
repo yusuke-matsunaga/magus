@@ -1,4 +1,4 @@
-#ifndef EIBINARYOP_H
+﻿#ifndef EIBINARYOP_H
 #define EIBINARYOP_H
 
 /// @file EiBinaryOp.h

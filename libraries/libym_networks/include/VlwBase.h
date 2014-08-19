@@ -1,4 +1,4 @@
-#ifndef VLWBASE_H
+﻿#ifndef VLWBASE_H
 #define VLWBASE_H
 
 /// @file VlwBase.h

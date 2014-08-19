@@ -1,4 +1,4 @@
-#ifndef SMTQUALTERM_H
+﻿#ifndef SMTQUALTERM_H
 #define SMTQUALTERM_H
 
 /// @file SmtCompTerm.h

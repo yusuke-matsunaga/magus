@@ -1,4 +1,4 @@
-#ifndef FUNCHANDLER_H
+﻿#ifndef FUNCHANDLER_H
 #define FUNCHANDLER_H
 
 /// @file FuncHandler.h

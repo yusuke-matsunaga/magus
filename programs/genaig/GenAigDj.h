@@ -1,4 +1,4 @@
-#ifndef GENAIGDJ_H
+﻿#ifndef GENAIGDJ_H
 #define GENAIGDJ_H
 
 /// @file GenAigDj.h

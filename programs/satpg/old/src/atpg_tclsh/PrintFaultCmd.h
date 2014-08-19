@@ -1,4 +1,4 @@
-#ifndef PRINTFAULTCMD_H
+﻿#ifndef PRINTFAULTCMD_H
 #define PRINTFAULTCMD_H
 
 /// @file src/atpg_tclsh/PrintFaultCmd.h

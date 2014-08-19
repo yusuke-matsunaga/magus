@@ -1,4 +1,4 @@
-#ifndef SRC_SEAL_TMRCMD_H
+﻿#ifndef SRC_SEAL_TMRCMD_H
 #define SRC_SEAL_TMRCMD_H
 
 /// @file src/seal/TMRCmd.h

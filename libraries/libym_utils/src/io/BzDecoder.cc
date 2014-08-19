@@ -1,4 +1,4 @@
-
+﻿
 /// @file BzDecoder.cc
 /// @brief BzDecoder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

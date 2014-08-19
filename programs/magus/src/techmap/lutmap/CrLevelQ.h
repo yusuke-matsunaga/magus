@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_CRLEVELQ_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_CRLEVELQ_H
 #define LIBYM_TECHMAP_LUTMAP_CRLEVELQ_H
 
 /// @file libym_techmap/lutmap/CrLevelQ.h

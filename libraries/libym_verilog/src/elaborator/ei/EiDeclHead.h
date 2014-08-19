@@ -1,4 +1,4 @@
-#ifndef EIDECLHEAD_H
+﻿#ifndef EIDECLHEAD_H
 #define EIDECLHEAD_H
 
 /// @file EiDeclHead.h

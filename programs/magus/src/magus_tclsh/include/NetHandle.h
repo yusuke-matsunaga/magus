@@ -1,4 +1,4 @@
-#ifndef MAGUS_NETHANDLE_H
+﻿#ifndef MAGUS_NETHANDLE_H
 #define MAGUS_NETHANDLE_H
 
 /// @file include/NetHandle.h

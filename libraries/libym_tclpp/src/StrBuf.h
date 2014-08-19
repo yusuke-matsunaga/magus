@@ -1,4 +1,4 @@
-#ifndef STRBUF_H
+﻿#ifndef STRBUF_H
 #define STRBUF_H
 
 /// @file StrBuf.h

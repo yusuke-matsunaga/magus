@@ -1,4 +1,4 @@
-#ifndef DOTLIBMGR_H
+﻿#ifndef DOTLIBMGR_H
 #define DOTLIBMGR_H
 
 /// @file DotlibMgr.h

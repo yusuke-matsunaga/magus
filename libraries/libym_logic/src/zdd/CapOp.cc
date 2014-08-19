@@ -1,4 +1,4 @@
-
+﻿
 /// @file CapOp.cc
 /// @brief CapOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

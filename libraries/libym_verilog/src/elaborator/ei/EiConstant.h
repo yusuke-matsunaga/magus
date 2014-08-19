@@ -1,4 +1,4 @@
-#ifndef EICONSTANT_H
+﻿#ifndef EICONSTANT_H
 #define EICONSTANT_H
 
 /// @file EiConstant.h

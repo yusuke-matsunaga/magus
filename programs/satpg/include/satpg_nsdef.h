@@ -1,4 +1,4 @@
-#ifndef SATPG_NSDEF_H
+﻿#ifndef SATPG_NSDEF_H
 #define SATPG_NSDEF_H
 
 /// @file satpg_nsdef.h

@@ -1,4 +1,4 @@
-#ifndef MCSOLVERIMPL_H
+﻿#ifndef MCSOLVERIMPL_H
 #define MCSOLVERIMPL_H
 
 /// @file McSolverImpl.h

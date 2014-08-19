@@ -1,4 +1,4 @@
-#ifndef CIPATGRAPH_H
+﻿#ifndef CIPATGRAPH_H
 #define CIPATGRAPH_H
 
 /// @file CiPatGraph.h

@@ -1,4 +1,4 @@
-#ifndef LEXSTATE_H
+﻿#ifndef LEXSTATE_H
 #define LEXSTATE_H
 
 /// @file LexState.h

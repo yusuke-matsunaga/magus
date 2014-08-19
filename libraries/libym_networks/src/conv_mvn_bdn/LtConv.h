@@ -1,4 +1,4 @@
-#ifndef LTCONV_H
+﻿#ifndef LTCONV_H
 #define LTCONV_H
 
 /// @file LtConv.h

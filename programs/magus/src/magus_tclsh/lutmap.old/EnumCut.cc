@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/EnumCut.cc 
 /// @brief EnumCut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

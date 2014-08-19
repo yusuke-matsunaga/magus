@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_NEWBNETWORK_H
+﻿#ifndef SRC_CORE_NEWBNETWORK_H
 #define SRC_CORE_NEWBNETWORK_H
 
 /// @file src/core/NewBNetwork.h

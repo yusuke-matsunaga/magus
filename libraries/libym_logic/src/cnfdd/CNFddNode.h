@@ -1,4 +1,4 @@
-#ifndef CNFDDNODE_H
+﻿#ifndef CNFDDNODE_H
 #define CNFDDNODE_H
 
 /// @file CNFddNode.h

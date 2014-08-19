@@ -1,4 +1,4 @@
-#ifndef PTIFACTORY_H
+﻿#ifndef PTIFACTORY_H
 #define PTIFACTORY_H
 
 /// @file PtiFactory.h

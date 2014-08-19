@@ -1,4 +1,4 @@
-#ifndef IGVAR_H
+﻿#ifndef IGVAR_H
 #define IGVAR_H
 
 /// @file IgVar.h

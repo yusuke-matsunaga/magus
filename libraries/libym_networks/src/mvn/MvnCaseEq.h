@@ -1,4 +1,4 @@
-#ifndef MVNCASEEQ_H
+﻿#ifndef MVNCASEEQ_H
 #define MVNCASEEQ_H
 
 /// @file MvnCaseEq.h

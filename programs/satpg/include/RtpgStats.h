@@ -1,4 +1,4 @@
-#ifndef RTPGSTATS_H
+﻿#ifndef RTPGSTATS_H
 #define RTPGSTATS_H
 
 /// @file RtpgStats.h

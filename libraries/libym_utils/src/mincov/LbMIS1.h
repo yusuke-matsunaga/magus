@@ -1,4 +1,4 @@
-#ifndef LBMIS1_H
+﻿#ifndef LBMIS1_H
 #define LBMIS1_H
 
 /// @file LbMIS1.h

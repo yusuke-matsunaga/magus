@@ -1,4 +1,4 @@
-#ifndef VERILOG_BITVECTOR_H
+﻿#ifndef VERILOG_BITVECTOR_H
 #define VERILOG_BITVECTOR_H
 
 /// @file YmVerilog/BitVector.h

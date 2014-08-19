@@ -1,4 +1,4 @@
-#ifndef W0OP_H
+﻿#ifndef W0OP_H
 #define W0OP_H
 
 /// @file W0Op.h

@@ -1,4 +1,4 @@
-#ifndef DOTLIBLIBRARY_H
+﻿#ifndef DOTLIBLIBRARY_H
 #define DOTLIBLIBRARY_H
 
 /// @file DotlibLibrary.h

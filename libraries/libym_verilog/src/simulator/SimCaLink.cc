@@ -1,4 +1,4 @@
-// $Id: SimCaLink.cc 700 2007-05-31 00:41:30Z matsunaga $
+﻿// $Id: SimCaLink.cc 700 2007-05-31 00:41:30Z matsunaga $
 
 // continuous assignment に対応するノード
 

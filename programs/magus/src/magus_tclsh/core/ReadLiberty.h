@@ -1,4 +1,4 @@
-#ifndef READLIBERTY_H
+﻿#ifndef READLIBERTY_H
 #define READLIBERTY_H
 
 /// @file ReadLiberty.h

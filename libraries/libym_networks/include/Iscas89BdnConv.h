@@ -1,4 +1,4 @@
-#ifndef ISCAS89BDNCONV_H
+﻿#ifndef ISCAS89BDNCONV_H
 #define ISCAS89BDNCONV_H
 
 /// @file Iscas89BdnConv.h

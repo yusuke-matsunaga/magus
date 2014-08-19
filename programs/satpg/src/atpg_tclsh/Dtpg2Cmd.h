@@ -1,4 +1,4 @@
-#ifndef DTPG2CMD_H
+﻿#ifndef DTPG2CMD_H
 #define DTPG2CMD_H
 
 /// @file Dtpg2Cmd.h

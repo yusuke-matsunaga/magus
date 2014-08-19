@@ -1,4 +1,4 @@
-#ifndef GDS_GDSPARSER_H
+﻿#ifndef GDS_GDSPARSER_H
 #define GDS_GDSPARSER_H
 
 /// @file gds/GdsParser.h

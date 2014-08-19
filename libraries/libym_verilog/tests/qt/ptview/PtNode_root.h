@@ -1,4 +1,4 @@
-#ifndef PTNODE_ROOT_H
+﻿#ifndef PTNODE_ROOT_H
 #define PTNODE_ROOT_H
 
 /// @file PtNode_root.h

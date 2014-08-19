@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_aig/tests/bliftest.cc
 /// @brief blif ファイルの読み書きのテスト
 /// @author Yusuke Matsunaga (松永 裕介)

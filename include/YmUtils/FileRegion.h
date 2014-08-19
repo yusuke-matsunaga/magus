@@ -1,4 +1,4 @@
-#ifndef YMUTILS_FILEREGION_H
+﻿#ifndef YMUTILS_FILEREGION_H
 #define YMUTILS_FILEREGION_H
 
 /// @file YmUtils/FileRegion.h

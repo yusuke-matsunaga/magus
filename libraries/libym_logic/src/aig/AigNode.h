@@ -1,4 +1,4 @@
-#ifndef AIGNODE_H
+﻿#ifndef AIGNODE_H
 #define AIGNODE_H
 
 /// @file AigNode.h

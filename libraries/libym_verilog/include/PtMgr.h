@@ -1,4 +1,4 @@
-#ifndef PTMGR_H
+﻿#ifndef PTMGR_H
 #define PTMGR_H
 
 /// @file PtMgr.h

@@ -1,4 +1,4 @@
-#ifndef SORTMGR_H
+﻿#ifndef SORTMGR_H
 #define SORTMGR_H
 
 /// @file SortMgr.h

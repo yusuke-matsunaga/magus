@@ -1,4 +1,4 @@
-#ifndef ISCAS89NETWORKREADER_H
+﻿#ifndef ISCAS89NETWORKREADER_H
 #define ISCAS89NETWORKREADER_H
 
 /// @file Iscas89NetworkReader.h

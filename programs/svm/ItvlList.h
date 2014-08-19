@@ -1,4 +1,4 @@
-#ifndef ITVLLIST_H
+﻿#ifndef ITVLLIST_H
 #define ITVLLIST_H
 
 /// @file ItvlList.h

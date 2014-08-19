@@ -1,4 +1,4 @@
-#ifndef SHELLIMPL_H
+﻿#ifndef SHELLIMPL_H
 #define SHELLIMPL_H
 
 /// @file ShellImpl.h

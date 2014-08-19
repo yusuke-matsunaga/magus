@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_LVLQ_H
+﻿#ifndef DTPG_CLASSIC_LVLQ_H
 #define DTPG_CLASSIC_LVLQ_H
 
 /// @file src/dtpg_classic/LvlQ.h

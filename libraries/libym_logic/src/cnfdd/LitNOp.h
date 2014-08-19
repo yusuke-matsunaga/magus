@@ -1,4 +1,4 @@
-#ifndef LITNOP_H
+﻿#ifndef LITNOP_H
 #define LITNOP_H
 
 /// @file LitNOp.h

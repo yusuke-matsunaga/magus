@@ -1,4 +1,4 @@
-#ifndef SUBCONV_H
+﻿#ifndef SUBCONV_H
 #define SUBCONV_H
 
 /// @file SubConv.h

@@ -1,4 +1,4 @@
-#ifndef EUFMGR_H
+﻿#ifndef EUFMGR_H
 #define EUFMGR_H
 
 /// @file EufMgr.h

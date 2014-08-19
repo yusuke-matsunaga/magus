@@ -1,4 +1,4 @@
-
+﻿
 /// @file BtBase.cc
 /// @brief BtBase の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

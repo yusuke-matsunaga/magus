@@ -1,4 +1,4 @@
-#ifndef EXITCMD_H
+﻿#ifndef EXITCMD_H
 #define EXITCMD_H
 
 /// @file ExitCmd.h

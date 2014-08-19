@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_SNGATE_H
+﻿#ifndef CALC_SVF_SNGATE_H
 #define CALC_SVF_SNGATE_H
 
 /// @file calc_svf/SnGate.h

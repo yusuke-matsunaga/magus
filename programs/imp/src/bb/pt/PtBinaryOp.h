@@ -1,4 +1,4 @@
-#ifndef SRC_PT_PTBINARYOP_H
+﻿#ifndef SRC_PT_PTBINARYOP_H
 #define SRC_PT_PTBINARYOP_H
 
 /// @file src/pt/PtBinaryOp.h

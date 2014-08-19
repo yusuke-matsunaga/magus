@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_NODESET_H
+﻿#ifndef CALC_SVF_NODESET_H
 #define CALC_SVF_NODESET_H
 
 /// @file calc_svf/NodeSet.h

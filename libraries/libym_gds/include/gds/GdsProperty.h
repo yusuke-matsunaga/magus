@@ -1,4 +1,4 @@
-#ifndef GDS_GDSPROPERTY_H
+﻿#ifndef GDS_GDSPROPERTY_H
 #define GDS_GDSPROPERTY_H
 
 /// @file gds/GdsProperty.h

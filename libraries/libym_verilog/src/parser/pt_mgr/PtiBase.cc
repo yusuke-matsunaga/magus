@@ -1,4 +1,4 @@
-
+﻿
 /// @file PtiBase.cc
 /// @brief PtiXXX の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

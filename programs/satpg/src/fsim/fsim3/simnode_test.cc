@@ -1,4 +1,4 @@
-
+﻿
 /// @file simnode_test.cc
 /// @brief  SimNode::calc_gval(), calc_fval() のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_cec/FraigMgr.cc
 /// @brief FraigMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

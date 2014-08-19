@@ -1,4 +1,4 @@
-#ifndef ATPG_DTPGCL_NSDEF_H
+﻿#ifndef ATPG_DTPGCL_NSDEF_H
 #define ATPG_DTPGCL_NSDEF_H
 
 /// @file include/dtpgcl_nsdef.h

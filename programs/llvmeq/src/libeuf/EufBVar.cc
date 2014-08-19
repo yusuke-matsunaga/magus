@@ -1,4 +1,4 @@
-
+﻿
 /// @file EufBVar.cc
 /// @brief EufBVar の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

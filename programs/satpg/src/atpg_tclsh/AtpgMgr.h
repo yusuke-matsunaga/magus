@@ -1,4 +1,4 @@
-#ifndef ATPGMGR_H
+﻿#ifndef ATPGMGR_H
 #define ATPGMGR_H
 
 /// @file AtpgMgr.h

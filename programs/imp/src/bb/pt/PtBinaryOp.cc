@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pt/PtBinaryOp.cc
 /// @brief PtBinaryOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

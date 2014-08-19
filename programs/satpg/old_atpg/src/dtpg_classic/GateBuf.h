@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_GATEBUF_H
+﻿#ifndef DTPG_CLASSIC_GATEBUF_H
 #define DTPG_CLASSIC_GATEBUF_H
 
 /// @file src/dtpg_classic/GateBuf.h

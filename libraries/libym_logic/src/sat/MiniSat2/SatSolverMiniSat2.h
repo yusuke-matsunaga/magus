@@ -1,4 +1,4 @@
-#ifndef SATSOLVERMINISAT2_H
+﻿#ifndef SATSOLVERMINISAT2_H
 #define SATSOLVERMINISAT2_H
 
 /// @file SatSolverMiniSat2.h

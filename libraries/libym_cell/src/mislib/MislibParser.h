@@ -1,4 +1,4 @@
-#ifndef MISLIBPARSER_H
+﻿#ifndef MISLIBPARSER_H
 #define MISLIBPARSER_H
 
 /// @file MislibParser.h

@@ -1,4 +1,4 @@
-#ifndef READMISLIB_H
+﻿#ifndef READMISLIB_H
 #define READMISLIB_H
 
 /// @file ReadMislib.h

@@ -1,4 +1,4 @@
-#ifndef VMMISCNODE_H
+﻿#ifndef VMMISCNODE_H
 #define VMMISCNODE_H
 
 /// @file VmMiscNode.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file BlifBdnConv.cc
 /// @brief BlifBdnConv の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

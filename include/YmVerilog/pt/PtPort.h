@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_POPORT_H
+﻿#ifndef VERILOG_PT_POPORT_H
 #define VERILOG_PT_POPORT_H
 
 /// @file YmVerilog/pt/PtPort.h

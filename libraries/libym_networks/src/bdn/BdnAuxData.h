@@ -1,4 +1,4 @@
-#ifndef BDNAUXDATA_H
+﻿#ifndef BDNAUXDATA_H
 #define BDNAUXDATA_H
 
 /// @file BdnAuxData.h

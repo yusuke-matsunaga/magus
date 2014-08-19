@@ -1,4 +1,4 @@
-#ifndef H_MATPG_PGraph
+﻿#ifndef H_MATPG_PGraph
 #define H_MATPG_PGraph
 
 /*

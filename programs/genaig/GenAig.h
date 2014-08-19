@@ -1,4 +1,4 @@
-#ifndef GENAIG_H
+﻿#ifndef GENAIG_H
 #define GENAIG_H
 
 /// @file GenAig.h

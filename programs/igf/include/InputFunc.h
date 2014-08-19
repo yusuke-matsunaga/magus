@@ -1,4 +1,4 @@
-#ifndef INPUTFUNC_H
+﻿#ifndef INPUTFUNC_H
 #define INPUTFUNC_H
 
 /// @file InputFunc.h

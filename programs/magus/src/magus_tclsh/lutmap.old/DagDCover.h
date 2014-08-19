@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_DAGDCOVER_H
+﻿#ifndef MAGUS_LUTMAP_DAGDCOVER_H
 #define MAGUS_LUTMAP_DAGDCOVER_H
 
 /// @file magus/lutmap/DagDCover.h

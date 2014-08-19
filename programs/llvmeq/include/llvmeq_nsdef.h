@@ -1,4 +1,4 @@
-#ifndef LLVMEQ_NSDEF_H
+﻿#ifndef LLVMEQ_NSDEF_H
 #define LLVMEQ_NSDEF_H
 
 /// @file llvmeq_nsdef.h

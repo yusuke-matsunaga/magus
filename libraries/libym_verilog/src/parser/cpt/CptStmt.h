@@ -1,4 +1,4 @@
-#ifndef CPTSTMT_H
+﻿#ifndef CPTSTMT_H
 #define CPTSTMT_H
 
 /// @file CptStmt.h

@@ -1,4 +1,4 @@
-#ifndef DIRCMD_H
+﻿#ifndef DIRCMD_H
 #define DIRCMD_H
 
 /// @file DirCmd.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_seal/lu_decomp.cc
 /// @brief LU 分解を行って連立方程式を求解するアルゴリズムの実装
 /// @author Yusuke Matsunaga (松永 裕介)

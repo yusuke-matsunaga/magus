@@ -1,4 +1,4 @@
-#ifndef OP2_H
+﻿#ifndef OP2_H
 #define OP2_H
 
 /// @file atpg/src/main/Op2.h

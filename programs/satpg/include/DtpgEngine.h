@@ -1,4 +1,4 @@
-#ifndef DTPGENGINE_H
+﻿#ifndef DTPGENGINE_H
 #define DTPGENGINE_H
 
 /// @file DtpgEngine.h

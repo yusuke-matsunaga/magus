@@ -1,4 +1,4 @@
-#ifndef IMPREC_H
+﻿#ifndef IMPREC_H
 #define IMPREC_H
 
 /// @file ImpRec.h

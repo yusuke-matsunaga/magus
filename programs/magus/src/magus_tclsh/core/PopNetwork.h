@@ -1,4 +1,4 @@
-#ifndef SRC_CORE_POPNETWORK_H
+﻿#ifndef SRC_CORE_POPNETWORK_H
 #define SRC_CORE_POPNETWORK_H
 
 /// @file src/core/PopNetwork.h

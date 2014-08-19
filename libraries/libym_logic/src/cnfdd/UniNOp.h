@@ -1,4 +1,4 @@
-#ifndef UNINOP_H
+﻿#ifndef UNINOP_H
 #define UNINOP_H
 
 /// @file UniNOp.h

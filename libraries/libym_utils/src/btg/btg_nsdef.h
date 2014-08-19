@@ -1,4 +1,4 @@
-#ifndef BTG_NSDEF_H
+﻿#ifndef BTG_NSDEF_H
 #define BTG_NSDEF_H
 
 /// @file btg_nsdef.h

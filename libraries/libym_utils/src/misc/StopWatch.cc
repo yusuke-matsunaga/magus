@@ -1,4 +1,4 @@
-
+﻿
 /// @file StopWatch.cc
 /// @brief 時間計測用のクラスの実装ファイル
 /// @author Yusuke Matsunaga

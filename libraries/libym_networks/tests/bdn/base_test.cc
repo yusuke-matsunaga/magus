@@ -1,4 +1,4 @@
-
+﻿
 /// @file base_test.cc
 /// @brief BdnMgr の基本機能のテスト
 /// @author Yusuke Matsunaga (松永 裕介)

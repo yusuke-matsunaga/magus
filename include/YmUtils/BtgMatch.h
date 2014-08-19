@@ -1,4 +1,4 @@
-#ifndef YMUTILS_BTGMATCH_H
+﻿#ifndef YMUTILS_BTGMATCH_H
 #define YMUTILS_BTGMATCH_H
 
 /// @file YmUtils/BtgMatch.h

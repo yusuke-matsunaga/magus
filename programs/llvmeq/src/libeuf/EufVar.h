@@ -1,4 +1,4 @@
-#ifndef EUFVAR_H
+﻿#ifndef EUFVAR_H
 #define EUFVAR_H
 
 /// @file EufVar.h

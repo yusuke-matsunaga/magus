@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_SIMFFR_H
+﻿#ifndef CALC_CVF_SIMFFR_H
 #define CALC_CVF_SIMFFR_H
 
 /// @file calc_cvf/SimFFR.h

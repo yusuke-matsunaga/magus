@@ -1,4 +1,4 @@
-
+﻿
 /// @file pyigf_init.cc
 /// @brief pyigf の初期化関数
 /// @author Yusuke Matsunaga (松永 裕介)

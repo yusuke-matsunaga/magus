@@ -1,4 +1,4 @@
-#ifndef PARSER_COMMON_H
+﻿#ifndef PARSER_COMMON_H
 #define PARSER_COMMON_H
 
 /// @file parser_common.h

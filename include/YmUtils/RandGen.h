@@ -1,4 +1,4 @@
-#ifndef YMUTILS_RANDGEN_H
+﻿#ifndef YMUTILS_RANDGEN_H
 #define YMUTILS_RANDGEN_H
 
 /// @file YmUtils/RandGen.h

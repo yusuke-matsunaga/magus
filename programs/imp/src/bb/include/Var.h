@@ -1,4 +1,4 @@
-#ifndef INCLUDE_VAR_H
+﻿#ifndef INCLUDE_VAR_H
 #define INCLUDE_VAR_H
 
 /// @file include/Var.h

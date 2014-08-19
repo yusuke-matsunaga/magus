@@ -1,4 +1,4 @@
-#ifndef EQCONV_H
+﻿#ifndef EQCONV_H
 #define EQCONV_H
 
 /// @file EqConv.h

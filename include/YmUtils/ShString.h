@@ -1,4 +1,4 @@
-#ifndef YMUTILS_SHSTRING_H
+﻿#ifndef YMUTILS_SHSTRING_H
 #define YMUTILS_SHSTRING_H
 
 /// @file YmUtils/ShString.h

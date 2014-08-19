@@ -1,4 +1,4 @@
-#ifndef SRLCONV_H
+﻿#ifndef SRLCONV_H
 #define SRLCONV_H
 
 /// @file SrlConv.h

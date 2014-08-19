@@ -1,4 +1,4 @@
-#ifndef SATPGNODE_H
+﻿#ifndef SATPGNODE_H
 #define SATPGNODE_H
 
 /// @file SatpgNode.h

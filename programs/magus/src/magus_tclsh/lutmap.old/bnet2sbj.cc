@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/bnet2sbj.cc
 /// @brief bnet2sbj() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

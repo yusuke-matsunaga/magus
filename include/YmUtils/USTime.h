@@ -1,4 +1,4 @@
-#ifndef YMUTILS_USTIME_H
+﻿#ifndef YMUTILS_USTIME_H
 #define YMUTILS_USTIME_H
 
 /// @file YmUtils/USTime.h

@@ -1,4 +1,4 @@
-#ifndef IMPLISTREC2_H
+﻿#ifndef IMPLISTREC2_H
 #define IMPLISTREC2_H
 
 /// @file ImpListRec2.h

@@ -1,4 +1,4 @@
-#ifndef CELL_CELLBUSTYPE_H
+﻿#ifndef CELL_CELLBUSTYPE_H
 #define CELL_CELLBUSTYPE_H
 
 /// @file YmCell/CellBusType.h

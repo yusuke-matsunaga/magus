@@ -1,4 +1,4 @@
-#ifndef MINCOV_NSDEF_H
+﻿#ifndef MINCOV_NSDEF_H
 #define MINCOV_NSDEF_H
 
 /// @file mincov_nsdef.h

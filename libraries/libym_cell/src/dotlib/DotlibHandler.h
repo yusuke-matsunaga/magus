@@ -1,4 +1,4 @@
-#ifndef DOTLIBHANDLER_H
+﻿#ifndef DOTLIBHANDLER_H
 #define DOTLIBHANDLER_H
 
 /// @file DotlibHandler.h

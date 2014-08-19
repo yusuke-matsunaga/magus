@@ -1,4 +1,4 @@
-#ifndef CELL_CELLPATGRAPH_H
+﻿#ifndef CELL_CELLPATGRAPH_H
 #define CELL_CELLPATGRAPH_H
 
 /// @file YmCell/CellPatGraph.h

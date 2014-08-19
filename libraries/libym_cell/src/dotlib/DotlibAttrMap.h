@@ -1,4 +1,4 @@
-#ifndef DOTLIBATTRMAP_H
+﻿#ifndef DOTLIBATTRMAP_H
 #define DOTLIBATTRMAP_H
 
 /// @file DotlibAttrMap.h

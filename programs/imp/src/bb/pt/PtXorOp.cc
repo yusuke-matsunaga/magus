@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pt/PtXorOp.cc
 /// @brief PtXorOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

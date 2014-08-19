@@ -1,4 +1,4 @@
-#ifndef ENVMERGER_H
+﻿#ifndef ENVMERGER_H
 #define ENVMERGER_H
 
 /// @file EnvMerger.h

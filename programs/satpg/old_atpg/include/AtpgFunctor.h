@@ -1,4 +1,4 @@
-#ifndef MAIN_ATPGFUNCTOR_H
+﻿#ifndef MAIN_ATPGFUNCTOR_H
 #define MAIN_ATPGFUNCTOR_H
 
 /// @file src/main/AtpgFunctor.h

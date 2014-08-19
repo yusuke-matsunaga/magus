@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MSGTYPE_H
+﻿#ifndef YMUTILS_MSGTYPE_H
 #define YMUTILS_MSGTYPE_H
 
 /// @file YmUtils/MsgType.h

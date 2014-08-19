@@ -1,4 +1,4 @@
-
+﻿
 /// @file EufBin.cc
 /// @brief EufBin の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

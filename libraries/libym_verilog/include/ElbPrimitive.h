@@ -1,4 +1,4 @@
-#ifndef ELBPRIMITIVE_H
+﻿#ifndef ELBPRIMITIVE_H
 #define ELBPRIMITIVE_H
 
 /// @file ElbPrimitive.h

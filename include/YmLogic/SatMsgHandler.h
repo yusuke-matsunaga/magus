@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SATMSGHANDLER_H
+﻿#ifndef YMYMLOGIC_SATMSGHANDLER_H
 #define YMYMLOGIC_SATMSGHANDLER_H
 
 /// @file YmLogic/SatMsgHandler.h

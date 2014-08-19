@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_KFNMAPPERX_H
+﻿#ifndef MAGUS_LUTMAP_KFNMAPPERX_H
 #define MAGUS_LUTMAP_KFNMAPPERX_H
 
 /// @file magus/lutmap/KfnMapperX.h

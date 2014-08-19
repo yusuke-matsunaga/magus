@@ -1,4 +1,4 @@
-#ifndef ELBIODECL_H
+﻿#ifndef ELBIODECL_H
 #define ELBIODECL_H
 
 /// @file ElbIODecl.h

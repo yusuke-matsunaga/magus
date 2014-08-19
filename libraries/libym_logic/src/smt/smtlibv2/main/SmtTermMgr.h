@@ -1,4 +1,4 @@
-#ifndef SMTTERMMGR_H
+﻿#ifndef SMTTERMMGR_H
 #define SMTTERMMGR_H
 
 /// @file SmtTermMgr.h

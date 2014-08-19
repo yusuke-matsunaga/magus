@@ -1,4 +1,4 @@
-#ifndef YM_TECHMAP_LNGRAPH_H
+﻿#ifndef YM_TECHMAP_LNGRAPH_H
 #define YM_TECHMAP_LNGRAPH_H
 
 /// @file ym_techmap/LnGraph.h

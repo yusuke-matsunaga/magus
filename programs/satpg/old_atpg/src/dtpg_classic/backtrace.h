@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_BACKTRACE_H
+﻿#ifndef DTPG_CLASSIC_BACKTRACE_H
 #define DTPG_CLASSIC_BACKTRACE_H
 
 /// @file src/dtpg_classic/backtrace.h

@@ -1,4 +1,4 @@
-#ifndef TOKENINFO_H
+﻿#ifndef TOKENINFO_H
 #define TOKENINFO_H
 
 /// @file TokenInfo.h

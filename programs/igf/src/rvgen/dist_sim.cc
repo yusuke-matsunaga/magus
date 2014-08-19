@@ -1,4 +1,4 @@
-
+﻿
 /// @file dist_sim.cc
 /// @brief dist_sim のソースファイル
 /// @author Yusuke Matsunaga (松永 裕介)

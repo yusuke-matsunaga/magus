@@ -1,4 +1,4 @@
-#ifndef CALC_CVF_SNXOR_H
+﻿#ifndef CALC_CVF_SNXOR_H
 #define CALC_CVF_SNXOR_H
 
 /// @file calc_cvf/SnXor.h

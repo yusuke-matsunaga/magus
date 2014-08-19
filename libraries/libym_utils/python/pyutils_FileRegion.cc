@@ -1,4 +1,4 @@
-
+﻿
 /// @file pyutils_FileRegion.cc
 /// @brief FileRegion の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

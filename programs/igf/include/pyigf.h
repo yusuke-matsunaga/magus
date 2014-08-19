@@ -1,4 +1,4 @@
-#ifndef PYIGF_H
+﻿#ifndef PYIGF_H
 #define PYIGF_H
 
 /// @file pyigf.h

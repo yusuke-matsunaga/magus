@@ -1,4 +1,4 @@
-#ifndef GBMBDDENGINEONEHOT_H
+﻿#ifndef GBMBDDENGINEONEHOT_H
 #define GBMBDDENGINEONEHOT_H
 
 /// @file GbmBddEngineOneHot.h

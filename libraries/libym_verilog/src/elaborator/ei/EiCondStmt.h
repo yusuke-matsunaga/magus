@@ -1,4 +1,4 @@
-#ifndef EICONDSTMT_H
+﻿#ifndef EICONDSTMT_H
 #define EICONDSTMT_H
 
 /// @file EiCondStmt.h

@@ -1,4 +1,4 @@
-#ifndef LSIM_H
+﻿#ifndef LSIM_H
 #define LSIM_H
 
 /// @file Lsim.h

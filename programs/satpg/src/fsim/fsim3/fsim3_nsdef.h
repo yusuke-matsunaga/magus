@@ -1,4 +1,4 @@
-#ifndef FSIM3_NSDEF_H
+﻿#ifndef FSIM3_NSDEF_H
 #define FSIM3_NSDEF_H
 
 /// @file fsim3_nsdef.h

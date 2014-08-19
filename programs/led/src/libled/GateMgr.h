@@ -1,4 +1,4 @@
-#ifndef GATEMGR_H
+﻿#ifndef GATEMGR_H
 #define GATEMGR_H
 
 /// @file GateMgr.h

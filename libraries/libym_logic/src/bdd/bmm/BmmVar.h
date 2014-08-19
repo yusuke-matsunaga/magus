@@ -1,4 +1,4 @@
-#ifndef BMMVAR_H
+﻿#ifndef BMMVAR_H
 #define BMMVAR_H
 
 /// @file BmmVar.h

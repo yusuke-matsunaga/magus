@@ -1,4 +1,4 @@
-#ifndef SRC_IO_CMDS_ATPGMSGHANDLER_H
+﻿#ifndef SRC_IO_CMDS_ATPGMSGHANDLER_H
 #define SRC_IO_CMDS_ATPGMSGHANDLER_H
 
 /// @file src/io_cmds/AtpgMsgHandler.h

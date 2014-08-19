@@ -1,4 +1,4 @@
-#ifndef UOPSKIP_H
+﻿#ifndef UOPSKIP_H
 #define UOPSKIP_H
 
 /// @file UopSkip.h

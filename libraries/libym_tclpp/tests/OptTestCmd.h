@@ -1,4 +1,4 @@
-#ifndef OPTTESTCMD_H
+﻿#ifndef OPTTESTCMD_H
 #define OPTTESTCMD_H
 
 /// @file OptTestCmd.h

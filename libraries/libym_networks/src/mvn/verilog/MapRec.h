@@ -1,4 +1,4 @@
-#ifndef MAPREC_H
+﻿#ifndef MAPREC_H
 #define MAPREC_H
 
 /// @file MapRec.h

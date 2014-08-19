@@ -1,4 +1,4 @@
-#ifndef SMTLISTTERM_H
+﻿#ifndef SMTLISTTERM_H
 #define SMTLISTTERM_H
 
 /// @file SmtListTerm.h

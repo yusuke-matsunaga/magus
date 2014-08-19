@@ -1,4 +1,4 @@
-#ifndef BNODEMAP_H
+﻿#ifndef BNODEMAP_H
 #define BNODEMAP_H
 
 /// @file BNodeMap.h

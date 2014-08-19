@@ -1,4 +1,4 @@
-#ifndef FOPDROP_H
+﻿#ifndef FOPDROP_H
 #define FOPDROP_H
 
 /// @file FopDrop.h

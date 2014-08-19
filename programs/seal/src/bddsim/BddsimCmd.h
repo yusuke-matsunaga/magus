@@ -1,4 +1,4 @@
-#ifndef BDDSIM_BDDSIMCMD_H
+﻿#ifndef BDDSIM_BDDSIMCMD_H
 #define BDDSIM_BDDSIMCMD_H
 
 /// @file src/bddsim/BddsimCmd.h

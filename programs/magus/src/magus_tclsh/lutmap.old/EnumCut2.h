@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_ENUMCUT2_H
+﻿#ifndef MAGUS_LUTMAP_ENUMCUT2_H
 #define MAGUS_LUTMAP_ENUMCUT2_H
 
 /// @file magus/lutmap/EnumCut2.h 

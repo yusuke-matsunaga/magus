@@ -1,4 +1,4 @@
-#ifndef NETWORKS_CMNBLIFWRITER_H
+﻿#ifndef NETWORKS_CMNBLIFWRITER_H
 #define NETWORKS_CMNBLIFWRITER_H
 
 /// @file YmNetworks/CmnBlifWriter.h

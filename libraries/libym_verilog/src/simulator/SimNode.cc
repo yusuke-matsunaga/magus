@@ -1,4 +1,4 @@
-// $Id: SimNode.cc 1052 2007-10-24 11:08:51Z matsunaga $
+﻿// $Id: SimNode.cc 1052 2007-10-24 11:08:51Z matsunaga $
 
 // シミュレーション用のコントロールフローグラフ
 

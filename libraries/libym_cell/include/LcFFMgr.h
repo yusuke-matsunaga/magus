@@ -1,4 +1,4 @@
-#ifndef LCFFMGR_H
+﻿#ifndef LCFFMGR_H
 #define LCFFMGR_H
 
 /// @file LcFFMgr.h

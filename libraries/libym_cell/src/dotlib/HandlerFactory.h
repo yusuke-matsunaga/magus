@@ -1,4 +1,4 @@
-#ifndef HANDLERFACTORY_H
+﻿#ifndef HANDLERFACTORY_H
 #define HANDLERFACTORY_H
 
 /// @file HandlerFactory.h

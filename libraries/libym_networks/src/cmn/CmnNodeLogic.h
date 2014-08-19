@@ -1,4 +1,4 @@
-#ifndef CMNNODEYMLOGIC_H
+﻿#ifndef CMNNODEYMLOGIC_H
 #define CMNNODEYMLOGIC_H
 
 /// @file CmnNodeLogic.h

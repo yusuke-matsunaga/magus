@@ -1,4 +1,4 @@
-#ifndef GLV_H
+﻿#ifndef GLV_H
 #define GLV_H
 
 /// @file Glv.h

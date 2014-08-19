@@ -1,4 +1,4 @@
-#ifndef MCMATRIX_H
+﻿#ifndef MCMATRIX_H
 #define MCMATRIX_H
 
 /// @file McMatrix.h

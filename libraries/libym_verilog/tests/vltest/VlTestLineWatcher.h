@@ -1,4 +1,4 @@
-#ifndef VLTESTLINEWATCHER_H
+﻿#ifndef VLTESTLINEWATCHER_H
 #define VLTESTLINEWATCHER_H
 
 /// @file VlTestLineWatcher.h

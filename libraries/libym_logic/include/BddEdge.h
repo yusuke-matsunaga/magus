@@ -1,4 +1,4 @@
-#ifndef BDDEDGE_H
+﻿#ifndef BDDEDGE_H
 #define BDDEDGE_H
 
 /// @file BddEdge.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file ymsat2.cc
 /// @brief 簡単な SAT プログラム(2)
 /// @author Yusuke Matsunaga (松永 裕介)

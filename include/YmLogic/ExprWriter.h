@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_EXPRWRITER_H
+﻿#ifndef YMYMLOGIC_EXPRWRITER_H
 #define YMYMLOGIC_EXPRWRITER_H
 
 /// @file YmLogic/ExprWriter.h

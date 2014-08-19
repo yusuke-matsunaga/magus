@@ -1,4 +1,4 @@
-#ifndef LED_GATEOBJ_H
+﻿#ifndef LED_GATEOBJ_H
 #define LED_GATEOBJ_H
 
 /// @file led/GateObj.h

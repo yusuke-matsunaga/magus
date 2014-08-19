@@ -1,4 +1,4 @@
-
+﻿
 /// @file gctest.cc
 /// @brief GcSolver のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

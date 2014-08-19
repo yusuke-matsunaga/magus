@@ -1,4 +1,4 @@
-#ifndef RWTMGR_H
+﻿#ifndef RWTMGR_H
 #define RWTMGR_H
 
 /// @file RwtMgr.h

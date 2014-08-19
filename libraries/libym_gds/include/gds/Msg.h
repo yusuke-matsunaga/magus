@@ -1,4 +1,4 @@
-#ifndef YM_GDS_MSG_H
+﻿#ifndef YM_GDS_MSG_H
 #define YM_GDS_MSG_H
 
 /// @file ym_gds/Msg.h

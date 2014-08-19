@@ -1,4 +1,4 @@
-#ifndef READERIMPL_H
+﻿#ifndef READERIMPL_H
 #define READERIMPL_H
 
 /// @file ReaderImpl.h

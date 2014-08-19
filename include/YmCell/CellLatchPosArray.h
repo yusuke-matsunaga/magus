@@ -1,4 +1,4 @@
-#ifndef CELL_CELLLATCHPOSARRAY_H
+﻿#ifndef CELL_CELLLATCHPOSARRAY_H
 #define CELL_CELLLATCHPOSARRAY_H
 
 /// @file YmCell/CellLatchPosArray.h

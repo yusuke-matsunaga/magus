@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_DG_H
+﻿#ifndef YMYMLOGIC_DG_H
 #define YMYMLOGIC_DG_H
 
 /// @file YmLogic/Dg.h

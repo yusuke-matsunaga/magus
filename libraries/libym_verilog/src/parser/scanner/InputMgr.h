@@ -1,4 +1,4 @@
-#ifndef INPUTMGR_H
+﻿#ifndef INPUTMGR_H
 #define INPUTMGR_H
 
 /// @file InputMgr.h

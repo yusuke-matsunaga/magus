@@ -1,4 +1,4 @@
-#ifndef TECHMAP_DUMPSBJCMD_H
+﻿#ifndef TECHMAP_DUMPSBJCMD_H
 #define TECHMAP_DUMPSBJCMD_H
 
 /// @file magus/techmap/DumpSbjCmd.h

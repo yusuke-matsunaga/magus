@@ -1,4 +1,4 @@
-#ifndef ELBUSERSYSTF_H
+﻿#ifndef ELBUSERSYSTF_H
 #define ELBUSERSYSTF_H
 
 /// @file ElbUserSystf.h

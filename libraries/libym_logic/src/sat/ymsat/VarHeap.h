@@ -1,4 +1,4 @@
-#ifndef VARHEAP_H
+﻿#ifndef VARHEAP_H
 #define VARHEAP_H
 
 /// @file VarHeap.h

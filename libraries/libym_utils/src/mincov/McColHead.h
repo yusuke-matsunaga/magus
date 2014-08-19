@@ -1,4 +1,4 @@
-#ifndef MCCOLHEAD_H
+﻿#ifndef MCCOLHEAD_H
 #define MCCOLHEAD_H
 
 /// @file McColHead.h

@@ -1,4 +1,4 @@
-#ifndef CPTFACTORY_H
+﻿#ifndef CPTFACTORY_H
 #define CPTFACTORY_H
 
 /// @file CptFactory.h

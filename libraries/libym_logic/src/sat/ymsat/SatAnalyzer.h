@@ -1,4 +1,4 @@
-#ifndef SATANALYZER_H
+﻿#ifndef SATANALYZER_H
 #define SATANALYZER_H
 
 /// @file SatAnalyzer.h

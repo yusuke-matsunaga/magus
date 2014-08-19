@@ -1,4 +1,4 @@
-/// @file GpMgr.cc
+﻿/// @file GpMgr.cc
 /// @brief GpMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

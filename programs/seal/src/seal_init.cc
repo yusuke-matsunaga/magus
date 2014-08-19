@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/seal_init.cc
 /// @brief seal のパッケージ初期化
 /// @author Yusuke Matsunaga (松永 裕介)

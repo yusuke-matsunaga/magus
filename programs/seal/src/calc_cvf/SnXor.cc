@@ -1,4 +1,4 @@
-
+﻿
 /// @file calc_cvf/SnXor.cc
 /// @brief SnXor の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

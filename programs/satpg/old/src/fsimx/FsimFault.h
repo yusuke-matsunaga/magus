@@ -1,4 +1,4 @@
-#ifndef FSIMXFAULT_H
+﻿#ifndef FSIMXFAULT_H
 #define FSIMXFAULT_H
 
 /// @file src/fsimx/FsimFault.h

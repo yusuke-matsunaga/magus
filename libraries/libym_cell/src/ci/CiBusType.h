@@ -1,4 +1,4 @@
-#ifndef CIBUSTYPE_H
+﻿#ifndef CIBUSTYPE_H
 #define CIBUSTYPE_H
 
 /// @file CiBusType.h

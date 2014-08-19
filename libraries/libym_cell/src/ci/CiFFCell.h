@@ -1,4 +1,4 @@
-#ifndef CIFFCELL_H
+﻿#ifndef CIFFCELL_H
 #define CIFFCELL_H
 
 /// @file CiFFCell.h

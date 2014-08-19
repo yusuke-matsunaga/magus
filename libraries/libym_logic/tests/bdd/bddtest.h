@@ -1,4 +1,4 @@
-#ifndef BDDTEST_H
+﻿#ifndef BDDTEST_H
 #define BDDTEST_H
 
 /// @file bddtest.h

@@ -1,4 +1,4 @@
-#ifndef TECHMAP_AREAMAPCMD_H
+﻿#ifndef TECHMAP_AREAMAPCMD_H
 #define TECHMAP_AREAMAPCMD_H
 
 /// @file AreamapCmd.h

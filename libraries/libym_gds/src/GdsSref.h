@@ -1,4 +1,4 @@
-#ifndef GDSSREF_H
+﻿#ifndef GDSSREF_H
 #define GDSSREF_H
 
 /// @file GdsSref.h

@@ -1,4 +1,4 @@
-#ifndef DIMACSSCANNER_H
+﻿#ifndef DIMACSSCANNER_H
 #define DIMACSSCANNER_H
 
 /// @file DimacsScanner.h

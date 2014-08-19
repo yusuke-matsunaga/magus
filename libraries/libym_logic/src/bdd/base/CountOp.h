@@ -1,4 +1,4 @@
-#ifndef COUNTOP_H
+﻿#ifndef COUNTOP_H
 #define COUNTOP_H
 
 /// @file CountOp.h

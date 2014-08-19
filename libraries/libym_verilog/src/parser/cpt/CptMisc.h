@@ -1,4 +1,4 @@
-#ifndef CPTMISC_H
+﻿#ifndef CPTMISC_H
 #define CPTMISC_H
 
 /// @file CptMisc.h

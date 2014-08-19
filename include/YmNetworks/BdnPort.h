@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNPORT_H
+﻿#ifndef NETWORKS_BDNPORT_H
 #define NETWORKS_BDNPORT_H
 
 /// @file YmNetworks/BdnPort.h

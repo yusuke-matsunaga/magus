@@ -1,4 +1,4 @@
-#ifndef IGU_H
+﻿#ifndef IGU_H
 #define IGU_H
 
 /// @file IGU.h

@@ -1,4 +1,4 @@
-%{
+﻿%{
 
 /// @file bddsh_parser.yy
 /// @brief Bdd のテスト用shellの構文解析用ソース

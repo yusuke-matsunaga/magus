@@ -1,4 +1,4 @@
-#ifndef SEAL_TESTVECTOR_H
+﻿#ifndef SEAL_TESTVECTOR_H
 #define SEAL_TESTVECTOR_H
 
 /// @file include/TestVectort.h

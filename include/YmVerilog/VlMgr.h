@@ -1,4 +1,4 @@
-#ifndef VERILOG_VLMGR_H
+﻿#ifndef VERILOG_VLMGR_H
 #define VERILOG_VLMGR_H
 
 /// @file YmVerilog/VlMgr.h

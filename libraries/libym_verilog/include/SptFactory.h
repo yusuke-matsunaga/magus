@@ -1,4 +1,4 @@
-#ifndef SPTFACTORY_H
+﻿#ifndef SPTFACTORY_H
 #define SPTFACTORY_H
 
 /// @file SptFactory.h

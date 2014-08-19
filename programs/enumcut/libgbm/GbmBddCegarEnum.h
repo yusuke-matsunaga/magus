@@ -1,4 +1,4 @@
-#ifndef GBMBDDCEGARENUM_H
+﻿#ifndef GBMBDDCEGARENUM_H
 #define GBMBDDCEGARENUM_H
 
 /// @file GbmBddCegarEnum.h

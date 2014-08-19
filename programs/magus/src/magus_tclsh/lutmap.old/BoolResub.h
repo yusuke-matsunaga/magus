@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_BOOLRESUB_H
+﻿#ifndef MAGUS_LUTMAP_BOOLRESUB_H
 #define MAGUS_LUTMAP_BOOLRESUB_H
 
 /// @file magus/lutmap/BoolResub.h

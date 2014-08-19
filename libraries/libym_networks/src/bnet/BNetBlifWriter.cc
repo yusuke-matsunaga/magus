@@ -1,4 +1,4 @@
-
+﻿
 /// @file BNetBlifWriter.cc
 /// @brief BNetBlifWriter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

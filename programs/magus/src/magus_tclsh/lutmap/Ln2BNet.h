@@ -1,4 +1,4 @@
-#ifndef YM_LUTMAP_LN2BNET_H
+﻿#ifndef YM_LUTMAP_LN2BNET_H
 #define YM_LUTMAP_LN2BNET_H
 
 /// @file ym_lutmap/Ln2BNet.h

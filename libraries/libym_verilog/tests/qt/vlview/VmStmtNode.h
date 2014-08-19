@@ -1,4 +1,4 @@
-#ifndef VMSTMTNODE_H
+﻿#ifndef VMSTMTNODE_H
 #define VMSTMTNODE_H
 
 /// @file VmStmtNode.h

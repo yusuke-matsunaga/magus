@@ -1,4 +1,4 @@
-
+﻿
 /// @file mgr_test.cc
 /// @brief BddMgr 用のテスト
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef GENAIGNAIVE_H
+﻿#ifndef GENAIGNAIVE_H
 #define GENAIGNAIVE_H
 
 /// @file GenAigNaive.h

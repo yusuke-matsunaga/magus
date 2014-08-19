@@ -1,4 +1,4 @@
-
+﻿
 /// @file EufVar.cc
 /// @brief EufVar の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

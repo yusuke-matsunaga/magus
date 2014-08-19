@@ -1,4 +1,4 @@
-#ifndef FUNCREC_H
+﻿#ifndef FUNCREC_H
 #define FUNCREC_H
 
 /// @file FuncRec.h

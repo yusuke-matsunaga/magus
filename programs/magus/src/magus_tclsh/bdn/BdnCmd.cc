@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/logbase/MagBdnCmd.cc
 /// @brief MagBdnCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_PTMODULE_H
+﻿#ifndef VERILOG_PT_PTMODULE_H
 #define VERILOG_PT_PTMODULE_H
 
 /// @file YmVerilog/pt/PtModule.h

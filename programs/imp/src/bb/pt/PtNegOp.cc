@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pt/PtNegOp.cc
 /// @brief PtNegOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-
+﻿
 /// @file phf_sim.cc
 /// @brief phf_sim のソースファイル
 /// @author Yusuke Matsunaga (松永 裕介)

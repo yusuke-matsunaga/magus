@@ -1,4 +1,4 @@
-/// @file GpMgr.h
+﻿/// @file GpMgr.h
 /// @brief GpMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

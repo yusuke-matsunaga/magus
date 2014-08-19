@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/lutmap/TreeLBD.cc
 /// @brief TreeLBD の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

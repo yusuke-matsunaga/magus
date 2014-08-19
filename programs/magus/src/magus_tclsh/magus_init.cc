@@ -1,4 +1,4 @@
-
+﻿
 /// @file src/pkg_init.cc
 /// @brief Magus のパッケージ初期化
 /// @author Yusuke Matsunaga (松永 裕介)

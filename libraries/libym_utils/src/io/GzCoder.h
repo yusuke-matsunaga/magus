@@ -1,4 +1,4 @@
-#ifndef GZCODER_H
+﻿#ifndef GZCODER_H
 #define GZCODER_H
 
 /// @file GzCoder.h

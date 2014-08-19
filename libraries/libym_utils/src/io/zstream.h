@@ -1,4 +1,4 @@
-#ifndef ZSTREAM_H
+﻿#ifndef ZSTREAM_H
 #define	ZSTREAM_H
 
 /// @file zstream.h

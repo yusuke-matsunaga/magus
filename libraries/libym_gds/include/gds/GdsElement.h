@@ -1,4 +1,4 @@
-#ifndef GDS_GDSELEMENT_H
+﻿#ifndef GDS_GDSELEMENT_H
 #define GDS_GDSELEMENT_H
 
 /// @file GdsElement.h

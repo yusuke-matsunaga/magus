@@ -1,4 +1,4 @@
-
+﻿
 /// @file gdsprint/gdsencode.cc
 /// @brief 16進データを生成するプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

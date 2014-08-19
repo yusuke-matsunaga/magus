@@ -1,4 +1,4 @@
-#ifndef NPNRAWSIG_H
+﻿#ifndef NPNRAWSIG_H
 #define NPNRAWSIG_H
 
 /// @file NpnRawSig.h

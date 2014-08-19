@@ -1,4 +1,4 @@
-#ifndef COFPOP_H
+﻿#ifndef COFPOP_H
 #define COFPOP_H
 
 /// @file CofPOp.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file ZCoder_test.cc
 /// @brief ZCoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

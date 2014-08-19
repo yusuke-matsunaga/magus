@@ -1,4 +1,4 @@
-#ifndef BTBASE_H
+﻿#ifndef BTBASE_H
 #define BTBASE_H
 
 /// @file BtBase.h

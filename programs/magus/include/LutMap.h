@@ -1,4 +1,4 @@
-#ifndef YM_TECHMAP_LUTMAP_H
+﻿#ifndef YM_TECHMAP_LUTMAP_H
 #define YM_TECHMAP_LUTMAP_H
 
 /// @file ym_techmap/LutMap.h

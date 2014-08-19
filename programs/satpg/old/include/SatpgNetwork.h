@@ -1,4 +1,4 @@
-#ifndef SATPGNETWORK_H
+﻿#ifndef SATPGNETWORK_H
 #define SATPGNETWORK_H
 
 /// @file SatpgNetwork.h

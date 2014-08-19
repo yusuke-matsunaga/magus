@@ -1,4 +1,4 @@
-#ifndef MAPRECORD_H
+﻿#ifndef MAPRECORD_H
 #define MAPRECORD_H
 
 /// @file MapRecord.h

@@ -1,4 +1,4 @@
-// $Id: file_test.cc 700 2007-05-31 00:41:30Z matsunaga $
+﻿// $Id: file_test.cc 700 2007-05-31 00:41:30Z matsunaga $
 
 // PathName のテスト
 

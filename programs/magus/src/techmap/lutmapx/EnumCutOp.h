@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_ENUMCUTOP_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_ENUMCUTOP_H
 #define LIBYM_TECHMAP_LUTMAP_ENUMCUTOP_H
 
 /// @file libym_techmap/lutmap/EnumCutOp.h

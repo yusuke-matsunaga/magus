@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_MAPRECORD_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_MAPRECORD_H
 #define LIBYM_TECHMAP_LUTMAP_MAPRECORD_H
 
 /// @file libym_techmap/lutmap/MapRecord.h

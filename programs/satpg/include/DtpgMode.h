@@ -1,4 +1,4 @@
-#ifndef DTPGMODE_H
+﻿#ifndef DTPGMODE_H
 #define DTPGMODE_H
 
 /// @file DtpgMode.h

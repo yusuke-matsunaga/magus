@@ -1,4 +1,4 @@
-#ifndef FLOWGRAPH_H
+﻿#ifndef FLOWGRAPH_H
 #define FLOWGRAPH_H
 
 /// @file FlowGraph.h

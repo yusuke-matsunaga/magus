@@ -1,4 +1,4 @@
-#ifndef GZ_COMMON_H
+﻿#ifndef GZ_COMMON_H
 #define GZ_COMMON_H
 
 /// @file gz_common.h

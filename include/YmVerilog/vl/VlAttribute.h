@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLATTRIBUTE_H
+﻿#ifndef VERILOG_VL_VLATTRIBUTE_H
 #define VERILOG_VL_VLATTRIBUTE_H
 
 /// @file YmVerilog/vl/VlAttribute.h

@@ -1,4 +1,4 @@
-#ifndef NETWORKVIEW_H
+﻿#ifndef NETWORKVIEW_H
 #define NETWORKVIEW_H
 
 /// @file NetworkView.h

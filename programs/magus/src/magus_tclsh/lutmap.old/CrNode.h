@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CRNODE_H
+﻿#ifndef MAGUS_LUTMAP_CRNODE_H
 #define MAGUS_LUTMAP_CRNODE_H
 
 /// @file magus/lutmap/CrNode.h

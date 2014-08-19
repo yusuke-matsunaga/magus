@@ -1,4 +1,4 @@
-#ifndef NETWORKS_BDNLATCH_H
+﻿#ifndef NETWORKS_BDNLATCH_H
 #define NETWORKS_BDNLATCH_H
 
 /// @file YmNetworks/BdnLatch.h

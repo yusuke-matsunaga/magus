@@ -1,4 +1,4 @@
-#ifndef SYMOP_H
+﻿#ifndef SYMOP_H
 #define SYMOP_H
 
 /// @file SymOp.h

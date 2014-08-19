@@ -1,4 +1,4 @@
-
+﻿
 /// @file MinPatCmd.cc
 /// @brief MinPatCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef GRAPHSATR_H
+﻿#ifndef GRAPHSATR_H
 #define GRAPHSATR_H
 
 /// @file GraphSatR.h

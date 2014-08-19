@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_DFCOVER_H
+﻿#ifndef MAGUS_LUTMAP_DFCOVER_H
 #define MAGUS_LUTMAP_DFCOVER_H
 
 /// @file magus/lutmap/DFCover.h

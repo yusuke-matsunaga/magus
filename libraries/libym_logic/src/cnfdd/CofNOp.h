@@ -1,4 +1,4 @@
-#ifndef COFNOP_H
+﻿#ifndef COFNOP_H
 #define COFNOP_H
 
 /// @file CofNOp.h

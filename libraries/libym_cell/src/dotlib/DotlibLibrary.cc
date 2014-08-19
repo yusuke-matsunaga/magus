@@ -1,4 +1,4 @@
-
+﻿
 /// @file DotlibLibrary.cc
 /// @brief DotlibLibrary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

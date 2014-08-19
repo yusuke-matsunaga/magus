@@ -1,4 +1,4 @@
-#ifndef MAGUS_TEST_TESTCMD_H
+﻿#ifndef MAGUS_TEST_TESTCMD_H
 #define MAGUS_TEST_TESTCMD_H
 
 /// @file src/test/TestCmd.h

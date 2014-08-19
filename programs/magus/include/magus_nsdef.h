@@ -1,4 +1,4 @@
-#ifndef MAGUS_NSDEF_H
+﻿#ifndef MAGUS_NSDEF_H
 #define MAGUS_NSDEF_H
 
 /// @file magus_nsdef.h

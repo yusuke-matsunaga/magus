@@ -1,4 +1,4 @@
-#ifndef OBJDICT_H
+﻿#ifndef OBJDICT_H
 #define OBJDICT_H
 
 /// @file ObjDict.h

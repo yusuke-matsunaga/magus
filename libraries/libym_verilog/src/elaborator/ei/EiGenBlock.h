@@ -1,4 +1,4 @@
-#ifndef EIGENBLOCK_H
+﻿#ifndef EIGENBLOCK_H
 #define EIGENBLOCK_H
 
 /// @file EiGenBlock.h

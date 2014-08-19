@@ -1,4 +1,4 @@
-#ifndef LCPATHANDLE_H
+﻿#ifndef LCPATHANDLE_H
 #define LCPATHANDLE_H
 
 /// @file LcPatHandle.h

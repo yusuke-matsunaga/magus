@@ -1,4 +1,4 @@
-#ifndef CELL_CELLTIMING_H
+﻿#ifndef CELL_CELLTIMING_H
 #define CELL_CELLTIMING_H
 
 /// @file YmCell/CellTiming.h

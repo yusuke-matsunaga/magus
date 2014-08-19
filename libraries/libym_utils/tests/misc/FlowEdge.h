@@ -1,4 +1,4 @@
-#ifndef FLOWEDGE_H
+﻿#ifndef FLOWEDGE_H
 #define FLOWEDGE_H
 
 /// @file FlowEdge.h

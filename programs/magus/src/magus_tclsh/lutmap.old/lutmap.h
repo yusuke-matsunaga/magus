@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_OLD_LUTMAP_H
+﻿#ifndef MAGUS_LUTMAP_OLD_LUTMAP_H
 #define MAGUS_LUTMAP_OLD_LUTMAP_H
 
 /// @file magus/lutmap/lutmap.h

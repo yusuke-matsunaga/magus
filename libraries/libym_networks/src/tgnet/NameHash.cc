@@ -1,4 +1,4 @@
-
+﻿
 /// @file NameHash.cc
 /// @brief NameHash の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

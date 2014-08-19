@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLDECLBASE_H
+﻿#ifndef VERILOG_VL_VLDECLBASE_H
 #define VERILOG_VL_VLDECLBASE_H
 
 /// @file YmVerilog/vl/VlDeclBase.h

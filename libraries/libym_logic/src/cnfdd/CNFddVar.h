@@ -1,4 +1,4 @@
-#ifndef CNFDDVAR_H
+﻿#ifndef CNFDDVAR_H
 #define CNFDDVAR_H
 
 /// @file CNFddVar.h

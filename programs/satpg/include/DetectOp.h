@@ -1,4 +1,4 @@
-#ifndef DETECTOP_H
+﻿#ifndef DETECTOP_H
 #define DETECTOP_H
 
 /// @file DetectOp.h

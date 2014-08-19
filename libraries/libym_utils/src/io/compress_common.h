@@ -1,4 +1,4 @@
-#ifndef COMPRESS_COMMON_H
+﻿#ifndef COMPRESS_COMMON_H
 #define COMPRESS_COMMON_H
 
 /// @file compress_common.h

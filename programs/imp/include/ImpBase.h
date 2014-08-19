@@ -1,4 +1,4 @@
-#ifndef IMPBASE_H
+﻿#ifndef IMPBASE_H
 #define IMPBASE_H
 
 /// @file ImpBase.h

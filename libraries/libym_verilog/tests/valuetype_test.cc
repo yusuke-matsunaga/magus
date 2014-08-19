@@ -1,4 +1,4 @@
-
+﻿
 /// @file valuetype_test.cc
 /// @brief VlValueType のテスト
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-%{
+﻿%{
 
 /// @file bvcal.yy
 /// @brief BitVector のテスト用簡易電卓の構文解析用ソース

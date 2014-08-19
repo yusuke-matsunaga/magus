@@ -1,4 +1,4 @@
-#ifndef YMUTILS_MSGMGR_H
+﻿#ifndef YMUTILS_MSGMGR_H
 #define YMUTILS_MSGMGR_H
 
 /// @file YmUtils/MsgMgr.h

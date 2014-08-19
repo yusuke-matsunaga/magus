@@ -1,4 +1,4 @@
-#ifndef SLACONV_H
+﻿#ifndef SLACONV_H
 #define SLACONV_H
 
 /// @file SlaConv.h

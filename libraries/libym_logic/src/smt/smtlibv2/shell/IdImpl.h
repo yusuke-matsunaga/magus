@@ -1,4 +1,4 @@
-#ifndef IDIMPL_H
+﻿#ifndef IDIMPL_H
 #define IDIMPL_H
 
 /// @file IdImpl.h

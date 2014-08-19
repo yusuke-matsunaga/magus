@@ -1,4 +1,4 @@
-/*
+﻿/*
  *	matpg - Mat's Automatic Testpattern Generator
  *	10/5/91 by Mat.
  *	$Log: fault.c,v $

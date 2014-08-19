@@ -1,4 +1,4 @@
-#ifndef ELABORATOR_H
+﻿#ifndef ELABORATOR_H
 #define ELABORATOR_H
 
 /// @file Elaborator.h

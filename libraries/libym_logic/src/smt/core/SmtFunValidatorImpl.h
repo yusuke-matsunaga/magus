@@ -1,4 +1,4 @@
-#ifndef SMTFUNVALIDATORIMPL_H
+﻿#ifndef SMTFUNVALIDATORIMPL_H
 #define SMTFUNVALIDATORIMPL_H
 
 /// @file SmtFunValidatorImpl.h

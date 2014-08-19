@@ -1,4 +1,4 @@
-#ifndef SRC_PT_EQ_H
+﻿#ifndef SRC_PT_EQ_H
 #define SRC_PT_EQ_H
 
 /// @file src/pt/Eq.h

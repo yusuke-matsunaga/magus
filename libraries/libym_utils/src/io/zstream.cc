@@ -1,4 +1,4 @@
-
+﻿
 /// @file zstream.cc
 /// @brief zstream の実装ファイル
 /// @author Yusuke Matsunaga

@@ -1,4 +1,4 @@
-#ifndef MSGMGRIMPL_H
+﻿#ifndef MSGMGRIMPL_H
 #define MSGMGRIMPL_H
 
 /// @file MsgMgrImpl.h

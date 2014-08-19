@@ -1,4 +1,4 @@
-#ifndef MAGUS_CORE_WRITEVERILOG_H
+﻿#ifndef MAGUS_CORE_WRITEVERILOG_H
 #define MAGUS_CORE_WRITEVERILOG_H
 
 /// @file src/core/WriteVerilog.h

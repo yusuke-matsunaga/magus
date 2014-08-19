@@ -1,4 +1,4 @@
-#ifndef SIMNODE_H
+﻿#ifndef SIMNODE_H
 #define SIMNODE_H
 
 /// @file SimNode.h

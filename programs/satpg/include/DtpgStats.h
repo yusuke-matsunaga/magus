@@ -1,4 +1,4 @@
-#ifndef DTPGSTATS_H
+﻿#ifndef DTPGSTATS_H
 #define DTPGSTATS_H
 
 /// @file DtpgStats.h

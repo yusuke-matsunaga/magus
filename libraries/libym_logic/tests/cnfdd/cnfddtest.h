@@ -1,4 +1,4 @@
-#ifndef CNFDDTEST_H
+﻿#ifndef CNFDDTEST_H
 #define CNFDDTEST_H
 
 /// @file cnfddtest.h

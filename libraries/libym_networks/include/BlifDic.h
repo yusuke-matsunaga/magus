@@ -1,4 +1,4 @@
-#ifndef BLIFDIC_H
+﻿#ifndef BLIFDIC_H
 #define BLIFDIC_H
 
 /// @file BlifDic.h

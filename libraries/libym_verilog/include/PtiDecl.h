@@ -1,4 +1,4 @@
-#ifndef PTIDECL_H
+﻿#ifndef PTIDECL_H
 #define PTIDECL_H
 
 /// @file PtiDecl.h

@@ -1,4 +1,4 @@
-#ifndef MCOP_H
+﻿#ifndef MCOP_H
 #define MCOP_H
 
 /// @file McOp.h

@@ -1,4 +1,4 @@
-#ifndef VLPARSETREEVIEW_H
+﻿#ifndef VLPARSETREEVIEW_H
 #define VLPARSETREEVIEW_H
 
 /// @file VlParseTreeView.h

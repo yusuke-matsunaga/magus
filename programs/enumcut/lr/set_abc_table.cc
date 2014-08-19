@@ -1,4 +1,4 @@
-
+﻿
 /// @file set_abc_table.cc
 /// @brief abc のパタンテーブルを読み込む．
 /// @author Yusuke Matsunaga (松永 裕介)

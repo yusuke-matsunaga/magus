@@ -1,4 +1,4 @@
-#ifndef NETWORKS_NETWORKS_NSDEF_H
+﻿#ifndef NETWORKS_NETWORKS_NSDEF_H
 #define NETWORKS_NETWORKS_NSDEF_H
 
 /// @file YmNetworks/networks_nsdef.h

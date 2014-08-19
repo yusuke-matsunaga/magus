@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_CECHANDLE_H
+﻿#ifndef LIBYM_CEC_CECHANDLE_H
 #define LIBYM_CEC_CECHANDLE_H
 
 /// @file libym_cec/CecHandle.h

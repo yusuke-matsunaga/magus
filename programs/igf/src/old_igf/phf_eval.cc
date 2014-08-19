@@ -1,4 +1,4 @@
-
+﻿
 /// @file eval.cc
 /// @brief 複数の IGU 構成法の比較を行うプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

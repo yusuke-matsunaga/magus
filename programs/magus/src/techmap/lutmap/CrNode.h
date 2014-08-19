@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_CRNODE_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_CRNODE_H
 #define LIBYM_TECHMAP_LUTMAP_CRNODE_H
 
 /// @file libym_techmap/lutmap/CrNode.h

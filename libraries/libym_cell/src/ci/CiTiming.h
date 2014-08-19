@@ -1,4 +1,4 @@
-#ifndef CITIMING_H
+﻿#ifndef CITIMING_H
 #define CITIMING_H
 
 /// @file　CiTiming.h

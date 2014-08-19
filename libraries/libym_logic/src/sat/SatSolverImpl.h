@@ -1,4 +1,4 @@
-#ifndef SATSOLVERIMPL_H
+﻿#ifndef SATSOLVERIMPL_H
 #define SATSOLVERIMPL_H
 
 /// @file SatSolverImpl.h

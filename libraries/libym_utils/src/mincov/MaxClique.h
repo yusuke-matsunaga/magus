@@ -1,4 +1,4 @@
-#ifndef MAXCLIQUE_H
+﻿#ifndef MAXCLIQUE_H
 #define MAXCLIQUE_H
 
 /// @file MaxClique.h

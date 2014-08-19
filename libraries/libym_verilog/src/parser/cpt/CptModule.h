@@ -1,4 +1,4 @@
-#ifndef CPTMODULE_H
+﻿#ifndef CPTMODULE_H
 #define CPTMODULE_H
 
 /// @file CptModule.h

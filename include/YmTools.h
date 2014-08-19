@@ -1,4 +1,4 @@
-#ifndef YMTOOLS_H
+﻿#ifndef YMTOOLS_H
 #define YMTOOLS_H
 
 /// @file YmTools.h

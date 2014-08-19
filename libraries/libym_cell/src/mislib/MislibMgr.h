@@ -1,4 +1,4 @@
-#ifndef MISLIBMGR_H
+﻿#ifndef MISLIBMGR_H
 #define MISLIBMGR_H
 
 /// @file MislibMgr.h

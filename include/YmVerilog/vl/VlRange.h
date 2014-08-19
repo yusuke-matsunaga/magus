@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLRANGE_H
+﻿#ifndef VERILOG_VL_VLRANGE_H
 #define VERILOG_VL_VLRANGE_H
 
 /// @file YmVerilog/vl/VlRange.h

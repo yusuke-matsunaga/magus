@@ -1,4 +1,4 @@
-#ifndef SRC_FSIM_RTPGCMD_H
+﻿#ifndef SRC_FSIM_RTPGCMD_H
 #define SRC_FSIM_RTPGCMD_H
 
 /// @file src/fsim/RtpgCmd.h

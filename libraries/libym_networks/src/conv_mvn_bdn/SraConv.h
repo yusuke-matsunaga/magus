@@ -1,4 +1,4 @@
-#ifndef SRACONV_H
+﻿#ifndef SRACONV_H
 #define SRACONV_H
 
 /// @file SraConv.h

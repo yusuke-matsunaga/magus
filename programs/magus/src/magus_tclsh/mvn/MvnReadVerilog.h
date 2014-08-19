@@ -1,4 +1,4 @@
-#ifndef SRC_LOGBASE_MVNREADVERILOG_H
+﻿#ifndef SRC_LOGBASE_MVNREADVERILOG_H
 #define SRC_LOGBASE_MVNREADVERILOG_H
 
 /// @file src/logbase/MvnReadVerilog.h

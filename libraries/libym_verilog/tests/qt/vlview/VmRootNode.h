@@ -1,4 +1,4 @@
-#ifndef VMROOTNODE_H
+﻿#ifndef VMROOTNODE_H
 #define VMROOTNODE_H
 
 /// @file VmRootNode.h

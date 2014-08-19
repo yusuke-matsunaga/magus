@@ -1,4 +1,4 @@
-/// @file libym_npn/tests/TvFuncTimeCmd.cc
+﻿/// @file libym_npn/tests/TvFuncTimeCmd.cc
 /// @brief TvFuncTimeCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

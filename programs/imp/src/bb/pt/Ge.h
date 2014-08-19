@@ -1,4 +1,4 @@
-#ifndef SRC_PT_GE_H
+﻿#ifndef SRC_PT_GE_H
 #define SRC_PT_GE_H
 
 /// @file src/pt/Ge.h

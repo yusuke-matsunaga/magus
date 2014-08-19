@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_cec/make_miter.cc
 /// @brief make_miter の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

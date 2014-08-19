@@ -1,4 +1,4 @@
-#ifndef GBMSATNAIVEENUM_H
+﻿#ifndef GBMSATNAIVEENUM_H
 #define GBMSATNAIVEENUM_H
 
 /// @file GbmSatNaiveEnum.h

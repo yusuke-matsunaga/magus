@@ -1,4 +1,4 @@
-#ifndef INCLUDE_CONSTR_H
+﻿#ifndef INCLUDE_CONSTR_H
 #define INCLUDE_CONSTR_H
 
 /// @file include/Constr.h

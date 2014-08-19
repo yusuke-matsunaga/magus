@@ -1,4 +1,4 @@
-#ifndef YMUTILS_GENBASE_H
+﻿#ifndef YMUTILS_GENBASE_H
 #define YMUTILS_GENBASE_H
 
 /// @file YmUtils/GenBase.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file seal/src/TestVector.cc
 /// @brief TestVector の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

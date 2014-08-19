@@ -1,4 +1,4 @@
-#ifndef DTPGCL_H
+﻿#ifndef DTPGCL_H
 #define DTPGCL_H
 
 /// @file include/DtpgCl.h

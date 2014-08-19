@@ -1,4 +1,4 @@
-#ifndef EICONTROL_H
+﻿#ifndef EICONTROL_H
 #define EICONTROL_H
 
 /// @file EiControl.h

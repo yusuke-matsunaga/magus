@@ -1,4 +1,4 @@
-#ifndef IMPHASH_H
+﻿#ifndef IMPHASH_H
 #define IMPHASH_H
 
 /// @file ImpHash.h

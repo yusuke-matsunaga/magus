@@ -1,4 +1,4 @@
-#ifndef CNFCLAUSE_H
+﻿#ifndef CNFCLAUSE_H
 #define CNFCLAUSE_H
 
 /// @file CnfClause.h

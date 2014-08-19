@@ -1,4 +1,4 @@
-
+﻿
 /// @file npngen.cc
 /// @brief npngen のソースファイル
 /// @author Yusuke Matsunaga (松永 裕介)

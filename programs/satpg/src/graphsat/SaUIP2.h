@@ -1,4 +1,4 @@
-#ifndef SAUIP2_H
+﻿#ifndef SAUIP2_H
 #define SAUIP2_H
 
 /// @file SaUIP2.h

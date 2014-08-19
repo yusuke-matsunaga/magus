@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_SENSE_H
+﻿#ifndef DTPG_CLASSIC_SENSE_H
 #define DTPG_CLASSIC_SENSE_H
 
 /// @file src/dtpg_classic/sense.h

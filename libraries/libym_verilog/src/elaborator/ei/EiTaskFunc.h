@@ -1,4 +1,4 @@
-#ifndef EITASKFUNC_H
+﻿#ifndef EITASKFUNC_H
 #define EITASKFUNC_H
 
 /// @file ElbTaskFuncImpl.h

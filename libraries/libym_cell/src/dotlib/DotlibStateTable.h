@@ -1,4 +1,4 @@
-#ifndef YM_DOTLIB_DOTLIBSTATETABLE_H
+﻿#ifndef YM_DOTLIB_DOTLIBSTATETABLE_H
 #define YM_DOTLIB_DOTLIBSTATETABLE_H
 
 /// @file ym_dotlib/DotlibStateTable.h

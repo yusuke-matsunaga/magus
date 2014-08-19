@@ -1,4 +1,4 @@
-
+﻿
 /// @file BNetIscas89Reader.cc
 /// @brief BNetIscas89Reader の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

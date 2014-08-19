@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_VARID_H
+﻿#ifndef YMYMLOGIC_VARID_H
 #define YMYMLOGIC_VARID_H
 
 /// @file YmLogic/VarId.h

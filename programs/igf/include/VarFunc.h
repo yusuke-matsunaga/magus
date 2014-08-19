@@ -1,4 +1,4 @@
-#ifndef VARFUNC_H
+﻿#ifndef VARFUNC_H
 #define VARFUNC_H
 
 /// @file VarFunc.h

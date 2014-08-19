@@ -1,4 +1,4 @@
-#ifndef BLIFHANDLER_H
+﻿#ifndef BLIFHANDLER_H
 #define BLIFHANDLER_H
 
 /// @file BlifHandler.h

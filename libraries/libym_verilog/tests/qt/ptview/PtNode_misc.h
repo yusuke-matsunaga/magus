@@ -1,4 +1,4 @@
-#ifndef PTNODE_MISC_H
+﻿#ifndef PTNODE_MISC_H
 #define PTNODE_MISC_H
 
 /// @file PtNode_misc.h

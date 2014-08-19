@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMTFUNVALIDATOR_H
+﻿#ifndef YMYMLOGIC_SMTFUNVALIDATOR_H
 #define YMYMLOGIC_SMTFUNVALIDATOR_H
 
 /// @file YmLogic/SmtFunValidator.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file magus/logbase/BNetElimCmd.cc
 /// @brief ElimCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef YM_YMYMLOGIC_PYYMYMLOGIC_H
+﻿#ifndef YM_YMYMLOGIC_PYYMYMLOGIC_H
 #define YM_YMYMLOGIC_PYYMYMLOGIC_H
 
 /// @file ym_YmLogic/pylogic.h

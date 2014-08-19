@@ -1,4 +1,4 @@
-#ifndef DOTLIBPARSERIMPL_H
+﻿#ifndef DOTLIBPARSERIMPL_H
 #define DOTLIBPARSERIMPL_H
 
 /// @file DotlibParserImpl.h

@@ -1,4 +1,4 @@
-#ifndef YM_YMYMLOGIC_AIGSATMGR_H
+﻿#ifndef YM_YMYMLOGIC_AIGSATMGR_H
 #define YM_YMYMLOGIC_AIGSATMGR_H
 
 /// @file ym_YmLogic/AigSatMgr.h

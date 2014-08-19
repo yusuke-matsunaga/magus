@@ -1,4 +1,4 @@
-#ifndef RORCONV_H
+﻿#ifndef RORCONV_H
 #define RORCONV_H
 
 /// @file RorConv.h

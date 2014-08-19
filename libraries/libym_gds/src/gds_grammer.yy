@@ -1,4 +1,4 @@
-%{
+﻿%{
 
 /// @file gds_grammer.yy
 /// @brief GDS-II のパーサ

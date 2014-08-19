@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_LUTNETWORK_H
+﻿#ifndef MAGUS_LUTMAP_LUTNETWORK_H
 #define MAGUS_LUTMAP_LUTNETWORK_H
 
 /// @file magus/lutmap/LutNetwork.h 

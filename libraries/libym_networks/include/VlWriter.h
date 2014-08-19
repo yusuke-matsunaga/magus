@@ -1,4 +1,4 @@
-#ifndef VLWRITER_H
+﻿#ifndef VLWRITER_H
 #define VLWRITER_H
 
 /// @file VlWriter.h

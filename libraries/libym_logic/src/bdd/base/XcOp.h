@@ -1,4 +1,4 @@
-#ifndef XCOP_H
+﻿#ifndef XCOP_H
 #define XCOP_H
 
 /// @file XcOp.h

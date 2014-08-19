@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_SNOR_H
+﻿#ifndef CALC_SVF_SNOR_H
 #define CALC_SVF_SNOR_H
 
 /// @file calc_svf/SnOr.h

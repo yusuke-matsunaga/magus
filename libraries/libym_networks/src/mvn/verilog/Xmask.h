@@ -1,4 +1,4 @@
-#ifndef XMASK_H
+﻿#ifndef XMASK_H
 #define XMASK_H
 
 /// @file Xmask.h

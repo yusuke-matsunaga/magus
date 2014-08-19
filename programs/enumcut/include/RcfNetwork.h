@@ -1,4 +1,4 @@
-#ifndef RCFNETWORK_H
+﻿#ifndef RCFNETWORK_H
 #define RCFNETWORK_H
 
 /// @file RcfNetwork.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file cannonical.cc
 /// @brief NPN同値類の代表関数を求めるプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

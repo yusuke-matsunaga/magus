@@ -1,4 +1,4 @@
-
+﻿
 /// @file phf_fixed.cc
 /// @brief phf_fixed の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

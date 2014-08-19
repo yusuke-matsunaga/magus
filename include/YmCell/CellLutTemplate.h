@@ -1,4 +1,4 @@
-#ifndef CELL_CELLLUTTEMPLATE_H
+﻿#ifndef CELL_CELLLUTTEMPLATE_H
 #define CELL_CELLLUTTEMPLATE_H
 
 /// @file YmCell/CellLutTemplate.h

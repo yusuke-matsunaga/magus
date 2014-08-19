@@ -1,4 +1,4 @@
-#ifndef MAGUS_MAIN_RANDCMD_H
+﻿#ifndef MAGUS_MAIN_RANDCMD_H
 #define MAGUS_MAIN_RANDCMD_H
 
 /// @file magus/main/RandCmd.h

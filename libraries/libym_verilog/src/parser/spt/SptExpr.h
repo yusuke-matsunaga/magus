@@ -1,4 +1,4 @@
-#ifndef SPTEXPR_H
+﻿#ifndef SPTEXPR_H
 #define SPTEXPR_H
 
 /// @file SptExpr.h

@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_EXPR_NSDEF_H
+﻿#ifndef YMYMLOGIC_EXPR_NSDEF_H
 #define YMYMLOGIC_EXPR_NSDEF_H
 
 /// @file YmLogic/expr_nsdef.h

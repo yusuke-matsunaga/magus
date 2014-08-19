@@ -1,4 +1,4 @@
-#ifndef ENUMCUT_H
+﻿#ifndef ENUMCUT_H
 #define ENUMCUT_H
 
 /// @file EnumCut.h

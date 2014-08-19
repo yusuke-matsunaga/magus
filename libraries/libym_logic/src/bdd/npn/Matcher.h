@@ -1,4 +1,4 @@
-#ifndef YM_BDD_MATCHER_H
+﻿#ifndef YM_BDD_MATCHER_H
 #define YM_BDD_MATCHER_H
 
 // $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_bdd/npn/Matcher.h,v $

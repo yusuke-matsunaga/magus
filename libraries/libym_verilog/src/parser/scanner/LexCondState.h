@@ -1,4 +1,4 @@
-#ifndef LEXCONDSTATE_H
+﻿#ifndef LEXCONDSTATE_H
 #define LEXCONDSTATE_H
 
 /// @file LexCondState.h

@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_NPN_NSDEF_H
+﻿#ifndef YMYMLOGIC_NPN_NSDEF_H
 #define YMYMLOGIC_NPN_NSDEF_H
 
 /// @file YmLogic/npn_nsdef.h

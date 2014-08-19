@@ -1,4 +1,4 @@
-#ifndef THRUDECODER_H
+﻿#ifndef THRUDECODER_H
 #define THRUDECODER_H
 
 /// @file ThruDecoder.h

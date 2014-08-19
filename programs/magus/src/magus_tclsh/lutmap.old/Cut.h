@@ -1,4 +1,4 @@
-#ifndef MAGUS_LUTMAP_CUT_H
+﻿#ifndef MAGUS_LUTMAP_CUT_H
 #define MAGUS_LUTMAP_CUT_H
 
 /// @file magus/lutmap/Cut.h 

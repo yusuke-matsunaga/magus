@@ -1,4 +1,4 @@
-
+﻿
 /// @file init_table.cc
 /// @brief RwtMgr の初期化用テストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

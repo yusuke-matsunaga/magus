@@ -1,4 +1,4 @@
-#ifndef LEXMODULEPLUGIN_H
+﻿#ifndef LEXMODULEPLUGIN_H
 #define LEXMODULEPLUGIN_H
 
 /// @file LexModulePlugin.h

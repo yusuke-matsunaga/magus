@@ -1,4 +1,4 @@
-#ifndef CFDICT_H
+﻿#ifndef CFDICT_H
 #define CFDICT_H
 
 /// @file CfDict.h

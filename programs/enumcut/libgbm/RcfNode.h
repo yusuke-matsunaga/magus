@@ -1,4 +1,4 @@
-#ifndef RCFNODE_H
+﻿#ifndef RCFNODE_H
 #define RCFNODE_H
 
 /// @file RcfNode.h

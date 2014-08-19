@@ -1,4 +1,4 @@
-#ifndef FSIM_SNGATE_H
+﻿#ifndef FSIM_SNGATE_H
 #define FSIM_SNGATE_H
 
 /// @file fsim/SnGate.h

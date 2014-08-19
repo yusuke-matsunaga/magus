@@ -1,4 +1,4 @@
-#ifndef BZDECODER_H
+﻿#ifndef BZDECODER_H
 #define BZDECODER_H
 
 /// @file BzDecoder.h

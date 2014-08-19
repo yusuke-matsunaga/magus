@@ -1,4 +1,4 @@
-#ifndef EIPARAMASSIGN_H
+﻿#ifndef EIPARAMASSIGN_H
 #define EIPARAMASSIGN_H
 
 /// @file EiParamAssign.h

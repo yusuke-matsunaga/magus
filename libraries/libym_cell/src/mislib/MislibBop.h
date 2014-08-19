@@ -1,4 +1,4 @@
-#ifndef MISLIBBOP_H
+﻿#ifndef MISLIBBOP_H
 #define MISLIBBOP_H
 
 /// @file MislibBop.h

@@ -1,4 +1,4 @@
-
+﻿
 /// @file pyutils_MsgMgr.cc
 /// @brief MsgMgr の Python 用ラッパ
 /// @author Yusuke Matsunaga (松永 裕介)

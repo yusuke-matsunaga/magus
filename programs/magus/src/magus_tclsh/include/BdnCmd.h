@@ -1,4 +1,4 @@
-#ifndef MAGUS_BDNCMD_H
+﻿#ifndef MAGUS_BDNCMD_H
 #define MAGUS_BDNCMD_H
 
 /// @file BdnCmd.h

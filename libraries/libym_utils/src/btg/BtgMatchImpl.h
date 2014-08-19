@@ -1,4 +1,4 @@
-#ifndef BTGMATCHIMPL_H
+﻿#ifndef BTGMATCHIMPL_H
 #define BTGMATCHIMPL_H
 
 /// @file BtgMatchImpl.h

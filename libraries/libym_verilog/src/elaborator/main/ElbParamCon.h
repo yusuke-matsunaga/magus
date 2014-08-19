@@ -1,4 +1,4 @@
-#ifndef ELBPARAMCON_H
+﻿#ifndef ELBPARAMCON_H
 #define ELBPARAMCON_H
 
 /// @file ElbParamCon.h

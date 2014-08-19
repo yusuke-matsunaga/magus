@@ -1,4 +1,4 @@
-#ifndef CMNNODELATCHOUT_H
+﻿#ifndef CMNNODELATCHOUT_H
 #define CMNNODELATCHOUT_H
 
 /// @file CmnNodeLatchOut.h

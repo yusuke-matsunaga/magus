@@ -1,4 +1,4 @@
-
+﻿
 /// @file BtJust1.cc
 /// @brief BtJust1 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

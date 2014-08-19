@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVVLMAP_H
+﻿#ifndef NETWORKS_MVVLMAP_H
 #define NETWORKS_MVVLMAP_H
 
 /// @file YmNetworks/MvnVlMap.h

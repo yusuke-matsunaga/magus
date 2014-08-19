@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_FRAIGNODE_H
+﻿#ifndef LIBYM_CEC_FRAIGNODE_H
 #define LIBYM_CEC_FRAIGNODE_H
 
 /// @file libym_cec/FraigNode.h

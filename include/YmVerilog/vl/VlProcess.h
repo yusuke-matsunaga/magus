@@ -1,4 +1,4 @@
-#ifndef VERILOG_VL_VLPROCESS_H
+﻿#ifndef VERILOG_VL_VLPROCESS_H
 #define VERILOG_VL_VLPROCESS_H
 
 /// @file YmVerilog/vl/VlProcess.h

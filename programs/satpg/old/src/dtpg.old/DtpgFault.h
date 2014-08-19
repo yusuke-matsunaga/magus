@@ -1,4 +1,4 @@
-#ifndef DTPGFAULT_H
+﻿#ifndef DTPGFAULT_H
 #define DTPGFAULT_H
 
 /// @file DtpgFault.h

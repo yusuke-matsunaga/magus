@@ -1,4 +1,4 @@
-#ifndef YMUTILS_NSDEF_H
+﻿#ifndef YMUTILS_NSDEF_H
 #define YMUTILS_NSDEF_H
 
 /// @file YmUtils/nsdef.h

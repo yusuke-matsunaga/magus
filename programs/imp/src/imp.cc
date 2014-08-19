@@ -1,4 +1,4 @@
-
+﻿
 /// @file imp.cc
 /// @brief 構造的含意の列挙プログラム
 /// @author Yusuke Matsunaga (松永 裕介)

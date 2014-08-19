@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_ZDDVECTOR_H
+﻿#ifndef YMYMLOGIC_ZDDVECTOR_H
 #define YMYMLOGIC_ZDDVECTOR_H
 
 /// @file YmLogic/ZddVector.h

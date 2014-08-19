@@ -1,4 +1,4 @@
-#ifndef NETWORKS_TGBLIFREADER_H
+﻿#ifndef NETWORKS_TGBLIFREADER_H
 #define NETWORKS_TGBLIFREADER_H
 
 /// @file YmNetworks/TgBlifReader.h

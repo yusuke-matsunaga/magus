@@ -1,4 +1,4 @@
-#ifndef RANDCONV_H
+﻿#ifndef RANDCONV_H
 #define RANDCONV_H
 
 /// @file RandConv.h

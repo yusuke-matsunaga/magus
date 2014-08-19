@@ -1,4 +1,4 @@
-
+﻿
 /// @file gatemgr_test.cc
 /// @brief GateMgr のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef BNODEMGR_H
+﻿#ifndef BNODEMGR_H
 #define BNODEMGR_H
 
 /// @file BNodeMgr.h

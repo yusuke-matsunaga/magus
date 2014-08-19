@@ -1,4 +1,4 @@
-#ifndef VLWINPUT_H
+﻿#ifndef VLWINPUT_H
 #define VLWINPUT_H
 
 /// @file VlwIO.h

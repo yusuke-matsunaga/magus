@@ -1,4 +1,4 @@
-#ifndef LIBYM_SEAL_IDXMAPPER_H
+﻿#ifndef LIBYM_SEAL_IDXMAPPER_H
 #define LIBYM_SEAL_IDXMAPPER_H
 
 /// @file libym_seal/IdxMapper.h

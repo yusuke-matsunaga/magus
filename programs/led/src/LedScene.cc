@@ -1,4 +1,4 @@
-
+﻿
 /// @file led/LedScene.cc
 /// @brief ゲート描画用の drawing area
 /// @author Yusuke Matsunaga (松永 裕介)

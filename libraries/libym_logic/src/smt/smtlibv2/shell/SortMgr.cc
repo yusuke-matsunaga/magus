@@ -1,4 +1,4 @@
-
+﻿
 /// @file SortMgr.cc
 /// @brief SortMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

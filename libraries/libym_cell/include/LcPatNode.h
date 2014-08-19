@@ -1,4 +1,4 @@
-#ifndef LCPATNODE_H
+﻿#ifndef LCPATNODE_H
 #define LCPATNODE_H
 
 /// @file LcPatNode.h

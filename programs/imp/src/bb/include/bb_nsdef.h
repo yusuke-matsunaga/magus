@@ -1,4 +1,4 @@
-#ifndef BB_NSDEF_H
+﻿#ifndef BB_NSDEF_H
 #define BB_NSDEF_H
 
 /// @file bb_nsdef.h

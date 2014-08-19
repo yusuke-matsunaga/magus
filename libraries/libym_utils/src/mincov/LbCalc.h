@@ -1,4 +1,4 @@
-#ifndef LBCALC_H
+﻿#ifndef LBCALC_H
 #define LBCALC_H
 
 /// @file LbCalc.h

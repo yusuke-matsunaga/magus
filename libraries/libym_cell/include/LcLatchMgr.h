@@ -1,4 +1,4 @@
-#ifndef LCLATCHMGR_H
+﻿#ifndef LCLATCHMGR_H
 #define LCLATCHMGR_H
 
 /// @file LcLatchMgr.h

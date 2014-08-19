@@ -1,4 +1,4 @@
-
+﻿
 /// @file ConcatConv.cc
 /// @brief ConcatConv の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)

@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_CECMGR_H
+﻿#ifndef LIBYM_CEC_CECMGR_H
 #define LIBYM_CEC_CECMGR_H
 
 /// @file libym_cec/CecMgr.h

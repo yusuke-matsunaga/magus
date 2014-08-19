@@ -1,4 +1,4 @@
-#ifndef MISLIBGATE_H
+﻿#ifndef MISLIBGATE_H
 #define MISLIBGATE_H
 
 /// @file MislibGate.h

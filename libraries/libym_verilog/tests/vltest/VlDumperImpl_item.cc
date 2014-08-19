@@ -1,4 +1,4 @@
-
+﻿
 /// @file VlDumperImpl.cc
 /// @brief VlDumperImpl の実装ファイル (item担当)
 /// @author Yusuke Matsunaga (松永 裕介)

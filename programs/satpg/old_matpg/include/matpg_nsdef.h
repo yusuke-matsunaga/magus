@@ -1,4 +1,4 @@
-#ifndef MATPG_MATPG_NSDEF_H
+﻿#ifndef MATPG_MATPG_NSDEF_H
 #define MATPG_MATPG_NSDEF_H
 
 /// @file matpg/matpg_nsdef.h

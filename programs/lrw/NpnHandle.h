@@ -1,4 +1,4 @@
-#ifndef NPNHANDLE_H
+﻿#ifndef NPNHANDLE_H
 #define NPNHANDLE_H
 
 /// @file NpnHandle.h

@@ -1,4 +1,4 @@
-#ifndef STRBNODEMAP_H
+﻿#ifndef STRBNODEMAP_H
 #define STRBNODEMAP_H
 
 /// @file StrBNodeMap.h

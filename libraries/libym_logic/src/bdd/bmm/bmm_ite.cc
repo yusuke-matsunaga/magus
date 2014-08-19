@@ -1,4 +1,4 @@
-
+﻿
 /// @file bmm_ite.cc
 /// @brief ITE 演算を行う関数の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

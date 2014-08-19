@@ -1,4 +1,4 @@
-#ifndef NEOP_H
+﻿#ifndef NEOP_H
 #define NEOP_H
 
 /// @file NeOp.h

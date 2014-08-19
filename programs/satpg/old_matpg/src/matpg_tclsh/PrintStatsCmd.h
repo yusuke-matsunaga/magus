@@ -1,4 +1,4 @@
-#ifndef SRC_MATPG_PRINTSTATSCMD_H
+﻿#ifndef SRC_MATPG_PRINTSTATSCMD_H
 #define SRC_MATPG_PRINTSTATSCMD_H
 
 /// @file src/matpg/PrintStatsCmd.h

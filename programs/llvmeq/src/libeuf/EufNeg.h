@@ -1,4 +1,4 @@
-#ifndef EUFNEG_H
+﻿#ifndef EUFNEG_H
 #define EUFNEG_H
 
 /// @file EufNeg.h

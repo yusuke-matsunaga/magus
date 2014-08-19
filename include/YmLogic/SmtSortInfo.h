@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_SMTSORTINFO_H
+﻿#ifndef YMYMLOGIC_SMTSORTINFO_H
 #define YMYMLOGIC_SMTSORTINFO_H
 
 /// @file YmLogic/SmtSortInfo.h

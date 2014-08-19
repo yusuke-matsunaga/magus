@@ -1,4 +1,4 @@
-#ifndef GDS_GDSACL_H
+﻿#ifndef GDS_GDSACL_H
 #define GDS_GDSACL_H
 
 /// @file gds/GdsACL.h

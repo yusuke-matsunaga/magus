@@ -1,4 +1,4 @@
-#ifndef YMUTILS_RANDPERMGEN_H
+﻿#ifndef YMUTILS_RANDPERMGEN_H
 #define YMUTILS_RANDPERMGEN_H
 
 /// @file YmUtils/RandPermGen.h

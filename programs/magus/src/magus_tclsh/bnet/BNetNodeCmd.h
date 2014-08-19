@@ -1,4 +1,4 @@
-#ifndef LOGBASE_NODECMD_H
+﻿#ifndef LOGBASE_NODECMD_H
 #define LOGBASE_NODECMD_H
 
 /// @file magus/logbase/NodeCmd.h

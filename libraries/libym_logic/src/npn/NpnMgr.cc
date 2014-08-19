@@ -1,4 +1,4 @@
-
+﻿
 /// @file NpnMgr.cc
 /// @brief NpnMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

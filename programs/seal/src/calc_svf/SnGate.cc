@@ -1,4 +1,4 @@
-
+﻿
 /// @file calc_svf/SnGate.cc
 /// @brief SnGate の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

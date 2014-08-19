@@ -1,4 +1,4 @@
-#ifndef CALC_SVF_EVENTQ_H
+﻿#ifndef CALC_SVF_EVENTQ_H
 #define CALC_SVF_EVENTQ_H
 
 /// @file calc_svf/EventQ.h

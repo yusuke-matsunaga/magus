@@ -1,4 +1,4 @@
-#ifndef CONSTBITSELECTCONV_H
+﻿#ifndef CONSTBITSELECTCONV_H
 #define CONSTBITSELECTCONV_H
 
 /// @file ConstBitSelectConv.h

@@ -1,4 +1,4 @@
-#ifndef CELL_CELLRESISTANCE_H
+﻿#ifndef CELL_CELLRESISTANCE_H
 #define CELL_CELLRESISTANCE_H
 
 /// @file YmCell/CellResistance.h

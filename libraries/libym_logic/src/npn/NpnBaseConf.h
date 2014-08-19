@@ -1,4 +1,4 @@
-#ifndef NPNBASECONF_H
+﻿#ifndef NPNBASECONF_H
 #define NPNBASECONF_H
 
 /// @file NpnBaseConf.h

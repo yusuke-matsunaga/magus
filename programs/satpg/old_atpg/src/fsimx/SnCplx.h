@@ -1,4 +1,4 @@
-#ifndef FSIMX_SNCPLX_H
+﻿#ifndef FSIMX_SNCPLX_H
 #define FSIMX_SNCPLX_H
 
 /// @file fsim/SnCplx.h

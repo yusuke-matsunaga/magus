@@ -1,4 +1,4 @@
-#ifndef ANDCONV_H
+﻿#ifndef ANDCONV_H
 #define ANDCONV_H
 
 /// @file AndConv.h

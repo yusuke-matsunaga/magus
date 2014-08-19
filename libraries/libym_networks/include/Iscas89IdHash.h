@@ -1,4 +1,4 @@
-#ifndef ISCAS89IDHASH_H
+﻿#ifndef ISCAS89IDHASH_H
 #define ISCAS89IDHASH_H
 
 /// @file Iscas89IdHash.h

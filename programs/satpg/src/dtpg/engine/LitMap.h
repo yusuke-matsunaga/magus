@@ -1,4 +1,4 @@
-#ifndef LITMAP_H
+﻿#ifndef LITMAP_H
 #define LITMAP_H
 
 /// @file LitMap.h

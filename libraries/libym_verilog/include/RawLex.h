@@ -1,4 +1,4 @@
-#ifndef RAWLEX_H
+﻿#ifndef RAWLEX_H
 #define RAWLEX_H
 
 /// @file RawLex.h

@@ -1,4 +1,4 @@
-#ifndef DIMACSPARSERIMPL_H
+﻿#ifndef DIMACSPARSERIMPL_H
 #define DIMACSPARSERIMPL_H
 
 /// @file DimacsParserImpl.h

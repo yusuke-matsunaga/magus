@@ -1,4 +1,4 @@
-#ifndef CIFSMCELL_H
+﻿#ifndef CIFSMCELL_H
 #define CIFSMCELL_H
 
 /// @file CiFsmCell.h

@@ -1,4 +1,4 @@
-#ifndef CPTDECL_H
+﻿#ifndef CPTDECL_H
 #define CPTDECL_H
 
 /// @file CptDecl.h

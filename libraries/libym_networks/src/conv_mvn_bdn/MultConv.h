@@ -1,4 +1,4 @@
-#ifndef MULTCONV_H
+﻿#ifndef MULTCONV_H
 #define MULTCONV_H
 
 /// @file MultConv.h

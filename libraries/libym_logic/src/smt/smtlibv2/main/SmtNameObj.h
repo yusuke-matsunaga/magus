@@ -1,4 +1,4 @@
-#ifndef SMTNAMEOBJ_H
+﻿#ifndef SMTNAMEOBJ_H
 #define SMTNAMEOBJ_H
 
 /// @file SmtNameObj.h

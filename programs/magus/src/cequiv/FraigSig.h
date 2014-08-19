@@ -1,4 +1,4 @@
-#ifndef LIBYM_AIG_FRAIGSIG_H
+﻿#ifndef LIBYM_AIG_FRAIGSIG_H
 #define LIBYM_AIG_FRAIGSIG_H
 
 /// @file libym_aig/FraigSig.h

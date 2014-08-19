@@ -1,4 +1,4 @@
-#ifndef YMYMLOGIC_AIG_H
+﻿#ifndef YMYMLOGIC_AIG_H
 #define YMYMLOGIC_AIG_H
 
 /// @file YmLogic/Aig.h

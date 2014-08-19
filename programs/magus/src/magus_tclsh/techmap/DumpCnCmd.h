@@ -1,4 +1,4 @@
-#ifndef TECHMAP_DUMPCNCMD_H
+﻿#ifndef TECHMAP_DUMPCNCMD_H
 #define TECHMAP_DUMPCNCMD_H
 
 /// @file DumpCnCmd.h

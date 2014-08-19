@@ -1,4 +1,4 @@
-#ifndef SPTITEM_H
+﻿#ifndef SPTITEM_H
 #define SPTITEM_H
 
 /// @file SptItem.h

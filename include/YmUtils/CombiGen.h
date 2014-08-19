@@ -1,4 +1,4 @@
-#ifndef YMUTILS_COMBIGEN_H
+﻿#ifndef YMUTILS_COMBIGEN_H
 #define YMUTILS_COMBIGEN_H
 
 /// @file YmUtils/CombiGen.h

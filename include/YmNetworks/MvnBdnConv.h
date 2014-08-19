@@ -1,4 +1,4 @@
-#ifndef NETWORKS_MVNBDNCONV_H
+﻿#ifndef NETWORKS_MVNBDNCONV_H
 #define NETWORKS_MVNBDNCONV_H
 
 /// @file YmNetworks/MvnBdnConv.h

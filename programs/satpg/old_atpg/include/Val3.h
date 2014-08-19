@@ -1,4 +1,4 @@
-#ifndef ATPG_VAL3_H
+﻿#ifndef ATPG_VAL3_H
 #define ATPG_VAL3_H
 
 /// @file Val3.h

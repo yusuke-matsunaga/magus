@@ -1,4 +1,4 @@
-#ifndef IMPINPUT_H
+﻿#ifndef IMPINPUT_H
 #define IMPINPUT_H
 
 /// @file ImpInput.h

@@ -1,4 +1,4 @@
-#ifndef MISLIBSCANNER_H
+﻿#ifndef MISLIBSCANNER_H
 #define MISLIBSCANNER_H
 
 /// @file MislexScanner.h

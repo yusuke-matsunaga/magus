@@ -1,4 +1,4 @@
-#ifndef GDS_GDSXY_H
+﻿#ifndef GDS_GDSXY_H
 #define GDS_GDSXY_H
 
 /// @file gds/GdsXY.h

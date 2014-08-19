@@ -1,4 +1,4 @@
-#ifndef LIBYM_CEC_CECNODE_H
+﻿#ifndef LIBYM_CEC_CECNODE_H
 #define LIBYM_CEC_CECNODE_H
 
 /// @file libym_cec/CecNode.h

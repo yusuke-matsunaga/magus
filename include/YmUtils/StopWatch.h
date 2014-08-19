@@ -1,4 +1,4 @@
-#ifndef YMUTILS_STOPWATCH_H
+﻿#ifndef YMUTILS_STOPWATCH_H
 #define	YMUTILS_STOPWATCH_H
 
 /// @file YmUtils/StopWatch.h

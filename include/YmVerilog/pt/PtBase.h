@@ -1,4 +1,4 @@
-#ifndef VERILOG_PT_PTBASE_H
+﻿#ifndef VERILOG_PT_PTBASE_H
 #define VERILOG_PT_PTBASE_H
 
 /// @file YmVerilog/pt/PtBase.h

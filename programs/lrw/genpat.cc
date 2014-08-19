@@ -1,4 +1,4 @@
-
+﻿
 /// @file genpat.cc
 /// @brief genpat のメインプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

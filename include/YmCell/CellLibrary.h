@@ -1,4 +1,4 @@
-#ifndef CELL_CELLLIBRARY_H
+﻿#ifndef CELL_CELLLIBRARY_H
 #define CELL_CELLLIBRARY_H
 
 /// @file YmCell/CellLibrary.h

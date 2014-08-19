@@ -1,4 +1,4 @@
-#ifndef VMNODE_H
+﻿#ifndef VMNODE_H
 #define VMNODE_H
 
 /// @file VmNode.h

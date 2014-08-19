@@ -1,4 +1,4 @@
-#ifndef CNFDDMGRIMPL_H
+﻿#ifndef CNFDDMGRIMPL_H
 #define CNFDDMGRIMPL_H
 
 /// @file CNFddMgrImpl.h

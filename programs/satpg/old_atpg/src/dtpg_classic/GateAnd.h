@@ -1,4 +1,4 @@
-#ifndef DTPG_CLASSIC_GATEAND_H
+﻿#ifndef DTPG_CLASSIC_GATEAND_H
 #define DTPG_CLASSIC_GATEAND_H
 
 /// @file src/dtpg_classic/GateAnd.h

@@ -1,4 +1,4 @@
-#ifndef PYMSGHANDLER_H
+﻿#ifndef PYMSGHANDLER_H
 #define PYMSGHANDLER_H
 
 /// @file PyMsgHandler.h

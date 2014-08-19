@@ -1,4 +1,4 @@
-#ifndef YMUTILS_IDO_H
+﻿#ifndef YMUTILS_IDO_H
 #define YMUTILS_IDO_H
 
 /// @file YmUtils/IDO.h

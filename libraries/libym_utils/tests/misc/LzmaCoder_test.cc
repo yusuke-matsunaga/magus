@@ -1,4 +1,4 @@
-
+﻿
 /// @file LzmaCoder_test.cc
 /// @brief LzmaCoder のテストプログラム
 /// @author Yusuke Matsunaga (松永 裕介)

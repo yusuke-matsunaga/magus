@@ -1,4 +1,4 @@
-#ifndef FHSCANNER_H
+﻿#ifndef FHSCANNER_H
 #define FHSCANNER_H
 
 /// @file FhScanner.h

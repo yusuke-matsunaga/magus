@@ -1,4 +1,4 @@
-#ifndef LIBYM_TECHMAP_LUTMAP_CRHEAP_H
+﻿#ifndef LIBYM_TECHMAP_LUTMAP_CRHEAP_H
 #define LIBYM_TECHMAP_LUTMAP_CRHEAP_H
 
 /// @file libym_techmap/lutmap/CrHeap.h

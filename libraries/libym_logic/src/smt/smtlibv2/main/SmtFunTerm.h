@@ -1,4 +1,4 @@
-#ifndef SMTFUNTERM_H
+﻿#ifndef SMTFUNTERM_H
 #define SMTFUNTERM_H
 
 /// @file SmtFunTerm.h

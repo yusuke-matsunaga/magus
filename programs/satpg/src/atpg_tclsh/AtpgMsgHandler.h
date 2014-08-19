@@ -1,4 +1,4 @@
-#ifndef ATPGMSGHANDLER_H
+﻿#ifndef ATPGMSGHANDLER_H
 #define ATPGMSGHANDLER_H
 
 /// @file AtpgMsgHandler.h

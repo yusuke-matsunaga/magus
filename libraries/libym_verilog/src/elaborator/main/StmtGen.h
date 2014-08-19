@@ -1,4 +1,4 @@
-#ifndef STMTGEN_H
+﻿#ifndef STMTGEN_H
 #define STMTGEN_H
 
 /// @file StmtGen.h

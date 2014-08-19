@@ -1,4 +1,4 @@
-#ifndef DOTLIB_INT_H
+﻿#ifndef DOTLIB_INT_H
 #define DOTLIB_INT_H
 
 /// @file dotlib_int.h

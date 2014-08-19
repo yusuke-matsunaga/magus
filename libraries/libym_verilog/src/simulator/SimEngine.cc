@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_YmVerilog/simulator/SimEngine.cc
 /// @brief simulator の心臓部
 /// @author Yusuke Matsunaga (松永 裕介)

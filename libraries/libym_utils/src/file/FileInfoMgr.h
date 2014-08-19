@@ -1,4 +1,4 @@
-#ifndef FILEINFOMGR_H
+﻿#ifndef FILEINFOMGR_H
 #define FILEINFOMGR_H
 
 /// @file FileInfoMgr.h

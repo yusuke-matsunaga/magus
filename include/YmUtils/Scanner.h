@@ -1,4 +1,4 @@
-#ifndef YMUTILS_SCANNER_H
+﻿#ifndef YMUTILS_SCANNER_H
 #define YMUTILS_SCANNER_H
 
 /// @file YmUtils/Scanner.h

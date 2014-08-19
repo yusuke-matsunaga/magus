@@ -1,4 +1,4 @@
-#ifndef EIASSIGNMENT_H
+﻿#ifndef EIASSIGNMENT_H
 #define EIASSIGNMENT_H
 
 /// @file EiAssignment.h

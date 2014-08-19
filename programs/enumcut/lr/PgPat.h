@@ -1,4 +1,4 @@
-#ifndef PGPAT_H
+﻿#ifndef PGPAT_H
 #define PGPAT_H
 
 /// @file PgPat.h

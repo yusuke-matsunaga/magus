@@ -1,4 +1,4 @@
-#ifndef ISCAS89HANDLER_H
+﻿#ifndef ISCAS89HANDLER_H
 #define ISCAS89HANDLER_H
 
 /// @file Iscas89Handler.h

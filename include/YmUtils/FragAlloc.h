@@ -1,4 +1,4 @@
-#ifndef YMUTILS_FRAGALLOC_H
+﻿#ifndef YMUTILS_FRAGALLOC_H
 #define YMUTILS_FRAGALLOC_H
 
 /// @file YmUtils/FragAlloc.h

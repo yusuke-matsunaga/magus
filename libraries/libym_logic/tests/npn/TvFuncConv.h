@@ -1,4 +1,4 @@
-#ifndef TVFUNCCONV_H
+﻿#ifndef TVFUNCCONV_H
 #define TVFUNCCONV_H
 
 /// @file TvFuncConv.h

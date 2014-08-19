@@ -1,4 +1,4 @@
-#ifndef NAMEOBJ_H
+﻿#ifndef NAMEOBJ_H
 #define NAMEOBJ_H
 
 /// @file NameObj.h

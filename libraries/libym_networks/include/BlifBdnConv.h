@@ -1,4 +1,4 @@
-#ifndef BLIFBDNCONV_H
+﻿#ifndef BLIFBDNCONV_H
 #define BLIFBDNCONV_H
 
 /// @file BlifBdnConv.h

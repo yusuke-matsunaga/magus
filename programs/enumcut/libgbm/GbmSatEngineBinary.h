@@ -1,4 +1,4 @@
-#ifndef GBMSATENGINEBINARY_H
+﻿#ifndef GBMSATENGINEBINARY_H
 #define GBMSATENGINEBINARY_H
 
 /// @file GbmSatEngineBinary.h

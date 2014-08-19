@@ -1,4 +1,4 @@
-#ifndef NETWORKS_TGISCAS89READER_H
+﻿#ifndef NETWORKS_TGISCAS89READER_H
 #define NETWORKS_TGISCAS89READER_H
 
 /// @file YmNetworks/TgIscas89Reader.h

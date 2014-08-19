@@ -1,4 +1,4 @@
-#ifndef CONSTIMP_H
+﻿#ifndef CONSTIMP_H
 #define CONSTIMP_H
 
 /// @file ConstImp.h

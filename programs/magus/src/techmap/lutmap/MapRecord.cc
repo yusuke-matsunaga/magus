@@ -1,4 +1,4 @@
-
+﻿
 /// @file libym_techmap/lutmap/MapRecord.cc
 /// @brief MapRecord の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)

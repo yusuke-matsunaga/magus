@@ -1,4 +1,4 @@
-#ifndef CILUT_H
+﻿#ifndef CILUT_H
 #define CILUT_H
 
 /// @file　CiLut.h

@@ -1,4 +1,4 @@
-#ifndef CMNMGRIMPL_H
+﻿#ifndef CMNMGRIMPL_H
 #define CMNMGRIMPL_H
 
 /// @file CmnMgrImpl.h

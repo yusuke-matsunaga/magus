@@ -1,4 +1,4 @@
-#ifndef GDS_GDSSTRANS_H
+﻿#ifndef GDS_GDSSTRANS_H
 #define GDS_GDSSTRANS_H
 
 /// @file gds/GdsStrans.h

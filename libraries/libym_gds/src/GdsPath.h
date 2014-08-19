@@ -1,4 +1,4 @@
-#ifndef GDSPATH_H
+﻿#ifndef GDSPATH_H
 #define GDSPATH_H
 
 /// @file GdsPath.h

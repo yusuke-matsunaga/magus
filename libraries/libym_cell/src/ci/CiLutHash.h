@@ -1,4 +1,4 @@
-#ifndef CILUTHASH_H
+﻿#ifndef CILUTHASH_H
 #define CILUTHASH_H
 
 /// @file CiLutHash.h

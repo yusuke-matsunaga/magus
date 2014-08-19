@@ -1,4 +1,4 @@
-#ifndef SELSIMPLE_H
+﻿#ifndef SELSIMPLE_H
 #define SELSIMPLE_H
 
 /// @file Selector.h

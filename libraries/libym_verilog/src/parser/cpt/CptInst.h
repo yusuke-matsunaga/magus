@@ -1,4 +1,4 @@
-#ifndef CPTINST_H
+﻿#ifndef CPTINST_H
 #define CPTINST_H
 
 /// @file CptInst.h

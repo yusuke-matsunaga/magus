@@ -1,4 +1,4 @@
-#ifndef CIPIN_H
+﻿#ifndef CIPIN_H
 #define CIPIN_H
 
 /// @file　CiPin.h

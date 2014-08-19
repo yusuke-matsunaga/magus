@@ -1,4 +1,4 @@
-
+﻿
 /// @file StrBuff.cc
 /// @brief StrBuff の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
