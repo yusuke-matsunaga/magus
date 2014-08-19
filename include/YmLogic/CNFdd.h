@@ -13,9 +13,9 @@
 #include "YmLogic/cnfdd_nsdef.h"
 #include "YmLogic/VarId.h"
 #include "YmLogic/Literal.h"
+#include "YmUtils/MpInt.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
-#include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -295,7 +295,7 @@ public:
   node_count() const;
 
   /// @brief 項数を返す．
-  mpz_class
+  MpInt
   count() const;
 
   /// @}

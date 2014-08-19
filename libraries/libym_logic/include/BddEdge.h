@@ -11,7 +11,7 @@
 
 
 #include "YmLogic/bdd_nsdef.h"
-#include <gmpxx.h>
+#include "YmUtils/MpInt.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -266,7 +266,7 @@ private:
 typedef unordered_map<BddEdge, BddEdge> BddEdgeEdgeMap;
 typedef unordered_map<BddEdge, ymint> BddEdgeIntMap;
 typedef unordered_map<BddEdge, ymuint32> BddEdgeUint32Map;
-typedef unordered_map<BddEdge, mpz_class> BddEdgeMpzMap;
+typedef unordered_map<BddEdge, MpInt> BddEdgeMpIntMap;
 typedef unordered_set<BddEdge> BddEdgeSet;
 
 

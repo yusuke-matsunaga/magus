@@ -41,7 +41,7 @@ public:
   /// @param[in] e 根の枝
   /// @param[in] nvar 変数の数
   /// @return e が表す BDD のWalsh の0次係数を返す．
-  mpz_class
+  MpInt
   apply(BddEdge e,
 	ymuint nvar);
 
@@ -56,8 +56,8 @@ private:
   // 下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief apply() の下請け関数(mpz_class 版)
-  mpz_class
+  /// @brief apply() の下請け関数(MpInt 版)
+  MpInt
   count_sub1(BddEdge e);
 
   /// @brief apply() の下請け関数(ymint32 版)
@@ -70,11 +70,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 全最小項数(mpz_class版)
-  mpz_class mAllCount1;
+  // 全最小項数(MpInt版)
+  MpInt mAllCount1;
 
-  // 演算結果を覚えておくハッシュ表(mpz_class版)
-  BddEdgeMpzMap mCompTbl1;
+  // 演算結果を覚えておくハッシュ表(MpInt版)
+  BddEdgeMpIntMap mCompTbl1;
 
   // 全最小項数(ymint32版)
   ymint32 mAllCount2;

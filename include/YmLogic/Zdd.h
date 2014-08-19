@@ -12,9 +12,9 @@
 
 #include "YmLogic/zdd_nsdef.h"
 #include "YmLogic/VarId.h"
+#include "YmUtils/MpInt.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
-#include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -259,7 +259,7 @@ public:
   node_count() const;
 
   /// @brief 集合の要素数を数える．
-  mpz_class
+  MpInt
   count() const;
 
   /// @}

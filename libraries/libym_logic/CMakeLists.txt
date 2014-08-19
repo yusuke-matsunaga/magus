@@ -8,10 +8,6 @@ include_directories (
   include
   )
 
-if (GMP_FOUND)
-  include_directories (${GMP_INCLUDE_DIR})
-endif (GMP_FOUND)
-
 if (READLINE_FOUND)
   include_directories (${Readline_INCLUDE_DIR})
 endif (READLINE_FOUND)
@@ -231,12 +227,6 @@ add_library(ym_logic SHARED
 target_link_libraries(ym_logic
   ym_utils
 )
-
-if (GMP_FOUND)
-  target_link_libraries(ym_logic
-    ${GMP_LIBRARY}
-    )
-endif (GMP_FOUND)
 
 if (READLINE_FOUND)
   target_link_libraries(ym_logic

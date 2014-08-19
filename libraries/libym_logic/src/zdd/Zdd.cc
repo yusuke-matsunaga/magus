@@ -391,7 +391,7 @@ Zdd::node_count() const
 }
 
 // @brief 要素数の計算
-mpz_class
+MpInt
 Zdd::count() const
 {
   return mMgr->count(ZddEdge(mRoot));

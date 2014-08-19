@@ -13,12 +13,9 @@
 #include "YmLogic/bdd_nsdef.h"
 #include "YmLogic/VarId.h"
 #include "YmLogic/Expr.h"
+#include "YmUtils/MpInt.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
-
-#if defined(GMP_FOUND)
-#include "gmpxx.h"
-#endif
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -372,20 +369,20 @@ public:
   /// @brief 最小項の数の計算
   /// @param[in] nvar 入力数
   /// @return 最小項の数
-  mpz_class
+  MpInt
   minterm_count(ymuint nvar) const;
 
   /// @brief Walsh変換の 0次係数の計算
   /// @param[in] nvar 入力数
   /// @return Walsh変換の 0次係数
-  mpz_class
+  MpInt
   walsh0(ymuint nvar) const;
 
   /// @brief Walsh変換の 1次係数の計算
   /// @param[in] var 変数番号
   /// @param[in] nvar 入力数
   /// @return 変数 var の 1次係数
-  mpz_class
+  MpInt
   walsh1(VarId var,
 	 ymuint nvar) const;
 

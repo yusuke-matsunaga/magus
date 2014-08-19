@@ -13,7 +13,6 @@
 #include "YmLogic/zdd_nsdef.h"
 #include "YmLogic/VarId.h"
 #include "YmUtils/Binder.h"
-#include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD

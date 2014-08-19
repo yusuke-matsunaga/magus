@@ -696,16 +696,21 @@ Bdd::node_count() const
 double
 Bdd::density(ymuint nvar) const
 {
+#if 0
   BddEdge e(mRoot);
-  mpz_class mc = mMgr->minterm_count(e, nvar);
-  mpf_class mc_f(mc);
-  mpz_class w = mpz_class(1) << nvar;
-  mpf_class d = mc_f / w;
+  MpInt mc = mMgr->minterm_count(e, nvar);
+  MpFloat mc_f(mc);
+  MpInt w = MpInt(1) << nvar;
+  MpFloat d = mc_f / w;
   return d.get_d();
+#else
+#warning "未完"
+  return 0.0;
+#endif
 }
 
 // @brief 最小項の数の計算
-mpz_class
+MpInt
 Bdd::minterm_count(ymuint nvar) const
 {
   BddEdge e(mRoot);
@@ -713,7 +718,7 @@ Bdd::minterm_count(ymuint nvar) const
 }
 
 // @brief Walsh変換の 0次係数の計算
-mpz_class
+MpInt
 Bdd::walsh0(ymuint nvar) const
 {
   BddEdge e(mRoot);
@@ -721,7 +726,7 @@ Bdd::walsh0(ymuint nvar) const
 }
 
 // @brief Walsh変換の 1次係数の計算
-mpz_class
+MpInt
 Bdd::walsh1(VarId var,
 	    ymuint nvar) const
 {

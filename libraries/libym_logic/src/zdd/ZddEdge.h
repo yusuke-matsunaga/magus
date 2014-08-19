@@ -12,7 +12,7 @@
 
 #include "YmLogic/zdd_nsdef.h"
 #include "YmLogic/VarId.h"
-#include <gmpxx.h>
+#include "YmUtils/MpInt.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -225,7 +225,7 @@ private:
 
 };
 
-typedef unordered_map<ZddEdge, mpz_class> ZddEdgeMpzMap;
+typedef unordered_map<ZddEdge, MpInt> ZddEdgeMpIntMap;
 typedef unordered_map<ZddEdge, ZddEdge> ZddEdgeEdgeMap;
 typedef unordered_map<ZddEdge, ymuint64> IdMap;
 typedef unordered_set<ZddEdge> ZddEdgeSet;

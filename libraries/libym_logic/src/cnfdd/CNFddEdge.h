@@ -12,7 +12,6 @@
 
 #include "YmLogic/cnfdd_nsdef.h"
 #include "YmLogic/VarId.h"
-#include <gmpxx.h>
 
 
 BEGIN_NAMESPACE_YM_CNFDD
@@ -225,7 +224,7 @@ private:
 
 };
 
-typedef unordered_map<CNFddEdge, mpz_class> CNFddEdgeMpzMap;
+typedef unordered_map<CNFddEdge, MpInt> CNFddEdgeMpIntMap;
 typedef unordered_map<CNFddEdge, CNFddEdge> CNFddEdgeEdgeMap;
 typedef unordered_set<CNFddEdge> CNFddEdgeSet;
 

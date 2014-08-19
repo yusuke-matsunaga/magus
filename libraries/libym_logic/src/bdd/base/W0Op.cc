@@ -32,12 +32,12 @@ W0Op::~W0Op()
 // @param[in] e 根の枝
 // @param[in] nvar 変数の数
 // @return e が表す BDD の最小項の数を返す．
-mpz_class
+MpInt
 W0Op::apply(BddEdge e,
 	    ymuint nvar)
 {
   if ( e.is_invalid() ) {
-    return 0;
+    return MpInt(0);
   }
 
   ymuint bitsize = nvar + 2;
@@ -50,14 +50,14 @@ W0Op::apply(BddEdge e,
     mCompTbl2.clear();
     ymint32 ans = count_sub2(e);
 
-    return mpz_class(ans);
+    return MpInt(ans);
   }
   else {
     // 全入力ベクトルの数の計算
-    mAllCount1 = mpz_class(1) << nvar;
+    mAllCount1 = MpInt(1) << nvar;
 
     mCompTbl1.clear();
-    mpz_class ans = count_sub1(e);
+    MpInt ans = count_sub1(e);
 
     return ans;
   }
@@ -70,8 +70,8 @@ W0Op::sweep()
   // 何もしない．
 }
 
-// @brief apply() の下請け関数(mpz_class 版)
-mpz_class
+// @brief apply() の下請け関数(MpInt 版)
+MpInt
 W0Op::count_sub1(BddEdge e)
 {
   if ( e.is_zero() ) {
@@ -89,9 +89,9 @@ W0Op::count_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
+    BddEdgeMpIntMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
-      mpz_class ans = p->second;
+      MpInt ans = p->second;
       if ( inv ) {
 	ans = -ans;
       }
@@ -100,12 +100,12 @@ W0Op::count_sub1(BddEdge e)
   }
 
   // 子ノードが表す関数の walsh0 を計算する
-  mpz_class n0 = count_sub1(node->edge0());
-  mpz_class n1 = count_sub1(node->edge1());
+  MpInt n0 = count_sub1(node->edge0());
+  MpInt n1 = count_sub1(node->edge1());
 
   // 子ノードが表す関数の walsh0 を足して半分にしたものが
   // 親ノードが表す関数の walsh0
-  mpz_class ans = (n0 + n1) >> 1;
+  MpInt ans = (n0 + n1) >> 1;
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．

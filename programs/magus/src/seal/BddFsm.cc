@@ -189,9 +189,14 @@ BddFsm::rs_sub(Bdd rel,
     st_vec[pos] = 0;
   }
   else {
-    mpz_class mc = rel.minterm_count(input_num());
+    MpInt mc = rel.minterm_count(input_num());
+#if 0
     assert_cond(mc.fits_uint_p(), __FILE__, __LINE__);
     double prob = static_cast<double>(mc.get_ui()) * mWeight;
+#else
+#warning "未完"
+    double prob = 0.0;
+#endif
     vector<ymuint> dcmap;
     dcmap.reserve(ff_num() * 2);
     State tmp = "";

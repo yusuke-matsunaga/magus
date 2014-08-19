@@ -32,12 +32,12 @@ McOp::~McOp()
 // @param[in] e 根の枝
 // @param[in] nvar 変数の数
 // @return e が表す BDD の最小項の数を返す．
-mpz_class
+MpInt
 McOp::apply(BddEdge e,
 	    ymuint nvar)
 {
   if ( e.is_invalid() ) {
-    return 0;
+    return MpInt(0);
   }
 
   ymuint bitsize = nvar + 1;
@@ -50,14 +50,14 @@ McOp::apply(BddEdge e,
     mCompTbl2.clear();
     ymuint32 ans = count_sub2(e);
 
-    return mpz_class(ans);
+    return MpInt(ans);
   }
   else {
     // 全入力ベクトルの数の計算
-    mAllCount1 = mpz_class(1U) << nvar;
+    mAllCount1 = MpInt(1U) << nvar;
 
     mCompTbl1.clear();
-    mpz_class ans = count_sub1(e);
+    MpInt ans = count_sub1(e);
 
     return ans;
   }
@@ -70,15 +70,15 @@ McOp::sweep()
   // 何もしない．
 }
 
-// @brief apply() の下請け関数(mpz_class 版)
-mpz_class
+// @brief apply() の下請け関数(MpInt 版)
+MpInt
 McOp::count_sub1(BddEdge e)
 {
   if ( e.is_one() ) {
     return mAllCount1;
   }
   if ( e.is_zero() ) {
-    return mpz_class(0);
+    return MpInt(0);
   }
 
   BddNode* node = e.get_node();
@@ -86,19 +86,19 @@ McOp::count_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    BddEdgeMpzMap::iterator p = mCompTbl1.find(e);
+    BddEdgeMpIntMap::iterator p = mCompTbl1.find(e);
     if ( p != mCompTbl1.end() ) {
       return p->second;
     }
   }
 
   // 子ノードが表す関数のminterm数を計算する
-  mpz_class n0 = count_sub1(node->edge0(inv));
-  mpz_class n1 = count_sub1(node->edge1(inv));
+  MpInt n0 = count_sub1(node->edge0(inv));
+  MpInt n1 = count_sub1(node->edge1(inv));
 
   // 子ノードが表す関数の minterm 数を足して半分にしたものが
   // 親ノードが表す関数の minterm 数
-  mpz_class ans = (n0 + n1) >> 1;
+  MpInt ans = (n0 + n1) >> 1;
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．

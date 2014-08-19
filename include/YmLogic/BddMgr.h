@@ -16,7 +16,6 @@
 #include "YmUtils/Binder.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
-#include "gmpxx.h"
 
 
 BEGIN_NAMESPACE_YM_BDD

@@ -204,8 +204,8 @@ public:
   node_count(const vector<ZddEdge>& edge_list);
 
   /// @brief ZDD の表す集合の要素数を返す．
-  /// 無限長精度の整数(mpz_class)を用いて計算する．
-  mpz_class
+  /// 無限長精度の整数(MpInt)を用いて計算する．
+  MpInt
   count(ZddEdge e);
 
 
@@ -351,9 +351,9 @@ private:
   count1(ZddEdge e);
 
   /// @brief count の下請関数
-  mpz_class
+  MpInt
   count_step(ZddEdge e,
-	     ZddEdgeMpzMap& mc_map);
+	     ZddEdgeMpIntMap& mc_map);
 
   /// @brief サポート変数に印をつける．
   void

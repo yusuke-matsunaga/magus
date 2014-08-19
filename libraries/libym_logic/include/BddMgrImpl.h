@@ -375,15 +375,15 @@ public:
   /// @brief BDD の表す論理関数の minterm の数を返す．
   /// @param[in] e 根の枝
   /// @param[in] nvar 論理関数の変数の数
-  /// 無限長精度の整数(mpz_class)を用いて計算する．
-  mpz_class
+  /// 無限長精度の整数(MpInt)を用いて計算する．
+  MpInt
   minterm_count(BddEdge e,
 		ymuint nvar);
 
   /// @brief Walsh 変換の0次の係数を計算する．
   /// @param[in] e 根の枝
   /// @param[in] nvar 論理関数の変数の数
-  mpz_class
+  MpInt
   walsh0(BddEdge e,
 	 ymuint nvar);
 
@@ -391,7 +391,7 @@ public:
   /// @param[in] e 根の枝
   /// @param[in] var 変数番号
   /// @param[in] nvar 論理関数の変数の数
-  mpz_class
+  MpInt
   walsh1(BddEdge e,
 	 VarId var,
 	 ymuint nvar);

@@ -45,41 +45,41 @@ ZddMgrImpl::count1(ZddEdge e)
 }
 
 // ZDD の表す集合の要素数を返す．
-// 無限長精度の整数(mpz_class)を用いて計算する．
-mpz_class
+// 無限長精度の整数(MpInt)を用いて計算する．
+MpInt
 ZddMgrImpl::count(ZddEdge e)
 {
   if ( e.is_overflow() ) {
-    return 0;
+    return MpInt(0);
   }
   if ( e.is_error() ) {
-    return 0;
+    return MpInt(0);
   }
 
-  ZddEdgeMpzMap mc_map;
-  mpz_class ans = count_step(e, mc_map);
+  ZddEdgeMpIntMap mc_map;
+  MpInt ans = count_step(e, mc_map);
   return ans;
 }
 
 // count の下請関数
-mpz_class
+MpInt
 ZddMgrImpl::count_step(ZddEdge e,
-		       ZddEdgeMpzMap& mc_map)
+		       ZddEdgeMpIntMap& mc_map)
 {
   bool zattr = e.zattr();
   e.normalize();
 
-  mpz_class ans;
+  MpInt ans;
 
   if ( e.is_zero() ) {
-    ans = 0;
+    ans = MpInt(0);
   }
   else {
     ZddNode* vp = e.get_node();
     ymuint ref = vp->refcount();
     bool found = false;
     if ( ref != 1 ) {
-      ZddEdgeMpzMap::iterator p = mc_map.find(e);
+      ZddEdgeMpIntMap::iterator p = mc_map.find(e);
       if ( p != mc_map.end() ) {
 	found = true;
 	ans = p->second;
@@ -87,8 +87,8 @@ ZddMgrImpl::count_step(ZddEdge e,
     }
     if ( !found ) {
       // 子ノードが表す関数の要素数を計算する
-      mpz_class n0 = count_step(vp->edge0(), mc_map);
-      mpz_class n1 = count_step(vp->edge1(), mc_map);
+      MpInt n0 = count_step(vp->edge0(), mc_map);
+      MpInt n1 = count_step(vp->edge1(), mc_map);
 
       // 子ノードが表す関数の要素数を足す．
       ans = n0 + n1;
@@ -100,7 +100,7 @@ ZddMgrImpl::count_step(ZddEdge e,
   }
 
   if ( zattr ) {
-    ans += 1;
+    ans += MpInt(1);
   }
 
   return ans;
