@@ -1,4 +1,4 @@
-﻿%{
+%{
 
 /// @file iscas89_grammer.yy
 /// @brief .bench(iscas89) フォーマット用の YACC ソース
