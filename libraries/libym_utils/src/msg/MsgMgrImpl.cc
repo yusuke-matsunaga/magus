@@ -73,7 +73,7 @@ MsgMgrImpl::put_msg(const char* src_file,
   case kMsgInfo:     ++ mInfoNum; break;
   case kMsgFailure:  ++ mFailNum; break;
   case kMsgDebug:    ++ mDebugNum; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   mMgr.prop_event(src_file, src_line, file_loc, type, label, msg);
@@ -99,7 +99,7 @@ MsgMgrImpl::put_msg(const char* src_file,
   case kMsgInfo:     ++ mInfoNum; break;
   case kMsgFailure:  ++ mFailNum; break;
   case kMsgDebug:    ++ mDebugNum; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   mMgr.prop_event(src_file, src_line, FileRegion(), type, label, msg);

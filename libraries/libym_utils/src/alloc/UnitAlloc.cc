@@ -26,7 +26,7 @@ UnitAlloc::UnitAlloc(ymuint64 unit_size,
   if ( mUnitSize < sizeof(Block) ) {
     mUnitSize = sizeof(Block);
   }
-  assert_cond(block_size > 0, __FILE__, __LINE__);
+  ASSERT_COND( block_size > 0 );
 }
 
 // デストラクタ
@@ -54,7 +54,7 @@ UnitAlloc::_get_memory(ymuint64 n)
       b->mLink = mAvailTop;
       mAvailTop = b;
     }
-    assert_cond(mAvailTop, __FILE__, __LINE__);
+    ASSERT_COND( mAvailTop != NULL );
   }
   Block* b = mAvailTop;
   mAvailTop = b->mLink;

@@ -160,7 +160,8 @@ inline
 void
 MisNodeHeap::put(MisNode* node)
 {
-  assert_cond( mNodeNum < mNodeSize, __FILE__, __LINE__);
+  ASSERT_COND( mNodeNum < mNodeSize );
+
   set(mNodeNum, node);
   ++ mNodeNum;
   move_up(node);
@@ -171,9 +172,12 @@ inline
 void
 MisNodeHeap::delete_node(MisNode* node)
 {
-  assert_cond( !empty(), __FILE__, __LINE__);
+  ASSERT_COND( !empty() );
+
   ymuint idx = node->mHeapIdx;
-  assert_cond( idx > 0, __FILE__, __LINE__);
+
+  ASSERT_COND( idx > 0 );
+
   node->mHeapIdx = 0;
   -- mNodeNum;
   MisNode* last = mNodeHeap[mNodeNum];
@@ -190,7 +194,8 @@ inline
 MisNode*
 MisNodeHeap::get_min()
 {
-  assert_cond( !empty(), __FILE__, __LINE__);
+  ASSERT_COND( !empty() );
+
   MisNode* node = mNodeHeap[0];
   node->mHeapIdx = 0;
   -- mNodeNum;
@@ -209,10 +214,10 @@ void
 MisNodeHeap::update(MisNode* node)
 {
   ymuint idx = node->mHeapIdx;
-  assert_cond( idx > 0, __FILE__, __LINE__);
+  ASSERT_COND( idx > 0 );
 
   -- idx;
-  assert_cond( mNodeHeap[idx] == node, __FILE__, __LINE__);
+  ASSERT_COND( mNodeHeap[idx] == node );
 
   if ( idx > 0 ) {
     ymuint p_idx = (idx - 1) / 2;

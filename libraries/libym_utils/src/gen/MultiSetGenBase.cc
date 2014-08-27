@@ -44,7 +44,8 @@ MultiSetGenBase::init()
       ++ pos;
       count = 0;
     }
-    assert_cond( count < mNumArray[pos], __FILE__, __LINE__);
+    ASSERT_COND( count < mNumArray[pos] );
+
     mElem[i] = pos;
     ++ count;
   }

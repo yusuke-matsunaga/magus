@@ -93,8 +93,9 @@ BtgMatchImpl::add_edge(ymuint node1_id,
 		       ymuint node2_id,
 		       ymuint weight)
 {
-  assert_cond( node1_id < node1_num(), __FILE__, __LINE__);
-  assert_cond( node2_id < node2_num(), __FILE__, __LINE__);
+  ASSERT_COND( node1_id < node1_num() );
+  ASSERT_COND( node2_id < node2_num() );
+
   BtgNode* node1 = &mNode1Array[node1_id];
   BtgNode* node2 = &mNode2Array[node2_id];
   BtgEdge* edge = new BtgEdge(mEdgeList.size(), node1, node2, weight);
@@ -146,7 +147,8 @@ BtgMatchImpl::edge_info(ymuint pos,
 			ymuint& node2_id,
 			ymuint& weight) const
 {
-  assert_cond( pos < edge_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < edge_num() );
+
   BtgEdge* edge = mEdgeList[pos];
   node1_id = edge->node1()->id();
   node2_id = edge->node2()->id();
@@ -193,7 +195,8 @@ BtgMatchImpl::calc_match(vector<ymuint>& edge_list)
       if ( edge == NULL ) {
 	return 0;
       }
-      assert_cond( edge->node2()->cur_edge() == edge, __FILE__, __LINE__);
+      ASSERT_COND( edge->node2()->cur_edge() == edge );
+
       edge_list.push_back(edge->id());
       weight_sum += edge->weight();
     }
@@ -215,7 +218,8 @@ BtgMatchImpl::calc_match(vector<ymuint>& edge_list)
       if ( edge == NULL ) {
 	return 0;
       }
-      assert_cond( edge->node1()->cur_edge() == edge, __FILE__, __LINE__);
+      ASSERT_COND( edge->node1()->cur_edge() == edge );
+
       edge_list.push_back(edge->id());
       weight_sum += edge->weight();
     }
@@ -279,7 +283,8 @@ BtgMatchImpl::calc_match1()
 	for (BtgEdge* edge = v1->edge_top(); edge; edge = edge->link1()) {
 	  BtgNode* v2 = edge->node2();
 	  BtgEdge* cur_edge = v2->cur_edge();
-	  assert_cond( cur_edge != NULL, __FILE__, __LINE__);
+	  ASSERT_COND( cur_edge != NULL );
+
 	  BtgNode* v3 = cur_edge->node1();
 	  if ( !qmark[v3->id()] ) {
 	    qmark[v3->id()] = true;
@@ -352,7 +357,8 @@ BtgMatchImpl::calc_match2()
 	for (BtgEdge* edge = v2->edge_top(); edge; edge = edge->link2()) {
 	  BtgNode* v1 = edge->node1();
 	  BtgEdge* cur_edge = v1->cur_edge();
-	  assert_cond( cur_edge != NULL, __FILE__, __LINE__);
+	  ASSERT_COND( cur_edge != NULL );
+
 	  BtgNode* v3 = cur_edge->node2();
 	  if ( !qmark[v3->id()] ) {
 	    qmark[v3->id()] = true;

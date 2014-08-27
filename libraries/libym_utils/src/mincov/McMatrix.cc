@@ -51,7 +51,7 @@ McRowHead::search_insert_pos(McCell* cell)
 	// pcell と ncell の間に cell を挿入する．
 	break;
       }
-      assert_cond(!is_end(ncell), __FILE__, __LINE__);
+      ASSERT_COND(!is_end(ncell) );
     }
   }
   cell->mLeftLink = pcell;
@@ -94,7 +94,7 @@ McColHead::search_insert_pos(McCell* cell)
 	// pcell と ncell の間に cell を挿入する．
 	break;
       }
-      assert_cond(!is_end(ncell), __FILE__, __LINE__);
+      ASSERT_COND(!is_end(ncell) );
     }
   }
   cell->mUpLink = pcell;
@@ -291,8 +291,8 @@ McMatrix::resize(ymuint32 row_size,
 void
 McMatrix::copy(const McMatrix& src)
 {
-  assert_cond(row_size() == src.row_size(), __FILE__, __LINE__);
-  assert_cond(col_size() == src.col_size(), __FILE__, __LINE__);
+  ASSERT_COND(row_size() == src.row_size() );
+  ASSERT_COND(col_size() == src.col_size() );
 
   for (const McRowHead* src_row = src.row_front();
        !src.is_row_end(src_row); src_row = src_row->next()) {
@@ -331,7 +331,7 @@ McMatrix::merge(McMatrix& matrix1,
       row2 = row2->mNext;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
   for ( ; row1 != &matrix1.mRowHead; row1 = row1->mNext) {
@@ -368,7 +368,7 @@ McMatrix::merge(McMatrix& matrix1,
       col2 = col2->mNext;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
   for ( ; col1 != &matrix1.mColHead; col1 = col1->mNext) {
@@ -582,7 +582,7 @@ McMatrix::insert_elem(ymuint32 row_pos,
 
   McColHead* col1 = col(col_pos);
   bool stat2 = col1->search_insert_pos(cell);
-  assert_cond(stat2, __FILE__, __LINE__);
+  ASSERT_COND( stat2 );
 
   row1->insert_elem(cell);
   if ( row1->num() == 1 ) {
@@ -595,12 +595,12 @@ McMatrix::insert_elem(ymuint32 row_pos,
     else {
       for (prev = &mRowHead; ; prev = next) {
 	next = prev->mNext;
-	assert_cond(next->pos() != row_pos, __FILE__, __LINE__);
+	ASSERT_COND( next->pos() != row_pos );
 	if ( next->pos() > row_pos ) {
 	  // prev と next の間に挿入する．
 	  break;
 	}
-	assert_cond(next != &mRowHead, __FILE__, __LINE__);
+	ASSERT_COND( next != &mRowHead );
       }
     }
     prev->mNext = row1;
@@ -621,12 +621,12 @@ McMatrix::insert_elem(ymuint32 row_pos,
     else {
       for (prev = &mColHead; ; prev = next) {
 	next = prev->mNext;
-	assert_cond(next->pos() != col_pos, __FILE__, __LINE__);
+	ASSERT_COND( next->pos() != col_pos );
 	if ( next->pos() > col_pos ) {
 	  // prev と next の間に挿入する．
 	  break;
 	}
-	assert_cond(next != &mColHead, __FILE__, __LINE__);
+	ASSERT_COND( next != &mColHead );
       }
     }
     prev->mNext = col1;
@@ -644,7 +644,7 @@ void
 McMatrix::select_col(ymuint32 col_pos)
 {
   McColHead* col1 = col(col_pos);
-  assert_cond( !col1->mDeleted, __FILE__, __LINE__);
+  ASSERT_COND( !col1->mDeleted );
 
   vector<ymuint32> row_list;
   row_list.reserve(col1->num());
@@ -722,7 +722,8 @@ void
 McMatrix::restore_row(ymuint32 row_pos)
 {
   McRowHead* row1 = row(row_pos);
-  assert_cond( row1->mDeleted, __FILE__, __LINE__);
+  ASSERT_COND( row1->mDeleted );
+
   row1->mDeleted = false;
   ++ mRowNum;
 
@@ -772,7 +773,8 @@ void
 McMatrix::restore_col(ymuint32 col_pos)
 {
   McColHead* col1 = col(col_pos);
-  assert_cond( col1->mDeleted, __FILE__, __LINE__);
+  ASSERT_COND( col1->mDeleted );
+
   col1->mDeleted = false;
   ++ mColNum;
 
@@ -1052,7 +1054,8 @@ McMatrix::essential_col(vector<ymuint32>& selected_cols)
     if ( row1->num() == 1 ) {
       const McCell* cell = row1->front();
       ymuint32 col_pos = cell->col_pos();
-      assert_cond( !col(col_pos)->mDeleted, __FILE__, __LINE__);
+      ASSERT_COND( !col(col_pos)->mDeleted );
+
       McColHead* col1 = col(col_pos);
       if ( col1->mWork == 0 ) {
 	col1->mWork = 1;

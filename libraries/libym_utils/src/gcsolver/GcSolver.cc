@@ -83,8 +83,8 @@ void
 GcSolver::connect(ymuint id1,
 		  ymuint id2)
 {
-  assert_cond( id1 < node_num(), __FILE__, __LINE__);
-  assert_cond( id2 < node_num(), __FILE__, __LINE__);
+  ASSERT_COND( id1 < node_num() );
+  ASSERT_COND( id2 < node_num() );
 
   GcNode* node1 = &mNodeArray[id1];
   GcNode* node2 = &mNodeArray[id2];
@@ -158,13 +158,14 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
     for (ymuint i = 0; i < mNodeNum; ++ i) {
       GcNode* node = &mNodeArray[i];
       ymuint c0 = node->color();
-      assert_cond( c0 > 0, __FILE__, __LINE__);
+      ASSERT_COND( c0 > 0 );
+
       const vector<GcNode*>& node_list = node->link_list();
       for (vector<GcNode*>::const_iterator p = node_list.begin();
 	   p != node_list.end(); ++ p) {
 	GcNode* node1 = *p;
 	ymuint c1 = node1->color();
-	assert_cond( c0 != c1, __FILE__, __LINE__);
+	ASSERT_COND( c0 != c1 );
       }
     }
   }
@@ -175,8 +176,10 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     GcNode* node = &mNodeArray[i];
     ymuint c = node->color();
-    assert_cond( c > 0, __FILE__, __LINE__);
-    assert_cond( c <= mMaxColor, __FILE__, __LINE__);
+
+    ASSERT_COND( c > 0 );
+    ASSERT_COND( c <= mMaxColor );
+
     color_group[c - 1].push_back(i);
   }
 
@@ -278,7 +281,8 @@ GcSolver::push_node(GcNode* node)
 GcNode*
 GcSolver::pop_node()
 {
-  assert_cond( mHeapNum > 0, __FILE__, __LINE__);
+  ASSERT_COND( mHeapNum > 0 );
+
   GcNode* node = mNodeHeap[0];
 
   -- mHeapNum;

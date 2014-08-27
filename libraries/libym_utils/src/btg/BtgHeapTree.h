@@ -137,7 +137,8 @@ inline
 void
 BtgHeapTree::put(BtgNode* node)
 {
-  assert_cond( mNum < mMaxSize, __FILE__, __LINE__);
+  ASSERT_COND( mNum < mMaxSize );
+
   set(mNum, node);
   ++ mNum;
   move_up(node);

@@ -117,7 +117,8 @@ inline
 ymuint
 MultiSetGenBase::n(ymuint grp) const
 {
-  assert_cond( grp < group_num(), __FILE__, __LINE__);
+  ASSERT_COND( grp < group_num() );
+
   return mNumArray[grp];
 }
 

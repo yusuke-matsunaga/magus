@@ -27,55 +27,58 @@ void
 verify_matrix(McMatrix& a,
 	      McMatrix& b)
 {
-  assert_cond( a.row_num() == b.row_num(), __FILE__, __LINE__);
-  assert_cond( a.col_num() == b.col_num(), __FILE__, __LINE__);
+  ASSERT_COND( a.row_num() == b.row_num() );
+  ASSERT_COND( a.col_num() == b.col_num() );
+
   const McRowHead* row_a = a.row_front();
   const McRowHead* row_b = b.row_front();
   for ( ; ; ) {
-    assert_cond( row_a->pos() == row_b->pos(), __FILE__, __LINE__);
-    assert_cond( row_a->num() == row_b->num(), __FILE__, __LINE__);
+    ASSERT_COND( row_a->pos() == row_b->pos() );
+    ASSERT_COND( row_a->num() == row_b->num() );
+
     const McCell* cell_a = row_a->front();
     const McCell* cell_b = row_b->front();
     for ( ; ; ) {
-      assert_cond( cell_a->row_pos() == row_a->pos(), __FILE__, __LINE__);
-      assert_cond( cell_b->row_pos() == row_b->pos(), __FILE__, __LINE__);
-      assert_cond( cell_a->col_pos() == cell_b->col_pos(), __FILE__, __LINE__);
+      ASSERT_COND( cell_a->row_pos() == row_a->pos() );
+      ASSERT_COND( cell_b->row_pos() == row_b->pos() );
+      ASSERT_COND( cell_a->col_pos() == cell_b->col_pos() );
       cell_a = cell_a->row_next();
       cell_b = cell_b->row_next();
       if ( row_a->is_end(cell_a) ) {
-	assert_cond( row_b->is_end(cell_b), __FILE__, __LINE__);
+	ASSERT_COND( row_b->is_end(cell_b) );
 	break;
       }
     }
     row_a = row_a->next();
     row_b = row_b->next();
     if ( a.is_row_end(row_a) ) {
-      assert_cond( b.is_row_end(row_b), __FILE__, __LINE__);
+      ASSERT_COND( b.is_row_end(row_b) );
       break;
     }
   }
   const McColHead* col_a = a.col_front();
   const McColHead* col_b = b.col_front();
   for ( ; ; ) {
-    assert_cond( col_a->pos() == col_b->pos(), __FILE__, __LINE__);
-    assert_cond( col_a->num() == col_b->num(), __FILE__, __LINE__);
+    ASSERT_COND( col_a->pos() == col_b->pos() );
+    ASSERT_COND( col_a->num() == col_b->num() );
     const McCell* cell_a = col_a->front();
     const McCell* cell_b = col_b->front();
     for ( ; ; ) {
-      assert_cond( cell_a->col_pos() == col_a->pos(), __FILE__, __LINE__);
-      assert_cond( cell_b->col_pos() == col_b->pos(), __FILE__, __LINE__);
-      assert_cond( cell_a->row_pos() == cell_b->row_pos(), __FILE__, __LINE__);
+      ASSERT_COND( cell_a->col_pos() == col_a->pos() );
+      ASSERT_COND( cell_b->col_pos() == col_b->pos() );
+      ASSERT_COND( cell_a->row_pos() == cell_b->row_pos() );
+
       cell_a = cell_a->col_next();
       cell_b = cell_b->col_next();
       if ( col_a->is_end(cell_a) ) {
-	assert_cond( col_b->is_end(cell_b), __FILE__, __LINE__);
+	ASSERT_COND( col_b->is_end(cell_b) );
 	break;
       }
     }
     col_a = col_a->next();
     col_b = col_b->next();
     if ( a.is_col_end(col_a) ) {
-      assert_cond( b.is_col_end(col_b), __FILE__, __LINE__);
+      ASSERT_COND( b.is_col_end(col_b) );
       break;
     }
   }
@@ -137,7 +140,8 @@ McSolverImpl::exact(vector<ymuint32>& solution)
   mBest = UINT_MAX;
   mCurSolution.clear();
   bool stat = solve(0, 0);
-  assert_cond( stat, __FILE__, __LINE__);
+  ASSERT_COND( stat );
+
   solution = mBestSolution;
 
   // 復元が正しいかチェックする．
@@ -145,7 +149,7 @@ McSolverImpl::exact(vector<ymuint32>& solution)
   verify_matrix(mMatrix, orig_matrix);
 
   // solution がカバーになっているかチェックする．
-  assert_cond( mMatrix.verify(solution), __FILE__, __LINE__);
+  ASSERT_COND( mMatrix.verify(solution) );
 
   cout << "Total branch: " << solve_id << endl;
 
@@ -237,7 +241,7 @@ McSolverImpl::solve(ymuint lb,
     mMatrix.merge(solver1.mMatrix, solver2.mMatrix);
 
     if ( stat1 ) {
-      assert_cond( mMatrix.verify(mCurSolution), __FILE__, __LINE__);
+      ASSERT_COND( mMatrix.verify(mCurSolution) );
       if ( mBest > cost_so_far ) {
 	mBest = cost_so_far;
 	mBestSolution = mCurSolution;
@@ -276,7 +280,7 @@ McSolverImpl::solve(ymuint lb,
 
 #if defined(VERIFYY_MINCOV)
   verify_matrix(orig_matrix, mMatrix);
-  assert_cond( orig_solution == mCurSlution, __FILE__, __LINE__);
+  ASSERT_COND( orig_solution == mCurSlution );
 #endif
 
   // 今得た最良解が下界と等しかったら探索を続ける必要はない．

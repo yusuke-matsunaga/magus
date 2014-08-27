@@ -19,7 +19,8 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 SimpleAlloc::SimpleAlloc(ymuint64 page_size)
 {
-  assert_cond(page_size > 0, __FILE__, __LINE__);
+  ASSERT_COND( page_size > 0 );
+
   mPageSize = align(page_size);
   mBlockTop = NULL;
 }

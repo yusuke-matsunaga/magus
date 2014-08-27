@@ -89,7 +89,7 @@ LbMIS1::operator()(const McMatrix& matrix)
     node->set(row_pos);
     node_array[row_pos] = node;
     if ( last == NULL ) {
-      assert_cond( top == NULL, __FILE__, __LINE__);
+      ASSERT_COND( top == NULL );
       top = node;
     }
     else {

@@ -518,7 +518,9 @@ DlListBase::_push_front(DlElem* t)
 {
   DlElem* prev = &mDummyTop;
   DlElem* next = prev->mNextLink;
-  assert_cond(next->mPrevLink == prev, __FILE__, __LINE__);
+
+  ASSERT_COND( next->mPrevLink == prev );
+
   _insert(t, prev, next);
 }
 
@@ -529,7 +531,9 @@ DlListBase::_push_back(DlElem* t)
 {
   DlElem* next = &mDummyTop;
   DlElem* prev = next->mPrevLink;
-  assert_cond(prev->mNextLink == next, __FILE__, __LINE__);
+
+  ASSERT_COND( prev->mNextLink == next );
+
   _insert(t, prev, next);
 }
 
@@ -543,8 +547,9 @@ DlListBase::_insert(DlElem* t,
 		    DlElem* prev,
 		    DlElem* next)
 {
-  assert_cond(t->mNextLink == t, __FILE__, __LINE__);
-  assert_cond(t->mPrevLink == t, __FILE__, __LINE__);
+  ASSERT_COND( t->mNextLink == t );
+  ASSERT_COND( t->mPrevLink == t );
+
   prev->mNextLink = t;
   t->mPrevLink = prev;
   t->mNextLink = next;
@@ -560,8 +565,10 @@ DlListBase::_pop_front()
   DlElem* prev = &mDummyTop;
   DlElem* t = prev->mNextLink;
   DlElem* next = t->mNextLink;
-  assert_cond(t->mPrevLink == prev, __FILE__, __LINE__);
-  assert_cond(next->mPrevLink == t, __FILE__, __LINE__);
+
+  ASSERT_COND( t->mPrevLink == prev );
+  ASSERT_COND( next->mPrevLink == t );
+
   __erase(t, prev, next);
 }
 
@@ -573,8 +580,10 @@ DlListBase::_pop_back()
   DlElem* next = &mDummyTop;
   DlElem* t = next->mPrevLink;
   DlElem* prev = t->mPrevLink;
-  assert_cond(t->mNextLink == next, __FILE__, __LINE__);
-  assert_cond(prev->mNextLink == t, __FILE__, __LINE__);
+
+  ASSERT_COND( t->mNextLink == next );
+  ASSERT_COND( prev->mNextLink == t );
+
   __erase(t, prev, next);
 }
 
@@ -585,10 +594,12 @@ DlListBase::_erase(DlElem* t)
 {
   DlElem* prev = t->mPrevLink;
   DlElem* next = t->mNextLink;
-  assert_cond(prev != t, __FILE__, __LINE__);
-  assert_cond(next != t, __FILE__, __LINE__);
-  assert_cond(prev->mNextLink == t, __FILE__, __LINE__);
-  assert_cond(next->mPrevLink == t, __FILE__, __LINE__);
+
+  ASSERT_COND( prev != t );
+  ASSERT_COND( next != t );
+  ASSERT_COND( prev->mNextLink == t );
+  ASSERT_COND( next->mPrevLink == t );
+
   __erase(t, prev, next);
 }
 
@@ -971,7 +982,9 @@ DlList<T>::insert(const DlListIter<T>& p,
 {
   DlElem* prev = p.mPtr;
   DlElem* next = prev->next();
-  assert_cond(next->prev() == prev, __FILE__, __LINE__);
+
+  ASSERT_COND( next->prev() == prev );
+
   _insert(t, prev, next);
 }
 

@@ -428,7 +428,7 @@ inline
 ymuint32
 McMatrix::row_num() const
 {
-  //assert_cond( mRowNum == _remain_row_size(), __FILE__, __LINE__);
+  //ASSERT_COND( mRowNum == _remain_row_size() );
   return mRowNum;
 }
 
@@ -487,7 +487,7 @@ inline
 ymuint32
 McMatrix::col_num() const
 {
-  //assert_cond( mColNum == _remain_col_size(), __FILE__, __LINE__);
+  //ASSERT_COND( mColNum == _remain_col_size() );
   return mColNum;
 }
 

@@ -25,9 +25,9 @@ FragAlloc::FragAlloc(ymuint64 max_size) :
   mMinSize = 1;
   mMinLogSize = 0;
   for ( ; mMinSize < ALIGNOF_DOUBLE; mMinSize <<= 1, ++ mMinLogSize) ;
-  assert_cond(mMinSize == ALIGNOF_DOUBLE, __FILE__, __LINE__);
+  ASSERT_COND( mMinSize == ALIGNOF_DOUBLE );
 
-  assert_cond(max_size > 0, __FILE__, __LINE__);
+  ASSERT_COND( max_size > 0 );
   mMaxPowerSize = 1;
   mMaxLogSize = 0;
   for ( ; mMaxPowerSize < max_size; mMaxPowerSize <<= 1, ++ mMaxLogSize) ;

@@ -34,7 +34,8 @@ FileInfoMgr::~FileInfoMgr()
 string
 FileInfoMgr::filename(ymuint id)
 {
-  assert_cond( id < mFiArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( id < mFiArray.size() );
+
   const _FileInfo& fi = mFiArray[id];
   return fi.mFileName;
 }
@@ -45,7 +46,8 @@ FileInfoMgr::filename(ymuint id)
 FileLoc
 FileInfoMgr::parent_loc(ymuint id)
 {
-  assert_cond( id < mFiArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( id < mFiArray.size() );
+
   const _FileInfo& fi = mFiArray[id];
   return fi.mParentLoc;
 }

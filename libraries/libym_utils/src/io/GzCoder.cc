@@ -56,7 +56,8 @@ GzCoder::open(const char* filename,
   }
 
   // ヘッダを書き込む．
-  assert_cond( mBuff.buff_size() > sizeof(header), __FILE__, __LINE__);
+  ASSERT_COND( mBuff.buff_size() > sizeof(header) );
+
   memcpy(mBuff.buff_ptr(), header, sizeof(header));
   mBuff.seek(sizeof(header));
 

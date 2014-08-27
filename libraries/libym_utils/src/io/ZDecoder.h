@@ -201,7 +201,8 @@ inline
 void
 ZDecoder::push_stack(char_type data)
 {
-  assert_cond( mStackPtr < &mStack[8000], __FILE__, __LINE__);
+  ASSERT_COND( mStackPtr < &mStack[8000] );
+
   *(mStackPtr ++) = data;
 }
 

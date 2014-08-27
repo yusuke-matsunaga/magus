@@ -140,7 +140,9 @@ MisNodeHeap::print(ostream& s)
   s << " heap_size = " << mNodeNum << endl;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     MisNode* node1 = mNodeHeap[i];
-    assert_cond( node1->mHeapIdx - 1 == i, __FILE__, __LINE__);
+
+    ASSERT_COND( node1->mHeapIdx - 1 == i );
+
     s << " Node#" << i << ": row_pos = " << node1->row_pos()
       << " value = " << node1->adj_num() << endl;
   }

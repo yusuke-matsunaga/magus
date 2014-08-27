@@ -288,7 +288,7 @@ ItvlMgrImpl::add_cell(ItvlCell* cell,
   }
   else {
     // 重複した追加は違反
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return false;
 }
@@ -481,7 +481,7 @@ ItvlMgrImpl::remove_cell(ItvlCell* cell,
 
   // この場合，ptr と cell の区間がオーバーラップしているので
   // ptr == cell でないとおかしい．
-  assert_cond( ptr == cell, __FILE__, __LINE__);
+  ASSERT_COND( ptr == cell );
   bool chg = false;
   if ( !ptr->mLchd ) {
     // 右の子供しか持たない場合
@@ -599,8 +599,8 @@ ItvlMgrImpl::add(int d)
     start = right->start();
   }
 
-  assert_cond(end < d, __FILE__, __LINE__);
-  assert_cond(start > d, __FILE__, __LINE__);
+  ASSERT_COND( end < d );
+  ASSERT_COND( start > d );
 
   if ( end + 2 == start ) {
     // 2つの区間が d で一つにつながる．
@@ -649,8 +649,8 @@ ItvlMgrImpl::add(int d1,
     start = right->mStart;
   }
 
-  assert_cond(end < d1, __FILE__, __LINE__);
-  assert_cond(start > d2, __FILE__, __LINE__);
+  ASSERT_COND( end < d1 );
+  ASSERT_COND( start > d2 );
 
   if ( end + 1 == d1 && start - 1 == d2 ) {
     // 2つの区間が [d1, d2] で一つにつながる．
@@ -700,30 +700,30 @@ ItvlMgrImpl::check_cell(ItvlCell* cell,
 
   switch ( cell->balance() ) {
   case 1: // 右が高いはず
-    assert_cond( hl < hr, __FILE__, __LINE__);
+    ASSERT_COND( hl < hr );
     break;
 
   case -1: // 左が高いはず
-    assert_cond( hl > hr, __FILE__, __LINE__);
+    ASSERT_COND( hl > hr );
     break;
 
   case 0: // 高さは等しいはず
-    assert_cond( hl == hr, __FILE__, __LINE__);
+    ASSERT_COND( hl == hr );
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   if ( cell->mLchd ) {
-    assert_cond( r1 < cell->start(), __FILE__, __LINE__);
+    ASSERT_COND( r1 < cell->start() );
     l = l1;
   }
   else {
     l = cell->start();
   }
   if ( cell->mRchd ) {
-    assert_cond( l2 > cell->end(), __FILE__, __LINE__);
+    ASSERT_COND( l2 > cell->end() );
     r = r2;
   }
   else {

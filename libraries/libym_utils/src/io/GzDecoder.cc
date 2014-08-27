@@ -201,7 +201,7 @@ GzDecoder::read(ymuint8* buff,
       if ( mZS.avail_out() > 0 ) {
 	// 出力バッファが満杯でないのに BUF_ERROR ということは
 	// 入力データが枯渇したということ．
-	assert_cond( mZS.avail_in() == 0, __FILE__, __LINE__);
+	ASSERT_COND( mZS.avail_in() == 0 );
 	// もう一回繰り返す．
 	continue;
       }

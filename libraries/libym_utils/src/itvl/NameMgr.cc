@@ -55,7 +55,8 @@ const StrBuff&
 NameMgr::new_name(bool add_name)
 {
   int d = mInterval.avail_num();
-  assert_cond(d >= 0, __FILE__, __LINE__);
+  ASSERT_COND( d >= 0 );
+
   mTmpString.reserve(mPrefix.size() + mSuffix.size() + 10);
   mTmpString.clear();
   mTmpString.put_str(mPrefix);

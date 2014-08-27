@@ -135,9 +135,13 @@ PoptMainApp::parse_options(int argc,
       return kPoptAbort;
     }
     ymuint id = static_cast<ymuint>(rc);
-    assert_cond( id > 0, __FILE__, __LINE__);
+
+    ASSERT_COND( id > 0 );
+
     -- id;
-    assert_cond( id < mOptionList.size(), __FILE__, __LINE__);
+
+    ASSERT_COND( id < mOptionList.size() );
+
     Popt* popt = mOptionList[id];
     ++ popt->mCount;
     // 該当するオプションの処理を行なう．

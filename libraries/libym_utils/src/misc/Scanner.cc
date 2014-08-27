@@ -91,7 +91,8 @@ Scanner::update()
 void
 Scanner::accept()
 {
-  assert_cond( mNeedUpdate == false, __FILE__, __LINE__);
+  ASSERT_COND( mNeedUpdate == false );
+
   mNeedUpdate = true;
   mCurLine = mNextLine;
   mCurColumn = mNextColumn;

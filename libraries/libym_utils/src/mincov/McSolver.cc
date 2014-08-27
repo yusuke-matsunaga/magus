@@ -128,7 +128,8 @@ McSolver::heuristic(vector<ymuint32>& solution)
     }
   }
 
-  assert_cond( mMatrix->verify(solution), __FILE__, __LINE__);
+  ASSERT_COND( mMatrix->verify(solution) );
+
   ymuint32 cost = mMatrix->cost(solution);
 
   return cost;

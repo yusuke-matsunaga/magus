@@ -142,7 +142,8 @@ FileBuff::FileBuff(ymuint buff_size)
 {
   mFd = -1;
   mBuffSize = buff_size;
-  assert_cond( mBuffSize > 0 , __FILE__, __LINE__);
+  ASSERT_COND( mBuffSize > 0 );
+
   mBuff = new ymuint8[mBuffSize];
   mDataSize = 0;
   mPos = mBuffSize;
@@ -243,7 +244,8 @@ inline
 void
 FileBuff::seek(ymuint64 num)
 {
-  assert_cond( mPos + num <= mDataSize, __FILE__, __LINE__);
+  ASSERT_COND( mPos + num <= mDataSize );
+
   mPos += num;
 }
 

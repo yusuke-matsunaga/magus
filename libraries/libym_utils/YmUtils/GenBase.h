@@ -140,7 +140,8 @@ inline
 ymuint
 GenBase::operator()(ymuint pos) const
 {
-  assert_cond( pos < mK, __FILE__, __LINE__);
+  ASSERT_COND( pos < mK );
+
   return mElem[pos];
 }
 
