@@ -9,7 +9,7 @@
 class Literal
 {
 %TypeHeaderCode
-#include "logic/Literal.h"
+#include "YmLogic/Literal.h"
 using nsYm::Literal;
 %End
 

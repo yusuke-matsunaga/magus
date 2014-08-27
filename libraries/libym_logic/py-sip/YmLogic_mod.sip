@@ -17,3 +17,4 @@
 %Include NpnVmap.sip
 %Include NpnMap.sip
 %Include NpnMapM.sip
+%Include SatSolver.sip
