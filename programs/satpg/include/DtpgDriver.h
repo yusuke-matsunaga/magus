@@ -11,7 +11,6 @@
 
 
 #include "satpg_nsdef.h"
-#include "DtpgMode.h"
 #include "YmNetworks/tgnet.h"
 
 
