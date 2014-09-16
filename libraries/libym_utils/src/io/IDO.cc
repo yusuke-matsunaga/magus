@@ -23,6 +23,16 @@ BEGIN_NAMESPACE_YM
 // クラス IDO
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+IDO::IDO()
+{
+}
+
+// @brief デストラクタ
+IDO::~IDO()
+{
+}
+
 // @brief read() を呼び出して結果をチェックする．
 void
 IDO::_read(ymuint8* buff,
@@ -142,18 +152,6 @@ IDO::read_str()
   else {
     return string();
   }
-}
-
-// @brief 一行分の文字列の読み出し．
-string
-IDO::read_line()
-{
-  StrBuff buf;
-  ymuint8 c;
-  while ( (c = read_8()) != '\n' && c != '\0' ) {
-    buf.put_char(c);
-  }
-  return buf;
 }
 
 
