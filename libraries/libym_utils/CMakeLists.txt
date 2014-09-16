@@ -127,6 +127,7 @@ set (mincov_SOURCES
 
 set (misc_SOURCES
   src/misc/Binder.cc
+  src/misc/Dictionary.cc
   src/misc/DlList.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
