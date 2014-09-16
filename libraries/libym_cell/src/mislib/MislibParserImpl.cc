@@ -90,8 +90,6 @@ bool
 MislibParserImpl::read_file(const string& filename,
 			    MislibMgrImpl* mgr)
 {
-  int yyparse(MislibParserImpl& parser);
-
   FileIDO ido;
   if ( !ido.open(filename) ) {
     // エラー
