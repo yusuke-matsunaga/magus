@@ -274,7 +274,7 @@ public:
   nblk() const;
 
   /// @brief 生のデータを得る．
-  ymulong
+  ymuint64
   raw_data(ymuint blk) const;
 
 
@@ -360,7 +360,7 @@ private:
   ymuint32 mBlockNum;
 
   // パックされた真理値ベクトル
-  ymulong* mVector;
+  ymuint64* mVector;
 
 };
 
@@ -519,7 +519,7 @@ TvFunc::nblk() const
 
 // 生のデータを得る．
 inline
-ymulong
+ymuint64
 TvFunc::raw_data(ymuint blk) const
 {
   return mVector[blk];
@@ -530,7 +530,7 @@ inline
 ymuint
 TvFunc::nblock(ymuint ni)
 {
-  const ymuint wsize = sizeof(ymulong) * 8;
+  const ymuint wsize = sizeof(ymuint64) * 8;
   return ((1 << ni) + wsize - 1) / wsize;
 }
 
@@ -539,7 +539,7 @@ inline
 ymuint
 TvFunc::block(ymuint pos)
 {
-  const ymuint wsize = sizeof(ymulong) * 8;
+  const ymuint wsize = sizeof(ymuint64) * 8;
   return pos / wsize;
 }
 
@@ -548,7 +548,7 @@ inline
 ymuint
 TvFunc::shift(ymuint pos)
 {
-  const ymuint wsize = sizeof(ymulong) * 8;
+  const ymuint wsize = sizeof(ymuint64) * 8;
   return pos % wsize;
 }
 

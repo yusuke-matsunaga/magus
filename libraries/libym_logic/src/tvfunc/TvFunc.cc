@@ -11,26 +11,15 @@
 #include "YmLogic/NpnMap.h"
 
 
-#if SIZEOF_LONG == 8
-// 1 ワード 64 ビットの時 1 となるマクロ
-#define WORD64 1
 // 1 ワード当たりの入力数
 #define NIPW 6
-#else
-// 1 ワード 64 ビットの時 1 となるマクロ
-#define WORD64 0
-// 1 ワード当たりの入力数
-#define NIPW 5
-#endif
 
 //#define DEBUG
 
 BEGIN_NONAMESPACE
 
-#if WORD64
-
 // コファクターマスク
-ymulong c_masks[] = {
+ymuint64 c_masks[] = {
   0xAAAAAAAAAAAAAAAA,
   0xCCCCCCCCCCCCCCCC,
   0xF0F0F0F0F0F0F0F0,
@@ -41,7 +30,7 @@ ymulong c_masks[] = {
 
 // 対称性を調べるためのテーブルその1
 // 同位相の時に用いる．
-ymulong sym_masks2[] = {
+ymuint64 sym_masks2[] = {
   0x2222222222222222, // (1, 0)
   0x0A0A0A0A0A0A0A0A, // (2, 0)
   0x0C0C0C0C0C0C0C0C, // (2, 1)
@@ -61,7 +50,7 @@ ymulong sym_masks2[] = {
 
 // 対称性を調べるためのテーブルその2
 // 逆位相の時に用いる．
-ymulong sym_masks3[] = {
+ymuint64 sym_masks3[] = {
   0x1111111111111111, // (1, 0)
   0x0505050505050505, // (2, 0)
   0x0303030303030303, // (2, 1)
@@ -93,61 +82,6 @@ ymuint s_pidx[] = {
   0, 1, 7, 22, 42, 57, 63, 64
 };
 
-#else
-
-// コファクターマスク
-ymulong c_masks[] = {
-  0xAAAAAAAA, // 10101010101010101010101010101010
-  0xCCCCCCCC, // 11001100110011001100110011001100
-  0xF0F0F0F0, // 11110000111100001111000011110000
-  0xFF00FF00, // 11111111000000001111111100000000
-  0xFFFF0000  // 11111111111111110000000000000000
-};
-
-// 対称性を調べるためのテーブルその1
-// 同位相の時に用いる．
-ymulong sym_masks2[] = {
-  0x22222222, // (1, 0)
-  0x0A0A0A0A, // (2, 0)
-  0x0C0C0C0C, // (2, 1)
-  0x00AA00AA, // (3, 0)
-  0x00CC00CC, // (3, 1)
-  0x00F000F0, // (3, 2)
-  0x0000AAAA, // (4, 0)
-  0x0000CCCC, // (4, 1)
-  0x0000F0F0, // (4, 2)
-  0x0000FF00  // (4, 3)
-};
-
-// 対称性を調べるためのテーブルその2
-// 逆位相の時に用いる．
-ymulong sym_masks3[] = {
-  0x11111111, // (1, 0)
-  0x05050505, // (2, 0)
-  0x03030303, // (2, 1)
-  0x00550055, // (3, 0)
-  0x00330033, // (3, 1)
-  0x000F000F, // (3, 2)
-  0x00005555, // (4, 0)
-  0x00003333, // (4, 1)
-  0x00000F0F, // (4, 2)
-  0x000000FF  // (4, 3)
-};
-
-ymuint s_plist[] = {
-  0,
-  1,  2,  4,  8, 16,
-  3,  5,  6,  9, 10, 12, 17, 18, 20, 24,
-  7, 11, 13, 14, 19, 21, 22, 25, 26, 28,
-  15, 23, 27, 29, 30,
-  31
-};
-
-ymuint s_pidx[] = {
-  0, 1, 6, 16, 26, 31, 32
-};
-
-#endif
 
 #include "w_table.h"
 
@@ -164,7 +98,7 @@ BEGIN_NAMESPACE_YM
 TvFunc::TvFunc(ymuint ni) :
   mInputNum(ni),
   mBlockNum(nblock(ni)),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = 0UL;
@@ -177,7 +111,7 @@ TvFunc::TvFunc(ymuint ni,
 	       int dummy) :
   mInputNum(ni),
   mBlockNum(nblock(ni)),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   switch ( mInputNum ) {
   case 0:
@@ -204,11 +138,9 @@ TvFunc::TvFunc(ymuint ni,
     mVector[0] = 0xFFFFFFFF;
     break;
 
-#if WORD64
   case 6:
     mVector[0] = 0xFFFFFFFFFFFFFFFF;
     break;
-#endif
 
   default:
     for (ymuint i = 0; i < mBlockNum; ++ i) {
@@ -223,7 +155,7 @@ TvFunc::TvFunc(ymuint ni,
 	       bool inv) :
   mInputNum(ni),
   mBlockNum(nblock(ni)),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   assert_cond( varid.val() < ni, __FILE__, __LINE__);
   switch ( ni ) {
@@ -394,7 +326,6 @@ TvFunc::TvFunc(ymuint ni,
     }
     break;
 
-#if WORD64
   case 6:
     switch ( varid.val() ) {
     case 0:
@@ -456,11 +387,10 @@ TvFunc::TvFunc(ymuint ni,
       break;
     }
     break;
-#endif
 
   default:
     if ( varid.val() < NIPW ) {
-      ymulong pat = c_masks[varid.val()];
+      ymuint64 pat = c_masks[varid.val()];
       if ( inv ) {
 	pat = ~pat;
       }
@@ -471,14 +401,14 @@ TvFunc::TvFunc(ymuint ni,
     else {
       ymuint i5 = varid.val() - NIPW;
       ymuint check = 1U << i5;
-      ymulong pat0;
+      ymuint64 pat0;
       if ( inv ) {
 	pat0 = 0UL;
       }
       else {
 	pat0 = ~(0UL);
       }
-      ymulong pat1 = ~pat0;
+      ymuint64 pat1 = ~pat0;
       for (ymuint b = 0; b < mBlockNum; ++ b) {
 	if ( b & check ) {
 	  mVector[b] = pat0;
@@ -497,12 +427,12 @@ TvFunc::TvFunc(ymuint ni,
 	       const vector<int>& values) :
   mInputNum(ni),
   mBlockNum(nblock(ni)),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   ymuint ni_pow = 1U << ni;
   assert_cond(values.size() == ni_pow, __FILE__, __LINE__);
   if ( ni <= NIPW ) {
-    ymulong pat = 0UL;
+    ymuint64 pat = 0UL;
     for (ymuint i = 0; i < ni_pow; ++ i) {
       if ( values[i] ) {
 	pat |= 1UL << i;
@@ -514,7 +444,7 @@ TvFunc::TvFunc(ymuint ni,
     ymuint nipb_pow = 1U << NIPW;
     ymuint base = 0;
     for (ymuint i = 0; i < mBlockNum; ++ i, base += nipb_pow) {
-      ymulong pat = 0UL;
+      ymuint64 pat = 0UL;
       for (ymuint j = 0; j < nipb_pow; ++ j) {
 	if ( values[base + j] ) {
 	  pat |= 1UL << j;
@@ -529,7 +459,7 @@ TvFunc::TvFunc(ymuint ni,
 TvFunc::TvFunc(const TvFunc& src) :
   mInputNum(src.mInputNum),
   mBlockNum(src.mBlockNum),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   for (ymuint b = 0; b < mBlockNum; ++ b) {
     mVector[b] = src.mVector[b];
@@ -543,7 +473,7 @@ TvFunc::operator=(const TvFunc& src)
   if ( mBlockNum != src.mBlockNum ) {
     delete [] mVector;
     mBlockNum = src.mBlockNum;
-    mVector = new ymulong[mBlockNum];
+    mVector = new ymuint64[mBlockNum];
   }
   mInputNum = src.mInputNum;
 
@@ -619,11 +549,9 @@ TvFunc::negate()
     mVector[0] ^= 0xFFFFFFFF;
     break;
 
-#if WORD64
   case 6:
     mVector[0] ^= 0xFFFFFFFFFFFFFFFF;
     break;
-#endif
 
   default:
     for (ymuint b = 0; b < mBlockNum; ++ b) {
@@ -674,13 +602,13 @@ TvFunc::set_cofactor(VarId varid,
 {
   ymuint pos = varid.val();
   if ( pos < NIPW ) {
-    ymulong mask = c_masks[pos];
+    ymuint64 mask = c_masks[pos];
     if ( inv ) {
       mask = ~mask;
     }
     int shift = 1 << pos;
     for (ymuint b = 0; b < mBlockNum; ++ b) {
-      ymulong pat = mVector[b] & mask;
+      ymuint64 pat = mVector[b] & mask;
       if ( inv ) {
 	pat |= (pat << shift);
       }
@@ -715,7 +643,7 @@ BEGIN_NONAMESPACE
 // 0入力用
 inline
 ymuint
-count_onebits_0(ymulong word)
+count_onebits_0(ymuint64 word)
 {
   return word & 0x1;
 }
@@ -724,9 +652,9 @@ count_onebits_0(ymulong word)
 // 1入力用
 inline
 ymuint
-count_onebits_1(ymulong word)
+count_onebits_1(ymuint64 word)
 {
-  const ymulong mask1 = 0x3;
+  const ymuint64 mask1 = 0x3;
 
   word = (word & mask1) + ((word >> 1) & mask1);
   return word;
@@ -736,10 +664,10 @@ count_onebits_1(ymulong word)
 // 2入力用
 inline
 ymuint
-count_onebits_2(ymulong word)
+count_onebits_2(ymuint64 word)
 {
-  const ymulong mask1  = 0x5;
-  const ymulong mask2  = 0x3;
+  const ymuint64 mask1  = 0x5;
+  const ymuint64 mask2  = 0x3;
 
   word = (word & mask1) + ((word >> 1) & mask1);
   word = (word & mask2) + ((word >> 2) & mask2);
@@ -750,11 +678,11 @@ count_onebits_2(ymulong word)
 // 3入力用
 inline
 ymuint
-count_onebits_3(ymulong word)
+count_onebits_3(ymuint64 word)
 {
-  const ymulong mask1  = 0x55;
-  const ymulong mask2  = 0x33;
-  const ymulong mask4  = 0x0f;
+  const ymuint64 mask1  = 0x55;
+  const ymuint64 mask2  = 0x33;
+  const ymuint64 mask4  = 0x0f;
 
   word = (word & mask1) + ((word >> 1) & mask1);
   word = (word & mask2) + ((word >> 2) & mask2);
@@ -766,12 +694,12 @@ count_onebits_3(ymulong word)
 // 4入力用
 inline
 ymuint
-count_onebits_4(ymulong word)
+count_onebits_4(ymuint64 word)
 {
-  const ymulong mask1  = 0x5555;
-  const ymulong mask2  = 0x3333;
-  const ymulong mask4  = 0x0f0f;
-  const ymulong mask8  = 0x00ff;
+  const ymuint64 mask1  = 0x5555;
+  const ymuint64 mask2  = 0x3333;
+  const ymuint64 mask4  = 0x0f0f;
+  const ymuint64 mask8  = 0x00ff;
 
   word = (word & mask1) + ((word >> 1) & mask1);
   word = (word & mask2) + ((word >> 2) & mask2);
@@ -784,13 +712,13 @@ count_onebits_4(ymulong word)
 // 5入力用
 inline
 ymuint
-count_onebits_5(ymulong word)
+count_onebits_5(ymuint64 word)
 {
-  const ymulong mask1   = 0x55555555;
-  const ymulong mask2   = 0x33333333;
-  const ymulong mask4   = 0x0f0f0f0f;
-  const ymulong mask8   = 0x00ff00ff;
-  const ymulong mask16  = 0x0000ffff;
+  const ymuint64 mask1   = 0x55555555;
+  const ymuint64 mask2   = 0x33333333;
+  const ymuint64 mask4   = 0x0f0f0f0f;
+  const ymuint64 mask8   = 0x00ff00ff;
+  const ymuint64 mask16  = 0x0000ffff;
 
   word = (word & mask1)  + ((word >>  1) & mask1);
   word = (word & mask2)  + ((word >>  2) & mask2);
@@ -800,20 +728,18 @@ count_onebits_5(ymulong word)
   return word;
 }
 
-#if WORD64
-
 // word の中の 1 のビットを数える．
 // 6入力用
 inline
 ymuint
-count_onebits_6(ymulong word)
+count_onebits_6(ymuint64 word)
 {
-  const ymulong mask1  = 0x5555555555555555;
-  const ymulong mask2  = 0x3333333333333333;
-  const ymulong mask4  = 0x0f0f0f0f0f0f0f0f;
-  const ymulong mask8  = 0x00ff00ff00ff00ff;
-  const ymulong mask16 = 0x0000ffff0000ffff;
-  const ymulong mask32 = 0x00000000ffffffff;
+  const ymuint64 mask1  = 0x5555555555555555;
+  const ymuint64 mask2  = 0x3333333333333333;
+  const ymuint64 mask4  = 0x0f0f0f0f0f0f0f0f;
+  const ymuint64 mask8  = 0x00ff00ff00ff00ff;
+  const ymuint64 mask16 = 0x0000ffff0000ffff;
+  const ymuint64 mask32 = 0x00000000ffffffff;
 
   word = (word & mask1)  + ((word >>  1) & mask1);
   word = (word & mask2)  + ((word >>  2) & mask2);
@@ -827,22 +753,10 @@ count_onebits_6(ymulong word)
 // word の中の 1 のビットを数える．
 inline
 ymuint
-count_onebits(ymulong word)
+count_onebits(ymuint64 word)
 {
   return count_onebits_6(word);
 }
-
-#else
-
-// word の中の 1 のビットを数える．
-inline
-ymuint
-count_onebits(ymulong word)
-{
-  return count_onebits_5(word);
-}
-
-#endif
 
 END_NONAMESPACE
 
@@ -857,10 +771,7 @@ TvFunc::count_zero() const
   case 3: return (1 << 3) - count_onebits_3(mVector[0]);
   case 4: return (1 << 4) - count_onebits_4(mVector[0]);
   case 5: return (1 << 5) - count_onebits_5(mVector[0]);
-
-#if WORD64
   case 6: return (1 << 6) - count_onebits_6(mVector[0]);
-#endif
 
   default:
     ;
@@ -884,10 +795,7 @@ TvFunc::count_one() const
   case 3: return count_onebits_3(mVector[0]);
   case 4: return count_onebits_4(mVector[0]);
   case 5: return count_onebits_5(mVector[0]);
-
-#if WORD64
   case 6: return count_onebits_6(mVector[0]);
-#endif
 
   default:
     ;
@@ -911,10 +819,7 @@ TvFunc::walsh_0() const
   case 3: return (1 << 3) - count_onebits_3(mVector[0]) * 2;
   case 4: return (1 << 4) - count_onebits_4(mVector[0]) * 2;
   case 5: return (1 << 5) - count_onebits_5(mVector[0]) * 2;
-
-#if WORD64
   case 6: return (1 << 6) - count_onebits_6(mVector[0]) * 2;
-#endif
 
   default:
     ;
@@ -939,10 +844,7 @@ TvFunc::walsh_1(VarId varid) const
   case 3: return (1 << 3) - count_onebits_3(mVector[0] ^ c_masks[pos]) * 2;
   case 4: return (1 << 4) - count_onebits_4(mVector[0] ^ c_masks[pos]) * 2;
   case 5: return (1 << 5) - count_onebits_5(mVector[0] ^ c_masks[pos]) * 2;
-
-#if WORD64
   case 6: return (1 << 6) - count_onebits_6(mVector[0] ^ c_masks[pos]) * 2;
-#endif
 
   default:
     ;
@@ -952,7 +854,7 @@ TvFunc::walsh_1(VarId varid) const
   int c = 0;
   int n = 1 << input_num();
   if ( pos < NIPW ) {
-    ymulong mask = c_masks[pos];
+    ymuint64 mask = c_masks[pos];
     for (ymuint i = 0; i < mBlockNum; ++ i) {
       c += count_onebits(mVector[i] ^ mask);
     }
@@ -968,7 +870,7 @@ TvFunc::walsh_1(VarId varid) const
     //   }
     // }
     for (ymuint b = 0; b < mBlockNum; ++ b) {
-      ymulong mask = 0UL - ((b >> i5) & 1UL);
+      ymuint64 mask = 0UL - ((b >> i5) & 1UL);
       c += count_onebits(mVector[b] ^ mask);
     }
   }
@@ -1005,10 +907,8 @@ TvFunc::walsh_2(VarId var1,
   case 5:
     return (1 << 5) - count_onebits_5(mVector[0] ^ c_masks[i] ^ c_masks[j]) * 2;
 
-#if WORD64
   case 6:
     return (1 << 6) - count_onebits_6(mVector[0] ^ c_masks[i] ^ c_masks[j]) * 2;
-#endif
 
   default:
     ;
@@ -1023,7 +923,7 @@ TvFunc::walsh_2(VarId var1,
 
   ymint c = 0;
   if ( i < NIPW ) {
-    ymulong mask = c_masks[i] ^ c_masks[j];
+    ymuint64 mask = c_masks[i] ^ c_masks[j];
     for (ymuint i = 0; i < mBlockNum; ++ i) {
       c += count_onebits(mVector[i] ^ mask);
     }
@@ -1040,9 +940,9 @@ TvFunc::walsh_2(VarId var1,
     //   }
     // }
     ymuint i5 = i - NIPW;
-    ymulong mask = c_masks[j];
+    ymuint64 mask = c_masks[j];
     for (ymuint i = 0; i < mBlockNum; ++ i) {
-      ymulong mask1 = 0UL - ((i >> i5) & 1UL);
+      ymuint64 mask1 = 0UL - ((i >> i5) & 1UL);
       c += count_onebits(mVector[i] ^ mask ^ mask1);
     }
   }
@@ -1061,7 +961,7 @@ TvFunc::walsh_2(VarId var1,
     ymuint i5 = i - NIPW;
     ymuint j5 = j - NIPW;
     for (ymuint i = 0; i < mBlockNum; ++ i) {
-      ymulong mask = 0UL - (((i >> i5) ^ (i >> j5)) & 1UL);
+      ymuint64 mask = 0UL - (((i >> i5) ^ (i >> j5)) & 1UL);
       c += count_onebits(mVector[i] ^ mask);
     }
   }
@@ -1073,20 +973,20 @@ BEGIN_NONAMESPACE
 // 5入力の walsh_01 用サブルーティン
 inline
 ymint
-walsh_01_5b(ymulong* src_vec,
+walsh_01_5b(ymuint64* src_vec,
 	    ymint vec[])
 {
-  const ymulong mask1   = 0x55555555;
-  const ymulong mask2   = 0x33333333;
-  const ymulong mask4   = 0x0f0f0f0f;
-  const ymulong mask8   = 0x00ff00ff;
-  const ymulong mask16  = 0x0000ffff;
+  const ymuint64 mask1   = 0x55555555;
+  const ymuint64 mask2   = 0x33333333;
+  const ymuint64 mask4   = 0x0f0f0f0f;
+  const ymuint64 mask8   = 0x00ff00ff;
+  const ymuint64 mask16  = 0x0000ffff;
 
-  ymulong tmp;
+  ymuint64 tmp;
   {
     tmp = src_vec[0];
-    ymulong tmp0 = tmp & mask1;
-    ymulong tmp1 = (tmp >> 1) & mask1;
+    ymuint64 tmp0 = tmp & mask1;
+    ymuint64 tmp1 = (tmp >> 1) & mask1;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x55555555;
     tmp0 = (tmp0 & mask2)  + ((tmp0 >>  2) & mask2);
@@ -1097,8 +997,8 @@ walsh_01_5b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask2;
-    ymulong tmp1 = (tmp >> 2) & mask2;
+    ymuint64 tmp0 = tmp & mask2;
+    ymuint64 tmp1 = (tmp >> 2) & mask2;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x22222222;
     tmp0 = (tmp0 & mask4)  + ((tmp0 >>  4) & mask4);
@@ -1108,8 +1008,8 @@ walsh_01_5b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask4;
-    ymulong tmp1 = (tmp >> 4) & mask4;
+    ymuint64 tmp0 = tmp & mask4;
+    ymuint64 tmp1 = (tmp >> 4) & mask4;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x04040404;
     tmp0 = (tmp0 & mask8)  + ((tmp0 >>  8) & mask8);
@@ -1118,8 +1018,8 @@ walsh_01_5b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask8;
-    ymulong tmp1 = (tmp >> 8) & mask8;
+    ymuint64 tmp0 = tmp & mask8;
+    ymuint64 tmp1 = (tmp >> 8) & mask8;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x00080008;
     tmp0 = (tmp0 & mask16) + ((tmp0 >> 16) & mask16);
@@ -1127,8 +1027,8 @@ walsh_01_5b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask16;
-    ymulong tmp1 = (tmp >> 16) & mask16;
+    ymuint64 tmp0 = tmp & mask16;
+    ymuint64 tmp1 = (tmp >> 16) & mask16;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x00000010;
     vec[4] += tmp0;
@@ -1137,26 +1037,24 @@ walsh_01_5b(ymulong* src_vec,
   return tmp;
 }
 
-#if WORD64
-
 // 6 入力の walsh_01 用サブルーティン
 inline
 ymint
-walsh_01_6b(ymulong* src_vec,
+walsh_01_6b(ymuint64* src_vec,
 	    ymint vec[])
 {
-  const ymulong mask1   = 0x5555555555555555;
-  const ymulong mask2   = 0x3333333333333333;
-  const ymulong mask4   = 0x0f0f0f0f0f0f0f0f;
-  const ymulong mask8   = 0x00ff00ff00ff00ff;
-  const ymulong mask16  = 0x0000ffff0000ffff;
-  const ymulong mask32  = 0x00000000ffffffff;
+  const ymuint64 mask1   = 0x5555555555555555;
+  const ymuint64 mask2   = 0x3333333333333333;
+  const ymuint64 mask4   = 0x0f0f0f0f0f0f0f0f;
+  const ymuint64 mask8   = 0x00ff00ff00ff00ff;
+  const ymuint64 mask16  = 0x0000ffff0000ffff;
+  const ymuint64 mask32  = 0x00000000ffffffff;
 
-  ymulong tmp;
+  ymuint64 tmp;
   {
     tmp = src_vec[0];
-    ymulong tmp0 = tmp & mask1;
-    ymulong tmp1 = (tmp >> 1) & mask1;
+    ymuint64 tmp0 = tmp & mask1;
+    ymuint64 tmp1 = (tmp >> 1) & mask1;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x5555555555555555;
     tmp0 = (tmp0 & mask2)  + ((tmp0 >> 2) & mask2);
@@ -1168,8 +1066,8 @@ walsh_01_6b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask2;
-    ymulong tmp1 = (tmp >> 2) & mask2;
+    ymuint64 tmp0 = tmp & mask2;
+    ymuint64 tmp1 = (tmp >> 2) & mask2;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x2222222222222222;
     tmp0 = (tmp0 & mask4)  + ((tmp0 >> 4) & mask4);
@@ -1180,8 +1078,8 @@ walsh_01_6b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask4;
-    ymulong tmp1 = (tmp >> 4) & mask4;
+    ymuint64 tmp0 = tmp & mask4;
+    ymuint64 tmp1 = (tmp >> 4) & mask4;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x0404040404040404;
     tmp0 = (tmp0 & mask8)  + ((tmp0 >> 8) & mask8);
@@ -1191,8 +1089,8 @@ walsh_01_6b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask8;
-    ymulong tmp1 = (tmp >> 8) & mask8;
+    ymuint64 tmp0 = tmp & mask8;
+    ymuint64 tmp1 = (tmp >> 8) & mask8;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x0008000800080008;
     tmp0 = (tmp0 & mask16) + ((tmp0 >> 16) & mask16);
@@ -1201,8 +1099,8 @@ walsh_01_6b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask16;
-    ymulong tmp1 = (tmp >> 16) & mask16;
+    ymuint64 tmp0 = tmp & mask16;
+    ymuint64 tmp1 = (tmp >> 16) & mask16;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x0000001000000010;
     tmp0 = (tmp0 & mask32) + ((tmp0 >> 32) & mask32);
@@ -1210,8 +1108,8 @@ walsh_01_6b(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask32;
-    ymulong tmp1 = (tmp >> 32) & mask32;
+    ymuint64 tmp0 = tmp & mask32;
+    ymuint64 tmp1 = (tmp >> 32) & mask32;
     tmp =tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x0000000000000020;
     vec[5] += tmp0;
@@ -1220,26 +1118,10 @@ walsh_01_6b(ymulong* src_vec,
   return tmp;
 }
 
-#else
-
-// 6入力の walsh_01 用サブルーティン
-inline
-ymint
-walsh_01_6b(ymulong* src_vec,
-	    ymint vec[])
-{
-  ymint ans0 = walsh_01_5b(src_vec,                     vec);
-  ymint ans1 = walsh_01_5b(src_vec + (1 << (5 - NIPW)), vec);
-  vec[5] += ans0 + ((1 << 5) - ans1);
-  return ans0 + ans1;
-}
-
-#endif
-
 // 7入力の walsh_01 用サブルーティン
 inline
 ymint
-walsh_01_7b(ymulong* src_vec,
+walsh_01_7b(ymuint64* src_vec,
 	    ymint vec[])
 {
   ymint ans0 = walsh_01_6b(src_vec,                     vec);
@@ -1251,7 +1133,7 @@ walsh_01_7b(ymulong* src_vec,
 // 8入力の walsh_01 用サブルーティン
 inline
 ymint
-walsh_01_8b(ymulong* src_vec,
+walsh_01_8b(ymuint64* src_vec,
 	    ymint vec[])
 {
   ymint ans0 = walsh_01_7b(src_vec,                     vec);
@@ -1263,7 +1145,7 @@ walsh_01_8b(ymulong* src_vec,
 // 9入力の walsh_01 用サブルーティン
 inline
 ymint
-walsh_01_9b(ymulong* src_vec,
+walsh_01_9b(ymuint64* src_vec,
 	    ymint vec[])
 {
   ymint ans0 = walsh_01_8b(src_vec,                     vec);
@@ -1275,7 +1157,7 @@ walsh_01_9b(ymulong* src_vec,
 // 10入力の walsh_01 用サブルーティン
 inline
 ymint
-walsh_01_10b(ymulong* src_vec,
+walsh_01_10b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_9b(src_vec,                     vec);
@@ -1286,7 +1168,7 @@ walsh_01_10b(ymulong* src_vec,
 
 // 11入力の walsh_01 用サブルーティン
 ymint
-walsh_01_11b(ymulong* src_vec,
+walsh_01_11b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_10b(src_vec,                      vec);
@@ -1297,7 +1179,7 @@ walsh_01_11b(ymulong* src_vec,
 
 // 12入力の walsh_01 用サブルーティン
 ymint
-walsh_01_12b(ymulong* src_vec,
+walsh_01_12b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_11b(src_vec,                      vec);
@@ -1308,7 +1190,7 @@ walsh_01_12b(ymulong* src_vec,
 
 // 13入力の walsh_01 用サブルーティン
 ymint
-walsh_01_13b(ymulong* src_vec,
+walsh_01_13b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_12b(src_vec,                      vec);
@@ -1319,7 +1201,7 @@ walsh_01_13b(ymulong* src_vec,
 
 // 14入力の walsh_01 用サブルーティン
 ymint
-walsh_01_14b(ymulong* src_vec,
+walsh_01_14b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_13b(src_vec,                      vec);
@@ -1330,7 +1212,7 @@ walsh_01_14b(ymulong* src_vec,
 
 // 15入力の walsh_01 用サブルーティン
 ymint
-walsh_01_15b(ymulong* src_vec,
+walsh_01_15b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_14b(src_vec,                      vec);
@@ -1341,7 +1223,7 @@ walsh_01_15b(ymulong* src_vec,
 
 // 16入力の walsh_01 用サブルーティン
 ymint
-walsh_01_16b(ymulong* src_vec,
+walsh_01_16b(ymuint64* src_vec,
 	     int vec[])
 {
   ymint ans0 = walsh_01_15b(src_vec,                      vec);
@@ -1352,7 +1234,7 @@ walsh_01_16b(ymulong* src_vec,
 
 // 17入力の walsh_01 用サブルーティン
 ymint
-walsh_01_17b(ymulong* src_vec,
+walsh_01_17b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_16b(src_vec,                      vec);
@@ -1363,7 +1245,7 @@ walsh_01_17b(ymulong* src_vec,
 
 // 18入力の walsh_01 用サブルーティン
 ymint
-walsh_01_18b(ymulong* src_vec,
+walsh_01_18b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_17b(src_vec,                      vec);
@@ -1374,7 +1256,7 @@ walsh_01_18b(ymulong* src_vec,
 
 // 19入力の walsh_01 用サブルーティン
 ymint
-walsh_01_19b(ymulong* src_vec,
+walsh_01_19b(ymuint64* src_vec,
 	     ymint vec[])
 {
   ymint ans0 = walsh_01_18b(src_vec,                      vec);
@@ -1386,18 +1268,18 @@ walsh_01_19b(ymulong* src_vec,
 // 1入力の walsh_01 本体
 inline
 ymint
-walsh_01_1(ymulong* src_vec,
+walsh_01_1(ymuint64* src_vec,
 	   ymint vec[])
 {
-  const ymulong mask1   = 0x3;
+  const ymuint64 mask1   = 0x3;
 
   const ymint n = (1 << 1);
 
-  ymulong tmp;
+  ymuint64 tmp;
   {
     tmp = src_vec[0];
-    ymulong tmp0 = tmp & mask1;
-    ymulong tmp1 = (tmp >> 1) & mask1;
+    ymuint64 tmp0 = tmp & mask1;
+    ymuint64 tmp1 = (tmp >> 1) & mask1;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x1;
     vec[0] = n - tmp0 * 2;
@@ -1409,19 +1291,19 @@ walsh_01_1(ymulong* src_vec,
 // 2入力の walsh_01 本体
 inline
 ymint
-walsh_01_2(ymulong* src_vec,
+walsh_01_2(ymuint64* src_vec,
 	   ymint vec[])
 {
-  const ymulong mask1   = 0x5;
-  const ymulong mask2   = 0x3;
+  const ymuint64 mask1   = 0x5;
+  const ymuint64 mask2   = 0x3;
 
   const ymint n = (1 << 2);
 
-  ymulong tmp;
+  ymuint64 tmp;
   {
     tmp = src_vec[0];
-    ymulong tmp0 = tmp & mask1;
-    ymulong tmp1 = (tmp >> 1) & mask1;
+    ymuint64 tmp0 = tmp & mask1;
+    ymuint64 tmp1 = (tmp >> 1) & mask1;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x5;
     tmp0 = (tmp0 & mask2)  + ((tmp0 >>  2) & mask2);
@@ -1429,8 +1311,8 @@ walsh_01_2(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask2;
-    ymulong tmp1 = (tmp >> 2) & mask2;
+    ymuint64 tmp0 = tmp & mask2;
+    ymuint64 tmp1 = (tmp >> 2) & mask2;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x2;
     vec[1] = n - tmp0 * 2;
@@ -1442,20 +1324,20 @@ walsh_01_2(ymulong* src_vec,
 // 3入力の walsh_01 本体
 inline
 ymint
-walsh_01_3(ymulong* src_vec,
+walsh_01_3(ymuint64* src_vec,
 	   ymint vec[])
 {
-  const ymulong mask1   = 0x55;
-  const ymulong mask2   = 0x33;
-  const ymulong mask4   = 0x0f;
+  const ymuint64 mask1   = 0x55;
+  const ymuint64 mask2   = 0x33;
+  const ymuint64 mask4   = 0x0f;
 
   const ymint n = (1 << 3);
 
-  ymulong tmp;
+  ymuint64 tmp;
   {
     tmp = src_vec[0];
-    ymulong tmp0 = tmp & mask1;
-    ymulong tmp1 = (tmp >> 1) & mask1;
+    ymuint64 tmp0 = tmp & mask1;
+    ymuint64 tmp1 = (tmp >> 1) & mask1;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x55;
     tmp0 = (tmp0 & mask2)  + ((tmp0 >>  2) & mask2);
@@ -1464,8 +1346,8 @@ walsh_01_3(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask2;
-    ymulong tmp1 = (tmp >> 2) & mask2;
+    ymuint64 tmp0 = tmp & mask2;
+    ymuint64 tmp1 = (tmp >> 2) & mask2;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x22;
     tmp0 = (tmp0 & mask4)  + ((tmp0 >>  4) & mask4);
@@ -1473,8 +1355,8 @@ walsh_01_3(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask4;
-    ymulong tmp1 = (tmp >> 4) & mask4;
+    ymuint64 tmp0 = tmp & mask4;
+    ymuint64 tmp1 = (tmp >> 4) & mask4;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x04;
     vec[2] = n - tmp0 * 2;
@@ -1486,21 +1368,21 @@ walsh_01_3(ymulong* src_vec,
 // 4入力の walsh_01 本体
 inline
 ymint
-walsh_01_4(ymulong* src_vec,
+walsh_01_4(ymuint64* src_vec,
 	   ymint vec[])
 {
-  const ymulong mask1   = 0x5555;
-  const ymulong mask2   = 0x3333;
-  const ymulong mask4   = 0x0f0f;
-  const ymulong mask8   = 0x00ff;
+  const ymuint64 mask1   = 0x5555;
+  const ymuint64 mask2   = 0x3333;
+  const ymuint64 mask4   = 0x0f0f;
+  const ymuint64 mask8   = 0x00ff;
 
   const ymint n = (1 << 4);
 
-  ymulong tmp;
+  ymuint64 tmp;
   {
     tmp = src_vec[0];
-    ymulong tmp0 = tmp & mask1;
-    ymulong tmp1 = (tmp >> 1) & mask1;
+    ymuint64 tmp0 = tmp & mask1;
+    ymuint64 tmp1 = (tmp >> 1) & mask1;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x5555;
     tmp0 = (tmp0 & mask2)  + ((tmp0 >>  2) & mask2);
@@ -1510,8 +1392,8 @@ walsh_01_4(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask2;
-    ymulong tmp1 = (tmp >> 2) & mask2;
+    ymuint64 tmp0 = tmp & mask2;
+    ymuint64 tmp1 = (tmp >> 2) & mask2;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x2222;
     tmp0 = (tmp0 & mask4)  + ((tmp0 >>  4) & mask4);
@@ -1520,8 +1402,8 @@ walsh_01_4(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask4;
-    ymulong tmp1 = (tmp >> 4) & mask4;
+    ymuint64 tmp0 = tmp & mask4;
+    ymuint64 tmp1 = (tmp >> 4) & mask4;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x0404;
     tmp0 = (tmp0 & mask8)  + ((tmp0 >>  8) & mask8);
@@ -1529,8 +1411,8 @@ walsh_01_4(ymulong* src_vec,
   }
 
   {
-    ymulong tmp0 = tmp & mask8;
-    ymulong tmp1 = (tmp >> 8) & mask8;
+    ymuint64 tmp0 = tmp & mask8;
+    ymuint64 tmp1 = (tmp >> 8) & mask8;
     tmp = tmp0 + tmp1;
     tmp0 = tmp0 - tmp1 + 0x0008;
     vec[3] = n - tmp0 * 2;
@@ -1542,7 +1424,7 @@ walsh_01_4(ymulong* src_vec,
 // 5入力の walsh_01 本体
 inline
 ymint
-walsh_01_5(ymulong* src_vec,
+walsh_01_5(ymuint64* src_vec,
 	   ymint vec[])
 {
   for (ymuint i = 0; i < 5; ++ i) {
@@ -1558,12 +1440,10 @@ walsh_01_5(ymulong* src_vec,
   return n - ans * 2;
 }
 
-#if WORD64
-
 // 6入力の walsh_01 本体
 inline
 ymint
-walsh_01_6(ymulong* src_vec,
+walsh_01_6(ymuint64* src_vec,
 	   ymint vec[])
 {
   for (ymuint i = 0; i < 6; ++ i) {
@@ -1579,35 +1459,10 @@ walsh_01_6(ymulong* src_vec,
   return n - ans * 2;
 }
 
-#else
-
-// 6入力の walsh_01 本体
-inline
-ymint
-walsh_01_6(ymulong* src_vec,
-	   ymint vec[])
-{
-  for (ymuint i = 0; i < 5; ++ i) {
-    vec[i] = 0;
-  }
-
-  ymint ans0 = walsh_01_5b(src_vec, vec);
-  ymint ans1 = walsh_01_5b(src_vec + (1 << (5 - NIPW)), vec);
-
-  const ymint n = (1 << 6);
-  for (ymuint i = 0; i < 5; ++ i) {
-    vec[i] = n - vec[i] * 2;
-  }
-  vec[5] = (ans1 - ans0) * 2;
-  return n - (ans0 + ans1) * 2;
-}
-
-#endif
-
 // 7入力の walsh_01 本体
 inline
 ymint
-walsh_01_7(ymulong* src_vec,
+walsh_01_7(ymuint64* src_vec,
 	   ymint vec[])
 {
   for (ymuint i = 0; i < 6; ++ i) {
@@ -1628,7 +1483,7 @@ walsh_01_7(ymulong* src_vec,
 // 8入力の walsh_01 本体
 inline
 ymint
-walsh_01_8(ymulong* src_vec,
+walsh_01_8(ymuint64* src_vec,
 	   ymint vec[])
 {
   for (ymuint i = 0; i < 7; ++ i) {
@@ -1649,7 +1504,7 @@ walsh_01_8(ymulong* src_vec,
 // 9入力の walsh_01 本体
 inline
 ymint
-walsh_01_9(ymulong* src_vec,
+walsh_01_9(ymuint64* src_vec,
 	   ymint vec[])
 {
   for (ymuint i = 0; i < 8; ++ i) {
@@ -1670,7 +1525,7 @@ walsh_01_9(ymulong* src_vec,
 // 10入力の walsh_01 本体
 inline
 ymint
-walsh_01_10(ymulong* src_vec,
+walsh_01_10(ymuint64* src_vec,
 	    int vec[])
 {
   for (ymuint i = 0; i < 9; ++ i) {
@@ -1690,7 +1545,7 @@ walsh_01_10(ymulong* src_vec,
 
 // 11入力の walsh_01 本体
 ymint
-walsh_01_11(ymulong* src_vec,
+walsh_01_11(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 10; ++ i) {
@@ -1710,7 +1565,7 @@ walsh_01_11(ymulong* src_vec,
 
 // 12入力の walsh_01 本体
 ymint
-walsh_01_12(ymulong* src_vec,
+walsh_01_12(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 11; ++ i) {
@@ -1730,7 +1585,7 @@ walsh_01_12(ymulong* src_vec,
 
 // 13入力の walsh_01 本体
 ymint
-walsh_01_13(ymulong* src_vec,
+walsh_01_13(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 12; ++ i) {
@@ -1750,7 +1605,7 @@ walsh_01_13(ymulong* src_vec,
 
 // 14入力の walsh_01 本体
 ymint
-walsh_01_14(ymulong* src_vec,
+walsh_01_14(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 13; ++ i) {
@@ -1770,7 +1625,7 @@ walsh_01_14(ymulong* src_vec,
 
 // 15入力の walsh_01 本体
 ymint
-walsh_01_15(ymulong* src_vec,
+walsh_01_15(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 14; ++ i) {
@@ -1790,7 +1645,7 @@ walsh_01_15(ymulong* src_vec,
 
 // 16入力の walsh_01 本体
 ymint
-walsh_01_16(ymulong* src_vec,
+walsh_01_16(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 15; ++ i) {
@@ -1810,7 +1665,7 @@ walsh_01_16(ymulong* src_vec,
 
 // 17入力の walsh_01 本体
 ymint
-walsh_01_17(ymulong* src_vec,
+walsh_01_17(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 16; ++ i) {
@@ -1830,7 +1685,7 @@ walsh_01_17(ymulong* src_vec,
 
 // 18入力の walsh_01 本体
 ymint
-walsh_01_18(ymulong* src_vec,
+walsh_01_18(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 17; ++ i) {
@@ -1850,7 +1705,7 @@ walsh_01_18(ymulong* src_vec,
 
 // 19入力の walsh_01 本体
 ymint
-walsh_01_19(ymulong* src_vec,
+walsh_01_19(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 18; ++ i) {
@@ -1870,7 +1725,7 @@ walsh_01_19(ymulong* src_vec,
 
 // 20入力の walsh_01 本体
 ymint
-walsh_01_20(ymulong* src_vec,
+walsh_01_20(ymuint64* src_vec,
 	    ymint vec[])
 {
   for (ymuint i = 0; i < 19; ++ i) {
@@ -1881,7 +1736,7 @@ walsh_01_20(ymulong* src_vec,
   ymint ans1 = walsh_01_19b(src_vec + (1 << (19 - NIPW)), vec);
 
   const ymint n = (1 << 20);
-  for (ymulong i = 0; i < 19; ++ i) {
+  for (ymuint64 i = 0; i < 19; ++ i) {
     vec[i] = n - vec[i] * 2;
   }
   vec[19] = (ans1 - ans0) * 2;
@@ -1925,368 +1780,364 @@ TvFunc::walsh_01(ymint vec[]) const
 BEGIN_NONAMESPACE
 
 inline
-ymulong
-pm2_1(ymulong w,
-      ymulong& m)
+ymuint64
+pm2_1(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask1   = 0x5;
-  const ymulong offset1 = 0x5;
-  ymulong tmp0 = w & mask1;
-  ymulong tmp1 = (w >> 1) & mask1;
+  const ymuint64 mask1   = 0x5;
+  const ymuint64 offset1 = 0x5;
+  ymuint64 tmp0 = w & mask1;
+  ymuint64 tmp1 = (w >> 1) & mask1;
   m = tmp0 - tmp1 + offset1;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm2_2(ymulong w,
-      ymulong& m)
+ymuint64
+pm2_2(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask2   = 0x3;
-  const ymulong offset2 = 0x2;
-  ymulong tmp0 = w & mask2;
-  ymulong tmp1 = (w >> 2) & mask2;
+  const ymuint64 mask2   = 0x3;
+  const ymuint64 offset2 = 0x2;
+  ymuint64 tmp0 = w & mask2;
+  ymuint64 tmp1 = (w >> 2) & mask2;
   m = tmp0 - tmp1 + offset2;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm3_1(ymulong w,
-      ymulong& m)
+ymuint64
+pm3_1(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask1   = 0x55;
-  const ymulong offset1 = 0x55;
-  ymulong tmp0 = w & mask1;
-  ymulong tmp1 = (w >> 1) & mask1;
+  const ymuint64 mask1   = 0x55;
+  const ymuint64 offset1 = 0x55;
+  ymuint64 tmp0 = w & mask1;
+  ymuint64 tmp1 = (w >> 1) & mask1;
   m = tmp0 - tmp1 + offset1;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm3_2(ymulong w,
-      ymulong& m)
+ymuint64
+pm3_2(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask2   = 0x33;
-  const ymulong offset2 = 0x22;
-  ymulong tmp0 = w & mask2;
-  ymulong tmp1 = (w >> 2) & mask2;
+  const ymuint64 mask2   = 0x33;
+  const ymuint64 offset2 = 0x22;
+  ymuint64 tmp0 = w & mask2;
+  ymuint64 tmp1 = (w >> 2) & mask2;
   m = tmp0 - tmp1 + offset2;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm3_4(ymulong w,
-      ymulong& m)
+ymuint64
+pm3_4(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask4   = 0x0f;
-  const ymulong offset4 = 0x04;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f;
+  const ymuint64 offset4 = 0x04;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   m = tmp0 - tmp1 + offset4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_3_4(ymulong w)
+ymuint64
+p_3_4(ymuint64 w)
 {
-  const ymulong mask4   = 0x0f;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm4_1(ymulong w,
-      ymulong& m)
+ymuint64
+pm4_1(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask1   = 0x5555;
-  const ymulong offset1 = 0x5555;
-  ymulong tmp0 = w & mask1;
-  ymulong tmp1 = (w >> 1) & mask1;
+  const ymuint64 mask1   = 0x5555;
+  const ymuint64 offset1 = 0x5555;
+  ymuint64 tmp0 = w & mask1;
+  ymuint64 tmp1 = (w >> 1) & mask1;
   m = tmp0 - tmp1 + offset1;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm4_2(ymulong w,
-      ymulong& m)
+ymuint64
+pm4_2(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask2   = 0x3333;
-  const ymulong offset2 = 0x2222;
-  ymulong tmp0 = w & mask2;
-  ymulong tmp1 = (w >> 2) & mask2;
+  const ymuint64 mask2   = 0x3333;
+  const ymuint64 offset2 = 0x2222;
+  ymuint64 tmp0 = w & mask2;
+  ymuint64 tmp1 = (w >> 2) & mask2;
   m = tmp0 - tmp1 + offset2;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm4_4(ymulong w,
-      ymulong& m)
+ymuint64
+pm4_4(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask4   = 0x0f0f;
-  const ymulong offset4 = 0x0404;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f0f;
+  const ymuint64 offset4 = 0x0404;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   m = tmp0 - tmp1 + offset4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_4_4(ymulong w)
+ymuint64
+p_4_4(ymuint64 w)
 {
-  const ymulong mask4   = 0x0f0f;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f0f;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm4_8(ymulong w,
-      ymulong& m)
+ymuint64
+pm4_8(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask8   = 0x00ff;
-  const ymulong offset8 = 0x0008;
-  ymulong tmp0 = w & mask8;
-  ymulong tmp1 = (w >> 8) & mask8;
+  const ymuint64 mask8   = 0x00ff;
+  const ymuint64 offset8 = 0x0008;
+  ymuint64 tmp0 = w & mask8;
+  ymuint64 tmp1 = (w >> 8) & mask8;
   m = tmp0 - tmp1 + offset8;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_4_8(ymulong w)
+ymuint64
+p_4_8(ymuint64 w)
 {
-  const ymulong mask8   = 0x00ff;
-  ymulong tmp0 = w & mask8;
-  ymulong tmp1 = (w >> 8) & mask8;
+  const ymuint64 mask8   = 0x00ff;
+  ymuint64 tmp0 = w & mask8;
+  ymuint64 tmp1 = (w >> 8) & mask8;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm5_1(ymulong w,
-      ymulong& m)
+ymuint64
+pm5_1(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask1   = 0x55555555;
-  const ymulong offset1 = 0x55555555;
-  ymulong tmp0 = w & mask1;
-  ymulong tmp1 = (w >> 1) & mask1;
+  const ymuint64 mask1   = 0x55555555;
+  const ymuint64 offset1 = 0x55555555;
+  ymuint64 tmp0 = w & mask1;
+  ymuint64 tmp1 = (w >> 1) & mask1;
   m = tmp0 - tmp1 + offset1;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm5_2(ymulong w,
-      ymulong& m)
+ymuint64
+pm5_2(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask2   = 0x33333333;
-  const ymulong offset2 = 0x22222222;
-  ymulong tmp0 = w & mask2;
-  ymulong tmp1 = (w >> 2) & mask2;
+  const ymuint64 mask2   = 0x33333333;
+  const ymuint64 offset2 = 0x22222222;
+  ymuint64 tmp0 = w & mask2;
+  ymuint64 tmp1 = (w >> 2) & mask2;
   m = tmp0 - tmp1 + offset2;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm5_4(ymulong w,
-      ymulong& m)
+ymuint64
+pm5_4(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask4   = 0x0f0f0f0f;
-  const ymulong offset4 = 0x04040404;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f0f0f0f;
+  const ymuint64 offset4 = 0x04040404;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   m = tmp0 - tmp1 + offset4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_5_4(ymulong w)
+ymuint64
+p_5_4(ymuint64 w)
 {
-  const ymulong mask4   = 0x0f0f0f0f;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f0f0f0f;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm5_8(ymulong w,
-      ymulong& m)
+ymuint64
+pm5_8(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask8   = 0x00ff00ff;
-  const ymulong offset8 = 0x00080008;
-  ymulong tmp0 = w & mask8;
-  ymulong tmp1 = (w >> 8) & mask8;
+  const ymuint64 mask8   = 0x00ff00ff;
+  const ymuint64 offset8 = 0x00080008;
+  ymuint64 tmp0 = w & mask8;
+  ymuint64 tmp1 = (w >> 8) & mask8;
   m = tmp0 - tmp1 + offset8;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_5_8(ymulong w)
+ymuint64
+p_5_8(ymuint64 w)
 {
-  const ymulong mask8   = 0x00ff00ff;
-  ymulong tmp0 = w & mask8;
-  ymulong tmp1 = (w >> 8) & mask8;
+  const ymuint64 mask8   = 0x00ff00ff;
+  ymuint64 tmp0 = w & mask8;
+  ymuint64 tmp1 = (w >> 8) & mask8;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm5_16(ymulong w,
-       ymulong& m)
+ymuint64
+pm5_16(ymuint64 w,
+       ymuint64& m)
 {
-  const ymulong mask16   = 0x0000ffff;
-  const ymulong offset16 = 0x00000010;
-  ymulong tmp0 = w & mask16;
-  ymulong tmp1 = (w >> 16) & mask16;
+  const ymuint64 mask16   = 0x0000ffff;
+  const ymuint64 offset16 = 0x00000010;
+  ymuint64 tmp0 = w & mask16;
+  ymuint64 tmp1 = (w >> 16) & mask16;
   m = tmp0 - tmp1 + offset16;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_5_16(ymulong w)
+ymuint64
+p_5_16(ymuint64 w)
 {
-  const ymulong mask16   = 0x0000ffff;
-  ymulong tmp0 = w & mask16;
-  ymulong tmp1 = (w >> 16) & mask16;
+  const ymuint64 mask16   = 0x0000ffff;
+  ymuint64 tmp0 = w & mask16;
+  ymuint64 tmp1 = (w >> 16) & mask16;
   return tmp0 + tmp1;
 }
 
-#if WORD64
-
 inline
-ymulong
-pm6_1(ymulong w,
-      ymulong& m)
+ymuint64
+pm6_1(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask1   = 0x5555555555555555;
-  const ymulong offset1 = 0x5555555555555555;
-  ymulong tmp0 = w & mask1;
-  ymulong tmp1 = (w >> 1) & mask1;
+  const ymuint64 mask1   = 0x5555555555555555;
+  const ymuint64 offset1 = 0x5555555555555555;
+  ymuint64 tmp0 = w & mask1;
+  ymuint64 tmp1 = (w >> 1) & mask1;
   m = tmp0 - tmp1 + offset1;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm6_2(ymulong w,
-      ymulong& m)
+ymuint64
+pm6_2(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask2   = 0x3333333333333333;
-  const ymulong offset2 = 0x2222222222222222;
-  ymulong tmp0 = w & mask2;
-  ymulong tmp1 = (w >> 2) & mask2;
+  const ymuint64 mask2   = 0x3333333333333333;
+  const ymuint64 offset2 = 0x2222222222222222;
+  ymuint64 tmp0 = w & mask2;
+  ymuint64 tmp1 = (w >> 2) & mask2;
   m = tmp0 - tmp1 + offset2;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm6_4(ymulong w,
-      ymulong& m)
+ymuint64
+pm6_4(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask4   = 0x0f0f0f0f0f0f0f0f;
-  const ymulong offset4 = 0x0404040404040404;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f0f0f0f0f0f0f0f;
+  const ymuint64 offset4 = 0x0404040404040404;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   m = tmp0 - tmp1 + offset4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_6_4(ymulong w)
+ymuint64
+p_6_4(ymuint64 w)
 {
-  const ymulong mask4   = 0x0f0f0f0f0f0f0f0f;
-  ymulong tmp0 = w & mask4;
-  ymulong tmp1 = (w >> 4) & mask4;
+  const ymuint64 mask4   = 0x0f0f0f0f0f0f0f0f;
+  ymuint64 tmp0 = w & mask4;
+  ymuint64 tmp1 = (w >> 4) & mask4;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm6_8(ymulong w,
-      ymulong& m)
+ymuint64
+pm6_8(ymuint64 w,
+      ymuint64& m)
 {
-  const ymulong mask8   = 0x00ff00ff00ff00ff;
-  const ymulong offset8 = 0x0008000800080008;
-  ymulong tmp0 = w & mask8;
-  ymulong tmp1 = (w >> 8) & mask8;
+  const ymuint64 mask8   = 0x00ff00ff00ff00ff;
+  const ymuint64 offset8 = 0x0008000800080008;
+  ymuint64 tmp0 = w & mask8;
+  ymuint64 tmp1 = (w >> 8) & mask8;
   m = tmp0 - tmp1 + offset8;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_6_8(ymulong w)
+ymuint64
+p_6_8(ymuint64 w)
 {
-  const ymulong mask8   = 0x00ff00ff00ff00ff;
-  ymulong tmp0 = w & mask8;
-  ymulong tmp1 = (w >> 8) & mask8;
+  const ymuint64 mask8   = 0x00ff00ff00ff00ff;
+  ymuint64 tmp0 = w & mask8;
+  ymuint64 tmp1 = (w >> 8) & mask8;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm6_16(ymulong w,
-       ymulong& m)
+ymuint64
+pm6_16(ymuint64 w,
+       ymuint64& m)
 {
-  const ymulong mask16   = 0x0000ffff0000ffff;
-  const ymulong offset16 = 0x0000001000000010;
-  ymulong tmp0 = w & mask16;
-  ymulong tmp1 = (w >> 16) & mask16;
+  const ymuint64 mask16   = 0x0000ffff0000ffff;
+  const ymuint64 offset16 = 0x0000001000000010;
+  ymuint64 tmp0 = w & mask16;
+  ymuint64 tmp1 = (w >> 16) & mask16;
   m = tmp0 - tmp1 + offset16;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_6_16(ymulong w)
+ymuint64
+p_6_16(ymuint64 w)
 {
-  const ymulong mask16   = 0x0000ffff0000ffff;
-  ymulong tmp0 = w & mask16;
-  ymulong tmp1 = (w >> 16) & mask16;
+  const ymuint64 mask16   = 0x0000ffff0000ffff;
+  ymuint64 tmp0 = w & mask16;
+  ymuint64 tmp1 = (w >> 16) & mask16;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-pm6_32(ymulong w,
-       ymulong& m)
+ymuint64
+pm6_32(ymuint64 w,
+       ymuint64& m)
 {
-  const ymulong mask32   = 0x00000000ffffffff;
-  const ymulong offset32 = 0x0000000000000020;
-  ymulong tmp0 = w & mask32;
-  ymulong tmp1 = (w >> 32) & mask32;
+  const ymuint64 mask32   = 0x00000000ffffffff;
+  const ymuint64 offset32 = 0x0000000000000020;
+  ymuint64 tmp0 = w & mask32;
+  ymuint64 tmp1 = (w >> 32) & mask32;
   m = tmp0 - tmp1 + offset32;
   return tmp0 + tmp1;
 }
 
 inline
-ymulong
-p_6_32(ymulong w)
+ymuint64
+p_6_32(ymuint64 w)
 {
-  const ymulong mask32   = 0x00000000ffffffff;
-  ymulong tmp0 = w & mask32;
-  ymulong tmp1 = (w >> 32) & mask32;
+  const ymuint64 mask32   = 0x00000000ffffffff;
+  ymuint64 tmp0 = w & mask32;
+  ymuint64 tmp1 = (w >> 32) & mask32;
   return tmp0 + tmp1;
 }
-
-#endif
 
 inline
 ymuint
@@ -2300,7 +2151,7 @@ w2pos(ymuint ni,
 // 5入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_5b(ymulong* src_vec,
+walsh_012_5b(ymuint64* src_vec,
 	     ymuint ni,
 	     ymint vec1[],
 	     ymint vec2[])
@@ -2309,27 +2160,27 @@ walsh_012_5b(ymulong* src_vec,
 
   ymint ans;
 
-  ymulong tmp_1;
-  ymulong tmp = pm5_1(src_vec[0], tmp_1);
+  ymuint64 tmp_1;
+  ymuint64 tmp = pm5_1(src_vec[0], tmp_1);
   // tmp  : 0
   // tmp_1: 1
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm5_2(tmp, tmp_2);
     // tmp  : 00
     // tmp_2: 01
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm5_4(tmp, tmp_3);
       // tmp  : 000
       // tmp_3: 001
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm5_8(tmp, tmp_4);
 	// tmp  : 0000
 	// tmp_4: 0001
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm5_16(tmp, tmp_5);
 	  // tmp  : 00000
 	  // tmp_5: 00001
@@ -2337,7 +2188,7 @@ walsh_012_5b(ymulong* src_vec,
 	  vec1[4] = n - tmp_5 * 2;
 	}
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm5_16(tmp_4, tmp_5);
 	  // tmp  : 00010
 	  // tmp_5: 00011
@@ -2346,12 +2197,12 @@ walsh_012_5b(ymulong* src_vec,
 	}
       }
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm5_8(tmp_3, tmp_4);
 	// tmp  : 0010
 	// tmp_4: 0011
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm5_16(tmp, tmp_5);
 	  // tmp  : 00100
 	  // tmp_5: 00101
@@ -2364,17 +2215,17 @@ walsh_012_5b(ymulong* src_vec,
       }
     }
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm5_4(tmp_2, tmp_3);
       // tmp  : 010
       // tmp_3: 011
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm5_8(tmp, tmp_4);
 	// tmp  : 0100
 	// tmp_4: 0101
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm5_16(tmp, tmp_5);
 	  // tmp  : 01000
 	  // tmp_5: 01001
@@ -2393,22 +2244,22 @@ walsh_012_5b(ymulong* src_vec,
     }
   }
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm5_2(tmp_1, tmp_2);
     // tmp  : 10
     // tmp_2: 11
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm5_4(tmp, tmp_3);
       // tmp  : 100
       // tmp_3: 101
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm5_8(tmp, tmp_4);
 	// tmp  : 1000
 	// tmp_4: 1001
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm5_16(tmp, tmp_5);
 	  // tmp  : 10000
 	  // tmp_5: 10001
@@ -2436,12 +2287,10 @@ walsh_012_5b(ymulong* src_vec,
   return ans;
 }
 
-#if WORD64
-
 // 6 入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_6b(ymulong* src_vec,
+walsh_012_6b(ymuint64* src_vec,
 	     ymuint ni,
 	     ymint vec1[],
 	     ymint vec2[])
@@ -2450,32 +2299,32 @@ walsh_012_6b(ymulong* src_vec,
 
   ymint ans;
 
-  ymulong tmp_1;
-  ymulong tmp = pm6_1(src_vec[0], tmp_1);
+  ymuint64 tmp_1;
+  ymuint64 tmp = pm6_1(src_vec[0], tmp_1);
   // tmp  : 0
   // tmp_1: 1
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm6_2(tmp, tmp_2);
     // tmp  : 00
     // tmp_2: 01
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm6_4(tmp, tmp_3);
       // tmp  : 000
       // tmp_3: 001
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm6_8(tmp, tmp_4);
 	// tmp  : 0000
 	// tmp_4: 0001
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm6_16(tmp, tmp_5);
 	  // tmp  : 00000
 	  // tmp_5: 00001
 	  {
-	    ymulong tmp_6;
+	    ymuint64 tmp_6;
 	    tmp = pm6_32(tmp, tmp_6);
 	    // tmp  : 000000
 	    // tmp_6: 000001
@@ -2483,7 +2332,7 @@ walsh_012_6b(ymulong* src_vec,
 	    vec1[5] = n - tmp_6 * 2;
 	  }
 	  {
-	    ymulong tmp_6;
+	    ymuint64 tmp_6;
 	    tmp = pm6_32(tmp_5, tmp_6);
 	    // tmp  : 000010
 	    // tmp_6: 000011
@@ -2492,12 +2341,12 @@ walsh_012_6b(ymulong* src_vec,
 	  }
 	}
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm6_16(tmp_4, tmp_5);
 	  // tmp  : 00010
 	  // tmp_5: 00011
 	  {
-	    ymulong tmp_6;
+	    ymuint64 tmp_6;
 	    tmp = pm6_32(tmp, tmp_6);
 	    // tmp  : 000100
 	    // tmp_6: 000101
@@ -2510,17 +2359,17 @@ walsh_012_6b(ymulong* src_vec,
 	}
       }
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm6_8(tmp_3, tmp_4);
 	// tmp  : 0010
 	// tmp_4: 0011
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm6_16(tmp, tmp_5);
 	  // tmp  : 00100
 	  // tmp_5: 00101
 	  {
-	    ymulong tmp_6;
+	    ymuint64 tmp_6;
 	    tmp = pm6_32(tmp, tmp_6);
 	    // tmp  : 001000
 	    // tmp_6: 001001
@@ -2539,22 +2388,22 @@ walsh_012_6b(ymulong* src_vec,
       }
     }
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm6_4(tmp_2, tmp_3);
       // tmp  : 010
       // tmp_3: 011
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm6_8(tmp, tmp_4);
 	// tmp  : 0100
 	// tmp_4: 0101
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm6_16(tmp, tmp_5);
 	  // tmp  : 01000
 	  // tmp_5: 01001
 	  {
-	    ymulong tmp_6;
+	    ymuint64 tmp_6;
 	    tmp = pm6_32(tmp, tmp_6);
 	    // tmp  : 010000
 	    // tmp_6: 010001
@@ -2581,27 +2430,27 @@ walsh_012_6b(ymulong* src_vec,
     }
   }
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm6_2(tmp_1, tmp_2);
     // tmp  : 10
     // tmp_2: 11
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm6_4(tmp, tmp_3);
       // tmp  : 100
       // tmp_3: 101
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm6_8(tmp, tmp_4);
 	// tmp  : 1000
 	// tmp_4: 1001
 	{
-	  ymulong tmp_5;
+	  ymuint64 tmp_5;
 	  tmp = pm6_16(tmp, tmp_5);
 	  // tmp  : 10000
 	  // tmp_5: 10001
 	  {
-	    ymulong tmp_6;
+	    ymuint64 tmp_6;
 	    tmp = pm6_32(tmp, tmp_6);
 	    // tmp  : 100000
 	    // tmp_6: 100001
@@ -2639,35 +2488,10 @@ walsh_012_6b(ymulong* src_vec,
   return ans;
 }
 
-#else
-
-// 6入力の walsh_012 用サブルーティン
-inline
-ymint
-walsh_012_6b(ymulong* src_vec,
-	     ymuint ni,
-	     ymint vec1[],
-	     ymint vec2[])
-{
-  ymint vec1_1[TvFunc::kMaxNi];
-  ymint ans0 = walsh_012_5b(src_vec,                     ni, vec1,   vec2);
-  ymint ans1 = walsh_012_5b(src_vec + (1 << (5 - NIPW)), ni, vec1_1, vec2);
-  for (ymuint i = 0; i < 5; ++ i) {
-    vec2[w2pos(ni, i, 5)] += vec1[i] - vec1_1[i];
-  }
-  for (ymuint i = 0; i < 5; ++ i) {
-    vec1[i] += vec1_1[i];
-  }
-  vec1[5] = ans0 - ans1;
-  return ans0 + ans1;
-}
-
-#endif
-
 // 7入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_7b(ymulong* src_vec,
+walsh_012_7b(ymuint64* src_vec,
 	     ymuint ni,
 	     ymint vec1[],
 	     ymint vec2[])
@@ -2688,7 +2512,7 @@ walsh_012_7b(ymulong* src_vec,
 // 8入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_8b(ymulong* src_vec,
+walsh_012_8b(ymuint64* src_vec,
 	     ymuint ni,
 	     ymint vec1[],
 	     ymint vec2[])
@@ -2709,7 +2533,7 @@ walsh_012_8b(ymulong* src_vec,
 // 9入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_9b(ymulong* src_vec,
+walsh_012_9b(ymuint64* src_vec,
 	     ymuint ni,
 	     ymint vec1[],
 	     ymint vec2[])
@@ -2730,7 +2554,7 @@ walsh_012_9b(ymulong* src_vec,
 // 10入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_10b(ymulong* src_vec,
+walsh_012_10b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2751,7 +2575,7 @@ walsh_012_10b(ymulong* src_vec,
 // 11入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_11b(ymulong* src_vec,
+walsh_012_11b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2772,7 +2596,7 @@ walsh_012_11b(ymulong* src_vec,
 // 12入力の walsh_012 用サブルーティン
 inline
 ymint
-walsh_012_12b(ymulong* src_vec,
+walsh_012_12b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2792,7 +2616,7 @@ walsh_012_12b(ymulong* src_vec,
 
 // 13入力の walsh_012 用サブルーティン
 ymint
-walsh_012_13b(ymulong* src_vec,
+walsh_012_13b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2812,7 +2636,7 @@ walsh_012_13b(ymulong* src_vec,
 
 // 14入力の walsh_012 用サブルーティン
 ymint
-walsh_012_14b(ymulong* src_vec,
+walsh_012_14b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2832,7 +2656,7 @@ walsh_012_14b(ymulong* src_vec,
 
 // 15入力の walsh_012 用サブルーティン
 ymint
-walsh_012_15b(ymulong* src_vec,
+walsh_012_15b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2852,7 +2676,7 @@ walsh_012_15b(ymulong* src_vec,
 
 // 16入力の walsh_012 用サブルーティン
 ymint
-walsh_012_16b(ymulong* src_vec,
+walsh_012_16b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2872,7 +2696,7 @@ walsh_012_16b(ymulong* src_vec,
 
 // 17入力の walsh_012 用サブルーティン
 ymint
-walsh_012_17b(ymulong* src_vec,
+walsh_012_17b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2892,7 +2716,7 @@ walsh_012_17b(ymulong* src_vec,
 
 // 18入力の walsh_012 用サブルーティン
 ymint
-walsh_012_18b(ymulong* src_vec,
+walsh_012_18b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2912,7 +2736,7 @@ walsh_012_18b(ymulong* src_vec,
 
 // 19入力の walsh_012 用サブルーティン
 ymint
-walsh_012_19b(ymulong* src_vec,
+walsh_012_19b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2932,7 +2756,7 @@ walsh_012_19b(ymulong* src_vec,
 
 // 20入力の walsh_012 用サブルーティン
 ymint
-walsh_012_20b(ymulong* src_vec,
+walsh_012_20b(ymuint64* src_vec,
 	      ymuint ni,
 	      ymint vec1[],
 	      ymint vec2[])
@@ -2952,7 +2776,7 @@ walsh_012_20b(ymulong* src_vec,
 
 // 2入力の walsh_012 本体
 ymint
-walsh_012_2(ymulong* src_vec,
+walsh_012_2(ymuint64* src_vec,
 	    ymint vec1[],
 	    ymint vec2[])
 {
@@ -2960,16 +2784,16 @@ walsh_012_2(ymulong* src_vec,
 
   ymint ans;
 
-  ymulong tmp_1;
-  ymulong tmp = pm2_1(src_vec[0], tmp_1);
+  ymuint64 tmp_1;
+  ymuint64 tmp = pm2_1(src_vec[0], tmp_1);
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm2_2(tmp, tmp_2);
     ans = n - tmp * 2;
     vec1[1] = n - tmp_2 * 2;
   }
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm2_2(tmp_1, tmp_2);
     vec1[0] = n - tmp * 2;
     vec2[w2pos(2, 1, 0)] = vec2[w2pos(2, 0, 1)] = n - tmp_2 * 2;
@@ -2980,7 +2804,7 @@ walsh_012_2(ymulong* src_vec,
 
 // 3入力の walsh_012 本体
 ymint
-walsh_012_3(ymulong* src_vec,
+walsh_012_3(ymuint64* src_vec,
 	    ymint vec1[],
 	    ymint vec2[])
 {
@@ -2988,29 +2812,29 @@ walsh_012_3(ymulong* src_vec,
 
   ymint ans;
 
-  ymulong tmp_1;
-  ymulong tmp = pm3_1(src_vec[0], tmp_1);
+  ymuint64 tmp_1;
+  ymuint64 tmp = pm3_1(src_vec[0], tmp_1);
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm3_2(tmp, tmp_2);
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm3_4(tmp, tmp_3);
       ans = n - tmp * 2;
       vec1[2] = n - tmp_3 * 2;
     }
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm3_4(tmp_2, tmp_3);
       vec1[1] = n - tmp * 2;
       vec2[w2pos(3, 2, 1)] = vec2[w2pos(3, 1, 2)] = n - tmp_3 * 2;
     }
   }
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm3_2(tmp_1, tmp_2);
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm3_4(tmp, tmp_3);
       vec1[0] = n - tmp * 2;
       vec2[w2pos(3, 2, 0)] = vec2[w2pos(3, 0, 2)] = n - tmp_3 * 2;
@@ -3026,7 +2850,7 @@ walsh_012_3(ymulong* src_vec,
 
 // 4入力の walsh_012 本体
 ymint
-walsh_012_4(ymulong* src_vec,
+walsh_012_4(ymuint64* src_vec,
 	    ymint vec1[],
 	    ymint vec2[])
 {
@@ -3034,32 +2858,32 @@ walsh_012_4(ymulong* src_vec,
 
   ymint ans;
 
-  ymulong tmp_1;
-  ymulong tmp = pm4_1(src_vec[0], tmp_1);
+  ymuint64 tmp_1;
+  ymuint64 tmp = pm4_1(src_vec[0], tmp_1);
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm4_2(tmp, tmp_2);
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm4_4(tmp, tmp_3);
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm4_8(tmp, tmp_4);
 	ans = n - tmp * 2;
 	vec1[3] = n - tmp_4 * 2;
       }
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm4_8(tmp_3, tmp_4);
 	vec1[2] = n - tmp * 2;
 	vec2[w2pos(4, 3, 2)] = vec2[w2pos(4, 2, 3)] = n - tmp_4 * 2;
       }
     }
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm4_4(tmp_2, tmp_3);
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm4_8(tmp, tmp_4);
 	vec1[1] = n - tmp * 2;
 	vec2[w2pos(4, 3, 1)] = vec2[w2pos(4, 1, 3)] = n - tmp_4 * 2;
@@ -3069,13 +2893,13 @@ walsh_012_4(ymulong* src_vec,
     }
   }
   {
-    ymulong tmp_2;
+    ymuint64 tmp_2;
     tmp = pm4_2(tmp_1, tmp_2);
     {
-      ymulong tmp_3;
+      ymuint64 tmp_3;
       tmp = pm4_4(tmp, tmp_3);
       {
-	ymulong tmp_4;
+	ymuint64 tmp_4;
 	tmp = pm4_8(tmp, tmp_4);
 	vec1[0] = n - tmp * 2;
 	vec2[w2pos(4, 3, 0)] = vec2[w2pos(4, 0, 3)] = n - tmp_4 * 2;
@@ -3093,7 +2917,7 @@ walsh_012_4(ymulong* src_vec,
 
 // 5入力の walsh_012 本体
 ymint
-walsh_012_5(ymulong* src_vec,
+walsh_012_5(ymuint64* src_vec,
 	    ymint vec1[],
 	    ymint vec2[])
 {
@@ -3115,7 +2939,7 @@ walsh_012_5(ymulong* src_vec,
 
 // 6入力の walsh_012 本体
 int
-walsh_012_6(ymulong* src_vec,
+walsh_012_6(ymuint64* src_vec,
 	    int vec1[],
 	    int vec2[])
 {
@@ -3137,7 +2961,7 @@ walsh_012_6(ymulong* src_vec,
 
 // 7入力の walsh_012 本体
 int
-walsh_012_7(ymulong* src_vec,
+walsh_012_7(ymuint64* src_vec,
 	    int vec1[],
 	    int vec2[])
 {
@@ -3159,7 +2983,7 @@ walsh_012_7(ymulong* src_vec,
 
 // 8入力の walsh_012 本体
 int
-walsh_012_8(ymulong* src_vec,
+walsh_012_8(ymuint64* src_vec,
 	    int vec1[],
 	    int vec2[])
 {
@@ -3181,7 +3005,7 @@ walsh_012_8(ymulong* src_vec,
 
 // 9入力の walsh_012 本体
 int
-walsh_012_9(ymulong* src_vec,
+walsh_012_9(ymuint64* src_vec,
 	    int vec1[],
 	    int vec2[])
 {
@@ -3203,7 +3027,7 @@ walsh_012_9(ymulong* src_vec,
 
 // 10入力の walsh_012 本体
 int
-walsh_012_10(ymulong* src_vec,
+walsh_012_10(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3225,7 +3049,7 @@ walsh_012_10(ymulong* src_vec,
 
 // 11入力の walsh_012 本体
 int
-walsh_012_11(ymulong* src_vec,
+walsh_012_11(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3247,7 +3071,7 @@ walsh_012_11(ymulong* src_vec,
 
 // 12入力の walsh_012 本体
 int
-walsh_012_12(ymulong* src_vec,
+walsh_012_12(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3269,7 +3093,7 @@ walsh_012_12(ymulong* src_vec,
 
 // 13入力の walsh_012 本体
 int
-walsh_012_13(ymulong* src_vec,
+walsh_012_13(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3291,7 +3115,7 @@ walsh_012_13(ymulong* src_vec,
 
 // 14入力の walsh_012 本体
 int
-walsh_012_14(ymulong* src_vec,
+walsh_012_14(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3313,7 +3137,7 @@ walsh_012_14(ymulong* src_vec,
 
 // 15入力の walsh_012 本体
 int
-walsh_012_15(ymulong* src_vec,
+walsh_012_15(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3335,7 +3159,7 @@ walsh_012_15(ymulong* src_vec,
 
 // 16入力の walsh_012 本体
 int
-walsh_012_16(ymulong* src_vec,
+walsh_012_16(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3357,7 +3181,7 @@ walsh_012_16(ymulong* src_vec,
 
 // 17入力の walsh_012 本体
 int
-walsh_012_17(ymulong* src_vec,
+walsh_012_17(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3379,7 +3203,7 @@ walsh_012_17(ymulong* src_vec,
 
 // 18入力の walsh_012 本体
 int
-walsh_012_18(ymulong* src_vec,
+walsh_012_18(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3401,7 +3225,7 @@ walsh_012_18(ymulong* src_vec,
 
 // 19入力の walsh_012 本体
 int
-walsh_012_19(ymulong* src_vec,
+walsh_012_19(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3423,7 +3247,7 @@ walsh_012_19(ymulong* src_vec,
 
 // 20入力の walsh_01 本体
 int
-walsh_012_20(ymulong* src_vec,
+walsh_012_20(ymuint64* src_vec,
 	     int vec1[],
 	     int vec2[])
 {
@@ -3481,11 +3305,11 @@ BEGIN_NONAMESPACE
 
 inline
 int
-walsh_w0_2(ymulong* src_vec,
+walsh_w0_2(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall;
   int c;
   switch ( w ) {
@@ -3513,11 +3337,11 @@ walsh_w0_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_3(ymulong* src_vec,
+walsh_w0_3(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall;
   int c;
   switch ( w ) {
@@ -3552,11 +3376,11 @@ walsh_w0_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_4(ymulong* src_vec,
+walsh_w0_4(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall;
   int c;
   switch ( w ) {
@@ -3602,10 +3426,10 @@ walsh_w0_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5_0(ymulong* src_vec,
+walsh_w0_5_0(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall = 1;
   int c = (tmp >> (0 ^ ibits)) & 1;
   return nall - c * 2;
@@ -3613,10 +3437,10 @@ walsh_w0_5_0(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5_1(ymulong* src_vec,
+walsh_w0_5_1(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall = 5;
   int c = (tmp >> (1 ^ ibits)) & 1;
   c += (tmp >> (2 ^ ibits)) & 1;
@@ -3628,10 +3452,10 @@ walsh_w0_5_1(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5_2(ymulong* src_vec,
+walsh_w0_5_2(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall = 10;
   int c  = (tmp >> (3 ^ ibits)) & 1;
   c += (tmp >> (5 ^ ibits)) & 1;
@@ -3648,10 +3472,10 @@ walsh_w0_5_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5_3(ymulong* src_vec,
+walsh_w0_5_3(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall = 10;
   int c  = (tmp >> (7 ^ ibits)) & 1;
   c += (tmp >> (11 ^ ibits)) & 1;
@@ -3668,10 +3492,10 @@ walsh_w0_5_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5_4(ymulong* src_vec,
+walsh_w0_5_4(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall = 5;
   int c  = (tmp >> (15 ^ ibits)) & 1;
   c += (tmp >> (23 ^ ibits)) & 1;
@@ -3683,10 +3507,10 @@ walsh_w0_5_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5_5(ymulong* src_vec,
+walsh_w0_5_5(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int nall = 1;
   int c = (tmp >> (31 ^ ibits)) & 1;
   return nall - c * 2;
@@ -3694,7 +3518,7 @@ walsh_w0_5_5(ymulong* src_vec,
 
 inline
 int
-walsh_w0_5(ymulong* src_vec,
+walsh_w0_5(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -3712,14 +3536,12 @@ walsh_w0_5(ymulong* src_vec,
   return 0;
 }
 
-#if WORD64
-
 inline
 int
-walsh_w0_6_0(ymulong* src_vec,
+walsh_w0_6_0(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 1;
   int c = (tmp >> (0 ^ ibits)) & 1;
   return n - c * 2;
@@ -3727,10 +3549,10 @@ walsh_w0_6_0(ymulong* src_vec,
 
 inline
 int
-walsh_w0_6_1(ymulong* src_vec,
+walsh_w0_6_1(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 6;
   int c = (tmp >> (1 ^ ibits)) & 1;
   c += (tmp >> (2 ^ ibits)) & 1;
@@ -3743,10 +3565,10 @@ walsh_w0_6_1(ymulong* src_vec,
 
 inline
 int
-walsh_w0_6_2(ymulong* src_vec,
+walsh_w0_6_2(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 15;
   int c = (tmp >> (3 ^ ibits)) & 1;
   c += (tmp >> (5 ^ ibits)) & 1;
@@ -3768,10 +3590,10 @@ walsh_w0_6_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_6_3(ymulong* src_vec,
+walsh_w0_6_3(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 20;
   int c = (tmp >> (7 ^ ibits)) & 1;
   c += (tmp >> (11 ^ ibits)) & 1;
@@ -3798,10 +3620,10 @@ walsh_w0_6_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_6_4(ymulong* src_vec,
+walsh_w0_6_4(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 15;
   int c = (tmp >> (15 ^ ibits)) & 1;
   c += (tmp >> (23 ^ ibits)) & 1;
@@ -3823,10 +3645,10 @@ walsh_w0_6_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_6_5(ymulong* src_vec,
+walsh_w0_6_5(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 6;
   int c = (tmp >> (31 ^ ibits)) & 1;
   c += (tmp >> (47 ^ ibits)) & 1;
@@ -3839,109 +3661,18 @@ walsh_w0_6_5(ymulong* src_vec,
 
 inline
 int
-walsh_w0_6_6(ymulong* src_vec,
+walsh_w0_6_6(ymuint64* src_vec,
 	     ymuint ibits)
 {
-  ymulong tmp = src_vec[0];
+  ymuint64 tmp = src_vec[0];
   int n = 1;
   int c = (tmp >> (63 ^ ibits)) & 1;
   return n - c * 2;
 }
 
-#else
-
 inline
 int
-walsh_w0_6_0(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset1 = flag * (1 << (5 - NIPW));
-  int ans1 = walsh_w0_5_0(src_vec + offset1, ibits);
-  return ans1;
-}
-
-inline
-int
-walsh_w0_6_1(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset1 = flag * (1 << (5 - NIPW));
-  ymuint offset2 = (1 - flag) * (1 << (5 - NIPW));
-  int ans1 = walsh_w0_5_1(src_vec + offset1, ibits);
-  int ans2 = walsh_w0_5_0(src_vec + offset2, ibits);
-  return ans1 + ans2;
-}
-
-inline
-int
-walsh_w0_6_2(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset1 = flag * (1 << (5 - NIPW));
-  ymuint offset2 = (1 - flag) * (1 << (5 - NIPW));
-  int ans1 = walsh_w0_5_2(src_vec + offset1, ibits);
-  int ans2 = walsh_w0_5_1(src_vec + offset2, ibits);
-  return ans1 + ans2;
-}
-
-inline
-int
-walsh_w0_6_3(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset1 = flag * (1 << (5 - NIPW));
-  ymuint offset2 = (1 - flag) * (1 << (5 - NIPW));
-  int ans1 = walsh_w0_5_3(src_vec + offset1, ibits);
-  int ans2 = walsh_w0_5_2(src_vec + offset2, ibits);
-  return ans1 + ans2;
-}
-
-inline
-int
-walsh_w0_6_4(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset1 = flag * (1 << (5 - NIPW));
-  ymuint offset2 = (1 - flag) * (1 << (5 - NIPW));
-  int ans1 = walsh_w0_5_4(src_vec + offset1, ibits);
-  int ans2 = walsh_w0_5_3(src_vec + offset2, ibits);
-  return ans1 + ans2;
-}
-
-inline
-int
-walsh_w0_6_5(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset1 = flag * (1 << (5 - NIPW));
-  ymuint offset2 = (1 - flag) * (1 << (5 - NIPW));
-  int ans1 = walsh_w0_5_5(src_vec + offset1, ibits);
-  int ans2 = walsh_w0_5_4(src_vec + offset2, ibits);
-  return ans1 + ans2;
-}
-
-inline
-int
-walsh_w0_6_6(ymulong* src_vec,
-	     ymuint ibits)
-{
-  ymuint flag = ((ibits >> 5) & 1);
-  ymuint offset2 = (1 - flag) * (1 << (5 - NIPW));
-  int ans2 = walsh_w0_5_5(src_vec + offset2, ibits);
-  return ans2;
-}
-
-#endif
-
-inline
-int
-walsh_w0_6(ymulong* src_vec,
+walsh_w0_6(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -3962,7 +3693,7 @@ walsh_w0_6(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_0(ymulong* src_vec,
+walsh_w0_7_0(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -3972,7 +3703,7 @@ walsh_w0_7_0(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_1(ymulong* src_vec,
+walsh_w0_7_1(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -3985,7 +3716,7 @@ walsh_w0_7_1(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_2(ymulong* src_vec,
+walsh_w0_7_2(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -3998,7 +3729,7 @@ walsh_w0_7_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_3(ymulong* src_vec,
+walsh_w0_7_3(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -4011,7 +3742,7 @@ walsh_w0_7_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_4(ymulong* src_vec,
+walsh_w0_7_4(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -4024,7 +3755,7 @@ walsh_w0_7_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_5(ymulong* src_vec,
+walsh_w0_7_5(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -4037,7 +3768,7 @@ walsh_w0_7_5(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_6(ymulong* src_vec,
+walsh_w0_7_6(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -4050,7 +3781,7 @@ walsh_w0_7_6(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7_7(ymulong* src_vec,
+walsh_w0_7_7(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 6) & 1);
@@ -4060,7 +3791,7 @@ walsh_w0_7_7(ymulong* src_vec,
 
 inline
 int
-walsh_w0_7(ymulong* src_vec,
+walsh_w0_7(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -4082,7 +3813,7 @@ walsh_w0_7(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_0(ymulong* src_vec,
+walsh_w0_8_0(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4092,7 +3823,7 @@ walsh_w0_8_0(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_1(ymulong* src_vec,
+walsh_w0_8_1(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4105,7 +3836,7 @@ walsh_w0_8_1(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_2(ymulong* src_vec,
+walsh_w0_8_2(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4118,7 +3849,7 @@ walsh_w0_8_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_3(ymulong* src_vec,
+walsh_w0_8_3(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4131,7 +3862,7 @@ walsh_w0_8_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_4(ymulong* src_vec,
+walsh_w0_8_4(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4144,7 +3875,7 @@ walsh_w0_8_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_5(ymulong* src_vec,
+walsh_w0_8_5(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4157,7 +3888,7 @@ walsh_w0_8_5(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_6(ymulong* src_vec,
+walsh_w0_8_6(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4170,7 +3901,7 @@ walsh_w0_8_6(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_7(ymulong* src_vec,
+walsh_w0_8_7(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4183,7 +3914,7 @@ walsh_w0_8_7(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8_8(ymulong* src_vec,
+walsh_w0_8_8(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 7) & 1);
@@ -4193,7 +3924,7 @@ walsh_w0_8_8(ymulong* src_vec,
 
 inline
 int
-walsh_w0_8(ymulong* src_vec,
+walsh_w0_8(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -4216,7 +3947,7 @@ walsh_w0_8(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_0(ymulong* src_vec,
+walsh_w0_9_0(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4226,7 +3957,7 @@ walsh_w0_9_0(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_1(ymulong* src_vec,
+walsh_w0_9_1(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4239,7 +3970,7 @@ walsh_w0_9_1(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_2(ymulong* src_vec,
+walsh_w0_9_2(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4252,7 +3983,7 @@ walsh_w0_9_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_3(ymulong* src_vec,
+walsh_w0_9_3(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4265,7 +3996,7 @@ walsh_w0_9_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_4(ymulong* src_vec,
+walsh_w0_9_4(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4278,7 +4009,7 @@ walsh_w0_9_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_5(ymulong* src_vec,
+walsh_w0_9_5(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4291,7 +4022,7 @@ walsh_w0_9_5(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_6(ymulong* src_vec,
+walsh_w0_9_6(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4304,7 +4035,7 @@ walsh_w0_9_6(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_7(ymulong* src_vec,
+walsh_w0_9_7(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4317,7 +4048,7 @@ walsh_w0_9_7(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_8(ymulong* src_vec,
+walsh_w0_9_8(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4330,7 +4061,7 @@ walsh_w0_9_8(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9_9(ymulong* src_vec,
+walsh_w0_9_9(ymuint64* src_vec,
 	     ymuint ibits)
 {
   ymuint flag = ((ibits >> 8) & 1);
@@ -4340,7 +4071,7 @@ walsh_w0_9_9(ymulong* src_vec,
 
 inline
 int
-walsh_w0_9(ymulong* src_vec,
+walsh_w0_9(ymuint64* src_vec,
 	   ymuint ibits,
 	   ymuint w)
 {
@@ -4364,7 +4095,7 @@ walsh_w0_9(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_0(ymulong* src_vec,
+walsh_w0_10_0(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4374,7 +4105,7 @@ walsh_w0_10_0(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_1(ymulong* src_vec,
+walsh_w0_10_1(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4387,7 +4118,7 @@ walsh_w0_10_1(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_2(ymulong* src_vec,
+walsh_w0_10_2(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4400,7 +4131,7 @@ walsh_w0_10_2(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_3(ymulong* src_vec,
+walsh_w0_10_3(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4413,7 +4144,7 @@ walsh_w0_10_3(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_4(ymulong* src_vec,
+walsh_w0_10_4(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4426,7 +4157,7 @@ walsh_w0_10_4(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_5(ymulong* src_vec,
+walsh_w0_10_5(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4439,7 +4170,7 @@ walsh_w0_10_5(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_6(ymulong* src_vec,
+walsh_w0_10_6(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4452,7 +4183,7 @@ walsh_w0_10_6(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_7(ymulong* src_vec,
+walsh_w0_10_7(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4465,7 +4196,7 @@ walsh_w0_10_7(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_8(ymulong* src_vec,
+walsh_w0_10_8(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4478,7 +4209,7 @@ walsh_w0_10_8(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_9(ymulong* src_vec,
+walsh_w0_10_9(ymuint64* src_vec,
 	      ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4491,7 +4222,7 @@ walsh_w0_10_9(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10_10(ymulong* src_vec,
+walsh_w0_10_10(ymuint64* src_vec,
 	       ymuint ibits)
 {
   ymuint flag = ((ibits >> 9) & 1);
@@ -4501,7 +4232,7 @@ walsh_w0_10_10(ymulong* src_vec,
 
 inline
 int
-walsh_w0_10(ymulong* src_vec,
+walsh_w0_10(ymuint64* src_vec,
 	    ymuint ibits,
 	    ymuint w)
 {
@@ -5079,9 +4810,9 @@ TvFunc::check_sup(VarId var) const
   if ( i < NIPW ) {
     // ブロックごとにチェック
     ymuint dist = 1 << i;
-    ymulong mask = c_masks[i];
+    ymuint64 mask = c_masks[i];
     for (ymuint b = 0; b < mBlockNum; ++ b) {
-      ymulong word = mVector[b];
+      ymuint64 word = mVector[b];
       if ( (word ^ (word << dist)) & mask ) {
 	return true;
       }
@@ -5151,7 +4882,7 @@ TvFunc::check_sym(VarId var1,
     else {
       cond = mask_i;
     }
-    ymulong mask2 = ~c_masks[j];
+    ymuint64 mask2 = ~c_masks[j];
     ymuint s = 1 << j;
     for (ymuint v = 0; v < mBlockNum; ++ v) {
       if ( (v & mask_i) == cond &&
@@ -5165,10 +4896,10 @@ TvFunc::check_sym(VarId var1,
     // i < NIPW
     // j < NIPW
     if ( inv ) {
-      ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
+      ymuint64 mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1 << i) + (1 << j);
       for (ymuint b = 0; b < mBlockNum; ++ b) {
-	ymulong word = mVector[b];
+	ymuint64 word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -5176,10 +4907,10 @@ TvFunc::check_sym(VarId var1,
       }
     }
     else {
-      ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
+      ymuint64 mask = sym_masks2[(i * (i - 1)) / 2 + j];
       ymuint s = (1 << i) - (1 << j);
       for (ymuint b = 0; b < mBlockNum; ++ b) {
-	ymulong word = mVector[b];
+	ymuint64 word = mVector[b];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -5225,7 +4956,7 @@ TvFunc::xform(const NpnMap& npnmap) const
 	new_i |= ipat[b];
       }
     }
-    ymulong pat = (value(i ^ imask) ^ omask);
+    ymuint64 pat = (value(i ^ imask) ^ omask);
     ans.mVector[block(new_i)] |= pat << shift(new_i);
   }
 
@@ -5240,7 +4971,7 @@ TvFunc::xform(const NpnMap& npnmap) const
 ymuint
 TvFunc::hash() const
 {
-  ymulong ans = 0;
+  ymuint64 ans = 0;
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans ^= mVector[i];
   }
@@ -5263,8 +4994,8 @@ compare(const TvFunc& func1,
   // 以降は入力数が等しい場合
   ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
-    ymulong w1 = func1.mVector[n - i - 1];
-    ymulong w2 = func2.mVector[n - i - 1];
+    ymuint64 w1 = func1.mVector[n - i - 1];
+    ymuint64 w2 = func2.mVector[n - i - 1];
     if ( w1 < w2 ) {
       return -1;
     }
@@ -5286,8 +5017,8 @@ operator&&(const TvFunc& func1,
   }
   ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
-    ymulong w1 = func1.mVector[n - i - 1];
-    ymulong w2 = func2.mVector[n - i - 1];
+    ymuint64 w1 = func1.mVector[n - i - 1];
+    ymuint64 w2 = func2.mVector[n - i - 1];
     if ( (w1 & w2) != 0U ) {
       return true;
     }
@@ -5302,11 +5033,11 @@ TvFunc::print(ostream& s,
 	      int mode) const
 {
   ymuint ni_pow = 1UL << mInputNum;
-  const ymuint wordsize = sizeof(ymulong) * 8;
+  const ymuint wordsize = sizeof(ymuint64) * 8;
   if ( mode == 2 ) {
-    ymulong* bp = mVector;
+    ymuint64* bp = mVector;
     ymuint offset = 0;
-    ymulong tmp = *bp;
+    ymuint64 tmp = *bp;
     for (ymuint i = 0; i < ni_pow; ++ i) {
       s << (tmp & 1L);
       tmp >>= 1;
@@ -5320,11 +5051,11 @@ TvFunc::print(ostream& s,
   }
   else if ( mode == 16 ) {
     ymuint ni_pow4 = ni_pow / 4;
-    ymulong* bp = mVector;
+    ymuint64* bp = mVector;
     ymuint offset = 0;
-    ymulong tmp = *bp;
+    ymuint64 tmp = *bp;
     for (ymuint i = 0; i < ni_pow4; ++ i) {
-      ymulong tmp1 = (tmp & 0xF);
+      ymuint64 tmp1 = (tmp & 0xF);
       if ( tmp1 < 10 ) {
 	s << static_cast<char>('0' + tmp1);
       }
@@ -5366,7 +5097,7 @@ TvFunc::restore(IDO& s)
   if ( mBlockNum != nblk ) {
     delete [] mVector;
     mBlockNum = nblk;
-    mVector = new ymulong[mBlockNum];
+    mVector = new ymuint64[mBlockNum];
   }
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     s >> mVector[i];
