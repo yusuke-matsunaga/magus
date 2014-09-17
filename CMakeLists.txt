@@ -14,6 +14,9 @@ set (YMTOOLS_VERSION_MINOR 0)
 # 名前空間
 set (YMTOOLS_NAMESPACE "nsYm")
 
+# デバッグモード
+set ( CMAKE_BUILD_TYPE DEBUG )
+
 
 # ===================================================================
 # パッケージの検査

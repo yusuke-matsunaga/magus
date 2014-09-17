@@ -11,13 +11,13 @@
 #include "MislibMgrImpl.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/MsgMgr.h"
+#include "YmUtils/ShStringDict.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
 
 BEGIN_NONAMESPACE
 
-typedef unordered_map<ShString, const MislibNode*> StrNodeMap;
 typedef unordered_set<ShString> StrSet;
 
 // MislibScanner::read_token() をデバッグする時に true にする．
@@ -126,15 +126,15 @@ MislibParserImpl::read_file(const string& filename,
   // また，セル内のピン名が重複していないか，出力ピンの論理式に現れるピン名
   // と入力ピンに齟齬がないかもチェックする．
   const MislibNode* gate_list = mgr->gate_list();
-  StrNodeMap cell_map;
+  ShStringDict<const MislibNode*> cell_map;
   for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
     assert_cond( gate->type() == MislibNode::kGate, __FILE__, __LINE__);
     ShString name = gate->name()->str();
-    StrNodeMap::iterator p = cell_map.find(name);
-    if ( p != cell_map.end() ) {
+    const MislibNode* dummy_node;
+    if ( cell_map.find(name, dummy_node) ) {
       ostringstream buf;
       buf << "Cell name, " << name << " is defined more than once. "
-	  << "Previous definition is " << p->second->name()->loc() << ".";
+	  << "Previous definition is " << dummy_node->name()->loc() << ".";
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      gate->name()->loc(),
 		      kMsgError,
@@ -144,22 +144,22 @@ MislibParserImpl::read_file(const string& filename,
       continue;
     }
     // 情報を登録する．
-    cell_map.insert(make_pair(name, gate));
+    cell_map.reg(name, gate);
 
     // 入力ピン名のチェック
-    const MislibNode* ipin_list = gate->ipin_list();
-    if ( ipin_list->type() == MislibNode::kList ) {
+    const MislibNode* ipin_top = gate->ipin_top();
+    if ( ipin_top != NULL && ipin_top->name() != NULL ) {
       // 通常の入力ピン定義の場合
-      StrNodeMap ipin_map;
-      for (const MislibNode* ipin = ipin_list->top(); ipin; ipin = ipin->next()) {
-	assert_cond( ipin->type() == MislibNode::kPin, __FILE__, __LINE__);
+      ShStringDict<const MislibNode*> ipin_map;
+      for (const MislibNode* ipin = ipin_top; ipin; ipin = ipin->next()) {
+	ASSERT_COND( ipin->type() == MislibNode::kPin );
 	ShString name = ipin->name()->str();
-	StrNodeMap::iterator p = ipin_map.find(name);
-	if ( p != ipin_map.end() ) {
+	const MislibNode* dummy_node;
+	if ( ipin_map.find(name, dummy_node) ) {
 	  ostringstream buf;
 	  buf << "Pin name, " << name << " is defined more than once. "
 	      << "Previous definition is "
-	      << p->second->name()->loc() << ".";
+	      << dummy_node->name()->loc() << ".";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  ipin->name()->loc(),
 			  kMsgError,
@@ -167,24 +167,28 @@ MislibParserImpl::read_file(const string& filename,
 			  buf.str());
 	}
 	else {
-	  ipin_map.insert(make_pair(name, ipin));
+	  ipin_map.reg(name, ipin);
 	}
       }
       // 論理式に現れる名前の集合を求める．
       StrSet ipin_set;
       get_ipin_names(gate->opin_expr(), ipin_set);
-      for (StrNodeMap::iterator p = ipin_map.begin();
-	   p != ipin_map.end(); ++ p) {
-	ShString name = p->first;
+      vector<ShString> name_list;
+      ipin_map.name_list(name_list);
+      for (vector<ShString>::const_iterator p = name_list.begin();
+	   p != name_list.end(); ++ p) {
+	ShString name = *p;
 	if ( ipin_set.count(name) == 0 ) {
 	  // ピン定義に現れる名前が論理式中に現れない．
 	  // エラーではないが，このピンのタイミング情報は意味をもたない．
+	  const MislibNode* node;
+	  ipin_map.find(name, node);
 	  ostringstream buf;
 	  buf << "Input pin, " << name
 	      << " does not appear in the logic expression. "
 	      << "Timing information will be ignored.";
 	  MsgMgr::put_msg(__FILE__, __LINE__,
-			  p->second->loc(),
+			  node->loc(),
 			  kMsgWarning,
 			  "MISLIB_PARSER",
 			  buf.str());
@@ -193,7 +197,8 @@ MislibParserImpl::read_file(const string& filename,
       for (StrSet::iterator p = ipin_set.begin();
 	   p != ipin_set.end(); ++ p) {
 	ShString name = *p;
-	if ( ipin_map.count(name) == 0 ) {
+	const MislibNode* dummy;
+	if ( !ipin_map.find(name, dummy) ) {
 	  // 論理式中に現れる名前の入力ピンが存在しない．
 	  // これはエラー
 	  ostringstream buf;
@@ -206,14 +211,6 @@ MislibParserImpl::read_file(const string& filename,
 			  buf.str());
 	}
       }
-    }
-    else if ( ipin_list->type() == MislibNode::kPin ) {
-      // ワイルドカードの場合
-      // シンタックス的にはエラーとなることはない．
-    }
-    else {
-      // yacc の文法からありえない．
-      assert_not_reached(__FILE__, __LINE__);
     }
   }
 
@@ -318,10 +315,14 @@ MislibParserImpl::read_expr(MislibToken end_token)
     return NULL;
   }
 
-  MislibToken tok = peek();
-  while ( tok != end_token ) {
+  for ( ; ; ) {
+    MislibToken tok = peek();
+    if ( tok == end_token ) {
+      return expr1;
+    }
     if ( tok != PLUS && tok != HAT ) {
       // シンタックスエラー
+      cout << "Error in read_expr(): PLUS or HAT is expected" << endl;
       return NULL;
     }
     skip_token();
@@ -337,7 +338,6 @@ MislibParserImpl::read_expr(MislibToken end_token)
       expr1 = mMislibMgr->new_xor(FileRegion(expr1->loc(), expr2->loc()), expr1, expr2);
     }
   }
-  return expr1;
 }
 
 // @brief 積項を読み込む．
@@ -380,19 +380,27 @@ MislibParserImpl::read_literal()
     return node;
 
   case LP:
-    return read_expr(RP);
+    {
+      MislibNode* expr = read_expr(RP);
+      MislibNodeImpl* dummy_node;
+      FileRegion dummy_loc;
+      tok = scan(dummy_node, dummy_loc);
+      ASSERT_COND( tok == RP );
+      return expr;
+    }
 
   case NOT:
-    break;
+    {
+      MislibNode* expr = read_literal();
+      return mMislibMgr->new_not(FileRegion(loc, expr->loc()), expr);
+    }
 
   default:
-    // シンタックスエラー
-    return NULL;
+    break;
   }
-
-  // ここに来るのは NOT のみ
-  MislibNode* expr = read_literal();
-  return mMislibMgr->new_not(FileRegion(loc, expr->loc()), expr);
+  // シンタックスエラー
+  cout << "Error in read_literal(): STR/CONST0/CONST1/LP/NOT is expected" << endl;
+  return NULL;
 }
 
 // @brief ピンリスト記述を読み込む．
@@ -409,11 +417,13 @@ MislibParserImpl::read_pin_list()
     FileRegion loc;
 
     // 最初は PIN
-    MislibToken tok = scan(node, loc);
+    MislibToken tok = peek();
     if ( tok != PIN ) {
       // 終わる．
       break;
     }
+
+    scan(node, loc);
 
     // 次は STR か STAR
     FileRegion loc0 = loc;
@@ -478,7 +488,13 @@ MislibParserImpl::read_pin_list()
 MislibToken
 MislibParserImpl::peek()
 {
-  mUngetToken = mScanner->read_token(mUngetLoc);
+  if ( mUngetToken == END ) {
+    mUngetToken = mScanner->read_token(mUngetLoc);
+  }
+  if ( debug_read_token ) {
+    cout << "MislibParserImpl::peek(): "
+	 << mUngetToken << endl;
+  }
   return mUngetToken;
 }
 
@@ -486,6 +502,10 @@ MislibParserImpl::peek()
 void
 MislibParserImpl::skip_token()
 {
+  if ( debug_read_token ) {
+    cout << "MislibParserImpl::skip_token(): "
+	 << mUngetToken << " is discarded" << endl;
+  }
   mUngetToken = END;
 }
 
@@ -581,7 +601,7 @@ MislibParserImpl::scan(MislibNodeImpl*& lval,
       break;
 
     case END:
-      cout << "EOF" << endl;
+      cout << "END" << endl;
       break;
 
     default:

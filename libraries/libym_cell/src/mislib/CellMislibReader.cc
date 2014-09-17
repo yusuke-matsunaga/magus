@@ -100,32 +100,33 @@ gen_library(const string& lib_name,
     CellArea area(gate->area()->num());
     ShString opin_name = gate->opin_name()->str();
     const MislibNode* opin_expr = gate->opin_expr();
-    const MislibNode* ipin_list = gate->ipin_list();
+    const MislibNode* ipin_top = gate->ipin_top();
     vector<const MislibNode*> ipin_array;
     vector<ShString> ipin_name_list;
     NameMap ipin_name_map;
-    if ( ipin_list->type() == MislibNode::kList ) {
-      // 通常の入力ピン定義がある場合
-      // ipin_list の順に入力ピンを作る．
-      for (const MislibNode* pin = ipin_list->top(); pin; pin = pin->next()) {
-	assert_cond( pin->type() == MislibNode::kPin, __FILE__, __LINE__);
-	ShString name = pin->name()->str();
-	assert_cond( ipin_name_map.count(name) == 0, __FILE__, __LINE__);
-	ipin_name_map.insert(make_pair(name, ipin_array.size()));
-	ipin_array.push_back(pin);
-	ipin_name_list.push_back(name);
+    bool wildcard_pin = false;
+    if ( ipin_top != NULL ) {
+      if ( ipin_top->name() != NULL ) {
+	// 通常の入力ピン定義がある場合
+	// ipin_list の順に入力ピンを作る．
+	for (const MislibNode* pin = ipin_top; pin; pin = pin->next()) {
+	  ASSERT_COND( pin->type() == MislibNode::kPin );
+	  ShString name = pin->name()->str();
+	  ASSERT_COND( ipin_name_map.count(name) == 0 );
+	  ipin_name_map.insert(make_pair(name, ipin_array.size()));
+	  ipin_array.push_back(pin);
+	  ipin_name_list.push_back(name);
+	}
       }
-    }
-    else if ( ipin_list->type() == MislibNode::kPin ) {
-      // ワイルドカードの場合
-      // 論理式に現れる順に入力ピンを作る．
-      dfs(opin_expr, ipin_name_list, ipin_name_map);
-      for (ymuint i = 0; i < ipin_name_list.size(); ++ i) {
-	ipin_array.push_back(ipin_list);
+      else {
+	// ワイルドカードの場合
+	// 論理式に現れる順に入力ピンを作る．
+	wildcard_pin = true;
+	dfs(opin_expr, ipin_name_list, ipin_name_map);
+	for (ymuint i = 0; i < ipin_name_list.size(); ++ i) {
+	  ipin_array.push_back(ipin_top);
+	}
       }
-    }
-    else {
-      assert_not_reached(__FILE__, __LINE__);
     }
 
     ymuint ni = ipin_name_list.size();
@@ -158,7 +159,7 @@ gen_library(const string& lib_name,
 
     // タイミング情報の生成
     vector<ymuint> tid_array(ni);
-    if ( ipin_list->type() == MislibNode::kList ) {
+    if ( !wildcard_pin ) {
       library->set_timing_num(cell_id, ni);
       for (ymuint i = 0; i < ni; ++ i) {
 	const MislibNode* pt_pin = ipin_array[i];
@@ -177,7 +178,7 @@ gen_library(const string& lib_name,
     }
     else { // ipin_list->type() == MislibNode::kPin
       library->set_timing_num(cell_id, 1);
-      const MislibNode* pt_pin = ipin_list;
+      const MislibNode* pt_pin = ipin_top;
       CellTime r_i(pt_pin->rise_block_delay()->num());
       CellResistance r_r(pt_pin->rise_fanout_delay()->num());
       CellTime f_i(pt_pin->fall_block_delay()->num());

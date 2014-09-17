@@ -11,7 +11,7 @@
 #include "YmLogic/NpnMap.h"
 
 
-#if SIZEOF_UNSIGNED_LONG == 8
+#if SIZEOF_LONG == 8
 // 1 ワード 64 ビットの時 1 となるマクロ
 #define WORD64 1
 // 1 ワード当たりの入力数

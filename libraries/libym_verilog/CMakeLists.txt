@@ -6,6 +6,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}
   include
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 
@@ -161,39 +162,40 @@ set (parser_SOURCES
   src/parser/spt/SptSpecItem.cc
   src/parser/spt/SptStmt.cc
   src/parser/spt/SptUdp.cc
+
+  ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc
   )
 
 
 # Create target for the parser
- ADD_CUSTOM_TARGET(verilog_grammer echo "Creating verilog_grammer.cc")
+add_custom_target ( verilog_grammer
+  echo "Creating verilog_grammer.cc" )
 
 # Create custom command for bison/yacc (note the DEPENDS)
- ADD_CUSTOM_COMMAND(
-   SOURCE src/parser/main/verilog_grammer.yy
-   COMMAND ${BISON_EXECUTABLE}
-   ARGS -y ${CMAKE_CURRENT_SOURCE_DIR}/src/parser/main/verilog_grammer.yy
-        -o ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc
-	-d -v
-   TARGET verilog_grammer
-   OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc)
+add_custom_command (
+  TARGET verilog_grammer
+  COMMAND ${BISON_EXECUTABLE}
+  ARGS -y ${CMAKE_CURRENT_SOURCE_DIR}/src/parser/main/verilog_grammer.yy
+  -o ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc
+  -d -v
+  OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc
+  ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.output
+  )
 
-# Add verilog_grammer.cc to the list of sources
-set (parser_SOURCES ${parser_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc)
-
-# Since parser.c does not exists yet when cmake is run, mark
+# Since verilog_grammer.cc does not exists yet when cmake is run, mark
 # it as generated
- SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc GENERATED)
-
-# Include binary directory to include lexer.c in parser.c
- INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+set_source_files_properties ( ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc GENERATED )
 
 
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
 
-add_library(ym_verilog SHARED
+add_library ( ym_verilog SHARED
   ${common_SOURCES}
   ${elaborator_SOURCES}
   ${parser_SOURCES}
   )
+
+add_dependencies ( ym_verilog verilog_grammer )

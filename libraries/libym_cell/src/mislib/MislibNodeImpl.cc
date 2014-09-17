@@ -204,10 +204,10 @@ MislibNodeImpl::opin_expr() const
   return NULL;
 }
 
-// @brief 入力ピンのリストを表すオブジェクトを返す．
+// @brief 入力ピンの先頭を表すオブジェクトを返す．
 // @note デフォルトでは NULL を返す．
 const MislibNode*
-MislibNodeImpl::ipin_list() const
+MislibNodeImpl::ipin_top() const
 {
   return NULL;
 }
