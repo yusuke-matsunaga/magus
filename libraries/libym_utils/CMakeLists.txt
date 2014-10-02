@@ -130,6 +130,7 @@ set (misc_SOURCES
   src/misc/DlList.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
+  src/misc/RandSampler.cc
   src/misc/RefCount.cc
   src/misc/Scanner.cc
   src/misc/StopWatch.cc
