@@ -44,18 +44,11 @@ class Grammer :
         # 開始規則
         self.m_StartRule = -1
 
-        # 状態リスト
-        # 状態とは項の集合
-        self.m_StateList = []
-
         # FIRST マップ
         self.m_FirstMap = []
 
         # FOLLOW マップ
         self.m_FollowMap = []
-
-        # ACTION マップ
-        self.m_ActionMap = []
 
     # @brief 文法記号の追加
     # @param[in] token 追加するトークン文字列
@@ -102,59 +95,6 @@ class Grammer :
         self.m_LeftFormat = "%%-%ds ::=" % left_max
 
         self.calc_first()
-
-        self.LR0_items()
-
-    # @brief 構文解析表を作る．
-    def make_table(self) :
-        for state in self.m_StateList :
-            state_id = self.state2id(state)
-            self.m_ActionMap.append({})
-            for token_id in range(0, len(self.m_TokenList)) :
-                if self.m_TerminalList[token_id] :
-                    for (rule_id, pos) in state :
-                        (left, right) = self.id2rule(rule_id)
-                        if len(right) > pos and right[pos] == token_id :
-                            next_state = self.next_state(state, token_id)
-                            next_id = self.state2id(next_state)
-                            assert next_id != -1
-                            if not self.set_action(state_id, token_id, 'shift', next_id) :
-                                print "Error: not an LR(0)"
-                else :
-                    next_state = self.next_state(state, token_id)
-                    if len(next_state) > 0 :
-                        next_id = self.state2id(next_state)
-                        if not self.set_action(state_id, token_id, 'goto', next_id) :
-                            print "Error: not an LR(0)"
-            for (rule_id, pos) in state :
-                (left, right) = self.id2rule(rule_id)
-                if len(right) == pos :
-                    if left == self.m_StartNode :
-                        if not self.set_action(state_id, 0, 'accept', 0) :
-                            print "Error: not an LR(0)"
-                    else :
-                        for token_id in self.m_FollowMap[left] :
-                            if not self.set_action(state_id, token_id, 'reduce', rule_id) :
-                                print "Error: not an LR(0)"
-
-    # @brief ACTION 表の項目をセットする．
-    # @param[in] state_id 状態番号
-    # @param[in] token_id 記号番号
-    # @param[in] action 動作
-    # @param[in] action_id 動作に関連した番号
-    #
-    # 以前の設定内容と矛盾が生じた場合には False を返す．
-    def set_action(self, state_id, token_id, action, action_id) :
-        if self.m_DEBUG :
-            print 'set_action(%d, %s, %s, %d)' % (state_id, self.id2token(token_id), action, action_id)
-        if self.m_ActionMap[state_id].has_key(token_id) :
-            if self.m_ActionMap[state_id][token_id] != (action, action_id) :
-                return False
-            else :
-                return True
-        else :
-            self.m_ActionMap[state_id][token_id] = (action, action_id)
-            return True
 
     # @brief FIRST()/FOLLOW() を求める．
     def calc_first(self) :
@@ -224,56 +164,23 @@ class Grammer :
         for token_id in range(0, len(self.m_TokenList)) :
             self.m_FollowMap[token_id].sort()
 
-    # @brief LR(0)正準集を作る．
-    def LR0_items(self) :
-        start_state = self.closure([(self.m_StartRule, 0)])
-
-        self.m_StateList = []
-        self.m_StateList.append(start_state)
-        new_states = []
-        new_states.append(start_state)
-        while len(new_states) > 0 :
-            cur_states = new_states
-            new_states = []
-            for state in cur_states :
-                for token_id in range(0, len(self.m_TokenList)) :
-                    next_state = self.next_state(state, token_id)
-                    if len(next_state) > 0 and not next_state in self.m_StateList :
-                        self.m_StateList.append(next_state)
-                        new_states.append(next_state)
-
-    # @brief 項集合の遷移先を求める．
-    # @param[in] terms 入力の項集合
-    def next_state(self, cur_state, token) :
-        tmp_state = []
-        for (rule_id, pos) in cur_state :
-            (left, right) = self.id2rule(rule_id)
-            if len(right) > pos and right[pos] == token :
-                tmp_state.append( (rule_id, pos + 1) )
-        return self.closure(tmp_state)
-
-    # @brief 項の閉包演算を行う．
-    # @param[in] terms 入力の項集合(リスト)
-    # @return terms に対する閉包(項のリスト)を返す．
-    def closure(self, terms) :
-        ans_terms = list(terms)
-        new_terms = list(terms)
-        while len(new_terms) > 0 :
-            cur_terms = new_terms
-            new_terms = []
-            for (rule_id, pos) in cur_terms :
-                (left, right) = self.id2rule(rule_id)
-                if len(right) > pos :
-                    head = right[pos]
-                    for rule1_id in range(0, len(self.m_RuleList)) :
-                        (left1, right1) = self.id2rule(rule1_id)
-                        if left1 == head :
-                            term1 = (rule1_id, 0)
-                            if not term1 in ans_terms :
-                                ans_terms.append(term1)
-                                new_terms.append(term1)
-        ans_terms.sort()
-        return ans_terms
+    # 記号列(トークン番号のリスト)に対する FIRST() を計算する．
+    def first(self, token_list) :
+        ans_list = []
+        all_epsilon = True
+        for token in token_list :
+            has_epsilon = False
+            for tmp_id in self.m_FirstMap[token] :
+                if tmp_id == -1 :
+                    has_epsilon = True
+                else :
+                    add_to_tokenlist(tmp_id, ans_list)
+            if not has_epsilon :
+                all_epsilon = False
+                break
+        if all_epsilon :
+            ans_list.append(-1)
+        return ans_list
 
     # @brief 内容を表示する
     def print_rules(self) :
@@ -289,38 +196,7 @@ class Grammer :
             print line
         print ""
 
-    # @brief 項集合を表示する．
-    def print_terms(self, terms) :
-        for (rule_id, pos) in terms :
-            (left, right) = self.id2rule(rule_id)
-            line = "  Rule (%d): " % rule_id
-            line += self.m_LeftFormat % self.id2token(left)
-            cur = 0
-            for token_id in right :
-                line += ' '
-                if cur == pos :
-                    line += '. '
-                line += self.id2token(token_id)
-                cur += 1
-            if cur == pos :
-                line += " ."
-            print line
-
-    # @brief 状態リストを表示する．
-    def print_states(self) :
-        for state in self.m_StateList :
-            state_id = self.state2id(state)
-            print 'State#%d:' % state_id
-            print ''
-            self.print_terms(state)
-            print ""
-            for key in self.m_ActionMap[state_id].keys() :
-                (action, action_id) = self.m_ActionMap[state_id][key]
-                token = self.id2token(key)
-                print '  %s: %s %d' % (token, action, action_id)
-            print ''
-
-    # @brief FIRST/FOLLOW を表示する．
+    # @brief トークンの情報とFIRST/FOLLOW を表示する．
     def print_tokens(self) :
         for token_id in range(1, len(self.m_TokenList)) :
             print '%s:' % self.id2token(token_id)
@@ -339,17 +215,6 @@ class Grammer :
                     print self.id2token(tmp),
             print ''
             print ''
-
-    # @brief 状態番号を返す．
-    # @param[in] state 状態(項の集合)
-    def state2id(self, state) :
-        state_id = 0
-        for state1 in self.m_StateList :
-            if state1 == state :
-                return state_id
-            state_id += 1
-        else :
-            return -1
 
     # @brief トークン番号からトークン文字列を得る．
     # @param[in] id トークン番号
@@ -398,7 +263,3 @@ if __name__ == '__main__' :
     g.print_rules()
 
     g.print_tokens()
-
-    g.make_table()
-
-    g.print_states()
