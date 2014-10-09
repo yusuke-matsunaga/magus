@@ -10,14 +10,36 @@
 
 
 #include "iscas89_nsdef.h"
-#include "Iscas89Handler.h"
-#include "Iscas89Scanner.h"
 
 #include "YmUtils/StrBuff.h"
 #include "Iscas89IdHash.h"
 
 
 BEGIN_NAMESPACE_YM_ISCAS89
+
+class Iscas89Handler;
+class Iscas89Scanner;
+
+//////////////////////////////////////////////////////////////////////
+/// @brief トークン
+//////////////////////////////////////////////////////////////////////
+enum Token {
+  kToken_INPUT,
+  kToken_OUTPUT,
+  kToken_BUFF,
+  kToken_NOT,
+  kToken_AND,
+  kToken_NAND,
+  kToken_OR,
+  kToken_NOR,
+  kToken_XOR,
+  kToken_XNOR,
+  kToken_DFF,
+  kToken_NAME,
+  kToken_EOF,
+  kToken_ERROR
+};
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class Iscas89ParserImpl Iscas89ParserImpl.h "Iscas89ParserImpl.h"
@@ -35,6 +57,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 読み込みを行う．
   /// @param[in] filename ファイル名

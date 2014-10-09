@@ -43,27 +43,27 @@ Iscas89Scanner::~Iscas89Scanner()
 int
 Iscas89Scanner::read_token(FileRegion& loc)
 {
-  int token = scan();
+  Token token = scan();
   loc = cur_loc();
 
   if ( debug_read_token ) {
     cerr << "read_token()" << " --> "
 	 << loc << ": ";
     switch ( token ) {
-    case INPUT:  cerr << "INPUT"; break;
-    case OUTPUT: cerr << "OUTPUT"; break;
-    case BUFF:   cerr << "BUFF"; break;
-    case NOT:    cerr << "NOT"; break;
-    case AND:    cerr << "AND"; break;
-    case NAND:   cerr << "NAND"; break;
-    case OR:     cerr << "OR"; break;
-    case NOR:    cerr << "NOR"; break;
-    case XOR:    cerr << "XOR"; break;
-    case XNOR:   cerr << "XNOR"; break;
-    case DFF:    cerr << "DFF"; break;
-    case NAME:   cerr << "NAME(" << cur_string() << ")"; break;
-    case EOF:    cerr << "EOF"; break;
-    default:     cerr << static_cast<char>(token); break;
+    case kToken_INPUT:  cerr << "INPUT"; break;
+    case kToken_OUTPUT: cerr << "OUTPUT"; break;
+    case kToken_BUFF:   cerr << "BUFF"; break;
+    case kToken_NOT:    cerr << "NOT"; break;
+    case kToken_AND:    cerr << "AND"; break;
+    case kToken_NAND:   cerr << "NAND"; break;
+    case kToken_OR:     cerr << "OR"; break;
+    case kToken_NOR:    cerr << "NOR"; break;
+    case kToken_XOR:    cerr << "XOR"; break;
+    case kToken_XNOR:   cerr << "XNOR"; break;
+    case kToken_DFF:    cerr << "DFF"; break;
+    case kToken_NAME:   cerr << "NAME(" << cur_string() << ")"; break;
+    case kToken_EOF:    cerr << "EOF"; break;
+    default:            cerr << static_cast<char>(token); break;
     }
     cerr << endl;
   }
@@ -88,7 +88,7 @@ Iscas89Scanner::scan()
   set_first_loc();
   switch ( c ) {
   case EOF:
-    return EOF;
+    return kToken_EOF;
 
   case ' ':
   case '\t':
@@ -122,7 +122,7 @@ Iscas89Scanner::scan()
     goto ST_INIT;
   }
   if ( c == EOF ) {
-    return EOF;
+    return kToken_EOF;
   }
   // 改行までは読み飛ばす．
   goto ST_SHARP;
@@ -143,42 +143,42 @@ Iscas89Scanner::scan()
 
     // 予約後の検索
     if ( mCurString == "INPUT" ) {
-      return INPUT;
+      return kToken_INPUT;
     }
     if ( mCurString == "OUTPUT" ) {
-      return OUTPUT;
+      return kToken_OUTPUT;
     }
     if ( mCurString == "BUFF" ) {
-      return BUFF;
+      return kToken_BUFF;
     }
     if ( mCurString == "NOT" ) {
-      return NOT;
+      return kToken_NOT;
     }
     if ( mCurString == "INV" ) {
-      return NOT;
+      return kToken_NOT;
     }
     if ( mCurString == "AND" ) {
-      return AND;
+      return kToken_AND;
     }
     if ( mCurString == "NAND" ) {
-      return NAND;
+      return kToken_NAND;
     }
     if ( mCurString == "OR" ) {
-      return OR;
+      return kToken_OR;
     }
     if ( mCurString == "NOR" ) {
-      return NOR;
+      return kToken_NOR;
     }
     if ( mCurString == "XOR" ) {
-      return XOR;
+      return kToken_XOR;
     }
     if ( mCurString == "XNOR" ) {
-      return XNOR;
+      return kToken_XNOR;
     }
     if ( mCurString == "DFF" ) {
-      return DFF;
+      return kToken_DFF;
     }
-    return NAME;
+    return kToken_NAME;
 
   default:
     accept();

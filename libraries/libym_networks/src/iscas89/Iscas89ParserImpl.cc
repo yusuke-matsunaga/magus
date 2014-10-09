@@ -8,6 +8,7 @@
 
 
 #include "Iscas89ParserImpl.h"
+#include "Iscas89Scanner.h"
 #include "Iscas89Handler.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/MsgMgr.h"
