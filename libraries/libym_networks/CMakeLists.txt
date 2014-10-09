@@ -6,7 +6,6 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}
   include
-  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 
@@ -120,8 +119,6 @@ set ( iscas89_SOURCES
   src/iscas89/Iscas89Parser.cc
   src/iscas89/Iscas89ParserImpl.cc
   src/iscas89/Iscas89Scanner.cc
-
-  ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
   )
 
 set ( mvn_SOURCES
@@ -175,28 +172,6 @@ set ( verilog_SOURCES
   )
 
 
-# Create target for the parser
-add_custom_target ( iscas89_grammer
-  echo "Creating iscas89_grammer.cc"
-  )
-
-# Create custom command for bison/yacc (note the DEPENDS)
-add_custom_command (
-  TARGET iscas89_grammer
-  COMMAND ${BISON_EXECUTABLE}
-  ARGS -y ${CMAKE_CURRENT_SOURCE_DIR}/src/iscas89/iscas89_grammer.yy
-  -o ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
-  -d -v
-  OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.output
-  )
-
-# Since parser.c does not exists yet when cmake is run, mark
-# it as generated
-set_source_files_properties ( ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc GENERATED )
-
-
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
@@ -213,10 +188,6 @@ add_library( ym_networks
   ${mvn_SOURCES}
   ${tgnet_SOURCES}
   ${verilog_SOURCES}
-  )
-
-add_dependencies ( ym_networks
-  iscas89_grammer
   )
 
 target_link_libraries ( ym_networks

@@ -37,6 +37,30 @@ class Iscas89Network;
 class Iscas89Node;
 class Iscas89NetworkReader;
 
+//////////////////////////////////////////////////////////////////////
+/// @brief トークン
+//////////////////////////////////////////////////////////////////////
+enum Token {
+  kToken_LPAR,
+  kToken_RPAR,
+  kToken_COMMA,
+  kToken_EQ,
+  kToken_INPUT,
+  kToken_OUTPUT,
+  kToken_BUFF,
+  kToken_NOT,
+  kToken_AND,
+  kToken_NAND,
+  kToken_OR,
+  kToken_NOR,
+  kToken_XOR,
+  kToken_XNOR,
+  kToken_DFF,
+  kToken_NAME,
+  kToken_EOF,
+  kToken_ERROR
+};
+
 /// @brief ゲートの型
 /// @ingroup Iscas89Group
 enum tIscas89GateType {

@@ -56,7 +56,7 @@ public:
   virtual
   bool
   read_input(const FileRegion& loc,
-	     ymuint32 name_id);
+	     ymuint name_id);
 
   /// @brief OUTPUT 文を読み込む．
   /// @param[in] loc ファイル位置
@@ -66,7 +66,7 @@ public:
   virtual
   bool
   read_output(const FileRegion& loc,
-	      ymuint32 name_id);
+	      ymuint name_id);
 
   /// @brief ゲート文を読み込む．
   /// @param[in] loc ファイル位置
@@ -79,8 +79,8 @@ public:
   bool
   read_gate(const FileRegion& loc,
 	    tIscas89GateType type,
-	    ymuint32 oname_id,
-	    const vector<ymuint32>& iname_list);
+	    ymuint oname_id,
+	    const vector<ymuint>& iname_list);
 
   /// @brief 通常終了時の処理
   virtual
@@ -100,11 +100,11 @@ protected:
 
   /// @brief ID 番号から文字列を得る．
   const char*
-  id2str(ymuint32 id) const;
+  id2str(ymuint id) const;
 
   /// @brief ID 番号から位置情報を得る．
   FileRegion
-  id2loc(ymuint32 id) const;
+  id2loc(ymuint id) const;
 
 
 private:

@@ -20,26 +20,6 @@ BEGIN_NAMESPACE_YM_ISCAS89
 class Iscas89Handler;
 class Iscas89Scanner;
 
-//////////////////////////////////////////////////////////////////////
-/// @brief トークン
-//////////////////////////////////////////////////////////////////////
-enum Token {
-  kToken_INPUT,
-  kToken_OUTPUT,
-  kToken_BUFF,
-  kToken_NOT,
-  kToken_AND,
-  kToken_NAND,
-  kToken_OR,
-  kToken_NOR,
-  kToken_XOR,
-  kToken_XNOR,
-  kToken_DFF,
-  kToken_NAME,
-  kToken_EOF,
-  kToken_ERROR
-};
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class Iscas89ParserImpl Iscas89ParserImpl.h "Iscas89ParserImpl.h"
@@ -72,16 +52,33 @@ public:
   void
   add_handler(Iscas89Handler* handler);
 
+  /// @brief ID 番号から文字列を得る．
+  const char*
+  id2str(ymuint id) const;
 
-public:
+  /// @brief ID 番号から位置情報を得る．
+  FileRegion
+  id2loc(ymuint id) const;
 
-  /// @brief yylex() 用の処理を行う．
-  /// @param[out] lval トークンの値を格納する変数
-  /// @param[out] lloc トークンの位置を格納する変数
-  /// @return トークンの型を返す．
-  int
-  scan(ymuint32& lval,
-       FileRegion& lloc);
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief INPUT/OUTPUT 文に共通なパースを行う．
+  /// @param[out] name_id 名前の識別子番号を格納する変数
+  /// @param[out] last_loc 末尾のファイル位置
+  bool
+  parse_inout(ymuint& name_id,
+	      FileRegion& last_loc);
+
+  /// @brief ゲート文に共通なパースを行う．
+  /// @param[in] first_loc 先頭のファイル位置
+  /// @param[in] oname_id 出力名の識別子番号
+  bool
+  parse_gate(const FileRegion& first_loc,
+	     ymuint oname_id);
 
   /// @brief INPUT 文を読み込む．
   /// @param[in] loc ファイル位置
@@ -89,7 +86,7 @@ public:
   /// @return エラーが起きたら false を返す．
   bool
   read_input(const FileRegion& loc,
-	     ymuint32 name_id);
+	     ymuint name_id);
 
   /// @brief OUTPUT 文を読み込む．
   /// @param[in] loc ファイル位置
@@ -97,7 +94,7 @@ public:
   /// @return エラーが起きたら false を返す．
   bool
   read_output(const FileRegion& loc,
-	      ymuint32 name_id);
+	      ymuint name_id);
 
   /// @brief ゲート文を読み込む．
   /// @param[in] loc ファイル位置
@@ -107,25 +104,23 @@ public:
   /// @note 入力名のリストは push_str() で積まれている．
   bool
   read_gate(const FileRegion& loc,
-	    ymuint32 oname_id,
-	    tIscas89GateType type);
+	    ymuint oname_id,
+	    tIscas89GateType type,
+	    const vector<ymuint>& iname_id_list);
 
-  /// @brief 名前をリストに追加する．
-  /// @param[in] str_id 文字列の ID 番号
-  void
-  push_str(ymuint32 str_id);
+  /// @brief トークンを一つ読みだす．
+  /// @param[out] lval トークンの値を格納する変数
+  /// @param[out] lloc トークンの位置を格納する変数
+  /// @return トークンの型を返す．
+  ///
+  /// lval に値が入るのはトークンが kToken_NAME の時だけ
+  Token
+  read_token(ymuint& lval,
+	     FileRegion& lloc);
 
   /// @brief ID 番号から IdCell を得る．
   IdCell*
-  id2cell(ymuint32 id) const;
-
-  /// @brief ID 番号から文字列を得る．
-  const char*
-  id2str(ymuint32 id) const;
-
-  /// @brief ID 番号から位置情報を得る．
-  FileRegion
-  id2loc(ymuint32 id) const;
+  id2cell(ymuint id) const;
 
 
 private:
@@ -137,7 +132,7 @@ private:
   /// @param[in] src_str ソース文字列
   /// @param[in] loc 文字列の位置情報
   /// @return 文字列の ID 番号
-  ymuint32
+  ymuint
   reg_str(const char* src_str,
 	  const FileRegion& loc);
 
@@ -156,12 +151,6 @@ private:
   // 文字列のハッシュ
   Iscas89IdHash mIdHash;
 
-  // 位置情報バッファ
-  FileRegion mLoc1;
-
-  // 入力IDのリスト
-  vector<ymuint32> mInputList;
-
 };
 
 
@@ -172,7 +161,7 @@ private:
 // @brief ID 番号から IdCell を得る．
 inline
 IdCell*
-Iscas89ParserImpl::id2cell(ymuint32 id) const
+Iscas89ParserImpl::id2cell(ymuint id) const
 {
   return mIdHash.cell(id);
 }
@@ -180,7 +169,7 @@ Iscas89ParserImpl::id2cell(ymuint32 id) const
 // @brief ID 番号から文字列を得る．
 inline
 const char*
-Iscas89ParserImpl::id2str(ymuint32 id) const
+Iscas89ParserImpl::id2str(ymuint id) const
 {
   return mIdHash.str(id);
 }
@@ -188,7 +177,7 @@ Iscas89ParserImpl::id2str(ymuint32 id) const
 // @brief ID 番号から位置情報を得る．
 inline
 FileRegion
-Iscas89ParserImpl::id2loc(ymuint32 id) const
+Iscas89ParserImpl::id2loc(ymuint id) const
 {
   return mIdHash.loc(id);
 }

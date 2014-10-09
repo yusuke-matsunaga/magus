@@ -19,9 +19,6 @@ END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_ISCAS89
 
-#include "iscas89_grammer.hh"
-
-
 //////////////////////////////////////////////////////////////////////
 // iscas89 用の字句解析器
 //////////////////////////////////////////////////////////////////////
@@ -40,7 +37,7 @@ Iscas89Scanner::~Iscas89Scanner()
 
 // @brief トークンを一つ読み出す．
 // @param[out] loc トークンの位置を格納する変数
-int
+Token
 Iscas89Scanner::read_token(FileRegion& loc)
 {
   Token token = scan();
@@ -50,6 +47,10 @@ Iscas89Scanner::read_token(FileRegion& loc)
     cerr << "read_token()" << " --> "
 	 << loc << ": ";
     switch ( token ) {
+    case kToken_LPAR:   cerr << "("; break;
+    case kToken_RPAR:   cerr << ")"; break;
+    case kToken_EQ:     cerr << "="; break;
+    case kToken_COMMA:  cerr << ","; break;
     case kToken_INPUT:  cerr << "INPUT"; break;
     case kToken_OUTPUT: cerr << "OUTPUT"; break;
     case kToken_BUFF:   cerr << "BUFF"; break;
@@ -73,7 +74,7 @@ Iscas89Scanner::read_token(FileRegion& loc)
 
 // @brief read_token() の下請け関数
 // @return トークンを返す．
-int
+Token
 Iscas89Scanner::scan()
 {
   int c;
@@ -100,16 +101,16 @@ Iscas89Scanner::scan()
     goto ST_SHARP;
 
   case '=':
-    return '=';
+    return kToken_EQ;
 
   case '(':
-    return '(';
+    return kToken_LPAR;
 
   case ')':
-    return ')';
+    return kToken_RPAR;
 
   case ',':
-    return ',';
+    return kToken_COMMA;
 
   default:
     mCurString.put_char(c);
