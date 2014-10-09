@@ -58,15 +58,15 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   MsgMgr::reg_handler(&mh);
 
   TpgNetwork* new_network = TpgNetwork::read_blif(ex_filename, NULL);
-  set_network(new_network);
 
   MsgMgr::unreg_handler(&mh);
 
-  if ( !stat ) {
+  if ( new_network == NULL ) {
     set_result(mh.msg_obj());
     return TCL_ERROR;
   }
 
+  set_network(new_network);
   after_set_network();
 
   return TCL_OK;
@@ -114,15 +114,15 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   MsgMgr::reg_handler(&mh);
 
   TpgNetwork* new_network = TpgNetwork::read_iscas89(ex_filename);
-  set_network(new_network);
 
   MsgMgr::unreg_handler(&mh);
 
-  if ( !stat ) {
+  if ( new_network == NULL ) {
     set_result(mh.msg_obj());
     return TCL_ERROR;
   }
 
+  set_network(new_network);
   after_set_network();
 
   return TCL_OK;
