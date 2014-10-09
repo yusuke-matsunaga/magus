@@ -6,6 +6,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}
   include
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 
@@ -13,11 +14,11 @@ include_directories(
 #  ソースファイルの設定
 # ===================================================================
 
-set (main_SOURCES
+set ( main_SOURCES
   src/BNetBdnConv.cc
   )
 
-set (bdn_SOURCES
+set ( bdn_SOURCES
   src/bdn/BdnBlifWriter.cc
   src/bdn/BdnDumper.cc
   src/bdn/BdnMgr.cc
@@ -32,7 +33,7 @@ set (bdn_SOURCES
   src/bdn/iscas89/Iscas89BdnConv.cc
   )
 
-set (blif_SOURCES
+set ( blif_SOURCES
   src/blif/BlifDic.cc
   src/blif/BlifHandler.cc
   src/blif/BlifIdHash.cc
@@ -44,7 +45,7 @@ set (blif_SOURCES
   src/blif/BlifScanner.cc
   )
 
-set (bnet_SOURCES
+set ( bnet_SOURCES
   src/bnet/BNetBlifWriter.cc
   src/bnet/BNetDecomp.cc
   src/bnet/BNetEquWriter.cc
@@ -65,7 +66,7 @@ set (bnet_SOURCES
   src/bnet/iscas89/BNetIscas89Reader.cc
   )
 
-set (cmn_SOURCES
+set ( cmn_SOURCES
   src/cmn/BlifWriterImpl.cc
   src/cmn/CmnBlifWriter.cc
   src/cmn/CmnDffCell.cc
@@ -79,7 +80,7 @@ set (cmn_SOURCES
   src/cmn/VerilogWriterImpl.cc
   )
 
-set (conv_mvn_bdn_SOURCES
+set ( conv_mvn_bdn_SOURCES
   src/conv_mvn_bdn/AddConv.cc
   src/conv_mvn_bdn/AndConv.cc
   src/conv_mvn_bdn/CaseEqConv.cc
@@ -110,7 +111,7 @@ set (conv_mvn_bdn_SOURCES
   src/conv_mvn_bdn/XorConv.cc
   )
 
-set (iscas89_SOURCES
+set ( iscas89_SOURCES
   src/iscas89/Iscas89Handler.cc
   src/iscas89/Iscas89IdHash.cc
   src/iscas89/Iscas89Network.cc
@@ -119,9 +120,11 @@ set (iscas89_SOURCES
   src/iscas89/Iscas89Parser.cc
   src/iscas89/Iscas89ParserImpl.cc
   src/iscas89/Iscas89Scanner.cc
+
+  ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
   )
 
-set (mvn_SOURCES
+set ( mvn_SOURCES
   src/mvn/MvnCaseEq.cc
   src/mvn/MvnCellNode.cc
   src/mvn/MvnConst.cc
@@ -149,7 +152,7 @@ set (mvn_SOURCES
   src/mvn/verilog/Xmask.cc
   )
 
-set (tgnet_SOURCES
+set ( tgnet_SOURCES
   src/tgnet/LogicMgr.cc
   src/tgnet/NameHash.cc
   src/tgnet/TgNetwork.cc
@@ -161,7 +164,7 @@ set (tgnet_SOURCES
   src/tgnet/iscas89/TgIscas89Reader.cc
   )
 
-set (verilog_SOURCES
+set ( verilog_SOURCES
   src/verilog/VlWriter.cc
   src/verilog/VlwAssign.cc
   src/verilog/VlwBase.cc
@@ -173,34 +176,33 @@ set (verilog_SOURCES
 
 
 # Create target for the parser
- ADD_CUSTOM_TARGET(iscas89_grammer echo "Creating iscas89_grammer.cc")
+add_custom_target ( iscas89_grammer
+  echo "Creating iscas89_grammer.cc"
+  )
 
 # Create custom command for bison/yacc (note the DEPENDS)
- ADD_CUSTOM_COMMAND(
-   SOURCE src/iscas89/iscas89_grammer.yy
-   COMMAND ${BISON_EXECUTABLE}
-   ARGS -y ${CMAKE_CURRENT_SOURCE_DIR}/src/iscas89/iscas89_grammer.yy
-        -o ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
-	-d -v
-   TARGET iscas89_grammer
-   OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc)
-
-# Add iscas89_grammer.cc to the list of sources
- SET(iscas89_SOURCES ${iscas89_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc)
+add_custom_command (
+  TARGET iscas89_grammer
+  COMMAND ${BISON_EXECUTABLE}
+  ARGS -y ${CMAKE_CURRENT_SOURCE_DIR}/src/iscas89/iscas89_grammer.yy
+  -o ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
+  -d -v
+  OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc
+  ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.output
+  )
 
 # Since parser.c does not exists yet when cmake is run, mark
 # it as generated
- SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc GENERATED)
-
-# Include binary directory to include lexer.c in parser.c
- INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+set_source_files_properties ( ${CMAKE_CURRENT_BINARY_DIR}/iscas89_grammer.cc GENERATED )
 
 
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
 
-add_library(ym_networks SHARED
+add_library( ym_networks
+  SHARED
   ${main_SOURCES}
   ${bdn_SOURCES}
   ${blif_SOURCES}
@@ -213,7 +215,11 @@ add_library(ym_networks SHARED
   ${verilog_SOURCES}
   )
 
-target_link_libraries(ym_networks
+add_dependencies ( ym_networks
+  iscas89_grammer
+  )
+
+target_link_libraries ( ym_networks
   ym_verilog
   ym_cell
   ym_logic

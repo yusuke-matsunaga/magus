@@ -127,13 +127,17 @@ set (mincov_SOURCES
 
 set (misc_SOURCES
   src/misc/Binder.cc
+  src/misc/Dictionary.cc
   src/misc/DlList.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc
   src/misc/RefCount.cc
   src/misc/Scanner.cc
+  src/misc/ShStringDict.cc
   src/misc/StopWatch.cc
+  src/misc/StrBuff.cc
+  src/misc/StrPool.cc
   )
 
 set (msg_SOURCES
@@ -149,12 +153,6 @@ if (POPT_FOUND)
 else (POPT_FOUND)
   set (popt_SOURCES)
 endif (POPT_FOUND)
-
-set (str_SOURCES
-  src/str/StrBuff.cc
-  src/str/StrPool.cc
-  src/str/StrPool.h
-  )
 
 
 # ===================================================================

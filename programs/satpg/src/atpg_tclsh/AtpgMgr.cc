@@ -61,53 +61,9 @@ AtpgMgr::set_network(TpgNetwork* network)
 {
   delete mNetwork;
   mNetwork = network;
+
+  after_set_network();
 }
-
-#if 0
-// @brief blif 形式のファイルを読み込む．
-// @param[in] filename ファイル名
-// @param[in] cell_library セルライブラリ
-// @retval true 読み込みが成功した．
-// @retval false 読み込みが失敗した．
-bool
-AtpgMgr::read_blif(const string& filename,
-		   const CellLibrary* cell_library)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_READ);
-
-  delete mNetwork;
-  mNetwork = TpgNetwork::read_blif(filename, cell_library);
-  if ( mNetwork != NULL ) {
-    after_set_network();
-  }
-
-  mTimer.change(old_id);
-
-  return mNetwork != NULL;
-}
-
-// @brief iscas89 形式のファイルを読み込む．
-// @param[in] filename ファイル名
-// @retval true 読み込みが成功した．
-// @retval false 読み込みが失敗した．
-bool
-AtpgMgr::read_iscas89(const string& filename)
-{
-  ymuint old_id = mTimer.cur_id();
-  mTimer.change(TM_READ);
-
-  delete mNetwork;
-  mNetwork = TpgNetwork::read_iscas89(filename);
-  if ( mNetwork != NULL ) {
-    after_set_network();
-  }
-
-  mTimer.change(old_id);
-
-  return mNetwork != NULL;
-}
-#endif
 
 // @brief 乱数生成器を初期化する．
 void

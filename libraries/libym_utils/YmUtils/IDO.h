@@ -25,9 +25,12 @@ class IDO
 {
 public:
 
+  /// @brief コンストラクタ
+  IDO();
+
   /// @brief デストラクタ
   virtual
-  ~IDO() { }
+  ~IDO();
 
 
 public:
@@ -69,10 +72,6 @@ public:
   /// @return 読み込んだ値を返す．
   string
   read_str();
-
-  /// @brief 一行分の文字列の読み出し．
-  string
-  read_line();
 
 
 public:

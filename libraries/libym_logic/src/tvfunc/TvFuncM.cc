@@ -11,26 +11,15 @@
 #include "YmLogic/NpnMapM.h"
 
 
-#if SIZEOF_UNSIGNED_LONG == 8
-// 1 ワード 64 ビットの時 1 となるマクロ
-#define WORD64 1
 // 1 ワード当たりの入力数
 #define NIPW 6
-#else
-// 1 ワード 64 ビットの時 1 となるマクロ
-#define WORD64 0
-// 1 ワード当たりの入力数
-#define NIPW 5
-#endif
 
 //#define DEBUG
 
 BEGIN_NONAMESPACE
 
-#if WORD64
-
 // コファクターマスク
-ymulong c_masks[] = {
+ymuint64 c_masks[] = {
   0xAAAAAAAAAAAAAAAA,
   0xCCCCCCCCCCCCCCCC,
   0xF0F0F0F0F0F0F0F0,
@@ -41,7 +30,7 @@ ymulong c_masks[] = {
 
 // 対称性を調べるためのテーブルその1
 // 同位相の時に用いる．
-ymulong sym_masks2[] = {
+ymuint64 sym_masks2[] = {
   0x2222222222222222, // (1, 0)
   0x0A0A0A0A0A0A0A0A, // (2, 0)
   0x0C0C0C0C0C0C0C0C, // (2, 1)
@@ -61,7 +50,7 @@ ymulong sym_masks2[] = {
 
 // 対称性を調べるためのテーブルその2
 // 逆位相の時に用いる．
-ymulong sym_masks3[] = {
+ymuint64 sym_masks3[] = {
   0x1111111111111111, // (1, 0)
   0x0505050505050505, // (2, 0)
   0x0303030303030303, // (2, 1)
@@ -79,49 +68,6 @@ ymulong sym_masks3[] = {
   0x000000000000FFFF  // (5, 4)
 };
 
-#else
-
-// コファクターマスク
-ymulong c_masks[] = {
-  0xAAAAAAAA, // 10101010101010101010101010101010
-  0xCCCCCCCC, // 11001100110011001100110011001100
-  0xF0F0F0F0, // 11110000111100001111000011110000
-  0xFF00FF00, // 11111111000000001111111100000000
-  0xFFFF0000  // 11111111111111110000000000000000
-};
-
-// 対称性を調べるためのテーブルその1
-// 同位相の時に用いる．
-ymulong sym_masks2[] = {
-  0x22222222, // (1, 0)
-  0x0A0A0A0A, // (2, 0)
-  0x0C0C0C0C, // (2, 1)
-  0x00AA00AA, // (3, 0)
-  0x00CC00CC, // (3, 1)
-  0x00F000F0, // (3, 2)
-  0x0000AAAA, // (4, 0)
-  0x0000CCCC, // (4, 1)
-  0x0000F0F0, // (4, 2)
-  0x0000FF00  // (4, 3)
-};
-
-// 対称性を調べるためのテーブルその2
-// 逆位相の時に用いる．
-ymulong sym_masks3[] = {
-  0x11111111, // (1, 0)
-  0x05050505, // (2, 0)
-  0x03030303, // (2, 1)
-  0x00550055, // (3, 0)
-  0x00330033, // (3, 1)
-  0x000F000F, // (3, 2)
-  0x00005555, // (4, 0)
-  0x00003333, // (4, 1)
-  0x00000F0F, // (4, 2)
-  0x000000FF  // (4, 3)
-};
-
-#endif
-
 END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM
@@ -138,7 +84,7 @@ TvFuncM::TvFuncM(ymuint ni,
   mOutputNum(no),
   mBlockNum1(nblock(ni)),
   mBlockNum(mBlockNum1 * no),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = 0UL;
@@ -162,7 +108,7 @@ TvFuncM::TvFuncM(const vector<TvFunc>& src_list)
   mOutputNum = no;
   mBlockNum1 = nblock(ni);
   mBlockNum = mBlockNum1 * no;
-  mVector = new ymulong[mBlockNum];
+  mVector = new ymuint64[mBlockNum];
   for (ymuint i = 0; i < no; ++ i) {
     ymuint offset = i * mBlockNum1;
     const TvFunc& src1 = src_list[i];
@@ -178,7 +124,7 @@ TvFuncM::TvFuncM(const TvFuncM& src) :
   mOutputNum(src.mOutputNum),
   mBlockNum1(src.mBlockNum1),
   mBlockNum(src.mBlockNum),
-  mVector(new ymulong[mBlockNum])
+  mVector(new ymuint64[mBlockNum])
 {
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = src.mVector[i];
@@ -193,7 +139,7 @@ TvFuncM::TvFuncM(const TvFunc& src)
   mOutputNum = 1;
   mBlockNum1 = nblock(ni);
   mBlockNum = mBlockNum1;
-  mVector = new ymulong[mBlockNum];
+  mVector = new ymuint64[mBlockNum];
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     mVector[i] = src.raw_data(i);
   }
@@ -207,7 +153,7 @@ TvFuncM::operator=(const TvFuncM& src)
     delete [] mVector;
     mBlockNum1 = src.mBlockNum1;
     mBlockNum = src.mBlockNum;
-    mVector = new ymulong[mBlockNum];
+    mVector = new ymuint64[mBlockNum];
   }
   mInputNum = src.mInputNum;
   mOutputNum = src.mOutputNum;
@@ -266,18 +212,16 @@ TvFuncM::negate()
     }
     break;
 
-#if WORD64
   case 6:
     for (ymuint i = 0; i < mOutputNum; ++ i) {
       mVector[i] ^= 0xFFFFFFFFFFFFFFFF;
     }
     break;
-#endif
 
   default:
     {
-      ymulong* endp = mVector + mBlockNum;
-      for (ymulong* bp = mVector; bp != endp; ++ bp) {
+      ymuint64* endp = mVector + mBlockNum;
+      for (ymuint64* bp = mVector; bp != endp; ++ bp) {
 	*bp ^= ~(0UL);
       }
     }
@@ -325,13 +269,13 @@ TvFuncM::set_cofactor(VarId varid,
 {
   ymuint pos = varid.val();
   if ( pos < NIPW ) {
-    ymulong mask = c_masks[pos];
+    ymuint64 mask = c_masks[pos];
     if ( inv ) {
       mask = ~mask;
     }
     int shift = 1 << pos;
     for (ymuint i = 0; i < mBlockNum; ++ i) {
-      ymulong pat = mVector[i] & mask;
+      ymuint64 pat = mVector[i] & mask;
       if ( inv ) {
 	pat |= (pat << shift);
       }
@@ -386,9 +330,9 @@ TvFuncM::check_sup(VarId var) const
   if ( i < NIPW ) {
     // ブロックごとにチェック
     ymuint dist = 1U << i;
-    ymulong mask = c_masks[i];
+    ymuint64 mask = c_masks[i];
     for (ymuint i = 0; i < mBlockNum; ++ i) {
-      ymulong word = mVector[i];
+      ymuint64 word = mVector[i];
       if ( (word ^ (word << dist)) & mask ) {
 	return true;
       }
@@ -453,7 +397,7 @@ TvFuncM::check_sym(VarId var1,
     // j < NIPW
     ymuint mask_i = (1U << (i - NIPW));
     ymuint cond = inv ? 0UL : mask_i;
-    ymulong mask2 = ~c_masks[j];
+    ymuint64 mask2 = ~c_masks[j];
     ymuint s = 1U << j;
     for (ymuint i = 0; i < mOutputNum; ++ i) {
       ymuint offset = i * mBlockNum1;
@@ -470,10 +414,10 @@ TvFuncM::check_sym(VarId var1,
     // i < NIPW
     // j < NIPW
     if ( inv ) {
-      ymulong mask = sym_masks3[(i * (i - 1)) / 2 + j];
+      ymuint64 mask = sym_masks3[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) + (1U << j);
       for (ymuint i = 0; i < mBlockNum; ++ i) {
-	ymulong word = mVector[i];
+	ymuint64 word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -481,10 +425,10 @@ TvFuncM::check_sym(VarId var1,
       }
     }
     else {
-      ymulong mask = sym_masks2[(i * (i - 1)) / 2 + j];
+      ymuint64 mask = sym_masks2[(i * (i - 1)) / 2 + j];
       ymuint s = (1U << i) - (1U << j);
       for (ymuint i = 0; i < mBlockNum; ++ i) {
-	ymulong word = mVector[i];
+	ymuint64 word = mVector[i];
 	if ( ((word >> s) ^ word) & mask ) {
 	  ans = false;
 	  break;
@@ -527,7 +471,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
     NpnVmap omap = npnmap.omap(src_var);
     VarId dst_var = omap.var();
     ymuint dst_pos = dst_var.val();
-    ymulong omask = omap.inv() ? 1UL : 0UL;
+    ymuint64 omask = omap.inv() ? 1UL : 0UL;
     for (ymuint i = 0; i < ni_pow; ++ i) {
       ymuint new_i = 0;
       ymuint tmp = i;
@@ -536,7 +480,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
 	  new_i |= ipat[b];
 	}
       }
-      ymulong pat = (value(VarId(o), i ^ imask) ^ omask);
+      ymuint64 pat = (value(VarId(o), i ^ imask) ^ omask);
       ans.mVector[block(new_i) + dst_pos * mBlockNum1] |= pat << shift(new_i);
     }
   }
@@ -552,7 +496,7 @@ TvFuncM::xform(const NpnMapM& npnmap) const
 ymuint
 TvFuncM::hash() const
 {
-  ymulong ans = 0;
+  ymuint64 ans = 0;
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     ans ^= mVector[i];
   }
@@ -586,8 +530,8 @@ compare(const TvFuncM& left,
 
   ymuint n = left.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
-    ymulong w1 = left.mVector[i];
-    ymulong w2 = right.mVector[i];
+    ymuint64 w1 = left.mVector[i];
+    ymuint64 w2 = right.mVector[i];
     if ( w1 < w2 ) {
       return -1;
     }
@@ -612,8 +556,8 @@ operator&&(const TvFuncM& func1,
 
   ymuint n = func1.mBlockNum;
   for (ymuint i = 0; i < n; ++ i) {
-    ymulong w1 = func1.mVector[i];
-    ymulong w2 = func2.mVector[i];
+    ymuint64 w1 = func1.mVector[i];
+    ymuint64 w2 = func2.mVector[i];
     if ( (w1 & w2) != 0U ) {
       return true;
     }
@@ -628,10 +572,10 @@ TvFuncM::print(ostream& s,
 	       int mode) const
 {
   ymuint ni_pow = 1UL << mInputNum;
-  const ymuint wordsize = sizeof(ymulong) * 8;
+  const ymuint wordsize = sizeof(ymuint64) * 8;
   if ( mode == 2 ) {
-    ymulong* bp = mVector;
-    ymulong tmp = *bp;
+    ymuint64* bp = mVector;
+    ymuint64 tmp = *bp;
     const char* del = "";
     for (ymuint j = 0; j < mOutputNum; ++ j) {
       s << del;
@@ -655,15 +599,15 @@ TvFuncM::print(ostream& s,
   }
   else if ( mode == 16 ) {
     ymuint ni_pow4 = ni_pow / 4;
-    ymulong* bp = mVector;
-    ymulong tmp = *bp;
+    ymuint64* bp = mVector;
+    ymuint64 tmp = *bp;
     for (ymuint j = 0; j < mOutputNum; ++ j) {
       const char* del = "";
       ymuint offset = 0;
       for (ymuint i = 0; i < ni_pow4; ++ i) {
 	s << del;
 	del = "|";
-	ymulong tmp1 = (tmp & 0xF);
+	ymuint64 tmp1 = (tmp & 0xF);
 	if ( tmp1 < 10 ) {
 	  s << static_cast<char>('0' + tmp1);
 	}
@@ -719,7 +663,7 @@ TvFuncM::restore(IDO& s)
   if ( mBlockNum != nblk ) {
     delete [] mVector;
     mBlockNum = nblk;
-    mVector = new ymulong[mBlockNum];
+    mVector = new ymuint64[mBlockNum];
   }
   for (ymuint i = 0; i < mBlockNum; ++ i) {
     s >> mVector[i];

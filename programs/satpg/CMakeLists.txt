@@ -32,6 +32,7 @@ set (dtpg_SOURCES
   src/dtpg/bt/BtJust2.cc
   src/dtpg/bt/BtJustBase.cc
   src/dtpg/bt/BtSimple.cc
+
   src/dtpg/dop/DopBase.cc
   src/dtpg/dop/DopDrop.cc
   src/dtpg/dop/DopDummy.cc
@@ -39,7 +40,9 @@ set (dtpg_SOURCES
   src/dtpg/dop/DopTvList.cc
   src/dtpg/dop/DopVerify.cc
   src/dtpg/dop/FopDrop.cc
+
   src/dtpg/driver/DtpgDriverImpl.cc
+
   src/dtpg/engine/LitMap.cc
   src/dtpg/engine/SatEngine.cc
   src/dtpg/engine/SatEngineMulti.cc
@@ -48,6 +51,7 @@ set (dtpg_SOURCES
   src/dtpg/engine/SatEngineSingle2.cc
   src/dtpg/engine/SmtEngine.cc
   src/dtpg/engine/SmtEngineSingle.cc
+
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc
   src/dtpg/uop/UopList.cc
@@ -56,6 +60,7 @@ set (dtpg_SOURCES
 
 set (fsim_SOURCES
   src/fsim/fop/FopKDet.cc
+
   src/fsim/fsim2/EventQ.cc
   src/fsim/fsim2/Fsim2.cc
   src/fsim/fsim2/SimNode.cc
@@ -64,6 +69,7 @@ set (fsim_SOURCES
   src/fsim/fsim2/SnInput.cc
   src/fsim/fsim2/SnOr.cc
   src/fsim/fsim2/SnXor.cc
+
   src/fsim/fsim3/EventQ.cc
   src/fsim/fsim3/Fsim3.cc
   src/fsim/fsim3/SimNode.cc
@@ -72,7 +78,6 @@ set (fsim_SOURCES
   src/fsim/fsim3/SnInput.cc
   src/fsim/fsim3/SnOr.cc
   src/fsim/fsim3/SnXor.cc
-  src/fsim/fsim3/simnode_test.cc
   )
 
 set (graphsat_SOURCES
@@ -150,3 +155,21 @@ if (TCL_FOUND)
     ${TCL_LIBRARIES}
     )
 endif (TCL_FOUND)
+
+
+# ===================================================================
+#  テストの設定
+# ===================================================================
+
+add_executable ( satpg_simnode_test
+  src/fsim/fsim3/simnode_test.cc
+  )
+
+target_link_libraries( satpg_simnode_test
+  satpg_fsim
+  )
+
+add_test (
+  NAME satpg_simnode_test_run
+  COMMAND satpg_simnode_test
+  )

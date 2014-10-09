@@ -223,10 +223,10 @@ public:
   const MislibNode*
   opin_expr() const = 0;
 
-  /// @brief 入力ピンのリストを表すオブジェクトを返す．
+  /// @brief 入力ピンの先頭を表すオブジェクトを返す．
   virtual
   const MislibNode*
-  ipin_list() const = 0;
+  ipin_top() const = 0;
 
 };
 

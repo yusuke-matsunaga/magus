@@ -126,9 +126,17 @@ LcLogicMgr::find_repfunc(const TvFuncM& f,
     mNpnMgr.cannonical(f1, xmap1);
     xmap = NpnMapM(xmap1);
     repfunc = f.xform(xmap);
-    {
+    { // 一応検証
       TvFunc repfunc1 = f1.xform(xmap1);
-      assert_cond( repfunc.output(VarId(0)) == repfunc1, __FILE__, __LINE__);
+
+      if ( repfunc.output(VarId(0)) != repfunc1 ) {
+	cout << "Error in find_repfunc" << endl
+	     << "f          = " << f1 << endl
+	     << "repfunc    = " << repfunc << endl
+	     << "repfunc(0) = " << repfunc.output(VarId(0)) << endl
+	     << "repfunc1   = " << repfunc1 << endl;
+      }
+      ASSERT_COND( repfunc.output(VarId(0)) == repfunc1 );
     }
   }
   else {
