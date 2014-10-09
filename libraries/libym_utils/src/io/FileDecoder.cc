@@ -10,6 +10,7 @@
 #include "FileDecoder.h"
 #include "ThruDecoder.h"
 #include "ZDecoder.h"
+#include "YmUtils/MsgMgr.h"
 
 #if defined(ZLIB_FOUND)
 #include "GzDecoder.h"

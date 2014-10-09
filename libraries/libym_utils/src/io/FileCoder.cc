@@ -10,6 +10,7 @@
 #include "FileCoder.h"
 #include "ThruCoder.h"
 #include "ZCoder.h"
+#include "YmUtils/MsgMgr.h"
 
 #if defined(ZLIB_FOUND)
 #include "GzCoder.h"
