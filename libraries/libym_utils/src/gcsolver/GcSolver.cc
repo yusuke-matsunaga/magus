@@ -54,14 +54,23 @@ GcSolver::~GcSolver()
 void
 GcSolver::init(ymuint num)
 {
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    delete [] mNodeArray[i].mColorSet;
+  }
   delete [] mNodeArray;
   delete [] mNodeHeap;
 
   mNodeNum = num;
   if ( mNodeNum > 0 ) {
+    ymuint vectlen = (mNodeNum + 63) / 64;
     mNodeArray = new GcNode[mNodeNum];
     for (ymuint i = 0; i < mNodeNum; ++ i) {
-      mNodeArray[i].mId = i;
+      GcNode* node = &mNodeArray[i];
+      node->mId = i;
+      node->mColorSet = new ymuint64[vectlen];
+      for (ymuint j = 0; j < vectlen; ++ j) {
+	node->mColorSet[j] = 0UL;
+      }
     }
     mNodeHeap = new GcNode*[mNodeNum];
   }
@@ -226,9 +235,11 @@ void
 GcSolver::update_sat_degree(GcNode* node,
 			    ymuint color)
 {
-  if ( node->mColorSet.count(color) == 0 ) {
-    node->mColorSet.insert(color);
+  if ( !node->check_color(color) ) {
+    node->set_color(color);
     ++ node->mSatDegree;
+
+    // SAT degree が変わったのでヒープ上の位置も更新する．
     ymuint pos = node->mHeapPos;
     while ( pos > 0 ) {
       GcNode* node = mNodeHeap[pos];
