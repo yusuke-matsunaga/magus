@@ -10,8 +10,6 @@
 
 
 #include "iscas89_nsdef.h"
-
-#include "YmUtils/StrBuff.h"
 #include "Iscas89IdHash.h"
 
 
@@ -19,7 +17,6 @@ BEGIN_NAMESPACE_YM_ISCAS89
 
 class Iscas89Handler;
 class Iscas89Scanner;
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class Iscas89ParserImpl Iscas89ParserImpl.h "Iscas89ParserImpl.h"
@@ -66,19 +63,36 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief INPUT/OUTPUT 文に共通なパースを行う．
-  /// @param[out] name_id 名前の識別子番号を格納する変数
-  /// @param[out] last_loc 末尾のファイル位置
+  /// @brief ゲート型を読み込む．
+  /// @param[out] gate_type ゲート型を格納する変数．
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  ///
+  /// エラーが起きたらエラーメッセージをセットする．
   bool
-  parse_inout(ymuint& name_id,
-	      FileRegion& last_loc);
+  parse_gate_type(tIscas89GateType& gate_type);
 
-  /// @brief ゲート文に共通なパースを行う．
-  /// @param[in] first_loc 先頭のファイル位置
-  /// @param[in] oname_id 出力名の識別子番号
+  /// @brief '(' ')' で囲まれた名前を読み込む．
+  /// @param[in] name_id 名前の識別子番号を格納する変数．
+  /// @param[in] last_loc 末尾のファイル位置
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  ///
+  /// エラーが起きたらエラーメッセージをセットする．
   bool
-  parse_gate(const FileRegion& first_loc,
-	     ymuint oname_id);
+  parse_name(ymuint& name_id,
+	     FileRegion& last_loc);
+
+  /// @brief '(' ')' で囲まれた名前のリストを読み込む．
+  /// @param[in] name_id_list 名前の識別子番号を格納するリスト．
+  /// @param[in] last_loc 末尾のファイル位置
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  ///
+  /// エラーが起きたらエラーメッセージをセットする．
+  bool
+  parse_name_list(vector<ymuint>& name_id_list,
+		  FileRegion& last_loc);
 
   /// @brief INPUT 文を読み込む．
   /// @param[in] loc ファイル位置
@@ -108,6 +122,19 @@ private:
 	    tIscas89GateType type,
 	    const vector<ymuint>& iname_id_list);
 
+  /// @brief 次のトークンが期待されている型か調べる．
+  /// @param[in] exp_token トークンの期待値
+  /// @param[out] lval トークンの値を格納する変数
+  /// @param[out] loc トークンのファイル位置を格納する変数．
+  /// @retval true トークンの型が一致した．
+  /// @retval false トークンの方が一致しなかった．
+  ///
+  /// トークンの方が一致しなかった場合にはエラーメッセージをセットする．
+  bool
+  expect(Token exp_token,
+	 ymuint& lval,
+	 FileRegion& loc);
+
   /// @brief トークンを一つ読みだす．
   /// @param[out] lval トークンの値を格納する変数
   /// @param[out] lloc トークンの位置を格納する変数
@@ -121,12 +148,6 @@ private:
   /// @brief ID 番号から IdCell を得る．
   IdCell*
   id2cell(ymuint id) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
   /// @brief 文字列用の領域を確保する．
   /// @param[in] src_str ソース文字列

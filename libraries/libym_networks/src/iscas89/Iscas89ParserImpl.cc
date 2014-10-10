@@ -82,8 +82,8 @@ Iscas89ParserImpl::read(const string& filename)
   }
 
   // パーサー本体
-  bool has_error = false;
   bool go_on = true;
+  bool has_error = false;
   while ( go_on ) {
     ymuint name_id;
     FileRegion first_loc;
@@ -91,26 +91,45 @@ Iscas89ParserImpl::read(const string& filename)
     Token tok = read_token(name_id, first_loc);
     switch ( tok ) {
     case kToken_INPUT:
-      if ( !parse_inout(name_id, last_loc) ) {
-	has_error = true;
+      if ( !parse_name(name_id, last_loc) ) {
+	goto error;
       }
-      else if ( !read_input(FileRegion(first_loc, last_loc), name_id) ) {
-	has_error = true;
+      if ( !read_input(FileRegion(first_loc, last_loc), name_id) ) {
+	goto error;
       }
       break;
 
     case kToken_OUTPUT:
-      if ( !parse_inout(name_id, last_loc) ) {
-	has_error = true;
+      if ( !parse_name(name_id, last_loc) ) {
+	goto error;
       }
-      else if ( !read_output(FileRegion(first_loc, last_loc), name_id) ) {
-	has_error = true;
+      if ( !read_output(FileRegion(first_loc, last_loc), name_id) ) {
+	goto error;
       }
       break;
 
     case kToken_NAME:
-      if ( !parse_gate(first_loc, name_id) ) {
-	has_error = true;
+      {
+	ymuint cur_lval;
+	FileRegion cur_loc;
+
+	if ( !expect(kToken_EQ, cur_lval, cur_loc) ) {
+	  goto error;
+	}
+
+	tIscas89GateType gate_type;
+	if ( !parse_gate_type(gate_type) ) {
+	  goto error;
+	}
+
+	vector<ymuint> iname_id_list;
+	if ( !parse_name_list(iname_id_list, last_loc) ) {
+	  goto error;
+	}
+	if ( !read_gate(FileRegion(first_loc, last_loc),
+			name_id, gate_type, iname_id_list) ) {
+	  goto error;
+	}
       }
       break;
 
@@ -118,6 +137,12 @@ Iscas89ParserImpl::read(const string& filename)
       go_on = false;
       break;
     }
+    continue;
+
+  error:
+    has_error = true;
+    // ')' まで読み進める．
+    while ( read_token(name_id, first_loc) != kToken_RPAR ) ;
   }
 
   delete mScanner;
@@ -153,51 +178,19 @@ Iscas89ParserImpl::add_handler(Iscas89Handler* handler)
   handler->mParser = this;
 }
 
-// @brief INPUT/OUTPUT 文に共通なパースを行う．
-// @param[out] name_id 名前の識別子番号を格納する変数
-// @param[out] last_loc 末尾のファイル位置
+// @brief ゲート型を読み込む．
+// @param[out] gate_type ゲート型を格納する変数．
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+//
+// エラーが起きたらエラーメッセージをセットする．
 bool
-Iscas89ParserImpl::parse_inout(ymuint& name_id,
-			       FileRegion& last_loc)
+Iscas89ParserImpl::parse_gate_type(tIscas89GateType& gate_type)
 {
   ymuint cur_lval;
   FileRegion cur_loc;
-
-  if ( read_token(cur_lval, cur_loc) != kToken_LPAR ) {
-    // '(' を期待していたシンタックスエラー
-    return false;
-  }
-  if ( read_token(name_id, cur_loc) != kToken_NAME ) {
-    // NAME を期待していたシンタックスエラー
-    return false;
-  }
-
-  if ( read_token(cur_lval, last_loc) != kToken_RPAR ) {
-    // ')' を期待していたシンタックスエラー
-    return false;
-  }
-
-  return true;
-}
-
-// @brief ゲート文に共通なパースを行う．
-// @param[out] gate_type ゲート型を格納する変数
-// @param[out] iname_id_list 入力名の識別子番号のリスト
-// @param[out] last_loc 末尾のファイル位置
-bool
-Iscas89ParserImpl::parse_gate(const FileRegion& first_loc,
-			      ymuint oname_id)
-{
-  ymuint cur_lval;
-  FileRegion cur_loc;
-
-  if ( read_token(cur_lval, cur_loc) != kToken_EQ ) {
-    // '=' を期待していたシンタックスエラー
-    return false;
-  }
 
   Token tok = read_token(cur_lval, cur_loc);
-  tIscas89GateType gate_type;
   switch ( tok ) {
   case kToken_BUFF:
     gate_type = kGt89BUFF;
@@ -237,35 +230,92 @@ Iscas89ParserImpl::parse_gate(const FileRegion& first_loc,
 
   default:
     // シンタックスエラー
+    // トークンが期待値と異なっていた
+    ostringstream buf;
+    buf << "Syntax error: gate-type is expected.";
+    MsgMgr::put_msg(__FILE__, __LINE__, cur_loc,
+		    kMsgError,
+		    "ER_SYNTAX02",
+		    buf.str());
     return false;
   }
 
-  if ( read_token(cur_lval, cur_loc) != kToken_LPAR ) {
+  return true;
+}
+
+// @brief '(' ')' で囲まれた名前を読み込む．
+// @param[in] name_id 名前の識別子番号を格納する変数．
+// @param[in] last_loc 末尾のファイル位置
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+//
+// エラーが起きたらエラーメッセージをセットする．
+bool
+Iscas89ParserImpl::parse_name(ymuint& name_id,
+			      FileRegion& last_loc)
+{
+  ymuint cur_lval;
+  FileRegion cur_loc;
+
+  if ( !expect(kToken_LPAR, cur_lval, cur_loc) ) {
+    return false;
+  }
+  if ( !expect(kToken_NAME, name_id, cur_loc) ) {
+    return false;
+  }
+
+  if ( !expect(kToken_RPAR, cur_lval, last_loc) ) {
+    return false;
+  }
+
+  return true;
+}
+
+// @brief '(' ')' で囲まれた名前のリストを読み込む．
+// @param[in] name_id_list 名前の識別子番号を格納するリスト．
+// @param[in] last_loc 末尾のファイル位置
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+//
+// エラーが起きたらエラーメッセージをセットする．
+bool
+Iscas89ParserImpl::parse_name_list(vector<ymuint>& name_id_list,
+				   FileRegion& last_loc)
+{
+  ymuint cur_lval;
+  FileRegion cur_loc;
+
+  name_id_list.clear();
+
+  if ( !expect(kToken_LPAR, cur_lval, cur_loc) ) {
     // '(' を期待していたシンタックスエラー
     return false;
   }
 
-  FileRegion last_loc;
-  vector<ymuint> iname_id_list;
   for ( ; ; ) {
-    if ( read_token(cur_lval, cur_loc) != kToken_NAME ) {
+    if ( !expect(kToken_NAME, cur_lval, cur_loc) ) {
       // NAME を期待したシンタックスエラー
       return false;
     }
-    iname_id_list.push_back(cur_lval);
+    name_id_list.push_back(cur_lval);
 
-    tok = read_token(cur_lval, last_loc);
+    Token tok = read_token(cur_lval, last_loc);
     if ( tok == kToken_RPAR ) {
       break;
     }
     if ( tok != kToken_COMMA ) {
       // ')' か ',' を期待していたシンタックスエラー
+      ostringstream buf;
+      buf << "Syntax error: ')' or ',' are expected.";
+      MsgMgr::put_msg(__FILE__, __LINE__, cur_loc,
+		      kMsgError,
+		      "ER_SYNTAX03",
+		      buf.str());
       return false;
     }
   }
 
-  return read_gate(FileRegion(first_loc, last_loc),
-		   oname_id, gate_type, iname_id_list);
+  return true;
 }
 
 // @brief INPUT 文を読み込む．
@@ -364,6 +414,60 @@ Iscas89ParserImpl::read_gate(const FileRegion& loc,
     }
   }
   return stat;
+}
+
+BEGIN_NONAMESPACE
+
+const char*
+token_str(Token token)
+{
+  switch (token) {
+  case kToken_LPAR:   return "(";
+  case kToken_RPAR:   return ")";
+  case kToken_EQ:     return "=";
+  case kToken_COMMA:  return ",";
+  case kToken_INPUT:  return "INPUT";
+  case kToken_OUTPUT: return "OUTPUT";
+  case kToken_BUFF:   return "BUFF";
+  case kToken_NOT:    return "NOT";
+  case kToken_AND:    return "AND";
+  case kToken_NAND:   return "NAND";
+  case kToken_OR:     return "OR";
+  case kToken_NOR:    return "NOR";
+  case kToken_XOR:    return "XOR";
+  case kToken_XNOR:   return "XNOR";
+  case kToken_DFF:    return "DFF";
+  }
+  ASSERT_NOT_REACHED;
+}
+
+END_NONAMESPACE
+
+// @brief 次のトークンが期待されている型か調べる．
+// @param[in] exp_token トークンの期待値
+// @param[out] lval トークンの値を格納する変数
+// @param[out] loc トークンのファイル位置を格納する変数．
+// @retval true トークンの型が一致した．
+// @retval false トークンの方が一致しなかった．
+//
+// トークンの方が一致しなかった場合にはエラーメッセージをセットする．
+bool
+Iscas89ParserImpl::expect(Token exp_token,
+			  ymuint& lval,
+			  FileRegion& loc)
+{
+  if ( read_token(lval, loc) != exp_token ) {
+    // トークンが期待値と異なっていた
+    ostringstream buf;
+    buf << "Syntax error: '" << token_str(exp_token) << "' is expected.";
+    MsgMgr::put_msg(__FILE__, __LINE__, loc,
+		    kMsgError,
+		    "ER_SYNTAX01",
+		    buf.str());
+    return false;
+  }
+
+  return true;
 }
 
 // @brief yylex() 用の処理を行う．
