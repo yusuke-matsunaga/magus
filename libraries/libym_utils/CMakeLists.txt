@@ -127,17 +127,12 @@ set (mincov_SOURCES
 
 set (misc_SOURCES
   src/misc/Binder.cc
-  src/misc/Dictionary.cc
   src/misc/DlList.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc
   src/misc/RefCount.cc
-  src/misc/Scanner.cc
-  src/misc/ShStringDict.cc
   src/misc/StopWatch.cc
-  src/misc/StrBuff.cc
-  src/misc/StrPool.cc
   )
 
 set (msg_SOURCES
@@ -154,6 +149,13 @@ else (POPT_FOUND)
   set (popt_SOURCES)
 endif (POPT_FOUND)
 
+set (textproc_SOURCES
+  src/textproc/Dictionary.cc
+  src/textproc/Scanner.cc
+  src/textproc/ShStringDict.cc
+  src/textproc/StrBuff.cc
+  src/textproc/StrPool.cc
+  )
 
 # ===================================================================
 #  ターゲットの設定
@@ -172,7 +174,7 @@ add_library(ym_utils SHARED
   ${misc_SOURCES}
   ${msg_SOURCES}
   ${popt_SOURCES}
-  ${str_SOURCES}
+  ${textproc_SOURCES}
   )
 
 if (ZLIB_FOUND)
