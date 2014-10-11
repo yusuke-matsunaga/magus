@@ -156,11 +156,9 @@ Parser::new_Udp1995(const FileRegion& file_region,
 
   if ( iomap.num() > 0 ) {
     // iolist 中のみに現れる要素がある．
-    vector<const PtIOItem*> iolist;
-    iomap.value_list(iolist);
-    for (vector<const PtIOItem*>::iterator q = iolist.begin();
-	 q != iolist.end(); ++ q) {
-      const PtIOItem* ioelem = *q;
+    for (HashMapIterator<string, const PtIOItem*> q = iomap.begin();
+	 q != iomap.end(); ++ q) {
+      const PtIOItem* ioelem = q.value();
       ostringstream buf;
       buf << "\"" << ioelem->name() << "\" does not appear in portlist.";
       MsgMgr::put_msg(__FILE__, __LINE__,

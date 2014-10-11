@@ -252,13 +252,11 @@ Bdd
 BddMgr::expr_to_bdd(const Expr& expr,
 		    const HashMap<VarId, VarId>& varmap)
 {
-  vector<pair<VarId, VarId> > kv_list;
-  varmap.key_value_list(kv_list);
   HashMap<VarId, Bdd> vbmap;
-  for (vector<pair<VarId, VarId> >::iterator p = kv_list.begin();
-       p != kv_list.end(); ++ p) {
-    VarId id = p->first;
-    VarId id2 = p->second;
+  for (HashMapIterator<VarId, VarId> p = varmap.begin();
+       p != varmap.end(); ++ p) {
+    VarId id = p.key();
+    VarId id2 = p.value();
     Bdd bdd = make_posiliteral(id2);
     vbmap.add(id, bdd);
   }

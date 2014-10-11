@@ -48,8 +48,7 @@ BEGIN_NONAMESPACE
 // 論理式中に現れる名前を ipin_set に積む．
 void
 get_ipin_names(const MislibNode* expr_node,
-	       HashSet<ShString>& ipin_set,
-	       vector<ShString>& ipin_list)
+	       HashSet<ShString>& ipin_set)
 {
   ShString name;
 
@@ -62,19 +61,18 @@ get_ipin_names(const MislibNode* expr_node,
   case MislibNode::kStr:
     if ( !ipin_set.check(expr_node->str()) ) {
       ipin_set.add(expr_node->str());
-      ipin_list.push_back(expr_node->str());
     }
     break;
 
   case MislibNode::kNot:
-    get_ipin_names(expr_node->child1(), ipin_set, ipin_list);
+    get_ipin_names(expr_node->child1(), ipin_set);
     break;
 
   case MislibNode::kAnd:
   case MislibNode::kOr:
   case MislibNode::kXor:
-    get_ipin_names(expr_node->child1(), ipin_set, ipin_list);
-    get_ipin_names(expr_node->child2(), ipin_set, ipin_list);
+    get_ipin_names(expr_node->child1(), ipin_set);
+    get_ipin_names(expr_node->child2(), ipin_set);
     break;
 
   default:
@@ -175,13 +173,10 @@ MislibParserImpl::read_file(const string& filename,
       }
       // 論理式に現れる名前の集合を求める．
       HashSet<ShString> ipin_set;
-      vector<ShString> ipin_list;
-      get_ipin_names(gate->opin_expr(), ipin_set, ipin_list);
-      vector<ShString> name_list;
-      ipin_map.key_list(name_list);
-      for (vector<ShString>::const_iterator p = name_list.begin();
-	   p != name_list.end(); ++ p) {
-	ShString name = *p;
+      get_ipin_names(gate->opin_expr(), ipin_set);
+      for (HashMapIterator<ShString, const MislibNode*> p = ipin_map.begin();
+	   p != ipin_map.end(); ++ p) {
+	ShString name = p.key();
 	if ( !ipin_set.check(name) ) {
 	  // ピン定義に現れる名前が論理式中に現れない．
 	  // エラーではないが，このピンのタイミング情報は意味をもたない．
@@ -198,9 +193,9 @@ MislibParserImpl::read_file(const string& filename,
 			  buf.str());
 	}
       }
-      for (vector<ShString>::iterator p = ipin_list.begin();
-	   p != ipin_list.end(); ++ p) {
-	ShString name = *p;
+      for (HashSetIterator<ShString> p = ipin_set.begin();
+	   p != ipin_set.end(); ++ p) {
+	ShString name = p.key();
 	const MislibNode* dummy;
 	if ( !ipin_map.find(name, dummy) ) {
 	  // 論理式中に現れる名前の入力ピンが存在しない．
