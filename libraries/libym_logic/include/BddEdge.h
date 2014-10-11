@@ -12,6 +12,7 @@
 
 #include "YmLogic/bdd_nsdef.h"
 #include "YmUtils/MpInt.h"
+#include "YmUtils/HashFunc.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -262,12 +263,6 @@ private:
   const ympuint kEdgeLeaf = 0UL;
 
 };
-
-typedef unordered_map<BddEdge, BddEdge> BddEdgeEdgeMap;
-typedef unordered_map<BddEdge, ymint> BddEdgeIntMap;
-typedef unordered_map<BddEdge, ymuint32> BddEdgeUint32Map;
-typedef unordered_map<BddEdge, MpInt> BddEdgeMpIntMap;
-typedef unordered_set<BddEdge> BddEdgeSet;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -551,19 +546,19 @@ BddEdge::hash() const
 
 END_NAMESPACE_YM_BDD
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 
 // BddEdge をキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsBdd::BddEdge>
+struct HashFunc<nsBdd::BddEdge>
 {
   ymuint
-  operator()(const nsYm::nsBdd::BddEdge& e) const
+  operator()(const nsBdd::BddEdge& e) const
   {
     return e.hash();
   }
 };
 
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // YM_YMYMLOGIC_BDDEDGE_H

@@ -126,10 +126,10 @@ Printer::print_step(ZddEdge e)
   }
   ZddEdge e_p(e);
   e_p.normalize();
-  if ( mMark.count(e_p) ) {
+  if ( mMark.find(e_p) ) {
     return;
   }
-  mMark.insert(e_p);
+  mMark.add(e_p);
   print_id(e_p);
   ZddNode* node = e_p.get_node();
   ymuint level = node->level();

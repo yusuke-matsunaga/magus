@@ -13,6 +13,7 @@
 #include "YmUtils/DlList.h"
 #include "YmUtils/ItvlMgr.h"
 #include "YmUtils/NameMgr.h"
+#include "YmUtils/HashFunc.h"
 #include "YmUtils/Binder.h"
 #include "YmLogic/Expr.h"
 
@@ -1922,17 +1923,17 @@ BNetworkTrace::network() const
 
 END_NAMESPACE_YM_NETWORKS_BNET
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 // BNode へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsNetworks::nsBnet::BNode*>
+struct HashFunc<nsNetworks::nsBnet::BNode*>
 {
   ymuint
-  operator()(nsYm::nsNetworks::nsBnet::BNode* node) const
+  operator()(nsNetworks::nsBnet::BNode* node) const
   {
     return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }
 };
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // NETWORKS_BNETWORK_H

@@ -62,10 +62,6 @@ private:
 };
 
 typedef vector<ExprNodePtr> ExprNodeList;
-typedef vector<ExprNodePtr>::iterator ExprNode_itr;
-typedef vector<ExprNodePtr>::const_iterator ExprNode_citr;
-typedef unordered_map<VarId, ExprNodePtr> VarExprNodeMap;
-
 
 
 //////////////////////////////////////////////////////////////////////

@@ -12,6 +12,7 @@
 #include "YmLogic/SmtSolver.h"
 #include "YmLogic/SmtFun.h"
 #include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_SMT
@@ -349,10 +350,8 @@ private:
   // SmtVar の次の ID番号
   ymuint32 mVarId;
 
-  typedef unordered_map<ymuint32, const SmtFunValidator*> FunValidatorMap;
-
   // SmtFunValidator 用のハッシュ表
-  FunValidatorMap mFunValidatorMap;
+  HashMap<ymuint32, const SmtFunValidator*> mFunValidatorMap;
 
 };
 

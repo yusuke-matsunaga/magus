@@ -13,6 +13,7 @@
 #include "ElbGfRoot.h"
 #include "YmVerilog/pt/PtP.h"
 #include "YmUtils/StrBuff.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -170,10 +171,8 @@ private:
   // 対応するパース木の要素
   const PtItem* mPtItem;
 
-  typedef unordered_map<int, const VlNamedObj*> IntNamedObjMap;
-
   // 子供のスコープのハッシュ表
-  IntNamedObjMap mTable;
+  HashMap<int, const VlNamedObj*> mTable;
 
 };
 

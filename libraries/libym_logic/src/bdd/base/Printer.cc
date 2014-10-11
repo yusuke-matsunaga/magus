@@ -129,10 +129,10 @@ Printer::print_step(BddEdge e)
   }
   BddEdge e_p(e);
   e_p.normalize();
-  if ( mMark.count(e_p) ) {
+  if ( mMark.find(e_p) ) {
     return;
   }
-  mMark.insert(e_p);
+  mMark.add(e_p);
   print_id(e_p);
   BddNode* node = e_p.get_node();
   BddEdge e0 = node->edge0();

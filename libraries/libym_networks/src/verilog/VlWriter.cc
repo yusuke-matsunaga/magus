@@ -400,7 +400,7 @@ VlWriter::put_num(int num)
 // @note expr 中の i 番めの変数の名前が name_map[i] に入っている．
 void
 VlWriter::put_expr(const Expr& expr,
-		  const VarStrMap& name_map)
+		   const HashMap<VarId, string>& name_map)
 {
   if ( expr.is_zero() ) {
     put_str("0");
@@ -413,12 +413,12 @@ VlWriter::put_expr(const Expr& expr,
       put_str("~");
     }
     VarId id = expr.varid();
-    VarStrMap::const_iterator p = name_map.find(id);
-    if ( p == name_map.end() ) {
+    string name;
+    bool found = name_map.find(id, name);
+    if ( !found ) {
 #warning "TODO: 未対応"
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
-    string name = p->second;
     put_idstr(name);
   }
   else if ( expr.is_op() ){

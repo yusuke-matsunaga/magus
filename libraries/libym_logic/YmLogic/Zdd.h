@@ -1,5 +1,5 @@
-﻿#ifndef YMYMLOGIC_ZDD_H
-#define YMYMLOGIC_ZDD_H
+﻿#ifndef YMLOGIC_ZDD_H
+#define YMLOGIC_ZDD_H
 
 /// @file YmLogic/Zdd.h
 /// @brief Zdd のヘッダファイル
@@ -13,6 +13,8 @@
 #include "YmLogic/zdd_nsdef.h"
 #include "YmLogic/VarId.h"
 #include "YmUtils/MpInt.h"
+#include "YmUtils/HashFunc.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -193,7 +195,7 @@ public:
   /// @param[in] var_map 置き換え元の変数から置き換え先の変数への写像
   /// @return 演算結果
   Zdd
-  remap_var(const VarVarMap& var_map) const;
+  remap_var(const HashMap<VarId, VarId>& var_map) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -560,19 +562,19 @@ Zdd::hash() const
 
 END_NAMESPACE_YM_ZDD
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 
 // ZDDをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsZdd::Zdd>
+struct HashFunc<Zdd>
 {
   ymuint
-  operator()(const nsYm::nsZdd::Zdd& bdd) const
+  operator()(const Zdd& bdd) const
   {
     return bdd.hash();
   }
 };
 
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
-#endif // YMYMLOGIC_ZDD_H
+#endif // YMLOGIC_ZDD_H

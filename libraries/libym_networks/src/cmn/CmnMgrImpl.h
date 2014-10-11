@@ -13,22 +13,9 @@
 #include "YmCell/cell_nsdef.h"
 
 #include "YmUtils/FragAlloc.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/DlList.h"
 #include "YmUtils/ItvlMgr.h"
-
-
-BEGIN_NAMESPACE_HASH
-// Cell へのポインタをキーにしたハッシュ関数クラスの定義
-template <>
-struct hash<const nsYm::Cell*>
-{
-  ymuint
-  operator()(const nsYm::Cell* cell) const
-  {
-    return reinterpret_cast<ympuint>(cell)/sizeof(void*);
-  }
-};
-END_NAMESPACE_HASH
 
 
 BEGIN_NAMESPACE_YM_NETWORKS_CMN
@@ -351,15 +338,11 @@ private:
   // 論理ノードのリスト
   CmnNodeList mLogicList;
 
-  typedef unordered_map<const Cell*, const CmnDffCell*> CellDffMap;
-
   // cell のアドレスをキーにして CmnDffCell を記憶するハッシュ表
-  CellDffMap mDffCellMap;
-
-  typedef unordered_map<const Cell*, const CmnLatchCell*> CellLatchMap;
+  HashMap<const Cell*, const CmnDffCell*> mDffCellMap;
 
   // cell のアドレスをキーにして CmnLatchCell を記憶するハッシュ表
-  CellLatchMap mLatchCellMap;
+  HashMap<const Cell*, const CmnLatchCell*> mLatchCellMap;
 
 };
 
@@ -525,5 +508,20 @@ CmnMgrImpl::logic_list() const
 }
 
 END_NAMESPACE_YM_NETWORKS_CMN
+
+BEGIN_NAMESPACE_YM
+
+// Cell へのポインタをキーにしたハッシュ関数クラスの定義
+template <>
+struct HashFunc<const Cell*>
+{
+  ymuint
+  operator()(const Cell* cell) const
+  {
+    return reinterpret_cast<ympuint>(cell)/sizeof(void*);
+  }
+};
+
+END_NAMESPACE_YM
 
 #endif // CMNMGRIMPL_H

@@ -18,20 +18,15 @@
 #include "YmLogic/VarId.h"
 
 
-/// @brief lexp 用の名前空間の開始
+/// @brief expr 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM_EXPR \
 BEGIN_NAMESPACE_YM \
 BEGIN_NAMESPACE(nsExpr)
 
-/// @brief ymlexp 用の名前空間の終了
+/// @brief expr 用の名前空間の終了
 #define END_NAMESPACE_YM_EXPR \
 END_NAMESPACE(nsExpr) \
 END_NAMESPACE_YM
-
-/// @namespace nsYm::nsLogic::nsExpr
-/// @brief Expr 関係のクラスの属する名前空間
-///
-/// ただし，主要なものは nsYm にインポートされている．
 
 BEGIN_NAMESPACE_YM_EXPR
 
@@ -61,10 +56,6 @@ typedef vector<Expr> ExprVector;
 /// @ingroup ExprGroup
 /// @brief Expr のリスト
 typedef list<Expr> ExprList;
-
-/// @ingroup ExprGroup
-/// @brief 変数番号から Expr への写像 (連想配列)
-typedef unordered_map<VarId, Expr> VarExprMap;
 
 END_NAMESPACE_YM
 

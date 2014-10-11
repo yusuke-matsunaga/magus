@@ -222,8 +222,8 @@ LcPatMgr::check_equivalent(LcPatHandle handle1,
     return false;
   }
 
-  UintUintMap map1;
-  UintUintMap map2;
+  HashMap<ymuint, ymuint> map1;
+  HashMap<ymuint, ymuint> map2;
 
   return ceq_sub(handle1.node(), handle2.node(), map1, map2);
 }
@@ -232,24 +232,24 @@ LcPatMgr::check_equivalent(LcPatHandle handle1,
 bool
 LcPatMgr::ceq_sub(LcPatNode* node1,
 		  LcPatNode* node2,
-		  UintUintMap& map1,
-		  UintUintMap& map2)
+		  HashMap<ymuint, ymuint>& map1,
+		  HashMap<ymuint, ymuint>& map2)
 {
   if ( node1->is_input() && node2->is_input() ) {
     ymuint id1 = node1->input_id();
     ymuint id2 = node2->input_id();
-    UintUintMap::iterator p1 = map1.find(id1);
-    UintUintMap::iterator p2 = map2.find(id2);
-    if ( p1 == map1.end() ) {
-      map1.insert(make_pair(id1, id2));
+    ymuint id1_reg;
+    ymuint id2_reg;
+    if ( !map1.find(id1, id2_reg) ) {
+      map1.add(id1, id2);
     }
-    else if ( p1->second != id2 ) {
+    else if ( id2_reg != id2 ) {
       return false;
     }
-    if ( p2 == map2.end() ) {
-      map2.insert(make_pair(id2, id1));
+    if ( !map2.find(id2, id1_reg) ) {
+      map2.add(id2, id1);
     }
-    else if ( p2->second != id1 ) {
+    else if ( id1_reg != id1 ) {
       return false;
     }
     return true;

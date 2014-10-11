@@ -11,6 +11,7 @@
 
 #include "YmLogic/VarId.h"
 #include "YmLogic/npn_nsdef.h"
+#include "YmUtils/HashBase.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -488,6 +489,18 @@ operator>>(IDO& s,
 	   TvFunc& func);
 
 
+// TvFunc をキーにしたハッシュ関数クラスの定義
+template <>
+struct HashFunc<TvFunc>
+{
+  ymuint
+  operator()(const TvFunc& f) const
+  {
+    return f.hash();
+  }
+};
+
+
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
@@ -686,18 +699,5 @@ operator>>(IDO& s,
 }
 
 END_NAMESPACE_YM
-
-BEGIN_NAMESPACE_HASH
-// TvFunc をキーにしたハッシュ関数クラスの定義
-template <>
-struct hash<nsYm::TvFunc>
-{
-  ymuint
-  operator()(const nsYm::TvFunc& f) const
-  {
-    return f.hash();
-  }
-};
-END_NAMESPACE_HASH
 
 #endif // YMYMLOGIC_TVFUNC_H

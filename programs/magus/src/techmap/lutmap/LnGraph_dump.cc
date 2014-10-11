@@ -10,6 +10,7 @@
 
 
 #include "LnGraph.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -230,7 +231,7 @@ dump_verilog(ostream& s,
   const LnNodeList& dff_list = lngraph.dff_list();
   const LnNodeList& lut_list = lngraph.lnode_list();
 
-  unordered_set<string> lut_name_set;
+  HashSet<string> lut_name_set;
   ymuint n = lngraph.max_node_id();
   vector<string> lut_names(n);
 
@@ -241,9 +242,9 @@ dump_verilog(ostream& s,
     if ( node->fanin_num() > 0 ) {
       string name = lut_name(node);
       lut_names[node->id()] = name;
-      if ( lut_name_set.count(name) == 0 ) {
+      if ( !lut_name_set.check(name) ) {
 	dump_lut(s, node, name);
-	lut_name_set.insert(name);
+	lut_name_set.add(name);
       }
     }
   }

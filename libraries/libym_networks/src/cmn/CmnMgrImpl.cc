@@ -285,11 +285,13 @@ CmnMgrImpl::clear()
 const CmnDffCell*
 CmnMgrImpl::dff_cell(const Cell* cell) const
 {
-  CellDffMap::const_iterator p = mDffCellMap.find(cell);
-  if ( p == mDffCellMap.end() ) {
+  const CmnDffCell* ans;
+  if ( mDffCellMap.find(cell, ans) ) {
+    return ans;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 // @brief ラッチセルの情報を得る．
@@ -298,11 +300,13 @@ CmnMgrImpl::dff_cell(const Cell* cell) const
 const CmnLatchCell*
 CmnMgrImpl::latch_cell(const Cell* cell) const
 {
-  CellLatchMap::const_iterator p = mLatchCellMap.find(cell);
-  if ( p == mLatchCellMap.end() ) {
+  const CmnLatchCell* ans;
+  if ( mLatchCellMap.find(cell, ans) ) {
+    return ans;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 // @brief モジュール名を設定する．
@@ -560,7 +564,7 @@ CmnMgrImpl::reg_dff_cell(const Cell* cell,
     return dff_cell;
   }
   dff_cell = new CmnDffCell(cell, pin_info);
-  mDffCellMap.insert(make_pair(cell, dff_cell));
+  mDffCellMap.add(cell, dff_cell);
   return dff_cell;
 }
 
@@ -577,7 +581,7 @@ CmnMgrImpl::reg_latch_cell(const Cell* cell,
     return latch_cell;
   }
   latch_cell = new CmnLatchCell(cell, pin_info);
-  mLatchCellMap.insert(make_pair(cell, latch_cell));
+  mLatchCellMap.add(cell, latch_cell);
   return latch_cell;
 }
 

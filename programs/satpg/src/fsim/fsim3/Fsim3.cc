@@ -15,6 +15,7 @@
 #include "TestVector.h"
 #include "SimNode.h"
 #include "SimFFR.h"
+#include "YmUtils/HashSet.h"
 #include "YmUtils/StopWatch.h"
 
 
@@ -224,9 +225,9 @@ Fsim3::set_skip(TpgFault* f)
 void
 Fsim3::set_faults(const vector<TpgFault*>& fault_list)
 {
-  unordered_set<ymuint> fault_set;
+  HashSet<ymuint> fault_set;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    fault_set.insert(fault_list[i]->id());
+    fault_set.add(fault_list[i]->id());
   }
 
   // 同時に各 SimFFR 内の fault_list() も再構築する．
@@ -237,7 +238,7 @@ Fsim3::set_faults(const vector<TpgFault*>& fault_list)
   ymuint nf = mSimFaults.size();
   for (ymuint i = 0; i < nf; ++ i) {
     SimFault* ff = &mSimFaults[i];
-    if ( fault_set.count(ff->mOrigF->id()) > 0 ) {
+    if ( fault_set.check(ff->mOrigF->id()) ) {
       ff->mSkip = false;
       SimNode* simnode = ff->mNode;
       SimFFR* ffr = simnode->ffr();

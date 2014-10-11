@@ -63,10 +63,10 @@ Ms2Op::apply_step(ZddEdge e,
   assert_cond( !e.is_zero(), __FILE__, __LINE__);
 
   // この時点で e は終端ではない．
-  MinimumSetMap::iterator p = mHash.find(e);
-  if ( p != mHash.end() ) {
-    nelem = p->second.second;
-    return p->second.first;
+  pair<ZddEdge, ymuint> ans;
+  if ( mHash.find(e, ans) ) {
+    nelem = ans.second;
+    return ans.first;
   }
 
   ZddNode* e_node = e.get_node();
@@ -88,7 +88,7 @@ Ms2Op::apply_step(ZddEdge e,
   }
   assert_cond( nelem > 0, __FILE__, __LINE__);
 
-  mHash.insert(make_pair(e, make_pair(r, nelem)));
+  mHash.add(e, make_pair(r, nelem));
 
   return r;
 }

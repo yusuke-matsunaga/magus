@@ -30,14 +30,14 @@ xform_expr(const Expr& expr,
 {
   ymuint ni = map.input_num();
   ymuint no = map.output_num();
-  assert_cond( no == 1, __FILE__, __LINE__);
-  VarExprMap vlm;
+  ASSERT_COND( no == 1 );
+  HashMap<VarId, Expr> vlm;
   for (ymuint i = 0; i < ni; ++ i) {
     VarId src_var(i);
     NpnVmap imap = map.imap(src_var);
     VarId dst_var = imap.var();
     Expr expr = Expr::make_literal(dst_var, imap.inv());
-    vlm.insert(make_pair(src_var, expr));
+    vlm.add(src_var, expr);
   }
   Expr cexpr = expr.compose(vlm);
   if ( map.omap(VarId(0)).inv() ) {

@@ -11,6 +11,7 @@
 
 #include "YmLogic/bdd_nsdef.h"
 #include "BddEdge.h"
+#include "YmUtils/HashFunc.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -293,17 +294,17 @@ BddNode::BddNode()
 
 END_NAMESPACE_YM_BDD
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 // BddNode へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsBdd::BddNode*>
+struct HashFunc<nsBdd::BddNode*>
 {
   ymuint
-  operator()(nsYm::nsBdd::BddNode* node) const
+  operator()(nsBdd::BddNode* node) const
   {
     return reinterpret_cast<ympuint>(node)/sizeof(void*);
   }
 };
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // BMCNODE_H

@@ -9,16 +9,15 @@
 
 #include "MislibParserImpl.h"
 #include "MislibMgrImpl.h"
+#include "YmUtils/HashSet.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/MsgMgr.h"
-#include "YmUtils/ShStringDict.h"
 
 
 BEGIN_NAMESPACE_YM_MISLIB
 
 BEGIN_NONAMESPACE
-
-typedef unordered_set<ShString> StrSet;
 
 // MislibScanner::read_token() をデバッグする時に true にする．
 bool debug_read_token = false;
@@ -49,7 +48,8 @@ BEGIN_NONAMESPACE
 // 論理式中に現れる名前を ipin_set に積む．
 void
 get_ipin_names(const MislibNode* expr_node,
-	       StrSet& ipin_set)
+	       HashSet<ShString>& ipin_set,
+	       vector<ShString>& ipin_list)
 {
   ShString name;
 
@@ -60,18 +60,21 @@ get_ipin_names(const MislibNode* expr_node,
     return;
 
   case MislibNode::kStr:
-    ipin_set.insert(expr_node->str());
+    if ( !ipin_set.check(expr_node->str()) ) {
+      ipin_set.add(expr_node->str());
+      ipin_list.push_back(expr_node->str());
+    }
     break;
 
   case MislibNode::kNot:
-    get_ipin_names(expr_node->child1(), ipin_set);
+    get_ipin_names(expr_node->child1(), ipin_set, ipin_list);
     break;
 
   case MislibNode::kAnd:
   case MislibNode::kOr:
   case MislibNode::kXor:
-    get_ipin_names(expr_node->child1(), ipin_set);
-    get_ipin_names(expr_node->child2(), ipin_set);
+    get_ipin_names(expr_node->child1(), ipin_set, ipin_list);
+    get_ipin_names(expr_node->child2(), ipin_set, ipin_list);
     break;
 
   default:
@@ -126,7 +129,7 @@ MislibParserImpl::read_file(const string& filename,
   // また，セル内のピン名が重複していないか，出力ピンの論理式に現れるピン名
   // と入力ピンに齟齬がないかもチェックする．
   const MislibNode* gate_list = mgr->gate_list();
-  ShStringDict<const MislibNode*> cell_map;
+  HashMap<ShString, const MislibNode*> cell_map;
   for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
     assert_cond( gate->type() == MislibNode::kGate, __FILE__, __LINE__);
     ShString name = gate->name()->str();
@@ -144,13 +147,13 @@ MislibParserImpl::read_file(const string& filename,
       continue;
     }
     // 情報を登録する．
-    cell_map.reg(name, gate);
+    cell_map.add(name, gate);
 
     // 入力ピン名のチェック
     const MislibNode* ipin_top = gate->ipin_top();
     if ( ipin_top != NULL && ipin_top->name() != NULL ) {
       // 通常の入力ピン定義の場合
-      ShStringDict<const MislibNode*> ipin_map;
+      HashMap<ShString, const MislibNode*> ipin_map;
       for (const MislibNode* ipin = ipin_top; ipin; ipin = ipin->next()) {
 	ASSERT_COND( ipin->type() == MislibNode::kPin );
 	ShString name = ipin->name()->str();
@@ -167,18 +170,19 @@ MislibParserImpl::read_file(const string& filename,
 			  buf.str());
 	}
 	else {
-	  ipin_map.reg(name, ipin);
+	  ipin_map.add(name, ipin);
 	}
       }
       // 論理式に現れる名前の集合を求める．
-      StrSet ipin_set;
-      get_ipin_names(gate->opin_expr(), ipin_set);
+      HashSet<ShString> ipin_set;
+      vector<ShString> ipin_list;
+      get_ipin_names(gate->opin_expr(), ipin_set, ipin_list);
       vector<ShString> name_list;
-      ipin_map.name_list(name_list);
+      ipin_map.key_list(name_list);
       for (vector<ShString>::const_iterator p = name_list.begin();
 	   p != name_list.end(); ++ p) {
 	ShString name = *p;
-	if ( ipin_set.count(name) == 0 ) {
+	if ( !ipin_set.check(name) ) {
 	  // ピン定義に現れる名前が論理式中に現れない．
 	  // エラーではないが，このピンのタイミング情報は意味をもたない．
 	  const MislibNode* node;
@@ -194,8 +198,8 @@ MislibParserImpl::read_file(const string& filename,
 			  buf.str());
 	}
       }
-      for (StrSet::iterator p = ipin_set.begin();
-	   p != ipin_set.end(); ++ p) {
+      for (vector<ShString>::iterator p = ipin_list.begin();
+	   p != ipin_list.end(); ++ p) {
 	ShString name = *p;
 	const MislibNode* dummy;
 	if ( !ipin_map.find(name, dummy) ) {

@@ -13,6 +13,7 @@
 #include "YmNetworks/bdn.h"
 #include "YmCell/cell_nsdef.h"
 #include "Match.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -90,7 +91,7 @@ private:
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
-  unordered_map<ymuint, ymuint> mPatMap;
+  HashMap<ymuint, ymuint> mPatMap;
 
   // パタンノードの ID をキーとして極性を入れる配列
   vector<bool> mInvMap;

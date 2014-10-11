@@ -50,7 +50,7 @@ BddFsm::BddFsm(BddMgr& bdd_mgr,
     VarId next_id = state_vars[i].second;
     mCurVarIds[i] = cur_id;
     mNextVarIds[i] = next_id;
-    mNext2CurMap.insert(make_pair(next_id, cur_id));
+    mNext2CurMap.add(next_id, cur_id);
   }
 
   // 現状態変数の集合を表す BDD を作る．
@@ -137,9 +137,9 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
 
   // 状態文字列から状態番号のハッシュ表を作る．
   ymuint ns = reachable_states.size();
-  unordered_map<State, ymuint> state_hash;
+  HashMap<State, ymuint> state_hash;
   for (ymuint i = 0; i < ns; ++ i) {
-    state_hash.insert(make_pair(reachable_states[i], i));
+    state_hash.add(reachable_states[i], i);
   }
 
   vector<ymuint> st_vec(ff_num() * 2, 0);
@@ -162,7 +162,7 @@ BddFsm::calc_trans_prob(const Bdd& reachable_states_bdd,
 // @param[in] trans_prob_map 確率を収めるハッシュ表
 void
 BddFsm::rs_sub(Bdd rel,
-	       const unordered_map<State, ymuint>& state_hash,
+	       const HashMap<State, ymuint>& state_hash,
 	       vector<ymuint>& st_vec,
 	       vector<list<TransProb> >& trans_map)
 {
@@ -230,13 +230,13 @@ BddFsm::rs_sub(Bdd rel,
 	}
       }
       State cur_state = tmp.substr(0, ff_num());
-      unordered_map<State, ymuint>::const_iterator q = state_hash.find(cur_state);
-      assert_cond( q != state_hash.end(), __FILE__, __LINE__);
-      ymuint cur_state_id = q->second;
+      ymuint cur_state_id;
+      bool stat1 = state_hash.find(cur_state, cur_state_id);
+      ASSERT_COND( stat1 );
       State next_state = tmp.substr(ff_num(), ff_num());
-      unordered_map<State, ymuint>::const_iterator r = state_hash.find(next_state);
-      assert_cond( r != state_hash.end(), __FILE__, __LINE__);
-      ymuint next_state_id = r->second;
+      ymuint next_state_id;
+      bool stat2 = state_hash.find(next_state, next_state_id);
+      ASSERT_COND( stat2 );
       trans_map[cur_state_id].push_back(TransProb(next_state_id, prob));
     }
   }

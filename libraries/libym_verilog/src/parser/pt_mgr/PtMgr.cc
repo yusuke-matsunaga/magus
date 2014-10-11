@@ -58,10 +58,7 @@ PtMgr::pt_udp_list() const
 bool
 PtMgr::check_def_name(const char* name) const
 {
-  if ( mDefNames.count(name) > 0 ) {
-    return true;
-  }
-  return false;
+  return mDefNames.check(name);
 }
 
 // UDP の登録
@@ -84,7 +81,7 @@ PtMgr::reg_module(const PtModule* module)
 void
 PtMgr::reg_defname(const char* name)
 {
-  mDefNames.insert(name);
+  mDefNames.add(name);
 }
 
 END_NAMESPACE_YM_VERILOG

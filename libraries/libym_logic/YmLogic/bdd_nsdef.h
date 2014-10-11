@@ -54,17 +54,6 @@ class BddLitSet;
 class BddVector;
 class BddList;
 
-//////////////////////////////////////////////////////////////////////
-/// @name 型名の定義
-/// @{
-
-/// @brief 変数番号をキートして BDD を値とする連想配列
-/// @ingroup Bdd
-typedef unordered_map<VarId, Bdd> VarBddMap;
-
-/// @}
-//////////////////////////////////////////////////////////////////////
-
 END_NAMESPACE_YM_BDD
 
 BEGIN_NAMESPACE_YM
@@ -76,7 +65,6 @@ using nsBdd::BddVarSet;
 using nsBdd::BddLitSet;
 using nsBdd::BddVector;
 using nsBdd::BddList;
-using nsBdd::VarBddMap;
 
 END_NAMESPACE_YM
 

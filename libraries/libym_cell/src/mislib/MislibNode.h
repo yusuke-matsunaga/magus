@@ -26,8 +26,6 @@ class MislibNode
 {
 public:
 
-  typedef unordered_map<ShString, ymuint> NameMap;
-
 public:
 
   /// @brief ノードの種類
@@ -138,7 +136,7 @@ public:
   /// @param[in] name_map 端子名をキーにして端子番号を取り出す連想配列
   virtual
   Expr
-  to_expr(const NameMap& name_map) const = 0;
+  to_expr(const HashMap<ShString, ymuint>& name_map) const = 0;
 
 
 public:

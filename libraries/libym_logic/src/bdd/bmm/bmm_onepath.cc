@@ -56,13 +56,13 @@ BddMgrModern::shortest_onepath(BddEdge e)
     return BddEdge::make_overflow();
   }
 
-  BddEdgeEdgeMap sp_assoc;
+  HashMap<BddEdge, BddEdge> sp_assoc;
   return sp_step(e, sp_assoc);
 }
 
 BddEdge
 BddMgrModern::sp_step(BddEdge e,
-		      BddEdgeEdgeMap& sp_assoc)
+		      HashMap<BddEdge, BddEdge>& sp_assoc)
 {
   if ( e.is_one() ) {
     return BddEdge::make_one();
@@ -72,8 +72,7 @@ BddMgrModern::sp_step(BddEdge e,
   }
 
   BddEdge result;
-  BddEdgeEdgeMap::iterator p = sp_assoc.find(e);
-  if ( p == sp_assoc.end() ) {
+  if ( !sp_assoc.find(e, result) ) {
     BddNode* vp = e.get_node();
     bool inv = e.inv();
     BddEdge l = sp_step(vp->edge0(inv), sp_assoc);
@@ -88,10 +87,7 @@ BddMgrModern::sp_step(BddEdge e,
     }
     ymuint level = vp->level();
     result = new_node(level, l, h);
-    sp_assoc[e] = result;
-  }
-  else {
-    result = p->second;
+    sp_assoc.add(e, result);
   }
   return result;
 }
@@ -126,7 +122,7 @@ BddMgrModern::shortest_onepath_len(BddEdge e)
   if ( e.is_invalid() ) {
     return 0;
   }
-  BddEdgeIntMap assoc;
+  HashMap<BddEdge, ymint> assoc;
   ymint tmp = spl_step(e, assoc);
   assert_cond(tmp >= 0, __FILE__, __LINE__);
   return static_cast<ymuint>(tmp);
@@ -134,7 +130,7 @@ BddMgrModern::shortest_onepath_len(BddEdge e)
 
 ymint
 BddMgrModern::spl_step(BddEdge e,
-		       BddEdgeIntMap& assoc)
+		       HashMap<BddEdge, ymint>& assoc)
 {
   if ( e.is_one() ) {
     return 0;
@@ -144,8 +140,7 @@ BddMgrModern::spl_step(BddEdge e,
   }
 
   ymint result;
-  BddEdgeIntMap::iterator p = assoc.find(e);
-  if ( p == assoc.end() ) {
+  if ( !assoc.find(e, result) ) {
     BddNode* vp = e.get_node();
     bool inv = e.inv();
     ymint ans1 = spl_step(vp->edge0(inv), assoc);
@@ -156,10 +151,7 @@ BddMgrModern::spl_step(BddEdge e,
     else {
       result = ans2;
     }
-    assoc[e] = result;
-  }
-  else {
-    result = p->second;
+    assoc.add(e, result);
   }
   return result;
 }

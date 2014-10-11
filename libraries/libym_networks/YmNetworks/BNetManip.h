@@ -701,7 +701,7 @@ private:
   vector<int> mTmpPos;
 
   // 論理式の入力変数付け替え用の作業領域
-  VarVarMap mTmpMap;
+  HashMap<VarId, VarId> mTmpMap;
 
   // TFO チェックで用いる作業領域
   vector<int> mTmpMark;

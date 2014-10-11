@@ -96,9 +96,8 @@ W1Op::w1_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    BddEdgeMpIntMap::iterator p = mCompTbl1.find(e);
-    if ( p != mCompTbl1.end() ) {
-      MpInt ans = p->second;
+    MpInt ans;
+    if ( mCompTbl1.find(e, ans) ) {
       if ( inv ) {
 	ans = -ans;
       }
@@ -125,7 +124,7 @@ W1Op::w1_sub1(BddEdge e)
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．
-    mCompTbl1.insert(make_pair(e, result));
+    mCompTbl1.add(e, result);
   }
 
   // 極性を考慮して補正する．
@@ -158,9 +157,8 @@ W1Op::w1_sub2(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    BddEdgeIntMap::iterator p = mCompTbl2.find(e);
-    if ( p != mCompTbl2.end() ) {
-      ymint32 ans = p->second;
+    ymint32 ans;
+    if ( mCompTbl2.find(e, ans) ) {
       if ( inv ) {
 	ans = -ans;
       }
@@ -187,7 +185,7 @@ W1Op::w1_sub2(BddEdge e)
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．
-    mCompTbl2.insert(make_pair(e, result));
+    mCompTbl2.add(e, result);
   }
 
   // 極性を考慮して補正する．
@@ -218,9 +216,8 @@ W1Op::w0_sub1(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    BddEdgeMpIntMap::iterator p = mCompTbl1.find(e);
-    if ( p != mCompTbl1.end() ) {
-      MpInt ans = p->second;
+    MpInt ans;
+    if ( mCompTbl1.find(e, ans) ) {
       if ( inv ) {
 	ans = -ans;
       }
@@ -238,7 +235,7 @@ W1Op::w0_sub1(BddEdge e)
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．
-    mCompTbl1.insert(make_pair(e, result));
+    mCompTbl1.add(e, result);
   }
 
   // 極性を考慮して補正する．
@@ -269,9 +266,8 @@ W1Op::w0_sub2(BddEdge e)
   ymuint ref = node->refcount();
   if ( ref != 1 ) {
     // 複数回参照されていたらまず演算結果テーブルを探す．
-    BddEdgeIntMap::iterator p = mCompTbl2.find(e);
-    if ( p != mCompTbl2.end() ) {
-      ymint32 ans = p->second;
+    ymint32 ans;
+    if ( mCompTbl2.find(e, ans) ) {
       if ( inv ) {
 	ans = -ans;
       }
@@ -289,7 +285,7 @@ W1Op::w0_sub2(BddEdge e)
 
   if ( ref != 1) {
     // 演算結果テーブルに答を登録する．
-    mCompTbl2.insert(make_pair(e, result));
+    mCompTbl2.add(e, result);
   }
 
   // 極性を考慮して補正する．

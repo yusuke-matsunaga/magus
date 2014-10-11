@@ -33,19 +33,15 @@ BEGIN_NONAMESPACE
 // を返す．
 Expr
 calc_expr_for_node(const BdnNode* node,
-		   const unordered_map<ymuint, Expr>& logmap)
+		   const HashMap<ymuint, Expr>& logmap)
 {
   Expr ans;
   if ( node == NULL ) {
     ans =  Expr::make_zero();
   }
   else {
-    unordered_map<ymuint, Expr>::const_iterator p = logmap.find(node->id());
-    if ( p != logmap.end() ) {
-      ans = p->second;
-    }
-    else {
-      assert_cond( node->is_logic(), __FILE__, __LINE__);
+    if ( !logmap.find(node->id(), ans) ) {
+      ASSERT_COND( node->is_logic() );
 
       Expr cexp0 = calc_expr_for_node(node->fanin0(), logmap);
       Expr cexp1 = calc_expr_for_node(node->fanin1(), logmap);
@@ -77,11 +73,11 @@ Cut::expr() const
     return Expr::make_zero();
   }
 
-  unordered_map<ymuint, Expr> logmap;
+  HashMap<ymuint, Expr> logmap;
   for (ymuint i = 0; i < input_num(); i ++) {
     const BdnNode* node = mInputs[i];
     ymuint id = node->id();
-    logmap.insert(make_pair(id, Expr::make_posiliteral(VarId(i))));
+    logmap.add(id, Expr::make_posiliteral(VarId(i)));
   }
   return calc_expr_for_node(root(), logmap);
 }

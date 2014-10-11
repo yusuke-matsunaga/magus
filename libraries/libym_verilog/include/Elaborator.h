@@ -15,6 +15,7 @@
 #include "YmCell/cell_nsdef.h"
 
 #include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/HashMap.h"
 
 #include "CfDict.h"
 #include "AttrDict.h"
@@ -213,10 +214,8 @@ private:
   // constant function の辞書
   CfDict mCfDict;
 
-  typedef unordered_map<string, const PtModule*> ModuleDict;
-
   // モジュールテンプレートの辞書
-  ModuleDict mModuleDict;
+  HashMap<string, const PtModule*> mModuleDict;
 
   // attribute instance の辞書
   AttrDict mAttrDict;

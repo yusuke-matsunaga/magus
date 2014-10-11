@@ -11,6 +11,7 @@
 #include "satpg_nsdef.h"
 #include "Val3.h"
 #include "FaultStatus.h"
+#include "YmUtils/HashFunc.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -380,17 +381,17 @@ TpgFault::set_dominance(TpgFault* dom_f)
 
 END_NAMESPACE_YM_SATPG
 
-BEGIN_NAMESPACE_HASH
-// BNode へのポインタをキーにしたハッシュ関数クラスの定義
+BEGIN_NAMESPACE_YM
+// TpgFault へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsSatpg::TpgFault*>
+struct HashFunc<nsSatpg::TpgFault*>
 {
   ymuint
-  operator()(nsYm::nsSatpg::TpgFault* fault) const
+  operator()(nsSatpg::TpgFault* fault) const
   {
     return reinterpret_cast<ympuint>(fault)/sizeof(void*);
   }
 };
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // TPGFAULT_H

@@ -1,5 +1,5 @@
-﻿#ifndef YMYMLOGIC_VARID_H
-#define YMYMLOGIC_VARID_H
+﻿#ifndef YMLOGIC_VARID_H
+#define YMLOGIC_VARID_H
 
 /// @file YmLogic/VarId.h
 /// @brief VarId の定義ファイル
@@ -10,6 +10,7 @@
 
 
 #include "YmTools.h"
+#include "YmUtils/HashFunc.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -81,7 +82,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際の値
-  ymuint32 mVal;
+  ymuint mVal;
 
 };
 
@@ -158,17 +159,19 @@ typedef vector<VarId> VarVector;
 /// @brief 変数番号のリスト
 typedef list<VarId> VarList;
 
-/// @ingroup LogicGroup
-/// @brief 変数番号から変数番号への写像 (連想配列)
-typedef unordered_map<VarId, VarId> VarVarMap;
 
-/// @ingroup LogicGroup
-/// @brief 文字列から変数番号への写像 (連想配列)
-typedef unordered_map<string, VarId> StrVarMap;
-
-/// @ingroup LogicGroup
-/// @brief 変数番号から文字列への写像 (連想配列)
-typedef unordered_map<VarId, string> VarStrMap;
+//////////////////////////////////////////////////////////////////////
+// HashBase<VarId> 用のハッシュ関数
+//////////////////////////////////////////////////////////////////////
+template<>
+struct
+HashFunc<VarId>
+{
+  ymuint
+  operator()(VarId key) const {
+    return key.val();
+  }
+};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -349,17 +352,4 @@ operator>>(IDO& s,
 
 END_NAMESPACE_YM
 
-BEGIN_NAMESPACE_HASH
-// VarId をキーにしたハッシュ関数クラスの定義
-template <>
-struct hash<nsYm::VarId>
-{
-  ymuint
-  operator()(const nsYm::VarId& varid) const
-  {
-    return varid.val();
-  }
-};
-END_NAMESPACE_HASH
-
-#endif // YMYMLOGIC_VARID_H
+#endif // YMLOGIC_VARID_H

@@ -72,7 +72,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 演算結果テーブル
-  BddEdgeEdgeMap mCompTbl;
+  HashMap<BddEdge, BddEdge> mCompTbl;
 
 };
 
@@ -87,12 +87,12 @@ inline
 BddEdge
 BddUniOp::get(BddEdge e1)
 {
-  BddEdgeEdgeMap::iterator p = mCompTbl.find(e1);
-  if ( p == mCompTbl.end() ) {
-    return BddEdge::make_error();
+  BddEdge ans;
+  if ( mCompTbl.find(e1, ans) ) {
+    return ans;
   }
   else {
-    return p->second;
+    return BddEdge::make_error();
   }
 }
 
@@ -104,7 +104,7 @@ void
 BddUniOp::put(BddEdge e1,
 	      BddEdge ans)
 {
-  mCompTbl.insert(make_pair(e1, ans));
+  mCompTbl.add(e1, ans);
 }
 
 // @brief 演算結果テーブルをクリアする．

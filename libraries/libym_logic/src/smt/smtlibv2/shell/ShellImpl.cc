@@ -952,12 +952,13 @@ tSmtSortId
 ShellImpl::make_sort(const SmtId* name_id,
 		     const vector<tSmtSortId>& elem_list)
 {
-  SortMap::iterator p = mBuiltinSortMap.find(name_id->id());
-  if ( p != mBuiltinSortMap.end() ) {
-    return p->second;
+  tSmtSortId ans;
+  if ( mBuiltinSortMap.find(name_id->id(), ans) ) {
+    return ans;
   }
-
-  return sort_mgr().make_sort(name_id, elem_list);
+  else {
+    return sort_mgr().make_sort(name_id, elem_list);
+  }
 }
 
 // @brief 名前から変数か関数を探す
@@ -1825,7 +1826,7 @@ ShellImpl::bind_builtin_sort(const char* name,
   const SmtId* id = mIdMgr->make_id(ShString(name));
   assert_cond( id != NULL, __FILE__, __LINE__);
 
-  mBuiltinSortMap.insert(make_pair(id->id(), sort_id));
+  mBuiltinSortMap.add(id->id(), sort_id);
 }
 
 // @brief 組み込み関数と名前を結びつける．

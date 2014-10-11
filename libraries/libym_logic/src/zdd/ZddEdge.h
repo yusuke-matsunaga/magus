@@ -12,6 +12,9 @@
 
 #include "YmLogic/zdd_nsdef.h"
 #include "YmLogic/VarId.h"
+#include "YmUtils/HashFunc.h"
+#include "YmUtils/HashSet.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/MpInt.h"
 
 
@@ -224,11 +227,6 @@ private:
   const ympuint kEdgeError = 3UL;
 
 };
-
-typedef unordered_map<ZddEdge, MpInt> ZddEdgeMpIntMap;
-typedef unordered_map<ZddEdge, ZddEdge> ZddEdgeEdgeMap;
-typedef unordered_map<ZddEdge, ymuint64> IdMap;
-typedef unordered_set<ZddEdge> ZddEdgeSet;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -476,19 +474,19 @@ ZddEdge::hash() const
 
 END_NAMESPACE_YM_ZDD
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 
 // ZddEdge をキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsZdd::ZddEdge>
+struct HashFunc<nsZdd::ZddEdge>
 {
   ymuint
-  operator()(const nsYm::nsZdd::ZddEdge& e) const
+  operator()(const nsZdd::ZddEdge& e) const
   {
     return e.hash();
   }
 };
 
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // ZDDEDGE_H

@@ -50,7 +50,7 @@ UdpGen::~UdpGen()
 void
 UdpGen::instantiate_udp(const PtUdp* pt_udp)
 {
-  typedef unordered_map<string, pair<const PtIOHead*, const PtIOItem*> > IODict;
+  typedef HashMap<string, pair<const PtIOHead*, const PtIOItem*> > IODict;
 
   const FileRegion& file_region = pt_udp->file_region();
   const char* def_name = pt_udp->name();
@@ -82,7 +82,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
     for (ymuint j = 0; j < iohead->item_num(); ++ j) {
       const PtIOItem* elem = iohead->item(j);
       const char* name = elem->name();
-      iodict.insert(make_pair(name, make_pair(iohead, elem)));
+      iodict.add(name, make_pair(iohead, elem));
       if ( strcmp(name, outname) == 0 ) {
 	outhead = iohead;
       }
@@ -94,10 +94,11 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
   for (ymuint i = 0; i < io_size; ++ i) {
     const PtPort* port = pt_udp->port(i);
     const char* name = port->ext_name();
-    IODict::const_iterator q = iodict.find(name);
-    assert_cond(q != iodict.end(), __FILE__, __LINE__);
-    const PtIOHead* pt_header = q->second.first;
-    const PtIOItem* pt_item = q->second.second;
+    pair<const PtIOHead*, const PtIOItem*> ans;
+    bool found = iodict.find(name, ans);
+    ASSERT_COND( found );
+    const PtIOHead* pt_header = ans.first;
+    const PtIOItem* pt_item = ans.second;
     udp->set_io(i, pt_header, pt_item);
   }
 

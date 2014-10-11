@@ -10,6 +10,7 @@
 
 
 #include "dotlib_nsdef.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/ShString.h"
 #include "YmUtils/FileRegion.h"
 
@@ -61,6 +62,8 @@ public:
   /// @param[out] node 結果のノードを格納するノード
   /// @retval true 値の読み出しが成功した．
   /// @retval false エラーが起こった．
+  ///
+  /// 空の時は node に NULL を入れて true を返す．
   bool
   get_singleton_or_null(const char* name,
 			const DotlibNode*& node) const;
@@ -88,10 +91,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  typedef unordered_map<ShString, list<const DotlibNode*> > StrNodeListMap;
-
   // ハッシュ表
-  StrNodeListMap mHash;
+  HashMap<ShString, vector<const DotlibNode*> > mHash;
 
 };
 

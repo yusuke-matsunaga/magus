@@ -12,6 +12,7 @@
 #include "YmTclpp/tclpp_nsdef.h"
 #include "YmTclpp/TclBase.h"
 #include "YmTclpp/TclObj.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_TCLPP
@@ -225,10 +226,8 @@ protected:
   // オプション解析用オブジェクトのリスト
   list<TclPopt*> mPoptList;
 
-  typedef unordered_map<string, TclPopt*> StrPoptMap;
-
   // オプション文字列をキーとして TclPopt を要素とするハッシュ表
-  StrPoptMap mPoptTable;
+  HashMap<string, TclPopt*> mPoptTable;
 
   // TclPoptGroup のリスト
   list<TclPoptGroup*> mPoptGroupList;

@@ -175,15 +175,15 @@ PatMatcher::bind(const BdnNode* sbj_node,
     mClearQueue.push_back(pat_id);
   }
 
-  unordered_map<ymuint, ymuint>::iterator p = mPatMap.find(sbj_node->id());
-  if ( p != mPatMap.end() ) {
-    if ( p->second != pat_id ) {
+  ymuint pat_id1;
+  if ( mPatMap.find(sbj_node->id(), pat_id1) ) {
+    if ( pat_id1 != pat_id ) {
       // SbjNode が既に他のノードにバインドしていた．
       return false;
     }
   }
   else {
-    mPatMap.insert(make_pair(sbj_node->id(), pat_id));
+    mPatMap.add(sbj_node->id(), pat_id);
   }
   return true;
 }

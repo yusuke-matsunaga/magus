@@ -31,10 +31,29 @@ ExprWriter::~ExprWriter()
 ostream&
 ExprWriter::dump(ostream& s,
 		 const Expr& expr,
-		 const VarStrMap& var_names) const
+		 const HashMap<VarId, string>& var_names) const
 {
   dump_sub(s, expr, var_names);
   return s;
+}
+
+// ostream に対する書出し
+ostream&
+ExprWriter::dump(ostream& s,
+		 const Expr& expr) const
+{
+  dump_sub(s, expr, HashMap<VarId, string>());
+  return s;
+}
+
+// @brief 内容を文字列にする．
+// @param[in] expr 文字列
+string
+ExprWriter::dump_string(const Expr& expr) const
+{
+  ostringstream buf;
+  dump(buf, expr);
+  return string(buf.str());
 }
 
 // @brief 内容を文字列にする．
@@ -44,7 +63,7 @@ ExprWriter::dump(ostream& s,
 // 登録されていなければデフォルトの表記を用いる．
 string
 ExprWriter::dump_string(const Expr& expr,
-			const VarStrMap& var_names) const
+			const HashMap<VarId, string>& var_names) const
 {
   ostringstream buf;
   dump(buf, expr, var_names);
@@ -105,7 +124,7 @@ operator<<(ostream& s,
 {
   ExprWriter writer;
   // 空の map を渡す
-  return writer.dump(s, expr, VarStrMap());
+  return writer.dump(s, expr, HashMap<VarId, string>());
 }
 
 
@@ -113,7 +132,7 @@ operator<<(ostream& s,
 void
 ExprWriter::dump_sub(ostream& s,
 		     const Expr& expr,
-		     const VarStrMap& var_names) const
+		     const HashMap<VarId, string>& var_names) const
 {
   if ( expr.is_zero() ) {
     s << "0";
@@ -126,12 +145,12 @@ ExprWriter::dump_sub(ostream& s,
       s << not_str();
     }
     VarId id = expr.varid();
-    VarStrMap::const_iterator p = var_names.find(id);
-    if ( p == var_names.end() ) {
-      s << "V" << id;
+    string ans;
+    if ( var_names.find(id, ans) ) {
+      s << ans;
     }
     else {
-      s << p->second;
+      s << "V" << id;
     }
   }
   else { // AND/OR/XOR

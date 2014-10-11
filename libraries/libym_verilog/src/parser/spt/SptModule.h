@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "YmUtils/FileRegion.h"
-
 #include "YmVerilog/pt/PtModule.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/HashMap.h"
 #include "PtiDecl.h"
 
 
@@ -268,10 +268,8 @@ private:
   // 要素のリスト
   PtItemArray mItemArray;
 
-  typedef unordered_map<string, const PtItem*> StrItemMap;
-
   // 関数定義の辞書
-  StrItemMap mFuncDic;
+  HashMap<string, const PtItem*> mFuncDic;
 
 };
 

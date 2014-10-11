@@ -14,6 +14,9 @@ set (YMTOOLS_VERSION_MINOR 0)
 # 名前空間
 set (YMTOOLS_NAMESPACE "nsYm")
 
+# リリースモード
+#set ( CMAKE_BUILD_TYPE REREASE )
+
 # デバッグモード
 set ( CMAKE_BUILD_TYPE DEBUG )
 
@@ -32,15 +35,16 @@ list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include (FindDoxygen)
 
 find_package(BISON REQUIRED)
+
 include (FindPythonInterp)
 include (FindPythonLibs)
 
 include (FindQt4)
 find_package(Qt4 4.8.0 REQUIRED QtCore QtGui QtXml)
 include(${QT_USE_FILE})
+
 find_package(TCL)
-#include (FindTclsh)
-#include (FindTclStub)
+
 include (FindBZip2)
 include (FindLibLZMA)
 include (FindZLIB)

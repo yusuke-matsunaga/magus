@@ -14,6 +14,7 @@
 #include "YmLogic/VarId.h"
 #include "YmLogic/Expr.h"
 #include "YmUtils/Binder.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -179,14 +180,21 @@ public:
 
   /// @brief 論理式からBDDを作る．
   /// @param[in] expr 論理式
+  /// @return 生成された BDD
+  ///
+  /// 変数番号はそのまま使う．
+  Bdd
+  expr_to_bdd(const Expr& expr);
+
+  /// @brief 論理式からBDDを作る．
+  /// @param[in] expr 論理式
   /// @param[in] varmap 変数番号の割当てを表す連想配列
   /// @return 生成された BDD
   /// @note varmapは論理式中にあらわれる変数から BDD 用の変数
   /// への写像を表す．
-  /// varmap に登録されていない場合には恒等変換だと思う．
   Bdd
   expr_to_bdd(const Expr& expr,
-	      const VarVarMap& varmap = VarVarMap());
+	      const HashMap<VarId, VarId>& varmap);
 
   /// @brief 論理式からBDDを作る(compose版)．
   /// @param[in] expr 論理式
@@ -197,7 +205,7 @@ public:
   /// map に登録されていない場合には恒等変換だと思う．
   Bdd
   expr_to_bdd(const Expr& expr,
-	      const VarBddMap& varmap);
+	      const HashMap<VarId, Bdd>& varmap);
 
   /// @brief ストリームを論理式と見なしてBDDを作る．
   /// @param[in] in 入力ストリーム

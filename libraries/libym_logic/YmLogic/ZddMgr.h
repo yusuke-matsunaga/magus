@@ -1,5 +1,5 @@
-﻿#ifndef YMYMLOGIC_ZDDMGR_H
-#define YMYMLOGIC_ZDDMGR_H
+﻿#ifndef YMLOGIC_ZDDMGR_H
+#define YMLOGIC_ZDDMGR_H
 
 /// @file YmLogic/ZddMgr.h
 /// @brief ZddMgr のヘッダファイル
@@ -336,4 +336,4 @@ private:
 
 END_NAMESPACE_YM_ZDD
 
-#endif // YMYMLOGIC_ZDDMGR_H
+#endif // YMLOGIC_ZDDMGR_H

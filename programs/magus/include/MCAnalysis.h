@@ -11,6 +11,7 @@
 
 #include "seal_nsdef.h"
 #include "YmNetworks/bnet.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_SEAL
@@ -138,7 +139,7 @@ private:
   vector<double> mFailureProb0;
 
   // 回路対の各状態の初期存在確率
-  unordered_map<State, double> mInitialProb;
+  HashMap<State, double> mInitialProb;
 
   // 回路対の各状態の failure 吸収確率
   vector<double> mFailureProb;

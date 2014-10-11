@@ -10,6 +10,7 @@
 
 
 #include "DotlibHandler.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_DOTLIB
@@ -145,10 +146,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  typedef unordered_map<ShString, DotlibHandler*> StrHandlerMap;
-
   // ハンドラの連想配列
-  StrHandlerMap mHandlerMap;
+  HashMap<ShString, DotlibHandler*> mHandlerMap;
 
   // 対応する DotlibNode
   DotlibNodeImpl* mNode;

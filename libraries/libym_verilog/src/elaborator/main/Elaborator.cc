@@ -110,7 +110,7 @@ Elaborator::operator()(const PtMgr& pt_mgr)
 		      buf.str());
       ++ nerr;
     }
-    else if ( mModuleDict.count(name) > 0 ) {
+    else if ( mModuleDict.check(name) ) {
       ostringstream buf;
       buf << "module \"" << name<< "\" is redefined.";
       MsgMgr::put_msg(__FILE__, __LINE__,
@@ -122,7 +122,7 @@ Elaborator::operator()(const PtMgr& pt_mgr)
     }
     else {
       // モジュール名をキーにして登録する．
-      mModuleDict.insert(make_pair(name, module));
+      mModuleDict.add(name, module);
     }
   }
   if ( nerr == 0 ) {
@@ -281,11 +281,13 @@ Elaborator::add_phase3stub(ElbStub* stub)
 const PtModule*
 Elaborator::find_moduledef(const char* name) const
 {
-  ModuleDict::const_iterator p = mModuleDict.find(name);
-  if ( p != mModuleDict.end() ) {
-    return p->second;
+  const PtModule* ans;
+  if ( mModuleDict.find(name, ans) ) {
+    return ans;
   }
-  return NULL;
+  else {
+    return NULL;
+  }
 }
 
 // @brief constant function を取り出す．

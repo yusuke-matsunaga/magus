@@ -78,7 +78,7 @@ CptModule::CptModule(const FileRegion& file_region,
   for (ymuint i = 0; i < mItemArray.size(); ++ i) {
     const PtItem* item = mItemArray[i];
     if ( item->type() == kPtItem_Func ) {
-      mFuncDic.insert(make_pair(item->name(), item));
+      mFuncDic.add(item->name(), item);
     }
   }
 }
@@ -314,11 +314,13 @@ CptModule::cell() const
 const PtItem*
 CptModule::find_function(const char* name) const
 {
-  StrItemMap::const_iterator p = mFuncDic.find(name);
-  if ( p == mFuncDic.end() ) {
+  const PtItem* ans;
+  if ( mFuncDic.find(name, ans) ) {
+    return ans;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 

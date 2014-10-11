@@ -59,7 +59,7 @@ END_NAMESPACE(HASH_NAMESPACE)
 /// @brief c 用の名前空間の終了
 #define END_EXTERN_C }
 
-/// @brief ymtools 用の名前空間の開始
+/// @brief YmTools 用の名前空間の開始
 #define BEGIN_NAMESPACE_YM \
 BEGIN_NAMESPACE(YMTOOLS_NAMESPACE)
 

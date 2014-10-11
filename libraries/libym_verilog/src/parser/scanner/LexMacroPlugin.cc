@@ -45,8 +45,6 @@ LpDefine::~LpDefine()
 bool
 LpDefine::parse()
 {
-  typedef unordered_map<string, ymuint> StrPosMap;
-
   // 次の非空白文字が IDENTIFIER でなければエラー
   if ( !expect(IDENTIFIER) ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -75,7 +73,7 @@ LpDefine::parse()
   FileRegion macro_loc = cur_token_loc();
 
   // パラメータ名をキーにして位置番号を格納する連想配列
-  StrPosMap param_dic;
+  HashMap<string, ymuint> param_dic;
 
   // ここは空白が重要なので get_raw_token() を呼ぶ．
   int id = get_raw_token();
@@ -95,7 +93,7 @@ LpDefine::parse()
 		      "expecting an identifier after '('.");
       return false;
     }
-    param_dic.insert(make_pair(cur_string(), pos));
+    param_dic.add(cur_string(), pos);
     ++ pos;
     for ( bool go = true; go; ) {
       int id = get_nospace_token();
@@ -114,7 +112,7 @@ LpDefine::parse()
 			  "expecting an identifier after ','.");
 	  return false;
 	}
-	param_dic.insert(make_pair(cur_string(), pos));
+	param_dic.add(cur_string(), pos);
 	++ pos;
 	break;
 
@@ -142,7 +140,7 @@ LpDefine::parse()
 
   // マクロをプラグインとして生成
   const char* macroname = defsymbol.c_str();
-  ymuint n = param_dic.size();
+  ymuint n = param_dic.num();
   LpMacro* macro = new LpMacro(lex(), macroname, n);
 
   // マクロ本体を macro に記録
@@ -150,11 +148,11 @@ LpDefine::parse()
     for (int id = get_nospace_token();
 	 id != NL && id != EOF;
 	 id = get_nospace_token()) {
-      StrPosMap::iterator p;
+      ymuint pos;
       if ( id == IDENTIFIER &&
-	   (p = param_dic.find(cur_string())) != param_dic.end() ) {
+	   param_dic.find(cur_string(), pos) ) {
 	// 置き換え対象のパラメータ
-	macro->mTokenList.add(p->second);
+	macro->mTokenList.add(pos);
       }
       else {
 	// それ以外のトークンはそのまま記録

@@ -15,36 +15,20 @@
 //#include "aig/AigSatMgr.h"
 //#include "sat/SatSolver.h"
 
+#include "YmUtils/HashMap.h"
 #include "YmUtils/MsgMgr.h"
 #include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM
 
-typedef unordered_map<BNode*, Aig> BNodeMap;
-
-BEGIN_NONAMESPACE
-
-// bnode に対応する Aig を連想配列 assoc から探す．
-// 見つからなかったらアボートする．
-Aig
-find_node(BNode* bnode,
-	  const BNodeMap& assoc)
-{
-  BNodeMap::const_iterator p = assoc.find(bnode);
-  assert_cond(p != assoc.end(), __FILE__, __LINE__);
-  return p->second;
-}
-
-END_NONAMESPACE
-
 // BNetwork から AIG をつくるコンストラクタ
 void
 bnet2aig(const BNetwork& network,
 	 AigMgr& aig_mgr)
 {
-  // BNetwork 中のノードと AIG 中のノードの対応を持つ連想配列
-  BNodeMap assoc;
+  // BNetwork 中のノードと AIG 中のノードの対応を持つ配列
+  vector<Aig> aig_map(network.max_node_id());
 
   // 外部入力を作る．
   ymuint ipos = 0;
@@ -52,7 +36,7 @@ bnet2aig(const BNetwork& network,
        p != network.inputs_end(); ++p, ++ ipos) {
     BNode* bnode = *p;
     Aig anode = aig_mgr.make_input(VarId(ipos));
-    assoc.insert(make_pair(bnode, anode));
+    aig_map[bnode->id()] = anode;
   }
 
   // 内部ノードを作る．
@@ -60,19 +44,19 @@ bnet2aig(const BNetwork& network,
   BNodeVector node_list;
   network.tsort(node_list);
   ymuint nv = network.logic_node_num();
-  for (size_t i = 0; i < nv; ++ i) {
+  for (ymuint i = 0; i < nv; ++ i) {
     BNode* bnode = node_list[i];
     ymuint ni = bnode->fanin_num();
-    unordered_map<VarId, Aig> input_map;
+    HashMap<VarId, Aig> input_map;
     for (ymuint pos = 0; pos < ni; ++ pos) {
-      Aig iaig = find_node(bnode->fanin(pos), assoc);
-      input_map.insert(make_pair(VarId(pos), iaig));
+      Aig iaig = aig_map[bnode->fanin(pos)->id()];
+      input_map.add(VarId(pos), iaig);
       cout << "input_map[" << pos << "] = " << iaig << endl;
     }
     cout << "bnode->func() = " << bnode->func() << endl;
     Aig anode = aig_mgr.make_logic(bnode->func(), input_map);
     cout << "anode = " << anode << endl;
-    assoc.insert(make_pair(bnode, anode));
+    aig_map[bnode->id()] = anode;
   }
 
   // 外部出力を作る．
@@ -82,7 +66,7 @@ bnet2aig(const BNetwork& network,
        p != output_list.end(); ++ p) {
     BNode* obnode = *p;
     BNode* ibnode = obnode->fanin(0);
-    Aig ianode = find_node(ibnode, assoc);
+    Aig ianode = aig_map[ibnode->id()];
     output_handle_list.push_back(ianode);
   }
 

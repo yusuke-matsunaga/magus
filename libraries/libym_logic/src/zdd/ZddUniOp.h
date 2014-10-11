@@ -79,7 +79,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 一時的に結果を覚えておくハッシュ表
-  ZddEdgeEdgeMap mCompTbl;
+  HashMap<ZddEdge, ZddEdge> mCompTbl;
 
 };
 
@@ -94,12 +94,12 @@ inline
 ZddEdge
 ZddUniOp::get(ZddEdge e1)
 {
-  ZddEdgeEdgeMap::iterator p = mCompTbl.find(e1);
-  if ( p == mCompTbl.end() ) {
-    return ZddEdge::make_error();
+  ZddEdge ans;
+  if ( mCompTbl.find(e1, ans) ) {
+    return ans;
   }
   else {
-    return p->second;
+    return ZddEdge::make_error();
   }
 }
 
@@ -111,7 +111,7 @@ void
 ZddUniOp::put(ZddEdge e1,
 	      ZddEdge ans)
 {
-  mCompTbl.insert(make_pair(e1, ans));
+  mCompTbl.add(e1, ans);
 }
 
 // @brief 演算結果テーブルをクリアする．

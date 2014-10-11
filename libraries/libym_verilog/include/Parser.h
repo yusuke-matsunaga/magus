@@ -14,6 +14,8 @@
 #include "YmUtils/Alloc.h"
 #include "YmUtils/FragAlloc.h"
 #include "YmUtils/UnitAlloc.h"
+#include "YmUtils/HashSet.h"
+#include "YmUtils/HashMap.h"
 #include "PtiFwd.h"
 #include "PtiFactory.h"
 #include "PtiDecl.h"
@@ -28,10 +30,6 @@ class Lex;
 class PuHierName;
 
 union YYSTYPE;
-
-typedef unordered_set<string> StrSet;
-typedef unordered_map<string, tVlDirection> StrDirMap;
-typedef unordered_map<string, const PtIOItem*> StrIOMap;
 
 //////////////////////////////////////////////////////////////////////
 /// @class Parser Parser.h "Parser.h"

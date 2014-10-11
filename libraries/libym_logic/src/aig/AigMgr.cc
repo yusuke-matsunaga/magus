@@ -9,6 +9,7 @@
 
 #include "YmLogic/AigMgr.h"
 #include "AigMgrImpl.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
@@ -46,7 +47,7 @@ AigMgr::node_num() const
 
 BEGIN_NONAMESPACE
 
-typedef unordered_set<ymuint> IdSet;
+typedef HashSet<ymuint> IdSet;
 
 void
 dfs(ostream& s,
@@ -57,10 +58,10 @@ dfs(ostream& s,
     return;
   }
   ymuint id = aig.node_id();
-  if ( mark.count(id) > 0 ) {
+  if ( mark.find(id) ) {
     return;
   }
-  mark.insert(id);
+  mark.add(id);
   s << "Node#" << id << ": ";
   if ( aig.is_input() ) {
     s << "Input#" << aig.input_id() << endl;
@@ -224,7 +225,7 @@ AigMgr::make_xor(const list<Aig>& edge_list)
 // @param[in] input_map 入力とAIGの対応表
 Aig
 AigMgr::make_logic(const Expr& expr,
-		   const VarAigMap& input_map)
+		   const HashMap<VarId, Aig>& input_map)
 {
   if ( expr.is_zero() ) {
     return make_zero();
@@ -234,18 +235,18 @@ AigMgr::make_logic(const Expr& expr,
   }
   if ( expr.is_posiliteral() ) {
     VarId id = expr.varid();
-VarAigMap::const_iterator p = input_map.find(id);
-    if ( p != input_map.end() ) {
-      return p->second;
+    Aig aig;
+    if ( input_map.find(id, aig) ) {
+      return aig;
     }
     // なかったらそのままの入力ノードに変換する．
     return make_input(id);
   }
   if ( expr.is_negaliteral() ) {
     VarId id = expr.varid();
-    VarAigMap::const_iterator p = input_map.find(id);
-    if ( p != input_map.end() ) {
-      return ~p->second;
+    Aig aig;
+    if ( input_map.find(id, aig) ) {
+      return ~aig;
     }
     // なかったらそのままの入力ノードに変換する．
     return ~make_input(id);

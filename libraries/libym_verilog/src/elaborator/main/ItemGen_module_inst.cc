@@ -31,8 +31,6 @@ BEGIN_NAMESPACE_YM_VERILOG
 
 BEGIN_NONAMESPACE
 
-typedef unordered_map<string, int> StrIntMap;
-
 // 英語の序数の接尾語を作る関数
 const char*
 num_suffix(int num)
@@ -338,7 +336,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 
   // YACC の文法から一つでも named_con なら全部そう
   bool conn_by_name = (pt_inst->port(0)->name() != NULL);
-  StrIntMap port_index;
+  HashMap<string, ymuint> port_index;
   if ( conn_by_name ) {
     // ポート名とインデックスの辞書を作る．
     ymuint n = pt_module->port_num();
@@ -346,7 +344,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       const PtPort* pt_port = pt_module->port(index);
       const char* name = pt_port->ext_name();
       if ( name != NULL ) {
-	port_index.insert(make_pair(name, index));
+	port_index.add(name, index);
       }
     }
   }
@@ -366,8 +364,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
       // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
       assert_cond(port_name != NULL, __FILE__, __LINE__);
-      StrIntMap::iterator p = port_index.find(port_name);
-      if ( p == port_index.end() ) {
+      if ( !port_index.find(port_name, index) ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";
 	MsgMgr::put_msg(__FILE__, __LINE__,
@@ -377,14 +374,13 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 			buf.str());
 	continue;
       }
-      index = p->second;
-      assert_cond(index < port_num, __FILE__, __LINE__);
+      ASSERT_COND ( index < port_num );
     }
     else {
       // 順序に割り当ての場合は単純に i
       index = i;
       // 前にも書いたように YACC の文法で規定されているのでこれは常に真
-      assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
+      ASSERT_COND ( pt_con->name() == NULL );
     }
 
     // 割り当てるポートを取り出す．
@@ -555,7 +551,7 @@ ItemGen::link_module(ElbModule* module,
 
   // YACC の文法から一つでも named_con なら全部そう
   bool conn_by_name = (pt_inst->port(0)->name() != NULL);
-  StrIntMap port_index;
+  HashMap<string, ymuint> port_index;
   if ( conn_by_name ) {
     // ポート名とインデックスの辞書を作る．
     ymuint n = pt_module->port_num();
@@ -563,7 +559,7 @@ ItemGen::link_module(ElbModule* module,
       const PtPort* pt_port = pt_module->port(index);
       const char* name = pt_port->ext_name();
       if ( name != NULL ) {
-	port_index.insert(make_pair(name, index));
+	port_index.add(name, index);
       }
     }
   }
@@ -582,9 +578,8 @@ ItemGen::link_module(ElbModule* module,
     if ( conn_by_name ) {
       // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
-      assert_cond(port_name != NULL, __FILE__, __LINE__);
-      StrIntMap::iterator p = port_index.find(port_name);
-      if ( p == port_index.end() ) {
+      ASSERT_COND( port_name != NULL );
+      if ( !port_index.find(port_name, index) ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";
 	MsgMgr::put_msg(__FILE__, __LINE__,
@@ -594,14 +589,13 @@ ItemGen::link_module(ElbModule* module,
 			buf.str());
 	continue;
       }
-      index = p->second;
-      assert_cond(index < port_num, __FILE__, __LINE__);
+      ASSERT_COND( index < port_num );
     }
     else {
       // 順序による割り当ての場合は単純に i
       index = i;
       // 前にも書いたように YACC の文法から下の仮定は常になりたつはず．
-      assert_cond(pt_con->name() == NULL, __FILE__, __LINE__);
+      ASSERT_COND( pt_con->name() == NULL );
     }
 
     const VlPort* port = module->port(index);

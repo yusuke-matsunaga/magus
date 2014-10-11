@@ -11,6 +11,7 @@
 
 #include "YmLogic/expr_nsdef.h"
 #include "YmLogic/Literal.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -242,7 +243,7 @@ public:
   ///
   /// 一度に複数の置き換えを行う
   Expr
-  compose(const VarExprMap& comp_map) const;
+  compose(const HashMap<VarId, Expr>& comp_map) const;
 
   /// @brief 変数番号を再マップする．
   /// @param[in] varmap 置き換え元の変数番号をキーとして
@@ -251,7 +252,7 @@ public:
   ///
   /// varmap に登録されていない場合には不変とする．
   Expr
-  remap_var(const VarVarMap& varmap) const;
+  remap_var(const HashMap<VarId, VarId>& varmap) const;
 
   /// @brief 簡単化
   /// - expr + expr = expr

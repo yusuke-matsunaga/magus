@@ -337,11 +337,13 @@ Bdd::compose(VarId var,
 
 // @brief 複数変数の compose 演算
 Bdd
-Bdd::compose(const VarBddMap& comp_map) const
+Bdd::compose(const HashMap<VarId, Bdd>& comp_map) const
 {
   // 始める前にエラーチェックを行う．
-  for (VarBddMap::const_iterator p = comp_map.begin();
-       p != comp_map.end(); ++ p) {
+  vector<pair<VarId, Bdd> > kv_list;
+  comp_map.key_value_list(kv_list);
+  for (vector<pair<VarId, Bdd> >::iterator p = kv_list.begin();
+       p != kv_list.end(); ++ p) {
     Bdd bdd = p->second;
     if ( mMgr != bdd.mMgr || bdd.is_error() ) {
       return Bdd(mMgr, BddEdge::make_error());
@@ -352,8 +354,8 @@ Bdd::compose(const VarBddMap& comp_map) const
   }
 
   mMgr->compose_start();
-  for (VarBddMap::const_iterator p = comp_map.begin();
-       p != comp_map.end(); ++ p) {
+  for (vector<pair<VarId, Bdd> >::iterator p = kv_list.begin();
+       p != kv_list.end(); ++ p) {
     VarId id = p->first;
     Bdd bdd = p->second;
     BddEdge e1(bdd.mRoot);
@@ -366,11 +368,13 @@ Bdd::compose(const VarBddMap& comp_map) const
 
 // @brief 変数インデックスの置き換え
 Bdd
-Bdd::remap_var(const VarVarMap& var_map) const
+Bdd::remap_var(const HashMap<VarId, VarId>& var_map) const
 {
+  vector<pair<VarId, VarId> > kv_list;
+  var_map.key_value_list(kv_list);
   mMgr->compose_start();
-  for (VarVarMap::const_iterator p = var_map.begin();
-       p != var_map.end(); ++ p) {
+  for (vector<pair<VarId, VarId> >::iterator p = kv_list.begin();
+       p != kv_list.end(); ++ p) {
     VarId id = p->first;
     VarId mid = p->second;
     BddEdge e1 = mMgr->make_posiliteral(mid);

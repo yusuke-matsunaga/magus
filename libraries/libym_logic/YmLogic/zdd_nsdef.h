@@ -1,12 +1,12 @@
-﻿#ifndef YM_YMYMLOGIC_ZDD_NSDEF_H
-#define YM_YMYMLOGIC_ZDD_NSDEF_H
+﻿#ifndef YMLOGIC_ZDD_NSDEF_H
+#define YMLOGIC_ZDD_NSDEF_H
 
-/// @file ym_YmLogic/zdd_nsdef.h
+/// @file YmLogic/zdd_nsdef.h
 /// @brief ZDD に共通な定義ファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 /// @defgroup Zdd ZDD パッケージ
@@ -41,7 +41,6 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_ZDD
 
-
 //////////////////////////////////////////////////////////////////////
 // クラス名の前方参照用の宣言
 //////////////////////////////////////////////////////////////////////
@@ -64,4 +63,4 @@ using nsZdd::ZddMgrParam;
 
 END_NAMESPACE_YM
 
-#endif // YM_ZDD_ZDD_NSDEF_H
+#endif // YMLOGIC_ZDD_NSDEF_H

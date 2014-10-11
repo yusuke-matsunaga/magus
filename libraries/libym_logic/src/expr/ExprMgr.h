@@ -147,13 +147,13 @@ public:
   /// を入れた連想配列
   ExprNodePtr
   compose(const ExprNode* node,
-	  const VarExprMap& compmap);
+	  const HashMap<VarId, Expr>& compmap);
 
   /// @brief 変数番号をマッピングし直す
   /// @param[in] varmap 置き換え元と置き換え先の変数番号を入れた連想配列
   ExprNodePtr
   remap_var(const ExprNode* node,
-	    const VarVarMap& varmap);
+	    const HashMap<VarId, VarId>& varmap);
 
   /// @brief 簡単化を行う．
   ExprNodePtr

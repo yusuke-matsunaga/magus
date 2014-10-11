@@ -10,6 +10,7 @@
 
 
 #include "YmVerilog/pt/PtP.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_VERILOG
@@ -87,11 +88,9 @@ private:
   // モジュール定義のリスト
   list<const PtModule*> mModuleList;
 
-  typedef unordered_set<string> StrSet;
-
   // インスタンス記述で用いられている名前
   // たぶんモジュール名か UDP名のはず
-  StrSet mDefNames;
+  HashSet<string> mDefNames;
 
 };
 

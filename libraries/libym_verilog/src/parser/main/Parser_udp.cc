@@ -78,7 +78,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
   // の確認を行う．
   // まず portdecl_list の各要素を名前をキーにした連想配列に格納する．
   // ついでに output の数を数える．
-  StrIOMap iomap;
+  HashMap<string, const PtIOItem*> iomap;
   for (ymuint i = 0; i < iohead_array.size(); ++ i) {
     const PtIOHead* io = iohead_array[i];
     if ( io->type() == kPtIO_Output ) {
@@ -104,7 +104,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
     }
     for (ymuint j = 0; j < io->item_num(); ++ j) {
       const PtIOItem* elem = io->item(j);
-      if ( iomap.count(elem->name()) > 0 ) {
+      if ( iomap.check(elem->name()) ) {
 	// 二重登録
 	ostringstream buf;
 	buf << elem->name() << ": Defined more than once.";
@@ -116,7 +116,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
 	sane = false;
 	break;
       }
-      iomap.insert(make_pair(elem->name(), elem));
+      iomap.add(elem->name(), elem);
     }
   }
 
@@ -125,8 +125,8 @@ Parser::new_Udp1995(const FileRegion& file_region,
   for (ymuint i = 0; i < port_array.size(); ++ i) {
     const PtiPort* port = port_array[i];
     const char* port_name = port->ext_name();
-    StrIOMap::iterator q = iomap.find(port_name);
-    if ( q == iomap.end() ) {
+    const PtIOItem* ioelem;
+    if ( !iomap.find(port_name, ioelem) ) {
       ostringstream buf;
       buf << "\"" << port_name << "\" undefined.";
       MsgMgr::put_msg(__FILE__, __LINE__,
@@ -138,7 +138,6 @@ Parser::new_Udp1995(const FileRegion& file_region,
       break;
     }
     if ( i == 0 ) {
-      const PtIOItem* ioelem = q->second;
       if ( out_item != ioelem ) {
 	// 最初の名前は output でなければならない．
 	ostringstream buf;
@@ -152,14 +151,16 @@ Parser::new_Udp1995(const FileRegion& file_region,
 	break;
       }
     }
-    iomap.erase(q);
+    iomap.erase(port_name);
   }
 
-  if ( !iomap.empty() ) {
+  if ( iomap.num() > 0 ) {
     // iolist 中のみに現れる要素がある．
-    for (StrIOMap::const_iterator q = iomap.begin();
-	 q != iomap.end(); ++ q) {
-      const PtIOItem* ioelem = q->second;
+    vector<const PtIOItem*> iolist;
+    iomap.value_list(iolist);
+    for (vector<const PtIOItem*>::iterator q = iolist.begin();
+	 q != iolist.end(); ++ q) {
+      const PtIOItem* ioelem = *q;
       ostringstream buf;
       buf << "\"" << ioelem->name() << "\" does not appear in portlist.";
       MsgMgr::put_msg(__FILE__, __LINE__,

@@ -11,6 +11,7 @@
 
 #include "YmLogic/Zdd.h"
 #include "ZddEdge.h"
+#include "YmUtils/HashFunc.h"
 
 
 BEGIN_NAMESPACE_YM_ZDD
@@ -234,17 +235,17 @@ ZddNode::ZddNode()
 
 END_NAMESPACE_YM_ZDD
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 // ZddNode へのポインタをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsZdd::ZddNode*>
+struct HashFunc<nsZdd::ZddNode*>
 {
   ymuint
-  operator()(nsYm::nsZdd::ZddNode* node) const
+  operator()(nsZdd::ZddNode* node) const
   {
     return reinterpret_cast<ympuint>(node) / sizeof(void*);
   }
 };
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // ZDDNODE_H

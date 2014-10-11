@@ -11,6 +11,8 @@
 
 #include "cec_nsdef.h"
 #include "YmLogic/VarId.h"
+#include "YmUtils/HashFunc.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -170,7 +172,7 @@ operator!=(CecHandle src1,
 /// @param[in] s 出力先のストリーム
 void
 dump_handle(CecHandle src,
-	    unordered_set<ymuint>& mark,
+	    HashSet<ymuint>& mark,
 	    ostream& s);
 
 /// @relates CecHandle
@@ -300,17 +302,17 @@ operator!=(CecHandle src1,
 
 END_NAMESPACE_YM_CEC
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 // CecHandleをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsCec::CecHandle>
+struct HashFunc<nsCec::CecHandle>
 {
   ymuint
-  operator()(nsYm::nsCec::CecHandle aig) const
+  operator()(nsCec::CecHandle aig) const
   {
     return aig.hash_func();
   }
 };
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // LIBYM_CEC_CECHANDLE_H

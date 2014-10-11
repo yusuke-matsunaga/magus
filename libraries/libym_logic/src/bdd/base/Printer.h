@@ -11,6 +11,7 @@
 
 #include "BddMgrImpl.h"
 #include "IdMgr.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_BDD
@@ -72,7 +73,7 @@ private:
   ostream& mStream;
 
   // 処理済の BddEdge に印を付けておくためのハッシュ表
-  BddEdgeSet mMark;
+  HashSet<BddEdge> mMark;
 
   // ID 番号を管理するマネージャ
   IdMgr mIdMgr;

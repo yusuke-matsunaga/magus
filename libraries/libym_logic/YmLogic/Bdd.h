@@ -14,6 +14,8 @@
 #include "YmLogic/VarId.h"
 #include "YmLogic/Expr.h"
 #include "YmUtils/MpInt.h"
+#include "YmUtils/HashFunc.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -295,13 +297,13 @@ public:
   /// @param[in] comp_map 置き換える対象の変数から置き換え先の BDD への写像
   /// @return 演算結果
   Bdd
-  compose(const VarBddMap& comp_map) const;
+  compose(const HashMap<VarId, Bdd>& comp_map) const;
 
   /// @brief 変数インデックスの置き換えを行う．
   /// @param[in] var_map 置き換え元の変数から置き換え先の変数への写像
   /// @return 演算結果
   Bdd
-  remap_var(const VarVarMap& var_map) const;
+  remap_var(const HashMap<VarId, VarId>& var_map) const;
 
   /// @brief e-smoothing(elimination)
   /// @param[in] svars 消去する変数の集合
@@ -894,19 +896,19 @@ print_sop(ostream& s,
 
 END_NAMESPACE_YM_BDD
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
 
 // BDDをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsBdd::Bdd>
+struct HashFunc<nsBdd::Bdd>
 {
   ymuint
-  operator()(const nsYm::nsBdd::Bdd& bdd) const
+  operator()(const nsBdd::Bdd& bdd) const
   {
     return bdd.hash();
   }
 };
 
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // YMYMLOGIC_BDD_H

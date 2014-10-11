@@ -181,10 +181,10 @@ fsm_analysis(const BNetwork& bnetwork,
     BNode* node = *p;
     Expr expr = node->func();
     ymuint ni = node->fanin_num();
-    VarBddMap fanin_map;
+    HashMap<VarId, Bdd> fanin_map;
     for (ymuint i = 0; i < ni; ++ i) {
       BNode* inode = node->fanin(i);
-      fanin_map.insert(make_pair(VarId(i), bdd_array[inode->id()]));
+      fanin_map.add(VarId(i), bdd_array[inode->id()]);
     }
     bdd_array[node->id()] = bddmgr.expr_to_bdd(expr, fanin_map);
   }
@@ -233,14 +233,14 @@ fsm_analysis(const BNetwork& bnetwork,
   fsm.calc_trans_prob(rs_bdd, reachable_states1, trans_map1);
 
   // 正常回路の変数をエラー回路にシフトさせるためのマップ
-  VarVarMap c2e_map;
+  HashMap<VarId, VarId> c2e_map;
   for (ymuint i = 0; i < ff_num; ++ i) {
     VarId cur_id1 = idxmap.cur_normal_idx(i);
     VarId cur_id2 = idxmap.cur_error_idx(i);
-    c2e_map.insert(make_pair(cur_id1, cur_id2));
+    c2e_map.add(cur_id1, cur_id2);
     VarId next_id1 = idxmap.next_normal_idx(i);
     VarId next_id2 = idxmap.next_error_idx(i);
-    c2e_map.insert(make_pair(next_id1, next_id2));
+    c2e_map.add(next_id1, next_id2);
   }
 
   for (ymuint i = 0; i < ff_num; ++ i) {

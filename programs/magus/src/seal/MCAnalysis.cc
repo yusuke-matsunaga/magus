@@ -117,9 +117,8 @@ MCAnalysis::analyze(const BNetwork& network,
   double abs_prob_sum = 0.0;
   for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
     State st_pair = mReachableStates2[i];
-    unordered_map<State, double>::iterator p = mInitialProb.find(st_pair);
-    if ( p != mInitialProb.end() ) {
-      double init_prob = p->second;
+    double init_prob;
+    if ( mInitialProb.find(st_pair, init_prob) ) {
       abs_prob_sum += mFailureProb[i] * init_prob;
     }
   }
@@ -175,9 +174,8 @@ MCAnalysis::analyze2(istream& s)
   double abs_prob_sum = 0.0;
   for (ymuint i = 0; i < mReachableStates2.size(); ++ i) {
     State st_pair = mReachableStates2[i];
-    unordered_map<State, double>::iterator p = mInitialProb.find(st_pair);
-    if ( p != mInitialProb.end() ) {
-      double init_prob = p->second;
+    double init_prob;
+    if ( mInitialProb.find(st_pair, init_prob) ) {
       abs_prob_sum += mFailureProb[i] * init_prob;
     }
   }
@@ -468,7 +466,7 @@ MCAnalysis::calc_error_prob(const vector<double>& error_rate)
       }
       StatePair tmp_pair = correct_state + error_state;
       double prob = mSteadyProb[i] * error_rate[j];
-      mInitialProb.insert(make_pair(tmp_pair, prob));
+      mInitialProb.add(tmp_pair, prob);
     }
   }
 }

@@ -11,6 +11,7 @@
 
 #include "smtlibv2_nsdef.h"
 #include "YmLogic/SmtSolver.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/Alloc.h"
 #include "YmUtils/StrBuff.h"
 #include "IdMgr.h"
@@ -383,10 +384,8 @@ private:
   // SMT ソルバ
   SmtSolver* mSolver;
 
-  typedef unordered_map<ymuint32, tSmtSortId> SortMap;
-
   // 組み込み型を保持するハッシュ表
-  SortMap mBuiltinSortMap;
+  HashMap<ymuint32, tSmtSortId> mBuiltinSortMap;
 
   // スタック
   vector<StackPage*> mStack;

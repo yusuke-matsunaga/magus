@@ -100,7 +100,7 @@ SptModule::SptModule(const FileRegion& file_region,
   for (ymuint i = 0; i < mItemArray.size(); ++ i) {
     const PtItem* item = mItemArray[i];
     if ( item->type() == kPtItem_Func ) {
-      mFuncDic.insert(make_pair(item->name(), item));
+      mFuncDic.add(item->name(), item);
     }
   }
 }
@@ -335,11 +335,13 @@ SptModule::cell() const
 const PtItem*
 SptModule::find_function(const char* name) const
 {
-  StrItemMap::const_iterator p = mFuncDic.find(name);
-  if ( p == mFuncDic.end() ) {
+  const PtItem* item;
+  if ( mFuncDic.find(name, item) ) {
+    return item;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 // 名無しのポートを持つことを記録する．

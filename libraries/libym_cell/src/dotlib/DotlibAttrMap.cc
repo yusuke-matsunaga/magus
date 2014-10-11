@@ -37,15 +37,16 @@ bool
 DotlibAttrMap::get(const char* name,
 		   vector<const DotlibNode*>& node_list) const
 {
-  node_list.clear();
-  StrNodeListMap::const_iterator p
-    = mHash.find(ShString(name));
-  if ( p == mHash.end() ) {
+  ShString sh_name(name);
+
+  if ( !mHash.check(sh_name) ) {
     return false;
   }
-  const list<const DotlibNode*>& src_node_list = p->second;
+
+  const vector<const DotlibNode*>& src_node_list = mHash[sh_name];
+  node_list.clear();
   node_list.reserve(src_node_list.size());
-  for (list<const DotlibNode*>::const_iterator q = src_node_list.begin();
+  for (vector<const DotlibNode*>::const_iterator q = src_node_list.begin();
        q != src_node_list.end(); ++ q) {
     node_list.push_back(*q);
   }
@@ -84,23 +85,22 @@ DotlibAttrMap::get_singleton(const char* name,
 // @param[out] node 結果のノードを格納するノード
 // @retval true 値の読み出しが成功した．
 // @retval false エラーが起こった．
+//
+// 空の時は node に NULL を入れて true を返す．
 bool
 DotlibAttrMap::get_singleton_or_null(const char* name,
 				     const DotlibNode*& node) const
 {
-  StrNodeListMap::const_iterator p
-    = mHash.find(ShString(name));
-  if ( p == mHash.end() ) {
+  ShString sh_name(name);
+
+  if ( !mHash.check(sh_name) ) {
     node = NULL;
     return true;
   }
 
-  const list<const DotlibNode*>& node_list = p->second;
-  list<const DotlibNode*>::const_iterator q = node_list.begin();
-  node = *q;
-  ++ q;
-  if ( q != node_list.end() ) {
-    const DotlibNode* second = *q;
+  const vector<const DotlibNode*>& node_list = mHash[sh_name];
+  if ( node_list.size() != 1 ) {
+    const DotlibNode* second = node_list[1];
     ostringstream buf;
     buf << "More than one '" << name << "' definitions."
 	<< " First occurence is " << node->loc() << ".";
@@ -111,6 +111,8 @@ DotlibAttrMap::get_singleton_or_null(const char* name,
 		    buf.str());
     return false;
   }
+
+  node = node_list[0];
   return true;
 }
 
@@ -128,12 +130,10 @@ void
 DotlibAttrMap::add(const ShString& name,
 		   const DotlibNode* node)
 {
-  StrNodeListMap::iterator p = mHash.find(name);
-  if ( p == mHash.end() ) {
-    mHash.insert(make_pair(name, list<const DotlibNode*>()));
-    p = mHash.find(name);
+  if ( !mHash.check(name) ) {
+    mHash.add(name, vector<const DotlibNode*>());
   }
-  (p->second).push_back(node);
+  mHash[name].push_back(node);
 }
 
 

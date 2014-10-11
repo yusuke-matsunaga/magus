@@ -150,9 +150,7 @@ else (POPT_FOUND)
 endif (POPT_FOUND)
 
 set (textproc_SOURCES
-  src/textproc/Dictionary.cc
   src/textproc/Scanner.cc
-  src/textproc/ShStringDict.cc
   src/textproc/StrBuff.cc
   src/textproc/StrPool.cc
   )

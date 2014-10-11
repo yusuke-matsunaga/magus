@@ -56,7 +56,7 @@ ZddMgrImpl::count(ZddEdge e)
     return MpInt(0);
   }
 
-  ZddEdgeMpIntMap mc_map;
+  HashMap<ZddEdge, MpInt> mc_map;
   MpInt ans = count_step(e, mc_map);
   return ans;
 }
@@ -64,7 +64,7 @@ ZddMgrImpl::count(ZddEdge e)
 // count の下請関数
 MpInt
 ZddMgrImpl::count_step(ZddEdge e,
-		       ZddEdgeMpIntMap& mc_map)
+		       HashMap<ZddEdge, MpInt>& mc_map)
 {
   bool zattr = e.zattr();
   e.normalize();
@@ -79,11 +79,7 @@ ZddMgrImpl::count_step(ZddEdge e,
     ymuint ref = vp->refcount();
     bool found = false;
     if ( ref != 1 ) {
-      ZddEdgeMpIntMap::iterator p = mc_map.find(e);
-      if ( p != mc_map.end() ) {
-	found = true;
-	ans = p->second;
-      }
+      found = mc_map.find(e, ans);
     }
     if ( !found ) {
       // 子ノードが表す関数の要素数を計算する
@@ -94,7 +90,7 @@ ZddMgrImpl::count_step(ZddEdge e,
       ans = n0 + n1;
 
       if ( ref != 1) {
-	mc_map[e] = ans;
+	mc_map.add(e, ans);
       }
     }
   }

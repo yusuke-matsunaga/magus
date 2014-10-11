@@ -1,5 +1,5 @@
-﻿#ifndef YMYMLOGIC_LITERAL_H
-#define YMYMLOGIC_LITERAL_H
+﻿#ifndef YMLOGIC_LITERAL_H
+#define YMLOGIC_LITERAL_H
 
 /// @file YmLogic/Literal.h
 /// @brief Literal のヘッダファイル
@@ -11,6 +11,7 @@
 
 #include "YmTools.h"
 #include "YmLogic/VarId.h"
+#include "YmUtils/HashFunc.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ODO.h"
 
@@ -241,6 +242,17 @@ typedef vector<Literal> LiteralVector;
 
 /// @brief リテラルのリスト
 typedef list<Literal> LiteralList;
+
+// Literal をキーにしたハッシュ関数クラス
+template <>
+struct HashFunc<Literal>
+{
+  ymuint
+  operator()(Literal lit) const
+  {
+    return lit.hash();
+  }
+};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -483,20 +495,4 @@ struct equal_to<nsYm::Literal>
 
 END_NAMESPACE_STD
 
-
-BEGIN_NAMESPACE_HASH
-
-// Literal をキーにしたハッシュ関数クラス
-template <>
-struct hash<nsYm::Literal>
-{
-  ymuint
-  operator()(nsYm::Literal lit) const
-  {
-    return lit.hash();
-  }
-};
-
-END_NAMESPACE_HASH
-
-#endif // YMYMLOGIC_LITERAL_H
+#endif // YMLOGIC_LITERAL_H

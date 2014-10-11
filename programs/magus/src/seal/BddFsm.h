@@ -129,7 +129,7 @@ private:
   /// @param[in] trans_prob_map 確率を収めるハッシュ表
   void
   rs_sub(Bdd rel,
-	 const unordered_map<State, ymuint>& state_hash,
+	 const HashMap<State, ymuint>& state_hash,
 	 vector<ymuint>& st_vec,
 	 vector<list<TransProb> >& trans_map);
 
@@ -168,7 +168,7 @@ private:
   BddVarSet mCurStateVars;
 
   // 次状態から現状態を得るための変換マップ
-  VarVarMap mNext2CurMap;
+  HashMap<VarId, VarId> mNext2CurMap;
 
   // 最小項の重み
   double mWeight;

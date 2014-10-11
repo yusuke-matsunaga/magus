@@ -147,7 +147,7 @@ bool
 GroupHandler::reg_handler(const ShString& attr_name,
 			  DotlibHandler* handler)
 {
-  mHandlerMap.insert(make_pair(attr_name, handler));
+  mHandlerMap.add(attr_name, handler);
   return true;
 }
 
@@ -157,13 +157,12 @@ GroupHandler::reg_handler(const ShString& attr_name,
 DotlibHandler*
 GroupHandler::find_handler(const ShString& attr_name)
 {
-  StrHandlerMap::const_iterator p
-    = mHandlerMap.find(attr_name);
-  if ( p == mHandlerMap.end() ) {
-    return NULL;
+  DotlibHandler* ans;
+  if ( mHandlerMap.find(attr_name, ans) ) {
+    return ans;
   }
   else {
-    return p->second;
+    return NULL;
   }
 }
 

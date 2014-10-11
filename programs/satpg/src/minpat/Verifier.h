@@ -13,6 +13,7 @@
 #include "TestVector.h"
 #include "FsimOp.h"
 #include "TpgFault.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -66,7 +67,7 @@ private:
   Fsim& mFsim;
 
   // 検出済みの故障を入れるハッシュ
-  unordered_set<TpgFault*> mDetSet;
+  HashSet<TpgFault*> mDetSet;
 
 };
 

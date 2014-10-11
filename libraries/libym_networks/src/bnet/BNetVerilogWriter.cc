@@ -125,7 +125,7 @@ BNetVerilogWriter::dump(ostream& s,
   }
 
   // 各内部節点の処理
-  VarStrMap fanin_name;
+  HashMap<VarId, string> fanin_name;
   for (BNodeList::const_iterator p = network.logic_nodes_begin();
        p != network.logic_nodes_end(); ++p) {
     BNode* node = *p;
@@ -138,7 +138,7 @@ BNetVerilogWriter::dump(ostream& s,
     for (ymuint i = 0; i < n; i ++) {
       BNode* inode = node->fanin(i);
       assert_cond( inode != 0, __FILE__, __LINE__);
-      fanin_name.insert(make_pair(VarId(i), inode->name()));
+      fanin_name.add(VarId(i), inode->name());
     }
     const Expr& f = node->func();
     vlw_assign.put_rhs(f, fanin_name);

@@ -35,7 +35,7 @@ FopVer::operator()(TpgFault* f,
 		   PackedVal dpat)
 {
   mFsim.set_skip(f);
-  mDetSet.insert(f);
+  mDetSet.add(f);
 }
 
 // @brief det_flag を下ろす．
@@ -49,7 +49,7 @@ FopVer::clear_det_flag()
 bool
 FopVer::is_detected(TpgFault* f)
 {
-  return mDetSet.count(f) > 0;
+  return mDetSet.check(f);
 }
 
 

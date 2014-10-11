@@ -88,11 +88,13 @@ ElbMgr::udp_list() const
 const ElbUdpDefn*
 ElbMgr::find_udp(const char* name) const
 {
-  UdpDict::const_iterator p = mUdpHash.find(name);
-  if ( p == mUdpHash.end() ) {
+  const ElbUdpDefn* ans;
+  if ( mUdpHash.find(name, ans) ) {
+    return ans;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 // @brief UDP を登録する．
@@ -103,7 +105,7 @@ ElbMgr::reg_udp(const char* def_name,
 		const ElbUdpDefn* udp)
 {
   mUdpList.push_back(udp);
-  mUdpHash.insert(make_pair(def_name, udp));
+  mUdpHash.add(def_name, udp);
 }
 
 // @brief グローバルスコープを登録する．
@@ -127,18 +129,20 @@ ElbMgr::topmodule_list() const
 const ElbUserSystf*
 ElbMgr::find_user_systf(const char* name) const
 {
-  SystfDict::const_iterator p = mSystfHash.find(name);
-  if ( p == mSystfHash.end() ) {
+  const ElbUserSystf* ans;
+  if ( mSystfHash.find(name, ans) ) {
+    return ans;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 // @brief システムタスク/システム関数を登録する．
 void
 ElbMgr::reg_user_systf(const ElbUserSystf* systf)
 {
-  mSystfHash.insert(make_pair(systf->_name(), systf));
+  mSystfHash.add(systf->_name(), systf);
 }
 
 // @brief internal scope を登録する．

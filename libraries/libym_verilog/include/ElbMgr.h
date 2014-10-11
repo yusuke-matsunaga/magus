@@ -12,6 +12,7 @@
 #include "YmVerilog/pt/PtP.h"
 #include "YmVerilog/vl/VlFwd.h"
 #include "YmUtils/Alloc.h"
+#include "YmUtils/HashMap.h"
 
 #include "TagDict.h"
 #include "ObjDict.h"
@@ -387,9 +388,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  typedef unordered_map<string, const ElbUdpDefn*> UdpDict;
-  typedef unordered_map<string, const ElbUserSystf*> SystfDict;
-
   // メモリ確保用のアロケータ
   Alloc& mAlloc;
 
@@ -397,13 +395,13 @@ private:
   list<const VlUdpDefn*> mUdpList;
 
   // UDP の辞書
-  UdpDict mUdpHash;
+  HashMap<string, const ElbUdpDefn*> mUdpHash;
 
   // topmodule のリスト
   list<const VlModule*> mTopmoduleList;
 
   // UserSystf の辞書
-  SystfDict mSystfHash;
+  HashMap<string, const ElbUserSystf*> mSystfHash;
 
   // 名前をキーにしたオブジェクトの辞書
   ObjDict mObjDict;

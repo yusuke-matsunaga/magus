@@ -11,6 +11,7 @@
 
 #include "YmLogic/aig_nsdef.h"
 #include "YmLogic/VarId.h"
+#include "YmUtils/HashFunc.h"
 
 
 BEGIN_NAMESPACE_YM_AIG
@@ -154,10 +155,6 @@ ostream&
 operator<<(ostream& s,
 	   Aig src);
 
-/// @relates Aig
-/// @brief 変数番号をキーにして AIG を保持するハッシュ表
-typedef unordered_map<VarId, Aig> VarAigMap;
-
 
 //////////////////////////////////////////////////////////////////////
 // Aig のインライン関数
@@ -262,17 +259,18 @@ operator!=(Aig src1,
 
 END_NAMESPACE_YM_AIG
 
-BEGIN_NAMESPACE_HASH
+BEGIN_NAMESPACE_YM
+
 // Aigをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<nsYm::nsAig::Aig>
+struct HashFunc<nsAig::Aig>
 {
   ymuint
-  operator()(nsYm::nsAig::Aig aig) const
+  operator()(nsAig::Aig aig) const
   {
     return aig.hash_func();
   }
 };
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
-#endif // YMYMLOGIC_AIG_H
+#endif // YMLOGIC_AIG_H

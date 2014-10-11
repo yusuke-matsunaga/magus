@@ -87,13 +87,13 @@ private:
   MpInt mAllCount1;
 
   // 演算結果を覚えておくハッシュ表(MpInt版)
-  BddEdgeMpIntMap mCompTbl1;
+  HashMap<BddEdge, MpInt> mCompTbl1;
 
   // 全最小項数(ymint32版)
   ymint32 mAllCount2;
 
   // 演算結果を覚えておくハッシュ表(ymint32版)
-  BddEdgeIntMap mCompTbl2;
+  HashMap<BddEdge, ymint32> mCompTbl2;
 
 };
 

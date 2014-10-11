@@ -193,7 +193,7 @@ BddMgr::tvec_to_bdd(const vector<int>& v,
 // varmap に登録されていないリテラルはそのまま使う．
 Bdd
 BddMgr::expr_to_bdd(const Expr& expr,
-		    const VarBddMap& varmap)
+		    const HashMap<VarId, Bdd>& varmap)
 {
   // 定数0の場合
   if ( expr.is_zero() ) {
@@ -208,13 +208,9 @@ BddMgr::expr_to_bdd(const Expr& expr,
   // リテラルの場合
   if ( expr.is_literal() ) {
     VarId pos = expr.varid();
-    VarBddMap::const_iterator p = varmap.find(pos);
     Bdd ans;
-    if ( p == varmap.end() ) {
+    if ( !varmap.find(pos, ans) ) {
       ans = make_posiliteral(pos);
-    }
-    else {
-      ans = p->second;
     }
     if ( expr.is_negaliteral() ) {
       ans.negate();
@@ -243,19 +239,28 @@ BddMgr::expr_to_bdd(const Expr& expr,
 }
 
 // Expr から対応するBDDを作り出す．
+Bdd
+BddMgr::expr_to_bdd(const Expr& expr)
+{
+  return expr_to_bdd(expr, HashMap<VarId, Bdd>());
+}
+
+// Expr から対応するBDDを作り出す．
 // 論理式中に現れるリテラルを置き換えるリテラル番号を varmap に入れる．
 // varmap に登録されていないリテラルはそのまま使う．
 Bdd
 BddMgr::expr_to_bdd(const Expr& expr,
-		    const VarVarMap& varmap)
+		    const HashMap<VarId, VarId>& varmap)
 {
-  VarBddMap vbmap;
-  for (VarVarMap::const_iterator p = varmap.begin();
-       p != varmap.end(); ++ p) {
+  vector<pair<VarId, VarId> > kv_list;
+  varmap.key_value_list(kv_list);
+  HashMap<VarId, Bdd> vbmap;
+  for (vector<pair<VarId, VarId> >::iterator p = kv_list.begin();
+       p != kv_list.end(); ++ p) {
     VarId id = p->first;
     VarId id2 = p->second;
     Bdd bdd = make_posiliteral(id2);
-    vbmap.insert(make_pair(id, bdd));
+    vbmap.add(id, bdd);
   }
   return expr_to_bdd(expr, vbmap);
 }

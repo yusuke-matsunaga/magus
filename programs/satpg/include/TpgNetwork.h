@@ -15,6 +15,7 @@
 #include "YmLogic/Bool3.h"
 #include "YmLogic/expr_nsdef.h"
 #include "YmUtils/SimpleAlloc.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -51,8 +52,6 @@ struct CplxInfo
 //////////////////////////////////////////////////////////////////////
 class TpgNetwork
 {
-  typedef unordered_map<ymuint, CplxInfo> CplxInfoMap;
-
 public:
   //////////////////////////////////////////////////////////////////////
   // ファイルを読み込んでインスタンスを作るクラスメソッド
@@ -290,7 +289,7 @@ private:
   /// @param[in] tgnode もととなる TgNode
   void
   make_faults(const TgNode* tgnode,
-	      const unordered_map<ymuint, CplxInfo>& en_hash);
+	      const HashMap<ymuint, CplxInfo*>& en_hash);
 
   /// @brief 出力の故障を作る．
   /// @param[in] node 故障位置のノード

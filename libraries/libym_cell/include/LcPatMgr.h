@@ -11,6 +11,7 @@
 
 #include "libcomp_nsdef.h"
 #include "YmLogic/expr_nsdef.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/UnitAlloc.h"
 
 
@@ -23,8 +24,6 @@ BEGIN_NAMESPACE_YM_CELL_LIBCOMP
 //////////////////////////////////////////////////////////////////////
 class LcPatMgr
 {
-  typedef unordered_map<ymuint, ymuint> UintUintMap;
-
 public:
 
   /// @brief コンストラクタ
@@ -115,8 +114,8 @@ private:
   bool
   ceq_sub(LcPatNode* node1,
 	  LcPatNode* node2,
-	  UintUintMap& map1,
-	  UintUintMap& map2);
+	  HashMap<ymuint, ymuint>& map1,
+	  HashMap<ymuint, ymuint>& map2);
 
   /// @brief パタングラフを生成する再帰関数
   /// @param[in] expr 元になる論理式

@@ -66,7 +66,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  typedef unordered_map<ZddEdge, pair<ZddEdge, ymuint32> > MinimumSetMap;
+  typedef HashMap<ZddEdge, pair<ZddEdge, ymuint32> > MinimumSetMap;
 
   // 枝をキーとしてminimum set を保持するハッシュ表
   MinimumSetMap mHash;

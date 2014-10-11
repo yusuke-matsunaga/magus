@@ -11,6 +11,7 @@
 
 #include "YmLogic/expr_nsdef.h"
 #include "YmLogic/VarId.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_EXPR
@@ -37,6 +38,14 @@ public:
   /// @brief 内容の出力
   /// @param[in] s 出力ストリーム
   /// @param[in] expr 文字列
+  /// @return s
+  ostream&
+  dump(ostream& s,
+       const Expr& expr) const;
+
+  /// @brief 内容の出力
+  /// @param[in] s 出力ストリーム
+  /// @param[in] expr 文字列
   /// @param[in] var_names 各変数番号から変数名への写像
   /// @note varid 番目の変数名として var_names[varid] を用いる．
   /// 登録されていなければデフォルトの表記を用いる．
@@ -44,7 +53,12 @@ public:
   ostream&
   dump(ostream& s,
        const Expr& expr,
-       const VarStrMap& var_names = VarStrMap()) const;
+       const HashMap<VarId, string>& var_names) const;
+
+  /// @brief 内容を文字列にする．
+  /// @param[in] expr 文字列
+  string
+  dump_string(const Expr& expr) const;
 
   /// @brief 内容を文字列にする．
   /// @param[in] expr 文字列
@@ -53,7 +67,7 @@ public:
   /// 登録されていなければデフォルトの表記を用いる．
   string
   dump_string(const Expr& expr,
-	      const VarStrMap& var_names = VarStrMap()) const;
+	      const HashMap<VarId, string>& var_names) const;
 
 
 public:
@@ -100,7 +114,7 @@ private:
   void
   dump_sub(ostream& s,
 	   const Expr& expr,
-	   const VarStrMap& var_names) const;
+	   const HashMap<VarId, string>& var_names) const;
 
 
 private:

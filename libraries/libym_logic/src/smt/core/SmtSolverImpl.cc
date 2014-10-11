@@ -206,36 +206,36 @@ SmtSolverImpl::Core_init()
   void* q = mAlloc.get_memory(sizeof(SmtBool0Validator));
   SmtFunValidator* fv0 = new (q) SmtBool0Validator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_True, fv0));
-  mFunValidatorMap.insert(make_pair(kSmtFun_False, fv0));
+  mFunValidatorMap.add(kSmtFun_True, fv0);
+  mFunValidatorMap.add(kSmtFun_False, fv0);
 
   // not 関数用の validator の生成
   void* r = mAlloc.get_memory(sizeof(SmtBool1Validator));
   SmtFunValidator* fv1 = new (r) SmtBool1Validator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Not, fv1));
+  mFunValidatorMap.add(kSmtFun_Not, fv1);
 
   // and/or/xor/=> 用の validator の生成
   void* s = mAlloc.get_memory(sizeof(SmtBool2Validator));
   SmtFunValidator* fv2 = new (s) SmtBool2Validator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_And, fv2));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Or, fv2));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Xor, fv2));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Imp, fv2));
+  mFunValidatorMap.add(kSmtFun_And, fv2);
+  mFunValidatorMap.add(kSmtFun_Or, fv2);
+  mFunValidatorMap.add(kSmtFun_Xor, fv2);
+  mFunValidatorMap.add(kSmtFun_Imp, fv2);
 
   // ite 用の validator の生成
   void* t = mAlloc.get_memory(sizeof(SmtIteValidator));
   SmtFunValidator* fv3 = new (t) SmtIteValidator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Ite, fv3));
+  mFunValidatorMap.add(kSmtFun_Ite, fv3);
 
   // eq/distinct 用の validator の生成
   void* u = mAlloc.get_memory(sizeof(SmtEqValidator));
   SmtFunValidator* fv4 = new (u) SmtEqValidator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Eq, fv4));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Diseq, fv4));
+  mFunValidatorMap.add(kSmtFun_Eq, fv4);
+  mFunValidatorMap.add(kSmtFun_Diseq, fv4);
 }
 
 // @brief INTS logic の初期化を行う．
@@ -255,24 +255,24 @@ SmtSolverImpl::Ints_init()
   void* q = mAlloc.get_memory(sizeof(SmtUminusValidator));
   SmtFunValidator* fv1 = new (q) SmtUminusValidator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Uminus, fv1));
+  mFunValidatorMap.add(kSmtFun_Uminus, fv1);
 
   // 2項演算用の validator の生成
   void* r = mAlloc.get_memory(sizeof(SmtArithValidator));
   SmtFunValidator* fv2 = new (r) SmtArithValidator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Add, fv2));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Sub, fv2));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Mul, fv2));
+  mFunValidatorMap.add(kSmtFun_Add, fv2);
+  mFunValidatorMap.add(kSmtFun_Sub, fv2);
+  mFunValidatorMap.add(kSmtFun_Mul, fv2);
 
   // 比較演算用の validator の生成
   void* s = mAlloc.get_memory(sizeof(SmtCompValidator));
   SmtFunValidator* fv3 = new (s) SmtCompValidator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Le, fv3));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Lt, fv3));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Ge, fv3));
-  mFunValidatorMap.insert(make_pair(kSmtFun_Gt, fv3));
+  mFunValidatorMap.add(kSmtFun_Le, fv3);
+  mFunValidatorMap.add(kSmtFun_Lt, fv3);
+  mFunValidatorMap.add(kSmtFun_Ge, fv3);
+  mFunValidatorMap.add(kSmtFun_Gt, fv3);
 }
 
 // @brief REALS logic の初期化を行う．
@@ -292,7 +292,7 @@ SmtSolverImpl::Reals_init()
   void* q = mAlloc.get_memory(sizeof(SmtDivValidator));
   SmtFunValidator* fv1 = new (q) SmtDivValidator();
 
-  mFunValidatorMap.insert(make_pair(kSmtFun_Div, fv1));
+  mFunValidatorMap.add(kSmtFun_Div, fv1);
 }
 
 // @brief 型を作る．(単純型)
@@ -503,11 +503,13 @@ SmtSolverImpl::make_fun(const vector<const SmtVar*>& input_var_list,
 const SmtFunValidator*
 SmtSolverImpl::get_fun_validator(tSmtFunType fun_type)
 {
-  FunValidatorMap::const_iterator p = mFunValidatorMap.find(fun_type);
-  if ( p == mFunValidatorMap.end() ) {
+  const SmtFunValidator* ans;
+  if ( mFunValidatorMap.find(fun_type, ans) ) {
+    return ans;
+  }
+  else {
     return NULL;
   }
-  return p->second;
 }
 
 // @brief <numeral> 型の term を作る．

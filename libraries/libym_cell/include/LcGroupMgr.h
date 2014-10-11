@@ -11,6 +11,7 @@
 
 #include "libcomp_nsdef.h"
 #include "YmLogic/TvFuncM.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELL_LIBCOMP
@@ -104,16 +105,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  typedef unordered_map<TvFuncM, ymuint> FuncMIdMap;
-
   // 親の LibComp
   LibComp& mLibComp;
 
   // 多出力論理関数をキーとしてグループ番号を保持するハッシュ表
-  FuncMIdMap mGroupMap;
+  HashMap<TvFuncM, ymuint> mGroupMap;
 
   // 代表関数をキーとしてクラス番号を保持するハッシュ表
-  FuncMIdMap mClassMap;
+  HashMap<TvFuncM, ymuint> mClassMap;
 
 };
 

@@ -410,16 +410,16 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
   ymuint nn_orig = tgnetwork.node_num();
   ymuint nl = tgnetwork.logic_num();
   ymuint nn = nn_orig;
-  CplxInfoMap en_hash;
+  HashMap<ymuint, CplxInfo*> en_hash;
   for (ymuint i = 0; i < nl; ++ i) {
     const TgNode* tgnode = tgnetwork.logic(i);
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
-      if ( en_hash.count(fid) > 0 ) {
+      CplxInfo* cinfo;
+      if ( en_hash.find(fid, cinfo) ) {
 	// すでに同じ論理式を処理済みの場合は
 	// 以前の結果を利用する．
-	CplxInfoMap::iterator p = en_hash.find(fid);
-	nn += p->second.mExtraNodeCount;
+	nn += cinfo->mExtraNodeCount;
       }
       else {
 	// 論理式を取り出す．
@@ -427,16 +427,14 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
 	ymuint ni = tgnode->fanin_num();
 	// 追加で必要となるノード数を計算する．
 	ymuint n = extra_node_count(expr, ni);
-	// ハッシュに登録する．
-	en_hash.insert(make_pair(fid, CplxInfo(n, ni)));
+	cinfo = new CplxInfo(n, ni);
 	// 入力の制御値を計算する．
-	CplxInfoMap::iterator p = en_hash.find(fid);
-	assert_cond( p != en_hash.end(), __FILE__, __LINE__);
-	CplxInfo& cinfo = p->second;
 	for (ymuint j = 0; j < ni; ++ j) {
-	  cinfo.mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kB3False);
-	  cinfo.mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kB3True);
+	  cinfo->mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kB3False);
+	  cinfo->mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kB3True);
 	}
+	// ハッシュに登録する．
+	en_hash.add(fid, cinfo);
 	nn += n;
       }
     }
@@ -1115,7 +1113,7 @@ TpgNetwork::bind(TpgNode* node,
 
 void
 TpgNetwork::make_faults(const TgNode* tgnode,
-			const unordered_map<ymuint, CplxInfo>& en_hash)
+			const HashMap<ymuint, CplxInfo*>& en_hash)
 {
   TpgFault* rep0 = NULL;
   TpgFault* rep1 = NULL;
@@ -1163,11 +1161,10 @@ TpgNetwork::make_faults(const TgNode* tgnode,
     Bool3 oval1;
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
-      unordered_map<ymuint, CplxInfo>::const_iterator p = en_hash.find(fid);
-      assert_cond( p != en_hash.end(), __FILE__, __LINE__);
-      const CplxInfo& cinfo = p->second;
-      oval0 = cinfo.mCVal[i * 2 + 0];
-      oval1 = cinfo.mCVal[i * 2 + 1];
+      ASSERT_COND( en_hash.check(fid) );
+      const CplxInfo* cinfo = en_hash[fid];
+      oval0 = cinfo->mCVal[i * 2 + 0];
+      oval1 = cinfo->mCVal[i * 2 + 1];
     }
     else {
       oval0 = c_val(tgnode->gate_type(), kB3False);

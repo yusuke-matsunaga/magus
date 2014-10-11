@@ -83,7 +83,7 @@ VlwAssign::put_lhs(const string& name,
 // @note expr 中の i 番めの変数の名前が name_map[i] に入っている．
 void
 VlwAssign::put_rhs(const Expr& expr,
-		   const VarStrMap& name_map)
+		   const HashMap<VarId, string>& name_map)
 {
   writer().put_expr(expr, name_map);
 }

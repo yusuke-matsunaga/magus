@@ -142,6 +142,13 @@ assert_cond(A assertion,
 //////////////////////////////////////////////////////////////////////
 /// @relates AssertNotReached
 /// @brief 通常は到達してはいけない部分に達したときに例外を投げるマクロ
+///
+/// ソースプログラム中で
+///
+///   ...
+///   ASSERT_NOT_REACHED;
+///
+/// という風に使う．ここに実行が到達したら例外が送出される．
 //////////////////////////////////////////////////////////////////////
 #define ASSERT_NOT_REACHED assert_not_reached(__FILE__, __LINE__)
 
@@ -150,9 +157,15 @@ assert_cond(A assertion,
 /// @relates AssertError
 /// @brief assert 違反で AssertError 例外を投げるマクロ
 /// @param[in] assertion 例外発生条件
+///
+/// ソースプログラム中で
+///
+///   ...
+///   ASSERT_COND( x > 0 );
+///
+/// という風に使う．この例では x > 0 が成り立たないと例外が送出される．
 //////////////////////////////////////////////////////////////////////
 #define ASSERT_COND(assertion) assert_cond(assertion, __FILE__, __LINE__)
-
 
 END_NAMESPACE_YM
 

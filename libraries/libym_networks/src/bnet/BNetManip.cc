@@ -41,7 +41,7 @@ BNetManip::eliminate_node(BNode* node)
   // ファンアウトリストの複製を作る．
   BNodeEdgeList fanouts(node->fanouts());
 
-  size_t old_ni = node->fanin_num();
+  ymuint old_ni = node->fanin_num();
   const Expr& orig_f = node->func();
   for (BNodeEdgeList::const_iterator it = fanouts.begin();
        it != fanouts.end(); it ++) {
@@ -51,23 +51,23 @@ BNetManip::eliminate_node(BNode* node)
       // 中間ノードの場合
 
       // node の論理式を併合した新しい論理式を作る．
-      size_t oni = fo_node->fanin_num();
-      VarVarMap vvmap;
-      for (size_t i = 0; i < old_ni; i ++) {
-	vvmap.insert(make_pair(VarId(i), VarId(i + oni)));
+      ymuint oni = fo_node->fanin_num();
+      HashMap<VarId, VarId> vvmap;
+      for (ymuint i = 0; i < old_ni; i ++) {
+	vvmap.add(VarId(i), VarId(i + oni));
       }
       Expr tmp = orig_f.remap_var(vvmap);
       Expr new_expr = fo_node->func().compose(VarId(edge->pos()), tmp);
 
       // 新しいファンインの配列を作る．
-      size_t new_ni = oni + old_ni;
+      ymuint new_ni = oni + old_ni;
       BNodeVector fanins(new_ni);
-      for (size_t i = 0; i < oni; i ++) {
+      for (ymuint i = 0; i < oni; i ++) {
 	// この中には node も含まれることになるが，
 	// 論理式中にはこの node に対応したリテラルは現れない．
 	fanins[i] = fo_node->fanin(i);
       }
-      for (size_t i = 0; i < old_ni; i ++) {
+      for (ymuint i = 0; i < old_ni; i ++) {
 	fanins[i + oni] = node->fanin(i);
       }
 
@@ -178,8 +178,8 @@ BNetManip::replace_node(BNode* old_node,
     BNode* fo_node = edge->to();
 
     bool found = false;
-    size_t ni = fo_node->fanin_num();
-    for (size_t i = 0; i < ni; ++ i) {
+    ymuint ni = fo_node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
       if ( fo_node->fanin(i) == new_node ) {
 	found = true;
 	break;
@@ -188,7 +188,7 @@ BNetManip::replace_node(BNode* old_node,
     if ( found ) {
       // fo_node のファンインに new_node がすでに含まれていた場合
       vector<BNode*> fanins(ni);
-      for (size_t i = 0; i < ni; ++ i) {
+      for (ymuint i = 0; i < ni; ++ i) {
 	fanins[i] = fo_node->fanin(i);
       }
       // ダブっているのを承知で new_node を加える．
@@ -288,8 +288,8 @@ BNetManip::change_logic(BNode* node,
   }
 
   // Phase-1: 重複したファンインを一つにまとめる処理を行う．
-  size_t orig_ni = fanins.size();
-  size_t new_ni = 0;
+  ymuint orig_ni = fanins.size();
+  ymuint new_ni = 0;
   Expr new_expr = expr;
 
   // 新しいファンインを mNodes に入れる．
@@ -301,9 +301,9 @@ BNetManip::change_logic(BNode* node,
   mTmpPos.resize(orig_ni);
 
   // ファンインの重複チェック
-  for (size_t i = 0; i < orig_ni; i ++) {
+  for (ymuint i = 0; i < orig_ni; i ++) {
     BNode* node = fanins[i];
-    size_t j = 0;
+    ymuint j = 0;
     for ( ; j < mTmpNodes.size(); ++ j) {
       if ( mTmpNodes[j] == node ) {
 	break;
@@ -329,7 +329,7 @@ BNetManip::change_logic(BNode* node,
     for (ymuint i = 0; i < orig_ni; i ++) {
       int pos = mTmpPos[i];
       if ( pos >= 0 ) {
-	mTmpMap.insert(make_pair(VarId(i), VarId(pos)));
+	mTmpMap.add(VarId(i), VarId(pos));
       }
     }
     // リテラルを付け替えたファクタードフォームを作る．
@@ -347,14 +347,14 @@ BNetManip::change_logic(BNode* node,
   }
   if ( redundant ) {
     mTmpMap.clear();
-    size_t wpos = 0;
+    ymuint wpos = 0;
     for (ymuint i = 0; i < new_ni; i ++) {
       ymuint lit = new_expr.litnum(VarId(i));
       if ( lit > 0 ) {
 	if ( wpos < i ) {
 	  BNode* node = mTmpNodes[i];
 	  mTmpNodes[wpos] = node;
-	  mTmpMap.insert(make_pair(VarId(i), VarId(wpos)));
+	  mTmpMap.add(VarId(i), VarId(wpos));
 	}
 	++ wpos;
       }
@@ -373,7 +373,7 @@ BNetManip::change_logic(BNode* node,
   }
 
   bool ans = true;
-  for (size_t i = 0; i < new_ni; i ++) {
+  for (ymuint i = 0; i < new_ni; i ++) {
     BNode* inode = mTmpNodes[i];
     if ( !inode ) {
       // inode が NULL だとエラーになる．
@@ -463,9 +463,9 @@ bool
 BNetManip::change_logic(BNode* node,
 			const Expr& expr)
 {
-  size_t ni = node->fanin_num();
+  ymuint ni = node->fanin_num();
   vector<BNode*> fanins(ni);
-  for (size_t i = 0; i < ni; ++ i) {
+  for (ymuint i = 0; i < ni; ++ i) {
     fanins[i] = node->fanin(i);
   }
   // ファンインは変わらないので TFO チェックは不要
@@ -578,9 +578,9 @@ BNetManip::change_to_and(BNode* node,
 			 const BNodeVector& fanins)
 {
   // AND を表すファクタードフォームを作る．
-  size_t n = fanins.size();
+  ymuint n = fanins.size();
   ExprVector leaves(n);
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     leaves[i] = Expr::make_posiliteral(VarId(i));
   }
   Expr expr = Expr::make_and(leaves);
@@ -597,9 +597,9 @@ BNetManip::change_to_nand(BNode* node,
 			  const BNodeVector& fanins)
 {
   // NAND を表すファクタードフォームを作る．
-  size_t n = fanins.size();
+  ymuint n = fanins.size();
   ExprVector leaves(n);
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     leaves[i] = Expr::make_posiliteral(VarId(i));
   }
   Expr expr = ~Expr::make_and(leaves);
@@ -616,9 +616,9 @@ BNetManip::change_to_or(BNode* node,
 			const BNodeVector& fanins)
 {
   // OR を表すファクタードフォームを作る．
-  size_t n = fanins.size();
+  ymuint n = fanins.size();
   ExprVector leaves(n);
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     leaves[i] = Expr::make_posiliteral(VarId(i));
   }
   Expr expr = Expr::make_or(leaves);
@@ -635,9 +635,9 @@ BNetManip::change_to_nor(BNode* node,
 			 const BNodeVector& fanins)
 {
   // OR を表すファクタードフォームを作る．
-  size_t n = fanins.size();
+  ymuint n = fanins.size();
   ExprVector leaves(n);
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     leaves[i] = Expr::make_posiliteral(VarId(i));
   }
   Expr expr = ~Expr::make_or(leaves);
@@ -654,9 +654,9 @@ BNetManip::change_to_xor(BNode* node,
 			 const BNodeVector& fanins)
 {
   // XOR を表すファクタードフォームを作る．
-  size_t n = fanins.size();
+  ymuint n = fanins.size();
   ExprVector leaves(n);
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     leaves[i] = Expr::make_posiliteral(VarId(i));
   }
   Expr expr = Expr::make_xor(leaves);
@@ -673,9 +673,9 @@ BNetManip::change_to_xnor(BNode* node,
 			  const BNodeVector& fanins)
 {
   // XOR を表すファクタードフォームを作る．
-  size_t n = fanins.size();
+  ymuint n = fanins.size();
   ExprVector leaves(n);
-  for (size_t i = 0; i < n; i ++) {
+  for (ymuint i = 0; i < n; i ++) {
     leaves[i] = Expr::make_posiliteral(VarId(i));
   }
   Expr expr = ~Expr::make_xor(leaves);

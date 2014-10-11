@@ -273,21 +273,21 @@ Expr::operator^=(const Expr& src)
 // pos 番目のリテラルを src の論理式に置き換える．
 Expr
 Expr::compose(VarId varid,
-		 const Expr& src) const
+	      const Expr& src) const
 {
   return Expr(ExprMgr::the_obj().compose(root(), varid, src.root()));
 }
 
 // comp_map にしたがって複数のリテラルの置き換えを行う．
 Expr
-Expr::compose(const VarExprMap& comp_map) const
+Expr::compose(const HashMap<VarId, Expr>& comp_map) const
 {
   return Expr(ExprMgr::the_obj().compose(root(), comp_map));
 }
 
 // 与えられた論理式のリテラル番号を再マップする．
 Expr
-Expr::remap_var(const VarVarMap& varmap) const
+Expr::remap_var(const HashMap<VarId, VarId>& varmap) const
 {
   return Expr(ExprMgr::the_obj().remap_var(root(), varmap));
 }

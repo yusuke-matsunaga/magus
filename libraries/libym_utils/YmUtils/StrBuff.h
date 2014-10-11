@@ -10,6 +10,7 @@
 
 
 #include "YmTools.h"
+#include "YmUtils/HashFunc.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -434,16 +435,12 @@ operator<<(ostream& s, const StrBuff& strbuf)
   return s << strbuf.c_str();
 }
 
-END_NAMESPACE_YM
-
-BEGIN_NAMESPACE_HASH
-
 // StrBuff をキーとしたハッシュを使うために必要なクラス定義
 
 template <>
-struct hash<YMTOOLS_NAMESPACE::StrBuff> {
-  size_t
-  operator()(const nsYm::StrBuff& __x) const {
+struct HashFunc<StrBuff> {
+  ymuint
+  operator()(const StrBuff& __x) const {
     unsigned long __h = 0;
     for (const char* __s = __x.c_str(); *__s; ++ __s)
       __h = 37*__h + *__s;
@@ -452,9 +449,9 @@ struct hash<YMTOOLS_NAMESPACE::StrBuff> {
 };
 
 template <>
-struct hash<const YMTOOLS_NAMESPACE::StrBuff> {
-  size_t
-  operator()(const YMTOOLS_NAMESPACE::StrBuff& __x) const {
+struct HashFunc<const StrBuff> {
+  ymuint
+  operator()(const StrBuff& __x) const {
     unsigned long __h = 0;
     for (const char* __s = __x.c_str(); *__s; ++ __s)
       __h = 37*__h + *__s;
@@ -462,6 +459,6 @@ struct hash<const YMTOOLS_NAMESPACE::StrBuff> {
   }
 };
 
-END_NAMESPACE_HASH
+END_NAMESPACE_YM
 
 #endif // YMUTILS_STRBUFF_H

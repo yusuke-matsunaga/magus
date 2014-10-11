@@ -40,7 +40,8 @@ IdMgr::has_id(ZddEdge e) const
 {
   ZddEdge e_p(e);
   e_p.normalize();
-  return mMap.count(e_p);
+  ymuint64 id;
+  return mMap.find(e_p, id);
 }
 
 // e の ID 番号を返す．
@@ -51,14 +52,10 @@ IdMgr::id(ZddEdge e)
   ZddEdge e_p(e);
   e_p.normalize();
   ymuint64 id;
-  IdMap::iterator p = mMap.find(e_p);
-  if ( p == mMap.end() ) {
+  if ( !mMap.find(e_p, id) ) {
     id = mNext;
     ++ mNext;
-    mMap.insert(make_pair(e_p, id));
-  }
-  else {
-    id = p->second;
+    mMap.add(e_p, id);
   }
   return id;
 }

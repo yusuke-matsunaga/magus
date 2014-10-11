@@ -366,7 +366,7 @@ public:
   // 最短の1パスを求める．
   BddEdge
   sp_step(BddEdge e,
-	  BddEdgeEdgeMap& sp_map);
+	  HashMap<BddEdge, BddEdge>& sp_map);
 
   // ISOP を求める．
   BddEdge
@@ -394,7 +394,7 @@ public:
   static
   ymint
   spl_step(BddEdge e,
-	   BddEdgeIntMap& assoc);
+	   HashMap<BddEdge, ymint>& assoc);
 
 
   //////////////////////////////////////////////////////////////////////

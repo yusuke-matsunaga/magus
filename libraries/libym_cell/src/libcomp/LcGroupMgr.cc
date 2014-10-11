@@ -81,38 +81,36 @@ LcGroup*
 LcGroupMgr::find_group(const TvFuncM& f,
 		       bool builtin)
 {
-  LcGroup* fgroup = NULL;
-  FuncMIdMap::iterator p = mGroupMap.find(f);
-  if ( p == mGroupMap.end() ) {
-    // なかったので新たに作る．
-    fgroup = mLibComp.new_group();
-    mGroupMap.insert(make_pair(f, fgroup->id()));
+  ymuint fgid;
+  if ( mGroupMap.find(f, fgid) ) {
+    // 既に登録されていた．
+    return mLibComp.group(fgid);
+  }
 
-    // 代表関数を求める．
-    TvFuncM repfunc;
-    NpnMapM xmap;
-    find_repfunc(f, repfunc, xmap);
+  // なかったので新たに作る．
+  LcGroup* fgroup = mLibComp.new_group();
+  mGroupMap.add(f, fgroup->id());
 
-    LcClass* fclass = NULL;
-    FuncMIdMap::iterator q = mClassMap.find(repfunc);
-    if ( q == mClassMap.end() ) {
-      // まだ登録されていない．
-      fclass = mLibComp.new_class(repfunc, builtin);
-      mClassMap.insert(make_pair(repfunc, fclass->id()));
-      find_idmap_list(repfunc, fclass->mIdmapList);
-    }
-    else {
-      // 登録されていた．
-      fclass = mLibComp.npn_class(q->second);
-    }
+  // 代表関数を求める．
+  TvFuncM repfunc;
+  NpnMapM xmap;
+  find_repfunc(f, repfunc, xmap);
 
-    // グループを追加する．
-    fclass->add_group(fgroup, xmap);
+  LcClass* fclass = NULL;
+  ymuint fcid;
+  if ( mClassMap.find(repfunc, fcid) ) {
+    // 登録されていた．
+    fclass = mLibComp.npn_class(fcid);
   }
   else {
-    // 既に登録されていた．
-    fgroup = mLibComp.group(p->second);
+    // まだ登録されていない．
+    LcClass* fclass = mLibComp.new_class(repfunc, builtin);
+    mClassMap.add(repfunc, fclass->id());
+    find_idmap_list(repfunc, fclass->mIdmapList);
   }
+
+  // グループを追加する．
+  fclass->add_group(fgroup, xmap);
 
   return fgroup;
 }
