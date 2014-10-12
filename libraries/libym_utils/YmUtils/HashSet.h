@@ -30,7 +30,8 @@ class HashSet :
 public:
 
   /// @brief コンストラクタ
-  HashSet();
+  /// @param[in] size 表の初期サイズ
+  HashSet(ymuint size = 1024);
 
   /// @brief デストラクタ
   ~HashSet();
@@ -140,7 +141,8 @@ private:
 // @brief コンストラクタ
 template<typename Key_Type>
 inline
-HashSet<Key_Type>::HashSet()
+HashSet<Key_Type>::HashSet(ymuint size) :
+  HashBase<Key_Type>(size)
 {
 }
 

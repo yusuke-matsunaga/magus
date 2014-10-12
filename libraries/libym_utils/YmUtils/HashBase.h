@@ -49,7 +49,8 @@ class HashBase
 protected:
 
   /// @brief コンストラクタ
-  HashBase();
+  /// @param[in] size 表の初期サイズ
+  HashBase(ymuint size);
 
   /// @brief デストラクタ
   ~HashBase();
@@ -237,12 +238,12 @@ private:
 // @brief コンストラクタ
 template<typename Key_Type>
 inline
-HashBase<Key_Type>::HashBase()
+HashBase<Key_Type>::HashBase(ymuint size)
 {
   mHashSize = 0;
   mHashTable = NULL;
   mNum = 0;
-  alloc_table(1024);
+  alloc_table(size);
 }
 
 // @brief デストラクタ

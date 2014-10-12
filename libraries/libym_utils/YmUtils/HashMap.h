@@ -38,7 +38,7 @@ struct HashMapCell :
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class Ditionary HashMap.h "YmUtils/HashMap.h"
+/// @class HashMap HashMap.h "YmUtils/HashMap.h"
 /// @brief 任意の型を保持する連想配列クラス
 //////////////////////////////////////////////////////////////////////
 template<typename Key_Type,
@@ -51,7 +51,8 @@ class HashMap :
 public:
 
   /// @brief コンストラクタ
-  HashMap();
+  /// @param[in] size 表の初期サイズ
+  HashMap(ymuint size = 1024);
 
   /// @brief デストラクタ
   ~HashMap();
@@ -183,7 +184,8 @@ private:
 template<typename Key_Type,
 	 typename Value_Type>
 inline
-HashMap<Key_Type, Value_Type>::HashMap()
+HashMap<Key_Type, Value_Type>::HashMap(ymuint size) :
+  HashBase<Key_Type>(size)
 {
 }
 
