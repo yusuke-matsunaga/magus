@@ -45,18 +45,10 @@ BEGIN_NAMESPACE(std)
 #define END_NAMESPACE_STD \
 END_NAMESPACE(std)
 
-/// @brief hash 用の名前空間の開始
-#define BEGIN_NAMESPACE_HASH \
-BEGIN_NAMESPACE(HASH_NAMESPACE)
-
-/// @brief hash 用の名前空間の終了
-#define END_NAMESPACE_HASH \
-END_NAMESPACE(HASH_NAMESPACE)
-
-/// @brief c 用の名前空間の開始
+/// @brief ANSI-C 用の名前空間の開始
 #define BEGIN_EXTERN_C extern "C" {
 
-/// @brief c 用の名前空間の終了
+/// @brief ANSI-C 用の名前空間の終了
 #define END_EXTERN_C }
 
 /// @brief YmTools 用の名前空間の開始
