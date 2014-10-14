@@ -50,11 +50,11 @@ include (FindLibLZMA)
 include (FindZLIB)
 include (FindCurses)
 
-include (FindGMP)
+#include (FindGMP)
 
-include (FindPOPT)
+#include (FindPOPT)
 
-include (FindReadline)
+#include (FindReadline)
 
 
 # ===================================================================
