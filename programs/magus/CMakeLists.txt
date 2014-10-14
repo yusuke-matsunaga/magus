@@ -3,7 +3,7 @@
 # サブディレクトリの設定
 # ===================================================================
 add_subdirectory (src/cequiv)
-add_subdirectory (src/seal)
+#add_subdirectory (src/seal)
 add_subdirectory (src/techmap)
 
 if (TCL_FOUND)
