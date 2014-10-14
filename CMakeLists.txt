@@ -118,6 +118,18 @@ add_subdirectory (programs/magus)
 # 設定ファイルの生成
 # ===================================================================
 configure_file (
-  "${PROJECT_SOURCE_DIR}/etc/YmConfig.h.in"
-  "${PROJECT_BINARY_DIR}/YmConfig.h"
+  "${PROJECT_SOURCE_DIR}/etc/make_header.cc.in"
+  "${PROJECT_BINARY_DIR}/make_header.cc"
+  )
+
+# ===================================================================
+# YmTools.h を生成するプログラム
+# ===================================================================
+add_executable(make_header
+  "${PROJECT_BINARY_DIR}/make_header.cc"
+  )
+
+add_custom_target(YmTools.h ALL
+  COMMAND "${PROJECT_BINARY_DIR}/make_header" ">" "${PROJECT_BINARY_DIR}/YmTools.h"
+  DEPENDS "${PROJECT_BINARY_DIR}/make_header"
   )
