@@ -129,7 +129,16 @@ add_executable(make_header
   "${PROJECT_BINARY_DIR}/make_header.cc"
   )
 
-add_custom_target(YmTools.h ALL
+add_custom_target(header ALL
+  DEPENDS "${PROJECT_BINARY_DIR}/YmTools.h"
+  )
+
+add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/YmTools.h"
   COMMAND "${PROJECT_BINARY_DIR}/make_header" ">" "${PROJECT_BINARY_DIR}/YmTools.h"
   DEPENDS "${PROJECT_BINARY_DIR}/make_header"
+  )
+
+install (
+  FILES "${PROJECT_BINARY_DIR}/YmTools.h"
+  DESTINATION include
   )
