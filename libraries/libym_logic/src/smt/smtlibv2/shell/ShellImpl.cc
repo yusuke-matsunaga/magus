@@ -6,6 +6,9 @@
 /// Copyright (C) 2013 Yusuke Matsunaga
 /// All rights reserved.
 
+#if !defined(READLINE_FOUND)
+#define _WITH_GETLINE
+#endif
 
 #include "ShellImpl.h"
 #include "SmtLibParser.h"
@@ -123,7 +126,15 @@ ShellImpl::run()
 {
   const char* prompt = mPrompt1.c_str();
   for (mLoop = true; mLoop; ) {
+#if defined(READLINE_FOUND)
     char* line = readline(prompt);
+#else
+    printf(prompt);
+    fflush(stdout);
+    char* line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen = getline(&line, &linecap, stdin);
+#endif
     if ( line == NULL ) {
       // EOF が入力された．
       if ( mAllowCtrlDExit ) {
@@ -141,6 +152,7 @@ ShellImpl::run()
       continue;
     }
 
+#if defined(READLINE_FOUND)
     // ヒストリに追加する．
     add_history(str);
     ++ mHistoryNum;
@@ -151,6 +163,7 @@ ShellImpl::run()
       free(hist);
       -- mHistoryNum;
     }
+#endif
 
     mStrList.push_back(string(str));
 
