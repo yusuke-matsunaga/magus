@@ -345,7 +345,12 @@ inline
 HashBaseIterator<Key_Type>
 HashBase<Key_Type>::begin() const
 {
-  return HashBaseIterator<Key_Type>(mHashTable, mHashSize, 0, mHashTable[0]);
+  for (ymuint i = 0; i < mHashSize; ++ i) {
+    if ( mHashTable[i] != NULL ) {
+      return HashBaseIterator<Key_Type>(mHashTable, mHashSize, i, mHashTable[i]);
+    }
+  }
+  return HashBaseIterator<Key_Type>(NULL, 0, 0, NULL);
 }
 
 // @brief セルの末尾の反復子を返す．
