@@ -1,7 +1,7 @@
 # ===================================================================
 # CMAKE のおまじない
 # ===================================================================
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.0)
 
 
 # ===================================================================
@@ -52,9 +52,9 @@ include (FindCurses)
 
 #include (FindGMP)
 
-#include (FindPOPT)
+include (FindPOPT)
 
-#include (FindReadline)
+include (FindReadline)
 
 
 # ===================================================================
@@ -115,16 +115,13 @@ add_subdirectory (programs/magus)
 
 
 # ===================================================================
-# 設定ファイルの生成
+# YmTools.h を生成するプログラム
 # ===================================================================
 configure_file (
   "${PROJECT_SOURCE_DIR}/etc/make_header.cc.in"
   "${PROJECT_BINARY_DIR}/make_header.cc"
   )
 
-# ===================================================================
-# YmTools.h を生成するプログラム
-# ===================================================================
 add_executable(make_header
   "${PROJECT_BINARY_DIR}/make_header.cc"
   )
@@ -142,3 +139,21 @@ install (
   FILES "${PROJECT_BINARY_DIR}/YmTools.h"
   DESTINATION include
   )
+
+
+# ===================================================================
+# doxygen 起動用のコマンド
+# ===================================================================
+if (DOXYGEN_FOUND)
+  configure_file (
+    "${PROJECT_SOURCE_DIR}/etc/Doxyfile.in"
+    "${PROJECT_BINARY_DIR}/Doxyfile"
+    )
+
+  add_custom_target(dox
+    "${DOXYGEN_EXECUTABLE}" ">" "${PROJECT_BINARY_DIR}/doxygen.log"
+    DEPENDS "${PROJECT_BINARY_DIR}/Doxyfile"
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
+    COMMENT "generating doxygen documents"
+    )
+endif (DOXYGEN_FOUND)
