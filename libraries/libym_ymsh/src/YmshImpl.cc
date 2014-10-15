@@ -7,6 +7,10 @@
 /// All rights reserved.
 
 
+#if !defined(READLINE_FOUND)
+#define _WITH_GETLINE
+#endif
+
 #include "YmshImpl.h"
 #include "Ymsh/YmshCmd.h"
 
@@ -90,6 +94,7 @@ ymsh_completion (const char *text,
 		 int start,
 		 int end)
 {
+#if defined(READLINE_FOUND)
   char **matches;
 
   matches = (char **)NULL;
@@ -101,16 +106,20 @@ ymsh_completion (const char *text,
     matches = rl_completion_matches (text, command_generator);
 
   return (matches);
+#else
+  return NULL;
+#endif
 }
 
 // readline の completion 機能の設定を行う．
 void
 initialize_rl_completion(YmshImpl* impl)
 {
+#if defined(READLINE_FOUND)
   gYmsh = impl;
 
   rl_attempted_completion_function = ymsh_completion;
-
+#endif
 }
 
 END_NONAMESPACE
@@ -236,7 +245,15 @@ void
 YmshImpl::run()
 {
   for (mLoop = true; mLoop; ) {
+#if defined(READLINE_FOUND)
     char* line = readline(mPrompt1.c_str());
+#else
+    printf(mPrompt1.c_str());
+    fflush(stdout);
+    char* line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen = getline(&line, &linecap, stdin);
+#endif
     if ( line == NULL ) {
       if ( mAllowCtrlDExit ) {
 	mLoop = false;
@@ -250,6 +267,7 @@ YmshImpl::run()
       continue;
     }
 
+#if defined(READLINE_FOUND)
     add_history(str);
     ++ mHistoryNum;
     if ( mHistoryNum > mMaxHistory ) {
@@ -258,6 +276,7 @@ YmshImpl::run()
       free(history);
       -- mHistoryNum;
     }
+#endif
 
     // コマンドラインの文字列を空白で切り分ける．
     vector<string> argv;
