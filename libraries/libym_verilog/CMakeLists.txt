@@ -168,19 +168,20 @@ set (parser_SOURCES
 
 
 # Create target for the parser
-add_custom_target ( verilog_grammer
-  echo "Creating verilog_grammer.cc" )
+add_custom_target ( verilog_grammer ALL
+  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.hh"
+  "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc"
+  )
 
 # Create custom command for bison/yacc (note the DEPENDS)
 add_custom_command (
-  TARGET verilog_grammer
-  COMMAND ${BISON_EXECUTABLE}
-  ARGS -y ${CMAKE_CURRENT_SOURCE_DIR}/src/parser/main/verilog_grammer.yy
-  -o ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc
+  COMMAND "${BISON_EXECUTABLE}"
+  -y "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/main/verilog_grammer.yy"
+  -o "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc"
   -d -v
-  OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.output
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc"
+  "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.hh"
+  "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.output"
   )
 
 # Since verilog_grammer.cc does not exists yet when cmake is run, mark
@@ -197,5 +198,3 @@ add_library ( ym_verilog SHARED
   ${elaborator_SOURCES}
   ${parser_SOURCES}
   )
-
-add_dependencies ( ym_verilog verilog_grammer )
