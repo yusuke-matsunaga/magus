@@ -15,10 +15,20 @@ set (YMTOOLS_VERSION_MINOR 0)
 set (YMTOOLS_NAMESPACE "nsYm")
 
 # リリースモード
-#set ( CMAKE_BUILD_TYPE REREASE )
+#set (CMAKE_BUILD_TYPE RELEASE)
 
 # デバッグモード
-set ( CMAKE_BUILD_TYPE DEBUG )
+#set (CMAKE_BUILD_TYPE DEBUG)
+
+
+# ===================================================================
+# オプション
+# ===================================================================
+
+option (BUILD_MAGUS "build magus" ON)
+option (BUILD_SATPG "build satpg" ON)
+option (BUILD_BNET2AIG "build bnet2aig" OFF)
+option (BUILD_MAKEBDD "build makebdd" OFF)
 
 
 # ===================================================================
@@ -108,10 +118,21 @@ if (TCL_FOUND)
   add_subdirectory (libraries/libym_tclpp)
 endif (TCL_FOUND)
 
-add_subdirectory (programs/bnet2aig)
-add_subdirectory (programs/makebdd)
-add_subdirectory (programs/satpg)
-add_subdirectory (programs/magus)
+if (BUILD_BNET2AIG)
+  add_subdirectory (programs/bnet2aig)
+endif (BUILD_BNET2AIG)
+
+if (BUILD_MAKEBDD)
+  add_subdirectory (programs/makebdd)
+endif (BUILD_MAKEBDD)
+
+if (BUILD_SATPG)
+  add_subdirectory (programs/satpg)
+endif (BUILD_SATPG)
+
+if (BUILD_MAGUS)
+  add_subdirectory (programs/magus)
+endif (BUILD_MAGUS)
 
 
 # ===================================================================
