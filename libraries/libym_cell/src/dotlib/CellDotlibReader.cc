@@ -639,7 +639,7 @@ gen_library(const DotlibNode* dt_library)
        p != dt_lut_template_list.end(); ++ p, ++ templ_id) {
     DotlibTemplate templ_info;
     if ( !templ_info.set_data(*p) ) {
-      return false;
+      return NULL;
     }
     ymuint d = templ_info.dimension();
     switch ( d ) {
