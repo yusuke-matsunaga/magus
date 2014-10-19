@@ -20,7 +20,10 @@
 #include <vector>
 #include <list>
 
-#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 6
+#if defined(__clang__)
+#include <algorithm>
+#include <functional>
+#elif __GNUC__ >= 4 && __GNUC_MINOR__ >= 6
 #include <ext/algorithm>
 #include <functional>
 #elif __GNUC__ >= 3

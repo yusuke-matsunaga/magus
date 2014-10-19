@@ -209,7 +209,7 @@ bool
 HashMap<Key_Type, Value_Type>::find(const Key_Type& key,
 				    Value_Type& value) const
 {
-  Cell* cell = reinterpret_cast<Cell*>(find_cell(key));
+  Cell* cell = reinterpret_cast<Cell*>(HashBase<Key_Type>::find_cell(key));
   if ( cell != NULL ) {
     value = cell->mValue;
     return true;
@@ -256,7 +256,7 @@ HashMap<Key_Type, Value_Type>::add(const Key_Type& key,
   Cell* cell = new Cell;
   cell->mKey = key;
   cell->mValue = value;
-  reg_cell(cell);
+  HashBase<Key_Type>::reg_cell(cell);
 }
 
 // @brief 先頭の反復子を返す．

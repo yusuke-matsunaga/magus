@@ -162,7 +162,7 @@ inline
 bool
 HashSet<Key_Type>::find(const Key_Type& key) const
 {
-  Cell* cell = reinterpret_cast<Cell*>(find_cell(key));
+  Cell* cell = reinterpret_cast<Cell*>(HashBase<Key_Type>::find_cell(key));
   if ( cell != NULL ) {
     return true;
   }
@@ -180,7 +180,7 @@ HashSet<Key_Type>::add(const Key_Type& key)
 {
   Cell* cell = new Cell;
   cell->mKey = key;
-  reg_cell(cell);
+  HashBase<Key_Type>::reg_cell(cell);
 }
 
 // @brief 先頭の反復子を返す．
