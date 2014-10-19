@@ -23,6 +23,7 @@
 #if defined(__clang__)
 #include <algorithm>
 #include <functional>
+#define constexpr const
 #elif __GNUC__ >= 4 && __GNUC_MINOR__ >= 6
 #include <ext/algorithm>
 #include <functional>

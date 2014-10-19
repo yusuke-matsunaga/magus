@@ -39,7 +39,11 @@ BNetManip::eliminate_node(BNode* node)
   }
 
   // ファンアウトリストの複製を作る．
-  BNodeEdgeList fanouts(node->fanouts());
+  BNodeEdgeList fanouts;
+  for (BNodeFoList::const_iterator p = node->fanouts_begin();
+       p != node->fanouts_end(); ++ p) {
+    fanouts.push_back(*p);
+  }
 
   ymuint old_ni = node->fanin_num();
   const Expr& orig_f = node->func();
@@ -171,8 +175,13 @@ BNetManip::replace_node(BNode* old_node,
   // 実際の置き換えを行う．
 
   // reference ではなくコピーを作る．
-  BNodeEdgeList folist(old_node->fanouts());
-  for (BNodeEdgeList::const_iterator p = folist.begin();
+  vector<BNodeEdge*> folist;
+  folist.reserve(old_node->fanout_num());
+  for (BNodeFoList::const_iterator p = old_node->fanouts_begin();
+       p != old_node->fanouts_end(); ++ p) {
+    folist.push_back(*p);
+  }
+  for (vector<BNodeEdge*>::const_iterator p = folist.begin();
        p != folist.end(); ++p) {
     BNodeEdge* edge = *p;
     BNode* fo_node = edge->to();
@@ -205,7 +214,7 @@ BNetManip::replace_node(BNode* old_node,
   }
 
   // ここで mFanouts は空になっているはず．
-  assert_cond( old_node->fanouts().size() == 0, __FILE__, __LINE__);
+  assert_cond( old_node->fanout_num() == 0, __FILE__, __LINE__);
 
   return true;
 }

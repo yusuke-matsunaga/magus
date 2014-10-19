@@ -405,8 +405,7 @@ BNetwork::clean_up()
       BNode* inode = node->fanin(i);
       if ( inode->is_input() ) continue;
       if ( inode->fanout_num() == 1 ) {
-	assert_cond( inode->fanouts().front()->to() == node,
-		     __FILE__, __LINE__);
+	ASSERT_COND( (*inode->fanouts_begin())->to() == node );
 	// node を削除するとinodeのファンアウト数が0になるので，
 	// キューに積む．
 	del_nodes.push_back(inode);
@@ -739,8 +738,8 @@ BNetwork::rename_node(BNode* node,
   }
 
   if ( name != NULL &&
-       (node->is_output() && find_ponode(name) ||
-	!node->is_output() && find_node(name)) ) {
+       ((node->is_output() && find_ponode(name)) ||
+	(!node->is_output() && find_node(name))) ) {
     // name はもうすでに使われている．
     BNET_ERROR("name has been in use.");
     return false;

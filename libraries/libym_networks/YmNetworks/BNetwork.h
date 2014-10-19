@@ -382,11 +382,6 @@ public:
   ymuint
   fanout_num() const;
 
-  /// @brief ファンアウトリストを得る．
-  /// @note この関数は呼ばれるたびにリストの複製を作る．
-  BNodeEdgeList
-  fanouts() const;
-
   /// @brief ファンアウトリストの先頭の反復子を返す．
   BNodeFoList::const_iterator
   fanouts_begin() const;
@@ -1335,14 +1330,6 @@ ymuint
 BNode::fanout_num() const
 {
   return mFanouts.size();
-}
-
-// ファンアウトリストを得る．
-inline
-BNodeEdgeList
-BNode::fanouts() const
-{
-  return BNodeEdgeList(fanouts_begin(), fanouts_end());
 }
 
 // ファンアウトリストの先頭の反復子を返す．
