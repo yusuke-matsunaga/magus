@@ -226,7 +226,7 @@ inline
 Value_Type&
 HashMap<Key_Type, Value_Type>::operator[](const Key_Type& key)
 {
-  Cell* cell = reinterpret_cast<Cell*>(find_cell(key));
+  Cell* cell = reinterpret_cast<Cell*>(HashBase<Key_Type>::find_cell(key));
   ASSERT_COND( cell != NULL );
   return cell->mValue;
 }
@@ -238,7 +238,7 @@ inline
 const Value_Type&
 HashMap<Key_Type, Value_Type>::operator[](const Key_Type& key) const
 {
-  Cell* cell = reinterpret_cast<Cell*>(find_cell(key));
+  Cell* cell = reinterpret_cast<Cell*>(HashBase<Key_Type>::find_cell(key));
   ASSERT_COND( cell != NULL );
   return cell->mValue;
 }
