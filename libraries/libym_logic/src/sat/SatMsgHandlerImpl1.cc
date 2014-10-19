@@ -11,7 +11,7 @@
 #include "YmLogic/SatStats.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_SAT
 
 // @brief コンストラクタ
 SatMsgHandlerImpl1::SatMsgHandlerImpl1(ostream& s) :
@@ -76,4 +76,4 @@ SatMsgHandlerImpl1::print_footer(const SatStats& stats)
      << "CPU time          : " << stats.mTime << endl;
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_SAT

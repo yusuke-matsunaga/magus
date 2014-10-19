@@ -1,5 +1,5 @@
-﻿#ifndef YMYMLOGIC_SAT_MSGHANDLERIMPL1_H
-#define YMYMLOGIC_SAT_MSGHANDLERIMPL1_H
+﻿#ifndef YMLOGIC_SATMSGHANDLERIMPL1_H
+#define YMLOGIC_SATMSGHANDLERIMPL1_H
 
 /// @file YmLogic/SatMsgHandlerImpl1.h
 /// @brief SatMsgHandlerImpl1 のヘッダファイル
@@ -12,7 +12,7 @@
 #include "YmLogic/SatMsgHandler.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_SAT
 
 //////////////////////////////////////////////////////////////////////
 /// @class SatMsgHandlerImpl1 SatMsgHandlerImpl1.h "YmLogic/SatMsgHandlerImpl1.h"
@@ -64,6 +64,6 @@ private:
 
 };
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_SAT
 
-#endif // YMYMLOGIC_SAT_MSGHANDLERIMPL1_H
+#endif // YMLOGIC_SATMSGHANDLERIMPL1_H
