@@ -53,7 +53,7 @@ typedef const char    cchar;
 template<class T> static inline T min(T x, T y) { return (x < y) ? x : y; }
 template<class T> static inline T max(T x, T y) { return (x > y) ? x : y; }
 
-template <bool> struct STATIC_ASSERTION_FAILURE;
+template <bool> struct STATIC_ASSERTION_FAILURE { };
 template <> struct STATIC_ASSERTION_FAILURE<true>{};
 #define TEMPLATE_FAIL STATIC_ASSERTION_FAILURE<false>()
 
