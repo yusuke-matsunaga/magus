@@ -2,11 +2,11 @@
 
 import grammer
 
-# LR(0)構文解析表を作るモジュール
+# LALR(1)構文解析表を作るモジュール
 #
-# - LR(0) 項は (rule_id, pos) という2つ組で表す．
+# - LALR(1) 項は (rule_id, pos, token) という3つ組で表す．
 
-class LR0_table :
+class LR1_table :
     # コンストラクタ
     def __init__(self) :
         self.clear()
@@ -21,7 +21,7 @@ class LR0_table :
         # ACTION マップ
         self._ActionMap = []
 
-    # @brief LR(0)構文解析表を作る．
+    # @brief LALR(1)構文解析表を作る．
     def make_table(self, grammer) :
         self.clear()
         self.items(grammer)
@@ -30,30 +30,29 @@ class LR0_table :
             self._ActionMap.append({})
             for token_id in range(0, len(grammer._TokenList)) :
                 if grammer._TerminalList[token_id] :
-                    for (rule_id, pos) in state :
+                    for (rule_id, pos, token) in state :
                         (left, right) = grammer.id2rule(rule_id)
                         if len(right) > pos and right[pos] == token_id :
                             tmp_state = next_state(grammer, state, token_id)
                             next_id = self.state2id(tmp_state)
                             assert next_id != -1
                             if not self.set_action(state_id, token_id, 'shift', next_id) :
-                                print "Error: not an LR(0)"
+                                print "Error: not an LALR(1)"
                 else :
                     tmp_state = next_state(grammer, state, token_id)
                     if len(tmp_state) > 0 :
                         next_id = self.state2id(tmp_state)
                         if not self.set_action(state_id, token_id, 'goto', next_id) :
-                            print "Error: not an LR(0)"
-            for (rule_id, pos) in state :
+                            print "Error: not an LALR(1)"
+            for (rule_id, pos, token) in state :
                 (left, right) = grammer.id2rule(rule_id)
                 if len(right) == pos :
                     if left == grammer._StartNode :
                         if not self.set_action(state_id, 0, 'accept', 0) :
-                            print "Error: not an LR(0)"
+                            print "Error: not an LALR(1)"
                     else :
-                        for token_id in grammer._FollowMap[left] :
-                            if not self.set_action(state_id, token_id, 'reduce', rule_id) :
-                                print "Error: not an LR(0)"
+                        if not self.set_action(state_id, token, 'reduce', rule_id) :
+                            print "Error: not an LALR(1)"
 
     # @brief ACTION 表の項目をセットする．
     # @param[in] state_id 状態番号
@@ -72,9 +71,9 @@ class LR0_table :
             self._ActionMap[state_id][token_id] = (action, action_id)
             return True
 
-    # @brief LR(0)正準集を作る．
+    # @brief LALR(1)正準集を作る．
     def items(self, grammer) :
-        start_state = closure(grammer, [(grammer._StartRule, 0)])
+        start_state = closure(grammer, [(grammer._StartRule, 0, 0)])
 
         self._StateList = []
         self._StateList.append(start_state)
@@ -90,7 +89,7 @@ class LR0_table :
                         self._StateList.append(new_state)
                         new_states.append(new_state)
 
-    # @brief LR(0)状態リストを表示する．
+    # @brief LALR(1)状態リストを表示する．
     def print_states(self, grammer) :
         for state in self._StateList :
             state_id = self.state2id(state)
@@ -102,7 +101,7 @@ class LR0_table :
                 (action, action_id) = self._ActionMap[state_id][key]
                 token = grammer.id2token(key)
                 print '  %s: %s %d' % (token, action, action_id)
-        print ''
+            print ''
 
     # @brief 状態番号を返す．
     # @param[in] state 状態(項の集合)
@@ -115,17 +114,17 @@ class LR0_table :
         else :
             return -1
 
-# @brief LR(0)項集合の遷移先を求める．
+# @brief LALR(1)項集合の遷移先を求める．
 # @param[in] terms 入力の項集合
 def next_state(grammer, cur_state, token) :
     tmp_state = []
-    for (rule_id, pos) in cur_state :
+    for (rule_id, pos, token1) in cur_state :
         (left, right) = grammer.id2rule(rule_id)
         if len(right) > pos and right[pos] == token :
-            tmp_state.append( (rule_id, pos + 1) )
+            tmp_state.append( (rule_id, pos + 1, token1) )
     return closure(grammer, tmp_state)
 
-# @brief LR(0)項の閉包演算を行う．
+# @brief LALR(1)項の閉包演算を行う．
 # @param[in] terms 入力の項集合(リスト)
 # @return terms に対する閉包(項のリスト)を返す．
 def closure(grammer, terms) :
@@ -134,23 +133,26 @@ def closure(grammer, terms) :
     while len(new_terms) > 0 :
         cur_terms = new_terms
         new_terms = []
-        for (rule_id, pos) in cur_terms :
+        for (rule_id, pos, token) in cur_terms :
             (left, right) = grammer.id2rule(rule_id)
             if len(right) > pos :
                 head = right[pos]
                 for rule1_id in range(0, len(grammer._RuleList)) :
                     (left1, right1) = grammer.id2rule(rule1_id)
                     if left1 == head :
-                        term1 = (rule1_id, 0)
-                        if not term1 in ans_terms :
-                            ans_terms.append(term1)
-                            new_terms.append(term1)
+                        rest = list(right[pos + 1:])
+                        rest.append(token)
+                        for token1 in grammer.first(rest) :
+                            term1 = (rule1_id, 0, token1)
+                            if not term1 in ans_terms :
+                                ans_terms.append(term1)
+                                new_terms.append(term1)
     ans_terms.sort()
     return ans_terms
 
-# @brief LR(0)項集合を表示する．
+# @brief LALR(1)項集合を表示する．
 def print_terms(grammer, terms) :
-    for (rule_id, pos) in terms :
+    for (rule_id, pos, token) in terms :
         (left, right) = grammer.id2rule(rule_id)
         line = "  Rule (%d): " % rule_id
         line += grammer._LeftFormat % grammer.id2token(left)
@@ -163,38 +165,30 @@ def print_terms(grammer, terms) :
             cur += 1
         if cur == pos :
             line += " ."
+        line += ", %s" % grammer.id2token(token)
         print line
 
 if __name__ == '__main__' :
     # テストプログラム
     g = grammer.Grammer()
 
-    id = g.add_token('id')
-    plus = g.add_token('+')
-    times = g.add_token('*')
-    lpar = g.add_token('(')
-    rpar = g.add_token(')')
-    expr = g.add_token('expr')
-    term = g.add_token('term')
-    factor = g.add_token('factor')
+    S = g.add_token('S')
+    C = g.add_token('C')
+    c = g.add_token('c')
+    d = g.add_token('d')
 
-    g.add_rule(expr, (expr, plus, term))
-    g.add_rule(expr, (term, )) # (term) ではタプルにならない
+    g.add_rule(S, (C, C))
+    g.add_rule(C, (c, C))
+    g.add_rule(C, (d, ))
 
-    g.add_rule(term, (term, times, factor))
-    g.add_rule(term, (factor, )) # (factor) ではタプルにならない
-
-    g.add_rule(factor, (lpar, expr, rpar))
-    g.add_rule(factor, (id, )) # (id) ではタプルにならない
-
-    g.set_start(expr)
+    g.set_start(S)
 
     g.print_rules()
 
     g.print_tokens()
 
-    lr0_tab = LR0_table()
+    lr1_tab = LALR1_table()
 
-    lr0_tab.make_table(g)
+    lr1_tab.make_table(g)
 
-    lr0_tab.print_states(g)
+    lr1_tab.print_states(g)

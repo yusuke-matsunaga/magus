@@ -23,40 +23,40 @@ class Grammer :
 
     # @brief 内容をクリアする．
     def clear(self) :
-        self.m_DEBUG = False
+        self._DEBUG = False
 
         # 文法記号のリスト
-        self.m_TokenList = []
+        self._TokenList = []
 
         # 終端記号を表すフラグ
-        self.m_TerminalList = []
+        self._TerminalList = []
 
         # 0 番目の '$' は終端文字
         ret = self.add_token('$')
         assert ret == 0
 
         # 文法規則のリスト
-        self.m_RuleList = []
+        self._RuleList = []
 
         # 開始記号
-        self.m_StartNode = -1
+        self._StartNode = -1
 
         # 開始規則
-        self.m_StartRule = -1
+        self._StartRule = -1
 
         # FIRST マップ
-        self.m_FirstMap = []
+        self._FirstMap = []
 
         # FOLLOW マップ
-        self.m_FollowMap = []
+        self._FollowMap = []
 
     # @brief 文法記号の追加
     # @param[in] token 追加するトークン文字列
     # @return トークン番号を返す．
     def add_token(self, token) :
-        ret = len(self.m_TokenList)
-        self.m_TokenList.append(token)
-        self.m_TerminalList.append(True)
+        ret = len(self._TokenList)
+        self._TokenList.append(token)
+        self._TerminalList.append(True)
         return ret
 
     # @brief 文法規則の追加
@@ -64,13 +64,13 @@ class Grammer :
     # @param[in] right 右辺式を表すトークン番号のタプル
     # @return 文法番号を返す．
     def add_rule(self, left, right) :
-        assert left < len(self.m_TokenList)
+        assert left < len(self._TokenList)
         for token in right :
-            assert token < len(self.m_TokenList)
+            assert token < len(self._TokenList)
 
-        self.m_TerminalList[left] = False
-        ret = len(self.m_RuleList)
-        self.m_RuleList.append( (left, right) )
+        self._TerminalList[left] = False
+        ret = len(self._RuleList)
+        self._RuleList.append( (left, right) )
         return ret
 
     # @brief 開始記号の設定
@@ -78,91 +78,80 @@ class Grammer :
     #
     # この関数は clear() 後に一回しか呼べない．
     def set_start(self, start) :
-        assert self.m_StartNode == -1
+        assert self._StartNode == -1
         ss_id = self.add_token('_START_')
-        self.m_StartNode = ss_id
-        self.m_StartRule = self.add_rule(ss_id, (start, ))
+        self._StartNode = ss_id
+        self._StartRule = self.add_rule(ss_id, (start, ))
 
         # 左辺の文字数の最大値を求める．
         left_max = 0
-        for rule in self.m_RuleList :
+        for rule in self._RuleList :
             (left, right) = rule
             tmp = self.id2token(left)
             tmp_len = len(tmp)
             if left_max < tmp_len :
                 left_max = tmp_len
 
-        self.m_LeftFormat = "%%-%ds ::=" % left_max
+        self._LeftFormat = "%%-%ds ::=" % left_max
 
         self.calc_first()
 
     # @brief FIRST()/FOLLOW() を求める．
     def calc_first(self) :
         # m_FirstMap を [] で初期化する．
-        self.m_FirstMap = []
-        for token in self.m_TokenList :
-            self.m_FirstMap.append([])
+        self._FirstMap = []
+        for token in self._TokenList :
+            self._FirstMap.append([])
 
         # 終端記号の FIRST() は自分自身
-        for token_id in range(0, len(self.m_TokenList)) :
-            if self.m_TerminalList[token_id] :
-                self.m_FirstMap[token_id].append(token_id)
+        for token_id in range(0, len(self._TokenList)) :
+            if self._TerminalList[token_id] :
+                self._FirstMap[token_id].append(token_id)
 
         # 変更がなくなるまで以下のループを繰り返す．
         update = True
         while update :
             update = False
-            for (left, right) in self.m_RuleList :
-                all_epsilon = True
-                flist = []
-                for node_id in right :
-                    has_epsilon = False
-                    for token_id1 in self.m_FirstMap[node_id] :
-                        if token_id1 == -1 :
-                            has_epsilon = True
-                        else :
-                            add_to_tokenlist(token_id1, flist)
-                    if not has_epsilon :
-                        all_epsilon = False
-                        break
+            for (left, right) in self._RuleList :
+                flist = self.first(right)
                 for token_id1 in flist :
-                    if add_to_tokenlist(token_id1, self.m_FirstMap[left]) :
+                    if add_to_tokenlist(token_id1, self._FirstMap[left]) :
                         update = True
-                if all_epsilon :
-                    if add_to_tokenlist(-1, self.m_FirstMap[left]) :
-                        update = True
+
         # ソートしておく
-        for token_id in range(0, len(self.m_TokenList)) :
-            self.m_FirstMap[token_id].sort()
+        for token_id in range(0, len(self._TokenList)) :
+            self._FirstMap[token_id].sort()
 
-        # self.m_FollowMap を [] で初期化する．
-        self.m_FollowMap = []
-        for token_id in self.m_TokenList :
-            self.m_FollowMap.append([])
+        # self._FollowMap を [] で初期化する．
+        self._FollowMap = []
+        for token_id in self._TokenList :
+            self._FollowMap.append([])
 
-        self.m_FollowMap[self.m_StartNode].append(0)
+        self._FollowMap[self._StartNode].append(0)
         update = True
         while update :
             update = False
-            for (left, right) in self.m_RuleList :
+            for (left, right) in self._RuleList :
                 n = len(right)
                 for i in range(0, n - 1) :
-                    for token_id in self.m_FirstMap[right[i + 1]] :
+                    has_epsilon = False
+                    for token_id in self._FirstMap[right[i + 1]] :
                         if token_id == -1 :
                             has_epsilon = True
                         else :
-                            if add_to_tokenlist(token_id, self.m_FollowMap[right[i]]) :
+                            if add_to_tokenlist(token_id, self._FollowMap[right[i]]) :
                                 update = True
                     if has_epsilon :
-                        for token_id in self.m_FollowMap[left] :
-                            if add_to_tokenlist(token_id, self.m_FollowMap[right[i]]) :
+                        for token_id in self._FollowMap[left] :
+                            if add_to_tokenlist(token_id, self._FollowMap[right[i]]) :
                                 update = True
-                for token_id in self.m_FollowMap[left] :
-                    if add_to_tokenlist(token_id, self.m_FollowMap[right[n - 1]]) :
+                for token_id in self._FollowMap[left] :
+                    if add_to_tokenlist(token_id, self._FollowMap[right[n - 1]]) :
                         update = True
+
         # ソートしておく
-        for token_id in range(0, len(self.m_TokenList)) :
-            self.m_FollowMap[token_id].sort()
+        for token_id in range(0, len(self._TokenList)) :
+            self._FollowMap[token_id].sort()
 
     # 記号列(トークン番号のリスト)に対する FIRST() を計算する．
     def first(self, token_list) :
@@ -170,7 +159,7 @@ class Grammer :
         all_epsilon = True
         for token in token_list :
             has_epsilon = False
-            for tmp_id in self.m_FirstMap[token] :
+            for tmp_id in self._FirstMap[token] :
                 if tmp_id == -1 :
                     has_epsilon = True
                 else :
@@ -185,11 +174,11 @@ class Grammer :
     # @brief 内容を表示する
     def print_rules(self) :
         rule_id = 0
-        for rule in self.m_RuleList :
+        for rule in self._RuleList :
             (left, right) = rule
             line = "Rule (%d): " % rule_id
             rule_id += 1
-            line += self.m_LeftFormat % self.id2token(left)
+            line += self._LeftFormat % self.id2token(left)
             for id in right :
                 line += " ";
                 line += self.id2token(id)
@@ -198,17 +187,17 @@ class Grammer :
 
     # @brief トークンの情報とFIRST/FOLLOW を表示する．
     def print_tokens(self) :
-        for token_id in range(1, len(self.m_TokenList)) :
+        for token_id in range(1, len(self._TokenList)) :
             print '%s:' % self.id2token(token_id)
             print '  FIRST: ',
-            for tmp in self.m_FirstMap[token_id] :
+            for tmp in self._FirstMap[token_id] :
                 if tmp == -1 :
                     print '<>',
                 else :
                     print self.id2token(tmp),
             print ''
             print '  FOLLOW: ',
-            for tmp in self.m_FollowMap[token_id] :
+            for tmp in self._FollowMap[token_id] :
                 if tmp == -1 :
                     print '<>',
                 else :
@@ -219,14 +208,14 @@ class Grammer :
     # @brief トークン番号からトークン文字列を得る．
     # @param[in] id トークン番号
     def id2token(self, id) :
-        assert id < len(self.m_TokenList)
-        return self.m_TokenList[id]
+        assert id < len(self._TokenList)
+        return self._TokenList[id]
 
     # @brief 規則番号から規則を得る．
     # @param[in] id 規則番号
     def id2rule(self, id) :
-        assert id < len(self.m_RuleList)
-        return self.m_RuleList[id]
+        assert id < len(self._RuleList)
+        return self._RuleList[id]
 
 # @brief トークンリストに重複なく追加する．
 def add_to_tokenlist(token, token_list) :
