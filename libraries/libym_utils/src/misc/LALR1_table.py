@@ -1,12 +1,12 @@
 ﻿# coding=UTF-8
 
-import grammer
+from grammer import *
 
 # LALR(1)構文解析表を作るモジュール
 #
 # - LALR(1) 項は (rule_id, pos, token) という3つ組で表す．
 
-class LR1_table :
+class LALR1_table :
     # コンストラクタ
     def __init__(self) :
         self.clear()
@@ -24,6 +24,53 @@ class LR1_table :
     # @brief LALR(1)構文解析表を作る．
     def make_table(self, grammer) :
         self.clear()
+
+        # LR0 カーネルを求める．
+        state_list = LR0_kernel_list(grammer)
+
+        # カーネル項の全リストを作る．
+        kernel_list = []
+        for state in state_list :
+            for kernel in state :
+                kernel_list.append(kernel)
+
+        # 先読みの生成/伝搬を調べる．
+        generated_token = [[] in kernel_list]
+        propagated_token = [[] in kernel_list]
+        for (rule_id, pos) in kernel_list :
+            exp_set = LR1_closure(grammer, (rule_id, pos, -1))
+            for (rule_id1, pos1, token1) in exp_set :
+                if token1 != -1 :
+                    # 生成された先読み
+                    add_token1(generated_token, rule_id1, pos1, token1)
+                else :
+                    # 伝搬された先読み
+                    add_token2(propagated_token, rule_id, pos)
+
+        la_token_list = generated_token
+        new_token_list = []
+        k_id = 0
+        for token_list in la_token_list :
+            (rule_id, pos) = kernel_list[k_id]
+            k_id += 1
+            for token in token_list :
+                new_token_list.append( (rule_id, pos, token) )
+
+        while len(new_token_list) > 0 :
+            cur_token_list = new_token_list
+            new_token_list = []
+            for (rule_id, pos, token) in cur_token_list :
+                pass
+
+        for state in state_list :
+            for (rule_id, pos) in state :
+                J = LR1_closure(grammer, (rule_id, pos, -1))
+                for (rule_id1, pos1, token1) in J :
+                    if token1 != -1 :
+                        # 生成された先読みトークン
+                        la_array[state_id].append(token1)
+
+
         self.items(grammer)
         for state in self._StateList :
             state_id = self.state2id(state)
@@ -71,24 +118,6 @@ class LR1_table :
             self._ActionMap[state_id][token_id] = (action, action_id)
             return True
 
-    # @brief LALR(1)正準集を作る．
-    def items(self, grammer) :
-        start_state = closure(grammer, [(grammer._StartRule, 0, 0)])
-
-        self._StateList = []
-        self._StateList.append(start_state)
-        new_states = []
-        new_states.append(start_state)
-        while len(new_states) > 0 :
-            cur_states = new_states
-            new_states = []
-            for state in cur_states :
-                for token_id in range(0, len(grammer._TokenList)) :
-                    new_state = next_state(grammer, state, token_id)
-                    if len(new_state) > 0 and not new_state in self._StateList :
-                        self._StateList.append(new_state)
-                        new_states.append(new_state)
-
     # @brief LALR(1)状態リストを表示する．
     def print_states(self, grammer) :
         for state in self._StateList :
@@ -114,72 +143,23 @@ class LR1_table :
         else :
             return -1
 
-# @brief LALR(1)項集合の遷移先を求める．
-# @param[in] terms 入力の項集合
-def next_state(grammer, cur_state, token) :
-    tmp_state = []
-    for (rule_id, pos, token1) in cur_state :
-        (left, right) = grammer.id2rule(rule_id)
-        if len(right) > pos and right[pos] == token :
-            tmp_state.append( (rule_id, pos + 1, token1) )
-    return closure(grammer, tmp_state)
-
-# @brief LALR(1)項の閉包演算を行う．
-# @param[in] terms 入力の項集合(リスト)
-# @return terms に対する閉包(項のリスト)を返す．
-def closure(grammer, terms) :
-    ans_terms = list(terms)
-    new_terms = list(terms)
-    while len(new_terms) > 0 :
-        cur_terms = new_terms
-        new_terms = []
-        for (rule_id, pos, token) in cur_terms :
-            (left, right) = grammer.id2rule(rule_id)
-            if len(right) > pos :
-                head = right[pos]
-                for rule1_id in range(0, len(grammer._RuleList)) :
-                    (left1, right1) = grammer.id2rule(rule1_id)
-                    if left1 == head :
-                        rest = list(right[pos + 1:])
-                        rest.append(token)
-                        for token1 in grammer.first(rest) :
-                            term1 = (rule1_id, 0, token1)
-                            if not term1 in ans_terms :
-                                ans_terms.append(term1)
-                                new_terms.append(term1)
-    ans_terms.sort()
-    return ans_terms
-
-# @brief LALR(1)項集合を表示する．
-def print_terms(grammer, terms) :
-    for (rule_id, pos, token) in terms :
-        (left, right) = grammer.id2rule(rule_id)
-        line = "  Rule (%d): " % rule_id
-        line += grammer._LeftFormat % grammer.id2token(left)
-        cur = 0
-        for token_id in right :
-            line += ' '
-            if cur == pos :
-                line += '. '
-            line += grammer.id2token(token_id)
-            cur += 1
-        if cur == pos :
-            line += " ."
-        line += ", %s" % grammer.id2token(token)
-        print line
 
 if __name__ == '__main__' :
     # テストプログラム
-    g = grammer.Grammer()
+    g = Grammer()
 
     S = g.add_token('S')
-    C = g.add_token('C')
-    c = g.add_token('c')
-    d = g.add_token('d')
+    L = g.add_token('L')
+    R = g.add_token('R')
+    id = g.add_token('id')
+    eq = g.add_token('=')
+    star = g.add_token('*')
 
-    g.add_rule(S, (C, C))
-    g.add_rule(C, (c, C))
-    g.add_rule(C, (d, ))
+    g.add_rule(S, (L, eq, R))
+    g.add_rule(S, (R, ))
+    g.add_rule(L, (star, R))
+    g.add_rule(L, (id, ))
+    g.add_rule(R, (L, ))
 
     g.set_start(S)
 
@@ -187,8 +167,10 @@ if __name__ == '__main__' :
 
     g.print_tokens()
 
+    """
     lr1_tab = LALR1_table()
 
     lr1_tab.make_table(g)
 
     lr1_tab.print_states(g)
+    """

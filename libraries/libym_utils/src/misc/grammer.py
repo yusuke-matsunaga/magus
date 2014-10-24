@@ -217,6 +217,154 @@ class Grammer :
         assert id < len(self._RuleList)
         return self._RuleList[id]
 
+# @brief LR(0)正準集を求める．
+def LR0_state_list(grammer) :
+    start_state = LR0_closure(grammer, [(grammer._StartRule, 0)])
+
+    state_list = []
+    state_list.append(start_state)
+    new_states = []
+    new_states.append(start_state)
+    while len(new_states) > 0 :
+        cur_states = new_states
+        new_states = []
+        for state in cur_states :
+            for token_id in range(0, len(grammer._TokenList)) :
+                new_state = LR0_next_state(grammer, state, token_id)
+                if len(new_state) > 0 and not new_state in state_list :
+                    state_list.append(new_state)
+                    new_states.append(new_state)
+
+    return state_list
+
+# @brief LR(0)正準集のカーネルを求める．
+def LR0_kernel_list(grammer) :
+    all_state_list = LR0_state_list(grammer)
+
+    state_list = []
+    for state in all_state_list :
+        kernel = []
+        for term in state :
+            (rule_id, pos) = term
+            if pos > 0 or rule_id == grammer._StartRule :
+                kernel.append(term)
+        state_list.append(kernel)
+
+    return state_list
+
+# @brief LR(0)項集合の遷移先を求める．
+# @param[in] terms 入力の項集合
+def LR0_next_state(grammer, cur_state, token) :
+    tmp_state = []
+    for (rule_id, pos) in cur_state :
+        (left, right) = grammer.id2rule(rule_id)
+        if len(right) > pos and right[pos] == token :
+            tmp_state.append( (rule_id, pos + 1) )
+    return LR0_closure(grammer, tmp_state)
+
+# @brief LR(0)項の閉包演算を行う．
+# @param[in] terms 入力の項集合(リスト)
+# @return terms に対する閉包(項のリスト)を返す．
+def LR0_closure(grammer, terms) :
+    ans_terms = list(terms)
+    new_terms = list(terms)
+    while len(new_terms) > 0 :
+        cur_terms = new_terms
+        new_terms = []
+        for (rule_id, pos) in cur_terms :
+            (left, right) = grammer.id2rule(rule_id)
+            if len(right) > pos :
+                head = right[pos]
+                for rule1_id in range(0, len(grammer._RuleList)) :
+                    (left1, right1) = grammer.id2rule(rule1_id)
+                    if left1 == head :
+                        term1 = (rule1_id, 0)
+                        if not term1 in ans_terms :
+                            ans_terms.append(term1)
+                            new_terms.append(term1)
+    ans_terms.sort()
+    return ans_terms
+
+# @brief LR(0)状態リストを表示する．
+def LR0_print_states(grammer, state_list) :
+    state_id = 0
+    for state in state_list :
+        print 'State#%d:' % state_id
+        print ''
+        LR0_print_terms(grammer, state)
+        state_id += 1
+
+# @brief LR(0)項集合を表示する．
+def LR0_print_terms(grammer, terms) :
+    for (rule_id, pos) in terms :
+        (left, right) = grammer.id2rule(rule_id)
+        line = "  Rule (%d): " % rule_id
+        line += grammer._LeftFormat % grammer.id2token(left)
+        cur = 0
+        for token_id in right :
+            line += ' '
+            if cur == pos :
+                line += '. '
+            line += grammer.id2token(token_id)
+            cur += 1
+        if cur == pos :
+            line += " ."
+        print line
+
+# @brief LR(1)項集合の遷移先を求める．
+# @param[in] terms 入力の項集合
+def LR1_next_state(grammer, cur_state, token) :
+    tmp_state = []
+    for (rule_id, pos, token1) in cur_state :
+        (left, right) = grammer.id2rule(rule_id)
+        if len(right) > pos and right[pos] == token :
+            tmp_state.append( (rule_id, pos + 1, token1) )
+    return LR1_closure(grammer, tmp_state)
+
+# @brief LR(1)項の閉包演算を行う．
+# @param[in] terms 入力の項集合(リスト)
+# @return terms に対する閉包(項のリスト)を返す．
+def LR1_closure(grammer, terms) :
+    ans_terms = list(terms)
+    new_terms = list(terms)
+    while len(new_terms) > 0 :
+        cur_terms = new_terms
+        new_terms = []
+        for (rule_id, pos, token) in cur_terms :
+            (left, right) = grammer.id2rule(rule_id)
+            if len(right) > pos :
+                head = right[pos]
+                for rule1_id in range(0, len(grammer._RuleList)) :
+                    (left1, right1) = grammer.id2rule(rule1_id)
+                    if left1 == head :
+                        rest = list(right[pos + 1:])
+                        rest.append(token)
+                        for token1 in grammer.first(rest) :
+                            term1 = (rule1_id, 0, token1)
+                            if not term1 in ans_terms :
+                                ans_terms.append(term1)
+                                new_terms.append(term1)
+    ans_terms.sort()
+    return ans_terms
+
+# @brief LR(1)項集合を表示する．
+def LR1_print_terms(grammer, terms) :
+    for (rule_id, pos, token) in terms :
+        (left, right) = grammer.id2rule(rule_id)
+        line = "  Rule (%d): " % rule_id
+        line += grammer._LeftFormat % grammer.id2token(left)
+        cur = 0
+        for token_id in right :
+            line += ' '
+            if cur == pos :
+                line += '. '
+            line += grammer.id2token(token_id)
+            cur += 1
+        if cur == pos :
+            line += " ."
+        line += ", %s" % grammer.id2token(token)
+        print line
+
 # @brief トークンリストに重複なく追加する．
 def add_to_tokenlist(token, token_list) :
     if not token in token_list :

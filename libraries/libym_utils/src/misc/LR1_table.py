@@ -1,12 +1,14 @@
 ﻿# coding=UTF-8
 
-import grammer
+from grammer import *
 
 # LR(1)構文解析表を作るモジュール
 #
 # - LR(1) 項は (rule_id, pos, token) という3つ組で表す．
-
 class LR1_table :
+    """LR(1)構文解析表を作るモジュール
+       - LR(1) 項は (rule_id, pos, token) という3つ組で表す．"""
+
     # コンストラクタ
     def __init__(self) :
         self.clear()
@@ -28,31 +30,30 @@ class LR1_table :
         for state in self._StateList :
             state_id = self.state2id(state)
             self._ActionMap.append({})
-            for token_id in range(0, len(grammer._TokenList)) :
-                if grammer._TerminalList[token_id] :
-                    for (rule_id, pos, token) in state :
-                        (left, right) = grammer.id2rule(rule_id)
-                        if len(right) > pos and right[pos] == token_id :
-                            tmp_state = next_state(grammer, state, token_id)
-                            next_id = self.state2id(tmp_state)
-                            assert next_id != -1
-                            if not self.set_action(state_id, token_id, 'shift', next_id) :
-                                print "Error: not an LR(0)"
-                else :
-                    tmp_state = next_state(grammer, state, token_id)
-                    if len(tmp_state) > 0 :
-                        next_id = self.state2id(tmp_state)
-                        if not self.set_action(state_id, token_id, 'goto', next_id) :
-                            print "Error: not an LR(0)"
             for (rule_id, pos, token) in state :
                 (left, right) = grammer.id2rule(rule_id)
-                if len(right) == pos :
+                if len(right) > pos :
+                    # 次のトークンを読む．
+                    token_id = right[pos]
+                    tmp_state = LR1_next_state(grammer, state, token_id)
+                    if grammer._TerminalList[token_id] :
+                        next_id = self.state2id(tmp_state)
+                        assert next_id != -1
+                        if not self.set_action(state_id, token_id, 'shift', next_id) :
+                            print "Error: not an LR(1)"
+                    else :
+                        if len(tmp_state) > 0 :
+                            next_id = self.state2id(tmp_state)
+                            if not self.set_action(state_id, token_id, 'goto', next_id) :
+                                print "Error: not an LR(1)"
+                else :
+                    # 末尾の場合
                     if left == grammer._StartNode :
                         if not self.set_action(state_id, 0, 'accept', 0) :
-                            print "Error: not an LR(0)"
+                            print "Error: not an LR(1)"
                     else :
                         if not self.set_action(state_id, token, 'reduce', rule_id) :
-                            print "Error: not an LR(0)"
+                            print "Error: not an LR(1)"
 
     # @brief ACTION 表の項目をセットする．
     # @param[in] state_id 状態番号
@@ -73,7 +74,7 @@ class LR1_table :
 
     # @brief LR(1)正準集を作る．
     def items(self, grammer) :
-        start_state = closure(grammer, [(grammer._StartRule, 0, 0)])
+        start_state = LR1_closure(grammer, [(grammer._StartRule, 0, 0)])
 
         self._StateList = []
         self._StateList.append(start_state)
@@ -84,7 +85,7 @@ class LR1_table :
             new_states = []
             for state in cur_states :
                 for token_id in range(0, len(grammer._TokenList)) :
-                    new_state = next_state(grammer, state, token_id)
+                    new_state = LR1_next_state(grammer, state, token_id)
                     if len(new_state) > 0 and not new_state in self._StateList :
                         self._StateList.append(new_state)
                         new_states.append(new_state)
@@ -95,7 +96,7 @@ class LR1_table :
             state_id = self.state2id(state)
             print 'State#%d:' % state_id
             print ''
-            print_terms(grammer, state)
+            LR1_print_terms(grammer, state)
             print ""
             for key in self._ActionMap[state_id].keys() :
                 (action, action_id) = self._ActionMap[state_id][key]
@@ -114,63 +115,9 @@ class LR1_table :
         else :
             return -1
 
-# @brief LR(1)項集合の遷移先を求める．
-# @param[in] terms 入力の項集合
-def next_state(grammer, cur_state, token) :
-    tmp_state = []
-    for (rule_id, pos, token1) in cur_state :
-        (left, right) = grammer.id2rule(rule_id)
-        if len(right) > pos and right[pos] == token :
-            tmp_state.append( (rule_id, pos + 1, token1) )
-    return closure(grammer, tmp_state)
-
-# @brief LR(1)項の閉包演算を行う．
-# @param[in] terms 入力の項集合(リスト)
-# @return terms に対する閉包(項のリスト)を返す．
-def closure(grammer, terms) :
-    ans_terms = list(terms)
-    new_terms = list(terms)
-    while len(new_terms) > 0 :
-        cur_terms = new_terms
-        new_terms = []
-        for (rule_id, pos, token) in cur_terms :
-            (left, right) = grammer.id2rule(rule_id)
-            if len(right) > pos :
-                head = right[pos]
-                for rule1_id in range(0, len(grammer._RuleList)) :
-                    (left1, right1) = grammer.id2rule(rule1_id)
-                    if left1 == head :
-                        rest = list(right[pos + 1:])
-                        rest.append(token)
-                        for token1 in grammer.first(rest) :
-                            term1 = (rule1_id, 0, token1)
-                            if not term1 in ans_terms :
-                                ans_terms.append(term1)
-                                new_terms.append(term1)
-    ans_terms.sort()
-    return ans_terms
-
-# @brief LR(1)項集合を表示する．
-def print_terms(grammer, terms) :
-    for (rule_id, pos, token) in terms :
-        (left, right) = grammer.id2rule(rule_id)
-        line = "  Rule (%d): " % rule_id
-        line += grammer._LeftFormat % grammer.id2token(left)
-        cur = 0
-        for token_id in right :
-            line += ' '
-            if cur == pos :
-                line += '. '
-            line += grammer.id2token(token_id)
-            cur += 1
-        if cur == pos :
-            line += " ."
-        line += ", %s" % grammer.id2token(token)
-        print line
-
 if __name__ == '__main__' :
     # テストプログラム
-    g = grammer.Grammer()
+    g = Grammer()
 
     S = g.add_token('S')
     C = g.add_token('C')
