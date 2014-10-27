@@ -31,18 +31,24 @@ class Grammer :
         # 終端記号を表すフラグ
         self._TerminalList = []
 
+        # 文法規則のリスト
+        self._RuleList = []
+
+        # 文法規則の左辺をキーにした右辺のリスト
+        self._RuleArray = []
+
         # 0 番目の '$' は終端文字
         ret = self.add_token('$')
         assert ret == 0
 
-        # 文法規則のリスト
-        self._RuleList = []
-
         # 開始記号
-        self._StartNode = -1
+        self._StartNode = self.add_token('_START_')
 
         # 開始規則
         self._StartRule = -1
+
+        # 使われない終端記号
+        self._DummyToken = -1
 
         # FIRST マップ
         self._FirstMap = []
@@ -57,7 +63,9 @@ class Grammer :
         ret = len(self._TokenList)
         self._TokenList.append(token)
         self._TerminalList.append(True)
+        self._RuleArray.append([])
         return ret
+
 
     # @brief 文法規則の追加
     # @param[in] left 左辺のトークン番号
@@ -71,17 +79,20 @@ class Grammer :
         self._TerminalList[left] = False
         ret = len(self._RuleList)
         self._RuleList.append( (left, right) )
+        self._RuleArray[left].append(ret)
         return ret
+
 
     # @brief 開始記号の設定
     # @param[in] start 開始記号のトークン番号
     #
     # この関数は clear() 後に一回しか呼べない．
     def set_start(self, start) :
-        assert self._StartNode == -1
-        ss_id = self.add_token('_START_')
-        self._StartNode = ss_id
-        self._StartRule = self.add_rule(ss_id, (start, ))
+        # 開始記号を右辺とする規則を追加する．
+        self._StartRule = self.add_rule(self._StartNode, (start, ))
+
+        # 使われない終端器号を追加する．
+        self._DummyToken = self.add_token('#')
 
         # 左辺の文字数の最大値を求める．
         left_max = 0
@@ -91,10 +102,12 @@ class Grammer :
             tmp_len = len(tmp)
             if left_max < tmp_len :
                 left_max = tmp_len
-
+        # 表示用のフォーマットを作る．
         self._LeftFormat = "%%-%ds ::=" % left_max
 
+        # FIRST/FOLLOW を計算する．
         self.calc_first()
+
 
     # @brief FIRST()/FOLLOW() を求める．
     def calc_first(self) :
@@ -127,7 +140,10 @@ class Grammer :
         for token_id in self._TokenList :
             self._FollowMap.append([])
 
+        # 開始記号の FOLLOW は '$'
         self._FollowMap[self._StartNode].append(0)
+
+        # 変化がなくなるまで以下の処理を繰り返す．
         update = True
         while update :
             update = False
@@ -153,6 +169,7 @@ class Grammer :
         for token_id in range(0, len(self._TokenList)) :
             self._FollowMap[token_id].sort()
 
+
     # 記号列(トークン番号のリスト)に対する FIRST() を計算する．
     def first(self, token_list) :
         ans_list = []
@@ -170,6 +187,7 @@ class Grammer :
         if all_epsilon :
             ans_list.append(-1)
         return ans_list
+
 
     # @brief 内容を表示する
     def print_rules(self) :
@@ -217,6 +235,7 @@ class Grammer :
         assert id < len(self._RuleList)
         return self._RuleList[id]
 
+
 # @brief LR(0)正準集を求める．
 def LR0_state_list(grammer) :
     start_state = LR0_closure(grammer, [(grammer._StartRule, 0)])
@@ -237,6 +256,7 @@ def LR0_state_list(grammer) :
 
     return state_list
 
+
 # @brief LR(0)正準集のカーネルを求める．
 def LR0_kernel_list(grammer) :
     all_state_list = LR0_state_list(grammer)
@@ -252,6 +272,7 @@ def LR0_kernel_list(grammer) :
 
     return state_list
 
+
 # @brief LR(0)項集合の遷移先を求める．
 # @param[in] terms 入力の項集合
 def LR0_next_state(grammer, cur_state, token) :
@@ -261,6 +282,7 @@ def LR0_next_state(grammer, cur_state, token) :
         if len(right) > pos and right[pos] == token :
             tmp_state.append( (rule_id, pos + 1) )
     return LR0_closure(grammer, tmp_state)
+
 
 # @brief LR(0)項の閉包演算を行う．
 # @param[in] terms 入力の項集合(リスト)
@@ -275,15 +297,14 @@ def LR0_closure(grammer, terms) :
             (left, right) = grammer.id2rule(rule_id)
             if len(right) > pos :
                 head = right[pos]
-                for rule1_id in range(0, len(grammer._RuleList)) :
-                    (left1, right1) = grammer.id2rule(rule1_id)
-                    if left1 == head :
+                for rule1_id in grammer._RuleArray[head] :
                         term1 = (rule1_id, 0)
                         if not term1 in ans_terms :
                             ans_terms.append(term1)
                             new_terms.append(term1)
     ans_terms.sort()
     return ans_terms
+
 
 # @brief LR(0)状態リストを表示する．
 def LR0_print_states(grammer, state_list) :
@@ -293,6 +314,7 @@ def LR0_print_states(grammer, state_list) :
         print ''
         LR0_print_terms(grammer, state)
         state_id += 1
+
 
 # @brief LR(0)項集合を表示する．
 def LR0_print_terms(grammer, terms) :
@@ -311,6 +333,7 @@ def LR0_print_terms(grammer, terms) :
             line += " ."
         print line
 
+
 # @brief LR(1)項集合の遷移先を求める．
 # @param[in] terms 入力の項集合
 def LR1_next_state(grammer, cur_state, token) :
@@ -320,6 +343,7 @@ def LR1_next_state(grammer, cur_state, token) :
         if len(right) > pos and right[pos] == token :
             tmp_state.append( (rule_id, pos + 1, token1) )
     return LR1_closure(grammer, tmp_state)
+
 
 # @brief LR(1)項の閉包演算を行う．
 # @param[in] terms 入力の項集合(リスト)
@@ -334,16 +358,14 @@ def LR1_closure(grammer, terms) :
             (left, right) = grammer.id2rule(rule_id)
             if len(right) > pos :
                 head = right[pos]
-                for rule1_id in range(0, len(grammer._RuleList)) :
-                    (left1, right1) = grammer.id2rule(rule1_id)
-                    if left1 == head :
-                        rest = list(right[pos + 1:])
-                        rest.append(token)
-                        for token1 in grammer.first(rest) :
-                            term1 = (rule1_id, 0, token1)
-                            if not term1 in ans_terms :
-                                ans_terms.append(term1)
-                                new_terms.append(term1)
+                for rule1_id in grammer._RuleArray[head] :
+                    rest = list(right[pos + 1:])
+                    rest.append(token)
+                    for token1 in grammer.first(rest) :
+                        term1 = (rule1_id, 0, token1)
+                        if not term1 in ans_terms :
+                            ans_terms.append(term1)
+                            new_terms.append(term1)
     ans_terms.sort()
     return ans_terms
 
