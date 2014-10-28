@@ -11,6 +11,7 @@ class LALR1_table :
     def __init__(self) :
         self.clear()
 
+
     # 内容をクリアする．
     def clear(self) :
 
@@ -20,6 +21,7 @@ class LALR1_table :
 
         # ACTION マップ
         self._ActionMap = []
+
 
     # @brief LALR(1)構文解析表を作る．
     def make_table(self, grammer) :
@@ -38,14 +40,15 @@ class LALR1_table :
         generated_token = [[] in kernel_list]
         propagated_token = [[] in kernel_list]
         for (rule_id, pos) in kernel_list :
-            exp_set = LR1_closure(grammer, (rule_id, pos, -1))
+            dummy = grammer._DummyToken
+            exp_set = LR1_closure(grammer, (rule_id, pos, dummy))
             for (rule_id1, pos1, token1) in exp_set :
-                if token1 != -1 :
-                    # 生成された先読み
-                    add_token1(generated_token, rule_id1, pos1, token1)
-                else :
+                if token1 == dummy :
                     # 伝搬された先読み
                     add_token2(propagated_token, rule_id, pos)
+                else :
+                    # 生成された先読み
+                    add_token1(generated_token, rule_id1, pos1, token1)
 
         la_token_list = generated_token
         new_token_list = []
