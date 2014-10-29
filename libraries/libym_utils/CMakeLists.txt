@@ -128,6 +128,7 @@ set (mincov_SOURCES
 set (misc_SOURCES
   src/misc/Binder.cc
   src/misc/DlList.cc
+  src/misc/Grammer.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc
@@ -198,3 +199,11 @@ if (POPT_FOUND)
     ${POPT_LIBRARY}
     )
 endif (POPT_FOUND)
+
+add_executable(Grammer_test
+  tests/misc/Grammer_test.cc
+  )
+
+target_link_libraries(Grammer_test
+  ym_utils
+  )
