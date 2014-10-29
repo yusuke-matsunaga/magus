@@ -387,6 +387,28 @@ def LR1_print_terms(grammer, terms) :
         line += ", %s" % grammer.id2token(token)
         print line
 
+# @brief LALR(1)項集合を表示する．
+def LALR1_print_terms(grammer, terms) :
+    for (rule_id, pos, token_list) in terms :
+        (left, right) = grammer.id2rule(rule_id)
+        line = "  Rule (%d): " % rule_id
+        line += grammer._LeftFormat % grammer.id2token(left)
+        cur = 0
+        for token_id in right :
+            line += ' '
+            if cur == pos :
+                line += '. '
+            line += grammer.id2token(token_id)
+            cur += 1
+        if cur == pos :
+            line += " ."
+        line += ", "
+        slash = ""
+        for token in token_list :
+            line += "%s%s" % (slash, grammer.id2token(token))
+            slash = "/"
+        print line
+
 # @brief トークンリストに重複なく追加する．
 def add_to_tokenlist(token, token_list) :
     if not token in token_list :
