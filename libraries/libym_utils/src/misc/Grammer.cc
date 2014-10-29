@@ -66,6 +66,9 @@ Token::follow() const
   return mFollow;
 }
 
+
+BEGIN_NONAMESPACE
+
 // @brief トークンのリストに追加する．
 // @param[in] token_list 対象のトークンリスト
 // @param[in] src_token 追加するトークン
@@ -127,8 +130,6 @@ add_to_tokenlist(vector<Token*>& token_list,
   return update;
 }
 
-BEGIN_NONAMESPACE
-
 struct TokenLt
 {
   bool
@@ -139,14 +140,14 @@ struct TokenLt
   }
 };
 
-END_NONAMESPACE
-
 // @brief トークンのリストをソートする．
 void
 sort_tokenlist(vector<Token*>& token_list)
 {
   sort(token_list.begin(), token_list.end(), TokenLt());
 }
+
+END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
@@ -371,6 +372,40 @@ Grammer::rule(ymuint id) const
 {
   ASSERT_COND( id < mRuleList.size() );
   return mRuleList[id];
+}
+
+// @brief トークンを表示する．
+// @param[in] s 出力先のストリーム
+void
+Grammer::print_tokens(ostream& s) const
+{
+  s << "Tokens" << endl;
+  for (vector<Token*>::const_iterator p = mTokenList.begin();
+       p != mTokenList.end(); ++ p) {
+    Token* token = *p;
+    s << token->id() << ": " << token->str() << endl;
+  }
+  s << endl;
+}
+
+// @brief 文法規則を表示する．
+// @param[in] s 出力先のストリーム
+void
+Grammer::print_rules(ostream& s) const
+{
+  s << "Rules" << endl;
+  for (vector<Rule*>::const_iterator p = mRuleList.begin();
+       p != mRuleList.end(); ++ p) {
+    Rule* rule = *p;
+    s << rule->id() << ": " << rule->left()->str() << " ::=";
+    for (vector<Token*>::const_iterator q = rule->right().begin();
+	 q != rule->right().end(); ++ q) {
+      Token* token = *q;
+      s << " " << token->str();
+    }
+    s << endl;
+  }
+  s << endl;
 }
 
 // @brief トークンのリストに対する FIRST を求める．

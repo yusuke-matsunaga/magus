@@ -85,28 +85,6 @@ private:
 
 };
 
-/// @brief トークンのリストに追加する．
-/// @param[in] token_list 対象のトークンリスト
-/// @param[in] src_token 追加するトークン
-/// @retval true トークンが追加された．
-/// @retval false すでに含まれていた．
-bool
-add_to_tokenlist(vector<Token*>& token_list,
-		 Token* token);
-
-/// @brief トークンのリストに追加する．
-/// @param[in] token_list 対象のトークンリスト
-/// @param[in] src_token_list 追加するトークン
-/// @retval true トークンが追加された．
-/// @retval false すでに含まれていた．
-bool
-add_to_tokenlist(vector<Token*>& token_list,
-		 const vector<Token*>& src_token_list);
-
-/// @brief トークンのリストをソートする．
-void
-sort_tokenlist(vector<Token*>& token_list);
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class Rule Grammer.h "Grammer.h"
@@ -251,6 +229,16 @@ public:
   /// @return 文法規則を返す．
   Rule*
   rule(ymuint id) const;
+
+  /// @brief トークンを表示する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print_tokens(ostream& s) const;
+
+  /// @brief 文法規則を表示する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print_rules(ostream& s) const;
 
 
 private:
