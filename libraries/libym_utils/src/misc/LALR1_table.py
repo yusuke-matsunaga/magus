@@ -27,14 +27,16 @@ class LALR1_table :
     def make_table(self, grammer) :
         self.clear()
 
-        # LR0 カーネルを求める．
-        state_list = LR0_kernel_list(grammer)
+        # LR0正準集を求める．
+        lr0_state_list = LR0_state_list(grammer)
 
         # カーネル項の全リストを作る．
         kernel_list = []
-        for state in state_list :
-            for kernel in state :
-                kernel_list.append(kernel)
+        for terms in lr0_state_list :
+            for term in terms :
+                (rule_id, pos) = term
+                if rule_id == grammer._StartRule or pos > 0 :
+                    kernel_list.append(term)
 
         # 先読みの生成/伝搬を調べる．
         generated_token = []
@@ -47,44 +49,44 @@ class LALR1_table :
                 if pos1 < len(right) :
                     if token1 == dummy :
                         # 伝搬された先読み
-                        propagated_token.append( (rule_id, pos, rule_id1, pos1 + 1) )
+                        src_id = grammer.term2id(rule_id, pos)
+                        dst_id = grammer.term2id(rule_id1, pos1 + 1)
+                        propagated_token.append( (src_id, dst_id) )
                     else :
                         # 生成された先読み
-                        generated_token.append( (rule_id1, pos1 + 1, token1) )
+                        dst_id = grammer.term2id(rule_id1, pos1 + 1)
+                        generated_token.append( (dst_id, token1) )
 
         # 先読みの伝搬を行う．
         la_token_list = []
         new_token_list = generated_token
-        new_token_list.append( (grammer._StartRule, 0, 0) )
+        start_term_id = grammer.term2id(grammer._StartRule, 0)
+        new_token_list.append( (start_term_id, 0) )
         while len(new_token_list) > 0 :
             cur_token_list = new_token_list
             new_token_list = []
-            for (rule_id, pos, token) in cur_token_list :
-                if (rule_id, pos, token) in la_token_list :
+            for (term_id, token) in cur_token_list :
+                if (term_id, token) in la_token_list :
                     continue
-                # rule_id, pos の先読みに token を追加
-                la_token_list.append( (rule_id, pos, token) )
-                # (rule_id, pos, token) の伝搬を調べる．
-                for (rule_id1, pos1, rule_id2, pos2) in propagated_token :
-                    if rule_id1 == rule_id and pos1 == pos :
-                        new_token_list.append( (rule_id2, pos2, token) )
+                # term_id の先読みに token を追加
+                la_token_list.append( (term_id, token) )
+                # (term_id, token) の伝搬を調べる．
+                for (src_id, dst_id) in propagated_token :
+                    if src_id == term_id :
+                        new_token_list.append( (dst_id, token) )
 
         # LALR(1) 正準集を作る．
-        for state in state_list :
+        for lr0_state in lr0_state_list :
             lalr1_state = []
-            for (rule_id, pos) in state :
-                for (rule_id1, pos1, token) in la_token_list :
-                    if rule_id1 == rule_id and pos1 == pos :
-                        tmp_terms = LR1_closure(grammer, [(rule_id, pos, token)])
-                        for term in tmp_terms :
-                            lalr1_state.append(term)
+            for (rule_id, pos) in lr0_state :
+                term_id = grammer.term2id(rule_id, pos)
+                for (term_id1, token) in la_token_list :
+                    if term_id1 == term_id :
+                        lalr1_state.append( (rule_id, pos, token) )
             lalr1_state.sort()
             self._StateList.append(lalr1_state)
-            state_id = self.state2id(lalr1_state)
-            print 'State#%d:' % state_id
-            print ''
-            LR1_print_terms(grammer, lalr1_state)
-            print ""
+
+        self.print_states(grammer)
 
         for state in self._StateList :
             state_id = self.state2id(state)
