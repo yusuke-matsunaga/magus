@@ -9,6 +9,7 @@ from grammer import *
 class LALR1_table :
     # コンストラクタ
     def __init__(self) :
+        self._Debug = False
         self.clear()
 
 
@@ -45,40 +46,41 @@ class LALR1_table :
         for state in self._StateList :
             for (rule_id, pos) in state :
                 if rule_id != grammer._StartRule and pos == 0 :
+                    # 非カーネル項は除外する．
                     continue
                 exp_set = LR1_closure(grammer, [(rule_id, pos, dummy)])
                 for (rule_id1, pos1, token1) in exp_set :
                     (left, right) = grammer.id2rule(rule_id1)
                     if pos1 == len(right) :
                         continue
+                    next_token = right[pos1]
+                    state2 = LR0_next_state(grammer, state, next_token)
                     if token1 == dummy :
                         # 伝搬された先読み
-                        token = right[pos1]
-                        state2 = LR0_next_state(grammer, state, token)
                         for (rule_id2, pos2) in state2 :
-                            if rule_id2 == rule_id1 and pos2 == pos1 :
-                                propagated_token.append( (state, rule_id, pos, state2, rule_id2, pos2 + 1) )
+                            if rule_id2 == rule_id1 and pos2 == pos1 + 1:
+                                propagated_token.append( (state, rule_id, pos, state2, rule_id2, pos2) )
                     else :
                         # 生成された先読み
-                        token = right[pos1]
-                        state2 = LR0_next_state(grammer, state, token)
                         for (rule_id2, pos2) in state2 :
-                            if rule_id2 == rule_id1 and pos2 == pos1 :
-                                generated_token.append( (state2, rule_id2, pos2 + 1, token1) )
-        start_state = [(grammer._StartRule, 0)]
+                            if rule_id2 == rule_id1 and pos2 == pos1 + 1:
+                                generated_token.append( (state2, rule_id2, pos2, token1) )
+
+        start_state = LR0_closure(grammer, [(grammer._StartRule, 0)])
         generated_token.append( (start_state, grammer._StartRule, 0, 0) )
 
-        print ""
-        print "*** generated look-ahead token ***"
-        for (state, rule_id, pos, token) in generated_token :
-            print state, rule_id, pos, token
-        print ""
-
-        print ""
-        print "*** propagation rule ***"
-        for (state1, rule_id1, pos1, state2, rule_id2, pos2) in propagated_token :
-            print state1, rule_id1, pos1, state2, rule_id2, pos2
-        print ""
+        if self._Debug :
+            print "Generated Tokens"
+            for (state, rule_id, pos, token) in generated_token :
+                state_id = self.state2id(state)
+                print " State#%d: Rule%d, %d: %s" % (state_id, rule_id, pos, grammer._TokenList[token])
+            print ""
+            print "Propagated Tokens"
+            for (state1, rule_id1, pos1, state2, rule_id2, pos2) in propagated_token :
+                state_id1 = self.state2id(state1)
+                state_id2 = self.state2id(state2)
+                print " State#%d: Rule%d, %d -> State#%d: Rule%d, %d" % (state_id1, rule_id1, pos1, state_id2, rule_id2, pos2)
+            print ""
 
         # 先読みの伝搬を行う．
         la_token_list = []
@@ -94,21 +96,19 @@ class LALR1_table :
                 # (state, rule_id, pos, token) の伝搬を調べる．
                 for (state1, rule_id1, pos1, state2, rule_id2, pos2) in propagated_token :
                     if state1 == state and rule_id1 == rule_id and pos1 == pos :
-                        print "propagated: ", state2, rule_id2, pos2, token
-                        print " from: ", state, rule_id, pos
                         new_token_list.append( (state2, rule_id2, pos2, token) )
 
         # LALR(1) 正準集を作る．
         # 実際には項番号をキーにした先読みトークンリストを作る．
 
-        """
-        self.print_states(grammer)
-        term_id = 0
-        for token_list in self._LaTokenList :
-            print "Term#%d: " % term_id, token_list
-            term_id += 1
-        """
+        if self._Debug :
+            print "Look Ahead Tokens"
+            for (state, rule_id, pos, token) in la_token_list :
+                state_id = self.state2id(state)
+                print " State#%d: Rule%d, %d: %s" % (state_id, rule_id, pos, grammer._TokenList[token])
+            print ""
 
+        # 動作表を作る．
         for state in self._StateList :
             state_id = self.state2id(state)
             self._ActionMap.append({})
@@ -139,7 +139,7 @@ class LALR1_table :
                     else :
                         for (state1, rule_id1, pos1, token1) in la_token_list :
                             state1_id = self.state2id(state1)
-                            if state1_id == state and rule_id1 == rule_id and pos1 == pos :
+                            if state1_id == state_id and rule_id1 == rule_id and pos1 == pos :
                                 if not self.set_action(state_id, token1, 'reduce', rule_id, grammer) :
                                     print "Error: not an LALR(1) REDUCE"
 
@@ -152,7 +152,6 @@ class LALR1_table :
     #
     # 以前の設定内容と矛盾が生じた場合には False を返す．
     def set_action(self, state_id, token_id, action, action_id, grammer) :
-        print "set_action(%d, %s, %s)" % (state_id, grammer._TokenList[token_id], action)
         if self._ActionMap[state_id].has_key(token_id) :
             if self._ActionMap[state_id][token_id] != (action, action_id) :
                 print "conflict with", self._ActionMap[state_id][token_id]
@@ -171,13 +170,11 @@ class LALR1_table :
             print ''
             LR0_print_terms(grammer, state)
             print ""
-            """
             for key in self._ActionMap[state_id].keys() :
                 (action, action_id) = self._ActionMap[state_id][key]
                 token = grammer.id2token(key)
                 print '  %s: %s %d' % (token, action, action_id)
             print ''
-            """
 
     # @brief 状態番号を返す．
     # @param[in] state 状態(項の集合)

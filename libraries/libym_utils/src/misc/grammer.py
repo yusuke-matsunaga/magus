@@ -37,15 +37,6 @@ class Grammer :
         # 文法規則の左辺をキーにした右辺のリスト
         self._RuleArray = []
 
-        # LR0 項の数
-        self._LR0TermNum = 0
-
-        # 元となる文法規則番号をキーとしたLR(0)項の先頭の項番号を収めめるリスト
-        self._LR0TermTop = []
-
-        # 項番号をキーとしてLR(0)項を格納するリスト
-        self._LR0TermList = []
-
         # 0 番目の '$' は終端文字
         ret = self.add_token('$')
         assert ret == 0
@@ -89,10 +80,6 @@ class Grammer :
         ret = len(self._RuleList)
         self._RuleList.append( (left, right) )
         self._RuleArray[left].append(ret)
-        self._LR0TermTop.append(self._LR0TermNum)
-        self._LR0TermNum += len(right) + 1
-        for pos in range(0, len(right) + 1) :
-            self._LR0TermList.append( (ret, pos) )
         return ret
 
 
@@ -213,14 +200,6 @@ class Grammer :
         assert id < len(self._RuleList)
         return self._RuleList[id]
 
-    # LR(0) 項から項番号を返す．
-    def term2id(self, rule_id, pos) :
-        return self._LR0TermTop[rule_id] + pos
-
-    # 項番号からLR(0)項を返す．
-    def id2term(self, id) :
-        return self._LR0TermList[id]
-
     # @brief 内容を表示する
     def print_rules(self) :
         rule_id = 0
@@ -338,7 +317,7 @@ def LR0_print_states(grammer, state_list) :
 def LR0_print_terms(grammer, terms) :
     for (rule_id, pos) in terms :
         (left, right) = grammer.id2rule(rule_id)
-        line = "  Term#%d: " % (grammer._LR0TermTop[rule_id] + pos)
+        line = "  Rule#%d: " % rule_id
         line += grammer._LeftFormat % grammer.id2token(left)
         cur = 0
         for token_id in right :
@@ -349,7 +328,6 @@ def LR0_print_terms(grammer, terms) :
             cur += 1
         if cur == pos :
             line += " ."
-        line += " (Rule#%d): " % rule_id
         print line
 
 
