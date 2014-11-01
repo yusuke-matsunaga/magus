@@ -270,7 +270,9 @@ def LR0_state_list(grammer) :
         for state in cur_states :
             for token_id in range(0, len(grammer._TokenList)) :
                 new_state = LR0_next_state(grammer, state, token_id)
-                if len(new_state) > 0 and not new_state in state_list :
+                if len(new_state) == 0 :
+                    continue
+                if not new_state in state_list :
                     state_list.append(new_state)
                     new_states.append(new_state)
 
@@ -419,11 +421,12 @@ def LALR1_print_terms(grammer, terms) :
             cur += 1
         if cur == pos :
             line += " ."
-        line += ", "
+        line += ", ["
         slash = ""
         for token in token_list :
             line += "%s%s" % (slash, grammer.id2token(token))
             slash = "/"
+        line += "]"
         print line
 
 # @brief トークンリストに重複なく追加する．
