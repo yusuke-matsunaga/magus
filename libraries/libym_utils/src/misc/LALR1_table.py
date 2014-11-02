@@ -122,45 +122,53 @@ class LALR1_table :
                             tmp_state = LR0_next_state(grammer, state, token_id)
                             next_id = self.state2id(tmp_state)
                             assert next_id != -1
-                            if not self.set_action(state_id, token_id, 'shift', next_id, grammer) :
-                                print "Error: not an LALR(1) SS"
+                            self.set_action(state_id, token_id, 'shift', next_id, rule_id, pos)
                 else :
                     tmp_state = LR0_next_state(grammer, state, token_id)
                     if len(tmp_state) > 0 :
                         next_id = self.state2id(tmp_state)
-                        if not self.set_action(state_id, token_id, 'goto', next_id, grammer) :
-                            print "Error: not an LALR(1) GOTO"
+                        self.set_action(state_id, token_id, 'goto', next_id, rule_id, pos)
             for (rule_id, pos) in state :
                 (left, right) = grammer.id2rule(rule_id)
                 if len(right) == pos :
                     if left == grammer._StartNode :
-                        if not self.set_action(state_id, 0, 'accept', 0, grammer) :
-                            print "Error: not an LALR(1) ACCEPT"
+                        self.set_action(state_id, 0, 'accept', 0, rule_id, pos)
                     else :
                         for (state1, rule_id1, pos1, token1) in la_token_list :
                             state1_id = self.state2id(state1)
                             if state1_id == state_id and rule_id1 == rule_id and pos1 == pos :
-                                if not self.set_action(state_id, token1, 'reduce', rule_id, grammer) :
-                                    print "Error: not an LALR(1) REDUCE"
-
+                                self.set_action(state_id, token1, 'reduce', rule_id, rule_id, pos)
+            # conflict チェック
+            for key in self._ActionMap[state_id].keys() :
+                action_list = self._ActionMap[state_id][key]
+                n = len(action_list)
+                if n > 1 :
+                    for i in range(0, n - 1) :
+                        (action1, action_id1, rule_id1, pos1) = action_list[i]
+                        for j in range(i + 1, n) :
+                            (action2, action_id2, rule_id2, pos2) = action_list[j]
+                            if action1 == "shift" :
+                                if action2 == "shift" :
+                                    print "shift/shift conflict"
+                                if action2 == "reduce" :
+                                    print "shift/reduce conflict"
+                            if action1 == "reduce" :
+                                if action2 == "shift" :
+                                    print "shift/reduce conflict"
+                                if action2 == "reduce" :
+                                    print "reduce/reduce conflict"
 
     # @brief ACTION 表の項目をセットする．
     # @param[in] state_id 状態番号
     # @param[in] token_id 記号番号
     # @param[in] action 動作
     # @param[in] action_id 動作に関連した番号
-    #
-    # 以前の設定内容と矛盾が生じた場合には False を返す．
-    def set_action(self, state_id, token_id, action, action_id, grammer) :
+    def set_action(self, state_id, token_id, action, action_id, rule_id, pos) :
         if self._ActionMap[state_id].has_key(token_id) :
-            if self._ActionMap[state_id][token_id] != (action, action_id) :
-                print "conflict with", self._ActionMap[state_id][token_id]
-                return False
-            else :
-                return True
+            if not (action, action_id) in self._ActionMap[state_id][token_id] :
+                self._ActionMap[state_id][token_id].append( (action, action_id, rule_id, pos) )
         else :
-            self._ActionMap[state_id][token_id] = (action, action_id)
-            return True
+            self._ActionMap[state_id][token_id] = [(action, action_id, rule_id, pos)]
 
     # @brief LALR(1)状態リストを表示する．
     def print_states(self, grammer) :
@@ -171,9 +179,9 @@ class LALR1_table :
             LR0_print_terms(grammer, state)
             print ""
             for key in self._ActionMap[state_id].keys() :
-                (action, action_id) = self._ActionMap[state_id][key]
                 token = grammer.id2token(key)
-                print '  %s: %s %d' % (token, action, action_id)
+                for (action, action_id, rule_id, pos) in self._ActionMap[state_id][key] :
+                    print '  %s: %s State#%d , Rule#%d, %d' % (token, action, action_id, rule_id, pos)
             print ''
 
     # @brief 状態番号を返す．
@@ -193,20 +201,42 @@ if __name__ == '__main__' :
     # テストプログラム
     g = Grammer()
 
-    S = g.add_token('S')
-    L = g.add_token('L')
-    R = g.add_token('R')
-    id = g.add_token('id')
-    eq = g.add_token('=')
-    star = g.add_token('*')
+    use_1 = False
+    use_2 = True
 
-    g.add_rule(S, (L, eq, R))
-    g.add_rule(S, (R, ))
-    g.add_rule(L, (star, R))
-    g.add_rule(L, (id, ))
-    g.add_rule(R, (L, ))
+    if use_1 and use_2 :
+        use_2 = False
 
-    g.set_start(S)
+    if use_1 :
+        S = g.add_token('S')
+        L = g.add_token('L')
+        R = g.add_token('R')
+        id = g.add_token('id')
+        eq = g.add_token('=')
+        star = g.add_token('*')
+
+        g.add_rule(S, (L, eq, R))
+        g.add_rule(S, (R, ))
+        g.add_rule(L, (star, R))
+        g.add_rule(L, (id, ))
+        g.add_rule(R, (L, ))
+
+        g.set_start(S)
+
+    if use_2:
+        expr = g.add_token("expr")
+        id = g.add_token("id")
+        plus = g.add_token("+")
+        times = g.add_token("*")
+        lpar = g.add_token("(")
+        rpar = g.add_token(")")
+
+        g.add_rule(expr, (id, ))
+        g.add_rule(expr, (expr, plus, expr))
+        g.add_rule(expr, (expr, times, expr))
+        g.add_rule(expr, (lpar, expr, rpar))
+
+        g.set_start(expr)
 
     g.print_rules()
 
