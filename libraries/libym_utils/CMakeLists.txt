@@ -129,6 +129,9 @@ set (misc_SOURCES
   src/misc/Binder.cc
   src/misc/DlList.cc
   src/misc/Grammer.cc
+  src/misc/LR0Set.cc
+  src/misc/LR0State.cc
+  src/misc/LR0Term.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc

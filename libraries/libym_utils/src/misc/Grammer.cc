@@ -196,8 +196,6 @@ Rule::right() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-//
-// 上の特殊記号はすでに定義済み
 Grammer::Grammer()
 {
   mStart = add_token("_start_");
@@ -439,5 +437,59 @@ Grammer::first_of(const vector<Token*>& token_list,
     first_list.push_back(mEpsilon);
   }
 }
+
+#if 0
+void
+LR0_next_state(const vector<LR0Term*>& input,
+	       Token* token,
+	       vector<LR0Term*>& output)
+{
+  vector<LR0Term*> tmp_terms;
+  for (vector<LR0Term*>::const_iterator p = input.begin();
+       p != input.end(); ++ p) {
+    LR0Term* term = *p;
+    Rule* rule = term->rule();
+    ymuint pos = term->pos();
+    const vector<Token*>& right = rule->right();
+    if ( pos < right.size() && right[pos] == token ) {
+      tmp_terms.push_back( new LR0Term(rule, pos + 1) );
+    }
+  }
+  LR0_closure(tmp_terms, output);
+}
+
+// @brief LR(0)項のクロージャを求める．
+// @param[in] input 入力の項集合
+// @param[out] output 結果を納めるベクタ
+void
+Grammer::LR0_closure(const vector<LR0Term*>& input,
+		     vector<LR0Term*>& output)
+{
+  vector<LR0Term*> new_list = input;
+  output = input;
+  while ( !new_list.empty() ) {
+    vector<LR0Term*> cur_list = new_list;
+    new_list.clear();
+    for (vector<LR0Term*>::iterator p = cur_list.begin();
+	 p != cur_list.end(); ++ p) {
+      LR0Term* term = *p;
+      Rule* rule = term->rule();
+      ymuint pos = rule->pos();
+      Token* left = rule->left();
+      const vector<Token*>& right = rule->right();
+      if ( pos < right.size() ) {
+	Token* head = right[pos];
+	const vector<Rule*>& rule_list = head->rule_list();
+	for (vector<Rule*>::const_iterator p = rule_list.begin();
+	     p != rule_list.end(); ++ p) {
+	  Rule* rule1 = *p;
+	  add_to_LR0term(new_list, rule1, 0);
+	  add_to_LR0term(output, rule1, 0);
+	}
+      }
+    }
+  }
+}
+#endif
 
 END_NAMESPACE_YM
