@@ -45,6 +45,20 @@ Token::str() const
   return mStr;
 }
 
+// @brief 優先順位を返す．
+ymuint
+Token::priority() const
+{
+  return mPri;
+}
+
+// @brief 結合性を返す．
+AssocType
+Token::assoc_type() const
+{
+  return mAssocType;
+}
+
 // @brief 文法規則のリストを返す．
 const vector<Rule*>&
 Token::rule_list() const
@@ -53,14 +67,14 @@ Token::rule_list() const
 }
 
 // @brief FIRST を返す．
-const vector<Token*>&
+const vector<const Token*>&
 Token::first() const
 {
   return mFirst;
 }
 
 // @brief FOLLOW を返す．
-const vector<Token*>&
+const vector<const Token*>&
 Token::follow() const
 {
   return mFollow;
@@ -75,12 +89,12 @@ BEGIN_NONAMESPACE
 // @retval true トークンが追加された．
 // @retval false すでに含まれていた．
 bool
-add_to_tokenlist(vector<Token*>& token_list,
-		 Token* token)
+add_to_tokenlist(vector<const Token*>& token_list,
+		 const Token* token)
 {
-  for (vector<Token*>::iterator p = token_list.begin();
+  for (vector<const Token*>::iterator p = token_list.begin();
        p != token_list.end(); ++ p) {
-    Token* token1 = *p;
+    const Token* token1 = *p;
     if ( token->id() == token1->id() ) {
       return false;
     }
@@ -99,17 +113,17 @@ add_to_tokenlist(vector<Token*>& token_list,
 // @retval true トークンが追加された．
 // @retval false すでに含まれていた．
 bool
-add_to_tokenlist(vector<Token*>& token_list,
-		 const vector<Token*>& src_token_list)
+add_to_tokenlist(vector<const Token*>& token_list,
+		 const vector<const Token*>& src_token_list)
 {
-  vector<Token*>::iterator p = token_list.begin();
-  vector<Token*>::iterator p_end = token_list.end();
-  vector<Token*>::const_iterator q = src_token_list.begin();
-  vector<Token*>::const_iterator q_end = src_token_list.end();
+  vector<const Token*>::iterator p = token_list.begin();
+  vector<const Token*>::iterator p_end = token_list.end();
+  vector<const Token*>::const_iterator q = src_token_list.begin();
+  vector<const Token*>::const_iterator q_end = src_token_list.end();
   bool update = false;
   while ( p != p_end && q != q_end ) {
-    Token* token1 = *p;
-    Token* src_token = *q;
+    const Token* token1 = *p;
+    const Token* src_token = *q;
     if ( src_token->id() == token1->id() ) {
       ++ p;
       ++ q;
@@ -133,8 +147,8 @@ add_to_tokenlist(vector<Token*>& token_list,
 struct TokenLt
 {
   bool
-  operator()(Token* a,
-	     Token* b)
+  operator()(const Token* a,
+	     const Token* b)
   {
     return a->id() < b->id();
   }
@@ -142,7 +156,7 @@ struct TokenLt
 
 // @brief トークンのリストをソートする．
 void
-sort_tokenlist(vector<Token*>& token_list)
+sort_tokenlist(vector<const Token*>& token_list)
 {
   sort(token_list.begin(), token_list.end(), TokenLt());
 }
@@ -177,17 +191,26 @@ Rule::id() const
 }
 
 // @brief 左辺のトークンを返す．
-Token*
+const Token*
 Rule::left() const
 {
   return mLeft;
 }
 
-// @brief 右辺のトークンのリストを返す．
-const vector<Token*>&
-Rule::right() const
+// @brief 右辺の要素数を返す．
+ymuint
+Rule::right_size() const
 {
-  return mRight;
+  return mRight.size();
+}
+
+// @brief 右辺のトークンを返す．
+// @param[in] pos 位置番号 ( 0 <= pos < right_size() )
+const Token*
+Rule::right(ymuint pos) const
+{
+  ASSERT_COND( pos < right_size() );
+  return mRight[pos];
 }
 
 
@@ -288,12 +311,11 @@ Grammer::analyze()
     for (vector<Rule*>::const_iterator p = mRuleList.begin();
 	 p != mRuleList.end(); ++ p) {
       Rule* rule = *p;
-      vector<Token*> tmp_list;
-      first_of(rule->right(), tmp_list);
-      for (vector<Token*>::iterator q = tmp_list.begin();
-	   q != tmp_list.end(); ++ q) {
-	Token* token = *q;
-	if ( add_to_tokenlist(rule->left()->mFirst, token) ) {
+      for (ymuint i = 0; i < rule->right_size(); ++ i) {
+	const Token* token = rule->right(i);
+	// const を外すための hack
+	Token* left = mTokenList[rule->left()->id()];
+	if ( add_to_tokenlist(left->mFirst, token) ) {
 	  update = true;
 	}
       }
@@ -318,26 +340,28 @@ Grammer::analyze()
     for (vector<Rule*>::const_iterator p = mRuleList.begin();
 	 p != mRuleList.end(); ++ p) {
       Rule* rule = *p;
-      const vector<Token*>& right = rule->right();
-      ymuint n = right.size();
+      ymuint n = rule->right_size();
       for (ymuint i = 0; i < n - 1; ++ i) {
 	bool has_epsilon = false;
-	Token* token = right[i + 1];
+	const Token* token = rule->right(i + 1);
 	if ( token == mEpsilon ) {
 	  has_epsilon = true;
 	}
 	else {
-	  if ( add_to_tokenlist(right[i]->mFollow, token) ) {
+	  Token* right = mTokenList[rule->right(i)->id()];
+	  if ( add_to_tokenlist(right->mFollow, token) ) {
 	    update = true;
 	  }
 	}
 	if ( has_epsilon ) {
-	  if ( add_to_tokenlist(right[i]->mFollow, rule->left()->mFollow) ) {
+	  Token* right = mTokenList[rule->right(i)->id()];
+	  if ( add_to_tokenlist(right->mFollow, rule->left()->mFollow) ) {
 	    update = true;
 	  }
 	}
       }
-      if ( add_to_tokenlist(right[n - 1]->mFollow, rule->left()->mFollow) ) {
+      Token* right = mTokenList[rule->right(n - 1)->id()];
+      if ( add_to_tokenlist(right->mFollow, rule->left()->mFollow) ) {
 	update = true;
       }
     }
@@ -396,9 +420,8 @@ Grammer::print_rules(ostream& s) const
        p != mRuleList.end(); ++ p) {
     Rule* rule = *p;
     s << rule->id() << ": " << rule->left()->str() << " ::=";
-    for (vector<Token*>::const_iterator q = rule->right().begin();
-	 q != rule->right().end(); ++ q) {
-      Token* token = *q;
+    for (ymuint i = 0; i < rule->right_size(); ++ i) {
+      const Token* token = rule->right(i);
       s << " " << token->str();
     }
     s << endl;
@@ -408,19 +431,19 @@ Grammer::print_rules(ostream& s) const
 
 // @brief トークンのリストに対する FIRST を求める．
 void
-Grammer::first_of(const vector<Token*>& token_list,
-		  vector<Token*>& first_list)
+Grammer::first_of(const vector<const Token*>& token_list,
+		  vector<const Token*>& first_list)
 {
   first_list.clear();
   bool all_epsilon = true;
-  for (vector<Token*>::const_iterator p = token_list.begin();
+  for (vector<const Token*>::const_iterator p = token_list.begin();
        p != token_list.end(); ++ p) {
     bool has_epsilon = false;
-    Token* token = *p;
-    const vector<Token*>& flist = token->first();
-    for (vector<Token*>::const_iterator q = flist.begin();
+    const Token* token = *p;
+    const vector<const Token*>& flist = token->first();
+    for (vector<const Token*>::const_iterator q = flist.begin();
 	 q != flist.end(); ++ q) {
-      Token* token1 = *q;
+      const Token* token1 = *q;
       if ( token1 == mEpsilon ) {
 	has_epsilon = true;
       }
@@ -450,8 +473,7 @@ LR0_next_state(const vector<LR0Term*>& input,
     LR0Term* term = *p;
     Rule* rule = term->rule();
     ymuint pos = term->pos();
-    const vector<Token*>& right = rule->right();
-    if ( pos < right.size() && right[pos] == token ) {
+    if ( pos < rule->right_size() && rule->right(pos) == token ) {
       tmp_terms.push_back( new LR0Term(rule, pos + 1) );
     }
   }

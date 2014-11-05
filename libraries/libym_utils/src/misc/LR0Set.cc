@@ -31,9 +31,8 @@ closure(const vector<LR0Term>& input,
     const LR0Term& term = output[rpos];
     const Rule* rule = term.rule();
     ymuint pos = term.pos();
-    const vector<Token*>& right = rule->right();
-    if ( pos < right.size() ) {
-      Token* head = right[pos];
+    if ( pos < rule->right_size() ) {
+      const Token* head = rule->right(pos);
       const vector<Rule*>& rule_list = head->rule_list();
       for (vector<Rule*>::const_iterator p = rule_list.begin();
 	   p != rule_list.end(); ++ p) {
@@ -66,7 +65,7 @@ next_state(LR0State* cur_state,
     const LR0Term& term = *p;
     const Rule* rule = term.rule();
     ymuint pos = term.pos();
-    if ( pos < rule->right().size() && rule->right()[pos] == token ) {
+    if ( pos < rule->right_size() && rule->right(pos) == token ) {
       tmp_terms.push_back(LR0Term(rule, pos + 1));
     }
     closure(tmp_terms, next_terms);

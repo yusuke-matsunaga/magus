@@ -17,6 +17,22 @@ BEGIN_NAMESPACE_YM
 class Token;
 class Rule;
 
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 結合性を表す列挙型
+//////////////////////////////////////////////////////////////////////
+enum AssocType {
+  /// @brief 指定なし
+  kNotDefined,
+  /// @brief 左結合性
+  kLeftAssoc,
+  /// @brief 右結合性
+  kRightAssoc,
+  /// @brief 結合しない
+  kNonAssoc
+};
+
+
 //////////////////////////////////////////////////////////////////////
 /// @class Token Grammer.h "Grammer.h"
 /// @brief トークンを表すクラス
@@ -50,16 +66,24 @@ public:
   string
   str() const;
 
+  /// @brief 優先順位を返す．
+  ymuint
+  priority() const;
+
+  /// @brief 結合性を返す．
+  AssocType
+  assoc_type() const;
+
   /// @brief 文法規則のリストを返す．
   const vector<Rule*>&
   rule_list() const;
 
   /// @brief FIRST を返す．
-  const vector<Token*>&
+  const vector<const Token*>&
   first() const;
 
   /// @brief FOLLOW を返す．
-  const vector<Token*>&
+  const vector<const Token*>&
   follow() const;
 
 
@@ -74,14 +98,21 @@ private:
   // 文字列
   string mStr;
 
+  // 優先順位
+  // 0 で優先順位なし
+  ymuint mPri;
+
+  // 結合性
+  AssocType mAssocType;
+
   // このトークンを左辺に持つ文法規則のリスト
   vector<Rule*> mRuleList;
 
   // FIRST リスト
-  vector<Token*> mFirst;
+  vector<const Token*> mFirst;
 
   // FOLLOW リスト
-  vector<Token*> mFollow;
+  vector<const Token*> mFollow;
 
 };
 
@@ -113,12 +144,23 @@ public:
   id() const;
 
   /// @brief 左辺のトークンを返す．
-  Token*
+  const Token*
   left() const;
 
-  /// @brief 右辺のトークンのリストを返す．
-  const vector<Token*>&
-  right() const;
+  /// @brief 右辺の要素数を返す．
+  ymuint
+  right_size() const;
+
+  /// @brief 右辺のトークンを返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < right_size() )
+  const Token*
+  right(ymuint pos) const;
+
+  /// @brief 優先順位の指定を持つ最後のトークンを返す．
+  ///
+  /// なければ NULL を返す．
+  const Token*
+  key_token() const;
 
 
 private:
@@ -129,7 +171,7 @@ private:
   // ID番号
   ymuint mId;
 
-  // 左辺のトークン番号
+  // 左辺のトークン
   Token* mLeft;
 
   // 右辺のトークンリスト
@@ -248,8 +290,8 @@ private:
 
   /// @brief トークンのリストに対する FIRST を求める．
   void
-  first_of(const vector<Token*>& token_list,
-	   vector<Token*>& first_list);
+  first_of(const vector<const Token*>& token_list,
+	   vector<const Token*>& first_list);
 
 
 private:

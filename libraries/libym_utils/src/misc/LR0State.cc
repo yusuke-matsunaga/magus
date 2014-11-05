@@ -27,10 +27,9 @@ LR0State::LR0State(const vector<LR0Term>& terms)
     const LR0Term& term = *p;
     mTermList.push_back(term);
     const Rule* rule = term.rule();
-    const vector<Token*>& right = rule->right();
     ymuint pos = term.pos();
-    if ( pos < right.size() ) {
-      const Token* token = right[pos];
+    if ( pos < rule->right_size() ) {
+      const Token* token = rule->right(pos);
       bool found = false;
       for (vector<const Token*>::iterator q = mTokenList.begin();
 	   q != mTokenList.end(); ++ q) {
