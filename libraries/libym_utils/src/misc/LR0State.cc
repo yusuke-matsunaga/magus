@@ -9,7 +9,7 @@
 
 #include "LR0State.h"
 #include "LR0Term.h"
-#include "Grammer.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -19,17 +19,21 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
 // @param[in] terms 項集合
-LR0State::LR0State(const vector<LR0Term>& terms)
+LR0State::LR0State(ymuint id,
+		   const vector<LR0Term>& terms)
 {
+  mId = id;
+
   for (vector<LR0Term>::const_iterator p = terms.begin();
        p != terms.end(); ++ p) {
     const LR0Term& term = *p;
     mTermList.push_back(term);
-    const Rule* rule = term.rule();
-    ymuint pos = term.pos();
-    if ( pos < rule->right_size() ) {
-      const Token* token = rule->right(pos);
+    const Token* token = term.next_token();
+    if ( token != NULL ) {
+      // mToken リストを更新する．
+      // ただしすでに含まれていたらなにもしない．
       bool found = false;
       for (vector<const Token*>::iterator q = mTokenList.begin();
 	   q != mTokenList.end(); ++ q) {

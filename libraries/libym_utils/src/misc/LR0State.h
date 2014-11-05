@@ -28,8 +28,10 @@ class LR0State
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] id ID番号
   /// @param[in] terms 項集合
-  LR0State(const vector<LR0Term>& terms);
+  LR0State(ymuint id,
+	   const vector<LR0Term>& terms);
 
   /// @brief デストラクタ
   ~LR0State();

@@ -44,9 +44,17 @@ public:
   const Rule*
   rule() const;
 
-  /// @brief 位置を返す．
+  /// @brief dot の位置を返す．
+  ///
+  /// 値の範囲は 0 〜 rule()->right_size()
   ymuint
-  pos() const;
+  dot_pos() const;
+
+  /// @brief dot の直後のトークンを返す．
+  ///
+  /// dot が末尾にある場合には NULL を返す．
+  const Token*
+  next_token() const;
 
 
 private:
@@ -57,7 +65,7 @@ private:
   // 文法規則
   const Rule* mRule;
 
-  // 位置
+  // dot の位置
   ymuint mPos;
 
 };
@@ -68,7 +76,7 @@ bool
 operator==(const LR0Term& left,
 	   const LR0Term& right)
 {
-  return left.rule() == right.rule() && left.pos() == right.pos();
+  return left.rule() == right.rule() && left.dot_pos() == right.dot_pos();
 }
 
 END_NAMESPACE_YM

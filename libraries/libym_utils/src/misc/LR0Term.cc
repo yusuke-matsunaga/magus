@@ -8,6 +8,7 @@
 
 
 #include "LR0Term.h"
+#include "Rule.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -38,11 +39,21 @@ LR0Term::rule() const
   return mRule;
 }
 
-// @brief 位置を返す．
+// @brief dot の位置を返す．
 ymuint
-LR0Term::pos() const
+LR0Term::dot_pos() const
 {
   return mPos;
+}
+
+// @brief dot の直後のトークンを返す．
+const Token*
+LR0Term::next_token() const
+{
+  if ( mPos < mRule->right_size() ) {
+    return mRule->right(mPos);
+  }
+  return NULL;
 }
 
 END_NAMESPACE_YM

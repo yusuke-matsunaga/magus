@@ -132,6 +132,8 @@ set (misc_SOURCES
   src/misc/LR0Set.cc
   src/misc/LR0State.cc
   src/misc/LR0Term.cc
+  src/misc/Rule.cc
+  src/misc/Token.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc

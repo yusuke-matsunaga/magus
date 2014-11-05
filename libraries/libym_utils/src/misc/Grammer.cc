@@ -8,78 +8,11 @@
 
 
 #include "Grammer.h"
+#include "Rule.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM
-
-//////////////////////////////////////////////////////////////////////
-// クラス Token
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] id トークンID
-// @param[in] str 文字列
-Token::Token(ymuint id,
-	     string str) :
-  mId(id),
-  mStr(str)
-{
-}
-
-// @brief デストラクタ
-Token::~Token()
-{
-}
-
-// @brief ID番号を返す．
-ymuint
-Token::id() const
-{
-  return mId;
-}
-
-// @brief 文字列を返す．
-string
-Token::str() const
-{
-  return mStr;
-}
-
-// @brief 優先順位を返す．
-ymuint
-Token::priority() const
-{
-  return mPri;
-}
-
-// @brief 結合性を返す．
-AssocType
-Token::assoc_type() const
-{
-  return mAssocType;
-}
-
-// @brief 文法規則のリストを返す．
-const vector<Rule*>&
-Token::rule_list() const
-{
-  return mRuleList;
-}
-
-// @brief FIRST を返す．
-const vector<const Token*>&
-Token::first() const
-{
-  return mFirst;
-}
-
-// @brief FOLLOW を返す．
-const vector<const Token*>&
-Token::follow() const
-{
-  return mFollow;
-}
-
 
 BEGIN_NONAMESPACE
 
@@ -162,56 +95,6 @@ sort_tokenlist(vector<const Token*>& token_list)
 }
 
 END_NONAMESPACE
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス Rule
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-Rule::Rule(ymuint id,
-	   Token* left,
-	   const vector<Token*>& right) :
-  mId(id),
-  mLeft(left),
-  mRight(right)
-{
-}
-
-// @brief デストラクタ
-Rule::~Rule()
-{
-}
-
-// @brief ID番号を返す．
-ymuint
-Rule::id() const
-{
-  return mId;
-}
-
-// @brief 左辺のトークンを返す．
-const Token*
-Rule::left() const
-{
-  return mLeft;
-}
-
-// @brief 右辺の要素数を返す．
-ymuint
-Rule::right_size() const
-{
-  return mRight.size();
-}
-
-// @brief 右辺のトークンを返す．
-// @param[in] pos 位置番号 ( 0 <= pos < right_size() )
-const Token*
-Rule::right(ymuint pos) const
-{
-  ASSERT_COND( pos < right_size() );
-  return mRight[pos];
-}
 
 
 //////////////////////////////////////////////////////////////////////
