@@ -31,14 +31,6 @@ class LALR1_table :
         # LR0正準集を求める．
         self._StateList = LR0_state_list(grammer)
 
-        # カーネル項の全リストを作る．
-        kernel_list = []
-        for terms in self._StateList :
-            for term in terms :
-                (rule_id, pos) = term
-                if rule_id == grammer._StartRule or pos > 0 :
-                    kernel_list.append(term)
-
         # 先読みの生成/伝搬を調べる．
         generated_token = []
         propagated_token = []
