@@ -47,6 +47,11 @@ public:
   LR0State*
   start_state() const;
 
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -54,12 +59,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 状態を追加する．
+  /// @param[in] grammer 元となる文法
   /// @param[in] terms 状態を表す項集合
   /// @return 対応する状態を返す．
   ///
   /// すでに等価は状態が存在したらその状態を返す．
   LR0State*
-  new_state(const vector<LR0Term>& terms);
+  new_state(Grammer* grammer,
+	    const vector<LR0Term>& terms);
 
 
 private:

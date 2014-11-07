@@ -8,6 +8,7 @@
 
 
 #include "../../src/misc/Grammer.h"
+#include "../../src/misc/LR0Set.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -67,6 +68,10 @@ test1()
   g.print_tokens(cout);
 
   g.print_rules(cout);
+
+  LR0Set lr0set(&g);
+
+  lr0set.print(cout);
 }
 
 void

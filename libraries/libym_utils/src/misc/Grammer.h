@@ -125,6 +125,17 @@ public:
   Rule*
   rule(ymuint id) const;
 
+  /// @brief 項番号を返す．
+  /// @param[in] rule_id 文法規則ID
+  /// @param[in] dot_pos dot の位置
+  ymuint
+  term_id(ymuint rule_id,
+	  ymuint dot_pos) const;
+
+  /// @brief 項の総数を返す．
+  ymuint
+  term_size() const;
+
   /// @brief トークンを表示する．
   /// @param[in] s 出力先のストリーム
   void
@@ -159,6 +170,12 @@ private:
   // 文法規則のリスト
   // Rule::mId をキーにした配列
   vector<Rule*> mRuleList;
+
+  // 各文法規則の項番号の先頭を納める配列
+  vector<ymuint> mTermIdList;
+
+  // 現在の項番号
+  ymuint mNextTermId;
 
   // ダミーの開始記号
   Token* mStart;

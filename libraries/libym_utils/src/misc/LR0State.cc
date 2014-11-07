@@ -9,7 +9,9 @@
 
 #include "LR0State.h"
 #include "LR0Term.h"
+#include "Rule.h"
 #include "Token.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -21,32 +23,31 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] terms 項集合
+// @param[in] signature シグネチャ
 LR0State::LR0State(ymuint id,
-		   const vector<LR0Term>& terms)
+		   const vector<LR0Term>& terms,
+		   const vector<ymuint64>& signature) :
+  mSignature(signature)
 {
   mId = id;
 
+  HashSet<ymuint> token_set;
   for (vector<LR0Term>::const_iterator p = terms.begin();
        p != terms.end(); ++ p) {
     const LR0Term& term = *p;
     mTermList.push_back(term);
     const Token* token = term.next_token();
-    if ( token != NULL ) {
-      // mToken リストを更新する．
-      // ただしすでに含まれていたらなにもしない．
-      bool found = false;
-      for (vector<const Token*>::iterator q = mTokenList.begin();
-	   q != mTokenList.end(); ++ q) {
-	const Token* token1 = *q;
-	if ( token1 == token ) {
-	  found = true;
-	  break;
-	}
-      }
-      if ( !found ) {
-	mTokenList.push_back(token);
-      }
+    if ( token == NULL ) {
+      continue;
     }
+
+    // mToken リストを更新する．
+    // ただしすでに含まれていたらなにもしない．
+    if ( token_set.check(token->id()) ) {
+      continue;
+    }
+    mTokenList.push_back(token);
+    token_set.add(token->id());
   }
 }
 
@@ -67,6 +68,13 @@ const vector<LR0Term>&
 LR0State::term_list() const
 {
   return mTermList;
+}
+
+// @brief シグネチャを返す．
+const vector<ymuint64>&
+LR0State::signature() const
+{
+  return mSignature;
 }
 
 // @brief トークンによる遷移先を返す．
@@ -102,7 +110,33 @@ LR0State::add_next_state(const Token* token,
 {
   ASSERT_COND( !mNextStates.check(token->id()) );
   mNextStates.add(token->id(), next_state);
-  mTokenList.push_back(token);
+}
+
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+LR0State::print(ostream& s) const
+{
+  s << "State#" << mId << ":" << endl;
+  for (vector<LR0Term>::const_iterator p = mTermList.begin();
+       p != mTermList.end(); ++ p) {
+    const Rule* rule = p->rule();
+    ymuint pos = p->dot_pos();
+    const Token* left = rule->left();
+    s << "  " << left->str() << " ->";
+    ymuint n = rule->right_size();
+    for (ymuint i = 0; i < n; ++ i) {
+      if ( i == pos ) {
+	s << " .";
+      }
+      s << " " << rule->right(i)->str();
+    }
+    if ( pos == n ) {
+      s << " .";
+    }
+    s << endl;
+  }
+  s << endl;
 }
 
 END_NAMESPACE_YM

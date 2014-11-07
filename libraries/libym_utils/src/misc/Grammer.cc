@@ -159,6 +159,9 @@ Grammer::add_rule(Token* left,
   Rule* rule = new Rule(id, left, right);
   mRuleList.push_back(rule);
   left->mRuleList.push_back(rule);
+  mTermIdList.push_back(mNextTermId);
+  ymuint n = right.size();
+  mNextTermId += n + 1;
   return rule;
 }
 
@@ -277,6 +280,25 @@ Grammer::rule(ymuint id) const
 {
   ASSERT_COND( id < mRuleList.size() );
   return mRuleList[id];
+}
+
+// @brief 項番号を返す．
+// @param[in] rule_id 文法規則ID
+// @param[in] dot_pos dot の位置
+ymuint
+Grammer::term_id(ymuint rule_id,
+		 ymuint dot_pos) const
+{
+  ASSERT_COND( rule_id < mRuleList.size() );
+  ASSERT_COND( dot_pos <= rule(rule_id)->right_size() );
+  return mTermIdList[rule_id] + dot_pos;
+}
+
+// @brief 項の総数を返す．
+ymuint
+Grammer::term_size() const
+{
+  return mNextTermId;
 }
 
 // @brief トークンを表示する．

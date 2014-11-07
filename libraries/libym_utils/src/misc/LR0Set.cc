@@ -98,7 +98,7 @@ closure(const vector<LR0Term>& input,
 void
 next_state(LR0State* cur_state,
 	   const Token* token,
-	   vector<LR0Term> next_terms)
+	   vector<LR0Term>& next_terms)
 {
   // 次のトークンが token に等しい項の dot を進めた項を tmp_terms に入れる．
   vector<LR0Term> tmp_terms;
@@ -135,7 +135,7 @@ LR0Set::LR0Set(Grammer* grammer)
   start_terms.push_back(LR0Term(rule_list[0], 0));
   vector<LR0Term> tmp_terms;
   closure(start_terms, tmp_terms);
-  mStartState = new_state(tmp_terms);
+  mStartState = new_state(grammer, tmp_terms);
 
   // mStateList に未処理の状態が残っている限り以下の処理を繰り返す．
   for (ymuint rpos = 0; rpos < mStateList.size(); ++ rpos) {
@@ -150,7 +150,7 @@ LR0Set::LR0Set(Grammer* grammer)
       next_state(cur_state, token, tmp_terms);
       // tmp_terms に対応する状態を作る．
       // 場合によっては既存の状態を再利用する．
-      LR0State* state1 = new_state(tmp_terms);
+      LR0State* state1 = new_state(grammer, tmp_terms);
       // それを cur_state の遷移先に設定する．
       cur_state->add_next_state(token, state1);
     }
@@ -181,26 +181,52 @@ LR0Set::start_state() const
 }
 
 // @brief 状態を追加する．
+// @param[in] grammer 元となる文法
 // @param[in] terms 状態を表す項集合
 // @return 対応する状態を返す．
 //
 // すでに等価は状態が存在したらその状態を返す．
 LR0State*
-LR0Set::new_state(const vector<LR0Term>& terms)
+LR0Set::new_state(Grammer* grammer,
+		  const vector<LR0Term>& terms)
 {
+  // シグネチャを作る．
+  ymuint n = grammer->term_size();
+  ymuint ns = (n + 63) / 64;
+  vector<ymuint64> sig(ns, 0UL);
+  for (vector<LR0Term>::const_iterator p = terms.begin();
+       p != terms.end(); ++ p) {
+    ymuint term_id = grammer->term_id(p->rule()->id(), p->dot_pos());
+    ymuint blk = term_id / 64;
+    ymuint sft = term_id % 64;
+    sig[blk] |= (1UL << sft);
+  }
+
   // たぶん効率のすごく悪い実装法
   for (ymuint i = 0; i < mStateList.size(); ++ i) {
     LR0State* state1 = mStateList[i];
-    if ( state1->term_list() == terms ) {
+    if ( state1->signature() == sig ) {
       // すでに同じ状態が存在した．
       return state1;
     }
   }
   // なかったので新たに作る．
   ymuint id = mStateList.size();
-  LR0State* state = new LR0State(id, terms);
+  LR0State* state = new LR0State(id, terms, sig);
   mStateList.push_back(state);
   return state;
+}
+
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+LR0Set::print(ostream& s) const
+{
+  for (vector<LR0State*>::const_iterator p = mStateList.begin();
+       p != mStateList.end(); ++ p) {
+    LR0State* state = *p;
+    state->print(s);
+  }
 }
 
 END_NAMESPACE_YM
