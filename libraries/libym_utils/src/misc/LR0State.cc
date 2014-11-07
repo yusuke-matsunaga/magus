@@ -23,11 +23,8 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 // @param[in] id ID番号
 // @param[in] terms 項集合
-// @param[in] signature シグネチャ
 LR0State::LR0State(ymuint id,
-		   const vector<LR0Term>& terms,
-		   const vector<ymuint64>& signature) :
-  mSignature(signature)
+		   const vector<LR0Term>& terms)
 {
   mId = id;
 
@@ -68,13 +65,6 @@ const vector<LR0Term>&
 LR0State::term_list() const
 {
   return mTermList;
-}
-
-// @brief シグネチャを返す．
-const vector<ymuint64>&
-LR0State::signature() const
-{
-  return mSignature;
 }
 
 // @brief トークンによる遷移先を返す．

@@ -30,10 +30,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] id ID番号
   /// @param[in] terms 項集合
-  /// @param[in] signature シグネチャ
   LR0State(ymuint id,
-	   const vector<LR0Term>& terms,
-	   const vector<ymuint64>& signature);
+	   const vector<LR0Term>& terms);
 
   /// @brief デストラクタ
   ~LR0State();
@@ -51,10 +49,6 @@ public:
   /// @brief LR(0)項集合を返す．
   const vector<LR0Term>&
   term_list() const;
-
-  /// @brief シグネチャを返す．
-  const vector<ymuint64>&
-  signature() const;
 
   /// @brief トークンによる遷移先を返す．
   /// @param[in] token トークン
@@ -97,9 +91,6 @@ private:
 
   // LR(0)項の集合
   vector<LR0Term> mTermList;
-
-  // シグネチャ
-  vector<ymuint64> mSignature;
 
   // トークン番号をキーにした連想配列
   // 遷移先の状態を保持する．

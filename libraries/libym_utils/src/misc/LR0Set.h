@@ -10,6 +10,7 @@
 
 
 #include "YmTools.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -60,12 +61,14 @@ private:
 
   /// @brief 状態を追加する．
   /// @param[in] grammer 元となる文法
+  /// @param[in] state_map シグネチャをキーにして状態を収めたハッシュ表
   /// @param[in] terms 状態を表す項集合
   /// @return 対応する状態を返す．
   ///
   /// すでに等価は状態が存在したらその状態を返す．
   LR0State*
   new_state(Grammer* grammer,
+	    HashMap<vector<ymuint64>, LR0State*>& state_map,
 	    const vector<LR0Term>& terms);
 
 

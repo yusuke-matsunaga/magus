@@ -13,6 +13,7 @@
 #include "LR0Term.h"
 #include "Rule.h"
 #include "Token.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -61,29 +62,27 @@ closure(const vector<LR0Term>& input,
   // output は次に処理すべき項を入れるキューとしても機能している．
   // rpos が次に処理する項の位置を示す．
   // これが末尾に達したら新たに加わった項がないということ．
+
+  // 処理したトークン番号を入れるハッシュ表
+  HashSet<ymuint> token_set;
   for (ymuint rpos = 0; rpos < output.size(); ++ rpos) {
     const LR0Term& term = output[rpos];
     const Token* next_token = term.next_token();
-    if ( next_token != NULL ) {
-      // dot の次のトークンを左辺に持つ規則を列挙する．
-      const vector<const Rule*>& rule_list = next_token->rule_list();
-      for (vector<const Rule*>::const_iterator p = rule_list.begin();
-	   p != rule_list.end(); ++ p) {
-	const Rule* rule1 = *p;
-	// rule1 を output に加える．
-	// ただし，重複していたらなにもしない．
-	// TODO: 線形探索でいいのか実際の例でサイズを調査する．
-	bool found = false;
-	for (ymuint i = 0; i < output.size(); ++ i) {
-	  if ( output[i] == LR0Term(rule1, 0) ) {
-	    found = true;
-	    break;
-	  }
-	}
-	if ( !found ) {
-	  output.push_back(LR0Term(rule1, 0));
-	}
-      }
+    if ( next_token == NULL ) {
+      continue;
+    }
+    if ( token_set.check(next_token->id()) ) {
+      continue;
+    }
+    token_set.add(next_token->id());
+
+    // dot の次のトークンを左辺に持つ規則を列挙する．
+    const vector<const Rule*>& rule_list = next_token->rule_list();
+    for (vector<const Rule*>::const_iterator p = rule_list.begin();
+	 p != rule_list.end(); ++ p) {
+      const Rule* rule1 = *p;
+      // rule1 を output に加える．
+      output.push_back(LR0Term(rule1, 0));
     }
   }
 
@@ -118,6 +117,26 @@ next_state(LR0State* cur_state,
 
 END_NONAMESPACE
 
+// シグネチャのハッシュ関数
+template<>
+struct
+HashFunc<vector<ymuint64> >
+{
+  ymuint
+  operator()(const vector<ymuint64>& key) const
+  {
+    ymuint ans = 0;
+    for (vector<ymuint64>::const_iterator p = key.begin();
+	 p != key.end(); ++ p) {
+      ymuint64 tmp = *p;
+      ans += (ans * 1023);
+      ans += static_cast<ymuint>(tmp & 0xFFFFFFFFU);
+      ans += static_cast<ymuint>(tmp >> 32) * 511;
+    }
+    return ans;
+  }
+};
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス LR0Set
@@ -135,7 +154,9 @@ LR0Set::LR0Set(Grammer* grammer)
   start_terms.push_back(LR0Term(rule_list[0], 0));
   vector<LR0Term> tmp_terms;
   closure(start_terms, tmp_terms);
-  mStartState = new_state(grammer, tmp_terms);
+
+  HashMap<vector<ymuint64>, LR0State*> state_hash;
+  mStartState = new_state(grammer, state_hash, tmp_terms);
 
   // mStateList に未処理の状態が残っている限り以下の処理を繰り返す．
   for (ymuint rpos = 0; rpos < mStateList.size(); ++ rpos) {
@@ -150,7 +171,7 @@ LR0Set::LR0Set(Grammer* grammer)
       next_state(cur_state, token, tmp_terms);
       // tmp_terms に対応する状態を作る．
       // 場合によっては既存の状態を再利用する．
-      LR0State* state1 = new_state(grammer, tmp_terms);
+      LR0State* state1 = new_state(grammer, state_hash, tmp_terms);
       // それを cur_state の遷移先に設定する．
       cur_state->add_next_state(token, state1);
     }
@@ -188,6 +209,7 @@ LR0Set::start_state() const
 // すでに等価は状態が存在したらその状態を返す．
 LR0State*
 LR0Set::new_state(Grammer* grammer,
+		  HashMap<vector<ymuint64>, LR0State*>& state_map,
 		  const vector<LR0Term>& terms)
 {
   // シグネチャを作る．
@@ -202,18 +224,18 @@ LR0Set::new_state(Grammer* grammer,
     sig[blk] |= (1UL << sft);
   }
 
-  // たぶん効率のすごく悪い実装法
-  for (ymuint i = 0; i < mStateList.size(); ++ i) {
-    LR0State* state1 = mStateList[i];
-    if ( state1->signature() == sig ) {
-      // すでに同じ状態が存在した．
-      return state1;
-    }
+  // ハッシュ表に存在するか調べる．
+  LR0State* state;
+  if ( state_map.find(sig, state) ) {
+    // 見つかった．
+    return state;
   }
+
   // なかったので新たに作る．
   ymuint id = mStateList.size();
-  LR0State* state = new LR0State(id, terms, sig);
+  state = new LR0State(id, terms);
   mStateList.push_back(state);
+  state_map.add(sig, state);
   return state;
 }
 
