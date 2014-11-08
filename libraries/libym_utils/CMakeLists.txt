@@ -128,12 +128,6 @@ set (mincov_SOURCES
 set (misc_SOURCES
   src/misc/Binder.cc
   src/misc/DlList.cc
-  src/misc/Grammer.cc
-  src/misc/LR0Set.cc
-  src/misc/LR0State.cc
-  src/misc/LR0Term.cc
-  src/misc/Rule.cc
-  src/misc/Token.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc
@@ -145,6 +139,15 @@ set (msg_SOURCES
   src/msg/MsgHandler.cc
   src/msg/MsgMgr.cc
   src/msg/MsgMgrImpl.cc
+  )
+
+set (parser_SOURCES
+  src/parser/Grammer.cc
+  src/parser/LR0Set.cc
+  src/parser/LR0State.cc
+  src/parser/LR0Term.cc
+  src/parser/Rule.cc
+  src/parser/Token.cc
   )
 
 if (POPT_FOUND)
@@ -177,6 +180,7 @@ add_library(ym_utils SHARED
   ${mincov_SOURCES}
   ${misc_SOURCES}
   ${msg_SOURCES}
+  ${parser_SOURCES}
   ${popt_SOURCES}
   ${textproc_SOURCES}
   )
@@ -206,7 +210,7 @@ if (POPT_FOUND)
 endif (POPT_FOUND)
 
 add_executable(Grammer_test
-  tests/misc/Grammer_test.cc
+  tests/parser/Grammer_test.cc
   )
 
 target_link_libraries(Grammer_test

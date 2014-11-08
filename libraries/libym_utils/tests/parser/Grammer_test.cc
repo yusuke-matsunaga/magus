@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "../../src/misc/Grammer.h"
-#include "../../src/misc/LR0Set.h"
+#include "../../src/parser/Grammer.h"
+#include "../../src/parser/LR0Set.h"
 
 
 BEGIN_NAMESPACE_YM
