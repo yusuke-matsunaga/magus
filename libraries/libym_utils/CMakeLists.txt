@@ -143,9 +143,11 @@ set (msg_SOURCES
 
 set (parser_SOURCES
   src/parser/Grammer.cc
+  src/parser/LALR1Set.cc
   src/parser/LR0Set.cc
   src/parser/LR0State.cc
   src/parser/LR0Term.cc
+  src/parser/LR1Term.cc
   src/parser/Rule.cc
   src/parser/Token.cc
   )

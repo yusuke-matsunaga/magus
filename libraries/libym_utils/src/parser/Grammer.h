@@ -113,17 +113,29 @@ public:
   void
   analyze();
 
+  /// @brief トークン数
+  ymuint
+  token_num() const;
+
   /// @brief トークンを返す．
-  /// @param[in] id トークンID
+  /// @param[in] id トークンID ( 0 <= id < token_num() )
   /// @return トークンを返す．
   Token*
   token(ymuint id) const;
 
+  /// @brief 文法規則の数
+  ymuint
+  rule_num() const;
+
   /// @brief 文法規則を返す．
-  /// @param[in] id 文法規則ID
+  /// @param[in] id 文法規則ID ( 0 <= id < rule_num() )
   /// @return 文法規則を返す．
   Rule*
   rule(ymuint id) const;
+
+  /// @brief 開始規則を返す．
+  Rule*
+  start_rule() const;
 
   /// @brief 項番号を返す．
   /// @param[in] rule_id 文法規則ID
@@ -136,6 +148,11 @@ public:
   ymuint
   term_size() const;
 
+  /// @brief トークンのリストに対する FIRST を求める．
+  void
+  first_of(const vector<const Token*>& token_list,
+	   vector<const Token*>& first_list);
+
   /// @brief トークンを表示する．
   /// @param[in] s 出力先のストリーム
   void
@@ -145,17 +162,6 @@ public:
   /// @param[in] s 出力先のストリーム
   void
   print_rules(ostream& s) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief トークンのリストに対する FIRST を求める．
-  void
-  first_of(const vector<const Token*>& token_list,
-	   vector<const Token*>& first_list);
 
 
 private:

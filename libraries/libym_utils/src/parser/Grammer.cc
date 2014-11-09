@@ -172,6 +172,7 @@ Grammer::set_start(Token* start)
 {
   ASSERT_COND( mStartRule == NULL );
   mStartRule = add_rule(mStart, vector<Token*>(1, start));
+  analyze();
 }
 
 // @brief 種々の解析を行う．
@@ -262,6 +263,13 @@ Grammer::analyze()
 
 }
 
+// @brief トークン数
+ymuint
+Grammer::token_num() const
+{
+  return mTokenList.size();
+}
+
 // @brief トークンを返す．
 // @param[in] id トークンID
 // @return トークンを返す．
@@ -272,6 +280,13 @@ Grammer::token(ymuint id) const
   return mTokenList[id];
 }
 
+// @brief 文法規則の数
+ymuint
+Grammer::rule_num() const
+{
+  return mRuleList.size();
+}
+
 // @brief 文法規則を返す．
 // @param[in] id 文法規則ID
 // @return 文法規則を返す．
@@ -280,6 +295,13 @@ Grammer::rule(ymuint id) const
 {
   ASSERT_COND( id < mRuleList.size() );
   return mRuleList[id];
+}
+
+// @brief 開始規則を返す．
+Rule*
+Grammer::start_rule() const
+{
+  return mStartRule;
 }
 
 // @brief 項番号を返す．
