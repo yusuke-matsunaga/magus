@@ -273,7 +273,7 @@ Grammer::token_num() const
 // @brief トークンを返す．
 // @param[in] id トークンID
 // @return トークンを返す．
-Token*
+const Token*
 Grammer::token(ymuint id) const
 {
   ASSERT_COND( id < mTokenList.size() );
@@ -290,7 +290,7 @@ Grammer::rule_num() const
 // @brief 文法規則を返す．
 // @param[in] id 文法規則ID
 // @return 文法規則を返す．
-Rule*
+const Rule*
 Grammer::rule(ymuint id) const
 {
   ASSERT_COND( id < mRuleList.size() );
@@ -298,7 +298,7 @@ Grammer::rule(ymuint id) const
 }
 
 // @brief 開始規則を返す．
-Rule*
+const Rule*
 Grammer::start_rule() const
 {
   return mStartRule;

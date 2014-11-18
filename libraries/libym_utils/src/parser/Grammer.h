@@ -120,7 +120,7 @@ public:
   /// @brief トークンを返す．
   /// @param[in] id トークンID ( 0 <= id < token_num() )
   /// @return トークンを返す．
-  Token*
+  const Token*
   token(ymuint id) const;
 
   /// @brief 文法規則の数
@@ -130,11 +130,11 @@ public:
   /// @brief 文法規則を返す．
   /// @param[in] id 文法規則ID ( 0 <= id < rule_num() )
   /// @return 文法規則を返す．
-  Rule*
+  const Rule*
   rule(ymuint id) const;
 
   /// @brief 開始規則を返す．
-  Rule*
+  const Rule*
   start_rule() const;
 
   /// @brief 項番号を返す．

@@ -53,11 +53,11 @@ public:
   const Token*
   right(ymuint pos) const;
 
-  /// @brief 優先順位の指定を持つ最後のトークンを返す．
+  /// @brief 最も右にある終端トークンを返す．
   ///
   /// なければ NULL を返す．
   const Token*
-  key_token() const;
+  last_terminal() const;
 
 
 private:
