@@ -16,6 +16,7 @@
 BEGIN_NAMESPACE_YM
 
 class Token;
+class Rule;
 
 //////////////////////////////////////////////////////////////////////
 /// @class LALR1Set LALR1Set.h "LALR1Set.h"
@@ -77,6 +78,12 @@ private:
 
   // 各項ごとの先読みトークンのリスト
   vector<vector<const Token*> > mTokenList;
+
+  // 各状態ごとの shift 動作リスト
+  vector<vector<pair<const Token*, ymuint> > > mShiftList;
+
+  // 各状態ごとの reduce 動作リスト
+  vector<vector<pair<const Token*, const Rule*> > > mReduceList;
 
 };
 

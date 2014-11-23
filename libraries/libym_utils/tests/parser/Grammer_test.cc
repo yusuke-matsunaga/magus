@@ -9,6 +9,7 @@
 
 #include "../../src/parser/Grammer.h"
 #include "../../src/parser/LR0Set.h"
+#include "../../src/parser/LALR1Set.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -69,7 +70,7 @@ test1()
 
   g.print_rules(cout);
 
-  LR0Set lr0set(&g);
+  LALR1Set lr0set(&g);
 
   lr0set.print(cout);
 }

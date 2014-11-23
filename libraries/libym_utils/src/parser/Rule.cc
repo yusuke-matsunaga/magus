@@ -8,6 +8,7 @@
 
 
 #include "Rule.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -59,6 +60,21 @@ Rule::right(ymuint pos) const
 {
   ASSERT_COND( pos < right_size() );
   return mRight[pos];
+}
+
+// @brief 最も右にある終端トークンを返す．
+//
+// なければ NULL を返す．
+const Token*
+Rule::last_terminal() const
+{
+  for (int i = right_size(); -- i >= 0; ) {
+    const Token* token = mRight[i];
+    if ( token->rule_list().empty() ) {
+      return token;
+    }
+  }
+  return NULL;
 }
 
 END_NAMESPACE_YM
