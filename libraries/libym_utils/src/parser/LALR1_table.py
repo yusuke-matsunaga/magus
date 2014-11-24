@@ -193,8 +193,8 @@ if __name__ == '__main__' :
     # テストプログラム
     g = Grammer()
 
-    use_1 = False
-    use_2 = True
+    use_1 = True
+    use_2 = False
 
     if use_1 and use_2 :
         use_2 = False

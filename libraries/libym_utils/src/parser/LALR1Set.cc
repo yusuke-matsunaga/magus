@@ -20,6 +20,8 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
+const int debug = 1;
+
 struct Action
 {
   Action(LR0State* state = NULL) :
@@ -39,7 +41,16 @@ LR1_closure(Grammer* grammer,
 	    const vector<LR1Term>& input,
 	    vector<LR1Term>& output)
 {
-  cout << "LR1_closure" << endl;
+  if ( debug ) {
+    cout << "LR1_closure" << endl;
+    for (vector<LR1Term>::const_iterator p = input.begin();
+	 p != input.end(); ++ p) {
+      const LR1Term& term = *p;
+      cout << term << endl;
+    }
+    cout << endl;
+  }
+
   for (vector<LR1Term>::const_iterator p = input.begin();
        p != input.end(); ++ p) {
     output.push_back(*p);
@@ -80,7 +91,16 @@ LR1_closure(Grammer* grammer,
       }
     }
   }
-  cout << "LR1_closure end" << endl;
+
+  if ( debug ) {
+    cout << "LR1_closure end" << endl;
+    for (vector<LR1Term>::const_iterator p = output.begin();
+	 p != output.end(); ++ p) {
+      const LR1Term& term = *p;
+      cout << term << endl;
+    }
+    cout << endl;
+  }
 }
 
 END_NONAMESPACE
@@ -106,8 +126,6 @@ LALR1Set::LALR1Set(Grammer* grammer) :
     mTokenList.push_back(vector<const Token*>(0));
   }
 
-  cout << " before look ahead calculation" << endl;
-
   // 先読みの計算をする．
   vector<pair<ymuint, const Token*> > gen_list;
   vector<vector<ymuint> > prop_list(mTermNum, vector<ymuint>(0));
@@ -116,7 +134,9 @@ LALR1Set::LALR1Set(Grammer* grammer) :
   for (vector<LR0State*>::const_iterator p = state_list().begin();
        p != state_list().end(); ++ p) {
     LR0State* state = *p;
-    cout << "State#" << state->id() << endl;
+    if ( debug ) {
+      cout << "State#" << state->id() << endl;
+    }
     const vector<LR0Term>& term_list = state->term_list();
     ymuint n = term_list.size();
     for (ymuint i = 0; i < n; ++ i) {
@@ -150,6 +170,11 @@ LALR1Set::LALR1Set(Grammer* grammer) :
 	      ymuint src_id = calc_term_id(state->id(), i);
 	      ymuint dst_id = calc_term_id(state2->id(), i2);
 	      prop_list[src_id].push_back(dst_id);
+
+	      if ( debug ) {
+		cout << "Propagation: " << endl
+		     << (*q) << endl;
+	      }
 	      break;
 	    }
 	  }
@@ -161,18 +186,35 @@ LALR1Set::LALR1Set(Grammer* grammer) :
 	    if ( term2.rule() == rule1 && term2.dot_pos() == pos1 + 1 ) {
 	      ymuint dst_id = calc_term_id(state2->id(), i2);
 	      gen_list.push_back(make_pair(dst_id, token1));
+
+	      if ( debug ) {
+		cout << "Generation: " << token1->str() << endl
+		     << term2 << endl;
+	      }
 	      break;
 	    }
 	  }
 	}
       }
+      if ( debug ) {
+	cout << endl;
+      }
     }
   }
 
-  cout << "after look-ahead calculation" << endl;
-
   // S' -> . S, $ という先読みを追加する．
-  ymuint start_id = calc_term_id(start_state()->id(), 0);
+  ymuint start_id;
+  {
+    LR0State* state0 = start_state();
+    const vector<LR0Term>& term_list = state0->term_list();
+    ymuint n = term_list.size();
+    for (ymuint i = 0; i < n; ++ i) {
+      if ( term_list[i].rule() == grammer->start_rule() ) {
+	start_id = calc_term_id(state0->id(), i);
+	break;
+      }
+    }
+  }
   const Token* end = grammer->token(Grammer::kEnd);
   gen_list.push_back(make_pair(start_id, end));
 
@@ -199,8 +241,6 @@ LALR1Set::LALR1Set(Grammer* grammer) :
     }
   }
 
-  cout << "after look-ahead propagation" << endl;
-
   // gen_list の結果を記録する．
   for (vector<pair<ymuint, const Token*> >::iterator q = gen_list.begin();
        q != gen_list.end(); ++ q) {
@@ -220,10 +260,29 @@ LALR1Set::LALR1Set(Grammer* grammer) :
     }
   }
 
+  if ( debug ) {
+    for (vector<LR0State*>::const_iterator p = state_list().begin();
+	 p != state_list().end(); ++ p) {
+      LR0State* state = *p;
+      cout << "State#" << state->id() << endl;
+      const vector<LR0Term>& term_list = state->term_list();
+      ymuint n = term_list.size();
+      for (ymuint i = 0; i < n; ++ i) {
+	const LR0Term& term = term_list[i];
+	cout << term << ", ";
+	const vector<const Token*>& token_list1 = token_list(state->id(), i);
+	for (vector<const Token*>::const_iterator p = token_list1.begin();
+	     p != token_list1.end(); ++ p) {
+	  cout << " " << (*p)->str();
+	}
+	cout << endl;
+      }
+      cout << endl;
+    }
+  }
+
   mShiftList.resize(state_list().size());
   mReduceList.resize(state_list().size());
-
-  cout << "before action table generation" << endl;
 
   // 動作表を作る．
   for (vector<LR0State*>::const_iterator p = state_list().begin();
@@ -246,55 +305,62 @@ LALR1Set::LALR1Set(Grammer* grammer) :
     const vector<LR0Term>& term_list = state->term_list();
     ymuint n = term_list.size();
     for (ymuint i = 0; i < n; ++ i) {
-      const vector<const Token*>& token_list1 = token_list(state->id(), i);
-      for (vector<const Token*>::const_iterator q = token_list1.begin();
-	   q != token_list1.end(); ++ q) {
-	const Token* token = *q;
-	const LR0Term& term = term_list[i];
-	const Rule* rule = term.rule();
-	// const Token* left = rule->left()
-	// LR0State* next = state->next_state(left)
-	// token: reduce rule を記録
-	Action* action = NULL;
-	if ( !action_map.find(token->id(), action) ) {
-	  action = new Action();
-	  action_map.add(token->id(), action);
-	}
-	if ( action->shift_next != NULL ) {
-	  // token と rule->last_terminal() の優先順位を比較
-	  const Token* r_token = rule->last_terminal();
-	  if ( r_token != NULL ) {
-	    ymuint l_pri = token->priority();
-	    ymuint r_pri = r_token->priority();
-	    if ( l_pri > r_pri ) {
-	      // reduce は無視
-	      continue;
-	    }
-	    if ( l_pri < r_pri ) {
-	      // shift は無視
-	      action->shift_next = NULL;
-	    }
-	    switch ( token->assoc_type() ) {
-	    case kNotDefined:
-	      break;
+      const LR0Term& term = term_list[i];
+      if ( term.next_token() != NULL ) {
+	continue;
+      }
+      const Rule* rule = term.rule();
+      if ( rule == grammer->start_rule() ) {
+	// $ -> accept を記録
+	ymuint end_id = Grammer::kEnd;
+	action_map.add(end_id, new Action());
+      }
+      else {
+	const vector<const Token*>& token_list1 = token_list(state->id(), i);
+	for (vector<const Token*>::const_iterator q = token_list1.begin();
+	     q != token_list1.end(); ++ q) {
+	  const Token* token = *q;
+	  Action* action = NULL;
+	  if ( !action_map.find(token->id(), action) ) {
+	    action = new Action();
+	    action_map.add(token->id(), action);
+	  }
+	  if ( action->shift_next != NULL ) {
+	    // token と rule->last_terminal() の優先順位を比較
+	    const Token* r_token = rule->last_terminal();
+	    if ( r_token != NULL ) {
+	      ymuint l_pri = token->priority();
+	      ymuint r_pri = r_token->priority();
+	      if ( l_pri > r_pri ) {
+		// reduce は無視
+		continue;
+	      }
+	      if ( l_pri < r_pri ) {
+		// shift は無視
+		action->shift_next = NULL;
+	      }
+	      switch ( token->assoc_type() ) {
+	      case kNotDefined:
+		break;
 
-	    case kLeftAssoc:
-	      // shift は無視
-	      action->shift_next = NULL;
-	      break;
+	      case kLeftAssoc:
+		// shift は無視
+		action->shift_next = NULL;
+		break;
 
-	    case kRightAssoc:
-	      // reduce は無視
-	      continue;
+	      case kRightAssoc:
+		// reduce は無視
+		continue;
 
-	    case kNonAssoc:
-	      // syntax error
-	      cerr << "syntax error: cascade chain of non-assoc operators" << endl;
-	      break;
+	      case kNonAssoc:
+		// syntax error
+		cerr << "syntax error: cascade chain of non-assoc operators" << endl;
+		break;
+	      }
 	    }
 	  }
+	  action->reduce_list.push_back(rule);
 	}
-	action->reduce_list.push_back(rule);
       }
     }
 
@@ -318,16 +384,22 @@ LALR1Set::LALR1Set(Grammer* grammer) :
       }
       else {
 	ymuint n = action->reduce_list.size();
-	ASSERT_COND( n > 0 );
-	const Rule* rule0 = action->reduce_list[0];
-	if ( n > 1 ) {
-	  // reduce/reduce conflict
-	  for (ymuint i = 1; i < n; ++ i) {
-	    cerr << "warning: reduce/reduce conflict" << endl;
-	  }
+	if ( n == 0 ) {
+	  ASSERT_COND( token_id == Grammer::kEnd );
+	  mAcceptState = state->id();
 	}
-	// reduce token_id, rule0 を記録
-	reduce_list.push_back(make_pair(grammer->token(token_id), rule0));
+	else {
+	  ASSERT_COND( n > 0 );
+	  const Rule* rule0 = action->reduce_list[0];
+	  if ( n > 1 ) {
+	    // reduce/reduce conflict
+	    for (ymuint i = 1; i < n; ++ i) {
+	      cerr << "warning: reduce/reduce conflict" << endl;
+	    }
+	  }
+	  // reduce token_id, rule0 を記録
+	  reduce_list.push_back(make_pair(grammer->token(token_id), rule0));
+	}
       }
 
       delete action;
@@ -363,30 +435,37 @@ LALR1Set::print(ostream& s) const
     const vector<LR0Term>& term_list = state->term_list();
     ymuint n = term_list.size();
     for (ymuint i = 0; i < n; ++ i) {
-      const Rule* rule = term_list[i].rule();
-      ymuint pos = term_list[i].dot_pos();
-      const Token* left = rule->left();
-      s << "  " << left->str() << " ->";
-      ymuint nr = rule->right_size();
-      for (ymuint j = 0; j < nr; ++ j) {
-	if ( j == pos ) {
-	  s << " .";
-	}
-	s << " " << rule->right(j)->str();
-      }
-      if ( pos == nr ) {
-	s << " .";
-      }
-      s << " ,";
-      const vector<const Token*>& tlist = token_list(state->id(), i);
-      const char* slash = "";
-      for (vector<const Token*>::const_iterator q = tlist.begin();
-	   q != tlist.end(); ++ q) {
-	s << slash << (*q)->str();
-	slash = "/";
-      }
-      s << endl;
+      s << term_list[i] << endl;
     }
+    s << endl;
+
+    const vector<pair<const Token*, ymuint> >& shift_list = mShiftList[state->id()];
+    for (vector<pair<const Token*, ymuint> >::const_iterator p = shift_list.begin();
+	 p != shift_list.end(); ++ p) {
+      const Token* token = p->first;
+
+      ymuint next_id = p->second;
+      if ( token->rule_list().empty() ) {
+	s << token->str() << ": shift State#" << next_id << endl;
+      }
+      else {
+	s << token->str() << ": goto State#" << next_id << endl;
+      }
+    }
+
+    const vector<pair<const Token*, const Rule*> >& reduce_list = mReduceList[state->id()];
+    for (vector<pair<const Token*, const Rule*> >::const_iterator p = reduce_list.begin();
+	 p != reduce_list.end(); ++ p) {
+      const Token* token = p->first;
+      const Rule* rule = p->second;
+      s << token->str() << ": reduce Rule#" << rule->id() << endl;
+    }
+
+    if ( mAcceptState == state->id() ) {
+      s << "_end_: accept" << endl;
+    }
+
+    s << endl;
   }
   s << endl;
 }

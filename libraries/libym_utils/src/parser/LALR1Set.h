@@ -85,6 +85,9 @@ private:
   // 各状態ごとの reduce 動作リスト
   vector<vector<pair<const Token*, const Rule*> > > mReduceList;
 
+  // 受理する直前の状態番号
+  ymuint mAcceptState;
+
 };
 
 END_NAMESPACE_YM

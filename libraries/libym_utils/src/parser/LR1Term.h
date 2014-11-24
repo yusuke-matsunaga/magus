@@ -88,6 +88,11 @@ operator==(const LR1Term& left,
   return left.rule() == right.rule() && left.dot_pos() == right.dot_pos() && left.token() == right.token();
 }
 
+/// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const LR1Term& term);
+
 END_NAMESPACE_YM
 
 #endif // LR1TERM_H

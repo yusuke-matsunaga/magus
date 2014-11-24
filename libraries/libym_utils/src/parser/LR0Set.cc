@@ -20,6 +20,8 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
+const int debug = 0;
+
 // LR0Term の比較関数
 struct LR0TermLt
 {
@@ -53,6 +55,15 @@ void
 closure(const vector<LR0Term>& input,
 	vector<LR0Term>& output)
 {
+  if ( debug ) {
+    cout << "LR(0) closure:" << endl;
+    for (vector<LR0Term>::const_iterator p = input.begin();
+	 p != input.end(); ++ p) {
+      cout << *p << endl;
+    }
+    cout << endl;
+  }
+
   // 入力をコピーする．
   ymuint n = input.size();
   for (ymuint i = 0; i < n; ++ i) {
@@ -88,6 +99,15 @@ closure(const vector<LR0Term>& input,
 
   // ソートしておく．
   sort(output.begin(), output.end(), LR0TermLt());
+
+  if ( debug ) {
+    cout << "LR(0) closure end:" << endl;
+    for (vector<LR0Term>::const_iterator p = output.begin();
+	 p != output.end(); ++ p) {
+      cout << *p << endl;
+    }
+    cout << endl;
+  }
 }
 
 // @brief 遷移先の項集合を求める．
@@ -161,6 +181,10 @@ LR0Set::LR0Set(Grammer* grammer)
   // mStateList に未処理の状態が残っている限り以下の処理を繰り返す．
   for (ymuint rpos = 0; rpos < mStateList.size(); ++ rpos) {
     LR0State* cur_state = mStateList[rpos];
+    if ( debug ) {
+      cur_state->print(cout);
+      cout << endl;
+    }
     // cur_state に関係するトークンを取り出す．
     const vector<const Token*>& token_list = cur_state->token_list();
     for (vector<const Token*>::const_iterator p = token_list.begin();

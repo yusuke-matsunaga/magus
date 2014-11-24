@@ -29,8 +29,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] id トークンID
   /// @param[in] str 文字列
+  /// @param[in] pri 優先順位
+  /// @param[in] assoc 結合規則
   Token(ymuint id,
-	string str);
+	string str,
+	ymuint pri = 0,
+	AssocType assoc = kNotDefined);
 
   /// @brief デストラクタ
   ~Token();

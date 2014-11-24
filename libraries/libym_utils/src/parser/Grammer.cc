@@ -117,6 +117,8 @@ Grammer::Grammer()
   ASSERT_COND( mNotExist->id() == kNotExist );
 
   mStartRule = NULL;
+
+  mNextTermId = 0;
 }
 
 // @brief デストラクタ
@@ -137,12 +139,16 @@ Grammer::~Grammer()
 
 // @brief トークンを追加する．
 // @param[in] str 記号を表す文字列
+// @param[in] pri 優先順位
+// @param[in] assoc 結合規則
 // @return トークンを返す．
 Token*
-Grammer::add_token(string str)
+Grammer::add_token(string str,
+		   ymuint pri,
+		   AssocType assoc)
 {
   ymuint id = mTokenList.size();
-  Token* token = new Token(id, str);
+  Token* token = new Token(id, str, pri, assoc);
   mTokenList.push_back(token);
   return token;
 }

@@ -9,6 +9,7 @@
 
 #include "LR1Term.h"
 #include "Rule.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -64,6 +65,32 @@ const Token*
 LR1Term::token() const
 {
   return mToken;
+}
+
+// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const LR1Term& term)
+{
+  const Rule* rule = term.rule();
+  ymuint pos = term.dot_pos();
+  const Token* left = rule->left();
+  s << "  " << left->str() << " ->";
+  ymuint nr = rule->right_size();
+  for (ymuint j = 0; j < nr; ++ j) {
+    if ( j == pos ) {
+      s << " .";
+    }
+    s << " " << rule->right(j)->str();
+  }
+  if ( pos == nr ) {
+    s << " .";
+  }
+  const Token* la = term.token();
+  if ( la != NULL ) {
+    s << ", " << la->str();
+  }
+  return s;
 }
 
 END_NAMESPACE_YM

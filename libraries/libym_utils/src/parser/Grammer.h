@@ -89,9 +89,13 @@ public:
 
   /// @brief トークンを追加する．
   /// @param[in] str 記号を表す文字列
+  /// @param[in] pri 優先順位
+  /// @param[in] assoc 結合規則
   /// @return トークンを返す．
   Token*
-  add_token(string str);
+  add_token(string str,
+	    ymuint pri = 0,
+	    AssocType assoc = kNotDefined);
 
   /// @brief 文法規則を追加する．
   /// @param[in] left 左辺のトークン番号

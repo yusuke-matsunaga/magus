@@ -9,6 +9,7 @@
 
 #include "LR0Term.h"
 #include "Rule.h"
+#include "Token.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -54,6 +55,28 @@ LR0Term::next_token() const
     return mRule->right(mPos);
   }
   return NULL;
+}
+
+// @brief ストリーム出力
+ostream&
+operator<<(ostream& s,
+	   const LR0Term& term)
+{
+  const Rule* rule = term.rule();
+  ymuint pos = term.dot_pos();
+  const Token* left = rule->left();
+  s << "  " << left->str() << " ->";
+  ymuint nr = rule->right_size();
+  for (ymuint j = 0; j < nr; ++ j) {
+    if ( j == pos ) {
+      s << " .";
+    }
+    s << " " << rule->right(j)->str();
+  }
+  if ( pos == nr ) {
+    s << " .";
+  }
+  return s;
 }
 
 END_NAMESPACE_YM

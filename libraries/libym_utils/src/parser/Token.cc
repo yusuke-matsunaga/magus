@@ -19,10 +19,16 @@ BEGIN_NAMESPACE_YM
 // @brief コンストラクタ
 // @param[in] id トークンID
 // @param[in] str 文字列
+// @param[in] pri 優先順位
+// @param[in] assoc 結合規則
 Token::Token(ymuint id,
-	     string str) :
+	     string str,
+	     ymuint pri,
+	     AssocType assoc) :
   mId(id),
-  mStr(str)
+  mStr(str),
+  mPri(pri),
+  mAssocType(assoc)
 {
 }
 
