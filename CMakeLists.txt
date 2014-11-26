@@ -113,6 +113,7 @@ add_subdirectory (libraries/libym_cell)
 add_subdirectory (libraries/libym_verilog)
 add_subdirectory (libraries/libym_networks)
 add_subdirectory (libraries/libym_ymsh)
+add_subdirectory (libraries/libymsl)
 
 if (TCL_FOUND)
   add_subdirectory (libraries/libym_tclpp)
