@@ -10,6 +10,7 @@
 #include "YmUtils/IDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StrListIDO.h"
+#include "YmUtils/StringIDO.h"
 #include "YmUtils/StrBuff.h"
 #include "YmUtils/MsgMgr.h"
 #include "YmUtils/FileRegion.h"
@@ -206,6 +207,7 @@ StreamIDO::read(ymuint8* buff,
   return mS.readsome(reinterpret_cast<char*>(buff), n);
 }
 
+
 //////////////////////////////////////////////////////////////////////
 // クラス StrListIDO
 //////////////////////////////////////////////////////////////////////
@@ -277,6 +279,81 @@ StrListIDO::read(ymuint8* buff,
     if ( mColumnNum >= str.size() ) {
       ++ mLineNum;
       mColumnNum = 0;
+    }
+  }
+  return count;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス StringIDO
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] strt 文字列
+StringIDO::StringIDO(const char* str) :
+  mString(str)
+{
+  mLineNum = 0;
+  mColumnNum = 0;
+}
+
+// @brief デストラクタ
+StringIDO::~StringIDO()
+{
+}
+
+// @brief 読み出し可能なら true を返す．
+bool
+StringIDO::is_ready() const
+{
+  if ( mColumnNum < mString.size() ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+// @brief オープン中のファイル情報を得る．
+const FileInfo&
+StringIDO::file_info() const
+{
+  return mFileInfo;
+}
+
+// @brief 現在のファイル情報を書き換える．
+// @param[in] new_info 新しいファイル情報
+// @note プリプロセッサのプラグマなどで用いることを想定している．
+// @note 通常は使わないこと．
+void
+StringIDO::set_file_info(const FileInfo& file_info)
+{
+  mFileInfo = file_info;
+}
+
+// @brief データを読み込む．
+// @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
+// @param[in] n 読み込むデータサイズ
+// @return 実際に読み込んだ量を返す．
+ssize_t
+StringIDO::read(ymuint8* buff,
+		ymuint64 n)
+{
+  ymuint count = 0;
+  while ( n > 0 && mColumnNum < mString.size() ) {
+    ymuint src_size = mString.size() - mColumnNum;
+    ymuint n1 = src_size;
+    if ( n1 > n ) {
+      n1 = n;
+    }
+    for (ymuint i = 0; i < n1; ++ i, ++ mColumnNum) {
+      buff[count + i] = mString[mColumnNum];
+    }
+    n -= n1;
+    count += n1;
+    if ( mColumnNum >= mString.size() ) {
+      break;
     }
   }
   return count;

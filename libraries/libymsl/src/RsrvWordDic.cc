@@ -12,6 +12,8 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+#include "grammer.hh"
+
 BEGIN_NONAMESPACE
 
 // 表を作るためのデータ構造
@@ -23,17 +25,54 @@ struct STpair {
 // 予約語のデータの配列
 static
 STpair init_data[] = {
-  { "if",       IF       },
-  { "else",     ELSE     },
-  { "elif",     ELIF     },
-  { "for",      FOR      },
-  { "while",    WHILE    },
-  { "do",       DO       },
-  { "goto",     GOTO     },
-  { "break",    BREAK    },
-  { "continue", CONTINUE },
-  { "function", FUNCTION },
-  { "var",      VAR      }
+  { ":",        COLON      },
+  { ";",        SEMI       },
+  { ",",        COMMA      },
+  { ".",        DOT        },
+  { "++",       PLUSPLUS   },
+  { "--",       MINUSMINUS },
+  { "+",        PLUS       },
+  { "-",        MINUS      },
+  { "*",        MULT       },
+  { "/",        DIV        },
+  { "%",        MOD        },
+  { "not",      LOGNOT     },
+  { "and",      LOGAND     },
+  { "or",       LOGOR      },
+  { "~",        BITNEG     },
+  { "&",        BITAND     },
+  { "|",        BITOR      },
+  { "^",        BITXOR     },
+  { "==",       EQEQ       },
+  { "!=",       NOTEQ      },
+  { "<",        LT         },
+  { ">",        GT         },
+  { "<=",       LE         },
+  { ">=",       GE         },
+  { "=",        EQ         },
+  { "(",        LP         },
+  { ")",        RP         },
+  { "{",        LCB        },
+  { "}",        RCB        },
+  { "[",        LBK        },
+  { "]",        RBK        },
+  { "if",       IF         },
+  { "else",     ELSE       },
+  { "elif",     ELIF       },
+  { "for",      FOR        },
+  { "while",    WHILE      },
+  { "do",       DO         },
+  { "goto",     GOTO       },
+  { "break",    BREAK      },
+  { "continue", CONTINUE   },
+  { "switch",   SWITCH     },
+  { "case",     CASE       },
+  { "function", FUNCTION   },
+  { "var",      VAR        },
+  { "int",      INT        },
+  { "float",    FLOAT      },
+  { "_symbol_", SYMBOL     },
+  { "_string_", STRING     },
 };
 
 // 文字列からのハッシュ関数
@@ -56,18 +95,25 @@ RsrvWordDic::RsrvWordDic()
 {
   mSize = sizeof(init_data) / sizeof(STpair);
   mCellArray = new Cell[mSize];
-  mTable = new Cell*[mSize];
+  mTable1 = new Cell*[mSize];
+  mTable2 = new Cell*[mSize];
   for (ymuint i = 0; i < mSize; ++ i) {
-    mTable[i] = NULL;
+    mTable1[i] = NULL;
+    mTable2[i] = NULL;
   }
   for (ymuint i = 0; i < mSize; ++ i) {
     STpair& p = init_data[i];
     Cell* cell = &mCellArray[i];
     cell->mStr = p.mStr;
     cell->mTok = p.mTok;
-    ymuint pos1 = hash_func1(p.mStr) % mSize;
-    cell->mLink = mTable[pos1];
-    mTable[pos1] = cell;
+    if ( isascii(p.mStr[0]) ) {
+      ymuint pos1 = hash_func1(p.mStr) % mSize;
+      cell->mLink1 = mTable1[pos1];
+      mTable1[pos1] = cell;
+    }
+    ymuint pos2 = p.mTok % mSize;
+    cell->mLink2 = mTable2[pos2];
+    mTable2[pos2] = cell;
   }
 }
 
@@ -75,7 +121,8 @@ RsrvWordDic::RsrvWordDic()
 RsrvWordDic::~RsrvWordDic()
 {
   delete [] mCellArray;
-  delete [] mTable;
+  delete [] mTable1;
+  delete [] mTable2;
 }
 
 // str が予約語ならそのトークン番号を返す．
@@ -84,7 +131,7 @@ TokenType
 RsrvWordDic::token(const char* str) const
 {
   ymuint pos = hash_func1(str) % mSize;
-  for (Cell* cell = mTable[pos]; cell; cell = cell->mLink) {
+  for (Cell* cell = mTable1[pos]; cell; cell = cell->mLink1) {
     if ( strcmp(str, cell->mStr) == 0 ) {
       return cell->mTok;
     }
@@ -94,118 +141,15 @@ RsrvWordDic::token(const char* str) const
 
 // @brief トークン番号から文字列を返す関数
 const char*
-token2str(TokenType token)
+RsrvWordDic::str(TokenType token) const
 {
-  static const char* table[] = {
-    /// @brief コロン(:)
-    ":",
-    /// @brief セミコロン(;)
-    ";",
-    /// @brief コンマ(,)
-    ",",
-    /// @brief ドット(.)
-    ".",
-
-    /// @brief プラス(+)
-    "+",
-    /// @brief マイナス(-)
-    "-",
-    /// @brief かける(*)
-    "*",
-    /// @brief わる(/)
-    "/",
-    /// @brief 余り(%)
-    "%",
-    /// @brief ++
-    "++",
-    /// @brief --
-    "--",
-
-    /// @brief logical not(!)
-    "!",
-    /// @brief logical and(&&)
-    "&&",
-    /// @brief logical or(||)
-    "||",
-    /// @brief 等しい(==)
-    "==",
-    /// @brief 等しくない(!=)
-    "!=",
-    /// @brief 小なり(<)
-    "<",
-    /// @brief 大なり(>)
-    ">",
-    /// @brief 小なりイコール(<=)
-    "<=",
-    /// @brief 大なりイコール(>=)
-    ">=",
-
-    /// @brief bitwise not(~)
-    "~",
-    /// @brief bitwise and(&)
-    "&",
-    /// @brief bitwise or(|)
-    "|",
-    /// @brief bitwise xor(^)
-    "^",
-
-    /// @brief 代入 (=)
-    "=",
-
-    /// @brief 左括弧( ( )
-    "(",
-    /// @brief 右括弧( ) )
-    ")",
-    /// @brief 左中括弧( { )
-    "{",
-    /// @brief 右中括弧( } )
-    "}",
-    /// @brief 左角括弧( [ )
-    "[",
-    /// @brief 右角括弧( ] )
-    "]",
-
-    /// @brief 'if'
-    "if",
-    /// @brief 'else'
-    "else",
-    /// @brief 'elif'
-    "elif",
-    /// @brief 'for'
-    "for",
-    /// @brief 'while'
-    "while",
-    /// @brief 'do'
-    "do",
-    /// @brief 'goto'
-    "goto",
-    /// @brief 'break'
-    "break",
-    /// @brief 'continue'
-    "continue",
-
-    /// @brief 'function'
-    "function",
-    /// @brief 'return'
-    "return",
-    /// @brief 'var'
-    "var",
-
-    /// @brief シンボル
-    "__symbol__",
-    /// @brief 整数値
-    "__int_num__",
-    /// @brief 浮動小数点数値
-    "__float_num__",
-    /// @brief 文字列リテラル
-    "__string__",
-    /// @brief エラー
-    "__error__",
-    /// @brief ファイルの末尾
-    "__end__"
-  };
-
-  return table[token];
+  ymuint pos = token % mSize;
+  for (Cell* cell = mTable2[pos]; cell; cell = cell->mLink2) {
+    if ( token == cell->mTok ) {
+      return cell->mStr;
+    }
+  }
+  return NULL;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -8,26 +8,31 @@
 
 
 #include "../src/YmslScanner.h"
+#include "../src/RsrvWordDic.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
+#include "YmUtils/StringIDO.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
+
 
 int
 scanner_test1(IDO& ido)
 {
   YmslScanner scanner(ido);
+  RsrvWordDic dic;
 
   for ( ; ; ) {
     FileRegion loc;
     TokenType token = scanner.read_token(loc);
-    cout << loc << ": " << token2str(token);
+    cout << loc << ": ";
     switch ( token ) {
-    case SYMBOL: cout << scanner.cur_string(); break;
-    case INT_NUM: cout << scanner.cur_int(); break;
-    case FLOAT_NUM: cout << scanner.cur_float(); break;
-    default: break;
+    case SYMBOL:    cout << "SYMBOL[" << scanner.cur_string() << "]"; break;
+    case INT_NUM:   cout << "INT[" << scanner.cur_int() << "]"; break;
+    case FLOAT_NUM: cout << "FLOAT[" << scanner.cur_float() << "]"; break;
+    case END:       cout << "END"; break;
+    default:        cout << dic.str(token); break;
     }
     cout << endl;
     if ( token == END ) {
@@ -42,7 +47,61 @@ scanner_test(int argc,
 	     char** argv)
 {
   if ( argc == 1 ) {
-    StreamIDO ido(cin);
+    const char* str =
+      ":\n"
+      ";\n"
+      ",\n"
+      ".\n"
+      "++\n"
+      "--\n"
+      "+\n"
+      "-\n"
+      "*\n"
+      "/\n"
+      "%\n"
+      "not\n"
+      "and\n"
+      "or\n"
+      "~\n"
+      "&\n"
+      "|\n"
+      "^\n"
+      "==\n"
+      "!=\n"
+      "<\n"
+      ">\n"
+      "<=\n"
+      ">=\n"
+      "=\n"
+      "(\n"
+      ")\n"
+      "{\n"
+      "}\n"
+      "[\n"
+      "]\n"
+      "if\n"
+      "else\n"
+      "elif\n"
+      "for\n"
+      "while\n"
+      "do\n"
+      "goto\n"
+      "break\n"
+      "continue\n"
+      "switch\n"
+      "case\n"
+      "function\n"
+      "var\n"
+      "int\n"
+      "float\n"
+      "abcd\n"
+      "1\n"
+      "1.23450\n"
+      "//comment\n"
+      "/*-----\n"
+      "-----*/\n";
+
+    StringIDO ido(str);
     return scanner_test1(ido);
   }
   else {

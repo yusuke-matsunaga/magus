@@ -18,6 +18,8 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+#include "grammer.hh"
+
 //////////////////////////////////////////////////////////////////////
 /// @class YmslScanner YmslScanner.h "YmslScanner.h"
 /// @brief YMSL 用の字句解析器
@@ -45,6 +47,13 @@ public:
   /// @return トークンの型を返す．
   TokenType
   read_token(FileRegion& loc);
+
+  /// @brief 読んだトークンを戻す．
+  /// @param[in] token トークン
+  /// @param[in] loc ファイル位置
+  void
+  unget_token(TokenType token,
+	      const FileRegion& loc);
 
   /// @brief 直前の read_token() に対応する文字列を返す．
   const char*
@@ -87,6 +96,13 @@ private:
 
   // 予約後表
   RsrvWordDic mRsrvWordDic;
+
+  // unget したトークン
+  // unget していない場合は ERROR を入れておく．
+  TokenType mUngetToken;
+
+  // unget したファイル位置
+  FileRegion mUngetLoc;
 
 };
 

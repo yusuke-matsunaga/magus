@@ -29,6 +29,11 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_YMSL
 
+class YmslAst;
+class YmslParser;
+class YmslScanner;
+
+#if 0
 /// @brief トークンの値
 enum TokenType {
   /// @brief コロン(:)
@@ -138,6 +143,9 @@ enum TokenType {
   /// @brief ファイルの末尾
   END
 };
+#else
+typedef int TokenType;
+#endif
 
 /// @brief トークン番号から文字列を返す関数
 extern

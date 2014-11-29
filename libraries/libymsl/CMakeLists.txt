@@ -4,8 +4,9 @@
 # ===================================================================
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}
-  ${Readline_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 
@@ -15,8 +16,40 @@ include_directories(
 
 set (ymsl_SOURCES
   src/RsrvWordDic.cc
+  src/YmslAstBinOp.cc
+  src/YmslAstFloat.cc
+  src/YmslAstImpl.cc
+  src/YmslAstInt.cc
+  src/YmslAstString.cc
+  src/YmslAstSymbol.cc
+  src/YmslAstUniOp.cc
+  src/YmslParser.cc
   src/YmslScanner.cc
+
+  ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
   )
+
+
+# Create target for the parser
+add_custom_target ( grammer ALL
+  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/grammer.hh"
+  "${CMAKE_CURRENT_BINARY_DIR}/grammer.cc"
+  )
+
+# Create custom command for bison/yacc (note the DEPENDS)
+add_custom_command (
+  COMMAND "${BISON_EXECUTABLE}"
+  -y "${CMAKE_CURRENT_SOURCE_DIR}/src/grammer.yy"
+  -o "${CMAKE_CURRENT_BINARY_DIR}/grammer.cc"
+  -d -v
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/grammer.cc"
+  "${CMAKE_CURRENT_BINARY_DIR}/grammer.hh"
+  "${CMAKE_CURRENT_BINARY_DIR}/grammer.output"
+  )
+
+# Since verilog_grammer.cc does not exists yet when cmake is run, mark
+# it as generated
+set_source_files_properties ( ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc GENERATED )
 
 
 # ===================================================================

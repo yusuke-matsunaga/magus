@@ -13,11 +13,14 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+#include "grammer.hh"
+
 // @brief コンストラクタ
 // @param[in] ido 入力データ
 YmslScanner::YmslScanner(IDO& ido) :
   Scanner(ido)
 {
+  mUngetToken = DUMMY;
 }
 
 // デストラクタ
@@ -30,6 +33,13 @@ YmslScanner::~YmslScanner()
 TokenType
 YmslScanner::read_token(FileRegion& loc)
 {
+  if ( mUngetToken != DUMMY ) {
+    TokenType token = mUngetToken;
+    loc = mUngetLoc;
+    mUngetToken = DUMMY;
+    return token;
+  }
+
   TokenType type = scan();
   loc = cur_loc();
   return type;
@@ -40,12 +50,10 @@ YmslScanner::read_token(FileRegion& loc)
 TokenType
 YmslScanner::scan()
 {
-  int c;
-
   mCurString.clear();
 
  ST_INIT: // 初期状態
-  c = get();
+  int c = get();
   set_first_loc();
   if ( is_symbol(c) ) {
     mCurString.put_char(c);
@@ -110,13 +118,13 @@ YmslScanner::scan()
     goto ST_NOT;
 
   case '&':
-    goto ST_AND;
+    return BITAND;
 
   case '|':
-    goto ST_OR;
+    return BITOR;
 
   case '~':
-    return BITNOT;
+    return BITNEG;
 
   case '^':
     return BITXOR;
@@ -157,7 +165,7 @@ YmslScanner::scan()
 		    "syntax error");
     return ERROR;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
  ST_DOT: // '.' を読み込んだ時
   c = peek();
@@ -185,6 +193,10 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUM1;
   }
+  if ( c == '-' ) {
+    accept();
+    return MINUSMINUS;
+  }
   return MINUS;
 
  ST_NOT: // '!' を読み込んだ時
@@ -193,23 +205,16 @@ YmslScanner::scan()
     accept();
     return NOTEQ;
   }
-  return LNOT;
-
- ST_AND: // '&' を読み込んだ時
-  c = peek();
-  if ( c == '&' ) {
-    accept();
-    return LAND;
+  {
+    ostringstream buf;
+    buf << "unexpected character '!'";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    cur_loc(),
+		    kMsgError,
+		    "DOTLIB_LEX",
+		    buf.str());
+    return ERROR;
   }
-  return BITAND;
-
- ST_OR: // '|' を読み込んだ時
-  c = peek();
-  if ( c == '|' ) {
-    accept();
-    return LOR;
-  }
-  return BITOR;
 
  ST_EQ: // '=' を読み込んだ時
   c = peek();
@@ -247,6 +252,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUMDOT;
   }
+  cout << "cur_int() = " << cur_int() << endl;
   return INT_NUM;
 
  ST_NUMDOT: // [0-9]+'.' を読み込んだ時
@@ -279,6 +285,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUM3;
   }
+  cout << "cur_float() = " << cur_float() << endl;
   return FLOAT_NUM;
 
  ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
@@ -311,6 +318,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUM4;
   }
+  cout << "cur_float() = " << cur_float() << endl;
   return FLOAT_NUM;
 
  ST_ID: // 一文字目が[a-zA-Z_]の時
@@ -413,6 +421,18 @@ YmslScanner::scan()
 		    buf.str());
   }
   return ERROR;
+}
+
+// @brief 読んだトークンを戻す．
+// @param[in] token トークン
+// @param[in] loc ファイル位置
+void
+YmslScanner::unget_token(TokenType token,
+			 const FileRegion& loc)
+{
+  ASSERT_COND( mUngetToken == DUMMY );
+  mUngetToken = token;
+  mUngetLoc = loc;
 }
 
 // @brief c が文字の時に true を返す．

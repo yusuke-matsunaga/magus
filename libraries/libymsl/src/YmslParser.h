@@ -10,7 +10,8 @@
 
 
 #include "ymsl_int.h"
-#include "YmslScanner.h"
+#include "YmUtils/IDO.h"
+#include "YmUtils/FileRegion.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -23,10 +24,31 @@ class YmslParser
 {
 public:
 
+  /// @brief コンストラクタ
+  YmslParser();
+
+  /// @brief デストラクタ
+  ~YmslParser();
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 読み込む．
+  /// @param[in] ido 入力データ
+  /// @return 成功したら true を返す．
+  bool
+  read(IDO& ido);
+
+  /// @brief yylex とのインターフェイス
+  /// @param[out] lvalp 値を格納する変数
+  /// @param[out] llocp 位置情報を格納する変数
+  /// @return 読み込んだトークンの id を返す．
+  int
+  yylex(YmslAst*& lval,
+	FileRegion& lloc);
 
 
 private:
@@ -34,21 +56,63 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 式を読む．
+  /// @brief + 式を作る．
+  /// @param[in] left, right オペランド
   YmslAst*
-  read_expr();
+  new_AstPlus(YmslAst* left,
+	      YmslAst* right);
 
-  /// @brief 項を読む．
+  /// @brief - 式を作る．
+  /// @param[in] left, right オペランド
   YmslAst*
-  read_term();
+  new_AstMinus(YmslAst* left,
+	       YmslAst* right);
 
-  /// @brief ファクターを読む．
+  /// @brief * 式を作る．
+  /// @param[in] left, right オペランド
   YmslAst*
-  read_factor();
+  new_AstMult(YmslAst* left,
+	      YmslAst* right);
 
-  /// @brief プライマリを読む．
+  /// @brief / 式を作る．
+  /// @param[in] left, right オペランド
   YmslAst*
-  read_primary();
+  new_AstDiv(YmslAst* left,
+	     YmslAst* right);
+
+  /// @brief % 式を作る．
+  /// @param[in] left, right オペランド
+  YmslAst*
+  new_AstMod(YmslAst* left,
+	     YmslAst* right);
+
+  /// @brief 識別子式を作る．
+  /// @param[in] val 値
+  /// @param[in] loc ファイル位置
+  YmslAst*
+  new_AstSymbol(const char* val,
+		const FileRegion& loc);
+
+  /// @brief 文字列定数式を作る．
+  /// @param[in] val 値
+  /// @param[in] loc ファイル位置
+  YmslAst*
+  new_AstString(const char* val,
+		const FileRegion& loc);
+
+  /// @brief 整数定数式を作る．
+  /// @param[in] val 値
+  /// @param[in] loc ファイル位置
+  YmslAst*
+  new_AstInt(int val,
+	     const FileRegion& loc);
+
+  /// @brief 浮動小数点定数式を作る．
+  /// @param[in] val 値
+  /// @param[in] loc ファイル位置
+  YmslAst*
+  new_AstFloat(double val,
+	       const FileRegion& loc);
 
 
 private:
@@ -58,6 +122,9 @@ private:
 
   // 字句解析器
   YmslScanner* mScanner;
+
+  // 構文木の根
+  YmslAst* mRoot;
 
 };
 

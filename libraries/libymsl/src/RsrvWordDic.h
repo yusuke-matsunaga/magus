@@ -38,6 +38,13 @@ public:
   TokenType
   token(const char* str) const;
 
+  /// @brief トークンから文字列を取り出す．
+  /// @param[in] token トークン番号
+  /// @return token に対応した文字列を返す．\n
+  /// トークンが正しくなければ NULL を返す．
+  const char*
+  str(TokenType token) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -54,7 +61,10 @@ private:
     TokenType mTok;
 
     // ハッシュ用のリンク
-    Cell* mLink;
+    Cell* mLink1;
+
+    // トークンをキーとしたハッシュ用のリンク
+    Cell* mLink2;
 
   };
 
@@ -68,7 +78,10 @@ private:
   Cell* mCellArray;
 
   // 文字列をキーとしてトークンを持つハッシュ表
-  Cell** mTable;
+  Cell** mTable1;
+
+  // トークンをキーとして文字列を持つハッシュ表
+  Cell** mTable2;
 
   // テーブルサイズ
   ymuint mSize;
