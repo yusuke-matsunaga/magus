@@ -23,6 +23,32 @@ enum AstType
   kAstInt,
   kAstFloat,
 
+  kAstStringType,
+  kAstIntType,
+  kAstFloatType,
+  kAstUserType,
+
+  kAstList,
+
+  kAstVarDecl,
+  kAstFuncDecl,
+
+  kAstAssignment,
+
+  kAstIf,
+  kAstElif,
+  kAstElse,
+  kAstFor,
+  kAstWhile,
+  kAstDoWhile,
+  kAstSwitch,
+  kAstCaseItem,
+  kAstGoto,
+  kAstLabel,
+  kAstBreak,
+  kAstContinue,
+  kAstReturn,
+
   kAstUniPlus,
   kAstUniMinus,
   kAstPlus,
@@ -41,20 +67,14 @@ enum AstType
   kAstLogOr,
   kAstLogXor,
 
+  kAstEqEq,
+  kAstNotEq,
+  kAstLt,
+  kAstGt,
+  kAstLe,
+  kAstGe,
+
   kAstFuncCall,
-
-  kAstFuncDecl,
-  kAstVarDecl,
-
-  kAstAssign,
-
-  kAstIf,
-  kAstElif,
-  kAstElse,
-  kAstFor,
-  kAstWhile,
-  kAstDoWhile,
-  kAstSwitch,
 };
 
 
@@ -111,6 +131,11 @@ public:
   virtual
   YmslAst*
   child(ymuint pos) const = 0;
+
+  /// @brief 子供を追加する．
+  virtual
+  void
+  add_child(YmslAst* child) = 0;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

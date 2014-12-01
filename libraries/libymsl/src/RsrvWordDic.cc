@@ -71,8 +71,13 @@ STpair init_data[] = {
   { "var",      VAR        },
   { "int",      INT        },
   { "float",    FLOAT      },
+#if 0
+  { "string",   STRING     },
+#endif
   { "_symbol_", SYMBOL     },
-  { "_string_", STRING     },
+  { "_int_",    INT_NUM    },
+  { "_float_",  FLOAT_NUM  },
+  { "_string_", STRING_VAL },
 };
 
 // 文字列からのハッシュ関数

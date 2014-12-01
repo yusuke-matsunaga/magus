@@ -31,11 +31,11 @@ scanner_test1(IDO& ido)
     case SYMBOL:    cout << "SYMBOL[" << scanner.cur_string() << "]"; break;
     case INT_NUM:   cout << "INT[" << scanner.cur_int() << "]"; break;
     case FLOAT_NUM: cout << "FLOAT[" << scanner.cur_float() << "]"; break;
-    case END:       cout << "END"; break;
+    case EOF:       cout << "EOF"; break;
     default:        cout << dic.str(token); break;
     }
     cout << endl;
-    if ( token == END ) {
+    if ( token == EOF ) {
       break;
     }
   }

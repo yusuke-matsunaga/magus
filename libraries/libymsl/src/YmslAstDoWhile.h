@@ -1,35 +1,39 @@
-#ifndef YMSLASTIMPL_H
-#define YMSLASTIMPL_H
+#ifndef YMSLASTDOWHILE_H
+#define YMSLASTDOWHILE_H
 
-/// @file YmslAstImpl.h
-/// @brief YmslAstImpl のヘッダファイル
+/// @file YmslAstDoWhile.h
+/// @brief YmslAstDoWhile のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAst.h"
+#include "YmslAstImpl.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstImpl YmslAstImpl.h "YmslAstImpl.h"
-/// @brief YmslAst の実装クラス
+/// @class YmslAstDoWhile YmslAstDoWhile.h "YmslAstDoWhile.h"
+/// @brief for 文を表す YmslAst
 //////////////////////////////////////////////////////////////////////
-class YmslAstImpl :
-  public YmslAst
+class YmslAstDoWhile :
+  public YmslAstImpl
 {
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] body 本文
+  /// @param[in] cond 条件式
   /// @param[in] loc ファイル位置
-  YmslAstImpl(const FileRegion& loc);
+  YmslAstDoWhile(YmslAst* body,
+		 YmslAst* cond,
+		 const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstImpl();
+  ~YmslAstDoWhile();
 
 
 public:
@@ -37,25 +41,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ファイル位置を得る．
+  /// @brief 型を得る．
   virtual
-  const FileRegion&
-  file_region() const;
-
-  /// @brief 文字列型の値を返す．
-  virtual
-  const char*
-  str_val() const;
-
-  /// @brief 整数型の値を返す．
-  virtual
-  int
-  int_val() const;
-
-  /// @brief 浮動小数点型の値を返す．
-  virtual
-  double
-  float_val() const;
+  AstType
+  type() const;
 
   /// @brief 子供の数を返す．
   virtual
@@ -68,10 +57,11 @@ public:
   YmslAst*
   child(ymuint pos) const;
 
-  /// @brief 子供を追加する．
+  /// @brief 内容を表示する．(デバッグ用)
+  /// @param[in] s 出力ストリーム
   virtual
   void
-  add_child(YmslAst* child);
+  print(ostream& s) const;
 
 
 private:
@@ -79,12 +69,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ファイル位置
-  FileRegion mLoc;
+  // 要素の配列
+  YmslAst* mChildList[2];
 
 };
 
 END_NAMESPACE_YM_YMSL
 
 
-#endif // YMSLASTIMPL_H
+#endif // YMSLASTDOWHILE_H

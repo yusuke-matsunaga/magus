@@ -1,8 +1,8 @@
-#ifndef YMSLASTIMPL_H
-#define YMSLASTIMPL_H
+#ifndef YMSLASTLIST_H
+#define YMSLASTLIST_H
 
-/// @file YmslAstImpl.h
-/// @brief YmslAstImpl のヘッダファイル
+/// @file YmslAstList.h
+/// @brief YmslAstList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,21 +15,20 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstImpl YmslAstImpl.h "YmslAstImpl.h"
-/// @brief YmslAst の実装クラス
+/// @class YmslAstList YmslAstList.h "YmslAstList.h"
+/// @brief リストを表す YmslAst
 //////////////////////////////////////////////////////////////////////
-class YmslAstImpl :
+class YmslAstList :
   public YmslAst
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] loc ファイル位置
-  YmslAstImpl(const FileRegion& loc);
+  YmslAstList();
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstImpl();
+  ~YmslAstList();
 
 
 public:
@@ -41,6 +40,11 @@ public:
   virtual
   const FileRegion&
   file_region() const;
+
+  /// @brief 型を得る．
+  virtual
+  AstType
+  type() const;
 
   /// @brief 文字列型の値を返す．
   virtual
@@ -73,6 +77,12 @@ public:
   void
   add_child(YmslAst* child);
 
+  /// @brief 内容を表示する．(デバッグ用)
+  /// @param[in] s 出力ストリーム
+  virtual
+  void
+  print(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -82,9 +92,11 @@ private:
   // ファイル位置
   FileRegion mLoc;
 
+  // リストの本体
+  vector<YmslAst*> mList;
+
 };
 
 END_NAMESPACE_YM_YMSL
 
-
-#endif // YMSLASTIMPL_H
+#endif // YMSLASTLIST_H

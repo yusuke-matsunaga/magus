@@ -70,7 +70,7 @@ YmslScanner::scan()
     goto ST_DOT;
 
   case EOF:
-    return END;
+    return EOF;
 
   case ' ':
   case '\t':
@@ -252,7 +252,6 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUMDOT;
   }
-  cout << "cur_int() = " << cur_int() << endl;
   return INT_NUM;
 
  ST_NUMDOT: // [0-9]+'.' を読み込んだ時
@@ -333,7 +332,7 @@ YmslScanner::scan()
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
   c = get();
   if ( c == '\"' ) {
-    return STRING;
+    return STRING_VAL;
   }
   if ( c == '\n' ) {
     ostringstream buf;
@@ -383,7 +382,7 @@ YmslScanner::scan()
     goto ST_INIT;
   }
   if ( c == EOF ) {
-    return END;
+    return EOF;
   }
   goto ST_COMMENT2;
 

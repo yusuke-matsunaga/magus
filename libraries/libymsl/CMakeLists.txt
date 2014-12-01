@@ -45,6 +45,7 @@ add_custom_command (
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/grammer.cc"
   "${CMAKE_CURRENT_BINARY_DIR}/grammer.hh"
   "${CMAKE_CURRENT_BINARY_DIR}/grammer.output"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/grammer.yy"
   )
 
 # Since verilog_grammer.cc does not exists yet when cmake is run, mark
@@ -70,5 +71,13 @@ add_executable(scanner_test
   )
 
 target_link_libraries(scanner_test
+  ymsl
+  )
+
+add_executable(parser_test
+  tests/parser_test.cc
+  )
+
+target_link_libraries(parser_test
   ymsl
   )

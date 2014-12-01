@@ -348,4 +348,154 @@ YmslAstLogXor::type() const
   return kAstLogXor;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstEqEq
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] left, right オペランド
+YmslAstEqEq::YmslAstEqEq(YmslAst* left,
+			 YmslAst* right) :
+  YmslAstBinOp(left, right)
+{
+}
+
+// @brief デストラクタ
+YmslAstEqEq::~YmslAstEqEq()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstEqEq::type() const
+{
+  return kAstEqEq;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstNotEq
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] left, right オペランド
+YmslAstNotEq::YmslAstNotEq(YmslAst* left,
+			   YmslAst* right) :
+  YmslAstBinOp(left, right)
+{
+}
+
+// @brief デストラクタ
+YmslAstNotEq::~YmslAstNotEq()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstNotEq::type() const
+{
+  return kAstNotEq;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstLt
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] left, right オペランド
+YmslAstLt::YmslAstLt(YmslAst* left,
+		     YmslAst* right) :
+  YmslAstBinOp(left, right)
+{
+}
+
+// @brief デストラクタ
+YmslAstLt::~YmslAstLt()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstLt::type() const
+{
+  return kAstLt;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstGt
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] left, right オペランド
+YmslAstGt::YmslAstGt(YmslAst* left,
+		     YmslAst* right) :
+  YmslAstBinOp(left, right)
+{
+}
+
+// @brief デストラクタ
+YmslAstGt::~YmslAstGt()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstGt::type() const
+{
+  return kAstGt;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstLe
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] left, right オペランド
+YmslAstLe::YmslAstLe(YmslAst* left,
+		     YmslAst* right) :
+  YmslAstBinOp(left, right)
+{
+}
+
+// @brief デストラクタ
+YmslAstLe::~YmslAstLe()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstLe::type() const
+{
+  return kAstLe;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstGe
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] left, right オペランド
+YmslAstGe::YmslAstGe(YmslAst* left,
+		     YmslAst* right) :
+  YmslAstBinOp(left, right)
+{
+}
+
+// @brief デストラクタ
+YmslAstGe::~YmslAstGe()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstGe::type() const
+{
+  return kAstGe;
+}
+
 END_NAMESPACE_YM_YMSL
