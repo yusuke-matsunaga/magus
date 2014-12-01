@@ -11,6 +11,7 @@
 #include "YmslAstList.h"
 #include "YmslAstVarDecl.h"
 #include "YmslAstFuncDecl.h"
+#include "YmslAstFuncCall.h"
 #include "YmslAstAssignment.h"
 #include "YmslAstIf.h"
 #include "YmslAstElif.h"
@@ -348,6 +349,72 @@ YmslAstFuncDecl::print(ostream& s) const
     }
   }
   s << "}" << endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstFuncCall
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id 関数名
+// @param[in] expr_list 引数リスト
+// @param[in] loc ファイル位置
+YmslAstFuncCall::YmslAstFuncCall(YmslAst* id,
+				 YmslAst* expr_list,
+				 const FileRegion& loc) :
+  YmslAstImpl(loc)
+{
+  mChildList[0] = id;
+  mChildList[1] = expr_list;
+}
+
+// @brief デストラクタ
+YmslAstFuncCall::~YmslAstFuncCall()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstFuncCall::type() const
+{
+  return kAstFuncCall;
+}
+
+// @brief 子供の数を返す．
+ymuint
+YmslAstFuncCall::child_num() const
+{
+  return 2;
+}
+
+// @brief 子供を返す．
+// @param[in] pos 位置( 0 <= pos < child_num() )
+YmslAst*
+YmslAstFuncCall::child(ymuint pos) const
+{
+  ASSERT_COND( pos < child_num() );
+  return mChildList[pos];
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+void
+YmslAstFuncCall::print(ostream& s) const
+{
+  mChildList[0]->print(s);
+  s << "(";
+  {
+    ymuint n = mChildList[1]->child_num();
+    const char* comma = "";
+    for (ymuint i = 0; i < n; ++ i) {
+      YmslAst* expr = mChildList[1]->child(i);
+      s << comma;
+      comma = ", ";
+      expr->print(s);
+    }
+  }
+  s << ")" << endl;
 }
 
 

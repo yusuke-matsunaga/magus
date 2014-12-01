@@ -1,8 +1,8 @@
-#ifndef YMSLASTSYMBOL_H
-#define YMSLASTSYMBOL_H
+#ifndef YMSLASTFUNCCALL_H
+#define YMSLASTFUNCCALL_H
 
-/// @file YmslAstSymbol.h
-/// @brief YmslAstSymbol のヘッダファイル
+/// @file YmslAstFuncCall.h
+/// @brief YmslAstFuncCall のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -10,29 +10,30 @@
 
 
 #include "YmslAstImpl.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstSymbol YmslAstSymbol.h "YmslAstSymbol.h"
-/// @brief 整数型定数を表す YmslAst
+/// @class YmslAstFuncCall YmslAstFuncCall.h "YmslAstFuncCall.h"
+/// @brief 関数呼び出しを表す YmslAst
 //////////////////////////////////////////////////////////////////////
-class YmslAstSymbol :
+class YmslAstFuncCall :
   public YmslAstImpl
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] val 値
+  /// @param[in] id 関数名
+  /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  YmslAstSymbol(ShString val,
-		const FileRegion& loc);
+  YmslAstFuncCall(YmslAst* id,
+		  YmslAst* expr_list,
+		  const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstSymbol();
+  ~YmslAstFuncCall();
 
 
 public:
@@ -45,10 +46,16 @@ public:
   AstType
   type() const;
 
-  /// @brief 文字列型の値を返す．
+  /// @brief 子供の数を返す．
   virtual
-  const char*
-  str_val() const;
+  ymuint
+  child_num() const;
+
+  /// @brief 子供を返す．
+  /// @param[in] pos 位置( 0 <= pos < child_num() )
+  virtual
+  YmslAst*
+  child(ymuint pos) const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -62,12 +69,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値
-  ShString mVal;
+  // 要素の配列
+  YmslAst* mChildList[2];
 
 };
 
 END_NAMESPACE_YM_YMSL
 
 
-#endif // YMSLASTSYMBOL_H
+#endif // YMSLASTFUNCCALL_H

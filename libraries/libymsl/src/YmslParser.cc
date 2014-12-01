@@ -13,6 +13,7 @@
 #include "YmslAstList.h"
 #include "YmslAstVarDecl.h"
 #include "YmslAstFuncDecl.h"
+#include "YmslAstFuncCall.h"
 #include "YmslAstAssignment.h"
 #include "YmslAstIf.h"
 #include "YmslAstElif.h"
@@ -392,7 +393,7 @@ YmslParser::new_AstFuncCall(YmslAst* id,
 			    YmslAst* param_list,
 			    const FileRegion& loc)
 {
-  return NULL;
+  return new YmslAstFuncCall(id, param_list, loc);
 }
 
 // @brief 識別子式を作る．
@@ -402,7 +403,7 @@ YmslAst*
 YmslParser::new_AstSymbol(const char* val,
 			  const FileRegion& loc)
 {
-  return new YmslAstSymbol(val, loc);
+  return new YmslAstSymbol(ShString(val), loc);
 }
 
 // @brief 整数定数式を作る．
