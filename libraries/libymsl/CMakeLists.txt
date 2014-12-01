@@ -16,13 +16,9 @@ include_directories(
 
 set (ymsl_SOURCES
   src/RsrvWordDic.cc
-  src/YmslAstBinOp.cc
-  src/YmslAstFloat.cc
+  src/YmslAstExpr.cc
   src/YmslAstImpl.cc
-  src/YmslAstInt.cc
-  src/YmslAstString.cc
-  src/YmslAstSymbol.cc
-  src/YmslAstUniOp.cc
+  src/YmslAstStatement.cc
   src/YmslParser.cc
   src/YmslScanner.cc
 

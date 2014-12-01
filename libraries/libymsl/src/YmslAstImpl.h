@@ -74,6 +74,30 @@ public:
   add_child(YmslAst* child);
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // print() で用いる便利関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief インデント用の空白を出力する
+  /// @param[in] s 出力ストリーム
+  /// @param[in] indent インデント量
+  static
+  void
+  print_indent(ostream& s,
+	       ymuint indent);
+
+  /// @brief ステートメントリストを出力する
+  /// @param[in] s 出力ストリーム
+  /// @param[in] statement_list ステートメントリスト
+  /// @param[in] indent インデント量
+  static
+  void
+  print_statement_list(ostream& s,
+		       YmslAst* statement_list,
+		       ymuint indent);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

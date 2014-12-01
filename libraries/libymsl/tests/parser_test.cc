@@ -30,7 +30,13 @@ parser_test1(IDO& ido)
 
   parser.read(ido);
 
-  parser.root()->print(cout);
+  YmslAst* root = parser.root();
+  ASSERT_COND( root->type() == kAstList );
+  ymuint n = root->child_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    YmslAst* item = root->child(i);
+    item->print(cout);
+  }
 
   return 0;
 }

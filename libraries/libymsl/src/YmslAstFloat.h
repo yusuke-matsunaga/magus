@@ -16,7 +16,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class YmslAstFloat YmslAstFloat.h "YmslAstFloat.h"
-/// @brief 浮動小数点型を表す YmslAst
+/// @brief 浮動小数点型の定数を表す YmslAst
 //////////////////////////////////////////////////////////////////////
 class YmslAstFloat :
   public YmslAstImpl
@@ -51,9 +51,11 @@ public:
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
+  /// @param[in] indent インデントレベル
   virtual
   void
-  print(ostream& s) const;
+  print(ostream& s,
+	ymuint indent = 0) const;
 
 
 private:

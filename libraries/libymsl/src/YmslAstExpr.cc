@@ -1,16 +1,87 @@
 
-/// @file YmslAstBinOp.cc
-/// @brief YmslAstBinOp の実装ファイル
+/// @file YmslAstImpl.cc
+/// @brief YmslAstImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
+#include "YmslAstFuncCall.h"
+#include "YmslAstUniOp.h"
 #include "YmslAstBinOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstFuncCall
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] id 関数名
+// @param[in] expr_list 引数リスト
+// @param[in] loc ファイル位置
+YmslAstFuncCall::YmslAstFuncCall(YmslAst* id,
+				 YmslAst* expr_list,
+				 const FileRegion& loc) :
+  YmslAstImpl(loc)
+{
+  mChildList[0] = id;
+  mChildList[1] = expr_list;
+}
+
+// @brief デストラクタ
+YmslAstFuncCall::~YmslAstFuncCall()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstFuncCall::type() const
+{
+  return kAstFuncCall;
+}
+
+// @brief 子供の数を返す．
+ymuint
+YmslAstFuncCall::child_num() const
+{
+  return 2;
+}
+
+// @brief 子供を返す．
+// @param[in] pos 位置( 0 <= pos < child_num() )
+YmslAst*
+YmslAstFuncCall::child(ymuint pos) const
+{
+  ASSERT_COND( pos < child_num() );
+  return mChildList[pos];
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+// @param[in] indent インデントレベル
+void
+YmslAstFuncCall::print(ostream& s,
+		       ymuint indent) const
+{
+  print_indent(s, indent);
+  mChildList[0]->print(s);
+  s << "(";
+  {
+    ymuint n = mChildList[1]->child_num();
+    const char* comma = "";
+    for (ymuint i = 0; i < n; ++ i) {
+      YmslAst* expr = mChildList[1]->child(i);
+      s << comma;
+      comma = ", ";
+      expr->print(s);
+    }
+  }
+  s << ")" << endl;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス YmslAstBinOp
@@ -503,6 +574,164 @@ AstType
 YmslAstGe::type() const
 {
   return kAstGe;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstUniOp
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] child 子供のノード
+// @param[in] loc ファイル位置
+YmslAstUniOp::YmslAstUniOp(YmslAst* child,
+			   const FileRegion& loc) :
+  YmslAstImpl(FileRegion(loc, child->file_region())),
+  mChild(child)
+{
+}
+
+// @brief デストラクタ
+YmslAstUniOp::~YmslAstUniOp()
+{
+}
+
+// @brief 子供の数を返す．
+ymuint
+YmslAstUniOp::child_num() const
+{
+  return 1;
+}
+
+// @brief 子供を返す．
+// @param[in] pos 位置( 0 <= pos < child_num() )
+YmslAst*
+YmslAstUniOp::child(ymuint pos) const
+{
+  ASSERT_COND( pos == 0 );
+  return mChild;
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+// @param[in] indent インデントレベル
+void
+YmslAstUniOp::print(ostream& s,
+		    ymuint indent) const
+{
+  print_indent(s, indent);
+  switch ( type() ) {
+  case kAstUniPlus: s << "+"; break;
+  case kAstUniMinus: s << "-"; break;
+  case kAstBitNeg: s << "~"; break;
+  case kAstLogNot: s << "!"; break;
+  default: ASSERT_NOT_REACHED;
+  }
+  child(0)->print(s);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstUniPlus
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] child 子供のノード
+// @param[in] loc ファイル位置
+YmslAstUniPlus::YmslAstUniPlus(YmslAst* child,
+			       const FileRegion& loc) :
+  YmslAstUniOp(child, loc)
+{
+}
+
+// @brief デストラクタ
+YmslAstUniPlus::~YmslAstUniPlus()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstUniPlus::type() const
+{
+  return kAstUniPlus;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstUniMinus
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] child 子供のノード
+// @param[in] loc ファイル位置
+YmslAstUniMinus::YmslAstUniMinus(YmslAst* child,
+				 const FileRegion& loc) :
+  YmslAstUniOp(child, loc)
+{
+}
+
+// @brief デストラクタ
+YmslAstUniMinus::~YmslAstUniMinus()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstUniMinus::type() const
+{
+  return kAstUniMinus;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstBitNeg
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] child 子供のノード
+// @param[in] loc ファイル位置
+YmslAstBitNeg::YmslAstBitNeg(YmslAst* child,
+			     const FileRegion& loc) :
+  YmslAstUniOp(child, loc)
+{
+}
+
+// @brief デストラクタ
+YmslAstBitNeg::~YmslAstBitNeg()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstBitNeg::type() const
+{
+  return kAstBitNeg;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstLogNot
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] child 子供のノード
+// @param[in] loc ファイル位置
+YmslAstLogNot::YmslAstLogNot(YmslAst* child,
+			     const FileRegion& loc) :
+  YmslAstUniOp(child, loc)
+{
+}
+
+// @brief デストラクタ
+YmslAstLogNot::~YmslAstLogNot()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstLogNot::type() const
+{
+  return kAstLogNot;
 }
 
 END_NAMESPACE_YM_YMSL
