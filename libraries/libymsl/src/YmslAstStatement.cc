@@ -312,7 +312,7 @@ YmslAstIf::print(ostream& s,
     }
   }
 
-  if ( mChildList[3]->child_num() > 0 ) {
+  if ( mChildList[3] != NULL ) {
     print_indent(s, indent);
     s << "else {" << endl;
 

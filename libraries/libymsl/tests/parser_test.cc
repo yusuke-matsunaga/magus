@@ -49,8 +49,19 @@ parser_test(int argc,
     const char* str =
       "var a:int\n"
       "a = 1\n"
+      "if a == b {\n"
       "F = a + b\n"
       "F = a\n"
+      "}\n"
+      "elif a != c {\n"
+      "F = c"
+      "}\n"
+      "else {\n"
+      "F = 0\n"
+      "}\n"
+      "for (var i:int = 0; i < 10; i = i + 1) {\n"
+      "print(i)\n"
+      "}\n"
       "F = a + b / c * d % e + (f > g) & (h <= k)\n"
       "//comment\n";
 

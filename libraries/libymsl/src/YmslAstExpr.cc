@@ -140,6 +140,8 @@ YmslAstBinOp::print(ostream& s,
   case kAstLogAnd: s << " and "; break;
   case kAstLogOr:  s << " or "; break;
   case kAstLogXor: s << " xor "; break;
+  case kAstEqEq:   s << "=="; break;
+  case kAstNotEq:  s << "!="; break;
   case kAstLt:     s << "<"; break;
   case kAstGt:     s << ">"; break;
   case kAstLe:     s << "<="; break;
