@@ -197,11 +197,11 @@ statement
 {
   $$ = parser.new_AstFor($3, $5, $7, $10, @$);
 }
-| WHILE expr LCB statement_list RCB
+| WHILE LP expr RP LCB statement_list RCB
 {
   $$ = parser.new_AstWhile($2, $4, @$);
 }
-| DO LCB statement_list RCB WHILE expr
+| DO LCB statement_list RCB WHILE LP expr RP
 {
   $$ = parser.new_AstDoWhile($3, $6, @$);
 }
@@ -229,9 +229,13 @@ statement
 {
   $$ = parser.new_AstReturn(NULL, @$);
 }
-| RETURN expr
+| RETURN LP expr RP
 {
   $$ = parser.new_AstReturn($2, @$);
+}
+| LCB statement_list RCB
+{
+  $$ = parser.new_AstBlock($2, @$);
 }
 ;
 

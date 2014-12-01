@@ -24,6 +24,7 @@
 #include "YmslAstBreak.h"
 #include "YmslAstContinue.h"
 #include "YmslAstReturn.h"
+#include "YmslAstBlock.h"
 #include "YmslAstIntType.h"
 #include "YmslAstFloatType.h"
 #include "YmslAstStringType.h"
@@ -1108,6 +1109,63 @@ YmslAstReturn::print(ostream& s) const
   s << "return ";
   mExpr->print(s);
   s << endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス YmslAstBlock
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] statement_list 文のリスト
+// @param[in] loc ファイル位置
+YmslAstBlock::YmslAstBlock(YmslAst* statement_list,
+			   const FileRegion& loc) :
+  YmslAstImpl(loc)
+{
+  mStatementList = statement_list;
+}
+
+// @brief デストラクタ
+YmslAstBlock::~YmslAstBlock()
+{
+}
+
+// @brief 型を得る．
+AstType
+YmslAstBlock::type() const
+{
+  return kAstBlock;
+}
+
+// @brief 子供の数を返す．
+ymuint
+YmslAstBlock::child_num() const
+{
+  return 1;
+}
+
+// @brief 子供を返す．
+// @param[in] pos 位置( 0 <= pos < child_num() )
+YmslAst*
+YmslAstBlock::child(ymuint pos) const
+{
+  ASSERT_COND( pos < child_num() );
+  return mStatementList;
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+void
+YmslAstBlock::print(ostream& s) const
+{
+  s << "{" << endl;
+  ymuint n = mStatementList->child_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    YmslAst* statement = mStatementList->child(i);
+    statement->print(s);
+  }
+  s << "}" << endl;
 }
 
 

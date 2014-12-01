@@ -201,6 +201,13 @@ public:
   new_AstReturn(YmslAst* expr,
 		const FileRegion& loc);
 
+  /// @brief ブロックを作る．
+  /// @param[in] statement_list 文のリスト
+  /// @param[in] loc ファイル位置
+  YmslAst*
+  new_AstBlock(YmslAst* statement_list,
+	       const FileRegion& loc);
+
   /// @brief 単項演算式を作る．
   /// @param[in] op 演算子のトークン
   /// @param[in] left オペランド

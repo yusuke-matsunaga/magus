@@ -48,6 +48,7 @@ enum AstType
   kAstBreak,
   kAstContinue,
   kAstReturn,
+  kAstBlock,
 
   kAstUniPlus,
   kAstUniMinus,

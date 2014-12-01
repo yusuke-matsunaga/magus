@@ -26,6 +26,7 @@
 #include "YmslAstBreak.h"
 #include "YmslAstContinue.h"
 #include "YmslAstReturn.h"
+#include "YmslAstBlock.h"
 #include "YmslAstUniOp.h"
 #include "YmslAstBinOp.h"
 #include "YmslAstInt.h"
@@ -309,6 +310,16 @@ YmslParser::new_AstReturn(YmslAst* expr,
 			  const FileRegion& loc)
 {
   return new YmslAstReturn(expr, loc);
+}
+
+// @brief ブロックを作る．
+// @param[in] statement_list 文のリスト
+// @param[in] loc ファイル位置
+YmslAst*
+YmslParser::new_AstBlock(YmslAst* statement_list,
+			 const FileRegion& loc)
+{
+  return new YmslAstBlock(statement_list, loc);
 }
 
 // @brief 単項演算式を作る．
