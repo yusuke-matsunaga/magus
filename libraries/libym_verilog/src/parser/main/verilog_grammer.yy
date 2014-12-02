@@ -73,7 +73,7 @@ fr_merge(const FileRegion fr_array[],
 
   // 真の末尾を求める．
   size_t j;
-  for (j = n; i >= i && !fr_array[j].is_valid(); -- j) ;
+  for (j = n; j >= i && !fr_array[j].is_valid(); -- j) ;
   const FileRegion& last = fr_array[j];
 
   return FileRegion(first, last);

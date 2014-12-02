@@ -182,6 +182,7 @@ add_custom_command (
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.cc"
   "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.hh"
   "${CMAKE_CURRENT_BINARY_DIR}/verilog_grammer.output"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/main/verilog_grammer.yy"
   )
 
 # Since verilog_grammer.cc does not exists yet when cmake is run, mark
