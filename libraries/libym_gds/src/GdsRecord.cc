@@ -51,36 +51,36 @@ GdsRecord::dtype_string() const
 // pos 番目の 2バイトのデータを符号つき数(2の補数表現)に変換する．
 // kGds2Int 用の変換関数
 ymint16
-GdsRecord::conv_2byte_int(ymuint32 pos) const
+GdsRecord::get_2byte_int(ymuint32 pos) const
 {
   ymuint32 offset = pos * 2;
-  ymuint16 ans = (conv_1byte(offset) << 8) + conv_1byte(offset + 1);
+  ymuint16 ans = (get_1byte(offset) << 8) + get_1byte(offset + 1);
   return static_cast<ymint16>(ans);
 }
 
 // pos 番目の 4バイトのデータを符号つき数(2の補数表現)に変換する．
 // kGds4Int 用の変換関数
 ymint32
-GdsRecord::conv_4byte_int(ymuint32 pos) const
+GdsRecord::get_4byte_int(ymuint32 pos) const
 {
   ymuint32 offset = pos * 4;
-  ymuint32 ans = (conv_1byte(offset + 0) << 24);
-  ans += (conv_1byte(offset + 1) << 16);
-  ans += (conv_1byte(offset + 2) << 8);
-  ans += conv_1byte(offset + 3);
+  ymuint32 ans = (get_1byte(offset + 0) << 24);
+  ans += (get_1byte(offset + 1) << 16);
+  ans += (get_1byte(offset + 2) << 8);
+  ans += get_1byte(offset + 3);
   return static_cast<ymint32>(ans);
 }
 
 // pos 番目の 4バイトのデータを浮動小数点数に変換する．
 // kGds4Real 用の変換関数
 double
-GdsRecord::conv_4byte_real(ymuint32 pos) const
+GdsRecord::get_4byte_real(ymuint32 pos) const
 {
   ymuint32 offset = pos * 4;
   bool zero = true;
   ymuint v[4];
   for (ymuint i = 0; i < 4; ++ i) {
-    v[i] = conv_1byte(i + offset);
+    v[i] = get_1byte(i + offset);
     if ( v[i] ) {
       zero = false;
     }
@@ -123,13 +123,13 @@ GdsRecord::conv_4byte_real(ymuint32 pos) const
 // pos 番目の 8バイトのデータを浮動小数点数に変換する．
 // kGds8Real 用の変換関数
 double
-GdsRecord::conv_8byte_real(ymuint pos) const
+GdsRecord::get_8byte_real(ymuint pos) const
 {
   ymuint offset = pos * 8;
   bool zero = true;
   ymuint v[8];
   for (ymuint i = 0; i < 8; ++ i) {
-    v[i] = conv_1byte(i + offset);
+    v[i] = get_1byte(i + offset);
     if ( v[i] ) {
       zero = false;
     }
@@ -177,7 +177,7 @@ GdsRecord::conv_8byte_real(ymuint pos) const
 // 末尾に '\0'(EndOfString) があるとは限らない．
 // kGdsString 用の変換関数
 string
-GdsRecord::conv_string() const
+GdsRecord::get_string() const
 {
   ymuint n = dsize();
   ymuint len = n;

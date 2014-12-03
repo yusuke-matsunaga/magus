@@ -87,8 +87,8 @@ GdsScanner::read_rec()
   if ( !read_2byte_uint(tmp_word) ) {
     return false;
   }
-  mCurRtype = static_cast<tGdsRtype>(tmp_word >> 8);
-  mCurDtype = static_cast<tGdsDtype>(tmp_word & 0xFF);
+  mCurRtype = static_cast<GdsRtype>(tmp_word >> 8);
+  mCurDtype = static_cast<GdsDtype>(tmp_word & 0xFF);
 
   // データの integrity check を行う．
   const GdsRecTable& table = GdsRecTable::obj();

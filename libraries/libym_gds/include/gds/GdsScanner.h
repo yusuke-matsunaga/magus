@@ -60,11 +60,11 @@ public:
   cur_size() const;
 
   /// @brief 直前の read_rec() で読んだレコードの型を得る．
-  tGdsRtype
+  GdsRtype
   cur_rtype() const;
 
   /// @brief 直前の read_rec() で読んだレコードのデータ型を得る．
-  tGdsDtype
+  GdsDtype
   cur_dtype() const;
 
   /// @brief 直前お read_rec() で読んだレコードのデータサイズを得る．
@@ -163,10 +163,10 @@ private:
   ymuint32 mCurSize;
 
   // 現在のレコードの型
-  tGdsRtype mCurRtype;
+  GdsRtype mCurRtype;
 
   // 現在のレコードのデータ型
-  tGdsDtype mCurDtype;
+  GdsDtype mCurDtype;
 
   // 現在のレコードのデータバッファ
   ymuint8* mDataBuff;
@@ -199,7 +199,7 @@ GdsScanner::cur_size() const
 
 // @brief 直前の read_rec() で読んだレコードの型を得る．
 inline
-tGdsRtype
+GdsRtype
 GdsScanner::cur_rtype() const
 {
   return mCurRtype;
@@ -207,7 +207,7 @@ GdsScanner::cur_rtype() const
 
 // @brief 直前の read_rec() で読んだレコードのデータ型を得る．
 inline
-tGdsDtype
+GdsDtype
 GdsScanner::cur_dtype() const
 {
   return mCurDtype;

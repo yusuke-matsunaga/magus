@@ -111,4 +111,42 @@ record 番号  record 名       データ型
   58 SRFNAME:   string
 
 
+- 構文規則
 
+file::= HEADER BGNLIB [ LIBDIRSIZE ] [ SRFNAME ] [ LIBSECUR ]
+	LIBNAME [ REFLIBS ] [ FONTS ] [ ATTRTABLE ] [ GENERATIONS ]
+	[ format_type ] UNITS { structure }* ENDLIB
+
+format_type: FORMAT | FORMAT { MASK }+ ENDMASKS
+
+structure: BGNSTR STRNAME [ STRCLASS ] { element }* ENDSTR
+
+element: element_header [ PROPATTR PROPVALUE ]* ENDEL
+
+element_header:
+	boudary|
+	path|
+	sref|
+	aref|
+	text|
+	node|
+	box
+
+boundary: BOUNDARY [ ELFLAGS ] [ PLEX ] LAYER DATATYPE XY
+
+path: PATH [ ELFLAGS ] [ PLEX ] LAYER DATATYPE
+      [ PATHTYPE ] [ WIDTH ] [ BGNEXTN ] [ ENDEXTN ] XY
+
+sref: SREF [ ELFLAGS ] [ PLEX ] SNAME [ strans ] XY
+
+aref: AREF [ ELFLAGS ] [ PLEX ] SNAME [ strans ] COLROW XY
+
+text: TEXT [ ELFLAGS ] [ PlEX ] LAYER TEXTTYPE
+      [ PRESENTATION ] [ PATHTYPE ] [ WIDTH ] [ strans ]
+      XY STRING
+
+node: NODE [ ELFLAGS ] [ PLEX ] LAYER NODETYPE XY
+
+box: BOX [ ELFLAGS ] [ PLEX ] LAYER BOXTYPE XY
+
+strans: STRANS [ MAG ] [ ANGLE ]

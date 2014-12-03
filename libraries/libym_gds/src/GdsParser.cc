@@ -357,7 +357,7 @@ GdsParser::yylex(nsParser::YYSTYPE& lval)
 
   const GdsRecTable& table = GdsRecTable::obj();
 
-  tGdsRtype rtype = mScanner.cur_rtype();
+  GdsRtype rtype = mScanner.cur_rtype();
   switch ( rtype ) {
   case kGdsBGNLIB:        lval.date_type = new_date(); break;
   case kGdsUNITS:         lval.units_type = new_units(); break;
@@ -371,7 +371,7 @@ GdsParser::yylex(nsParser::YYSTYPE& lval)
   default:
     assert_cond( table.data_num(rtype) <= 1, __FILE__, __LINE__);
     {
-      tGdsDtype dtype = mScanner.cur_dtype();
+      GdsDtype dtype = mScanner.cur_dtype();
       switch ( dtype ) {
       case kGds2Int:   lval.int2_type = new_int2(); break;
       case kGds4Int:   lval.int4_type = new_int4(); break;

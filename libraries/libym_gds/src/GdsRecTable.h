@@ -39,27 +39,30 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   // レコード型からトークン値を得る．
   int
-  rtype_token(tGdsRtype rtype) const;
+  rtype_token(GdsRtype rtype) const;
 
   // レコード型から文字列を得る．
   const char*
-  rtype_string(tGdsRtype rtype) const;
+  rtype_string(GdsRtype rtype) const;
 
   // このレコード型に対応したデータ型を得る．
-  tGdsDtype
-  dtype(tGdsRtype rtype) const;
+  GdsDtype
+  dtype(GdsRtype rtype) const;
 
   // データ型から文字列を得る．
   const char*
-  dtype_string(tGdsDtype dtype) const;
+  dtype_string(GdsDtype dtype) const;
 
   // レコード型から期待されるデータ数を得る．
   // 負数の場合にはその絶対値の倍数の可変個数の意味
   int
-  data_num(tGdsRtype rtype) const;
+  data_num(GdsRtype rtype) const;
 
 
 private:
@@ -69,7 +72,7 @@ private:
   struct cell
   {
     // レコード型
-    tGdsRtype mRtype;
+    GdsRtype mRtype;
 
     // トークン値
     int mToken;
@@ -78,7 +81,7 @@ private:
     const char* mString;
 
     // 期待されるデータ型
-    tGdsDtype mDtype;
+    GdsDtype mDtype;
 
     // データ数
     // 負数の場合にはその絶対値の倍数の可変

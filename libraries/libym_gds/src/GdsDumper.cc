@@ -59,8 +59,8 @@ GdsDumper::operator()(const GdsScanner& scanner)
 void
 GdsDumper::dump_common(ymuint32 offset,
 		       ymuint32 size,
-		       tGdsRtype rtype,
-		       tGdsDtype dtype,
+		       GdsRtype rtype,
+		       GdsDtype dtype,
 		       const ymuint8 data[])
 {
   // オフセット : サイズ 生データ

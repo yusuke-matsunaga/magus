@@ -33,6 +33,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief record の内容を出力する．
   /// @param[in] record レコード
@@ -60,8 +63,8 @@ private:
   void
   dump_common(ymuint32 offset,
 	      ymuint32 size,
-	      tGdsRtype rtype,
-	      tGdsDtype dtype,
+	      GdsRtype rtype,
+	      GdsDtype dtype,
 	      const ymuint8 data[]);
 
   /// @brief HEADER の出力

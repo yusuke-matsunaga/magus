@@ -393,28 +393,28 @@ GdsRecTable::~GdsRecTable()
 
 // レコード型からトークン値を得る．
 int
-GdsRecTable::rtype_token(tGdsRtype rtype) const
+GdsRecTable::rtype_token(GdsRtype rtype) const
 {
   return mTable[rtype].mToken;
 }
 
 // レコード型から文字列を得る．
 const char*
-GdsRecTable::rtype_string(tGdsRtype rtype) const
+GdsRecTable::rtype_string(GdsRtype rtype) const
 {
   return mTable[rtype].mString;
 }
 
 // このレコード型に対応したデータ型を得る．
-tGdsDtype
-GdsRecTable::dtype(tGdsRtype rtype) const
+GdsDtype
+GdsRecTable::dtype(GdsRtype rtype) const
 {
   return mTable[rtype].mDtype;
 }
 
 // データ型から文字列を得る．
 const char*
-GdsRecTable::dtype_string(tGdsDtype dtype) const
+GdsRecTable::dtype_string(GdsDtype dtype) const
 {
   switch ( dtype ) {
   case kGdsNodata:   return "No data present";
@@ -431,7 +431,7 @@ GdsRecTable::dtype_string(tGdsDtype dtype) const
 // レコード型から期待されるデータ数を得る．
 // 負数の場合にはその絶対値の倍数の可変個数の意味
 int
-GdsRecTable::data_num(tGdsRtype rtype) const
+GdsRecTable::data_num(GdsRtype rtype) const
 {
   return mTable[rtype].mDataNum;
 }

@@ -35,6 +35,9 @@ private:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 先頭のオフセットを取り出す．
   ymuint32
@@ -45,7 +48,7 @@ public:
   size() const;
 
   /// @brief レコード型を取り出す．
-  tGdsRtype
+  GdsRtype
   rtype() const;
 
   /// @brief レコード型を表すトークンを返す．
@@ -57,7 +60,7 @@ public:
   rtype_string() const;
 
   /// @brief データ型を取り出す．
-  tGdsDtype
+  GdsDtype
   dtype() const;
 
   /// @brief データ型を表す文字列を返す．
@@ -75,37 +78,37 @@ public:
   /// @brief pos 番目のバイトデータを返す．
   /// @param[in] pos 位置
   ymuint8
-  conv_1byte(ymuint32 pos) const;
+  get_1byte(ymuint32 pos) const;
 
   /// @brief pos 番目の 2バイトのデータを符号つき数(2の補数表現)に変換する．
   /// @param[in] pos 位置
   /// @note kGds2Int 用の変換関数
   ymint16
-  conv_2byte_int(ymuint32 pos) const;
+  get_2byte_int(ymuint32 pos) const;
 
   /// @brief pos 番目の 4バイトのデータを符号つき数(2の補数表現)に変換する．
   /// @param[in] pos 位置
   /// @note kGds4Int 用の変換関数
   ymint32
-  conv_4byte_int(ymuint32 pos) const;
+  get_4byte_int(ymuint32 pos) const;
 
   /// @brief pos 番目の 4バイトのデータを浮動小数点数に変換する．
   /// @param[in] pos 位置
   /// @note kGds4Real 用の変換関数
   double
-  conv_4byte_real(ymuint32 pos) const;
+  get_4byte_real(ymuint32 pos) const;
 
   /// @brief pos 番目の 8バイトのデータを浮動小数点数に変換する．
   /// @param[in] pos 位置
   /// @note kGds8Real 用の変換関数
   double
-  conv_8byte_real(ymuint32 pos) const;
+  get_8byte_real(ymuint32 pos) const;
 
   /// @brief データを文字列に変換する．
   /// @note 末尾に '\\0'(EndOfString) があるとは限らない．
   /// @note GdsString 用の変換関数
   string
-  conv_string() const;
+  get_string() const;
 
 
 private:
@@ -120,10 +123,10 @@ private:
   ymuint32 mSize;
 
   // レコード型
-  tGdsRtype mRtype;
+  GdsRtype mRtype;
 
   // データ型
-  tGdsDtype mDtype;
+  GdsDtype mDtype;
 
   // データ本体を格納する配列(のダミー定義)
   ymuint8 mData[1];
@@ -161,7 +164,7 @@ GdsRecord::rtype() const
 
 // データ型を取り出す．
 inline
-tGdsDtype
+GdsDtype
 GdsRecord::dtype() const
 {
   return mDtype;
@@ -186,7 +189,7 @@ GdsRecord::data() const
 // pos 番目のバイトデータを返す．
 inline
 ymuint8
-GdsRecord::conv_1byte(ymuint32 pos) const
+GdsRecord::get_1byte(ymuint32 pos) const
 {
   return mData[pos];
 }
