@@ -69,69 +69,210 @@ GdsParser::parse(const string& filename)
   mFormatType = 0;
   mMasks.clear();
 
-  nsParser::yyparse(*this);
+  bool stat = true;
+
+  if ( !read_header() ) {
+    stat = false;
+    goto end;
+  }
+
+  for ( ; ; ) {
+    if ( !mScanner.read_rec() ) {
+      stat = false;
+      goto end;
+    }
+    if ( mScanner.cur_rtype() == kGdsBGNSTR ) {
+      if ( !read_structure() ) {
+	stat = false;
+	goto end;
+      }
+    }
+    else if ( mScanner.cur_rtype() == kGdsENDLIB ) {
+      break;
+    }
+    else {
+      // error
+      stat = false;
+      goto end;
+    }
+  }
+
+ end:
 
   mScanner.close_file();
 
-  return true;
+  return stat;
 }
 
-// @brief GdsData の生成
-// @param[in] version バージョン番号
-// @param[in] date 2つの日時の配列
-// @param[in] libdirsize LIBDIRSIZE の値
-// @param[in] srfname SRFNAME の値
-// @param[in] acl LIBSECURE の値
-// @param[in] libname LIBNAME の値
-// @param[in] reflibs REFLIBS の値
-// @param[in] fonts FONTS の値
-// @param[in] attrtable ATTRTABLE の値
-// @param[in] generations GENERATIONS の値
-// @param[in] units UNITS の値
-void
-GdsParser::new_header(ymint16 version,
-		      GdsDate* date,
-		      ymint16 libdirsize,
-		      GdsString* srfname,
-		      GdsACL* acl,
-		      GdsString* libname,
-		      GdsString* reflibs,
-		      GdsString* fonts,
-		      GdsString* attrtable,
-		      ymint16 generations,
-		      GdsUnits* units)
+bool
+GdsParser::read_header()
 {
-  GdsFormat* format = new_format();
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // HEADER: version
+  if ( mScanner.cur_rtype() != kGdsHEADER ) {
+    return false;
+  }
+  ymint16 version = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // BGNLIB
+  if ( mScanner.cur_rtype() != kGdsBGNLIB ) {
+    return false;
+  }
+  GdsDate* date = new_date();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ LIBDIRSIZE ]
+  ymint16 libdirsize = 0;
+  if ( mScanner.cur_rtype() == kGdsLIBDIRSIZE ) {
+    libdirsize = new_int2();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ SRFNAME ]
+  GdsString* srfname = NULL;
+  if ( mScanner.cur_rtype() == kGdsSRFNAME ) {
+    srfname = new_string();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ LIBSECUR ]
+  GdsACL* acl = NULL;
+  if ( mScanner.cur_rtype() == kGdsLIBSECUR ) {
+    acl = new_acl();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // LIBNAME
+  if ( mScanner.cur_rtype() != kGdsLIBNAME ) {
+    return false;
+  }
+  GdsString* libname = new_string();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ REFLIBS ]
+  GdsString* reflibs = NULL;
+  if ( mScanner.cur_rtype() == kGdsREFLIBS ) {
+    reflibs = new_string();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ FONTS ]
+  GdsString* fonts = NULL;
+  if ( mScanner.cur_rtype() == kGdsFONTS ) {
+    fonts = new_string();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ ATTRTABLE ]
+  GdsString* attrtable = NULL;
+  if ( mScanner.cur_rtype() == kGdsATTRTABLE ) {
+    attrtable = new_string();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ GENERATIONS ]
+  ymint16 generations = 0;
+  if ( mScanner.cur_rtype() == kGdsGENERATIONS ) {
+    generations = new_int2();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ FORMAT | FORMAT { MASK } + ENDMASKS ]
+  GdsFormat* format = NULL;
+  if ( mScanner.cur_rtype() == kGdsFORMAT ) {
+    ymint16 format_type = new_int2();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+
+    vector<GdsString*> masks;
+    while ( mScanner.cur_rtype() == kGdsMASK ) {
+      GdsString* mask = new_string();
+      masks.push_back(mask);
+
+      if ( !mScanner.read_token() ) {
+	return false;
+      }
+    }
+    if ( !masks.empty() ) {
+      if ( mScanner.cur_rtype() != kGdsENDMASKS ) {
+	return false;
+      }
+
+      if ( !mScanner.read_token() ) {
+	return false;
+      }
+    }
+
+    format = new_foramt(format_type, masks);
+  }
+
+  // UNITS
+  if ( mScanner.cur_rtype() != kGdsUNITS ) {
+    return false;
+  }
+  GdsUnits* units = new_units();
 
   void* p = mAlloc.get_memory(sizeof(GdsData));
   mCurData = new (p) GdsData(version, date, libdirsize, srfname, acl, libname,
 			     reflibs, fonts, attrtable, generations, format, units);
   mCurStruct = NULL;
+
+  return true;
 }
 
-// @brief フォーマットタイプの設定
-// @param[in] type フォーマットタイプ
-void
-GdsParser::set_format(ymint16 type)
+bool
+GdsParser::read_structure()
 {
-  mFormatType = type;
-}
+  // BGNSTR を読んだ直後
+  GdsDate* date = new_date();
 
-// @brief マスクの追加
-// @param[in] mask マスク
-void
-GdsParser::add_mask(GdsString* mask)
-{
-  mMasks.push_back(mask);
-}
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
 
-// @brief GdsStruct の追加
-// @param[in] date 2つの日時の配列
-// @param[in] strname 構造名
-void
-GdsParser::add_struct(GdsDate* date,
-		      GdsString* strname)
-{
+  // STRNAME
+  if ( mScanner.cur_rtype() != kGdsSTRNAME ) {
+    return false;
+  }
+
+  GdsString* strname = new_string();
+
   void* p = mAlloc.get_memory(sizeof(GdsStruct));
   GdsStruct* str = new (p) GdsStruct(date, strname);
 
@@ -144,171 +285,648 @@ GdsParser::add_struct(GdsDate* date,
   mCurStruct = str;
 
   mCurElement = NULL;
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ STRCLASS ]
+  if ( mScanner.cur_rtype() == kGdsSTRCLASS ) {
+    // あれ？これ何するの？
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  while ( mScanner.cur_rtype() != kGdsENDSTR ) {
+    switch ( mScanner.cur_rtype() ) {
+    case kGdsBOUNDARY:
+      if ( !read_boundary() ) {
+	return false;
+      }
+      break;
+
+    case kGdsPATH:
+      if ( !read_path() ) {
+	return false;
+      }
+      break;
+
+    case kGdsSREF:
+      if ( !read_sref() ) {
+	return false;
+      }
+      break;
+
+    case kGdsAREF:
+      if ( !read_aref() ) {
+	return false;
+      }
+      break;
+
+    case kGdsTEXT:
+      if ( !read_text() ) {
+	return false;
+      }
+      break;
+
+    case kGdsNODE:
+      if ( !read_node() ) {
+	return false;
+      }
+      break;
+
+    case kGdsBOX:
+      if ( !read_box() ) {
+	return false;
+      }
+      break;
+
+    default:
+      return false;
+    }
+
+    // { PROPATTR PROPVALUE }*
+    for ( ; ; ) {
+      if ( mScanner.cur_rtype() != kGdsPROPATTR ) {
+	break;
+      }
+      ymint16 prop_attr = new_int2();
+
+      if ( !mScanner.read_token() ) {
+	return false;
+      }
+
+      if ( mScanner.cur_rtype() != kGdsPROPVALUE ) {
+	return false;
+      }
+      GdsString* prop_value = new_string();
+
+      if ( !mScanner.read_token() ) {
+	return false;
+      }
+
+      add_property(prop_attr, prop_value);
+    }
+  }
 }
 
-// @brief GdsAref の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] strname 構造名
-// @param[in] strans STRANS の値
-// @param[in] colrow 列と行の数
-// @param[in] xy 座標
-void
-GdsParser::add_aref(ymuint16 elflags,
-		    ymint32 plex,
-		    GdsString* strname,
-		    GdsStrans* strans,
-		    ymuint32 colrow,
-		    GdsXY* xy)
+bool
+GdsParser::read_boundary()
 {
-  void* p = mAlloc.get_memory(sizeof(GdsAref));
-  GdsAref* aref = new (p) GdsAref(elflags, plex, strname, strans, colrow, xy);
+  // BOUNDARY を読んだ直後
 
-  add_element(aref);
-}
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
 
-// @brief GdsBoundary の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] layer LAYER の値
-// @param[in] datatype DATATYPE の値
-// @param[in] xy XY の値
-void
-GdsParser::add_boundary(ymuint16 elflags,
-			ymint32 plex,
-			ymint16 layer,
-			ymint16 datatype,
-			GdsXY* xy)
-{
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // LAYER
+  if ( mScanner.cur_rtype() != kGdsLAYER ) {
+    return false;
+  }
+  ymint16 layer = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // DATATYPE
+  if ( mScanner.cur_rtype() != kGdsDATATYPE ) {
+    return false;
+  }
+  ymint16 datatype = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
   void* p = mAlloc.get_memory(sizeof(GdsBoundary));
   GdsBoundary* boundary = new (p) GdsBoundary(elflags, plex, layer, datatype, xy);
 
   add_element(boundary);
+
+  return true;
 }
 
-// @brief GdsBox の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] layer LAYER の値
-// @param[in] boxtype BOXTYPE の値
-// @param[in] xy XY の値
-void
-GdsParser::add_box(ymuint16 elflags,
-		   ymint32 plex,
-		   ymint16 layer,
-		   ymint16 datatype,
-		   GdsXY* xy)
+bool
+GdsParser::read_path()
 {
-  void* p = mAlloc.get_memory(sizeof(GdsBox));
-  GdsBox* box = new (p) GdsBox(elflags, plex, layer, datatype, xy);
+  // PATH を読み込んだあと
 
-  add_element(box);
-}
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
 
-// @brief GdsNode の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] layer LAYER の値
-// @param[in] datatype DATATYPE の値
-// @param[in] xy XY の値
-void
-GdsParser::add_node(ymuint16 elflags,
-		    ymint32 plex,
-		    ymint16 layer,
-		    ymint16 nodetype,
-		    GdsXY* xy)
-{
-  void* p = mAlloc.get_memory(sizeof(GdsNode));
-  GdsNode* node = new (p) GdsNode(elflags, plex, layer, nodetype, xy);
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
 
-  add_element(node);
-}
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
 
-// @brief GdsPath の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] layer LAYER の値
-// @param[in] datatype DATATYPE の値
-// @param[in] pathtype PATYTYPE の値
-// @param[in] width WIDTH の値
-// @param[in] bgn_extn BGNEXTN の値
-// @param[in] end_extn ENDEXTN の値
-// @param[in] xy XY の値
-void
-GdsParser::add_path(ymuint16 elflags,
-		    ymint32 plex,
-		    ymint16 layer,
-		    ymint16 datatype,
-		    ymint16 pathtype,
-		    ymint32 width,
-		    ymint32 bgn_extn,
-		    ymint32 end_extn,
-		    GdsXY* xy)
-{
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // LAYER
+  if ( mScanner.cur_rtype() != kGdsLAYER ) {
+    return false;
+  }
+  ymint16 layer = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // DATATYPE
+  if ( mScanner.cur_rtype() != kGdsDATATYPE ) {
+    return false;
+  }
+  ymint16 datatype = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ PATHTYPE ]
+  ymint16 pathtype = 0;
+  if ( mScanner.cur_rtype() == kGdsPATHTYPE ) {
+    pathtype = new_int2();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ WIDTH ]
+  ymint32 width = 0;
+  if ( mScanner.cur_rtype() == kGdsWIDTH ) {
+    width = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ BGNEXTN ]
+  ymint32 bgn_extn = 0;
+  if ( mScanner.cur_rtype() == kGdsBGNEXTN ) {
+    bgnextn = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ ENDEXTN ]
+  ymint32 end_extn = 0;
+  if ( mScanner.cur_rtype() == kGdsENDEXTN ) {
+    endextn = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
   void* p = mAlloc.get_memory(sizeof(GdsPath));
   GdsPath* path = new (p) GdsPath(elflags, plex, layer, datatype, pathtype, width, bgn_extn, end_extn, xy);
 
   add_element(path);
+
+  return true;
 }
 
-// @brief GdsSref の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] strname 構造名
-// @param[in] strans STRANS の値
-// @param[in] xy 座標
-void
-GdsParser::add_sref(ymuint16 elflags,
-		    ymint32 plex,
-		    GdsString* strname,
-		    GdsStrans* strans,
-		    GdsXY* xy)
+bool
+read_sref()
 {
+  // SREF を読んだ直後
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // SNAME
+  if ( mScanner.cur_rtype() != kGdsSNAME ) {
+    return false;
+  }
+  GdsString* strname = new_string();
+
+  // [ STRANS [ MAG ] [ ANGLE ] ]
+  GdsStrans* strans = NULL;
+  if ( !read_strans(strans) ) {
+    return false;
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
   void* p = mAlloc.get_memory(sizeof(GdsSref));
   GdsSref* sref = new (p) GdsSref(elflags, plex, strname, strans, xy);
 
   add_element(sref);
+
+  return true;
 }
 
-// @brief GdsText の作成
-// @param[in] elflags ELFLAGS の値
-// @param[in] plex PLEX の値
-// @param[in] layer LAYER の値
-// @param[in] texttype TEXTTYPE の値
-// @param[in] presentation PRESENTATION の値
-// @param[in] pathtype PATHTYPE の値
-// @param[in] width WIDTH の値
-// @param[in] strans STRANS の値
-// @param[in] xy XY座標
-// @param[in] body 本体の文字列
-void
-GdsParser::add_text(ymuint16 elflags,
-		    ymint32 plex,
-		    ymint16 layer,
-		    ymint16 texttype,
-		    ymuint16 presentation,
-		    ymint16 pathtype,
-		    ymint32 width,
-		    GdsStrans* strans,
-		    GdsXY* xy,
-		    GdsString* body)
+bool
+GdsParser::read_aref()
 {
+  // AREF を読んだ直後
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // SNAME
+  if ( mScanner.cur_rtype() != kGdsSNAME ) {
+    return false;
+  }
+  GdsString* strname = new_string();
+
+  // [ STRANS [ MAG ] [ ANGLE ] ]
+  GdsStrans* strans = NULL;
+  if ( !read_strans(strans) ) {
+    return false;
+  }
+
+  // COLROW
+  if ( mScanner.cur_rtype() != kGdsCOLROW ) {
+    return false;
+  }
+  ymuint32 colrow = new_colrow();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
+  void* p = mAlloc.get_memory(sizeof(GdsAref));
+  GdsAref* aref = new (p) GdsAref(elflags, plex, strname, strans, colrow, xy);
+
+  add_element(aref);
+
+  return true;
+}
+
+bool
+GdsParser::read_text()
+{
+  // TEXT を読んだ直後
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // LAYER
+  if ( mScanner.cur_rtype() != kGdsLAYER ) {
+    return false;
+  }
+  ymint16 layer = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // TEXTTYPE
+  if ( mScanner.cur_rtype() != kGdsTEXTTYPE ) {
+    return false;
+  }
+  ymint16 texttype = new_int2();
+
+  // [ PRESENTATION ]
+  ymuint16 presentation = 0;
+  if ( mScanner.cur_rtype() == kGdsPRESENTATION ) {
+    presentation = new_int2();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PATHTYPE ]
+  ymint16 pathtype = 0;
+  if ( mScanner.cur_rtype() == kGdsPATHTYPE ) {
+    pathtype = new_int2();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ WIDTH ]
+  ymint32 width = 0;
+  if ( mScanner.cur_rtype() == kGdsWIDTH ) {
+    width = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ STRANS [ MAG ] [ ANGLE ] ]
+  GdsStrans* strans = NULL;
+  if ( !read_strans(strans) ) {
+    return false;
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
+  // TEXT
+  if ( mScanner.cur_rtype() != kGdsTEXT ) {
+    return false;
+  }
+  GdsString* body = new_text();
+
   void* p = mAlloc.get_memory(sizeof(GdsText));
   GdsText* text = new (p) GdsText(elflags, plex, layer, texttype, presentation, pathtype, width, strans, xy, body);
 
   add_element(text);
+
+  return true;
 }
 
-// @brief GdsStrans の作成
-GdsStrans*
-GdsParser::new_strans(ymuint flags,
-		      double mag,
-		      double angle)
+bool
+GdsParser::read_node()
 {
-  void* p = mAlloc.get_memory(sizeof(GdsStrans));
-  GdsStrans* strans = new (p) GdsStrans(flags, mag, angle);
+  // NODE を読んだ直後
 
-  return strans;
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // LAYER
+  if ( mScanner.cur_rtype() != kGdsLAYER ) {
+    return false;
+  }
+  ymint16 layer = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // NODETYPE
+  if ( mScanner.cur_rtype() != kGdsNODETYPE ) {
+    return false;
+  }
+  ymint16 nodetype = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
+  void* p = mAlloc.get_memory(sizeof(GdsNode));
+  GdsNode* node = new (p) GdsNode(elflags, plex, layer, nodetype, xy);
+
+  add_element(node);
+
+  return true;
+}
+
+bool
+GdsParser::read_box()
+{
+  // BOX を読んだ直後
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ ELFLAGS ]
+  ymuint16 elflags = 0U;
+  if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
+    eflags = new_bitarray();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ PLEX ]
+  ymint32 plex = 0;
+  if ( mScanner.cur_rtype() == kGdsPLEX ) {
+    plex = new_int4();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // LAYER
+  if ( mScanner.cur_rtype() != kGdsLAYER ) {
+    return false;
+  }
+  ymint16 layer = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // BOXTYPE
+  if ( mScanner.cur_rtype() != kGdsBOXTYPE ) {
+    return false;
+  }
+  ymint16 boxtype = new_int2();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // XY
+  if ( mScanner.cur_rtype() != kGdsXY ) {
+    return false;
+  }
+  GdsXY* xy = new_xy();
+
+  void* p = mAlloc.get_memory(sizeof(GdsBox));
+  GdsBox* box = new (p) GdsBox(elflags, plex, layer, boxtype, xy);
+
+  add_element(box);
+
+  return true;
+}
+
+// @brief STRANS 以降の読み込み
+// @param[out] strans 結果を格納する変数
+//
+// エラーが起きたら false を返す．
+bool
+GdsParser::read_strans(GdsStrans*& strans)
+{
+  if ( mScanner.cur_rtype() != kGdsSTRANS ) {
+    return true;
+  }
+
+  // STRANS を読み込んだ直後
+
+  ymuint flags = new_bitarray();
+
+  if ( !mScanner.read_token() ) {
+    return false;
+  }
+
+  // [ MAG ]
+  double mag = 1.0;
+  if ( mScanner.cur_rtype() == kGdsMAG ) {
+    mag = new_double();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  // [ ANGLE ]
+  double angle = 0.0;
+  if ( mScanner.cur_rtype() == kGdsANGLE ) {
+    angle = new_angle();
+
+    if ( !mScanner.read_token() ) {
+      return false;
+    }
+  }
+
+  void* p = mAlloc.get_memory(sizeof(GdsStrans));
+  strans = new (p) GdsStrans(flags, mag, angle);
+
+  return true;
 }
 
 // @brief GdsElement (の派生要素)の追加
@@ -402,17 +1020,18 @@ GdsParser::yyerror(const char* s)
 
 // @brief GdsFormat の作成
 GdsFormat*
-GdsParser::new_format()
+GdsParser::new_format(ymint16 format_type,
+		      const vector<GdsString*>& masks)
 {
-  if ( mFormatType == 0 && mMasks.empty() ) {
+  if ( format_type == 0 && masks.empty() ) {
     return NULL;
   }
-  ymuint nm = mMasks.size();
+  ymuint nm = masks.size();
   void* p = mAlloc.get_memory(sizeof(GdsFormat) + (nm - 1) * sizeof(GdsString*));
-  GdsFormat* format = new (p) GdsFormat(mFormatType);
+  GdsFormat* format = new (p) GdsFormat(format_type);
   format->mMaskNum = nm;
   for (ymuint i = 0; i < nm; ++ i) {
-    format->mMasks[i] = mMasks[i];
+    format->mMasks[i] = masks[i];
   }
   return format;
 }
