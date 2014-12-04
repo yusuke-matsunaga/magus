@@ -1,34 +1,39 @@
-#ifndef YMSLASTLIST_H
-#define YMSLASTLIST_H
+#ifndef ASTSWITCH_H
+#define ASTSWITCH_H
 
-/// @file YmslAstList.h
-/// @brief YmslAstList のヘッダファイル
+/// @file AstSwitch.h
+/// @brief AstSwitch のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAstImpl.h"
+#include "AstStatement.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstList YmslAstList.h "YmslAstList.h"
-/// @brief リストを表す YmslAst
+/// @class AstSwitch AstSwitch.h "AstSwitch.h"
+/// @brief switch 文を表す Ast
 //////////////////////////////////////////////////////////////////////
-class YmslAstList :
-  public YmslAstImpl
+class AstSwitch :
+  public AstStatement
 {
 public:
 
   /// @brief コンストラクタ
-  YmslAstList();
+  /// @param[in] expr 条件式
+  /// @param[in] case_list case 文のリスト
+  /// @param[in] loc ファイル位置
+  AstSwitch(AstExpr* expr,
+	    const vector<AstCaseItem*>& case_list,
+	    const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstList();
+  ~AstSwitch();
 
 
 public:
@@ -40,22 +45,6 @@ public:
   virtual
   AstType
   type() const;
-
-  /// @brief 子供の数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供を返す．
-  /// @param[in] pos 位置( 0 <= pos < child_num() )
-  virtual
-  YmslAst*
-  child(ymuint pos) const;
-
-  /// @brief 子供を追加する．
-  virtual
-  void
-  add_child(YmslAst* child);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -71,11 +60,15 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // リストの本体
-  vector<YmslAst*> mList;
+  // 式
+  AstExpr* mExpr;
+
+  // case-item のリスト
+  vector<AstCaseItem*> mCaseItemList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTLIST_H
+
+#endif // ASTSWITCH_H

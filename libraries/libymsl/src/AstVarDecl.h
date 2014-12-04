@@ -1,34 +1,41 @@
-#ifndef YMSLASTLIST_H
-#define YMSLASTLIST_H
+#ifndef ASTVARDECL_H
+#define ASTVARDECL_H
 
-/// @file YmslAstList.h
-/// @brief YmslAstList のヘッダファイル
+/// @file AstVarDecl.h
+/// @brief AstVarDecl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAstImpl.h"
+#include "DeclBase.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstList YmslAstList.h "YmslAstList.h"
-/// @brief リストを表す YmslAst
+/// @class AstVarDecl AstVarDecl.h "AstVarDecl.h"
+/// @brief 変数宣言を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslAstList :
-  public YmslAstImpl
+class AstVarDecl :
+  public AstDeclBase
 {
 public:
 
   /// @brief コンストラクタ
-  YmslAstList();
+  /// @param[in] name 変数名
+  /// @param[in] type 型
+  /// @param[in] init_expr 初期化式
+  /// @param[in] loc ファイル位置
+  AstVarDecl(ShString name,
+	     YmslAst* type,
+	     AstExpr* init_expr,
+	     const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstList();
+  ~AstVarDecl();
 
 
 public:
@@ -37,25 +44,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 型を得る．
-  virtual
-  AstType
+  Ast*
   type() const;
 
-  /// @brief 子供の数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供を返す．
-  /// @param[in] pos 位置( 0 <= pos < child_num() )
-  virtual
-  YmslAst*
-  child(ymuint pos) const;
-
-  /// @brief 子供を追加する．
-  virtual
-  void
-  add_child(YmslAst* child);
+  /// @brief 初期化式を返す．
+  ///
+  /// NULL の場合もある．
+  AstExpr*
+  init_expr() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -71,11 +67,18 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // リストの本体
-  vector<YmslAst*> mList;
+  // 名前
+  ShString mName;
+
+  // 変数の型
+  Ast* mType;
+
+  // 初期化式
+  AstExpr* mInitExpr;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTLIST_H
+
+#endif // ASTVARDECL_H

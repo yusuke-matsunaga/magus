@@ -1,34 +1,39 @@
-#ifndef YMSLASTLIST_H
-#define YMSLASTLIST_H
+#ifndef ASTFUNCCALL_H
+#define ASTFUNCCALL_H
 
-/// @file YmslAstList.h
-/// @brief YmslAstList のヘッダファイル
+/// @file AstFuncCall.h
+/// @brief AstFuncCall のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAstImpl.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstList YmslAstList.h "YmslAstList.h"
-/// @brief リストを表す YmslAst
+/// @class AstFuncCall AstFuncCall.h "AstFuncCall.h"
+/// @brief 関数呼び出しを表す Ast
 //////////////////////////////////////////////////////////////////////
-class YmslAstList :
-  public YmslAstImpl
+class AstFuncCall :
+  public AstExpr
 {
 public:
 
   /// @brief コンストラクタ
-  YmslAstList();
+  /// @param[in] name 関数名
+  /// @param[in] expr_list 引数のリスト
+  /// @param[in] loc ファイル位置
+  AstFuncCall(AstSymbol* name,
+	      const vector<AstExpr*>& expr_list,
+	      const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstList();
+  ~AstFuncCall();
 
 
 public:
@@ -40,22 +45,6 @@ public:
   virtual
   AstType
   type() const;
-
-  /// @brief 子供の数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供を返す．
-  /// @param[in] pos 位置( 0 <= pos < child_num() )
-  virtual
-  YmslAst*
-  child(ymuint pos) const;
-
-  /// @brief 子供を追加する．
-  virtual
-  void
-  add_child(YmslAst* child);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -71,11 +60,15 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // リストの本体
-  vector<YmslAst*> mList;
+  // 関数名
+  AstSymbol* mName;
+
+  // 引数のリスト
+  vector<AstExpr*> mExprList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTLIST_H
+
+#endif // ASTFUNCCALL_H

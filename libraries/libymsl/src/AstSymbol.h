@@ -1,34 +1,38 @@
-#ifndef YMSLASTLIST_H
-#define YMSLASTLIST_H
+#ifndef ASTSYMBOL_H
+#define ASTSYMBOL_H
 
-/// @file YmslAstList.h
-/// @brief YmslAstList のヘッダファイル
+/// @file AstSymbol.h
+/// @brief AstSymbol のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAstImpl.h"
+#include "AstImpl.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstList YmslAstList.h "YmslAstList.h"
-/// @brief リストを表す YmslAst
+/// @class AstSymbol AstSymbol.h "AstSymbol.h"
+/// @brief シンボルを表す Ast
 //////////////////////////////////////////////////////////////////////
-class YmslAstList :
-  public YmslAstImpl
+class AstSymbol :
+  public AstImpl
 {
 public:
 
   /// @brief コンストラクタ
-  YmslAstList();
+  /// @param[in] val 値
+  /// @param[in] loc ファイル位置
+  AstSymbol(ShString val,
+	    const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstList();
+  ~AstSymbol();
 
 
 public:
@@ -41,21 +45,10 @@ public:
   AstType
   type() const;
 
-  /// @brief 子供の数を返す．
+  /// @brief 文字列型の値を返す．
   virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供を返す．
-  /// @param[in] pos 位置( 0 <= pos < child_num() )
-  virtual
-  YmslAst*
-  child(ymuint pos) const;
-
-  /// @brief 子供を追加する．
-  virtual
-  void
-  add_child(YmslAst* child);
+  ShString
+  str_val() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -71,11 +64,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // リストの本体
-  vector<YmslAst*> mList;
+  // 値
+  ShString mVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTLIST_H
+
+#endif // ASTSYMBOL_H

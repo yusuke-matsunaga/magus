@@ -1,0 +1,196 @@
+#ifndef ASTUNIOP_H
+#define ASTUNIOP_H
+
+/// @file AstUniOp.h
+/// @brief AstUniOp のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2014 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "AstExpr.h"
+
+
+BEGIN_NAMESPACE_YM_YMSL
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstUniOp AstUniOp.h "AstUniOp.h"
+/// @brief 単項演算子を表す Ast
+//////////////////////////////////////////////////////////////////////
+class AstUniOp :
+  public AstExpr
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] opr オペランド
+  /// @param[in] loc ファイル位置
+  AstUniOp(AstExpr* opr,
+	   const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstUniOp();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を表示する．(デバッグ用)
+  /// @param[in] s 出力ストリーム
+  /// @param[in] indent インデントレベル
+  virtual
+  void
+  print(ostream& s,
+	ymuint indent = 0) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // オペランド
+  AstExpr* mOperand;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstUniPlus AstUniPlus.h "AstUniPlus.h"
+/// @brief 単項プラスを表すクラス
+//////////////////////////////////////////////////////////////////////
+class AstUniPlus :
+  public AstUniOp
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] opr 子供のノード
+  /// @param[in] loc ファイル位置
+  AstUniPlus(AstExpr* opr,
+	     const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstUniPlus();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  AstType
+  type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstUniMinus AstUniOp.h "AstUniOp.h"
+/// @brief 単項マイナスを表すクラス
+//////////////////////////////////////////////////////////////////////
+class AstUniMinus :
+  public AstUniOp
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] opr 子供のノード
+  /// @param[in] loc ファイル位置
+  AstUniMinus(AstExpr* opr,
+	      const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstUniMinus();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  AstType
+  type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstLogNot AstUniOp.h "AstUniOp.h"
+/// @brief 論理否定を表すクラス
+//////////////////////////////////////////////////////////////////////
+class AstLogNot :
+  public AstUniOp
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] opr 子供のノード
+  /// @param[in] loc ファイル位置
+  AstLogNot(AstExpr* opr,
+	    const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstLogNot();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  AstType
+  type() const;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstBitNeg AstUniOp.h "AstUniOp.h"
+/// @brief ビット否定を表すクラス
+//////////////////////////////////////////////////////////////////////
+class AstBitNeg :
+  public AstUniOp
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] opr 子供のノード
+  /// @param[in] loc ファイル位置
+  AstBitNeg(AstExpr* opr,
+	    const FileRegion& loc);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstBitNeg();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 型を得る．
+  virtual
+  AstType
+  type() const;
+
+};
+
+END_NAMESPACE_YM_YMSL
+
+
+#endif // ASTUNIOP_H

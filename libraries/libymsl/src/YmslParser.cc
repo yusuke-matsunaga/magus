@@ -10,6 +10,7 @@
 #include "YmslParser.h"
 #include "YmslScanner.h"
 
+#include "YmslBlock.h"
 #include "YmslAstList.h"
 #include "YmslAstVarDecl.h"
 #include "YmslAstFuncDecl.h"
@@ -50,7 +51,7 @@ BEGIN_NAMESPACE_YM_YMSL
 YmslParser::YmslParser()
 {
   mScanner = NULL;
-  mRoot = NULL;
+  mToplevelBlock = NULL;
 }
 
 // @brief デストラクタ
@@ -70,19 +71,15 @@ YmslParser::read(IDO& ido)
 
   mScanner = new YmslScanner(ido);
 
+  mToplevelBlock = new YmslBlock(NULL);
+  mBlockStack.push_back(mToplevelBlock);
+
   int stat = yyparse(*this);
 
   delete mScanner;
   mScanner = NULL;
 
   return (stat == 0);
-}
-
-// @brief 構文木の根のノードを返す．
-YmslAst*
-YmslParser::root() const
-{
-  return mRoot;
 }
 
 // @brief yylex とのインターフェイス
@@ -121,11 +118,30 @@ YmslParser::yylex(YmslAst*& lval,
   return id;
 }
 
-// @brief ルートを設定する．
-void
-YmslParser::set_root(YmslAst* root)
+// @brief 現在のブロックを返す．
+YmslBlock*
+YmslParser::cur_block()
 {
-  mRoot = root;
+  ASSERT_COND( !mBlockStack.empty() );
+  return mBlockStack.back();
+}
+
+// @brief 新しいブロックを作りスタックに積む．
+// @return 新しいブロックを返す．
+YmslBlock*
+YmslParser::push_new_block()
+{
+  YmslBlock* parent = cur_block();
+  YmslBlock* block = new YmslBlock(parent);
+  mBlockStack.push_back(block);
+  return block;
+}
+
+// @brief ブロックをスタックから取り去る．
+void
+YmslParser::pop_block()
+{
+  mBlockStack.pop_back();
 }
 
 // @brief リストを作る．
@@ -150,19 +166,19 @@ YmslParser::new_AstVarDecl(YmslAst* id,
 }
 
 // @brief 関数宣言を作る．
-// @param[in] id 変数名
+// @param[in] name 変数名
 // @param[in] type 型
 // @param[in] param_list パラメータリスト
-// @param[in] statement_list 本体のリスト
+// @param[in] block 本体のブロック
 // @param[in] loc ファイル位置
 YmslAst*
-YmslParser::new_AstFuncDecl(YmslAst* id,
+YmslParser::new_AstFuncDecl(YmslAst* name,
 			    YmslAst* type,
 			    YmslAst* param_list,
-			    YmslAst* statement_list,
+			    YmslBlock* block,
 			    const FileRegion& loc)
 {
-  return new YmslAstFuncDecl(id, type, param_list, statement_list, loc);
+  return new YmslAstFuncDecl(name, type, param_list, block, loc);
 }
 
 // @brief 代入文を作る．
@@ -177,70 +193,70 @@ YmslParser::new_AstAssignment(YmslAst* left,
 
 // @brief if 文を作る．
 // @param[in] cond 条件式
-// @param[in] then_list then 文
+// @param[in] then_block then ブロック
 // @param[in] elif_list elif ブロックリスト
-// @param[in] else_list else 文
+// @param[in] else_block else ブロック
 // @param[in] loc ファイル位置
 YmslAst*
 YmslParser::new_AstIf(YmslAst* cond,
-		      YmslAst* then_list,
+		      YmslBlock* then_block,
 		      YmslAst* elif_list,
-		      YmslAst* else_list,
+		      YmslBlock* else_block,
 		      const FileRegion& loc)
 {
-  return new YmslAstIf(cond, then_list, elif_list, else_list, loc);
+  return new YmslAstIf(cond, then_block, elif_list, else_block, loc);
 }
 
 // @brief elif 文を作る．
 // @param[in] cond 条件式
-// @param[in] body_list 本文
+// @param[in] block 本体
 // @param[in] loc ファイル位置
 YmslAst*
 YmslParser::new_AstElif(YmslAst* cond,
-			YmslAst* body_list,
+			YmslBlock* block,
 			const FileRegion& loc)
 {
-  return new YmslAstElif(cond, body_list, loc);
+  return new YmslAstElif(cond, block, loc);
 }
 
 // @brief for 文を作る．
 // @param[in] init 初期化文
 // @param[in] cond 条件式
 // @param[in] next 増加文
-// @param[in] body 本文
+// @param[in] block 本体
 // @param[in] loc ファイル位置
 YmslAst*
 YmslParser::new_AstFor(YmslAst* init,
 		       YmslAst* cond,
 		       YmslAst* next,
-		       YmslAst* body,
+		       YmslBlock* block,
 		       const FileRegion& loc)
 {
-  return new YmslAstFor(init, cond, next, body, loc);
+  return new YmslAstFor(init, cond, next, block, loc);
 }
 
 // @brief while 文を作る．
 // @param[in] cond 条件式
-// @param[in] body 本文
+// @param[in] block 本体
 // @param[in] loc ファイル位置
 YmslAst*
 YmslParser::new_AstWhile(YmslAst* cond,
-			 YmslAst* body,
+			 YmslBlock* block,
 			 const FileRegion& loc)
 {
-  return new YmslAstWhile(cond, body, loc);
+  return new YmslAstWhile(cond, block, loc);
 }
 
 // @brief do-while 文を作る．
-// @param[in] body 本文
+// @param[in] block 本体
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
 YmslAst*
-YmslParser::new_AstDoWhile(YmslAst* body,
+YmslParser::new_AstDoWhile(YmslBlock* block,
 			   YmslAst* cond,
 			   const FileRegion& loc)
 {
-  return new YmslAstDoWhile(body, cond, loc);
+  return new YmslAstDoWhile(block, cond, loc);
 }
 
 // @brief switch 文を作る．
@@ -257,14 +273,14 @@ YmslParser::new_AstSwitch(YmslAst* body,
 
 // @brief case-item を作る．
 // @param[in] label ラベル
-// @param[in] statement_list 本体のリスト
+// @param[in] block 本体
 // @param[in] loc ファイル位置
 YmslAst*
 YmslParser::new_AstCaseItem(YmslAst* label,
-			    YmslAst* statement_list,
+			    YmslBlock* block,
 			    const FileRegion& loc)
 {
-  return new YmslAstCaseItem(label, statement_list, loc);
+  return new YmslAstCaseItem(label, block, loc);
 }
 
 // @brief goto 文を作る．
@@ -314,13 +330,13 @@ YmslParser::new_AstReturn(YmslAst* expr,
 }
 
 // @brief ブロックを作る．
-// @param[in] statement_list 文のリスト
+// @param[in] block 本体
 // @param[in] loc ファイル位置
 YmslAst*
-YmslParser::new_AstBlock(YmslAst* statement_list,
+YmslParser::new_AstBlock(YmslBlock* block,
 			 const FileRegion& loc)
 {
-  return new YmslAstBlock(statement_list, loc);
+  return new YmslAstBlock(block, loc);
 }
 
 // @brief 単項演算式を作る．
@@ -433,7 +449,7 @@ YmslAst*
 YmslParser::new_AstString(const char* val,
 			  const FileRegion& loc)
 {
-  return new YmslAstString(val, loc);
+  return new YmslAstString(ShString(val), loc);
 }
 
 // @brief 文字列型を作る．

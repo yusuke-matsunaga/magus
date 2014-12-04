@@ -1,35 +1,86 @@
-#ifndef YMSLASTIMPL_H
-#define YMSLASTIMPL_H
+#ifndef AST_H
+#define AST_H
 
-/// @file YmslAstImpl.h
-/// @brief YmslAstImpl のヘッダファイル
+/// @file Ast.h
+/// @brief Ast のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAst.h"
+#include "ymsl_int.h"
+#include "YmUtils/FileRegion.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
+#if 0
+/// @brief 抽象構文木の型
+enum AstType
+{
+  kAstSymbol,
+
+  kAstInt,
+  kAstFloat,
+  kAstString,
+
+  kAstStringType,
+  kAstIntType,
+  kAstFloatType,
+  kAstUserType,
+
+  kAstList,
+
+  kAstVarDecl,
+  kAstFuncDecl,
+
+  kAstUniPlus,
+  kAstUniMinus,
+  kAstPlus,
+  kAstMinus,
+  kAstMult,
+  kAstDiv,
+  kAstMod,
+
+  kAstBitNeg,
+  kAstBitAnd,
+  kAstBitOr,
+  kAstBitXor,
+
+  kAstLogNot,
+  kAstLogAnd,
+  kAstLogOr,
+  kAstLogXor,
+
+  kAstEqEq,
+  kAstNotEq,
+  kAstLt,
+  kAstGt,
+  kAstLe,
+  kAstGe,
+
+  kAstFuncCall,
+};
+#endif
+
+
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstImpl YmslAstImpl.h "YmslAstImpl.h"
-/// @brief YmslAst の実装クラス
+/// @class Ast Ast.h "Ast.h"
+/// @brief YMSL の抽象構文木クラス
 //////////////////////////////////////////////////////////////////////
-class YmslAstImpl :
-  public YmslAst
+class Ast
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル位置
-  YmslAstImpl(const FileRegion& loc);
+  Ast(const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstImpl();
+  ~Ast();
 
 
 public:
@@ -38,84 +89,73 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ファイル位置を得る．
-  virtual
   const FileRegion&
   file_region() const;
+
+#if 0
+  /// @brief 型を得る．
+  virtual
+  AstType
+  type() const = 0;
 
   /// @brief 名前を得る．
   ///
   /// 名前を持つ要素のみ意味を持つ．
   virtual
   ShString
-  name() const;
+  name() const = 0;
 
   /// @brief ブロックを返す．
   ///
   /// ブロックを持たない要素の場合 NULL を返す．
   virtual
   YmslBlock*
-  block() const;
+  block() const = 0;
 
   /// @brief 文字列型の値を返す．
   virtual
   ShString
-  str_val() const;
+  str_val() const = 0;
 
   /// @brief 整数型の値を返す．
   virtual
   int
-  int_val() const;
+  int_val() const = 0;
 
   /// @brief 浮動小数点型の値を返す．
   virtual
   double
-  float_val() const;
+  float_val() const = 0;
 
   /// @brief 子供の数を返す．
   virtual
   ymuint
-  child_num() const;
+  child_num() const = 0;
 
   /// @brief 子供を返す．
   /// @param[in] pos 位置( 0 <= pos < child_num() )
   virtual
-  YmslAst*
-  child(ymuint pos) const;
+  Ast*
+  child(ymuint pos) const = 0;
 
   /// @brief 子供を追加する．
   virtual
   void
-  add_child(YmslAst* child);
+  add_child(Ast* child) = 0;
 
   /// @brief ファイル位置を設定する．
   virtual
   void
-  set_file_region(const FileRegion& loc);
+  set_file_region(const FileRegion& loc) = 0;
 
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // print() で用いる便利関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief インデント用の空白を出力する
+  /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデント量
-  static
+  /// @param[in] indent インデントレベル
+  virtual
   void
-  print_indent(ostream& s,
-	       ymuint indent);
-
-  /// @brief ステートメントリストを出力する
-  /// @param[in] s 出力ストリーム
-  /// @param[in] statement_list ステートメントリスト
-  /// @param[in] indent インデント量
-  static
-  void
-  print_statement_list(ostream& s,
-		       YmslAst* statement_list,
-		       ymuint indent);
-
+  print(ostream& s,
+	ymuint indent = 0) const = 0;
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -129,5 +169,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-
-#endif // YMSLASTIMPL_H
+#endif // AST_H

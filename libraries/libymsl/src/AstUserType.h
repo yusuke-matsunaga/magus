@@ -1,34 +1,36 @@
-#ifndef YMSLASTLIST_H
-#define YMSLASTLIST_H
+#ifndef ASTUSERTYPE_H
+#define ASTUSERTYPE_H
 
-/// @file YmslAstList.h
-/// @brief YmslAstList のヘッダファイル
+/// @file AstUserType.h
+/// @brief AstUserType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslAstImpl.h"
+#include "AstValueType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslAstList YmslAstList.h "YmslAstList.h"
-/// @brief リストを表す YmslAst
+/// @class AstUserType AstUserType.h "AstUserType.h"
+/// @brief ユーザー定義型を表す Ast
 //////////////////////////////////////////////////////////////////////
-class YmslAstList :
-  public YmslAstImpl
+class AstUserType :
+  public AstValueType
 {
 public:
 
   /// @brief コンストラクタ
-  YmslAstList();
+  /// @param[in] type_name 型名
+  /// @param[in] loc ファイル位置
+  AstUserType(AstSymbol* type_name);
 
   /// @brief デストラクタ
   virtual
-  ~YmslAstList();
+  ~AstUserType();
 
 
 public:
@@ -40,22 +42,6 @@ public:
   virtual
   AstType
   type() const;
-
-  /// @brief 子供の数を返す．
-  virtual
-  ymuint
-  child_num() const;
-
-  /// @brief 子供を返す．
-  /// @param[in] pos 位置( 0 <= pos < child_num() )
-  virtual
-  YmslAst*
-  child(ymuint pos) const;
-
-  /// @brief 子供を追加する．
-  virtual
-  void
-  add_child(YmslAst* child);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -71,11 +57,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // リストの本体
-  vector<YmslAst*> mList;
+  // 形名
+  AstSymbol* mTypeName;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTLIST_H
+#endif // ASTUSERTYPE_H

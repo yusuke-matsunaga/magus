@@ -30,8 +30,14 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_YMSL
 
 class YmslAst;
+class YmslBlock;
 class YmslParser;
 class YmslScanner;
+
+class AstFuncDecl;
+class AstVarDecl;
+class AstStatement;
+class AstExpr;
 
 #if 0
 /// @brief トークンの値

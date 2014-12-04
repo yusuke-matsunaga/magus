@@ -11,6 +11,7 @@
 
 #include "YmslParser.h"
 #include "YmslAst.h"
+#include "AstBlock.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 
@@ -18,7 +19,7 @@
 #define YYERROR_VERBOSE 1
 
 // 値を表す型
-#define YYSTYPE YmslAst*
+//#define YYSTYPE YmslAst*
 
 // 位置を表す型
 // (yylloc の型)
@@ -89,6 +90,17 @@ fr_merge(const FileRegion fr_array[],
 // yylex の引数
 %lex-param {YmslParser& parser}
 
+// 値を表す型
+%union {
+  YmslAst* ast_type;
+  AstBlock* block_type;
+  YmslExpr* expr_type;
+  YmslFuncDecl* funcdecl_type;
+  YmslStatement* statement_type;
+  YmslVarDecl* vardecl_type;
+  AstValueType valuetype_type;
+}
+
 
 // 終端記号
 %token COLON
@@ -141,8 +153,12 @@ fr_merge(const FileRegion fr_array[],
 %left MULT DIV MOD
 %left LOGNOT BITNEG UOP
 
-%nonassoc LOWER_THAN_ELSE
-%nonassoc ELSE
+// 非終端の型
+%type <statement_type> statement
+ //%type <block_type> block
+%type <expr_type> expr
+%type <funcdecl_type> func_decl
+%type <vardecl_type> var_decl
 
 %%
 
@@ -151,15 +167,7 @@ fr_merge(const FileRegion fr_array[],
 // トップレベルの要素リスト
 item_list
 : // 空
-{
-  $$ = parser.new_AstList();
-  parser.set_root($$);
-}
 | item_list item
-{
-  $$ = $1;
-  $$->add_child($2);
-}
 ;
 
 // トップレベルの要素
@@ -167,21 +175,25 @@ item_list
 item
 : statement
 {
-  $$ = $1;
+  AstBlock* block = parser.cur_block();
+  block->add_statement($1);
 }
+// 関数宣言
 | func_decl
 {
-  $$ = $1;
+  AstBlock* block = parser.cur_block();
+  block->add_funcdecl($1);
+}
+| var_decl
+{
+  AstBlock* block = parser.cur_block();
+  block->add_vardecl($1);
 }
 ;
 
 // ステートメント
 statement
-: var_decl
-{
-  $$ = $1;
-}
-| lvalue EQ expr
+: lvalue EQ expr
 {
   $$ = parser.new_AstAssignment($1, $3);
 }
@@ -189,21 +201,21 @@ statement
 {
   $$ = parser.new_AstFuncCall($1, $3, @$);
 }
-| IF expr LCB statement_list RCB elif_list else_block
+| IF expr statement_block elif_list else_block
 {
-  $$ = parser.new_AstIf($2, $4, $6, $7, @$);
+  $$ = parser.new_AstIf($2, $3, $4, $5, @$);
 }
-| FOR LP statement SEMI expr SEMI statement RP LCB statement_list RCB
+| FOR LP statement SEMI expr SEMI statement RP statement_block
 {
-  $$ = parser.new_AstFor($3, $5, $7, $10, @$);
+  $$ = parser.new_AstFor($3, $5, $7, $9, @$);
 }
-| WHILE LP expr RP LCB statement_list RCB
+| WHILE LP expr RP statement_block
 {
-  $$ = parser.new_AstWhile($2, $4, @$);
+  $$ = parser.new_AstWhile($3, $5, @$);
 }
-| DO LCB statement_list RCB WHILE LP expr RP
+| DO statement_block WHILE LP expr RP
 {
-  $$ = parser.new_AstDoWhile($3, $6, @$);
+  $$ = parser.new_AstDoWhile($2, $5, @$);
 }
 | SWITCH expr LCB case_list RCB
 {
@@ -233,21 +245,86 @@ statement
 {
   $$ = parser.new_AstReturn($2, @$);
 }
-| LCB statement_list RCB
+| statement_block
 {
-  $$ = parser.new_AstBlock($2, @$);
+  $$ = parser.new_AstBlock($1, @$);
+}
+;
+
+statement_block
+: stmt_begin statement_list stmt_end
+{
+  $$ = $1;
+}
+;
+
+stmt_begin
+: LCB
+{
+  AstBlock* cur_block = parser.cur_block();
+  $$ = parser.push_new_block(cur_block);
+}
+;
+
+stmt_end
+: RCB
+{
+  parser.pop_block();
 }
 ;
 
 statement_list
 : // 空
 {
-  $$ = parser.new_AstList();
+  // なにもしない．
 }
 | statement_list statement
 {
+  AstBlock* cur_block = parser.cur_block();
+  cur_block->add_statment($2);
+}
+;
+
+elif_list
+: // 空
+{
+  $$ = parser.new_AstList();
+}
+| elif_list ELIF expr statement_block
+{
   $$ = $1;
-  $$->add_child($2);
+  YmslAst* elif = parser.new_AstElif($3, $4, FileRegion(@2, @4));
+  $$->add_child(elif);
+}
+;
+
+else_block
+: // 空
+{
+  $$ = NULL;
+}
+| ELSE statement_block
+{
+  $$ = $2;
+}
+;
+
+case_list
+: // 空
+{
+  $$ = parser.new_AstList();
+}
+| case_list CASE expr COLON statement_list
+{
+  $$ = $1;
+  YmslAst* case_item = parser.new_AstCaseItem($3, $5, FileRegion(@2, @5));
+  $$->add_child(case_item);
+}
+| case_list DEFAULT COLON statement_list
+{
+  $$ = $1;
+  YmslAst* case_item = parser.new_AstCaseItem(NULL, $4, FileRegion(@2, @4));
+  $$->add_child(case_item);
 }
 ;
 
@@ -262,17 +339,39 @@ lvalue
 }
 ;
 
-// 変数定義
-var_decl
-: VAR SYMBOL COLON type init_expr
+func_decl
+: FUNCTION SYMBOL LP param_list RP COLON type statement_block
 {
-  $$ = parser.new_AstVarDecl($2, $4, $5, @$);
-}
-| VAR SYMBOL LBK INT_NUM RBK COLON type
-{
+  $$ = parser.new_AstFuncDecl($2, $4, $7, $8, @$);
 }
 ;
 
+param_list
+: // 空
+{
+  $$ = parser.new_AstList();
+}
+| param_decl
+{
+  $$ = parser.new_AstList();
+  $$->add_child($1);
+}
+| param_list COMMA var_decl
+{
+  $$ = $1;
+  $$->add_child($3);
+}
+;
+
+// 変数宣言
+var_decl
+: SYMBOL COLON type init_expr
+{
+  $$ = parser.new_AstVarDecl($1, $3, $4, @$);
+}
+;
+
+// データ型
 type
 : INT
 {
@@ -300,91 +399,6 @@ init_expr
 | EQ expr
 {
   $$ = $2;
-}
-;
-
-elif_list
-: // 空
-{
-  $$ = parser.new_AstList();
-}
-| elif_list ELIF expr LCB statement_list RCB
-{
-  $$ = $1;
-  YmslAst* elif = parser.new_AstElif($3, $5, FileRegion(@2, @6));
-  $$->add_child(elif);
-}
-;
-
-else_block
-: // 空
-{
-  $$ = NULL;
-}
-| ELSE LCB statement_list RCB
-{
-  $$ = $3;
-}
-;
-
-case_list
-: // 空
-{
-  $$ = parser.new_AstList();
-}
-| case_list CASE expr COLON statement_list
-{
-  $$ = $1;
-  YmslAst* case_item = parser.new_AstCaseItem($3, $5, FileRegion(@2, @5));
-  $$->add_child(case_item);
-}
-| case_list DEFAULT COLON statement_list
-{
-  $$ = $1;
-  YmslAst* case_item = parser.new_AstCaseItem(NULL, $4, FileRegion(@2, @4));
-  $$->add_child(case_item);
-}
-;
-
-func_decl
-: FUNCTION SYMBOL LP param_list RP COLON type LCB statement_list RCB
-{
-  $$ = parser.new_AstFuncDecl($2, $4, $7, $8, @$);
-}
-;
-
-param_list
-: // 空
-{
-  $$ = parser.new_AstList();
-}
-| param_list1
-{
-  $$ = $1;
-}
-;
-
-param_list1
-: param_decl
-{
-  $$ = parser.new_AstList();
-  $$->add_child($1);
-}
-| param_list1 COMMA param_decl
-{
-  $$ = $1;
-  $$->add_child($3);
-}
-;
-
-param_decl
-: SYMBOL COLON type
-{
-  $$ = parser.new_AstVarDecl($1, $3, NULL, @$);
-}
-| SYMBOL COLON type EQ expr
-{
-  $$ = parser.new_AstVarDecl($1, $3, $5, @$);
 }
 ;
 

@@ -44,12 +44,31 @@ YmslAstImpl::file_region() const
   return mLoc;
 }
 
+// @brief 名前を得る．
+//
+// 名前を持つ要素のみ意味を持つ．
+ShString
+YmslAstImpl::name() const
+{
+  ASSERT_NOT_REACHED;
+  return ShString();
+}
+
+// @brief ブロックを返す．
+//
+// ブロックを持たない要素の場合 NULL を返す．
+YmslBlock*
+YmslAstImpl::block() const
+{
+  return NULL;
+}
+
 // @brief 文字列型の値を返す．
-const char*
+ShString
 YmslAstImpl::str_val() const
 {
   ASSERT_NOT_REACHED;
-  return NULL;
+  return ShString();
 }
 
 // @brief 整数型の値を返す．
@@ -92,6 +111,13 @@ YmslAstImpl::add_child(YmslAst* child)
   ASSERT_NOT_REACHED;
 }
 
+// @brief ファイル位置を設定する．
+void
+YmslAstImpl::set_file_region(const FileRegion& loc)
+{
+  mLoc = loc;
+}
+
 // @brief インデント用の空白を出力する
 // @param[in] s 出力ストリーム
 // @param[in] indent インデント量
@@ -127,7 +153,8 @@ YmslAstImpl::print_statement_list(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslAstList::YmslAstList()
+YmslAstList::YmslAstList() :
+  YmslAstImpl(FileRegion())
 {
 }
 
@@ -136,42 +163,11 @@ YmslAstList::~YmslAstList()
 {
 }
 
-// @brief ファイル位置を得る．
-const FileRegion&
-YmslAstList::file_region() const
-{
-  return mLoc;
-}
-
 // @brief 型を得る．
 AstType
 YmslAstList::type() const
 {
   return kAstList;
-}
-
-// @brief 文字列型の値を返す．
-const char*
-YmslAstList::str_val() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 整数型の値を返す．
-int
-YmslAstList::int_val() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
-// @brief 浮動小数点型の値を返す．
-double
-YmslAstList::float_val() const
-{
-  ASSERT_NOT_REACHED;
-  return 0.0;
 }
 
 // @brief 子供の数を返す．
@@ -198,9 +194,11 @@ YmslAstList::add_child(YmslAst* child)
     return;
   }
   if ( mList.empty() ) {
-    mLoc = child->file_region();
+    set_file_region(child->file_region());
   }
-  mLoc = FileRegion(mLoc, child->file_region());
+  else {
+    set_file_region(FileRegion(file_region(), child->file_region()));
+  }
   mList.push_back(child);
 }
 
@@ -211,7 +209,7 @@ void
 YmslAstList::print(ostream& s,
 		   ymuint indent) const
 {
-  YmslAstImpl::print_indent(s, indent);
+  print_indent(s, indent);
   s << "[List begin]" << endl;
 
   for (vector<YmslAst*>::const_iterator p = mList.begin();
@@ -221,7 +219,7 @@ YmslAstList::print(ostream& s,
     s << endl;
   }
 
-  YmslAstImpl::print_indent(s, indent);
+  print_indent(s, indent);
   s << "[List end]" << endl;
 }
 
@@ -480,7 +478,7 @@ YmslAstFloat::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] val 値
 // @param[in] loc ファイル位置
-YmslAstString::YmslAstString(const char* val,
+YmslAstString::YmslAstString(ShString val,
 			     const FileRegion& loc) :
   YmslAstImpl(loc),
   mVal(val)
@@ -500,7 +498,7 @@ YmslAstString::type() const
 }
 
 // @brief 文字列型の値を返す．
-const char*
+ShString
 YmslAstString::str_val() const
 {
   return mVal;
@@ -545,7 +543,7 @@ YmslAstSymbol::type() const
 }
 
 // @brief 文字列型の値を返す．
-const char*
+ShString
 YmslAstSymbol::str_val() const
 {
   return mVal;
