@@ -27,12 +27,14 @@ GdsRecord::~GdsRecord()
 {
 }
 
+#if 0
 // レコード型を表すトークンを返す．
 int
 GdsRecord::rtype_token() const
 {
   return GdsRecTable::obj().rtype_token(mRtype);
 }
+#endif
 
 // レコード型を表す文字列を返す．
 const char*

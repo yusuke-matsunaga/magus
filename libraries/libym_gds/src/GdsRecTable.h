@@ -43,9 +43,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // レコード型からトークン値を得る．
   int
   rtype_token(GdsRtype rtype) const;
+#endif
 
   // レコード型から文字列を得る．
   const char*
@@ -74,8 +76,10 @@ private:
     // レコード型
     GdsRtype mRtype;
 
+#if 0
     // トークン値
     int mToken;
+#endif
 
     // 文字列(表示用)
     const char* mString;

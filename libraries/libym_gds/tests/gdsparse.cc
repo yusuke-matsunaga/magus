@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_gds/gds_nsdef.h"
-#include "ym_gds/GdsParser.h"
+#include "gds/gds_nsdef.h"
+#include "gds/GdsParser.h"
 
 
 int

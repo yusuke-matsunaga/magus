@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym_gds/gds_nsdef.h"
+#include "gds/gds_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_GDS

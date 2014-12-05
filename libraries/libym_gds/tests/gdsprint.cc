@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_gds/GdsScanner.h"
-#include "ym_gds/GdsDumper.h"
-#include "ym_gds/Msg.h"
+#include "gds/GdsScanner.h"
+#include "gds/GdsDumper.h"
+#include "gds/Msg.h"
 
 int
 main(int argc,

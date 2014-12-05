@@ -31,6 +31,7 @@
 #include "GdsText.h"
 
 
+#if 0
 BEGIN_NAMESPACE_YM_GDS_PARSER
 
 #include "gds_grammer.hh"
@@ -39,7 +40,7 @@ extern
 int yyparse(GdsParser&);
 
 END_NAMESPACE_YM_GDS_PARSER
-
+#endif
 
 BEGIN_NAMESPACE_YM_GDS
 
@@ -107,7 +108,7 @@ GdsParser::parse(const string& filename)
 bool
 GdsParser::read_header()
 {
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -117,7 +118,7 @@ GdsParser::read_header()
   }
   ymint16 version = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -127,7 +128,7 @@ GdsParser::read_header()
   }
   GdsDate* date = new_date();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -136,7 +137,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsLIBDIRSIZE ) {
     libdirsize = new_int2();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -146,7 +147,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsSRFNAME ) {
     srfname = new_string();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -156,7 +157,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsLIBSECUR ) {
     acl = new_acl();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -167,7 +168,7 @@ GdsParser::read_header()
   }
   GdsString* libname = new_string();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -176,7 +177,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsREFLIBS ) {
     reflibs = new_string();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -186,7 +187,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsFONTS ) {
     fonts = new_string();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -196,7 +197,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsATTRTABLE ) {
     attrtable = new_string();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -206,7 +207,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsGENERATIONS ) {
     generations = new_int2();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -216,7 +217,7 @@ GdsParser::read_header()
   if ( mScanner.cur_rtype() == kGdsFORMAT ) {
     ymint16 format_type = new_int2();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
 
@@ -225,7 +226,7 @@ GdsParser::read_header()
       GdsString* mask = new_string();
       masks.push_back(mask);
 
-      if ( !mScanner.read_token() ) {
+      if ( !mScanner.read_rec() ) {
 	return false;
       }
     }
@@ -234,12 +235,12 @@ GdsParser::read_header()
 	return false;
       }
 
-      if ( !mScanner.read_token() ) {
+      if ( !mScanner.read_rec() ) {
 	return false;
       }
     }
 
-    format = new_foramt(format_type, masks);
+    format = new_format(format_type, masks);
   }
 
   // UNITS
@@ -262,7 +263,7 @@ GdsParser::read_structure()
   // BGNSTR を読んだ直後
   GdsDate* date = new_date();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -286,20 +287,27 @@ GdsParser::read_structure()
 
   mCurElement = NULL;
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ STRCLASS ]
   if ( mScanner.cur_rtype() == kGdsSTRCLASS ) {
     // あれ？これ何するの？
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
 
-  while ( mScanner.cur_rtype() != kGdsENDSTR ) {
+  // { element }* ENDSTR
+  for ( ; ; ) {
     switch ( mScanner.cur_rtype() ) {
+    case kGdsENDSTR:
+      if ( !mScanner.read_rec() ) {
+	return false;
+      }
+      return true;
+
     case kGdsBOUNDARY:
       if ( !read_boundary() ) {
 	return false;
@@ -353,7 +361,7 @@ GdsParser::read_structure()
       }
       ymint16 prop_attr = new_int2();
 
-      if ( !mScanner.read_token() ) {
+      if ( !mScanner.read_rec() ) {
 	return false;
       }
 
@@ -362,13 +370,25 @@ GdsParser::read_structure()
       }
       GdsString* prop_value = new_string();
 
-      if ( !mScanner.read_token() ) {
+      if ( !mScanner.read_rec() ) {
 	return false;
       }
 
       add_property(prop_attr, prop_value);
     }
+
+    // ENDEL
+    if ( mScanner.cur_rtype() != kGdsENDEL ) {
+      return false;
+    }
+
+    if ( !mScanner.read_rec() ) {
+      return false;
+    }
   }
+
+  ASSERT_NOT_REACHED;
+  return false;
 }
 
 bool
@@ -376,16 +396,16 @@ GdsParser::read_boundary()
 {
   // BOUNDARY を読んだ直後
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -395,7 +415,7 @@ GdsParser::read_boundary()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -406,7 +426,7 @@ GdsParser::read_boundary()
   }
   ymint16 layer = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -416,7 +436,7 @@ GdsParser::read_boundary()
   }
   ymint16 datatype = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -439,16 +459,16 @@ GdsParser::read_path()
 {
   // PATH を読み込んだあと
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -458,7 +478,7 @@ GdsParser::read_path()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -469,7 +489,7 @@ GdsParser::read_path()
   }
   ymint16 layer = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -479,7 +499,7 @@ GdsParser::read_path()
   }
   ymint16 datatype = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -488,7 +508,7 @@ GdsParser::read_path()
   if ( mScanner.cur_rtype() == kGdsPATHTYPE ) {
     pathtype = new_int2();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -498,7 +518,7 @@ GdsParser::read_path()
   if ( mScanner.cur_rtype() == kGdsWIDTH ) {
     width = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -506,9 +526,9 @@ GdsParser::read_path()
   // [ BGNEXTN ]
   ymint32 bgn_extn = 0;
   if ( mScanner.cur_rtype() == kGdsBGNEXTN ) {
-    bgnextn = new_int4();
+    bgn_extn = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -516,9 +536,9 @@ GdsParser::read_path()
   // [ ENDEXTN ]
   ymint32 end_extn = 0;
   if ( mScanner.cur_rtype() == kGdsENDEXTN ) {
-    endextn = new_int4();
+    end_extn = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -538,20 +558,20 @@ GdsParser::read_path()
 }
 
 bool
-read_sref()
+GdsParser::read_sref()
 {
   // SREF を読んだ直後
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -561,7 +581,7 @@ read_sref()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -597,16 +617,16 @@ GdsParser::read_aref()
 {
   // AREF を読んだ直後
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -616,7 +636,7 @@ GdsParser::read_aref()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -639,7 +659,7 @@ GdsParser::read_aref()
   }
   ymuint32 colrow = new_colrow();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -662,16 +682,16 @@ GdsParser::read_text()
 {
   // TEXT を読んだ直後
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -681,7 +701,7 @@ GdsParser::read_text()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -692,7 +712,7 @@ GdsParser::read_text()
   }
   ymint16 layer = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -707,7 +727,7 @@ GdsParser::read_text()
   if ( mScanner.cur_rtype() == kGdsPRESENTATION ) {
     presentation = new_int2();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -717,7 +737,7 @@ GdsParser::read_text()
   if ( mScanner.cur_rtype() == kGdsPATHTYPE ) {
     pathtype = new_int2();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -727,7 +747,7 @@ GdsParser::read_text()
   if ( mScanner.cur_rtype() == kGdsWIDTH ) {
     width = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -748,7 +768,7 @@ GdsParser::read_text()
   if ( mScanner.cur_rtype() != kGdsTEXT ) {
     return false;
   }
-  GdsString* body = new_text();
+  GdsString* body = new_string();
 
   void* p = mAlloc.get_memory(sizeof(GdsText));
   GdsText* text = new (p) GdsText(elflags, plex, layer, texttype, presentation, pathtype, width, strans, xy, body);
@@ -763,16 +783,16 @@ GdsParser::read_node()
 {
   // NODE を読んだ直後
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -782,7 +802,7 @@ GdsParser::read_node()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -793,7 +813,7 @@ GdsParser::read_node()
   }
   ymint16 layer = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -803,7 +823,7 @@ GdsParser::read_node()
   }
   ymint16 nodetype = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -826,16 +846,16 @@ GdsParser::read_box()
 {
   // BOX を読んだ直後
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ ELFLAGS ]
   ymuint16 elflags = 0U;
   if ( mScanner.cur_rtype() == kGdsELFLAGS ) {
-    eflags = new_bitarray();
+    elflags = new_bitarray();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -845,7 +865,7 @@ GdsParser::read_box()
   if ( mScanner.cur_rtype() == kGdsPLEX ) {
     plex = new_int4();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -856,7 +876,7 @@ GdsParser::read_box()
   }
   ymint16 layer = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -866,7 +886,7 @@ GdsParser::read_box()
   }
   ymint16 boxtype = new_int2();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
@@ -899,16 +919,16 @@ GdsParser::read_strans(GdsStrans*& strans)
 
   ymuint flags = new_bitarray();
 
-  if ( !mScanner.read_token() ) {
+  if ( !mScanner.read_rec() ) {
     return false;
   }
 
   // [ MAG ]
   double mag = 1.0;
   if ( mScanner.cur_rtype() == kGdsMAG ) {
-    mag = new_double();
+    mag = new_real();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -916,9 +936,9 @@ GdsParser::read_strans(GdsStrans*& strans)
   // [ ANGLE ]
   double angle = 0.0;
   if ( mScanner.cur_rtype() == kGdsANGLE ) {
-    angle = new_angle();
+    angle = new_real();
 
-    if ( !mScanner.read_token() ) {
+    if ( !mScanner.read_rec() ) {
       return false;
     }
   }
@@ -963,6 +983,7 @@ GdsParser::add_property(ymuint attr,
   mCurProperty = prop;
 }
 
+#if 0
 // @brief yylex() の実装
 int
 GdsParser::yylex(nsParser::YYSTYPE& lval)
@@ -1007,6 +1028,7 @@ GdsParser::yylex(nsParser::YYSTYPE& lval)
   int token = table.rtype_token(rtype);
   return token;
 }
+#endif
 
 // @brief yyerror() の実装
 int

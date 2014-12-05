@@ -51,9 +51,11 @@ public:
   GdsRtype
   rtype() const;
 
+#if 0
   /// @brief レコード型を表すトークンを返す．
   int
   rtype_token() const;
+#endif
 
   /// @brief レコード型を表す文字列を返す．
   const char*
@@ -156,7 +158,7 @@ GdsRecord::size() const
 
 // レコード型を取り出す．
 inline
-tGdsRtype
+GdsRtype
 GdsRecord::rtype() const
 {
   return mRtype;

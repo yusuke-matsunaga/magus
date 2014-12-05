@@ -11,7 +11,7 @@
 
 #include "gds/gds_nsdef.h"
 #include "gds/GdsScanner.h"
-#include "utils/SimpleAlloc.h"
+#include "YmUtils/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_GDS
@@ -132,9 +132,11 @@ private:
   add_property(ymuint attr,
 	       GdsString* value);
 
+#if 0
   /// @brief yylex() の実装
   int
   yylex(nsParser::YYSTYPE& lval);
+#endif
 
   /// @brief yyerror() の実装
   int
@@ -148,7 +150,8 @@ private:
 
   /// @brief GdsFormat の作成
   GdsFormat*
-  new_format();
+  new_format(ymint16 format_type,
+	     const vector<GdsString*>& masks);
 
   /// @brief GdsACL の作成
   GdsACL*

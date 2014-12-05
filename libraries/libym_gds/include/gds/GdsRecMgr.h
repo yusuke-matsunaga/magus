@@ -10,7 +10,7 @@
 
 
 #include "gds/gds_nsdef.h"
-#include "utils/FragAlloc.h"
+#include "YmUtils/FragAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_GDS
