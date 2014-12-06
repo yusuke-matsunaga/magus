@@ -30,8 +30,8 @@ public:
   /// @param[in] block 本文のブロック
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
-	      YmslAst* type,
-	      const vector<AstVarDecl*>& param_list,
+	      AstValueType* type,
+	      AstVarDecl* param_list,
 	      AstBlock* block,
 	      const FileRegion& loc);
 
@@ -46,7 +46,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 出力の型を返す．
-  YmslAst*
+  AstValueType*
   output_type() const;
 
   /// @brief パラメータリストを返す．
@@ -72,7 +72,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 出力の型
-  YmslAst* mType;
+  AstValueType* mType;
 
   // パラメータリスト
   vector<AstVarDecl*> mParamList;

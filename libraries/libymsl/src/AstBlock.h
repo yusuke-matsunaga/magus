@@ -10,11 +10,12 @@
 
 
 #include "ymsl_int.h"
-#include "YmUtils/HashMap.h"
 #include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
+
+class AstSymHandle;
 
 //////////////////////////////////////////////////////////////////////
 /// @class AstBlock AstBlock.h "AstBlock.h"
@@ -37,7 +38,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief statement を追加する．
+  /// @brief ステートメントを追加する．
   void
   add_statement(AstStatement* statement);
 
@@ -51,14 +52,29 @@ public:
   void
   add_vardecl(AstVarDecl* item);
 
-  /// @brief 名前から要素を見つける．
+  /// @brief 名前からラベルステートメントを見つける．
   /// @param[in] name 名前
-  /// @return name という名前の要素を返す．
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  YmslAst*
-  find_item(ShString name) const;
+  AstStatement*
+  find_label(ShString name) const;
+
+  /// @brief 名前から関数宣言を見つける．
+  /// @param[in] name 名前
+  ///
+  /// ここになければ親のブロックを探す．
+  /// それでもなければ NULL を返す．
+  AstFuncDecl*
+  find_funcdecl(ShString name) const;
+
+  /// @brief 名前から変数宣言を見つける．
+  /// @param[in] name 名前
+  ///
+  /// ここになければ親のブロックを探す．
+  /// それでもなければ NULL を返す．
+  AstVarDecl*
+  find_vardecl(ShString name) const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -70,17 +86,52 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ハッシュ表を確保する．
+  /// @param[in] req_size 要求サイズ
+  void
+  alloc_table(ymuint req_size);
+
+  /// @brief 名前からハンドルを探す．
+  /// @param[in] name 名前
+  AstSymHandle*
+  find(ShString name) const;
+
+  /// @brief ハンドルを登録する．
+  void
+  put(AstSymHandle* handle);
+
+  /// @brief ハンドルを登録する．
+  ///
+  /// こちらはサイズチェックなし
+  void
+  _put(AstSymHandle* handle);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // 親のブロック
   AstBlock* mParent;
 
-  // シンボルテーブル
-  HashMap<ShString, YmslAst*> mSymbolTable;
-
   // statement リスト
   vector<AstStatement*> mStatementList;
+
+  // ハッシュサイズ
+  ymuint mHashSize;
+
+  // ハッシュ表を拡大するしきい値
+  ymuint mNextLimit;
+
+  // ハッシュ表
+  AstSymHandle** mHashTable;
+
+  // ハッシュの要素数
+  ymuint mHashNum;
 
 };
 

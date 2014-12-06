@@ -15,12 +15,13 @@ include_directories(
 # ===================================================================
 
 set (ymsl_SOURCES
+  src/Ast.cc
   src/AstBlock.cc
+  src/AstDeclBase.cc
   src/AstExpr.cc
   src/AstStatement.cc
   src/AstValueType.cc
   src/RsrvWordDic.cc
-  src/YmslAstImpl.cc
   src/YmslParser.cc
   src/YmslScanner.cc
 

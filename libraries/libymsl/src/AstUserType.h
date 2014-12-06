@@ -40,8 +40,13 @@ public:
 
   /// @brief 型を得る．
   virtual
-  AstType
-  type() const;
+  ValueType
+  value_type() const;
+
+  /// @brief 値を表す文字列を返す．
+  virtual
+  string
+  str() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

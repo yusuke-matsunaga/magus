@@ -11,7 +11,6 @@
 
 #include "ymsl_int.h"
 #include "YmUtils/FileRegion.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL

@@ -61,17 +61,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ファイル位置を得る．
-  virtual
-  const FileRegion&
-  file_region() const;
-
   /// @brief ブロックを返す．
   ///
   /// ブロックを持たない要素の場合 NULL を返す．
   virtual
   AstBlock*
-  block() const = 0;
+  block() const;
+
+  /// @brief ラベルステートメントの場合に名前を返す．
+  ///
+  /// それ以外では ShString() を返す．
+  virtual
+  ShString
+  label() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -80,15 +82,6 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const = 0;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ファイル位置
-  FileRegion mLoc;
 
 };
 

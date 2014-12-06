@@ -1,37 +1,37 @@
-#ifndef ASTFLOATVAL_H
-#define ASTFLOATVAL_H
+#ifndef ASTBLOCKSTMT_H
+#define ASTBLOCKSTMT_H
 
-/// @file AstFloatVal.h
-/// @brief AstFloatVal のヘッダファイル
+/// @file AstBlockStmt.h
+/// @brief AstBlockStmt のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstImpl.h"
+#include "AstStatement.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstFloatVal AstFloatVal.h "AstFloatVal.h"
-/// @brief 浮動小数点型の定数を表す Ast
+/// @class AstBlockStmt AstBlockStmt.h "AstBlockStmt.h"
+/// @brief block文を表す AstStatement
 //////////////////////////////////////////////////////////////////////
-class AstFloatVal :
-  public Ast
+class AstBlockStmt :
+  public AstStatement
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] val 値
+  /// @param[in] block 本体
   /// @param[in] loc ファイル位置
-  AstFloatVal(double val,
-	      const FileRegion& loc);
+  AstBlockStmt(AstBlock* block,
+	       const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstFloatVal();
+  ~AstBlockStmt();
 
 
 public:
@@ -39,15 +39,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
+  /// @brief ブロックを返す．
+  ///
+  /// ブロックを持たない要素の場合 NULL を返す．
   virtual
-  AstType
-  type() const;
-
-  /// @brief 浮動小数点型の値を返す．
-  virtual
-  double
-  float_val() const;
+  AstBlock*
+  block() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -63,12 +60,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値
-  double mVal;
+  // 本体
+  AstBlock* mBlock;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-
-#endif // YMSLASTFLOATVAL_H
+#endif // ASTBLOCKSTMT_H

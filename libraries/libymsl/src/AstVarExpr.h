@@ -1,37 +1,37 @@
-#ifndef ASTLABEL_H
-#define ASTLABEL_H
+#ifndef ASTVAREXPR_H
+#define ASTVAREXPR_H
 
-/// @file AstLabel.h
-/// @brief AstLabel のヘッダファイル
+/// @file AstVarExpr.h
+/// @brief AstVarExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstStatement.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstLabel AstLabel.h "AstLabel.h"
-/// @brief ラベルを表す Ast
+/// @class AstVarExpr AstVarExpr.h "AstVarExpr.h"
+/// @brief 変数を表す AstExpr
 //////////////////////////////////////////////////////////////////////
-class AstLabel :
-  public AstStatement
+class AstVarExpr :
+  public AstExpr
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] label ラベル
+  /// @param[in] var 変数
   /// @param[in] loc ファイル位置
-  AstLabel(AstSymbol* label,
-	   const FileRegion& loc);
+  AstVarExpr(AstVarDecl* var,
+	     const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstLabel();
+  ~AstVarExpr();
 
 
 public:
@@ -41,11 +41,9 @@ public:
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
   virtual
   void
-  print(ostream& s,
-	ymuint indent = 0) const;
+  print(ostream& s) const;
 
 
 private:
@@ -53,11 +51,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ラベル
-  AstSymbol* mLabel;
+  // 変数
+  AstVarDecl* mVar;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTLABEL_H
+
+#endif // ASTVAREXPR_H

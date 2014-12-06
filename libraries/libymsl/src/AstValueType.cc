@@ -11,6 +11,8 @@
 #include "AstIntType.h"
 #include "AstFloatType.h"
 #include "AstStringType.h"
+#include "AstUserType.h"
+#include "AstSymbol.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -121,6 +123,48 @@ string
 AstStringType::str() const
 {
   return string("string");
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstUserType
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] type_name 型名
+// @param[in] loc ファイル位置
+AstUserType::AstUserType(AstSymbol* type_name) :
+  AstValueType(type_name->file_region()),
+  mTypeName(type_name)
+{
+}
+
+// @brief デストラクタ
+AstUserType::~AstUserType()
+{
+}
+
+// @brief 型を得る．
+ValueType
+AstUserType::value_type() const
+{
+  return kUserType;
+}
+
+// @brief 値を表す文字列を返す．
+string
+AstUserType::str() const
+{
+  return mTypeName->str_val();
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+// @param[in] indent インデントレベル
+void
+AstUserType::print(ostream& s,
+		   ymuint indent) const
+{
 }
 
 END_NAMESPACE_YM_YMSL

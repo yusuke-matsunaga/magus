@@ -1,37 +1,33 @@
-#ifndef ASTLABEL_H
-#define ASTLABEL_H
+#ifndef ASTLIST_H
+#define ASTLIST_H
 
-/// @file AstLabel.h
-/// @brief AstLabel のヘッダファイル
+/// @file AstList.h
+/// @brief AstList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstStatement.h"
+#include "Ast.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstLabel AstLabel.h "AstLabel.h"
-/// @brief ラベルを表す Ast
+/// @class AstList AstList.h "AstList.h"
+/// @brief リストを表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstLabel :
-  public AstStatement
+class AstList
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] label ラベル
-  /// @param[in] loc ファイル位置
-  AstLabel(AstSymbol* label,
-	   const FileRegion& loc);
+  AstList();
 
   /// @brief デストラクタ
   virtual
-  ~AstLabel();
+  ~AstList();
 
 
 public:
@@ -39,10 +35,22 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 子供の数を返す．
+  ymuint
+  child_num() const;
+
+  /// @brief 子供を返す．
+  /// @param[in] pos 位置( 0 <= pos < child_num() )
+  Ast*
+  child(ymuint pos) const;
+
+  /// @brief 子供を追加する．
+  void
+  add_child(Ast* child);
+
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   /// @param[in] indent インデントレベル
-  virtual
   void
   print(ostream& s,
 	ymuint indent = 0) const;
@@ -53,11 +61,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ラベル
-  AstSymbol* mLabel;
+  // リストの本体
+  vector<Ast*> mList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTLABEL_H
+#endif // ASTLIST_H

@@ -1,8 +1,8 @@
-#ifndef ASTELIF_H
-#define ASTELIF_H
+#ifndef ASTIFBLOCK_H
+#define ASTIFBLOCK_H
 
-/// @file AstElif.h
-/// @brief AstElif のヘッダファイル
+/// @file AstIfBlock
+/// @brief AstIfBlock のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstElif AstElif.h "AstElif.h"
-/// @brief case ブロックを表す Ast
+/// @class AstIfBlock AstIfBlock.h "AstIfBlock.h"
+/// @brief if ブロックを表す Ast
 //////////////////////////////////////////////////////////////////////
-class AstElif :
+class AstIfBlock :
   public AstBlockStmt
 {
 public:
@@ -27,13 +27,13 @@ public:
   /// @param[in] cond 条件式
   /// @param[in] block 本体
   /// @param[in] loc ファイル位置
-  AstElif(AstExpr* cond,
-	  AstBlock* block,
-	  const FileRegion& loc);
+  AstIfBlock(AstExpr* cond,
+	     AstBlock* block,
+	     const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstElif();
+  ~AstIfBlock();
 
 
 public:
@@ -41,10 +41,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
-  virtual
-  AstType
-  type() const;
+  /// @brief 次の要素を得る．
+  AstIfBlock*
+  next() const;
+
+  /// @brief 前の要素をセットする．
+  void
+  set_prev(AstIfBlock* prev);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -62,6 +65,9 @@ private:
 
   // 条件
   AstExpr* mCond;
+
+  // 次の要素
+  AstIfBlock* mNext;
 
 };
 

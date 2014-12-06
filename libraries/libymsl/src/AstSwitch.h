@@ -28,7 +28,7 @@ public:
   /// @param[in] case_list case 文のリスト
   /// @param[in] loc ファイル位置
   AstSwitch(AstExpr* expr,
-	    const vector<AstCaseItem*>& case_list,
+	    AstCaseItem* case_list,
 	    const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -40,11 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型を得る．
-  virtual
-  AstType
-  type() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

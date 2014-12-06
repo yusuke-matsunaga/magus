@@ -9,7 +9,8 @@
 
 #include "../src/YmslParser.h"
 #include "../src/RsrvWordDic.h"
-#include "../src/YmslAst.h"
+#include "../src/Ast.h"
+#include "../src/AstBlock.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -30,13 +31,8 @@ parser_test1(IDO& ido)
 
   parser.read(ido);
 
-  YmslAst* root = parser.root();
-  ASSERT_COND( root->type() == kAstList );
-  ymuint n = root->child_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    YmslAst* item = root->child(i);
-    item->print(cout);
-  }
+  AstBlock* toplevel = parser.toplevel_block();
+  toplevel->print(cout);
 
   return 0;
 }

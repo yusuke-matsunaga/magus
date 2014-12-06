@@ -9,17 +9,20 @@
 
 // C++ 用の定義
 
-#include "YmslParser.h"
-#include "YmslAst.h"
-#include "AstBlock.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 
+#include "YmslParser.h"
+
+#include "AstBlock.h"
+#include "AstCaseItem.h"
+#include "AstExpr.h"
+#include "AstIfBlock.h"
+#include "AstVarDecl.h"
+
+
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
-
-// 値を表す型
-//#define YYSTYPE YmslAst*
 
 // 位置を表す型
 // (yylloc の型)
@@ -30,8 +33,6 @@
 
 
 BEGIN_NAMESPACE_YM_YMSL
-
-#include "grammer.hh"
 
 // 字句解析関数
 int
@@ -92,13 +93,16 @@ fr_merge(const FileRegion fr_array[],
 
 // 値を表す型
 %union {
-  YmslAst* ast_type;
+  int int_type;
+  double float_type;
   AstBlock* block_type;
-  YmslExpr* expr_type;
-  YmslFuncDecl* funcdecl_type;
-  YmslStatement* statement_type;
-  YmslVarDecl* vardecl_type;
-  AstValueType valuetype_type;
+  AstCaseItem* caseitem_type;
+  AstExpr* expr_type;
+  AstIfBlock* ifblock_type;
+  AstStatement* statement_type;
+  AstSymbol* symbol_type;
+  AstVarDecl* vardecl_type;
+  AstValueType* valuetype_type;
 }
 
 
@@ -134,10 +138,10 @@ fr_merge(const FileRegion fr_array[],
 %token INT
 %token FLOAT
 %token STRING
-%token SYMBOL
-%token INT_NUM
-%token FLOAT_NUM
-%token STRING_VAL
+%token <symbol_type> SYMBOL
+%token <int_type> INT_NUM
+%token <float_type> FLOAT_NUM
+%token <expr_type> STRING_VAL
 
 %token DUMMY
 %token ERROR
@@ -154,11 +158,17 @@ fr_merge(const FileRegion fr_array[],
 %left LOGNOT BITNEG UOP
 
 // 非終端の型
-%type <statement_type> statement
- //%type <block_type> block
+%type <block_type> statement_block
+%type <caseitem_type> case_list
 %type <expr_type> expr
-%type <funcdecl_type> func_decl
-%type <vardecl_type> var_decl
+%type <expr_type> expr_list
+%type <expr_type> init_expr
+%type <expr_type> lvalue
+%type <ifblock_type> elif_list
+%type <ifblock_type> else_block
+%type <statement_type> statement
+%type <valuetype_type> type
+%type <vardecl_type> var_decl param_list
 
 %%
 
@@ -175,14 +185,13 @@ item_list
 item
 : statement
 {
-  AstBlock* block = parser.cur_block();
-  block->add_statement($1);
+  parser.add_statement($1);
 }
 // 関数宣言
-| func_decl
+| func_head SYMBOL LP param_list RP COLON type statement_block
 {
-  AstBlock* block = parser.cur_block();
-  block->add_funcdecl($1);
+  parser.new_AstFuncDecl($2, $7, $4, $8, @$);
+  parser.pop_block();
 }
 | var_decl
 {
@@ -191,110 +200,125 @@ item
 }
 ;
 
+// 関数宣言のヘッダ
+func_head
+: FUNCTION
+{
+  parser.push_new_block();
+}
+;
+
 // ステートメント
 statement
-: lvalue EQ expr
+// 代入文
+: lvalue EQ expr SEMI
 {
   $$ = parser.new_AstAssignment($1, $3);
 }
-| SYMBOL LP expr_list RP
+// 式文
+| expr SEMI
 {
-  $$ = parser.new_AstFuncCall($1, $3, @$);
+  $$ = parser.new_AstExprStmt($1);
 }
+// IF 文
 | IF expr statement_block elif_list else_block
 {
-  $$ = parser.new_AstIf($2, $3, $4, $5, @$);
+  AstIfBlock* top = parser.new_AstIfBlock($2, $3, FileRegion(@1, @3));
+  $$ = parser.new_AstIf(top, $4, $5, @$);
 }
+// FOR 文
 | FOR LP statement SEMI expr SEMI statement RP statement_block
 {
   $$ = parser.new_AstFor($3, $5, $7, $9, @$);
 }
+// WHILE 文
 | WHILE LP expr RP statement_block
 {
   $$ = parser.new_AstWhile($3, $5, @$);
 }
+// DO-WHILE 文
 | DO statement_block WHILE LP expr RP
 {
   $$ = parser.new_AstDoWhile($2, $5, @$);
 }
+// SWITCH 文
 | SWITCH expr LCB case_list RCB
 {
   $$ = parser.new_AstSwitch($2, $4, @$);
 }
+// GOTO 文
 | GOTO SYMBOL
 {
   $$ = parser.new_AstGoto($2, @$);
 }
+// ラベル文
 | SYMBOL COLON
 {
   $$ = parser.new_AstLabel($1, @$);
 }
-| BREAK
+// BREAK 文
+| BREAK SEMI
 {
   $$ = parser.new_AstBreak(@$);
 }
-| CONTINUE
+// CONTINUE 文
+| CONTINUE SEMI
 {
   $$ = parser.new_AstContinue(@$);
 }
-| RETURN
+// RETURN 文(引数なし)
+| RETURN SEMI
 {
   $$ = parser.new_AstReturn(NULL, @$);
 }
-| RETURN LP expr RP
+// RETURN 文(引数あり)
+| RETURN LP expr RP SEMI
 {
-  $$ = parser.new_AstReturn($2, @$);
+  $$ = parser.new_AstReturn($3, @$);
 }
+// ブロック文
 | statement_block
 {
-  $$ = parser.new_AstBlock($1, @$);
+  $$ = parser.new_AstBlockStmt($1, @$);
 }
 ;
 
+// ブロック
 statement_block
-: stmt_begin statement_list stmt_end
+: stmt_begin statement_list RCB
 {
-  $$ = $1;
+  $$ = parser.cur_block();
+  parser.pop_block();
 }
 ;
 
+// ブロック文の開始
+// わざと非終端ノードを導入したのは
+// 本体よりも先にアクションを起こすため．
 stmt_begin
 : LCB
 {
-  AstBlock* cur_block = parser.cur_block();
-  $$ = parser.push_new_block(cur_block);
-}
-;
-
-stmt_end
-: RCB
-{
-  parser.pop_block();
+  parser.push_new_block();
 }
 ;
 
 statement_list
 : // 空
-{
-  // なにもしない．
-}
 | statement_list statement
 {
-  AstBlock* cur_block = parser.cur_block();
-  cur_block->add_statment($2);
+  parser.add_statement($2);
 }
 ;
 
 elif_list
 : // 空
 {
-  $$ = parser.new_AstList();
+  $$ = NULL;
 }
 | elif_list ELIF expr statement_block
 {
-  $$ = $1;
-  YmslAst* elif = parser.new_AstElif($3, $4, FileRegion(@2, @4));
-  $$->add_child(elif);
+  $$ = parser.new_AstIfBlock($3, $4, FileRegion(@2,@4));
+  $$->set_prev($1);
 }
 ;
 
@@ -305,33 +329,31 @@ else_block
 }
 | ELSE statement_block
 {
-  $$ = $2;
+  $$ = parser.new_AstIfBlock(NULL, $2, @$);
 }
 ;
 
 case_list
 : // 空
 {
-  $$ = parser.new_AstList();
+  $$ = NULL;
 }
-| case_list CASE expr COLON statement_list
+| case_list CASE expr COLON statement_block
 {
-  $$ = $1;
-  YmslAst* case_item = parser.new_AstCaseItem($3, $5, FileRegion(@2, @5));
-  $$->add_child(case_item);
+  $$ = parser.new_AstCaseItem($3, $5, FileRegion(@2, @5));
+  $$->set_prev($1);
 }
-| case_list DEFAULT COLON statement_list
+| case_list DEFAULT COLON statement_block
 {
-  $$ = $1;
-  YmslAst* case_item = parser.new_AstCaseItem(NULL, $4, FileRegion(@2, @4));
-  $$->add_child(case_item);
+  $$ = parser.new_AstCaseItem(NULL, $4, FileRegion(@2, @4));
+  $$->set_prev($1);
 }
 ;
 
 lvalue
 : SYMBOL
 {
-  $$ = $1;
+  $$ = parser.new_AstVarExpr($1);
 }
 | SYMBOL LBK expr RBK
 {
@@ -339,27 +361,19 @@ lvalue
 }
 ;
 
-func_decl
-: FUNCTION SYMBOL LP param_list RP COLON type statement_block
-{
-  $$ = parser.new_AstFuncDecl($2, $4, $7, $8, @$);
-}
-;
-
 param_list
 : // 空
 {
-  $$ = parser.new_AstList();
+  $$ = NULL;
 }
-| param_decl
+| var_decl
 {
-  $$ = parser.new_AstList();
-  $$->add_child($1);
+  $$ = $1;
 }
 | param_list COMMA var_decl
 {
-  $$ = $1;
-  $$->add_child($3);
+  $$ = $3;
+  $$->set_prev($1);
 }
 ;
 
@@ -405,17 +419,16 @@ init_expr
 expr_list
 : // 空
 {
-  $$ = parser.new_AstList();
+  $$ = NULL;
 }
 | expr
 {
-  $$ = parser.new_AstList();
-  $$->add_child($1);
+  $$ = $1;
 }
 | expr_list COMMA expr
 {
-  $$ = $1;
-  $$->add_child($3);
+  $$ = $3;
+  $$->set_prev($1);
 }
 ;
 
@@ -502,7 +515,9 @@ expr
 }
 | SYMBOL
 {
-  $$ = $1;
+  $$ = parser.new_AstVarExpr($1);
+  if ( $$ == NULL ) {
+  }
 }
 | SYMBOL LBK expr RBK
 {
@@ -514,11 +529,11 @@ expr
 }
 | INT_NUM
 {
-  $$ = $1;
+  $$ = parser.new_AstIntConst($1, @$);
 }
 | FLOAT_NUM
 {
-  $$ = $1;
+  $$ = parser.new_AstFloatConst($1, @$);
 }
 | STRING_VAL
 {

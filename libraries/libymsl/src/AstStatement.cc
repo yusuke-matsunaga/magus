@@ -11,7 +11,7 @@
 #include "AstFuncDecl.h"
 #include "AstAssignment.h"
 #include "AstIf.h"
-#include "AstElif.h"
+#include "AstIfBlock.h"
 #include "AstFor.h"
 #include "AstWhile.h"
 #include "AstDoWhile.h"
@@ -23,192 +23,46 @@
 #include "AstContinue.h"
 #include "AstReturn.h"
 #include "AstBlockStmt.h"
+#include "AstExprStmt.h"
 #include "AstBlock.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstVarDecl
+// クラス AstStatement
 //////////////////////////////////////////////////////////////////////
 
+
 // @brief コンストラクタ
-// @param[in] name 変数名
-// @param[in] type 型
-// @param[in] init_expr 初期化式
 // @param[in] loc ファイル位置
-AstVarDecl::AstVarDecl(Ast* name,
-			       Ast* type,
-			       Ast* init_expr,
-			       const FileRegion& loc) :
-  AstImpl(loc)
+AstStatement::AstStatement(const FileRegion& loc) :
+  Ast(loc)
 {
-  ASSERT_COND( name->type() == kAstSymbol );
-  mName = name->str_val();
-
-  mType = type;
-
-  mInitExpr = init_expr;
 }
 
 // @brief デストラクタ
-AstVarDecl::~AstVarDecl()
+AstStatement::~AstStatement()
 {
-}
-
-// @brief 型を得る．
-AstType
-AstVarDecl::type() const
-{
-  return kAstVarDecl;
-}
-
-// @brief 名前を返す．
-ShString
-AstVarDecl::name() const
-{
-  return mName;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstVarDecl::child_num() const
-{
-  return 2;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstVarDecl::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  switch ( pos ) {
-  case 0: return mType;
-  case 1: return mInitExpr;
-  default: ASSERT_NOT_REACHED;
-  }
-  return NULL;
-}
-
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-// @param[in] indent インデントレベル
-void
-AstVarDecl::print(ostream& s,
-		      ymuint indent) const
-{
-  print_indent(s, indent);
-  s << "var " << name() << ": ";
-  mType->print(s);
-  if ( mInitExpr != NULL ) {
-    s << " = ";
-    mInitExpr->print(s);
-  }
-  s << endl;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstFuncDecl
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] name 関数名
-// @param[in] type 型
-// @param[in] param_list パラメータリスト
-// @param[in] block 本体のブロック
-// @param[in] loc ファイル位置
-AstFuncDecl::AstFuncDecl(Ast* name,
-				 Ast* type,
-				 Ast* param_list,
-				 YmslBlock* block,
-				 const FileRegion& loc) :
-  AstImpl(loc)
-{
-  ASSERT_COND( name->type() == kAstSymbol );
-  mName = name->str_val();
-
-  mType = type;
-
-  mParamList = param_list;
-
-  mBlock = block;
-}
-
-// @brief デストラクタ
-AstFuncDecl::~AstFuncDecl()
-{
-}
-
-// @brief 型を得る．
-AstType
-AstFuncDecl::type() const
-{
-  return kAstFuncDecl;
-}
-
-// @brief 名前を返す．
-ShString
-AstFuncDecl::name() const
-{
-  return mName;
 }
 
 // @brief ブロックを返す．
 //
 // ブロックを持たない要素の場合 NULL を返す．
-YmslBlock*
-AstFuncDecl::block() const
+AstBlock*
+AstStatement::block() const
 {
-  return mBlock;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstFuncDecl::child_num() const
-{
-  return 2;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstFuncDecl::child(ymuint pos) const
-{
-  switch ( pos ) {
-  case 0: return mType;
-  case 1: return mParamList;
-  default: ASSERT_NOT_REACHED;
-  }
   return NULL;
 }
 
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-// @param[in] indent インデントレベル
-void
-AstFuncDecl::print(ostream& s,
-		       ymuint indent) const
+// @brief ラベルステートメントの場合に名前を返す．
+//
+// それ以外では ShString() を返す．
+ShString
+AstStatement::label() const
 {
-  // 関数宣言はトップレベルなので indent は無視
-
-  s << "function " << name() << ": ";
-  mType->print(s);
-  s << "(";
-  {
-    ymuint n = mParamList->child_num();
-    const char* comma = "";
-    for (ymuint i = 0; i < n; ++ i) {
-      Ast* param = mParamList->child(i);
-      s << comma;
-      comma = ", ";
-      param->print(s);
-    }
-  }
-  s << ")";
-
-  mBlock->print(s, 0);
+  return ShString();
 }
 
 
@@ -219,12 +73,12 @@ AstFuncDecl::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] left 左辺
 // @param[in] right 右辺
-AstAssignment::AstAssignment(Ast* left,
-				     Ast* right) :
-  AstImpl(FileRegion(left->file_region(), right->file_region()))
+AstAssignment::AstAssignment(AstExpr* left,
+			     AstExpr* right) :
+  AstStatement(FileRegion(left->file_region(), right->file_region())),
+  mLeft(left),
+  mRight(right)
 {
-  mChildList[0] = left;
-  mChildList[1] = right;
 }
 
 // @brief デストラクタ
@@ -232,41 +86,20 @@ AstAssignment::~AstAssignment()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstAssignment::type() const
-{
-  return kAstAssignment;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstAssignment::child_num() const
-{
-  return 2;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstAssignment::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mChildList[pos];
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstAssignment::print(ostream& s,
-			 ymuint indent) const
+		     ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   mChildList[0]->print(s);
   s << " = ";
   mChildList[1]->print(s);
   s << endl;
+#endif
 }
 
 
@@ -274,20 +107,37 @@ AstAssignment::print(ostream& s,
 // クラス AstIf
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-// @param[in] cond 条件
-// @param[in] then_block then ブロック
-// @param[in] elif_list elif ブロックのリスト
-// @param[in] else_block else ブロック
-// @param[in] loc ファイル位置
-AstIf::AstIf(Ast* cond,
-		     YmslBlock* then_block,
-		     Ast* elif_list,
-		     YmslBlock* else_block,
-		     const FileRegion& loc) :
-  AstBlock(then_block, loc)
+BEGIN_NONAMESPACE
+
+ymuint
+count_size(AstIfBlock* block_list)
 {
-  mCond = cond;
+  ymuint n = 0;
+  for (AstIfBlock* ib = block_list; ib != NULL; ib = ib->next()) {
+    ++ n;
+  }
+  return n;
+}
+
+END_NONAMESPACE
+
+// @brief コンストラクタ
+// @param[in] top 先頭の if ブロック
+// @param[in] elif_list elif ブロックリスト
+// @param[in] loc ファイル位置
+AstIf::AstIf(AstIfBlock* top,
+	     AstIfBlock* elif_list,
+	     const FileRegion& loc) :
+  AstStatement(loc),
+  mIfBlockList(count_size(elif_list) + 1)
+{
+  ASSERT_COND( top != NULL );
+  mIfBlockList[0] = top;
+  ymuint i = mIfBlockList.size();
+  for (AstIfBlock* ib = elif_list; ib != NULL; ib = ib->next()) {
+    -- i;
+    mIfBlockList[i] = ib;
+  }
 }
 
 // @brief デストラクタ
@@ -295,35 +145,12 @@ AstIf::~AstIf()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstIf::type() const
-{
-  return kAstIf;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstIf::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstIf::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mCond;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstIf::print(ostream& s,
-		 ymuint indent) const
+	     ymuint indent) const
 {
 #if 0
   print_indent(s, indent);
@@ -358,55 +185,47 @@ AstIf::print(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstElif
+// クラス AstIfBlock
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] cond 条件
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-AstElif::AstElif(Ast* cond,
-			 YmslBlock* block,
-			 const FileRegion& loc) :
-  AstBlock(block, loc)
+AstIfBlock::AstIfBlock(AstExpr* cond,
+		       AstBlock* block,
+		       const FileRegion& loc) :
+  AstBlockStmt(block, loc),
+  mCond(cond),
+  mNext(NULL)
 {
-  mCond = cond;
 }
 
 // @brief デストラクタ
-AstElif::~AstElif()
+AstIfBlock::~AstIfBlock()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstElif::type() const
+// @brief 次の要素を得る．
+AstIfBlock*
+AstIfBlock::next() const
 {
-  return kAstElif;
+  return mNext;
 }
 
-// @brief 子供の数を返す．
-ymuint
-AstElif::child_num() const
+// @brief 次の要素をセットする．
+void
+AstIfBlock::set_prev(AstIfBlock* prev)
 {
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstElif::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mCond;
+  mNext = prev;
 }
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
-AstElif::print(ostream& s,
-		   ymuint indent) const
+AstIfBlock::print(ostream& s,
+		  ymuint indent) const
 {
 #if 0
   print_indent(s, indent);
@@ -432,16 +251,16 @@ AstElif::print(ostream& s,
 // @param[in] next 増加文
 // @param[in] body 本文
 // @param[in] loc ファイル位置
-AstFor::AstFor(Ast* init,
-		       Ast* cond,
-		       Ast* next,
-		       YmslBlock* block,
-		       const FileRegion& loc) :
-  AstBlock(block, loc)
+AstFor::AstFor(AstStatement* init,
+	       AstExpr* cond,
+	       AstStatement* next,
+	       AstBlock* block,
+	       const FileRegion& loc) :
+  AstBlockStmt(block, loc),
+  mInit(init),
+  mCond(cond),
+  mNext(next)
 {
-  mInit = init;
-  mCond = cond;
-  mNext = next;
 }
 
 // @brief デストラクタ
@@ -449,41 +268,14 @@ AstFor::~AstFor()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstFor::type() const
-{
-  return kAstFor;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstFor::child_num() const
-{
-  return 3;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstFor::child(ymuint pos) const
-{
-  switch ( pos ) {
-  case 0: return mInit;
-  case 1: return mCond;
-  case 2: return mNext;
-  default: ASSERT_NOT_REACHED;
-  }
-  return NULL;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstFor::print(ostream& s,
-		  ymuint indent) const
+	      ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "for (";
   mInit->print(s);
@@ -494,6 +286,7 @@ AstFor::print(ostream& s,
   s << ")" << endl;
 
   block()->print(s, indent);
+#endif
 }
 
 
@@ -505,12 +298,12 @@ AstFor::print(ostream& s,
 // @param[in] cond 条件式
 // @param[in] body 本文
 // @param[in] loc ファイル位置
-AstWhile::AstWhile(Ast* cond,
-			   YmslBlock* block,
-			   const FileRegion& loc) :
-  AstBlock(block, loc)
+AstWhile::AstWhile(AstExpr* cond,
+		   AstBlock* block,
+		   const FileRegion& loc) :
+  AstBlockStmt(block, loc),
+  mCond(cond)
 {
-  mCond = cond;
 }
 
 // @brief デストラクタ
@@ -518,41 +311,20 @@ AstWhile::~AstWhile()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstWhile::type() const
-{
-  return kAstWhile;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstWhile::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstWhile::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mCond;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstWhile::print(ostream& s,
-		    ymuint indent) const
+		ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "while ";
   mCond->print(s);
 
   block()->print(s, indent);
+#endif
 }
 
 
@@ -564,12 +336,12 @@ AstWhile::print(ostream& s,
 // @param[in] block 本体
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
-AstDoWhile::AstDoWhile(YmslBlock* block,
-			       Ast* cond,
-			       const FileRegion& loc) :
-  AstBlock(block, loc)
+AstDoWhile::AstDoWhile(AstBlock* block,
+		       AstExpr* cond,
+		       const FileRegion& loc) :
+  AstBlockStmt(block, loc),
+  mCond(cond)
 {
-  mCond = cond;
 }
 
 // @brief デストラクタ
@@ -577,36 +349,14 @@ AstDoWhile::~AstDoWhile()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstDoWhile::type() const
-{
-  return kAstDoWhile;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstDoWhile::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstDoWhile::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mCond;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstDoWhile::print(ostream& s,
-		      ymuint indent) const
+		  ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "do" << endl;
 
@@ -616,6 +366,7 @@ AstDoWhile::print(ostream& s,
   s << "while ";
   mCond->print(s);
   s << endl;
+#endif
 }
 
 
@@ -624,16 +375,15 @@ AstDoWhile::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] cond 条件式
+// @param[in] expr 条件式
 // @param[in] case_list case リスト
 // @param[in] loc ファイル位置
-AstSwitch::AstSwitch(Ast* cond,
-			     Ast* case_list,
-			     const FileRegion& loc) :
-  AstImpl(loc)
+AstSwitch::AstSwitch(AstExpr* expr,
+		     AstCaseItem* case_list,
+		     const FileRegion& loc) :
+  AstStatement(loc),
+  mExpr(expr)
 {
-  mChildList[0] = cond;
-  mChildList[1] = case_list;
 }
 
 // @brief デストラクタ
@@ -641,36 +391,14 @@ AstSwitch::~AstSwitch()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstSwitch::type() const
-{
-  return kAstSwitch;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstSwitch::child_num() const
-{
-  return 2;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstSwitch::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mChildList[pos];
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstSwitch::print(ostream& s,
-		     ymuint indent) const
+		 ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "switch ";
   mChildList[0]->print(s);
@@ -686,6 +414,7 @@ AstSwitch::print(ostream& s,
 
   print_indent(s, indent);
   s << "}" << endl;
+#endif
 }
 
 
@@ -697,12 +426,13 @@ AstSwitch::print(ostream& s,
 // @param[in] label ラベル
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-AstCaseItem::AstCaseItem(Ast* label,
-				 YmslBlock* block,
-				 const FileRegion& loc) :
-  AstBlock(block, loc)
+AstCaseItem::AstCaseItem(AstExpr* label,
+			 AstBlock* block,
+			 const FileRegion& loc) :
+  AstBlockStmt(block, loc),
+  mLabel(label),
+  mNext(NULL)
 {
-  mLabel = label;
 }
 
 // @brief デストラクタ
@@ -710,27 +440,20 @@ AstCaseItem::~AstCaseItem()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstCaseItem::type() const
+// @brief 次の要素を得る．
+AstCaseItem*
+AstCaseItem::next() const
 {
-  return kAstCaseItem;
+  return mNext;
 }
 
-// @brief 子供の数を返す．
-ymuint
-AstCaseItem::child_num() const
+// @brief 前の要素をセットする．
+void
+AstCaseItem::set_prev(AstCaseItem* prev)
 {
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstCaseItem::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mLabel;
+  if ( prev != NULL ) {
+    prev->mNext = this;
+  }
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -738,8 +461,9 @@ AstCaseItem::child(ymuint pos) const
 // @param[in] indent インデントレベル
 void
 AstCaseItem::print(ostream& s,
-		       ymuint indent) const
+		   ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   if ( mLabel != NULL ) {
     s << "case ";
@@ -753,6 +477,7 @@ AstCaseItem::print(ostream& s,
   block()->print(s, indent);
 
   s << endl;
+#endif
 }
 
 
@@ -763,11 +488,11 @@ AstCaseItem::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
-AstGoto::AstGoto(Ast* label,
-			 const FileRegion& loc) :
-  AstImpl(loc)
+AstGoto::AstGoto(AstSymbol* label,
+		 const FileRegion& loc) :
+  AstStatement(loc),
+  mLabel(label)
 {
-  mLabel = label;
 }
 
 // @brief デストラクタ
@@ -775,40 +500,19 @@ AstGoto::~AstGoto()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstGoto::type() const
-{
-  return kAstGoto;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstGoto::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstGoto::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mLabel;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstGoto::print(ostream& s,
-		   ymuint indent) const
+	       ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "goto ";
   mLabel->print(s);
   s << endl;
+#endif
 }
 
 
@@ -819,11 +523,11 @@ AstGoto::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
-AstLabel::AstLabel(Ast* label,
-			   const FileRegion& loc) :
-  AstImpl(loc)
+AstLabel::AstLabel(AstSymbol* label,
+		   const FileRegion& loc) :
+  AstStatement(loc),
+  mLabel(label)
 {
-  mLabel = label;
 }
 
 // @brief デストラクタ
@@ -831,39 +535,18 @@ AstLabel::~AstLabel()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstLabel::type() const
-{
-  return kAstLabel;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstLabel::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstLabel::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mLabel;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstLabel::print(ostream& s,
-		    ymuint indent) const
+		ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   mLabel->print(s);
   s << ":" << endl;
+#endif
 }
 
 
@@ -874,7 +557,7 @@ AstLabel::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] loc ファイル位置
 AstBreak::AstBreak(const FileRegion& loc) :
-  AstImpl(loc)
+  AstStatement(loc)
 {
 }
 
@@ -883,22 +566,17 @@ AstBreak::~AstBreak()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstBreak::type() const
-{
-  return kAstBreak;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstBreak::print(ostream& s,
-		    ymuint indent) const
+		ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "break" << endl;
+#endif
 }
 
 
@@ -909,7 +587,7 @@ AstBreak::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] loc ファイル位置
 AstContinue::AstContinue(const FileRegion& loc) :
-  AstImpl(loc)
+  AstStatement(loc)
 {
 }
 
@@ -918,22 +596,17 @@ AstContinue::~AstContinue()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstContinue::type() const
-{
-  return kAstContinue;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstContinue::print(ostream& s,
-		       ymuint indent) const
+		   ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "continue" << endl;
+#endif
 }
 
 
@@ -944,11 +617,11 @@ AstContinue::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] expr 値
 // @param[in] loc ファイル位置
-AstReturn::AstReturn(Ast* expr,
-			     const FileRegion& loc) :
-  AstImpl(loc)
+AstReturn::AstReturn(AstExpr* expr,
+		     const FileRegion& loc) :
+  AstStatement(loc),
+  mExpr(expr)
 {
-  mExpr = expr;
 }
 
 // @brief デストラクタ
@@ -956,102 +629,86 @@ AstReturn::~AstReturn()
 {
 }
 
-// @brief 型を得る．
-AstType
-AstReturn::type() const
-{
-  return kAstReturn;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstReturn::child_num() const
-{
-  return 1;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstReturn::child(ymuint pos) const
-{
-  ASSERT_COND( pos < child_num() );
-  return mExpr;
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
 AstReturn::print(ostream& s,
-		     ymuint indent) const
+		 ymuint indent) const
 {
+#if 0
   print_indent(s, indent);
   s << "return ";
   mExpr->print(s);
   s << endl;
+#endif
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstBlock
+// クラス AstBlockStmt
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-AstBlock::AstBlock(YmslBlock* block,
+AstBlockStmt::AstBlockStmt(AstBlock* block,
 			   const FileRegion& loc) :
-  AstImpl(loc),
+  AstStatement(loc),
   mBlock(block)
 {
 }
 
 // @brief デストラクタ
-AstBlock::~AstBlock()
+AstBlockStmt::~AstBlockStmt()
 {
-}
-
-// @brief 型を得る．
-AstType
-AstBlock::type() const
-{
-  return kAstBlock;
 }
 
 // @brief ブロックを返す．
 //
 // ブロックを持たない要素の場合 NULL を返す．
-YmslBlock*
-AstBlock::block() const
+AstBlock*
+AstBlockStmt::block() const
 {
   return mBlock;
-}
-
-// @brief 子供の数を返す．
-ymuint
-AstBlock::child_num() const
-{
-  return 0;
-}
-
-// @brief 子供を返す．
-// @param[in] pos 位置( 0 <= pos < child_num() )
-Ast*
-AstBlock::child(ymuint pos) const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
 }
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
-AstBlock::print(ostream& s,
+AstBlockStmt::print(ostream& s,
 		    ymuint indent) const
 {
+#if 0
   block()->print(s, indent);
+#endif
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstExprStmt
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] expr 式
+AstExprStmt::AstExprStmt(AstExpr* expr) :
+  AstStatement(expr->file_region())
+{
+}
+
+// @brief デストラクタ
+AstExprStmt::~AstExprStmt()
+{
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+// @param[in] indent インデントレベル
+void
+AstExprStmt::print(ostream& s,
+		   ymuint indent) const
+{
 }
 
 END_NAMESPACE_YM_YMSL

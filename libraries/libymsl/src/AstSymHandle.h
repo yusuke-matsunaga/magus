@@ -1,0 +1,220 @@
+#ifndef ASTSYMHANDLE_H
+#define ASTSYMHANDLE_H
+
+/// @file AstSymHandle.h
+/// @brief AstSymHandle のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2014 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ymsl_int.h"
+
+
+BEGIN_NAMESPACE_YM_YMSL
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstSymHandle AstSymHandle.h "AstSymHandle.h"
+/// @brief Symbol Table のハンドル
+//////////////////////////////////////////////////////////////////////
+class AstSymHandle
+{
+  friend class AstBlock;
+
+public:
+
+  /// @brief コンストラクタ
+  AstSymHandle();
+
+  /// @brief デストラクタ
+  virtual
+  ~AstSymHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const = 0;
+
+  /// @brief 変数宣言を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  AstVarDecl*
+  vardecl() const;
+
+  /// @brief 関数宣言を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  AstFuncDecl*
+  funcdecl() const;
+
+  /// @brief ラベルステートメントを返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  AstStatement*
+  statement() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 次の要素を指すリンク
+  AstSymHandle* mLink;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstVarHandle AstSymHandle.h "AstSymHandle.h"
+/// @brief AstVarDecl を保持する AstSymHandle
+//////////////////////////////////////////////////////////////////////
+class AstVarHandle :
+  public AstSymHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] vardecl 変数宣言
+  AstVarHandle(AstVarDecl* vardecl);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstVarHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 変数宣言を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  AstVarDecl*
+  vardecl() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 変数宣言
+  AstVarDecl* mVarDecl;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstFuncHandle AstSymHandle.h "AstSymHandle.h"
+/// @brief AstFuncDecl を保持する AstSymHandle
+//////////////////////////////////////////////////////////////////////
+class AstFuncHandle :
+  public AstSymHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] funcdecl 関数宣言
+  AstFuncHandle(AstFuncDecl* funcdecl);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstFuncHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 関数宣言を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  AstFuncDecl*
+  funcdecl() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 関数宣言
+  AstFuncDecl* mFuncDecl;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class AstStmtHandle AstSymHandle.h "AstSymHandle.h"
+/// @brief AstStatement を保持する AstSymHandle
+//////////////////////////////////////////////////////////////////////
+class AstStmtHandle :
+  public AstSymHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] statement ラベルすてーとめんと
+  AstStmtHandle(AstStatement* statement);
+
+  /// @brief デストラクタ
+  virtual
+  ~AstStmtHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 関数宣言を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  AstStatement*
+  statement() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ステートメント
+  AstStatement* mStatement;
+
+};
+
+END_NAMESPACE_YM_YMSL
+
+#endif // ASTSYMHANDLE_H

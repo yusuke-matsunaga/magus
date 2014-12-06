@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @class AstStringType AstStringType.h "AstStringType.h"
 /// @brief string 型を表す AstValueType
 //////////////////////////////////////////////////////////////////////
-class YmslAstStringType :
+class AstStringType :
   public AstValueType
 {
 public:

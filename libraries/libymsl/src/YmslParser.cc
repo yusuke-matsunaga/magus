@@ -10,35 +10,36 @@
 #include "YmslParser.h"
 #include "YmslScanner.h"
 
-#include "YmslBlock.h"
-#include "YmslAstList.h"
-#include "YmslAstVarDecl.h"
-#include "YmslAstFuncDecl.h"
-#include "YmslAstFuncCall.h"
-#include "YmslAstAssignment.h"
-#include "YmslAstIf.h"
-#include "YmslAstElif.h"
-#include "YmslAstFor.h"
-#include "YmslAstWhile.h"
-#include "YmslAstDoWhile.h"
-#include "YmslAstSwitch.h"
-#include "YmslAstCaseItem.h"
-#include "YmslAstGoto.h"
-#include "YmslAstLabel.h"
-#include "YmslAstBreak.h"
-#include "YmslAstContinue.h"
-#include "YmslAstReturn.h"
-#include "YmslAstBlock.h"
-#include "YmslAstUniOp.h"
-#include "YmslAstBinOp.h"
-#include "YmslAstInt.h"
-#include "YmslAstFloat.h"
-#include "YmslAstString.h"
-#include "YmslAstSymbol.h"
-#include "YmslAstIntType.h"
-#include "YmslAstFloatType.h"
-#include "YmslAstStringType.h"
-#include "YmslAstUserType.h"
+#include "AstSymbol.h"
+#include "AstBlock.h"
+#include "AstVarDecl.h"
+#include "AstFuncDecl.h"
+#include "AstAssignment.h"
+#include "AstIf.h"
+#include "AstIfBlock.h"
+#include "AstFor.h"
+#include "AstWhile.h"
+#include "AstDoWhile.h"
+#include "AstSwitch.h"
+#include "AstCaseItem.h"
+#include "AstGoto.h"
+#include "AstLabel.h"
+#include "AstBreak.h"
+#include "AstContinue.h"
+#include "AstReturn.h"
+#include "AstBlockStmt.h"
+#include "AstExprStmt.h"
+#include "AstFuncCall.h"
+#include "AstUniOp.h"
+#include "AstBinOp.h"
+#include "AstVarExpr.h"
+#include "AstIntConst.h"
+#include "AstFloatConst.h"
+#include "AstStringConst.h"
+#include "AstIntType.h"
+#include "AstFloatType.h"
+#include "AstStringType.h"
+#include "AstUserType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -71,7 +72,7 @@ YmslParser::read(IDO& ido)
 
   mScanner = new YmslScanner(ido);
 
-  mToplevelBlock = new YmslBlock(NULL);
+  mToplevelBlock = new AstBlock(NULL);
   mBlockStack.push_back(mToplevelBlock);
 
   int stat = yyparse(*this);
@@ -82,12 +83,19 @@ YmslParser::read(IDO& ido)
   return (stat == 0);
 }
 
+// @brief トップレベルブロックを返す．
+AstBlock*
+YmslParser::toplevel_block() const
+{
+  return mToplevelBlock;
+}
+
 // @brief yylex とのインターフェイス
 // @param[out] lvalp 値を格納する変数
 // @param[out] llocp 位置情報を格納する変数
 // @return 読み込んだトークンの id を返す．
 int
-YmslParser::yylex(YmslAst*& lval,
+YmslParser::yylex(YYSTYPE& lval,
 		  FileRegion& lloc)
 {
   int id = mScanner->read_token(lloc);
@@ -95,23 +103,22 @@ YmslParser::yylex(YmslAst*& lval,
 
   switch ( id ) {
   case SYMBOL:
-    lval = new_AstSymbol(mScanner->cur_string(), lloc);
+    lval.symbol_type = new AstSymbol(ShString(mScanner->cur_string()), lloc);
     break;
 
   case STRING_VAL:
-    lval = new_AstString(mScanner->cur_string(), lloc);
+    lval.expr_type = new_AstStringConst(mScanner->cur_string(), lloc);
     break;
 
   case INT_NUM:
-    lval = new_AstInt(mScanner->cur_int(), lloc);
+    lval.int_type = mScanner->cur_int();
     break;
 
   case FLOAT_NUM:
-    lval = new_AstFloat(mScanner->cur_float(), lloc);
+    lval.float_type = mScanner->cur_float();
     break;
 
   default:
-    lval = NULL;
     break;
   }
 
@@ -119,7 +126,7 @@ YmslParser::yylex(YmslAst*& lval,
 }
 
 // @brief 現在のブロックを返す．
-YmslBlock*
+AstBlock*
 YmslParser::cur_block()
 {
   ASSERT_COND( !mBlockStack.empty() );
@@ -128,11 +135,11 @@ YmslParser::cur_block()
 
 // @brief 新しいブロックを作りスタックに積む．
 // @return 新しいブロックを返す．
-YmslBlock*
+AstBlock*
 YmslParser::push_new_block()
 {
-  YmslBlock* parent = cur_block();
-  YmslBlock* block = new YmslBlock(parent);
+  AstBlock* parent = cur_block();
+  AstBlock* block = new AstBlock(parent);
   mBlockStack.push_back(block);
   return block;
 }
@@ -144,25 +151,18 @@ YmslParser::pop_block()
   mBlockStack.pop_back();
 }
 
-// @brief リストを作る．
-YmslAst*
-YmslParser::new_AstList()
-{
-  return new YmslAstList();
-}
-
 // @brief 変数宣言を作る．
-// @param[in] id 変数名
+// @param[in] name 変数名
 // @param[in] type 型
 // @param[in] init_expr 初期化式
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstVarDecl(YmslAst* id,
-			   YmslAst* type,
-			   YmslAst* init_expr,
+AstVarDecl*
+YmslParser::new_AstVarDecl(AstSymbol* name,
+			   AstValueType* type,
+			   AstExpr* init_expr,
 			   const FileRegion& loc)
 {
-  return new YmslAstVarDecl(id, type, init_expr, loc);
+  return new AstVarDecl(name->str_val(), type, init_expr, loc);
 }
 
 // @brief 関数宣言を作る．
@@ -171,24 +171,24 @@ YmslParser::new_AstVarDecl(YmslAst* id,
 // @param[in] param_list パラメータリスト
 // @param[in] block 本体のブロック
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstFuncDecl(YmslAst* name,
-			    YmslAst* type,
-			    YmslAst* param_list,
-			    YmslBlock* block,
+AstFuncDecl*
+YmslParser::new_AstFuncDecl(AstSymbol* name,
+			    AstValueType* type,
+			    AstVarDecl* param_list,
+			    AstBlock* block,
 			    const FileRegion& loc)
 {
-  return new YmslAstFuncDecl(name, type, param_list, block, loc);
+  return new AstFuncDecl(name->str_val(), type, param_list, block, loc);
 }
 
 // @brief 代入文を作る．
 // @param[in] left 左辺
 // @param[in] right 右辺
-YmslAst*
-YmslParser::new_AstAssignment(YmslAst* left,
-			      YmslAst* right)
+AstStatement*
+YmslParser::new_AstAssignment(AstExpr* left,
+			      AstExpr* right)
 {
-  return new YmslAstAssignment(left, right);
+  return new AstAssignment(left, right);
 }
 
 // @brief if 文を作る．
@@ -197,26 +197,29 @@ YmslParser::new_AstAssignment(YmslAst* left,
 // @param[in] elif_list elif ブロックリスト
 // @param[in] else_block else ブロック
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstIf(YmslAst* cond,
-		      YmslBlock* then_block,
-		      YmslAst* elif_list,
-		      YmslBlock* else_block,
+AstStatement*
+YmslParser::new_AstIf(AstIfBlock* top,
+		      AstIfBlock* elif_list,
+		      AstIfBlock* else_block,
 		      const FileRegion& loc)
 {
-  return new YmslAstIf(cond, then_block, elif_list, else_block, loc);
+  if ( else_block != NULL ) {
+    else_block->set_prev(elif_list);
+    elif_list = else_block;
+  }
+  return new AstIf(top, elif_list, loc);
 }
 
-// @brief elif 文を作る．
+// @brief if blockを作る．
 // @param[in] cond 条件式
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstElif(YmslAst* cond,
-			YmslBlock* block,
-			const FileRegion& loc)
+AstIfBlock*
+YmslParser::new_AstIfBlock(AstExpr* cond,
+			   AstBlock* block,
+			   const FileRegion& loc)
 {
-  return new YmslAstElif(cond, block, loc);
+  return new AstIfBlock(cond, block, loc);
 }
 
 // @brief for 文を作る．
@@ -225,176 +228,165 @@ YmslParser::new_AstElif(YmslAst* cond,
 // @param[in] next 増加文
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstFor(YmslAst* init,
-		       YmslAst* cond,
-		       YmslAst* next,
-		       YmslBlock* block,
+AstStatement*
+YmslParser::new_AstFor(AstStatement* init,
+		       AstExpr* cond,
+		       AstStatement* next,
+		       AstBlock* block,
 		       const FileRegion& loc)
 {
-  return new YmslAstFor(init, cond, next, block, loc);
+  return new AstFor(init, cond, next, block, loc);
 }
 
 // @brief while 文を作る．
 // @param[in] cond 条件式
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstWhile(YmslAst* cond,
-			 YmslBlock* block,
+AstStatement*
+YmslParser::new_AstWhile(AstExpr* cond,
+			 AstBlock* block,
 			 const FileRegion& loc)
 {
-  return new YmslAstWhile(cond, block, loc);
+  return new AstWhile(cond, block, loc);
 }
 
 // @brief do-while 文を作る．
 // @param[in] block 本体
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstDoWhile(YmslBlock* block,
-			   YmslAst* cond,
+AstStatement*
+YmslParser::new_AstDoWhile(AstBlock* block,
+			   AstExpr* cond,
 			   const FileRegion& loc)
 {
-  return new YmslAstDoWhile(block, cond, loc);
+  return new AstDoWhile(block, cond, loc);
 }
 
 // @brief switch 文を作る．
-// @param[in] cond 条件式
+// @param[in] expr 条件式
 // @param[in] case_list caseリスト
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstSwitch(YmslAst* body,
-			  YmslAst* case_list,
+AstStatement*
+YmslParser::new_AstSwitch(AstExpr* expr,
+			  AstCaseItem* case_list,
 			  const FileRegion& loc)
 {
-  return new YmslAstSwitch(body, case_list, loc);
+  return new AstSwitch(expr, case_list, loc);
 }
 
 // @brief case-item を作る．
 // @param[in] label ラベル
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstCaseItem(YmslAst* label,
-			    YmslBlock* block,
+AstCaseItem*
+YmslParser::new_AstCaseItem(AstExpr* label,
+			    AstBlock* block,
 			    const FileRegion& loc)
 {
-  return new YmslAstCaseItem(label, block, loc);
+  return new AstCaseItem(label, block, loc);
 }
 
 // @brief goto 文を作る．
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstGoto(YmslAst* label,
+AstStatement*
+YmslParser::new_AstGoto(AstSymbol* label,
 			const FileRegion& loc)
 {
-  return new YmslAstGoto(label, loc);
+  return new AstGoto(label, loc);
 }
 
 // @brief ラベルを作る．
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstLabel(YmslAst* label,
+AstStatement*
+YmslParser::new_AstLabel(AstSymbol* label,
 			 const FileRegion& loc)
 {
-  return new YmslAstLabel(label, loc);
+  return new AstLabel(label, loc);
 }
 
 // @brief break 文を作る．
 // @param[in] loc ファイル位置
-YmslAst*
+AstStatement*
 YmslParser::new_AstBreak(const FileRegion& loc)
 {
-  return new YmslAstBreak(loc);
+  return new AstBreak(loc);
 }
 
 // @brief continue 文を作る．
 // @param[in] loc ファイル位置
-YmslAst*
+AstStatement*
 YmslParser::new_AstContinue(const FileRegion& loc)
 {
-  return new YmslAstContinue(loc);
+  return new AstContinue(loc);
 }
 
 // @brief return 文を作る．
 // @param[in] expr 値
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstReturn(YmslAst* expr,
+AstStatement*
+YmslParser::new_AstReturn(AstExpr* expr,
 			  const FileRegion& loc)
 {
-  return new YmslAstReturn(expr, loc);
+  return new AstReturn(expr, loc);
 }
 
-// @brief ブロックを作る．
+// @brief ブロック文を作る．
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstBlock(YmslBlock* block,
-			 const FileRegion& loc)
+AstStatement*
+YmslParser::new_AstBlockStmt(AstBlock* block,
+			     const FileRegion& loc)
 {
-  return new YmslAstBlock(block, loc);
+  return new AstBlockStmt(block, loc);
+}
+
+// @brief 式文を作る．
+// @param[in] expr 式
+AstStatement*
+YmslParser::new_AstExprStmt(AstExpr* expr)
+{
+  return new AstExprStmt(expr);
+}
+
+// @brief 現在のブロックに statement を追加する．
+void
+YmslParser::add_statement(AstStatement* stmt)
+{
+  mBlockStack.back()->add_statement(stmt);
 }
 
 // @brief 単項演算式を作る．
 // @param[in] op 演算子のトークン
 // @param[in] left オペランド
 // @param[in] loc ファイル位置
-YmslAst*
+AstExpr*
 YmslParser::new_AstUniOp(TokenType op,
-			 YmslAst* left,
+			 AstExpr* left,
 			 const FileRegion& loc)
 {
-  switch ( op ) {
-  case PLUS: return new YmslAstUniPlus(left, loc);
-  case MINUS: return new YmslAstUniMinus(left, loc);
-  case BITNEG: return new YmslAstBitNeg(left, loc);
-  case LOGNOT: return new YmslAstLogNot(left, loc);
-  default: ASSERT_NOT_REACHED;
-  }
-  return NULL;
+  return new AstUniOp(op, left, loc);
 }
 
 // @brief 二項演算式を作る．
 // @param[in] op 演算子のトークン
 // @param[in] left, right オペランド
-YmslAst*
+AstExpr*
 YmslParser::new_AstBinOp(TokenType op,
-			 YmslAst* left,
-			 YmslAst* right)
+			 AstExpr* left,
+			 AstExpr* right)
 {
-  switch ( op ) {
-  case PLUS: return new YmslAstPlus(left, right);
-  case MINUS: return new YmslAstMinus(left, right);
-  case MULT: return new YmslAstMult(left, right);
-  case DIV: return new YmslAstDiv(left, right);
-  case MOD: return new YmslAstMod(left, right);
-  case BITAND: return new YmslAstBitAnd(left, right);
-  case BITOR: return new YmslAstBitOr(left, right);
-  case BITXOR: return new YmslAstBitXor(left, right);
-  case LOGAND: return new YmslAstLogAnd(left, right);
-  case LOGOR: return new YmslAstLogOr(left, right);
-  case EQEQ: return new YmslAstEqEq(left, right);
-  case NOTEQ: return new YmslAstNotEq(left, right);
-  case LT: return new YmslAstLt(left, right);
-  case GT: return new YmslAstGt(left, right);
-  case LE: return new YmslAstLe(left, right);
-  case GE: return new YmslAstGe(left, right);
-  default: ASSERT_NOT_REACHED;
-  }
-  return NULL;
+  return new AstBinOp(op, left, right);
 }
 
 // @brief 配列参照を作る．
 // @param[in] id 配列名
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstArrayRef(YmslAst* id,
-			    YmslAst* index,
+AstExpr*
+YmslParser::new_AstArrayRef(AstSymbol* id,
+			    AstExpr* index,
 			    const FileRegion& loc)
 {
   return NULL;
@@ -402,87 +394,91 @@ YmslParser::new_AstArrayRef(YmslAst* id,
 
 // @brief 関数呼び出しを作る．
 // @param[in] id 関数名
-// @param[in] param_list 引数のリスト
+// @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstFuncCall(YmslAst* id,
-			    YmslAst* param_list,
+AstExpr*
+YmslParser::new_AstFuncCall(AstSymbol* id,
+			    AstExpr* expr_list,
 			    const FileRegion& loc)
 {
-  return new YmslAstFuncCall(id, param_list, loc);
+  return new AstFuncCall(id, expr_list, loc);
 }
 
 // @brief 識別子式を作る．
-// @param[in] val 値
+// @param[in] symbol 値
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstSymbol(const char* val,
-			  const FileRegion& loc)
+AstExpr*
+YmslParser::new_AstVarExpr(AstSymbol* symbol)
 {
-  return new YmslAstSymbol(ShString(val), loc);
+  AstBlock* block = cur_block();
+  AstVarDecl* var_decl = block->find_vardecl(symbol->str_val());
+  if ( var_decl == NULL ) {
+    return NULL;
+  }
+  return new AstVarExpr(var_decl, symbol->file_region());
 }
 
 // @brief 整数定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstInt(int val,
-		       const FileRegion& loc)
+AstExpr*
+YmslParser::new_AstIntConst(int val,
+			    const FileRegion& loc)
 {
-  return new YmslAstInt(val, loc);
+  return new AstIntConst(val, loc);
 }
 
 // @brief 浮動小数点定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstFloat(double val,
-			 const FileRegion& loc)
+AstExpr*
+YmslParser::new_AstFloatConst(double val,
+			      const FileRegion& loc)
 {
-  return new YmslAstFloat(val, loc);
+  return new AstFloatConst(val, loc);
 }
 
 // @brief 文字列定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstString(const char* val,
-			  const FileRegion& loc)
+AstExpr*
+YmslParser::new_AstStringConst(const char* val,
+			       const FileRegion& loc)
 {
-  return new YmslAstString(ShString(val), loc);
+  return new AstStringConst(val, loc);
 }
 
 // @brief 文字列型を作る．
 // @param[in] loc ファイル位置
-YmslAst*
+AstValueType*
 YmslParser::new_AstStringType(const FileRegion& loc)
 {
-  return new YmslAstStringType(loc);
+  return new AstStringType(loc);
 }
 
 // @brief 整数型を作る．
 // @param[in] loc ファイル位置
-YmslAst*
+AstValueType*
 YmslParser::new_AstIntType(const FileRegion& loc)
 {
-  return new YmslAstIntType(loc);
+  return new AstIntType(loc);
 }
 
 // @brief 浮動小数点型を作る．
 // @param[in] loc ファイル位置
-YmslAst*
+AstValueType*
 YmslParser::new_AstFloatType(const FileRegion& loc)
 {
-  return new YmslAstFloatType(loc);
+  return new AstFloatType(loc);
 }
 
 // @brief ユーザー定義型を作る．
 // @param[in] type_name 型名
 // @param[in] loc ファイル位置
-YmslAst*
-YmslParser::new_AstUserType(YmslAst* type_name)
+AstValueType*
+YmslParser::new_AstUserType(AstSymbol* type_name)
 {
-  return new YmslAstUserType(type_name);
+  return new AstUserType(type_name);
 }
 
 END_NAMESPACE_YM_YMSL

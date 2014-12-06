@@ -10,6 +10,7 @@
 
 
 #include "Ast.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -39,14 +40,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ファイル位置を得る．
-  virtual
-  const FileRegion&
-  file_region() const;
-
   /// @brief 名前を得る．
-  ///
-  /// 名前を持つ要素のみ意味を持つ．
   virtual
   ShString
   name() const;
@@ -56,9 +50,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ファイル位置
-  FileRegion mLoc;
 
   // 名前
   ShString mName;

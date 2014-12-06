@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "DeclBase.h"
+#include "AstDeclBase.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -29,7 +29,7 @@ public:
   /// @param[in] init_expr 初期化式
   /// @param[in] loc ファイル位置
   AstVarDecl(ShString name,
-	     YmslAst* type,
+	     AstValueType* type,
 	     AstExpr* init_expr,
 	     const FileRegion& loc);
 
@@ -44,7 +44,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 型を得る．
-  Ast*
+  AstValueType*
   type() const;
 
   /// @brief 初期化式を返す．
@@ -52,6 +52,14 @@ public:
   /// NULL の場合もある．
   AstExpr*
   init_expr() const;
+
+  /// @brief 次の要素を取り出す．
+  AstVarDecl*
+  next();
+
+  /// @brief 前の要素をセットする．
+  void
+  set_prev(AstVarDecl* prev);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -67,14 +75,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  ShString mName;
-
   // 変数の型
-  Ast* mType;
+  AstValueType* mType;
 
   // 初期化式
   AstExpr* mInitExpr;
+
+  // 前の要素
+  AstVarDecl* mPrev;
+
+  // 次の要素
+  AstVarDecl* mNext;
 
 };
 

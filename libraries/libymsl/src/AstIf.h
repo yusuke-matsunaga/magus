@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstBlockStmt.h"
+#include "AstStatement.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,20 +19,16 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief if 文を表す Ast
 //////////////////////////////////////////////////////////////////////
 class AstIf :
-  public AstBlockStmt
+  public AstStatement
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] cond 条件式
-  /// @param[in] then_block then ブロック
-  /// @param[in] elif_list elif ブロックのリスト
-  /// @param[in] else_block else ブロック
+  /// @param[in] top 先頭の if ブロック
+  /// @param[in] elif_list elif ブロックリスト
   /// @param[in] loc ファイル位置
-  AstIf(AstExpr* cond,
-	AstBlock* then_block,
-	Ast* elif_list,
-	AstBlock* else_block,
+  AstIf(AstIfBlock* top,
+	AstIfBlock* elif_list,
 	const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -44,11 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 型を得る．
-  virtual
-  AstType
-  type() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -64,8 +55,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 条件
-  AstExpr* mCond;
+  // if ブロックのリスト
+  vector<AstIfBlock*> mIfBlockList;
 
 };
 
