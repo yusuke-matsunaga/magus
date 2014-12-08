@@ -10,12 +10,11 @@
 
 
 #include "ymsl_int.h"
+#include "YmslDict.h"
 #include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
-
-class AstSymHandle;
 
 //////////////////////////////////////////////////////////////////////
 /// @class AstBlock AstBlock.h "AstBlock.h"
@@ -86,32 +85,6 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ハッシュ表を確保する．
-  /// @param[in] req_size 要求サイズ
-  void
-  alloc_table(ymuint req_size);
-
-  /// @brief 名前からハンドルを探す．
-  /// @param[in] name 名前
-  AstSymHandle*
-  find(ShString name) const;
-
-  /// @brief ハンドルを登録する．
-  void
-  put(AstSymHandle* handle);
-
-  /// @brief ハンドルを登録する．
-  ///
-  /// こちらはサイズチェックなし
-  void
-  _put(AstSymHandle* handle);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -121,17 +94,8 @@ private:
   // statement リスト
   vector<AstStatement*> mStatementList;
 
-  // ハッシュサイズ
-  ymuint mHashSize;
-
-  // ハッシュ表を拡大するしきい値
-  ymuint mNextLimit;
-
-  // ハッシュ表
-  AstSymHandle** mHashTable;
-
-  // ハッシュの要素数
-  ymuint mHashNum;
+  // 辞書
+  YmslDict mDict;
 
 };
 

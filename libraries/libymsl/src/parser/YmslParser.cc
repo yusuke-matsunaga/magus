@@ -175,9 +175,9 @@ AstFuncDecl*
 YmslParser::new_AstFuncDecl(AstSymbol* name,
 			    AstValueType* type,
 			    AstVarDecl* param_list,
-			    AstBlock* block,
 			    const FileRegion& loc)
 {
+  AstBlock* block = cur_block();
   return new AstFuncDecl(name->str_val(), type, param_list, block, loc);
 }
 
@@ -393,15 +393,20 @@ YmslParser::new_AstArrayRef(AstSymbol* id,
 }
 
 // @brief 関数呼び出しを作る．
-// @param[in] id 関数名
+// @param[in] symbol 関数名
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
 AstExpr*
-YmslParser::new_AstFuncCall(AstSymbol* id,
+YmslParser::new_AstFuncCall(AstSymbol* symbol,
 			    AstExpr* expr_list,
 			    const FileRegion& loc)
 {
-  return new AstFuncCall(id, expr_list, loc);
+  AstBlock* block = cur_block();
+  AstFuncDecl* func_decl = block->find_funcdecl(symbol->str_val());
+  if ( func_decl == NULL ) {
+    return NULL;
+  }
+  return new AstFuncCall(func_decl, expr_list, loc);
 }
 
 // @brief 識別子式を作る．

@@ -96,7 +96,6 @@ public:
   new_AstFuncDecl(AstSymbol* name,
 		  AstValueType* type,
 		  AstVarDecl* param_list,
-		  AstBlock* block,
 		  const FileRegion& loc);
 
   /// @brief 代入文を作る．

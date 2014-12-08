@@ -1,39 +1,32 @@
-#ifndef ASTFUNCCALL_H
-#define ASTFUNCCALL_H
+#ifndef YMSLENV_H
+#define YMSLENV_H
 
-/// @file AstFuncCall.h
-/// @brief AstFuncCall のヘッダファイル
+/// @file YmslEnv.h
+/// @brief YmslEnv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "ymsl_int.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstFuncCall AstFuncCall.h "AstFuncCall.h"
-/// @brief 関数呼び出しを表す Ast
+/// @class YmslEnv YmslEnv.h "YmslEnv.h"
+/// @brief 実行環境を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstFuncCall :
-  public AstExpr
+class YmslEnv
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 関数名
-  /// @param[in] expr_list 引数のリスト
-  /// @param[in] loc ファイル位置
-  AstFuncCall(AstSymbol* name,
-	      AstExpr* expr_list,
-	      const FileRegion& loc);
+  YmslEnv();
 
   /// @brief デストラクタ
-  virtual
-  ~AstFuncCall();
+  ~YmslEnv();
 
 
 public:
@@ -41,27 +34,24 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数名
-  AstSymbol* mName;
+  // トップレベルのブロック
+  YmslBlock* mToplevelBlock;
 
-  // 引数のリスト
-  vector<AstExpr*> mExprList;
+  // ブロックのリスト
+  vector<YmslBlock*> mBlockList;
+
+  // 変数のリスト
+  vector<AstVarDecl*> mVarList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
 
-#endif // ASTFUNCCALL_H
+#endif // YMSLENV_H

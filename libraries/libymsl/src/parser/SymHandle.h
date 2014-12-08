@@ -1,8 +1,8 @@
-#ifndef ASTSYMHANDLE_H
-#define ASTSYMHANDLE_H
+#ifndef SYMHANDLE_H
+#define SYMHANDLE_H
 
-/// @file AstSymHandle.h
-/// @brief AstSymHandle のヘッダファイル
+/// @file SymHandle.h
+/// @brief SymHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstSymHandle AstSymHandle.h "AstSymHandle.h"
+/// @class SymHandle SymHandle.h "SymHandle.h"
 /// @brief Symbol Table のハンドル
 //////////////////////////////////////////////////////////////////////
-class AstSymHandle
+class SymHandle
 {
-  friend class AstBlock;
+  friend class YmslDict;
 
 public:
 
   /// @brief コンストラクタ
-  AstSymHandle();
+  SymHandle();
 
   /// @brief デストラクタ
   virtual
-  ~AstSymHandle();
+  ~SymHandle();
 
 
 public:
@@ -63,6 +63,13 @@ public:
   AstStatement*
   statement() const;
 
+  /// @brief 名前空間を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  YmslSubspace*
+  subspace() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -70,27 +77,27 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 次の要素を指すリンク
-  AstSymHandle* mLink;
+  SymHandle* mLink;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstVarHandle AstSymHandle.h "AstSymHandle.h"
-/// @brief AstVarDecl を保持する AstSymHandle
+/// @class VarHandle SymHandle.h "SymHandle.h"
+/// @brief AstVarDecl を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class AstVarHandle :
-  public AstSymHandle
+class VarHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] vardecl 変数宣言
-  AstVarHandle(AstVarDecl* vardecl);
+  VarHandle(AstVarDecl* vardecl);
 
   /// @brief デストラクタ
   virtual
-  ~AstVarHandle();
+  ~VarHandle();
 
 
 public:
@@ -123,21 +130,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstFuncHandle AstSymHandle.h "AstSymHandle.h"
-/// @brief AstFuncDecl を保持する AstSymHandle
+/// @class FuncHandle SymHandle.h "SymHandle.h"
+/// @brief AstFuncDecl を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class AstFuncHandle :
-  public AstSymHandle
+class FuncHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] funcdecl 関数宣言
-  AstFuncHandle(AstFuncDecl* funcdecl);
+  FuncHandle(AstFuncDecl* funcdecl);
 
   /// @brief デストラクタ
   virtual
-  ~AstFuncHandle();
+  ~FuncHandle();
 
 
 public:
@@ -170,21 +177,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstStmtHandle AstSymHandle.h "AstSymHandle.h"
-/// @brief AstStatement を保持する AstSymHandle
+/// @class StmtHandle SymHandle.h "SymHandle.h"
+/// @brief AstStatement を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class AstStmtHandle :
-  public AstSymHandle
+class StmtHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] statement ラベルすてーとめんと
-  AstStmtHandle(AstStatement* statement);
+  StmtHandle(AstStatement* statement);
 
   /// @brief デストラクタ
   virtual
-  ~AstStmtHandle();
+  ~StmtHandle();
 
 
 public:
@@ -215,6 +222,53 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+/// @class SubspaceHandle SymHandle.h "SymHandle.h"
+/// @brief AstStatement を保持する SymHandle
+//////////////////////////////////////////////////////////////////////
+class SubspaceHandle :
+  public SymHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] subspace 名前空間
+  SubspaceHandle(YmslSubspace* subspace);
+
+  /// @brief デストラクタ
+  virtual
+  ~SubspaceHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 名前空間を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  YmslSubspace*
+  subspace() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 名前空間
+  YmslSubspace* mSubspace;
+
+};
+
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTSYMHANDLE_H
+#endif // SYMHANDLE_H

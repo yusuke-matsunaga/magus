@@ -1,0 +1,57 @@
+#ifndef YMSLSUBSPACE_H
+#define YMSLSUBSPACE_H
+
+/// @file YmslSubspace.h
+/// @brief YmslSubspace のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2014 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ymsl_int.h"
+
+
+BEGIN_NAMESPACE_YM_YMSL
+
+//////////////////////////////////////////////////////////////////////
+/// @class YmslSubspace YmslSubspace.h "YmslSubspace.h"
+/// @brief 名前空間を表すクラス
+//////////////////////////////////////////////////////////////////////
+class YmslSubspace
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] name 名前
+  YmslSubspace(ShString name);
+
+  /// @brief デストラクタ
+  ~YmslSubspace();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 下位の辞書
+  YmslDict mDict;
+
+};
+
+END_NAMESPACE_YM_YMSL
+
+
+#endif // YMSLSUBSPACE_H

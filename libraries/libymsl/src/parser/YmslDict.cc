@@ -1,29 +1,28 @@
 
-/// @file AstBlock.cc
-/// @brief AstBlock の実装ファイル
+/// @file YmslDict.cc
+/// @brief YmslDict の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstBlock.h"
+#include "YmslDict.h"
 #include "AstFuncDecl.h"
 #include "AstStatement.h"
 #include "AstVarDecl.h"
-#include "AstSymHandle.h"
+#include "YmslSubspace.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstBlock
+// クラス YmslDict
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parent 親のブロック
-AstBlock::AstBlock(AstBlock* parent) :
-  mParent(parent),
+YmslDict::YmslDict() :
   mHashSize(0),
   mHashTable(NULL),
   mHashNum(0)
@@ -32,18 +31,17 @@ AstBlock::AstBlock(AstBlock* parent) :
 }
 
 // @brief デストラクタ
-AstBlock::~AstBlock()
+YmslDict::~YmslDict()
 {
 }
 
 // @brief statement を追加する．
 void
-AstBlock::add_statement(AstStatement* statement)
+YmslDict::add_statement(AstStatement* statement)
 {
-  mStatementList.push_back(statement);
   ShString label = statement->label();
   if ( label != ShString() ) {
-    AstStmtHandle* handle = new AstStmtHandle(statement);
+    SymHandle* handle = new StmtHandle(statement);
     put(handle);
   }
 }
@@ -51,18 +49,27 @@ AstBlock::add_statement(AstStatement* statement)
 // @brief 関数定義を追加する．
 // @param[in] item 追加する要素
 void
-AstBlock::add_funcdecl(AstFuncDecl* item)
+YmslDict::add_funcdecl(AstFuncDecl* item)
 {
-  AstFuncHandle* handle = new AstFuncHandle(item);
+  SymHandle* handle = new FuncHandle(item);
   put(handle);
 }
 
 // @brief 変数定義を追加する．
 // @param[in] item 追加する要素
 void
-AstBlock::add_vardecl(AstVarDecl* item)
+YmslDict::add_vardecl(AstVarDecl* item)
 {
-  AstVarHandle* handle = new AstVarHandle(item);
+  SymHandle* handle = new VarHandle(item);
+  put(handle);
+}
+
+// @brief 名前空間を追加する．
+// @param[in] item 追加する要素
+void
+YmslDict::add_namespace(YmslSubspace* item)
+{
+  SymHandle* handle = new SubspaceHandle(item);
   put(handle);
 }
 
@@ -72,9 +79,9 @@ AstBlock::add_vardecl(AstVarDecl* item)
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 AstStatement*
-AstBlock::find_label(ShString name) const
+YmslDict::find_label(ShString name) const
 {
-  AstSymHandle* handle = find(name);
+  SymHandle* handle = find(name);
   if ( handle != NULL ) {
     return handle->statement();
   }
@@ -87,9 +94,9 @@ AstBlock::find_label(ShString name) const
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 AstFuncDecl*
-AstBlock::find_funcdecl(ShString name) const
+YmslDict::find_funcdecl(ShString name) const
 {
-  AstSymHandle* handle = find(name);
+  SymHandle* handle = find(name);
   if ( handle != NULL ) {
     return handle->funcdecl();
   }
@@ -102,20 +109,36 @@ AstBlock::find_funcdecl(ShString name) const
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 AstVarDecl*
-AstBlock::find_vardecl(ShString name) const
+YmslDict::find_vardecl(ShString name) const
 {
-  AstSymHandle* handle = find(name);
+  SymHandle* handle = find(name);
   if ( handle != NULL ) {
     return handle->vardecl();
   }
   return NULL;
 }
 
+// @brief 名前から名前空間を探す．
+// @param[in] name 名前
+//
+// ここになければ親のブロックを探す．
+// それでもなければ NULL を返す．
+YmslSubspace*
+YmslDict::find_subspace(ShString name) const
+{
+  SymHandle* handle = find(name);
+  if ( handle != NULL ) {
+    return handle->subspace();
+  }
+  return NULL;
+}
+
+#if 0
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
-AstBlock::print(ostream& s,
+YmslDict::print(ostream& s,
 		ymuint indent) const
 {
 #if 0
@@ -131,23 +154,24 @@ AstBlock::print(ostream& s,
   s << "}" << endl;
 #endif
 }
+#endif
 
 // @brief ハッシュ表を確保する．
 void
-AstBlock::alloc_table(ymuint req_size)
+YmslDict::alloc_table(ymuint req_size)
 {
   ymuint old_size = mHashSize;
-  AstSymHandle** old_table = mHashTable;
+  SymHandle** old_table = mHashTable;
   mHashSize = req_size;
   mNextLimit = static_cast<ymuint>(mHashSize * 1.8);
-  mHashTable = new AstSymHandle*[mHashSize];
+  mHashTable = new SymHandle*[mHashSize];
   for (ymuint i = 0; i < mHashSize; ++ i) {
     mHashTable[i] = NULL;
   }
   for (ymuint i = 0; i < old_size; ++ i) {
-    for (AstSymHandle* handle = old_table[i];
+    for (SymHandle* handle = old_table[i];
 	 handle != NULL; ) {
-      AstSymHandle* next = handle->mLink;
+      SymHandle* next = handle->mLink;
       _put(handle);
       handle = next;
     }
@@ -157,11 +181,11 @@ AstBlock::alloc_table(ymuint req_size)
 
 // @brief 名前からハンドルを探す．
 // @param[in] name 名前
-AstSymHandle*
-AstBlock::find(ShString name) const
+SymHandle*
+YmslDict::find(ShString name) const
 {
   ymuint pos = name.hash() % mHashSize;
-  for (AstSymHandle* handle = mHashTable[pos];
+  for (SymHandle* handle = mHashTable[pos];
        handle != NULL; handle = handle->mLink) {
     if ( handle->name() == name ) {
       return handle;
@@ -175,7 +199,7 @@ AstBlock::find(ShString name) const
 
 // @brief ハンドルを登録する．
 void
-AstBlock::put(AstSymHandle* handle)
+YmslDict::put(SymHandle* handle)
 {
   if ( mHashNum >= mNextLimit ) {
     alloc_table(mHashSize << 1);
@@ -188,7 +212,7 @@ AstBlock::put(AstSymHandle* handle)
 //
 // こちらはサイズチェックなし
 void
-AstBlock::_put(AstSymHandle* handle)
+YmslDict::_put(SymHandle* handle)
 {
   ymuint pos = handle->name().hash() % mHashSize;
   handle->mLink = mHashTable[pos];
@@ -198,17 +222,17 @@ AstBlock::_put(AstSymHandle* handle)
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstSymHandle
+// クラス SymHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AstSymHandle::AstSymHandle() :
+SymHandle::SymHandle() :
   mLink(NULL)
 {
 }
 
 // @brief デストラクタ
-AstSymHandle::~AstSymHandle()
+SymHandle::~SymHandle()
 {
 }
 
@@ -216,7 +240,7 @@ AstSymHandle::~AstSymHandle()
 //
 // 他の要素の場合には NULL を返す．
 AstVarDecl*
-AstSymHandle::vardecl() const
+SymHandle::vardecl() const
 {
   return NULL;
 }
@@ -225,7 +249,7 @@ AstSymHandle::vardecl() const
 //
 // 他の要素の場合には NULL を返す．
 AstFuncDecl*
-AstSymHandle::funcdecl() const
+SymHandle::funcdecl() const
 {
   return NULL;
 }
@@ -234,31 +258,31 @@ AstSymHandle::funcdecl() const
 //
 // 他の要素の場合には NULL を返す．
 AstStatement*
-AstSymHandle::statement() const
+SymHandle::statement() const
 {
   return NULL;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstVarHandle
+// クラス VarHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] vardecl 変数宣言
-AstVarHandle::AstVarHandle(AstVarDecl* vardecl) :
+VarHandle::VarHandle(AstVarDecl* vardecl) :
   mVarDecl(vardecl)
 {
 }
 
 // @brief デストラクタ
-AstVarHandle::~AstVarHandle()
+VarHandle::~VarHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-AstVarHandle::name() const
+VarHandle::name() const
 {
   return mVarDecl->name();
 }
@@ -267,31 +291,31 @@ AstVarHandle::name() const
 //
 // 他の要素の場合には NULL を返す．
 AstVarDecl*
-AstVarHandle::vardecl() const
+VarHandle::vardecl() const
 {
   return mVarDecl;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstFuncHandle
+// クラス FuncHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] funcdecl 関数宣言
-AstFuncHandle::AstFuncHandle(AstFuncDecl* funcdecl) :
+FuncHandle::FuncHandle(AstFuncDecl* funcdecl) :
   mFuncDecl(funcdecl)
 {
 }
 
 // @brief デストラクタ
-AstFuncHandle::~AstFuncHandle()
+FuncHandle::~FuncHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-AstFuncHandle::name() const
+FuncHandle::name() const
 {
   return mFuncDecl->name();
 }
@@ -300,31 +324,31 @@ AstFuncHandle::name() const
 //
 // 他の要素の場合には NULL を返す．
 AstFuncDecl*
-AstFuncHandle::funcdecl() const
+FuncHandle::funcdecl() const
 {
   return mFuncDecl;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// AstStmtHandle
+// クラス StmtHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] statement ラベルすてーとめんと
-AstStmtHandle::AstStmtHandle(AstStatement* statement) :
+StmtHandle::StmtHandle(AstStatement* statement) :
   mStatement(statement)
 {
 }
 
 // @brief デストラクタ
-AstStmtHandle::~AstStmtHandle()
+StmtHandle::~StmtHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-AstStmtHandle::name() const
+StmtHandle::name() const
 {
   return mStatement->label();
 }
@@ -333,9 +357,42 @@ AstStmtHandle::name() const
 //
 // 他の要素の場合には NULL を返す．
 AstStatement*
-AstStmtHandle::statement() const
+StmtHandle::statement() const
 {
   return mStatement;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス SubspaceHandle
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] subspace 名前空間
+SubspaceHandle::SubspaceHandle(YmslSubspace* subspace) :
+  mSubspace(subspace)
+{
+}
+
+// @brief デストラクタ
+SubspaceHandle::~SubspaceHandle()
+{
+}
+
+// @brief 名前を返す．
+ShString
+SubspaceHandle::name() const
+{
+  return mSubspace->name();
+}
+
+// @brief 名前空間を返す．
+//
+// 他の要素の場合には NULL を返す．
+YmslSubspace*
+SubspaceHandle::subspace() const
+{
+  return mSubspace;
 }
 
 END_NAMESPACE_YM_YMSL

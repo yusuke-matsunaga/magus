@@ -61,16 +61,35 @@ AstExpr::set_prev(AstExpr* prev)
 // クラス AstFuncCall
 //////////////////////////////////////////////////////////////////////
 
+BEGIN_NONAMESPACE
+
+ymuint
+count_size(AstExpr* expr_list)
+{
+  ymuint n = 0;
+  for (AstExpr* expr = expr_list; expr != NULL; expr = expr->next()) {
+    ++ n;
+  }
+  return n;
+}
+
+END_NONAMESPACE
+
 // @brief コンストラクタ
-// @param[in] name 関数名
+// @param[in] func 関数
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstSymbol* name,
+AstFuncCall::AstFuncCall(AstFuncDecl* func,
 			 AstExpr* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mName(name)
+  mFunc(func),
+  mExprList(count_size(expr_list))
 {
+  for (ymuint i = 0; expr_list != NULL;
+       expr_list = expr_list->next(), ++ i) {
+    mExprList[i] = expr_list;
+  }
 }
 
 // @brief デストラクタ

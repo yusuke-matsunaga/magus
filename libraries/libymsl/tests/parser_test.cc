@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "../src/YmslParser.h"
-#include "../src/RsrvWordDic.h"
-#include "../src/Ast.h"
-#include "../src/AstBlock.h"
+#include "YmslParser.h"
+#include "RsrvWordDic.h"
+#include "Ast.h"
+#include "AstBlock.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"

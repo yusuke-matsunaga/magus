@@ -31,6 +31,11 @@ BEGIN_NAMESPACE_YM_YMSL
 
 class YmslParser;
 class YmslScanner;
+class YmslExecutable;
+class YmslFunc;
+class YmslSubspace;
+class YmslValueType;
+class YmslVar;
 
 class AstBlock;
 class AstCaseItem;

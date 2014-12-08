@@ -4,6 +4,7 @@
 # ===================================================================
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -15,15 +16,20 @@ include_directories(
 # ===================================================================
 
 set (ymsl_SOURCES
-  src/Ast.cc
-  src/AstBlock.cc
-  src/AstDeclBase.cc
-  src/AstExpr.cc
-  src/AstStatement.cc
-  src/AstValueType.cc
-  src/RsrvWordDic.cc
-  src/YmslParser.cc
-  src/YmslScanner.cc
+  src/YmslExecutable.cc
+  src/YmslFunc.cc
+  src/YmslValueType.cc
+  src/YmslVar.cc
+  src/parser/Ast.cc
+  src/parser/AstBlock.cc
+  src/parser/AstDeclBase.cc
+  src/parser/AstExpr.cc
+  src/parser/AstStatement.cc
+  src/parser/AstValueType.cc
+  src/parser/RsrvWordDic.cc
+  src/parser/YmslDict.cc
+  src/parser/YmslParser.cc
+  src/parser/YmslScanner.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
   )
@@ -38,13 +44,13 @@ add_custom_target ( grammer ALL
 # Create custom command for bison/yacc (note the DEPENDS)
 add_custom_command (
   COMMAND "${BISON_EXECUTABLE}"
-  -y "${CMAKE_CURRENT_SOURCE_DIR}/src/grammer.yy"
+  -y "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/grammer.yy"
   -o "${CMAKE_CURRENT_BINARY_DIR}/grammer.cc"
   -d -v
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/grammer.cc"
   "${CMAKE_CURRENT_BINARY_DIR}/grammer.hh"
   "${CMAKE_CURRENT_BINARY_DIR}/grammer.output"
-  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/grammer.yy"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/grammer.yy"
   )
 
 # Since verilog_grammer.cc does not exists yet when cmake is run, mark

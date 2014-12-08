@@ -135,6 +135,7 @@ fr_merge(const FileRegion fr_array[],
 %token FUNCTION
 %token RETURN
 %token VAR
+%token GLOBAL
 %token INT
 %token FLOAT
 %token STRING
@@ -188,16 +189,19 @@ item
   parser.add_statement($1);
 }
 // 関数宣言
-| func_head SYMBOL LP param_list RP COLON type statement_block
+| func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
 {
-  parser.new_AstFuncDecl($2, $7, $4, $8, @$);
+  AstFuncDecl* funcdecl = parser.new_AstFuncDecl($2, $7, $4, @$);
   parser.pop_block();
+  AstBlock* block = parser.cur_block();
+  block->add_funcdecl(funcdecl);
 }
 | var_decl
 {
   AstBlock* block = parser.cur_block();
   block->add_vardecl($1);
 }
+| GLOBAL SYMBOL COLON type SEMI
 ;
 
 // 関数宣言のヘッダ
@@ -247,7 +251,7 @@ statement
   $$ = parser.new_AstSwitch($2, $4, @$);
 }
 // GOTO 文
-| GOTO SYMBOL
+| GOTO SYMBOL SEMI
 {
   $$ = parser.new_AstGoto($2, @$);
 }
@@ -272,9 +276,9 @@ statement
   $$ = parser.new_AstReturn(NULL, @$);
 }
 // RETURN 文(引数あり)
-| RETURN LP expr RP SEMI
+| RETURN expr SEMI
 {
-  $$ = parser.new_AstReturn($3, @$);
+  $$ = parser.new_AstReturn($2, @$);
 }
 // ブロック文
 | statement_block
@@ -517,6 +521,7 @@ expr
 {
   $$ = parser.new_AstVarExpr($1);
   if ( $$ == NULL ) {
+    // 変数が見つからない
   }
 }
 | SYMBOL LBK expr RBK
@@ -526,6 +531,9 @@ expr
 | SYMBOL LP expr_list RP
 {
   $$ = parser.new_AstFuncCall($1, $3, @$);
+  if ( $$ == NULL ) {
+    // 関数が見つからない
+  }
 }
 | INT_NUM
 {
