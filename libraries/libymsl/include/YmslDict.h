@@ -26,7 +26,8 @@ class YmslDict
 public:
 
   /// @brief コンストラクタ
-  YmslDict();
+  /// @param[in] parent 親
+  YmslDict(YmslDict* parent = NULL);
 
   /// @brief デストラクタ
   ~YmslDict();
@@ -119,6 +120,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 親の辞書
+  YmslDict* mParent;
 
   // ハッシュサイズ
   ymuint mHashSize;

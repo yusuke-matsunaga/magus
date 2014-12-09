@@ -12,7 +12,7 @@
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 
-#include "YmslParser.h"
+#include "Driver.h"
 
 #include "AstBlock.h"
 #include "AstCaseItem.h"
@@ -38,12 +38,12 @@ BEGIN_NAMESPACE_YM_YMSL
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      YmslParser&);
+      Driver&);
 
 // エラー報告関数
 int
 yyerror(YYLTYPE*,
-	YmslParser&,
+	Driver&,
 	const char*);
 
 
@@ -79,22 +79,20 @@ fr_merge(const FileRegion fr_array[],
 
 // Yacc 用の定義
 
-// "pure" parser にする．
+// "pure" driver にする．
 %define api.pure
 
 // 位置のトラッキングを行う．
 %locations
 
 // yyparse の引数
-%parse-param {YmslParser& parser}
+%parse-param {Driver& driver}
 
 // yylex の引数
-%lex-param {YmslParser& parser}
+%lex-param {Driver& driver}
 
 // 値を表す型
 %union {
-  int int_type;
-  double float_type;
   AstBlock* block_type;
   AstCaseItem* caseitem_type;
   AstExpr* expr_type;
@@ -140,8 +138,8 @@ fr_merge(const FileRegion fr_array[],
 %token FLOAT
 %token STRING
 %token <symbol_type> SYMBOL
-%token <int_type> INT_NUM
-%token <float_type> FLOAT_NUM
+%token <expr_type> INT_VAL
+%token <expr_type> FLOAT_VAL
 %token <expr_type> STRING_VAL
 
 %token DUMMY
@@ -167,6 +165,8 @@ fr_merge(const FileRegion fr_array[],
 %type <expr_type> lvalue
 %type <ifblock_type> elif_list
 %type <ifblock_type> else_block
+%type <statement_type> block_statement
+%type <statement_type> single_statement
 %type <statement_type> statement
 %type <valuetype_type> type
 %type <vardecl_type> var_decl param_list
@@ -174,6 +174,8 @@ fr_merge(const FileRegion fr_array[],
 %%
 
 // 本体
+
+%start item_list;
 
 // トップレベルの要素リスト
 item_list
@@ -186,104 +188,121 @@ item_list
 item
 : statement
 {
-  parser.add_statement($1);
+  driver.add_statement($1);
 }
 // 関数宣言
 | func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
 {
-  AstFuncDecl* funcdecl = parser.new_AstFuncDecl($2, $7, $4, @$);
-  parser.pop_block();
-  AstBlock* block = parser.cur_block();
-  block->add_funcdecl(funcdecl);
+  AstFuncDecl* funcdecl = driver.new_FuncDecl($2, $7, $4, @$);
+  driver.pop_block();
+  driver.add_function(funcdecl);
 }
-| var_decl
+| var_decl SEMI
 {
-  AstBlock* block = parser.cur_block();
-  block->add_vardecl($1);
+  driver.add_local_var($1);
 }
 | GLOBAL SYMBOL COLON type SEMI
+{
+  AstVarDecl* vardecl = driver.new_VarDecl($2, $4, NULL, @$);
+  driver.add_global_var(vardecl);
+}
 ;
 
 // 関数宣言のヘッダ
 func_head
 : FUNCTION
 {
-  parser.push_new_block();
+  driver.push_new_block();
 }
 ;
 
 // ステートメント
 statement
-// 代入文
-: lvalue EQ expr SEMI
+: single_statement SEMI
 {
-  $$ = parser.new_AstAssignment($1, $3);
+  $$ = $1;
 }
-// 式文
-| expr SEMI
+| block_statement
 {
-  $$ = parser.new_AstExprStmt($1);
-}
-// IF 文
-| IF expr statement_block elif_list else_block
-{
-  AstIfBlock* top = parser.new_AstIfBlock($2, $3, FileRegion(@1, @3));
-  $$ = parser.new_AstIf(top, $4, $5, @$);
-}
-// FOR 文
-| FOR LP statement SEMI expr SEMI statement RP statement_block
-{
-  $$ = parser.new_AstFor($3, $5, $7, $9, @$);
-}
-// WHILE 文
-| WHILE LP expr RP statement_block
-{
-  $$ = parser.new_AstWhile($3, $5, @$);
-}
-// DO-WHILE 文
-| DO statement_block WHILE LP expr RP
-{
-  $$ = parser.new_AstDoWhile($2, $5, @$);
-}
-// SWITCH 文
-| SWITCH expr LCB case_list RCB
-{
-  $$ = parser.new_AstSwitch($2, $4, @$);
-}
-// GOTO 文
-| GOTO SYMBOL SEMI
-{
-  $$ = parser.new_AstGoto($2, @$);
+  $$ = $1;
 }
 // ラベル文
 | SYMBOL COLON
 {
-  $$ = parser.new_AstLabel($1, @$);
+  $$ = driver.new_Label($1, @$);
+}
+;
+
+single_statement
+// 代入文
+: lvalue EQ expr
+{
+  $$ = driver.new_Assignment($1, $3);
+}
+// 式文
+| expr
+{
+  $$ = driver.new_ExprStmt($1);
+}
+// GOTO 文
+| GOTO SYMBOL
+{
+  $$ = driver.new_Goto($2, @$);
 }
 // BREAK 文
-| BREAK SEMI
+| BREAK
 {
-  $$ = parser.new_AstBreak(@$);
+  $$ = driver.new_Break(@$);
 }
 // CONTINUE 文
-| CONTINUE SEMI
+| CONTINUE
 {
-  $$ = parser.new_AstContinue(@$);
+  $$ = driver.new_Continue(@$);
 }
 // RETURN 文(引数なし)
-| RETURN SEMI
+| RETURN
 {
-  $$ = parser.new_AstReturn(NULL, @$);
+  $$ = driver.new_Return(NULL, @$);
 }
 // RETURN 文(引数あり)
-| RETURN expr SEMI
+| RETURN expr
 {
-  $$ = parser.new_AstReturn($2, @$);
+  $$ = driver.new_Return($2, @$);
+}
+;
+
+// 複合文
+block_statement
+// IF 文
+: IF expr statement_block elif_list else_block
+{
+  AstIfBlock* top = driver.new_IfBlock($2, $3, FileRegion(@1, @3));
+  $$ = driver.new_If(top, $4, $5, @$);
+}
+// FOR 文
+| FOR LP single_statement SEMI expr SEMI single_statement RP statement_block
+{
+  $$ = driver.new_For($3, $5, $7, $9, @$);
+}
+// WHILE 文
+| WHILE LP expr RP statement_block
+{
+  $$ = driver.new_While($3, $5, @$);
+}
+// DO-WHILE 文
+| DO statement_block WHILE LP expr RP
+{
+  $$ = driver.new_DoWhile($2, $5, @$);
+}
+// SWITCH 文
+| SWITCH expr LCB case_list RCB
+{
+  $$ = driver.new_Switch($2, $4, @$);
 }
 // ブロック文
 | statement_block
 {
-  $$ = parser.new_AstBlockStmt($1, @$);
+  $$ = driver.new_BlockStmt($1, @$);
 }
 ;
 
@@ -291,8 +310,8 @@ statement
 statement_block
 : stmt_begin statement_list RCB
 {
-  $$ = parser.cur_block();
-  parser.pop_block();
+  $$ = driver.cur_block();
+  driver.pop_block();
 }
 ;
 
@@ -302,7 +321,7 @@ statement_block
 stmt_begin
 : LCB
 {
-  parser.push_new_block();
+  driver.push_new_block();
 }
 ;
 
@@ -310,7 +329,7 @@ statement_list
 : // 空
 | statement_list statement
 {
-  parser.add_statement($2);
+  driver.add_statement($2);
 }
 ;
 
@@ -321,7 +340,7 @@ elif_list
 }
 | elif_list ELIF expr statement_block
 {
-  $$ = parser.new_AstIfBlock($3, $4, FileRegion(@2,@4));
+  $$ = driver.new_IfBlock($3, $4, FileRegion(@2,@4));
   $$->set_prev($1);
 }
 ;
@@ -333,7 +352,7 @@ else_block
 }
 | ELSE statement_block
 {
-  $$ = parser.new_AstIfBlock(NULL, $2, @$);
+  $$ = driver.new_IfBlock(NULL, $2, @$);
 }
 ;
 
@@ -344,12 +363,12 @@ case_list
 }
 | case_list CASE expr COLON statement_block
 {
-  $$ = parser.new_AstCaseItem($3, $5, FileRegion(@2, @5));
+  $$ = driver.new_CaseItem($3, $5, FileRegion(@2, @5));
   $$->set_prev($1);
 }
 | case_list DEFAULT COLON statement_block
 {
-  $$ = parser.new_AstCaseItem(NULL, $4, FileRegion(@2, @4));
+  $$ = driver.new_CaseItem(NULL, $4, FileRegion(@2, @4));
   $$->set_prev($1);
 }
 ;
@@ -357,11 +376,11 @@ case_list
 lvalue
 : SYMBOL
 {
-  $$ = parser.new_AstVarExpr($1);
+  $$ = driver.new_VarExpr($1);
 }
 | SYMBOL LBK expr RBK
 {
-  $$ = parser.new_AstArrayRef($1, $3, @$);
+  $$ = driver.new_ArrayRef($1, $3, @$);
 }
 ;
 
@@ -385,7 +404,7 @@ param_list
 var_decl
 : SYMBOL COLON type init_expr
 {
-  $$ = parser.new_AstVarDecl($1, $3, $4, @$);
+  $$ = driver.new_VarDecl($1, $3, $4, @$);
 }
 ;
 
@@ -393,19 +412,19 @@ var_decl
 type
 : INT
 {
-  $$ = parser.new_AstIntType(@$);
+  $$ = driver.new_IntType(@$);
 }
 | FLOAT
 {
-  $$ = parser.new_AstFloatType(@$);
+  $$ = driver.new_FloatType(@$);
 }
 | STRING
 {
-  $$ = parser.new_AstStringType(@$);
+  $$ = driver.new_StringType(@$);
 }
 | SYMBOL
 {
-  $$ = parser.new_AstUserType($1);
+  $$ = driver.new_UserType($1);
 }
 ;
 
@@ -439,79 +458,79 @@ expr_list
 expr
 : expr PLUS expr
 {
-  $$ = parser.new_AstBinOp(PLUS, $1, $3);
+  $$ = driver.new_BinOp(PLUS, $1, $3);
 }
 | expr MINUS expr
 {
-  $$ = parser.new_AstBinOp(MINUS, $1, $3);
+  $$ = driver.new_BinOp(MINUS, $1, $3);
 }
 | expr MULT expr
 {
-  $$ = parser.new_AstBinOp(MULT, $1, $3);
+  $$ = driver.new_BinOp(MULT, $1, $3);
 }
 | expr DIV expr
 {
-  $$ = parser.new_AstBinOp(DIV, $1, $3);
+  $$ = driver.new_BinOp(DIV, $1, $3);
 }
 | expr MOD expr
 {
-  $$ = parser.new_AstBinOp(MOD, $1, $3);
+  $$ = driver.new_BinOp(MOD, $1, $3);
 }
 | expr LOGOR expr
 {
-  $$ = parser.new_AstBinOp(LOGOR, $1, $3);
+  $$ = driver.new_BinOp(LOGOR, $1, $3);
 }
 | expr LOGAND expr
 {
-  $$ = parser.new_AstBinOp(LOGAND, $1, $3);
+  $$ = driver.new_BinOp(LOGAND, $1, $3);
 }
 | LOGNOT expr
 {
-  $$ = parser.new_AstUniOp(LOGNOT, $2, @$);
+  $$ = driver.new_UniOp(LOGNOT, $2, @$);
 }
 | expr BITAND expr
 {
-  $$ = parser.new_AstBinOp(BITAND, $1, $3);
+  $$ = driver.new_BinOp(BITAND, $1, $3);
 }
 | expr BITOR expr
 {
-  $$ = parser.new_AstBinOp(BITOR, $1, $3);
+  $$ = driver.new_BinOp(BITOR, $1, $3);
 }
 | BITNEG expr
 {
-  $$ = parser.new_AstUniOp(BITNEG, $2, @$);
+  $$ = driver.new_UniOp(BITNEG, $2, @$);
 }
 | expr EQEQ expr
 {
-  $$ = parser.new_AstBinOp(EQEQ, $1, $3);
+  $$ = driver.new_BinOp(EQEQ, $1, $3);
 }
 | expr NOTEQ expr
 {
-  $$ = parser.new_AstBinOp(NOTEQ, $1, $3);
+  $$ = driver.new_BinOp(NOTEQ, $1, $3);
 }
 | expr LT expr
 {
-  $$ = parser.new_AstBinOp(LT, $1, $3);
+  $$ = driver.new_BinOp(LT, $1, $3);
 }
 | expr GT expr
 {
-  $$ = parser.new_AstBinOp(GT, $1, $3);
+  $$ = driver.new_BinOp(GT, $1, $3);
 }
 | expr LE expr
 {
-  $$ = parser.new_AstBinOp(LE, $1, $3);
+  $$ = driver.new_BinOp(LE, $1, $3);
 }
 | expr GE expr
 {
-  $$ = parser.new_AstBinOp(GE, $1, $3);
+  $$ = driver.new_BinOp(GE, $1, $3);
 }
 | PLUS expr %prec UOP
 {
-  $$ = parser.new_AstUniOp(PLUS, $2, @$);
+  $$ = driver.new_UniOp(PLUS, $2, @$);
 }
 | MINUS expr %prec UOP
 {
-  $$ = parser.new_AstUniOp(MINUS, $2, @$);
+  $$ = driver.new_UniOp(MINUS, $2, @$);
 }
 | LP expr RP
 {
@@ -519,29 +538,29 @@ expr
 }
 | SYMBOL
 {
-  $$ = parser.new_AstVarExpr($1);
+  $$ = driver.new_VarExpr($1);
   if ( $$ == NULL ) {
     // 変数が見つからない
   }
 }
 | SYMBOL LBK expr RBK
 {
-  $$ = parser.new_AstArrayRef($1, $3, @$);
+  $$ = driver.new_ArrayRef($1, $3, @$);
 }
 | SYMBOL LP expr_list RP
 {
-  $$ = parser.new_AstFuncCall($1, $3, @$);
+  $$ = driver.new_FuncCall($1, $3, @$);
   if ( $$ == NULL ) {
     // 関数が見つからない
   }
 }
-| INT_NUM
+| INT_VAL
 {
-  $$ = parser.new_AstIntConst($1, @$);
+  $$ = $1;
 }
-| FLOAT_NUM
+| FLOAT_VAL
 {
-  $$ = parser.new_AstFloatConst($1, @$);
+  $$ = $1;
 }
 | STRING_VAL
 {
@@ -560,16 +579,16 @@ expr
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      YmslParser& parser)
+      Driver& driver)
 {
-  return parser.yylex(*lvalp, *llocp);
+  return driver.yylex(*lvalp, *llocp);
 }
 
 // yacc パーサーが内部で呼び出す関数
 // エラーメッセージを出力する．
 int
 yyerror(YYLTYPE* llocp,
-	YmslParser& parser,
+	Driver& driver,
 	const char* s)
 {
   string s2;

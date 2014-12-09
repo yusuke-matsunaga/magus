@@ -22,7 +22,9 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslDict::YmslDict() :
+// @param[in] parent 親
+YmslDict::YmslDict(YmslDict* parent) :
+  mParent(parent),
   mHashSize(0),
   mHashTable(NULL),
   mHashNum(0)
@@ -259,6 +261,15 @@ SymHandle::funcdecl() const
 // 他の要素の場合には NULL を返す．
 AstStatement*
 SymHandle::statement() const
+{
+  return NULL;
+}
+
+// @brief 名前空間を返す．
+//
+// 他の要素の場合には NULL を返す．
+YmslSubspace*
+SymHandle::subspace() const
 {
   return NULL;
 }

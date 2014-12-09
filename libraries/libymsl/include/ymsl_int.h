@@ -29,8 +29,8 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_YMSL
 
-class YmslParser;
-class YmslScanner;
+class Driver;
+
 class YmslExecutable;
 class YmslFunc;
 class YmslSubspace;

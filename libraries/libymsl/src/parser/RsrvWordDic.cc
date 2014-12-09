@@ -68,15 +68,14 @@ STpair init_data[] = {
   { "switch",   SWITCH     },
   { "case",     CASE       },
   { "function", FUNCTION   },
+  { "global",   GLOBAL     },
   { "var",      VAR        },
   { "int",      INT        },
   { "float",    FLOAT      },
-#if 0
   { "string",   STRING     },
-#endif
   { "_symbol_", SYMBOL     },
-  { "_int_",    INT_NUM    },
-  { "_float_",  FLOAT_NUM  },
+  { "_int_",    INT_VAL    },
+  { "_float_",  FLOAT_VAL  },
   { "_string_", STRING_VAL },
 };
 

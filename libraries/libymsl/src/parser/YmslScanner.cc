@@ -42,6 +42,17 @@ YmslScanner::read_token(FileRegion& loc)
 
   TokenType type = scan();
   loc = cur_loc();
+  {
+    switch ( type ) {
+    case SYMBOL:     cout << "SYMBOL[" << cur_string() << "]"; break;
+    case INT_VAL:    cout << "INT[" << cur_int() << "]"; break;
+    case FLOAT_VAL:  cout << "FLOAT[" << cur_float() << "]"; break;
+    case STRING_VAL: cout << "STRING[" << cur_string() << "]"; break;
+    case EOF:        cout << "EOF"; break;
+    default:         cout << mRsrvWordDic.str(type); break;
+    }
+    cout << endl;
+  }
   return type;
 }
 
@@ -252,7 +263,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUMDOT;
   }
-  return INT_NUM;
+  return INT_VAL;
 
  ST_NUMDOT: // [0-9]+'.' を読み込んだ時
   c = peek();
@@ -284,8 +295,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUM3;
   }
-  cout << "cur_float() = " << cur_float() << endl;
-  return FLOAT_NUM;
+  return FLOAT_VAL;
 
  ST_NUM3: // [0-9]*'.'[0-9]*(e|E)を読み込んだ時
   c = peek();
@@ -317,8 +327,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_NUM4;
   }
-  cout << "cur_float() = " << cur_float() << endl;
-  return FLOAT_NUM;
+  return FLOAT_VAL;
 
  ST_ID: // 一文字目が[a-zA-Z_]の時
   c = peek();

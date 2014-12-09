@@ -21,9 +21,16 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] parent_dict 親の辞書
+AstBlock::AstBlock(YmslDict* parent_dict) :
+  mDict(parent_dict)
+{
+}
+
+// @brief コンストラクタ
 // @param[in] parent 親のブロック
 AstBlock::AstBlock(AstBlock* parent) :
-  mParent(parent)
+  mDict(&parent->mDict)
 {
 }
 
@@ -41,14 +48,6 @@ AstBlock::add_statement(AstStatement* statement)
   if ( label != ShString() ) {
     mDict.add_statement(statement);
   }
-}
-
-// @brief 関数定義を追加する．
-// @param[in] item 追加する要素
-void
-AstBlock::add_funcdecl(AstFuncDecl* item)
-{
-  mDict.add_funcdecl(item);
 }
 
 // @brief 変数定義を追加する．
@@ -70,17 +69,6 @@ AstBlock::find_label(ShString name) const
   return mDict.find_label(name);
 }
 
-// @brief 名前から関数宣言を見つける．
-// @param[in] name 名前
-//
-// ここになければ親のブロックを探す．
-// それでもなければ NULL を返す．
-AstFuncDecl*
-AstBlock::find_funcdecl(ShString name) const
-{
-  return mDict.find_funcdecl(name);
-}
-
 // @brief 名前から変数宣言を見つける．
 // @param[in] name 名前
 //
@@ -94,10 +82,8 @@ AstBlock::find_vardecl(ShString name) const
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
-// @param[in] indent インデントレベル
 void
-AstBlock::print(ostream& s,
-		ymuint indent) const
+AstBlock::print(ostream& s) const
 {
 #if 0
   YmslAstImpl::print_indent(s, indent);

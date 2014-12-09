@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "YmslParser.h"
+#include "Driver.h"
 #include "RsrvWordDic.h"
 #include "Ast.h"
 #include "AstBlock.h"
@@ -27,11 +27,11 @@ parser_test1(IDO& ido)
   StreamMsgHandler handler(&cout);
   MsgMgr::reg_handler(&handler);
 
-  YmslParser parser;
+  Driver driver;
 
-  parser.read(ido);
+  driver.read(ido);
 
-  AstBlock* toplevel = parser.toplevel_block();
+  AstBlock* toplevel = driver.toplevel_block();
   toplevel->print(cout);
 
   return 0;
@@ -43,22 +43,32 @@ parser_test(int argc,
 {
   if ( argc == 1 ) {
     const char* str =
-      "var a:int\n"
-      "a = 1\n"
+      "a:int;\n"
+      "b:int;\n"
+      "c:int;\n"
+      "d:int;\n"
+      "e:int;\n"
+      "f:int;\n"
+      "g:int;\n"
+      "h:int;\n"
+      "i:int;\n"
+      "k:int;\n"
+      "F:int;\n"
+      "a = 1;\n"
       "if a == b {\n"
-      "F = a + b\n"
-      "F = a\n"
+      "F = a + b;\n"
+      "F = a\n;"
       "}\n"
       "elif a != c {\n"
-      "F = c"
+      "F = c;"
       "}\n"
       "else {\n"
-      "F = 0\n"
+      "F = 0;\n"
       "}\n"
-      "for (var i:int = 0; i < 10; i = i + 1) {\n"
-      "print(i)\n"
+      "for (i = 0; i < 10; i = i + 1) {\n"
+      "print(i);\n"
       "}\n"
-      "F = a + b / c * d % e + (f > g) & (h <= k)\n"
+      "F = a + b / c * d % e + (f > g) & (h <= k);\n"
       "//comment\n";
 
     StringIDO ido(str);

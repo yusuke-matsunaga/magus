@@ -25,6 +25,10 @@ class AstBlock
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] parent_dict 親の辞書
+  AstBlock(YmslDict* parent_dict);
+
+  /// @brief コンストラクタ
   /// @param[in] parent 親のブロック
   AstBlock(AstBlock* parent);
 
@@ -41,11 +45,6 @@ public:
   void
   add_statement(AstStatement* statement);
 
-  /// @brief 関数定義を追加する．
-  /// @param[in] item 追加する要素
-  void
-  add_funcdecl(AstFuncDecl* item);
-
   /// @brief 変数定義を追加する．
   /// @param[in] item 追加する要素
   void
@@ -59,14 +58,6 @@ public:
   AstStatement*
   find_label(ShString name) const;
 
-  /// @brief 名前から関数宣言を見つける．
-  /// @param[in] name 名前
-  ///
-  /// ここになければ親のブロックを探す．
-  /// それでもなければ NULL を返す．
-  AstFuncDecl*
-  find_funcdecl(ShString name) const;
-
   /// @brief 名前から変数宣言を見つける．
   /// @param[in] name 名前
   ///
@@ -77,19 +68,14 @@ public:
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
   void
-  print(ostream& s,
-	ymuint indent = 0) const;
+  print(ostream& s) const;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 親のブロック
-  AstBlock* mParent;
 
   // statement リスト
   vector<AstStatement*> mStatementList;
