@@ -16,6 +16,7 @@
 #include "AstStringConst.h"
 
 #include "AstVarDecl.h"
+#include "YmslFunc.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -79,7 +80,7 @@ END_NONAMESPACE
 // @param[in] func 関数
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstFuncDecl* func,
+AstFuncCall::AstFuncCall(YmslFunc* func,
 			 AstExpr* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
@@ -102,21 +103,17 @@ AstFuncCall::~AstFuncCall()
 void
 AstFuncCall::print(ostream& s) const
 {
-#if 0
-  mName->print(s);
-  s << "(";
+  s << mFunc->name() << "(";
   {
-    ymuint n = mChildList[1]->child_num();
+    ymuint n = mExprList.size();
     const char* comma = "";
     for (ymuint i = 0; i < n; ++ i) {
-      Ast* expr = mChildList[1]->child(i);
+      AstExpr* expr = mExprList[i];
       s << comma;
       comma = ", ";
       expr->print(s);
     }
   }
-  s << ")" << endl;
-#endif
 }
 
 

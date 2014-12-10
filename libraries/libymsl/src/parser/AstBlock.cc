@@ -82,21 +82,15 @@ AstBlock::find_vardecl(ShString name) const
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
+// @param[in] indent インデントレベル
 void
-AstBlock::print(ostream& s) const
+AstBlock::print(ostream& s,
+		ymuint indent) const
 {
-#if 0
-  YmslAstImpl::print_indent(s, indent);
-  s << "{" << endl;
-
   ymuint n = mStatementList.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mStatementList[i]->print(s, indent + 1);
+    mStatementList[i]->print(s, indent);
   }
-
-  YmslAstImpl::print_indent(s, indent);
-  s << "}" << endl;
-#endif
 }
 
 END_NAMESPACE_YM_YMSL

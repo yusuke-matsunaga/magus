@@ -41,6 +41,8 @@
 #include "AstStringType.h"
 #include "AstUserType.h"
 
+#include "../builtin/YmslPrint.h"
+
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -53,6 +55,9 @@ Driver::Driver()
 {
   mScanner = NULL;
   mToplevelBlock = NULL;
+
+  YmslFunc* func1 = new YmslPrint(ShString("print"), vector<YmslVar*>(0));
+  mGlobalDict.add_function(func1);
 }
 
 // @brief デストラクタ
@@ -154,7 +159,7 @@ Driver::pop_block()
 void
 Driver::add_function(AstFuncDecl* funcdecl)
 {
-  mGlobalDict.add_funcdecl(funcdecl);
+  //mGlobalDict.add_func(func);
 }
 
 // @brief グローバル変数を追加する．
@@ -441,12 +446,12 @@ Driver::new_FuncCall(AstSymbol* symbol,
 		     AstExpr* expr_list,
 		     const FileRegion& loc)
 {
-  AstFuncDecl* func_decl = mGlobalDict.find_funcdecl(symbol->str_val());
-  if ( func_decl == NULL ) {
+  YmslFunc* func = mGlobalDict.find_function(symbol->str_val());
+  if ( func == NULL ) {
     return NULL;
   }
   void* p = mAlloc.get_memory(sizeof(AstFuncCall));
-  return new (p) AstFuncCall(func_decl, expr_list, loc);
+  return new (p) AstFuncCall(func, expr_list, loc);
 }
 
 // @brief 識別子式を作る．

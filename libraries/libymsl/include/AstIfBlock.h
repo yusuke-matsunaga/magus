@@ -49,6 +49,10 @@ public:
   void
   set_prev(AstIfBlock* prev);
 
+  /// @brief 条件を返す．
+  AstExpr*
+  cond() const;
+
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   /// @param[in] indent インデントレベル

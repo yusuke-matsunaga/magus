@@ -42,17 +42,6 @@ YmslScanner::read_token(FileRegion& loc)
 
   TokenType type = scan();
   loc = cur_loc();
-  {
-    switch ( type ) {
-    case SYMBOL:     cout << "SYMBOL[" << cur_string() << "]"; break;
-    case INT_VAL:    cout << "INT[" << cur_int() << "]"; break;
-    case FLOAT_VAL:  cout << "FLOAT[" << cur_float() << "]"; break;
-    case STRING_VAL: cout << "STRING[" << cur_string() << "]"; break;
-    case EOF:        cout << "EOF"; break;
-    default:         cout << mRsrvWordDic.str(type); break;
-    }
-    cout << endl;
-  }
   return type;
 }
 

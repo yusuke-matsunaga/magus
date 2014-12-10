@@ -27,7 +27,7 @@ public:
   /// @param[in] func 関数
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstFuncDecl* func,
+  AstFuncCall(YmslFunc* func,
 	      AstExpr* expr_list,
 	      const FileRegion& loc);
 
@@ -54,7 +54,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  AstFuncDecl* mFunc;
+  YmslFunc* mFunc;
 
   // 引数のリスト
   vector<AstExpr*> mExprList;

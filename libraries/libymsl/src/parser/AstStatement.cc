@@ -30,6 +30,19 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+BEGIN_NONAMESPACE
+
+void
+print_indent(ostream& s,
+	    ymuint indent)
+{
+  for (ymuint i = 0; i < indent; ++ i) {
+    s << "  ";
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス AstStatement
 //////////////////////////////////////////////////////////////////////
@@ -93,13 +106,11 @@ void
 AstAssignment::print(ostream& s,
 		     ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
-  mChildList[0]->print(s);
+  mLeft->print(s);
   s << " = ";
-  mChildList[1]->print(s);
+  mRight->print(s);
   s << endl;
-#endif
 }
 
 
@@ -152,35 +163,29 @@ void
 AstIf::print(ostream& s,
 	     ymuint indent) const
 {
-#if 0
-  print_indent(s, indent);
-  s << "if ";
-  mChildList[0]->print(s);
-  s << " {" << endl;
-
-  print_statement_list(s, mChildList[1], indent + 1);
-
-  print_indent(s, indent);
-  s << "}" << endl;
-
-  {
-    ymuint n = mChildList[2]->child_num();
-    for (ymuint i = 0; i < n; ++ i) {
-      Ast* elif = mChildList[2]->child(i);
-      elif->print(s, indent);
-    }
-  }
-
-  if ( mChildList[3] != NULL ) {
+  ymuint n = mIfBlockList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    AstIfBlock* if_block = mIfBlockList[i];
+    AstExpr* cond = if_block->cond();
     print_indent(s, indent);
-    s << "else {" << endl;
-
-    print_statement_list(s, mChildList[3], indent + 1);
-
+    if ( cond != NULL ) {
+      if ( i == 0 ) {
+	s << "if ";
+      }
+      else {
+	s << "elif ";
+      }
+      cond->print(s);
+    }
+    else {
+      s << "else";
+    }
+    s << " {" << endl;
+    AstBlock* block = if_block->block();
+    block->print(s, indent + 1);
     print_indent(s, indent);
     s << "}" << endl;
   }
-#endif
 }
 
 
@@ -218,6 +223,13 @@ void
 AstIfBlock::set_prev(AstIfBlock* prev)
 {
   mNext = prev;
+}
+
+// @brief 条件を返す．
+AstExpr*
+AstIfBlock::cond() const
+{
+  return mCond;
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -318,13 +330,12 @@ void
 AstWhile::print(ostream& s,
 		ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
   s << "while ";
   mCond->print(s);
-
-  block()->print(s, indent);
-#endif
+  s << " {" << endl;
+  block()->print(s, indent + 1);
+  s << "}" << endl;
 }
 
 
@@ -356,17 +367,15 @@ void
 AstDoWhile::print(ostream& s,
 		  ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
-  s << "do" << endl;
+  s << "do {" << endl;
 
-  block()->print(s, indent);
+  block()->print(s, indent + 1);
 
   print_indent(s, indent);
   s << "while ";
   mCond->print(s);
   s << endl;
-#endif
 }
 
 
@@ -573,10 +582,8 @@ void
 AstBreak::print(ostream& s,
 		ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
   s << "break" << endl;
-#endif
 }
 
 
@@ -603,10 +610,8 @@ void
 AstContinue::print(ostream& s,
 		   ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
   s << "continue" << endl;
-#endif
 }
 
 
@@ -636,12 +641,12 @@ void
 AstReturn::print(ostream& s,
 		 ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
   s << "return ";
-  mExpr->print(s);
+  if ( mExpr != NULL ) {
+    mExpr->print(s);
+  }
   s << endl;
-#endif
 }
 
 
@@ -680,9 +685,11 @@ void
 AstBlockStmt::print(ostream& s,
 		    ymuint indent) const
 {
-#if 0
-  block()->print(s, indent);
-#endif
+  print_indent(s, indent);
+  s << "{" << endl;
+  block()->print(s, indent + 1);
+  print_indent(s, indent);
+  s << "}" << endl;
 }
 
 
@@ -693,7 +700,8 @@ AstBlockStmt::print(ostream& s,
 // @brief コンストラクタ
 // @param[in] expr 式
 AstExprStmt::AstExprStmt(AstExpr* expr) :
-  AstStatement(expr->file_region())
+  AstStatement(expr->file_region()),
+  mExpr(expr)
 {
 }
 
@@ -709,6 +717,9 @@ void
 AstExprStmt::print(ostream& s,
 		   ymuint indent) const
 {
+  print_indent(s, indent);
+  mExpr->print(s);
+  s << endl;
 }
 
 END_NAMESPACE_YM_YMSL

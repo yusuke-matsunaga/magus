@@ -8,9 +8,9 @@
 
 
 #include "YmslDict.h"
-#include "AstFuncDecl.h"
 #include "AstStatement.h"
 #include "AstVarDecl.h"
+#include "YmslFunc.h"
 #include "YmslSubspace.h"
 #include "SymHandle.h"
 
@@ -48,10 +48,10 @@ YmslDict::add_statement(AstStatement* statement)
   }
 }
 
-// @brief 関数定義を追加する．
+// @brief 関数を追加する．
 // @param[in] item 追加する要素
 void
-YmslDict::add_funcdecl(AstFuncDecl* item)
+YmslDict::add_function(YmslFunc* item)
 {
   SymHandle* handle = new FuncHandle(item);
   put(handle);
@@ -90,17 +90,17 @@ YmslDict::find_label(ShString name) const
   return NULL;
 }
 
-// @brief 名前から関数宣言を見つける．
+// @brief 名前から関数を見つける．
 // @param[in] name 名前
 //
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
-AstFuncDecl*
-YmslDict::find_funcdecl(ShString name) const
+YmslFunc*
+YmslDict::find_function(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
-    return handle->funcdecl();
+    return handle->func();
   }
   return NULL;
 }
@@ -247,11 +247,11 @@ SymHandle::vardecl() const
   return NULL;
 }
 
-// @brief 関数宣言を返す．
+// @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-AstFuncDecl*
-SymHandle::funcdecl() const
+YmslFunc*
+SymHandle::func() const
 {
   return NULL;
 }
@@ -313,9 +313,9 @@ VarHandle::vardecl() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] funcdecl 関数宣言
-FuncHandle::FuncHandle(AstFuncDecl* funcdecl) :
-  mFuncDecl(funcdecl)
+// @param[in] func 関数
+FuncHandle::FuncHandle(YmslFunc* func) :
+  mFunc(func)
 {
 }
 
@@ -328,16 +328,16 @@ FuncHandle::~FuncHandle()
 ShString
 FuncHandle::name() const
 {
-  return mFuncDecl->name();
+  return mFunc->name();
 }
 
-// @brief 関数宣言を返す．
+// @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-AstFuncDecl*
-FuncHandle::funcdecl() const
+YmslFunc*
+FuncHandle::func() const
 {
-  return mFuncDecl;
+  return mFunc;
 }
 
 

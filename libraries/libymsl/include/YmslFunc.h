@@ -58,9 +58,10 @@ public:
   is_builtin() const = 0;
 
   /// @brief 組み込み関数の時の実行関数
+  /// @param[in] exectable 実行環境
   virtual
   void
-  execute() const = 0;
+  execute(YmslExecutable& executable) const = 0;
 
   /// @brief YMSL 関数の場合の局所変数の数を返す．
   virtual

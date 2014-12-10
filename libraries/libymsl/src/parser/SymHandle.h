@@ -49,12 +49,12 @@ public:
   AstVarDecl*
   vardecl() const;
 
-  /// @brief 関数宣言を返す．
+  /// @brief 関数を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  AstFuncDecl*
-  funcdecl() const;
+  YmslFunc*
+  func() const;
 
   /// @brief ラベルステートメントを返す．
   ///
@@ -131,7 +131,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class FuncHandle SymHandle.h "SymHandle.h"
-/// @brief AstFuncDecl を保持する SymHandle
+/// @brief YmslFunc を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
 class FuncHandle :
   public SymHandle
@@ -139,8 +139,8 @@ class FuncHandle :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] funcdecl 関数宣言
-  FuncHandle(AstFuncDecl* funcdecl);
+  /// @param[in] func 関数
+  FuncHandle(YmslFunc* func);
 
   /// @brief デストラクタ
   virtual
@@ -157,12 +157,12 @@ public:
   ShString
   name() const;
 
-  /// @brief 関数宣言を返す．
+  /// @brief 関数を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  AstFuncDecl*
-  funcdecl() const;
+  YmslFunc*
+  func() const;
 
 
 private:
@@ -170,8 +170,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数宣言
-  AstFuncDecl* mFuncDecl;
+  // 関数
+  YmslFunc* mFunc;
 
 };
 

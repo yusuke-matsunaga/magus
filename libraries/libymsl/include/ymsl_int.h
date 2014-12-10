@@ -33,6 +33,7 @@ class Driver;
 
 class YmslExecutable;
 class YmslFunc;
+class YmslObj;
 class YmslSubspace;
 class YmslValueType;
 class YmslVar;
@@ -167,6 +168,18 @@ typedef int TokenType;
 extern
 const char*
 token2str(TokenType token);
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class 値を表す共用型
+///
+/// あんまり union は使いたくないんだけど
+//////////////////////////////////////////////////////////////////////
+union YmslValue {
+  ymint64 int_value;
+  double  float_value;
+  YmslObj* obj_value;
+};
 
 END_NAMESPACE_YM_YMSL
 

@@ -32,7 +32,7 @@ parser_test1(IDO& ido)
   driver.read(ido);
 
   AstBlock* toplevel = driver.toplevel_block();
-  toplevel->print(cout);
+  toplevel->print(cout, 0);
 
   return 0;
 }

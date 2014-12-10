@@ -48,6 +48,18 @@ public:
   YmslVar*
   global_var(ymuint gindex) const;
 
+  /// @brief グローバル変数の値にアクセスする．
+  /// @param[in] index インデックス
+  YmslValue&
+  global_heap(ymuint index);
+
+  /// @brief ローカル変数の値にアクセスする．
+  /// @param[in] index インデックス
+  ///
+  /// index は 0 でスタックトップ
+  YmslValue&
+  local_stack(ymuint index);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -59,6 +71,12 @@ private:
 
   // グローバル変数テーブル
   vector<YmslVar*> mGlobalVarTable;
+
+  // グローバル変数領域
+  vector<YmslValue> mGlobalHeap;
+
+  // 値のスタック
+  vector<YmslValue> mLocalStack;
 
 };
 
