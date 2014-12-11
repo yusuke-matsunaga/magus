@@ -1,13 +1,13 @@
 
-/// @file Driver.cc
-/// @brief Driver の実装ファイル
+/// @file YmslDriver.cc
+/// @brief YmslDriver の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Driver.h"
+#include "YmslDriver.h"
 #include "YmslScanner.h"
 
 #include "AstSymbol.h"
@@ -47,11 +47,11 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス Driver
+// クラス YmslDriver
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Driver::Driver()
+YmslDriver::YmslDriver()
 {
   mScanner = NULL;
   mToplevelBlock = NULL;
@@ -61,7 +61,7 @@ Driver::Driver()
 }
 
 // @brief デストラクタ
-Driver::~Driver()
+YmslDriver::~YmslDriver()
 {
   // 念の為
   delete mScanner;
@@ -71,9 +71,9 @@ Driver::~Driver()
 // @param[in] ido 入力データ
 // @return 成功したら true を返す．
 bool
-Driver::read(IDO& ido)
+YmslDriver::read(IDO& ido)
 {
-  int yyparser(Driver&);
+  int yyparser(YmslDriver&);
 
   mScanner = new YmslScanner(ido);
 
@@ -90,7 +90,7 @@ Driver::read(IDO& ido)
 
 // @brief トップレベルブロックを返す．
 AstBlock*
-Driver::toplevel_block() const
+YmslDriver::toplevel_block() const
 {
   return mToplevelBlock;
 }
@@ -100,8 +100,8 @@ Driver::toplevel_block() const
 // @param[out] llocp 位置情報を格納する変数
 // @return 読み込んだトークンの id を返す．
 int
-Driver::yylex(YYSTYPE& lval,
-	      FileRegion& lloc)
+YmslDriver::yylex(YYSTYPE& lval,
+		  FileRegion& lloc)
 {
   int id = mScanner->read_token(lloc);
 
@@ -131,7 +131,7 @@ Driver::yylex(YYSTYPE& lval,
 
 // @brief 現在のブロックを返す．
 AstBlock*
-Driver::cur_block()
+YmslDriver::cur_block()
 {
   ASSERT_COND( !mBlockStack.empty() );
   return mBlockStack.back();
@@ -140,7 +140,7 @@ Driver::cur_block()
 // @brief 新しいブロックを作りスタックに積む．
 // @return 新しいブロックを返す．
 AstBlock*
-Driver::push_new_block()
+YmslDriver::push_new_block()
 {
   AstBlock* parent = cur_block();
   AstBlock* block = new AstBlock(parent);
@@ -150,14 +150,14 @@ Driver::push_new_block()
 
 // @brief ブロックをスタックから取り去る．
 void
-Driver::pop_block()
+YmslDriver::pop_block()
 {
   mBlockStack.pop_back();
 }
 
 // @brief 関数を追加する．
 void
-Driver::add_function(AstFuncDecl* funcdecl)
+YmslDriver::add_function(AstFuncDecl* funcdecl)
 {
   //mGlobalDict.add_func(func);
 }
@@ -165,21 +165,21 @@ Driver::add_function(AstFuncDecl* funcdecl)
 // @brief グローバル変数を追加する．
 // @param[in] vardecl 変数宣言
 void
-Driver::add_global_var(AstVarDecl* vardecl)
+YmslDriver::add_global_var(AstVarDecl* vardecl)
 {
   mGlobalDict.add_vardecl(vardecl);
 }
 
 // @brief 現在のブロックに変数を追加する．
 void
-Driver::add_local_var(AstVarDecl* vardecl)
+YmslDriver::add_local_var(AstVarDecl* vardecl)
 {
   mBlockStack.back()->add_vardecl(vardecl);
 }
 
 // @brief 現在のブロックに statement を追加する．
 void
-Driver::add_statement(AstStatement* stmt)
+YmslDriver::add_statement(AstStatement* stmt)
 {
   mBlockStack.back()->add_statement(stmt);
 }
@@ -190,10 +190,10 @@ Driver::add_statement(AstStatement* stmt)
 // @param[in] init_expr 初期化式
 // @param[in] loc ファイル位置
 AstVarDecl*
-Driver::new_VarDecl(AstSymbol* name,
-		    AstValueType* type,
-		    AstExpr* init_expr,
-		    const FileRegion& loc)
+YmslDriver::new_VarDecl(AstSymbol* name,
+			AstValueType* type,
+			AstExpr* init_expr,
+			const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstVarDecl));
   return new (p) AstVarDecl(name->str_val(), type, init_expr, loc);
@@ -206,10 +206,10 @@ Driver::new_VarDecl(AstSymbol* name,
 // @param[in] block 本体のブロック
 // @param[in] loc ファイル位置
 AstFuncDecl*
-Driver::new_FuncDecl(AstSymbol* name,
-		     AstValueType* type,
-		     AstVarDecl* param_list,
-		     const FileRegion& loc)
+YmslDriver::new_FuncDecl(AstSymbol* name,
+			 AstValueType* type,
+			 AstVarDecl* param_list,
+			 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
   AstBlock* block = cur_block();
@@ -220,8 +220,8 @@ Driver::new_FuncDecl(AstSymbol* name,
 // @param[in] left 左辺
 // @param[in] right 右辺
 AstStatement*
-Driver::new_Assignment(AstExpr* left,
-		       AstExpr* right)
+YmslDriver::new_Assignment(AstExpr* left,
+			   AstExpr* right)
 {
   void* p = mAlloc.get_memory(sizeof(AstAssignment));
   return new (p) AstAssignment(left, right);
@@ -234,10 +234,10 @@ Driver::new_Assignment(AstExpr* left,
 // @param[in] else_block else ブロック
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_If(AstIfBlock* top,
-	       AstIfBlock* elif_list,
-	       AstIfBlock* else_block,
-	       const FileRegion& loc)
+YmslDriver::new_If(AstIfBlock* top,
+		   AstIfBlock* elif_list,
+		   AstIfBlock* else_block,
+		   const FileRegion& loc)
 {
   if ( else_block != NULL ) {
     else_block->set_prev(elif_list);
@@ -252,9 +252,9 @@ Driver::new_If(AstIfBlock* top,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstIfBlock*
-Driver::new_IfBlock(AstExpr* cond,
-		    AstBlock* block,
-		    const FileRegion& loc)
+YmslDriver::new_IfBlock(AstExpr* cond,
+			AstBlock* block,
+			const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIfBlock));
   return new (p) AstIfBlock(cond, block, loc);
@@ -267,11 +267,11 @@ Driver::new_IfBlock(AstExpr* cond,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_For(AstStatement* init,
-		AstExpr* cond,
-		AstStatement* next,
-		AstBlock* block,
-		const FileRegion& loc)
+YmslDriver::new_For(AstStatement* init,
+		    AstExpr* cond,
+		    AstStatement* next,
+		    AstBlock* block,
+		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFor));
   return new (p) AstFor(init, cond, next, block, loc);
@@ -282,9 +282,9 @@ Driver::new_For(AstStatement* init,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_While(AstExpr* cond,
-		  AstBlock* block,
-		  const FileRegion& loc)
+YmslDriver::new_While(AstExpr* cond,
+		      AstBlock* block,
+		      const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstWhile));
   return new (p) AstWhile(cond, block, loc);
@@ -295,9 +295,9 @@ Driver::new_While(AstExpr* cond,
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_DoWhile(AstBlock* block,
-		    AstExpr* cond,
-		    const FileRegion& loc)
+YmslDriver::new_DoWhile(AstBlock* block,
+			AstExpr* cond,
+			const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstDoWhile));
   return new (p) AstDoWhile(block, cond, loc);
@@ -308,9 +308,9 @@ Driver::new_DoWhile(AstBlock* block,
 // @param[in] case_list caseリスト
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_Switch(AstExpr* expr,
-		   AstCaseItem* case_list,
-		   const FileRegion& loc)
+YmslDriver::new_Switch(AstExpr* expr,
+		       AstCaseItem* case_list,
+		       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstSwitch));
   return new (p) AstSwitch(expr, case_list, loc);
@@ -321,9 +321,9 @@ Driver::new_Switch(AstExpr* expr,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstCaseItem*
-Driver::new_CaseItem(AstExpr* label,
-		     AstBlock* block,
-		     const FileRegion& loc)
+YmslDriver::new_CaseItem(AstExpr* label,
+			 AstBlock* block,
+			 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstCaseItem));
   return new (p) AstCaseItem(label, block, loc);
@@ -333,8 +333,8 @@ Driver::new_CaseItem(AstExpr* label,
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_Goto(AstSymbol* label,
-		 const FileRegion& loc)
+YmslDriver::new_Goto(AstSymbol* label,
+		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstGoto));
   return new (p) AstGoto(label, loc);
@@ -344,8 +344,8 @@ Driver::new_Goto(AstSymbol* label,
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_Label(AstSymbol* label,
-		  const FileRegion& loc)
+YmslDriver::new_Label(AstSymbol* label,
+		      const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstLabel));
   return new (p) AstLabel(label, loc);
@@ -354,7 +354,7 @@ Driver::new_Label(AstSymbol* label,
 // @brief break 文を作る．
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_Break(const FileRegion& loc)
+YmslDriver::new_Break(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBreak));
   return new (p) AstBreak(loc);
@@ -363,7 +363,7 @@ Driver::new_Break(const FileRegion& loc)
 // @brief continue 文を作る．
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_Continue(const FileRegion& loc)
+YmslDriver::new_Continue(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstContinue));
   return new (p) AstContinue(loc);
@@ -373,8 +373,8 @@ Driver::new_Continue(const FileRegion& loc)
 // @param[in] expr 値
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_Return(AstExpr* expr,
-		   const FileRegion& loc)
+YmslDriver::new_Return(AstExpr* expr,
+		       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstReturn));
   return new (p) AstReturn(expr, loc);
@@ -384,8 +384,8 @@ Driver::new_Return(AstExpr* expr,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstStatement*
-Driver::new_BlockStmt(AstBlock* block,
-		      const FileRegion& loc)
+YmslDriver::new_BlockStmt(AstBlock* block,
+			  const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBlockStmt));
   return new (p) AstBlockStmt(block, loc);
@@ -394,7 +394,7 @@ Driver::new_BlockStmt(AstBlock* block,
 // @brief 式文を作る．
 // @param[in] expr 式
 AstStatement*
-Driver::new_ExprStmt(AstExpr* expr)
+YmslDriver::new_ExprStmt(AstExpr* expr)
 {
   void* p = mAlloc.get_memory(sizeof(AstExprStmt));
   return new (p) AstExprStmt(expr);
@@ -405,9 +405,9 @@ Driver::new_ExprStmt(AstExpr* expr)
 // @param[in] left オペランド
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_UniOp(TokenType op,
-		  AstExpr* left,
-		  const FileRegion& loc)
+YmslDriver::new_UniOp(TokenType op,
+		      AstExpr* left,
+		      const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstUniOp));
   return new (p) AstUniOp(op, left, loc);
@@ -417,9 +417,9 @@ Driver::new_UniOp(TokenType op,
 // @param[in] op 演算子のトークン
 // @param[in] left, right オペランド
 AstExpr*
-Driver::new_BinOp(TokenType op,
-		  AstExpr* left,
-		  AstExpr* right)
+YmslDriver::new_BinOp(TokenType op,
+		      AstExpr* left,
+		      AstExpr* right)
 {
   void* p = mAlloc.get_memory(sizeof(AstBinOp));
   return new (p) AstBinOp(op, left, right);
@@ -430,9 +430,9 @@ Driver::new_BinOp(TokenType op,
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_ArrayRef(AstSymbol* id,
-		     AstExpr* index,
-		     const FileRegion& loc)
+YmslDriver::new_ArrayRef(AstSymbol* id,
+			 AstExpr* index,
+			 const FileRegion& loc)
 {
   return NULL;
 }
@@ -442,9 +442,9 @@ Driver::new_ArrayRef(AstSymbol* id,
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_FuncCall(AstSymbol* symbol,
-		     AstExpr* expr_list,
-		     const FileRegion& loc)
+YmslDriver::new_FuncCall(AstSymbol* symbol,
+			 AstExpr* expr_list,
+			 const FileRegion& loc)
 {
   YmslFunc* func = mGlobalDict.find_function(symbol->str_val());
   if ( func == NULL ) {
@@ -458,7 +458,7 @@ Driver::new_FuncCall(AstSymbol* symbol,
 // @param[in] symbol 値
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_VarExpr(AstSymbol* symbol)
+YmslDriver::new_VarExpr(AstSymbol* symbol)
 {
   AstBlock* block = cur_block();
   AstVarDecl* var_decl = block->find_vardecl(symbol->str_val());
@@ -473,8 +473,8 @@ Driver::new_VarExpr(AstSymbol* symbol)
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_IntConst(int val,
-		     const FileRegion& loc)
+YmslDriver::new_IntConst(int val,
+			 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIntConst));
   return new (p) AstIntConst(val, loc);
@@ -484,8 +484,8 @@ Driver::new_IntConst(int val,
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_FloatConst(double val,
-		       const FileRegion& loc)
+YmslDriver::new_FloatConst(double val,
+			   const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFloatConst));
   return new (p) AstFloatConst(val, loc);
@@ -495,8 +495,8 @@ Driver::new_FloatConst(double val,
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-Driver::new_StringConst(const char* val,
-			const FileRegion& loc)
+YmslDriver::new_StringConst(const char* val,
+			    const FileRegion& loc)
 {
   ymuint n = 0;
   if ( val != NULL ) {
@@ -516,7 +516,7 @@ Driver::new_StringConst(const char* val,
 // @brief 文字列型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-Driver::new_StringType(const FileRegion& loc)
+YmslDriver::new_StringType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstStringType));
   return new (p) AstStringType(loc);
@@ -525,7 +525,7 @@ Driver::new_StringType(const FileRegion& loc)
 // @brief 整数型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-Driver::new_IntType(const FileRegion& loc)
+YmslDriver::new_IntType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIntType));
   return new (p) AstIntType(loc);
@@ -534,7 +534,7 @@ Driver::new_IntType(const FileRegion& loc)
 // @brief 浮動小数点型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-Driver::new_FloatType(const FileRegion& loc)
+YmslDriver::new_FloatType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFloatType));
   return new (p) AstFloatType(loc);
@@ -544,7 +544,7 @@ Driver::new_FloatType(const FileRegion& loc)
 // @param[in] type_name 型名
 // @param[in] loc ファイル位置
 AstValueType*
-Driver::new_UserType(AstSymbol* type_name)
+YmslDriver::new_UserType(AstSymbol* type_name)
 {
   void* p = mAlloc.get_memory(sizeof(AstUserType));
   return new (p) AstUserType(type_name);

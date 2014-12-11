@@ -29,7 +29,7 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_YMSL
 
-class Driver;
+class YmslDriver;
 
 class YmslExecutable;
 class YmslFunc;

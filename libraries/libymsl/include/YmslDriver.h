@@ -1,8 +1,8 @@
-#ifndef DRIVER_H
-#define DRIVER_H
+#ifndef YMSLDRIVER_H
+#define YMSLDRIVER_H
 
-/// @file Driver.h
-/// @brief Driver のヘッダファイル
+/// @file YmslDriver.h
+/// @brief YmslDriver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -22,18 +22,18 @@ union YYSTYPE;
 class YmslScanner;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Driver Driver.h "Driver.h"
+/// @class YmslDriver YmslDriver.h "YmslDriver.h"
 /// @brief YMSL 用の構文解析器
 //////////////////////////////////////////////////////////////////////
-class Driver
+class YmslDriver
 {
 public:
 
   /// @brief コンストラクタ
-  Driver();
+  YmslDriver();
 
   /// @brief デストラクタ
-  ~Driver();
+  ~YmslDriver();
 
 
 public:
@@ -362,4 +362,4 @@ private:
 END_NAMESPACE_YM_YMSL
 
 
-#endif // DRIVER_H
+#endif // YMSLDRIVER_H

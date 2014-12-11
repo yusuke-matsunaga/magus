@@ -29,7 +29,7 @@ set (ymsl_SOURCES
   src/parser/AstValueType.cc
   src/parser/RsrvWordDic.cc
   src/parser/YmslDict.cc
-  src/parser/Driver.cc
+  src/parser/YmslDriver.cc
   src/parser/YmslScanner.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc

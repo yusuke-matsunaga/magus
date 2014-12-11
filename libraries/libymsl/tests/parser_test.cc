@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "Driver.h"
+#include "YmslDriver.h"
 #include "RsrvWordDic.h"
 #include "Ast.h"
 #include "AstBlock.h"
@@ -27,7 +27,7 @@ parser_test1(IDO& ido)
   StreamMsgHandler handler(&cout);
   MsgMgr::reg_handler(&handler);
 
-  Driver driver;
+  YmslDriver driver;
 
   driver.read(ido);
 

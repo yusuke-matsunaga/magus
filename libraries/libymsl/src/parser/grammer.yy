@@ -12,7 +12,7 @@
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 
-#include "Driver.h"
+#include "YmslDriver.h"
 
 #include "AstBlock.h"
 #include "AstCaseItem.h"
@@ -38,12 +38,12 @@ BEGIN_NAMESPACE_YM_YMSL
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      Driver&);
+      YmslDriver&);
 
 // エラー報告関数
 int
 yyerror(YYLTYPE*,
-	Driver&,
+	YmslDriver&,
 	const char*);
 
 
@@ -86,10 +86,10 @@ fr_merge(const FileRegion fr_array[],
 %locations
 
 // yyparse の引数
-%parse-param {Driver& driver}
+%parse-param {YmslDriver& driver}
 
 // yylex の引数
-%lex-param {Driver& driver}
+%lex-param {YmslDriver& driver}
 
 // 値を表す型
 %union {
@@ -189,6 +189,13 @@ item
 : statement
 {
   driver.add_statement($1);
+}
+// 関数定義
+| func_head SYMBOL LP param_list RP COLON type SEMI
+{
+  AstFuncDecl* funcdecl = driver.new_FuncDecl($2, $7, $4, @$);
+  driver.pop_block();
+  driver.add_function(funcdecl);
 }
 // 関数宣言
 | func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
@@ -579,7 +586,7 @@ expr
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      Driver& driver)
+      YmslDriver& driver)
 {
   return driver.yylex(*lvalp, *llocp);
 }
@@ -588,7 +595,7 @@ yylex(YYSTYPE* lvalp,
 // エラーメッセージを出力する．
 int
 yyerror(YYLTYPE* llocp,
-	Driver& driver,
+	YmslDriver& driver,
 	const char* s)
 {
   string s2;
