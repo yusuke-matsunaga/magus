@@ -21,6 +21,7 @@ set (ymsl_SOURCES
   src/engine/YmslFunc.cc
   src/engine/YmslValueType.cc
   src/engine/YmslVar.cc
+  src/engine/YmslVM.cc
   src/parser/Ast.cc
   src/parser/AstBlock.cc
   src/parser/AstDeclBase.cc

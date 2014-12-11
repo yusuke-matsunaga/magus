@@ -170,16 +170,117 @@ const char*
 token2str(TokenType token);
 
 
+/// @brief 整数型
+typedef ymint32 Ymsl_INT;
+
+/// @brief 浮動小数点型
+typedef double Ymsl_FLOAT;
+
+/// @brief オブジェクト型
+typedef YmslObj* Ymsl_OBJPTR;
+
+/// @brief プログラムのコード
+typedef ymuint32 Ymsl_CODE;
+
+
 //////////////////////////////////////////////////////////////////////
 /// @class 値を表す共用型
 ///
 /// あんまり union は使いたくないんだけど
 //////////////////////////////////////////////////////////////////////
 union YmslValue {
-  ymint64 int_value;
-  double  float_value;
-  YmslObj* obj_value;
+  Ymsl_INT    int_value;
+  Ymsl_FLOAT  float_value;
+  Ymsl_OBJPTR obj_value;
 };
+
+
+/// @brief プログラムコードに INT を書き込む．
+/// @param[in] code_array コード配列
+/// @param[in] wpos 書き込む場所
+/// @param[in] val 書き込む値
+inline
+void
+write_INT(Ymsl_CODE* code_array,
+	  Ymsl_INT& wpos,
+	  Ymsl_INT val)
+{
+  ASSERT_COND( sizeof(Ymsl_CODE) == sizeof(Ymsl_INT) );
+  code_array[wpos] = val;
+  ++ wpos;
+}
+
+/// @brief プログラムコードに FLOAT を書き込む．
+/// @param[in] code_array コード配列
+/// @param[in] wpos 書き込む場所
+/// @param[in] val 書き込む値
+inline
+void
+write_FLOAT(Ymsl_CODE* code_array,
+	    Ymsl_INT& wpos,
+	    Ymsl_FLOAT val)
+{
+  *(reinterpret_cast<Ymsl_FLOAT*>(&code_array[wpos])) = val;
+  const ymuint n = sizeof(Ymsl_FLOAT) / sizeof(Ymsl_CODE);
+  wpos += n;
+}
+
+/// @brief プログラムコードに OBJPTR を書き込む．
+/// @param[in] code_array コード配列
+/// @param[in] wpos 書き込む場所
+/// @param[in] val 書き込む値
+inline
+void
+write_OBJPTR(Ymsl_CODE* code_array,
+	     Ymsl_INT& wpos,
+	     Ymsl_OBJPTR val)
+{
+  *(reinterpret_cast<Ymsl_OBJPTR*>(&code_array[wpos])) = val;
+  const ymuint n = sizeof(Ymsl_OBJPTR) / sizeof(Ymsl_CODE);
+  wpos += n;
+}
+
+/// @brief プログラムコードから INT を読み込む．
+/// @param[in] code_array コード配列
+/// @param[in] rpos 読み込む場所
+inline
+Ymsl_INT
+read_INT(const Ymsl_CODE* code_array,
+	 Ymsl_INT& rpos)
+{
+  ASSERT_COND( sizeof(Ymsl_CODE) == sizeof(Ymsl_INT) );
+  Ymsl_INT val = code_array[rpos];
+  ++ rpos;
+  return val;
+}
+
+/// @brief プログラムコードから FLOAT を読み込む．
+/// @param[in] code_array コード配列
+/// @param[in] rpos 読み込む場所
+inline
+Ymsl_FLOAT
+read_FLOAT(const Ymsl_CODE* code_array,
+	   Ymsl_INT& rpos)
+{
+  Ymsl_FLOAT val = *(reinterpret_cast<const Ymsl_FLOAT*>(&code_array[rpos]));
+  const ymuint n = sizeof(Ymsl_FLOAT) / sizeof(Ymsl_CODE);
+  rpos += n;
+  return val;
+}
+
+/// @brief プログラムコードから OBJPTR を読み込む．
+/// @param[in] code_array コード配列
+/// @param[in] rpos 読み込む場所
+inline
+Ymsl_OBJPTR
+read_OBJPTR(const Ymsl_CODE* code_array,
+	    Ymsl_INT& rpos)
+{
+  Ymsl_OBJPTR val = *(reinterpret_cast<const Ymsl_OBJPTR*>(&code_array[rpos]));
+  const ymuint n = sizeof(Ymsl_OBJPTR) / sizeof(Ymsl_CODE);
+  rpos += n;
+  return val;
+}
 
 END_NAMESPACE_YM_YMSL
 
