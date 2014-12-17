@@ -49,14 +49,17 @@ AstDeclBase::name() const
 // @param[in] name 変数名
 // @param[in] type 型
 // @param[in] init_expr 初期化式
+// @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstVarDecl::AstVarDecl(ShString name,
 		       AstValueType* type,
 		       AstExpr* init_expr,
+		       bool global,
 		       const FileRegion& loc) :
   AstDeclBase(name, loc),
   mType(type),
-  mInitExpr(init_expr)
+  mInitExpr(init_expr),
+  mGlobal(global)
 {
 }
 
@@ -79,6 +82,13 @@ AstExpr*
 AstVarDecl::init_expr() const
 {
   return mInitExpr;
+}
+
+// @brief グローバル変数の時 true を返す．
+bool
+AstVarDecl::global() const
+{
+  return mGlobal;
 }
 
 // @brief 次の要素を取り出す．

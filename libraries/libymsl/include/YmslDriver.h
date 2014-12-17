@@ -10,7 +10,6 @@
 
 
 #include "ymsl_int.h"
-#include "YmslDict.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/SimpleAlloc.h"
@@ -109,11 +108,13 @@ public:
   /// @param[in] name 変数名
   /// @param[in] type 型
   /// @param[in] init_expr 初期化式
+  /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
   AstVarDecl*
   new_VarDecl(AstSymbol* name,
 	      AstValueType* type,
 	      AstExpr* init_expr,
+	      bool global,
 	      const FileRegion& loc);
 
   /// @brief 関数宣言を作る．
@@ -347,15 +348,8 @@ private:
   // 字句解析器
   YmslScanner* mScanner;
 
-  // グローバル辞書
-  // 関数とグローバル変数が登録されている
-  YmslDict mGlobalDict;
-
-  // トップレベルブロック
-  AstBlock* mToplevelBlock;
-
-  // ブロックスタック
-  vector<AstBlock*> mBlockStack;
+  // 現在のモジュール
+  YmslModule* mCurModule;
 
 };
 

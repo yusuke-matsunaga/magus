@@ -53,7 +53,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslFunc*
+  AstFuncDecl*
   func() const;
 
   /// @brief ラベルステートメントを返す．
@@ -131,7 +131,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 /// @class FuncHandle SymHandle.h "SymHandle.h"
-/// @brief YmslFunc を保持する SymHandle
+/// @brief AstFuncDecl を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
 class FuncHandle :
   public SymHandle
@@ -140,7 +140,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
-  FuncHandle(YmslFunc* func);
+  FuncHandle(AstFuncDecl* func);
 
   /// @brief デストラクタ
   virtual
@@ -161,7 +161,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslFunc*
+  AstFuncDecl*
   func() const;
 
 
@@ -171,7 +171,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  YmslFunc* mFunc;
+  AstFuncDecl* mFunc;
 
 };
 

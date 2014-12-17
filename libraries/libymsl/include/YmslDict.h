@@ -45,7 +45,7 @@ public:
   /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_function(YmslFunc* item);
+  add_function(AstFuncDecl* item);
 
   /// @brief 変数定義を追加する．
   /// @param[in] item 追加する要素
@@ -70,7 +70,7 @@ public:
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  YmslFunc*
+  AstFuncDecl*
   find_function(ShString name) const;
 
   /// @brief 名前から変数宣言を見つける．
