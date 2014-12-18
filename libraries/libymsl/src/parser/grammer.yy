@@ -190,27 +190,29 @@ item
 {
   driver.add_statement($1);
 }
-// 関数定義
+// 関数宣言
 | func_head SYMBOL LP param_list RP COLON type SEMI
 {
   AstFuncDecl* funcdecl = driver.new_FuncDecl($2, $7, $4, @$);
   driver.pop_block();
   driver.add_function(funcdecl);
 }
-// 関数宣言
+// 関数定義
 | func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
 {
   AstFuncDecl* funcdecl = driver.new_FuncDecl($2, $7, $4, @$);
   driver.pop_block();
   driver.add_function(funcdecl);
 }
+// ローカル変数定義
 | var_decl SEMI
 {
   driver.add_local_var($1);
 }
-| GLOBAL SYMBOL COLON type SEMI
+// グローバル変数定義
+| GLOBAL SYMBOL COLON type init_expr SEMI
 {
-  AstVarDecl* vardecl = driver.new_VarDecl($2, $4, NULL, @$);
+  AstVarDecl* vardecl = driver.new_VarDecl($2, $4, $5, true, @$);
   driver.add_global_var(vardecl);
 }
 ;
@@ -411,7 +413,7 @@ param_list
 var_decl
 : SYMBOL COLON type init_expr
 {
-  $$ = driver.new_VarDecl($1, $3, $4, @$);
+  $$ = driver.new_VarDecl($1, $3, $4, false, @$);
 }
 ;
 

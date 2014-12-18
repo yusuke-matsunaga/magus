@@ -9,6 +9,7 @@
 
 #include "YmslDriver.h"
 #include "YmslScanner.h"
+#include "YmslModule.h"
 
 #include "AstSymbol.h"
 #include "AstBlock.h"
@@ -41,8 +42,6 @@
 #include "AstStringType.h"
 #include "AstUserType.h"
 
-#include "../builtin/YmslPrint.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -54,10 +53,6 @@ BEGIN_NAMESPACE_YM_YMSL
 YmslDriver::YmslDriver()
 {
   mScanner = NULL;
-  mToplevelBlock = NULL;
-
-  YmslFunc* func1 = new YmslPrint(ShString("print"), vector<YmslVar*>(0));
-  mGlobalDict.add_function(func1);
 }
 
 // @brief デストラクタ
@@ -77,8 +72,7 @@ YmslDriver::read(IDO& ido)
 
   mScanner = new YmslScanner(ido);
 
-  mToplevelBlock = new AstBlock(&mGlobalDict);
-  mBlockStack.push_back(mToplevelBlock);
+  mCurModule = new YmslModule(ShString("__main__"));
 
   int stat = yyparse(*this);
 
@@ -92,7 +86,7 @@ YmslDriver::read(IDO& ido)
 AstBlock*
 YmslDriver::toplevel_block() const
 {
-  return mToplevelBlock;
+  return mCurModule->toplevel_block();
 }
 
 // @brief yylex とのインターフェイス
@@ -125,7 +119,18 @@ YmslDriver::yylex(YYSTYPE& lval,
   default:
     break;
   }
-
+  if ( 0 ) {
+    RsrvWordDic dic;
+    switch ( id ) {
+    case SYMBOL:     cout << "SYMBOL[" << mScanner->cur_string() << "]"; break;
+    case INT_VAL:    cout << "INT[" << mScanner->cur_int() << "]"; break;
+    case FLOAT_VAL:  cout << "FLOAT[" << mScanner->cur_float() << "]"; break;
+    case STRING_VAL: cout << "STRING[" << mScanner->cur_string() << "]"; break;
+    case EOF:        cout << "EOF"; break;
+    default:         cout << dic.str(id); break;
+    }
+    cout << endl;
+  }
   return id;
 }
 
@@ -133,8 +138,7 @@ YmslDriver::yylex(YYSTYPE& lval,
 AstBlock*
 YmslDriver::cur_block()
 {
-  ASSERT_COND( !mBlockStack.empty() );
-  return mBlockStack.back();
+  return mCurModule->cur_block();
 }
 
 // @brief 新しいブロックを作りスタックに積む．
@@ -142,24 +146,21 @@ YmslDriver::cur_block()
 AstBlock*
 YmslDriver::push_new_block()
 {
-  AstBlock* parent = cur_block();
-  AstBlock* block = new AstBlock(parent);
-  mBlockStack.push_back(block);
-  return block;
+  return mCurModule->push_new_block();
 }
 
 // @brief ブロックをスタックから取り去る．
 void
 YmslDriver::pop_block()
 {
-  mBlockStack.pop_back();
+  mCurModule->pop_block();
 }
 
 // @brief 関数を追加する．
 void
 YmslDriver::add_function(AstFuncDecl* funcdecl)
 {
-  //mGlobalDict.add_func(func);
+  mCurModule->add_function(funcdecl);
 }
 
 // @brief グローバル変数を追加する．
@@ -167,36 +168,38 @@ YmslDriver::add_function(AstFuncDecl* funcdecl)
 void
 YmslDriver::add_global_var(AstVarDecl* vardecl)
 {
-  mGlobalDict.add_vardecl(vardecl);
+  mCurModule->add_global_var(vardecl);
 }
 
 // @brief 現在のブロックに変数を追加する．
 void
 YmslDriver::add_local_var(AstVarDecl* vardecl)
 {
-  mBlockStack.back()->add_vardecl(vardecl);
+  mCurModule->add_local_var(vardecl);
 }
 
 // @brief 現在のブロックに statement を追加する．
 void
 YmslDriver::add_statement(AstStatement* stmt)
 {
-  mBlockStack.back()->add_statement(stmt);
+  mCurModule->add_statement(stmt);
 }
 
 // @brief 変数宣言を作る．
 // @param[in] name 変数名
 // @param[in] type 型
 // @param[in] init_expr 初期化式
+// @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstVarDecl*
 YmslDriver::new_VarDecl(AstSymbol* name,
 			AstValueType* type,
 			AstExpr* init_expr,
+			bool global,
 			const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstVarDecl));
-  return new (p) AstVarDecl(name->str_val(), type, init_expr, loc);
+  return new (p) AstVarDecl(name->str_val(), type, init_expr, global, loc);
 }
 
 // @brief 関数宣言を作る．
@@ -446,7 +449,7 @@ YmslDriver::new_FuncCall(AstSymbol* symbol,
 			 AstExpr* expr_list,
 			 const FileRegion& loc)
 {
-  YmslFunc* func = mGlobalDict.find_function(symbol->str_val());
+  AstFuncDecl* func = mCurModule->find_function(symbol->str_val());
   if ( func == NULL ) {
     return NULL;
   }
@@ -460,8 +463,7 @@ YmslDriver::new_FuncCall(AstSymbol* symbol,
 AstExpr*
 YmslDriver::new_VarExpr(AstSymbol* symbol)
 {
-  AstBlock* block = cur_block();
-  AstVarDecl* var_decl = block->find_vardecl(symbol->str_val());
+  AstVarDecl* var_decl = mCurModule->find_var(symbol->str_val());
   if ( var_decl == NULL ) {
     return NULL;
   }

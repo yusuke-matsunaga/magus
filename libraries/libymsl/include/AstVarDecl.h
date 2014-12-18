@@ -27,10 +27,12 @@ public:
   /// @param[in] name 変数名
   /// @param[in] type 型
   /// @param[in] init_expr 初期化式
+  /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
   AstVarDecl(ShString name,
 	     AstValueType* type,
 	     AstExpr* init_expr,
+	     bool global,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -52,6 +54,10 @@ public:
   /// NULL の場合もある．
   AstExpr*
   init_expr() const;
+
+  /// @brief グローバル変数の時 true を返す．
+  bool
+  global() const;
 
   /// @brief 次の要素を取り出す．
   AstVarDecl*
@@ -80,6 +86,12 @@ private:
 
   // 初期化式
   AstExpr* mInitExpr;
+
+  // グローバル変数の時 true にするフラグ
+  bool mGlobal;
+
+  // インデックス番号
+  ymuint mIndex;
 
   // 前の要素
   AstVarDecl* mPrev;

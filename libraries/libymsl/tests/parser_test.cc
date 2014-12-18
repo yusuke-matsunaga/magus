@@ -43,6 +43,7 @@ parser_test(int argc,
 {
   if ( argc == 1 ) {
     const char* str =
+      "function print(s:string):int;\n"
       "a:int;\n"
       "b:int;\n"
       "c:int;\n"

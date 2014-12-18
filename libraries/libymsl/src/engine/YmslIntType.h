@@ -1,5 +1,5 @@
 #ifndef YMSLINTTYPE_H
-#define YMSLTINTTYPE_H
+#define YMSLINTTYPE_H
 
 /// @file YmslIntType.h
 /// @brief YmslIntType のヘッダファイル

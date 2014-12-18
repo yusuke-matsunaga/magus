@@ -33,6 +33,7 @@ class YmslDriver;
 
 class YmslExecutable;
 class YmslFunc;
+class YmslModule;
 class YmslObj;
 class YmslSubspace;
 class YmslValueType;

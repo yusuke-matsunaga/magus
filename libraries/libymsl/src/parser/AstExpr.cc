@@ -15,8 +15,8 @@
 #include "AstFloatConst.h"
 #include "AstStringConst.h"
 
+#include "AstFuncDecl.h"
 #include "AstVarDecl.h"
-#include "YmslFunc.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -80,7 +80,7 @@ END_NONAMESPACE
 // @param[in] func 関数
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(YmslFunc* func,
+AstFuncCall::AstFuncCall(AstFuncDecl* func,
 			 AstExpr* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),

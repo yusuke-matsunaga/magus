@@ -31,6 +31,7 @@ set (ymsl_SOURCES
   src/parser/RsrvWordDic.cc
   src/parser/SymDict.cc
   src/parser/YmslDriver.cc
+  src/parser/YmslModule.cc
   src/parser/YmslScanner.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
