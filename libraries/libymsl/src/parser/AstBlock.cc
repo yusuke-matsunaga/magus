@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] parent_dict 親の辞書
-AstBlock::AstBlock(YmslDict* parent_dict) :
+AstBlock::AstBlock(SymDict* parent_dict) :
   mDict(parent_dict)
 {
 }

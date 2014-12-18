@@ -1,8 +1,8 @@
-#ifndef YMSLDICT_H
-#define YMSLDICT_H
+#ifndef SYMDICT_H
+#define SYMDICT_H
 
-/// @file YmslDict.h
-/// @brief YmslDict のヘッダファイル
+/// @file SymDict.h
+/// @brief SymDict のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -18,19 +18,19 @@ BEGIN_NAMESPACE_YM_YMSL
 class SymHandle;
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslDict YmslDict.h "YmslDict.h"
+/// @class SymDict SymDict.h "SymDict.h"
 /// @breif 辞書を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslDict
+class SymDict
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親
-  YmslDict(YmslDict* parent = NULL);
+  SymDict(SymDict* parent = NULL);
 
   /// @brief デストラクタ
-  ~YmslDict();
+  ~SymDict();
 
 
 public:
@@ -122,7 +122,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の辞書
-  YmslDict* mParent;
+  SymDict* mParent;
 
   // ハッシュサイズ
   ymuint mHashSize;
@@ -141,4 +141,4 @@ private:
 END_NAMESPACE_YM_YMSL
 
 
-#endif // YMSLDICT_H
+#endif // SYMDICT_H

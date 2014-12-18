@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 class SymHandle
 {
-  friend class YmslDict;
+  friend class SymDict;
 
 public:
 

@@ -10,7 +10,7 @@
 
 
 #include "ymsl_int.h"
-#include "YmslDict.h"
+#include "SymDict.h"
 #include "YmUtils/ShString.h"
 
 
@@ -26,7 +26,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] parent_dict 親の辞書
-  AstBlock(YmslDict* parent_dict);
+  AstBlock(SymDict* parent_dict);
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のブロック
@@ -83,7 +83,7 @@ private:
   vector<AstStatement*> mStatementList;
 
   // 辞書
-  YmslDict mDict;
+  SymDict mDict;
 
 };
 

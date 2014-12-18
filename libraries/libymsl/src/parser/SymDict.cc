@@ -1,13 +1,13 @@
 
-/// @file YmslDict.cc
-/// @brief YmslDict の実装ファイル
+/// @file SymDict.cc
+/// @brief SymDict の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslDict.h"
+#include "SymDict.h"
 #include "AstStatement.h"
 #include "AstVarDecl.h"
 #include "YmslFunc.h"
@@ -18,12 +18,12 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス YmslDict
+// クラス SymDict
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] parent 親
-YmslDict::YmslDict(YmslDict* parent) :
+SymDict::SymDict(SymDict* parent) :
   mParent(parent),
   mHashSize(0),
   mHashTable(NULL),
@@ -33,13 +33,13 @@ YmslDict::YmslDict(YmslDict* parent) :
 }
 
 // @brief デストラクタ
-YmslDict::~YmslDict()
+SymDict::~SymDict()
 {
 }
 
 // @brief statement を追加する．
 void
-YmslDict::add_statement(AstStatement* statement)
+SymDict::add_statement(AstStatement* statement)
 {
   ShString label = statement->label();
   if ( label != ShString() ) {
@@ -51,7 +51,7 @@ YmslDict::add_statement(AstStatement* statement)
 // @brief 関数を追加する．
 // @param[in] item 追加する要素
 void
-YmslDict::add_function(YmslFunc* item)
+SymDict::add_function(YmslFunc* item)
 {
   SymHandle* handle = new FuncHandle(item);
   put(handle);
@@ -60,7 +60,7 @@ YmslDict::add_function(YmslFunc* item)
 // @brief 変数定義を追加する．
 // @param[in] item 追加する要素
 void
-YmslDict::add_vardecl(AstVarDecl* item)
+SymDict::add_vardecl(AstVarDecl* item)
 {
   SymHandle* handle = new VarHandle(item);
   put(handle);
@@ -69,7 +69,7 @@ YmslDict::add_vardecl(AstVarDecl* item)
 // @brief 名前空間を追加する．
 // @param[in] item 追加する要素
 void
-YmslDict::add_namespace(YmslSubspace* item)
+SymDict::add_namespace(YmslSubspace* item)
 {
   SymHandle* handle = new SubspaceHandle(item);
   put(handle);
@@ -81,7 +81,7 @@ YmslDict::add_namespace(YmslSubspace* item)
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 AstStatement*
-YmslDict::find_label(ShString name) const
+SymDict::find_label(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
@@ -96,7 +96,7 @@ YmslDict::find_label(ShString name) const
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 YmslFunc*
-YmslDict::find_function(ShString name) const
+SymDict::find_function(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
@@ -111,7 +111,7 @@ YmslDict::find_function(ShString name) const
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 AstVarDecl*
-YmslDict::find_vardecl(ShString name) const
+SymDict::find_vardecl(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
@@ -126,7 +126,7 @@ YmslDict::find_vardecl(ShString name) const
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
 YmslSubspace*
-YmslDict::find_subspace(ShString name) const
+SymDict::find_subspace(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
@@ -140,7 +140,7 @@ YmslDict::find_subspace(ShString name) const
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
-YmslDict::print(ostream& s,
+SymDict::print(ostream& s,
 		ymuint indent) const
 {
 #if 0
@@ -160,7 +160,7 @@ YmslDict::print(ostream& s,
 
 // @brief ハッシュ表を確保する．
 void
-YmslDict::alloc_table(ymuint req_size)
+SymDict::alloc_table(ymuint req_size)
 {
   ymuint old_size = mHashSize;
   SymHandle** old_table = mHashTable;
@@ -184,7 +184,7 @@ YmslDict::alloc_table(ymuint req_size)
 // @brief 名前からハンドルを探す．
 // @param[in] name 名前
 SymHandle*
-YmslDict::find(ShString name) const
+SymDict::find(ShString name) const
 {
   ymuint pos = name.hash() % mHashSize;
   for (SymHandle* handle = mHashTable[pos];
@@ -201,7 +201,7 @@ YmslDict::find(ShString name) const
 
 // @brief ハンドルを登録する．
 void
-YmslDict::put(SymHandle* handle)
+SymDict::put(SymHandle* handle)
 {
   if ( mHashNum >= mNextLimit ) {
     alloc_table(mHashSize << 1);
@@ -214,7 +214,7 @@ YmslDict::put(SymHandle* handle)
 //
 // こちらはサイズチェックなし
 void
-YmslDict::_put(SymHandle* handle)
+SymDict::_put(SymHandle* handle)
 {
   ymuint pos = handle->name().hash() % mHashSize;
   handle->mLink = mHashTable[pos];

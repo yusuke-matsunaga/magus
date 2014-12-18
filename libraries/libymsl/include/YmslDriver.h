@@ -10,7 +10,7 @@
 
 
 #include "ymsl_int.h"
-#include "YmslDict.h"
+#include "SymDict.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/SimpleAlloc.h"
@@ -349,7 +349,7 @@ private:
 
   // グローバル辞書
   // 関数とグローバル変数が登録されている
-  YmslDict mGlobalDict;
+  SymDict mGlobalDict;
 
   // トップレベルブロック
   AstBlock* mToplevelBlock;

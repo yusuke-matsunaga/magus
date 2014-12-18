@@ -29,7 +29,7 @@ set (ymsl_SOURCES
   src/parser/AstStatement.cc
   src/parser/AstValueType.cc
   src/parser/RsrvWordDic.cc
-  src/parser/YmslDict.cc
+  src/parser/SymDict.cc
   src/parser/YmslDriver.cc
   src/parser/YmslScanner.cc
 
