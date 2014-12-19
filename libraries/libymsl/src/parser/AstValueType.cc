@@ -49,6 +49,13 @@ AstIntType::~AstIntType()
 {
 }
 
+// @brief 単純型の場合に true を返す．
+bool
+AstIntType::simple_type() const
+{
+  return true;
+}
+
 // @brief 型を得る．
 ValueType
 AstIntType::value_type() const
@@ -78,6 +85,13 @@ AstFloatType::AstFloatType(const FileRegion& loc) :
 // @brief デストラクタ
 AstFloatType::~AstFloatType()
 {
+}
+
+// @brief 単純型の場合に true を返す．
+bool
+AstFloatType::simple_type() const
+{
+  return true;
 }
 
 // @brief 型を得る．
@@ -111,6 +125,13 @@ AstStringType::~AstStringType()
 {
 }
 
+// @brief 単純型の場合に true を返す．
+bool
+AstStringType::simple_type() const
+{
+  return true;
+}
+
 // @brief 型を得る．
 ValueType
 AstStringType::value_type() const
@@ -142,6 +163,13 @@ AstUserType::AstUserType(AstSymbol* type_name) :
 // @brief デストラクタ
 AstUserType::~AstUserType()
 {
+}
+
+// @brief 単純型の場合に true を返す．
+bool
+AstUserType::simple_type() const
+{
+  return false;
 }
 
 // @brief 型を得る．

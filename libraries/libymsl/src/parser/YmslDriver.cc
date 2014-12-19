@@ -9,6 +9,7 @@
 
 #include "YmslDriver.h"
 #include "YmslScanner.h"
+#include "YmslLabel.h"
 #include "YmslModule.h"
 
 #include "AstSymbol.h"
@@ -198,8 +199,12 @@ YmslDriver::new_VarDecl(AstSymbol* name,
 			bool global,
 			const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstVarDecl));
-  return new (p) AstVarDecl(name->str_val(), type, init_expr, global, loc);
+  if ( type->simple_type() ) {
+    void* p = mAlloc.get_memory(sizeof(AstVarDecl));
+    return new (p) AstVarDecl(name->str_val(), type->value_type(), init_expr, global, loc);
+  }
+  else {
+  }
 }
 
 // @brief 関数宣言を作る．
@@ -214,9 +219,13 @@ YmslDriver::new_FuncDecl(AstSymbol* name,
 			 AstVarDecl* param_list,
 			 const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
-  AstBlock* block = cur_block();
-  return  new (p) AstFuncDecl(name->str_val(), type, param_list, block, loc);
+  if ( type->simple_type() ) {
+    void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
+    AstBlock* block = cur_block();
+    return  new (p) AstFuncDecl(name->str_val(), type->value_type(), param_list, block, loc);
+  }
+  else {
+  }
 }
 
 // @brief 代入文を作る．
@@ -231,36 +240,29 @@ YmslDriver::new_Assignment(AstExpr* left,
 }
 
 // @brief if 文を作る．
-// @param[in] cond 条件式
-// @param[in] then_block then ブロック
-// @param[in] elif_list elif ブロックリスト
-// @param[in] else_block else ブロック
+// @param[in] if_list IfBlock のリスト
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_If(AstIfBlock* top,
-		   AstIfBlock* elif_list,
-		   AstIfBlock* else_block,
+YmslDriver::new_If(AstIfBlock* if_list,
 		   const FileRegion& loc)
 {
-  if ( else_block != NULL ) {
-    else_block->set_prev(elif_list);
-    elif_list = else_block;
-  }
   void* p = mAlloc.get_memory(sizeof(AstIf));
-  return new (p) AstIf(top, elif_list, loc);
+  return new (p) AstIf(if_list, loc);
 }
 
-// @brief if blockを作る．
+// @brief if blockを作る
+// @param[in] prev 前の要素．
 // @param[in] cond 条件式
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstIfBlock*
-YmslDriver::new_IfBlock(AstExpr* cond,
+YmslDriver::new_IfBlock(AstIfBlock* prev,
+			AstExpr* cond,
 			AstBlock* block,
 			const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIfBlock));
-  return new (p) AstIfBlock(cond, block, loc);
+  return new (p) AstIfBlock(prev, cond, block, loc);
 }
 
 // @brief for 文を作る．
@@ -320,16 +322,18 @@ YmslDriver::new_Switch(AstExpr* expr,
 }
 
 // @brief case-item を作る．
+// @param[in] prev 直前の要素
 // @param[in] label ラベル
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstCaseItem*
-YmslDriver::new_CaseItem(AstExpr* label,
+YmslDriver::new_CaseItem(AstCaseItem* prev,
+			 AstExpr* label,
 			 AstBlock* block,
 			 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstCaseItem));
-  return new (p) AstCaseItem(label, block, loc);
+  return new (p) AstCaseItem(prev, label, block, loc);
 }
 
 // @brief goto 文を作る．
@@ -550,6 +554,15 @@ YmslDriver::new_UserType(AstSymbol* type_name)
 {
   void* p = mAlloc.get_memory(sizeof(AstUserType));
   return new (p) AstUserType(type_name);
+}
+
+// @brief ラベルを作る．
+// @param[in] name ラベル名
+YmslLabel*
+YmslDriver::new_label(ShString name)
+{
+  void* p = mAlloc.get_memory(sizeof(YmslLabel));
+  return new (p) YmslLabel(name);
 }
 
 END_NAMESPACE_YM_YMSL

@@ -9,6 +9,8 @@
 
 #include "YmslModule.h"
 #include "AstBlock.h"
+#include "AstFuncDecl.h"
+#include "AstVarDecl.h"
 
 #include "../builtin/YmslPrint.h"
 
@@ -83,6 +85,9 @@ void
 YmslModule::add_function(AstFuncDecl* funcdecl)
 {
   mGlobalDict.add_function(funcdecl);
+  ymuint id = mFuncList.size();
+  mFuncList.push_back(funcdecl);
+  funcdecl->mIndex = id;
 }
 
 // @brief グローバル変数を追加する．
@@ -91,6 +96,9 @@ void
 YmslModule::add_global_var(AstVarDecl* vardecl)
 {
   mGlobalDict.add_vardecl(vardecl);
+  ymuint id = mGlobalVarList.size();
+  mGlobalVarList.push_back(vardecl);
+  vardecl->mIndex = id;
 }
 
 // @brief 現在のブロックに変数を追加する．
@@ -98,6 +106,9 @@ void
 YmslModule::add_local_var(AstVarDecl* vardecl)
 {
   mBlockStack.back()->add_vardecl(vardecl);
+  ymuint id = mLocalVarList.size();
+  mLocalVarList.push_back(vardecl);
+  vardecl->mIndex = id;
 }
 
 // @brief 現在のブロックに statement を追加する．

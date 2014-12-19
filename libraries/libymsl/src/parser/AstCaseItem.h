@@ -24,10 +24,12 @@ class AstCaseItem :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] prev 直前の要素
   /// @param[in] label ラベル
   /// @param[in] block 本体
   /// @param[in] loc ファイル位置
-  AstCaseItem(AstExpr* label,
+  AstCaseItem(AstCaseItem* prev,
+	      AstExpr* label,
 	      AstBlock* block,
 	      const FileRegion& loc);
 
@@ -41,13 +43,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 次の要素を得る．
+  /// @brief 前の要素を得る．
   AstCaseItem*
-  next() const;
-
-  /// @brief 前の要素をセットする．
-  void
-  set_prev(AstCaseItem* prev);
+  prev() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -66,8 +64,8 @@ private:
   // ラベル
   AstExpr* mLabel;
 
-  // 次の要素
-  AstCaseItem* mNext;
+  // 前の要素
+  AstCaseItem* mPrev;
 
 };
 

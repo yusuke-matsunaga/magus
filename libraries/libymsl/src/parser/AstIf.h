@@ -24,11 +24,9 @@ class AstIf :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] top 先頭の if ブロック
-  /// @param[in] elif_list elif ブロックリスト
+  /// @param[in] if_list IfBlock のリスト
   /// @param[in] loc ファイル位置
-  AstIf(AstIfBlock* top,
-	AstIfBlock* elif_list,
+  AstIf(AstIfBlock* if_list,
 	const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -40,6 +38,23 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 命令コードのサイズを計算する．
+  virtual
+  ymuint
+  calc_size();
+
+  /// @brief 命令コードを生成する．
+  /// @param[in] driver ドライバ
+  /// @param[in] code_list 命令コードの格納先
+  /// @param[inout] addr 命令コードの現在のアドレス
+  ///
+  /// addr の値は更新される．
+  virtual
+  void
+  compile(YmslDriver& driver,
+	  YmslCodeList& code_list,
+	  Ymsl_INT& addr);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

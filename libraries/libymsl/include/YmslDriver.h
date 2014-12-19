@@ -12,6 +12,7 @@
 #include "ymsl_int.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/FileRegion.h"
+#include "YmUtils/ShString.h"
 #include "YmUtils/SimpleAlloc.h"
 
 
@@ -137,22 +138,20 @@ public:
 		 AstExpr* right);
 
   /// @brief if 文を作る．
-  /// @param[in] top 先頭の if ブロック
-  /// @param[in] elif_list elif ブロックリスト
-  /// @param[in] else_block else ブロック
+  /// @param[in] if_list IfBlock のリスト
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_If(AstIfBlock* top,
-	 AstIfBlock* elif_list,
-	 AstIfBlock* else_block,
+  new_If(AstIfBlock* if_list,
 	 const FileRegion& loc);
 
   /// @brief if blockを作る．
+  /// @param[in] prev 直前の要素
   /// @param[in] cond 条件式
   /// @param[in] block 本体
   /// @param[in] loc ファイル位置
   AstIfBlock*
-  new_IfBlock(AstExpr* cond,
+  new_IfBlock(AstIfBlock* prev,
+	      AstExpr* cond,
 	      AstBlock* block,
 	      const FileRegion& loc);
 
@@ -197,11 +196,13 @@ public:
 	     const FileRegion& loc);
 
   /// @brief case-item を作る．
+  /// @param[in] prev 直前の要素
   /// @param[in] label ラベル
   /// @param[in] block 本体
   /// @param[in] loc ファイル位置
   AstCaseItem*
-  new_CaseItem(AstExpr* label,
+  new_CaseItem(AstCaseItem* prev,
+	       AstExpr* label,
 	       AstBlock* block,
 	       const FileRegion& loc);
 
@@ -329,6 +330,11 @@ public:
   /// @param[in] type_name 型名
   AstValueType*
   new_UserType(AstSymbol* type_name);
+
+  /// @brief ラベルを作る．
+  /// @param[in] name ラベル名
+  YmslLabel*
+  new_label(ShString name);
 
 
 private:

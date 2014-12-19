@@ -52,15 +52,17 @@ AstDeclBase::name() const
 // @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstVarDecl::AstVarDecl(ShString name,
-		       AstValueType* type,
+		       ValueType type,
 		       AstExpr* init_expr,
 		       bool global,
 		       const FileRegion& loc) :
   AstDeclBase(name, loc),
+  mIndex(-1),
   mType(type),
   mInitExpr(init_expr),
   mGlobal(global)
 {
+  mPrev = NULL;
 }
 
 // @brief デストラクタ
@@ -68,8 +70,15 @@ AstVarDecl::~AstVarDecl()
 {
 }
 
+// @brief インデックス番号を返す．
+ymuint
+AstVarDecl::index() const
+{
+  return mIndex;
+}
+
 // @brief 型を得る．
-AstValueType*
+ValueType
 AstVarDecl::type() const
 {
   return mType;
@@ -91,20 +100,18 @@ AstVarDecl::global() const
   return mGlobal;
 }
 
-// @brief 次の要素を取り出す．
+// @brief 前の要素を取り出す．
 AstVarDecl*
-AstVarDecl::next()
+AstVarDecl::prev() const
 {
-  return mNext;
+  return mPrev;
 }
 
 // @brief 前の要素をセットする．
 void
 AstVarDecl::set_prev(AstVarDecl* prev)
 {
-  if ( prev != NULL ) {
-    prev->mNext = this;
-  }
+  mPrev = prev;
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -127,7 +134,7 @@ ymuint
 count_size(AstVarDecl* param_list)
 {
   ymuint n = 0;
-  for (AstVarDecl* vd = param_list; vd != NULL; vd = vd->next()) {
+  for (AstVarDecl* vd = param_list; vd != NULL; vd = vd->prev()) {
     ++ n;
   }
   return n;
@@ -142,17 +149,18 @@ END_NONAMESPACE
 // @param[in] block 本文のブロック
 // @param[in] loc ファイル位置
 AstFuncDecl::AstFuncDecl(ShString name,
-			 AstValueType* type,
+			 ValueType type,
 			 AstVarDecl* param_list,
 			 AstBlock* block,
 			 const FileRegion& loc) :
   AstDeclBase(name, loc),
+  mIndex(-1),
   mType(type),
   mParamList(count_size(param_list)),
   mBlock(block)
 {
   ymuint i = mParamList.size();
-  for (AstVarDecl* vd = param_list; vd != NULL; vd = vd->next()) {
+  for (AstVarDecl* vd = param_list; vd != NULL; vd = vd->prev()) {
     -- i;
     mParamList[i] = vd;
   }
@@ -163,9 +171,16 @@ AstFuncDecl::~AstFuncDecl()
 {
 }
 
+// @brief インデックス番号を返す．
+ymuint
+AstFuncDecl::index() const
+{
+  return mIndex;
+}
+
 // @brief 出力の型を返す．
-AstValueType*
-AstFuncDecl::output_type() const
+ValueType
+AstFuncDecl::type() const
 {
   return mType;
 }

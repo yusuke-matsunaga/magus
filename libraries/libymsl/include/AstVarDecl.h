@@ -21,6 +21,8 @@ BEGIN_NAMESPACE_YM_YMSL
 class AstVarDecl :
   public AstDeclBase
 {
+  friend class YmslModule;
+
 public:
 
   /// @brief コンストラクタ
@@ -30,7 +32,7 @@ public:
   /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
   AstVarDecl(ShString name,
-	     AstValueType* type,
+	     ValueType type,
 	     AstExpr* init_expr,
 	     bool global,
 	     const FileRegion& loc);
@@ -45,8 +47,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief インデックス番号を返す．
+  ymuint
+  index() const;
+
   /// @brief 型を得る．
-  AstValueType*
+  ValueType
   type() const;
 
   /// @brief 初期化式を返す．
@@ -59,9 +65,9 @@ public:
   bool
   global() const;
 
-  /// @brief 次の要素を取り出す．
+  /// @brief 前の要素を取り出す．
   AstVarDecl*
-  next();
+  prev() const;
 
   /// @brief 前の要素をセットする．
   void
@@ -81,8 +87,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // インデックス番号
+  ymuint mIndex;
+
   // 変数の型
-  AstValueType* mType;
+  ValueType mType;
 
   // 初期化式
   AstExpr* mInitExpr;
@@ -90,14 +99,8 @@ private:
   // グローバル変数の時 true にするフラグ
   bool mGlobal;
 
-  // インデックス番号
-  ymuint mIndex;
-
   // 前の要素
   AstVarDecl* mPrev;
-
-  // 次の要素
-  AstVarDecl* mNext;
 
 };
 

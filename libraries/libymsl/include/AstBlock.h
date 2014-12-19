@@ -45,17 +45,22 @@ public:
   void
   add_statement(AstStatement* statement);
 
+  /// @brief ラベルを追加する．
+  /// @param[in] item 追加する要素
+  void
+  add_label(YmslLabel* item);
+
   /// @brief 変数定義を追加する．
   /// @param[in] item 追加する要素
   void
   add_vardecl(AstVarDecl* item);
 
-  /// @brief 名前からラベルステートメントを見つける．
+  /// @brief 名前からラベルを見つける．
   /// @param[in] name 名前
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  AstStatement*
+  YmslLabel*
   find_label(ShString name) const;
 
   /// @brief 名前から変数宣言を見つける．
@@ -65,6 +70,30 @@ public:
   /// それでもなければ NULL を返す．
   AstVarDecl*
   find_vardecl(ShString name) const;
+
+  /// @brief ステートメント数を返す．
+  ymuint
+  statement_num() const;
+
+  /// @brief ステートメントを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < statement_num() )
+  AstStatement*
+  statement(ymuint pos) const;
+
+  /// @brief 命令コードのサイズを計算する．
+  ymuint
+  calc_size() const;
+
+  /// @brief 命令コードを生成する．
+  /// @param[in] driver ドライバ
+  /// @param[in] code_list 命令コードの格納先
+  /// @param[inout] addr 命令コードの現在のアドレス
+  ///
+  /// addr の値は更新される．
+  void
+  compile(YmslDriver& driver,
+	  YmslCodeList& code_list,
+	  Ymsl_INT& addr);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

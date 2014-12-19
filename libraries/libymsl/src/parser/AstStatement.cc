@@ -26,6 +26,7 @@
 #include "AstExprStmt.h"
 #include "AstBlock.h"
 #include "AstExpr.h"
+#include "YmslDriver.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -99,6 +100,25 @@ AstAssignment::~AstAssignment()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstAssignment::calc_size()
+{
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstAssignment::compile(YmslDriver& driver,
+		       YmslCodeList& code_list,
+		       Ymsl_INT& addr)
+{
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -124,7 +144,7 @@ ymuint
 count_size(AstIfBlock* block_list)
 {
   ymuint n = 0;
-  for (AstIfBlock* ib = block_list; ib != NULL; ib = ib->next()) {
+  for (AstIfBlock* ib = block_list; ib != NULL; ib = ib->prev()) {
     ++ n;
   }
   return n;
@@ -133,19 +153,15 @@ count_size(AstIfBlock* block_list)
 END_NONAMESPACE
 
 // @brief コンストラクタ
-// @param[in] top 先頭の if ブロック
-// @param[in] elif_list elif ブロックリスト
+// @param[in] if_list IfBlock のリスト
 // @param[in] loc ファイル位置
-AstIf::AstIf(AstIfBlock* top,
-	     AstIfBlock* elif_list,
+AstIf::AstIf(AstIfBlock* if_list,
 	     const FileRegion& loc) :
   AstStatement(loc),
-  mIfBlockList(count_size(elif_list) + 1)
+  mIfBlockList(count_size(if_list))
 {
-  ASSERT_COND( top != NULL );
-  mIfBlockList[0] = top;
   ymuint i = mIfBlockList.size();
-  for (AstIfBlock* ib = elif_list; ib != NULL; ib = ib->next()) {
+  for (AstIfBlock* ib = if_list; ib != NULL; ib = ib->prev()) {
     -- i;
     mIfBlockList[i] = ib;
   }
@@ -153,6 +169,25 @@ AstIf::AstIf(AstIfBlock* top,
 
 // @brief デストラクタ
 AstIf::~AstIf()
+{
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstIf::calc_size()
+{
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstIf::compile(YmslDriver& driver,
+	       YmslCodeList& code_list,
+	       Ymsl_INT& addr)
 {
 }
 
@@ -194,15 +229,17 @@ AstIf::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] prev 前の要素
 // @param[in] cond 条件
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-AstIfBlock::AstIfBlock(AstExpr* cond,
+AstIfBlock::AstIfBlock(AstIfBlock* prev,
+		       AstExpr* cond,
 		       AstBlock* block,
 		       const FileRegion& loc) :
   AstBlockStmt(block, loc),
   mCond(cond),
-  mNext(NULL)
+  mPrev(prev)
 {
 }
 
@@ -211,18 +248,11 @@ AstIfBlock::~AstIfBlock()
 {
 }
 
-// @brief 次の要素を得る．
+// @brief 前の要素を得る．
 AstIfBlock*
-AstIfBlock::next() const
+AstIfBlock::prev() const
 {
-  return mNext;
-}
-
-// @brief 次の要素をセットする．
-void
-AstIfBlock::set_prev(AstIfBlock* prev)
-{
-  mNext = prev;
+  return mPrev;
 }
 
 // @brief 条件を返す．
@@ -280,6 +310,25 @@ AstFor::~AstFor()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstFor::calc_size()
+{
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstFor::compile(YmslDriver& driver,
+		YmslCodeList& code_list,
+		Ymsl_INT& addr)
+{
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -323,6 +372,34 @@ AstWhile::~AstWhile()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstWhile::calc_size()
+{
+  ymuint size = mCond->calc_size();
+  size += block()->calc_size();
+  size += 4;
+  return size;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstWhile::compile(YmslDriver& driver,
+		  YmslCodeList& code_list,
+		  Ymsl_INT& addr)
+{
+  YmslLabel* label1 = driver.new_label(ShString());
+  // label1 を配置
+  YmslLabel* label2 = driver.new_label(ShString());
+  mCond->compile(driver, code_list, addr);
+
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -360,6 +437,29 @@ AstDoWhile::~AstDoWhile()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstDoWhile::calc_size()
+{
+  ymuint size = block()->calc_size();
+  size += mCond->calc_size();
+  size += 2;
+  return size;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstDoWhile::compile(YmslDriver& driver,
+		    YmslCodeList& code_list,
+		    Ymsl_INT& addr)
+{
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -383,6 +483,20 @@ AstDoWhile::print(ostream& s,
 // クラス AstSwitch
 //////////////////////////////////////////////////////////////////////
 
+BEGIN_NONAMESPACE
+
+ymuint
+count_size(AstCaseItem* block_list)
+{
+  ymuint n = 0;
+  for (AstCaseItem* ib = block_list; ib != NULL; ib = ib->prev()) {
+    ++ n;
+  }
+  return n;
+}
+
+END_NONAMESPACE
+
 // @brief コンストラクタ
 // @param[in] expr 条件式
 // @param[in] case_list case リスト
@@ -391,12 +505,37 @@ AstSwitch::AstSwitch(AstExpr* expr,
 		     AstCaseItem* case_list,
 		     const FileRegion& loc) :
   AstStatement(loc),
-  mExpr(expr)
+  mExpr(expr),
+  mCaseItemList(count_size(case_list))
 {
+  ymuint i = mCaseItemList.size();
+  for (AstCaseItem* ci = case_list; ci != NULL; ci = ci->prev()) {
+    -- i;
+    mCaseItemList[i] = ci;
+  }
 }
 
 // @brief デストラクタ
 AstSwitch::~AstSwitch()
+{
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstSwitch::calc_size()
+{
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstSwitch::compile(YmslDriver& driver,
+		   YmslCodeList& code_list,
+		   Ymsl_INT& addr)
 {
 }
 
@@ -432,15 +571,17 @@ AstSwitch::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] prev 直前の要素
 // @param[in] label ラベル
 // @param[in] block 本体
 // @param[in] loc ファイル位置
-AstCaseItem::AstCaseItem(AstExpr* label,
+AstCaseItem::AstCaseItem(AstCaseItem* prev,
+			 AstExpr* label,
 			 AstBlock* block,
 			 const FileRegion& loc) :
   AstBlockStmt(block, loc),
   mLabel(label),
-  mNext(NULL)
+  mPrev(prev)
 {
 }
 
@@ -449,20 +590,11 @@ AstCaseItem::~AstCaseItem()
 {
 }
 
-// @brief 次の要素を得る．
+// @brief 前の要素を得る．
 AstCaseItem*
-AstCaseItem::next() const
+AstCaseItem::prev() const
 {
-  return mNext;
-}
-
-// @brief 前の要素をセットする．
-void
-AstCaseItem::set_prev(AstCaseItem* prev)
-{
-  if ( prev != NULL ) {
-    prev->mNext = this;
-  }
+  return mPrev;
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -509,6 +641,26 @@ AstGoto::~AstGoto()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstGoto::calc_size()
+{
+  return 2;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstGoto::compile(YmslDriver& driver,
+		 YmslCodeList& code_list,
+		 Ymsl_INT& addr)
+{
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -544,6 +696,26 @@ AstLabel::~AstLabel()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstLabel::calc_size()
+{
+  return 0;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstLabel::compile(YmslDriver& driver,
+		  YmslCodeList& code_list,
+		  Ymsl_INT& addr)
+{
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -575,6 +747,26 @@ AstBreak::~AstBreak()
 {
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstBreak::calc_size()
+{
+  return 2;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstBreak::compile(YmslDriver& driver,
+		  YmslCodeList& code_list,
+		  Ymsl_INT& addr)
+{
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -600,6 +792,26 @@ AstContinue::AstContinue(const FileRegion& loc) :
 
 // @brief デストラクタ
 AstContinue::~AstContinue()
+{
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstContinue::calc_size()
+{
+  return 2;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstContinue::compile(YmslDriver& driver,
+		     YmslCodeList& code_list,
+		     Ymsl_INT& addr)
 {
 }
 
@@ -631,6 +843,30 @@ AstReturn::AstReturn(AstExpr* expr,
 
 // @brief デストラクタ
 AstReturn::~AstReturn()
+{
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstReturn::calc_size()
+{
+  ymuint size = 1;
+  if ( mExpr != NULL ) {
+    size += mExpr->calc_size();
+  }
+  return size;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstReturn::compile(YmslDriver& driver,
+		   YmslCodeList& code_list,
+		   Ymsl_INT& addr)
 {
 }
 
@@ -678,6 +914,27 @@ AstBlockStmt::block() const
   return mBlock;
 }
 
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstBlockStmt::calc_size()
+{
+  return mBlock->calc_size();
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstBlockStmt::compile(YmslDriver& driver,
+		      YmslCodeList& code_list,
+		      Ymsl_INT& addr)
+{
+  mBlock->compile(driver, code_list, addr);
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -708,6 +965,27 @@ AstExprStmt::AstExprStmt(AstExpr* expr) :
 // @brief デストラクタ
 AstExprStmt::~AstExprStmt()
 {
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstExprStmt::calc_size()
+{
+  return mExpr->calc_size();
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstExprStmt::compile(YmslDriver& driver,
+		     YmslCodeList& code_list,
+		     Ymsl_INT& addr)
+{
+  mExpr->compile(driver, code_list, addr);
 }
 
 // @brief 内容を表示する．(デバッグ用)

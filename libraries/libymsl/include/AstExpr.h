@@ -37,13 +37,43 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 次の要素を得る．
+  /// @brief 前の要素を得る．
   AstExpr*
-  next() const;
+  prev() const;
 
   /// @brief 前の要素をセットする．
   void
   set_prev(AstExpr* prev);
+
+  /// @brief 式の型を解析する．
+  /// @return 引数の方が間違っていたら false を返す．
+  ///
+  /// 結果としてキャスト演算が挿入される場合もある．
+  virtual
+  bool
+  type_analysis() = 0;
+
+  /// @brief 式の型を返す．
+  virtual
+  ValueType
+  type() = 0;
+
+  /// @brief 命令コードのサイズを計算する．
+  virtual
+  ymuint
+  calc_size() = 0;
+
+  /// @brief 命令コードを生成する．
+  /// @param[in] driver ドライバ
+  /// @param[in] code_list 命令コードの格納先
+  /// @param[inout] addr 命令コードの現在のアドレス
+  ///
+  /// addr の値は更新される．
+  virtual
+  void
+  compile(YmslDriver& driver,
+	  YmslCodeList& code_list,
+	  Ymsl_INT& addr) = 0;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -57,8 +87,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 次の要素
-  AstExpr* mNext;
+  // 前の要素
+  AstExpr* mPrev;
 
 };
 

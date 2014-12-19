@@ -38,9 +38,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ステートメントを追加する．
+  /// @brief 名前空間を追加する．
+  /// @param[in] item 追加する要素
   void
-  add_statement(AstStatement* statement);
+  add_namespace(YmslSubspace* subspace);
 
   /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
@@ -52,18 +53,17 @@ public:
   void
   add_vardecl(AstVarDecl* item);
 
-  /// @brief 名前空間を追加する．
-  /// @param[in] item 追加する要素
+  /// @brief ラベルを追加する．
   void
-  add_namespace(YmslSubspace* subspace);
+  add_label(YmslLabel* label);
 
-  /// @brief 名前からラベルステートメントを見つける．
+  /// @brief 名前から名前空間を探す．
   /// @param[in] name 名前
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  AstStatement*
-  find_label(ShString name) const;
+  YmslSubspace*
+  find_subspace(ShString name) const;
 
   /// @brief 名前から関数を見つける．
   /// @param[in] name 名前
@@ -81,13 +81,13 @@ public:
   AstVarDecl*
   find_vardecl(ShString name) const;
 
-  /// @brief 名前から名前空間を探す．
+  /// @brief 名前からラベルを見つける．
   /// @param[in] name 名前
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  YmslSubspace*
-  find_subspace(ShString name) const;
+  YmslLabel*
+  find_label(ShString name) const;
 
 
 private:

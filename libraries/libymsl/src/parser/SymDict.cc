@@ -8,10 +8,10 @@
 
 
 #include "SymDict.h"
-#include "AstStatement.h"
 #include "AstVarDecl.h"
 #include "AstFuncDecl.h"
 #include "YmslSubspace.h"
+#include "YmslLabel.h"
 #include "SymHandle.h"
 
 
@@ -37,15 +37,12 @@ SymDict::~SymDict()
 {
 }
 
-// @brief statement を追加する．
+// @brief ラベルを追加する．
 void
-SymDict::add_statement(AstStatement* statement)
+SymDict::add_label(YmslLabel* label)
 {
-  ShString label = statement->label();
-  if ( label != ShString() ) {
-    SymHandle* handle = new StmtHandle(statement);
-    put(handle);
-  }
+  SymHandle* handle = new LabelHandle(label);
+  put(handle);
 }
 
 // @brief 関数を追加する．
@@ -75,17 +72,17 @@ SymDict::add_namespace(YmslSubspace* item)
   put(handle);
 }
 
-// @brief 名前からラベルステートメントを見つける．
+// @brief 名前からラベルを見つける．
 // @param[in] name 名前
 //
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
-AstStatement*
+YmslLabel*
 SymDict::find_label(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
-    return handle->statement();
+    return handle->label();
   }
   return NULL;
 }
@@ -256,11 +253,11 @@ SymHandle::func() const
   return NULL;
 }
 
-// @brief ラベルステートメントを返す．
+// @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-AstStatement*
-SymHandle::statement() const
+YmslLabel*
+SymHandle::label() const
 {
   return NULL;
 }
@@ -342,35 +339,35 @@ FuncHandle::func() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス StmtHandle
+// クラス LabelHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] statement ラベルすてーとめんと
-StmtHandle::StmtHandle(AstStatement* statement) :
-  mStatement(statement)
+// @param[in] label ラベル
+LabelHandle::LabelHandle(YmslLabel* label) :
+  mLabel(label)
 {
 }
 
 // @brief デストラクタ
-StmtHandle::~StmtHandle()
+LabelHandle::~LabelHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-StmtHandle::name() const
+LabelHandle::name() const
 {
-  return mStatement->label();
+  return mLabel->name();
 }
 
-// @brief 関数宣言を返す．
+// @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-AstStatement*
-StmtHandle::statement() const
+YmslLabel*
+LabelHandle::label() const
 {
-  return mStatement;
+  return mLabel;
 }
 
 

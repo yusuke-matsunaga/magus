@@ -37,6 +37,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 単純型の場合に true を返す．
+  virtual
+  bool
+  simple_type() const;
+
   /// @brief 型を得る．
   virtual
   ValueType

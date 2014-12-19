@@ -363,6 +363,7 @@ YmslVM::load_global_OBJPTR(Ymsl_INT index)
 // @brief グローバル変数に INT の値を書き込む．
 // @param[in] index インデックス
 // @param[in] val 値
+inline
 void
 YmslVM::store_global_INT(Ymsl_INT index,
 			 Ymsl_INT val)

@@ -17,7 +17,7 @@ include_directories(
 
 set (ymsl_SOURCES
   src/builtin/YmslPrint.cc
-  src/engine/YmslExecutable.cc
+  src/engine/YmslCodeList.cc
   src/engine/YmslFunc.cc
   src/engine/YmslValueType.cc
   src/engine/YmslVar.cc
@@ -31,6 +31,7 @@ set (ymsl_SOURCES
   src/parser/RsrvWordDic.cc
   src/parser/SymDict.cc
   src/parser/YmslDriver.cc
+  src/parser/YmslLabel.cc
   src/parser/YmslModule.cc
   src/parser/YmslScanner.cc
 

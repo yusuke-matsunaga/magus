@@ -42,6 +42,13 @@ public:
   ShString
   name() const = 0;
 
+  /// @brief 名前空間を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  YmslSubspace*
+  subspace() const;
+
   /// @brief 変数宣言を返す．
   ///
   /// 他の要素の場合には NULL を返す．
@@ -56,19 +63,12 @@ public:
   AstFuncDecl*
   func() const;
 
-  /// @brief ラベルステートメントを返す．
+  /// @brief ラベルを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  AstStatement*
-  statement() const;
-
-  /// @brief 名前空間を返す．
-  ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  YmslSubspace*
-  subspace() const;
+  YmslLabel*
+  label() const;
 
 
 private:
@@ -177,21 +177,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class StmtHandle SymHandle.h "SymHandle.h"
-/// @brief AstStatement を保持する SymHandle
+/// @class LabelHandle SymHandle.h "SymHandle.h"
+/// @brief YmslLabel を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class StmtHandle :
+class LabelHandle :
   public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] statement ラベルすてーとめんと
-  StmtHandle(AstStatement* statement);
+  LabelHandle(YmslLabel* statement);
 
   /// @brief デストラクタ
   virtual
-  ~StmtHandle();
+  ~LabelHandle();
 
 
 public:
@@ -204,12 +204,12 @@ public:
   ShString
   name() const;
 
-  /// @brief 関数宣言を返す．
+  /// @brief ラベルを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  AstStatement*
-  statement() const;
+  YmslLabel*
+  label() const;
 
 
 private:
@@ -217,15 +217,15 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ステートメント
-  AstStatement* mStatement;
+  // ラベル
+  YmslLabel* mLabel;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
 /// @class SubspaceHandle SymHandle.h "SymHandle.h"
-/// @brief AstStatement を保持する SymHandle
+/// @brief YmslSubspace を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
 class SubspaceHandle :
   public SymHandle

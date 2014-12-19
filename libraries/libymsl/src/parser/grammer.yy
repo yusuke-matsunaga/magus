@@ -15,9 +15,9 @@
 #include "YmslDriver.h"
 
 #include "AstBlock.h"
-#include "AstCaseItem.h"
+  //#include "AstCaseItem.h"
 #include "AstExpr.h"
-#include "AstIfBlock.h"
+  //#include "AstIfBlock.h"
 #include "AstVarDecl.h"
 
 
@@ -163,8 +163,8 @@ fr_merge(const FileRegion fr_array[],
 %type <expr_type> expr_list
 %type <expr_type> init_expr
 %type <expr_type> lvalue
-%type <ifblock_type> elif_list
-%type <ifblock_type> else_block
+%type <ifblock_type> if_list
+%type <ifblock_type> if_else_list
 %type <statement_type> block_statement
 %type <statement_type> single_statement
 %type <statement_type> statement
@@ -283,10 +283,9 @@ single_statement
 // 複合文
 block_statement
 // IF 文
-: IF expr statement_block elif_list else_block
+: if_else_list
 {
-  AstIfBlock* top = driver.new_IfBlock($2, $3, FileRegion(@1, @3));
-  $$ = driver.new_If(top, $4, $5, @$);
+  $$ = driver.new_If($1, @$);
 }
 // FOR 文
 | FOR LP single_statement SEMI expr SEMI single_statement RP statement_block
@@ -342,26 +341,25 @@ statement_list
 }
 ;
 
-elif_list
-: // 空
+if_list
+: IF expr statement_block
 {
-  $$ = NULL;
+  $$ = driver.new_IfBlock(NULL, $2, $3, @$);
 }
-| elif_list ELIF expr statement_block
+| if_list ELIF expr statement_block
 {
-  $$ = driver.new_IfBlock($3, $4, FileRegion(@2,@4));
-  $$->set_prev($1);
+  $$ = driver.new_IfBlock($1, $3, $4, FileRegion(@2, @4));
 }
 ;
 
-else_block
-: // 空
+if_else_list
+: if_list
 {
-  $$ = NULL;
+  $$ = $1;
 }
-| ELSE statement_block
+| if_list ELSE statement_block
 {
-  $$ = driver.new_IfBlock(NULL, $2, @$);
+  $$ = driver.new_IfBlock($1, NULL, $3, FileRegion(@2, @3));
 }
 ;
 
@@ -372,13 +370,11 @@ case_list
 }
 | case_list CASE expr COLON statement_block
 {
-  $$ = driver.new_CaseItem($3, $5, FileRegion(@2, @5));
-  $$->set_prev($1);
+  $$ = driver.new_CaseItem($1, $3, $5, FileRegion(@2, @5));
 }
 | case_list DEFAULT COLON statement_block
 {
-  $$ = driver.new_CaseItem(NULL, $4, FileRegion(@2, @4));
-  $$->set_prev($1);
+  $$ = driver.new_CaseItem($1, NULL, $4, FileRegion(@2, @4));
 }
 ;
 

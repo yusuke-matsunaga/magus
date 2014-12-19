@@ -29,10 +29,11 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_YMSL
 
+class YmslCodeList;
 class YmslDriver;
-
 class YmslExecutable;
 class YmslFunc;
+class YmslLabel;
 class YmslModule;
 class YmslObj;
 class YmslSubspace;
@@ -182,6 +183,17 @@ typedef YmslObj* Ymsl_OBJPTR;
 
 /// @brief プログラムのコード
 typedef ymuint32 Ymsl_CODE;
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 値の型
+//////////////////////////////////////////////////////////////////////
+enum ValueType {
+  kIntType,
+  kFloatType,
+  kStringType,
+  kUserType
+};
 
 
 //////////////////////////////////////////////////////////////////////

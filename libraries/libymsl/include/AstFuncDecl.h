@@ -21,6 +21,8 @@ BEGIN_NAMESPACE_YM_YMSL
 class AstFuncDecl :
   public AstDeclBase
 {
+  friend class YmslModule;
+
 public:
 
   /// @brief コンストラクタ
@@ -30,7 +32,7 @@ public:
   /// @param[in] block 本文のブロック
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
-	      AstValueType* type,
+	      ValueType type,
 	      AstVarDecl* param_list,
 	      AstBlock* block,
 	      const FileRegion& loc);
@@ -45,9 +47,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief インデックス番号を返す．
+  ymuint
+  index() const;
+
   /// @brief 出力の型を返す．
-  AstValueType*
-  output_type() const;
+  ValueType
+  type() const;
 
   /// @brief パラメータリストを返す．
   const vector<AstVarDecl*>&
@@ -71,8 +77,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // インデックス番号
+  ymuint mIndex;
+
   // 出力の型
-  AstValueType* mType;
+  ValueType mType;
 
   // パラメータリスト
   vector<AstVarDecl*> mParamList;
