@@ -189,6 +189,8 @@ typedef ymuint32 Ymsl_CODE;
 /// @brief 値の型
 //////////////////////////////////////////////////////////////////////
 enum ValueType {
+  kVoidType,
+  kBooleanType,
   kIntType,
   kFloatType,
   kStringType,

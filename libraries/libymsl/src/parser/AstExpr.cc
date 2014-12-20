@@ -78,14 +78,15 @@ count_size(AstExpr* expr_list)
 END_NONAMESPACE
 
 // @brief コンストラクタ
-// @param[in] func 関数
+// @param[in] func_name 関数名
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstFuncDecl* func,
+AstFuncCall::AstFuncCall(AstSymbol* func_name,
 			 AstExpr* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mFunc(func),
+  mFuncName(func_name),
+  mFunc(NULL),
   mExprList(count_size(expr_list))
 {
   ymuint i = mExprList.size();

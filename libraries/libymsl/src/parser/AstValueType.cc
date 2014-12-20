@@ -8,6 +8,8 @@
 
 
 #include "AstValueType.h"
+#include "AstVoidType.h"
+#include "AstBooleanType.h"
 #include "AstIntType.h"
 #include "AstFloatType.h"
 #include "AstStringType.h"
@@ -30,6 +32,82 @@ AstValueType::AstValueType(const FileRegion& loc) :
 // @brief デストラクタ
 AstValueType::~AstValueType()
 {
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstVoidType
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] loc ファイル位置
+AstVoidType::AstVoidType(const FileRegion& loc) :
+  AstValueType(loc)
+{
+}
+
+// @brief デストラクタ
+AstVoidType::~AstVoidType()
+{
+}
+
+// @brief 単純型の場合に true を返す．
+bool
+AstVoidType::simple_type() const
+{
+  return true;
+}
+
+// @brief 型を得る．
+ValueType
+AstVoidType::value_type() const
+{
+  return kVoidType;
+}
+
+// @brief 値を表す文字列を返す．
+string
+AstVoidType::str() const
+{
+  return string("int");
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstBooleanType
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] loc ファイル位置
+AstBooleanType::AstBooleanType(const FileRegion& loc) :
+  AstValueType(loc)
+{
+}
+
+// @brief デストラクタ
+AstBooleanType::~AstBooleanType()
+{
+}
+
+// @brief 単純型の場合に true を返す．
+bool
+AstBooleanType::simple_type() const
+{
+  return true;
+}
+
+// @brief 型を得る．
+ValueType
+AstBooleanType::value_type() const
+{
+  return kBooleanType;
+}
+
+// @brief 値を表す文字列を返す．
+string
+AstBooleanType::str() const
+{
+  return string("int");
 }
 
 

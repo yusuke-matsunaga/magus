@@ -38,10 +38,14 @@
 #include "AstIntConst.h"
 #include "AstFloatConst.h"
 #include "AstStringConst.h"
+#include "AstVoidType.h"
+#include "AstBooleanType.h"
 #include "AstIntType.h"
 #include "AstFloatType.h"
 #include "AstStringType.h"
 #include "AstUserType.h"
+
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -453,12 +457,8 @@ YmslDriver::new_FuncCall(AstSymbol* symbol,
 			 AstExpr* expr_list,
 			 const FileRegion& loc)
 {
-  AstFuncDecl* func = mCurModule->find_function(symbol->str_val());
-  if ( func == NULL ) {
-    return NULL;
-  }
   void* p = mAlloc.get_memory(sizeof(AstFuncCall));
-  return new (p) AstFuncCall(func, expr_list, loc);
+  return new (p) AstFuncCall(symbol, expr_list, loc);
 }
 
 // @brief 識別子式を作る．
@@ -469,6 +469,13 @@ YmslDriver::new_VarExpr(AstSymbol* symbol)
 {
   AstVarDecl* var_decl = mCurModule->find_var(symbol->str_val());
   if ( var_decl == NULL ) {
+    ostringstream buf;
+    buf << symbol->str_val() << ": Undefined";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    symbol->file_region(),
+		    kMsgError,
+		    "PARS",
+		    buf.str());
     return NULL;
   }
   void* p = mAlloc.get_memory(sizeof(AstVarExpr));
@@ -526,6 +533,24 @@ YmslDriver::new_StringType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstStringType));
   return new (p) AstStringType(loc);
+}
+
+// @brief void型を作る．
+// @param[in] loc ファイル位置
+AstValueType*
+YmslDriver::new_VoidType(const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstVoidType));
+  return new (p) AstVoidType(loc);
+}
+
+// @brief boolean型を作る．
+// @param[in] loc ファイル位置
+AstValueType*
+YmslDriver::new_BooleanType(const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstBooleanType));
+  return new (p) AstBooleanType(loc);
 }
 
 // @brief 整数型を作る．

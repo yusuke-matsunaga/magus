@@ -10,6 +10,7 @@
 
 
 #include "AstExpr.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -24,10 +25,10 @@ class AstFuncCall :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func 関数
+  /// @param[in] func_name 関数名
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstFuncDecl* func,
+  AstFuncCall(AstSymbol* func_name,
 	      AstExpr* expr_list,
 	      const FileRegion& loc);
 
@@ -82,6 +83,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 関数名
+  AstSymbol* mFuncName;
 
   // 関数
   AstFuncDecl* mFunc;

@@ -15,11 +15,10 @@
 #include "YmslDriver.h"
 
 #include "AstBlock.h"
-  //#include "AstCaseItem.h"
 #include "AstExpr.h"
-  //#include "AstIfBlock.h"
 #include "AstVarDecl.h"
 
+#include "../src/parser/AstSymbol.h"
 
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
@@ -134,6 +133,8 @@ fr_merge(const FileRegion fr_array[],
 %token RETURN
 %token VAR
 %token GLOBAL
+%token VOID
+%token BOOLEAN
 %token INT
 %token FLOAT
 %token STRING
@@ -189,13 +190,6 @@ item
 : statement
 {
   driver.add_statement($1);
-}
-// 関数宣言
-| func_head SYMBOL LP param_list RP COLON type SEMI
-{
-  AstFuncDecl* funcdecl = driver.new_FuncDecl($2, $7, $4, @$);
-  driver.pop_block();
-  driver.add_function(funcdecl);
 }
 // 関数定義
 | func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
@@ -382,11 +376,16 @@ lvalue
 : SYMBOL
 {
   $$ = driver.new_VarExpr($1);
+  if ( $$ == NULL ) {
+    YYERROR;
+  }
 }
+/*
 | SYMBOL LBK expr RBK
 {
   $$ = driver.new_ArrayRef($1, $3, @$);
 }
+*/
 ;
 
 param_list
@@ -415,7 +414,15 @@ var_decl
 
 // データ型
 type
-: INT
+: VOID
+{
+  $$ = driver.new_VoidType(@$);
+}
+| BOOLEAN
+{
+  $$ = driver.new_BooleanType(@$);
+}
+| INT
 {
   $$ = driver.new_IntType(@$);
 }
@@ -545,19 +552,18 @@ expr
 {
   $$ = driver.new_VarExpr($1);
   if ( $$ == NULL ) {
-    // 変数が見つからない
+    YYERROR;
   }
 }
+/*
 | SYMBOL LBK expr RBK
 {
   $$ = driver.new_ArrayRef($1, $3, @$);
 }
+*/
 | SYMBOL LP expr_list RP
 {
   $$ = driver.new_FuncCall($1, $3, @$);
-  if ( $$ == NULL ) {
-    // 関数が見つからない
-  }
 }
 | INT_VAL
 {

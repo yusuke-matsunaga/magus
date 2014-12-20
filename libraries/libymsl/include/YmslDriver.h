@@ -311,6 +311,16 @@ public:
   new_StringConst(const char* val,
 		  const FileRegion& loc);
 
+  /// @brief void型を作る．
+  /// @param[in] loc ファイル位置
+  AstValueType*
+  new_VoidType(const FileRegion& loc);
+
+  /// @brief boolean型を作る．
+  /// @param[in] loc ファイル位置
+  AstValueType*
+  new_BooleanType(const FileRegion& loc);
+
   /// @brief 整数型を作る．
   /// @param[in] loc ファイル位置
   AstValueType*
