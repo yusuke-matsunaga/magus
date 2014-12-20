@@ -47,7 +47,7 @@ GzDecoder::open(const char* filename)
   ymuint hsize = mBuff.read(header, sizeof(header));
   if ( hsize != sizeof(header) ||
        header[0] != GZIP_MAGIC0 ||
-       (header[1] != GZIP_MAGIC1) && (header[1] != GZIP_OMAGIC1) ) {
+       ((header[1] != GZIP_MAGIC1) && (header[1] != GZIP_OMAGIC1)) ) {
        // ファイル形式が違う．
     goto error_out;
   }

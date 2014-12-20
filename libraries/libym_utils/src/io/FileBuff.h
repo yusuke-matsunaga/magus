@@ -113,6 +113,9 @@ protected:
   // ファイルディスクリプタ
   int mFd;
 
+  // 最初の読み出しであることを示すフラグ
+  bool mFirstTime;
+
   // flush が必要なことを示すフラグ
   bool mNeedFlush;
 
@@ -147,6 +150,7 @@ FileBuff::FileBuff(ymuint buff_size)
   mBuff = new ymuint8[mBuffSize];
   mDataSize = 0;
   mPos = mBuffSize;
+  mFirstTime = true;
   mNeedFlush = false;
 }
 
@@ -179,6 +183,7 @@ FileBuff::open(const char* filename,
     mPos = 0;
   }
   mDataSize = mBuffSize;
+  mFirstTime = true;
   mNeedFlush = false;
   return mFd >= 0;
 }

@@ -100,6 +100,17 @@ FileBuff::read(ymuint8* buff,
       num1 = mDataSize - mPos;
     }
 
+    // 先頭の BOM マークを検出
+    if ( mFirstTime ) {
+      ASSERT_COND( mPos == 0 );
+      ASSERT_COND( num1 >= 3 );
+      if ( mBuff[0] == 0xEF && mBuff[1] == 0xBB && mBuff[2] == 0xBF ) {
+	mPos += 3;
+	num1 -= 3;
+      }
+      mFirstTime = false;
+    }
+
     // buff に転送する．
     memcpy(reinterpret_cast<void*>(buff),
 	   reinterpret_cast<void*>(mBuff + mPos),
