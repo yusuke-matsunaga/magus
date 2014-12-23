@@ -102,6 +102,9 @@ YmslScanner::scan()
   case ',':
     return COMMA;
 
+  case '?':
+    return QST;
+
   case '+':
     goto ST_PLUS;
 
