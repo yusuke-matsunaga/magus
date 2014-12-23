@@ -134,7 +134,7 @@ public:
   /// @param[in] left 左辺
   /// @param[in] right 右辺
   AstStatement*
-  new_Assignment(AstExpr* left,
+  new_Assignment(AstPrimary* left,
 		 AstExpr* right);
 
   /// @brief if 文を作る．
@@ -266,6 +266,13 @@ public:
 	    AstExpr* left,
 	    AstExpr* right);
 
+  /// @brief ITE演算式を作る．
+  /// @param[in] opr1, opr2, opr3 オペランド
+  AstExpr*
+  new_IteOp(AstExpr* opr1,
+	    AstExpr* opr2,
+	    AstExpr* opr3);
+
   /// @brief 配列参照を作る．
   /// @param[in] id 配列名
   /// @param[in] index インデックス
@@ -311,6 +318,11 @@ public:
   new_StringConst(const char* val,
 		  const FileRegion& loc);
 
+  /// @brief 左辺のプライマリを作る．
+  /// @param[in] symbol 変数名
+  AstPrimary*
+  new_Primary(AstSymbol* symbol);
+
   /// @brief void型を作る．
   /// @param[in] loc ファイル位置
   AstValueType*
@@ -342,9 +354,11 @@ public:
   new_UserType(AstSymbol* type_name);
 
   /// @brief ラベルを作る．
+  /// @param[in] code_list 命令コードを格納する配列
   /// @param[in] name ラベル名
   YmslLabel*
-  new_label(ShString name);
+  new_label(YmslCodeList& code_list,
+	    ShString name = ShString());
 
 
 private:

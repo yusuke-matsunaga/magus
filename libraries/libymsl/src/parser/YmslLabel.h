@@ -24,8 +24,10 @@ class YmslLabel
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] code_list 命令コードを収める配列
   /// @param[in] name 名前
-  YmslLabel(ShString name);
+  YmslLabel(YmslCodeList& code_list,
+	    ShString name = ShString());
 
   /// @brief デストラクタ
   ~YmslLabel();
@@ -50,15 +52,18 @@ public:
   place(Ymsl_INT addr);
 
   /// @brief 参照する．
-  /// @param[in] p_ref アドレスを書き込む位置
+  /// @param[in] w_pos アドレスを書き込む位置
   void
-  refer(Ymsl_INT* p_ref);
+  refer(Ymsl_INT w_pos);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 命令コードを収める配列
+  YmslCodeList& mCodeList;
 
   // 名前
   ShString mName;
@@ -70,7 +75,7 @@ private:
   Ymsl_INT mAddr;
 
   // 参照リスト
-  vector<Ymsl_INT*> mRefList;
+  vector<Ymsl_INT> mRefList;
 
 };
 

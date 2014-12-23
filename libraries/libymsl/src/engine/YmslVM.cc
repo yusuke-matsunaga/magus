@@ -8,6 +8,7 @@
 
 
 #include "YmslVM.h"
+#include "YmslCodeList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -30,24 +31,22 @@ YmslVM::~YmslVM()
 // @param[in] code_array コードの配列
 // @param[in] code_size コードサイズ
 void
-YmslVM::execute(const Ymsl_CODE* code_array,
-		Ymsl_INT code_size)
+YmslVM::execute(const YmslCodeList& code_list)
 {
-  for (Ymsl_INT rpos = 0; rpos < code_size; ) {
-    Ymsl_CODE code = code_array[rpos];
-    ++ rpos;
+  for (Ymsl_INT pc = 0; pc < code_list.size(); ) {
+    Ymsl_CODE code = code_list.read_opcode(pc);
 
     switch ( code ) {
     case YMVM_PUSH_INT_IMM:
       {
-	Ymsl_INT val = read_INT(code_array, rpos);
+	Ymsl_INT val = code_list.read_int(pc);
 	push_INT(val);
       }
       break;
 
     case YMVM_PUSH_FLOAT_IMM:
       {
-	Ymsl_FLOAT val = read_FLOAT(code_array, rpos);
+	Ymsl_FLOAT val = code_list.read_float(pc);
 	push_FLOAT(val);
       }
       break;
@@ -66,7 +65,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_LOAD_GLOBAL_INT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = load_global_INT(index);
 	push_INT(val);
       }
@@ -74,7 +73,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_LOAD_GLOBAL_FLOAT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = load_global_FLOAT(index);
 	push_FLOAT(val);
       }
@@ -82,7 +81,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_LOAD_GLOBAL_OBJ:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = load_global_OBJPTR(index);
 	push_OBJPTR(val);
       }
@@ -90,7 +89,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_LOAD_LOCAL_INT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = load_local_INT(index);
 	push_INT(val);
       }
@@ -98,7 +97,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_LOAD_LOCAL_FLOAT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = load_local_FLOAT(index);
 	push_FLOAT(val);
       }
@@ -106,7 +105,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_LOAD_LOCAL_OBJ:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = load_local_OBJPTR(index);
 	push_OBJPTR(val);
       }
@@ -114,7 +113,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_STORE_GLOBAL_INT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = pop_INT();
 	store_global_INT(index, val);
       }
@@ -122,7 +121,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_STORE_GLOBAL_FLOAT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = pop_FLOAT();
 	store_global_FLOAT(index, val);
       }
@@ -130,7 +129,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_STORE_GLOBAL_OBJ:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = pop_OBJPTR();
 	store_global_OBJPTR(index, val);
       }
@@ -138,7 +137,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_STORE_LOCAL_INT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = pop_INT();
 	store_local_INT(index, val);
       }
@@ -146,7 +145,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_STORE_LOCAL_FLOAT:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = pop_FLOAT();
 	store_local_FLOAT(index, val);
       }
@@ -154,7 +153,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_STORE_LOCAL_OBJ:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = pop_OBJPTR();
 	store_local_OBJPTR(index, val);
       }
@@ -162,34 +161,34 @@ YmslVM::execute(const Ymsl_CODE* code_array,
 
     case YMVM_JUMP:
       {
-	Ymsl_INT addr = read_INT(code_array, rpos);
-	rpos = addr;
+	Ymsl_INT addr = code_list.read_int(pc);
+	pc = addr;
       }
       break;
 
     case YMVM_BRANCH_TRUE:
       {
-	Ymsl_INT addr = read_INT(code_array, rpos);
+	Ymsl_INT addr = code_list.read_int(pc);
 	Ymsl_INT cond = pop_INT();
 	if ( code ) {
-	  rpos = addr;
+	  pc = addr;
 	}
       }
       break;
 
     case YMVM_BRANCH_FALSE:
       {
-	Ymsl_INT addr = read_INT(code_array, rpos);
+	Ymsl_INT addr = code_list.read_int(pc);
 	Ymsl_INT cond = pop_INT();
 	if ( !code ) {
-	  rpos = addr;
+	  pc = addr;
 	}
       }
       break;
 
     case YMVM_CALL:
       {
-	Ymsl_INT index = read_INT(code_array, rpos);
+	Ymsl_INT index = code_list.read_int(pc);
       }
       break;
 
@@ -222,18 +221,10 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_INT_BITNEG:
+    case YMVM_INT_NOT:
       {
 	Ymsl_INT val = pop_INT();
 	val = ~val;
-	push_INT(val);
-      }
-      break;
-
-    case YMVM_INT_LOGNOT:
-      {
-	Ymsl_INT val = pop_INT();
-	val = !val;
 	push_INT(val);
       }
       break;
@@ -363,7 +354,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_INT_BITAND:
+    case YMVM_INT_AND:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -372,7 +363,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_INT_BITOR:
+    case YMVM_INT_OR:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -381,29 +372,11 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_INT_BITXOR:
+    case YMVM_INT_XOR:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
 	Ymsl_INT val = val1 ^ val2;
-	push_INT(val);
-      }
-      break;
-
-    case YMVM_INT_LOGAND:
-      {
-	Ymsl_INT val1 = pop_INT();
-	Ymsl_INT val2 = pop_INT();
-	Ymsl_INT val = (val1 && val2);
-	push_INT(val);
-      }
-      break;
-
-    case YMVM_INT_LOGOR:
-      {
-	Ymsl_INT val1 = pop_INT();
-	Ymsl_INT val2 = pop_INT();
-	Ymsl_INT val = (val1 || val2);
 	push_INT(val);
       }
       break;
@@ -561,7 +534,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_OBJ_BITNEG:
+    case YMVM_OBJ_NOT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -718,7 +691,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_OBJ_BITAND:
+    case YMVM_OBJ_AND:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -728,7 +701,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_OBJ_BITOR:
+    case YMVM_OBJ_OR:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -738,7 +711,7 @@ YmslVM::execute(const Ymsl_CODE* code_array,
       }
       break;
 
-    case YMVM_OBJ_BITXOR:
+    case YMVM_OBJ_XOR:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();

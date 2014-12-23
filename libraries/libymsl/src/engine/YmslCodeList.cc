@@ -87,11 +87,18 @@ YmslCodeList::write_objptr(Ymsl_INT& addr,
   addr += sizeof(Ymsl_OBJPTR) / sizeof(Ymsl_CODE);
 }
 
+// @brief サイズを得る．
+Ymsl_INT
+YmslCodeList::size() const
+{
+  return mSize;
+}
+
 // @brief 命令を読みだす．
 // @param[inout] addr アドレス
 // @return 読みだした値を返す．
 Ymsl_CODE
-YmslCodeList::read_opcode(Ymsl_INT& addr)
+YmslCodeList::read_opcode(Ymsl_INT& addr) const
 {
   Ymsl_CODE op = mBody[addr];
   ++ addr;
@@ -102,7 +109,7 @@ YmslCodeList::read_opcode(Ymsl_INT& addr)
 // @param[inout] addr アドレス
 // @return 読みだした値を返す．
 Ymsl_INT
-YmslCodeList::read_int(Ymsl_INT& addr)
+YmslCodeList::read_int(Ymsl_INT& addr) const
 {
   ASSERT_COND( sizeof(Ymsl_INT) == sizeof(Ymsl_CODE) );
   Ymsl_INT val = mBody[addr];
@@ -114,7 +121,7 @@ YmslCodeList::read_int(Ymsl_INT& addr)
 // @param[inout] addr アドレス
 // @return 読みだした値を返す．
 Ymsl_FLOAT
-YmslCodeList::read_float(Ymsl_INT& addr)
+YmslCodeList::read_float(Ymsl_INT& addr) const
 {
   Ymsl_CODE* c_ptr = mBody + addr;
   Ymsl_FLOAT* f_ptr = reinterpret_cast<Ymsl_FLOAT*>(c_ptr);
@@ -127,7 +134,7 @@ YmslCodeList::read_float(Ymsl_INT& addr)
 // @param[inout] addr アドレス
 // @return 読みだした値を返す．
 Ymsl_OBJPTR
-YmslCodeList::read_objptr(Ymsl_INT& addr)
+YmslCodeList::read_objptr(Ymsl_INT& addr) const
 {
   Ymsl_CODE* c_ptr = mBody + addr;
   Ymsl_OBJPTR* o_ptr = reinterpret_cast<Ymsl_OBJPTR*>(c_ptr);

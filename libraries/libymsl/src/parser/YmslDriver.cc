@@ -34,10 +34,12 @@
 #include "AstFuncCall.h"
 #include "AstUniOp.h"
 #include "AstBinOp.h"
+#include "AstIteOp.h"
 #include "AstVarExpr.h"
 #include "AstIntConst.h"
 #include "AstFloatConst.h"
 #include "AstStringConst.h"
+#include "AstPrimary.h"
 #include "AstVoidType.h"
 #include "AstBooleanType.h"
 #include "AstIntType.h"
@@ -236,7 +238,7 @@ YmslDriver::new_FuncDecl(AstSymbol* name,
 // @param[in] left 左辺
 // @param[in] right 右辺
 AstStatement*
-YmslDriver::new_Assignment(AstExpr* left,
+YmslDriver::new_Assignment(AstPrimary* left,
 			   AstExpr* right)
 {
   void* p = mAlloc.get_memory(sizeof(AstAssignment));
@@ -436,6 +438,17 @@ YmslDriver::new_BinOp(TokenType op,
   return new (p) AstBinOp(op, left, right);
 }
 
+// @brief ITE演算式を作る．
+// @param[in] opr1, opr2, opr3 オペランド
+AstExpr*
+YmslDriver::new_IteOp(AstExpr* opr1,
+		      AstExpr* opr2,
+		      AstExpr* opr3)
+{
+  void* p = mAlloc.get_memory(sizeof(AstIteOp));
+  return new (p) AstIteOp(opr1, opr2, opr3);
+}
+
 // @brief 配列参照を作る．
 // @param[in] id 配列名
 // @param[in] index インデックス
@@ -526,6 +539,26 @@ YmslDriver::new_StringConst(const char* val,
   return new (p) AstStringConst(dup_str, loc);
 }
 
+// @brief 左辺のプライマリを作る．
+// @param[in] symbol 変数名
+AstPrimary*
+YmslDriver::new_Primary(AstSymbol* symbol)
+{
+  AstVarDecl* var_decl = mCurModule->find_var(symbol->str_val());
+  if ( var_decl == NULL ) {
+    ostringstream buf;
+    buf << symbol->str_val() << ": Undefined";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    symbol->file_region(),
+		    kMsgError,
+		    "PARS",
+		    buf.str());
+    return NULL;
+  }
+  void* p = mAlloc.get_memory(sizeof(AstPrimary));
+  return new (p) AstPrimary(var_decl, symbol->file_region());
+}
+
 // @brief 文字列型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
@@ -584,10 +617,11 @@ YmslDriver::new_UserType(AstSymbol* type_name)
 // @brief ラベルを作る．
 // @param[in] name ラベル名
 YmslLabel*
-YmslDriver::new_label(ShString name)
+YmslDriver::new_label(YmslCodeList& code_list,
+		      ShString name)
 {
   void* p = mAlloc.get_memory(sizeof(YmslLabel));
-  return new (p) YmslLabel(name);
+  return new (p) YmslLabel(code_list, name);
 }
 
 END_NAMESPACE_YM_YMSL

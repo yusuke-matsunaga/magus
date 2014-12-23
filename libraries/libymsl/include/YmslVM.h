@@ -18,6 +18,8 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief YmslVM の命令コード
 //////////////////////////////////////////////////////////////////////
 enum YmslOpcode {
+  YMVM_NOP,
+
   YMVM_PUSH_INT_IMM,
   YMVM_PUSH_FLOAT_IMM,
   YMVM_PUSH_FLOAT_ZERO,
@@ -50,8 +52,7 @@ enum YmslOpcode {
   YMVM_INT_MINUS,
   YMVM_INT_INC,
   YMVM_INT_DEC,
-  YMVM_INT_BITNEG,
-  YMVM_INT_LOGNOT,
+  YMVM_INT_NOT,
   YMVM_INT_TO_FLOAT,
 
   YMVM_INT_ADD,
@@ -67,11 +68,9 @@ enum YmslOpcode {
   YMVM_INT_LE,
   YMVM_INT_GT,
   YMVM_INT_GE,
-  YMVM_INT_BITAND,
-  YMVM_INT_BITOR,
-  YMVM_INT_BITXOR,
-  YMVM_INT_LOGAND,
-  YMVM_INT_LOGOR,
+  YMVM_INT_AND,
+  YMVM_INT_OR,
+  YMVM_INT_XOR,
 
   YMVM_INT_ITE,
 
@@ -94,7 +93,7 @@ enum YmslOpcode {
   YMVM_OBJ_MINUS,
   YMVM_OBJ_INC,
   YMVM_OBJ_DEC,
-  YMVM_OBJ_BITNEG,
+  YMVM_OBJ_NOT,
   YMVM_OBJ_TO_INT,
   YMVM_OBJ_TO_FLOAT,
 
@@ -111,9 +110,9 @@ enum YmslOpcode {
   YMVM_OBJ_LE,
   YMVM_OBJ_GT,
   YMVM_OBJ_GE,
-  YMVM_OBJ_BITAND,
-  YMVM_OBJ_BITOR,
-  YMVM_OBJ_BITXOR,
+  YMVM_OBJ_AND,
+  YMVM_OBJ_OR,
+  YMVM_OBJ_XOR,
 
   YMVM_OBJ_ITE,
 };
@@ -140,11 +139,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief バイトコードを実行する．
-  /// @param[in] code_array コードの配列
-  /// @param[in] code_size コードサイズ
+  /// @param[in] code_list コードの配列
   void
-  execute(const Ymsl_CODE* code_array,
-	  Ymsl_INT code_size);
+  execute(const YmslCodeList& code_list);
 
 
 private:

@@ -85,6 +85,9 @@ private:
   // トークン
   TokenType mToken;
 
+  // 型
+  ValueType mType;
+
   // 左オペランド
   AstExpr* mLeft;
 

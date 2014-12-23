@@ -91,7 +91,7 @@ YmslScanner::scan()
     goto ST_INIT;
 
   case '/':
-    goto ST_COMMENT1;
+    goto ST_DIV;
 
   case ':':
     return COLON;
@@ -109,25 +109,25 @@ YmslScanner::scan()
     goto ST_MINUS;
 
   case '*':
-    return MULT;
+    goto ST_MULT;
 
   case '%':
-    return MOD;
+    goto ST_MOD;
 
   case '!':
     goto ST_NOT;
 
   case '&':
-    return BITAND;
+    goto ST_AND;
 
   case '|':
-    return BITOR;
+    goto ST_OR;
 
   case '~':
     return BITNEG;
 
   case '^':
-    return BITXOR;
+    goto ST_XOR;
 
   case '=':
     goto ST_EQ;
@@ -179,6 +179,10 @@ YmslScanner::scan()
 
  ST_PLUS: // '+' を読み込んだ時
   c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQPLUS;
+  }
   if ( c == '+' ) {
     accept();
     return PLUSPLUS;
@@ -187,17 +191,37 @@ YmslScanner::scan()
 
  ST_MINUS: // '-' を読み込んだ時
   c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQMINUS;
+  }
+  if ( c == '-' ) {
+    accept();
+    return MINUSMINUS;
+  }
   if ( isdigit(c) ) {
     accept();
     mCurString.put_char('-');
     mCurString.put_char(c);
     goto ST_NUM1;
   }
-  if ( c == '-' ) {
-    accept();
-    return MINUSMINUS;
-  }
   return MINUS;
+
+ ST_MULT: // '*' を読み込んだ時
+  c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQMULT;
+  }
+  return MULT;
+
+ ST_MOD: // '%' を読み込んだ時
+  c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQMOD;
+  }
+  return MOD;
 
  ST_NOT: // '!' を読み込んだ時
   c = peek();
@@ -216,6 +240,30 @@ YmslScanner::scan()
     return ERROR;
   }
 
+ ST_AND: // '&' を読み込んだ時
+  c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQBITAND;
+  }
+  return BITAND;
+
+ ST_OR: // '|' を読み込んだ時
+  c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQBITOR;
+  }
+  return BITOR;
+
+ ST_XOR: // '^' を読み込んだ時
+  c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQBITXOR;
+  }
+  return BITXOR;
+
  ST_EQ: // '=' を読み込んだ時
   c = peek();
   if ( c == '=' ) {
@@ -230,6 +278,15 @@ YmslScanner::scan()
     accept();
     return LE;
   }
+  if ( c == '<' ) {
+    accept();
+    c = peek();
+    if ( c == '=' ) {
+      accept();
+      return EQLSHIFT;
+    }
+    return LSHIFT;
+  }
   return LT;
 
  ST_GT: // '>' を読み込んだ時
@@ -237,6 +294,15 @@ YmslScanner::scan()
   if ( c == '=' ) {
     accept();
     return GE;
+  }
+  if ( c == '>' ) {
+    accept();
+    c = peek();
+    if ( c == '=' ) {
+      accept();
+      return EQRSHIFT;
+    }
+    return RSHIFT;
   }
   return GT;
 
@@ -362,8 +428,12 @@ YmslScanner::scan()
   mCurString.put_char(c);
   goto ST_DQ;
 
- ST_COMMENT1: // '/' を読み込んだ直後
+ ST_DIV: // '/' を読み込んだ直後
   c = peek();
+  if ( c == '=' ) {
+    accept();
+    return EQDIV;
+  }
   if ( c == '/' ) { // C++ スタイルのコメント
     accept();
     goto ST_COMMENT2;

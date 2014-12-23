@@ -92,13 +92,14 @@ fr_merge(const FileRegion fr_array[],
 
 // 値を表す型
 %union {
-  AstBlock* block_type;
-  AstCaseItem* caseitem_type;
-  AstExpr* expr_type;
-  AstIfBlock* ifblock_type;
+  AstBlock*     block_type;
+  AstCaseItem*  caseitem_type;
+  AstExpr*      expr_type;
+  AstIfBlock*   ifblock_type;
+  AstPrimary*   primary_type;
   AstStatement* statement_type;
-  AstSymbol* symbol_type;
-  AstVarDecl* vardecl_type;
+  AstSymbol*    symbol_type;
+  AstVarDecl*   vardecl_type;
   AstValueType* valuetype_type;
 }
 
@@ -108,69 +109,85 @@ fr_merge(const FileRegion fr_array[],
 %token SEMI
 %token COMMA
 %token DOT
+%token QST
 %token PLUSPLUS
 %token MINUSMINUS
 %token EQ
+%token EQPLUS
+%token EQMINUS
+%token EQMULT
+%token EQDIV
+%token EQMOD
+%token EQLSHIFT
+%token EQRSHIFT
+%token EQBITAND
+%token EQBITOR
+%token EQBITXOR
 %token LP
 %token RP
 %token LCB
 %token RCB
 %token LBK
 %token RBK
-%token IF
-%token ELSE
-%token ELIF
-%token FOR
-%token WHILE
-%token SWITCH
+
+%token BOOLEAN
+%token BREAK
 %token CASE
+%token CONTINUE
 %token DEFAULT
 %token DO
-%token GOTO
-%token BREAK
-%token CONTINUE
-%token FUNCTION
-%token RETURN
-%token VAR
-%token GLOBAL
-%token VOID
-%token BOOLEAN
-%token INT
+%token ELIF
+%token ELSE
 %token FLOAT
+%token FOR
+%token FUNCTION
+%token GLOBAL
+%token GOTO
+%token IF
+%token IMPORT
+%token INT
+%token RETURN
 %token STRING
+%token SWITCH
+%token VAR
+%token VOID
+%token WHILE
+
 %token <symbol_type> SYMBOL
-%token <expr_type> INT_VAL
-%token <expr_type> FLOAT_VAL
-%token <expr_type> STRING_VAL
+%token <expr_type>   INT_VAL
+%token <expr_type>   FLOAT_VAL
+%token <expr_type>   STRING_VAL
 
 %token DUMMY
 %token ERROR
 
 // 演算子の定義
-%left LOGOR LOGXOR
-%left LOGAND
-%left BITOR BITXOR
-%left BITAND
-%left EQEQ NOTEQ
-%left LT LE GT GE
-%left PLUS MINUS
-%left MULT DIV MOD
-%left LOGNOT BITNEG UOP
+%nonassoc QST
+%nonassoc ITE
+%left     LOGOR
+%left     LOGAND
+%nonassoc LSHIFT RSHIFT
+%left     BITOR BITXOR
+%left     BITAND
+%nonassoc EQEQ NOTEQ LT LE GT GE
+%left     PLUS MINUS
+%left     MULT DIV MOD
+%left     LOGNOT BITNEG UOP
 
 // 非終端の型
-%type <block_type> statement_block
-%type <caseitem_type> case_list
-%type <expr_type> expr
-%type <expr_type> expr_list
-%type <expr_type> init_expr
-%type <expr_type> lvalue
-%type <ifblock_type> if_list
-%type <ifblock_type> if_else_list
+%type <block_type>     statement_block
+%type <caseitem_type>  case_list
+%type <expr_type>      expr
+%type <expr_type>      expr_list
+%type <expr_type>      init_expr
+%type <primary_type>   lvalue
+%type <ifblock_type>   if_list
+%type <ifblock_type>   if_else_list
 %type <statement_type> block_statement
 %type <statement_type> single_statement
 %type <statement_type> statement
 %type <valuetype_type> type
-%type <vardecl_type> var_decl param_list
+%type <vardecl_type>   param param_list
 
 %%
 
@@ -178,7 +195,7 @@ fr_merge(const FileRegion fr_array[],
 
 %start item_list;
 
-// トップレベルの要素リスト
+// 要素のリスト
 item_list
 : // 空
 | item_list item
@@ -198,17 +215,22 @@ item
   driver.pop_block();
   driver.add_function(funcdecl);
 }
-// ローカル変数定義
-| var_decl SEMI
-{
-  driver.add_local_var($1);
-}
 // グローバル変数定義
 | GLOBAL SYMBOL COLON type init_expr SEMI
 {
   AstVarDecl* vardecl = driver.new_VarDecl($2, $4, $5, true, @$);
   driver.add_global_var(vardecl);
 }
+// import 文
+| IMPORT module_name
+{
+}
+;
+
+// モジュール名
+module_name
+: SYMBOL
+| module_name DOT SYMBOL
 ;
 
 // 関数宣言のヘッダ
@@ -221,13 +243,21 @@ func_head
 
 // ステートメント
 statement
+// 単一のステートメント
 : single_statement SEMI
 {
   $$ = $1;
 }
+// ブロックステートメント
 | block_statement
 {
   $$ = $1;
+}
+// ローカル変数定義
+| VAR SYMBOL COLON type init_expr SEMI
+{
+  AstVarDecl* vd = driver.new_VarDecl($2, $4, $5, false, @$);
+  driver.add_local_var(vd);
 }
 // ラベル文
 | SYMBOL COLON
@@ -242,10 +272,22 @@ single_statement
 {
   $$ = driver.new_Assignment($1, $3);
 }
+| lvalue EQPLUS expr
+{
+  $$ = driver.new_Assignment($1, $3);
+}
 // 式文
 | expr
 {
   $$ = driver.new_ExprStmt($1);
+}
+// インクリメント文
+| lvalue PLUSPLUS
+{
+}
+// デクリメント文
+| lvalue MINUSMINUS
+{
 }
 // GOTO 文
 | GOTO SYMBOL
@@ -375,7 +417,7 @@ case_list
 lvalue
 : SYMBOL
 {
-  $$ = driver.new_VarExpr($1);
+  $$ = driver.new_Primary($1);
   if ( $$ == NULL ) {
     YYERROR;
   }
@@ -393,19 +435,19 @@ param_list
 {
   $$ = NULL;
 }
-| var_decl
+| param
 {
   $$ = $1;
 }
-| param_list COMMA var_decl
+| param_list COMMA param
 {
   $$ = $3;
   $$->set_prev($1);
 }
 ;
 
-// 変数宣言
-var_decl
+// パラメータ宣言
+param
 : SYMBOL COLON type init_expr
 {
   $$ = driver.new_VarDecl($1, $3, $4, false, @$);
@@ -468,7 +510,23 @@ expr_list
 ;
 
 expr
-: expr PLUS expr
+: PLUS expr %prec UOP
+{
+  $$ = driver.new_UniOp(PLUS, $2, @$);
+}
+| MINUS expr %prec UOP
+{
+  $$ = driver.new_UniOp(MINUS, $2, @$);
+}
+| BITNEG expr
+{
+  $$ = driver.new_UniOp(BITNEG, $2, @$);
+}
+| LOGNOT expr
+{
+  $$ = driver.new_UniOp(LOGNOT, $2, @$);
+}
+| expr PLUS expr
 {
   $$ = driver.new_BinOp(PLUS, $1, $3);
 }
@@ -488,6 +546,14 @@ expr
 {
   $$ = driver.new_BinOp(MOD, $1, $3);
 }
+| expr LSHIFT expr
+{
+  $$ = driver.new_BinOp(LSHIFT, $1, $3);
+}
+| expr RSHIFT expr
+{
+  $$ = driver.new_BinOp(RSHIFT, $1, $3);
+}
 | expr LOGOR expr
 {
   $$ = driver.new_BinOp(LOGOR, $1, $3);
@@ -495,10 +561,6 @@ expr
 | expr LOGAND expr
 {
   $$ = driver.new_BinOp(LOGAND, $1, $3);
-}
-| LOGNOT expr
-{
-  $$ = driver.new_UniOp(LOGNOT, $2, @$);
 }
 | expr BITAND expr
 {
@@ -508,9 +570,9 @@ expr
 {
   $$ = driver.new_BinOp(BITOR, $1, $3);
 }
-| BITNEG expr
+| expr BITXOR expr
 {
-  $$ = driver.new_UniOp(BITNEG, $2, @$);
+  $$ = driver.new_BinOp(BITXOR, $1, $3);
 }
 | expr EQEQ expr
 {
@@ -536,13 +598,9 @@ expr
 {
   $$ = driver.new_BinOp(GE, $1, $3);
 }
-| PLUS expr %prec UOP
+| expr QST expr COLON expr %prec ITE
 {
-  $$ = driver.new_UniOp(PLUS, $2, @$);
-}
-| MINUS expr %prec UOP
-{
-  $$ = driver.new_UniOp(MINUS, $2, @$);
+  $$ = driver.new_IteOp($1, $3, $5);
 }
 | LP expr RP
 {

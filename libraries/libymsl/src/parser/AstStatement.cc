@@ -26,7 +26,11 @@
 #include "AstExprStmt.h"
 #include "AstBlock.h"
 #include "AstExpr.h"
+#include "AstPrimary.h"
+#include "YmslCodeList.h"
 #include "YmslDriver.h"
+#include "YmslLabel.h"
+#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -87,7 +91,7 @@ AstStatement::label() const
 // @brief コンストラクタ
 // @param[in] left 左辺
 // @param[in] right 右辺
-AstAssignment::AstAssignment(AstExpr* left,
+AstAssignment::AstAssignment(AstPrimary* left,
 			     AstExpr* right) :
   AstStatement(FileRegion(left->file_region(), right->file_region())),
   mLeft(left),
@@ -104,6 +108,9 @@ AstAssignment::~AstAssignment()
 ymuint
 AstAssignment::calc_size()
 {
+  ymuint size = mRight->calc_size();
+  size += 2;
+  return size;
 }
 
 // @brief 命令コードを生成する．
@@ -117,6 +124,11 @@ AstAssignment::compile(YmslDriver& driver,
 		       YmslCodeList& code_list,
 		       Ymsl_INT& addr)
 {
+  mRight->compile(driver, code_list, addr);
+
+  Ymsl_CODE op = mLeft->opcode();
+  code_list.write_opcode(addr, op);
+  code_list.write_int(addr, mLeft->var()->index());
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -189,6 +201,34 @@ AstIf::compile(YmslDriver& driver,
 	       YmslCodeList& code_list,
 	       Ymsl_INT& addr)
 {
+  ymuint n = mIfBlockList.size();
+  vector<Ymsl_INT> addr_list;
+  for (ymuint i = 0; i < n; ++ i) {
+    AstIfBlock* if_block = mIfBlockList[i];
+    AstExpr* cond = if_block->cond();
+    if ( cond != NULL ) {
+      cond->compile(driver, code_list, addr);
+      code_list.write_opcode(addr, YMVM_BRANCH_FALSE);
+      Ymsl_INT label1_addr = addr;
+      code_list.write_int(addr, 0);
+      if_block->compile(driver, code_list, addr);
+      if ( i < n - 1 ) {
+	code_list.write_opcode(addr, YMVM_JUMP);
+	addr_list.push_back(addr);
+	code_list.write_int(addr, 0);
+      }
+      code_list.write_int(label1_addr, addr);
+    }
+    else {
+      ASSERT_COND( i == n - 1 );
+      if_block->compile(driver, code_list, addr);
+    }
+  }
+  for (vector<Ymsl_INT>::iterator p = addr_list.begin();
+       p != addr_list.end(); ++ p) {
+    Ymsl_INT label_addr = *p;
+    code_list.write_int(label_addr, addr);
+  }
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -393,11 +433,15 @@ AstWhile::compile(YmslDriver& driver,
 		  YmslCodeList& code_list,
 		  Ymsl_INT& addr)
 {
-  YmslLabel* label1 = driver.new_label(ShString());
-  // label1 を配置
-  YmslLabel* label2 = driver.new_label(ShString());
+  Ymsl_INT label1 = addr;
   mCond->compile(driver, code_list, addr);
-
+  code_list.write_opcode(addr, YMVM_BRANCH_FALSE);
+  Ymsl_INT label2_addr = addr;
+  code_list.write_int(addr, 0);
+  block()->compile(driver, code_list, addr);
+  code_list.write_opcode(addr, YMVM_JUMP);
+  code_list.write_int(addr, label1);
+  code_list.write_int(label2_addr, addr);
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -458,6 +502,11 @@ AstDoWhile::compile(YmslDriver& driver,
 		    YmslCodeList& code_list,
 		    Ymsl_INT& addr)
 {
+  Ymsl_INT label1 = addr;
+  block()->compile(driver, code_list, addr);
+  mCond->compile(driver, code_list, addr);
+  code_list.write_opcode(addr, YMVM_BRANCH_TRUE);
+  code_list.write_int(addr, label1);
 }
 
 // @brief 内容を表示する．(デバッグ用)

@@ -8,6 +8,7 @@
 
 
 #include "YmslLabel.h"
+#include "YmslCodeList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -17,8 +18,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] code_list 命令コードを収める配列
 // @param[in] name 名前
-YmslLabel::YmslLabel(ShString name) :
+YmslLabel::YmslLabel(YmslCodeList& code_list,
+		     ShString name) :
+  mCodeList(code_list),
   mName(name)
 {
   mPlaced = false;
@@ -51,23 +55,23 @@ YmslLabel::place(Ymsl_INT addr)
   ASSERT_COND( !mPlaced );
   mPlaced = true;
   mAddr = addr;
-  for (vector<Ymsl_INT*>::iterator p = mRefList.begin();
+  for (vector<Ymsl_INT>::iterator p = mRefList.begin();
        p != mRefList.end(); ++ p) {
-    Ymsl_INT* p_ref = *p;
-    *p_ref = addr;
+    Ymsl_INT w_pos = *p;
+    mCodeList.write_int(w_pos, addr);
   }
 }
 
 // @brief 参照する．
-// @param[in] p_ref アドレスを書き込む位置
+// @param[in] w_pos アドレスを書き込む位置
 void
-YmslLabel::refer(Ymsl_INT* p_ref)
+YmslLabel::refer(Ymsl_INT w_pos)
 {
   if ( is_placed() ) {
-    *p_ref = mAddr;
+    mCodeList.write_int(w_pos, mAddr);
   }
   else {
-    mRefList.push_back(p_ref);
+    mRefList.push_back(w_pos);
   }
 }
 

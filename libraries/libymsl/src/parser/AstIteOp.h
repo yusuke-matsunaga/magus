@@ -1,43 +1,56 @@
-#ifndef ASTASSIGNMENT_H
-#define ASTASSIGNMENT_H
+#ifndef ASTITEOP_H
+#define ASTITEOP_H
 
-/// @file AstAssignment.h
-/// @brief AstAssignment のヘッダファイル
+/// @file AstIteOp.h
+/// @brief AstIteOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstStatement.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstAssignment AstAssignment.h "AstAssignment.h"
-/// @brief 代入文を表す AstStatement
+/// @ckass AstIteOp AstIteOp.h "AstIteOp.h"
+/// @brief ITE演算子を表す AstExpr
 //////////////////////////////////////////////////////////////////////
-class AstAssignment :
-  public AstStatement
+class AstIteOp :
+  public AstExpr
 {
 public:
 
-  /// @brief コンストラクタ
-  /// @param[in] left 左辺
-  /// @param[in] right 右辺
-  AstAssignment(AstPrimary* left,
-		AstExpr* right);
+  /// @breif コンストラクタ
+  /// @param[in] opr1, opr2, opr3 オペランド
+  AstIteOp(AstExpr* opr1,
+	   AstExpr* opr2,
+	   AstExpr* opr3);
 
   /// @brief デストラクタ
   virtual
-  ~AstAssignment();
+  ~AstIteOp();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 式の型を解析する．
+  /// @return 引数の方が間違っていたら false を返す．
+  ///
+  /// 結果としてキャスト演算が挿入される場合もある．
+  virtual
+  bool
+  type_analysis();
+
+  /// @brief 式の型を返す．
+  virtual
+  ValueType
+  type();
 
   /// @brief 命令コードのサイズを計算する．
   virtual
@@ -58,11 +71,9 @@ public:
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
   virtual
   void
-  print(ostream& s,
-	ymuint indent = 0) const;
+  print(ostream& s) const;
 
 
 private:
@@ -70,14 +81,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 左辺式
-  AstPrimary* mLeft;
+  // 型
+  ValueType mType;
 
-  // 右辺式
-  AstExpr* mRight;
+  // オペランド
+  AstExpr* mOpr[3];
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTASSIGNMENT_H
+#endif // ASTITEOP_H
