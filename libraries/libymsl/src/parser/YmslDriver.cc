@@ -235,14 +235,16 @@ YmslDriver::new_FuncDecl(AstSymbol* name,
 }
 
 // @brief 代入文を作る．
+// @param[in] token トークン
 // @param[in] left 左辺
 // @param[in] right 右辺
 AstStatement*
-YmslDriver::new_Assignment(AstPrimary* left,
+YmslDriver::new_Assignment(TokenType token,
+			   AstPrimary* left,
 			   AstExpr* right)
 {
   void* p = mAlloc.get_memory(sizeof(AstAssignment));
-  return new (p) AstAssignment(left, right);
+  return new (p) AstAssignment(token, left, right);
 }
 
 // @brief if 文を作る．

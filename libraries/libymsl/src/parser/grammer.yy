@@ -92,6 +92,7 @@ fr_merge(const FileRegion fr_array[],
 
 // 値を表す型
 %union {
+  TokenType     token_type;
   AstBlock*     block_type;
   AstCaseItem*  caseitem_type;
   AstExpr*      expr_type;
@@ -186,6 +187,7 @@ fr_merge(const FileRegion fr_array[],
 %type <statement_type> block_statement
 %type <statement_type> single_statement
 %type <statement_type> statement
+%type <token_type>     eqop
 %type <valuetype_type> type
 %type <vardecl_type>   param param_list
 
@@ -264,17 +266,18 @@ statement
 {
   $$ = driver.new_Label($1, @$);
 }
+// エラー回復用のルール
+| error SEMI
+{
+  yyerrok;
+}
 ;
 
 single_statement
 // 代入文
-: lvalue EQ expr
+: lvalue eqop expr
 {
-  $$ = driver.new_Assignment($1, $3);
-}
-| lvalue EQPLUS expr
-{
-  $$ = driver.new_Assignment($1, $3);
+  $$ = driver.new_Assignment($2, $1, $3);
 }
 // 式文
 | expr
@@ -316,7 +319,24 @@ single_statement
 }
 ;
 
+// 代入文の演算子
+// なんかバカみたいなアクション定義
+eqop
+: EQ       { $$ = EQ; }
+| EQPLUS   { $$ = EQPLUS; }
+| EQMINUS  { $$ = EQMINUS; }
+| EQMULT   { $$ = EQMULT; }
+| EQDIV    { $$ = EQDIV; }
+| EQMOD    { $$ = EQMOD; }
+| EQLSHIFT { $$ = EQLSHIFT; }
+| EQRSHIFT { $$ = EQRSHIFT; }
+| EQBITAND { $$ = EQBITAND; }
+| EQBITOR  { $$ = EQBITOR; }
+| EQBITXOR { $$ = EQBITXOR; }
+;
+
 // 複合文
+// というか末尾にセミコロンがこない文
 block_statement
 // IF 文
 : if_else_list
@@ -377,6 +397,7 @@ statement_list
 }
 ;
 
+// if 〜 elif 〜 のリスト
 if_list
 : IF expr statement_block
 {
@@ -388,6 +409,7 @@ if_list
 }
 ;
 
+// if_list の末尾にオプションで else 〜 がくるもの
 if_else_list
 : if_list
 {
@@ -414,6 +436,7 @@ case_list
 }
 ;
 
+// 左辺値
 lvalue
 : SYMBOL
 {
@@ -430,6 +453,7 @@ lvalue
 */
 ;
 
+// 関数定義の引数リスト
 param_list
 : // 空
 {
@@ -493,23 +517,8 @@ init_expr
 }
 ;
 
-expr_list
-: // 空
-{
-  $$ = NULL;
-}
-| expr
-{
-  $$ = $1;
-}
-| expr_list COMMA expr
-{
-  $$ = $3;
-  $$->set_prev($1);
-}
-;
-
 expr
+// 単項演算
 : PLUS expr %prec UOP
 {
   $$ = driver.new_UniOp(PLUS, $2, @$);
@@ -526,6 +535,7 @@ expr
 {
   $$ = driver.new_UniOp(LOGNOT, $2, @$);
 }
+// 二項演算
 | expr PLUS expr
 {
   $$ = driver.new_BinOp(PLUS, $1, $3);
@@ -554,14 +564,6 @@ expr
 {
   $$ = driver.new_BinOp(RSHIFT, $1, $3);
 }
-| expr LOGOR expr
-{
-  $$ = driver.new_BinOp(LOGOR, $1, $3);
-}
-| expr LOGAND expr
-{
-  $$ = driver.new_BinOp(LOGAND, $1, $3);
-}
 | expr BITAND expr
 {
   $$ = driver.new_BinOp(BITAND, $1, $3);
@@ -573,6 +575,14 @@ expr
 | expr BITXOR expr
 {
   $$ = driver.new_BinOp(BITXOR, $1, $3);
+}
+| expr LOGAND expr
+{
+  $$ = driver.new_BinOp(LOGAND, $1, $3);
+}
+| expr LOGOR expr
+{
+  $$ = driver.new_BinOp(LOGOR, $1, $3);
 }
 | expr EQEQ expr
 {
@@ -634,6 +644,23 @@ expr
 | STRING_VAL
 {
   $$ = $1;
+}
+;
+
+// 式のリスト
+expr_list
+: // 空
+{
+  $$ = NULL;
+}
+| expr
+{
+  $$ = $1;
+}
+| expr_list COMMA expr
+{
+  $$ = $3;
+  $$->set_prev($1);
 }
 ;
 

@@ -555,6 +555,10 @@ AstVarExpr::compile(YmslDriver& driver,
 {
   Ymsl_CODE op;
   switch ( mVar->type() ) {
+  case kVoidType:
+    break;
+
+  case kBooleanType:
   case kIntType:
     if ( mVar->global() ) {
       op = YMVM_LOAD_GLOBAL_INT;

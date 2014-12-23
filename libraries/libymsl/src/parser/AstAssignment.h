@@ -24,9 +24,11 @@ class AstAssignment :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] token トークン
   /// @param[in] left 左辺
   /// @param[in] right 右辺
-  AstAssignment(AstPrimary* left,
+  AstAssignment(TokenType token,
+		AstPrimary* left,
 		AstExpr* right);
 
   /// @brief デストラクタ
@@ -69,6 +71,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // トークン
+  TokenType mToken;
 
   // 左辺式
   AstPrimary* mLeft;

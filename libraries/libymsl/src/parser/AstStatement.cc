@@ -35,6 +35,8 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+#include "grammer.hh"
+
 BEGIN_NONAMESPACE
 
 void
@@ -89,11 +91,14 @@ AstStatement::label() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] token トークン
 // @param[in] left 左辺
 // @param[in] right 右辺
-AstAssignment::AstAssignment(AstPrimary* left,
+AstAssignment::AstAssignment(TokenType token,
+			     AstPrimary* left,
 			     AstExpr* right) :
   AstStatement(FileRegion(left->file_region(), right->file_region())),
+  mToken(token),
   mLeft(left),
   mRight(right)
 {
@@ -140,7 +145,20 @@ AstAssignment::print(ostream& s,
 {
   print_indent(s, indent);
   mLeft->print(s);
-  s << " = ";
+  switch ( mToken ) {
+  case EQ:       s << " = "; break;
+  case EQPLUS:   s << " += "; break;
+  case EQMINUS:  s << " -= "; break;
+  case EQMULT:   s << " *= "; break;
+  case EQDIV:    s << " /= "; break;
+  case EQMOD:    s << " %= "; break;
+  case EQLSHIFT: s << " <<= "; break;
+  case EQRSHIFT: s << " >>= "; break;
+  case EQBITAND: s << " &= "; break;
+  case EQBITOR:  s << " |= "; break;
+  case EQBITXOR: s << " ^= "; break;
+  default: ASSERT_NOT_REACHED;
+  }
   mRight->print(s);
   s << endl;
 }

@@ -131,10 +131,12 @@ public:
 	       const FileRegion& loc);
 
   /// @brief 代入文を作る．
+  /// @param[in] token トークン
   /// @param[in] left 左辺
   /// @param[in] right 右辺
   AstStatement*
-  new_Assignment(AstPrimary* left,
+  new_Assignment(TokenType token,
+		 AstPrimary* left,
 		 AstExpr* right);
 
   /// @brief if 文を作る．
