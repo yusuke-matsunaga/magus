@@ -60,6 +60,7 @@ BEGIN_NAMESPACE_YM_YMSL
 YmslDriver::YmslDriver()
 {
   mScanner = NULL;
+  mDebug = false;
 }
 
 // @brief デストラクタ
@@ -126,7 +127,7 @@ YmslDriver::yylex(YYSTYPE& lval,
   default:
     break;
   }
-  if ( 0 ) {
+  if ( mDebug ) {
     RsrvWordDic dic;
     switch ( id ) {
     case SYMBOL:     cout << "SYMBOL[" << mScanner->cur_string() << "]"; break;

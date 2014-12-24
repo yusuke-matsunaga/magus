@@ -383,6 +383,9 @@ private:
   // 現在のモジュール
   YmslModule* mCurModule;
 
+  // デバッグフラグ
+  bool mDebug;
+
 };
 
 END_NAMESPACE_YM_YMSL
