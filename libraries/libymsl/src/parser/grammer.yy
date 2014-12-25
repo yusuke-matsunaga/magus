@@ -535,6 +535,18 @@ expr
 {
   $$ = driver.new_UniOp(LOGNOT, $2, @$);
 }
+| INT LP expr RP
+{
+  $$ = driver.new_UniOp(INT, $3, @$);
+}
+| BOOLEAN LP expr RP
+{
+  $$ = driver.new_UniOp(BOOLEAN, $3, @$);
+}
+| FLOAT LP expr RP
+{
+  $$ = driver.new_UniOp(FLOAT, $3, @$);
+}
 // 二項演算
 | expr PLUS expr
 {

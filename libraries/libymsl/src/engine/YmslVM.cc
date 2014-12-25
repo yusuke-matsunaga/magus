@@ -229,6 +229,14 @@ YmslVM::execute(const YmslCodeList& code_list)
       }
       break;
 
+    case YMVM_INT_TO_BOOL:
+      {
+	Ymsl_INT val = pop_INT();
+	Ymsl_INT val1 = (val != 0);
+	push_FLOAT(val1);
+      }
+      break;
+
     case YMVM_INT_TO_FLOAT:
       {
 	Ymsl_INT val = pop_INT();
@@ -395,6 +403,14 @@ YmslVM::execute(const YmslCodeList& code_list)
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val = -val1;
+	push_FLOAT(val);
+      }
+      break;
+
+    case YMVM_FLOAT_TO_BOOL:
+      {
+	Ymsl_FLOAT val1 = pop_FLOAT();
+	Ymsl_INT val = (val1 != 0.0);
 	push_FLOAT(val);
       }
       break;

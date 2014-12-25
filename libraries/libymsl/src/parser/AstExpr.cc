@@ -160,6 +160,194 @@ AstFuncCall::print(ostream& s) const
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス AstUniOp
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] token トークン
+// @param[in] opr オペランド
+// @param[in] loc ファイル位置
+AstUniOp::AstUniOp(TokenType token,
+		   AstExpr* opr,
+		   const FileRegion& loc) :
+  AstExpr(FileRegion(loc, opr->file_region())),
+  mToken(token),
+  mOperand(opr)
+{
+}
+
+// @brief デストラクタ
+AstUniOp::~AstUniOp()
+{
+}
+
+// @brief 式の型を解析する．
+// @return 引数の方が間違っていたら false を返す．
+//
+// 結果としてキャスト演算が挿入される場合もある．
+bool
+AstUniOp::type_analysis()
+{
+}
+
+// @brief 式の型を返す．
+ValueType
+AstUniOp::type()
+{
+  return mType;
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstUniOp::calc_size()
+{
+  return mOperand->calc_size() + 1;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstUniOp::compile(YmslDriver& driver,
+		  YmslCodeList& code_list,
+		  Ymsl_INT& addr)
+{
+  mOperand->compile(driver, code_list, addr);
+
+  Ymsl_CODE op = YMVM_NOP;
+  switch ( mType ) {
+  case kVoidType:
+    break;
+
+  case kBooleanType:
+    switch( mToken ) {
+    case LOGNOT: op = YMVM_INT_NOT; break;
+    case BOOLEAN:
+      switch ( mOperand->type() ) {
+      case kVoidType:
+	ASSERT_NOT_REACHED;
+	break;
+
+      case kBooleanType:
+	// なにもしない．
+	break;
+
+      case kIntType:
+	op = YMVM_INT_TO_BOOL;
+	break;
+
+      case kFloatType:
+	op = YMVM_FLOAT_TO_BOOL;
+	break;
+
+      default:
+	ASSERT_NOT_REACHED;
+	break;
+      }
+      break;
+
+    default: ASSERT_NOT_REACHED;
+    }
+    break;
+
+  case kIntType:
+    switch ( mToken ) {
+    case MINUS:  op = YMVM_INT_MINUS; break;
+    case BITNEG: op = YMVM_INT_NOT; break;
+    case INT:
+      switch ( mOperand->type() ) {
+      case kVoidType:
+	ASSERT_NOT_REACHED;
+	break;
+
+      case kBooleanType:
+      case kIntType:
+	// なにもしない．
+	break;
+
+      case kFloatType:
+	op = YMVM_FLOAT_TO_INT;
+	break;
+
+      default:
+	ASSERT_NOT_REACHED;
+	break;
+      }
+      break;
+
+    default: ASSERT_NOT_REACHED;
+    }
+    break;
+
+  case kFloatType:
+    switch ( mToken ) {
+    case MINUS:  op = YMVM_FLOAT_MINUS; break;
+    case FLOAT:
+      switch ( mOperand->type() ) {
+      case kVoidType:
+	ASSERT_NOT_REACHED;
+	break;
+
+      case kBooleanType:
+      case kIntType:
+	op = YMVM_INT_TO_FLOAT;
+	break;
+
+      case kFloatType:
+	// なにもしない．
+	break;
+
+      default:
+	ASSERT_NOT_REACHED;
+	break;
+      }
+      break;
+
+    default: ASSERT_NOT_REACHED;
+    }
+    break;
+
+  case kStringType:
+    break;
+
+  case kUserType:
+    break;
+  }
+  code_list.write_opcode(addr, op);
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+void
+AstUniOp::print(ostream& s) const
+{
+  switch ( mToken ) {
+  case PLUS:    s << "+"; break;
+  case MINUS:   s << "-"; break;
+  case BITNEG:  s << "~"; break;
+  case LOGNOT:  s << "!"; break;
+  case INT:     s << "int("; break;
+  case BOOLEAN: s << "boolean("; break;
+  case FLOAT:   s << "float("; break;
+  default: ASSERT_NOT_REACHED;
+  }
+
+  mOperand->print(s);
+
+  switch ( mToken ) {
+  case INT:
+  case BOOLEAN:
+  case FLOAT:
+    s << ")"; break;
+  default: break;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス AstBinOp
 //////////////////////////////////////////////////////////////////////
 
@@ -386,116 +574,6 @@ AstIteOp::print(ostream& s) const
   mOpr[1]->print(s);
   s << " : ";
   mOpr[2]->print(s);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstUniOp
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] token トークン
-// @param[in] opr オペランド
-// @param[in] loc ファイル位置
-AstUniOp::AstUniOp(TokenType token,
-		   AstExpr* opr,
-		   const FileRegion& loc) :
-  AstExpr(FileRegion(loc, opr->file_region())),
-  mToken(token),
-  mOperand(opr)
-{
-}
-
-// @brief デストラクタ
-AstUniOp::~AstUniOp()
-{
-}
-
-// @brief 式の型を解析する．
-// @return 引数の方が間違っていたら false を返す．
-//
-// 結果としてキャスト演算が挿入される場合もある．
-bool
-AstUniOp::type_analysis()
-{
-}
-
-// @brief 式の型を返す．
-ValueType
-AstUniOp::type()
-{
-  return mType;
-}
-
-// @brief 命令コードのサイズを計算する．
-ymuint
-AstUniOp::calc_size()
-{
-  return mOperand->calc_size() + 1;
-}
-
-// @brief 命令コードを生成する．
-// @param[in] driver ドライバ
-// @param[in] code_list 命令コードの格納先
-// @param[inout] addr 命令コードの現在のアドレス
-//
-// addr の値は更新される．
-void
-AstUniOp::compile(YmslDriver& driver,
-		  YmslCodeList& code_list,
-		  Ymsl_INT& addr)
-{
-  mOperand->compile(driver, code_list, addr);
-
-  Ymsl_CODE op = YMVM_NOP;
-  switch ( mType ) {
-  case kVoidType:
-    break;
-
-  case kBooleanType:
-    switch( mToken ) {
-    case LOGNOT: op = YMVM_INT_NOT; break;
-    default: ASSERT_NOT_REACHED;
-    }
-    break;
-
-  case kIntType:
-    switch ( mToken ) {
-    case MINUS:  op = YMVM_INT_MINUS; break;
-    case BITNEG: op = YMVM_INT_NOT; break;
-    default: ASSERT_NOT_REACHED;
-    }
-    break;
-
-  case kFloatType:
-    switch ( mToken ) {
-    case MINUS:  op = YMVM_FLOAT_MINUS; break;
-    default: ASSERT_NOT_REACHED;
-    }
-    break;
-
-  case kStringType:
-    break;
-
-  case kUserType:
-    break;
-  }
-  code_list.write_opcode(addr, op);
-}
-
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-void
-AstUniOp::print(ostream& s) const
-{
-  switch ( mToken ) {
-  case PLUS:   s << "+"; break;
-  case MINUS:  s << "-"; break;
-  case BITNEG: s << "~"; break;
-  case LOGNOT: s << "!"; break;
-  default: ASSERT_NOT_REACHED;
-  }
-  mOperand->print(s);
 }
 
 
