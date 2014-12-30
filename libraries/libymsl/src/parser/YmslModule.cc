@@ -12,8 +12,6 @@
 #include "AstFuncDecl.h"
 #include "AstVarDecl.h"
 
-#include "../builtin/YmslPrint.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -54,6 +52,40 @@ YmslModule::toplevel_block() const
   return mToplevelBlock;
 }
 
+// @brief 関数のリストを返す．
+const vector<AstFuncDecl*>&
+YmslModule::function_list() const
+{
+  return mFuncList;
+}
+
+// @brief グローバル変数のリストを返す．
+const vector<AstVarDecl*>&
+YmslModule::global_var_list() const
+{
+  return mGlobalVarList;
+}
+
+// @brief 関数を探す．
+// @param[in] name 関数名
+//
+// 見つからなければ NULL を返す．
+AstFuncDecl*
+YmslModule::find_function(ShString name) const
+{
+  return mGlobalDict.find_function(name);
+}
+
+// @brief 変数を探す．
+// @param[in] name 変数名
+//
+// 見つからなければ NULL を返す．
+AstVarDecl*
+YmslModule::find_var(ShString name) const
+{
+  return mGlobalDict.find_vardecl(name);
+}
+
 // @brief 現在のブロックを返す．
 AstBlock*
 YmslModule::cur_block() const
@@ -84,10 +116,8 @@ YmslModule::pop_block()
 void
 YmslModule::add_function(AstFuncDecl* funcdecl)
 {
-  mGlobalDict.add_function(funcdecl);
-  ymuint id = mFuncList.size();
   mFuncList.push_back(funcdecl);
-  funcdecl->mIndex = id;
+  mGlobalDict.add_function(funcdecl);
 }
 
 // @brief グローバル変数を追加する．
@@ -95,48 +125,22 @@ YmslModule::add_function(AstFuncDecl* funcdecl)
 void
 YmslModule::add_global_var(AstVarDecl* vardecl)
 {
-  mGlobalDict.add_vardecl(vardecl);
-  ymuint id = mGlobalVarList.size();
   mGlobalVarList.push_back(vardecl);
-  vardecl->mIndex = id;
+  mGlobalDict.add_vardecl(vardecl);
 }
 
 // @brief 現在のブロックに変数を追加する．
 void
 YmslModule::add_local_var(AstVarDecl* vardecl)
 {
-  mBlockStack.back()->add_vardecl(vardecl);
-  ymuint id = mLocalVarList.size();
-  mLocalVarList.push_back(vardecl);
-  vardecl->mIndex = id;
+  cur_block()->add_vardecl(vardecl);
 }
 
 // @brief 現在のブロックに statement を追加する．
 void
 YmslModule::add_statement(AstStatement* stmt)
 {
-  mBlockStack.back()->add_statement(stmt);
-}
-
-// @brief 関数を探す．
-// @param[in] name 関数名
-//
-// 見つからなければ NULL を返す．
-AstFuncDecl*
-YmslModule::find_function(ShString name) const
-{
-  return mGlobalDict.find_function(name);
-}
-
-// @brief 変数を探す．
-// @param[in] name 変数名
-//
-// 見つからなければ NULL を返す．
-AstVarDecl*
-YmslModule::find_var(ShString name) const
-{
-  AstBlock* block = cur_block();
-  return block->find_vardecl(name);
+  cur_block()->add_statement(stmt);
 }
 
 END_NAMESPACE_YM_YMSL

@@ -40,9 +40,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 次の要素をセットする．
+  void
+  set_next(AstSymbol* next);
+
   /// @brief 文字列型の値を返す．
   ShString
   str_val() const;
+
+  /// @brief 次の要素を得る．
+  ///
+  /// なければ NULL を返す．
+  AstSymbol*
+  next() const;
 
 
 private:
@@ -52,6 +62,9 @@ private:
 
   // 値
   ShString mVal;
+
+  // 次の要素
+  AstSymbol* mNext;
 
 };
 

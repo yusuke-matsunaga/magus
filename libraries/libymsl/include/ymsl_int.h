@@ -36,6 +36,7 @@ class YmslFunc;
 class YmslLabel;
 class YmslModule;
 class YmslObj;
+class YmslParser;
 class YmslSubspace;
 class YmslValueType;
 class YmslVar;

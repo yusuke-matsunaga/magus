@@ -45,6 +45,34 @@ public:
   AstBlock*
   toplevel_block() const;
 
+  /// @brief 関数のリストを返す．
+  const vector<AstFuncDecl*>&
+  function_list() const;
+
+  /// @brief グローバル変数のリストを返す．
+  const vector<AstVarDecl*>&
+  global_var_list() const;
+
+  /// @brief 関数を探す．
+  /// @param[in] name 関数名
+  ///
+  /// 見つからなければ NULL を返す．
+  AstFuncDecl*
+  find_function(ShString name) const;
+
+  /// @brief 変数を探す．
+  /// @param[in] name 変数名
+  ///
+  /// 見つからなければ NULL を返す．
+  AstVarDecl*
+  find_var(ShString name) const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // bison から用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 現在のブロックを返す．
   AstBlock*
   cur_block() const;
@@ -74,20 +102,6 @@ public:
   /// @brief 現在のブロックに statement を追加する．
   void
   add_statement(AstStatement* stmt);
-
-  /// @brief 関数を探す．
-  /// @param[in] name 関数名
-  ///
-  /// 見つからなければ NULL を返す．
-  AstFuncDecl*
-  find_function(ShString name) const;
-
-  /// @brief 変数を探す．
-  /// @param[in] name 変数名
-  ///
-  /// 見つからなければ NULL を返す．
-  AstVarDecl*
-  find_var(ShString name) const;
 
 
 private:

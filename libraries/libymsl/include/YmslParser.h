@@ -1,8 +1,8 @@
-#ifndef YMSLDRIVER_H
-#define YMSLDRIVER_H
+#ifndef YMSLPARSER_H
+#define YMSLPARSER_H
 
-/// @file YmslDriver.h
-/// @brief YmslDriver のヘッダファイル
+/// @file YmslParser.h
+/// @brief YmslParser のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -18,19 +18,22 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+union YYSTYPE;
+class YmslScanner;
+
 //////////////////////////////////////////////////////////////////////
-/// @class YmslDriver YmslDriver.h "YmslDriver.h"
-/// @brief YMSL 用の構文解析器
+/// @class YmslParser YmslParser.h "YmslParser.h"
+/// @brief YMSL のモジュールを表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslDriver
+class YmslParser
 {
 public:
 
   /// @brief コンストラクタ
-  YmslDriver();
+  YmslParser();
 
   /// @brief デストラクタ
-  ~YmslDriver();
+  ~YmslParser();
 
 
 public:
@@ -38,41 +41,49 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 読み込む．
+  /// @brief 一つのソースファイルを読み込む．
   /// @param[in] ido 入力データ
-  /// @return 成功したら true を返す．
+  /// @param[in] module モジュール
+  /// @return 読み込みに成功したら true を返す．
   bool
-  read(IDO& ido);
+  read_source(IDO& ido,
+	      YmslModule* module);
 
   /// @brief トップレベルブロックを返す．
   AstBlock*
   toplevel_block() const;
 
+  /// @brief 関数のリストを返す．
+  const vector<AstFuncDecl*>&
+  function_list() const;
 
-#if 0
+  /// @brief グローバル変数のリストを返す．
+  const vector<AstVarDecl*>&
+  global_var_list() const;
+
+  /// @brief 関数を探す．
+  /// @param[in] name 関数名
+  ///
+  /// 見つからなければ NULL を返す．
+  AstFuncDecl*
+  find_function(ShString name) const;
+
+  /// @brief 変数を探す．
+  /// @param[in] name 変数名
+  ///
+  /// 見つからなければ NULL を返す．
+  AstVarDecl*
+  find_var(ShString name) const;
+
+
 public:
   //////////////////////////////////////////////////////////////////////
-  // yacc/bison で用いる関数
+  // bison から用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief yylex とのインターフェイス
-  /// @param[out] lval 値を格納する変数
-  /// @param[out] lloc 位置情報を格納する変数
-  /// @return 読み込んだトークンの id を返す．
-  int
-  scan(YYSTYPE& lval,
-       FileRegion& lloc);
-
-  /// @brief インポートする．
-  /// @param[in] module_name モジュール名
-  /// @param[in] alias_name エイリアス名
-  void
-  import(AstSymbol* module_name,
-	 AstSymbol* alias_name);
 
   /// @brief 現在のブロックを返す．
   AstBlock*
-  cur_block();
+  cur_block() const;
 
   /// @brief 新しいブロックを作りスタックに積む．
   /// @return 新しいブロックを返す．
@@ -82,6 +93,13 @@ public:
   /// @brief ブロックをスタックから取り去る．
   void
   pop_block();
+
+  /// @brief インポートする．
+  /// @param[in] module_name モジュール名
+  /// @param[in] alias_name エイリアス名
+  void
+  import(AstSymbol* module_name,
+	 AstSymbol* alias_name);
 
   /// @brief 関数を追加する．
   void
@@ -99,9 +117,16 @@ public:
   /// @brief 現在のブロックに statement を追加する．
   void
   add_statement(AstStatement* stmt);
-#endif
 
-#if 0
+  /// @brief yylex とのインターフェイス
+  /// @param[out] lval 値を格納する変数
+  /// @param[out] lloc 位置情報を格納する変数
+  /// @return 読み込んだトークンの id を返す．
+  int
+  scan(YYSTYPE& lval,
+       FileRegion& lloc);
+
+
 public:
   //////////////////////////////////////////////////////////////////////
   // 抽象構文木の部品クラスを作る関数
@@ -367,42 +392,28 @@ public:
   YmslLabel*
   new_label(YmslCodeList& code_list,
 	    ShString name = ShString());
-#endif
 
-#if 0
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 一つのソースファイルを読み込む．
-  /// @param[in] ido 入力データ
-  /// @param[in] module_name モジュール名
-  /// @return 読み込みに成功したら true を返す．
-  bool
-  read_source(IDO& ido,
-	      ShString module_name);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-#if 0
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
   // 字句解析器
   YmslScanner* mScanner;
-#endif
 
-  // 現在のモジュール
-  YmslModule* mCurModule;
+  // モジュール
+  YmslModule* mModule;
+
+  // デバッグフラグ
+  bool mDebug;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-
-#endif // YMSLDRIVER_H
+#endif // YMSLPARSER_H

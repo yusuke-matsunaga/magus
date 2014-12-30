@@ -1,19 +1,21 @@
 
-/// @file YmslDriver.cc
-/// @brief YmslDriver の実装ファイル
+/// @file YmslParser.cc
+/// @brief YmslParser の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslDriver.h"
-#include "YmslScanner.h"
-#include "YmslLabel.h"
-#include "YmslModule.h"
 #include "YmslParser.h"
+#include "YmslScanner.h"
+#include "YmslModule.h"
+#include "AstBlock.h"
+#include "AstFuncDecl.h"
+#include "AstVarDecl.h"
 
-#if 0
+#include "../builtin/YmslPrint.h"
+
 #include "AstSymbol.h"
 #include "AstBlock.h"
 #include "AstVarDecl.h"
@@ -48,86 +50,137 @@
 #include "AstFloatType.h"
 #include "AstStringType.h"
 #include "AstUserType.h"
+#include "YmslLabel.h"
 
 #include "YmUtils/MsgMgr.h"
-#endif
+
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス YmslDriver
+// クラス YmslParser
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslDriver::YmslDriver()
+YmslParser::YmslParser()
 {
+  mScanner = NULL;
+  mModule = NULL;
+
+#if 0
+  YmslFunc* func1 = new YmslPrint(ShString("print"), vector<YmslVar*>(0));
+  mGlobalDict.add_function(func1);
+#endif
+
+  mDebug = false;
 }
 
 // @brief デストラクタ
-YmslDriver::~YmslDriver()
+YmslParser::~YmslParser()
 {
+  // 念の為
+  delete mScanner;
 }
 
-// @brief 読み込む．
-// @param[in] ido 入力データ
-// @return 成功したら true を返す．
-bool
-YmslDriver::read(IDO& ido)
+// @brief トップレベルブロックを返す．
+AstBlock*
+YmslParser::toplevel_block() const
 {
-  YmslModule* module = new YmslModule(ShString("__main__"));
-  mCurModule = module;
-  YmslParser parser;
-  return parser.read_source(ido, mCurModule);
-}
-
-#if 0
-// @brief インポートする．
-// @param[in] module_name モジュール名
-// @param[in] alias_name エイリアス名
-void
-YmslDriver::import(AstSymbol* module_name_sym,
-		   AstSymbol* alias_name_sym)
-{
-  ASSERT_COND( module_name_sym->next() == NULL );
-  ASSERT_COND( alias_name_sym == NULL || alias_name_sym->next() == NULL );
-  ShString module_name = module_name_sym->str_val();
-  ShString alias_name = alias_name_sym != NULL ? alias_name_sym->str_val() : module_name;
-
-  IDO ido;
-  // module_name を探し．ido に結びつける．
-  bool stat = read_source(ido, module_name);
-
+  return mModule->toplevel_block();
 }
 
 // @brief 一つのソースファイルを読み込む．
 // @param[in] ido 入力データ
-// @param[in] module_name モジュール名
+// @param[in] module モジュール
 // @return 読み込みに成功したら true を返す．
 bool
-YmslDriver::read_source(IDO& ido,
-			ShString module_name)
+YmslParser::read_source(IDO& ido,
+			YmslModule* module)
 {
-  int yyparser(YmslDriver&);
+  int yyparser(YmslParser&);
 
   mScanner = new YmslScanner(ido);
-
-  mCurModule = new YmslModule(module_name);
+  mModule = module;
 
   int stat = yyparse(*this);
 
   delete mScanner;
   mScanner = NULL;
 
+  mModule = NULL;
+
   return (stat == 0);
 }
-#endif
 
-#if 0
-// @brief トップレベルブロックを返す．
+// @brief 現在のブロックを返す．
 AstBlock*
-YmslDriver::toplevel_block() const
+YmslParser::cur_block() const
 {
-  return mCurModule->toplevel_block();
+  return mModule->cur_block();
+}
+
+// @brief 新しいブロックを作りスタックに積む．
+// @return 新しいブロックを返す．
+AstBlock*
+YmslParser::push_new_block()
+{
+  return mModule->push_new_block();
+}
+
+// @brief ブロックをスタックから取り去る．
+void
+YmslParser::pop_block()
+{
+  mModule->pop_block();
+}
+
+// @brief インポートする．
+// @param[in] module_name モジュール名
+// @param[in] alias_name エイリアス名
+void
+YmslParser::import(AstSymbol* module_name_sym,
+		   AstSymbol* alias_name_sym)
+{
+#if 0
+  ASSERT_COND( module_name_sym->next() == NULL );
+  ASSERT_COND( alias_name_sym == NULL || alias_name_sym->next() == NULL );
+  ShString module_name = module_name_sym->str_val();
+  ShString alias_name = alias_name_sym != NULL ? alias_name_sym->str_val() : module_name;
+
+  //IDO ido;
+  IDO* p_ido;
+  // module_name を探し．ido に結びつける．
+  bool stat = read_source(*p_ido, module_name);
+#endif
+}
+
+// @brief 関数を追加する．
+void
+YmslParser::add_function(AstFuncDecl* funcdecl)
+{
+  mModule->add_function(funcdecl);
+}
+
+// @brief グローバル変数を追加する．
+// @param[in] vardecl 変数宣言
+void
+YmslParser::add_global_var(AstVarDecl* vardecl)
+{
+  mModule->add_global_var(vardecl);
+}
+
+// @brief 現在のブロックに変数を追加する．
+void
+YmslParser::add_local_var(AstVarDecl* vardecl)
+{
+  mModule->add_local_var(vardecl);
+}
+
+// @brief 現在のブロックに statement を追加する．
+void
+YmslParser::add_statement(AstStatement* stmt)
+{
+  mModule->add_statement(stmt);
 }
 
 // @brief yylex とのインターフェイス
@@ -135,7 +188,7 @@ YmslDriver::toplevel_block() const
 // @param[out] llocp 位置情報を格納する変数
 // @return 読み込んだトークンの id を返す．
 int
-YmslDriver::scan(YYSTYPE& lval,
+YmslParser::scan(YYSTYPE& lval,
 		 FileRegion& lloc)
 {
   int id = mScanner->read_token(lloc);
@@ -175,55 +228,38 @@ YmslDriver::scan(YYSTYPE& lval,
   return id;
 }
 
-// @brief 現在のブロックを返す．
-AstBlock*
-YmslDriver::cur_block()
+// @brief 関数のリストを返す．
+const vector<AstFuncDecl*>&
+YmslParser::function_list() const
 {
-  return mCurModule->cur_block();
+  return mModule->function_list();
 }
 
-// @brief 新しいブロックを作りスタックに積む．
-// @return 新しいブロックを返す．
-AstBlock*
-YmslDriver::push_new_block()
+// @brief グローバル変数のリストを返す．
+const vector<AstVarDecl*>&
+YmslParser::global_var_list() const
 {
-  return mCurModule->push_new_block();
+  return mModule->global_var_list();
 }
 
-// @brief ブロックをスタックから取り去る．
-void
-YmslDriver::pop_block()
+// @brief 関数を探す．
+// @param[in] name 関数名
+//
+// 見つからなければ NULL を返す．
+AstFuncDecl*
+YmslParser::find_function(ShString name) const
 {
-  mCurModule->pop_block();
+  return mModule->find_function(name);
 }
 
-// @brief 関数を追加する．
-void
-YmslDriver::add_function(AstFuncDecl* funcdecl)
+// @brief 変数を探す．
+// @param[in] name 変数名
+//
+// 見つからなければ NULL を返す．
+AstVarDecl*
+YmslParser::find_var(ShString name) const
 {
-  mCurModule->add_function(funcdecl);
-}
-
-// @brief グローバル変数を追加する．
-// @param[in] vardecl 変数宣言
-void
-YmslDriver::add_global_var(AstVarDecl* vardecl)
-{
-  mCurModule->add_global_var(vardecl);
-}
-
-// @brief 現在のブロックに変数を追加する．
-void
-YmslDriver::add_local_var(AstVarDecl* vardecl)
-{
-  mCurModule->add_local_var(vardecl);
-}
-
-// @brief 現在のブロックに statement を追加する．
-void
-YmslDriver::add_statement(AstStatement* stmt)
-{
-  mCurModule->add_statement(stmt);
+  return mModule->find_var(name);
 }
 
 // @brief 変数宣言を作る．
@@ -233,7 +269,7 @@ YmslDriver::add_statement(AstStatement* stmt)
 // @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstVarDecl*
-YmslDriver::new_VarDecl(AstSymbol* name,
+YmslParser::new_VarDecl(AstSymbol* name,
 			AstValueType* type,
 			AstExpr* init_expr,
 			bool global,
@@ -254,7 +290,7 @@ YmslDriver::new_VarDecl(AstSymbol* name,
 // @param[in] block 本体のブロック
 // @param[in] loc ファイル位置
 AstFuncDecl*
-YmslDriver::new_FuncDecl(AstSymbol* name,
+YmslParser::new_FuncDecl(AstSymbol* name,
 			 AstValueType* type,
 			 AstVarDecl* param_list,
 			 const FileRegion& loc)
@@ -273,7 +309,7 @@ YmslDriver::new_FuncDecl(AstSymbol* name,
 // @param[in] left 左辺
 // @param[in] right 右辺
 AstStatement*
-YmslDriver::new_Assignment(TokenType token,
+YmslParser::new_Assignment(TokenType token,
 			   AstPrimary* left,
 			   AstExpr* right)
 {
@@ -285,7 +321,7 @@ YmslDriver::new_Assignment(TokenType token,
 // @param[in] if_list IfBlock のリスト
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_If(AstIfBlock* if_list,
+YmslParser::new_If(AstIfBlock* if_list,
 		   const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIf));
@@ -298,7 +334,7 @@ YmslDriver::new_If(AstIfBlock* if_list,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstIfBlock*
-YmslDriver::new_IfBlock(AstIfBlock* prev,
+YmslParser::new_IfBlock(AstIfBlock* prev,
 			AstExpr* cond,
 			AstBlock* block,
 			const FileRegion& loc)
@@ -314,7 +350,7 @@ YmslDriver::new_IfBlock(AstIfBlock* prev,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_For(AstStatement* init,
+YmslParser::new_For(AstStatement* init,
 		    AstExpr* cond,
 		    AstStatement* next,
 		    AstBlock* block,
@@ -329,7 +365,7 @@ YmslDriver::new_For(AstStatement* init,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_While(AstExpr* cond,
+YmslParser::new_While(AstExpr* cond,
 		      AstBlock* block,
 		      const FileRegion& loc)
 {
@@ -342,7 +378,7 @@ YmslDriver::new_While(AstExpr* cond,
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_DoWhile(AstBlock* block,
+YmslParser::new_DoWhile(AstBlock* block,
 			AstExpr* cond,
 			const FileRegion& loc)
 {
@@ -355,7 +391,7 @@ YmslDriver::new_DoWhile(AstBlock* block,
 // @param[in] case_list caseリスト
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_Switch(AstExpr* expr,
+YmslParser::new_Switch(AstExpr* expr,
 		       AstCaseItem* case_list,
 		       const FileRegion& loc)
 {
@@ -369,7 +405,7 @@ YmslDriver::new_Switch(AstExpr* expr,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstCaseItem*
-YmslDriver::new_CaseItem(AstCaseItem* prev,
+YmslParser::new_CaseItem(AstCaseItem* prev,
 			 AstExpr* label,
 			 AstBlock* block,
 			 const FileRegion& loc)
@@ -382,7 +418,7 @@ YmslDriver::new_CaseItem(AstCaseItem* prev,
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_Goto(AstSymbol* label,
+YmslParser::new_Goto(AstSymbol* label,
 		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstGoto));
@@ -393,7 +429,7 @@ YmslDriver::new_Goto(AstSymbol* label,
 // @param[in] label ラベル
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_Label(AstSymbol* label,
+YmslParser::new_Label(AstSymbol* label,
 		      const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstLabel));
@@ -403,7 +439,7 @@ YmslDriver::new_Label(AstSymbol* label,
 // @brief break 文を作る．
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_Break(const FileRegion& loc)
+YmslParser::new_Break(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBreak));
   return new (p) AstBreak(loc);
@@ -412,7 +448,7 @@ YmslDriver::new_Break(const FileRegion& loc)
 // @brief continue 文を作る．
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_Continue(const FileRegion& loc)
+YmslParser::new_Continue(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstContinue));
   return new (p) AstContinue(loc);
@@ -422,7 +458,7 @@ YmslDriver::new_Continue(const FileRegion& loc)
 // @param[in] expr 値
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_Return(AstExpr* expr,
+YmslParser::new_Return(AstExpr* expr,
 		       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstReturn));
@@ -433,7 +469,7 @@ YmslDriver::new_Return(AstExpr* expr,
 // @param[in] block 本体
 // @param[in] loc ファイル位置
 AstStatement*
-YmslDriver::new_BlockStmt(AstBlock* block,
+YmslParser::new_BlockStmt(AstBlock* block,
 			  const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBlockStmt));
@@ -443,7 +479,7 @@ YmslDriver::new_BlockStmt(AstBlock* block,
 // @brief 式文を作る．
 // @param[in] expr 式
 AstStatement*
-YmslDriver::new_ExprStmt(AstExpr* expr)
+YmslParser::new_ExprStmt(AstExpr* expr)
 {
   void* p = mAlloc.get_memory(sizeof(AstExprStmt));
   return new (p) AstExprStmt(expr);
@@ -454,7 +490,7 @@ YmslDriver::new_ExprStmt(AstExpr* expr)
 // @param[in] left オペランド
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_UniOp(TokenType op,
+YmslParser::new_UniOp(TokenType op,
 		      AstExpr* left,
 		      const FileRegion& loc)
 {
@@ -466,7 +502,7 @@ YmslDriver::new_UniOp(TokenType op,
 // @param[in] op 演算子のトークン
 // @param[in] left, right オペランド
 AstExpr*
-YmslDriver::new_BinOp(TokenType op,
+YmslParser::new_BinOp(TokenType op,
 		      AstExpr* left,
 		      AstExpr* right)
 {
@@ -477,7 +513,7 @@ YmslDriver::new_BinOp(TokenType op,
 // @brief ITE演算式を作る．
 // @param[in] opr1, opr2, opr3 オペランド
 AstExpr*
-YmslDriver::new_IteOp(AstExpr* opr1,
+YmslParser::new_IteOp(AstExpr* opr1,
 		      AstExpr* opr2,
 		      AstExpr* opr3)
 {
@@ -490,7 +526,7 @@ YmslDriver::new_IteOp(AstExpr* opr1,
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_ArrayRef(AstSymbol* id,
+YmslParser::new_ArrayRef(AstSymbol* id,
 			 AstExpr* index,
 			 const FileRegion& loc)
 {
@@ -502,7 +538,7 @@ YmslDriver::new_ArrayRef(AstSymbol* id,
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_FuncCall(AstSymbol* symbol,
+YmslParser::new_FuncCall(AstSymbol* symbol,
 			 AstExpr* expr_list,
 			 const FileRegion& loc)
 {
@@ -514,9 +550,9 @@ YmslDriver::new_FuncCall(AstSymbol* symbol,
 // @param[in] symbol 値
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_VarExpr(AstSymbol* symbol)
+YmslParser::new_VarExpr(AstSymbol* symbol)
 {
-  AstVarDecl* var_decl = mCurModule->find_var(symbol->str_val());
+  AstVarDecl* var_decl = find_var(symbol->str_val());
   if ( var_decl == NULL ) {
     ostringstream buf;
     buf << symbol->str_val() << ": Undefined";
@@ -535,7 +571,7 @@ YmslDriver::new_VarExpr(AstSymbol* symbol)
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_IntConst(int val,
+YmslParser::new_IntConst(int val,
 			 const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIntConst));
@@ -546,7 +582,7 @@ YmslDriver::new_IntConst(int val,
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_FloatConst(double val,
+YmslParser::new_FloatConst(double val,
 			   const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFloatConst));
@@ -557,7 +593,7 @@ YmslDriver::new_FloatConst(double val,
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-YmslDriver::new_StringConst(const char* val,
+YmslParser::new_StringConst(const char* val,
 			    const FileRegion& loc)
 {
   ymuint n = 0;
@@ -578,9 +614,9 @@ YmslDriver::new_StringConst(const char* val,
 // @brief 左辺のプライマリを作る．
 // @param[in] symbol 変数名
 AstPrimary*
-YmslDriver::new_Primary(AstSymbol* symbol)
+YmslParser::new_Primary(AstSymbol* symbol)
 {
-  AstVarDecl* var_decl = mCurModule->find_var(symbol->str_val());
+  AstVarDecl* var_decl = find_var(symbol->str_val());
   if ( var_decl == NULL ) {
     ostringstream buf;
     buf << symbol->str_val() << ": Undefined";
@@ -598,7 +634,7 @@ YmslDriver::new_Primary(AstSymbol* symbol)
 // @brief 文字列型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-YmslDriver::new_StringType(const FileRegion& loc)
+YmslParser::new_StringType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstStringType));
   return new (p) AstStringType(loc);
@@ -607,7 +643,7 @@ YmslDriver::new_StringType(const FileRegion& loc)
 // @brief void型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-YmslDriver::new_VoidType(const FileRegion& loc)
+YmslParser::new_VoidType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstVoidType));
   return new (p) AstVoidType(loc);
@@ -616,7 +652,7 @@ YmslDriver::new_VoidType(const FileRegion& loc)
 // @brief boolean型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-YmslDriver::new_BooleanType(const FileRegion& loc)
+YmslParser::new_BooleanType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBooleanType));
   return new (p) AstBooleanType(loc);
@@ -625,7 +661,7 @@ YmslDriver::new_BooleanType(const FileRegion& loc)
 // @brief 整数型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-YmslDriver::new_IntType(const FileRegion& loc)
+YmslParser::new_IntType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIntType));
   return new (p) AstIntType(loc);
@@ -634,7 +670,7 @@ YmslDriver::new_IntType(const FileRegion& loc)
 // @brief 浮動小数点型を作る．
 // @param[in] loc ファイル位置
 AstValueType*
-YmslDriver::new_FloatType(const FileRegion& loc)
+YmslParser::new_FloatType(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFloatType));
   return new (p) AstFloatType(loc);
@@ -644,7 +680,7 @@ YmslDriver::new_FloatType(const FileRegion& loc)
 // @param[in] type_name 型名
 // @param[in] loc ファイル位置
 AstValueType*
-YmslDriver::new_UserType(AstSymbol* type_name)
+YmslParser::new_UserType(AstSymbol* type_name)
 {
   void* p = mAlloc.get_memory(sizeof(AstUserType));
   return new (p) AstUserType(type_name);
@@ -653,12 +689,11 @@ YmslDriver::new_UserType(AstSymbol* type_name)
 // @brief ラベルを作る．
 // @param[in] name ラベル名
 YmslLabel*
-YmslDriver::new_label(YmslCodeList& code_list,
+YmslParser::new_label(YmslCodeList& code_list,
 		      ShString name)
 {
   void* p = mAlloc.get_memory(sizeof(YmslLabel));
   return new (p) YmslLabel(code_list, name);
 }
-#endif
 
 END_NAMESPACE_YM_YMSL

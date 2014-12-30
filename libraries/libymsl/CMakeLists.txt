@@ -33,6 +33,7 @@ set (ymsl_SOURCES
   src/parser/YmslDriver.cc
   src/parser/YmslLabel.cc
   src/parser/YmslModule.cc
+  src/parser/YmslParser.cc
   src/parser/YmslScanner.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc

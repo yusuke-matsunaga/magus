@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "YmslScanner.h"
-#include "RsrvWordDic.h"
+#include "../src/parser/YmslScanner.h"
+#include "../src/parser/RsrvWordDic.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"

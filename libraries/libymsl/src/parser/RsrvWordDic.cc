@@ -68,6 +68,7 @@ STpair init_data[] = {
   { "<=",       LE         },
   { ">=",       GE         },
 
+  { "as",       AS         },
   { "boolean",  BOOLEAN    },
   { "break",    BREAK      },
   { "case",     CASE       },

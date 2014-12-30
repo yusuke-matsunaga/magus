@@ -12,7 +12,7 @@
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 
-#include "YmslDriver.h"
+#include "YmslParser.h"
 
 #include "AstBlock.h"
 #include "AstExpr.h"
@@ -37,12 +37,12 @@ BEGIN_NAMESPACE_YM_YMSL
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      YmslDriver&);
+      YmslParser&);
 
 // エラー報告関数
 int
 yyerror(YYLTYPE*,
-	YmslDriver&,
+	YmslParser&,
 	const char*);
 
 
@@ -85,10 +85,10 @@ fr_merge(const FileRegion fr_array[],
 %locations
 
 // yyparse の引数
-%parse-param {YmslDriver& driver}
+%parse-param {YmslParser& parser}
 
 // yylex の引数
-%lex-param {YmslDriver& driver}
+%lex-param {YmslParser& parser}
 
 // 値を表す型
 %union {
@@ -131,6 +131,7 @@ fr_merge(const FileRegion fr_array[],
 %token LBK
 %token RBK
 
+%token AS
 %token BOOLEAN
 %token BREAK
 %token CASE
@@ -187,6 +188,7 @@ fr_merge(const FileRegion fr_array[],
 %type <statement_type> block_statement
 %type <statement_type> single_statement
 %type <statement_type> statement
+%type <symbol_type>    identifier
 %type <token_type>     eqop
 %type <valuetype_type> type
 %type <vardecl_type>   param param_list
@@ -208,38 +210,50 @@ item_list
 item
 : statement
 {
-  driver.add_statement($1);
+  parser.add_statement($1);
 }
 // 関数定義
 | func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
 {
-  AstFuncDecl* funcdecl = driver.new_FuncDecl($2, $7, $4, @$);
-  driver.pop_block();
-  driver.add_function(funcdecl);
+  AstFuncDecl* funcdecl = parser.new_FuncDecl($2, $7, $4, @$);
+  parser.pop_block();
+  parser.add_function(funcdecl);
 }
 // グローバル変数定義
 | GLOBAL SYMBOL COLON type init_expr SEMI
 {
-  AstVarDecl* vardecl = driver.new_VarDecl($2, $4, $5, true, @$);
-  driver.add_global_var(vardecl);
+  AstVarDecl* vardecl = parser.new_VarDecl($2, $4, $5, true, @$);
+  parser.add_global_var(vardecl);
 }
 // import 文
-| IMPORT module_name
-{
-}
+| import_stmt
 ;
 
-// モジュール名
-module_name
-: SYMBOL
-| module_name DOT SYMBOL
+// import 文
+import_stmt
+: IMPORT SYMBOL
+{
+  parser.import($2, NULL);
+}
+| IMPORT SYMBOL AS SYMBOL
+{
+  parser.import($2, $4);
+}
+| import_stmt COMMA SYMBOL
+{
+  parser.import($3, NULL);
+}
+| import_stmt COMMA SYMBOL AS SYMBOL
+{
+  parser.import($3, $5);
+}
 ;
 
 // 関数宣言のヘッダ
 func_head
 : FUNCTION
 {
-  driver.push_new_block();
+  parser.push_new_block();
 }
 ;
 
@@ -258,13 +272,13 @@ statement
 // ローカル変数定義
 | VAR SYMBOL COLON type init_expr SEMI
 {
-  AstVarDecl* vd = driver.new_VarDecl($2, $4, $5, false, @$);
-  driver.add_local_var(vd);
+  AstVarDecl* vd = parser.new_VarDecl($2, $4, $5, false, @$);
+  parser.add_local_var(vd);
 }
 // ラベル文
 | SYMBOL COLON
 {
-  $$ = driver.new_Label($1, @$);
+  $$ = parser.new_Label($1, @$);
 }
 // エラー回復用のルール
 | error SEMI
@@ -277,12 +291,12 @@ single_statement
 // 代入文
 : lvalue eqop expr
 {
-  $$ = driver.new_Assignment($2, $1, $3);
+  $$ = parser.new_Assignment($2, $1, $3);
 }
 // 式文
 | expr
 {
-  $$ = driver.new_ExprStmt($1);
+  $$ = parser.new_ExprStmt($1);
 }
 // インクリメント文
 | lvalue PLUSPLUS
@@ -295,27 +309,27 @@ single_statement
 // GOTO 文
 | GOTO SYMBOL
 {
-  $$ = driver.new_Goto($2, @$);
+  $$ = parser.new_Goto($2, @$);
 }
 // BREAK 文
 | BREAK
 {
-  $$ = driver.new_Break(@$);
+  $$ = parser.new_Break(@$);
 }
 // CONTINUE 文
 | CONTINUE
 {
-  $$ = driver.new_Continue(@$);
+  $$ = parser.new_Continue(@$);
 }
 // RETURN 文(引数なし)
 | RETURN
 {
-  $$ = driver.new_Return(NULL, @$);
+  $$ = parser.new_Return(NULL, @$);
 }
 // RETURN 文(引数あり)
 | RETURN expr
 {
-  $$ = driver.new_Return($2, @$);
+  $$ = parser.new_Return($2, @$);
 }
 ;
 
@@ -341,32 +355,32 @@ block_statement
 // IF 文
 : if_else_list
 {
-  $$ = driver.new_If($1, @$);
+  $$ = parser.new_If($1, @$);
 }
 // FOR 文
 | FOR LP single_statement SEMI expr SEMI single_statement RP statement_block
 {
-  $$ = driver.new_For($3, $5, $7, $9, @$);
+  $$ = parser.new_For($3, $5, $7, $9, @$);
 }
 // WHILE 文
 | WHILE LP expr RP statement_block
 {
-  $$ = driver.new_While($3, $5, @$);
+  $$ = parser.new_While($3, $5, @$);
 }
 // DO-WHILE 文
 | DO statement_block WHILE LP expr RP
 {
-  $$ = driver.new_DoWhile($2, $5, @$);
+  $$ = parser.new_DoWhile($2, $5, @$);
 }
 // SWITCH 文
 | SWITCH expr LCB case_list RCB
 {
-  $$ = driver.new_Switch($2, $4, @$);
+  $$ = parser.new_Switch($2, $4, @$);
 }
 // ブロック文
 | statement_block
 {
-  $$ = driver.new_BlockStmt($1, @$);
+  $$ = parser.new_BlockStmt($1, @$);
 }
 ;
 
@@ -374,8 +388,8 @@ block_statement
 statement_block
 : stmt_begin statement_list RCB
 {
-  $$ = driver.cur_block();
-  driver.pop_block();
+  $$ = parser.cur_block();
+  parser.pop_block();
 }
 ;
 
@@ -385,7 +399,7 @@ statement_block
 stmt_begin
 : LCB
 {
-  driver.push_new_block();
+  parser.push_new_block();
 }
 ;
 
@@ -393,7 +407,7 @@ statement_list
 : // 空
 | statement_list statement
 {
-  driver.add_statement($2);
+  parser.add_statement($2);
 }
 ;
 
@@ -401,11 +415,11 @@ statement_list
 if_list
 : IF expr statement_block
 {
-  $$ = driver.new_IfBlock(NULL, $2, $3, @$);
+  $$ = parser.new_IfBlock(NULL, $2, $3, @$);
 }
 | if_list ELIF expr statement_block
 {
-  $$ = driver.new_IfBlock($1, $3, $4, FileRegion(@2, @4));
+  $$ = parser.new_IfBlock($1, $3, $4, FileRegion(@2, @4));
 }
 ;
 
@@ -417,7 +431,7 @@ if_else_list
 }
 | if_list ELSE statement_block
 {
-  $$ = driver.new_IfBlock($1, NULL, $3, FileRegion(@2, @3));
+  $$ = parser.new_IfBlock($1, NULL, $3, FileRegion(@2, @3));
 }
 ;
 
@@ -428,27 +442,27 @@ case_list
 }
 | case_list CASE expr COLON statement_block
 {
-  $$ = driver.new_CaseItem($1, $3, $5, FileRegion(@2, @5));
+  $$ = parser.new_CaseItem($1, $3, $5, FileRegion(@2, @5));
 }
 | case_list DEFAULT COLON statement_block
 {
-  $$ = driver.new_CaseItem($1, NULL, $4, FileRegion(@2, @4));
+  $$ = parser.new_CaseItem($1, NULL, $4, FileRegion(@2, @4));
 }
 ;
 
 // 左辺値
 lvalue
-: SYMBOL
+: identifier
 {
-  $$ = driver.new_Primary($1);
+  $$ = parser.new_Primary($1);
   if ( $$ == NULL ) {
     YYERROR;
   }
 }
 /*
-| SYMBOL LBK expr RBK
+| identifier LBK expr RBK
 {
-  $$ = driver.new_ArrayRef($1, $3, @$);
+  $$ = parser.new_ArrayRef($1, $3, @$);
 }
 */
 ;
@@ -474,7 +488,7 @@ param_list
 param
 : SYMBOL COLON type init_expr
 {
-  $$ = driver.new_VarDecl($1, $3, $4, false, @$);
+  $$ = parser.new_VarDecl($1, $3, $4, false, @$);
 }
 ;
 
@@ -482,27 +496,27 @@ param
 type
 : VOID
 {
-  $$ = driver.new_VoidType(@$);
+  $$ = parser.new_VoidType(@$);
 }
 | BOOLEAN
 {
-  $$ = driver.new_BooleanType(@$);
+  $$ = parser.new_BooleanType(@$);
 }
 | INT
 {
-  $$ = driver.new_IntType(@$);
+  $$ = parser.new_IntType(@$);
 }
 | FLOAT
 {
-  $$ = driver.new_FloatType(@$);
+  $$ = parser.new_FloatType(@$);
 }
 | STRING
 {
-  $$ = driver.new_StringType(@$);
+  $$ = parser.new_StringType(@$);
 }
 | SYMBOL
 {
-  $$ = driver.new_UserType($1);
+  $$ = parser.new_UserType($1);
 }
 ;
 
@@ -521,129 +535,129 @@ expr
 // 単項演算
 : PLUS expr %prec UOP
 {
-  $$ = driver.new_UniOp(PLUS, $2, @$);
+  $$ = parser.new_UniOp(PLUS, $2, @$);
 }
 | MINUS expr %prec UOP
 {
-  $$ = driver.new_UniOp(MINUS, $2, @$);
+  $$ = parser.new_UniOp(MINUS, $2, @$);
 }
 | BITNEG expr
 {
-  $$ = driver.new_UniOp(BITNEG, $2, @$);
+  $$ = parser.new_UniOp(BITNEG, $2, @$);
 }
 | LOGNOT expr
 {
-  $$ = driver.new_UniOp(LOGNOT, $2, @$);
+  $$ = parser.new_UniOp(LOGNOT, $2, @$);
 }
 | INT LP expr RP
 {
-  $$ = driver.new_UniOp(INT, $3, @$);
+  $$ = parser.new_UniOp(INT, $3, @$);
 }
 | BOOLEAN LP expr RP
 {
-  $$ = driver.new_UniOp(BOOLEAN, $3, @$);
+  $$ = parser.new_UniOp(BOOLEAN, $3, @$);
 }
 | FLOAT LP expr RP
 {
-  $$ = driver.new_UniOp(FLOAT, $3, @$);
+  $$ = parser.new_UniOp(FLOAT, $3, @$);
 }
 // 二項演算
 | expr PLUS expr
 {
-  $$ = driver.new_BinOp(PLUS, $1, $3);
+  $$ = parser.new_BinOp(PLUS, $1, $3);
 }
 | expr MINUS expr
 {
-  $$ = driver.new_BinOp(MINUS, $1, $3);
+  $$ = parser.new_BinOp(MINUS, $1, $3);
 }
 | expr MULT expr
 {
-  $$ = driver.new_BinOp(MULT, $1, $3);
+  $$ = parser.new_BinOp(MULT, $1, $3);
 }
 | expr DIV expr
 {
-  $$ = driver.new_BinOp(DIV, $1, $3);
+  $$ = parser.new_BinOp(DIV, $1, $3);
 }
 | expr MOD expr
 {
-  $$ = driver.new_BinOp(MOD, $1, $3);
+  $$ = parser.new_BinOp(MOD, $1, $3);
 }
 | expr LSHIFT expr
 {
-  $$ = driver.new_BinOp(LSHIFT, $1, $3);
+  $$ = parser.new_BinOp(LSHIFT, $1, $3);
 }
 | expr RSHIFT expr
 {
-  $$ = driver.new_BinOp(RSHIFT, $1, $3);
+  $$ = parser.new_BinOp(RSHIFT, $1, $3);
 }
 | expr BITAND expr
 {
-  $$ = driver.new_BinOp(BITAND, $1, $3);
+  $$ = parser.new_BinOp(BITAND, $1, $3);
 }
 | expr BITOR expr
 {
-  $$ = driver.new_BinOp(BITOR, $1, $3);
+  $$ = parser.new_BinOp(BITOR, $1, $3);
 }
 | expr BITXOR expr
 {
-  $$ = driver.new_BinOp(BITXOR, $1, $3);
+  $$ = parser.new_BinOp(BITXOR, $1, $3);
 }
 | expr LOGAND expr
 {
-  $$ = driver.new_BinOp(LOGAND, $1, $3);
+  $$ = parser.new_BinOp(LOGAND, $1, $3);
 }
 | expr LOGOR expr
 {
-  $$ = driver.new_BinOp(LOGOR, $1, $3);
+  $$ = parser.new_BinOp(LOGOR, $1, $3);
 }
 | expr EQEQ expr
 {
-  $$ = driver.new_BinOp(EQEQ, $1, $3);
+  $$ = parser.new_BinOp(EQEQ, $1, $3);
 }
 | expr NOTEQ expr
 {
-  $$ = driver.new_BinOp(NOTEQ, $1, $3);
+  $$ = parser.new_BinOp(NOTEQ, $1, $3);
 }
 | expr LT expr
 {
-  $$ = driver.new_BinOp(LT, $1, $3);
+  $$ = parser.new_BinOp(LT, $1, $3);
 }
 | expr GT expr
 {
-  $$ = driver.new_BinOp(GT, $1, $3);
+  $$ = parser.new_BinOp(GT, $1, $3);
 }
 | expr LE expr
 {
-  $$ = driver.new_BinOp(LE, $1, $3);
+  $$ = parser.new_BinOp(LE, $1, $3);
 }
 | expr GE expr
 {
-  $$ = driver.new_BinOp(GE, $1, $3);
+  $$ = parser.new_BinOp(GE, $1, $3);
 }
 | expr QST expr COLON expr %prec ITE
 {
-  $$ = driver.new_IteOp($1, $3, $5);
+  $$ = parser.new_IteOp($1, $3, $5);
 }
 | LP expr RP
 {
   $$ = $2;
 }
-| SYMBOL
+| identifier
 {
-  $$ = driver.new_VarExpr($1);
+  $$ = parser.new_VarExpr($1);
   if ( $$ == NULL ) {
     YYERROR;
   }
 }
 /*
-| SYMBOL LBK expr RBK
+| identifier LBK expr RBK
 {
-  $$ = driver.new_ArrayRef($1, $3, @$);
+  $$ = parser.new_ArrayRef($1, $3, @$);
 }
 */
-| SYMBOL LP expr_list RP
+| identifier LP expr_list RP
 {
-  $$ = driver.new_FuncCall($1, $3, @$);
+  $$ = parser.new_FuncCall($1, $3, @$);
 }
 | INT_VAL
 {
@@ -676,6 +690,19 @@ expr_list
 }
 ;
 
+// 識別子
+identifier
+: SYMBOL
+{
+  $$ = $1;
+}
+| identifier DOT SYMBOL
+{
+  $$ = $1;
+  $$->set_next($1);
+}
+;
+
 %%
 
 // C++ の記述
@@ -687,16 +714,16 @@ expr_list
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      YmslDriver& driver)
+      YmslParser& parser)
 {
-  return driver.yylex(*lvalp, *llocp);
+  return parser.scan(*lvalp, *llocp);
 }
 
 // yacc パーサーが内部で呼び出す関数
 // エラーメッセージを出力する．
 int
 yyerror(YYLTYPE* llocp,
-	YmslDriver& driver,
+	YmslParser& parser,
 	const char* s)
 {
   string s2;

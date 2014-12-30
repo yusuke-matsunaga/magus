@@ -47,7 +47,8 @@ Ast::file_region() const
 AstSymbol::AstSymbol(ShString val,
 		     const FileRegion& loc) :
   Ast(loc),
-  mVal(val)
+  mVal(val),
+  mNext(NULL)
 {
 }
 
@@ -56,11 +57,28 @@ AstSymbol::~AstSymbol()
 {
 }
 
+// @brief 次の要素をセットする．
+void
+AstSymbol::set_next(AstSymbol* next)
+{
+  ASSERT_COND( mNext == NULL );
+  mNext = next;
+}
+
 // @brief 文字列型の値を返す．
 ShString
 AstSymbol::str_val() const
 {
   return mVal;
+}
+
+// @brief 次の要素を得る．
+//
+// なければ NULL を返す．
+AstSymbol*
+AstSymbol::next() const
+{
+  return mNext;
 }
 
 END_NAMESPACE_YM_YMSL
