@@ -136,6 +136,9 @@ Iscas89ParserImpl::read(const string& filename)
     case kToken_EOF:
       go_on = false;
       break;
+
+    default:
+      goto error;
     }
     continue;
 
@@ -437,6 +440,9 @@ token_str(Token token)
   case kToken_XOR:    return "XOR";
   case kToken_XNOR:   return "XNOR";
   case kToken_DFF:    return "DFF";
+  case kToken_NAME:   return "__name__";
+  case kToken_EOF:    return "__eof__";
+  case kToken_ERROR:  return "__error__";
   }
   ASSERT_NOT_REACHED;
 }

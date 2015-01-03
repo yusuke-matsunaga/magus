@@ -31,8 +31,10 @@ parser_test1(IDO& ido)
 
   driver.read(ido);
 
+#if 0
   AstBlock* toplevel = driver.toplevel_block();
   toplevel->print(cout, 0);
+#endif
 
   return 0;
 }

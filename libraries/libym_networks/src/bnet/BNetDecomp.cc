@@ -100,7 +100,7 @@ BNetDecomp::operator()(BNetwork& network,
 
     ymuint max_fanin1 = ( max_fanin < 2 ) ? node->fanin_num() : max_fanin;
     const Expr& expr = node->func();
-    if ( !expr.is_simple() || expr.litnum() > max_fanin || no_xor && expr.is_xor() ) {
+    if ( !expr.is_simple() || expr.litnum() > max_fanin || (no_xor && expr.is_xor()) ) {
       // ここに来ているということは expr の根のタイプは二項演算子
       decomp_type1_sub(node, max_fanin1, expr, node, no_xor);
     }
@@ -143,7 +143,7 @@ BNetDecomp::operator()(BNetwork& network,
 
     ymuint max_fanin1 = ( max_fanin < 2 ) ? node->fanin_num() : max_fanin;
     const Expr& expr = node->func();
-    if ( !expr.is_simple() || expr.litnum() > max_fanin1 || no_xor && expr.is_xor() ) {
+    if ( !expr.is_simple() || expr.litnum() > max_fanin1 || (no_xor && expr.is_xor()) ) {
       // ここに来ているということは expr の根のタイプは二項演算子
       decomp_type2_sub(node, max_fanin1, expr, node, no_xor);
     }

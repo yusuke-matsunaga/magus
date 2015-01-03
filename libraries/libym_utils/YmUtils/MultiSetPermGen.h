@@ -1,5 +1,5 @@
 ﻿#ifndef YMUTILS_MULTISETPERMGEN_H
-#define YmUTILS_MULTISETPERMGEN_H
+#define YMUTILS_MULTISETPERMGEN_H
 
 /// @file YmUtils/MultiSetPermGen.h
 /// @brief MultiSetPermGen のヘッダファイル

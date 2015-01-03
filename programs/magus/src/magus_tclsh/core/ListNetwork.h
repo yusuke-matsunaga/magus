@@ -1,5 +1,5 @@
 ﻿#ifndef SRC_CORE_LISTNETWORK_H
-#define SRC_CoRE_LISTNETWORK_H
+#define SRC_CORE_LISTNETWORK_H
 
 /// @file src/core/ListNetwork.h
 /// @brief ListNetwork のヘッダファイル

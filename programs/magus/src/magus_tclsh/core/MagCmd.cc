@@ -61,7 +61,7 @@ MagCmd::cur_cell_library()
 bool
 MagCmd::check_network_name(const string& name) const
 {
-  NetHandle* neth = mMagMgr->find_nethandle(name, false);
+  NetHandle* neth = mMagMgr->find_nethandle(name);
   return (neth != NULL) ? true : false;
 }
 

@@ -514,6 +514,10 @@ SmtEngine::make_dlit_cnf(Solver& solver,
     case kTgGateXnor:
       // なにもしない．
       break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
     }
   }
 

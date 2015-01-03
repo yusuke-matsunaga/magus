@@ -1,5 +1,5 @@
-﻿#ifndef SRC_CORE_NEWBDNORK_H
-#define SRC_CORE_NEWBDNWORK_H
+﻿#ifndef SRC_CORE_NEWBDN_H
+#define SRC_CORE_NEWBDN_H
 
 /// @file src/core/NewBdn.h
 /// @brief NewBdn のヘッダファイル

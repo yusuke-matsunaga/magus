@@ -1020,7 +1020,7 @@ ZddMgrImpl::dealloc_nodechunk(ZddNode* chunk)
 void*
 ZddMgrImpl::allocate(ymuint64 size)
 {
-  if ( mOverflow || mMemLimit > 0 && mUsedMem + size > mMemLimit ) {
+  if ( mOverflow || (mMemLimit > 0 && mUsedMem + size > mMemLimit) ) {
     // メモリ制限をオーバーしたので 0 を返す．
     mOverflow = true;
     return 0;

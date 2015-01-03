@@ -122,22 +122,22 @@ ExprParser::get_token(VarId& lit_id)
   }
 
  stateZ:
-  if ( !mInput->get(c) || c != 'e' && c != 'E' ) {
+  if ( !mInput->get(c) || (c != 'e' && c != 'E') ) {
     throw SyntaxError("syntax error");
   }
-  if ( !mInput->get(c) || c != 'r' && c != 'R' ) {
+  if ( !mInput->get(c) || (c != 'r' && c != 'R') ) {
     throw SyntaxError("syntax error");
   }
-  if ( !mInput->get(c) || c != 'o' && c != 'O' ) {
+  if ( !mInput->get(c) || (c != 'o' && c != 'O') ) {
     throw SyntaxError("syntax error");
   }
   return kTokenZERO;
 
  stateO:
-  if ( !mInput->get(c) || c != 'n' && c != 'N' ) {
+  if ( !mInput->get(c) || (c != 'n' && c != 'N') ) {
     throw SyntaxError("syntax error");
   }
-  if ( !mInput->get(c) || c != 'e' && c != 'E' ) {
+  if ( !mInput->get(c) || (c != 'e' && c != 'E') ) {
     throw SyntaxError("syntax error");
   }
   return kTokenONE;

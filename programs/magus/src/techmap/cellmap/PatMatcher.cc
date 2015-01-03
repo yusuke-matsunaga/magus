@@ -55,14 +55,14 @@ PatMatcher::operator()(const BdnNode* sbj_root,
   case kCellPatAnd:
     if ( !sbj_root->is_and() ) {
       // 型が違う．
-      return NULL;
+      return false;
     }
     break;
 
   case kCellPatXor:
     if ( !sbj_root->is_xor() ) {
       // 型が違う．
-      return NULL;
+      return false;
     }
     break;
 

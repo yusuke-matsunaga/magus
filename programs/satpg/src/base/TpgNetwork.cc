@@ -200,7 +200,12 @@ c_val(tTgGateType type,
     // これは使わない．
     assert_not_reached(__FILE__, __LINE__);
     return kB3X;
+
+  deefault:
+    break;
   }
+  ASSERT_NOT_REACHED;
+  return kB3X;
 }
 
 // immediate dominator リストをマージする．

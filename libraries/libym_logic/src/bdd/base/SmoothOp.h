@@ -1,5 +1,5 @@
 ﻿#ifndef SMOOTHOP_H
-#define SMOTTHOP_H
+#define SMOOTHOP_H
 
 /// @file SmoothOp.h
 /// @brief SmoothOp のヘッダファイル
@@ -72,4 +72,4 @@ private:
 
 END_NAMESPACE_YM_BDD
 
-#endif // SMOTTHOP_H
+#endif // SMOOTHOP_H

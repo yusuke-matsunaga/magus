@@ -1601,14 +1601,14 @@ BitVector::eq_base(const BitVector& src1,
     // x を 0 または 1 と見なす等価比較
     ymuint32 n = block(src1.size());
     for (ymuint32 i = 0; i < n - 1; ++ i) {
-      if ( (src1.mVal0[i] & src2.mVal0[i] | src1.mVal1[i] & src2.mVal1[i])
+      if ( ((src1.mVal0[i] & src2.mVal0[i]) | (src1.mVal1[i] & src2.mVal1[i]))
 	   != kAll1 ) {
 	return false;
       }
     }
     ymuint32 m = mask(src1.size());
-    if ( (src1.mVal0[n - 1] & src2.mVal0[n - 1] |
-	  src1.mVal1[n - 1] & src2.mVal1[n - 1] |
+    if ( ((src1.mVal0[n - 1] & src2.mVal0[n - 1]) |
+	  (src1.mVal1[n - 1] & src2.mVal1[n - 1]) |
 	  ~m) != kAll1 ) {
       return false;
     }
@@ -2741,8 +2741,8 @@ BitVector::xz_to_0()
   ymuint32 pat = ~mVal0[n - 1] & mVal1[n - 1];
   ymuint32 andpat = ~pat | ~m;
   ymuint32 orpat = pat & m;
-  mVal0[n - 1] = mVal0[n - 1] | orpat & andpat;
-  mVal1[n - 1] = mVal1[n - 1] | orpat & andpat;
+  mVal0[n - 1] = (mVal0[n - 1] | orpat) & andpat;
+  mVal1[n - 1] = (mVal1[n - 1] | orpat) & andpat;
 }
 
 // 値を近い double 型に変換する．
@@ -3138,8 +3138,8 @@ BitVector::set(const ymuint32* val0,
     }
     else if ( i == src_n - 1 ) {
       ymuint32 sm = mask(src_size);
-      mVal0[i] = last_val0 & ~sm | val0[i] & sm;
-      mVal1[i] = last_val1 & ~sm | val1[i] & sm;
+      mVal0[i] = (last_val0 & ~sm) | (val0[i] & sm);
+      mVal1[i] = (last_val1 & ~sm) | (val1[i] & sm);
     }
     else {
       mVal0[i] = last_val0;
@@ -3197,8 +3197,8 @@ BitVector::set(const vector<ymuint32>& val0,
     }
     else if ( i == src_n - 1 ) {
       ymuint32 sm = mask(src_size);
-      mVal0[i] = last_val0 & ~sm | val0[i] & sm;
-      mVal1[i] = last_val1 & ~sm | val1[i] & sm;
+      mVal0[i] = (last_val0 & ~sm) | (val0[i] & sm);
+      mVal1[i] = (last_val1 & ~sm) | (val1[i] & sm);
     }
     else {
       mVal0[i] = last_val0;

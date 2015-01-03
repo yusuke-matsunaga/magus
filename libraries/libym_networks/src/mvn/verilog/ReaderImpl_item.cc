@@ -133,7 +133,7 @@ ReaderImpl::gen_item(MvnModule* module,
 	const VlProcess* process = *p;
 	bool stat1 = gen_process(module, process);
 	if ( !stat1 ) {
-	  return NULL;
+	  return false;
 	}
       }
     }

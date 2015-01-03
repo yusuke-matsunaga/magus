@@ -1,4 +1,4 @@
-﻿#ifndef ELBPAREMETER_H
+﻿#ifndef ELBPARAMETER_H
 #define ELBPARAMETER_H
 
 /// @file ElbParameter.h

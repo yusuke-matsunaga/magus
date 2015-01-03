@@ -1,5 +1,5 @@
 ﻿#ifndef NETWORKS_BLIFNETWORK_H
-#define NETWROKS_BLIFNETWORK_H
+#define NETWORKS_BLIFNETWORK_H
 
 /// @file YmNetworks/BlifNetwork.h
 /// @brief BlifNetwork のヘッダファイル
@@ -131,4 +131,4 @@ private:
 
 END_NAMESPACE_YM_NETWORKS_BLIF
 
-#endif // BLIFNETWORK_H
+#endif // NETWORKS_BLIFNETWORK_H
