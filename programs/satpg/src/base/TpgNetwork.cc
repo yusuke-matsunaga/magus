@@ -201,7 +201,7 @@ c_val(tTgGateType type,
     assert_not_reached(__FILE__, __LINE__);
     return kB3X;
 
-  deefault:
+  default:
     break;
   }
   ASSERT_NOT_REACHED;

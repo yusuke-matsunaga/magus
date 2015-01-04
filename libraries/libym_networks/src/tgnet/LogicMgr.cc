@@ -12,6 +12,9 @@
 
 BEGIN_NAMESPACE_YM_NETWORKS_TGNET
 
+// ハッシュ表を拡大するときに使われる定数
+const double LogicMgr::kHashCapacity = 1.8;
+
 // @brief コンストラクタ
 LogicMgr::LogicMgr()
 {

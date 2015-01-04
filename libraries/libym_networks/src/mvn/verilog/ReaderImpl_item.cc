@@ -101,7 +101,7 @@ ReaderImpl::gen_item(MvnModule* module,
 	ymuint n = vl_primarray->elem_num();
 	for (ymuint i = 0; i < n; ++ i) {
 	  const VlPrimitive* prim = vl_primarray->elem_by_offset(i);
-	  if ( prim->type() == kVpiCellPrim ) {
+	  if ( prim->prim_type() == kVpiCellPrim ) {
 	    gen_cellinst(module, prim);
 	  }
 	  else {

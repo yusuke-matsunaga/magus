@@ -111,9 +111,15 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // ハッシュ表を拡大するときに使われる定数
   static
   constexpr double kHashCapacity = 1.8;
+#else
+  // ハッシュ表を拡大するときに使われる定数
+  static
+  const double kHashCapacity;
+#endif
 
   // Cell の配列
   vector<Cell*> mCellArray;
