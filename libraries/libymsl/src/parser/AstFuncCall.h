@@ -10,7 +10,6 @@
 
 
 #include "AstExpr.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -85,7 +84,8 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数名
-  AstSymbol* mFuncName;
+  // 階層付きの場合にはシンボルのリストになる．
+  vector<AstSymbol*> mFuncName;
 
   // 関数
   AstFuncDecl* mFunc;

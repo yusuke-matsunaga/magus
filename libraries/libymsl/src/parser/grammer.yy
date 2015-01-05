@@ -223,7 +223,7 @@ item
 | GLOBAL SYMBOL COLON type init_expr SEMI
 {
   AstVarDecl* vardecl = parser.new_VarDecl($2, $4, $5, true, @$);
-  parser.add_global_var(vardecl);
+  parser.add_statement(vardecl);
 }
 // import 文
 | import_stmt
@@ -272,8 +272,7 @@ statement
 // ローカル変数定義
 | VAR SYMBOL COLON type init_expr SEMI
 {
-  AstVarDecl* vd = parser.new_VarDecl($2, $4, $5, false, @$);
-  parser.add_local_var(vd);
+  $$ = parser.new_VarDecl($2, $4, $5, false, @$);
 }
 // ラベル文
 | SYMBOL COLON
@@ -644,10 +643,7 @@ expr
 }
 | identifier
 {
-  $$ = parser.new_VarExpr($1);
-  if ( $$ == NULL ) {
-    YYERROR;
-  }
+  $$ = parser.new_VarExpr($1, @$);
 }
 /*
 | identifier LBK expr RBK
@@ -698,7 +694,7 @@ identifier
 }
 | identifier DOT SYMBOL
 {
-  $$ = $1;
+  $$ = $3;
   $$->set_next($1);
 }
 ;

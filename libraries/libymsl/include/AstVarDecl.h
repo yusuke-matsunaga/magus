@@ -9,7 +9,8 @@
 /// All rights reserved.
 
 
-#include "AstDeclBase.h"
+#include "AstStatement.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 変数宣言を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstVarDecl :
-  public AstDeclBase
+  public AstStatement
 {
   friend class YmslModule;
 
@@ -47,6 +48,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 名前を得る．
+  ShString
+  name() const;
+
   /// @brief インデックス番号を返す．
   ymuint
   index() const;
@@ -73,6 +78,29 @@ public:
   void
   set_prev(AstVarDecl* prev);
 
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // AstStatement の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 命令コードのサイズを計算する．
+  virtual
+  ymuint
+  calc_size();
+
+  /// @brief 命令コードを生成する．
+  /// @param[in] driver ドライバ
+  /// @param[in] code_list 命令コードの格納先
+  /// @param[inout] addr 命令コードの現在のアドレス
+  ///
+  /// addr の値は更新される．
+  virtual
+  void
+  compile(YmslDriver& driver,
+	  YmslCodeList& code_list,
+	  Ymsl_INT& addr);
+
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   /// @param[in] indent インデントレベル
@@ -86,6 +114,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  ShString mName;
 
   // インデックス番号
   ymuint mIndex;
@@ -105,6 +136,5 @@ private:
 };
 
 END_NAMESPACE_YM_YMSL
-
 
 #endif // ASTVARDECL_H

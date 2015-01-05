@@ -328,7 +328,8 @@ public:
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_VarExpr(AstSymbol* symbol);
+  new_VarExpr(AstSymbol* symbol,
+	      const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
   /// @param[in] val 値

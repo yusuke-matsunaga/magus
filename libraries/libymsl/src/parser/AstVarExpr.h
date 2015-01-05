@@ -24,9 +24,9 @@ class AstVarExpr :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
+  /// @param[in] var_name 変数名
   /// @param[in] loc ファイル位置
-  AstVarExpr(AstVarDecl* var,
+  AstVarExpr(AstSymbol* var_name,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -81,8 +81,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  AstVarDecl* mVar;
+  // 変数名
+  // 階層付きの場合にはシンボルのリストになる．
+  vector<AstSymbol*> mVarName;
+
+  // 変数宣言
+  AstVarDecl* mVarDecl;
 
 };
 

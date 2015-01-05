@@ -10,6 +10,7 @@
 
 
 #include "Ast.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL

@@ -23,11 +23,12 @@ set (ymsl_SOURCES
   src/engine/YmslVM.cc
   src/parser/Ast.cc
   src/parser/AstBlock.cc
-  src/parser/AstDeclBase.cc
   src/parser/AstExpr.cc
+  src/parser/AstFuncDecl.cc
   src/parser/AstPrimary.cc
   src/parser/AstStatement.cc
   src/parser/AstValueType.cc
+  src/parser/AstVarDecl.cc
   src/parser/RsrvWordDic.cc
   src/parser/SymDict.cc
   src/parser/YmslDriver.cc

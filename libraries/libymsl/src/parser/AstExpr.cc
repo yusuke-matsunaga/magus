@@ -15,6 +15,7 @@
 #include "AstIntConst.h"
 #include "AstFloatConst.h"
 #include "AstStringConst.h"
+#include "AstSymbol.h"
 #include "AstValueType.h"
 
 #include "AstFuncDecl.h"
@@ -28,6 +29,21 @@ BEGIN_NAMESPACE_YM_YMSL
 
 #include "grammer.hh"
 
+
+BEGIN_NONAMESPACE
+
+// シンボルリストのサイズを計算する．
+ymuint
+count_size(AstSymbol* symbol)
+{
+  ymuint n = 0;
+  for (AstSymbol* p = symbol; p != NULL; p = p->next()) {
+    ++ n;
+  }
+  return n;
+}
+
+END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス AstExpr
@@ -87,10 +103,16 @@ AstFuncCall::AstFuncCall(AstSymbol* func_name,
 			 AstExpr* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mFuncName(func_name),
+  mFuncName(count_size(func_name)),
   mFunc(NULL),
   mExprList(count_size(expr_list))
 {
+  ymuint pos = mFuncName.size();
+  for (AstSymbol* p = func_name; p != NULL; p = p->next()) {
+    -- pos;
+    mFuncName[pos] = p;
+  }
+
   ymuint i = mExprList.size();
   for (AstExpr* expr = expr_list; expr != NULL; expr = expr->prev()) {
     -- i;
@@ -582,13 +604,19 @@ AstIteOp::print(ostream& s) const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var 変数
+// @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstVarExpr::AstVarExpr(AstVarDecl* var,
+AstVarExpr::AstVarExpr(AstSymbol* var_name,
 		       const FileRegion& loc) :
   AstExpr(loc),
-  mVar(var)
+  mVarName(count_size(var_name)),
+  mVarDecl(NULL)
 {
+  ymuint pos = mVarName.size();
+  for (AstSymbol* p = var_name; p != NULL; p = p->next()) {
+    -- pos;
+    mVarName[pos] = p;
+  }
 }
 
 // @brief デストラクタ
@@ -610,7 +638,7 @@ AstVarExpr::type_analysis()
 ValueType
 AstVarExpr::type()
 {
-  return mVar->type();
+  return mVarDecl->type();
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -632,13 +660,13 @@ AstVarExpr::compile(YmslDriver& driver,
 		    Ymsl_INT& addr)
 {
   Ymsl_CODE op;
-  switch ( mVar->type() ) {
+  switch ( mVarDecl->type() ) {
   case kVoidType:
     break;
 
   case kBooleanType:
   case kIntType:
-    if ( mVar->global() ) {
+    if ( mVarDecl->global() ) {
       op = YMVM_LOAD_GLOBAL_INT;
     }
     else {
@@ -647,7 +675,7 @@ AstVarExpr::compile(YmslDriver& driver,
     break;
 
   case kFloatType:
-    if ( mVar->global() ) {
+    if ( mVarDecl->global() ) {
       op = YMVM_LOAD_GLOBAL_FLOAT;
     }
     else {
@@ -660,7 +688,7 @@ AstVarExpr::compile(YmslDriver& driver,
     break;
 
   case kUserType:
-    if ( mVar->global() ) {
+    if ( mVarDecl->global() ) {
       op = YMVM_LOAD_GLOBAL_OBJ;
     }
     else {
@@ -669,7 +697,7 @@ AstVarExpr::compile(YmslDriver& driver,
     break;
   }
   code_list.write_opcode(addr, op);
-  code_list.write_int(addr, mVar->index());
+  code_list.write_int(addr, mVarDecl->index());
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -677,7 +705,7 @@ AstVarExpr::compile(YmslDriver& driver,
 void
 AstVarExpr::print(ostream& s) const
 {
-  s << mVar->name();
+  s << mVarDecl->name();
 }
 
 

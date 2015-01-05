@@ -550,8 +550,10 @@ YmslParser::new_FuncCall(AstSymbol* symbol,
 // @param[in] symbol 値
 // @param[in] loc ファイル位置
 AstExpr*
-YmslParser::new_VarExpr(AstSymbol* symbol)
+YmslParser::new_VarExpr(AstSymbol* symbol,
+			const FileRegion& loc)
 {
+#if 0
   AstVarDecl* var_decl = find_var(symbol->str_val());
   if ( var_decl == NULL ) {
     ostringstream buf;
@@ -563,8 +565,9 @@ YmslParser::new_VarExpr(AstSymbol* symbol)
 		    buf.str());
     return NULL;
   }
+#endif
   void* p = mAlloc.get_memory(sizeof(AstVarExpr));
-  return new (p) AstVarExpr(var_decl, symbol->file_region());
+  return new (p) AstVarExpr(symbol, loc);
 }
 
 // @brief 整数定数式を作る．
