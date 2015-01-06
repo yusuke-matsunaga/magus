@@ -20,12 +20,13 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var 変数
+// @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstPrimary::AstPrimary(AstVarDecl* var,
+AstPrimary::AstPrimary(AstSymbol* var_name,
 		       const FileRegion& loc) :
   Ast(loc),
-  mVar(var)
+  mVarName(var_name),
+  mVar(NULL)
 {
 }
 

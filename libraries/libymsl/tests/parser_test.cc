@@ -8,7 +8,7 @@
 
 
 #include "YmslDriver.h"
-#include "../src/parser/RsrvWordDic.h"
+#include "RsrvWordDic.h"
 #include "Ast.h"
 #include "AstBlock.h"
 #include "YmUtils/FileIDO.h"

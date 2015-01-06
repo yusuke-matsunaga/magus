@@ -619,6 +619,7 @@ YmslParser::new_StringConst(const char* val,
 AstPrimary*
 YmslParser::new_Primary(AstSymbol* symbol)
 {
+#if 0
   AstVarDecl* var_decl = find_var(symbol->str_val());
   if ( var_decl == NULL ) {
     ostringstream buf;
@@ -632,6 +633,10 @@ YmslParser::new_Primary(AstSymbol* symbol)
   }
   void* p = mAlloc.get_memory(sizeof(AstPrimary));
   return new (p) AstPrimary(var_decl, symbol->file_region());
+#else
+  void* p = mAlloc.get_memory(sizeof(AstPrimary));
+  return new (p) AstPrimary(symbol, symbol->file_region());
+#endif
 }
 
 // @brief 文字列型を作る．
