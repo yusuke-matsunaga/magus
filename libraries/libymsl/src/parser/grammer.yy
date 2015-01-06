@@ -212,7 +212,7 @@ fr_merge(const FileRegion fr_array[],
 item_top
 : item_list
 {
-  mgr.set_root($1);
+  mgr.set_root($1, @$);
 }
 
 // 要素のリスト

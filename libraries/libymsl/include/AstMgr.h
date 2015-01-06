@@ -47,9 +47,9 @@ public:
   bool
   read_source(IDO& ido);
 
-  /// @brief トップレベルのステートメントリストを返す．
-  const vector<AstStatement*>&
-  toplevel_list() const;
+  /// @brief トップレベルのASTを返す．
+  AstToplevel*
+  toplevel() const;
 
 
 public:
@@ -58,8 +58,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 根のノードをセットする．
+  /// @param[in] stmt_list ステートメントリスト
+  /// @param[in] loc ファイル位置
   void
-  set_root(AstStmtList* stmt_list);
+  set_root(AstStmtList* stmt_list,
+	   const FileRegion& loc);
 
   /// @brief yylex とのインターフェイス
   /// @param[out] lval 値を格納する変数
@@ -364,8 +367,8 @@ private:
   // 字句解析器
   YmslScanner* mScanner;
 
-  // トップレベルのステートメントリスト
-  vector<AstStatement*> mToplevelList;
+  // トップレベルの AST
+  AstToplevel* mToplevel;
 
   // デバッグフラグ
   bool mDebug;

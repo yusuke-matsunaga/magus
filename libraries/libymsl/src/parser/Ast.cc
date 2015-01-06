@@ -8,8 +8,11 @@
 
 
 #include "Ast.h"
-#include "AstSymbol.h"
+#include "AstList.h"
 #include "AstModule.h"
+#include "AstStatement.h"
+#include "AstSymbol.h"
+#include "AstToplevel.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -101,6 +104,44 @@ AstSymbol*
 AstModule::alias_name() const
 {
   return mAliasName;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstToplevel
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] stmt_list ステートメントリスト
+// @param[in] loc ファイル位置
+AstToplevel::AstToplevel(AstStmtList* stmt_list,
+			 const FileRegion& loc) :
+  Ast(loc),
+  mStmtList(stmt_list->size())
+{
+  ymuint pos = 0;
+  for (AstStmtList::Iterator p = stmt_list->begin();
+       !p.is_end(); p.next()) {
+    mStmtList[pos] = *p;
+    ++ pos;
+  }
+}
+
+// @brief デストラクタ
+AstToplevel::~AstToplevel()
+{
+}
+
+// @brief 出力する
+// @param[in] s 出力先のストリーム
+void
+AstToplevel::print(ostream& s) const
+{
+  for (vector<AstStatement*>::const_iterator p = mStmtList.begin();
+       p != mStmtList.end(); ++ p) {
+    AstStatement* stmt = *p;
+    stmt->print(s, 0);
+  }
 }
 
 

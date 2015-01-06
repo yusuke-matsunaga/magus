@@ -51,6 +51,7 @@ class AstPrimary;
 class AstStatement;
 class AstStringConst;
 class AstSymbol;
+class AstToplevel;
 class AstValueType;
 class AstVarDecl;
 

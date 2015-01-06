@@ -10,7 +10,7 @@
 #include "RsrvWordDic.h"
 #include "Ast.h"
 #include "AstMgr.h"
-#include "AstStatement.h"
+#include "AstToplevel.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -30,12 +30,8 @@ parser_test1(IDO& ido)
 
   bool stat = mgr.read_source(ido);
   if ( stat ) {
-    const vector<AstStatement*>& toplevel_list = mgr.toplevel_list();
-    for (vector<AstStatement*>::const_iterator p = toplevel_list.begin();
-	 p != toplevel_list.end(); ++ p) {
-      AstStatement* stmt = *p;
-      stmt->print(cout);
-    }
+    AstToplevel* toplevel = mgr.toplevel();
+    toplevel->print(cout);
   }
 
   return 0;

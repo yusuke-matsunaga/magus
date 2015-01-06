@@ -42,6 +42,7 @@
 #include "AstStringType.h"
 #include "AstSwitch.h"
 #include "AstSymbol.h"
+#include "AstToplevel.h"
 #include "AstUniOp.h"
 #include "AstUserType.h"
 #include "AstVarDecl.h"
@@ -77,6 +78,7 @@ AstMgr::read_source(IDO& ido)
   int yyparser(AstMgr&);
 
   mScanner = new YmslScanner(ido);
+  mToplevel = NULL;
 
   int stat = yyparse(*this);
 
@@ -86,25 +88,23 @@ AstMgr::read_source(IDO& ido)
   return (stat == 0);
 }
 
-// @brief トップレベルのステートメントリストを返す．
-const vector<AstStatement*>&
-AstMgr::toplevel_list() const
+// @brief トップレベルのASTを返す．
+AstToplevel*
+AstMgr::toplevel() const
 {
-  return mToplevelList;
+  return mToplevel;
 }
 
 // @brief 根のノードをセットする．
+// @param[in] stmt_list ステートメントリスト
+// @param[in] loc ファイル位置
 void
-AstMgr::set_root(AstStmtList* stmt_list)
+AstMgr::set_root(AstStmtList* stmt_list,
+		 const FileRegion& loc)
 {
-  mToplevelList.clear();
-  mToplevelList.resize(stmt_list->size());
-  ymuint pos = 0;
-  for (AstStmtList::Iterator p = stmt_list->begin();
-       !p.is_end(); p.next()) {
-    mToplevelList[pos] = *p;
-    ++ pos;
-  }
+  ASSERT_COND ( mToplevel == NULL );
+  void* p = mAlloc.get_memory(sizeof(AstToplevel));
+  mToplevel = new (p) AstToplevel(stmt_list, loc);
 }
 
 // @brief yylex とのインターフェイス
