@@ -12,12 +12,11 @@
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 
-#include "YmslParser.h"
 #include "AstMgr.h"
-#include "AstBlock.h"
 #include "AstExpr.h"
 #include "AstList.h"
 #include "AstSymbol.h"
+#include "AstFuncDecl.h"
 #include "AstVarDecl.h"
 
 
@@ -38,13 +37,11 @@ BEGIN_NAMESPACE_YM_YMSL
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      YmslParser&,
       AstMgr& mgr);
 
 // エラー報告関数
 int
 yyerror(YYLTYPE*,
-	YmslParser&,
 	AstMgr&,
 	const char*);
 
@@ -88,21 +85,20 @@ fr_merge(const FileRegion fr_array[],
 %locations
 
 // yyparse の引数
-%parse-param {YmslParser& parser}
 %parse-param {AstMgr& mgr}
 
 // yylex の引数
-%lex-param {YmslParser& parser}
 %lex-param {AstMgr& mgr}
 
 // 値を表す型
 %union {
   TokenType      token_type;
-  AstBlock*      block_type;
   AstCaseList*   caselist_type;
   AstExpr*       expr_type;
   AstExprList*   exprlist_type;
   AstIfList*     iflist_type;
+  AstModule*     module_type;
+  AstModuleList* modulelist_type;
   AstPrimary*    primary_type;
   AstStatement*  statement_type;
   AstStmtList*   stmtlist_type;
@@ -193,9 +189,13 @@ fr_merge(const FileRegion fr_array[],
 %type <primary_type>    lvalue
 %type <iflist_type>     if_list
 %type <iflist_type>     if_else_list
+%type <module_type>     module
+%type <modulelist_type> module_list
 %type <statement_type>  complex_statement
+%type <statement_type>  item
 %type <statement_type>  single_statement
 %type <statement_type>  statement
+%type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
 %type <symbollist_type> identifier
 %type <token_type>      eqop
@@ -207,12 +207,25 @@ fr_merge(const FileRegion fr_array[],
 
 // 本体
 
-%start item_list;
+%start item_top;
+
+item_top
+: item_list
+{
+  mgr.set_root($1);
+}
 
 // 要素のリスト
 item_list
 : // 空
+{
+  $$ = new AstStmtList;
+}
 | item_list item
+{
+  $$ = $1;
+  $$->add($2);
+}
 ;
 
 // トップレベルの要素
@@ -220,50 +233,47 @@ item_list
 item
 : statement
 {
-  parser.add_statement($1);
+  $$ = $1;
 }
 // 関数定義
-| func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
+| FUNCTION SYMBOL LP param_list RP COLON type LCB statement_list RCB
 {
-  AstFuncDecl* funcdecl = mgr.new_FuncDecl($2, $7, $4, $9, @$);
-  parser.pop_block();
-  parser.add_function(funcdecl);
+  $$ = mgr.new_FuncDecl($2, $7, $4, $9, @$);
 }
 // グローバル変数定義
 | GLOBAL SYMBOL COLON type init_expr SEMI
 {
-  AstVarDecl* vardecl = mgr.new_VarDecl($2, $4, $5, true, @$);
-  parser.add_statement(vardecl);
+  $$ = mgr.new_VarDecl($2, $4, $5, true, @$);
 }
 // import 文
-| import_stmt
-;
-
-// import 文
-import_stmt
-: IMPORT SYMBOL
+| IMPORT module_list SEMI
 {
-  parser.import($2, NULL);
-}
-| IMPORT SYMBOL AS SYMBOL
-{
-  parser.import($2, $4);
-}
-| import_stmt COMMA SYMBOL
-{
-  parser.import($3, NULL);
-}
-| import_stmt COMMA SYMBOL AS SYMBOL
-{
-  parser.import($3, $5);
+  $$ = mgr.new_Import($2, @$);
 }
 ;
 
-// 関数宣言のヘッダ
-func_head
-: FUNCTION
+// import のモジュールリスト
+module_list
+: module
 {
-  parser.push_new_block();
+  $$ = new AstModuleList;
+  $$->add($1);
+}
+| module_list COMMA module
+{
+  $$ = $1;
+  $$->add($3);
+}
+;
+
+module
+: SYMBOL
+{
+  $$ = mgr.new_Module($1, NULL, @$);
+}
+| SYMBOL AS SYMBOL
+{
+  $$ = mgr.new_Module($1, $3, @$);
 }
 ;
 
@@ -715,17 +725,15 @@ identifier
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      YmslParser& parser,
       AstMgr& mgr)
 {
-  return parser.scan(*lvalp, *llocp, mgr);
+  return mgr.scan(*lvalp, *llocp);
 }
 
 // yacc パーサーが内部で呼び出す関数
 // エラーメッセージを出力する．
 int
 yyerror(YYLTYPE* llocp,
-	YmslParser& parser,
 	AstMgr& mgr,
 	const char* s)
 {

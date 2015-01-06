@@ -38,12 +38,62 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ソースファイルを読み込む．
+  /// @param[in] ido 入力データ
+  /// @return 読み込みに成功したら true を返す．
+  bool
+  read_source(IDO& ido);
+
+  /// @brief トップレベルのステートメントリストを返す．
+  const vector<AstStatement*>&
+  toplevel_list() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // bison から用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 根のノードをセットする．
+  void
+  set_root(AstStmtList* stmt_list);
+
+  /// @brief yylex とのインターフェイス
+  /// @param[out] lval 値を格納する変数
+  /// @param[out] lloc 位置情報を格納する変数
+  /// @return 読み込んだトークンの id を返す．
+  int
+  scan(YYSTYPE& lval,
+       FileRegion& lloc);
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
   // 抽象構文木の部品クラスを作る関数
   //
   // これらのオブジェクトは全て mAlloc 上に確保される．
   // このクラスのデストラクタが全て開放するので個別に
   // 開放する必要はない．
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief import 用のモジュール記述を作る
+  /// @param[in] module モジュール名
+  /// @param[in] alias エイリアス名
+  /// @param[in] loc ファイル位置
+  AstModule*
+  new_Module(AstSymbol* module,
+	     AstSymbol* alias,
+	     const FileRegion& loc);
+
+  /// @brief import 文を作る．
+  /// @param[in] module_list モジュールのリスト
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_Import(AstModuleList* module_list,
+	     const FileRegion& loc);
 
   /// @brief 変数宣言を作る．
   /// @param[in] name 変数名
@@ -310,6 +360,15 @@ private:
 
   // メモリアロケータ
   SimpleAlloc mAlloc;
+
+  // 字句解析器
+  YmslScanner* mScanner;
+
+  // トップレベルのステートメントリスト
+  vector<AstStatement*> mToplevelList;
+
+  // デバッグフラグ
+  bool mDebug;
 
 };
 

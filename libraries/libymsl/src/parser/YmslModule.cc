@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 // クラス YmslModule
 //////////////////////////////////////////////////////////////////////
-
+#if 0
 // @brief コンストラクタ
 // @param[in] name モジュール名
 YmslModule::YmslModule(ShString name) :
@@ -89,7 +89,7 @@ YmslModule::find_var(ShString name) const
 // @brief 現在のブロックを返す．
 AstBlock*
 YmslModule::cur_block() const
-{
+nn{
   ASSERT_COND( !mBlockStack.empty() );
   return mBlockStack.back();
 }
@@ -142,5 +142,6 @@ YmslModule::add_statement(AstStatement* stmt)
 {
   cur_block()->add_statement(stmt);
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

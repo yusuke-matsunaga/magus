@@ -9,6 +9,7 @@
 
 #include "AstPrimary.h"
 #include "AstList.h"
+#include "AstSymbol.h"
 #include "AstVarDecl.h"
 
 #include "YmslVM.h"
@@ -98,7 +99,13 @@ AstPrimary::opcode() const
 void
 AstPrimary::print(ostream& s) const
 {
-  s << mVar->name();
+  ymuint n = mVarName.size();
+  const char* dot = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    AstSymbol* sym = mVarName[i];
+    s << dot << sym->str_val();
+    dot = ".";
+  }
 }
 
 END_NAMESPACE_YM_YMSL

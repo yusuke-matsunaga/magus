@@ -15,44 +15,6 @@
 #include "AstFuncDecl.h"
 #include "AstVarDecl.h"
 
-#include "../builtin/YmslPrint.h"
-
-#include "AstSymbol.h"
-#include "AstBlock.h"
-#include "AstVarDecl.h"
-#include "AstFuncDecl.h"
-#include "AstAssignment.h"
-#include "AstIf.h"
-#include "AstIfBlock.h"
-#include "AstFor.h"
-#include "AstWhile.h"
-#include "AstDoWhile.h"
-#include "AstSwitch.h"
-#include "AstCaseItem.h"
-#include "AstGoto.h"
-#include "AstLabel.h"
-#include "AstBreak.h"
-#include "AstContinue.h"
-#include "AstReturn.h"
-#include "AstBlockStmt.h"
-#include "AstExprStmt.h"
-#include "AstFuncCall.h"
-#include "AstUniOp.h"
-#include "AstBinOp.h"
-#include "AstIteOp.h"
-#include "AstVarExpr.h"
-#include "AstIntConst.h"
-#include "AstFloatConst.h"
-#include "AstStringConst.h"
-#include "AstPrimary.h"
-#include "AstVoidType.h"
-#include "AstBooleanType.h"
-#include "AstIntType.h"
-#include "AstFloatType.h"
-#include "AstStringType.h"
-#include "AstUserType.h"
-#include "YmslLabel.h"
-
 #include "YmUtils/MsgMgr.h"
 
 
@@ -83,12 +45,14 @@ YmslParser::~YmslParser()
   delete mScanner;
 }
 
+#if 0
 // @brief トップレベルブロックを返す．
 AstBlock*
 YmslParser::toplevel_block() const
 {
   return mModule->toplevel_block();
 }
+#endif
 
 // @brief 一つのソースファイルを読み込む．
 // @param[in] ido 入力データ
@@ -115,6 +79,7 @@ YmslParser::read_source(IDO& ido,
   return (stat == 0);
 }
 
+#if 0
 // @brief 現在のブロックを返す．
 AstBlock*
 YmslParser::cur_block() const
@@ -185,6 +150,7 @@ YmslParser::add_statement(AstStatement* stmt)
 {
   mModule->add_statement(stmt);
 }
+#endif
 
 // @brief yylex とのインターフェイス
 // @param[out] lvalp 値を格納する変数
@@ -232,6 +198,7 @@ YmslParser::scan(YYSTYPE& lval,
   return id;
 }
 
+#if 0
 // @brief 関数のリストを返す．
 const vector<AstFuncDecl*>&
 YmslParser::function_list() const
@@ -265,6 +232,7 @@ YmslParser::find_var(ShString name) const
 {
   return mModule->find_var(name);
 }
+#endif
 
 #if 0
 // @brief 変数宣言を作る．

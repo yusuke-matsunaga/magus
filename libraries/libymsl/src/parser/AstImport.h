@@ -1,11 +1,11 @@
-#ifndef ASTBLOCKSTMT_H
-#define ASTBLOCKSTMT_H
+#ifndef ASTIMPORT_H
+#define ASTIMPORT_H
 
-/// @file AstBlockStmt.h
-/// @brief AstBlockStmt のヘッダファイル
+/// @file AstImport.h
+/// @brief AstImport のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,23 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstBlockStmt AstBlockStmt.h "AstBlockStmt.h"
-/// @brief block文を表す AstStatement
+/// @class AstImport AstImport.h "AstImport.h"
+/// @brief import 文を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstBlockStmt :
+class AstImport :
   public AstStatement
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] module_list モジュールのリスト
   /// @param[in] loc ファイル位置
-  AstBlockStmt(AstStmtList* stmt_list,
-	       const FileRegion& loc);
+  AstImport(AstModuleList* module_list,
+	    const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstBlockStmt();
+  ~AstImport();
 
 
 public:
@@ -70,11 +70,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 本体
-  vector<AstStatement*> mStmtList;
+  // モジュールのリスト
+  vector<AstModule*> mModuleList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTBLOCKSTMT_H
+#endif // ASTIMPORT_H

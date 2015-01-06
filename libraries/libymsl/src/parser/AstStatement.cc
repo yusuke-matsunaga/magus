@@ -7,27 +7,29 @@
 /// All rights reserved.
 
 
-#include "AstVarDecl.h"
-#include "AstFuncDecl.h"
 #include "AstAssignment.h"
+#include "AstBlockStmt.h"
+#include "AstBreak.h"
+#include "AstCaseItem.h"
+#include "AstContinue.h"
+#include "AstDoWhile.h"
+#include "AstExpr.h"
+#include "AstExprStmt.h"
+#include "AstFor.h"
+#include "AstFuncDecl.h"
+#include "AstGoto.h"
 #include "AstIf.h"
 #include "AstIfBlock.h"
-#include "AstFor.h"
-#include "AstList.h"
-#include "AstWhile.h"
-#include "AstDoWhile.h"
-#include "AstSwitch.h"
-#include "AstCaseItem.h"
-#include "AstGoto.h"
+#include "AstImport.h"
 #include "AstLabel.h"
-#include "AstBreak.h"
-#include "AstContinue.h"
-#include "AstReturn.h"
-#include "AstBlockStmt.h"
-#include "AstExprStmt.h"
-#include "AstBlock.h"
-#include "AstExpr.h"
+#include "AstList.h"
+#include "AstModule.h"
 #include "AstPrimary.h"
+#include "AstReturn.h"
+#include "AstSwitch.h"
+#include "AstSymbol.h"
+#include "AstVarDecl.h"
+#include "AstWhile.h"
 #include "YmslCodeList.h"
 #include "YmslDriver.h"
 #include "YmslLabel.h"
@@ -37,19 +39,6 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 #include "grammer.hh"
-
-BEGIN_NONAMESPACE
-
-void
-print_indent(ostream& s,
-	    ymuint indent)
-{
-  for (ymuint i = 0; i < indent; ++ i) {
-    s << "  ";
-  }
-}
-
-END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス AstStatement
@@ -68,15 +57,6 @@ AstStatement::~AstStatement()
 {
 }
 
-// @brief ブロックを返す．
-//
-// ブロックを持たない要素の場合 NULL を返す．
-AstBlock*
-AstStatement::block() const
-{
-  return NULL;
-}
-
 // @brief ラベルステートメントの場合に名前を返す．
 //
 // それ以外では ShString() を返す．
@@ -84,6 +64,86 @@ ShString
 AstStatement::label() const
 {
   return ShString();
+}
+
+// @brief インデントする．
+// @param[in] s 出力ストリーム
+// @param[in] indent インデント量
+void
+AstStatement::print_indent(ostream& s,
+			   ymuint indent)
+{
+  for (ymuint i = 0; i < indent; ++ i) {
+    s << "  ";
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstImport
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] module_list モジュールのリスト
+// @param[in] loc ファイル位置
+AstImport::AstImport(AstModuleList* module_list,
+		     const FileRegion& loc) :
+  AstStatement(loc),
+  mModuleList(module_list->size())
+{
+  ymuint pos = 0;
+  for (AstModuleList::Iterator p = module_list->begin();
+       !p.is_end(); p.next()) {
+    mModuleList[pos] = *p;
+    ++ pos;
+  }
+}
+
+// @brief デストラクタ
+AstImport::~AstImport()
+{
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstImport::calc_size()
+{
+  return 0;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstImport::compile(YmslDriver& driver,
+		   YmslCodeList& code_list,
+		   Ymsl_INT& addr)
+{
+}
+
+// @brief 内容を表示する．(デバッグ用)
+// @param[in] s 出力ストリーム
+// @param[in] indent インデントレベル
+void
+AstImport::print(ostream& s,
+		 ymuint indent) const
+{
+  print_indent(s, indent);
+  s << "import ";
+  ymuint n = mModuleList.size();
+  const char* comma = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    AstModule* module = mModuleList[i];
+    s << comma << module->module_name()->str_val();
+    if ( module->alias_name() != NULL ) {
+      s << " as " << module->alias_name()->str_val();
+    }
+    comma = ", ";
+  }
+  s << ";" << endl;
 }
 
 
@@ -262,8 +322,7 @@ AstIf::print(ostream& s,
       s << "else";
     }
     s << " {" << endl;
-    AstBlock* block = if_block->block();
-    block->print(s, indent + 1);
+    if_block->print(s, indent + 1);
     print_indent(s, indent);
     s << "}" << endl;
   }
@@ -296,26 +355,6 @@ AstExpr*
 AstIfBlock::cond() const
 {
   return mCond;
-}
-
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-// @param[in] indent インデントレベル
-void
-AstIfBlock::print(ostream& s,
-		  ymuint indent) const
-{
-#if 0
-  print_indent(s, indent);
-  s << "elif ";
-  mChildList[0]->print(s);
-  s << " {" << endl;
-
-  print_statement_list(s, mChildList[1], indent + 1);
-
-  print_indent(s, indent);
-  s << "}" << endl;
-#endif
 }
 
 
@@ -413,7 +452,7 @@ ymuint
 AstWhile::calc_size()
 {
   ymuint size = mCond->calc_size();
-  size += block()->calc_size();
+  size += AstBlockStmt::calc_size();
   size += 4;
   return size;
 }
@@ -434,7 +473,7 @@ AstWhile::compile(YmslDriver& driver,
   code_list.write_opcode(addr, YMVM_BRANCH_FALSE);
   Ymsl_INT label2_addr = addr;
   code_list.write_int(addr, 0);
-  block()->compile(driver, code_list, addr);
+  AstBlockStmt::compile(driver, code_list, addr);
   code_list.write_opcode(addr, YMVM_JUMP);
   code_list.write_int(addr, label1);
   code_list.write_int(label2_addr, addr);
@@ -451,7 +490,7 @@ AstWhile::print(ostream& s,
   s << "while ";
   mCond->print(s);
   s << " {" << endl;
-  block()->print(s, indent + 1);
+  AstBlockStmt::print(s, indent + 1);
   s << "}" << endl;
 }
 
@@ -481,7 +520,7 @@ AstDoWhile::~AstDoWhile()
 ymuint
 AstDoWhile::calc_size()
 {
-  ymuint size = block()->calc_size();
+  ymuint size = AstBlockStmt::calc_size();
   size += mCond->calc_size();
   size += 2;
   return size;
@@ -499,7 +538,7 @@ AstDoWhile::compile(YmslDriver& driver,
 		    Ymsl_INT& addr)
 {
   Ymsl_INT label1 = addr;
-  block()->compile(driver, code_list, addr);
+  AstBlockStmt::compile(driver, code_list, addr);
   mCond->compile(driver, code_list, addr);
   code_list.write_opcode(addr, YMVM_BRANCH_TRUE);
   code_list.write_int(addr, label1);
@@ -515,7 +554,7 @@ AstDoWhile::print(ostream& s,
   print_indent(s, indent);
   s << "do {" << endl;
 
-  block()->print(s, indent + 1);
+  AstBlockStmt::print(s, indent + 1);
 
   print_indent(s, indent);
   s << "while ";
@@ -578,23 +617,19 @@ void
 AstSwitch::print(ostream& s,
 		 ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
   s << "switch ";
-  mChildList[0]->print(s);
+  mExpr->print(s);
   s << "{" << endl;
 
-  {
-    ymuint n = mChildList[1]->child_num();
-    for (ymuint i = 0; i < n; ++ i) {
-      Ast* caseitem = mChildList[1]->child(i);
-      caseitem->print(s, indent + 1);
-    }
+  ymuint n = mCaseItemList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    AstCaseItem* caseitem = mCaseItemList[i];
+    caseitem->print(s, indent + 1);
   }
 
   print_indent(s, indent);
   s << "}" << endl;
-#endif
 }
 
 
@@ -626,7 +661,6 @@ void
 AstCaseItem::print(ostream& s,
 		   ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
   if ( mLabel != NULL ) {
     s << "case ";
@@ -637,10 +671,9 @@ AstCaseItem::print(ostream& s,
   }
   s << ": " << endl;
 
-  block()->print(s, indent);
+  AstBlockStmt::print(s, indent);
 
   s << endl;
-#endif
 }
 
 
@@ -690,12 +723,8 @@ void
 AstGoto::print(ostream& s,
 	       ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
-  s << "goto ";
-  mLabel->print(s);
-  s << endl;
-#endif
+  s << "goto " << mLabel->str_val() << endl;
 }
 
 
@@ -745,11 +774,8 @@ void
 AstLabel::print(ostream& s,
 		ymuint indent) const
 {
-#if 0
   print_indent(s, indent);
-  mLabel->print(s);
-  s << ":" << endl;
-#endif
+  s << mLabel->str_val() << ":" << endl;
 }
 
 
@@ -933,19 +959,6 @@ AstBlockStmt::~AstBlockStmt()
 {
 }
 
-// @brief ブロックを返す．
-//
-// ブロックを持たない要素の場合 NULL を返す．
-AstBlock*
-AstBlockStmt::block() const
-{
-#if 0
-  return mBlock;
-#else
-  return NULL;
-#endif
-}
-
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstBlockStmt::calc_size()
@@ -980,11 +993,11 @@ void
 AstBlockStmt::print(ostream& s,
 		    ymuint indent) const
 {
-  print_indent(s, indent);
-  s << "{" << endl;
-  block()->print(s, indent + 1);
-  print_indent(s, indent);
-  s << "}" << endl;
+  ymuint n = mStmtList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    AstStatement* stmt = mStmtList[i];
+    stmt->print(s, indent);
+  }
 }
 
 

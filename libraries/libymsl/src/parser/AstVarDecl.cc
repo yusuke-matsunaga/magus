@@ -34,7 +34,6 @@ AstVarDecl::AstVarDecl(ShString name,
   mInitExpr(init_expr),
   mGlobal(global)
 {
-  mPrev = NULL;
 }
 
 // @brief デストラクタ
@@ -79,20 +78,6 @@ AstVarDecl::global() const
   return mGlobal;
 }
 
-// @brief 前の要素を取り出す．
-AstVarDecl*
-AstVarDecl::prev() const
-{
-  return mPrev;
-}
-
-// @brief 前の要素をセットする．
-void
-AstVarDecl::set_prev(AstVarDecl* prev)
-{
-  mPrev = prev;
-}
-
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstVarDecl::calc_size()
@@ -120,6 +105,11 @@ void
 AstVarDecl::print(ostream& s,
 		  ymuint indent) const
 {
+  print_indent(s, indent);
+  if ( global() ) {
+    s << "global ";
+  }
+  s << "var " << name() << ": " << type() << ";" << endl;
 }
 
 END_NAMESPACE_YM_YMSL

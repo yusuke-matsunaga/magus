@@ -125,7 +125,14 @@ AstFuncCall::compile(YmslDriver& driver,
 void
 AstFuncCall::print(ostream& s) const
 {
-  s << mFunc->name() << "(";
+  ymuint n = mFuncName.size();
+  const char* dot = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    AstSymbol* sym = mFuncName[i];
+    s << dot << sym->str_val();
+    dot = ".";
+  }
+  s << "(";
   {
     ymuint n = mExprList.size();
     const char* comma = "";
@@ -664,7 +671,13 @@ AstVarExpr::compile(YmslDriver& driver,
 void
 AstVarExpr::print(ostream& s) const
 {
-  s << mVarDecl->name();
+  ymuint n = mVarName.size();
+  const char* dot = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    AstSymbol* sym = mVarName[i];
+    s << dot << sym->str_val();
+    dot = ".";
+  }
 }
 
 

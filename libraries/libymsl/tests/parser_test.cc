@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "YmslDriver.h"
 #include "RsrvWordDic.h"
 #include "Ast.h"
-#include "AstBlock.h"
+#include "AstMgr.h"
+#include "AstStatement.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -20,21 +20,23 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
-
 int
 parser_test1(IDO& ido)
 {
   StreamMsgHandler handler(&cout);
   MsgMgr::reg_handler(&handler);
 
-  YmslDriver driver;
+  AstMgr mgr;
 
-  driver.read(ido);
-
-#if 0
-  AstBlock* toplevel = driver.toplevel_block();
-  toplevel->print(cout, 0);
-#endif
+  bool stat = mgr.read_source(ido);
+  if ( stat ) {
+    const vector<AstStatement*>& toplevel_list = mgr.toplevel_list();
+    for (vector<AstStatement*>::const_iterator p = toplevel_list.begin();
+	 p != toplevel_list.end(); ++ p) {
+      AstStatement* stmt = *p;
+      stmt->print(cout);
+    }
+  }
 
   return 0;
 }
@@ -45,18 +47,22 @@ parser_test(int argc,
 {
   if ( argc == 1 ) {
     const char* str =
-      "function print(s:string):int;\n"
-      "a:int;\n"
-      "b:int;\n"
-      "c:int;\n"
-      "d:int;\n"
-      "e:int;\n"
-      "f:int;\n"
-      "g:int;\n"
-      "h:int;\n"
-      "i:int;\n"
-      "k:int;\n"
-      "F:int;\n"
+      "import stdlib;\n"
+      "import math as R;\n"
+      "import a, b, c as D;\n"
+      "function print(s:string):int {\n"
+      "}\n"
+      "var a:int;\n"
+      "var b:int;\n"
+      "var c:int;\n"
+      "var d:int;\n"
+      "var e:int;\n"
+      "var f:int;\n"
+      "var g:int;\n"
+      "var h:int;\n"
+      "var i:int;\n"
+      "var k:int;\n"
+      "var F:int;\n"
       "a = 1;\n"
       "if a == b {\n"
       "F = a + b;\n"

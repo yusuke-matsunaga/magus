@@ -41,10 +41,6 @@ public:
   ShString
   name() const;
 
-  /// @brief トップレベルブロックを返す．
-  AstBlock*
-  toplevel_block() const;
-
   /// @brief 関数のリストを返す．
   const vector<AstFuncDecl*>&
   function_list() const;
@@ -67,7 +63,7 @@ public:
   AstVarDecl*
   find_var(ShString name) const;
 
-
+#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // bison から用いられる関数
@@ -102,7 +98,7 @@ public:
   /// @brief 現在のブロックに statement を追加する．
   void
   add_statement(AstStatement* stmt);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -115,12 +111,13 @@ private:
   // グローバル辞書
   // 関数とグローバル変数が登録されている
   SymDict mGlobalDict;
-
+#if 0
   // トップレベルブロック
   AstBlock* mToplevelBlock;
 
   // ブロックスタック
   vector<AstBlock*> mBlockStack;
+#endif
 
   // 関数のリスト
   vector<AstFuncDecl*> mFuncList;

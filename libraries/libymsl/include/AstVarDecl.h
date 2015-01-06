@@ -70,14 +70,6 @@ public:
   bool
   global() const;
 
-  /// @brief 前の要素を取り出す．
-  AstVarDecl*
-  prev() const;
-
-  /// @brief 前の要素をセットする．
-  void
-  set_prev(AstVarDecl* prev);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -129,9 +121,6 @@ private:
 
   // グローバル変数の時 true にするフラグ
   bool mGlobal;
-
-  // 前の要素
-  AstVarDecl* mPrev;
 
 };
 

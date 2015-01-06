@@ -9,6 +9,7 @@
 
 #include "Ast.h"
 #include "AstSymbol.h"
+#include "AstModule.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -61,6 +62,66 @@ ShString
 AstSymbol::str_val() const
 {
   return mVal;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス AstModule
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] module モジュール名
+// @param[in] alias エイリアス名
+// @param[in] loc ファイル位置
+AstModule::AstModule(AstSymbol* module,
+		     AstSymbol* alias,
+		     const FileRegion& loc) :
+  Ast(loc),
+  mModuleName(module),
+  mAliasName(alias)
+{
+}
+
+// @brief デストラクタ
+AstModule::~AstModule()
+{
+}
+
+// @brief モジュール名を返す．
+AstSymbol*
+AstModule::module_name() const
+{
+  return mModuleName;
+}
+
+// @brief エイリアス名を返す．
+//
+// 場合によっては NULL を返す．
+AstSymbol*
+AstModule::alias_name() const
+{
+  return mAliasName;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// misc
+//////////////////////////////////////////////////////////////////////
+
+// @brief ValueType を出力する．
+ostream&
+operator<<(ostream& s,
+	   ValueType vt)
+{
+  switch ( vt ) {
+  case kVoidType:    s << "void"; break;
+  case kBooleanType: s << "boolean"; break;
+  case kIntType:     s << "int"; break;
+  case kFloatType:   s << "float"; break;
+  case kStringType:  s << "string"; break;
+  case kUserType:    s << "__user__"; break;
+  }
+  return s;
 }
 
 END_NAMESPACE_YM_YMSL

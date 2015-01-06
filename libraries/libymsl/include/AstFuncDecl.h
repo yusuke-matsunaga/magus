@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "Ast.h"
+#include "AstStatement.h"
 #include "YmUtils/ShString.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 関数宣言を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstFuncDecl :
-  public Ast
+  public AstStatement
 {
   friend class YmslModule;
 
@@ -67,6 +67,29 @@ public:
   /// @brief 本体のリストを返す．
   const vector<AstStatement*>&
   stmt_list() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // AstStatement の仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 命令コードのサイズを計算する．
+  virtual
+  ymuint
+  calc_size();
+
+  /// @brief 命令コードを生成する．
+  /// @param[in] driver ドライバ
+  /// @param[in] code_list 命令コードの格納先
+  /// @param[inout] addr 命令コードの現在のアドレス
+  ///
+  /// addr の値は更新される．
+  virtual
+  void
+  compile(YmslDriver& driver,
+	  YmslCodeList& code_list,
+	  Ymsl_INT& addr);
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

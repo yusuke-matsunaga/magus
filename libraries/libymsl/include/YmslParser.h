@@ -49,6 +49,7 @@ public:
   read_source(IDO& ido,
 	      YmslModule* module);
 
+#if 0
   /// @brief トップレベルブロックを返す．
   AstBlock*
   toplevel_block() const;
@@ -74,13 +75,14 @@ public:
   /// 見つからなければ NULL を返す．
   AstVarDecl*
   find_var(ShString name) const;
+#endif
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // bison から用いられる関数
   //////////////////////////////////////////////////////////////////////
-
+#if 0
   /// @brief 現在のブロックを返す．
   AstBlock*
   cur_block() const;
@@ -117,6 +119,7 @@ public:
   /// @brief 現在のブロックに statement を追加する．
   void
   add_statement(AstStatement* stmt);
+#endif
 
   /// @brief yylex とのインターフェイス
   /// @param[out] lval 値を格納する変数

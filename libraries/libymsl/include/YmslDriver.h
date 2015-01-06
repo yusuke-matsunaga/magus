@@ -44,10 +44,6 @@ public:
   bool
   read(IDO& ido);
 
-  /// @brief トップレベルブロックを返す．
-  AstBlock*
-  toplevel_block() const;
-
 
 #if 0
 public:

@@ -41,12 +41,12 @@ class YmslSubspace;
 class YmslValueType;
 class YmslVar;
 
-class AstBlock;
 class AstCaseItem;
 class AstExpr;
 class AstFuncDecl;
 class AstIfBlock;
 class AstMgr;
+class AstModule;
 class AstPrimary;
 class AstStatement;
 class AstStringConst;
@@ -57,6 +57,7 @@ class AstVarDecl;
 template <typename T>
 class AstList;
 
+typedef AstList<AstModule> AstModuleList;
 typedef AstList<AstStatement> AstStmtList;
 typedef AstList<AstIfBlock> AstIfList;
 typedef AstList<AstCaseItem> AstCaseList;
@@ -208,6 +209,11 @@ enum ValueType {
   kStringType,
   kUserType
 };
+
+/// @brief ValueType を出力する．
+ostream&
+operator<<(ostream& s,
+	   ValueType vt);
 
 
 //////////////////////////////////////////////////////////////////////

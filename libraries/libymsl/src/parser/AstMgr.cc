@@ -8,41 +8,46 @@
 
 
 #include "AstMgr.h"
-#include "AstFuncDecl.h"
-#include "AstVarDecl.h"
-#include "AstSymbol.h"
-#include "AstVarDecl.h"
-#include "AstFuncDecl.h"
+
+#include "YmslScanner.h"
+
 #include "AstAssignment.h"
+#include "AstBinOp.h"
+#include "AstBlockStmt.h"
+#include "AstBooleanType.h"
+#include "AstBreak.h"
+#include "AstCaseItem.h"
+#include "AstContinue.h"
+#include "AstDoWhile.h"
+#include "AstExpr.h"
+#include "AstExprStmt.h"
+#include "AstFloatConst.h"
+#include "AstFloatType.h"
+#include "AstFor.h"
+#include "AstFuncCall.h"
+#include "AstFuncDecl.h"
+#include "AstGoto.h"
 #include "AstIf.h"
 #include "AstIfBlock.h"
-#include "AstFor.h"
-#include "AstWhile.h"
-#include "AstDoWhile.h"
-#include "AstSwitch.h"
-#include "AstCaseItem.h"
-#include "AstGoto.h"
-#include "AstLabel.h"
-#include "AstBreak.h"
-#include "AstContinue.h"
-#include "AstReturn.h"
-#include "AstBlockStmt.h"
-#include "AstExprStmt.h"
-#include "AstFuncCall.h"
-#include "AstUniOp.h"
-#include "AstBinOp.h"
-#include "AstIteOp.h"
-#include "AstVarExpr.h"
+#include "AstImport.h"
 #include "AstIntConst.h"
-#include "AstFloatConst.h"
-#include "AstStringConst.h"
-#include "AstPrimary.h"
-#include "AstVoidType.h"
-#include "AstBooleanType.h"
 #include "AstIntType.h"
-#include "AstFloatType.h"
+#include "AstIteOp.h"
+#include "AstLabel.h"
+#include "AstList.h"
+#include "AstModule.h"
+#include "AstPrimary.h"
+#include "AstReturn.h"
+#include "AstStringConst.h"
 #include "AstStringType.h"
+#include "AstSwitch.h"
+#include "AstSymbol.h"
+#include "AstUniOp.h"
 #include "AstUserType.h"
+#include "AstVarDecl.h"
+#include "AstVarExpr.h"
+#include "AstVoidType.h"
+#include "AstWhile.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -54,11 +59,121 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 AstMgr::AstMgr()
 {
+  mScanner = NULL;
+  mDebug = false;
 }
 
 // @brief デストラクタ
 AstMgr::~AstMgr()
 {
+}
+
+// @brief ソースファイルを読み込む．
+// @param[in] ido 入力データ
+// @return 読み込みに成功したら true を返す．
+bool
+AstMgr::read_source(IDO& ido)
+{
+  int yyparser(AstMgr&);
+
+  mScanner = new YmslScanner(ido);
+
+  int stat = yyparse(*this);
+
+  delete mScanner;
+  mScanner = NULL;
+
+  return (stat == 0);
+}
+
+// @brief トップレベルのステートメントリストを返す．
+const vector<AstStatement*>&
+AstMgr::toplevel_list() const
+{
+  return mToplevelList;
+}
+
+// @brief 根のノードをセットする．
+void
+AstMgr::set_root(AstStmtList* stmt_list)
+{
+  mToplevelList.clear();
+  mToplevelList.resize(stmt_list->size());
+  ymuint pos = 0;
+  for (AstStmtList::Iterator p = stmt_list->begin();
+       !p.is_end(); p.next()) {
+    mToplevelList[pos] = *p;
+    ++ pos;
+  }
+}
+
+// @brief yylex とのインターフェイス
+// @param[out] lval 値を格納する変数
+// @param[out] lloc 位置情報を格納する変数
+// @return 読み込んだトークンの id を返す．
+int
+AstMgr::scan(YYSTYPE& lval,
+	     FileRegion& lloc)
+{
+  int id = mScanner->read_token(lloc);
+
+  switch ( id ) {
+  case SYMBOL:
+    lval.symbol_type = new_Symbol(ShString(mScanner->cur_string()), lloc);
+    break;
+
+  case STRING_VAL:
+    lval.expr_type = new_StringConst(mScanner->cur_string(), lloc);
+    break;
+
+  case INT_VAL:
+    lval.expr_type = new_IntConst(mScanner->cur_int(), lloc);
+    break;
+
+  case FLOAT_VAL:
+    lval.expr_type = new_FloatConst(mScanner->cur_float(), lloc);
+    break;
+
+  default:
+    break;
+  }
+  if ( mDebug ) {
+    RsrvWordDic dic;
+    switch ( id ) {
+    case SYMBOL:     cout << "SYMBOL[" << mScanner->cur_string() << "]"; break;
+    case INT_VAL:    cout << "INT[" << mScanner->cur_int() << "]"; break;
+    case FLOAT_VAL:  cout << "FLOAT[" << mScanner->cur_float() << "]"; break;
+    case STRING_VAL: cout << "STRING[" << mScanner->cur_string() << "]"; break;
+    case EOF:        cout << "EOF"; break;
+    default:         cout << dic.str(id); break;
+    }
+    cout << endl;
+  }
+  return id;
+}
+
+// @brief import 用のモジュール記述を作る
+// @param[in] module モジュール名
+// @param[in] alias エイリアス名
+// @param[in] loc ファイル位置
+AstModule*
+AstMgr::new_Module(AstSymbol* module,
+		   AstSymbol* alias,
+		   const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstModule));
+  return new (p) AstModule(module, alias, loc);
+}
+
+// @brief import 文を作る．
+// @param[in] module_list モジュールのリスト
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_Import(AstModuleList* module_list,
+		   const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstImport));
+  return new (p) AstImport(module_list, loc);
 }
 
 // @brief 変数宣言を作る．

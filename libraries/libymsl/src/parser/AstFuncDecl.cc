@@ -28,7 +28,7 @@ AstFuncDecl::AstFuncDecl(ShString name,
 			 AstVarList* param_list,
 			 AstStmtList* stmt_list,
 			 const FileRegion& loc) :
-  Ast(loc),
+  AstStatement(loc),
   mName(name),
   mIndex(-1),
   mType(type),
@@ -87,6 +87,26 @@ const vector<AstStatement*>&
 AstFuncDecl::stmt_list() const
 {
   return mStmtList;
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstFuncDecl::calc_size()
+{
+  return 0;
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstFuncDecl::compile(YmslDriver& driver,
+		     YmslCodeList& code_list,
+		     Ymsl_INT& addr)
+{
 }
 
 // @brief 内容を表示する．(デバッグ用)
