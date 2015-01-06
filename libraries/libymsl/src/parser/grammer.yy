@@ -13,12 +13,13 @@
 #include "YmUtils/MsgMgr.h"
 
 #include "YmslParser.h"
-
+#include "AstMgr.h"
 #include "AstBlock.h"
 #include "AstExpr.h"
+#include "AstList.h"
+#include "AstSymbol.h"
 #include "AstVarDecl.h"
 
-#include "../src/parser/AstSymbol.h"
 
 // より詳細なエラー情報を出力させる．
 #define YYERROR_VERBOSE 1
@@ -37,12 +38,14 @@ BEGIN_NAMESPACE_YM_YMSL
 int
 yylex(YYSTYPE*,
       YYLTYPE*,
-      YmslParser&);
+      YmslParser&,
+      AstMgr& mgr);
 
 // エラー報告関数
 int
 yyerror(YYLTYPE*,
 	YmslParser&,
+	AstMgr&,
 	const char*);
 
 
@@ -86,22 +89,28 @@ fr_merge(const FileRegion fr_array[],
 
 // yyparse の引数
 %parse-param {YmslParser& parser}
+%parse-param {AstMgr& mgr}
 
 // yylex の引数
 %lex-param {YmslParser& parser}
+%lex-param {AstMgr& mgr}
 
 // 値を表す型
 %union {
-  TokenType     token_type;
-  AstBlock*     block_type;
-  AstCaseItem*  caseitem_type;
-  AstExpr*      expr_type;
-  AstIfBlock*   ifblock_type;
-  AstPrimary*   primary_type;
-  AstStatement* statement_type;
-  AstSymbol*    symbol_type;
-  AstVarDecl*   vardecl_type;
-  AstValueType* valuetype_type;
+  TokenType      token_type;
+  AstBlock*      block_type;
+  AstCaseList*   caselist_type;
+  AstExpr*       expr_type;
+  AstExprList*   exprlist_type;
+  AstIfList*     iflist_type;
+  AstPrimary*    primary_type;
+  AstStatement*  statement_type;
+  AstStmtList*   stmtlist_type;
+  AstSymbol*     symbol_type;
+  AstSymbolList* symbollist_type;
+  AstVarDecl*    vardecl_type;
+  AstVarList*    varlist_type;
+  AstValueType*  valuetype_type;
 }
 
 
@@ -177,21 +186,22 @@ fr_merge(const FileRegion fr_array[],
 %left     LOGNOT BITNEG UOP
 
 // 非終端の型
-%type <block_type>     statement_block
-%type <caseitem_type>  case_list
-%type <expr_type>      expr
-%type <expr_type>      expr_list
-%type <expr_type>      init_expr
-%type <primary_type>   lvalue
-%type <ifblock_type>   if_list
-%type <ifblock_type>   if_else_list
-%type <statement_type> block_statement
-%type <statement_type> single_statement
-%type <statement_type> statement
-%type <symbol_type>    identifier
-%type <token_type>     eqop
-%type <valuetype_type> type
-%type <vardecl_type>   param param_list
+%type <caselist_type>   case_list
+%type <expr_type>       expr
+%type <expr_type>       init_expr
+%type <exprlist_type>   expr_list
+%type <primary_type>    lvalue
+%type <iflist_type>     if_list
+%type <iflist_type>     if_else_list
+%type <statement_type>  complex_statement
+%type <statement_type>  single_statement
+%type <statement_type>  statement
+%type <stmtlist_type>   statement_list
+%type <symbollist_type> identifier
+%type <token_type>      eqop
+%type <valuetype_type>  type
+%type <vardecl_type>    param
+%type <varlist_type>    param_list
 
 %%
 
@@ -215,14 +225,14 @@ item
 // 関数定義
 | func_head SYMBOL LP param_list RP COLON type LCB statement_list RCB
 {
-  AstFuncDecl* funcdecl = parser.new_FuncDecl($2, $7, $4, @$);
+  AstFuncDecl* funcdecl = mgr.new_FuncDecl($2, $7, $4, $9, @$);
   parser.pop_block();
   parser.add_function(funcdecl);
 }
 // グローバル変数定義
 | GLOBAL SYMBOL COLON type init_expr SEMI
 {
-  AstVarDecl* vardecl = parser.new_VarDecl($2, $4, $5, true, @$);
+  AstVarDecl* vardecl = mgr.new_VarDecl($2, $4, $5, true, @$);
   parser.add_statement(vardecl);
 }
 // import 文
@@ -264,20 +274,20 @@ statement
 {
   $$ = $1;
 }
-// ブロックステートメント
-| block_statement
+// 複合文
+| complex_statement
 {
   $$ = $1;
 }
 // ローカル変数定義
 | VAR SYMBOL COLON type init_expr SEMI
 {
-  $$ = parser.new_VarDecl($2, $4, $5, false, @$);
+  $$ = mgr.new_VarDecl($2, $4, $5, false, @$);
 }
 // ラベル文
 | SYMBOL COLON
 {
-  $$ = parser.new_Label($1, @$);
+  $$ = mgr.new_Label($1, @$);
 }
 // エラー回復用のルール
 | error SEMI
@@ -290,12 +300,12 @@ single_statement
 // 代入文
 : lvalue eqop expr
 {
-  $$ = parser.new_Assignment($2, $1, $3);
+  $$ = mgr.new_Assignment($2, $1, $3);
 }
 // 式文
 | expr
 {
-  $$ = parser.new_ExprStmt($1);
+  $$ = mgr.new_ExprStmt($1);
 }
 // インクリメント文
 | lvalue PLUSPLUS
@@ -308,27 +318,27 @@ single_statement
 // GOTO 文
 | GOTO SYMBOL
 {
-  $$ = parser.new_Goto($2, @$);
+  $$ = mgr.new_Goto($2, @$);
 }
 // BREAK 文
 | BREAK
 {
-  $$ = parser.new_Break(@$);
+  $$ = mgr.new_Break(@$);
 }
 // CONTINUE 文
 | CONTINUE
 {
-  $$ = parser.new_Continue(@$);
+  $$ = mgr.new_Continue(@$);
 }
 // RETURN 文(引数なし)
 | RETURN
 {
-  $$ = parser.new_Return(NULL, @$);
+  $$ = mgr.new_Return(NULL, @$);
 }
 // RETURN 文(引数あり)
 | RETURN expr
 {
-  $$ = parser.new_Return($2, @$);
+  $$ = mgr.new_Return($2, @$);
 }
 ;
 
@@ -350,75 +360,64 @@ eqop
 
 // 複合文
 // というか末尾にセミコロンがこない文
-block_statement
+complex_statement
 // IF 文
 : if_else_list
 {
-  $$ = parser.new_If($1, @$);
+  $$ = mgr.new_If($1, @$);
 }
 // FOR 文
-| FOR LP single_statement SEMI expr SEMI single_statement RP statement_block
+| FOR LP single_statement SEMI expr SEMI single_statement RP LCB statement_list RCB
 {
-  $$ = parser.new_For($3, $5, $7, $9, @$);
+  $$ = mgr.new_For($3, $5, $7, $10, @$);
 }
 // WHILE 文
-| WHILE LP expr RP statement_block
+| WHILE LP expr RP LCB statement_list RCB
 {
-  $$ = parser.new_While($3, $5, @$);
+  $$ = mgr.new_While($3, $6, @$);
 }
 // DO-WHILE 文
-| DO statement_block WHILE LP expr RP
+| DO LCB statement_list RCB WHILE LP expr RP
 {
-  $$ = parser.new_DoWhile($2, $5, @$);
+  $$ = mgr.new_DoWhile($3, $7, @$);
 }
 // SWITCH 文
 | SWITCH expr LCB case_list RCB
 {
-  $$ = parser.new_Switch($2, $4, @$);
+  $$ = mgr.new_Switch($2, $4, @$);
 }
 // ブロック文
-| statement_block
+| LCB statement_list RCB
 {
-  $$ = parser.new_BlockStmt($1, @$);
-}
-;
-
-// ブロック
-statement_block
-: stmt_begin statement_list RCB
-{
-  $$ = parser.cur_block();
-  parser.pop_block();
-}
-;
-
-// ブロック文の開始
-// わざと非終端ノードを導入したのは
-// 本体よりも先にアクションを起こすため．
-stmt_begin
-: LCB
-{
-  parser.push_new_block();
+  $$ = mgr.new_BlockStmt($2, @$);
 }
 ;
 
 statement_list
 : // 空
+{
+  $$ = new AstStmtList;
+}
 | statement_list statement
 {
-  parser.add_statement($2);
+  $$ = $1;
+  $$->add($2);
 }
 ;
 
 // if 〜 elif 〜 のリスト
 if_list
-: IF expr statement_block
+: IF expr LCB statement_list RCB
 {
-  $$ = parser.new_IfBlock(NULL, $2, $3, @$);
+  AstIfBlock* block = mgr.new_IfBlock($2, $4, @$);
+  $$ = new AstIfList;
+  $$->add(block);
 }
-| if_list ELIF expr statement_block
+| if_list ELIF expr LCB statement_list RCB
 {
-  $$ = parser.new_IfBlock($1, $3, $4, FileRegion(@2, @4));
+  AstIfBlock* block = mgr.new_IfBlock($3, $5, FileRegion(@2, @6));
+  $$ = $1;
+  $$->add(block);
 }
 ;
 
@@ -428,24 +427,30 @@ if_else_list
 {
   $$ = $1;
 }
-| if_list ELSE statement_block
+| if_list ELSE LCB statement_list RCB
 {
-  $$ = parser.new_IfBlock($1, NULL, $3, FileRegion(@2, @3));
+  AstIfBlock* block = mgr.new_IfBlock(NULL, $4, FileRegion(@2, @5));
+  $$ = $1;
+  $$->add(block);
 }
 ;
 
 case_list
 : // 空
 {
-  $$ = NULL;
+  $$ = new AstCaseList;
 }
-| case_list CASE expr COLON statement_block
+| case_list CASE expr COLON LCB statement_list RCB
 {
-  $$ = parser.new_CaseItem($1, $3, $5, FileRegion(@2, @5));
+  AstCaseItem* item = mgr.new_CaseItem($3, $6, FileRegion(@2, @7));
+  $$ = $1;
+  $$->add(item);
 }
-| case_list DEFAULT COLON statement_block
+| case_list DEFAULT COLON LCB statement_list RCB
 {
-  $$ = parser.new_CaseItem($1, NULL, $4, FileRegion(@2, @4));
+  AstCaseItem* item = mgr.new_CaseItem(NULL, $5, FileRegion(@2, @6));
+  $$ = $1;
+  $$->add(item);
 }
 ;
 
@@ -453,15 +458,12 @@ case_list
 lvalue
 : identifier
 {
-  $$ = parser.new_Primary($1);
-  if ( $$ == NULL ) {
-    YYERROR;
-  }
+  $$ = mgr.new_Primary($1, @$);
 }
 /*
 | identifier LBK expr RBK
 {
-  $$ = parser.new_ArrayRef($1, $3, @$);
+  $$ = mgr.new_ArrayRef($1, $3, @$);
 }
 */
 ;
@@ -470,16 +472,17 @@ lvalue
 param_list
 : // 空
 {
-  $$ = NULL;
+  $$ = new AstVarList;
 }
 | param
 {
-  $$ = $1;
+  $$ = new AstVarList;
+  $$->add($1);
 }
 | param_list COMMA param
 {
-  $$ = $3;
-  $$->set_prev($1);
+  $$ = $1;
+  $$->add($3);
 }
 ;
 
@@ -487,7 +490,7 @@ param_list
 param
 : SYMBOL COLON type init_expr
 {
-  $$ = parser.new_VarDecl($1, $3, $4, false, @$);
+  $$ = mgr.new_VarDecl($1, $3, $4, false, @$);
 }
 ;
 
@@ -495,27 +498,27 @@ param
 type
 : VOID
 {
-  $$ = parser.new_VoidType(@$);
+  $$ = mgr.new_VoidType(@$);
 }
 | BOOLEAN
 {
-  $$ = parser.new_BooleanType(@$);
+  $$ = mgr.new_BooleanType(@$);
 }
 | INT
 {
-  $$ = parser.new_IntType(@$);
+  $$ = mgr.new_IntType(@$);
 }
 | FLOAT
 {
-  $$ = parser.new_FloatType(@$);
+  $$ = mgr.new_FloatType(@$);
 }
 | STRING
 {
-  $$ = parser.new_StringType(@$);
+  $$ = mgr.new_StringType(@$);
 }
 | SYMBOL
 {
-  $$ = parser.new_UserType($1);
+  $$ = mgr.new_UserType($1);
 }
 ;
 
@@ -534,108 +537,108 @@ expr
 // 単項演算
 : PLUS expr %prec UOP
 {
-  $$ = parser.new_UniOp(PLUS, $2, @$);
+  $$ = mgr.new_UniOp(PLUS, $2, @$);
 }
 | MINUS expr %prec UOP
 {
-  $$ = parser.new_UniOp(MINUS, $2, @$);
+  $$ = mgr.new_UniOp(MINUS, $2, @$);
 }
 | BITNEG expr
 {
-  $$ = parser.new_UniOp(BITNEG, $2, @$);
+  $$ = mgr.new_UniOp(BITNEG, $2, @$);
 }
 | LOGNOT expr
 {
-  $$ = parser.new_UniOp(LOGNOT, $2, @$);
+  $$ = mgr.new_UniOp(LOGNOT, $2, @$);
 }
 | INT LP expr RP
 {
-  $$ = parser.new_UniOp(INT, $3, @$);
+  $$ = mgr.new_UniOp(INT, $3, @$);
 }
 | BOOLEAN LP expr RP
 {
-  $$ = parser.new_UniOp(BOOLEAN, $3, @$);
+  $$ = mgr.new_UniOp(BOOLEAN, $3, @$);
 }
 | FLOAT LP expr RP
 {
-  $$ = parser.new_UniOp(FLOAT, $3, @$);
+  $$ = mgr.new_UniOp(FLOAT, $3, @$);
 }
 // 二項演算
 | expr PLUS expr
 {
-  $$ = parser.new_BinOp(PLUS, $1, $3);
+  $$ = mgr.new_BinOp(PLUS, $1, $3);
 }
 | expr MINUS expr
 {
-  $$ = parser.new_BinOp(MINUS, $1, $3);
+  $$ = mgr.new_BinOp(MINUS, $1, $3);
 }
 | expr MULT expr
 {
-  $$ = parser.new_BinOp(MULT, $1, $3);
+  $$ = mgr.new_BinOp(MULT, $1, $3);
 }
 | expr DIV expr
 {
-  $$ = parser.new_BinOp(DIV, $1, $3);
+  $$ = mgr.new_BinOp(DIV, $1, $3);
 }
 | expr MOD expr
 {
-  $$ = parser.new_BinOp(MOD, $1, $3);
+  $$ = mgr.new_BinOp(MOD, $1, $3);
 }
 | expr LSHIFT expr
 {
-  $$ = parser.new_BinOp(LSHIFT, $1, $3);
+  $$ = mgr.new_BinOp(LSHIFT, $1, $3);
 }
 | expr RSHIFT expr
 {
-  $$ = parser.new_BinOp(RSHIFT, $1, $3);
+  $$ = mgr.new_BinOp(RSHIFT, $1, $3);
 }
 | expr BITAND expr
 {
-  $$ = parser.new_BinOp(BITAND, $1, $3);
+  $$ = mgr.new_BinOp(BITAND, $1, $3);
 }
 | expr BITOR expr
 {
-  $$ = parser.new_BinOp(BITOR, $1, $3);
+  $$ = mgr.new_BinOp(BITOR, $1, $3);
 }
 | expr BITXOR expr
 {
-  $$ = parser.new_BinOp(BITXOR, $1, $3);
+  $$ = mgr.new_BinOp(BITXOR, $1, $3);
 }
 | expr LOGAND expr
 {
-  $$ = parser.new_BinOp(LOGAND, $1, $3);
+  $$ = mgr.new_BinOp(LOGAND, $1, $3);
 }
 | expr LOGOR expr
 {
-  $$ = parser.new_BinOp(LOGOR, $1, $3);
+  $$ = mgr.new_BinOp(LOGOR, $1, $3);
 }
 | expr EQEQ expr
 {
-  $$ = parser.new_BinOp(EQEQ, $1, $3);
+  $$ = mgr.new_BinOp(EQEQ, $1, $3);
 }
 | expr NOTEQ expr
 {
-  $$ = parser.new_BinOp(NOTEQ, $1, $3);
+  $$ = mgr.new_BinOp(NOTEQ, $1, $3);
 }
 | expr LT expr
 {
-  $$ = parser.new_BinOp(LT, $1, $3);
+  $$ = mgr.new_BinOp(LT, $1, $3);
 }
 | expr GT expr
 {
-  $$ = parser.new_BinOp(GT, $1, $3);
+  $$ = mgr.new_BinOp(GT, $1, $3);
 }
 | expr LE expr
 {
-  $$ = parser.new_BinOp(LE, $1, $3);
+  $$ = mgr.new_BinOp(LE, $1, $3);
 }
 | expr GE expr
 {
-  $$ = parser.new_BinOp(GE, $1, $3);
+  $$ = mgr.new_BinOp(GE, $1, $3);
 }
 | expr QST expr COLON expr %prec ITE
 {
-  $$ = parser.new_IteOp($1, $3, $5);
+  $$ = mgr.new_IteOp($1, $3, $5);
 }
 | LP expr RP
 {
@@ -643,17 +646,17 @@ expr
 }
 | identifier
 {
-  $$ = parser.new_VarExpr($1, @$);
+  $$ = mgr.new_VarExpr($1, @$);
 }
 /*
 | identifier LBK expr RBK
 {
-  $$ = parser.new_ArrayRef($1, $3, @$);
+  $$ = mgr.new_ArrayRef($1, $3, @$);
 }
 */
 | identifier LP expr_list RP
 {
-  $$ = parser.new_FuncCall($1, $3, @$);
+  $$ = mgr.new_FuncCall($1, $3, @$);
 }
 | INT_VAL
 {
@@ -673,16 +676,17 @@ expr
 expr_list
 : // 空
 {
-  $$ = NULL;
+  $$ = new AstExprList;
 }
 | expr
 {
-  $$ = $1;
+  $$ = new AstExprList;
+  $$->add($1);
 }
 | expr_list COMMA expr
 {
-  $$ = $3;
-  $$->set_prev($1);
+  $$ = $1;
+  $$->add($3);
 }
 ;
 
@@ -690,12 +694,13 @@ expr_list
 identifier
 : SYMBOL
 {
-  $$ = $1;
+  $$ = new AstSymbolList;
+  $$->add($1);
 }
 | identifier DOT SYMBOL
 {
-  $$ = $3;
-  $$->set_next($1);
+  $$ = $1;
+  $$->add($3);
 }
 ;
 
@@ -710,9 +715,10 @@ identifier
 int
 yylex(YYSTYPE* lvalp,
       YYLTYPE* llocp,
-      YmslParser& parser)
+      YmslParser& parser,
+      AstMgr& mgr)
 {
-  return parser.scan(*lvalp, *llocp);
+  return parser.scan(*lvalp, *llocp, mgr);
 }
 
 // yacc パーサーが内部で呼び出す関数
@@ -720,6 +726,7 @@ yylex(YYSTYPE* lvalp,
 int
 yyerror(YYLTYPE* llocp,
 	YmslParser& parser,
+	AstMgr& mgr,
 	const char* s)
 {
   string s2;

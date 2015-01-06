@@ -13,6 +13,7 @@
 #include "AstIf.h"
 #include "AstIfBlock.h"
 #include "AstFor.h"
+#include "AstList.h"
 #include "AstWhile.h"
 #include "AstDoWhile.h"
 #include "AstSwitch.h"
@@ -168,32 +169,19 @@ AstAssignment::print(ostream& s,
 // クラス AstIf
 //////////////////////////////////////////////////////////////////////
 
-BEGIN_NONAMESPACE
-
-ymuint
-count_size(AstIfBlock* block_list)
-{
-  ymuint n = 0;
-  for (AstIfBlock* ib = block_list; ib != NULL; ib = ib->prev()) {
-    ++ n;
-  }
-  return n;
-}
-
-END_NONAMESPACE
-
 // @brief コンストラクタ
 // @param[in] if_list IfBlock のリスト
 // @param[in] loc ファイル位置
-AstIf::AstIf(AstIfBlock* if_list,
+AstIf::AstIf(AstIfList* if_list,
 	     const FileRegion& loc) :
   AstStatement(loc),
-  mIfBlockList(count_size(if_list))
+  mIfBlockList(if_list->size())
 {
-  ymuint i = mIfBlockList.size();
-  for (AstIfBlock* ib = if_list; ib != NULL; ib = ib->prev()) {
-    -- i;
-    mIfBlockList[i] = ib;
+  ymuint pos = 0;
+  for (AstIfList::Iterator p = if_list->begin();
+       !p.is_end(); p.next()) {
+    mIfBlockList[pos] = *p;
+    ++ pos;
   }
 }
 
@@ -287,30 +275,20 @@ AstIf::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] prev 前の要素
 // @param[in] cond 条件
-// @param[in] block 本体
+// @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
-AstIfBlock::AstIfBlock(AstIfBlock* prev,
-		       AstExpr* cond,
-		       AstBlock* block,
+AstIfBlock::AstIfBlock(AstExpr* cond,
+		       AstStmtList* stmt_list,
 		       const FileRegion& loc) :
-  AstBlockStmt(block, loc),
-  mCond(cond),
-  mPrev(prev)
+  AstBlockStmt(stmt_list, loc),
+  mCond(cond)
 {
 }
 
 // @brief デストラクタ
 AstIfBlock::~AstIfBlock()
 {
-}
-
-// @brief 前の要素を得る．
-AstIfBlock*
-AstIfBlock::prev() const
-{
-  return mPrev;
 }
 
 // @brief 条件を返す．
@@ -349,14 +327,14 @@ AstIfBlock::print(ostream& s,
 // @param[in] init 初期化文
 // @param[in] cond 条件式
 // @param[in] next 増加文
-// @param[in] body 本文
+// @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
 AstFor::AstFor(AstStatement* init,
 	       AstExpr* cond,
 	       AstStatement* next,
-	       AstBlock* block,
+	       AstStmtList* stmt_list,
 	       const FileRegion& loc) :
-  AstBlockStmt(block, loc),
+  AstBlockStmt(stmt_list, loc),
   mInit(init),
   mCond(cond),
   mNext(next)
@@ -415,12 +393,12 @@ AstFor::print(ostream& s,
 
 // @brief コンストラクタ
 // @param[in] cond 条件式
-// @param[in] body 本文
+// @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
 AstWhile::AstWhile(AstExpr* cond,
-		   AstBlock* block,
+		   AstStmtList* stmt_list,
 		   const FileRegion& loc) :
-  AstBlockStmt(block, loc),
+  AstBlockStmt(stmt_list, loc),
   mCond(cond)
 {
 }
@@ -483,13 +461,13 @@ AstWhile::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] block 本体
+// @param[in] stmt_list 本体の文
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
-AstDoWhile::AstDoWhile(AstBlock* block,
+AstDoWhile::AstDoWhile(AstStmtList* stmt_list,
 		       AstExpr* cond,
 		       const FileRegion& loc) :
-  AstBlockStmt(block, loc),
+  AstBlockStmt(stmt_list, loc),
   mCond(cond)
 {
 }
@@ -550,35 +528,22 @@ AstDoWhile::print(ostream& s,
 // クラス AstSwitch
 //////////////////////////////////////////////////////////////////////
 
-BEGIN_NONAMESPACE
-
-ymuint
-count_size(AstCaseItem* block_list)
-{
-  ymuint n = 0;
-  for (AstCaseItem* ib = block_list; ib != NULL; ib = ib->prev()) {
-    ++ n;
-  }
-  return n;
-}
-
-END_NONAMESPACE
-
 // @brief コンストラクタ
 // @param[in] expr 条件式
 // @param[in] case_list case リスト
 // @param[in] loc ファイル位置
 AstSwitch::AstSwitch(AstExpr* expr,
-		     AstCaseItem* case_list,
+		     AstCaseList* case_list,
 		     const FileRegion& loc) :
   AstStatement(loc),
   mExpr(expr),
-  mCaseItemList(count_size(case_list))
+  mCaseItemList(case_list->size())
 {
-  ymuint i = mCaseItemList.size();
-  for (AstCaseItem* ci = case_list; ci != NULL; ci = ci->prev()) {
-    -- i;
-    mCaseItemList[i] = ci;
+  ymuint pos = 0;
+  for (AstCaseList::Iterator p = case_list->begin();
+       !p.is_end(); p.next()) {
+    mCaseItemList[pos] = *p;
+    ++ pos;
   }
 }
 
@@ -638,30 +603,20 @@ AstSwitch::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] prev 直前の要素
 // @param[in] label ラベル
-// @param[in] block 本体
+// @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
-AstCaseItem::AstCaseItem(AstCaseItem* prev,
-			 AstExpr* label,
-			 AstBlock* block,
+AstCaseItem::AstCaseItem(AstExpr* label,
+			 AstStmtList* stmt_list,
 			 const FileRegion& loc) :
-  AstBlockStmt(block, loc),
-  mLabel(label),
-  mPrev(prev)
+  AstBlockStmt(stmt_list, loc),
+  mLabel(label)
 {
 }
 
 // @brief デストラクタ
 AstCaseItem::~AstCaseItem()
 {
-}
-
-// @brief 前の要素を得る．
-AstCaseItem*
-AstCaseItem::prev() const
-{
-  return mPrev;
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -958,13 +913,19 @@ AstReturn::print(ostream& s,
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] block 本体
+// @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
-AstBlockStmt::AstBlockStmt(AstBlock* block,
+AstBlockStmt::AstBlockStmt(AstStmtList* stmt_list,
 			   const FileRegion& loc) :
   AstStatement(loc),
-  mBlock(block)
+  mStmtList(stmt_list->size())
 {
+  ymuint pos = 0;
+  for (AstStmtList::Iterator p = stmt_list->begin();
+       !p.is_end(); p.next()) {
+    mStmtList[pos] = *p;
+    ++ pos;
+  }
 }
 
 // @brief デストラクタ
@@ -978,14 +939,22 @@ AstBlockStmt::~AstBlockStmt()
 AstBlock*
 AstBlockStmt::block() const
 {
+#if 0
   return mBlock;
+#else
+  return NULL;
+#endif
 }
 
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstBlockStmt::calc_size()
 {
-  return mBlock->calc_size();
+  ymuint size = 0;
+  for (ymuint pos = 0; pos < mStmtList.size(); ++ pos) {
+    size += mStmtList[pos]->calc_size();
+  }
+  return size;
 }
 
 // @brief 命令コードを生成する．
@@ -999,7 +968,9 @@ AstBlockStmt::compile(YmslDriver& driver,
 		      YmslCodeList& code_list,
 		      Ymsl_INT& addr)
 {
-  mBlock->compile(driver, code_list, addr);
+  for (ymuint pos = 0; pos < mStmtList.size(); ++ pos) {
+    mStmtList[pos]->compile(driver, code_list, addr);
+  }
 }
 
 // @brief 内容を表示する．(デバッグ用)

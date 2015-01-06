@@ -25,6 +25,7 @@ set (ymsl_SOURCES
   src/parser/AstBlock.cc
   src/parser/AstExpr.cc
   src/parser/AstFuncDecl.cc
+  src/parser/AstMgr.cc
   src/parser/AstPrimary.cc
   src/parser/AstStatement.cc
   src/parser/AstValueType.cc

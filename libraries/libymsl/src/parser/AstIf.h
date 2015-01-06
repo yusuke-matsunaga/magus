@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] if_list IfBlock のリスト
   /// @param[in] loc ファイル位置
-  AstIf(AstIfBlock* if_list,
+  AstIf(AstIfList* if_list,
 	const FileRegion& loc);
 
   /// @brief デストラクタ

@@ -24,13 +24,11 @@ class AstIfBlock :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] prev 前の要素
   /// @param[in] cond 条件式
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
-  AstIfBlock(AstIfBlock* prev,
-	     AstExpr* cond,
-	     AstBlock* block,
+  AstIfBlock(AstExpr* cond,
+	     AstStmtList* stmt_list,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -42,10 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 前の要素を得る．
-  AstIfBlock*
-  prev() const;
 
   /// @brief 条件を返す．
   AstExpr*
@@ -67,9 +61,6 @@ private:
 
   // 条件
   AstExpr* mCond;
-
-  // 前の要素
-  AstIfBlock* mPrev;
 
 };
 

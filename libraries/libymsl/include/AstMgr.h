@@ -1,8 +1,8 @@
-#ifndef YMSLPARSER_H
-#define YMSLPARSER_H
+#ifndef ASTMGR_H
+#define ASTMGR_H
 
-/// @file YmslParser.h
-/// @brief YmslParser のヘッダファイル
+/// @file AstMgr.h
+/// @brief AstMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -22,112 +22,20 @@ union YYSTYPE;
 class YmslScanner;
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslParser YmslParser.h "YmslParser.h"
-/// @brief YMSL のモジュールを表すクラス
+/// @class AstMgr AstMgr.h "AstMgr.h"
+/// @brief AST を管理するクラス
 //////////////////////////////////////////////////////////////////////
-class YmslParser
+class AstMgr
 {
 public:
 
   /// @brief コンストラクタ
-  YmslParser();
+  AstMgr();
 
   /// @brief デストラクタ
-  ~YmslParser();
+  ~AstMgr();
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 一つのソースファイルを読み込む．
-  /// @param[in] ido 入力データ
-  /// @param[in] module モジュール
-  /// @return 読み込みに成功したら true を返す．
-  bool
-  read_source(IDO& ido,
-	      YmslModule* module);
-
-  /// @brief トップレベルブロックを返す．
-  AstBlock*
-  toplevel_block() const;
-
-  /// @brief 関数のリストを返す．
-  const vector<AstFuncDecl*>&
-  function_list() const;
-
-  /// @brief グローバル変数のリストを返す．
-  const vector<AstVarDecl*>&
-  global_var_list() const;
-
-  /// @brief 関数を探す．
-  /// @param[in] name 関数名
-  ///
-  /// 見つからなければ NULL を返す．
-  AstFuncDecl*
-  find_function(ShString name) const;
-
-  /// @brief 変数を探す．
-  /// @param[in] name 変数名
-  ///
-  /// 見つからなければ NULL を返す．
-  AstVarDecl*
-  find_var(ShString name) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // bison から用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 現在のブロックを返す．
-  AstBlock*
-  cur_block() const;
-
-  /// @brief 新しいブロックを作りスタックに積む．
-  /// @return 新しいブロックを返す．
-  AstBlock*
-  push_new_block();
-
-  /// @brief ブロックをスタックから取り去る．
-  void
-  pop_block();
-
-  /// @brief インポートする．
-  /// @param[in] module_name モジュール名
-  /// @param[in] alias_name エイリアス名
-  void
-  import(AstSymbol* module_name,
-	 AstSymbol* alias_name);
-
-  /// @brief 関数を追加する．
-  void
-  add_function(AstFuncDecl* funcdecl);
-
-  /// @brief グローバル変数を追加する．
-  /// @param[in] vardecl 変数宣言
-  void
-  add_global_var(AstVarDecl* vardecl);
-
-  /// @brief 現在のブロックに変数を追加する．
-  void
-  add_local_var(AstVarDecl* vardecl);
-
-  /// @brief 現在のブロックに statement を追加する．
-  void
-  add_statement(AstStatement* stmt);
-
-  /// @brief yylex とのインターフェイス
-  /// @param[out] lval 値を格納する変数
-  /// @param[out] lloc 位置情報を格納する変数
-  /// @return 読み込んだトークンの id を返す．
-  int
-  scan(YYSTYPE& lval,
-       FileRegion& lloc,
-       AstMgr& mgr);
-
-#if 0
 public:
   //////////////////////////////////////////////////////////////////////
   // 抽象構文木の部品クラスを作る関数
@@ -154,12 +62,13 @@ public:
   /// @param[in] name 変数名
   /// @param[in] type 型
   /// @param[in] param_list パラメータリスト
-  /// @param[in] block 本体のブロック
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstFuncDecl*
   new_FuncDecl(AstSymbol* name,
 	       AstValueType* type,
-	       AstVarDecl* param_list,
+	       AstVarList* param_list,
+	       AstStmtList* stmt_list,
 	       const FileRegion& loc);
 
   /// @brief 代入文を作る．
@@ -175,48 +84,46 @@ public:
   /// @param[in] if_list IfBlock のリスト
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_If(AstIfBlock* if_list,
+  new_If(AstIfList* if_list,
 	 const FileRegion& loc);
 
   /// @brief if blockを作る．
-  /// @param[in] prev 直前の要素
   /// @param[in] cond 条件式
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstIfBlock*
-  new_IfBlock(AstIfBlock* prev,
-	      AstExpr* cond,
-	      AstBlock* block,
+  new_IfBlock(AstExpr* cond,
+	      AstStmtList* stmt_list,
 	      const FileRegion& loc);
 
   /// @brief for 文を作る．
   /// @param[in] init 初期化文
   /// @param[in] cond 条件式
   /// @param[in] next 増加文
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstStatement*
   new_For(AstStatement* init,
 	  AstExpr* cond,
 	  AstStatement* next,
-	  AstBlock* block,
+	  AstStmtList* stmt_list,
 	  const FileRegion& loc);
 
   /// @brief while 文を作る．
   /// @param[in] cond 条件式
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstStatement*
   new_While(AstExpr* cond,
-	    AstBlock* block,
+	    AstStmtList* stmt_list,
 	    const FileRegion& loc);
 
   /// @brief do-while 文を作る．
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] cond 条件式
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_DoWhile(AstBlock* block,
+  new_DoWhile(AstStmtList* stmt_list,
 	      AstExpr* cond,
 	      const FileRegion& loc);
 
@@ -226,18 +133,16 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_Switch(AstExpr* expr,
-	     AstCaseItem* case_list,
+	     AstCaseList* case_list,
 	     const FileRegion& loc);
 
   /// @brief case-item を作る．
-  /// @param[in] prev 直前の要素
   /// @param[in] label ラベル
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstCaseItem*
-  new_CaseItem(AstCaseItem* prev,
-	       AstExpr* label,
-	       AstBlock* block,
+  new_CaseItem(AstExpr* label,
+	       AstStmtList* stmt_list,
 	       const FileRegion& loc);
 
   /// @brief goto 文を作る．
@@ -272,10 +177,10 @@ public:
 		const FileRegion& loc);
 
   /// @brief ブロック文を作る．
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_BlockStmt(AstBlock* block,
+  new_BlockStmt(AstStmtList* stmt_list,
 		const FileRegion& loc);
 
   /// @brief 式文を作る．
@@ -321,15 +226,15 @@ public:
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_FuncCall(AstSymbol* id,
-	       AstExpr* expr_list,
+  new_FuncCall(AstSymbolList* id,
+	       AstExprList* expr_list,
 	       const FileRegion& loc);
 
   /// @brief 識別子式を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_VarExpr(AstSymbol* symbol,
+  new_VarExpr(AstSymbolList* symbol,
 	      const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
@@ -355,8 +260,10 @@ public:
 
   /// @brief 左辺のプライマリを作る．
   /// @param[in] symbol 変数名
+  /// @param[in] loc ファイル位置
   AstPrimary*
-  new_Primary(AstSymbol* symbol);
+  new_Primary(AstSymbolList* symbol,
+	      const FileRegion& loc);
 
   /// @brief void型を作る．
   /// @param[in] loc ファイル位置
@@ -388,13 +295,12 @@ public:
   AstValueType*
   new_UserType(AstSymbol* type_name);
 
-  /// @brief ラベルを作る．
-  /// @param[in] code_list 命令コードを格納する配列
-  /// @param[in] name ラベル名
-  YmslLabel*
-  new_label(YmslCodeList& code_list,
-	    ShString name = ShString());
-#endif
+  /// @brief シンボルを作る．
+  /// @param[in] str シンボル名
+  /// @param[in] loc ファイル位置
+  AstSymbol*
+  new_Symbol(ShString str,
+	     const FileRegion& loc);
 
 
 private:
@@ -405,17 +311,8 @@ private:
   // メモリアロケータ
   SimpleAlloc mAlloc;
 
-  // 字句解析器
-  YmslScanner* mScanner;
-
-  // モジュール
-  YmslModule* mModule;
-
-  // デバッグフラグ
-  bool mDebug;
-
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLPARSER_H
+#endif // ASTMGR_H

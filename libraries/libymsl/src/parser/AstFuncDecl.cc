@@ -8,7 +8,7 @@
 
 
 #include "AstFuncDecl.h"
-#include "AstVarDecl.h"
+#include "AstList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -17,42 +17,35 @@ BEGIN_NAMESPACE_YM_YMSL
 // クラス AstFuncDecl
 //////////////////////////////////////////////////////////////////////
 
-BEGIN_NONAMESPACE
-
-ymuint
-count_size(AstVarDecl* param_list)
-{
-  ymuint n = 0;
-  for (AstVarDecl* vd = param_list; vd != NULL; vd = vd->prev()) {
-    ++ n;
-  }
-  return n;
-}
-
-END_NONAMESPACE
-
 // @brief コンストラクタ
 // @param[in] name 関数名
 // @param[in] type 型
 // @param[in] param_list パラメータリスト
-// @param[in] block 本文のブロック
+// @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
 AstFuncDecl::AstFuncDecl(ShString name,
 			 ValueType type,
-			 AstVarDecl* param_list,
-			 AstBlock* block,
+			 AstVarList* param_list,
+			 AstStmtList* stmt_list,
 			 const FileRegion& loc) :
   Ast(loc),
   mName(name),
   mIndex(-1),
   mType(type),
-  mParamList(count_size(param_list)),
-  mBlock(block)
+  mParamList(param_list->size()),
+  mStmtList(stmt_list->size())
 {
-  ymuint i = mParamList.size();
-  for (AstVarDecl* vd = param_list; vd != NULL; vd = vd->prev()) {
-    -- i;
-    mParamList[i] = vd;
+  ymuint pos = 0;
+  for (AstVarList::Iterator p = param_list->begin();
+       !p.is_end(); p.next()) {
+    mParamList[pos] = *p;
+    ++ pos;
+  }
+  pos = 0;
+  for (AstStmtList::Iterator p = stmt_list->begin();
+       !p.is_end(); p.next()) {
+    mStmtList[pos] = *p;
+    ++ pos;
   }
 }
 
@@ -89,11 +82,11 @@ AstFuncDecl::param_list() const
   return mParamList;
 }
 
-// @brief ブロックを返す．
-AstBlock*
-AstFuncDecl::block() const
+// @brief 本体のリストを返す．
+const vector<AstStatement*>&
+AstFuncDecl::stmt_list() const
 {
-  return mBlock;
+  return mStmtList;
 }
 
 // @brief 内容を表示する．(デバッグ用)

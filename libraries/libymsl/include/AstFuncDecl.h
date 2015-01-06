@@ -30,12 +30,12 @@ public:
   /// @param[in] name 関数名
   /// @param[in] type 型
   /// @param[in] param_list パラメータリスト
-  /// @param[in] block 本文のブロック
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
 	      ValueType type,
-	      AstVarDecl* param_list,
-	      AstBlock* block,
+	      AstVarList* param_list,
+	      AstStmtList* stmt_list,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -64,9 +64,9 @@ public:
   const vector<AstVarDecl*>&
   param_list() const;
 
-  /// @brief ブロックを返す．
-  AstBlock*
-  block() const;
+  /// @brief 本体のリストを返す．
+  const vector<AstStatement*>&
+  stmt_list() const;
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -94,8 +94,8 @@ private:
   // パラメータリスト
   vector<AstVarDecl*> mParamList;
 
-  // 本体のブロック
-  AstBlock* mBlock;
+  // 本体の文リスト
+  vector<AstStatement*> mStmtList;
 
 };
 

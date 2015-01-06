@@ -11,6 +11,7 @@
 #include "AstUniOp.h"
 #include "AstBinOp.h"
 #include "AstIteOp.h"
+#include "AstList.h"
 #include "AstVarExpr.h"
 #include "AstIntConst.h"
 #include "AstFloatConst.h"
@@ -29,22 +30,6 @@ BEGIN_NAMESPACE_YM_YMSL
 
 #include "grammer.hh"
 
-
-BEGIN_NONAMESPACE
-
-// シンボルリストのサイズを計算する．
-ymuint
-count_size(AstSymbol* symbol)
-{
-  ymuint n = 0;
-  for (AstSymbol* p = symbol; p != NULL; p = p->next()) {
-    ++ n;
-  }
-  return n;
-}
-
-END_NONAMESPACE
-
 //////////////////////////////////////////////////////////////////////
 // クラス AstExpr
 //////////////////////////////////////////////////////////////////////
@@ -54,7 +39,6 @@ END_NONAMESPACE
 AstExpr::AstExpr(const FileRegion& loc) :
   Ast(loc)
 {
-  mPrev = NULL;
 }
 
 // @brief デストラクタ
@@ -62,61 +46,35 @@ AstExpr::~AstExpr()
 {
 }
 
-// @brief 前の要素を得る．
-AstExpr*
-AstExpr::prev() const
-{
-  return mPrev;
-}
-
-// @brief 前の要素をセットする．
-void
-AstExpr::set_prev(AstExpr* prev)
-{
-  mPrev = prev;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス AstFuncCall
 //////////////////////////////////////////////////////////////////////
 
-BEGIN_NONAMESPACE
-
-ymuint
-count_size(AstExpr* expr_list)
-{
-  ymuint n = 0;
-  for (AstExpr* expr = expr_list; expr != NULL; expr = expr->prev()) {
-    ++ n;
-  }
-  return n;
-}
-
-END_NONAMESPACE
-
 // @brief コンストラクタ
 // @param[in] func_name 関数名
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstSymbol* func_name,
-			 AstExpr* expr_list,
+AstFuncCall::AstFuncCall(AstSymbolList* func_name,
+			 AstExprList* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mFuncName(count_size(func_name)),
+  mFuncName(func_name->size()),
   mFunc(NULL),
-  mExprList(count_size(expr_list))
+  mExprList(expr_list->size())
 {
-  ymuint pos = mFuncName.size();
-  for (AstSymbol* p = func_name; p != NULL; p = p->next()) {
-    -- pos;
-    mFuncName[pos] = p;
+  ymuint pos = 0;
+  for (AstSymbolList::Iterator p = func_name->begin();
+       !p.is_end(); p.next()) {
+    mFuncName[pos] = *p;
+    ++ pos;
   }
 
-  ymuint i = mExprList.size();
-  for (AstExpr* expr = expr_list; expr != NULL; expr = expr->prev()) {
-    -- i;
-    mExprList[i] = expr;
+  pos = 0;
+  for (AstExprList::Iterator p = expr_list->begin();
+       !p.is_end(); p.next()) {
+    mExprList[pos] = *p;
+    ++ pos;
   }
 }
 
@@ -606,16 +564,17 @@ AstIteOp::print(ostream& s) const
 // @brief コンストラクタ
 // @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstVarExpr::AstVarExpr(AstSymbol* var_name,
+AstVarExpr::AstVarExpr(AstSymbolList* var_name,
 		       const FileRegion& loc) :
   AstExpr(loc),
-  mVarName(count_size(var_name)),
+  mVarName(var_name->size()),
   mVarDecl(NULL)
 {
-  ymuint pos = mVarName.size();
-  for (AstSymbol* p = var_name; p != NULL; p = p->next()) {
-    -- pos;
-    mVarName[pos] = p;
+  ymuint pos = 0;
+  for (AstSymbolList::Iterator p = var_name->begin();
+       !p.is_end(); p.next() ) {
+    mVarName[pos] = *p;
+    ++ pos;
   }
 }
 

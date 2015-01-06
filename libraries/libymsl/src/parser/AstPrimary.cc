@@ -8,6 +8,7 @@
 
 
 #include "AstPrimary.h"
+#include "AstList.h"
 #include "AstVarDecl.h"
 
 #include "YmslVM.h"
@@ -22,12 +23,18 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstPrimary::AstPrimary(AstSymbol* var_name,
+AstPrimary::AstPrimary(AstSymbolList* var_name,
 		       const FileRegion& loc) :
   Ast(loc),
-  mVarName(var_name),
+  mVarName(var_name->size()),
   mVar(NULL)
 {
+  ymuint pos = 0;
+  for (AstSymbolList::Iterator p = var_name->begin();
+       !p.is_end(); p.next()) {
+    mVarName[pos] = *p;
+    ++ pos;
+  }
 }
 
 // @brief デストラクタ

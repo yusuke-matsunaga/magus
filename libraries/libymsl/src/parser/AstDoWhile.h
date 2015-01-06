@@ -24,10 +24,10 @@ class AstDoWhile :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] cond 条件式
   /// @param[in] loc ファイル位置
-  AstDoWhile(AstBlock* block,
+  AstDoWhile(AstStmtList* stmt_list,
 	     AstExpr* cond,
 	     const FileRegion& loc);
 

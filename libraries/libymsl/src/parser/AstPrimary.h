@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] var_name 変数名
   /// @param[in] loc ファイル位置
-  AstPrimary(AstSymbol* var_name,
+  AstPrimary(AstSymbolList* var_name,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -59,7 +59,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数名
-  AstSymbol* mVarName;
+  vector<AstSymbol*> mVarName;
 
   // 変数
   AstVarDecl* mVar;

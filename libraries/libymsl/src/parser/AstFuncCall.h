@@ -27,8 +27,8 @@ public:
   /// @param[in] func_name 関数名
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstSymbol* func_name,
-	      AstExpr* expr_list,
+  AstFuncCall(AstSymbolList* func_name,
+	      AstExprList* expr_list,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ

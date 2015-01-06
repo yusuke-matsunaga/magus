@@ -10,6 +10,7 @@
 #include "YmslParser.h"
 #include "YmslScanner.h"
 #include "YmslModule.h"
+#include "AstMgr.h"
 #include "AstBlock.h"
 #include "AstFuncDecl.h"
 #include "AstVarDecl.h"
@@ -97,12 +98,14 @@ bool
 YmslParser::read_source(IDO& ido,
 			YmslModule* module)
 {
-  int yyparser(YmslParser&);
+  int yyparser(YmslParser&, AstMgr&);
 
   mScanner = new YmslScanner(ido);
   mModule = module;
 
-  int stat = yyparse(*this);
+  AstMgr mgr;
+
+  int stat = yyparse(*this, mgr);
 
   delete mScanner;
   mScanner = NULL;
@@ -189,25 +192,26 @@ YmslParser::add_statement(AstStatement* stmt)
 // @return 読み込んだトークンの id を返す．
 int
 YmslParser::scan(YYSTYPE& lval,
-		 FileRegion& lloc)
+		 FileRegion& lloc,
+		 AstMgr& mgr)
 {
   int id = mScanner->read_token(lloc);
 
   switch ( id ) {
   case SYMBOL:
-    lval.symbol_type = new AstSymbol(ShString(mScanner->cur_string()), lloc);
+    lval.symbol_type = mgr.new_Symbol(ShString(mScanner->cur_string()), lloc);
     break;
 
   case STRING_VAL:
-    lval.expr_type = new_StringConst(mScanner->cur_string(), lloc);
+    lval.expr_type = mgr.new_StringConst(mScanner->cur_string(), lloc);
     break;
 
   case INT_VAL:
-    lval.expr_type = new_IntConst(mScanner->cur_int(), lloc);
+    lval.expr_type = mgr.new_IntConst(mScanner->cur_int(), lloc);
     break;
 
   case FLOAT_VAL:
-    lval.expr_type = new_FloatConst(mScanner->cur_float(), lloc);
+    lval.expr_type = mgr.new_FloatConst(mScanner->cur_float(), lloc);
     break;
 
   default:
@@ -262,6 +266,7 @@ YmslParser::find_var(ShString name) const
   return mModule->find_var(name);
 }
 
+#if 0
 // @brief 変数宣言を作る．
 // @param[in] name 変数名
 // @param[in] type 型
@@ -703,5 +708,6 @@ YmslParser::new_label(YmslCodeList& code_list,
   void* p = mAlloc.get_memory(sizeof(YmslLabel));
   return new (p) YmslLabel(code_list, name);
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

@@ -27,12 +27,12 @@ public:
   /// @param[in] init 初期化文
   /// @param[in] cond 条件式
   /// @param[in] next 増加文
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstFor(AstStatement* init,
 	 AstExpr* cond,
 	 AstStatement* next,
-	 AstBlock* block,
+	 AstStmtList* stmt_list,
 	 const FileRegion& loc);
 
   /// @brief デストラクタ

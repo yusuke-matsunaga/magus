@@ -28,7 +28,7 @@ public:
   /// @param[in] case_list case 文のリスト
   /// @param[in] loc ファイル位置
   AstSwitch(AstExpr* expr,
-	    AstCaseItem* case_list,
+	    AstCaseList* case_list,
 	    const FileRegion& loc);
 
   /// @brief デストラクタ

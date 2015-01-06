@@ -25,10 +25,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] cond 条件式
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstWhile(AstExpr* cond,
-	   AstBlock* block,
+	   AstStmtList* stmt_list,
 	   const FileRegion& loc);
 
   /// @brief デストラクタ

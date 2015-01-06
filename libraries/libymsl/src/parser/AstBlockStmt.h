@@ -24,9 +24,9 @@ class AstBlockStmt :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] block 本体
+  /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
-  AstBlockStmt(AstBlock* block,
+  AstBlockStmt(AstStmtList* stmt_list,
 	       const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -78,7 +78,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本体
-  AstBlock* mBlock;
+  vector<AstStatement*> mStmtList;
 
 };
 

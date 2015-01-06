@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] var_name 変数名
   /// @param[in] loc ファイル位置
-  AstVarExpr(AstSymbol* var_name,
+  AstVarExpr(AstSymbolList* var_name,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ

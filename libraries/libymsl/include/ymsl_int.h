@@ -46,13 +46,23 @@ class AstCaseItem;
 class AstExpr;
 class AstFuncDecl;
 class AstIfBlock;
-class AstList;
+class AstMgr;
 class AstPrimary;
 class AstStatement;
 class AstStringConst;
 class AstSymbol;
 class AstValueType;
 class AstVarDecl;
+
+template <typename T>
+class AstList;
+
+typedef AstList<AstStatement> AstStmtList;
+typedef AstList<AstIfBlock> AstIfList;
+typedef AstList<AstCaseItem> AstCaseList;
+typedef AstList<AstVarDecl> AstVarList;
+typedef AstList<AstExpr> AstExprList;
+typedef AstList<AstSymbol> AstSymbolList;
 
 #if 0
 /// @brief トークンの値
