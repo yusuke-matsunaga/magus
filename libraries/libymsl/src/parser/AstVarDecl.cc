@@ -8,6 +8,7 @@
 
 
 #include "AstVarDecl.h"
+#include "YmslScope.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -76,6 +77,14 @@ bool
 AstVarDecl::global() const
 {
   return mGlobal;
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstVarDecl::phase1(YmslScope* parent_scope)
+{
+  parent_scope->add_vardecl(this);
 }
 
 // @brief 命令コードのサイズを計算する．

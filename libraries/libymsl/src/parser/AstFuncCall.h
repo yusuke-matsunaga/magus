@@ -27,7 +27,7 @@ public:
   /// @param[in] func_name 関数名
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstSymbolList* func_name,
+  AstFuncCall(AstIdentifier* func_name,
 	      AstExprList* expr_list,
 	      const FileRegion& loc);
 
@@ -40,6 +40,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の参照を解決する．
+  virtual
+  void
+  resolve_var(YmslScope* parent_scope);
 
   /// @brief 式の型を解析する．
   /// @return 引数の方が間違っていたら false を返す．
@@ -84,8 +89,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数名
-  // 階層付きの場合にはシンボルのリストになる．
-  vector<AstSymbol*> mFuncName;
+  AstIdentifier* mFuncName;
 
   // 関数
   AstFuncDecl* mFunc;

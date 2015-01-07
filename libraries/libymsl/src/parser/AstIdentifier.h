@@ -1,8 +1,8 @@
-#ifndef ASTTOPLEVEL_H
-#define ASTTOPLEVEL_H
+#ifndef ASTIDENTIFIER_H
+#define ASTIDENTIFIER_H
 
-/// @file AstToplevel.h
-/// @brief AstToplevel のヘッダファイル
+/// @file AstIdentifier.h
+/// @brief AstIdentifier のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,23 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstToplevel AstToplevel.h "AstToplevel.h"
-/// @brief AST のトップレベルを表すクラス
+/// @class AstIdentifier AstIdentifier.h "AstIdentifier.h"
+/// @brief 識別子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstToplevel :
+class AstIdentifier :
   public Ast
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] root 根のノード
+  /// @param[in] symbol_list シンボルリスト
   /// @param[in] loc ファイル位置
-  AstToplevel(AstStmtList* root,
-	      const FileRegion& loc);
+  AstIdentifier(AstSymbolList* symbol_list,
+		const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstToplevel();
+  ~AstIdentifier();
 
 
 public:
@@ -39,8 +39,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 出力する
-  /// @param[in] s 出力先のストリーム
+  /// @brief シンボルリストを返す．
+  const vector<AstSymbol*>&
+  symbol_list() const;
+
+  /// @brief 内容を出力する．
   void
   print(ostream& s) const;
 
@@ -50,11 +53,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // トップレベルのステートメントリスト
-  vector<AstStatement*> mStmtList;
+  // シンボルリスト
+  vector<AstSymbol*> mSymbolList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTTOPLEVEL_H
+#endif // ASTIDENTIFIER_H

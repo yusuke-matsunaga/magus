@@ -1,8 +1,8 @@
-#ifndef ASTLABEL_H
-#define ASTLABEL_H
+#ifndef ASTVARDECL_H
+#define ASTVARDECL_H
 
-/// @file AstLabel.h
-/// @brief AstLabel のヘッダファイル
+/// @file AstVarDecl.h
+/// @brief AstVarDecl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -10,33 +10,70 @@
 
 
 #include "AstStatement.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstLabel AstLabel.h "AstLabel.h"
-/// @brief ラベルを表す Ast
+/// @class AstVarDecl AstVarDecl.h "AstVarDecl.h"
+/// @brief 変数宣言を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstLabel :
+class AstVarDecl :
   public AstStatement
 {
+  friend class YmslModule;
+
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] label ラベル
+  /// @param[in] name 変数名
+  /// @param[in] type 型
+  /// @param[in] init_expr 初期化式
+  /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
-  AstLabel(AstSymbol* label,
-	   const FileRegion& loc);
+  AstVarDecl(ShString name,
+	     ValueType type,
+	     AstExpr* init_expr,
+	     bool global,
+	     const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstLabel();
+  ~AstVarDecl();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を得る．
+  ShString
+  name() const;
+
+  /// @brief インデックス番号を返す．
+  ymuint
+  index() const;
+
+  /// @brief 型を得る．
+  ValueType
+  type() const;
+
+  /// @brief 初期化式を返す．
+  ///
+  /// NULL の場合もある．
+  AstExpr*
+  init_expr() const;
+
+  /// @brief グローバル変数の時 true を返す．
+  bool
+  global() const;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // AstStatement の仮想関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief スコープの生成と変数名の参照解決を行う．
@@ -76,11 +113,23 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ラベル
-  AstSymbol* mLabel;
+  // 名前
+  ShString mName;
+
+  // インデックス番号
+  ymuint mIndex;
+
+  // 変数の型
+  ValueType mType;
+
+  // 初期化式
+  AstExpr* mInitExpr;
+
+  // グローバル変数の時 true にするフラグ
+  bool mGlobal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTLABEL_H
+#endif // ASTVARDECL_H

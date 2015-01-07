@@ -10,7 +10,7 @@
 #include "RsrvWordDic.h"
 #include "Ast.h"
 #include "AstMgr.h"
-#include "AstToplevel.h"
+#include "AstStatement.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -30,8 +30,8 @@ parser_test1(IDO& ido)
 
   bool stat = mgr.read_source(ido);
   if ( stat ) {
-    AstToplevel* toplevel = mgr.toplevel();
-    toplevel->print(cout);
+    AstStatement* toplevel = mgr.toplevel();
+    toplevel->print(cout, 0);
   }
 
   return 0;

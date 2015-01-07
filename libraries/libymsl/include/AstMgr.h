@@ -48,7 +48,7 @@ public:
   read_source(IDO& ido);
 
   /// @brief トップレベルのASTを返す．
-  AstToplevel*
+  AstStatement*
   toplevel() const;
 
 
@@ -104,12 +104,23 @@ public:
   /// @param[in] init_expr 初期化式
   /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
-  AstVarDecl*
+  AstStatement*
   new_VarDecl(AstSymbol* name,
 	      AstValueType* type,
 	      AstExpr* init_expr,
 	      bool global,
 	      const FileRegion& loc);
+
+  /// @brief パラメータ宣言を作る．
+  /// @param[in] name 変数名
+  /// @param[in] type 型
+  /// @param[in] init_expr 初期化式
+  /// @param[in] loc ファイル位置
+  AstParam*
+  new_Param(AstSymbol* name,
+	    AstValueType* type,
+	    AstExpr* init_expr,
+	    const FileRegion& loc);
 
   /// @brief 関数宣言を作る．
   /// @param[in] name 変数名
@@ -117,10 +128,10 @@ public:
   /// @param[in] param_list パラメータリスト
   /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
-  AstFuncDecl*
+  AstStatement*
   new_FuncDecl(AstSymbol* name,
 	       AstValueType* type,
-	       AstVarList* param_list,
+	       AstParamList* param_list,
 	       AstStmtList* stmt_list,
 	       const FileRegion& loc);
 
@@ -270,7 +281,7 @@ public:
   /// @param[in] index インデックス
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_ArrayRef(AstSymbol* id,
+  new_ArrayRef(AstIdentifier* id,
 	       AstExpr* index,
 	       const FileRegion& loc);
 
@@ -279,15 +290,15 @@ public:
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_FuncCall(AstSymbolList* id,
+  new_FuncCall(AstIdentifier* id,
 	       AstExprList* expr_list,
 	       const FileRegion& loc);
 
   /// @brief 識別子式を作る．
-  /// @param[in] val 値
+  /// @param[in] id 識別子名
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_VarExpr(AstSymbolList* symbol,
+  new_VarExpr(AstIdentifier* id,
 	      const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
@@ -312,10 +323,10 @@ public:
 		  const FileRegion& loc);
 
   /// @brief 左辺のプライマリを作る．
-  /// @param[in] symbol 変数名
+  /// @param[in] id 変数名
   /// @param[in] loc ファイル位置
   AstPrimary*
-  new_Primary(AstSymbolList* symbol,
+  new_Primary(AstIdentifier* id,
 	      const FileRegion& loc);
 
   /// @brief void型を作る．
@@ -347,6 +358,13 @@ public:
   /// @param[in] type_name 型名
   AstValueType*
   new_UserType(AstSymbol* type_name);
+
+  /// @brief 識別子名を作る．
+  /// @param[in] symbol_list シンボルリスト
+  /// @param[in] loc ファイル位置
+  AstIdentifier*
+  new_Identifier(AstSymbolList* symbol_list,
+		 const FileRegion& loc);
 
   /// @brief シンボルを作る．
   /// @param[in] str シンボル名

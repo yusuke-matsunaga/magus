@@ -21,6 +21,7 @@
 
 #include "AstFuncDecl.h"
 #include "AstVarDecl.h"
+#include "AstIdentifier.h"
 
 #include "YmslCodeList.h"
 #include "YmslVM.h"
@@ -55,22 +56,15 @@ AstExpr::~AstExpr()
 // @param[in] func_name 関数名
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstSymbolList* func_name,
+AstFuncCall::AstFuncCall(AstIdentifier* func_name,
 			 AstExprList* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mFuncName(func_name->size()),
+  mFuncName(func_name),
   mFunc(NULL),
   mExprList(expr_list->size())
 {
   ymuint pos = 0;
-  for (AstSymbolList::Iterator p = func_name->begin();
-       !p.is_end(); p.next()) {
-    mFuncName[pos] = *p;
-    ++ pos;
-  }
-
-  pos = 0;
   for (AstExprList::Iterator p = expr_list->begin();
        !p.is_end(); p.next()) {
     mExprList[pos] = *p;
@@ -81,6 +75,16 @@ AstFuncCall::AstFuncCall(AstSymbolList* func_name,
 // @brief デストラクタ
 AstFuncCall::~AstFuncCall()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstFuncCall::resolve_var(YmslScope* parent_scope)
+{
+  ymuint n = mExprList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    mExprList[i]->resolve_var(parent_scope);
+  }
 }
 
 // @brief 式の型を解析する．
@@ -125,13 +129,7 @@ AstFuncCall::compile(YmslDriver& driver,
 void
 AstFuncCall::print(ostream& s) const
 {
-  ymuint n = mFuncName.size();
-  const char* dot = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    AstSymbol* sym = mFuncName[i];
-    s << dot << sym->str_val();
-    dot = ".";
-  }
+  mFuncName->print(s);
   s << "(";
   {
     ymuint n = mExprList.size();
@@ -166,6 +164,13 @@ AstUniOp::AstUniOp(TokenType token,
 // @brief デストラクタ
 AstUniOp::~AstUniOp()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstUniOp::resolve_var(YmslScope* parent_scope)
+{
+  mOperand->resolve_var(parent_scope);
 }
 
 // @brief 式の型を解析する．
@@ -356,6 +361,14 @@ AstBinOp::~AstBinOp()
 {
 }
 
+// @brief 変数の参照を解決する．
+void
+AstBinOp::resolve_var(YmslScope* parent_scope)
+{
+  mLeft->resolve_var(parent_scope);
+  mRight->resolve_var(parent_scope);
+}
+
 // @brief 式の型を解析する．
 // @return 引数の方が間違っていたら false を返す．
 //
@@ -516,6 +529,15 @@ AstIteOp::~AstIteOp()
 {
 }
 
+// @brief 変数の参照を解決する．
+void
+AstIteOp::resolve_var(YmslScope* parent_scope)
+{
+  for (ymuint i = 0; i < 3; ++ i) {
+    mOpr[i]->resolve_var(parent_scope);
+  }
+}
+
 // @brief 式の型を解析する．
 // @return 引数の方が間違っていたら false を返す．
 //
@@ -571,23 +593,36 @@ AstIteOp::print(ostream& s) const
 // @brief コンストラクタ
 // @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstVarExpr::AstVarExpr(AstSymbolList* var_name,
+AstVarExpr::AstVarExpr(AstIdentifier* var_name,
 		       const FileRegion& loc) :
   AstExpr(loc),
-  mVarName(var_name->size()),
+  mVarName(var_name),
   mVarDecl(NULL)
 {
-  ymuint pos = 0;
-  for (AstSymbolList::Iterator p = var_name->begin();
-       !p.is_end(); p.next() ) {
-    mVarName[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
 AstVarExpr::~AstVarExpr()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstVarExpr::resolve_var(YmslScope* parent_scope)
+{
+#if 0
+  mVarDecl = parent_scope->find_var(mVarName);
+  if ( mVarDecl == NULL ) {
+    ostringstream buf;
+    mVarName->print(buf);
+    buf << ": Undefined";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    mVarName->file_region(),
+		    kMsgError,
+		    "PARS",
+		    buf.str());
+  }
+#endif
 }
 
 // @brief 式の型を解析する．
@@ -671,13 +706,7 @@ AstVarExpr::compile(YmslDriver& driver,
 void
 AstVarExpr::print(ostream& s) const
 {
-  ymuint n = mVarName.size();
-  const char* dot = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    AstSymbol* sym = mVarName[i];
-    s << dot << sym->str_val();
-    dot = ".";
-  }
+  mVarName->print(s);
 }
 
 
@@ -698,6 +727,13 @@ AstIntConst::AstIntConst(int val,
 // @brief デストラクタ
 AstIntConst::~AstIntConst()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstIntConst::resolve_var(YmslScope* parent_scope)
+{
+  // 何もしない．
 }
 
 // @brief 式の型を解析する．
@@ -765,6 +801,13 @@ AstFloatConst::AstFloatConst(double val,
 // @brief デストラクタ
 AstFloatConst::~AstFloatConst()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstFloatConst::resolve_var(YmslScope* parent_scope)
+{
+  // 何もしない．
 }
 
 // @brief 式の型を解析する．
@@ -845,6 +888,13 @@ AstStringConst::AstStringConst(const char* val,
 // @brief デストラクタ
 AstStringConst::~AstStringConst()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstStringConst::resolve_var(YmslScope* parent_scope)
+{
+  // 何もしない．
 }
 
 // @brief 式の型を解析する．

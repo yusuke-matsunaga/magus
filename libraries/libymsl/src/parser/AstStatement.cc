@@ -28,11 +28,14 @@
 #include "AstReturn.h"
 #include "AstSwitch.h"
 #include "AstSymbol.h"
+#include "AstToplevel.h"
 #include "AstVarDecl.h"
 #include "AstWhile.h"
+
 #include "YmslCodeList.h"
 #include "YmslDriver.h"
 #include "YmslLabel.h"
+#include "YmslScope.h"
 #include "YmslVM.h"
 
 
@@ -104,6 +107,14 @@ AstImport::~AstImport()
 {
 }
 
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstImport::phase1(YmslScope* parent_scope)
+{
+  // ここで import 処理を行う．
+}
+
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstImport::calc_size()
@@ -168,6 +179,15 @@ AstAssignment::AstAssignment(TokenType token,
 // @brief デストラクタ
 AstAssignment::~AstAssignment()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstAssignment::phase1(YmslScope* parent_scope)
+{
+  mLeft->resolve_var(parent_scope);
+  mRight->resolve_var(parent_scope);
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -248,6 +268,17 @@ AstIf::AstIf(AstIfList* if_list,
 // @brief デストラクタ
 AstIf::~AstIf()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstIf::phase1(YmslScope* parent_scope)
+{
+  ymuint n = mIfBlockList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    mIfBlockList[i]->phase1(parent_scope);
+  }
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -357,6 +388,15 @@ AstIfBlock::cond() const
   return mCond;
 }
 
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstIfBlock::phase1(YmslScope* parent_scope)
+{
+  mCond->resolve_var(parent_scope);
+  AstBlockStmt::phase1(parent_scope);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス AstFor
@@ -382,6 +422,13 @@ AstFor::AstFor(AstStatement* init,
 
 // @brief デストラクタ
 AstFor::~AstFor()
+{
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstFor::phase1(YmslScope* parent_scope)
 {
 }
 
@@ -445,6 +492,15 @@ AstWhile::AstWhile(AstExpr* cond,
 // @brief デストラクタ
 AstWhile::~AstWhile()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstWhile::phase1(YmslScope* parent_scope)
+{
+  mCond->resolve_var(parent_scope);
+  AstBlockStmt::phase1(parent_scope);
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -514,6 +570,15 @@ AstDoWhile::AstDoWhile(AstStmtList* stmt_list,
 // @brief デストラクタ
 AstDoWhile::~AstDoWhile()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstDoWhile::phase1(YmslScope* parent_scope)
+{
+  mCond->resolve_var(parent_scope);
+  AstBlockStmt::phase1(parent_scope);
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -589,6 +654,18 @@ AstSwitch::AstSwitch(AstExpr* expr,
 // @brief デストラクタ
 AstSwitch::~AstSwitch()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstSwitch::phase1(YmslScope* parent_scope)
+{
+  mExpr->resolve_var(parent_scope);
+  ymuint n = mCaseItemList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    mCaseItemList[i]->phase1(parent_scope);
+  }
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -696,6 +773,13 @@ AstGoto::~AstGoto()
 {
 }
 
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstGoto::phase1(YmslScope* parent_scope)
+{
+}
+
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstGoto::calc_size()
@@ -747,6 +831,13 @@ AstLabel::~AstLabel()
 {
 }
 
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstLabel::phase1(YmslScope* parent_scope)
+{
+}
+
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstLabel::calc_size()
@@ -795,6 +886,13 @@ AstBreak::~AstBreak()
 {
 }
 
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstBreak::phase1(YmslScope* parent_scope)
+{
+}
+
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstBreak::calc_size()
@@ -840,6 +938,13 @@ AstContinue::AstContinue(const FileRegion& loc) :
 
 // @brief デストラクタ
 AstContinue::~AstContinue()
+{
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstContinue::phase1(YmslScope* parent_scope)
 {
 }
 
@@ -894,6 +999,16 @@ AstReturn::~AstReturn()
 {
 }
 
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstReturn::phase1(YmslScope* parent_scope)
+{
+  if ( mExpr != NULL ) {
+    mExpr->resolve_var(parent_scope);
+  }
+}
+
 // @brief 命令コードのサイズを計算する．
 ymuint
 AstReturn::calc_size()
@@ -935,6 +1050,25 @@ AstReturn::print(ostream& s,
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス AstToplevel
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] stmt_list ステートメントリスト
+// @param[in] loc ファイル位置
+AstToplevel::AstToplevel(AstStmtList* stmt_list,
+			 const FileRegion& loc) :
+  AstBlockStmt(stmt_list, loc)
+{
+}
+
+// @brief デストラクタ
+AstToplevel::~AstToplevel()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス AstBlockStmt
 //////////////////////////////////////////////////////////////////////
 
@@ -944,7 +1078,8 @@ AstReturn::print(ostream& s,
 AstBlockStmt::AstBlockStmt(AstStmtList* stmt_list,
 			   const FileRegion& loc) :
   AstStatement(loc),
-  mStmtList(stmt_list->size())
+  mStmtList(stmt_list->size()),
+  mScope(NULL)
 {
   ymuint pos = 0;
   for (AstStmtList::Iterator p = stmt_list->begin();
@@ -957,6 +1092,19 @@ AstBlockStmt::AstBlockStmt(AstStmtList* stmt_list,
 // @brief デストラクタ
 AstBlockStmt::~AstBlockStmt()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstBlockStmt::phase1(YmslScope* parent_scope)
+{
+  mScope = new YmslScope(parent_scope);
+  ymuint n = mStmtList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    AstStatement* stmt = mStmtList[i];
+    stmt->phase1(mScope);
+  }
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -1016,6 +1164,14 @@ AstExprStmt::AstExprStmt(AstExpr* expr) :
 // @brief デストラクタ
 AstExprStmt::~AstExprStmt()
 {
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstExprStmt::phase1(YmslScope* parent_scope)
+{
+  mExpr->resolve_var(parent_scope);
 }
 
 // @brief 命令コードのサイズを計算する．

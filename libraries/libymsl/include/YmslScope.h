@@ -1,8 +1,8 @@
-#ifndef ASTBLOCK_H
-#define ASTBLOCK_H
+#ifndef YMSLSCOPE_H
+#define YMSLSCOPE_H
 
-/// @file AstBlock.h
-/// @brief AstBlock のヘッダファイル
+/// @file YmslScope.h
+/// @brief YmslScope のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -17,23 +17,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstBlock AstBlock.h "AstBlock.h"
-/// @brief ブロックを表すクラス
+/// @class YmslScope YmslScope.h "YmslScope.h"
+/// @brief スコープを表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstBlock
+class YmslScope
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent_dict 親の辞書
-  AstBlock(SymDict* parent_dict);
+  YmslScope(SymDict* parent_dict);
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のブロック
-  AstBlock(AstBlock* parent);
+  YmslScope(YmslScope* parent);
 
   /// @brief デストラクタ
-  ~AstBlock();
+  ~YmslScope();
 
 
 public:
@@ -44,6 +44,11 @@ public:
   /// @brief ステートメントを追加する．
   void
   add_statement(AstStatement* statement);
+
+  /// @brief 関数を追加する．
+  /// @param[in] item 追加する要素
+  void
+  add_function(AstFuncDecl* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素
@@ -118,4 +123,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTBLOCK_H
+#endif // YMSLSCOPE_H

@@ -22,10 +22,10 @@ set (ymsl_SOURCES
   src/engine/YmslVar.cc
   src/engine/YmslVM.cc
   src/parser/Ast.cc
-  src/parser/AstBlock.cc
   src/parser/AstExpr.cc
   src/parser/AstFuncDecl.cc
   src/parser/AstMgr.cc
+  src/parser/AstParam.cc
   src/parser/AstPrimary.cc
   src/parser/AstStatement.cc
   src/parser/AstValueType.cc
@@ -34,6 +34,7 @@ set (ymsl_SOURCES
   src/parser/SymDict.cc
   src/parser/YmslLabel.cc
   src/parser/YmslScanner.cc
+  src/parser/YmslScope.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
   )

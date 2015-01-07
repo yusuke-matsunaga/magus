@@ -34,7 +34,7 @@ public:
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
 	      ValueType type,
-	      AstVarList* param_list,
+	      AstParamList* param_list,
 	      AstStmtList* stmt_list,
 	      const FileRegion& loc);
 
@@ -61,7 +61,7 @@ public:
   type() const;
 
   /// @brief パラメータリストを返す．
-  const vector<AstVarDecl*>&
+  const vector<AstParam*>&
   param_list() const;
 
   /// @brief 本体のリストを返す．
@@ -73,6 +73,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // AstStatement の仮想関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief スコープの生成と変数名の参照解決を行う．
+  /// @param[in] parent_scope 親のスコープ
+  virtual
+  void
+  phase1(YmslScope* parent_scope);
 
   /// @brief 命令コードのサイズを計算する．
   virtual
@@ -115,10 +121,13 @@ private:
   ValueType mType;
 
   // パラメータリスト
-  vector<AstVarDecl*> mParamList;
+  vector<AstParam*> mParamList;
 
   // 本体の文リスト
   vector<AstStatement*> mStmtList;
+
+  // スコープ
+  YmslScope* mScope;
 
 };
 

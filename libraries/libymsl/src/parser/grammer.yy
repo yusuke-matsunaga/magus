@@ -13,11 +13,7 @@
 #include "YmUtils/MsgMgr.h"
 
 #include "AstMgr.h"
-#include "AstExpr.h"
 #include "AstList.h"
-#include "AstSymbol.h"
-#include "AstFuncDecl.h"
-#include "AstVarDecl.h"
 
 
 // より詳細なエラー情報を出力させる．
@@ -96,16 +92,17 @@ fr_merge(const FileRegion fr_array[],
   AstCaseList*   caselist_type;
   AstExpr*       expr_type;
   AstExprList*   exprlist_type;
+  AstIdentifier* id_type;
   AstIfList*     iflist_type;
   AstModule*     module_type;
   AstModuleList* modulelist_type;
+  AstParam*      param_type;
+  AstParamList*  paramlist_type;
   AstPrimary*    primary_type;
   AstStatement*  statement_type;
   AstStmtList*   stmtlist_type;
   AstSymbol*     symbol_type;
   AstSymbolList* symbollist_type;
-  AstVarDecl*    vardecl_type;
-  AstVarList*    varlist_type;
   AstValueType*  valuetype_type;
 }
 
@@ -187,21 +184,22 @@ fr_merge(const FileRegion fr_array[],
 %type <expr_type>       init_expr
 %type <exprlist_type>   expr_list
 %type <primary_type>    lvalue
+%type <id_type>         identifier
 %type <iflist_type>     if_list
 %type <iflist_type>     if_else_list
 %type <module_type>     module
 %type <modulelist_type> module_list
+%type <param_type>      param
+%type <paramlist_type>  param_list
 %type <statement_type>  complex_statement
 %type <statement_type>  item
 %type <statement_type>  single_statement
 %type <statement_type>  statement
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
-%type <symbollist_type> identifier
+%type <symbollist_type> symbol_list
 %type <token_type>      eqop
 %type <valuetype_type>  type
-%type <vardecl_type>    param
-%type <varlist_type>    param_list
 
 %%
 
@@ -482,11 +480,11 @@ lvalue
 param_list
 : // 空
 {
-  $$ = new AstVarList;
+  $$ = new AstParamList;
 }
 | param
 {
-  $$ = new AstVarList;
+  $$ = new AstParamList;
   $$->add($1);
 }
 | param_list COMMA param
@@ -500,7 +498,7 @@ param_list
 param
 : SYMBOL COLON type init_expr
 {
-  $$ = mgr.new_VarDecl($1, $3, $4, false, @$);
+  $$ = mgr.new_Param($1, $3, $4, @$);
 }
 ;
 
@@ -702,12 +700,19 @@ expr_list
 
 // 識別子
 identifier
+: symbol_list
+{
+  $$ = mgr.new_Identifier($1, @$);
+}
+;
+
+symbol_list
 : SYMBOL
 {
   $$ = new AstSymbolList;
   $$->add($1);
 }
-| identifier DOT SYMBOL
+| symbol_list DOT SYMBOL
 {
   $$ = $1;
   $$->add($3);

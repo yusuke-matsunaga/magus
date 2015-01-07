@@ -9,6 +9,7 @@
 
 #include "AstFuncDecl.h"
 #include "AstList.h"
+#include "YmslScope.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -25,7 +26,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] loc ファイル位置
 AstFuncDecl::AstFuncDecl(ShString name,
 			 ValueType type,
-			 AstVarList* param_list,
+			 AstParamList* param_list,
 			 AstStmtList* stmt_list,
 			 const FileRegion& loc) :
   AstStatement(loc),
@@ -33,10 +34,11 @@ AstFuncDecl::AstFuncDecl(ShString name,
   mIndex(-1),
   mType(type),
   mParamList(param_list->size()),
-  mStmtList(stmt_list->size())
+  mStmtList(stmt_list->size()),
+  mScope(NULL)
 {
   ymuint pos = 0;
-  for (AstVarList::Iterator p = param_list->begin();
+  for (AstParamList::Iterator p = param_list->begin();
        !p.is_end(); p.next()) {
     mParamList[pos] = *p;
     ++ pos;
@@ -76,7 +78,7 @@ AstFuncDecl::type() const
 }
 
 // @brief パラメータリストを返す．
-const vector<AstVarDecl*>&
+const vector<AstParam*>&
 AstFuncDecl::param_list() const
 {
   return mParamList;
@@ -87,6 +89,23 @@ const vector<AstStatement*>&
 AstFuncDecl::stmt_list() const
 {
   return mStmtList;
+}
+
+// @brief スコープの生成と変数名の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstFuncDecl::phase1(YmslScope* parent_scope)
+{
+  parent_scope->add_function(this);
+
+  mScope = new YmslScope(parent_scope);
+
+  // mParamList を登録
+
+  ymuint n = mStmtList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    mStmtList[i]->phase1(parent_scope);
+  }
 }
 
 // @brief 命令コードのサイズを計算する．

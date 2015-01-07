@@ -8,6 +8,7 @@
 
 
 #include "Ast.h"
+#include "AstIdentifier.h"
 #include "AstList.h"
 #include "AstModule.h"
 #include "AstStatement.h"
@@ -69,6 +70,52 @@ AstSymbol::str_val() const
 
 
 //////////////////////////////////////////////////////////////////////
+// クラス AstIdentifier
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] symbol_list シンボルリスト
+// @param[in] loc ファイル位置
+AstIdentifier::AstIdentifier(AstSymbolList* symbol_list,
+			     const FileRegion& loc) :
+  Ast(loc),
+  mSymbolList(symbol_list->size())
+{
+  ymuint pos = 0;
+  for (AstSymbolList::Iterator p = symbol_list->begin();
+       !p.is_end(); p.next()) {
+    mSymbolList[pos] = *p;
+    ++ pos;
+  }
+}
+
+// @brief デストラクタ
+AstIdentifier::~AstIdentifier()
+{
+}
+
+// @brief シンボルリストを返す．
+const vector<AstSymbol*>&
+AstIdentifier::symbol_list() const
+{
+  return mSymbolList;
+}
+
+// @brief 内容を出力する．
+void
+AstIdentifier::print(ostream& s) const
+{
+  ymuint n = mSymbolList.size();
+  const char* dot = "";
+  for (ymuint i = 0; i < n; ++ i) {
+    AstSymbol* sym = mSymbolList[i];
+    s << dot << sym->str_val();
+    dot = ".";
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス AstModule
 //////////////////////////////////////////////////////////////////////
 
@@ -104,44 +151,6 @@ AstSymbol*
 AstModule::alias_name() const
 {
   return mAliasName;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstToplevel
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] stmt_list ステートメントリスト
-// @param[in] loc ファイル位置
-AstToplevel::AstToplevel(AstStmtList* stmt_list,
-			 const FileRegion& loc) :
-  Ast(loc),
-  mStmtList(stmt_list->size())
-{
-  ymuint pos = 0;
-  for (AstStmtList::Iterator p = stmt_list->begin();
-       !p.is_end(); p.next()) {
-    mStmtList[pos] = *p;
-    ++ pos;
-  }
-}
-
-// @brief デストラクタ
-AstToplevel::~AstToplevel()
-{
-}
-
-// @brief 出力する
-// @param[in] s 出力先のストリーム
-void
-AstToplevel::print(ostream& s) const
-{
-  for (vector<AstStatement*>::const_iterator p = mStmtList.begin();
-       p != mStmtList.end(); ++ p) {
-    AstStatement* stmt = *p;
-    stmt->print(s, 0);
-  }
 }
 
 

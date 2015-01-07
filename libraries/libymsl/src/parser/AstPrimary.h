@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] var_name 変数名
   /// @param[in] loc ファイル位置
-  AstPrimary(AstSymbolList* var_name,
+  AstPrimary(AstIdentifier* var_name,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -38,6 +38,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の参照を解決する．
+  virtual
+  void
+  resolve_var(YmslScope* parent_scope);
 
   /// @brief 変数を返す．
   AstVarDecl*
@@ -59,7 +64,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数名
-  vector<AstSymbol*> mVarName;
+  AstIdentifier* mVarName;
 
   // 変数
   AstVarDecl* mVar;

@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] var_name 変数名
   /// @param[in] loc ファイル位置
-  AstVarExpr(AstSymbolList* var_name,
+  AstVarExpr(AstIdentifier* var_name,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -38,6 +38,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 変数の参照を解決する．
+  virtual
+  void
+  resolve_var(YmslScope* parent_scope);
 
   /// @brief 式の型を解析する．
   /// @return 引数の方が間違っていたら false を返す．
@@ -82,8 +87,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数名
-  // 階層付きの場合にはシンボルのリストになる．
-  vector<AstSymbol*> mVarName;
+  AstIdentifier* mVarName;
 
   // 変数宣言
   AstVarDecl* mVarDecl;

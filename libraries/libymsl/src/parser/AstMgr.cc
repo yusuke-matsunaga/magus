@@ -27,6 +27,7 @@
 #include "AstFuncCall.h"
 #include "AstFuncDecl.h"
 #include "AstGoto.h"
+#include "AstIdentifier.h"
 #include "AstIf.h"
 #include "AstIfBlock.h"
 #include "AstImport.h"
@@ -36,6 +37,7 @@
 #include "AstLabel.h"
 #include "AstList.h"
 #include "AstModule.h"
+#include "AstParam.h"
 #include "AstPrimary.h"
 #include "AstReturn.h"
 #include "AstStringConst.h"
@@ -89,7 +91,7 @@ AstMgr::read_source(IDO& ido)
 }
 
 // @brief トップレベルのASTを返す．
-AstToplevel*
+AstStatement*
 AstMgr::toplevel() const
 {
   return mToplevel;
@@ -182,7 +184,7 @@ AstMgr::new_Import(AstModuleList* module_list,
 // @param[in] init_expr 初期化式
 // @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
-AstVarDecl*
+AstStatement*
 AstMgr::new_VarDecl(AstSymbol* name,
 		    AstValueType* type,
 		    AstExpr* init_expr,
@@ -197,16 +199,35 @@ AstMgr::new_VarDecl(AstSymbol* name,
   }
 }
 
+// @brief パラメータ宣言を作る．
+// @param[in] name 変数名
+// @param[in] type 型
+// @param[in] init_expr 初期化式
+// @param[in] loc ファイル位置
+AstParam*
+AstMgr::new_Param(AstSymbol* name,
+		  AstValueType* type,
+		  AstExpr* init_expr,
+		  const FileRegion& loc)
+{
+  if ( type->simple_type() ) {
+    void* p = mAlloc.get_memory(sizeof(AstParam));
+    return new (p) AstParam(name->str_val(), type->value_type(), init_expr, loc);
+  }
+  else {
+  }
+}
+
 // @brief 関数宣言を作る．
 // @param[in] name 変数名
 // @param[in] type 型
 // @param[in] param_list パラメータリスト
 // @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
-AstFuncDecl*
+AstStatement*
 AstMgr::new_FuncDecl(AstSymbol* name,
 		     AstValueType* type,
-		     AstVarList* param_list,
+		     AstParamList* param_list,
 		     AstStmtList* stmt_list,
 		     const FileRegion& loc)
 {
@@ -436,7 +457,7 @@ AstMgr::new_IteOp(AstExpr* opr1,
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_ArrayRef(AstSymbol* id,
+AstMgr::new_ArrayRef(AstIdentifier* id,
 		     AstExpr* index,
 		     const FileRegion& loc)
 {
@@ -444,40 +465,27 @@ AstMgr::new_ArrayRef(AstSymbol* id,
 }
 
 // @brief 関数呼び出しを作る．
-// @param[in] symbol 関数名
+// @param[in] id 関数名
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_FuncCall(AstSymbolList* symbol,
+AstMgr::new_FuncCall(AstIdentifier* id,
 		     AstExprList* expr_list,
 		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFuncCall));
-  return new (p) AstFuncCall(symbol, expr_list, loc);
+  return new (p) AstFuncCall(id, expr_list, loc);
 }
 
 // @brief 識別子式を作る．
-// @param[in] symbol 値
+// @param[in] id 変数名
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_VarExpr(AstSymbolList* symbol,
+AstMgr::new_VarExpr(AstIdentifier* id,
 		    const FileRegion& loc)
 {
-#if 0
-  AstVarDecl* var_decl = find_var(symbol->str_val());
-  if ( var_decl == NULL ) {
-    ostringstream buf;
-    buf << symbol->str_val() << ": Undefined";
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    symbol->file_region(),
-		    kMsgError,
-		    "PARS",
-		    buf.str());
-    return NULL;
-  }
-#endif
   void* p = mAlloc.get_memory(sizeof(AstVarExpr));
-  return new (p) AstVarExpr(symbol, loc);
+  return new (p) AstVarExpr(id, loc);
 }
 
 // @brief 整数定数式を作る．
@@ -525,14 +533,14 @@ AstMgr::new_StringConst(const char* val,
 }
 
 // @brief 左辺のプライマリを作る．
-// @param[in] symbol 変数名
+// @param[in] id 変数名
 // @param[in] loc ファイル位置
 AstPrimary*
-AstMgr::new_Primary(AstSymbolList* symbol,
+AstMgr::new_Primary(AstIdentifier* id,
 		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstPrimary));
-  return new (p) AstPrimary(symbol, loc);
+  return new (p) AstPrimary(id, loc);
 }
 
 // @brief 文字列型を作る．
@@ -587,6 +595,17 @@ AstMgr::new_UserType(AstSymbol* type_name)
 {
   void* p = mAlloc.get_memory(sizeof(AstUserType));
   return new (p) AstUserType(type_name);
+}
+
+// @brief 識別子名を作る．
+// @param[in] symbol_list シンボルリスト
+// @param[in] loc ファイル位置
+AstIdentifier*
+AstMgr::new_Identifier(AstSymbolList* symbol_list,
+		       const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstIdentifier));
+  return new (p) AstIdentifier(symbol_list, loc);
 }
 
 // @brief シンボルを作る．

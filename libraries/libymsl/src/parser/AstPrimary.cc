@@ -8,8 +8,7 @@
 
 
 #include "AstPrimary.h"
-#include "AstList.h"
-#include "AstSymbol.h"
+#include "AstIdentifier.h"
 #include "AstVarDecl.h"
 
 #include "YmslVM.h"
@@ -24,18 +23,12 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstPrimary::AstPrimary(AstSymbolList* var_name,
+AstPrimary::AstPrimary(AstIdentifier* var_name,
 		       const FileRegion& loc) :
   Ast(loc),
-  mVarName(var_name->size()),
+  mVarName(var_name),
   mVar(NULL)
 {
-  ymuint pos = 0;
-  for (AstSymbolList::Iterator p = var_name->begin();
-       !p.is_end(); p.next()) {
-    mVarName[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
@@ -94,18 +87,31 @@ AstPrimary::opcode() const
   return op;
 }
 
+// @brief 変数の参照を解決する．
+void
+AstPrimary::resolve_var(YmslScope* parent_scope)
+{
+#if 0
+  mVar = find_var(mVarName);
+  if ( mVar == NULL ) {
+    ostringstream buf;
+    mVarName->print(buf);
+    buf << ": Undefined";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    mVarName->file_region(),
+		    kMsgError,
+		    "PARS",
+		    buf.str());
+  }
+#endif
+}
+
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 void
 AstPrimary::print(ostream& s) const
 {
-  ymuint n = mVarName.size();
-  const char* dot = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    AstSymbol* sym = mVarName[i];
-    s << dot << sym->str_val();
-    dot = ".";
-  }
+  mVarName->print(s);
 }
 
 END_NAMESPACE_YM_YMSL
