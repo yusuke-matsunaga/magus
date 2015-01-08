@@ -45,12 +45,10 @@ class YmslVar;
 class AstCaseItem;
 class AstExpr;
 class AstFuncDecl;
-class AstIdentifier;
 class AstIfBlock;
 class AstMgr;
 class AstModule;
 class AstParam;
-class AstPrimary;
 class AstStatement;
 class AstStringConst;
 class AstSymbol;
@@ -67,7 +65,6 @@ typedef AstList<AstIfBlock> AstIfList;
 typedef AstList<AstCaseItem> AstCaseList;
 typedef AstList<AstParam> AstParamList;
 typedef AstList<AstExpr> AstExprList;
-typedef AstList<AstSymbol> AstSymbolList;
 
 #if 0
 /// @brief トークンの値

@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "RsrvWordDic.h"
 #include "Ast.h"
 #include "AstMgr.h"
-#include "AstStatement.h"
+#include "../src/parser/AstStatement.h"
+#include "../src/parser/RsrvWordDic.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -74,6 +74,8 @@ parser_test(int argc,
       "print(i);\n"
       "}\n"
       "F = a + b / c * d % e + (f > g) & (h <= k);\n"
+      "F = a.b;\n"
+      "F = c[d + e];\n"
       "//comment\n";
 
     StringIDO ido(str);

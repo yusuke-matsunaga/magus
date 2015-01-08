@@ -24,7 +24,6 @@
 #include "AstLabel.h"
 #include "AstList.h"
 #include "AstModule.h"
-#include "AstPrimary.h"
 #include "AstReturn.h"
 #include "AstSwitch.h"
 #include "AstSymbol.h"
@@ -167,7 +166,7 @@ AstImport::print(ostream& s,
 // @param[in] left 左辺
 // @param[in] right 右辺
 AstAssignment::AstAssignment(TokenType token,
-			     AstPrimary* left,
+			     AstExpr* left,
 			     AstExpr* right) :
   AstStatement(FileRegion(left->file_region(), right->file_region())),
   mToken(token),
@@ -210,11 +209,13 @@ AstAssignment::compile(YmslDriver& driver,
 		       YmslCodeList& code_list,
 		       Ymsl_INT& addr)
 {
+#if 0
   mRight->compile(driver, code_list, addr);
 
   Ymsl_CODE op = mLeft->opcode();
   code_list.write_opcode(addr, op);
   code_list.write_int(addr, mLeft->var()->index());
+#endif
 }
 
 // @brief 内容を表示する．(デバッグ用)

@@ -30,7 +30,8 @@ class AstMgr
 public:
 
   /// @brief コンストラクタ
-  AstMgr();
+  /// @param[in] debug デバッグフラグ
+  AstMgr(bool debug = false);
 
   /// @brief デストラクタ
   ~AstMgr();
@@ -141,7 +142,7 @@ public:
   /// @param[in] right 右辺
   AstStatement*
   new_Assignment(TokenType token,
-		 AstPrimary* left,
+		 AstExpr* left,
 		 AstExpr* right);
 
   /// @brief if 文を作る．
@@ -281,25 +282,27 @@ public:
   /// @param[in] index インデックス
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_ArrayRef(AstIdentifier* id,
+  new_ArrayRef(AstExpr* id,
 	       AstExpr* index,
 	       const FileRegion& loc);
+
+  /// @brief メンバ参照を作る．
+  /// @param[in] id オブジェクト名
+  /// @param[in] member メンバ名
+  /// @param[in] loc ファイル位置
+  AstExpr*
+  new_MemberRef(AstExpr* id,
+		AstSymbol* member,
+		const FileRegion& loc);
 
   /// @brief 関数呼び出しを作る．
   /// @param[in] id 関数名
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_FuncCall(AstIdentifier* id,
+  new_FuncCall(AstExpr* id,
 	       AstExprList* expr_list,
 	       const FileRegion& loc);
-
-  /// @brief 識別子式を作る．
-  /// @param[in] id 識別子名
-  /// @param[in] loc ファイル位置
-  AstExpr*
-  new_VarExpr(AstIdentifier* id,
-	      const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
   /// @param[in] val 値
@@ -325,8 +328,8 @@ public:
   /// @brief 左辺のプライマリを作る．
   /// @param[in] id 変数名
   /// @param[in] loc ファイル位置
-  AstPrimary*
-  new_Primary(AstIdentifier* id,
+  AstExpr*
+  new_Primary(AstSymbol* id,
 	      const FileRegion& loc);
 
   /// @brief void型を作る．
@@ -358,13 +361,6 @@ public:
   /// @param[in] type_name 型名
   AstValueType*
   new_UserType(AstSymbol* type_name);
-
-  /// @brief 識別子名を作る．
-  /// @param[in] symbol_list シンボルリスト
-  /// @param[in] loc ファイル位置
-  AstIdentifier*
-  new_Identifier(AstSymbolList* symbol_list,
-		 const FileRegion& loc);
 
   /// @brief シンボルを作る．
   /// @param[in] str シンボル名

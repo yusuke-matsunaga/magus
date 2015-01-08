@@ -22,8 +22,10 @@ set (ymsl_SOURCES
   src/engine/YmslVar.cc
   src/engine/YmslVM.cc
   src/parser/Ast.cc
+  src/parser/AstArrayRef.cc
   src/parser/AstExpr.cc
   src/parser/AstFuncDecl.cc
+  src/parser/AstMemberRef.cc
   src/parser/AstMgr.cc
   src/parser/AstParam.cc
   src/parser/AstPrimary.cc

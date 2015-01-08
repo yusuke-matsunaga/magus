@@ -92,17 +92,14 @@ fr_merge(const FileRegion fr_array[],
   AstCaseList*   caselist_type;
   AstExpr*       expr_type;
   AstExprList*   exprlist_type;
-  AstIdentifier* id_type;
   AstIfList*     iflist_type;
   AstModule*     module_type;
   AstModuleList* modulelist_type;
   AstParam*      param_type;
   AstParamList*  paramlist_type;
-  AstPrimary*    primary_type;
   AstStatement*  statement_type;
   AstStmtList*   stmtlist_type;
   AstSymbol*     symbol_type;
-  AstSymbolList* symbollist_type;
   AstValueType*  valuetype_type;
 }
 
@@ -181,10 +178,10 @@ fr_merge(const FileRegion fr_array[],
 // 非終端の型
 %type <caselist_type>   case_list
 %type <expr_type>       expr
+ //%type <expr_type>       identifier
 %type <expr_type>       init_expr
+%type <expr_type>       primary
 %type <exprlist_type>   expr_list
-%type <primary_type>    lvalue
-%type <id_type>         identifier
 %type <iflist_type>     if_list
 %type <iflist_type>     if_else_list
 %type <module_type>     module
@@ -197,7 +194,6 @@ fr_merge(const FileRegion fr_array[],
 %type <statement_type>  statement
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
-%type <symbollist_type> symbol_list
 %type <token_type>      eqop
 %type <valuetype_type>  type
 
@@ -306,7 +302,7 @@ statement
 
 single_statement
 // 代入文
-: lvalue eqop expr
+: primary eqop expr
 {
   $$ = mgr.new_Assignment($2, $1, $3);
 }
@@ -316,11 +312,11 @@ single_statement
   $$ = mgr.new_ExprStmt($1);
 }
 // インクリメント文
-| lvalue PLUSPLUS
+| primary PLUSPLUS
 {
 }
 // デクリメント文
-| lvalue MINUSMINUS
+| primary MINUSMINUS
 {
 }
 // GOTO 文
@@ -460,20 +456,6 @@ case_list
   $$ = $1;
   $$->add(item);
 }
-;
-
-// 左辺値
-lvalue
-: identifier
-{
-  $$ = mgr.new_Primary($1, @$);
-}
-/*
-| identifier LBK expr RBK
-{
-  $$ = mgr.new_ArrayRef($1, $3, @$);
-}
-*/
 ;
 
 // 関数定義の引数リスト
@@ -652,20 +634,17 @@ expr
 {
   $$ = $2;
 }
-| identifier
-{
-  $$ = mgr.new_VarExpr($1, @$);
-}
-/*
-| identifier LBK expr RBK
-{
-  $$ = mgr.new_ArrayRef($1, $3, @$);
-}
-*/
-| identifier LP expr_list RP
+// 関数呼び出し
+| primary LP expr_list RP
 {
   $$ = mgr.new_FuncCall($1, $3, @$);
 }
+// プライマリ
+| primary
+{
+  $$ = $1;
+}
+// 定数
 | INT_VAL
 {
   $$ = $1;
@@ -680,6 +659,33 @@ expr
 }
 ;
 
+// プライマリ式
+primary
+: SYMBOL
+{
+  $$ = mgr.new_Primary($1, @$);
+}
+| primary DOT SYMBOL
+{
+  $$ = mgr.new_MemberRef($1, $3, @$);
+}
+| primary LBK expr RBK
+{
+  $$ = mgr.new_ArrayRef($1, $3, @$);
+}
+;
+
+//identifier
+//: SYMBOL
+//{
+//  $$ = mgr.new_Primary($1, @$);
+//}
+//| SYMBOL DOT identifier
+//{
+//  $$ = mgr.new_MemberRef($1, $3, @$);
+//}
+//;
+
 // 式のリスト
 expr_list
 : // 空
@@ -692,27 +698,6 @@ expr_list
   $$->add($1);
 }
 | expr_list COMMA expr
-{
-  $$ = $1;
-  $$->add($3);
-}
-;
-
-// 識別子
-identifier
-: symbol_list
-{
-  $$ = mgr.new_Identifier($1, @$);
-}
-;
-
-symbol_list
-: SYMBOL
-{
-  $$ = new AstSymbolList;
-  $$->add($1);
-}
-| symbol_list DOT SYMBOL
 {
   $$ = $1;
   $$->add($3);

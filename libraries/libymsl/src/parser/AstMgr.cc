@@ -11,6 +11,7 @@
 
 #include "YmslScanner.h"
 
+#include "AstArrayRef.h"
 #include "AstAssignment.h"
 #include "AstBinOp.h"
 #include "AstBlockStmt.h"
@@ -27,7 +28,6 @@
 #include "AstFuncCall.h"
 #include "AstFuncDecl.h"
 #include "AstGoto.h"
-#include "AstIdentifier.h"
 #include "AstIf.h"
 #include "AstIfBlock.h"
 #include "AstImport.h"
@@ -36,6 +36,7 @@
 #include "AstIteOp.h"
 #include "AstLabel.h"
 #include "AstList.h"
+#include "AstMemberRef.h"
 #include "AstModule.h"
 #include "AstParam.h"
 #include "AstPrimary.h"
@@ -48,7 +49,6 @@
 #include "AstUniOp.h"
 #include "AstUserType.h"
 #include "AstVarDecl.h"
-#include "AstVarExpr.h"
 #include "AstVoidType.h"
 #include "AstWhile.h"
 
@@ -60,10 +60,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AstMgr::AstMgr()
+// @param[in] debug デバッグフラグ
+AstMgr::AstMgr(bool debug)
 {
   mScanner = NULL;
-  mDebug = false;
+  mDebug = debug;
 }
 
 // @brief デストラクタ
@@ -245,7 +246,7 @@ AstMgr::new_FuncDecl(AstSymbol* name,
 // @param[in] right 右辺
 AstStatement*
 AstMgr::new_Assignment(TokenType token,
-		       AstPrimary* left,
+		       AstExpr* left,
 		       AstExpr* right)
 {
   void* p = mAlloc.get_memory(sizeof(AstAssignment));
@@ -457,11 +458,25 @@ AstMgr::new_IteOp(AstExpr* opr1,
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_ArrayRef(AstIdentifier* id,
+AstMgr::new_ArrayRef(AstExpr* id,
 		     AstExpr* index,
 		     const FileRegion& loc)
 {
-  return NULL;
+  void* p = mAlloc.get_memory(sizeof(AstArrayRef));
+  return new (p) AstArrayRef(id, index, loc);
+}
+
+// @brief メンバ参照を作る．
+// @param[in] id オブジェクト名
+// @param[in] member メンバ名
+// @param[in] loc ファイル位置
+AstExpr*
+AstMgr::new_MemberRef(AstExpr* id,
+		      AstSymbol* member,
+		      const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstMemberRef));
+  return new (p) AstMemberRef(id, member, loc);
 }
 
 // @brief 関数呼び出しを作る．
@@ -469,23 +484,12 @@ AstMgr::new_ArrayRef(AstIdentifier* id,
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_FuncCall(AstIdentifier* id,
+AstMgr::new_FuncCall(AstExpr* id,
 		     AstExprList* expr_list,
 		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFuncCall));
   return new (p) AstFuncCall(id, expr_list, loc);
-}
-
-// @brief 識別子式を作る．
-// @param[in] id 変数名
-// @param[in] loc ファイル位置
-AstExpr*
-AstMgr::new_VarExpr(AstIdentifier* id,
-		    const FileRegion& loc)
-{
-  void* p = mAlloc.get_memory(sizeof(AstVarExpr));
-  return new (p) AstVarExpr(id, loc);
 }
 
 // @brief 整数定数式を作る．
@@ -535,8 +539,8 @@ AstMgr::new_StringConst(const char* val,
 // @brief 左辺のプライマリを作る．
 // @param[in] id 変数名
 // @param[in] loc ファイル位置
-AstPrimary*
-AstMgr::new_Primary(AstIdentifier* id,
+AstExpr*
+AstMgr::new_Primary(AstSymbol* id,
 		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstPrimary));
@@ -595,17 +599,6 @@ AstMgr::new_UserType(AstSymbol* type_name)
 {
   void* p = mAlloc.get_memory(sizeof(AstUserType));
   return new (p) AstUserType(type_name);
-}
-
-// @brief 識別子名を作る．
-// @param[in] symbol_list シンボルリスト
-// @param[in] loc ファイル位置
-AstIdentifier*
-AstMgr::new_Identifier(AstSymbolList* symbol_list,
-		       const FileRegion& loc)
-{
-  void* p = mAlloc.get_memory(sizeof(AstIdentifier));
-  return new (p) AstIdentifier(symbol_list, loc);
 }
 
 // @brief シンボルを作る．

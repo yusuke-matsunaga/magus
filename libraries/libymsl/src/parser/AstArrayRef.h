@@ -1,39 +1,39 @@
-#ifndef ASTASSIGNMENT_H
-#define ASTASSIGNMENT_H
+#ifndef ASTARRAYREF_H
+#define ASTARRAYREF_H
 
-/// @file AstAssignment.h
-/// @brief AstAssignment のヘッダファイル
+/// @file AstArrayRef.h
+/// @brief AstArrayRef のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstStatement.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstAssignment AstAssignment.h "AstAssignment.h"
-/// @brief 代入文を表す AstStatement
+/// @class AstArrayRef AstArrayRef.h "AstArrayRef.h"
+/// @brief 配列参照を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstAssignment :
-  public AstStatement
+class AstArrayRef :
+  public AstExpr
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] token トークン
-  /// @param[in] left 左辺
-  /// @param[in] right 右辺
-  AstAssignment(TokenType token,
-		AstExpr* left,
-		AstExpr* right);
+  /// @param[in] id 配列名
+  /// @param[in] index インデックス
+  /// @param[in] loc ファイル位置
+  AstArrayRef(AstExpr* id,
+	      AstExpr* index,
+	      const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstAssignment();
+  ~AstArrayRef();
 
 
 public:
@@ -41,11 +41,23 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と変数名の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
+  /// @brief 変数の参照を解決する．
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  resolve_var(YmslScope* parent_scope);
+
+  /// @brief 式の型を解析する．
+  /// @return 引数の方が間違っていたら false を返す．
+  ///
+  /// 結果としてキャスト演算が挿入される場合もある．
+  virtual
+  bool
+  type_analysis();
+
+  /// @brief 式の型を返す．
+  virtual
+  ValueType
+  type();
 
   /// @brief 命令コードのサイズを計算する．
   virtual
@@ -66,11 +78,9 @@ public:
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
   virtual
   void
-  print(ostream& s,
-	ymuint indent = 0) const;
+  print(ostream& s) const;
 
 
 private:
@@ -78,17 +88,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // トークン
-  TokenType mToken;
+  // 配列名
+  AstExpr* mArray;
 
-  // 左辺式
-  AstExpr* mLeft;
-
-  // 右辺式
-  AstExpr* mRight;
+  // インデックス
+  AstExpr* mIndex;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTASSIGNMENT_H
+#endif // ASTARRAYREF_H

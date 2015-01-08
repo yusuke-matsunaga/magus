@@ -12,7 +12,6 @@
 #include "AstBinOp.h"
 #include "AstIteOp.h"
 #include "AstList.h"
-#include "AstVarExpr.h"
 #include "AstIntConst.h"
 #include "AstFloatConst.h"
 #include "AstStringConst.h"
@@ -21,7 +20,6 @@
 
 #include "AstFuncDecl.h"
 #include "AstVarDecl.h"
-#include "AstIdentifier.h"
 
 #include "YmslCodeList.h"
 #include "YmslVM.h"
@@ -56,7 +54,7 @@ AstExpr::~AstExpr()
 // @param[in] func_name 関数名
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstIdentifier* func_name,
+AstFuncCall::AstFuncCall(AstExpr* func_name,
 			 AstExprList* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
@@ -585,7 +583,7 @@ AstIteOp::print(ostream& s) const
   mOpr[2]->print(s);
 }
 
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス AstVarExpr
 //////////////////////////////////////////////////////////////////////
@@ -708,7 +706,7 @@ AstVarExpr::print(ostream& s) const
 {
   mVarName->print(s);
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス AstIntConst

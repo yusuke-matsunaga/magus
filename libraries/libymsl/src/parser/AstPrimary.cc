@@ -8,10 +8,12 @@
 
 
 #include "AstPrimary.h"
-#include "AstIdentifier.h"
 #include "AstVarDecl.h"
 
+#include "YmslScope.h"
 #include "YmslVM.h"
+
+#include "YmUtils/MsgMgr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -23,16 +25,50 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] var_name 変数名
 // @param[in] loc ファイル位置
-AstPrimary::AstPrimary(AstIdentifier* var_name,
+AstPrimary::AstPrimary(AstSymbol* var_name,
 		       const FileRegion& loc) :
-  Ast(loc),
-  mVarName(var_name),
+  AstExpr(loc),
+  mVarName(var_name->str_val()),
   mVar(NULL)
 {
 }
 
 // @brief デストラクタ
 AstPrimary::~AstPrimary()
+{
+}
+
+// @brief 式の型を解析する．
+// @return 引数の方が間違っていたら false を返す．
+//
+// 結果としてキャスト演算が挿入される場合もある．
+bool
+AstPrimary::type_analysis()
+{
+}
+
+// @brief 式の型を返す．
+ValueType
+AstPrimary::type()
+{
+}
+
+// @brief 命令コードのサイズを計算する．
+ymuint
+AstPrimary::calc_size()
+{
+}
+
+// @brief 命令コードを生成する．
+// @param[in] driver ドライバ
+// @param[in] code_list 命令コードの格納先
+// @param[inout] addr 命令コードの現在のアドレス
+//
+// addr の値は更新される．
+void
+AstPrimary::compile(YmslDriver& driver,
+		    YmslCodeList& code_list,
+		    Ymsl_INT& addr)
 {
 }
 
@@ -91,19 +127,16 @@ AstPrimary::opcode() const
 void
 AstPrimary::resolve_var(YmslScope* parent_scope)
 {
-#if 0
-  mVar = find_var(mVarName);
+  mVar = parent_scope->find_vardecl(mVarName);
   if ( mVar == NULL ) {
     ostringstream buf;
-    mVarName->print(buf);
-    buf << ": Undefined";
+    buf << mVarName << ": Undefined";
     MsgMgr::put_msg(__FILE__, __LINE__,
-		    mVarName->file_region(),
+		    file_region(),
 		    kMsgError,
 		    "PARS",
 		    buf.str());
   }
-#endif
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -111,7 +144,7 @@ AstPrimary::resolve_var(YmslScope* parent_scope)
 void
 AstPrimary::print(ostream& s) const
 {
-  mVarName->print(s);
+  s << mVarName;
 }
 
 END_NAMESPACE_YM_YMSL

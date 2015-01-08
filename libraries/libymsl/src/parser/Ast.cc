@@ -8,7 +8,6 @@
 
 
 #include "Ast.h"
-#include "AstIdentifier.h"
 #include "AstList.h"
 #include "AstModule.h"
 #include "AstStatement.h"
@@ -66,52 +65,6 @@ ShString
 AstSymbol::str_val() const
 {
   return mVal;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstIdentifier
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] symbol_list シンボルリスト
-// @param[in] loc ファイル位置
-AstIdentifier::AstIdentifier(AstSymbolList* symbol_list,
-			     const FileRegion& loc) :
-  Ast(loc),
-  mSymbolList(symbol_list->size())
-{
-  ymuint pos = 0;
-  for (AstSymbolList::Iterator p = symbol_list->begin();
-       !p.is_end(); p.next()) {
-    mSymbolList[pos] = *p;
-    ++ pos;
-  }
-}
-
-// @brief デストラクタ
-AstIdentifier::~AstIdentifier()
-{
-}
-
-// @brief シンボルリストを返す．
-const vector<AstSymbol*>&
-AstIdentifier::symbol_list() const
-{
-  return mSymbolList;
-}
-
-// @brief 内容を出力する．
-void
-AstIdentifier::print(ostream& s) const
-{
-  ymuint n = mSymbolList.size();
-  const char* dot = "";
-  for (ymuint i = 0; i < n; ++ i) {
-    AstSymbol* sym = mSymbolList[i];
-    s << dot << sym->str_val();
-    dot = ".";
-  }
 }
 
 
