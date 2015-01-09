@@ -88,19 +88,19 @@ fr_merge(const FileRegion fr_array[],
 
 // 値を表す型
 %union {
-  TokenType      token_type;
-  AstCaseList*   caselist_type;
-  AstExpr*       expr_type;
-  AstExprList*   exprlist_type;
-  AstIfList*     iflist_type;
-  AstModule*     module_type;
-  AstModuleList* modulelist_type;
-  AstParam*      param_type;
-  AstParamList*  paramlist_type;
-  AstStatement*  statement_type;
-  AstStmtList*   stmtlist_type;
-  AstSymbol*     symbol_type;
-  AstValueType*  valuetype_type;
+  TokenType       token_type;
+  AstCaseList*    caselist_type;
+  AstExpr*        expr_type;
+  AstExprList*    exprlist_type;
+  AstIfList*      iflist_type;
+  AstModule*      module_type;
+  AstModuleList*  modulelist_type;
+  AstParam*       param_type;
+  AstParamList*   paramlist_type;
+  AstStatement*   statement_type;
+  AstStmtList*    stmtlist_type;
+  AstSymbol*      symbol_type;
+  const YmslType* type_type;
 }
 
 
@@ -178,7 +178,6 @@ fr_merge(const FileRegion fr_array[],
 // 非終端の型
 %type <caselist_type>   case_list
 %type <expr_type>       expr
- //%type <expr_type>       identifier
 %type <expr_type>       init_expr
 %type <expr_type>       primary
 %type <exprlist_type>   expr_list
@@ -195,7 +194,7 @@ fr_merge(const FileRegion fr_array[],
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
 %type <token_type>      eqop
-%type <valuetype_type>  type
+%type <type_type>       type
 
 %%
 
@@ -674,17 +673,6 @@ primary
   $$ = mgr.new_ArrayRef($1, $3, @$);
 }
 ;
-
-//identifier
-//: SYMBOL
-//{
-//  $$ = mgr.new_Primary($1, @$);
-//}
-//| SYMBOL DOT identifier
-//{
-//  $$ = mgr.new_MemberRef($1, $3, @$);
-//}
-//;
 
 // 式のリスト
 expr_list

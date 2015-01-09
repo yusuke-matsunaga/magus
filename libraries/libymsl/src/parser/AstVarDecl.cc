@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstVarDecl::AstVarDecl(ShString name,
-		       ValueType type,
+		       const YmslType* type,
 		       AstExpr* init_expr,
 		       bool global,
 		       const FileRegion& loc) :
@@ -57,7 +57,7 @@ AstVarDecl::index() const
 }
 
 // @brief 型を得る．
-ValueType
+const YmslType*
 AstVarDecl::type() const
 {
   return mType;

@@ -52,7 +52,7 @@ AstArrayRef::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstArrayRef::type()
 {
 }

@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] init_expr 初期化式
 // @param[in] loc ファイル位置
 AstParam::AstParam(ShString name,
-		   ValueType type,
+		   const YmslType* type,
 		   AstExpr* init_expr,
 		   const FileRegion& loc) :
   Ast(loc),
@@ -54,7 +54,7 @@ AstParam::index() const
 }
 
 // @brief 型を得る．
-ValueType
+const YmslType*
 AstParam::type() const
 {
   return mType;

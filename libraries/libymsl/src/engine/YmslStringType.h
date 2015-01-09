@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "YmslValueType.h"
+#include "YmslType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class YmslStringType YmslStringType.h "YmslStringType.h"
-/// @brief string 型を表す YmslValueType
+/// @brief string 型を表す YmslType
 //////////////////////////////////////////////////////////////////////
 class YmslStringType :
-  public YmslValueType
+  public YmslType
 {
 public:
 
@@ -38,8 +38,8 @@ public:
 
   /// @brief 型を得る．
   virtual
-  ValueType
-  value_type() const;
+  TypeId
+  type() const;
 
   /// @brief 値を表す文字列を返す．
   virtual

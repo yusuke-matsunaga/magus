@@ -56,7 +56,7 @@ public:
 
   /// @brief 式の型を返す．
   virtual
-  ValueType
+  const YmslType*
   type();
 
   /// @brief 命令コードのサイズを計算する．

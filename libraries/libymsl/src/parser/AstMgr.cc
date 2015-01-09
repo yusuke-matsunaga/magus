@@ -15,7 +15,7 @@
 #include "AstAssignment.h"
 #include "AstBinOp.h"
 #include "AstBlockStmt.h"
-#include "AstBooleanType.h"
+//#include "AstBooleanType.h"
 #include "AstBreak.h"
 #include "AstCaseItem.h"
 #include "AstContinue.h"
@@ -23,7 +23,7 @@
 #include "AstExpr.h"
 #include "AstExprStmt.h"
 #include "AstFloatConst.h"
-#include "AstFloatType.h"
+//#include "AstFloatType.h"
 #include "AstFor.h"
 #include "AstFuncCall.h"
 #include "AstFuncDecl.h"
@@ -32,7 +32,7 @@
 #include "AstIfBlock.h"
 #include "AstImport.h"
 #include "AstIntConst.h"
-#include "AstIntType.h"
+//#include "AstIntType.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
 #include "AstList.h"
@@ -42,14 +42,14 @@
 #include "AstPrimary.h"
 #include "AstReturn.h"
 #include "AstStringConst.h"
-#include "AstStringType.h"
+//#include "AstStringType.h"
 #include "AstSwitch.h"
 #include "AstSymbol.h"
 #include "AstToplevel.h"
 #include "AstUniOp.h"
-#include "AstUserType.h"
+//#include "AstUserType.h"
 #include "AstVarDecl.h"
-#include "AstVoidType.h"
+//#include "AstVoidType.h"
 #include "AstWhile.h"
 
 
@@ -187,17 +187,13 @@ AstMgr::new_Import(AstModuleList* module_list,
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_VarDecl(AstSymbol* name,
-		    AstValueType* type,
+		    const YmslType* type,
 		    AstExpr* init_expr,
 		    bool global,
 		    const FileRegion& loc)
 {
-  if ( type->simple_type() ) {
-    void* p = mAlloc.get_memory(sizeof(AstVarDecl));
-    return new (p) AstVarDecl(name->str_val(), type->value_type(), init_expr, global, loc);
-  }
-  else {
-  }
+  void* p = mAlloc.get_memory(sizeof(AstVarDecl));
+  return new (p) AstVarDecl(name->str_val(), type, init_expr, global, loc);
 }
 
 // @brief パラメータ宣言を作る．
@@ -207,16 +203,12 @@ AstMgr::new_VarDecl(AstSymbol* name,
 // @param[in] loc ファイル位置
 AstParam*
 AstMgr::new_Param(AstSymbol* name,
-		  AstValueType* type,
+		  const YmslType* type,
 		  AstExpr* init_expr,
 		  const FileRegion& loc)
 {
-  if ( type->simple_type() ) {
-    void* p = mAlloc.get_memory(sizeof(AstParam));
-    return new (p) AstParam(name->str_val(), type->value_type(), init_expr, loc);
-  }
-  else {
-  }
+  void* p = mAlloc.get_memory(sizeof(AstParam));
+  return new (p) AstParam(name->str_val(), type, init_expr, loc);
 }
 
 // @brief 関数宣言を作る．
@@ -227,17 +219,13 @@ AstMgr::new_Param(AstSymbol* name,
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_FuncDecl(AstSymbol* name,
-		     AstValueType* type,
+		     const YmslType* type,
 		     AstParamList* param_list,
 		     AstStmtList* stmt_list,
 		     const FileRegion& loc)
 {
-  if ( type->simple_type() ) {
-    void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
-    return  new (p) AstFuncDecl(name->str_val(), type->value_type(), param_list, stmt_list, loc);
-  }
-  else {
-  }
+  void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
+  return  new (p) AstFuncDecl(name->str_val(), type, param_list, stmt_list, loc);
 }
 
 // @brief 代入文を作る．
@@ -549,56 +537,44 @@ AstMgr::new_Primary(AstSymbol* id,
 
 // @brief 文字列型を作る．
 // @param[in] loc ファイル位置
-AstValueType*
+const YmslType*
 AstMgr::new_StringType(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstStringType));
-  return new (p) AstStringType(loc);
 }
 
 // @brief void型を作る．
 // @param[in] loc ファイル位置
-AstValueType*
+const YmslType*
 AstMgr::new_VoidType(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstVoidType));
-  return new (p) AstVoidType(loc);
 }
 
 // @brief boolean型を作る．
 // @param[in] loc ファイル位置
-AstValueType*
+const YmslType*
 AstMgr::new_BooleanType(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstBooleanType));
-  return new (p) AstBooleanType(loc);
 }
 
 // @brief 整数型を作る．
 // @param[in] loc ファイル位置
-AstValueType*
+const YmslType*
 AstMgr::new_IntType(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstIntType));
-  return new (p) AstIntType(loc);
 }
 
 // @brief 浮動小数点型を作る．
 // @param[in] loc ファイル位置
-AstValueType*
+const YmslType*
 AstMgr::new_FloatType(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstFloatType));
-  return new (p) AstFloatType(loc);
 }
 
 // @brief ユーザー定義型を作る．
 // @param[in] type_name 型名
-AstValueType*
+const YmslType*
 AstMgr::new_UserType(AstSymbol* type_name)
 {
-  void* p = mAlloc.get_memory(sizeof(AstUserType));
-  return new (p) AstUserType(type_name);
 }
 
 // @brief シンボルを作る．

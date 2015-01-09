@@ -43,7 +43,7 @@ public:
 
   /// @brief 型を得る．
   virtual
-  ValueType
+  const YmslType*
   value_type() const = 0;
 
   /// @brief 値を表す文字列を返す．

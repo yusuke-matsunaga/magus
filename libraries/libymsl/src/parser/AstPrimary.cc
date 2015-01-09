@@ -48,7 +48,7 @@ AstPrimary::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstPrimary::type()
 {
 }
@@ -83,6 +83,7 @@ AstPrimary::var() const
 Ymsl_CODE
 AstPrimary::opcode() const
 {
+#if 0
   Ymsl_CODE op;
   switch ( mVar->type() ) {
   case kVoidType:
@@ -121,6 +122,7 @@ AstPrimary::opcode() const
     break;
   }
   return op;
+#endif
 }
 
 // @brief 変数の参照を解決する．

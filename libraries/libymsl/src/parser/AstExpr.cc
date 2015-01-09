@@ -97,7 +97,7 @@ AstFuncCall::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstFuncCall::type()
 {
   return mFunc->type();
@@ -181,7 +181,7 @@ AstUniOp::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstUniOp::type()
 {
   return mType;
@@ -205,6 +205,7 @@ AstUniOp::compile(YmslDriver& driver,
 		  YmslCodeList& code_list,
 		  Ymsl_INT& addr)
 {
+#if 0
   mOperand->compile(driver, code_list, addr);
 
   Ymsl_CODE op = YMVM_NOP;
@@ -307,6 +308,7 @@ AstUniOp::compile(YmslDriver& driver,
     break;
   }
   code_list.write_opcode(addr, op);
+#endif
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -377,7 +379,7 @@ AstBinOp::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstBinOp::type()
 {
   return mType;
@@ -401,6 +403,7 @@ AstBinOp::compile(YmslDriver& driver,
 		  YmslCodeList& code_list,
 		  Ymsl_INT& addr)
 {
+#if 0
   mLeft->compile(driver, code_list, addr);
   mRight->compile(driver, code_list, addr);
 
@@ -473,6 +476,7 @@ AstBinOp::compile(YmslDriver& driver,
     break;
   }
   code_list.write_opcode(addr, op);
+#endif
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -546,7 +550,7 @@ AstIteOp::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstIteOp::type()
 {
   return mType;
@@ -634,7 +638,7 @@ AstVarExpr::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstVarExpr::type()
 {
   return mVarDecl->type();
@@ -658,6 +662,7 @@ AstVarExpr::compile(YmslDriver& driver,
 		    YmslCodeList& code_list,
 		    Ymsl_INT& addr)
 {
+#if 0
   Ymsl_CODE op;
   switch ( mVarDecl->type() ) {
   case kVoidType:
@@ -697,6 +702,7 @@ AstVarExpr::compile(YmslDriver& driver,
   }
   code_list.write_opcode(addr, op);
   code_list.write_int(addr, mVarDecl->index());
+#endif
 }
 
 // @brief 内容を表示する．(デバッグ用)
@@ -745,10 +751,9 @@ AstIntConst::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstIntConst::type()
 {
-  return kIntType;
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -819,10 +824,9 @@ AstFloatConst::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstFloatConst::type()
 {
-  return kFloatType;
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -906,10 +910,9 @@ AstStringConst::type_analysis()
 }
 
 // @brief 式の型を返す．
-ValueType
+const YmslType*
 AstStringConst::type()
 {
-  return kStringType;
 }
 
 // @brief 命令コードのサイズを計算する．

@@ -1,13 +1,13 @@
 
-/// @file YmslValueType.cc
-/// @brief YmslValueType の実装ファイル
+/// @file YmslType.cc
+/// @brief YmslType の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslValueType.h"
+#include "YmslType.h"
 #include "YmslIntType.h"
 #include "YmslFloatType.h"
 #include "YmslStringType.h"
@@ -32,8 +32,8 @@ YmslIntType::~YmslIntType()
 }
 
 // @brief 型を得る．
-ValueType
-YmslIntType::value_type() const
+TypeId
+YmslIntType::type() const
 {
   return kIntType;
 }
@@ -61,8 +61,8 @@ YmslFloatType::~YmslFloatType()
 }
 
 // @brief 型を得る．
-ValueType
-YmslFloatType::value_type() const
+TypeId
+YmslFloatType::type() const
 {
   return kFloatType;
 }
@@ -90,8 +90,8 @@ YmslStringType::~YmslStringType()
 }
 
 // @brief 型を得る．
-ValueType
-YmslStringType::value_type() const
+TypeId
+YmslStringType::type() const
 {
   return kStringType;
 }
@@ -121,8 +121,8 @@ YmslUserType::~YmslUserType()
 }
 
 // @brief 型を得る．
-ValueType
-YmslUserType::value_type() const
+TypeId
+YmslUserType::type() const
 {
   return kUserType;
 }
@@ -132,6 +132,33 @@ string
 YmslUserType::str() const
 {
   return mTypeName;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// misc
+//////////////////////////////////////////////////////////////////////
+
+// @brief ValueType を出力する．
+ostream&
+operator<<(ostream& s,
+	   TypeId vt)
+{
+  switch ( vt ) {
+  case kVoidType:    s << "void"; break;
+  case kBooleanType: s << "boolean"; break;
+  case kIntType:     s << "int"; break;
+  case kFloatType:   s << "float"; break;
+  case kStringType:  s << "string"; break;
+  case kArrayType:   s << "__array__"; break;
+  case kSetType:     s << "__set__"; break;
+  case kMapType:     s << "__map__"; break;
+  case kStructType:  s << "__struct__"; break;
+  case kClassType:   s << "__class__"; break;
+  case kFuncType:    s << "__function__"; break;
+  case kUserType:    s << "__user__"; break;
+  }
+  return s;
 }
 
 END_NAMESPACE_YM_YMSL

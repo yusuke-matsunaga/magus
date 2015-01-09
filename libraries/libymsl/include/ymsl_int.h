@@ -39,7 +39,7 @@ class YmslObj;
 class YmslParser;
 class YmslScope;
 class YmslSubspace;
-class YmslValueType;
+class YmslType;
 class YmslVar;
 
 class AstCaseItem;
@@ -197,24 +197,6 @@ typedef YmslObj* Ymsl_OBJPTR;
 
 /// @brief プログラムのコード
 typedef ymuint32 Ymsl_CODE;
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 値の型
-//////////////////////////////////////////////////////////////////////
-enum ValueType {
-  kVoidType,
-  kBooleanType,
-  kIntType,
-  kFloatType,
-  kStringType,
-  kUserType
-};
-
-/// @brief ValueType を出力する．
-ostream&
-operator<<(ostream& s,
-	   ValueType vt);
 
 
 //////////////////////////////////////////////////////////////////////

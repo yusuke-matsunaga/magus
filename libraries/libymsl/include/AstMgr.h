@@ -107,7 +107,7 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_VarDecl(AstSymbol* name,
-	      AstValueType* type,
+	      const YmslType* type,
 	      AstExpr* init_expr,
 	      bool global,
 	      const FileRegion& loc);
@@ -119,7 +119,7 @@ public:
   /// @param[in] loc ファイル位置
   AstParam*
   new_Param(AstSymbol* name,
-	    AstValueType* type,
+	    const YmslType* type,
 	    AstExpr* init_expr,
 	    const FileRegion& loc);
 
@@ -131,7 +131,7 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_FuncDecl(AstSymbol* name,
-	       AstValueType* type,
+	       const YmslType* type,
 	       AstParamList* param_list,
 	       AstStmtList* stmt_list,
 	       const FileRegion& loc);
@@ -334,32 +334,32 @@ public:
 
   /// @brief void型を作る．
   /// @param[in] loc ファイル位置
-  AstValueType*
+  const YmslType*
   new_VoidType(const FileRegion& loc);
 
   /// @brief boolean型を作る．
   /// @param[in] loc ファイル位置
-  AstValueType*
+  const YmslType*
   new_BooleanType(const FileRegion& loc);
 
   /// @brief 整数型を作る．
   /// @param[in] loc ファイル位置
-  AstValueType*
+  const YmslType*
   new_IntType(const FileRegion& loc);
 
   /// @brief 浮動小数点型を作る．
   /// @param[in] loc ファイル位置
-  AstValueType*
+  const YmslType*
   new_FloatType(const FileRegion& loc);
 
   /// @brief 文字列型を作る．
   /// @param[in] loc ファイル位置
-  AstValueType*
+  const YmslType*
   new_StringType(const FileRegion& loc);
 
   /// @brief ユーザー定義型を作る．
   /// @param[in] type_name 型名
-  AstValueType*
+  const YmslType*
   new_UserType(AstSymbol* type_name);
 
   /// @brief シンボルを作る．

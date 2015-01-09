@@ -33,7 +33,7 @@ public:
   /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
   AstVarDecl(ShString name,
-	     ValueType type,
+	     const YmslType* type,
 	     AstExpr* init_expr,
 	     bool global,
 	     const FileRegion& loc);
@@ -57,7 +57,7 @@ public:
   index() const;
 
   /// @brief 型を得る．
-  ValueType
+  const YmslType*
   type() const;
 
   /// @brief 初期化式を返す．
@@ -120,7 +120,7 @@ private:
   ymuint mIndex;
 
   // 変数の型
-  ValueType mType;
+  const YmslType* mType;
 
   // 初期化式
   AstExpr* mInitExpr;

@@ -106,25 +106,4 @@ AstModule::alias_name() const
   return mAliasName;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// misc
-//////////////////////////////////////////////////////////////////////
-
-// @brief ValueType を出力する．
-ostream&
-operator<<(ostream& s,
-	   ValueType vt)
-{
-  switch ( vt ) {
-  case kVoidType:    s << "void"; break;
-  case kBooleanType: s << "boolean"; break;
-  case kIntType:     s << "int"; break;
-  case kFloatType:   s << "float"; break;
-  case kStringType:  s << "string"; break;
-  case kUserType:    s << "__user__"; break;
-  }
-  return s;
-}
-
 END_NAMESPACE_YM_YMSL
