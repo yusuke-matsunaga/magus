@@ -19,6 +19,7 @@ set (ymsl_SOURCES
   src/builtin/YmslPrint.cc
   src/engine/YmslFunc.cc
   src/engine/YmslType.cc
+  src/engine/YmslTypeMgr.cc
   src/engine/YmslVar.cc
   src/engine/YmslVM.cc
   src/parser/Ast.cc

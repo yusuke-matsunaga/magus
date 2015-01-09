@@ -16,122 +16,201 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
-
 //////////////////////////////////////////////////////////////////////
-// クラス YmslIntType
+// クラス YmslType
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslIntType::YmslIntType()
+// @param[in] id ID番号
+YmslType::YmslType(ymuint id) :
+  mId(id)
 {
 }
 
 // @brief デストラクタ
-YmslIntType::~YmslIntType()
+YmslType::~YmslType()
 {
-}
-
-// @brief 型を得る．
-TypeId
-YmslIntType::type() const
-{
-  return kIntType;
 }
 
 // @brief 値を表す文字列を返す．
+//
+// class/enum/userdef のみ有効
 string
-YmslIntType::str() const
+YmslType::str() const
 {
-  return string("int");
+  return string();
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス YmslFloatType
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-YmslFloatType::YmslFloatType()
+// @brief 要素の型を得る．
+//
+// array/set/map のみ有効
+const YmslType*
+YmslType::elem_type() const
 {
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
-// @brief デストラクタ
-YmslFloatType::~YmslFloatType()
+// @brief キーの型を得る．
+//
+// map のみ有効
+const YmslType*
+YmslType::key_type() const
 {
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
-// @brief 型を得る．
-TypeId
-YmslFloatType::type() const
+// @brief 関数の出力の型を返す．
+//
+// function のみ有効
+const YmslType*
+YmslType::function_type() const
 {
-  return kFloatType;
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
-// @brief 値を表す文字列を返す．
-string
-YmslFloatType::str() const
+// @brief 関数の入力数を返す．
+//
+// function のみ有効
+ymuint
+YmslType::function_input_num() const
 {
-  return string("float");
+  ASSERT_NOT_REACHED;
+  return 0;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス YmslStringType
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-YmslStringType::YmslStringType()
+// @brief 関数の入力の型を返す．
+// @param[in] pos 入力番号 ( 0 <= pos < function_input_num() )
+//
+// function のみ有効
+const YmslType*
+YmslType::function_input_type(ymuint pos) const
 {
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
-// @brief デストラクタ
-YmslStringType::~YmslStringType()
+// @brief フィールド(メンバ変数)の数を得る．
+//
+// class のみ有効
+ymuint
+YmslType::field_num() const
 {
+  ASSERT_NOT_REACHED;
+  return 0;
 }
 
-// @brief 型を得る．
-TypeId
-YmslStringType::type() const
+// @brief フィールド(メンバ変数)の型を得る．
+// @param[in] index インデックス ( 0 <= index < field_num() )
+//
+// class のみ有効
+const YmslType*
+YmslType::field_type(ymuint index) const
 {
-  return kStringType;
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
-// @brief 値を表す文字列を返す．
-string
-YmslStringType::str() const
+// @brief フィールド(メンバ変数)の名前を得る．
+// @param[in] index インデックス ( 0 <= index < field_num() )
+//
+// class のみ有効
+ShString
+YmslType::field_name(ymuint index) const
 {
-  return string("string");
+  ASSERT_NOT_REACHED;
+  return ShString();
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス YmslUserType
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] type_name 型名
-YmslUserType::YmslUserType(string type_name) :
-  mTypeName(type_name)
+// @brief フィールド(メンバ変数)のインデックスを得る．
+// @param[in] name フィールド名
+//
+// class のみ有効
+// 該当するフィールドがなければ -1 を返す．
+int
+YmslType::field_index(ShString name) const
 {
+  ASSERT_NOT_REACHED;
+  return -1;
 }
 
-// @brief デストラクタ
-YmslUserType::~YmslUserType()
+// @brief メソッド(メンバ関数)の数を得る．
+//
+// class のみ有効
+ymuint
+YmslType::method_num() const
 {
+  ASSERT_NOT_REACHED;
+  return 0;
 }
 
-// @brief 型を得る．
-TypeId
-YmslUserType::type() const
+// @brief メソッド(メンバ関数)の型を得る．
+// @param[in] index インデックス ( 0 <= index < method_num() )
+//
+// class のみ有効
+const YmslType*
+YmslType::method_type(ymuint index) const
 {
-  return kUserType;
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
-// @brief 値を表す文字列を返す．
-string
-YmslUserType::str() const
+// @brief メソッド(メンバ関数)の名前を得る．
+// @param[in] index インデックス ( 0 <= index < method_num() )
+//
+// class のみ有効
+ShString
+YmslType::method_name(ymuint index) const
 {
-  return mTypeName;
+  ASSERT_NOT_REACHED;
+  return ShString();
+}
+
+// @brief メソッド(メンバ関数)のインデックスを得る．
+// @param[in] name メソッド名
+//
+// class のみ有効
+// 該当するメソッドがなければ -1 を返す．
+int
+YmslType::method_index(ShString name) const
+{
+  ASSERT_NOT_REACHED;
+  return -1;
+}
+
+// @brief 列挙型の数を得る．
+//
+// enum のみ有効
+ymuint
+YmslType::enum_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief 列挙型の要素名を得る．
+// @param[in] index インデックス ( 0 <= index < enum_num() )
+//
+// enum のみ有効
+ShString
+YmslType::enum_name(ymuint index) const
+{
+  ASSERT_NOT_REACHED;
+  return ShString();
+}
+
+// @brief 列挙型のインデックスを得る．
+// @param[in] name 列挙型の名前
+//
+// enum のみ有効
+// 該当する名前がなければ -1 を返す．
+int
+YmslType::enum_index(ShString name) const
+{
+  ASSERT_NOT_REACHED;
+  return -1;
 }
 
 
@@ -153,10 +232,10 @@ operator<<(ostream& s,
   case kArrayType:   s << "__array__"; break;
   case kSetType:     s << "__set__"; break;
   case kMapType:     s << "__map__"; break;
-  case kStructType:  s << "__struct__"; break;
-  case kClassType:   s << "__class__"; break;
   case kFuncType:    s << "__function__"; break;
-  case kUserType:    s << "__user__"; break;
+  case kClassType:   s << "__class__"; break;
+  case kEnumType:    s << "__enum__"; break;
+  case kUserDefType: s << "__user__"; break;
   }
   return s;
 }
