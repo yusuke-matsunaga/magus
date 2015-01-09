@@ -53,7 +53,7 @@ class AstStatement;
 class AstStringConst;
 class AstSymbol;
 class AstToplevel;
-class AstValueType;
+class AstType;
 class AstVarDecl;
 
 template <typename T>
@@ -197,6 +197,30 @@ typedef YmslObj* Ymsl_OBJPTR;
 
 /// @brief プログラムのコード
 typedef ymuint32 Ymsl_CODE;
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 型の種類
+//////////////////////////////////////////////////////////////////////
+enum TypeId {
+  kVoidType,
+  kBooleanType,
+  kIntType,
+  kFloatType,
+  kStringType,
+  kArrayType,
+  kSetType,
+  kMapType,
+  kFuncType,
+  kClassType,
+  kEnumType,
+  kUserDefType
+};
+
+/// @brief ValueType を出力する．
+ostream&
+operator<<(ostream& s,
+	   TypeId vt);
 
 
 //////////////////////////////////////////////////////////////////////

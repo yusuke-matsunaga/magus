@@ -31,6 +31,7 @@ set (ymsl_SOURCES
   src/parser/AstParam.cc
   src/parser/AstPrimary.cc
   src/parser/AstStatement.cc
+  src/parser/AstType.cc
   src/parser/AstVarDecl.cc
   src/parser/RsrvWordDic.cc
   src/parser/SymDict.cc

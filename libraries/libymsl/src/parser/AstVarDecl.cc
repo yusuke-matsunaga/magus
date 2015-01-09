@@ -8,6 +8,7 @@
 
 
 #include "AstVarDecl.h"
+#include "AstType.h"
 #include "YmslScope.h"
 
 
@@ -24,7 +25,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstVarDecl::AstVarDecl(ShString name,
-		       const YmslType* type,
+		       AstType* type,
 		       AstExpr* init_expr,
 		       bool global,
 		       const FileRegion& loc) :
@@ -57,7 +58,7 @@ AstVarDecl::index() const
 }
 
 // @brief 型を得る．
-const YmslType*
+AstType*
 AstVarDecl::type() const
 {
   return mType;
@@ -118,7 +119,9 @@ AstVarDecl::print(ostream& s,
   if ( global() ) {
     s << "global ";
   }
-  s << "var " << name() << ": " << type() << ";" << endl;
+  s << "var " << name() << ": ";
+  type()->print(s);
+  s << ";" << endl;
 }
 
 END_NAMESPACE_YM_YMSL

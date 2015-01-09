@@ -16,7 +16,7 @@
 #include "AstFloatConst.h"
 #include "AstStringConst.h"
 #include "AstSymbol.h"
-#include "AstValueType.h"
+#include "AstType.h"
 
 #include "AstFuncDecl.h"
 #include "AstVarDecl.h"
@@ -100,7 +100,7 @@ AstFuncCall::type_analysis()
 const YmslType*
 AstFuncCall::type()
 {
-  return mFunc->type();
+  //  return mFunc->type();
 }
 
 // @brief 命令コードのサイズを計算する．

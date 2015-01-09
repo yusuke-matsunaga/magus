@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] stmt_list 本体の文
 // @param[in] loc ファイル位置
 AstFuncDecl::AstFuncDecl(ShString name,
-			 const YmslType* type,
+			 AstType* type,
 			 AstParamList* param_list,
 			 AstStmtList* stmt_list,
 			 const FileRegion& loc) :
@@ -71,7 +71,7 @@ AstFuncDecl::index() const
 }
 
 // @brief 出力の型を返す．
-const YmslType*
+AstType*
 AstFuncDecl::type() const
 {
   return mType;

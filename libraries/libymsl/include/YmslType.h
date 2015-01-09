@@ -17,30 +17,6 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @brief 型の種類
-//////////////////////////////////////////////////////////////////////
-enum TypeId {
-  kVoidType,
-  kBooleanType,
-  kIntType,
-  kFloatType,
-  kStringType,
-  kArrayType,
-  kSetType,
-  kMapType,
-  kFuncType,
-  kClassType,
-  kEnumType,
-  kUserDefType
-};
-
-/// @brief ValueType を出力する．
-ostream&
-operator<<(ostream& s,
-	   TypeId vt);
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class YmslType YmslType.h "YmslType.h"
 /// @brief 値の型を表すクラス
 //////////////////////////////////////////////////////////////////////
@@ -65,7 +41,7 @@ public:
   /// @brief 型を得る．
   virtual
   TypeId
-  type() const = 0;
+  type_id() const = 0;
 
   /// @brief ID番号を得る
   ///
@@ -73,12 +49,12 @@ public:
   ymuint
   id() const;
 
-  /// @brief 値を表す文字列を返す．
+  /// @brief キーの型を得る．
   ///
-  /// class/enum/userdef のみ有効
+  /// map のみ有効
   virtual
-  string
-  str() const;
+  const YmslType*
+  key_type() const;
 
   /// @brief 要素の型を得る．
   ///
@@ -86,13 +62,6 @@ public:
   virtual
   const YmslType*
   elem_type() const;
-
-  /// @brief キーの型を得る．
-  ///
-  /// map のみ有効
-  virtual
-  const YmslType*
-  key_type() const;
 
   /// @brief 関数の出力の型を返す．
   ///
@@ -115,70 +84,6 @@ public:
   virtual
   const YmslType*
   function_input_type(ymuint pos) const;
-
-  /// @brief フィールド(メンバ変数)の数を得る．
-  ///
-  /// class のみ有効
-  virtual
-  ymuint
-  field_num() const;
-
-  /// @brief フィールド(メンバ変数)の型を得る．
-  /// @param[in] index インデックス ( 0 <= index < field_num() )
-  ///
-  /// class のみ有効
-  virtual
-  const YmslType*
-  field_type(ymuint index) const;
-
-  /// @brief フィールド(メンバ変数)の名前を得る．
-  /// @param[in] index インデックス ( 0 <= index < field_num() )
-  ///
-  /// class のみ有効
-  virtual
-  ShString
-  field_name(ymuint index) const;
-
-  /// @brief フィールド(メンバ変数)のインデックスを得る．
-  /// @param[in] name フィールド名
-  ///
-  /// class のみ有効
-  /// 該当するフィールドがなければ -1 を返す．
-  virtual
-  int
-  field_index(ShString name) const;
-
-  /// @brief メソッド(メンバ関数)の数を得る．
-  ///
-  /// class のみ有効
-  virtual
-  ymuint
-  method_num() const;
-
-  /// @brief メソッド(メンバ関数)の型を得る．
-  /// @param[in] index インデックス ( 0 <= index < method_num() )
-  ///
-  /// class のみ有効
-  virtual
-  const YmslType*
-  method_type(ymuint index) const;
-
-  /// @brief メソッド(メンバ関数)の名前を得る．
-  /// @param[in] index インデックス ( 0 <= index < method_num() )
-  ///
-  /// class のみ有効
-  virtual
-  ShString
-  method_name(ymuint index) const;
-
-  /// @brief メソッド(メンバ関数)のインデックスを得る．
-  /// @param[in] name メソッド名
-  ///
-  /// class のみ有効
-  /// 該当するメソッドがなければ -1 を返す．
-  virtual
-  int
-  method_index(ShString name) const;
 
   /// @brief 列挙型の数を得る．
   ///
@@ -203,6 +108,12 @@ public:
   virtual
   int
   enum_index(ShString name) const;
+
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  print(ostream& s) const = 0;
 
 
 private:

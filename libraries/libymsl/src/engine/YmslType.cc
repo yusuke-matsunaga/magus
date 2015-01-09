@@ -32,13 +32,14 @@ YmslType::~YmslType()
 {
 }
 
-// @brief 値を表す文字列を返す．
+// @brief キーの型を得る．
 //
-// class/enum/userdef のみ有効
-string
-YmslType::str() const
+// map のみ有効
+const YmslType*
+YmslType::key_type() const
 {
-  return string();
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
 // @brief 要素の型を得る．
@@ -46,16 +47,6 @@ YmslType::str() const
 // array/set/map のみ有効
 const YmslType*
 YmslType::elem_type() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief キーの型を得る．
-//
-// map のみ有効
-const YmslType*
-YmslType::key_type() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -90,94 +81,6 @@ YmslType::function_input_type(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
   return NULL;
-}
-
-// @brief フィールド(メンバ変数)の数を得る．
-//
-// class のみ有効
-ymuint
-YmslType::field_num() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
-// @brief フィールド(メンバ変数)の型を得る．
-// @param[in] index インデックス ( 0 <= index < field_num() )
-//
-// class のみ有効
-const YmslType*
-YmslType::field_type(ymuint index) const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief フィールド(メンバ変数)の名前を得る．
-// @param[in] index インデックス ( 0 <= index < field_num() )
-//
-// class のみ有効
-ShString
-YmslType::field_name(ymuint index) const
-{
-  ASSERT_NOT_REACHED;
-  return ShString();
-}
-
-// @brief フィールド(メンバ変数)のインデックスを得る．
-// @param[in] name フィールド名
-//
-// class のみ有効
-// 該当するフィールドがなければ -1 を返す．
-int
-YmslType::field_index(ShString name) const
-{
-  ASSERT_NOT_REACHED;
-  return -1;
-}
-
-// @brief メソッド(メンバ関数)の数を得る．
-//
-// class のみ有効
-ymuint
-YmslType::method_num() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
-// @brief メソッド(メンバ関数)の型を得る．
-// @param[in] index インデックス ( 0 <= index < method_num() )
-//
-// class のみ有効
-const YmslType*
-YmslType::method_type(ymuint index) const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief メソッド(メンバ関数)の名前を得る．
-// @param[in] index インデックス ( 0 <= index < method_num() )
-//
-// class のみ有効
-ShString
-YmslType::method_name(ymuint index) const
-{
-  ASSERT_NOT_REACHED;
-  return ShString();
-}
-
-// @brief メソッド(メンバ関数)のインデックスを得る．
-// @param[in] name メソッド名
-//
-// class のみ有効
-// 該当するメソッドがなければ -1 を返す．
-int
-YmslType::method_index(ShString name) const
-{
-  ASSERT_NOT_REACHED;
-  return -1;
 }
 
 // @brief 列挙型の数を得る．

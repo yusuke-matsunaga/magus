@@ -1,36 +1,37 @@
-#ifndef ASTUSERTYPE_H
-#define ASTUSERTYPE_H
+#ifndef ASTARRAYTYPE_H
+#define ASTARRAYTYPE_H
 
-/// @file AstUserType.h
-/// @brief AstUserType のヘッダファイル
+/// @file AstArrayType.h
+/// @brief AstArrayType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstValueType.h"
+#include "AstType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstUserType AstUserType.h "AstUserType.h"
-/// @brief ユーザー定義型を表す Ast
+/// @class AstArrayType AstArrayType.h "AstArrayType.h"
+/// @brief array 型を表す AstType
 //////////////////////////////////////////////////////////////////////
-class AstUserType :
-  public AstValueType
+class AstArrayType :
+  public AstType
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] type_name 型名
+  /// @param[in] elem_type 要素の型
   /// @param[in] loc ファイル位置
-  AstUserType(AstSymbol* type_name);
+  AstArrayType(AstType* elem_type,
+	       const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstUserType();
+  ~AstArrayType();
 
 
 public:
@@ -38,28 +39,21 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 単純型の場合に true を返す．
+  /// @brief array 型の時 true を返す．
   virtual
   bool
-  simple_type() const;
+  array_type() const;
 
-  /// @brief 型を得る．
+  /// @brief array/set/map 型の時に要素の型を返す．
   virtual
-  ValueType
-  value_type() const;
+  AstType*
+  elem_type() const;
 
-  /// @brief 値を表す文字列を返す．
-  virtual
-  string
-  str() const;
-
-  /// @brief 内容を表示する．(デバッグ用)
+  /// @brief 内容を出力する．
   /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
   virtual
   void
-  print(ostream& s,
-	ymuint indent = 0) const;
+  print(ostream& s) const;
 
 
 private:
@@ -67,11 +61,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 形名
-  AstSymbol* mTypeName;
+  // 要素の型
+  AstType* mElemType;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTUSERTYPE_H
+
+#endif // ASTARRAYTYPE_H

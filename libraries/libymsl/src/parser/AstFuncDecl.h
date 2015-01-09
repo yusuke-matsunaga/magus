@@ -33,7 +33,7 @@ public:
   /// @param[in] stmt_list 本体の文
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
-	      const YmslType* type,
+	      AstType* type,
 	      AstParamList* param_list,
 	      AstStmtList* stmt_list,
 	      const FileRegion& loc);
@@ -57,7 +57,7 @@ public:
   index() const;
 
   /// @brief 出力の型を返す．
-  const YmslType*
+  AstType*
   type() const;
 
   /// @brief パラメータリストを返す．
@@ -118,7 +118,7 @@ private:
   ymuint mIndex;
 
   // 出力の型
-  const YmslType* mType;
+  AstType* mType;
 
   // パラメータリスト
   vector<AstParam*> mParamList;

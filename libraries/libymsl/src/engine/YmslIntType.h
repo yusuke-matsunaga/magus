@@ -39,12 +39,13 @@ public:
   /// @brief 型を得る．
   virtual
   TypeId
-  type() const;
+  type_id() const;
 
-  /// @brief 値を表す文字列を返す．
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
   virtual
-  string
-  str() const;
+  void
+  print(ostream& s) const;
 
 };
 

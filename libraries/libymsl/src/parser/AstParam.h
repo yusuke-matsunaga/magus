@@ -32,7 +32,7 @@ public:
   /// @param[in] init_expr 初期化式
   /// @param[in] loc ファイル位置
   AstParam(ShString name,
-	   const YmslType* type,
+	   AstType* type,
 	   AstExpr* init_expr,
 	   const FileRegion& loc);
 
@@ -55,7 +55,7 @@ public:
   index() const;
 
   /// @brief 型を得る．
-  const YmslType*
+  AstType*
   type() const;
 
   /// @brief 初期化式を返す．
@@ -82,7 +82,7 @@ private:
   ymuint mIndex;
 
   // 変数の型
-  const YmslType* mType;
+  AstType* mType;
 
   // 初期化式
   AstExpr* mInitExpr;

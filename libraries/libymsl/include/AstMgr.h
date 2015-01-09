@@ -107,7 +107,7 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_VarDecl(AstSymbol* name,
-	      const YmslType* type,
+	      AstType* type,
 	      AstExpr* init_expr,
 	      bool global,
 	      const FileRegion& loc);
@@ -119,7 +119,7 @@ public:
   /// @param[in] loc ファイル位置
   AstParam*
   new_Param(AstSymbol* name,
-	    const YmslType* type,
+	    AstType* type,
 	    AstExpr* init_expr,
 	    const FileRegion& loc);
 
@@ -131,7 +131,7 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_FuncDecl(AstSymbol* name,
-	       const YmslType* type,
+	       AstType* type,
 	       AstParamList* param_list,
 	       AstStmtList* stmt_list,
 	       const FileRegion& loc);
@@ -332,35 +332,40 @@ public:
   new_Primary(AstSymbol* id,
 	      const FileRegion& loc);
 
-  /// @brief void型を作る．
+  /// @brief プリミティブ型を作る．
+  /// @param[in] type 型
   /// @param[in] loc ファイル位置
-  const YmslType*
-  new_VoidType(const FileRegion& loc);
+  AstType*
+  new_PrimType(TypeId type,
+	       const FileRegion& loc);
 
-  /// @brief boolean型を作る．
-  /// @param[in] loc ファイル位置
-  const YmslType*
-  new_BooleanType(const FileRegion& loc);
-
-  /// @brief 整数型を作る．
-  /// @param[in] loc ファイル位置
-  const YmslType*
-  new_IntType(const FileRegion& loc);
-
-  /// @brief 浮動小数点型を作る．
-  /// @param[in] loc ファイル位置
-  const YmslType*
-  new_FloatType(const FileRegion& loc);
-
-  /// @brief 文字列型を作る．
-  /// @param[in] loc ファイル位置
-  const YmslType*
-  new_StringType(const FileRegion& loc);
-
-  /// @brief ユーザー定義型を作る．
+  /// @brief 名前付きの型を作る．
   /// @param[in] type_name 型名
-  const YmslType*
-  new_UserType(AstSymbol* type_name);
+  AstType*
+  new_NamedType(AstSymbol* type_name);
+
+  /// @brief array 型を作る．
+  /// @param[in] elem_type 要素の型
+  /// @param[in] loc ファイル位置
+  AstType*
+  new_ArrayType(AstType* elem_type,
+		const FileRegion& loc);
+
+  /// @brief set 型を作る．
+  /// @param[in] elem_type 要素の型
+  /// @param[in] loc ファイル位置
+  AstType*
+  new_SetType(AstType* elem_type,
+	      const FileRegion& loc);
+
+  /// @brief map 型を作る．
+  /// @param[in] key_type キーの型
+  /// @param[in] elem_type 要素の型
+  /// @param[in] loc ファイル位置
+  AstType*
+  new_MapType(AstType* key_type,
+	      AstType* elem_type,
+	      const FileRegion& loc);
 
   /// @brief シンボルを作る．
   /// @param[in] str シンボル名

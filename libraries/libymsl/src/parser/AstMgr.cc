@@ -12,10 +12,10 @@
 #include "YmslScanner.h"
 
 #include "AstArrayRef.h"
+#include "AstArrayType.h"
 #include "AstAssignment.h"
 #include "AstBinOp.h"
 #include "AstBlockStmt.h"
-//#include "AstBooleanType.h"
 #include "AstBreak.h"
 #include "AstCaseItem.h"
 #include "AstContinue.h"
@@ -23,7 +23,6 @@
 #include "AstExpr.h"
 #include "AstExprStmt.h"
 #include "AstFloatConst.h"
-//#include "AstFloatType.h"
 #include "AstFor.h"
 #include "AstFuncCall.h"
 #include "AstFuncDecl.h"
@@ -32,24 +31,24 @@
 #include "AstIfBlock.h"
 #include "AstImport.h"
 #include "AstIntConst.h"
-//#include "AstIntType.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
 #include "AstList.h"
+#include "AstMapType.h"
 #include "AstMemberRef.h"
 #include "AstModule.h"
+#include "AstNamedType.h"
 #include "AstParam.h"
 #include "AstPrimary.h"
+#include "AstPrimType.h"
 #include "AstReturn.h"
+#include "AstSetType.h"
 #include "AstStringConst.h"
-//#include "AstStringType.h"
 #include "AstSwitch.h"
 #include "AstSymbol.h"
 #include "AstToplevel.h"
 #include "AstUniOp.h"
-//#include "AstUserType.h"
 #include "AstVarDecl.h"
-//#include "AstVoidType.h"
 #include "AstWhile.h"
 
 
@@ -187,7 +186,7 @@ AstMgr::new_Import(AstModuleList* module_list,
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_VarDecl(AstSymbol* name,
-		    const YmslType* type,
+		    AstType* type,
 		    AstExpr* init_expr,
 		    bool global,
 		    const FileRegion& loc)
@@ -203,7 +202,7 @@ AstMgr::new_VarDecl(AstSymbol* name,
 // @param[in] loc ファイル位置
 AstParam*
 AstMgr::new_Param(AstSymbol* name,
-		  const YmslType* type,
+		  AstType* type,
 		  AstExpr* init_expr,
 		  const FileRegion& loc)
 {
@@ -219,7 +218,7 @@ AstMgr::new_Param(AstSymbol* name,
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_FuncDecl(AstSymbol* name,
-		     const YmslType* type,
+		     AstType* type,
 		     AstParamList* param_list,
 		     AstStmtList* stmt_list,
 		     const FileRegion& loc)
@@ -535,46 +534,59 @@ AstMgr::new_Primary(AstSymbol* id,
   return new (p) AstPrimary(id, loc);
 }
 
-// @brief 文字列型を作る．
+// @brief プリミティブ型を作る．
+// @param[in] type 型
 // @param[in] loc ファイル位置
-const YmslType*
-AstMgr::new_StringType(const FileRegion& loc)
+AstType*
+AstMgr::new_PrimType(TypeId type,
+		     const FileRegion& loc)
 {
+  void* p = mAlloc.get_memory(sizeof(AstPrimType));
+  return new (p) AstPrimType(type, loc);
 }
 
-// @brief void型を作る．
-// @param[in] loc ファイル位置
-const YmslType*
-AstMgr::new_VoidType(const FileRegion& loc)
-{
-}
-
-// @brief boolean型を作る．
-// @param[in] loc ファイル位置
-const YmslType*
-AstMgr::new_BooleanType(const FileRegion& loc)
-{
-}
-
-// @brief 整数型を作る．
-// @param[in] loc ファイル位置
-const YmslType*
-AstMgr::new_IntType(const FileRegion& loc)
-{
-}
-
-// @brief 浮動小数点型を作る．
-// @param[in] loc ファイル位置
-const YmslType*
-AstMgr::new_FloatType(const FileRegion& loc)
-{
-}
-
-// @brief ユーザー定義型を作る．
+// @brief 名前付きの型を作る．
 // @param[in] type_name 型名
-const YmslType*
-AstMgr::new_UserType(AstSymbol* type_name)
+AstType*
+AstMgr::new_NamedType(AstSymbol* type_name)
 {
+  void* p = mAlloc.get_memory(sizeof(AstNamedType));
+  return new (p) AstNamedType(type_name);
+}
+
+// @brief array 型を作る．
+// @param[in] elem_type 要素の型
+// @param[in] loc ファイル位置
+AstType*
+AstMgr::new_ArrayType(AstType* elem_type,
+		      const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstArrayType));
+  return new (p) AstArrayType(elem_type, loc);
+}
+
+// @brief set 型を作る．
+// @param[in] elem_type 要素の型
+// @param[in] loc ファイル位置
+AstType*
+AstMgr::new_SetType(AstType* elem_type,
+		    const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstSetType));
+  return new (p) AstSetType(elem_type, loc);
+}
+
+// @brief map 型を作る．
+// @param[in] key_type キーの型
+// @param[in] elem_type 要素の型
+// @param[in] loc ファイル位置
+AstType*
+AstMgr::new_MapType(AstType* key_type,
+		    AstType* elem_type,
+		    const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstMapType));
+  return new (p) AstMapType(key_type, elem_type, loc);
 }
 
 // @brief シンボルを作る．

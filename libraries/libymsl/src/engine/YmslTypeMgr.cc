@@ -116,24 +116,4 @@ YmslTypeMgr::function_type(const YmslType* output_type,
 {
 }
 
-// @brief class 型を得る．
-// @param[in] name 型名
-//
-// 登録されていなければ NULL を返す．
-const YmslType*
-YmslTypeMgr::class_type(ShString name)
-{
-}
-
-// @brief class 型を登録する．
-// @param[in] name
-// @param[in] type 登録する型
-//
-// 同名の型が登録されていたらなにもしない．
-void
-YmslTypeMgr::reg_type(ShString name,
-		      const YmslType* type)
-{
-}
-
 END_NAMESPACE_YM_YMSL

@@ -100,7 +100,7 @@ fr_merge(const FileRegion fr_array[],
   AstStatement*   statement_type;
   AstStmtList*    stmtlist_type;
   AstSymbol*      symbol_type;
-  const YmslType* type_type;
+  AstType*        type_type;
 }
 
 
@@ -130,15 +130,18 @@ fr_merge(const FileRegion fr_array[],
 %token LBK
 %token RBK
 
+%token ARRAY
 %token AS
 %token BOOLEAN
 %token BREAK
 %token CASE
+%token CLASS
 %token CONTINUE
 %token DEFAULT
 %token DO
 %token ELIF
 %token ELSE
+%token ENUM
 %token FLOAT
 %token FOR
 %token FUNCTION
@@ -147,7 +150,9 @@ fr_merge(const FileRegion fr_array[],
 %token IF
 %token IMPORT
 %token INT
+%token MAP
 %token RETURN
+%token SET
 %token STRING
 %token SWITCH
 %token VAR
@@ -487,27 +492,39 @@ param
 type
 : VOID
 {
-  $$ = mgr.new_VoidType(@$);
+  $$ = mgr.new_PrimType(kVoidType, @$);
 }
 | BOOLEAN
 {
-  $$ = mgr.new_BooleanType(@$);
+  $$ = mgr.new_PrimType(kBooleanType, @$);
 }
 | INT
 {
-  $$ = mgr.new_IntType(@$);
+  $$ = mgr.new_PrimType(kIntType, @$);
 }
 | FLOAT
 {
-  $$ = mgr.new_FloatType(@$);
+  $$ = mgr.new_PrimType(kFloatType, @$);
 }
 | STRING
 {
-  $$ = mgr.new_StringType(@$);
+  $$ = mgr.new_PrimType(kStringType, @$);
 }
 | SYMBOL
 {
-  $$ = mgr.new_UserType($1);
+  $$ = mgr.new_NamedType($1);
+}
+| ARRAY LP type RP
+{
+  $$ = mgr.new_ArrayType($3, @$);
+}
+| SET LP type RP
+{
+  $$ = mgr.new_SetType($3, @$);
+}
+| MAP LP type COMMA type RP
+{
+  $$ = mgr.new_MapType($3, $5, @$);
 }
 ;
 

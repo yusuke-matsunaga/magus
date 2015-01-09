@@ -9,6 +9,7 @@
 
 #include "AstParam.h"
 #include "AstExpr.h"
+#include "AstType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -23,7 +24,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] init_expr 初期化式
 // @param[in] loc ファイル位置
 AstParam::AstParam(ShString name,
-		   const YmslType* type,
+		   AstType* type,
 		   AstExpr* init_expr,
 		   const FileRegion& loc) :
   Ast(loc),
@@ -54,7 +55,7 @@ AstParam::index() const
 }
 
 // @brief 型を得る．
-const YmslType*
+AstType*
 AstParam::type() const
 {
   return mType;
@@ -74,7 +75,8 @@ AstParam::init_expr() const
 void
 AstParam::print(ostream& s) const
 {
-  s << name() << ": " << type();
+  s << name() << ": ";
+  type()->print(s);
   if ( init_expr() != NULL ) {
     s << " = ";
     init_expr()->print(s);
