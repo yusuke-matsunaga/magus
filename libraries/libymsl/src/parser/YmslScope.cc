@@ -8,11 +8,7 @@
 
 
 #include "YmslScope.h"
-#include "AstStatement.h"
-//#include "AstFuncDecl.h"
-//#include "AstVarDecl.h"
-#include "SymHandle.h"
-//#include "YmslLabel.h"
+#include "ObjHandleImpl.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -22,29 +18,39 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parent_dict 親の辞書
-YmslScope::YmslScope(SymDict* parent_dict) :
-  mDict(parent_dict)
+// @param[in] parent 親のスコープ
+// @param[in] name 名前
+YmslScope::YmslScope(YmslScope* parent,
+		     ShString name) :
+  mParent(parent),
+  mName(name),
+  mHashSize(0),
+  mHashTable(NULL),
+  mHashNum(0)
 {
-}
-
-// @brief コンストラクタ
-// @param[in] parent 親のブロック
-YmslScope::YmslScope(YmslScope* parent) :
-  mDict(&parent->mDict)
-{
+  alloc_table(16);
 }
 
 // @brief デストラクタ
 YmslScope::~YmslScope()
 {
+  for (ymuint i = 0; i < mHashSize; ++ i) {
+    for (ObjHandle* h = mHashTable[i]; h; ) {
+      ObjHandle* n = h->mLink;
+      delete h;
+      h = n;
+    }
+  }
+  delete [] mHashTable;
 }
 
-// @brief statement を追加する．
-void
-YmslScope::add_statement(AstStatement* statement)
+// @brief 自身の名前を返す．
+//
+// ShString() (空文字列)の場合もある．
+ShString
+YmslScope::name() const
 {
-  mStatementList.push_back(statement);
+  return mName;
 }
 
 // @brief ラベルを追加する．
@@ -52,47 +58,102 @@ YmslScope::add_statement(AstStatement* statement)
 void
 YmslScope::add_label(YmslLabel* item)
 {
-  mDict.add_label(item);
+  ObjHandle* handle = new LabelHandle(item);
+  put(handle);
 }
 
 // @brief 関数を追加する．
 // @param[in] item 追加する要素
 void
-YmslScope::add_function(AstFuncDecl* item)
+YmslScope::add_function(YmslFunction* item)
 {
-  mDict.add_function(item);
+  ObjHandle* handle = new FuncHandle(item);
+  put(handle);
 }
 
-// @brief 変数定義を追加する．
+// @brief 変数を追加する．
 // @param[in] item 追加する要素
 void
-YmslScope::add_vardecl(AstVarDecl* item)
+YmslScope::add_var(YmslVar* item)
 {
-  mDict.add_vardecl(item);
+  ObjHandle* handle = new VarHandle(item);
+  put(handle);
 }
 
-// @brief 名前からラベルを見つける．
+// @brief スコープを追加する．
+// @param[in] item 追加する要素
+void
+YmslScope::add_scope(YmslScope* item)
+{
+  ObjHandle* handle = new ScopeHandle(item);
+  put(handle);
+}
+
+// @brief ハッシュ表を確保する．
+void
+YmslScope::alloc_table(ymuint req_size)
+{
+  ymuint old_size = mHashSize;
+  ObjHandle** old_table = mHashTable;
+  mHashSize = req_size;
+  mNextLimit = static_cast<ymuint>(mHashSize * 1.8);
+  mHashTable = new ObjHandle*[mHashSize];
+  for (ymuint i = 0; i < mHashSize; ++ i) {
+    mHashTable[i] = NULL;
+  }
+  for (ymuint i = 0; i < old_size; ++ i) {
+    for (ObjHandle* handle = old_table[i];
+	 handle != NULL; ) {
+      ObjHandle* next = handle->mLink;
+      _put(handle);
+      handle = next;
+    }
+  }
+  delete [] old_table;
+}
+
+// @brief 名前からハンドルを探す．
 // @param[in] name 名前
-//
-// ここになければ親のブロックを探す．
-// それでもなければ NULL を返す．
-YmslLabel*
-YmslScope::find_label(ShString name) const
+ObjHandle*
+YmslScope::find(ShString name) const
 {
-  return mDict.find_label(name);
+  ymuint pos = name.hash() % mHashSize;
+  for (ObjHandle* handle = mHashTable[pos];
+       handle != NULL; handle = handle->mLink) {
+    if ( handle->name() == name ) {
+      return handle;
+    }
+  }
+  if ( mParent != NULL ) {
+    return mParent->find(name);
+  }
+  return NULL;
 }
 
-// @brief 名前から変数宣言を見つける．
-// @param[in] name 名前
-//
-// ここになければ親のブロックを探す．
-// それでもなければ NULL を返す．
-AstVarDecl*
-YmslScope::find_vardecl(ShString name) const
+// @brief ハンドルを登録する．
+void
+YmslScope::put(ObjHandle* handle)
 {
-  return mDict.find_vardecl(name);
+  if ( mHashNum >= mNextLimit ) {
+    alloc_table(mHashSize << 1);
+  }
+
+  _put(handle);
 }
 
+// @brief ハンドルを登録する．
+//
+// こちらはサイズチェックなし
+void
+YmslScope::_put(ObjHandle* handle)
+{
+  ymuint pos = handle->name().hash() % mHashSize;
+  handle->mLink = mHashTable[pos];
+  mHashTable[pos] = handle;
+  ++ mHashNum;
+}
+
+#if 0
 // @brief ステートメント数を返す．
 ymuint
 YmslScope::statement_num() const
@@ -152,5 +213,6 @@ YmslScope::print(ostream& s,
     mStatementList[i]->print(s, indent);
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

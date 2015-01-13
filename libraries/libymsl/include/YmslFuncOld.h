@@ -1,8 +1,8 @@
-#ifndef YMSLFUNC_H
-#define YMSLFUNC_H
+#ifndef YMSLFUNCTION_H
+#define YMSLFUNCTION_H
 
-/// @file YmslFunc.h
-/// @brief YmslFunc のヘッダファイル
+/// @file YmslFunction.h
+/// @brief YmslFunction のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,22 +16,22 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslFunc YmslFunc.h "YmslFunc.h"
+/// @class YmslFunction YmslFunction.h "YmslFunction.h"
 /// @brief YMSL の関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslFunc
+class YmslFunction
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] arg_list 引数のリスト
-  YmslFunc(ShString name,
-	   const vector<YmslVar*>& arg_list);
+  YmslFunction(ShString name,
+	       const vector<YmslVar*>& arg_list);
 
   /// @brief デストラクタ
   virtual
-  ~YmslFunc();
+  ~YmslFunction();
 
 
 public:
@@ -103,4 +103,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFUNC_H
+#endif // YMSLFUNCTION_H

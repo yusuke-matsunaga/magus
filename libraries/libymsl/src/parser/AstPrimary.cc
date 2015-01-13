@@ -13,6 +13,8 @@
 #include "YmslScope.h"
 #include "YmslVM.h"
 
+#include "ObjHandle.h"
+
 #include "YmUtils/MsgMgr.h"
 
 
@@ -73,7 +75,7 @@ AstPrimary::compile(YmslDriver& driver,
 }
 
 // @brief 変数を返す．
-AstVarDecl*
+YmslVar*
 AstPrimary::var() const
 {
   return mVar;
@@ -129,8 +131,8 @@ AstPrimary::opcode() const
 void
 AstPrimary::resolve_var(YmslScope* parent_scope)
 {
-  mVar = parent_scope->find_vardecl(mVarName);
-  if ( mVar == NULL ) {
+  ObjHandle* h = parent_scope->find(mVarName);
+  if ( h == NULL ) {
     ostringstream buf;
     buf << mVarName << ": Undefined";
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -139,6 +141,8 @@ AstPrimary::resolve_var(YmslScope* parent_scope)
 		    "PARS",
 		    buf.str());
   }
+  mVar = h->var();
+  #warning "嘘"
 }
 
 // @brief 内容を表示する．(デバッグ用)

@@ -77,7 +77,7 @@ public:
 	  Ymsl_INT& addr);
 
   /// @brief 変数を返す．
-  AstVarDecl*
+  YmslVar*
   var() const;
 
   /// @brief 変数に対する代入命令を返す．
@@ -99,7 +99,7 @@ private:
   ShString mVarName;
 
   // 変数
-  AstVarDecl* mVar;
+  YmslVar* mVar;
 
 };
 

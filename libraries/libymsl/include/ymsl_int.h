@@ -31,8 +31,9 @@ BEGIN_NAMESPACE_YM_YMSL
 
 class YmslCodeList;
 class YmslDriver;
+class YmslEnum;
 class YmslExecutable;
-class YmslFunc;
+class YmslFunction;
 class YmslLabel;
 class YmslModule;
 class YmslObj;
@@ -41,6 +42,8 @@ class YmslScope;
 class YmslSubspace;
 class YmslType;
 class YmslVar;
+
+class ObjHandle;
 
 class AstCaseItem;
 class AstExpr;

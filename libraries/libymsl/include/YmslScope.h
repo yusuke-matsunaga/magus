@@ -10,7 +10,6 @@
 
 
 #include "ymsl_int.h"
-#include "SymDict.h"
 #include "YmUtils/ShString.h"
 
 
@@ -25,12 +24,10 @@ class YmslScope
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parent_dict 親の辞書
-  YmslScope(SymDict* parent_dict);
-
-  /// @brief コンストラクタ
-  /// @param[in] parent 親のブロック
-  YmslScope(YmslScope* parent);
+  /// @param[in] parent 親のスコープ
+  /// @param[in] name 名前
+  YmslScope(YmslScope* parent,
+	    ShString name = ShString());
 
   /// @brief デストラクタ
   ~YmslScope();
@@ -41,71 +38,61 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ステートメントを追加する．
+  /// @brief 自身の名前を返す．
+  ///
+  /// ShString() (空文字列)の場合もある．
+  ShString
+  name() const;
+
+  /// @brief 子のスコープを追加する．
+  /// @param[in] item 追加する要素
   void
-  add_statement(AstStatement* statement);
+  add_scope(YmslScope* item);
 
   /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_function(AstFuncDecl* item);
+  add_function(YmslFunction* item);
+
+  /// @brief 変数を追加する．
+  /// @param[in] item 追加する要素
+  void
+  add_var(YmslVar* item);
+
+  /// @brief 列挙型を追加する．
+  void
+  add_enum(YmslEnum* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素
   void
   add_label(YmslLabel* item);
 
-  /// @brief 変数定義を追加する．
-  /// @param[in] item 追加する要素
-  void
-  add_vardecl(AstVarDecl* item);
-
-  /// @brief 名前からラベルを見つける．
+  /// @brief 名前からハンドルを探す．
   /// @param[in] name 名前
-  ///
-  /// ここになければ親のブロックを探す．
-  /// それでもなければ NULL を返す．
-  YmslLabel*
-  find_label(ShString name) const;
+  ObjHandle*
+  find(ShString name) const;
 
-  /// @brief 名前から変数宣言を見つける．
-  /// @param[in] name 名前
-  ///
-  /// ここになければ親のブロックを探す．
-  /// それでもなければ NULL を返す．
-  AstVarDecl*
-  find_vardecl(ShString name) const;
 
-  /// @brief ステートメント数を返す．
-  ymuint
-  statement_num() const;
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief ステートメントを返す．
-  /// @param[in] pos 位置 ( 0 <= pos < statement_num() )
-  AstStatement*
-  statement(ymuint pos) const;
-
-  /// @brief 命令コードのサイズを計算する．
-  ymuint
-  calc_size() const;
-
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
-  ///
-  /// addr の値は更新される．
+  /// @brief ハッシュ表を確保する．
+  /// @param[in] req_size 要求サイズ
   void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr);
+  alloc_table(ymuint req_size);
 
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
+  /// @brief ハンドルを登録する．
   void
-  print(ostream& s,
-	ymuint indent) const;
+  put(ObjHandle* handle);
+
+  /// @brief ハンドルを登録する．
+  ///
+  /// こちらはサイズチェックなし
+  void
+  _put(ObjHandle* handle);
 
 
 private:
@@ -113,11 +100,23 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // statement リスト
-  vector<AstStatement*> mStatementList;
+  // 親のスコープ
+  YmslScope* mParent;
 
-  // 辞書
-  SymDict mDict;
+  // 自身の名前
+  ShString mName;
+
+  // ハッシュサイズ
+  ymuint mHashSize;
+
+  // ハッシュ表を拡大するしきい値
+  ymuint mNextLimit;
+
+  // ハッシュ表
+  ObjHandle** mHashTable;
+
+  // ハッシュの要素数
+  ymuint mHashNum;
 
 };
 

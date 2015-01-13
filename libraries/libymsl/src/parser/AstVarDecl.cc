@@ -85,7 +85,7 @@ AstVarDecl::global() const
 void
 AstVarDecl::phase1(YmslScope* parent_scope)
 {
-  parent_scope->add_vardecl(this);
+  //parent_scope->add_var(this);
 }
 
 // @brief 命令コードのサイズを計算する．

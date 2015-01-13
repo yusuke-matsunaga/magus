@@ -46,12 +46,16 @@ public:
   /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_function(AstFuncDecl* item);
+  add_function(YmslFunction* item);
 
-  /// @brief 変数定義を追加する．
+  /// @brief 変数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_vardecl(AstVarDecl* item);
+  add_var(YmslVar* item);
+
+  /// @brief 列挙型を追加する．
+  void
+  add_enum(YmslEnum* item);
 
   /// @brief ラベルを追加する．
   void
@@ -70,7 +74,7 @@ public:
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  AstFuncDecl*
+  YmslFunction*
   find_function(ShString name) const;
 
   /// @brief 名前から変数宣言を見つける．
@@ -78,8 +82,8 @@ public:
   ///
   /// ここになければ親のブロックを探す．
   /// それでもなければ NULL を返す．
-  AstVarDecl*
-  find_vardecl(ShString name) const;
+  YmslVar*
+  find_var(ShString name) const;
 
   /// @brief 名前からラベルを見つける．
   /// @param[in] name 名前
@@ -139,6 +143,5 @@ private:
 };
 
 END_NAMESPACE_YM_YMSL
-
 
 #endif // SYMDICT_H

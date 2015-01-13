@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] value_type 型
 // @param[in] index インデックス
 YmslVar::YmslVar(ShString name,
-		 YmslType* value_type,
+		 const YmslType* value_type,
 		 int index) :
   mName(name),
   mValueType(value_type),

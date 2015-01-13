@@ -1,99 +1,31 @@
-#ifndef SYMHANDLE_H
-#define SYMHANDLE_H
+#ifndef OBJHANDLEIMPL_H
+#define OBJHANDLEIMPL_H
 
-/// @file SymHandle.h
-/// @brief SymHandle のヘッダファイル
+/// @file ObjHandle.h
+/// @brief ObjHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymsl_int.h"
+#include "ObjHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class SymHandle SymHandle.h "SymHandle.h"
-/// @brief Symbol Table のハンドル
-//////////////////////////////////////////////////////////////////////
-class SymHandle
-{
-  friend class SymDict;
-
-public:
-
-  /// @brief コンストラクタ
-  SymHandle();
-
-  /// @brief デストラクタ
-  virtual
-  ~SymHandle();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 名前を返す．
-  virtual
-  ShString
-  name() const = 0;
-
-  /// @brief 名前空間を返す．
-  ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  YmslSubspace*
-  subspace() const;
-
-  /// @brief 変数宣言を返す．
-  ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  AstVarDecl*
-  vardecl() const;
-
-  /// @brief 関数を返す．
-  ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  AstFuncDecl*
-  func() const;
-
-  /// @brief ラベルを返す．
-  ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  YmslLabel*
-  label() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 次の要素を指すリンク
-  SymHandle* mLink;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @class VarHandle SymHandle.h "SymHandle.h"
-/// @brief AstVarDecl を保持する SymHandle
+/// @class VarHandle ObjHandle.h "ObjHandle.h"
+/// @brief YmslVar を保持する ObjHandle
 //////////////////////////////////////////////////////////////////////
 class VarHandle :
-  public SymHandle
+  public ObjHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] vardecl 変数宣言
-  VarHandle(AstVarDecl* vardecl);
+  /// @param[in] var 変数
+  VarHandle(YmslVar* var);
 
   /// @brief デストラクタ
   virtual
@@ -110,12 +42,12 @@ public:
   ShString
   name() const;
 
-  /// @brief 変数宣言を返す．
+  /// @brief 変数を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  AstVarDecl*
-  vardecl() const;
+  YmslVar*
+  var() const;
 
 
 private:
@@ -123,24 +55,24 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数宣言
-  AstVarDecl* mVarDecl;
+  // 変数
+  YmslVar* mVar;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class FuncHandle SymHandle.h "SymHandle.h"
-/// @brief AstFuncDecl を保持する SymHandle
+/// @class FuncHandle ObjHandle.h "ObjHandle.h"
+/// @brief YmslFunction を保持する ObjHandle
 //////////////////////////////////////////////////////////////////////
 class FuncHandle :
-  public SymHandle
+  public ObjHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
-  FuncHandle(AstFuncDecl* func);
+  FuncHandle(YmslFunction* func);
 
   /// @brief デストラクタ
   virtual
@@ -161,8 +93,8 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  AstFuncDecl*
-  func() const;
+  YmslFunction*
+  function() const;
 
 
 private:
@@ -171,17 +103,17 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  AstFuncDecl* mFunc;
+  YmslFunction* mFunc;
 
 };
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class LabelHandle SymHandle.h "SymHandle.h"
-/// @brief YmslLabel を保持する SymHandle
+/// @class LabelHandle ObjHandle.h "ObjHandle.h"
+/// @brief YmslLabel を保持する ObjHandle
 //////////////////////////////////////////////////////////////////////
 class LabelHandle :
-  public SymHandle
+  public ObjHandle
 {
 public:
 
@@ -224,21 +156,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SubspaceHandle SymHandle.h "SymHandle.h"
-/// @brief YmslSubspace を保持する SymHandle
+/// @class ScopeHandle ObjHandle.h "ObjHandle.h"
+/// @brief YmslScope を保持する ObjHandle
 //////////////////////////////////////////////////////////////////////
-class SubspaceHandle :
-  public SymHandle
+class ScopeHandle :
+  public ObjHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] subspace 名前空間
-  SubspaceHandle(YmslSubspace* subspace);
+  /// @param[in] scope スコープ
+  ScopeHandle(YmslScope* scope);
 
   /// @brief デストラクタ
   virtual
-  ~SubspaceHandle();
+  ~ScopeHandle();
 
 
 public:
@@ -255,8 +187,8 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslSubspace*
-  subspace() const;
+  YmslScope*
+  scope() const;
 
 
 private:
@@ -264,11 +196,58 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前空間
-  YmslSubspace* mSubspace;
+  // スコープ
+  YmslScope* mScope;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class EnumHandle ObjHandle.h "ObjHandle.h"
+/// @brief YmslEnum を保持する ObjHandle
+//////////////////////////////////////////////////////////////////////
+class EnumHandle :
+  public ObjHandle
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] enum_type enum 型
+  EnumHandle(YmslEnum* enum_type);
+
+  /// @brief デストラクタ
+  virtual
+  ~EnumHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 名前を返す．
+  virtual
+  ShString
+  name() const;
+
+  /// @brief enum 型を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  YmslEnum*
+  enum_type() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // enum 型
+  YmslEnum* mEnum;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // SYMHANDLE_H
+#endif // OBJHANDLEIMPL_H

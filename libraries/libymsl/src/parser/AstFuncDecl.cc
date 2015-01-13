@@ -96,7 +96,7 @@ AstFuncDecl::stmt_list() const
 void
 AstFuncDecl::phase1(YmslScope* parent_scope)
 {
-  parent_scope->add_function(this);
+  //parent_scope->add_function(this);
 
   mScope = new YmslScope(parent_scope);
 

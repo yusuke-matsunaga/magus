@@ -8,8 +8,8 @@
 
 
 #include "SymDict.h"
-#include "AstVarDecl.h"
-#include "AstFuncDecl.h"
+#include "YmslFunction.h"
+#include "YmslVar.h"
 #include "YmslSubspace.h"
 #include "YmslLabel.h"
 #include "SymHandle.h"
@@ -48,16 +48,16 @@ SymDict::add_label(YmslLabel* label)
 // @brief 関数を追加する．
 // @param[in] item 追加する要素
 void
-SymDict::add_function(AstFuncDecl* item)
+SymDict::add_function(YmslFunction* item)
 {
   SymHandle* handle = new FuncHandle(item);
   put(handle);
 }
 
-// @brief 変数定義を追加する．
+// @brief 変数を追加する．
 // @param[in] item 追加する要素
 void
-SymDict::add_vardecl(AstVarDecl* item)
+SymDict::add_var(YmslVar* item)
 {
   SymHandle* handle = new VarHandle(item);
   put(handle);
@@ -92,27 +92,27 @@ SymDict::find_label(ShString name) const
 //
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
-AstFuncDecl*
+YmslFunction*
 SymDict::find_function(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
-    return handle->func();
+    return handle->function();
   }
   return NULL;
 }
 
-// @brief 名前から変数宣言を見つける．
+// @brief 名前から変数を見つける．
 // @param[in] name 名前
 //
 // ここになければ親のブロックを探す．
 // それでもなければ NULL を返す．
-AstVarDecl*
-SymDict::find_vardecl(ShString name) const
+YmslVar*
+SymDict::find_var(ShString name) const
 {
   SymHandle* handle = find(name);
   if ( handle != NULL ) {
-    return handle->vardecl();
+    return handle->var();
   }
   return NULL;
 }
@@ -235,11 +235,11 @@ SymHandle::~SymHandle()
 {
 }
 
-// @brief 変数宣言を返す．
+// @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．
-AstVarDecl*
-SymHandle::vardecl() const
+YmslVar*
+SymHandle::var() const
 {
   return NULL;
 }
@@ -247,8 +247,8 @@ SymHandle::vardecl() const
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-AstFuncDecl*
-SymHandle::func() const
+YmslFunction*
+SymHandle::function() const
 {
   return NULL;
 }
@@ -278,8 +278,8 @@ SymHandle::subspace() const
 
 // @brief コンストラクタ
 // @param[in] vardecl 変数宣言
-VarHandle::VarHandle(AstVarDecl* vardecl) :
-  mVarDecl(vardecl)
+VarHandle::VarHandle(YmslVar* var) :
+  mVar(var)
 {
 }
 
@@ -292,16 +292,16 @@ VarHandle::~VarHandle()
 ShString
 VarHandle::name() const
 {
-  return mVarDecl->name();
+  return mVar->name();
 }
 
 // @brief 変数宣言を返す．
 //
 // 他の要素の場合には NULL を返す．
-AstVarDecl*
-VarHandle::vardecl() const
+YmslVar*
+VarHandle::var() const
 {
-  return mVarDecl;
+  return mVar;
 }
 
 
@@ -311,7 +311,7 @@ VarHandle::vardecl() const
 
 // @brief コンストラクタ
 // @param[in] func 関数
-FuncHandle::FuncHandle(AstFuncDecl* func) :
+FuncHandle::FuncHandle(YmslFunction* func) :
   mFunc(func)
 {
 }
@@ -331,8 +331,8 @@ FuncHandle::name() const
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-AstFuncDecl*
-FuncHandle::func() const
+YmslFunction*
+FuncHandle::function() const
 {
   return mFunc;
 }

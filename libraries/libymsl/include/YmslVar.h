@@ -28,7 +28,7 @@ public:
   /// @param[in] value_type 型
   /// @param[in] index インデックス
   YmslVar(ShString name,
-	  YmslType* value_type,
+	  const YmslType* value_type,
 	  int index);
 
   /// @brief デストラクタ
@@ -65,7 +65,7 @@ private:
   ShString mName;
 
   // 型
-  YmslType* mValueType;
+  const YmslType* mValueType;
 
   // インデックス
   int mIndex;

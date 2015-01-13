@@ -1,67 +1,86 @@
 
-/// @file YmslFunc.cc
-/// @brief YmslFunc の実装ファイル
+/// @file YmslFunction.cc
+/// @brief YmslFunction の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslFunc.h"
-#include "YmslBuiltinFunc.h"
-#include "YmslUserFunc.h"
+#include "YmslFunction.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス YmslFunc
+// クラス YmslFunction
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 関数名
-// @param[in] arg_list 引数のリスト
-YmslFunc::YmslFunc(ShString name,
-		   const vector<YmslVar*>& arg_list) :
-  mName(name)
+// @param[in] output_type 出力の型
+// @param[in] input_type_list 入力の型のリスト
+// @param[in] index インデックス
+YmslFunction::YmslFunction(ShString name,
+			   const YmslType* output_type,
+			   const vector<const YmslType*>& input_type_list,
+			   int index) :
+  mName(name),
+  mOutputType(output_type),
+  mInputNum(input_type_list.size()),
+  mIndex(index)
 {
-  mArgNum = arg_list.size();
-  mArgList = new YmslVar*[mArgNum];
-  for (ymuint i = 0; i < mArgNum; ++ i) {
-    mArgList[i] = arg_list[i];
+  mInputType = new const YmslType*[mInputNum];
+  for (ymuint i = 0; i < mInputNum; ++ i) {
+    mInputType[i] = input_type_list[i];
   }
 }
 
 // @brief デストラクタ
-YmslFunc::~YmslFunc()
+YmslFunction::~YmslFunction()
 {
-  delete [] mArgList;
+  delete [] mInputType;
 }
 
 // @brief 関数名を返す．
 ShString
-YmslFunc::name() const
+YmslFunction::name() const
 {
   return mName;
 }
 
-// @brief 引数の数
+// @brief 出力の型を返す．
+const YmslType*
+YmslFunction::output_type() const
+{
+  return mOutputType;
+}
+
+// @brief 入力数を返す．
 ymuint
-YmslFunc::arg_num() const
+YmslFunction::input_num() const
 {
-  return mArgNum;
+  return mInputNum;
 }
 
-// @brief 引数を得る．
-// @param[in] pos 位置 ( 0 <= pos < arg_num() )
-YmslVar*
-YmslFunc::arg(ymuint pos) const
+// @brief 入力の型の返す．
+// @param[in] pos 位置 ( 0 <= pos < input_num() )
+const YmslType*
+YmslFunction::input_type(ymuint pos) const
 {
-  ASSERT_COND( pos < arg_num() );
-  return mArgList[pos];
+  ASSERT_COND( pos < input_num() );
+  return mInputType[pos];
+}
+
+// @brief 関数インデックスを返す．
+int
+YmslFunction::index() const
+{
+  return mIndex;
 }
 
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス YmslBuiltinFunc
 //////////////////////////////////////////////////////////////////////
@@ -199,5 +218,6 @@ YmslUserFunc::byte_codes_top() const
 {
   return mByteCodes;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL
