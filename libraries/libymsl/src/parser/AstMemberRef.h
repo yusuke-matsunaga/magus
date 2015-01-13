@@ -94,6 +94,12 @@ private:
   // メンバ名
   AstSymbol* mMember;
 
+  // スコープオブジェクト
+  YmslScope* mScope;
+
+  // enum オブジェクト
+  YmslEnum* mEnum;
+
 };
 
 END_NAMESPACE_YM_YMSL

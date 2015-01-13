@@ -10,6 +10,7 @@
 
 
 #include "AstExpr.h"
+#include "AstList.h"
 #include "AstSymbol.h"
 #include "YmUtils/ShString.h"
 
@@ -26,9 +27,9 @@ class AstPrimary :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var_name 変数名
+  /// @param[in] symbol_list 変数名
   /// @param[in] loc ファイル位置
-  AstPrimary(AstSymbol* var_name,
+  AstPrimary(AstSymbolList* symbol_list,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -95,11 +96,20 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数名
-  ShString mVarName;
+  // オブジェクト名
+  vector<AstSymbol*> mSymbolList;
 
-  // 変数
-  YmslVar* mVar;
+  // オブジェクト
+  union {
+    // 変数
+    YmslVar* mVar;
+
+    // 関数
+    YmslFunction* mFunction;
+
+    // enum 定数
+    YmslEnumConst* mEnumConst;
+  };
 
 };
 

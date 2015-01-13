@@ -68,6 +68,7 @@ typedef AstList<AstIfBlock> AstIfList;
 typedef AstList<AstCaseItem> AstCaseList;
 typedef AstList<AstParam> AstParamList;
 typedef AstList<AstExpr> AstExprList;
+typedef AstList<AstSymbol> AstSymbolList;
 
 #if 0
 /// @brief トークンの値

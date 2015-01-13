@@ -100,6 +100,7 @@ fr_merge(const FileRegion fr_array[],
   AstStatement*   statement_type;
   AstStmtList*    stmtlist_type;
   AstSymbol*      symbol_type;
+  AstSymbolList*  symlist_type;
   AstType*        type_type;
 }
 
@@ -198,6 +199,7 @@ fr_merge(const FileRegion fr_array[],
 %type <statement_type>  statement
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
+%type <symlist_type>    symbol_list
 %type <token_type>      eqop
 %type <type_type>       type
 
@@ -655,6 +657,11 @@ expr
 {
   $$ = mgr.new_FuncCall($1, $3, @$);
 }
+// 配列参照
+| primary LBK expr RBK
+{
+  $$ = mgr.new_ArrayRef($1, $3, @$);
+}
 // プライマリ
 | primary
 {
@@ -677,17 +684,23 @@ expr
 
 // プライマリ式
 primary
-: SYMBOL
+: symbol_list
 {
   $$ = mgr.new_Primary($1, @$);
 }
-| primary DOT SYMBOL
+;
+
+// 階層名
+symbol_list
+: SYMBOL
 {
-  $$ = mgr.new_MemberRef($1, $3, @$);
+  $$ = new AstSymbolList;
+  $$->add($1);
 }
-| primary LBK expr RBK
+| symbol_list DOT SYMBOL
 {
-  $$ = mgr.new_ArrayRef($1, $3, @$);
+  $$ = $1;
+  $$->add($3);
 }
 ;
 

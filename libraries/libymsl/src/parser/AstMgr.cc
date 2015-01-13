@@ -523,15 +523,15 @@ AstMgr::new_StringConst(const char* val,
   return new (p) AstStringConst(dup_str, loc);
 }
 
-// @brief 左辺のプライマリを作る．
-// @param[in] id 変数名
+// @brief プライマリを作る．
+// @param[in] symbol_list 変数名
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_Primary(AstSymbol* id,
+AstMgr::new_Primary(AstSymbolList* symbol_list,
 		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstPrimary));
-  return new (p) AstPrimary(id, loc);
+  return new (p) AstPrimary(symbol_list, loc);
 }
 
 // @brief プリミティブ型を作る．

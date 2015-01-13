@@ -25,19 +25,65 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var_name 変数名
+// @param[in] symbol_list 変数名
 // @param[in] loc ファイル位置
-AstPrimary::AstPrimary(AstSymbol* var_name,
+AstPrimary::AstPrimary(AstSymbolList* symbol_list,
 		       const FileRegion& loc) :
   AstExpr(loc),
-  mVarName(var_name->str_val()),
+  mSymbolList(symbol_list->size()),
   mVar(NULL)
 {
+  ymuint pos = 0;
+  for (AstSymbolList::Iterator p = symbol_list->begin();
+       !p.is_end(); p.next()) {
+    mSymbolList[pos] = *p;
+    ++ pos;
+  }
 }
 
 // @brief デストラクタ
 AstPrimary::~AstPrimary()
 {
+}
+
+// @brief 変数の参照を解決する．
+void
+AstPrimary::resolve_var(YmslScope* parent_scope)
+{
+#if 0
+  ObjHandle* h = parent_scope->find(mVarName);
+  if ( h == NULL ) {
+    ostringstream buf;
+    buf << mVarName << ": Undefined";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region(),
+		    kMsgError,
+		    "PARS",
+		    buf.str());
+    return;
+  }
+
+  mVar = h->var();
+  if ( mVar != NULL ) {
+    return;
+  }
+
+  // h が他の型の場合．
+  if ( h->function() != NULL ) {
+    ostringstream buf;
+    buf << mVarName << ": variable expected";
+    MsgMgr::put_msg(__FILE__, __LINE__,
+		    file_region(),
+		    kMsgError,
+		    "PARS",
+		    buf.str());
+    return;
+  }
+
+  YmslScope* scope = h->scope();
+
+#endif
+  #warning "嘘"
 }
 
 // @brief 式の型を解析する．
@@ -127,30 +173,16 @@ AstPrimary::opcode() const
 #endif
 }
 
-// @brief 変数の参照を解決する．
-void
-AstPrimary::resolve_var(YmslScope* parent_scope)
-{
-  ObjHandle* h = parent_scope->find(mVarName);
-  if ( h == NULL ) {
-    ostringstream buf;
-    buf << mVarName << ": Undefined";
-    MsgMgr::put_msg(__FILE__, __LINE__,
-		    file_region(),
-		    kMsgError,
-		    "PARS",
-		    buf.str());
-  }
-  mVar = h->var();
-  #warning "嘘"
-}
-
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 void
 AstPrimary::print(ostream& s) const
 {
-  s << mVarName;
+  const char* dot = "";
+  for (ymuint i = 0; i < mSymbolList.size(); ++ i) {
+    s << dot << mSymbolList[i]->str_val();
+    dot = ".";
+  }
 }
 
 END_NAMESPACE_YM_YMSL

@@ -24,14 +24,21 @@ set (ymsl_SOURCES
   src/engine/YmslVM.cc
   src/parser/Ast.cc
   src/parser/AstArrayRef.cc
+  src/parser/AstBinOp.cc
   src/parser/AstExpr.cc
+  src/parser/AstFloatConst.cc
+  src/parser/AstFuncCall.cc
   src/parser/AstFuncDecl.cc
+  src/parser/AstIteOp.cc
+  src/parser/AstIntConst.cc
   src/parser/AstMemberRef.cc
   src/parser/AstMgr.cc
   src/parser/AstParam.cc
   src/parser/AstPrimary.cc
   src/parser/AstStatement.cc
+  src/parser/AstStringConst.cc
   src/parser/AstType.cc
+  src/parser/AstUniOp.cc
   src/parser/AstVarDecl.cc
   src/parser/ObjHandle.cc
   src/parser/RsrvWordDic.cc

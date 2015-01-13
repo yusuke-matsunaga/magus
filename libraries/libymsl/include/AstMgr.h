@@ -325,11 +325,11 @@ public:
   new_StringConst(const char* val,
 		  const FileRegion& loc);
 
-  /// @brief 左辺のプライマリを作る．
-  /// @param[in] id 変数名
+  /// @brief プライマリを作る．
+  /// @param[in] symbol_list 変数名
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_Primary(AstSymbol* id,
+  new_Primary(AstSymbolList* symbol_list,
 	      const FileRegion& loc);
 
   /// @brief プリミティブ型を作る．
