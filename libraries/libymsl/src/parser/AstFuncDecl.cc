@@ -9,6 +9,7 @@
 
 #include "AstFuncDecl.h"
 #include "AstList.h"
+
 #include "YmslScope.h"
 
 
@@ -91,20 +92,27 @@ AstFuncDecl::stmt_list() const
   return mStmtList;
 }
 
-// @brief スコープの生成と変数名の参照解決を行う．
+// @brief 関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstFuncDecl::phase1(YmslScope* parent_scope)
 {
-  //parent_scope->add_function(this);
+  // parent_scope に関数を登録
 
+  // 自身のスコープを作る．
   mScope = new YmslScope(parent_scope);
+}
 
-  // mParamList を登録
+// @brief スコープの生成と参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstFuncDecl::phase2(YmslScope* parent_scope)
+{
+  // mParamList を mScope に登録．
 
   ymuint n = mStmtList.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mStmtList[i]->phase1(parent_scope);
+    mStmtList[i]->phase2(mScope);
   }
 }
 

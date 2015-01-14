@@ -10,8 +10,6 @@
 #include "AstExpr.h"
 
 #include "YmslCodeList.h"
-#include "YmslDriver.h"
-#include "YmslLabel.h"
 #include "YmslScope.h"
 #include "YmslVM.h"
 
@@ -35,10 +33,17 @@ AstExprStmt::~AstExprStmt()
 {
 }
 
-// @brief スコープの生成と変数名の参照解決を行う．
+// @brief 関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstExprStmt::phase1(YmslScope* parent_scope)
+{
+}
+
+// @brief スコープの生成と参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstExprStmt::phase2(YmslScope* parent_scope)
 {
   mExpr->resolve_var(parent_scope);
 }

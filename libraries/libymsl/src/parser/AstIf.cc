@@ -12,8 +12,6 @@
 #include "AstList.h"
 
 #include "YmslCodeList.h"
-#include "YmslDriver.h"
-#include "YmslLabel.h"
 #include "YmslScope.h"
 #include "YmslVM.h"
 
@@ -45,14 +43,21 @@ AstIf::~AstIf()
 {
 }
 
-// @brief スコープの生成と変数名の参照解決を行う．
+// @brief 関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstIf::phase1(YmslScope* parent_scope)
 {
+}
+
+// @brief スコープの生成と参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstIf::phase2(YmslScope* parent_scope)
+{
   ymuint n = mIfBlockList.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mIfBlockList[i]->phase1(parent_scope);
+    mIfBlockList[i]->phase2(parent_scope);
   }
 }
 
@@ -163,13 +168,20 @@ AstIfBlock::cond() const
   return mCond;
 }
 
-// @brief スコープの生成と変数名の参照解決を行う．
+// @brief 関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstIfBlock::phase1(YmslScope* parent_scope)
 {
+}
+
+// @brief スコープの生成と参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstIfBlock::phase2(YmslScope* parent_scope)
+{
   mCond->resolve_var(parent_scope);
-  AstBlockStmt::phase1(parent_scope);
+  AstBlockStmt::phase2(parent_scope);
 }
 
 END_NAMESPACE_YM_YMSL

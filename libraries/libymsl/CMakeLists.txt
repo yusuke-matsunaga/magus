@@ -16,11 +16,15 @@ include_directories(
 # ===================================================================
 
 set (ymsl_SOURCES
-  src/engine/YmslEnumType.cc
-  src/engine/YmslFunction.cc
-  src/engine/YmslType.cc
-  src/engine/YmslTypeMgr.cc
-  src/engine/YmslVar.cc
+  src/compiler/ObjHandle.cc
+  src/compiler/YmslCompiler.cc
+  src/compiler/YmslEnumType.cc
+  src/compiler/YmslFunction.cc
+  src/compiler/YmslLabel.cc
+  src/compiler/YmslScope.cc
+  src/compiler/YmslType.cc
+  src/compiler/YmslTypeMgr.cc
+  src/compiler/YmslVar.cc
   src/engine/YmslVM.cc
   src/parser/Ast.cc
   src/parser/AstArrayRef.cc
@@ -54,11 +58,8 @@ set (ymsl_SOURCES
   src/parser/AstUniOp.cc
   src/parser/AstVarDecl.cc
   src/parser/AstWhile.cc
-  src/parser/ObjHandle.cc
   src/parser/RsrvWordDic.cc
-  src/parser/YmslLabel.cc
   src/parser/YmslScanner.cc
-  src/parser/YmslScope.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
   )

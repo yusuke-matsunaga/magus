@@ -9,8 +9,6 @@
 #include "AstToplevel.h"
 
 #include "YmslCodeList.h"
-#include "YmslDriver.h"
-#include "YmslLabel.h"
 #include "YmslScope.h"
 #include "YmslVM.h"
 

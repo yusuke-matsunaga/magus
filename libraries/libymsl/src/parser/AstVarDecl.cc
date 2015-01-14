@@ -80,10 +80,17 @@ AstVarDecl::global() const
   return mGlobal;
 }
 
-// @brief スコープの生成と変数名の参照解決を行う．
+// @brief 関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstVarDecl::phase1(YmslScope* parent_scope)
+{
+}
+
+// @brief スコープの生成と参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+void
+AstVarDecl::phase2(YmslScope* parent_scope)
 {
   //parent_scope->add_var(this);
 }

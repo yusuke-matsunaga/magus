@@ -62,11 +62,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と変数名の参照解決を行う．
+  /// @brief 関数の登録を行う．
   /// @param[in] parent_scope 親のスコープ
   virtual
   void
   phase1(YmslScope* parent_scope) = 0;
+
+  /// @brief スコープの生成と参照解決を行う．
+  /// @param[in] parent_scope 親のスコープ
+  virtual
+  void
+  phase2(YmslScope* parent_scope) = 0;
 
   /// @brief ラベルステートメントの場合に名前を返す．
   ///

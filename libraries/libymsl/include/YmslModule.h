@@ -10,7 +10,7 @@
 
 
 #include "ymsl_int.h"
-#include "SymDict.h"
+#include "YmslScope.h"
 #include "YmUtils/ShString.h"
 
 

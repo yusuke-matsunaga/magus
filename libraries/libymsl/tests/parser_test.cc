@@ -9,8 +9,7 @@
 
 #include "Ast.h"
 #include "AstMgr.h"
-#include "../src/parser/AstStatement.h"
-#include "../src/parser/RsrvWordDic.h"
+#include "AstStatement.h"
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
