@@ -42,19 +42,24 @@ AstBlockStmt::~AstBlockStmt()
 {
 }
 
-// @brief 関数の登録を行う．
+// @brief スコープの生成と関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstBlockStmt::phase1(YmslScope* parent_scope)
 {
+  mScope = new YmslScope(parent_scope);
+  ymuint n = mStmtList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    AstStatement* stmt = mStmtList[i];
+    stmt->phase1(mScope);
+  }
 }
 
-// @brief スコープの生成と参照解決を行う．
+// @brief 参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstBlockStmt::phase2(YmslScope* parent_scope)
 {
-  mScope = new YmslScope(parent_scope);
   ymuint n = mStmtList.size();
   for (ymuint i = 0; i < n; ++ i) {
     AstStatement* stmt = mStmtList[i];

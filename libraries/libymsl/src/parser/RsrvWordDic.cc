@@ -82,7 +82,6 @@ STpair init_data[] = {
   { "float",    FLOAT      },
   { "for",      FOR        },
   { "function", FUNCTION   },
-  { "global",   GLOBAL     },
   { "goto",     GOTO       },
   { "if",       IF         },
   { "import",   IMPORT     },

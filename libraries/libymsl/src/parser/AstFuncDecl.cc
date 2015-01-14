@@ -92,7 +92,7 @@ AstFuncDecl::stmt_list() const
   return mStmtList;
 }
 
-// @brief 関数の登録を行う．
+// @brief スコープの生成と関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstFuncDecl::phase1(YmslScope* parent_scope)
@@ -101,9 +101,14 @@ AstFuncDecl::phase1(YmslScope* parent_scope)
 
   // 自身のスコープを作る．
   mScope = new YmslScope(parent_scope);
+
+  ymuint n = mStmtList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    mStmtList[i]->phase1(mScope);
+  }
 }
 
-// @brief スコープの生成と参照解決を行う．
+// @brief 参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstFuncDecl::phase2(YmslScope* parent_scope)

@@ -146,7 +146,6 @@ fr_merge(const FileRegion fr_array[],
 %token FLOAT
 %token FOR
 %token FUNCTION
-%token GLOBAL
 %token GOTO
 %token IF
 %token IMPORT
@@ -235,16 +234,6 @@ item
 {
   $$ = $1;
 }
-// 関数定義
-| FUNCTION SYMBOL LP param_list RP COLON type LCB statement_list RCB
-{
-  $$ = mgr.new_FuncDecl($2, $7, $4, $9, @$);
-}
-// グローバル変数定義
-| GLOBAL SYMBOL COLON type init_expr SEMI
-{
-  $$ = mgr.new_VarDecl($2, $4, $5, true, @$);
-}
 // import 文
 | IMPORT module_list SEMI
 {
@@ -289,7 +278,12 @@ statement
 {
   $$ = $1;
 }
-// ローカル変数定義
+// 関数定義
+| FUNCTION SYMBOL LP param_list RP COLON type LCB statement_list RCB
+{
+  $$ = mgr.new_FuncDecl($2, $7, $4, $9, @$);
+}
+// 変数定義
 | VAR SYMBOL COLON type init_expr SEMI
 {
   $$ = mgr.new_VarDecl($2, $4, $5, false, @$);

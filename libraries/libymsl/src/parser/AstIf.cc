@@ -43,14 +43,18 @@ AstIf::~AstIf()
 {
 }
 
-// @brief 関数の登録を行う．
+// @brief スコープの生成と関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstIf::phase1(YmslScope* parent_scope)
 {
+  ymuint n = mIfBlockList.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    mIfBlockList[i]->phase1(parent_scope);
+  }
 }
 
-// @brief スコープの生成と参照解決を行う．
+// @brief 参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstIf::phase2(YmslScope* parent_scope)
@@ -168,14 +172,15 @@ AstIfBlock::cond() const
   return mCond;
 }
 
-// @brief 関数の登録を行う．
+// @brief スコープの生成と関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstIfBlock::phase1(YmslScope* parent_scope)
 {
+  AstBlockStmt::phase1(parent_scope);
 }
 
-// @brief スコープの生成と参照解決を行う．
+// @brief 参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstIfBlock::phase2(YmslScope* parent_scope)

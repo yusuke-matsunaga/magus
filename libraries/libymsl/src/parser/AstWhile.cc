@@ -37,14 +37,15 @@ AstWhile::~AstWhile()
 {
 }
 
-// @brief 関数の登録を行う．
+// @brief スコープの生成と関数の登録を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstWhile::phase1(YmslScope* parent_scope)
 {
+  AstBlockStmt::phase1(parent_scope);
 }
 
-// @brief スコープの生成と参照解決を行う．
+// @brief 参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstWhile::phase2(YmslScope* parent_scope)
