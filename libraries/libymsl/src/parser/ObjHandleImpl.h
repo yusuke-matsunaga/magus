@@ -213,7 +213,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] enum_type enum 型
-  EnumHandle(YmslEnum* enum_type);
+  EnumHandle(YmslEnumType* enum_type);
 
   /// @brief デストラクタ
   virtual
@@ -234,7 +234,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslEnum*
+  YmslEnumType*
   enum_type() const;
 
 
@@ -244,7 +244,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // enum 型
-  YmslEnum* mEnum;
+  YmslEnumType* mEnum;
 
 };
 

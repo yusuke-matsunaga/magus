@@ -61,7 +61,7 @@ public:
 
   /// @brief 列挙型を追加する．
   void
-  add_enum(YmslEnum* item);
+  add_enum(YmslEnumType* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素

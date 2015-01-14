@@ -35,7 +35,7 @@
 #include "AstLabel.h"
 #include "AstList.h"
 #include "AstMapType.h"
-#include "AstMemberRef.h"
+//#include "AstMemberRef.h"
 #include "AstModule.h"
 #include "AstNamedType.h"
 #include "AstParam.h"
@@ -453,6 +453,7 @@ AstMgr::new_ArrayRef(AstExpr* id,
   return new (p) AstArrayRef(id, index, loc);
 }
 
+#if 0
 // @brief メンバ参照を作る．
 // @param[in] id オブジェクト名
 // @param[in] member メンバ名
@@ -465,6 +466,7 @@ AstMgr::new_MemberRef(AstExpr* id,
   void* p = mAlloc.get_memory(sizeof(AstMemberRef));
   return new (p) AstMemberRef(id, member, loc);
 }
+#endif
 
 // @brief 関数呼び出しを作る．
 // @param[in] id 関数名

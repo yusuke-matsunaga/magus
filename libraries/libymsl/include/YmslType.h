@@ -43,6 +43,13 @@ public:
   TypeId
   type_id() const = 0;
 
+  /// @brief 型名を得る．
+  ///
+  /// enum のみ有効
+  virtual
+  ShString
+  type_name() const;
+
   /// @brief ID番号を得る
   ///
   /// おもにハッシュ関数用
@@ -92,16 +99,16 @@ public:
   ymuint
   enum_num() const;
 
-  /// @brief 列挙型の要素名を得る．
+  /// @brief 列挙型の定数を得る．
   /// @param[in] index インデックス ( 0 <= index < enum_num() )
   ///
   /// enum のみ有効
   virtual
-  ShString
-  enum_name(ymuint index) const;
+  const YmslEnumConst*
+  enum_elem(ymuint index) const;
 
   /// @brief 列挙型のインデックスを得る．
-  /// @param[in] name 列挙型の名前
+  /// @param[in] name 列挙型の定数の名前
   ///
   /// enum のみ有効
   /// 該当する名前がなければ -1 を返す．

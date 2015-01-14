@@ -75,7 +75,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslEnum*
+  YmslEnumType*
   enum_type() const;
 
 

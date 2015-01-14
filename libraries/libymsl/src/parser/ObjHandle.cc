@@ -8,7 +8,7 @@
 
 
 #include "ObjHandleImpl.h"
-#include "YmslEnum.h"
+#include "YmslEnumType.h"
 #include "YmslFunction.h"
 #include "YmslLabel.h"
 #include "YmslScope.h"
@@ -71,7 +71,7 @@ ObjHandle::scope() const
 // @brief enum 型を返す．
 //
 // 他の要素の場合には NULL を返す．
-YmslEnum*
+YmslEnumType*
 ObjHandle::enum_type() const
 {
   return NULL;
@@ -216,7 +216,7 @@ ScopeHandle::scope() const
 
 // @brief コンストラクタ
 // @param[in] enum_type enum 型
-EnumHandle::EnumHandle(YmslEnum* enum_type) :
+EnumHandle::EnumHandle(YmslEnumType* enum_type) :
   mEnum(enum_type)
 {
 }
@@ -230,13 +230,13 @@ EnumHandle::~EnumHandle()
 ShString
 EnumHandle::name() const
 {
-  return mEnum->name();
+  return mEnum->type_name();
 }
 
 // @brief enum 型を返す．
 //
 // 他の要素の場合には NULL を返す．
-YmslEnum*
+YmslEnumType*
 EnumHandle::enum_type() const
 {
   return mEnum;

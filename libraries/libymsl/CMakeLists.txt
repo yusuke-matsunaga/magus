@@ -16,7 +16,7 @@ include_directories(
 # ===================================================================
 
 set (ymsl_SOURCES
-  src/engine/YmslEnum.cc
+  src/engine/YmslEnumType.cc
   src/engine/YmslFunction.cc
   src/engine/YmslType.cc
   src/engine/YmslTypeMgr.cc
@@ -31,7 +31,6 @@ set (ymsl_SOURCES
   src/parser/AstFuncDecl.cc
   src/parser/AstIteOp.cc
   src/parser/AstIntConst.cc
-  src/parser/AstMemberRef.cc
   src/parser/AstMgr.cc
   src/parser/AstParam.cc
   src/parser/AstPrimary.cc

@@ -32,6 +32,16 @@ YmslType::~YmslType()
 {
 }
 
+// @brief 型名を得る．
+//
+// enum のみ有効
+ShString
+YmslType::type_name() const
+{
+  ASSERT_NOT_REACHED;
+  return ShString();
+}
+
 // @brief キーの型を得る．
 //
 // map のみ有効
@@ -93,15 +103,15 @@ YmslType::enum_num() const
   return 0;
 }
 
-// @brief 列挙型の要素名を得る．
+// @brief 列挙型の定数を得る．
 // @param[in] index インデックス ( 0 <= index < enum_num() )
 //
 // enum のみ有効
-ShString
-YmslType::enum_name(ymuint index) const
+const YmslEnumConst*
+YmslType::enum_elem(ymuint index) const
 {
   ASSERT_NOT_REACHED;
-  return ShString();
+  return NULL;
 }
 
 // @brief 列挙型のインデックスを得る．
