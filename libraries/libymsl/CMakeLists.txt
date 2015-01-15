@@ -22,6 +22,7 @@ set (ymsl_SOURCES
   src/compiler/YmslFunction.cc
   src/compiler/YmslLabel.cc
   src/compiler/YmslScope.cc
+  src/compiler/YmslSimpleType.cc
   src/compiler/YmslType.cc
   src/compiler/YmslTypeMgr.cc
   src/compiler/YmslVar.cc

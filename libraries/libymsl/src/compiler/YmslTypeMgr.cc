@@ -9,6 +9,7 @@
 
 #include "YmslTypeMgr.h"
 #include "YmslType.h"
+#include "YmslSimpleType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -25,20 +26,13 @@ YmslTypeMgr::YmslTypeMgr()
   init();
 }
 
-// @brief 組み込み型を登録する．
-void
-YmslTypeMgr::init()
-{
-}
-
 // @brief デストラクタ
 YmslTypeMgr::~YmslTypeMgr()
 {
-  delete mVoidType;
-  delete mBooleanType;
-  delete mIntType;
-  delete mFloatType;
-  delete mStringType;
+  for (vector<YmslType*>::iterator p = mTypeList.begin();
+       p != mTypeList.end(); ++ p) {
+    delete *p;
+  }
 }
 
 // @brief void 型を得る．
@@ -114,6 +108,32 @@ const YmslType*
 YmslTypeMgr::function_type(const YmslType* output_type,
 			   const vector<YmslType*>& input_type_list)
 {
+}
+
+/// @brief 型を登録する．
+/// @param[in] type 登録する型
+void
+YmslTypeMgr::reg_type(YmslType* type)
+{
+  type->mId = mTypeList.size();
+  mTypeList.push_back(type);
+}
+
+// @brief 組み込み型を登録する．
+void
+YmslTypeMgr::init()
+{
+  mVoidType = new YmslSimpleType(kVoidType);
+  mBooleanType = new YmslSimpleType(kBooleanType);
+  mIntType = new YmslSimpleType(kIntType);
+  mFloatType = new YmslSimpleType(kFloatType);
+  mStringType = new YmslSimpleType(kStringType);
+
+  reg_type(mVoidType);
+  reg_type(mBooleanType);
+  reg_type(mIntType);
+  reg_type(mFloatType);
+  reg_type(mStringType);
 }
 
 END_NAMESPACE_YM_YMSL

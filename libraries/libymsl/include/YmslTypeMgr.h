@@ -90,21 +90,10 @@ public:
   function_type(const YmslType* output_type,
 		const vector<YmslType*>& input_type_list);
 
-  /// @brief class 型を得る．
-  /// @param[in] name 型名
-  ///
-  /// 登録されていなければ NULL を返す．
-  const YmslType*
-  class_type(ShString name);
-
-  /// @brief class 型を登録する．
-  /// @param[in] name
+  /// @brief 型を登録する．
   /// @param[in] type 登録する型
-  ///
-  /// 同名の型が登録されていたらなにもしない．
   void
-  reg_type(ShString name,
-	   const YmslType* type);
+  reg_type(YmslType* type);
 
 
 private:
@@ -121,6 +110,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 全ての型を保持するリスト
+  vector<YmslType*> mTypeList;
 
   // void 型
   YmslType* mVoidType;

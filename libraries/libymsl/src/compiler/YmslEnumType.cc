@@ -53,13 +53,10 @@ YmslEnumConst::val() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
 // @param[in] name 名前
 // @param[in] elem_list 要素のリスト
-YmslEnumType::YmslEnumType(ymuint id,
-			   ShString name,
+YmslEnumType::YmslEnumType(ShString name,
 			   const vector<ShString>& elem_list) :
-  YmslType(id),
   mName(name),
   mElemNum(elem_list.size())
 {

@@ -8,10 +8,6 @@
 
 
 #include "YmslType.h"
-#include "YmslIntType.h"
-#include "YmslFloatType.h"
-#include "YmslStringType.h"
-#include "YmslUserType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -21,9 +17,7 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id ID番号
-YmslType::YmslType(ymuint id) :
-  mId(id)
+YmslType::YmslType()
 {
 }
 

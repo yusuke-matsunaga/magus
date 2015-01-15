@@ -1,11 +1,11 @@
-#ifndef YMSLFLOATTYPE_H
-#define YMSLFLOATTYPE_H
+#ifndef YMSLSIMPLETYPE_H
+#define YMSLSIMPLETYPE_H
 
-/// @file YmslFloatType.h
-/// @brief YmslFloatType のヘッダファイル
+/// @file YmslSimpleType.h
+/// @brief YmslSimpleType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,20 +15,22 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslFloatType YmslFloatType.h "YmslFloatType.h"
-/// @brief float 型を表す YmslType
+/// @class YmslSimpleType YmslType.h "YmslType.h"
+/// @brief 単純な型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslFloatType :
+class YmslSimpleType :
   public YmslType
 {
 public:
 
   /// @brief コンストラクタ
-  YmslFloatType();
+  /// @param[in] type 型
+  YmslSimpleType(TypeId type);
+
 
   /// @brief デストラクタ
   virtual
-  ~YmslFloatType();
+  ~YmslSimpleType();
 
 
 public:
@@ -37,9 +39,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 型を得る．
-  virtual
   TypeId
-  type() const;
+  type_id() const;
 
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
@@ -47,8 +48,17 @@ public:
   void
   print(ostream& s) const;
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 型
+  TypeId mType;
+
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFLOATTYPE_H
+#endif // YMSLSIMPLETYPE_H

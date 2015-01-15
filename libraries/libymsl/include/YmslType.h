@@ -22,11 +22,12 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 class YmslType
 {
+  friend class YmslTypeMgr;
+
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  YmslType(ymuint id);
+  YmslType();
 
   /// @brief デストラクタ
   virtual
