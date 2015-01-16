@@ -16,6 +16,7 @@
 #include "AstAssignment.h"
 #include "AstBinOp.h"
 #include "AstBlockStmt.h"
+#include "AstBoolConst.h"
 #include "AstBreak.h"
 #include "AstCaseItem.h"
 #include "AstContinue.h"
@@ -423,11 +424,11 @@ AstMgr::new_ExprStmt(AstExpr* expr,
 }
 
 // @brief 単項演算式を作る．
-// @param[in] op 演算子のトークン
+// @param[in] op 演算子のタイプ
 // @param[in] left オペランド
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_UniOp(TokenType op,
+AstMgr::new_UniOp(ExprType op,
 		  AstExpr* left,
 		  const FileRegion& loc)
 {
@@ -436,10 +437,10 @@ AstMgr::new_UniOp(TokenType op,
 }
 
 // @brief 二項演算式を作る．
-// @param[in] op 演算子のトークン
+// @param[in] op 演算子のタイプ
 // @param[in] left, right オペランド
 AstExpr*
-AstMgr::new_BinOp(TokenType op,
+AstMgr::new_BinOp(ExprType op,
 		  AstExpr* left,
 		  AstExpr* right)
 {
@@ -471,21 +472,6 @@ AstMgr::new_ArrayRef(AstExpr* id,
   return new (p) AstArrayRef(id, index, loc);
 }
 
-#if 0
-// @brief メンバ参照を作る．
-// @param[in] id オブジェクト名
-// @param[in] member メンバ名
-// @param[in] loc ファイル位置
-AstExpr*
-AstMgr::new_MemberRef(AstExpr* id,
-		      AstSymbol* member,
-		      const FileRegion& loc)
-{
-  void* p = mAlloc.get_memory(sizeof(AstMemberRef));
-  return new (p) AstMemberRef(id, member, loc);
-}
-#endif
-
 // @brief 関数呼び出しを作る．
 // @param[in] id 関数名
 // @param[in] expr_list 引数のリスト
@@ -497,6 +483,24 @@ AstMgr::new_FuncCall(AstExpr* id,
 {
   void* p = mAlloc.get_memory(sizeof(AstFuncCall));
   return new (p) AstFuncCall(id, expr_list, loc);
+}
+
+// @brief true 定数式を作る．
+// @param[in] loc ファイル位置
+AstExpr*
+AstMgr::new_TrueConst(const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstBoolConst));
+  return new (p) AstBoolConst(kTrue, loc);
+}
+
+// @brief false 定数式を作る．
+// @param[in] loc ファイル位置
+AstExpr*
+AstMgr::new_FalseConst(const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstBoolConst));
+  return new (p) AstBoolConst(kFalse, loc);
 }
 
 // @brief 整数定数式を作る．

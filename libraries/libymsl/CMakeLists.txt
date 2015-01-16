@@ -32,6 +32,7 @@ set (ymsl_SOURCES
   src/parser/AstAssignment.cc
   src/parser/AstBinOp.cc
   src/parser/AstBlockStmt.cc
+  src/parser/AstBoolConst.cc
   src/parser/AstBreak.cc
   src/parser/AstContinue.cc
   src/parser/AstDoWhile.cc
@@ -51,6 +52,7 @@ set (ymsl_SOURCES
   src/parser/AstMgr.cc
   src/parser/AstParam.cc
   src/parser/AstPrimary.cc
+  src/parser/AstPrinter.cc
   src/parser/AstReturn.cc
   src/parser/AstStatement.cc
   src/parser/AstStringConst.cc

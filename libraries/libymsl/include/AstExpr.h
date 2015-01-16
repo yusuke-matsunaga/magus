@@ -37,6 +37,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief 変数の参照を解決する．
   virtual
   void
@@ -71,6 +72,7 @@ public:
   compile(YmslDriver& driver,
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr) = 0;
+#endif
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム

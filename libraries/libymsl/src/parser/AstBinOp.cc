@@ -15,20 +15,18 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
-#include "grammer.hh"
-
 //////////////////////////////////////////////////////////////////////
 // クラス AstBinOp
 //////////////////////////////////////////////////////////////////////
 
 // @breif コンストラクタ
-// @param[in] token トークン
+// @param[in] op 演算子のタイプ
 // @param[in] left, right オペランド
-AstBinOp::AstBinOp(TokenType token,
+AstBinOp::AstBinOp(ExprType op,
 		   AstExpr* left,
 		   AstExpr* right) :
   AstExpr(FileRegion(left->file_region(), right->file_region())),
-  mToken(token),
+  mOp(op),
   mLeft(left),
   mRight(right)
 {
@@ -39,6 +37,7 @@ AstBinOp::~AstBinOp()
 {
 }
 
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstBinOp::resolve_var(YmslScope* parent_scope)
@@ -156,6 +155,7 @@ AstBinOp::compile(YmslDriver& driver,
   code_list.write_opcode(addr, op);
 #endif
 }
+#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
@@ -164,23 +164,25 @@ AstBinOp::print(ostream& s) const
 {
   s << "(";
   mLeft->print(s);
-  switch ( mToken) {
-  case PLUS:   s << "+"; break;
-  case MINUS:  s << "-"; break;
-  case MULT:   s << "*"; break;
-  case DIV:    s << "/"; break;
-  case MOD:    s << "%"; break;
-  case BITAND: s << "&"; break;
-  case BITOR:  s << "|"; break;
-  case BITXOR: s << "^"; break;
-  case LOGAND: s << " and "; break;
-  case LOGOR:  s << " or "; break;
-  case EQEQ:   s << "=="; break;
-  case NOTEQ:  s << "!="; break;
-  case LT:     s << "<"; break;
-  case GT:     s << ">"; break;
-  case LE:     s << "<="; break;
-  case GE:     s << ">="; break;
+  switch ( mOp) {
+  case kPlus:   s << "+"; break;
+  case kMinus:  s << "-"; break;
+  case kMult:   s << "*"; break;
+  case kDiv:    s << "/"; break;
+  case kMod:    s << "%"; break;
+  case kBitAnd: s << "&"; break;
+  case kBitOr:  s << "|"; break;
+  case kBitXor: s << "^"; break;
+  case kLogAnd: s << " and "; break;
+  case kLogOr:  s << " or "; break;
+  case kEqual:  s << "=="; break;
+  case kNotEq:  s << "!="; break;
+  case kLt:     s << "<"; break;
+  case kGt:     s << ">"; break;
+  case kLe:     s << "<="; break;
+  case kGe:     s << ">="; break;
+  case kLshift: s << "<<"; break;
+  case kRshift: s << ">>"; break;
   default: ASSERT_NOT_REACHED;
   }
   mRight->print(s);

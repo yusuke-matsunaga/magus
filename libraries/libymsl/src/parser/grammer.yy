@@ -143,6 +143,7 @@ fr_merge(const FileRegion fr_array[],
 %token ELIF
 %token ELSE
 %token ENUM
+%token FALSE
 %token FLOAT
 %token FOR
 %token FUNCTION
@@ -155,6 +156,7 @@ fr_merge(const FileRegion fr_array[],
 %token SET
 %token STRING
 %token SWITCH
+%token TRUE
 %token VAR
 %token VOID
 %token WHILE
@@ -572,104 +574,104 @@ expr
 // 単項演算
 : PLUS expr %prec UOP
 {
-  $$ = mgr.new_UniOp(PLUS, $2, @$);
+  $$ = mgr.new_UniOp(kUniPlus, $2, @$);
 }
 | MINUS expr %prec UOP
 {
-  $$ = mgr.new_UniOp(MINUS, $2, @$);
+  $$ = mgr.new_UniOp(kUniMinus, $2, @$);
 }
 | BITNEG expr
 {
-  $$ = mgr.new_UniOp(BITNEG, $2, @$);
+  $$ = mgr.new_UniOp(kBitNeg, $2, @$);
 }
 | LOGNOT expr
 {
-  $$ = mgr.new_UniOp(LOGNOT, $2, @$);
+  $$ = mgr.new_UniOp(kLogNot, $2, @$);
 }
 | INT LP expr RP
 {
-  $$ = mgr.new_UniOp(INT, $3, @$);
+  $$ = mgr.new_UniOp(kCastInt, $3, @$);
 }
 | BOOLEAN LP expr RP
 {
-  $$ = mgr.new_UniOp(BOOLEAN, $3, @$);
+  $$ = mgr.new_UniOp(kCastBoolean, $3, @$);
 }
 | FLOAT LP expr RP
 {
-  $$ = mgr.new_UniOp(FLOAT, $3, @$);
+  $$ = mgr.new_UniOp(kCastFloat, $3, @$);
 }
 // 二項演算
 | expr PLUS expr
 {
-  $$ = mgr.new_BinOp(PLUS, $1, $3);
+  $$ = mgr.new_BinOp(kPlus, $1, $3);
 }
 | expr MINUS expr
 {
-  $$ = mgr.new_BinOp(MINUS, $1, $3);
+  $$ = mgr.new_BinOp(kMinus, $1, $3);
 }
 | expr MULT expr
 {
-  $$ = mgr.new_BinOp(MULT, $1, $3);
+  $$ = mgr.new_BinOp(kMult, $1, $3);
 }
 | expr DIV expr
 {
-  $$ = mgr.new_BinOp(DIV, $1, $3);
+  $$ = mgr.new_BinOp(kDiv, $1, $3);
 }
 | expr MOD expr
 {
-  $$ = mgr.new_BinOp(MOD, $1, $3);
+  $$ = mgr.new_BinOp(kMod, $1, $3);
 }
 | expr LSHIFT expr
 {
-  $$ = mgr.new_BinOp(LSHIFT, $1, $3);
+  $$ = mgr.new_BinOp(kLshift, $1, $3);
 }
 | expr RSHIFT expr
 {
-  $$ = mgr.new_BinOp(RSHIFT, $1, $3);
+  $$ = mgr.new_BinOp(kRshift, $1, $3);
 }
 | expr BITAND expr
 {
-  $$ = mgr.new_BinOp(BITAND, $1, $3);
+  $$ = mgr.new_BinOp(kBitAnd, $1, $3);
 }
 | expr BITOR expr
 {
-  $$ = mgr.new_BinOp(BITOR, $1, $3);
+  $$ = mgr.new_BinOp(kBitOr, $1, $3);
 }
 | expr BITXOR expr
 {
-  $$ = mgr.new_BinOp(BITXOR, $1, $3);
+  $$ = mgr.new_BinOp(kBitXor, $1, $3);
 }
 | expr LOGAND expr
 {
-  $$ = mgr.new_BinOp(LOGAND, $1, $3);
+  $$ = mgr.new_BinOp(kLogAnd, $1, $3);
 }
 | expr LOGOR expr
 {
-  $$ = mgr.new_BinOp(LOGOR, $1, $3);
+  $$ = mgr.new_BinOp(kLogOr, $1, $3);
 }
 | expr EQEQ expr
 {
-  $$ = mgr.new_BinOp(EQEQ, $1, $3);
+  $$ = mgr.new_BinOp(kEqual, $1, $3);
 }
 | expr NOTEQ expr
 {
-  $$ = mgr.new_BinOp(NOTEQ, $1, $3);
+  $$ = mgr.new_BinOp(kNotEq, $1, $3);
 }
 | expr LT expr
 {
-  $$ = mgr.new_BinOp(LT, $1, $3);
+  $$ = mgr.new_BinOp(kLt, $1, $3);
 }
 | expr GT expr
 {
-  $$ = mgr.new_BinOp(GT, $1, $3);
+  $$ = mgr.new_BinOp(kGt, $1, $3);
 }
 | expr LE expr
 {
-  $$ = mgr.new_BinOp(LE, $1, $3);
+  $$ = mgr.new_BinOp(kLe, $1, $3);
 }
 | expr GE expr
 {
-  $$ = mgr.new_BinOp(GE, $1, $3);
+  $$ = mgr.new_BinOp(kGe, $1, $3);
 }
 | expr QST expr COLON expr %prec ITE
 {
@@ -696,6 +698,14 @@ expr
   $$ = $1;
 }
 // 定数
+| TRUE
+{
+  $$ = mgr.new_TrueConst(@$);
+}
+| FALSE
+{
+  $$ = mgr.new_FalseConst(@$);
+}
 | INT_VAL
 {
   $$ = $1;

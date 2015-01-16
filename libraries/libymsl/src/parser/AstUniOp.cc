@@ -15,21 +15,19 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
-#include "grammer.hh"
-
 //////////////////////////////////////////////////////////////////////
 // クラス AstUniOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] token トークン
+// @param[in] op 演算子の種類
 // @param[in] opr オペランド
 // @param[in] loc ファイル位置
-AstUniOp::AstUniOp(TokenType token,
+AstUniOp::AstUniOp(ExprType op,
 		   AstExpr* opr,
 		   const FileRegion& loc) :
   AstExpr(FileRegion(loc, opr->file_region())),
-  mToken(token),
+  mOp(op),
   mOperand(opr)
 {
 }
@@ -39,6 +37,7 @@ AstUniOp::~AstUniOp()
 {
 }
 
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstUniOp::resolve_var(YmslScope* parent_scope)
@@ -185,29 +184,30 @@ AstUniOp::compile(YmslDriver& driver,
   code_list.write_opcode(addr, op);
 #endif
 }
+#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 void
 AstUniOp::print(ostream& s) const
 {
-  switch ( mToken ) {
-  case PLUS:    s << "+"; break;
-  case MINUS:   s << "-"; break;
-  case BITNEG:  s << "~"; break;
-  case LOGNOT:  s << "!"; break;
-  case INT:     s << "int("; break;
-  case BOOLEAN: s << "boolean("; break;
-  case FLOAT:   s << "float("; break;
+  switch ( mOp ) {
+  case kUniPlus:     s << "+"; break;
+  case kUniMinus:    s << "-"; break;
+  case kBitNeg:      s << "~"; break;
+  case kLogNot:      s << "!"; break;
+  case kCastInt:     s << "int("; break;
+  case kCastBoolean: s << "boolean("; break;
+  case kCastFloat:   s << "float("; break;
   default: ASSERT_NOT_REACHED;
   }
 
   mOperand->print(s);
 
-  switch ( mToken ) {
-  case INT:
-  case BOOLEAN:
-  case FLOAT:
+  switch ( mOp ) {
+  case kCastInt:
+  case kCastBoolean:
+  case kCastFloat:
     s << ")"; break;
   default: break;
   }

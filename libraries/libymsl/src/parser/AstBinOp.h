@@ -24,9 +24,9 @@ class AstBinOp :
 public:
 
   /// @breif コンストラクタ
-  /// @param[in] token トークン
+  /// @param[in] op 演算子のタイプ
   /// @param[in] left, right オペランド
-  AstBinOp(TokenType token,
+  AstBinOp(ExprType op,
 	   AstExpr* left,
 	   AstExpr* right);
 
@@ -40,6 +40,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief 変数の参照を解決する．
   virtual
   void
@@ -74,6 +75,7 @@ public:
   compile(YmslDriver& driver,
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr);
+#endif
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
@@ -87,8 +89,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // トークン
-  TokenType mToken;
+  // 演算子のタイプ
+  ExprType mOp;
 
   // 型
   const YmslType* mType;

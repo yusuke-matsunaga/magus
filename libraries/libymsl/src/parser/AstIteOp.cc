@@ -36,6 +36,7 @@ AstIteOp::~AstIteOp()
 {
 }
 
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstIteOp::resolve_var(YmslScope* parent_scope)
@@ -79,6 +80,7 @@ AstIteOp::compile(YmslDriver& driver,
 		  Ymsl_INT& addr)
 {
 }
+#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム

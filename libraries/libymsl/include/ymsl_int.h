@@ -266,6 +266,47 @@ enum StmtType {
 
 
 //////////////////////////////////////////////////////////////////////
+/// @brief 式の種類
+//////////////////////////////////////////////////////////////////////
+enum ExprType {
+  kPrimary,
+  kArrayRef,
+  kFuncCall,
+  kTrue,
+  kFalse,
+  kIntConst,
+  kFloatConst,
+  kStringConst,
+  kUniPlus,
+  kUniMinus,
+  kBitNeg,
+  kBitAnd,
+  kBitOr,
+  kBitXor,
+  kLogNot,
+  kLogAnd,
+  kLogOr,
+  kEqual,
+  kNotEq,
+  kLt,
+  kLe,
+  kGt,
+  kGe,
+  kPlus,
+  kMinus,
+  kMult,
+  kDiv,
+  kMod,
+  kLshift,
+  kRshift,
+  kIte,
+  kCastInt,
+  kCastBoolean,
+  kCastFloat
+};
+
+
+//////////////////////////////////////////////////////////////////////
 /// @class 値を表す共用型
 ///
 /// あんまり union は使いたくないんだけど

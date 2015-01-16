@@ -10,6 +10,8 @@
 #include "Ast.h"
 #include "AstMgr.h"
 #include "AstStatement.h"
+#include "AstPrinter.h"
+
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -29,10 +31,10 @@ parser_test1(IDO& ido)
 
   bool stat = mgr.read_source(ido);
   if ( stat ) {
+    AstPrinter printer(cout);
+
     AstStatement* toplevel = mgr.toplevel();
-#if 0
-    toplevel->print(cout, 0);
-#endif
+    printer.print_statement(toplevel);
   }
 
   return 0;

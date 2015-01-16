@@ -269,19 +269,19 @@ public:
 	       const FileRegion& loc);
 
   /// @brief 単項演算式を作る．
-  /// @param[in] op 演算子のトークン
+  /// @param[in] op 演算子のタイプ
   /// @param[in] left オペランド
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_UniOp(TokenType op,
+  new_UniOp(ExprType op,
 	    AstExpr* left,
 	    const FileRegion& loc);
 
   /// @brief 二項演算式を作る．
-  /// @param[in] op 演算子のトークン
+  /// @param[in] op 演算子のタイプ
   /// @param[in] left, right オペランド
   AstExpr*
-  new_BinOp(TokenType op,
+  new_BinOp(ExprType op,
 	    AstExpr* left,
 	    AstExpr* right);
 
@@ -301,15 +301,6 @@ public:
 	       AstExpr* index,
 	       const FileRegion& loc);
 
-  /// @brief メンバ参照を作る．
-  /// @param[in] id オブジェクト名
-  /// @param[in] member メンバ名
-  /// @param[in] loc ファイル位置
-  AstExpr*
-  new_MemberRef(AstExpr* id,
-		AstSymbol* member,
-		const FileRegion& loc);
-
   /// @brief 関数呼び出しを作る．
   /// @param[in] id 関数名
   /// @param[in] expr_list 引数のリスト
@@ -318,6 +309,16 @@ public:
   new_FuncCall(AstExpr* id,
 	       AstExprList* expr_list,
 	       const FileRegion& loc);
+
+  /// @brief true 定数式を作る．
+  /// @param[in] loc ファイル位置
+  AstExpr*
+  new_TrueConst(const FileRegion& loc);
+
+  /// @brief false 定数式を作る．
+  /// @param[in] loc ファイル位置
+  AstExpr*
+  new_FalseConst(const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
   /// @param[in] val 値
