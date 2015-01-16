@@ -29,13 +29,13 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 変数名
   /// @param[in] type 型
-  /// @param[in] init_expr 初期化式
-  /// @param[in] global グローバル変数の時 true にするフラグ
+  /// @param[in] expr 初期化式
   /// @param[in] loc ファイル位置
+  ///
+  /// expr は NULL の場合もある．
   AstVarDecl(ShString name,
 	     AstType* type,
-	     AstExpr* init_expr,
-	     bool global,
+	     AstExpr* expr,
 	     const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -48,27 +48,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 名前を得る．
-  ShString
-  name() const;
-
   /// @brief インデックス番号を返す．
   ymuint
   index() const;
-
-  /// @brief 型を得る．
-  AstType*
-  type() const;
-
-  /// @brief 初期化式を返す．
-  ///
-  /// NULL の場合もある．
-  AstExpr*
-  init_expr() const;
-
-  /// @brief グローバル変数の時 true を返す．
-  bool
-  global() const;
 
 
 public:
@@ -76,11 +58,40 @@ public:
   // AstStatement の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
+  /// @brief 名前を返す．
+  ///
+  /// kEnumDecl, kFuncDecl, kVarDecl のみ有効
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 型を返す．
+  ///
+  /// kFuncDecl, kVarDecl のみ有効
+  virtual
+  const AstType*
+  type() const;
+
+  /// @brief 式を返す．
+  ///
+  /// kExprStmt, kReturn, kVarDecl のみ有効
+  virtual
+  const AstExpr*
+  expr() const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr);
 
   /// @brief 参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
@@ -112,7 +123,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -129,10 +140,7 @@ private:
   AstType* mType;
 
   // 初期化式
-  AstExpr* mInitExpr;
-
-  // グローバル変数の時 true にするフラグ
-  bool mGlobal;
+  AstExpr* mExpr;
 
 };
 

@@ -42,14 +42,16 @@ class YmslParser;
 class YmslScope;
 class YmslSubspace;
 class YmslType;
+class YmslTypeMgr;
 class YmslVar;
 
 class ObjHandle;
 
 class AstCaseItem;
+class AstEnumDecl;
+class AstEnumConst;
 class AstExpr;
 class AstFuncDecl;
-class AstIfBlock;
 class AstMgr;
 class AstModule;
 class AstParam;
@@ -65,10 +67,10 @@ class AstList;
 
 typedef AstList<AstModule> AstModuleList;
 typedef AstList<AstStatement> AstStmtList;
-typedef AstList<AstIfBlock> AstIfList;
 typedef AstList<AstCaseItem> AstCaseList;
 typedef AstList<AstParam> AstParamList;
 typedef AstList<AstExpr> AstExprList;
+typedef AstList<AstEnumConst> AstEnumConstList;
 typedef AstList<AstSymbol> AstSymbolList;
 
 #if 0
@@ -226,6 +228,41 @@ enum TypeId {
 ostream&
 operator<<(ostream& s,
 	   TypeId vt);
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 文の種類
+//////////////////////////////////////////////////////////////////////
+enum StmtType {
+  kBlockStmt,
+  kBreak,
+  kContinue,
+  kDoWhile,
+  kEnumDecl,
+  kEqAssign,
+  kEqPlus,
+  kEqMinus,
+  kEqMult,
+  kEqDiv,
+  kEqMod,
+  kEqLshift,
+  kEqRshift,
+  kEqAnd,
+  kEqOr,
+  kEqXor,
+  kExprStmt,
+  kFor,
+  kFuncDecl,
+  kGoto,
+  kIf,
+  kImport,
+  kLabel,
+  kReturn,
+  kSwitch,
+  kToplevel,
+  kVarDecl,
+  kWhile
+};
 
 
 //////////////////////////////////////////////////////////////////////

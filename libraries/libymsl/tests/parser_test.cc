@@ -30,7 +30,9 @@ parser_test1(IDO& ido)
   bool stat = mgr.read_source(ido);
   if ( stat ) {
     AstStatement* toplevel = mgr.toplevel();
+#if 0
     toplevel->print(cout, 0);
+#endif
   }
 
   return 0;

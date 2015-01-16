@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstBlockStmt.h"
+#include "AstStatement.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief for 文を表す Ast
 //////////////////////////////////////////////////////////////////////
 class AstFor :
-  public AstBlockStmt
+  public AstStatement
 {
 public:
 
@@ -27,12 +27,12 @@ public:
   /// @param[in] init 初期化文
   /// @param[in] cond 条件式
   /// @param[in] next 増加文
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstFor(AstStatement* init,
 	 AstExpr* cond,
 	 AstStatement* next,
-	 AstStmtList* stmt_list,
+	 AstStatement* stmt,
 	 const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -45,11 +45,47 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
+  /// @brief 条件式を返す．
+  ///
+  /// kDoWhile, kFor, kIf, kWhile, kSwitch のみ有効
+  virtual
+  const AstExpr*
+  expr() const;
+
+  /// @brief 初期化文を返す．
+  ///
+  /// kFor のみ有効
+  virtual
+  const AstStatement*
+  init_stmt() const;
+
+  /// @brief 増加文を返す．
+  ///
+  /// kFor のみ有効
+  virtual
+  const AstStatement*
+  next_stmt() const;
+
+  /// @brief 本体の文を返す．
+  ///
+  /// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+  virtual
+  const AstStatement*
+  stmt() const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr);
 
   /// @brief 参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
@@ -81,7 +117,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -92,10 +128,13 @@ private:
   AstStatement* mInit;
 
   // 条件
-  AstExpr* mCond;
+  AstExpr* mExpr;
 
   // 増加文
   AstStatement* mNext;
+
+  // 本体の文
+  AstStatement* mStmt;
 
 };
 

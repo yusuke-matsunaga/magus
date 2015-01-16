@@ -24,12 +24,14 @@ class AstAssignment :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] token トークン
+  /// @param[in] stmt_type 文の種類
   /// @param[in] left 左辺
   /// @param[in] right 右辺
-  AstAssignment(TokenType token,
+  /// @param[in] loc ファイル位置
+  AstAssignment(StmtType stmt_type,
 		AstExpr* left,
-		AstExpr* right);
+		AstExpr* right,
+		const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
@@ -41,11 +43,35 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
+  /// @brief 左辺式を返す．
+  ///
+  /// kAssignment のみ有効
+  virtual
+  const AstExpr*
+  lhs_expr() const;
+
+  /// @brief 式を返す．
+  ///
+  /// kAssignment,
+  /// kDoWhile, kFor, kIf, kWhile, kSwitch
+  /// kExprStmt, kReturn, kVarDecl のみ有効
+  virtual
+  const AstExpr*
+  expr() const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr);
 
   /// @brief 参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
@@ -77,6 +103,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
+#endif
 
 
 private:
@@ -84,8 +111,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // トークン
-  TokenType mToken;
+  // 文の種類
+  StmtType mStmtType;
 
   // 左辺式
   AstExpr* mLeft;

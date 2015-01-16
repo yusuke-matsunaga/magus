@@ -7,11 +7,6 @@
 /// All rights reserved.
 
 #include "AstExprStmt.h"
-#include "AstExpr.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -22,8 +17,10 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] expr 式
-AstExprStmt::AstExprStmt(AstExpr* expr) :
-  AstStatement(expr->file_region()),
+// @param[in] loc ファイル位置
+AstExprStmt::AstExprStmt(AstExpr* expr,
+			 const FileRegion& loc) :
+  AstStatement(loc),
   mExpr(expr)
 {
 }
@@ -33,11 +30,31 @@ AstExprStmt::~AstExprStmt()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstExprStmt::phase1(YmslScope* parent_scope)
+// @brief 種類を返す．
+StmtType
+AstExprStmt::stmt_type() const
 {
+  return kExprStmt;
+}
+
+// @brief 式を返す．
+//
+// kExprStmt のみ有効
+const AstExpr*
+AstExprStmt::expr() const
+{
+  return mExpr;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
+void
+AstExprStmt::phase1(YmslScope* parent_scope,
+		    YmslTypeMgr* type_mgr)
+{
+  mExpr->resolve_var(parent_scope);
 }
 
 // @brief 参照解決を行う．
@@ -45,7 +62,6 @@ AstExprStmt::phase1(YmslScope* parent_scope)
 void
 AstExprStmt::phase2(YmslScope* parent_scope)
 {
-  mExpr->resolve_var(parent_scope);
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -80,5 +96,6 @@ AstExprStmt::print(ostream& s,
   mExpr->print(s);
   s << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

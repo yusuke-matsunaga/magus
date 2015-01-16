@@ -8,10 +8,6 @@
 
 #include "AstContinue.h"
 
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -31,14 +27,24 @@ AstContinue::~AstContinue()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 種類を返す．
+StmtType
+AstContinue::stmt_type() const
+{
+  return kContinue;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstContinue::phase1(YmslScope* parent_scope)
+AstContinue::phase1(YmslScope* parent_scope,
+		    YmslTypeMgr* type_mgr)
 {
 }
 
-// @brief 参照解決を行う．
+// @brief 関数の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstContinue::phase2(YmslScope* parent_scope)
@@ -75,5 +81,6 @@ AstContinue::print(ostream& s,
   print_indent(s, indent);
   s << "continue" << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

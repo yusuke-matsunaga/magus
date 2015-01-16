@@ -10,8 +10,6 @@
 #include "AstFuncDecl.h"
 #include "AstList.h"
 
-#include "YmslScope.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -23,31 +21,25 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] name 関数名
 // @param[in] type 型
 // @param[in] param_list パラメータリスト
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstFuncDecl::AstFuncDecl(ShString name,
 			 AstType* type,
 			 AstParamList* param_list,
-			 AstStmtList* stmt_list,
+			 AstStatement* stmt,
 			 const FileRegion& loc) :
   AstStatement(loc),
   mName(name),
   mIndex(-1),
   mType(type),
   mParamList(param_list->size()),
-  mStmtList(stmt_list->size()),
+  mStmt(stmt),
   mScope(NULL)
 {
   ymuint pos = 0;
   for (AstParamList::Iterator p = param_list->begin();
        !p.is_end(); p.next()) {
     mParamList[pos] = *p;
-    ++ pos;
-  }
-  pos = 0;
-  for (AstStmtList::Iterator p = stmt_list->begin();
-       !p.is_end(); p.next()) {
-    mStmtList[pos] = *p;
     ++ pos;
   }
 }
@@ -57,13 +49,6 @@ AstFuncDecl::~AstFuncDecl()
 {
 }
 
-// @brief 名前を得る．
-ShString
-AstFuncDecl::name() const
-{
-  return mName;
-}
-
 // @brief インデックス番号を返す．
 ymuint
 AstFuncDecl::index() const
@@ -71,41 +56,77 @@ AstFuncDecl::index() const
   return mIndex;
 }
 
+// @brief 種類を返す．
+StmtType
+AstFuncDecl::stmt_type() const
+{
+  return kFuncDecl;
+}
+
+// @brief 名前を得る．
+ShString
+AstFuncDecl::name() const
+{
+  return mName;
+}
+
 // @brief 出力の型を返す．
-AstType*
+const AstType*
 AstFuncDecl::type() const
 {
   return mType;
 }
 
-// @brief パラメータリストを返す．
-const vector<AstParam*>&
-AstFuncDecl::param_list() const
+// @brief パラメータリストの要素数を返す．
+//
+// kFuncDecl のみ有効
+ymuint
+AstFuncDecl::param_num() const
 {
-  return mParamList;
+  return mParamList.size();
 }
 
-// @brief 本体のリストを返す．
-const vector<AstStatement*>&
-AstFuncDecl::stmt_list() const
+// @brief パラメータリストの要素を返す．
+// @param[in] pos 位置 ( 0 <= pos < param_num() )
+//
+// kFuncDecl のみ有効
+const AstParam*
+AstFuncDecl::param(ymuint pos) const
 {
-  return mStmtList;
+  ASSERT_COND( pos < param_num() );
+  return mParamList[pos];
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 本体の文を返す．
+//
+// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+const AstStatement*
+AstFuncDecl::stmt() const
+{
+  return mStmt;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstFuncDecl::phase1(YmslScope* parent_scope)
+AstFuncDecl::phase1(YmslScope* parent_scope,
+		    YmslTypeMgr* type_mgr)
 {
+#if 0
   // parent_scope に関数を登録
 
   // 自身のスコープを作る．
   mScope = new YmslScope(parent_scope);
 
+  // mParamList を mScope に登録．
+
   ymuint n = mStmtList.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mStmtList[i]->phase1(mScope);
+    mStmtList[i]->phase1(mScope, type_mgr);
   }
+#endif
 }
 
 // @brief 参照解決を行う．
@@ -113,12 +134,12 @@ AstFuncDecl::phase1(YmslScope* parent_scope)
 void
 AstFuncDecl::phase2(YmslScope* parent_scope)
 {
-  // mParamList を mScope に登録．
-
+#if 0
   ymuint n = mStmtList.size();
   for (ymuint i = 0; i < n; ++ i) {
     mStmtList[i]->phase2(mScope);
   }
+#endif
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -149,5 +170,6 @@ AstFuncDecl::print(ostream& s,
 		   ymuint indent) const
 {
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

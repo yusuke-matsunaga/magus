@@ -8,8 +8,6 @@
 
 
 #include "AstVarDecl.h"
-#include "AstType.h"
-#include "YmslScope.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -21,33 +19,23 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 変数名
 // @param[in] type 型
-// @param[in] init_expr 初期化式
-// @param[in] global グローバル変数の時 true にするフラグ
+// @param[in] expr 初期化式
 // @param[in] loc ファイル位置
 AstVarDecl::AstVarDecl(ShString name,
 		       AstType* type,
-		       AstExpr* init_expr,
-		       bool global,
+		       AstExpr* expr,
 		       const FileRegion& loc) :
   AstStatement(loc),
   mName(name),
   mIndex(-1),
   mType(type),
-  mInitExpr(init_expr),
-  mGlobal(global)
+  mExpr(expr)
 {
 }
 
 // @brief デストラクタ
 AstVarDecl::~AstVarDecl()
 {
-}
-
-// @brief 名前を得る．
-ShString
-AstVarDecl::name() const
-{
-  return mName;
 }
 
 // @brief インデックス番号を返す．
@@ -57,34 +45,53 @@ AstVarDecl::index() const
   return mIndex;
 }
 
-// @brief 型を得る．
-AstType*
+// @brief 種類を返す．
+StmtType
+AstVarDecl::stmt_type() const
+{
+  return kVarDecl;
+}
+
+// @brief 名前を返す．
+//
+// kEnumDecl, kFuncDecl, kVarDecl のみ有効
+ShString
+AstVarDecl::name() const
+{
+  return mName;
+}
+
+// @brief 型を返す．
+//
+// kFuncDecl, kVarDecl のみ有効
+const AstType*
 AstVarDecl::type() const
 {
   return mType;
 }
 
-// @brief 初期化式を返す．
+// @brief 式を返す．
 //
-// NULL の場合もある．
-AstExpr*
-AstVarDecl::init_expr() const
+// kExprStmt, kReturn, kVarDecl のみ有効
+const AstExpr*
+AstVarDecl::expr() const
 {
-  return mInitExpr;
+  return mExpr;
 }
 
-// @brief グローバル変数の時 true を返す．
-bool
-AstVarDecl::global() const
-{
-  return mGlobal;
-}
-
-// @brief スコープの生成と関数の登録を行う．
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstVarDecl::phase1(YmslScope* parent_scope)
+AstVarDecl::phase1(YmslScope* parent_scope,
+		   YmslTypeMgr* type_mgr)
 {
+  //parent_scope->add_var(this);
+
+  if ( mExpr != NULL ) {
+    mExpr->resolve_var(parent_scope);
+  }
 }
 
 // @brief 参照解決を行う．
@@ -92,7 +99,6 @@ AstVarDecl::phase1(YmslScope* parent_scope)
 void
 AstVarDecl::phase2(YmslScope* parent_scope)
 {
-  //parent_scope->add_var(this);
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -123,12 +129,13 @@ AstVarDecl::print(ostream& s,
 		  ymuint indent) const
 {
   print_indent(s, indent);
-  if ( global() ) {
-    s << "global ";
-  }
   s << "var " << name() << ": ";
   type()->print(s);
+  if ( expr() != NULL ) {
+    expr()->print(s);
+  }
   s << ";" << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

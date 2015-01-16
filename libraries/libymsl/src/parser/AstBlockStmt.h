@@ -39,13 +39,36 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
+  /// @brief 文のリストの要素数を返す．
+  ///
+  /// AstBlockStmt のみ有効
+  virtual
+  ymuint
+  stmtlist_num() const;
+
+  /// @brief 文のリストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < stmt_num() )
+  ///
+  /// AstBlockStmt のみ有効
+  virtual
+  const AstStatement*
+  stmtlist_elem(ymuint pos) const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr);
 
-  /// @brief 参照解決を行う．
+  /// @brief 関数の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
   virtual
   void
@@ -75,6 +98,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
+#endif
 
 
 private:

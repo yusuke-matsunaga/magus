@@ -39,6 +39,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
 };
 
 END_NAMESPACE_YM_YMSL

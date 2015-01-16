@@ -24,9 +24,13 @@ class AstIf :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] if_list IfBlock のリスト
+  /// @param[in] expr 条件式
+  /// @param[in] then_stmt 条件が成り立った時実行される文のリスト
+  /// @param[in] else_stmt 条件が成り立たなかった時実行される文
   /// @param[in] loc ファイル位置
-  AstIf(AstIfList* if_list,
+  AstIf(AstExpr* expr,
+	AstStatement* then_stmt,
+	AstStatement* else_stmt,
 	const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -39,13 +43,44 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
+  /// @brief 式を返す．
+  ///
+  /// kAssignment,
+  /// kDoWhile, kFor, kIf, kWhile, kSwitch
+  /// kExprStmt, kReturn, kVarDecl のみ有効
+  virtual
+  const AstExpr*
+  expr() const;
+
+  /// @brief 本体の文を返す．
+  ///
+  /// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+  virtual
+  const AstStatement*
+  stmt() const;
+
+  /// @brief else 節を得る．
+  ///
+  /// kIf のみ有効
+  virtual
+  const AstStatement*
+  else_stmt() const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr);
 
-  /// @brief 参照解決を行う．
+  /// @brief 関数の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
   virtual
   void
@@ -75,6 +110,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
+#endif
 
 
 private:
@@ -82,8 +118,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // if ブロックのリスト
-  vector<AstIfBlock*> mIfBlockList;
+  // 式
+  AstExpr* mExpr;
+
+  // then 節
+  AstStatement* mStmt;
+
+  // else 節
+  AstStatement* mElseStmt;
 
 };
 

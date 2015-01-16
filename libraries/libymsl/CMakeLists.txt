@@ -35,6 +35,7 @@ set (ymsl_SOURCES
   src/parser/AstBreak.cc
   src/parser/AstContinue.cc
   src/parser/AstDoWhile.cc
+  src/parser/AstEnumDecl.cc
   src/parser/AstExpr.cc
   src/parser/AstExprStmt.cc
   src/parser/AstFloatConst.cc

@@ -7,11 +7,6 @@
 /// All rights reserved.
 
 #include "AstReturn.h"
-#include "AstExpr.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -35,11 +30,33 @@ AstReturn::~AstReturn()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstReturn::phase1(YmslScope* parent_scope)
+// @brief 種類を返す．
+StmtType
+AstReturn::stmt_type() const
 {
+  return kReturn;
+}
+
+// @brief 式を返す．
+//
+// kExprStmt, kReturn のみ有効
+const AstExpr*
+AstReturn::expr() const
+{
+  return mExpr;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
+void
+AstReturn::phase1(YmslScope* parent_scope,
+		  YmslTypeMgr* type_mgr)
+{
+  if ( mExpr != NULL ) {
+    mExpr->resolve_var(parent_scope);
+  }
 }
 
 // @brief 参照解決を行う．
@@ -47,9 +64,6 @@ AstReturn::phase1(YmslScope* parent_scope)
 void
 AstReturn::phase2(YmslScope* parent_scope)
 {
-  if ( mExpr != NULL ) {
-    mExpr->resolve_var(parent_scope);
-  }
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -90,5 +104,6 @@ AstReturn::print(ostream& s,
   }
   s << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

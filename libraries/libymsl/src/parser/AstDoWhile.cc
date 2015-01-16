@@ -7,11 +7,6 @@
 /// All rights reserved.
 
 #include "AstDoWhile.h"
-#include "AstExpr.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -21,14 +16,15 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
-AstDoWhile::AstDoWhile(AstStmtList* stmt_list,
+AstDoWhile::AstDoWhile(AstStatement* stmt,
 		       AstExpr* cond,
 		       const FileRegion& loc) :
-  AstBlockStmt(stmt_list, loc),
-  mCond(cond)
+  AstStatement(loc),
+  mStmt(stmt),
+  mExpr(cond)
 {
 }
 
@@ -37,20 +33,50 @@ AstDoWhile::~AstDoWhile()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstDoWhile::phase1(YmslScope* parent_scope)
+// @brief 種類を返す．
+StmtType
+AstDoWhile::stmt_type() const
 {
-  AstBlockStmt::phase1(parent_scope);
+  return kDoWhile;
 }
 
-// @brief 参照解決を行う．
+// @brief 式を返す．
+//
+// kAssignment,
+// kDoWhile, kFor, kIf, kWhile, kSwitch
+// kExprStmt, kReturn, kVarDecl のみ有効
+const AstExpr*
+AstDoWhile::expr() const
+{
+  return mExpr;
+}
+
+// @brief 本体の文を返す．
+//
+// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+const AstStatement*
+AstDoWhile::stmt() const
+{
+  return mStmt;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
+void
+AstDoWhile::phase1(YmslScope* parent_scope,
+		   YmslTypeMgr* type_mgr)
+{
+  mCond->resolve_var(parent_scope);
+  AstBlockStmt::phase1(parent_scope, type_mgr);
+}
+
+// @brief 関数の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstDoWhile::phase2(YmslScope* parent_scope)
 {
-  mCond->resolve_var(parent_scope);
   AstBlockStmt::phase2(parent_scope);
 }
 
@@ -99,5 +125,6 @@ AstDoWhile::print(ostream& s,
   mCond->print(s);
   s << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

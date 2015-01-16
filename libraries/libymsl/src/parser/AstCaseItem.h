@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstBlockStmt.h"
+#include "Ast.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,16 +19,16 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief case ブロックを表す Ast
 //////////////////////////////////////////////////////////////////////
 class AstCaseItem :
-  public AstBlockStmt
+  public Ast
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] label ラベル
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstCaseItem(AstExpr* label,
-	      AstStmtList* stmt_list,
+	      AstStatement* stmt,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -41,6 +41,15 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ラベルを返す．
+  const AstExpr*
+  label() const;
+
+  /// @brief 本体の文を返す．
+  const AstStatement*
+  stmt() const;
+
+#if 0
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   /// @param[in] indent インデントレベル
@@ -48,6 +57,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
+#endif
 
 
 private:
@@ -57,6 +67,9 @@ private:
 
   // ラベル
   AstExpr* mLabel;
+
+  // 本体の文
+  AstStatement* mStmt;
 
 };
 

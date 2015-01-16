@@ -9,10 +9,6 @@
 #include "AstBlockStmt.h"
 #include "AstList.h"
 
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -42,16 +38,46 @@ AstBlockStmt::~AstBlockStmt()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 種類を返す．
+StmtType
+AstBlockStmt::stmt_type() const
+{
+  return kBlockStmt;
+}
+
+// @brief 文のリストの要素数を返す．
+//
+// AstBlockStmt のみ有効
+ymuint
+AstBlockStmt::stmtlist_num() const
+{
+  return mStmtList.size();
+}
+
+// @brief 文のリストの要素を返す．
+// @param[in] pos 位置 ( 0 <= pos < stmt_num() )
+//
+// AstBlockStmt のみ有効
+const AstStatement*
+AstBlockStmt::stmtlist_elem(ymuint pos) const
+{
+  ASSERT_COND( pos < stmtlist_num() );
+  return mStmtList[pos];
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstBlockStmt::phase1(YmslScope* parent_scope)
+AstBlockStmt::phase1(YmslScope* parent_scope,
+		     YmslTypeMgr* type_mgr)
 {
   mScope = new YmslScope(parent_scope);
   ymuint n = mStmtList.size();
   for (ymuint i = 0; i < n; ++ i) {
     AstStatement* stmt = mStmtList[i];
-    stmt->phase1(mScope);
+    stmt->phase1(mScope, type_mgr);
   }
 }
 
@@ -107,5 +133,6 @@ AstBlockStmt::print(ostream& s,
     stmt->print(s, indent);
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

@@ -30,12 +30,12 @@ public:
   /// @param[in] name 関数名
   /// @param[in] type 型
   /// @param[in] param_list パラメータリスト
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
 	      AstType* type,
 	      AstParamList* param_list,
-	      AstStmtList* stmt_list,
+	      AstStatement* stmt,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -48,25 +48,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 名前を得る．
-  ShString
-  name() const;
-
   /// @brief インデックス番号を返す．
   ymuint
   index() const;
-
-  /// @brief 出力の型を返す．
-  AstType*
-  type() const;
-
-  /// @brief パラメータリストを返す．
-  const vector<AstParam*>&
-  param_list() const;
-
-  /// @brief 本体のリストを返す．
-  const vector<AstStatement*>&
-  stmt_list() const;
 
 
 public:
@@ -74,13 +58,53 @@ public:
   // AstStatement の仮想関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const;
+
+  /// @brief 名前を得る．
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 出力の型を返す．
+  virtual
+  const AstType*
+  type() const;
+
+  /// @brief パラメータリストの要素数を返す．
+  ///
+  /// kFuncDecl のみ有効
+  virtual
+  ymuint
+  param_num() const;
+
+  /// @brief パラメータリストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < param_num() )
+  ///
+  /// kFuncDecl のみ有効
+  virtual
+  const AstParam*
+  param(ymuint pos) const;
+
+  /// @brief 本体の文を返す．
+  ///
+  /// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+  virtual
+  const AstStatement*
+  stmt() const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope);
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr);
 
-  /// @brief 参照解決を行う．
+  /// @brief 関数の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
   virtual
   void
@@ -110,6 +134,7 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const;
+#endif
 
 
 private:
@@ -129,8 +154,8 @@ private:
   // パラメータリスト
   vector<AstParam*> mParamList;
 
-  // 本体の文リスト
-  vector<AstStatement*> mStmtList;
+  // 本体の文
+  AstStatement* mStmt;
 
   // スコープ
   YmslScope* mScope;

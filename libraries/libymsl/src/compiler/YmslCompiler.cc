@@ -11,6 +11,7 @@
 #include "AstMgr.h"
 #include "AstStatement.h"
 #include "YmslScope.h"
+#include "YmslTypeMgr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -45,8 +46,13 @@ YmslCompiler::compile(IDO& ido)
   AstStatement* toplevel = mgr.toplevel();
 
   YmslScope* toplevel_scope = new YmslScope(NULL, ShString("__main__"));
-  toplevel->phase1(toplevel_scope);
+
+  YmslTypeMgr type_mgr;
+
+#if 0
+  toplevel->phase1(toplevel_scope, &type_mgr);
   toplevel->phase2(toplevel_scope);
+#endif
 
   return true;
 }

@@ -7,13 +7,6 @@
 /// All rights reserved.
 
 #include "AstIf.h"
-#include "AstIfBlock.h"
-#include "AstExpr.h"
-#include "AstList.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -23,19 +16,19 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] if_list IfBlock のリスト
+// @param[in] expr 条件式
+// @param[in] then_stmt 条件が成り立った時実行される文のリスト
+// @param[in] else_stmt 条件が成り立たなかった時実行される文
 // @param[in] loc ファイル位置
-AstIf::AstIf(AstIfList* if_list,
+AstIf::AstIf(AstExpr* expr,
+	     AstStatement* then_stmt,
+	     AstStatement* else_stmt,
 	     const FileRegion& loc) :
   AstStatement(loc),
-  mIfBlockList(if_list->size())
+  mExpr(expr),
+  mStmt(then_stmt),
+  mElseStmt(else_stmt)
 {
-  ymuint pos = 0;
-  for (AstIfList::Iterator p = if_list->begin();
-       !p.is_end(); p.next()) {
-    mIfBlockList[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
@@ -43,14 +36,53 @@ AstIf::~AstIf()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 種類を返す．
+StmtType
+AstIf::stmt_type() const
+{
+  return kIf;
+}
+
+// @brief 式を返す．
+//
+// kAssignment,
+// kDoWhile, kFor, kIf, kWhile, kSwitch
+// kExprStmt, kReturn, kVarDecl のみ有効
+const AstExpr*
+AstIf::expr() const
+{
+  return mExpr;
+}
+
+// @brief 本体の文を返す．
+//
+// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+const AstStatement*
+AstIf::stmt() const
+{
+  return mStmt;
+}
+
+// @brief else 節を得る．
+//
+// kIf のみ有効
+const AstStatement*
+AstIf::else_stmt() const
+{
+  return mElseStmt;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstIf::phase1(YmslScope* parent_scope)
+AstIf::phase1(YmslScope* parent_scope,
+	      YmslTypeMgr* type_mgr)
 {
   ymuint n = mIfBlockList.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mIfBlockList[i]->phase1(parent_scope);
+    mIfBlockList[i]->phase1(parent_scope, type_mgr);
   }
 }
 
@@ -142,51 +174,6 @@ AstIf::print(ostream& s,
     s << "}" << endl;
   }
 }
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstIfBlock
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] cond 条件
-// @param[in] stmt_list 本体の文
-// @param[in] loc ファイル位置
-AstIfBlock::AstIfBlock(AstExpr* cond,
-		       AstStmtList* stmt_list,
-		       const FileRegion& loc) :
-  AstBlockStmt(stmt_list, loc),
-  mCond(cond)
-{
-}
-
-// @brief デストラクタ
-AstIfBlock::~AstIfBlock()
-{
-}
-
-// @brief 条件を返す．
-AstExpr*
-AstIfBlock::cond() const
-{
-  return mCond;
-}
-
-// @brief スコープの生成と関数の登録を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstIfBlock::phase1(YmslScope* parent_scope)
-{
-  AstBlockStmt::phase1(parent_scope);
-}
-
-// @brief 参照解決を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstIfBlock::phase2(YmslScope* parent_scope)
-{
-  mCond->resolve_var(parent_scope);
-  AstBlockStmt::phase2(parent_scope);
-}
+#endif
 
 END_NAMESPACE_YM_YMSL

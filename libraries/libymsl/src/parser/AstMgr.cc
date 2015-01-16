@@ -20,6 +20,7 @@
 #include "AstCaseItem.h"
 #include "AstContinue.h"
 #include "AstDoWhile.h"
+#include "AstEnumDecl.h"
 #include "AstExpr.h"
 #include "AstExprStmt.h"
 #include "AstFloatConst.h"
@@ -28,14 +29,12 @@
 #include "AstFuncDecl.h"
 #include "AstGoto.h"
 #include "AstIf.h"
-#include "AstIfBlock.h"
 #include "AstImport.h"
 #include "AstIntConst.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
 #include "AstList.h"
 #include "AstMapType.h"
-//#include "AstMemberRef.h"
 #include "AstModule.h"
 #include "AstNamedType.h"
 #include "AstParam.h"
@@ -178,21 +177,45 @@ AstMgr::new_Import(AstModuleList* module_list,
   return new (p) AstImport(module_list, loc);
 }
 
+// @brief enum 定義を作る．
+// @param[in] name 型名
+// @param[in] const_list 定数リスト
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_EnumDecl(AstSymbol* name,
+		     AstEnumConstList* const_list,
+		     const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstEnumDecl));
+  return new (p) AstEnumDecl(name, const_list, loc);
+}
+
+// @brief enum 定数を作る．
+// @param[in] name 定数名
+// @param[in] expr 値を表す式
+// @param[in] loc ファイル位置
+AstEnumConst*
+AstMgr::new_EnumConst(AstSymbol* name,
+		      AstExpr* expr,
+		      const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstEnumConst));
+  return new (p) AstEnumConst(name, expr, loc);
+}
+
 // @brief 変数宣言を作る．
 // @param[in] name 変数名
 // @param[in] type 型
 // @param[in] init_expr 初期化式
-// @param[in] global グローバル変数の時 true にするフラグ
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_VarDecl(AstSymbol* name,
 		    AstType* type,
 		    AstExpr* init_expr,
-		    bool global,
 		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstVarDecl));
-  return new (p) AstVarDecl(name->str_val(), type, init_expr, global, loc);
+  return new (p) AstVarDecl(name->str_val(), type, init_expr, loc);
 }
 
 // @brief パラメータ宣言を作る．
@@ -214,97 +237,90 @@ AstMgr::new_Param(AstSymbol* name,
 // @param[in] name 変数名
 // @param[in] type 型
 // @param[in] param_list パラメータリスト
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_FuncDecl(AstSymbol* name,
 		     AstType* type,
 		     AstParamList* param_list,
-		     AstStmtList* stmt_list,
+		     AstStatement* stmt,
 		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
-  return  new (p) AstFuncDecl(name->str_val(), type, param_list, stmt_list, loc);
+  return  new (p) AstFuncDecl(name->str_val(), type, param_list, stmt, loc);
 }
 
 // @brief 代入文を作る．
-// @param[in] token トークン
+// @param[in] stmt_type 文の種類
 // @param[in] left 左辺
 // @param[in] right 右辺
+// @param[in] loc ファイル位置
 AstStatement*
-AstMgr::new_Assignment(TokenType token,
+AstMgr::new_Assignment(StmtType stmt_type,
 		       AstExpr* left,
-		       AstExpr* right)
+		       AstExpr* right,
+		       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstAssignment));
-  return new (p) AstAssignment(token, left, right);
+  return new (p) AstAssignment(stmt_type, left, right, loc);
 }
 
 // @brief if 文を作る．
-// @param[in] if_list IfBlock のリスト
+// @param[in] expr 条件式
+// @param[in] then_stmt 条件が成り立った時実行される文のリスト
+// @param[in] else_stmt 条件が成り立たなかった時実行される文
 // @param[in] loc ファイル位置
 AstStatement*
-AstMgr::new_If(AstIfList* if_list,
+AstMgr::new_If(AstExpr* expr,
+	       AstStatement* then_stmt,
+	       AstStatement* else_stmt,
 	       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIf));
-  return new (p) AstIf(if_list, loc);
-}
-
-// @brief if blockを作る
-// @param[in] cond 条件式
-// @param[in] stmt_list 本体の文
-// @param[in] loc ファイル位置
-AstIfBlock*
-AstMgr::new_IfBlock(AstExpr* cond,
-		    AstStmtList* stmt_list,
-		    const FileRegion& loc)
-{
-  void* p = mAlloc.get_memory(sizeof(AstIfBlock));
-  return new (p) AstIfBlock(cond, stmt_list, loc);
+  return new (p) AstIf(expr, then_stmt, else_stmt, loc);
 }
 
 // @brief for 文を作る．
 // @param[in] init 初期化文
 // @param[in] cond 条件式
 // @param[in] next 増加文
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_For(AstStatement* init,
 		AstExpr* cond,
 		AstStatement* next,
-		AstStmtList* stmt_list,
+		AstStatement* stmt,
 		const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFor));
-  return new (p) AstFor(init, cond, next, stmt_list, loc);
+  return new (p) AstFor(init, cond, next, stmt, loc);
 }
 
 // @brief while 文を作る．
 // @param[in] cond 条件式
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_While(AstExpr* cond,
-		  AstStmtList* stmt_list,
+		  AstStatement* stmt,
 		  const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstWhile));
-  return new (p) AstWhile(cond, stmt_list, loc);
+  return new (p) AstWhile(cond, stmt, loc);
 }
 
 // @brief do-while 文を作る．
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] cond 条件式
 // @param[in] loc ファイル位置
 AstStatement*
-AstMgr::new_DoWhile(AstStmtList* stmt_list,
+AstMgr::new_DoWhile(AstStatement* stmt,
 		    AstExpr* cond,
 		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstDoWhile));
-  return new (p) AstDoWhile(stmt_list, cond, loc);
+  return new (p) AstDoWhile(stmt, cond, loc);
 }
 
 // @brief switch 文を作る．
@@ -322,15 +338,15 @@ AstMgr::new_Switch(AstExpr* expr,
 
 // @brief case-item を作る．
 // @param[in] label ラベル
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstCaseItem*
 AstMgr::new_CaseItem(AstExpr* label,
-		     AstStmtList* stmt_list,
+		     AstStatement* stmt,
 		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstCaseItem));
-  return new (p) AstCaseItem(label, stmt_list, loc);
+  return new (p) AstCaseItem(label, stmt, loc);
 }
 
 // @brief goto 文を作る．
@@ -397,11 +413,13 @@ AstMgr::new_BlockStmt(AstStmtList* stmt_list,
 
 // @brief 式文を作る．
 // @param[in] expr 式
+// @param[in] loc ファイル位置
 AstStatement*
-AstMgr::new_ExprStmt(AstExpr* expr)
+AstMgr::new_ExprStmt(AstExpr* expr,
+		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstExprStmt));
-  return new (p) AstExprStmt(expr);
+  return new (p) AstExprStmt(expr, loc);
 }
 
 // @brief 単項演算式を作る．

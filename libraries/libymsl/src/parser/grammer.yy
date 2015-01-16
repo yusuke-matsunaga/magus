@@ -88,20 +88,20 @@ fr_merge(const FileRegion fr_array[],
 
 // 値を表す型
 %union {
-  TokenType       token_type;
-  AstCaseList*    caselist_type;
-  AstExpr*        expr_type;
-  AstExprList*    exprlist_type;
-  AstIfList*      iflist_type;
-  AstModule*      module_type;
-  AstModuleList*  modulelist_type;
-  AstParam*       param_type;
-  AstParamList*   paramlist_type;
-  AstStatement*   statement_type;
-  AstStmtList*    stmtlist_type;
-  AstSymbol*      symbol_type;
-  AstSymbolList*  symlist_type;
-  AstType*        type_type;
+  AstCaseList*      caselist_type;
+  AstEnumConstList* eclist_type;
+  AstExpr*          expr_type;
+  AstExprList*      exprlist_type;
+  AstModule*        module_type;
+  AstModuleList*    modulelist_type;
+  AstParam*         param_type;
+  AstParamList*     paramlist_type;
+  AstStatement*     statement_type;
+  AstStmtList*      stmtlist_type;
+  AstSymbol*        symbol_type;
+  AstSymbolList*    symlist_type;
+  AstType*          type_type;
+  StmtType          stmttype_type;
 }
 
 
@@ -182,24 +182,25 @@ fr_merge(const FileRegion fr_array[],
 
 // 非終端の型
 %type <caselist_type>   case_list
+%type <eclist_type>     enumconst_list
 %type <expr_type>       expr
 %type <expr_type>       init_expr
 %type <expr_type>       primary
 %type <exprlist_type>   expr_list
-%type <iflist_type>     if_list
-%type <iflist_type>     if_else_list
 %type <module_type>     module
 %type <modulelist_type> module_list
 %type <param_type>      param
 %type <paramlist_type>  param_list
-%type <statement_type>  complex_statement
+%type <statement_type>  block_stmt
+%type <statement_type>  complex_stmt
 %type <statement_type>  item
-%type <statement_type>  single_statement
+%type <statement_type>  single_stmt
 %type <statement_type>  statement
+%type <statement_type>  else_stmt
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
+%type <stmttype_type>   eqop
 %type <symlist_type>    symbol_list
-%type <token_type>      eqop
 %type <type_type>       type
 
 %%
@@ -212,6 +213,7 @@ item_top
 : item_list
 {
   mgr.set_root($1, @$);
+  delete $1;
 }
 
 // 要素のリスト
@@ -238,6 +240,7 @@ item
 | IMPORT module_list SEMI
 {
   $$ = mgr.new_Import($2, @$);
+  delete $2;
 }
 ;
 
@@ -269,24 +272,31 @@ module
 // ステートメント
 statement
 // 単一のステートメント
-: single_statement SEMI
+: single_stmt SEMI
 {
   $$ = $1;
 }
 // 複合文
-| complex_statement
+| complex_stmt
 {
   $$ = $1;
 }
-// 関数定義
-| FUNCTION SYMBOL LP param_list RP COLON type LCB statement_list RCB
+// enum 定義
+| ENUM SYMBOL LP enumconst_list RP SEMI
 {
-  $$ = mgr.new_FuncDecl($2, $7, $4, $9, @$);
+  $$ = mgr.new_EnumDecl($2, $4, @$);
+  delete $4;
+}
+// 関数定義
+| FUNCTION SYMBOL LP param_list RP COLON type block_stmt
+{
+  $$ = mgr.new_FuncDecl($2, $7, $4, $8, @$);
+  delete $4;
 }
 // 変数定義
 | VAR SYMBOL COLON type init_expr SEMI
 {
-  $$ = mgr.new_VarDecl($2, $4, $5, false, @$);
+  $$ = mgr.new_VarDecl($2, $4, $5, @$);
 }
 // ラベル文
 | SYMBOL COLON
@@ -300,16 +310,16 @@ statement
 }
 ;
 
-single_statement
+single_stmt
 // 代入文
 : primary eqop expr
 {
-  $$ = mgr.new_Assignment($2, $1, $3);
+  $$ = mgr.new_Assignment($2, $1, $3, @$);
 }
 // 式文
 | expr
 {
-  $$ = mgr.new_ExprStmt($1);
+  $$ = mgr.new_ExprStmt($1, @$);
 }
 // インクリメント文
 | primary PLUSPLUS
@@ -346,54 +356,91 @@ single_statement
 }
 ;
 
+enumconst_list
+: SYMBOL
+{
+  AstEnumConst* ec = mgr.new_EnumConst($1, NULL, @$);
+  $$ = new AstEnumConstList;
+  $$->add(ec);
+}
+| SYMBOL EQ expr
+{
+  AstEnumConst* ec = mgr.new_EnumConst($1, $3, @$);
+  $$ = new AstEnumConstList;
+  $$->add(ec);
+}
+| enumconst_list COMMA SYMBOL
+{
+  AstEnumConst* ec = mgr.new_EnumConst($3, NULL, @3);
+  $$ = $1;
+  $$->add(ec);
+}
+| enumconst_list COMMA SYMBOL EQ expr
+{
+  AstEnumConst* ec = mgr.new_EnumConst($3, $5, FileRegion(@3, @5));
+  $$ = $1;
+  $$->add(ec);
+}
+;
+
 // 代入文の演算子
 // なんかバカみたいなアクション定義
 eqop
-: EQ       { $$ = EQ; }
-| EQPLUS   { $$ = EQPLUS; }
-| EQMINUS  { $$ = EQMINUS; }
-| EQMULT   { $$ = EQMULT; }
-| EQDIV    { $$ = EQDIV; }
-| EQMOD    { $$ = EQMOD; }
-| EQLSHIFT { $$ = EQLSHIFT; }
-| EQRSHIFT { $$ = EQRSHIFT; }
-| EQBITAND { $$ = EQBITAND; }
-| EQBITOR  { $$ = EQBITOR; }
-| EQBITXOR { $$ = EQBITXOR; }
+: EQ       { $$ = kEqAssign; }
+| EQPLUS   { $$ = kEqPlus; }
+| EQMINUS  { $$ = kEqMinus; }
+| EQMULT   { $$ = kEqMult; }
+| EQDIV    { $$ = kEqDiv; }
+| EQMOD    { $$ = kEqMod; }
+| EQLSHIFT { $$ = kEqLshift; }
+| EQRSHIFT { $$ = kEqRshift; }
+| EQBITAND { $$ = kEqAnd; }
+| EQBITOR  { $$ = kEqOr; }
+| EQBITXOR { $$ = kEqXor; }
 ;
 
 // 複合文
 // というか末尾にセミコロンがこない文
-complex_statement
+complex_stmt
 // IF 文
-: if_else_list
+: IF expr block_stmt else_stmt
 {
-  $$ = mgr.new_If($1, @$);
+  $$ = mgr.new_If($2, $3, $4, @$);
 }
 // FOR 文
-| FOR LP single_statement SEMI expr SEMI single_statement RP LCB statement_list RCB
+| FOR LP single_stmt SEMI expr SEMI single_stmt RP block_stmt
 {
-  $$ = mgr.new_For($3, $5, $7, $10, @$);
+  $$ = mgr.new_For($3, $5, $7, $9, @$);
 }
 // WHILE 文
-| WHILE LP expr RP LCB statement_list RCB
+| WHILE LP expr RP block_stmt
 {
-  $$ = mgr.new_While($3, $6, @$);
+  $$ = mgr.new_While($3, $5, @$);
 }
 // DO-WHILE 文
-| DO LCB statement_list RCB WHILE LP expr RP
+| DO block_stmt WHILE LP expr RP
 {
-  $$ = mgr.new_DoWhile($3, $7, @$);
+  $$ = mgr.new_DoWhile($2, $5, @$);
 }
 // SWITCH 文
 | SWITCH expr LCB case_list RCB
 {
   $$ = mgr.new_Switch($2, $4, @$);
+  delete $4;
 }
 // ブロック文
-| LCB statement_list RCB
+| block_stmt
+{
+  $$ = $1;
+}
+;
+
+// ブロック文
+block_stmt
+: LCB statement_list RCB
 {
   $$ = mgr.new_BlockStmt($2, @$);
+  delete $2;
 }
 ;
 
@@ -409,33 +456,19 @@ statement_list
 }
 ;
 
-// if 〜 elif 〜 のリスト
-if_list
-: IF expr LCB statement_list RCB
+// elif/else 節のリスト
+else_stmt
+: // 空
 {
-  AstIfBlock* block = mgr.new_IfBlock($2, $4, @$);
-  $$ = new AstIfList;
-  $$->add(block);
+  $$ = NULL;
 }
-| if_list ELIF expr LCB statement_list RCB
+| ELSE block_stmt
 {
-  AstIfBlock* block = mgr.new_IfBlock($3, $5, FileRegion(@2, @6));
-  $$ = $1;
-  $$->add(block);
+  $$ = $2;
 }
-;
-
-// if_list の末尾にオプションで else 〜 がくるもの
-if_else_list
-: if_list
+| ELIF expr block_stmt else_stmt
 {
-  $$ = $1;
-}
-| if_list ELSE LCB statement_list RCB
-{
-  AstIfBlock* block = mgr.new_IfBlock(NULL, $4, FileRegion(@2, @5));
-  $$ = $1;
-  $$->add(block);
+  $$ = mgr.new_If($2, $3, $4, @$);
 }
 ;
 
@@ -444,15 +477,15 @@ case_list
 {
   $$ = new AstCaseList;
 }
-| case_list CASE expr COLON LCB statement_list RCB
+| case_list CASE expr COLON block_stmt
 {
-  AstCaseItem* item = mgr.new_CaseItem($3, $6, FileRegion(@2, @7));
+  AstCaseItem* item = mgr.new_CaseItem($3, $5, FileRegion(@2, @5));
   $$ = $1;
   $$->add(item);
 }
-| case_list DEFAULT COLON LCB statement_list RCB
+| case_list DEFAULT COLON block_stmt
 {
-  AstCaseItem* item = mgr.new_CaseItem(NULL, $5, FileRegion(@2, @6));
+  AstCaseItem* item = mgr.new_CaseItem(NULL, $4, FileRegion(@2, @4));
   $$ = $1;
   $$->add(item);
 }
@@ -650,6 +683,7 @@ expr
 | primary LP expr_list RP
 {
   $$ = mgr.new_FuncCall($1, $3, @$);
+  delete $3;
 }
 // 配列参照
 | primary LBK expr RBK
@@ -681,6 +715,7 @@ primary
 : symbol_list
 {
   $$ = mgr.new_Primary($1, @$);
+  delete $1;
 }
 ;
 

@@ -8,10 +8,6 @@
 
 #include "AstToplevel.h"
 
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -31,6 +27,13 @@ AstToplevel::AstToplevel(AstStmtList* stmt_list,
 // @brief デストラクタ
 AstToplevel::~AstToplevel()
 {
+}
+
+// @brief 種類を返す．
+StmtType
+AstToplevel::stmt_type() const
+{
+  return kToplevel;
 }
 
 END_NAMESPACE_YM_YMSL

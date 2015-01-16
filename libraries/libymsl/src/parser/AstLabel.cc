@@ -7,11 +7,6 @@
 /// All rights reserved.
 
 #include "AstLabel.h"
-#include "AstSymbol.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -35,10 +30,29 @@ AstLabel::~AstLabel()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 種類を返す．
+StmtType
+AstLabel::stmt_type() const
+{
+  return kLabel;
+}
+
+// @brief ラベルを得る．
+//
+// kGoto, kLabel のみ有効
+const AstSymbol*
+AstLabel::label() const
+{
+  return mLabel;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstLabel::phase1(YmslScope* parent_scope)
+AstLabel::phase1(YmslScope* parent_scope,
+		 YmslTypeMgr* type_mgr)
 {
 }
 
@@ -79,5 +93,6 @@ AstLabel::print(ostream& s,
   print_indent(s, indent);
   s << mLabel->str_val() << ":" << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

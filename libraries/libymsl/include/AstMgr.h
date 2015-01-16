@@ -99,17 +99,33 @@ public:
   new_Import(AstModuleList* module_list,
 	     const FileRegion& loc);
 
+  /// @brief enum 定義を作る．
+  /// @param[in] name 型名
+  /// @param[in] const_list 定数リスト
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_EnumDecl(AstSymbol* name,
+	       AstEnumConstList* const_list,
+	       const FileRegion& loc);
+
+  /// @brief enum 定数を作る．
+  /// @param[in] name 定数名
+  /// @param[in] expr 値を表す式
+  /// @param[in] loc ファイル位置
+  AstEnumConst*
+  new_EnumConst(AstSymbol* name,
+		AstExpr* expr,
+		const FileRegion& loc);
+
   /// @brief 変数宣言を作る．
   /// @param[in] name 変数名
   /// @param[in] type 型
   /// @param[in] init_expr 初期化式
-  /// @param[in] global グローバル変数の時 true にするフラグ
   /// @param[in] loc ファイル位置
   AstStatement*
   new_VarDecl(AstSymbol* name,
 	      AstType* type,
 	      AstExpr* init_expr,
-	      bool global,
 	      const FileRegion& loc);
 
   /// @brief パラメータ宣言を作る．
@@ -127,68 +143,65 @@ public:
   /// @param[in] name 変数名
   /// @param[in] type 型
   /// @param[in] param_list パラメータリスト
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstStatement*
   new_FuncDecl(AstSymbol* name,
 	       AstType* type,
 	       AstParamList* param_list,
-	       AstStmtList* stmt_list,
+	       AstStatement* stmt,
 	       const FileRegion& loc);
 
   /// @brief 代入文を作る．
-  /// @param[in] token トークン
+  /// @param[in] stmt_type 文の種類
   /// @param[in] left 左辺
   /// @param[in] right 右辺
+  /// @param[in] loc ファイル位置
   AstStatement*
-  new_Assignment(TokenType token,
+  new_Assignment(StmtType stmt_type,
 		 AstExpr* left,
-		 AstExpr* right);
+		 AstExpr* right,
+		 const FileRegion& loc);
 
   /// @brief if 文を作る．
-  /// @param[in] if_list IfBlock のリスト
+  /// @param[in] expr 条件式
+  /// @param[in] then_stmt 条件が成り立った時実行される文
+  /// @param[in] else_stmt 条件が成り立たなかった時実行される文
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_If(AstIfList* if_list,
+  new_If(AstExpr* expr,
+	 AstStatement* then_stmt,
+	 AstStatement* else_stmt,
 	 const FileRegion& loc);
-
-  /// @brief if blockを作る．
-  /// @param[in] cond 条件式
-  /// @param[in] stmt_list 本体の文
-  /// @param[in] loc ファイル位置
-  AstIfBlock*
-  new_IfBlock(AstExpr* cond,
-	      AstStmtList* stmt_list,
-	      const FileRegion& loc);
 
   /// @brief for 文を作る．
   /// @param[in] init 初期化文
   /// @param[in] cond 条件式
   /// @param[in] next 増加文
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstStatement*
   new_For(AstStatement* init,
 	  AstExpr* cond,
 	  AstStatement* next,
-	  AstStmtList* stmt_list,
+	  AstStatement* stmt,
 	  const FileRegion& loc);
 
   /// @brief while 文を作る．
   /// @param[in] cond 条件式
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstStatement*
   new_While(AstExpr* cond,
-	    AstStmtList* stmt_list,
+	    AstStatement* stmt,
 	    const FileRegion& loc);
 
   /// @brief do-while 文を作る．
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体
   /// @param[in] cond 条件式
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_DoWhile(AstStmtList* stmt_list,
+  new_DoWhile(AstStatement* stmt,
 	      AstExpr* cond,
 	      const FileRegion& loc);
 
@@ -203,11 +216,11 @@ public:
 
   /// @brief case-item を作る．
   /// @param[in] label ラベル
-  /// @param[in] stmt_list 本体の文
+  /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstCaseItem*
   new_CaseItem(AstExpr* label,
-	       AstStmtList* stmt_list,
+	       AstStatement* stmt,
 	       const FileRegion& loc);
 
   /// @brief goto 文を作る．
@@ -250,8 +263,10 @@ public:
 
   /// @brief 式文を作る．
   /// @param[in] expr 式
+  /// @param[in] loc ファイル位置
   AstStatement*
-  new_ExprStmt(AstExpr* expr);
+  new_ExprStmt(AstExpr* expr,
+	       const FileRegion& loc);
 
   /// @brief 単項演算式を作る．
   /// @param[in] op 演算子のトークン

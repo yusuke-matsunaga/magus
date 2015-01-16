@@ -8,12 +8,7 @@
 
 #include "AstSwitch.h"
 #include "AstCaseItem.h"
-#include "AstExpr.h"
 #include "AstList.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -46,14 +41,25 @@ AstSwitch::~AstSwitch()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstSwitch::phase1(YmslScope* parent_scope)
+// @brief 種類を返す．
+StmtType
+AstSwitch::stmt_type() const
 {
+  return kSwitch;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
+void
+AstSwitch::phase1(YmslScope* parent_scope,
+		  YmslTypeMgr* type_mgr)
+{
+  mExpr->resolve_var(parent_scope);
   ymuint n = mCaseItemList.size();
   for (ymuint i = 0; i < n; ++ i) {
-    mCaseItemList[i]->phase1(parent_scope);
+    mCaseItemList[i]->phase1(parent_scope, type_mgr);
   }
 }
 
@@ -62,7 +68,6 @@ AstSwitch::phase1(YmslScope* parent_scope)
 void
 AstSwitch::phase2(YmslScope* parent_scope)
 {
-  mExpr->resolve_var(parent_scope);
   ymuint n = mCaseItemList.size();
   for (ymuint i = 0; i < n; ++ i) {
     mCaseItemList[i]->phase2(parent_scope);
@@ -109,6 +114,7 @@ AstSwitch::print(ostream& s,
   print_indent(s, indent);
   s << "}" << endl;
 }
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -117,13 +123,14 @@ AstSwitch::print(ostream& s,
 
 // @brief コンストラクタ
 // @param[in] label ラベル
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstCaseItem::AstCaseItem(AstExpr* label,
-			 AstStmtList* stmt_list,
+			 AstStatement* stmt,
 			 const FileRegion& loc) :
-  AstBlockStmt(stmt_list, loc),
-  mLabel(label)
+  Ast(loc),
+  mLabel(label),
+  mStmt(stmt)
 {
 }
 
@@ -132,6 +139,21 @@ AstCaseItem::~AstCaseItem()
 {
 }
 
+// @brief ラベルを返す．
+const AstExpr*
+AstCaseItem::label() const
+{
+  return mLabel;
+}
+
+// @brief 本体の文を返す．
+const AstStatement*
+AstCaseItem::stmt() const
+{
+  return mStmt;
+}
+
+#if 0
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -153,5 +175,6 @@ AstCaseItem::print(ostream& s,
 
   s << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

@@ -8,30 +8,25 @@
 
 
 #include "AstAssignment.h"
-#include "AstExpr.h"
-
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
-
-#include "grammer.hh"
 
 //////////////////////////////////////////////////////////////////////
 // クラス AstAssignment
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] token トークン
+// @param[in] stmt_type 文の種類
 // @param[in] left 左辺
 // @param[in] right 右辺
-AstAssignment::AstAssignment(TokenType token,
+// @param[in] loc ファイル位置
+AstAssignment::AstAssignment(StmtType stmt_type,
 			     AstExpr* left,
-			     AstExpr* right) :
-  AstStatement(FileRegion(left->file_region(), right->file_region())),
-  mToken(token),
+			     AstExpr* right,
+			     const FileRegion& loc) :
+  AstStatement(loc),
+  mStmtType(stmt_type),
   mLeft(left),
   mRight(right)
 {
@@ -42,20 +37,50 @@ AstAssignment::~AstAssignment()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstAssignment::phase1(YmslScope* parent_scope)
+// @brief 種類を返す．
+StmtType
+AstAssignment::stmt_type() const
 {
+  return mStmtType;
 }
 
-// @brief 参照解決を行う．
+// @brief 左辺式を返す．
+//
+// kAssignment のみ有効
+const AstExpr*
+AstAssignment::lhs_expr() const
+{
+  return mLeft;
+}
+
+// @brief 式を返す．
+//
+// kAssignment,
+// kDoWhile, kFor, kIf, kWhile, kSwitch
+// kExprStmt, kReturn, kVarDecl のみ有効
+const AstExpr*
+AstAssignment::expr() const
+{
+  return mRight;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
+// @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
+void
+AstAssignment::phase1(YmslScope* parent_scope,
+		      YmslTypeMgr* type_mgr)
+{
+  mLeft->resolve_var(parent_scope);
+  mRight->resolve_var(parent_scope);
+}
+
+// @brief 関数の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstAssignment::phase2(YmslScope* parent_scope)
 {
-  mLeft->resolve_var(parent_scope);
-  mRight->resolve_var(parent_scope);
 }
 
 // @brief 命令コードのサイズを計算する．
@@ -86,7 +111,9 @@ AstAssignment::compile(YmslDriver& driver,
   code_list.write_int(addr, mLeft->var()->index());
 #endif
 }
+#endif
 
+#if 0
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
@@ -113,5 +140,6 @@ AstAssignment::print(ostream& s,
   mRight->print(s);
   s << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

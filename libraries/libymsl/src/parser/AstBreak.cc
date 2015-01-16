@@ -8,10 +8,6 @@
 
 #include "AstBreak.h"
 
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -31,14 +27,24 @@ AstBreak::~AstBreak()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 種類を返す．
+StmtType
+AstBreak::stmt_type() const
+{
+  return kBreak;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstBreak::phase1(YmslScope* parent_scope)
+AstBreak::phase1(YmslScope* parent_scope,
+		 YmslTypeMgr* type_mgr)
 {
 }
 
-// @brief 参照解決を行う．
+// @brief 関数の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstBreak::phase2(YmslScope* parent_scope)
@@ -75,5 +81,6 @@ AstBreak::print(ostream& s,
   print_indent(s, indent);
   s << "break" << endl;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

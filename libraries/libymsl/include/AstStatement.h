@@ -15,30 +15,6 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
-#if 0
-//////////////////////////////////////////////////////////////////////
-/// @brief スタートメントの種類
-//////////////////////////////////////////////////////////////////////
-enum AstStmtType {
-  kAstAssignment,
-  kAstIf,
-  kAstElif,
-  kAstElse,
-  kAstFor,
-  kAstWhile,
-  kAstDoWhile,
-  kAstSwitch,
-  kAstCaseItem,
-  kAstGoto,
-  kAstLabel,
-  kAstBreak,
-  kAstContinue,
-  kAstReturn,
-  kAstBlock
-};
-#endif
-
-
 //////////////////////////////////////////////////////////////////////
 /// @class AstStatement AstStatement.h "AstStatement.h"
 /// @brief ステートメントを表すクラス
@@ -62,24 +38,135 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープの生成と関数の登録を行う．
+  /// @brief 種類を返す．
+  virtual
+  StmtType
+  stmt_type() const = 0;
+
+  /// @brief 名前を返す．
+  ///
+  /// kEnumDecl, kFuncDecl, kVarDecl のみ有効
+  virtual
+  ShString
+  name() const;
+
+  /// @brief 型を返す．
+  ///
+  /// kFuncDecl, kVarDecl のみ有効
+  virtual
+  const AstType*
+  type() const;
+
+  /// @brief パラメータリストの要素数を返す．
+  ///
+  /// kFuncDecl のみ有効
+  virtual
+  ymuint
+  param_num() const;
+
+  /// @brief パラメータリストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < param_num() )
+  ///
+  /// kFuncDecl のみ有効
+  virtual
+  const AstParam*
+  param(ymuint pos) const;
+
+  /// @brief enum 定数の数を返す．
+  ///
+  /// kEnumDecl のみ有効
+  virtual
+  ymuint
+  enum_num() const;
+
+  /// @brief enum 定数を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < enum_num() )
+  ///
+  /// kEnumDecl のみ有効
+  virtual
+  const AstEnumConst*
+  enum_const(ymuint pos) const;
+
+  /// @brief 左辺式を返す．
+  ///
+  /// kAssignment のみ有効
+  virtual
+  const AstExpr*
+  lhs_expr() const;
+
+  /// @brief 式を返す．
+  ///
+  /// kAssignment,
+  /// kDoWhile, kFor, kIf, kWhile, kSwitch
+  /// kExprStmt, kReturn, kVarDecl のみ有効
+  virtual
+  const AstExpr*
+  expr() const;
+
+  /// @brief 文のリストの要素数を返す．
+  ///
+  /// AstBlockStmt のみ有効
+  virtual
+  ymuint
+  stmtlist_num() const;
+
+  /// @brief 文のリストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < stmt_num() )
+  ///
+  /// AstBlockStmt のみ有効
+  virtual
+  const AstStatement*
+  stmtlist_elem(ymuint pos) const;
+
+  /// @brief 本体の文を返す．
+  ///
+  /// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+  virtual
+  const AstStatement*
+  stmt() const;
+
+  /// @brief else 節を得る．
+  ///
+  /// kIf のみ有効
+  virtual
+  const AstStatement*
+  else_stmt() const;
+
+  /// @brief 初期化文を返す．
+  ///
+  /// kFor のみ有効
+  virtual
+  const AstStatement*
+  init_stmt() const;
+
+  /// @brief 増加文を返す．
+  ///
+  /// kFor のみ有効
+  virtual
+  const AstStatement*
+  next_stmt() const;
+
+  /// @brief ラベルを得る．
+  ///
+  /// kGoto, kLabel のみ有効
+  virtual
+  const AstSymbol*
+  label() const;
+
+#if 0
+  /// @brief 要素の生成と関数以外の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
+  /// @param[in] type_mgr 型マネージャ
   virtual
   void
-  phase1(YmslScope* parent_scope) = 0;
+  phase1(YmslScope* parent_scope,
+	 YmslTypeMgr* type_mgr) = 0;
 
-  /// @brief 参照解決を行う．
+  /// @brief 関数の参照解決を行う．
   /// @param[in] parent_scope 親のスコープ
   virtual
   void
   phase2(YmslScope* parent_scope) = 0;
-
-  /// @brief ラベルステートメントの場合に名前を返す．
-  ///
-  /// それ以外では ShString() を返す．
-  virtual
-  ShString
-  label() const;
 
   /// @brief 命令コードのサイズを計算する．
   virtual
@@ -105,8 +192,9 @@ public:
   void
   print(ostream& s,
 	ymuint indent = 0) const = 0;
+#endif
 
-
+#if 0
 protected:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -119,6 +207,7 @@ protected:
   void
   print_indent(ostream& s,
 	       ymuint indent);
+#endif
 
 };
 

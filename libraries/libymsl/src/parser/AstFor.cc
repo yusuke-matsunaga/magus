@@ -8,10 +8,6 @@
 
 #include "AstFor.h"
 
-#include "YmslCodeList.h"
-#include "YmslScope.h"
-#include "YmslVM.h"
-
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -23,17 +19,18 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] init 初期化文
 // @param[in] cond 条件式
 // @param[in] next 増加文
-// @param[in] stmt_list 本体の文
+// @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
 AstFor::AstFor(AstStatement* init,
 	       AstExpr* cond,
 	       AstStatement* next,
-	       AstStmtList* stmt_list,
+	       AstStatement* stmt,
 	       const FileRegion& loc) :
-  AstBlockStmt(stmt_list, loc),
+  AstStatement(loc),
   mInit(init),
-  mCond(cond),
-  mNext(next)
+  mExpr(cond),
+  mNext(next),
+  mStmt(stmt)
 {
 }
 
@@ -42,14 +39,60 @@ AstFor::~AstFor()
 {
 }
 
-// @brief スコープの生成と関数の登録を行う．
+// @brief 種類を返す．
+StmtType
+AstFor::stmt_type() const
+{
+  return kFor;
+}
+
+// @brief 条件式を返す．
+//
+// kDoWhile, kFor, kIf, kWhile, kSwitch のみ有効
+const AstExpr*
+AstFor::expr() const
+{
+  return mExpr;
+}
+
+// @brief 初期化文を返す．
+//
+// kFor のみ有効
+const AstStatement*
+AstFor::init_stmt() const
+{
+  return mInit;
+}
+
+// @brief 増加文を返す．
+//
+// kFor のみ有効
+const AstStatement*
+AstFor::next_stmt() const
+{
+  return mNext;
+}
+
+// @brief 本体の文を返す．
+//
+// kFuncDecl, kFor, kDoWhile, kWhile, kIf のみ有効
+const AstStatement*
+AstFor::stmt() const
+{
+  return mStmt;
+}
+
+#if 0
+// @brief 要素の生成と関数以外の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
+// @param[in] type_mgr 型マネージャ
 void
-AstFor::phase1(YmslScope* parent_scope)
+AstFor::phase1(YmslScope* parent_scope,
+	       YmslTypeMgr* type_mgr)
 {
 }
 
-// @brief 参照解決を行う．
+// @brief 関数の参照解決を行う．
 // @param[in] parent_scope 親のスコープ
 void
 AstFor::phase2(YmslScope* parent_scope)
@@ -95,5 +138,6 @@ AstFor::print(ostream& s,
   block()->print(s, indent);
 #endif
 }
+#endif
 
 END_NAMESPACE_YM_YMSL
