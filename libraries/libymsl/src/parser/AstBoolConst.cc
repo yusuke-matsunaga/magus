@@ -31,6 +31,14 @@ AstBoolConst::~AstBoolConst()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstBoolConst::expr_type() const
+{
+  return mExprType;
+}
+
+#if 0
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 void
@@ -43,5 +51,6 @@ AstBoolConst::print(ostream& s) const
     s << "false";
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

@@ -21,15 +21,14 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func_name 関数名
+// @param[in] func 関数
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstExpr* func_name,
+AstFuncCall::AstFuncCall(AstExpr* func,
 			 AstExprList* expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mFuncName(func_name),
-  mFunc(NULL),
+  mFunc(func),
   mExprList(expr_list->size())
 {
   ymuint pos = 0;
@@ -43,6 +42,40 @@ AstFuncCall::AstFuncCall(AstExpr* func_name,
 // @brief デストラクタ
 AstFuncCall::~AstFuncCall()
 {
+}
+
+// @brief 種類を返す．
+ExprType
+AstFuncCall::expr_type() const
+{
+  return kFuncCall;
+}
+
+// @brief 関数本体を返す．
+const AstExpr*
+AstFuncCall::func_body() const
+{
+  return mFunc;
+}
+
+// @brief 引数リストの要素数を返す．
+//
+// kFuncCall のみ有効
+ymuint
+AstFuncCall::arglist_num() const
+{
+  return mExprList.size();
+}
+
+// @brief 引数リストの要素を返す．
+// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
+//
+// kFuncCall のみ有効
+const AstExpr*
+AstFuncCall::arglist_elem(ymuint pos) const
+{
+  ASSERT_COND( pos < arglist_num() );
+  return mExprList[pos];
 }
 
 #if 0
@@ -92,7 +125,6 @@ AstFuncCall::compile(YmslDriver& driver,
 		     Ymsl_INT& addr)
 {
 }
-#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
@@ -112,5 +144,6 @@ AstFuncCall::print(ostream& s) const
     }
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

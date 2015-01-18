@@ -24,10 +24,10 @@ class AstArrayRef :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] id 配列名
-  /// @param[in] index インデックス
+  /// @param[in] array 本体の式
+  /// @param[in] index インデックスの式
   /// @param[in] loc ファイル位置
-  AstArrayRef(AstExpr* id,
+  AstArrayRef(AstExpr* array,
 	      AstExpr* index,
 	      const FileRegion& loc);
 
@@ -40,6 +40,25 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const;
+
+  /// @brief 配列本体を返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  const AstExpr*
+  array_body() const;
+
+  /// @brief インデックスを返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  const AstExpr*
+  array_index() const;
 
 #if 0
   /// @brief 変数の参照を解決する．
@@ -76,13 +95,13 @@ public:
   compile(YmslDriver& driver,
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr);
-#endif
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   virtual
   void
   print(ostream& s) const;
+#endif
 
 
 private:

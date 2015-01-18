@@ -34,6 +34,23 @@ AstFloatConst::~AstFloatConst()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstFloatConst::expr_type() const
+{
+  return kFloatConst;
+}
+
+// @brief 浮動小数点値を返す．
+//
+// kFloatConst のみ有効
+double
+AstFloatConst::float_val() const
+{
+  return mVal;
+}
+
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstFloatConst::resolve_var(YmslScope* parent_scope)
@@ -100,5 +117,6 @@ AstFloatConst::print(ostream& s) const
 {
   s << mVal;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

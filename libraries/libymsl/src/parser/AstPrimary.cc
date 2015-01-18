@@ -30,8 +30,7 @@ BEGIN_NAMESPACE_YM_YMSL
 AstPrimary::AstPrimary(AstSymbolList* symbol_list,
 		       const FileRegion& loc) :
   AstExpr(loc),
-  mSymbolList(symbol_list->size()),
-  mVar(NULL)
+  mSymbolList(symbol_list->size())
 {
   ymuint pos = 0;
   for (AstSymbolList::Iterator p = symbol_list->begin();
@@ -46,11 +45,38 @@ AstPrimary::~AstPrimary()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstPrimary::expr_type() const
+{
+  return kPrimary;
+}
+
+// @brief シンボルリストの要素数を返す．
+//
+// kPrimary, kArrayRef, kFuncCall のみ有効
+ymuint
+AstPrimary::symbollist_num() const
+{
+  return mSymbolList.size();
+}
+
+// @brief シンボルリストの要素を返す．
+// @param[in] pos 位置 ( 0 <= pos < symbollist_num() )
+//
+// kPrimary, kArrayRef, kFuncCall のみ有効
+const AstSymbol*
+AstPrimary::symbollist_elem(ymuint pos) const
+{
+  ASSERT_COND( pos < symbollist_num() );
+  return mSymbolList[pos];
+}
+
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstPrimary::resolve_var(YmslScope* parent_scope)
 {
-#if 0
   ObjHandle* h = parent_scope->find(mVarName);
   if ( h == NULL ) {
     ostringstream buf;
@@ -82,7 +108,6 @@ AstPrimary::resolve_var(YmslScope* parent_scope)
 
   YmslScope* scope = h->scope();
 
-#endif
   #warning "嘘"
 }
 
@@ -184,5 +209,6 @@ AstPrimary::print(ostream& s) const
     dot = ".";
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

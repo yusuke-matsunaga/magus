@@ -70,6 +70,7 @@ AstParam::init_expr() const
   return mInitExpr;
 }
 
+#if 0
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
 void
@@ -82,5 +83,6 @@ AstParam::print(ostream& s) const
     init_expr()->print(s);
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

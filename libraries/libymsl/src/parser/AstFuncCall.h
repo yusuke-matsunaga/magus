@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "AstPrimary.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -24,10 +24,10 @@ class AstFuncCall :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func_name 関数名
+  /// @param[in] func 関数
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstExpr* func_name,
+  AstFuncCall(AstExpr* func,
 	      AstExprList* expr_list,
 	      const FileRegion& loc);
 
@@ -40,6 +40,31 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const;
+
+  /// @brief 関数本体を返す．
+  virtual
+  const AstExpr*
+  func_body() const;
+
+  /// @brief 引数リストの要素数を返す．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  ymuint
+  arglist_num() const;
+
+  /// @brief 引数リストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  const AstExpr*
+  arglist_elem(ymuint pos) const;
 
 #if 0
   /// @brief 変数の参照を解決する．
@@ -76,13 +101,13 @@ public:
   compile(YmslDriver& driver,
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr);
-#endif
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   virtual
   void
   print(ostream& s) const;
+#endif
 
 
 private:
@@ -90,11 +115,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数名
-  AstExpr* mFuncName;
-
   // 関数
-  AstFuncDecl* mFunc;
+  AstExpr* mFunc;
 
   // 引数のリスト
   vector<AstExpr*> mExprList;

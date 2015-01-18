@@ -36,6 +36,33 @@ AstIteOp::~AstIteOp()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstIteOp::expr_type() const
+{
+  return kIte;
+}
+
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+AstIteOp::operand_num() const
+{
+  return 3;
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num()
+//
+// 演算子のみ有効
+const AstExpr*
+AstIteOp::operand(ymuint pos) const
+{
+  ASSERT_COND( pos < operand_num() );
+  return mOpr[pos];
+}
+
 #if 0
 // @brief 変数の参照を解決する．
 void
@@ -80,7 +107,6 @@ AstIteOp::compile(YmslDriver& driver,
 		  Ymsl_INT& addr)
 {
 }
-#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
@@ -93,5 +119,6 @@ AstIteOp::print(ostream& s) const
   s << " : ";
   mOpr[2]->print(s);
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

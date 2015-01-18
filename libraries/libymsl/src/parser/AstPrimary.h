@@ -42,6 +42,27 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const;
+
+  /// @brief シンボルリストの要素数を返す．
+  ///
+  /// kPrimary, kArrayRef, kFuncCall のみ有効
+  virtual
+  ymuint
+  symbollist_num() const;
+
+  /// @brief シンボルリストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < symbollist_num() )
+  ///
+  /// kPrimary, kArrayRef, kFuncCall のみ有効
+  virtual
+  const AstSymbol*
+  symbollist_elem(ymuint pos) const;
+
+#if 0
   /// @brief 変数の参照を解決する．
   virtual
   void
@@ -89,6 +110,7 @@ public:
   /// @param[in] s 出力ストリーム
   void
   print(ostream& s) const;
+#endif
 
 
 private:
@@ -99,6 +121,7 @@ private:
   // オブジェクト名
   vector<AstSymbol*> mSymbolList;
 
+#if 0
   // オブジェクト
   union {
     // 変数
@@ -110,6 +133,7 @@ private:
     // enum 定数
     YmslEnumConst* mEnumConst;
   };
+#endif
 
 };
 

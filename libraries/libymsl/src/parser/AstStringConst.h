@@ -39,6 +39,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const;
+
+  /// @brief 文字列値を返す．
+  ///
+  /// kStringConst のみ有効
+  virtual
+  const char*
+  string_val() const;
+
+#if 0
   /// @brief 変数の参照を解決する．
   virtual
   void
@@ -79,7 +92,7 @@ public:
   virtual
   void
   print(ostream& s) const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////

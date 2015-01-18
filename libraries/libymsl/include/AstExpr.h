@@ -37,6 +37,96 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const = 0;
+
+  /// @brief シンボルリストの要素数を返す．
+  ///
+  /// kPrimary, kArrayRef, kFuncCall のみ有効
+  virtual
+  ymuint
+  symbollist_num() const;
+
+  /// @brief シンボルリストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < symbollist_num() )
+  ///
+  /// kPrimary, kArrayRef, kFuncCall のみ有効
+  virtual
+  const AstSymbol*
+  symbollist_elem(ymuint pos) const;
+
+  /// @brief 配列本体を返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  const AstExpr*
+  array_body() const;
+
+  /// @brief インデックスを返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  const AstExpr*
+  array_index() const;
+
+  /// @brief 関数本体を返す．
+  virtual
+  const AstExpr*
+  func_body() const;
+
+  /// @brief 引数リストの要素数を返す．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  ymuint
+  arglist_num() const;
+
+  /// @brief 引数リストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  const AstExpr*
+  arglist_elem(ymuint pos) const;
+
+  /// @brief 整数値を返す．
+  ///
+  /// kIntConst のみ有効
+  virtual
+  int
+  int_val() const;
+
+  /// @brief 浮動小数点値を返す．
+  ///
+  /// kFloatConst のみ有効
+  virtual
+  double
+  float_val() const;
+
+  /// @brief 文字列値を返す．
+  ///
+  /// kStringConst のみ有効
+  virtual
+  const char*
+  string_val() const;
+
+  /// @brief オペランド数を返す．
+  ///
+  /// 演算子のみ有効
+  virtual
+  ymuint
+  operand_num() const;
+
+  /// @brief オペランドを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < operand_num()
+  ///
+  /// 演算子のみ有効
+  virtual
+  const AstExpr*
+  operand(ymuint pos) const;
+
 #if 0
   /// @brief 変数の参照を解決する．
   virtual
@@ -72,13 +162,13 @@ public:
   compile(YmslDriver& driver,
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr) = 0;
-#endif
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   virtual
   void
   print(ostream& s) const = 0;
+#endif
 
 };
 

@@ -64,10 +64,12 @@ public:
   AstExpr*
   init_expr() const;
 
+#if 0
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   void
   print(ostream& s) const;
+#endif
 
 
 private:

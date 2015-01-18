@@ -39,6 +39,26 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const;
+
+  /// @brief オペランド数を返す．
+  ///
+  /// 演算子のみ有効
+  virtual
+  ymuint
+  operand_num() const;
+
+  /// @brief オペランドを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < operand_num()
+  ///
+  /// 演算子のみ有効
+  virtual
+  const AstExpr*
+  operand(ymuint pos) const;
+
 #if 0
   /// @brief 変数の参照を解決する．
   virtual
@@ -74,13 +94,13 @@ public:
   compile(YmslDriver& driver,
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr);
-#endif
 
   /// @brief 内容を表示する．(デバッグ用)
   /// @param[in] s 出力ストリーム
   virtual
   void
   print(ostream& s) const;
+#endif
 
 
 private:

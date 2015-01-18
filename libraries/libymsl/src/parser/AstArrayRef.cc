@@ -17,14 +17,14 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id 配列名
+// @param[in] array 本体の式
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
-AstArrayRef::AstArrayRef(AstExpr* id,
+AstArrayRef::AstArrayRef(AstExpr* body,
 			 AstExpr* index,
 			 const FileRegion& loc) :
   AstExpr(loc),
-  mArray(id),
+  mArray(body),
   mIndex(index)
 {
 }
@@ -32,6 +32,31 @@ AstArrayRef::AstArrayRef(AstExpr* id,
 // @brief デストラクタ
 AstArrayRef::~AstArrayRef()
 {
+}
+
+// @brief 種類を返す．
+ExprType
+AstArrayRef::expr_type() const
+{
+  return kArrayRef;
+}
+
+// @brief 配列本体を返す．
+//
+// kArrayRef のみ有効
+const AstExpr*
+AstArrayRef::array_body() const
+{
+  return mArray;
+}
+
+// @brief インデックスを返す．
+//
+// kArrayRef のみ有効
+const AstExpr*
+AstArrayRef::array_index() const
+{
+  return mIndex;
 }
 
 #if 0
@@ -76,7 +101,6 @@ AstArrayRef::compile(YmslDriver& driver,
 		     Ymsl_INT& addr)
 {
 }
-#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
@@ -88,5 +112,6 @@ AstArrayRef::print(ostream& s) const
   mIndex->print(s);
   s << "]";
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

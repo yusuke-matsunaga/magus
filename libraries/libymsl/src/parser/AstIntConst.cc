@@ -34,6 +34,23 @@ AstIntConst::~AstIntConst()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstIntConst::expr_type() const
+{
+  return kIntConst;
+}
+
+// @brief 整数値を返す．
+//
+// kIntConst のみ有効
+int
+AstIntConst::int_val() const
+{
+  return mVal;
+}
+
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstIntConst::resolve_var(YmslScope* parent_scope)
@@ -86,5 +103,6 @@ AstIntConst::print(ostream& s) const
 {
   s << mVal;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

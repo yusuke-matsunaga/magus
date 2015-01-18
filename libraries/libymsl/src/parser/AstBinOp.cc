@@ -37,6 +37,37 @@ AstBinOp::~AstBinOp()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstBinOp::expr_type() const
+{
+  return mOp;
+}
+
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+AstBinOp::operand_num() const
+{
+  return 2;
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num()
+//
+// 演算子のみ有効
+const AstExpr*
+AstBinOp::operand(ymuint pos) const
+{
+  switch ( pos ) {
+  case 0: return mLeft;
+  case 1: return mRight;
+  default: ASSERT_NOT_REACHED; break;
+  }
+  return NULL;
+}
+
 #if 0
 // @brief 変数の参照を解決する．
 void
@@ -155,7 +186,6 @@ AstBinOp::compile(YmslDriver& driver,
   code_list.write_opcode(addr, op);
 #endif
 }
-#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
@@ -188,5 +218,6 @@ AstBinOp::print(ostream& s) const
   mRight->print(s);
   s << ")";
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

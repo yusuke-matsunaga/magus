@@ -24,7 +24,8 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] loc ファイル位置
 AstStringConst::AstStringConst(const char* val,
 			       const FileRegion& loc) :
-  AstExpr(loc)
+  AstExpr(loc),
+  mVal(val)
 {
 }
 
@@ -33,6 +34,23 @@ AstStringConst::~AstStringConst()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstStringConst::expr_type() const
+{
+  return kStringConst;
+}
+
+// @brief 文字列値を返す．
+//
+// kStringConst のみ有効
+const char*
+AstStringConst::string_val() const
+{
+  return mVal;
+}
+
+#if 0
 // @brief 変数の参照を解決する．
 void
 AstStringConst::resolve_var(YmslScope* parent_scope)
@@ -82,5 +100,6 @@ AstStringConst::print(ostream& s) const
 {
   s << mVal;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

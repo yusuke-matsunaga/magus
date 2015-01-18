@@ -37,6 +37,33 @@ AstUniOp::~AstUniOp()
 {
 }
 
+// @brief 種類を返す．
+ExprType
+AstUniOp::expr_type() const
+{
+  return mOp;
+}
+
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+AstUniOp::operand_num() const
+{
+  return 1;
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num()
+//
+// 演算子のみ有効
+const AstExpr*
+AstUniOp::operand(ymuint pos) const
+{
+  ASSERT_COND( pos <= operand_num() );
+  return mOperand;
+}
+
 #if 0
 // @brief 変数の参照を解決する．
 void
@@ -184,7 +211,6 @@ AstUniOp::compile(YmslDriver& driver,
   code_list.write_opcode(addr, op);
 #endif
 }
-#endif
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム
@@ -212,5 +238,6 @@ AstUniOp::print(ostream& s) const
   default: break;
   }
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

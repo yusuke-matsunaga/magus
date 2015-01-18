@@ -27,7 +27,7 @@ public:
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
   AstFloatConst(double val,
-	      const FileRegion& loc);
+		const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
@@ -39,6 +39,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 種類を返す．
+  virtual
+  ExprType
+  expr_type() const;
+
+  /// @brief 浮動小数点値を返す．
+  ///
+  /// kFloatConst のみ有効
+  virtual
+  double
+  float_val() const;
+
+#if 0
   /// @brief 変数の参照を解決する．
   virtual
   void
@@ -79,7 +92,7 @@ public:
   virtual
   void
   print(ostream& s) const;
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////

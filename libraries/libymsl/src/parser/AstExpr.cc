@@ -31,6 +31,127 @@ AstExpr::~AstExpr()
 {
 }
 
+// @brief シンボルリストの要素数を返す．
+//
+// kPrimary, kArrayRef, kFuncCall のみ有効
+ymuint
+AstExpr::symbollist_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief シンボルリストの要素を返す．
+// @param[in] pos 位置 ( 0 <= pos < symbollist_num() )
+//
+// kPrimary, kArrayRef, kFuncCall のみ有効
+const AstSymbol*
+AstExpr::symbollist_elem(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 配列本体を返す．
+//
+// kArrayRef のみ有効
+const AstExpr*
+AstExpr::array_body() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief インデックスを返す．
+//
+// kArrayRef のみ有効
+const AstExpr*
+AstExpr::array_index() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 関数本体を返す．
+const AstExpr*
+AstExpr::func_body() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 引数リストの要素数を返す．
+//
+// kFuncCall のみ有効
+ymuint
+AstExpr::arglist_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief 引数リストの要素を返す．
+// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
+//
+// kFuncCall のみ有効
+const AstExpr*
+AstExpr::arglist_elem(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 整数値を返す．
+//
+// kIntConst のみ有効
+int
+AstExpr::int_val() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief 浮動小数点値を返す．
+//
+// kFloatConst のみ有効
+double
+AstExpr::float_val() const
+{
+  ASSERT_NOT_REACHED;
+  return 0.0;
+}
+
+// @brief 文字列値を返す．
+//
+// kStringConst のみ有効
+const char*
+AstExpr::string_val() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+AstExpr::operand_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置
+//
+// pos の範囲は演算子によって異なる．
+const AstExpr*
+AstExpr::operand(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 #if 0
 //////////////////////////////////////////////////////////////////////
 // クラス AstVarExpr
