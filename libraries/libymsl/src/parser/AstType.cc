@@ -33,13 +33,6 @@ AstType::~AstType()
 {
 }
 
-// @brief プリミティブ型の時 true を返す．
-bool
-AstType::primitive_type() const
-{
-  return false;
-}
-
 // @brief 名前付き型の時 true を返す．
 bool
 AstType::named_type() const
@@ -47,37 +40,8 @@ AstType::named_type() const
   return false;
 }
 
-// @brief array 型の時 true を返す．
-bool
-AstType::array_type() const
-{
-  return false;
-}
-
-// @brief set 型の時 true を返す．
-bool
-AstType::set_type() const
-{
-  return false;
-}
-
-// @brief map 型の時 true を返す．
-bool
-AstType::map_type() const
-{
-  return false;
-}
-
-// @brief プリミティブ型の時に型を返す．
-TypeId
-AstType::type_id() const
-{
-  ASSERT_NOT_REACHED;
-  return kVoidType;
-}
-
 // @brief 名前付き方の時に名前を返す．
-AstSymbol*
+const AstSymbol*
 AstType::name() const
 {
   ASSERT_NOT_REACHED;
@@ -85,7 +49,7 @@ AstType::name() const
 }
 
 // @brief map 型の時にキーの型を返す．
-AstType*
+const AstType*
 AstType::key_type() const
 {
   ASSERT_NOT_REACHED;
@@ -93,7 +57,7 @@ AstType::key_type() const
 }
 
 // @brief array/set/map 型の時に要素の型を返す．
-AstType*
+const AstType*
 AstType::elem_type() const
 {
   ASSERT_NOT_REACHED;
@@ -120,14 +84,7 @@ AstPrimType::~AstPrimType()
 {
 }
 
-// @brief プリミティブ型の時 true を返す．
-bool
-AstPrimType::primitive_type() const
-{
-  return true;
-}
-
-// @brief 型を得る．
+// @brief 型番号を返す．
 TypeId
 AstPrimType::type_id() const
 {
@@ -168,10 +125,17 @@ AstNamedType::named_type() const
 }
 
 // @brief 名前付き方の時に名前を返す．
-AstSymbol*
+const AstSymbol*
 AstNamedType::name() const
 {
   return mName;
+}
+
+// @brief 型番号を返す．
+TypeId
+AstNamedType::type_id() const
+{
+  return kVoidType;
 }
 
 // @brief 内容を出力する．
@@ -202,15 +166,15 @@ AstArrayType::~AstArrayType()
 {
 }
 
-// @brief array 型の時 true を返す．
-bool
-AstArrayType::array_type() const
+// @brief 型番号を返す．
+TypeId
+AstArrayType::type_id() const
 {
-  return true;
+  return kArrayType;
 }
 
 // @brief array/set/map 型の時に要素の型を返す．
-AstType*
+const AstType*
 AstArrayType::elem_type() const
 {
   return mElemType;
@@ -246,15 +210,15 @@ AstSetType::~AstSetType()
 {
 }
 
-// @brief set 型の時 true を返す．
-bool
-AstSetType::set_type() const
+// @brief 型番号を返す．
+TypeId
+AstSetType::type_id() const
 {
-  return true;
+  return kSetType;
 }
 
 // @brief array/set/map 型の時に要素の型を返す．
-AstType*
+const AstType*
 AstSetType::elem_type() const
 {
   return mElemType;
@@ -293,22 +257,22 @@ AstMapType::~AstMapType()
 {
 }
 
-// @brief map 型の時 true を返す．
-bool
-AstMapType::map_type() const
+// @brief 型番号を返す．
+TypeId
+AstMapType::type_id() const
 {
-  return true;
+  return kMapType;
 }
 
 // @brief map 型の時にキーの型を返す．
-AstType*
+const AstType*
 AstMapType::key_type() const
 {
   return mKeyType;
 }
 
 // @brief array/set/map 型の時に要素の型を返す．
-AstType*
+const AstType*
 AstMapType::elem_type() const
 {
   return mElemType;

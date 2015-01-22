@@ -80,6 +80,15 @@ YmslScope::add_var(YmslVar* item)
   put(handle);
 }
 
+// @brief 型を追加する．
+// @param[in] item 追加する要素
+void
+YmslScope::add_type(YmslType* item)
+{
+  ObjHandle* handle = new TypeHandle(item);
+  put(handle);
+}
+
 // @brief スコープを追加する．
 // @param[in] item 追加する要素
 void

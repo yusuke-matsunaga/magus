@@ -39,14 +39,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief array 型の時 true を返す．
+  /// @brief 型を得る．
   virtual
-  bool
-  set_type() const;
+  TypeId
+  type_id() const;
 
   /// @brief array/set/map 型の時に要素の型を返す．
   virtual
-  AstType*
+  const AstType*
   elem_type() const;
 
   /// @brief 内容を出力する．

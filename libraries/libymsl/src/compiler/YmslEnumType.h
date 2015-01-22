@@ -37,8 +37,8 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief enum 型を返す．
-  YmslEnumType*
+  /// @brief 親の enum 型を返す．
+  YmslType*
   parent() const;
 
   /// @brief 名前を返す．
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の enum 型
-  YmslEnumType* mParent;
+  YmslType* mParent;
 
   // 名前
   ShString mName;

@@ -8,7 +8,7 @@
 
 
 #include "ObjHandleImpl.h"
-#include "YmslEnumType.h"
+#include "YmslType.h"
 #include "YmslFunction.h"
 #include "YmslLabel.h"
 #include "YmslScope.h"
@@ -68,11 +68,11 @@ ObjHandle::scope() const
   return NULL;
 }
 
-// @brief enum 型を返す．
+// @brief 型を返す．
 //
 // 他の要素の場合には NULL を返す．
-YmslEnumType*
-ObjHandle::enum_type() const
+YmslType*
+ObjHandle::named_type() const
 {
   return NULL;
 }
@@ -211,35 +211,35 @@ ScopeHandle::scope() const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス EnumHandle
+// クラス TypeHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] enum_type enum 型
-EnumHandle::EnumHandle(YmslEnumType* enum_type) :
-  mEnum(enum_type)
+// @param[in] type 型
+TypeHandle::TypeHandle(YmslType* type) :
+  mType(type)
 {
 }
 
 // @brief デストラクタ
-EnumHandle::~EnumHandle()
+TypeHandle::~TypeHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-EnumHandle::name() const
+TypeHandle::name() const
 {
-  return mEnum->type_name();
+  return mType->type_name();
 }
 
-// @brief enum 型を返す．
+// @brief 型を返す．
 //
 // 他の要素の場合には NULL を返す．
-YmslEnumType*
-EnumHandle::enum_type() const
+YmslType*
+TypeHandle::named_type() const
 {
-  return mEnum;
+  return mType;
 }
 
 END_NAMESPACE_YM_YMSL

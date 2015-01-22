@@ -27,7 +27,7 @@ YmslEnumConst::~YmslEnumConst()
 }
 
 // @brief enum 型を返す．
-YmslEnumType*
+YmslType*
 YmslEnumConst::parent() const
 {
   return mParent;

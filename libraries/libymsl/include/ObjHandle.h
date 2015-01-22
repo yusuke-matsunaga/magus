@@ -71,12 +71,12 @@ public:
   YmslLabel*
   label() const;
 
-  /// @brief enum 型を返す．
+  /// @brief 名前付き型を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslEnumType*
-  enum_type() const;
+  YmslType*
+  named_type() const;
 
 
 private:

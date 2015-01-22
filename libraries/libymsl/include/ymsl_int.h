@@ -32,7 +32,6 @@ BEGIN_NAMESPACE_YM_YMSL
 class YmslCodeList;
 class YmslDriver;
 class YmslEnumConst;
-class YmslEnumType;
 class YmslExecutable;
 class YmslFunction;
 class YmslLabel;

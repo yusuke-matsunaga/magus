@@ -55,13 +55,13 @@ public:
   index() const;
 
   /// @brief 型を得る．
-  AstType*
+  const AstType*
   type() const;
 
   /// @brief 初期化式を返す．
   ///
   /// NULL の場合もある．
-  AstExpr*
+  const AstExpr*
   init_expr() const;
 
 #if 0

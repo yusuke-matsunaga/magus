@@ -203,21 +203,21 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class EnumHandle ObjHandle.h "ObjHandle.h"
-/// @brief YmslEnum を保持する ObjHandle
+/// @class TypeHandle ObjHandle.h "ObjHandle.h"
+/// @brief YmslType を保持する ObjHandle
 //////////////////////////////////////////////////////////////////////
-class EnumHandle :
+class TypeHandle :
   public ObjHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] enum_type enum 型
-  EnumHandle(YmslEnumType* enum_type);
+  /// @param[in] type 型
+  TypeHandle(YmslType* type);
 
   /// @brief デストラクタ
   virtual
-  ~EnumHandle();
+  ~TypeHandle();
 
 
 public:
@@ -230,12 +230,12 @@ public:
   ShString
   name() const;
 
-  /// @brief enum 型を返す．
+  /// @brief 名前付き型を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  YmslEnumType*
-  enum_type() const;
+  YmslType*
+  named_type() const;
 
 
 private:
@@ -243,8 +243,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // enum 型
-  YmslEnumType* mEnum;
+  // 型
+  YmslType* mType;
 
 };
 

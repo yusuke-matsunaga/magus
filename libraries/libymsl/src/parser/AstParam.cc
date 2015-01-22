@@ -55,7 +55,7 @@ AstParam::index() const
 }
 
 // @brief 型を得る．
-AstType*
+const AstType*
 AstParam::type() const
 {
   return mType;
@@ -64,7 +64,7 @@ AstParam::type() const
 // @brief 初期化式を返す．
 //
 // NULL の場合もある．
-AstExpr*
+const AstExpr*
 AstParam::init_expr() const
 {
   return mInitExpr;

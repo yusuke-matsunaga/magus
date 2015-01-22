@@ -42,9 +42,14 @@ public:
   bool
   named_type() const;
 
+  /// @brief 型を得る．
+  virtual
+  TypeId
+  type_id() const;
+
   /// @brief 名前付き方の時に名前を返す．
   virtual
-  AstSymbol*
+  const AstSymbol*
   name() const;
 
   /// @brief 内容を出力する．

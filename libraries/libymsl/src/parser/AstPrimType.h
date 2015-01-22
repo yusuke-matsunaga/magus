@@ -39,11 +39,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief プリミティブ型の時 true を返す．
-  virtual
-  bool
-  primitive_type() const;
-
   /// @brief 型を得る．
   virtual
   TypeId

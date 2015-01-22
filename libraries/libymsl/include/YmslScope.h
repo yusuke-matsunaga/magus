@@ -59,9 +59,10 @@ public:
   void
   add_var(YmslVar* item);
 
-  /// @brief 列挙型を追加する．
+  /// @brief 型を追加する．
+  /// @param[in] item 追加する要素
   void
-  add_enum(YmslEnumType* item);
+  add_type(YmslType* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素

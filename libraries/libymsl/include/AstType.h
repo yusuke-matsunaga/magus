@@ -36,49 +36,31 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief プリミティブ型の時 true を返す．
-  virtual
-  bool
-  primitive_type() const;
-
   /// @brief 名前付き型の時 true を返す．
+  ///
+  /// 名前付き型の場合には type_id() は意味を持たない．
   virtual
   bool
   named_type() const;
 
-  /// @brief array 型の時 true を返す．
-  virtual
-  bool
-  array_type() const;
-
-  /// @brief set 型の時 true を返す．
-  virtual
-  bool
-  set_type() const;
-
-  /// @brief map 型の時 true を返す．
-  virtual
-  bool
-  map_type() const;
-
-  /// @brief プリミティブ型の時に型を返す．
-  virtual
-  TypeId
-  type_id() const;
-
   /// @brief 名前付き方の時に名前を返す．
   virtual
-  AstSymbol*
+  const AstSymbol*
   name() const;
+
+  /// @brief 型番号を返す．
+  virtual
+  TypeId
+  type_id() const = 0;
 
   /// @brief map 型の時にキーの型を返す．
   virtual
-  AstType*
+  const AstType*
   key_type() const;
 
   /// @brief array/set/map 型の時に要素の型を返す．
   virtual
-  AstType*
+  const AstType*
   elem_type() const;
 
   /// @brief 内容を出力する．
