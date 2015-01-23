@@ -8,10 +8,12 @@
 
 
 #include "YmslCompiler.h"
-#include "AstMgr.h"
-#include "AstStatement.h"
+#include "AstEnumConst.h"
 #include "AstExpr.h"
+#include "AstMgr.h"
 #include "AstParam.h"
+#include "AstStatement.h"
+#include "AstSymbol.h"
 #include "AstType.h"
 #include "YmslScope.h"
 
@@ -154,6 +156,24 @@ YmslCompiler::phase1(const AstStatement* stmt)
 void
 YmslCompiler::reg_enum(const AstStatement* stmt)
 {
+  ASSERT_COND( stmt->stmt_type() == kEnumDecl );
+
+  ShString name = stmt->name();
+  ymint n = stmt->enum_num();
+  vector<const AstEnumConst*> ec_list(n);
+  vector<ShString> elem_list(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    const AstEnumConst* ec = stmt->enum_const(i);
+    ec_list[i] = ec;
+    elem_list[i] = ec->name()->str_val();
+  }
+
+  // 定数に式がついている場合の処理
+  HashMap<ymuint, int> val_dict;
+  YmslType* type = mTypeMgr.enum_type(name, elem_list, val_dict);
+
+
+  // type をカレントスコープに登録する．
 }
 
 // @brief 関数の定義を行う．

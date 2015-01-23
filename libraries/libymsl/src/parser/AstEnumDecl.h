@@ -75,58 +75,6 @@ private:
 
 };
 
-
-//////////////////////////////////////////////////////////////////////
-/// @class AstEnumConst AstEnumDecl.h "AstEnumDecl.h"
-/// @brief enum 定数を表すクラス
-//////////////////////////////////////////////////////////////////////
-class AstEnumConst :
-  public Ast
-{
-public:
-
-  /// @brief コンストラクタ
-  /// @param[in] name 名前
-  /// @param[in] expr 値を表す式
-  /// @param[in] loc ファイル位置
-  AstEnumConst(AstSymbol* name,
-	       AstExpr* expr,
-	       const FileRegion& loc);
-
-  /// @brief デストラクタ
-  virtual
-  ~AstEnumConst();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 名前を返す．
-  const AstSymbol*
-  name() const;
-
-  /// @brief 値を表す式を返す．
-  ///
-  /// NULL の場合もある．
-  const AstExpr*
-  expr() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 名前
-  AstSymbol* mName;
-
-  // 値を表す式
-  AstExpr* mExpr;
-
-};
-
 END_NAMESPACE_YM_YMSL
 
 #endif // ASTENUMDECL_H

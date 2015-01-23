@@ -90,10 +90,14 @@ public:
   function_type(const YmslType* output_type,
 		const vector<YmslType*>& input_type_list);
 
-  /// @brief 型を登録する．
-  /// @param[in] type 登録する型
-  void
-  reg_type(YmslType* type);
+  /// @brief enum 型を作る．
+  /// @param[in] name 名前
+  /// @param[in] elem_list 要素名のリスト
+  /// @param[in] val_dict 値が指定された要素の辞書
+  YmslType*
+  enum_type(ShString name,
+	    const vector<ShString>& elem_list,
+	    const HashMap<ymuint, int>& val_dict);
 
 
 private:
@@ -104,6 +108,40 @@ private:
   /// @brief 組み込み型を登録する．
   void
   init();
+
+  /// @brief プリミティブ型を作る．
+  /// @param[in] type_id 型番号
+  YmslType*
+  new_PrimType(TypeId type_id);
+
+  /// @brief array 型を作る．
+  /// @param[in] elem_type 要素の型
+  YmslType*
+  new_ArrayType(const YmslType* elem_type);
+
+  /// @brief set 型を作る．
+  /// @param[in] elem_type 要素の型
+  YmslType*
+  new_SetType(const YmslType* elem_type);
+
+  /// @brief map 型を作る．
+  /// @param[in] key_type キーの
+  /// @param[in] elem_type 要素の型
+  YmslType*
+  new_MapType(const YmslType* key_type,
+	      const YmslType* elem_type);
+
+  /// @brief enum 型を作る．
+  /// @param[in] name 名前
+  /// @param[in] elem_list 要素名のリスト
+  YmslType*
+  new_EnumType(ShString name,
+	       const vector<ShString>& elem_list);
+
+  /// @brief 型を登録する．
+  /// @param[in] type 登録する型
+  void
+  reg_type(YmslType* type);
 
 
 private:

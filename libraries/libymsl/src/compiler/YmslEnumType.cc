@@ -8,6 +8,7 @@
 
 
 #include "YmslEnumType.h"
+#include "YmslEnumConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -41,7 +42,7 @@ YmslEnumConst::name() const
 }
 
 // @brief 値を返す．
-ymuint
+int
 YmslEnumConst::val() const
 {
   return mVal;
@@ -57,7 +58,7 @@ YmslEnumConst::val() const
 // @param[in] elem_list 要素のリスト
 YmslEnumType::YmslEnumType(ShString name,
 			   const vector<ShString>& elem_list) :
-  mName(name),
+  YmslNamedType(name),
   mElemNum(elem_list.size())
 {
   mElemArray = new YmslEnumConst[mElemNum];
@@ -80,15 +81,6 @@ TypeId
 YmslEnumType::type_id() const
 {
   return kEnumType;
-}
-
-// @brief 型名を得る．
-//
-// enum のみ有効
-ShString
-YmslEnumType::type_name() const
-{
-  return mName;
 }
 
 // @brief 列挙型の数を得る．

@@ -8,6 +8,7 @@
 
 
 #include "AstEnumDecl.h"
+#include "AstEnumConst.h"
 #include "AstList.h"
 
 

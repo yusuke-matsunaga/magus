@@ -21,6 +21,7 @@
 #include "AstCaseItem.h"
 #include "AstContinue.h"
 #include "AstDoWhile.h"
+#include "AstEnumConst.h"
 #include "AstEnumDecl.h"
 #include "AstExpr.h"
 #include "AstExprStmt.h"

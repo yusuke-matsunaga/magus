@@ -284,7 +284,7 @@ statement
   $$ = $1;
 }
 // enum 定義
-| ENUM SYMBOL LP enumconst_list RP SEMI
+| ENUM SYMBOL LCB enumconst_list RCB SEMI
 {
   $$ = mgr.new_EnumDecl($2, $4, @$);
   delete $4;

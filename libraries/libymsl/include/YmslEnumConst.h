@@ -1,36 +1,35 @@
-#ifndef YMSLSIMPLETYPE_H
-#define YMSLSIMPLETYPE_H
+#ifndef YMSLENUMCONST_H
+#define YMSLENUMCONST_H
 
-/// @file YmslSimpleType.h
-/// @brief YmslSimpleType のヘッダファイル
+/// @file YmslEnumConst.h
+/// @brief YmslEnumConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslType.h"
+#include "ymsl_int.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslSimpleType YmslType.h "YmslType.h"
-/// @brief 単純な型を表すクラス
+/// @class YmslEnumConst YmslEnumConst.h "YmslEnumConst.h"
+/// @brief enum 定数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslSimpleType :
-  public YmslType
+class YmslEnumConst
 {
+  friend class YmslEnumType;
+
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] type 型
-  YmslSimpleType(TypeId type);
-
+  YmslEnumConst();
 
   /// @brief デストラクタ
-  virtual
-  ~YmslSimpleType();
+  ~YmslEnumConst();
 
 
 public:
@@ -38,15 +37,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
-  TypeId
-  type_id() const;
+  /// @brief 親の enum 型を返す．
+  YmslType*
+  parent() const;
 
-  /// @brief 内容を出力する．
-  /// @param[in] s 出力先のストリーム
-  virtual
-  void
-  print(ostream& s) const;
+  /// @brief 名前を返す．
+  ShString
+  name() const;
+
+  /// @brief 値を返す．
+  int
+  val() const;
 
 
 private:
@@ -54,11 +55,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 型
-  TypeId mType;
+  // 親の enum 型
+  YmslType* mParent;
+
+  // 名前
+  ShString mName;
+
+  // 値
+  int mVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLSIMPLETYPE_H
+#endif // YMSLENUMCONST_H

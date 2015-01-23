@@ -9,7 +9,11 @@
 
 #include "YmslTypeMgr.h"
 #include "YmslType.h"
-#include "YmslSimpleType.h"
+#include "YmslPrimType.h"
+#include "YmslArrayType.h"
+#include "YmslSetType.h"
+#include "YmslMapType.h"
+#include "YmslEnumType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -110,30 +114,91 @@ YmslTypeMgr::function_type(const YmslType* output_type,
 {
 }
 
-/// @brief 型を登録する．
-/// @param[in] type 登録する型
-void
-YmslTypeMgr::reg_type(YmslType* type)
+// @brief enum 型を作る．
+// @param[in] name 名前
+// @param[in] elem_list 要素名のリスト
+// @param[in] val_dict 値が指定された要素の辞書
+YmslType*
+YmslTypeMgr::enum_type(ShString name,
+		       const vector<ShString>& elem_list,
+		       const HashMap<ymuint, int>& val_dict)
 {
-  type->mId = mTypeList.size();
-  mTypeList.push_back(type);
+  YmslType* type = new_EnumType(name, elem_list);
+  return type;
 }
 
 // @brief 組み込み型を登録する．
 void
 YmslTypeMgr::init()
 {
-  mVoidType = new YmslSimpleType(kVoidType);
-  mBooleanType = new YmslSimpleType(kBooleanType);
-  mIntType = new YmslSimpleType(kIntType);
-  mFloatType = new YmslSimpleType(kFloatType);
-  mStringType = new YmslSimpleType(kStringType);
+  mVoidType = new_PrimType(kVoidType);
+  mBooleanType = new_PrimType(kBooleanType);
+  mIntType = new_PrimType(kIntType);
+  mFloatType = new_PrimType(kFloatType);
+  mStringType = new_PrimType(kStringType);
+}
 
-  reg_type(mVoidType);
-  reg_type(mBooleanType);
-  reg_type(mIntType);
-  reg_type(mFloatType);
-  reg_type(mStringType);
+// @brief プリミティブ型を作る．
+// @param[in] type_id 型番号
+YmslType*
+YmslTypeMgr::new_PrimType(TypeId type_id)
+{
+  YmslType* type = new YmslPrimType(type_id);
+  reg_type(type);
+  return type;
+}
+
+// @brief array 型を作る．
+// @param[in] elem_type 要素の型
+YmslType*
+YmslTypeMgr::new_ArrayType(const YmslType* elem_type)
+{
+  YmslType* type = new YmslArrayType(elem_type);
+  reg_type(type);
+  return type;
+}
+
+// @brief set 型を作る．
+// @param[in] elem_type 要素の型
+YmslType*
+YmslTypeMgr::new_SetType(const YmslType* elem_type)
+{
+  YmslType* type = new YmslSetType(elem_type);
+  reg_type(type);
+  return type;
+}
+
+// @brief map 型を作る．
+// @param[in] key_type キーの
+// @param[in] elem_type 要素の型
+YmslType*
+YmslTypeMgr::new_MapType(const YmslType* key_type,
+			 const YmslType* elem_type)
+{
+  YmslType* type = new YmslMapType(key_type, elem_type);
+  reg_type(type);
+  return type;
+}
+
+// @brief enum 型を作る．
+// @param[in] name 名前
+// @param[in] const_list 定数リスト
+YmslType*
+YmslTypeMgr::new_EnumType(ShString name,
+			  const vector<ShString>& elem_list)
+{
+  YmslType* type = new YmslEnumType(name, elem_list);
+  reg_type(type);
+  return type;
+}
+
+// @brief 型を登録する．
+// @param[in] type 登録する型
+void
+YmslTypeMgr::reg_type(YmslType* type)
+{
+  type->mId = mTypeList.size();
+  mTypeList.push_back(type);
 }
 
 END_NAMESPACE_YM_YMSL

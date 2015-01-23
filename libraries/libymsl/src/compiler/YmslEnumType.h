@@ -2,77 +2,25 @@
 #define YMSLENUMTYPE_H
 
 /// @file YmslEnumType.h
-/// @brief YmslEnum のヘッダファイル
+/// @brief YmslEnumType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslType.h"
+#include "YmslNamedType.h"
 #include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslEnumConst YmslEnumType.h "YmslEnumType.h"
-/// @brief enum 定数を表すクラス
-//////////////////////////////////////////////////////////////////////
-class YmslEnumConst
-{
-  friend class YmslEnumType;
-
-public:
-
-  /// @brief コンストラクタ
-  YmslEnumConst();
-
-  /// @brief デストラクタ
-  ~YmslEnumConst();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 親の enum 型を返す．
-  YmslType*
-  parent() const;
-
-  /// @brief 名前を返す．
-  ShString
-  name() const;
-
-  /// @brief 値を返す．
-  ymuint
-  val() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 親の enum 型
-  YmslType* mParent;
-
-  // 名前
-  ShString mName;
-
-  // 値
-  ymuint mVal;
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class YmslEnumType YmslEnumType.h "YmslEnumType.h"
 /// @brief enum 型を表すクラス
 //////////////////////////////////////////////////////////////////////
 class YmslEnumType :
-  public YmslType
+  public YmslNamedType
 {
 public:
 
@@ -96,13 +44,6 @@ public:
   virtual
   TypeId
   type_id() const;
-
-  /// @brief 型名を得る．
-  ///
-  /// enum のみ有効
-  virtual
-  ShString
-  type_name() const;
 
   /// @brief 列挙型の数を得る．
   ///
@@ -139,9 +80,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 名前
-  ShString mName;
 
   // 要素数
   ymuint mElemNum;

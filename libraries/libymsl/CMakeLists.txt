@@ -17,12 +17,16 @@ include_directories(
 
 set (ymsl_SOURCES
   src/compiler/ObjHandle.cc
+  src/compiler/YmslArrayType.cc
   src/compiler/YmslCompiler.cc
   src/compiler/YmslEnumType.cc
   src/compiler/YmslFunction.cc
   src/compiler/YmslLabel.cc
+  src/compiler/YmslMapType.cc
+  src/compiler/YmslNamedType.cc
+  src/compiler/YmslPrimType.cc
   src/compiler/YmslScope.cc
-  src/compiler/YmslSimpleType.cc
+  src/compiler/YmslSetType.cc
   src/compiler/YmslType.cc
   src/compiler/YmslTypeMgr.cc
   src/compiler/YmslVar.cc
