@@ -20,10 +20,10 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] body 本体の式
 // @param[in] member メンバ名
 // @param[in] loc ファイル位置
-AstMemberRef::AstMemberRef(AstLeaf* body,
+AstMemberRef::AstMemberRef(AstExpr* body,
 			   AstSymbol* member,
 			   const FileRegion& loc) :
-  AstLeaf(loc),
+  AstExpr(loc),
   mBody(body),
   mMember(member)
 {
@@ -35,8 +35,8 @@ AstMemberRef::~AstMemberRef()
 }
 
 // @brief 種類を返す．
-LeafType
-AstMemberRef::leaf_type() const
+ExprType
+AstMemberRef::expr_type() const
 {
   return kMemberRef;
 }
@@ -44,7 +44,7 @@ AstMemberRef::leaf_type() const
 // @brief 本体の式を返す．
 //
 // kMemberRef, kArrayRef, kFuncCall のみ有効
-const AstLeaf*
+const AstExpr*
 AstMemberRef::body() const
 {
   return mBody;
@@ -54,7 +54,7 @@ AstMemberRef::body() const
 //
 // kMemberRef のみ有効
 const AstSymbol*
-AstMemberRef::symbol() const
+AstMemberRef::member() const
 {
   return mMember;
 }

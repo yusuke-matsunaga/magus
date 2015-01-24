@@ -92,7 +92,7 @@ AstStatement::enum_const(ymuint pos) const
 // @brief 左辺式を返す．
 //
 // kAssignment のみ有効
-const AstLeaf*
+const AstExpr*
 AstStatement::lhs_expr() const
 {
   ASSERT_NOT_REACHED;

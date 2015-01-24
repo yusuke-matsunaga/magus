@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] loc ファイル位置
 AstFloatConst::AstFloatConst(double val,
 			     const FileRegion& loc) :
-  AstLeaf(loc),
+  AstExpr(loc),
   mVal(val)
 {
 }
@@ -32,8 +32,8 @@ AstFloatConst::~AstFloatConst()
 }
 
 // @brief 種類を返す．
-LeafType
-AstFloatConst::leaf_type() const
+ExprType
+AstFloatConst::expr_type() const
 {
   return kFloatConst;
 }

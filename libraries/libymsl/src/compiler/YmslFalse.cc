@@ -28,8 +28,8 @@ YmslFalse::~YmslFalse()
 }
 
 // @brief 型を返す．
-LeafType
-YmslFalse::leaf_type() const
+ExprType
+YmslFalse::expr_type() const
 {
   return kFalse;
 }

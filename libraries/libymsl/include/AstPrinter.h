@@ -53,11 +53,6 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 終端式を出力する．
-  /// @param[in] leaf 式
-  void
-  print_leaf(const AstLeaf* leaf);
-
   /// @brief インデントする．
   /// @param[in] indent インデントレベル
   void

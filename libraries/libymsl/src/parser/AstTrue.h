@@ -1,8 +1,8 @@
-#ifndef ASTLEAFEXPR_H
-#define ASTLEAFEXPR_H
+#ifndef ASTTRUE_H
+#define ASTTRUE_H
 
-/// @file AstLeafExpr.h
-/// @brief AstLeafExpr のヘッダファイル
+/// @file AstTrue.h
+/// @brief AstTrue のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,20 +15,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstLeafExpr AstLeafExpr.h "AstLeafExpr.h"
-/// @brief 終端式を表すクラス
+/// @class AstTrue AstTrue.h "AstTrue.h"
+/// @brief true を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstLeafExpr :
+class AstTrue :
   public AstExpr
 {
 public:
 
   /// @brief コンストラクタ
-  AstLeafExpr(AstLeaf* leaf);
+  /// @param[in] loc ファイル位置
+  AstTrue(const FileRegion& loc);
 
-  /// @breif デストラクタ
+  /// @brief デストラクタ
   virtual
-  ~AstLeafExpr();
+  ~AstTrue();
 
 
 public:
@@ -41,24 +42,8 @@ public:
   ExprType
   expr_type() const;
 
-  /// @brief 終端を返す．
-  ///
-  /// kLeafExpr のみ有効
-  virtual
-  const AstLeaf*
-  leaf() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 終端
-  AstLeaf* mLeaf;
-
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTLEAFEXPR_H
+#endif // ASTTRUE_H

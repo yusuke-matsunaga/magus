@@ -29,8 +29,8 @@ YmslVarExpr::~YmslVarExpr()
 }
 
 // @brief 種類を返す．
-LeafType
-YmslVarExpr::leaf_type() const
+ExprType
+YmslVarExpr::expr_type() const
 {
   return kSymbolExpr;
 }

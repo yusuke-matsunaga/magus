@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmslLeaf.h"
+#include "YmslExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief メンバ参照を表すクラス
 //////////////////////////////////////////////////////////////////////
 class YmslMemberRef :
-  public YmslLeaf
+  public YmslExpr
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] body 本体
   /// @param[in] offset メンバのオフセット
-  YmslMemberRef(YmslLeaf* body,
+  YmslMemberRef(YmslExpr* body,
 		ymuint offset);
 
   /// @brief デストラクタ
@@ -41,14 +41,14 @@ public:
 
   /// @brief 型を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 本体を返す．
   ///
   /// kMemberRef, kArrayRef, kFuncCall のみ有効
   virtual
-  YmslLeaf*
+  YmslExpr*
   body() const;
 
   /// @brief メンバのオフセットを得る．
@@ -65,7 +65,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本体の式
-  YmslLeaf* mBody;
+  YmslExpr* mBody;
 
   // オフセット
   ymuint mOffset;

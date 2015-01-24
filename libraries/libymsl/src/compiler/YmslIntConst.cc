@@ -29,8 +29,8 @@ YmslIntConst::~YmslIntConst()
 }
 
 // @brief 種類を返す．
-LeafType
-YmslIntConst::leaf_type() const
+ExprType
+YmslIntConst::expr_type() const
 {
   return kIntConst;
 }

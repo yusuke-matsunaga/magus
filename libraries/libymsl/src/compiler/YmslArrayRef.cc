@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] body 本体
 // @param[in] index インデックス
-YmslArrayRef::YmslArrayRef(YmslLeaf* body,
+YmslArrayRef::YmslArrayRef(YmslExpr* body,
 			   YmslExpr* index) :
   mBody(body),
   mIndex(index)
@@ -32,16 +32,16 @@ YmslArrayRef::~YmslArrayRef()
 }
 
 // @brief 型を返す．
-LeafType
-YmslArrayRef::leaf_type() const
+ExprType
+YmslArrayRef::expr_type() const
 {
   return kArrayRef;
 }
 
 // @brief 本体を返す．
 //
-// kMemberRef, kArrayRef, kFuncCall のみ有効
-YmslLeaf*
+// kMemberRef, kArrayRef のみ有効
+YmslExpr*
 YmslArrayRef::body() const
 {
   return mBody;

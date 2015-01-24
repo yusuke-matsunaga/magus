@@ -29,8 +29,8 @@ YmslStringConst::~YmslStringConst()
 }
 
 // @brief 種類を返す．
-LeafType
-YmslStringConst::leaf_type() const
+ExprType
+YmslStringConst::expr_type() const
 {
   return kStringConst;
 }

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmslLeaf.h"
+#include "YmslExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 配列参照を表すクラス
 //////////////////////////////////////////////////////////////////////
 class YmslArrayRef :
-  public YmslLeaf
+  public YmslExpr
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] body 本体
   /// @param[in] index インデックス
-  YmslArrayRef(YmslLeaf* body,
+  YmslArrayRef(YmslExpr* body,
 	       YmslExpr* index);
 
   /// @brief デストラクタ
@@ -41,14 +41,14 @@ public:
 
   /// @brief 型を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 本体を返す．
   ///
-  /// kMemberRef, kArrayRef, kFuncCall のみ有効
+  /// kMemberRef, kArrayRef のみ有効
   virtual
-  YmslLeaf*
+  YmslExpr*
   body() const;
 
   /// @brief 配列のインデックスを得る．
@@ -65,7 +65,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本体の式
-  YmslLeaf* mBody;
+  YmslExpr* mBody;
 
   // 配列のインデックス
   YmslExpr* mIndex;

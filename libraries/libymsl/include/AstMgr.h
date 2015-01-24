@@ -159,7 +159,7 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_Assignment(StmtType stmt_type,
-		 AstLeaf* left,
+		 AstExpr* left,
 		 AstExpr* right,
 		 const FileRegion& loc);
 
@@ -271,7 +271,7 @@ public:
   /// @brief 終端式を作る．
   /// @param[in] leaf 終端
   AstExpr*
-  new_LeafExpr(AstLeaf* leaf);
+  new_LeafExpr(AstExpr* leaf);
 
   /// @brief 単項演算式を作る．
   /// @param[in] op 演算子のタイプ
@@ -299,15 +299,15 @@ public:
 
   /// @brief シンボル式を作る．
   /// @param[in] symbol シンボル
-  AstLeaf*
+  AstExpr*
   new_SymbolExpr(AstSymbol* symbol);
 
   /// @brief メンバ参照を作る．
   /// @param[in] body 本体の式
   /// @param[in] member メンバ名
   /// @param[in] loc ファイル位置
-  AstLeaf*
-  new_MemberRef(AstLeaf* body,
+  AstExpr*
+  new_MemberRef(AstExpr* body,
 		AstSymbol* member,
 		const FileRegion& loc);
 
@@ -315,8 +315,8 @@ public:
   /// @param[in] body 本体の式
   /// @param[in] index インデックス
   /// @param[in] loc ファイル位置
-  AstLeaf*
-  new_ArrayRef(AstLeaf* body,
+  AstExpr*
+  new_ArrayRef(AstExpr* body,
 	       AstExpr* index,
 	       const FileRegion& loc);
 
@@ -324,39 +324,39 @@ public:
   /// @param[in] id 関数名
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstLeaf*
-  new_FuncCall(AstLeaf* id,
+  AstExpr*
+  new_FuncCall(AstExpr* id,
 	       AstExprList* expr_list,
 	       const FileRegion& loc);
 
   /// @brief true 定数式を作る．
   /// @param[in] loc ファイル位置
-  AstLeaf*
+  AstExpr*
   new_TrueConst(const FileRegion& loc);
 
   /// @brief false 定数式を作る．
   /// @param[in] loc ファイル位置
-  AstLeaf*
+  AstExpr*
   new_FalseConst(const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstLeaf*
+  AstExpr*
   new_IntConst(int val,
 	       const FileRegion& loc);
 
   /// @brief 浮動小数点定数式を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstLeaf*
+  AstExpr*
   new_FloatConst(double val,
 		 const FileRegion& loc);
 
   /// @brief 文字列定数を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstLeaf*
+  AstExpr*
   new_StringConst(const char* val,
 		  const FileRegion& loc);
 

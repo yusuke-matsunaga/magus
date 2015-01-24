@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] body 本体
 // @param[in] offset メンバのオフセット
-YmslMemberRef::YmslMemberRef(YmslLeaf* body,
+YmslMemberRef::YmslMemberRef(YmslExpr* body,
 			     ymuint offset) :
   mBody(body),
   mOffset(offset)
@@ -32,16 +32,16 @@ YmslMemberRef::~YmslMemberRef()
 }
 
 // @brief 型を返す．
-LeafType
-YmslMemberRef::leaf_type() const
+ExprType
+YmslMemberRef::expr_type() const
 {
   return kMemberRef;
 }
 
 // @brief 本体を返す．
 //
-// kMemberRef, kArrayRef, kFuncCall のみ有効
-YmslLeaf*
+// kMemberRef, kArrayRef のみ有効
+YmslExpr*
 YmslMemberRef::body() const
 {
   return mBody;

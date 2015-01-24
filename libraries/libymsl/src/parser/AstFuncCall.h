@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstLeaf.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 関数呼び出しを表す Ast
 //////////////////////////////////////////////////////////////////////
 class AstFuncCall :
-  public AstLeaf
+  public AstExpr
 {
 public:
 
@@ -27,7 +27,7 @@ public:
   /// @param[in] func 関数
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstLeaf* func,
+  AstFuncCall(AstExpr* func,
 	      AstExprList* expr_list,
 	      const FileRegion& loc);
 
@@ -43,13 +43,13 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 関数本体を返す．
   virtual
-  const AstLeaf*
-  body() const;
+  const AstExpr*
+  func() const;
 
   /// @brief 引数リストの要素数を返す．
   ///
@@ -73,7 +73,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  AstLeaf* mFunc;
+  AstExpr* mFunc;
 
   // 引数のリスト
   vector<AstExpr*> mExprList;

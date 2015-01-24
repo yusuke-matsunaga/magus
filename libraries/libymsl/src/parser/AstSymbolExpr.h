@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstLeaf.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief シンボル式を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstSymbolExpr :
-  public AstLeaf
+  public AstExpr
 {
 public:
 
@@ -39,8 +39,8 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief シンボル名を返す．
   ///

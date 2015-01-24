@@ -16,7 +16,6 @@
 #include "AstAssignment.h"
 #include "AstBinOp.h"
 #include "AstBlockStmt.h"
-#include "AstBoolConst.h"
 #include "AstBreak.h"
 #include "AstCaseItem.h"
 #include "AstContinue.h"
@@ -25,6 +24,7 @@
 #include "AstEnumDecl.h"
 #include "AstExpr.h"
 #include "AstExprStmt.h"
+#include "AstFalse.h"
 #include "AstFloatConst.h"
 #include "AstFor.h"
 #include "AstFuncCall.h"
@@ -35,7 +35,6 @@
 #include "AstIntConst.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
-#include "AstLeafExpr.h"
 #include "AstList.h"
 #include "AstMapType.h"
 #include "AstMemberRef.h"
@@ -50,6 +49,7 @@
 #include "AstSymbol.h"
 #include "AstSymbolExpr.h"
 #include "AstToplevel.h"
+#include "AstTrue.h"
 #include "AstUniOp.h"
 #include "AstVarDecl.h"
 #include "AstWhile.h"
@@ -128,15 +128,15 @@ AstMgr::scan(YYSTYPE& lval,
     break;
 
   case STRING_VAL:
-    lval.leaf_type = new_StringConst(mScanner->cur_string(), lloc);
+    lval.expr_type = new_StringConst(mScanner->cur_string(), lloc);
     break;
 
   case INT_VAL:
-    lval.leaf_type = new_IntConst(mScanner->cur_int(), lloc);
+    lval.expr_type = new_IntConst(mScanner->cur_int(), lloc);
     break;
 
   case FLOAT_VAL:
-    lval.leaf_type = new_FloatConst(mScanner->cur_float(), lloc);
+    lval.expr_type = new_FloatConst(mScanner->cur_float(), lloc);
     break;
 
   default:
@@ -261,7 +261,7 @@ AstMgr::new_FuncDecl(AstSymbol* name,
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_Assignment(StmtType stmt_type,
-		       AstLeaf* left,
+		       AstExpr* left,
 		       AstExpr* right,
 		       const FileRegion& loc)
 {
@@ -426,15 +426,6 @@ AstMgr::new_ExprStmt(AstExpr* expr,
   return new (p) AstExprStmt(expr, loc);
 }
 
-// @brief 終端式を作る．
-// @param[in] leaf 終端
-AstExpr*
-AstMgr::new_LeafExpr(AstLeaf* leaf)
-{
-  void* p = mAlloc.get_memory(sizeof(AstLeafExpr));
-  return new (p) AstLeafExpr(leaf);
-}
-
 // @brief 単項演算式を作る．
 // @param[in] op 演算子のタイプ
 // @param[in] left オペランド
@@ -473,7 +464,7 @@ AstMgr::new_IteOp(AstExpr* opr1,
 
 // @brief シンボル式を作る．
 // @param[in] symbol シンボル
-AstLeaf*
+AstExpr*
 AstMgr::new_SymbolExpr(AstSymbol* symbol)
 {
   void* p = mAlloc.get_memory(sizeof(AstSymbolExpr));
@@ -484,8 +475,8 @@ AstMgr::new_SymbolExpr(AstSymbol* symbol)
 // @param[in] body 本体の式
 // @param[in] member メンバ名
 // @param[in] loc ファイル位置
-AstLeaf*
-AstMgr::new_MemberRef(AstLeaf* body,
+AstExpr*
+AstMgr::new_MemberRef(AstExpr* body,
 		      AstSymbol* member,
 		      const FileRegion& loc)
 {
@@ -497,8 +488,8 @@ AstMgr::new_MemberRef(AstLeaf* body,
 // @param[in] id 配列名
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
-AstLeaf*
-AstMgr::new_ArrayRef(AstLeaf* id,
+AstExpr*
+AstMgr::new_ArrayRef(AstExpr* id,
 		     AstExpr* index,
 		     const FileRegion& loc)
 {
@@ -510,8 +501,8 @@ AstMgr::new_ArrayRef(AstLeaf* id,
 // @param[in] id 関数名
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
-AstLeaf*
-AstMgr::new_FuncCall(AstLeaf* id,
+AstExpr*
+AstMgr::new_FuncCall(AstExpr* id,
 		     AstExprList* expr_list,
 		     const FileRegion& loc)
 {
@@ -521,26 +512,26 @@ AstMgr::new_FuncCall(AstLeaf* id,
 
 // @brief true 定数式を作る．
 // @param[in] loc ファイル位置
-AstLeaf*
+AstExpr*
 AstMgr::new_TrueConst(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstBoolConst));
-  return new (p) AstBoolConst(kTrue, loc);
+  void* p = mAlloc.get_memory(sizeof(AstTrue));
+  return new (p) AstTrue(loc);
 }
 
 // @brief false 定数式を作る．
 // @param[in] loc ファイル位置
-AstLeaf*
+AstExpr*
 AstMgr::new_FalseConst(const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstBoolConst));
-  return new (p) AstBoolConst(kFalse, loc);
+  void* p = mAlloc.get_memory(sizeof(AstFalse));
+  return new (p) AstFalse(loc);
 }
 
 // @brief 整数定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstLeaf*
+AstExpr*
 AstMgr::new_IntConst(int val,
 		     const FileRegion& loc)
 {
@@ -551,7 +542,7 @@ AstMgr::new_IntConst(int val,
 // @brief 浮動小数点定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstLeaf*
+AstExpr*
 AstMgr::new_FloatConst(double val,
 		       const FileRegion& loc)
 {
@@ -562,7 +553,7 @@ AstMgr::new_FloatConst(double val,
 // @brief 文字列定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstLeaf*
+AstExpr*
 AstMgr::new_StringConst(const char* val,
 			const FileRegion& loc)
 {

@@ -30,7 +30,6 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_YMSL
 
 class YmslCodeList;
-//class YmslDriver;
 class YmslEnumConst;
 class YmslExpr;
 class YmslFunction;
@@ -40,7 +39,6 @@ class YmslLeaf;
 class YmslObj;
 class YmslParser;
 class YmslScope;
-//class YmslSubspace;
 class YmslType;
 class YmslTypeMgr;
 class YmslVar;
@@ -52,7 +50,6 @@ class AstEnumDecl;
 class AstEnumConst;
 class AstExpr;
 class AstFuncDecl;
-class AstLeaf;
 class AstMgr;
 class AstModule;
 class AstParam;
@@ -270,8 +267,16 @@ enum StmtType {
 /// @brief 式の種類
 //////////////////////////////////////////////////////////////////////
 enum ExprType {
+  // 定数
+  kTrue,
+  kFalse,
+  kIntConst,
+  kFloatConst,
+  kStringConst,
   // 終端
-  kLeafExpr,
+  kSymbolExpr,
+  kArrayRef,
+  kMemberRef,
   // 単項演算
   kCastInt,
   kCastBoolean,
@@ -300,23 +305,9 @@ enum ExprType {
   kGt,
   kGe,
   // 三項演算
-  kIte
-};
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 終端式の種類
-//////////////////////////////////////////////////////////////////////
-enum LeafType {
-  kSymbolExpr,
-  kArrayRef,
-  kMemberRef,
-  kFuncCall,
-  kTrue,
-  kFalse,
-  kIntConst,
-  kFloatConst,
-  kStringConst
+  kIte,
+  // 関数呼び出し
+  kFuncCall
 };
 
 

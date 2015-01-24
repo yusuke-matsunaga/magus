@@ -10,7 +10,6 @@
 #include "YmslCompiler.h"
 #include "AstEnumConst.h"
 #include "AstExpr.h"
-#include "AstLeaf.h"
 #include "AstMgr.h"
 #include "AstParam.h"
 #include "AstStatement.h"
@@ -22,7 +21,6 @@
 #include "YmslVar.h"
 
 #include "YmslOpExpr.h"
-#include "YmslLeafExpr.h"
 
 #include "YmslMemberRef.h"
 #include "YmslArrayRef.h"
@@ -375,7 +373,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
   case kEqOr:
   case kEqXor:
   case kExprStmt:
-    elab_leaf(stmt->lhs_expr(), scope);
+    elab_expr(stmt->lhs_expr(), scope);
     elab_expr(stmt->expr(), scope);
     break;
 
@@ -454,11 +452,55 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
   }
 
   switch ( ast_expr->expr_type() ) {
-  case kLeafExpr:
+  case kTrue:
+    return new YmslTrue();
+
+  case kFalse:
+    return new YmslFalse();
+
+  case kIntConst:
+    return new YmslIntConst(ast_expr->int_val());
+
+  case kFloatConst:
+    return new YmslFloatConst(ast_expr->float_val());
+
+  case kStringConst:
+    return new YmslStringConst(ast_expr->string_val());
+
+  case kSymbolExpr:
+#if 0
     {
-      YmslLeaf* leaf = elab_leaf(ast_expr->leaf(), scope);
-      return new YmslLeafExpr(leaf);
+      const AstSymbol* symbol = ast_leaf->symbol();
+      ObjHandle* handle = scope->find(symbol->str_val());
+      if ( handle == NULL ) {
+	// symbol not found
+	return NULL;
+      }
+      YmslVar* var = handle->var();
+      if ( var == NULL ) {
+	// symbol is not a variable
+	return NULL;
+      }
+      return new YmslVarExpr(var);
     }
+#endif
+    break;
+
+  case kArrayRef:
+    {
+      YmslExpr* body = elab_expr(ast_expr->body(), scope);
+      YmslExpr* index = elab_expr(ast_expr->index(), scope);
+      return new YmslArrayRef(body, index);
+    }
+    break;
+
+  case kMemberRef:
+    {
+      YmslExpr* body = elab_expr(ast_expr->body(), scope);
+      const AstSymbol* symbol = ast_expr->symbol();
+      //return new YmslMemberRef(body, symbol);
+    }
+    break;
 
   case kCastInt:
     return new YmslOpExpr(kCastInt, opr[0]);
@@ -538,83 +580,19 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
   case kIte:
     return new YmslOpExpr(kIte, opr[0], opr[1], opr[2]);
 
-  default:
-    break;
-  }
-
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 終端式の実体化を行う．
-// @param[in] ast_leaf 式を表す構文木
-// @param[in] scope 現在のスコープ
-YmslLeaf*
-YmslCompiler::elab_leaf(const AstLeaf* ast_leaf,
-			YmslScope* scope)
-{
-  switch ( ast_leaf->leaf_type() ) {
-  case kSymbolExpr:
+  case kFuncCall:
 #if 0
     {
-      const AstSymbol* symbol = ast_leaf->symbol();
-      ObjHandle* handle = scope->find(symbol->str_val());
-      if ( handle == NULL ) {
-	// symbol not found
-	return NULL;
-      }
-      YmslVar* var = handle->var();
-      if ( var == NULL ) {
-	// symbol is not a variable
-	return NULL;
-      }
-      return new YmslVarExpr(var);
-    }
-#endif
-    break;
-
-  case kMemberRef:
-    {
-      YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
-      const AstSymbol* symbol = ast_leaf->symbol();
-      //return new YmslMemberRef(leaf, symbol);
-    }
-    break;
-
-  case kArrayRef:
-    {
-      YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
-      YmslExpr* index = elab_expr(ast_leaf->index(), scope);
-      return new YmslArrayRef(leaf, index);
-    }
-    break;
-
-  case kFuncCall:
-    {
-      YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
-      ymuint n = ast_leaf->arglist_num();
+      YmslLeaf* leaf = elab_leaf(ast_expr->func(), scope);
+      ymuint n = ast_expr->arglist_num();
       vector<YmslExpr*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
-	arglist[i] = elab_expr(ast_leaf->arglist_elem(i), scope);
+	arglist[i] = elab_expr(ast_expr->arglist_elem(i), scope);
       }
       return new YmslFuncCall(leaf, arglist);
     }
+#endif
     break;
-
-  case kTrue:
-    return new YmslTrue();
-
-  case kFalse:
-    return new YmslFalse();
-
-  case kIntConst:
-    return new YmslIntConst(ast_leaf->int_val());
-
-  case kFloatConst:
-    return new YmslFloatConst(ast_leaf->float_val());
-
-  case kStringConst:
-    return new YmslStringConst(ast_leaf->string_val());
 
   default:
     break;

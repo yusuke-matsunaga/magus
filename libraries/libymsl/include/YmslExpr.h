@@ -40,6 +40,27 @@ public:
   ExprType
   expr_type() const = 0;
 
+  /// @brief 整数値を得る．
+  ///
+  /// kIntConst のみ有効
+  virtual
+  int
+  int_val() const;
+
+  /// @brief 実数値を得る．
+  ///
+  /// kFloatConst のみ有効
+  virtual
+  double
+  float_val() const;
+
+  /// @brief 文字列を得る．
+  ///
+  /// kStringConst のみ有効
+  virtual
+  const char*
+  string_val() const;
+
   /// @brief 終端式を返す．
   ///
   /// kLeafExpr の時のみ有効
@@ -61,6 +82,28 @@ public:
   virtual
   YmslExpr*
   operand(ymuint pos) const;
+
+  /// @brief 関数本体を返す．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  YmslLeaf*
+  func() const;
+
+  /// @brief 関数の引数の数を得る．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  ymuint
+  arglist_num() const;
+
+  /// @brief 関数の引数を得る．
+  /// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  YmslExpr*
+  arglist_elem(ymuint pos) const;
 
 };
 

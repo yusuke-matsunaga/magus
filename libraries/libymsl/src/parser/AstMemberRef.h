@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstLeaf.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief メンバ参照を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstMemberRef :
-  public AstLeaf
+  public AstExpr
 {
 public:
 
@@ -27,7 +27,7 @@ public:
   /// @param[in] body 本体の式
   /// @param[in] member メンバ名
   /// @param[in] loc ファイル位置
-  AstMemberRef(AstLeaf* body,
+  AstMemberRef(AstExpr* body,
 	       AstSymbol* member,
 	       const FileRegion& loc);
 
@@ -43,14 +43,14 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 本体の式を返す．
   ///
-  /// kMemberRef, kArrayRef, kFuncCall のみ有効
+  /// kMemberRef, kArrayRef のみ有効
   virtual
-  const AstLeaf*
+  const AstExpr*
   body() const;
 
   /// @brief メンバ名を返す．
@@ -58,7 +58,7 @@ public:
   /// kMemberRef のみ有効
   virtual
   const AstSymbol*
-  symbol() const;
+  member() const;
 
 
 private:
@@ -67,7 +67,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オブジェクト名
-  AstLeaf* mBody;
+  AstExpr* mBody;
 
   // メンバ名
   AstSymbol* mMember;

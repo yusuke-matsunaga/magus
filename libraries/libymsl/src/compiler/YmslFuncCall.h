@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmslLeaf.h"
+#include "YmslExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 関数呼び出しを表すクラス
 //////////////////////////////////////////////////////////////////////
 class YmslFuncCall :
-  public YmslLeaf
+  public YmslExpr
 {
 public:
 
@@ -41,8 +41,8 @@ public:
 
   /// @brief 型を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 本体を返す．
   ///

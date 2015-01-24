@@ -20,10 +20,10 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] body 本体の式
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
-AstArrayRef::AstArrayRef(AstLeaf* body,
+AstArrayRef::AstArrayRef(AstExpr* body,
 			 AstExpr* index,
 			 const FileRegion& loc) :
-  AstLeaf(loc),
+  AstExpr(loc),
   mBody(body),
   mIndex(index)
 {
@@ -35,8 +35,8 @@ AstArrayRef::~AstArrayRef()
 }
 
 // @brief 種類を返す．
-LeafType
-AstArrayRef::leaf_type() const
+ExprType
+AstArrayRef::expr_type() const
 {
   return kArrayRef;
 }
@@ -44,7 +44,7 @@ AstArrayRef::leaf_type() const
 // @brief 配列本体を返す．
 //
 // kArrayRef のみ有効
-const AstLeaf*
+const AstExpr*
 AstArrayRef::body() const
 {
   return mBody;

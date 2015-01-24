@@ -37,8 +37,8 @@ YmslFuncCall::~YmslFuncCall()
 }
 
 // @brief 型を返す．
-LeafType
-YmslFuncCall::leaf_type() const
+ExprType
+YmslFuncCall::expr_type() const
 {
   return kFuncCall;
 }

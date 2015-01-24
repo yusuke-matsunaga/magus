@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] symbol シンボル
 AstSymbolExpr::AstSymbolExpr(AstSymbol* symbol) :
-  AstLeaf(symbol->file_region()),
+  AstExpr(symbol->file_region()),
   mSymbol(symbol)
 {
 }
@@ -31,8 +31,8 @@ AstSymbolExpr::~AstSymbolExpr()
 }
 
 // @brief 種類を返す．
-LeafType
-AstSymbolExpr::leaf_type() const
+ExprType
+AstSymbolExpr::expr_type() const
 {
   return kSymbolExpr;
 }

@@ -1,42 +1,43 @@
-#ifndef YMSLFALSE_H
-#define YMSLFALSE_H
+#ifndef ASTFALSE_H
+#define ASTFALSE_H
 
-/// @file YmslFalse.h
-/// @brief YmslFalse のヘッダファイル
+/// @file AstFalse.h
+/// @brief AstFalse のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslExpr.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslFalse YmslFalse.h "YmslFalse.h"
+/// @class AstFalse AstFalse.h "AstFalse.h"
 /// @brief false を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslFalse :
-  public YmslExpr
+class AstFalse :
+  public AstExpr
 {
 public:
 
   /// @brief コンストラクタ
-  YmslFalse();
+  /// @param[in] loc ファイル位置
+  AstFalse(const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~YmslFalse();
+  ~AstFalse();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェス
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を返す．
+  /// @brief 種類を返す．
   virtual
   ExprType
   expr_type() const;
@@ -45,4 +46,4 @@ public:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFALSE_H
+#endif // ASTFALSE_H

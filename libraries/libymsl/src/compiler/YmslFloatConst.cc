@@ -29,8 +29,8 @@ YmslFloatConst::~YmslFloatConst()
 }
 
 // @brief 種類を返す．
-LeafType
-YmslFloatConst::leaf_type() const
+ExprType
+YmslFloatConst::expr_type() const
 {
   return kFloatConst;
 }

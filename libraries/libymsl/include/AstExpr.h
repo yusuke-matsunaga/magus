@@ -42,12 +42,52 @@ public:
   ExprType
   expr_type() const = 0;
 
-  /// @brief 終端を返す．
+  /// @brief 整数値を返す．
   ///
-  /// kLeafExpr のみ有効
+  /// kIntConst のみ有効
   virtual
-  const AstLeaf*
-  leaf() const;
+  int
+  int_val() const;
+
+  /// @brief 浮動小数点値を返す．
+  ///
+  /// kFloatConst のみ有効
+  virtual
+  double
+  float_val() const;
+
+  /// @brief 文字列値を返す．
+  ///
+  /// kStringConst のみ有効
+  virtual
+  const char*
+  string_val() const;
+
+  /// @brief シンボルを返す．
+  ///
+  /// kSymbolExpr のみ有効
+  virtual
+  const AstSymbol*
+  symbol() const;
+
+  /// @brief 本体を返す．
+  ///
+  /// kArrayRef, kMemberRef のみ有効
+  virtual
+  const AstExpr*
+  body() const;
+
+  /// @brief メンバ名を返す．
+  virtual
+  const AstSymbol*
+  member() const;
+
+  /// @brief 配列のインデックスを返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  const AstExpr*
+  index() const;
 
   /// @brief オペランド数を返す．
   ///
@@ -63,6 +103,27 @@ public:
   virtual
   const AstExpr*
   operand(ymuint pos) const;
+
+  /// @brief 関数本体を返す．
+  virtual
+  const AstExpr*
+  func() const;
+
+  /// @brief 引数リストの要素数を返す．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  ymuint
+  arglist_num() const;
+
+  /// @brief 引数リストの要素を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  const AstExpr*
+  arglist_elem(ymuint pos) const;
+
 
 #if 0
   /// @brief 変数の参照を解決する．

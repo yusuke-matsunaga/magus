@@ -21,10 +21,10 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] func 関数
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
-AstFuncCall::AstFuncCall(AstLeaf* func,
+AstFuncCall::AstFuncCall(AstExpr* func,
 			 AstExprList* expr_list,
 			 const FileRegion& loc) :
-  AstLeaf(loc),
+  AstExpr(loc),
   mFunc(func),
   mExprList(expr_list->size())
 {
@@ -42,15 +42,15 @@ AstFuncCall::~AstFuncCall()
 }
 
 // @brief 種類を返す．
-LeafType
-AstFuncCall::leaf_type() const
+ExprType
+AstFuncCall::expr_type() const
 {
   return kFuncCall;
 }
 
 // @brief 関数本体を返す．
-const AstLeaf*
-AstFuncCall::body() const
+const AstExpr*
+AstFuncCall::func() const
 {
   return mFunc;
 }

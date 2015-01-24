@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmslLeaf.h"
+#include "YmslExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 文字列定数を表すクラス
 //////////////////////////////////////////////////////////////////////
 class YmslStringConst :
-  public YmslLeaf
+  public YmslExpr
 {
 public:
 
@@ -39,8 +39,8 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 文字列を返す．
   ///

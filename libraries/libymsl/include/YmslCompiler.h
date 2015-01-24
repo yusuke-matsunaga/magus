@@ -105,13 +105,6 @@ private:
   elab_expr(const AstExpr* ast_expr,
 	    YmslScope* scope);
 
-  /// @brief 終端式の実体化を行う．
-  /// @param[in] ast_leaf 式を表す構文木
-  /// @param[in] scope 現在のスコープ
-  YmslLeaf*
-  elab_leaf(const AstLeaf* ast_leaf,
-	    YmslScope* scope);
-
   /// @brief 変数の参照を解決する．
 
 

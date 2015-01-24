@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmslLeaf.h"
+#include "YmslExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief true を表すクラス
 //////////////////////////////////////////////////////////////////////
 class YmslTrue :
-  public YmslLeaf
+  public YmslExpr
 {
 public:
 
@@ -38,8 +38,8 @@ public:
 
   /// @brief 型を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
 };
 

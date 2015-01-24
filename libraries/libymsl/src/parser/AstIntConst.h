@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstLeaf.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 整数型定数を表す Ast
 //////////////////////////////////////////////////////////////////////
 class AstIntConst :
-  public AstLeaf
+  public AstExpr
 {
 public:
 
@@ -41,8 +41,8 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
   /// @brief 整数値を返す．
   ///
@@ -50,6 +50,7 @@ public:
   virtual
   int
   int_val() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

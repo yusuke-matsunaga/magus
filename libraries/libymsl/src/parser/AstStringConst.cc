@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] loc ファイル位置
 AstStringConst::AstStringConst(const char* val,
 			       const FileRegion& loc) :
-  AstLeaf(loc),
+  AstExpr(loc),
   mVal(val)
 {
 }
@@ -32,8 +32,8 @@ AstStringConst::~AstStringConst()
 }
 
 // @brief 種類を返す．
-LeafType
-AstStringConst::leaf_type() const
+ExprType
+AstStringConst::expr_type() const
 {
   return kStringConst;
 }

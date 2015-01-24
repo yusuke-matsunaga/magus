@@ -92,7 +92,6 @@ fr_merge(const FileRegion fr_array[],
   AstEnumConstList* eclist_type;
   AstExpr*          expr_type;
   AstExprList*      exprlist_type;
-  AstLeaf*          leaf_type;
   AstModule*        module_type;
   AstModuleList*    modulelist_type;
   AstParam*         param_type;
@@ -162,9 +161,9 @@ fr_merge(const FileRegion fr_array[],
 %token WHILE
 
 %token <symbol_type> SYMBOL
-%token <leaf_type>   INT_VAL
-%token <leaf_type>   FLOAT_VAL
-%token <leaf_type>   STRING_VAL
+%token <expr_type>   INT_VAL
+%token <expr_type>   FLOAT_VAL
+%token <expr_type>   STRING_VAL
 
 %token DUMMY
 %token ERROR
@@ -187,9 +186,8 @@ fr_merge(const FileRegion fr_array[],
 %type <eclist_type>     enumconst_list
 %type <expr_type>       expr
 %type <expr_type>       init_expr
+%type <expr_type>       primary
 %type <exprlist_type>   expr_list
-%type <leaf_type>       leaf_expr
-%type <leaf_type>       primary
 %type <module_type>     module
 %type <modulelist_type> module_list
 %type <param_type>      param
@@ -571,8 +569,34 @@ init_expr
 ;
 
 expr
+// 定数
+: TRUE
+{
+  $$ = mgr.new_TrueConst(@$);
+}
+| FALSE
+{
+  $$ = mgr.new_FalseConst(@$);
+}
+| INT_VAL
+{
+  $$ = $1;
+}
+| FLOAT_VAL
+{
+  $$ = $1;
+}
+| STRING_VAL
+{
+  $$ = $1;
+}
+// プライマリ
+| primary
+{
+  $$ = $1;
+}
 // 単項演算
-: PLUS expr %prec UOP
+| PLUS expr %prec UOP
 {
   $$ = mgr.new_UniOp(kUniPlus, $2, @$);
 }
@@ -681,46 +705,11 @@ expr
 {
   $$ = $2;
 }
-// 終端
-| leaf_expr
-{
-  $$ = mgr.new_LeafExpr($1);
-}
-;
-
-// 終端式
-leaf_expr
-// プライマリ
-: primary
-{
-  $$ = $1;
-}
 // 関数呼び出し
 | primary LP expr_list RP
 {
   $$ = mgr.new_FuncCall($1, $3, @$);
   delete $3;
-}
-// 定数
-| TRUE
-{
-  $$ = mgr.new_TrueConst(@$);
-}
-| FALSE
-{
-  $$ = mgr.new_FalseConst(@$);
-}
-| INT_VAL
-{
-  $$ = $1;
-}
-| FLOAT_VAL
-{
-  $$ = $1;
-}
-| STRING_VAL
-{
-  $$ = $1;
 }
 ;
 
