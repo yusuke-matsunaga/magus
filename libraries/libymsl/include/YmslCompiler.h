@@ -115,6 +115,23 @@ private:
   /// @brief 変数の参照を解決する．
 
 
+  /// @brief 変数を生成する．
+  /// @param[in] name 名前
+  /// @param[in] type 型
+  YmslVar*
+  new_var(ShString name,
+	  const YmslType* type);
+
+  /// @brief 関数を生成する．
+  /// @param[in] name 名前
+  /// @param[in] type 出力の型
+  /// @param[in] input_type_list 入力の型のリスト
+  YmslFunction*
+  new_function(ShString name,
+	       const YmslType* type,
+	       const vector<const YmslType*>& input_type_list);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ

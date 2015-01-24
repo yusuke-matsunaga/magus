@@ -16,11 +16,17 @@
 #include "AstStatement.h"
 #include "AstSymbol.h"
 #include "AstType.h"
+
 #include "YmslScope.h"
+#include "YmslFunction.h"
 #include "YmslVar.h"
 
 #include "YmslOpExpr.h"
 #include "YmslLeafExpr.h"
+
+#include "YmslMemberRef.h"
+#include "YmslArrayRef.h"
+#include "YmslFuncCall.h"
 #include "YmslIntConst.h"
 #include "YmslFloatConst.h"
 #include "YmslStringConst.h"
@@ -234,7 +240,9 @@ YmslCompiler::reg_func(const AstStatement* stmt,
     const YmslType* type = resolve_type(asttype, scope);
     input_type_list[i] = type;
   }
-  // name: type, input_type_list という関数を作り，カレントスコープに登録する．
+
+  YmslFunction* func = new_function(name, type, input_type_list);
+  scope->add_function(func);
 }
 
 // @brief 変数の定義を行う．
@@ -251,10 +259,7 @@ YmslCompiler::reg_var(const AstStatement* stmt,
   const AstType* asttype = stmt->type();
   const YmslType* type = resolve_type(asttype, scope);
 
-  ymuint index = mVarList.size();
-  YmslVar* var = new YmslVar(name, type, index);
-  mVarList.push_back(var);
-
+  YmslVar* var = new_var(name, type);
   scope->add_var(var);
 }
 
@@ -370,7 +375,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
   case kEqOr:
   case kEqXor:
   case kExprStmt:
-    //elab_expr(stmt->lhs_expr(), scope);
+    elab_leaf(stmt->lhs_expr(), scope);
     elab_expr(stmt->expr(), scope);
     break;
 
@@ -572,6 +577,7 @@ YmslCompiler::elab_leaf(const AstLeaf* ast_leaf,
     {
       YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
       const AstSymbol* symbol = ast_leaf->symbol();
+      //return new YmslMemberRef(leaf, symbol);
     }
     break;
 
@@ -579,12 +585,19 @@ YmslCompiler::elab_leaf(const AstLeaf* ast_leaf,
     {
       YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
       YmslExpr* index = elab_expr(ast_leaf->index(), scope);
+      return new YmslArrayRef(leaf, index);
     }
     break;
 
   case kFuncCall:
     {
       YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
+      ymuint n = ast_leaf->arglist_num();
+      vector<YmslExpr*> arglist(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	arglist[i] = elab_expr(ast_leaf->arglist_elem(i), scope);
+      }
+      return new YmslFuncCall(leaf, arglist);
     }
     break;
 
@@ -609,6 +622,36 @@ YmslCompiler::elab_leaf(const AstLeaf* ast_leaf,
 
   ASSERT_NOT_REACHED;
   return NULL;
+}
+
+// @brief 変数を生成する．
+// @param[in] name 名前
+// @param[in] type 型
+YmslVar*
+YmslCompiler::new_var(ShString name,
+		      const YmslType* type)
+{
+  ymuint index = mVarList.size();
+  YmslVar* var = new YmslVar(name, type, index);
+  mVarList.push_back(var);
+
+  return var;
+}
+
+// @brief 関数を生成する．
+// @param[in] name 名前
+// @param[in] type 出力の型
+// @param[in] input_type_list 入力の型のリスト
+YmslFunction*
+YmslCompiler::new_function(ShString name,
+			   const YmslType* type,
+			   const vector<const YmslType*>& input_type_list)
+{
+  ymuint index = mFuncList.size();
+  YmslFunction* func = new YmslFunction(name, type, input_type_list, index);
+  mFuncList.push_back(func);
+
+  return func;
 }
 
 END_NAMESPACE_YM_YMSL
