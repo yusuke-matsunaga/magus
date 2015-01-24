@@ -92,6 +92,7 @@ fr_merge(const FileRegion fr_array[],
   AstEnumConstList* eclist_type;
   AstExpr*          expr_type;
   AstExprList*      exprlist_type;
+  AstLeaf*          leaf_type;
   AstModule*        module_type;
   AstModuleList*    modulelist_type;
   AstParam*         param_type;
@@ -99,7 +100,6 @@ fr_merge(const FileRegion fr_array[],
   AstStatement*     statement_type;
   AstStmtList*      stmtlist_type;
   AstSymbol*        symbol_type;
-  AstSymbolList*    symlist_type;
   AstType*          type_type;
   StmtType          stmttype_type;
 }
@@ -162,9 +162,9 @@ fr_merge(const FileRegion fr_array[],
 %token WHILE
 
 %token <symbol_type> SYMBOL
-%token <expr_type>   INT_VAL
-%token <expr_type>   FLOAT_VAL
-%token <expr_type>   STRING_VAL
+%token <leaf_type>   INT_VAL
+%token <leaf_type>   FLOAT_VAL
+%token <leaf_type>   STRING_VAL
 
 %token DUMMY
 %token ERROR
@@ -187,8 +187,9 @@ fr_merge(const FileRegion fr_array[],
 %type <eclist_type>     enumconst_list
 %type <expr_type>       expr
 %type <expr_type>       init_expr
-%type <expr_type>       primary
 %type <exprlist_type>   expr_list
+%type <leaf_type>       leaf_expr
+%type <leaf_type>       primary
 %type <module_type>     module
 %type <modulelist_type> module_list
 %type <param_type>      param
@@ -202,7 +203,6 @@ fr_merge(const FileRegion fr_array[],
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
 %type <stmttype_type>   eqop
-%type <symlist_type>    symbol_list
 %type <type_type>       type
 
 %%
@@ -681,21 +681,25 @@ expr
 {
   $$ = $2;
 }
+// 終端
+| leaf_expr
+{
+  $$ = mgr.new_LeafExpr($1);
+}
+;
+
+// 終端式
+leaf_expr
+// プライマリ
+: primary
+{
+  $$ = $1;
+}
 // 関数呼び出し
 | primary LP expr_list RP
 {
   $$ = mgr.new_FuncCall($1, $3, @$);
   delete $3;
-}
-// 配列参照
-| primary LBK expr RBK
-{
-  $$ = mgr.new_ArrayRef($1, $3, @$);
-}
-// プライマリ
-| primary
-{
-  $$ = $1;
 }
 // 定数
 | TRUE
@@ -722,24 +726,19 @@ expr
 
 // プライマリ式
 primary
-: symbol_list
-{
-  $$ = mgr.new_Primary($1, @$);
-  delete $1;
-}
-;
-
-// 階層名
-symbol_list
 : SYMBOL
 {
-  $$ = new AstSymbolList;
-  $$->add($1);
+  $$ = mgr.new_SymbolExpr($1);
 }
-| symbol_list DOT SYMBOL
+// メンバ参照
+| primary DOT SYMBOL
 {
-  $$ = $1;
-  $$->add($3);
+  $$ = mgr.new_MemberRef($1, $3, @$);
+}
+// 配列参照
+| primary LBK expr RBK
+{
+  $$ = mgr.new_ArrayRef($1, $3, @$);
 }
 ;
 

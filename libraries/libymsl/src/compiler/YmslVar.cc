@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] index インデックス
 YmslVar::YmslVar(ShString name,
 		 const YmslType* value_type,
-		 int index) :
+		 ymuint index) :
   mName(name),
   mValueType(value_type),
   mIndex(index)
@@ -49,10 +49,7 @@ YmslVar::value_type() const
 }
 
 // @brief 変数インデックスを得る．
-//
-// 正ならグローバル変数
-// 負ならローカル変数
-int
+ymuint
 YmslVar::index() const
 {
   return mIndex;

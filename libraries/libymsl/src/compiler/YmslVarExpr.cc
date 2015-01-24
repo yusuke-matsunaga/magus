@@ -1,41 +1,47 @@
 
-/// @file AstBoolConst.cc
-/// @brief AstBoolConst の実装ファイル
+/// @file YmslVarExpr.cc
+/// @brief YmslVarExpr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstBoolConst.h"
+#include "YmslVarExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstBoolConst
+// クラス YmslVarExpr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] leaf_type 式の種類 (kTrue/kFalse)
-// @param[in] loc ファイル位置
-AstBoolConst::AstBoolConst(LeafType leaf_type,
-			   const FileRegion& loc) :
-  AstLeaf(loc),
-  mType(leaf_type)
+// @param[in] var 変数
+YmslVarExpr::YmslVarExpr(YmslVar* var) :
+  mVar(var)
 {
 }
 
 // @brief デストラクタ
-AstBoolConst::~AstBoolConst()
+YmslVarExpr::~YmslVarExpr()
 {
 }
 
 // @brief 種類を返す．
 LeafType
-AstBoolConst::leaf_type() const
+YmslVarExpr::leaf_type() const
 {
-  return mType;
+  return kSymbolExpr;
+}
+
+// @brief 変数を返す．
+//
+// kPrimary の時のみ有効
+YmslVar*
+YmslVarExpr::var() const
+{
+  return mVar;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "AstLeaf.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,15 +19,15 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 配列参照を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstArrayRef :
-  public AstExpr
+  public AstLeaf
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] array 本体の式
+  /// @param[in] body 本体の式
   /// @param[in] index インデックスの式
   /// @param[in] loc ファイル位置
-  AstArrayRef(AstExpr* array,
+  AstArrayRef(AstLeaf* body,
 	      AstExpr* index,
 	      const FileRegion& loc);
 
@@ -43,65 +43,22 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
-  expr_type() const;
+  LeafType
+  leaf_type() const;
 
   /// @brief 配列本体を返す．
   ///
-  /// kArrayRef のみ有効
+  /// kMemberRef, kArrayRef, kFuncCall のみ有効
   virtual
-  const AstExpr*
-  array_body() const;
+  const AstLeaf*
+  body() const;
 
   /// @brief インデックスを返す．
   ///
   /// kArrayRef のみ有効
   virtual
   const AstExpr*
-  array_index() const;
-
-#if 0
-  /// @brief 変数の参照を解決する．
-  virtual
-  void
-  resolve_var(YmslScope* parent_scope);
-
-  /// @brief 式の型を解析する．
-  /// @return 引数の方が間違っていたら false を返す．
-  ///
-  /// 結果としてキャスト演算が挿入される場合もある．
-  virtual
-  bool
-  type_analysis();
-
-  /// @brief 式の型を返す．
-  virtual
-  const YmslType*
-  type();
-
-  /// @brief 命令コードのサイズを計算する．
-  virtual
-  ymuint
-  calc_size();
-
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
-  ///
-  /// addr の値は更新される．
-  virtual
-  void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr);
-
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
-#endif
+  index() const;
 
 
 private:
@@ -109,8 +66,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 配列名
-  AstExpr* mArray;
+  // 配列の本体
+  AstLeaf* mBody;
 
   // インデックス
   AstExpr* mIndex;

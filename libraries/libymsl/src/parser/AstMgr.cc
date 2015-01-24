@@ -35,18 +35,20 @@
 #include "AstIntConst.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
+#include "AstLeafExpr.h"
 #include "AstList.h"
 #include "AstMapType.h"
+#include "AstMemberRef.h"
 #include "AstModule.h"
 #include "AstNamedType.h"
 #include "AstParam.h"
-#include "AstPrimary.h"
 #include "AstPrimType.h"
 #include "AstReturn.h"
 #include "AstSetType.h"
 #include "AstStringConst.h"
 #include "AstSwitch.h"
 #include "AstSymbol.h"
+#include "AstSymbolExpr.h"
 #include "AstToplevel.h"
 #include "AstUniOp.h"
 #include "AstVarDecl.h"
@@ -126,15 +128,15 @@ AstMgr::scan(YYSTYPE& lval,
     break;
 
   case STRING_VAL:
-    lval.expr_type = new_StringConst(mScanner->cur_string(), lloc);
+    lval.leaf_type = new_StringConst(mScanner->cur_string(), lloc);
     break;
 
   case INT_VAL:
-    lval.expr_type = new_IntConst(mScanner->cur_int(), lloc);
+    lval.leaf_type = new_IntConst(mScanner->cur_int(), lloc);
     break;
 
   case FLOAT_VAL:
-    lval.expr_type = new_FloatConst(mScanner->cur_float(), lloc);
+    lval.leaf_type = new_FloatConst(mScanner->cur_float(), lloc);
     break;
 
   default:
@@ -144,8 +146,8 @@ AstMgr::scan(YYSTYPE& lval,
     RsrvWordDic dic;
     switch ( id ) {
     case SYMBOL:     cout << "SYMBOL[" << mScanner->cur_string() << "]"; break;
-    case INT_VAL:    cout << "INT[" << mScanner->cur_int() << "]"; break;
-    case FLOAT_VAL:  cout << "FLOAT[" << mScanner->cur_float() << "]"; break;
+    case INT_VAL:    cout << "INT["    << mScanner->cur_int() << "]"; break;
+    case FLOAT_VAL:  cout << "FLOAT["  << mScanner->cur_float() << "]"; break;
     case STRING_VAL: cout << "STRING[" << mScanner->cur_string() << "]"; break;
     case EOF:        cout << "EOF"; break;
     default:         cout << dic.str(id); break;
@@ -259,7 +261,7 @@ AstMgr::new_FuncDecl(AstSymbol* name,
 // @param[in] loc ファイル位置
 AstStatement*
 AstMgr::new_Assignment(StmtType stmt_type,
-		       AstExpr* left,
+		       AstLeaf* left,
 		       AstExpr* right,
 		       const FileRegion& loc)
 {
@@ -424,6 +426,15 @@ AstMgr::new_ExprStmt(AstExpr* expr,
   return new (p) AstExprStmt(expr, loc);
 }
 
+// @brief 終端式を作る．
+// @param[in] leaf 終端
+AstExpr*
+AstMgr::new_LeafExpr(AstLeaf* leaf)
+{
+  void* p = mAlloc.get_memory(sizeof(AstLeafExpr));
+  return new (p) AstLeafExpr(leaf);
+}
+
 // @brief 単項演算式を作る．
 // @param[in] op 演算子のタイプ
 // @param[in] left オペランド
@@ -460,12 +471,34 @@ AstMgr::new_IteOp(AstExpr* opr1,
   return new (p) AstIteOp(opr1, opr2, opr3);
 }
 
+// @brief シンボル式を作る．
+// @param[in] symbol シンボル
+AstLeaf*
+AstMgr::new_SymbolExpr(AstSymbol* symbol)
+{
+  void* p = mAlloc.get_memory(sizeof(AstSymbolExpr));
+  return new (p) AstSymbolExpr(symbol);
+}
+
+// @brief メンバ参照を作る．
+// @param[in] body 本体の式
+// @param[in] member メンバ名
+// @param[in] loc ファイル位置
+AstLeaf*
+AstMgr::new_MemberRef(AstLeaf* body,
+		      AstSymbol* member,
+		      const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstMemberRef));
+  return new (p) AstMemberRef(body, member, loc);
+}
+
 // @brief 配列参照を作る．
 // @param[in] id 配列名
 // @param[in] index インデックス
 // @param[in] loc ファイル位置
-AstExpr*
-AstMgr::new_ArrayRef(AstExpr* id,
+AstLeaf*
+AstMgr::new_ArrayRef(AstLeaf* id,
 		     AstExpr* index,
 		     const FileRegion& loc)
 {
@@ -477,8 +510,8 @@ AstMgr::new_ArrayRef(AstExpr* id,
 // @param[in] id 関数名
 // @param[in] expr_list 引数のリスト
 // @param[in] loc ファイル位置
-AstExpr*
-AstMgr::new_FuncCall(AstExpr* id,
+AstLeaf*
+AstMgr::new_FuncCall(AstLeaf* id,
 		     AstExprList* expr_list,
 		     const FileRegion& loc)
 {
@@ -488,7 +521,7 @@ AstMgr::new_FuncCall(AstExpr* id,
 
 // @brief true 定数式を作る．
 // @param[in] loc ファイル位置
-AstExpr*
+AstLeaf*
 AstMgr::new_TrueConst(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBoolConst));
@@ -497,7 +530,7 @@ AstMgr::new_TrueConst(const FileRegion& loc)
 
 // @brief false 定数式を作る．
 // @param[in] loc ファイル位置
-AstExpr*
+AstLeaf*
 AstMgr::new_FalseConst(const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstBoolConst));
@@ -507,7 +540,7 @@ AstMgr::new_FalseConst(const FileRegion& loc)
 // @brief 整数定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstExpr*
+AstLeaf*
 AstMgr::new_IntConst(int val,
 		     const FileRegion& loc)
 {
@@ -518,7 +551,7 @@ AstMgr::new_IntConst(int val,
 // @brief 浮動小数点定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstExpr*
+AstLeaf*
 AstMgr::new_FloatConst(double val,
 		       const FileRegion& loc)
 {
@@ -529,7 +562,7 @@ AstMgr::new_FloatConst(double val,
 // @brief 文字列定数式を作る．
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstExpr*
+AstLeaf*
 AstMgr::new_StringConst(const char* val,
 			const FileRegion& loc)
 {
@@ -546,17 +579,6 @@ AstMgr::new_StringConst(const char* val,
 
   void* p = mAlloc.get_memory(sizeof(AstStringConst));
   return new (p) AstStringConst(dup_str, loc);
-}
-
-// @brief プライマリを作る．
-// @param[in] symbol_list 変数名
-// @param[in] loc ファイル位置
-AstExpr*
-AstMgr::new_Primary(AstSymbolList* symbol_list,
-		    const FileRegion& loc)
-{
-  void* p = mAlloc.get_memory(sizeof(AstPrimary));
-  return new (p) AstPrimary(symbol_list, loc);
 }
 
 // @brief プリミティブ型を作る．

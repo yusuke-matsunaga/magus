@@ -30,16 +30,17 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_YMSL
 
 class YmslCodeList;
-class YmslDriver;
+//class YmslDriver;
 class YmslEnumConst;
-class YmslExecutable;
+class YmslExpr;
 class YmslFunction;
 class YmslLabel;
-class YmslModule;
+class YmslLeaf;
+//class YmslModule;
 class YmslObj;
 class YmslParser;
 class YmslScope;
-class YmslSubspace;
+//class YmslSubspace;
 class YmslType;
 class YmslTypeMgr;
 class YmslVar;
@@ -51,6 +52,7 @@ class AstEnumDecl;
 class AstEnumConst;
 class AstExpr;
 class AstFuncDecl;
+class AstLeaf;
 class AstMgr;
 class AstModule;
 class AstParam;
@@ -268,29 +270,22 @@ enum StmtType {
 /// @brief 式の種類
 //////////////////////////////////////////////////////////////////////
 enum ExprType {
-  kPrimary,
-  kArrayRef,
-  kFuncCall,
-  kTrue,
-  kFalse,
-  kIntConst,
-  kFloatConst,
-  kStringConst,
+  // 終端
+  kLeafExpr,
+  // 単項演算
+  kCastInt,
+  kCastBoolean,
+  kCastFloat,
+  kBitNeg,
+  kLogNot,
   kUniPlus,
   kUniMinus,
-  kBitNeg,
+  // 二項演算
   kBitAnd,
   kBitOr,
   kBitXor,
-  kLogNot,
   kLogAnd,
   kLogOr,
-  kEqual,
-  kNotEq,
-  kLt,
-  kLe,
-  kGt,
-  kGe,
   kPlus,
   kMinus,
   kMult,
@@ -298,10 +293,30 @@ enum ExprType {
   kMod,
   kLshift,
   kRshift,
-  kIte,
-  kCastInt,
-  kCastBoolean,
-  kCastFloat
+  kEqual,
+  kNotEq,
+  kLt,
+  kLe,
+  kGt,
+  kGe,
+  // 三項演算
+  kIte
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief 終端式の種類
+//////////////////////////////////////////////////////////////////////
+enum LeafType {
+  kSymbolExpr,
+  kArrayRef,
+  kMemberRef,
+  kFuncCall,
+  kTrue,
+  kFalse,
+  kIntConst,
+  kFloatConst,
+  kStringConst
 };
 
 

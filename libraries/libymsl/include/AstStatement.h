@@ -91,7 +91,7 @@ public:
   ///
   /// kAssignment のみ有効
   virtual
-  const AstExpr*
+  const AstLeaf*
   lhs_expr() const;
 
   /// @brief 式を返す．

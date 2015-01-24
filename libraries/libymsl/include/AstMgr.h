@@ -159,7 +159,7 @@ public:
   /// @param[in] loc ファイル位置
   AstStatement*
   new_Assignment(StmtType stmt_type,
-		 AstExpr* left,
+		 AstLeaf* left,
 		 AstExpr* right,
 		 const FileRegion& loc);
 
@@ -268,6 +268,11 @@ public:
   new_ExprStmt(AstExpr* expr,
 	       const FileRegion& loc);
 
+  /// @brief 終端式を作る．
+  /// @param[in] leaf 終端
+  AstExpr*
+  new_LeafExpr(AstLeaf* leaf);
+
   /// @brief 単項演算式を作る．
   /// @param[in] op 演算子のタイプ
   /// @param[in] left オペランド
@@ -292,12 +297,26 @@ public:
 	    AstExpr* opr2,
 	    AstExpr* opr3);
 
+  /// @brief シンボル式を作る．
+  /// @param[in] symbol シンボル
+  AstLeaf*
+  new_SymbolExpr(AstSymbol* symbol);
+
+  /// @brief メンバ参照を作る．
+  /// @param[in] body 本体の式
+  /// @param[in] member メンバ名
+  /// @param[in] loc ファイル位置
+  AstLeaf*
+  new_MemberRef(AstLeaf* body,
+		AstSymbol* member,
+		const FileRegion& loc);
+
   /// @brief 配列参照を作る．
-  /// @param[in] id 配列名
+  /// @param[in] body 本体の式
   /// @param[in] index インデックス
   /// @param[in] loc ファイル位置
-  AstExpr*
-  new_ArrayRef(AstExpr* id,
+  AstLeaf*
+  new_ArrayRef(AstLeaf* body,
 	       AstExpr* index,
 	       const FileRegion& loc);
 
@@ -305,48 +324,41 @@ public:
   /// @param[in] id 関数名
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstExpr*
-  new_FuncCall(AstExpr* id,
+  AstLeaf*
+  new_FuncCall(AstLeaf* id,
 	       AstExprList* expr_list,
 	       const FileRegion& loc);
 
   /// @brief true 定数式を作る．
   /// @param[in] loc ファイル位置
-  AstExpr*
+  AstLeaf*
   new_TrueConst(const FileRegion& loc);
 
   /// @brief false 定数式を作る．
   /// @param[in] loc ファイル位置
-  AstExpr*
+  AstLeaf*
   new_FalseConst(const FileRegion& loc);
 
   /// @brief 整数定数式を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstExpr*
+  AstLeaf*
   new_IntConst(int val,
 	       const FileRegion& loc);
 
   /// @brief 浮動小数点定数式を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstExpr*
+  AstLeaf*
   new_FloatConst(double val,
 		 const FileRegion& loc);
 
   /// @brief 文字列定数を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstExpr*
+  AstLeaf*
   new_StringConst(const char* val,
 		  const FileRegion& loc);
-
-  /// @brief プライマリを作る．
-  /// @param[in] symbol_list 変数名
-  /// @param[in] loc ファイル位置
-  AstExpr*
-  new_Primary(AstSymbolList* symbol_list,
-	      const FileRegion& loc);
 
   /// @brief プリミティブ型を作る．
   /// @param[in] type 型

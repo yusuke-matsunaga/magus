@@ -1,37 +1,35 @@
-#ifndef ASTFLOATCONST_H
-#define ASTFLOATCONST_H
+#ifndef YMSLINTCONST_H
+#define YMSLINTCONST_H
 
-/// @file AstFloatConst.h
-/// @brief AstFloatConst のヘッダファイル
+/// @file YmslIntConst.h
+/// @brief YmslIntConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstLeaf.h"
+#include "YmslLeaf.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstFloatConst AstFloatConst.h "AstFloatConst.h"
-/// @brief 浮動小数点型の定数を表す Ast
+/// @class YmslIntConst YmslIntConst.h "YmslIntConst.h"
+/// @brief 整数定数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstFloatConst :
-  public AstLeaf
+class YmslIntConst :
+  public YmslLeaf
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] val 値
-  /// @param[in] loc ファイル位置
-  AstFloatConst(double val,
-		const FileRegion& loc);
+  YmslIntConst(int val);
 
   /// @brief デストラクタ
   virtual
-  ~AstFloatConst();
+  ~YmslIntConst();
 
 
 public:
@@ -44,12 +42,13 @@ public:
   LeafType
   leaf_type() const;
 
-  /// @brief 浮動小数点値を返す．
+  /// @brief 整数値を返す．
   ///
-  /// kFloatConst のみ有効
+  /// kIntConst の時のみ有効
   virtual
-  double
-  float_val() const;
+  int
+  int_val() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -57,10 +56,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  double mVal;
+  int mVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTFLOATCONST_H
+#endif // YMSLINTCONST_H

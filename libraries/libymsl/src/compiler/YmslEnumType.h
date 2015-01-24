@@ -26,9 +26,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] elem_list 要素のリスト
+  /// @param[in] elem_list 要素名と値のリスト
   YmslEnumType(ShString name,
-	       const vector<ShString>& elem_list);
+	       const vector<pair<ShString, int> >& elem_list);
 
   /// @brief デストラクタ
   virtual

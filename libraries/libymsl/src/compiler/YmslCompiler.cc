@@ -10,13 +10,24 @@
 #include "YmslCompiler.h"
 #include "AstEnumConst.h"
 #include "AstExpr.h"
+#include "AstLeaf.h"
 #include "AstMgr.h"
 #include "AstParam.h"
 #include "AstStatement.h"
 #include "AstSymbol.h"
 #include "AstType.h"
 #include "YmslScope.h"
+#include "YmslVar.h"
 
+#include "YmslOpExpr.h"
+#include "YmslLeafExpr.h"
+#include "YmslIntConst.h"
+#include "YmslFloatConst.h"
+#include "YmslStringConst.h"
+#include "YmslTrue.h"
+#include "YmslFalse.h"
+
+#include "ObjHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -49,12 +60,18 @@ YmslCompiler::compile(IDO& ido)
   }
 
   AstStatement* toplevel = mgr.toplevel();
+  YmslScope* toplevel_scope = new YmslScope(NULL, ShString("__main__"));
 
-  phase1(toplevel);
+  mStmtList.clear();
 
-  phase2(toplevel);
+  phase1(toplevel, toplevel_scope);
 
-  // YmslScope* toplevel_scope = new YmslScope(NULL, ShString("__main__"));
+  for (vector<pair<const AstStatement*, YmslScope*> >::iterator p = mStmtList.begin();
+       p != mStmtList.end(); ++ p) {
+    const AstStatement* stmt = p->first;
+    YmslScope* scope = p->second;
+    phase2(stmt, scope);
+  }
 
   return true;
 }
@@ -62,15 +79,20 @@ YmslCompiler::compile(IDO& ido)
 // @brief 要素の生成を行う．
 // @param[in] stmt 文
 void
-YmslCompiler::phase1(const AstStatement* stmt)
+YmslCompiler::phase1(const AstStatement* stmt,
+		     YmslScope* scope)
 {
+  mStmtList.push_back(make_pair(stmt, scope));
+
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
     {
+      YmslScope* block_scope = new YmslScope(scope);
+
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	phase1(stmt1);
+	phase1(stmt1, block_scope);
       }
     }
     break;
@@ -82,11 +104,11 @@ YmslCompiler::phase1(const AstStatement* stmt)
     break;
 
   case kDoWhile:
-    phase1(stmt->stmt());
+    phase1(stmt->stmt(), scope);
     break;
 
   case kEnumDecl:
-    reg_enum(stmt);
+    reg_enum(stmt, scope);
     break;
 
   case kEqAssign:
@@ -104,15 +126,15 @@ YmslCompiler::phase1(const AstStatement* stmt)
     break;
 
   case kFuncDecl:
-    reg_func(stmt);
+    reg_func(stmt, scope);
     break;
 
   case kGoto:
     break;
 
   case kIf:
-    phase1(stmt->stmt());
-    phase1(stmt->else_stmt());
+    phase1(stmt->stmt(), scope);
+    phase1(stmt->else_stmt(), scope);
     break;
 
   case kImport:
@@ -128,24 +150,28 @@ YmslCompiler::phase1(const AstStatement* stmt)
     break;
 
   case kToplevel:
-    // トップレベルのスコープを追加
-    phase1(stmt->stmt());
+    phase1(stmt->stmt(), scope);
     break;
 
   case kVarDecl:
-    reg_var(stmt);
+    reg_var(stmt, scope);
     break;
 
   case kFor:
-    // for 文のスコープを追加
-    phase1(stmt->init_stmt());
-    phase1(stmt->next_stmt());
-    phase1(stmt->stmt());
+    {
+      YmslScope* for_scope = new YmslScope(scope);
+      phase1(stmt->init_stmt(), for_scope);
+      phase1(stmt->next_stmt(), for_scope);
+      phase1(stmt->stmt(), for_scope);
+    }
     break;
 
   case kWhile:
-    phase1(stmt->stmt());
+    phase1(stmt->stmt(), scope);
     break;
+
+  default:
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -154,26 +180,36 @@ YmslCompiler::phase1(const AstStatement* stmt)
 //
 // stmt は kEnumDecl でなければならない．
 void
-YmslCompiler::reg_enum(const AstStatement* stmt)
+YmslCompiler::reg_enum(const AstStatement* stmt,
+		       YmslScope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kEnumDecl );
 
   ShString name = stmt->name();
   ymint n = stmt->enum_num();
-  vector<const AstEnumConst*> ec_list(n);
-  vector<ShString> elem_list(n);
+  vector<pair<ShString, int> > elem_list(n);
+  int next_val = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const AstEnumConst* ec = stmt->enum_const(i);
-    ec_list[i] = ec;
-    elem_list[i] = ec->name()->str_val();
+    ShString elem_name = ec->name()->str_val();
+    int v;
+    if ( ec->expr() != NULL ) {
+      // v = eval(ec->expr());
+      // v が重複していないかチェック
+    }
+    else {
+      // while ( check(next_val) ) {
+      //   ++ next_val;
+      // }
+      v = next_val;
+      ++ next_val;
+    }
+    elem_list[i] = make_pair(elem_name, v);
   }
 
-  // 定数に式がついている場合の処理
-  HashMap<ymuint, int> val_dict;
-  YmslType* type = mTypeMgr.enum_type(name, elem_list, val_dict);
+  YmslType* type = mTypeMgr.enum_type(name, elem_list);
 
-
-  // type をカレントスコープに登録する．
+  scope->add_type(type);
 }
 
 // @brief 関数の定義を行う．
@@ -181,20 +217,21 @@ YmslCompiler::reg_enum(const AstStatement* stmt)
 //
 // stmt は kFuncDecl でなければならない．
 void
-YmslCompiler::reg_func(const AstStatement* stmt)
+YmslCompiler::reg_func(const AstStatement* stmt,
+		       YmslScope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kFuncDecl );
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const YmslType* type = resolve_type(asttype);
+  const YmslType* type = resolve_type(asttype, scope);
 
   ymuint np = stmt->param_num();
   vector<const YmslType*> input_type_list(np);
   for (ymuint i = 0; i < np; ++ i) {
     const AstParam* param = stmt->param(i);
     const AstType* asttype = param->type();
-    const YmslType* type = resolve_type(asttype);
+    const YmslType* type = resolve_type(asttype, scope);
     input_type_list[i] = type;
   }
   // name: type, input_type_list という関数を作り，カレントスコープに登録する．
@@ -205,15 +242,20 @@ YmslCompiler::reg_func(const AstStatement* stmt)
 //
 // stmt は kVarDecl でなければならない．
 void
-YmslCompiler::reg_var(const AstStatement* stmt)
+YmslCompiler::reg_var(const AstStatement* stmt,
+		      YmslScope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kVarDecl );
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const YmslType* type = resolve_type(asttype);
+  const YmslType* type = resolve_type(asttype, scope);
 
-  // name: type という変数を作り，カレントスコープに登録する．
+  ymuint index = mVarList.size();
+  YmslVar* var = new YmslVar(name, type, index);
+  mVarList.push_back(var);
+
+  scope->add_var(var);
 }
 
 // @brief 型の参照を解決する．
@@ -221,7 +263,8 @@ YmslCompiler::reg_var(const AstStatement* stmt)
 //
 // 解決できない時には NULL を返す．
 const YmslType*
-YmslCompiler::resolve_type(const AstType* asttype)
+YmslCompiler::resolve_type(const AstType* asttype,
+			   YmslScope* scope)
 {
   if ( asttype->named_type() ) {
     // スコープから名前の解決を行う
@@ -246,7 +289,7 @@ YmslCompiler::resolve_type(const AstType* asttype)
 
   case kArrayType:
     {
-      const YmslType* elem_type = resolve_type(asttype->elem_type());
+      const YmslType* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -256,7 +299,7 @@ YmslCompiler::resolve_type(const AstType* asttype)
 
   case kSetType:
     {
-      const YmslType* elem_type = resolve_type(asttype->elem_type());
+      const YmslType* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -266,11 +309,11 @@ YmslCompiler::resolve_type(const AstType* asttype)
 
   case kMapType:
     {
-      const YmslType* key_type = resolve_type(asttype->key_type());
+      const YmslType* key_type = resolve_type(asttype->key_type(), scope);
       if ( key_type == NULL ) {
 	break;
       }
-      const YmslType* elem_type = resolve_type(asttype->elem_type());
+      const YmslType* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -292,16 +335,280 @@ YmslCompiler::resolve_type(const AstType* asttype)
 
 // @brief 参照の解決を行う．
 // @param[in] stmt 文
+// @param[in] scope 現在のスコープ
 void
-YmslCompiler::phase2(const AstStatement* stmt)
+YmslCompiler::phase2(const AstStatement* stmt,
+		     YmslScope* scope)
 {
+  switch ( stmt->stmt_type() ) {
+  case kBlockStmt:
+    break;
+
+  case kBreak:
+    break;
+
+  case kContinue:
+    break;
+
+  case kDoWhile:
+    elab_expr(stmt->expr(), scope);
+    break;
+
+  case kEnumDecl:
+    //reg_enum(stmt, scope);
+    break;
+
+  case kEqAssign:
+  case kEqPlus:
+  case kEqMinus:
+  case kEqMult:
+  case kEqDiv:
+  case kEqMod:
+  case kEqLshift:
+  case kEqRshift:
+  case kEqAnd:
+  case kEqOr:
+  case kEqXor:
+  case kExprStmt:
+    //elab_expr(stmt->lhs_expr(), scope);
+    elab_expr(stmt->expr(), scope);
+    break;
+
+  case kFuncDecl:
+    //reg_func(stmt, scope);
+    break;
+
+  case kGoto:
+    break;
+
+  case kIf:
+    elab_expr(stmt->expr(), scope);
+    break;
+
+  case kImport:
+    break;
+
+  case kLabel:
+    break;
+
+  case kReturn:
+    if ( stmt->expr() ) {
+      elab_expr(stmt->expr(), scope);
+    }
+    break;
+
+  case kSwitch:
+    elab_expr(stmt->expr(), scope);
+    break;
+
+  case kToplevel:
+    break;
+
+  case kVarDecl:
+    //reg_var(stmt, scope);
+    if ( stmt->expr() ) {
+      elab_expr(stmt->expr(), scope);
+    }
+    break;
+
+  case kFor:
+    {
+      //YmslScope* for_scope = new YmslScope(scope);
+      //phase1(stmt->init_stmt(), for_scope);
+      //phase1(stmt->next_stmt(), for_scope);
+      //phase1(stmt->stmt(), for_scope);
+    }
+    break;
+
+  case kWhile:
+    elab_expr(stmt->expr(), scope);
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+  }
 }
 
-// @brief 参照の解決を行う．
-// @param[in] expr 式
-void
-YmslCompiler::phase2(const AstExpr* expr)
+// @brief 式の実体化を行う．
+// @param[in] ast_expr 式を表す構文木
+// @param[in] scope 現在のスコープ
+YmslExpr*
+YmslCompiler::elab_expr(const AstExpr* ast_expr,
+			YmslScope* scope)
 {
+  YmslExpr* opr[3] = { NULL, NULL, NULL };
+  for (ymuint i = 0; i < ast_expr->operand_num(); ++ i) {
+    YmslExpr* opr1 = elab_expr(ast_expr->operand(i), scope);
+    if ( opr1 == NULL ) {
+      return NULL;
+    }
+    opr[i] = opr1;
+    if ( i == 2 ) {
+      break;
+    }
+  }
+
+  switch ( ast_expr->expr_type() ) {
+  case kLeafExpr:
+    {
+      YmslLeaf* leaf = elab_leaf(ast_expr->leaf(), scope);
+      return new YmslLeafExpr(leaf);
+    }
+
+  case kCastInt:
+    return new YmslOpExpr(kCastInt, opr[0]);
+
+  case kCastBoolean:
+    return new YmslOpExpr(kCastBoolean, opr[0]);
+
+  case kCastFloat:
+    return new YmslOpExpr(kCastFloat, opr[0]);
+
+  case kBitNeg:
+    return new YmslOpExpr(kBitNeg, opr[0]);
+
+  case kLogNot:
+    return new YmslOpExpr(kLogNot, opr[0]);
+
+  case kUniPlus:
+    return new YmslOpExpr(kUniPlus, opr[0]);
+
+  case kUniMinus:
+    return new YmslOpExpr(kUniMinus, opr[0]);
+
+  case kBitAnd:
+    return new YmslOpExpr(kBitAnd, opr[0], opr[1]);
+
+  case kBitOr:
+    return new YmslOpExpr(kBitOr, opr[0], opr[1]);
+
+  case kBitXor:
+    return new YmslOpExpr(kBitXor, opr[0], opr[1]);
+
+  case kLogAnd:
+    return new YmslOpExpr(kLogAnd, opr[0], opr[1]);
+
+  case kLogOr:
+    return new YmslOpExpr(kLogOr, opr[0], opr[1]);
+
+  case kPlus:
+    return new YmslOpExpr(kPlus, opr[0], opr[1]);
+
+  case kMinus:
+    return new YmslOpExpr(kMinus, opr[0], opr[1]);
+
+  case kMult:
+    return new YmslOpExpr(kMult, opr[0], opr[1]);
+
+  case kDiv:
+    return new YmslOpExpr(kDiv, opr[0], opr[1]);
+
+  case kMod:
+    return new YmslOpExpr(kMod, opr[0], opr[1]);
+
+  case kLshift:
+    return new YmslOpExpr(kLshift, opr[0], opr[1]);
+
+  case kRshift:
+    return new YmslOpExpr(kRshift, opr[0], opr[1]);
+
+  case kEqual:
+    return new YmslOpExpr(kEqual, opr[0], opr[1]);
+
+  case kNotEq:
+    return new YmslOpExpr(kNotEq, opr[0], opr[1]);
+
+  case kLt:
+    return new YmslOpExpr(kLt, opr[0], opr[1]);
+
+  case kLe:
+    return new YmslOpExpr(kLe, opr[0], opr[1]);
+
+  case kGt:
+    return new YmslOpExpr(kGt, opr[0], opr[1]);
+
+  case kGe:
+    return new YmslOpExpr(kGe, opr[0], opr[1]);
+
+  case kIte:
+    return new YmslOpExpr(kIte, opr[0], opr[1], opr[2]);
+
+  default:
+    break;
+  }
+
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 終端式の実体化を行う．
+// @param[in] ast_leaf 式を表す構文木
+// @param[in] scope 現在のスコープ
+YmslLeaf*
+YmslCompiler::elab_leaf(const AstLeaf* ast_leaf,
+			YmslScope* scope)
+{
+  switch ( ast_leaf->leaf_type() ) {
+  case kSymbolExpr:
+#if 0
+    {
+      const AstSymbol* symbol = ast_leaf->symbol();
+      ObjHandle* handle = scope->find(symbol->str_val());
+      if ( handle == NULL ) {
+	// symbol not found
+	return NULL;
+      }
+      YmslVar* var = handle->var();
+      if ( var == NULL ) {
+	// symbol is not a variable
+	return NULL;
+      }
+      return new YmslVarExpr(var);
+    }
+#endif
+    break;
+
+  case kMemberRef:
+    {
+      YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
+      const AstSymbol* symbol = ast_leaf->symbol();
+    }
+    break;
+
+  case kArrayRef:
+    {
+      YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
+      YmslExpr* index = elab_expr(ast_leaf->index(), scope);
+    }
+    break;
+
+  case kFuncCall:
+    {
+      YmslLeaf* leaf = elab_leaf(ast_leaf->body(), scope);
+    }
+    break;
+
+  case kTrue:
+    return new YmslTrue();
+
+  case kFalse:
+    return new YmslFalse();
+
+  case kIntConst:
+    return new YmslIntConst(ast_leaf->int_val());
+
+  case kFloatConst:
+    return new YmslFloatConst(ast_leaf->float_val());
+
+  case kStringConst:
+    return new YmslStringConst(ast_leaf->string_val());
+
+  default:
+    break;
+  }
+
+  ASSERT_NOT_REACHED;
+  return NULL;
 }
 
 END_NAMESPACE_YM_YMSL

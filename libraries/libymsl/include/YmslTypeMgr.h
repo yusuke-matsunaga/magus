@@ -92,12 +92,10 @@ public:
 
   /// @brief enum 型を作る．
   /// @param[in] name 名前
-  /// @param[in] elem_list 要素名のリスト
-  /// @param[in] val_dict 値が指定された要素の辞書
+  /// @param[in] elem_list 要素名と値のリスト
   YmslType*
   enum_type(ShString name,
-	    const vector<ShString>& elem_list,
-	    const HashMap<ymuint, int>& val_dict);
+	    const vector<pair<ShString, int> >& elem_list);
 
 
 private:
@@ -133,10 +131,10 @@ private:
 
   /// @brief enum 型を作る．
   /// @param[in] name 名前
-  /// @param[in] elem_list 要素名のリスト
+  /// @param[in] elem_list 要素名と値のリスト
   YmslType*
   new_EnumType(ShString name,
-	       const vector<ShString>& elem_list);
+	       const vector<pair<ShString, int> >& elem_list);
 
   /// @brief 型を登録する．
   /// @param[in] type 登録する型

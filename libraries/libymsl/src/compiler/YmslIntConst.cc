@@ -1,48 +1,45 @@
 
-/// @file AstIntCont.cc
-/// @brief AstIntConst の実装ファイル
+/// @file YmslIntConst.cc
+/// @brief YmslIntConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstIntConst.h"
+#include "YmslIntConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstIntConst
+// クラス YmslIntConst
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] val 値
-// @param[in] loc ファイル位置
-AstIntConst::AstIntConst(int val,
-			 const FileRegion& loc) :
-  AstLeaf(loc),
+YmslIntConst::YmslIntConst(int val) :
   mVal(val)
 {
 }
 
 // @brief デストラクタ
-AstIntConst::~AstIntConst()
+YmslIntConst::~YmslIntConst()
 {
 }
 
 // @brief 種類を返す．
 LeafType
-AstIntConst::leaf_type() const
+YmslIntConst::leaf_type() const
 {
   return kIntConst;
 }
 
 // @brief 整数値を返す．
 //
-// kIntConst のみ有効
+// kIntConst の時のみ有効
 int
-AstIntConst::int_val() const
+YmslIntConst::int_val() const
 {
   return mVal;
 }

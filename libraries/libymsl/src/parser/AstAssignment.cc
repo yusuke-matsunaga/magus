@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] right 右辺
 // @param[in] loc ファイル位置
 AstAssignment::AstAssignment(StmtType stmt_type,
-			     AstExpr* left,
+			     AstLeaf* left,
 			     AstExpr* right,
 			     const FileRegion& loc) :
   AstStatement(loc),
@@ -47,7 +47,7 @@ AstAssignment::stmt_type() const
 // @brief 左辺式を返す．
 //
 // kAssignment のみ有効
-const AstExpr*
+const AstLeaf*
 AstAssignment::lhs_expr() const
 {
   return mLeft;

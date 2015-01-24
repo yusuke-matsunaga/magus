@@ -20,16 +20,26 @@ set (ymsl_SOURCES
   src/compiler/YmslArrayType.cc
   src/compiler/YmslCompiler.cc
   src/compiler/YmslEnumType.cc
+  src/compiler/YmslExpr.cc
+  src/compiler/YmslFalse.cc
+  src/compiler/YmslFloatConst.cc
   src/compiler/YmslFunction.cc
+  src/compiler/YmslIntConst.cc
   src/compiler/YmslLabel.cc
+  src/compiler/YmslLeaf.cc
+  src/compiler/YmslLeafExpr.cc
   src/compiler/YmslMapType.cc
   src/compiler/YmslNamedType.cc
+  src/compiler/YmslOpExpr.cc
   src/compiler/YmslPrimType.cc
   src/compiler/YmslScope.cc
   src/compiler/YmslSetType.cc
+  src/compiler/YmslStringConst.cc
+  src/compiler/YmslTrue.cc
   src/compiler/YmslType.cc
   src/compiler/YmslTypeMgr.cc
   src/compiler/YmslVar.cc
+  src/compiler/YmslVarExpr.cc
   src/engine/YmslVM.cc
   src/parser/Ast.cc
   src/parser/AstArrayRef.cc
@@ -53,14 +63,17 @@ set (ymsl_SOURCES
   src/parser/AstIteOp.cc
   src/parser/AstIntConst.cc
   src/parser/AstLabel.cc
+  src/parser/AstLeaf.cc
+  src/parser/AstLeafExpr.cc
+  src/parser/AstMemberRef.cc
   src/parser/AstMgr.cc
   src/parser/AstParam.cc
-  src/parser/AstPrimary.cc
   src/parser/AstPrinter.cc
   src/parser/AstReturn.cc
   src/parser/AstStatement.cc
   src/parser/AstStringConst.cc
   src/parser/AstSwitch.cc
+  src/parser/AstSymbolExpr.cc
   src/parser/AstToplevel.cc
   src/parser/AstType.cc
   src/parser/AstUniOp.cc

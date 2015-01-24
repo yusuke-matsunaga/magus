@@ -1,11 +1,11 @@
-#ifndef ASTFLOATCONST_H
-#define ASTFLOATCONST_H
+#ifndef ASTSYMBOLEXPR_H
+#define ASTSYMBOLEXPR_H
 
-/// @file AstFloatConst.h
-/// @brief AstFloatConst のヘッダファイル
+/// @file AstSymbolExpr.h
+/// @brief AstSymbolExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,23 +15,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstFloatConst AstFloatConst.h "AstFloatConst.h"
-/// @brief 浮動小数点型の定数を表す Ast
+/// @class AstSymbolExpr AstSymbolExpr.h "AstSymbolExpr.h"
+/// @brief シンボル式を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstFloatConst :
+class AstSymbolExpr :
   public AstLeaf
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] val 値
-  /// @param[in] loc ファイル位置
-  AstFloatConst(double val,
-		const FileRegion& loc);
+  /// @param[in] symbol シンボル
+  AstSymbolExpr(AstSymbol* symbol);
 
   /// @brief デストラクタ
   virtual
-  ~AstFloatConst();
+  ~AstSymbolExpr();
 
 
 public:
@@ -44,23 +42,24 @@ public:
   LeafType
   leaf_type() const;
 
-  /// @brief 浮動小数点値を返す．
+  /// @brief シンボル名を返す．
   ///
-  /// kFloatConst のみ有効
+  /// kSymbolExpr のみ有効
   virtual
-  double
-  float_val() const;
+  const AstSymbol*
+  symbol() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値
-  double mVal;
+  // シンボル
+  AstSymbol* mSymbol;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTFLOATCONST_H
+#endif // ASTSYMBOLEXPR_H

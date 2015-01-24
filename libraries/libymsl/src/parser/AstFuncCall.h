@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstPrimary.h"
+#include "AstLeaf.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 関数呼び出しを表す Ast
 //////////////////////////////////////////////////////////////////////
 class AstFuncCall :
-  public AstExpr
+  public AstLeaf
 {
 public:
 
@@ -27,7 +27,7 @@ public:
   /// @param[in] func 関数
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
-  AstFuncCall(AstExpr* func,
+  AstFuncCall(AstLeaf* func,
 	      AstExprList* expr_list,
 	      const FileRegion& loc);
 
@@ -43,13 +43,13 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
-  expr_type() const;
+  LeafType
+  leaf_type() const;
 
   /// @brief 関数本体を返す．
   virtual
-  const AstExpr*
-  func_body() const;
+  const AstLeaf*
+  body() const;
 
   /// @brief 引数リストの要素数を返す．
   ///
@@ -66,49 +66,6 @@ public:
   const AstExpr*
   arglist_elem(ymuint pos) const;
 
-#if 0
-  /// @brief 変数の参照を解決する．
-  virtual
-  void
-  resolve_var(YmslScope* parent_scope);
-
-  /// @brief 式の型を解析する．
-  /// @return 引数の方が間違っていたら false を返す．
-  ///
-  /// 結果としてキャスト演算が挿入される場合もある．
-  virtual
-  bool
-  type_analysis();
-
-  /// @brief 式の型を返す．
-  virtual
-  const YmslType*
-  type();
-
-  /// @brief 命令コードのサイズを計算する．
-  virtual
-  ymuint
-  calc_size();
-
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
-  ///
-  /// addr の値は更新される．
-  virtual
-  void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr);
-
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
-#endif
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -116,7 +73,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  AstExpr* mFunc;
+  AstLeaf* mFunc;
 
   // 引数のリスト
   vector<AstExpr*> mExprList;
@@ -124,6 +81,5 @@ private:
 };
 
 END_NAMESPACE_YM_YMSL
-
 
 #endif // ASTFUNCCALL_H

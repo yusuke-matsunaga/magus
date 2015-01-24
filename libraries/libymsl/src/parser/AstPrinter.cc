@@ -9,6 +9,7 @@
 
 #include "AstPrinter.h"
 #include "AstExpr.h"
+#include "AstLeaf.h"
 #include "AstStatement.h"
 #include "AstSymbol.h"
 
@@ -74,7 +75,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqAssign:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " = ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -82,7 +83,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqPlus:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " += ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -90,7 +91,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqMinus:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " -= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -98,7 +99,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqMult:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " *= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -106,7 +107,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqDiv:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " /= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -114,7 +115,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqMod:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " %= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -122,7 +123,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqLshift:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " <<= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -130,7 +131,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqRshift:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " >>= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -138,7 +139,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqAnd:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " &= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -146,7 +147,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqOr:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " |= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -154,7 +155,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEqXor:
     print_indent(indent);
-    print_expr(stmt->lhs_expr());
+    print_leaf(stmt->lhs_expr());
     mS << " ^= ";
     print_expr(stmt->expr());
     mS << ";" << endl;
@@ -231,58 +232,8 @@ void
 AstPrinter::print_expr(const AstExpr* expr)
 {
   switch ( expr->expr_type() ) {
-  case kPrimary:
-    {
-      ymuint n = expr->symbollist_num();
-      const char* dot = "";
-      for (ymuint i = 0; i < n; ++ i) {
-	const AstSymbol* sym = expr->symbollist_elem(i);
-	mS << dot << sym->str_val();
-	dot = ".";
-      }
-    }
-    break;
-
-  case kArrayRef:
-    print_expr(expr->array_body());
-    mS << "[";
-    print_expr(expr->array_index());
-    mS << "]";
-    break;
-
-  case kFuncCall:
-    {
-      print_expr(expr->func_body());
-      mS << "(";
-      ymuint n = expr->arglist_num();
-      const char* comma = "";
-      for (ymuint i = 0; i < n; ++ i) {
-	mS << comma;
-	print_expr(expr->arglist_elem(i));
-	comma = ", ";
-      }
-      mS << ")";
-    }
-    break;
-
-  case kTrue:
-    mS << "true";
-    break;
-
-  case kFalse:
-    mS << "false";
-    break;
-
-  case kIntConst:
-    mS << expr->int_val();
-    break;
-
-  case kFloatConst:
-    mS << expr->float_val();
-    break;
-
-  case kStringConst:
-    mS << expr->string_val();
+  case kLeafExpr:
+    print_leaf(expr->leaf());
     break;
 
   case kUniPlus:
@@ -483,6 +434,65 @@ AstPrinter::print_expr(const AstExpr* expr)
     mS << "float(";
     print_expr(expr->operand(0));
     mS << ")";
+    break;
+  }
+}
+
+// @brief 終端式を出力する．
+// @param[in] leaf 式
+void
+AstPrinter::print_leaf(const AstLeaf* leaf)
+{
+  switch ( leaf->leaf_type() ) {
+  case kSymbolExpr:
+    mS << leaf->symbol()->str_val();
+    break;
+
+  case kMemberRef:
+    print_leaf(leaf->body());
+    mS << "." << leaf->symbol()->str_val();
+    break;
+
+  case kArrayRef:
+    print_leaf(leaf->body());
+    mS << "[";
+    print_expr(leaf->index());
+    mS << "]";
+    break;
+
+  case kFuncCall:
+    {
+      print_leaf(leaf->body());
+      mS << "(";
+      ymuint n = leaf->arglist_num();
+      const char* comma = "";
+      for (ymuint i = 0; i < n; ++ i) {
+	mS << comma;
+	print_expr(leaf->arglist_elem(i));
+	comma = ", ";
+      }
+      mS << ")";
+    }
+    break;
+
+  case kTrue:
+    mS << "true";
+    break;
+
+  case kFalse:
+    mS << "false";
+    break;
+
+  case kIntConst:
+    mS << leaf->int_val();
+    break;
+
+  case kFloatConst:
+    mS << leaf->float_val();
+    break;
+
+  case kStringConst:
+    mS << leaf->string_val();
     break;
   }
 }

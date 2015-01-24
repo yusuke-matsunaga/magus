@@ -50,46 +50,69 @@ private:
 
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
+  /// @param[in] scope 現在のスコープ
   void
-  phase1(const AstStatement* stmt);
+  phase1(const AstStatement* stmt,
+	 YmslScope* scope);
 
   /// @brief enum 型の定義を行う．
   /// @param[in] stmt 文
+  /// @param[in] scope 現在のスコープ
   ///
   /// stmt は kEnumDecl でなければならない．
   void
-  reg_enum(const AstStatement* stmt);
+  reg_enum(const AstStatement* stmt,
+	   YmslScope* scope);
 
   /// @brief 関数の定義を行う．
   /// @param[in] stmt 文
+  /// @param[in] scope 現在のスコープ
   ///
   /// stmt は kFuncDecl でなければならない．
   void
-  reg_func(const AstStatement* stmt);
+  reg_func(const AstStatement* stmt,
+	   YmslScope* scope);
 
   /// @brief 変数の定義を行う．
   /// @param[in] stmt 文
+  /// @param[in] scope 現在のスコープ
   ///
   /// stmt は kVarDecl でなければならない．
   void
-  reg_var(const AstStatement* stmt);
+  reg_var(const AstStatement* stmt,
+	  YmslScope* scope);
 
   /// @brief 型の参照を解決する．
   /// @param[in] asttype 型を表す構文木
+  /// @param[in] scope 現在のスコープ
   ///
   /// 解決できない時には NULL を返す．
   const YmslType*
-  resolve_type(const AstType* asttype);
+  resolve_type(const AstType* asttype,
+	       YmslScope* scope);
 
   /// @brief 参照の解決を行う．
   /// @param[in] stmt 文
+  /// @param[in] scope 現在のスコープ
   void
-  phase2(const AstStatement* stmt);
+  phase2(const AstStatement* stmt,
+	 YmslScope* scope);
 
-  /// @brief 参照の解決を行う．
-  /// @param[in] expr 式
-  void
-  phase2(const AstExpr* expr);
+  /// @brief 式の実体化を行う．
+  /// @param[in] ast_expr 式を表す構文木
+  /// @param[in] scope 現在のスコープ
+  YmslExpr*
+  elab_expr(const AstExpr* ast_expr,
+	    YmslScope* scope);
+
+  /// @brief 終端式の実体化を行う．
+  /// @param[in] ast_leaf 式を表す構文木
+  /// @param[in] scope 現在のスコープ
+  YmslLeaf*
+  elab_leaf(const AstLeaf* ast_leaf,
+	    YmslScope* scope);
+
+  /// @brief 変数の参照を解決する．
 
 
 private:
@@ -99,6 +122,15 @@ private:
 
   // 型を管理するマネージャ
   YmslTypeMgr mTypeMgr;
+
+  // 文とスコープのリスト
+  vector<pair<const AstStatement*, YmslScope*> > mStmtList;
+
+  // 変数のリスト
+  vector<YmslVar*> mVarList;
+
+  // 関数のリスト
+  vector<YmslFunction*> mFuncList;
 
 };
 

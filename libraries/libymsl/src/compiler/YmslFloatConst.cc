@@ -1,48 +1,45 @@
 
-/// @file AstFloatConst.cc
-/// @brief AstFloatConst の実装ファイル
+/// @file YmslFloatConst.cc
+/// @brief YmslFloatConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstFloatConst.h"
+#include "YmslFloatConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス AstFloatConst
+// クラス YmslFloatConst
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] val 値
-// @param[in] loc ファイル位置
-AstFloatConst::AstFloatConst(double val,
-			     const FileRegion& loc) :
-  AstLeaf(loc),
+YmslFloatConst::YmslFloatConst(double val) :
   mVal(val)
 {
 }
 
 // @brief デストラクタ
-AstFloatConst::~AstFloatConst()
+YmslFloatConst::~YmslFloatConst()
 {
 }
 
 // @brief 種類を返す．
 LeafType
-AstFloatConst::leaf_type() const
+YmslFloatConst::leaf_type() const
 {
   return kFloatConst;
 }
 
-// @brief 浮動小数点値を返す．
+// @brief 実数値を返す．
 //
-// kFloatConst のみ有効
+// kFloatConst の時のみ有効
 double
-AstFloatConst::float_val() const
+YmslFloatConst::float_val() const
 {
   return mVal;
 }

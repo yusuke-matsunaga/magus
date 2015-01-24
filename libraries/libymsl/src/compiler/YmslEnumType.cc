@@ -55,9 +55,9 @@ YmslEnumConst::val() const
 
 // @brief コンストラクタ
 // @param[in] name 名前
-// @param[in] elem_list 要素のリスト
+// @param[in] elem_list 要素名と値のリスト
 YmslEnumType::YmslEnumType(ShString name,
-			   const vector<ShString>& elem_list) :
+			   const vector<pair<ShString, int> >& elem_list) :
   YmslNamedType(name),
   mElemNum(elem_list.size())
 {
@@ -65,8 +65,8 @@ YmslEnumType::YmslEnumType(ShString name,
   for (ymuint i = 0; i < mElemNum; ++ i) {
     YmslEnumConst& enum_const = mElemArray[i];
     enum_const.mParent = this;
-    enum_const.mName = elem_list[i];
-    enum_const.mVal = i;
+    enum_const.mName = elem_list[i].first;
+    enum_const.mVal = elem_list[i].second;
   }
 }
 

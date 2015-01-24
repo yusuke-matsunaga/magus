@@ -1,37 +1,34 @@
-#ifndef ASTFLOATCONST_H
-#define ASTFLOATCONST_H
+#ifndef ASTLEAFEXPR_H
+#define ASTLEAFEXPR_H
 
-/// @file AstFloatConst.h
-/// @brief AstFloatConst のヘッダファイル
+/// @file AstLeafExpr.h
+/// @brief AstLeafExpr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstLeaf.h"
+#include "AstExpr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstFloatConst AstFloatConst.h "AstFloatConst.h"
-/// @brief 浮動小数点型の定数を表す Ast
+/// @class AstLeafExpr AstLeafExpr.h "AstLeafExpr.h"
+/// @brief 終端式を表すクラス
 //////////////////////////////////////////////////////////////////////
-class AstFloatConst :
-  public AstLeaf
+class AstLeafExpr :
+  public AstExpr
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] val 値
-  /// @param[in] loc ファイル位置
-  AstFloatConst(double val,
-		const FileRegion& loc);
+  AstLeafExpr(AstLeaf* leaf);
 
-  /// @brief デストラクタ
+  /// @breif デストラクタ
   virtual
-  ~AstFloatConst();
+  ~AstLeafExpr();
 
 
 public:
@@ -41,26 +38,27 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  LeafType
-  leaf_type() const;
+  ExprType
+  expr_type() const;
 
-  /// @brief 浮動小数点値を返す．
+  /// @brief 終端を返す．
   ///
-  /// kFloatConst のみ有効
+  /// kLeafExpr のみ有効
   virtual
-  double
-  float_val() const;
+  const AstLeaf*
+  leaf() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値
-  double mVal;
+  // 終端
+  AstLeaf* mLeaf;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLASTFLOATCONST_H
+#endif // ASTLEAFEXPR_H

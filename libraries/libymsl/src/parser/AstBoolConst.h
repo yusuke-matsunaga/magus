@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "AstLeaf.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief true/false を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstBoolConst :
-  public AstExpr
+  public AstLeaf
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] expr_type 式の種類 (kTrue/kFalse)
+  /// @param[in] leaf_type 式の種類 (kTrue/kFalse)
   /// @param[in] loc ファイル位置
-  AstBoolConst(ExprType expr_type,
+  AstBoolConst(LeafType leaf_type,
 	       const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -41,16 +41,8 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
-  expr_type() const;
-
-#if 0
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
-#endif
+  LeafType
+  leaf_type() const;
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -58,7 +50,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 式の種類
-  ExprType mExprType;
+  LeafType mType;
 
 };
 

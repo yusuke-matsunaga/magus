@@ -29,7 +29,7 @@ public:
   /// @param[in] right 右辺
   /// @param[in] loc ファイル位置
   AstAssignment(StmtType stmt_type,
-		AstExpr* left,
+		AstLeaf* left,
 		AstExpr* right,
 		const FileRegion& loc);
 
@@ -52,7 +52,7 @@ public:
   ///
   /// kAssignment のみ有効
   virtual
-  const AstExpr*
+  const AstLeaf*
   lhs_expr() const;
 
   /// @brief 式を返す．
@@ -115,7 +115,7 @@ private:
   StmtType mStmtType;
 
   // 左辺式
-  AstExpr* mLeft;
+  AstLeaf* mLeft;
 
   // 右辺式
   AstExpr* mRight;

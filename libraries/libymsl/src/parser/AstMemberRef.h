@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "AstLeaf.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,15 +19,15 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief メンバ参照を表すクラス
 //////////////////////////////////////////////////////////////////////
 class AstMemberRef :
-  public AstExpr
+  public AstLeaf
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] id オブジェクト名
+  /// @param[in] body 本体の式
   /// @param[in] member メンバ名
   /// @param[in] loc ファイル位置
-  AstMemberRef(AstExpr* id,
+  AstMemberRef(AstLeaf* body,
 	       AstSymbol* member,
 	       const FileRegion& loc);
 
@@ -41,46 +41,24 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数の参照を解決する．
+  /// @brief 種類を返す．
   virtual
-  void
-  resolve_var(YmslScope* parent_scope);
+  LeafType
+  leaf_type() const;
 
-  /// @brief 式の型を解析する．
-  /// @return 引数の方が間違っていたら false を返す．
+  /// @brief 本体の式を返す．
   ///
-  /// 結果としてキャスト演算が挿入される場合もある．
+  /// kMemberRef, kArrayRef, kFuncCall のみ有効
   virtual
-  bool
-  type_analysis();
+  const AstLeaf*
+  body() const;
 
-  /// @brief 式の型を返す．
-  virtual
-  const YmslType*
-  type();
-
-  /// @brief 命令コードのサイズを計算する．
-  virtual
-  ymuint
-  calc_size();
-
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
+  /// @brief メンバ名を返す．
   ///
-  /// addr の値は更新される．
+  /// kMemberRef のみ有効
   virtual
-  void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr);
-
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
+  const AstSymbol*
+  symbol() const;
 
 
 private:
@@ -89,16 +67,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オブジェクト名
-  AstExpr* mId;
+  AstLeaf* mBody;
 
   // メンバ名
   AstSymbol* mMember;
-
-  // スコープオブジェクト
-  YmslScope* mScope;
-
-  // enum オブジェクト
-  YmslEnum* mEnum;
 
 };
 

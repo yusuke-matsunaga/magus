@@ -8,7 +8,6 @@
 
 
 #include "AstMemberRef.h"
-#include "AstSymbol.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -18,14 +17,14 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] id オブジェクト名
+// @param[in] body 本体の式
 // @param[in] member メンバ名
 // @param[in] loc ファイル位置
-AstMemberRef::AstMemberRef(AstExpr* id,
+AstMemberRef::AstMemberRef(AstLeaf* body,
 			   AstSymbol* member,
 			   const FileRegion& loc) :
-  AstExpr(loc),
-  mId(id),
+  AstLeaf(loc),
+  mBody(body),
   mMember(member)
 {
 }
@@ -35,54 +34,29 @@ AstMemberRef::~AstMemberRef()
 {
 }
 
-// @brief 変数の参照を解決する．
-void
-AstMemberRef::resolve_var(YmslScope* parent_scope)
+// @brief 種類を返す．
+LeafType
+AstMemberRef::leaf_type() const
 {
-  mId->resolve_var(parent_scope);
+  return kMemberRef;
 }
 
-// @brief 式の型を解析する．
-// @return 引数の方が間違っていたら false を返す．
+// @brief 本体の式を返す．
 //
-// 結果としてキャスト演算が挿入される場合もある．
-bool
-AstMemberRef::type_analysis()
+// kMemberRef, kArrayRef, kFuncCall のみ有効
+const AstLeaf*
+AstMemberRef::body() const
 {
+  return mBody;
 }
 
-// @brief 式の型を返す．
-const YmslType*
-AstMemberRef::type()
-{
-}
-
-// @brief 命令コードのサイズを計算する．
-ymuint
-AstMemberRef::calc_size()
-{
-}
-
-// @brief 命令コードを生成する．
-// @param[in] driver ドライバ
-// @param[in] code_list 命令コードの格納先
-// @param[inout] addr 命令コードの現在のアドレス
+// @brief メンバ名を返す．
 //
-// addr の値は更新される．
-void
-AstMemberRef::compile(YmslDriver& driver,
-		      YmslCodeList& code_list,
-		      Ymsl_INT& addr)
+// kMemberRef のみ有効
+const AstSymbol*
+AstMemberRef::symbol() const
 {
-}
-
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-void
-AstMemberRef::print(ostream& s) const
-{
-  mId->print(s);
-  s << "." << mMember->str_val();
+  return mMember;
 }
 
 END_NAMESPACE_YM_YMSL
