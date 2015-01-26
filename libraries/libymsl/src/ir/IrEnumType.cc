@@ -57,7 +57,7 @@ IrEnumConst::val() const
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
 IrEnumType::IrEnumType(ShString name,
-			   const vector<pair<ShString, int> >& elem_list) :
+		       const vector<pair<ShString, int> >& elem_list) :
   IrNamedType(name),
   mElemNum(elem_list.size())
 {
@@ -92,15 +92,26 @@ IrEnumType::enum_num() const
   return mElemNum;
 }
 
-// @brief 列挙型の定数を得る．
+// @brief 列挙型の定数値を得る．
 // @param[in] index インデックス ( 0 <= index < enum_num() )
 //
 // enum のみ有効
-const IrEnumConst*
-IrEnumType::enum_elem(ymuint index) const
+int
+IrEnumType::enum_elem_val(ymuint index) const
 {
   ASSERT_COND( index < enum_num() );
-  return &mElemArray[index];
+  return mElemArray[index].val();
+}
+
+// @brief 列挙型の定数名を得る．
+// @param[in] index インデックス ( 0 <= index < enum_num() )
+//
+// enum のみ有効
+ShString
+IrEnumType::enum_elem_name(ymuint index) const
+{
+  ASSERT_COND( index < enum_num() );
+  return mElemArray[index].name();
 }
 
 // @brief 列挙型のインデックスを得る．

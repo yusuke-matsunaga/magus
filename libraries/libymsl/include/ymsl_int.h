@@ -33,7 +33,6 @@ class YmslCodeList;
 class YmslParser;
 class YmslObj;
 
-class IrEnumConst;
 class IrExpr;
 class IrFunction;
 class IrLabel;

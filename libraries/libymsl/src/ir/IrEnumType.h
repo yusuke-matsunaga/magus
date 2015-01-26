@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_YMSL
 
+class IrEnumConst;
+
 //////////////////////////////////////////////////////////////////////
 /// @class IrEnumType IrEnumType.h "IrEnumType.h"
 /// @brief enum 型を表すクラス
@@ -28,7 +30,7 @@ public:
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
   IrEnumType(ShString name,
-	       const vector<pair<ShString, int> >& elem_list);
+	     const vector<pair<ShString, int> >& elem_list);
 
   /// @brief デストラクタ
   virtual
@@ -52,13 +54,21 @@ public:
   ymuint
   enum_num() const;
 
-  /// @brief 列挙型の定数を得る．
+  /// @brief 列挙型の定数値を得る．
   /// @param[in] index インデックス ( 0 <= index < enum_num() )
   ///
   /// enum のみ有効
   virtual
-  const IrEnumConst*
-  enum_elem(ymuint index) const;
+  int
+  enum_elem_val(ymuint index) const;
+
+  /// @brief 列挙型の定数名を得る．
+  /// @param[in] index インデックス ( 0 <= index < enum_num() )
+  ///
+  /// enum のみ有効
+  virtual
+  ShString
+  enum_elem_name(ymuint index) const;
 
   /// @brief 列挙型のインデックスを得る．
   /// @param[in] name 列挙型の定数の名前

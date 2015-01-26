@@ -16,7 +16,6 @@
 #include "AstSymbol.h"
 #include "AstType.h"
 
-#include "IrEnumConst.h"
 #include "IrFunction.h"
 #include "IrVar.h"
 #include "IrScope.h"
@@ -486,8 +485,8 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
 	    return NULL;
 	  }
 
-	  const IrEnumConst* ec = type->enum_elem(index);
-	  return mIrMgr.new_IntConst(ec->val());
+	  int val = type->enum_elem_val(index);
+	  return mIrMgr.new_IntConst(val);
 	}
 	break;
 

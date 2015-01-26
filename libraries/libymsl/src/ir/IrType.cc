@@ -97,15 +97,26 @@ IrType::enum_num() const
   return 0;
 }
 
-// @brief 列挙型の定数を得る．
+// @brief 列挙型の定数値を得る．
 // @param[in] index インデックス ( 0 <= index < enum_num() )
 //
 // enum のみ有効
-const IrEnumConst*
-IrType::enum_elem(ymuint index) const
+int
+IrType::enum_elem_val(ymuint index) const
 {
   ASSERT_NOT_REACHED;
-  return NULL;
+  return 0;
+}
+
+// @brief 列挙型の定数名を得る．
+// @param[in] index インデックス ( 0 <= index < enum_num() )
+//
+// enum のみ有効
+ShString
+IrType::enum_elem_name(ymuint index) const
+{
+  ASSERT_NOT_REACHED;
+  return ShString();
 }
 
 // @brief 列挙型のインデックスを得る．
