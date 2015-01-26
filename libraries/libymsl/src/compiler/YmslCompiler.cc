@@ -16,22 +16,13 @@
 #include "AstSymbol.h"
 #include "AstType.h"
 
-#include "YmslScope.h"
-#include "YmslFunction.h"
-#include "YmslVar.h"
-
-#include "YmslOpExpr.h"
-
-#include "YmslMemberRef.h"
-#include "YmslArrayRef.h"
-#include "YmslFuncCall.h"
-#include "YmslIntConst.h"
-#include "YmslFloatConst.h"
-#include "YmslStringConst.h"
-#include "YmslTrue.h"
-#include "YmslFalse.h"
-
-#include "ObjHandle.h"
+#include "IrEnumConst.h"
+#include "IrFunction.h"
+#include "IrVar.h"
+#include "IrScope.h"
+#include "IrType.h"
+#include "IrExpr.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -56,24 +47,24 @@ YmslCompiler::~YmslCompiler()
 bool
 YmslCompiler::compile(IDO& ido)
 {
-  AstMgr mgr;
+  AstMgr ast_mgr;
 
-  bool stat = mgr.read_source(ido);
+  bool stat = ast_mgr.read_source(ido);
   if ( !stat ) {
     return false;
   }
 
-  AstStatement* toplevel = mgr.toplevel();
-  YmslScope* toplevel_scope = new YmslScope(NULL, ShString("__main__"));
+  AstStatement* toplevel = ast_mgr.toplevel();
 
   mStmtList.clear();
 
+  IrScope* toplevel_scope = mIrMgr.new_Scope(NULL, ShString("__main__"));
   phase1(toplevel, toplevel_scope);
 
-  for (vector<pair<const AstStatement*, YmslScope*> >::iterator p = mStmtList.begin();
+  for (vector<pair<const AstStatement*, IrScope*> >::iterator p = mStmtList.begin();
        p != mStmtList.end(); ++ p) {
     const AstStatement* stmt = p->first;
-    YmslScope* scope = p->second;
+    IrScope* scope = p->second;
     phase2(stmt, scope);
   }
 
@@ -84,14 +75,14 @@ YmslCompiler::compile(IDO& ido)
 // @param[in] stmt 文
 void
 YmslCompiler::phase1(const AstStatement* stmt,
-		     YmslScope* scope)
+		     IrScope* scope)
 {
   mStmtList.push_back(make_pair(stmt, scope));
 
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
     {
-      YmslScope* block_scope = new YmslScope(scope);
+      IrScope* block_scope = mIrMgr.new_Scope(scope);
 
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -163,7 +154,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
 
   case kFor:
     {
-      YmslScope* for_scope = new YmslScope(scope);
+      IrScope* for_scope = mIrMgr.new_Scope(scope);
       phase1(stmt->init_stmt(), for_scope);
       phase1(stmt->next_stmt(), for_scope);
       phase1(stmt->stmt(), for_scope);
@@ -185,7 +176,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
 // stmt は kEnumDecl でなければならない．
 void
 YmslCompiler::reg_enum(const AstStatement* stmt,
-		       YmslScope* scope)
+		       IrScope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kEnumDecl );
 
@@ -211,7 +202,7 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
     elem_list[i] = make_pair(elem_name, v);
   }
 
-  YmslType* type = mTypeMgr.enum_type(name, elem_list);
+  IrType* type = mTypeMgr.enum_type(name, elem_list);
 
   scope->add_type(type);
 }
@@ -222,24 +213,24 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
 // stmt は kFuncDecl でなければならない．
 void
 YmslCompiler::reg_func(const AstStatement* stmt,
-		       YmslScope* scope)
+		       IrScope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kFuncDecl );
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const YmslType* type = resolve_type(asttype, scope);
+  const IrType* type = resolve_type(asttype, scope);
 
   ymuint np = stmt->param_num();
-  vector<const YmslType*> input_type_list(np);
+  vector<const IrType*> input_type_list(np);
   for (ymuint i = 0; i < np; ++ i) {
     const AstParam* param = stmt->param(i);
     const AstType* asttype = param->type();
-    const YmslType* type = resolve_type(asttype, scope);
+    const IrType* type = resolve_type(asttype, scope);
     input_type_list[i] = type;
   }
 
-  YmslFunction* func = new_function(name, type, input_type_list);
+  IrFunction* func = new_function(name, type, input_type_list);
   scope->add_function(func);
 }
 
@@ -249,15 +240,15 @@ YmslCompiler::reg_func(const AstStatement* stmt,
 // stmt は kVarDecl でなければならない．
 void
 YmslCompiler::reg_var(const AstStatement* stmt,
-		      YmslScope* scope)
+		      IrScope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kVarDecl );
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const YmslType* type = resolve_type(asttype, scope);
+  const IrType* type = resolve_type(asttype, scope);
 
-  YmslVar* var = new_var(name, type);
+  IrVar* var = new_var(name, type);
   scope->add_var(var);
 }
 
@@ -265,9 +256,9 @@ YmslCompiler::reg_var(const AstStatement* stmt,
 // @param[in] asttype 型を表す構文木
 //
 // 解決できない時には NULL を返す．
-const YmslType*
+const IrType*
 YmslCompiler::resolve_type(const AstType* asttype,
-			   YmslScope* scope)
+			   IrScope* scope)
 {
   if ( asttype->named_type() ) {
     // スコープから名前の解決を行う
@@ -292,7 +283,7 @@ YmslCompiler::resolve_type(const AstType* asttype,
 
   case kArrayType:
     {
-      const YmslType* elem_type = resolve_type(asttype->elem_type(), scope);
+      const IrType* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -302,7 +293,7 @@ YmslCompiler::resolve_type(const AstType* asttype,
 
   case kSetType:
     {
-      const YmslType* elem_type = resolve_type(asttype->elem_type(), scope);
+      const IrType* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -312,11 +303,11 @@ YmslCompiler::resolve_type(const AstType* asttype,
 
   case kMapType:
     {
-      const YmslType* key_type = resolve_type(asttype->key_type(), scope);
+      const IrType* key_type = resolve_type(asttype->key_type(), scope);
       if ( key_type == NULL ) {
 	break;
       }
-      const YmslType* elem_type = resolve_type(asttype->elem_type(), scope);
+      const IrType* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -341,7 +332,7 @@ YmslCompiler::resolve_type(const AstType* asttype,
 // @param[in] scope 現在のスコープ
 void
 YmslCompiler::phase2(const AstStatement* stmt,
-		     YmslScope* scope)
+		     IrScope* scope)
 {
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
@@ -416,7 +407,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
 
   case kFor:
     {
-      //YmslScope* for_scope = new YmslScope(scope);
+      //IrScope* for_scope = mIrMgr.new_Scope(scope);
       //phase1(stmt->init_stmt(), for_scope);
       //phase1(stmt->next_stmt(), for_scope);
       //phase1(stmt->stmt(), for_scope);
@@ -435,13 +426,13 @@ YmslCompiler::phase2(const AstStatement* stmt,
 // @brief 式の実体化を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
-YmslExpr*
+IrExpr*
 YmslCompiler::elab_expr(const AstExpr* ast_expr,
-			YmslScope* scope)
+			IrScope* scope)
 {
-  YmslExpr* opr[3] = { NULL, NULL, NULL };
+  IrExpr* opr[3] = { NULL, NULL, NULL };
   for (ymuint i = 0; i < ast_expr->operand_num(); ++ i) {
-    YmslExpr* opr1 = elab_expr(ast_expr->operand(i), scope);
+    IrExpr* opr1 = elab_expr(ast_expr->operand(i), scope);
     if ( opr1 == NULL ) {
       return NULL;
     }
@@ -453,145 +444,158 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
 
   switch ( ast_expr->expr_type() ) {
   case kTrue:
-    return new YmslTrue();
+    return mIrMgr.new_True();
 
   case kFalse:
-    return new YmslFalse();
+    return mIrMgr.new_False();
 
   case kIntConst:
-    return new YmslIntConst(ast_expr->int_val());
+    return mIrMgr.new_IntConst(ast_expr->int_val());
 
   case kFloatConst:
-    return new YmslFloatConst(ast_expr->float_val());
+    return mIrMgr.new_FloatConst(ast_expr->float_val());
 
   case kStringConst:
-    return new YmslStringConst(ast_expr->string_val());
+    return mIrMgr.new_StringConst(ast_expr->string_val());
 
   case kSymbolExpr:
-#if 0
-    {
-      const AstSymbol* symbol = ast_leaf->symbol();
-      ObjHandle* handle = scope->find(symbol->str_val());
-      if ( handle == NULL ) {
-	// symbol not found
-	return NULL;
-      }
-      YmslVar* var = handle->var();
-      if ( var == NULL ) {
-	// symbol is not a variable
-	return NULL;
-      }
-      return new YmslVarExpr(var);
-    }
-#endif
-    break;
+    return symbol2expr(ast_expr->symbol(), scope);
 
   case kArrayRef:
     {
-      YmslExpr* body = elab_expr(ast_expr->body(), scope);
-      YmslExpr* index = elab_expr(ast_expr->index(), scope);
-      return new YmslArrayRef(body, index);
+      IrExpr* body = elab_expr(ast_expr->body(), scope);
+      IrExpr* index = elab_expr(ast_expr->index(), scope);
+      return mIrMgr.new_ArrayRef(body, index);
     }
     break;
 
   case kMemberRef:
     {
-      YmslExpr* body = elab_expr(ast_expr->body(), scope);
+      IrExpr* body = elab_expr(ast_expr->body(), scope);
       const AstSymbol* symbol = ast_expr->symbol();
-      //return new YmslMemberRef(body, symbol);
+      switch ( body->expr_type() ) {
+      case kScopeExpr:
+	return symbol2expr(symbol, body->scope());
+
+      case kEnumExpr:
+	{
+	  const IrType* type = body->enum_type();
+	  int index = type->enum_index(symbol->str_val());
+	  if ( index == -1 ) {
+	    // symbol not found
+	    return NULL;
+	  }
+
+	  const IrEnumConst* ec = type->enum_elem(index);
+	  return mIrMgr.new_IntConst(ec->val());
+	}
+	break;
+
+      case kSymbolExpr:
+	{
+	  const IrVar* var = body->var();
+	  const IrType* type = var->value_type();
+	  // type から symbol という名のメンバを探す．
+	  //return mIrMgr.new_MemberRef(body, symbol);
+	}
+	break;
+
+      default:
+	break;
+      }
+      ASSERT_NOT_REACHED;
+      return NULL;
     }
     break;
 
   case kCastInt:
-    return new YmslOpExpr(kCastInt, opr[0]);
+    return mIrMgr.new_OpExpr(kCastInt, opr[0]);
 
   case kCastBoolean:
-    return new YmslOpExpr(kCastBoolean, opr[0]);
+    return mIrMgr.new_OpExpr(kCastBoolean, opr[0]);
 
   case kCastFloat:
-    return new YmslOpExpr(kCastFloat, opr[0]);
+    return mIrMgr.new_OpExpr(kCastFloat, opr[0]);
 
   case kBitNeg:
-    return new YmslOpExpr(kBitNeg, opr[0]);
+    return mIrMgr.new_OpExpr(kBitNeg, opr[0]);
 
   case kLogNot:
-    return new YmslOpExpr(kLogNot, opr[0]);
+    return mIrMgr.new_OpExpr(kLogNot, opr[0]);
 
   case kUniPlus:
-    return new YmslOpExpr(kUniPlus, opr[0]);
+    return mIrMgr.new_OpExpr(kUniPlus, opr[0]);
 
   case kUniMinus:
-    return new YmslOpExpr(kUniMinus, opr[0]);
+    return mIrMgr.new_OpExpr(kUniMinus, opr[0]);
 
   case kBitAnd:
-    return new YmslOpExpr(kBitAnd, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kBitAnd, opr[0], opr[1]);
 
   case kBitOr:
-    return new YmslOpExpr(kBitOr, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kBitOr, opr[0], opr[1]);
 
   case kBitXor:
-    return new YmslOpExpr(kBitXor, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kBitXor, opr[0], opr[1]);
 
   case kLogAnd:
-    return new YmslOpExpr(kLogAnd, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kLogAnd, opr[0], opr[1]);
 
   case kLogOr:
-    return new YmslOpExpr(kLogOr, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kLogOr, opr[0], opr[1]);
 
   case kPlus:
-    return new YmslOpExpr(kPlus, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kPlus, opr[0], opr[1]);
 
   case kMinus:
-    return new YmslOpExpr(kMinus, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kMinus, opr[0], opr[1]);
 
   case kMult:
-    return new YmslOpExpr(kMult, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kMult, opr[0], opr[1]);
 
   case kDiv:
-    return new YmslOpExpr(kDiv, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kDiv, opr[0], opr[1]);
 
   case kMod:
-    return new YmslOpExpr(kMod, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kMod, opr[0], opr[1]);
 
   case kLshift:
-    return new YmslOpExpr(kLshift, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kLshift, opr[0], opr[1]);
 
   case kRshift:
-    return new YmslOpExpr(kRshift, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kRshift, opr[0], opr[1]);
 
   case kEqual:
-    return new YmslOpExpr(kEqual, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kEqual, opr[0], opr[1]);
 
   case kNotEq:
-    return new YmslOpExpr(kNotEq, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kNotEq, opr[0], opr[1]);
 
   case kLt:
-    return new YmslOpExpr(kLt, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kLt, opr[0], opr[1]);
 
   case kLe:
-    return new YmslOpExpr(kLe, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kLe, opr[0], opr[1]);
 
   case kGt:
-    return new YmslOpExpr(kGt, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kGt, opr[0], opr[1]);
 
   case kGe:
-    return new YmslOpExpr(kGe, opr[0], opr[1]);
+    return mIrMgr.new_OpExpr(kGe, opr[0], opr[1]);
 
   case kIte:
-    return new YmslOpExpr(kIte, opr[0], opr[1], opr[2]);
+    return mIrMgr.new_OpExpr(kIte, opr[0], opr[1], opr[2]);
 
   case kFuncCall:
-#if 0
     {
-      YmslLeaf* leaf = elab_leaf(ast_expr->func(), scope);
+      IrExpr* func_expr = elab_expr(ast_expr->func(), scope);
       ymuint n = ast_expr->arglist_num();
-      vector<YmslExpr*> arglist(n);
+      vector<IrExpr*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
 	arglist[i] = elab_expr(ast_expr->arglist_elem(i), scope);
       }
-      return new YmslFuncCall(leaf, arglist);
+      return mIrMgr.new_FuncCall(func_expr, arglist);
     }
-#endif
     break;
 
   default:
@@ -602,15 +606,52 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
   return NULL;
 }
 
+// @brief シンボルに対応する式を返す．
+// @param[in] symbol シンボル
+// @param[in] scope スコープ
+IrExpr*
+YmslCompiler::symbol2expr(const AstSymbol* symbol,
+			  IrScope* scope)
+{
+  IrHandle* handle = scope->find(symbol->str_val());
+  if ( handle == NULL ) {
+    // symbol not found
+    return NULL;
+  }
+
+  IrFunction* func = handle->function();
+  if ( func != NULL ) {
+    return mIrMgr.new_FuncExpr(func);
+  }
+
+  IrVar* var = handle->var();
+  if ( var != NULL ) {
+    return mIrMgr.new_VarExpr(var);
+  }
+
+  IrScope* scope1 = handle->scope();
+  if ( scope1 != NULL ) {
+    return mIrMgr.new_ScopeExpr(scope1);
+  }
+
+  const IrType* type = handle->named_type();
+  if ( type != NULL ) {
+    return mIrMgr.new_EnumExpr(type);
+  }
+
+  // 型が合わない．
+  return NULL;
+}
+
 // @brief 変数を生成する．
 // @param[in] name 名前
 // @param[in] type 型
-YmslVar*
+IrVar*
 YmslCompiler::new_var(ShString name,
-		      const YmslType* type)
+		      const IrType* type)
 {
   ymuint index = mVarList.size();
-  YmslVar* var = new YmslVar(name, type, index);
+  IrVar* var = mIrMgr.new_Var(name, type, index);
   mVarList.push_back(var);
 
   return var;
@@ -620,13 +661,13 @@ YmslCompiler::new_var(ShString name,
 // @param[in] name 名前
 // @param[in] type 出力の型
 // @param[in] input_type_list 入力の型のリスト
-YmslFunction*
+IrFunction*
 YmslCompiler::new_function(ShString name,
-			   const YmslType* type,
-			   const vector<const YmslType*>& input_type_list)
+			   const IrType* type,
+			   const vector<const IrType*>& input_type_list)
 {
   ymuint index = mFuncList.size();
-  YmslFunction* func = new YmslFunction(name, type, input_type_list, index);
+  IrFunction* func = mIrMgr.new_Function(name, type, input_type_list, index);
   mFuncList.push_back(func);
 
   return func;

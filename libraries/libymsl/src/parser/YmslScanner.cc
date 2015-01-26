@@ -8,6 +8,7 @@
 
 
 #include "YmslScanner.h"
+#include "RsrvWordDic.h"
 #include "YmUtils/MsgMgr.h"
 
 
@@ -20,12 +21,14 @@ BEGIN_NAMESPACE_YM_YMSL
 YmslScanner::YmslScanner(IDO& ido) :
   Scanner(ido)
 {
+  mDic = new RsrvWordDic;
   mUngetToken = DUMMY;
 }
 
 // デストラクタ
 YmslScanner::~YmslScanner()
 {
+  delete mDic;
 }
 
 // @brief トークンを一つとってくる．
@@ -394,7 +397,7 @@ YmslScanner::scan()
     mCurString.put_char(c);
     goto ST_ID;
   }
-  return mRsrvWordDic.token(mCurString.c_str());
+  return mDic->token(mCurString.c_str());
 
  ST_DQ: // "があったら次の"までを強制的に文字列だと思う．
   c = get();
@@ -514,6 +517,23 @@ YmslScanner::is_symbol(int c)
     return true;
   }
   return false;
+}
+
+// @brief 現在のトークンの内容を出力する．(デバッグ用)
+// @param[in] id トークン
+// @param[in] s 出力先のストリーム
+void
+YmslScanner::print_token(TokenType id,
+			 ostream& s) const
+{
+  switch ( id ) {
+  case SYMBOL:     cout << "SYMBOL[" << cur_string() << "]"; break;
+  case INT_VAL:    cout << "INT["    << cur_int() << "]"; break;
+  case FLOAT_VAL:  cout << "FLOAT["  << cur_float() << "]"; break;
+  case STRING_VAL: cout << "STRING[" << cur_string() << "]"; break;
+  case EOF:        cout << "EOF"; break;
+  default:         cout << mDic->str(id); break;
+  }
 }
 
 END_NAMESPACE_YM_YMSL

@@ -30,20 +30,18 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_YMSL
 
 class YmslCodeList;
-class YmslEnumConst;
-class YmslExpr;
-class YmslFunction;
-class YmslLabel;
-class YmslLeaf;
-//class YmslModule;
-class YmslObj;
 class YmslParser;
-class YmslScope;
-class YmslType;
-class YmslTypeMgr;
-class YmslVar;
+class YmslObj;
 
-class ObjHandle;
+class IrEnumConst;
+class IrExpr;
+class IrFunction;
+class IrLabel;
+class IrHandle;
+class IrScope;
+class IrType;
+class IrTypeMgr;
+class IrVar;
 
 class AstCaseItem;
 class AstEnumDecl;
@@ -307,7 +305,11 @@ enum ExprType {
   // 三項演算
   kIte,
   // 関数呼び出し
-  kFuncCall
+  kFuncCall,
+  // 特殊
+  kScopeExpr,
+  kEnumExpr,
+  kFuncExpr
 };
 
 

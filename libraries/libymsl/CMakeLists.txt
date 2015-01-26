@@ -16,73 +16,82 @@ include_directories(
 # ===================================================================
 
 set (ymsl_SOURCES
-  src/compiler/ObjHandle.cc
-  src/compiler/YmslArrayRef.cc
-  src/compiler/YmslArrayType.cc
-  src/compiler/YmslCompiler.cc
-  src/compiler/YmslEnumType.cc
-  src/compiler/YmslExpr.cc
-  src/compiler/YmslFalse.cc
-  src/compiler/YmslFloatConst.cc
-  src/compiler/YmslFuncCall.cc
-  src/compiler/YmslFunction.cc
-  src/compiler/YmslIntConst.cc
-  src/compiler/YmslLabel.cc
-  src/compiler/YmslMapType.cc
-  src/compiler/YmslMemberRef.cc
-  src/compiler/YmslNamedType.cc
-  src/compiler/YmslOpExpr.cc
-  src/compiler/YmslPrimType.cc
-  src/compiler/YmslScope.cc
-  src/compiler/YmslSetType.cc
-  src/compiler/YmslStringConst.cc
-  src/compiler/YmslTrue.cc
-  src/compiler/YmslType.cc
-  src/compiler/YmslTypeMgr.cc
-  src/compiler/YmslVar.cc
-  src/compiler/YmslVarExpr.cc
-  src/engine/YmslVM.cc
-  src/parser/Ast.cc
-  src/parser/AstArrayRef.cc
-  src/parser/AstAssignment.cc
-  src/parser/AstBinOp.cc
-  src/parser/AstBlockStmt.cc
-  src/parser/AstBreak.cc
-  src/parser/AstContinue.cc
-  src/parser/AstDoWhile.cc
-  src/parser/AstEnumDecl.cc
-  src/parser/AstExpr.cc
-  src/parser/AstExprStmt.cc
-  src/parser/AstFalse.cc
-  src/parser/AstFloatConst.cc
-  src/parser/AstFor.cc
-  src/parser/AstFuncCall.cc
-  src/parser/AstFuncDecl.cc
-  src/parser/AstGoto.cc
-  src/parser/AstIf.cc
-  src/parser/AstImport.cc
-  src/parser/AstIteOp.cc
-  src/parser/AstIntConst.cc
-  src/parser/AstLabel.cc
-  src/parser/AstMemberRef.cc
-  src/parser/AstMgr.cc
-  src/parser/AstParam.cc
-  src/parser/AstPrinter.cc
-  src/parser/AstReturn.cc
-  src/parser/AstStatement.cc
-  src/parser/AstStringConst.cc
-  src/parser/AstSwitch.cc
-  src/parser/AstSymbolExpr.cc
-  src/parser/AstToplevel.cc
-  src/parser/AstTrue.cc
-  src/parser/AstType.cc
-  src/parser/AstUniOp.cc
-  src/parser/AstVarDecl.cc
-  src/parser/AstWhile.cc
   src/parser/RsrvWordDic.cc
   src/parser/YmslScanner.cc
 
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
+
+  src/ast/Ast.cc
+  src/ast/AstArrayRef.cc
+  src/ast/AstAssignment.cc
+  src/ast/AstBinOp.cc
+  src/ast/AstBlockStmt.cc
+  src/ast/AstBreak.cc
+  src/ast/AstContinue.cc
+  src/ast/AstDoWhile.cc
+  src/ast/AstEnumDecl.cc
+  src/ast/AstExpr.cc
+  src/ast/AstExprStmt.cc
+  src/ast/AstFalse.cc
+  src/ast/AstFloatConst.cc
+  src/ast/AstFor.cc
+  src/ast/AstFuncCall.cc
+  src/ast/AstFuncDecl.cc
+  src/ast/AstGoto.cc
+  src/ast/AstIf.cc
+  src/ast/AstImport.cc
+  src/ast/AstIteOp.cc
+  src/ast/AstIntConst.cc
+  src/ast/AstLabel.cc
+  src/ast/AstMemberRef.cc
+  src/ast/AstMgr.cc
+  src/ast/AstParam.cc
+  src/ast/AstPrinter.cc
+  src/ast/AstReturn.cc
+  src/ast/AstStatement.cc
+  src/ast/AstStringConst.cc
+  src/ast/AstSwitch.cc
+  src/ast/AstSymbolExpr.cc
+  src/ast/AstToplevel.cc
+  src/ast/AstTrue.cc
+  src/ast/AstType.cc
+  src/ast/AstUniOp.cc
+  src/ast/AstVarDecl.cc
+  src/ast/AstWhile.cc
+
+  src/ir/IrArrayRef.cc
+  src/ir/IrArrayType.cc
+  src/ir/IrEnumExpr.cc
+  src/ir/IrEnumType.cc
+  src/ir/IrExpr.cc
+  src/ir/IrFalse.cc
+  src/ir/IrFloatConst.cc
+  src/ir/IrFuncCall.cc
+  src/ir/IrFuncExpr.cc
+  src/ir/IrFunction.cc
+  src/ir/IrHandle.cc
+  src/ir/IrIntConst.cc
+  src/ir/IrMapType.cc
+  src/ir/IrMemberRef.cc
+  src/ir/IrMgr.cc
+  src/ir/IrNamedType.cc
+  src/ir/IrOpExpr.cc
+  src/ir/IrPrimType.cc
+  src/ir/IrScope.cc
+  src/ir/IrScopeExpr.cc
+  src/ir/IrSetType.cc
+  src/ir/IrStringConst.cc
+  src/ir/IrTrue.cc
+  src/ir/IrType.cc
+  src/ir/IrTypeMgr.cc
+  src/ir/IrVar.cc
+  src/ir/IrVarExpr.cc
+
+  src/compiler/YmslCompiler.cc
+  src/compiler/YmslLabel.cc
+
+  src/engine/YmslVM.cc
+
   )
 
 

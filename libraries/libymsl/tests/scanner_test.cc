@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "../src/parser/YmslScanner.h"
-#include "../src/parser/RsrvWordDic.h"
+#include "YmslScanner.h"
+
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
 #include "YmUtils/StringIDO.h"
@@ -21,20 +21,12 @@ int
 scanner_test1(IDO& ido)
 {
   YmslScanner scanner(ido);
-  RsrvWordDic dic;
 
   for ( ; ; ) {
     FileRegion loc;
     TokenType token = scanner.read_token(loc);
     cout << loc << ": ";
-    switch ( token ) {
-    case SYMBOL:     cout << "SYMBOL[" << scanner.cur_string() << "]"; break;
-    case INT_VAL:    cout << "INT[" << scanner.cur_int() << "]"; break;
-    case FLOAT_VAL:  cout << "FLOAT[" << scanner.cur_float() << "]"; break;
-    case STRING_VAL: cout << "STRING[" << scanner.cur_string() << "]"; break;
-    case EOF:        cout << "EOF"; break;
-    default:         cout << dic.str(token); break;
-    }
+    scanner.print_token(token, cout);
     cout << endl;
     if ( token == EOF ) {
       break;
