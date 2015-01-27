@@ -8,7 +8,6 @@
 
 #include "AstSwitch.h"
 #include "AstCaseItem.h"
-#include "AstList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -75,92 +74,5 @@ AstSwitch::case_stmt(ymuint pos) const
   ASSERT_COND( pos < switch_num() );
   return mCaseItemList[pos]->stmt();
 }
-
-
-#if 0
-
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-// @param[in] indent インデントレベル
-void
-AstSwitch::print(ostream& s,
-		 ymuint indent) const
-{
-  print_indent(s, indent);
-  s << "switch ";
-  mExpr->print(s);
-  s << "{" << endl;
-
-  ymuint n = mCaseItemList.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    AstCaseItem* caseitem = mCaseItemList[i];
-    caseitem->print(s, indent + 1);
-  }
-
-  print_indent(s, indent);
-  s << "}" << endl;
-}
-#endif
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstCaseItem
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] label ラベル
-// @param[in] stmt 本体の文
-// @param[in] loc ファイル位置
-AstCaseItem::AstCaseItem(AstExpr* label,
-			 AstStatement* stmt,
-			 const FileRegion& loc) :
-  Ast(loc),
-  mLabel(label),
-  mStmt(stmt)
-{
-}
-
-// @brief デストラクタ
-AstCaseItem::~AstCaseItem()
-{
-}
-
-// @brief ラベルを返す．
-const AstExpr*
-AstCaseItem::label() const
-{
-  return mLabel;
-}
-
-// @brief 本体の文を返す．
-const AstStatement*
-AstCaseItem::stmt() const
-{
-  return mStmt;
-}
-
-#if 0
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-// @param[in] indent インデントレベル
-void
-AstCaseItem::print(ostream& s,
-		   ymuint indent) const
-{
-  print_indent(s, indent);
-  if ( mLabel != NULL ) {
-    s << "case ";
-    mLabel->print(s);
-  }
-  else {
-    s << "default ";
-  }
-  s << ": " << endl;
-
-  AstBlockStmt::print(s, indent);
-
-  s << endl;
-}
-#endif
 
 END_NAMESPACE_YM_YMSL

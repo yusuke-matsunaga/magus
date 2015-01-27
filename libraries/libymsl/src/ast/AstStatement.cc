@@ -78,12 +78,23 @@ AstStatement::enum_num() const
   return 0;
 }
 
-// @brief enum 定数を返す．
+// @brief enum 定数名を返す．
 // @param[in] pos 位置 ( 0 <= pos < enum_num() )
 //
 // kEnumDecl のみ有効
-const AstEnumConst*
+const AstSymbol*
 AstStatement::enum_const(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief enum 定数の規定値を返す．
+// @param[in] pos 位置 ( 0 <= pos < enum_num() )
+//
+// kEnumDecl のみ有効
+const AstExpr*
+AstStatement::enum_const_expr(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
   return NULL;

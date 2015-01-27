@@ -8,7 +8,7 @@
 
 
 #include "YmslCompiler.h"
-#include "AstEnumConst.h"
+
 #include "AstExpr.h"
 #include "AstMgr.h"
 #include "AstParam.h"
@@ -184,11 +184,12 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
   vector<pair<ShString, int> > elem_list(n);
   int next_val = 0;
   for (ymuint i = 0; i < n; ++ i) {
-    const AstEnumConst* ec = stmt->enum_const(i);
-    ShString elem_name = ec->name()->str_val();
+    const AstSymbol* ec_symbol = stmt->enum_const(i);
+    ShString elem_name = ec_symbol->str_val();
+    const AstExpr* ec_expr = stmt->enum_const_expr(i);
     int v;
-    if ( ec->expr() != NULL ) {
-      // v = eval(ec->expr());
+    if ( ec_expr != NULL ) {
+      // v = eval(ec_expr());
       // v が重複していないかチェック
     }
     else {

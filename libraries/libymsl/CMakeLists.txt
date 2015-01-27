@@ -27,8 +27,10 @@ set (ymsl_SOURCES
   src/ast/AstBinOp.cc
   src/ast/AstBlockStmt.cc
   src/ast/AstBreak.cc
+  src/ast/AstCaseItem.cc
   src/ast/AstContinue.cc
   src/ast/AstDoWhile.cc
+  src/ast/AstEnumConst.cc
   src/ast/AstEnumDecl.cc
   src/ast/AstExpr.cc
   src/ast/AstExprStmt.cc

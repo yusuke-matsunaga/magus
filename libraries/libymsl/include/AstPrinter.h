@@ -47,6 +47,11 @@ public:
   void
   print_expr(const AstExpr* expr);
 
+  /// @brief 型を出力する．
+  /// @param[in] type 型
+  void
+  print_type(const AstType* type);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

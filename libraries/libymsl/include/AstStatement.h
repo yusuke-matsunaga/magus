@@ -79,13 +79,21 @@ public:
   ymuint
   enum_num() const;
 
-  /// @brief enum 定数を返す．
+  /// @brief enum 定数名を返す．
   /// @param[in] pos 位置 ( 0 <= pos < enum_num() )
   ///
   /// kEnumDecl のみ有効
   virtual
-  const AstEnumConst*
+  const AstSymbol*
   enum_const(ymuint pos) const;
+
+  /// @brief enum 定数の規定値を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < enum_num() )
+  ///
+  /// kEnumDecl のみ有効
+  virtual
+  const AstExpr*
+  enum_const_expr(ymuint pos) const;
 
   /// @brief 左辺式を返す．
   ///

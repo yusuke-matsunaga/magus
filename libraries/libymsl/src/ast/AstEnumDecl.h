@@ -47,6 +47,13 @@ public:
   StmtType
   stmt_type() const;
 
+  /// @brief 名前を返す．
+  ///
+  /// kEnumDecl, kFuncDecl, kVarDecl のみ有効
+  virtual
+  ShString
+  name() const;
+
   /// @brief enum 定数の数を返す．
   ///
   /// kEnumDecl のみ有効
@@ -54,13 +61,21 @@ public:
   ymuint
   enum_num() const;
 
-  /// @brief enum 定数を返す．
+  /// @brief enum 定数名を返す．
   /// @param[in] pos 位置 ( 0 <= pos < enum_num() )
   ///
   /// kEnumDecl のみ有効
   virtual
-  const AstEnumConst*
+  const AstSymbol*
   enum_const(ymuint pos) const;
+
+  /// @brief enum 定数の規定値を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < enum_num() )
+  ///
+  /// kEnumDecl のみ有効
+  virtual
+  const AstExpr*
+  enum_const_expr(ymuint pos) const;
 
 
 private:

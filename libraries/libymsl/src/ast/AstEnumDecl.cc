@@ -9,6 +9,7 @@
 
 #include "AstEnumDecl.h"
 #include "AstEnumConst.h"
+#include "AstSymbol.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -45,6 +46,15 @@ AstEnumDecl::stmt_type() const
   return kEnumDecl;
 }
 
+// @brief 名前を返す．
+//
+// kEnumDecl, kFuncDecl, kVarDecl のみ有効
+ShString
+AstEnumDecl::name() const
+{
+  return mName->str_val();
+}
+
 // @brief enum 定数の数を返す．
 //
 // kEnumDecl のみ有効
@@ -58,50 +68,22 @@ AstEnumDecl::enum_num() const
 // @param[in] pos 位置 ( 0 <= pos < enum_num() )
 //
 // kEnumDecl のみ有効
-const AstEnumConst*
+const AstSymbol*
 AstEnumDecl::enum_const(ymuint pos) const
 {
   ASSERT_COND( pos < enum_num() );
-  return mConstList[pos];
+  return mConstList[pos]->name();
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// クラス AstEnumConst
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] name 名前
-// @param[in] expr 値を表す式
-// @param[in] loc ファイル位置
-AstEnumConst::AstEnumConst(AstSymbol* name,
-			   AstExpr* expr,
-			   const FileRegion& loc) :
-  Ast(loc),
-  mName(name),
-  mExpr(expr)
-{
-}
-
-// @brief デストラクタ
-AstEnumConst::~AstEnumConst()
-{
-}
-
-// @brief 名前を返す．
-const AstSymbol*
-AstEnumConst::name() const
-{
-  return mName;
-}
-
-// @brief 値を表す式を返す．
+// @brief enum 定数の規定値を返す．
+// @param[in] pos 位置 ( 0 <= pos < enum_num() )
 //
-// NULL の場合もある．
+// kEnumDecl のみ有効
 const AstExpr*
-AstEnumConst::expr() const
+AstEnumDecl::enum_const_expr(ymuint pos) const
 {
-  return mExpr;
+  ASSERT_COND( pos < enum_num() );
+  return mConstList[pos]->expr();
 }
 
 END_NAMESPACE_YM_YMSL

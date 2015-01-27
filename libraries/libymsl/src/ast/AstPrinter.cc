@@ -8,9 +8,11 @@
 
 
 #include "AstPrinter.h"
+
 #include "AstExpr.h"
 #include "AstStatement.h"
 #include "AstSymbol.h"
+#include "AstType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -70,6 +72,27 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case kEnumDecl:
+    print_indent(indent);
+    mS << "enum " << stmt->name() << " {" << endl;
+    {
+      ymuint n = stmt->enum_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	const AstSymbol* name = stmt->enum_const(i);
+	const AstExpr* expr = stmt->enum_const_expr(i);
+	print_indent(indent + 1);
+	mS << name->str_val();
+	if ( expr != NULL ) {
+	  mS << " = ";
+	  print_expr(expr);
+	}
+	if ( i < n - 1 ) {
+	  mS << ",";
+	}
+	mS << endl;
+      }
+    }
+    print_indent(indent);
+    mS << "};" << endl;
     break;
 
   case kEqAssign:
@@ -215,6 +238,30 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case kSwitch:
+    print_indent(indent);
+    mS << "switch ";
+    print_expr(stmt->expr());
+    mS << "{" << endl;
+    {
+      ymuint n = stmt->switch_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	const AstExpr* label = stmt->case_label(i);
+	const AstStatement* body = stmt->case_stmt(i);
+	print_indent(indent);
+	if ( label != NULL ) {
+	  mS << "case ";
+	  print_expr(label);
+	}
+	else {
+	  mS << "default";
+	}
+	mS << ": " << endl;
+	print_statement(body, indent + 1);
+	mS << endl;
+      }
+    }
+    print_indent(indent);
+    mS << "}" << endl;
     break;
 
   case kToplevel:
@@ -225,6 +272,17 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case kVarDecl:
+    print_indent(indent);
+    mS << "var " << stmt->name() << ": ";
+    print_type(stmt->type());
+    {
+      const AstExpr* expr = stmt->expr();
+      if ( expr != NULL ) {
+	mS << " = ";
+	print_expr(expr);
+      }
+    }
+    mS << ";" << endl;
     break;
 
   case kWhile:
@@ -504,6 +562,49 @@ AstPrinter::print_expr(const AstExpr* expr)
     // AST ではありえない．
     ASSERT_NOT_REACHED;
     break;
+  }
+}
+
+// @brief 型を出力する．
+// @param[in] type 型
+void
+AstPrinter::print_type(const AstType* type)
+{
+  if ( type->named_type() ) {
+    mS << type->name()->str_val();
+  }
+  else {
+    switch ( type->type_id() ) {
+    case kVoidType:    mS << "void"; break;
+    case kBooleanType: mS << "boolean"; break;
+    case kIntType:     mS << "int"; break;
+    case kFloatType:   mS << "float"; break;
+    case kStringType:  mS << "string"; break;
+
+    case kArrayType:
+      mS << "array(";
+      print_type(type->elem_type());
+      mS << ")";
+      break;
+
+    case kSetType:
+      mS << "set(";
+      print_type(type->elem_type());
+      mS << ")";
+      break;
+
+    case kMapType:
+      mS << "map(";
+      print_type(type->key_type());
+      mS << ", ";
+      print_type(type->elem_type());
+      mS << ")";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
   }
 }
 
