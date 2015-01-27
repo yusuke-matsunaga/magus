@@ -172,11 +172,75 @@ AstStatement::next_stmt() const
   return NULL;
 }
 
+// @brief switch 文の case 数を返す．
+//
+// kSwitch のみ有効
+ymuint
+AstStatement::switch_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief switch 文の case ラベルを返す．
+// @param[in] pos 位置 ( 0 <= pos < switch_num() )
+//
+// kSwitch のみ有効
+const AstExpr*
+AstStatement::case_label(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief switch 文の case ブロックを返す．
+// @param[in] pos 位置 ( 0 <= pos < switch_num() )
+//
+// kSwitch のみ有効
+const AstStatement*
+AstStatement::case_stmt(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 // @brief ラベルを得る．
 //
 // kGoto, kLabel のみ有効
 const AstSymbol*
 AstStatement::label() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief インポートするモジュール数を返す．
+//
+// kImport のみ有効
+ymuint
+AstStatement::import_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief インポートするモジュール名を返す．
+// @param[in] pos 位置 ( 0 <= pos < inport_num() )
+//
+// kImport のみ有効
+const AstSymbol*
+AstStatement::import_module(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief インポートするモジュールのエイリアスを返す．
+// @param[in] pos 位置 ( 0 <= pos < inport_num() )
+//
+// kImport のみ有効
+const AstSymbol*
+AstStatement::import_alias(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
   return NULL;

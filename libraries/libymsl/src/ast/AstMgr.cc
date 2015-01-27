@@ -108,8 +108,19 @@ AstMgr::set_root(AstStmtList* stmt_list,
 		 const FileRegion& loc)
 {
   ASSERT_COND ( mToplevel == NULL );
+
+  ymuint num = stmt_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstStatement*) * num);
+  AstStatement** stmt_array = new (q) AstStatement*[num];
+  ymuint pos = 0;
+  for (AstStmtList::Iterator p = stmt_list->begin();
+       !p.is_end(); p.next()) {
+    stmt_array[pos] = *p;
+    ++ pos;
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstToplevel));
-  mToplevel = new (p) AstToplevel(stmt_list, loc);
+  mToplevel = new (p) AstToplevel(num, stmt_array, loc);
 }
 
 // @brief yylex とのインターフェイス
@@ -169,8 +180,20 @@ AstStatement*
 AstMgr::new_Import(AstModuleList* module_list,
 		   const FileRegion& loc)
 {
+  ymuint num = module_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstSymbol*) * num * 2);
+  AstSymbol** module_array = new (q) AstSymbol*[num * 2];
+
+  ymuint pos = 0;
+  for (AstModuleList::Iterator p = module_list->begin();
+       !p.is_end(); p.next()) {
+    AstModule* m = *p;
+    module_array[pos * 2 + 0] = m->module_name();
+    module_array[pos * 2 + 1] = m->alias_name();
+    ++ pos;
+  }
   void* p = mAlloc.get_memory(sizeof(AstImport));
-  return new (p) AstImport(module_list, loc);
+  return new (p) AstImport(num, module_array, loc);
 }
 
 // @brief enum 定義を作る．
@@ -182,8 +205,18 @@ AstMgr::new_EnumDecl(AstSymbol* name,
 		     AstEnumConstList* const_list,
 		     const FileRegion& loc)
 {
+  ymuint num = const_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstEnumConst*) * num);
+  AstEnumConst** const_array = new (q) AstEnumConst*[num];
+  ymuint pos = 0;
+  for (AstEnumConstList::Iterator p = const_list->begin();
+       !p.is_end(); p.next()) {
+    const_array[pos] = *p;
+    ++ pos;
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstEnumDecl));
-  return new (p) AstEnumDecl(name, const_list, loc);
+  return new (p) AstEnumDecl(name, num, const_array, loc);
 }
 
 // @brief enum 定数を作る．
@@ -242,8 +275,18 @@ AstMgr::new_FuncDecl(AstSymbol* name,
 		     AstStatement* stmt,
 		     const FileRegion& loc)
 {
+  ymuint param_num = param_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstParam*) * param_num);
+  AstParam** param_array = new (q) AstParam*[param_num];
+  ymuint pos = 0;
+  for (AstParamList::Iterator p = param_list->begin();
+       !p.is_end(); p.next()) {
+    param_array[pos] = *p;
+    ++ pos;
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
-  return  new (p) AstFuncDecl(name->str_val(), type, param_list, stmt, loc);
+  return  new (p) AstFuncDecl(name->str_val(), type, param_num, param_array, stmt, loc);
 }
 
 // @brief 代入文を作る．
@@ -328,8 +371,19 @@ AstMgr::new_Switch(AstExpr* expr,
 		   AstCaseList* case_list,
 		   const FileRegion& loc)
 {
+  ymuint num = case_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstCaseItem*) * num);
+  AstCaseItem** case_array = new (q) AstCaseItem*[num];
+
+  ymuint pos = 0;
+  for (AstCaseList::Iterator p = case_list->begin();
+       !p.is_end(); p.next()) {
+    case_array[pos] = *p;
+    ++ pos;
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstSwitch));
-  return new (p) AstSwitch(expr, case_list, loc);
+  return new (p) AstSwitch(expr, num, case_array, loc);
 }
 
 // @brief case-item を作る．
@@ -403,8 +457,18 @@ AstStatement*
 AstMgr::new_BlockStmt(AstStmtList* stmt_list,
 		      const FileRegion& loc)
 {
+  ymuint num = stmt_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstStatement*) * num);
+  AstStatement** stmt_array = new (q) AstStatement*[num];
+  ymuint pos = 0;
+  for (AstStmtList::Iterator p = stmt_list->begin();
+       !p.is_end(); p.next()) {
+    stmt_array[pos] = *p;
+    ++ pos;
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstBlockStmt));
-  return new (p) AstBlockStmt(stmt_list, loc);
+  return new (p) AstBlockStmt(num, stmt_array, loc);
 }
 
 // @brief 式文を作る．
@@ -498,8 +562,19 @@ AstMgr::new_FuncCall(AstExpr* id,
 		     AstExprList* expr_list,
 		     const FileRegion& loc)
 {
+  ymuint num = expr_list->size();
+  void* q = mAlloc.get_memory(sizeof(AstExpr*) * num);
+  AstExpr** expr_array = new (q) AstExpr*[num];
+
+  ymuint pos = 0;
+  for (AstExprList::Iterator p = expr_list->begin();
+       !p.is_end(); p.next()) {
+    expr_array[pos] = *p;
+    ++ pos;
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstFuncCall));
-  return new (p) AstFuncCall(id, expr_list, loc);
+  return new (p) AstFuncCall(id, num, expr_array, loc);
 }
 
 // @brief true 定数式を作る．

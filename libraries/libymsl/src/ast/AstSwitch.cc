@@ -19,21 +19,18 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] expr 条件式
+// @param[in] case_num case 文の数
 // @param[in] case_list case リスト
 // @param[in] loc ファイル位置
 AstSwitch::AstSwitch(AstExpr* expr,
-		     AstCaseList* case_list,
+		     ymuint case_num,
+		     AstCaseItem** case_list,
 		     const FileRegion& loc) :
   AstStatement(loc),
   mExpr(expr),
-  mCaseItemList(case_list->size())
+  mNum(case_num),
+  mCaseItemList(case_list)
 {
-  ymuint pos = 0;
-  for (AstCaseList::Iterator p = case_list->begin();
-       !p.is_end(); p.next()) {
-    mCaseItemList[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
@@ -48,50 +45,39 @@ AstSwitch::stmt_type() const
   return kSwitch;
 }
 
-#if 0
-// @brief 要素の生成と関数以外の参照解決を行う．
-// @param[in] parent_scope 親のスコープ
-// @param[in] type_mgr 型マネージャ
-void
-AstSwitch::phase1(YmslScope* parent_scope,
-		  YmslTypeMgr* type_mgr)
-{
-  mExpr->resolve_var(parent_scope);
-  ymuint n = mCaseItemList.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    mCaseItemList[i]->phase1(parent_scope, type_mgr);
-  }
-}
-
-// @brief 参照解決を行う．
-// @param[in] parent_scope 親のスコープ
-void
-AstSwitch::phase2(YmslScope* parent_scope)
-{
-  ymuint n = mCaseItemList.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    mCaseItemList[i]->phase2(parent_scope);
-  }
-}
-
-// @brief 命令コードのサイズを計算する．
-ymuint
-AstSwitch::calc_size()
-{
-}
-
-// @brief 命令コードを生成する．
-// @param[in] driver ドライバ
-// @param[in] code_list 命令コードの格納先
-// @param[inout] addr 命令コードの現在のアドレス
+// @brief switch 文の case 数を返す．
 //
-// addr の値は更新される．
-void
-AstSwitch::compile(YmslDriver& driver,
-		   YmslCodeList& code_list,
-		   Ymsl_INT& addr)
+// kSwitch のみ有効
+ymuint
+AstSwitch::switch_num() const
 {
+  return mNum;
 }
+
+// @brief switch 文の case ラベルを返す．
+// @param[in] pos 位置 ( 0 <= pos < switch_num() )
+//
+// kSwitch のみ有効
+const AstExpr*
+AstSwitch::case_label(ymuint pos) const
+{
+  ASSERT_COND( pos < switch_num() );
+  return mCaseItemList[pos]->label();
+}
+
+// @brief switch 文の case ブロックを返す．
+// @param[in] pos 位置 ( 0 <= pos < switch_num() )
+//
+// kSwitch のみ有効
+const AstStatement*
+AstSwitch::case_stmt(ymuint pos) const
+{
+  ASSERT_COND( pos < switch_num() );
+  return mCaseItemList[pos]->stmt();
+}
+
+
+#if 0
 
 // @brief 内容を表示する．(デバッグ用)
 // @param[in] s 出力ストリーム

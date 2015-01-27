@@ -28,7 +28,8 @@ public:
   /// @param[in] const_list 定数リスト
   /// @param[in] loc ファイル位置
   AstEnumDecl(AstSymbol* name,
-	      AstEnumConstList* const_list,
+	      ymuint const_num,
+	      AstEnumConst** const_list,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -70,8 +71,11 @@ private:
   // 名前
   AstSymbol* mName;
 
-  // 定数リスト
-  vector<AstEnumConst*> mConstList;
+  // 定数の数
+  ymuint mConstNum;
+
+  // 定数リスト(ポインタ配列)
+  AstEnumConst** mConstList;
 
 };
 

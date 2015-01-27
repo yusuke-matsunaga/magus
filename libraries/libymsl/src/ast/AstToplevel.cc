@@ -16,11 +16,13 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] stmt_list ステートメントリスト
+// @param[in] stmt_num 文のリストの要素数
+// @param[in] stmt_list 文のリスト
 // @param[in] loc ファイル位置
-AstToplevel::AstToplevel(AstStmtList* stmt_list,
+AstToplevel::AstToplevel(ymuint num,
+			 AstStatement** stmt_list,
 			 const FileRegion& loc) :
-  AstBlockStmt(stmt_list, loc)
+  AstBlockStmt(num, stmt_list, loc)
 {
 }
 

@@ -25,10 +25,12 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
+  /// @param[in] expr_num 引数の数
   /// @param[in] expr_list 引数のリスト
   /// @param[in] loc ファイル位置
   AstFuncCall(AstExpr* func,
-	      AstExprList* expr_list,
+	      ymuint expr_num,
+	      AstExpr** expr_list,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -75,8 +77,11 @@ private:
   // 関数
   AstExpr* mFunc;
 
-  // 引数のリスト
-  vector<AstExpr*> mExprList;
+  // 引数の数
+  ymuint mExprNum;
+
+  // 引数のリスト(ポインタ配列)
+  AstExpr** mExprList;
 
 };
 

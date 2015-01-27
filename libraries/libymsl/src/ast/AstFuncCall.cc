@@ -8,7 +8,6 @@
 
 
 #include "AstFuncCall.h"
-#include "AstList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,21 +18,18 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] func 関数
+// @param[in] expr_num 引数の数
 // @param[in] expr_list 引数リスト
 // @param[in] loc ファイル位置
 AstFuncCall::AstFuncCall(AstExpr* func,
-			 AstExprList* expr_list,
+			 ymuint expr_num,
+			 AstExpr** expr_list,
 			 const FileRegion& loc) :
   AstExpr(loc),
   mFunc(func),
-  mExprList(expr_list->size())
+  mExprNum(expr_num),
+  mExprList(expr_list)
 {
-  ymuint pos = 0;
-  for (AstExprList::Iterator p = expr_list->begin();
-       !p.is_end(); p.next()) {
-    mExprList[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
@@ -61,7 +57,7 @@ AstFuncCall::func() const
 ymuint
 AstFuncCall::arglist_num() const
 {
-  return mExprList.size();
+  return mExprNum;
 }
 
 // @brief 引数リストの要素を返す．

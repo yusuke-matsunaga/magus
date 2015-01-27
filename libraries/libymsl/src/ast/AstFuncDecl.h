@@ -29,12 +29,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] type 型
+  /// @param[in] param_num パラメータの数
   /// @param[in] param_list パラメータリスト
   /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
   AstFuncDecl(ShString name,
 	      AstType* type,
-	      AstParamList* param_list,
+	      ymuint param_num,
+	      AstParam** param_list,
 	      AstStatement* stmt,
 	      const FileRegion& loc);
 
@@ -85,47 +87,6 @@ public:
   const AstStatement*
   stmt() const;
 
-#if 0
-  /// @brief 要素の生成と関数以外の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
-  /// @param[in] type_mgr 型マネージャ
-  virtual
-  void
-  phase1(YmslScope* parent_scope,
-	 YmslTypeMgr* type_mgr);
-
-  /// @brief 関数の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
-  virtual
-  void
-  phase2(YmslScope* parent_scope);
-
-  /// @brief 命令コードのサイズを計算する．
-  virtual
-  ymuint
-  calc_size();
-
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
-  ///
-  /// addr の値は更新される．
-  virtual
-  void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr);
-
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
-  virtual
-  void
-  print(ostream& s,
-	ymuint indent = 0) const;
-#endif
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -138,8 +99,11 @@ private:
   // 出力の型
   AstType* mType;
 
-  // パラメータリスト
-  vector<AstParam*> mParamList;
+  // パラメータの数
+  ymuint mParamNum;
+
+  // パラメータリスト(ポインタ配列)
+  AstParam** mParamList;
 
   // 本体の文
   AstStatement* mStmt;

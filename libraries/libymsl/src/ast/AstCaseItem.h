@@ -49,16 +49,6 @@ public:
   const AstStatement*
   stmt() const;
 
-#if 0
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
-  virtual
-  void
-  print(ostream& s,
-	ymuint indent = 0) const;
-#endif
-
 
 private:
   //////////////////////////////////////////////////////////////////////

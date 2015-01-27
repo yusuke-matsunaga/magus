@@ -9,7 +9,6 @@
 
 #include "AstEnumDecl.h"
 #include "AstEnumConst.h"
-#include "AstList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -20,21 +19,18 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 名前
+// @param[in] name 名前
 // @param[in] const_list 定数リスト
 // @param[in] loc ファイル位置
 AstEnumDecl::AstEnumDecl(AstSymbol* name,
-			 AstEnumConstList* const_list,
+			 ymuint const_num,
+			 AstEnumConst** const_list,
 			 const FileRegion& loc) :
   AstStatement(loc),
   mName(name),
-  mConstList(const_list->size())
+  mConstNum(const_num),
+  mConstList(const_list)
 {
-  ymuint pos = 0;
-  for (AstEnumConstList::Iterator p = const_list->begin();
-       !p.is_end(); p.next()) {
-    mConstList[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
@@ -55,7 +51,7 @@ AstEnumDecl::stmt_type() const
 ymuint
 AstEnumDecl::enum_num() const
 {
-  return mConstList.size();
+  return mConstNum;
 }
 
 // @brief enum 定数を返す．

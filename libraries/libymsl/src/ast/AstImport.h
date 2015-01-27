@@ -24,9 +24,11 @@ class AstImport :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] num モジュール数
   /// @param[in] module_list モジュールのリスト
   /// @param[in] loc ファイル位置
-  AstImport(AstModuleList* module_list,
+  AstImport(ymuint num,
+	    AstSymbol** module_list,
 	    const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -44,54 +46,41 @@ public:
   StmtType
   stmt_type() const;
 
-#if 0
-  /// @brief 要素の生成と関数以外の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
-  /// @param[in] type_mgr 型マネージャ
-  virtual
-  void
-  phase1(YmslScope* parent_scope,
-	 YmslTypeMgr* type_mgr);
-
-  /// @brief 関数の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
-  virtual
-  void
-  phase2(YmslScope* parent_scope);
-
-  /// @brief 命令コードのサイズを計算する．
+  /// @brief インポートするモジュール数を返す．
+  ///
+  /// kImport のみ有効
   virtual
   ymuint
-  calc_size();
+  import_num() const;
 
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
+  /// @brief インポートするモジュール名を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
   ///
-  /// addr の値は更新される．
+  /// kImport のみ有効
   virtual
-  void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr);
+  const AstSymbol*
+  import_module(ymuint pos) const;
 
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
+  /// @brief インポートするモジュールのエイリアスを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
+  ///
+  /// kImport のみ有効
   virtual
-  void
-  print(ostream& s,
-	ymuint indent = 0) const;
-#endif
+  const AstSymbol*
+  import_alias(ymuint pos) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // モジュールのリスト
-  vector<AstModule*> mModuleList;
+  // モジュール数
+  ymuint mNum;
+
+  // モジュール名とエイリアスのリスト
+  // 実体はポインタ配列でサイズは mNum * 2
+  AstSymbol** mModuleList;
 
 };
 

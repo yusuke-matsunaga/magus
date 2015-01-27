@@ -7,7 +7,6 @@
 /// All rights reserved.
 
 #include "AstBlockStmt.h"
-#include "AstList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -17,19 +16,16 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] stmt_list 本体の文
+// @param[in] stmt_num 文のリストの要素数
+// @param[in] stmt_list 文のリスト
 // @param[in] loc ファイル位置
-AstBlockStmt::AstBlockStmt(AstStmtList* stmt_list,
+AstBlockStmt::AstBlockStmt(ymuint stmt_num,
+			   AstStatement** stmt_list,
 			   const FileRegion& loc) :
   AstStatement(loc),
-  mStmtList(stmt_list->size())
+  mStmtNum(stmt_num),
+  mStmtList(stmt_list)
 {
-  ymuint pos = 0;
-  for (AstStmtList::Iterator p = stmt_list->begin();
-       !p.is_end(); p.next()) {
-    mStmtList[pos] = *p;
-    ++ pos;
-  }
 }
 
 // @brief デストラクタ
@@ -50,7 +46,7 @@ AstBlockStmt::stmt_type() const
 ymuint
 AstBlockStmt::stmtlist_num() const
 {
-  return mStmtList.size();
+  return mStmtNum;
 }
 
 // @brief 文のリストの要素を返す．

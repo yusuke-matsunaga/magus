@@ -146,6 +146,29 @@ public:
   const AstStatement*
   next_stmt() const;
 
+  /// @brief switch 文の case 数を返す．
+  ///
+  /// kSwitch のみ有効
+  virtual
+  ymuint
+  switch_num() const;
+
+  /// @brief switch 文の case ラベルを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < switch_num() )
+  ///
+  /// kSwitch のみ有効
+  virtual
+  const AstExpr*
+  case_label(ymuint pos) const;
+
+  /// @brief switch 文の case ブロックを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < switch_num() )
+  ///
+  /// kSwitch のみ有効
+  virtual
+  const AstStatement*
+  case_stmt(ymuint pos) const;
+
   /// @brief ラベルを得る．
   ///
   /// kGoto, kLabel のみ有効
@@ -153,61 +176,28 @@ public:
   const AstSymbol*
   label() const;
 
-#if 0
-  /// @brief 要素の生成と関数以外の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
-  /// @param[in] type_mgr 型マネージャ
-  virtual
-  void
-  phase1(YmslScope* parent_scope,
-	 YmslTypeMgr* type_mgr) = 0;
-
-  /// @brief 関数の参照解決を行う．
-  /// @param[in] parent_scope 親のスコープ
-  virtual
-  void
-  phase2(YmslScope* parent_scope) = 0;
-
-  /// @brief 命令コードのサイズを計算する．
+  /// @brief インポートするモジュール数を返す．
+  ///
+  /// kImport のみ有効
   virtual
   ymuint
-  calc_size() = 0;
+  import_num() const;
 
-  /// @brief 命令コードを生成する．
-  /// @param[in] driver ドライバ
-  /// @param[in] code_list 命令コードの格納先
-  /// @param[inout] addr 命令コードの現在のアドレス
+  /// @brief インポートするモジュール名を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
   ///
-  /// addr の値は更新される．
+  /// kImport のみ有効
   virtual
-  void
-  compile(YmslDriver& driver,
-	  YmslCodeList& code_list,
-	  Ymsl_INT& addr) = 0;
+  const AstSymbol*
+  import_module(ymuint pos) const;
 
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデントレベル
+  /// @brief インポートするモジュールのエイリアスを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
+  ///
+  /// kImport のみ有効
   virtual
-  void
-  print(ostream& s,
-	ymuint indent = 0) const = 0;
-#endif
-
-#if 0
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief インデントする．
-  /// @param[in] s 出力ストリーム
-  /// @param[in] indent インデント量
-  static
-  void
-  print_indent(ostream& s,
-	       ymuint indent);
-#endif
+  const AstSymbol*
+  import_alias(ymuint pos) const;
 
 };
 

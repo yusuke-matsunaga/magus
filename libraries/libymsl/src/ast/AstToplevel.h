@@ -24,9 +24,11 @@ class AstToplevel :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] root 根のノード
+  /// @param[in] stmt_num 文のリストの要素数
+  /// @param[in] stmt_list 文のリスト
   /// @param[in] loc ファイル位置
-  AstToplevel(AstStmtList* root,
+  AstToplevel(ymuint num,
+	      AstStatement** stmt_list,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ

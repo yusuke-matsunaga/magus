@@ -230,7 +230,7 @@ item_list
 ;
 
 // トップレベルの要素
-// ステートメントか関数定義
+// ステートメントか import 文
 item
 : statement
 {
