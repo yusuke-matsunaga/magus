@@ -163,6 +163,20 @@ public:
 		 AstExpr* right,
 		 const FileRegion& loc);
 
+  /// @brief 増加文を作る．
+  /// @param[in] expr 対象の式
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_Incr(AstExpr* expr,
+	   const FileRegion& loc);
+
+  /// @brief 減少文を作る．
+  /// @param[in] expr 対象の式
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_Decr(AstExpr* expr,
+	   const FileRegion& loc);
+
   /// @brief if 文を作る．
   /// @param[in] expr 条件式
   /// @param[in] then_stmt 条件が成り立った時実行される文
@@ -268,10 +282,10 @@ public:
   new_ExprStmt(AstExpr* expr,
 	       const FileRegion& loc);
 
-  /// @brief 終端式を作る．
-  /// @param[in] leaf 終端
-  AstExpr*
-  new_LeafExpr(AstExpr* leaf);
+  /// @brief 空文を作る．
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_NullStmt(const FileRegion& loc);
 
   /// @brief 単項演算式を作る．
   /// @param[in] op 演算子のタイプ

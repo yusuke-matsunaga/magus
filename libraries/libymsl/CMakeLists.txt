@@ -29,6 +29,7 @@ set (ymsl_SOURCES
   src/ast/AstBreak.cc
   src/ast/AstCaseItem.cc
   src/ast/AstContinue.cc
+  src/ast/AstDecr.cc
   src/ast/AstDoWhile.cc
   src/ast/AstEnumConst.cc
   src/ast/AstEnumDecl.cc
@@ -42,12 +43,14 @@ set (ymsl_SOURCES
   src/ast/AstGoto.cc
   src/ast/AstIf.cc
   src/ast/AstImport.cc
-  src/ast/AstIteOp.cc
+  src/ast/AstIncr.cc
   src/ast/AstIntConst.cc
+  src/ast/AstIteOp.cc
   src/ast/AstLabel.cc
   src/ast/AstMemberRef.cc
   src/ast/AstMgr.cc
   src/ast/AstModule.cc
+  src/ast/AstNullStmt.cc
   src/ast/AstParam.cc
   src/ast/AstPrinter.cc
   src/ast/AstReturn.cc

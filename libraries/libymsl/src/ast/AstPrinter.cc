@@ -54,21 +54,28 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kBreak:
     print_indent(indent);
-    mS << "break;";
+    mS << "break;" << endl;
     break;
 
   case kContinue:
     print_indent(indent);
-    mS << "continue;";
+    mS << "continue;" << endl;
+    break;
+
+  case kDecr:
+    print_indent(indent);
+    print_expr(stmt->lhs_expr());
+    mS << " --;" << endl;
     break;
 
   case kDoWhile:
     print_indent(indent);
     mS << "do" << endl;
     print_statement(stmt->stmt(), indent + 1);
+    print_indent(indent);
     mS << "while ";
     print_expr(stmt->expr());
-    mS << ";" << endl;
+    mS << endl;
     break;
 
   case kEnumDecl:
@@ -92,7 +99,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
       }
     }
     print_indent(indent);
-    mS << "};" << endl;
+    mS << "}" << endl;
     break;
 
   case kEqAssign:
@@ -190,6 +197,14 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case kFor:
+    print_indent(indent);
+    mS << "for (" << endl;
+    print_statement(stmt->init_stmt(), indent + 1);
+    print_indent(indent + 1);
+    print_expr(stmt->expr());
+    mS << ";" << endl;
+    print_statement(stmt->next_stmt(), indent + 1);
+    print_statement(stmt->stmt(), indent + 1);
     break;
 
   case kFuncDecl:
@@ -219,6 +234,16 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case kIf:
+    print_indent(indent);
+    mS << "if ";
+    print_expr(stmt->expr());
+    mS << endl;
+    print_statement(stmt->stmt(), indent + 1);
+    if ( stmt->else_stmt() != NULL ) {
+      print_indent(indent);
+      mS << "else" << endl;
+      print_statement(stmt->else_stmt(), indent + 1);
+    }
     break;
 
   case kImport:
@@ -240,9 +265,20 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
+  case kIncr:
+    print_indent(indent);
+    print_expr(stmt->lhs_expr());
+    mS << " ++;" << endl;
+    break;
+
   case kLabel:
     print_indent(indent);
     mS << stmt->label()->str_val() << ":" << endl;
+    break;
+
+  case kNullStmt:
+    print_indent(indent);
+    mS << ";" << endl;
     break;
 
   case kReturn:

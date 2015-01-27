@@ -19,6 +19,7 @@
 #include "AstBreak.h"
 #include "AstCaseItem.h"
 #include "AstContinue.h"
+#include "AstDecr.h"
 #include "AstDoWhile.h"
 #include "AstEnumConst.h"
 #include "AstEnumDecl.h"
@@ -32,6 +33,7 @@
 #include "AstGoto.h"
 #include "AstIf.h"
 #include "AstImport.h"
+#include "AstIncr.h"
 #include "AstIntConst.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
@@ -40,6 +42,7 @@
 #include "AstMemberRef.h"
 #include "AstModule.h"
 #include "AstNamedType.h"
+#include "AstNullStmt.h"
 #include "AstParam.h"
 #include "AstPrimType.h"
 #include "AstReturn.h"
@@ -304,6 +307,28 @@ AstMgr::new_Assignment(StmtType stmt_type,
   return new (p) AstAssignment(stmt_type, left, right, loc);
 }
 
+// @brief 増加文を作る．
+// @param[in] expr 対象の式
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_Incr(AstExpr* expr,
+		 const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstIncr));
+  return new (p) AstIncr(expr, loc);
+}
+
+// @brief 減少文を作る．
+// @param[in] expr 対象の式
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_Decr(AstExpr* expr,
+		 const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstDecr));
+  return new (p) AstDecr(expr, loc);
+}
+
 // @brief if 文を作る．
 // @param[in] expr 条件式
 // @param[in] then_stmt 条件が成り立った時実行される文のリスト
@@ -480,6 +505,15 @@ AstMgr::new_ExprStmt(AstExpr* expr,
 {
   void* p = mAlloc.get_memory(sizeof(AstExprStmt));
   return new (p) AstExprStmt(expr, loc);
+}
+
+// @brief 空文を作る．
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_NullStmt(const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstNullStmt));
+  return new (p) AstNullStmt(loc);
 }
 
 // @brief 単項演算式を作る．

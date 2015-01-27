@@ -282,7 +282,7 @@ statement
   $$ = $1;
 }
 // enum 定義
-| ENUM SYMBOL LCB enumconst_list RCB SEMI
+| ENUM SYMBOL LCB enumconst_list RCB
 {
   $$ = mgr.new_EnumDecl($2, $4, @$);
   delete $4;
@@ -302,6 +302,11 @@ statement
 | SYMBOL COLON
 {
   $$ = mgr.new_Label($1, @$);
+}
+// 空文
+| SEMI
+{
+  $$ = mgr.new_NullStmt(@$);
 }
 // エラー回復用のルール
 | error SEMI
@@ -324,10 +329,12 @@ single_stmt
 // インクリメント文
 | primary PLUSPLUS
 {
+  $$ = mgr.new_Incr($1, @$);
 }
 // デクリメント文
 | primary MINUSMINUS
 {
+  $$ = mgr.new_Decr($1, @$);
 }
 // GOTO 文
 | GOTO SYMBOL
