@@ -57,12 +57,34 @@ AstStatement::param_num() const
   return 0;
 }
 
-// @brief パラメータリストの要素を返す．
+// @brief パラメータ名を返す．
 // @param[in] pos 位置 ( 0 <= pos < param_num() )
 //
 // kFuncDecl のみ有効
-const AstParam*
-AstStatement::param(ymuint pos) const
+ShString
+AstStatement::param_name(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return ShString();
+}
+
+// @brief パラメータの型を返す．
+// @param[in] pos 位置 ( 0 <= pos < param_num() )
+//
+// kFuncDecl のみ有効
+const AstType*
+AstStatement::param_type(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief パラメータの初期値を返す．
+// @param[in] pos 位置 ( 0 <= pos < param_num() )
+//
+// kFuncDecl のみ有効
+const AstExpr*
+AstStatement::param_expr(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
   return NULL;

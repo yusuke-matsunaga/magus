@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstStatement.h"
+#include "Ast.h"
 #include "YmUtils/ShString.h"
 
 
@@ -22,8 +22,6 @@ BEGIN_NAMESPACE_YM_YMSL
 class AstParam :
   public Ast
 {
-  friend class YmslModule;
-
 public:
 
   /// @brief コンストラクタ
@@ -50,10 +48,6 @@ public:
   ShString
   name() const;
 
-  /// @brief インデックス番号を返す．
-  ymuint
-  index() const;
-
   /// @brief 型を得る．
   const AstType*
   type() const;
@@ -64,13 +58,6 @@ public:
   const AstExpr*
   init_expr() const;
 
-#if 0
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  void
-  print(ostream& s) const;
-#endif
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -79,9 +66,6 @@ private:
 
   // 名前
   ShString mName;
-
-  // インデックス番号
-  ymuint mIndex;
 
   // 変数の型
   AstType* mType;

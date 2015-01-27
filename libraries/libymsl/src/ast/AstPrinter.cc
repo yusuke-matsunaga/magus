@@ -193,6 +193,24 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case kFuncDecl:
+    {
+      print_indent(indent);
+      mS << "function " << stmt->name() << "(";
+      ymuint np = stmt->param_num();
+      const char* comma = "";
+      for (ymuint i = 0; i < np; ++ i) {
+	mS << comma << stmt->param_name(i) << ": ";
+	print_type(stmt->param_type(i));
+	const AstExpr* expr = stmt->param_expr(i);
+	if ( expr != NULL ) {
+	  mS << " = ";
+	  print_expr(expr);
+	}
+	comma = ", ";
+      }
+      mS << ")" << endl;
+      print_statement(stmt->stmt(), indent + 1);
+    }
     break;
 
   case kGoto:

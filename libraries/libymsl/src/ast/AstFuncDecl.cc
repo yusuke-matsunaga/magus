@@ -8,6 +8,7 @@
 
 
 #include "AstFuncDecl.h"
+#include "AstParam.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -73,15 +74,37 @@ AstFuncDecl::param_num() const
   return mParamNum;
 }
 
-// @brief パラメータリストの要素を返す．
+// @brief パラメータ名を返す．
 // @param[in] pos 位置 ( 0 <= pos < param_num() )
 //
 // kFuncDecl のみ有効
-const AstParam*
-AstFuncDecl::param(ymuint pos) const
+ShString
+AstFuncDecl::param_name(ymuint pos) const
 {
   ASSERT_COND( pos < param_num() );
-  return mParamList[pos];
+  return mParamList[pos]->name();
+}
+
+// @brief パラメータの型を返す．
+// @param[in] pos 位置 ( 0 <= pos < param_num() )
+//
+// kFuncDecl のみ有効
+const AstType*
+AstFuncDecl::param_type(ymuint pos) const
+{
+  ASSERT_COND( pos < param_num() );
+  return mParamList[pos]->type();
+}
+
+// @brief パラメータの初期値を返す．
+// @param[in] pos 位置 ( 0 <= pos < param_num() )
+//
+// kFuncDecl のみ有効
+const AstExpr*
+AstFuncDecl::param_expr(ymuint pos) const
+{
+  ASSERT_COND( pos < param_num() );
+  return mParamList[pos]->init_expr();
 }
 
 // @brief 本体の文を返す．

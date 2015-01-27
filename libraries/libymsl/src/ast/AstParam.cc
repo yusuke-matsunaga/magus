@@ -8,8 +8,6 @@
 
 
 #include "AstParam.h"
-#include "AstExpr.h"
-#include "AstType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -29,7 +27,6 @@ AstParam::AstParam(ShString name,
 		   const FileRegion& loc) :
   Ast(loc),
   mName(name),
-  mIndex(-1),
   mType(type),
   mInitExpr(init_expr)
 {
@@ -47,13 +44,6 @@ AstParam::name() const
   return mName;
 }
 
-// @brief インデックス番号を返す．
-ymuint
-AstParam::index() const
-{
-  return mIndex;
-}
-
 // @brief 型を得る．
 const AstType*
 AstParam::type() const
@@ -69,20 +59,5 @@ AstParam::init_expr() const
 {
   return mInitExpr;
 }
-
-#if 0
-// @brief 内容を表示する．(デバッグ用)
-// @param[in] s 出力ストリーム
-void
-AstParam::print(ostream& s) const
-{
-  s << name() << ": ";
-  type()->print(s);
-  if ( init_expr() != NULL ) {
-    s << " = ";
-    init_expr()->print(s);
-  }
-}
-#endif
 
 END_NAMESPACE_YM_YMSL

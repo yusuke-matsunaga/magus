@@ -11,7 +11,6 @@
 
 #include "AstExpr.h"
 #include "AstMgr.h"
-#include "AstParam.h"
 #include "AstStatement.h"
 #include "AstSymbol.h"
 #include "AstType.h"
@@ -224,8 +223,7 @@ YmslCompiler::reg_func(const AstStatement* stmt,
   ymuint np = stmt->param_num();
   vector<const IrType*> input_type_list(np);
   for (ymuint i = 0; i < np; ++ i) {
-    const AstParam* param = stmt->param(i);
-    const AstType* asttype = param->type();
+    const AstType* asttype = stmt->param_type(i);
     const IrType* type = resolve_type(asttype, scope);
     input_type_list[i] = type;
   }

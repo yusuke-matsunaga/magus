@@ -64,13 +64,29 @@ public:
   ymuint
   param_num() const;
 
-  /// @brief パラメータリストの要素を返す．
+  /// @brief パラメータ名を返す．
   /// @param[in] pos 位置 ( 0 <= pos < param_num() )
   ///
   /// kFuncDecl のみ有効
   virtual
-  const AstParam*
-  param(ymuint pos) const;
+  ShString
+  param_name(ymuint pos) const;
+
+  /// @brief パラメータの型を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < param_num() )
+  ///
+  /// kFuncDecl のみ有効
+  virtual
+  const AstType*
+  param_type(ymuint pos) const;
+
+  /// @brief パラメータの初期値を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < param_num() )
+  ///
+  /// kFuncDecl のみ有効
+  virtual
+  const AstExpr*
+  param_expr(ymuint pos) const;
 
   /// @brief enum 定数の数を返す．
   ///
