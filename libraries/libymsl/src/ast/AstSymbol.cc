@@ -1,38 +1,41 @@
 
-/// @file Ast.cc
-/// @brief Ast の実装ファイル
+/// @file AstSymbol.cc
+/// @brief AstSymbol の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Ast.h"
+#include "AstSymbol.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス Ast
+// クラス AstSymbol
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] val 値
 // @param[in] loc ファイル位置
-Ast::Ast(const FileRegion& loc) :
-  mLoc(loc)
+AstSymbol::AstSymbol(ShString val,
+		     const FileRegion& loc) :
+  Ast(loc),
+  mVal(val)
 {
 }
 
 // @brief デストラクタ
-Ast::~Ast()
+AstSymbol::~AstSymbol()
 {
 }
 
-// @brief ファイル位置を得る．
-const FileRegion&
-Ast::file_region() const
+// @brief 文字列型の値を返す．
+ShString
+AstSymbol::str_val() const
 {
-  return mLoc;
+  return mVal;
 }
 
 END_NAMESPACE_YM_YMSL

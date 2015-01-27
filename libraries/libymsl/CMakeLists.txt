@@ -47,12 +47,14 @@ set (ymsl_SOURCES
   src/ast/AstLabel.cc
   src/ast/AstMemberRef.cc
   src/ast/AstMgr.cc
+  src/ast/AstModule.cc
   src/ast/AstParam.cc
   src/ast/AstPrinter.cc
   src/ast/AstReturn.cc
   src/ast/AstStatement.cc
   src/ast/AstStringConst.cc
   src/ast/AstSwitch.cc
+  src/ast/AstSymbol.cc
   src/ast/AstSymbolExpr.cc
   src/ast/AstToplevel.cc
   src/ast/AstTrue.cc
