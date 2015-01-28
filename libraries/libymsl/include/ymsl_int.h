@@ -33,14 +33,15 @@ class YmslCodeList;
 class YmslParser;
 class YmslObj;
 
+class Function;
+class Label;
+class Scope;
+class SymHandle;
+class Type;
+class Var;
+
 class IrExpr;
-class IrFunction;
-class IrLabel;
-class IrHandle;
-class IrScope;
-class IrType;
 class IrTypeMgr;
-class IrVar;
 
 class AstCaseItem;
 class AstEnumDecl;

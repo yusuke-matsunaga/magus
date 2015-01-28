@@ -1,75 +1,75 @@
 
-/// @file IrTypeMgr.cc
-/// @brief IrTypeMgr の実装ファイル
+/// @file TypeMgr.cc
+/// @brief TypeMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrTypeMgr.h"
-#include "IrType.h"
-#include "IrPrimType.h"
-#include "IrArrayType.h"
-#include "IrSetType.h"
-#include "IrMapType.h"
-#include "IrEnumType.h"
+#include "TypeMgr.h"
+#include "Type.h"
+#include "PrimType.h"
+#include "ArrayType.h"
+#include "SetType.h"
+#include "MapType.h"
+#include "EnumType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrTypeMgr
+// クラス TypeMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 //
 // この時点で組込型だけは登録されている．
-IrTypeMgr::IrTypeMgr()
+TypeMgr::TypeMgr()
 {
   init();
 }
 
 // @brief デストラクタ
-IrTypeMgr::~IrTypeMgr()
+TypeMgr::~TypeMgr()
 {
-  for (vector<IrType*>::iterator p = mTypeList.begin();
+  for (vector<Type*>::iterator p = mTypeList.begin();
        p != mTypeList.end(); ++ p) {
     delete *p;
   }
 }
 
 // @brief void 型を得る．
-const IrType*
-IrTypeMgr::void_type()
+const Type*
+TypeMgr::void_type()
 {
   return mVoidType;
 }
 
 // @brief boolean 型を得る．
-const IrType*
-IrTypeMgr::boolean_type()
+const Type*
+TypeMgr::boolean_type()
 {
   return mBooleanType;
 }
 
 // @brief int 型を得る．
-const IrType*
-IrTypeMgr::int_type()
+const Type*
+TypeMgr::int_type()
 {
   return mIntType;
 }
 
 // @brief float 型を得る．
-const IrType*
-IrTypeMgr::float_type()
+const Type*
+TypeMgr::float_type()
 {
   return mFloatType;
 }
 
 // @brief string 型を得る．
-const IrType*
-IrTypeMgr::string_type()
+const Type*
+TypeMgr::string_type()
 {
   return mStringType;
 }
@@ -78,8 +78,8 @@ IrTypeMgr::string_type()
 // @param[in] elem_type 要素の型
 //
 // 登録されていなければ新たに登録する．
-const IrType*
-IrTypeMgr::array_type(const IrType* elem_type)
+const Type*
+TypeMgr::array_type(const Type* elem_type)
 {
 }
 
@@ -87,8 +87,8 @@ IrTypeMgr::array_type(const IrType* elem_type)
 // @param[in] elem_type 要素の型
 //
 // 登録されていなければ新たに登録する．
-const IrType*
-IrTypeMgr::set_type(const IrType* elem_type)
+const Type*
+TypeMgr::set_type(const Type* elem_type)
 {
 }
 
@@ -97,9 +97,9 @@ IrTypeMgr::set_type(const IrType* elem_type)
 // @param[in] key_type キーの型
 //
 // 登録されていなければ新たに登録する．
-const IrType*
-IrTypeMgr::map_type(const IrType* elem_type,
-		      const IrType* key_type)
+const Type*
+TypeMgr::map_type(const Type* elem_type,
+		  const Type* key_type)
 {
 }
 
@@ -108,26 +108,26 @@ IrTypeMgr::map_type(const IrType* elem_type,
 // @param[in] input_type_list 入力の型のリスト
 //
 // 登録されていなければ新たに登録する．
-const IrType*
-IrTypeMgr::function_type(const IrType* output_type,
-			   const vector<IrType*>& input_type_list)
+const Type*
+TypeMgr::function_type(const Type* output_type,
+		       const vector<Type*>& input_type_list)
 {
 }
 
 // @brief enum 型を作る．
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
-IrType*
-IrTypeMgr::enum_type(ShString name,
-		       const vector<pair<ShString, int> >& elem_list)
+Type*
+TypeMgr::enum_type(ShString name,
+		   const vector<pair<ShString, int> >& elem_list)
 {
-  IrType* type = new_EnumType(name, elem_list);
+  Type* type = new_EnumType(name, elem_list);
   return type;
 }
 
 // @brief 組み込み型を登録する．
 void
-IrTypeMgr::init()
+TypeMgr::init()
 {
   mVoidType = new_PrimType(kVoidType);
   mBooleanType = new_PrimType(kBooleanType);
@@ -138,30 +138,30 @@ IrTypeMgr::init()
 
 // @brief プリミティブ型を作る．
 // @param[in] type_id 型番号
-IrType*
-IrTypeMgr::new_PrimType(TypeId type_id)
+Type*
+TypeMgr::new_PrimType(TypeId type_id)
 {
-  IrType* type = new IrPrimType(type_id);
+  Type* type = new PrimType(type_id);
   reg_type(type);
   return type;
 }
 
 // @brief array 型を作る．
 // @param[in] elem_type 要素の型
-IrType*
-IrTypeMgr::new_ArrayType(const IrType* elem_type)
+Type*
+TypeMgr::new_ArrayType(const Type* elem_type)
 {
-  IrType* type = new IrArrayType(elem_type);
+  Type* type = new ArrayType(elem_type);
   reg_type(type);
   return type;
 }
 
 // @brief set 型を作る．
 // @param[in] elem_type 要素の型
-IrType*
-IrTypeMgr::new_SetType(const IrType* elem_type)
+Type*
+TypeMgr::new_SetType(const Type* elem_type)
 {
-  IrType* type = new IrSetType(elem_type);
+  Type* type = new SetType(elem_type);
   reg_type(type);
   return type;
 }
@@ -169,11 +169,11 @@ IrTypeMgr::new_SetType(const IrType* elem_type)
 // @brief map 型を作る．
 // @param[in] key_type キーの
 // @param[in] elem_type 要素の型
-IrType*
-IrTypeMgr::new_MapType(const IrType* key_type,
-			 const IrType* elem_type)
+Type*
+TypeMgr::new_MapType(const Type* key_type,
+		     const Type* elem_type)
 {
-  IrType* type = new IrMapType(key_type, elem_type);
+  Type* type = new MapType(key_type, elem_type);
   reg_type(type);
   return type;
 }
@@ -181,11 +181,11 @@ IrTypeMgr::new_MapType(const IrType* key_type,
 // @brief enum 型を作る．
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
-IrType*
-IrTypeMgr::new_EnumType(ShString name,
-			  const vector<pair<ShString, int> >& elem_list)
+Type*
+TypeMgr::new_EnumType(ShString name,
+		      const vector<pair<ShString, int> >& elem_list)
 {
-  IrType* type = new IrEnumType(name, elem_list);
+  Type* type = new EnumType(name, elem_list);
   reg_type(type);
   return type;
 }
@@ -193,7 +193,7 @@ IrTypeMgr::new_EnumType(ShString name,
 // @brief 型を登録する．
 // @param[in] type 登録する型
 void
-IrTypeMgr::reg_type(IrType* type)
+TypeMgr::reg_type(Type* type)
 {
   type->mId = mTypeList.size();
   mTypeList.push_back(type);

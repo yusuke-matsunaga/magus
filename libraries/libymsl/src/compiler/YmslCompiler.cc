@@ -15,12 +15,12 @@
 #include "AstSymbol.h"
 #include "AstType.h"
 
-#include "IrFunction.h"
-#include "IrVar.h"
-#include "IrScope.h"
-#include "IrType.h"
+#include "Function.h"
+#include "Var.h"
+#include "Scope.h"
+#include "Type.h"
 #include "IrExpr.h"
-#include "IrHandle.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -56,13 +56,13 @@ YmslCompiler::compile(IDO& ido)
 
   mStmtList.clear();
 
-  IrScope* toplevel_scope = mIrMgr.new_Scope(NULL, ShString("__main__"));
+  Scope* toplevel_scope = mIrMgr.new_Scope(NULL, ShString("__main__"));
   phase1(toplevel, toplevel_scope);
 
-  for (vector<pair<const AstStatement*, IrScope*> >::iterator p = mStmtList.begin();
+  for (vector<pair<const AstStatement*, Scope*> >::iterator p = mStmtList.begin();
        p != mStmtList.end(); ++ p) {
     const AstStatement* stmt = p->first;
-    IrScope* scope = p->second;
+    Scope* scope = p->second;
     phase2(stmt, scope);
   }
 
@@ -73,14 +73,14 @@ YmslCompiler::compile(IDO& ido)
 // @param[in] stmt 文
 void
 YmslCompiler::phase1(const AstStatement* stmt,
-		     IrScope* scope)
+		     Scope* scope)
 {
   mStmtList.push_back(make_pair(stmt, scope));
 
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
     {
-      IrScope* block_scope = mIrMgr.new_Scope(scope);
+      Scope* block_scope = mIrMgr.new_Scope(scope);
 
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -152,7 +152,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
 
   case kFor:
     {
-      IrScope* for_scope = mIrMgr.new_Scope(scope);
+      Scope* for_scope = mIrMgr.new_Scope(scope);
       phase1(stmt->init_stmt(), for_scope);
       phase1(stmt->next_stmt(), for_scope);
       phase1(stmt->stmt(), for_scope);
@@ -174,7 +174,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
 // stmt は kEnumDecl でなければならない．
 void
 YmslCompiler::reg_enum(const AstStatement* stmt,
-		       IrScope* scope)
+		       Scope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kEnumDecl );
 
@@ -201,7 +201,7 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
     elem_list[i] = make_pair(elem_name, v);
   }
 
-  IrType* type = mTypeMgr.enum_type(name, elem_list);
+  Type* type = mTypeMgr.enum_type(name, elem_list);
 
   scope->add_type(type);
 }
@@ -212,23 +212,23 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
 // stmt は kFuncDecl でなければならない．
 void
 YmslCompiler::reg_func(const AstStatement* stmt,
-		       IrScope* scope)
+		       Scope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kFuncDecl );
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const IrType* type = resolve_type(asttype, scope);
+  const Type* type = resolve_type(asttype, scope);
 
   ymuint np = stmt->param_num();
-  vector<const IrType*> input_type_list(np);
+  vector<const Type*> input_type_list(np);
   for (ymuint i = 0; i < np; ++ i) {
     const AstType* asttype = stmt->param_type(i);
-    const IrType* type = resolve_type(asttype, scope);
+    const Type* type = resolve_type(asttype, scope);
     input_type_list[i] = type;
   }
 
-  IrFunction* func = new_function(name, type, input_type_list);
+  Function* func = new_function(name, type, input_type_list);
   scope->add_function(func);
 }
 
@@ -238,15 +238,15 @@ YmslCompiler::reg_func(const AstStatement* stmt,
 // stmt は kVarDecl でなければならない．
 void
 YmslCompiler::reg_var(const AstStatement* stmt,
-		      IrScope* scope)
+		      Scope* scope)
 {
   ASSERT_COND( stmt->stmt_type() == kVarDecl );
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const IrType* type = resolve_type(asttype, scope);
+  const Type* type = resolve_type(asttype, scope);
 
-  IrVar* var = new_var(name, type);
+  Var* var = new_var(name, type);
   scope->add_var(var);
 }
 
@@ -254,9 +254,9 @@ YmslCompiler::reg_var(const AstStatement* stmt,
 // @param[in] asttype 型を表す構文木
 //
 // 解決できない時には NULL を返す．
-const IrType*
+const Type*
 YmslCompiler::resolve_type(const AstType* asttype,
-			   IrScope* scope)
+			   Scope* scope)
 {
   if ( asttype->named_type() ) {
     // スコープから名前の解決を行う
@@ -281,7 +281,7 @@ YmslCompiler::resolve_type(const AstType* asttype,
 
   case kArrayType:
     {
-      const IrType* elem_type = resolve_type(asttype->elem_type(), scope);
+      const Type* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -291,7 +291,7 @@ YmslCompiler::resolve_type(const AstType* asttype,
 
   case kSetType:
     {
-      const IrType* elem_type = resolve_type(asttype->elem_type(), scope);
+      const Type* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -301,11 +301,11 @@ YmslCompiler::resolve_type(const AstType* asttype,
 
   case kMapType:
     {
-      const IrType* key_type = resolve_type(asttype->key_type(), scope);
+      const Type* key_type = resolve_type(asttype->key_type(), scope);
       if ( key_type == NULL ) {
 	break;
       }
-      const IrType* elem_type = resolve_type(asttype->elem_type(), scope);
+      const Type* elem_type = resolve_type(asttype->elem_type(), scope);
       if ( elem_type == NULL ) {
 	break;
       }
@@ -330,7 +330,7 @@ YmslCompiler::resolve_type(const AstType* asttype,
 // @param[in] scope 現在のスコープ
 void
 YmslCompiler::phase2(const AstStatement* stmt,
-		     IrScope* scope)
+		     Scope* scope)
 {
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
@@ -405,7 +405,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
 
   case kFor:
     {
-      //IrScope* for_scope = mIrMgr.new_Scope(scope);
+      //Scope* for_scope = mIrMgr.new_Scope(scope);
       //phase1(stmt->init_stmt(), for_scope);
       //phase1(stmt->next_stmt(), for_scope);
       //phase1(stmt->stmt(), for_scope);
@@ -426,7 +426,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
 // @param[in] scope 現在のスコープ
 IrExpr*
 YmslCompiler::elab_expr(const AstExpr* ast_expr,
-			IrScope* scope)
+			Scope* scope)
 {
   IrExpr* opr[3] = { NULL, NULL, NULL };
   for (ymuint i = 0; i < ast_expr->operand_num(); ++ i) {
@@ -477,7 +477,7 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
 
       case kEnumExpr:
 	{
-	  const IrType* type = body->enum_type();
+	  const Type* type = body->enum_type();
 	  int index = type->enum_index(symbol->str_val());
 	  if ( index == -1 ) {
 	    // symbol not found
@@ -491,8 +491,8 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
 
       case kSymbolExpr:
 	{
-	  const IrVar* var = body->var();
-	  const IrType* type = var->value_type();
+	  const Var* var = body->var();
+	  const Type* type = var->value_type();
 	  // type から symbol という名のメンバを探す．
 	  //return mIrMgr.new_MemberRef(body, symbol);
 	}
@@ -609,30 +609,30 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
 // @param[in] scope スコープ
 IrExpr*
 YmslCompiler::symbol2expr(const AstSymbol* symbol,
-			  IrScope* scope)
+			  Scope* scope)
 {
-  IrHandle* handle = scope->find(symbol->str_val());
+  SymHandle* handle = scope->find(symbol->str_val());
   if ( handle == NULL ) {
     // symbol not found
     return NULL;
   }
 
-  IrFunction* func = handle->function();
+  Function* func = handle->function();
   if ( func != NULL ) {
     return mIrMgr.new_FuncExpr(func);
   }
 
-  IrVar* var = handle->var();
+  Var* var = handle->var();
   if ( var != NULL ) {
     return mIrMgr.new_VarExpr(var);
   }
 
-  IrScope* scope1 = handle->scope();
+  Scope* scope1 = handle->scope();
   if ( scope1 != NULL ) {
     return mIrMgr.new_ScopeExpr(scope1);
   }
 
-  const IrType* type = handle->named_type();
+  const Type* type = handle->named_type();
   if ( type != NULL ) {
     return mIrMgr.new_EnumExpr(type);
   }
@@ -644,12 +644,12 @@ YmslCompiler::symbol2expr(const AstSymbol* symbol,
 // @brief 変数を生成する．
 // @param[in] name 名前
 // @param[in] type 型
-IrVar*
+Var*
 YmslCompiler::new_var(ShString name,
-		      const IrType* type)
+		      const Type* type)
 {
   ymuint index = mVarList.size();
-  IrVar* var = mIrMgr.new_Var(name, type, index);
+  Var* var = mIrMgr.new_Var(name, type, index);
   mVarList.push_back(var);
 
   return var;
@@ -659,13 +659,13 @@ YmslCompiler::new_var(ShString name,
 // @param[in] name 名前
 // @param[in] type 出力の型
 // @param[in] input_type_list 入力の型のリスト
-IrFunction*
+Function*
 YmslCompiler::new_function(ShString name,
-			   const IrType* type,
-			   const vector<const IrType*>& input_type_list)
+			   const Type* type,
+			   const vector<const Type*>& input_type_list)
 {
   ymuint index = mFuncList.size();
-  IrFunction* func = mIrMgr.new_Function(name, type, input_type_list, index);
+  Function* func = mIrMgr.new_Function(name, type, input_type_list, index);
   mFuncList.push_back(func);
 
   return func;

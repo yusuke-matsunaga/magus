@@ -1,28 +1,28 @@
 
-/// @file IrType.cc
-/// @brief IrType の実装ファイル
+/// @file Type.cc
+/// @brief Type の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrType.h"
+#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrType
+// クラス Type
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-IrType::IrType()
+Type::Type()
 {
 }
 
 // @brief デストラクタ
-IrType::~IrType()
+Type::~Type()
 {
 }
 
@@ -30,7 +30,7 @@ IrType::~IrType()
 //
 // enum のみ有効
 ShString
-IrType::type_name() const
+Type::type_name() const
 {
   ASSERT_NOT_REACHED;
   return ShString();
@@ -39,8 +39,8 @@ IrType::type_name() const
 // @brief キーの型を得る．
 //
 // map のみ有効
-const IrType*
-IrType::key_type() const
+const Type*
+Type::key_type() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -49,8 +49,8 @@ IrType::key_type() const
 // @brief 要素の型を得る．
 //
 // array/set/map のみ有効
-const IrType*
-IrType::elem_type() const
+const Type*
+Type::elem_type() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -59,8 +59,8 @@ IrType::elem_type() const
 // @brief 関数の出力の型を返す．
 //
 // function のみ有効
-const IrType*
-IrType::function_type() const
+const Type*
+Type::function_type() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -70,7 +70,7 @@ IrType::function_type() const
 //
 // function のみ有効
 ymuint
-IrType::function_input_num() const
+Type::function_input_num() const
 {
   ASSERT_NOT_REACHED;
   return 0;
@@ -80,8 +80,8 @@ IrType::function_input_num() const
 // @param[in] pos 入力番号 ( 0 <= pos < function_input_num() )
 //
 // function のみ有効
-const IrType*
-IrType::function_input_type(ymuint pos) const
+const Type*
+Type::function_input_type(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -91,7 +91,7 @@ IrType::function_input_type(ymuint pos) const
 //
 // enum のみ有効
 ymuint
-IrType::enum_num() const
+Type::enum_num() const
 {
   ASSERT_NOT_REACHED;
   return 0;
@@ -102,7 +102,7 @@ IrType::enum_num() const
 //
 // enum のみ有効
 int
-IrType::enum_elem_val(ymuint index) const
+Type::enum_elem_val(ymuint index) const
 {
   ASSERT_NOT_REACHED;
   return 0;
@@ -113,7 +113,7 @@ IrType::enum_elem_val(ymuint index) const
 //
 // enum のみ有効
 ShString
-IrType::enum_elem_name(ymuint index) const
+Type::enum_elem_name(ymuint index) const
 {
   ASSERT_NOT_REACHED;
   return ShString();
@@ -125,7 +125,7 @@ IrType::enum_elem_name(ymuint index) const
 // enum のみ有効
 // 該当する名前がなければ -1 を返す．
 int
-IrType::enum_index(ShString name) const
+Type::enum_index(ShString name) const
 {
   ASSERT_NOT_REACHED;
   return -1;

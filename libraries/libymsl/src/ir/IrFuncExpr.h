@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
-  IrFuncExpr(IrFunction* func);
+  IrFuncExpr(Function* func);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// kFuncExpr のみ有効
   virtual
-  IrFunction*
+  Function*
   function() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  IrFunction* mFunction;
+  Function* mFunction;
 
 };
 

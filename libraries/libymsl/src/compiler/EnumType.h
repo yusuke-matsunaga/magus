@@ -1,40 +1,40 @@
-#ifndef YMSLENUMTYPE_H
-#define YMSLENUMTYPE_H
+#ifndef ENUMTYPE_H
+#define ENUMTYPE_H
 
-/// @file IrEnumType.h
-/// @brief IrEnumType のヘッダファイル
+/// @file EnumType.h
+/// @brief EnumType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrNamedType.h"
+#include "NamedType.h"
 #include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
-class IrEnumConst;
+class EnumConst;
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrEnumType IrEnumType.h "IrEnumType.h"
+/// @class EnumType EnumType.h "EnumType.h"
 /// @brief enum 型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrEnumType :
-  public IrNamedType
+class EnumType :
+  public NamedType
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
-  IrEnumType(ShString name,
-	     const vector<pair<ShString, int> >& elem_list);
+  EnumType(ShString name,
+	   const vector<pair<ShString, int> >& elem_list);
 
   /// @brief デストラクタ
   virtual
-  ~IrEnumType();
+  ~EnumType();
 
 
 public:
@@ -95,10 +95,10 @@ private:
   ymuint mElemNum;
 
   // 要素の配列
-  IrEnumConst* mElemArray;
+  EnumConst* mElemArray;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLENUMTYPE_H
+#endif // ENUMTYPE_H

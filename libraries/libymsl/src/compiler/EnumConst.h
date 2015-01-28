@@ -1,35 +1,35 @@
-#ifndef YMSLSCOPEEXPR_H
-#define YMSLSCOPEEXPR_H
+#ifndef ENUMCONST_H
+#define ENUMCONST_H
 
-/// @file IrScopeExpr.h
-/// @brief IrScopeExpr のヘッダファイル
+/// @file EnumConst.h
+/// @brief EnumConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "ymsl_int.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrScopeExpr IrScopeExpr.h "IrScopeExpr.h"
-/// @brief scope を表す IrExpr
+/// @class EnumConst EnumConst.h "EnumConst.h"
+/// @brief enum 定数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrScopeExpr :
-  public IrExpr
+class EnumConst
 {
+  friend class EnumType;
+
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] scope スコープ
-  IrScopeExpr(Scope* scope);
+  EnumConst();
 
   /// @brief デストラクタ
-  virtual
-  ~IrScopeExpr();
+  ~EnumConst();
 
 
 public:
@@ -37,17 +37,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 種類を返す．
-  virtual
-  ExprType
-  expr_type() const;
+  /// @brief 親の enum 型を返す．
+  Type*
+  parent() const;
 
-  /// @brief スコープを返す．
-  ///
-  /// kScopeExpr のみ有効
-  virtual
-  Scope*
-  scope() const;
+  /// @brief 名前を返す．
+  ShString
+  name() const;
+
+  /// @brief 値を返す．
+  int
+  val() const;
 
 
 private:
@@ -55,11 +55,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // スコープ
-  Scope* mScope;
+  // 親の enum 型
+  Type* mParent;
+
+  // 名前
+  ShString mName;
+
+  // 値
+  int mVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLSCOPEEXPR_H
+#endif // ENUMCONST_H

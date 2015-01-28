@@ -39,17 +39,17 @@ public:
   /// @brief スコープを生成する．
   /// @param[in] parent 親のスコープ
   /// @param[in] name 名前
-  IrScope*
-  new_Scope(IrScope* parent,
+  Scope*
+  new_Scope(Scope* parent,
 	    ShString name = ShString());
 
   /// @brief 変数を生成する．
   /// @param[in] name 名前
   /// @param[in] type 型
   /// @param[in] index インデックス
-  IrVar*
+  Var*
   new_Var(ShString name,
-	  const IrType* type,
+	  const Type* type,
 	  ymuint index);
 
   /// @brief 関数を生成する．
@@ -57,10 +57,10 @@ public:
   /// @param[in] type 出力の型
   /// @param[in] input_type_list 入力の型のリスト
   /// @param[in] index インデックス
-  IrFunction*
+  Function*
   new_Function(ShString name,
-	       const IrType* type,
-	       const vector<const IrType*>& input_type_list,
+	       const Type* type,
+	       const vector<const Type*>& input_type_list,
 	       ymuint index);
 
   /// @brief true 定数を生成する．
@@ -89,7 +89,7 @@ public:
   /// @brief 変数式を生成する．
   /// @param[in] var 変数
   IrExpr*
-  new_VarExpr(IrVar* var);
+  new_VarExpr(Var* var);
 
   /// @brief 配列参照式を生成する．
   /// @param[in] body 配列を表す式
@@ -139,17 +139,17 @@ public:
   /// @brief スコープ式を生成する．
   /// @param[in] scope スコープ
   IrExpr*
-  new_ScopeExpr(IrScope* scope);
+  new_ScopeExpr(Scope* scope);
 
   /// @brief 関数式を生成する．
   /// @param[in] func 関数
   IrExpr*
-  new_FuncExpr(IrFunction* func);
+  new_FuncExpr(Function* func);
 
   /// @brief enum 型式を生成する．
   /// @param[in] type enum 型
   IrExpr*
-  new_EnumExpr(const IrType* type);
+  new_EnumExpr(const Type* type);
 
 
 private:

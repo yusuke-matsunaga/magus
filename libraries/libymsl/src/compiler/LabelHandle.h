@@ -1,38 +1,35 @@
-#ifndef IRVAR_H
-#define IRVAR_H
+#ifndef LABELHANEL_H
+#define LABELHANEL_H
 
-/// @file IrVar.h
-/// @brief IrVar のヘッダファイル
+/// @file LabelHandle.h
+/// @brief LabelHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymsl_int.h"
-#include "YmUtils/ShString.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrVar IrVar.h "IrVar.h"
-/// @brief IR の変数を表すクラス
+/// @class LabelHandle LabelHandle.h "LabelHandle.h"
+/// @brief Label を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class IrVar
+class LabelHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 変数名
-  /// @param[in] value_type 型
-  /// @param[in] index インデックス
-  IrVar(ShString name,
-	const IrType* value_type,
-	ymuint index);
+  /// @param[in] label ラベル
+  LabelHandle(Label* statement);
 
   /// @brief デストラクタ
-  ~IrVar();
+  virtual
+  ~LabelHandle();
 
 
 public:
@@ -40,17 +37,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数名を得る．
+  /// @brief 名前を返す．
+  virtual
   ShString
   name() const;
 
-  /// @brief 型を得る．
-  const IrType*
-  value_type() const;
-
-  /// @brief 変数インデックスを得る．
-  ymuint
-  index() const;
+  /// @brief ラベルを返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  Label*
+  label() const;
 
 
 private:
@@ -58,17 +55,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  ShString mName;
-
-  // 型
-  const IrType* mValueType;
-
-  // インデックス
-  ymuint mIndex;
+  // ラベル
+  Label* mLabel;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRVAR_H
+#endif // LABELHANEL_H

@@ -1,45 +1,46 @@
 
-/// @file IrVarExpr.cc
-/// @brief IrVarExpr の実装ファイル
+/// @file VarHandle.cc
+/// @brief VarHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrVarExpr.h"
+#include "VarHandle.h"
+#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrVarExpr
+// クラス VarHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var 変数
-IrVarExpr::IrVarExpr(Var* var) :
+// @param[in] var 変数宣言
+VarHandle::VarHandle(Var* var) :
   mVar(var)
 {
 }
 
 // @brief デストラクタ
-IrVarExpr::~IrVarExpr()
+VarHandle::~VarHandle()
 {
 }
 
-// @brief 種類を返す．
-ExprType
-IrVarExpr::expr_type() const
+// @brief 名前を返す．
+ShString
+VarHandle::name() const
 {
-  return kSymbolExpr;
+  return mVar->name();
 }
 
 // @brief 変数を返す．
 //
-// kPrimary の時のみ有効
+// 他の要素の場合には NULL を返す．
 Var*
-IrVarExpr::var() const
+VarHandle::var() const
 {
   return mVar;
 }

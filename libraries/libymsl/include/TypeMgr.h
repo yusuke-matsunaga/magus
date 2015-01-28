@@ -1,8 +1,8 @@
-#ifndef IRTYPEMGR_H
-#define IRTYPEMGR_H
+#ifndef TYPEMGR_H
+#define TYPEMGR_H
 
-/// @file IrTypeMgr.h
-/// @brief IrTypeMgr のヘッダファイル
+/// @file TypeMgr.h
+/// @brief TypeMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -17,20 +17,20 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrTypeMgr IrTypeMgr.h "IrTypeMgr.h"
-/// @brief IrType を管理するクラス
+/// @class TypeMgr TypeMgr.h "TypeMgr.h"
+/// @brief Type を管理するクラス
 //////////////////////////////////////////////////////////////////////
-class IrTypeMgr
+class TypeMgr
 {
 public:
 
   /// @brief コンストラクタ
   ///
   /// この時点で組込型だけは登録されている．
-  IrTypeMgr();
+  TypeMgr();
 
   /// @brief デストラクタ
-  ~IrTypeMgr();
+  ~TypeMgr();
 
 
 public:
@@ -39,61 +39,61 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief void 型を得る．
-  const IrType*
+  const Type*
   void_type();
 
   /// @brief boolean 型を得る．
-  const IrType*
+  const Type*
   boolean_type();
 
   /// @brief int 型を得る．
-  const IrType*
+  const Type*
   int_type();
 
   /// @brief float 型を得る．
-  const IrType*
+  const Type*
   float_type();
 
   /// @brief string 型を得る．
-  const IrType*
+  const Type*
   string_type();
 
   /// @brief array 型を得る．
   /// @param[in] elem_type 要素の型
   ///
   /// 登録されていなければ新たに登録する．
-  const IrType*
-  array_type(const IrType* elem_type);
+  const Type*
+  array_type(const Type* elem_type);
 
   /// @brief set 型を得る．
   /// @param[in] elem_type 要素の型
   ///
   /// 登録されていなければ新たに登録する．
-  const IrType*
-  set_type(const IrType* elem_type);
+  const Type*
+  set_type(const Type* elem_type);
 
   /// @brief map 型を得る．
   /// @param[in] elem_type 要素の型
   /// @param[in] key_type キーの型
   ///
   /// 登録されていなければ新たに登録する．
-  const IrType*
-  map_type(const IrType* elem_type,
-	   const IrType* key_type);
+  const Type*
+  map_type(const Type* elem_type,
+	   const Type* key_type);
 
   /// @brief function 型を得る．
   /// @param[in] output_type 出力の型
   /// @param[in] input_type_list 入力の型のリスト
   ///
   /// 登録されていなければ新たに登録する．
-  const IrType*
-  function_type(const IrType* output_type,
-		const vector<IrType*>& input_type_list);
+  const Type*
+  function_type(const Type* output_type,
+		const vector<Type*>& input_type_list);
 
   /// @brief enum 型を作る．
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
-  IrType*
+  Type*
   enum_type(ShString name,
 	    const vector<pair<ShString, int> >& elem_list);
 
@@ -109,37 +109,37 @@ private:
 
   /// @brief プリミティブ型を作る．
   /// @param[in] type_id 型番号
-  IrType*
+  Type*
   new_PrimType(TypeId type_id);
 
   /// @brief array 型を作る．
   /// @param[in] elem_type 要素の型
-  IrType*
-  new_ArrayType(const IrType* elem_type);
+  Type*
+  new_ArrayType(const Type* elem_type);
 
   /// @brief set 型を作る．
   /// @param[in] elem_type 要素の型
-  IrType*
-  new_SetType(const IrType* elem_type);
+  Type*
+  new_SetType(const Type* elem_type);
 
   /// @brief map 型を作る．
   /// @param[in] key_type キーの
   /// @param[in] elem_type 要素の型
-  IrType*
-  new_MapType(const IrType* key_type,
-	      const IrType* elem_type);
+  Type*
+  new_MapType(const Type* key_type,
+	      const Type* elem_type);
 
   /// @brief enum 型を作る．
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
-  IrType*
+  Type*
   new_EnumType(ShString name,
 	       const vector<pair<ShString, int> >& elem_list);
 
   /// @brief 型を登録する．
   /// @param[in] type 登録する型
   void
-  reg_type(IrType* type);
+  reg_type(Type* type);
 
 
 private:
@@ -148,35 +148,35 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 全ての型を保持するリスト
-  vector<IrType*> mTypeList;
+  vector<Type*> mTypeList;
 
   // void 型
-  IrType* mVoidType;
+  Type* mVoidType;
 
   // boolean 型
-  IrType* mBooleanType;
+  Type* mBooleanType;
 
   // int 型
-  IrType* mIntType;
+  Type* mIntType;
 
   // float 型
-  IrType* mFloatType;
+  Type* mFloatType;
 
   // string 型
-  IrType* mStringType;
+  Type* mStringType;
 
   // array 型のハッシュ表
-  HashMap<const IrType*, const IrType*> mArrayTypeDic;
+  HashMap<const Type*, const Type*> mArrayTypeDic;
 
   // set 型のハッシュ表
-  HashMap<const IrType*, const IrType*> mSetTypeDic;
+  HashMap<const Type*, const Type*> mSetTypeDic;
 
   // map 型のハッシュ表
 
   // function 型のハッシュ表
 
   // struct/class 型のハッシュ表
-  HashMap<ShString, const IrType*> mClassTypeDic;
+  HashMap<ShString, const Type*> mClassTypeDic;
 
 };
 

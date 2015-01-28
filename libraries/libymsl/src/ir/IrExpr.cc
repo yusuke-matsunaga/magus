@@ -59,7 +59,7 @@ IrExpr::string_val() const
 // @brief 変数を返す．
 //
 // kSymbolExpr のみ有効
-IrVar*
+Var*
 IrExpr::var() const
 {
   ASSERT_NOT_REACHED;
@@ -149,8 +149,8 @@ IrExpr::arglist_elem(ymuint pos) const
 
 // @brief スコープを返す．
 //
-// kScopeExpr のみ有効
-IrScope*
+// kIrScopeExpr のみ有効
+Scope*
 IrExpr::scope() const
 {
   ASSERT_NOT_REACHED;
@@ -160,7 +160,7 @@ IrExpr::scope() const
 // @brief enum 型を返す．
 //
 // kEnumExpr のみ返す．
-const IrType*
+const Type*
 IrExpr::enum_type() const
 {
   ASSERT_NOT_REACHED;
@@ -170,7 +170,7 @@ IrExpr::enum_type() const
 // @brief 関数を返す．
 //
 // kFuncExpr のみ有効
-IrFunction*
+Function*
 IrExpr::function() const
 {
   ASSERT_NOT_REACHED;

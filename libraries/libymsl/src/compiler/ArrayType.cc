@@ -1,45 +1,45 @@
 
-/// @file IrSetType.cc
-/// @brief IrSetType の実装ファイル
+/// @file ArrayType.cc
+/// @brief ArrayType の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrSetType.h"
+#include "ArrayType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrSetType
+// クラス ArrayType
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] elem_type 要素の型
-IrSetType::IrSetType(const IrType* elem_type) :
+ArrayType::ArrayType(const Type* elem_type) :
   mElemType(elem_type)
 {
 }
 
 // @brief デストラクタ
-IrSetType::~IrSetType()
+ArrayType::~ArrayType()
 {
 }
 
 // @brief 型を得る．
 TypeId
-IrSetType::type_id() const
+ArrayType::type_id() const
 {
-  return kSetType;
+  return kArrayType;
 }
 
 // @brief 要素の型を得る．
 //
 // array/set/map のみ有効
-const IrType*
-IrSetType::elem_type() const
+const Type*
+ArrayType::elem_type() const
 {
   return mElemType;
 }
@@ -47,9 +47,9 @@ IrSetType::elem_type() const
 // @brief 内容を出力する．
 // @param[in] s 出力先のストリーム
 void
-IrSetType::print(ostream& s) const
+ArrayType::print(ostream& s) const
 {
-  s << "set(";
+  s << "array(";
   mElemType->print(s);
   s << ")";
 }

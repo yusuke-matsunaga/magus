@@ -9,9 +9,9 @@
 
 #include "IrMgr.h"
 
-#include "IrScope.h"
-#include "IrVar.h"
-#include "IrFunction.h"
+#include "Scope.h"
+#include "Var.h"
+#include "Function.h"
 
 #include "IrTrue.h"
 #include "IrFalse.h"
@@ -47,25 +47,25 @@ IrMgr::~IrMgr()
 // @brief スコープを生成する．
 // @param[in] parent 親のスコープ
 // @param[in] name 名前
-IrScope*
-IrMgr::new_Scope(IrScope* parent,
+Scope*
+IrMgr::new_Scope(Scope* parent,
 		 ShString name)
 {
-  void* p = mAlloc.get_memory(sizeof(IrScope));
-  return new (p) IrScope(parent, name);
+  void* p = mAlloc.get_memory(sizeof(Scope));
+  return new (p) Scope(parent, name);
 }
 
 // @brief 変数を生成する．
 // @param[in] name 名前
 // @param[in] type 型
 // @param[in] index インデックス
-IrVar*
+Var*
 IrMgr::new_Var(ShString name,
-	       const IrType* type,
+	       const Type* type,
 	       ymuint index)
 {
-  void* p = mAlloc.get_memory(sizeof(IrVar));
-  return new (p) IrVar(name, type, index);
+  void* p = mAlloc.get_memory(sizeof(Var));
+  return new (p) Var(name, type, index);
 }
 
 // @brief 関数を生成する．
@@ -73,14 +73,14 @@ IrMgr::new_Var(ShString name,
 // @param[in] type 出力の型
 // @param[in] input_type_list 入力の型のリスト
 // @param[in] index インデックス
-IrFunction*
+Function*
 IrMgr::new_Function(ShString name,
-		    const IrType* type,
-		    const vector<const IrType*>& input_type_list,
+		    const Type* type,
+		    const vector<const Type*>& input_type_list,
 		    ymuint index)
 {
-  void* p = mAlloc.get_memory(sizeof(IrFunction));
-  return new (p) IrFunction(name, type, input_type_list, index);
+  void* p = mAlloc.get_memory(sizeof(Function));
+  return new (p) Function(name, type, input_type_list, index);
 }
 
 // @brief true 定数を生成する．
@@ -129,7 +129,7 @@ IrMgr::new_StringConst(const char* val)
 // @brief 変数式を生成する．
 // @param[in] var 変数
 IrExpr*
-IrMgr::new_VarExpr(IrVar* var)
+IrMgr::new_VarExpr(Var* var)
 {
   void* p = mAlloc.get_memory(sizeof(IrVarExpr));
   return new (p) IrVarExpr(var);
@@ -207,7 +207,7 @@ IrMgr::new_FuncCall(IrExpr* func,
 // @brief スコープ式を生成する．
 // @param[in] scope スコープ
 IrExpr*
-IrMgr::new_ScopeExpr(IrScope* scope)
+IrMgr::new_ScopeExpr(Scope* scope)
 {
   void* p = mAlloc.get_memory(sizeof(IrScopeExpr));
   return new (p) IrScopeExpr(scope);
@@ -216,7 +216,7 @@ IrMgr::new_ScopeExpr(IrScope* scope)
 // @brief 関数式を生成する．
 // @param[in] func 関数
 IrExpr*
-IrMgr::new_FuncExpr(IrFunction* func)
+IrMgr::new_FuncExpr(Function* func)
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncExpr));
   return new (p) IrFuncExpr(func);
@@ -225,7 +225,7 @@ IrMgr::new_FuncExpr(IrFunction* func)
 // @brief enum 型式を生成する．
 // @param[in] type enum 型
 IrExpr*
-IrMgr::new_EnumExpr(const IrType* type)
+IrMgr::new_EnumExpr(const Type* type)
 {
   void* p = mAlloc.get_memory(sizeof(IrEnumExpr));
   return new (p) IrEnumExpr(type);

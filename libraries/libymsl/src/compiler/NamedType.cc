@@ -1,30 +1,30 @@
 
-/// @file IrNamedtype.cc
-/// @brief IrNamedtype の実装ファイル
+/// @file Namedtype.cc
+/// @brief Namedtype の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrNamedType.h"
+#include "NamedType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrNamedtype
+// クラス Namedtype
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 名前
-IrNamedType::IrNamedType(ShString name) :
+NamedType::NamedType(ShString name) :
   mName(name)
 {
 }
 
 // @brief デストラクタ
-IrNamedType::~IrNamedType()
+NamedType::~NamedType()
 {
 }
 
@@ -32,7 +32,7 @@ IrNamedType::~IrNamedType()
 //
 // enum のみ有効
 ShString
-IrNamedType::type_name() const
+NamedType::type_name() const
 {
   return mName;
 }

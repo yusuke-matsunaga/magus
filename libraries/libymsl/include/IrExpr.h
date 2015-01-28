@@ -65,7 +65,7 @@ public:
   ///
   /// kSymbolExpr のみ有効
   virtual
-  IrVar*
+  Var*
   var() const;
 
   /// @brief 本体の式を返す．
@@ -130,21 +130,21 @@ public:
   ///
   /// kScopeExpr のみ有効
   virtual
-  IrScope*
+  Scope*
   scope() const;
 
   /// @brief enum 型を返す．
   ///
   /// kEnumExpr のみ有効．
   virtual
-  const IrType*
+  const Type*
   enum_type() const;
 
   /// @brief 関数を返す．
   ///
   /// kFuncExpr のみ有効
   virtual
-  IrFunction*
+  Function*
   function() const;
 
 };

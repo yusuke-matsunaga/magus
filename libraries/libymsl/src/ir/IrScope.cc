@@ -1,26 +1,26 @@
 
-/// @file IrScope.cc
-/// @brief IrScope の実装ファイル
+/// @file IrScopeExpr.cc
+/// @brief IrScopeExpr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrScope.h"
+#include "IrScopeExpr.h"
 #include "IrHandleImpl.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrScope
+// クラス IrScopeExpr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] parent 親のスコープ
 // @param[in] name 名前
-IrScope::IrScope(IrScope* parent,
+IrScopeExpr::IrScopeExpr(IrScopeExpr* parent,
 		     ShString name) :
   mParent(parent),
   mName(name),
@@ -32,7 +32,7 @@ IrScope::IrScope(IrScope* parent,
 }
 
 // @brief デストラクタ
-IrScope::~IrScope()
+IrScopeExpr::~IrScopeExpr()
 {
   for (ymuint i = 0; i < mHashSize; ++ i) {
     for (IrHandle* h = mHashTable[i]; h; ) {
@@ -48,7 +48,7 @@ IrScope::~IrScope()
 //
 // ShString() (空文字列)の場合もある．
 ShString
-IrScope::name() const
+IrScopeExpr::name() const
 {
   return mName;
 }
@@ -56,7 +56,7 @@ IrScope::name() const
 // @brief ラベルを追加する．
 // @param[in] item 追加する要素
 void
-IrScope::add_label(IrLabel* item)
+IrScopeExpr::add_label(Label* item)
 {
   IrHandle* handle = new LabelHandle(item);
   put(handle);
@@ -65,7 +65,7 @@ IrScope::add_label(IrLabel* item)
 // @brief 関数を追加する．
 // @param[in] item 追加する要素
 void
-IrScope::add_function(IrFunction* item)
+IrScopeExpr::add_function(Function* item)
 {
   IrHandle* handle = new FuncHandle(item);
   put(handle);
@@ -74,7 +74,7 @@ IrScope::add_function(IrFunction* item)
 // @brief 変数を追加する．
 // @param[in] item 追加する要素
 void
-IrScope::add_var(IrVar* item)
+IrScopeExpr::add_var(Var* item)
 {
   IrHandle* handle = new VarHandle(item);
   put(handle);
@@ -83,7 +83,7 @@ IrScope::add_var(IrVar* item)
 // @brief 型を追加する．
 // @param[in] item 追加する要素
 void
-IrScope::add_type(IrType* item)
+IrScopeExpr::add_type(Type* item)
 {
   IrHandle* handle = new TypeHandle(item);
   put(handle);
@@ -92,15 +92,15 @@ IrScope::add_type(IrType* item)
 // @brief スコープを追加する．
 // @param[in] item 追加する要素
 void
-IrScope::add_scope(IrScope* item)
+IrScopeExpr::add_scope(IrScopeExpr* item)
 {
-  IrHandle* handle = new ScopeHandle(item);
+  IrHandle* handle = new IrScopeExprHandle(item);
   put(handle);
 }
 
 // @brief ハッシュ表を確保する．
 void
-IrScope::alloc_table(ymuint req_size)
+IrScopeExpr::alloc_table(ymuint req_size)
 {
   ymuint old_size = mHashSize;
   IrHandle** old_table = mHashTable;
@@ -124,7 +124,7 @@ IrScope::alloc_table(ymuint req_size)
 // @brief 名前からハンドルを探す．
 // @param[in] name 名前
 IrHandle*
-IrScope::find(ShString name) const
+IrScopeExpr::find(ShString name) const
 {
   ymuint pos = name.hash() % mHashSize;
   for (IrHandle* handle = mHashTable[pos];
@@ -141,7 +141,7 @@ IrScope::find(ShString name) const
 
 // @brief ハンドルを登録する．
 void
-IrScope::put(IrHandle* handle)
+IrScopeExpr::put(IrHandle* handle)
 {
   if ( mHashNum >= mNextLimit ) {
     alloc_table(mHashSize << 1);
@@ -154,7 +154,7 @@ IrScope::put(IrHandle* handle)
 //
 // こちらはサイズチェックなし
 void
-IrScope::_put(IrHandle* handle)
+IrScopeExpr::_put(IrHandle* handle)
 {
   ymuint pos = handle->name().hash() % mHashSize;
   handle->mLink = mHashTable[pos];
@@ -165,7 +165,7 @@ IrScope::_put(IrHandle* handle)
 #if 0
 // @brief ステートメント数を返す．
 ymuint
-IrScope::statement_num() const
+IrScopeExpr::statement_num() const
 {
   return mStatementList.size();
 }
@@ -173,7 +173,7 @@ IrScope::statement_num() const
 // @brief ステートメントを返す．
 // @param[in] pos 位置 ( 0 <= pos < statement_num() )
 AstStatement*
-IrScope::statement(ymuint pos) const
+IrScopeExpr::statement(ymuint pos) const
 {
   ASSERT_COND( pos < statement_num() );
   return mStatementList[pos];
@@ -181,7 +181,7 @@ IrScope::statement(ymuint pos) const
 
 // @brief 命令コードのサイズを計算する．
 ymuint
-IrScope::calc_size() const
+IrScopeExpr::calc_size() const
 {
   ymuint size = 0;
   for (vector<AstStatement*>::const_iterator p = mStatementList.begin();
@@ -199,7 +199,7 @@ IrScope::calc_size() const
 //
 // addr の値は更新される．
 void
-IrScope::compile(IrDriver& driver,
+IrScopeExpr::compile(IrDriver& driver,
 		  IrCodeList& code_list,
 		  Ir_INT& addr)
 {
@@ -214,7 +214,7 @@ IrScope::compile(IrDriver& driver,
 // @param[in] s 出力ストリーム
 // @param[in] indent インデントレベル
 void
-IrScope::print(ostream& s,
+IrScopeExpr::print(ostream& s,
 		ymuint indent) const
 {
   ymuint n = mStatementList.size();

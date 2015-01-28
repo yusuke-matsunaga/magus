@@ -1,35 +1,35 @@
-#ifndef YMSLSCOPEEXPR_H
-#define YMSLSCOPEEXPR_H
+#ifndef SCOPEHANDLE_H
+#define SCOPEHANDLE_H
 
-/// @file IrScopeExpr.h
-/// @brief IrScopeExpr のヘッダファイル
+/// @file ScopeHandle.h
+/// @brief ScopeHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrScopeExpr IrScopeExpr.h "IrScopeExpr.h"
-/// @brief scope を表す IrExpr
+/// @class ScopeHandle ScopeHandle.h "ScopeHandle.h"
+/// @brief Scope を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class IrScopeExpr :
-  public IrExpr
+class ScopeHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] scope スコープ
-  IrScopeExpr(Scope* scope);
+  ScopeHandle(Scope* scope);
 
   /// @brief デストラクタ
   virtual
-  ~IrScopeExpr();
+  ~ScopeHandle();
 
 
 public:
@@ -37,14 +37,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 種類を返す．
+  /// @brief 名前を返す．
   virtual
-  ExprType
-  expr_type() const;
+  ShString
+  name() const;
 
-  /// @brief スコープを返す．
+  /// @brief 名前空間を返す．
   ///
-  /// kScopeExpr のみ有効
+  /// 他の要素の場合には NULL を返す．
   virtual
   Scope*
   scope() const;
@@ -62,4 +62,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLSCOPEEXPR_H
+#endif // SCOPEHANDLE_H

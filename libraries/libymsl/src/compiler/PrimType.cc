@@ -1,36 +1,36 @@
 
-/// @file IrPrimType.cc
-/// @brief IrPrimType の実装ファイル
+/// @file PrimType.cc
+/// @brief PrimType の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrPrimType.h"
+#include "PrimType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrPrimType
+// クラス PrimType
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] type 型
-IrPrimType::IrPrimType(TypeId type) :
+PrimType::PrimType(TypeId type) :
   mType(type)
 {
 }
 
 // @brief デストラクタ
-IrPrimType::~IrPrimType()
+PrimType::~PrimType()
 {
 }
 
 // @brief 型を得る．
 TypeId
-IrPrimType::type_id() const
+PrimType::type_id() const
 {
   return mType;
 }
@@ -38,7 +38,7 @@ IrPrimType::type_id() const
 // @brief 内容を出力する．
 // @param[in] s 出力先のストリーム
 void
-IrPrimType::print(ostream& s) const
+PrimType::print(ostream& s) const
 {
   s << type_id();
 }

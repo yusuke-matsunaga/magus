@@ -66,36 +66,41 @@ set (ymsl_SOURCES
   src/ast/AstVarDecl.cc
   src/ast/AstWhile.cc
 
+  src/compiler/YmslCompiler.cc
+  src/compiler/YmslLabel.cc
+  src/compiler/ArrayType.cc
+  src/compiler/EnumType.cc
+  src/compiler/Function.cc
+  src/compiler/FuncHandle.cc
+  src/compiler/LabelHandle.cc
+  src/compiler/MapType.cc
+  src/compiler/NamedType.cc
+  src/compiler/PrimType.cc
+  src/compiler/Scope.cc
+  src/compiler/ScopeHandle.cc
+  src/compiler/SetType.cc
+  src/compiler/SymHandle.cc
+  src/compiler/Type.cc
+  src/compiler/TypeHandle.cc
+  src/compiler/TypeMgr.cc
+  src/compiler/Var.cc
+  src/compiler/VarHandle.cc
+
   src/ir/IrArrayRef.cc
-  src/ir/IrArrayType.cc
   src/ir/IrEnumExpr.cc
-  src/ir/IrEnumType.cc
   src/ir/IrExpr.cc
   src/ir/IrFalse.cc
   src/ir/IrFloatConst.cc
   src/ir/IrFuncCall.cc
   src/ir/IrFuncExpr.cc
-  src/ir/IrFunction.cc
-  src/ir/IrHandle.cc
   src/ir/IrIntConst.cc
-  src/ir/IrMapType.cc
   src/ir/IrMemberRef.cc
   src/ir/IrMgr.cc
-  src/ir/IrNamedType.cc
   src/ir/IrOpExpr.cc
-  src/ir/IrPrimType.cc
-  src/ir/IrScope.cc
   src/ir/IrScopeExpr.cc
-  src/ir/IrSetType.cc
   src/ir/IrStringConst.cc
   src/ir/IrTrue.cc
-  src/ir/IrType.cc
-  src/ir/IrTypeMgr.cc
-  src/ir/IrVar.cc
   src/ir/IrVarExpr.cc
-
-  src/compiler/YmslCompiler.cc
-  src/compiler/YmslLabel.cc
 
   src/engine/YmslVM.cc
 

@@ -1,8 +1,8 @@
-#ifndef IRFUNCTION_H
-#define IRFUNCTION_H
+#ifndef FUNCTION_H
+#define FUNCTION_H
 
-/// @file IrFunction.h
-/// @brief IrFunction のヘッダファイル
+/// @file Function.h
+/// @brief Function のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,10 +16,10 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrFunction IrFunction.h "IrFunction.h"
+/// @class Function Function.h "Function.h"
 /// @brief YMSL の関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrFunction
+class Function
 {
 public:
 
@@ -28,14 +28,14 @@ public:
   /// @param[in] output_type 出力の型
   /// @param[in] input_type_list 入力の型のリスト
   /// @param[in] index インデックス
-  IrFunction(ShString name,
-	     const IrType* output_type,
-	     const vector<const IrType*>& input_type_list,
+  Function(ShString name,
+	     const Type* output_type,
+	     const vector<const Type*>& input_type_list,
 	     int index);
 
   /// @brief デストラクタ
   virtual
-  ~IrFunction();
+  ~Function();
 
 
 public:
@@ -48,7 +48,7 @@ public:
   name() const;
 
   /// @brief 出力の型を返す．
-  const IrType*
+  const Type*
   output_type() const;
 
   /// @brief 入力数を返す．
@@ -57,7 +57,7 @@ public:
 
   /// @brief 入力の型の返す．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
-  const IrType*
+  const Type*
   input_type(ymuint pos) const;
 
   /// @brief 関数インデックスを返す．
@@ -74,13 +74,13 @@ private:
   ShString mName;
 
   // 出力の型
-  const IrType* mOutputType;
+  const Type* mOutputType;
 
   // 入力の数
   ymuint mInputNum;
 
   // 入力の型の配列
-  const IrType** mInputType;
+  const Type** mInputType;
 
   // インデックス
   int mIndex;
@@ -89,4 +89,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRFUNCTION_H
+#endif // FUNCTION_H

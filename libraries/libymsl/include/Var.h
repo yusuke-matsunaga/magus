@@ -1,35 +1,38 @@
-#ifndef YMSLUSERTYPE_H
-#define YMSLUSERTYPE_H
+#ifndef VAR_H
+#define VAR_H
 
-/// @file IrUserType.h
-/// @brief IrUserType のヘッダファイル
+/// @file Var.h
+/// @brief Var のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Type.h"
+#include "ymsl_int.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrUserType IrUserType.h "IrUserType.h"
-/// @brief ユーザー定義型を表す Type
+/// @class Var Var.h "Var.h"
+/// @brief 変数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrUserType :
-  public Type
+class Var
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] type_name 型名
-  IrUserType(string type_name);
+  /// @param[in] name 変数名
+  /// @param[in] value_type 型
+  /// @param[in] index インデックス
+  Var(ShString name,
+      const Type* value_type,
+      ymuint index);
 
   /// @brief デストラクタ
-  virtual
-  ~IrUserType();
+  ~Var();
 
 
 public:
@@ -37,15 +40,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
-  virtual
-  TypeId
-  type() const;
+  /// @brief 変数名を得る．
+  ShString
+  name() const;
 
-  /// @brief 値を表す文字列を返す．
-  virtual
-  string
-  str() const;
+  /// @brief 型を得る．
+  const Type*
+  value_type() const;
+
+  /// @brief 変数インデックスを得る．
+  ymuint
+  index() const;
 
 
 private:
@@ -53,11 +58,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 型名
-  string mTypeName;
+  // 名前
+  ShString mName;
+
+  // 型
+  const Type* mValueType;
+
+  // インデックス
+  ymuint mIndex;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLUSERTYPE_H
+#endif // VAR_H

@@ -1,36 +1,35 @@
-#ifndef YMSLPRIMTYPE_H
-#define YMSLPRIMTYPE_H
+#ifndef ARRAYTYPE_H
+#define ARRAYTYPE_H
 
-/// @file IrPrimType.h
-/// @brief IrPrimType のヘッダファイル
+/// @file IrArrayType.h
+/// @brief IrArrayType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrType.h"
+#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrPrimType IrType.h "IrType.h"
-/// @brief 単純な型を表すクラス
+/// @class ArrayType ArrayType.h "ArrayType.h"
+/// @brief array 型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrPrimType :
-  public IrType
+class ArrayType :
+  public Type
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] type 型
-  IrPrimType(TypeId type);
-
+  /// @param[in] elem_type 要素の型
+  ArrayType(const Type* elem_type);
 
   /// @brief デストラクタ
   virtual
-  ~IrPrimType();
+  ~ArrayType();
 
 
 public:
@@ -39,8 +38,16 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 型を得る．
+  virtual
   TypeId
   type_id() const;
+
+  /// @brief 要素の型を得る．
+  ///
+  /// array/set/map のみ有効
+  virtual
+  const Type*
+  elem_type() const;
 
   /// @brief 内容を出力する．
   /// @param[in] s 出力先のストリーム
@@ -54,11 +61,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 型
-  TypeId mType;
+  // 要素の型
+  const Type* mElemType;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLPRIMTYPE_H
+#endif // ARRAYTYPE_H

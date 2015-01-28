@@ -1,36 +1,35 @@
-#ifndef YMSLNAMEDTYPE_H
-#define YMSLNAMEDTYPE_H
+#ifndef VARHANDLE_H
+#define VARHANDLE_H
 
-/// @file IrNamedtype.h
-/// @brief IrNamedType のヘッダファイル
+/// @file VarHandle.h
+/// @brief VarHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrType.h"
-#include "YmUtils/ShString.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrNamedType IrNamedType.h "IrNamedType.h"
-/// @brief 名前付き型を表すクラス
+/// @class VarHandle VarHandle.h "VarHandle.h"
+/// @brief Var を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class IrNamedType :
-  public IrType
+class VarHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 名前
-  IrNamedType(ShString name);
+  /// @param[in] var 変数
+  VarHandle(Var* var);
 
   /// @brief デストラクタ
   virtual
-  ~IrNamedType();
+  ~VarHandle();
 
 
 public:
@@ -38,12 +37,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型名を得る．
-  ///
-  /// enum のみ有効
+  /// @brief 名前を返す．
   virtual
   ShString
-  type_name() const;
+  name() const;
+
+  /// @brief 変数を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  Var*
+  var() const;
 
 
 private:
@@ -51,11 +55,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  ShString mName;
+  // 変数
+  Var* mVar;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLNAMEDTYPE_H
+#endif // VARHANDLE_H

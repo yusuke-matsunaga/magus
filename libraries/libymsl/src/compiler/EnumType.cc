@@ -1,69 +1,69 @@
 
-/// @file IrEnumType.cc
-/// @brief IrEnumType の実装ファイル
+/// @file EnumType.cc
+/// @brief EnumType の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrEnumType.h"
-#include "IrEnumConst.h"
+#include "EnumType.h"
+#include "EnumConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrEnumConst
+// クラス EnumConst
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-IrEnumConst::IrEnumConst()
+EnumConst::EnumConst()
 {
 }
 
 // @brief デストラクタ
-IrEnumConst::~IrEnumConst()
+EnumConst::~EnumConst()
 {
 }
 
 // @brief enum 型を返す．
-IrType*
-IrEnumConst::parent() const
+Type*
+EnumConst::parent() const
 {
   return mParent;
 }
 
 // @brief 名前を返す．
 ShString
-IrEnumConst::name() const
+EnumConst::name() const
 {
   return mName;
 }
 
 // @brief 値を返す．
 int
-IrEnumConst::val() const
+EnumConst::val() const
 {
   return mVal;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrEnumType
+// クラス EnumType
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
-IrEnumType::IrEnumType(ShString name,
-		       const vector<pair<ShString, int> >& elem_list) :
-  IrNamedType(name),
+EnumType::EnumType(ShString name,
+		   const vector<pair<ShString, int> >& elem_list) :
+  NamedType(name),
   mElemNum(elem_list.size())
 {
-  mElemArray = new IrEnumConst[mElemNum];
+  mElemArray = new EnumConst[mElemNum];
   for (ymuint i = 0; i < mElemNum; ++ i) {
-    IrEnumConst& enum_const = mElemArray[i];
+    EnumConst& enum_const = mElemArray[i];
     enum_const.mParent = this;
     enum_const.mName = elem_list[i].first;
     enum_const.mVal = elem_list[i].second;
@@ -71,14 +71,14 @@ IrEnumType::IrEnumType(ShString name,
 }
 
 // @brief デストラクタ
-IrEnumType::~IrEnumType()
+EnumType::~EnumType()
 {
   delete [] mElemArray;
 }
 
 // @brief 型を得る．
 TypeId
-IrEnumType::type_id() const
+EnumType::type_id() const
 {
   return kEnumType;
 }
@@ -87,7 +87,7 @@ IrEnumType::type_id() const
 //
 // enum のみ有効
 ymuint
-IrEnumType::enum_num() const
+EnumType::enum_num() const
 {
   return mElemNum;
 }
@@ -97,7 +97,7 @@ IrEnumType::enum_num() const
 //
 // enum のみ有効
 int
-IrEnumType::enum_elem_val(ymuint index) const
+EnumType::enum_elem_val(ymuint index) const
 {
   ASSERT_COND( index < enum_num() );
   return mElemArray[index].val();
@@ -108,7 +108,7 @@ IrEnumType::enum_elem_val(ymuint index) const
 //
 // enum のみ有効
 ShString
-IrEnumType::enum_elem_name(ymuint index) const
+EnumType::enum_elem_name(ymuint index) const
 {
   ASSERT_COND( index < enum_num() );
   return mElemArray[index].name();
@@ -120,7 +120,7 @@ IrEnumType::enum_elem_name(ymuint index) const
 // enum のみ有効
 // 該当する名前がなければ -1 を返す．
 int
-IrEnumType::enum_index(ShString name) const
+EnumType::enum_index(ShString name) const
 {
   // とりあえず線形探索
   for (ymuint i = 0; i < mElemNum; ++ i) {
@@ -134,7 +134,7 @@ IrEnumType::enum_index(ShString name) const
 // @brief 内容を出力する．
 // @param[in] s 出力先のストリーム
 void
-IrEnumType::print(ostream& s) const
+EnumType::print(ostream& s) const
 {
   s << type_name();
 }

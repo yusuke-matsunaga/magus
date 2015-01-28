@@ -1,35 +1,36 @@
-#ifndef YMSLARRAYTYPE_H
-#define YMSLARRAYTYPE_H
+#ifndef NAMEDTYPE_H
+#define NAMEDTYPE_H
 
-/// @file IrArrayType.h
-/// @brief IrArrayType のヘッダファイル
+/// @file Namedtype.h
+/// @brief NamedType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrType.h"
+#include "Type.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrArrayType IrArrayType.h "IrArrayType.h"
-/// @brief array 型を表すクラス
+/// @class NamedType NamedType.h "NamedType.h"
+/// @brief 名前付き型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrArrayType :
-  public IrType
+class NamedType :
+  public Type
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] elem_type 要素の型
-  IrArrayType(const IrType* elem_type);
+  /// @param[in] name 名前
+  NamedType(ShString name);
 
   /// @brief デストラクタ
   virtual
-  ~IrArrayType();
+  ~NamedType();
 
 
 public:
@@ -37,23 +38,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
-  virtual
-  TypeId
-  type_id() const;
-
-  /// @brief 要素の型を得る．
+  /// @brief 型名を得る．
   ///
-  /// array/set/map のみ有効
+  /// enum のみ有効
   virtual
-  const IrType*
-  elem_type() const;
-
-  /// @brief 内容を出力する．
-  /// @param[in] s 出力先のストリーム
-  virtual
-  void
-  print(ostream& s) const;
+  ShString
+  type_name() const;
 
 
 private:
@@ -61,11 +51,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 要素の型
-  const IrType* mElemType;
+  // 名前
+  ShString mName;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLARRAYTYPE_H
+#endif // NAMEDTYPE_H

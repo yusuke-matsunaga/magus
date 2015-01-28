@@ -1,28 +1,28 @@
 
-/// @file IrVar.cc
-/// @brief IrVar の実装ファイル
+/// @file Var.cc
+/// @brief Var の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrVar.h"
+#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrVar
+// クラス Var
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 変数名
 // @param[in] value_type 型
 // @param[in] index インデックス
-IrVar::IrVar(ShString name,
-		 const IrType* value_type,
-		 ymuint index) :
+Var::Var(ShString name,
+	 const Type* value_type,
+	 ymuint index) :
   mName(name),
   mValueType(value_type),
   mIndex(index)
@@ -30,27 +30,27 @@ IrVar::IrVar(ShString name,
 }
 
 // @brief デストラクタ
-IrVar::~IrVar()
+Var::~Var()
 {
 }
 
 // @brief 変数名を得る．
 ShString
-IrVar::name() const
+Var::name() const
 {
   return mName;
 }
 
 // @brief 型を得る．
-const IrType*
-IrVar::value_type() const
+const Type*
+Var::value_type() const
 {
   return mValueType;
 }
 
 // @brief 変数インデックスを得る．
 ymuint
-IrVar::index() const
+Var::index() const
 {
   return mIndex;
 }

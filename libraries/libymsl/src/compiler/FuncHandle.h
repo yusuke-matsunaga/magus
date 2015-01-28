@@ -1,35 +1,35 @@
-#ifndef IRENUMCONST_H
-#define IRENUMCONST_H
+#ifndef FUNCHANDLE_H
+#define FUNCHANDLE_H
 
-/// @file IrEnumConst.h
-/// @brief IrEnumConst のヘッダファイル
+/// @file FuncHandle.h
+/// @brief FuncHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymsl_int.h"
-#include "YmUtils/ShString.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrEnumConst IrEnumConst.h "IrEnumConst.h"
-/// @brief enum 定数を表すクラス
+/// @class FuncHandle FuncHandle.h "FuncHandle.h"
+/// @brief Function を保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class IrEnumConst
+class FuncHandle :
+  public SymHandle
 {
-  friend class IrEnumType;
-
 public:
 
   /// @brief コンストラクタ
-  IrEnumConst();
+  /// @param[in] func 関数
+  FuncHandle(Function* func);
 
   /// @brief デストラクタ
-  ~IrEnumConst();
+  virtual
+  ~FuncHandle();
 
 
 public:
@@ -37,17 +37,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 親の enum 型を返す．
-  IrType*
-  parent() const;
-
   /// @brief 名前を返す．
+  virtual
   ShString
   name() const;
 
-  /// @brief 値を返す．
-  int
-  val() const;
+  /// @brief 関数を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  Function*
+  function() const;
 
 
 private:
@@ -55,17 +55,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 親の enum 型
-  IrType* mParent;
-
-  // 名前
-  ShString mName;
-
-  // 値
-  int mVal;
+  // 関数
+  Function* mFunc;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRENUMCONST_H
+#endif // FUNCHANDLE_H

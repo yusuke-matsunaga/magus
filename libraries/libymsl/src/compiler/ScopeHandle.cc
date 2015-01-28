@@ -1,45 +1,46 @@
 
-/// @file IrScopeExpr.cc
-/// @brief IrScopeExpr の実装ファイル
+/// @file ScopeHandle.cc
+/// @brief ScopeHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrScopeExpr.h"
+#include "ScopeHandle.h"
+#include "Scope.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrScopeExpr
+// クラス ScopeHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] scope スコープ
-IrScopeExpr::IrScopeExpr(Scope* scope) :
+ScopeHandle::ScopeHandle(Scope* scope) :
   mScope(scope)
 {
 }
 
 // @brief デストラクタ
-IrScopeExpr::~IrScopeExpr()
+ScopeHandle::~ScopeHandle()
 {
 }
 
-// @brief 種類を返す．
-ExprType
-IrScopeExpr::expr_type() const
+// @brief 名前を返す．
+ShString
+ScopeHandle::name() const
 {
-  return kScopeExpr;
+  return mScope->name();
 }
 
 // @brief スコープを返す．
 //
-// kScopeExpr のみ有効
+// 他の要素の場合には NULL を返す．
 Scope*
-IrScopeExpr::scope() const
+ScopeHandle::scope() const
 {
   return mScope;
 }

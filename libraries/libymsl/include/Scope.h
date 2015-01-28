@@ -1,8 +1,8 @@
-#ifndef YMSLSCOPE_H
-#define YMSLSCOPE_H
+#ifndef SCOPE_H
+#define SCOPE_H
 
-/// @file IrScope.h
-/// @brief IrScope のヘッダファイル
+/// @file Scope.h
+/// @brief Scope のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,21 +16,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrScope IrScope.h "IrScope.h"
+/// @class Scope Scope.h "Scope.h"
 /// @brief スコープを表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrScope
+class Scope
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] parent 親のスコープ
   /// @param[in] name 名前
-  IrScope(IrScope* parent,
-	  ShString name = ShString());
+  Scope(Scope* parent,
+	ShString name = ShString());
 
   /// @brief デストラクタ
-  ~IrScope();
+  ~Scope();
 
 
 public:
@@ -47,31 +47,31 @@ public:
   /// @brief 子のスコープを追加する．
   /// @param[in] item 追加する要素
   void
-  add_scope(IrScope* item);
+  add_scope(Scope* item);
 
   /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_function(IrFunction* item);
+  add_function(Function* item);
 
   /// @brief 変数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_var(IrVar* item);
+  add_var(Var* item);
 
   /// @brief 型を追加する．
   /// @param[in] item 追加する要素
   void
-  add_type(IrType* item);
+  add_type(Type* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素
   void
-  add_label(IrLabel* item);
+  add_label(Label* item);
 
   /// @brief 名前からハンドルを探す．
   /// @param[in] name 名前
-  IrHandle*
+  SymHandle*
   find(ShString name) const;
 
 
@@ -87,13 +87,13 @@ private:
 
   /// @brief ハンドルを登録する．
   void
-  put(IrHandle* handle);
+  put(SymHandle* handle);
 
   /// @brief ハンドルを登録する．
   ///
   /// こちらはサイズチェックなし
   void
-  _put(IrHandle* handle);
+  _put(SymHandle* handle);
 
 
 private:
@@ -102,7 +102,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親のスコープ
-  IrScope* mParent;
+  Scope* mParent;
 
   // 自身の名前
   ShString mName;
@@ -114,7 +114,7 @@ private:
   ymuint mNextLimit;
 
   // ハッシュ表
-  IrHandle** mHashTable;
+  SymHandle** mHashTable;
 
   // ハッシュの要素数
   ymuint mHashNum;
@@ -123,4 +123,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLSCOPE_H
+#endif // SCOPE_H

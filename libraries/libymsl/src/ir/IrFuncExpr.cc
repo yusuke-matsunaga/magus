@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] func 関数
-IrFuncExpr::IrFuncExpr(IrFunction* func) :
+IrFuncExpr::IrFuncExpr(Function* func) :
   mFunction(func)
 {
 }
@@ -38,7 +38,7 @@ IrFuncExpr::expr_type() const
 // @brief 関数を返す．
 //
 // kFuncExpr のみ有効
-IrFunction*
+Function*
 IrFuncExpr::function() const
 {
   return mFunction;

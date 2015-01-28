@@ -1,5 +1,5 @@
-#ifndef IRTYPE_H
-#define IRTYPE_H
+#ifndef TYPE_H
+#define TYPE_H
 
 /// @file AstValueType.h
 /// @brief AstValueType のヘッダファイル
@@ -17,21 +17,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrType IrType.h "IrType.h"
+/// @class Type Type.h "Type.h"
 /// @brief 値の型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrType
+class Type
 {
-  friend class IrTypeMgr;
+  friend class TypeMgr;
 
 public:
 
   /// @brief コンストラクタ
-  IrType();
+  Type();
 
   /// @brief デストラクタ
   virtual
-  ~IrType();
+  ~Type();
 
 
 public:
@@ -61,21 +61,21 @@ public:
   ///
   /// map のみ有効
   virtual
-  const IrType*
+  const Type*
   key_type() const;
 
   /// @brief 要素の型を得る．
   ///
   /// array/set/map のみ有効
   virtual
-  const IrType*
+  const Type*
   elem_type() const;
 
   /// @brief 関数の出力の型を返す．
   ///
   /// function のみ有効
   virtual
-  const IrType*
+  const Type*
   function_type() const;
 
   /// @brief 関数の入力数を返す．
@@ -90,7 +90,7 @@ public:
   ///
   /// function のみ有効
   virtual
-  const IrType*
+  const Type*
   function_input_type(ymuint pos) const;
 
   /// @brief 列挙型の数を得る．
@@ -147,7 +147,7 @@ private:
 // おもにハッシュ関数用
 inline
 ymuint
-IrType::id() const
+Type::id() const
 {
   return mId;
 }
@@ -158,14 +158,14 @@ END_NAMESPACE_YM_YMSL
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// HashFunc<const IrType*> の特殊化
+// HashFunc<const Type*> の特殊化
 //////////////////////////////////////////////////////////////////////
 template<>
 struct
-HashFunc<const nsYmsl::IrType*>
+HashFunc<const nsYmsl::Type*>
 {
   ymuint
-  operator()(const nsYmsl::IrType* key) const
+  operator()(const nsYmsl::Type* key) const
   {
     return key->id();
   }
@@ -173,4 +173,4 @@ HashFunc<const nsYmsl::IrType*>
 
 END_NAMESPACE_YM
 
-#endif // IRTYPE_H
+#endif // TYPE_H

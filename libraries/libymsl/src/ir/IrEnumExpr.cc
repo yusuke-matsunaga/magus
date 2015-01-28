@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] enum_type enum 型
-IrEnumExpr::IrEnumExpr(const IrType* enum_type) :
+IrEnumExpr::IrEnumExpr(const Type* enum_type) :
   mEnumType(enum_type)
 {
 }
@@ -38,7 +38,7 @@ IrEnumExpr::expr_type() const
 // @brief enum 型を返す．
 //
 // kEnumExpr のみ有効
-const IrType*
+const Type*
 IrEnumExpr::enum_type() const
 {
   return mEnumType;

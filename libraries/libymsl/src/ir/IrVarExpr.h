@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] var 変数
-  IrVarExpr(IrVar* var);
+  IrVarExpr(Var* var);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// kPrimary の時のみ有効
   virtual
-  IrVar*
+  Var*
   var() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数
-  IrVar* mVar;
+  Var* mVar;
 
 };
 

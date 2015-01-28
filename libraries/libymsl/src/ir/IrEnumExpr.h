@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] enum_type enum 型
-  IrEnumExpr(const IrType* enum_type);
+  IrEnumExpr(const Type* enum_type);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// kEnumExpr のみ有効
   virtual
-  const IrType*
+  const Type*
   enum_type() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // enum 型
-  const IrType* mEnumType;
+  const Type* mEnumType;
 
 };
 

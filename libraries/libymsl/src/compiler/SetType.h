@@ -1,35 +1,35 @@
-#ifndef YMSLSETTYPE_H
-#define YMSLSETTYPE_H
+#ifndef SETTYPE_H
+#define SETTYPE_H
 
-/// @file IrSetType.h
-/// @brief IrSetType のヘッダファイル
+/// @file SetType.h
+/// @brief SetType のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrType.h"
+#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrSetType IrSetType.h "IrSetType.h"
+/// @class SetType SetType.h "SetType.h"
 /// @brief set 型を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrSetType :
-  public IrType
+class SetType :
+  public Type
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] elem_type 要素の型
-  IrSetType(const IrType* elem_type);
+  SetType(const Type* elem_type);
 
   /// @brief デストラクタ
   virtual
-  ~IrSetType();
+  ~SetType();
 
 
 public:
@@ -46,7 +46,7 @@ public:
   ///
   /// array/set/map のみ有効
   virtual
-  const IrType*
+  const Type*
   elem_type() const;
 
   /// @brief 内容を出力する．
@@ -62,10 +62,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素の型
-  const IrType* mElemType;
+  const Type* mElemType;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLSETTYPE_H
+#endif // SETTYPE_H
