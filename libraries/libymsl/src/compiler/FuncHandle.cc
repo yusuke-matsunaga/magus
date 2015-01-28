@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] func 関数
-FuncHandle::FuncHandle(Function* func) :
+FuncHandle::FuncHandle(const Function* func) :
   mFunc(func)
 {
 }
@@ -39,7 +39,7 @@ FuncHandle::name() const
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-Function*
+const Function*
 FuncHandle::function() const
 {
   return mFunc;

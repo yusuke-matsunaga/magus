@@ -54,28 +54,28 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Var*
+  const Var*
   var() const;
 
   /// @brief 関数を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Function*
+  const Function*
   function() const;
 
   /// @brief ラベルを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Label*
+  const Label*
   label() const;
 
   /// @brief 名前付き型を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Type*
+  const Type*
   named_type() const;
 
 

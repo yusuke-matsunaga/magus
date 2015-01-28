@@ -60,7 +60,7 @@ Scope::name() const
 // @brief ラベルを追加する．
 // @param[in] item 追加する要素
 void
-Scope::add_label(Label* item)
+Scope::add_label(const Label* item)
 {
   SymHandle* handle = new LabelHandle(item);
   put(handle);
@@ -69,7 +69,7 @@ Scope::add_label(Label* item)
 // @brief 関数を追加する．
 // @param[in] item 追加する要素
 void
-Scope::add_function(Function* item)
+Scope::add_function(const Function* item)
 {
   SymHandle* handle = new FuncHandle(item);
   put(handle);
@@ -78,7 +78,7 @@ Scope::add_function(Function* item)
 // @brief 変数を追加する．
 // @param[in] item 追加する要素
 void
-Scope::add_var(Var* item)
+Scope::add_var(const Var* item)
 {
   SymHandle* handle = new VarHandle(item);
   put(handle);
@@ -87,7 +87,7 @@ Scope::add_var(Var* item)
 // @brief 型を追加する．
 // @param[in] item 追加する要素
 void
-Scope::add_type(Type* item)
+Scope::add_type(const Type* item)
 {
   SymHandle* handle = new TypeHandle(item);
   put(handle);

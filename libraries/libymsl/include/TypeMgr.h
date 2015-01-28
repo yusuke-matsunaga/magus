@@ -88,12 +88,12 @@ public:
   /// 登録されていなければ新たに登録する．
   const Type*
   function_type(const Type* output_type,
-		const vector<Type*>& input_type_list);
+		const vector<const Type*>& input_type_list);
 
   /// @brief enum 型を作る．
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
-  Type*
+  const Type*
   enum_type(ShString name,
 	    const vector<pair<ShString, int> >& elem_list);
 
@@ -109,30 +109,37 @@ private:
 
   /// @brief プリミティブ型を作る．
   /// @param[in] type_id 型番号
-  Type*
+  const Type*
   new_PrimType(TypeId type_id);
 
   /// @brief array 型を作る．
   /// @param[in] elem_type 要素の型
-  Type*
+  const Type*
   new_ArrayType(const Type* elem_type);
 
   /// @brief set 型を作る．
   /// @param[in] elem_type 要素の型
-  Type*
+  const Type*
   new_SetType(const Type* elem_type);
 
   /// @brief map 型を作る．
   /// @param[in] key_type キーの
   /// @param[in] elem_type 要素の型
-  Type*
+  const Type*
   new_MapType(const Type* key_type,
 	      const Type* elem_type);
+
+  /// @brief function 型を作る．
+  /// @param[in] output_type 出力の型
+  /// @param[in] input_type_list 入力の型のリスト
+  const Type*
+  new_FuncType(const Type* output_type,
+	       const vector<const Type*>& input_type_list);
 
   /// @brief enum 型を作る．
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
-  Type*
+  const Type*
   new_EnumType(ShString name,
 	       const vector<pair<ShString, int> >& elem_list);
 
@@ -151,19 +158,19 @@ private:
   vector<Type*> mTypeList;
 
   // void 型
-  Type* mVoidType;
+  const Type* mVoidType;
 
   // boolean 型
-  Type* mBooleanType;
+  const Type* mBooleanType;
 
   // int 型
-  Type* mIntType;
+  const Type* mIntType;
 
   // float 型
-  Type* mFloatType;
+  const Type* mFloatType;
 
   // string 型
-  Type* mStringType;
+  const Type* mStringType;
 
   // array 型のハッシュ表
   HashMap<const Type*, const Type*> mArrayTypeDic;

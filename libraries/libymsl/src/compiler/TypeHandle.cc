@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] type 型
-TypeHandle::TypeHandle(Type* type) :
+TypeHandle::TypeHandle(const Type* type) :
   mType(type)
 {
 }
@@ -39,7 +39,7 @@ TypeHandle::name() const
 // @brief 型を返す．
 //
 // 他の要素の場合には NULL を返す．
-Type*
+const Type*
 TypeHandle::named_type() const
 {
   return mType;

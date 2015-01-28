@@ -72,6 +72,7 @@ set (ymsl_SOURCES
   src/compiler/EnumType.cc
   src/compiler/Function.cc
   src/compiler/FuncHandle.cc
+  src/compiler/FuncType.cc
   src/compiler/LabelHandle.cc
   src/compiler/MapType.cc
   src/compiler/NamedType.cc

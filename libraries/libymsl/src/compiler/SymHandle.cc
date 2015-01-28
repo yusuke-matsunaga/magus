@@ -30,7 +30,7 @@ SymHandle::~SymHandle()
 // @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．
-Var*
+const Var*
 SymHandle::var() const
 {
   return NULL;
@@ -39,7 +39,7 @@ SymHandle::var() const
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-Function*
+const Function*
 SymHandle::function() const
 {
   return NULL;
@@ -48,7 +48,7 @@ SymHandle::function() const
 // @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-Label*
+const Label*
 SymHandle::label() const
 {
   return NULL;
@@ -66,7 +66,7 @@ SymHandle::scope() const
 // @brief 型を返す．
 //
 // 他の要素の場合には NULL を返す．
-Type*
+const Type*
 SymHandle::named_type() const
 {
   return NULL;

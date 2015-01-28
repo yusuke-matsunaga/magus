@@ -44,45 +44,6 @@ IrMgr::~IrMgr()
 {
 }
 
-// @brief スコープを生成する．
-// @param[in] parent 親のスコープ
-// @param[in] name 名前
-Scope*
-IrMgr::new_Scope(Scope* parent,
-		 ShString name)
-{
-  void* p = mAlloc.get_memory(sizeof(Scope));
-  return new (p) Scope(parent, name);
-}
-
-// @brief 変数を生成する．
-// @param[in] name 名前
-// @param[in] type 型
-// @param[in] index インデックス
-Var*
-IrMgr::new_Var(ShString name,
-	       const Type* type,
-	       ymuint index)
-{
-  void* p = mAlloc.get_memory(sizeof(Var));
-  return new (p) Var(name, type, index);
-}
-
-// @brief 関数を生成する．
-// @param[in] name 名前
-// @param[in] type 出力の型
-// @param[in] input_type_list 入力の型のリスト
-// @param[in] index インデックス
-Function*
-IrMgr::new_Function(ShString name,
-		    const Type* type,
-		    const vector<const Type*>& input_type_list,
-		    ymuint index)
-{
-  void* p = mAlloc.get_memory(sizeof(Function));
-  return new (p) Function(name, type, input_type_list, index);
-}
-
 // @brief true 定数を生成する．
 IrExpr*
 IrMgr::new_True()

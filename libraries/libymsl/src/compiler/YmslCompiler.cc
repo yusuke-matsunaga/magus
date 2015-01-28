@@ -56,7 +56,7 @@ YmslCompiler::compile(IDO& ido)
 
   mStmtList.clear();
 
-  Scope* toplevel_scope = mIrMgr.new_Scope(NULL, ShString("__main__"));
+  Scope* toplevel_scope = new Scope(NULL, ShString("__main__"));
   phase1(toplevel, toplevel_scope);
 
   for (vector<pair<const AstStatement*, Scope*> >::iterator p = mStmtList.begin();
@@ -80,7 +80,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
     {
-      Scope* block_scope = mIrMgr.new_Scope(scope);
+      Scope* block_scope = new Scope(scope);
 
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -152,7 +152,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
 
   case kFor:
     {
-      Scope* for_scope = mIrMgr.new_Scope(scope);
+      Scope* for_scope = new Scope(scope);
       phase1(stmt->init_stmt(), for_scope);
       phase1(stmt->next_stmt(), for_scope);
       phase1(stmt->stmt(), for_scope);
@@ -201,7 +201,7 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
     elem_list[i] = make_pair(elem_name, v);
   }
 
-  Type* type = mTypeMgr.enum_type(name, elem_list);
+  const Type* type = mTypeMgr.enum_type(name, elem_list);
 
   scope->add_type(type);
 }
@@ -218,7 +218,7 @@ YmslCompiler::reg_func(const AstStatement* stmt,
 
   ShString name = stmt->name();
   const AstType* asttype = stmt->type();
-  const Type* type = resolve_type(asttype, scope);
+  const Type* output_type = resolve_type(asttype, scope);
 
   ymuint np = stmt->param_num();
   vector<const Type*> input_type_list(np);
@@ -228,7 +228,8 @@ YmslCompiler::reg_func(const AstStatement* stmt,
     input_type_list[i] = type;
   }
 
-  Function* func = new_function(name, type, input_type_list);
+  const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
+  Function* func = new_function(name, ftype);
   scope->add_function(func);
 }
 
@@ -405,7 +406,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
 
   case kFor:
     {
-      //Scope* for_scope = mIrMgr.new_Scope(scope);
+      //Scope* for_scope = new Scope(scope);
       //phase1(stmt->init_stmt(), for_scope);
       //phase1(stmt->next_stmt(), for_scope);
       //phase1(stmt->stmt(), for_scope);
@@ -616,13 +617,13 @@ YmslCompiler::symbol2expr(const AstSymbol* symbol,
     // symbol not found
     return NULL;
   }
-
-  Function* func = handle->function();
+#if 0
+  const Function* func = handle->function();
   if ( func != NULL ) {
     return mIrMgr.new_FuncExpr(func);
   }
 
-  Var* var = handle->var();
+  const Var* var = handle->var();
   if ( var != NULL ) {
     return mIrMgr.new_VarExpr(var);
   }
@@ -636,7 +637,7 @@ YmslCompiler::symbol2expr(const AstSymbol* symbol,
   if ( type != NULL ) {
     return mIrMgr.new_EnumExpr(type);
   }
-
+#endif
   // 型が合わない．
   return NULL;
 }
@@ -649,7 +650,7 @@ YmslCompiler::new_var(ShString name,
 		      const Type* type)
 {
   ymuint index = mVarList.size();
-  Var* var = mIrMgr.new_Var(name, type, index);
+  Var* var = new Var(name, type, index);
   mVarList.push_back(var);
 
   return var;
@@ -661,11 +662,10 @@ YmslCompiler::new_var(ShString name,
 // @param[in] input_type_list 入力の型のリスト
 Function*
 YmslCompiler::new_function(ShString name,
-			   const Type* type,
-			   const vector<const Type*>& input_type_list)
+			   const Type* type)
 {
   ymuint index = mFuncList.size();
-  Function* func = mIrMgr.new_Function(name, type, input_type_list, index);
+  Function* func = new Function(name, type, index);
   mFuncList.push_back(func);
 
   return func;

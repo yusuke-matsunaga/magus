@@ -76,7 +76,7 @@ public:
   /// function のみ有効
   virtual
   const Type*
-  function_type() const;
+  function_output_type() const;
 
   /// @brief 関数の入力数を返す．
   ///

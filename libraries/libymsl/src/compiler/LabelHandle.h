@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] label ラベル
-  LabelHandle(Label* statement);
+  LabelHandle(const Label* statement);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Label*
+  const Label*
   label() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ラベル
-  Label* mLabel;
+  const Label* mLabel;
 
 };
 

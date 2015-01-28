@@ -13,6 +13,7 @@
 #include "ArrayType.h"
 #include "SetType.h"
 #include "MapType.h"
+#include "FuncType.h"
 #include "EnumType.h"
 
 
@@ -110,18 +111,18 @@ TypeMgr::map_type(const Type* elem_type,
 // 登録されていなければ新たに登録する．
 const Type*
 TypeMgr::function_type(const Type* output_type,
-		       const vector<Type*>& input_type_list)
+		       const vector<const Type*>& input_type_list)
 {
 }
 
 // @brief enum 型を作る．
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
-Type*
+const Type*
 TypeMgr::enum_type(ShString name,
 		   const vector<pair<ShString, int> >& elem_list)
 {
-  Type* type = new_EnumType(name, elem_list);
+  const Type* type = new_EnumType(name, elem_list);
   return type;
 }
 
@@ -138,7 +139,7 @@ TypeMgr::init()
 
 // @brief プリミティブ型を作る．
 // @param[in] type_id 型番号
-Type*
+const Type*
 TypeMgr::new_PrimType(TypeId type_id)
 {
   Type* type = new PrimType(type_id);
@@ -148,7 +149,7 @@ TypeMgr::new_PrimType(TypeId type_id)
 
 // @brief array 型を作る．
 // @param[in] elem_type 要素の型
-Type*
+const Type*
 TypeMgr::new_ArrayType(const Type* elem_type)
 {
   Type* type = new ArrayType(elem_type);
@@ -158,7 +159,7 @@ TypeMgr::new_ArrayType(const Type* elem_type)
 
 // @brief set 型を作る．
 // @param[in] elem_type 要素の型
-Type*
+const Type*
 TypeMgr::new_SetType(const Type* elem_type)
 {
   Type* type = new SetType(elem_type);
@@ -169,7 +170,7 @@ TypeMgr::new_SetType(const Type* elem_type)
 // @brief map 型を作る．
 // @param[in] key_type キーの
 // @param[in] elem_type 要素の型
-Type*
+const Type*
 TypeMgr::new_MapType(const Type* key_type,
 		     const Type* elem_type)
 {
@@ -178,10 +179,22 @@ TypeMgr::new_MapType(const Type* key_type,
   return type;
 }
 
+// @brief function 型を作る．
+// @param[in] output_type 出力の型
+// @param[in] input_type_list 入力の型のリスト
+const Type*
+TypeMgr::new_FuncType(const Type* output_type,
+		      const vector<const Type*>& input_type_list)
+{
+  Type* type = new FuncType(output_type, input_type_list);
+  reg_type(type);
+  return type;
+}
+
 // @brief enum 型を作る．
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
-Type*
+const Type*
 TypeMgr::new_EnumType(ShString name,
 		      const vector<pair<ShString, int> >& elem_list)
 {

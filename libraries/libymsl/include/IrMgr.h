@@ -36,33 +36,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スコープを生成する．
-  /// @param[in] parent 親のスコープ
-  /// @param[in] name 名前
-  Scope*
-  new_Scope(Scope* parent,
-	    ShString name = ShString());
-
-  /// @brief 変数を生成する．
-  /// @param[in] name 名前
-  /// @param[in] type 型
-  /// @param[in] index インデックス
-  Var*
-  new_Var(ShString name,
-	  const Type* type,
-	  ymuint index);
-
-  /// @brief 関数を生成する．
-  /// @param[in] name 名前
-  /// @param[in] type 出力の型
-  /// @param[in] input_type_list 入力の型のリスト
-  /// @param[in] index インデックス
-  Function*
-  new_Function(ShString name,
-	       const Type* type,
-	       const vector<const Type*>& input_type_list,
-	       ymuint index);
-
   /// @brief true 定数を生成する．
   IrExpr*
   new_True();

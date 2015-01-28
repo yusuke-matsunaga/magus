@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] type 型
-  TypeHandle(Type* type);
+  TypeHandle(const Type* type);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Type*
+  const Type*
   named_type() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 型
-  Type* mType;
+  const Type* mType;
 
 };
 

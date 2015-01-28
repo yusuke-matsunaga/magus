@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
-  FuncHandle(Function* func);
+  FuncHandle(const Function* func);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Function*
+  const Function*
   function() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  Function* mFunc;
+  const Function* mFunc;
 
 };
 

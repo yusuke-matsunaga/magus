@@ -52,22 +52,22 @@ public:
   /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_function(Function* item);
+  add_function(const Function* item);
 
   /// @brief 変数を追加する．
   /// @param[in] item 追加する要素
   void
-  add_var(Var* item);
+  add_var(const Var* item);
 
   /// @brief 型を追加する．
   /// @param[in] item 追加する要素
   void
-  add_type(Type* item);
+  add_type(const Type* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素
   void
-  add_label(Label* item);
+  add_label(const Label* item);
 
   /// @brief 名前からハンドルを探す．
   /// @param[in] name 名前

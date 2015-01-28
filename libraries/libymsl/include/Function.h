@@ -25,13 +25,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  /// @param[in] output_type 出力の型
-  /// @param[in] input_type_list 入力の型のリスト
+  /// @param[in] type 関数の型
   /// @param[in] index インデックス
   Function(ShString name,
-	     const Type* output_type,
-	     const vector<const Type*>& input_type_list,
-	     int index);
+	   const Type* type,
+	   int index);
 
   /// @brief デストラクタ
   virtual
@@ -47,18 +45,9 @@ public:
   ShString
   name() const;
 
-  /// @brief 出力の型を返す．
+  /// @brief 関数の型を返す．
   const Type*
-  output_type() const;
-
-  /// @brief 入力数を返す．
-  ymuint
-  input_num() const;
-
-  /// @brief 入力の型の返す．
-  /// @param[in] pos 位置 ( 0 <= pos < input_num() )
-  const Type*
-  input_type(ymuint pos) const;
+  type() const;
 
   /// @brief 関数インデックスを返す．
   int
@@ -73,14 +62,8 @@ private:
   // 関数名
   ShString mName;
 
-  // 出力の型
-  const Type* mOutputType;
-
-  // 入力の数
-  ymuint mInputNum;
-
-  // 入力の型の配列
-  const Type** mInputType;
+  // 関数の型
+  const Type* mType;
 
   // インデックス
   int mIndex;

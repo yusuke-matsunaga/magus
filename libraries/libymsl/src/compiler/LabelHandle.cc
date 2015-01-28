@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] label ラベル
-LabelHandle::LabelHandle(Label* label) :
+LabelHandle::LabelHandle(const Label* label) :
   mLabel(label)
 {
 }
@@ -39,7 +39,7 @@ LabelHandle::name() const
 // @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-Label*
+const Label*
 LabelHandle::label() const
 {
   return mLabel;

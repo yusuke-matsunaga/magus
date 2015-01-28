@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] var 変数宣言
-VarHandle::VarHandle(Var* var) :
+VarHandle::VarHandle(const Var* var) :
   mVar(var)
 {
 }
@@ -39,7 +39,7 @@ VarHandle::name() const
 // @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．
-Var*
+const Var*
 VarHandle::var() const
 {
   return mVar;

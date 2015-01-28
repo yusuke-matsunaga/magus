@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] var 変数
-  VarHandle(Var* var);
+  VarHandle(const Var* var);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +46,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Var*
+  const Var*
   var() const;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数
-  Var* mVar;
+  const Var* mVar;
 
 };
 

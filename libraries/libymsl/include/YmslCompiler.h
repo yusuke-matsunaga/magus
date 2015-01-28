@@ -122,12 +122,10 @@ private:
 
   /// @brief 関数を生成する．
   /// @param[in] name 名前
-  /// @param[in] type 出力の型
-  /// @param[in] input_type_list 入力の型のリスト
+  /// @param[in] type 関数の型
   Function*
   new_function(ShString name,
-	       const Type* type,
-	       const vector<const Type*>& input_type_list);
+	       const Type* type);
 
 
 private:

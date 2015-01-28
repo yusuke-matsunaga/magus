@@ -60,7 +60,7 @@ Type::elem_type() const
 //
 // function のみ有効
 const Type*
-Type::function_type() const
+Type::function_output_type() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
