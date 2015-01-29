@@ -159,3 +159,11 @@ add_executable(parser_test
 target_link_libraries(parser_test
   ymsl
   )
+
+add_executable(TypeMgr_test
+  tests/TypeMgr_test.cc
+  )
+
+target_link_libraries(TypeMgr_test
+  ymsl
+  )

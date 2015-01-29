@@ -140,6 +140,9 @@ private:
   // ID番号
   ymuint mId;
 
+  // ハッシュ表中で次の要素を指すリンクポインタ
+  Type* mLink;
+
 };
 
 // @brief ID番号を得る

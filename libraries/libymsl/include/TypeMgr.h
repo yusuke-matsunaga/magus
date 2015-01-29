@@ -19,6 +19,10 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 /// @class TypeMgr TypeMgr.h "TypeMgr.h"
 /// @brief Type を管理するクラス
+///
+/// ここでは組み込み型と派生型の正規化を行う．
+/// 名前付きの型(enum と class)は名前空間で管理される．
+/// TypeMgr による正規化は行われない．
 //////////////////////////////////////////////////////////////////////
 class TypeMgr
 {
@@ -37,6 +41,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容をクリアする．
+  void
+  clear();
 
   /// @brief void 型を得る．
   const Type*
@@ -112,41 +120,15 @@ private:
   const Type*
   new_PrimType(TypeId type_id);
 
-  /// @brief array 型を作る．
-  /// @param[in] elem_type 要素の型
-  const Type*
-  new_ArrayType(const Type* elem_type);
-
-  /// @brief set 型を作る．
-  /// @param[in] elem_type 要素の型
-  const Type*
-  new_SetType(const Type* elem_type);
-
-  /// @brief map 型を作る．
-  /// @param[in] key_type キーの
-  /// @param[in] elem_type 要素の型
-  const Type*
-  new_MapType(const Type* key_type,
-	      const Type* elem_type);
-
-  /// @brief function 型を作る．
-  /// @param[in] output_type 出力の型
-  /// @param[in] input_type_list 入力の型のリスト
-  const Type*
-  new_FuncType(const Type* output_type,
-	       const vector<const Type*>& input_type_list);
-
-  /// @brief enum 型を作る．
-  /// @param[in] name 名前
-  /// @param[in] elem_list 要素名と値のリスト
-  const Type*
-  new_EnumType(ShString name,
-	       const vector<pair<ShString, int> >& elem_list);
-
   /// @brief 型を登録する．
   /// @param[in] type 登録する型
   void
   reg_type(Type* type);
+
+  /// @brief ハッシュ表を確保する．
+  /// @param[in] req_size 表のサイズ
+  void
+  alloc_table(ymuint req_size);
 
 
 private:
@@ -172,18 +154,17 @@ private:
   // string 型
   const Type* mStringType;
 
-  // array 型のハッシュ表
-  HashMap<const Type*, const Type*> mArrayTypeDic;
+  // ハッシュ表のサイズ
+  ymuint mHashSize;
 
-  // set 型のハッシュ表
-  HashMap<const Type*, const Type*> mSetTypeDic;
+  // ハッシュ表を拡張する目安
+  ymuint mNextLimit;
 
-  // map 型のハッシュ表
+  // ハッシュ表
+  Type** mHashTable;
 
-  // function 型のハッシュ表
-
-  // struct/class 型のハッシュ表
-  HashMap<ShString, const Type*> mClassTypeDic;
+  // ハッシュ表に登録されている要素数
+  ymuint mHashNum;
 
 };
 

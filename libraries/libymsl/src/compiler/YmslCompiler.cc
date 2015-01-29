@@ -56,8 +56,7 @@ YmslCompiler::compile(IDO& ido)
 
   mStmtList.clear();
 
-  Scope* toplevel_scope = new Scope(NULL, ShString("__main__"));
-  phase1(toplevel, toplevel_scope);
+  phase1(toplevel, NULL);
 
   for (vector<pair<const AstStatement*, Scope*> >::iterator p = mStmtList.begin();
        p != mStmtList.end(); ++ p) {
@@ -65,6 +64,26 @@ YmslCompiler::compile(IDO& ido)
     Scope* scope = p->second;
     phase2(stmt, scope);
   }
+
+  for (vector<Scope*>::iterator p = mScopeList.begin();
+      p != mScopeList.end(); ++ p) {
+    delete *p;
+  }
+  mScopeList.clear();
+
+  for (vector<Var*>::iterator p = mVarList.begin();
+       p != mVarList.end(); ++ p) {
+    delete *p;
+  }
+  mVarList.clear();
+
+  for (vector<Function*>::iterator p = mFuncList.begin();
+       p != mFuncList.end(); ++ p) {
+    delete *p;
+  }
+  mFuncList.clear();
+
+  mTypeMgr.clear();
 
   return true;
 }
@@ -80,7 +99,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
     {
-      Scope* block_scope = new Scope(scope);
+      Scope* block_scope = new_scope(scope);
 
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -149,7 +168,14 @@ YmslCompiler::phase1(const AstStatement* stmt,
     break;
 
   case kToplevel:
-    phase1(stmt->stmt(), scope);
+    {
+      Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
+      ymuint n = stmt->stmtlist_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
+	phase1(stmt1, toplevel_scope);
+      }
+    }
     break;
 
   case kVarDecl:
@@ -158,7 +184,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
 
   case kFor:
     {
-      Scope* for_scope = new Scope(scope);
+      Scope* for_scope = new_scope(scope);
       phase1(stmt->init_stmt(), for_scope);
       phase1(stmt->next_stmt(), for_scope);
       phase1(stmt->stmt(), for_scope);
@@ -646,6 +672,19 @@ YmslCompiler::symbol2expr(const AstSymbol* symbol,
 #endif
   // 型が合わない．
   return NULL;
+}
+
+// @brief スコープを生成する．
+// @param[in] parent_scope 親のスコープ
+// @param[in] name スコープ名
+Scope*
+YmslCompiler::new_scope(Scope* parent_scope,
+			ShString name)
+{
+  Scope* scope = new Scope(parent_scope, name);
+  mScopeList.push_back(scope);
+
+  return scope;
 }
 
 // @brief 変数を生成する．

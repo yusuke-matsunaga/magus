@@ -113,6 +113,13 @@ private:
   symbol2expr(const AstSymbol* symbol,
 	      Scope* scope);
 
+  /// @brief スコープを生成する．
+  /// @param[in] parent_scope 親のスコープ
+  /// @param[in] name スコープ名
+  Scope*
+  new_scope(Scope* parent_scope,
+	    ShString name = ShString());
+
   /// @brief 変数を生成する．
   /// @param[in] name 名前
   /// @param[in] type 型
@@ -141,6 +148,9 @@ private:
 
   // 文とスコープのリスト
   vector<pair<const AstStatement*, Scope*> > mStmtList;
+
+  // スコープのリスト
+  vector<Scope*> mScopeList;
 
   // 変数のリスト
   vector<Var*> mVarList;
