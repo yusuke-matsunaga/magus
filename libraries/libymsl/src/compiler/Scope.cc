@@ -130,15 +130,26 @@ Scope::alloc_table(ymuint req_size)
 SymHandle*
 Scope::find(ShString name) const
 {
+  SymHandle* h = find_local(name);
+  if ( h == NULL && mParent != NULL ) {
+    h = mParent->find(name);
+  }
+  return h;
+}
+
+// @brief 名前からハンドルを探す．
+// @param[in] name 名前
+//
+// こちらはこのスコープのみ探す．
+SymHandle*
+Scope::find_local(ShString name) const
+{
   ymuint pos = name.hash() % mHashSize;
   for (SymHandle* handle = mHashTable[pos];
        handle != NULL; handle = handle->mLink) {
     if ( handle->name() == name ) {
       return handle;
     }
-  }
-  if ( mParent != NULL ) {
-    return mParent->find(name);
   }
   return NULL;
 }

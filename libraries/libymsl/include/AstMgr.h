@@ -381,9 +381,15 @@ public:
 	       const FileRegion& loc);
 
   /// @brief 名前付きの型を作る．
+  /// @param[in] scope_list スコープ名のリスト
   /// @param[in] type_name 型名
+  /// @param[in] loc ファイル位置
+  ///
+  /// scope_list は NULL の場合もある．
   AstType*
-  new_NamedType(AstSymbol* type_name);
+  new_NamedType(AstSymbolList* scope_list,
+		AstSymbol* type_name,
+		const FileRegion& loc);
 
   /// @brief array 型を作る．
   /// @param[in] elem_type 要素の型

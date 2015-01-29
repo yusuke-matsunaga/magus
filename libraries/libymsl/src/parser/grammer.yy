@@ -99,6 +99,7 @@ fr_merge(const FileRegion fr_array[],
   AstStatement*     statement_type;
   AstStmtList*      stmtlist_type;
   AstSymbol*        symbol_type;
+  AstSymbolList*    symbollist_type;
   AstType*          type_type;
   StmtType          stmttype_type;
 }
@@ -201,6 +202,7 @@ fr_merge(const FileRegion fr_array[],
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
 %type <stmttype_type>   eqop
+%type <symbollist_type> scope_list
 %type <type_type>       type
 
 %%
@@ -548,7 +550,12 @@ type
 }
 | SYMBOL
 {
-  $$ = mgr.new_NamedType($1);
+  $$ = mgr.new_NamedType(NULL, $1, @$);
+}
+| scope_list DOT SYMBOL
+{
+  $$ = mgr.new_NamedType($1, $3, @$);
+  delete $1;
 }
 | ARRAY LP type RP
 {
@@ -561,6 +568,20 @@ type
 | MAP LP type COMMA type RP
 {
   $$ = mgr.new_MapType($3, $5, @$);
+}
+;
+
+// 階層名
+scope_list
+: SYMBOL
+{
+  $$ = new AstSymbolList;
+  $$->add($1);
+}
+| scope_list DOT SYMBOL
+{
+  $$ = $1;
+  $$->add($3);
 }
 ;
 

@@ -74,12 +74,6 @@ public:
 	  YmslCodeList& code_list,
 	  Ymsl_INT& addr);
 
-  /// @brief 内容を表示する．(デバッグ用)
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////

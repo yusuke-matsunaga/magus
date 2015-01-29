@@ -687,12 +687,30 @@ AstMgr::new_PrimType(TypeId type,
 }
 
 // @brief 名前付きの型を作る．
+// @param[in] scope_list スコープ名のリスト
 // @param[in] type_name 型名
+// @param[in] loc ファイル位置
 AstType*
-AstMgr::new_NamedType(AstSymbol* type_name)
+AstMgr::new_NamedType(AstSymbolList* scope_list,
+		      AstSymbol* type_name,
+		      const FileRegion& loc)
 {
+  ymuint n = 0;
+  AstSymbol** scope_array = NULL;
+  if ( scope_list != NULL ) {
+    n = scope_list->size();
+    void* q = mAlloc.get_memory(sizeof(AstSymbol*) * n);
+    scope_array = new (q) AstSymbol*[n];
+    ymuint pos = 0;
+    for (AstSymbolList::Iterator p = scope_list->begin();
+	 !p.is_end(); p.next()) {
+      scope_array[pos] = *p;
+      ++ pos;
+    }
+  }
+
   void* p = mAlloc.get_memory(sizeof(AstNamedType));
-  return new (p) AstNamedType(type_name);
+  return new (p) AstNamedType(n, scope_array, type_name, loc);
 }
 
 // @brief array 型を作る．

@@ -151,6 +151,7 @@ operator<<(ostream& s,
   case kSetType:     s << "__set__"; break;
   case kMapType:     s << "__map__"; break;
   case kFuncType:    s << "__function__"; break;
+  case kNamedType:   s << "__named__"; break;
   case kClassType:   s << "__class__"; break;
   case kEnumType:    s << "__enum__"; break;
   case kUserDefType: s << "__user__"; break;

@@ -10,7 +10,6 @@
 
 
 #include "ymsl_int.h"
-#include "YmslScope.h"
 #include "YmUtils/ShString.h"
 
 
@@ -29,6 +28,7 @@ public:
   YmslModule(ShString name);
 
   /// @brief デストラクタ
+  virtual
   ~YmslModule();
 
 
@@ -41,64 +41,37 @@ public:
   ShString
   name() const;
 
-  /// @brief 関数のリストを返す．
-  const vector<AstFuncDecl*>&
-  function_list() const;
+  /// @brief このモジュールが import しているモジュールの数を返す．
+  ymuint
+  imported_module_num() const;
 
-  /// @brief グローバル変数のリストを返す．
-  const vector<AstVarDecl*>&
-  global_var_list() const;
+  /// @brief このモジュールが import しているモジュールを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < imported_module_num() )
+  YmslModule*
+  imported_module(ymuint pos) const;
 
-  /// @brief 関数を探す．
-  /// @param[in] name 関数名
-  ///
-  /// 見つからなければ NULL を返す．
-  AstFuncDecl*
-  find_function(ShString name) const;
+  /// @brief このモジュールが export している関数の数を返す．
+  ymuint
+  exported_function_num() const;
 
-  /// @brief 変数を探す．
-  /// @param[in] name 変数名
-  ///
-  /// 見つからなければ NULL を返す．
-  AstVarDecl*
-  find_var(ShString name) const;
+  /// @brief このモジュールが export している関数を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < exported_function_num() )
+  Function*
+  exported_function(ymuint pos) const;
 
-#if 0
-public:
-  //////////////////////////////////////////////////////////////////////
-  // bison から用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  /// @brief このモジュールが export している変数の数を返す．
+  ymuint
+  exported_variable_num() const;
 
-  /// @brief 現在のブロックを返す．
-  AstBlock*
-  cur_block() const;
+  /// @brief このモジュールが export している変数を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < exported_variable_num() )
+  Var*
+  exported_variable(ymuint pos) const;
 
-  /// @brief 新しいブロックを作りスタックに積む．
-  /// @return 新しいブロックを返す．
-  AstBlock*
-  push_new_block();
+  /// @brief 関数リンクの数
+  ymuint
+  function_link_num() const;
 
-  /// @brief ブロックをスタックから取り去る．
-  void
-  pop_block();
-
-  /// @brief 関数を追加する．
-  void
-  add_function(AstFuncDecl* funcdecl);
-
-  /// @brief グローバル変数を追加する．
-  /// @param[in] vardecl 変数宣言
-  void
-  add_global_var(AstVarDecl* vardecl);
-
-  /// @brief 現在のブロックに変数を追加する．
-  void
-  add_local_var(AstVarDecl* vardecl);
-
-  /// @brief 現在のブロックに statement を追加する．
-  void
-  add_statement(AstStatement* stmt);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -108,25 +81,23 @@ private:
   // モジュール名
   ShString mName;
 
-  // グローバル辞書
-  // 関数とグローバル変数が登録されている
-  SymDict mGlobalDict;
-#if 0
-  // トップレベルブロック
-  AstBlock* mToplevelBlock;
+  // import されたモジュールの数
+  ymuint mImportedModuleNum;
 
-  // ブロックスタック
-  vector<AstBlock*> mBlockStack;
-#endif
+  // import されたモジュールの配列
+  YmslModule** mImportedModuleList;
 
-  // 関数のリスト
-  vector<AstFuncDecl*> mFuncList;
+  // export している関数の数
+  ymuint mExportedFuncNum;
 
-  // グローバル変数のリスト
-  vector<AstVarDecl*> mGlobalVarList;
+  // export している関数の配列
+  Function* mExportedFuncList;
 
-  // トップレベルのローカル変数のリスト
-  vector<AstVarDecl*> mLocalVarList;
+  // export している変数の数
+  ymuint mExportedVarNum;
+
+  // export している変数の配列
+  Var* mExportedVarList;
 
 };
 

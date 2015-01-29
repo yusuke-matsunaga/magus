@@ -624,41 +624,48 @@ AstPrinter::print_expr(const AstExpr* expr)
 void
 AstPrinter::print_type(const AstType* type)
 {
-  if ( type->named_type() ) {
-    mS << type->name()->str_val();
-  }
-  else {
-    switch ( type->type_id() ) {
-    case kVoidType:    mS << "void"; break;
-    case kBooleanType: mS << "boolean"; break;
-    case kIntType:     mS << "int"; break;
-    case kFloatType:   mS << "float"; break;
-    case kStringType:  mS << "string"; break;
+  switch ( type->type_id() ) {
+  case kVoidType:    mS << "void"; break;
+  case kBooleanType: mS << "boolean"; break;
+  case kIntType:     mS << "int"; break;
+  case kFloatType:   mS << "float"; break;
+  case kStringType:  mS << "string"; break;
 
-    case kArrayType:
-      mS << "array(";
-      print_type(type->elem_type());
-      mS << ")";
-      break;
+  case kArrayType:
+    mS << "array(";
+    print_type(type->elem_type());
+    mS << ")";
+    break;
 
-    case kSetType:
-      mS << "set(";
-      print_type(type->elem_type());
-      mS << ")";
-      break;
+  case kSetType:
+    mS << "set(";
+    print_type(type->elem_type());
+    mS << ")";
+    break;
 
-    case kMapType:
-      mS << "map(";
-      print_type(type->key_type());
-      mS << ", ";
-      print_type(type->elem_type());
-      mS << ")";
-      break;
+  case kMapType:
+    mS << "map(";
+    print_type(type->key_type());
+    mS << ", ";
+    print_type(type->elem_type());
+    mS << ")";
+    break;
 
-    default:
-      ASSERT_NOT_REACHED;
-      break;
+  case kNamedType:
+    {
+      ymuint n = type->scope_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	const AstSymbol* scope_symbol = type->scope(i);
+	mS << scope_symbol->str_val() << ".";
+      }
+      const AstSymbol* name_symbol = type->name();
+      mS << name_symbol->str_val();
     }
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+    break;
   }
 }
 

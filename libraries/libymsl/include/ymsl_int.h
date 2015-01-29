@@ -215,8 +215,9 @@ enum TypeId {
   kSetType,
   kMapType,
   kFuncType,
-  kClassType,
+  kNamedType,
   kEnumType,
+  kClassType,
   kUserDefType
 };
 

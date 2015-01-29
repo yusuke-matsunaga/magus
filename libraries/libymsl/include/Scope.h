@@ -74,6 +74,13 @@ public:
   SymHandle*
   find(ShString name) const;
 
+  /// @brief 名前からハンドルを探す．
+  /// @param[in] name 名前
+  ///
+  /// こちらはこのスコープのみ探す．
+  SymHandle*
+  find_local(ShString name) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

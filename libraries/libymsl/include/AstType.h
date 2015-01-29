@@ -36,38 +36,46 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 名前付き型の時 true を返す．
-  ///
-  /// 名前付き型の場合には type_id() は意味を持たない．
-  virtual
-  bool
-  named_type() const;
-
-  /// @brief 名前付き方の時に名前を返す．
-  virtual
-  const AstSymbol*
-  name() const;
-
   /// @brief 型番号を返す．
   virtual
   TypeId
   type_id() const = 0;
 
-  /// @brief map 型の時にキーの型を返す．
+  /// @brief キーの型を返す．
+  ///
+  /// kMapType のみ有効
   virtual
   const AstType*
   key_type() const;
 
-  /// @brief array/set/map 型の時に要素の型を返す．
+  /// @brief 要素の型を返す．
+  ///
+  /// kArrayType, kSetType, kMapType のみ有効
   virtual
   const AstType*
   elem_type() const;
 
-  /// @brief 内容を出力する．
-  /// @param[in] s 出力ストリーム
+  /// @brief スコープ名の数を返す．
+  ///
+  /// kNamedType のみ有効
   virtual
-  void
-  print(ostream& s) const = 0;
+  ymuint
+  scope_num() const;
+
+  /// @brief スコープ名を返す．
+  /// @param[in] pos 位置 ( 0 <= pos < scope_num() )
+  ///
+  /// kNamedType のみ有効
+  virtual
+  const AstSymbol*
+  scope(ymuint pos) const;
+
+  /// @brief 名前を返す．
+  ///
+  /// kNamedType のみ有効
+  virtual
+  const AstSymbol*
+  name() const;
 
 };
 

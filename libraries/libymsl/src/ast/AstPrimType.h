@@ -44,12 +44,6 @@ public:
   TypeId
   type_id() const;
 
-  /// @brief 内容を出力する．
-  /// @param[in] s 出力ストリーム
-  virtual
-  void
-  print(ostream& s) const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////

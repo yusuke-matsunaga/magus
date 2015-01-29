@@ -210,7 +210,16 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == kEnumDecl );
 
-  ShString name = stmt->name()->str_val();
+  const AstSymbol* name_symbol = stmt->name();
+  ShString name = name_symbol->str_val();
+
+  SymHandle* h = scope->find_local(name);
+  if ( h != NULL ) {
+    // name が重複している．
+    // previous definition is h->file_region()
+    return;
+  }
+
   ymint n = stmt->enum_num();
   vector<pair<ShString, int> > elem_list(n);
   int next_val = 0;
@@ -220,6 +229,7 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
     const AstExpr* ec_expr = stmt->enum_const_expr(i);
     int v;
     if ( ec_expr != NULL ) {
+      // ec_expr が定数式であるかのチェック
       // v = eval(ec_expr());
       // v が重複していないかチェック
     }
@@ -234,7 +244,6 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
   }
 
   const Type* type = mTypeMgr.enum_type(name, elem_list);
-
   scope->add_type(type);
 }
 
@@ -248,19 +257,37 @@ YmslCompiler::reg_func(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == kFuncDecl );
 
-  ShString name = stmt->name()->str_val();
+  const AstSymbol* name_symbol = stmt->name();
+  ShString name = name_symbol->str_val();
+
+  SymHandle* h = scope->find_local(name);
+  if ( h != NULL ) {
+    // name が重複している．
+    // previous definition is h->file_region()
+    return;
+  }
+
   const AstType* asttype = stmt->type();
   const Type* output_type = resolve_type(asttype, scope);
+  if ( output_type == NULL ) {
+    // エラーメッセージをどこで出すか考える．
+    return;
+  }
 
   ymuint np = stmt->param_num();
   vector<const Type*> input_type_list(np);
   for (ymuint i = 0; i < np; ++ i) {
     const AstType* asttype = stmt->param_type(i);
     const Type* type = resolve_type(asttype, scope);
+    if ( type == NULL ) {
+      // エラーメッセージをどこで出すか考える．
+      return;
+    }
     input_type_list[i] = type;
   }
 
   const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
+
   Function* func = new_function(name, ftype);
   scope->add_function(func);
 }
@@ -275,9 +302,22 @@ YmslCompiler::reg_var(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == kVarDecl );
 
-  ShString name = stmt->name()->str_val();
+  const AstSymbol* name_symbol = stmt->name();
+  ShString name = name_symbol->str_val();
+
+  SymHandle* h = scope->find_local(name);
+  if ( h != NULL ) {
+    // name が重複している．
+    // previous definition is h->file_region()
+    return;
+  }
+
   const AstType* asttype = stmt->type();
   const Type* type = resolve_type(asttype, scope);
+  if ( type == NULL ) {
+    // エラーメッセージをどこで出すか考える．
+    return;
+  }
 
   Var* var = new_var(name, type);
   scope->add_var(var);
@@ -291,11 +331,6 @@ const Type*
 YmslCompiler::resolve_type(const AstType* asttype,
 			   Scope* scope)
 {
-  if ( asttype->named_type() ) {
-    // スコープから名前の解決を行う
-    return NULL;
-  }
-
   switch ( asttype->type_id() ) {
   case kVoidType:
     return mTypeMgr.void_type();
@@ -346,9 +381,43 @@ YmslCompiler::resolve_type(const AstType* asttype,
     }
     break;
 
+  case kNamedType:
+    {
+      // スコープから名前の解決を行う
+      ymuint n = asttype->scope_num();
+      Scope* cur_scope = scope;
+      for (ymuint i = 0; i < n; ++ i) {
+	const AstSymbol* scope1_symbol = asttype->scope(i);
+	ShString scope1_name = scope1_symbol->str_val();
+	SymHandle* h = cur_scope->find(scope1_name);
+	if ( h == NULL ) {
+	  // scope1_name is not found
+	  return NULL;
+	}
+	cur_scope = h->scope();
+	if ( cur_scope == NULL ) {
+	  // scope1_name is not a scope
+	  return NULL;
+	}
+      }
+      const AstSymbol* name_symbol = asttype->name();
+      ShString name = name_symbol->str_val();
+      SymHandle* h = cur_scope->find(name);
+      if ( h == NULL ) {
+	// name is not defined
+	return NULL;
+      }
+      const Type* type = h->named_type();
+      if ( type == NULL ) {
+	// name is not a type;
+      }
+      return type;
+    }
+    break;
+
   case kFuncType:
-  case kClassType:
   case kEnumType:
+  case kClassType:
   case kUserDefType:
     // AstType でこれらの型はありえない．
     ASSERT_NOT_REACHED;
