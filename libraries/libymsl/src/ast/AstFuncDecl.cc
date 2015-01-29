@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] param_list パラメータリスト
 // @param[in] stmt 本体の文
 // @param[in] loc ファイル位置
-AstFuncDecl::AstFuncDecl(ShString name,
+AstFuncDecl::AstFuncDecl(AstSymbol* name,
 			 AstType* type,
 			 ymuint param_num,
 			 AstParam** param_list,
@@ -52,7 +52,7 @@ AstFuncDecl::stmt_type() const
 }
 
 // @brief 名前を得る．
-ShString
+const AstSymbol*
 AstFuncDecl::name() const
 {
   return mName;
@@ -78,7 +78,7 @@ AstFuncDecl::param_num() const
 // @param[in] pos 位置 ( 0 <= pos < param_num() )
 //
 // kFuncDecl のみ有効
-ShString
+const AstSymbol*
 AstFuncDecl::param_name(ymuint pos) const
 {
   ASSERT_COND( pos < param_num() );

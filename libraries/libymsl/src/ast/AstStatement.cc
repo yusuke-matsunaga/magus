@@ -30,11 +30,11 @@ AstStatement::~AstStatement()
 // @brief 名前を返す．
 //
 // kEnumDecl, kFuncDecl, kVarDecl のみ有効
-ShString
+const AstSymbol*
 AstStatement::name() const
 {
   ASSERT_NOT_REACHED;
-  return ShString();
+  return NULL;
 }
 
 // @brief 型を返す．
@@ -61,11 +61,11 @@ AstStatement::param_num() const
 // @param[in] pos 位置 ( 0 <= pos < param_num() )
 //
 // kFuncDecl のみ有効
-ShString
+const AstSymbol*
 AstStatement::param_name(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
-  return ShString();
+  return NULL;
 }
 
 // @brief パラメータの型を返す．

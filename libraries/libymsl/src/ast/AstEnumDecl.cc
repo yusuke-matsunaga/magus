@@ -49,10 +49,10 @@ AstEnumDecl::stmt_type() const
 // @brief 名前を返す．
 //
 // kEnumDecl, kFuncDecl, kVarDecl のみ有効
-ShString
+const AstSymbol*
 AstEnumDecl::name() const
 {
-  return mName->str_val();
+  return mName;
 }
 
 // @brief enum 定数の数を返す．

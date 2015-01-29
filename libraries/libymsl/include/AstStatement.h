@@ -10,7 +10,6 @@
 
 
 #include "Ast.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -45,9 +44,9 @@ public:
 
   /// @brief 名前を返す．
   ///
-  /// kEnumDecl, kFuncDecl, kVarDecl のみ有効
+  /// kEnumDecl, kFuncDecl, kVarDecl, kLabel のみ有効
   virtual
-  ShString
+  const AstSymbol*
   name() const;
 
   /// @brief 型を返す．
@@ -69,7 +68,7 @@ public:
   ///
   /// kFuncDecl のみ有効
   virtual
-  ShString
+  const AstSymbol*
   param_name(ymuint pos) const;
 
   /// @brief パラメータの型を返す．

@@ -57,6 +57,8 @@
 #include "AstVarDecl.h"
 #include "AstWhile.h"
 
+#include "YmUtils/ShString.h"
+
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -138,7 +140,7 @@ AstMgr::scan(YYSTYPE& lval,
 
   switch ( id ) {
   case SYMBOL:
-    lval.symbol_type = new_Symbol(ShString(mScanner->cur_string()), lloc);
+    lval.symbol_type = new_Symbol(mScanner->cur_string(), lloc);
     break;
 
   case STRING_VAL:
@@ -247,7 +249,7 @@ AstMgr::new_VarDecl(AstSymbol* name,
 		    const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstVarDecl));
-  return new (p) AstVarDecl(name->str_val(), type, init_expr, loc);
+  return new (p) AstVarDecl(name, type, init_expr, loc);
 }
 
 // @brief パラメータ宣言を作る．
@@ -262,7 +264,7 @@ AstMgr::new_Param(AstSymbol* name,
 		  const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstParam));
-  return new (p) AstParam(name->str_val(), type, init_expr, loc);
+  return new (p) AstParam(name, type, init_expr, loc);
 }
 
 // @brief 関数宣言を作る．
@@ -289,7 +291,7 @@ AstMgr::new_FuncDecl(AstSymbol* name,
   }
 
   void* p = mAlloc.get_memory(sizeof(AstFuncDecl));
-  return  new (p) AstFuncDecl(name->str_val(), type, param_num, param_array, stmt, loc);
+  return  new (p) AstFuncDecl(name, type, param_num, param_array, stmt, loc);
 }
 
 // @brief 代入文を作る．
@@ -732,11 +734,11 @@ AstMgr::new_MapType(AstType* key_type,
 // @param[in] str シンボル名
 // @param[in] loc ファイル位置
 AstSymbol*
-AstMgr::new_Symbol(ShString str,
+AstMgr::new_Symbol(const char* str,
 		   const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstSymbol));
-  return new (p) AstSymbol(str, loc);
+  return new (p) AstSymbol(ShString(str), loc);
 }
 
 END_NAMESPACE_YM_YMSL

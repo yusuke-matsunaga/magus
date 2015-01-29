@@ -12,7 +12,6 @@
 #include "ymsl_int.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/FileRegion.h"
-#include "YmUtils/ShString.h"
 #include "YmUtils/SimpleAlloc.h"
 
 
@@ -413,7 +412,7 @@ public:
   /// @param[in] str シンボル名
   /// @param[in] loc ファイル位置
   AstSymbol*
-  new_Symbol(ShString str,
+  new_Symbol(const char* str,
 	     const FileRegion& loc);
 
 

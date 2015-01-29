@@ -51,7 +51,7 @@ public:
   ///
   /// kEnumDecl, kFuncDecl, kVarDecl のみ有効
   virtual
-  ShString
+  const AstSymbol*
   name() const;
 
   /// @brief enum 定数の数を返す．

@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] type 型
 // @param[in] expr 初期化式
 // @param[in] loc ファイル位置
-AstVarDecl::AstVarDecl(ShString name,
+AstVarDecl::AstVarDecl(AstSymbol* name,
 		       AstType* type,
 		       AstExpr* expr,
 		       const FileRegion& loc) :
@@ -47,7 +47,7 @@ AstVarDecl::stmt_type() const
 // @brief 名前を返す．
 //
 // kEnumDecl, kFuncDecl, kVarDecl のみ有効
-ShString
+const AstSymbol*
 AstVarDecl::name() const
 {
   return mName;

@@ -10,7 +10,6 @@
 
 
 #include "AstStatement.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -33,7 +32,7 @@ public:
   /// @param[in] param_list パラメータリスト
   /// @param[in] stmt 本体の文
   /// @param[in] loc ファイル位置
-  AstFuncDecl(ShString name,
+  AstFuncDecl(AstSymbol* name,
 	      AstType* type,
 	      ymuint param_num,
 	      AstParam** param_list,
@@ -57,7 +56,7 @@ public:
 
   /// @brief 名前を得る．
   virtual
-  ShString
+  const AstSymbol*
   name() const;
 
   /// @brief 出力の型を返す．
@@ -77,7 +76,7 @@ public:
   ///
   /// kFuncDecl のみ有効
   virtual
-  ShString
+  const AstSymbol*
   param_name(ymuint pos) const;
 
   /// @brief パラメータの型を返す．
@@ -110,7 +109,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 名前
-  ShString mName;
+  AstSymbol* mName;
 
   // 出力の型
   AstType* mType;

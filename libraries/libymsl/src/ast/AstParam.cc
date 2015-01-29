@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] type 型
 // @param[in] init_expr 初期化式
 // @param[in] loc ファイル位置
-AstParam::AstParam(ShString name,
+AstParam::AstParam(AstSymbol* name,
 		   AstType* type,
 		   AstExpr* init_expr,
 		   const FileRegion& loc) :
@@ -38,7 +38,7 @@ AstParam::~AstParam()
 }
 
 // @brief 名前を得る．
-ShString
+const AstSymbol*
 AstParam::name() const
 {
   return mName;

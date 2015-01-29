@@ -140,6 +140,12 @@ YmslCompiler::phase1(const AstStatement* stmt,
     break;
 
   case kSwitch:
+    {
+      ymuint n = stmt->switch_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	phase1(stmt->case_stmt(i), scope);
+      }
+    }
     break;
 
   case kToplevel:
@@ -178,7 +184,7 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == kEnumDecl );
 
-  ShString name = stmt->name();
+  ShString name = stmt->name()->str_val();
   ymint n = stmt->enum_num();
   vector<pair<ShString, int> > elem_list(n);
   int next_val = 0;
@@ -216,7 +222,7 @@ YmslCompiler::reg_func(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == kFuncDecl );
 
-  ShString name = stmt->name();
+  ShString name = stmt->name()->str_val();
   const AstType* asttype = stmt->type();
   const Type* output_type = resolve_type(asttype, scope);
 
@@ -243,7 +249,7 @@ YmslCompiler::reg_var(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == kVarDecl );
 
-  ShString name = stmt->name();
+  ShString name = stmt->name()->str_val();
   const AstType* asttype = stmt->type();
   const Type* type = resolve_type(asttype, scope);
 

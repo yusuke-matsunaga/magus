@@ -10,7 +10,6 @@
 
 
 #include "AstStatement.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -22,8 +21,6 @@ BEGIN_NAMESPACE_YM_YMSL
 class AstVarDecl :
   public AstStatement
 {
-  friend class YmslModule;
-
 public:
 
   /// @brief コンストラクタ
@@ -33,7 +30,7 @@ public:
   /// @param[in] loc ファイル位置
   ///
   /// expr は NULL の場合もある．
-  AstVarDecl(ShString name,
+  AstVarDecl(AstSymbol* name,
 	     AstType* type,
 	     AstExpr* expr,
 	     const FileRegion& loc);
@@ -57,7 +54,7 @@ public:
   ///
   /// kEnumDecl, kFuncDecl, kVarDecl のみ有効
   virtual
-  ShString
+  const AstSymbol*
   name() const;
 
   /// @brief 型を返す．
@@ -81,7 +78,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 名前
-  ShString mName;
+  AstSymbol* mName;
 
   // 変数の型
   AstType* mType;

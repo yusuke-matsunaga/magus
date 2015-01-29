@@ -10,7 +10,6 @@
 
 
 #include "Ast.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -29,7 +28,7 @@ public:
   /// @param[in] type 型
   /// @param[in] init_expr 初期化式
   /// @param[in] loc ファイル位置
-  AstParam(ShString name,
+  AstParam(AstSymbol* name,
 	   AstType* type,
 	   AstExpr* init_expr,
 	   const FileRegion& loc);
@@ -45,7 +44,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 名前を得る．
-  ShString
+  const AstSymbol*
   name() const;
 
   /// @brief 型を得る．
@@ -65,7 +64,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 名前
-  ShString mName;
+  AstSymbol* mName;
 
   // 変数の型
   AstType* mType;

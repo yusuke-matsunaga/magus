@@ -80,7 +80,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kEnumDecl:
     print_indent(indent);
-    mS << "enum " << stmt->name() << " {" << endl;
+    mS << "enum " << stmt->name()->str_val() << " {" << endl;
     {
       ymuint n = stmt->enum_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -210,11 +210,11 @@ AstPrinter::print_statement(const AstStatement* stmt,
   case kFuncDecl:
     {
       print_indent(indent);
-      mS << "function " << stmt->name() << "(";
+      mS << "function " << stmt->name()->str_val() << "(";
       ymuint np = stmt->param_num();
       const char* comma = "";
       for (ymuint i = 0; i < np; ++ i) {
-	mS << comma << stmt->param_name(i) << ": ";
+	mS << comma << stmt->param_name(i)->str_val() << ": ";
 	print_type(stmt->param_type(i));
 	const AstExpr* expr = stmt->param_expr(i);
 	if ( expr != NULL ) {
@@ -327,7 +327,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case kVarDecl:
     print_indent(indent);
-    mS << "var " << stmt->name() << ": ";
+    mS << "var " << stmt->name()->str_val() << ": ";
     print_type(stmt->type());
     {
       const AstExpr* expr = stmt->expr();
