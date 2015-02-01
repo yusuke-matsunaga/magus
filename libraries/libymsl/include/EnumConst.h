@@ -38,8 +38,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 親の enum 型を返す．
-  Type*
-  parent() const;
+  const Type*
+  parent_type() const;
 
   /// @brief 名前を返す．
   ShString
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親の enum 型
-  Type* mParent;
+  const Type* mParentType;
 
   // 名前
   ShString mName;

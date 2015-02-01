@@ -28,10 +28,10 @@ EnumConst::~EnumConst()
 }
 
 // @brief enum 型を返す．
-Type*
-EnumConst::parent() const
+const Type*
+EnumConst::parent_type() const
 {
-  return mParent;
+  return mParentType;
 }
 
 // @brief 名前を返す．
@@ -58,13 +58,13 @@ EnumConst::val() const
 // @param[in] elem_list 要素名と値のリスト
 EnumType::EnumType(ShString name,
 		   const vector<pair<ShString, int> >& elem_list) :
-  NamedType(name),
+  NamedType(kEnumType, name),
   mElemNum(elem_list.size())
 {
   mElemArray = new EnumConst[mElemNum];
   for (ymuint i = 0; i < mElemNum; ++ i) {
     EnumConst& enum_const = mElemArray[i];
-    enum_const.mParent = this;
+    enum_const.mParentType = this;
     enum_const.mName = elem_list[i].first;
     enum_const.mVal = elem_list[i].second;
   }
@@ -76,11 +76,12 @@ EnumType::~EnumType()
   delete [] mElemArray;
 }
 
-// @brief 型を得る．
-TypeId
-EnumType::type_id() const
+// @brief 指定された型にキャスト可能な場合に true を返す．
+// @param[in] type 指定された型
+bool
+EnumType::castable_to(const Type* type) const
 {
-  return kEnumType;
+  return type == this;
 }
 
 // @brief 列挙型の数を得る．

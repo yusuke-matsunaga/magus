@@ -19,8 +19,11 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] type 型
-TypeHandle::TypeHandle(const Type* type) :
-  mType(type)
+// @param[in] scope スコープ
+TypeHandle::TypeHandle(const Type* type,
+		       Scope* scope) :
+  mType(type),
+  mScope(scope)
 {
 }
 
@@ -34,6 +37,15 @@ ShString
 TypeHandle::name() const
 {
   return mType->type_name();
+}
+
+// @brief スコープを返す．
+//
+// 他の要素の場合には NULL を返す．
+Scope*
+TypeHandle::scope() const
+{
+  return mScope;
 }
 
 // @brief 型を返す．

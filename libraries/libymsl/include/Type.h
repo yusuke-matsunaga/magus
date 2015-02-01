@@ -27,7 +27,8 @@ class Type
 public:
 
   /// @brief コンストラクタ
-  Type();
+  /// @param[in] type_id タイプID
+  Type(TypeId type_id);
 
   /// @brief デストラクタ
   virtual
@@ -40,9 +41,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 型を得る．
-  virtual
   TypeId
-  type_id() const = 0;
+  type_id() const;
+
+  /// @brief 指定された型にキャスト可能な場合に true を返す．
+  /// @param[in] type 指定された型
+  virtual
+  bool
+  castable_to(const Type* type) const = 0;
 
   /// @brief 型名を得る．
   ///
@@ -136,6 +142,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // タイプID
+  TypeId mTypeId;
 
   // ID番号
   ymuint mId;

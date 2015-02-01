@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] type 型
 // @param[in] val 値
-IrIntConst::IrIntConst(int val) :
+IrIntConst::IrIntConst(const Type* type,
+		       int val) :
+  IrNode(kOpIntConst, type),
   mVal(val)
 {
 }
@@ -26,13 +29,6 @@ IrIntConst::IrIntConst(int val) :
 // @brief デストラクタ
 IrIntConst::~IrIntConst()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrIntConst::opcode() const
-{
-  return kOpIntConst;
 }
 
 // @brief 整数値を返す．

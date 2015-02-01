@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] type 型
 PrimType::PrimType(TypeId type) :
-  mType(type)
+  Type(type)
 {
 }
 
@@ -28,11 +28,56 @@ PrimType::~PrimType()
 {
 }
 
-// @brief 型を得る．
-TypeId
-PrimType::type_id() const
+// @brief 指定された型にキャスト可能な場合に true を返す．
+// @param[in] type 指定された型
+bool
+PrimType::castable_to(const Type* type) const
 {
-  return mType;
+  switch ( type->type_id() ) {
+  case kBooleanType:
+    switch ( type_id() ) {
+    case kBooleanType:
+    case kIntType:
+    case kFloatType:
+      return true;
+
+    default:
+      return false;
+    }
+
+  case kIntType:
+    switch ( type_id() ) {
+    case kBooleanType:
+    case kIntType:
+      return true;
+
+    default:
+      return false;
+    }
+
+  case kFloatType:
+    switch ( type_id() ) {
+    case kIntType:
+    case kFloatType:
+      return true;
+
+    default:
+      return false;
+    }
+
+  case kStringType:
+    switch ( type_id() ) {
+    case kStringType:
+      return true;
+
+    default:
+      return false;
+    }
+
+  default:
+    break;
+  }
+  return false;
 }
 
 // @brief 内容を出力する．

@@ -24,8 +24,10 @@ class IrStringConst :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] type 型
   /// @param[in] val 値
-  IrStringConst(const char* val);
+  IrStringConst(const Type* type,
+		const char* val);
 
   /// @brief デストラクタ
   virtual
@@ -36,11 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
 
   /// @brief 文字列を返す．
   virtual

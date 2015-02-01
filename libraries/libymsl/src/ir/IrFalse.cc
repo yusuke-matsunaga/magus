@@ -17,20 +17,15 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-IrFalse::IrFalse()
+// @param[in] type 型
+IrFalse::IrFalse(const Type* type) :
+  IrNode(kOpFalse, type)
 {
 }
 
 // @brief デストラクタ
 IrFalse::~IrFalse()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrFalse::opcode() const
-{
-  return kOpFalse;
 }
 
 END_NAMESPACE_YM_YMSL

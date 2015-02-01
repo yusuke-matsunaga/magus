@@ -24,8 +24,10 @@ class IrFloatConst :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] type 型
   /// @param[in] val 値
-  IrFloatConst(double val);
+  IrFloatConst(const Type* type,
+	       double val);
 
   /// @brief デストラクタ
   virtual
@@ -36,11 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
 
   /// @brief 実数値を返す．
   virtual

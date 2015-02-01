@@ -19,6 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] elem_type 要素の型
 SetType::SetType(const Type* elem_type) :
+  Type(kSetType),
   mElemType(elem_type)
 {
 }
@@ -28,11 +29,12 @@ SetType::~SetType()
 {
 }
 
-// @brief 型を得る．
-TypeId
-SetType::type_id() const
+// @brief 指定された型にキャスト可能な場合に true を返す．
+// @param[in] type 指定された型
+bool
+SetType::castable_to(const Type* type) const
 {
-  return kSetType;
+  return type == this;
 }
 
 // @brief 要素の型を得る．

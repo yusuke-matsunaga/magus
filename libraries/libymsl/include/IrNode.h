@@ -22,9 +22,15 @@ class IrNode
 {
 public:
 
+  /// @brief コンストラクタ
+  /// @param[in] opcode オペコード
+  /// @param[in] type 型
+  IrNode(OpCode opcode,
+	 const Type* type);
+
   /// @brief デストラクタ
   virtual
-  ~IrNode() { }
+  ~IrNode();
 
 
 public:
@@ -33,9 +39,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief opcode を返す．
-  virtual
   OpCode
-  opcode() const = 0;
+  opcode() const;
+
+  /// @brief 型を返す．
+  const Type*
+  type() const;
 
   /// @brief 第1ソースを返す．
   virtual
@@ -109,6 +118,18 @@ public:
   virtual
   void
   set_addr(IrNode* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // オペコード
+  OpCode mOpCode;
+
+  // 型
+  const Type* mType;
 
 };
 

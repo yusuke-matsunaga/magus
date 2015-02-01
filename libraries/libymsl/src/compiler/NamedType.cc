@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] type_id タイプID
 // @param[in] name 名前
-NamedType::NamedType(ShString name) :
+NamedType::NamedType(TypeId type_id,
+		     ShString name) :
+  Type(type_id),
   mName(name)
 {
 }

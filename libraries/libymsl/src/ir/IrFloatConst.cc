@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] type 型
 // @param[in] val 値
-IrFloatConst::IrFloatConst(double val) :
+IrFloatConst::IrFloatConst(const Type* type,
+			   double val) :
+  IrNode(kOpFloatConst, type),
   mVal(val)
 {
 }
@@ -26,13 +29,6 @@ IrFloatConst::IrFloatConst(double val) :
 // @brief デストラクタ
 IrFloatConst::~IrFloatConst()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrFloatConst::opcode() const
-{
-  return kOpFloatConst;
 }
 
 // @brief 実数値を返す．

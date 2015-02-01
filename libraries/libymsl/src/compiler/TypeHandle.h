@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] type 型
-  TypeHandle(const Type* type);
+  /// @param[in] scope スコープ
+  TypeHandle(const Type* type,
+	     Scope* scope);
 
   /// @brief デストラクタ
   virtual
@@ -42,6 +44,13 @@ public:
   ShString
   name() const;
 
+  /// @brief スコープを返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  Scope*
+  scope() const;
+
   /// @brief 名前付き型を返す．
   ///
   /// 他の要素の場合には NULL を返す．
@@ -57,6 +66,9 @@ private:
 
   // 型
   const Type* mType;
+
+  // スコープ
+  Scope* mScope;
 
 };
 

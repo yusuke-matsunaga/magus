@@ -86,10 +86,12 @@ Scope::add_var(const Var* item)
 
 // @brief 型を追加する．
 // @param[in] item 追加する要素
+// @param[in] scope item のスコープ
 void
-Scope::add_type(const Type* item)
+Scope::add_type(const Type* item,
+		Scope* scope)
 {
-  SymHandle* handle = new TypeHandle(item);
+  SymHandle* handle = new TypeHandle(item, scope);
   put(handle);
 }
 

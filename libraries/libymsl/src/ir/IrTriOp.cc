@@ -18,12 +18,14 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] opcode オペコード
+// @param[in] type 型
 // @param[in] src1, src2, src3 オペランド
 IrTriOp::IrTriOp(OpCode opcode,
+		 const Type* type,
 		 IrNode* src1,
 		 IrNode* src2,
 		 IrNode* src3) :
-  mOpCode(opcode),
+  IrNode(opcode, type),
   mSrc1(src1),
   mSrc2(src2),
   mSrc3(src3)
@@ -33,13 +35,6 @@ IrTriOp::IrTriOp(OpCode opcode,
 // @brief デストラクタ
 IrTriOp::~IrTriOp()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrTriOp::opcode() const
-{
-  return mOpCode;
 }
 
 // @brief 第1ソースを返す．

@@ -16,6 +16,35 @@ BEGIN_NAMESPACE_YM_YMSL
 // クラス IrNode
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+// @param[in] opcode オペコード
+// @param[in] type 型
+IrNode::IrNode(OpCode opcode,
+	       const Type* type) :
+  mOpCode(opcode),
+  mType(type)
+{
+}
+
+// @brief デストラクタ
+IrNode::~IrNode()
+{
+}
+
+// @brief opcode を返す．
+OpCode
+IrNode::opcode() const
+{
+  return mOpCode;
+}
+
+// @brief 型を返す．
+const Type*
+IrNode::type() const
+{
+  return mType;
+}
+
 // @brief 第1ソースを返す．
 IrNode*
 IrNode::src1() const

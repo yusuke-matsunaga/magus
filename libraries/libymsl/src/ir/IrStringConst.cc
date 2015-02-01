@@ -18,7 +18,10 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] val 値
-IrStringConst::IrStringConst(const char* val) :
+// @param[in] type 型
+IrStringConst::IrStringConst(const Type* type,
+			     const char* val) :
+  IrNode(kOpStringConst, type),
   mVal(val)
 {
 }
@@ -26,13 +29,6 @@ IrStringConst::IrStringConst(const char* val) :
 // @brief デストラクタ
 IrStringConst::~IrStringConst()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrStringConst::opcode() const
-{
-  return kOpStringConst;
 }
 
 // @brief 文字列を返す．

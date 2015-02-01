@@ -25,8 +25,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] opcode オペコード
+  /// @param[in] type 型
   /// @param[in] src1, src2, src3 オペランド
   IrTriOp(OpCode opcode,
+	  const Type* type,
 	  IrNode* src1,
 	  IrNode* src2,
 	  IrNode* src3);
@@ -40,11 +42,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
 
   /// @brief 第1ソースを返す．
   virtual

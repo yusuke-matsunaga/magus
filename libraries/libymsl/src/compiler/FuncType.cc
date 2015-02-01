@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] input_type_list 入力の型のリスト
 FuncType::FuncType(const Type* output_type,
 		   const vector<const Type*>& input_type_list) :
+  Type(kFuncType),
   mOutputType(output_type),
   mInputType(input_type_list.size())
 {
@@ -34,11 +35,12 @@ FuncType::~FuncType()
 {
 }
 
-// @brief 型を得る．
-TypeId
-FuncType::type_id() const
+// @brief 指定された型にキャスト可能な場合に true を返す．
+// @param[in] type 指定された型
+bool
+FuncType::castable_to(const Type* type) const
 {
-  return kFuncType;
+  return type == this;
 }
 
 // @brief 関数の出力の型を返す．

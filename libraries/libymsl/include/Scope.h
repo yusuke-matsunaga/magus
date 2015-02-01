@@ -61,8 +61,10 @@ public:
 
   /// @brief 型を追加する．
   /// @param[in] item 追加する要素
+  /// @param[in] scope item のスコープ
   void
-  add_type(const Type* item);
+  add_type(const Type* item,
+	   Scope* scope);
 
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素

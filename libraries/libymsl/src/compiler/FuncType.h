@@ -39,10 +39,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を得る．
+  /// @brief 指定された型にキャスト可能な場合に true を返す．
+  /// @param[in] type 指定された型
   virtual
-  TypeId
-  type_id() const;
+  bool
+  castable_to(const Type* type) const;
 
   /// @brief 関数の出力の型を返す．
   ///

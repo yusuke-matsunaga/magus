@@ -17,13 +17,22 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-Type::Type()
+// @param[in] type_id タイプID
+Type::Type(TypeId type_id) :
+  mTypeId(type_id)
 {
 }
 
 // @brief デストラクタ
 Type::~Type()
 {
+}
+
+// @brief 型を得る．
+TypeId
+Type::type_id() const
+{
+  return mTypeId;
 }
 
 // @brief 型名を得る．

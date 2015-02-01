@@ -25,8 +25,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] opcode オペコード
+  /// @param[in] type 型
   /// @param[in] src1 オペランド
   IrUniOp(OpCode opcode,
+	  const Type* type,
 	  IrNode* src1);
 
   /// @brief デストラクタ
@@ -39,11 +41,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
-
   /// @brief 第1ソースを返す．
   virtual
   IrNode*
@@ -54,9 +51,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // opcode
-  OpCode mOpCode;
 
   // 第1ソース
   IrNode* mSrc1;

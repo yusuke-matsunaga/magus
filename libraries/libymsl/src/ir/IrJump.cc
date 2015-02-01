@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] opcode オペコード
 IrJump::IrJump(OpCode opcode) :
-  mOpCode(opcode)
+  IrNode(opcode, NULL)
 {
   mJumpAddr = NULL;
 }

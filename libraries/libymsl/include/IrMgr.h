@@ -25,7 +25,8 @@ class IrMgr
 public:
 
   /// @brief コンストラクタ
-  IrMgr();
+  /// @param[in] type_mgr 型を管理するオブジェクト
+  IrMgr(TypeMgr& type_mgr);
 
   /// @brief デストラクタ
   ~IrMgr();
@@ -61,24 +62,30 @@ public:
 
   /// @brief 単項演算式を生成する．
   /// @param[in] opcode オペコード
+  /// @param[in] type 出力の型
   /// @param[in] opr1 オペランド
   IrNode*
   new_UniOp(OpCode opcode,
+	    const Type* type,
 	    IrNode* opr1);
 
   /// @brief 二項演算式を生成する．
   /// @param[in] opcode オペコード
+  /// @param[in] type 出力の型
   /// @param[in] opr1, opr2 オペランド
   IrNode*
   new_BinOp(OpCode opcode,
+	    const Type* type,
 	    IrNode* opr1,
 	    IrNode* opr2);
 
   /// @brief 三項演算式を生成する．
   /// @param[in] opcode オペコード
+  /// @param[in] type 出力の型
   /// @param[in] opr1, opr2, opr3 オペランド
   IrNode*
   new_TriOp(OpCode opcode,
+	    const Type* type,
 	    IrNode* opr1,
 	    IrNode* opr2,
 	    IrNode* opr3);
@@ -100,6 +107,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 型を管理するオブジェクト
+  TypeMgr& mTypeMgr;
 
   // メモリアロケータ
   SimpleAlloc mAlloc;

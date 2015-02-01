@@ -24,22 +24,12 @@ class IrFalse :
 public:
 
   /// @brief コンストラクタ
-  IrFalse();
+  /// @param[in] type 型
+  IrFalse(const Type* type);
 
   /// @brief デストラクタ
   virtual
   ~IrFalse();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
 
 };
 

@@ -8,6 +8,8 @@
 
 
 #include "IrFuncCall.h"
+#include "Function.h"
+#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -21,6 +23,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] arglist 引数リスト
 IrFuncCall::IrFuncCall(const Function* func,
 		       const vector<IrNode*>& arglist) :
+  IrNode(kOpFuncCall, func->type()->function_output_type()),
   mFunc(func)
 {
   mArgNum = arglist.size();
@@ -34,13 +37,6 @@ IrFuncCall::IrFuncCall(const Function* func,
 IrFuncCall::~IrFuncCall()
 {
   delete [] mArgList;
-}
-
-// @brief opcode を返す．
-OpCode
-IrFuncCall::opcode() const
-{
-  return kOpFuncCall;
 }
 
 // @brief 関数本体を返す．

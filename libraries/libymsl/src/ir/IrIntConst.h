@@ -24,8 +24,10 @@ class IrIntConst :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] type 型
   /// @param[in] val 値
-  IrIntConst(int val);
+  IrIntConst(const Type* type,
+	     int val);
 
   /// @brief デストラクタ
   virtual
@@ -36,11 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
 
   /// @brief 整数値を返す．
   virtual

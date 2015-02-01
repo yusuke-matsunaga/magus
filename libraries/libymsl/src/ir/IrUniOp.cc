@@ -18,10 +18,12 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] opcode オペコード
+// @param[in] type 型
 // @param[in] src1 オペランド
 IrUniOp::IrUniOp(OpCode opcode,
+		 const Type* type,
 		 IrNode* src1) :
-  mOpCode(opcode),
+  IrNode(opcode, type),
   mSrc1(src1)
 {
 }
@@ -29,13 +31,6 @@ IrUniOp::IrUniOp(OpCode opcode,
 // @brief デストラクタ
 IrUniOp::~IrUniOp()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrUniOp::opcode() const
-{
-  return mOpCode;
 }
 
 // @brief 第1ソースを返す．

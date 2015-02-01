@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] elem_type 要素の型
 MapType::MapType(const Type* key_type,
 		 const Type* elem_type) :
+  Type(kMapType),
   mKeyType(key_type),
   mElemType(elem_type)
 {
@@ -31,11 +32,12 @@ MapType::~MapType()
 {
 }
 
-// @brief 型を得る．
-TypeId
-MapType::type_id() const
+// @brief 指定された型にキャスト可能な場合に true を返す．
+// @param[in] type 指定された型
+bool
+MapType::castable_to(const Type* type) const
 {
-  return kMapType;
+  return type == this;
 }
 
 // @brief キーの型を得る．

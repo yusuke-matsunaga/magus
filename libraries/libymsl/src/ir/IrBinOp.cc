@@ -18,11 +18,13 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] opcode オペコード
+// @param[in] type 型
 // @param[in] src1, src2 オペランド
 IrBinOp::IrBinOp(OpCode opcode,
+		 const Type* type,
 		 IrNode* src1,
 		 IrNode* src2) :
-  mOpCode(opcode),
+  IrNode(opcode, type),
   mSrc1(src1),
   mSrc2(src2)
 {
@@ -31,13 +33,6 @@ IrBinOp::IrBinOp(OpCode opcode,
 // @brief デストラクタ
 IrBinOp::~IrBinOp()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrBinOp::opcode() const
-{
-  return mOpCode;
 }
 
 // @brief 第1ソースを返す．

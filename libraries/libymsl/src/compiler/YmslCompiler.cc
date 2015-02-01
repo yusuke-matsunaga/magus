@@ -19,8 +19,8 @@
 #include "Var.h"
 #include "Scope.h"
 #include "Type.h"
-#include "IrExpr.h"
 #include "SymHandle.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -30,7 +30,8 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslCompiler::YmslCompiler()
+YmslCompiler::YmslCompiler() :
+  mIrMgr(mTypeMgr)
 {
 }
 
@@ -244,7 +245,8 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
   }
 
   const Type* type = mTypeMgr.enum_type(name, elem_list);
-  scope->add_type(type);
+  Scope* enum_scope = new_scope(scope, name);
+  scope->add_type(type, enum_scope);
 }
 
 // @brief 関数の定義を行う．
@@ -531,16 +533,32 @@ IrNode*
 YmslCompiler::elab_rhs(const AstExpr* ast_expr,
 		       Scope* scope)
 {
-  IrNode* opr[3] = { NULL, NULL, NULL };
   ASSERT_COND( ast_expr->operand_num() <= 3 );
-  for (ymuint i = 0; i < ast_expr->operand_num(); ++ i) {
-    IrNode* opr1 = elab_rhs(ast_expr->operand(i), scope);
-    if ( opr1 == NULL ) {
+
+  IrNode* op0 = NULL;
+  IrNode* op1 = NULL;
+  IrNode* op2 = NULL;
+  ymuint nop = ast_expr->operand_num();
+  if ( nop > 0 ) {
+    op0 = elab_rhs(ast_expr->operand(0), scope);
+    if ( op0 == NULL ) {
       return NULL;
     }
-    opr[i] = opr1;
+    if ( nop > 1 ) {
+      op1 = elab_rhs(ast_expr->operand(1), scope);
+      if ( op1 == NULL ) {
+	return NULL;
+      }
+      if ( nop > 2 ) {
+	op2 = elab_rhs(ast_expr->operand(2), scope);
+	if ( op2 == NULL ) {
+	  return NULL;
+	}
+      }
+    }
   }
 
+  OpCode opcode = kOpHalt;
   switch ( ast_expr->expr_type() ) {
   case kTrue:
     return mIrMgr.new_True();
@@ -557,141 +575,115 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
   case kStringConst:
     return mIrMgr.new_StringConst(ast_expr->string_val());
 
-#if 0
-  case kSymbolExpr:
-    {
-      SymHandle* h = scope->find(ast_expr->symbol());
-      if ( h != NULL ) {
-	// ast_expr-symbol() is not found
-	return NULL;
-      }
-      const Var* var = h->var();
-      if ( var != NULL ) {
-	// エラーメッセージ
-	return NULL;
-      }
-
-    }
-
-  case kArrayRef:
-    {
-      IrNode* body = elab_rhs(ast_expr->body(), scope);
-      IrNode* index = elab_rhs(ast_expr->index(), scope);
-      return mIrMgr.new_ArrayRef(body, index);
-    }
-    break;
-
-  case kMemberRef:
-    {
-      const AstExpr* body_expr = ast_expr->body();
-      SymHandle* h = resolve_symbol(body_expr, scope);
-
-      Scope* scope1 = h->scope();
-      if ( scope1 != NULL ) {
-
-	const Var* var = resolve_var(ast_expr->symbol(), scope1);
-
-      }
-
-      const Type* type = h->named_type();
-      if ( type != NULL ) {
-	ASSERT_COND( type->type_id() == kEnumType );
-	int index = type->enum_index(ast_expr->symbol());
-	if ( index == -1 ) {
-	  // ast_expr->symbol() is not an enum element
-	  return NULL;
-	}
-	int val = type->elem_val(index);
-	return mIrMgr.new_IntConst(val);
-      }
-
-      const Var* var = h->var();
-      if ( var != NULL ) {
-	const Type* type = var->value_type();
-	// type から symbol という名のメンバを探す．
-	//return mIrMgr.new_MemberRef(body, symbol);
-      }
-
-      ASSERT_NOT_REACHED;
-      return NULL;
-    }
-    break;
-#endif
-
   case kCastInt:
-    return mIrMgr.new_UniOp(kOpCastInt, opr[0]);
+    opcode = kOpCastInt;
+    break;
 
   case kCastBoolean:
-    return mIrMgr.new_UniOp(kOpCastBoolean, opr[0]);
+    opcode = kOpCastBoolean;
+    break;
 
   case kCastFloat:
-    return mIrMgr.new_UniOp(kOpCastFloat, opr[0]);
+    opcode = kOpCastFloat;
+    break;
 
   case kBitNeg:
-    return mIrMgr.new_UniOp(kOpBitNeg, opr[0]);
+    opcode = kOpBitNeg;
+    break;
 
   case kLogNot:
-    return mIrMgr.new_UniOp(kOpLogNot, opr[0]);
+    opcode = kOpLogNot;
+    break;
 
   case kUniMinus:
-    return mIrMgr.new_UniOp(kOpUniMinus, opr[0]);
+    opcode = kOpUniMinus;
+    break;
 
   case kBitAnd:
-    return mIrMgr.new_BinOp(kOpBitAnd, opr[0], opr[1]);
+    opcode = kOpBitAnd;
+    break;
 
   case kBitOr:
-    return mIrMgr.new_BinOp(kOpBitOr, opr[0], opr[1]);
+    opcode = kOpBitOr;
+    break;
 
   case kBitXor:
-    return mIrMgr.new_BinOp(kOpBitXor, opr[0], opr[1]);
+    opcode = kOpBitXor;
+    break;
 
   case kLogAnd:
-    return mIrMgr.new_BinOp(kOpLogAnd, opr[0], opr[1]);
+    opcode = kOpLogAnd;
+    break;
 
   case kLogOr:
-    return mIrMgr.new_BinOp(kOpLogOr, opr[0], opr[1]);
+    opcode = kOpLogOr;
+    break;
 
   case kPlus:
-    return mIrMgr.new_BinOp(kOpPlus, opr[0], opr[1]);
+    opcode = kOpPlus;
+    break;
 
   case kMinus:
-    return mIrMgr.new_BinOp(kOpMinus, opr[0], opr[1]);
+    opcode = kOpMinus;
+    break;
 
   case kMult:
-    return mIrMgr.new_BinOp(kOpMult, opr[0], opr[1]);
+    opcode = kOpMult;
+    break;
 
   case kDiv:
-    return mIrMgr.new_BinOp(kOpDiv, opr[0], opr[1]);
+    opcode = kOpDiv;
+    break;
 
   case kMod:
-    return mIrMgr.new_BinOp(kOpMod, opr[0], opr[1]);
+    opcode = kOpMod;
+    break;
 
   case kLshift:
-    return mIrMgr.new_BinOp(kOpLshift, opr[0], opr[1]);
+    opcode = kOpLshift;
+    break;
 
   case kRshift:
-    return mIrMgr.new_BinOp(kOpRshift, opr[0], opr[1]);
+    opcode = kOpRshift;
+    break;
 
   case kEqual:
-    return mIrMgr.new_BinOp(kOpEqual, opr[0], opr[1]);
+    opcode = kOpEqual;
+    break;
 
   case kNotEq:
-    return mIrMgr.new_BinOp(kOpNotEq, opr[0], opr[1]);
+    opcode = kOpNotEq;
+    break;
 
   case kLt:
-    return mIrMgr.new_BinOp(kOpLt, opr[0], opr[1]);
+    opcode = kOpLt;
+    break;
 
   case kLe:
-    return mIrMgr.new_BinOp(kOpLe, opr[0], opr[1]);
+    opcode = kOpLe;
+    break;
 
   case kGt:
-    return mIrMgr.new_BinOp(kOpLt, opr[1], opr[0]);
+    opcode = kOpLt;
+    {
+      IrNode* tmp = op0;
+      op0 = op1;
+      op1 = tmp;
+    }
+    break;
 
   case kGe:
-    return mIrMgr.new_BinOp(kOpLe, opr[1], opr[0]);
+    opcode = kOpLe;
+    {
+      IrNode* tmp = op0;
+      op0 = op1;
+      op1 = tmp;
+    }
+    break;
 
   case kIte:
-    return mIrMgr.new_TriOp(kOpIte, opr[0], opr[1], opr[2]);
+    opcode = kOpIte;
+    break;
 
   case kFuncCall:
     {
@@ -715,7 +707,10 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
       ymuint n = ast_expr->arglist_num();
       vector<IrNode*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
-	arglist[i] = elab_rhs(ast_expr->arglist_elem(i), scope);
+	IrNode* arg = elab_rhs(ast_expr->arglist_elem(i), scope);
+	// arg->type() と func->type()->function_input_type(i) をチェック
+	// 必要に応じてキャストノードを挿入する．
+	arglist[i] = arg;
       }
       return mIrMgr.new_FuncCall(func, arglist);
     }
@@ -723,6 +718,67 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
 
   default:
     return elab_rhs_primary(ast_expr, scope);
+  }
+
+  if ( nop == 1 ) {
+    const Type* op0_type = op0->type();
+    const Type* type = mTypeMgr.calc_type1(opcode, op0_type);
+    if ( type == NULL ) {
+      // type mismatch
+      return NULL;
+    }
+
+    const Type* rtype = mTypeMgr.req_type(opcode, type, 0);
+    if ( op0_type != rtype ) {
+      // キャストノードの挿入
+    }
+    return mIrMgr.new_UniOp(opcode, type, op0);
+  }
+  else if ( nop == 2 ) {
+    const Type* op0_type = op0->type();
+    const Type* op1_type = op1->type();
+    const Type* type = mTypeMgr.calc_type2(opcode, op0_type, op1_type);
+    if ( type == NULL ) {
+      // type mismatch
+      return NULL;
+    }
+
+    const Type* rtype0 = mTypeMgr.req_type(opcode, type, 0);
+    if ( rtype0 != op0_type ) {
+      // キャストノードの挿入
+    }
+
+    const Type* rtype1 = mTypeMgr.req_type(opcode, type, 1);
+    if ( rtype1 != op1_type ) {
+      // キャストノードの挿入
+    }
+    return mIrMgr.new_BinOp(opcode, type, op0, op1);
+  }
+  else if ( nop == 3 ) {
+    const Type* op0_type = op0->type();
+    const Type* op1_type = op1->type();
+    const Type* op2_type = op2->type();
+    const Type* type = mTypeMgr.calc_type3(opcode, op0_type, op1_type, op2_type);
+    if ( type == NULL ) {
+      // type mismatch
+      return NULL;
+    }
+
+    const Type* rtype0 = mTypeMgr.req_type(opcode, type, 0);
+    if ( rtype0 != op0_type ) {
+      // キャストノードの挿入
+    }
+
+    const Type* rtype1 = mTypeMgr.req_type(opcode, type, 1);
+    if ( rtype1 != op1_type ) {
+      // キャストノードの挿入
+    }
+
+    const Type* rtype2 = mTypeMgr.req_type(opcode, type, 2);
+    if ( rtype2 != op2_type ) {
+      // キャストノードの挿入
+    }
+    return mIrMgr.new_TriOp(opcode, type, op0, op1, op2);
   }
 
   ASSERT_NOT_REACHED;
@@ -736,12 +792,33 @@ IrNode*
 YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 			       Scope* scope)
 {
+  SymHandle* h = resolve_symbol(ast_expr, scope);
+  if ( h != NULL ) {
+    const Var* var = h->var();
+    if ( var != NULL ) {
+    }
+  }
+
   switch ( ast_expr->expr_type() ) {
   case kSymbolExpr:
+    // resolve_symbol() で失敗しているので
+    // ここでは成功するはずがない．
+    // symbol not found
+    return NULL;
 
   case kArrayRef:
+    {
+      IrNode* body = elab_rhs_primary(ast_expr->body(), scope);
+      IrNode* index = elab_rhs(ast_expr->index(), scope);
+      // ...
+    }
+    break;
 
   case kMemberRef:
+    {
+      IrNode* body = elab_rhs_primary(ast_expr->body(), scope);
+    }
+    break;
 
   default:
     break;

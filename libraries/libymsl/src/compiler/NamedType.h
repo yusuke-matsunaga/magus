@@ -25,8 +25,10 @@ class NamedType :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] type_id タイプID
   /// @param[in] name 名前
-  NamedType(ShString name);
+  NamedType(TypeId type_id,
+	    ShString name);
 
   /// @brief デストラクタ
   virtual
