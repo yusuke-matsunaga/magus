@@ -28,16 +28,14 @@ IrStringConst::~IrStringConst()
 {
 }
 
-// @brief 種類を返す．
-ExprType
-IrStringConst::expr_type() const
+// @brief opcode を返す．
+OpCode
+IrStringConst::opcode() const
 {
-  return kStringConst;
+  return kOpStringConst;
 }
 
 // @brief 文字列を返す．
-//
-// kStringConst の時のみ有効
 const char*
 IrStringConst::string_val() const
 {

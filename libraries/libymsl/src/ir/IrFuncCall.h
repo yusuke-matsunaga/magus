@@ -1,5 +1,5 @@
-#ifndef YMSLFUNCCALL_H
-#define YMSLFUNCCALL_H
+#ifndef IRFUNCCALL_H
+#define IRFUNCCALL_H
 
 /// @file IrFuncCall.h
 /// @brief IrFuncCall のヘッダファイル
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,15 +19,15 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 関数呼び出しを表すクラス
 //////////////////////////////////////////////////////////////////////
 class IrFuncCall :
-  public IrExpr
+  public IrNode
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
   /// @param[in] arglist 引数リスト
-  IrFuncCall(IrExpr* func,
-	       const vector<IrExpr*>& arglist);
+  IrFuncCall(const Function* func,
+	     const vector<IrNode*>& arglist);
 
   /// @brief デストラクタ
   virtual
@@ -39,21 +39,21 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を返す．
+  /// @brief opcode を返す．
   virtual
-  ExprType
-  expr_type() const;
+  OpCode
+  opcode() const;
 
   /// @brief 関数本体を返す．
   ///
-  /// kFuncCall のみ有効
+  /// kOpFuncCall のみ有効
   virtual
-  IrExpr*
-  func_expr() const;
+  const Function*
+  function() const;
 
   /// @brief 関数の引数の数を得る．
   ///
-  /// kFuncCall のみ有効
+  /// kOpFuncCall のみ有効
   virtual
   ymuint
   arglist_num() const;
@@ -61,9 +61,9 @@ public:
   /// @brief 関数の引数を得る．
   /// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
   ///
-  /// kFuncCall のみ有効
+  /// kOpFuncCall のみ有効
   virtual
-  IrExpr*
+  IrNode*
   arglist_elem(ymuint pos) const;
 
 
@@ -73,16 +73,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  IrExpr* mFunc;
+  const Function* mFunc;
 
   // 引数の数
   ymuint mArgNum;
 
   // 引数のリスト
-  IrExpr** mArgList;
+  IrNode** mArgList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFUNCCALL_H
+#endif // IRFUNCCALL_H

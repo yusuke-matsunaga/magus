@@ -1,5 +1,5 @@
-#ifndef YMSLFALSE_H
-#define YMSLFALSE_H
+#ifndef IRFALSE_H
+#define IRFALSE_H
 
 /// @file IrFalse.h
 /// @brief IrFalse のヘッダファイル
@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IrFalse IrFalse.h "IrFalse.h"
-/// @brief false を表すクラス
+/// @brief true を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrFalse :
-  public IrExpr
+  public IrNode
 {
 public:
 
@@ -33,16 +33,16 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェス
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を返す．
+  /// @brief opcode を返す．
   virtual
-  ExprType
-  expr_type() const;
+  OpCode
+  opcode() const;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFALSE_H
+#endif // IRFALSE_H

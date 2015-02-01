@@ -28,16 +28,14 @@ IrIntConst::~IrIntConst()
 {
 }
 
-// @brief 種類を返す．
-ExprType
-IrIntConst::expr_type() const
+// @brief opcode を返す．
+OpCode
+IrIntConst::opcode() const
 {
-  return kIntConst;
+  return kOpIntConst;
 }
 
 // @brief 整数値を返す．
-//
-// kIntConst の時のみ有効
 int
 IrIntConst::int_val() const
 {

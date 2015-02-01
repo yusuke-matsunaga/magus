@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] parent 親のスコープ
 // @param[in] name 名前
 Scope::Scope(Scope* parent,
-		     ShString name) :
+	     ShString name) :
   mParent(parent),
   mName(name),
   mHashSize(0),
@@ -60,7 +60,7 @@ Scope::name() const
 // @brief ラベルを追加する．
 // @param[in] item 追加する要素
 void
-Scope::add_label(const Label* item)
+Scope::add_label(Label* item)
 {
   SymHandle* handle = new LabelHandle(item);
   put(handle);

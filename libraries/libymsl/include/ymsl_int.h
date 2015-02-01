@@ -38,10 +38,10 @@ class Label;
 class Scope;
 class SymHandle;
 class Type;
+class TypeMgr;
 class Var;
 
-class IrExpr;
-class IrTypeMgr;
+class IrNode;
 
 class AstCaseItem;
 class AstEnumDecl;
@@ -314,6 +314,62 @@ enum ExprType {
   kScopeExpr,
   kEnumExpr,
   kFuncExpr
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @brief IrNode の種類
+//////////////////////////////////////////////////////////////////////
+enum OpCode {
+  // 定数
+  kOpTrue,
+  kOpFalse,
+  kOpIntConst,
+  kOpFloatConst,
+  kOpStringConst,
+  // ロード/ストア
+  kOpLoad,
+  kOpStore,
+  // 変数参照
+  kOpVarRef,
+  // 単項演算
+  kOpCastBoolean,
+  kOpCastInt,
+  kOpCastFloat,
+  kOpBitNeg,
+  kOpLogNot,
+  kOpUniMinus,
+  // 二項演算
+  kOpBitAnd,
+  kOpBitOr,
+  kOpBitXor,
+  kOpLogAnd,
+  kOpLogOr,
+  kOpPlus,
+  kOpMinus,
+  kOpMult,
+  kOpDiv,
+  kOpMod,
+  kOpLshift,
+  kOpRshift,
+  kOpEqual,
+  kOpNotEq,
+  kOpLt,
+  kOpLe,
+  // 三項演算
+  kOpIte,
+  // 関数呼び出し
+  kOpFuncCall,
+  // ジャンプ
+  kOpJump,
+  kOpBranchEqual,
+  kOpBranchNotEq,
+  kOpBranchLt,
+  kOpBranchGe,
+  // 特殊
+  kOpLabel,
+  // 停止
+  kOpHalt
 };
 
 

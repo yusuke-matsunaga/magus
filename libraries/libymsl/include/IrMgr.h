@@ -37,92 +37,63 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief true 定数を生成する．
-  IrExpr*
+  IrNode*
   new_True();
 
   /// @brief False 定数を生成する．
-  IrExpr*
+  IrNode*
   new_False();
 
   /// @brief 整数値定数を生成する．
   /// @param[in] val 値
-  IrExpr*
+  IrNode*
   new_IntConst(int val);
 
   /// @brief 実数値定数を生成する．
   /// @param[in] val 値
-  IrExpr*
+  IrNode*
   new_FloatConst(double val);
 
   /// @brief 文字列定数を生成する．
   /// @param[in] val 値
-  IrExpr*
+  IrNode*
   new_StringConst(const char* val);
 
-  /// @brief 変数式を生成する．
-  /// @param[in] var 変数
-  IrExpr*
-  new_VarExpr(Var* var);
-
-  /// @brief 配列参照式を生成する．
-  /// @param[in] body 配列を表す式
-  /// @param[in] index インデックス
-  IrExpr*
-  new_ArrayRef(IrExpr* body,
-	       IrExpr* index);
-
-  /// @brief メンバ参照式を生成する．
-  /// @param[in] obj 対象のオブジェクト
-  /// @param[in] offset メンバのオフセット
-  IrExpr*
-  new_MemberRef(IrExpr* obj,
-		ymuint offset);
-
   /// @brief 単項演算式を生成する．
-  /// @param[in] type 型
+  /// @param[in] opcode オペコード
   /// @param[in] opr1 オペランド
-  IrExpr*
-  new_OpExpr(ExprType type,
-	     IrExpr* opr1);
+  IrNode*
+  new_UniOp(OpCode opcode,
+	    IrNode* opr1);
 
   /// @brief 二項演算式を生成する．
-  /// @param[in] type 型
+  /// @param[in] opcode オペコード
   /// @param[in] opr1, opr2 オペランド
-  IrExpr*
-  new_OpExpr(ExprType type,
-	     IrExpr* opr1,
-	     IrExpr* opr2);
+  IrNode*
+  new_BinOp(OpCode opcode,
+	    IrNode* opr1,
+	    IrNode* opr2);
 
   /// @brief 三項演算式を生成する．
-  /// @param[in] type 型
+  /// @param[in] opcode オペコード
   /// @param[in] opr1, opr2, opr3 オペランド
-  IrExpr*
-  new_OpExpr(ExprType type,
-	     IrExpr* opr1,
-	     IrExpr* opr2,
-	     IrExpr* opr3);
+  IrNode*
+  new_TriOp(OpCode opcode,
+	    IrNode* opr1,
+	    IrNode* opr2,
+	    IrNode* opr3);
 
   /// @brief 関数呼び出し式を生成する．
-  /// @param[in] func 関数式
-  /// @param[in] arglist 引数のリスト
-  IrExpr*
-  new_FuncCall(IrExpr* func,
-	       const vector<IrExpr*>& arglist);
-
-  /// @brief スコープ式を生成する．
-  /// @param[in] scope スコープ
-  IrExpr*
-  new_ScopeExpr(Scope* scope);
-
-  /// @brief 関数式を生成する．
   /// @param[in] func 関数
-  IrExpr*
-  new_FuncExpr(Function* func);
+  /// @param[in] arglist 引数のリスト
+  IrNode*
+  new_FuncCall(const Function* func,
+	       const vector<IrNode*>& arglist);
 
-  /// @brief enum 型式を生成する．
-  /// @param[in] type enum 型
-  IrExpr*
-  new_EnumExpr(const Type* type);
+  /// @brief ジャンプ系のノードを生成する．
+  /// @param[in] opcode オペコード
+  IrNode*
+  new_Jump(OpCode opcode);
 
 
 private:

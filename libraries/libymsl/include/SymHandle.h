@@ -68,7 +68,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  const Label*
+  Label*
   label() const;
 
   /// @brief 名前付き型を返す．

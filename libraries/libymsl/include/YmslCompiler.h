@@ -99,19 +99,48 @@ private:
   phase2(const AstStatement* stmt,
 	 Scope* scope);
 
-  /// @brief 式の実体化を行う．
+  /// @brief 右辺式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
-  IrExpr*
-  elab_expr(const AstExpr* ast_expr,
-	    Scope* scope);
+  IrNode*
+  elab_rhs(const AstExpr* ast_expr,
+	   Scope* scope);
 
-  /// @brief シンボルに対応する式を返す．
-  /// @param[in] symbol シンボル
-  /// @param[in] scope スコープ
-  IrExpr*
-  symbol2expr(const AstSymbol* symbol,
-	      Scope* scope);
+  /// @brief 右辺式の実体化を行う．(プライマリ用)
+  /// @param[in] ast_expr 式を表す構文木
+  /// @param[in] scope 現在のスコープ
+  IrNode*
+  elab_rhs_primary(const AstExpr* ast_expr,
+		   Scope* scope);
+
+  /// @brief 左辺式の実体化を行う．
+  /// @param[in] ast_expr 式を表す構文木
+  /// @param[in] scope 現在のスコープ
+  /// @param[out] base ベース値
+  /// @param[out] offset オフセット
+  ///
+  /// エラーが起きたら false を返す．
+  /// 書き込む位置が決まっている場合には
+  /// base = NULL とする．
+  bool
+  elab_lhs(const AstExpr* ast_expr,
+	   Scope* scope,
+	   IrNode& base,
+	   int& offset);
+
+  /// @brief 式からスコープの解決を行う．
+  /// @param[in] expr 式
+  /// @param[in] scopde 現在のスコープ
+  Scope*
+  resolve_scope(const AstExpr* expr,
+		Scope* scope);
+
+  /// @brief 式からシンボルの解決を行う．
+  /// @param[in] expr 式
+  /// @param[in] scopde 現在のスコープ
+  SymHandle*
+  resolve_symbol(const AstExpr* expr,
+		 Scope* scope);
 
   /// @brief スコープを生成する．
   /// @param[in] parent_scope 親のスコープ

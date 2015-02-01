@@ -48,7 +48,7 @@ SymHandle::function() const
 // @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-const Label*
+Label*
 SymHandle::label() const
 {
   return NULL;

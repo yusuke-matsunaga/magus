@@ -16,7 +16,6 @@ BEGIN_NAMESPACE_YM_YMSL
 // クラス IrTrue
 //////////////////////////////////////////////////////////////////////
 
-
 // @brief コンストラクタ
 IrTrue::IrTrue()
 {
@@ -27,11 +26,11 @@ IrTrue::~IrTrue()
 {
 }
 
-// @brief 型を返す．
-ExprType
-IrTrue::expr_type() const
+// @brief opcode を返す．
+OpCode
+IrTrue::opcode() const
 {
-  return kTrue;
+  return kOpTrue;
 }
 
 END_NAMESPACE_YM_YMSL

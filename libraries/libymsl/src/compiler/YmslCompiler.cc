@@ -436,6 +436,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
 {
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
+    // 中身の statement は個別に phase2() で呼ばれる．
     break;
 
   case kBreak:
@@ -445,7 +446,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
     break;
 
   case kDoWhile:
-    elab_expr(stmt->expr(), scope);
+    //elab_expr(stmt->expr(), scope);
     break;
 
   case kEnumDecl:
@@ -464,8 +465,8 @@ YmslCompiler::phase2(const AstStatement* stmt,
   case kEqOr:
   case kEqXor:
   case kExprStmt:
-    elab_expr(stmt->lhs_expr(), scope);
-    elab_expr(stmt->expr(), scope);
+    //elab_expr(stmt->lhs_expr(), scope);
+    //elab_expr(stmt->expr(), scope);
     break;
 
   case kFuncDecl:
@@ -476,7 +477,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
     break;
 
   case kIf:
-    elab_expr(stmt->expr(), scope);
+    //elab_expr(stmt->expr(), scope);
     break;
 
   case kImport:
@@ -487,12 +488,12 @@ YmslCompiler::phase2(const AstStatement* stmt,
 
   case kReturn:
     if ( stmt->expr() ) {
-      elab_expr(stmt->expr(), scope);
+      //elab_expr(stmt->expr(), scope);
     }
     break;
 
   case kSwitch:
-    elab_expr(stmt->expr(), scope);
+    //elab_expr(stmt->expr(), scope);
     break;
 
   case kToplevel:
@@ -501,7 +502,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
   case kVarDecl:
     //reg_var(stmt, scope);
     if ( stmt->expr() ) {
-      elab_expr(stmt->expr(), scope);
+      //elab_expr(stmt->expr(), scope);
     }
     break;
 
@@ -515,7 +516,7 @@ YmslCompiler::phase2(const AstStatement* stmt,
     break;
 
   case kWhile:
-    elab_expr(stmt->expr(), scope);
+    //elab_expr(stmt->expr(), scope);
     break;
 
   default:
@@ -523,23 +524,21 @@ YmslCompiler::phase2(const AstStatement* stmt,
   }
 }
 
-// @brief 式の実体化を行う．
+// @brief 右辺式の実体化を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
-IrExpr*
-YmslCompiler::elab_expr(const AstExpr* ast_expr,
-			Scope* scope)
+IrNode*
+YmslCompiler::elab_rhs(const AstExpr* ast_expr,
+		       Scope* scope)
 {
-  IrExpr* opr[3] = { NULL, NULL, NULL };
+  IrNode* opr[3] = { NULL, NULL, NULL };
+  ASSERT_COND( ast_expr->operand_num() <= 3 );
   for (ymuint i = 0; i < ast_expr->operand_num(); ++ i) {
-    IrExpr* opr1 = elab_expr(ast_expr->operand(i), scope);
+    IrNode* opr1 = elab_rhs(ast_expr->operand(i), scope);
     if ( opr1 == NULL ) {
       return NULL;
     }
     opr[i] = opr1;
-    if ( i == 2 ) {
-      break;
-    }
   }
 
   switch ( ast_expr->expr_type() ) {
@@ -558,144 +557,222 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
   case kStringConst:
     return mIrMgr.new_StringConst(ast_expr->string_val());
 
+#if 0
   case kSymbolExpr:
-    return symbol2expr(ast_expr->symbol(), scope);
+    {
+      SymHandle* h = scope->find(ast_expr->symbol());
+      if ( h != NULL ) {
+	// ast_expr-symbol() is not found
+	return NULL;
+      }
+      const Var* var = h->var();
+      if ( var != NULL ) {
+	// エラーメッセージ
+	return NULL;
+      }
+
+    }
 
   case kArrayRef:
     {
-      IrExpr* body = elab_expr(ast_expr->body(), scope);
-      IrExpr* index = elab_expr(ast_expr->index(), scope);
+      IrNode* body = elab_rhs(ast_expr->body(), scope);
+      IrNode* index = elab_rhs(ast_expr->index(), scope);
       return mIrMgr.new_ArrayRef(body, index);
     }
     break;
 
   case kMemberRef:
     {
-      IrExpr* body = elab_expr(ast_expr->body(), scope);
-      const AstSymbol* symbol = ast_expr->symbol();
-      switch ( body->expr_type() ) {
-      case kScopeExpr:
-	return symbol2expr(symbol, body->scope());
+      const AstExpr* body_expr = ast_expr->body();
+      SymHandle* h = resolve_symbol(body_expr, scope);
 
-      case kEnumExpr:
-	{
-	  const Type* type = body->enum_type();
-	  int index = type->enum_index(symbol->str_val());
-	  if ( index == -1 ) {
-	    // symbol not found
-	    return NULL;
-	  }
+      Scope* scope1 = h->scope();
+      if ( scope1 != NULL ) {
 
-	  int val = type->enum_elem_val(index);
-	  return mIrMgr.new_IntConst(val);
-	}
-	break;
+	const Var* var = resolve_var(ast_expr->symbol(), scope1);
 
-      case kSymbolExpr:
-	{
-	  const Var* var = body->var();
-	  const Type* type = var->value_type();
-	  // type から symbol という名のメンバを探す．
-	  //return mIrMgr.new_MemberRef(body, symbol);
-	}
-	break;
-
-      default:
-	break;
       }
+
+      const Type* type = h->named_type();
+      if ( type != NULL ) {
+	ASSERT_COND( type->type_id() == kEnumType );
+	int index = type->enum_index(ast_expr->symbol());
+	if ( index == -1 ) {
+	  // ast_expr->symbol() is not an enum element
+	  return NULL;
+	}
+	int val = type->elem_val(index);
+	return mIrMgr.new_IntConst(val);
+      }
+
+      const Var* var = h->var();
+      if ( var != NULL ) {
+	const Type* type = var->value_type();
+	// type から symbol という名のメンバを探す．
+	//return mIrMgr.new_MemberRef(body, symbol);
+      }
+
       ASSERT_NOT_REACHED;
       return NULL;
     }
     break;
+#endif
 
   case kCastInt:
-    return mIrMgr.new_OpExpr(kCastInt, opr[0]);
+    return mIrMgr.new_UniOp(kOpCastInt, opr[0]);
 
   case kCastBoolean:
-    return mIrMgr.new_OpExpr(kCastBoolean, opr[0]);
+    return mIrMgr.new_UniOp(kOpCastBoolean, opr[0]);
 
   case kCastFloat:
-    return mIrMgr.new_OpExpr(kCastFloat, opr[0]);
+    return mIrMgr.new_UniOp(kOpCastFloat, opr[0]);
 
   case kBitNeg:
-    return mIrMgr.new_OpExpr(kBitNeg, opr[0]);
+    return mIrMgr.new_UniOp(kOpBitNeg, opr[0]);
 
   case kLogNot:
-    return mIrMgr.new_OpExpr(kLogNot, opr[0]);
-
-  case kUniPlus:
-    return mIrMgr.new_OpExpr(kUniPlus, opr[0]);
+    return mIrMgr.new_UniOp(kOpLogNot, opr[0]);
 
   case kUniMinus:
-    return mIrMgr.new_OpExpr(kUniMinus, opr[0]);
+    return mIrMgr.new_UniOp(kOpUniMinus, opr[0]);
 
   case kBitAnd:
-    return mIrMgr.new_OpExpr(kBitAnd, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpBitAnd, opr[0], opr[1]);
 
   case kBitOr:
-    return mIrMgr.new_OpExpr(kBitOr, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpBitOr, opr[0], opr[1]);
 
   case kBitXor:
-    return mIrMgr.new_OpExpr(kBitXor, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpBitXor, opr[0], opr[1]);
 
   case kLogAnd:
-    return mIrMgr.new_OpExpr(kLogAnd, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLogAnd, opr[0], opr[1]);
 
   case kLogOr:
-    return mIrMgr.new_OpExpr(kLogOr, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLogOr, opr[0], opr[1]);
 
   case kPlus:
-    return mIrMgr.new_OpExpr(kPlus, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpPlus, opr[0], opr[1]);
 
   case kMinus:
-    return mIrMgr.new_OpExpr(kMinus, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpMinus, opr[0], opr[1]);
 
   case kMult:
-    return mIrMgr.new_OpExpr(kMult, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpMult, opr[0], opr[1]);
 
   case kDiv:
-    return mIrMgr.new_OpExpr(kDiv, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpDiv, opr[0], opr[1]);
 
   case kMod:
-    return mIrMgr.new_OpExpr(kMod, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpMod, opr[0], opr[1]);
 
   case kLshift:
-    return mIrMgr.new_OpExpr(kLshift, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLshift, opr[0], opr[1]);
 
   case kRshift:
-    return mIrMgr.new_OpExpr(kRshift, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpRshift, opr[0], opr[1]);
 
   case kEqual:
-    return mIrMgr.new_OpExpr(kEqual, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpEqual, opr[0], opr[1]);
 
   case kNotEq:
-    return mIrMgr.new_OpExpr(kNotEq, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpNotEq, opr[0], opr[1]);
 
   case kLt:
-    return mIrMgr.new_OpExpr(kLt, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLt, opr[0], opr[1]);
 
   case kLe:
-    return mIrMgr.new_OpExpr(kLe, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLe, opr[0], opr[1]);
 
   case kGt:
-    return mIrMgr.new_OpExpr(kGt, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLt, opr[1], opr[0]);
 
   case kGe:
-    return mIrMgr.new_OpExpr(kGe, opr[0], opr[1]);
+    return mIrMgr.new_BinOp(kOpLe, opr[1], opr[0]);
 
   case kIte:
-    return mIrMgr.new_OpExpr(kIte, opr[0], opr[1], opr[2]);
+    return mIrMgr.new_TriOp(kOpIte, opr[0], opr[1], opr[2]);
 
   case kFuncCall:
     {
-      IrExpr* func_expr = elab_expr(ast_expr->func(), scope);
-      ymuint n = ast_expr->arglist_num();
-      vector<IrExpr*> arglist(n);
-      for (ymuint i = 0; i < n; ++ i) {
-	arglist[i] = elab_expr(ast_expr->arglist_elem(i), scope);
+      const AstExpr* func_expr = ast_expr->func();
+      const Function* func = NULL;
+      if ( func_expr->expr_type() == kSymbolExpr ) {
+	SymHandle* h = scope->find(func_expr->symbol()->str_val());
+	if ( h == NULL ) {
+	  // h is not found
+	  return NULL;
+	}
+	func = h->function();
+	if ( func == NULL ) {
+	  // func is not a function
+	  return NULL;
+	}
       }
-      return mIrMgr.new_FuncCall(func_expr, arglist);
+      else {
+	// 未完
+      }
+      ymuint n = ast_expr->arglist_num();
+      vector<IrNode*> arglist(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	arglist[i] = elab_rhs(ast_expr->arglist_elem(i), scope);
+      }
+      return mIrMgr.new_FuncCall(func, arglist);
     }
+    break;
+
+  default:
+    return elab_rhs_primary(ast_expr, scope);
+  }
+
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 右辺式の実体化を行う．(プライマリ用)
+// @param[in] ast_expr 式を表す構文木
+// @param[in] scope 現在のスコープ
+IrNode*
+YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
+			       Scope* scope)
+{
+  switch ( ast_expr->expr_type() ) {
+  case kSymbolExpr:
+
+  case kArrayRef:
+
+  case kMemberRef:
+
+  default:
+    break;
+  }
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 左辺式の実体化を行う．
+// @param[in] ast_expr 式を表す構文木
+// @param[in] scope 現在のスコープ
+// @param[out] base ベース値
+// @param[out] offset オフセット
+//
+// エラーが起きたら false を返す．
+// 書き込む位置が決まっている場合には
+// base = NULL とする．
+bool
+YmslCompiler::elab_lhs(const AstExpr* ast_expr,
+		       Scope* scope,
+		       IrNode& base,
+		       int& offset)
+{
+  switch ( ast_expr->expr_type() ) {
+  case kSymbolExpr:
+    break;
+
+  case kArrayRef:
+    break;
+
+  case kMemberRef:
     break;
 
   default:
@@ -703,43 +780,37 @@ YmslCompiler::elab_expr(const AstExpr* ast_expr,
   }
 
   ASSERT_NOT_REACHED;
-  return NULL;
+  return false;
 }
 
-// @brief シンボルに対応する式を返す．
-// @param[in] symbol シンボル
-// @param[in] scope スコープ
-IrExpr*
-YmslCompiler::symbol2expr(const AstSymbol* symbol,
-			  Scope* scope)
+// @brief 式からシンボルの解決を行う．
+// @param[in] expr 式
+// @param[in] scopde 現在のスコープ
+SymHandle*
+YmslCompiler::resolve_symbol(const AstExpr* expr,
+			     Scope* scope)
 {
-  SymHandle* handle = scope->find(symbol->str_val());
-  if ( handle == NULL ) {
-    // symbol not found
-    return NULL;
-  }
-#if 0
-  const Function* func = handle->function();
-  if ( func != NULL ) {
-    return mIrMgr.new_FuncExpr(func);
+  switch ( expr->expr_type() ) {
+  case kSymbolExpr:
+    return scope->find(expr->symbol()->str_val());
+
+  case kMemberRef:
+    {
+      const AstExpr* body = expr->body();
+      SymHandle* h = resolve_symbol(body, scope);
+      Scope* scope1 = h->scope();
+      if ( scope1 == NULL ) {
+	// not scope
+	return NULL;
+      }
+      return scope1->find(expr->symbol()->str_val());
+    }
+    break;
+
+  default:
+    break;
   }
 
-  const Var* var = handle->var();
-  if ( var != NULL ) {
-    return mIrMgr.new_VarExpr(var);
-  }
-
-  Scope* scope1 = handle->scope();
-  if ( scope1 != NULL ) {
-    return mIrMgr.new_ScopeExpr(scope1);
-  }
-
-  const Type* type = handle->named_type();
-  if ( type != NULL ) {
-    return mIrMgr.new_EnumExpr(type);
-  }
-#endif
-  // 型が合わない．
   return NULL;
 }
 

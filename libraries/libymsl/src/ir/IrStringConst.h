@@ -1,5 +1,5 @@
-#ifndef YMSLSTRINGCONST_H
-#define YMSLSTRINGCONST_H
+#ifndef IRSTRINGCONST_H
+#define IRSTRINGCONST_H
 
 /// @file IrStringConst.h
 /// @brief IrStringConst のヘッダファイル
@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IrStringConst IrStringConst.h "IrStringConst.h"
-/// @brief 文字列定数を表すクラス
+/// @brief 文字列定数を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrStringConst :
-  public IrExpr
+  public IrNode
 {
 public:
 
@@ -37,14 +37,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 種類を返す．
+  /// @brief opcode を返す．
   virtual
-  ExprType
-  expr_type() const;
+  OpCode
+  opcode() const;
 
   /// @brief 文字列を返す．
-  ///
-  /// kStringConst の時のみ有効
   virtual
   const char*
   string_val() const;
@@ -62,4 +60,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLSTRINGCONST_H
+#endif // IRSTRINGCONST_H

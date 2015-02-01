@@ -8,7 +8,7 @@
 
 
 #include "LabelHandle.h"
-//#include "Label.h"
+#include "Label.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] label ラベル
-LabelHandle::LabelHandle(const Label* label) :
+LabelHandle::LabelHandle(Label* label) :
   mLabel(label)
 {
 }
@@ -33,13 +33,13 @@ LabelHandle::~LabelHandle()
 ShString
 LabelHandle::name() const
 {
-  //return mLabel->name();
+  return mLabel->name();
 }
 
 // @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-const Label*
+Label*
 LabelHandle::label() const
 {
   return mLabel;

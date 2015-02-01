@@ -67,12 +67,12 @@ set (ymsl_SOURCES
   src/ast/AstWhile.cc
 
   src/compiler/YmslCompiler.cc
-  src/compiler/YmslLabel.cc
   src/compiler/ArrayType.cc
   src/compiler/EnumType.cc
   src/compiler/Function.cc
   src/compiler/FuncHandle.cc
   src/compiler/FuncType.cc
+  src/compiler/Label.cc
   src/compiler/LabelHandle.cc
   src/compiler/MapType.cc
   src/compiler/NamedType.cc
@@ -87,21 +87,18 @@ set (ymsl_SOURCES
   src/compiler/Var.cc
   src/compiler/VarHandle.cc
 
-  src/ir/IrArrayRef.cc
-  src/ir/IrEnumExpr.cc
-  src/ir/IrExpr.cc
-  src/ir/IrFalse.cc
-  src/ir/IrFloatConst.cc
-  src/ir/IrFuncCall.cc
-  src/ir/IrFuncExpr.cc
-  src/ir/IrIntConst.cc
-  src/ir/IrMemberRef.cc
   src/ir/IrMgr.cc
-  src/ir/IrOpExpr.cc
-  src/ir/IrScopeExpr.cc
-  src/ir/IrStringConst.cc
+  src/ir/IrNode.cc
   src/ir/IrTrue.cc
-  src/ir/IrVarExpr.cc
+  src/ir/IrFalse.cc
+  src/ir/IrIntConst.cc
+  src/ir/IrFloatConst.cc
+  src/ir/IrStringConst.cc
+  src/ir/IrUniOp.cc
+  src/ir/IrBinOp.cc
+  src/ir/IrTriOp.cc
+  src/ir/IrFuncCall.cc
+  src/ir/IrJump.cc
 
   src/engine/YmslVM.cc
 

@@ -1,5 +1,5 @@
-#ifndef YMSLINTCONST_H
-#define YMSLINTCONST_H
+#ifndef IRINTCONST_H
+#define IRINTCONST_H
 
 /// @file IrIntConst.h
 /// @brief IrIntConst のヘッダファイル
@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IrIntConst IrIntConst.h "IrIntConst.h"
-/// @brief 整数定数を表すクラス
+/// @brief 整数定数を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrIntConst :
-  public IrExpr
+  public IrNode
 {
 public:
 
@@ -37,14 +37,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 種類を返す．
+  /// @brief opcode を返す．
   virtual
-  ExprType
-  expr_type() const;
+  OpCode
+  opcode() const;
 
   /// @brief 整数値を返す．
-  ///
-  /// kIntConst の時のみ有効
   virtual
   int
   int_val() const;
@@ -62,4 +60,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLINTCONST_H
+#endif // IRINTCONST_H

@@ -1,5 +1,5 @@
-#ifndef YMSLTRUE_H
-#define YMSLTRUE_H
+#ifndef IRTRUE_H
+#define IRTRUE_H
 
 /// @file IrTrue.h
 /// @brief IrTrue のヘッダファイル
@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IrTrue IrTrue.h "IrTrue.h"
-/// @brief true を表すクラス
+/// @brief true を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrTrue :
-  public IrExpr
+  public IrNode
 {
 public:
 
@@ -33,16 +33,16 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェス
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 型を返す．
+  /// @brief opcode を返す．
   virtual
-  ExprType
-  expr_type() const;
+  OpCode
+  opcode() const;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLTRUE_H
+#endif // IRTRUE_H

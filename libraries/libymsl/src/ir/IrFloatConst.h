@@ -1,5 +1,5 @@
-#ifndef YMSLFLOATCONST_H
-#define YMSLFLOATCONST_H
+#ifndef IRFLOATCONST_H
+#define IRFLOATCONST_H
 
 /// @file IrFloatConst.h
 /// @brief IrFloatConst のヘッダファイル
@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "IrExpr.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IrFloatConst IrFloatConst.h "IrFloatConst.h"
-/// @brief 実数定数を表すクラス
+/// @brief 実数定数を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrFloatConst :
-  public IrExpr
+  public IrNode
 {
 public:
 
@@ -37,14 +37,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 種類を返す．
+  /// @brief opcode を返す．
   virtual
-  ExprType
-  expr_type() const;
+  OpCode
+  opcode() const;
 
   /// @brief 実数値を返す．
-  ///
-  /// kFloatConst の時のみ有効
   virtual
   double
   float_val() const;
@@ -62,4 +60,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFLOATCONST_H
+#endif // IRFLOATCONST_H

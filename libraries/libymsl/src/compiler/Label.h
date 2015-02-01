@@ -1,8 +1,8 @@
-#ifndef YMSLLABEL_H
-#define YMSLLABEL_H
+#ifndef LABEL_H
+#define LABEL_H
 
-/// @file YmslLabel.h
-/// @brief YmslLabel のヘッダファイル
+/// @file Label.h
+/// @brief Label のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,21 +16,19 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslLabel YmslLabel.h "YmslLabel.h"
+/// @class Label Label.h "Label.h"
 /// @brief ラベルを表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslLabel
+class Label
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] code_list 命令コードを収める配列
   /// @param[in] name 名前
-  YmslLabel(YmslCodeList& code_list,
-	    ShString name = ShString());
+  Label(ShString name = ShString());
 
   /// @brief デストラクタ
-  ~YmslLabel();
+  ~Label();
 
 
 public:
@@ -47,14 +45,14 @@ public:
   is_placed() const;
 
   /// @brief 配置する
-  /// @param[in] addr アドレス
+  /// @param[in] next_node 直後のノード
   void
-  place(Ymsl_INT addr);
+  place(IrNode* next_node);
 
   /// @brief 参照する．
-  /// @param[in] w_pos アドレスを書き込む位置
+  /// @param[in] rerer_node 参照しているノード
   void
-  refer(Ymsl_INT w_pos);
+  add_refer(IrNode* refer_node);
 
 
 private:
@@ -62,23 +60,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 命令コードを収める配列
-  YmslCodeList& mCodeList;
-
   // 名前
   ShString mName;
 
-  // 配置済みフラグ
-  bool mPlaced;
+  // 直後のノード
+  IrNode* mNextNode;
 
-  // 配置位置
-  Ymsl_INT mAddr;
-
-  // 参照リスト
-  vector<Ymsl_INT> mRefList;
+  // このラベルを参照しているノードのリスト
+  vector<IrNode*> mRefList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLLABEL_H
+#endif // LABEL_H

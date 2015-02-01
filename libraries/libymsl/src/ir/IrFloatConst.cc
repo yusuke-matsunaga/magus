@@ -28,16 +28,14 @@ IrFloatConst::~IrFloatConst()
 {
 }
 
-// @brief 種類を返す．
-ExprType
-IrFloatConst::expr_type() const
+// @brief opcode を返す．
+OpCode
+IrFloatConst::opcode() const
 {
-  return kFloatConst;
+  return kOpFloatConst;
 }
 
 // @brief 実数値を返す．
-//
-// kFloatConst の時のみ有効
 double
 IrFloatConst::float_val() const
 {

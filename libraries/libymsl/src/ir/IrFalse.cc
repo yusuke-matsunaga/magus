@@ -16,7 +16,6 @@ BEGIN_NAMESPACE_YM_YMSL
 // クラス IrFalse
 //////////////////////////////////////////////////////////////////////
 
-
 // @brief コンストラクタ
 IrFalse::IrFalse()
 {
@@ -27,11 +26,11 @@ IrFalse::~IrFalse()
 {
 }
 
-// @brief 型を返す．
-ExprType
-IrFalse::expr_type() const
+// @brief opcode を返す．
+OpCode
+IrFalse::opcode() const
 {
-  return kFalse;
+  return kOpFalse;
 }
 
 END_NAMESPACE_YM_YMSL
