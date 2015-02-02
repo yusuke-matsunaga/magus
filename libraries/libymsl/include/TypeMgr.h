@@ -108,41 +108,41 @@ public:
   /// @brief 演算と入力の型から出力の型を求める．(単項演算用)
   /// @param[in] opcode オペコード
   /// @param[in] op1_type オペランドの型
+  /// @param[in] opt1_reqtype オペランドに要求される型
   ///
   /// マッチする型がない場合には NULL を返す．
   const Type*
   calc_type1(OpCode opcode,
-	     const Type* op1_type);
+	     const Type* op1_type,
+	     const Type*& op1_reqtype);
 
   /// @brief 演算と入力の型から出力の型を求める．(二項演算用)
   /// @param[in] opcode オペコード
   /// @param[in] op1_type, op2_type オペランドの型
+  /// @param[in] op1_reqtype, op2_reqtype オペランドに要求される型
   ///
   /// マッチする型がない場合には NULL を返す．
   const Type*
   calc_type2(OpCode opcode,
 	     const Type* op1_type,
-	     const Type* op2_type);
+	     const Type* op2_type,
+	     const Type*& op1_reqtype,
+	     const Type*& op2_reqtype);
 
   /// @brief 演算と入力の型から出力の型を求める．(三項演算用)
   /// @param[in] opcode オペコード
   /// @param[in] op1_type, op2_type, op3_type オペランドの型
+  /// @param[in] op1_reqtype, op2_reqtype, op3_reqtype オペランドに要求される型
   ///
   /// マッチする型がない場合には NULL を返す．
   const Type*
   calc_type3(OpCode opcode,
 	     const Type* op1_type,
 	     const Type* op2_type,
-	     const Type* op3_type);
-
-  /// @brief 入力に要求される型を求める．
-  /// @param[in] opcode オペコード
-  /// @param[in] type 出力の型
-  /// @param[in] ipos 入力位置
-  const Type*
-  req_type(OpCode opcode,
-	   const Type* type,
-	   ymuint ipos);
+	     const Type* op3_type,
+	     const Type*& op1_reqtype,
+	     const Type*& op2_reqtype,
+	     const Type*& op3_reqtype);
 
 
 private:

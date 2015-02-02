@@ -50,12 +50,19 @@ public:
   Scope*
   scope() const;
 
-  /// @brief 変数宣言を返す．
+  /// @brief 変数を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
   const Var*
   var() const;
+
+  /// @brief 定数を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  IrNode*
+  const_node() const;
 
   /// @brief 関数を返す．
   ///

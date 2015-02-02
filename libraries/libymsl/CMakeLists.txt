@@ -68,6 +68,7 @@ set (ymsl_SOURCES
 
   src/compiler/YmslCompiler.cc
   src/compiler/ArrayType.cc
+  src/compiler/ConstHandle.cc
   src/compiler/EnumType.cc
   src/compiler/Function.cc
   src/compiler/FuncHandle.cc

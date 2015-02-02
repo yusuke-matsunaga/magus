@@ -8,6 +8,7 @@
 
 
 #include "Scope.h"
+#include "ConstHandle.h"
 #include "FuncHandle.h"
 #include "LabelHandle.h"
 #include "ScopeHandle.h"
@@ -92,6 +93,17 @@ Scope::add_type(const Type* item,
 		Scope* scope)
 {
   SymHandle* handle = new TypeHandle(item, scope);
+  put(handle);
+}
+
+// @brief 定数ノードを追加する．
+// @param[in] name 名前
+// @param[in] item 追加する要素
+void
+Scope::add_const(ShString name,
+		 IrNode* item)
+{
+  SymHandle* handle = new ConstHandle(name, item);
   put(handle);
 }
 

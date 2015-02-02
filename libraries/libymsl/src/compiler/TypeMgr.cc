@@ -259,16 +259,23 @@ TypeMgr::enum_type(ShString name,
 // @brief 演算と入力の型から出力の型を求める．(単項演算用)
 // @param[in] opcode オペコード
 // @param[in] op1_type オペランドの型
+// @param[in] opt1_reqtype オペランドに要求される型
 //
 // マッチする型がない場合には NULL を返す．
 const Type*
 TypeMgr::calc_type1(OpCode opcode,
-		    const Type* op1_type)
+		    const Type* op1_type,
+		    const Type*& op1_reqtype)
 {
+  // デフォルトで op1_reqtype は op1_type と等しい
+  op1_reqtype = op1_type;
+
   switch ( opcode ) {
   case kOpCastBoolean:
   case kOpCastInt:
   case kOpCastFloat:
+    // 検討中
+    break;
 
   case kOpBitNeg:
     // int -> int のみ
@@ -280,6 +287,7 @@ TypeMgr::calc_type1(OpCode opcode,
   case kOpLogNot:
     // boolean -> boolean のみ
     if ( op1_type->castable_to(boolean_type()) ) {
+      op1_reqtype = boolean_type();
       return boolean_type();
     }
     break;
@@ -305,13 +313,20 @@ TypeMgr::calc_type1(OpCode opcode,
 // @brief 演算と入力の型から出力の型を求める．(二項演算用)
 // @param[in] opcode オペコード
 // @param[in] op1_type, op2_type オペランドの型
+// @param[in] op1_reqtype, op2_reqtype オペランドに要求される型
 //
 // マッチする型がない場合には NULL を返す．
 const Type*
 TypeMgr::calc_type2(OpCode opcode,
 		    const Type* op1_type,
-		    const Type* op2_type)
+		    const Type* op2_type,
+		    const Type*& op1_reqtype,
+		    const Type*& op2_reqtype)
 {
+  // デフォルトで opX_reqtype は opX_type と等しい
+  op1_reqtype = op1_type;
+  op2_reqtype = op2_type;
+
   switch ( opcode ) {
   case kOpBitAnd:
   case kOpBitOr:
@@ -325,7 +340,10 @@ TypeMgr::calc_type2(OpCode opcode,
   case kOpLogAnd:
   case kOpLogOr:
     // (boolean, boolean) -> boolean
-    if ( op1_type->castable_to(boolean_type()) ) {
+    if ( op1_type->castable_to(boolean_type()) &&
+	 op2_type->castable_to(boolean_type()) ) {
+      op1_reqtype = boolean_type();
+      op2_reqtype = boolean_type();
       return boolean_type();
     }
     break;
@@ -341,6 +359,8 @@ TypeMgr::calc_type2(OpCode opcode,
     }
     if ( (op1_type == int_type() || op2_type == float_type()) &&
 	 (op2_type == int_type() || op2_type == float_type()) ) {
+      op1_reqtype = float_type();
+      op2_reqtype = float_type();
       return float_type();
     }
     break;
@@ -367,9 +387,21 @@ TypeMgr::calc_type2(OpCode opcode,
     // (float, int) -> boolean
     // (float, float) -> boolean
     // (string, string) -> boolean
-    if ( ((op1_type == int_type() || op1_type == float_type()) &&
-	  (op2_type == int_type() || op2_type == float_type())) ||
+    // (enum, enum) -> boolean
+    if ( op1_type == int_type() && op2_type == float_type() ) {
+      op1_reqtype = float_type();
+      return boolean_type();
+    }
+    if ( op2_type == int_type() && op1_type == float_type() ) {
+      op2_reqtype = float_type();
+      return boolean_type();
+    }
+    if ( (op1_type == int_type() && op2_type == int_type()) ||
+	 (op1_type == float_type() && op2_type == float_type()) ||
 	 (op1_type == string_type() && op2_type == string_type()) ) {
+      return boolean_type();
+    }
+    if ( (op1_type == op2_type) && op1_type->type_id() == kEnumType ) {
       return boolean_type();
     }
     break;
@@ -381,11 +413,20 @@ TypeMgr::calc_type2(OpCode opcode,
     // (float, int) -> boolean
     // (float, float) -> boolean
     // (string, string) -> boolean
-    if ( ((op1_type == int_type() || op1_type == float_type()) &&
-	  (op2_type == int_type() || op2_type == float_type())) ||
+    if ( op1_type == int_type() && op2_type == float_type() ) {
+      op1_reqtype = float_type();
+      return boolean_type();
+    }
+    if ( op2_type == int_type() && op1_type == float_type() ) {
+      op2_reqtype = float_type();
+      return boolean_type();
+    }
+    if ( (op1_type == int_type() && op2_type == int_type()) ||
+	 (op1_type == float_type() && op2_type == float_type()) ||
 	 (op1_type == string_type() && op2_type == string_type()) ) {
       return boolean_type();
     }
+    // enum 型の大小比較はない．
     break;
 
   default:
@@ -400,15 +441,24 @@ TypeMgr::calc_type2(OpCode opcode,
 
 // @brief 演算と入力の型から出力の型を求める．(三項演算用)
 // @param[in] opcode オペコード
-// @param[in] op1_type, op2_type, op3_type オペランドの型
+// @param[in] op1_type, op2_typee, op3_type オペランドの型
+// @param[in] op1_reqtype, op2_reqtype, op3_reqtype オペランドに要求される型
 //
 // マッチする型がない場合には NULL を返す．
 const Type*
 TypeMgr::calc_type3(OpCode opcode,
 		    const Type* op1_type,
 		    const Type* op2_type,
-		    const Type* op3_type)
+		    const Type* op3_type,
+		    const Type*& op1_reqtype,
+		    const Type*& op2_reqtype,
+		    const Type*& op3_reqtype)
 {
+  // デフォルトで opX_reqtype は opX_type と等しい
+  op1_reqtype = op1_type;
+  op2_reqtype = op2_type;
+  op3_reqtype = op3_type;
+
   switch ( opcode ) {
   case kOpIte:
     // (boolean, X, X) -> X
@@ -416,6 +466,7 @@ TypeMgr::calc_type3(OpCode opcode,
 	 op2_type == op3_type ) {
       // 本当は op2_type と op3_type の昇格に関しても
       // 考慮する必要がある．
+      op1_reqtype = boolean_type();
       return op2_type;
     }
     break;
@@ -428,65 +479,6 @@ TypeMgr::calc_type3(OpCode opcode,
   // ユーザー定義型はここに来る
   // 今はエラーにしておく．
   return NULL;
-}
-
-// @brief 入力に要求される型を求める．
-// @param[in] opcode オペコード
-// @param[in] type 出力の型
-// @param[in] ipos 入力位置
-const Type*
-TypeMgr::req_type(OpCode opcode,
-		  const Type* type,
-		  ymuint ipos)
-{
-  switch ( opcode ) {
-  case kOpCastBoolean:
-
-  case kOpCastInt:
-
-  case kOpCastFloat:
-
-  case kOpBitNeg:
-    ASSERT_COND( ipos == 0 );
-    return int_type();
-
-  case kOpLogNot:
-    ASSERT_COND( ipos == 0 );
-    return boolean_type();
-
-  case kOpUniMinus:
-    ASSERT_COND( ipos == 0 );
-    return type;
-
-  case kOpBitAnd:
-  case kOpBitOr:
-  case kOpBitXor:
-    ASSERT_COND( ipos < 2 );
-    return int_type();
-
-  case kOpLogAnd:
-  case kOpLogOr:
-    ASSERT_COND( ipos < 2 );
-    return boolean_type();
-
-  case kOpPlus:
-  case kOpMinus:
-  case kOpMult:
-  case kOpDiv:
-    ASSERT_COND( ipos < 2 );
-
-  case kOpMod:
-
-  case kOpLshift:
-  case kOpRshift:
-
-  case kOpEqual:
-  case kOpNotEq:
-  case kOpLt:
-  case kOpLe:
-  case kOpIte:
-    break;
-  }
 }
 
 // @brief 組み込み型を登録する．

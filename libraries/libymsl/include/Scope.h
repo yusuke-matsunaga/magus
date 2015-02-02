@@ -66,6 +66,13 @@ public:
   add_type(const Type* item,
 	   Scope* scope);
 
+  /// @brief 定数ノードを追加する．
+  /// @param[in] name 名前
+  /// @param[in] item 追加する要素
+  void
+  add_const(ShString name,
+	    IrNode* item);
+
   /// @brief ラベルを追加する．
   /// @param[in] item 追加する要素
   void

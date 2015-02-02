@@ -36,6 +36,15 @@ SymHandle::var() const
   return NULL;
 }
 
+// @brief 定数を返す．
+//
+// 他の要素の場合には NULL を返す．
+IrNode*
+SymHandle::const_node() const
+{
+  return NULL;
+}
+
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．

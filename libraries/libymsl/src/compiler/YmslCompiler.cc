@@ -246,6 +246,12 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
 
   const Type* type = mTypeMgr.enum_type(name, elem_list);
   Scope* enum_scope = new_scope(scope, name);
+  for (ymuint i = 0; i < n; ++ i) {
+    ShString name = type->enum_elem_name(i);
+    int val = type->enum_elem_val(i);
+    IrNode* const_node = mIrMgr.new_IntConst(val);
+    enum_scope->add_const(name, const_node);
+  }
   scope->add_type(type, enum_scope);
 }
 
@@ -722,34 +728,35 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
 
   if ( nop == 1 ) {
     const Type* op0_type = op0->type();
-    const Type* type = mTypeMgr.calc_type1(opcode, op0_type);
+    const Type* op0_rtype;
+    const Type* type = mTypeMgr.calc_type1(opcode, op0_type, op0_rtype);
     if ( type == NULL ) {
       // type mismatch
       return NULL;
     }
 
-    const Type* rtype = mTypeMgr.req_type(opcode, type, 0);
-    if ( op0_type != rtype ) {
+    if ( op0_type != op0_rtype ) {
       // キャストノードの挿入
+      // 結果を op0 に代入
     }
     return mIrMgr.new_UniOp(opcode, type, op0);
   }
   else if ( nop == 2 ) {
     const Type* op0_type = op0->type();
     const Type* op1_type = op1->type();
-    const Type* type = mTypeMgr.calc_type2(opcode, op0_type, op1_type);
+    const Type* op0_rtype;
+    const Type* op1_rtype;
+    const Type* type = mTypeMgr.calc_type2(opcode, op0_type, op1_type, op0_rtype, op1_rtype);
     if ( type == NULL ) {
       // type mismatch
       return NULL;
     }
 
-    const Type* rtype0 = mTypeMgr.req_type(opcode, type, 0);
-    if ( rtype0 != op0_type ) {
+    if ( op0_rtype != op0_type ) {
       // キャストノードの挿入
     }
 
-    const Type* rtype1 = mTypeMgr.req_type(opcode, type, 1);
-    if ( rtype1 != op1_type ) {
+    if ( op1_rtype != op1_type ) {
       // キャストノードの挿入
     }
     return mIrMgr.new_BinOp(opcode, type, op0, op1);
@@ -758,24 +765,24 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
     const Type* op0_type = op0->type();
     const Type* op1_type = op1->type();
     const Type* op2_type = op2->type();
-    const Type* type = mTypeMgr.calc_type3(opcode, op0_type, op1_type, op2_type);
+    const Type* op0_rtype;
+    const Type* op1_rtype;
+    const Type* op2_rtype;
+    const Type* type = mTypeMgr.calc_type3(opcode, op0_type, op1_type, op2_type, op0_rtype, op1_rtype, op2_rtype);
     if ( type == NULL ) {
       // type mismatch
       return NULL;
     }
 
-    const Type* rtype0 = mTypeMgr.req_type(opcode, type, 0);
-    if ( rtype0 != op0_type ) {
+    if ( op0_rtype != op0_type ) {
       // キャストノードの挿入
     }
 
-    const Type* rtype1 = mTypeMgr.req_type(opcode, type, 1);
-    if ( rtype1 != op1_type ) {
+    if ( op1_rtype != op1_type ) {
       // キャストノードの挿入
     }
 
-    const Type* rtype2 = mTypeMgr.req_type(opcode, type, 2);
-    if ( rtype2 != op2_type ) {
+    if ( op2_rtype != op2_type ) {
       // キャストノードの挿入
     }
     return mIrMgr.new_TriOp(opcode, type, op0, op1, op2);
@@ -796,6 +803,10 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
   if ( h != NULL ) {
     const Var* var = h->var();
     if ( var != NULL ) {
+    }
+    IrNode* const_node = h->const_node();
+    if ( const_node != NULL ) {
+      return const_node;
     }
   }
 
