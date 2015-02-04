@@ -17,11 +17,15 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] src1, src2 オペランド
-IrLoad::IrLoad(IrNode* src1,
-	       IrNode* src2) :
-  mSrc1(src1),
-  mSrc2(src2)
+// @param[in] type 型
+// @param[in] base ベースアドレス
+// @param[in] offset オフセット
+IrLoad::IrLoad(const Type* type,
+	       IrNode* base,
+	       IrNode* offset) :
+  IrNode(kOpLoad, type),
+  mBase(base),
+  mOffset(offset)
 {
 }
 
@@ -30,11 +34,18 @@ IrLoad::~IrLoad()
 {
 }
 
-// @brief opcode を返す．
-OpCode
-IrLoad::opcode() const
+// @brief ベースアドレスを返す．
+IrNode*
+IrLoad::base() const
 {
-  return kOpLoad;
+  return mBase;
+}
+
+// @brief オフセットを返す．
+IrNode*
+IrLoad::offset() const
+{
+  return mOffset;
 }
 
 END_NAMESPACE_YM_YMSL

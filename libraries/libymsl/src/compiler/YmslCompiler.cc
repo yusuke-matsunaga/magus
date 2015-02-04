@@ -53,19 +53,23 @@ YmslCompiler::compile(IDO& ido)
     return false;
   }
 
+  mFuncCallList.clear();
+
+  // 中間表現を作る．
   AstStatement* toplevel = ast_mgr.toplevel();
+  vector<IrNode*> node_list;
+  elab_stmt(toplevel, NULL, node_list);
 
-  mStmtList.clear();
-
-  phase1(toplevel, NULL);
-
-  for (vector<pair<const AstStatement*, Scope*> >::iterator p = mStmtList.begin();
-       p != mStmtList.end(); ++ p) {
-    const AstStatement* stmt = p->first;
-    Scope* scope = p->second;
-    phase2(stmt, scope);
+  // 関数呼び出しの解決を行う．
+  for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();
+       p != mFuncCallList.end(); ++ p) {
+    const AstExpr* func_expr = p->mExpr;
+    Scope* scope = p->mScope;
+    IrNode* node = p->mNode;
+    resolve_func(func_expr, scope, node);
   }
 
+  // 後始末
   for (vector<Scope*>::iterator p = mScopeList.begin();
       p != mScopeList.end(); ++ p) {
     delete *p;
@@ -84,6 +88,8 @@ YmslCompiler::compile(IDO& ido)
   }
   mFuncList.clear();
 
+  mIrMgr.clear();
+
   mTypeMgr.clear();
 
   return true;
@@ -91,21 +97,21 @@ YmslCompiler::compile(IDO& ido)
 
 // @brief 要素の生成を行う．
 // @param[in] stmt 文
+// @param[in] scope 現在のスコープ
+// @param[out] node_list 生成されたノードのリスト
 void
-YmslCompiler::phase1(const AstStatement* stmt,
-		     Scope* scope)
+YmslCompiler::elab_stmt(const AstStatement* stmt,
+			Scope* scope,
+			vector<IrNode*>& node_list)
 {
-  mStmtList.push_back(make_pair(stmt, scope));
-
   switch ( stmt->stmt_type() ) {
   case kBlockStmt:
     {
       Scope* block_scope = new_scope(scope);
-
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	phase1(stmt1, block_scope);
+	elab_stmt(stmt1, block_scope, node_list);
       }
     }
     break;
@@ -117,7 +123,11 @@ YmslCompiler::phase1(const AstStatement* stmt,
     break;
 
   case kDoWhile:
-    phase1(stmt->stmt(), scope);
+    {
+      vector<IrNode*> node_list1;
+      elab_stmt(stmt->stmt(), scope, node_list1);
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
+    }
     break;
 
   case kEnumDecl:
@@ -125,6 +135,25 @@ YmslCompiler::phase1(const AstStatement* stmt,
     break;
 
   case kEqAssign:
+    {
+      IrNode* rhs = elab_rhs(stmt->expr(), scope);
+      if ( rhs == NULL ) {
+	// エラー
+	return;
+      }
+      IrNode* lhs_base;
+      IrNode* lhs_offset;
+      bool stat = elab_lhs(stmt->lhs_expr(), scope, lhs_base, lhs_offset);
+      if ( !stat ) {
+	// エラー
+	return;
+      }
+      // 右辺と左辺の型のチェック
+      IrNode* node = mIrMgr.new_Store(lhs_base, lhs_offset, rhs);
+      node_list.push_back(node);
+    }
+    break;
+
   case kEqPlus:
   case kEqMinus:
   case kEqMult:
@@ -146,8 +175,13 @@ YmslCompiler::phase1(const AstStatement* stmt,
     break;
 
   case kIf:
-    phase1(stmt->stmt(), scope);
-    phase1(stmt->else_stmt(), scope);
+    {
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      vector<IrNode*> node_list1;
+      elab_stmt(stmt->stmt(), scope, node_list1);
+      vector<IrNode*> node_list2;
+      elab_stmt(stmt->else_stmt(), scope, node_list2);
+    }
     break;
 
   case kImport:
@@ -161,9 +195,11 @@ YmslCompiler::phase1(const AstStatement* stmt,
 
   case kSwitch:
     {
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
-	phase1(stmt->case_stmt(i), scope);
+	vector<IrNode*> node_list1;
+	elab_stmt(stmt->case_stmt(i), scope, node_list1);
       }
     }
     break;
@@ -174,7 +210,7 @@ YmslCompiler::phase1(const AstStatement* stmt,
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	phase1(stmt1, toplevel_scope);
+	elab_stmt(stmt1, toplevel_scope, node_list);
       }
     }
     break;
@@ -186,14 +222,22 @@ YmslCompiler::phase1(const AstStatement* stmt,
   case kFor:
     {
       Scope* for_scope = new_scope(scope);
-      phase1(stmt->init_stmt(), for_scope);
-      phase1(stmt->next_stmt(), for_scope);
-      phase1(stmt->stmt(), for_scope);
+      vector<IrNode*> node_list1;
+      elab_stmt(stmt->init_stmt(), for_scope, node_list1);
+      IrNode* cond = elab_rhs(stmt->expr(), for_scope);
+      vector<IrNode*> node_list2;
+      elab_stmt(stmt->next_stmt(), for_scope, node_list2);
+      vector<IrNode*> node_list3;
+      elab_stmt(stmt->stmt(), for_scope, node_list3);
     }
     break;
 
   case kWhile:
-    phase1(stmt->stmt(), scope);
+    {
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      vector<IrNode*> node_list1;
+      elab_stmt(stmt->stmt(), scope, node_list1);
+    }
     break;
 
   default:
@@ -435,103 +479,6 @@ YmslCompiler::resolve_type(const AstType* asttype,
   return NULL;
 }
 
-// @brief 参照の解決を行う．
-// @param[in] stmt 文
-// @param[in] scope 現在のスコープ
-void
-YmslCompiler::phase2(const AstStatement* stmt,
-		     Scope* scope)
-{
-  switch ( stmt->stmt_type() ) {
-  case kBlockStmt:
-    // 中身の statement は個別に phase2() で呼ばれる．
-    break;
-
-  case kBreak:
-    break;
-
-  case kContinue:
-    break;
-
-  case kDoWhile:
-    //elab_expr(stmt->expr(), scope);
-    break;
-
-  case kEnumDecl:
-    //reg_enum(stmt, scope);
-    break;
-
-  case kEqAssign:
-  case kEqPlus:
-  case kEqMinus:
-  case kEqMult:
-  case kEqDiv:
-  case kEqMod:
-  case kEqLshift:
-  case kEqRshift:
-  case kEqAnd:
-  case kEqOr:
-  case kEqXor:
-  case kExprStmt:
-    //elab_expr(stmt->lhs_expr(), scope);
-    //elab_expr(stmt->expr(), scope);
-    break;
-
-  case kFuncDecl:
-    //reg_func(stmt, scope);
-    break;
-
-  case kGoto:
-    break;
-
-  case kIf:
-    //elab_expr(stmt->expr(), scope);
-    break;
-
-  case kImport:
-    break;
-
-  case kLabel:
-    break;
-
-  case kReturn:
-    if ( stmt->expr() ) {
-      //elab_expr(stmt->expr(), scope);
-    }
-    break;
-
-  case kSwitch:
-    //elab_expr(stmt->expr(), scope);
-    break;
-
-  case kToplevel:
-    break;
-
-  case kVarDecl:
-    //reg_var(stmt, scope);
-    if ( stmt->expr() ) {
-      //elab_expr(stmt->expr(), scope);
-    }
-    break;
-
-  case kFor:
-    {
-      //Scope* for_scope = new Scope(scope);
-      //phase1(stmt->init_stmt(), for_scope);
-      //phase1(stmt->next_stmt(), for_scope);
-      //phase1(stmt->stmt(), for_scope);
-    }
-    break;
-
-  case kWhile:
-    //elab_expr(stmt->expr(), scope);
-    break;
-
-  default:
-    ASSERT_NOT_REACHED;
-  }
-}
-
 // @brief 右辺式の実体化を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
@@ -694,22 +641,6 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
   case kFuncCall:
     {
       const AstExpr* func_expr = ast_expr->func();
-      const Function* func = NULL;
-      if ( func_expr->expr_type() == kSymbolExpr ) {
-	SymHandle* h = scope->find(func_expr->symbol()->str_val());
-	if ( h == NULL ) {
-	  // h is not found
-	  return NULL;
-	}
-	func = h->function();
-	if ( func == NULL ) {
-	  // func is not a function
-	  return NULL;
-	}
-      }
-      else {
-	// 未完
-      }
       ymuint n = ast_expr->arglist_num();
       vector<IrNode*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
@@ -718,7 +649,9 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
 	// 必要に応じてキャストノードを挿入する．
 	arglist[i] = arg;
       }
-      return mIrMgr.new_FuncCall(func, arglist);
+      IrNode* node = mIrMgr.new_FuncCall(NULL, arglist);
+      mFuncCallList.push_back(FuncCallStub(func_expr, scope, node));
+      return node;
     }
     break;
 
@@ -822,13 +755,28 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
     {
       IrNode* body = elab_rhs_primary(ast_expr->body(), scope);
       IrNode* index = elab_rhs(ast_expr->index(), scope);
-      // ...
+      if ( body->type()->type_id() != kArrayType ) {
+	// body is not an array
+	return NULL;
+      }
+      if ( index->type()->type_id() != kIntType ) {
+	// index is not an integer
+	return NULL;
+      }
+      const Type* etype = body->type()->elem_type();
+      return mIrMgr.new_Load(etype, body, index);
     }
     break;
 
   case kMemberRef:
     {
+      // resolve_symbol() で失敗しているので
+      // ここでは階層名は考えなくてよい．
       IrNode* body = elab_rhs_primary(ast_expr->body(), scope);
+      const Type* type = body->type();
+      const AstSymbol* member_symbol = ast_expr->member();
+      ShString member_name = member_symbol->str_val();
+      // type のメンバに member_name があることを確認する．
     }
     break;
 
@@ -846,20 +794,43 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 // @param[out] offset オフセット
 //
 // エラーが起きたら false を返す．
-// 書き込む位置が決まっている場合には
-// base = NULL とする．
 bool
 YmslCompiler::elab_lhs(const AstExpr* ast_expr,
 		       Scope* scope,
-		       IrNode& base,
-		       int& offset)
+		       IrNode*& base,
+		       IrNode*& offset)
 {
+  SymHandle* h = resolve_symbol(ast_expr, scope);
+  if ( h != NULL ) {
+    const Var* var = h->var();
+    if ( var != NULL ) {
+      base = mIrMgr.new_VarRef(var);
+      offset = NULL;
+      return true;
+    }
+    // 左辺のシンボルは変数だけ．
+    return false;
+  }
+
   switch ( ast_expr->expr_type() ) {
   case kSymbolExpr:
-    break;
+    // これはあり得ない．
+    return false;
 
   case kArrayRef:
-    break;
+    // 配列本体やインデックス値自体は右辺値
+    base = elab_rhs_primary(ast_expr->body(), scope);
+    if ( base->type()->type_id() != kArrayType ) {
+      // base is not an array
+      return false;
+    }
+
+    offset = elab_rhs(ast_expr->index(), scope);
+    if ( offset->type()->type_id() != kIntType ) {
+      // offset is not an integer
+      return false;
+    }
+    return true;
 
   case kMemberRef:
     break;
@@ -901,6 +872,37 @@ YmslCompiler::resolve_symbol(const AstExpr* expr,
   }
 
   return NULL;
+}
+
+// @brief 式から関数の解決を行う．
+// @param[in] expr 式
+// @param[in] scope 現在のスコープ
+// @param[in] node 関数呼び出しノード
+bool
+YmslCompiler::resolve_func(const AstExpr* expr,
+			   Scope* scope,
+			   IrNode* node)
+{
+  const Function* func = NULL;
+  if ( expr->expr_type() == kSymbolExpr ) {
+    const AstSymbol* func_symbol = expr->symbol();
+    SymHandle* h = scope->find(func_symbol->str_val());
+    if ( h == NULL ) {
+      // h is not found
+      return false;
+    }
+    func = h->function();
+    if ( func == NULL ) {
+      // func is not a function
+      return false;
+    }
+    // node に func をセット
+    return true;
+  }
+  else {
+    // 未完
+  }
+  return false;
 }
 
 // @brief スコープを生成する．

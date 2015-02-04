@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrBinOp.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,14 +19,17 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief ストア命令を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrStore :
-  public IrBinOp
+  public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] src1, src2 オペランド
-  IrStore(IrNode* src1,
-	  IrNode* src2);
+  /// @param[in] base ベースアドレス
+  /// @param[in] offset オフセット
+  /// @param[in] val 値
+  IrStore(IrNode* base,
+	  IrNode* offset,
+	  IrNode* val);
 
   /// @brief デストラクタ
   virtual
@@ -38,10 +41,35 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief opcode を返す．
+  /// @brief ベースアドレスを返す．
   virtual
-  OpCode
-  opcode() const;
+  IrNode*
+  base() const;
+
+  /// @brief オフセットを返す．
+  virtual
+  IrNode*
+  offset() const;
+
+  /// @brief 書き込む値を返す．
+  virtual
+  IrNode*
+  store_val() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ベースアドレス
+  IrNode* mBase;
+
+  // オフセット
+  IrNode* mOffset;
+
+  // 書き込む値
+  IrNode* mStoreVal;
 
 };
 

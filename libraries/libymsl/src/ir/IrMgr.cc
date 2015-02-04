@@ -15,6 +15,8 @@
 #include "IrFloatConst.h"
 #include "IrStringConst.h"
 #include "IrVarRef.h"
+#include "IrLoad.h"
+#include "IrStore.h"
 #include "IrUniOp.h"
 #include "IrBinOp.h"
 #include "IrTriOp.h"
@@ -38,6 +40,13 @@ IrMgr::IrMgr(TypeMgr& type_mgr) :
 // @brief デストラクタ
 IrMgr::~IrMgr()
 {
+}
+
+// @brief クリアする．
+void
+IrMgr::clear()
+{
+  mAlloc.destroy();
 }
 
 // @brief true 定数を生成する．
@@ -89,6 +98,38 @@ IrMgr::new_VarRef(const Var* var)
 {
   void* p = mAlloc.get_memory(sizeof(IrVarRef));
   return new (p) IrVarRef(var);
+}
+
+// @brief ロード命令を生成する．
+// @param[in] type 型
+// @param[in] base ベースアドレス
+// @param[in] offset オフセット
+//
+// offset は int 型でなければならない．
+IrNode*
+IrMgr::new_Load(const Type* type,
+		IrNode* base,
+		IrNode* offset)
+{
+  void* p = mAlloc.get_memory(sizeof(IrLoad));
+  return new (p) IrLoad(type, base, offset);
+}
+
+// @brief ストア命令を生成する．
+// @param[in] base ベースアドレス
+// @param[in] offset オフセット
+// @param[in] val 値
+//
+// base は array 型でなければならない．
+// offset は int 型でなければならない．
+// val の型と base の要素型が等しくなければならない．
+IrNode*
+IrMgr::new_Store(IrNode* base,
+		 IrNode* offset,
+		 IrNode* val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrStore));
+  return new (p) IrStore(base, offset, val);
 }
 
 // @brief 単項演算式を生成する．

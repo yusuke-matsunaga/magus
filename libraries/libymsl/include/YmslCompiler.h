@@ -52,9 +52,11 @@ private:
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
+  /// @param[out] node_list 生成されたノードのリスト
   void
-  phase1(const AstStatement* stmt,
-	 Scope* scope);
+  elab_stmt(const AstStatement* stmt,
+	    Scope* scope,
+	    vector<IrNode*>& node_list);
 
   /// @brief enum 型の定義を行う．
   /// @param[in] stmt 文
@@ -92,13 +94,6 @@ private:
   resolve_type(const AstType* asttype,
 	       Scope* scope);
 
-  /// @brief 参照の解決を行う．
-  /// @param[in] stmt 文
-  /// @param[in] scope 現在のスコープ
-  void
-  phase2(const AstStatement* stmt,
-	 Scope* scope);
-
   /// @brief 右辺式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
@@ -120,13 +115,11 @@ private:
   /// @param[out] offset オフセット
   ///
   /// エラーが起きたら false を返す．
-  /// 書き込む位置が決まっている場合には
-  /// base = NULL とする．
   bool
   elab_lhs(const AstExpr* ast_expr,
 	   Scope* scope,
-	   IrNode& base,
-	   int& offset);
+	   IrNode*& base,
+	   IrNode*& offset);
 
   /// @brief 式からスコープの解決を行う．
   /// @param[in] expr 式
@@ -141,6 +134,15 @@ private:
   SymHandle*
   resolve_symbol(const AstExpr* expr,
 		 Scope* scope);
+
+  /// @brief 式から関数の解決を行う．
+  /// @param[in] expr 式
+  /// @param[in] scope 現在のスコープ
+  /// @param[in] node 関数呼び出しノード
+  bool
+  resolve_func(const AstExpr* expr,
+	       Scope* scope,
+	       IrNode* node);
 
   /// @brief スコープを生成する．
   /// @param[in] parent_scope 親のスコープ
@@ -175,8 +177,29 @@ private:
   // 型を管理するマネージャ
   TypeMgr mTypeMgr;
 
-  // 文とスコープのリスト
-  vector<pair<const AstStatement*, Scope*> > mStmtList;
+  struct FuncCallStub {
+
+    // コンストラクタ
+    FuncCallStub(const AstExpr* expr = NULL,
+		 Scope* scope = NULL,
+		 IrNode* node = NULL) :
+      mExpr(expr),
+      mScope(scope),
+      mNode(node) { }
+
+    // 式
+    const AstExpr* mExpr;
+
+    // スコープ
+    Scope* mScope;
+
+    // ノード
+    IrNode* mNode;
+
+  };
+
+  // 関数呼び出しのリスト
+  vector<FuncCallStub> mFuncCallList;
 
   // スコープのリスト
   vector<Scope*> mScopeList;

@@ -17,11 +17,16 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] src1, src2 オペランド
-IrStore::IrStore(IrNode* src1,
-		 IrNode* src2) :
-  mSrc1(src1),
-  mSrc2(src2)
+// @param[in] base ベースアドレス
+// @param[in] offset オフセット
+// @param[in] val 値
+IrStore::IrStore(IrNode* base,
+		 IrNode* offset,
+		 IrNode* val) :
+  IrNode(kOpStore, NULL),
+  mBase(base),
+  mOffset(offset),
+  mStoreVal(val)
 {
 }
 
@@ -30,11 +35,25 @@ IrStore::~IrStore()
 {
 }
 
-// @brief opcode を返す．
-OpCode
-IrStore::opcode() const
+// @brief ベースアドレスを返す．
+IrNode*
+IrStore::base() const
 {
-  return kOpStore;
+  return mBase;
+}
+
+// @brief オフセットを返す．
+IrNode*
+IrStore::offset() const
+{
+  return mOffset;
+}
+
+// @brief 書き込む値を返す．
+IrNode*
+IrStore::store_val() const
+{
+  return mStoreVal;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrBinOp.h"
+#include "IrNode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,14 +19,17 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief ロード命令を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrLoad :
-  public IrBinOp
+  public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] src1, src2 オペランド
-  IrLoad(IrNode* src1,
-	 IrNode* src2);
+  /// @param[in] type 型
+  /// @param[in] base ベースアドレス
+  /// @param[in] offset オフセット
+  IrLoad(const Type* type,
+	 IrNode* base,
+	 IrNode* offset);
 
   /// @brief デストラクタ
   virtual
@@ -38,10 +41,27 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief opcode を返す．
+  /// @brief ベースアドレスを返す．
   virtual
-  OpCode
-  opcode() const;
+  IrNode*
+  base() const;
+
+  /// @brief オフセットを返す．
+  virtual
+  IrNode*
+  offset() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ベースアドレス
+  IrNode* mBase;
+
+  // オフセット
+  IrNode* mOffset;
 
 };
 

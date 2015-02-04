@@ -37,6 +37,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief クリアする．
+  void
+  clear();
+
   /// @brief true 定数を生成する．
   IrNode*
   new_True();
@@ -63,6 +67,28 @@ public:
   /// @brief 変数参照を生成する．
   IrNode*
   new_VarRef(const Var* var);
+
+  /// @brief ロード命令を生成する．
+  /// @param[in] type 型
+  /// @param[in] base ベースアドレス
+  /// @param[in] offset オフセット
+  ///
+  /// offset は int 型でなければならない．
+  IrNode*
+  new_Load(const Type* type,
+	   IrNode* base,
+	   IrNode* offset);
+
+  /// @brief ストア命令を生成する．
+  /// @param[in] base ベースアドレス
+  /// @param[in] offset オフセット
+  /// @param[in] val 値
+  ///
+  /// offset は int 型でなければならない．
+  IrNode*
+  new_Store(IrNode* base,
+	    IrNode* offset,
+	    IrNode* val);
 
   /// @brief 単項演算式を生成する．
   /// @param[in] opcode オペコード
