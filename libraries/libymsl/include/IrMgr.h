@@ -60,6 +60,10 @@ public:
   IrNode*
   new_StringConst(const char* val);
 
+  /// @brief 変数参照を生成する．
+  IrNode*
+  new_VarRef(const Var* var);
+
   /// @brief 単項演算式を生成する．
   /// @param[in] opcode オペコード
   /// @param[in] type 出力の型

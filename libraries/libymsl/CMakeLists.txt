@@ -95,6 +95,7 @@ set (ymsl_SOURCES
   src/ir/IrIntConst.cc
   src/ir/IrFloatConst.cc
   src/ir/IrStringConst.cc
+  src/ir/IrVarRef.cc
   src/ir/IrUniOp.cc
   src/ir/IrBinOp.cc
   src/ir/IrTriOp.cc

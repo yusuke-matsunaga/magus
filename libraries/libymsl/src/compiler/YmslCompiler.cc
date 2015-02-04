@@ -803,6 +803,7 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
   if ( h != NULL ) {
     const Var* var = h->var();
     if ( var != NULL ) {
+      return mIrMgr.new_VarRef(var);
     }
     IrNode* const_node = h->const_node();
     if ( const_node != NULL ) {

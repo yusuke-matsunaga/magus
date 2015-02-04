@@ -93,6 +93,14 @@ IrNode::string_val() const
   return NULL;
 }
 
+// @brief 変数を返す．
+const Var*
+IrNode::var() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 // @brief 関数本体を返す．
 //
 // kOpFuncCall のみ有効

@@ -17,6 +17,9 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 /// @class IrNode IrNode.h "IrNode.h"
 /// @brief IR(intermediate representation) ノードを表す基底クラス
+///
+/// C の union を C++ 風に実装したようなものなので
+/// なんでもありのインターフェイスになっている．
 //////////////////////////////////////////////////////////////////////
 class IrNode
 {
@@ -81,6 +84,11 @@ public:
   virtual
   const char*
   string_val() const;
+
+  /// @brief 変数を返す．
+  virtual
+  const Var*
+  var() const;
 
   /// @brief 関数本体を返す．
   ///
