@@ -362,10 +362,8 @@ enum OpCode {
   kOpFuncCall,
   // ジャンプ
   kOpJump,
-  kOpBranchEqual,
-  kOpBranchNotEq,
-  kOpBranchLt,
-  kOpBranchGe,
+  kOpBranchTrue,
+  kOpBranchFalse,
   // 特殊
   kOpLabel,
   // 停止

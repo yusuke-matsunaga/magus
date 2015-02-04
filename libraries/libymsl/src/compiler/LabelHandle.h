@@ -10,6 +10,7 @@
 
 
 #include "SymHandle.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -24,8 +25,10 @@ class LabelHandle :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] name 名前
   /// @param[in] label ラベル
-  LabelHandle(Label* statement);
+  LabelHandle(ShString name,
+	      IrNode* label);
 
   /// @brief デストラクタ
   virtual
@@ -46,7 +49,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  Label*
+  IrNode*
   label() const;
 
 
@@ -55,8 +58,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 名前
+  ShString mName;
+
   // ラベル
-  Label* mLabel;
+  IrNode* mLabel;
 
 };
 

@@ -73,7 +73,6 @@ set (ymsl_SOURCES
   src/compiler/Function.cc
   src/compiler/FuncHandle.cc
   src/compiler/FuncType.cc
-  src/compiler/Label.cc
   src/compiler/LabelHandle.cc
   src/compiler/MapType.cc
   src/compiler/NamedType.cc
@@ -103,6 +102,7 @@ set (ymsl_SOURCES
   src/ir/IrTriOp.cc
   src/ir/IrFuncCall.cc
   src/ir/IrJump.cc
+  src/ir/IrLabel.cc
 
   src/engine/YmslVM.cc
 

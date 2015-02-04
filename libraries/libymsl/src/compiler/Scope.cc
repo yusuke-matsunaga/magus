@@ -59,11 +59,13 @@ Scope::name() const
 }
 
 // @brief ラベルを追加する．
+// @param[in] name 名前
 // @param[in] item 追加する要素
 void
-Scope::add_label(Label* item)
+Scope::add_label(ShString name,
+		 IrNode* item)
 {
-  SymHandle* handle = new LabelHandle(item);
+  SymHandle* handle = new LabelHandle(name, item);
   put(handle);
 }
 

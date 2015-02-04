@@ -52,10 +52,14 @@ private:
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
+  /// @param[in] start_label ブロックの開始ラベル
+  /// @param[in] end_label ブロックの終了ラベル
   /// @param[out] node_list 生成されたノードのリスト
   void
   elab_stmt(const AstStatement* stmt,
 	    Scope* scope,
+	    IrNode* start_label,
+	    IrNode* end_label,
 	    vector<IrNode*>& node_list);
 
   /// @brief enum 型の定義を行う．
@@ -177,6 +181,7 @@ private:
   // 型を管理するマネージャ
   TypeMgr mTypeMgr;
 
+  // mFuncCallList の要素の構造体
   struct FuncCallStub {
 
     // コンストラクタ

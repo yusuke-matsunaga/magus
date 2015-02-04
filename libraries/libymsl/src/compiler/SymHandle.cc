@@ -57,7 +57,7 @@ SymHandle::function() const
 // @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
-Label*
+IrNode*
 SymHandle::label() const
 {
   return NULL;

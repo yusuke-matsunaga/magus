@@ -25,7 +25,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] opcode オペコード
-  IrJump(OpCode opcode);
+  /// @param[in] label ジャンプ先のラベル
+  /// @param[in] cond 条件
+  IrJump(OpCode opcode,
+	 IrNode* label,
+	 IrNode* cond);
 
   /// @brief デストラクタ
   virtual
@@ -37,11 +41,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief opcode を返す．
-  virtual
-  OpCode
-  opcode() const;
-
   /// @brief ジャンプ先のノードを得る．
   ///
   /// kOpJump, kOpBranchXXX のみ有効
@@ -49,13 +48,10 @@ public:
   IrNode*
   jump_addr() const;
 
-  /// @brief ジャンプ先のノードを設定する．
-  /// @param[in] node ジャンプ先のノード
-  ///
-  /// kOpJump, kOpBranchXXX のみ有効
+  /// @brief 分岐条件
   virtual
-  void
-  set_addr(IrNode* node);
+  IrNode*
+  branch_cond() const;
 
 
 private:
@@ -63,11 +59,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // オペコード
-  OpCode mOpCode;
-
   // ジャンプ先のノード
   IrNode* mJumpAddr;
+
+  // 条件
+  IrNode* mCond;
 
 };
 

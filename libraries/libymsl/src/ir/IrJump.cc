@@ -18,22 +18,20 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] opcode オペコード
-IrJump::IrJump(OpCode opcode) :
-  IrNode(opcode, NULL)
+// @param[in] label ジャンプ先のラベル
+// @param[in] cond 条件
+IrJump::IrJump(OpCode opcode,
+	       IrNode* label,
+	       IrNode* cond) :
+  IrNode(opcode, NULL),
+  mJumpAddr(label),
+  mCond(cond)
 {
-  mJumpAddr = NULL;
 }
 
 // @brief デストラクタ
 IrJump::~IrJump()
 {
-}
-
-// @brief opcode を返す．
-OpCode
-IrJump::opcode() const
-{
-  return mOpCode;
 }
 
 // @brief ジャンプ先のノードを得る．
@@ -45,15 +43,11 @@ IrJump::jump_addr() const
   return mJumpAddr;
 }
 
-// @brief ジャンプ先のノードを設定する．
-// @param[in] node ジャンプ先のノード
-//
-// kOpJump, kOpBranchXXX のみ有効
-void
-IrJump::set_addr(IrNode* node)
+// @brief 分岐条件
+IrNode*
+IrJump::branch_cond() const
 {
-  ASSERT_COND( mJumpAddr == NULL );
-  mJumpAddr = node;
+  return mCond;
 }
 
 END_NAMESPACE_YM_YMSL

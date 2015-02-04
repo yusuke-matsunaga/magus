@@ -119,13 +119,10 @@ public:
   IrNode*
   jump_addr() const;
 
-  /// @brief ジャンプ先のノードを設定する．
-  /// @param[in] node ジャンプ先のノード
-  ///
-  /// kOpJump, kOpBranchXXX のみ有効
+  /// @brief 分岐条件
   virtual
-  void
-  set_addr(IrNode* node);
+  IrNode*
+  branch_cond() const;
 
 
 private:

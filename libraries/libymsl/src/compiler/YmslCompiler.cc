@@ -57,8 +57,9 @@ YmslCompiler::compile(IDO& ido)
 
   // 中間表現を作る．
   AstStatement* toplevel = ast_mgr.toplevel();
+  Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
   vector<IrNode*> node_list;
-  elab_stmt(toplevel, NULL, node_list);
+  elab_stmt(toplevel, toplevel_scope, NULL, NULL, node_list);
 
   // 関数呼び出しの解決を行う．
   for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();
@@ -98,10 +99,14 @@ YmslCompiler::compile(IDO& ido)
 // @brief 要素の生成を行う．
 // @param[in] stmt 文
 // @param[in] scope 現在のスコープ
+// @param[in] start_label ブロックの開始ラベル
+// @param[in] end_label ブロックの終了ラベル
 // @param[out] node_list 生成されたノードのリスト
 void
 YmslCompiler::elab_stmt(const AstStatement* stmt,
 			Scope* scope,
+			IrNode* start_label,
+			IrNode* end_label,
 			vector<IrNode*>& node_list)
 {
   switch ( stmt->stmt_type() ) {
@@ -111,22 +116,43 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	elab_stmt(stmt1, block_scope, node_list);
+	elab_stmt(stmt1, block_scope, start_label, end_label, node_list);
       }
     }
     break;
 
   case kBreak:
+    {
+      if ( end_label == NULL ) {
+	// not inside loop
+	return;
+      }
+      IrNode* node = mIrMgr.new_Jump(kOpJump, end_label);
+      node_list.push_back(node);
+    }
     break;
 
   case kContinue:
+    {
+      if ( start_label == NULL ) {
+	// not inside loop
+	return;
+      }
+      IrNode* node = mIrMgr.new_Jump(kOpJump, start_label);
+      node_list.push_back(node);
+    }
     break;
 
   case kDoWhile:
     {
-      vector<IrNode*> node_list1;
-      elab_stmt(stmt->stmt(), scope, node_list1);
+      IrNode* start1 = mIrMgr.new_Label();
+      IrNode* end1 = mIrMgr.new_Label();
+      node_list.push_back(start1);
+      elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
       IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* node1 = mIrMgr.new_Jump(kOpBranchTrue, start1, cond);
+      node_list.push_back(node1);
+      node_list.push_back(end1);
     }
     break;
 
@@ -177,10 +203,15 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
   case kIf:
     {
       IrNode* cond = elab_rhs(stmt->expr(), scope);
-      vector<IrNode*> node_list1;
-      elab_stmt(stmt->stmt(), scope, node_list1);
-      vector<IrNode*> node_list2;
-      elab_stmt(stmt->else_stmt(), scope, node_list2);
+      IrNode* label1 = mIrMgr.new_Label();
+      IrNode* label2 = mIrMgr.new_Label();
+      IrNode* node1 = mIrMgr.new_Jump(kOpBranchFalse, label1, cond);
+      node_list.push_back(node1);
+      elab_stmt(stmt->stmt(), scope, start_label, end_label, node_list);
+      IrNode* node2 = mIrMgr.new_Jump(kOpJump, label2);
+      node_list.push_back(node2);
+      elab_stmt(stmt->else_stmt(), scope, start_label, end_label, node_list);
+      node_list.push_back(label2);
     }
     break;
 
@@ -199,18 +230,17 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
 	vector<IrNode*> node_list1;
-	elab_stmt(stmt->case_stmt(i), scope, node_list1);
+	elab_stmt(stmt->case_stmt(i), scope, start_label, end_label, node_list1);
       }
     }
     break;
 
   case kToplevel:
     {
-      Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	elab_stmt(stmt1, toplevel_scope, node_list);
+	elab_stmt(stmt1, scope, NULL, NULL, node_list);
       }
     }
     break;
@@ -222,21 +252,31 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
   case kFor:
     {
       Scope* for_scope = new_scope(scope);
-      vector<IrNode*> node_list1;
-      elab_stmt(stmt->init_stmt(), for_scope, node_list1);
+      elab_stmt(stmt->init_stmt(), for_scope, NULL, NULL, node_list);
+      IrNode* start1 = mIrMgr.new_Label();
+      node_list.push_back(start1);
+      IrNode* end1 = mIrMgr.new_Label();
       IrNode* cond = elab_rhs(stmt->expr(), for_scope);
-      vector<IrNode*> node_list2;
-      elab_stmt(stmt->next_stmt(), for_scope, node_list2);
-      vector<IrNode*> node_list3;
-      elab_stmt(stmt->stmt(), for_scope, node_list3);
+      IrNode* node1 = mIrMgr.new_Jump(kOpBranchFalse, end1, cond);
+      node_list.push_back(node1);
+      elab_stmt(stmt->stmt(), for_scope, start1, end1, node_list);
+      elab_stmt(stmt->next_stmt(), for_scope, start1, end1, node_list);
+      IrNode* node2 = mIrMgr.new_Jump(kOpJump, start1);
+      node_list.push_back(node2);
     }
     break;
 
   case kWhile:
     {
+      IrNode* start1 = mIrMgr.new_Label();
+      node_list.push_back(start1);
       IrNode* cond = elab_rhs(stmt->expr(), scope);
-      vector<IrNode*> node_list1;
-      elab_stmt(stmt->stmt(), scope, node_list1);
+      IrNode* end1 = mIrMgr.new_Label();
+      IrNode* node1 = mIrMgr.new_Jump(kOpBranchFalse, end1, cond);
+      node_list.push_back(node1);
+      elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
+      IrNode* node2 = mIrMgr.new_Jump(kOpJump, start1);
+      node_list.push_back(node2);
     }
     break;
 

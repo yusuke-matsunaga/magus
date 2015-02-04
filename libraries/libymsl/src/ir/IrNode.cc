@@ -142,14 +142,12 @@ IrNode::jump_addr() const
   return NULL;
 }
 
-// @brief ジャンプ先のノードを設定する．
-// @param[in] node ジャンプ先のノード
-//
-// kOpJump, kOpBranchXXX のみ有効
-void
-IrNode::set_addr(IrNode* node)
+// @brief 分岐条件
+IrNode*
+IrNode::branch_cond() const
 {
   ASSERT_NOT_REACHED;
+  return NULL;
 }
 
 END_NAMESPACE_YM_YMSL

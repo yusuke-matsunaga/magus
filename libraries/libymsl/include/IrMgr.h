@@ -129,8 +129,16 @@ public:
 
   /// @brief ジャンプ系のノードを生成する．
   /// @param[in] opcode オペコード
+  /// @param[in] label ジャンプ先のラベル
+  /// @param[in] cond 条件
   IrNode*
-  new_Jump(OpCode opcode);
+  new_Jump(OpCode opcode,
+	   IrNode* label,
+	   IrNode* cond = NULL);
+
+  /// @brief ラベルノードを生成する．
+  IrNode*
+  new_Label();
 
 
 private:

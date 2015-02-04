@@ -22,6 +22,7 @@
 #include "IrTriOp.h"
 #include "IrFuncCall.h"
 #include "IrJump.h"
+#include "IrLabel.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -187,11 +188,23 @@ IrMgr::new_FuncCall(const Function* func,
 
 // @brief ジャンプ系のノードを生成する．
 // @param[in] opcode オペコード
+// @param[in] label ジャンプ先のラベル
+// @param[in] cond 条件
 IrNode*
-IrMgr::new_Jump(OpCode opcode)
+IrMgr::new_Jump(OpCode opcode,
+		IrNode* label,
+		IrNode* cond)
 {
   void* p = mAlloc.get_memory(sizeof(IrJump));
-  return new (p) IrJump(opcode);
+  return new (p) IrJump(opcode, label, cond);
+}
+
+// @brief ラベルノードを生成する．
+IrNode*
+IrMgr::new_Label()
+{
+  void* p = mAlloc.get_memory(sizeof(IrLabel));
+  return new (p) IrLabel();
 }
 
 END_NAMESPACE_YM_YMSL
