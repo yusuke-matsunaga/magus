@@ -44,10 +44,8 @@ class Var;
 class IrNode;
 
 class AstCaseItem;
-class AstEnumDecl;
 class AstEnumConst;
 class AstExpr;
-class AstFuncDecl;
 class AstMgr;
 class AstModule;
 class AstParam;
@@ -56,7 +54,6 @@ class AstStringConst;
 class AstSymbol;
 class AstToplevel;
 class AstType;
-//class AstVarDecl;
 
 template <typename T>
 class AstList;

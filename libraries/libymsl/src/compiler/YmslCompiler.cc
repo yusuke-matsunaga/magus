@@ -142,6 +142,10 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
     }
     break;
 
+  case kConstDecl:
+    reg_const(stmt, scope);
+    break;
+
   case kContinue:
     {
       if ( start_label == NULL ) {
@@ -482,6 +486,40 @@ YmslCompiler::reg_var(const AstStatement* stmt,
 
   Var* var = new_var(name, type);
   scope->add_var(var);
+}
+
+// @brief 定数の定義を行う．
+// @param[in] stmt 文
+//
+// stmt は kConstDecl でなければならない．
+void
+YmslCompiler::reg_const(const AstStatement* stmt,
+			Scope* scope)
+{
+  ASSERT_COND( stmt->stmt_type() == kConstDecl );
+
+  const AstSymbol* name_symbol = stmt->name();
+  ShString name = name_symbol->str_val();
+
+  SymHandle* h = scope->find_local(name);
+  if ( h != NULL ) {
+    // name が重複している．
+    // previous definition is h->file_region()
+    return;
+  }
+
+  const AstType* asttype = stmt->type();
+  const Type* type = resolve_type(asttype, scope);
+  if ( type == NULL ) {
+    // エラーメッセージをどこで出すか考える．
+    return;
+  }
+
+  IrNode* node = elab_rhs(stmt->expr(), scope);
+  // node->type() が type と互換性があるかをチェック
+  // node が定数式かチェック
+
+  scope->add_const(name, node);
 }
 
 // @brief 型の参照を解決する．

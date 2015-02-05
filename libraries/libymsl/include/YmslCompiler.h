@@ -89,6 +89,15 @@ private:
   reg_var(const AstStatement* stmt,
 	  Scope* scope);
 
+  /// @brief 定数の定義を行う．
+  /// @param[in] stmt 文
+  /// @param[in] scope 現在のスコープ
+  ///
+  /// stmt は kConstDecl でなければならない．
+  void
+  reg_const(const AstStatement* stmt,
+	    Scope* scope);
+
   /// @brief 型の参照を解決する．
   /// @param[in] asttype 型を表す構文木
   /// @param[in] scope 現在のスコープ
