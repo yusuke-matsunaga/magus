@@ -56,7 +56,7 @@ class AstStringConst;
 class AstSymbol;
 class AstToplevel;
 class AstType;
-class AstVarDecl;
+//class AstVarDecl;
 
 template <typename T>
 class AstList;
@@ -233,6 +233,7 @@ operator<<(ostream& s,
 enum StmtType {
   kBlockStmt,
   kBreak,
+  kConstDecl,
   kContinue,
   kDecr,
   kDoWhile,

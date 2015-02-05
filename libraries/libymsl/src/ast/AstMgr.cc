@@ -18,6 +18,7 @@
 #include "AstBlockStmt.h"
 #include "AstBreak.h"
 #include "AstCaseItem.h"
+#include "AstConstDecl.h"
 #include "AstContinue.h"
 #include "AstDecr.h"
 #include "AstDoWhile.h"
@@ -250,6 +251,21 @@ AstMgr::new_VarDecl(AstSymbol* name,
 {
   void* p = mAlloc.get_memory(sizeof(AstVarDecl));
   return new (p) AstVarDecl(name, type, init_expr, loc);
+}
+
+// @brief 定数宣言を作る．
+// @param[in] name 定数名
+// @param[in] type 型
+// @param[in] init_expr 初期化式
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_ConstDecl(AstSymbol* name,
+		      AstType* type,
+		      AstExpr* init_expr,
+		      const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstConstDecl));
+  return new (p) AstConstDecl(name, type, init_expr, loc);
 }
 
 // @brief パラメータ宣言を作る．

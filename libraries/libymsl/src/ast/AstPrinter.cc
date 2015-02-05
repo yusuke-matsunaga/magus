@@ -57,6 +57,18 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << "break;" << endl;
     break;
 
+  case kConstDecl:
+    print_indent(indent);
+    mS << "const " << stmt->name()->str_val() << ": ";
+    print_type(stmt->type());
+    {
+      const AstExpr* expr = stmt->expr();
+      mS << " = ";
+      print_expr(expr);
+    }
+    mS << ";" << endl;
+    break;
+
   case kContinue:
     print_indent(indent);
     mS << "continue;" << endl;
@@ -376,7 +388,7 @@ AstPrinter::print_expr(const AstExpr* expr)
     break;
 
   case kStringConst:
-    mS << expr->string_val();
+    mS << '"' << expr->string_val() << '"';
     break;
 
   case kSymbolExpr:

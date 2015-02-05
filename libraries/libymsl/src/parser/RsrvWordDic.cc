@@ -75,6 +75,7 @@ STpair init_data[] = {
   { "boolean",  BOOLEAN    },
   { "break",    BREAK      },
   { "case",     CASE       },
+  { "const",    CONST      },
   { "continue", CONTINUE   },
   { "default",  DEFAULT    },
   { "do",       DO         },

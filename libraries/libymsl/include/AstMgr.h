@@ -127,6 +127,17 @@ public:
 	      AstExpr* init_expr,
 	      const FileRegion& loc);
 
+  /// @brief 定数宣言を作る．
+  /// @param[in] name 定数名
+  /// @param[in] type 型
+  /// @param[in] init_expr 初期化式
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_ConstDecl(AstSymbol* name,
+		AstType* type,
+		AstExpr* init_expr,
+		const FileRegion& loc);
+
   /// @brief パラメータ宣言を作る．
   /// @param[in] name 変数名
   /// @param[in] type 型

@@ -129,6 +129,20 @@ public:
   IrNode*
   return_val() const;
 
+  /// @brief 定義済みの時に true を返す．
+  ///
+  /// kOpLabel のみ意味を持つ．
+  virtual
+  bool
+  is_defined() const;
+
+  /// @brief 定義済みにする．
+  ///
+  /// kOpLabel のみ意味を持つ．
+  virtual
+  void
+  set_defined();
+
 
 private:
   //////////////////////////////////////////////////////////////////////

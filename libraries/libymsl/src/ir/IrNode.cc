@@ -158,4 +158,23 @@ IrNode::return_val() const
   return NULL;
 }
 
+// @brief 定義済みの時に true を返す．
+//
+// kOpLabel のみ意味を持つ．
+bool
+IrNode::is_defined() const
+{
+  ASSERT_NOT_REACHED;
+  return false;
+}
+
+// @brief 定義済みにする．
+//
+// kOpLabel のみ意味を持つ．
+void
+IrNode::set_defined()
+{
+  ASSERT_NOT_REACHED;
+}
+
 END_NAMESPACE_YM_YMSL

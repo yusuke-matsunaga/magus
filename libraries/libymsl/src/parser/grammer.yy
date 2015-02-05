@@ -105,7 +105,7 @@ fr_merge(const FileRegion fr_array[],
 }
 
 
-// 終端記号
+// 終端記号(文字以外の記号)
 %token COLON
 %token SEMI
 %token COMMA
@@ -131,12 +131,14 @@ fr_merge(const FileRegion fr_array[],
 %token LBK
 %token RBK
 
+// 終端記号(予約語)
 %token ARRAY
 %token AS
 %token BOOLEAN
 %token BREAK
 %token CASE
 %token CLASS
+%token CONST
 %token CONTINUE
 %token DEFAULT
 %token DO
@@ -161,6 +163,7 @@ fr_merge(const FileRegion fr_array[],
 %token VOID
 %token WHILE
 
+// 値を持つ終端記号
 %token <symbol_type> SYMBOL
 %token <expr_type>   INT_VAL
 %token <expr_type>   FLOAT_VAL
@@ -299,6 +302,11 @@ statement
 | VAR SYMBOL COLON type init_expr SEMI
 {
   $$ = mgr.new_VarDecl($2, $4, $5, @$);
+}
+// 定数定義
+| CONST SYMBOL COLON type EQ expr SEMI
+{
+  $$ = mgr.new_ConstDecl($2, $4, $6, @$);
 }
 // ラベル文
 | SYMBOL COLON

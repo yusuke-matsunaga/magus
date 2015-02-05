@@ -68,6 +68,8 @@ parser_test(int argc,
       "var i:map(int, string);\n"
       "var k:array(set(int));\n"
       "var F:int;\n"
+      "const pi:float = 3.1415;\n"
+      "const msg:string = \"hello YMSL!\";\n"
       "a = 1;\n"
       "if a == b {\n"
       "F = a + b;\n"

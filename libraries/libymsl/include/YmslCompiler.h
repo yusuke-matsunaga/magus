@@ -206,6 +206,9 @@ private:
   // 関数呼び出しのリスト
   vector<FuncCallStub> mFuncCallList;
 
+  // 未定義ラベルのリスト
+  vector<IrNode*> mUndefList;
+
   // スコープのリスト
   vector<Scope*> mScopeList;
 

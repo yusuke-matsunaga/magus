@@ -70,7 +70,15 @@ YmslCompiler::compile(IDO& ido)
     resolve_func(func_expr, scope, node);
   }
 
-  // ラベルの解決を行う．
+  // ラベルの解決が行われているかチェックする．
+  for (vector<IrNode*>::iterator p = mUndefList.begin();
+       p != mUndefList.end(); ++ p) {
+    IrNode* label = *p;
+    if ( !label->is_defined() ) {
+      // undefined
+      return false;
+    }
+  }
 
   // 後始末
   for (vector<Scope*>::iterator p = mScopeList.begin();
@@ -215,7 +223,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 	// ノードを作ってしまう．
 	label_node = mIrMgr.new_Label();
 	scope->add_label(label_symbol->str_val(), label_node);
-	// label_node をどこかに記憶しておく．
+	mUndefList.push_back(label_node);
       }
       else {
 	label_node = h->label();
@@ -263,10 +271,12 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 	  // というかラベルじゃないものだった．
 	  return;
 	}
-	// label_node が goto 文によって作られたものなら
-	// hanging flag を下ろす．
-	// そうでなければ同名のラベルの2重定義となる．
+	if ( label_node->is_defined() ) {
+	  // 二重定義
+	  return;
+	}
       }
+      label_node->set_defined();
       node_list.push_back(label_node);
     }
     break;

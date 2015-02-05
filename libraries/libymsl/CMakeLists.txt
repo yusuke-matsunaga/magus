@@ -28,6 +28,7 @@ set (ymsl_SOURCES
   src/ast/AstBlockStmt.cc
   src/ast/AstBreak.cc
   src/ast/AstCaseItem.cc
+  src/ast/AstConstDecl.cc
   src/ast/AstContinue.cc
   src/ast/AstDecr.cc
   src/ast/AstDoWhile.cc
