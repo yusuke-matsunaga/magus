@@ -127,6 +127,11 @@ public:
   new_FuncCall(const Function* func,
 	       const vector<IrNode*>& arglist);
 
+  /// @brief リターン命令を生成する．
+  /// @param[in] ret_val 返り値
+  IrNode*
+  new_Return(IrNode* ret_val = NULL);
+
   /// @brief ジャンプ系のノードを生成する．
   /// @param[in] opcode オペコード
   /// @param[in] label ジャンプ先のラベル

@@ -21,6 +21,7 @@
 #include "IrBinOp.h"
 #include "IrTriOp.h"
 #include "IrFuncCall.h"
+#include "IrReturn.h"
 #include "IrJump.h"
 #include "IrLabel.h"
 
@@ -184,6 +185,15 @@ IrMgr::new_FuncCall(const Function* func,
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncCall));
   return new (p) IrFuncCall(func, arglist);
+}
+
+// @brief リターン命令を生成する．
+// @param[in] ret_val 返り値
+IrNode*
+IrMgr::new_Return(IrNode* ret_val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrReturn));
+  return new (p) IrReturn(ret_val);
 }
 
 // @brief ジャンプ系のノードを生成する．

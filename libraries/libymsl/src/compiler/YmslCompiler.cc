@@ -70,6 +70,8 @@ YmslCompiler::compile(IDO& ido)
     resolve_func(func_expr, scope, node);
   }
 
+  // ラベルの解決を行う．
+
   // 後始末
   for (vector<Scope*>::iterator p = mScopeList.begin();
       p != mScopeList.end(); ++ p) {
@@ -190,7 +192,13 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
   case kEqAnd:
   case kEqOr:
   case kEqXor:
+    break;
+
   case kExprStmt:
+    {
+      IrNode* node = elab_rhs(stmt->expr(), scope);
+      node_list.push_back(node);
+    }
     break;
 
   case kFuncDecl:
@@ -198,6 +206,27 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
     break;
 
   case kGoto:
+    {
+      const AstSymbol* label_symbol = stmt->label();
+      SymHandle* h = scope->find(label_symbol->str_val());
+      IrNode* label_node;
+      if ( h == NULL ) {
+	// ラベルが未定義
+	// ノードを作ってしまう．
+	label_node = mIrMgr.new_Label();
+	scope->add_label(label_symbol->str_val(), label_node);
+	// label_node をどこかに記憶しておく．
+      }
+      else {
+	label_node = h->label();
+	if ( label_node == NULL ) {
+	  // label_symbol is not a label
+	  return;
+	}
+      }
+      IrNode* node = mIrMgr.new_Jump(kOpJump, label_node);
+      node_list.push_back(node);
+    }
     break;
 
   case kIf:
@@ -219,9 +248,39 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
     break;
 
   case kLabel:
+    {
+      const AstSymbol* label_symbol = stmt->label();
+      SymHandle* h = scope->find(label_symbol->str_val());
+      IrNode* label_node;
+      if ( h == NULL ) {
+	label_node = mIrMgr.new_Label();
+	scope->add_label(label_symbol->str_val(), label_node);
+      }
+      else {
+	label_node = h->label();
+	if ( label_node == NULL ) {
+	  // duplicate definition
+	  // というかラベルじゃないものだった．
+	  return;
+	}
+	// label_node が goto 文によって作られたものなら
+	// hanging flag を下ろす．
+	// そうでなければ同名のラベルの2重定義となる．
+      }
+      node_list.push_back(label_node);
+    }
     break;
 
   case kReturn:
+    {
+      const AstExpr* expr = stmt->expr();
+      IrNode* ret_val = NULL;
+      if ( expr != NULL ) {
+	ret_val = elab_rhs(expr, scope);
+      }
+      IrNode* node = mIrMgr.new_Return(ret_val);
+      node_list.push_back(node);
+    }
     break;
 
   case kSwitch:

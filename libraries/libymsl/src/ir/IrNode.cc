@@ -150,4 +150,12 @@ IrNode::branch_cond() const
   return NULL;
 }
 
+// @brief 返り値
+IrNode*
+IrNode::return_val() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 END_NAMESPACE_YM_YMSL

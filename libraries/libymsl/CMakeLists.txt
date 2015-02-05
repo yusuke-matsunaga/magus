@@ -101,6 +101,7 @@ set (ymsl_SOURCES
   src/ir/IrBinOp.cc
   src/ir/IrTriOp.cc
   src/ir/IrFuncCall.cc
+  src/ir/IrReturn.cc
   src/ir/IrJump.cc
   src/ir/IrLabel.cc
 

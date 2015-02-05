@@ -124,6 +124,11 @@ public:
   IrNode*
   branch_cond() const;
 
+  /// @brief 返り値
+  virtual
+  IrNode*
+  return_val() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

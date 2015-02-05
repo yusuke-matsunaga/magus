@@ -358,8 +358,9 @@ enum OpCode {
   kOpLe,
   // 三項演算
   kOpIte,
-  // 関数呼び出し
+  // 関数呼び出し/復帰
   kOpFuncCall,
+  kOpReturn,
   // ジャンプ
   kOpJump,
   kOpBranchTrue,
