@@ -1,8 +1,8 @@
-#ifndef IRSTORE_H
-#define IRSTORE_H
+#ifndef IRARRAYSTORE_H
+#define IRARRAYSTORE_H
 
-/// @file IrStore.h
-/// @brief IrStore のヘッダファイル
+/// @file IrArrayStore.h
+/// @brief IrArrayStore のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,23 +15,25 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrStore IrStore.h "IrStore.h"
-/// @brief ストア命令を表すノード
+/// @class IrArrayStore IrArrayStore.h "IrArrayStore.h"
+/// @brief 配列用のストア命令を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrStore :
+class IrArrayStore :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
+  /// @param[in] base ベースアドレス
+  /// @param[in] offset オフセット
   /// @param[in] val 値
-  IrStore(const Var* var,
-	  IrNode* val);
+  IrArrayStore(IrNode* base,
+	       IrNode* offset,
+	       IrNode* val);
 
   /// @brief デストラクタ
   virtual
-  ~IrStore();
+  ~IrArrayStore();
 
 
 public:
@@ -39,12 +41,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を返す．
+  /// @brief 配列本体の式を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
+  /// kOpArrayLoad, kOpArrayStore のみ有効
   virtual
-  const Var*
-  var() const;
+  IrNode*
+  array_expr() const;
+
+  /// @brief 配列のインデックスを返す．
+  ///
+  /// kOpArrayLoad, kOpArrayStore のみ有効
+  virtual
+  IrNode*
+  array_index() const;
 
   /// @brief 書き込む値を返す．
   virtual
@@ -57,8 +66,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const Var* mVar;
+  // ベースアドレス
+  IrNode* mBase;
+
+  // オフセット
+  IrNode* mOffset;
 
   // 書き込む値
   IrNode* mStoreVal;
@@ -67,4 +79,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRSTORE_H
+#endif // IRARRAYSTORE_H

@@ -1,8 +1,8 @@
-#ifndef IRLOAD_H
-#define IRLOAD_H
+#ifndef IRARRAYLOAD_H
+#define IRARRAYLOAD_H
 
-/// @file IrLoad.h
-/// @brief IrLoad のヘッダファイル
+/// @file IrArrayLoad.h
+/// @brief IrArrayLoad のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,21 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrLoad IrLoad.h "IrLoad.h"
-/// @brief ロード命令を表すノード
+/// @class IrArrayLoad IrArrayLoad.h "IrArrayLoad.h"
+/// @brief 配列用のロード命令を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrLoad :
+class IrArrayLoad :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrLoad(const Var* var);
+  /// @param[in] base ベースアドレス
+  /// @param[in] offset オフセット
+  IrArrayLoad(IrNode* base,
+	      IrNode* offset);
 
   /// @brief デストラクタ
   virtual
-  ~IrLoad();
+  ~IrArrayLoad();
 
 
 public:
@@ -37,12 +39,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を返す．
+  /// @brief 配列本体の式を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
+  /// kOpArrayLoad, kOpArrayStore のみ有効
   virtual
-  const Var*
-  var() const;
+  IrNode*
+  array_expr() const;
+
+  /// @brief 配列のインデックスを返す．
+  ///
+  /// kOpArrayLoad, kOpArrayStore のみ有効
+  virtual
+  IrNode*
+  array_index() const;
 
 
 private:
@@ -50,11 +59,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const Var* mVar;
+  // ベースアドレス
+  IrNode* mBase;
+
+  // オフセット
+  IrNode* mOffset;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRLOAD_H
+#endif // IRARRAYLOAD_H

@@ -45,25 +45,21 @@ IrNode::type() const
   return mType;
 }
 
-// @brief 第1ソースを返す．
-IrNode*
-IrNode::src1() const
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+IrNode::operand_num() const
 {
-  ASSERT_NOT_REACHED;
-  return NULL;
+  return 0;
 }
 
-// @brief 第2ソースを返す．
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+//
+// 演算子のみ有効
 IrNode*
-IrNode::src2() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 第3ソースを返す．
-IrNode*
-IrNode::src3() const
+IrNode::operand(ymuint pos) const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -99,6 +95,56 @@ IrNode::var() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
+}
+
+// @brief 書き込む値を返す．
+//
+// kOpStore, kOpArrayStore, kOpMemberStore のみ有効
+IrNode*
+IrNode::store_val() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 配列本体の式を返す．
+//
+// kOpArrayLoad, kOpArrayStore のみ有効
+IrNode*
+IrNode::array_expr() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief 配列のインデックスを返す．
+//
+// kOpArrayLoad, kOpArrayStore のみ有効
+IrNode*
+IrNode::array_index() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief オブジェクトを指す式を返す．
+//
+// kOpMemberLoad, kOpMemberStore のみ有効
+IrNode*
+IrNode::obj_expr() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
+// @brief メンバのインデックスを返す．
+//
+// kOpMemberLoad, kOpMemberStore のみ有効
+ymuint
+IrNode::member_index() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
 }
 
 // @brief 関数本体を返す．

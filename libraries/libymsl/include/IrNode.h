@@ -49,20 +49,20 @@ public:
   const Type*
   type() const;
 
-  /// @brief 第1ソースを返す．
+  /// @brief オペランド数を返す．
+  ///
+  /// 演算子のみ有効
   virtual
-  IrNode*
-  src1() const;
+  ymuint
+  operand_num() const;
 
-  /// @brief 第2ソースを返す．
+  /// @brief オペランドを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+  ///
+  /// 演算子のみ有効
   virtual
   IrNode*
-  src2() const;
-
-  /// @brief 第3ソースを返す．
-  virtual
-  IrNode*
-  src3() const;
+  operand(ymuint pos) const;
 
   /// @brief 整数値を返す．
   ///
@@ -86,9 +86,46 @@ public:
   string_val() const;
 
   /// @brief 変数を返す．
+  ///
+  /// kOpVarRef, kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
   virtual
   const Var*
   var() const;
+
+  /// @brief 書き込む値を返す．
+  ///
+  /// kOpStore, kOpArrayStore, kOpMemberStore のみ有効
+  virtual
+  IrNode*
+  store_val() const;
+
+  /// @brief 配列本体の式を返す．
+  ///
+  /// kOpArrayLoad, kOpArrayStore のみ有効
+  virtual
+  IrNode*
+  array_expr() const;
+
+  /// @brief 配列のインデックスを返す．
+  ///
+  /// kOpArrayLoad, kOpArrayStore のみ有効
+  virtual
+  IrNode*
+  array_index() const;
+
+  /// @brief オブジェクトを指す式を返す．
+  ///
+  /// kOpMemberLoad, kOpMemberStore のみ有効
+  virtual
+  IrNode*
+  obj_expr() const;
+
+  /// @brief メンバのインデックスを返す．
+  ///
+  /// kOpMemberLoad, kOpMemberStore のみ有効
+  virtual
+  ymuint
+  member_index() const;
 
   /// @brief 関数本体を返す．
   ///
@@ -120,11 +157,15 @@ public:
   jump_addr() const;
 
   /// @brief 分岐条件
+  ///
+  /// kOpBranchXXX のみ有効
   virtual
   IrNode*
   branch_cond() const;
 
   /// @brief 返り値
+  ///
+  /// kOpReturn のみ有効
   virtual
   IrNode*
   return_val() const;

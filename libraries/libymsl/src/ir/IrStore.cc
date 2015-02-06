@@ -17,15 +17,12 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] base ベースアドレス
-// @param[in] offset オフセット
+// @param[in] var 変数
 // @param[in] val 値
-IrStore::IrStore(IrNode* base,
-		 IrNode* offset,
+IrStore::IrStore(const Var* var,
 		 IrNode* val) :
   IrNode(kOpStore, NULL),
-  mBase(base),
-  mOffset(offset),
+  mVar(var),
   mStoreVal(val)
 {
 }
@@ -35,18 +32,13 @@ IrStore::~IrStore()
 {
 }
 
-// @brief ベースアドレスを返す．
-IrNode*
-IrStore::base() const
+// @brief 変数を返す．
+//
+// kOpVarRef, kOpLoad, kOpStore のみ有効
+const Var*
+IrStore::var() const
 {
-  return mBase;
-}
-
-// @brief オフセットを返す．
-IrNode*
-IrStore::offset() const
-{
-  return mOffset;
+  return mVar;
 }
 
 // @brief 書き込む値を返す．

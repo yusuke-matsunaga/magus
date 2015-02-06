@@ -15,11 +15,15 @@
 #include "IrFloatConst.h"
 #include "IrStringConst.h"
 #include "IrVarRef.h"
-#include "IrLoad.h"
-#include "IrStore.h"
 #include "IrUniOp.h"
 #include "IrBinOp.h"
 #include "IrTriOp.h"
+#include "IrLoad.h"
+#include "IrStore.h"
+#include "IrArrayLoad.h"
+#include "IrArrayStore.h"
+#include "IrMemberLoad.h"
+#include "IrMemberStore.h"
 #include "IrFuncCall.h"
 #include "IrReturn.h"
 #include "IrJump.h"
@@ -102,38 +106,6 @@ IrMgr::new_VarRef(const Var* var)
   return new (p) IrVarRef(var);
 }
 
-// @brief ロード命令を生成する．
-// @param[in] type 型
-// @param[in] base ベースアドレス
-// @param[in] offset オフセット
-//
-// offset は int 型でなければならない．
-IrNode*
-IrMgr::new_Load(const Type* type,
-		IrNode* base,
-		IrNode* offset)
-{
-  void* p = mAlloc.get_memory(sizeof(IrLoad));
-  return new (p) IrLoad(type, base, offset);
-}
-
-// @brief ストア命令を生成する．
-// @param[in] base ベースアドレス
-// @param[in] offset オフセット
-// @param[in] val 値
-//
-// base は array 型でなければならない．
-// offset は int 型でなければならない．
-// val の型と base の要素型が等しくなければならない．
-IrNode*
-IrMgr::new_Store(IrNode* base,
-		 IrNode* offset,
-		 IrNode* val)
-{
-  void* p = mAlloc.get_memory(sizeof(IrStore));
-  return new (p) IrStore(base, offset, val);
-}
-
 // @brief 単項演算式を生成する．
 // @param[in] opcode オペコード
 // @param[in] type 出力の型
@@ -174,6 +146,74 @@ IrMgr::new_TriOp(OpCode opcode,
 {
   void* p = mAlloc.get_memory(sizeof(IrTriOp));
   return new (p) IrTriOp(opcode, type, opr1, opr2, opr3);
+}
+
+// @brief load 文を生成する．
+// @param[in] var 変数
+IrNode*
+IrMgr::new_Load(const Var* var)
+{
+  void* p = mAlloc.get_memory(sizeof(IrLoad));
+  return new (p) IrLoad(var);
+}
+
+// @brief store 文を生成する．
+// @param[in] var 変数
+// @param[in] val 書き込む値
+IrNode*
+IrMgr::new_Store(const Var* var,
+		 IrNode* val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrStore));
+  return new (p) IrStore(var, val);
+}
+
+// @brief 配列用の load 文を生成する．
+// @param[in] array 配列
+// @param[in] index インデックス
+IrNode*
+IrMgr::new_ArrayLoad(IrNode* array,
+		     IrNode* index)
+{
+  void* p = mAlloc.get_memory(sizeof(IrArrayLoad));
+  return new (p) IrArrayLoad(array, index);
+}
+
+// @brief 配列用の store 文を生成する．
+// @param[in] array 配列
+// @param[in] index インデックス
+// @param[in] val 書き込む値
+IrNode*
+IrMgr::new_ArrayStore(IrNode* array,
+		      IrNode* index,
+		      IrNode* val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrArrayStore));
+  return new (p) IrArrayStore(array, index, val);
+}
+
+// @brief クラスメンバ用の load 文を生成する．
+// @param[in] obj オブジェクト
+// @param[in] var メンバ変数
+IrNode*
+IrMgr::new_MemberLoad(IrNode* obj,
+		      const Var* var)
+{
+  void* p = mAlloc.get_memory(sizeof(IrMemberLoad));
+  return new (p) IrMemberLoad(obj, var);
+}
+
+// @brief クラスメンバ用の store 文を生成する．
+// @param[in] obj オブジェクト
+// @param[in] var メンバ変数
+// @param[in] val 書き込む値
+IrNode*
+IrMgr::new_MemberStore(IrNode* obj,
+		       const Var* var,
+		       IrNode* val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrMemberStore));
+  return new (p) IrMemberStore(obj, var, val);
 }
 
 // @brief 関数呼び出し式を生成する．

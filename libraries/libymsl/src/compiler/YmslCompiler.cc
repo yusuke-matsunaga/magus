@@ -181,16 +181,21 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
+      const Var* lhs_var;
       IrNode* lhs_base;
       IrNode* lhs_offset;
-      bool stat = elab_lhs(stmt->lhs_expr(), scope, lhs_base, lhs_offset);
+      bool stat = elab_lhs(stmt->lhs_expr(), scope, lhs_var, lhs_base, lhs_offset);
       if ( !stat ) {
 	// エラー
 	return;
       }
+      // elab_lhs の返り値を左辺の形を表す列挙型にする．
+      //
       // 右辺と左辺の型のチェック
-      IrNode* node = mIrMgr.new_Store(lhs_base, lhs_offset, rhs);
-      node_list.push_back(node);
+      //
+      // Store/ArrayStore/MemberStore の生成
+      //IrNode* node = mIrMgr.new_Store(lhs_base, lhs_offset, rhs);
+      //node_list.push_back(node);
     }
     break;
 
@@ -883,7 +888,7 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
   if ( h != NULL ) {
     const Var* var = h->var();
     if ( var != NULL ) {
-      return mIrMgr.new_VarRef(var);
+      return mIrMgr.new_Load(var);
     }
     IrNode* const_node = h->const_node();
     if ( const_node != NULL ) {
@@ -910,8 +915,7 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 	// index is not an integer
 	return NULL;
       }
-      const Type* etype = body->type()->elem_type();
-      return mIrMgr.new_Load(etype, body, index);
+      return mIrMgr.new_ArrayLoad(body, index);
     }
     break;
 
@@ -924,6 +928,8 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
       const AstSymbol* member_symbol = ast_expr->member();
       ShString member_name = member_symbol->str_val();
       // type のメンバに member_name があることを確認する．
+      const Var* var;
+      return mIrMgr.new_MemberLoad(body, var);
     }
     break;
 
@@ -944,19 +950,20 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 bool
 YmslCompiler::elab_lhs(const AstExpr* ast_expr,
 		       Scope* scope,
+		       const Var*& var,
 		       IrNode*& base,
 		       IrNode*& offset)
 {
   SymHandle* h = resolve_symbol(ast_expr, scope);
   if ( h != NULL ) {
-    const Var* var = h->var();
-    if ( var != NULL ) {
-      base = mIrMgr.new_VarRef(var);
-      offset = NULL;
-      return true;
+    var = h->var();
+    if ( var == NULL ) {
+      // 左辺のシンボルは変数だけ．
+      return false;
     }
-    // 左辺のシンボルは変数だけ．
-    return false;
+    base = NULL;
+    offset = NULL;
+    return true;
   }
 
   switch ( ast_expr->expr_type() ) {
@@ -977,9 +984,21 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
       // offset is not an integer
       return false;
     }
+    var = NULL;
     return true;
 
   case kMemberRef:
+    {
+      // resolve_symbol() で失敗しているので
+      // ここでは階層名は考えなくてよい．
+      base = elab_rhs_primary(ast_expr->body(), scope);
+      const Type* type = base->type();
+      const AstSymbol* member_symbol = ast_expr->member();
+      ShString member_name = member_symbol->str_val();
+      // type のメンバに member_name があることを確認する．
+      offset = NULL;
+      return true;
+    }
     break;
 
   default:

@@ -325,9 +325,6 @@ enum OpCode {
   kOpIntConst,
   kOpFloatConst,
   kOpStringConst,
-  // ロード/ストア
-  kOpLoad,
-  kOpStore,
   // 変数参照
   kOpVarRef,
   // 単項演算
@@ -356,6 +353,13 @@ enum OpCode {
   kOpLe,
   // 三項演算
   kOpIte,
+  // ロード/ストア
+  kOpLoad,
+  kOpStore,
+  kOpArrayLoad,
+  kOpArrayStore,
+  kOpMemberLoad,
+  kOpMemberStore,
   // 関数呼び出し/復帰
   kOpFuncCall,
   kOpReturn,

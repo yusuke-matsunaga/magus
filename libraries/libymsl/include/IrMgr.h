@@ -68,28 +68,6 @@ public:
   IrNode*
   new_VarRef(const Var* var);
 
-  /// @brief ロード命令を生成する．
-  /// @param[in] type 型
-  /// @param[in] base ベースアドレス
-  /// @param[in] offset オフセット
-  ///
-  /// offset は int 型でなければならない．
-  IrNode*
-  new_Load(const Type* type,
-	   IrNode* base,
-	   IrNode* offset);
-
-  /// @brief ストア命令を生成する．
-  /// @param[in] base ベースアドレス
-  /// @param[in] offset オフセット
-  /// @param[in] val 値
-  ///
-  /// offset は int 型でなければならない．
-  IrNode*
-  new_Store(IrNode* base,
-	    IrNode* offset,
-	    IrNode* val);
-
   /// @brief 単項演算式を生成する．
   /// @param[in] opcode オペコード
   /// @param[in] type 出力の型
@@ -119,6 +97,50 @@ public:
 	    IrNode* opr1,
 	    IrNode* opr2,
 	    IrNode* opr3);
+
+  /// @brief load 文を生成する．
+  /// @param[in] var 変数
+  IrNode*
+  new_Load(const Var* var);
+
+  /// @brief store 文を生成する．
+  /// @param[in] var 変数
+  /// @param[in] val 書き込む値
+  IrNode*
+  new_Store(const Var* var,
+	    IrNode* val);
+
+  /// @brief 配列用の load 文を生成する．
+  /// @param[in] array 配列
+  /// @param[in] index インデックス
+  IrNode*
+  new_ArrayLoad(IrNode* array,
+		IrNode* index);
+
+  /// @brief 配列用の store 文を生成する．
+  /// @param[in] array 配列
+  /// @param[in] index インデックス
+  /// @param[in] val 書き込む値
+  IrNode*
+  new_ArrayStore(IrNode* array,
+		 IrNode* index,
+		 IrNode* val);
+
+  /// @brief クラスメンバ用の load 文を生成する．
+  /// @param[in] obj オブジェクト
+  /// @param[in] var メンバ変数
+  IrNode*
+  new_MemberLoad(IrNode* obj,
+		 const Var* var);
+
+  /// @brief クラスメンバ用の store 文を生成する．
+  /// @param[in] obj オブジェクト
+  /// @param[in] var メンバ変数
+  /// @param[in] val 書き込む値
+  IrNode*
+  new_MemberStore(IrNode* obj,
+		  const Var* var,
+		  IrNode* val);
 
   /// @brief 関数呼び出し式を生成する．
   /// @param[in] func 関数

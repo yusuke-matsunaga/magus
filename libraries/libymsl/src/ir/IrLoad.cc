@@ -8,6 +8,7 @@
 
 
 #include "IrLoad.h"
+#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -17,15 +18,10 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] type 型
-// @param[in] base ベースアドレス
-// @param[in] offset オフセット
-IrLoad::IrLoad(const Type* type,
-	       IrNode* base,
-	       IrNode* offset) :
-  IrNode(kOpLoad, type),
-  mBase(base),
-  mOffset(offset)
+// @param[in] var 変数
+IrLoad::IrLoad(const Var* var) :
+  IrNode(kOpLoad, var->value_type()),
+  mVar(var)
 {
 }
 
@@ -34,18 +30,13 @@ IrLoad::~IrLoad()
 {
 }
 
-// @brief ベースアドレスを返す．
-IrNode*
-IrLoad::base() const
+// @brief 変数を返す．
+//
+// kOpVarRef, kOpLoad, kOpStore のみ有効
+const Var*
+IrLoad::var() const
 {
-  return mBase;
-}
-
-// @brief オフセットを返す．
-IrNode*
-IrLoad::offset() const
-{
-  return mOffset;
+  return mVar;
 }
 
 END_NAMESPACE_YM_YMSL

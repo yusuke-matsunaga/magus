@@ -96,11 +96,15 @@ set (ymsl_SOURCES
   src/ir/IrFloatConst.cc
   src/ir/IrStringConst.cc
   src/ir/IrVarRef.cc
-  src/ir/IrLoad.cc
-  src/ir/IrStore.cc
   src/ir/IrUniOp.cc
   src/ir/IrBinOp.cc
   src/ir/IrTriOp.cc
+  src/ir/IrLoad.cc
+  src/ir/IrStore.cc
+  src/ir/IrArrayLoad.cc
+  src/ir/IrArrayStore.cc
+  src/ir/IrMemberLoad.cc
+  src/ir/IrMemberStore.cc
   src/ir/IrFuncCall.cc
   src/ir/IrReturn.cc
   src/ir/IrJump.cc

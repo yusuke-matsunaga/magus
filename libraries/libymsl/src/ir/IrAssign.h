@@ -1,8 +1,8 @@
-#ifndef IRLOAD_H
-#define IRLOAD_H
+#ifndef IRASSIGN_H
+#define IRASSIGN_H
 
-/// @file IrLoad.h
-/// @brief IrLoad のヘッダファイル
+/// @file IrAssign.h
+/// @brief IrAssign のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,21 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrLoad IrLoad.h "IrLoad.h"
-/// @brief ロード命令を表すノード
+/// @class IrAssign IrAssign.h "IrAssign.h"
+/// @brief 代入文を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrLoad :
+class IrAssign :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrLoad(const Var* var);
+  /// @param[in] lhs 左辺式
+  /// @param[in] rhs 右辺式
+  IrAssign(IrNode* lhs,
+	   IrNode* rhs);
 
   /// @brief デストラクタ
   virtual
-  ~IrLoad();
+  ~IrAssign();
 
 
 public:
@@ -37,12 +39,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を返す．
+  /// @brief 左辺式を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
+  /// kOpAssign のみ有効
   virtual
-  const Var*
-  var() const;
+  IrNode*
+  lhs_expr() const;
+
+  /// @brief 右辺式を返す．
+  ///
+  /// kOpAssign のみ有効
+  virtual
+  IrNode*
+  rhs_expr() const;
 
 
 private:
@@ -50,11 +59,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const Var* mVar;
+  // 左辺式
+  IrNode* mLhsExpr;
+
+  // 右辺式
+  IrNode* mRhsExpr;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRLOAD_H
+#endif // IRASSIGN_H

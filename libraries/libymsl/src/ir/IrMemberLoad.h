@@ -1,8 +1,8 @@
-#ifndef IRLOAD_H
-#define IRLOAD_H
+#ifndef IRMEMBERLOAD_H
+#define IRMEMBERLOAD_H
 
-/// @file IrLoad.h
-/// @brief IrLoad のヘッダファイル
+/// @file IrMemberLoad.h
+/// @brief IrMemberLoad のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,21 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrLoad IrLoad.h "IrLoad.h"
-/// @brief ロード命令を表すノード
+/// @class IrMemberLoad IrMemberLoad.h "IrMemberLoad.h"
+/// @brief クラスメンバ用のロード命令を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrLoad :
+class IrMemberLoad :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrLoad(const Var* var);
+  /// @param[in] base ベースアドレス
+  /// @param[in] var メンバ変数
+  IrMemberLoad(IrNode* base,
+	       const Var* var);
 
   /// @brief デストラクタ
   virtual
-  ~IrLoad();
+  ~IrMemberLoad();
 
 
 public:
@@ -37,9 +39,16 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief オブジェクトを指す式を返す．
+  ///
+  /// kOpMemberLoad, kOpMemberStore のみ有効
+  virtual
+  IrNode*
+  obj_expr() const;
+
   /// @brief 変数を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
+  /// kOpVarRef, kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
   virtual
   const Var*
   var() const;
@@ -50,6 +59,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ベースアドレス
+  IrNode* mBase;
+
   // 変数
   const Var* mVar;
 
@@ -57,4 +69,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRLOAD_H
+#endif // IRMEMBERLOAD_H

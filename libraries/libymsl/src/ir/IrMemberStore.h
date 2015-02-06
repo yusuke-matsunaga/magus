@@ -1,8 +1,8 @@
-#ifndef IRSTORE_H
-#define IRSTORE_H
+#ifndef IRMEMBERSTORE_H
+#define IRMEMBERSTORE_H
 
-/// @file IrStore.h
-/// @brief IrStore のヘッダファイル
+/// @file IrMemberStore.h
+/// @brief IrMemberStore のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,23 +15,25 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrStore IrStore.h "IrStore.h"
-/// @brief ストア命令を表すノード
+/// @class IrMemberStore IrMemberStore.h "IrMemberStore.h"
+/// @brief クラスメンバ用のストア命令を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrStore :
+class IrMemberStore :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
+  /// @param[in] base ベースアドレス
+  /// @param[in] var メンバ変数
   /// @param[in] val 値
-  IrStore(const Var* var,
-	  IrNode* val);
+  IrMemberStore(IrNode* base,
+		const Var* var,
+		IrNode* val);
 
   /// @brief デストラクタ
   virtual
-  ~IrStore();
+  ~IrMemberStore();
 
 
 public:
@@ -39,9 +41,16 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief オブジェクトを指す式を返す．
+  ///
+  /// kOpMemberLoad, kOpMemberStore のみ有効
+  virtual
+  IrNode*
+  obj_expr() const;
+
   /// @brief 変数を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
+  /// kOpVarRef, kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
   virtual
   const Var*
   var() const;
@@ -57,7 +66,10 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
+  // ベースアドレス
+  IrNode* mBase;
+
+  // メンバ変数
   const Var* mVar;
 
   // 書き込む値
@@ -67,4 +79,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRSTORE_H
+#endif // IRMEMBERSTORE_H

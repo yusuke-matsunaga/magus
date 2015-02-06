@@ -124,6 +124,7 @@ private:
   /// @brief 左辺式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
+  /// @param[out] var 変数
   /// @param[out] base ベース値
   /// @param[out] offset オフセット
   ///
@@ -131,6 +132,7 @@ private:
   bool
   elab_lhs(const AstExpr* ast_expr,
 	   Scope* scope,
+	   const Var*& var,
 	   IrNode*& base,
 	   IrNode*& offset);
 

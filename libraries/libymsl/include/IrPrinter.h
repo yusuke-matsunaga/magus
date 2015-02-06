@@ -1,35 +1,33 @@
-#ifndef IRLOAD_H
-#define IRLOAD_H
+#ifndef IRPRINTER_H
+#define IRPRINTER_H
 
-/// @file IrLoad.h
-/// @brief IrLoad のヘッダファイル
+/// @file IrPrinter.h
+/// @brief IrPrinter のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "ymsl_int.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrLoad IrLoad.h "IrLoad.h"
-/// @brief ロード命令を表すノード
+/// @class IrPrinter IrPrinter.h "IrPrinter.h"
+/// @brief IrNode の内容を出力するクラス
 //////////////////////////////////////////////////////////////////////
-class IrLoad :
-  public IrNode
+class IrPrinter
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrLoad(const Var* var);
+  /// @param[in] s 出力先のストリーム
+  IrPrinter(ostream& s);
 
   /// @brief デストラクタ
-  virtual
-  ~IrLoad();
+  ~IrPrinter();
 
 
 public:
@@ -37,12 +35,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 変数を返す．
-  ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
-  virtual
-  const Var*
-  var() const;
+  /// @brief ノードの内容を文として出力する．
+  void
+  print_statement(IrNode* node);
+
+  /// @brief ノードの内容を式として出力する．
+  void
+  print_expr(IrNode* node);
 
 
 private:
@@ -50,11 +49,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const Var* mVar;
+  // 出力先のストリーム
+  ostream& mS;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRLOAD_H
+#endif // IRPRINTER_H
