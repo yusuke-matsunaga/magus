@@ -35,13 +35,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノードの内容を文として出力する．
+  /// @brief コードの内容を出力する．
   void
-  print_statement(IrNode* node);
+  print_code(const vector<IrNode*>& node_list);
 
-  /// @brief ノードの内容を式として出力する．
+  /// @brief ノードの内容を出力する．
   void
-  print_expr(IrNode* node);
+  print_node(IrNode* node);
 
 
 private:

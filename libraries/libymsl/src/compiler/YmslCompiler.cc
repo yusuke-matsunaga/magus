@@ -163,7 +163,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       IrNode* end1 = mIrMgr.new_Label();
       node_list.push_back(start1);
       elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
       IrNode* node1 = mIrMgr.new_Jump(kOpBranchTrue, start1, cond);
       node_list.push_back(node1);
       node_list.push_back(end1);
@@ -176,7 +176,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 
   case kEqAssign:
     {
-      IrNode* rhs = elab_rhs(stmt->expr(), scope);
+      IrNode* rhs = elab_rhs(stmt->expr(), scope, node_list);
       if ( rhs == NULL ) {
 	// エラー
 	return;
@@ -184,7 +184,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       const Var* lhs_var;
       IrNode* lhs_base;
       IrNode* lhs_offset;
-      bool stat = elab_lhs(stmt->lhs_expr(), scope, lhs_var, lhs_base, lhs_offset);
+      bool stat = elab_lhs(stmt->lhs_expr(), scope, lhs_var, lhs_base, lhs_offset, node_list);
       if ( !stat ) {
 	// エラー
 	return;
@@ -213,7 +213,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 
   case kExprStmt:
     {
-      IrNode* node = elab_rhs(stmt->expr(), scope);
+      IrNode* node = elab_rhs(stmt->expr(), scope, node_list);
       node_list.push_back(node);
     }
     break;
@@ -248,7 +248,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 
   case kIf:
     {
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
       IrNode* label1 = mIrMgr.new_Label();
       IrNode* label2 = mIrMgr.new_Label();
       IrNode* node1 = mIrMgr.new_Jump(kOpBranchFalse, label1, cond);
@@ -256,6 +256,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       elab_stmt(stmt->stmt(), scope, start_label, end_label, node_list);
       IrNode* node2 = mIrMgr.new_Jump(kOpJump, label2);
       node_list.push_back(node2);
+      node_list.push_back(label1);
       elab_stmt(stmt->else_stmt(), scope, start_label, end_label, node_list);
       node_list.push_back(label2);
     }
@@ -295,7 +296,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       const AstExpr* expr = stmt->expr();
       IrNode* ret_val = NULL;
       if ( expr != NULL ) {
-	ret_val = elab_rhs(expr, scope);
+	ret_val = elab_rhs(expr, scope, node_list);
       }
       IrNode* node = mIrMgr.new_Return(ret_val);
       node_list.push_back(node);
@@ -304,7 +305,7 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
 
   case kSwitch:
     {
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
 	vector<IrNode*> node_list1;
@@ -334,13 +335,14 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       IrNode* start1 = mIrMgr.new_Label();
       node_list.push_back(start1);
       IrNode* end1 = mIrMgr.new_Label();
-      IrNode* cond = elab_rhs(stmt->expr(), for_scope);
+      IrNode* cond = elab_rhs(stmt->expr(), for_scope, node_list);
       IrNode* node1 = mIrMgr.new_Jump(kOpBranchFalse, end1, cond);
       node_list.push_back(node1);
       elab_stmt(stmt->stmt(), for_scope, start1, end1, node_list);
       elab_stmt(stmt->next_stmt(), for_scope, start1, end1, node_list);
       IrNode* node2 = mIrMgr.new_Jump(kOpJump, start1);
       node_list.push_back(node2);
+      node_list.push_back(end1);
     }
     break;
 
@@ -348,13 +350,14 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
     {
       IrNode* start1 = mIrMgr.new_Label();
       node_list.push_back(start1);
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
       IrNode* end1 = mIrMgr.new_Label();
       IrNode* node1 = mIrMgr.new_Jump(kOpBranchFalse, end1, cond);
       node_list.push_back(node1);
       elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
       IrNode* node2 = mIrMgr.new_Jump(kOpJump, start1);
       node_list.push_back(node2);
+      node_list.push_back(end1);
     }
     break;
 
@@ -520,7 +523,8 @@ YmslCompiler::reg_const(const AstStatement* stmt,
     return;
   }
 
-  IrNode* node = elab_rhs(stmt->expr(), scope);
+  vector<IrNode*> node_list;
+  IrNode* node = elab_rhs(stmt->expr(), scope, node_list);
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
 
@@ -634,28 +638,29 @@ YmslCompiler::resolve_type(const AstType* asttype,
 // @brief 右辺式の実体化を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
+// @param[in] node_list ノードを収めるリスト
 IrNode*
 YmslCompiler::elab_rhs(const AstExpr* ast_expr,
-		       Scope* scope)
+		       Scope* scope,
+		       vector<IrNode*>& node_list)
 {
-  ASSERT_COND( ast_expr->operand_num() <= 3 );
-
   IrNode* op0 = NULL;
   IrNode* op1 = NULL;
   IrNode* op2 = NULL;
   ymuint nop = ast_expr->operand_num();
+  ASSERT_COND( nop <= 3 );
   if ( nop > 0 ) {
-    op0 = elab_rhs(ast_expr->operand(0), scope);
+    op0 = elab_rhs(ast_expr->operand(0), scope, node_list);
     if ( op0 == NULL ) {
       return NULL;
     }
     if ( nop > 1 ) {
-      op1 = elab_rhs(ast_expr->operand(1), scope);
+      op1 = elab_rhs(ast_expr->operand(1), scope, node_list);
       if ( op1 == NULL ) {
 	return NULL;
       }
       if ( nop > 2 ) {
-	op2 = elab_rhs(ast_expr->operand(2), scope);
+	op2 = elab_rhs(ast_expr->operand(2), scope, node_list);
 	if ( op2 == NULL ) {
 	  return NULL;
 	}
@@ -663,22 +668,50 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
     }
   }
 
+  IrNode* node = NULL;
   OpCode opcode = kOpHalt;
   switch ( ast_expr->expr_type() ) {
   case kTrue:
-    return mIrMgr.new_True();
+    node = mIrMgr.new_True();
+    node_list.push_back(node);
+    return node;
 
   case kFalse:
-    return mIrMgr.new_False();
+    node = mIrMgr.new_False();
+    node_list.push_back(node);
+    return node;
 
   case kIntConst:
-    return mIrMgr.new_IntConst(ast_expr->int_val());
+    node = mIrMgr.new_IntConst(ast_expr->int_val());
+    node_list.push_back(node);
+    return node;
 
   case kFloatConst:
-    return mIrMgr.new_FloatConst(ast_expr->float_val());
+    node = mIrMgr.new_FloatConst(ast_expr->float_val());
+    node_list.push_back(node);
+    return node;
 
   case kStringConst:
-    return mIrMgr.new_StringConst(ast_expr->string_val());
+    node = mIrMgr.new_StringConst(ast_expr->string_val());
+    node_list.push_back(node);
+    return node;
+
+  case kFuncCall:
+    {
+      const AstExpr* func_expr = ast_expr->func();
+      ymuint n = ast_expr->arglist_num();
+      vector<IrNode*> arglist(n);
+      for (ymuint i = 0; i < n; ++ i) {
+	IrNode* arg = elab_rhs(ast_expr->arglist_elem(i), scope, node_list);
+	// arg->type() と func->type()->function_input_type(i) をチェック
+	// 必要に応じてキャストノードを挿入する．
+	arglist[i] = arg;
+      }
+      node = mIrMgr.new_FuncCall(NULL, arglist);
+      mFuncCallList.push_back(FuncCallStub(func_expr, scope, node));
+      return node;
+    }
+    break;
 
   case kCastInt:
     opcode = kOpCastInt;
@@ -707,7 +740,6 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
   case kBitAnd:
     opcode = kOpBitAnd;
     break;
-
   case kBitOr:
     opcode = kOpBitOr;
     break;
@@ -790,25 +822,8 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
     opcode = kOpIte;
     break;
 
-  case kFuncCall:
-    {
-      const AstExpr* func_expr = ast_expr->func();
-      ymuint n = ast_expr->arglist_num();
-      vector<IrNode*> arglist(n);
-      for (ymuint i = 0; i < n; ++ i) {
-	IrNode* arg = elab_rhs(ast_expr->arglist_elem(i), scope);
-	// arg->type() と func->type()->function_input_type(i) をチェック
-	// 必要に応じてキャストノードを挿入する．
-	arglist[i] = arg;
-      }
-      IrNode* node = mIrMgr.new_FuncCall(NULL, arglist);
-      mFuncCallList.push_back(FuncCallStub(func_expr, scope, node));
-      return node;
-    }
-    break;
-
   default:
-    return elab_rhs_primary(ast_expr, scope);
+    return elab_rhs_primary(ast_expr, scope, node_list);
   }
 
   if ( nop == 1 ) {
@@ -824,7 +839,9 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
       // キャストノードの挿入
       // 結果を op0 に代入
     }
-    return mIrMgr.new_UniOp(opcode, type, op0);
+    node = mIrMgr.new_UniOp(opcode, type, op0);
+    node_list.push_back(node);
+    return node;
   }
   else if ( nop == 2 ) {
     const Type* op0_type = op0->type();
@@ -844,7 +861,9 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
     if ( op1_rtype != op1_type ) {
       // キャストノードの挿入
     }
-    return mIrMgr.new_BinOp(opcode, type, op0, op1);
+    node = mIrMgr.new_BinOp(opcode, type, op0, op1);
+    node_list.push_back(node);
+    return node;
   }
   else if ( nop == 3 ) {
     const Type* op0_type = op0->type();
@@ -870,7 +889,9 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
     if ( op2_rtype != op2_type ) {
       // キャストノードの挿入
     }
-    return mIrMgr.new_TriOp(opcode, type, op0, op1, op2);
+    node = mIrMgr.new_TriOp(opcode, type, op0, op1, op2);
+    node_list.push_back(node);
+    return node;
   }
 
   ASSERT_NOT_REACHED;
@@ -880,18 +901,23 @@ YmslCompiler::elab_rhs(const AstExpr* ast_expr,
 // @brief 右辺式の実体化を行う．(プライマリ用)
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
+// @param[in] node_list ノードを収めるリスト
 IrNode*
 YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
-			       Scope* scope)
+			       Scope* scope,
+			       vector<IrNode*>& node_list)
 {
   SymHandle* h = resolve_symbol(ast_expr, scope);
   if ( h != NULL ) {
     const Var* var = h->var();
     if ( var != NULL ) {
-      return mIrMgr.new_Load(var);
+      IrNode* node = mIrMgr.new_Load(var);
+      node_list.push_back(node);
+      return node;
     }
     IrNode* const_node = h->const_node();
     if ( const_node != NULL ) {
+      node_list.push_back(const_node);
       return const_node;
     }
   }
@@ -905,8 +931,8 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 
   case kArrayRef:
     {
-      IrNode* body = elab_rhs_primary(ast_expr->body(), scope);
-      IrNode* index = elab_rhs(ast_expr->index(), scope);
+      IrNode* body = elab_rhs_primary(ast_expr->body(), scope, node_list);
+      IrNode* index = elab_rhs(ast_expr->index(), scope, node_list);
       if ( body->type()->type_id() != kArrayType ) {
 	// body is not an array
 	return NULL;
@@ -915,7 +941,9 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 	// index is not an integer
 	return NULL;
       }
-      return mIrMgr.new_ArrayLoad(body, index);
+      IrNode* node = mIrMgr.new_ArrayLoad(body, index);
+      node_list.push_back(node);
+      return node;
     }
     break;
 
@@ -923,13 +951,15 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
     {
       // resolve_symbol() で失敗しているので
       // ここでは階層名は考えなくてよい．
-      IrNode* body = elab_rhs_primary(ast_expr->body(), scope);
+      IrNode* body = elab_rhs_primary(ast_expr->body(), scope, node_list);
       const Type* type = body->type();
       const AstSymbol* member_symbol = ast_expr->member();
       ShString member_name = member_symbol->str_val();
       // type のメンバに member_name があることを確認する．
       const Var* var;
-      return mIrMgr.new_MemberLoad(body, var);
+      IrNode* node = mIrMgr.new_MemberLoad(body, var);
+      node_list.push_back(node);
+      return node;
     }
     break;
 
@@ -945,6 +975,7 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 // @param[in] scope 現在のスコープ
 // @param[out] base ベース値
 // @param[out] offset オフセット
+// @param[in] node_list ノードを収めるリスト
 //
 // エラーが起きたら false を返す．
 bool
@@ -952,7 +983,8 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
 		       Scope* scope,
 		       const Var*& var,
 		       IrNode*& base,
-		       IrNode*& offset)
+		       IrNode*& offset,
+		       vector<IrNode*>& node_list)
 {
   SymHandle* h = resolve_symbol(ast_expr, scope);
   if ( h != NULL ) {
@@ -973,13 +1005,13 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
 
   case kArrayRef:
     // 配列本体やインデックス値自体は右辺値
-    base = elab_rhs_primary(ast_expr->body(), scope);
+    base = elab_rhs_primary(ast_expr->body(), scope, node_list);
     if ( base->type()->type_id() != kArrayType ) {
       // base is not an array
       return false;
     }
 
-    offset = elab_rhs(ast_expr->index(), scope);
+    offset = elab_rhs(ast_expr->index(), scope, node_list);
     if ( offset->type()->type_id() != kIntType ) {
       // offset is not an integer
       return false;
@@ -991,7 +1023,7 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
     {
       // resolve_symbol() で失敗しているので
       // ここでは階層名は考えなくてよい．
-      base = elab_rhs_primary(ast_expr->body(), scope);
+      base = elab_rhs_primary(ast_expr->body(), scope, node_list);
       const Type* type = base->type();
       const AstSymbol* member_symbol = ast_expr->member();
       ShString member_name = member_symbol->str_val();

@@ -95,7 +95,6 @@ set (ymsl_SOURCES
   src/ir/IrIntConst.cc
   src/ir/IrFloatConst.cc
   src/ir/IrStringConst.cc
-  src/ir/IrVarRef.cc
   src/ir/IrUniOp.cc
   src/ir/IrBinOp.cc
   src/ir/IrTriOp.cc
@@ -109,6 +108,8 @@ set (ymsl_SOURCES
   src/ir/IrReturn.cc
   src/ir/IrJump.cc
   src/ir/IrLabel.cc
+
+  src/ir/IrPrinter.cc
 
   src/engine/YmslVM.cc
 

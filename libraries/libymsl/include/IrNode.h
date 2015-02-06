@@ -49,6 +49,15 @@ public:
   const Type*
   type() const;
 
+  /// @brief 番号を返す．
+  ymuint
+  id() const;
+
+  /// @brief 番号をセットする．
+  /// @param[in] id 番号
+  void
+  set_id(ymuint id);
+
   /// @brief オペランド数を返す．
   ///
   /// 演算子のみ有効
@@ -87,7 +96,7 @@ public:
 
   /// @brief 変数を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
+  /// kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
   virtual
   const Var*
   var() const;
@@ -195,6 +204,9 @@ private:
 
   // 型
   const Type* mType;
+
+  // 番号
+  ymuint mId;
 
 };
 

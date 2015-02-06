@@ -14,7 +14,6 @@
 #include "IrIntConst.h"
 #include "IrFloatConst.h"
 #include "IrStringConst.h"
-#include "IrVarRef.h"
 #include "IrUniOp.h"
 #include "IrBinOp.h"
 #include "IrTriOp.h"
@@ -96,14 +95,6 @@ IrMgr::new_StringConst(const char* val)
 {
   void* p = mAlloc.get_memory(sizeof(IrStringConst));
   return new (p) IrStringConst(mTypeMgr.string_type(), val);
-}
-
-// @brief 変数参照を生成する．
-IrNode*
-IrMgr::new_VarRef(const Var* var)
-{
-  void* p = mAlloc.get_memory(sizeof(IrVarRef));
-  return new (p) IrVarRef(var);
 }
 
 // @brief 単項演算式を生成する．

@@ -325,8 +325,6 @@ enum OpCode {
   kOpIntConst,
   kOpFloatConst,
   kOpStringConst,
-  // 変数参照
-  kOpVarRef,
   // 単項演算
   kOpCastBoolean,
   kOpCastInt,

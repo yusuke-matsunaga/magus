@@ -110,16 +110,20 @@ private:
   /// @brief 右辺式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
+  /// @param[in] node_list ノードを収めるリスト
   IrNode*
   elab_rhs(const AstExpr* ast_expr,
-	   Scope* scope);
+	   Scope* scope,
+	   vector<IrNode*>& node_list);
 
   /// @brief 右辺式の実体化を行う．(プライマリ用)
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
+  /// @param[in] node_list ノードを収めるリスト
   IrNode*
   elab_rhs_primary(const AstExpr* ast_expr,
-		   Scope* scope);
+		   Scope* scope,
+		   vector<IrNode*>& node_list);
 
   /// @brief 左辺式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
@@ -127,6 +131,7 @@ private:
   /// @param[out] var 変数
   /// @param[out] base ベース値
   /// @param[out] offset オフセット
+  /// @param[in] node_list ノードを収めるリスト
   ///
   /// エラーが起きたら false を返す．
   bool
@@ -134,7 +139,8 @@ private:
 	   Scope* scope,
 	   const Var*& var,
 	   IrNode*& base,
-	   IrNode*& offset);
+	   IrNode*& offset,
+	   vector<IrNode*>& node_list);
 
   /// @brief 式からスコープの解決を行う．
   /// @param[in] expr 式

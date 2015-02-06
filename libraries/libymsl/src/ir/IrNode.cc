@@ -45,6 +45,21 @@ IrNode::type() const
   return mType;
 }
 
+// @brief 番号を返す．
+ymuint
+IrNode::id() const
+{
+  return mId;
+}
+
+// @brief 番号をセットする．
+// @param[in] id 番号
+void
+IrNode::set_id(ymuint id)
+{
+  mId = id;
+}
+
 // @brief オペランド数を返す．
 //
 // 演算子のみ有効
