@@ -1,6 +1,6 @@
 
-/// @file parser_test.cc
-/// @brief parser_test の実装ファイル
+/// @file ir_test.cc
+/// @brief ir_test の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -11,6 +11,8 @@
 #include "AstMgr.h"
 #include "AstStatement.h"
 #include "AstPrinter.h"
+#include "IrMgr.h"
+#include "IrPrinter.h"
 
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
@@ -22,26 +24,37 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 int
-parser_test1(IDO& ido)
+ir_test1(IDO& ido)
 {
   StreamMsgHandler handler(&cout);
   MsgMgr::reg_handler(&handler);
 
-  AstMgr mgr;
-
-  bool stat = mgr.read_source(ido);
-  if ( stat ) {
-    AstPrinter printer(cout);
-
-    AstStatement* toplevel = mgr.toplevel();
-    printer.print_statement(toplevel);
+  AstMgr ast_mgr;
+  bool stat = ast_mgr.read_source(ido);
+  if ( !stat ) {
+    return 1;
   }
+
+  AstPrinter printer(cout);
+
+  AstStatement* toplevel = ast_mgr.toplevel();
+  printer.print_statement(toplevel);
+
+  IrMgr ir_mgr;
+  vector<IrNode*> node_list;
+  bool stat2 = ir_mgr.elaborate(toplevel, node_list);
+  if ( !stat2 ) {
+    return 2;
+  }
+
+  IrPrinter ir_printer(cout);
+  ir_printer.print_code(node_list);
 
   return 0;
 }
 
 int
-parser_test(int argc,
+ir_test(int argc,
 	    char** argv)
 {
   if ( argc == 1 ) {
@@ -107,7 +120,7 @@ parser_test(int argc,
       "//comment\n";
 
     StringIDO ido(str);
-    return parser_test1(ido);
+    return ir_test1(ido);
   }
   else {
     for (int i = 1; i < argc; ++ i) {
@@ -116,7 +129,7 @@ parser_test(int argc,
 	cerr << argv[i] << ": no such file" << endl;
 	return -1;
       }
-      int stat = parser_test1(ido);
+      int stat = ir_test1(ido);
       if ( stat != 0 ) {
 	return stat;
       }
@@ -132,5 +145,5 @@ int
 main(int argc,
      char** argv)
 {
-  return nsYm::nsYmsl::parser_test(argc, argv);
+  return nsYm::nsYmsl::ir_test(argc, argv);
 }

@@ -9,18 +9,8 @@
 
 #include "YmslCompiler.h"
 
-#include "AstExpr.h"
 #include "AstMgr.h"
-#include "AstStatement.h"
-#include "AstSymbol.h"
-#include "AstType.h"
-
-#include "Function.h"
-#include "Var.h"
-#include "Scope.h"
-#include "Type.h"
-#include "SymHandle.h"
-#include "IrNode.h"
+#include "IrMgr.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -30,8 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslCompiler::YmslCompiler() :
-  mIrMgr(mTypeMgr)
+YmslCompiler::YmslCompiler()
 {
 }
 
@@ -48,64 +37,25 @@ YmslCompiler::compile(IDO& ido)
 {
   AstMgr ast_mgr;
 
-  bool stat = ast_mgr.read_source(ido);
-  if ( !stat ) {
+  bool stat1 = ast_mgr.read_source(ido);
+  if ( !stat1 ) {
     return false;
   }
 
-  mFuncCallList.clear();
+  IrMgr ir_mgr;
 
   // 中間表現を作る．
   AstStatement* toplevel = ast_mgr.toplevel();
-  Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
   vector<IrNode*> node_list;
-  elab_stmt(toplevel, toplevel_scope, NULL, NULL, node_list);
-
-  // 関数呼び出しの解決を行う．
-  for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();
-       p != mFuncCallList.end(); ++ p) {
-    const AstExpr* func_expr = p->mExpr;
-    Scope* scope = p->mScope;
-    IrNode* node = p->mNode;
-    resolve_func(func_expr, scope, node);
+  bool stat2 = ir_mgr.elaborate(toplevel, node_list);
+  if ( !stat2 ) {
+    return false;
   }
-
-  // ラベルの解決が行われているかチェックする．
-  for (vector<IrNode*>::iterator p = mUndefList.begin();
-       p != mUndefList.end(); ++ p) {
-    IrNode* label = *p;
-    if ( !label->is_defined() ) {
-      // undefined
-      return false;
-    }
-  }
-
-  // 後始末
-  for (vector<Scope*>::iterator p = mScopeList.begin();
-      p != mScopeList.end(); ++ p) {
-    delete *p;
-  }
-  mScopeList.clear();
-
-  for (vector<Var*>::iterator p = mVarList.begin();
-       p != mVarList.end(); ++ p) {
-    delete *p;
-  }
-  mVarList.clear();
-
-  for (vector<Function*>::iterator p = mFuncList.begin();
-       p != mFuncList.end(); ++ p) {
-    delete *p;
-  }
-  mFuncList.clear();
-
-  mIrMgr.clear();
-
-  mTypeMgr.clear();
 
   return true;
 }
 
+#if 0
 // @brief 要素の生成を行う．
 // @param[in] stmt 文
 // @param[in] scope 現在のスコープ
@@ -184,18 +134,39 @@ YmslCompiler::elab_stmt(const AstStatement* stmt,
       const Var* lhs_var;
       IrNode* lhs_base;
       IrNode* lhs_offset;
-      bool stat = elab_lhs(stmt->lhs_expr(), scope, lhs_var, lhs_base, lhs_offset, node_list);
-      if ( !stat ) {
+      LhsType lhs_type = elab_lhs(stmt->lhs_expr(), scope, lhs_var, lhs_base, lhs_offset, node_list);
+      switch ( lhs_type ) {
+      case kLhsVar:
+	// lhs_var->type() と rhs->type() のチェック
+	// 必要ならキャスト
+	{
+	  IrNode* node = mIrMgr.new_Store(lhs_var, rhs);
+	  node_list.push_back(node);
+	}
+	break;
+
+      case kLhsArray:
+	// lhs_base->type()->elem_type() と rhs->type() のチェック
+	// 必要ならキャスト
+	{
+	  IrNode* node = mIrMgr.new_ArrayStore(lhs_base, lhs_offset, rhs);
+	  node_list.push_back(node);
+	}
+	break;
+
+      case kLhsObj:
+	// lhs_var->type() と rhs->type() のチェック
+	// 必要ならキャスト
+	{
+	  IrNode* node = mIrMgr.new_MemberStore(lhs_base, lhs_var, rhs);
+	  node_list.push_back(node);
+	}
+	break;
+
+      case kLhsError:
 	// エラー
 	return;
       }
-      // elab_lhs の返り値を左辺の形を表す列挙型にする．
-      //
-      // 右辺と左辺の型のチェック
-      //
-      // Store/ArrayStore/MemberStore の生成
-      //IrNode* node = mIrMgr.new_Store(lhs_base, lhs_offset, rhs);
-      //node_list.push_back(node);
     }
     break;
 
@@ -395,7 +366,10 @@ YmslCompiler::reg_enum(const AstStatement* stmt,
     const AstExpr* ec_expr = stmt->enum_const_expr(i);
     int v;
     if ( ec_expr != NULL ) {
-      // ec_expr が定数式であるかのチェック
+      if ( !ec_expr->is_static() ) {
+	// ec_expr が定数式ではない．
+	return;
+      }
       // v = eval(ec_expr());
       // v が重複していないかチェック
     }
@@ -976,9 +950,7 @@ YmslCompiler::elab_rhs_primary(const AstExpr* ast_expr,
 // @param[out] base ベース値
 // @param[out] offset オフセット
 // @param[in] node_list ノードを収めるリスト
-//
-// エラーが起きたら false を返す．
-bool
+YmslCompiler::LhsType
 YmslCompiler::elab_lhs(const AstExpr* ast_expr,
 		       Scope* scope,
 		       const Var*& var,
@@ -991,33 +963,34 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
     var = h->var();
     if ( var == NULL ) {
       // 左辺のシンボルは変数だけ．
-      return false;
+      return kLhsError;
     }
     base = NULL;
     offset = NULL;
-    return true;
+    return kLhsVar;
   }
 
   switch ( ast_expr->expr_type() ) {
   case kSymbolExpr:
     // これはあり得ない．
-    return false;
+    return kLhsError;
 
   case kArrayRef:
     // 配列本体やインデックス値自体は右辺値
     base = elab_rhs_primary(ast_expr->body(), scope, node_list);
     if ( base->type()->type_id() != kArrayType ) {
       // base is not an array
-      return false;
+      return kLhsError;
     }
 
     offset = elab_rhs(ast_expr->index(), scope, node_list);
     if ( offset->type()->type_id() != kIntType ) {
       // offset is not an integer
-      return false;
+      return kLhsError;
     }
+
     var = NULL;
-    return true;
+    return kLhsArray;
 
   case kMemberRef:
     {
@@ -1029,7 +1002,7 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
       ShString member_name = member_symbol->str_val();
       // type のメンバに member_name があることを確認する．
       offset = NULL;
-      return true;
+      return kLhsObj;
     }
     break;
 
@@ -1038,7 +1011,7 @@ YmslCompiler::elab_lhs(const AstExpr* ast_expr,
   }
 
   ASSERT_NOT_REACHED;
-  return false;
+  return kLhsError;
 }
 
 // @brief 式からシンボルの解決を行う．
@@ -1144,5 +1117,6 @@ YmslCompiler::new_function(ShString name,
 
   return func;
 }
+#endif
 
 END_NAMESPACE_YM_YMSL

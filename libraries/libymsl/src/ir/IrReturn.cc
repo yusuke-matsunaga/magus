@@ -29,6 +29,18 @@ IrReturn::~IrReturn()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrReturn::is_static() const
+{
+  if ( return_val() != NULL ) {
+    return return_val()->is_static();
+  }
+  return true;
+}
+
 // @brief 返り値
 IrNode*
 IrReturn::return_val() const

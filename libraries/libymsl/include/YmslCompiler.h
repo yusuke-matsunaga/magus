@@ -10,8 +10,10 @@
 
 
 #include "ymsl_int.h"
+#if 0
 #include "IrMgr.h"
 #include "TypeMgr.h"
+#endif
 #include "YmUtils/IDO.h"
 
 
@@ -43,7 +45,7 @@ public:
   bool
   compile(IDO& ido);
 
-
+#if 0
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -125,6 +127,14 @@ private:
 		   Scope* scope,
 		   vector<IrNode*>& node_list);
 
+  /// @brief elab_lhs の返り値の型
+  enum LhsType {
+    kLhsVar,
+    kLhsArray,
+    kLhsObj,
+    kLhsError
+  };
+
   /// @brief 左辺式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
@@ -132,9 +142,7 @@ private:
   /// @param[out] base ベース値
   /// @param[out] offset オフセット
   /// @param[in] node_list ノードを収めるリスト
-  ///
-  /// エラーが起きたら false を返す．
-  bool
+  LhsType
   elab_lhs(const AstExpr* ast_expr,
 	   Scope* scope,
 	   const Var*& var,
@@ -185,12 +193,13 @@ private:
   Function*
   new_function(ShString name,
 	       const Type* type);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+#if 0
 
   // IR を管理するマネージャ
   IrMgr mIrMgr;
@@ -234,6 +243,7 @@ private:
 
   // 関数のリスト
   vector<Function*> mFuncList;
+#endif
 
 };
 

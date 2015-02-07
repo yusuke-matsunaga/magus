@@ -32,6 +32,15 @@ IrStore::~IrStore()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrStore::is_static() const
+{
+  return false;
+}
+
 // @brief 変数を返す．
 //
 // kOpVarRef, kOpLoad, kOpStore のみ有効

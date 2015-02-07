@@ -31,6 +31,15 @@ IrStringConst::~IrStringConst()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrStringConst::is_static() const
+{
+  return true;
+}
+
 // @brief 文字列を返す．
 const char*
 IrStringConst::string_val() const

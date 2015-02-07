@@ -35,6 +35,15 @@ IrMemberStore::~IrMemberStore()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrMemberStore::is_static() const
+{
+  return false;
+}
+
 // @brief オブジェクトを指す式を返す．
 //
 // kOpMemberLoad, kOpMemberStore のみ有効

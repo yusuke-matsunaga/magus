@@ -24,10 +24,10 @@ IrBinOp::IrBinOp(OpCode opcode,
 		 const Type* type,
 		 IrNode* src1,
 		 IrNode* src2) :
-  IrNode(opcode, type),
-  mSrc1(src1),
-  mSrc2(src2)
+  IrNode(opcode, type)
 {
+  mOperand[0] = src1;
+  mOperand[1] = src2;
 }
 
 // @brief デストラクタ
@@ -35,18 +35,33 @@ IrBinOp::~IrBinOp()
 {
 }
 
-// @brief 第1ソースを返す．
-IrNode*
-IrBinOp::src1() const
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrBinOp::is_static() const
 {
-  return mSrc1;
+  return operand(0)->is_static() && operand(1)->is_static();
 }
 
-// @brief 第2ソースを返す．
-IrNode*
-IrBinOp::src2() const
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+IrBinOp::operand_num() const
 {
-  return mSrc2;
+  return 2;
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+//
+// 演算子のみ有効
+IrNode*
+IrBinOp::operand(ymuint pos) const
+{
+  ASSERT_COND( pos < operand_num() );
+  return mOperand[pos];
 }
 
 END_NAMESPACE_YM_YMSL

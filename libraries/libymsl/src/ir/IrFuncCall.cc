@@ -39,6 +39,17 @@ IrFuncCall::~IrFuncCall()
   delete [] mArgList;
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrFuncCall::is_static() const
+{
+  // 副作用を考えないと判断できない．
+  // ので今はパス
+  return false;
+}
+
 // @brief 関数本体を返す．
 //
 // kOpFuncCall のみ有効

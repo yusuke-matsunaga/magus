@@ -34,6 +34,15 @@ IrJump::~IrJump()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrJump::is_static() const
+{
+  return true;
+}
+
 // @brief ジャンプ先のノードを得る．
 //
 // kOpJump, kOpBranchXXX のみ有効

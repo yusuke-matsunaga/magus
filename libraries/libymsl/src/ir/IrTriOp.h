@@ -43,20 +43,27 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 第1ソースを返す．
+  /// @brief 静的評価可能か調べる．
+  ///
+  /// 要するに定数式かどうかということ
   virtual
-  IrNode*
-  src1() const;
+  bool
+  is_static() const;
 
-  /// @brief 第2ソースを返す．
+  /// @brief オペランド数を返す．
+  ///
+  /// 演算子のみ有効
   virtual
-  IrNode*
-  src2() const;
+  ymuint
+  operand_num() const;
 
-  /// @brief 第3ソースを返す．
+  /// @brief オペランドを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+  ///
+  /// 演算子のみ有効
   virtual
   IrNode*
-  src3() const;
+  operand(ymuint pos) const;
 
 
 private:
@@ -67,14 +74,8 @@ private:
   // opcode
   OpCode mOpCode;
 
-  // 第1ソース
-  IrNode* mSrc1;
-
-  // 第2ソース
-  IrNode* mSrc2;
-
-  // 第3ソース
-  IrNode* mSrc3;
+  // オペランド
+  IrNode* mOperand[3];
 
 };
 

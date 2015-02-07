@@ -58,6 +58,13 @@ public:
   void
   set_id(ymuint id);
 
+  /// @brief 静的評価可能か調べる．
+  ///
+  /// 要するに定数式かどうかということ
+  virtual
+  bool
+  is_static() const = 0;
+
   /// @brief オペランド数を返す．
   ///
   /// 演算子のみ有効

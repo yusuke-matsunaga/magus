@@ -175,3 +175,11 @@ add_executable(TypeMgr_test
 target_link_libraries(TypeMgr_test
   ymsl
   )
+
+add_executable(IrMgr_test
+  tests/IrMgr_test.cc
+  )
+
+target_link_libraries(IrMgr_test
+  ymsl
+  )

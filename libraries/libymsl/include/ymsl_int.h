@@ -218,7 +218,9 @@ enum TypeId {
   kUserDefType
 };
 
-/// @brief ValueType を出力する．
+/// @brief TypeId を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] vt 型番号
 ostream&
 operator<<(ostream& s,
 	   TypeId vt);
@@ -251,8 +253,8 @@ enum StmtType {
   kFuncDecl,
   kGoto,
   kIf,
-  kIncr,
   kImport,
+  kIncr,
   kLabel,
   kNullStmt,
   kReturn,
@@ -261,6 +263,13 @@ enum StmtType {
   kVarDecl,
   kWhile
 };
+
+/// @brief StmtType を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] st 文の種類
+ostream&
+operator<<(ostream& s,
+	   StmtType st);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -313,6 +322,13 @@ enum ExprType {
   kEnumExpr,
   kFuncExpr
 };
+
+/// @brief ExprType を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] et 式の種類
+ostream&
+operator<<(ostream& s,
+	   ExprType et);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -370,6 +386,13 @@ enum OpCode {
   // 停止
   kOpHalt
 };
+
+/// @brief OpCode を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] op オペオード
+ostream&
+operator<<(ostream& s,
+	   OpCode op);
 
 
 //////////////////////////////////////////////////////////////////////

@@ -31,6 +31,15 @@ IrFloatConst::~IrFloatConst()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrFloatConst::is_static() const
+{
+  return true;
+}
+
 // @brief 実数値を返す．
 double
 IrFloatConst::float_val() const

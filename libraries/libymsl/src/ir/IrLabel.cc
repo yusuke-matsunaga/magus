@@ -28,6 +28,15 @@ IrLabel::~IrLabel()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrLabel::is_static() const
+{
+  return true;
+}
+
 // @brief 定義済みの時に true を返す．
 //
 // kOpLabel のみ意味を持つ．

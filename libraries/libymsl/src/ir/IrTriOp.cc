@@ -25,11 +25,11 @@ IrTriOp::IrTriOp(OpCode opcode,
 		 IrNode* src1,
 		 IrNode* src2,
 		 IrNode* src3) :
-  IrNode(opcode, type),
-  mSrc1(src1),
-  mSrc2(src2),
-  mSrc3(src3)
+  IrNode(opcode, type)
 {
+  mOperand[0] = src1;
+  mOperand[1] = src2;
+  mOperand[2] = src3;
 }
 
 // @brief デストラクタ
@@ -37,25 +37,33 @@ IrTriOp::~IrTriOp()
 {
 }
 
-// @brief 第1ソースを返す．
-IrNode*
-IrTriOp::src1() const
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrTriOp::is_static() const
 {
-  return mSrc1;
+  return operand(0)->is_static() && operand(1)->is_static() && operand(2)->is_static();
 }
 
-// @brief 第2ソースを返す．
-IrNode*
-IrTriOp::src2() const
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+IrTriOp::operand_num() const
 {
-  return mSrc2;
+  return 3;
 }
 
-// @brief 第3ソースを返す．
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+//
+// 演算子のみ有効
 IrNode*
-IrTriOp::src3() const
+IrTriOp::operand(ymuint pos) const
 {
-  return mSrc3;
+  ASSERT_COND( pos < operand_num() );
+  return mOperand[pos];
 }
 
 END_NAMESPACE_YM_YMSL

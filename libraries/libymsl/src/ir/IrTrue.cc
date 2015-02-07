@@ -28,4 +28,13 @@ IrTrue::~IrTrue()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrTrue::is_static() const
+{
+  return true;
+}
+
 END_NAMESPACE_YM_YMSL

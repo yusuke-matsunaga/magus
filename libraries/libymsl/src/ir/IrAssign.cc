@@ -32,6 +32,15 @@ IrAssign::~IrAssign()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrAssign::is_static() const
+{
+  return false;
+}
+
 // @brief 左辺式を返す．
 //
 // kOpAssign のみ有効

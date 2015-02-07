@@ -33,10 +33,32 @@ IrUniOp::~IrUniOp()
 {
 }
 
-// @brief 第1ソースを返す．
-IrNode*
-IrUniOp::src1() const
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrUniOp::is_static() const
 {
+  return operand(0)->is_static();
+}
+
+// @brief オペランド数を返す．
+//
+// 演算子のみ有効
+ymuint
+IrUniOp::operand_num() const
+{
+  return 1;
+}
+
+// @brief オペランドを返す．
+// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+//
+// 演算子のみ有効
+IrNode*
+IrUniOp::operand(ymuint pos) const
+{
+  ASSERT_COND( pos < operand_num() );
   return mSrc1;
 }
 

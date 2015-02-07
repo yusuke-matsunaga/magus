@@ -238,4 +238,62 @@ IrNode::set_defined()
   ASSERT_NOT_REACHED;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// その他
+//////////////////////////////////////////////////////////////////////
+
+// @brief OpCode を出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] op オペオード
+ostream&
+operator<<(ostream& s,
+	   OpCode op)
+{
+  switch ( op ) {
+  case kOpTrue:        s << "True"; break;
+  case kOpFalse:       s << "False"; break;
+  case kOpIntConst:    s << "IntConst"; break;
+  case kOpFloatConst:  s << "FloatConst"; break;
+  case kOpStringConst: s << "StringConst"; break;
+  case kOpCastBoolean: s << "CastBoolean"; break;
+  case kOpCastInt:     s << "CastInt"; break;
+  case kOpCastFloat:   s << "CastFloat"; break;
+  case kOpBitNeg:      s << "BitNeg"; break;
+  case kOpLogNot:      s << "LogNot"; break;
+  case kOpUniMinus:    s << "UniMinus"; break;
+  case kOpBitAnd:      s << "BitAnd"; break;
+  case kOpBitOr:       s << "BitOr"; break;
+  case kOpBitXor:      s << "BitXor"; break;
+  case kOpLogAnd:      s << "LogAnd"; break;
+  case kOpLogOr:       s << "LogOr"; break;
+  case kOpPlus:        s << "Plus"; break;
+  case kOpMinus:       s << "Minus"; break;
+  case kOpMult:        s << "Mult"; break;
+  case kOpDiv:         s << "Div"; break;
+  case kOpMod:         s << "Mod"; break;
+  case kOpLshift:      s << "Lshift"; break;
+  case kOpRshift:      s << "Rshift"; break;
+  case kOpEqual:       s << "Equal"; break;
+  case kOpNotEq:       s << "NotEq"; break;
+  case kOpLt:          s << "Lt"; break;
+  case kOpLe:          s << "Le"; break;
+  case kOpIte:         s << "Ite"; break;
+  case kOpLoad:        s << "Load"; break;
+  case kOpStore:       s << "Store"; break;
+  case kOpArrayLoad:   s << "ArrayLoad"; break;
+  case kOpArrayStore:  s << "ArrayStore"; break;
+  case kOpMemberLoad:  s << "MemberLoad"; break;
+  case kOpMemberStore: s << "MemberStore"; break;
+  case kOpFuncCall:    s << "FuncCall"; break;
+  case kOpReturn:      s << "Return"; break;
+  case kOpJump:        s << "Jump"; break;
+  case kOpBranchTrue:  s << "BranchTrue"; break;
+  case kOpBranchFalse: s << "BranchFalse"; break;
+  case kOpLabel:       s << "Label"; break;
+  case kOpHalt:         s << "Halt"; break;
+  default: ASSERT_NOT_REACHED; break;
+  }
+}
+
 END_NAMESPACE_YM_YMSL

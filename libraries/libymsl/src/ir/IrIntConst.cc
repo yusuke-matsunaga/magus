@@ -31,6 +31,15 @@ IrIntConst::~IrIntConst()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrIntConst::is_static() const
+{
+  return true;
+}
+
 // @brief 整数値を返す．
 int
 IrIntConst::int_val() const

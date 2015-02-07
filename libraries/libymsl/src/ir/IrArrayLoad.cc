@@ -33,6 +33,17 @@ IrArrayLoad::~IrArrayLoad()
 {
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrArrayLoad::is_static() const
+{
+  // 配列が不変ならロード結果も不変
+  // だけど今は考えない．
+  return false;
+}
+
 // @brief 配列本体の式を返す．
 //
 // kOpArrayLoad, kOpArrayStore のみ有効
