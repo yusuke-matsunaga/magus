@@ -89,6 +89,7 @@ set (ymsl_SOURCES
   src/compiler/VarHandle.cc
 
   src/ir/IrMgr.cc
+  src/ir/IrMgr_sub2.cc
   src/ir/IrNode.cc
   src/ir/IrTrue.cc
   src/ir/IrFalse.cc
@@ -100,10 +101,11 @@ set (ymsl_SOURCES
   src/ir/IrTriOp.cc
   src/ir/IrLoad.cc
   src/ir/IrStore.cc
-  src/ir/IrArrayLoad.cc
-  src/ir/IrArrayStore.cc
-  src/ir/IrMemberLoad.cc
-  src/ir/IrMemberStore.cc
+  src/ir/IrInplaceUniOp.cc
+  src/ir/IrInplaceBinOp.cc
+  src/ir/IrVarRef.cc
+  src/ir/IrArrayRef.cc
+  src/ir/IrMemberRef.cc
   src/ir/IrFuncCall.cc
   src/ir/IrReturn.cc
   src/ir/IrJump.cc

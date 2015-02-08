@@ -1,8 +1,8 @@
-#ifndef IRMEMBERSTORE_H
-#define IRMEMBERSTORE_H
+#ifndef IRINPLACEBINOP_H
+#define IRINPLACEBINOP_H
 
-/// @file IrMemberStore.h
-/// @brief IrMemberStore のヘッダファイル
+/// @file IrInplaceBinOp.h
+/// @brief IrInplaceBinOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,25 +15,25 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrMemberStore IrMemberStore.h "IrMemberStore.h"
-/// @brief クラスメンバ用のストア命令を表すノード
+/// @class IrInplaceBinOp IrInplaceBinOp.h "IrInplaceBinOp.h"
+/// @brief 自己代入型の単項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrMemberStore :
+class IrInplaceBinOp :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] base ベースアドレス
-  /// @param[in] var メンバ変数
-  /// @param[in] val 値
-  IrMemberStore(IrNode* base,
-		const Var* var,
-		IrNode* val);
+  /// @param[in] opcode オペコード
+  /// @param[in] lhs_addr 左辺値
+  /// @param[in] opr1 オペランド
+  IrInplaceBinOp(OpCode opcode,
+		 IrNode* lhs_addr,
+		 IrNode* opr1);
 
   /// @brief デストラクタ
   virtual
-  ~IrMemberStore();
+  ~IrInplaceBinOp();
 
 
 public:
@@ -48,24 +48,27 @@ public:
   bool
   is_static() const;
 
-  /// @brief オブジェクトを指す式を返す．
+  /// @brief ロード/ストア対象のアドレスを得る．
   ///
-  /// kOpMemberLoad, kOpMemberStore のみ有効
+  /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
   IrNode*
-  obj_expr() const;
+  address() const;
 
-  /// @brief 変数を返す．
+  /// @brief オペランド数を返す．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
+  /// 演算子のみ有効
   virtual
-  const Var*
-  var() const;
+  ymuint
+  operand_num() const;
 
-  /// @brief 書き込む値を返す．
+  /// @brief オペランドを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < operand_num() )
+  ///
+  /// 演算子のみ有効
   virtual
   IrNode*
-  store_val() const;
+  operand(ymuint pos) const;
 
 
 private:
@@ -73,17 +76,15 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ベースアドレス
-  IrNode* mBase;
+  // アドレス
+  IrNode* mAddress;
 
-  // メンバ変数
-  const Var* mVar;
-
-  // 書き込む値
-  IrNode* mStoreVal;
+  // オペランド
+  IrNode* mOperand;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRMEMBERSTORE_H
+
+#endif // IRINPLACEBINOP_H

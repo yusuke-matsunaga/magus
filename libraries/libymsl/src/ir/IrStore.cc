@@ -17,12 +17,12 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var 変数
+// @param[in] addr アドレス
 // @param[in] val 値
-IrStore::IrStore(const Var* var,
+IrStore::IrStore(IrNode* addr,
 		 IrNode* val) :
   IrNode(kOpStore, NULL),
-  mVar(var),
+  mAddress(addr),
   mStoreVal(val)
 {
 }
@@ -41,13 +41,13 @@ IrStore::is_static() const
   return false;
 }
 
-// @brief 変数を返す．
+// @brief ロード/ストア対象のアドレスを得る．
 //
-// kOpVarRef, kOpLoad, kOpStore のみ有効
-const Var*
-IrStore::var() const
+// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
+IrNode*
+IrStore::address() const
 {
-  return mVar;
+  return mAddress;
 }
 
 // @brief 書き込む値を返す．

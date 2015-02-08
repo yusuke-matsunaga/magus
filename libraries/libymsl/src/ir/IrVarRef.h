@@ -1,8 +1,8 @@
-#ifndef IRARRAYSTORE_H
-#define IRARRAYSTORE_H
+#ifndef IRVARREF_H
+#define IRVARREF_H
 
-/// @file IrArrayStore.h
-/// @brief IrArrayStore のヘッダファイル
+/// @file IrVarRef.h
+/// @brief IrVarRef のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,25 +15,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrArrayStore IrArrayStore.h "IrArrayStore.h"
-/// @brief 配列用のストア命令を表すノード
+/// @class IrVarRef IrVarRef.h "IrVarRef.h"
+/// @brief 変数参照を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrArrayStore :
+class IrVarRef :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] base ベースアドレス
-  /// @param[in] offset オフセット
-  /// @param[in] val 値
-  IrArrayStore(IrNode* base,
-	       IrNode* offset,
-	       IrNode* val);
+  /// @param[in] var 変数
+  IrVarRef(const Var* var);
 
   /// @brief デストラクタ
   virtual
-  ~IrArrayStore();
+  ~IrVarRef();
 
 
 public:
@@ -48,24 +44,12 @@ public:
   bool
   is_static() const;
 
-  /// @brief 配列本体の式を返す．
+  /// @brief 変数を返す．
   ///
-  /// kOpArrayLoad, kOpArrayStore のみ有効
+  /// kOpVarRef, kMemberRef のみ有効
   virtual
-  IrNode*
-  array_expr() const;
-
-  /// @brief 配列のインデックスを返す．
-  ///
-  /// kOpArrayLoad, kOpArrayStore のみ有効
-  virtual
-  IrNode*
-  array_index() const;
-
-  /// @brief 書き込む値を返す．
-  virtual
-  IrNode*
-  store_val() const;
+  const Var*
+  var() const;
 
 
 private:
@@ -73,17 +57,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ベースアドレス
-  IrNode* mBase;
-
-  // オフセット
-  IrNode* mOffset;
-
-  // 書き込む値
-  IrNode* mStoreVal;
+  // 変数
+  const Var* mVar;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRARRAYSTORE_H
+#endif // IRVARREF_H

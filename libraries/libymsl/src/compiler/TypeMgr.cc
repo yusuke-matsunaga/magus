@@ -348,9 +348,9 @@ TypeMgr::calc_type2(OpCode opcode,
     }
     break;
 
-  case kOpPlus:
-  case kOpMinus:
-  case kOpMult:
+  case kOpAdd:
+  case kOpSub:
+  case kOpMul:
   case kOpDiv:
     // int/float のみ可
     // どちらかが float なら結果も float

@@ -1,31 +1,32 @@
 
-/// @file IrLoad.cc
-/// @brief IrLoad の実装ファイル
+/// @file IrVarRef.cc
+/// @brief IrVarRef の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrLoad.h"
+#include "IrVarRef.h"
+#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrLoad
+// クラス IrVarRef
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] addr アドレス
-IrLoad::IrLoad(IrNode* addr) :
-  IrNode(kOpLoad, addr->type()),
-  mAddress(addr)
+// @param[in] var 変数
+IrVarRef::IrVarRef(const Var* var) :
+  IrNode(kOpVarRef, var->value_type()),
+  mVar(var)
 {
 }
 
 // @brief デストラクタ
-IrLoad::~IrLoad()
+IrVarRef::~IrVarRef()
 {
 }
 
@@ -33,18 +34,18 @@ IrLoad::~IrLoad()
 //
 // 要するに定数式かどうかということ
 bool
-IrLoad::is_static() const
+IrVarRef::is_static() const
 {
   return false;
 }
 
-// @brief ロード/ストア対象のアドレスを得る．
+// @brief 変数を返す．
 //
-// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrNode*
-IrLoad::address() const
+// kOpVarRef, kOpLoad, kOpStore のみ有効
+const Var*
+IrVarRef::var() const
 {
-  return mAddress;
+  return mVar;
 }
 
 END_NAMESPACE_YM_YMSL

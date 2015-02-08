@@ -132,28 +132,26 @@ private:
 		   Scope* scope,
 		   vector<IrNode*>& node_list);
 
-  /// @brief elab_lhs の返り値の型
-  enum LhsType {
-    kLhsVar,
-    kLhsArray,
-    kLhsObj,
-    kLhsError
+  /// @brief analyze_primary の返り値の型
+  enum PrimType {
+    kPrimConst,
+    kPrimAddr,
+    kPrimFunc,
+    kPrimError
   };
 
-  /// @brief 左辺式の実体化を行う．
+  /// @brief プライマリ式の解析を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
-  /// @param[out] var 変数
-  /// @param[out] base ベース値
-  /// @param[out] offset オフセット
+  /// @param[out] node 定数/アドレスを格納する変数
+  /// @param[out] func 関数
   /// @param[in] node_list ノードを収めるリスト
-  LhsType
-  elab_lhs(const AstExpr* ast_expr,
-	   Scope* scope,
-	   const Var*& var,
-	   IrNode*& base,
-	   IrNode*& offset,
-	   vector<IrNode*>& node_list);
+  PrimType
+  analyze_primary(const AstExpr* ast_expr,
+		  Scope* scope,
+		  IrNode*& node,
+		  const Function*& func,
+		  vector<IrNode*>& node_list);
 
   /// @brief 式からスコープの解決を行う．
   /// @param[in] expr 式
@@ -228,10 +226,6 @@ private:
   IrNode*
   new_StringConst(const char* val);
 
-  /// @brief 変数参照を生成する．
-  IrNode*
-  new_VarRef(const Var* var);
-
   /// @brief 単項演算式を生成する．
   /// @param[in] opcode オペコード
   /// @param[in] type 出力の型
@@ -263,48 +257,51 @@ private:
 	    IrNode* opr3);
 
   /// @brief load 文を生成する．
-  /// @param[in] var 変数
+  /// @param[in] addr アドレス
   IrNode*
-  new_Load(const Var* var);
+  new_Load(IrNode* addr);
 
   /// @brief store 文を生成する．
-  /// @param[in] var 変数
+  /// @param[in] addr アドレス
   /// @param[in] val 書き込む値
   IrNode*
-  new_Store(const Var* var,
+  new_Store(IrNode* addr,
 	    IrNode* val);
 
-  /// @brief 配列用の load 文を生成する．
+  /// @brief 自己代入型の単項演算を生成する．
+  /// @param[in] opcode オペコード
+  /// @param[in] lhs_addr 左辺式
+  IrNode*
+  new_InplaceUniOp(OpCode opcode,
+		   IrNode* lhs_addr);
+
+  /// @brief 自己代入型の二項演算を生成する．
+  /// @param[in] opcode オペコード
+  /// @param[in] lhs_addr 左辺式
+  /// @param[in] opr オペランド
+  IrNode*
+  new_InplaceBinOp(OpCode opcode,
+		   IrNode* lhs_addr,
+		   IrNode* opr);
+
+  /// @brief 変数参照を生成する．
+  /// @param[in] var 変数
+  IrNode*
+  new_VarRef(const Var* var);
+
+  /// @brief 配列参照を生成する．
   /// @param[in] array 配列
   /// @param[in] index インデックス
   IrNode*
-  new_ArrayLoad(IrNode* array,
-		IrNode* index);
+  new_ArrayRef(IrNode* array,
+	       IrNode* index);
 
-  /// @brief 配列用の store 文を生成する．
-  /// @param[in] array 配列
-  /// @param[in] index インデックス
-  /// @param[in] val 書き込む値
-  IrNode*
-  new_ArrayStore(IrNode* array,
-		 IrNode* index,
-		 IrNode* val);
-
-  /// @brief クラスメンバ用の load 文を生成する．
+  /// @brief クラスメンバ参照を生成する．
   /// @param[in] obj オブジェクト
   /// @param[in] var メンバ変数
   IrNode*
-  new_MemberLoad(IrNode* obj,
-		 const Var* var);
-
-  /// @brief クラスメンバ用の store 文を生成する．
-  /// @param[in] obj オブジェクト
-  /// @param[in] var メンバ変数
-  /// @param[in] val 書き込む値
-  IrNode*
-  new_MemberStore(IrNode* obj,
-		  const Var* var,
-		  IrNode* val);
+  new_MemberRef(IrNode* obj,
+		const Var* var);
 
   /// @brief 関数呼び出し式を生成する．
   /// @param[in] func 関数

@@ -24,8 +24,8 @@ class IrLoad :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrLoad(const Var* var);
+  /// @param[in] addr アドレス
+  IrLoad(IrNode* addr);
 
   /// @brief デストラクタ
   virtual
@@ -44,12 +44,12 @@ public:
   bool
   is_static() const;
 
-  /// @brief 変数を返す．
+  /// @brief ロード/ストア対象のアドレスを得る．
   ///
-  /// kOpVarRef, kOpLoad, kOpStore のみ有効
+  /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  const Var*
-  var() const;
+  IrNode*
+  address() const;
 
 
 private:
@@ -57,8 +57,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const Var* mVar;
+  // アドレス
+  IrNode* mAddress;
 
 };
 

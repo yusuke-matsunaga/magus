@@ -1,8 +1,8 @@
-#ifndef IRSTORE_H
-#define IRSTORE_H
+#ifndef IRINPLACEUNIOP_H
+#define IRINPLACEUNIOP_H
 
-/// @file IrStore.h
-/// @brief IrStore のヘッダファイル
+/// @file IrInplaceUniOp.h
+/// @brief IrInplaceUniOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,23 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrStore IrStore.h "IrStore.h"
-/// @brief ストア命令を表すノード
+/// @class IrInplaceUniOp IrInplaceUniOp.h "IrInplaceUniOp.h"
+/// @brief 自己代入型の単項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrStore :
+class IrInplaceUniOp :
   public IrNode
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] addr アドレス
-  /// @param[in] val 値
-  IrStore(IrNode* addr,
-	  IrNode* val);
+  /// @param[in] opcode オペコード
+  /// @param[in] lhs_addr 左辺値
+  IrInplaceUniOp(OpCode opcode,
+		 IrNode* lhs_addr);
 
   /// @brief デストラクタ
   virtual
-  ~IrStore();
+  ~IrInplaceUniOp();
 
 
 public:
@@ -53,11 +53,6 @@ public:
   IrNode*
   address() const;
 
-  /// @brief 書き込む値を返す．
-  virtual
-  IrNode*
-  store_val() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -67,11 +62,9 @@ private:
   // アドレス
   IrNode* mAddress;
 
-  // 書き込む値
-  IrNode* mStoreVal;
-
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRSTORE_H
+
+#endif // IRINPLACEUNIOP_H

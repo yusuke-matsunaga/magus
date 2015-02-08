@@ -116,15 +116,15 @@ IrPrinter::print_node(IrNode* node)
     mS << "log_or %" << node->operand(0)->id() << " %" << node->operand(1)->id();
     break;
 
-  case kOpPlus:
+  case kOpAdd:
     mS << "add %" << node->operand(0)->id() << " %" << node->operand(1)->id();
     break;
 
-  case kOpMinus:
+  case kOpSub:
     mS << "sub %" << node->operand(0)->id() << " %" << node->operand(1)->id();
     break;
 
-  case kOpMult:
+  case kOpMul:
     mS << "mul %" << node->operand(0)->id() << " %" << node->operand(1)->id();
     break;
 
@@ -166,29 +166,71 @@ IrPrinter::print_node(IrNode* node)
     break;
 
   case kOpLoad:
-    mS << "load " << node->var()->name();
+    mS << "load %" << node->address()->id();
     break;
 
   case kOpStore:
-    mS << "store " << node->var()->name() << " %" << node->store_val()->id();
+    mS << "store %" << node->address()->id() << " %" << node->store_val()->id();
     break;
 
-  case kOpArrayLoad:
-    mS << "load_array %" << node->array_expr()->id() << " %" << node->array_index()->id();
+  case kOpInc:
+    mS << "inc %" << node->address()->id();
     break;
 
-  case kOpArrayStore:
-    mS << "store_array %" << node->array_expr()->id() << " %" << node->array_index()->id()
-       << " %" << node->store_val()->id();
+  case kOpDec:
+    mS << "dec %" << node->address()->id();
     break;
 
-  case kOpMemberLoad:
-    mS << "load_member %" << node->obj_expr()->id() << " " << node->var()->name();
+  case kOpInplaceBitAnd:
+    mS << "inplace_bit_and %" << node->address()->id() << " %" << node->operand(0)->id();
     break;
 
-  case kOpMemberStore:
-    mS << "store_member %" << node->obj_expr()->id() << " " << node->var()->name()
-       << " %" << node->store_val()->id();
+  case kOpInplaceBitOr:
+    mS << "inplace_bit_or %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceBitXor:
+    mS << "inplace_bit_xor %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceAdd:
+    mS << "inplace_add %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceSub:
+    mS << "inplace_sub %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceMul:
+    mS << "inplace_mul %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceDiv:
+    mS << "inplace_div %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceMod:
+    mS << "inplace_mod %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceLshift:
+    mS << "inplace_lshift %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpInplaceRshift:
+    mS << "inplace_rshift %" << node->address()->id() << " %" << node->operand(0)->id();
+    break;
+
+  case kOpVarRef:
+    mS << "var_ref " << node->var()->name();
+    break;
+
+  case kOpArrayRef:
+    mS << "array_ref %" << node->array_expr()->id() << " %" << node->array_index()->id();
+    break;
+
+  case kOpMemberRef:
+    mS << "member_ref %" << node->obj_expr()->id() << " " << node->var()->name();
     break;
 
   case kOpFuncCall:

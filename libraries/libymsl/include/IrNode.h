@@ -101,47 +101,47 @@ public:
   const char*
   string_val() const;
 
-  /// @brief 変数を返す．
+  /// @brief ロード/ストア対象のアドレスを得る．
   ///
-  /// kOpLoad, kOpStore, kOpMemberLoad, kOpMemberStore のみ有効
+  /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  const Var*
-  var() const;
+  IrNode*
+  address() const;
 
   /// @brief 書き込む値を返す．
   ///
-  /// kOpStore, kOpArrayStore, kOpMemberStore のみ有効
+  /// kOpStore のみ有効
   virtual
   IrNode*
   store_val() const;
 
+  /// @brief 変数を返す．
+  ///
+  /// kOpVarRef, kOpMemberRef のみ有効
+  virtual
+  const Var*
+  var() const;
+
   /// @brief 配列本体の式を返す．
   ///
-  /// kOpArrayLoad, kOpArrayStore のみ有効
+  /// kOpArrayRef のみ有効
   virtual
   IrNode*
   array_expr() const;
 
   /// @brief 配列のインデックスを返す．
   ///
-  /// kOpArrayLoad, kOpArrayStore のみ有効
+  /// kOpArrayRef のみ有効
   virtual
   IrNode*
   array_index() const;
 
   /// @brief オブジェクトを指す式を返す．
   ///
-  /// kOpMemberLoad, kOpMemberStore のみ有効
+  /// kOpMemberRef のみ有効
   virtual
   IrNode*
   obj_expr() const;
-
-  /// @brief メンバのインデックスを返す．
-  ///
-  /// kOpMemberLoad, kOpMemberStore のみ有効
-  virtual
-  ymuint
-  member_index() const;
 
   /// @brief 関数本体を返す．
   ///

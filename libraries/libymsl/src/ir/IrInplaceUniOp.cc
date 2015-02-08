@@ -1,31 +1,33 @@
 
-/// @file IrLoad.cc
-/// @brief IrLoad の実装ファイル
+/// @file IrInplaceUniOp.cc
+/// @brief IrInplaceUniOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrLoad.h"
+#include "IrInplaceUniOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrLoad
+// クラス IrInplaceUniOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] addr アドレス
-IrLoad::IrLoad(IrNode* addr) :
-  IrNode(kOpLoad, addr->type()),
-  mAddress(addr)
+// @param[in] opcode オペコード
+// @param[in] lhs_addr 左辺値
+IrInplaceUniOp::IrInplaceUniOp(OpCode opcode,
+			       IrNode* lhs_addr) :
+  IrNode(opcode, NULL),
+  mAddress(lhs_addr)
 {
 }
 
 // @brief デストラクタ
-IrLoad::~IrLoad()
+IrInplaceUniOp::~IrInplaceUniOp()
 {
 }
 
@@ -33,7 +35,7 @@ IrLoad::~IrLoad()
 //
 // 要するに定数式かどうかということ
 bool
-IrLoad::is_static() const
+IrInplaceUniOp::is_static() const
 {
   return false;
 }
@@ -42,7 +44,7 @@ IrLoad::is_static() const
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
 IrNode*
-IrLoad::address() const
+IrInplaceUniOp::address() const
 {
   return mAddress;
 }

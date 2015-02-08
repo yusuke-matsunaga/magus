@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] arglist 引数リスト
 IrFuncCall::IrFuncCall(const Function* func,
 		       const vector<IrNode*>& arglist) :
-  IrNode(kOpFuncCall, func->type()->function_output_type()),
+  IrNode(kOpFuncCall, NULL),
   mFunc(func)
 {
   mArgNum = arglist.size();

@@ -104,9 +104,11 @@ IrNode::string_val() const
   return NULL;
 }
 
-// @brief 変数を返す．
-const Var*
-IrNode::var() const
+// @brief ロード/ストア対象のアドレスを得る．
+//
+// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
+IrNode*
+IrNode::address() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -114,7 +116,7 @@ IrNode::var() const
 
 // @brief 書き込む値を返す．
 //
-// kOpStore, kOpArrayStore, kOpMemberStore のみ有効
+// kOpStore のみ有効
 IrNode*
 IrNode::store_val() const
 {
@@ -122,9 +124,19 @@ IrNode::store_val() const
   return NULL;
 }
 
+// @brief 変数を返す．
+//
+// kOpVarRef, kOpMemberRef のみ有効
+const Var*
+IrNode::var() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 // @brief 配列本体の式を返す．
 //
-// kOpArrayLoad, kOpArrayStore のみ有効
+// kOpArrayRef のみ有効
 IrNode*
 IrNode::array_expr() const
 {
@@ -134,7 +146,7 @@ IrNode::array_expr() const
 
 // @brief 配列のインデックスを返す．
 //
-// kOpArrayLoad, kOpArrayStore のみ有効
+// kOpArrayRef のみ有効
 IrNode*
 IrNode::array_index() const
 {
@@ -144,22 +156,12 @@ IrNode::array_index() const
 
 // @brief オブジェクトを指す式を返す．
 //
-// kOpMemberLoad, kOpMemberStore のみ有効
+// kOpMemberRef のみ有効
 IrNode*
 IrNode::obj_expr() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
-}
-
-// @brief メンバのインデックスを返す．
-//
-// kOpMemberLoad, kOpMemberStore のみ有効
-ymuint
-IrNode::member_index() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
 }
 
 // @brief 関数本体を返す．
@@ -251,49 +253,62 @@ operator<<(ostream& s,
 	   OpCode op)
 {
   switch ( op ) {
-  case kOpTrue:        s << "True"; break;
-  case kOpFalse:       s << "False"; break;
-  case kOpIntConst:    s << "IntConst"; break;
-  case kOpFloatConst:  s << "FloatConst"; break;
-  case kOpStringConst: s << "StringConst"; break;
-  case kOpCastBoolean: s << "CastBoolean"; break;
-  case kOpCastInt:     s << "CastInt"; break;
-  case kOpCastFloat:   s << "CastFloat"; break;
-  case kOpBitNeg:      s << "BitNeg"; break;
-  case kOpLogNot:      s << "LogNot"; break;
-  case kOpUniMinus:    s << "UniMinus"; break;
-  case kOpBitAnd:      s << "BitAnd"; break;
-  case kOpBitOr:       s << "BitOr"; break;
-  case kOpBitXor:      s << "BitXor"; break;
-  case kOpLogAnd:      s << "LogAnd"; break;
-  case kOpLogOr:       s << "LogOr"; break;
-  case kOpPlus:        s << "Plus"; break;
-  case kOpMinus:       s << "Minus"; break;
-  case kOpMult:        s << "Mult"; break;
-  case kOpDiv:         s << "Div"; break;
-  case kOpMod:         s << "Mod"; break;
-  case kOpLshift:      s << "Lshift"; break;
-  case kOpRshift:      s << "Rshift"; break;
-  case kOpEqual:       s << "Equal"; break;
-  case kOpNotEq:       s << "NotEq"; break;
-  case kOpLt:          s << "Lt"; break;
-  case kOpLe:          s << "Le"; break;
-  case kOpIte:         s << "Ite"; break;
-  case kOpLoad:        s << "Load"; break;
-  case kOpStore:       s << "Store"; break;
-  case kOpArrayLoad:   s << "ArrayLoad"; break;
-  case kOpArrayStore:  s << "ArrayStore"; break;
-  case kOpMemberLoad:  s << "MemberLoad"; break;
-  case kOpMemberStore: s << "MemberStore"; break;
-  case kOpFuncCall:    s << "FuncCall"; break;
-  case kOpReturn:      s << "Return"; break;
-  case kOpJump:        s << "Jump"; break;
-  case kOpBranchTrue:  s << "BranchTrue"; break;
-  case kOpBranchFalse: s << "BranchFalse"; break;
-  case kOpLabel:       s << "Label"; break;
-  case kOpHalt:         s << "Halt"; break;
+  case kOpTrue:          s << "True"; break;
+  case kOpFalse:         s << "False"; break;
+  case kOpIntConst:      s << "IntConst"; break;
+  case kOpFloatConst:    s << "FloatConst"; break;
+  case kOpStringConst:   s << "StringConst"; break;
+  case kOpCastBoolean:   s << "CastBoolean"; break;
+  case kOpCastInt:       s << "CastInt"; break;
+  case kOpCastFloat:     s << "CastFloat"; break;
+  case kOpBitNeg:        s << "BitNeg"; break;
+  case kOpLogNot:        s << "LogNot"; break;
+  case kOpUniMinus:      s << "UniMinus"; break;
+  case kOpBitAnd:        s << "BitAnd"; break;
+  case kOpBitOr:         s << "BitOr"; break;
+  case kOpBitXor:        s << "BitXor"; break;
+  case kOpLogAnd:        s << "LogAnd"; break;
+  case kOpLogOr:         s << "LogOr"; break;
+  case kOpAdd:           s << "Add"; break;
+  case kOpSub:           s << "Sub"; break;
+  case kOpMul:           s << "Mul"; break;
+  case kOpDiv:           s << "Div"; break;
+  case kOpMod:           s << "Mod"; break;
+  case kOpLshift:        s << "Lshift"; break;
+  case kOpRshift:        s << "Rshift"; break;
+  case kOpEqual:         s << "Equal"; break;
+  case kOpNotEq:         s << "NotEq"; break;
+  case kOpLt:            s << "Lt"; break;
+  case kOpLe:            s << "Le"; break;
+  case kOpIte:           s << "Ite"; break;
+  case kOpLoad:          s << "Load"; break;
+  case kOpStore:         s << "Store"; break;
+  case kOpInc:           s << "Inc"; break;
+  case kOpDec:           s << "Dec"; break;
+  case kOpInplaceBitAnd: s << "InplaceBitAnd"; break;
+  case kOpInplaceBitOr:  s << "InplaceBitOr"; break;
+  case kOpInplaceBitXor: s << "InplaceBitXor"; break;
+  case kOpInplaceAdd:    s << "InplaceAdd"; break;
+  case kOpInplaceSub:    s << "InplaceSub"; break;
+  case kOpInplaceMul:    s << "InplaceMul"; break;
+  case kOpInplaceDiv:    s << "InplaceDiv"; break;
+  case kOpInplaceMod:    s << "InplaceMod"; break;
+  case kOpInplaceLshift: s << "InplaceLshift"; break;
+  case kOpInplaceRshift: s << "InplaceRshift"; break;
+  case kOpVarRef:        s << "VarRef"; break;
+  case kOpArrayRef:      s << "ArrayRef"; break;
+  case kOpMemberRef:     s << "MemberRef"; break;
+  case kOpFuncCall:      s << "FuncCall"; break;
+  case kOpReturn:        s << "Return"; break;
+  case kOpJump:          s << "Jump"; break;
+  case kOpBranchTrue:    s << "BranchTrue"; break;
+  case kOpBranchFalse:   s << "BranchFalse"; break;
+  case kOpLabel:         s << "Label"; break;
+  case kOpHalt:          s << "Halt"; break;
   default: ASSERT_NOT_REACHED; break;
   }
+
+  return s;
 }
 
 END_NAMESPACE_YM_YMSL
