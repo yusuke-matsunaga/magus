@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "SymHandle.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class ScopeHandle ScopeHandle.h "ScopeHandle.h"
-/// @brief Scope を保持する SymHandle
+/// @brief Scope を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
 class ScopeHandle :
-  public SymHandle
+  public IrHandle
 {
 public:
 
@@ -41,6 +41,11 @@ public:
   virtual
   ShString
   name() const;
+
+  /// @brief 種類を返す．
+  virtual
+  HandleType
+  handle_type() const;
 
   /// @brief 名前空間を返す．
   ///

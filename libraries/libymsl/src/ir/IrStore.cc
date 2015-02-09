@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] addr アドレス
 // @param[in] val 値
-IrStore::IrStore(IrNode* addr,
+IrStore::IrStore(IrHandle* addr,
 		 IrNode* val) :
   IrNode(kOpStore, NULL),
   mAddress(addr),
@@ -44,7 +44,7 @@ IrStore::is_static() const
 // @brief ロード/ストア対象のアドレスを得る．
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrNode*
+IrHandle*
 IrStore::address() const
 {
   return mAddress;

@@ -29,6 +29,9 @@
 #include "IrReturn.h"
 #include "IrJump.h"
 #include "IrLabel.h"
+#include "Var.h"
+#include "Function.h"
+#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -125,17 +128,41 @@ IrMgr::new_TriOp(OpCode opcode,
 // @brief load 文を生成する．
 // @param[in] addr アドレス
 IrNode*
-IrMgr::new_Load(IrNode* addr)
+IrMgr::new_Load(IrHandle* addr)
 {
+  const Type* type = NULL;
+  switch ( addr->handle_type() ) {
+  case IrHandle::kVar:
+  case IrHandle::kMemberRef:
+    type = addr->var()->value_type();
+    break;
+
+  case IrHandle::kFunction:
+  case IrHandle::kMethodRef:
+    type = addr->function()->type();
+    break;
+
+  case IrHandle::kConstant:
+    type = addr->constant()->type();
+    break;
+
+  case IrHandle::kArrayRef:
+    type = addr->array_expr()->type()->elem_type();
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+    break;
+  }
   void* p = mAlloc.get_memory(sizeof(IrLoad));
-  return new (p) IrLoad(addr);
+  return new (p) IrLoad(type, addr);
 }
 
 // @brief store 文を生成する．
 // @param[in] addr アドレス
 // @param[in] val 書き込む値
 IrNode*
-IrMgr::new_Store(IrNode* addr,
+IrMgr::new_Store(IrHandle* addr,
 		 IrNode* val)
 {
   void* p = mAlloc.get_memory(sizeof(IrStore));
@@ -147,7 +174,7 @@ IrMgr::new_Store(IrNode* addr,
 // @param[in] lhs_addr 左辺式
 IrNode*
 IrMgr::new_InplaceUniOp(OpCode opcode,
-			IrNode* lhs_addr)
+			IrHandle* lhs_addr)
 {
   void* p = mAlloc.get_memory(sizeof(IrInplaceUniOp));
   return new (p) IrInplaceUniOp(opcode, lhs_addr);
@@ -159,13 +186,14 @@ IrMgr::new_InplaceUniOp(OpCode opcode,
 // @param[in] opr オペランド
 IrNode*
 IrMgr::new_InplaceBinOp(OpCode opcode,
-			IrNode* lhs_addr,
+			IrHandle* lhs_addr,
 			IrNode* opr)
 {
   void* p = mAlloc.get_memory(sizeof(IrInplaceBinOp));
   return new (p) IrInplaceBinOp(opcode, lhs_addr, opr);
 }
 
+#if 0
 // @brief 変数参照を生成する．
 // @param[in] var 変数
 IrNode*
@@ -183,11 +211,12 @@ IrMgr::new_FuncRef(const Function* func)
   void* p = mAlloc.get_memory(sizeof(IrFuncRef));
   return new (p) IrFuncRef(func);
 }
+#endif
 
 // @brief 配列参照を生成する．
 // @param[in] array 配列
 // @param[in] index インデックス
-IrNode*
+IrHandle*
 IrMgr::new_ArrayRef(IrNode* array,
 		    IrNode* index)
 {
@@ -198,7 +227,7 @@ IrMgr::new_ArrayRef(IrNode* array,
 // @brief クラスメンバ参照を生成する．
 // @param[in] obj オブジェクト
 // @param[in] var メンバ変数
-IrNode*
+IrHandle*
 IrMgr::new_MemberRef(IrNode* obj,
 		     const Var* var)
 {
@@ -210,7 +239,7 @@ IrMgr::new_MemberRef(IrNode* obj,
 // @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数のリスト
 IrNode*
-IrMgr::new_FuncCall(IrNode* func_addr,
+IrMgr::new_FuncCall(IrHandle* func_addr,
 		    const vector<IrNode*>& arglist)
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncCall));

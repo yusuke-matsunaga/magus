@@ -39,6 +39,13 @@ TypeHandle::name() const
   return mType->type_name();
 }
 
+// @brief 種類を返す．
+IrHandle::HandleType
+TypeHandle::handle_type() const
+{
+  return kNamedType;
+}
+
 // @brief スコープを返す．
 //
 // 他の要素の場合には NULL を返す．

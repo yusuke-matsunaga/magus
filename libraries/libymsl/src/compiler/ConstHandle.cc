@@ -38,11 +38,18 @@ ConstHandle::name() const
   return mName;
 }
 
+// @brief 種類を返す．
+IrHandle::HandleType
+ConstHandle::handle_type() const
+{
+  return kConstant;
+}
+
 // @brief 定数ノードを返す．
 //
 // 他の要素の場合には NULL を返す．
 IrNode*
-ConstHandle::const_node() const
+ConstHandle::constant() const
 {
   return mConstNode;
 }

@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "SymHandle.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class ConstHandle ConstHandle.h "ConstHandle.h"
-/// @brief 定数値を保持する SymHandle
+/// @brief 定数値を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
 class ConstHandle :
-  public SymHandle
+  public IrHandle
 {
 public:
 
@@ -44,12 +44,17 @@ public:
   ShString
   name() const;
 
+  /// @brief 種類を返す．
+  virtual
+  HandleType
+  handle_type() const;
+
   /// @brief 定数ノードを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
   IrNode*
-  const_node() const;
+  constant() const;
 
 
 private:

@@ -43,6 +43,10 @@ public:
   void
   print_node(IrNode* node);
 
+  /// @brief ハンドルの内容を出力する．
+  void
+  print_handle(IrHandle* handle);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

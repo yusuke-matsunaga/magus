@@ -28,7 +28,7 @@ public:
   /// @param[in] lhs_addr 左辺値
   /// @param[in] opr1 オペランド
   IrInplaceBinOp(OpCode opcode,
-		 IrNode* lhs_addr,
+		 IrHandle* lhs_addr,
 		 IrNode* opr1);
 
   /// @brief デストラクタ
@@ -52,7 +52,7 @@ public:
   ///
   /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  IrNode*
+  IrHandle*
   address() const;
 
   /// @brief オペランド数を返す．
@@ -77,7 +77,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // アドレス
-  IrNode* mAddress;
+  IrHandle* mAddress;
 
   // オペランド
   IrNode* mOperand;

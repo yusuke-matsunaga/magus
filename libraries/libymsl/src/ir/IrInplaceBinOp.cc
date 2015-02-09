@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] lhs_addr 左辺値
 // @param[in] opr1 オペランド
 IrInplaceBinOp::IrInplaceBinOp(OpCode opcode,
-			       IrNode* lhs_addr,
+			       IrHandle* lhs_addr,
 			       IrNode* opr1) :
   IrNode(opcode, NULL),
   mAddress(lhs_addr),
@@ -46,7 +46,7 @@ IrInplaceBinOp::is_static() const
 // @brief ロード/ストア対象のアドレスを得る．
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrNode*
+IrHandle*
 IrInplaceBinOp::address() const
 {
   return mAddress;

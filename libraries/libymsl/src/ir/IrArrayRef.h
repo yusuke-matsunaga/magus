@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 配列参照を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrArrayRef :
-  public IrNode
+  public IrHandle
 {
 public:
 
@@ -39,12 +39,15 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 静的評価可能か調べる．
-  ///
-  /// 要するに定数式かどうかということ
+  /// @brief 名前を返す．
   virtual
-  bool
-  is_static() const;
+  ShString
+  name() const;
+
+  /// @brief 種類を返す．
+  virtual
+  HandleType
+  handle_type() const;
 
   /// @brief 配列本体の式を返す．
   ///

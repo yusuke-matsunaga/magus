@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] opcode オペコード
 // @param[in] lhs_addr 左辺値
 IrInplaceUniOp::IrInplaceUniOp(OpCode opcode,
-			       IrNode* lhs_addr) :
+			       IrHandle* lhs_addr) :
   IrNode(opcode, NULL),
   mAddress(lhs_addr)
 {
@@ -43,7 +43,7 @@ IrInplaceUniOp::is_static() const
 // @brief ロード/ストア対象のアドレスを得る．
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrNode*
+IrHandle*
 IrInplaceUniOp::address() const
 {
   return mAddress;

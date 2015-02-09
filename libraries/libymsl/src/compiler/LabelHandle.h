@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "SymHandle.h"
+#include "IrHandle.h"
 #include "YmUtils/ShString.h"
 
 
@@ -17,10 +17,10 @@ BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class LabelHandle LabelHandle.h "LabelHandle.h"
-/// @brief Label を保持する SymHandle
+/// @brief Label を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
 class LabelHandle :
-  public SymHandle
+  public IrHandle
 {
 public:
 
@@ -44,6 +44,11 @@ public:
   virtual
   ShString
   name() const;
+
+  /// @brief 種類を返す．
+  virtual
+  HandleType
+  handle_type() const;
 
   /// @brief ラベルを返す．
   ///

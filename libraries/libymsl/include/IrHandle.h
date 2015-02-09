@@ -1,8 +1,8 @@
-#ifndef SYMHANDLE_H
-#define SYMHANDLE_H
+#ifndef IRHANDLE_H
+#define IRHANDLE_H
 
-/// @file SymHandle.h
-/// @brief SymHandle のヘッダファイル
+/// @file IrHandle.h
+/// @brief IrHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,21 +16,40 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class SymHandle SymHandle.h "SymHandle.h"
+/// @class IrHandle IrHandle.h "IrHandle.h"
 /// @brief Symbol Table のハンドル
 //////////////////////////////////////////////////////////////////////
-class SymHandle
+class IrHandle
 {
   friend class Scope;
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 型定義
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 種類を表す列挙型
+  enum HandleType {
+    kScope,
+    kVar,
+    kFunction,
+    kConstant,
+    kLabel,
+    kNamedType,
+    kArrayRef,
+    kMemberRef,
+    kMethodRef
+  };
+
+
+public:
 
   /// @brief コンストラクタ
-  SymHandle();
+  IrHandle();
 
   /// @brief デストラクタ
   virtual
-  ~SymHandle();
+  ~IrHandle();
 
 
 public:
@@ -43,47 +62,73 @@ public:
   ShString
   name() const = 0;
 
+  /// @brief 種類を返す．
+  virtual
+  HandleType
+  handle_type() const = 0;
+
   /// @brief スコープを返す．
   ///
-  /// 他の要素の場合には NULL を返す．
+  /// kScope のみ有効
   virtual
   Scope*
   scope() const;
 
   /// @brief 変数を返す．
   ///
-  /// 他の要素の場合には NULL を返す．
+  /// kVar, kMemberRef のみ有効
   virtual
   const Var*
   var() const;
 
-  /// @brief 定数を返す．
-  ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  IrNode*
-  const_node() const;
-
   /// @brief 関数を返す．
   ///
-  /// 他の要素の場合には NULL を返す．
+  /// kFunction, kMethodRef のみ有効
   virtual
   const Function*
   function() const;
 
+  /// @brief 定数を返す．
+  ///
+  /// kConstant のみ有効
+  virtual
+  IrNode*
+  constant() const;
+
   /// @brief ラベルを返す．
   ///
-  /// 他の要素の場合には NULL を返す．
+  /// kLabel のみ有効
   virtual
   IrNode*
   label() const;
 
   /// @brief 名前付き型を返す．
   ///
-  /// 他の要素の場合には NULL を返す．
+  /// kNamedType のみ有効
   virtual
   const Type*
   named_type() const;
+
+  /// @brief 配列本体の式を返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  IrNode*
+  array_expr() const;
+
+  /// @brief 配列のインデックスを返す．
+  ///
+  /// kArrayRef のみ有効
+  virtual
+  IrNode*
+  array_index() const;
+
+  /// @brief オブジェクトを指す式を返す．
+  ///
+  /// kMemberRef, kMethodRef のみ有効
+  virtual
+  IrNode*
+  obj_expr() const;
 
 
 private:
@@ -92,10 +137,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 次の要素を指すリンク
-  SymHandle* mLink;
+  IrHandle* mLink;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // SYMHANDLE_H
+#endif // IRHANDLE_H

@@ -9,6 +9,7 @@
 
 #include "IrPrinter.h"
 #include "IrNode.h"
+#include "IrHandle.h"
 #include "Var.h"
 #include "Function.h"
 
@@ -166,75 +167,89 @@ IrPrinter::print_node(IrNode* node)
     break;
 
   case kOpLoad:
-    mS << "load %" << node->address()->id();
+    mS << "load ";
+    print_handle(node->address());
     break;
 
   case kOpStore:
-    mS << "store %" << node->address()->id() << " %" << node->store_val()->id();
+    mS << "store ";
+    print_handle(node->address());
+    mS << " %" << node->store_val()->id();
     break;
 
   case kOpInc:
-    mS << "inc %" << node->address()->id();
+    mS << "inc ";
+    print_handle(node->address());
     break;
 
   case kOpDec:
-    mS << "dec %" << node->address()->id();
+    mS << "dec ";
+    print_handle(node->address());
     break;
 
   case kOpInplaceBitAnd:
-    mS << "inplace_bit_and %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_bit_and ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceBitOr:
-    mS << "inplace_bit_or %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_bit_or ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceBitXor:
-    mS << "inplace_bit_xor %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_bit_xor ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceAdd:
-    mS << "inplace_add %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_add ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceSub:
-    mS << "inplace_sub %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_sub ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceMul:
-    mS << "inplace_mul %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_mul ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceDiv:
-    mS << "inplace_div %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_div ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceMod:
-    mS << "inplace_mod %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_mod ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceLshift:
-    mS << "inplace_lshift %" << node->address()->id() << " %" << node->operand(0)->id();
+    mS << "inplace_lshift ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpInplaceRshift:
-    mS << "inplace_rshift %" << node->address()->id() << " %" << node->operand(0)->id();
-    break;
-
-  case kOpVarRef:
-    mS << "var_ref " << node->var()->name();
-    break;
-
-  case kOpArrayRef:
-    mS << "array_ref %" << node->array_expr()->id() << " %" << node->array_index()->id();
-    break;
-
-  case kOpMemberRef:
-    mS << "member_ref %" << node->obj_expr()->id() << " " << node->var()->name();
+    mS << "inplace_rshift ";
+    print_handle(node->address());
+    mS << " %" << node->operand(0)->id();
     break;
 
   case kOpFuncCall:
-    mS << "func_call " << node->function()->name();
+    mS << "func_call ";
+    print_handle(node->func_addr());
     {
       ymuint n = node->arglist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -277,6 +292,49 @@ IrPrinter::print_node(IrNode* node)
     break;
   }
   mS << endl;
+}
+
+// @brief ハンドルの内容を出力する．
+void
+IrPrinter::print_handle(IrHandle* handle)
+{
+  switch ( handle->handle_type() ) {
+  case IrHandle::kScope:
+    mS << "scope[" << handle->name() << "]";
+    break;
+
+  case IrHandle::kVar:
+    mS << "var[" << handle->name() << "]";
+    break;
+
+  case IrHandle::kFunction:
+    mS << "function[" << handle->name() << "]";
+    break;
+
+  case IrHandle::kConstant:
+    mS << "constant[]";
+    break;
+
+  case IrHandle::kLabel:
+    mS << "label[" << handle->name() << "]";
+    break;
+
+  case IrHandle::kNamedType:
+    mS << "named_type[" << handle->name() << "]";
+    break;
+
+  case IrHandle::kArrayRef:
+    mS << "array_ref(%" << handle->array_expr()->id() << ", %" << handle->array_index()->id() << ")";
+    break;
+
+  case IrHandle::kMemberRef:
+    mS << "member_ref(%" << handle->obj_expr()->id() << ", var[" << handle->var()->name() << "]";
+    break;
+
+  case IrHandle::kMethodRef:
+    mS << "method_ref(%" << handle->obj_expr()->id() << ", function[" << handle->function()->name() << "]";
+    break;
+  }
 }
 
 END_NAMESPACE_YM_YMSL

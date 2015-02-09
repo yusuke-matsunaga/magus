@@ -8,7 +8,6 @@
 
 
 #include "IrMemberRef.h"
-#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -22,7 +21,6 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] var メンバ変数
 IrMemberRef::IrMemberRef(IrNode* base,
 			 const Var* var) :
-  IrNode(kOpMemberRef, var->value_type()),
   mBase(base),
   mVar(var)
 {
@@ -33,13 +31,18 @@ IrMemberRef::~IrMemberRef()
 {
 }
 
-// @brief 静的評価可能か調べる．
-//
-// 要するに定数式かどうかということ
-bool
-IrMemberRef::is_static() const
+// @brief 名前を返す．
+ShString
+IrMemberRef::name() const
 {
-  return false;
+  return ShString();
+}
+
+// @brief 種類を返す．
+IrHandle::HandleType
+IrMemberRef::handle_type() const
+{
+  return kMemberRef;
 }
 
 // @brief オブジェクトを指す式を返す．

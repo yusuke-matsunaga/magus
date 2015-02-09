@@ -20,7 +20,7 @@
 #include "Var.h"
 #include "Scope.h"
 #include "Type.h"
-#include "SymHandle.h"
+#include "IrHandle.h"
 #include "IrNode.h"
 
 
@@ -162,14 +162,14 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kDecr:
     {
-      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
-      if ( lhs_node == NULL ) {
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_handle == NULL ) {
 	// エラー
 	return;
       }
-      // lhs_node の指しているものが int 型の変数かチェック
+      // lhs_handle の指しているものが int 型の変数かチェック
 
-      IrNode* node = new_InplaceUniOp(kOpDec, lhs_node);
+      IrNode* node = new_InplaceUniOp(kOpDec, lhs_handle);
       node_list.push_back(node);
     }
     break;
@@ -198,15 +198,15 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
-      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
-      if ( lhs_node == NULL ) {
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_handle == NULL ) {
 	// エラー
 	return;
       }
 
-      // lhs_node->type() と rhs->type() のチェック
+      // lhs_handle->type() と rhs->type() のチェック
       // 必要ならキャスト
-      IrNode* node = new_Store(lhs_node, rhs);
+      IrNode* node = new_Store(lhs_handle, rhs);
       node_list.push_back(node);
     }
     break;
@@ -227,13 +227,13 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
-      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
-      if ( lhs_node == NULL ) {
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_handle == NULL ) {
 	// エラー
 	return;
       }
 
-      // lhs_node->type() と rhs->type() のチェック
+      // lhs_handle->type() と rhs->type() のチェック
       // 必要ならキャスト
       OpCode opcode;
       switch ( stmt->stmt_type() ) {
@@ -247,8 +247,9 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       case kEqAnd:    opcode = kOpInplaceBitAnd; break;
       case kEqOr:     opcode = kOpInplaceBitOr; break;
       case kEqXor:    opcode = kOpInplaceBitXor; break;
+      default: ASSERT_NOT_REACHED; break;
       }
-      IrNode* node = new_InplaceBinOp(opcode, lhs_node, rhs);
+      IrNode* node = new_InplaceBinOp(opcode, lhs_handle, rhs);
       node_list.push_back(node);
     }
     break;
@@ -285,7 +286,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
   case kGoto:
     {
       const AstSymbol* label_symbol = stmt->label();
-      SymHandle* h = scope->find(label_symbol->str_val());
+      IrHandle* h = scope->find(label_symbol->str_val());
       IrNode* label_node;
       if ( h == NULL ) {
 	// ラベルが未定義
@@ -295,8 +296,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	mUndefList.push_back(label_node);
       }
       else {
-	label_node = h->label();
-	if ( label_node == NULL ) {
+	if ( h->handle_type() != IrHandle::kLabel ) {
 	  // label_symbol is not a label
 	  return;
 	}
@@ -327,12 +327,12 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kIncr:
     {
-      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
-      if ( lhs_node == NULL ) {
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_handle == NULL ) {
 	// エラー
 	return;
       }
-      IrNode* node = new_InplaceUniOp(kOpInc, lhs_node);
+      IrNode* node = new_InplaceUniOp(kOpInc, lhs_handle);
       node_list.push_back(node);
     }
     break;
@@ -340,15 +340,14 @@ IrMgr::elab_stmt(const AstStatement* stmt,
   case kLabel:
     {
       const AstSymbol* label_symbol = stmt->label();
-      SymHandle* h = scope->find(label_symbol->str_val());
+      IrHandle* h = scope->find(label_symbol->str_val());
       IrNode* label_node;
       if ( h == NULL ) {
 	label_node = new_Label();
 	scope->add_label(label_symbol->str_val(), label_node);
       }
       else {
-	label_node = h->label();
-	if ( label_node == NULL ) {
+	if ( h->handle_type() != IrHandle::kLabel ) {
 	  // duplicate definition
 	  // というかラベルじゃないものだった．
 	  return;
@@ -439,7 +438,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
 
-  SymHandle* h = scope->find_local(name);
+  IrHandle* h = scope->find_local(name);
   if ( h != NULL ) {
     // name が重複している．
     // previous definition is h->file_region()
@@ -488,9 +487,9 @@ IrMgr::reg_enum(const AstStatement* stmt,
     ShString name = type->enum_elem_name(i);
     int val = type->enum_elem_val(i);
     IrNode* const_node = new_IntConst(val);
-    enum_scope->add_const(name, const_node);
+    enum_scope->add_constant(name, const_node);
   }
-  scope->add_type(type, enum_scope);
+  scope->add_named_type(type, enum_scope);
 }
 
 // @brief 関数の定義を行う．
@@ -506,7 +505,7 @@ IrMgr::reg_func(const AstStatement* stmt,
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
 
-  SymHandle* h = scope->find_local(name);
+  IrHandle* h = scope->find_local(name);
   if ( h != NULL ) {
     // name が重複している．
     // previous definition is h->file_region()
@@ -551,7 +550,7 @@ IrMgr::reg_var(const AstStatement* stmt,
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
 
-  SymHandle* h = scope->find_local(name);
+  IrHandle* h = scope->find_local(name);
   if ( h != NULL ) {
     // name が重複している．
     // previous definition is h->file_region()
@@ -582,7 +581,7 @@ IrMgr::reg_const(const AstStatement* stmt,
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
 
-  SymHandle* h = scope->find_local(name);
+  IrHandle* h = scope->find_local(name);
   if ( h != NULL ) {
     // name が重複している．
     // previous definition is h->file_region()
@@ -601,7 +600,7 @@ IrMgr::reg_const(const AstStatement* stmt,
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
 
-  scope->add_const(name, node);
+  scope->add_constant(name, node);
 }
 
 // @brief 型の参照を解決する．
@@ -670,7 +669,7 @@ IrMgr::resolve_type(const AstType* asttype,
       for (ymuint i = 0; i < n; ++ i) {
 	const AstSymbol* scope1_symbol = asttype->scope(i);
 	ShString scope1_name = scope1_symbol->str_val();
-	SymHandle* h = cur_scope->find(scope1_name);
+	IrHandle* h = cur_scope->find(scope1_name);
 	if ( h == NULL ) {
 	  // scope1_name is not found
 	  return NULL;
@@ -683,7 +682,7 @@ IrMgr::resolve_type(const AstType* asttype,
       }
       const AstSymbol* name_symbol = asttype->name();
       ShString name = name_symbol->str_val();
-      SymHandle* h = cur_scope->find(name);
+      IrHandle* h = cur_scope->find(name);
       if ( h == NULL ) {
 	// name is not defined
 	return NULL;
@@ -981,13 +980,13 @@ IrMgr::elab_rhs_primary(const AstExpr* ast_expr,
 			Scope* scope,
 			vector<IrNode*>& node_list)
 {
-  IrNode* node = analyze_primary(ast_expr, scope, node_list);
-  if ( node == NULL ) {
+  IrHandle* handle = analyze_primary(ast_expr, scope, node_list);
+  if ( handle == NULL ) {
     // エラー
     return NULL;
   }
 
-  IrNode* load_node = new_Load(node);
+  IrNode* load_node = new_Load(handle);
   node_list.push_back(load_node);
   return load_node;
 }
@@ -996,34 +995,14 @@ IrMgr::elab_rhs_primary(const AstExpr* ast_expr,
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
 // @param[in] node_list ノードを収めるリスト
-IrNode*
+IrHandle*
 IrMgr::analyze_primary(const AstExpr* ast_expr,
 		       Scope* scope,
 		       vector<IrNode*>& node_list)
 {
-  SymHandle* h = resolve_symbol(ast_expr, scope);
+  IrHandle* h = resolve_symbol(ast_expr, scope);
   if ( h != NULL ) {
-    IrNode* node = h->const_node();
-    if ( node != NULL ) {
-      return node;
-    }
-
-    const Var* var = h->var();
-    if ( var != NULL ) {
-      IrNode* node = new_VarRef(var);
-      node_list.push_back(node);
-      return node;
-    }
-
-    const Function* func = h->function();
-    if ( func != NULL ) {
-      IrNode* node = new_FuncRef(func);
-      node_list.push_back(node);
-      return node;
-    }
-
-    // ここまで来たらエラー
-    return NULL;
+    return h;
   }
 
   switch ( ast_expr->expr_type() ) {
@@ -1046,9 +1025,8 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
 	return NULL;
       }
 
-      IrNode* node = new_ArrayRef(base, offset);
-      node_list.push_back(node);
-      return node;
+      IrHandle* h = new_ArrayRef(base, offset);
+      return h;
     }
 
   case kMemberRef:
@@ -1062,9 +1040,8 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
       // type のメンバに member_name があることを確認する．
       const Var* var;
 
-      IrNode* node = new_MemberRef(base, var);
-      node_list.push_back(node);
-      return node;
+      IrHandle* h = new_MemberRef(base, var);
+      return h;
     }
     break;
 
@@ -1079,7 +1056,7 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
 // @brief 式からシンボルの解決を行う．
 // @param[in] expr 式
 // @param[in] scopde 現在のスコープ
-SymHandle*
+IrHandle*
 IrMgr::resolve_symbol(const AstExpr* expr,
 		      Scope* scope)
 {
@@ -1090,7 +1067,7 @@ IrMgr::resolve_symbol(const AstExpr* expr,
   case kMemberRef:
     {
       const AstExpr* body = expr->body();
-      SymHandle* h = resolve_symbol(body, scope);
+      IrHandle* h = resolve_symbol(body, scope);
       Scope* scope1 = h->scope();
       if ( scope1 == NULL ) {
 	// not scope
@@ -1116,16 +1093,16 @@ IrMgr::resolve_func(const AstExpr* expr,
 		    Scope* scope,
 		    IrNode* node)
 {
-  SymHandle* h = resolve_symbol(expr, scope);
+  IrHandle* h = resolve_symbol(expr, scope);
   if ( h == NULL ) {
     // expr not found
     return false;
   }
-  const Function* func = h->function();
-  if ( func == NULL ) {
-    // func is not a function
+  if ( h->handle_type() != IrHandle::kFunction ) {
+    // expr is not a function;
     return false;
   }
+  const Function* func = h->function();
   // func の型と node の arglist の型をチェック
 
   // node に func をセット

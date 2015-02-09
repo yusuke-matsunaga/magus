@@ -105,7 +105,7 @@ public:
   ///
   /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  IrNode*
+  IrHandle*
   address() const;
 
   /// @brief 書き込む値を返す．
@@ -115,6 +115,7 @@ public:
   IrNode*
   store_val() const;
 
+#if 0
   /// @brief 変数を返す．
   ///
   /// kOpVarRef, kOpMemberRef のみ有効
@@ -149,12 +150,13 @@ public:
   virtual
   IrNode*
   obj_expr() const;
+#endif
 
   /// @brief 関数アドレスを返す．
   ///
   /// kOpFuncCall のみ有効
   virtual
-  IrNode*
+  IrHandle*
   func_addr() const;
 
   /// @brief 関数の引数の数を得る．

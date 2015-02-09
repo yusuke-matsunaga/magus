@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "SymHandle.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class TypeHandle TypeHandle.h "TypeHandle.h"
-/// @brief Type を保持する SymHandle
+/// @brief Type を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
 class TypeHandle :
-  public SymHandle
+  public IrHandle
 {
 public:
 
@@ -43,6 +43,11 @@ public:
   virtual
   ShString
   name() const;
+
+  /// @brief 種類を返す．
+  virtual
+  HandleType
+  handle_type() const;
 
   /// @brief スコープを返す．
   ///

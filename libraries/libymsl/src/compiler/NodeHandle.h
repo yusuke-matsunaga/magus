@@ -1,35 +1,37 @@
-#ifndef FUNCHANDLE_H
-#define FUNCHANDLE_H
+#ifndef NODEHANDLE_H
+#define NODEHANDLE_H
 
-/// @file FuncHandle.h
-/// @brief FuncHandle のヘッダファイル
+/// @file NodeHandle.h
+/// @brief NodeHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrHandle.h"
+#include "SymHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class FuncHandle FuncHandle.h "FuncHandle.h"
-/// @brief Function を保持する IrHandle
+/// @class NodeHandle NodeHandle.h "NodeHandle.h"
+/// @brief ノードを保持する SymHandle
 //////////////////////////////////////////////////////////////////////
-class FuncHandle :
-  public IrHandle
+class NodeHandle :
+  public SymHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func 関数
-  FuncHandle(const Function* func);
+  /// @param[in] name 名前
+  /// @param[in] node ノード
+  NodeHandle(ShString name,
+	     IrNode* node);
 
   /// @brief デストラクタ
   virtual
-  ~FuncHandle();
+  ~NodeHandle();
 
 
 public:
@@ -42,17 +44,12 @@ public:
   ShString
   name() const;
 
-  /// @brief 種類を返す．
-  virtual
-  HandleType
-  handle_type() const;
-
-  /// @brief 関数を返す．
+  /// @brief ノードを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  const Function*
-  function() const;
+  IrNode*
+  node() const;
 
 
 private:
@@ -60,11 +57,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数
-  const Function* mFunc;
+  // 名前
+  ShString mName;
+
+  // ノード
+  IrNode* mNode;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // FUNCHANDLE_H
+#endif // NODEHANDLE_H

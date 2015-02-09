@@ -81,7 +81,7 @@ set (ymsl_SOURCES
   src/compiler/Scope.cc
   src/compiler/ScopeHandle.cc
   src/compiler/SetType.cc
-  src/compiler/SymHandle.cc
+  src/compiler/IrHandle.cc
   src/compiler/Type.cc
   src/compiler/TypeHandle.cc
   src/compiler/TypeMgr.cc
@@ -103,8 +103,6 @@ set (ymsl_SOURCES
   src/ir/IrStore.cc
   src/ir/IrInplaceUniOp.cc
   src/ir/IrInplaceBinOp.cc
-  src/ir/IrVarRef.cc
-  src/ir/IrFuncRef.cc
   src/ir/IrArrayRef.cc
   src/ir/IrMemberRef.cc
   src/ir/IrFuncCall.cc

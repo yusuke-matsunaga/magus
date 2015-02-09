@@ -1,57 +1,50 @@
 
-/// @file LabelHandle.cc
-/// @brief LabelHandle の実装ファイル
+/// @file NodeHandle.cc
+/// @brief NodeHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LabelHandle.h"
+#include "NodeHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス LabelHandle
+// クラス NodeHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 名前
-// @param[in] label ラベル
-LabelHandle::LabelHandle(ShString name,
-			 IrNode* label) :
+// @param[in] node ノード
+NodeHandle::NodeHandle(ShString name,
+		       IrNode* node) :
   mName(name),
-  mLabel(label)
+  mNode(node)
 {
 }
 
 // @brief デストラクタ
-LabelHandle::~LabelHandle()
+NodeHandle::~NodeHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-LabelHandle::name() const
+NodeHandle::name() const
 {
   return mName;
 }
 
-// @brief 種類を返す．
-IrHandle::HandleType
-LabelHandle::handle_type() const
-{
-  return kLabel;
-}
-
-// @brief ラベルを返す．
+// @brief ノードを返す．
 //
 // 他の要素の場合には NULL を返す．
 IrNode*
-LabelHandle::label() const
+NodeHandle::node() const
 {
-  return mLabel;
+  return mNode;
 }
 
 END_NAMESPACE_YM_YMSL

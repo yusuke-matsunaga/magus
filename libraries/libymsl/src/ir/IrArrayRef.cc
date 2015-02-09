@@ -8,7 +8,6 @@
 
 
 #include "IrArrayRef.h"
-#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -22,7 +21,6 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] offset オフセット
 IrArrayRef::IrArrayRef(IrNode* base,
 		       IrNode* offset) :
-  IrNode(kOpArrayRef, base->type()->elem_type()),
   mBase(base),
   mOffset(offset)
 {
@@ -33,15 +31,18 @@ IrArrayRef::~IrArrayRef()
 {
 }
 
-// @brief 静的評価可能か調べる．
-//
-// 要するに定数式かどうかということ
-bool
-IrArrayRef::is_static() const
+// @brief 名前を返す．
+ShString
+IrArrayRef::name() const
 {
-  // 配列が不変ならロード結果も不変
-  // だけど今は考えない．
-  return false;
+  return ShString();
+}
+
+// @brief 種類を返す．
+IrHandle::HandleType
+IrArrayRef::handle_type() const
+{
+  return kArrayRef;
 }
 
 // @brief 配列本体の式を返す．

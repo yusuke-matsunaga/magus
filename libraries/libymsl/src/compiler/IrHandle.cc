@@ -1,29 +1,29 @@
 
-/// @file SymHandle.cc
-/// @brief SymHandle の実装ファイル
+/// @file IrHandle.cc
+/// @brief IrHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SymHandle.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス SymHandle
+// クラス IrHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-SymHandle::SymHandle() :
+IrHandle::IrHandle() :
   mLink(NULL)
 {
 }
 
 // @brief デストラクタ
-SymHandle::~SymHandle()
+IrHandle::~IrHandle()
 {
 }
 
@@ -31,16 +31,7 @@ SymHandle::~SymHandle()
 //
 // 他の要素の場合には NULL を返す．
 const Var*
-SymHandle::var() const
-{
-  return NULL;
-}
-
-// @brief 定数を返す．
-//
-// 他の要素の場合には NULL を返す．
-IrNode*
-SymHandle::const_node() const
+IrHandle::var() const
 {
   return NULL;
 }
@@ -49,7 +40,16 @@ SymHandle::const_node() const
 //
 // 他の要素の場合には NULL を返す．
 const Function*
-SymHandle::function() const
+IrHandle::function() const
+{
+  return NULL;
+}
+
+// @brief 定数を返す．
+//
+// 他の要素の場合には NULL を返す．
+IrNode*
+IrHandle::constant() const
 {
   return NULL;
 }
@@ -58,7 +58,7 @@ SymHandle::function() const
 //
 // 他の要素の場合には NULL を返す．
 IrNode*
-SymHandle::label() const
+IrHandle::label() const
 {
   return NULL;
 }
@@ -67,7 +67,7 @@ SymHandle::label() const
 //
 // 他の要素の場合には NULL を返す．
 Scope*
-SymHandle::scope() const
+IrHandle::scope() const
 {
   return NULL;
 }
@@ -76,7 +76,34 @@ SymHandle::scope() const
 //
 // 他の要素の場合には NULL を返す．
 const Type*
-SymHandle::named_type() const
+IrHandle::named_type() const
+{
+  return NULL;
+}
+
+// @brief 配列本体の式を返す．
+//
+// kArrayRef のみ有効
+IrNode*
+IrHandle::array_expr() const
+{
+  return NULL;
+}
+
+// @brief 配列のインデックスを返す．
+//
+// kArrayRef のみ有効
+IrNode*
+IrHandle::array_index() const
+{
+  return NULL;
+}
+
+// @brief オブジェクトを指す式を返す．
+//
+// kMemberRef, kMethodRef のみ有効
+IrNode*
+IrHandle::obj_expr() const
 {
   return NULL;
 }

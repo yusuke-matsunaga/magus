@@ -36,6 +36,13 @@ FuncHandle::name() const
   return mFunc->name();
 }
 
+// @brief 種類を返す．
+IrHandle::HandleType
+FuncHandle::handle_type() const
+{
+  return kFunction;
+}
+
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．

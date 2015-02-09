@@ -40,8 +40,8 @@ Scope::Scope(Scope* parent,
 Scope::~Scope()
 {
   for (ymuint i = 0; i < mHashSize; ++ i) {
-    for (SymHandle* h = mHashTable[i]; h; ) {
-      SymHandle* n = h->mLink;
+    for (IrHandle* h = mHashTable[i]; h; ) {
+      IrHandle* n = h->mLink;
       delete h;
       h = n;
     }
@@ -65,7 +65,7 @@ void
 Scope::add_label(ShString name,
 		 IrNode* item)
 {
-  SymHandle* handle = new LabelHandle(name, item);
+  IrHandle* handle = new LabelHandle(name, item);
   put(handle);
 }
 
@@ -74,7 +74,7 @@ Scope::add_label(ShString name,
 void
 Scope::add_function(const Function* item)
 {
-  SymHandle* handle = new FuncHandle(item);
+  IrHandle* handle = new FuncHandle(item);
   put(handle);
 }
 
@@ -83,7 +83,7 @@ Scope::add_function(const Function* item)
 void
 Scope::add_var(const Var* item)
 {
-  SymHandle* handle = new VarHandle(item);
+  IrHandle* handle = new VarHandle(item);
   put(handle);
 }
 
@@ -91,10 +91,10 @@ Scope::add_var(const Var* item)
 // @param[in] item 追加する要素
 // @param[in] scope item のスコープ
 void
-Scope::add_type(const Type* item,
-		Scope* scope)
+Scope::add_named_type(const Type* item,
+		      Scope* scope)
 {
-  SymHandle* handle = new TypeHandle(item, scope);
+  IrHandle* handle = new TypeHandle(item, scope);
   put(handle);
 }
 
@@ -102,10 +102,10 @@ Scope::add_type(const Type* item,
 // @param[in] name 名前
 // @param[in] item 追加する要素
 void
-Scope::add_const(ShString name,
-		 IrNode* item)
+Scope::add_constant(ShString name,
+		    IrNode* item)
 {
-  SymHandle* handle = new ConstHandle(name, item);
+  IrHandle* handle = new ConstHandle(name, item);
   put(handle);
 }
 
@@ -114,7 +114,7 @@ Scope::add_const(ShString name,
 void
 Scope::add_scope(Scope* item)
 {
-  SymHandle* handle = new ScopeHandle(item);
+  IrHandle* handle = new ScopeHandle(item);
   put(handle);
 }
 
@@ -123,17 +123,17 @@ void
 Scope::alloc_table(ymuint req_size)
 {
   ymuint old_size = mHashSize;
-  SymHandle** old_table = mHashTable;
+  IrHandle** old_table = mHashTable;
   mHashSize = req_size;
   mNextLimit = static_cast<ymuint>(mHashSize * 1.8);
-  mHashTable = new SymHandle*[mHashSize];
+  mHashTable = new IrHandle*[mHashSize];
   for (ymuint i = 0; i < mHashSize; ++ i) {
     mHashTable[i] = NULL;
   }
   for (ymuint i = 0; i < old_size; ++ i) {
-    for (SymHandle* handle = old_table[i];
+    for (IrHandle* handle = old_table[i];
 	 handle != NULL; ) {
-      SymHandle* next = handle->mLink;
+      IrHandle* next = handle->mLink;
       _put(handle);
       handle = next;
     }
@@ -143,10 +143,10 @@ Scope::alloc_table(ymuint req_size)
 
 // @brief 名前からハンドルを探す．
 // @param[in] name 名前
-SymHandle*
+IrHandle*
 Scope::find(ShString name) const
 {
-  SymHandle* h = find_local(name);
+  IrHandle* h = find_local(name);
   if ( h == NULL && mParent != NULL ) {
     h = mParent->find(name);
   }
@@ -157,11 +157,11 @@ Scope::find(ShString name) const
 // @param[in] name 名前
 //
 // こちらはこのスコープのみ探す．
-SymHandle*
+IrHandle*
 Scope::find_local(ShString name) const
 {
   ymuint pos = name.hash() % mHashSize;
-  for (SymHandle* handle = mHashTable[pos];
+  for (IrHandle* handle = mHashTable[pos];
        handle != NULL; handle = handle->mLink) {
     if ( handle->name() == name ) {
       return handle;
@@ -172,7 +172,7 @@ Scope::find_local(ShString name) const
 
 // @brief ハンドルを登録する．
 void
-Scope::put(SymHandle* handle)
+Scope::put(IrHandle* handle)
 {
   if ( mHashNum >= mNextLimit ) {
     alloc_table(mHashSize << 1);
@@ -185,7 +185,7 @@ Scope::put(SymHandle* handle)
 //
 // こちらはサイズチェックなし
 void
-Scope::_put(SymHandle* handle)
+Scope::_put(IrHandle* handle)
 {
   ymuint pos = handle->name().hash() % mHashSize;
   handle->mLink = mHashTable[pos];

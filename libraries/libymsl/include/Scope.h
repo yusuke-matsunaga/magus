@@ -49,29 +49,22 @@ public:
   void
   add_scope(Scope* item);
 
-  /// @brief 関数を追加する．
-  /// @param[in] item 追加する要素
-  void
-  add_function(const Function* item);
-
   /// @brief 変数を追加する．
   /// @param[in] item 追加する要素
   void
   add_var(const Var* item);
 
-  /// @brief 型を追加する．
+  /// @brief 関数を追加する．
   /// @param[in] item 追加する要素
-  /// @param[in] scope item のスコープ
   void
-  add_type(const Type* item,
-	   Scope* scope);
+  add_function(const Function* item);
 
   /// @brief 定数ノードを追加する．
   /// @param[in] name 名前
   /// @param[in] item 追加する要素
   void
-  add_const(ShString name,
-	    IrNode* item);
+  add_constant(ShString name,
+	       IrNode* item);
 
   /// @brief ラベルを追加する．
   /// @param[in] name 名前
@@ -80,16 +73,23 @@ public:
   add_label(ShString name,
 	    IrNode* item);
 
+  /// @brief 型を追加する．
+  /// @param[in] item 追加する要素
+  /// @param[in] scope item のスコープ
+  void
+  add_named_type(const Type* item,
+		 Scope* scope);
+
   /// @brief 名前からハンドルを探す．
   /// @param[in] name 名前
-  SymHandle*
+  IrHandle*
   find(ShString name) const;
 
   /// @brief 名前からハンドルを探す．
   /// @param[in] name 名前
   ///
   /// こちらはこのスコープのみ探す．
-  SymHandle*
+  IrHandle*
   find_local(ShString name) const;
 
 
@@ -105,13 +105,13 @@ private:
 
   /// @brief ハンドルを登録する．
   void
-  put(SymHandle* handle);
+  put(IrHandle* handle);
 
   /// @brief ハンドルを登録する．
   ///
   /// こちらはサイズチェックなし
   void
-  _put(SymHandle* handle);
+  _put(IrHandle* handle);
 
 
 private:
@@ -132,7 +132,7 @@ private:
   ymuint mNextLimit;
 
   // ハッシュ表
-  SymHandle** mHashTable;
+  IrHandle** mHashTable;
 
   // ハッシュの要素数
   ymuint mHashNum;

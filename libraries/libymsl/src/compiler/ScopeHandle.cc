@@ -36,6 +36,13 @@ ScopeHandle::name() const
   return mScope->name();
 }
 
+// @brief 種類を返す．
+IrHandle::HandleType
+ScopeHandle::handle_type() const
+{
+  return kScope;
+}
+
 // @brief スコープを返す．
 //
 // 他の要素の場合には NULL を返す．

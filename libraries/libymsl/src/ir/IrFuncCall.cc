@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数リスト
-IrFuncCall::IrFuncCall(IrNode* func_addr,
+IrFuncCall::IrFuncCall(IrHandle* func_addr,
 		       const vector<IrNode*>& arglist) :
   IrNode(kOpFuncCall, NULL),
   mFuncAddr(func_addr)
@@ -53,7 +53,7 @@ IrFuncCall::is_static() const
 // @brief 関数アドレスを返す．
 //
 // kOpFuncCall のみ有効
-IrNode*
+IrHandle*
 IrFuncCall::func_addr() const
 {
   return mFuncAddr;

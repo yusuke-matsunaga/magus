@@ -27,7 +27,7 @@ public:
   /// @param[in] opcode オペコード
   /// @param[in] lhs_addr 左辺値
   IrInplaceUniOp(OpCode opcode,
-		 IrNode* lhs_addr);
+		 IrHandle* lhs_addr);
 
   /// @brief デストラクタ
   virtual
@@ -50,7 +50,7 @@ public:
   ///
   /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  IrNode*
+  IrHandle*
   address() const;
 
 
@@ -60,7 +60,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // アドレス
-  IrNode* mAddress;
+  IrHandle* mAddress;
 
 };
 

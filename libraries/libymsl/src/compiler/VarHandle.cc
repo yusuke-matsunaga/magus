@@ -36,6 +36,13 @@ VarHandle::name() const
   return mVar->name();
 }
 
+// @brief 種類を返す．
+IrHandle::HandleType
+VarHandle::handle_type() const
+{
+  return kVar;
+}
+
 // @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．

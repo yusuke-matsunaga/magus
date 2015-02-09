@@ -34,14 +34,14 @@ class YmslParser;
 class YmslObj;
 
 class Function;
+class IrHandle;
+class IrNode;
 class Label;
 class Scope;
-class SymHandle;
 class Type;
 class TypeMgr;
 class Var;
 
-class IrNode;
 
 class AstCaseItem;
 class AstEnumConst;
@@ -383,11 +383,6 @@ enum OpCode {
   kOpInplaceMod,
   kOpInplaceLshift,
   kOpInplaceRshift,
-  // アドレス指定
-  kOpVarRef,
-  kOpFuncRef,
-  kOpArrayRef,
-  kOpMemberRef,
   // 関数呼び出し/復帰
   kOpFuncCall,
   kOpReturn,

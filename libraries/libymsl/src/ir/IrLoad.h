@@ -24,8 +24,10 @@ class IrLoad :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] type 型
   /// @param[in] addr アドレス
-  IrLoad(IrNode* addr);
+  IrLoad(const Type* type,
+	 IrHandle* addr);
 
   /// @brief デストラクタ
   virtual
@@ -48,7 +50,7 @@ public:
   ///
   /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  IrNode*
+  IrHandle*
   address() const;
 
 
@@ -58,7 +60,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // アドレス
-  IrNode* mAddress;
+  IrHandle* mAddress;
 
 };
 

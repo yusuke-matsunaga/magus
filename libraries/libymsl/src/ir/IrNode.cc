@@ -107,7 +107,7 @@ IrNode::string_val() const
 // @brief ロード/ストア対象のアドレスを得る．
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrNode*
+IrHandle*
 IrNode::address() const
 {
   ASSERT_NOT_REACHED;
@@ -124,60 +124,10 @@ IrNode::store_val() const
   return NULL;
 }
 
-// @brief 変数を返す．
-//
-// kOpVarRef, kOpMemberRef のみ有効
-const Var*
-IrNode::var() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 関数本体を返す．
-//
-// kOpFuncRef のみ有効
-const Function*
-IrNode::function() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 配列本体の式を返す．
-//
-// kOpArrayRef のみ有効
-IrNode*
-IrNode::array_expr() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 配列のインデックスを返す．
-//
-// kOpArrayRef のみ有効
-IrNode*
-IrNode::array_index() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief オブジェクトを指す式を返す．
-//
-// kOpMemberRef のみ有効
-IrNode*
-IrNode::obj_expr() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
 // @brief 関数アドレスを返す．
 //
 // kOpFuncCall のみ有効
-IrNode*
+IrHandle*
 IrNode::func_addr() const
 {
   ASSERT_NOT_REACHED;
@@ -305,10 +255,6 @@ operator<<(ostream& s,
   case kOpInplaceMod:    s << "InplaceMod"; break;
   case kOpInplaceLshift: s << "InplaceLshift"; break;
   case kOpInplaceRshift: s << "InplaceRshift"; break;
-  case kOpVarRef:        s << "VarRef"; break;
-  case kOpFuncRef:       s << "FuncRef"; break;
-  case kOpArrayRef:      s << "ArrayRef"; break;
-  case kOpMemberRef:     s << "MemberRef"; break;
   case kOpFuncCall:      s << "FuncCall"; break;
   case kOpReturn:        s << "Return"; break;
   case kOpJump:          s << "Jump"; break;

@@ -136,7 +136,7 @@ private:
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
   /// @param[in] node_list ノードを収めるリスト
-  IrNode*
+  IrHandle*
   analyze_primary(const AstExpr* ast_expr,
 		  Scope* scope,
 		  vector<IrNode*>& node_list);
@@ -144,7 +144,7 @@ private:
   /// @brief 式からシンボルの解決を行う．
   /// @param[in] expr 式
   /// @param[in] scopde 現在のスコープ
-  SymHandle*
+  IrHandle*
   resolve_symbol(const AstExpr* expr,
 		 Scope* scope);
 
@@ -240,13 +240,13 @@ private:
   /// @brief load 文を生成する．
   /// @param[in] addr アドレス
   IrNode*
-  new_Load(IrNode* addr);
+  new_Load(IrHandle* addr);
 
   /// @brief store 文を生成する．
   /// @param[in] addr アドレス
   /// @param[in] val 書き込む値
   IrNode*
-  new_Store(IrNode* addr,
+  new_Store(IrHandle* addr,
 	    IrNode* val);
 
   /// @brief 自己代入型の単項演算を生成する．
@@ -254,7 +254,7 @@ private:
   /// @param[in] lhs_addr 左辺式
   IrNode*
   new_InplaceUniOp(OpCode opcode,
-		   IrNode* lhs_addr);
+		   IrHandle* lhs_addr);
 
   /// @brief 自己代入型の二項演算を生成する．
   /// @param[in] opcode オペコード
@@ -262,38 +262,14 @@ private:
   /// @param[in] opr オペランド
   IrNode*
   new_InplaceBinOp(OpCode opcode,
-		   IrNode* lhs_addr,
+		   IrHandle* lhs_addr,
 		   IrNode* opr);
-
-  /// @brief 変数参照を生成する．
-  /// @param[in] var 変数
-  IrNode*
-  new_VarRef(const Var* var);
-
-  /// @brief 関数参照を生成する．
-  /// @param[in] func 関数
-  IrNode*
-  new_FuncRef(const Function* func);
-
-  /// @brief 配列参照を生成する．
-  /// @param[in] array 配列
-  /// @param[in] index インデックス
-  IrNode*
-  new_ArrayRef(IrNode* array,
-	       IrNode* index);
-
-  /// @brief クラスメンバ参照を生成する．
-  /// @param[in] obj オブジェクト
-  /// @param[in] var メンバ変数
-  IrNode*
-  new_MemberRef(IrNode* obj,
-		const Var* var);
 
   /// @brief 関数呼び出し式を生成する．
   /// @param[in] func_addr 関数アドレス
   /// @param[in] arglist 引数のリスト
   IrNode*
-  new_FuncCall(IrNode* func_addr,
+  new_FuncCall(IrHandle* func_addr,
 	       const vector<IrNode*>& arglist);
 
   /// @brief リターン命令を生成する．
@@ -313,6 +289,26 @@ private:
   /// @brief ラベルノードを生成する．
   IrNode*
   new_Label();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // IrHandle の派生クラスを生成する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 配列参照を生成する．
+  /// @param[in] array 配列
+  /// @param[in] index インデックス
+  IrHandle*
+  new_ArrayRef(IrNode* array,
+	       IrNode* index);
+
+  /// @brief クラスメンバ参照を生成する．
+  /// @param[in] obj オブジェクト
+  /// @param[in] var メンバ変数
+  IrHandle*
+  new_MemberRef(IrNode* obj,
+		const Var* var);
 
 
 private:

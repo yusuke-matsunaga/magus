@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] func_addr 関数アドレス
   /// @param[in] arglist 引数リスト
-  IrFuncCall(IrNode* func_addr,
+  IrFuncCall(IrHandle* func_addr,
 	     const vector<IrNode*>& arglist);
 
   /// @brief デストラクタ
@@ -50,7 +50,7 @@ public:
   ///
   /// kOpFuncCall のみ有効
   virtual
-  IrNode*
+  IrHandle*
   func_addr() const;
 
   /// @brief 関数の引数の数を得る．
@@ -75,7 +75,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数アドレス
-  IrNode* mFuncAddr;
+  IrHandle* mFuncAddr;
 
   // 引数の数
   ymuint mArgNum;

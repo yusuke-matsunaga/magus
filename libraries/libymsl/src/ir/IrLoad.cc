@@ -17,9 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] type 型
 // @param[in] addr アドレス
-IrLoad::IrLoad(IrNode* addr) :
-  IrNode(kOpLoad, addr->type()),
+IrLoad::IrLoad(const Type* type,
+	       IrHandle* addr) :
+  IrNode(kOpLoad, type),
   mAddress(addr)
 {
 }
@@ -41,7 +43,7 @@ IrLoad::is_static() const
 // @brief ロード/ストア対象のアドレスを得る．
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrNode*
+IrHandle*
 IrLoad::address() const
 {
   return mAddress;

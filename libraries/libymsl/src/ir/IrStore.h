@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] addr アドレス
   /// @param[in] val 値
-  IrStore(IrNode* addr,
+  IrStore(IrHandle* addr,
 	  IrNode* val);
 
   /// @brief デストラクタ
@@ -50,7 +50,7 @@ public:
   ///
   /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
   virtual
-  IrNode*
+  IrHandle*
   address() const;
 
   /// @brief 書き込む値を返す．
@@ -65,7 +65,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // アドレス
-  IrNode* mAddress;
+  IrHandle* mAddress;
 
   // 書き込む値
   IrNode* mStoreVal;
