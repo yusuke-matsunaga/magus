@@ -141,13 +141,6 @@ private:
 		  Scope* scope,
 		  vector<IrNode*>& node_list);
 
-  /// @brief 式からスコープの解決を行う．
-  /// @param[in] expr 式
-  /// @param[in] scopde 現在のスコープ
-  Scope*
-  resolve_scope(const AstExpr* expr,
-		Scope* scope);
-
   /// @brief 式からシンボルの解決を行う．
   /// @param[in] expr 式
   /// @param[in] scopde 現在のスコープ
