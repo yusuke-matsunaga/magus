@@ -19,12 +19,12 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func 関数
+// @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数リスト
-IrFuncCall::IrFuncCall(const Function* func,
+IrFuncCall::IrFuncCall(IrNode* func_addr,
 		       const vector<IrNode*>& arglist) :
   IrNode(kOpFuncCall, NULL),
-  mFunc(func)
+  mFuncAddr(func_addr)
 {
   mArgNum = arglist.size();
   mArgList = new IrNode*[mArgNum];
@@ -50,13 +50,13 @@ IrFuncCall::is_static() const
   return false;
 }
 
-// @brief 関数本体を返す．
+// @brief 関数アドレスを返す．
 //
 // kOpFuncCall のみ有効
-const Function*
-IrFuncCall::function() const
+IrNode*
+IrFuncCall::func_addr() const
 {
-  return mFunc;
+  return mFuncAddr;
 }
 
 // @brief 関数の引数の数を得る．

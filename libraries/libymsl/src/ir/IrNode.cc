@@ -134,6 +134,16 @@ IrNode::var() const
   return NULL;
 }
 
+// @brief 関数本体を返す．
+//
+// kOpFuncRef のみ有効
+const Function*
+IrNode::function() const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 // @brief 配列本体の式を返す．
 //
 // kOpArrayRef のみ有効
@@ -164,11 +174,11 @@ IrNode::obj_expr() const
   return NULL;
 }
 
-// @brief 関数本体を返す．
+// @brief 関数アドレスを返す．
 //
 // kOpFuncCall のみ有効
-const Function*
-IrNode::function() const
+IrNode*
+IrNode::func_addr() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
@@ -296,6 +306,7 @@ operator<<(ostream& s,
   case kOpInplaceLshift: s << "InplaceLshift"; break;
   case kOpInplaceRshift: s << "InplaceRshift"; break;
   case kOpVarRef:        s << "VarRef"; break;
+  case kOpFuncRef:       s << "FuncRef"; break;
   case kOpArrayRef:      s << "ArrayRef"; break;
   case kOpMemberRef:     s << "MemberRef"; break;
   case kOpFuncCall:      s << "FuncCall"; break;

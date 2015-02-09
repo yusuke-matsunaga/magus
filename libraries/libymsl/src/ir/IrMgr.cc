@@ -162,26 +162,15 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kDecr:
     {
-      IrNode* lhs_node;
-      const Function* lhs_func;
-      PrimType prim_type = analyze_primary(stmt->lhs_expr(), scope, lhs_node, lhs_func, node_list);
-      switch ( prim_type ) {
-      case kPrimAddr:
-	{
-	  IrNode* node = new_InplaceUniOp(kOpDec, lhs_node);
-	  node_list.push_back(node);
-	}
-	break;
-
-      case kPrimError:
+      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_node == NULL ) {
 	// エラー
 	return;
-
-      default:
-	// ここでは許されない．
-	return;
       }
+      // lhs_node の指しているものが int 型の変数かチェック
 
+      IrNode* node = new_InplaceUniOp(kOpDec, lhs_node);
+      node_list.push_back(node);
     }
     break;
 
@@ -209,27 +198,16 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
-      IrNode* lhs_node;
-      const Function* lhs_func;
-      PrimType prim_type = analyze_primary(stmt->lhs_expr(), scope, lhs_node, lhs_func, node_list);
-      switch ( prim_type ) {
-      case kPrimAddr:
-	// lhs_node->type() と rhs->type() のチェック
-	// 必要ならキャスト
-	{
-	  IrNode* node = new_Store(lhs_node, rhs);
-	  node_list.push_back(node);
-	}
-	break;
-
-      case kPrimError:
+      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_node == NULL ) {
 	// エラー
 	return;
-
-      default:
-	// ここでは許されない．
-	return;
       }
+
+      // lhs_node->type() と rhs->type() のチェック
+      // 必要ならキャスト
+      IrNode* node = new_Store(lhs_node, rhs);
+      node_list.push_back(node);
     }
     break;
 
@@ -249,40 +227,29 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
-      IrNode* lhs_node;
-      const Function* lhs_func;
-      PrimType prim_type = analyze_primary(stmt->lhs_expr(), scope, lhs_node, lhs_func, node_list);
-      switch ( prim_type ) {
-      case kPrimAddr:
-	// lhs_node->type() と rhs->type() のチェック
-	// 必要ならキャスト
-	{
-	  OpCode opcode;
-	  switch ( stmt->stmt_type() ) {
-	  case kEqPlus:   opcode = kOpInplaceAdd; break;
-	  case kEqMinus:  opcode = kOpInplaceSub; break;
-	  case kEqMult:   opcode = kOpInplaceMul; break;
-	  case kEqDiv:    opcode = kOpInplaceDiv; break;
-	  case kEqMod:    opcode = kOpInplaceMod; break;
-	  case kEqLshift: opcode = kOpInplaceLshift; break;
-	  case kEqRshift: opcode = kOpInplaceRshift; break;
-	  case kEqAnd:    opcode = kOpInplaceBitAnd; break;
-	  case kEqOr:     opcode = kOpInplaceBitOr; break;
-	  case kEqXor:    opcode = kOpInplaceBitXor; break;
-	  }
-	  IrNode* node = new_InplaceBinOp(opcode, lhs_node, rhs);
-	  node_list.push_back(node);
-	}
-	break;
-
-      case kPrimError:
+      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_node == NULL ) {
 	// エラー
 	return;
-
-      default:
-	// ここでは許されない．
-	return;
       }
+
+      // lhs_node->type() と rhs->type() のチェック
+      // 必要ならキャスト
+      OpCode opcode;
+      switch ( stmt->stmt_type() ) {
+      case kEqPlus:   opcode = kOpInplaceAdd; break;
+      case kEqMinus:  opcode = kOpInplaceSub; break;
+      case kEqMult:   opcode = kOpInplaceMul; break;
+      case kEqDiv:    opcode = kOpInplaceDiv; break;
+      case kEqMod:    opcode = kOpInplaceMod; break;
+      case kEqLshift: opcode = kOpInplaceLshift; break;
+      case kEqRshift: opcode = kOpInplaceRshift; break;
+      case kEqAnd:    opcode = kOpInplaceBitAnd; break;
+      case kEqOr:     opcode = kOpInplaceBitOr; break;
+      case kEqXor:    opcode = kOpInplaceBitXor; break;
+      }
+      IrNode* node = new_InplaceBinOp(opcode, lhs_node, rhs);
+      node_list.push_back(node);
     }
     break;
 
@@ -360,26 +327,13 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kIncr:
     {
-      IrNode* lhs_node;
-      const Function* lhs_func;
-      PrimType prim_type = analyze_primary(stmt->lhs_expr(), scope, lhs_node, lhs_func, node_list);
-      switch ( prim_type ) {
-      case kPrimAddr:
-	{
-	  IrNode* node = new_InplaceUniOp(kOpInc, lhs_node);
-	  node_list.push_back(node);
-	}
-	break;
-
-      case kPrimError:
+      IrNode* lhs_node = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      if ( lhs_node == NULL ) {
 	// エラー
 	return;
-
-      default:
-	// ここでは許されない．
-	return;
       }
-
+      IrNode* node = new_InplaceUniOp(kOpInc, lhs_node);
+      node_list.push_back(node);
     }
     break;
 
@@ -1027,74 +981,55 @@ IrMgr::elab_rhs_primary(const AstExpr* ast_expr,
 			Scope* scope,
 			vector<IrNode*>& node_list)
 {
-  IrNode* node;
-  const Function* func;
-  PrimType prim_type = analyze_primary(ast_expr, scope, node, func, node_list);
-  switch ( prim_type ) {
-  case kPrimConst:
-    return node;
-
-  case kPrimAddr:
-    {
-      ASSERT_COND( node != NULL );
-      IrNode* load_node = new_Load(node);
-      node_list.push_back(load_node);
-      return load_node;
-    }
-    break;
-
-  case kPrimFunc:
-    // 今はエラー
-    return NULL;
-
-  case kPrimError:
+  IrNode* node = analyze_primary(ast_expr, scope, node_list);
+  if ( node == NULL ) {
+    // エラー
     return NULL;
   }
 
-  ASSERT_NOT_REACHED;
-  return NULL;
+  IrNode* load_node = new_Load(node);
+  node_list.push_back(load_node);
+  return load_node;
 }
 
 // @brief プライマリ式の解析を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
-// @param[out] node 定数/アドレスを格納する変数
-// @param[out] func 関数
 // @param[in] node_list ノードを収めるリスト
-IrMgr::PrimType
+IrNode*
 IrMgr::analyze_primary(const AstExpr* ast_expr,
 		       Scope* scope,
-		       IrNode*& node,
-		       const Function*& func,
 		       vector<IrNode*>& node_list)
 {
   SymHandle* h = resolve_symbol(ast_expr, scope);
   if ( h != NULL ) {
-    node = h->const_node();
+    IrNode* node = h->const_node();
     if ( node != NULL ) {
-      return kPrimConst;
+      return node;
     }
 
     const Var* var = h->var();
     if ( var != NULL ) {
-      node = new_VarRef(var);
+      IrNode* node = new_VarRef(var);
       node_list.push_back(node);
-      return kPrimAddr;
+      return node;
     }
 
-    func = h->function();
+    const Function* func = h->function();
     if ( func != NULL ) {
-      return kPrimFunc;
+      IrNode* node = new_FuncRef(func);
+      node_list.push_back(node);
+      return node;
     }
 
     // ここまで来たらエラー
-    return kPrimError;
+    return NULL;
   }
 
   switch ( ast_expr->expr_type() ) {
   case kSymbolExpr:
     // これはあり得ない．
-    return kPrimError;
+    return NULL;
 
   case kArrayRef:
     {
@@ -1102,19 +1037,19 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
       IrNode* base = elab_rhs_primary(ast_expr->body(), scope, node_list);
       if ( base->type()->type_id() != kArrayType ) {
 	// base is not an array
-	return kPrimError;
+	return NULL;
       }
 
       IrNode* offset = elab_rhs(ast_expr->index(), scope, node_list);
       if ( offset->type()->type_id() != kIntType ) {
 	// offset is not an integer
-	return kPrimError;
+	return NULL;
       }
 
-      node = new_ArrayRef(base, offset);
+      IrNode* node = new_ArrayRef(base, offset);
       node_list.push_back(node);
+      return node;
     }
-    return kPrimAddr;
 
   case kMemberRef:
     {
@@ -1127,9 +1062,9 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
       // type のメンバに member_name があることを確認する．
       const Var* var;
 
-      node = new_MemberRef(base, var);
+      IrNode* node = new_MemberRef(base, var);
       node_list.push_back(node);
-      return kPrimAddr;
+      return node;
     }
     break;
 
@@ -1138,7 +1073,7 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
   }
 
   ASSERT_NOT_REACHED;
-  return kPrimError;
+  return NULL;
 }
 
 // @brief 式からシンボルの解決を行う．

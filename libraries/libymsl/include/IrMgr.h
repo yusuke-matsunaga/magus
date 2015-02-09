@@ -132,25 +132,13 @@ private:
 		   Scope* scope,
 		   vector<IrNode*>& node_list);
 
-  /// @brief analyze_primary の返り値の型
-  enum PrimType {
-    kPrimConst,
-    kPrimAddr,
-    kPrimFunc,
-    kPrimError
-  };
-
   /// @brief プライマリ式の解析を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
-  /// @param[out] node 定数/アドレスを格納する変数
-  /// @param[out] func 関数
   /// @param[in] node_list ノードを収めるリスト
-  PrimType
+  IrNode*
   analyze_primary(const AstExpr* ast_expr,
 		  Scope* scope,
-		  IrNode*& node,
-		  const Function*& func,
 		  vector<IrNode*>& node_list);
 
   /// @brief 式からスコープの解決を行う．
@@ -289,6 +277,11 @@ private:
   IrNode*
   new_VarRef(const Var* var);
 
+  /// @brief 関数参照を生成する．
+  /// @param[in] func 関数
+  IrNode*
+  new_FuncRef(const Function* func);
+
   /// @brief 配列参照を生成する．
   /// @param[in] array 配列
   /// @param[in] index インデックス
@@ -304,10 +297,10 @@ private:
 		const Var* var);
 
   /// @brief 関数呼び出し式を生成する．
-  /// @param[in] func 関数
+  /// @param[in] func_addr 関数アドレス
   /// @param[in] arglist 引数のリスト
   IrNode*
-  new_FuncCall(const Function* func,
+  new_FuncCall(IrNode* func_addr,
 	       const vector<IrNode*>& arglist);
 
   /// @brief リターン命令を生成する．

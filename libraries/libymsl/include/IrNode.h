@@ -122,6 +122,13 @@ public:
   const Var*
   var() const;
 
+  /// @brief 関数本体を返す．
+  ///
+  /// kOpFuncRef のみ有効
+  virtual
+  const Function*
+  function() const;
+
   /// @brief 配列本体の式を返す．
   ///
   /// kOpArrayRef のみ有効
@@ -143,12 +150,12 @@ public:
   IrNode*
   obj_expr() const;
 
-  /// @brief 関数本体を返す．
+  /// @brief 関数アドレスを返す．
   ///
   /// kOpFuncCall のみ有効
   virtual
-  const Function*
-  function() const;
+  IrNode*
+  func_addr() const;
 
   /// @brief 関数の引数の数を得る．
   ///

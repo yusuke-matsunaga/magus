@@ -385,6 +385,7 @@ enum OpCode {
   kOpInplaceRshift,
   // アドレス指定
   kOpVarRef,
+  kOpFuncRef,
   kOpArrayRef,
   kOpMemberRef,
   // 関数呼び出し/復帰

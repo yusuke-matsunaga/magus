@@ -22,6 +22,7 @@
 #include "IrInplaceUniOp.h"
 #include "IrInplaceBinOp.h"
 #include "IrVarRef.h"
+#include "IrFuncRef.h"
 #include "IrArrayRef.h"
 #include "IrMemberRef.h"
 #include "IrFuncCall.h"
@@ -174,6 +175,15 @@ IrMgr::new_VarRef(const Var* var)
   return new (p) IrVarRef(var);
 }
 
+// @brief 関数参照を生成する．
+// @param[in] func 関数
+IrNode*
+IrMgr::new_FuncRef(const Function* func)
+{
+  void* p = mAlloc.get_memory(sizeof(IrFuncRef));
+  return new (p) IrFuncRef(func);
+}
+
 // @brief 配列参照を生成する．
 // @param[in] array 配列
 // @param[in] index インデックス
@@ -197,14 +207,14 @@ IrMgr::new_MemberRef(IrNode* obj,
 }
 
 // @brief 関数呼び出し式を生成する．
-// @param[in] func 関数式
+// @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数のリスト
 IrNode*
-IrMgr::new_FuncCall(const Function* func,
+IrMgr::new_FuncCall(IrNode* func_addr,
 		    const vector<IrNode*>& arglist)
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncCall));
-  return new (p) IrFuncCall(func, arglist);
+  return new (p) IrFuncCall(func_addr, arglist);
 }
 
 // @brief リターン命令を生成する．

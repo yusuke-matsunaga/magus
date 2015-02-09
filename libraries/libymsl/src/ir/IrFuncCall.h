@@ -24,9 +24,9 @@ class IrFuncCall :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func 関数
+  /// @param[in] func_addr 関数アドレス
   /// @param[in] arglist 引数リスト
-  IrFuncCall(const Function* func,
+  IrFuncCall(IrNode* func_addr,
 	     const vector<IrNode*>& arglist);
 
   /// @brief デストラクタ
@@ -46,12 +46,12 @@ public:
   bool
   is_static() const;
 
-  /// @brief 関数本体を返す．
+  /// @brief 関数のアドレスを返す．
   ///
   /// kOpFuncCall のみ有効
   virtual
-  const Function*
-  function() const;
+  IrNode*
+  func_addr() const;
 
   /// @brief 関数の引数の数を得る．
   ///
@@ -74,8 +74,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数
-  const Function* mFunc;
+  // 関数アドレス
+  IrNode* mFuncAddr;
 
   // 引数の数
   ymuint mArgNum;

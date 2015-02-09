@@ -104,6 +104,7 @@ set (ymsl_SOURCES
   src/ir/IrInplaceUniOp.cc
   src/ir/IrInplaceBinOp.cc
   src/ir/IrVarRef.cc
+  src/ir/IrFuncRef.cc
   src/ir/IrArrayRef.cc
   src/ir/IrMemberRef.cc
   src/ir/IrFuncCall.cc
