@@ -296,6 +296,41 @@ private:
   // IrHandle の派生クラスを生成する関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief スコープ参照を生成する．
+  /// @param[in] scope スコープ
+  IrHandle*
+  new_ScopeHandle(Scope* scope);
+
+  /// @brief 変数参照を生成する．
+  /// @param[in] var 変数
+  IrHandle*
+  new_VarHandle(const Var* var);
+
+  /// @brief 関数参照を生成する．
+  /// @param[in] func 関数
+  IrHandle*
+  new_FuncHandle(const Function* func);
+
+  /// @brief 定数参照を生成する．
+  /// @param[in] name 名前
+  /// @param[in] node 定数ノード
+  IrHandle*
+  new_ConstHandle(ShString name,
+		  IrNode* node);
+
+  /// @brief ラベル参照を生成する．
+  /// @param[in] name 名前
+  /// @param[in] label ラベル
+  IrHandle*
+  new_LabelHandle(ShString name,
+		  IrNode* label);
+
+  /// @brief 名前付き型参照を生成する．
+  /// @param[in] type 型
+  IrHandle*
+  new_TypeHandle(const Type* type,
+		 Scope* scope);
+
   /// @brief 配列参照を生成する．
   /// @param[in] array 配列
   /// @param[in] index インデックス

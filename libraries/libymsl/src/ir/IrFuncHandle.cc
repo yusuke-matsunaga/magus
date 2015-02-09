@@ -1,55 +1,55 @@
 
-/// @file ScopeHandle.cc
-/// @brief ScopeHandle の実装ファイル
+/// @file IrFuncHandle.cc
+/// @brief IrFuncHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ScopeHandle.h"
-#include "Scope.h"
+#include "IrFuncHandle.h"
+#include "Function.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス ScopeHandle
+// クラス IrFuncHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] scope スコープ
-ScopeHandle::ScopeHandle(Scope* scope) :
-  mScope(scope)
+// @param[in] func 関数
+IrFuncHandle::IrFuncHandle(const Function* func) :
+  mFunc(func)
 {
 }
 
 // @brief デストラクタ
-ScopeHandle::~ScopeHandle()
+IrFuncHandle::~IrFuncHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-ScopeHandle::name() const
+IrFuncHandle::name() const
 {
-  return mScope->name();
+  return mFunc->name();
 }
 
 // @brief 種類を返す．
 IrHandle::HandleType
-ScopeHandle::handle_type() const
+IrFuncHandle::handle_type() const
 {
-  return kScope;
+  return kFunction;
 }
 
-// @brief スコープを返す．
+// @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-Scope*
-ScopeHandle::scope() const
+const Function*
+IrFuncHandle::function() const
 {
-  return mScope;
+  return mFunc;
 }
 
 END_NAMESPACE_YM_YMSL

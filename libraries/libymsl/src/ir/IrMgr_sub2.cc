@@ -21,14 +21,20 @@
 #include "IrStore.h"
 #include "IrInplaceUniOp.h"
 #include "IrInplaceBinOp.h"
-#include "IrVarRef.h"
-#include "IrFuncRef.h"
-#include "IrArrayRef.h"
-#include "IrMemberRef.h"
 #include "IrFuncCall.h"
 #include "IrReturn.h"
 #include "IrJump.h"
 #include "IrLabel.h"
+
+#include "IrConstHandle.h"
+#include "IrFuncHandle.h"
+#include "IrLabelHandle.h"
+#include "IrScopeHandle.h"
+#include "IrTypeHandle.h"
+#include "IrVarHandle.h"
+#include "IrArrayRef.h"
+#include "IrMemberRef.h"
+
 #include "Var.h"
 #include "Function.h"
 #include "Type.h"
@@ -193,48 +199,6 @@ IrMgr::new_InplaceBinOp(OpCode opcode,
   return new (p) IrInplaceBinOp(opcode, lhs_addr, opr);
 }
 
-#if 0
-// @brief 変数参照を生成する．
-// @param[in] var 変数
-IrNode*
-IrMgr::new_VarRef(const Var* var)
-{
-  void* p = mAlloc.get_memory(sizeof(IrVarRef));
-  return new (p) IrVarRef(var);
-}
-
-// @brief 関数参照を生成する．
-// @param[in] func 関数
-IrNode*
-IrMgr::new_FuncRef(const Function* func)
-{
-  void* p = mAlloc.get_memory(sizeof(IrFuncRef));
-  return new (p) IrFuncRef(func);
-}
-#endif
-
-// @brief 配列参照を生成する．
-// @param[in] array 配列
-// @param[in] index インデックス
-IrHandle*
-IrMgr::new_ArrayRef(IrNode* array,
-		    IrNode* index)
-{
-  void* p = mAlloc.get_memory(sizeof(IrArrayRef));
-  return new (p) IrArrayRef(array, index);
-}
-
-// @brief クラスメンバ参照を生成する．
-// @param[in] obj オブジェクト
-// @param[in] var メンバ変数
-IrHandle*
-IrMgr::new_MemberRef(IrNode* obj,
-		     const Var* var)
-{
-  void* p = mAlloc.get_memory(sizeof(IrMemberRef));
-  return new (p) IrMemberRef(obj, var);
-}
-
 // @brief 関数呼び出し式を生成する．
 // @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数のリスト
@@ -274,6 +238,87 @@ IrMgr::new_Label()
 {
   void* p = mAlloc.get_memory(sizeof(IrLabel));
   return new (p) IrLabel();
+}
+
+// @brief スコープ参照を生成する．
+// @param[in] scope スコープ
+IrHandle*
+IrMgr::new_ScopeHandle(Scope* scope)
+{
+  void* p = mAlloc.get_memory(sizeof(IrScopeHandle));
+  return new (p) IrScopeHandle(scope);
+}
+
+// @brief 変数参照を生成する．
+// @param[in] var 変数
+IrHandle*
+IrMgr::new_VarHandle(const Var* var)
+{
+  void* p = mAlloc.get_memory(sizeof(IrVarHandle));
+  return new (p) IrVarHandle(var);
+}
+
+// @brief 関数参照を生成する．
+// @param[in] func 関数
+IrHandle*
+IrMgr::new_FuncHandle(const Function* func)
+{
+  void* p = mAlloc.get_memory(sizeof(IrFuncHandle));
+  return new (p) IrFuncHandle(func);
+}
+
+// @brief 定数参照を生成する．
+// @param[in] name 名前
+// @param[in] node 定数ノード
+IrHandle*
+IrMgr::new_ConstHandle(ShString name,
+		       IrNode* node)
+{
+  void* p = mAlloc.get_memory(sizeof(IrConstHandle));
+  return new (p) IrConstHandle(name, node);
+}
+
+// @brief ラベル参照を生成する．
+// @param[in] name 名前
+// @param[in] label ラベル
+IrHandle*
+IrMgr::new_LabelHandle(ShString name,
+		       IrNode* label)
+{
+  void* p = mAlloc.get_memory(sizeof(IrLabelHandle));
+  return new (p) IrLabelHandle(name, label);
+}
+
+// @brief 名前付き型参照を生成する．
+// @param[in] type 型
+IrHandle*
+IrMgr::new_TypeHandle(const Type* type,
+		      Scope* scope)
+{
+  void* p = mAlloc.get_memory(sizeof(IrTypeHandle));
+  return new (p) IrTypeHandle(type, scope);
+}
+
+// @brief 配列参照を生成する．
+// @param[in] array 配列
+// @param[in] index インデックス
+IrHandle*
+IrMgr::new_ArrayRef(IrNode* array,
+		    IrNode* index)
+{
+  void* p = mAlloc.get_memory(sizeof(IrArrayRef));
+  return new (p) IrArrayRef(array, index);
+}
+
+// @brief クラスメンバ参照を生成する．
+// @param[in] obj オブジェクト
+// @param[in] var メンバ変数
+IrHandle*
+IrMgr::new_MemberRef(IrNode* obj,
+		     const Var* var)
+{
+  void* p = mAlloc.get_memory(sizeof(IrMemberRef));
+  return new (p) IrMemberRef(obj, var);
 }
 
 END_NAMESPACE_YM_YMSL

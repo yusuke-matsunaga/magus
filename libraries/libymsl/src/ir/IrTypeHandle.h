@@ -1,8 +1,8 @@
-#ifndef FUNCHANDLE_H
-#define FUNCHANDLE_H
+#ifndef IRTYPEHANDLE_H
+#define IRTYPEHANDLE_H
 
-/// @file FuncHandle.h
-/// @brief FuncHandle のヘッダファイル
+/// @file IrTypeHandle.h
+/// @brief IrTypeHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,21 +15,23 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class FuncHandle FuncHandle.h "FuncHandle.h"
-/// @brief Function を保持する IrHandle
+/// @class IrTypeHandle IrTypeHandle.h "IrTypeHandle.h"
+/// @brief Type を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
-class FuncHandle :
+class IrTypeHandle :
   public IrHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func 関数
-  FuncHandle(const Function* func);
+  /// @param[in] type 型
+  /// @param[in] scope スコープ
+  IrTypeHandle(const Type* type,
+	       Scope* scope);
 
   /// @brief デストラクタ
   virtual
-  ~FuncHandle();
+  ~IrTypeHandle();
 
 
 public:
@@ -47,12 +49,19 @@ public:
   HandleType
   handle_type() const;
 
-  /// @brief 関数を返す．
+  /// @brief スコープを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  const Function*
-  function() const;
+  Scope*
+  scope() const;
+
+  /// @brief 名前付き型を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  const Type*
+  named_type() const;
 
 
 private:
@@ -60,11 +69,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数
-  const Function* mFunc;
+  // 型
+  const Type* mType;
+
+  // スコープ
+  Scope* mScope;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // FUNCHANDLE_H
+#endif // IRTYPEHANDLE_H

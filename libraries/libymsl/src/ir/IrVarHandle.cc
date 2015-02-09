@@ -1,57 +1,55 @@
 
-/// @file LabelHandle.cc
-/// @brief LabelHandle の実装ファイル
+/// @file IrVarHandle.cc
+/// @brief IrVarHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LabelHandle.h"
+#include "IrVarHandle.h"
+#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス LabelHandle
+// クラス IrVarHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] name 名前
-// @param[in] label ラベル
-LabelHandle::LabelHandle(ShString name,
-			 IrNode* label) :
-  mName(name),
-  mLabel(label)
+// @param[in] var 変数宣言
+IrVarHandle::IrVarHandle(const Var* var) :
+  mVar(var)
 {
 }
 
 // @brief デストラクタ
-LabelHandle::~LabelHandle()
+IrVarHandle::~IrVarHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-LabelHandle::name() const
+IrVarHandle::name() const
 {
-  return mName;
+  return mVar->name();
 }
 
 // @brief 種類を返す．
 IrHandle::HandleType
-LabelHandle::handle_type() const
+IrVarHandle::handle_type() const
 {
-  return kLabel;
+  return kVar;
 }
 
-// @brief ラベルを返す．
+// @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．
-IrNode*
-LabelHandle::label() const
+const Var*
+IrVarHandle::var() const
 {
-  return mLabel;
+  return mVar;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -69,27 +69,26 @@ set (ymsl_SOURCES
 
   src/compiler/YmslCompiler.cc
   src/compiler/ArrayType.cc
-  src/compiler/ConstHandle.cc
   src/compiler/EnumType.cc
   src/compiler/Function.cc
-  src/compiler/FuncHandle.cc
   src/compiler/FuncType.cc
-  src/compiler/LabelHandle.cc
   src/compiler/MapType.cc
   src/compiler/NamedType.cc
   src/compiler/PrimType.cc
-  src/compiler/Scope.cc
-  src/compiler/ScopeHandle.cc
   src/compiler/SetType.cc
-  src/compiler/IrHandle.cc
   src/compiler/Type.cc
-  src/compiler/TypeHandle.cc
   src/compiler/TypeMgr.cc
   src/compiler/Var.cc
-  src/compiler/VarHandle.cc
 
   src/ir/IrMgr.cc
   src/ir/IrMgr_sub2.cc
+  src/ir/IrHandle.cc
+  src/ir/IrConstHandle.cc
+  src/ir/IrFuncHandle.cc
+  src/ir/IrLabelHandle.cc
+  src/ir/IrScopeHandle.cc
+  src/ir/IrTypeHandle.cc
+  src/ir/IrVarHandle.cc
   src/ir/IrNode.cc
   src/ir/IrTrue.cc
   src/ir/IrFalse.cc
@@ -109,6 +108,7 @@ set (ymsl_SOURCES
   src/ir/IrReturn.cc
   src/ir/IrJump.cc
   src/ir/IrLabel.cc
+  src/ir/Scope.cc
 
   src/ir/IrPrinter.cc
 

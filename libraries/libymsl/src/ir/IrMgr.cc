@@ -292,7 +292,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// ラベルが未定義
 	// ノードを作ってしまう．
 	label_node = new_Label();
-	scope->add_label(label_symbol->str_val(), label_node);
+	h = new_LabelHandle(label_symbol->str_val(), label_node);
+	scope->add(h);
 	mUndefList.push_back(label_node);
       }
       else {
@@ -344,7 +345,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* label_node;
       if ( h == NULL ) {
 	label_node = new_Label();
-	scope->add_label(label_symbol->str_val(), label_node);
+	h = new_LabelHandle(label_symbol->str_val(), label_node);
+	scope->add(h);
       }
       else {
 	if ( h->handle_type() != IrHandle::kLabel ) {
@@ -487,9 +489,12 @@ IrMgr::reg_enum(const AstStatement* stmt,
     ShString name = type->enum_elem_name(i);
     int val = type->enum_elem_val(i);
     IrNode* const_node = new_IntConst(val);
-    enum_scope->add_constant(name, const_node);
+    IrHandle* h = new_ConstHandle(name, const_node);
+    enum_scope->add(h);
   }
-  scope->add_named_type(type, enum_scope);
+
+  IrHandle* h1 = new_TypeHandle(type, enum_scope);
+  scope->add(h1);
 }
 
 // @brief 関数の定義を行う．
@@ -532,9 +537,9 @@ IrMgr::reg_func(const AstStatement* stmt,
   }
 
   const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
-
   Function* func = new_function(name, ftype);
-  scope->add_function(func);
+  IrHandle* h1 = new_FuncHandle(func);
+  scope->add(h1);
 }
 
 // @brief 変数の定義を行う．
@@ -565,7 +570,8 @@ IrMgr::reg_var(const AstStatement* stmt,
   }
 
   Var* var = new_var(name, type);
-  scope->add_var(var);
+  IrHandle* h1 = new_VarHandle(var);
+  scope->add(h1);
 }
 
 // @brief 定数の定義を行う．
@@ -600,7 +606,8 @@ IrMgr::reg_const(const AstStatement* stmt,
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
 
-  scope->add_constant(name, node);
+  IrHandle* h1 = new_ConstHandle(name, node);
+  scope->add(h1);
 }
 
 // @brief 型の参照を解決する．

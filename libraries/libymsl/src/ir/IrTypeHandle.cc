@@ -1,47 +1,47 @@
 
-/// @file TypeHandle.cc
-/// @brief TypeHandle の実装ファイル
+/// @file IrTypeHandle.cc
+/// @brief IrTypeHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "TypeHandle.h"
+#include "IrTypeHandle.h"
 #include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス TypeHandle
+// クラス IrTypeHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] type 型
 // @param[in] scope スコープ
-TypeHandle::TypeHandle(const Type* type,
-		       Scope* scope) :
+IrTypeHandle::IrTypeHandle(const Type* type,
+			   Scope* scope) :
   mType(type),
   mScope(scope)
 {
 }
 
 // @brief デストラクタ
-TypeHandle::~TypeHandle()
+IrTypeHandle::~IrTypeHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-TypeHandle::name() const
+IrTypeHandle::name() const
 {
   return mType->type_name();
 }
 
 // @brief 種類を返す．
 IrHandle::HandleType
-TypeHandle::handle_type() const
+IrTypeHandle::handle_type() const
 {
   return kNamedType;
 }
@@ -50,7 +50,7 @@ TypeHandle::handle_type() const
 //
 // 他の要素の場合には NULL を返す．
 Scope*
-TypeHandle::scope() const
+IrTypeHandle::scope() const
 {
   return mScope;
 }
@@ -59,7 +59,7 @@ TypeHandle::scope() const
 //
 // 他の要素の場合には NULL を返す．
 const Type*
-TypeHandle::named_type() const
+IrTypeHandle::named_type() const
 {
   return mType;
 }

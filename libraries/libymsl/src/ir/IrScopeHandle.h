@@ -1,8 +1,8 @@
-#ifndef SCOPEHANDLE_H
-#define SCOPEHANDLE_H
+#ifndef IRSCOPEHANDLE_H
+#define IRSCOPEHANDLE_H
 
-/// @file ScopeHandle.h
-/// @brief ScopeHandle のヘッダファイル
+/// @file IrScopeHandle.h
+/// @brief IrScopeHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,21 +15,21 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class ScopeHandle ScopeHandle.h "ScopeHandle.h"
+/// @class IrScopeHandle IrScopeHandle.h "IrScopeHandle.h"
 /// @brief Scope を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
-class ScopeHandle :
+class IrScopeHandle :
   public IrHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] scope スコープ
-  ScopeHandle(Scope* scope);
+  IrScopeHandle(Scope* scope);
 
   /// @brief デストラクタ
   virtual
-  ~ScopeHandle();
+  ~IrScopeHandle();
 
 
 public:
@@ -67,4 +67,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // SCOPEHANDLE_H
+#endif // IRSCOPEHANDLE_H

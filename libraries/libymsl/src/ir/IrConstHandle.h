@@ -1,8 +1,8 @@
-#ifndef LABELHANEL_H
-#define LABELHANEL_H
+#ifndef IRCONSTHANDLE_H
+#define IRCONSTHANDLE_H
 
-/// @file LabelHandle.h
-/// @brief LabelHandle のヘッダファイル
+/// @file IrConstHandle.h
+/// @brief IrConstHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -10,29 +10,28 @@
 
 
 #include "IrHandle.h"
-#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class LabelHandle LabelHandle.h "LabelHandle.h"
-/// @brief Label を保持する IrHandle
+/// @class IrConstHandle IrConstHandle.h "IrConstHandle.h"
+/// @brief 定数値を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
-class LabelHandle :
+class IrConstHandle :
   public IrHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] label ラベル
-  LabelHandle(ShString name,
-	      IrNode* label);
+  /// @param[in] const_node 定数ノード
+  IrConstHandle(ShString name,
+		IrNode* const_node);
 
   /// @brief デストラクタ
   virtual
-  ~LabelHandle();
+  ~IrConstHandle();
 
 
 public:
@@ -50,12 +49,12 @@ public:
   HandleType
   handle_type() const;
 
-  /// @brief ラベルを返す．
+  /// @brief 定数ノードを返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
   IrNode*
-  label() const;
+  constant() const;
 
 
 private:
@@ -66,11 +65,11 @@ private:
   // 名前
   ShString mName;
 
-  // ラベル
-  IrNode* mLabel;
+  // 定数ノード
+  IrNode* mConstNode;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // LABELHANEL_H
+#endif // IRCONSTHANDLE_H

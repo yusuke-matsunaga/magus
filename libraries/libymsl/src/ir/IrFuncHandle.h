@@ -1,35 +1,35 @@
-#ifndef IRVARREF_H
-#define IRVARREF_H
+#ifndef IRFUNCHANDLE_H
+#define IRFUNCHANDLE_H
 
-/// @file IrVarRef.h
-/// @brief IrVarRef のヘッダファイル
+/// @file IrFuncHandle.h
+/// @brief IrFuncHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrVarRef IrVarRef.h "IrVarRef.h"
-/// @brief 変数参照を表すノード
+/// @class IrFuncHandle IrFuncHandle.h "IrFuncHandle.h"
+/// @brief Function を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
-class IrVarRef :
-  public IrNode
+class IrFuncHandle :
+  public IrHandle
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrVarRef(const Var* var);
+  /// @param[in] func 関数
+  IrFuncHandle(const Function* func);
 
   /// @brief デストラクタ
   virtual
-  ~IrVarRef();
+  ~IrFuncHandle();
 
 
 public:
@@ -37,19 +37,22 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 静的評価可能か調べる．
-  ///
-  /// 要するに定数式かどうかということ
+  /// @brief 名前を返す．
   virtual
-  bool
-  is_static() const;
+  ShString
+  name() const;
 
-  /// @brief 変数を返す．
-  ///
-  /// kOpVarRef, kMemberRef のみ有効
+  /// @brief 種類を返す．
   virtual
-  const Var*
-  var() const;
+  HandleType
+  handle_type() const;
+
+  /// @brief 関数を返す．
+  ///
+  /// 他の要素の場合には NULL を返す．
+  virtual
+  const Function*
+  function() const;
 
 
 private:
@@ -57,11 +60,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const Var* mVar;
+  // 関数
+  const Function* mFunc;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRVARREF_H
+#endif // IRFUNCHANDLE_H

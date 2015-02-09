@@ -1,55 +1,55 @@
 
-/// @file VarHandle.cc
-/// @brief VarHandle の実装ファイル
+/// @file IrScopeHandle.cc
+/// @brief IrScopeHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VarHandle.h"
-#include "Var.h"
+#include "IrScopeHandle.h"
+#include "Scope.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス VarHandle
+// クラス IrScopeHandle
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var 変数宣言
-VarHandle::VarHandle(const Var* var) :
-  mVar(var)
+// @param[in] scope スコープ
+IrScopeHandle::IrScopeHandle(Scope* scope) :
+  mScope(scope)
 {
 }
 
 // @brief デストラクタ
-VarHandle::~VarHandle()
+IrScopeHandle::~IrScopeHandle()
 {
 }
 
 // @brief 名前を返す．
 ShString
-VarHandle::name() const
+IrScopeHandle::name() const
 {
-  return mVar->name();
+  return mScope->name();
 }
 
 // @brief 種類を返す．
 IrHandle::HandleType
-VarHandle::handle_type() const
+IrScopeHandle::handle_type() const
 {
-  return kVar;
+  return kScope;
 }
 
-// @brief 変数を返す．
+// @brief スコープを返す．
 //
 // 他の要素の場合には NULL を返す．
-const Var*
-VarHandle::var() const
+Scope*
+IrScopeHandle::scope() const
 {
-  return mVar;
+  return mScope;
 }
 
 END_NAMESPACE_YM_YMSL

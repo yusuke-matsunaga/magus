@@ -8,12 +8,7 @@
 
 
 #include "Scope.h"
-#include "ConstHandle.h"
-#include "FuncHandle.h"
-#include "LabelHandle.h"
-#include "ScopeHandle.h"
-#include "TypeHandle.h"
-#include "VarHandle.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -39,13 +34,9 @@ Scope::Scope(Scope* parent,
 // @brief デストラクタ
 Scope::~Scope()
 {
-  for (ymuint i = 0; i < mHashSize; ++ i) {
-    for (IrHandle* h = mHashTable[i]; h; ) {
-      IrHandle* n = h->mLink;
-      delete h;
-      h = n;
-    }
-  }
+  // IrHandleのメモリは IrMgr が管理している．
+  // のでここで開放する必要はない．
+
   delete [] mHashTable;
 }
 
@@ -58,64 +49,16 @@ Scope::name() const
   return mName;
 }
 
-// @brief ラベルを追加する．
-// @param[in] name 名前
+// @brief 要素を追加する．
 // @param[in] item 追加する要素
 void
-Scope::add_label(ShString name,
-		 IrNode* item)
+Scope::add(IrHandle* item)
 {
-  IrHandle* handle = new LabelHandle(name, item);
-  put(handle);
-}
+  if ( mHashNum >= mNextLimit ) {
+    alloc_table(mHashSize << 1);
+  }
 
-// @brief 関数を追加する．
-// @param[in] item 追加する要素
-void
-Scope::add_function(const Function* item)
-{
-  IrHandle* handle = new FuncHandle(item);
-  put(handle);
-}
-
-// @brief 変数を追加する．
-// @param[in] item 追加する要素
-void
-Scope::add_var(const Var* item)
-{
-  IrHandle* handle = new VarHandle(item);
-  put(handle);
-}
-
-// @brief 型を追加する．
-// @param[in] item 追加する要素
-// @param[in] scope item のスコープ
-void
-Scope::add_named_type(const Type* item,
-		      Scope* scope)
-{
-  IrHandle* handle = new TypeHandle(item, scope);
-  put(handle);
-}
-
-// @brief 定数ノードを追加する．
-// @param[in] name 名前
-// @param[in] item 追加する要素
-void
-Scope::add_constant(ShString name,
-		    IrNode* item)
-{
-  IrHandle* handle = new ConstHandle(name, item);
-  put(handle);
-}
-
-// @brief スコープを追加する．
-// @param[in] item 追加する要素
-void
-Scope::add_scope(Scope* item)
-{
-  IrHandle* handle = new ScopeHandle(item);
-  put(handle);
+  _put(item);
 }
 
 // @brief ハッシュ表を確保する．
@@ -168,17 +111,6 @@ Scope::find_local(ShString name) const
     }
   }
   return NULL;
-}
-
-// @brief ハンドルを登録する．
-void
-Scope::put(IrHandle* handle)
-{
-  if ( mHashNum >= mNextLimit ) {
-    alloc_table(mHashSize << 1);
-  }
-
-  _put(handle);
 }
 
 // @brief ハンドルを登録する．

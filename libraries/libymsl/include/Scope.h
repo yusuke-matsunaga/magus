@@ -44,41 +44,10 @@ public:
   ShString
   name() const;
 
-  /// @brief 子のスコープを追加する．
+  /// @brief 要素を追加する．
   /// @param[in] item 追加する要素
   void
-  add_scope(Scope* item);
-
-  /// @brief 変数を追加する．
-  /// @param[in] item 追加する要素
-  void
-  add_var(const Var* item);
-
-  /// @brief 関数を追加する．
-  /// @param[in] item 追加する要素
-  void
-  add_function(const Function* item);
-
-  /// @brief 定数ノードを追加する．
-  /// @param[in] name 名前
-  /// @param[in] item 追加する要素
-  void
-  add_constant(ShString name,
-	       IrNode* item);
-
-  /// @brief ラベルを追加する．
-  /// @param[in] name 名前
-  /// @param[in] item 追加する要素
-  void
-  add_label(ShString name,
-	    IrNode* item);
-
-  /// @brief 型を追加する．
-  /// @param[in] item 追加する要素
-  /// @param[in] scope item のスコープ
-  void
-  add_named_type(const Type* item,
-		 Scope* scope);
+  add(IrHandle* item);
 
   /// @brief 名前からハンドルを探す．
   /// @param[in] name 名前
@@ -102,10 +71,6 @@ private:
   /// @param[in] req_size 要求サイズ
   void
   alloc_table(ymuint req_size);
-
-  /// @brief ハンドルを登録する．
-  void
-  put(IrHandle* handle);
 
   /// @brief ハンドルを登録する．
   ///
