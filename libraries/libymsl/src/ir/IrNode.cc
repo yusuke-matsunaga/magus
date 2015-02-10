@@ -90,30 +90,6 @@ IrNode::operand(ymuint pos) const
   return NULL;
 }
 
-// @brief 整数値を返す．
-int
-IrNode::int_val() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
-// @brief 実数値を返す．
-double
-IrNode::float_val() const
-{
-  ASSERT_NOT_REACHED;
-  return 0.0;
-}
-
-// @brief 文字列を返す．
-const char*
-IrNode::string_val() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
 // @brief ロード/ストア対象のアドレスを得る．
 //
 // kLoad, kStore, kInc, kDec のみ有効
@@ -223,11 +199,6 @@ operator<<(ostream& s,
 	   IrNode::IrType op)
 {
   switch ( op ) {
-  case IrNode::kTrue:          s << "True"; break;
-  case IrNode::kFalse:         s << "False"; break;
-  case IrNode::kIntConst:      s << "IntConst"; break;
-  case IrNode::kFloatConst:    s << "FloatConst"; break;
-  case IrNode::kStringConst:   s << "StringConst"; break;
   case IrNode::kUniOp:         s << "UniOp"; break;
   case IrNode::kBinOp:         s << "BinOp"; break;
   case IrNode::kTriOp:         s << "TriOp"; break;

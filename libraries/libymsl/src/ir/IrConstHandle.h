@@ -25,9 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 名前
-  /// @param[in] const_node 定数ノード
+  /// @param[in] const_val 定数値
   IrConstHandle(ShString name,
-		IrNode* const_node);
+		const ConstVal* const_val);
 
   /// @brief デストラクタ
   virtual
@@ -49,11 +49,11 @@ public:
   HandleType
   handle_type() const;
 
-  /// @brief 定数ノードを返す．
+  /// @brief 定数値を返す．
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  IrNode*
+  const ConstVal*
   constant() const;
 
 
@@ -65,8 +65,8 @@ private:
   // 名前
   ShString mName;
 
-  // 定数ノード
-  IrNode* mConstNode;
+  // 定数値
+  const ConstVal* mConstVal;
 
 };
 

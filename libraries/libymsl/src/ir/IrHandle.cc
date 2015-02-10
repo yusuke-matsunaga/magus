@@ -48,7 +48,7 @@ IrHandle::function() const
 // @brief 定数を返す．
 //
 // 他の要素の場合には NULL を返す．
-IrNode*
+const ConstVal*
 IrHandle::constant() const
 {
   return NULL;

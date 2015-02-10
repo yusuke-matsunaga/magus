@@ -9,11 +9,10 @@
 
 #include "IrMgr.h"
 #include "TypeMgr.h"
-#include "IrTrue.h"
-#include "IrFalse.h"
-#include "IrIntConst.h"
-#include "IrFloatConst.h"
-#include "IrStringConst.h"
+#include "BooleanConst.h"
+#include "IntConst.h"
+#include "FloatConst.h"
+#include "StringConst.h"
 #include "IrUniOp.h"
 #include "IrBinOp.h"
 #include "IrTriOp.h"
@@ -37,6 +36,7 @@
 
 #include "Var.h"
 #include "Function.h"
+#include "ConstVal.h"
 #include "Type.h"
 
 
@@ -47,46 +47,55 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief true 定数を生成する．
-IrNode*
+const ConstVal*
 IrMgr::new_True()
 {
-  void* p = mAlloc.get_memory(sizeof(IrTrue));
-  return new (p) IrTrue(mTypeMgr.boolean_type());
+  void* p = mAlloc.get_memory(sizeof(BooleanConst));
+  return new (p) BooleanConst(mTypeMgr.boolean_type(), true);
 }
 
 // @brief False 定数を生成する．
-IrNode*
+const ConstVal*
 IrMgr::new_False()
 {
-  void* p = mAlloc.get_memory(sizeof(IrFalse));
-  return new (p) IrFalse(mTypeMgr.boolean_type());
+  void* p = mAlloc.get_memory(sizeof(BooleanConst));
+  return new (p) BooleanConst(mTypeMgr.boolean_type(), false);
 }
 
 // @brief 整数値定数を生成する．
 // @param[in] val 値
-IrNode*
+const ConstVal*
 IrMgr::new_IntConst(int val)
 {
-  void* p = mAlloc.get_memory(sizeof(IrIntConst));
-  return new (p) IrIntConst(mTypeMgr.int_type(), val);
+  void* p = mAlloc.get_memory(sizeof(IntConst));
+  return new (p) IntConst(mTypeMgr.int_type(), val);
 }
 
 // @brief 実数値定数を生成する．
 // @param[in] val 値
-IrNode*
+const ConstVal*
 IrMgr::new_FloatConst(double val)
 {
-  void* p = mAlloc.get_memory(sizeof(IrFloatConst));
-  return new (p) IrFloatConst(mTypeMgr.float_type(), val);
+  void* p = mAlloc.get_memory(sizeof(FloatConst));
+  return new (p) FloatConst(mTypeMgr.float_type(), val);
 }
 
 // @brief 文字列定数を生成する．
 // @param[in] val 値
-IrNode*
+const ConstVal*
 IrMgr::new_StringConst(const char* val)
 {
-  void* p = mAlloc.get_memory(sizeof(IrStringConst));
-  return new (p) IrStringConst(mTypeMgr.string_type(), val);
+  void* p = mAlloc.get_memory(sizeof(StringConst));
+  return new (p) StringConst(mTypeMgr.string_type(), val);
+}
+
+// @brief 定数参照式を生成する．
+// @param[in] const_val 定数値
+IrNode*
+IrMgr::new_ConstNode(const ConstVal* const_val)
+{
+  IrHandle* h = new_ConstHandle(ShString(), const_val);
+  return new_Load(h);
 }
 
 // @brief 単項演算式を生成する．
@@ -287,13 +296,13 @@ IrMgr::new_FuncHandle(const Function* func)
 
 // @brief 定数参照を生成する．
 // @param[in] name 名前
-// @param[in] node 定数ノード
+// @param[in] const_val 定数値
 IrHandle*
 IrMgr::new_ConstHandle(ShString name,
-		       IrNode* node)
+		       const ConstVal* const_val)
 {
   void* p = mAlloc.get_memory(sizeof(IrConstHandle));
-  return new (p) IrConstHandle(name, node);
+  return new (p) IrConstHandle(name, const_val);
 }
 
 // @brief ラベル参照を生成する．

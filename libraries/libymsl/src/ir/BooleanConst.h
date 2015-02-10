@@ -1,37 +1,37 @@
-#ifndef IRINTCONST_H
-#define IRINTCONST_H
+#ifndef BOOLEANCONST_H
+#define BOOLEANCONST_H
 
-/// @file IrIntConst.h
-/// @brief IrIntConst のヘッダファイル
+/// @file BooleanConst.h
+/// @brief BooleanConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "ConstVal.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrIntConst IrIntConst.h "IrIntConst.h"
-/// @brief 整数定数を表すノード
+/// @class BooleanConst BooleanConst.h "BooleanConst.h"
+/// @brief boolean型定数を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrIntConst :
-  public IrNode
+class BooleanConst :
+  public ConstVal
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] type 型
   /// @param[in] val 値
-  IrIntConst(const Type* type,
-	     int val);
+  BooleanConst(const Type* type,
+	       bool val);
 
   /// @brief デストラクタ
   virtual
-  ~IrIntConst();
+  ~BooleanConst();
 
 
 public:
@@ -39,17 +39,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 静的評価可能か調べる．
+  /// @brief ブール値を返す．
   ///
-  /// 要するに定数式かどうかということ
+  /// value_type() が boolean_type の時有効
   virtual
   bool
-  is_static() const;
-
-  /// @brief 整数値を返す．
-  virtual
-  int
-  int_val() const;
+  boolean_val() const;
 
 
 private:
@@ -58,10 +53,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  int mVal;
+  bool mVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRINTCONST_H
+#endif // BOOLEANCONST_H

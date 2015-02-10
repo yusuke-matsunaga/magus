@@ -91,12 +91,12 @@ set (ymsl_SOURCES
   src/ir/IrScopeHandle.cc
   src/ir/IrTypeHandle.cc
   src/ir/IrVarHandle.cc
+  src/ir/ConstVal.cc
+  src/ir/BooleanConst.cc
+  src/ir/IntConst.cc
+  src/ir/FloatConst.cc
+  src/ir/StringConst.cc
   src/ir/IrNode.cc
-  src/ir/IrTrue.cc
-  src/ir/IrFalse.cc
-  src/ir/IrIntConst.cc
-  src/ir/IrFloatConst.cc
-  src/ir/IrStringConst.cc
   src/ir/IrOp.cc
   src/ir/IrUniOp.cc
   src/ir/IrBinOp.cc

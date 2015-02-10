@@ -18,11 +18,11 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 名前
-// @param[in] const_node 定数ノード
+// @param[in] const_val 定数値
 IrConstHandle::IrConstHandle(ShString name,
-			     IrNode* const_node) :
+			     const ConstVal* const_val) :
   mName(name),
-  mConstNode(const_node)
+  mConstVal(const_val)
 {
 }
 
@@ -45,13 +45,13 @@ IrConstHandle::handle_type() const
   return kConstant;
 }
 
-// @brief 定数ノードを返す．
+// @brief 定数値を返す．
 //
 // 他の要素の場合には NULL を返す．
-IrNode*
+const ConstVal*
 IrConstHandle::constant() const
 {
-  return mConstNode;
+  return mConstVal;
 }
 
 END_NAMESPACE_YM_YMSL

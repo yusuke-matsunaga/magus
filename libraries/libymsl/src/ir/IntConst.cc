@@ -1,40 +1,41 @@
 
-/// @file IrTrue.cc
-/// @brief IrTrue の実装ファイル
+/// @file IntConst.cc
+/// @brief IntConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrTrue.h"
+#include "IntConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrTrue
+// クラス IntConst
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] type 型
-IrTrue::IrTrue(const Type* type) :
-  IrNode(kTrue, type)
+// @param[in] val 値
+IntConst::IntConst(const Type* type,
+		   int val) :
+  ConstVal(type),
+  mVal(val)
 {
 }
 
 // @brief デストラクタ
-IrTrue::~IrTrue()
+IntConst::~IntConst()
 {
 }
 
-// @brief 静的評価可能か調べる．
-//
-// 要するに定数式かどうかということ
-bool
-IrTrue::is_static() const
+// @brief 整数値を返す．
+int
+IntConst::int_val() const
 {
-  return true;
+  return mVal;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -30,9 +30,9 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_YMSL
 
 class YmslCodeList;
-class YmslParser;
 class YmslObj;
 
+class ConstVal;
 class Function;
 class IrHandle;
 class IrNode;
@@ -50,7 +50,6 @@ class AstMgr;
 class AstModule;
 class AstParam;
 class AstStatement;
-class AstStringConst;
 class AstSymbol;
 class AstToplevel;
 class AstType;
@@ -224,7 +223,6 @@ enum TypeId {
 ostream&
 operator<<(ostream& s,
 	   TypeId vt);
-
 
 
 //////////////////////////////////////////////////////////////////////

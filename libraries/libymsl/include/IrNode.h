@@ -29,12 +29,6 @@ public:
   /// @brief IrNode の種類
   //////////////////////////////////////////////////////////////////////
   enum IrType {
-    // 定数
-    kTrue,
-    kFalse,
-    kIntConst,
-    kFloatConst,
-    kStringConst,
     // 単項演算
     kUniOp,
     // 二項演算
@@ -126,27 +120,6 @@ public:
   virtual
   IrNode*
   operand(ymuint pos) const;
-
-  /// @brief 整数値を返す．
-  ///
-  /// kIntConst のみ有効
-  virtual
-  int
-  int_val() const;
-
-  /// @brief 実数値を返す．
-  ///
-  /// kFloatConst のみ有効
-  virtual
-  double
-  float_val() const;
-
-  /// @brief 文字列を返す．
-  ///
-  /// kStringConst のみ有効
-  virtual
-  const char*
-  string_val() const;
 
   /// @brief ロード/ストア対象のアドレスを得る．
   ///

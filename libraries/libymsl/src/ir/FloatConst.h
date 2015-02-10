@@ -1,33 +1,37 @@
-#ifndef YMSLSUBSPACE_H
-#define YMSLSUBSPACE_H
+#ifndef FLOATCONST_H
+#define FLOATCONST_H
 
-/// @file YmslSubspace.h
-/// @brief YmslSubspace のヘッダファイル
+/// @file FloatConst.h
+/// @brief FloatConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymsl_int.h"
+#include "ConstVal.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslSubspace YmslSubspace.h "YmslSubspace.h"
-/// @brief 名前空間を表すクラス
+/// @class FloatConst FloatConst.h "FloatConst.h"
+/// @brief 実数定数を表すノード
 //////////////////////////////////////////////////////////////////////
-class YmslSubspace
+class FloatConst :
+  public ConstVal
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 名前
-  YmslSubspace(ShString name);
+  /// @param[in] type 型
+  /// @param[in] val 値
+  FloatConst(const Type* type,
+	     double val);
 
   /// @brief デストラクタ
-  ~YmslSubspace();
+  virtual
+  ~FloatConst();
 
 
 public:
@@ -35,10 +39,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 名前を返す．
+  /// @brief 実数値を返す．
   virtual
-  ShString
-  name() const;
+  double
+  float_val() const;
 
 
 private:
@@ -46,12 +50,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 下位の辞書
-  SymDict mDict;
+  // 値
+  double mVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-
-#endif // YMSLSUBSPACE_H
+#endif // FLOATCONST_H

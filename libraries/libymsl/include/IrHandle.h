@@ -92,7 +92,7 @@ public:
   ///
   /// kConstant のみ有効
   virtual
-  IrNode*
+  const ConstVal*
   constant() const;
 
   /// @brief ラベルを返す．

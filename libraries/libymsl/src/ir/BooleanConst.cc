@@ -1,48 +1,41 @@
 
-/// @file IrIntConst.cc
-/// @brief IrIntConst の実装ファイル
+/// @file BooleanConst.cc
+/// @brief BooleanConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrIntConst.h"
+#include "BooleanConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrIntConst
+// クラス BooleanConst
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] type 型
 // @param[in] val 値
-IrIntConst::IrIntConst(const Type* type,
-		       int val) :
-  IrNode(kIntConst, type),
+BooleanConst::BooleanConst(const Type* type,
+			   bool val) :
+  ConstVal(type),
   mVal(val)
 {
 }
 
 // @brief デストラクタ
-IrIntConst::~IrIntConst()
+BooleanConst::~BooleanConst()
 {
 }
 
-// @brief 静的評価可能か調べる．
+// @brief ブール値を返す．
 //
-// 要するに定数式かどうかということ
+// value_type() が boolean_type の時有効
 bool
-IrIntConst::is_static() const
-{
-  return true;
-}
-
-// @brief 整数値を返す．
-int
-IrIntConst::int_val() const
+BooleanConst::boolean_val() const
 {
   return mVal;
 }

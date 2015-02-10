@@ -460,8 +460,8 @@ IrMgr::reg_enum(const AstStatement* stmt,
   for (ymuint i = 0; i < n; ++ i) {
     ShString name = type->enum_elem_name(i);
     int val = type->enum_elem_val(i);
-    IrNode* const_node = new_IntConst(val);
-    IrHandle* h = new_ConstHandle(name, const_node);
+    const ConstVal* const_val = new_IntConst(val);
+    IrHandle* h = new_ConstHandle(name, const_val);
     enum_scope->add(h);
   }
 
@@ -576,8 +576,10 @@ IrMgr::reg_const(const AstStatement* stmt,
   IrNode* node = elab_expr(stmt->expr(), scope);
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
+  const ConstVal* const_val;
+  // const_val = eval(node);
 
-  IrHandle* h1 = new_ConstHandle(name, node);
+  IrHandle* h1 = new_ConstHandle(name, const_val);
   scope->add(h1);
 }
 
@@ -695,19 +697,19 @@ IrMgr::elab_expr(const AstExpr* ast_expr,
   IrNode* node = NULL;
   switch ( ast_expr->expr_type() ) {
   case AstExpr::kTrue:
-    return new_True();
+    return new_ConstNode(new_True());
 
   case AstExpr::kFalse:
-    return new_False();
+    return new_ConstNode(new_False());
 
   case AstExpr::kIntConst:
-    return new_IntConst(ast_expr->int_val());
+    return new_ConstNode(new_IntConst(ast_expr->int_val()));
 
   case AstExpr::kFloatConst:
-    return new_FloatConst(ast_expr->float_val());
+    return new_ConstNode(new_FloatConst(ast_expr->float_val()));
 
   case AstExpr::kStringConst:
-    return new_StringConst(ast_expr->string_val());
+    return new_ConstNode(new_StringConst(ast_expr->string_val()));
 
   case AstExpr::kSymbolExpr:
   case AstExpr::kArrayRef:

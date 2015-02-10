@@ -12,6 +12,8 @@
 #include "IrHandle.h"
 #include "Var.h"
 #include "Function.h"
+#include "ConstVal.h"
+#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -37,13 +39,114 @@ void
 IrPrinter::print_code(const vector<IrNode*>& node_list)
 {
   ymuint n = node_list.size();
+  vector<IrNode*> all_list;
   for (ymuint i = 0; i < n; ++ i) {
     IrNode* node = node_list[i];
-    node->set_id(i + 1);
+    dfs_node(node, all_list);
   }
-  for (ymuint i = 0; i < n; ++ i) {
-    IrNode* node = node_list[i];
+
+  ymuint n2 = all_list.size();
+  for (ymuint i = 0; i < n2; ++ i) {
+    IrNode* node = all_list[i];
     print_node(node);
+  }
+}
+
+// @brief ノードに番号をつける．
+// @param[in] node ノード
+// @param[in] node_list ノードリスト
+void
+IrPrinter::dfs_node(IrNode* node,
+		    vector<IrNode*>& node_list)
+{
+  switch ( node->node_type() ) {
+  case IrNode::kUniOp:
+    dfs_node(node->operand(0), node_list);
+    break;
+
+  case IrNode::kBinOp:
+    dfs_node(node->operand(0), node_list);
+    dfs_node(node->operand(1), node_list);
+    break;
+
+  case IrNode::kTriOp:
+    dfs_node(node->operand(0), node_list);
+    dfs_node(node->operand(1), node_list);
+    dfs_node(node->operand(2), node_list);
+    break;
+
+  case IrNode::kLoad:
+    dfs_handle(node->address(), node_list);
+    break;
+
+  case IrNode::kStore:
+    dfs_handle(node->address(), node_list);
+    dfs_node(node->store_val(), node_list);
+    break;
+
+  case IrNode::kInplaceUniOp:
+    dfs_handle(node->address(), node_list);
+    break;
+
+  case IrNode::kInplaceBinOp:
+    dfs_handle(node->address(), node_list);
+    dfs_node(node->operand(0), node_list);
+    break;
+
+  case IrNode::kFuncCall:
+    dfs_handle(node->func_addr(), node_list);
+    {
+      ymuint n = node->arglist_num();
+      for (ymuint i = 0; i < n; ++ i) {
+	dfs_node(node->arglist_elem(i), node_list);
+      }
+    }
+    break;
+
+  case IrNode::kReturn:
+    if ( node->return_val() ) {
+      dfs_node(node->return_val(), node_list);
+    }
+    break;
+
+  case IrNode::kJump:
+    break;
+
+  case IrNode::kBranchTrue:
+  case IrNode::kBranchFalse:
+    dfs_node(node->branch_cond(), node_list);
+    break;
+
+  default:
+    break;
+  }
+  node->set_id(node_list.size());
+  node_list.push_back(node);
+}
+
+// @brief ハンドルが指しているノードに番号をつける．
+// @param[in] handle ハンドル
+// @param[in] node_list ノードリスト
+void
+IrPrinter::dfs_handle(IrHandle* handle,
+		      vector<IrNode*>& node_list)
+{
+  switch ( handle->handle_type() ) {
+  case IrHandle::kArrayRef:
+    dfs_node(handle->array_expr(), node_list);
+    dfs_node(handle->array_index(), node_list);
+    break;
+
+  case IrHandle::kMemberRef:
+    dfs_node(handle->obj_expr(), node_list);
+    break;
+
+  case IrHandle::kMethodRef:
+    dfs_node(handle->obj_expr(), node_list);
+    break;
+
+  default:
+    break;
   }
 }
 
@@ -53,26 +156,6 @@ IrPrinter::print_node(IrNode* node)
 {
   mS << "%" << node->id() << " = ";
   switch ( node->node_type() ) {
-  case IrNode::kTrue:
-    mS << "true";
-    break;
-
-  case IrNode::kFalse:
-    mS << "false";
-    break;
-
-  case IrNode::kIntConst:
-    mS << "int(" << node->int_val() << ")";
-    break;
-
-  case IrNode::kFloatConst:
-    mS << "float(" << node->float_val() << ")";
-    break;
-
-  case IrNode::kStringConst:
-    mS << "string(" << node->string_val() << ")";
-    break;
-
   case IrNode::kUniOp:
     switch ( node->opcode() ) {
     case kOpCastBoolean:
@@ -333,7 +416,37 @@ IrPrinter::print_handle(IrHandle* handle)
     break;
 
   case IrHandle::kConstant:
-    mS << "constant[]";
+    mS << "constant[";
+    {
+      const ConstVal* val = handle->constant();
+      switch ( val->value_type()->type_id() ) {
+      case kBooleanType:
+	if ( val->boolean_val() ) {
+	  mS << "true";
+	}
+	else {
+	  mS << "false";
+	}
+	break;
+
+      case kIntType:
+	mS << val->int_val();
+	break;
+
+      case kFloatType:
+	mS << val->float_val();
+	break;
+
+      case kStringType:
+	mS << val->string_val();
+	break;
+
+      default:
+	ASSERT_NOT_REACHED;
+	break;
+      }
+    }
+    mS << "]";
     break;
 
   case IrHandle::kLabel:

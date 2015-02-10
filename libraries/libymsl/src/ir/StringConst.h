@@ -1,50 +1,43 @@
-#ifndef IRSTRINGCONST_H
-#define IRSTRINGCONST_H
+#ifndef STRINGCONST_H
+#define STRINGCONST_H
 
-/// @file IrStringConst.h
-/// @brief IrStringConst のヘッダファイル
+/// @file StringConst.h
+/// @brief StringConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "ConstVal.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrStringConst IrStringConst.h "IrStringConst.h"
+/// @class StringConst StringConst.h "StringConst.h"
 /// @brief 文字列定数を表すノード
 //////////////////////////////////////////////////////////////////////
-class IrStringConst :
-  public IrNode
+class StringConst :
+  public ConstVal
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] type 型
   /// @param[in] val 値
-  IrStringConst(const Type* type,
-		const char* val);
+  StringConst(const Type* type,
+	      const char* val);
 
   /// @brief デストラクタ
   virtual
-  ~IrStringConst();
+  ~StringConst();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 静的評価可能か調べる．
-  ///
-  /// 要するに定数式かどうかということ
-  virtual
-  bool
-  is_static() const;
 
   /// @brief 文字列を返す．
   virtual
@@ -64,4 +57,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRSTRINGCONST_H
+#endif // STRINGCONST_H
