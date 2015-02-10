@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "IrInplaceOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
 /// @class IrInplaceBinOp IrInplaceBinOp.h "IrInplaceBinOp.h"
-/// @brief 自己代入型の単項演算子を表すクラス
+/// @brief 自己代入型のニ項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
 class IrInplaceBinOp :
-  public IrNode
+  public IrInplaceOp
 {
 public:
 
@@ -40,20 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 静的評価可能か調べる．
-  ///
-  /// 要するに定数式かどうかということ
-  virtual
-  bool
-  is_static() const;
-
-  /// @brief ロード/ストア対象のアドレスを得る．
-  ///
-  /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-  virtual
-  IrHandle*
-  address() const;
 
   /// @brief オペランド数を返す．
   ///
@@ -76,15 +62,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // アドレス
-  IrHandle* mAddress;
-
   // オペランド
   IrNode* mOperand;
 
 };
 
 END_NAMESPACE_YM_YMSL
-
 
 #endif // IRINPLACEBINOP_H

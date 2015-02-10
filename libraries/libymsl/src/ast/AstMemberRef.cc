@@ -35,7 +35,7 @@ AstMemberRef::~AstMemberRef()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstMemberRef::expr_type() const
 {
   return kMemberRef;

@@ -23,8 +23,7 @@ BEGIN_NAMESPACE_YM_YMSL
 IrInplaceBinOp::IrInplaceBinOp(OpCode opcode,
 			       IrHandle* lhs_addr,
 			       IrNode* opr1) :
-  IrNode(opcode, NULL),
-  mAddress(lhs_addr),
+  IrInplaceOp(kInplaceBinOp, opcode, lhs_addr),
   mOperand(opr1)
 {
 }
@@ -32,24 +31,6 @@ IrInplaceBinOp::IrInplaceBinOp(OpCode opcode,
 // @brief デストラクタ
 IrInplaceBinOp::~IrInplaceBinOp()
 {
-}
-
-// @brief 静的評価可能か調べる．
-//
-// 要するに定数式かどうかということ
-bool
-IrInplaceBinOp::is_static() const
-{
-  return false;
-}
-
-// @brief ロード/ストア対象のアドレスを得る．
-//
-// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-IrHandle*
-IrInplaceBinOp::address() const
-{
-  return mAddress;
 }
 
 // @brief オペランド数を返す．

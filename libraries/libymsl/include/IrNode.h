@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "OpCode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -24,11 +25,47 @@ BEGIN_NAMESPACE_YM_YMSL
 class IrNode
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  /// @brief IrNode の種類
+  //////////////////////////////////////////////////////////////////////
+  enum IrType {
+    // 定数
+    kTrue,
+    kFalse,
+    kIntConst,
+    kFloatConst,
+    kStringConst,
+    // 単項演算
+    kUniOp,
+    // 二項演算
+    kBinOp,
+    // 三項演算
+    kTriOp,
+    // ロード/ストア
+    kLoad,
+    kStore,
+    // 演算付き代入
+    kInplaceUniOp,
+    kInplaceBinOp,
+    // 関数呼び出し/復帰
+    kFuncCall,
+    kReturn,
+    // ジャンプ
+    kJump,
+    kBranchTrue,
+    kBranchFalse,
+    // 特殊
+    kLabel,
+    // 停止
+    kHalt
+  };
+
+public:
 
   /// @brief コンストラクタ
-  /// @param[in] opcode オペコード
+  /// @param[in] irtype IRタイプ
   /// @param[in] type 型
-  IrNode(OpCode opcode,
+  IrNode(IrType irtype,
 	 const Type* type);
 
   /// @brief デストラクタ
@@ -41,13 +78,16 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief opcode を返す．
-  OpCode
-  opcode() const;
+  /// @brief ノードの型を返す．
+  IrType
+  node_type() const;
 
-  /// @brief 型を返す．
+  /// @brief 値の型を返す．
+  ///
+  /// 値を返すタイプのみ意味を持つ．
+  /// それ以外のノードでは NULL を返す．
   const Type*
-  type() const;
+  value_type() const;
 
   /// @brief 番号を返す．
   ymuint
@@ -64,6 +104,13 @@ public:
   virtual
   bool
   is_static() const = 0;
+
+  /// @brief オペコードを返す．
+  ///
+  /// 演算子のみ有効
+  virtual
+  OpCode
+  opcode() const;
 
   /// @brief オペランド数を返す．
   ///
@@ -82,86 +129,49 @@ public:
 
   /// @brief 整数値を返す．
   ///
-  /// kOpIntConst のみ有効
+  /// kIntConst のみ有効
   virtual
   int
   int_val() const;
 
   /// @brief 実数値を返す．
   ///
-  /// kOpFloatConst のみ有効
+  /// kFloatConst のみ有効
   virtual
   double
   float_val() const;
 
   /// @brief 文字列を返す．
   ///
-  /// kOpStringConst のみ有効
+  /// kStringConst のみ有効
   virtual
   const char*
   string_val() const;
 
   /// @brief ロード/ストア対象のアドレスを得る．
   ///
-  /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
+  /// kLoad, kStore, kInplaceUniOp, kInplaceBinOp のみ有効
   virtual
   IrHandle*
   address() const;
 
   /// @brief 書き込む値を返す．
   ///
-  /// kOpStore のみ有効
+  /// kStore のみ有効
   virtual
   IrNode*
   store_val() const;
 
-#if 0
-  /// @brief 変数を返す．
-  ///
-  /// kOpVarRef, kOpMemberRef のみ有効
-  virtual
-  const Var*
-  var() const;
-
-  /// @brief 関数本体を返す．
-  ///
-  /// kOpFuncRef のみ有効
-  virtual
-  const Function*
-  function() const;
-
-  /// @brief 配列本体の式を返す．
-  ///
-  /// kOpArrayRef のみ有効
-  virtual
-  IrNode*
-  array_expr() const;
-
-  /// @brief 配列のインデックスを返す．
-  ///
-  /// kOpArrayRef のみ有効
-  virtual
-  IrNode*
-  array_index() const;
-
-  /// @brief オブジェクトを指す式を返す．
-  ///
-  /// kOpMemberRef のみ有効
-  virtual
-  IrNode*
-  obj_expr() const;
-#endif
-
   /// @brief 関数アドレスを返す．
   ///
-  /// kOpFuncCall のみ有効
+  /// kFuncCall のみ有効
   virtual
   IrHandle*
   func_addr() const;
 
   /// @brief 関数の引数の数を得る．
   ///
-  /// kOpFuncCall のみ有効
+  /// kFuncCall のみ有効
   virtual
   ymuint
   arglist_num() const;
@@ -169,42 +179,42 @@ public:
   /// @brief 関数の引数を得る．
   /// @param[in] pos 位置 ( 0 <= pos < arglist_num() )
   ///
-  /// kOpFuncCall のみ有効
+  /// kFuncCall のみ有効
   virtual
   IrNode*
   arglist_elem(ymuint pos) const;
 
   /// @brief ジャンプ先のノードを得る．
   ///
-  /// kOpJump, kOpBranchXXX のみ有効
+  /// kJump, kBranchXXX のみ有効
   virtual
   IrNode*
   jump_addr() const;
 
   /// @brief 分岐条件
   ///
-  /// kOpBranchXXX のみ有効
+  /// kBranchXXX のみ有効
   virtual
   IrNode*
   branch_cond() const;
 
   /// @brief 返り値
   ///
-  /// kOpReturn のみ有効
+  /// kReturn のみ有効
   virtual
   IrNode*
   return_val() const;
 
   /// @brief 定義済みの時に true を返す．
   ///
-  /// kOpLabel のみ意味を持つ．
+  /// kLabel のみ意味を持つ．
   virtual
   bool
   is_defined() const;
 
   /// @brief 定義済みにする．
   ///
-  /// kOpLabel のみ意味を持つ．
+  /// kLabel のみ意味を持つ．
   virtual
   void
   set_defined();
@@ -216,7 +226,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // オペコード
-  OpCode mOpCode;
+  IrType mIrType;
 
   // 型
   const Type* mType;
@@ -225,6 +235,13 @@ private:
   ymuint mId;
 
 };
+
+/// @brief IrType を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] irtype IR型
+ostream&
+operator<<(ostream& s,
+	   IrNode::IrType irtype);
 
 END_NAMESPACE_YM_YMSL
 

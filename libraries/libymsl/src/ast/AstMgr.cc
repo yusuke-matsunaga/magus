@@ -35,6 +35,7 @@
 #include "AstIf.h"
 #include "AstImport.h"
 #include "AstIncr.h"
+#include "AstInplaceOp.h"
 #include "AstIntConst.h"
 #include "AstIteOp.h"
 #include "AstLabel.h"
@@ -311,18 +312,31 @@ AstMgr::new_FuncDecl(AstSymbol* name,
 }
 
 // @brief 代入文を作る．
-// @param[in] stmt_type 文の種類
 // @param[in] left 左辺
 // @param[in] right 右辺
 // @param[in] loc ファイル位置
 AstStatement*
-AstMgr::new_Assignment(StmtType stmt_type,
-		       AstExpr* left,
+AstMgr::new_Assignment(AstExpr* left,
 		       AstExpr* right,
 		       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstAssignment));
-  return new (p) AstAssignment(stmt_type, left, right, loc);
+  return new (p) AstAssignment(left, right, loc);
+}
+
+// @brief 演算付き代入文を作る．
+// @param[in] opcode オペコード
+// @param[in] left 左辺
+// @param[in] right 右辺
+// @param[in] loc ファイル位置
+AstStatement*
+AstMgr::new_InplaceOp(OpCode opcode,
+		      AstExpr* left,
+		      AstExpr* right,
+		      const FileRegion& loc)
+{
+  void* p = mAlloc.get_memory(sizeof(AstInplaceOp));
+  return new (p) AstInplaceOp(opcode, left, right, loc);
 }
 
 // @brief 増加文を作る．
@@ -535,28 +549,28 @@ AstMgr::new_NullStmt(const FileRegion& loc)
 }
 
 // @brief 単項演算式を作る．
-// @param[in] op 演算子のタイプ
+// @param[in] opcode オペコード
 // @param[in] left オペランド
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_UniOp(ExprType op,
+AstMgr::new_UniOp(OpCode opcode,
 		  AstExpr* left,
 		  const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstUniOp));
-  return new (p) AstUniOp(op, left, loc);
+  return new (p) AstUniOp(opcode, left, loc);
 }
 
 // @brief 二項演算式を作る．
-// @param[in] op 演算子のタイプ
+// @param[in] opcode オペコード
 // @param[in] left, right オペランド
 AstExpr*
-AstMgr::new_BinOp(ExprType op,
+AstMgr::new_BinOp(OpCode opcode,
 		  AstExpr* left,
 		  AstExpr* right)
 {
   void* p = mAlloc.get_memory(sizeof(AstBinOp));
-  return new (p) AstBinOp(op, left, right);
+  return new (p) AstBinOp(opcode, left, right);
 }
 
 // @brief ITE演算式を作る．

@@ -101,7 +101,7 @@ fr_merge(const FileRegion fr_array[],
   AstSymbol*        symbol_type;
   AstSymbolList*    symbollist_type;
   AstType*          type_type;
-  StmtType          stmttype_type;
+  OpCode            opcode_type;
 }
 
 
@@ -194,6 +194,7 @@ fr_merge(const FileRegion fr_array[],
 %type <exprlist_type>   expr_list
 %type <module_type>     module
 %type <modulelist_type> module_list
+%type <opcode_type>     eqop
 %type <param_type>      param
 %type <paramlist_type>  param_list
 %type <statement_type>  block_stmt
@@ -204,7 +205,6 @@ fr_merge(const FileRegion fr_array[],
 %type <statement_type>  else_stmt
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
-%type <stmttype_type>   eqop
 %type <symbollist_type> scope_list
 %type <type_type>       type
 
@@ -327,9 +327,14 @@ statement
 
 single_stmt
 // 代入文
-: primary eqop expr
+: primary EQ expr
 {
-  $$ = mgr.new_Assignment($2, $1, $3, @$);
+  $$ = mgr.new_Assignment($1, $3, @$);
+}
+// 演算付き代入文
+| primary eqop expr
+{
+  $$ = mgr.new_InplaceOp($2, $1, $3, @$);
 }
 // 式文
 | expr
@@ -403,17 +408,16 @@ enumconst_list
 // 代入文の演算子
 // なんかバカみたいなアクション定義
 eqop
-: EQ       { $$ = kEqAssign; }
-| EQPLUS   { $$ = kEqPlus; }
-| EQMINUS  { $$ = kEqMinus; }
-| EQMULT   { $$ = kEqMult; }
-| EQDIV    { $$ = kEqDiv; }
-| EQMOD    { $$ = kEqMod; }
-| EQLSHIFT { $$ = kEqLshift; }
-| EQRSHIFT { $$ = kEqRshift; }
-| EQBITAND { $$ = kEqAnd; }
-| EQBITOR  { $$ = kEqOr; }
-| EQBITXOR { $$ = kEqXor; }
+: EQPLUS   { $$ = kOpAdd; }
+| EQMINUS  { $$ = kOpSub; }
+| EQMULT   { $$ = kOpMul; }
+| EQDIV    { $$ = kOpDiv; }
+| EQMOD    { $$ = kOpMod; }
+| EQLSHIFT { $$ = kOpLshift; }
+| EQRSHIFT { $$ = kOpRshift; }
+| EQBITAND { $$ = kOpBitAnd; }
+| EQBITOR  { $$ = kOpBitOr; }
+| EQBITXOR { $$ = kOpBitXor; }
 ;
 
 // 複合文
@@ -634,100 +638,102 @@ expr
 // 単項演算
 | MINUS expr %prec UOP
 {
-  $$ = mgr.new_UniOp(kUniMinus, $2, @$);
+  $$ = mgr.new_UniOp(kOpUniMinus, $2, @$);
 }
 | BITNEG expr
 {
-  $$ = mgr.new_UniOp(kBitNeg, $2, @$);
+  $$ = mgr.new_UniOp(kOpBitNeg, $2, @$);
 }
 | LOGNOT expr
 {
-  $$ = mgr.new_UniOp(kLogNot, $2, @$);
+  $$ = mgr.new_UniOp(kOpLogNot, $2, @$);
 }
 | INT LP expr RP
 {
-  $$ = mgr.new_UniOp(kCastInt, $3, @$);
+  $$ = mgr.new_UniOp(kOpCastInt, $3, @$);
 }
 | BOOLEAN LP expr RP
 {
-  $$ = mgr.new_UniOp(kCastBoolean, $3, @$);
+  $$ = mgr.new_UniOp(kOpCastBoolean, $3, @$);
 }
 | FLOAT LP expr RP
 {
-  $$ = mgr.new_UniOp(kCastFloat, $3, @$);
+  $$ = mgr.new_UniOp(kOpCastFloat, $3, @$);
 }
 // 二項演算
 | expr PLUS expr
 {
-  $$ = mgr.new_BinOp(kPlus, $1, $3);
+  $$ = mgr.new_BinOp(kOpAdd, $1, $3);
 }
 | expr MINUS expr
 {
-  $$ = mgr.new_BinOp(kMinus, $1, $3);
+  $$ = mgr.new_BinOp(kOpSub, $1, $3);
 }
 | expr MULT expr
 {
-  $$ = mgr.new_BinOp(kMult, $1, $3);
+  $$ = mgr.new_BinOp(kOpMul, $1, $3);
 }
 | expr DIV expr
 {
-  $$ = mgr.new_BinOp(kDiv, $1, $3);
+  $$ = mgr.new_BinOp(kOpDiv, $1, $3);
 }
 | expr MOD expr
 {
-  $$ = mgr.new_BinOp(kMod, $1, $3);
+  $$ = mgr.new_BinOp(kOpMod, $1, $3);
 }
 | expr LSHIFT expr
 {
-  $$ = mgr.new_BinOp(kLshift, $1, $3);
+  $$ = mgr.new_BinOp(kOpLshift, $1, $3);
 }
 | expr RSHIFT expr
 {
-  $$ = mgr.new_BinOp(kRshift, $1, $3);
+  $$ = mgr.new_BinOp(kOpRshift, $1, $3);
 }
 | expr BITAND expr
 {
-  $$ = mgr.new_BinOp(kBitAnd, $1, $3);
+  $$ = mgr.new_BinOp(kOpBitAnd, $1, $3);
 }
 | expr BITOR expr
 {
-  $$ = mgr.new_BinOp(kBitOr, $1, $3);
+  $$ = mgr.new_BinOp(kOpBitOr, $1, $3);
 }
 | expr BITXOR expr
 {
-  $$ = mgr.new_BinOp(kBitXor, $1, $3);
+  $$ = mgr.new_BinOp(kOpBitXor, $1, $3);
 }
 | expr LOGAND expr
 {
-  $$ = mgr.new_BinOp(kLogAnd, $1, $3);
+  $$ = mgr.new_BinOp(kOpLogAnd, $1, $3);
 }
 | expr LOGOR expr
 {
-  $$ = mgr.new_BinOp(kLogOr, $1, $3);
+  $$ = mgr.new_BinOp(kOpLogOr, $1, $3);
 }
 | expr EQEQ expr
 {
-  $$ = mgr.new_BinOp(kEqual, $1, $3);
+  $$ = mgr.new_BinOp(kOpEqual, $1, $3);
 }
 | expr NOTEQ expr
 {
-  $$ = mgr.new_BinOp(kNotEq, $1, $3);
+  $$ = mgr.new_BinOp(kOpNotEq, $1, $3);
 }
 | expr LT expr
 {
-  $$ = mgr.new_BinOp(kLt, $1, $3);
+  $$ = mgr.new_BinOp(kOpLt, $1, $3);
 }
 | expr GT expr
 {
-  $$ = mgr.new_BinOp(kGt, $1, $3);
+  // LT にしてオペランドを入れ替える．
+  $$ = mgr.new_BinOp(kOpLt, $3, $1);
 }
 | expr LE expr
 {
-  $$ = mgr.new_BinOp(kLe, $1, $3);
+  $$ = mgr.new_BinOp(kOpLe, $1, $3);
 }
 | expr GE expr
 {
-  $$ = mgr.new_BinOp(kGe, $1, $3);
+  // LE にしてオペランドを入れ替える．
+  $$ = mgr.new_BinOp(kOpLe, $3, $1);
 }
 | expr QST expr COLON expr %prec ITE
 {

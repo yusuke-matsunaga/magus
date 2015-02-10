@@ -31,7 +31,7 @@ AstSymbolExpr::~AstSymbolExpr()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstSymbolExpr::expr_type() const
 {
   return kSymbolExpr;

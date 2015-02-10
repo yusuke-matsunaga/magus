@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 IrLabel::IrLabel() :
-  IrNode(kOpLabel, NULL),
+  IrNode(kLabel, NULL),
   mDefined(false)
 {
 }

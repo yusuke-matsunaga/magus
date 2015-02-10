@@ -41,7 +41,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
+  Type
   expr_type() const;
 
   /// @brief 浮動小数点値を返す．

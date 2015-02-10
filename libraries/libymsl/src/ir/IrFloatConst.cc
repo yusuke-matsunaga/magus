@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] val 値
 IrFloatConst::IrFloatConst(const Type* type,
 			   double val) :
-  IrNode(kOpFloatConst, type),
+  IrNode(kFloatConst, type),
   mVal(val)
 {
 }

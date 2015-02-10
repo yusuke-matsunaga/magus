@@ -45,7 +45,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
+  Type
   expr_type() const;
 
   /// @brief 関数本体を返す．

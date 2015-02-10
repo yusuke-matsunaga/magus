@@ -8,6 +8,7 @@
 
 
 #include "RsrvWordDic.h"
+#include "OpCode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL

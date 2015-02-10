@@ -24,7 +24,7 @@ IrBinOp::IrBinOp(OpCode opcode,
 		 const Type* type,
 		 IrNode* src1,
 		 IrNode* src2) :
-  IrNode(opcode, type)
+  IrOp(kBinOp, opcode, type)
 {
   mOperand[0] = src1;
   mOperand[1] = src2;

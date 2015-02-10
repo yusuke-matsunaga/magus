@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] type 型
 IrFalse::IrFalse(const Type* type) :
-  IrNode(kOpFalse, type)
+  IrNode(kFalse, type)
 {
 }
 

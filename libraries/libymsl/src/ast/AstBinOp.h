@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "AstOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,14 +19,14 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 二項演算子を表す AstExpr
 //////////////////////////////////////////////////////////////////////
 class AstBinOp :
-  public AstExpr
+  public AstOp
 {
 public:
 
   /// @breif コンストラクタ
-  /// @param[in] op 演算子のタイプ
+  /// @param[in] opcode オペコード
   /// @param[in] left, right オペランド
-  AstBinOp(ExprType op,
+  AstBinOp(OpCode opcode,
 	   AstExpr* left,
 	   AstExpr* right);
 
@@ -42,7 +42,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
+  Type
   expr_type() const;
 
   /// @brief オペランド数を返す．
@@ -65,9 +65,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 演算子のタイプ
-  ExprType mOp;
 
   // 左オペランド
   AstExpr* mLeft;

@@ -17,16 +17,13 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] stmt_type 文の種類
 // @param[in] left 左辺
 // @param[in] right 右辺
 // @param[in] loc ファイル位置
-AstAssignment::AstAssignment(StmtType stmt_type,
-			     AstExpr* left,
+AstAssignment::AstAssignment(AstExpr* left,
 			     AstExpr* right,
 			     const FileRegion& loc) :
   AstStatement(loc),
-  mStmtType(stmt_type),
   mLeft(left),
   mRight(right)
 {
@@ -41,7 +38,7 @@ AstAssignment::~AstAssignment()
 StmtType
 AstAssignment::stmt_type() const
 {
-  return mStmtType;
+  return kAssignment;
 }
 
 // @brief 左辺式を返す．

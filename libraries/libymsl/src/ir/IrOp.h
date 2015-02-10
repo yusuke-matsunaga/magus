@@ -1,35 +1,39 @@
-#ifndef ASTSYMBOLEXPR_H
-#define ASTSYMBOLEXPR_H
+#ifndef IROP_H
+#define IROP_H
 
-/// @file AstSymbolExpr.h
-/// @brief AstSymbolExpr のヘッダファイル
+/// @file IrOp.h
+/// @brief IrOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AstExpr.h"
-
+#include "IrNode.h"
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstSymbolExpr AstSymbolExpr.h "AstSymbolExpr.h"
-/// @brief シンボル式を表すクラス
+/// @class IrOp IrOp.h "IrOp.h"
+/// @brief 演算子に共通な親クラス
 //////////////////////////////////////////////////////////////////////
-class AstSymbolExpr :
-  public AstExpr
+class IrOp :
+  public IrNode
+
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] symbol シンボル
-  AstSymbolExpr(AstSymbol* symbol);
+  /// @param[in] irtype IR型
+  /// @param[in] opcode オペコード
+  /// @param[in] type 値の型
+  IrOp(IrType irtype,
+       OpCode opcode,
+       const Type* type);
 
   /// @brief デストラクタ
   virtual
-  ~AstSymbolExpr();
+  ~IrOp();
 
 
 public:
@@ -37,17 +41,18 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 種類を返す．
-  virtual
-  Type
-  expr_type() const;
-
-  /// @brief シンボル名を返す．
+  /// @brief オペコードを返す．
   ///
-  /// kSymbolExpr のみ有効
+  /// 演算子のみ有効
   virtual
-  const AstSymbol*
-  symbol() const;
+  OpCode
+  opcode() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
 
 private:
@@ -55,11 +60,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // シンボル
-  AstSymbol* mSymbol;
+  // オペコード
+  OpCode mOpCode;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTSYMBOLEXPR_H
+#endif // IROP_H

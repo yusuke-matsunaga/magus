@@ -35,7 +35,7 @@ AstArrayRef::~AstArrayRef()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstArrayRef::expr_type() const
 {
   return kArrayRef;

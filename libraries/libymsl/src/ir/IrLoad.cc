@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] addr アドレス
 IrLoad::IrLoad(const Type* type,
 	       IrHandle* addr) :
-  IrNode(kOpLoad, type),
+  IrNode(kLoad, type),
   mAddress(addr)
 {
 }

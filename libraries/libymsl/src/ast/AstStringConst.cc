@@ -32,7 +32,7 @@ AstStringConst::~AstStringConst()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstStringConst::expr_type() const
 {
   return kStringConst;

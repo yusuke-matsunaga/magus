@@ -10,6 +10,7 @@
 
 
 #include "Ast.h"
+#include "OpCode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -110,16 +111,23 @@ public:
   const AstExpr*
   enum_const_expr(ymuint pos) const;
 
+  /// @brief オペコードを返す．
+  ///
+  /// kInplaceOp のみ有効
+  virtual
+  OpCode
+  opcode() const;
+
   /// @brief 左辺式を返す．
   ///
-  /// kAssignment のみ有効
+  /// kAssignment, kInplaceOp, kIncr, kDecr のみ有効
   virtual
   const AstExpr*
   lhs_expr() const;
 
   /// @brief 式を返す．
   ///
-  /// kAssignment,
+  /// kAssignment, kInplaceOp
   /// kDoWhile, kFor, kIf, kWhile, kSwitch
   /// kExprStmt, kReturn, kVarDecl のみ有効
   virtual

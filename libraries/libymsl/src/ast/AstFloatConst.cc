@@ -32,7 +32,7 @@ AstFloatConst::~AstFloatConst()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstFloatConst::expr_type() const
 {
   return kFloatConst;

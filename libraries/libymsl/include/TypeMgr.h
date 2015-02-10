@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "OpCode.h"
 #include "YmUtils/ShString.h"
 #include "YmUtils/HashMap.h"
 

@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] ret_val 返り値を表す式
 IrReturn::IrReturn(IrNode* ret_val) :
-  IrNode(kOpReturn, NULL),
+  IrNode(kReturn, NULL),
   mReturnVal(ret_val)
 {
 }

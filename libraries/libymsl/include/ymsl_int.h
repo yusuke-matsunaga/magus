@@ -237,17 +237,8 @@ enum StmtType {
   kDecr,
   kDoWhile,
   kEnumDecl,
-  kEqAssign,
-  kEqPlus,
-  kEqMinus,
-  kEqMult,
-  kEqDiv,
-  kEqMod,
-  kEqLshift,
-  kEqRshift,
-  kEqAnd,
-  kEqOr,
-  kEqXor,
+  kAssignment,
+  kInplaceOp,
   kExprStmt,
   kFor,
   kFuncDecl,
@@ -270,133 +261,6 @@ enum StmtType {
 ostream&
 operator<<(ostream& s,
 	   StmtType st);
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief 式の種類
-//////////////////////////////////////////////////////////////////////
-enum ExprType {
-  // 定数
-  kTrue,
-  kFalse,
-  kIntConst,
-  kFloatConst,
-  kStringConst,
-  // 終端
-  kSymbolExpr,
-  kArrayRef,
-  kMemberRef,
-  // 単項演算
-  kCastInt,
-  kCastBoolean,
-  kCastFloat,
-  kBitNeg,
-  kLogNot,
-  kUniMinus,
-  // 二項演算
-  kBitAnd,
-  kBitOr,
-  kBitXor,
-  kLogAnd,
-  kLogOr,
-  kPlus,
-  kMinus,
-  kMult,
-  kDiv,
-  kMod,
-  kLshift,
-  kRshift,
-  kEqual,
-  kNotEq,
-  kLt,
-  kLe,
-  kGt,
-  kGe,
-  // 三項演算
-  kIte,
-  // 関数呼び出し
-  kFuncCall
-};
-
-/// @brief ExprType を出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] et 式の種類
-ostream&
-operator<<(ostream& s,
-	   ExprType et);
-
-
-//////////////////////////////////////////////////////////////////////
-/// @brief IrNode の種類
-//////////////////////////////////////////////////////////////////////
-enum OpCode {
-  // 定数
-  kOpTrue,
-  kOpFalse,
-  kOpIntConst,
-  kOpFloatConst,
-  kOpStringConst,
-  // 単項演算
-  kOpCastBoolean,
-  kOpCastInt,
-  kOpCastFloat,
-  kOpBitNeg,
-  kOpLogNot,
-  kOpUniMinus,
-  // 二項演算
-  kOpBitAnd,
-  kOpBitOr,
-  kOpBitXor,
-  kOpLogAnd,
-  kOpLogOr,
-  kOpAdd,
-  kOpSub,
-  kOpMul,
-  kOpDiv,
-  kOpMod,
-  kOpLshift,
-  kOpRshift,
-  kOpEqual,
-  kOpNotEq,
-  kOpLt,
-  kOpLe,
-  // 三項演算
-  kOpIte,
-  // ロード/ストア
-  kOpLoad,
-  kOpStore,
-  // 計算付き代入
-  kOpInc,
-  kOpDec,
-  kOpInplaceBitAnd,
-  kOpInplaceBitOr,
-  kOpInplaceBitXor,
-  kOpInplaceAdd,
-  kOpInplaceSub,
-  kOpInplaceMul,
-  kOpInplaceDiv,
-  kOpInplaceMod,
-  kOpInplaceLshift,
-  kOpInplaceRshift,
-  // 関数呼び出し/復帰
-  kOpFuncCall,
-  kOpReturn,
-  // ジャンプ
-  kOpJump,
-  kOpBranchTrue,
-  kOpBranchFalse,
-  // 特殊
-  kOpLabel,
-  // 停止
-  kOpHalt
-};
-
-/// @brief OpCode を出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] op オペオード
-ostream&
-operator<<(ostream& s,
-	   OpCode op);
 
 
 //////////////////////////////////////////////////////////////////////

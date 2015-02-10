@@ -17,13 +17,13 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] opcode オペコード
+// @param[in] irtype IR型
 // @param[in] label ジャンプ先のラベル
 // @param[in] cond 条件
-IrJump::IrJump(OpCode opcode,
+IrJump::IrJump(IrType irtype,
 	       IrNode* label,
 	       IrNode* cond) :
-  IrNode(opcode, NULL),
+  IrNode(irtype, NULL),
   mJumpAddr(label),
   mCond(cond)
 {

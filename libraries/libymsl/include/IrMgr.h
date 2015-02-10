@@ -114,12 +114,12 @@ private:
   resolve_type(const AstType* asttype,
 	       Scope* scope);
 
-  /// @brief 右辺式の実体化を行う．
+  /// @brief 式の実体化を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
   IrNode*
-  elab_rhs(const AstExpr* ast_expr,
-	   Scope* scope);
+  elab_expr(const AstExpr* ast_expr,
+	    Scope* scope);
 
   /// @brief プライマリ式の解析を行う．
   /// @param[in] ast_expr 式を表す構文木
@@ -257,14 +257,24 @@ private:
   IrNode*
   new_Return(IrNode* ret_val = NULL);
 
-  /// @brief ジャンプ系のノードを生成する．
-  /// @param[in] opcode オペコード
+  /// @brief ジャンプノードを生成する．
+  /// @param[in] label ジャンプ先のラベル
+  IrNode*
+  new_Jump(IrNode* label);
+
+  /// @brief 分岐ノードを生成する．
   /// @param[in] label ジャンプ先のラベル
   /// @param[in] cond 条件
   IrNode*
-  new_Jump(OpCode opcode,
-	   IrNode* label,
-	   IrNode* cond = NULL);
+  new_BranchTrue(IrNode* label,
+		 IrNode* cond);
+
+  /// @brief 分岐ノードを生成する．
+  /// @param[in] label ジャンプ先のラベル
+  /// @param[in] cond 条件
+  IrNode*
+  new_BranchFalse(IrNode* label,
+		  IrNode* cond);
 
   /// @brief ラベルノードを生成する．
   IrNode*

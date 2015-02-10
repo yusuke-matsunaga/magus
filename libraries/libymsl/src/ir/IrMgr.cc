@@ -140,7 +140,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// not inside loop
 	return;
       }
-      IrNode* node = new_Jump(kOpJump, end_label);
+      IrNode* node = new_Jump(end_label);
       node_list.push_back(node);
     }
     break;
@@ -155,7 +155,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// not inside loop
 	return;
       }
-      IrNode* node = new_Jump(kOpJump, start_label);
+      IrNode* node = new_Jump(start_label);
       node_list.push_back(node);
     }
     break;
@@ -180,8 +180,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* end1 = new_Label();
       node_list.push_back(start1);
       elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
-      IrNode* node1 = new_Jump(kOpBranchTrue, start1, cond);
+      IrNode* cond = elab_expr(stmt->expr(), scope);
+      IrNode* node1 = new_BranchTrue(start1, cond);
       node_list.push_back(node1);
       node_list.push_back(end1);
     }
@@ -191,9 +191,9 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     reg_enum(stmt, scope);
     break;
 
-  case kEqAssign:
+  case kAssignment:
     {
-      IrNode* rhs = elab_rhs(stmt->expr(), scope);
+      IrNode* rhs = elab_expr(stmt->expr(), scope);
       if ( rhs == NULL ) {
 	// エラー
 	return;
@@ -211,18 +211,9 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kEqPlus:
-  case kEqMinus:
-  case kEqMult:
-  case kEqDiv:
-  case kEqMod:
-  case kEqLshift:
-  case kEqRshift:
-  case kEqAnd:
-  case kEqOr:
-  case kEqXor:
+  case kInplaceOp:
     {
-      IrNode* rhs = elab_rhs(stmt->expr(), scope);
+      IrNode* rhs = elab_expr(stmt->expr(), scope);
       if ( rhs == NULL ) {
 	// エラー
 	return;
@@ -235,20 +226,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
       // lhs_handle->type() と rhs->type() のチェック
       // 必要ならキャスト
-      OpCode opcode;
-      switch ( stmt->stmt_type() ) {
-      case kEqPlus:   opcode = kOpInplaceAdd; break;
-      case kEqMinus:  opcode = kOpInplaceSub; break;
-      case kEqMult:   opcode = kOpInplaceMul; break;
-      case kEqDiv:    opcode = kOpInplaceDiv; break;
-      case kEqMod:    opcode = kOpInplaceMod; break;
-      case kEqLshift: opcode = kOpInplaceLshift; break;
-      case kEqRshift: opcode = kOpInplaceRshift; break;
-      case kEqAnd:    opcode = kOpInplaceBitAnd; break;
-      case kEqOr:     opcode = kOpInplaceBitOr; break;
-      case kEqXor:    opcode = kOpInplaceBitXor; break;
-      default: ASSERT_NOT_REACHED; break;
-      }
+      OpCode opcode = stmt->opcode();
       IrNode* node = new_InplaceBinOp(opcode, lhs_handle, rhs);
       node_list.push_back(node);
     }
@@ -256,7 +234,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kExprStmt:
     {
-      IrNode* node = elab_rhs(stmt->expr(), scope);
+      IrNode* node = elab_expr(stmt->expr(), scope);
       node_list.push_back(node);
     }
     break;
@@ -268,12 +246,12 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* start1 = new_Label();
       node_list.push_back(start1);
       IrNode* end1 = new_Label();
-      IrNode* cond = elab_rhs(stmt->expr(), for_scope);
-      IrNode* node1 = new_Jump(kOpBranchFalse, end1, cond);
+      IrNode* cond = elab_expr(stmt->expr(), for_scope);
+      IrNode* node1 = new_BranchFalse(end1, cond);
       node_list.push_back(node1);
       elab_stmt(stmt->stmt(), for_scope, start1, end1, node_list);
       elab_stmt(stmt->next_stmt(), for_scope, start1, end1, node_list);
-      IrNode* node2 = new_Jump(kOpJump, start1);
+      IrNode* node2 = new_Jump(start1);
       node_list.push_back(node2);
       node_list.push_back(end1);
     }
@@ -302,20 +280,20 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	  return;
 	}
       }
-      IrNode* node = new_Jump(kOpJump, label_node);
+      IrNode* node = new_Jump(label_node);
       node_list.push_back(node);
     }
     break;
 
   case kIf:
     {
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_expr(stmt->expr(), scope);
       IrNode* label1 = new_Label();
       IrNode* label2 = new_Label();
-      IrNode* node1 = new_Jump(kOpBranchFalse, label1, cond);
+      IrNode* node1 = new_BranchFalse(label1, cond);
       node_list.push_back(node1);
       elab_stmt(stmt->stmt(), scope, start_label, end_label, node_list);
-      IrNode* node2 = new_Jump(kOpJump, label2);
+      IrNode* node2 = new_Jump(label2);
       node_list.push_back(node2);
       node_list.push_back(label1);
       elab_stmt(stmt->else_stmt(), scope, start_label, end_label, node_list);
@@ -372,7 +350,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       const AstExpr* expr = stmt->expr();
       IrNode* ret_val = NULL;
       if ( expr != NULL ) {
-	ret_val = elab_rhs(expr, scope);
+	ret_val = elab_expr(expr, scope);
       }
       IrNode* node = new_Return(ret_val);
       node_list.push_back(node);
@@ -381,7 +359,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kSwitch:
     {
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_expr(stmt->expr(), scope);
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
 	vector<IrNode*> node_list1;
@@ -408,22 +386,17 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     {
       IrNode* start1 = new_Label();
       node_list.push_back(start1);
-      IrNode* cond = elab_rhs(stmt->expr(), scope);
+      IrNode* cond = elab_expr(stmt->expr(), scope);
       IrNode* end1 = new_Label();
-      IrNode* node1 = new_Jump(kOpBranchFalse, end1, cond);
+      IrNode* node1 = new_BranchFalse(end1, cond);
       node_list.push_back(node1);
       elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
-      IrNode* node2 = new_Jump(kOpJump, start1);
+      IrNode* node2 = new_Jump(start1);
       node_list.push_back(node2);
       node_list.push_back(end1);
     }
     break;
 
-#if 0
-  default:
-    cerr << "stmt_type() = " << stmt->stmt_type() << endl;
-    ASSERT_NOT_REACHED;
-#endif
   }
 }
 
@@ -456,7 +429,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
     const AstExpr* ec_expr = stmt->enum_const_expr(i);
     int v;
     if ( ec_expr != NULL ) {
-      IrNode* node = elab_rhs(ec_expr, scope);
+      IrNode* node = elab_expr(ec_expr, scope);
       if ( node == NULL ) {
 	// エラー
 	return;
@@ -465,7 +438,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
 	// ec_expr が定数式ではない．
 	return;
       }
-      if ( node->type() != mTypeMgr.int_type() ) {
+      if ( node->value_type() != mTypeMgr.int_type() ) {
 	// 整数型ではない．
 	return;
       }
@@ -600,7 +573,7 @@ IrMgr::reg_const(const AstStatement* stmt,
     return;
   }
 
-  IrNode* node = elab_rhs(stmt->expr(), scope);
+  IrNode* node = elab_expr(stmt->expr(), scope);
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
 
@@ -716,59 +689,29 @@ IrMgr::resolve_type(const AstType* asttype,
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
 IrNode*
-IrMgr::elab_rhs(const AstExpr* ast_expr,
-		Scope* scope)
+IrMgr::elab_expr(const AstExpr* ast_expr,
+		 Scope* scope)
 {
-  IrNode* op0 = NULL;
-  IrNode* op1 = NULL;
-  IrNode* op2 = NULL;
-  ymuint nop = ast_expr->operand_num();
-  ASSERT_COND( nop <= 3 );
-  if ( nop > 0 ) {
-    op0 = elab_rhs(ast_expr->operand(0), scope);
-    if ( op0 == NULL ) {
-      return NULL;
-    }
-    if ( nop > 1 ) {
-      op1 = elab_rhs(ast_expr->operand(1), scope);
-      if ( op1 == NULL ) {
-	return NULL;
-      }
-      if ( nop > 2 ) {
-	op2 = elab_rhs(ast_expr->operand(2), scope);
-	if ( op2 == NULL ) {
-	  return NULL;
-	}
-      }
-    }
-  }
-
   IrNode* node = NULL;
-  OpCode opcode = kOpHalt;
   switch ( ast_expr->expr_type() ) {
-  case kTrue:
-    node = new_True();
-    return node;
+  case AstExpr::kTrue:
+    return new_True();
 
-  case kFalse:
-    node = new_False();
-    return node;
+  case AstExpr::kFalse:
+    return new_False();
 
-  case kIntConst:
-    node = new_IntConst(ast_expr->int_val());
-    return node;
+  case AstExpr::kIntConst:
+    return new_IntConst(ast_expr->int_val());
 
-  case kFloatConst:
-    node = new_FloatConst(ast_expr->float_val());
-    return node;
+  case AstExpr::kFloatConst:
+    return new_FloatConst(ast_expr->float_val());
 
-  case kStringConst:
-    node = new_StringConst(ast_expr->string_val());
-    return node;
+  case AstExpr::kStringConst:
+    return new_StringConst(ast_expr->string_val());
 
-  case kSymbolExpr:
-  case kArrayRef:
-  case kMemberRef:
+  case AstExpr::kSymbolExpr:
+  case AstExpr::kArrayRef:
+  case AstExpr::kMemberRef:
     {
       IrHandle* h = elab_primary(ast_expr, scope);
       if ( h == NULL ) {
@@ -777,13 +720,13 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
       return new_Load(h);
     }
 
-  case kFuncCall:
+  case AstExpr::kFuncCall:
     {
       const AstExpr* func_expr = ast_expr->func();
       ymuint n = ast_expr->arglist_num();
       vector<IrNode*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
-	IrNode* arg = elab_rhs(ast_expr->arglist_elem(i), scope);
+	IrNode* arg = elab_expr(ast_expr->arglist_elem(i), scope);
 	// arg->type() と func->type()->function_input_type(i) をチェック
 	// 必要に応じてキャストノードを挿入する．
 	arglist[i] = arg;
@@ -794,180 +737,103 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
     }
     break;
 
-  case kCastInt:
-    opcode = kOpCastInt;
-    break;
-
-  case kCastBoolean:
-    opcode = kOpCastBoolean;
-    break;
-
-  case kCastFloat:
-    opcode = kOpCastFloat;
-    break;
-
-  case kBitNeg:
-    opcode = kOpBitNeg;
-    break;
-
-  case kLogNot:
-    opcode = kOpLogNot;
-    break;
-
-  case kUniMinus:
-    opcode = kOpUniMinus;
-    break;
-
-  case kBitAnd:
-    opcode = kOpBitAnd;
-    break;
-  case kBitOr:
-    opcode = kOpBitOr;
-    break;
-
-  case kBitXor:
-    opcode = kOpBitXor;
-    break;
-
-  case kLogAnd:
-    opcode = kOpLogAnd;
-    break;
-
-  case kLogOr:
-    opcode = kOpLogOr;
-    break;
-
-  case kPlus:
-    opcode = kOpAdd;
-    break;
-
-  case kMinus:
-    opcode = kOpSub;
-    break;
-
-  case kMult:
-    opcode = kOpMul;
-    break;
-
-  case kDiv:
-    opcode = kOpDiv;
-    break;
-
-  case kMod:
-    opcode = kOpMod;
-    break;
-
-  case kLshift:
-    opcode = kOpLshift;
-    break;
-
-  case kRshift:
-    opcode = kOpRshift;
-    break;
-
-  case kEqual:
-    opcode = kOpEqual;
-    break;
-
-  case kNotEq:
-    opcode = kOpNotEq;
-    break;
-
-  case kLt:
-    opcode = kOpLt;
-    break;
-
-  case kLe:
-    opcode = kOpLe;
-    break;
-
-  case kGt:
-    opcode = kOpLt;
+  case AstExpr::kUniOp:
     {
-      IrNode* tmp = op0;
-      op0 = op1;
-      op1 = tmp;
-    }
-    break;
+      IrNode* op0 = elab_expr(ast_expr->operand(0), scope);
+      if ( op0 == NULL ) {
+	return NULL;
+      }
+      OpCode opcode = ast_expr->opcode();
+      const Type* op0_type = op0->value_type();
+      const Type* op0_rtype;
+      const Type* type = mTypeMgr.calc_type1(opcode, op0_type, op0_rtype);
+      if ( type == NULL ) {
+	// type mismatch
+	return NULL;
+      }
 
-  case kGe:
-    opcode = kOpLe;
+      if ( op0_type != op0_rtype ) {
+	// キャストノードの挿入
+	// 結果を op0 に代入
+      }
+
+      return new_UniOp(opcode, type, op0);
+    }
+
+  case AstExpr::kBinOp:
     {
-      IrNode* tmp = op0;
-      op0 = op1;
-      op1 = tmp;
-    }
-    break;
+      IrNode* op0 = elab_expr(ast_expr->operand(0), scope);
+      if ( op0 == NULL ) {
+	return NULL;
+      }
+      IrNode* op1 = elab_expr(ast_expr->operand(1), scope);
+      if ( op1 == NULL ) {
+	return NULL;
+      }
+      OpCode opcode = ast_expr->opcode();
+      const Type* op0_type = op0->value_type();
+      const Type* op1_type = op1->value_type();
+      const Type* op0_rtype;
+      const Type* op1_rtype;
+      const Type* type = mTypeMgr.calc_type2(opcode, op0_type, op1_type, op0_rtype, op1_rtype);
+      if ( type == NULL ) {
+	// type mismatch
+	cerr << "type mismatch" << endl;
+	return NULL;
+      }
 
-  case kIte:
-    opcode = kOpIte;
-    break;
-  }
+      if ( op0_rtype != op0_type ) {
+	// キャストノードの挿入
+      }
 
-  if ( nop == 1 ) {
-    const Type* op0_type = op0->type();
-    const Type* op0_rtype;
-    const Type* type = mTypeMgr.calc_type1(opcode, op0_type, op0_rtype);
-    if ( type == NULL ) {
-      // type mismatch
-      return NULL;
-    }
+      if ( op1_rtype != op1_type ) {
+	// キャストノードの挿入
+      }
 
-    if ( op0_type != op0_rtype ) {
-      // キャストノードの挿入
-      // 結果を op0 に代入
-    }
-    node = new_UniOp(opcode, type, op0);
-    return node;
-  }
-  else if ( nop == 2 ) {
-    const Type* op0_type = op0->type();
-    const Type* op1_type = op1->type();
-    const Type* op0_rtype;
-    const Type* op1_rtype;
-    const Type* type = mTypeMgr.calc_type2(opcode, op0_type, op1_type, op0_rtype, op1_rtype);
-    if ( type == NULL ) {
-      // type mismatch
-      cerr << "type mismatch" << endl;
-      return NULL;
+      return new_BinOp(opcode, type, op0, op1);
     }
 
-    if ( op0_rtype != op0_type ) {
-      // キャストノードの挿入
-    }
+  case AstExpr::kTriOp:
+    {
+      IrNode* op0 = elab_expr(ast_expr->operand(0), scope);
+      if ( op0 == NULL ) {
+	return NULL;
+      }
+      IrNode* op1 = elab_expr(ast_expr->operand(1), scope);
+      if ( op1 == NULL ) {
+	return NULL;
+      }
+      IrNode* op2 = elab_expr(ast_expr->operand(2), scope);
+      if ( op2 == NULL ) {
+	return NULL;
+      }
+      OpCode opcode = ast_expr->opcode();
+      const Type* op0_type = op0->value_type();
+      const Type* op1_type = op1->value_type();
+      const Type* op2_type = op2->value_type();
+      const Type* op0_rtype;
+      const Type* op1_rtype;
+      const Type* op2_rtype;
+      const Type* type = mTypeMgr.calc_type3(opcode, op0_type, op1_type, op2_type, op0_rtype, op1_rtype, op2_rtype);
+      if ( type == NULL ) {
+	// type mismatch
+	return NULL;
+      }
 
-    if ( op1_rtype != op1_type ) {
-      // キャストノードの挿入
-    }
-    node = new_BinOp(opcode, type, op0, op1);
-    return node;
-  }
-  else if ( nop == 3 ) {
-    const Type* op0_type = op0->type();
-    const Type* op1_type = op1->type();
-    const Type* op2_type = op2->type();
-    const Type* op0_rtype;
-    const Type* op1_rtype;
-    const Type* op2_rtype;
-    const Type* type = mTypeMgr.calc_type3(opcode, op0_type, op1_type, op2_type, op0_rtype, op1_rtype, op2_rtype);
-    if ( type == NULL ) {
-      // type mismatch
-      return NULL;
-    }
+      if ( op0_rtype != op0_type ) {
+	// キャストノードの挿入
+      }
 
-    if ( op0_rtype != op0_type ) {
-      // キャストノードの挿入
-    }
+      if ( op1_rtype != op1_type ) {
+	// キャストノードの挿入
+      }
 
-    if ( op1_rtype != op1_type ) {
-      // キャストノードの挿入
-    }
+      if ( op2_rtype != op2_type ) {
+	// キャストノードの挿入
+      }
 
-    if ( op2_rtype != op2_type ) {
-      // キャストノードの挿入
+      return new_TriOp(opcode, type, op0, op1, op2);
     }
-    node = new_TriOp(opcode, type, op0, op1, op2);
-    return node;
   }
 
   ASSERT_NOT_REACHED;
@@ -982,7 +848,7 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
 		    Scope* scope)
 {
   switch ( ast_expr->expr_type() ) {
-  case kSymbolExpr:
+  case AstExpr::kSymbolExpr:
     {
       const AstSymbol* symbol = ast_expr->symbol();
       IrHandle* h = scope->find(symbol->str_val());
@@ -993,7 +859,7 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
       return h;
     }
 
-  case kArrayRef:
+  case AstExpr::kArrayRef:
     {
       // 配列本体やインデックス値自体は右辺値
       IrHandle* h = elab_primary(ast_expr->body(), scope);
@@ -1001,13 +867,13 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
 	return NULL;
       }
       IrNode* base = new_Load(h);
-      if ( base->type()->type_id() != kArrayType ) {
+      if ( base->value_type()->type_id() != kArrayType ) {
 	// base is not an array
 	return NULL;
       }
 
-      IrNode* offset = elab_rhs(ast_expr->index(), scope);
-      if ( offset->type()->type_id() != kIntType ) {
+      IrNode* offset = elab_expr(ast_expr->index(), scope);
+      if ( offset->value_type()->type_id() != kIntType ) {
 	// offset is not an integer
 	return NULL;
       }
@@ -1015,7 +881,7 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
       return new_ArrayRef(base, offset);
     }
 
-  case kMemberRef:
+  case AstExpr::kMemberRef:
     {
       const AstExpr* body = ast_expr->body();
       const AstSymbol* member_symbol = ast_expr->member();

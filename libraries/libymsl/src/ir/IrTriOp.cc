@@ -25,7 +25,7 @@ IrTriOp::IrTriOp(OpCode opcode,
 		 IrNode* src1,
 		 IrNode* src2,
 		 IrNode* src3) :
-  IrNode(opcode, type)
+  IrOp(kTriOp, opcode, type)
 {
   mOperand[0] = src1;
   mOperand[1] = src2;

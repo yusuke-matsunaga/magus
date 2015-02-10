@@ -1,33 +1,45 @@
 
-/// @file IrInplaceUniOp.cc
-/// @brief IrInplaceUniOp の実装ファイル
+/// @file IrOp.cc
+/// @brief IrOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrInplaceUniOp.h"
+#include "IrOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrInplaceUniOp
+// クラス IrOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] irtype IR型
 // @param[in] opcode オペコード
-// @param[in] lhs_addr 左辺値
-IrInplaceUniOp::IrInplaceUniOp(OpCode opcode,
-			       IrHandle* lhs_addr) :
-  IrInplaceOp(kInplaceUniOp, opcode, lhs_addr)
+// @param[in] type 値の型
+IrOp::IrOp(IrType irtype,
+	   OpCode opcode,
+	   const Type* type) :
+  IrNode(irtype, type),
+  mOpCode(opcode)
 {
 }
 
 // @brief デストラクタ
-IrInplaceUniOp::~IrInplaceUniOp()
+IrOp::~IrOp()
 {
+}
+
+// @brief オペコードを返す．
+//
+// 演算子のみ有効
+OpCode
+IrOp::opcode() const
+{
+  return mOpCode;
 }
 
 END_NAMESPACE_YM_YMSL

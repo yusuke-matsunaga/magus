@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "IrInplaceOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 自己代入型の単項演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
 class IrInplaceUniOp :
-  public IrNode
+  public IrInplaceOp
 {
 public:
 
@@ -32,35 +32,6 @@ public:
   /// @brief デストラクタ
   virtual
   ~IrInplaceUniOp();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 静的評価可能か調べる．
-  ///
-  /// 要するに定数式かどうかということ
-  virtual
-  bool
-  is_static() const;
-
-  /// @brief ロード/ストア対象のアドレスを得る．
-  ///
-  /// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
-  virtual
-  IrHandle*
-  address() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // アドレス
-  IrHandle* mAddress;
 
 };
 

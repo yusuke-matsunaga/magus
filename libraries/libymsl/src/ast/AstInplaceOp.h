@@ -1,8 +1,8 @@
-#ifndef ASTASSIGNMENT_H
-#define ASTASSIGNMENT_H
+#ifndef ASTINPLACEOP_H
+#define ASTINPLACEOP_H
 
-/// @file AstAssignment.h
-/// @brief AstAssignment のヘッダファイル
+/// @file AstInplaceOp.h
+/// @brief AstInplaceOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,25 +15,27 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class AstAssignment AstAssignment.h "AstAssignment.h"
+/// @class AstInplaceOp AstInplaceOp.h "AstInplaceOp.h"
 /// @brief 代入文を表す AstStatement
 //////////////////////////////////////////////////////////////////////
-class AstAssignment :
+class AstInplaceOp :
   public AstStatement
 {
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] opcode オペコード
   /// @param[in] left 左辺
   /// @param[in] right 右辺
   /// @param[in] loc ファイル位置
-  AstAssignment(AstExpr* left,
-		AstExpr* right,
-		const FileRegion& loc);
+  AstInplaceOp(OpCode opcode,
+	       AstExpr* left,
+	       AstExpr* right,
+	       const FileRegion& loc);
 
   /// @brief デストラクタ
   virtual
-  ~AstAssignment();
+  ~AstInplaceOp();
 
 
 public:
@@ -46,16 +48,23 @@ public:
   StmtType
   stmt_type() const;
 
+  /// @brief オペコードを返す．
+  ///
+  /// kInplaceOp のみ有効
+  virtual
+  OpCode
+  opcode() const;
+
   /// @brief 左辺式を返す．
   ///
-  /// kAssignment のみ有効
+  /// kInplaceOp のみ有効
   virtual
   const AstExpr*
   lhs_expr() const;
 
   /// @brief 式を返す．
   ///
-  /// kAssignment,
+  /// kInplaceOp,
   /// kDoWhile, kFor, kIf, kWhile, kSwitch
   /// kExprStmt, kReturn, kVarDecl のみ有効
   virtual
@@ -68,6 +77,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // オペコード
+  OpCode mOpCode;
+
   // 左辺式
   AstExpr* mLeft;
 
@@ -78,4 +90,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // ASTASSIGNMENT_H
+#endif // ASTINPLACEOP_H

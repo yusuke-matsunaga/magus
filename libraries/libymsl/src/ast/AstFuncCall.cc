@@ -38,7 +38,7 @@ AstFuncCall::~AstFuncCall()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstFuncCall::expr_type() const
 {
   return kFuncCall;

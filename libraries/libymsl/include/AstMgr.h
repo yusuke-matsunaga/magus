@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "OpCode.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/SimpleAlloc.h"
@@ -163,15 +164,24 @@ public:
 	       const FileRegion& loc);
 
   /// @brief 代入文を作る．
-  /// @param[in] stmt_type 文の種類
   /// @param[in] left 左辺
   /// @param[in] right 右辺
   /// @param[in] loc ファイル位置
   AstStatement*
-  new_Assignment(StmtType stmt_type,
-		 AstExpr* left,
+  new_Assignment(AstExpr* left,
 		 AstExpr* right,
 		 const FileRegion& loc);
+
+  /// @brief 演算付き代入文を作る．
+  /// @param[in] opcode オペコード
+  /// @param[in] left 左辺
+  /// @param[in] right 右辺
+  /// @param[in] loc ファイル位置
+  AstStatement*
+  new_InplaceOp(OpCode opcode,
+		AstExpr* left,
+		AstExpr* right,
+		const FileRegion& loc);
 
   /// @brief 増加文を作る．
   /// @param[in] expr 対象の式
@@ -298,19 +308,19 @@ public:
   new_NullStmt(const FileRegion& loc);
 
   /// @brief 単項演算式を作る．
-  /// @param[in] op 演算子のタイプ
+  /// @param[in] opcode オペコード
   /// @param[in] left オペランド
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_UniOp(ExprType op,
+  new_UniOp(OpCode opcode,
 	    AstExpr* left,
 	    const FileRegion& loc);
 
   /// @brief 二項演算式を作る．
-  /// @param[in] op 演算子のタイプ
+  /// @param[in] opcode オペコード
   /// @param[in] left, right オペランド
   AstExpr*
-  new_BinOp(ExprType op,
+  new_BinOp(OpCode opcode,
 	    AstExpr* left,
 	    AstExpr* right);
 

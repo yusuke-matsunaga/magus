@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_YMSL
 IrUniOp::IrUniOp(OpCode opcode,
 		 const Type* type,
 		 IrNode* src1) :
-  IrNode(opcode, type),
+  IrOp(kUniOp, opcode, type),
   mSrc1(src1)
 {
 }

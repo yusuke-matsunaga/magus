@@ -149,11 +149,11 @@ IrMgr::new_Load(IrHandle* addr)
     break;
 
   case IrHandle::kConstant:
-    type = addr->constant()->type();
+    type = addr->constant()->value_type();
     break;
 
   case IrHandle::kArrayRef:
-    type = addr->array_expr()->type()->elem_type();
+    type = addr->array_expr()->value_type()->elem_type();
     break;
 
   default:
@@ -219,17 +219,35 @@ IrMgr::new_Return(IrNode* ret_val)
   return new (p) IrReturn(ret_val);
 }
 
-// @brief ジャンプ系のノードを生成する．
-// @param[in] opcode オペコード
+// @brief ジャンプノードを生成する．
+// @param[in] label ジャンプ先のラベル
+IrNode*
+IrMgr::new_Jump(IrNode* label)
+{
+  void* p = mAlloc.get_memory(sizeof(IrJump));
+  return new (p) IrJump(IrNode::kJump, label, NULL);
+}
+
+// @brief 分岐ノードを生成する．
 // @param[in] label ジャンプ先のラベル
 // @param[in] cond 条件
 IrNode*
-IrMgr::new_Jump(OpCode opcode,
-		IrNode* label,
-		IrNode* cond)
+IrMgr::new_BranchTrue(IrNode* label,
+		      IrNode* cond)
 {
   void* p = mAlloc.get_memory(sizeof(IrJump));
-  return new (p) IrJump(opcode, label, cond);
+  return new (p) IrJump(IrNode::kBranchTrue, label, cond);
+}
+
+// @brief 分岐ノードを生成する．
+// @param[in] label ジャンプ先のラベル
+// @param[in] cond 条件
+IrNode*
+IrMgr::new_BranchFalse(IrNode* label,
+		       IrNode* cond)
+{
+  void* p = mAlloc.get_memory(sizeof(IrJump));
+  return new (p) IrJump(IrNode::kBranchFalse, label, cond);
 }
 
 // @brief ラベルノードを生成する．

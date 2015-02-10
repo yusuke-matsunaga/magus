@@ -17,11 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] opcode オペコード
+// @param[in] irtype IR型
 // @param[in] type 型
-IrNode::IrNode(OpCode opcode,
+IrNode::IrNode(IrType irtype,
 	       const Type* type) :
-  mOpCode(opcode),
+  mIrType(irtype),
   mType(type)
 {
 }
@@ -31,16 +31,16 @@ IrNode::~IrNode()
 {
 }
 
-// @brief opcode を返す．
-OpCode
-IrNode::opcode() const
+// @brief ノードの型(IR型)を返す．
+IrNode::IrType
+IrNode::node_type() const
 {
-  return mOpCode;
+  return mIrType;
 }
 
-// @brief 型を返す．
+// @brief 値の型を返す．
 const Type*
-IrNode::type() const
+IrNode::value_type() const
 {
   return mType;
 }
@@ -58,6 +58,16 @@ void
 IrNode::set_id(ymuint id)
 {
   mId = id;
+}
+
+// @brief オペコードを返す．
+//
+// 演算子のみ有効
+OpCode
+IrNode::opcode() const
+{
+  ASSERT_NOT_REACHED;
+  return kOpCastBoolean;
 }
 
 // @brief オペランド数を返す．
@@ -106,7 +116,7 @@ IrNode::string_val() const
 
 // @brief ロード/ストア対象のアドレスを得る．
 //
-// kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
+// kLoad, kStore, kInc, kDec のみ有効
 IrHandle*
 IrNode::address() const
 {
@@ -116,7 +126,7 @@ IrNode::address() const
 
 // @brief 書き込む値を返す．
 //
-// kOpStore のみ有効
+// kStore のみ有効
 IrNode*
 IrNode::store_val() const
 {
@@ -126,7 +136,7 @@ IrNode::store_val() const
 
 // @brief 関数アドレスを返す．
 //
-// kOpFuncCall のみ有効
+// kFuncCall のみ有効
 IrHandle*
 IrNode::func_addr() const
 {
@@ -136,7 +146,7 @@ IrNode::func_addr() const
 
 // @brief 関数の引数の数を得る．
 //
-// kOpFuncCall のみ有効
+// kFuncCall のみ有効
 ymuint
 IrNode::arglist_num() const
 {
@@ -147,7 +157,7 @@ IrNode::arglist_num() const
 // @brief 関数の引数を得る．
 // @param[in] pos 位置 ( 0 <= pos < arglist_num() )
 //
-// kOpFuncCall のみ有効
+// kFuncCall のみ有効
 IrNode*
 IrNode::arglist_elem(ymuint pos) const
 {
@@ -157,7 +167,7 @@ IrNode::arglist_elem(ymuint pos) const
 
 // @brief ジャンプ先のノードを得る．
 //
-// kOpJump, kOpBranchXXX のみ有効
+// kJump, kBranchXXX のみ有効
 IrNode*
 IrNode::jump_addr() const
 {
@@ -183,7 +193,7 @@ IrNode::return_val() const
 
 // @brief 定義済みの時に true を返す．
 //
-// kOpLabel のみ意味を持つ．
+// kLabel のみ意味を持つ．
 bool
 IrNode::is_defined() const
 {
@@ -193,7 +203,7 @@ IrNode::is_defined() const
 
 // @brief 定義済みにする．
 //
-// kOpLabel のみ意味を持つ．
+// kLabel のみ意味を持つ．
 void
 IrNode::set_defined()
 {
@@ -205,63 +215,31 @@ IrNode::set_defined()
 // その他
 //////////////////////////////////////////////////////////////////////
 
-// @brief OpCode を出力する．
+// @brief IrType を出力する．
 // @param[in] s 出力先のストリーム
 // @param[in] op オペオード
 ostream&
 operator<<(ostream& s,
-	   OpCode op)
+	   IrNode::IrType op)
 {
   switch ( op ) {
-  case kOpTrue:          s << "True"; break;
-  case kOpFalse:         s << "False"; break;
-  case kOpIntConst:      s << "IntConst"; break;
-  case kOpFloatConst:    s << "FloatConst"; break;
-  case kOpStringConst:   s << "StringConst"; break;
-  case kOpCastBoolean:   s << "CastBoolean"; break;
-  case kOpCastInt:       s << "CastInt"; break;
-  case kOpCastFloat:     s << "CastFloat"; break;
-  case kOpBitNeg:        s << "BitNeg"; break;
-  case kOpLogNot:        s << "LogNot"; break;
-  case kOpUniMinus:      s << "UniMinus"; break;
-  case kOpBitAnd:        s << "BitAnd"; break;
-  case kOpBitOr:         s << "BitOr"; break;
-  case kOpBitXor:        s << "BitXor"; break;
-  case kOpLogAnd:        s << "LogAnd"; break;
-  case kOpLogOr:         s << "LogOr"; break;
-  case kOpAdd:           s << "Add"; break;
-  case kOpSub:           s << "Sub"; break;
-  case kOpMul:           s << "Mul"; break;
-  case kOpDiv:           s << "Div"; break;
-  case kOpMod:           s << "Mod"; break;
-  case kOpLshift:        s << "Lshift"; break;
-  case kOpRshift:        s << "Rshift"; break;
-  case kOpEqual:         s << "Equal"; break;
-  case kOpNotEq:         s << "NotEq"; break;
-  case kOpLt:            s << "Lt"; break;
-  case kOpLe:            s << "Le"; break;
-  case kOpIte:           s << "Ite"; break;
-  case kOpLoad:          s << "Load"; break;
-  case kOpStore:         s << "Store"; break;
-  case kOpInc:           s << "Inc"; break;
-  case kOpDec:           s << "Dec"; break;
-  case kOpInplaceBitAnd: s << "InplaceBitAnd"; break;
-  case kOpInplaceBitOr:  s << "InplaceBitOr"; break;
-  case kOpInplaceBitXor: s << "InplaceBitXor"; break;
-  case kOpInplaceAdd:    s << "InplaceAdd"; break;
-  case kOpInplaceSub:    s << "InplaceSub"; break;
-  case kOpInplaceMul:    s << "InplaceMul"; break;
-  case kOpInplaceDiv:    s << "InplaceDiv"; break;
-  case kOpInplaceMod:    s << "InplaceMod"; break;
-  case kOpInplaceLshift: s << "InplaceLshift"; break;
-  case kOpInplaceRshift: s << "InplaceRshift"; break;
-  case kOpFuncCall:      s << "FuncCall"; break;
-  case kOpReturn:        s << "Return"; break;
-  case kOpJump:          s << "Jump"; break;
-  case kOpBranchTrue:    s << "BranchTrue"; break;
-  case kOpBranchFalse:   s << "BranchFalse"; break;
-  case kOpLabel:         s << "Label"; break;
-  case kOpHalt:          s << "Halt"; break;
+  case IrNode::kTrue:          s << "True"; break;
+  case IrNode::kFalse:         s << "False"; break;
+  case IrNode::kIntConst:      s << "IntConst"; break;
+  case IrNode::kFloatConst:    s << "FloatConst"; break;
+  case IrNode::kStringConst:   s << "StringConst"; break;
+  case IrNode::kUniOp:         s << "UniOp"; break;
+  case IrNode::kBinOp:         s << "BinOp"; break;
+  case IrNode::kTriOp:         s << "TriOp"; break;
+  case IrNode::kLoad:          s << "Load"; break;
+  case IrNode::kStore:         s << "Store"; break;
+  case IrNode::kFuncCall:      s << "FuncCall"; break;
+  case IrNode::kReturn:        s << "Return"; break;
+  case IrNode::kJump:          s << "Jump"; break;
+  case IrNode::kBranchTrue:    s << "BranchTrue"; break;
+  case IrNode::kBranchFalse:   s << "BranchFalse"; break;
+  case IrNode::kLabel:         s << "Label"; break;
+  case IrNode::kHalt:          s << "Halt"; break;
   default: ASSERT_NOT_REACHED; break;
   }
 

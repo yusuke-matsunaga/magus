@@ -122,6 +122,16 @@ AstStatement::enum_const_expr(ymuint pos) const
   return NULL;
 }
 
+// @brief オペコードを返す．
+//
+// kInplaceOp のみ有効
+OpCode
+AstStatement::opcode() const
+{
+  ASSERT_NOT_REACHED;
+  return kOpCastBoolean;
+}
+
 // @brief 左辺式を返す．
 //
 // kAssignment のみ有効

@@ -10,6 +10,7 @@
 
 
 #include "Ast.h"
+#include "OpCode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -21,6 +22,30 @@ BEGIN_NAMESPACE_YM_YMSL
 class AstExpr :
   public Ast
 {
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @brief 式の種類
+  //////////////////////////////////////////////////////////////////////
+  enum Type {
+    // 定数
+    kTrue,
+    kFalse,
+    kIntConst,
+    kFloatConst,
+    kStringConst,
+    // 終端
+    kSymbolExpr,
+    kArrayRef,
+    kMemberRef,
+    // 演算
+    kUniOp,
+    kBinOp,
+    kTriOp,
+    // 関数呼び出し
+    kFuncCall
+  };
+
+
 public:
 
   /// @brief コンストラクタ
@@ -39,7 +64,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
+  Type
   expr_type() const = 0;
 
   /// @brief 整数値を返す．
@@ -89,6 +114,13 @@ public:
   const AstExpr*
   index() const;
 
+  /// @brief オペコードを返す．
+  ///
+  /// 演算子のみ有効
+  virtual
+  OpCode
+  opcode() const;
+
   /// @brief オペランド数を返す．
   ///
   /// 演算子のみ有効
@@ -125,6 +157,13 @@ public:
   arglist_elem(ymuint pos) const;
 
 };
+
+/// @brief AstExpr::Type を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] et 式の種類
+ostream&
+operator<<(ostream& s,
+	   AstExpr::Type et);
 
 END_NAMESPACE_YM_YMSL
 

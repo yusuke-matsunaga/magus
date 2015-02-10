@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrNode.h"
+#include "IrOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief 三項演算を表すノード
 //////////////////////////////////////////////////////////////////////
 class IrTriOp :
-  public IrNode
+  public IrOp
 {
 public:
 

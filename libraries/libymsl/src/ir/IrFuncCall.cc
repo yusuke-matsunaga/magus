@@ -8,8 +8,6 @@
 
 
 #include "IrFuncCall.h"
-#include "Function.h"
-#include "Type.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -23,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] arglist 引数リスト
 IrFuncCall::IrFuncCall(IrHandle* func_addr,
 		       const vector<IrNode*>& arglist) :
-  IrNode(kOpFuncCall, NULL),
+  IrNode(kFuncCall, NULL),
   mFuncAddr(func_addr)
 {
   mArgNum = arglist.size();

@@ -24,10 +24,10 @@ class IrJump :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] opcode オペコード
+  /// @param[in] irtype IR型
   /// @param[in] label ジャンプ先のラベル
   /// @param[in] cond 条件
-  IrJump(OpCode opcode,
+  IrJump(IrType irtype,
 	 IrNode* label,
 	 IrNode* cond);
 

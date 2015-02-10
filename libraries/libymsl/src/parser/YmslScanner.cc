@@ -9,6 +9,7 @@
 
 #include "YmslScanner.h"
 #include "RsrvWordDic.h"
+#include "OpCode.h"
 #include "YmUtils/MsgMgr.h"
 
 

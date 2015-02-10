@@ -1,34 +1,35 @@
 
-/// @file IrStore.cc
-/// @brief IrStore の実装ファイル
+/// @file IrInplaceOp.cc
+/// @brief IrInplaceOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrStore.h"
+#include "IrInplaceOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrStore
+// クラス IrInplaceOp
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] addr アドレス
-// @param[in] val 値
-IrStore::IrStore(IrHandle* addr,
-		 IrNode* val) :
-  IrNode(kStore, NULL),
-  mAddress(addr),
-  mStoreVal(val)
+// @param[in] irtype IR型
+// @param[in] opcode オペコード
+// @param[in] lhs_addr 左辺値
+IrInplaceOp::IrInplaceOp(IrType irtype,
+			 OpCode opcode,
+			 IrHandle* lhs_addr) :
+  IrOp(irtype, opcode, NULL),
+  mAddress(lhs_addr)
 {
 }
 
 // @brief デストラクタ
-IrStore::~IrStore()
+IrInplaceOp::~IrInplaceOp()
 {
 }
 
@@ -36,7 +37,7 @@ IrStore::~IrStore()
 //
 // 要するに定数式かどうかということ
 bool
-IrStore::is_static() const
+IrInplaceOp::is_static() const
 {
   return false;
 }
@@ -45,16 +46,9 @@ IrStore::is_static() const
 //
 // kOpLoad, kOpStore, kOpInc, kOpDec のみ有効
 IrHandle*
-IrStore::address() const
+IrInplaceOp::address() const
 {
   return mAddress;
-}
-
-// @brief 書き込む値を返す．
-IrNode*
-IrStore::store_val() const
-{
-  return mStoreVal;
 }
 
 END_NAMESPACE_YM_YMSL

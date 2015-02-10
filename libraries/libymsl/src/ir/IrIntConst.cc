@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] val 値
 IrIntConst::IrIntConst(const Type* type,
 		       int val) :
-  IrNode(kOpIntConst, type),
+  IrNode(kIntConst, type),
   mVal(val)
 {
 }

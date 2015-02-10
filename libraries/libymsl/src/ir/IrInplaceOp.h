@@ -1,8 +1,8 @@
-#ifndef IRBINOP_H
-#define IRBINOP_H
+#ifndef IRINPLACEOP_H
+#define IRINPLACEOP_H
 
-/// @file IrBinOp.h
-/// @brief IrBinOp のヘッダファイル
+/// @file IrInplaceOp.h
+/// @brief IrInplaceOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,26 +15,25 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrBinOp IrBinOp.h "IrBinOp.h"
-/// @brief 二項演算を表すノード
+/// @class IrInplaceOp IrInplaceOp.h "IrInplaceOp.h"
+/// @brief 自己代入型の演算子を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrBinOp :
+class IrInplaceOp :
   public IrOp
 {
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] irtype IR型
   /// @param[in] opcode オペコード
-  /// @param[in] type 型
-  /// @param[in] src1, src2 オペランド
-  IrBinOp(OpCode opcode,
-	  const Type* type,
-	  IrNode* src1,
-	  IrNode* src2);
+  /// @param[in] lhs_addr 左辺値
+  IrInplaceOp(IrType irtype,
+	      OpCode opcode,
+	      IrHandle* lhs_addr);
 
   /// @brief デストラクタ
   virtual
-  ~IrBinOp();
+  ~IrInplaceOp();
 
 
 public:
@@ -49,20 +48,12 @@ public:
   bool
   is_static() const;
 
-  /// @brief オペランド数を返す．
+  /// @brief ロード/ストア対象のアドレスを得る．
   ///
-  /// 演算子のみ有効
+  /// kIrLoad, kIrStore, kIrInplaceUniOp, kIrInplaceBinOp のみ有効
   virtual
-  ymuint
-  operand_num() const;
-
-  /// @brief オペランドを返す．
-  /// @param[in] pos 位置 ( 0 <= pos < operand_num() )
-  ///
-  /// 演算子のみ有効
-  virtual
-  IrNode*
-  operand(ymuint pos) const;
+  IrHandle*
+  address() const;
 
 
 private:
@@ -70,11 +61,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // オペランド
-  IrNode* mOperand[2];
+  // アドレス
+  IrHandle* mAddress;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRBINOP_H
+
+#endif // IRINPLACEOP_H

@@ -114,7 +114,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << "}" << endl;
     break;
 
-  case kEqAssign:
+  case kAssignment:
     print_indent(indent);
     print_expr(stmt->lhs_expr());
     mS << " = ";
@@ -122,82 +122,22 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kEqPlus:
+  case kInplaceOp:
     print_indent(indent);
     print_expr(stmt->lhs_expr());
-    mS << " += ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqMinus:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " -= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqMult:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " *= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqDiv:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " /= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqMod:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " %= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqLshift:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " <<= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqRshift:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " >>= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqAnd:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " &= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqOr:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " |= ";
-    print_expr(stmt->expr());
-    mS << ";" << endl;
-    break;
-
-  case kEqXor:
-    print_indent(indent);
-    print_expr(stmt->lhs_expr());
-    mS << " ^= ";
+    switch ( stmt->opcode() ) {
+    case kOpAdd:    mS << " += "; break;
+    case kOpSub:    mS << " -= "; break;
+    case kOpMul:    mS << " *= "; break;
+    case kOpDiv:    mS << " /= "; break;
+    case kOpMod:    mS << " %= "; break;
+    case kOpLshift: mS << " <<= "; break;
+    case kOpRshift: mS << " >>= "; break;
+    case kOpBitAnd: mS << " &= "; break;
+    case kOpBitOr:  mS << " |= "; break;
+    case kOpBitXor: mS << " ^= "; break;
+    default: ASSERT_NOT_REACHED; break;
+    }
     print_expr(stmt->expr());
     mS << ";" << endl;
     break;
@@ -371,236 +311,244 @@ void
 AstPrinter::print_expr(const AstExpr* expr)
 {
   switch ( expr->expr_type() ) {
-  case kTrue:
+  case AstExpr::kTrue:
     mS << "true";
     break;
 
-  case kFalse:
+  case AstExpr::kFalse:
     mS << "false";
     break;
 
-  case kIntConst:
+  case AstExpr::kIntConst:
     mS << expr->int_val();
     break;
 
-  case kFloatConst:
+  case AstExpr::kFloatConst:
     mS << expr->float_val();
     break;
 
-  case kStringConst:
+  case AstExpr::kStringConst:
     mS << '"' << expr->string_val() << '"';
     break;
 
-  case kSymbolExpr:
+  case AstExpr::kSymbolExpr:
     mS << expr->symbol()->str_val();
     break;
 
-  case kMemberRef:
+  case AstExpr::kMemberRef:
     print_expr(expr->body());
     mS << "." << expr->member()->str_val();
     break;
 
-  case kArrayRef:
+  case AstExpr::kArrayRef:
     print_expr(expr->body());
     mS << "[";
     print_expr(expr->index());
     mS << "]";
     break;
 
-  case kUniMinus:
-    mS << "(";
-    mS << " - ";
-    print_expr(expr->operand(0));
-    mS << ")";
+  case AstExpr::kUniOp:
+    switch ( expr->opcode() ) {
+    case kOpUniMinus:
+      mS << "(";
+      mS << " - ";
+      print_expr(expr->operand(0));
+      mS << ")";
+      break;
+
+    case kOpBitNeg:
+      mS << "(";
+      mS << " ~ ";
+      print_expr(expr->operand(0));
+      mS << ")";
+      break;
+
+    case kOpLogNot:
+      mS << "(";
+      mS << " not ";
+      print_expr(expr->operand(0));
+      mS << ")";
+      break;
+
+    case kOpCastInt:
+      mS << "int(";
+      print_expr(expr->operand(0));
+      mS << ")";
+      break;
+
+    case kOpCastBoolean:
+      mS << "boolean(";
+      print_expr(expr->operand(0));
+      mS << ")";
+      break;
+
+    case kOpCastFloat:
+      mS << "float(";
+      print_expr(expr->operand(0));
+      mS << ")";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
     break;
 
-  case kBitNeg:
-    mS << "(";
-    mS << " ~ ";
-    print_expr(expr->operand(0));
-    mS << ")";
+  case AstExpr::kBinOp:
+    switch ( expr->opcode() ) {
+    case kOpBitAnd:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " & ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpBitOr:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " | ";
+      print_expr(expr->operand(1));
+      mS << ")";
     break;
 
-  case kLogNot:
-    mS << "(";
-    mS << " not ";
-    print_expr(expr->operand(0));
-    mS << ")";
+    case kOpBitXor:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " ^ ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpLogAnd:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " and ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpLogOr:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " or ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpEqual:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " == ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpNotEq:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " != ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpLt:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " < ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpLe:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " <= ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpAdd:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " + ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpSub:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " - ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpMul:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " * ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpDiv:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " / ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpMod:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " % ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpLshift:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " << ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    case kOpRshift:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " >> ";
+      print_expr(expr->operand(1));
+      mS << ")";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
     break;
 
-  case kCastInt:
-    mS << "int(";
-    print_expr(expr->operand(0));
-    mS << ")";
+  case AstExpr::kTriOp:
+    switch ( expr->opcode() ) {
+    case kOpIte:
+      mS << "(";
+      print_expr(expr->operand(0));
+      mS << " ? ";
+      print_expr(expr->operand(1));
+      mS << " : ";
+      print_expr(expr->operand(2));
+      mS << ")";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
     break;
 
-  case kCastBoolean:
-    mS << "boolean(";
-    print_expr(expr->operand(0));
-    mS << ")";
-    break;
-
-  case kCastFloat:
-    mS << "float(";
-    print_expr(expr->operand(0));
-    mS << ")";
-    break;
-
-  case kBitAnd:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " & ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kBitOr:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " | ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kBitXor:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " ^ ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kLogAnd:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " and ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kLogOr:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " or ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kEqual:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " == ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kNotEq:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " != ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kLt:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " < ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kLe:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " <= ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kGt:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " > ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kGe:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " >= ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kPlus:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " + ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kMinus:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " - ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kMult:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " * ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kDiv:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " / ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kMod:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " % ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kLshift:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " << ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kRshift:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " >> ";
-    print_expr(expr->operand(1));
-    mS << ")";
-    break;
-
-  case kIte:
-    mS << "(";
-    print_expr(expr->operand(0));
-    mS << " ? ";
-    print_expr(expr->operand(1));
-    mS << " : ";
-    print_expr(expr->operand(2));
-    mS << ")";
-    break;
-
-  case kFuncCall:
+  case AstExpr::kFuncCall:
     {
       print_expr(expr->func());
       mS << "(";

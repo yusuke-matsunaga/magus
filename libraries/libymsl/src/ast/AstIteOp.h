@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "AstExpr.h"
+#include "AstOp.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief ITE演算子を表す AstExpr
 //////////////////////////////////////////////////////////////////////
 class AstIteOp :
-  public AstExpr
+  public AstOp
 {
 public:
 
@@ -41,7 +41,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
+  Type
   expr_type() const;
 
   /// @brief オペランド数を返す．

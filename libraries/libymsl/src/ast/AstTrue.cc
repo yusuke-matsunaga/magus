@@ -29,7 +29,7 @@ AstTrue::~AstTrue()
 }
 
 // @brief 種類を返す．
-ExprType
+AstExpr::Type
 AstTrue::expr_type() const
 {
   return kTrue;

@@ -45,6 +45,7 @@ set (ymsl_SOURCES
   src/ast/AstIf.cc
   src/ast/AstImport.cc
   src/ast/AstIncr.cc
+  src/ast/AstInplaceOp.cc
   src/ast/AstIntConst.cc
   src/ast/AstIteOp.cc
   src/ast/AstLabel.cc
@@ -52,6 +53,7 @@ set (ymsl_SOURCES
   src/ast/AstMgr.cc
   src/ast/AstModule.cc
   src/ast/AstNullStmt.cc
+  src/ast/AstOp.cc
   src/ast/AstParam.cc
   src/ast/AstPrinter.cc
   src/ast/AstReturn.cc
@@ -95,11 +97,13 @@ set (ymsl_SOURCES
   src/ir/IrIntConst.cc
   src/ir/IrFloatConst.cc
   src/ir/IrStringConst.cc
+  src/ir/IrOp.cc
   src/ir/IrUniOp.cc
   src/ir/IrBinOp.cc
   src/ir/IrTriOp.cc
   src/ir/IrLoad.cc
   src/ir/IrStore.cc
+  src/ir/IrInplaceOp.cc
   src/ir/IrInplaceUniOp.cc
   src/ir/IrInplaceBinOp.cc
   src/ir/IrArrayRef.cc

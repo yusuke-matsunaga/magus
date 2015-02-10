@@ -52,202 +52,227 @@ void
 IrPrinter::print_node(IrNode* node)
 {
   mS << "%" << node->id() << " = ";
-  switch ( node->opcode() ) {
-  case kOpTrue:
+  switch ( node->node_type() ) {
+  case IrNode::kTrue:
     mS << "true";
     break;
 
-  case kOpFalse:
+  case IrNode::kFalse:
     mS << "false";
     break;
 
-  case kOpIntConst:
+  case IrNode::kIntConst:
     mS << "int(" << node->int_val() << ")";
     break;
 
-  case kOpFloatConst:
+  case IrNode::kFloatConst:
     mS << "float(" << node->float_val() << ")";
     break;
 
-  case kOpStringConst:
+  case IrNode::kStringConst:
     mS << "string(" << node->string_val() << ")";
     break;
 
-  case kOpCastBoolean:
-    mS << "cast_to_boolean %" << node->operand(0)->id();
+  case IrNode::kUniOp:
+    switch ( node->opcode() ) {
+    case kOpCastBoolean:
+      mS << "cast_to_boolean";
+      break;
+
+    case kOpCastInt:
+      mS << "cast_to_int";
+      break;
+
+    case kOpCastFloat:
+      mS << "cast_to_float";
+      break;
+
+    case kOpBitNeg:
+      mS << "bit_neg";
+      break;
+
+    case kOpLogNot:
+      mS << "log_not";
+      break;
+
+    case kOpUniMinus:
+      mS << "complement";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
+    mS << " %" << node->operand(0)->id();
     break;
 
-  case kOpCastInt:
-    mS << "cast_to_int %" << node->operand(0)->id();
+  case IrNode::kBinOp:
+    switch ( node->opcode() ) {
+    case kOpBitAnd:
+      mS << "bit_and";
+      break;
+
+    case kOpBitOr:
+      mS << "bit_or";
+      break;
+
+    case kOpBitXor:
+      mS << "bit_xor";
+      break;
+
+    case kOpLogAnd:
+      mS << "log_and";
+      break;
+
+    case kOpLogOr:
+      mS << "log_or";
+      break;
+
+    case kOpAdd:
+      mS << "add";
+      break;
+
+    case kOpSub:
+      mS << "sub";
+      break;
+
+    case kOpMul:
+      mS << "mul";
+      break;
+
+    case kOpDiv:
+      mS << "div";
+      break;
+
+    case kOpMod:
+      mS << "mod";
+      break;
+
+    case kOpLshift:
+      mS << "l_shift";
+      break;
+
+    case kOpRshift:
+      mS << "r_shift";
+      break;
+
+    case kOpEqual:
+      mS << "equal";
+      break;
+
+    case kOpNotEq:
+      mS << "not_equal";
+      break;
+
+    case kOpLt:
+      mS << "less_than";
+      break;
+
+    case kOpLe:
+      mS << "less_than_or_equal";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
+    mS << " %" << node->operand(0)->id() << " %" << node->operand(1)->id();
     break;
 
-  case kOpCastFloat:
-    mS << "cast_to_float %" << node->operand(0)->id();
-    break;
+  case IrNode::kTriOp:
+    switch ( node->opcode() ) {
+    case kOpIte:
+      mS << "if_then_else";
+      break;
 
-  case kOpBitNeg:
-    mS << "bit_neg %" << node->operand(0)->id();
-    break;
-
-  case kOpLogNot:
-    mS << "log_not %" << node->operand(0)->id();
-    break;
-
-  case kOpUniMinus:
-    mS << "complement %" << node->operand(0)->id();
-    break;
-
-  case kOpBitAnd:
-    mS << "bit_and %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpBitOr:
-    mS << "bit_or %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpBitXor:
-    mS << "bit_xor %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpLogAnd:
-    mS << "log_and %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpLogOr:
-    mS << "log_or %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpAdd:
-    mS << "add %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpSub:
-    mS << "sub %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpMul:
-    mS << "mul %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpDiv:
-    mS << "div %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpMod:
-    mS << "mod %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpLshift:
-    mS << "l_shift %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpRshift:
-    mS << "r_shift %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpEqual:
-    mS << "equal %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpNotEq:
-    mS << "not_equal %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpLt:
-    mS << "less_than %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpLe:
-    mS << "less_than_or_equal %" << node->operand(0)->id() << " %" << node->operand(1)->id();
-    break;
-
-  case kOpIte:
-    mS << "if_then_else %" << node->operand(0)->id() << " %" << node->operand(1)->id()
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
+    mS << " %" << node->operand(0)->id()
+       << " %" << node->operand(1)->id()
        << " %" << node->operand(2)->id();
     break;
 
-  case kOpLoad:
+  case IrNode::kLoad:
     mS << "load ";
     print_handle(node->address());
     break;
 
-  case kOpStore:
+  case IrNode::kStore:
     mS << "store ";
     print_handle(node->address());
     mS << " %" << node->store_val()->id();
     break;
 
-  case kOpInc:
-    mS << "inc ";
+  case IrNode::kInplaceUniOp:
+    switch ( node->opcode() ) {
+    case kOpInc:
+      mS << "inc ";
+      break;
+
+    case kOpDec:
+      mS << "dec ";
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
     print_handle(node->address());
     break;
 
-  case kOpDec:
-    mS << "dec ";
-    print_handle(node->address());
-    break;
+  case IrNode::kInplaceBinOp:
+    switch ( node->opcode() ) {
+    case kOpBitAnd:
+      mS << "inplace_bit_and ";
+      break;
 
-  case kOpInplaceBitAnd:
-    mS << "inplace_bit_and ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpBitOr:
+      mS << "inplace_bit_or ";
+      break;
 
-  case kOpInplaceBitOr:
-    mS << "inplace_bit_or ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpBitXor:
+      mS << "inplace_bit_xor ";
+      break;
 
-  case kOpInplaceBitXor:
-    mS << "inplace_bit_xor ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpAdd:
+      mS << "inplace_add ";
+      break;
 
-  case kOpInplaceAdd:
-    mS << "inplace_add ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpSub:
+      mS << "inplace_sub ";
+      break;
 
-  case kOpInplaceSub:
-    mS << "inplace_sub ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpMul:
+      mS << "inplace_mul ";
+      break;
 
-  case kOpInplaceMul:
-    mS << "inplace_mul ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpDiv:
+      mS << "inplace_div ";
+      break;
 
-  case kOpInplaceDiv:
-    mS << "inplace_div ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpMod:
+      mS << "inplace_mod ";
+      break;
 
-  case kOpInplaceMod:
-    mS << "inplace_mod ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpLshift:
+      mS << "inplace_lshift ";
+      break;
 
-  case kOpInplaceLshift:
-    mS << "inplace_lshift ";
-    print_handle(node->address());
-    mS << " %" << node->operand(0)->id();
-    break;
+    case kOpRshift:
+      mS << "inplace_rshift ";
+      break;
 
-  case kOpInplaceRshift:
-    mS << "inplace_rshift ";
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
     print_handle(node->address());
     mS << " %" << node->operand(0)->id();
     break;
 
-  case kOpFuncCall:
+  case IrNode::kFuncCall:
     mS << "func_call ";
     print_handle(node->func_addr());
     {
@@ -258,37 +283,33 @@ IrPrinter::print_node(IrNode* node)
     }
     break;
 
-  case kOpReturn:
+  case IrNode::kReturn:
     mS << "return";
     if ( node->return_val() ) {
       mS << " %" << node->return_val()->id();
     }
     break;
 
-  case kOpJump:
+  case IrNode::kJump:
     mS << "jump %" << node->jump_addr()->id();
     break;
 
-  case kOpBranchTrue:
+  case IrNode::kBranchTrue:
     mS << "branch_true %" << node->jump_addr()->id()
        << " %" << node->branch_cond()->id();
     break;
 
-  case kOpBranchFalse:
+  case IrNode::kBranchFalse:
     mS << "branch_false %" << node->jump_addr()->id()
        << " %" << node->branch_cond()->id();
     break;
 
-  case kOpLabel:
+  case IrNode::kLabel:
     mS << "label";
     break;
 
-  case kOpHalt:
+  case IrNode::kHalt:
     mS << "halt";
-    break;
-
-  default:
-    ASSERT_NOT_REACHED;
     break;
   }
   mS << endl;

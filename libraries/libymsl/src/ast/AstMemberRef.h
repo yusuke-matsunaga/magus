@@ -43,7 +43,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  ExprType
+  Type
   expr_type() const;
 
   /// @brief 本体の式を返す．

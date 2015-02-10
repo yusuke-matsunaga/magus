@@ -13,6 +13,7 @@
 #include "YmUtils/Scanner.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/StrBuff.h"
+#include "OpCode.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
