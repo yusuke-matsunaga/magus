@@ -45,7 +45,7 @@ AstFuncDecl::~AstFuncDecl()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstFuncDecl::stmt_type() const
 {
   return kFuncDecl;

@@ -40,7 +40,7 @@ AstEnumDecl::~AstEnumDecl()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstEnumDecl::stmt_type() const
 {
   return kEnumDecl;

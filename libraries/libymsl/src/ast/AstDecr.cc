@@ -32,7 +32,7 @@ AstDecr::~AstDecr()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstDecr::stmt_type() const
 {
   return kDecr;

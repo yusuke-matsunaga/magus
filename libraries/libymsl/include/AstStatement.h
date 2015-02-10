@@ -23,6 +23,37 @@ class AstStatement :
   public Ast
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  /// @brief 文の種類
+  //////////////////////////////////////////////////////////////////////
+  enum Type {
+    kBlock,
+    kBreak,
+    kConstDecl,
+    kContinue,
+    kDecr,
+    kDoWhile,
+    kEnumDecl,
+    kAssignment,
+    kInplaceOp,
+    kExpr,
+    kFor,
+    kFuncDecl,
+    kGoto,
+    kIf,
+    kImport,
+    kIncr,
+    kLabel,
+    kNullStmt,
+    kReturn,
+    kSwitch,
+    kToplevel,
+    kVarDecl,
+    kWhile
+  };
+
+
+public:
 
   /// @brief コンストラクタ
   /// @param[in] loc ファイル位置
@@ -40,7 +71,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  StmtType
+  Type
   stmt_type() const = 0;
 
   /// @brief 名前を返す．
@@ -231,6 +262,14 @@ public:
   import_alias(ymuint pos) const;
 
 };
+
+
+/// @brief AstStatement::Type を出力する．
+/// @param[in] s 出力先のストリーム
+/// @param[in] st 文の種類
+ostream&
+operator<<(ostream& s,
+	   AstStatement::Type st);
 
 END_NAMESPACE_YM_YMSL
 

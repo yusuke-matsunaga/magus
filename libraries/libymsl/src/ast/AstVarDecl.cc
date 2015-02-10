@@ -38,7 +38,7 @@ AstVarDecl::~AstVarDecl()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstVarDecl::stmt_type() const
 {
   return kVarDecl;

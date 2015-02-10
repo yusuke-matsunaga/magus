@@ -32,7 +32,7 @@ AstToplevel::~AstToplevel()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstToplevel::stmt_type() const
 {
   return kToplevel;

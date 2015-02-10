@@ -37,7 +37,7 @@ AstIf::~AstIf()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstIf::stmt_type() const
 {
   return kIf;

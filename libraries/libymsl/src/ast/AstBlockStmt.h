@@ -43,7 +43,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  StmtType
+  Type
   stmt_type() const;
 
   /// @brief 文のリストの要素数を返す．

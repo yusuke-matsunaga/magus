@@ -34,10 +34,10 @@ AstBlockStmt::~AstBlockStmt()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstBlockStmt::stmt_type() const
 {
-  return kBlockStmt;
+  return kBlock;
 }
 
 // @brief 文のリストの要素数を返す．

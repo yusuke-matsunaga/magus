@@ -38,7 +38,7 @@ AstSwitch::~AstSwitch()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstSwitch::stmt_type() const
 {
   return kSwitch;

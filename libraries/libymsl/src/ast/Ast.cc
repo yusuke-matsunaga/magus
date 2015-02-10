@@ -35,46 +35,4 @@ Ast::file_region() const
   return mLoc;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// その他
-//////////////////////////////////////////////////////////////////////
-
-// @brief StmtType を出力する．
-// @param[in] s 出力先のストリーム
-// @param[in] st 文の種類
-ostream&
-operator<<(ostream& s,
-	   StmtType st)
-{
-  switch ( st ) {
-  case kBlockStmt:  s << "BlockStmt";  break;
-  case kBreak:      s << "Break";      break;
-  case kConstDecl:  s << "ConstDecl";  break;
-  case kContinue:   s << "Continue";   break;
-  case kDecr:       s << "Decr";       break;
-  case kDoWhile:    s << "DoWhile";    break;
-  case kEnumDecl:   s << "EnumDecl";   break;
-  case kAssignment: s << "Assignment"; break;
-  case kInplaceOp:  s << "InplaceOp";  break;
-  case kExprStmt:   s << "ExprStmt";   break;
-  case kFor:        s << "For";        break;
-  case kFuncDecl:   s << "FuncDecl";   break;
-  case kGoto:       s << "Goto";       break;
-  case kIf:         s << "If";         break;
-  case kIncr:       s << "Incr";       break;
-  case kImport:     s << "Import";     break;
-  case kLabel:      s << "Label";      break;
-  case kNullStmt:   s << "NullStmt";   break;
-  case kReturn:     s << "Return";     break;
-  case kSwitch:     s << "Switch";     break;
-  case kToplevel:   s << "Topleevel";  break;
-  case kVarDecl:    s << "VarDecl";    break;
-  case kWhile:      s << "While";      break;
-  default: ASSERT_NOT_REACHED;         break;
-  }
-
-  return s;
-}
-
 END_NAMESPACE_YM_YMSL

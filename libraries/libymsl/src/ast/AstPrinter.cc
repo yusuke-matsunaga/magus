@@ -41,7 +41,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 			    ymuint indent)
 {
   switch ( stmt->stmt_type() ) {
-  case kBlockStmt:
+  case AstStatement::kBlock:
     print_indent(indent);
     mS << "{" << endl;
     for (ymuint i = 0; i < stmt->stmtlist_num(); ++ i) {
@@ -52,12 +52,12 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << "}" << endl;
     break;
 
-  case kBreak:
+  case AstStatement::kBreak:
     print_indent(indent);
     mS << "break;" << endl;
     break;
 
-  case kConstDecl:
+  case AstStatement::kConstDecl:
     print_indent(indent);
     mS << "const " << stmt->name()->str_val() << ": ";
     print_type(stmt->type());
@@ -69,18 +69,18 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kContinue:
+  case AstStatement::kContinue:
     print_indent(indent);
     mS << "continue;" << endl;
     break;
 
-  case kDecr:
+  case AstStatement::kDecr:
     print_indent(indent);
     print_expr(stmt->lhs_expr());
     mS << " --;" << endl;
     break;
 
-  case kDoWhile:
+  case AstStatement::kDoWhile:
     print_indent(indent);
     mS << "do" << endl;
     print_statement(stmt->stmt(), indent + 1);
@@ -90,7 +90,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << endl;
     break;
 
-  case kEnumDecl:
+  case AstStatement::kEnumDecl:
     print_indent(indent);
     mS << "enum " << stmt->name()->str_val() << " {" << endl;
     {
@@ -114,7 +114,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << "}" << endl;
     break;
 
-  case kAssignment:
+  case AstStatement::kAssignment:
     print_indent(indent);
     print_expr(stmt->lhs_expr());
     mS << " = ";
@@ -122,7 +122,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kInplaceOp:
+  case AstStatement::kInplaceOp:
     print_indent(indent);
     print_expr(stmt->lhs_expr());
     switch ( stmt->opcode() ) {
@@ -142,13 +142,13 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kExprStmt:
+  case AstStatement::kExpr:
     print_indent(indent);
     print_expr(stmt->expr());
     mS << ";" << endl;
     break;
 
-  case kFor:
+  case AstStatement::kFor:
     print_indent(indent);
     mS << "for (" << endl;
     print_statement(stmt->init_stmt(), indent + 1);
@@ -159,7 +159,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     print_statement(stmt->stmt(), indent + 1);
     break;
 
-  case kFuncDecl:
+  case AstStatement::kFuncDecl:
     {
       print_indent(indent);
       mS << "function " << stmt->name()->str_val() << "(";
@@ -180,12 +180,12 @@ AstPrinter::print_statement(const AstStatement* stmt,
     }
     break;
 
-  case kGoto:
+  case AstStatement::kGoto:
     print_indent(indent);
     mS << "goto " << stmt->label()->str_val() << ";" << endl;
     break;
 
-  case kIf:
+  case AstStatement::kIf:
     print_indent(indent);
     mS << "if ";
     print_expr(stmt->expr());
@@ -198,7 +198,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     }
     break;
 
-  case kImport:
+  case AstStatement::kImport:
     print_indent(indent);
     mS << "import";
     {
@@ -217,23 +217,23 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kIncr:
+  case AstStatement::kIncr:
     print_indent(indent);
     print_expr(stmt->lhs_expr());
     mS << " ++;" << endl;
     break;
 
-  case kLabel:
+  case AstStatement::kLabel:
     print_indent(indent);
     mS << stmt->label()->str_val() << ":" << endl;
     break;
 
-  case kNullStmt:
+  case AstStatement::kNullStmt:
     print_indent(indent);
     mS << ";" << endl;
     break;
 
-  case kReturn:
+  case AstStatement::kReturn:
     print_indent(indent);
     mS << "return";
     if ( stmt->expr() != NULL ) {
@@ -243,7 +243,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kSwitch:
+  case AstStatement::kSwitch:
     print_indent(indent);
     mS << "switch ";
     print_expr(stmt->expr());
@@ -270,14 +270,14 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << "}" << endl;
     break;
 
-  case kToplevel:
+  case AstStatement::kToplevel:
     for (ymuint i = 0; i < stmt->stmtlist_num(); ++ i) {
       const AstStatement* stmt1 = stmt->stmtlist_elem(i);
       print_statement(stmt1, indent + 1);
     }
     break;
 
-  case kVarDecl:
+  case AstStatement::kVarDecl:
     print_indent(indent);
     mS << "var " << stmt->name()->str_val() << ": ";
     print_type(stmt->type());
@@ -291,7 +291,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
     mS << ";" << endl;
     break;
 
-  case kWhile:
+  case AstStatement::kWhile:
     print_indent(indent);
     mS << "while ";
     print_expr(stmt->expr());

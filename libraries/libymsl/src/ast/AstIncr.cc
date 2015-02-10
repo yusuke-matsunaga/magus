@@ -32,7 +32,7 @@ AstIncr::~AstIncr()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstIncr::stmt_type() const
 {
   return kIncr;

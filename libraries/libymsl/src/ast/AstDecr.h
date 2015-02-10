@@ -41,7 +41,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  StmtType
+  Type
   stmt_type() const;
 
   /// @brief 左辺式を返す．

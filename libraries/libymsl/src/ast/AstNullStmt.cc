@@ -29,7 +29,7 @@ AstNullStmt::~AstNullStmt()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstNullStmt::stmt_type() const
 {
   return kNullStmt;

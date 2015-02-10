@@ -289,4 +289,46 @@ AstStatement::import_alias(ymuint pos) const
   return NULL;
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// その他
+//////////////////////////////////////////////////////////////////////
+
+// @brief AstStatement::Type を出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] st 文の種類
+ostream&
+operator<<(ostream& s,
+	   AstStatement::Type st)
+{
+  switch ( st ) {
+  case AstStatement::kBlock:      s << "Block";      break;
+  case AstStatement::kBreak:      s << "Break";      break;
+  case AstStatement::kConstDecl:  s << "ConstDecl";  break;
+  case AstStatement::kContinue:   s << "Continue";   break;
+  case AstStatement::kDecr:       s << "Decr";       break;
+  case AstStatement::kDoWhile:    s << "DoWhile";    break;
+  case AstStatement::kEnumDecl:   s << "EnumDecl";   break;
+  case AstStatement::kAssignment: s << "Assignment"; break;
+  case AstStatement::kInplaceOp:  s << "InplaceOp";  break;
+  case AstStatement::kExpr:       s << "Expr";       break;
+  case AstStatement::kFor:        s << "For";        break;
+  case AstStatement::kFuncDecl:   s << "FuncDecl";   break;
+  case AstStatement::kGoto:       s << "Goto";       break;
+  case AstStatement::kIf:         s << "If";         break;
+  case AstStatement::kIncr:       s << "Incr";       break;
+  case AstStatement::kImport:     s << "Import";     break;
+  case AstStatement::kLabel:      s << "Label";      break;
+  case AstStatement::kNullStmt:   s << "NullStmt";   break;
+  case AstStatement::kReturn:     s << "Return";     break;
+  case AstStatement::kSwitch:     s << "Switch";     break;
+  case AstStatement::kToplevel:   s << "Topleevel";  break;
+  case AstStatement::kVarDecl:    s << "VarDecl";    break;
+  case AstStatement::kWhile:      s << "While";      break;
+  default: ASSERT_NOT_REACHED;         break;
+  }
+
+  return s;
+}
+
 END_NAMESPACE_YM_YMSL

@@ -34,7 +34,7 @@ AstImport::~AstImport()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstImport::stmt_type() const
 {
   return kImport;

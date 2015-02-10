@@ -45,7 +45,7 @@ public:
 
   /// @brief 種類を返す．
   virtual
-  StmtType
+  Type
   stmt_type() const;
 
   /// @brief switch 文の case 数を返す．

@@ -78,7 +78,7 @@ bool
 IrMgr::elaborate(const AstStatement* ast_root,
 		 vector<IrNode*>& node_list)
 {
-  ASSERT_COND( ast_root->stmt_type() == kToplevel );
+  ASSERT_COND( ast_root->stmt_type() == AstStatement::kToplevel );
 
   mFuncCallList.clear();
   mUndefList.clear();
@@ -123,7 +123,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 		 vector<IrNode*>& node_list)
 {
   switch ( stmt->stmt_type() ) {
-  case kBlockStmt:
+  case AstStatement::kBlock:
     {
       Scope* block_scope = new_scope(scope);
       ymuint n = stmt->stmtlist_num();
@@ -134,7 +134,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kBreak:
+  case AstStatement::kBreak:
     {
       if ( end_label == NULL ) {
 	// not inside loop
@@ -145,11 +145,11 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kConstDecl:
+  case AstStatement::kConstDecl:
     reg_const(stmt, scope);
     break;
 
-  case kContinue:
+  case AstStatement::kContinue:
     {
       if ( start_label == NULL ) {
 	// not inside loop
@@ -160,7 +160,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kDecr:
+  case AstStatement::kDecr:
     {
       IrHandle* lhs_handle = elab_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
@@ -174,7 +174,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kDoWhile:
+  case AstStatement::kDoWhile:
     {
       IrNode* start1 = new_Label();
       IrNode* end1 = new_Label();
@@ -187,11 +187,11 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kEnumDecl:
+  case AstStatement::kEnumDecl:
     reg_enum(stmt, scope);
     break;
 
-  case kAssignment:
+  case AstStatement::kAssignment:
     {
       IrNode* rhs = elab_expr(stmt->expr(), scope);
       if ( rhs == NULL ) {
@@ -211,7 +211,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kInplaceOp:
+  case AstStatement::kInplaceOp:
     {
       IrNode* rhs = elab_expr(stmt->expr(), scope);
       if ( rhs == NULL ) {
@@ -232,14 +232,14 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kExprStmt:
+  case AstStatement::kExpr:
     {
       IrNode* node = elab_expr(stmt->expr(), scope);
       node_list.push_back(node);
     }
     break;
 
-  case kFor:
+  case AstStatement::kFor:
     {
       Scope* for_scope = new_scope(scope);
       elab_stmt(stmt->init_stmt(), for_scope, NULL, NULL, node_list);
@@ -257,11 +257,11 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kFuncDecl:
+  case AstStatement::kFuncDecl:
     reg_func(stmt, scope);
     break;
 
-  case kGoto:
+  case AstStatement::kGoto:
     {
       const AstSymbol* label_symbol = stmt->label();
       IrHandle* h = scope->find(label_symbol->str_val());
@@ -285,7 +285,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kIf:
+  case AstStatement::kIf:
     {
       IrNode* cond = elab_expr(stmt->expr(), scope);
       IrNode* label1 = new_Label();
@@ -301,10 +301,10 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kImport:
+  case AstStatement::kImport:
     break;
 
-  case kIncr:
+  case AstStatement::kIncr:
     {
       IrHandle* lhs_handle = elab_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
@@ -316,7 +316,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kLabel:
+  case AstStatement::kLabel:
     {
       const AstSymbol* label_symbol = stmt->label();
       IrHandle* h = scope->find(label_symbol->str_val());
@@ -342,10 +342,10 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kNullStmt:
+  case AstStatement::kNullStmt:
     break;
 
-  case kReturn:
+  case AstStatement::kReturn:
     {
       const AstExpr* expr = stmt->expr();
       IrNode* ret_val = NULL;
@@ -357,7 +357,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kSwitch:
+  case AstStatement::kSwitch:
     {
       IrNode* cond = elab_expr(stmt->expr(), scope);
       ymuint n = stmt->switch_num();
@@ -368,7 +368,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kToplevel:
+  case AstStatement::kToplevel:
     {
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -378,11 +378,11 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     }
     break;
 
-  case kVarDecl:
+  case AstStatement::kVarDecl:
     reg_var(stmt, scope);
     break;
 
-  case kWhile:
+  case AstStatement::kWhile:
     {
       IrNode* start1 = new_Label();
       node_list.push_back(start1);
@@ -408,7 +408,7 @@ void
 IrMgr::reg_enum(const AstStatement* stmt,
 		Scope* scope)
 {
-  ASSERT_COND( stmt->stmt_type() == kEnumDecl );
+  ASSERT_COND( stmt->stmt_type() == AstStatement::kEnumDecl );
 
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
@@ -477,7 +477,7 @@ void
 IrMgr::reg_func(const AstStatement* stmt,
 		Scope* scope)
 {
-  ASSERT_COND( stmt->stmt_type() == kFuncDecl );
+  ASSERT_COND( stmt->stmt_type() == AstStatement::kFuncDecl );
 
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
@@ -522,7 +522,7 @@ void
 IrMgr::reg_var(const AstStatement* stmt,
 	       Scope* scope)
 {
-  ASSERT_COND( stmt->stmt_type() == kVarDecl );
+  ASSERT_COND( stmt->stmt_type() == AstStatement::kVarDecl );
 
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();
@@ -554,7 +554,7 @@ void
 IrMgr::reg_const(const AstStatement* stmt,
 		 Scope* scope)
 {
-  ASSERT_COND( stmt->stmt_type() == kConstDecl );
+  ASSERT_COND( stmt->stmt_type() == AstStatement::kConstDecl );
 
   const AstSymbol* name_symbol = stmt->name();
   ShString name = name_symbol->str_val();

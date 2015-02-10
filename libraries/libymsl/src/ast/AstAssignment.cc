@@ -35,7 +35,7 @@ AstAssignment::~AstAssignment()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstAssignment::stmt_type() const
 {
   return kAssignment;

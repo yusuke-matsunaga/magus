@@ -226,42 +226,6 @@ operator<<(ostream& s,
 	   TypeId vt);
 
 
-//////////////////////////////////////////////////////////////////////
-/// @brief 文の種類
-//////////////////////////////////////////////////////////////////////
-enum StmtType {
-  kBlockStmt,
-  kBreak,
-  kConstDecl,
-  kContinue,
-  kDecr,
-  kDoWhile,
-  kEnumDecl,
-  kAssignment,
-  kInplaceOp,
-  kExprStmt,
-  kFor,
-  kFuncDecl,
-  kGoto,
-  kIf,
-  kImport,
-  kIncr,
-  kLabel,
-  kNullStmt,
-  kReturn,
-  kSwitch,
-  kToplevel,
-  kVarDecl,
-  kWhile
-};
-
-/// @brief StmtType を出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] st 文の種類
-ostream&
-operator<<(ostream& s,
-	   StmtType st);
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class 値を表す共用型

@@ -38,7 +38,7 @@ AstConstDecl::~AstConstDecl()
 }
 
 // @brief 種類を返す．
-StmtType
+AstStatement::Type
 AstConstDecl::stmt_type() const
 {
   return kConstDecl;
