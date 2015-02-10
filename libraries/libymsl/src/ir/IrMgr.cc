@@ -162,7 +162,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kDecr:
     {
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -180,7 +180,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* end1 = new_Label();
       node_list.push_back(start1);
       elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
-      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
       IrNode* node1 = new_Jump(kOpBranchTrue, start1, cond);
       node_list.push_back(node1);
       node_list.push_back(end1);
@@ -193,12 +193,12 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kEqAssign:
     {
-      IrNode* rhs = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* rhs = elab_rhs(stmt->expr(), scope);
       if ( rhs == NULL ) {
 	// エラー
 	return;
       }
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -222,12 +222,12 @@ IrMgr::elab_stmt(const AstStatement* stmt,
   case kEqOr:
   case kEqXor:
     {
-      IrNode* rhs = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* rhs = elab_rhs(stmt->expr(), scope);
       if ( rhs == NULL ) {
 	// エラー
 	return;
       }
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -256,7 +256,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kExprStmt:
     {
-      IrNode* node = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* node = elab_rhs(stmt->expr(), scope);
       node_list.push_back(node);
     }
     break;
@@ -268,7 +268,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* start1 = new_Label();
       node_list.push_back(start1);
       IrNode* end1 = new_Label();
-      IrNode* cond = elab_rhs(stmt->expr(), for_scope, node_list);
+      IrNode* cond = elab_rhs(stmt->expr(), for_scope);
       IrNode* node1 = new_Jump(kOpBranchFalse, end1, cond);
       node_list.push_back(node1);
       elab_stmt(stmt->stmt(), for_scope, start1, end1, node_list);
@@ -309,7 +309,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kIf:
     {
-      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
       IrNode* label1 = new_Label();
       IrNode* label2 = new_Label();
       IrNode* node1 = new_Jump(kOpBranchFalse, label1, cond);
@@ -328,7 +328,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kIncr:
     {
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope, node_list);
+      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -372,7 +372,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       const AstExpr* expr = stmt->expr();
       IrNode* ret_val = NULL;
       if ( expr != NULL ) {
-	ret_val = elab_rhs(expr, scope, node_list);
+	ret_val = elab_rhs(expr, scope);
       }
       IrNode* node = new_Return(ret_val);
       node_list.push_back(node);
@@ -381,7 +381,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kSwitch:
     {
-      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
 	vector<IrNode*> node_list1;
@@ -408,7 +408,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     {
       IrNode* start1 = new_Label();
       node_list.push_back(start1);
-      IrNode* cond = elab_rhs(stmt->expr(), scope, node_list);
+      IrNode* cond = elab_rhs(stmt->expr(), scope);
       IrNode* end1 = new_Label();
       IrNode* node1 = new_Jump(kOpBranchFalse, end1, cond);
       node_list.push_back(node1);
@@ -456,8 +456,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
     const AstExpr* ec_expr = stmt->enum_const_expr(i);
     int v;
     if ( ec_expr != NULL ) {
-      vector<IrNode*> node_list;
-      IrNode* node = elab_rhs(ec_expr, scope, node_list);
+      IrNode* node = elab_rhs(ec_expr, scope);
       if ( node == NULL ) {
 	// エラー
 	return;
@@ -601,8 +600,7 @@ IrMgr::reg_const(const AstStatement* stmt,
     return;
   }
 
-  vector<IrNode*> node_list;
-  IrNode* node = elab_rhs(stmt->expr(), scope, node_list);
+  IrNode* node = elab_rhs(stmt->expr(), scope);
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
 
@@ -717,11 +715,9 @@ IrMgr::resolve_type(const AstType* asttype,
 // @brief 右辺式の実体化を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
-// @param[in] node_list ノードを収めるリスト
 IrNode*
 IrMgr::elab_rhs(const AstExpr* ast_expr,
-		Scope* scope,
-		vector<IrNode*>& node_list)
+		Scope* scope)
 {
   IrNode* op0 = NULL;
   IrNode* op1 = NULL;
@@ -729,17 +725,17 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
   ymuint nop = ast_expr->operand_num();
   ASSERT_COND( nop <= 3 );
   if ( nop > 0 ) {
-    op0 = elab_rhs(ast_expr->operand(0), scope, node_list);
+    op0 = elab_rhs(ast_expr->operand(0), scope);
     if ( op0 == NULL ) {
       return NULL;
     }
     if ( nop > 1 ) {
-      op1 = elab_rhs(ast_expr->operand(1), scope, node_list);
+      op1 = elab_rhs(ast_expr->operand(1), scope);
       if ( op1 == NULL ) {
 	return NULL;
       }
       if ( nop > 2 ) {
-	op2 = elab_rhs(ast_expr->operand(2), scope, node_list);
+	op2 = elab_rhs(ast_expr->operand(2), scope);
 	if ( op2 == NULL ) {
 	  return NULL;
 	}
@@ -752,27 +748,22 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
   switch ( ast_expr->expr_type() ) {
   case kTrue:
     node = new_True();
-    node_list.push_back(node);
     return node;
 
   case kFalse:
     node = new_False();
-    node_list.push_back(node);
     return node;
 
   case kIntConst:
     node = new_IntConst(ast_expr->int_val());
-    node_list.push_back(node);
     return node;
 
   case kFloatConst:
     node = new_FloatConst(ast_expr->float_val());
-    node_list.push_back(node);
     return node;
 
   case kStringConst:
     node = new_StringConst(ast_expr->string_val());
-    node_list.push_back(node);
     return node;
 
   case kFuncCall:
@@ -781,7 +772,7 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
       ymuint n = ast_expr->arglist_num();
       vector<IrNode*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
-	IrNode* arg = elab_rhs(ast_expr->arglist_elem(i), scope, node_list);
+	IrNode* arg = elab_rhs(ast_expr->arglist_elem(i), scope);
 	// arg->type() と func->type()->function_input_type(i) をチェック
 	// 必要に応じてキャストノードを挿入する．
 	arglist[i] = arg;
@@ -902,7 +893,7 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
     break;
 
   default:
-    return elab_rhs_primary(ast_expr, scope, node_list);
+    return elab_rhs_primary(ast_expr, scope);
   }
 
   if ( nop == 1 ) {
@@ -919,7 +910,6 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
       // 結果を op0 に代入
     }
     node = new_UniOp(opcode, type, op0);
-    node_list.push_back(node);
     return node;
   }
   else if ( nop == 2 ) {
@@ -942,7 +932,6 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
       // キャストノードの挿入
     }
     node = new_BinOp(opcode, type, op0, op1);
-    node_list.push_back(node);
     return node;
   }
   else if ( nop == 3 ) {
@@ -970,7 +959,6 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
       // キャストノードの挿入
     }
     node = new_TriOp(opcode, type, op0, op1, op2);
-    node_list.push_back(node);
     return node;
   }
 
@@ -981,52 +969,49 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
 // @brief 右辺式の実体化を行う．(プライマリ用)
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
-// @param[in] node_list ノードを収めるリスト
 IrNode*
 IrMgr::elab_rhs_primary(const AstExpr* ast_expr,
-			Scope* scope,
-			vector<IrNode*>& node_list)
+			Scope* scope)
 {
-  IrHandle* handle = analyze_primary(ast_expr, scope, node_list);
+  IrHandle* handle = analyze_primary(ast_expr, scope);
   if ( handle == NULL ) {
     // エラー
     return NULL;
   }
 
   IrNode* load_node = new_Load(handle);
-  node_list.push_back(load_node);
   return load_node;
 }
 
 // @brief プライマリ式の解析を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
-// @param[in] node_list ノードを収めるリスト
 IrHandle*
 IrMgr::analyze_primary(const AstExpr* ast_expr,
-		       Scope* scope,
-		       vector<IrNode*>& node_list)
+		       Scope* scope)
 {
-  IrHandle* h = resolve_symbol(ast_expr, scope);
-  if ( h != NULL ) {
-    return h;
-  }
-
   switch ( ast_expr->expr_type() ) {
   case kSymbolExpr:
-    // これはあり得ない．
-    return NULL;
+    {
+      const AstSymbol* symbol = ast_expr->symbol();
+      IrHandle* h = scope->find(symbol->str_val());
+      if ( h == NULL ) {
+	// symbol not found
+	return NULL;
+      }
+      return h;
+    }
 
   case kArrayRef:
     {
       // 配列本体やインデックス値自体は右辺値
-      IrNode* base = elab_rhs_primary(ast_expr->body(), scope, node_list);
+      IrNode* base = elab_rhs_primary(ast_expr->body(), scope);
       if ( base->type()->type_id() != kArrayType ) {
 	// base is not an array
 	return NULL;
       }
 
-      IrNode* offset = elab_rhs(ast_expr->index(), scope, node_list);
+      IrNode* offset = elab_rhs(ast_expr->index(), scope);
       if ( offset->type()->type_id() != kIntType ) {
 	// offset is not an integer
 	return NULL;
@@ -1038,17 +1023,37 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
 
   case kMemberRef:
     {
-      // resolve_symbol() で失敗しているので
-      // ここでは階層名は考えなくてよい．
-      IrNode* base = elab_rhs_primary(ast_expr->body(), scope, node_list);
-      const Type* type = base->type();
+      const AstExpr* body = ast_expr->body();
       const AstSymbol* member_symbol = ast_expr->member();
-      ShString member_name = member_symbol->str_val();
-      // type のメンバに member_name があることを確認する．
-      const Var* var;
+      IrHandle* h = analyze_primary(body, scope);
+      switch ( h->handle_type() ) {
+      case IrHandle::kScope:
+	{
+	  Scope* scope1 = h->scope();
+	  IrHandle* h1 = scope1->find(member_symbol->str_val());
+	  if ( h1 == NULL ) {
+	    // member_symbol not found
+	    return NULL;
+	  }
+	  return h1;
+	}
 
-      IrHandle* h = new_MemberRef(base, var);
-      return h;
+      case IrHandle::kVar:
+	{
+	  const Var* var = h->var();
+	  const Type* type = var->value_type();
+	  ShString member_name = member_symbol->str_val();
+	  // type のメンバに member_name があることを確認する．
+	  IrNode* base = new_Load(h);
+	  const Var* member;
+	  IrHandle* h1 = new_MemberRef(base, member);
+	  return h1;
+	}
+
+      default:
+	ASSERT_NOT_REACHED;
+	break;
+      }
     }
     break;
 
@@ -1057,37 +1062,6 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
   }
 
   ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 式からシンボルの解決を行う．
-// @param[in] expr 式
-// @param[in] scopde 現在のスコープ
-IrHandle*
-IrMgr::resolve_symbol(const AstExpr* expr,
-		      Scope* scope)
-{
-  switch ( expr->expr_type() ) {
-  case kSymbolExpr:
-    return scope->find(expr->symbol()->str_val());
-
-  case kMemberRef:
-    {
-      const AstExpr* body = expr->body();
-      IrHandle* h = resolve_symbol(body, scope);
-      Scope* scope1 = h->scope();
-      if ( scope1 == NULL ) {
-	// not scope
-	return NULL;
-      }
-      return scope1->find(expr->symbol()->str_val());
-    }
-    break;
-
-  default:
-    break;
-  }
-
   return NULL;
 }
 
@@ -1100,7 +1074,7 @@ IrMgr::resolve_func(const AstExpr* expr,
 		    Scope* scope,
 		    IrNode* node)
 {
-  IrHandle* h = resolve_symbol(expr, scope);
+  IrHandle* h = analyze_primary(expr, scope);
   if ( h == NULL ) {
     // expr not found
     return false;
