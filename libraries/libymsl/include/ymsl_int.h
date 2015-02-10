@@ -292,7 +292,6 @@ enum ExprType {
   kCastFloat,
   kBitNeg,
   kLogNot,
-  kUniPlus,
   kUniMinus,
   // 二項演算
   kBitAnd,
@@ -316,11 +315,7 @@ enum ExprType {
   // 三項演算
   kIte,
   // 関数呼び出し
-  kFuncCall,
-  // 特殊
-  kScopeExpr,
-  kEnumExpr,
-  kFuncExpr
+  kFuncCall
 };
 
 /// @brief ExprType を出力する．

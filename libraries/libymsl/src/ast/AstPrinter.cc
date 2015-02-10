@@ -407,13 +407,6 @@ AstPrinter::print_expr(const AstExpr* expr)
     mS << "]";
     break;
 
-  case kUniPlus:
-    mS << "(";
-    mS << " + ";
-    print_expr(expr->operand(0));
-    mS << ")";
-    break;
-
   case kUniMinus:
     mS << "(";
     mS << " - ";
@@ -620,13 +613,6 @@ AstPrinter::print_expr(const AstExpr* expr)
       }
       mS << ")";
     }
-    break;
-
-  case kScopeExpr:
-  case kEnumExpr:
-  case kFuncExpr:
-    // AST ではありえない．
-    ASSERT_NOT_REACHED;
     break;
   }
 }

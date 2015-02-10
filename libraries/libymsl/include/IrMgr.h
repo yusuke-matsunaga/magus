@@ -121,19 +121,12 @@ private:
   elab_rhs(const AstExpr* ast_expr,
 	   Scope* scope);
 
-  /// @brief 右辺式の実体化を行う．(プライマリ用)
-  /// @param[in] ast_expr 式を表す構文木
-  /// @param[in] scope 現在のスコープ
-  IrNode*
-  elab_rhs_primary(const AstExpr* ast_expr,
-		   Scope* scope);
-
   /// @brief プライマリ式の解析を行う．
   /// @param[in] ast_expr 式を表す構文木
   /// @param[in] scope 現在のスコープ
   IrHandle*
-  analyze_primary(const AstExpr* ast_expr,
-		  Scope* scope);
+  elab_primary(const AstExpr* ast_expr,
+	       Scope* scope);
 
   /// @brief 式から関数の解決を行う．
   /// @param[in] expr 式

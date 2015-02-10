@@ -632,10 +632,6 @@ expr
   $$ = $1;
 }
 // 単項演算
-| PLUS expr %prec UOP
-{
-  $$ = mgr.new_UniOp(kUniPlus, $2, @$);
-}
 | MINUS expr %prec UOP
 {
   $$ = mgr.new_UniOp(kUniMinus, $2, @$);

@@ -162,7 +162,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kDecr:
     {
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
+      IrHandle* lhs_handle = elab_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -198,7 +198,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
+      IrHandle* lhs_handle = elab_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -227,7 +227,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	// エラー
 	return;
       }
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
+      IrHandle* lhs_handle = elab_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -328,7 +328,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
   case kIncr:
     {
-      IrHandle* lhs_handle = analyze_primary(stmt->lhs_expr(), scope);
+      IrHandle* lhs_handle = elab_primary(stmt->lhs_expr(), scope);
       if ( lhs_handle == NULL ) {
 	// エラー
 	return;
@@ -766,6 +766,17 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
     node = new_StringConst(ast_expr->string_val());
     return node;
 
+  case kSymbolExpr:
+  case kArrayRef:
+  case kMemberRef:
+    {
+      IrHandle* h = elab_primary(ast_expr, scope);
+      if ( h == NULL ) {
+	return NULL;
+      }
+      return new_Load(h);
+    }
+
   case kFuncCall:
     {
       const AstExpr* func_expr = ast_expr->func();
@@ -891,9 +902,6 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
   case kIte:
     opcode = kOpIte;
     break;
-
-  default:
-    return elab_rhs_primary(ast_expr, scope);
   }
 
   if ( nop == 1 ) {
@@ -966,29 +974,12 @@ IrMgr::elab_rhs(const AstExpr* ast_expr,
   return NULL;
 }
 
-// @brief 右辺式の実体化を行う．(プライマリ用)
-// @param[in] ast_expr 式を表す構文木
-// @param[in] scope 現在のスコープ
-IrNode*
-IrMgr::elab_rhs_primary(const AstExpr* ast_expr,
-			Scope* scope)
-{
-  IrHandle* handle = analyze_primary(ast_expr, scope);
-  if ( handle == NULL ) {
-    // エラー
-    return NULL;
-  }
-
-  IrNode* load_node = new_Load(handle);
-  return load_node;
-}
-
 // @brief プライマリ式の解析を行う．
 // @param[in] ast_expr 式を表す構文木
 // @param[in] scope 現在のスコープ
 IrHandle*
-IrMgr::analyze_primary(const AstExpr* ast_expr,
-		       Scope* scope)
+IrMgr::elab_primary(const AstExpr* ast_expr,
+		    Scope* scope)
 {
   switch ( ast_expr->expr_type() ) {
   case kSymbolExpr:
@@ -1005,7 +996,11 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
   case kArrayRef:
     {
       // 配列本体やインデックス値自体は右辺値
-      IrNode* base = elab_rhs_primary(ast_expr->body(), scope);
+      IrHandle* h = elab_primary(ast_expr->body(), scope);
+      if ( h == NULL ) {
+	return NULL;
+      }
+      IrNode* base = new_Load(h);
       if ( base->type()->type_id() != kArrayType ) {
 	// base is not an array
 	return NULL;
@@ -1017,15 +1012,14 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
 	return NULL;
       }
 
-      IrHandle* h = new_ArrayRef(base, offset);
-      return h;
+      return new_ArrayRef(base, offset);
     }
 
   case kMemberRef:
     {
       const AstExpr* body = ast_expr->body();
       const AstSymbol* member_symbol = ast_expr->member();
-      IrHandle* h = analyze_primary(body, scope);
+      IrHandle* h = elab_primary(body, scope);
       switch ( h->handle_type() ) {
       case IrHandle::kScope:
 	{
@@ -1046,8 +1040,7 @@ IrMgr::analyze_primary(const AstExpr* ast_expr,
 	  // type のメンバに member_name があることを確認する．
 	  IrNode* base = new_Load(h);
 	  const Var* member;
-	  IrHandle* h1 = new_MemberRef(base, member);
-	  return h1;
+	  return new_MemberRef(base, member);
 	}
 
       default:
@@ -1074,7 +1067,7 @@ IrMgr::resolve_func(const AstExpr* expr,
 		    Scope* scope,
 		    IrNode* node)
 {
-  IrHandle* h = analyze_primary(expr, scope);
+  IrHandle* h = elab_primary(expr, scope);
   if ( h == NULL ) {
     // expr not found
     return false;
