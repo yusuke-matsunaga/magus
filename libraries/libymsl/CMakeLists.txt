@@ -88,8 +88,10 @@ set (ymsl_SOURCES
 
   src/ir/IrMgr.cc
   src/ir/IrMgr_const.cc
+  src/ir/IrMgr_expr.cc
   src/ir/IrMgr_handle.cc
   src/ir/IrMgr_node.cc
+  src/ir/IrMgr_stmt.cc
   src/ir/IrNode.cc
   src/ir/IrPrinter.cc
 
