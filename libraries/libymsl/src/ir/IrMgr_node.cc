@@ -1,6 +1,6 @@
 
-/// @file IrMgr.cc
-/// @brief IrMgr の実装ファイル
+/// @file IrMgr_node.cc
+/// @brief IrMgr の実装ファイル(IrNode生成関係)
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -8,36 +8,23 @@
 
 
 #include "IrMgr.h"
-#include "TypeMgr.h"
-#include "BooleanConst.h"
-#include "IntConst.h"
-#include "FloatConst.h"
-#include "StringConst.h"
-#include "IrUniOp.h"
-#include "IrBinOp.h"
-#include "IrTriOp.h"
-#include "IrLoad.h"
-#include "IrStore.h"
-#include "IrInplaceUniOp.h"
-#include "IrInplaceBinOp.h"
-#include "IrFuncCall.h"
-#include "IrReturn.h"
-#include "IrJump.h"
-#include "IrLabel.h"
-
-#include "IrConstHandle.h"
-#include "IrFuncHandle.h"
-#include "IrLabelHandle.h"
-#include "IrScopeHandle.h"
-#include "IrTypeHandle.h"
-#include "IrVarHandle.h"
-#include "IrArrayRef.h"
-#include "IrMemberRef.h"
-
+#include "IrHandle.h"
 #include "Var.h"
 #include "Function.h"
 #include "ConstVal.h"
 #include "Type.h"
+
+#include "node/IrLoad.h"
+#include "node/IrStore.h"
+#include "node/IrUniOp.h"
+#include "node/IrBinOp.h"
+#include "node/IrTriOp.h"
+#include "node/IrInplaceUniOp.h"
+#include "node/IrInplaceBinOp.h"
+#include "node/IrFuncCall.h"
+#include "node/IrReturn.h"
+#include "node/IrJump.h"
+#include "node/IrLabel.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -45,49 +32,6 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 // クラス IrMgr
 //////////////////////////////////////////////////////////////////////
-
-// @brief true 定数を生成する．
-const ConstVal*
-IrMgr::new_True()
-{
-  void* p = mAlloc.get_memory(sizeof(BooleanConst));
-  return new (p) BooleanConst(mTypeMgr.boolean_type(), true);
-}
-
-// @brief False 定数を生成する．
-const ConstVal*
-IrMgr::new_False()
-{
-  void* p = mAlloc.get_memory(sizeof(BooleanConst));
-  return new (p) BooleanConst(mTypeMgr.boolean_type(), false);
-}
-
-// @brief 整数値定数を生成する．
-// @param[in] val 値
-const ConstVal*
-IrMgr::new_IntConst(int val)
-{
-  void* p = mAlloc.get_memory(sizeof(IntConst));
-  return new (p) IntConst(mTypeMgr.int_type(), val);
-}
-
-// @brief 実数値定数を生成する．
-// @param[in] val 値
-const ConstVal*
-IrMgr::new_FloatConst(double val)
-{
-  void* p = mAlloc.get_memory(sizeof(FloatConst));
-  return new (p) FloatConst(mTypeMgr.float_type(), val);
-}
-
-// @brief 文字列定数を生成する．
-// @param[in] val 値
-const ConstVal*
-IrMgr::new_StringConst(const char* val)
-{
-  void* p = mAlloc.get_memory(sizeof(StringConst));
-  return new (p) StringConst(mTypeMgr.string_type(), val);
-}
 
 // @brief 定数参照式を生成する．
 // @param[in] const_val 定数値
@@ -265,87 +209,6 @@ IrMgr::new_Label()
 {
   void* p = mAlloc.get_memory(sizeof(IrLabel));
   return new (p) IrLabel();
-}
-
-// @brief スコープ参照を生成する．
-// @param[in] scope スコープ
-IrHandle*
-IrMgr::new_ScopeHandle(Scope* scope)
-{
-  void* p = mAlloc.get_memory(sizeof(IrScopeHandle));
-  return new (p) IrScopeHandle(scope);
-}
-
-// @brief 変数参照を生成する．
-// @param[in] var 変数
-IrHandle*
-IrMgr::new_VarHandle(const Var* var)
-{
-  void* p = mAlloc.get_memory(sizeof(IrVarHandle));
-  return new (p) IrVarHandle(var);
-}
-
-// @brief 関数参照を生成する．
-// @param[in] func 関数
-IrHandle*
-IrMgr::new_FuncHandle(const Function* func)
-{
-  void* p = mAlloc.get_memory(sizeof(IrFuncHandle));
-  return new (p) IrFuncHandle(func);
-}
-
-// @brief 定数参照を生成する．
-// @param[in] name 名前
-// @param[in] const_val 定数値
-IrHandle*
-IrMgr::new_ConstHandle(ShString name,
-		       const ConstVal* const_val)
-{
-  void* p = mAlloc.get_memory(sizeof(IrConstHandle));
-  return new (p) IrConstHandle(name, const_val);
-}
-
-// @brief ラベル参照を生成する．
-// @param[in] name 名前
-// @param[in] label ラベル
-IrHandle*
-IrMgr::new_LabelHandle(ShString name,
-		       IrNode* label)
-{
-  void* p = mAlloc.get_memory(sizeof(IrLabelHandle));
-  return new (p) IrLabelHandle(name, label);
-}
-
-// @brief 名前付き型参照を生成する．
-// @param[in] type 型
-IrHandle*
-IrMgr::new_TypeHandle(const Type* type,
-		      Scope* scope)
-{
-  void* p = mAlloc.get_memory(sizeof(IrTypeHandle));
-  return new (p) IrTypeHandle(type, scope);
-}
-
-// @brief 配列参照を生成する．
-// @param[in] array 配列
-// @param[in] index インデックス
-IrHandle*
-IrMgr::new_ArrayRef(IrNode* array,
-		    IrNode* index)
-{
-  void* p = mAlloc.get_memory(sizeof(IrArrayRef));
-  return new (p) IrArrayRef(array, index);
-}
-
-// @brief クラスメンバ参照を生成する．
-// @param[in] obj オブジェクト
-// @param[in] var メンバ変数
-IrHandle*
-IrMgr::new_MemberRef(IrNode* obj,
-		     const Var* var)
-{
-  void* p = mAlloc.get_memory(sizeof(IrMemberRef));
-  return new (p) IrMemberRef(obj, var);
 }
 
 END_NAMESPACE_YM_YMSL

@@ -22,52 +22,55 @@ set (ymsl_SOURCES
   ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc
 
   src/ast/Ast.cc
-  src/ast/AstArrayRef.cc
-  src/ast/AstAssignment.cc
-  src/ast/AstBinOp.cc
-  src/ast/AstBlockStmt.cc
-  src/ast/AstBreak.cc
-  src/ast/AstCaseItem.cc
-  src/ast/AstConstDecl.cc
-  src/ast/AstContinue.cc
-  src/ast/AstDecr.cc
-  src/ast/AstDoWhile.cc
-  src/ast/AstEnumConst.cc
-  src/ast/AstEnumDecl.cc
-  src/ast/AstExpr.cc
-  src/ast/AstExprStmt.cc
-  src/ast/AstFalse.cc
-  src/ast/AstFloatConst.cc
-  src/ast/AstFor.cc
-  src/ast/AstFuncCall.cc
-  src/ast/AstFuncDecl.cc
-  src/ast/AstGoto.cc
-  src/ast/AstIf.cc
-  src/ast/AstImport.cc
-  src/ast/AstIncr.cc
-  src/ast/AstInplaceOp.cc
-  src/ast/AstIntConst.cc
-  src/ast/AstIteOp.cc
-  src/ast/AstLabel.cc
-  src/ast/AstMemberRef.cc
   src/ast/AstMgr.cc
-  src/ast/AstModule.cc
-  src/ast/AstNullStmt.cc
-  src/ast/AstOp.cc
-  src/ast/AstParam.cc
   src/ast/AstPrinter.cc
-  src/ast/AstReturn.cc
-  src/ast/AstStatement.cc
-  src/ast/AstStringConst.cc
-  src/ast/AstSwitch.cc
   src/ast/AstSymbol.cc
-  src/ast/AstSymbolExpr.cc
-  src/ast/AstToplevel.cc
-  src/ast/AstTrue.cc
-  src/ast/AstType.cc
-  src/ast/AstUniOp.cc
-  src/ast/AstVarDecl.cc
-  src/ast/AstWhile.cc
+
+  src/ast/expr/AstArrayRef.cc
+  src/ast/expr/AstBinOp.cc
+  src/ast/expr/AstExpr.cc
+  src/ast/expr/AstFalse.cc
+  src/ast/expr/AstFloatConst.cc
+  src/ast/expr/AstFuncCall.cc
+  src/ast/expr/AstIntConst.cc
+  src/ast/expr/AstIteOp.cc
+  src/ast/expr/AstMemberRef.cc
+  src/ast/expr/AstOp.cc
+  src/ast/expr/AstStringConst.cc
+  src/ast/expr/AstSymbolExpr.cc
+  src/ast/expr/AstTrue.cc
+  src/ast/expr/AstUniOp.cc
+
+  src/ast/stmt/AstAssignment.cc
+  src/ast/stmt/AstBlockStmt.cc
+  src/ast/stmt/AstBreak.cc
+  src/ast/stmt/AstCaseItem.cc
+  src/ast/stmt/AstConstDecl.cc
+  src/ast/stmt/AstContinue.cc
+  src/ast/stmt/AstDecr.cc
+  src/ast/stmt/AstDoWhile.cc
+  src/ast/stmt/AstEnumConst.cc
+  src/ast/stmt/AstEnumDecl.cc
+  src/ast/stmt/AstExprStmt.cc
+  src/ast/stmt/AstFor.cc
+  src/ast/stmt/AstFuncDecl.cc
+  src/ast/stmt/AstGoto.cc
+  src/ast/stmt/AstIf.cc
+  src/ast/stmt/AstImport.cc
+  src/ast/stmt/AstIncr.cc
+  src/ast/stmt/AstInplaceOp.cc
+  src/ast/stmt/AstLabel.cc
+  src/ast/stmt/AstModule.cc
+  src/ast/stmt/AstNullStmt.cc
+  src/ast/stmt/AstParam.cc
+  src/ast/stmt/AstReturn.cc
+  src/ast/stmt/AstStatement.cc
+  src/ast/stmt/AstSwitch.cc
+  src/ast/stmt/AstToplevel.cc
+  src/ast/stmt/AstVarDecl.cc
+  src/ast/stmt/AstWhile.cc
+
+  src/ast/type/AstType.cc
 
   src/compiler/YmslCompiler.cc
   src/compiler/ArrayType.cc
@@ -77,44 +80,48 @@ set (ymsl_SOURCES
   src/compiler/MapType.cc
   src/compiler/NamedType.cc
   src/compiler/PrimType.cc
+  src/compiler/Scope.cc
   src/compiler/SetType.cc
   src/compiler/Type.cc
   src/compiler/TypeMgr.cc
   src/compiler/Var.cc
 
   src/ir/IrMgr.cc
-  src/ir/IrMgr_sub2.cc
-  src/ir/IrHandle.cc
-  src/ir/IrConstHandle.cc
-  src/ir/IrFuncHandle.cc
-  src/ir/IrLabelHandle.cc
-  src/ir/IrScopeHandle.cc
-  src/ir/IrTypeHandle.cc
-  src/ir/IrVarHandle.cc
-  src/ir/ConstVal.cc
-  src/ir/BooleanConst.cc
-  src/ir/IntConst.cc
-  src/ir/FloatConst.cc
-  src/ir/StringConst.cc
+  src/ir/IrMgr_const.cc
+  src/ir/IrMgr_handle.cc
+  src/ir/IrMgr_node.cc
   src/ir/IrNode.cc
-  src/ir/IrOp.cc
-  src/ir/IrUniOp.cc
-  src/ir/IrBinOp.cc
-  src/ir/IrTriOp.cc
-  src/ir/IrLoad.cc
-  src/ir/IrStore.cc
-  src/ir/IrInplaceOp.cc
-  src/ir/IrInplaceUniOp.cc
-  src/ir/IrInplaceBinOp.cc
-  src/ir/IrArrayRef.cc
-  src/ir/IrMemberRef.cc
-  src/ir/IrFuncCall.cc
-  src/ir/IrReturn.cc
-  src/ir/IrJump.cc
-  src/ir/IrLabel.cc
-  src/ir/Scope.cc
-
   src/ir/IrPrinter.cc
+
+  src/ir/handle/IrHandle.cc
+  src/ir/handle/IrConstHandle.cc
+  src/ir/handle/IrFuncHandle.cc
+  src/ir/handle/IrLabelHandle.cc
+  src/ir/handle/IrScopeHandle.cc
+  src/ir/handle/IrTypeHandle.cc
+  src/ir/handle/IrVarHandle.cc
+  src/ir/handle/IrArrayRef.cc
+  src/ir/handle/IrMemberRef.cc
+
+  src/ir/const_val/ConstVal.cc
+  src/ir/const_val/BooleanConst.cc
+  src/ir/const_val/IntConst.cc
+  src/ir/const_val/FloatConst.cc
+  src/ir/const_val/StringConst.cc
+
+  src/ir/node/IrLoad.cc
+  src/ir/node/IrStore.cc
+  src/ir/node/IrOp.cc
+  src/ir/node/IrUniOp.cc
+  src/ir/node/IrBinOp.cc
+  src/ir/node/IrTriOp.cc
+  src/ir/node/IrInplaceOp.cc
+  src/ir/node/IrInplaceUniOp.cc
+  src/ir/node/IrInplaceBinOp.cc
+  src/ir/node/IrFuncCall.cc
+  src/ir/node/IrReturn.cc
+  src/ir/node/IrJump.cc
+  src/ir/node/IrLabel.cc
 
   src/engine/YmslVM.cc
 
