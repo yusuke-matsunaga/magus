@@ -43,16 +43,12 @@ public:
 
   /// @brief 抽象構文木から中間表現を生成する．
   /// @param[in] ast_root 抽象構文木の根のノード
-  /// @param[out] var_list 生成された変数のリスト
-  /// @param[out] func_list 生成された関数のリスト
-  /// @param[out] node_list 生成したノードのリスト
+  /// @param[in] code_block 生成された中間表現を格納するオブジェクト
   ///
   /// エラーが起きたら false を返す．
   bool
   elaborate(const AstStatement* ast_root,
-	    vector<const Var*>& var_list,
-	    vector<IrFunction*>& func_list,
-	    vector<IrNode*>& node_list);
+	    IrCodeBlock& code_block);
 
 
 private:
@@ -65,17 +61,13 @@ private:
   /// @param[in] scope 現在のスコープ
   /// @param[in] start_label ブロックの開始ラベル
   /// @param[in] end_label ブロックの終了ラベル
-  /// @param[out] var_list 生成された変数のリスト
-  /// @param[out] func_list 生成された関数のリスト
-  /// @param[out] node_list 生成されたノードのリスト
+  /// @param[in] code_block 生成された中間表現を格納するオブジェクト
   void
   elab_stmt(const AstStatement* stmt,
 	    Scope* scope,
 	    IrNode* start_label,
 	    IrNode* end_label,
-	    vector<const Var*>& var_list,
-	    vector<IrFunction*>& func_list,
-	    vector<IrNode*>& node_list);
+	    IrCodeBlock& code_block);
 
   /// @brief 名前がローカルに重複していないかチェックする．
   /// @param[in] ast_name 名前を表す AST
@@ -98,13 +90,13 @@ private:
   /// @brief 関数の定義を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
-  /// @param[out] func_list 生成された関数のリスト
+  /// @param[in] code_block 生成された中間表現を格納するオブジェクト
   ///
   /// stmt は kFuncDecl でなければならない．
   void
   reg_func(const AstStatement* stmt,
 	   Scope* scope,
-	   vector<IrFunction*>& func_list);
+	   IrCodeBlock& code_block);
 
   /// @brief 定数の定義を行う．
   /// @param[in] stmt 文

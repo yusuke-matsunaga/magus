@@ -1,8 +1,8 @@
-#ifndef IRFUNCTION_H
-#define IRFUNCTION_H
+#ifndef IRTOPLEVEL_H
+#define IRTOPLEVEL_H
 
-/// @file IrFunction.h
-/// @brief IrFunction のヘッダファイル
+/// @file IrToplevel.h
+/// @brief IrToplevel のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,26 +15,19 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrFunction IrFunction.h "IrFunction.h"
-/// @brief 関数の中間表現
+/// @class IrToplevel IrToplevel.h "IrToplevel.h"
+/// @brief トップレベルのコードブロック
 //////////////////////////////////////////////////////////////////////
-class IrFunction :
+class IrToplevel :
   public IrCodeBlock
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] toplevel トップレベルブロック
-  /// @param[in] func 関数本体
-  /// @param[in] arg_list 引数のリスト
-  /// @param[in] arg_init_list 引数のデフォルト値のリスト
-  IrFunction(IrToplevel& toplevel,
-	     const Function* func,
-	     const vector<const Var*>& arg_list,
-	     const vector<IrNode*>& arg_init_list);
+  IrToplevel();
 
   /// @brief デストラクタ
-  ~IrFunction();
+  ~IrToplevel();
 
 
 public:
@@ -47,6 +40,24 @@ public:
   IrToplevel&
   toplevel();
 
+  /// @brief 変数を追加する．
+  virtual
+  void
+  add_var(Var* var);
+
+  /// @brief 関数を追加する．
+  /// @param[in] func 関数
+  void
+  add_function(IrFunction* func);
+
+  /// @brief グローバル変数のリストを返す．
+  const vector<const Var*>&
+  global_var_list() const;
+
+  /// @brief 関数のリストを返す．
+  const vector<IrFunction*>&
+  func_list() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -54,25 +65,19 @@ private:
   //////////////////////////////////////////////////////////////////////
 
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // トップレベルブロック
-  IrToplevel& mToplevel;
+  // グローバル変数のリスト
+  vector<const Var*> mGlobalVarList;
 
-  // 関数本体
-  const Function* mFunction;
-
-  // 引数のリスト
-  vector<const Var*> mArgList;
-
-  // 引数のデフォルト値のリスト
-  vector<IrNode*> mArgInitList;
+  // 関数のリスト
+  vector<IrFunction*> mFuncList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRFUNCTION_H
+#endif // IRTOPLEVEL_H

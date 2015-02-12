@@ -34,9 +34,11 @@ class YmslObj;
 
 class ConstVal;
 class Function;
+class IrCodeBlock;
 class IrHandle;
 class IrFunction;
 class IrNode;
+class IrToplevel;
 class Label;
 class Scope;
 class Type;

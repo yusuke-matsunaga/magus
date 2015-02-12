@@ -11,7 +11,7 @@
 
 #include "AstMgr.h"
 #include "IrMgr.h"
-
+#include "IrToplevel.h"
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -46,10 +46,8 @@ YmslCompiler::compile(IDO& ido)
 
   // 中間表現を作る．
   AstStatement* toplevel = ast_mgr.toplevel();
-  vector<const Var*> var_list;
-  vector<IrFunction*> func_list;
-  vector<IrNode*> node_list;
-  bool stat2 = ir_mgr.elaborate(toplevel, var_list, func_list, node_list);
+  IrToplevel* ir_toplevel = new IrToplevel;
+  bool stat2 = ir_mgr.elaborate(toplevel, *ir_toplevel);
   if ( !stat2 ) {
     return false;
   }

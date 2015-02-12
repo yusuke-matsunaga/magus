@@ -15,6 +15,7 @@
 #include "Function.h"
 #include "Var.h"
 #include "Scope.h"
+#include "IrCodeBlock.h"
 #include "IrNode.h"
 
 
@@ -66,13 +67,12 @@ IrMgr::clear()
 
 // @brief 抽象構文木から中間表現を生成する．
 // @param[in] ast_root 抽象構文木の根のノード
+// @param[in] code_block 生成された中間表現を格納するオブジェクト
 //
 // エラーが起きたら false を返す．
 bool
 IrMgr::elaborate(const AstStatement* ast_root,
-		 vector<const Var*>& var_list,
-		 vector<IrFunction*>& func_list,
-		 vector<IrNode*>& node_list)
+		 IrCodeBlock& code_block)
 {
   ASSERT_COND( ast_root->stmt_type() == AstStatement::kToplevel );
 
@@ -81,7 +81,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
 
   // 中間表現を作る．
   Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
-  elab_stmt(ast_root, toplevel_scope, NULL, NULL, var_list, func_list, node_list);
+  elab_stmt(ast_root, toplevel_scope, NULL, NULL, code_block);
 
   // 関数呼び出しの解決を行う．
   for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();

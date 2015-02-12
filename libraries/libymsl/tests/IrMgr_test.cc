@@ -12,6 +12,7 @@
 #include "AstStatement.h"
 #include "AstPrinter.h"
 #include "IrMgr.h"
+#include "IrToplevel.h"
 #include "IrPrinter.h"
 
 #include "YmUtils/FileIDO.h"
@@ -41,16 +42,14 @@ ir_test1(IDO& ido)
   printer.print_statement(toplevel);
 
   IrMgr ir_mgr;
-  vector<const Var*> var_list;
-  vector<IrFunction*> func_list;
-  vector<IrNode*> node_list;
-  bool stat2 = ir_mgr.elaborate(toplevel, var_list, func_list, node_list);
+  IrToplevel ir_toplevel;
+  bool stat2 = ir_mgr.elaborate(toplevel, ir_toplevel);
   if ( !stat2 ) {
     return 2;
   }
 
   IrPrinter ir_printer(cout);
-  ir_printer.print_code(node_list);
+  ir_printer.print_code(ir_toplevel.node_list());
 
   return 0;
 }
