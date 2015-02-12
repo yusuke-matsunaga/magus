@@ -28,7 +28,8 @@ IrFunction::IrFunction(IrToplevel& toplevel,
   mToplevel(toplevel),
   mFunction(func),
   mArgList(arg_list),
-  mArgInitList(arg_init_list)
+  mArgInitList(arg_init_list),
+  mIndex(0)
 {
 }
 
@@ -42,6 +43,27 @@ IrToplevel&
 IrFunction::toplevel()
 {
   return mToplevel;
+}
+
+// @brief 関数本体を返す．
+const Function*
+IrFunction::function() const
+{
+  return mFunction;
+}
+
+// @brief インデックスを返す．
+ymuint
+IrFunction::index() const
+{
+  return mIndex;
+}
+
+// @brief インデックスを設定する．
+void
+IrFunction::set_index(ymuint index)
+{
+  mIndex = index;
 }
 
 END_NAMESPACE_YM_YMSL

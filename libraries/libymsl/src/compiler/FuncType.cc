@@ -25,7 +25,7 @@ FuncType::FuncType(const Type* output_type,
   mOutputType(output_type),
   mInputType(input_type_list.size())
 {
-  for (ymuint i = 0; i < mInputType.size(); ++ i) {
+  for (ymuint i = 0; i < input_type_list.size(); ++ i) {
     mInputType[i] = input_type_list[i];
   }
 }

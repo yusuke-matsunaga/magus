@@ -165,6 +165,11 @@ private:
   void
   reg_type(Type* type);
 
+  /// @brief 型のハッシュ値を計算する．
+  /// @param[in] type 型
+  ymuint
+  hash_type(Type* type);
+
   /// @brief ハッシュ表を確保する．
   /// @param[in] req_size 表のサイズ
   void

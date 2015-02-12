@@ -49,7 +49,7 @@ ir_test1(IDO& ido)
   }
 
   IrPrinter ir_printer(cout);
-  ir_printer.print_code(ir_toplevel.node_list());
+  ir_printer.print_code(ir_toplevel);
 
   return 0;
 }

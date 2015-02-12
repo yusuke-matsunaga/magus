@@ -36,8 +36,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コードの内容を出力する．
+  /// @param[in] toplevel トップレベルのコードブロック
   void
-  print_code(const vector<IrNode*>& node_list);
+  print_code(const IrToplevel& toplevel);
+
+  /// @brief ノードリストの内容を出力する．
+  void
+  print_node_list(const vector<IrNode*>& node_list);
 
   /// @brief ノードの内容を出力する．
   void

@@ -8,6 +8,8 @@
 
 
 #include "IrPrinter.h"
+#include "IrToplevel.h"
+#include "IrFunction.h"
 #include "IrNode.h"
 #include "IrHandle.h"
 #include "Var.h"
@@ -35,8 +37,50 @@ IrPrinter::~IrPrinter()
 }
 
 // @brief コードの内容を出力する．
+// @param[in] toplevel トップレベルのコードブロック
 void
-IrPrinter::print_code(const vector<IrNode*>& node_list)
+IrPrinter::print_code(const IrToplevel& toplevel)
+{
+  const vector<const Var*>& global_var_list = toplevel.global_var_list();
+  ymuint ng = global_var_list.size();
+  for (ymuint i = 0; i < ng; ++ i) {
+    const Var* var = global_var_list[i];
+    mS << "global #" << var->index() << ": " << var->name()
+       << ": ";
+    var->value_type()->print(mS);
+    mS << endl;
+  }
+
+  const vector<const Var*>& var_list = toplevel.var_list();
+  ymuint nv = var_list.size();
+  for (ymuint i = 0; i < nv; ++ i) {
+    const Var* var = var_list[i];
+    mS << "var #" << var->index() << ": " << var->name()
+       << ": ";
+    var->value_type()->print(mS);
+    mS << endl;
+  }
+
+  const vector<IrNode*>& node_list = toplevel.node_list();
+  print_node_list(node_list);
+  mS << "--- end of toplevel code ---" << endl;
+
+  const vector<IrFunction*>& func_list = toplevel.func_list();
+  ymuint nf = func_list.size();
+  for (ymuint i = 0; i < nf; ++ i) {
+    IrFunction* ir_func = func_list[i];
+    const Function* func = ir_func->function();
+    mS << "function #" << ir_func->index()
+       << ": " << func->name() << endl;
+    const vector<IrNode*>& node_list = ir_func->node_list();
+    print_node_list(node_list);
+    mS << endl;
+  }
+}
+
+// @brief ノードリストの内容を出力する．
+void
+IrPrinter::print_node_list(const vector<IrNode*>& node_list)
 {
   ymuint n = node_list.size();
   vector<IrNode*> all_list;

@@ -104,6 +104,7 @@ TypeMgr::clear()
        p != mTypeList.end(); ++ p) {
     delete *p;
   }
+  mTypeList.clear();
 
   mVoidType = NULL;
   mBooleanType = NULL;
@@ -485,16 +486,16 @@ TypeMgr::calc_type3(OpCode opcode,
 void
 TypeMgr::init()
 {
+  mHashSize = 0;
+  mHashTable = NULL;
+  mHashNum = 0;
+  alloc_table(1024);
+
   mVoidType = new_PrimType(kVoidType);
   mBooleanType = new_PrimType(kBooleanType);
   mIntType = new_PrimType(kIntType);
   mFloatType = new_PrimType(kFloatType);
   mStringType = new_PrimType(kStringType);
-
-  mHashSize = 0;
-  mHashTable = NULL;
-  mHashNum = 0;
-  alloc_table(1024);
 }
 
 // @brief プリミティブ型を作る．
@@ -515,37 +516,45 @@ TypeMgr::reg_type(Type* type)
   type->mId = mTypeList.size();
   mTypeList.push_back(type);
 
-  ymuint h;
-  switch ( type->type_id() ) {
-  case kArrayType:
-    h = hash_array(type->elem_type());
-    break;
-
-  case kSetType:
-    h = hash_set(type->elem_type());
-    break;
-
-  case kMapType:
-    h = hash_map(type->key_type(), type->elem_type());
-    break;
-
-  case kFuncType:
-    h = hash_func2(type);
-    break;
-
-  default:
-    return;
-  }
-
   if ( mHashNum >= mNextLimit ) {
     alloc_table(mHashSize * 2);
   }
-  h = h % mHashSize;
-  type->mLink = mHashTable[h];
-  mHashTable[h] = type;
-  ++ mHashNum;
+
+  ymuint h = hash_type(type);
+  if ( h < mHashSize ) {
+    type->mLink = mHashTable[h];
+    mHashTable[h] = type;
+    ++ mHashNum;
+  }
 }
 
+// @brief 型のハッシュ値を計算する．
+// @param[in] type 型
+ymuint
+TypeMgr::hash_type(Type* type)
+{
+  switch ( type->type_id() ) {
+  case kArrayType:
+    return hash_array(type->elem_type()) % mHashSize;
+
+  case kSetType:
+    return hash_set(type->elem_type()) % mHashSize;
+
+  case kMapType:
+    return hash_map(type->key_type(), type->elem_type()) % mHashSize;
+
+  case kFuncType:
+    return hash_func2(type) % mHashSize;
+
+  default:
+    break;
+  }
+
+  return mHashSize;
+}
+
+// @brief ハッシュ表を確保する．
+// @param[in] req_size 表のサイズ
 void
 TypeMgr::alloc_table(ymuint req_size)
 {
@@ -561,7 +570,9 @@ TypeMgr::alloc_table(ymuint req_size)
     for (Type* type = old_table[i];
 	 type != NULL; ) {
       Type* next = type->mLink;
-      reg_type(type);
+      ymuint h = hash_type(type);
+      type->mLink = mHashTable[h];
+      mHashTable[h] = type;
       type = next;
     }
   }

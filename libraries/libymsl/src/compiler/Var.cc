@@ -25,7 +25,8 @@ Var::Var(ShString name,
 	 bool global) :
   mName(name),
   mValueType(value_type),
-  mGlobal(global)
+  mGlobal(global),
+  mIndex(0)
 {
 }
 
@@ -53,6 +54,20 @@ bool
 Var::is_global() const
 {
   return mGlobal;
+}
+
+// @brief インデックスを返す．
+ymuint
+Var::index() const
+{
+  return mIndex;
+}
+
+// @brief インデックスを設定する．
+void
+Var::set_index(ymuint index)
+{
+  mIndex = index;
 }
 
 END_NAMESPACE_YM_YMSL

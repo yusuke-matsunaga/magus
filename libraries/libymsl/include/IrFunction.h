@@ -47,6 +47,18 @@ public:
   IrToplevel&
   toplevel();
 
+  /// @brief 関数本体を返す．
+  const Function*
+  function() const;
+
+  /// @brief インデックスを返す．
+  ymuint
+  index() const;
+
+  /// @brief インデックスを設定する．
+  void
+  set_index(ymuint index);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -70,6 +82,9 @@ public:
 
   // 引数のデフォルト値のリスト
   vector<IrNode*> mArgInitList;
+
+  // インデックス
+  ymuint mIndex;
 
 };
 

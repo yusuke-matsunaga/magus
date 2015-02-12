@@ -9,6 +9,8 @@
 
 #include "IrToplevel.h"
 #include "Var.h"
+#include "IrFunction.h"
+#include "Function.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -39,6 +41,8 @@ void
 IrToplevel::add_var(Var* var)
 {
   if ( var->is_global() ) {
+    ymuint index = mGlobalVarList.size();
+    var->set_index(index);
     mGlobalVarList.push_back(var);
   }
   else {
@@ -51,6 +55,8 @@ IrToplevel::add_var(Var* var)
 void
 IrToplevel::add_function(IrFunction* func)
 {
+  ymuint index = mFuncList.size();
+  func->set_index(index);
   mFuncList.push_back(func);
 }
 

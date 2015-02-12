@@ -8,6 +8,7 @@
 
 
 #include "IrCodeBlock.h"
+#include "Var.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -31,6 +32,7 @@ void
 IrCodeBlock::add_var(Var* var)
 {
   ymuint index = mVarList.size();
+  var->set_index(index);
   mVarList.push_back(var);
 }
 

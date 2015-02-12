@@ -52,6 +52,14 @@ public:
   bool
   is_global() const;
 
+  /// @brief インデックスを返す．
+  ymuint
+  index() const;
+
+  /// @brief インデックスを設定する．
+  void
+  set_index(ymuint index);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -66,6 +74,9 @@ private:
 
   // グローバルフラグ
   bool mGlobal;
+
+  // インデックス
+  ymuint mIndex;
 
 };
 
