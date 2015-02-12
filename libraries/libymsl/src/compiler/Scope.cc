@@ -18,11 +18,14 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] parent 親のスコープ
+// @param[in] parent_scope 親のスコープ
+// @param[in] global_scope グローバルスコープ
 // @param[in] name 名前
-Scope::Scope(Scope* parent,
+Scope::Scope(Scope* parent_scope,
+	     Scope* global_scope,
 	     ShString name) :
-  mParent(parent),
+  mParentScope(parent_scope),
+  mGlobalScope(global_scope),
   mName(name),
   mHashSize(0),
   mHashTable(NULL),
@@ -49,6 +52,13 @@ Scope::name() const
   return mName;
 }
 
+// @brief グローバルスコープを返す．
+Scope*
+Scope::global_scope() const
+{
+  return mGlobalScope;
+}
+
 // @brief 要素を追加する．
 // @param[in] item 追加する要素
 void
@@ -59,6 +69,11 @@ Scope::add(IrHandle* item)
   }
 
   _put(item);
+
+  if ( item->handle_type() == IrHandle::kVar ) {
+    const Var* var = item->var();
+    mVarList.push_back(var);
+  }
 }
 
 // @brief ハッシュ表を確保する．
@@ -90,8 +105,19 @@ IrHandle*
 Scope::find(ShString name) const
 {
   IrHandle* h = find_local(name);
-  if ( h == NULL && mParent != NULL ) {
-    h = mParent->find(name);
+  if ( h != NULL ) {
+    return h;
+  }
+
+  if ( mParentScope != NULL ) {
+    h = mParentScope->find(name);
+    if ( h != NULL ) {
+      return h;
+    }
+  }
+
+  if ( mGlobalScope != NULL ) {
+    h = mGlobalScope->find(name);
   }
   return h;
 }

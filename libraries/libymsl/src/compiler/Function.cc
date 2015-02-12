@@ -19,14 +19,10 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 関数名
 // @param[in] type 関数の型
-// @param[in] input_type_list 入力の型のリスト
-// @param[in] index インデックス
 Function::Function(ShString name,
-		   const Type* type,
-		   int index) :
+		   const Type* type) :
   mName(name),
-  mType(type),
-  mIndex(index)
+  mType(type)
 {
 }
 
@@ -47,13 +43,6 @@ const Type*
 Function::type() const
 {
   return mType;
-}
-
-// @brief 関数インデックスを返す．
-int
-Function::index() const
-{
-  return mIndex;
 }
 
 END_NAMESPACE_YM_YMSL

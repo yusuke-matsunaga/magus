@@ -18,6 +18,7 @@
 #include "Scope.h"
 #include "Type.h"
 #include "IrHandle.h"
+#include "IrFunction.h"
 #include "IrNode.h"
 
 
@@ -32,12 +33,16 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] scope 現在のスコープ
 // @param[in] start_label ブロックの開始ラベル
 // @param[in] end_label ブロックの終了ラベル
+// @param[out] var_list 生成された変数のリスト
+// @param[out] func_list 生成された関数のリスト
 // @param[out] node_list 生成されたノードのリスト
 void
 IrMgr::elab_stmt(const AstStatement* stmt,
 		 Scope* scope,
 		 IrNode* start_label,
 		 IrNode* end_label,
+		 vector<const Var*>& var_list,
+		 vector<IrFunction*>& func_list,
 		 vector<IrNode*>& node_list)
 {
   switch ( stmt->stmt_type() ) {
@@ -47,7 +52,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	elab_stmt(stmt1, block_scope, start_label, end_label, node_list);
+	elab_stmt(stmt1, block_scope, start_label, end_label,
+		  var_list, func_list, node_list);
       }
     }
     break;
@@ -97,7 +103,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* start1 = new_Label();
       IrNode* end1 = new_Label();
       node_list.push_back(start1);
-      elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
+      elab_stmt(stmt->stmt(), scope, start1, end1,
+		var_list, func_list, node_list);
       IrNode* cond = elab_expr(stmt->expr(), scope);
       IrNode* node1 = new_BranchTrue(start1, cond);
       node_list.push_back(node1);
@@ -160,15 +167,18 @@ IrMgr::elab_stmt(const AstStatement* stmt,
   case AstStatement::kFor:
     {
       Scope* for_scope = new_scope(scope);
-      elab_stmt(stmt->init_stmt(), for_scope, NULL, NULL, node_list);
+      elab_stmt(stmt->init_stmt(), for_scope, NULL, NULL,
+		var_list, func_list, node_list);
       IrNode* start1 = new_Label();
       node_list.push_back(start1);
       IrNode* end1 = new_Label();
       IrNode* cond = elab_expr(stmt->expr(), for_scope);
       IrNode* node1 = new_BranchFalse(end1, cond);
       node_list.push_back(node1);
-      elab_stmt(stmt->stmt(), for_scope, start1, end1, node_list);
-      elab_stmt(stmt->next_stmt(), for_scope, start1, end1, node_list);
+      elab_stmt(stmt->stmt(), for_scope, start1, end1,
+		var_list, func_list, node_list);
+      elab_stmt(stmt->next_stmt(), for_scope, start1, end1,
+		var_list, func_list, node_list);
       IrNode* node2 = new_Jump(start1);
       node_list.push_back(node2);
       node_list.push_back(end1);
@@ -176,7 +186,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     break;
 
   case AstStatement::kFuncDecl:
-    reg_func(stmt, scope);
+    reg_func(stmt, scope, func_list);
     break;
 
   case AstStatement::kGoto:
@@ -210,11 +220,13 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* label2 = new_Label();
       IrNode* node1 = new_BranchFalse(label1, cond);
       node_list.push_back(node1);
-      elab_stmt(stmt->stmt(), scope, start_label, end_label, node_list);
+      elab_stmt(stmt->stmt(), scope, start_label, end_label,
+		var_list, func_list, node_list);
       IrNode* node2 = new_Jump(label2);
       node_list.push_back(node2);
       node_list.push_back(label1);
-      elab_stmt(stmt->else_stmt(), scope, start_label, end_label, node_list);
+      elab_stmt(stmt->else_stmt(), scope, start_label, end_label,
+		var_list, func_list, node_list);
       node_list.push_back(label2);
     }
     break;
@@ -281,7 +293,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
 	vector<IrNode*> node_list1;
-	elab_stmt(stmt->case_stmt(i), scope, start_label, end_label, node_list1);
+	elab_stmt(stmt->case_stmt(i), scope, start_label, end_label,
+		  var_list, func_list, node_list1);
       }
     }
     break;
@@ -291,13 +304,47 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	elab_stmt(stmt1, scope, NULL, NULL, node_list);
+	elab_stmt(stmt1, scope, NULL, NULL,
+		  var_list, func_list, node_list);
       }
     }
     break;
 
   case AstStatement::kVarDecl:
-    reg_var(stmt, scope);
+    {
+      const AstSymbol* ast_name = stmt->name();
+      if ( !check_name(ast_name, scope) ) {
+	// 名前が重複している．
+	return;
+      }
+
+      const AstType* ast_type = stmt->type();
+      const Type* type = resolve_type(ast_type, scope);
+      if ( type == NULL ) {
+	// エラーメッセージをどこで出すか考える．
+	return;
+      }
+
+      ShString name = ast_name->str_val();
+      bool global = (scope->global_scope() == NULL);
+      Var* var = new_var(name, type, global);
+
+      var_list.push_back(var);
+
+      IrHandle* h = new_VarHandle(var);
+      scope->add(h);
+
+      const AstExpr* ast_expr = stmt->expr();
+      if ( ast_expr != NULL ) {
+	IrNode* expr = elab_expr(ast_expr, scope);
+	if ( expr == NULL ) {
+	  // エラー
+	  return;
+	}
+	IrNode* node = new_Store(h, expr);
+	node_list.push_back(node);
+      }
+    }
     break;
 
   case AstStatement::kWhile:
@@ -308,7 +355,8 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* end1 = new_Label();
       IrNode* node1 = new_BranchFalse(end1, cond);
       node_list.push_back(node1);
-      elab_stmt(stmt->stmt(), scope, start1, end1, node_list);
+      elab_stmt(stmt->stmt(), scope, start1, end1,
+		var_list, func_list, node_list);
       IrNode* node2 = new_Jump(start1);
       node_list.push_back(node2);
       node_list.push_back(end1);
@@ -316,6 +364,26 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     break;
 
   }
+}
+
+// @brief 名前がローカルに重複していないかチェックする．
+// @param[in] ast_name 名前を表す AST
+// @param[in] scope 現在のスコープ
+// @retval true 重複していない．
+// @retval false 重複している．
+bool
+IrMgr::check_name(const AstSymbol* ast_name,
+		  Scope* scope)
+{
+  ShString name = ast_name->str_val();
+  IrHandle* h = scope->find_local(name);
+  if ( h != NULL ) {
+    // name が重複している．
+    // previous definition is h->file_region()
+    return false;
+  }
+
+  return true;
 }
 
 // @brief enum 型の定義を行う．
@@ -329,12 +397,8 @@ IrMgr::reg_enum(const AstStatement* stmt,
   ASSERT_COND( stmt->stmt_type() == AstStatement::kEnumDecl );
 
   const AstSymbol* name_symbol = stmt->name();
-  ShString name = name_symbol->str_val();
-
-  IrHandle* h = scope->find_local(name);
-  if ( h != NULL ) {
-    // name が重複している．
-    // previous definition is h->file_region()
+  if ( !check_name(name_symbol, scope) ) {
+    // 名前が重複している．
     return;
   }
 
@@ -373,6 +437,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
     elem_list[i] = make_pair(elem_name, v);
   }
 
+  ShString name = name_symbol->str_val();
   const Type* type = mTypeMgr.enum_type(name, elem_list);
   Scope* enum_scope = new_scope(scope, name);
   for (ymuint i = 0; i < n; ++ i) {
@@ -383,42 +448,61 @@ IrMgr::reg_enum(const AstStatement* stmt,
     enum_scope->add(h);
   }
 
-  IrHandle* h1 = new_TypeHandle(type, enum_scope);
-  scope->add(h1);
+  IrHandle* h = new_TypeHandle(type, enum_scope);
+  scope->add(h);
 }
 
 // @brief 関数の定義を行う．
 // @param[in] stmt 文
+// @param[in] scope 現在のスコープ
+// @param[out] func_list 生成された関数のリスト
 //
 // stmt は kFuncDecl でなければならない．
 void
 IrMgr::reg_func(const AstStatement* stmt,
-		Scope* scope)
+		Scope* scope,
+		vector<IrFunction*>& func_list)
+
 {
   ASSERT_COND( stmt->stmt_type() == AstStatement::kFuncDecl );
 
   const AstSymbol* name_symbol = stmt->name();
-  ShString name = name_symbol->str_val();
-
-  IrHandle* h = scope->find_local(name);
-  if ( h != NULL ) {
-    // name が重複している．
-    // previous definition is h->file_region()
+  if ( !check_name(name_symbol, scope) ) {
+    // 名前が重複している．
     return;
   }
 
-  const AstType* asttype = stmt->type();
-  const Type* output_type = resolve_type(asttype, scope);
+  // 関数のスコープを生成する．
+  Scope* global_scope = scope->global_scope();
+  if ( global_scope == NULL ) {
+    global_scope = scope;
+  }
+  Scope* func_scope = new_scope(global_scope);
+
+  // 出力の型を解決する．
+  const AstType* ast_type = stmt->type();
+  const Type* output_type = resolve_type(ast_type, scope);
   if ( output_type == NULL ) {
     // エラーメッセージをどこで出すか考える．
     return;
   }
 
+  // 入力に関するいくつかの処理を行う．
   ymuint np = stmt->param_num();
+  vector<ShString> input_name_list(np);
   vector<const Type*> input_type_list(np);
   for (ymuint i = 0; i < np; ++ i) {
-    const AstType* asttype = stmt->param_type(i);
-    const Type* type = resolve_type(asttype, scope);
+    // 名前の重複チェック
+    const AstSymbol* ast_name = stmt->param_name(i);
+    if ( !check_name(ast_name, func_scope) ) {
+      // 名前が重複していた．
+      return;
+    }
+    input_name_list[i] = ast_name->str_val();
+
+    // 型の解決
+    const AstType* ast_type = stmt->param_type(i);
+    const Type* type = resolve_type(ast_type, scope);
     if ( type == NULL ) {
       // エラーメッセージをどこで出すか考える．
       return;
@@ -426,42 +510,42 @@ IrMgr::reg_func(const AstStatement* stmt,
     input_type_list[i] = type;
   }
 
+  // 関数の生成
+  ShString name = name_symbol->str_val();
   const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
   Function* func = new_function(name, ftype);
-  IrHandle* h1 = new_FuncHandle(func);
-  scope->add(h1);
-}
 
-// @brief 変数の定義を行う．
-// @param[in] stmt 文
-//
-// stmt は kVarDecl でなければならない．
-void
-IrMgr::reg_var(const AstStatement* stmt,
-	       Scope* scope)
-{
-  ASSERT_COND( stmt->stmt_type() == AstStatement::kVarDecl );
+  IrHandle* h = new_FuncHandle(func);
+  scope->add(h);
 
-  const AstSymbol* name_symbol = stmt->name();
-  ShString name = name_symbol->str_val();
+  // 関数の内部表現の生成
+  IrFunction* ir_func = new IrFunction;
+  func_list.push_back(ir_func);
 
-  IrHandle* h = scope->find_local(name);
-  if ( h != NULL ) {
-    // name が重複している．
-    // previous definition is h->file_region()
-    return;
+  // 引数の生成
+  for (ymuint i = 0; i < np; ++ i) {
+    Var* var = new_var(input_name_list[i], input_type_list[i], false);
+    ir_func->mArgList.push_back(var);
+    IrHandle* h = new_VarHandle(var);
+    func_scope->add(h);
+
+    // デフォルト値の式の生成
+    // これは関数外のスコープで行う．
+    const AstExpr* ast_expr = stmt->param_expr(i);
+    IrNode* node = NULL;
+    if ( ast_expr != NULL ) {
+      node = elab_expr(ast_expr, scope);
+      if ( node == NULL ) {
+	return;
+      }
+    }
+    ir_func->mArgInitList.push_back(node);
   }
 
-  const AstType* asttype = stmt->type();
-  const Type* type = resolve_type(asttype, scope);
-  if ( type == NULL ) {
-    // エラーメッセージをどこで出すか考える．
-    return;
-  }
+  // 関数内部のノードの生成
+  elab_stmt(stmt->stmt(), func_scope, NULL, NULL,
+	    ir_func->mVarList, func_list, ir_func->mNodeList);
 
-  Var* var = new_var(name, type);
-  IrHandle* h1 = new_VarHandle(var);
-  scope->add(h1);
 }
 
 // @brief 定数の定義を行う．
@@ -475,30 +559,32 @@ IrMgr::reg_const(const AstStatement* stmt,
   ASSERT_COND( stmt->stmt_type() == AstStatement::kConstDecl );
 
   const AstSymbol* name_symbol = stmt->name();
-  ShString name = name_symbol->str_val();
-
-  IrHandle* h = scope->find_local(name);
-  if ( h != NULL ) {
-    // name が重複している．
-    // previous definition is h->file_region()
+  if ( !check_name(name_symbol, scope) ) {
+    // 名前が重複していた．
     return;
   }
 
-  const AstType* asttype = stmt->type();
-  const Type* type = resolve_type(asttype, scope);
+  const AstType* ast_type = stmt->type();
+  const Type* type = resolve_type(ast_type, scope);
   if ( type == NULL ) {
     // エラーメッセージをどこで出すか考える．
     return;
   }
 
-  IrNode* node = elab_expr(stmt->expr(), scope);
+  const AstExpr* ast_expr = stmt->expr();
+  IrNode* node = elab_expr(ast_expr, scope);
+  if ( node == NULL ) {
+    return;
+  }
+
   // node->type() が type と互換性があるかをチェック
   // node が定数式かチェック
-  const ConstVal* const_val;
+  const ConstVal* const_val = NULL; // 未完
   // const_val = eval(node);
 
-  IrHandle* h1 = new_ConstHandle(name, const_val);
-  scope->add(h1);
+  ShString name = name_symbol->str_val();
+  IrHandle* h = new_ConstHandle(name, const_val);
+  scope->add(h);
 }
 
 // @brief 型の参照を解決する．

@@ -24,9 +24,11 @@ class Scope
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] parent 親のスコープ
+  /// @param[in] parent_scope 親のスコープ
+  /// @param[in] global_scope グローバルスコープ
   /// @param[in] name 名前
-  Scope(Scope* parent,
+  Scope(Scope* parent_scope,
+	Scope* global_scope,
 	ShString name = ShString());
 
   /// @brief デストラクタ
@@ -43,6 +45,10 @@ public:
   /// ShString() (空文字列)の場合もある．
   ShString
   name() const;
+
+  /// @brief グローバルスコープを返す．
+  Scope*
+  global_scope() const;
 
   /// @brief 要素を追加する．
   /// @param[in] item 追加する要素
@@ -85,7 +91,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 親のスコープ
-  Scope* mParent;
+  Scope* mParentScope;
+
+  // グローバルスコープ
+  Scope* mGlobalScope;
 
   // 自身の名前
   ShString mName;
@@ -101,6 +110,9 @@ private:
 
   // ハッシュの要素数
   ymuint mHashNum;
+
+  // ここに属する変数のリスト
+  vector<const Var*> mVarList;
 
 };
 

@@ -19,13 +19,13 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 変数名
 // @param[in] value_type 型
-// @param[in] index インデックス
+// @param[in] global グローバル変数の時 true にするフラグ
 Var::Var(ShString name,
 	 const Type* value_type,
-	 ymuint index) :
+	 bool global) :
   mName(name),
   mValueType(value_type),
-  mIndex(index)
+  mGlobal(global)
 {
 }
 
@@ -48,11 +48,11 @@ Var::value_type() const
   return mValueType;
 }
 
-// @brief 変数インデックスを得る．
-ymuint
-Var::index() const
+// @brief グローバル変数の時に true を返す．
+bool
+Var::is_global() const
 {
-  return mIndex;
+  return mGlobal;
 }
 
 END_NAMESPACE_YM_YMSL

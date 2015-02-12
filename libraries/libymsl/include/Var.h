@@ -26,10 +26,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 変数名
   /// @param[in] value_type 型
-  /// @param[in] index インデックス
+  /// @param[in] global グローバル変数の時 true にするフラグ
   Var(ShString name,
       const Type* value_type,
-      ymuint index);
+      bool global);
 
   /// @brief デストラクタ
   ~Var();
@@ -48,9 +48,9 @@ public:
   const Type*
   value_type() const;
 
-  /// @brief 変数インデックスを得る．
-  ymuint
-  index() const;
+  /// @brief グローバル変数の時に true を返す．
+  bool
+  is_global() const;
 
 
 private:
@@ -64,8 +64,8 @@ private:
   // 型
   const Type* mValueType;
 
-  // インデックス
-  ymuint mIndex;
+  // グローバルフラグ
+  bool mGlobal;
 
 };
 

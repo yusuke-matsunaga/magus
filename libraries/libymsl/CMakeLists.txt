@@ -86,6 +86,7 @@ set (ymsl_SOURCES
   src/compiler/TypeMgr.cc
   src/compiler/Var.cc
 
+  src/ir/IrFunction.cc
   src/ir/IrMgr.cc
   src/ir/IrMgr_const.cc
   src/ir/IrMgr_expr.cc

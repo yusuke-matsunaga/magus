@@ -41,8 +41,10 @@ ir_test1(IDO& ido)
   printer.print_statement(toplevel);
 
   IrMgr ir_mgr;
+  vector<const Var*> var_list;
+  vector<IrFunction*> func_list;
   vector<IrNode*> node_list;
-  bool stat2 = ir_mgr.elaborate(toplevel, node_list);
+  bool stat2 = ir_mgr.elaborate(toplevel, var_list, func_list, node_list);
   if ( !stat2 ) {
     return 2;
   }

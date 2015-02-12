@@ -70,6 +70,8 @@ IrMgr::clear()
 // エラーが起きたら false を返す．
 bool
 IrMgr::elaborate(const AstStatement* ast_root,
+		 vector<const Var*>& var_list,
+		 vector<IrFunction*>& func_list,
 		 vector<IrNode*>& node_list)
 {
   ASSERT_COND( ast_root->stmt_type() == AstStatement::kToplevel );
@@ -79,7 +81,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
 
   // 中間表現を作る．
   Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
-  elab_stmt(ast_root, toplevel_scope, NULL, NULL, node_list);
+  elab_stmt(ast_root, toplevel_scope, NULL, NULL, var_list, func_list, node_list);
 
   // 関数呼び出しの解決を行う．
   for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();
@@ -110,7 +112,18 @@ Scope*
 IrMgr::new_scope(Scope* parent_scope,
 		 ShString name)
 {
-  Scope* scope = new Scope(parent_scope, name);
+  Scope* global_scope = NULL;
+  if ( parent_scope != NULL ) {
+    // 基本的には親のグローバルスコープを受け継ぐ
+    global_scope = parent_scope->global_scope();
+    if ( global_scope == NULL ) {
+      // グローバルスコープを持たないスコープは
+      // グローバルスコープだけ．
+      global_scope = parent_scope;
+      parent_scope = NULL;
+    }
+  }
+  Scope* scope = new Scope(parent_scope, global_scope, name);
   mScopeList.push_back(scope);
 
   return scope;
@@ -119,13 +132,13 @@ IrMgr::new_scope(Scope* parent_scope,
 // @brief 変数を生成する．
 // @param[in] name 名前
 // @param[in] type 型
+// @param[in] global グローバル変数の時 true にするフラグ
 Var*
 IrMgr::new_var(ShString name,
-	       const Type* type)
+	       const Type* type,
+	       bool global)
 {
-  ymuint index = mVarList.size();
-  Var* var = new Var(name, type, index);
-  mVarList.push_back(var);
+  Var* var = new Var(name, type, global);
 
   return var;
 }
@@ -138,9 +151,7 @@ Function*
 IrMgr::new_function(ShString name,
 		    const Type* type)
 {
-  ymuint index = mFuncList.size();
-  Function* func = new Function(name, type, index);
-  mFuncList.push_back(func);
+  Function* func = new Function(name, type);
 
   return func;
 }

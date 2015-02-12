@@ -26,10 +26,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] type 関数の型
-  /// @param[in] index インデックス
   Function(ShString name,
-	   const Type* type,
-	   int index);
+	   const Type* type);
 
   /// @brief デストラクタ
   virtual
@@ -49,10 +47,6 @@ public:
   const Type*
   type() const;
 
-  /// @brief 関数インデックスを返す．
-  int
-  index() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -64,9 +58,6 @@ private:
 
   // 関数の型
   const Type* mType;
-
-  // インデックス
-  int mIndex;
 
 };
 

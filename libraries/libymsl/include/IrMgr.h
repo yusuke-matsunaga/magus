@@ -43,11 +43,15 @@ public:
 
   /// @brief 抽象構文木から中間表現を生成する．
   /// @param[in] ast_root 抽象構文木の根のノード
-  /// @param[in] node_list 生成したノードのリスト
+  /// @param[out] var_list 生成された変数のリスト
+  /// @param[out] func_list 生成された関数のリスト
+  /// @param[out] node_list 生成したノードのリスト
   ///
   /// エラーが起きたら false を返す．
   bool
   elaborate(const AstStatement* ast_root,
+	    vector<const Var*>& var_list,
+	    vector<IrFunction*>& func_list,
 	    vector<IrNode*>& node_list);
 
 
@@ -61,13 +65,26 @@ private:
   /// @param[in] scope 現在のスコープ
   /// @param[in] start_label ブロックの開始ラベル
   /// @param[in] end_label ブロックの終了ラベル
+  /// @param[out] var_list 生成された変数のリスト
+  /// @param[out] func_list 生成された関数のリスト
   /// @param[out] node_list 生成されたノードのリスト
   void
   elab_stmt(const AstStatement* stmt,
 	    Scope* scope,
 	    IrNode* start_label,
 	    IrNode* end_label,
+	    vector<const Var*>& var_list,
+	    vector<IrFunction*>& func_list,
 	    vector<IrNode*>& node_list);
+
+  /// @brief 名前がローカルに重複していないかチェックする．
+  /// @param[in] ast_name 名前を表す AST
+  /// @param[in] scope 現在のスコープ
+  /// @retval true 重複していない．
+  /// @retval false 重複している．
+  bool
+  check_name(const AstSymbol* name,
+	     Scope* scope);
 
   /// @brief enum 型の定義を行う．
   /// @param[in] stmt 文
@@ -81,20 +98,13 @@ private:
   /// @brief 関数の定義を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
+  /// @param[out] func_list 生成された関数のリスト
   ///
   /// stmt は kFuncDecl でなければならない．
   void
   reg_func(const AstStatement* stmt,
-	   Scope* scope);
-
-  /// @brief 変数の定義を行う．
-  /// @param[in] stmt 文
-  /// @param[in] scope 現在のスコープ
-  ///
-  /// stmt は kVarDecl でなければならない．
-  void
-  reg_var(const AstStatement* stmt,
-	  Scope* scope);
+	   Scope* scope,
+	   vector<IrFunction*>& func_list);
 
   /// @brief 定数の定義を行う．
   /// @param[in] stmt 文
@@ -147,9 +157,11 @@ private:
   /// @brief 変数を生成する．
   /// @param[in] name 名前
   /// @param[in] type 型
+  /// @param[in] global グローバル変数の時 true にするフラグ
   Var*
   new_var(ShString name,
-	  const Type* type);
+	  const Type* type,
+	  bool global);
 
   /// @brief 関数を生成する．
   /// @param[in] name 名前
