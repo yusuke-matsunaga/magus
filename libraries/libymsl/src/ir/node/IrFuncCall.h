@@ -46,6 +46,13 @@ public:
   bool
   is_static() const;
 
+  /// @brief 関数アドレスを設定する．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  void
+  set_func_addr(IrHandle* handle);
+
   /// @brief 関数のアドレスを返す．
   ///
   /// kOpFuncCall のみ有効

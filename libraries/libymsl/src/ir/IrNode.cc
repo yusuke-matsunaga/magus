@@ -110,6 +110,15 @@ IrNode::store_val() const
   return NULL;
 }
 
+// @brief 関数アドレスを設定する．
+//
+// kFuncCall のみ有効
+void
+IrNode::set_func_addr(IrHandle* handle)
+{
+  ASSERT_NOT_REACHED;
+}
+
 // @brief 関数アドレスを返す．
 //
 // kFuncCall のみ有効

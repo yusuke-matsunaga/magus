@@ -135,6 +135,13 @@ public:
   IrNode*
   store_val() const;
 
+  /// @brief 関数アドレスを設定する．
+  ///
+  /// kFuncCall のみ有効
+  virtual
+  void
+  set_func_addr(IrHandle* handle);
+
   /// @brief 関数アドレスを返す．
   ///
   /// kFuncCall のみ有効

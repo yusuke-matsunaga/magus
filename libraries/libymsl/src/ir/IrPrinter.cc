@@ -70,11 +70,11 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   for (ymuint i = 0; i < nf; ++ i) {
     IrFunction* ir_func = func_list[i];
     const Function* func = ir_func->function();
+    mS << endl;
     mS << "function #" << ir_func->index()
        << ": " << func->name() << endl;
     const vector<IrNode*>& node_list = ir_func->node_list();
     print_node_list(node_list);
-    mS << endl;
   }
 }
 

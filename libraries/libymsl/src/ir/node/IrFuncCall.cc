@@ -48,6 +48,15 @@ IrFuncCall::is_static() const
   return false;
 }
 
+// @brief 関数アドレスを設定する．
+//
+// kFuncCall のみ有効
+void
+IrFuncCall::set_func_addr(IrHandle* handle)
+{
+  mFuncAddr = handle;
+}
+
 // @brief 関数アドレスを返す．
 //
 // kOpFuncCall のみ有効

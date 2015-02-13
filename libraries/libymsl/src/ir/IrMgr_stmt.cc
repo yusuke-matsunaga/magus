@@ -702,6 +702,7 @@ IrMgr::resolve_func(const AstExpr* expr,
   // func の型と node の arglist の型をチェック
 
   // node に func をセット
+  node->set_func_addr(h);
   return true;
 }
 
