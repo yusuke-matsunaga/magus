@@ -128,7 +128,7 @@ set (ymsl_SOURCES
   src/ir/node/IrJump.cc
   src/ir/node/IrLabel.cc
 
-  src/engine/YmslVM.cc
+  src/vsm/YmslVSM.cc
 
   )
 
