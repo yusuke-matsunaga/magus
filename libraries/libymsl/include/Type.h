@@ -111,7 +111,7 @@ public:
   ///
   /// enum のみ有効
   virtual
-  int
+  Ymsl_INT
   enum_elem_val(ymuint index) const;
 
   /// @brief 列挙型の定数名を得る．

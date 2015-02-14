@@ -30,7 +30,7 @@ public:
   /// @param[in] name 名前
   /// @param[in] elem_list 要素名と値のリスト
   EnumType(ShString name,
-	   const vector<pair<ShString, int> >& elem_list);
+	   const vector<pair<ShString, Ymsl_INT> >& elem_list);
 
   /// @brief デストラクタ
   virtual
@@ -60,7 +60,7 @@ public:
   ///
   /// enum のみ有効
   virtual
-  int
+  Ymsl_INT
   enum_elem_val(ymuint index) const;
 
   /// @brief 列挙型の定数名を得る．

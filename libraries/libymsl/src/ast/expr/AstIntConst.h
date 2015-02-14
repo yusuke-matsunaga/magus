@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstIntConst(int val,
+  AstIntConst(Ymsl_INT val,
 	      const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -48,7 +48,7 @@ public:
   ///
   /// kIntConst のみ有効
   virtual
-  int
+  Ymsl_INT
   int_val() const;
 
 
@@ -58,7 +58,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  int mVal;
+  Ymsl_INT mVal;
 
 };
 

@@ -27,7 +27,7 @@ public:
   /// @param[in] type 型
   /// @param[in] val 値
   FloatConst(const Type* type,
-	     double val);
+	     Ymsl_FLOAT val);
 
   /// @brief デストラクタ
   virtual
@@ -41,7 +41,7 @@ public:
 
   /// @brief 実数値を返す．
   virtual
-  double
+  Ymsl_FLOAT
   float_val() const;
 
 
@@ -51,7 +51,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  double mVal;
+  Ymsl_FLOAT mVal;
 
 };
 

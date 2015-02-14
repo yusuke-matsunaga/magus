@@ -71,14 +71,14 @@ public:
   ///
   /// kIntConst のみ有効
   virtual
-  int
+  Ymsl_INT
   int_val() const;
 
   /// @brief 浮動小数点値を返す．
   ///
   /// kFloatConst のみ有効
   virtual
-  double
+  Ymsl_FLOAT
   float_val() const;
 
   /// @brief 文字列値を返す．

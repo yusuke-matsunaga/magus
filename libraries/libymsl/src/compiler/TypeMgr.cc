@@ -250,7 +250,7 @@ TypeMgr::function_type(const Type* output_type,
 // @param[in] elem_list 要素名と値のリスト
 const Type*
 TypeMgr::enum_type(ShString name,
-		   const vector<pair<ShString, int> >& elem_list)
+		   const vector<pair<ShString, Ymsl_INT> >& elem_list)
 {
   Type* type = new EnumType(name, elem_list);
   reg_type(type);

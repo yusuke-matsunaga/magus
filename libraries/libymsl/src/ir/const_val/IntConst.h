@@ -27,7 +27,7 @@ public:
   /// @param[in] type 型
   /// @param[in] val 値
   IntConst(const Type* type,
-	   int val);
+	   Ymsl_INT val);
 
   /// @brief デストラクタ
   virtual
@@ -41,7 +41,7 @@ public:
 
   /// @brief 整数値を返す．
   virtual
-  int
+  Ymsl_INT
   int_val() const;
 
 
@@ -51,7 +51,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  int mVal;
+  Ymsl_INT mVal;
 
 };
 

@@ -394,13 +394,13 @@ IrMgr::reg_enum(const AstStatement* stmt,
   }
 
   ymint n = stmt->enum_num();
-  vector<pair<ShString, int> > elem_list(n);
+  vector<pair<ShString, Ymsl_INT> > elem_list(n);
   int next_val = 0;
   for (ymuint i = 0; i < n; ++ i) {
     const AstSymbol* ec_symbol = stmt->enum_const(i);
     ShString elem_name = ec_symbol->str_val();
     const AstExpr* ec_expr = stmt->enum_const_expr(i);
-    int v;
+    Ymsl_INT v;
     if ( ec_expr != NULL ) {
       IrNode* node = elab_expr(ec_expr, scope);
       if ( node == NULL ) {
@@ -433,7 +433,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
   Scope* enum_scope = new_scope(scope, name);
   for (ymuint i = 0; i < n; ++ i) {
     ShString name = type->enum_elem_name(i);
-    int val = type->enum_elem_val(i);
+    Ymsl_INT val = type->enum_elem_val(i);
     const ConstVal* const_val = new_IntConst(val);
     IrHandle* h = new_ConstHandle(name, const_val);
     enum_scope->add(h);

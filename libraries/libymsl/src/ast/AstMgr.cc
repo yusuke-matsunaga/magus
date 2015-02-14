@@ -135,11 +135,11 @@ AstMgr::set_root(AstStmtList* stmt_list,
 // @param[out] lval 値を格納する変数
 // @param[out] lloc 位置情報を格納する変数
 // @return 読み込んだトークンの id を返す．
-int
+TokenType
 AstMgr::scan(YYSTYPE& lval,
 	     FileRegion& lloc)
 {
-  int id = mScanner->read_token(lloc);
+  TokenType id = mScanner->read_token(lloc);
 
   switch ( id ) {
   case SYMBOL:
@@ -666,7 +666,7 @@ AstMgr::new_FalseConst(const FileRegion& loc)
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_IntConst(int val,
+AstMgr::new_IntConst(Ymsl_INT val,
 		     const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstIntConst));
@@ -677,7 +677,7 @@ AstMgr::new_IntConst(int val,
 // @param[in] val 値
 // @param[in] loc ファイル位置
 AstExpr*
-AstMgr::new_FloatConst(double val,
+AstMgr::new_FloatConst(Ymsl_FLOAT val,
 		       const FileRegion& loc)
 {
   void* p = mAlloc.get_memory(sizeof(AstFloatConst));

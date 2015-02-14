@@ -42,7 +42,7 @@ EnumConst::name() const
 }
 
 // @brief 値を返す．
-int
+Ymsl_INT
 EnumConst::val() const
 {
   return mVal;
@@ -57,7 +57,7 @@ EnumConst::val() const
 // @param[in] name 名前
 // @param[in] elem_list 要素名と値のリスト
 EnumType::EnumType(ShString name,
-		   const vector<pair<ShString, int> >& elem_list) :
+		   const vector<pair<ShString, Ymsl_INT> >& elem_list) :
   NamedType(kEnumType, name),
   mElemNum(elem_list.size())
 {
@@ -97,7 +97,7 @@ EnumType::enum_num() const
 // @param[in] index インデックス ( 0 <= index < enum_num() )
 //
 // enum のみ有効
-int
+Ymsl_INT
 EnumType::enum_elem_val(ymuint index) const
 {
   ASSERT_COND( index < enum_num() );

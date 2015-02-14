@@ -179,12 +179,12 @@ private:
   /// @brief 整数値定数を生成する．
   /// @param[in] val 値
   const ConstVal*
-  new_IntConst(int val);
+  new_IntConst(Ymsl_INT val);
 
   /// @brief 実数値定数を生成する．
   /// @param[in] val 値
   const ConstVal*
-  new_FloatConst(double val);
+  new_FloatConst(Ymsl_FLOAT val);
 
   /// @brief 文字列定数を生成する．
   /// @param[in] val 値

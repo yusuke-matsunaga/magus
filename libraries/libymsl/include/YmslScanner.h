@@ -64,12 +64,12 @@ public:
 
   /// @brief 直前の read_token() に対応する整数値を返す．
   /// @note 型が INT_NUM でなかったときの値は不定
-  int
+  Ymsl_INT
   cur_int() const;
 
   /// @brief 直前の read_token() に対応する実数値を返す．
   /// @note 型が FLOAT_NUM/INT_NUM でなかったときの値は不定
-  double
+  Ymsl_FLOAT
   cur_float() const;
 
   /// @brief 現在のトークンの内容を出力する．(デバッグ用)
@@ -132,7 +132,7 @@ YmslScanner::cur_string() const
 // @brief 直前の read_token() に対応する整数値を返す．
 // @note 型が INT_NUM でなかったときの値は不定
 inline
-int
+Ymsl_INT
 YmslScanner::cur_int() const
 {
   return strtol(cur_string(), NULL, 10);
@@ -141,7 +141,7 @@ YmslScanner::cur_int() const
 // @brief 直前の read_token() に対応する実数値を返す．
 // @note 型が FLOAT_NUM/INT_NUM でなかったときの値は不定
 inline
-double
+Ymsl_FLOAT
 YmslScanner::cur_float() const
 {
   return strtod(cur_string(), NULL);

@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] type 型
 // @param[in] val 値
 FloatConst::FloatConst(const Type* type,
-		       double val) :
+		       Ymsl_FLOAT val) :
   ConstVal(type),
   mVal(val)
 {
@@ -32,7 +32,7 @@ FloatConst::~FloatConst()
 }
 
 // @brief 実数値を返す．
-double
+Ymsl_FLOAT
 FloatConst::float_val() const
 {
   return mVal;

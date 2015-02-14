@@ -104,7 +104,7 @@ public:
   /// @param[in] elem_list 要素名と値のリスト
   const Type*
   enum_type(ShString name,
-	    const vector<pair<ShString, int> >& elem_list);
+	    const vector<pair<ShString, Ymsl_INT> >& elem_list);
 
   /// @brief 演算と入力の型から出力の型を求める．(単項演算用)
   /// @param[in] opcode オペコード

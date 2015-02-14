@@ -34,7 +34,7 @@ BooleanConst::~BooleanConst()
 // @brief ブール値を返す．
 //
 // value_type() が boolean_type の時有効
-bool
+Ymsl_BOOLEAN
 BooleanConst::boolean_val() const
 {
   return mVal;

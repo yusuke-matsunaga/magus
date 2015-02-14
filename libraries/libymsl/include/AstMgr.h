@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "TokenType.h"
 #include "OpCode.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/FileRegion.h"
@@ -69,7 +70,7 @@ public:
   /// @param[out] lval 値を格納する変数
   /// @param[out] lloc 位置情報を格納する変数
   /// @return 読み込んだトークンの id を返す．
-  int
+  TokenType
   scan(YYSTYPE& lval,
        FileRegion& lloc);
 
@@ -377,14 +378,14 @@ public:
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_IntConst(int val,
+  new_IntConst(Ymsl_INT val,
 	       const FileRegion& loc);
 
   /// @brief 浮動小数点定数式を作る．
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
   AstExpr*
-  new_FloatConst(double val,
+  new_FloatConst(Ymsl_FLOAT val,
 		 const FileRegion& loc);
 
   /// @brief 文字列定数を作る．

@@ -45,7 +45,6 @@ class Type;
 class TypeMgr;
 class Var;
 
-
 class AstCaseItem;
 class AstEnumConst;
 class AstExpr;
@@ -68,6 +67,9 @@ typedef AstList<AstExpr> AstExprList;
 typedef AstList<AstEnumConst> AstEnumConstList;
 typedef AstList<AstSymbol> AstSymbolList;
 
+
+/// @brief 論理型
+typedef bool Ymsl_BOOLEAN;
 
 /// @brief 整数型
 typedef ymint32 Ymsl_INT;

@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstIntConst::AstIntConst(int val,
+AstIntConst::AstIntConst(Ymsl_INT val,
 			 const FileRegion& loc) :
   AstExpr(loc),
   mVal(val)
@@ -41,7 +41,7 @@ AstIntConst::expr_type() const
 // @brief 整数値を返す．
 //
 // kIntConst のみ有効
-int
+Ymsl_INT
 AstIntConst::int_val() const
 {
   return mVal;

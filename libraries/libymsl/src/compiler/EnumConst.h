@@ -46,7 +46,7 @@ public:
   name() const;
 
   /// @brief 値を返す．
-  int
+  Ymsl_INT
   val() const;
 
 
@@ -62,7 +62,7 @@ private:
   ShString mName;
 
   // 値
-  int mVal;
+  Ymsl_INT mVal;
 
 };
 

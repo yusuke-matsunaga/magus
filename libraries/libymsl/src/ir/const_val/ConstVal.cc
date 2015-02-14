@@ -38,7 +38,7 @@ ConstVal::value_type() const
 // @brief ブール値を返す．
 //
 // value_type() が boolean_type の時有効
-bool
+Ymsl_BOOLEAN
 ConstVal::boolean_val() const
 {
   ASSERT_NOT_REACHED;
@@ -48,7 +48,7 @@ ConstVal::boolean_val() const
 // @brief 整数値を返す．
 //
 // value_type() が int_type の時有効
-int
+Ymsl_INT
 ConstVal::int_val() const
 {
   ASSERT_NOT_REACHED;
@@ -58,7 +58,7 @@ ConstVal::int_val() const
 // @brief 実数値を返す．
 //
 // value_type() が float_type の時有効
-double
+Ymsl_FLOAT
 ConstVal::float_val() const
 {
   ASSERT_NOT_REACHED;

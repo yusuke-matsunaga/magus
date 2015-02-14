@@ -44,21 +44,21 @@ public:
   ///
   /// value_type() が boolean_type の時有効
   virtual
-  bool
+  Ymsl_BOOLEAN
   boolean_val() const;
 
   /// @brief 整数値を返す．
   ///
   /// value_type() が int_type の時有効
   virtual
-  int
+  Ymsl_INT
   int_val() const;
 
   /// @brief 実数値を返す．
   ///
   /// value_type() が float_type の時有効
   virtual
-  double
+  Ymsl_FLOAT
   float_val() const;
 
   /// @brief 文字列を返す．

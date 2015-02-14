@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] type 型
 // @param[in] val 値
 IntConst::IntConst(const Type* type,
-		   int val) :
+		   Ymsl_INT val) :
   ConstVal(type),
   mVal(val)
 {
@@ -32,7 +32,7 @@ IntConst::~IntConst()
 }
 
 // @brief 整数値を返す．
-int
+Ymsl_INT
 IntConst::int_val() const
 {
   return mVal;

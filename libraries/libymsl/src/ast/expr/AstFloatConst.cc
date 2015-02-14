@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] val 値
 // @param[in] loc ファイル位置
-AstFloatConst::AstFloatConst(double val,
+AstFloatConst::AstFloatConst(Ymsl_FLOAT val,
 			     const FileRegion& loc) :
   AstExpr(loc),
   mVal(val)
@@ -41,7 +41,7 @@ AstFloatConst::expr_type() const
 // @brief 浮動小数点値を返す．
 //
 // kFloatConst のみ有効
-double
+Ymsl_FLOAT
 AstFloatConst::float_val() const
 {
   return mVal;

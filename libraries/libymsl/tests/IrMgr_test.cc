@@ -74,7 +74,8 @@ ir_test(int argc,
       "function f(a:int):int"
       "{"
       "const k:int = 2;"
-      "return a * k;"
+      "const k2: int = k * 2;"
+      "return a * k2;"
       "}";
 
     StringIDO ido(str);

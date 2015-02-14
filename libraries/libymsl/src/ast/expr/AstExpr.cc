@@ -31,7 +31,7 @@ AstExpr::~AstExpr()
 // @brief 整数値を返す．
 //
 // kIntConst のみ有効
-int
+Ymsl_INT
 AstExpr::int_val() const
 {
   ASSERT_NOT_REACHED;
@@ -41,7 +41,7 @@ AstExpr::int_val() const
 // @brief 実数値を返す．
 //
 // kFloatConst のみ有効
-double
+Ymsl_FLOAT
 AstExpr::float_val() const
 {
   ASSERT_NOT_REACHED;

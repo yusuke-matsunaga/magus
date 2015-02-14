@@ -40,7 +40,7 @@ IrMgr::new_False()
 // @brief 整数値定数を生成する．
 // @param[in] val 値
 const ConstVal*
-IrMgr::new_IntConst(int val)
+IrMgr::new_IntConst(Ymsl_INT val)
 {
   void* p = mAlloc.get_memory(sizeof(IntConst));
   return new (p) IntConst(mTypeMgr.int_type(), val);
@@ -49,7 +49,7 @@ IrMgr::new_IntConst(int val)
 // @brief 実数値定数を生成する．
 // @param[in] val 値
 const ConstVal*
-IrMgr::new_FloatConst(double val)
+IrMgr::new_FloatConst(Ymsl_FLOAT val)
 {
   void* p = mAlloc.get_memory(sizeof(FloatConst));
   return new (p) FloatConst(mTypeMgr.float_type(), val);

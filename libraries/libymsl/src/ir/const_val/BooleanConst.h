@@ -43,7 +43,7 @@ public:
   ///
   /// value_type() が boolean_type の時有効
   virtual
-  bool
+  Ymsl_BOOLEAN
   boolean_val() const;
 
 

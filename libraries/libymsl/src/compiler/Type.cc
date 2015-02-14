@@ -110,7 +110,7 @@ Type::enum_num() const
 // @param[in] index インデックス ( 0 <= index < enum_num() )
 //
 // enum のみ有効
-int
+Ymsl_INT
 Type::enum_elem_val(ymuint index) const
 {
   ASSERT_NOT_REACHED;

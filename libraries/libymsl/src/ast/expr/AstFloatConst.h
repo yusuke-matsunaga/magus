@@ -26,7 +26,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] val 値
   /// @param[in] loc ファイル位置
-  AstFloatConst(double val,
+  AstFloatConst(Ymsl_FLOAT val,
 		const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -48,7 +48,7 @@ public:
   ///
   /// kFloatConst のみ有効
   virtual
-  double
+  Ymsl_FLOAT
   float_val() const;
 
 
@@ -58,7 +58,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  double mVal;
+  Ymsl_FLOAT mVal;
 
 };
 
