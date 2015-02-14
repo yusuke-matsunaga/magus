@@ -1,0 +1,69 @@
+#ifndef IRINTERP_H
+#define IRINTERP_H
+
+/// @file IrInterp.h
+/// @brief IrInterp のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2015 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "ymsl_int.h"
+
+
+BEGIN_NAMESPACE_YM_YMSL
+
+//////////////////////////////////////////////////////////////////////
+/// @class IrInterp IrInterp.h "IrInterp.h"
+/// @brief IrNode のインタープリタ
+//////////////////////////////////////////////////////////////////////
+class IrInterp
+{
+public:
+
+  /// @brief コンストラクタ
+  IrInterp();
+
+  /// @brief デストラクタ
+  ~IrInterp();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief boolean 型の式の評価を行う．
+  /// @param[in] node 式を表すノード
+  bool
+  eval_boolean(IrNode* node);
+
+  /// @brief int 型の式の評価を行う．
+  /// @param[in] node 式を表すノード
+  Ymsl_INT
+  eval_int(IrNode* node);
+
+  /// @brief float 型の式の評価を行う．
+  /// @param[in] node 式を表すノード
+  Ymsl_FLOAT
+  eval_float(IrNode* node);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+
+};
+
+END_NAMESPACE_YM_YMSL
+
+#endif // IRINTERP_H

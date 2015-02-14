@@ -20,9 +20,9 @@ BEGIN_NAMESPACE_YM_YMSL
 /// あんまり union は使いたくないんだけど
 //////////////////////////////////////////////////////////////////////
 union YmslValue {
-  ymint64 int_value;
-  double  float_value;
-  YmslObj* obj_value;
+  Ymsl_INT    int_value;
+  Ymsl_FLOAT  float_value;
+  Ymsl_OBJPTR obj_value;
 };
 
 END_NAMESPACE_YM_YMSL

@@ -9,6 +9,8 @@
 
 // C++ 用の定義
 
+#include "ymsl_int.h"
+
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/MsgMgr.h"
 

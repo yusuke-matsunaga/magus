@@ -22,6 +22,9 @@
 #include "IrFunction.h"
 #include "IrNode.h"
 #include "IrToplevel.h"
+#include "IrInterp.h"
+
+#include "IrPrinter.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -547,9 +550,12 @@ IrMgr::reg_const(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == AstStatement::kConstDecl );
 
+  cout << "reg_const" << endl;
+
   const AstSymbol* name_symbol = stmt->name();
   if ( !check_name(name_symbol, scope) ) {
     // 名前が重複していた．
+    cout << name_symbol->str_val() << ": already defined" << endl;
     return;
   }
 
@@ -557,19 +563,63 @@ IrMgr::reg_const(const AstStatement* stmt,
   const Type* type = resolve_type(ast_type, scope);
   if ( type == NULL ) {
     // エラーメッセージをどこで出すか考える．
+    cout << "type resolve error" << endl;
     return;
   }
 
   const AstExpr* ast_expr = stmt->expr();
   IrNode* node = elab_expr(ast_expr, scope);
   if ( node == NULL ) {
+    cout << "eval_expr() == NULL" << endl;
     return;
   }
 
   // node->type() が type と互換性があるかをチェック
+
   // node が定数式かチェック
-  const ConstVal* const_val = NULL; // 未完
-  // const_val = eval(node);
+  if ( !node->is_static() ) {
+    // ast_expr is not a constant
+    cout << "not a constant" << endl;
+    return;
+  }
+
+  {
+    IrPrinter printer(cout);
+    printer.print_node(node);
+  }
+  IrInterp interp;
+  const ConstVal* const_val = NULL;
+  switch ( node->value_type()->type_id() ) {
+  case kBooleanType:
+    {
+      bool val = interp.eval_boolean(node);
+      if ( val ) {
+	const_val = new_True();
+      }
+      else {
+	const_val = new_False();
+      }
+    }
+    break;
+
+  case kIntType:
+    {
+      Ymsl_INT val = interp.eval_int(node);
+      const_val = new_IntConst(val);
+    }
+    break;
+
+  case kFloatType:
+    {
+      Ymsl_FLOAT val = interp.eval_float(node);
+      const_val = new_FloatConst(val);
+    }
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+  }
+  ASSERT_COND( const_val != NULL );
 
   ShString name = name_symbol->str_val();
   IrHandle* h = new_ConstHandle(name, const_val);

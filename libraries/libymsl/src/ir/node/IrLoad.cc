@@ -8,6 +8,7 @@
 
 
 #include "IrLoad.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -37,7 +38,7 @@ IrLoad::~IrLoad()
 bool
 IrLoad::is_static() const
 {
-  return false;
+  return address()->is_static();
 }
 
 // @brief ロード/ストア対象のアドレスを得る．

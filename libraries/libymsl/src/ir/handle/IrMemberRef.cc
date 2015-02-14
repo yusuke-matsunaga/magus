@@ -45,6 +45,15 @@ IrMemberRef::handle_type() const
   return kMemberRef;
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrMemberRef::is_static() const
+{
+  return false;
+}
+
 // @brief オブジェクトを指す式を返す．
 //
 // kOpMemberRef, kOpMemberStore のみ有効

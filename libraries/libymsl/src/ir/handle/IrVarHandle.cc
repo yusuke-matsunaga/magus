@@ -43,6 +43,15 @@ IrVarHandle::handle_type() const
   return kVar;
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrVarHandle::is_static() const
+{
+  return false;
+}
+
 // @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．

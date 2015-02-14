@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "YmslValue.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL

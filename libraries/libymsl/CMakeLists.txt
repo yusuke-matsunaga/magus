@@ -95,6 +95,7 @@ set (ymsl_SOURCES
   src/ir/IrMgr_handle.cc
   src/ir/IrMgr_node.cc
   src/ir/IrMgr_stmt.cc
+  src/ir/IrInterp.cc
   src/ir/IrNode.cc
   src/ir/IrPrinter.cc
 

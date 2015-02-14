@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "TokenType.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL

@@ -13,6 +13,7 @@
 #include "YmUtils/Scanner.h"
 #include "YmUtils/FileRegion.h"
 #include "YmUtils/StrBuff.h"
+#include "TokenType.h"
 #include "OpCode.h"
 
 

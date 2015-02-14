@@ -67,6 +67,13 @@ public:
   HandleType
   handle_type() const = 0;
 
+  /// @brief 静的評価可能か調べる．
+  ///
+  /// 要するに定数式かどうかということ
+  virtual
+  bool
+  is_static() const = 0;
+
   /// @brief スコープを返す．
   ///
   /// kScope のみ有効

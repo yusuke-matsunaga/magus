@@ -49,6 +49,13 @@ public:
   HandleType
   handle_type() const;
 
+  /// @brief 静的評価可能か調べる．
+  ///
+  /// 要するに定数式かどうかということ
+  virtual
+  bool
+  is_static() const;
+
   /// @brief 配列本体の式を返す．
   ///
   /// kOpArrayRef のみ有効

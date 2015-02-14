@@ -43,6 +43,15 @@ IrFuncHandle::handle_type() const
   return kFunction;
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrFuncHandle::is_static() const
+{
+  return false;
+}
+
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．

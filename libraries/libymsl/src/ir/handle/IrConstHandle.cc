@@ -45,6 +45,15 @@ IrConstHandle::handle_type() const
   return kConstant;
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrConstHandle::is_static() const
+{
+  return true;
+}
+
 // @brief 定数値を返す．
 //
 // 他の要素の場合には NULL を返す．

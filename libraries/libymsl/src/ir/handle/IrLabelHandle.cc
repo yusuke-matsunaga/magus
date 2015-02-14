@@ -45,6 +45,15 @@ IrLabelHandle::handle_type() const
   return kLabel;
 }
 
+// @brief 静的評価可能か調べる．
+//
+// 要するに定数式かどうかということ
+bool
+IrLabelHandle::is_static() const
+{
+  return false;
+}
+
 // @brief ラベルを返す．
 //
 // 他の要素の場合には NULL を返す．
