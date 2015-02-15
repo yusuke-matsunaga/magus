@@ -73,9 +73,11 @@ ir_test(int argc,
       ""
       "function f(a:int):int"
       "{"
-      "const k:int = 2;"
-      "const k2: int = k * 2;"
-      "return a * k2;"
+      "enum ktype {"
+      " k1 = 2,"
+      " k2 = k1 + 1"
+      "}"
+      "return a * ktype.k2;"
       "}";
 
     StringIDO ido(str);

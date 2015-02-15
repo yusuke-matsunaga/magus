@@ -195,6 +195,7 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
       IrHandle* h = scope->find(symbol->str_val());
       if ( h == NULL ) {
 	// symbol not found
+	cout << symbol->str_val() << ": not found" << endl;
 	return NULL;
       }
       return h;
@@ -210,12 +211,14 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
       IrNode* base = new_Load(h);
       if ( base->value_type()->type_id() != kArrayType ) {
 	// base is not an array
+	cout << "base is not an array" << endl;
 	return NULL;
       }
 
       IrNode* offset = elab_expr(ast_expr->index(), scope);
       if ( offset->value_type()->type_id() != kIntType ) {
 	// offset is not an integer
+	cout << "offset is not an integer" << endl;
 	return NULL;
       }
 
@@ -229,6 +232,7 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
       IrHandle* h = elab_primary(body, scope);
       switch ( h->handle_type() ) {
       case IrHandle::kScope:
+      case IrHandle::kNamedType:
 	{
 	  Scope* scope1 = h->scope();
 	  IrHandle* h1 = scope1->find(member_symbol->str_val());

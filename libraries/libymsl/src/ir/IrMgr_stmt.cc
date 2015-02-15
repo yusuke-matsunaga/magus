@@ -377,6 +377,23 @@ IrMgr::check_name(const AstSymbol* ast_name,
   return true;
 }
 
+BEGIN_NONAMESPACE
+
+bool
+check(const vector<Ymsl_INT>& used_val,
+      Ymsl_INT val)
+{
+  for (vector<Ymsl_INT>::const_iterator p = used_val.begin();
+       p != used_val.end(); ++ p) {
+    if ( *p == val ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+END_NONAMESPACE
+
 // @brief enum 型の定義を行う．
 // @param[in] stmt 文
 //
@@ -390,55 +407,66 @@ IrMgr::reg_enum(const AstStatement* stmt,
   const AstSymbol* name_symbol = stmt->name();
   if ( !check_name(name_symbol, scope) ) {
     // 名前が重複している．
+    cout << name_symbol->str_val() << ": duplicated" << endl;
     return;
   }
 
+  ShString name = name_symbol->str_val();
+  Scope* enum_scope = new_scope(scope, name);
+
+  IrInterp interp;
+
   ymint n = stmt->enum_num();
   vector<pair<ShString, Ymsl_INT> > elem_list(n);
-  int next_val = 0;
+  Ymsl_INT next_val = 0;
+  vector<Ymsl_INT> used_val;
+  used_val.reserve(n);
   for (ymuint i = 0; i < n; ++ i) {
     const AstSymbol* ec_symbol = stmt->enum_const(i);
     ShString elem_name = ec_symbol->str_val();
     const AstExpr* ec_expr = stmt->enum_const_expr(i);
     Ymsl_INT v;
     if ( ec_expr != NULL ) {
-      IrNode* node = elab_expr(ec_expr, scope);
+      IrNode* node = elab_expr(ec_expr, enum_scope);
       if ( node == NULL ) {
 	// エラー
+	cout << "error in elab_expr" << endl;
 	return;
       }
       if ( !node->is_static() ) {
 	// ec_expr が定数式ではない．
+	cout << "ec_expr is not a constant" << endl;
 	return;
       }
       if ( node->value_type() != mTypeMgr.int_type() ) {
 	// 整数型ではない．
+	cout << "ec_expr is not an integer" << endl;
 	return;
       }
-      // v = eval(node);
-      // v が重複していないかチェック
+      v = interp.eval_int(node);
+
+      if ( check(used_val, v) ) {
+	cout << "duplicated value" << endl;
+	return;
+      }
+      used_val.push_back(v);
     }
     else {
-      // while ( check(next_val) ) {
-      //   ++ next_val;
-      // }
+      while ( check(used_val, next_val) ) {
+	++ next_val;
+      }
       v = next_val;
+      used_val.push_back(v);
       ++ next_val;
     }
     elem_list[i] = make_pair(elem_name, v);
-  }
 
-  ShString name = name_symbol->str_val();
-  const Type* type = mTypeMgr.enum_type(name, elem_list);
-  Scope* enum_scope = new_scope(scope, name);
-  for (ymuint i = 0; i < n; ++ i) {
-    ShString name = type->enum_elem_name(i);
-    Ymsl_INT val = type->enum_elem_val(i);
-    const ConstVal* const_val = new_IntConst(val);
-    IrHandle* h = new_ConstHandle(name, const_val);
+    const ConstVal* const_val = new_IntConst(v);
+    IrHandle* h = new_ConstHandle(elem_name, const_val);
     enum_scope->add(h);
   }
 
+  const Type* type = mTypeMgr.enum_type(name, elem_list);
   IrHandle* h = new_TypeHandle(type, enum_scope);
   scope->add(h);
 }
@@ -550,8 +578,6 @@ IrMgr::reg_const(const AstStatement* stmt,
 {
   ASSERT_COND( stmt->stmt_type() == AstStatement::kConstDecl );
 
-  cout << "reg_const" << endl;
-
   const AstSymbol* name_symbol = stmt->name();
   if ( !check_name(name_symbol, scope) ) {
     // 名前が重複していた．
@@ -583,10 +609,6 @@ IrMgr::reg_const(const AstStatement* stmt,
     return;
   }
 
-  {
-    IrPrinter printer(cout);
-    printer.print_node(node);
-  }
   IrInterp interp;
   const ConstVal* const_val = NULL;
   switch ( node->value_type()->type_id() ) {
