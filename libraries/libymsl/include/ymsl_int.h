@@ -32,14 +32,13 @@ BEGIN_NAMESPACE_YM_YMSL
 class YmslCodeList;
 class YmslObj;
 
-class ConstVal;
-class Function;
 class IrCodeBlock;
 class IrHandle;
 class IrFunction;
 class IrNode;
 class IrToplevel;
-class Label;
+
+class Function;
 class Scope;
 class Type;
 class TypeMgr;
@@ -76,6 +75,9 @@ typedef ymint32 Ymsl_INT;
 
 /// @brief 浮動小数点型
 typedef double Ymsl_FLOAT;
+
+/// @brief 文字列型
+typedef const char* Ymsl_STRING;
 
 /// @brief オブジェクト型
 ///

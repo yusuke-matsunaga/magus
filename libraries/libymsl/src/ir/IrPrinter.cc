@@ -14,7 +14,6 @@
 #include "IrHandle.h"
 #include "Var.h"
 #include "Function.h"
-#include "ConstVal.h"
 #include "Type.h"
 
 
@@ -459,38 +458,27 @@ IrPrinter::print_handle(IrHandle* handle)
     mS << "function[" << handle->name() << "]";
     break;
 
-  case IrHandle::kConstant:
-    mS << "constant[";
-    {
-      const ConstVal* val = handle->constant();
-      switch ( val->value_type()->type_id() ) {
-      case kBooleanType:
-	if ( val->boolean_val() ) {
-	  mS << "true";
-	}
-	else {
-	  mS << "false";
-	}
-	break;
-
-      case kIntType:
-	mS << val->int_val();
-	break;
-
-      case kFloatType:
-	mS << val->float_val();
-	break;
-
-      case kStringType:
-	mS << val->string_val();
-	break;
-
-      default:
-	ASSERT_NOT_REACHED;
-	break;
-      }
+  case IrHandle::kBooleanConst:
+    mS << "boolean[";
+    if ( handle->boolean_val() ) {
+      mS << "true";
+    }
+    else {
+      mS << "false";
     }
     mS << "]";
+    break;
+
+  case IrHandle::kIntConst:
+    mS << "int[" << handle->int_val() << "]";
+    break;
+
+  case IrHandle::kFloatConst:
+    mS << "float[" << handle->float_val() << "]";
+    break;
+
+  case IrHandle::kStringConst:
+    mS << "string[" << handle->string_val() << "]";
     break;
 
   case IrHandle::kLabel:

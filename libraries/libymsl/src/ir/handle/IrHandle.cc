@@ -45,12 +45,43 @@ IrHandle::function() const
   return NULL;
 }
 
-// @brief 定数を返す．
+// @brief ブール値を返す．
 //
-// 他の要素の場合には NULL を返す．
-const ConstVal*
-IrHandle::constant() const
+// kBooleanConst のみ有効
+Ymsl_BOOLEAN
+IrHandle::boolean_val() const
 {
+  ASSERT_NOT_REACHED;
+  return false;
+}
+
+// @brief 整数値を返す．
+//
+// kIntConst のみ有効
+Ymsl_INT
+IrHandle::int_val() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief 実数値を返す．
+//
+// kFloatConst のみ有効
+Ymsl_FLOAT
+IrHandle::float_val() const
+{
+  ASSERT_NOT_REACHED;
+  return 0.0;
+}
+
+// @brief 文字列値を返す．
+//
+// kStringConst のみ有効
+const char*
+IrHandle::string_val() const
+{
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

@@ -1,64 +1,64 @@
 
-/// @file IrConstHandle.cc
-/// @brief IrConstHandle の実装ファイル
+/// @file IrStringConst.cc
+/// @brief IrStringConst の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrConstHandle.h"
+#include "IrStringConst.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrConstHandle
+// クラス IrStringConst
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 名前
 // @param[in] const_val 定数値
-IrConstHandle::IrConstHandle(ShString name,
-			     const ConstVal* const_val) :
+IrStringConst::IrStringConst(ShString name,
+			     Ymsl_STRING const_val) :
   mName(name),
   mConstVal(const_val)
 {
 }
 
 // @brief デストラクタ
-IrConstHandle::~IrConstHandle()
+IrStringConst::~IrStringConst()
 {
 }
 
 // @brief 名前を返す．
 ShString
-IrConstHandle::name() const
+IrStringConst::name() const
 {
   return mName;
 }
 
 // @brief 種類を返す．
 IrHandle::HandleType
-IrConstHandle::handle_type() const
+IrStringConst::handle_type() const
 {
-  return kConstant;
+  return kStringConst;
 }
 
 // @brief 静的評価可能か調べる．
 //
 // 要するに定数式かどうかということ
 bool
-IrConstHandle::is_static() const
+IrStringConst::is_static() const
 {
   return true;
 }
 
-// @brief 定数値を返す．
+// @brief ブール値を返す．
 //
-// 他の要素の場合には NULL を返す．
-const ConstVal*
-IrConstHandle::constant() const
+// kStringConst のみ有効
+Ymsl_STRING
+IrStringConst::string_val() const
 {
   return mConstVal;
 }

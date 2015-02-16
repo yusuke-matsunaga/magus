@@ -165,42 +165,8 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // ConstVal の派生クラスを生成する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief true 定数を生成する．
-  const ConstVal*
-  new_True();
-
-  /// @brief False 定数を生成する．
-  const ConstVal*
-  new_False();
-
-  /// @brief 整数値定数を生成する．
-  /// @param[in] val 値
-  const ConstVal*
-  new_IntConst(Ymsl_INT val);
-
-  /// @brief 実数値定数を生成する．
-  /// @param[in] val 値
-  const ConstVal*
-  new_FloatConst(Ymsl_FLOAT val);
-
-  /// @brief 文字列定数を生成する．
-  /// @param[in] val 値
-  const ConstVal*
-  new_StringConst(const char* val);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // IrNode の派生クラスを生成する関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 定数参照式を生成する．
-  /// @param[in] const_val 定数値
-  IrNode*
-  new_ConstNode(const ConstVal* const_val);
 
   /// @brief 単項演算式を生成する．
   /// @param[in] opcode オペコード
@@ -316,12 +282,33 @@ private:
   IrHandle*
   new_FuncHandle(const Function* func);
 
-  /// @brief 定数参照を生成する．
+  /// @brief ブール定数を生成する．
   /// @param[in] name 名前
   /// @param[in] const_val 定数値
   IrHandle*
-  new_ConstHandle(ShString name,
-		  const ConstVal* const_val);
+  new_BooleanConst(ShString name,
+		   Ymsl_BOOLEAN const_val);
+
+  /// @brief 整数定数を生成する．
+  /// @param[in] name 名前
+  /// @param[in] const_val 定数値
+  IrHandle*
+  new_IntConst(ShString name,
+	       Ymsl_INT const_val);
+
+  /// @brief 実数定数を生成する．
+  /// @param[in] name 名前
+  /// @param[in] const_val 定数値
+  IrHandle*
+  new_FloatConst(ShString name,
+		 Ymsl_FLOAT const_val);
+
+  /// @brief 文字列定数を生成する．
+  /// @param[in] name 名前
+  /// @param[in] const_val 定数値
+  IrHandle*
+  new_StringConst(ShString name,
+		  Ymsl_STRING const_val);
 
   /// @brief ラベル参照を生成する．
   /// @param[in] name 名前

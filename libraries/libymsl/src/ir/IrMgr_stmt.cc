@@ -461,8 +461,7 @@ IrMgr::reg_enum(const AstStatement* stmt,
     }
     elem_list[i] = make_pair(elem_name, v);
 
-    const ConstVal* const_val = new_IntConst(v);
-    IrHandle* h = new_ConstHandle(elem_name, const_val);
+    IrHandle* h = new_IntConst(elem_name, v);
     enum_scope->add(h);
   }
 
@@ -610,42 +609,44 @@ IrMgr::reg_const(const AstStatement* stmt,
   }
 
   IrInterp interp;
-  const ConstVal* const_val = NULL;
+  IrHandle* const_handle = NULL;
+  ShString name = name_symbol->str_val();
   switch ( node->value_type()->type_id() ) {
   case kBooleanType:
     {
       bool val = interp.eval_boolean(node);
-      if ( val ) {
-	const_val = new_True();
-      }
-      else {
-	const_val = new_False();
-      }
+      const_handle = new_BooleanConst(name, val);
     }
     break;
 
   case kIntType:
     {
       Ymsl_INT val = interp.eval_int(node);
-      const_val = new_IntConst(val);
+      const_handle = new_IntConst(name, val);
     }
     break;
 
   case kFloatType:
     {
       Ymsl_FLOAT val = interp.eval_float(node);
-      const_val = new_FloatConst(val);
+      const_handle = new_FloatConst(name, val);
+    }
+    break;
+
+  case kStringType:
+    {
+#if 0
+      Ymsl_STRING val = interp.eval_string(node);
+      const_handle = new_StringConst(name, val);
+#endif
     }
     break;
 
   default:
     ASSERT_NOT_REACHED;
   }
-  ASSERT_COND( const_val != NULL );
-
-  ShString name = name_symbol->str_val();
-  IrHandle* h = new_ConstHandle(name, const_val);
-  scope->add(h);
+  ASSERT_COND( const_handle != NULL );
+  scope->add(const_handle);
 }
 
 // @brief 型の参照を解決する．

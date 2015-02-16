@@ -36,19 +36,34 @@ IrMgr::elab_expr(const AstExpr* ast_expr,
   IrNode* node = NULL;
   switch ( ast_expr->expr_type() ) {
   case AstExpr::kTrue:
-    return new_ConstNode(new_True());
+    {
+      IrHandle* h = new_BooleanConst(ShString(), true);
+      return new_Load(h);
+    }
 
   case AstExpr::kFalse:
-    return new_ConstNode(new_False());
+    {
+      IrHandle* h = new_BooleanConst(ShString(), false);
+      return new_Load(h);
+    }
 
   case AstExpr::kIntConst:
-    return new_ConstNode(new_IntConst(ast_expr->int_val()));
+    {
+      IrHandle* h = new_IntConst(ShString(), ast_expr->int_val());
+      return new_Load(h);
+    }
 
   case AstExpr::kFloatConst:
-    return new_ConstNode(new_FloatConst(ast_expr->float_val()));
+    {
+      IrHandle* h = new_FloatConst(ShString(), ast_expr->float_val());
+      return new_Load(h);
+    }
 
   case AstExpr::kStringConst:
-    return new_ConstNode(new_StringConst(ast_expr->string_val()));
+    {
+      IrHandle* h = new_StringConst(ShString(), ast_expr->string_val());
+      return new_Load(h);
+    }
 
   case AstExpr::kSymbolExpr:
   case AstExpr::kArrayRef:
@@ -73,6 +88,7 @@ IrMgr::elab_expr(const AstExpr* ast_expr,
 	  // エラー発生
 	  return NULL;
 	}
+	arglist[i] = arg;
       }
       // IrNode だけ作っておいて関数名の解決はあとで行う．
       node = new_FuncCall(NULL, arglist);

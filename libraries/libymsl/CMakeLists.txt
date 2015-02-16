@@ -90,7 +90,6 @@ set (ymsl_SOURCES
   src/ir/IrFunction.cc
   src/ir/IrToplevel.cc
   src/ir/IrMgr.cc
-  src/ir/IrMgr_const.cc
   src/ir/IrMgr_expr.cc
   src/ir/IrMgr_handle.cc
   src/ir/IrMgr_node.cc
@@ -100,7 +99,10 @@ set (ymsl_SOURCES
   src/ir/IrPrinter.cc
 
   src/ir/handle/IrHandle.cc
-  src/ir/handle/IrConstHandle.cc
+  src/ir/handle/IrBooleanConst.cc
+  src/ir/handle/IrIntConst.cc
+  src/ir/handle/IrFloatConst.cc
+  src/ir/handle/IrStringConst.cc
   src/ir/handle/IrFuncHandle.cc
   src/ir/handle/IrLabelHandle.cc
   src/ir/handle/IrScopeHandle.cc
@@ -108,12 +110,6 @@ set (ymsl_SOURCES
   src/ir/handle/IrVarHandle.cc
   src/ir/handle/IrArrayRef.cc
   src/ir/handle/IrMemberRef.cc
-
-  src/ir/const_val/ConstVal.cc
-  src/ir/const_val/BooleanConst.cc
-  src/ir/const_val/IntConst.cc
-  src/ir/const_val/FloatConst.cc
-  src/ir/const_val/StringConst.cc
 
   src/ir/node/IrLoad.cc
   src/ir/node/IrStore.cc

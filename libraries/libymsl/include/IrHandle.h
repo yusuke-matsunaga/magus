@@ -33,7 +33,10 @@ public:
     kScope,
     kVar,
     kFunction,
-    kConstant,
+    kBooleanConst,
+    kIntConst,
+    kFloatConst,
+    kStringConst,
     kLabel,
     kNamedType,
     kArrayRef,
@@ -95,12 +98,33 @@ public:
   const Function*
   function() const;
 
-  /// @brief 定数を返す．
+  /// @brief ブール値を返す．
   ///
-  /// kConstant のみ有効
+  /// kBooleanConst のみ有効
   virtual
-  const ConstVal*
-  constant() const;
+  Ymsl_BOOLEAN
+  boolean_val() const;
+
+  /// @brief 整数値を返す．
+  ///
+  /// kIntConst のみ有効
+  virtual
+  Ymsl_INT
+  int_val() const;
+
+  /// @brief 実数値を返す．
+  ///
+  /// kFloatConst のみ有効
+  virtual
+  Ymsl_FLOAT
+  float_val() const;
+
+  /// @brief 文字列値を返す．
+  ///
+  /// kStringConst のみ有効
+  virtual
+  const char*
+  string_val() const;
 
   /// @brief ラベルを返す．
   ///

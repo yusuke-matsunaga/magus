@@ -9,7 +9,10 @@
 
 #include "IrMgr.h"
 
-#include "handle/IrConstHandle.h"
+#include "handle/IrBooleanConst.h"
+#include "handle/IrIntConst.h"
+#include "handle/IrFloatConst.h"
+#include "handle/IrStringConst.h"
 #include "handle/IrFuncHandle.h"
 #include "handle/IrLabelHandle.h"
 #include "handle/IrScopeHandle.h"
@@ -52,15 +55,48 @@ IrMgr::new_FuncHandle(const Function* func)
   return new (p) IrFuncHandle(func);
 }
 
-// @brief 定数参照を生成する．
+// @brief ブール定数を生成する．
 // @param[in] name 名前
 // @param[in] const_val 定数値
 IrHandle*
-IrMgr::new_ConstHandle(ShString name,
-		       const ConstVal* const_val)
+IrMgr::new_BooleanConst(ShString name,
+			Ymsl_BOOLEAN const_val)
 {
-  void* p = mAlloc.get_memory(sizeof(IrConstHandle));
-  return new (p) IrConstHandle(name, const_val);
+  void* p = mAlloc.get_memory(sizeof(IrBooleanConst));
+  return new (p) IrBooleanConst(name, const_val);
+}
+
+// @brief 整数定数を生成する．
+// @param[in] name 名前
+// @param[in] const_val 定数値
+IrHandle*
+IrMgr::new_IntConst(ShString name,
+		    Ymsl_INT const_val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrIntConst));
+  return new (p) IrIntConst(name, const_val);
+}
+
+// @brief 実数定数を生成する．
+// @param[in] name 名前
+// @param[in] const_val 定数値
+IrHandle*
+IrMgr::new_FloatConst(ShString name,
+		      Ymsl_FLOAT const_val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrFloatConst));
+  return new (p) IrFloatConst(name, const_val);
+}
+
+// @brief 文字列定数を生成する．
+// @param[in] name 名前
+// @param[in] const_val 定数値
+IrHandle*
+IrMgr::new_StringConst(ShString name,
+		       Ymsl_STRING const_val)
+{
+  void* p = mAlloc.get_memory(sizeof(IrStringConst));
+  return new (p) IrStringConst(name, const_val);
 }
 
 // @brief ラベル参照を生成する．

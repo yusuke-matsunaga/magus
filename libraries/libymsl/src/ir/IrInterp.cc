@@ -10,7 +10,6 @@
 #include "IrInterp.h"
 #include "IrNode.h"
 #include "IrHandle.h"
-#include "ConstVal.h"
 #include "Type.h"
 
 
@@ -161,14 +160,12 @@ IrInterp::eval_boolean(IrNode* node)
     {
       IrHandle* handle = node->address();
       switch ( handle->handle_type() ) {
-      case IrHandle::kConstant:
-	{
-	  const ConstVal* val = handle->constant();
-	  ASSERT_COND( val->value_type()->type_id() == kBooleanType );
-	  return val->boolean_val();
-	}
-	break;
+      case IrHandle::kBooleanConst:
+	return handle->boolean_val();
 
+      case IrHandle::kIntConst:
+      case IrHandle::kFloatConst:
+      case IrHandle::kStringConst:
       case IrHandle::kScope:
       case IrHandle::kVar:
       case IrHandle::kFunction:
@@ -291,14 +288,12 @@ IrInterp::eval_int(IrNode* node)
     {
       IrHandle* handle = node->address();
       switch ( handle->handle_type() ) {
-      case IrHandle::kConstant:
-	{
-	  const ConstVal* val = handle->constant();
-	  ASSERT_COND( val->value_type()->type_id() == kIntType );
-	  return val->int_val();
-	}
-	break;
+      case IrHandle::kIntConst:
+	return handle->int_val();
 
+      case IrHandle::kBooleanConst:
+      case IrHandle::kFloatConst:
+      case IrHandle::kStringConst:
       case IrHandle::kScope:
       case IrHandle::kVar:
       case IrHandle::kFunction:
@@ -410,14 +405,12 @@ IrInterp::eval_float(IrNode* node)
     {
       IrHandle* handle = node->address();
       switch ( handle->handle_type() ) {
-      case IrHandle::kConstant:
-	{
-	  const ConstVal* val = handle->constant();
-	  ASSERT_COND( val->value_type()->type_id() == kFloatType );
-	  return val->float_val();
-	}
-	break;
+      case IrHandle::kFloatConst:
+	return handle->float_val();
 
+      case IrHandle::kBooleanConst:
+      case IrHandle::kIntConst:
+      case IrHandle::kStringConst:
       case IrHandle::kScope:
       case IrHandle::kVar:
       case IrHandle::kFunction:

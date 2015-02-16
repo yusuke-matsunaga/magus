@@ -1,8 +1,8 @@
-#ifndef IRCONSTHANDLE_H
-#define IRCONSTHANDLE_H
+#ifndef IRBOOLEANCONST_H
+#define IRBOOLEANCONST_H
 
-/// @file IrConstHandle.h
-/// @brief IrConstHandle のヘッダファイル
+/// @file IrBooleanConst.h
+/// @brief IrBooleanConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrConstHandle IrConstHandle.h "IrConstHandle.h"
-/// @brief 定数値を保持する IrHandle
+/// @class IrBooleanConst IrBooleanConst.h "IrBooleanConst.h"
+/// @brief ブール定数値を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
-class IrConstHandle :
+class IrBooleanConst :
   public IrHandle
 {
 public:
@@ -26,12 +26,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 名前
   /// @param[in] const_val 定数値
-  IrConstHandle(ShString name,
-		const ConstVal* const_val);
+  IrBooleanConst(ShString name,
+		 Ymsl_BOOLEAN const_val);
 
   /// @brief デストラクタ
   virtual
-  ~IrConstHandle();
+  ~IrBooleanConst();
 
 
 public:
@@ -56,12 +56,12 @@ public:
   bool
   is_static() const;
 
-  /// @brief 定数値を返す．
+  /// @brief ブール値を返す．
   ///
-  /// 他の要素の場合には NULL を返す．
+  /// kBooleanConst のみ有効
   virtual
-  const ConstVal*
-  constant() const;
+  Ymsl_BOOLEAN
+  boolean_val() const;
 
 
 private:
@@ -73,10 +73,10 @@ private:
   ShString mName;
 
   // 定数値
-  const ConstVal* mConstVal;
+  Ymsl_BOOLEAN mConstVal;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRCONSTHANDLE_H
+#endif // IRBOOLEANCONST_H

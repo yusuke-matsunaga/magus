@@ -11,7 +11,6 @@
 #include "IrHandle.h"
 #include "Var.h"
 #include "Function.h"
-#include "ConstVal.h"
 #include "Type.h"
 
 #include "node/IrLoad.h"
@@ -33,15 +32,6 @@ BEGIN_NAMESPACE_YM_YMSL
 // クラス IrMgr
 //////////////////////////////////////////////////////////////////////
 
-// @brief 定数参照式を生成する．
-// @param[in] const_val 定数値
-IrNode*
-IrMgr::new_ConstNode(const ConstVal* const_val)
-{
-  IrHandle* h = new_ConstHandle(ShString(), const_val);
-  return new_Load(h);
-}
-
 // @brief 単項演算式を生成する．
 // @param[in] opcode オペコード
 // @param[in] type 出力の型
@@ -51,6 +41,8 @@ IrMgr::new_UniOp(OpCode opcode,
 		 const Type* type,
 		 IrNode* opr1)
 {
+  ASSERT_COND( type != NULL );
+  ASSERT_COND( opr1 != NULL );
   void* p = mAlloc.get_memory(sizeof(IrUniOp));
   return new (p) IrUniOp(opcode, type, opr1);
 }
@@ -65,6 +57,9 @@ IrMgr::new_BinOp(OpCode opcode,
 		 IrNode* opr1,
 		 IrNode* opr2)
 {
+  ASSERT_COND( type != NULL );
+  ASSERT_COND( opr1 != NULL );
+  ASSERT_COND( opr2 != NULL );
   void* p = mAlloc.get_memory(sizeof(IrBinOp));
   return new (p) IrBinOp(opcode, type, opr1, opr2);
 }
@@ -80,6 +75,10 @@ IrMgr::new_TriOp(OpCode opcode,
 		 IrNode* opr2,
 		 IrNode* opr3)
 {
+  ASSERT_COND( type != NULL );
+  ASSERT_COND( opr1 != NULL );
+  ASSERT_COND( opr2 != NULL );
+  ASSERT_COND( opr3 != NULL );
   void* p = mAlloc.get_memory(sizeof(IrTriOp));
   return new (p) IrTriOp(opcode, type, opr1, opr2, opr3);
 }
@@ -89,6 +88,7 @@ IrMgr::new_TriOp(OpCode opcode,
 IrNode*
 IrMgr::new_Load(IrHandle* addr)
 {
+  ASSERT_COND( addr != NULL );
   const Type* type = NULL;
   switch ( addr->handle_type() ) {
   case IrHandle::kVar:
@@ -101,8 +101,20 @@ IrMgr::new_Load(IrHandle* addr)
     type = addr->function()->type();
     break;
 
-  case IrHandle::kConstant:
-    type = addr->constant()->value_type();
+  case IrHandle::kBooleanConst:
+    type = mTypeMgr.boolean_type();
+    break;
+
+  case IrHandle::kIntConst:
+    type = mTypeMgr.int_type();
+    break;
+
+  case IrHandle::kFloatConst:
+    type = mTypeMgr.float_type();
+    break;
+
+  case IrHandle::kStringConst:
+    type = mTypeMgr.string_type();
     break;
 
   case IrHandle::kArrayRef:
@@ -113,6 +125,7 @@ IrMgr::new_Load(IrHandle* addr)
     ASSERT_NOT_REACHED;
     break;
   }
+  ASSERT_COND( type != NULL );
   void* p = mAlloc.get_memory(sizeof(IrLoad));
   return new (p) IrLoad(type, addr);
 }
@@ -124,6 +137,8 @@ IrNode*
 IrMgr::new_Store(IrHandle* addr,
 		 IrNode* val)
 {
+  ASSERT_COND( addr != NULL );
+  ASSERT_COND( val != NULL);
   void* p = mAlloc.get_memory(sizeof(IrStore));
   return new (p) IrStore(addr, val);
 }
@@ -135,6 +150,7 @@ IrNode*
 IrMgr::new_InplaceUniOp(OpCode opcode,
 			IrHandle* lhs_addr)
 {
+  ASSERT_COND( lhs_addr != NULL );
   void* p = mAlloc.get_memory(sizeof(IrInplaceUniOp));
   return new (p) IrInplaceUniOp(opcode, lhs_addr);
 }
@@ -148,6 +164,8 @@ IrMgr::new_InplaceBinOp(OpCode opcode,
 			IrHandle* lhs_addr,
 			IrNode* opr)
 {
+  ASSERT_COND( lhs_addr != NULL );
+  ASSERT_COND( opr != NULL );
   void* p = mAlloc.get_memory(sizeof(IrInplaceBinOp));
   return new (p) IrInplaceBinOp(opcode, lhs_addr, opr);
 }
@@ -159,6 +177,11 @@ IrNode*
 IrMgr::new_FuncCall(IrHandle* func_addr,
 		    const vector<IrNode*>& arglist)
 {
+  for (vector<IrNode*>::const_iterator p = arglist.begin();
+       p != arglist.end(); ++ p) {
+    IrNode* arg = *p;
+    ASSERT_COND( arg != NULL );
+  }
   void* p = mAlloc.get_memory(sizeof(IrFuncCall));
   return new (p) IrFuncCall(func_addr, arglist);
 }
@@ -177,6 +200,7 @@ IrMgr::new_Return(IrNode* ret_val)
 IrNode*
 IrMgr::new_Jump(IrNode* label)
 {
+  ASSERT_COND( label != NULL );
   void* p = mAlloc.get_memory(sizeof(IrJump));
   return new (p) IrJump(IrNode::kJump, label, NULL);
 }
@@ -188,6 +212,8 @@ IrNode*
 IrMgr::new_BranchTrue(IrNode* label,
 		      IrNode* cond)
 {
+  ASSERT_COND( label != NULL );
+  ASSERT_COND( cond != NULL );
   void* p = mAlloc.get_memory(sizeof(IrJump));
   return new (p) IrJump(IrNode::kBranchTrue, label, cond);
 }
@@ -199,6 +225,8 @@ IrNode*
 IrMgr::new_BranchFalse(IrNode* label,
 		       IrNode* cond)
 {
+  ASSERT_COND( label != NULL );
+  ASSERT_COND( cond != NULL );
   void* p = mAlloc.get_memory(sizeof(IrJump));
   return new (p) IrJump(IrNode::kBranchFalse, label, cond);
 }
