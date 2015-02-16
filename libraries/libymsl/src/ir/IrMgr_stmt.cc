@@ -772,6 +772,7 @@ IrMgr::resolve_func(const AstExpr* expr,
   }
   const Function* func = h->function();
   // func の型と node の arglist の型をチェック
+  // 場合によってはキャストノードを挿入する．
 
   // node に func をセット
   node->set_func_addr(h);

@@ -3,7 +3,7 @@
 
 /// @file ymsl_int.h
 /// @brief ymsl の内部定義ファイル
-/// @author Yusuke Matsunaga (松永 裕介)
+/// n@author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
@@ -78,6 +78,8 @@ typedef ymint32 Ymsl_INT;
 typedef double Ymsl_FLOAT;
 
 /// @brief オブジェクト型
+///
+/// 汎用のポインタ型
 typedef YmslObj* Ymsl_OBJPTR;
 
 /// @brief プログラムのコード

@@ -63,15 +63,18 @@ IrMgr::elab_expr(const AstExpr* ast_expr,
 
   case AstExpr::kFuncCall:
     {
+      // 関数は前方参照があるのでここでは解決できない．
       const AstExpr* func_expr = ast_expr->func();
       ymuint n = ast_expr->arglist_num();
       vector<IrNode*> arglist(n);
       for (ymuint i = 0; i < n; ++ i) {
 	IrNode* arg = elab_expr(ast_expr->arglist_elem(i), scope);
-	// arg->type() と func->type()->function_input_type(i) をチェック
-	// 必要に応じてキャストノードを挿入する．
-	arglist[i] = arg;
+	if ( arg == NULL ) {
+	  // エラー発生
+	  return NULL;
+	}
       }
+      // IrNode だけ作っておいて関数名の解決はあとで行う．
       node = new_FuncCall(NULL, arglist);
       mFuncCallList.push_back(FuncCallStub(func_expr, scope, node));
       return node;
