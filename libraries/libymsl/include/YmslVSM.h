@@ -109,10 +109,12 @@ enum YmslOpcode {
   YMVSM_OBJ_ITE,
 
   YMVSM_JUMP,
+  YMVSM_JUMP_R,
   YMVSM_BRANCH_TRUE,
   YMVSM_BRANCH_FALSE,
 
   YMVSM_CALL,
+  YMVSM_CALL_R,
   YMVSM_RETURN,
 
   YMVSM_HALT
@@ -141,8 +143,10 @@ public:
 
   /// @brief バイトコードを実行する．
   /// @param[in] code_list コードの配列
+  /// @param[in] func_table 関数テーブル
   void
-  execute(const YmslCodeList& code_list);
+  execute(const YmslCodeList& code_list,
+	  const vector<const Function*>& func_table);
 
 
 private:
@@ -249,6 +253,22 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 関数スタック
+  struct FuncStack {
+
+    /// @brief 復帰先のアドレス
+    Ymsl_INT mReturnAddr;
+
+    /// @brief 元の base レジスタ
+    Ymsl_INT mBASE;
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -269,6 +289,15 @@ private:
 
   // base レジスタ
   Ymsl_INT mBASE;
+
+  // 関数スタックのサイズ
+  Ymsl_INT mFuncStackSize;
+
+  // 関数スタック
+  FuncStack* mFuncStack;
+
+  // 関数スタックポインタ
+  Ymsl_INT mFP;
 
 };
 

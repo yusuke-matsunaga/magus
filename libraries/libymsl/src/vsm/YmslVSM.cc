@@ -20,18 +20,35 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 YmslVSM::YmslVSM()
 {
+  mGlobalHeapSize = 0;
+  mGlobalHeap = NULL;
+
+  mLocalStackSize = 0;
+  mLocalStack = NULL;
+
+  mSP = 0;
+  mBASE = 0;
+
+  mFuncStackSize = 0;
+  mFuncStack = NULL;
+
+  mFP = 0;
 }
 
 // @brief デストラクタ
 YmslVSM::~YmslVSM()
 {
+  delete [] mGlobalHeap;
+  delete [] mLocalStack;
+  delete [] mFuncStack;
 }
 
 // @brief バイトコードを実行する．
-// @param[in] code_array コードの配列
-// @param[in] code_size コードサイズ
+// @param[in] code_list コードの配列
+// @param[in] func_table 関数テーブル
 void
-YmslVSM::execute(const YmslCodeList& code_list)
+YmslVSM::execute(const YmslCodeList& code_list,
+		 const vector<const Function*>& func_table)
 {
   for (Ymsl_INT pc = 0; pc < code_list.size(); ) {
     Ymsl_CODE code = code_list.read_opcode(pc);
@@ -661,6 +678,13 @@ YmslVSM::execute(const YmslCodeList& code_list)
       }
       break;
 
+    case YMVSM_JUMP_R:
+      {
+	Ymsl_INT addr = pop_INT();
+	pc = addr;
+      }
+      break;
+
     case YMVSM_BRANCH_TRUE:
       {
 	Ymsl_INT addr = code_list.read_int(pc);
@@ -684,6 +708,20 @@ YmslVSM::execute(const YmslCodeList& code_list)
     case YMVSM_CALL:
       {
 	Ymsl_INT index = code_list.read_int(pc);
+	ASSERT_COND( index >= 0 && index < func_table.size() );
+	const Function* func = func_table[index];
+	ymuint n = func->arg_num();
+	Ymsl_INT base = mSP - n;
+	push_func(pc, mBASE);
+      }
+      break;
+
+    case YMVSM_CALL_R:
+      {
+	Ymsl_INT index = pop_INT();
+	ASSERT_COND( index >= 0 && index < func_table.size() );
+	const Function* func = func_table[index];
+	push_func(pc, mBASE);
       }
       break;
 

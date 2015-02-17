@@ -47,6 +47,19 @@ public:
   const Type*
   type() const;
 
+  /// @brief 入力数を返す．
+  ymuint
+  arg_num() const;
+
+  /// @breif 実行する．
+  /// @param[in] スタックの底
+  ///
+  /// 入力は stack_base から積まれている．
+  /// 出力は stack_base に積む．
+  virtual
+  void
+  execute(YmslValue* stack_base) const = 0;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
