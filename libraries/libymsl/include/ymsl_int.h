@@ -30,7 +30,9 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_YMSL
 
 class YmslCodeList;
+class YmslFunction;
 class YmslObj;
+class YmslVSM;
 
 class IrCodeBlock;
 class IrHandle;

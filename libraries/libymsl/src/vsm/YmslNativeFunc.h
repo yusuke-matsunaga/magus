@@ -1,8 +1,8 @@
-#ifndef YMSLBUILTINFUNC_H
-#define YMSLBUILTINFUNC_H
+#ifndef YMSLNATIVEFUNC_H
+#define YMSLNATIVEFUNC_H
 
-/// @file YmslBuiltinFunc.h
-/// @brief YmslBuiltinFunc のヘッダファイル
+/// @file YmslNativeFunc.h
+/// @brief YmslNativeFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -10,16 +10,15 @@
 
 
 #include "YmslFunction.h"
-#include "YmslValue.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslBuiltinFunc YmslBuiltinFunc.h "YmslBuiltinFunc.h"
-/// @brief YMSL の組み込み関数を表すクラス
+/// @class YmslNativeFunc YmslNativeFunc.h "YmslNativeFunc.h"
+/// @brief YMSL で記述された関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslBuiltinFunc :
+class YmslNativeFunc :
   public YmslFunction
 {
 public:
@@ -27,11 +26,13 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] arg_num 引数の数
-  YmslBuiltinFunc(ShString name,
-		  ymuint arg_num);
+  /// @param[in] code_list コードリスト
+  YmslNativeFunc(ShString name,
+		 ymuint arg_num,
+		 const YmslCodeList& code_list);
 
   /// @brief デストラクタ
-  ~YmslBuiltinFunc();
+  ~YmslNativeFunc();
 
 
 public:
@@ -58,24 +59,17 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 本当の実行関数
-  /// @param[in] arg_list 引数のリスト
-  /// @param[in] ret_val 返り値を格納する変数
-  ///
-  /// 実際の派生クラスが実装する必要がある．
-  virtual
-  void
-  _execute(const vector<YmslValue>& arg_list,
-	   YmslValue& ret_val) const = 0;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // コードリスト
+  const YmslCodeList& mCodeList;
+
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLBUILTINFUNC_H
+#endif // YMSLNATIVEFUNC_H

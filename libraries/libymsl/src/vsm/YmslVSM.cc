@@ -9,6 +9,7 @@
 
 #include "YmslVSM.h"
 #include "YmslCodeList.h"
+#include "YmslFunction.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -20,6 +21,9 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 YmslVSM::YmslVSM()
 {
+  mFuncTableSize = 0;
+  mFuncTable = NULL;
+
   mGlobalHeapSize = 0;
   mGlobalHeap = NULL;
 
@@ -27,28 +31,22 @@ YmslVSM::YmslVSM()
   mLocalStack = NULL;
 
   mSP = 0;
-  mBASE = 0;
-
-  mFuncStackSize = 0;
-  mFuncStack = NULL;
-
-  mFP = 0;
 }
 
 // @brief デストラクタ
 YmslVSM::~YmslVSM()
 {
+  delete [] mFuncTable;
   delete [] mGlobalHeap;
   delete [] mLocalStack;
-  delete [] mFuncStack;
 }
 
 // @brief バイトコードを実行する．
 // @param[in] code_list コードの配列
-// @param[in] func_table 関数テーブル
+// @param[in] base ベースレジスタ
 void
 YmslVSM::execute(const YmslCodeList& code_list,
-		 const vector<const Function*>& func_table)
+		 Ymsl_INT base)
 {
   for (Ymsl_INT pc = 0; pc < code_list.size(); ) {
     Ymsl_CODE code = code_list.read_opcode(pc);
@@ -107,7 +105,7 @@ YmslVSM::execute(const YmslCodeList& code_list,
     case YMVSM_LOAD_LOCAL_INT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
-	Ymsl_INT val = load_local_INT(index);
+	Ymsl_INT val = load_local_INT(base + index);
 	push_INT(val);
       }
       break;
@@ -115,7 +113,7 @@ YmslVSM::execute(const YmslCodeList& code_list,
     case YMVSM_LOAD_LOCAL_FLOAT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
-	Ymsl_FLOAT val = load_local_FLOAT(index);
+	Ymsl_FLOAT val = load_local_FLOAT(base + index);
 	push_FLOAT(val);
       }
       break;
@@ -123,7 +121,7 @@ YmslVSM::execute(const YmslCodeList& code_list,
     case YMVSM_LOAD_LOCAL_OBJ:
       {
 	Ymsl_INT index = code_list.read_int(pc);
-	Ymsl_OBJPTR val = load_local_OBJPTR(index);
+	Ymsl_OBJPTR val = load_local_OBJPTR(base + index);
 	push_OBJPTR(val);
       }
       break;
@@ -156,7 +154,7 @@ YmslVSM::execute(const YmslCodeList& code_list,
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = pop_INT();
-	store_local_INT(index, val);
+	store_local_INT(base + index, val);
       }
       break;
 
@@ -164,7 +162,7 @@ YmslVSM::execute(const YmslCodeList& code_list,
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = pop_FLOAT();
-	store_local_FLOAT(index, val);
+	store_local_FLOAT(base + index, val);
       }
       break;
 
@@ -172,14 +170,14 @@ YmslVSM::execute(const YmslCodeList& code_list,
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = pop_OBJPTR();
-	store_local_OBJPTR(index, val);
+	store_local_OBJPTR(base + index, val);
       }
       break;
 
     case YMVSM_INT_MINUS:
       {
 	Ymsl_INT val = pop_INT();
-	val = -val;
+	val = - val;
 	push_INT(val);
       }
       break;
@@ -708,20 +706,22 @@ YmslVSM::execute(const YmslCodeList& code_list,
     case YMVSM_CALL:
       {
 	Ymsl_INT index = code_list.read_int(pc);
-	ASSERT_COND( index >= 0 && index < func_table.size() );
-	const Function* func = func_table[index];
+	ASSERT_COND( index >= 0 && index < mFuncTableSize );
+	const YmslFunction* func = mFuncTable[index];
 	ymuint n = func->arg_num();
 	Ymsl_INT base = mSP - n;
-	push_func(pc, mBASE);
+	func->execute(*this, base);
       }
       break;
 
     case YMVSM_CALL_R:
       {
 	Ymsl_INT index = pop_INT();
-	ASSERT_COND( index >= 0 && index < func_table.size() );
-	const Function* func = func_table[index];
-	push_func(pc, mBASE);
+	ASSERT_COND( index >= 0 && index < mFuncTableSize );
+	const YmslFunction* func = mFuncTable[index];
+	ymuint n = func->arg_num();
+	Ymsl_INT base = mSP - n;
+	func->execute(*this, base);
       }
       break;
 

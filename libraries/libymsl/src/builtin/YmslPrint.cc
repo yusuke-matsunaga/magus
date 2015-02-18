@@ -18,10 +18,8 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 関数名
-// @param[in] arg_list 引数のリスト
-YmslPrint::YmslPrint(ShString name,
-		     const vector<YmslVar*>& arg_list) :
-  YmslBuiltinFunc(name, arg_list)
+YmslPrint::YmslPrint(ShString name) :
+  YmslBuiltinFunc(name, 1)
 {
 }
 
@@ -30,11 +28,16 @@ YmslPrint::~YmslPrint()
 {
 }
 
-// @brief 組み込み関数の時の実行関数
-// @param[in] exectable 実行環境
+// @brief 本当の実行関数
+// @param[in] arg_list 引数のリスト
+// @param[in] ret_val 返り値を格納する変数
+//
+// 実際の派生クラスが実装する必要がある．
 void
-YmslPrint::execute(YmslExecutable& executable) const
+YmslPrint::_execute(const vector<YmslValue>& arg_list,
+		    YmslValue& ret_val) const
 {
+  cout << arg_list[0].int_value << endl;
 }
 
 END_NAMESPACE_YM_YMSL

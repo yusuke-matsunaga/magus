@@ -126,7 +126,11 @@ set (ymsl_SOURCES
   src/ir/node/IrLabel.cc
 
   src/vsm/YmslVSM.cc
+  src/vsm/YmslFunction.cc
+  src/vsm/YmslNativeFunc.cc
+  src/vsm/YmslBuiltinFunc.cc
 
+  src/builtin/YmslPrint.cc
   )
 
 

@@ -143,10 +143,22 @@ public:
 
   /// @brief バイトコードを実行する．
   /// @param[in] code_list コードの配列
-  /// @param[in] func_table 関数テーブル
+  /// @param[in] base ベースレジスタ
   void
   execute(const YmslCodeList& code_list,
-	  const vector<const Function*>& func_table);
+	  Ymsl_INT base);
+
+  /// @brief スタックの内容を読む
+  /// @param[in] index インデックス
+  YmslValue
+  read_stack(Ymsl_INT index);
+
+  /// @brief スタックの内容を書き込む．
+  /// @param[in] index インデックス
+  /// @param[in] val 値
+  void
+  write_stack(Ymsl_INT index,
+	      YmslValue val);
 
 
 private:
@@ -253,24 +265,14 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 関数スタック
-  struct FuncStack {
-
-    /// @brief 復帰先のアドレス
-    Ymsl_INT mReturnAddr;
-
-    /// @brief 元の base レジスタ
-    Ymsl_INT mBASE;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 関数テーブルのサイズ
+  Ymsl_INT mFuncTableSize;
+
+  // 関数テーブル
+  YmslFunction** mFuncTable;
 
   // グローバル変数領域のサイズ
   Ymsl_INT mGlobalHeapSize;
@@ -287,24 +289,32 @@ private:
   // スタックポインタ
   Ymsl_INT mSP;
 
-  // base レジスタ
-  Ymsl_INT mBASE;
-
-  // 関数スタックのサイズ
-  Ymsl_INT mFuncStackSize;
-
-  // 関数スタック
-  FuncStack* mFuncStack;
-
-  // 関数スタックポインタ
-  Ymsl_INT mFP;
-
 };
 
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief スタックの内容を読む
+// @param[in] index インデックス
+inline
+YmslValue
+YmslVSM::read_stack(Ymsl_INT index)
+{
+  return mLocalStack[index];
+}
+
+// @brief スタックの内容を書き込む．
+// @param[in] index インデックス
+// @param[in] val 値
+inline
+void
+YmslVSM::write_stack(Ymsl_INT index,
+		     YmslValue val)
+{
+  mLocalStack[index] = val;
+}
 
 // @brief INT をプッシュする．
 inline
@@ -426,7 +436,7 @@ inline
 Ymsl_INT
 YmslVSM::load_local_INT(Ymsl_INT index)
 {
-  return mLocalStack[mBASE - index].int_value;
+  return mLocalStack[index].int_value;
 }
 
 // @brief ローカル変数の FLOAT の値を取り出す．
@@ -435,7 +445,7 @@ inline
 Ymsl_FLOAT
 YmslVSM::load_local_FLOAT(Ymsl_INT index)
 {
-  return mLocalStack[mBASE - index].float_value;
+  return mLocalStack[index].float_value;
 }
 
 // @brief ローカル変数の OBJ の値を取り出す．
@@ -444,7 +454,7 @@ inline
 Ymsl_OBJPTR
 YmslVSM::load_local_OBJPTR(Ymsl_INT index)
 {
-  return mLocalStack[mBASE - index].obj_value;
+  return mLocalStack[index].obj_value;
 }
 
 // @brief ローカル変数に INT の値を書き込む．
@@ -453,9 +463,9 @@ YmslVSM::load_local_OBJPTR(Ymsl_INT index)
 inline
 void
 YmslVSM::store_local_INT(Ymsl_INT index,
-			Ymsl_INT val)
+			 Ymsl_INT val)
 {
-  mLocalStack[mBASE - index].int_value = val;
+  mLocalStack[index].int_value = val;
 }
 
 // @brief ローカル変数に FLOAT の値を書き込む．
@@ -464,9 +474,9 @@ YmslVSM::store_local_INT(Ymsl_INT index,
 inline
 void
 YmslVSM::store_local_FLOAT(Ymsl_INT index,
-			  Ymsl_FLOAT val)
+			   Ymsl_FLOAT val)
 {
-  mLocalStack[mBASE - index].float_value = val;
+  mLocalStack[index].float_value = val;
 }
 
 // @brief ローカル変数に OBJ の値を書き込む．
@@ -475,9 +485,9 @@ YmslVSM::store_local_FLOAT(Ymsl_INT index,
 inline
 void
 YmslVSM::store_local_OBJPTR(Ymsl_INT index,
-			   Ymsl_OBJPTR val)
+			    Ymsl_OBJPTR val)
 {
-  mLocalStack[mBASE - index].obj_value = val;
+  mLocalStack[index].obj_value = val;
 }
 
 END_NAMESPACE_YM_YMSL

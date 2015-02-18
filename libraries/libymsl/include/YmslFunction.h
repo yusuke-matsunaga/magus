@@ -25,9 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  /// @param[in] arg_list 引数のリスト
+  /// @param[in] arg_num 引数の数
   YmslFunction(ShString name,
-	       const vector<YmslVar*>& arg_list);
+	       ymuint arg_num);
 
   /// @brief デストラクタ
   virtual
@@ -47,42 +47,18 @@ public:
   ymuint
   arg_num() const;
 
-  /// @brief 引数を得る．
-  /// @param[in] pos 位置 ( 0 <= pos < arg_num() )
-  YmslVar*
-  arg(ymuint pos) const;
-
   /// @brief 組み込み関数の時 true を返す．
   virtual
   bool
   is_builtin() const = 0;
 
   /// @brief 組み込み関数の時の実行関数
-  /// @param[in] exectable 実行環境
+  /// @param[in] vsm 仮想マシン
+  /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(YmslExecutable& executable) const = 0;
-
-  /// @brief YMSL 関数の場合の局所変数の数を返す．
-  virtual
-  ymuint
-  local_var_num() const = 0;
-
-  /// @brief YMSL 関数の場合の局所変数を返す．
-  /// @param[in] lindex 変数インデックス
-  virtual
-  YmslVar*
-  local_var(ymuint lindex) const = 0;
-
-  /// @brief YMSL 関数の場合のバイトコードのサイズを返す．
-  virtual
-  ymuint
-  byte_codes_size() const = 0;
-
-  /// @brief YMSL 関数の場合のバイトコードの先頭アドレスを返す．
-  virtual
-  const ymuint8*
-  byte_codes_top() const = 0;
+  execute(YmslVSM& vsm,
+	  Ymsl_INT base) const = 0;
 
 
 private:
@@ -95,9 +71,6 @@ private:
 
   // 引数の数
   ymuint mArgNum;
-
-  // 引数のリスト
-  YmslVar** mArgList;
 
 };
 

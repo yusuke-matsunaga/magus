@@ -25,25 +25,27 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  /// @param[in] arg_list 引数のリスト
-  YmslPrint(ShString name,
-	    const vector<YmslVar*>& arg_list);
+  YmslPrint(ShString name);
 
   /// @brief デストラクタ
   virtual
   ~YmslPrint();
 
 
-public:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
+  // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 組み込み関数の時の実行関数
-  /// @param[in] exectable 実行環境
+  /// @brief 本当の実行関数
+  /// @param[in] arg_list 引数のリスト
+  /// @param[in] ret_val 返り値を格納する変数
+  ///
+  /// 実際の派生クラスが実装する必要がある．
   virtual
   void
-  execute(YmslExecutable& executable) const;
+  _execute(const vector<YmslValue>& arg_list,
+	   YmslValue& ret_val) const;
 
 };
 
