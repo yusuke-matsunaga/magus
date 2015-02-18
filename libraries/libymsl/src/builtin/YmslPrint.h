@@ -43,9 +43,8 @@ private:
   ///
   /// 実際の派生クラスが実装する必要がある．
   virtual
-  void
-  _execute(const vector<YmslValue>& arg_list,
-	   YmslValue& ret_val) const;
+  YmslValue
+  _execute(const vector<YmslValue>& arg_list) const;
 
 };
 

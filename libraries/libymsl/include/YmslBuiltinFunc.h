@@ -60,13 +60,11 @@ private:
 
   /// @brief 本当の実行関数
   /// @param[in] arg_list 引数のリスト
-  /// @param[in] ret_val 返り値を格納する変数
   ///
   /// 実際の派生クラスが実装する必要がある．
   virtual
-  void
-  _execute(const vector<YmslValue>& arg_list,
-	   YmslValue& ret_val) const = 0;
+  YmslValue
+  _execute(const vector<YmslValue>& arg_list) const = 0;
 
 
 private:

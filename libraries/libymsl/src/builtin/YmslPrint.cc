@@ -33,11 +33,13 @@ YmslPrint::~YmslPrint()
 // @param[in] ret_val 返り値を格納する変数
 //
 // 実際の派生クラスが実装する必要がある．
-void
-YmslPrint::_execute(const vector<YmslValue>& arg_list,
-		    YmslValue& ret_val) const
+YmslValue
+YmslPrint::_execute(const vector<YmslValue>& arg_list) const
 {
   cout << arg_list[0].int_value << endl;
+
+  YmslValue dummy;
+  return dummy;
 }
 
 END_NAMESPACE_YM_YMSL

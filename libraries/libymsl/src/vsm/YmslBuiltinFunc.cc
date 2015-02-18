@@ -50,8 +50,7 @@ YmslBuiltinFunc::execute(YmslVSM& vsm,
     arg_list[i] = vsm.read_stack(base + i);
   }
 
-  YmslValue ret_val;
-  _execute(arg_list, ret_val);
+  YmslValue ret_val = _execute(arg_list);
 
   vsm.write_stack(base, ret_val);
 }
