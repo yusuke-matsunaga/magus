@@ -1,8 +1,8 @@
-#ifndef IRFUNCTION_H
-#define IRFUNCTION_H
+#ifndef IRFUNCBLOCK_H
+#define IRFUNCBLOCK_H
 
-/// @file IrFunction.h
-/// @brief IrFunction のヘッダファイル
+/// @file IrFuncBlock.h
+/// @brief IrFuncBlock のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrFunction IrFunction.h "IrFunction.h"
+/// @class IrFuncBlock IrFuncBlock.h "IrFuncBlock.h"
 /// @brief 関数の中間表現
 //////////////////////////////////////////////////////////////////////
-class IrFunction :
+class IrFuncBlock :
   public IrCodeBlock
 {
 public:
@@ -28,13 +28,13 @@ public:
   /// @param[in] func 関数本体
   /// @param[in] arg_list 引数のリスト
   /// @param[in] arg_init_list 引数のデフォルト値のリスト
-  IrFunction(IrToplevel& toplevel,
-	     const Function* func,
-	     const vector<const Var*>& arg_list,
-	     const vector<IrNode*>& arg_init_list);
+  IrFuncBlock(IrToplevel& toplevel,
+	      const Function* func,
+	      const vector<const Var*>& arg_list,
+	      const vector<IrNode*>& arg_init_list);
 
   /// @brief デストラクタ
-  ~IrFunction();
+  ~IrFuncBlock();
 
 
 public:
@@ -90,4 +90,4 @@ public:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRFUNCTION_H
+#endif // IRFUNCBLOCK_H

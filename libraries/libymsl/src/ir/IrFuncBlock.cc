@@ -1,19 +1,19 @@
 
-/// @file IrFunction.cc
-/// @brief IrFunction の実装ファイル
+/// @file IrFuncBlock.cc
+/// @brief IrFuncBlock の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "IrFunction.h"
+#include "IrFuncBlock.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス IrFunction
+// クラス IrFuncBlock
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
@@ -21,10 +21,10 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] func 関数本体
 // @param[in] arg_list 引数のリスト
 // @param[in] arg_init_list 引数のデフォルト値のリスト
-IrFunction::IrFunction(IrToplevel& toplevel,
-		       const Function* func,
-		       const vector<const Var*>& arg_list,
-		       const vector<IrNode*>& arg_init_list) :
+IrFuncBlock::IrFuncBlock(IrToplevel& toplevel,
+			 const Function* func,
+			 const vector<const Var*>& arg_list,
+			 const vector<IrNode*>& arg_init_list) :
   mToplevel(toplevel),
   mFunction(func),
   mArgList(arg_list),
@@ -34,34 +34,34 @@ IrFunction::IrFunction(IrToplevel& toplevel,
 }
 
 // @brief デストラクタ
-IrFunction::~IrFunction()
+IrFuncBlock::~IrFuncBlock()
 {
 }
 
 // @brief トップレベルのブロックを返す．
 IrToplevel&
-IrFunction::toplevel()
+IrFuncBlock::toplevel()
 {
   return mToplevel;
 }
 
 // @brief 関数本体を返す．
 const Function*
-IrFunction::function() const
+IrFuncBlock::function() const
 {
   return mFunction;
 }
 
 // @brief インデックスを返す．
 ymuint
-IrFunction::index() const
+IrFuncBlock::index() const
 {
   return mIndex;
 }
 
 // @brief インデックスを設定する．
 void
-IrFunction::set_index(ymuint index)
+IrFuncBlock::set_index(ymuint index)
 {
   mIndex = index;
 }

@@ -19,7 +19,7 @@
 #include "Type.h"
 #include "IrCodeBlock.h"
 #include "IrHandle.h"
-#include "IrFunction.h"
+#include "IrFuncBlock.h"
 #include "IrNode.h"
 #include "IrToplevel.h"
 #include "IrInterp.h"
@@ -560,7 +560,7 @@ IrMgr::reg_func(const AstStatement* stmt,
 
   IrToplevel& toplevel = code_block.toplevel();
   // 関数の内部表現の生成
-  IrFunction* ir_func = new IrFunction(toplevel, func, arg_list, arg_init_list);
+  IrFuncBlock* ir_func = new IrFuncBlock(toplevel, func, arg_list, arg_init_list);
   toplevel.add_function(ir_func);
 
   // 関数内部のノードの生成

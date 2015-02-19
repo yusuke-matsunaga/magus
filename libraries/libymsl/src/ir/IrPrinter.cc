@@ -9,7 +9,7 @@
 
 #include "IrPrinter.h"
 #include "IrToplevel.h"
-#include "IrFunction.h"
+#include "IrFuncBlock.h"
 #include "IrNode.h"
 #include "IrHandle.h"
 #include "Var.h"
@@ -64,10 +64,10 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   print_node_list(node_list);
   mS << "--- end of toplevel code ---" << endl;
 
-  const vector<IrFunction*>& func_list = toplevel.func_list();
+  const vector<IrFuncBlock*>& func_list = toplevel.func_list();
   ymuint nf = func_list.size();
   for (ymuint i = 0; i < nf; ++ i) {
-    IrFunction* ir_func = func_list[i];
+    IrFuncBlock* ir_func = func_list[i];
     const Function* func = ir_func->function();
     mS << endl;
     mS << "function #" << ir_func->index()

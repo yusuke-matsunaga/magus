@@ -37,8 +37,8 @@ class VsmFunction;
 class VsmModule;
 
 class IrCodeBlock;
+class IrFuncBlock;
 class IrHandle;
-class IrFunction;
 class IrNode;
 class IrToplevel;
 

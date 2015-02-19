@@ -9,7 +9,7 @@
 
 #include "IrToplevel.h"
 #include "Var.h"
-#include "IrFunction.h"
+#include "IrFuncBlock.h"
 #include "Function.h"
 
 
@@ -53,7 +53,7 @@ IrToplevel::add_var(Var* var)
 // @brief 関数を追加する．
 // @param[in] func 関数
 void
-IrToplevel::add_function(IrFunction* func)
+IrToplevel::add_function(IrFuncBlock* func)
 {
   ymuint index = mFuncList.size();
   func->set_index(index);
@@ -68,7 +68,7 @@ IrToplevel::global_var_list() const
 }
 
 // @brief 関数のリストを返す．
-const vector<IrFunction*>&
+const vector<IrFuncBlock*>&
 IrToplevel::func_list() const
 {
   return mFuncList;
