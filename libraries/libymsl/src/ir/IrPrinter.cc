@@ -12,8 +12,7 @@
 #include "IrFuncBlock.h"
 #include "IrNode.h"
 #include "IrHandle.h"
-#include "Var.h"
-#include "Function.h"
+#include "IrVar.h"
 #include "Type.h"
 
 
@@ -40,20 +39,20 @@ IrPrinter::~IrPrinter()
 void
 IrPrinter::print_code(const IrToplevel& toplevel)
 {
-  const vector<const Var*>& global_var_list = toplevel.global_var_list();
+  const vector<const IrVar*>& global_var_list = toplevel.global_var_list();
   ymuint ng = global_var_list.size();
   for (ymuint i = 0; i < ng; ++ i) {
-    const Var* var = global_var_list[i];
+    const IrVar* var = global_var_list[i];
     mS << "global #" << var->index() << ": " << var->name()
        << ": ";
     var->value_type()->print(mS);
     mS << endl;
   }
 
-  const vector<const Var*>& var_list = toplevel.var_list();
+  const vector<const IrVar*>& var_list = toplevel.var_list();
   ymuint nv = var_list.size();
   for (ymuint i = 0; i < nv; ++ i) {
-    const Var* var = var_list[i];
+    const IrVar* var = var_list[i];
     mS << "var #" << var->index() << ": " << var->name()
        << ": ";
     var->value_type()->print(mS);
@@ -68,10 +67,9 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   ymuint nf = func_list.size();
   for (ymuint i = 0; i < nf; ++ i) {
     IrFuncBlock* ir_func = func_list[i];
-    const Function* func = ir_func->function();
     mS << endl;
     mS << "function #" << ir_func->index()
-       << ": " << func->name() << endl;
+       << ": " << ir_func->name() << endl;
     const vector<IrNode*>& node_list = ir_func->node_list();
     print_node_list(node_list);
   }

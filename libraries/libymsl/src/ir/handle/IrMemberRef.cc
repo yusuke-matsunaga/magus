@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] base ベースアドレス
 // @param[in] var メンバ変数
 IrMemberRef::IrMemberRef(IrNode* base,
-			 const Var* var) :
+			 const IrVar* var) :
   mBase(base),
   mVar(var)
 {
@@ -66,7 +66,7 @@ IrMemberRef::obj_expr() const
 // @brief 変数を返す．
 //
 // kOpVarRef, kOpMemberRef のみ有効
-const Var*
+const IrVar*
 IrMemberRef::var() const
 {
   return mVar;

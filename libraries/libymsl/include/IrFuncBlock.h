@@ -10,6 +10,7 @@
 
 
 #include "IrCodeBlock.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -25,12 +26,14 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] toplevel トップレベルブロック
-  /// @param[in] func 関数本体
+  /// @param[in] name 関数名
+  /// @param[in] type 関数の型
   /// @param[in] arg_list 引数のリスト
   /// @param[in] arg_init_list 引数のデフォルト値のリスト
   IrFuncBlock(IrToplevel& toplevel,
-	      const Function* func,
-	      const vector<const Var*>& arg_list,
+	      ShString name,
+	      const Type* type,
+	      const vector<const IrVar*>& arg_list,
 	      const vector<IrNode*>& arg_init_list);
 
   /// @brief デストラクタ
@@ -47,9 +50,13 @@ public:
   IrToplevel&
   toplevel();
 
-  /// @brief 関数本体を返す．
-  const Function*
-  function() const;
+  /// @brief 関数名を返す．
+  ShString
+  name() const;
+
+  /// @brief 関数の型を返す．
+  const Type*
+  type() const;
 
   /// @brief インデックスを返す．
   ymuint
@@ -74,11 +81,14 @@ public:
   // トップレベルブロック
   IrToplevel& mToplevel;
 
-  // 関数本体
-  const Function* mFunction;
+  // 関数名
+  ShString mName;
+
+  // 関数の型
+  const Type* mType;
 
   // 引数のリスト
-  vector<const Var*> mArgList;
+  vector<const IrVar*> mArgList;
 
   // 引数のデフォルト値のリスト
   vector<IrNode*> mArgInitList;

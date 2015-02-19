@@ -8,9 +8,8 @@
 
 
 #include "IrToplevel.h"
-#include "Var.h"
+#include "IrVar.h"
 #include "IrFuncBlock.h"
-#include "Function.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -38,7 +37,7 @@ IrToplevel::toplevel()
 
 // @brief 変数を追加する．
 void
-IrToplevel::add_var(Var* var)
+IrToplevel::add_var(IrVar* var)
 {
   if ( var->is_global() ) {
     ymuint index = mGlobalVarList.size();
@@ -61,7 +60,7 @@ IrToplevel::add_function(IrFuncBlock* func)
 }
 
 // @brief グローバル変数のリストを返す．
-const vector<const Var*>&
+const vector<const IrVar*>&
 IrToplevel::global_var_list() const
 {
   return mGlobalVarList;

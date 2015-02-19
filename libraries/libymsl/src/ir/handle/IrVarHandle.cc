@@ -8,7 +8,7 @@
 
 
 #include "IrVarHandle.h"
-#include "Var.h"
+#include "IrVar.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] var 変数宣言
-IrVarHandle::IrVarHandle(const Var* var) :
+IrVarHandle::IrVarHandle(const IrVar* var) :
   mVar(var)
 {
 }
@@ -55,7 +55,7 @@ IrVarHandle::is_static() const
 // @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．
-const Var*
+const IrVar*
 IrVarHandle::var() const
 {
   return mVar;

@@ -11,6 +11,7 @@
 
 #include "ymsl_int.h"
 
+
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
@@ -45,14 +46,14 @@ public:
   /// @param[in] var 変数
   virtual
   void
-  add_var(Var* var);
+  add_var(IrVar* var);
 
   /// @brief ノードを追加する．
   void
   add_node(IrNode* node);
 
   /// @brief 変数のリストを得る．
-  const vector<const Var*>&
+  const vector<const IrVar*>&
   var_list() const;
 
   /// @brief ノードのリストを得る．
@@ -72,7 +73,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数のリスト
-  vector<const Var*> mVarList;
+  vector<const IrVar*> mVarList;
 
   // 本体のノードリスト
   vector<IrNode*> mNodeList;

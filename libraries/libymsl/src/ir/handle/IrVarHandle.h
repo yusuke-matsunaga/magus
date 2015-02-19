@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] var 変数
-  IrVarHandle(const Var* var);
+  IrVarHandle(const IrVar* var);
 
   /// @brief デストラクタ
   virtual
@@ -58,7 +58,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  const Var*
+  const IrVar*
   var() const;
 
 
@@ -68,7 +68,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数
-  const Var* mVar;
+  const IrVar* mVar;
 
 };
 

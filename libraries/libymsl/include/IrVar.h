@@ -1,8 +1,8 @@
-#ifndef VAR_H
-#define VAR_H
+#ifndef IRVAR_H
+#define IRVAR_H
 
-/// @file Var.h
-/// @brief Var のヘッダファイル
+/// @file IrVar.h
+/// @brief IrVar のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,10 +16,10 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class Var Var.h "Var.h"
+/// @class IrVar IrVar.h "IrVar.h"
 /// @brief 変数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class Var
+class IrVar
 {
 public:
 
@@ -27,12 +27,12 @@ public:
   /// @param[in] name 変数名
   /// @param[in] value_type 型
   /// @param[in] global グローバル変数の時 true にするフラグ
-  Var(ShString name,
-      const Type* value_type,
-      bool global);
+  IrVar(ShString name,
+	const Type* value_type,
+	bool global);
 
   /// @brief デストラクタ
-  ~Var();
+  ~IrVar();
 
 
 public:
@@ -82,4 +82,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // VAR_H
+#endif // IRVAR_H

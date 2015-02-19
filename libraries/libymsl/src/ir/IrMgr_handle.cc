@@ -40,7 +40,7 @@ IrMgr::new_ScopeHandle(Scope* scope)
 // @brief 変数参照を生成する．
 // @param[in] var 変数
 IrHandle*
-IrMgr::new_VarHandle(const Var* var)
+IrMgr::new_VarHandle(const IrVar* var)
 {
   void* p = mAlloc.get_memory(sizeof(IrVarHandle));
   return new (p) IrVarHandle(var);
@@ -49,7 +49,7 @@ IrMgr::new_VarHandle(const Var* var)
 // @brief 関数参照を生成する．
 // @param[in] func 関数
 IrHandle*
-IrMgr::new_FuncHandle(const Function* func)
+IrMgr::new_FuncHandle(IrFuncBlock* func)
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncHandle));
   return new (p) IrFuncHandle(func);
@@ -136,7 +136,7 @@ IrMgr::new_ArrayRef(IrNode* array,
 // @param[in] var メンバ変数
 IrHandle*
 IrMgr::new_MemberRef(IrNode* obj,
-		     const Var* var)
+		     const IrVar* var)
 {
   void* p = mAlloc.get_memory(sizeof(IrMemberRef));
   return new (p) IrMemberRef(obj, var);

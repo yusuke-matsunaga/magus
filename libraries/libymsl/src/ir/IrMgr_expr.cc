@@ -12,8 +12,7 @@
 #include "AstExpr.h"
 #include "AstSymbol.h"
 
-#include "Function.h"
-#include "Var.h"
+#include "IrVar.h"
 #include "Scope.h"
 #include "Type.h"
 #include "IrHandle.h"
@@ -264,12 +263,12 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
 
       case IrHandle::kVar:
 	{
-	  const Var* var = h->var();
+	  const IrVar* var = h->var();
 	  const Type* type = var->value_type();
 	  ShString member_name = member_symbol->str_val();
 	  // type のメンバに member_name があることを確認する．
 	  IrNode* base = new_Load(h);
-	  const Var* member;
+	  const IrVar* member;
 	  return new_MemberRef(base, member);
 	}
 

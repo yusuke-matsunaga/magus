@@ -88,14 +88,14 @@ public:
   ///
   /// kVar, kMemberRef のみ有効
   virtual
-  const Var*
+  const IrVar*
   var() const;
 
   /// @brief 関数を返す．
   ///
   /// kFunction, kMethodRef のみ有効
   virtual
-  const Function*
+  IrFuncBlock*
   function() const;
 
   /// @brief ブール値を返す．

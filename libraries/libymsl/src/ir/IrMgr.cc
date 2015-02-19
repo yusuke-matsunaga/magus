@@ -12,8 +12,7 @@
 #include "AstMgr.h"
 #include "AstStatement.h"
 
-#include "Function.h"
-#include "Var.h"
+#include "IrVar.h"
 #include "Scope.h"
 #include "IrCodeBlock.h"
 #include "IrNode.h"
@@ -46,17 +45,11 @@ IrMgr::clear()
   }
   mScopeList.clear();
 
-  for (vector<Var*>::iterator p = mVarList.begin();
+  for (vector<IrVar*>::iterator p = mVarList.begin();
        p != mVarList.end(); ++ p) {
     delete *p;
   }
   mVarList.clear();
-
-  for (vector<Function*>::iterator p = mFuncList.begin();
-       p != mFuncList.end(); ++ p) {
-    delete *p;
-  }
-  mFuncList.clear();
 
   mUndefList.clear();
 
@@ -133,27 +126,14 @@ IrMgr::new_scope(Scope* parent_scope,
 // @param[in] name 名前
 // @param[in] type 型
 // @param[in] global グローバル変数の時 true にするフラグ
-Var*
+IrVar*
 IrMgr::new_var(ShString name,
 	       const Type* type,
 	       bool global)
 {
-  Var* var = new Var(name, type, global);
+  IrVar* var = new IrVar(name, type, global);
 
   return var;
-}
-
-// @brief 関数を生成する．
-// @param[in] name 名前
-// @param[in] type 出力の型
-// @param[in] input_type_list 入力の型のリスト
-Function*
-IrMgr::new_function(ShString name,
-		    const Type* type)
-{
-  Function* func = new Function(name, type);
-
-  return func;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -43,7 +43,7 @@ public:
   /// @brief 変数を追加する．
   virtual
   void
-  add_var(Var* var);
+  add_var(IrVar* var);
 
   /// @brief 関数を追加する．
   /// @param[in] func 関数
@@ -51,7 +51,7 @@ public:
   add_function(IrFuncBlock* func);
 
   /// @brief グローバル変数のリストを返す．
-  const vector<const Var*>&
+  const vector<const IrVar*>&
   global_var_list() const;
 
   /// @brief 関数のリストを返す．
@@ -71,7 +71,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // グローバル変数のリスト
-  vector<const Var*> mGlobalVarList;
+  vector<const IrVar*> mGlobalVarList;
 
   // 関数のリスト
   vector<IrFuncBlock*> mFuncList;

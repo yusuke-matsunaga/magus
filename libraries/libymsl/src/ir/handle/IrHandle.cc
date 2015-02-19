@@ -30,7 +30,7 @@ IrHandle::~IrHandle()
 // @brief 変数を返す．
 //
 // 他の要素の場合には NULL を返す．
-const Var*
+const IrVar*
 IrHandle::var() const
 {
   return NULL;
@@ -39,7 +39,7 @@ IrHandle::var() const
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-const Function*
+IrFuncBlock*
 IrHandle::function() const
 {
   return NULL;

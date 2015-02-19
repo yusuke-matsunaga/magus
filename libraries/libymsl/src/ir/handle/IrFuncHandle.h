@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] func 関数
-  IrFuncHandle(const Function* func);
+  IrFuncHandle(IrFuncBlock* func);
 
   /// @brief デストラクタ
   virtual
@@ -58,7 +58,7 @@ public:
   ///
   /// 他の要素の場合には NULL を返す．
   virtual
-  const Function*
+  IrFuncBlock*
   function() const;
 
 
@@ -68,7 +68,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 関数
-  const Function* mFunc;
+  IrFuncBlock* mFunc;
 
 };
 

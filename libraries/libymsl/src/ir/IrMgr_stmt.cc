@@ -14,7 +14,6 @@
 #include "AstSymbol.h"
 #include "AstType.h"
 
-#include "Function.h"
 #include "Scope.h"
 #include "Type.h"
 #include "IrCodeBlock.h"
@@ -319,7 +318,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
       ShString name = ast_name->str_val();
       bool global = (scope->global_scope() == NULL);
-      Var* var = new_var(name, type, global);
+      IrVar* var = new_var(name, type, global);
 
       code_block.add_var(var);
 
@@ -531,16 +530,12 @@ IrMgr::reg_func(const AstStatement* stmt,
   // 関数の生成
   ShString name = name_symbol->str_val();
   const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
-  Function* func = new_function(name, ftype);
-
-  IrHandle* h = new_FuncHandle(func);
-  scope->add(h);
 
   // 引数の生成
-  vector<const Var*> arg_list(np);
+  vector<const IrVar*> arg_list(np);
   vector<IrNode*> arg_init_list(np);
   for (ymuint i = 0; i < np; ++ i) {
-    Var* var = new_var(input_name_list[i], input_type_list[i], false);
+    IrVar* var = new_var(input_name_list[i], input_type_list[i], false);
     arg_list[i] =  var;
     IrHandle* h = new_VarHandle(var);
     func_scope->add(h);
@@ -560,11 +555,14 @@ IrMgr::reg_func(const AstStatement* stmt,
 
   IrToplevel& toplevel = code_block.toplevel();
   // 関数の内部表現の生成
-  IrFuncBlock* ir_func = new IrFuncBlock(toplevel, func, arg_list, arg_init_list);
+  IrFuncBlock* ir_func = new IrFuncBlock(toplevel, name, ftype, arg_list, arg_init_list);
   toplevel.add_function(ir_func);
 
   // 関数内部のノードの生成
   elab_stmt(stmt->stmt(), func_scope, NULL, NULL, *ir_func);
+
+  IrHandle* h = new_FuncHandle(ir_func);
+  scope->add(h);
 }
 
 // @brief 定数の定義を行う．
@@ -752,7 +750,7 @@ IrMgr::resolve_func(const AstExpr* expr,
     // expr is not a function;
     return false;
   }
-  const Function* func = h->function();
+  IrFuncBlock* func = h->function();
   // func の型と node の arglist の型をチェック
   // 場合によってはキャストノードを挿入する．
 

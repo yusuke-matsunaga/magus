@@ -9,8 +9,8 @@
 
 #include "IrMgr.h"
 #include "IrHandle.h"
-#include "Var.h"
-#include "Function.h"
+#include "IrVar.h"
+#include "IrFuncBlock.h"
 #include "Type.h"
 
 #include "node/IrLoad.h"

@@ -27,7 +27,7 @@ public:
   /// @param[in] base ベースアドレス
   /// @param[in] var メンバ変数
   IrMemberRef(IrNode* base,
-	      const Var* var);
+	      const IrVar* var);
 
   /// @brief デストラクタ
   virtual
@@ -67,7 +67,7 @@ public:
   ///
   /// kOpVarRef, kOpMemberRef のみ有効
   virtual
-  const Var*
+  const IrVar*
   var() const;
 
 
@@ -80,7 +80,7 @@ private:
   IrNode* mBase;
 
   // 変数
-  const Var* mVar;
+  const IrVar* mVar;
 
 };
 

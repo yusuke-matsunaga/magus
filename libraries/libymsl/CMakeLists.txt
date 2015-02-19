@@ -60,7 +60,6 @@ set (ymsl_SOURCES
   src/ast/stmt/AstIncr.cc
   src/ast/stmt/AstInplaceOp.cc
   src/ast/stmt/AstLabel.cc
-  src/ast/stmt/AstModule.cc
   src/ast/stmt/AstNullStmt.cc
   src/ast/stmt/AstParam.cc
   src/ast/stmt/AstReturn.cc
@@ -75,7 +74,6 @@ set (ymsl_SOURCES
   src/compiler/YmslCompiler.cc
   src/compiler/ArrayType.cc
   src/compiler/EnumType.cc
-  src/compiler/Function.cc
   src/compiler/FuncType.cc
   src/compiler/MapType.cc
   src/compiler/NamedType.cc
@@ -84,7 +82,6 @@ set (ymsl_SOURCES
   src/compiler/SetType.cc
   src/compiler/Type.cc
   src/compiler/TypeMgr.cc
-  src/compiler/Var.cc
 
   src/ir/IrCodeBlock.cc
   src/ir/IrFuncBlock.cc
@@ -96,6 +93,7 @@ set (ymsl_SOURCES
   src/ir/IrMgr_stmt.cc
   src/ir/IrInterp.cc
   src/ir/IrNode.cc
+  src/ir/IrVar.cc
   src/ir/IrPrinter.cc
 
   src/ir/handle/IrHandle.cc

@@ -41,12 +41,11 @@ class IrFuncBlock;
 class IrHandle;
 class IrNode;
 class IrToplevel;
+class IrVar;
 
-class Function;
 class Scope;
 class Type;
 class TypeMgr;
-class Var;
 
 class AstCaseItem;
 class AstEnumConst;

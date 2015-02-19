@@ -150,17 +150,10 @@ private:
   /// @param[in] name 名前
   /// @param[in] type 型
   /// @param[in] global グローバル変数の時 true にするフラグ
-  Var*
+  IrVar*
   new_var(ShString name,
 	  const Type* type,
 	  bool global);
-
-  /// @brief 関数を生成する．
-  /// @param[in] name 名前
-  /// @param[in] type 関数の型
-  Function*
-  new_function(ShString name,
-	       const Type* type);
 
 
 private:
@@ -275,12 +268,12 @@ private:
   /// @brief 変数参照を生成する．
   /// @param[in] var 変数
   IrHandle*
-  new_VarHandle(const Var* var);
+  new_VarHandle(const IrVar* var);
 
   /// @brief 関数参照を生成する．
   /// @param[in] func 関数
   IrHandle*
-  new_FuncHandle(const Function* func);
+  new_FuncHandle(IrFuncBlock* func);
 
   /// @brief ブール定数を生成する．
   /// @param[in] name 名前
@@ -335,7 +328,7 @@ private:
   /// @param[in] var メンバ変数
   IrHandle*
   new_MemberRef(IrNode* obj,
-		const Var* var);
+		const IrVar* var);
 
 
 private:
@@ -381,10 +374,7 @@ private:
   vector<Scope*> mScopeList;
 
   // 変数のリスト
-  vector<Var*> mVarList;
-
-  // 関数のリスト
-  vector<Function*> mFuncList;
+  vector<IrVar*> mVarList;
 
 };
 

@@ -8,7 +8,7 @@
 
 
 #include "IrFuncHandle.h"
-#include "Function.h"
+#include "IrFuncBlock.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] func 関数
-IrFuncHandle::IrFuncHandle(const Function* func) :
+IrFuncHandle::IrFuncHandle(IrFuncBlock* func) :
   mFunc(func)
 {
 }
@@ -55,7 +55,7 @@ IrFuncHandle::is_static() const
 // @brief 関数を返す．
 //
 // 他の要素の場合には NULL を返す．
-const Function*
+IrFuncBlock*
 IrFuncHandle::function() const
 {
   return mFunc;

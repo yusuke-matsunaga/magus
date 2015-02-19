@@ -8,7 +8,7 @@
 
 
 #include "IrCodeBlock.h"
-#include "Var.h"
+#include "IrVar.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -29,7 +29,7 @@ IrCodeBlock::~IrCodeBlock()
 
 // @brief 変数を追加する．
 void
-IrCodeBlock::add_var(Var* var)
+IrCodeBlock::add_var(IrVar* var)
 {
   ymuint index = mVarList.size();
   var->set_index(index);
@@ -44,7 +44,7 @@ IrCodeBlock::add_node(IrNode* node)
 }
 
 // @brief 変数のリストを得る．
-const vector<const Var*>&
+const vector<const IrVar*>&
 IrCodeBlock::var_list() const
 {
   return mVarList;
