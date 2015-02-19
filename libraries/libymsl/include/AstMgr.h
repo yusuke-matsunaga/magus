@@ -84,20 +84,15 @@ public:
   // 開放する必要はない．
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief import 用のモジュール記述を作る
-  /// @param[in] module モジュール名
-  /// @param[in] alias エイリアス名
-  /// @param[in] loc ファイル位置
-  AstModule*
-  new_Module(AstSymbol* module,
-	     AstSymbol* alias,
-	     const FileRegion& loc);
-
   /// @brief import 文を作る．
-  /// @param[in] module_list モジュールのリスト
+  /// @param[in] module モジュール名
+  /// @param[in] alias エイリアス
   /// @param[in] loc ファイル位置
+  ///
+  /// alias は NULL の場合もある．
   AstStatement*
-  new_Import(AstModuleList* module_list,
+  new_Import(AstExpr* module,
+	     AstSymbol* alias,
 	     const FileRegion& loc);
 
   /// @brief enum 定義を作る．
@@ -403,14 +398,12 @@ public:
 	       const FileRegion& loc);
 
   /// @brief 名前付きの型を作る．
-  /// @param[in] scope_list スコープ名のリスト
   /// @param[in] type_name 型名
   /// @param[in] loc ファイル位置
   ///
   /// scope_list は NULL の場合もある．
   AstType*
-  new_NamedType(AstSymbolList* scope_list,
-		AstSymbol* type_name,
+  new_NamedType(AstExpr* type_name,
 		const FileRegion& loc);
 
   /// @brief array 型を作る．

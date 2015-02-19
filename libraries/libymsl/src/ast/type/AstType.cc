@@ -49,29 +49,8 @@ AstType::elem_type() const
   return NULL;
 }
 
-// @brief スコープ名の数を返す．
-//
-// kNamedType のみ有効
-ymuint
-AstType::scope_num() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
-// @brief スコープ名を返す．
-// @param[in] pos 位置 ( 0 <= pos < scope_num() )
-//
-// kNamedType のみ有効
-const AstSymbol*
-AstType::scope(ymuint pos) const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
 // @brief 名前付き方の時に名前を返す．
-const AstSymbol*
+const AstExpr*
 AstType::name() const
 {
   ASSERT_NOT_REACHED;
@@ -111,17 +90,11 @@ AstPrimType::type_id() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] scope_num 階層の数
-// @param[in] scope_list スコープ名のリスト
 // @param[in] name 型名
 // @param[in] loc ファイル位置
-AstNamedType::AstNamedType(ymuint scope_num,
-			   AstSymbol** scope_list,
-			   AstSymbol* name,
+AstNamedType::AstNamedType(AstExpr* name,
 			   const FileRegion& loc) :
   AstType(loc),
-  mScopeNum(scope_num),
-  mScopeList(scope_list),
   mName(name)
 {
 }
@@ -138,24 +111,8 @@ AstNamedType::type_id() const
   return kNamedType;
 }
 
-// @brief スコープ名の数を返す．
-ymuint
-AstNamedType::scope_num() const
-{
-  return mScopeNum;
-}
-
-// @brief スコープ名を返す．
-// @param[in] pos 位置 ( 0 <= pos < scope_num() )
-const AstSymbol*
-AstNamedType::scope(ymuint pos) const
-{
-  ASSERT_COND( pos < scope_num() );
-  return mScopeList[pos];
-}
-
 // @brief 名前付き方の時に名前を返す．
-const AstSymbol*
+const AstExpr*
 AstNamedType::name() const
 {
   return mName;

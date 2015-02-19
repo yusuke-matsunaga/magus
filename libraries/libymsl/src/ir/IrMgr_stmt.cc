@@ -709,26 +709,7 @@ IrMgr::resolve_type(const AstType* asttype,
 
   case kNamedType:
     {
-      // スコープから名前の解決を行う
-      ymuint n = asttype->scope_num();
-      Scope* cur_scope = scope;
-      for (ymuint i = 0; i < n; ++ i) {
-	const AstSymbol* scope1_symbol = asttype->scope(i);
-	ShString scope1_name = scope1_symbol->str_val();
-	IrHandle* h = cur_scope->find(scope1_name);
-	if ( h == NULL ) {
-	  // scope1_name is not found
-	  return NULL;
-	}
-	cur_scope = h->scope();
-	if ( cur_scope == NULL ) {
-	  // scope1_name is not a scope
-	  return NULL;
-	}
-      }
-      const AstSymbol* name_symbol = asttype->name();
-      ShString name = name_symbol->str_val();
-      IrHandle* h = cur_scope->find(name);
+      IrHandle* h = elab_primary(asttype->name(), scope);
       if ( h == NULL ) {
 	// name is not defined
 	return NULL;

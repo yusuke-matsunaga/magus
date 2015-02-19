@@ -24,11 +24,11 @@ class AstImport :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] num モジュール数
-  /// @param[in] module_list モジュールのリスト
+  /// @param[in] module モジュール名
+  /// @param[in] alias エイリアス
   /// @param[in] loc ファイル位置
-  AstImport(ymuint num,
-	    AstSymbol** module_list,
+  AstImport(AstExpr* module,
+	    AstSymbol* alias,
 	    const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -46,28 +46,19 @@ public:
   Type
   stmt_type() const;
 
-  /// @brief インポートするモジュール数を返す．
-  ///
-  /// kImport のみ有効
-  virtual
-  ymuint
-  import_num() const;
-
   /// @brief インポートするモジュール名を返す．
-  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
   ///
   /// kImport のみ有効
   virtual
-  const AstSymbol*
-  import_module(ymuint pos) const;
+  const AstExpr*
+  import_module() const;
 
   /// @brief インポートするモジュールのエイリアスを返す．
-  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
   ///
   /// kImport のみ有効
   virtual
   const AstSymbol*
-  import_alias(ymuint pos) const;
+  import_alias() const;
 
 
 private:
@@ -75,12 +66,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // モジュール数
-  ymuint mNum;
+  // モジュール名
+  AstExpr* mModule;
 
-  // モジュール名とエイリアスのリスト
-  // 実体はポインタ配列でサイズは mNum * 2
-  AstSymbol** mModuleList;
+  // エイリアス
+  AstSymbol* mAlias;
 
 };
 

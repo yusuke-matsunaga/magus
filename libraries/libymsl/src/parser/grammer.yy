@@ -101,7 +101,6 @@ fr_merge(const FileRegion fr_array[],
   AstStatement*     statement_type;
   AstStmtList*      stmtlist_type;
   AstSymbol*        symbol_type;
-  AstSymbolList*    symbollist_type;
   AstType*          type_type;
   OpCode            opcode_type;
 }
@@ -194,8 +193,6 @@ fr_merge(const FileRegion fr_array[],
 %type <expr_type>       init_expr
 %type <expr_type>       primary
 %type <exprlist_type>   expr_list
-%type <module_type>     module
-%type <modulelist_type> module_list
 %type <opcode_type>     eqop
 %type <param_type>      param
 %type <paramlist_type>  param_list
@@ -207,7 +204,6 @@ fr_merge(const FileRegion fr_array[],
 %type <statement_type>  else_stmt
 %type <stmtlist_type>   item_list
 %type <stmtlist_type>   statement_list
-%type <symbollist_type> scope_list
 %type <type_type>       type
 
 %%
@@ -244,35 +240,13 @@ item
   $$ = $1;
 }
 // import 文
-| IMPORT module_list SEMI
+| IMPORT primary SEMI
 {
-  $$ = mgr.new_Import($2, @$);
-  delete $2;
+  $$ = mgr.new_Import($2, NULL, @$);
 }
-;
-
-// import のモジュールリスト
-module_list
-: module
+| IMPORT primary AS SYMBOL SEMI
 {
-  $$ = new AstModuleList;
-  $$->add($1);
-}
-| module_list COMMA module
-{
-  $$ = $1;
-  $$->add($3);
-}
-;
-
-module
-: SYMBOL
-{
-  $$ = mgr.new_Module($1, NULL, @$);
-}
-| SYMBOL AS SYMBOL
-{
-  $$ = mgr.new_Module($1, $3, @$);
+  $$ = mgr.new_Import($2, $4, @$);
 }
 ;
 
@@ -562,14 +536,9 @@ type
 {
   $$ = mgr.new_PrimType(kStringType, @$);
 }
-| SYMBOL
+| primary
 {
-  $$ = mgr.new_NamedType(NULL, $1, @$);
-}
-| scope_list DOT SYMBOL
-{
-  $$ = mgr.new_NamedType($1, $3, @$);
-  delete $1;
+  $$ = mgr.new_NamedType($1, @$);
 }
 | ARRAY LP type RP
 {
@@ -582,20 +551,6 @@ type
 | MAP LP type COMMA type RP
 {
   $$ = mgr.new_MapType($3, $5, @$);
-}
-;
-
-// 階層名
-scope_list
-: SYMBOL
-{
-  $$ = new AstSymbolList;
-  $$->add($1);
-}
-| scope_list DOT SYMBOL
-{
-  $$ = $1;
-  $$->add($3);
 }
 ;
 

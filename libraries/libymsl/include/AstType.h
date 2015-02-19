@@ -55,26 +55,11 @@ public:
   const AstType*
   elem_type() const;
 
-  /// @brief スコープ名の数を返す．
-  ///
-  /// kNamedType のみ有効
-  virtual
-  ymuint
-  scope_num() const;
-
-  /// @brief スコープ名を返す．
-  /// @param[in] pos 位置 ( 0 <= pos < scope_num() )
-  ///
-  /// kNamedType のみ有効
-  virtual
-  const AstSymbol*
-  scope(ymuint pos) const;
-
   /// @brief 名前を返す．
   ///
   /// kNamedType のみ有効
   virtual
-  const AstSymbol*
+  const AstExpr*
   name() const;
 
 };

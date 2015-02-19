@@ -16,15 +16,15 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] num モジュール数
-// @param[in] module_list モジュールのリスト
+// @param[in] module モジュール名
+// @param[in] alias エイリアス
 // @param[in] loc ファイル位置
-AstImport::AstImport(ymuint num,
-		     AstSymbol** module_list,
+AstImport::AstImport(AstExpr* module,
+		     AstSymbol* alias,
 		     const FileRegion& loc) :
   AstStatement(loc),
-  mNum(num),
-  mModuleList(module_list)
+  mModule(module),
+  mAlias(alias)
 {
 }
 
@@ -40,35 +40,22 @@ AstImport::stmt_type() const
   return kImport;
 }
 
-// @brief インポートするモジュール数を返す．
-//
-// kImport のみ有効
-ymuint
-AstImport::import_num() const
-{
-  return mNum;
-}
-
 // @brief インポートするモジュール名を返す．
-// @param[in] pos 位置 ( 0 <= pos < inport_num() )
 //
 // kImport のみ有効
-const AstSymbol*
-AstImport::import_module(ymuint pos) const
+const AstExpr*
+AstImport::import_module() const
 {
-  ASSERT_COND( pos < import_num() );
-  return mModuleList[pos * 2 + 0];
+  return mModule;
 }
 
 // @brief インポートするモジュールのエイリアスを返す．
-// @param[in] pos 位置 ( 0 <= pos < inport_num() )
 //
 // kImport のみ有効
 const AstSymbol*
-AstImport::import_alias(ymuint pos) const
+AstImport::import_alias() const
 {
-  ASSERT_COND( pos < import_num() );
-  return mModuleList[pos * 2 + 1];
+  return mAlias;
 }
 
 END_NAMESPACE_YM_YMSL

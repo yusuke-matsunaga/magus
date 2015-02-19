@@ -202,16 +202,11 @@ AstPrinter::print_statement(const AstStatement* stmt,
     print_indent(indent);
     mS << "import";
     {
-      ymuint n = stmt->import_num();
-      const char* comma = " ";
-      for (ymuint i = 0; i < n; ++ i) {
-	const AstSymbol* module = stmt->import_module(i);
-	const AstSymbol* alias = stmt->import_alias(i);
-	mS << comma  << module->str_val();
-	if ( alias != NULL ) {
-	  mS << " as " << alias->str_val();
-	}
-	comma = ", ";
+      const AstExpr* module = stmt->import_module();
+      const AstSymbol* alias = stmt->import_alias();
+      print_expr(module);
+      if ( alias != NULL ) {
+	mS << " as " << alias->str_val();
       }
     }
     mS << ";" << endl;
@@ -598,15 +593,7 @@ AstPrinter::print_type(const AstType* type)
     break;
 
   case kNamedType:
-    {
-      ymuint n = type->scope_num();
-      for (ymuint i = 0; i < n; ++ i) {
-	const AstSymbol* scope_symbol = type->scope(i);
-	mS << scope_symbol->str_val() << ".";
-      }
-      const AstSymbol* name_symbol = type->name();
-      mS << name_symbol->str_val();
-    }
+    print_expr(type->name());
     break;
 
   default:

@@ -238,28 +238,19 @@ public:
   const AstSymbol*
   label() const;
 
-  /// @brief インポートするモジュール数を返す．
-  ///
-  /// kImport のみ有効
-  virtual
-  ymuint
-  import_num() const;
-
   /// @brief インポートするモジュール名を返す．
-  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
   ///
   /// kImport のみ有効
   virtual
-  const AstSymbol*
-  import_module(ymuint pos) const;
+  const AstExpr*
+  import_module() const;
 
   /// @brief インポートするモジュールのエイリアスを返す．
-  /// @param[in] pos 位置 ( 0 <= pos < inport_num() )
   ///
   /// kImport のみ有効
   virtual
   const AstSymbol*
-  import_alias(ymuint pos) const;
+  import_alias() const;
 
 };
 

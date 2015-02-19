@@ -27,13 +27,9 @@ class AstNamedType :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] scope_num 階層の数
-  /// @param[in] scope_list スコープ名のリスト
   /// @param[in] name 型名
   /// @param[in] loc ファイル位置
-  AstNamedType(ymuint scope_num,
-	       AstSymbol** scope_list,
-	       AstSymbol* name,
+  AstNamedType(AstExpr* name,
 	       const FileRegion& loc);
 
   /// @brief デストラクタ
@@ -51,20 +47,9 @@ public:
   TypeId
   type_id() const;
 
-  /// @brief スコープ名の数を返す．
-  virtual
-  ymuint
-  scope_num() const;
-
-  /// @brief スコープ名を返す．
-  /// @param[in] pos 位置 ( 0 <= pos < scope_num() )
-  virtual
-  const AstSymbol*
-  scope(ymuint pos) const;
-
   /// @brief 名前付き方の時に名前を返す．
   virtual
-  const AstSymbol*
+  const AstExpr*
   name() const;
 
 
@@ -73,14 +58,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // スコープ数
-  ymuint mScopeNum;
-
-  // スコープ名のリスト
-  AstSymbol** mScopeList;
-
   // 型名
-  AstSymbol* mName;
+  AstExpr* mName;
 
 };
 

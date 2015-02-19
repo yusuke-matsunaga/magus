@@ -45,7 +45,6 @@
 #include "stmt/AstIncr.h"
 #include "stmt/AstInplaceOp.h"
 #include "stmt/AstLabel.h"
-#include "stmt/AstModule.h"
 #include "stmt/AstNullStmt.h"
 #include "stmt/AstParam.h"
 #include "stmt/AstReturn.h"
@@ -168,40 +167,19 @@ AstMgr::scan(YYSTYPE& lval,
   return id;
 }
 
-// @brief import 用のモジュール記述を作る
+// @brief import 文を作る．
 // @param[in] module モジュール名
-// @param[in] alias エイリアス名
+// @param[in] alias エイリアス
 // @param[in] loc ファイル位置
-AstModule*
-AstMgr::new_Module(AstSymbol* module,
+//
+// alias は NULL の場合もある．
+AstStatement*
+AstMgr::new_Import(AstExpr* module,
 		   AstSymbol* alias,
 		   const FileRegion& loc)
 {
-  void* p = mAlloc.get_memory(sizeof(AstModule));
-  return new (p) AstModule(module, alias, loc);
-}
-
-// @brief import 文を作る．
-// @param[in] module_list モジュールのリスト
-// @param[in] loc ファイル位置
-AstStatement*
-AstMgr::new_Import(AstModuleList* module_list,
-		   const FileRegion& loc)
-{
-  ymuint num = module_list->size();
-  void* q = mAlloc.get_memory(sizeof(AstSymbol*) * num * 2);
-  AstSymbol** module_array = new (q) AstSymbol*[num * 2];
-
-  ymuint pos = 0;
-  for (AstModuleList::Iterator p = module_list->begin();
-       !p.is_end(); p.next()) {
-    AstModule* m = *p;
-    module_array[pos * 2 + 0] = m->module_name();
-    module_array[pos * 2 + 1] = m->alias_name();
-    ++ pos;
-  }
   void* p = mAlloc.get_memory(sizeof(AstImport));
-  return new (p) AstImport(num, module_array, loc);
+  return new (p) AstImport(module, alias, loc);
 }
 
 // @brief enum 定義を作る．
@@ -718,30 +696,14 @@ AstMgr::new_PrimType(TypeId type,
 }
 
 // @brief 名前付きの型を作る．
-// @param[in] scope_list スコープ名のリスト
 // @param[in] type_name 型名
 // @param[in] loc ファイル位置
 AstType*
-AstMgr::new_NamedType(AstSymbolList* scope_list,
-		      AstSymbol* type_name,
+AstMgr::new_NamedType(AstExpr* type_name,
 		      const FileRegion& loc)
 {
-  ymuint n = 0;
-  AstSymbol** scope_array = NULL;
-  if ( scope_list != NULL ) {
-    n = scope_list->size();
-    void* q = mAlloc.get_memory(sizeof(AstSymbol*) * n);
-    scope_array = new (q) AstSymbol*[n];
-    ymuint pos = 0;
-    for (AstSymbolList::Iterator p = scope_list->begin();
-	 !p.is_end(); p.next()) {
-      scope_array[pos] = *p;
-      ++ pos;
-    }
-  }
-
   void* p = mAlloc.get_memory(sizeof(AstNamedType));
-  return new (p) AstNamedType(n, scope_array, type_name, loc);
+  return new (p) AstNamedType(type_name, loc);
 }
 
 // @brief array 型を作る．

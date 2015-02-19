@@ -257,33 +257,21 @@ AstStatement::label() const
   return NULL;
 }
 
-// @brief インポートするモジュール数を返す．
-//
-// kImport のみ有効
-ymuint
-AstStatement::import_num() const
-{
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
 // @brief インポートするモジュール名を返す．
-// @param[in] pos 位置 ( 0 <= pos < inport_num() )
 //
 // kImport のみ有効
-const AstSymbol*
-AstStatement::import_module(ymuint pos) const
+const AstExpr*
+AstStatement::import_module() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
 }
 
 // @brief インポートするモジュールのエイリアスを返す．
-// @param[in] pos 位置 ( 0 <= pos < inport_num() )
 //
 // kImport のみ有効
 const AstSymbol*
-AstStatement::import_alias(ymuint pos) const
+AstStatement::import_alias() const
 {
   ASSERT_NOT_REACHED;
   return NULL;
