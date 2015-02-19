@@ -5,7 +5,7 @@
 /// @brief YmslModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -56,7 +56,7 @@ public:
 
   /// @brief このモジュールが export している関数を返す．
   /// @param[in] pos 位置 ( 0 <= pos < exported_function_num() )
-  Function*
+  YmslFunction*
   exported_function(ymuint pos) const;
 
   /// @brief このモジュールが export している変数の数を返す．
@@ -68,9 +68,11 @@ public:
   Var*
   exported_variable(ymuint pos) const;
 
-  /// @brief 関数リンクの数
-  ymuint
-  function_link_num() const;
+  /// @brief トップレベルの実行を行う．
+  /// @param[in] vsm 仮想マシン
+  virtual
+  void
+  execute_toplevel(YmslVSM& vsm) const = 0;
 
 
 private:
@@ -91,7 +93,7 @@ private:
   ymuint mExportedFuncNum;
 
   // export している関数の配列
-  Function* mExportedFuncList;
+  YmslFunction* mExportedFuncList;
 
   // export している変数の数
   ymuint mExportedVarNum;

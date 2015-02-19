@@ -125,7 +125,8 @@ set (ymsl_SOURCES
   src/ir/node/IrJump.cc
   src/ir/node/IrLabel.cc
 
-  src/vsm/YmslVSM.cc
+  src/vsm/CodeList.cc
+  src/vsm/YVSM.cc
   src/vsm/YmslFunction.cc
   src/vsm/YmslNativeFunc.cc
   src/vsm/YmslBuiltinFunc.cc

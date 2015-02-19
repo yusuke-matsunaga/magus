@@ -8,7 +8,7 @@
 
 
 #include "YmslBuiltinFunc.h"
-#include "YmslVSM.h"
+#include "YVSM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -42,7 +42,7 @@ YmslBuiltinFunc::is_builtin() const
 // @param[in] vsm 仮想マシン
 // @param[in] base ベースレジスタ
 void
-YmslBuiltinFunc::execute(YmslVSM& vsm,
+YmslBuiltinFunc::execute(YVSM& vsm,
 			 Ymsl_INT base) const
 {
   vector<YmslValue> arg_list(arg_num());

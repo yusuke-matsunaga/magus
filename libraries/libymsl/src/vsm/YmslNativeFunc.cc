@@ -8,7 +8,7 @@
 
 
 #include "YmslNativeFunc.h"
-#include "YmslVSM.h"
+#include "YVSM.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -20,12 +20,12 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 関数名
 // @param[in] arg_num 引数の数
-// @param[in] code_list コードリスト
+// @param[in] code_list_builder コードリストの初期化用オブジェクト
 YmslNativeFunc::YmslNativeFunc(ShString name,
 			       ymuint arg_num,
-			       const YmslCodeList& code_list) :
+			       const CodeList::Builder& code_list_builder) :
   YmslFunction(name, arg_num),
-  mCodeList(code_list)
+  mCodeList(code_list_builder)
 {
 }
 
@@ -45,7 +45,7 @@ YmslNativeFunc::is_builtin() const
 // @param[in] vsm 仮想マシン
 // @param[in] base ベースレジスタ
 void
-YmslNativeFunc::execute(YmslVSM& vsm,
+YmslNativeFunc::execute(YVSM& vsm,
 			Ymsl_INT base) const
 {
   vsm.execute(mCodeList, base);

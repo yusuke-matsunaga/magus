@@ -10,6 +10,7 @@
 
 
 #include "YmslFunction.h"
+#include "CodeList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -26,10 +27,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] arg_num 引数の数
-  /// @param[in] code_list コードリスト
+  /// @param[in] code_list_builder コードリストの初期化用オブジェクト
   YmslNativeFunc(ShString name,
 		 ymuint arg_num,
-		 const YmslCodeList& code_list);
+		 const CodeList::Builder& code_list_builder);
 
   /// @brief デストラクタ
   ~YmslNativeFunc();
@@ -50,7 +51,7 @@ public:
   /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(YmslVSM& vsm,
+  execute(YVSM& vsm,
 	  Ymsl_INT base) const;
 
 
@@ -66,7 +67,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // コードリスト
-  const YmslCodeList& mCodeList;
+  CodeList mCodeList;
 
 };
 

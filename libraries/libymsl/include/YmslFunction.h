@@ -5,7 +5,7 @@
 /// @brief YmslFunction のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -57,7 +57,7 @@ public:
   /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(YmslVSM& vsm,
+  execute(YVSM& vsm,
 	  Ymsl_INT base) const = 0;
 
 

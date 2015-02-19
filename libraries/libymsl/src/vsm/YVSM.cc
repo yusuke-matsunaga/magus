@@ -1,25 +1,25 @@
 
-/// @file YmslVSM.cc
-/// @brief YmslVSM の実装ファイル
+/// @file YVSM.cc
+/// @brief YVSM の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslVSM.h"
-#include "YmslCodeList.h"
+#include "YVSM.h"
+#include "CodeList.h"
 #include "YmslFunction.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス YmslVSM
+// クラス YVSM
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YmslVSM::YmslVSM()
+YVSM::YVSM()
 {
   mFuncTableSize = 0;
   mFuncTable = NULL;
@@ -34,7 +34,7 @@ YmslVSM::YmslVSM()
 }
 
 // @brief デストラクタ
-YmslVSM::~YmslVSM()
+YVSM::~YVSM()
 {
   delete [] mFuncTable;
   delete [] mGlobalHeap;
@@ -45,8 +45,8 @@ YmslVSM::~YmslVSM()
 // @param[in] code_list コードの配列
 // @param[in] base ベースレジスタ
 void
-YmslVSM::execute(const YmslCodeList& code_list,
-		 Ymsl_INT base)
+YVSM::execute(const CodeList& code_list,
+	      Ymsl_INT base)
 {
   for (Ymsl_INT pc = 0; pc < code_list.size(); ) {
     Ymsl_CODE code = code_list.read_opcode(pc);

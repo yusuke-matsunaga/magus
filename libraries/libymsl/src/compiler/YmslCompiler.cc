@@ -3,7 +3,7 @@
 /// @brief YmslCompiler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -12,6 +12,7 @@
 #include "AstMgr.h"
 #include "IrMgr.h"
 #include "IrToplevel.h"
+
 
 BEGIN_NAMESPACE_YM_YMSL
 
@@ -31,15 +32,17 @@ YmslCompiler::~YmslCompiler()
 
 // @brief コンパイルする．
 // @param[in] ido 入力データ
-// @return 成功したら true を返す．
-bool
+// @return コンパイルしたモジュールを返す．
+//
+// エラーが起きたら NULL を返す．
+YmslModule*
 YmslCompiler::compile(IDO& ido)
 {
   AstMgr ast_mgr;
 
   bool stat1 = ast_mgr.read_source(ido);
   if ( !stat1 ) {
-    return false;
+    return NULL;
   }
 
   IrMgr ir_mgr;
@@ -49,10 +52,10 @@ YmslCompiler::compile(IDO& ido)
   IrToplevel* ir_toplevel = new IrToplevel;
   bool stat2 = ir_mgr.elaborate(toplevel, *ir_toplevel);
   if ( !stat2 ) {
-    return false;
+    return NULL;
   }
 
-  return true;
+  return NULL;
 }
 
 END_NAMESPACE_YM_YMSL

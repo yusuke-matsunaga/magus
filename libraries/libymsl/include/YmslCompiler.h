@@ -37,8 +37,10 @@ public:
 
   /// @brief コンパイルする．
   /// @param[in] ido 入力データ
-  /// @return 成功したら true を返す．
-  bool
+  /// @return コンパイルしたモジュールを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  YmslModule*
   compile(IDO& ido);
 
 

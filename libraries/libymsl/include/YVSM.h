@@ -1,8 +1,8 @@
-#ifndef YMSLVSM_H
-#define YMSLVSM_H
+#ifndef YVSM_H
+#define YVSM_H
 
-/// @file YmslVSM.h
-/// @brief YmslVSM のヘッダファイル
+/// @file YVSM.h
+/// @brief YVSM のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -16,11 +16,11 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @brief YmslVSM の命令コード
+/// @brief YVSM の命令コード
 ///
 /// スタックマシンを模倣している．
 //////////////////////////////////////////////////////////////////////
-enum YmslOpcode {
+enum YvsmOpcode {
   YMVSM_NOP,
 
   YMVSM_PUSH_INT_IMM,
@@ -122,18 +122,18 @@ enum YmslOpcode {
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslVSM YmslVSM.h "YmslVSM.h"
+/// @class YVSM YVSM.h "YVSM.h"
 /// @brief YMSL の VSM(Virtual Stack Machine)
 //////////////////////////////////////////////////////////////////////
-class YmslVSM
+class YVSM
 {
 public:
 
   /// @brief コンストラクタ
-  YmslVSM();
+  YVSM();
 
   /// @brief デストラクタ
-  ~YmslVSM();
+  ~YVSM();
 
 
 public:
@@ -145,7 +145,7 @@ public:
   /// @param[in] code_list コードの配列
   /// @param[in] base ベースレジスタ
   void
-  execute(const YmslCodeList& code_list,
+  execute(const CodeList& code_list,
 	  Ymsl_INT base);
 
   /// @brief スタックの内容を読む
@@ -300,7 +300,7 @@ private:
 // @param[in] index インデックス
 inline
 YmslValue
-YmslVSM::read_stack(Ymsl_INT index)
+YVSM::read_stack(Ymsl_INT index)
 {
   return mLocalStack[index];
 }
@@ -310,8 +310,8 @@ YmslVSM::read_stack(Ymsl_INT index)
 // @param[in] val 値
 inline
 void
-YmslVSM::write_stack(Ymsl_INT index,
-		     YmslValue val)
+YVSM::write_stack(Ymsl_INT index,
+		  YmslValue val)
 {
   mLocalStack[index] = val;
 }
@@ -319,7 +319,7 @@ YmslVSM::write_stack(Ymsl_INT index,
 // @brief INT をプッシュする．
 inline
 void
-YmslVSM::push_INT(Ymsl_INT val)
+YVSM::push_INT(Ymsl_INT val)
 {
   mLocalStack[mSP].int_value = val;
   ++ mSP;
@@ -328,7 +328,7 @@ YmslVSM::push_INT(Ymsl_INT val)
 // @brief FLOAT をプッシュする．
 inline
 void
-YmslVSM::push_FLOAT(Ymsl_FLOAT val)
+YVSM::push_FLOAT(Ymsl_FLOAT val)
 {
   mLocalStack[mSP].float_value = val;
   ++ mSP;
@@ -337,7 +337,7 @@ YmslVSM::push_FLOAT(Ymsl_FLOAT val)
 // @brief OBJPTR をプッシュする．
 inline
 void
-YmslVSM::push_OBJPTR(Ymsl_OBJPTR val)
+YVSM::push_OBJPTR(Ymsl_OBJPTR val)
 {
   mLocalStack[mSP].obj_value = val;
   ++ mSP;
@@ -346,7 +346,7 @@ YmslVSM::push_OBJPTR(Ymsl_OBJPTR val)
 // @brief INT をポップする．
 inline
 Ymsl_INT
-YmslVSM::pop_INT()
+YVSM::pop_INT()
 {
   -- mSP;
   return mLocalStack[mSP].int_value;
@@ -355,7 +355,7 @@ YmslVSM::pop_INT()
 // @brief FLOAT をポップする．
 inline
 Ymsl_FLOAT
-YmslVSM::pop_FLOAT()
+YVSM::pop_FLOAT()
 {
   -- mSP;
   return mLocalStack[mSP].float_value;
@@ -364,7 +364,7 @@ YmslVSM::pop_FLOAT()
 // @brief OBJPTR をポップする．
 inline
 Ymsl_OBJPTR
-YmslVSM::pop_OBJPTR()
+YVSM::pop_OBJPTR()
 {
   -- mSP;
   return mLocalStack[mSP].obj_value;
@@ -374,7 +374,7 @@ YmslVSM::pop_OBJPTR()
 // @param[in] index インデックス
 inline
 Ymsl_INT
-YmslVSM::load_global_INT(Ymsl_INT index)
+YVSM::load_global_INT(Ymsl_INT index)
 {
   return mGlobalHeap[index].int_value;
 }
@@ -383,7 +383,7 @@ YmslVSM::load_global_INT(Ymsl_INT index)
 // @param[in] index インデックス
 inline
 Ymsl_FLOAT
-YmslVSM::load_global_FLOAT(Ymsl_INT index)
+YVSM::load_global_FLOAT(Ymsl_INT index)
 {
   return mGlobalHeap[index].float_value;
 }
@@ -392,7 +392,7 @@ YmslVSM::load_global_FLOAT(Ymsl_INT index)
 // @param[in] index インデックス
 inline
 Ymsl_OBJPTR
-YmslVSM::load_global_OBJPTR(Ymsl_INT index)
+YVSM::load_global_OBJPTR(Ymsl_INT index)
 {
   return mGlobalHeap[index].obj_value;
 }
@@ -402,8 +402,8 @@ YmslVSM::load_global_OBJPTR(Ymsl_INT index)
 // @param[in] val 値
 inline
 void
-YmslVSM::store_global_INT(Ymsl_INT index,
-			 Ymsl_INT val)
+YVSM::store_global_INT(Ymsl_INT index,
+		       Ymsl_INT val)
 {
   mGlobalHeap[index].int_value = val;
 }
@@ -413,8 +413,8 @@ YmslVSM::store_global_INT(Ymsl_INT index,
 // @param[in] val 値
 inline
 void
-YmslVSM::store_global_FLOAT(Ymsl_INT index,
-			   Ymsl_FLOAT val)
+YVSM::store_global_FLOAT(Ymsl_INT index,
+			 Ymsl_FLOAT val)
 {
   mGlobalHeap[index].float_value = val;
 }
@@ -424,8 +424,8 @@ YmslVSM::store_global_FLOAT(Ymsl_INT index,
 // @param[in] val 値
 inline
 void
-YmslVSM::store_global_OBJPTR(Ymsl_INT index,
-			    Ymsl_OBJPTR val)
+YVSM::store_global_OBJPTR(Ymsl_INT index,
+			  Ymsl_OBJPTR val)
 {
   mGlobalHeap[index].obj_value = val;
 }
@@ -434,7 +434,7 @@ YmslVSM::store_global_OBJPTR(Ymsl_INT index,
 // @param[in] index インデックス
 inline
 Ymsl_INT
-YmslVSM::load_local_INT(Ymsl_INT index)
+YVSM::load_local_INT(Ymsl_INT index)
 {
   return mLocalStack[index].int_value;
 }
@@ -443,7 +443,7 @@ YmslVSM::load_local_INT(Ymsl_INT index)
 // @param[in] index インデックス
 inline
 Ymsl_FLOAT
-YmslVSM::load_local_FLOAT(Ymsl_INT index)
+YVSM::load_local_FLOAT(Ymsl_INT index)
 {
   return mLocalStack[index].float_value;
 }
@@ -452,7 +452,7 @@ YmslVSM::load_local_FLOAT(Ymsl_INT index)
 // @param[in] index インデックス
 inline
 Ymsl_OBJPTR
-YmslVSM::load_local_OBJPTR(Ymsl_INT index)
+YVSM::load_local_OBJPTR(Ymsl_INT index)
 {
   return mLocalStack[index].obj_value;
 }
@@ -462,8 +462,8 @@ YmslVSM::load_local_OBJPTR(Ymsl_INT index)
 // @param[in] val 値
 inline
 void
-YmslVSM::store_local_INT(Ymsl_INT index,
-			 Ymsl_INT val)
+YVSM::store_local_INT(Ymsl_INT index,
+		      Ymsl_INT val)
 {
   mLocalStack[index].int_value = val;
 }
@@ -473,8 +473,8 @@ YmslVSM::store_local_INT(Ymsl_INT index,
 // @param[in] val 値
 inline
 void
-YmslVSM::store_local_FLOAT(Ymsl_INT index,
-			   Ymsl_FLOAT val)
+YVSM::store_local_FLOAT(Ymsl_INT index,
+			Ymsl_FLOAT val)
 {
   mLocalStack[index].float_value = val;
 }
@@ -484,12 +484,12 @@ YmslVSM::store_local_FLOAT(Ymsl_INT index,
 // @param[in] val 値
 inline
 void
-YmslVSM::store_local_OBJPTR(Ymsl_INT index,
-			    Ymsl_OBJPTR val)
+YVSM::store_local_OBJPTR(Ymsl_INT index,
+			 Ymsl_OBJPTR val)
 {
   mLocalStack[index].obj_value = val;
 }
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLVSM_H
+#endif // YVSM_H
