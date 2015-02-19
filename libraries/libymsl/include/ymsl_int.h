@@ -29,11 +29,12 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_YMSL
 
-class YmslModule;
-class CodeList;
-class YmslFunction;
 class YmslObj;
-class YVSM;
+
+class Vsm;
+class VsmCodeList;
+class VsmFunction;
+class VsmModule;
 
 class IrCodeBlock;
 class IrHandle;

@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 関数名
 YmslPrint::YmslPrint(ShString name) :
-  YmslBuiltinFunc(name, 1)
+  VsmBuiltinFunc(name, 1)
 {
 }
 
@@ -33,12 +33,12 @@ YmslPrint::~YmslPrint()
 // @param[in] ret_val 返り値を格納する変数
 //
 // 実際の派生クラスが実装する必要がある．
-YmslValue
-YmslPrint::_execute(const vector<YmslValue>& arg_list) const
+VsmValue
+YmslPrint::_execute(const vector<VsmValue>& arg_list) const
 {
   cout << arg_list[0].int_value << endl;
 
-  YmslValue dummy;
+  VsmValue dummy;
   return dummy;
 }
 

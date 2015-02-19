@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmslBuiltinFunc.h"
+#include "VsmBuiltinFunc.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief print 関数
 //////////////////////////////////////////////////////////////////////
 class YmslPrint :
-  public YmslBuiltinFunc
+  public VsmBuiltinFunc
 {
 public:
 
@@ -43,8 +43,8 @@ private:
   ///
   /// 実際の派生クラスが実装する必要がある．
   virtual
-  YmslValue
-  _execute(const vector<YmslValue>& arg_list) const;
+  VsmValue
+  _execute(const vector<VsmValue>& arg_list) const;
 
 };
 

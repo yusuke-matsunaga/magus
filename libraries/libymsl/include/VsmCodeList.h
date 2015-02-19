@@ -1,8 +1,8 @@
-#ifndef CODELIST_H
-#define CODELIST_H
+#ifndef VSMCODELIST_H
+#define VSMCODELIST_H
 
-/// @file CodeList.h
-/// @brief CodeList のヘッダファイル
+/// @file VsmCodeList.h
+/// @brief VsmCodeList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,18 +15,18 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class CodeList CodeList.h "CodeList.h"
+/// @class VsmCodeList VsmCodeList.h "VsmCodeList.h"
 /// @brief VSM用の命令コードのリスト
 ///
-/// CodeList のオブジェクトを作るにはまず
-/// CodeList::Builder オブジェクトに対して
+/// VsmCodeList のオブジェクトを作るにはまず
+/// VsmCodeList::Builder オブジェクトに対して
 /// write_opcode(), write_int(), write_float()
 /// などの関数でコードの中身を作り，それを
-/// CodeList のコンストラクタの引数として渡す．
-/// なので CodeList は const の読み出し専用関数
+/// VsmCodeList のコンストラクタの引数として渡す．
+/// なので VsmCodeList は const の読み出し専用関数
 /// しか持たない．
 //////////////////////////////////////////////////////////////////////
-class CodeList
+class VsmCodeList
 {
 public:
 
@@ -93,10 +93,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] builder 初期化用オブジェクト
-  CodeList(const Builder& builder);
+  VsmCodeList(const Builder& builder);
 
   /// @brief デストラクタ
-  ~CodeList();
+  ~VsmCodeList();
 
 
 public:
@@ -162,7 +162,7 @@ private:
 // @brief サイズを得る．
 inline
 Ymsl_INT
-CodeList::size() const
+VsmCodeList::size() const
 {
   return mSize;
 }
@@ -172,7 +172,7 @@ CodeList::size() const
 // @return 読みだした値を返す．
 inline
 Ymsl_CODE
-CodeList::read_opcode(Ymsl_INT& addr) const
+VsmCodeList::read_opcode(Ymsl_INT& addr) const
 {
   Ymsl_CODE op = mBody[addr];
   ++ addr;
@@ -184,7 +184,7 @@ CodeList::read_opcode(Ymsl_INT& addr) const
 // @return 読みだした値を返す．
 inline
 Ymsl_INT
-CodeList::read_int(Ymsl_INT& addr) const
+VsmCodeList::read_int(Ymsl_INT& addr) const
 {
   ASSERT_COND( sizeof(Ymsl_INT) == sizeof(Ymsl_CODE) );
   Ymsl_INT val = mBody[addr];
@@ -197,7 +197,7 @@ CodeList::read_int(Ymsl_INT& addr) const
 // @return 読みだした値を返す．
 inline
 Ymsl_FLOAT
-CodeList::read_float(Ymsl_INT& addr) const
+VsmCodeList::read_float(Ymsl_INT& addr) const
 {
   Ymsl_CODE* c_ptr = mBody + addr;
   Ymsl_FLOAT* f_ptr = reinterpret_cast<Ymsl_FLOAT*>(c_ptr);
@@ -211,7 +211,7 @@ CodeList::read_float(Ymsl_INT& addr) const
 // @return 読みだした値を返す．
 inline
 Ymsl_OBJPTR
-CodeList::read_objptr(Ymsl_INT& addr) const
+VsmCodeList::read_objptr(Ymsl_INT& addr) const
 {
   Ymsl_CODE* c_ptr = mBody + addr;
   Ymsl_OBJPTR* o_ptr = reinterpret_cast<Ymsl_OBJPTR*>(c_ptr);
@@ -223,4 +223,4 @@ CodeList::read_objptr(Ymsl_INT& addr) const
 END_NAMESPACE_YM_YMSL
 
 
-#endif // CODELIST_H
+#endif // VSMCODELIST_H

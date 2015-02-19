@@ -1,8 +1,8 @@
-#ifndef YMSLVALUE_H
-#define YMSLVALUE_H
+#ifndef VSMVALUE_H
+#define VSMVALUE_H
 
-/// @file YmslValue.h
-/// @brief YmslValue のヘッダファイル
+/// @file VsmValue.h
+/// @brief VsmValue のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 ///
 /// あんまり union は使いたくないんだけど
 //////////////////////////////////////////////////////////////////////
-union YmslValue {
+union VsmValue {
   Ymsl_INT    int_value;
   Ymsl_FLOAT  float_value;
   Ymsl_OBJPTR obj_value;
@@ -28,4 +28,4 @@ union YmslValue {
 END_NAMESPACE_YM_YMSL
 
 
-#endif // YMSLVALUE_H
+#endif // VSMVALUE_H

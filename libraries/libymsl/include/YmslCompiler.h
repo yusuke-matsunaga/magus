@@ -40,7 +40,7 @@ public:
   /// @return コンパイルしたモジュールを返す．
   ///
   /// エラーが起きたら NULL を返す．
-  YmslModule*
+  VsmModule*
   compile(IDO& ido);
 
 

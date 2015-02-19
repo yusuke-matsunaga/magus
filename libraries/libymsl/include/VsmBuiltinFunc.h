@@ -1,37 +1,37 @@
-#ifndef YMSLFUNCTION_H
-#define YMSLFUNCTION_H
+#ifndef VSMBUILTINFUNC_H
+#define VSMBUILTINFUNC_H
 
-/// @file YmslFunction.h
-/// @brief YmslFunction のヘッダファイル
+/// @file VsmBuiltinFunc.h
+/// @brief VsmBuiltinFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014, 2015 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ymsl_int.h"
-#include "YmUtils/ShString.h"
+#include "VsmFunction.h"
+#include "VsmValue.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslFunction YmslFunction.h "YmslFunction.h"
-/// @brief YMSL の関数を表すクラス
+/// @class VsmBuiltinFunc VsmBuiltinFunc.h "VsmBuiltinFunc.h"
+/// @brief VSM の組み込み関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslFunction
+class VsmBuiltinFunc :
+  public VsmFunction
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] arg_num 引数の数
-  YmslFunction(ShString name,
-	       ymuint arg_num);
+  VsmBuiltinFunc(ShString name,
+		 ymuint arg_num);
 
   /// @brief デストラクタ
-  virtual
-  ~YmslFunction();
+  ~VsmBuiltinFunc();
 
 
 public:
@@ -39,26 +39,32 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 関数名を返す．
-  ShString
-  name() const;
-
-  /// @brief 引数の数
-  ymuint
-  arg_num() const;
-
   /// @brief 組み込み関数の時 true を返す．
   virtual
   bool
-  is_builtin() const = 0;
+  is_builtin() const;
 
   /// @brief 組み込み関数の時の実行関数
   /// @param[in] vsm 仮想マシン
   /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(YVSM& vsm,
-	  Ymsl_INT base) const = 0;
+  execute(Vsm& vsm,
+	  Ymsl_INT base) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 本当の実行関数
+  /// @param[in] arg_list 引数のリスト
+  ///
+  /// 実際の派生クラスが実装する必要がある．
+  virtual
+  VsmValue
+  _execute(const vector<VsmValue>& arg_list) const = 0;
 
 
 private:
@@ -66,14 +72,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数名
-  ShString mName;
-
-  // 引数の数
-  ymuint mArgNum;
-
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLFUNCTION_H
+#endif // VSMBUILTINFUNC_H

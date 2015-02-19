@@ -1,35 +1,35 @@
 
-/// @file CodeList.cc
-/// @brief CodeList の実装ファイル
+/// @file VsmCodeList.cc
+/// @brief VsmCodeList の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "CodeList.h"
+#include "VsmCodeList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス CodeList::Builder
+// クラス VsmCodeList::Builder
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CodeList::Builder::Builder()
+VsmCodeList::Builder::Builder()
 {
 }
 
 // @brief デストラクタ
-CodeList::Builder::~Builder()
+VsmCodeList::Builder::~Builder()
 {
 }
 
 // @brief 命令を追加する．
 // @param[in] op 命令
 void
-CodeList::Builder::write_opcode(Ymsl_CODE op)
+VsmCodeList::Builder::write_opcode(Ymsl_CODE op)
 {
   mBody.push_back(op);
 }
@@ -37,7 +37,7 @@ CodeList::Builder::write_opcode(Ymsl_CODE op)
 // @brief INT を追加する
 // @param[in] val 値
 void
-CodeList::Builder::write_int(Ymsl_INT val)
+VsmCodeList::Builder::write_int(Ymsl_INT val)
 {
   ASSERT_COND( sizeof(Ymsl_INT) == sizeof(Ymsl_CODE) );
   mBody.push_back(static_cast<Ymsl_CODE>(val));
@@ -46,7 +46,7 @@ CodeList::Builder::write_int(Ymsl_INT val)
 // @brief FLOAT を追加する．
 // @param[in] val 値
 void
-CodeList::Builder::write_float(Ymsl_FLOAT val)
+VsmCodeList::Builder::write_float(Ymsl_FLOAT val)
 {
   // ちょっとキタナイコード
   const ymuint n = sizeof(Ymsl_FLOAT) / sizeof(Ymsl_CODE);
@@ -64,7 +64,7 @@ CodeList::Builder::write_float(Ymsl_FLOAT val)
 // @brief OBJPTR を追加する．
 // @param[in] val 値
 void
-CodeList::Builder::write_objptr(Ymsl_OBJPTR val)
+VsmCodeList::Builder::write_objptr(Ymsl_OBJPTR val)
 {
   // ちょっとキタナイコード
   const ymuint n = sizeof(Ymsl_OBJPTR) / sizeof(Ymsl_CODE);
@@ -81,7 +81,7 @@ CodeList::Builder::write_objptr(Ymsl_OBJPTR val)
 
 // @brief サイズを得る．
 Ymsl_INT
-CodeList::Builder::size() const
+VsmCodeList::Builder::size() const
 {
   return mBody.size();
 }
@@ -90,7 +90,7 @@ CodeList::Builder::size() const
 // @param[inout] addr アドレス
 // @return 読みだした値を返す．
 Ymsl_CODE
-CodeList::Builder::read_opcode(Ymsl_INT addr) const
+VsmCodeList::Builder::read_opcode(Ymsl_INT addr) const
 {
   ASSERT_COND( 0 <= addr && addr < size() );
   return mBody[addr];
@@ -98,12 +98,12 @@ CodeList::Builder::read_opcode(Ymsl_INT addr) const
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス CodeList
+// クラス VsmCodeList
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] builder 初期化用オブジェクト
-CodeList::CodeList(const Builder& builder)
+VsmCodeList::VsmCodeList(const Builder& builder)
 {
   mSize = builder.size();
   mBody = new Ymsl_CODE[mSize];
@@ -113,7 +113,7 @@ CodeList::CodeList(const Builder& builder)
 }
 
 // @brief デストラクタ
-CodeList::~CodeList()
+VsmCodeList::~VsmCodeList()
 {
   delete [] mBody;
 }

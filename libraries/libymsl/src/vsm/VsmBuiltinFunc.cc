@@ -1,54 +1,58 @@
 
-/// @file YmslNativeFunc.cc
-/// @brief YmslNativeFunc の実装ファイル
+/// @file VsmBuiltinFunc.cc
+/// @brief VsmBuiltinFunc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslNativeFunc.h"
-#include "YVSM.h"
+#include "VsmBuiltinFunc.h"
+#include "Vsm.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス YmslNativeFunc
+// クラス VsmBuiltinFunc
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] name 関数名
 // @param[in] arg_num 引数の数
-// @param[in] code_list_builder コードリストの初期化用オブジェクト
-YmslNativeFunc::YmslNativeFunc(ShString name,
-			       ymuint arg_num,
-			       const CodeList::Builder& code_list_builder) :
-  YmslFunction(name, arg_num),
-  mCodeList(code_list_builder)
+VsmBuiltinFunc::VsmBuiltinFunc(ShString name,
+				 ymuint arg_num) :
+  VsmFunction(name, arg_num)
 {
 }
 
 // @brief デストラクタ
-YmslNativeFunc::~YmslNativeFunc()
+VsmBuiltinFunc::~VsmBuiltinFunc()
 {
 }
 
 // @brief 組み込み関数の時 true を返す．
 bool
-YmslNativeFunc::is_builtin() const
+VsmBuiltinFunc::is_builtin() const
 {
-  return false;
+  return true;
 }
 
 // @brief 組み込み関数の時の実行関数
 // @param[in] vsm 仮想マシン
 // @param[in] base ベースレジスタ
 void
-YmslNativeFunc::execute(YVSM& vsm,
+VsmBuiltinFunc::execute(Vsm& vsm,
 			Ymsl_INT base) const
 {
-  vsm.execute(mCodeList, base);
+  vector<VsmValue> arg_list(arg_num());
+  for (ymuint i = 0; i < arg_num(); ++ i) {
+    arg_list[i] = vsm.read_stack(base + i);
+  }
+
+  VsmValue ret_val = _execute(arg_list);
+
+  vsm.write_stack(base, ret_val);
 }
 
 END_NAMESPACE_YM_YMSL

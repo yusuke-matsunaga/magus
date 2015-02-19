@@ -35,7 +35,7 @@ YmslCompiler::~YmslCompiler()
 // @return コンパイルしたモジュールを返す．
 //
 // エラーが起きたら NULL を返す．
-YmslModule*
+VsmModule*
 YmslCompiler::compile(IDO& ido)
 {
   AstMgr ast_mgr;

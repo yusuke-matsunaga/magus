@@ -1,8 +1,8 @@
-#ifndef YMSLMODULE_H
-#define YMSLMODULE_H
+#ifndef VSMMODULE_H
+#define VSMMODULE_H
 
-/// @file YmslModule.h
-/// @brief YmslModule のヘッダファイル
+/// @file VsmModule.h
+/// @brief VsmModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014, 2015 Yusuke Matsunaga
@@ -16,20 +16,20 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslModule YmslModule.h "YmslModule.h"
+/// @class VsmModule VsmModule.h "VsmModule.h"
 /// @brief YMSL のモジュールを表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslModule
+class VsmModule
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name モジュール名
-  YmslModule(ShString name);
+  VsmModule(ShString name);
 
   /// @brief デストラクタ
   virtual
-  ~YmslModule();
+  ~VsmModule();
 
 
 public:
@@ -47,7 +47,7 @@ public:
 
   /// @brief このモジュールが import しているモジュールを返す．
   /// @param[in] pos 位置 ( 0 <= pos < imported_module_num() )
-  YmslModule*
+  VsmModule*
   imported_module(ymuint pos) const;
 
   /// @brief このモジュールが export している関数の数を返す．
@@ -56,7 +56,7 @@ public:
 
   /// @brief このモジュールが export している関数を返す．
   /// @param[in] pos 位置 ( 0 <= pos < exported_function_num() )
-  YmslFunction*
+  VsmFunction*
   exported_function(ymuint pos) const;
 
   /// @brief このモジュールが export している変数の数を返す．
@@ -87,13 +87,13 @@ private:
   ymuint mImportedModuleNum;
 
   // import されたモジュールの配列
-  YmslModule** mImportedModuleList;
+  VsmModule** mImportedModuleList;
 
   // export している関数の数
   ymuint mExportedFuncNum;
 
   // export している関数の配列
-  YmslFunction* mExportedFuncList;
+  VsmFunction* mExportedFuncList;
 
   // export している変数の数
   ymuint mExportedVarNum;
@@ -105,4 +105,4 @@ private:
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLMODULE_H
+#endif // VSMMODULE_H

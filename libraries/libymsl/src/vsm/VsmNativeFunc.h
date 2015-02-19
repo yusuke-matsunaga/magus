@@ -1,37 +1,39 @@
-#ifndef YMSLBUILTINFUNC_H
-#define YMSLBUILTINFUNC_H
+#ifndef VSMNATIVEFUNC_H
+#define VSMNATIVEFUNC_H
 
-/// @file YmslBuiltinFunc.h
-/// @brief YmslBuiltinFunc のヘッダファイル
+/// @file VsmNativeFunc.h
+/// @brief VsmNativeFunc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslFunction.h"
-#include "YmslValue.h"
+#include "VsmFunction.h"
+#include "VsmCodeList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslBuiltinFunc YmslBuiltinFunc.h "YmslBuiltinFunc.h"
-/// @brief YMSL の組み込み関数を表すクラス
+/// @class VsmNativeFunc VsmNativeFunc.h "VsmNativeFunc.h"
+/// @brief YMSL で記述された関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslBuiltinFunc :
-  public YmslFunction
+class VsmNativeFunc :
+  public VsmFunction
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] arg_num 引数の数
-  YmslBuiltinFunc(ShString name,
-		  ymuint arg_num);
+  /// @param[in] code_list_builder コードリストの初期化用オブジェクト
+  VsmNativeFunc(ShString name,
+		ymuint arg_num,
+		const VsmCodeList::Builder& code_list_builder);
 
   /// @brief デストラクタ
-  ~YmslBuiltinFunc();
+  ~VsmNativeFunc();
 
 
 public:
@@ -49,7 +51,7 @@ public:
   /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(YVSM& vsm,
+  execute(Vsm& vsm,
 	  Ymsl_INT base) const;
 
 
@@ -58,22 +60,17 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 本当の実行関数
-  /// @param[in] arg_list 引数のリスト
-  ///
-  /// 実際の派生クラスが実装する必要がある．
-  virtual
-  YmslValue
-  _execute(const vector<YmslValue>& arg_list) const = 0;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // コードリスト
+  VsmCodeList mCodeList;
+
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLBUILTINFUNC_H
+#endif // VSMNATIVEFUNC_H

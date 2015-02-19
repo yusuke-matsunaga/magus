@@ -1,25 +1,25 @@
 
-/// @file YVSM.cc
-/// @brief YVSM の実装ファイル
+/// @file Vsm.cc
+/// @brief Vsm の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YVSM.h"
-#include "CodeList.h"
-#include "YmslFunction.h"
+#include "Vsm.h"
+#include "VsmCodeList.h"
+#include "VsmFunction.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-// クラス YVSM
+// クラス Vsm
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-YVSM::YVSM()
+Vsm::Vsm()
 {
   mFuncTableSize = 0;
   mFuncTable = NULL;
@@ -34,7 +34,7 @@ YVSM::YVSM()
 }
 
 // @brief デストラクタ
-YVSM::~YVSM()
+Vsm::~Vsm()
 {
   delete [] mFuncTable;
   delete [] mGlobalHeap;
@@ -45,40 +45,40 @@ YVSM::~YVSM()
 // @param[in] code_list コードの配列
 // @param[in] base ベースレジスタ
 void
-YVSM::execute(const CodeList& code_list,
-	      Ymsl_INT base)
+Vsm::execute(const VsmCodeList& code_list,
+	     Ymsl_INT base)
 {
   for (Ymsl_INT pc = 0; pc < code_list.size(); ) {
     Ymsl_CODE code = code_list.read_opcode(pc);
 
     switch ( code ) {
-    case YMVSM_PUSH_INT_IMM:
+    case VSM_PUSH_INT_IMM:
       {
 	Ymsl_INT val = code_list.read_int(pc);
 	push_INT(val);
       }
       break;
 
-    case YMVSM_PUSH_FLOAT_IMM:
+    case VSM_PUSH_FLOAT_IMM:
       {
 	Ymsl_FLOAT val = code_list.read_float(pc);
 	push_FLOAT(val);
       }
       break;
 
-    case YMVSM_PUSH_FLOAT_ZERO:
+    case VSM_PUSH_FLOAT_ZERO:
       push_FLOAT(0.0);
       break;
 
-    case YMVSM_PUSH_FLOAT_ONE:
+    case VSM_PUSH_FLOAT_ONE:
       push_FLOAT(1.0);
       break;
 
-    case YMVSM_PUSH_OBJ_NULL:
+    case VSM_PUSH_OBJ_NULL:
       push_OBJPTR(NULL);
       break;
 
-    case YMVSM_LOAD_GLOBAL_INT:
+    case VSM_LOAD_GLOBAL_INT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = load_global_INT(index);
@@ -86,7 +86,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_LOAD_GLOBAL_FLOAT:
+    case VSM_LOAD_GLOBAL_FLOAT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = load_global_FLOAT(index);
@@ -94,7 +94,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_LOAD_GLOBAL_OBJ:
+    case VSM_LOAD_GLOBAL_OBJ:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = load_global_OBJPTR(index);
@@ -102,7 +102,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_LOAD_LOCAL_INT:
+    case VSM_LOAD_LOCAL_INT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = load_local_INT(base + index);
@@ -110,7 +110,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_LOAD_LOCAL_FLOAT:
+    case VSM_LOAD_LOCAL_FLOAT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = load_local_FLOAT(base + index);
@@ -118,7 +118,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_LOAD_LOCAL_OBJ:
+    case VSM_LOAD_LOCAL_OBJ:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = load_local_OBJPTR(base + index);
@@ -126,7 +126,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_STORE_GLOBAL_INT:
+    case VSM_STORE_GLOBAL_INT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = pop_INT();
@@ -134,7 +134,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_STORE_GLOBAL_FLOAT:
+    case VSM_STORE_GLOBAL_FLOAT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = pop_FLOAT();
@@ -142,7 +142,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_STORE_GLOBAL_OBJ:
+    case VSM_STORE_GLOBAL_OBJ:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = pop_OBJPTR();
@@ -150,7 +150,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_STORE_LOCAL_INT:
+    case VSM_STORE_LOCAL_INT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_INT val = pop_INT();
@@ -158,7 +158,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_STORE_LOCAL_FLOAT:
+    case VSM_STORE_LOCAL_FLOAT:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_FLOAT val = pop_FLOAT();
@@ -166,7 +166,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_STORE_LOCAL_OBJ:
+    case VSM_STORE_LOCAL_OBJ:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	Ymsl_OBJPTR val = pop_OBJPTR();
@@ -174,7 +174,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_MINUS:
+    case VSM_INT_MINUS:
       {
 	Ymsl_INT val = pop_INT();
 	val = - val;
@@ -182,7 +182,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_INC:
+    case VSM_INT_INC:
       {
 	Ymsl_INT val = pop_INT();
 	++ val;
@@ -190,7 +190,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_DEC:
+    case VSM_INT_DEC:
       {
 	Ymsl_INT val = pop_INT();
 	-- val;
@@ -198,7 +198,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_NOT:
+    case VSM_INT_NOT:
       {
 	Ymsl_INT val = pop_INT();
 	val = ~val;
@@ -206,7 +206,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_TO_BOOL:
+    case VSM_INT_TO_BOOL:
       {
 	Ymsl_INT val = pop_INT();
 	Ymsl_INT val1 = (val != 0);
@@ -214,7 +214,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_TO_FLOAT:
+    case VSM_INT_TO_FLOAT:
       {
 	Ymsl_INT val = pop_INT();
 	Ymsl_FLOAT fval = val;
@@ -222,7 +222,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_ADD:
+    case VSM_INT_ADD:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -231,7 +231,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_SUB:
+    case VSM_INT_SUB:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -240,7 +240,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_MUL:
+    case VSM_INT_MUL:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -249,7 +249,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_DIV:
+    case VSM_INT_DIV:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -258,7 +258,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_MOD:
+    case VSM_INT_MOD:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -267,7 +267,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_LSHIFT:
+    case VSM_INT_LSHIFT:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -276,7 +276,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_RSHIFT:
+    case VSM_INT_RSHIFT:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -285,7 +285,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_EQ:
+    case VSM_INT_EQ:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -294,7 +294,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_NE:
+    case VSM_INT_NE:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -303,7 +303,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_LT:
+    case VSM_INT_LT:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -312,7 +312,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_LE:
+    case VSM_INT_LE:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -321,7 +321,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_AND:
+    case VSM_INT_AND:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -330,7 +330,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_OR:
+    case VSM_INT_OR:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -339,7 +339,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_XOR:
+    case VSM_INT_XOR:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -348,7 +348,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_INT_ITE:
+    case VSM_INT_ITE:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_INT val2 = pop_INT();
@@ -358,7 +358,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_MINUS:
+    case VSM_FLOAT_MINUS:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val = -val1;
@@ -366,7 +366,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_TO_BOOL:
+    case VSM_FLOAT_TO_BOOL:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_INT val = (val1 != 0.0);
@@ -374,7 +374,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_TO_INT:
+    case VSM_FLOAT_TO_INT:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_INT val = val1;
@@ -382,7 +382,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_ADD:
+    case VSM_FLOAT_ADD:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -391,7 +391,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_SUB:
+    case VSM_FLOAT_SUB:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -400,7 +400,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_MUL:
+    case VSM_FLOAT_MUL:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -409,7 +409,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_DIV:
+    case VSM_FLOAT_DIV:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -418,7 +418,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_EQ:
+    case VSM_FLOAT_EQ:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -427,7 +427,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_NE:
+    case VSM_FLOAT_NE:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -436,7 +436,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_LT:
+    case VSM_FLOAT_LT:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -445,7 +445,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_LE:
+    case VSM_FLOAT_LE:
       {
 	Ymsl_FLOAT val1 = pop_FLOAT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -454,7 +454,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_FLOAT_ITE:
+    case VSM_FLOAT_ITE:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_FLOAT val2 = pop_FLOAT();
@@ -464,7 +464,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_MINUS:
+    case VSM_OBJ_MINUS:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -473,7 +473,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_INC:
+    case VSM_OBJ_INC:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -482,7 +482,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_DEC:
+    case VSM_OBJ_DEC:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -491,7 +491,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_NOT:
+    case VSM_OBJ_NOT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -500,7 +500,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_TO_INT:
+    case VSM_OBJ_TO_INT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -509,7 +509,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_TO_FLOAT:
+    case VSM_OBJ_TO_FLOAT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	//
@@ -518,7 +518,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_ADD:
+    case VSM_OBJ_ADD:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -528,7 +528,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_SUB:
+    case VSM_OBJ_SUB:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -538,7 +538,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_MUL:
+    case VSM_OBJ_MUL:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -548,7 +548,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_DIV:
+    case VSM_OBJ_DIV:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -558,7 +558,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_MOD:
+    case VSM_OBJ_MOD:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -568,7 +568,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_LSHIFT:
+    case VSM_OBJ_LSHIFT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_INT val2 = pop_INT();
@@ -578,7 +578,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_RSHIFT:
+    case VSM_OBJ_RSHIFT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_INT val2 = pop_INT();
@@ -588,7 +588,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_EQ:
+    case VSM_OBJ_EQ:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -598,7 +598,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_NE:
+    case VSM_OBJ_NE:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -608,7 +608,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_LT:
+    case VSM_OBJ_LT:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -618,7 +618,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_LE:
+    case VSM_OBJ_LE:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -628,7 +628,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_AND:
+    case VSM_OBJ_AND:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -638,7 +638,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_OR:
+    case VSM_OBJ_OR:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -648,7 +648,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_XOR:
+    case VSM_OBJ_XOR:
       {
 	Ymsl_OBJPTR val1 = pop_OBJPTR();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -658,7 +658,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_OBJ_ITE:
+    case VSM_OBJ_ITE:
       {
 	Ymsl_INT val1 = pop_INT();
 	Ymsl_OBJPTR val2 = pop_OBJPTR();
@@ -669,21 +669,21 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_JUMP:
+    case VSM_JUMP:
       {
 	Ymsl_INT addr = code_list.read_int(pc);
 	pc = addr;
       }
       break;
 
-    case YMVSM_JUMP_R:
+    case VSM_JUMP_R:
       {
 	Ymsl_INT addr = pop_INT();
 	pc = addr;
       }
       break;
 
-    case YMVSM_BRANCH_TRUE:
+    case VSM_BRANCH_TRUE:
       {
 	Ymsl_INT addr = code_list.read_int(pc);
 	Ymsl_INT cond = pop_INT();
@@ -693,7 +693,7 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_BRANCH_FALSE:
+    case VSM_BRANCH_FALSE:
       {
 	Ymsl_INT addr = code_list.read_int(pc);
 	Ymsl_INT cond = pop_INT();
@@ -703,34 +703,34 @@ YVSM::execute(const CodeList& code_list,
       }
       break;
 
-    case YMVSM_CALL:
+    case VSM_CALL:
       {
 	Ymsl_INT index = code_list.read_int(pc);
 	ASSERT_COND( index >= 0 && index < mFuncTableSize );
-	const YmslFunction* func = mFuncTable[index];
+	const VsmFunction* func = mFuncTable[index];
 	ymuint n = func->arg_num();
 	Ymsl_INT base = mSP - n;
 	func->execute(*this, base);
       }
       break;
 
-    case YMVSM_CALL_R:
+    case VSM_CALL_R:
       {
 	Ymsl_INT index = pop_INT();
 	ASSERT_COND( index >= 0 && index < mFuncTableSize );
-	const YmslFunction* func = mFuncTable[index];
+	const VsmFunction* func = mFuncTable[index];
 	ymuint n = func->arg_num();
 	Ymsl_INT base = mSP - n;
 	func->execute(*this, base);
       }
       break;
 
-    case YMVSM_RETURN:
+    case VSM_RETURN:
       {
       }
       break;
 
-    case YMVSM_HALT:
+    case VSM_HALT:
       {
       }
       break;

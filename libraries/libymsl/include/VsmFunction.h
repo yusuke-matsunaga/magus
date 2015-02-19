@@ -1,39 +1,37 @@
-#ifndef YMSLNATIVEFUNC_H
-#define YMSLNATIVEFUNC_H
+#ifndef VSMFUNCTION_H
+#define VSMFUNCTION_H
 
-/// @file YmslNativeFunc.h
-/// @brief YmslNativeFunc のヘッダファイル
+/// @file VsmFunction.h
+/// @brief VsmFunction のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmslFunction.h"
-#include "CodeList.h"
+#include "ymsl_int.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmslNativeFunc YmslNativeFunc.h "YmslNativeFunc.h"
-/// @brief YMSL で記述された関数を表すクラス
+/// @class VsmFunction VsmFunction.h "VsmFunction.h"
+/// @brief YMSL の関数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class YmslNativeFunc :
-  public YmslFunction
+class VsmFunction
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] arg_num 引数の数
-  /// @param[in] code_list_builder コードリストの初期化用オブジェクト
-  YmslNativeFunc(ShString name,
-		 ymuint arg_num,
-		 const CodeList::Builder& code_list_builder);
+  VsmFunction(ShString name,
+	      ymuint arg_num);
 
   /// @brief デストラクタ
-  ~YmslNativeFunc();
+  virtual
+  ~VsmFunction();
 
 
 public:
@@ -41,24 +39,26 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 関数名を返す．
+  ShString
+  name() const;
+
+  /// @brief 引数の数
+  ymuint
+  arg_num() const;
+
   /// @brief 組み込み関数の時 true を返す．
   virtual
   bool
-  is_builtin() const;
+  is_builtin() const = 0;
 
   /// @brief 組み込み関数の時の実行関数
   /// @param[in] vsm 仮想マシン
   /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(YVSM& vsm,
-	  Ymsl_INT base) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  execute(Vsm& vsm,
+	  Ymsl_INT base) const = 0;
 
 
 private:
@@ -66,11 +66,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // コードリスト
-  CodeList mCodeList;
+  // 関数名
+  ShString mName;
+
+  // 引数の数
+  ymuint mArgNum;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // YMSLNATIVEFUNC_H
+#endif // VSMFUNCTION_H
