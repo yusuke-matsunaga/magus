@@ -16,6 +16,7 @@
 #include "Scope.h"
 #include "IrCodeBlock.h"
 #include "IrNode.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -74,7 +75,30 @@ IrMgr::elaborate(const AstStatement* ast_root,
 
   // 中間表現を作る．
   Scope* toplevel_scope = new_scope(NULL, ShString("__main__"));
-  elab_stmt(ast_root, toplevel_scope, NULL, NULL, code_block);
+
+  ymuint head_num = ast_root->headlist_num();
+  for (ymuint i = 0; i < head_num; ++ i) {
+    const AstStatement* stmt = ast_root->headlist_elem(i);
+    switch ( stmt->stmt_type() ) {
+    case AstStatement::kImport:
+      {
+	const AstSymbol* module = stmt->import_module();
+	const AstSymbol* alias = stmt->import_alias();
+	import(module, alias);
+      }
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
+  }
+
+  ymuint stmt_num = ast_root->stmtlist_num();
+  for (ymuint i = 0; i < stmt_num; ++ i) {
+    const AstStatement* stmt = ast_root->stmtlist_elem(i);
+    elab_stmt(stmt, toplevel_scope, NULL, NULL, code_block);
+  }
 
   // 関数呼び出しの解決を行う．
   for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();
@@ -95,6 +119,42 @@ IrMgr::elaborate(const AstStatement* ast_root,
     }
   }
 
+  return true;
+}
+
+// @brief インポートする
+// @param[in] module モジュール名
+// @param[in] alias エイリアス
+void
+IrMgr::import(const AstSymbol* module,
+	      const AstSymbol* alias)
+{
+}
+
+// @brief 式から関数の解決を行う．
+// @param[in] expr 式
+// @param[in] scope 現在のスコープ
+// @param[in] node 関数呼び出しノード
+bool
+IrMgr::resolve_func(const AstExpr* expr,
+		    Scope* scope,
+		    IrNode* node)
+{
+  IrHandle* h = elab_primary(expr, scope);
+  if ( h == NULL ) {
+    // expr not found
+    return false;
+  }
+  if ( h->handle_type() != IrHandle::kFunction ) {
+    // expr is not a function;
+    return false;
+  }
+  IrFuncBlock* func = h->function();
+  // func の型と node の arglist の型をチェック
+  // 場合によってはキャストノードを挿入する．
+
+  // node に func をセット
+  node->set_func_addr(h);
   return true;
 }
 

@@ -69,7 +69,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     break;
 
   case AstStatement::kConstDecl:
-    reg_const(stmt, scope);
+    reg_const(stmt->name(), stmt->type(), stmt->expr(), scope);
     break;
 
   case AstStatement::kContinue:
@@ -225,6 +225,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     break;
 
   case AstStatement::kImport:
+    ASSERT_NOT_REACHED;
     break;
 
   case AstStatement::kIncr:
@@ -292,13 +293,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     break;
 
   case AstStatement::kToplevel:
-    {
-      ymuint n = stmt->stmtlist_num();
-      for (ymuint i = 0; i < n; ++ i) {
-	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	elab_stmt(stmt1, scope, NULL, NULL, code_block);
-      }
-    }
+    ASSERT_NOT_REACHED;
     break;
 
   case AstStatement::kVarDecl:
@@ -570,19 +565,17 @@ IrMgr::reg_func(const AstStatement* stmt,
 //
 // stmt は kConstDecl でなければならない．
 void
-IrMgr::reg_const(const AstStatement* stmt,
+IrMgr::reg_const(const AstSymbol* name_symbol,
+		 const AstType* ast_type,
+		 const AstExpr* ast_expr,
 		 Scope* scope)
 {
-  ASSERT_COND( stmt->stmt_type() == AstStatement::kConstDecl );
-
-  const AstSymbol* name_symbol = stmt->name();
   if ( !check_name(name_symbol, scope) ) {
     // 名前が重複していた．
     cout << name_symbol->str_val() << ": already defined" << endl;
     return;
   }
 
-  const AstType* ast_type = stmt->type();
   const Type* type = resolve_type(ast_type, scope);
   if ( type == NULL ) {
     // エラーメッセージをどこで出すか考える．
@@ -590,7 +583,6 @@ IrMgr::reg_const(const AstStatement* stmt,
     return;
   }
 
-  const AstExpr* ast_expr = stmt->expr();
   IrNode* node = elab_expr(ast_expr, scope);
   if ( node == NULL ) {
     cout << "eval_expr() == NULL" << endl;
@@ -730,33 +722,6 @@ IrMgr::resolve_type(const AstType* asttype,
 
   }
   return NULL;
-}
-
-// @brief 式から関数の解決を行う．
-// @param[in] expr 式
-// @param[in] scope 現在のスコープ
-// @param[in] node 関数呼び出しノード
-bool
-IrMgr::resolve_func(const AstExpr* expr,
-		    Scope* scope,
-		    IrNode* node)
-{
-  IrHandle* h = elab_primary(expr, scope);
-  if ( h == NULL ) {
-    // expr not found
-    return false;
-  }
-  if ( h->handle_type() != IrHandle::kFunction ) {
-    // expr is not a function;
-    return false;
-  }
-  IrFuncBlock* func = h->function();
-  // func の型と node の arglist の型をチェック
-  // 場合によってはキャストノードを挿入する．
-
-  // node に func をセット
-  node->set_func_addr(h);
-  return true;
 }
 
 END_NAMESPACE_YM_YMSL

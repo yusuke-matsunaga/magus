@@ -281,7 +281,7 @@ AstStatement::label() const
 // @brief インポートするモジュール名を返す．
 //
 // kImport のみ有効
-const AstExpr*
+const AstSymbol*
 AstStatement::import_module() const
 {
   ASSERT_NOT_REACHED;

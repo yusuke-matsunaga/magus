@@ -234,11 +234,11 @@ module_head
 
 // import 文
 import
-: IMPORT primary SEMI
+: IMPORT SYMBOL SEMI
 {
   $$ = mgr.new_Import($2, NULL, @$);
 }
-| IMPORT primary AS SYMBOL SEMI
+| IMPORT SYMBOL AS SYMBOL SEMI
 {
   $$ = mgr.new_Import($2, $4, @$);
 }

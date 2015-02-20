@@ -202,9 +202,9 @@ AstPrinter::print_statement(const AstStatement* stmt,
     print_indent(indent);
     mS << "import ";
     {
-      const AstExpr* module = stmt->import_module();
+      const AstSymbol* module = stmt->import_module();
       const AstSymbol* alias = stmt->import_alias();
-      print_expr(module);
+      mS << module->str_val();
       if ( alias != NULL ) {
 	mS << " as " << alias->str_val();
       }

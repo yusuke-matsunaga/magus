@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] module モジュール名
 // @param[in] alias エイリアス
 // @param[in] loc ファイル位置
-AstImport::AstImport(AstExpr* module,
+AstImport::AstImport(AstSymbol* module,
 		     AstSymbol* alias,
 		     const FileRegion& loc) :
   AstStatement(loc),
@@ -43,7 +43,7 @@ AstImport::stmt_type() const
 // @brief インポートするモジュール名を返す．
 //
 // kImport のみ有効
-const AstExpr*
+const AstSymbol*
 AstImport::import_module() const
 {
   return mModule;

@@ -93,7 +93,7 @@ public:
   ///
   /// alias は NULL の場合もある．
   AstStatement*
-  new_Import(AstExpr* module,
+  new_Import(AstSymbol* module,
 	     AstSymbol* alias,
 	     const FileRegion& loc);
 

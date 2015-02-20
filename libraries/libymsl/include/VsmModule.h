@@ -65,7 +65,7 @@ public:
 
   /// @brief このモジュールが export している変数を返す．
   /// @param[in] pos 位置 ( 0 <= pos < exported_variable_num() )
-  Var*
+  IrVar*
   exported_variable(ymuint pos) const;
 
   /// @brief トップレベルの実行を行う．

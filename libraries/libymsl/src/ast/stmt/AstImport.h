@@ -27,7 +27,7 @@ public:
   /// @param[in] module モジュール名
   /// @param[in] alias エイリアス
   /// @param[in] loc ファイル位置
-  AstImport(AstExpr* module,
+  AstImport(AstSymbol* module,
 	    AstSymbol* alias,
 	    const FileRegion& loc);
 
@@ -50,7 +50,7 @@ public:
   ///
   /// kImport のみ有効
   virtual
-  const AstExpr*
+  const AstSymbol*
   import_module() const;
 
   /// @brief インポートするモジュールのエイリアスを返す．
@@ -67,7 +67,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // モジュール名
-  AstExpr* mModule;
+  AstSymbol* mModule;
 
   // エイリアス
   AstSymbol* mAlias;

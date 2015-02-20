@@ -84,19 +84,35 @@ public:
   Scope*
   scope() const;
 
-  /// @brief 変数を返す．
+  /// @brief 名前を得る．
   ///
-  /// kVar, kMemberRef のみ有効
-  virtual
-  const IrVar*
-  var() const;
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  ShString
+  name() const;
 
-  /// @brief 関数を返す．
+  /// @brief 型を得る．
   ///
-  /// kFunction, kMethodRef のみ有効
-  virtual
-  IrFuncBlock*
-  function() const;
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  const Type*
+  value_type() const;
+
+  /// @brief グローバル変数の時に true を返す．
+  ///
+  /// kVar のみ有効
+  bool
+  is_global() const;
+
+  /// @brief インデックスを返す．
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  ymuint
+  index() const;
+
+  /// @brief インデックスを設定する．
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  void
+  set_index(ymuint index);
 
   /// @brief ブール値を返す．
   ///

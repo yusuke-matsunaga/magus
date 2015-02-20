@@ -56,6 +56,13 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief インポートする
+  /// @param[in] module モジュール名
+  /// @param[in] alias エイリアス
+  void
+  import(const AstSymbol* module,
+	 const AstSymbol* alias);
+
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
@@ -99,12 +106,14 @@ private:
 	   IrCodeBlock& code_block);
 
   /// @brief 定数の定義を行う．
-  /// @param[in] stmt 文
+  /// @param[in] name_symbol 名前
+  /// @param[in] ast_type 型
+  /// @param[in] ast_expr 式
   /// @param[in] scope 現在のスコープ
-  ///
-  /// stmt は kConstDecl でなければならない．
   void
-  reg_const(const AstStatement* stmt,
+  reg_const(const AstSymbol* name_symbol,
+	    const AstType* ast_type,
+	    const AstExpr* ast_expr,
 	    Scope* scope);
 
   /// @brief 型の参照を解決する．

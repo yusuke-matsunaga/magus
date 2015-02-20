@@ -257,7 +257,7 @@ public:
   ///
   /// kImport のみ有効
   virtual
-  const AstExpr*
+  const AstSymbol*
   import_module() const;
 
   /// @brief インポートするモジュールのエイリアスを返す．

@@ -192,7 +192,7 @@ AstMgr::scan(YYSTYPE& lval,
 //
 // alias は NULL の場合もある．
 AstStatement*
-AstMgr::new_Import(AstExpr* module,
+AstMgr::new_Import(AstSymbol* module,
 		   AstSymbol* alias,
 		   const FileRegion& loc)
 {
