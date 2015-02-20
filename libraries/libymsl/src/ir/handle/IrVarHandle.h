@@ -10,6 +10,7 @@
 
 
 #include "IrHandle.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -24,8 +25,12 @@ class IrVarHandle :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] var 変数
-  IrVarHandle(const IrVar* var);
+  /// @param[in] name 変数名
+  /// @param[in] value_type 型
+  /// @param[in] global グローバル変数の時 true とするフラグ
+  IrVarHandle(ShString name,
+	      const Type* value_type,
+	      bool global);
 
   /// @brief デストラクタ
   virtual
@@ -54,12 +59,29 @@ public:
   bool
   is_static() const;
 
-  /// @brief 変数を返す．
+  /// @brief 型を得る．
   ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  const IrVar*
-  var() const;
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  const Type*
+  value_type() const;
+
+  /// @brief グローバル変数の時に true を返す．
+  ///
+  /// kVar のみ有効
+  bool
+  is_global() const;
+
+  /// @brief インデックスを返す．
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  ymuint
+  index() const;
+
+  /// @brief インデックスを設定する．
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  void
+  set_index(ymuint index);
 
 
 private:
@@ -67,8 +89,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数
-  const IrVar* mVar;
+  // 名前
+  ShString mName;
+
+  // 型
+  const Type* mValueType;
+
+  // グローバルフラグ
+  bool mGlobal;
+
+  // インデックス
+  ymuint mIndex;
 
 };
 

@@ -313,12 +313,10 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
       ShString name = ast_name->str_val();
       bool global = (scope->global_scope() == NULL);
-      IrVar* var = new_var(name, type, global);
 
-      code_block.add_var(var);
-
-      IrHandle* h = new_VarHandle(var);
+      IrHandle* h = new_VarHandle(name, type, global);
       scope->add(h);
+      code_block.add_var(h);
 
       const AstExpr* ast_expr = stmt->expr();
       if ( ast_expr != NULL ) {
@@ -527,13 +525,12 @@ IrMgr::reg_func(const AstStatement* stmt,
   const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
 
   // 引数の生成
-  vector<const IrVar*> arg_list(np);
+  vector<IrHandle*> arg_list(np);
   vector<IrNode*> arg_init_list(np);
   for (ymuint i = 0; i < np; ++ i) {
-    IrVar* var = new_var(input_name_list[i], input_type_list[i], false);
-    arg_list[i] =  var;
-    IrHandle* h = new_VarHandle(var);
+    IrHandle* h = new_VarHandle(input_name_list[i], input_type_list[i], false);
     func_scope->add(h);
+    arg_list[i] =  h;
 
     // デフォルト値の式の生成
     // これは関数外のスコープで行う．
@@ -548,16 +545,16 @@ IrMgr::reg_func(const AstStatement* stmt,
     arg_init_list[i] = node;
   }
 
+  IrHandle* h = new_FuncHandle(name, ftype);
+  scope->add(h);
+
   IrToplevel& toplevel = code_block.toplevel();
   // 関数の内部表現の生成
-  IrFuncBlock* ir_func = new IrFuncBlock(toplevel, name, ftype, arg_list, arg_init_list);
+  IrFuncBlock* ir_func = new IrFuncBlock(toplevel, arg_list, arg_init_list, h);
   toplevel.add_function(ir_func);
 
   // 関数内部のノードの生成
   elab_stmt(stmt->stmt(), func_scope, NULL, NULL, *ir_func);
-
-  IrHandle* h = new_FuncHandle(ir_func);
-  scope->add(h);
 }
 
 // @brief 定数の定義を行う．

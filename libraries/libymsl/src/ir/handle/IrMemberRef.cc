@@ -18,11 +18,11 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] base ベースアドレス
-// @param[in] var メンバ変数
+// @param[in] var メンバ変数のハンドル
 IrMemberRef::IrMemberRef(IrNode* base,
-			 const IrVar* var) :
+			 IrHandle* var) :
   mBase(base),
-  mVar(var)
+  mMemberVar(var)
 {
 }
 
@@ -63,13 +63,13 @@ IrMemberRef::obj_expr() const
   return mBase;
 }
 
-// @brief 変数を返す．
+// @brief 変数を得る．
 //
-// kOpVarRef, kOpMemberRef のみ有効
-const IrVar*
-IrMemberRef::var() const
+// kMemberRef のみ有効
+IrHandle*
+IrMemberRef::member_var() const
 {
-  return mVar;
+  return mMemberVar;
 }
 
 END_NAMESPACE_YM_YMSL

@@ -12,7 +12,6 @@
 #include "IrFuncBlock.h"
 #include "IrNode.h"
 #include "IrHandle.h"
-#include "IrVar.h"
 #include "Type.h"
 
 
@@ -39,20 +38,20 @@ IrPrinter::~IrPrinter()
 void
 IrPrinter::print_code(const IrToplevel& toplevel)
 {
-  const vector<const IrVar*>& global_var_list = toplevel.global_var_list();
+  const vector<IrHandle*>& global_var_list = toplevel.global_var_list();
   ymuint ng = global_var_list.size();
   for (ymuint i = 0; i < ng; ++ i) {
-    const IrVar* var = global_var_list[i];
+    IrHandle* var = global_var_list[i];
     mS << "global #" << var->index() << ": " << var->name()
        << ": ";
     var->value_type()->print(mS);
     mS << endl;
   }
 
-  const vector<const IrVar*>& var_list = toplevel.var_list();
+  const vector<IrHandle*>& var_list = toplevel.var_list();
   ymuint nv = var_list.size();
   for (ymuint i = 0; i < nv; ++ i) {
-    const IrVar* var = var_list[i];
+    const IrHandle* var = var_list[i];
     mS << "var #" << var->index() << ": " << var->name()
        << ": ";
     var->value_type()->print(mS);
@@ -68,8 +67,7 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   for (ymuint i = 0; i < nf; ++ i) {
     IrFuncBlock* ir_func = func_list[i];
     mS << endl;
-    mS << "function #" << ir_func->index()
-       << ": " << ir_func->name() << endl;
+    mS << "function " << ir_func->func_handle()->name() << endl;
     const vector<IrNode*>& node_list = ir_func->node_list();
     print_node_list(node_list);
   }
@@ -492,11 +490,11 @@ IrPrinter::print_handle(IrHandle* handle)
     break;
 
   case IrHandle::kMemberRef:
-    mS << "member_ref(%" << handle->obj_expr()->id() << ", var[" << handle->var()->name() << "]";
+    mS << "member_ref(%" << handle->obj_expr()->id() << ", var[" << handle->name() << "]";
     break;
 
   case IrHandle::kMethodRef:
-    mS << "method_ref(%" << handle->obj_expr()->id() << ", function[" << handle->function()->name() << "]";
+    mS << "method_ref(%" << handle->obj_expr()->id() << ", function[" << handle->name() << "]";
     break;
   }
 }

@@ -8,7 +8,6 @@
 
 
 #include "IrVarHandle.h"
-#include "IrVar.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -18,9 +17,15 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] var 変数宣言
-IrVarHandle::IrVarHandle(const IrVar* var) :
-  mVar(var)
+// @param[in] name 変数名
+// @param[in] value_type 型
+// @param[in] global グローバル変数の時 true とするフラグ
+IrVarHandle::IrVarHandle(ShString name,
+			 const Type* value_type,
+			 bool global) :
+  mName(name),
+  mValueType(value_type),
+  mGlobal(global)
 {
 }
 
@@ -33,7 +38,7 @@ IrVarHandle::~IrVarHandle()
 ShString
 IrVarHandle::name() const
 {
-  return mVar->name();
+  return mName;
 }
 
 // @brief 種類を返す．
@@ -52,13 +57,40 @@ IrVarHandle::is_static() const
   return false;
 }
 
-// @brief 変数を返す．
+// @brief 型を得る．
 //
-// 他の要素の場合には NULL を返す．
-const IrVar*
-IrVarHandle::var() const
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+const Type*
+IrVarHandle::value_type() const
 {
-  return mVar;
+  return mValueType;
+}
+
+// @brief グローバル変数の時に true を返す．
+//
+// kVar のみ有効
+bool
+IrVarHandle::is_global() const
+{
+  return mGlobal;
+}
+
+// @brief インデックスを返す．
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+ymuint
+IrVarHandle::index() const
+{
+  return mIndex;
+}
+
+// @brief インデックスを設定する．
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+void
+IrVarHandle::set_index(ymuint index)
+{
+  mIndex = index;
 }
 
 END_NAMESPACE_YM_YMSL

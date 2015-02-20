@@ -41,9 +41,10 @@ public:
   toplevel();
 
   /// @brief 変数を追加する．
+  /// @param[in] var 変数のハンドル
   virtual
   void
-  add_var(IrVar* var);
+  add_var(IrHandle* var);
 
   /// @brief 関数を追加する．
   /// @param[in] func 関数
@@ -51,7 +52,7 @@ public:
   add_function(IrFuncBlock* func);
 
   /// @brief グローバル変数のリストを返す．
-  const vector<const IrVar*>&
+  const vector<IrHandle*>&
   global_var_list() const;
 
   /// @brief 関数のリストを返す．
@@ -71,7 +72,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // グローバル変数のリスト
-  vector<const IrVar*> mGlobalVarList;
+  vector<IrHandle*> mGlobalVarList;
 
   // 関数のリスト
   vector<IrFuncBlock*> mFuncList;

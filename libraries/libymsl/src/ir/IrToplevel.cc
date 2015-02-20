@@ -8,7 +8,7 @@
 
 
 #include "IrToplevel.h"
-#include "IrVar.h"
+#include "IrHandle.h"
 #include "IrFuncBlock.h"
 
 
@@ -37,8 +37,9 @@ IrToplevel::toplevel()
 
 // @brief 変数を追加する．
 void
-IrToplevel::add_var(IrVar* var)
+IrToplevel::add_var(IrHandle* var)
 {
+  ASSERT_COND( var->handle_type() == IrHandle::kVar );
   if ( var->is_global() ) {
     ymuint index = mGlobalVarList.size();
     var->set_index(index);
@@ -55,12 +56,12 @@ void
 IrToplevel::add_function(IrFuncBlock* func)
 {
   ymuint index = mFuncList.size();
-  func->set_index(index);
+  func->func_handle()->set_index(index);
   mFuncList.push_back(func);
 }
 
 // @brief グローバル変数のリストを返す．
-const vector<const IrVar*>&
+const vector<IrHandle*>&
 IrToplevel::global_var_list() const
 {
   return mGlobalVarList;

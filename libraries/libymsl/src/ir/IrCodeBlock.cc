@@ -8,7 +8,7 @@
 
 
 #include "IrCodeBlock.h"
-#include "IrVar.h"
+#include "IrHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -29,8 +29,9 @@ IrCodeBlock::~IrCodeBlock()
 
 // @brief 変数を追加する．
 void
-IrCodeBlock::add_var(IrVar* var)
+IrCodeBlock::add_var(IrHandle* var)
 {
+  ASSERT_COND( var->handle_type() == IrHandle::kVar );
   ymuint index = mVarList.size();
   var->set_index(index);
   mVarList.push_back(var);
@@ -44,7 +45,7 @@ IrCodeBlock::add_node(IrNode* node)
 }
 
 // @brief 変数のリストを得る．
-const vector<const IrVar*>&
+const vector<IrHandle*>&
 IrCodeBlock::var_list() const
 {
   return mVarList;

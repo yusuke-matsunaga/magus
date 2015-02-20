@@ -27,22 +27,53 @@ IrHandle::~IrHandle()
 {
 }
 
-// @brief 変数を返す．
+// @brief スコープを返す．
 //
 // 他の要素の場合には NULL を返す．
-const IrVar*
-IrHandle::var() const
+Scope*
+IrHandle::scope() const
 {
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
-// @brief 関数を返す．
+// @brief 型を得る．
 //
-// 他の要素の場合には NULL を返す．
-IrFuncBlock*
-IrHandle::function() const
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+const Type*
+IrHandle::value_type() const
 {
+  ASSERT_NOT_REACHED;
   return NULL;
+}
+
+// @brief グローバル変数の時に true を返す．
+//
+// kVar のみ有効
+bool
+IrHandle::is_global() const
+{
+  ASSERT_NOT_REACHED;
+  return false;
+}
+
+// @brief インデックスを返す．
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+ymuint
+IrHandle::index() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief インデックスを設定する．
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+void
+IrHandle::set_index(ymuint index)
+{
+  ASSERT_NOT_REACHED;
 }
 
 // @brief ブール値を返す．
@@ -90,15 +121,6 @@ IrHandle::string_val() const
 // 他の要素の場合には NULL を返す．
 IrNode*
 IrHandle::label() const
-{
-  return NULL;
-}
-
-// @brief スコープを返す．
-//
-// 他の要素の場合には NULL を返す．
-Scope*
-IrHandle::scope() const
 {
   return NULL;
 }

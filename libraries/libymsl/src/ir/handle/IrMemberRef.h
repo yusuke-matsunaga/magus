@@ -25,9 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] base ベースアドレス
-  /// @param[in] var メンバ変数
+  /// @param[in] var メンバ変数のハンドル
   IrMemberRef(IrNode* base,
-	      const IrVar* var);
+	      IrHandle* var);
 
   /// @brief デストラクタ
   virtual
@@ -63,12 +63,12 @@ public:
   IrNode*
   obj_expr() const;
 
-  /// @brief 変数を返す．
+  /// @brief 変数を得る．
   ///
-  /// kOpVarRef, kOpMemberRef のみ有効
+  /// kMemberRef のみ有効
   virtual
-  const IrVar*
-  var() const;
+  IrHandle*
+  member_var() const;
 
 
 private:
@@ -80,7 +80,7 @@ private:
   IrNode* mBase;
 
   // 変数
-  const IrVar* mVar;
+  IrHandle* mMemberVar;
 
 };
 

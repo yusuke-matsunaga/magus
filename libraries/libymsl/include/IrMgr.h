@@ -155,15 +155,6 @@ private:
   new_scope(Scope* parent_scope,
 	    ShString name = ShString());
 
-  /// @brief 変数を生成する．
-  /// @param[in] name 名前
-  /// @param[in] type 型
-  /// @param[in] global グローバル変数の時 true にするフラグ
-  IrVar*
-  new_var(ShString name,
-	  const Type* type,
-	  bool global);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -275,14 +266,20 @@ private:
   new_ScopeHandle(Scope* scope);
 
   /// @brief 変数参照を生成する．
-  /// @param[in] var 変数
+  /// @param[in] name 変数名
+  /// @param[in] value_type 型
+  /// @param[in] global グローバル変数の時 true とするフラグ
   IrHandle*
-  new_VarHandle(const IrVar* var);
+  new_VarHandle(ShString name,
+		const Type* value_type,
+		bool global);
 
   /// @brief 関数参照を生成する．
-  /// @param[in] func 関数
+  /// @param[in] name 変数名
+  /// @param[in] value_type 型
   IrHandle*
-  new_FuncHandle(IrFuncBlock* func);
+  new_FuncHandle(ShString name,
+		 const Type* value_type);
 
   /// @brief ブール定数を生成する．
   /// @param[in] name 名前
@@ -337,7 +334,7 @@ private:
   /// @param[in] var メンバ変数
   IrHandle*
   new_MemberRef(IrNode* obj,
-		const IrVar* var);
+		IrHandle* var);
 
 
 private:
@@ -381,9 +378,6 @@ private:
 
   // スコープのリスト
   vector<Scope*> mScopeList;
-
-  // 変数のリスト
-  vector<IrVar*> mVarList;
 
 };
 

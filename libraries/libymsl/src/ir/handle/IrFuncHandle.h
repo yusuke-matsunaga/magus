@@ -10,6 +10,7 @@
 
 
 #include "IrHandle.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -24,8 +25,10 @@ class IrFuncHandle :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func 関数
-  IrFuncHandle(IrFuncBlock* func);
+  /// @param[in] name 関数名
+  /// @param[in] type 関数の型
+  IrFuncHandle(ShString name,
+	       const Type* type);
 
   /// @brief デストラクタ
   virtual
@@ -54,12 +57,23 @@ public:
   bool
   is_static() const;
 
-  /// @brief 関数を返す．
+  /// @brief 型を得る．
   ///
-  /// 他の要素の場合には NULL を返す．
-  virtual
-  IrFuncBlock*
-  function() const;
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  const Type*
+  value_type() const;
+
+  /// @brief インデックスを返す．
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  ymuint
+  index() const;
+
+  /// @brief インデックスを設定する．
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  void
+  set_index(ymuint index);
 
 
 private:
@@ -67,8 +81,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数
-  IrFuncBlock* mFunc;
+  // 名前
+  ShString mName;
+
+  // 型
+  const Type* mType;
+
+  // インデックス
+  ymuint mIndex;
 
 };
 

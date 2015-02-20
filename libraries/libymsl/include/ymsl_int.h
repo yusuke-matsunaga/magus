@@ -41,7 +41,6 @@ class IrFuncBlock;
 class IrHandle;
 class IrNode;
 class IrToplevel;
-class IrVar;
 
 class Scope;
 class Type;

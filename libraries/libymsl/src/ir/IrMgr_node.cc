@@ -9,7 +9,6 @@
 
 #include "IrMgr.h"
 #include "IrHandle.h"
-#include "IrVar.h"
 #include "IrFuncBlock.h"
 #include "Type.h"
 
@@ -93,12 +92,12 @@ IrMgr::new_Load(IrHandle* addr)
   switch ( addr->handle_type() ) {
   case IrHandle::kVar:
   case IrHandle::kMemberRef:
-    type = addr->var()->value_type();
+    type = addr->value_type();
     break;
 
   case IrHandle::kFunction:
   case IrHandle::kMethodRef:
-    type = addr->function()->type();
+    type = addr->value_type();
     break;
 
   case IrHandle::kBooleanConst:

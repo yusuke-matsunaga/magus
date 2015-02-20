@@ -43,17 +43,17 @@ public:
   toplevel() = 0;
 
   /// @brief 変数を追加する．
-  /// @param[in] var 変数
+  /// @param[in] var 変数のハンドル
   virtual
   void
-  add_var(IrVar* var);
+  add_var(IrHandle* var);
 
   /// @brief ノードを追加する．
   void
   add_node(IrNode* node);
 
   /// @brief 変数のリストを得る．
-  const vector<const IrVar*>&
+  const vector<IrHandle*>&
   var_list() const;
 
   /// @brief ノードのリストを得る．
@@ -73,7 +73,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 変数のリスト
-  vector<const IrVar*> mVarList;
+  vector<IrHandle*> mVarList;
 
   // 本体のノードリスト
   vector<IrNode*> mNodeList;

@@ -12,7 +12,6 @@
 #include "AstMgr.h"
 #include "AstStatement.h"
 
-#include "IrVar.h"
 #include "Scope.h"
 #include "IrCodeBlock.h"
 #include "IrNode.h"
@@ -45,12 +44,6 @@ IrMgr::clear()
     delete *p;
   }
   mScopeList.clear();
-
-  for (vector<IrVar*>::iterator p = mVarList.begin();
-       p != mVarList.end(); ++ p) {
-    delete *p;
-  }
-  mVarList.clear();
 
   mUndefList.clear();
 
@@ -149,7 +142,7 @@ IrMgr::resolve_func(const AstExpr* expr,
     // expr is not a function;
     return false;
   }
-  IrFuncBlock* func = h->function();
+
   // func の型と node の arglist の型をチェック
   // 場合によってはキャストノードを挿入する．
 
@@ -180,20 +173,6 @@ IrMgr::new_scope(Scope* parent_scope,
   mScopeList.push_back(scope);
 
   return scope;
-}
-
-// @brief 変数を生成する．
-// @param[in] name 名前
-// @param[in] type 型
-// @param[in] global グローバル変数の時 true にするフラグ
-IrVar*
-IrMgr::new_var(ShString name,
-	       const Type* type,
-	       bool global)
-{
-  IrVar* var = new IrVar(name, type, global);
-
-  return var;
 }
 
 END_NAMESPACE_YM_YMSL

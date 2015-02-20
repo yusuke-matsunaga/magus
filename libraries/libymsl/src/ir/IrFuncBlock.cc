@@ -18,21 +18,17 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] toplevel トップレベルブロック
-// @param[in] name 関数名
-// @param[in] type 関数の型
 // @param[in] arg_list 引数のリスト
 // @param[in] arg_init_list 引数のデフォルト値のリスト
+// @param[in] func_handle 関数のハンドル
 IrFuncBlock::IrFuncBlock(IrToplevel& toplevel,
-			 ShString name,
-			 const Type* type,
-			 const vector<const IrVar*>& arg_list,
-			 const vector<IrNode*>& arg_init_list) :
+			 const vector<IrHandle*>& arg_list,
+			 const vector<IrNode*>& arg_init_list,
+			 IrHandle* func_handle) :
   mToplevel(toplevel),
-  mName(name),
-  mType(type),
   mArgList(arg_list),
   mArgInitList(arg_init_list),
-  mIndex(0)
+  mFuncHandle(func_handle)
 {
 }
 
@@ -48,32 +44,11 @@ IrFuncBlock::toplevel()
   return mToplevel;
 }
 
-// @brief 関数名を返す．
-ShString
-IrFuncBlock::name() const
+// @brief 関数のハンドルを返す．
+IrHandle*
+IrFuncBlock::func_handle()
 {
-  return mName;
-}
-
-// @brief 関数の型を返す．
-const Type*
-IrFuncBlock::type() const
-{
-  return mType;
-}
-
-// @brief インデックスを返す．
-ymuint
-IrFuncBlock::index() const
-{
-  return mIndex;
-}
-
-// @brief インデックスを設定する．
-void
-IrFuncBlock::set_index(ymuint index)
-{
-  mIndex = index;
+  return mFuncHandle;
 }
 
 END_NAMESPACE_YM_YMSL

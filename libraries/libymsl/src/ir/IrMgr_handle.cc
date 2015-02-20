@@ -38,21 +38,27 @@ IrMgr::new_ScopeHandle(Scope* scope)
 }
 
 // @brief 変数参照を生成する．
-// @param[in] var 変数
+// @param[in] name 変数名
+// @param[in] value_type 型
+// @param[in] global グローバル変数の時 true とするフラグ
 IrHandle*
-IrMgr::new_VarHandle(const IrVar* var)
+IrMgr::new_VarHandle(ShString name,
+		     const Type* value_type,
+		     bool global)
 {
   void* p = mAlloc.get_memory(sizeof(IrVarHandle));
-  return new (p) IrVarHandle(var);
+  return new (p) IrVarHandle(name, value_type, global);
 }
 
 // @brief 関数参照を生成する．
-// @param[in] func 関数
+// @param[in] name 変数名
+// @param[in] value_type 型
 IrHandle*
-IrMgr::new_FuncHandle(IrFuncBlock* func)
+IrMgr::new_FuncHandle(ShString name,
+		      const Type* value_type)
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncHandle));
-  return new (p) IrFuncHandle(func);
+  return new (p) IrFuncHandle(name, value_type);
 }
 
 // @brief ブール定数を生成する．
@@ -133,10 +139,10 @@ IrMgr::new_ArrayRef(IrNode* array,
 
 // @brief クラスメンバ参照を生成する．
 // @param[in] obj オブジェクト
-// @param[in] var メンバ変数
+// @param[in] var メンバ変数のハンドル
 IrHandle*
 IrMgr::new_MemberRef(IrNode* obj,
-		     const IrVar* var)
+		     IrHandle* var)
 {
   void* p = mAlloc.get_memory(sizeof(IrMemberRef));
   return new (p) IrMemberRef(obj, var);

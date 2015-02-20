@@ -112,7 +112,7 @@ private:
   ymuint mHashNum;
 
   // ここに属する変数のリスト
-  vector<const IrVar*> mVarList;
+  vector<IrHandle*> mVarList;
 
 };
 

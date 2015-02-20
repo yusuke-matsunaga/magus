@@ -26,15 +26,13 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] toplevel トップレベルブロック
-  /// @param[in] name 関数名
-  /// @param[in] type 関数の型
   /// @param[in] arg_list 引数のリスト
   /// @param[in] arg_init_list 引数のデフォルト値のリスト
+  /// @param[in] func_handle 関数のハンドル
   IrFuncBlock(IrToplevel& toplevel,
-	      ShString name,
-	      const Type* type,
-	      const vector<const IrVar*>& arg_list,
-	      const vector<IrNode*>& arg_init_list);
+	      const vector<IrHandle*>& arg_list,
+	      const vector<IrNode*>& arg_init_list,
+	      IrHandle* func_handle);
 
   /// @brief デストラクタ
   ~IrFuncBlock();
@@ -50,21 +48,9 @@ public:
   IrToplevel&
   toplevel();
 
-  /// @brief 関数名を返す．
-  ShString
-  name() const;
-
-  /// @brief 関数の型を返す．
-  const Type*
-  type() const;
-
-  /// @brief インデックスを返す．
-  ymuint
-  index() const;
-
-  /// @brief インデックスを設定する．
-  void
-  set_index(ymuint index);
+  /// @brief 関数のハンドルを返す．
+  IrHandle*
+  func_handle();
 
 
 private:
@@ -81,20 +67,14 @@ public:
   // トップレベルブロック
   IrToplevel& mToplevel;
 
-  // 関数名
-  ShString mName;
-
-  // 関数の型
-  const Type* mType;
-
   // 引数のリスト
-  vector<const IrVar*> mArgList;
+  vector<IrHandle*> mArgList;
 
   // 引数のデフォルト値のリスト
   vector<IrNode*> mArgInitList;
 
-  // インデックス
-  ymuint mIndex;
+  // 関数のハンドル
+  IrHandle* mFuncHandle;
 
 };
 

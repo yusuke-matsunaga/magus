@@ -8,7 +8,6 @@
 
 
 #include "IrFuncHandle.h"
-#include "IrFuncBlock.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -18,9 +17,12 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func 関数
-IrFuncHandle::IrFuncHandle(IrFuncBlock* func) :
-  mFunc(func)
+// @param[in] name 関数名
+// @param[in] type 関数の型
+IrFuncHandle::IrFuncHandle(ShString name,
+			   const Type* type) :
+  mName(name),
+  mType(type)
 {
 }
 
@@ -33,7 +35,7 @@ IrFuncHandle::~IrFuncHandle()
 ShString
 IrFuncHandle::name() const
 {
-  return mFunc->name();
+  return mName;
 }
 
 // @brief 種類を返す．
@@ -52,13 +54,31 @@ IrFuncHandle::is_static() const
   return false;
 }
 
-// @brief 関数を返す．
+// @brief 型を得る．
 //
-// 他の要素の場合には NULL を返す．
-IrFuncBlock*
-IrFuncHandle::function() const
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+const Type*
+IrFuncHandle::value_type() const
 {
-  return mFunc;
+  return mType;
+}
+
+// @brief インデックスを返す．
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+ymuint
+IrFuncHandle::index() const
+{
+  return mIndex;
+}
+
+// @brief インデックスを設定する．
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+void
+IrFuncHandle::set_index(ymuint index)
+{
+  mIndex = index;
 }
 
 END_NAMESPACE_YM_YMSL

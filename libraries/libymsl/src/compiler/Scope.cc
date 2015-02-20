@@ -71,8 +71,7 @@ Scope::add(IrHandle* item)
   _put(item);
 
   if ( item->handle_type() == IrHandle::kVar ) {
-    const IrVar* var = item->var();
-    mVarList.push_back(var);
+    mVarList.push_back(item);
   }
 }
 
