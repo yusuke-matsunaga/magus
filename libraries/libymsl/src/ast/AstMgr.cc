@@ -108,26 +108,44 @@ AstMgr::toplevel() const
 }
 
 // @brief 根のノードをセットする．
+// @param[in] head_list ヘッダーリスト
 // @param[in] stmt_list ステートメントリスト
 // @param[in] loc ファイル位置
 void
-AstMgr::set_root(AstStmtList* stmt_list,
+AstMgr::set_root(AstStmtList* head_list,
+		 AstStmtList* stmt_list,
 		 const FileRegion& loc)
 {
   ASSERT_COND ( mToplevel == NULL );
 
-  ymuint num = stmt_list->size();
-  void* q = mAlloc.get_memory(sizeof(AstStatement*) * num);
-  AstStatement** stmt_array = new (q) AstStatement*[num];
-  ymuint pos = 0;
-  for (AstStmtList::Iterator p = stmt_list->begin();
-       !p.is_end(); p.next()) {
-    stmt_array[pos] = *p;
-    ++ pos;
+  AstStatement** head_array;
+  ymuint head_num = head_list->size();
+  {
+    void* q = mAlloc.get_memory(sizeof(AstStatement*) * head_num);
+    head_array = new (q) AstStatement*[head_num];
+    ymuint pos = 0;
+    for (AstStmtList::Iterator p = head_list->begin();
+	 !p.is_end(); p.next()) {
+      head_array[pos] = *p;
+      ++ pos;
+    }
+  }
+
+  AstStatement** stmt_array;
+  ymuint stmt_num = stmt_list->size();
+  {
+    void* q = mAlloc.get_memory(sizeof(AstStatement*) * stmt_num);
+    stmt_array = new (q) AstStatement*[stmt_num];
+    ymuint pos = 0;
+    for (AstStmtList::Iterator p = stmt_list->begin();
+	 !p.is_end(); p.next()) {
+      stmt_array[pos] = *p;
+      ++ pos;
+    }
   }
 
   void* p = mAlloc.get_memory(sizeof(AstToplevel));
-  mToplevel = new (p) AstToplevel(num, stmt_array, loc);
+  mToplevel = new (p) AstToplevel(head_num, head_array, stmt_num, stmt_array, loc);
 }
 
 // @brief yylex とのインターフェイス

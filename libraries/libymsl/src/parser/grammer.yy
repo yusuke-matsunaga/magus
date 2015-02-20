@@ -94,8 +94,6 @@ fr_merge(const FileRegion fr_array[],
   AstEnumConstList* eclist_type;
   AstExpr*          expr_type;
   AstExprList*      exprlist_type;
-  AstModule*        module_type;
-  AstModuleList*    modulelist_type;
   AstParam*         param_type;
   AstParamList*     paramlist_type;
   AstStatement*     statement_type;
@@ -198,11 +196,11 @@ fr_merge(const FileRegion fr_array[],
 %type <paramlist_type>  param_list
 %type <statement_type>  block_stmt
 %type <statement_type>  complex_stmt
-%type <statement_type>  item
+%type <statement_type>  import
 %type <statement_type>  single_stmt
 %type <statement_type>  statement
 %type <statement_type>  else_stmt
-%type <stmtlist_type>   item_list
+%type <stmtlist_type>   module_head
 %type <stmtlist_type>   statement_list
 %type <type_type>       type
 
@@ -210,43 +208,52 @@ fr_merge(const FileRegion fr_array[],
 
 // 本体
 
-%start item_top;
+%start module;
 
-item_top
-: item_list
+module
+: module_head statement_list
 {
-  mgr.set_root($1, @$);
+  mgr.set_root($1, $2, @$);
   delete $1;
+  delete $2;
 }
+;
 
-// 要素のリスト
-item_list
+// モジュールの先頭要素
+module_head
 : // 空
 {
   $$ = new AstStmtList;
 }
-| item_list item
+| module_head import
 {
   $$ = $1;
   $$->add($2);
 }
 ;
 
-// トップレベルの要素
-// ステートメントか import 文
-item
-: statement
-{
-  $$ = $1;
-}
 // import 文
-| IMPORT primary SEMI
+import
+: IMPORT primary SEMI
 {
   $$ = mgr.new_Import($2, NULL, @$);
 }
 | IMPORT primary AS SYMBOL SEMI
 {
   $$ = mgr.new_Import($2, $4, @$);
+}
+;
+
+// ステートメントのリスト
+statement_list
+: // 空
+{
+  $$ = new AstStmtList;
+}
+| statement_list statement
+{
+  $$ = $1;
+  $$->add($2);
 }
 ;
 
@@ -438,18 +445,6 @@ block_stmt
 {
   $$ = mgr.new_BlockStmt($2, @$);
   delete $2;
-}
-;
-
-statement_list
-: // 空
-{
-  $$ = new AstStmtList;
-}
-| statement_list statement
-{
-  $$ = $1;
-  $$->add($2);
 }
 ;
 

@@ -200,7 +200,7 @@ AstPrinter::print_statement(const AstStatement* stmt,
 
   case AstStatement::kImport:
     print_indent(indent);
-    mS << "import";
+    mS << "import ";
     {
       const AstExpr* module = stmt->import_module();
       const AstSymbol* alias = stmt->import_alias();
@@ -266,6 +266,10 @@ AstPrinter::print_statement(const AstStatement* stmt,
     break;
 
   case AstStatement::kToplevel:
+    for (ymuint i = 0; i < stmt->headlist_num(); ++ i) {
+      const AstStatement* stmt1 = stmt->headlist_elem(i);
+      print_statement(stmt1, indent + 1);
+    }
     for (ymuint i = 0; i < stmt->stmtlist_num(); ++ i) {
       const AstStatement* stmt1 = stmt->stmtlist_elem(i);
       print_statement(stmt1, indent + 1);

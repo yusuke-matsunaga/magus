@@ -24,10 +24,14 @@ class AstToplevel :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] head_num ヘッダのリストの要素数
+  /// @param[in] head_list ヘッダのリスト
   /// @param[in] stmt_num 文のリストの要素数
   /// @param[in] stmt_list 文のリスト
   /// @param[in] loc ファイル位置
-  AstToplevel(ymuint num,
+  AstToplevel(ymuint head_num,
+	      AstStatement** head_list,
+	      ymuint stmt_num,
 	      AstStatement** stmt_list,
 	      const FileRegion& loc);
 
@@ -45,6 +49,33 @@ public:
   virtual
   Type
   stmt_type() const;
+
+  /// @brief ヘッダのリストの要素数を返す．
+  ///
+  /// AstToplevel のみ有効
+  virtual
+  ymuint
+  headlist_num() const;
+
+  /// @brief ヘッダを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < headlist_num() )
+  ///
+  /// AstToplevel のみ有効
+  virtual
+  const AstStatement*
+  headlist_elem(ymuint pos) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ヘッダリストの要素数
+  ymuint mHeadNum;
+
+  // ヘッダリスト(ポインタ配列)
+  AstStatement** mHeadList;
 
 };
 

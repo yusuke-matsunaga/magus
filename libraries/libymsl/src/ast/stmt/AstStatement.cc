@@ -154,6 +154,27 @@ AstStatement::expr() const
   return NULL;
 }
 
+// @brief ヘッダのリストの要素数を返す．
+//
+// AstToplevel のみ有効
+ymuint
+AstStatement::headlist_num() const
+{
+  ASSERT_NOT_REACHED;
+  return 0;
+}
+
+// @brief ヘッダを返す．
+// @param[in] pos 位置 ( 0 <= pos < headlist_num() )
+//
+// AstToplevel のみ有効
+const AstStatement*
+AstStatement::headlist_elem(ymuint pos) const
+{
+  ASSERT_NOT_REACHED;
+  return NULL;
+}
+
 // @brief 文のリストの要素数を返す．
 //
 // AstBlockStmt の継承クラスのみ有効

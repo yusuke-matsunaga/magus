@@ -48,7 +48,6 @@ parser_test(int argc,
     const char* str =
       "import stdlib;\n"
       "import math as R;\n"
-      "import a, b, c as D;\n"
       "enum Signal {\n"
       "green = 1,\n"
       "yellow,\n"

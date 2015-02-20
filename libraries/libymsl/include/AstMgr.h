@@ -60,10 +60,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 根のノードをセットする．
+  /// @param[in] head_list ヘッダーリスト
   /// @param[in] stmt_list ステートメントリスト
   /// @param[in] loc ファイル位置
   void
-  set_root(AstStmtList* stmt_list,
+  set_root(AstStmtList* head_list,
+	   AstStmtList* stmt_list,
 	   const FileRegion& loc);
 
   /// @brief yylex とのインターフェイス

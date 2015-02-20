@@ -165,6 +165,21 @@ public:
   const AstExpr*
   expr() const;
 
+  /// @brief ヘッダのリストの要素数を返す．
+  ///
+  /// AstToplevel のみ有効
+  virtual
+  ymuint
+  headlist_num() const;
+
+  /// @brief ヘッダを返す．
+  /// @param[in] pos 位置 ( 0 <= pos < headlist_num() )
+  ///
+  /// AstToplevel のみ有効
+  virtual
+  const AstStatement*
+  headlist_elem(ymuint pos) const;
+
   /// @brief 文のリストの要素数を返す．
   ///
   /// AstBlockStmt のみ有効
@@ -173,7 +188,7 @@ public:
   stmtlist_num() const;
 
   /// @brief 文のリストの要素を返す．
-  /// @param[in] pos 位置 ( 0 <= pos < stmt_num() )
+  /// @param[in] pos 位置 ( 0 <= pos < stmtlist_num() )
   ///
   /// AstBlockStmt のみ有効
   virtual
