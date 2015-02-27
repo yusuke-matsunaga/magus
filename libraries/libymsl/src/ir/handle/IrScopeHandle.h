@@ -24,8 +24,10 @@ class IrScopeHandle :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] name 名前
   /// @param[in] scope スコープ
-  IrScopeHandle(Scope* scope);
+  IrScopeHandle(ShString name,
+		Scope* scope);
 
   /// @brief デストラクタ
   virtual
@@ -66,6 +68,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 名前
+  ShString mName;
 
   // スコープ
   Scope* mScope;

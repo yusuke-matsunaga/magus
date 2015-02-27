@@ -8,7 +8,6 @@
 
 
 #include "IrScopeHandle.h"
-#include "Scope.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -18,8 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] name 名前
 // @param[in] scope スコープ
-IrScopeHandle::IrScopeHandle(Scope* scope) :
+IrScopeHandle::IrScopeHandle(ShString name,
+			     Scope* scope) :
+  mName(name),
   mScope(scope)
 {
 }
@@ -33,7 +35,7 @@ IrScopeHandle::~IrScopeHandle()
 ShString
 IrScopeHandle::name() const
 {
-  return mScope->name();
+  return mName;
 }
 
 // @brief 種類を返す．

@@ -38,12 +38,12 @@ ir_test1(IDO& ido)
 
   AstPrinter printer(cout);
 
-  AstStatement* toplevel = ast_mgr.toplevel();
-  printer.print_statement(toplevel);
+  AstStatement* ast_toplevel = ast_mgr.toplevel();
+  printer.print_statement(ast_toplevel);
 
   IrMgr ir_mgr;
   IrToplevel ir_toplevel;
-  bool stat2 = ir_mgr.elaborate(toplevel, ir_toplevel);
+  bool stat2 = ir_mgr.elaborate(ast_toplevel, ShString("__main__"), ir_toplevel);
   if ( !stat2 ) {
     return 2;
   }

@@ -43,25 +43,20 @@ public:
 
   /// @brief 抽象構文木から中間表現を生成する．
   /// @param[in] ast_root 抽象構文木の根のノード
+  /// @param[in] name モジュール名
   /// @param[in] code_block 生成された中間表現を格納するオブジェクト
   ///
   /// エラーが起きたら false を返す．
   bool
   elaborate(const AstStatement* ast_root,
-	    IrCodeBlock& code_block);
+	    ShString name,
+	    IrToplevel& code_block);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief インポートする
-  /// @param[in] module モジュール名
-  /// @param[in] alias エイリアス
-  void
-  import(const AstSymbol* module,
-	 const AstSymbol* alias);
 
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
@@ -139,6 +134,15 @@ private:
   elab_primary(const AstExpr* ast_expr,
 	       Scope* scope);
 
+  /// @brief モジュールに対応するスコープを作る．
+  /// @param[in] module モジュール
+  /// @param[in] parent_scope 親のスコープ
+  /// @param[in] name 名前
+  Scope*
+  module2scope(VsmModule* module,
+	       Scope* parent_scope,
+	       ShString name);
+
   /// @brief 式から関数の解決を行う．
   /// @param[in] expr 式
   /// @param[in] scope 現在のスコープ
@@ -147,13 +151,6 @@ private:
   resolve_func(const AstExpr* expr,
 	       Scope* scope,
 	       IrNode* node);
-
-  /// @brief スコープを生成する．
-  /// @param[in] parent_scope 親のスコープ
-  /// @param[in] name スコープ名
-  Scope*
-  new_scope(Scope* parent_scope,
-	    ShString name = ShString());
 
 
 private:
@@ -261,9 +258,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief スコープ参照を生成する．
+  /// @param[in] name 名前
   /// @param[in] scope スコープ
   IrHandle*
-  new_ScopeHandle(Scope* scope);
+  new_ScopeHandle(ShString name,
+		  Scope* scope);
 
   /// @brief 変数参照を生成する．
   /// @param[in] name 変数名
@@ -335,6 +334,13 @@ private:
   IrHandle*
   new_MemberRef(IrNode* obj,
 		IrHandle* var);
+
+  /// @brief スコープを生成する．
+  /// @param[in] parent_scope 親のスコープ
+  /// @param[in] name スコープ名
+  Scope*
+  new_scope(Scope* parent_scope,
+	    ShString name = ShString());
 
 
 private:

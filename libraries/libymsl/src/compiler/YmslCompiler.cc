@@ -10,8 +10,11 @@
 #include "YmslCompiler.h"
 
 #include "AstMgr.h"
+#include "AstStatement.h"
+#include "AstSymbol.h"
 #include "IrMgr.h"
 #include "IrToplevel.h"
+#include "VsmGen.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -32,11 +35,13 @@ YmslCompiler::~YmslCompiler()
 
 // @brief コンパイルする．
 // @param[in] ido 入力データ
+// @param[in] name モジュール名
 // @return コンパイルしたモジュールを返す．
 //
 // エラーが起きたら NULL を返す．
 VsmModule*
-YmslCompiler::compile(IDO& ido)
+YmslCompiler::compile(IDO& ido,
+		      ShString name)
 {
   AstMgr ast_mgr;
 
@@ -50,14 +55,27 @@ YmslCompiler::compile(IDO& ido)
   // 中間表現を作る．
   AstStatement* ast_toplevel = ast_mgr.toplevel();
   IrToplevel* ir_toplevel = new IrToplevel;
-  bool stat2 = ir_mgr.elaborate(ast_toplevel, *ir_toplevel);
+  bool stat2 = ir_mgr.elaborate(ast_toplevel, name, *ir_toplevel);
   if ( !stat2 ) {
     return NULL;
   }
 
   // コード生成を行う．
+  VsmGen vsmgen;
 
-  return NULL;
+  VsmModule* module = vsmgen.code_gen(ir_toplevel, name);
+
+  return module;
+}
+
+// @brief import する．
+// @param[in] module_name モジュール名
+// @return モジュールを返す．
+VsmModule*
+YmslCompiler::import_module(ShString module_name)
+{
+  // VsmModule* module = compile(ido, module_name);
+  // mModuleDict.add(module_name, module);
 }
 
 END_NAMESPACE_YM_YMSL

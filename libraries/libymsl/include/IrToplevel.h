@@ -40,6 +40,11 @@ public:
   IrToplevel&
   toplevel();
 
+  /// @brief import しているモジュールを追加する．
+  /// @param[in] module モジュール
+  void
+  add_imported_module(VsmModule* module);
+
   /// @brief 変数を追加する．
   /// @param[in] var 変数のハンドル
   virtual
@@ -50,6 +55,10 @@ public:
   /// @param[in] func 関数
   void
   add_function(IrFuncBlock* func);
+
+  /// @brief import しているモジュールのリストを返す．
+  const vector<VsmModule*>&
+  imported_module_list() const;
 
   /// @brief グローバル変数のリストを返す．
   const vector<IrHandle*>&
@@ -70,6 +79,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // import しているモジュールのリスト
+  vector<VsmModule*> mModuleList;
 
   // グローバル変数のリスト
   vector<IrHandle*> mGlobalVarList;

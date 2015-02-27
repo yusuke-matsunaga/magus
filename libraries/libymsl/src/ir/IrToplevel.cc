@@ -35,6 +35,14 @@ IrToplevel::toplevel()
   return *this;
 }
 
+// @brief import しているモジュールを追加する．
+// @param[in] module モジュール
+void
+IrToplevel::add_imported_module(VsmModule* module)
+{
+  mModuleList.push_back(module);
+}
+
 // @brief 変数を追加する．
 void
 IrToplevel::add_var(IrHandle* var)
@@ -58,6 +66,13 @@ IrToplevel::add_function(IrFuncBlock* func)
   ymuint index = mFuncList.size();
   func->func_handle()->set_index(index);
   mFuncList.push_back(func);
+}
+
+// @brief import しているモジュールのリストを返す．
+const vector<VsmModule*>&
+IrToplevel::imported_module_list() const
+{
+  return mModuleList;
 }
 
 // @brief グローバル変数のリストを返す．

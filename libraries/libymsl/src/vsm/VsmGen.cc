@@ -46,6 +46,14 @@ VsmGen::code_gen(const IrToplevel* toplevel,
 
   VsmModule::Builder module_builder(name);
 
+  // import しているモジュール
+  const vector<VsmModule*>& module_list = toplevel->imported_module_list();
+  for (vector<VsmModule*>::const_iterator p = module_list.begin();
+       p != module_list.end(); ++ p) {
+    VsmModule* sub_module = *p;
+    module_builder.add_imported_module(sub_module);
+  }
+
   // 関数のコードを作る．
   const vector<IrFuncBlock*>& func_list = toplevel->func_list();
   ymuint nf = func_list.size();

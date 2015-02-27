@@ -29,12 +29,14 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief スコープ参照を生成する．
+// @param[in] name 名前
 // @param[in] scope スコープ
 IrHandle*
-IrMgr::new_ScopeHandle(Scope* scope)
+IrMgr::new_ScopeHandle(ShString name,
+		       Scope* scope)
 {
   void* p = mAlloc.get_memory(sizeof(IrScopeHandle));
-  return new (p) IrScopeHandle(scope);
+  return new (p) IrScopeHandle(name, scope);
 }
 
 // @brief 変数参照を生成する．
