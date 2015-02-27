@@ -35,6 +35,7 @@ class Vsm;
 class VsmCodeList;
 class VsmFunction;
 class VsmModule;
+class VsmVar;
 
 class IrCodeBlock;
 class IrFuncBlock;

@@ -1,37 +1,34 @@
-#ifndef VSMNATIVEFUNC_H
-#define VSMNATIVEFUNC_H
+#ifndef VSMGEN_H
+#define VSMGEN_H
 
-/// @file VsmNativeFunc.h
-/// @brief VsmNativeFunc のヘッダファイル
+/// @file VsmGen.h
+/// @brief VsmGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VsmFunction.h"
+#include "ymsl_int.h"
 #include "VsmCodeList.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class VsmNativeFunc VsmNativeFunc.h "VsmNativeFunc.h"
-/// @brief YMSL で記述された関数を表すクラス
+/// @class VsmGen VsmGen.h "VsmGen.h"
+/// @brief VSM 用のバイトコードを生成するクラス
 //////////////////////////////////////////////////////////////////////
-class VsmNativeFunc :
-  public VsmFunction
+class VsmGen
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 関数名
-  /// @param[in] code_list_builder コードリストの初期化用オブジェクト
-  VsmNativeFunc(ShString name,
-		const VsmCodeList::Builder& code_list_builder);
+  VsmGen();
 
   /// @brief デストラクタ
-  ~VsmNativeFunc();
+  ~VsmGen();
 
 
 public:
@@ -39,18 +36,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 組み込み関数の時 true を返す．
-  virtual
-  bool
-  is_builtin() const;
-
-  /// @brief 組み込み関数の時の実行関数
-  /// @param[in] vsm 仮想マシン
-  /// @param[in] base ベースレジスタ
-  virtual
-  void
-  execute(Vsm& vsm,
-	  Ymsl_INT base) const;
+  /// @brief コード生成を行う．
+  /// @param[in] topleve トップレベルのブロック
+  /// @param[in] name 名前
+  VsmModule*
+  code_gen(const IrToplevel* toplevel,
+	   ShString name);
 
 
 private:
@@ -58,17 +49,22 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief コードブロックに対するコード生成を行う．
+  /// @param[in] code_block コードブロック
+  /// @param[in] builder CodeList ビルダー
+  void
+  gen_block(const IrCodeBlock* code_block,
+	    VsmCodeList::Builder& builder);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // コードリスト
-  VsmCodeList mCodeList;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // VSMNATIVEFUNC_H
+#endif // VSMGEN_H

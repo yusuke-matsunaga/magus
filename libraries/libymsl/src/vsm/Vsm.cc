@@ -708,8 +708,7 @@ Vsm::execute(const VsmCodeList& code_list,
 	Ymsl_INT index = code_list.read_int(pc);
 	ASSERT_COND( index >= 0 && index < mFuncTableSize );
 	const VsmFunction* func = mFuncTable[index];
-	ymuint n = func->arg_num();
-	Ymsl_INT base = mSP - n;
+	Ymsl_INT base = mSP;
 	func->execute(*this, base);
       }
       break;
@@ -719,8 +718,7 @@ Vsm::execute(const VsmCodeList& code_list,
 	Ymsl_INT index = pop_INT();
 	ASSERT_COND( index >= 0 && index < mFuncTableSize );
 	const VsmFunction* func = mFuncTable[index];
-	ymuint n = func->arg_num();
-	Ymsl_INT base = mSP - n;
+	Ymsl_INT base = mSP;
 	func->execute(*this, base);
       }
       break;

@@ -1,35 +1,37 @@
-#ifndef VSMBUILTINFUNC_H
-#define VSMBUILTINFUNC_H
+#ifndef VSMNATIVEMODULE_H
+#define VSMNATIVEMODULE_H
 
-/// @file VsmBuiltinFunc.h
-/// @brief VsmBuiltinFunc のヘッダファイル
+/// @file VsmNativeModule.h
+/// @brief VsmNativeModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "VsmFunction.h"
-#include "VsmValue.h"
+#include "VsmModule.h"
+#include "VsmCodeList.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class VsmBuiltinFunc VsmBuiltinFunc.h "VsmBuiltinFunc.h"
-/// @brief VSM の組み込み関数を表すクラス
+/// @class VsmNativeModule VsmNativeModule.h "VsmNativeModule.h"
+/// @brief YMSLネイティブの VsmModule
 //////////////////////////////////////////////////////////////////////
-class VsmBuiltinFunc :
-  public VsmFunction
+class VsmNativeModule :
+  public VsmModule
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] name 関数名
-  VsmBuiltinFunc(ShString name);
+  /// @param[in] module_builder モジュール用のビルダー
+  /// @param[in] toplevel_builder トップレベルのコードビルダー
+  VsmNativeModule(VsmModule::Builder& module_builder,
+		  VsmCodeList::Builder& toplevel_builder);
 
   /// @brief デストラクタ
-  ~VsmBuiltinFunc();
+  ~VsmNativeModule();
 
 
 public:
@@ -37,18 +39,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 組み込み関数の時 true を返す．
-  virtual
-  bool
-  is_builtin() const;
-
-  /// @brief 組み込み関数の時の実行関数
+  /// @brief トップレベルの実行を行う．
   /// @param[in] vsm 仮想マシン
-  /// @param[in] base ベースレジスタ
   virtual
   void
-  execute(Vsm& vsm,
-	  Ymsl_INT base) const;
+  execute_toplevel(Vsm& vsm) const;
 
 
 private:
@@ -56,27 +51,17 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 引数の数を返す．
-  virtual
-  ymuint
-  arg_num() const = 0;
-
-  /// @brief 本当の実行関数
-  /// @param[in] arg_list 引数のリスト
-  ///
-  /// 実際の派生クラスが実装する必要がある．
-  virtual
-  VsmValue
-  _execute(const vector<VsmValue>& arg_list) const = 0;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // トップレベルのコード
+  VsmCodeList mToplevelCode;
+
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // VSMBUILTINFUNC_H
+#endif // VSMNATIVEMODULE_H

@@ -18,11 +18,8 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 関数名
-// @param[in] arg_num 引数の数
-VsmFunction::VsmFunction(ShString name,
-			 ymuint arg_num) :
-  mName(name),
-  mArgNum(arg_num)
+VsmFunction::VsmFunction(ShString name) :
+  mName(name)
 {
 }
 
@@ -36,13 +33,6 @@ ShString
 VsmFunction::name() const
 {
   return mName;
-}
-
-// @brief 引数の数
-ymuint
-VsmFunction::arg_num() const
-{
-  return mArgNum;
 }
 
 END_NAMESPACE_YM_YMSL

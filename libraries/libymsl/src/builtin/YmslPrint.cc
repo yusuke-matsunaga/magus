@@ -19,13 +19,20 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 関数名
 YmslPrint::YmslPrint(ShString name) :
-  VsmBuiltinFunc(name, 1)
+  VsmBuiltinFunc(name)
 {
 }
 
 // @brief デストラクタ
 YmslPrint::~YmslPrint()
 {
+}
+
+// @brief 引数の数を返す．
+ymuint
+YmslPrint::arg_num() const
+{
+  return 1;
 }
 
 // @brief 本当の実行関数

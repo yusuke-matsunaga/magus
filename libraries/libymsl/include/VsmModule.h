@@ -22,10 +22,84 @@ BEGIN_NAMESPACE_YM_YMSL
 class VsmModule
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // ビルダークラス
+  //////////////////////////////////////////////////////////////////////
+
+  class Builder
+  {
+  public:
+
+    /// @brief コンストラクタ
+    /// @param[in] name モジュール名
+    Builder(ShString name);
+
+    /// @brief デストラクタ
+    ~Builder();
+
+
+  public:
+    //////////////////////////////////////////////////////////////////////
+    // 外部インターフェイス
+    //////////////////////////////////////////////////////////////////////
+
+    /// @brief import しているモジュールを追加する．
+    /// @param[in] module import しているモジュール
+    void
+    add_imported_module(VsmModule* module);
+
+    /// @brief export している関数を追加する．
+    /// @param[in] func export している関数
+    void
+    add_exported_function(VsmFunction* func);
+
+    /// @brief export している変数を追加する．
+    /// @param[in] var export している変数
+    void
+    add_exported_var(VsmVar* var);
+
+    /// @brief 名前を返す．
+    ShString
+    name() const;
+
+    /// @brief import しているモジュールのリストを返す．
+    const vector<VsmModule*>&
+    imported_module_list() const;
+
+    /// @brief export している関数のリストを返す．
+    const vector<VsmFunction*>&
+    exported_function_list() const;
+
+    /// @brief export している変数のリストを返す．
+    const vector<VsmVar*>&
+    exported_var_list() const;
+
+
+  private:
+    //////////////////////////////////////////////////////////////////////
+    // データメンバ
+    //////////////////////////////////////////////////////////////////////
+
+    // 名前
+    ShString mName;
+
+    // import しているモジュールのリスト
+    vector<VsmModule*> mModuleList;
+
+    // export している関数のリスト
+    vector<VsmFunction*> mFuncList;
+
+    // export している変数のリスト
+    vector<VsmVar*> mVarList;
+
+  };
+
+
+public:
 
   /// @brief コンストラクタ
-  /// @param[in] name モジュール名
-  VsmModule(ShString name);
+  /// @param[in] builder ビルダー
+  VsmModule(Builder& builder);
 
   /// @brief デストラクタ
   virtual
@@ -65,14 +139,14 @@ public:
 
   /// @brief このモジュールが export している変数を返す．
   /// @param[in] pos 位置 ( 0 <= pos < exported_variable_num() )
-  IrVar*
+  VsmVar*
   exported_variable(ymuint pos) const;
 
   /// @brief トップレベルの実行を行う．
   /// @param[in] vsm 仮想マシン
   virtual
   void
-  execute_toplevel(YmslVSM& vsm) const = 0;
+  execute_toplevel(Vsm& vsm) const = 0;
 
 
 private:
@@ -93,13 +167,13 @@ private:
   ymuint mExportedFuncNum;
 
   // export している関数の配列
-  VsmFunction* mExportedFuncList;
+  VsmFunction** mExportedFuncList;
 
   // export している変数の数
   ymuint mExportedVarNum;
 
   // export している変数の配列
-  Var* mExportedVarList;
+  VsmVar** mExportedVarList;
 
 };
 

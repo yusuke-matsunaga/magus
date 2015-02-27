@@ -48,12 +48,14 @@ YmslCompiler::compile(IDO& ido)
   IrMgr ir_mgr;
 
   // 中間表現を作る．
-  AstStatement* toplevel = ast_mgr.toplevel();
+  AstStatement* ast_toplevel = ast_mgr.toplevel();
   IrToplevel* ir_toplevel = new IrToplevel;
-  bool stat2 = ir_mgr.elaborate(toplevel, *ir_toplevel);
+  bool stat2 = ir_mgr.elaborate(ast_toplevel, *ir_toplevel);
   if ( !stat2 ) {
     return NULL;
   }
+
+  // コード生成を行う．
 
   return NULL;
 }

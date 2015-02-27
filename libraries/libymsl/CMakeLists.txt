@@ -125,8 +125,11 @@ set (ymsl_SOURCES
   src/vsm/Vsm.cc
   src/vsm/VsmBuiltinFunc.cc
   src/vsm/VsmCodeList.cc
+  src/vsm/VsmGen.cc
   src/vsm/VsmFunction.cc
   src/vsm/VsmNativeFunc.cc
+  src/vsm/VsmModule.cc
+  src/vsm/VsmNativeModule.cc
 
   src/builtin/YmslPrint.cc
   )

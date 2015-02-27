@@ -25,9 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  /// @param[in] arg_num 引数の数
-  VsmFunction(ShString name,
-	      ymuint arg_num);
+  VsmFunction(ShString name);
 
   /// @brief デストラクタ
   virtual
@@ -42,10 +40,6 @@ public:
   /// @brief 関数名を返す．
   ShString
   name() const;
-
-  /// @brief 引数の数
-  ymuint
-  arg_num() const;
 
   /// @brief 組み込み関数の時 true を返す．
   virtual
@@ -68,9 +62,6 @@ private:
 
   // 関数名
   ShString mName;
-
-  // 引数の数
-  ymuint mArgNum;
 
 };
 

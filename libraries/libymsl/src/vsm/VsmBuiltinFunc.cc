@@ -19,10 +19,8 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 関数名
-// @param[in] arg_num 引数の数
-VsmBuiltinFunc::VsmBuiltinFunc(ShString name,
-				 ymuint arg_num) :
-  VsmFunction(name, arg_num)
+VsmBuiltinFunc::VsmBuiltinFunc(ShString name) :
+  VsmFunction(name)
 {
 }
 
