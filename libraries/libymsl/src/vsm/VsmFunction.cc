@@ -18,8 +18,11 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 関数名
-VsmFunction::VsmFunction(ShString name) :
-  mName(name)
+// @param[in] type 型
+VsmFunction::VsmFunction(ShString name,
+			 const Type* type) :
+  mName(name),
+  mType(type)
 {
 }
 
@@ -33,6 +36,13 @@ ShString
 VsmFunction::name() const
 {
   return mName;
+}
+
+// @brief 関数の型を返す．
+const Type*
+VsmFunction::type() const
+{
+  return mType;
 }
 
 END_NAMESPACE_YM_YMSL

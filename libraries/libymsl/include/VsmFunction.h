@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  VsmFunction(ShString name);
+  /// @param[in] type 型
+  VsmFunction(ShString name,
+	      const Type* type);
 
   /// @brief デストラクタ
   virtual
@@ -40,6 +42,10 @@ public:
   /// @brief 関数名を返す．
   ShString
   name() const;
+
+  /// @brief 関数の型を返す．
+  const Type*
+  type() const;
 
   /// @brief 組み込み関数の時 true を返す．
   virtual
@@ -62,6 +68,9 @@ private:
 
   // 関数名
   ShString mName;
+
+  // 型
+  const Type* mType;
 
 };
 

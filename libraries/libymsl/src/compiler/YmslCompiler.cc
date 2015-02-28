@@ -68,14 +68,4 @@ YmslCompiler::compile(IDO& ido,
   return module;
 }
 
-// @brief import する．
-// @param[in] module_name モジュール名
-// @return モジュールを返す．
-VsmModule*
-YmslCompiler::import_module(ShString module_name)
-{
-  // VsmModule* module = compile(ido, module_name);
-  // mModuleDict.add(module_name, module);
-}
-
 END_NAMESPACE_YM_YMSL

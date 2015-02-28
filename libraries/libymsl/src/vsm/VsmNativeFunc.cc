@@ -19,10 +19,12 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 関数名
+// @param[in] type 型
 // @param[in] code_list_builder コードリストの初期化用オブジェクト
 VsmNativeFunc::VsmNativeFunc(ShString name,
+			     const Type* type,
 			     const VsmCodeList::Builder& code_list_builder) :
-  VsmFunction(name),
+  VsmFunction(name, type),
   mCodeList(code_list_builder)
 {
 }

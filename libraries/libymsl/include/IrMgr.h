@@ -12,6 +12,7 @@
 #include "ymsl_int.h"
 #include "TypeMgr.h"
 #include "YmUtils/ShString.h"
+#include "YmUtils/HashMap.h"
 #include "YmUtils/SimpleAlloc.h"
 
 
@@ -57,6 +58,27 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief モジュールを import する．
+  /// @param[in] name モジュール名
+  pair<VsmModule*, Scope*>
+  import_module(ShString name);
+
+  /// @brief モジュールに対応するスコープを作る．
+  /// @param[in] module モジュール
+  /// @param[in] name 名前
+  Scope*
+  module2scope(VsmModule* module,
+	       ShString name);
+
+  /// @brief 式から関数の解決を行う．
+  /// @param[in] expr 式
+  /// @param[in] scope 現在のスコープ
+  /// @param[in] node 関数呼び出しノード
+  bool
+  resolve_func(const AstExpr* expr,
+	       Scope* scope,
+	       IrNode* node);
 
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
@@ -133,24 +155,6 @@ private:
   IrHandle*
   elab_primary(const AstExpr* ast_expr,
 	       Scope* scope);
-
-  /// @brief モジュールに対応するスコープを作る．
-  /// @param[in] module モジュール
-  /// @param[in] parent_scope 親のスコープ
-  /// @param[in] name 名前
-  Scope*
-  module2scope(VsmModule* module,
-	       Scope* parent_scope,
-	       ShString name);
-
-  /// @brief 式から関数の解決を行う．
-  /// @param[in] expr 式
-  /// @param[in] scope 現在のスコープ
-  /// @param[in] node 関数呼び出しノード
-  bool
-  resolve_func(const AstExpr* expr,
-	       Scope* scope,
-	       IrNode* node);
 
 
 private:
@@ -385,8 +389,32 @@ private:
   // スコープのリスト
   vector<Scope*> mScopeList;
 
+  // モジュールを保持するハッシュ表
+  HashMap<ShString, VsmModule*> mModuleDict;
+
+  // モジュールに対応したスコープを保持するハッシュ表
+  HashMap<VsmModule*, Scope*> mScopeDict;
+
 };
 
 END_NAMESPACE_YM_YMSL
+
+BEGIN_NAMESPACE_YM
+
+//////////////////////////////////////////////////////////////////////
+// HashFunc<VsmModule*> の特殊化
+//////////////////////////////////////////////////////////////////////
+template<>
+struct
+HashFunc<nsYmsl::VsmModule*>
+{
+  ymuint
+  operator()(nsYmsl::VsmModule* key) const
+  {
+    return reinterpret_cast<ympuint>(key) / sizeof(void*);
+  }
+};
+
+END_NAMESPACE_YM
 
 #endif // IRMGR_H

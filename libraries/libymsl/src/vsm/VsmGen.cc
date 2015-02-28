@@ -61,7 +61,10 @@ VsmGen::code_gen(const IrToplevel* toplevel,
     VsmCodeList::Builder code_builder;
     IrFuncBlock* func_block = func_list[i];
     gen_block(func_block, code_builder);
-    VsmFunction* func = new VsmNativeFunc(func_block->func_handle()->name(), code_builder);
+    IrHandle* func_handle = func_block->func_handle();
+    ShString name = func_handle->name();
+    const Type* type = func_handle->value_type();
+    VsmFunction* func = new VsmNativeFunc(name, type, code_builder);
     module_builder.add_exported_function(func);
   }
 

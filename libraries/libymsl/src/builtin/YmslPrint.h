@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  YmslPrint(ShString name);
+  /// @param[in] type 型
+  YmslPrint(ShString name,
+	    const Type* type);
 
   /// @brief デストラクタ
   virtual

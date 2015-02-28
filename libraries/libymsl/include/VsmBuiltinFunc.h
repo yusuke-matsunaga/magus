@@ -26,7 +26,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
-  VsmBuiltinFunc(ShString name);
+  /// @param[in] type 型
+  VsmBuiltinFunc(ShString name,
+		 const Type* type);
 
   /// @brief デストラクタ
   ~VsmBuiltinFunc();

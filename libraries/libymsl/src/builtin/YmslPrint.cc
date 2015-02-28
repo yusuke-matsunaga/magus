@@ -18,8 +18,10 @@ BEGIN_NAMESPACE_YM_YMSL
 
 // @brief コンストラクタ
 // @param[in] name 関数名
-YmslPrint::YmslPrint(ShString name) :
-  VsmBuiltinFunc(name)
+// @param[in] type 型
+YmslPrint::YmslPrint(ShString name,
+		     const Type* type) :
+  VsmBuiltinFunc(name, type)
 {
 }
 

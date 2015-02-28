@@ -26,8 +26,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
+  /// @param[in] type 型
   /// @param[in] code_list_builder コードリストの初期化用オブジェクト
   VsmNativeFunc(ShString name,
+		const Type* type,
 		const VsmCodeList::Builder& code_list_builder);
 
   /// @brief デストラクタ
