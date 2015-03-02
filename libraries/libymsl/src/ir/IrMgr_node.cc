@@ -170,11 +170,9 @@ IrMgr::new_InplaceBinOp(OpCode opcode,
 }
 
 // @brief 関数呼び出し式を生成する．
-// @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数のリスト
 IrNode*
-IrMgr::new_FuncCall(IrHandle* func_addr,
-		    const vector<IrNode*>& arglist)
+IrMgr::new_FuncCall(const vector<IrNode*>& arglist)
 {
   for (vector<IrNode*>::const_iterator p = arglist.begin();
        p != arglist.end(); ++ p) {
@@ -182,7 +180,7 @@ IrMgr::new_FuncCall(IrHandle* func_addr,
     ASSERT_COND( arg != NULL );
   }
   void* p = mAlloc.get_memory(sizeof(IrFuncCall));
-  return new (p) IrFuncCall(func_addr, arglist);
+  return new (p) IrFuncCall(arglist);
 }
 
 // @brief リターン命令を生成する．

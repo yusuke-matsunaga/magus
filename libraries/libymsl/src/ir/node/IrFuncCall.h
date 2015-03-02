@@ -24,10 +24,8 @@ class IrFuncCall :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] func_addr 関数アドレス
   /// @param[in] arglist 引数リスト
-  IrFuncCall(IrHandle* func_addr,
-	     const vector<IrNode*>& arglist);
+  IrFuncCall(const vector<IrNode*>& arglist);
 
   /// @brief デストラクタ
   virtual
@@ -46,19 +44,20 @@ public:
   bool
   is_static() const;
 
-  /// @brief 関数アドレスを設定する．
+  /// @brief 関数インデックスを設定する．
+  /// @param[in] index 関数インデックス
   ///
   /// kFuncCall のみ有効
   virtual
   void
-  set_func_addr(IrHandle* handle);
+  set_function_index(ymuint index);
 
-  /// @brief 関数のアドレスを返す．
+  /// @brief 関数インデックスを返す．
   ///
-  /// kOpFuncCall のみ有効
+  /// kFuncCall のみ有効
   virtual
-  IrHandle*
-  func_addr() const;
+  ymuint
+  function_index() const;
 
   /// @brief 関数の引数の数を得る．
   ///
@@ -81,8 +80,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 関数アドレス
-  IrHandle* mFuncAddr;
+  // 関数インデックス
+  ymuint mIndex;
 
   // 引数の数
   ymuint mArgNum;

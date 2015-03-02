@@ -9,8 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrHandle.h"
-#include "YmUtils/ShString.h"
+#include "IrIndexHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -20,15 +19,17 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief Function を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
 class IrFuncHandle :
-  public IrHandle
+  public IrIndexHandle
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] type 関数の型
+  /// @param[in] func 関数本体
   IrFuncHandle(ShString name,
-	       const Type* type);
+	       const Type* type,
+	       const VsmFunction* func);
 
   /// @brief デストラクタ
   virtual
@@ -39,11 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 名前を返す．
-  virtual
-  ShString
-  name() const;
 
   /// @brief 種類を返す．
   virtual
@@ -57,23 +53,12 @@ public:
   bool
   is_static() const;
 
-  /// @brief 型を得る．
+  /// @brief 関数本体を返す．
   ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  const Type*
-  value_type() const;
-
-  /// @brief インデックスを返す．
-  ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  ymuint
-  index() const;
-
-  /// @brief インデックスを設定する．
-  ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  void
-  set_index(ymuint index);
+  /// kFunction, kMethodRef のみ有効
+  virtual
+  const VsmFunction*
+  function() const;
 
 
 private:
@@ -81,14 +66,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  ShString mName;
-
-  // 型
-  const Type* mType;
-
-  // インデックス
-  ymuint mIndex;
+  // 関数本体
+  const VsmFunction* mFunction;
 
 };
 

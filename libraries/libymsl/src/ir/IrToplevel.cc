@@ -28,19 +28,15 @@ IrToplevel::~IrToplevel()
 {
 }
 
-// @brief トップレベルのブロックを返す．
-IrToplevel&
-IrToplevel::toplevel()
-{
-  return *this;
-}
-
 // @brief import しているモジュールを追加する．
 // @param[in] module モジュール
-void
+// @return モジュール番号を返す．
+ymuint
 IrToplevel::add_imported_module(VsmModule* module)
 {
+  ymuint id = mModuleList.size();
   mModuleList.push_back(module);
+  return id;
 }
 
 // @brief 変数を追加する．
@@ -63,9 +59,19 @@ IrToplevel::add_var(IrHandle* var)
 void
 IrToplevel::add_function(IrFuncBlock* func)
 {
-  ymuint index = mFuncList.size();
-  func->func_handle()->set_index(index);
   mFuncList.push_back(func);
+}
+
+// @brief 関数テーブルに登録する．
+// @param[in] func_handle 関数ハンドル
+void
+IrToplevel::reg_function(IrHandle* func_handle)
+{
+  if ( !func_handle->has_index() ) {
+    ymuint index = mFuncTable.size();
+    func_handle->set_index(index);
+    mFuncTable.push_back(func_handle);
+  }
 }
 
 // @brief import しているモジュールのリストを返す．

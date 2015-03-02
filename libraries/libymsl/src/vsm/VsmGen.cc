@@ -51,7 +51,7 @@ VsmGen::code_gen(const IrToplevel* toplevel,
   for (vector<VsmModule*>::const_iterator p = module_list.begin();
        p != module_list.end(); ++ p) {
     VsmModule* sub_module = *p;
-    module_builder.add_imported_module(sub_module);
+    ymuint module_id = module_builder.add_module(sub_module);
   }
 
   // 関数のコードを作る．
@@ -65,7 +65,7 @@ VsmGen::code_gen(const IrToplevel* toplevel,
     ShString name = func_handle->name();
     const Type* type = func_handle->value_type();
     VsmFunction* func = new VsmNativeFunc(name, type, code_builder);
-    module_builder.add_exported_function(func);
+    module_builder.add_function(func);
   }
 
   VsmModule* module = new VsmNativeModule(module_builder, toplevel_builder);

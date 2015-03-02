@@ -55,7 +55,7 @@ YmslCompiler::compile(IDO& ido,
   // 中間表現を作る．
   AstStatement* ast_toplevel = ast_mgr.toplevel();
   IrToplevel* ir_toplevel = new IrToplevel;
-  bool stat2 = ir_mgr.elaborate(ast_toplevel, name, *ir_toplevel);
+  bool stat2 = ir_mgr.elaborate(ast_toplevel, name, ir_toplevel);
   if ( !stat2 ) {
     return NULL;
   }

@@ -35,14 +35,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief トップレベルのブロックを返す．
-  virtual
-  IrToplevel&
-  toplevel();
-
   /// @brief import しているモジュールを追加する．
   /// @param[in] module モジュール
-  void
+  /// @return モジュール番号を返す．
+  ymuint
   add_imported_module(VsmModule* module);
 
   /// @brief 変数を追加する．
@@ -55,6 +51,11 @@ public:
   /// @param[in] func 関数
   void
   add_function(IrFuncBlock* func);
+
+  /// @brief 関数テーブルに登録する．
+  /// @param[in] func_handle 関数ハンドル
+  void
+  reg_function(IrHandle* func_handle);
 
   /// @brief import しているモジュールのリストを返す．
   const vector<VsmModule*>&
@@ -88,6 +89,9 @@ private:
 
   // 関数のリスト
   vector<IrFuncBlock*> mFuncList;
+
+  // 関数テーブル
+  vector<IrHandle*> mFuncTable;
 
 };
 

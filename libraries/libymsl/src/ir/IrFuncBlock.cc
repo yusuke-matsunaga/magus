@@ -17,15 +17,12 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] toplevel トップレベルブロック
 // @param[in] arg_list 引数のリスト
 // @param[in] arg_init_list 引数のデフォルト値のリスト
 // @param[in] func_handle 関数のハンドル
-IrFuncBlock::IrFuncBlock(IrToplevel& toplevel,
-			 const vector<IrHandle*>& arg_list,
+IrFuncBlock::IrFuncBlock(const vector<IrHandle*>& arg_list,
 			 const vector<IrNode*>& arg_init_list,
 			 IrHandle* func_handle) :
-  mToplevel(toplevel),
   mArgList(arg_list),
   mArgInitList(arg_init_list),
   mFuncHandle(func_handle)
@@ -35,13 +32,6 @@ IrFuncBlock::IrFuncBlock(IrToplevel& toplevel,
 // @brief デストラクタ
 IrFuncBlock::~IrFuncBlock()
 {
-}
-
-// @brief トップレベルのブロックを返す．
-IrToplevel&
-IrFuncBlock::toplevel()
-{
-  return mToplevel;
 }
 
 // @brief 関数のハンドルを返す．

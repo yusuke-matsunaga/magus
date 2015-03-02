@@ -9,8 +9,7 @@
 /// All rights reserved.
 
 
-#include "IrHandle.h"
-#include "YmUtils/ShString.h"
+#include "IrIndexHandle.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -20,7 +19,7 @@ BEGIN_NAMESPACE_YM_YMSL
 /// @brief Var を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
 class IrVarHandle :
-  public IrHandle
+  public IrIndexHandle
 {
 public:
 
@@ -28,9 +27,11 @@ public:
   /// @param[in] name 変数名
   /// @param[in] value_type 型
   /// @param[in] global グローバル変数の時 true とするフラグ
+  /// @param[in] var_addr 変数のアドレス
   IrVarHandle(ShString name,
 	      const Type* value_type,
-	      bool global);
+	      bool global,
+	      VsmValue* var_addr);
 
   /// @brief デストラクタ
   virtual
@@ -41,11 +42,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 名前を返す．
-  virtual
-  ShString
-  name() const;
 
   /// @brief 種類を返す．
   virtual
@@ -59,29 +55,18 @@ public:
   bool
   is_static() const;
 
-  /// @brief 型を得る．
-  ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  const Type*
-  value_type() const;
-
   /// @brief グローバル変数の時に true を返す．
   ///
   /// kVar のみ有効
   bool
   is_global() const;
 
-  /// @brief インデックスを返す．
+  /// @brief 変数本体を返す．
   ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  ymuint
-  index() const;
-
-  /// @brief インデックスを設定する．
-  ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  void
-  set_index(ymuint index);
+  /// kVar かつ is_global() == true の時のみ有効
+  virtual
+  VsmValue*
+  variable() const;
 
 
 private:
@@ -89,17 +74,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 名前
-  ShString mName;
-
-  // 型
-  const Type* mValueType;
-
   // グローバルフラグ
   bool mGlobal;
 
-  // インデックス
-  ymuint mIndex;
+  // 変数のアドレス
+  VsmValue* mVarAddr;
 
 };
 

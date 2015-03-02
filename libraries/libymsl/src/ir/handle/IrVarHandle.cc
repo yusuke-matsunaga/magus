@@ -20,25 +20,20 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] name 変数名
 // @param[in] value_type 型
 // @param[in] global グローバル変数の時 true とするフラグ
+// @param[in] var_addr 変数のアドレス
 IrVarHandle::IrVarHandle(ShString name,
 			 const Type* value_type,
-			 bool global) :
-  mName(name),
-  mValueType(value_type),
-  mGlobal(global)
+			 bool global,
+			 VsmValue* var_addr) :
+  IrIndexHandle(name, value_type),
+  mGlobal(global),
+  mVarAddr(var_addr)
 {
 }
 
 // @brief デストラクタ
 IrVarHandle::~IrVarHandle()
 {
-}
-
-// @brief 名前を返す．
-ShString
-IrVarHandle::name() const
-{
-  return mName;
 }
 
 // @brief 種類を返す．
@@ -57,15 +52,6 @@ IrVarHandle::is_static() const
   return false;
 }
 
-// @brief 型を得る．
-//
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-const Type*
-IrVarHandle::value_type() const
-{
-  return mValueType;
-}
-
 // @brief グローバル変数の時に true を返す．
 //
 // kVar のみ有効
@@ -75,22 +61,13 @@ IrVarHandle::is_global() const
   return mGlobal;
 }
 
-// @brief インデックスを返す．
+// @brief 変数本体を返す．
 //
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-ymuint
-IrVarHandle::index() const
+// kVar かつ is_global() == true の時のみ有効
+VsmValue*
+IrVarHandle::variable() const
 {
-  return mIndex;
-}
-
-// @brief インデックスを設定する．
-//
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-void
-IrVarHandle::set_index(ymuint index)
-{
-  mIndex = index;
+  return mVarAddr;
 }
 
 END_NAMESPACE_YM_YMSL

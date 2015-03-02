@@ -43,7 +43,7 @@ ir_test1(IDO& ido)
 
   IrMgr ir_mgr;
   IrToplevel ir_toplevel;
-  bool stat2 = ir_mgr.elaborate(ast_toplevel, ShString("__main__"), ir_toplevel);
+  bool stat2 = ir_mgr.elaborate(ast_toplevel, ShString("__main__"), &ir_toplevel);
   if ( !stat2 ) {
     return 2;
   }
@@ -65,6 +65,7 @@ ir_test(int argc,
       "for (a = 0; a < 10; a ++) {"
       "if c % 2 == 1 {"
       "c = c + a;"
+      "c = f2(c);"
       "}"
       "else {"
       "c = f(c + a + 1);"
@@ -78,7 +79,13 @@ ir_test(int argc,
       " k2 = k1 + 1"
       "}"
       "return a * ktype.k2;"
-      "}";
+      "}"
+      ""
+      "function f2(a:float):float"
+      "{"
+      "return a / 2.0;"
+      "}"
+      ;
 
     StringIDO ido(str);
     return ir_test1(ido);

@@ -67,7 +67,7 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   for (ymuint i = 0; i < nf; ++ i) {
     IrFuncBlock* ir_func = func_list[i];
     mS << endl;
-    mS << "function " << ir_func->func_handle()->name() << endl;
+    mS << "function #" << ir_func->func_handle()->index() << ": " << ir_func->func_handle()->name() << endl;
     const vector<IrNode*>& node_list = ir_func->node_list();
     print_node_list(node_list);
   }
@@ -133,7 +133,6 @@ IrPrinter::dfs_node(IrNode* node,
     break;
 
   case IrNode::kFuncCall:
-    dfs_handle(node->func_addr(), node_list);
     {
       ymuint n = node->arglist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -395,8 +394,7 @@ IrPrinter::print_node(IrNode* node)
     break;
 
   case IrNode::kFuncCall:
-    mS << "func_call ";
-    print_handle(node->func_addr());
+    mS << "func_call #" << node->function_index();
     {
       ymuint n = node->arglist_num();
       for (ymuint i = 0; i < n; ++ i) {

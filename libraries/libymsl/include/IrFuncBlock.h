@@ -25,12 +25,10 @@ class IrFuncBlock :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] toplevel トップレベルブロック
   /// @param[in] arg_list 引数のリスト
   /// @param[in] arg_init_list 引数のデフォルト値のリスト
   /// @param[in] func_handle 関数のハンドル
-  IrFuncBlock(IrToplevel& toplevel,
-	      const vector<IrHandle*>& arg_list,
+  IrFuncBlock(const vector<IrHandle*>& arg_list,
 	      const vector<IrNode*>& arg_init_list,
 	      IrHandle* func_handle);
 
@@ -42,11 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief トップレベルのブロックを返す．
-  virtual
-  IrToplevel&
-  toplevel();
 
   /// @brief 関数のハンドルを返す．
   IrHandle*
@@ -63,9 +56,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // トップレベルブロック
-  IrToplevel& mToplevel;
 
   // 引数のリスト
   vector<IrHandle*> mArgList;

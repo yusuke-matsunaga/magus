@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "VsmValue.h"
 #include "TypeMgr.h"
 #include "YmUtils/ShString.h"
 #include "YmUtils/HashMap.h"
@@ -45,13 +46,13 @@ public:
   /// @brief 抽象構文木から中間表現を生成する．
   /// @param[in] ast_root 抽象構文木の根のノード
   /// @param[in] name モジュール名
-  /// @param[in] code_block 生成された中間表現を格納するオブジェクト
+  /// @param[in] toplevel トップレベルのコードを格納するオブジェクト
   ///
   /// エラーが起きたら false を返す．
   bool
   elaborate(const AstStatement* ast_root,
 	    ShString name,
-	    IrToplevel& code_block);
+	    IrToplevel* toplevel);
 
 
 private:
@@ -75,23 +76,27 @@ private:
   /// @param[in] expr 式
   /// @param[in] scope 現在のスコープ
   /// @param[in] node 関数呼び出しノード
+  /// @param[in] toplevel トップレベルのコードを格納するオブジェクト
   bool
   resolve_func(const AstExpr* expr,
 	       Scope* scope,
-	       IrNode* node);
+	       IrNode* node,
+	       IrToplevel* toplevel);
 
   /// @brief 要素の生成を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
   /// @param[in] start_label ブロックの開始ラベル
   /// @param[in] end_label ブロックの終了ラベル
+  /// @param[in] toplevel トップレベルのコードを格納するオブジェクト
   /// @param[in] code_block 生成された中間表現を格納するオブジェクト
   void
   elab_stmt(const AstStatement* stmt,
 	    Scope* scope,
 	    IrNode* start_label,
 	    IrNode* end_label,
-	    IrCodeBlock& code_block);
+	    IrToplevel* toplevel,
+	    IrCodeBlock* code_block);
 
   /// @brief 名前がローカルに重複していないかチェックする．
   /// @param[in] ast_name 名前を表す AST
@@ -114,13 +119,13 @@ private:
   /// @brief 関数の定義を行う．
   /// @param[in] stmt 文
   /// @param[in] scope 現在のスコープ
-  /// @param[in] code_block 生成された中間表現を格納するオブジェクト
+  /// @param[in] toplevel トップレベルのコードを格納するオブジェクト
   ///
   /// stmt は kFuncDecl でなければならない．
   void
   reg_func(const AstStatement* stmt,
 	   Scope* scope,
-	   IrCodeBlock& code_block);
+	   IrToplevel* toplevel);
 
   /// @brief 定数の定義を行う．
   /// @param[in] name_symbol 名前
@@ -221,11 +226,9 @@ private:
 		   IrNode* opr);
 
   /// @brief 関数呼び出し式を生成する．
-  /// @param[in] func_addr 関数アドレス
   /// @param[in] arglist 引数のリスト
   IrNode*
-  new_FuncCall(IrHandle* func_addr,
-	       const vector<IrNode*>& arglist);
+  new_FuncCall(const vector<IrNode*>& arglist);
 
   /// @brief リターン命令を生成する．
   /// @param[in] ret_val 返り値
@@ -272,17 +275,21 @@ private:
   /// @param[in] name 変数名
   /// @param[in] value_type 型
   /// @param[in] global グローバル変数の時 true とするフラグ
+  /// @param[in] var_addr 変数のアドレス
   IrHandle*
   new_VarHandle(ShString name,
 		const Type* value_type,
-		bool global);
+		bool global,
+		VsmValue* var_addr);
 
   /// @brief 関数参照を生成する．
   /// @param[in] name 変数名
   /// @param[in] value_type 型
+  /// @param[in] func 関数本体
   IrHandle*
   new_FuncHandle(ShString name,
-		 const Type* value_type);
+		 const Type* value_type,
+		 const VsmFunction* func);
 
   /// @brief ブール定数を生成する．
   /// @param[in] name 名前

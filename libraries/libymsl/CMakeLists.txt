@@ -92,11 +92,11 @@ set (ymsl_SOURCES
   src/ir/IrMgr_node.cc
   src/ir/IrMgr_stmt.cc
   src/ir/IrInterp.cc
-  src/ir/IrNode.cc
   src/ir/IrPrinter.cc
 
   src/ir/handle/IrHandle.cc
   src/ir/handle/IrBooleanConst.cc
+  src/ir/handle/IrIndexHandle.cc
   src/ir/handle/IrIntConst.cc
   src/ir/handle/IrFloatConst.cc
   src/ir/handle/IrStringConst.cc
@@ -108,6 +108,7 @@ set (ymsl_SOURCES
   src/ir/handle/IrArrayRef.cc
   src/ir/handle/IrMemberRef.cc
 
+  src/ir/node/IrNode.cc
   src/ir/node/IrLoad.cc
   src/ir/node/IrStore.cc
   src/ir/node/IrOp.cc

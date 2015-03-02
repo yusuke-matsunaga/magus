@@ -37,13 +37,15 @@ BEGIN_NAMESPACE_YM_YMSL
 // @param[in] scope 現在のスコープ
 // @param[in] start_label ブロックの開始ラベル
 // @param[in] end_label ブロックの終了ラベル
+// @param[in] toplevel トップレベルのコードを格納するオブジェクト
 // @param[in] code_block 生成された中間表現を格納するオブジェクト
 void
 IrMgr::elab_stmt(const AstStatement* stmt,
 		 Scope* scope,
 		 IrNode* start_label,
 		 IrNode* end_label,
-		 IrCodeBlock& code_block)
+		 IrToplevel* toplevel,
+		 IrCodeBlock* code_block)
 {
   switch ( stmt->stmt_type() ) {
   case AstStatement::kBlock:
@@ -52,7 +54,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->stmtlist_num();
       for (ymuint i = 0; i < n; ++ i) {
 	const AstStatement* stmt1 = stmt->stmtlist_elem(i);
-	elab_stmt(stmt1, block_scope, start_label, end_label, code_block);
+	elab_stmt(stmt1, block_scope, start_label, end_label, toplevel, code_block);
       }
     }
     break;
@@ -64,7 +66,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	return;
       }
       IrNode* node = new_Jump(end_label);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -79,7 +81,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	return;
       }
       IrNode* node = new_Jump(start_label);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -93,7 +95,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       // lhs_handle の指しているものが int 型の変数かチェック
 
       IrNode* node = new_InplaceUniOp(kOpDec, lhs_handle);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -101,12 +103,12 @@ IrMgr::elab_stmt(const AstStatement* stmt,
     {
       IrNode* start1 = new_Label();
       IrNode* end1 = new_Label();
-      code_block.add_node(start1);
-      elab_stmt(stmt->stmt(), scope, start1, end1, code_block);
+      code_block->add_node(start1);
+      elab_stmt(stmt->stmt(), scope, start1, end1, toplevel, code_block);
       IrNode* cond = elab_expr(stmt->expr(), scope);
       IrNode* node1 = new_BranchTrue(start1, cond);
-      code_block.add_node(node1);
-      code_block.add_node(end1);
+      code_block->add_node(node1);
+      code_block->add_node(end1);
     }
     break;
 
@@ -130,7 +132,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       // lhs_handle->type() と rhs->type() のチェック
       // 必要ならキャスト
       IrNode* node = new_Store(lhs_handle, rhs);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -151,37 +153,37 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       // 必要ならキャスト
       OpCode opcode = stmt->opcode();
       IrNode* node = new_InplaceBinOp(opcode, lhs_handle, rhs);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
   case AstStatement::kExpr:
     {
       IrNode* node = elab_expr(stmt->expr(), scope);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
   case AstStatement::kFor:
     {
       Scope* for_scope = new_scope(scope);
-      elab_stmt(stmt->init_stmt(), for_scope, NULL, NULL, code_block);
+      elab_stmt(stmt->init_stmt(), for_scope, NULL, NULL, toplevel, code_block);
       IrNode* start1 = new_Label();
-      code_block.add_node(start1);
+      code_block->add_node(start1);
       IrNode* end1 = new_Label();
       IrNode* cond = elab_expr(stmt->expr(), for_scope);
       IrNode* node1 = new_BranchFalse(end1, cond);
-      code_block.add_node(node1);
-      elab_stmt(stmt->stmt(), for_scope, start1, end1, code_block);
-      elab_stmt(stmt->next_stmt(), for_scope, start1, end1, code_block);
+      code_block->add_node(node1);
+      elab_stmt(stmt->stmt(), for_scope, start1, end1, toplevel, code_block);
+      elab_stmt(stmt->next_stmt(), for_scope, start1, end1, toplevel, code_block);
       IrNode* node2 = new_Jump(start1);
-      code_block.add_node(node2);
-      code_block.add_node(end1);
+      code_block->add_node(node2);
+      code_block->add_node(end1);
     }
     break;
 
   case AstStatement::kFuncDecl:
-    reg_func(stmt, scope, code_block);
+    reg_func(stmt, scope, toplevel);
     break;
 
   case AstStatement::kGoto:
@@ -204,7 +206,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	}
       }
       IrNode* node = new_Jump(label_node);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -214,13 +216,13 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       IrNode* label1 = new_Label();
       IrNode* label2 = new_Label();
       IrNode* node1 = new_BranchFalse(label1, cond);
-      code_block.add_node(node1);
-      elab_stmt(stmt->stmt(), scope, start_label, end_label, code_block);
+      code_block->add_node(node1);
+      elab_stmt(stmt->stmt(), scope, start_label, end_label, toplevel, code_block);
       IrNode* node2 = new_Jump(label2);
-      code_block.add_node(node2);
-      code_block.add_node(label1);
-      elab_stmt(stmt->else_stmt(), scope, start_label, end_label, code_block);
-      code_block.add_node(label2);
+      code_block->add_node(node2);
+      code_block->add_node(label1);
+      elab_stmt(stmt->else_stmt(), scope, start_label, end_label, toplevel, code_block);
+      code_block->add_node(label2);
     }
     break;
 
@@ -236,7 +238,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	return;
       }
       IrNode* node = new_InplaceUniOp(kOpInc, lhs_handle);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -262,7 +264,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	}
       }
       label_node->set_defined();
-      code_block.add_node(label_node);
+      code_block->add_node(label_node);
     }
     break;
 
@@ -277,7 +279,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	ret_val = elab_expr(expr, scope);
       }
       IrNode* node = new_Return(ret_val);
-      code_block.add_node(node);
+      code_block->add_node(node);
     }
     break;
 
@@ -287,7 +289,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       ymuint n = stmt->switch_num();
       for (ymuint i = 0; i < n; ++ i) {
 	vector<IrNode*> node_list1;
-	elab_stmt(stmt->case_stmt(i), scope, start_label, end_label, code_block);
+	elab_stmt(stmt->case_stmt(i), scope, start_label, end_label, toplevel, code_block);
       }
     }
     break;
@@ -314,9 +316,9 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       ShString name = ast_name->str_val();
       bool global = (scope->global_scope() == NULL);
 
-      IrHandle* h = new_VarHandle(name, type, global);
+      IrHandle* h = new_VarHandle(name, type, global, NULL);
       scope->add(h);
-      code_block.add_var(h);
+      code_block->add_var(h);
 
       const AstExpr* ast_expr = stmt->expr();
       if ( ast_expr != NULL ) {
@@ -326,7 +328,7 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 	  return;
 	}
 	IrNode* node = new_Store(h, expr);
-	code_block.add_node(node);
+	code_block->add_node(node);
       }
     }
     break;
@@ -334,15 +336,15 @@ IrMgr::elab_stmt(const AstStatement* stmt,
   case AstStatement::kWhile:
     {
       IrNode* start1 = new_Label();
-      code_block.add_node(start1);
+      code_block->add_node(start1);
       IrNode* cond = elab_expr(stmt->expr(), scope);
       IrNode* end1 = new_Label();
       IrNode* node1 = new_BranchFalse(end1, cond);
-      code_block.add_node(node1);
-      elab_stmt(stmt->stmt(), scope, start1, end1, code_block);
+      code_block->add_node(node1);
+      elab_stmt(stmt->stmt(), scope, start1, end1, toplevel, code_block);
       IrNode* node2 = new_Jump(start1);
-      code_block.add_node(node2);
-      code_block.add_node(end1);
+      code_block->add_node(node2);
+      code_block->add_node(end1);
     }
     break;
 
@@ -465,14 +467,13 @@ IrMgr::reg_enum(const AstStatement* stmt,
 // @brief 関数の定義を行う．
 // @param[in] stmt 文
 // @param[in] scope 現在のスコープ
-// @param[in] code_block 生成された中間表現を格納するオブジェクト
+// @param[in] toplevel トップレベルのコードを格納するオブジェクト
 //
 // stmt は kFuncDecl でなければならない．
 void
 IrMgr::reg_func(const AstStatement* stmt,
 		Scope* scope,
-		IrCodeBlock& code_block)
-
+		IrToplevel* toplevel)
 {
   ASSERT_COND( stmt->stmt_type() == AstStatement::kFuncDecl );
 
@@ -528,7 +529,7 @@ IrMgr::reg_func(const AstStatement* stmt,
   vector<IrHandle*> arg_list(np);
   vector<IrNode*> arg_init_list(np);
   for (ymuint i = 0; i < np; ++ i) {
-    IrHandle* h = new_VarHandle(input_name_list[i], input_type_list[i], false);
+    IrHandle* h = new_VarHandle(input_name_list[i], input_type_list[i], false, NULL);
     func_scope->add(h);
     arg_list[i] =  h;
 
@@ -545,16 +546,15 @@ IrMgr::reg_func(const AstStatement* stmt,
     arg_init_list[i] = node;
   }
 
-  IrHandle* h = new_FuncHandle(name, ftype);
+  IrHandle* h = new_FuncHandle(name, ftype, NULL);
   scope->add(h);
 
-  IrToplevel& toplevel = code_block.toplevel();
   // 関数の内部表現の生成
-  IrFuncBlock* ir_func = new IrFuncBlock(toplevel, arg_list, arg_init_list, h);
-  toplevel.add_function(ir_func);
+  IrFuncBlock* ir_func = new IrFuncBlock(arg_list, arg_init_list, h);
+  toplevel->add_function(ir_func);
 
   // 関数内部のノードの生成
-  elab_stmt(stmt->stmt(), func_scope, NULL, NULL, *ir_func);
+  elab_stmt(stmt->stmt(), func_scope, NULL, NULL, toplevel, ir_func);
 }
 
 // @brief 定数の定義を行う．

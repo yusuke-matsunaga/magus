@@ -64,13 +64,13 @@ IrMgr::clear()
 // @brief 抽象構文木から中間表現を生成する．
 // @param[in] ast_root 抽象構文木の根のノード
 // @param[in] toplevel_scope トップレベルのスコープ
-// @param[in] code_block 生成された中間表現を格納するオブジェクト
+// @param[in] toplevel_block トップレベルのコードを格納するオブジェクト
 //
 // エラーが起きたら false を返す．
 bool
 IrMgr::elaborate(const AstStatement* ast_root,
 		 ShString name,
-		 IrToplevel& toplevel_block)
+		 IrToplevel* toplevel_block)
 {
   ASSERT_COND( ast_root->stmt_type() == AstStatement::kToplevel );
 
@@ -80,6 +80,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
   // 中間表現を作る．
   Scope* toplevel_scope = new_scope(NULL, name);
 
+  // import 文の処理
   ymuint head_num = ast_root->headlist_num();
   for (ymuint i = 0; i < head_num; ++ i) {
     const AstStatement* stmt = ast_root->headlist_elem(i);
@@ -92,7 +93,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
 	pair<VsmModule*, Scope*> p = import_module(module_name);
 	VsmModule* module = p.first;
 	Scope* scope = p.second;
-	toplevel_block.add_imported_module(module);
+	toplevel_block->add_imported_module(module);
 	ShString alias_name = module_name;
 	if ( alias_symbol != NULL ) {
 	  alias_name = alias_symbol->str_val();
@@ -108,11 +109,14 @@ IrMgr::elaborate(const AstStatement* ast_root,
     }
   }
 
+  // 本体の処理
   ymuint stmt_num = ast_root->stmtlist_num();
   for (ymuint i = 0; i < stmt_num; ++ i) {
     const AstStatement* stmt = ast_root->stmtlist_elem(i);
-    elab_stmt(stmt, toplevel_scope, NULL, NULL, toplevel_block);
+    elab_stmt(stmt, toplevel_scope, NULL, NULL, toplevel_block, toplevel_block);
   }
+
+  // グローバル関数をテーブルに登録
 
   // 関数呼び出しの解決を行う．
   for (vector<FuncCallStub>::iterator p = mFuncCallList.begin();
@@ -120,7 +124,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
     const AstExpr* func_expr = p->mExpr;
     Scope* scope = p->mScope;
     IrNode* node = p->mNode;
-    resolve_func(func_expr, scope, node);
+    resolve_func(func_expr, scope, node, toplevel_block);
   }
 
   // ラベルの解決が行われているかチェックする．
@@ -181,7 +185,7 @@ IrMgr::module2scope(VsmModule* module,
   for (ymuint i = 0; i < module->exported_function_num(); ++ i) {
     VsmFunction* func = module->exported_function(i);
 
-    IrHandle* h = new_FuncHandle(func->name(), func->type());
+    IrHandle* h = new_FuncHandle(func->name(), func->type(), func);
     scope->add(h);
   }
   for (ymuint i = 0; i < module->exported_variable_num(); ++ i) {
@@ -195,10 +199,12 @@ IrMgr::module2scope(VsmModule* module,
 // @param[in] expr 式
 // @param[in] scope 現在のスコープ
 // @param[in] node 関数呼び出しノード
+// @param[in] toplevel トップレベルのコードを格納するオブジェクト
 bool
 IrMgr::resolve_func(const AstExpr* expr,
 		    Scope* scope,
-		    IrNode* node)
+		    IrNode* node,
+		    IrToplevel* toplevel)
 {
   IrHandle* h = elab_primary(expr, scope);
   if ( h == NULL ) {
@@ -213,8 +219,10 @@ IrMgr::resolve_func(const AstExpr* expr,
   // func の型と node の arglist の型をチェック
   // 場合によってはキャストノードを挿入する．
 
-  // node に func をセット
-  node->set_func_addr(h);
+  // node に関数インデックスをセット
+  toplevel->reg_function(h);
+  ymuint index = h->index();
+  node->set_function_index(index);
   return true;
 }
 

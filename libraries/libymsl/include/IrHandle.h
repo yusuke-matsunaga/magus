@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "VsmValue.h"
 #include "YmUtils/ShString.h"
 
 
@@ -91,12 +92,12 @@ public:
   const Type*
   value_type() const;
 
-  /// @brief グローバル変数の時に true を返す．
+  /// @brief インデックスが設定されていたら true を返す．
   ///
-  /// kVar のみ有効
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
   virtual
   bool
-  is_global() const;
+  has_index() const;
 
   /// @brief インデックスを返す．
   ///
@@ -111,6 +112,27 @@ public:
   virtual
   void
   set_index(ymuint index);
+
+  /// @brief グローバル変数の時に true を返す．
+  ///
+  /// kVar のみ有効
+  virtual
+  bool
+  is_global() const;
+
+  /// @brief 変数本体を返す．
+  ///
+  /// kVar かつ is_global() == true の時のみ有効
+  virtual
+  VsmValue*
+  variable() const;
+
+  /// @brief 関数本体を返す．
+  ///
+  /// kFunction, kMethodRef のみ有効
+  virtual
+  const VsmFunction*
+  function() const;
 
   /// @brief ブール値を返す．
   ///

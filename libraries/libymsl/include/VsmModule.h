@@ -45,17 +45,20 @@ public:
 
     /// @brief import しているモジュールを追加する．
     /// @param[in] module import しているモジュール
-    void
-    add_imported_module(VsmModule* module);
+    /// @return モジュール番号を返す．
+    ymuint
+    add_module(VsmModule* module);
 
-    /// @brief export している関数を追加する．
-    /// @param[in] func export している関数
-    void
-    add_exported_function(VsmFunction* func);
+    /// @brief 関数を追加する．
+    /// @param[in] func 追加する関数
+    /// @return 関数番号を返す．
+    ymuint
+    add_function(VsmFunction* func);
 
     /// @brief export している変数を追加する．
     /// @param[in] var export している変数
-    void
+    /// @return 変数番号を返す．
+    ymuint
     add_exported_var(VsmVar* var);
 
     /// @brief 名前を返す．
@@ -166,8 +169,13 @@ private:
   // export している関数の数
   ymuint mExportedFuncNum;
 
-  // export している関数の配列
-  VsmFunction** mExportedFuncList;
+  // 登録されている全ての関数の数
+  ymuint mFuncNum;
+
+  // 関数テーブル
+  // mFuncTable[0] 〜 mFuncTable[mFuncNum - 1]
+  // は export している関数リストを兼ねる．
+  VsmFunction** mFuncTable;
 
   // export している変数の数
   ymuint mExportedVarNum;

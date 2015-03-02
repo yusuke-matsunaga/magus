@@ -89,7 +89,7 @@ IrMgr::elab_expr(const AstExpr* ast_expr,
 	arglist[i] = arg;
       }
       // IrNode だけ作っておいて関数名の解決はあとで行う．
-      node = new_FuncCall(NULL, arglist);
+      node = new_FuncCall(arglist);
       mFuncCallList.push_back(FuncCallStub(func_expr, scope, node));
       return node;
     }

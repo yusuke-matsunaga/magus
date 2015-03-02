@@ -17,13 +17,11 @@ BEGIN_NAMESPACE_YM_YMSL
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] func_addr 関数アドレス
 // @param[in] arglist 引数リスト
-IrFuncCall::IrFuncCall(IrHandle* func_addr,
-		       const vector<IrNode*>& arglist) :
-  IrNode(kFuncCall, NULL),
-  mFuncAddr(func_addr)
+IrFuncCall::IrFuncCall(const vector<IrNode*>& arglist) :
+  IrNode(kFuncCall, NULL)
 {
+  mIndex = 0;
   mArgNum = arglist.size();
   mArgList = new IrNode*[mArgNum];
   for (ymuint i = 0; i < mArgNum; ++ i) {
@@ -48,22 +46,23 @@ IrFuncCall::is_static() const
   return false;
 }
 
-// @brief 関数アドレスを設定する．
+// @brief 関数インデックスを設定する．
+// @param[in] index 関数インデックス
 //
 // kFuncCall のみ有効
 void
-IrFuncCall::set_func_addr(IrHandle* handle)
+IrFuncCall::set_function_index(ymuint index)
 {
-  mFuncAddr = handle;
+  mIndex = index;
 }
 
-// @brief 関数アドレスを返す．
+// @brief 関数インデックスを返す．
 //
-// kOpFuncCall のみ有効
-IrHandle*
-IrFuncCall::func_addr() const
+// kFuncCall のみ有効
+ymuint
+IrFuncCall::function_index() const
 {
-  return mFuncAddr;
+  return mIndex;
 }
 
 // @brief 関数の引数の数を得る．

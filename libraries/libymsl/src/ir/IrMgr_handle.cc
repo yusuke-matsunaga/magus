@@ -43,24 +43,28 @@ IrMgr::new_ScopeHandle(ShString name,
 // @param[in] name 変数名
 // @param[in] value_type 型
 // @param[in] global グローバル変数の時 true とするフラグ
+// @param[in] var_addr 変数のアドレス
 IrHandle*
 IrMgr::new_VarHandle(ShString name,
 		     const Type* value_type,
-		     bool global)
+		     bool global,
+		     VsmValue* var_addr)
 {
   void* p = mAlloc.get_memory(sizeof(IrVarHandle));
-  return new (p) IrVarHandle(name, value_type, global);
+  return new (p) IrVarHandle(name, value_type, global, var_addr);
 }
 
 // @brief 関数参照を生成する．
 // @param[in] name 変数名
 // @param[in] value_type 型
+// @param[in] func 関数本体
 IrHandle*
 IrMgr::new_FuncHandle(ShString name,
-		      const Type* value_type)
+		      const Type* value_type,
+		      const VsmFunction* func)
 {
   void* p = mAlloc.get_memory(sizeof(IrFuncHandle));
-  return new (p) IrFuncHandle(name, value_type);
+  return new (p) IrFuncHandle(name, value_type, func);
 }
 
 // @brief ブール定数を生成する．

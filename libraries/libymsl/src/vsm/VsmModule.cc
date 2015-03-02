@@ -31,26 +31,35 @@ VsmModule::Builder::~Builder()
 
 // @brief import しているモジュールを追加する．
 // @param[in] module import しているモジュール
-void
-VsmModule::Builder::add_imported_module(VsmModule* module)
+// @return モジュール番号を返す．
+ymuint
+VsmModule::Builder::add_module(VsmModule* module)
 {
+  ymuint id = mModuleList.size();
   mModuleList.push_back(module);
+  return id;
 }
 
-// @brief export している関数を追加する．
-// @param[in] func export している関数
-void
-VsmModule::Builder::add_exported_function(VsmFunction* func)
+// @brief 関数を追加する．
+// @param[in] func 追加する関数
+// @return 関数番号を返す．
+ymuint
+VsmModule::Builder::add_function(VsmFunction* func)
 {
+  ymuint id = mFuncList.size();
   mFuncList.push_back(func);
+  return id;
 }
 
 // @brief export している変数を追加する．
 // @param[in] var export している変数
-void
+// @return 変数番号を返す．
+ymuint
 VsmModule::Builder::add_exported_var(VsmVar* var)
 {
+  ymuint id = mVarList.size();
   mVarList.push_back(var);
+  return id;
 }
 
 // @brief 名前を返す．
@@ -100,9 +109,9 @@ VsmModule::VsmModule(Builder& builder) :
 
   const vector<VsmFunction*>& func_list = builder.exported_function_list();
   mExportedFuncNum = func_list.size();
-  mExportedFuncList = new VsmFunction*[mExportedFuncNum];
+  mFuncTable = new VsmFunction*[mExportedFuncNum];
   for (ymuint i = 0; i < mExportedFuncNum; ++ i) {
-    mExportedFuncList[i] = func_list[i];
+    mFuncTable[i] = func_list[i];
   }
 
   const vector<VsmVar*>& var_list = builder.exported_var_list();
@@ -117,13 +126,13 @@ VsmModule::VsmModule(Builder& builder) :
 VsmModule::~VsmModule()
 {
   for (ymuint i = 0; i < mExportedFuncNum; ++ i) {
-    delete mExportedFuncList[i];
+    delete mFuncTable;
   }
   for (ymuint i = 0; i < mExportedVarNum; ++ i) {
     delete mExportedVarList[i];
   }
   delete [] mImportedModuleList;
-  delete [] mExportedFuncList;
+  delete [] mFuncTable;
   delete [] mExportedVarList;
 }
 
@@ -163,7 +172,7 @@ VsmFunction*
 VsmModule::exported_function(ymuint pos) const
 {
   ASSERT_COND( pos < exported_function_num() );
-  return mExportedFuncList[pos];
+  return mFuncTable[pos];
 }
 
 // @brief このモジュールが export している変数の数を返す．
