@@ -3,7 +3,7 @@
 /// @brief IrIndexHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,12 +19,17 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 名前
 // @param[in] type 型
+// @param[in] module_index モジュールインデックス
+// @param[in] local_index ローカルインデックス
 IrIndexHandle::IrIndexHandle(ShString name,
-			     const Type* type) :
+			     const Type* type,
+			     ymuint module_index,
+			     ymuint local_index) :
   mName(name),
-  mType(type)
+  mType(type),
+  mModuleIndex(module_index),
+  mLocalIndex(local_index)
 {
-  mIndex = 0;
 }
 
 // @brief デストラクタ
@@ -48,31 +53,22 @@ IrIndexHandle::value_type() const
   return mType;
 }
 
-// @brief インデックスが設定されていたら true を返す．
+// @brief モジュールインデックスを返す．
 //
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-bool
-IrIndexHandle::has_index() const
+// kVar, kFunction のみ有効
+ymuint
+IrIndexHandle::module_index() const
 {
-  return static_cast<bool>(mIndex & 1U);
+  return mModuleIndex;
 }
 
-// @brief インデックスを返す．
+// @brief ローカルインデックスを返す．
 //
 // kVar, kFunction, kMemberRef, kMethodRef のみ有効
 ymuint
-IrIndexHandle::index() const
+IrIndexHandle::local_index() const
 {
-  return (mIndex >> 1);
-}
-
-// @brief インデックスを設定する．
-//
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-void
-IrIndexHandle::set_index(ymuint index)
-{
-  mIndex = (index << 1) | 1U;
+  return mLocalIndex;
 }
 
 END_NAMESPACE_YM_YMSL

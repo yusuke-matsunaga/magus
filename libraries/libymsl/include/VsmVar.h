@@ -1,8 +1,8 @@
-#ifndef IRCODEBLOCK_H
-#define IRCODEBLOCK_H
+#ifndef VSMVAR_H
+#define VSMVAR_H
 
-/// @file IrCodeBlock.h
-/// @brief IrCodeBlock のヘッダファイル
+/// @file VsmVar.h
+/// @brief VsmVar のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -10,26 +10,27 @@
 
 
 #include "ymsl_int.h"
+#include "YmUtils/ShString.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrCodeBlock IrCodeBlock.h "IrCodeBlock.h"
-/// @brief プログラムの中間表現
-///
-/// 派生クラスに IrToplevel と IrFunction がある．
+/// @class VsmVar VsmVar.h "VsmVar.h"
+/// @brief VSM の変数を表すクラス
 //////////////////////////////////////////////////////////////////////
-class IrCodeBlock
+class VsmVar
 {
 public:
 
   /// @brief コンストラクタ
-  IrCodeBlock();
+  /// @param[in] name 変数名
+  /// @param[in] type 型
+  VsmVar(ShString name,
+	 const Type* type);
 
   /// @brief デストラクタ
-  virtual
-  ~IrCodeBlock();
+  ~VsmVar();
 
 
 public:
@@ -37,27 +38,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 次のローカル変数インデックスを得る．
-  ymuint
-  next_local_index() const;
+  /// @brief 関数名を返す．
+  ShString
+  name() const;
 
-  /// @brief 変数を追加する．
-  /// @param[in] var 変数のハンドル
-  virtual
-  void
-  add_var(IrHandle* var);
-
-  /// @brief ノードを追加する．
-  void
-  add_node(IrNode* node);
-
-  /// @brief 変数のリストを得る．
-  const vector<IrHandle*>&
-  var_list() const;
-
-  /// @brief ノードのリストを得る．
-  const vector<IrNode*>&
-  node_list() const;
+  /// @brief 関数の型を返す．
+  const Type*
+  type() const;
 
 
 private:
@@ -71,14 +58,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数のリスト
-  vector<IrHandle*> mVarList;
+  // 変数名
+  ShString mName;
 
-  // 本体のノードリスト
-  vector<IrNode*> mNodeList;
+  // 型
+  const Type* mType;
 
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRCODEBLOCK_H
+#endif // VSMVAR_H

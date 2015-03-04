@@ -60,17 +60,14 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief モジュールを import する．
-  /// @param[in] name モジュール名
-  pair<VsmModule*, Scope*>
-  import_module(ShString name);
-
   /// @brief モジュールに対応するスコープを作る．
   /// @param[in] module モジュール
   /// @param[in] name 名前
+  /// @param[in] module_index モジュールインデックス
   Scope*
   module2scope(VsmModule* module,
-	       ShString name);
+	       ShString name,
+	       ymuint module_index);
 
   /// @brief 式から関数の解決を行う．
   /// @param[in] expr 式
@@ -274,22 +271,26 @@ private:
   /// @brief 変数参照を生成する．
   /// @param[in] name 変数名
   /// @param[in] value_type 型
+  /// @param[in] module_index モジュールインデックス
+  /// @param[in] local_index ローカルインデックス
   /// @param[in] global グローバル変数の時 true とするフラグ
-  /// @param[in] var_addr 変数のアドレス
   IrHandle*
   new_VarHandle(ShString name,
 		const Type* value_type,
-		bool global,
-		VsmValue* var_addr);
+		ymuint module_index,
+		ymuint local_index,
+		bool global);
 
   /// @brief 関数参照を生成する．
   /// @param[in] name 変数名
   /// @param[in] value_type 型
-  /// @param[in] func 関数本体
+  /// @param[in] module_index モジュールインデックス
+  /// @param[in] local_index ローカルインデックス
   IrHandle*
   new_FuncHandle(ShString name,
 		 const Type* value_type,
-		 const VsmFunction* func);
+		 ymuint module_index,
+		 ymuint local_index);
 
   /// @brief ブール定数を生成する．
   /// @param[in] name 名前

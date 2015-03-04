@@ -37,9 +37,12 @@ public:
 
   /// @brief import しているモジュールを追加する．
   /// @param[in] module モジュール
-  /// @return モジュール番号を返す．
-  ymuint
+  void
   add_imported_module(VsmModule* module);
+
+  /// @brief 次のグローバル変数インデックスを得る．
+  ymuint
+  next_global_index() const;
 
   /// @brief 変数を追加する．
   /// @param[in] var 変数のハンドル
@@ -47,15 +50,14 @@ public:
   void
   add_var(IrHandle* var);
 
+  /// @brief 次の関数インデックスを得る．
+  ymuint
+  next_func_index() const;
+
   /// @brief 関数を追加する．
   /// @param[in] func 関数
   void
   add_function(IrFuncBlock* func);
-
-  /// @brief 関数テーブルに登録する．
-  /// @param[in] func_handle 関数ハンドル
-  void
-  reg_function(IrHandle* func_handle);
 
   /// @brief import しているモジュールのリストを返す．
   const vector<VsmModule*>&

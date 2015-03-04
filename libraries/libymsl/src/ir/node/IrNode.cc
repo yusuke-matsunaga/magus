@@ -110,24 +110,24 @@ IrNode::store_val() const
   return NULL;
 }
 
-// @brief 関数インデックスを設定する．
-// @param[in] index 関数インデックス
+// @brief 関数のアドレスを設定する．
+// @param[in] func_handle 関数を表すハンドル
 //
 // kFuncCall のみ有効
 void
-IrNode::set_function_index(ymuint index)
+IrNode::set_function_address(IrHandle* func_handle)
 {
   ASSERT_NOT_REACHED;
 }
 
-// @brief 関数インデックスを返す．
+// @brief 関数のアドレスを返す．
 //
 // kFuncCall のみ有効
-ymuint
-IrNode::function_index() const
+IrHandle*
+IrNode::function_address() const
 {
   ASSERT_NOT_REACHED;
-  return 0;
+  return NULL;
 }
 
 // @brief 関数の引数の数を得る．

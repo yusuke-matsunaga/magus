@@ -19,15 +19,16 @@ BEGIN_NAMESPACE_YM_YMSL
 // @brief コンストラクタ
 // @param[in] name 変数名
 // @param[in] value_type 型
+// @param[in] module_index モジュールインデックス
+// @param[in] local_index ローカルインデックス
 // @param[in] global グローバル変数の時 true とするフラグ
-// @param[in] var_addr 変数のアドレス
 IrVarHandle::IrVarHandle(ShString name,
 			 const Type* value_type,
-			 bool global,
-			 VsmValue* var_addr) :
-  IrIndexHandle(name, value_type),
-  mGlobal(global),
-  mVarAddr(var_addr)
+			 ymuint module_index,
+			 ymuint local_index,
+			 bool global) :
+  IrIndexHandle(name, value_type, module_index, local_index),
+  mGlobal(global)
 {
 }
 
@@ -59,15 +60,6 @@ bool
 IrVarHandle::is_global() const
 {
   return mGlobal;
-}
-
-// @brief 変数本体を返す．
-//
-// kVar かつ is_global() == true の時のみ有効
-VsmValue*
-IrVarHandle::variable() const
-{
-  return mVarAddr;
 }
 
 END_NAMESPACE_YM_YMSL

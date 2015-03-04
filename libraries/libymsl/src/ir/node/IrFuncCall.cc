@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_YMSL
 IrFuncCall::IrFuncCall(const vector<IrNode*>& arglist) :
   IrNode(kFuncCall, NULL)
 {
-  mIndex = 0;
+  mFuncHandle = NULL;
   mArgNum = arglist.size();
   mArgList = new IrNode*[mArgNum];
   for (ymuint i = 0; i < mArgNum; ++ i) {
@@ -46,23 +46,23 @@ IrFuncCall::is_static() const
   return false;
 }
 
-// @brief 関数インデックスを設定する．
-// @param[in] index 関数インデックス
+// @brief 関数のアドレスを設定する．
+// @param[in] func_handle 関数を表すハンドル
 //
 // kFuncCall のみ有効
 void
-IrFuncCall::set_function_index(ymuint index)
+IrFuncCall::set_function_address(IrHandle* func_handle)
 {
-  mIndex = index;
+  mFuncHandle = func_handle;
 }
 
-// @brief 関数インデックスを返す．
+// @brief 関数のアドレスを返す．
 //
 // kFuncCall のみ有効
-ymuint
-IrFuncCall::function_index() const
+IrHandle*
+IrFuncCall::function_address() const
 {
-  return mIndex;
+  return mFuncHandle;
 }
 
 // @brief 関数の引数の数を得る．

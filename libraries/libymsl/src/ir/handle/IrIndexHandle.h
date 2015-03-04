@@ -5,7 +5,7 @@
 /// @brief IrIndexHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,8 +27,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 名前
   /// @param[in] type 型
+  /// @param[in] module_index モジュールインデックス
+  /// @param[in] local_index ローカルインデックス
   IrIndexHandle(ShString name,
-		const Type* type);
+		const Type* type,
+		ymuint module_index,
+		ymuint local_index);
 
   /// @brief デストラクタ
   virtual
@@ -51,24 +55,19 @@ public:
   const Type*
   value_type() const;
 
-  /// @brief インデックスが設定されていたら true を返す．
+  /// @brief モジュールインデックスを返す．
+  ///
+  /// kVar, kFunction のみ有効
+  virtual
+  ymuint
+  module_index() const;
+
+  /// @brief ローカルインデックスを返す．
   ///
   /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
   virtual
-  bool
-  has_index() const;
-
-  /// @brief インデックスを返す．
-  ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
   ymuint
-  index() const;
-
-  /// @brief インデックスを設定する．
-  ///
-  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-  void
-  set_index(ymuint index);
+  local_index() const;
 
 
 private:
@@ -82,9 +81,11 @@ private:
   // 型
   const Type* mType;
 
-  // インデックス
-  // 下位1ビットは設定されたかを示すフラグ
-  ymuint mIndex;
+  // モジュールインデックス
+  ymuint mModuleIndex;
+
+  // ローカルインデックス
+  ymuint mLocalIndex;
 
 };
 

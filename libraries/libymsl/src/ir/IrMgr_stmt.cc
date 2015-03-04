@@ -314,9 +314,16 @@ IrMgr::elab_stmt(const AstStatement* stmt,
       }
 
       ShString name = ast_name->str_val();
+      ymuint module_index = 0; // 自分自身は0
+      ymuint local_index = 0;
       bool global = (scope->global_scope() == NULL);
-
-      IrHandle* h = new_VarHandle(name, type, global, NULL);
+      if ( global ) {
+	local_index = toplevel->next_global_index();
+      }
+      else {
+	local_index = code_block->next_local_index();
+      }
+      IrHandle* h = new_VarHandle(name, type, module_index, local_index, global);
       scope->add(h);
       code_block->add_var(h);
 
@@ -525,11 +532,16 @@ IrMgr::reg_func(const AstStatement* stmt,
   ShString name = name_symbol->str_val();
   const Type* ftype = mTypeMgr.function_type(output_type, input_type_list);
 
+  // 自分自身のモジュール
+  ymuint module_index = 0;
+
   // 引数の生成
   vector<IrHandle*> arg_list(np);
   vector<IrNode*> arg_init_list(np);
   for (ymuint i = 0; i < np; ++ i) {
-    IrHandle* h = new_VarHandle(input_name_list[i], input_type_list[i], false, NULL);
+    ymuint local_index = i;
+    IrHandle* h = new_VarHandle(input_name_list[i], input_type_list[i],
+				module_index, local_index, false);
     func_scope->add(h);
     arg_list[i] =  h;
 
@@ -546,7 +558,8 @@ IrMgr::reg_func(const AstStatement* stmt,
     arg_init_list[i] = node;
   }
 
-  IrHandle* h = new_FuncHandle(name, ftype, NULL);
+  ymuint local_index = toplevel->next_func_index();
+  IrHandle* h = new_FuncHandle(name, ftype, module_index, local_index);
   scope->add(h);
 
   // 関数の内部表現の生成

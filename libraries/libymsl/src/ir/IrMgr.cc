@@ -23,6 +23,9 @@
 
 #include "VsmModule.h"
 #include "VsmFunction.h"
+#include "VsmVar.h"
+
+#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -82,6 +85,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
 
   // import 文の処理
   ymuint head_num = ast_root->headlist_num();
+  ymuint module_index = 1;
   for (ymuint i = 0; i < head_num; ++ i) {
     const AstStatement* stmt = ast_root->headlist_elem(i);
     switch ( stmt->stmt_type() ) {
@@ -90,10 +94,39 @@ IrMgr::elaborate(const AstStatement* ast_root,
 	const AstSymbol* module_symbol = stmt->import_module();
 	ShString module_name = module_symbol->str_val();
 	const AstSymbol* alias_symbol = stmt->import_alias();
-	pair<VsmModule*, Scope*> p = import_module(module_name);
-	VsmModule* module = p.first;
-	Scope* scope = p.second;
+
+	VsmModule* module = NULL;
+	Scope* scope = NULL;
+	// すでに import されていないか調べる．
+	if ( mModuleDict.find(name, module) ) {
+	  // この場合，対応するスコープも登録されているはず．
+	  bool stat = mScopeDict.find(module, scope);
+	  ASSERT_COND( stat );
+	}
+	else {
+	  // 実際に import する．
+	  string path_main = name;
+	  string path = path_main + ".ym";
+	  // サーチパスを考慮してファイルを探す．
+	  FileIDO ido;
+	  YmslCompiler compiler;
+	  module = compiler.compile(ido, name);
+	  if ( module == NULL ) {
+	    // エラーが起きた
+	    return false;
+	  }
+
+	  // import したモジュールに対応するスコープを作る．
+	  scope = module2scope(module, name, module_index);
+
+	  // 辞書に登録する．
+	  mModuleDict.add(name, module);
+	  mScopeDict.add(module, scope);
+	}
+
 	toplevel_block->add_imported_module(module);
+	++ module_index;
+
 	ShString alias_name = module_name;
 	if ( alias_symbol != NULL ) {
 	  alias_name = alias_symbol->str_val();
@@ -140,36 +173,14 @@ IrMgr::elaborate(const AstStatement* ast_root,
   return true;
 }
 
-// @brief モジュールを import する．
-// @param[in] name モジュール名
-pair<VsmModule*, Scope*>
-IrMgr::import_module(ShString name)
-{
-  VsmModule* module;
-  Scope* scope;
-  if ( !mModuleDict.find(name, module) ) {
-    module = NULL;
-
-    // import したモジュールに対応するスコープを作る．
-    scope = module2scope(module, name);
-
-    mModuleDict.add(name, module);
-    mScopeDict.add(module, scope);
-  }
-  else {
-    bool stat = mScopeDict.find(module, scope);
-    ASSERT_COND( stat );
-  }
-  return make_pair(module, scope);
-}
-
 // @brief モジュールに対応するスコープを作る．
 // @param[in] module モジュール
 // @param[in] parent_scope 親のスコープ
 // @param[in] name 名前
 Scope*
 IrMgr::module2scope(VsmModule* module,
-		    ShString name)
+		    ShString name,
+		    ymuint module_index)
 {
   Scope* scope = new_scope(NULL, name);
   for (ymuint i = 0; i < module->imported_module_num(); ++ i) {
@@ -182,15 +193,19 @@ IrMgr::module2scope(VsmModule* module,
     IrHandle* h = new_ScopeHandle(name, sub_scope);
     scope->add(h);
   }
-  for (ymuint i = 0; i < module->exported_function_num(); ++ i) {
-    VsmFunction* func = module->exported_function(i);
-
-    IrHandle* h = new_FuncHandle(func->name(), func->type(), func);
+  for (ymuint local_index = 0;
+       local_index < module->exported_function_num();
+       ++ local_index) {
+    VsmFunction* func = module->exported_function(local_index);
+    IrHandle* h = new_FuncHandle(func->name(), func->type(), module_index, local_index);
     scope->add(h);
   }
-  for (ymuint i = 0; i < module->exported_variable_num(); ++ i) {
-    VsmVar* var = module->exported_variable(i);
-    //scope.add();
+  for (ymuint local_index = 0;
+       local_index < module->exported_variable_num();
+       ++ local_index) {
+    VsmVar* var = module->exported_variable(local_index);
+    IrHandle* h = new_VarHandle(var->name(), var->type(), module_index, local_index, true);
+    scope->add(h);
   }
   return scope;
 }
@@ -219,10 +234,8 @@ IrMgr::resolve_func(const AstExpr* expr,
   // func の型と node の arglist の型をチェック
   // 場合によってはキャストノードを挿入する．
 
-  // node に関数インデックスをセット
-  toplevel->reg_function(h);
-  ymuint index = h->index();
-  node->set_function_index(index);
+  // node に関数のハンドルをセット
+  node->set_function_address(h);
   return true;
 }
 

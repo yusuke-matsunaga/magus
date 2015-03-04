@@ -31,12 +31,17 @@ IrToplevel::~IrToplevel()
 // @brief import しているモジュールを追加する．
 // @param[in] module モジュール
 // @return モジュール番号を返す．
-ymuint
+void
 IrToplevel::add_imported_module(VsmModule* module)
 {
-  ymuint id = mModuleList.size();
   mModuleList.push_back(module);
-  return id;
+}
+
+// @brief 次のグローバル変数インデックスを得る．
+ymuint
+IrToplevel::next_global_index() const
+{
+  return mGlobalVarList.size();
 }
 
 // @brief 変数を追加する．
@@ -45,13 +50,18 @@ IrToplevel::add_var(IrHandle* var)
 {
   ASSERT_COND( var->handle_type() == IrHandle::kVar );
   if ( var->is_global() ) {
-    ymuint index = mGlobalVarList.size();
-    var->set_index(index);
     mGlobalVarList.push_back(var);
   }
   else {
     IrCodeBlock::add_var(var);
   }
+}
+
+// @brief 次の関数インデックスを得る．
+ymuint
+IrToplevel::next_func_index() const
+{
+  return mFuncList.size();
 }
 
 // @brief 関数を追加する．
@@ -60,18 +70,6 @@ void
 IrToplevel::add_function(IrFuncBlock* func)
 {
   mFuncList.push_back(func);
-}
-
-// @brief 関数テーブルに登録する．
-// @param[in] func_handle 関数ハンドル
-void
-IrToplevel::reg_function(IrHandle* func_handle)
-{
-  if ( !func_handle->has_index() ) {
-    ymuint index = mFuncTable.size();
-    func_handle->set_index(index);
-    mFuncTable.push_back(func_handle);
-  }
 }
 
 // @brief import しているモジュールのリストを返す．

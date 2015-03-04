@@ -14,6 +14,7 @@
 #include "IrNode.h"
 #include "VsmNativeFunc.h"
 #include "VsmNativeModule.h"
+#include "VsmVar.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -52,6 +53,15 @@ VsmGen::code_gen(const IrToplevel* toplevel,
        p != module_list.end(); ++ p) {
     VsmModule* sub_module = *p;
     ymuint module_id = module_builder.add_module(sub_module);
+  }
+
+  // グローバル変数を追加する．
+  const vector<IrHandle*>& gvar_list = toplevel->global_var_list();
+  ymint nv = gvar_list.size();
+  for (ymuint i = 0; i < nv; ++ i) {
+    IrHandle* vh = gvar_list[i];
+    VsmVar* var = new VsmVar(vh->name(), vh->value_type());
+    module_builder.add_exported_var(var);
   }
 
   // 関数のコードを作る．

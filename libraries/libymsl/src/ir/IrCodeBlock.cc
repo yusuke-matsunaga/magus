@@ -27,13 +27,18 @@ IrCodeBlock::~IrCodeBlock()
 {
 }
 
+// @brief 次のローカル変数インデックスを得る．
+ymuint
+IrCodeBlock::next_local_index() const
+{
+  return mVarList.size();
+}
+
 // @brief 変数を追加する．
 void
 IrCodeBlock::add_var(IrHandle* var)
 {
   ASSERT_COND( var->handle_type() == IrHandle::kVar );
-  ymuint index = mVarList.size();
-  var->set_index(index);
   mVarList.push_back(var);
 }
 

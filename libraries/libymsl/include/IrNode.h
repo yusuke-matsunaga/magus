@@ -135,20 +135,20 @@ public:
   IrNode*
   store_val() const;
 
-  /// @brief 関数インデックスを設定する．
-  /// @param[in] index 関数インデックス
+  /// @brief 関数のアドレスを設定する．
+  /// @param[in] func_handle 関数を表すハンドル
   ///
   /// kFuncCall のみ有効
   virtual
   void
-  set_function_index(ymuint index);
+  set_function_address(IrHandle* func_handle);
 
-  /// @brief 関数インデックスを返す．
+  /// @brief 関数のアドレスを返す．
   ///
   /// kFuncCall のみ有効
   virtual
-  ymuint
-  function_index() const;
+  IrHandle*
+  function_address() const;
 
   /// @brief 関数の引数の数を得る．
   ///

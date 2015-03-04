@@ -5,7 +5,7 @@
 /// @brief IrFuncHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2014 Yusuke Matsunaga
+/// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -26,10 +26,12 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 関数名
   /// @param[in] type 関数の型
-  /// @param[in] func 関数本体
+  /// @param[in] module_index モジュールインデックス
+  /// @param[in] local_index ローカルインデックス
   IrFuncHandle(ShString name,
 	       const Type* type,
-	       const VsmFunction* func);
+	       ymuint module_index,
+	       ymuint local_index);
 
   /// @brief デストラクタ
   virtual
@@ -53,21 +55,11 @@ public:
   bool
   is_static() const;
 
-  /// @brief 関数本体を返す．
-  ///
-  /// kFunction, kMethodRef のみ有効
-  virtual
-  const VsmFunction*
-  function() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 関数本体
-  const VsmFunction* mFunction;
 
 };
 

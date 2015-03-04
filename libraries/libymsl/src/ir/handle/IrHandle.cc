@@ -47,33 +47,24 @@ IrHandle::value_type() const
   return NULL;
 }
 
-// @brief インデックスが設定されていたら true を返す．
+// @brief モジュールインデックスを返す．
 //
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
-bool
-IrHandle::has_index() const
-{
-  ASSERT_NOT_REACHED;
-  return false;
-}
-
-// @brief インデックスを返す．
-//
-// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+// kVar, kFunction のみ有効
 ymuint
-IrHandle::index() const
+IrHandle::module_index() const
 {
   ASSERT_NOT_REACHED;
   return 0;
 }
 
-// @brief インデックスを設定する．
+// @brief ローカルインデックスを返す．
 //
 // kVar, kFunction, kMemberRef, kMethodRef のみ有効
-void
-IrHandle::set_index(ymuint index)
+ymuint
+IrHandle::local_index() const
 {
   ASSERT_NOT_REACHED;
+  return 0;
 }
 
 // @brief グローバル変数の時に true を返す．
@@ -84,26 +75,6 @@ IrHandle::is_global() const
 {
   ASSERT_NOT_REACHED;
   return false;
-}
-
-// @brief 変数本体を返す．
-//
-// kVar かつ is_global() == true の時のみ有効
-VsmValue*
-IrHandle::variable() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
-}
-
-// @brief 関数本体を返す．
-//
-// kFunction, kMethodRef のみ有効
-const VsmFunction*
-IrHandle::function() const
-{
-  ASSERT_NOT_REACHED;
-  return NULL;
 }
 
 // @brief ブール値を返す．

@@ -26,12 +26,14 @@ public:
   /// @brief コンストラクタ
   /// @param[in] name 変数名
   /// @param[in] value_type 型
+  /// @param[in] module_index モジュールインデックス
+  /// @param[in] local_index ローカルインデックス
   /// @param[in] global グローバル変数の時 true とするフラグ
-  /// @param[in] var_addr 変数のアドレス
   IrVarHandle(ShString name,
 	      const Type* value_type,
-	      bool global,
-	      VsmValue* var_addr);
+	      ymuint module_index,
+	      ymuint local_index,
+	      bool global);
 
   /// @brief デストラクタ
   virtual
@@ -61,13 +63,6 @@ public:
   bool
   is_global() const;
 
-  /// @brief 変数本体を返す．
-  ///
-  /// kVar かつ is_global() == true の時のみ有効
-  virtual
-  VsmValue*
-  variable() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -76,9 +71,6 @@ private:
 
   // グローバルフラグ
   bool mGlobal;
-
-  // 変数のアドレス
-  VsmValue* mVarAddr;
 
 };
 

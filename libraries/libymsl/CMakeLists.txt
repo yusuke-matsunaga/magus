@@ -131,6 +131,7 @@ set (ymsl_SOURCES
   src/vsm/VsmNativeFunc.cc
   src/vsm/VsmModule.cc
   src/vsm/VsmNativeModule.cc
+  src/vsm/VsmVar.cc
 
   src/builtin/YmslPrint.cc
   )

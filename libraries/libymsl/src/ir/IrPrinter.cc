@@ -42,7 +42,7 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   ymuint ng = global_var_list.size();
   for (ymuint i = 0; i < ng; ++ i) {
     IrHandle* var = global_var_list[i];
-    mS << "global #" << var->index() << ": " << var->name()
+    mS << "global #" << var->local_index() << ": " << var->name()
        << ": ";
     var->value_type()->print(mS);
     mS << endl;
@@ -52,7 +52,7 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   ymuint nv = var_list.size();
   for (ymuint i = 0; i < nv; ++ i) {
     const IrHandle* var = var_list[i];
-    mS << "var #" << var->index() << ": " << var->name()
+    mS << "var #" << var->local_index() << ": " << var->name()
        << ": ";
     var->value_type()->print(mS);
     mS << endl;
@@ -67,7 +67,7 @@ IrPrinter::print_code(const IrToplevel& toplevel)
   for (ymuint i = 0; i < nf; ++ i) {
     IrFuncBlock* ir_func = func_list[i];
     mS << endl;
-    mS << "function #" << ir_func->func_handle()->index() << ": " << ir_func->func_handle()->name() << endl;
+    mS << "function #" << ir_func->func_handle()->local_index() << ": " << ir_func->func_handle()->name() << endl;
     const vector<IrNode*>& node_list = ir_func->node_list();
     print_node_list(node_list);
   }
@@ -394,7 +394,8 @@ IrPrinter::print_node(IrNode* node)
     break;
 
   case IrNode::kFuncCall:
-    mS << "func_call #" << node->function_index();
+    mS << "func_call ";
+    print_handle(node->function_address());
     {
       ymuint n = node->arglist_num();
       for (ymuint i = 0; i < n; ++ i) {
@@ -445,11 +446,17 @@ IrPrinter::print_handle(IrHandle* handle)
     break;
 
   case IrHandle::kVar:
-    mS << "var[" << handle->name() << "]";
+    mS << "var[" << handle->name()
+       << ": module#" << handle->module_index()
+       << ": #" << handle->local_index()
+       << "]";
     break;
 
   case IrHandle::kFunction:
-    mS << "function[" << handle->name() << "]";
+    mS << "function[" << handle->name()
+       << ": module#" << handle->module_index()
+       << ": #" << handle->local_index()
+       << "]";
     break;
 
   case IrHandle::kBooleanConst:
