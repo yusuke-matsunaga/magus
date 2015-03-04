@@ -1,8 +1,8 @@
-#ifndef IRVARHANDLE_H
-#define IRVARHANDLE_H
+#ifndef IRLOCALVARHANDLE_H
+#define IRLOCALVARHANDLE_H
 
-/// @file IrVarHandle.h
-/// @brief IrVarHandle のヘッダファイル
+/// @file IrLocalVarHandle.h
+/// @brief IrLocalVarHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014 Yusuke Matsunaga
@@ -15,10 +15,10 @@
 BEGIN_NAMESPACE_YM_YMSL
 
 //////////////////////////////////////////////////////////////////////
-/// @class IrVarHandle IrVarHandle.h "IrVarHandle.h"
+/// @class IrLocalVarHandle IrLocalVarHandle.h "IrLocalVarHandle.h"
 /// @brief Var を保持する IrHandle
 //////////////////////////////////////////////////////////////////////
-class IrVarHandle :
+class IrLocalVarHandle :
   public IrIndexHandle
 {
 public:
@@ -28,16 +28,14 @@ public:
   /// @param[in] value_type 型
   /// @param[in] module_index モジュールインデックス
   /// @param[in] local_index ローカルインデックス
-  /// @param[in] global グローバル変数の時 true とするフラグ
-  IrVarHandle(ShString name,
-	      const Type* value_type,
-	      ymuint module_index,
-	      ymuint local_index,
-	      bool global);
+  IrLocalVarHandle(ShString name,
+		   const Type* value_type,
+		   ymuint module_index,
+		   ymuint local_index);
 
   /// @brief デストラクタ
   virtual
-  ~IrVarHandle();
+  ~IrLocalVarHandle();
 
 
 public:
@@ -57,23 +55,14 @@ public:
   bool
   is_static() const;
 
-  /// @brief グローバル変数の時に true を返す．
-  ///
-  /// kVar のみ有効
-  bool
-  is_global() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // グローバルフラグ
-  bool mGlobal;
-
 };
 
 END_NAMESPACE_YM_YMSL
 
-#endif // IRVARHANDLE_H
+#endif // IRLOCALVARHANDLE_H

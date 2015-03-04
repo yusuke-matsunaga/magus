@@ -57,6 +57,16 @@ IrHandle::module_index() const
   return 0;
 }
 
+// @brief ローカルインデックスを設定する．
+// @param[in] index インデックス
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+void
+IrHandle::set_local_index(ymuint index)
+{
+  ASSERT_NOT_REACHED;
+}
+
 // @brief ローカルインデックスを返す．
 //
 // kVar, kFunction, kMemberRef, kMethodRef のみ有効
@@ -65,16 +75,6 @@ IrHandle::local_index() const
 {
   ASSERT_NOT_REACHED;
   return 0;
-}
-
-// @brief グローバル変数の時に true を返す．
-//
-// kVar のみ有効
-bool
-IrHandle::is_global() const
-{
-  ASSERT_NOT_REACHED;
-  return false;
 }
 
 // @brief ブール値を返す．

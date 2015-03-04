@@ -111,8 +111,10 @@ private:
   // ハッシュの要素数
   ymuint mHashNum;
 
+#if 0
   // ここに属する変数のリスト
   vector<IrHandle*> mVarList;
+#endif
 
 };
 

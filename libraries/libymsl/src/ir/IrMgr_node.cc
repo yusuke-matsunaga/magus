@@ -90,7 +90,8 @@ IrMgr::new_Load(IrHandle* addr)
   ASSERT_COND( addr != NULL );
   const Type* type = NULL;
   switch ( addr->handle_type() ) {
-  case IrHandle::kVar:
+  case IrHandle::kLocalVar:
+  case IrHandle::kGlobalVar:
   case IrHandle::kMemberRef:
     type = addr->value_type();
     break;

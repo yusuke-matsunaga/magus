@@ -445,8 +445,15 @@ IrPrinter::print_handle(IrHandle* handle)
     mS << "scope[" << handle->name() << "]";
     break;
 
-  case IrHandle::kVar:
+  case IrHandle::kLocalVar:
     mS << "var[" << handle->name()
+       << ": module#" << handle->module_index()
+       << ": #" << handle->local_index()
+       << "]";
+    break;
+
+  case IrHandle::kGlobalVar:
+    mS << "global var[" << handle->name()
        << ": module#" << handle->module_index()
        << ": #" << handle->local_index()
        << "]";

@@ -62,6 +62,14 @@ public:
   ymuint
   module_index() const;
 
+  /// @brief ローカルインデックスを設定する．
+  /// @param[in] index インデックス
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  virtual
+  void
+  set_local_index(ymuint index);
+
   /// @brief ローカルインデックスを返す．
   ///
   /// kVar, kFunction, kMemberRef, kMethodRef のみ有効

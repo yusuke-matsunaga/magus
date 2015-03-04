@@ -41,17 +41,17 @@ public:
   ymuint
   next_local_index() const;
 
-  /// @brief 変数を追加する．
+  /// @brief ローカル変数を追加する．
   /// @param[in] var 変数のハンドル
   virtual
   void
-  add_var(IrHandle* var);
+  add_local_var(IrHandle* var);
 
   /// @brief ノードを追加する．
   void
   add_node(IrNode* node);
 
-  /// @brief 変数のリストを得る．
+  /// @brief ローカル変数のリストを得る．
   const vector<IrHandle*>&
   var_list() const;
 
@@ -71,7 +71,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 変数のリスト
+  // ローカル変数のリスト
   vector<IrHandle*> mVarList;
 
   // 本体のノードリスト

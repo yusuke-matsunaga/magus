@@ -62,6 +62,16 @@ IrIndexHandle::module_index() const
   return mModuleIndex;
 }
 
+// @brief ローカルインデックスを設定する．
+// @param[in] index インデックス
+//
+// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+void
+IrIndexHandle::set_local_index(ymuint index)
+{
+  mLocalIndex = index;
+}
+
 // @brief ローカルインデックスを返す．
 //
 // kVar, kFunction, kMemberRef, kMethodRef のみ有効

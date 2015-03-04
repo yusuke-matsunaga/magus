@@ -167,7 +167,8 @@ IrInterp::eval_boolean(IrNode* node)
       case IrHandle::kFloatConst:
       case IrHandle::kStringConst:
       case IrHandle::kScope:
-      case IrHandle::kVar:
+      case IrHandle::kLocalVar:
+      case IrHandle::kGlobalVar:
       case IrHandle::kFunction:
       case IrHandle::kLabel:
       case IrHandle::kNamedType:
@@ -295,7 +296,8 @@ IrInterp::eval_int(IrNode* node)
       case IrHandle::kFloatConst:
       case IrHandle::kStringConst:
       case IrHandle::kScope:
-      case IrHandle::kVar:
+      case IrHandle::kLocalVar:
+      case IrHandle::kGlobalVar:
       case IrHandle::kFunction:
       case IrHandle::kLabel:
       case IrHandle::kNamedType:
@@ -412,7 +414,8 @@ IrInterp::eval_float(IrNode* node)
       case IrHandle::kIntConst:
       case IrHandle::kStringConst:
       case IrHandle::kScope:
-      case IrHandle::kVar:
+      case IrHandle::kLocalVar:
+      case IrHandle::kGlobalVar:
       case IrHandle::kFunction:
       case IrHandle::kLabel:
       case IrHandle::kNamedType:

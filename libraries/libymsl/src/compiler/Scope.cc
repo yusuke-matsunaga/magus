@@ -70,9 +70,11 @@ Scope::add(IrHandle* item)
 
   _put(item);
 
+#if 0
   if ( item->handle_type() == IrHandle::kVar ) {
     mVarList.push_back(item);
   }
+#endif
 }
 
 // @brief ハッシュ表を確保する．

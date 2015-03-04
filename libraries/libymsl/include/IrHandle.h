@@ -32,7 +32,8 @@ public:
   /// @brief 種類を表す列挙型
   enum HandleType {
     kScope,
-    kVar,
+    kGlobalVar,
+    kLocalVar,
     kFunction,
     kBooleanConst,
     kIntConst,
@@ -99,19 +100,20 @@ public:
   ymuint
   module_index() const;
 
+  /// @brief ローカルインデックスを設定する．
+  /// @param[in] index インデックス
+  ///
+  /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
+  virtual
+  void
+  set_local_index(ymuint index);
+
   /// @brief ローカルインデックスを返す．
   ///
   /// kVar, kFunction, kMemberRef, kMethodRef のみ有効
   virtual
   ymuint
   local_index() const;
-
-  /// @brief グローバル変数の時に true を返す．
-  ///
-  /// kVar のみ有効
-  virtual
-  bool
-  is_global() const;
 
   /// @brief ブール値を返す．
   ///

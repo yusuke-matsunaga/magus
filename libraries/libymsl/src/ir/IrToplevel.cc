@@ -44,17 +44,12 @@ IrToplevel::next_global_index() const
   return mGlobalVarList.size();
 }
 
-// @brief 変数を追加する．
+// @brief グローバル変数を追加する．
 void
-IrToplevel::add_var(IrHandle* var)
+IrToplevel::add_global_var(IrHandle* var)
 {
-  ASSERT_COND( var->handle_type() == IrHandle::kVar );
-  if ( var->is_global() ) {
-    mGlobalVarList.push_back(var);
-  }
-  else {
-    IrCodeBlock::add_var(var);
-  }
+  ASSERT_COND ( var->handle_type() == IrHandle::kGlobalVar );
+  mGlobalVarList.push_back(var);
 }
 
 // @brief 次の関数インデックスを得る．

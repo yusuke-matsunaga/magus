@@ -34,11 +34,11 @@ IrCodeBlock::next_local_index() const
   return mVarList.size();
 }
 
-// @brief 変数を追加する．
+// @brief ローカル変数を追加する．
 void
-IrCodeBlock::add_var(IrHandle* var)
+IrCodeBlock::add_local_var(IrHandle* var)
 {
-  ASSERT_COND( var->handle_type() == IrHandle::kVar );
+  ASSERT_COND( var->handle_type() == IrHandle::kLocalVar );
   mVarList.push_back(var);
 }
 

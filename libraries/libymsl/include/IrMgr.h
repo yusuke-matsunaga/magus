@@ -268,18 +268,27 @@ private:
   new_ScopeHandle(ShString name,
 		  Scope* scope);
 
-  /// @brief 変数参照を生成する．
+  /// @brief ローカル変数参照を生成する．
   /// @param[in] name 変数名
   /// @param[in] value_type 型
   /// @param[in] module_index モジュールインデックス
   /// @param[in] local_index ローカルインデックス
-  /// @param[in] global グローバル変数の時 true とするフラグ
   IrHandle*
-  new_VarHandle(ShString name,
-		const Type* value_type,
-		ymuint module_index,
-		ymuint local_index,
-		bool global);
+  new_LocalVarHandle(ShString name,
+		     const Type* value_type,
+		     ymuint module_index,
+		     ymuint local_index);
+
+  /// @brief グローバル変数参照を生成する．
+  /// @param[in] name 変数名
+  /// @param[in] value_type 型
+  /// @param[in] module_index モジュールインデックス
+  /// @param[in] local_index ローカルインデックス
+  IrHandle*
+  new_GlobalVarHandle(ShString name,
+		      const Type* value_type,
+		      ymuint module_index,
+		      ymuint local_index);
 
   /// @brief 関数参照を生成する．
   /// @param[in] name 変数名

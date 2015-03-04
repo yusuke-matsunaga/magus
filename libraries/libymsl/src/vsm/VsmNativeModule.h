@@ -60,6 +60,7 @@ private:
   // トップレベルのコード
   VsmCodeList mToplevelCode;
 
+  //
 };
 
 END_NAMESPACE_YM_YMSL

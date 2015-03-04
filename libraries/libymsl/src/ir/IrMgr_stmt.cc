@@ -315,17 +315,19 @@ IrMgr::elab_stmt(const AstStatement* stmt,
 
       ShString name = ast_name->str_val();
       ymuint module_index = 0; // 自分自身は0
-      ymuint local_index = 0;
       bool global = (scope->global_scope() == NULL);
+      IrHandle* h;
       if ( global ) {
-	local_index = toplevel->next_global_index();
+	ymuint local_index = toplevel->next_global_index();
+	h = new_GlobalVarHandle(name, type, module_index, local_index);
+	toplevel->add_global_var(h);
       }
       else {
-	local_index = code_block->next_local_index();
+	ymuint local_index = code_block->next_local_index();
+	h = new_LocalVarHandle(name, type, module_index, local_index);
+	code_block->add_local_var(h);
       }
-      IrHandle* h = new_VarHandle(name, type, module_index, local_index, global);
       scope->add(h);
-      code_block->add_var(h);
 
       const AstExpr* ast_expr = stmt->expr();
       if ( ast_expr != NULL ) {
@@ -540,8 +542,8 @@ IrMgr::reg_func(const AstStatement* stmt,
   vector<IrNode*> arg_init_list(np);
   for (ymuint i = 0; i < np; ++ i) {
     ymuint local_index = i;
-    IrHandle* h = new_VarHandle(input_name_list[i], input_type_list[i],
-				module_index, local_index, false);
+    IrHandle* h = new_LocalVarHandle(input_name_list[i], input_type_list[i],
+				     module_index, local_index);
     func_scope->add(h);
     arg_list[i] =  h;
 

@@ -17,7 +17,8 @@
 #include "handle/IrLabelHandle.h"
 #include "handle/IrScopeHandle.h"
 #include "handle/IrTypeHandle.h"
-#include "handle/IrVarHandle.h"
+#include "handle/IrLocalVarHandle.h"
+#include "handle/IrGlobalVarHandle.h"
 #include "handle/IrArrayRef.h"
 #include "handle/IrMemberRef.h"
 
@@ -39,21 +40,34 @@ IrMgr::new_ScopeHandle(ShString name,
   return new (p) IrScopeHandle(name, scope);
 }
 
-// @brief 変数参照を生成する．
+// @brief ローカル変数参照を生成する．
 // @param[in] name 変数名
 // @param[in] value_type 型
 // @param[in] module_index モジュールインデックス
 // @param[in] local_index ローカルインデックス
-// @param[in] global グローバル変数の時 true とするフラグ
 IrHandle*
-IrMgr::new_VarHandle(ShString name,
-		     const Type* value_type,
-		     ymuint module_index,
-		     ymuint local_index,
-		     bool global)
+IrMgr::new_LocalVarHandle(ShString name,
+			  const Type* value_type,
+			  ymuint module_index,
+			  ymuint local_index)
 {
-  void* p = mAlloc.get_memory(sizeof(IrVarHandle));
-  return new (p) IrVarHandle(name, value_type, module_index, local_index, global);
+  void* p = mAlloc.get_memory(sizeof(IrLocalVarHandle));
+  return new (p) IrLocalVarHandle(name, value_type, module_index, local_index);
+}
+
+// @brief グローバル変数参照を生成する．
+// @param[in] name 変数名
+// @param[in] value_type 型
+// @param[in] module_index モジュールインデックス
+// @param[in] local_index ローカルインデックス
+IrHandle*
+IrMgr::new_GlobalVarHandle(ShString name,
+			   const Type* value_type,
+			   ymuint module_index,
+			   ymuint local_index)
+{
+  void* p = mAlloc.get_memory(sizeof(IrGlobalVarHandle));
+  return new (p) IrGlobalVarHandle(name, value_type, module_index, local_index);
 }
 
 // @brief 関数参照を生成する．

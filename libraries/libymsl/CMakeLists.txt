@@ -104,7 +104,8 @@ set (ymsl_SOURCES
   src/ir/handle/IrLabelHandle.cc
   src/ir/handle/IrScopeHandle.cc
   src/ir/handle/IrTypeHandle.cc
-  src/ir/handle/IrVarHandle.cc
+  src/ir/handle/IrLocalVarHandle.cc
+  src/ir/handle/IrGlobalVarHandle.cc
   src/ir/handle/IrArrayRef.cc
   src/ir/handle/IrMemberRef.cc
 

@@ -44,11 +44,11 @@ public:
   ymuint
   next_global_index() const;
 
-  /// @brief 変数を追加する．
+  /// @brief グローバル変数を追加する．
   /// @param[in] var 変数のハンドル
   virtual
   void
-  add_var(IrHandle* var);
+  add_global_var(IrHandle* var);
 
   /// @brief 次の関数インデックスを得る．
   ymuint

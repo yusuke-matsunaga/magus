@@ -204,7 +204,7 @@ IrMgr::module2scope(VsmModule* module,
        local_index < module->exported_variable_num();
        ++ local_index) {
     VsmVar* var = module->exported_variable(local_index);
-    IrHandle* h = new_VarHandle(var->name(), var->type(), module_index, local_index, true);
+    IrHandle* h = new_GlobalVarHandle(var->name(), var->type(), module_index, local_index);
     scope->add(h);
   }
   return scope;

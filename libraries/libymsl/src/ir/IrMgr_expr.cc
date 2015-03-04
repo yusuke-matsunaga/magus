@@ -260,7 +260,17 @@ IrMgr::elab_primary(const AstExpr* ast_expr,
 	  return h1;
 	}
 
-      case IrHandle::kVar:
+      case IrHandle::kLocalVar:
+	{
+	  const Type* type = h->value_type();
+	  ShString member_name = member_symbol->str_val();
+	  // type のメンバに member_name があることを確認する．
+	  IrNode* base = new_Load(h);
+	  IrHandle* member;
+	  return new_MemberRef(base, member);
+	}
+
+      case IrHandle::kGlobalVar:
 	{
 	  const Type* type = h->value_type();
 	  ShString member_name = member_symbol->str_val();
