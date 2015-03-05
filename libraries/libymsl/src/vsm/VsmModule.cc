@@ -9,6 +9,7 @@
 
 #include "VsmModule.h"
 #include "VsmFunction.h"
+#include "VsmVar.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL

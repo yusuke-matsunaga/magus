@@ -18,14 +18,13 @@
 #include "Scope.h"
 #include "IrCodeBlock.h"
 #include "IrToplevel.h"
+#include "IrFuncBlock.h"
 #include "IrNode.h"
 #include "IrHandle.h"
 
 #include "VsmModule.h"
 #include "VsmFunction.h"
 #include "VsmVar.h"
-
-#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_YMSL
@@ -66,14 +65,15 @@ IrMgr::clear()
 
 // @brief 抽象構文木から中間表現を生成する．
 // @param[in] ast_root 抽象構文木の根のノード
-// @param[in] toplevel_scope トップレベルのスコープ
-// @param[in] toplevel_block トップレベルのコードを格納するオブジェクト
+// @param[in] name モジュール名
+// @param[in] compiler コンパイラ(import で用いる)
+// @return トップレベルのコードを格納するオブジェクトを返す．
 //
-// エラーが起きたら false を返す．
-bool
+// エラーが起きたら NULL を返す．
+IrToplevel*
 IrMgr::elaborate(const AstStatement* ast_root,
 		 ShString name,
-		 IrToplevel* toplevel_block)
+		 YmslCompiler& compiler)
 {
   ASSERT_COND( ast_root->stmt_type() == AstStatement::kToplevel );
 
@@ -81,6 +81,7 @@ IrMgr::elaborate(const AstStatement* ast_root,
   mUndefList.clear();
 
   // 中間表現を作る．
+  IrToplevel* toplevel_block = new_Toplevel();
   Scope* toplevel_scope = new_scope(NULL, name);
 
   // import 文の処理
@@ -104,16 +105,10 @@ IrMgr::elaborate(const AstStatement* ast_root,
 	  ASSERT_COND( stat );
 	}
 	else {
-	  // 実際に import する．
-	  string path_main = name;
-	  string path = path_main + ".ym";
-	  // サーチパスを考慮してファイルを探す．
-	  FileIDO ido;
-	  YmslCompiler compiler;
-	  module = compiler.compile(ido, name);
+	  module = compiler.import(module_name);
 	  if ( module == NULL ) {
 	    // エラーが起きた
-	    return false;
+	    return NULL;
 	  }
 
 	  // import したモジュールに対応するスコープを作る．
@@ -166,11 +161,11 @@ IrMgr::elaborate(const AstStatement* ast_root,
     IrNode* label = *p;
     if ( !label->is_defined() ) {
       // undefined
-      return false;
+      return NULL;
     }
   }
 
-  return true;
+  return toplevel_block;
 }
 
 // @brief モジュールに対応するスコープを作る．
@@ -237,6 +232,27 @@ IrMgr::resolve_func(const AstExpr* expr,
   // node に関数のハンドルをセット
   node->set_function_address(h);
   return true;
+}
+
+// @brief トップレベルブロックを生成する．
+IrToplevel*
+IrMgr::new_Toplevel()
+{
+  void* p = mAlloc.get_memory(sizeof(IrToplevel));
+  return new (p) IrToplevel;
+}
+
+// @brief 関数ブロックを生成する．
+// @param[in] arg_list 引数のリスト
+// @param[in] arg_init_list 引数の初期値のリスト
+// @param[in] func_handle 関数のハンドル
+IrFuncBlock*
+IrMgr::new_FuncBlock(const vector<IrHandle*>& arg_list,
+		     const vector<IrNode*>& arg_init_list,
+		     IrHandle* func_handle)
+{
+  void* p = mAlloc.get_memory(sizeof(IrFuncBlock));
+  return new (p) IrFuncBlock(arg_list, arg_init_list, func_handle);
 }
 
 // @brief スコープを生成する．

@@ -10,6 +10,7 @@
 
 
 #include "ymsl_int.h"
+#include "YmUtils/File.h"
 #include "YmUtils/IDO.h"
 #include "YmUtils/ShString.h"
 
@@ -46,11 +47,34 @@ public:
   compile(IDO& ido,
 	  ShString name);
 
+  /// @brief モジュールを import する．
+  /// @param[in] name モジュール名
+  /// @return モジュールを返す．
+  ///
+  /// エラーが起きたら NULL を返す．
+  VsmModule*
+  import(ShString name);
+
+  /// @brief サーチパスの先頭に path を追加する．
+  /// @param[in] path 追加するパス
+  /// @note path は ':' を含んでいても良い
+  void
+  add_searchpath_top(const string& path);
+
+  /// @brief サーチパスの末尾に path を追加する．
+  /// @param[in] path 追加するパス
+  /// @note path は ':' を含んでいても良い
+  void
+  add_searchpath_end(const string& path);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // モジュールのサーチパスリスト
+  SearchPathList mPathList;
 
 };
 

@@ -14,6 +14,7 @@
 #include "IrMgr.h"
 #include "IrToplevel.h"
 #include "IrPrinter.h"
+#include "YmslCompiler.h"
 
 #include "YmUtils/FileIDO.h"
 #include "YmUtils/StreamIDO.h"
@@ -41,15 +42,15 @@ ir_test1(IDO& ido)
   AstStatement* ast_toplevel = ast_mgr.toplevel();
   printer.print_statement(ast_toplevel);
 
+  YmslCompiler compiler;
   IrMgr ir_mgr;
-  IrToplevel ir_toplevel;
-  bool stat2 = ir_mgr.elaborate(ast_toplevel, ShString("__main__"), &ir_toplevel);
-  if ( !stat2 ) {
+  IrToplevel* ir_toplevel = ir_mgr.elaborate(ast_toplevel, ShString("__main__"), compiler);
+  if ( ir_toplevel == NULL ) {
     return 2;
   }
 
   IrPrinter ir_printer(cout);
-  ir_printer.print_code(ir_toplevel);
+  ir_printer.print_code(*ir_toplevel);
 
   return 0;
 }

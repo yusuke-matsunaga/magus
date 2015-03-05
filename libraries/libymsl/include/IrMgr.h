@@ -46,13 +46,14 @@ public:
   /// @brief 抽象構文木から中間表現を生成する．
   /// @param[in] ast_root 抽象構文木の根のノード
   /// @param[in] name モジュール名
-  /// @param[in] toplevel トップレベルのコードを格納するオブジェクト
+  /// @param[in] compiler コンパイラ(import で用いる)
+  /// @return トップレベルのコードを格納するオブジェクトを返す．
   ///
-  /// エラーが起きたら false を返す．
-  bool
+  /// エラーが起きたら NULL を返す．
+  IrToplevel*
   elaborate(const AstStatement* ast_root,
 	    ShString name,
-	    IrToplevel* toplevel);
+	    YmslCompiler& compiler);
 
 
 private:
@@ -355,6 +356,25 @@ private:
   IrHandle*
   new_MemberRef(IrNode* obj,
 		IrHandle* var);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // その他の部品を生成する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief トップレベルブロックを生成する．
+  IrToplevel*
+  new_Toplevel();
+
+  /// @brief 関数ブロックを生成する．
+  /// @param[in] arg_list 引数のリスト
+  /// @param[in] arg_init_list 引数の初期値のリスト
+  /// @param[in] func_handle 関数のハンドル
+  IrFuncBlock*
+  new_FuncBlock(const vector<IrHandle*>& arg_list,
+		const vector<IrNode*>& arg_init_list,
+		IrHandle* func_handle);
 
   /// @brief スコープを生成する．
   /// @param[in] parent_scope 親のスコープ

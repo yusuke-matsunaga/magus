@@ -565,7 +565,7 @@ IrMgr::reg_func(const AstStatement* stmt,
   scope->add(h);
 
   // 関数の内部表現の生成
-  IrFuncBlock* ir_func = new IrFuncBlock(arg_list, arg_init_list, h);
+  IrFuncBlock* ir_func = new_FuncBlock(arg_list, arg_init_list, h);
   toplevel->add_function(ir_func);
 
   // 関数内部のノードの生成
