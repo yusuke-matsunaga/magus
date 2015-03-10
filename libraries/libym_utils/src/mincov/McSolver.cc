@@ -102,10 +102,40 @@ McSolver::exact(vector<ymuint32>& solution)
 
 // @brief ヒューリスティックで最小被覆問題を解く．
 // @param[out] solution 選ばれた列集合
+// @param[in] alg ヒューリスティックの種類
 // @return 解のコスト
 ymuint32
-McSolver::heuristic(vector<ymuint32>& solution)
+McSolver::heuristic(vector<ymuint32>& solution,
+		    MinCov::AlgType alg)
 {
+  switch ( alg ) {
+  case MinCov::kGreedy:
+    greedy(solution);
+    break;
+
+  case MinCov::kRandom:
+    break;
+
+  case MinCov::kMCT:
+    break;
+  }
+
+  ASSERT_COND( mMatrix->verify(solution) );
+
+  ymuint32 cost = mMatrix->cost(solution);
+
+  return cost;
+}
+
+// @grief greedy アルゴリズムで解を求める．
+// @param[out] solution 選ばれた列集合
+void
+McSolver::greedy(vector<ymuint32>& solution)
+{
+  if ( McSolver_debug ) {
+    cout << "McSolver::greedy() start" << endl;
+  }
+
   McMatrix cur_matrix(*mMatrix);
 
   solution.clear();
@@ -127,12 +157,6 @@ McSolver::heuristic(vector<ymuint32>& solution)
       cout << "Col#" << col << " is selected heuristically" << endl;
     }
   }
-
-  ASSERT_COND( mMatrix->verify(solution) );
-
-  ymuint32 cost = mMatrix->cost(solution);
-
-  return cost;
 }
 
 // @brief 内部の行列の内容を出力する．

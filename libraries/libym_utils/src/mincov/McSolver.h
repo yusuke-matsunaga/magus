@@ -10,6 +10,7 @@
 
 
 #include "mincov_nsdef.h"
+#include "YmUtils/MinCov.h"
 
 
 BEGIN_NAMESPACE_YM_MINCOV
@@ -63,14 +64,27 @@ public:
 
   /// @brief ヒューリスティックで最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
+  /// @param[in] alg ヒューリスティックの種類
   /// @return 解のコスト
   ymuint32
-  heuristic(vector<ymuint32>& solution);
+  heuristic(vector<ymuint32>& solution,
+	    MinCov::AlgType alg);
 
   /// @brief 内部の行列の内容を出力する．
   /// @param[in] s 出力先のストリーム
   void
   print_matrix(ostream& s);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @grief greedy アルゴリズムで解を求める．
+  /// @param[out] solution 選ばれた列集合
+  void
+  greedy(vector<ymuint32>& solution);
 
 
 private:
