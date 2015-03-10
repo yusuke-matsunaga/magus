@@ -215,6 +215,12 @@ McMatrix::operator=(const McMatrix& src)
 // @brief デストラクタ
 McMatrix::~McMatrix()
 {
+  for (ymuint i = 0; i < row_size(); ++ i) {
+    delete mRowArray[i];
+  }
+  for (ymuint i = 0; i < col_size(); ++ i) {
+    delete mColArray[i];
+  }
   delete [] mRowArray;
   delete [] mColArray;
   delete [] mDelStack;

@@ -17,6 +17,8 @@
 #include "SelSimple.h"
 #include "SelCS.h"
 
+#include "YmUtils/RandGen.h"
+
 
 BEGIN_NAMESPACE_YM_MINCOV
 
@@ -108,16 +110,24 @@ ymuint32
 McSolver::heuristic(vector<ymuint32>& solution,
 		    MinCov::AlgType alg)
 {
-  switch ( alg ) {
-  case MinCov::kGreedy:
-    greedy(solution);
-    break;
+  McMatrix cur_matrix(*mMatrix);
 
-  case MinCov::kRandom:
-    break;
+  solution.clear();
+  cur_matrix.reduce(solution);
 
-  case MinCov::kMCT:
-    break;
+  if ( cur_matrix.row_num() > 0 ) {
+    switch ( alg ) {
+    case MinCov::kGreedy:
+      greedy(cur_matrix, solution);
+      break;
+
+    case MinCov::kRandom:
+      random(cur_matrix, solution);
+      break;
+
+    case MinCov::kMCT:
+      break;
+    }
   }
 
   ASSERT_COND( mMatrix->verify(solution) );
@@ -128,24 +138,21 @@ McSolver::heuristic(vector<ymuint32>& solution,
 }
 
 // @grief greedy アルゴリズムで解を求める．
+// @param[in] matrix 対象の行列
 // @param[out] solution 選ばれた列集合
 void
-McSolver::greedy(vector<ymuint32>& solution)
+McSolver::greedy(const McMatrix& matrix,
+		 vector<ymuint32>& solution)
 {
   if ( McSolver_debug ) {
     cout << "McSolver::greedy() start" << endl;
   }
 
-  McMatrix cur_matrix(*mMatrix);
-
-  solution.clear();
-  for ( ; ; ) {
-    cur_matrix.reduce(solution);
-
-    if ( cur_matrix.row_num() == 0 ) {
-      break;
-    }
-
+#if 0
+  for (ymuint i = 0; i < 10000; ++ i) {
+  McMatrix cur_matrix(matrix);
+  vector<ymuint32> solution;
+  while ( cur_matrix.row_num() > 0 ) {
     // 次の分岐のための列をとってくる．
     ymuint col = (*mSelector)(cur_matrix);
 
@@ -156,6 +163,89 @@ McSolver::greedy(vector<ymuint32>& solution)
     if ( McSolver_debug ) {
       cout << "Col#" << col << " is selected heuristically" << endl;
     }
+
+    cur_matrix.reduce(solution);
+  }
+  }
+#endif
+  McMatrix cur_matrix(matrix);
+
+  while ( cur_matrix.row_num() > 0 ) {
+    // 次の分岐のための列をとってくる．
+    ymuint col = (*mSelector)(cur_matrix);
+
+    // その列を選択する．
+    cur_matrix.select_col(col);
+    solution.push_back(col);
+
+    if ( McSolver_debug ) {
+      cout << "Col#" << col << " is selected heuristically" << endl;
+    }
+
+    cur_matrix.reduce(solution);
+  }
+}
+
+// @grief naive な random アルゴリズムで解を求める．
+// @param[in] matrix 対象の行列
+// @param[out] solution 選ばれた列集合
+void
+McSolver::random(const McMatrix& matrix,
+		 vector<ymuint32>& solution)
+{
+  if ( McSolver_debug ) {
+    cout << "McSolver::random() start" << endl;
+  }
+
+  RandGen rg;
+
+  ymuint count_limit = 1000000;
+
+  bool first = true;
+  ymuint32 best_cost = 0;
+  vector<ymuint32> best_solution;
+  for (ymuint count = 0; count < count_limit; ++ count) {
+    McMatrix cur_matrix(matrix);
+    vector<ymuint32> cur_solution;
+
+    while ( cur_matrix.row_num() > 0 ) {
+      // ランダムに選ぶ
+      ymuint col = 0; // 未完
+      const McRowHead* rh = cur_matrix.row_front();
+      ymuint n = rh->num();
+      ASSERT_COND( n > 0 );
+      ymuint idx = rg.int32() % n;
+      for (const McCell* cell = rh->front();
+	   !rh->is_end(cell); cell = cell->row_next(), -- idx) {
+	if ( idx == 0 ) {
+	  col = cell->col_pos();
+	  break;
+	}
+      }
+
+      // その列を選択する
+      cur_matrix.select_col(col);
+      cur_solution.push_back(col);
+
+      cur_matrix.reduce(cur_solution);
+    }
+    ymuint32 cur_cost = matrix.cost(cur_solution);
+    if ( first || best_cost > cur_cost ) {
+      first = false;
+      best_cost = cur_cost;
+      best_solution = cur_solution;
+      {
+	ymuint32 base_cost = matrix.cost(solution);
+	cout << "best so far = " << best_cost + base_cost
+	     << " ( " << best_cost << " + " << base_cost << " )"<< endl;
+      }
+    }
+  }
+
+  for (vector<ymuint32>::iterator p = best_solution.begin();
+       p != best_solution.end(); ++ p) {
+    ymuint32 col = *p;
+    solution.push_back(col);
   }
 }
 

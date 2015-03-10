@@ -82,9 +82,18 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @grief greedy アルゴリズムで解を求める．
+  /// @param[in] matrix 対象の行列
   /// @param[out] solution 選ばれた列集合
   void
-  greedy(vector<ymuint32>& solution);
+  greedy(const McMatrix& matrix,
+	 vector<ymuint32>& solution);
+
+  /// @grief naive な random アルゴリズムで解を求める．
+  /// @param[in] matrix 対象の行列
+  /// @param[out] solution 選ばれた列集合
+  void
+  random(const McMatrix& matrix,
+	 vector<ymuint32>& solution);
 
 
 private:

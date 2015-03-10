@@ -93,7 +93,7 @@ MinPatImpl::run(TvMgr& tvmgr,
     KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
-    ymuint k = 200;
+    ymuint k = 2000;
     kdet.run(tv_list, k, det_list_array);
     vector<bool> fmark(max_fault_id);
     vector<ymuint> fmap(max_fault_id);
@@ -124,7 +124,7 @@ MinPatImpl::run(TvMgr& tvmgr,
       }
     }
     vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list);
+    double cost = mincov.heuristic(pat_list, MinCov::kRandom);
     ymuint orig_num = tv_list.size();
     if ( pat_list.size() < tv_list.size() ) {
       vector<TestVector*> tv_tmp_list(tv_list);
@@ -219,7 +219,7 @@ MinPatImpl::run(TvMgr& tvmgr,
     KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
-    ymuint k = 400;
+    ymuint k = 4000;
     kdet.run(tv_list, k, det_list_array);
     vector<bool> fmark(max_fault_id);
     vector<ymuint> fmap(max_fault_id);
@@ -250,7 +250,7 @@ MinPatImpl::run(TvMgr& tvmgr,
       }
     }
     vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list);
+    double cost = mincov.heuristic(pat_list, MinCov::kRandom);
     if ( pat_list.size() < tv_list.size() ) {
       vector<TestVector*> tv_tmp_list(tv_list);
       tv_list.clear();
