@@ -68,6 +68,8 @@ GreedyMinPat::run(TvMgr& tvmgr,
 
   local_timer.start();
 
+  BddMgr bdd_mgr("classic");
+
   RandGen randgen;
 
   ymuint orig_num = tv_list.size();
@@ -90,6 +92,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
     }
   }
   ++ max_fault_id;
+  vector<vector<TestVector*> > tv_list_array(max_fault_id);
   {
 
     KDet kdet(fsim3, f_list, max_fault_id);
@@ -105,6 +108,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
     ymuint fnum = 0;
     ymuint pnum = tv_list.size();
     for (ymuint i = 0; i < pnum; ++ i) {
+      TestVector* tv = tv_list[i];
       const vector<ymuint>& det_list = det_list_array[i];
       for (ymuint j = 0; j < det_list.size(); ++ j) {
 	ymuint f = det_list[j];
@@ -113,6 +117,14 @@ GreedyMinPat::run(TvMgr& tvmgr,
 	  fmap[f] = fnum;
 	  ++ fnum;
 	}
+	tv_list_array[f].push_back(tv);
+      }
+    }
+
+    for (ymuint i = 0; i < max_fault_id; ++ i) {
+      ymuint n = tv_list_array[i].size();
+      if ( n > 0 ) {
+	cout << i << ": " << n << endl;
       }
     }
 
