@@ -23,6 +23,8 @@ BEGIN_NAMESPACE_YM_SATPG
 MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
+  mPoptGreedy = new TclPopt(this, "greedy",
+			    "greedy heuristic");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
 }
@@ -44,7 +46,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  MinPat* minpat = new_MinPat();
+  MinPat* minpat = mPoptGreedy->is_specified() ? new_GreedyMinPat() : new_MinPat();
 
   MinPatStats stats;
   minpat->run(_tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);

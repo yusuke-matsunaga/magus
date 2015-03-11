@@ -98,6 +98,7 @@ set (minpat_SOURCES
   src/minpat/KDetOp.cc
   src/minpat/MinPatImpl.cc
   src/minpat/Verifier.cc
+  src/minpat/GreedyMinPat.cc
   )
 
 set (rtpg_SOURCES
