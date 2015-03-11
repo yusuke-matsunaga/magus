@@ -199,7 +199,7 @@ McSolver::random(const McMatrix& matrix,
 
   RandGen rg;
 
-  ymuint count_limit = 1000000;
+  ymuint count_limit = 1000;
 
   bool first = true;
   ymuint32 best_cost = 0;
