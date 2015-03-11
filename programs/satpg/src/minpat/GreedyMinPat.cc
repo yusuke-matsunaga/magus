@@ -35,6 +35,34 @@ new_GreedyMinPat()
 }
 
 
+BEGIN_NONAMESPACE
+
+Bdd
+tv_to_bdd(TestVector* tv,
+	  BddMgr& bdd_mgr)
+{
+  Bdd ans = bdd_mgr.make_one();
+  ymuint n = tv->input_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    switch ( tv->val3(i) ) {
+    case kValX:
+      break;
+
+    case kVal0:
+      ans &= bdd_mgr.make_negaliteral(VarId(i));
+      break;
+
+    case kVal1:
+      ans &= bdd_mgr.make_posiliteral(VarId(i));
+      break;
+    }
+  }
+  return ans;
+}
+
+END_NONAMESPACE
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス GreedyMinPat
 //////////////////////////////////////////////////////////////////////
@@ -92,13 +120,17 @@ GreedyMinPat::run(TvMgr& tvmgr,
     }
   }
   ++ max_fault_id;
-  vector<vector<TestVector*> > tv_list_array(max_fault_id);
+
+  vector<Bdd> tf_array(max_fault_id);
+  for (ymuint i = 0; i < max_fault_id; ++ i) {
+    tf_array[i] = bdd_mgr.make_zero();
+  }
   {
 
     KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
-    ymuint k = 2000;
+    ymuint k = 10;
     kdet.run(tv_list, k, det_list_array);
     vector<bool> fmark(max_fault_id);
     vector<ymuint> fmap(max_fault_id);
@@ -108,6 +140,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
     ymuint fnum = 0;
     ymuint pnum = tv_list.size();
     for (ymuint i = 0; i < pnum; ++ i) {
+      cout << "pat#" << i << endl;
       TestVector* tv = tv_list[i];
       const vector<ymuint>& det_list = det_list_array[i];
       for (ymuint j = 0; j < det_list.size(); ++ j) {
@@ -117,163 +150,20 @@ GreedyMinPat::run(TvMgr& tvmgr,
 	  fmap[f] = fnum;
 	  ++ fnum;
 	}
-	tv_list_array[f].push_back(tv);
-      }
-    }
-
-    for (ymuint i = 0; i < max_fault_id; ++ i) {
-      ymuint n = tv_list_array[i].size();
-      if ( n > 0 ) {
-	cout << i << ": " << n << endl;
-      }
-    }
-
-    mincov.set_size(fnum, pnum);
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	ymuint r = fmap[f];
-	mincov.insert_elem(r, i);
-      }
-    }
-    vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list, MinCov::kRandom);
-    ymuint orig_num = tv_list.size();
-    if ( pat_list.size() < tv_list.size() ) {
-      vector<TestVector*> tv_tmp_list(tv_list);
-      tv_list.clear();
-      for (ymuint i = 0; i < pat_list.size(); ++ i) {
-	tv_list.push_back(tv_tmp_list[pat_list[i]]);
-      }
-    }
-    cout << "Minimum Covering End: " << tv_list.size() << " / " << orig_num << endl;
-  }
-
-  // 3値のパタンを抜き出し tv3_list に入れる．
-  // 2値のパタンは tv2_list に入れる．
-  vector<TestVector*> tv2_list;
-  vector<TestVector*> tv3_list;
-  tv2_list.reserve(orig_num);
-  tv3_list.reserve(orig_num);
-  for (vector<TestVector*>::iterator p = tv_list.begin();
-       p != tv_list.end(); ++ p) {
-    TestVector* tv = *p;
-    if ( tv->x_num() > 0 ) {
-      tv3_list.push_back(tv);
-    }
-    else {
-      tv2_list.push_back(tv);
-    }
-  }
-
-  if ( 0 ) {
-    // 検証しておく．
-    if ( ver.check(tv3_list) ) {
-      cout << "No Errors(2)" << endl;
-    }
-  }
-
-  if ( tv3_list.empty() ) {
-#if 0
-    cout << "No x-patterns" << endl;
-#endif
-  }
-  else {
-    // 最小彩色問題を解くことで3値のパタンを圧縮する．
-    GcSolver gcmgr;
-
-    ymuint n = tv3_list.size();
-    gcmgr.init(n);
-    for (ymuint i1 = 1; i1 < n; ++ i1) {
-      TestVector* tv1 = tv3_list[i1];
-      for (ymuint i2 = 0; i2 < i1; ++ i2) {
-	TestVector* tv2 = tv3_list[i2];
-	if ( TestVector::is_conflict(*tv1, *tv2) ) {
-	  gcmgr.connect(i1, i2);
-	}
-      }
-    }
-    vector<vector<ymuint> > color_group;
-    ymuint nc = gcmgr.coloring(color_group);
-
-#if 0
-    cout << "coloring " << n << " --> " << nc << endl;
-#endif
-
-    for (ymuint i = 0; i < nc; ++ i) {
-      // 同じ色のグループのパタンを一つにマージする．
-      TestVector* new_tv = tvmgr.new_vector();
-      const vector<ymuint>& id_list = color_group[i];
-      for (vector<ymuint>::const_iterator p = id_list.begin();
-	   p != id_list.end(); ++ p) {
-	ymuint id = *p;
-	TestVector* tv = tv3_list[id];
-	bool stat = new_tv->merge(*tv);
-	assert_cond( stat, __FILE__, __LINE__);
-      }
-      // 残った X にランダムに 0/1 を割り当てる．
-      new_tv->fix_x_from_random(randgen);
-
-      tv2_list.push_back(new_tv);
-    }
-  }
-  if ( 0 ) {
-    // 検証しておく．
-    if ( ver.check(tv2_list) ) {
-      cout << "No Errors(3)" << endl;
-    }
-  }
-  cout << "Graph Coloring End: " << tv2_list.size() << endl;
-
-  // 最小被覆問題を解く．
-  tv_list = tv2_list;
-
-  {
-    KDet kdet(fsim3, f_list, max_fault_id);
-
-    vector<vector<ymuint> > det_list_array;
-    ymuint k = 4000;
-    kdet.run(tv_list, k, det_list_array);
-    vector<bool> fmark(max_fault_id);
-    vector<ymuint> fmap(max_fault_id);
-
-    MinCov mincov;
-
-    ymuint fnum = 0;
-    ymuint pnum = tv_list.size();
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	if ( !fmark[f] ) {
-	  fmark[f] = true;
-	  fmap[f] = fnum;
-	  ++ fnum;
-	}
-      }
-    }
-
-    mincov.set_size(fnum, pnum);
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	ymuint r = fmap[f];
-	mincov.insert_elem(r, i);
-      }
-    }
-    vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list, MinCov::kRandom);
-    if ( pat_list.size() < tv_list.size() ) {
-      vector<TestVector*> tv_tmp_list(tv_list);
-      tv_list.clear();
-      for (ymuint i = 0; i < pat_list.size(); ++ i) {
-	tv_list.push_back(tv_tmp_list[pat_list[i]]);
+	tf_array[f] |= tv_to_bdd(tv, bdd_mgr);
       }
     }
   }
-  cout << "Minimum Covering End: " << tv_list.size() << endl;
+
+  // tf_array の maximal independent set を求める．
+  vector<ymuint> mis;
+  get_mis(tf_array, mis);
+
+  for (vector<ymuint>::iterator p = mis.begin();
+       p != mis.end(); ++ p) {
+    ymuint fid = *p;
+    Bdd f0 = tf_array[fid];
+  }
 
   {
     // 検証しておく．
