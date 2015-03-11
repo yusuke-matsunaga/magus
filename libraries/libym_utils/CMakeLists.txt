@@ -61,6 +61,8 @@ set (gen_SOURCES
 set (graph_SOURCES
   src/graph/GcSolver.cc
   src/graph/Graph.cc
+  src/graph/MisNodeHeap.cc
+  src/graph/MisSolver.cc
   )
 
 set (io_SOURCES
@@ -115,6 +117,7 @@ set (mincov_SOURCES
   src/mincov/LbMAX.cc
   src/mincov/LbMIS1.cc
   src/mincov/LbMIS2.cc
+  src/mincov/LbMIS3.cc
   src/mincov/MaxClique.cc
   src/mincov/McMatrix.cc
   src/mincov/McSolver.cc

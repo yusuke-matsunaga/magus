@@ -25,6 +25,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] node_num ノード数
   ///
+  /// ノードの重みは 1 で初期化される．
   /// この状態では枝はない
   Graph(ymuint node_num);
 
@@ -40,6 +41,18 @@ public:
   /// @brief ノード数を得る．
   ymuint
   node_num() const;
+
+  /// @brief ノードに重みを設定する．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  /// @param[in] weight 重み
+  void
+  set_node_weight(ymuint id,
+		  int weight);
+
+  /// @brief ノードの重みを返す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  int
+  node_weight(ymuint id) const;
 
   /// @brief 2つのノードを接続する．
   /// @param[in] id1, id2 2つのノードの番号 ( 0 <= id1, id2 < node_num() )
@@ -73,6 +86,9 @@ private:
   // ノード数
   ymuint32 mNodeNum;
 
+  // ノードの重みの配列
+  int* mNodeWeightArray;
+
   // 枝の実体の配列
   // ただし，実際には2つで1つの枝を表す．
   vector<ymuint> mEdgeArray;
@@ -87,6 +103,12 @@ extern
 ymuint
 coloring(const Graph& graph,
 	 vector<vector<ymuint> >& color_group);
+
+/// @brief 最大独立集合を求める．
+/// @param[in] graph 対象のグラフ
+extern
+ymuint
+get_mis(const Graph& graph);
 
 END_NAMESPACE_YM
 

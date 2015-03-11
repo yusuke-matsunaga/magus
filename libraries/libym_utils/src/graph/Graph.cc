@@ -21,11 +21,13 @@ BEGIN_NAMESPACE_YM
 Graph::Graph(ymuint node_num)
 {
   mNodeNum = node_num;
+  mNodeWeightArray = new int[mNodeNum];
 }
 
 // @brief デストラクタ
 Graph::~Graph()
 {
+  delete [] mNodeWeightArray;
 }
 
 // @brief ノード数を得る．
@@ -33,6 +35,26 @@ ymuint
 Graph::node_num() const
 {
   return mNodeNum;
+}
+
+// @brief ノードに重みを設定する．
+// @param[in] id ノード番号 ( 0 <= id < node_num() )
+// @param[in] weight 重み
+void
+Graph::set_node_weight(ymuint id,
+		       int weight)
+{
+  ASSERT_COND( id < node_num() );
+  mNodeWeightArray[id] = weight;
+}
+
+// @brief ノードの重みを返す．
+// @param[in] id ノード番号 ( 0 <= id < node_num() )
+int
+Graph::node_weight(ymuint id) const
+{
+  ASSERT_COND( id < node_num() );
+  return mNodeWeightArray[id];
 }
 
 // @brief 2つのノードを接続する．
