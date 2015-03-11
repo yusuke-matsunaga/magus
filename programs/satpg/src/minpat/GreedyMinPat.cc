@@ -18,7 +18,7 @@
 #include "Verifier.h"
 #include "YmLogic/Bdd.h"
 #include "YmLogic/BddMgr.h"
-#include "YmUtils/GcSolver.h"
+#include "YmUtils/Graph.h"
 #include "YmUtils/MinCov.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/RandPermGen.h"
@@ -155,6 +155,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
     }
   }
 
+#if 0
   // tf_array の maximal independent set を求める．
   vector<ymuint> mis;
   get_mis(tf_array, mis);
@@ -164,6 +165,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
     ymuint fid = *p;
     Bdd f0 = tf_array[fid];
   }
+#endif
 
   {
     // 検証しておく．

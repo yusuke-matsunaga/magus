@@ -16,7 +16,7 @@
 #include "Fsim.h"
 #include "KDet.h"
 #include "Verifier.h"
-#include "YmUtils/GcSolver.h"
+#include "YmUtils/Graph.h"
 #include "YmUtils/MinCov.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/RandPermGen.h"
@@ -166,22 +166,22 @@ MinPatImpl::run(TvMgr& tvmgr,
 #endif
   }
   else {
-    // 最小彩色問題を解くことで3値のパタンを圧縮する．
-    GcSolver gcmgr;
-
+    // マージできないテストパタンの間に枝を持つグラフを作る．
     ymuint n = tv3_list.size();
-    gcmgr.init(n);
+    Graph cg(n);
     for (ymuint i1 = 1; i1 < n; ++ i1) {
       TestVector* tv1 = tv3_list[i1];
       for (ymuint i2 = 0; i2 < i1; ++ i2) {
 	TestVector* tv2 = tv3_list[i2];
 	if ( TestVector::is_conflict(*tv1, *tv2) ) {
-	  gcmgr.connect(i1, i2);
+	  cg.connect(i1, i2);
 	}
       }
     }
+
+    // このグラフ上での最小彩色問題を解くことで3値のパタンを圧縮する．
     vector<vector<ymuint> > color_group;
-    ymuint nc = gcmgr.coloring(color_group);
+    ymuint nc = coloring(cg, color_group);
 
 #if 0
     cout << "coloring " << n << " --> " << nc << endl;

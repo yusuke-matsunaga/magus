@@ -46,10 +46,6 @@ set (file_SOURCES
   src/file/FileInfoMgr.cc
   )
 
-set (gcsolver_SOURCES
-  src/gcsolver/GcSolver.cc
-  )
-
 set (gen_SOURCES
   src/gen/CombiGen.cc
   src/gen/GenBase.cc
@@ -60,6 +56,11 @@ set (gen_SOURCES
   src/gen/MultiSetGenBase.cc
   src/gen/MultiSetPermGen.cc
   src/gen/PermGen.cc
+  )
+
+set (graph_SOURCES
+  src/graph/GcSolver.cc
+  src/graph/Graph.cc
   )
 
 set (io_SOURCES
@@ -174,8 +175,8 @@ add_library(ym_utils SHARED
   ${alloc_SOURCES}
   ${btg_SOURCES}
   ${file_SOURCES}
-  ${gcsolver_SOURCES}
   ${gen_SOURCES}
+  ${graph_SOURCES}
   ${io_SOURCES}
   ${itvl_SOURCES}
   ${mfset_SOURCES}

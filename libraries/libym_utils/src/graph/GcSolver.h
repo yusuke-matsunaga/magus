@@ -1,11 +1,11 @@
-﻿#ifndef YMUTILS_GCSOLVER_H
-#define YMUTILS_GCSOLVER_H
+﻿#ifndef GCSOLVER_H
+#define GCSOLVER_H
 
-/// @file YmUtils/GcSolver.h
+/// @file GcSolver.h
 /// @brief GcSolver のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -14,10 +14,11 @@
 
 BEGIN_NAMESPACE_YM
 
+class Graph;
 class GcNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class GcSolver GcSolver.h "YmUtils/GcSolver.h"
+/// @class GcSolver GcSolver.h "GcSolver.h"
 /// @brief 彩色問題を解くためのクラス
 //////////////////////////////////////////////////////////////////////
 class GcSolver
@@ -25,7 +26,8 @@ class GcSolver
 public:
 
   /// @brief コンストラクタ
-  GcSolver();
+  /// @param[in] graph 対象のグラフ
+  GcSolver(const Graph& graph);
 
   /// @brief デストラクタ
   ~GcSolver();
@@ -36,29 +38,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノード数を指定して初期化する．
-  void
-  init(ymuint num);
-
-  /// @brief ノード数を得る．
-  ymuint
-  node_num() const;
-
-  /// @brief 2つのノードを接続する．
-  /// @param[in] id1, id2 2つのノードの番号 ( 0 <= id1, id2 < node_num() )
-  void
-  connect(ymuint id1,
-	  ymuint id2);
-
   /// @brief 彩色する．
   /// @param[in] color_group 同じ色のノード番号のリストの配列
   /// @return 彩色数を返す．
   ymuint
   coloring(vector<vector<ymuint> >& color_group);
-
-  /// @brief グラフの内容を出力する．
-  void
-  dump(ostream& s) const;
 
 
 private:

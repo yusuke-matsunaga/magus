@@ -3,12 +3,13 @@
 /// @brief GcSolver の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2013 Yusuke Matsunaga
+/// Copyright (C) 2013, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmUtils/GcSolver.h"
+#include "GcSolver.h"
 #include "GcNode.h"
+#include "YmUtils/Graph.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -32,35 +33,29 @@ struct Lt
 
 END_NONAMESPACE
 
+
+// @brief 彩色問題を解く
+// @param[in] graph 対象のグラフ
+// @param[out] color_group 同じ色のノード番号のリストの配列
+// @return 彩色数を返す．
+ymuint
+coloring(const Graph& graph,
+	 vector<vector<ymuint> >& color_group)
+{
+  GcSolver gcsolver(graph);
+  return gcsolver.coloring(color_group);
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス GcSolver
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-GcSolver::GcSolver()
+// @param[in] graph 対象のグラフ
+GcSolver::GcSolver(const Graph& graph)
 {
-  mNodeNum = 0;
-  mNodeArray = NULL;
-  mNodeHeap = NULL;
-}
-
-// @brief デストラクタ
-GcSolver::~GcSolver()
-{
-  init(0);
-}
-
-// @brief ノード数を指定して初期化する．
-void
-GcSolver::init(ymuint num)
-{
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    delete [] mNodeArray[i].mColorSet;
-  }
-  delete [] mNodeArray;
-  delete [] mNodeHeap;
-
-  mNodeNum = num;
+  mNodeNum = graph.node_num();
   if ( mNodeNum > 0 ) {
     ymuint vectlen = (mNodeNum + 63) / 64;
     mNodeArray = new GcNode[mNodeNum];
@@ -76,30 +71,33 @@ GcSolver::init(ymuint num)
   }
   else {
     mNodeArray = NULL;
+    mNodeHeap = NULL;
+  }
+
+  for (ymuint i = 0; i < graph.edge_num(); ++ i) {
+    pair<ymuint, ymuint> p = graph.edge(i);
+    ymuint id1 = p.first;
+    ymuint id2 = p.second;
+
+    ASSERT_COND( id1 < graph.node_num() );
+    ASSERT_COND( id2 < graph.node_num() );
+
+    GcNode* node1 = &mNodeArray[id1];
+    GcNode* node2 = &mNodeArray[id2];
+
+    node1->mLinkList.push_back(node2);
+    node2->mLinkList.push_back(node1);
   }
 }
 
-// @brief ノード数を得る．
-ymuint
-GcSolver::node_num() const
+// @brief デストラクタ
+GcSolver::~GcSolver()
 {
-  return mNodeNum;
-}
-
-// @brief 2つのノードを接続する．
-// @param[in] id1, id2 2つのノードの番号 ( 0 <= id1, id2 < node_num() )
-void
-GcSolver::connect(ymuint id1,
-		  ymuint id2)
-{
-  ASSERT_COND( id1 < node_num() );
-  ASSERT_COND( id2 < node_num() );
-
-  GcNode* node1 = &mNodeArray[id1];
-  GcNode* node2 = &mNodeArray[id2];
-
-  node1->mLinkList.push_back(node2);
-  node2->mLinkList.push_back(node1);
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    delete [] mNodeArray[i].mColorSet;
+  }
+  delete [] mNodeArray;
+  delete [] mNodeHeap;
 }
 
 // @brief 彩色する．
@@ -193,24 +191,6 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
   }
 
   return mMaxColor;
-}
-
-// @brief グラフの内容を出力する．
-void
-GcSolver::dump(ostream& s) const
-{
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    GcNode* node = &mNodeArray[i];
-    const vector<GcNode*>& node_list = node->link_list();
-    cout << i << ": ";
-    for (vector<GcNode*>::const_iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      GcNode* node1 = *p;
-      cout << " " << node1->id();
-    }
-    cout << endl;
-  }
-  cout << endl;
 }
 
 // @brief ノードに彩色して情報を更新する．
