@@ -1,33 +1,33 @@
 ﻿
-/// @file McNodeHeap.cc
-/// @brief McNodeHeap の実装ファイル
+/// @file MisNodeHeap.cc
+/// @brief MisNodeHeap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "McNodeHeap.h"
+#include "MisNodeHeap.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-// クラス McNodeHeap
+// クラス MisNodeHeap
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] num ノード数
-McNodeHeap::McNodeHeap(ymuint num)
+MisNodeHeap::MisNodeHeap(ymuint num)
 {
   mNodeSize = num;
-  mNodeChunk = new McNode[num];
-  mNodeHeap = new McNode*[num];
+  mNodeChunk = new MisNode[num];
+  mNodeHeap = new MisNode*[num];
   mNodeNum = 0;
 }
 
 // @brief デストラクタ
-McNodeHeap::~McNodeHeap()
+MisNodeHeap::~MisNodeHeap()
 {
   delete [] mNodeChunk;
   delete [] mNodeHeap;
@@ -36,7 +36,7 @@ McNodeHeap::~McNodeHeap()
 // @brief ノードを適当な位置まで沈める．
 // @param[in] node 対象のノード
 void
-McNodeHeap::move_down(McNode* node)
+MisNodeHeap::move_down(MisNode* node)
 {
   ymuint idx = node->mHeapIdx;
   if ( idx == 0 ) {
@@ -53,8 +53,8 @@ McNodeHeap::move_down(McNode* node)
       // 左右の子供を持たない時
       break;
     }
-    McNode* p_node = mNodeHeap[idx];
-    McNode* l_node = mNodeHeap[l_idx];
+    MisNode* p_node = mNodeHeap[idx];
+    MisNode* l_node = mNodeHeap[l_idx];
     if ( r_idx == mNodeNum ) {
       // 右の子供を持たない時
       if ( compare(p_node, l_node) > 0 ) {
@@ -67,7 +67,7 @@ McNodeHeap::move_down(McNode* node)
     }
     else {
       // 左右の子供がいる場合
-      McNode* r_node = mNodeHeap[r_idx];
+      MisNode* r_node = mNodeHeap[r_idx];
       if ( compare(p_node, l_node) > 0 &&
 	   compare(l_node, r_node) <= 0 ) {
 	// 左の子供と入れ替える．
@@ -94,7 +94,7 @@ McNodeHeap::move_down(McNode* node)
 // @brief ノードを適当な位置まで浮かび上がらせる．
 // @param[in] node 対象のノード
 void
-McNodeHeap::move_up(McNode* node)
+MisNodeHeap::move_up(MisNode* node)
 {
   ymuint idx = node->mHeapIdx;
   if ( idx == 0 ) {
@@ -104,9 +104,9 @@ McNodeHeap::move_up(McNode* node)
 
   -- idx;
   while ( idx > 0 ) {
-    McNode* node = mNodeHeap[idx];
+    MisNode* node = mNodeHeap[idx];
     ymuint p_idx = (idx - 1) / 2;
-    McNode* p_node = mNodeHeap[p_idx];
+    MisNode* p_node = mNodeHeap[p_idx];
     if ( compare(p_node, node) > 0 ) {
       set(p_idx, node);
       set(idx, p_node);
@@ -120,12 +120,12 @@ McNodeHeap::move_up(McNode* node)
 
 // @brief 内容を出力する．
 void
-McNodeHeap::print(ostream& s) const
+MisNodeHeap::print(ostream& s) const
 {
-  s << "*** McNodeHeap ***" << endl
+  s << "*** MisNodeHeap ***" << endl
     << " node_size() = " << node_size() << endl;
   for (ymuint i = 0; i < node_size(); ++ i) {
-    const McNode* node1 = node(i);
+    const MisNode* node1 = node(i);
     s << "Node#" << i << ": id = " << node1->id();
     if ( node1->deleted() ) {
       s << "*";
@@ -139,7 +139,7 @@ McNodeHeap::print(ostream& s) const
 
   s << " heap_size = " << mNodeNum << endl;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
-    const McNode* node1 = mNodeHeap[i];
+    const MisNode* node1 = mNodeHeap[i];
 
     ASSERT_COND( node1->mHeapIdx - 1 == i );
 

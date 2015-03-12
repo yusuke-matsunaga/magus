@@ -1,33 +1,33 @@
 ﻿#ifndef MCNODEHEAP_H
 #define MCNODEHEAP_H
 
-/// @file McNodeHeap.h
-/// @brief McNodeHeap のヘッダファイル
+/// @file MisNodeHeap.h
+/// @brief MisNodeHeap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "McNode.h"
+#include "MisNode.h"
 
 
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class McNodeHeap McNodeHeap.h "McNodeHeap.h"
-/// @brief McNode のヒープ木
+/// @class MisNodeHeap MisNodeHeap.h "MisNodeHeap.h"
+/// @brief MisNode のヒープ木
 //////////////////////////////////////////////////////////////////////
-class McNodeHeap
+class MisNodeHeap
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] num ノード数
-  McNodeHeap(ymuint num);
+  MisNodeHeap(ymuint num);
 
   /// @brief デストラクタ
-  ~McNodeHeap();
+  ~MisNodeHeap();
 
 
 public:
@@ -41,12 +41,12 @@ public:
 
   /// @brief ノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < node_size() )
-  McNode*
+  MisNode*
   node(ymuint pos);
 
   /// @brief ノードを返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < node_size() )
-  const McNode*
+  const MisNode*
   node(ymuint pos) const;
 
   /// @brief ヒープが空の時 true を返す．
@@ -55,21 +55,21 @@ public:
 
   /// @brief ノードを追加する．
   void
-  put_node(McNode* node);
+  put_node(MisNode* node);
 
   /// @brief ノードを取り去る．
   void
-  delete_node(McNode* node);
+  delete_node(MisNode* node);
 
   /// @brief 値が最小の要素を取り出す．
   /// そのノードはヒープから取り除かれる．
-  McNode*
+  MisNode*
   get_min();
 
   /// @brief ノードの値の変更に伴ってヒープ構造を更新する．
   /// @param[in] node 値が変更されたノード
   void
-  update(McNode* node);
+  update(MisNode* node);
 
   /// @brief 内容を出力する．
   void
@@ -84,12 +84,12 @@ private:
   /// @brief ノードを適当な位置まで沈める．
   /// @param[in] node 対象のノード
   void
-  move_down(McNode* node);
+  move_down(MisNode* node);
 
   /// @brief ノードを適当な位置まで浮かび上がらせる．
   /// @param[in] node 対象のノード
   void
-  move_up(McNode* node);
+  move_up(MisNode* node);
 
   /// @brief ノードの比較を行う．
   /// @param[in] node1, node2 対象のノード
@@ -98,15 +98,15 @@ private:
   /// @retval 正の値 node1 が node2 より後ろにある．
   static
   int
-  compare(McNode* node1,
-	  McNode* node2);
+  compare(MisNode* node1,
+	  MisNode* node2);
 
   /// @brief ノードをセットする．
   /// @param[in] pos 位置
   /// @param[in] node ノード
   void
   set(ymuint pos,
-      McNode* node);
+      MisNode* node);
 
 
 private:
@@ -119,10 +119,10 @@ private:
 
   // ノードの実体の配列
   // サイズは mNodeSize
-  McNode* mNodeChunk;
+  MisNode* mNodeChunk;
 
   // ノードのヒープ木
-  McNode** mNodeHeap;
+  MisNode** mNodeHeap;
 
   // ヒープ木中にあるノード数
   ymuint32 mNodeNum;
@@ -137,7 +137,7 @@ private:
 // @brief 確保されているノード数を返す．
 inline
 ymuint
-McNodeHeap::node_size() const
+MisNodeHeap::node_size() const
 {
   return mNodeSize;
 }
@@ -145,8 +145,8 @@ McNodeHeap::node_size() const
 // @brief ノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < node_size() )
 inline
-McNode*
-McNodeHeap::node(ymuint pos)
+MisNode*
+MisNodeHeap::node(ymuint pos)
 {
   return &mNodeChunk[pos];
 }
@@ -154,8 +154,8 @@ McNodeHeap::node(ymuint pos)
 // @brief ノードを返す．
 // @param[in] pos 位置番号 ( 0 <= pos < node_size() )
 inline
-const McNode*
-McNodeHeap::node(ymuint pos) const
+const MisNode*
+MisNodeHeap::node(ymuint pos) const
 {
   return &mNodeChunk[pos];
 }
@@ -163,7 +163,7 @@ McNodeHeap::node(ymuint pos) const
 // @brief ヒープが空の時 true を返す．
 inline
 bool
-McNodeHeap::empty() const
+MisNodeHeap::empty() const
 {
   return mNodeNum == 0;
 }
@@ -171,7 +171,7 @@ McNodeHeap::empty() const
 // @brief ノードを追加する．
 inline
 void
-McNodeHeap::put_node(McNode* node)
+MisNodeHeap::put_node(MisNode* node)
 {
   ASSERT_COND( mNodeNum < mNodeSize );
 
@@ -183,7 +183,7 @@ McNodeHeap::put_node(McNode* node)
 // @brief ノードを取り去る．
 inline
 void
-McNodeHeap::delete_node(McNode* node)
+MisNodeHeap::delete_node(MisNode* node)
 {
   ASSERT_COND( !empty() );
 
@@ -193,7 +193,7 @@ McNodeHeap::delete_node(McNode* node)
 
   node->mHeapIdx = 0;
   -- mNodeNum;
-  McNode* last = mNodeHeap[mNodeNum];
+  MisNode* last = mNodeHeap[mNodeNum];
   if ( last != node ) {
     -- idx;
     set(idx, last);
@@ -204,16 +204,16 @@ McNodeHeap::delete_node(McNode* node)
 // @brief 値が最小の要素を取り出す．
 // そのノードはヒープから取り除かれる．
 inline
-McNode*
-McNodeHeap::get_min()
+MisNode*
+MisNodeHeap::get_min()
 {
   ASSERT_COND( !empty() );
 
-  McNode* node = mNodeHeap[0];
+  MisNode* node = mNodeHeap[0];
   node->mHeapIdx = 0;
   -- mNodeNum;
   if ( mNodeNum > 0 ) {
-    McNode* last = mNodeHeap[mNodeNum];
+    MisNode* last = mNodeHeap[mNodeNum];
     set(0, last);
     move_down(last);
   }
@@ -224,7 +224,7 @@ McNodeHeap::get_min()
 // @param[in] node 値が変更されたノード
 inline
 void
-McNodeHeap::update(McNode* node)
+MisNodeHeap::update(MisNode* node)
 {
   ymuint idx = node->mHeapIdx;
   ASSERT_COND( idx > 0 );
@@ -234,7 +234,7 @@ McNodeHeap::update(McNode* node)
 
   if ( idx > 0 ) {
     ymuint p_idx = (idx - 1) / 2;
-    McNode* p_node = mNodeHeap[p_idx];
+    MisNode* p_node = mNodeHeap[p_idx];
     if ( compare(p_node, node) > 0 ) {
       move_up(node);
       goto end;
@@ -252,8 +252,8 @@ McNodeHeap::update(McNode* node)
 // @retval 正の値 node1 が node2 より後ろにある．
 inline
 int
-McNodeHeap::compare(McNode* node1,
-		    McNode* node2)
+MisNodeHeap::compare(MisNode* node1,
+		    MisNode* node2)
 {
   return node1->adj_num() - node2->adj_num();
 }
@@ -263,8 +263,8 @@ McNodeHeap::compare(McNode* node1,
 // @param[in] node 要素
 inline
 void
-McNodeHeap::set(ymuint pos,
-		McNode* node)
+MisNodeHeap::set(ymuint pos,
+		MisNode* node)
 {
   mNodeHeap[pos] = node;
   node->mHeapIdx = pos + 1;
