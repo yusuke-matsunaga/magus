@@ -61,8 +61,8 @@ set (gen_SOURCES
 set (graph_SOURCES
   src/graph/GcSolver.cc
   src/graph/Graph.cc
-  src/graph/MisNodeHeap.cc
-  src/graph/MisSolver.cc
+  src/graph/max_clique.cc
+  src/graph/McNodeHeap.cc
   )
 
 set (io_SOURCES
