@@ -17,6 +17,7 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
+// @brief independent_set 用の NodeHeap
 class IndepNodeHeap :
   public NodeHeap
 {
@@ -122,7 +123,7 @@ independent_set(const Graph& graph,
       Node* node2 = best_node->adj_node(i);
       if ( !node2->deleted() ) {
 	node_heap.delete_node(node2);
-	// さらにこのノードに隣接しているノードの mNum を減らす．
+	// さらにこのノードに隣接しているノードの adj_num を減らす．
 	for (ymuint j = 0; j < node2->adj_size(); ++ j) {
 	  Node* node3 = node2->adj_node(j);
 	  if ( !node3->deleted() ) {

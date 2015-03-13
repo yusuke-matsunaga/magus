@@ -17,6 +17,7 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
+// @brief max_clique 用の NodeHeap
 class MaxCliqueNodeHeap :
   public NodeHeap
 {
@@ -97,6 +98,7 @@ max_clique(const Graph& graph,
     link_array[id1].push_back(id2);
     link_array[id2].push_back(id1);
   }
+  vector<Node*> node_list;
   for (ymuint i = 0; i < node_num; ++ i) {
     Node* node1 = node_heap.node(i);
     const vector<ymuint>& link_list = link_array[i];
@@ -110,6 +112,13 @@ max_clique(const Graph& graph,
     node1->set_adj_link(link_num, adj_link);
 
     node_heap.put_node(node1);
+    node_list.push_back(node1);
+  }
+
+  void* p = alloc.get_memory(sizeof(bool) * node_num);
+  bool* tmp_mark = new (p) bool[node_num];
+  for (ymuint i = 0; i < node_num; ++ i) {
+    tmp_mark[i] = false;
   }
 
   // 未処理の Node のうち Node::adj_num() が最大のものを取り出し，解に加える．
@@ -118,19 +127,42 @@ max_clique(const Graph& graph,
     node_set.push_back(best_node->id());
 
     for (ymuint i = 0; i < best_node->adj_size(); ++ i) {
-      // best_node に隣接していないノードも処理済みとする．
+      // best_node に隣接しているノードにマークをつける．
       Node* node2 = best_node->adj_node(i);
-      if ( !node2->deleted() ) {
-	node_heap.delete_node(node2);
+      tmp_mark[node2->id()] = true;
+    }
+    // マークのついていないノードを削除する．
+    vector<Node*> tmp_list;
+    tmp_list.reserve(node_list.size());
+    for (vector<Node*>::iterator p = node_list.begin();
+	 p != node_list.end(); ++ p) {
+      tmp_list.push_back(*p);
+    }
+    node_list.clear();
+    for (vector<Node*>::iterator p = tmp_list.begin();
+	 p != tmp_list.end(); ++ p) {
+      Node* node = *p;
+      if ( tmp_mark[node->id()] ) {
+	node_list.push_back(node);
+      }
+      else {
+	// このノードを削除する．
+	node_heap.delete_node(node);
 	// さらにこのノードに隣接しているノードの mNum を減らす．
-	for (ymuint j = 0; j < node2->adj_size(); ++ j) {
-	  Node* node3 = node2->adj_node(j);
+	for (ymuint j = 0; j < node->adj_size(); ++ j) {
+	  Node* node3 = node->adj_node(j);
 	  if ( !node3->deleted() ) {
 	    node3->dec_adj_num();
 	    node_heap.update(node3);
 	  }
 	}
       }
+    }
+    // マークを消す．
+    for (ymuint i = 0; i < best_node->adj_size(); ++ i) {
+      // best_node に隣接しているノードにマークをつける．
+      Node* node2 = best_node->adj_node(i);
+      tmp_mark[node2->id()] = false;
     }
   }
 
