@@ -16,12 +16,10 @@ BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
 /// @class Node Node.h "Node.h"
-/// @brief max_clique で用いられるクラス
+/// @brief NodeHeap で用いられるクラス
 //////////////////////////////////////////////////////////////////////
 class Node
 {
-  friend class NodeHeap;
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
@@ -58,9 +56,19 @@ public:
   ymuint
   adj_num() const;
 
-  /// @brief adj_num を１減らす
+  /// @brief adj_num を1減らす
   void
   dec_adj_num();
+
+  /// @brief ヒープ上の位置(+1)を返す．
+  ///
+  /// ヒープになければ 0 を返す．
+  ymuint
+  heap_location() const;
+
+  /// @brief ヒープ上の位置を設定する．
+  void
+  set_heap_location(ymuint pos);
 
 
 private:
@@ -161,6 +169,24 @@ void
 Node::dec_adj_num()
 {
   -- mNum;
+}
+
+// @brief ヒープ上の位置(+1)を返す．
+//
+// ヒープになければ 0 を返す．
+inline
+ymuint
+Node::heap_location() const
+{
+  return mHeapIdx;
+}
+
+// @brief ヒープ上の位置を設定する．
+inline
+void
+Node::set_heap_location(ymuint pos)
+{
+  mHeapIdx = pos;
 }
 
 END_NAMESPACE_YM

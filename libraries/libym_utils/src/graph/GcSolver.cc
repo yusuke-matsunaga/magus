@@ -9,30 +9,11 @@
 
 #include "GcSolver.h"
 #include "GcNode.h"
+#include "NodeHeap.h"
 #include "YmUtils/Graph.h"
 
 
 BEGIN_NAMESPACE_YM
-
-BEGIN_NONAMESPACE
-
-// GcNode のソート用の比較ファンクタ
-struct Lt
-{
-  bool
-  operator()(GcNode* node1,
-	     GcNode* node2)
-  {
-    if ( node1->adj_degree() > node2->adj_degree() ) {
-      return true;
-    }
-    return false;
-  }
-
-};
-
-END_NONAMESPACE
-
 
 // @brief 彩色問題を解く
 // @param[in] graph 対象のグラフ
@@ -45,6 +26,71 @@ coloring(const Graph& graph,
   GcSolver gcsolver(graph);
   return gcsolver.coloring(color_group);
 }
+
+
+BEGIN_NONAMESPACE
+
+// @brief GcSolver 用の比較関数
+class GcComp
+{
+public:
+
+  /// @brief ノードの比較関数
+  int
+  operator()(GcNode* node1,
+	     GcNode* node2);
+
+};
+
+// @brief ノードの比較関数
+int
+GcComp::operator()(GcNode* node1,
+		   GcNode* node2)
+{
+  if ( node1->sat_degree() < node2->sat_degree() ) {
+    return 1;
+  }
+  if ( node1->sat_degree() > node2->sat_degree() ) {
+    return -1;
+  }
+  if ( node1->adj_degree() < node2->adj_degree() ) {
+    return 1;
+  }
+  if ( node1->adj_degree() > node2->adj_degree() ) {
+    return -1;
+  }
+  return 0;
+}
+
+
+// @brief ノードに彩色して情報を更新する．
+void
+color_node(GcNode* node,
+	   ymuint color,
+	   NodeHeap<GcNode, GcComp>& node_heap)
+{
+  // node に color の色を割り当てる．
+  node->set_color(color);
+
+  // node に隣接するノードの SAT degree を更新する．
+  const vector<GcNode*>& node_list = node->link_list();
+  for (vector<GcNode*>::const_iterator p = node_list.begin();
+       p != node_list.end(); ++ p) {
+    GcNode* node1 = *p;
+    if ( node1->color() == 0 ) {
+      // node1 が未着色の場合
+      if ( !node1->check_adj_color(color) ) {
+	// node1 にとって color は新規の隣り合う色だった．
+	node1->add_adj_color(color);
+
+	// SAT degree が変わったのでヒープ上の位置も更新する．
+	node_heap.update(node1);
+      }
+    }
+  }
+}
+
+END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
@@ -61,17 +107,11 @@ GcSolver::GcSolver(const Graph& graph)
     mNodeArray = new GcNode[mNodeNum];
     for (ymuint i = 0; i < mNodeNum; ++ i) {
       GcNode* node = &mNodeArray[i];
-      node->mId = i;
-      node->mColorSet = new ymuint64[vectlen];
-      for (ymuint j = 0; j < vectlen; ++ j) {
-	node->mColorSet[j] = 0UL;
-      }
+      node->init(i, vectlen);
     }
-    mNodeHeap = new GcNode*[mNodeNum];
   }
   else {
     mNodeArray = NULL;
-    mNodeHeap = NULL;
   }
 
   for (ymuint i = 0; i < graph.edge_num(); ++ i) {
@@ -85,19 +125,14 @@ GcSolver::GcSolver(const Graph& graph)
     GcNode* node1 = &mNodeArray[id1];
     GcNode* node2 = &mNodeArray[id2];
 
-    node1->mLinkList.push_back(node2);
-    node2->mLinkList.push_back(node1);
+    connect(node1, node2);
   }
 }
 
 // @brief デストラクタ
 GcSolver::~GcSolver()
 {
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    delete [] mNodeArray[i].mColorSet;
-  }
   delete [] mNodeArray;
-  delete [] mNodeHeap;
 }
 
 // @brief 彩色する．
@@ -108,27 +143,26 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
 {
   // dsatur アルゴリズムを用いる．
 
-  mHeapNum = 0;
+  NodeHeap<GcNode, GcComp>  node_heap(mNodeNum);
 
-  // mNodeArray を隣接ノード数の降順にソートする．
   for (ymuint i = 0; i < mNodeNum; ++ i) {
-    push_node(&mNodeArray[i]);
+    node_heap.put_node(&mNodeArray[i]);
   }
 
   mMaxColor = 1;
 
   // 1: 隣接するノード数が最大のノードを選び彩色する．
   //    ソートしているので先頭のノードを選べば良い．
-  GcNode* max_node = pop_node();
-  color_node(max_node, mMaxColor);
+  GcNode* max_node = node_heap.get_min();
+  color_node(max_node, mMaxColor, node_heap);
 
   // 2: saturation degree が最大の未彩色ノードを選び最小の色番号で彩色する．
-  while ( mHeapNum > 0 ) {
-    GcNode* max_node = pop_node();
+  while ( !node_heap.empty() ) {
+    GcNode* max_node = node_heap.get_min();
     // max_node につけることのできる最小の色番号を求める．
     clear_count();
     ymuint cnum = 0;
-    const vector<GcNode*>& node_list = max_node->mLinkList;
+    const vector<GcNode*>& node_list = max_node->link_list();
     for (vector<GcNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       GcNode* node1 = *p;
@@ -154,7 +188,7 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
       ++ mMaxColor;
       min_col = mMaxColor;
     }
-    color_node(max_node, min_col);
+    color_node(max_node, min_col, node_heap);
   }
 
   // 検証
@@ -193,166 +227,12 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
   return mMaxColor;
 }
 
-// @brief ノードに彩色して情報を更新する．
-void
-GcSolver::color_node(GcNode* node,
-		     ymuint col)
-{
-  node->mColor = col;
-
-  const vector<GcNode*>& node_list = node->link_list();
-  for (vector<GcNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    GcNode* node1 = *p;
-    if ( node1->mColor == 0 ) {
-      update_sat_degree(node1, col);
-    }
-  }
-}
-
-// @brief saturation degree を再計算する．
-void
-GcSolver::update_sat_degree(GcNode* node,
-			    ymuint color)
-{
-  if ( !node->check_color(color) ) {
-    node->set_color(color);
-    ++ node->mSatDegree;
-
-    // SAT degree が変わったのでヒープ上の位置も更新する．
-    ymuint pos = node->mHeapPos;
-    while ( pos > 0 ) {
-      GcNode* node = mNodeHeap[pos];
-      ymuint parent = (pos - 1) >> 1;
-      GcNode* node_p = mNodeHeap[parent];
-      if ( compare(node_p, node) > 0 ) {
-	set_node(parent, node);
-	set_node(pos, node_p);
-	pos = parent;
-      }
-      else {
-	pos = 0;
-      }
-    }
-  }
-}
-
 // @brief mCountArray をクリアする．
 void
 GcSolver::clear_count()
 {
   mCountArray.clear();
   mCountArray.resize(mMaxColor, false);
-}
-
-// @brief ヒープにノードを追加する．
-void
-GcSolver::push_node(GcNode* node)
-{
-  set_node(mHeapNum, node);
-  ++ mHeapNum;
-
-  ymuint pos = mHeapNum - 1;
-  while ( pos > 0 ) {
-    GcNode* node = mNodeHeap[pos];
-    ymuint parent = (pos - 1) >> 1;
-    GcNode* node_p = mNodeHeap[parent];
-    if ( compare(node_p, node) > 0 ) {
-      set_node(parent, node);
-      set_node(pos, node_p);
-      pos = parent;
-    }
-    else {
-      pos = 0;
-    }
-  }
-}
-
-// @brief ヒープからノードを取り出す．
-GcNode*
-GcSolver::pop_node()
-{
-  ASSERT_COND( mHeapNum > 0 );
-
-  GcNode* node = mNodeHeap[0];
-
-  -- mHeapNum;
-  GcNode* last = mNodeHeap[mHeapNum];
-  set_node(0, last);
-
-  ymuint parent = 0;
-  for ( ; ; ) {
-    ymuint left = parent + parent + 1;
-    ymuint right = left + 1;
-    if ( right > mHeapNum ) {
-      // 左右の子供を持たない場合．
-      break;
-    }
-    GcNode* node_p = mNodeHeap[parent];
-    GcNode* node_l = mNodeHeap[left];
-    if ( right == mHeapNum ) {
-      // 右の子供を持たない場合
-      if ( compare(node_p, node_l) > 0 ) {
-	// 左の子供と取り替える．
-	set_node(parent, node_l);
-	set_node(left, node_p);
-      }
-      break;
-    }
-    else {
-      GcNode* node_r = mNodeHeap[right];
-      if ( compare(node_p, node_l) > 0 &&
-	   compare(node_l, node_r) <= 0 ) {
-	// 左の子供と取り替える．
-	// 次は左の子で同じ処理をする．
-	set_node(parent, node_l);
-	set_node(left, node_p);
-	parent = left;
-      }
-      else if ( compare(node_p, node_r) > 0 &&
-		compare(node_r, node_l) < 0 ) {
-	// 右の子供と取り替える．
-	// 次は右の子で同じ処理をする．
-	set_node(parent, node_r);
-	set_node(right, node_p);
-	parent = right;
-      }
-      else {
-	break;
-      }
-    }
-  }
-
-  return node;
-}
-
-// @brief ヒープ中の配列にノードをセットする．
-void
-GcSolver::set_node(ymuint pos,
-		GcNode* node)
-{
-  mNodeHeap[pos] = node;
-  node->mHeapPos = pos;
-}
-
-// @brief ノードの比較関数
-int
-GcSolver::compare(GcNode* node1,
-	       GcNode* node2)
-{
-  if ( node1->sat_degree() < node2->sat_degree() ) {
-    return 1;
-  }
-  if ( node1->sat_degree() > node2->sat_degree() ) {
-    return -1;
-  }
-  if ( node1->adj_degree() < node2->adj_degree() ) {
-    return 1;
-  }
-  if ( node1->adj_degree() > node2->adj_degree() ) {
-    return -1;
-  }
-  return 0;
 }
 
 
@@ -363,6 +243,7 @@ GcSolver::compare(GcNode* node1,
 // @brief コンストラクタ
 GcNode::GcNode()
 {
+  mColorSet = NULL;
   mSatDegree = 0;
   mColor = 0;
 }
@@ -370,6 +251,19 @@ GcNode::GcNode()
 // @brief デストラクタ
 GcNode::~GcNode()
 {
+  delete [] mColorSet;
+}
+
+// @brief 初期化する．
+void
+GcNode::init(ymuint id,
+	     ymuint vectlen)
+{
+  mId = id;
+  mColorSet = new ymuint64[vectlen];
+  for (ymuint i = 0; i < vectlen; ++ i) {
+    mColorSet[i] = 0UL;
+  }
 }
 
 END_NAMESPACE_YM

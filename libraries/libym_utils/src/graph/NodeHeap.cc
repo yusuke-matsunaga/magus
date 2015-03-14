@@ -20,8 +20,7 @@ BEGIN_NAMESPACE_YM
 // @param[in] num ノード数
 NodeHeap::NodeHeap(ymuint num)
 {
-  mNodeSize = num;
-  mNodeChunk = new Node[num];
+  mHeapSize = num;
   mNodeHeap = new Node*[num];
   mNodeNum = 0;
 }
@@ -29,7 +28,6 @@ NodeHeap::NodeHeap(ymuint num)
 // @brief デストラクタ
 NodeHeap::~NodeHeap()
 {
-  delete [] mNodeChunk;
   delete [] mNodeHeap;
 }
 
@@ -122,22 +120,7 @@ NodeHeap::move_up(Node* node)
 void
 NodeHeap::print(ostream& s) const
 {
-  s << "*** NodeHeap ***" << endl
-    << " node_size() = " << node_size() << endl;
-  for (ymuint i = 0; i < node_size(); ++ i) {
-    const Node* node1 = node(i);
-    s << "Node#" << i << ": id = " << node1->id();
-    if ( node1->deleted() ) {
-      s << "*";
-    }
-    else {
-      s << " ";
-    }
-    s << " adj_num = " << node1->adj_num() << endl;
-  }
-  s << endl;
-
-  s << " heap_size = " << mNodeNum << endl;
+  s << " heap_size = " << mHeapSize << endl;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     const Node* node1 = mNodeHeap[i];
 

@@ -17,37 +17,21 @@ BEGIN_NAMESPACE_YM
 
 BEGIN_NONAMESPACE
 
-// @brief independent_set 用の NodeHeap
-class IndepNodeHeap :
-  public NodeHeap
+// @brief independent_set 用の比較関数
+class IndepComp
 {
 public:
-
-  /// @brief コンストラクタ
-  /// @param[in] num ノード数
-  IndepNodeHeap(ymuint num);
-
-
-private:
 
   /// @brief 比較関数
   /// @param[in] node1, node2 対象のノード
   /// @retval 負の値 node1 が node2 より前にある．
   /// @retval 0 node1 と node2 は同じ
   /// @retval 正の値 node1 が node2 より後ろにある．
-  virtual
   int
-  compare(Node* node1,
-	  Node* node2);
+  operator()(Node* node1,
+	     Node* node2);
 
 };
-
-// @brief コンストラクタ
-// @param[in] num ノード数
-IndepNodeHeap::IndepNodeHeap(ymuint num) :
-  NodeHeap(num)
-{
-}
 
 // @brief 比較関数
 // @param[in] node1, node2 対象のノード
@@ -55,8 +39,8 @@ IndepNodeHeap::IndepNodeHeap(ymuint num) :
 // @retval 0 node1 と node2 は同じ
 // @retval 正の値 node1 が node2 より後ろにある．
 int
-IndepNodeHeap::compare(Node* node1,
-		       Node* node2)
+IndepComp::operator()(Node* node1,
+		      Node* node2)
 {
   return node1->adj_num() - node2->adj_num();
 }
@@ -81,13 +65,13 @@ independent_set(const Graph& graph,
   // 各ノードに対応する Node というオブジェクトを作る．
   // ndoe_array[row_pos] に row_pos の行の Node が入る．
   // top から Node::mNext を使ってリンクとリストを作る．
-  SimpleAlloc alloc;
-  IndepNodeHeap node_heap(node_num);
-
+  Node* node_array = new Node[node_num];
   for (ymuint i = 0; i < node_num; ++ i) {
-    Node* node = node_heap.node(i);
+    Node* node = &node_array[i];
     node->set(i);
   }
+
+  NodeHeap<Node, IndepComp> node_heap(node_num);
 
   // 隣接するノードの情報を link_array に入れる．
   vector<vector<ymuint> > link_array(node_num);
@@ -98,14 +82,16 @@ independent_set(const Graph& graph,
     link_array[id1].push_back(id2);
     link_array[id2].push_back(id1);
   }
+
+  SimpleAlloc alloc;
   for (ymuint i = 0; i < node_num; ++ i) {
-    Node* node1 = node_heap.node(i);
+    Node* node1 = &node_array[i];
     const vector<ymuint>& link_list = link_array[i];
     ymuint link_num = link_list.size();
     void* p = alloc.get_memory(sizeof(Node*) * link_num);
     Node** adj_link = new (p) Node*[link_num];
     for (ymuint j = 0; j < link_num; ++ j) {
-      Node* node2 = node_heap.node(link_list[j]);
+      Node* node2 = &node_array[link_list[j]];
       adj_link[j] = node2;
     }
     node1->set_adj_link(link_num, adj_link);
@@ -134,6 +120,8 @@ independent_set(const Graph& graph,
       }
     }
   }
+
+  delete [] node_array;
 
   return node_set.size();
 }

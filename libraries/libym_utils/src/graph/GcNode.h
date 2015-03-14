@@ -20,9 +20,7 @@ BEGIN_NAMESPACE_YM
 //////////////////////////////////////////////////////////////////////
 class GcNode
 {
-  friend class GcSolver;
-
-private:
+public:
 
   /// @brief コンストラクタ
   GcNode();
@@ -33,8 +31,13 @@ private:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 情報を得る関数
+  // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 初期化する．
+  void
+  init(ymuint id,
+       ymuint vectlen);
 
   /// @brief ID番号を得る．
   ymuint
@@ -52,6 +55,10 @@ public:
   ymuint
   sat_degree() const;
 
+  /// @brief 色番号を設定する．
+  void
+  set_color(ymuint color);
+
   /// @brief 色番号を得る．
   /// @note 0 は未彩色を表す．
   ymuint
@@ -59,11 +66,27 @@ public:
 
   /// @brief color のノードが隣接しているときに true を返す．
   bool
-  check_color(ymuint color) const;
+  check_adj_color(ymuint color) const;
 
   /// @brief color を隣接色に加える．
   void
-  set_color(ymuint color);
+  add_adj_color(ymuint color);
+
+  /// @brief 2つのノードを接続する．
+  friend
+  void
+  connect(GcNode* node1,
+	  GcNode* node2);
+
+  /// @brief ヒープ上の位置(+1)を返す．
+  ///
+  /// ヒープになければ 0 を返す．
+  ymuint
+  heap_location() const;
+
+  /// @brief ヒープ上の位置を設定する．
+  void
+  set_heap_location(ymuint pos);
 
 
 private:
@@ -74,8 +97,8 @@ private:
   // ID番号
   ymuint mId;
 
-  // ヒープ中の位置
-  ymuint mHeapPos;
+  // ヒープ中の位置(+1)
+  ymuint mHeapIdx;
 
   // 隣接するノードのリスト
   vector<GcNode*> mLinkList;
@@ -129,6 +152,14 @@ GcNode::sat_degree() const
   return mSatDegree;
 }
 
+// @brief 色番号を設定する．
+inline
+void
+GcNode::set_color(ymuint color)
+{
+  mColor = color;
+}
+
 // @brief 色番号を得る．
 // @note 0 は未彩色を表す．
 inline
@@ -141,7 +172,7 @@ GcNode::color() const
 // @brief color のノードが隣接しているときに true を返す．
 inline
 bool
-GcNode::check_color(ymuint color) const
+GcNode::check_adj_color(ymuint color) const
 {
   ymuint blk = color / 64;
   ymuint sft = color % 64;
@@ -151,11 +182,40 @@ GcNode::check_color(ymuint color) const
 // @brief color を隣接色に加える．
 inline
 void
-GcNode::set_color(ymuint color)
+GcNode::add_adj_color(ymuint color)
 {
   ymuint blk = color / 64;
   ymuint sft = color % 64;
   mColorSet[blk] |= (1UL << sft);
+  ++ mSatDegree;
+}
+
+// @brief ヒープ上の位置(+1)を返す．
+//
+// ヒープになければ 0 を返す．
+inline
+ymuint
+GcNode::heap_location() const
+{
+  return mHeapIdx;
+}
+
+// @brief ヒープ上の位置を設定する．
+inline
+void
+GcNode::set_heap_location(ymuint pos)
+{
+  mHeapIdx = pos;
+}
+
+// @brief 2つのノードを接続する．
+inline
+void
+connect(GcNode* node1,
+	GcNode* node2)
+{
+  node1->mLinkList.push_back(node2);
+  node2->mLinkList.push_back(node1);
 }
 
 END_NAMESPACE_YM

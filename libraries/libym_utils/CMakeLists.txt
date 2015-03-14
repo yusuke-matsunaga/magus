@@ -61,7 +61,6 @@ set (gen_SOURCES
 set (graph_SOURCES
   src/graph/GcSolver.cc
   src/graph/Graph.cc
-  src/graph/NodeHeap.cc
   src/graph/independent_set.cc
   src/graph/max_clique.cc
   )

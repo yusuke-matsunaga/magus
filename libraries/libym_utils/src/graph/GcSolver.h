@@ -50,44 +50,9 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノードに彩色して情報を更新する．
-  void
-  color_node(GcNode* node,
-	     ymuint col);
-
-  /// @brief saturation degree を再計算する．
-  void
-  update_sat_degree(GcNode* node,
-		    ymuint color);
-
   /// @brief mCountArray をクリアする．
   void
   clear_count();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // ヒープ用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ヒープにノードを追加する．
-  void
-  push_node(GcNode* node);
-
-  /// @brief ヒープからノードを取り出す．
-  GcNode*
-  pop_node();
-
-  /// @brief ヒープ中の配列にノードをセットする．
-  void
-  set_node(ymuint pos,
-	   GcNode* node);
-
-  /// @brief ノードの比較関数
-  static
-  int
-  compare(GcNode* node1,
-	  GcNode* node2);
 
 
 private:
@@ -100,12 +65,6 @@ private:
 
   // ノードの実体の配列
   GcNode* mNodeArray;
-
-  // ノードのヒープ
-  GcNode** mNodeHeap;
-
-  // ヒープの末尾
-  ymuint32 mHeapNum;
 
   // 現在の最大色番号
   ymuint32 mMaxColor;
