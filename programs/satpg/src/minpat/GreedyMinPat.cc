@@ -16,6 +16,7 @@
 #include "Fsim.h"
 #include "KDet.h"
 #include "Verifier.h"
+#include "MaxCompat.h"
 #include "YmLogic/Bdd.h"
 #include "YmLogic/BddMgr.h"
 #include "YmUtils/Graph.h"
@@ -125,6 +126,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
   for (ymuint i = 0; i < max_fault_id; ++ i) {
     tf_array[i] = bdd_mgr.make_zero();
   }
+  vector<ymuint> fid_list;
   {
 
     KDet kdet(fsim3, f_list, max_fault_id);
@@ -133,11 +135,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
     ymuint k = 10;
     kdet.run(tv_list, k, det_list_array);
     vector<bool> fmark(max_fault_id);
-    vector<ymuint> fmap(max_fault_id);
 
-    MinCov mincov;
-
-    ymuint fnum = 0;
     ymuint pnum = tv_list.size();
     for (ymuint i = 0; i < pnum; ++ i) {
       cout << "pat#" << i << endl;
@@ -147,8 +145,7 @@ GreedyMinPat::run(TvMgr& tvmgr,
 	ymuint f = det_list[j];
 	if ( !fmark[f] ) {
 	  fmark[f] = true;
-	  fmap[f] = fnum;
-	  ++ fnum;
+	  fid_list.push_back(f);
 	}
 	tf_array[f] |= tv_to_bdd(tv, bdd_mgr);
       }
@@ -167,6 +164,38 @@ GreedyMinPat::run(TvMgr& tvmgr,
   }
 #endif
 
+  MaxCompat max_compat(tf_array);
+
+  ymuint fnum = fid_list.size();
+  vector<bool> covered(max_fault_id, false);
+  ymuint np = 0;
+  ymuint nc = 0;
+  while ( nc < fnum ) {
+    for (ymuint i = 0; i < fnum; ++ i) {
+      ymuint f0 = fid_list[i];
+      if ( covered[f0] ) {
+	continue;
+      }
+      vector<ymuint> f_set;
+      max_compat(f0, covered, f_set);
+
+      for (ymuint j = 0; j < f_set.size(); ++ j) {
+	ymuint f = f_set[j];;
+	covered[f] = true;
+      }
+      nc += f_set.size();
+
+      cout << "#" << np << " pattern" << endl;
+      cout << "coveres: ";
+      for (ymuint j = 0; j < f_set.size(); ++ j) {
+	ymuint f = f_set[j];;
+	cout << " " << f;
+      }
+      cout << endl;
+      ++ np;
+    }
+  }
+
   {
     // 検証しておく．
     if ( ver.check(tv_list) ) {
@@ -177,7 +206,11 @@ GreedyMinPat::run(TvMgr& tvmgr,
   local_timer.stop();
   USTime time = local_timer.time();
 
+#if 0
   stats.set(orig_num, tv_list.size(), time);
+#else
+  stats.set(orig_num, np, time);
+#endif
 }
 
 

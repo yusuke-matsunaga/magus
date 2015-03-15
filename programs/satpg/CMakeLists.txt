@@ -99,6 +99,7 @@ set (minpat_SOURCES
   src/minpat/MinPatImpl.cc
   src/minpat/Verifier.cc
   src/minpat/GreedyMinPat.cc
+  src/minpat/MaxCompat.cc
   )
 
 set (rtpg_SOURCES
