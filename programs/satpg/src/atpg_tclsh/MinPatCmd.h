@@ -46,6 +46,9 @@ private:
   // greedy オプション
   TclPopt* mPoptGreedy;
 
+  // naive オプション
+  TclPopt* mPoptNaive;
+
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
 

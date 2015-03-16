@@ -25,8 +25,11 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 {
   mPoptGreedy = new TclPopt(this, "greedy",
 			    "greedy heuristic");
+  mPoptNaive = new TclPopt(this, "naive",
+			   "naive heuristic");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
+  new_popt_group(mPoptGreedy, mPoptNaive);
 }
 
 // @brief デストラクタ
@@ -46,7 +49,17 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  MinPat* minpat = mPoptGreedy->is_specified() ? new_GreedyMinPat() : new_MinPat();
+  MinPat* minpat = NULL;
+
+  if ( mPoptGreedy->is_specified() ) {
+    minpat = new_GreedyMinPat();
+  }
+  else if ( mPoptNaive->is_specified() ) {
+    minpat = new_NaiveMinPat();
+  }
+  else {
+    minpat = new_MinPat();
+  }
 
   MinPatStats stats;
   minpat->run(_tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);

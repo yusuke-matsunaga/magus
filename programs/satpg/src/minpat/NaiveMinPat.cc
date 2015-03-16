@@ -1,13 +1,13 @@
 ﻿
-/// @file MinPatImpl.cc
-/// @brief MinPatImpl の実装ファイル
+/// @file NaiveMinPat.cc
+/// @brief NaiveMinPat の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPatImpl.h"
+#include "NaiveMinPat.h"
 #include "MinPatStats.h"
 #include "TvMgr.h"
 #include "TestVector.h"
@@ -27,23 +27,23 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 MinPat*
-new_MinPat()
+new_NaiveMinPat()
 {
-  return new MinPatImpl();
+  return new NaiveMinPat();
 }
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス MinPatImpl
+// クラス NaiveMinPat
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MinPatImpl::MinPatImpl()
+NaiveMinPat::NaiveMinPat()
 {
 }
 
 // @brief デストラクタ
-MinPatImpl::~MinPatImpl()
+NaiveMinPat::~NaiveMinPat()
 {
 }
 
@@ -55,12 +55,12 @@ MinPatImpl::~MinPatImpl()
 // @param[inout] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
-MinPatImpl::run(TvMgr& tvmgr,
-		FaultMgr& fmgr,
-		Fsim& fsim2,
-		Fsim& fsim3,
-		vector<TestVector*>& tv_list,
-		MinPatStats& stats)
+NaiveMinPat::run(TvMgr& tvmgr,
+		 FaultMgr& fmgr,
+		 Fsim& fsim2,
+		 Fsim& fsim3,
+		 vector<TestVector*>& tv_list,
+		 MinPatStats& stats)
 {
   StopWatch local_timer;
 
