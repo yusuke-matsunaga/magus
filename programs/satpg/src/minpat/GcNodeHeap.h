@@ -1,37 +1,33 @@
-﻿#ifndef NODEHEAP_H
-#define NODEHEAP_H
+﻿#ifndef GCNODEHEAP_H
+#define GCNODEHEAP_H
 
-/// @file NodeHeap.h
-/// @brief NodeHeap のヘッダファイル
+/// @file GcNodeHeap.h
+/// @brief GcNodeHeap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Node.h"
+#include "GcNode.h"
 
 
-BEGIN_NAMESPACE_YM
+BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class NodeHeap NodeHeap.h "NodeHeap.h"
-/// @brief Node のヒープ木
-///
-/// 比較関数 compare() を実装した継承クラスを作る必要がある．
+/// @class GcNodeHeap GcNodeHeap.h "GcNodeHeap.h"
+/// @brief GcNode のヒープ木
 //////////////////////////////////////////////////////////////////////
-template <typename NodeClass,
-	  typename CompFuncClass>
-class NodeHeap
+class GcNodeHeap
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] max_size 最大の要素数
-  NodeHeap(ymuint max_size);
+  GcNodeHeap(ymuint max_size);
 
   /// @brief デストラクタ
-  ~NodeHeap();
+  ~GcNodeHeap();
 
 
 public:
@@ -45,21 +41,21 @@ public:
 
   /// @brief ノードを追加する．
   void
-  put_node(NodeClass* node);
+  put_node(GcNode* node);
 
   /// @brief ノードを取り去る．
   void
-  delete_node(NodeClass* node);
+  delete_node(GcNode* node);
 
   /// @brief 値が最小の要素を取り出す．
   /// そのノードはヒープから取り除かれる．
-  NodeClass*
+  GcNode*
   get_min();
 
   /// @brief ノードの値の変更に伴ってヒープ構造を更新する．
   /// @param[in] node 値が変更されたノード
   void
-  update(NodeClass* node);
+  update(GcNode* node);
 
   /// @brief 内容を出力する．
   void
@@ -74,18 +70,18 @@ private:
   /// @brief ノードを適当な位置まで沈める．
   /// @param[in] node 対象のノード
   void
-  move_down(NodeClass* node);
+  move_down(GcNode* node);
 
   /// @brief ノードを適当な位置まで浮かび上がらせる．
   /// @param[in] node 対象のノード
   void
-  move_up(NodeClass* node);
+  move_up(GcNode* node);
 
   /// @brief ノードをヒープ上にセットする．
   /// @param[in] node ノード
   /// @param[in] pos 位置
   void
-  locate_node(NodeClass* node,
+  locate_node(GcNode* node,
 	      ymuint pos);
 
 
@@ -98,7 +94,7 @@ private:
   ymuint32 mHeapSize;
 
   // ノードのヒープ木
-  NodeClass** mNodeHeap;
+  GcNode** mNodeHeap;
 
   // ヒープ木中にあるノード数
   ymuint32 mNodeNum;
@@ -110,43 +106,18 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-// @param[in] num ノード数
-template <typename NodeClass,
-	  typename CompFuncClass>
-inline
-NodeHeap<NodeClass, CompFuncClass>::NodeHeap(ymuint num)
-{
-  mHeapSize = num;
-  mNodeHeap = new NodeClass*[num];
-  mNodeNum = 0;
-}
-
-// @brief デストラクタ
-template <typename NodeClass,
-	  typename CompFuncClass>
-inline
-NodeHeap<NodeClass, CompFuncClass>::~NodeHeap()
-{
-  delete [] mNodeHeap;
-}
-
 // @brief ヒープが空の時 true を返す．
-template <typename NodeClass,
-	  typename CompFuncClass>
 inline
 bool
-NodeHeap<NodeClass, CompFuncClass>::empty() const
+GcNodeHeap::empty() const
 {
   return mNodeNum == 0;
 }
 
 // @brief ノードを追加する．
-template <typename NodeClass,
-	  typename CompFuncClass>
 inline
 void
-NodeHeap<NodeClass, CompFuncClass>::put_node(NodeClass* node)
+GcNodeHeap::put_node(GcNode* node)
 {
   ASSERT_COND( mNodeNum < mHeapSize );
 
@@ -156,11 +127,9 @@ NodeHeap<NodeClass, CompFuncClass>::put_node(NodeClass* node)
 }
 
 // @brief ノードを取り去る．
-template <typename NodeClass,
-	  typename CompFuncClass>
 inline
 void
-NodeHeap<NodeClass, CompFuncClass>::delete_node(NodeClass* node)
+GcNodeHeap::delete_node(GcNode* node)
 {
   ASSERT_COND( !empty() );
 
@@ -170,7 +139,7 @@ NodeHeap<NodeClass, CompFuncClass>::delete_node(NodeClass* node)
 
   node->set_heap_location(0);
   -- mNodeNum;
-  NodeClass* last = mNodeHeap[mNodeNum];
+  GcNode* last = mNodeHeap[mNodeNum];
   if ( last != node ) {
     -- idx;
     locate_node(last, idx);
@@ -180,19 +149,17 @@ NodeHeap<NodeClass, CompFuncClass>::delete_node(NodeClass* node)
 
 // @brief 値が最小の要素を取り出す．
 // そのノードはヒープから取り除かれる．
-template <typename NodeClass,
-	  typename CompFuncClass>
 inline
-NodeClass*
-NodeHeap<NodeClass, CompFuncClass>::get_min()
+GcNode*
+GcNodeHeap::get_min()
 {
   ASSERT_COND( !empty() );
 
-  NodeClass* node = mNodeHeap[0];
+  GcNode* node = mNodeHeap[0];
   node->set_heap_location(0);
   -- mNodeNum;
   if ( mNodeNum > 0 ) {
-    NodeClass* last = mNodeHeap[mNodeNum];
+    GcNode* last = mNodeHeap[mNodeNum];
     locate_node(last, 0);
     move_down(last);
   }
@@ -201,11 +168,9 @@ NodeHeap<NodeClass, CompFuncClass>::get_min()
 
 // @brief ノードの値の変更に伴ってヒープ構造を更新する．
 // @param[in] node 値が変更されたノード
-template <typename NodeClass,
-	  typename CompFuncClass>
 inline
 void
-NodeHeap<NodeClass, CompFuncClass>::update(NodeClass* node)
+GcNodeHeap::update(GcNode* node)
 {
   ymuint idx = node->heap_location();
   ASSERT_COND( idx > 0 );
@@ -217,134 +182,18 @@ NodeHeap<NodeClass, CompFuncClass>::update(NodeClass* node)
   move_down(node);
 }
 
-// @brief ノードを適当な位置まで沈める．
-// @param[in] node 対象のノード
-template <typename NodeClass,
-	  typename CompFuncClass>
-inline
-void
-NodeHeap<NodeClass, CompFuncClass>::move_down(NodeClass* node)
-{
-  ymuint idx = node->heap_location();
-  if ( idx == 0 ) {
-    // node はヒープに含まれない．
-    return;
-  }
-
-  CompFuncClass compare;
-
-  -- idx;
-  for ( ; ; ) {
-    // ヒープ木の性質から親の位置から子の位置が分かる．
-    ymuint l_idx = idx * 2 + 1;
-    ymuint r_idx = l_idx + 1;
-    if ( r_idx > mNodeNum ) {
-      // 左右の子供を持たない時
-      break;
-    }
-    NodeClass* p_node = mNodeHeap[idx];
-    NodeClass* l_node = mNodeHeap[l_idx];
-    if ( r_idx == mNodeNum ) {
-      // 右の子供を持たない時
-      if ( compare(p_node, l_node) > 0 ) {
-	// 逆転
-	locate_node(p_node, l_idx);
-	locate_node(l_node, idx);
-      }
-      // これ以上子供はいない．
-      break;
-    }
-    else {
-      // 左右の子供がいる場合
-      NodeClass* r_node = mNodeHeap[r_idx];
-      if ( compare(p_node, l_node) > 0 &&
-	   compare(l_node, r_node) <= 0 ) {
-	// 左の子供と入れ替える．
-	// 次は左の子供に対して同じ事をする．
-	locate_node(p_node, l_idx);
-	locate_node(l_node, idx);
-	idx = l_idx;
-      }
-      else if ( compare(p_node, r_node) > 0 &&
-		compare(r_node, l_node) < 0 ) {
-	// 右の子供と入れ替える．
-	// 次は右の子供に対して同じ事をする．
-	locate_node(p_node, r_idx);
-	locate_node(r_node, idx);
-	idx = r_idx;
-      }
-      else {
-	break;
-      }
-    }
-  }
-}
-
-// @brief ノードを適当な位置まで浮かび上がらせる．
-// @param[in] node 対象のノード
-template <typename NodeClass,
-	  typename CompFuncClass>
-inline
-void
-NodeHeap<NodeClass, CompFuncClass>::move_up(NodeClass* node)
-{
-  ymuint idx = node->heap_location();
-  if ( idx == 0 ) {
-    // node はヒープに含まれない．
-    return;
-  }
-
-  CompFuncClass compare;
-
-  -- idx;
-  while ( idx > 0 ) {
-    NodeClass* node = mNodeHeap[idx];
-    ymuint p_idx = (idx - 1) / 2;
-    NodeClass* p_node = mNodeHeap[p_idx];
-    if ( compare(p_node, node) > 0 ) {
-      locate_node(node, p_idx);
-      locate_node(p_node, idx);
-      idx = p_idx;
-    }
-    else {
-      break;
-    }
-  }
-}
-
-// @brief 内容を出力する．
-template <typename NodeClass,
-	  typename CompFuncClass>
-inline
-void
-NodeHeap<NodeClass, CompFuncClass>::print(ostream& s) const
-{
-  s << " heap_size = " << mHeapSize << endl;
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
-    const NodeClass* node1 = mNodeHeap[i];
-
-    ASSERT_COND( node1->heap_location() - 1 == i );
-
-    s << " Node#" << i << ": id = " << node1->id()
-      << " value = " << node1->adj_num() << endl;
-  }
-  s << endl;
-}
-
 // @brief ヒープ上にノードを置く
 // @param[in] node 要素
 // @param[in] pos 位置
-template <typename NodeClass,
-	  typename CompFuncClass>
 inline
 void
-NodeHeap<NodeClass, CompFuncClass>::locate_node(NodeClass* node,
-						ymuint pos)
+GcNodeHeap::locate_node(GcNode* node,
+			ymuint pos)
 {
   mNodeHeap[pos] = node;
   node->set_heap_location(pos + 1);
 }
 
-END_NAMESPACE_YM
+END_NAMESPACE_YM_SATPG
 
-#endif // NODEHEAP_H
+#endif // GCNODEHEAP_H

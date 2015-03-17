@@ -101,6 +101,9 @@ set (minpat_SOURCES
   src/minpat/GreedyMinPat.cc
   src/minpat/NaiveMinPat.cc
   src/minpat/MaxCompat.cc
+  src/minpat/GcNodeHeap.cc
+  src/minpat/GcSolver.cc
+  src/minpat/McMatrix.cc
   )
 
 set (rtpg_SOURCES

@@ -116,6 +116,8 @@ NaiveMinPat::run(TvMgr& tvmgr,
 
     mincov.set_size(fnum, pnum);
     for (ymuint i = 0; i < pnum; ++ i) {
+      TestVector* tv = tv_list[i];
+      mincov.set_col_cost(i, tv->input_num() - tv->x_num());
       const vector<ymuint>& det_list = det_list_array[i];
       for (ymuint j = 0; j < det_list.size(); ++ j) {
 	ymuint f = det_list[j];

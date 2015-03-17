@@ -12,12 +12,6 @@
 #include "satpg_nsdef.h"
 
 
-BEGIN_NAMESPACE_YM
-
-class Graph;
-
-END_NAMESPACE_YM
-
 BEGIN_NAMESPACE_YM_SATPG
 
 class GcNode;
@@ -31,8 +25,8 @@ class GcSolver
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] graph 対象のグラフ
-  GcSolver(const Graph& graph);
+  /// @param[in] node_num ノード数
+  GcSolver(ymuint node_num);
 
   /// @brief デストラクタ
   ~GcSolver();
@@ -42,6 +36,15 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノード数を得る．
+  ymuint
+  node_num() const;
+
+  /// @brief ノードを取り出す．
+  /// @param[in] id ノード番号 ( 0 <= id < node_num() )
+  GcNode*
+  node(ymuint id);
 
   /// @brief 彩色する．
   /// @param[in] color_group 同じ色のノード番号のリストの配列
@@ -58,6 +61,10 @@ private:
   /// @brief mCountArray をクリアする．
   void
   clear_count();
+
+  /// @brief ノードがカバーしている故障に印をつける．
+  void
+  cover_fault(GcNode* node);
 
 
 private:
@@ -76,6 +83,12 @@ private:
 
   // sat degree 計算用の配列
   vector<bool> mCountArray;
+
+  // 最大故障番号 + 1
+  ymuint mMaxFaultId;
+
+  // 故障のカバー状況を記録する配列
+  vector<bool> mFaultMark;
 
 };
 

@@ -43,6 +43,14 @@ public:
   ymuint
   id() const;
 
+  /// @brief パタンをセットする．
+  void
+  set_pat(TestVector* tv);
+
+  /// @brief パタンを返す．
+  TestVector*
+  pat() const;
+
   /// @brief 隣接するノードのリストを得る．
   const vector<GcNode*>&
   link_list() const;
@@ -50,6 +58,10 @@ public:
   /// @brief 隣接するノードの度数を返す．
   ymuint
   adj_degree() const;
+
+  /// @brief 隣接するノードを削除する．
+  void
+  delete_link(GcNode* node);
 
   /// @brief saturation degree を返す．
   ymuint
@@ -72,12 +84,6 @@ public:
   void
   add_adj_color(ymuint color);
 
-  /// @brief 2つのノードを接続する．
-  friend
-  void
-  connect(GcNode* node1,
-	  GcNode* node2);
-
   /// @brief ヒープ上の位置(+1)を返す．
   ///
   /// ヒープになければ 0 を返す．
@@ -87,6 +93,36 @@ public:
   /// @brief ヒープ上の位置を設定する．
   void
   set_heap_location(ymuint pos);
+
+  /// @brief 故障を追加する．
+  void
+  add_fault(ymuint f);
+
+  /// @brief 故障リストを返す．
+  const vector<ymuint>&
+  fault_list() const;
+
+  /// @brief 選択マークをつける．
+  void
+  set_selected();
+
+  /// @brief 選択マークを返す．
+  bool
+  is_selected();
+
+  /// @brief 削除マークをつける．
+  void
+  set_deleted();
+
+  /// @brief 削除マークを得る．
+  bool
+  is_deleted();
+
+  /// @brief 2つのノードを接続する．
+  friend
+  void
+  connect(GcNode* node1,
+	  GcNode* node2);
 
 
 private:
@@ -100,8 +136,14 @@ private:
   // ヒープ中の位置(+1)
   ymuint mHeapIdx;
 
+  // テストパタン
+  TestVector* mPat;
+
   // 隣接するノードのリスト
   vector<GcNode*> mLinkList;
+
+  /// 隣接するノードの数
+  ymuint32 mAdjDegree;
 
   // 隣接するノードの色の集合を表すビットベクタ
   ymuint64* mColorSet;
@@ -112,6 +154,15 @@ private:
   // 色番号
   // 0 が未彩色
   ymuint mColor;
+
+  // 関連する故障番号のリスト
+  vector<ymuint> mFaultList;
+
+  // 選択マーク
+  bool mSelected;
+
+  // 削除マーク
+  bool mDeleted;
 
 };
 
@@ -128,6 +179,22 @@ GcNode::id() const
   return mId;
 }
 
+// @brief パタンをセットする．
+inline
+void
+GcNode::set_pat(TestVector* tv)
+{
+  mPat = tv;
+}
+
+// @brief パタンを返す．
+inline
+TestVector*
+GcNode::pat() const
+{
+  return mPat;
+}
+
 // @brief 隣接するノードのリストを得る．
 inline
 const vector<GcNode*>&
@@ -141,7 +208,7 @@ inline
 ymuint
 GcNode::adj_degree() const
 {
-  return mLinkList.size();
+  return mAdjDegree;
 }
 
 // @brief saturation degree を返す．
@@ -208,6 +275,54 @@ GcNode::set_heap_location(ymuint pos)
   mHeapIdx = pos;
 }
 
+// @brief 故障を追加する．
+inline
+void
+GcNode::add_fault(ymuint f)
+{
+  mFaultList.push_back(f);
+}
+
+// @brief 故障リストを返す．
+inline
+const vector<ymuint>&
+GcNode::fault_list() const
+{
+  return mFaultList;
+}
+
+// @brief 選択マークをつける．
+inline
+void
+GcNode::set_selected()
+{
+  mSelected = true;
+}
+
+// @brief 選択マークを返す．
+inline
+bool
+GcNode::is_selected()
+{
+  return mSelected;
+}
+
+// @brief 削除マークをつける．
+inline
+void
+GcNode::set_deleted()
+{
+  mDeleted = true;
+}
+
+// @brief 削除マークを得る．
+inline
+bool
+GcNode::is_deleted()
+{
+  return mDeleted;
+}
+
 // @brief 2つのノードを接続する．
 inline
 void
@@ -215,7 +330,9 @@ connect(GcNode* node1,
 	GcNode* node2)
 {
   node1->mLinkList.push_back(node2);
+  ++ node1->mAdjDegree;
   node2->mLinkList.push_back(node1);
+  ++ node2->mAdjDegree;
 }
 
 END_NAMESPACE_YM_SATPG
