@@ -1,13 +1,13 @@
 ﻿
-/// @file SatEngineSingle.cc
-/// @brief SatEngineSingle の実装ファイル
+/// @file SatEngineSingleKDet.cc
+/// @brief SatEngineSingleKDet の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngineSingle.h"
+#include "SatEngineSingleKDet.h"
 
 #include "DtpgStats.h"
 #include "TpgNode.h"
@@ -18,7 +18,7 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-// @brief Single エンジンを作る．
+// @brief SingleKDet エンジンを作る．
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
@@ -26,39 +26,43 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
+// @param[in] kdet 多重度
 DtpgEngine*
-new_SatEngineSingle(const string& sat_type,
-		    const string& sat_option,
-		    ostream* sat_outp,
-		    const TpgNetwork& network,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop)
+new_SatEngineSingleKDet(const string& sat_type,
+			const string& sat_option,
+			ostream* sat_outp,
+			const TpgNetwork& network,
+			BackTracer& bt,
+			DetectOp& dop,
+			UntestOp& uop,
+			ymuint kdet)
 {
-  return new SatEngineSingle(sat_type, sat_option, sat_outp, network, bt, dop, uop);
+  return new SatEngineSingleKDet(sat_type, sat_option, sat_outp, network, bt, dop, uop, kdet);
 }
 
 // @brief コンストラクタ
-SatEngineSingle::SatEngineSingle(const string& sat_type,
-				 const string& sat_option,
-				 ostream* sat_outp,
-				 const TpgNetwork& network,
-				 BackTracer& bt,
-				 DetectOp& dop,
-				 UntestOp& uop) :
-  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop)
+SatEngineSingleKDet::SatEngineSingleKDet(const string& sat_type,
+					 const string& sat_option,
+					 ostream* sat_outp,
+					 const TpgNetwork& network,
+					 BackTracer& bt,
+					 DetectOp& dop,
+					 UntestOp& uop,
+					 ymuint kdet) :
+  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop),
+  mCount(kdet)
 {
 }
 
 // @brief デストラクタ
-SatEngineSingle::~SatEngineSingle()
+SatEngineSingleKDet::~SatEngineSingleKDet()
 {
 }
 
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 void
-SatEngineSingle::run(TpgFault* fault)
+SatEngineSingleKDet::run(TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
   int fval = fault->val();
@@ -121,10 +125,36 @@ SatEngineSingle::run(TpgFault* fault)
 
   cnf_end();
 
-  // 故障に対するテスト生成を行なう．
-  tmp_lits_begin();
+  for (ymuint i = 0; i < mCount; ++ i) {
+    // 故障に対するテスト生成を行なう．
+    tmp_lits_begin();
+    bool option = (i > 0);
+    Bool3 stat = solve(solver, fault, option);
+    if ( stat != kB3True ) {
+      break;
+    }
 
-  solve(solver, fault);
+    TestVector* pat = last_pat();
+    ymuint ni = pat->input_num();
+    tmp_lits_begin(ni - pat->x_num());
+    for (ymuint i = 0; i < ni; ++ i) {
+      TpgNode* node = input_node(i);
+      Literal lit(node->gvar());
+      switch ( pat->val3(i) ) {
+      case kVal1:
+	tmp_lits_add(~lit);
+	break;
+
+      case kVal0:
+	tmp_lits_add(lit);
+	break;
+
+      default:
+	break;
+      }
+    }
+    tmp_lits_end(solver);
+  }
 
   clear_node_mark();
 }
@@ -132,7 +162,7 @@ SatEngineSingle::run(TpgFault* fault)
 // @brief テスト生成を行なう．
 // @param[in] flist 対象の故障リスト
 void
-SatEngineSingle::run(const vector<TpgFault*>& flist)
+SatEngineSingleKDet::run(const vector<TpgFault*>& flist)
 {
   for (vector<TpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {

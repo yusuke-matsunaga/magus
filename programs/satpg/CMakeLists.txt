@@ -48,6 +48,7 @@ set (dtpg_SOURCES
   src/dtpg/engine/SatEngineMulti.cc
   src/dtpg/engine/SatEngineMulti2.cc
   src/dtpg/engine/SatEngineSingle.cc
+  src/dtpg/engine/SatEngineSingleKDet.cc
   src/dtpg/engine/SatEngineSingle2.cc
   src/dtpg/engine/SmtEngine.cc
   src/dtpg/engine/SmtEngineSingle.cc

@@ -12,6 +12,7 @@
 #include "DetectOp.h"
 #include "UntestOp.h"
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
@@ -26,21 +27,21 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
 SmtEngine::SmtEngine(const string& sat_type,
 		     const string& sat_option,
 		     ostream* sat_outp,
-		     ymuint max_id,
+		     const TpgNetwork& network,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop) :
   mSatType(sat_type),
   mSatOption(sat_option),
   mSatOutP(sat_outp),
-  mMaxNodeId(max_id),
+  mNetwork(network),
   mBackTracer(bt),
   mDetectOp(dop),
   mUntestOp(uop)
@@ -112,20 +113,18 @@ END_NONAMESPACE
 // @brief 故障位置を与えてその TFO の TFI リストを作る．
 // @param[in] solver SAT ソルバ
 // @param[in] fnode_list 故障位置のノードのリスト
-// @param[in] max_id ノード番号の最大値
 //
 // 結果は mTfoList に格納される．
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
 SmtEngine::mark_region(Solver& solver,
-		       const vector<TpgNode*>& fnode_list,
-		       ymuint max_id)
+		       const vector<TpgNode*>& fnode_list)
 {
   mMarkArray.clear();
-  mMarkArray.resize(max_id, 0U);
+  mMarkArray.resize(mNetwork.max_node_id(), 0U);
 
   mTfoList.clear();
-  mTfoList.reserve(max_id);
+  mTfoList.reserve(mNetwork.max_node_id());
 
   mInputList.clear();
   mOutputList.clear();
@@ -172,6 +171,13 @@ SmtEngine::mark_region(Solver& solver,
   }
 
   sort(mOutputList.begin(), mOutputList.end(), Lt());
+}
+
+// @brief ノードの最大番号を返す．
+ymuint
+SmtEngine::max_node_id() const
+{
+  return mNetwork.max_node_id();
 }
 
 // @brief 節の作成用の作業領域の使用を開始する．

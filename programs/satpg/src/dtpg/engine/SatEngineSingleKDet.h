@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINEMULTI_H
-#define SATENGINEMULTI_H
+﻿#ifndef SATENGINESINGLEKDET_H
+#define SATENGINESINGLEKDET_H
 
-/// @file SatEngineMulti.h
-/// @brief SatEngineMulti のヘッダファイル
+/// @file SatEngineSingleKDet.h
+/// @brief SatEngineSingleKDet のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -16,10 +16,10 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineMulti SatEngineMulti.h "SatEngineMulti.h"
-/// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
+/// @class SatEngineSingleKDet SatEngineSingleKDet.h "SatEngineSingleKDet.h"
+/// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineMulti :
+class SatEngineSingleKDet :
   public SatEngine
 {
 public:
@@ -32,18 +32,19 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineMulti(const string& sat_type,
-		 const string& sat_option,
-		 ostream* sat_outp,
-		 const TpgNetwork& network,
-		 BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop,
-		 bool forget);
+  /// @param[in] kdet 多重度
+  SatEngineSingleKDet(const string& sat_type,
+		      const string& sat_option,
+		      ostream* sat_outp,
+		      const TpgNetwork& network,
+		      BackTracer& bt,
+		      DetectOp& dop,
+		      UntestOp& uop,
+		      ymuint kdet);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineMulti();
+  ~SatEngineSingleKDet();
 
 
 public:
@@ -69,17 +70,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
-
-  // 作業用の配列
-  vector<bool> mDone;
-
-  // forget フラグ
-  bool mForget;
+  // 多重度
+  ymuint mCount;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEMULTI_H
+#endif // SATENGINESINGLEKDET_H

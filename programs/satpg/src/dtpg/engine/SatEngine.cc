@@ -12,6 +12,7 @@
 #include "DetectOp.h"
 #include "UntestOp.h"
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
@@ -276,14 +277,14 @@ END_NONAMESPACE
 SatEngine::SatEngine(const string& sat_type,
 		     const string& sat_option,
 		     ostream* sat_outp,
-		     ymuint max_id,
+		     const TpgNetwork& network,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop) :
   mSatType(sat_type),
   mSatOption(sat_option),
   mSatOutP(sat_outp),
-  mMaxNodeId(max_id),
+  mNetwork(network),
   mBackTracer(bt),
   mDetectOp(dop),
   mUntestOp(uop)
@@ -387,6 +388,7 @@ SatEngine::timer_enable(bool enable)
   mTimerEnable = enable;
 }
 
+
 BEGIN_NONAMESPACE
 
 struct Lt
@@ -412,10 +414,10 @@ SatEngine::mark_region(SatSolver& solver,
 		       const vector<TpgNode*>& fnode_list)
 {
   mMarkArray.clear();
-  mMarkArray.resize(mMaxNodeId, 0U);
+  mMarkArray.resize(mNetwork.max_node_id(), 0U);
 
   mTfoList.clear();
-  mTfoList.reserve(mMaxNodeId);
+  mTfoList.reserve(mNetwork.max_node_id());
 
   mInputList.clear();
   mOutputList.clear();
@@ -462,6 +464,14 @@ SatEngine::mark_region(SatSolver& solver,
   }
 
   sort(mOutputList.begin(), mOutputList.end(), Lt());
+}
+
+// @brief 入力ノードを得る．
+// @param[in] ipos 入力番号
+TpgNode*
+SatEngine::input_node(ymuint ipos) const
+{
+  return mNetwork.input(ipos);
 }
 
 // @brief 節の作成用の作業領域の使用を開始する．
@@ -1027,7 +1037,8 @@ SatEngine::make_flt01_cnf(SatSolver& solver,
 // @brief 一つの SAT問題を解く．
 Bool3
 SatEngine::solve(SatSolver& solver,
-		 TpgFault* f)
+		 TpgFault* f,
+		 bool option)
 {
   SatStats prev_stats;
   solver.get_stats(prev_stats);
@@ -1047,15 +1058,23 @@ SatEngine::solve(SatSolver& solver,
     // パタンが求まった．
     detect_op(f, sat_stats, time);
   }
-  else if ( ans == kB3False ) {
-    // 検出不能と判定された．
-    untest_op(f, sat_stats, time);
+  else if ( !option ) {
+    if ( ans == kB3False ) {
+      // 検出不能と判定された．
+      untest_op(f, sat_stats, time);
+    }
+    else { // ans == kB3X つまりアボート
+      abort_op(f, sat_stats, time);
+    }
   }
-  else { // ans == kB3X つまりアボート
-    abort_op(f, sat_stats, time);
-  }
-
   return ans;
+}
+
+// @brief 最後に生成されたパタンを得る．
+TestVector*
+SatEngine::last_pat()
+{
+  return mLastPat;
 }
 
 // @brief 一つの SAT問題を解く．
@@ -1078,6 +1097,8 @@ SatEngine::detect_op(TpgFault* fault,
 
   // パタンの登録などを行う．
   mDetectOp(fault, tv);
+
+  mLastPat = tv;
 
   ++ mStats.mDetCount;
   mStats.mDetTime += time;

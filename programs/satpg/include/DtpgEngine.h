@@ -74,7 +74,7 @@ public:
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
-/// @param[in] max_id ノード番号の最大値 + 1
+/// @param[in] network 対象のネットワーク
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -82,16 +82,37 @@ DtpgEngine*
 new_SatEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
-		    ymuint max_id,
+		    const TpgNetwork& network,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop);
+
+
+/// @brief Single(k-det) エンジンを作る．
+/// @param[in] sat_type SATソルバの種類を表す文字列
+/// @param[in] sat_option SATソルバに渡すオプション文字列
+/// @param[in] sat_outp SATソルバ用の出力ストリーム
+/// @param[in] network 対象のネットワーク
+/// @param[in] bt バックトレーサー
+/// @param[in] dop パタンが求められた時に実行されるファンクタ
+/// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+/// @param[in] kdet 多重度
+DtpgEngine*
+new_SatEngineSingleKDet(const string& sat_type,
+			const string& sat_option,
+			ostream* sat_outp,
+			const TpgNetwork& network,
+			BackTracer& bt,
+			DetectOp& dop,
+			UntestOp& uop,
+			ymuint kdet);
 
 /// @brief Single2 エンジンを作る．
 /// @param[in] th_val しきい値
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
+/// @param[in] network 対象のネットワーク
 /// @param[in] max_id ノード番号の最大値 + 1
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
@@ -101,7 +122,7 @@ new_SatEngineSingle2(ymuint th_val,
 		     const string& sat_type,
 		     const string& sat_option,
 		     ostream* sat_outp,
-		     ymuint max_id,
+		     const TpgNetwork& network,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop);
@@ -110,6 +131,7 @@ new_SatEngineSingle2(ymuint th_val,
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
+/// @param[in] network 対象のネットワーク
 /// @param[in] max_id ノード番号の最大値 + 1
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
@@ -118,7 +140,7 @@ DtpgEngine*
 new_SatEngineMulti(const string& sat_type,
 		   const string& sat_option,
 		   ostream* sat_outp,
-		   ymuint max_id,
+		   const TpgNetwork& network,
 		   BackTracer& bt,
 		   DetectOp& dop,
 		   UntestOp& uop,
@@ -129,6 +151,7 @@ new_SatEngineMulti(const string& sat_type,
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
+/// @param[in] network 対象のネットワーク
 /// @param[in] max_id ノード番号の最大値 + 1
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
@@ -138,7 +161,7 @@ new_SatEngineMulti2(ymuint th_val,
 		    const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
-		    ymuint max_id,
+		    const TpgNetwork& network,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop,
@@ -148,7 +171,7 @@ new_SatEngineMulti2(ymuint th_val,
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
-/// @param[in] max_id ノード番号の最大値 + 1
+/// @param[in] network 対象のネットワーク
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -156,7 +179,7 @@ DtpgEngine*
 new_SmtEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
-		    ymuint max_id,
+		    const TpgNetwork& network,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop);
