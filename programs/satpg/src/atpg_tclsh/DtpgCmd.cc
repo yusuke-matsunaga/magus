@@ -73,6 +73,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			  "X-extract mode [0-2]");
   mPoptDrop = new TclPopt(this, "drop",
 			  "with fault drop");
+  mPoptKDet = new TclPoptInt(this, "k_det",
+			     "detection count");
   mPoptOpt = new TclPoptStr(this, "option",
 			    "specify option string <STR>");
   mPoptVerify = new TclPopt(this, "verify",
@@ -149,8 +151,15 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   string engine_type;
   ymuint mode_val = 0;
+  ymuint kdet_val = 0;
   if ( mPoptSingle->is_specified() ) {
-    engine_type = "single";
+    if ( mPoptKDet->is_specified() ) {
+      engine_type = "single_kdet";
+      kdet_val = mPoptKDet->val();
+    }
+    else {
+      engine_type = "single";
+    }
   }
   else if ( mPoptSingle2->is_specified() ) {
     engine_type = "single2";
@@ -241,32 +250,34 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgDriver* dtpg = new_DtpgDriver();
 
-  ymuint max_id = _network().max_node_id();
-
   DtpgEngine* engine = NULL;
   if ( engine_type == "single" ) {
-    engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+    engine = new_SatEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
+  }
+  else if ( engine_type == "single_kdet" ) {
+    engine = new_SatEngineSingleKDet(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, kdet_val);
   }
   else if ( engine_type == "single2" ) {
-    engine = new_SatEngineSingle2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+    engine = new_SatEngineSingle2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
   else if ( engine_type == "multi" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, false);
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, false);
   }
   else if ( engine_type == "multi_forget" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, true);
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
   }
   else if ( engine_type == "multi2" ) {
-    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, false);
+    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, false);
   }
   else if ( engine_type == "multi2_forget" ) {
-    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, true);
+    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
   }
   else if ( engine_type == "smt_single" ) {
-    engine = new_SmtEngineSingle(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+    engine = new_SmtEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    // デフォルトフォールバック
+    engine = new_SatEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
 
   engine->set_option(option_str);

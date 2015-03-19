@@ -12,6 +12,7 @@
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "TestVector.h"
 #include "YmLogic/SatSolver.h"
 
 
@@ -21,7 +22,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -29,23 +30,23 @@ DtpgEngine*
 new_SatEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
-		    ymuint max_id,
+		    const TpgNetwork& network,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop)
 {
-  return new SatEngineSingle(sat_type, sat_option, sat_outp, max_id, bt, dop, uop);
+  return new SatEngineSingle(sat_type, sat_option, sat_outp, network, bt, dop, uop);
 }
 
 // @brief コンストラクタ
 SatEngineSingle::SatEngineSingle(const string& sat_type,
 				 const string& sat_option,
 				 ostream* sat_outp,
-				 ymuint max_id,
+				 const TpgNetwork& network,
 				 BackTracer& bt,
 				 DetectOp& dop,
 				 UntestOp& uop) :
-  SatEngine(sat_type, sat_option, sat_outp, max_id, bt, dop, uop)
+  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop)
 {
 }
 

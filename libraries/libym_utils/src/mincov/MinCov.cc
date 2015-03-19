@@ -71,11 +71,13 @@ MinCov::exact(vector<ymuint32>& solution)
 
 // @brief ヒューリスティックで最小被覆問題を解く．
 // @param[out] solution 選ばれた列集合
+// @param[in] alg ヒューリスティックの種類
 // @return 解のコスト
 ymuint32
-MinCov::heuristic(vector<ymuint32>& solution)
+MinCov::heuristic(vector<ymuint32>& solution,
+		  AlgType alg)
 {
-  return mSolver->heuristic(solution);
+  return mSolver->heuristic(solution, alg);
 }
 
 // @brief partition フラグを設定する．

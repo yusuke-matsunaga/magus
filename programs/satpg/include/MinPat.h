@@ -57,6 +57,16 @@ extern
 MinPat*
 new_MinPat();
 
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_GreedyMinPat();
+
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_NaiveMinPat();
+
 END_NAMESPACE_YM_SATPG
 
 #endif // MINPAT_H

@@ -5,7 +5,7 @@
 /// @brief MinCov のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -24,6 +24,16 @@ namespace nsMincov {
 //////////////////////////////////////////////////////////////////////
 class MinCov
 {
+public:
+
+  /// @brief ヒューリスティックの種類を表す列挙型
+  enum AlgType {
+    kGreedy,
+    kRandom,
+    kMCT
+  };
+
+
 public:
 
   /// @brief コンストラクタ
@@ -67,19 +77,24 @@ public:
 
   /// @brief ヒューリスティックで最小被覆問題を解く．
   /// @param[out] solution 選ばれた列集合
+  /// @param[in] alg ヒューリスティックの種類
   /// @return 解のコスト
   ymuint32
-  heuristic(vector<ymuint32>& solution);
+  heuristic(vector<ymuint32>& solution,
+	    AlgType alg = kGreedy);
 
   /// @brief partition フラグを設定する．
+  /// @param[in] flag 分割を行う時 true にセットする．
   void
   set_partition(bool flag);
 
   /// @brief デバッグフラグを設定する．
+  /// @param[in] flag デバッグ情報を出力する時 true にセットする．
   void
   set_debug(bool flag);
 
   /// @brief デバッグで表示する最大深さを設定する．
+  /// @param[in] depth セットする最大深さ
   void
   set_max_depth(ymuint depth);
 

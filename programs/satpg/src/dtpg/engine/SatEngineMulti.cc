@@ -10,6 +10,7 @@
 #include "SatEngineMulti.h"
 
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "YmLogic/SatSolver.h"
@@ -21,34 +22,34 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
-/// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
 new_SatEngineMulti(const string& sat_type,
 		   const string& sat_option,
 		   ostream* sat_outp,
-		   ymuint max_id,
+		   const TpgNetwork& network,
 		   BackTracer& bt,
 		   DetectOp& dop,
 		   UntestOp& uop,
 		   bool forget)
 {
-  return new SatEngineMulti(sat_type, sat_option, sat_outp, max_id, bt, dop, uop, forget);
+  return new SatEngineMulti(sat_type, sat_option, sat_outp, network, bt, dop, uop, forget);
 }
 
 // @brief コンストラクタ
 SatEngineMulti::SatEngineMulti(const string& sat_type,
 			       const string& sat_option,
 			       ostream* sat_outp,
-			       ymuint max_id,
+			       const TpgNetwork& network,
 			       BackTracer& bt,
 			       DetectOp& dop,
 			       UntestOp& uop,
 			       bool forget) :
-  SatEngine(sat_type, sat_option, sat_outp, max_id, bt, dop, uop),
-  mDone(max_id, false),
+  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop),
+  mDone(network.max_node_id(), false),
   mForget(forget)
 {
 }

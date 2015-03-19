@@ -695,18 +695,19 @@ TpgNetwork::activate_sub()
   mActNodeNum = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     TpgNode* node = &mNodeArray[i];
-    if ( !mTmpMark[i] ) {
-      node->clear_active();
-      continue;
+    if ( mTmpMark[i] ) {
+      node->set_active();
+      mActNodeArray[mActNodeNum] = node;
+      ++ mActNodeNum;
     }
-    node->set_active();
-    mActNodeArray[mActNodeNum] = node;
-    ++ mActNodeNum;
+    else {
+      node->clear_active();
+    }
   }
 
   for (ymuint i = 0; i < mActNodeNum; ++ i) {
     ymuint id = mActNodeNum - i - 1;
-    TpgNode* node = &mNodeArray[id];
+    TpgNode* node = mActNodeArray[id];
 
     // ファンアウトをPOまでのレベルの小さい順にならべる．
     ymuint nfo = node->fanout_num();
@@ -719,6 +720,7 @@ TpgNetwork::activate_sub()
       }
     }
     if ( tmp_folist.empty() ) {
+      ASSERT_COND( node->is_output() );
       node->mActFanoutNum = 0;
       level_array[node->id()] = 0;
     }
@@ -769,6 +771,7 @@ void
 TpgNetwork::clear_tfimark()
 {
   for (ymuint i = 0; i < mTmpNodeNum; ++ i) {
+    ASSERT_COND( mTmpMark[mTmpNodeList[i]->id()] );
     mTmpMark[mTmpNodeList[i]->id()] = false;
   }
   mTmpNodeNum = 0;

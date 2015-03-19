@@ -48,6 +48,7 @@ set (dtpg_SOURCES
   src/dtpg/engine/SatEngineMulti.cc
   src/dtpg/engine/SatEngineMulti2.cc
   src/dtpg/engine/SatEngineSingle.cc
+  src/dtpg/engine/SatEngineSingleKDet.cc
   src/dtpg/engine/SatEngineSingle2.cc
   src/dtpg/engine/SmtEngine.cc
   src/dtpg/engine/SmtEngineSingle.cc
@@ -98,6 +99,12 @@ set (minpat_SOURCES
   src/minpat/KDetOp.cc
   src/minpat/MinPatImpl.cc
   src/minpat/Verifier.cc
+  src/minpat/GreedyMinPat.cc
+  src/minpat/NaiveMinPat.cc
+  src/minpat/MaxCompat.cc
+  src/minpat/GcNodeHeap.cc
+  src/minpat/GcSolver.cc
+  src/minpat/McMatrix.cc
   )
 
 set (rtpg_SOURCES

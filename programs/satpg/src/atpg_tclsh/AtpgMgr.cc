@@ -114,29 +114,27 @@ AtpgMgr::dtpg(DtpgMode mode,
 
   DtpgDriver* dtpg = new_DtpgDriver();
 
-  ymuint max_id = mNetwork->max_node_id();
-
   DtpgEngine* engine = NULL;
   if ( mode.engine_type() == "single" ) {
-    engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);
+    engine = new_SatEngineSingle(sat_type, sat_option, outp, *mNetwork, bt, dop, uop);
   }
   else if ( mode.engine_type() == "single2" ) {
-    engine = new_SatEngineSingle2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop);
+    engine = new_SatEngineSingle2(mode.val(), sat_type, sat_option, outp, *mNetwork, bt, dop, uop);
   }
   else if ( mode.engine_type() == "multi" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop, false);
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, *mNetwork, bt, dop, uop, false);
   }
   else if ( mode.engine_type() == "multi_forget" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, bt, dop, uop, true);
+    engine = new_SatEngineMulti(sat_type, sat_option, outp, *mNetwork, bt, dop, uop, true);
   }
   else if ( mode.engine_type() == "multi2" ) {
-    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop, false);
+    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, *mNetwork, bt, dop, uop, false);
   }
   else if ( mode.engine_type() == "multi2_forget" ) {
-    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, max_id, bt, dop, uop, true);
+    engine = new_SatEngineMulti2(mode.val(), sat_type, sat_option, outp, *mNetwork, bt, dop, uop, true);
   }
   else if ( mode.engine_type() == "smt_single" ) {
-    engine = new_SmtEngineSingle(sat_type, sat_option, outp, max_id, bt, dop, uop);
+    engine = new_SmtEngineSingle(sat_type, sat_option, outp, *mNetwork, bt, dop, uop);
   }
   else {
     assert_not_reached(__FILE__, __LINE__);

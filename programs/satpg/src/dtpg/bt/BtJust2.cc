@@ -224,9 +224,32 @@ BtJust2::just_sub2(TpgNode* node,
 		   Bool3 val)
 {
   ymuint ni = node->fanin_num();
+  // まず gval と fval が等しい場合を探す．
+  ymuint pos = ni;
+  ymuint min = 0;
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    Bool3 igval = node_gval(inode, model);
+    Bool3 ifval = node_fval(inode, model);
+    if ( igval != ifval || igval != val ) {
+      continue;
+    }
+    NodeList* node_list1 = justify(inode, model);
+    ymuint n = list_size(node_list1);
+    if ( min == 0 || min > n ) {
+      pos = i;
+      min = n;
+    }
+  }
+  if ( pos < ni ) {
+    NodeList*& node_list = mJustArray[node->id()];
+    list_merge(node_list, mJustArray[node->fanin(pos)->id()]);
+    return node_list;
+  }
+
   ymuint gpos = ni;
-  ymuint gmin = 0;
   ymuint fpos = ni;
+  ymuint gmin = 0;
   ymuint fmin = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
@@ -250,13 +273,12 @@ BtJust2::just_sub2(TpgNode* node,
       }
     }
   }
-  assert_cond( gpos < ni, __FILE__, __LINE__);
-  assert_cond( fpos < ni, __FILE__, __LINE__);
+  ASSERT_COND( gpos < ni );
+  ASSERT_COND( fpos < ni );
+  ASSERT_COND( gpos != fpos );
   NodeList*& node_list = mJustArray[node->id()];
   list_merge(node_list, mJustArray[node->fanin(gpos)->id()]);
-  if ( gpos != fpos ) {
-    list_merge(node_list, mJustArray[node->fanin(fpos)->id()]);
-  }
+  list_merge(node_list, mJustArray[node->fanin(fpos)->id()]);
   return node_list;
 }
 

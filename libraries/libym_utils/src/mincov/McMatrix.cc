@@ -16,7 +16,7 @@
 
 BEGIN_NAMESPACE_YM_MINCOV
 
-bool mcmatrix_debug = false;
+int mcmatrix_debug = 0;
 
 //////////////////////////////////////////////////////////////////////
 // クラス McRowHead
@@ -215,6 +215,12 @@ McMatrix::operator=(const McMatrix& src)
 // @brief デストラクタ
 McMatrix::~McMatrix()
 {
+  for (ymuint i = 0; i < row_size(); ++ i) {
+    delete mRowArray[i];
+  }
+  for (ymuint i = 0; i < col_size(); ++ i) {
+    delete mColArray[i];
+  }
   delete [] mRowArray;
   delete [] mColArray;
   delete [] mDelStack;
@@ -795,11 +801,18 @@ McMatrix::restore_col(ymuint32 col_pos)
 void
 McMatrix::reduce(vector<ymuint32>& selected_cols)
 {
+  if ( mcmatrix_debug > 0 ) {
+    cout << "McMatrix::reduce(): " << _remain_row_size() << " x " << _remain_col_size() << endl;
+  }
+
   ymuint no_change = 0;
   for ( ; ; ) {
     // 列支配を探し，列の削除を行う．
     if ( col_dominance() ) {
       no_change = 0;
+      if ( mcmatrix_debug > 0 ) {
+	cout << " after col_dominance: " << _remain_row_size() << " x " << _remain_col_size() << endl;
+      }
     }
     else {
       ++ no_change;
@@ -811,6 +824,9 @@ McMatrix::reduce(vector<ymuint32>& selected_cols)
     // 必須列を探し，列の選択を行う．
     if ( essential_col(selected_cols) ) {
       no_change = 0;
+      if ( mcmatrix_debug > 0 ) {
+	cout << " after essential_col: " << _remain_row_size() << " x " << _remain_col_size() << endl;
+      }
     }
     else {
       ++ no_change;
@@ -822,6 +838,9 @@ McMatrix::reduce(vector<ymuint32>& selected_cols)
     // 行支配を探し，行の削除を行う．
     if ( row_dominance() ) {
       no_change = 0;
+      if ( mcmatrix_debug > 0 ) {
+	cout << " after row_dominance: " << _remain_row_size() << " x " << _remain_col_size() << endl;
+      }
     }
     else {
       ++ no_change;
@@ -927,7 +946,7 @@ McMatrix::row_dominance()
 	delete_row(row_pos);
 	row2->mWork = 1;
 	change = true;
-	if ( mcmatrix_debug ) {
+	if ( mcmatrix_debug > 1 ) {
 	  cout << "Row#" << row_pos << " is dominated by Row#" << row1->pos() << endl;
 	}
       }
@@ -1023,7 +1042,7 @@ McMatrix::col_dominance()
       if ( found ) {
 	// col2 は col1 を支配している．
 	delete_col(col1->pos());
-	if ( mcmatrix_debug ) {
+	if ( mcmatrix_debug > 1 ) {
 	  cout << "Col#" << col1->pos() << " is dominated by Col#"
 	       << col2->pos() << endl;
 	}
@@ -1060,7 +1079,7 @@ McMatrix::essential_col(vector<ymuint32>& selected_cols)
       if ( col1->mWork == 0 ) {
 	col1->mWork = 1;
 	selected_cols.push_back(col_pos);
-	if ( mcmatrix_debug ) {
+	if ( mcmatrix_debug > 1 ) {
 	  cout << "Col#" << col_pos << " is essential" << endl;
 	}
       }

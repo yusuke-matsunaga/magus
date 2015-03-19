@@ -16,7 +16,9 @@
 #include "Fsim.h"
 #include "KDet.h"
 #include "Verifier.h"
-#include "YmUtils/GcSolver.h"
+#include "GcSolver.h"
+#include "GcNode.h"
+#include "YmUtils/Graph.h"
 #include "YmUtils/MinCov.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/RandPermGen.h"
@@ -78,7 +80,7 @@ MinPatImpl::run(TvMgr& tvmgr,
     }
   }
 
-
+  // 故障番号の最大値を求める．
   ymuint max_fault_id = 0;
   const vector<TpgFault*>& f_list = fmgr.det_list();
   for (ymuint i = 0; i < f_list.size(); ++ i) {
@@ -88,138 +90,71 @@ MinPatImpl::run(TvMgr& tvmgr,
     }
   }
   ++ max_fault_id;
-  {
 
-    KDet kdet(fsim3, f_list, max_fault_id);
+  KDet kdet(fsim3, f_list, max_fault_id);
 
-    vector<vector<ymuint> > det_list_array;
-    ymuint k = 200;
-    kdet.run(tv_list, k, det_list_array);
-    vector<bool> fmark(max_fault_id);
-    vector<ymuint> fmap(max_fault_id);
+  vector<vector<ymuint> > det_list_array;
+  ymuint k = 2000;
+  kdet.run(tv_list, k, det_list_array);
 
-    MinCov mincov;
+  // マージできないテストパタンの間に枝を持つグラフを作る．
+  ymuint n = tv_list.size();
+  GcSolver gcsolver(n);
 
-    ymuint fnum = 0;
-    ymuint pnum = tv_list.size();
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	if ( !fmark[f] ) {
-	  fmark[f] = true;
-	  fmap[f] = fnum;
-	  ++ fnum;
-	}
+  for (ymuint i1 = 1; i1 < n; ++ i1) {
+    TestVector* tv1 = tv_list[i1];
+    GcNode* node1 = gcsolver.node(i1);
+    for (ymuint i2 = 0; i2 < i1; ++ i2) {
+      TestVector* tv2 = tv_list[i2];
+      GcNode* node2 = gcsolver.node(i2);
+      if ( TestVector::is_conflict(*tv1, *tv2) ) {
+	connect(node1, node2);
       }
     }
-
-    mincov.set_size(fnum, pnum);
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	ymuint r = fmap[f];
-	mincov.insert_elem(r, i);
-      }
-    }
-    vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list);
-    ymuint orig_num = tv_list.size();
-    if ( pat_list.size() < tv_list.size() ) {
-      vector<TestVector*> tv_tmp_list(tv_list);
-      tv_list.clear();
-      for (ymuint i = 0; i < pat_list.size(); ++ i) {
-	tv_list.push_back(tv_tmp_list[pat_list[i]]);
-      }
-    }
-    cout << "Minimum Covering End: " << tv_list.size() << " / " << orig_num << endl;
-  }
-
-  // 3値のパタンを抜き出し tv3_list に入れる．
-  // 2値のパタンは tv2_list に入れる．
-  vector<TestVector*> tv2_list;
-  vector<TestVector*> tv3_list;
-  tv2_list.reserve(orig_num);
-  tv3_list.reserve(orig_num);
-  for (vector<TestVector*>::iterator p = tv_list.begin();
-       p != tv_list.end(); ++ p) {
-    TestVector* tv = *p;
-    if ( tv->x_num() > 0 ) {
-      tv3_list.push_back(tv);
-    }
-    else {
-      tv2_list.push_back(tv);
+    node1->set_pat(tv1);
+    for (vector<ymuint>::const_iterator p = det_list_array[i1].begin();
+	 p != det_list_array[i1].end(); ++ p) {
+      node1->add_fault(*p);
     }
   }
 
-  if ( 0 ) {
+  // このグラフ上での最小彩色問題を解くことで3値のパタンを圧縮する．
+  vector<vector<ymuint> > color_group;
+  ymuint nc = gcsolver.coloring(color_group);
+
+  vector<TestVector*> new_tv_list;
+  for (ymuint i = 0; i < nc; ++ i) {
+    // 同じ色のグループのパタンを一つにマージする．
+    TestVector* new_tv = tvmgr.new_vector();
+    const vector<ymuint>& id_list = color_group[i];
+    for (vector<ymuint>::const_iterator p = id_list.begin();
+	 p != id_list.end(); ++ p) {
+      ymuint id = *p;
+      TestVector* tv = tv_list[id];
+      bool stat = new_tv->merge(*tv);
+      assert_cond( stat, __FILE__, __LINE__);
+    }
+    // 残った X にランダムに 0/1 を割り当てる．
+    new_tv->fix_x_from_random(randgen);
+
+    new_tv_list.push_back(new_tv);
+  }
+  if ( false ) {
     // 検証しておく．
-    if ( ver.check(tv3_list) ) {
-      cout << "No Errors(2)" << endl;
-    }
-  }
-
-  if ( tv3_list.empty() ) {
-#if 0
-    cout << "No x-patterns" << endl;
-#endif
-  }
-  else {
-    // 最小彩色問題を解くことで3値のパタンを圧縮する．
-    GcSolver gcmgr;
-
-    ymuint n = tv3_list.size();
-    gcmgr.init(n);
-    for (ymuint i1 = 1; i1 < n; ++ i1) {
-      TestVector* tv1 = tv3_list[i1];
-      for (ymuint i2 = 0; i2 < i1; ++ i2) {
-	TestVector* tv2 = tv3_list[i2];
-	if ( TestVector::is_conflict(*tv1, *tv2) ) {
-	  gcmgr.connect(i1, i2);
-	}
-      }
-    }
-    vector<vector<ymuint> > color_group;
-    ymuint nc = gcmgr.coloring(color_group);
-
-#if 0
-    cout << "coloring " << n << " --> " << nc << endl;
-#endif
-
-    for (ymuint i = 0; i < nc; ++ i) {
-      // 同じ色のグループのパタンを一つにマージする．
-      TestVector* new_tv = tvmgr.new_vector();
-      const vector<ymuint>& id_list = color_group[i];
-      for (vector<ymuint>::const_iterator p = id_list.begin();
-	   p != id_list.end(); ++ p) {
-	ymuint id = *p;
-	TestVector* tv = tv3_list[id];
-	bool stat = new_tv->merge(*tv);
-	assert_cond( stat, __FILE__, __LINE__);
-      }
-      // 残った X にランダムに 0/1 を割り当てる．
-      new_tv->fix_x_from_random(randgen);
-
-      tv2_list.push_back(new_tv);
-    }
-  }
-  if ( 0 ) {
-    // 検証しておく．
-    if ( ver.check(tv2_list) ) {
+    if ( ver.check(new_tv_list) ) {
       cout << "No Errors(3)" << endl;
     }
   }
-  cout << "Graph Coloring End: " << tv2_list.size() << endl;
+  cout << "Graph Coloring End: " << new_tv_list.size() << endl;
 
   // 最小被覆問題を解く．
-  tv_list = tv2_list;
+  tv_list = new_tv_list;
 
   {
     KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
-    ymuint k = 400;
+    ymuint k = 40;
     kdet.run(tv_list, k, det_list_array);
     vector<bool> fmark(max_fault_id);
     vector<ymuint> fmap(max_fault_id);
@@ -250,7 +185,7 @@ MinPatImpl::run(TvMgr& tvmgr,
       }
     }
     vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list);
+    double cost = mincov.heuristic(pat_list, MinCov::kGreedy);
     if ( pat_list.size() < tv_list.size() ) {
       vector<TestVector*> tv_tmp_list(tv_list);
       tv_list.clear();
