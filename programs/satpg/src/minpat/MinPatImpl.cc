@@ -93,9 +93,13 @@ MinPatImpl::run(TvMgr& tvmgr,
 
   KDet kdet(fsim3, f_list, max_fault_id);
 
+  cout << "  fault simulation starts." << endl;
+
   vector<vector<ymuint> > det_list_array;
   ymuint k = 2000;
   kdet.run(tv_list, k, det_list_array);
+
+  cout << "  fault simulation ends." << endl;
 
   // マージできないテストパタンの間に枝を持つグラフを作る．
   ymuint n = tv_list.size();

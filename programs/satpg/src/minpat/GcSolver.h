@@ -58,10 +58,6 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief mCountArray をクリアする．
-  void
-  clear_count();
-
   /// @brief ノードがカバーしている故障に印をつける．
   void
   cover_fault(GcNode* node);
@@ -80,9 +76,6 @@ private:
 
   // 現在の最大色番号
   ymuint32 mMaxColor;
-
-  // sat degree 計算用の配列
-  vector<bool> mCountArray;
 
   // 最大故障番号 + 1
   ymuint mMaxFaultId;
