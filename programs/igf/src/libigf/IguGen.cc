@@ -119,6 +119,7 @@ IguGen::naive_partition(const vector<const FuncVect*>& func_list,
       return false;
     }
   }
+  return true;
 }
 
 // @brief displace_decomposition を行う．

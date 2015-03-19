@@ -27,6 +27,7 @@ set (CMAKE_BUILD_TYPE DEBUG)
 
 option (BUILD_MAGUS "build magus" ON)
 option (BUILD_SATPG "build satpg" ON)
+option (BUILD_IGF "build igf" OFF)
 option (BUILD_BNET2AIG "build bnet2aig" OFF)
 option (BUILD_MAKEBDD "build makebdd" OFF)
 
@@ -123,6 +124,10 @@ endif (TCL_FOUND)
 if (BUILD_BNET2AIG)
   add_subdirectory (programs/bnet2aig)
 endif (BUILD_BNET2AIG)
+
+if (BUILD_IGF)
+  add_subdirectory (programs/igf)
+endif (BUILD_IGF)
 
 if (BUILD_MAKEBDD)
   add_subdirectory (programs/makebdd)

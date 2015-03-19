@@ -322,6 +322,9 @@ PhfGraph::cf_partition(vector<ymuint>& block_map)
     return false;
   }
 
+  cout << "  begin btg match";
+  cout.flush();
+
   // 残ったグラフを別の2部グラフに変換してマッチングを求める．
   BtgMatch bm;
 
@@ -340,6 +343,9 @@ PhfGraph::cf_partition(vector<ymuint>& block_map)
 
   vector<ymuint> edge_list;
   bool stat = bm.calc_match(edge_list);
+
+  cout << " end" << endl;
+
   if ( !stat ) {
     return false;
   }
