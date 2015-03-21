@@ -45,8 +45,10 @@ set (dtpg_SOURCES
 
   src/dtpg/engine/LitMap.cc
   src/dtpg/engine/SatEngine.cc
+  src/dtpg/engine/SatEngineMultiBase.cc
   src/dtpg/engine/SatEngineMulti.cc
   src/dtpg/engine/SatEngineMulti2.cc
+  src/dtpg/engine/SatEngineSingleBase.cc
   src/dtpg/engine/SatEngineSingle.cc
   src/dtpg/engine/SatEngineSingleKDet.cc
   src/dtpg/engine/SatEngineSingle2.cc

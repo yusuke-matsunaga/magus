@@ -3,7 +3,7 @@
 /// @brief SatEngineMulti2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -51,9 +51,8 @@ SatEngineMulti2::SatEngineMulti2(ymuint th_val,
 				 DetectOp& dop,
 				 UntestOp& uop,
 				 bool forget) :
-  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop),
+  SatEngineMultiBase(sat_type, sat_option, sat_outp, network, bt, dop, uop),
   mThVal(th_val),
-  mDone(network.max_node_id(), false),
   mMark(network.max_node_id(), 0),
   mForget(forget)
 {
@@ -64,19 +63,11 @@ SatEngineMulti2::~SatEngineMulti2()
 {
 }
 
-// @brief テスト生成を行なう．
-// @param[in] f_tgt 対象の故障
-void
-SatEngineMulti2::run(TpgFault* f_tgt)
-{
-  run(vector<TpgFault*>(1, f_tgt));
-}
-
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 // @param[in] th_val
 void
-SatEngineMulti2::run(const vector<TpgFault*>& flist)
+SatEngineMulti2::run_multi(const vector<TpgFault*>& flist)
 {
   SatSolver solver(sat_type(), sat_option(), sat_outp());
 
@@ -86,17 +77,14 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
   vector<VarId> flt_var(nf);
   // FnodeInfo を持つノードのリスト
   vector<TpgNode*> fnode_list;
-  fnode_list.reserve(nf);
+  make_fnode_list(flist, fnode_list);
+
   for (ymuint i = 0; i < nf; ++ i) {
     VarId fvar = solver.new_var();
     flt_var[i] = fvar;
     TpgFault* f = flist[i];
     int fval = f->val();
     TpgNode* node = f->node();
-    if ( !mDone[node->id()] ) {
-      mDone[node->id()] = true;
-      fnode_list.push_back(node);
-    }
 
     if ( f->is_output_fault() ) {
       node->set_ofvar(fval, fvar);
@@ -158,7 +146,12 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
 	continue;
       }
 
-      make_fnode_cnf(solver, node);
+      if ( node->has_flt_var() ) {
+	make_fnode_cnf2(solver, node);
+      }
+      else {
+	make_fnode_cnf(solver, node);
+      }
 
       make_dchain_cnf(solver, node);
     }
@@ -233,11 +226,9 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
       }
 
       // dominator ノードの dvar は1でなければならない．
-      if ( use_dominator() ) {
-	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-	  Literal dlit(node->dvar(), false);
-	  tmp_lits_add(dlit);
-	}
+      for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+	Literal dlit(node->dvar(), false);
+	tmp_lits_add(dlit);
       }
 
       SatStats prev_stats;
@@ -352,15 +343,10 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
       }
       mTmpNodeList.clear();
 
-      if ( use_dominator() ) {
-	// dominator ノードの dvar は1でなければならない．
-	for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-	  Literal dlit(node->dvar(), false);
-	  tmp_lits_add(dlit);
-	}
-      }
-      else {
-	tmp_lits_add(Literal(f->node()->dvar(), false));
+      // dominator ノードの dvar は1でなければならない．
+      for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+	Literal dlit(node->dvar(), false);
+	tmp_lits_add(dlit);
       }
 
       solve(solver, f);
@@ -374,11 +360,7 @@ SatEngineMulti2::run(const vector<TpgFault*>& flist)
     mMark[node->id()] = 0;
   }
 
-  for (ymuint i = 0; i < fnode_list.size(); ++ i) {
-    TpgNode* node = fnode_list[i];
-    node->clear_oifvar();
-    mDone[node->id()] = false;
-  }
+  clear_fnode_list(fnode_list);
 }
 
 END_NAMESPACE_YM_SATPG

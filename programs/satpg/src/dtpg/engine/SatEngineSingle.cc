@@ -46,7 +46,7 @@ SatEngineSingle::SatEngineSingle(const string& sat_type,
 				 BackTracer& bt,
 				 DetectOp& dop,
 				 UntestOp& uop) :
-  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop)
+  SatEngineSingleBase(sat_type, sat_option, sat_outp, network, bt, dop, uop)
 {
 }
 
@@ -58,7 +58,7 @@ SatEngineSingle::~SatEngineSingle()
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 void
-SatEngineSingle::run(TpgFault* fault)
+SatEngineSingle::run_single(TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
   int fval = fault->val();
@@ -108,15 +108,10 @@ SatEngineSingle::run(TpgFault* fault)
   }
   tmp_lits_end(solver);
 
-  if ( use_dominator() ) {
-    // dominator ノードの dvar は1でなければならない．
-    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), false);
-      solver.add_clause(dlit);
-    }
-  }
-  else {
-    solver.add_clause(Literal(fnode->dvar(), false));
+  // dominator ノードの dvar は1でなければならない．
+  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(node->dvar(), false);
+    solver.add_clause(dlit);
   }
 
   cnf_end();
@@ -127,18 +122,6 @@ SatEngineSingle::run(TpgFault* fault)
   solve(solver, fault);
 
   clear_node_mark();
-}
-
-// @brief テスト生成を行なう．
-// @param[in] flist 対象の故障リスト
-void
-SatEngineSingle::run(const vector<TpgFault*>& flist)
-{
-  for (vector<TpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    TpgFault* f = *p;
-    run(f);
-  }
 }
 
 END_NAMESPACE_YM_SATPG

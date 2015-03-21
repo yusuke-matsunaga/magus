@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINEMULTI_H
-#define SATENGINEMULTI_H
+﻿#ifndef SATENGINEMULTIBASE_H
+#define SATENGINEMULTIBASE_H
 
-/// @file SatEngineMulti.h
-/// @brief SatEngineMulti のヘッダファイル
+/// @file SatEngineMultiBase.h
+/// @brief SatEngineMultiBase のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,17 +10,17 @@
 /// All rights reserved.
 
 
-#include "SatEngineMultiBase.h"
+#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineMulti SatEngineMulti.h "SatEngineMulti.h"
+/// @class SatEngineMultiBase SatEngineMultiBase.h "SatEngineMultiBase.h"
 /// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineMulti :
-  public SatEngineMultiBase
+class SatEngineMultiBase :
+  public SatEngine
 {
 public:
 
@@ -32,18 +32,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineMulti(const string& sat_type,
-		 const string& sat_option,
-		 ostream* sat_outp,
-		 const TpgNetwork& network,
-		 BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop,
-		 bool forget);
+  SatEngineMultiBase(const string& sat_type,
+		     const string& sat_option,
+		     ostream* sat_outp,
+		     const TpgNetwork& network,
+		     BackTracer& bt,
+		     DetectOp& dop,
+		     UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineMulti();
+  ~SatEngineMultiBase();
 
 
 public:
@@ -52,10 +51,32 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
+  /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run_multi(const vector<TpgFault*>& flist);
+  run_single(TpgFault* f_tgt);
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief D-Chain 制約のCNFを作る．
+  void
+  make_dchain_cnf(SatSolver& solver,
+		  TpgNode* node);
+
+  /// @brief 故障に関係するノードのリストを作る．
+  /// @param[in] flist 故障のリスト
+  /// @param[out] fnode_list 故障に関係するノードのリスト
+  void
+  make_fnode_list(const vector<TpgFault*>& flist,
+		  vector<TpgNode*>& fnode_list);
+
+  /// @brief fnode の情報をクリアする．
+  void
+  clear_fnode_list(const vector<TpgNode*>& fnode_list);
 
 
 private:
@@ -63,11 +84,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
-
-  // forget フラグ
-  bool mForget;
+  // 作業用の配列
+  vector<bool> mDone;
 
 };
 

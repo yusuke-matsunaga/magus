@@ -124,7 +124,7 @@ DtpgDriverImpl::single_mode(DtpgEngine& sat_engine)
       TpgFault* f = node->fault(i);
       if ( f->status() != kFsDetected &&
 	   !f->is_skip() ) {
-	sat_engine.run(f);
+	sat_engine.run_single(f);
       }
     }
   }
@@ -228,7 +228,7 @@ DtpgDriverImpl::do_dtpg(DtpgEngine& sat_engine)
     return;
   }
 
-  sat_engine.run(mFaultList);
+  sat_engine.run_multi(mFaultList);
 }
 
 END_NAMESPACE_YM_SATPG

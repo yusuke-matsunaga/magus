@@ -97,26 +97,6 @@ protected:
   ostream*
   sat_outp() const;
 
-  /// @brief NEMESIS モード(含む EXT-NEMESIS)の時 true を返す．
-  bool
-  nemesis_mode() const;
-
-  /// @brief EXT-NEMESIS モードの時 true を返す．
-  bool
-  ext_nemesis_mode() const;
-
-  /// @brief TG-GRASP モード(含む EXT-TG-GRASP)の時 true を返す．
-  bool
-  tg_grasp_mode() const;
-
-  /// @brief EXT-TG-GRASP モードの時 true を返す．
-  bool
-  ext_tg_grasp_mode() const;
-
-  /// @brief dominator を用いた unique sensitization を行う時 true を返す．
-  bool
-  use_dominator() const;
-
   /// @brief CNF 作成を開始する．
   void
   cnf_begin();
@@ -206,87 +186,24 @@ protected:
   make_fnode_cnf(SatSolver& solver,
 		 TpgNode* node);
 
+  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] solver SATソルバ
+  /// @param[in] node 対象のノード
+  static
+  void
+  make_fnode_cnf2(SatSolver& solver,
+		  TpgNode* node);
+
   /// @brief 故障ゲートの CNF を作る．
   static
   void
   make_fault_cnf(SatSolver& solver,
 		 TpgFault* fault);
 
-  /// @brief D-Chain 制約のCNFを作る．
-  void
-  make_dchain_cnf(SatSolver& solver,
-		  TpgNode* node,
-		  TpgFault* fault);
-
-  /// @brief D-Chain 制約のCNFを作る．
-  void
-  make_dchain_cnf(SatSolver& solver,
-		  TpgNode* node);
-
-  /// @brief ノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] node 対象のノード
-  /// @param[in] litmap 入出力のリテラルを保持するクラス
-  static
-  void
-  make_node_cnf(SatSolver& solver,
-		TpgNode* node,
-		const LitMap& litmap,
-		Literal output);
-
-  /// @brief ゲートの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] type ゲートの種類
-  /// @param[in] litmap 入出力のリテラルを保持するクラス
-  static
-  void
-  make_gate_cnf(SatSolver& solver,
-		tTgGateType type,
-		const LitMap& litmap,
-		Literal output);
-
   /// @brief ノードの故障差関数を表すCNFを作る．
   void
   make_dlit_cnf(SatSolver& solver,
 		TpgNode* node);
-
-  /// @brief 故障挿入回路を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバー
-  /// @param[in] ivar 入力の変数
-  /// @param[in] fvar 故障変数
-  /// @param[in] ovar 出力の変数
-  static
-  void
-  make_flt0_cnf(SatSolver& solver,
-		VarId ivar,
-		VarId fvar,
-		VarId ovar);
-
-  /// @brief 故障挿入回路を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバー
-  /// @param[in] ivar 入力の変数
-  /// @param[in] fvar 故障変数
-  /// @param[in] ovar 出力の変数
-  static
-  void
-  make_flt1_cnf(SatSolver& solver,
-		VarId ivar,
-		VarId fvar,
-		VarId ovar);
-
-  /// @brief 故障挿入回路を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバー
-  /// @param[in] ivar 入力の変数
-  /// @param[in] fvar0 故障変数
-  /// @param[in] fvar1 故障変数
-  /// @param[in] ovar 出力の変数
-  static
-  void
-  make_flt01_cnf(SatSolver& solver,
-		 VarId ivar,
-		 VarId fvar0,
-		 VarId fvar1,
-		 VarId ovar);
 
   /// @brief 一つの SAT問題を解く．
   Bool3
@@ -413,21 +330,6 @@ private:
   // 検出不能時に呼ばれるファンクタ
   UntestOp& mUntestOp;
 
-  // NEMESIS モード
-  bool mNemesis;
-
-  // extected NEMESIS モード
-  bool mExtNemesis;
-
-  // TG-GRASP モード
-  bool mTgGrasp;
-
-  // extended TG-GRASP モード
-  bool mExtTgGrasp;
-
-  // unique sensitization を使う
-  bool mUseDominator;
-
   // 対象のネットワーク
   const TpgNetwork& mNetwork;
 
@@ -493,46 +395,6 @@ ostream*
 SatEngine::sat_outp() const
 {
   return mSatOutP;
-}
-
-// @brief NEMESIS モード(含む EXT-NEMESIS)の時 true を返す．
-inline
-bool
-SatEngine::nemesis_mode() const
-{
-  return mNemesis;
-}
-
-// @brief EXT-NEMESIS モードの時 true を返す．
-inline
-bool
-SatEngine::ext_nemesis_mode() const
-{
-  return mExtNemesis;
-}
-
-// @brief TG-GRASP モード(含む EXT-TG-GRASP)の時 true を返す．
-inline
-bool
-SatEngine::tg_grasp_mode() const
-{
-  return mTgGrasp;
-}
-
-// @brief EXT-TG-GRASP モードの時 true を返す．
-inline
-bool
-SatEngine::ext_tg_grasp_mode() const
-{
-  return mExtTgGrasp;
-}
-
-// @brief dominator を用いた unique sensitization を行う時 true を返す．
-inline
-bool
-SatEngine::use_dominator() const
-{
-  return mUseDominator;
 }
 
 // @brief TFO ノードの数を得る．

@@ -34,6 +34,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テストベクタの最小化を行なう．
+  /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim2 2値の故障シミュレータ
@@ -42,7 +43,8 @@ public:
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
   void
-  run(TvMgr& tvmgr,
+  run(TpgNetwork& network,
+      TvMgr& tvmgr,
       FaultMgr& fmgr,
       Fsim& fsim2,
       Fsim& fsim3,

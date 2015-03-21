@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "SatEngineMultiBase.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
 //////////////////////////////////////////////////////////////////////
 class SatEngineMulti2 :
-  public SatEngine
+  public SatEngineMultiBase
 {
 public:
 
@@ -54,16 +54,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] f_tgt 対象の故障
-  virtual
-  void
-  run(TpgFault* f_tgt);
-
-  /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run(const vector<TpgFault*>& flist);
+  run_multi(const vector<TpgFault*>& flist);
 
 
 private:
@@ -76,9 +70,6 @@ private:
 
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
-
-  // 作業用の配列
-  vector<bool> mDone;
 
   // 処理済みのノードのマーク
   vector<ymuint> mMark;

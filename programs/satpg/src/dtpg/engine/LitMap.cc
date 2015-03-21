@@ -23,19 +23,19 @@ GvarLitMap::GvarLitMap(const TpgNode* node) :
 {
 }
 
+// @brief 入力数を返す．
+ymuint
+GvarLitMap::input_size() const
+{
+  return mNode->fanin_num();
+}
+
 // @brief 入力のリテラルを返す．
 Literal
 GvarLitMap::input(ymuint pos) const
 {
   const TpgNode* inode = mNode->fanin(pos);
   return Literal(inode->gvar(), false);
-}
-
-// @brief 入力数を返す．
-ymuint
-GvarLitMap::input_size() const
-{
-  return mNode->fanin_num();
 }
 
 
@@ -49,19 +49,19 @@ FvarLitMap::FvarLitMap(const TpgNode* node) :
 {
 }
 
+// @brief 入力数を返す．
+ymuint
+FvarLitMap::input_size() const
+{
+  return mNode->fanin_num();
+}
+
 // @brief 入力のリテラルを返す．
 Literal
 FvarLitMap::input(ymuint pos) const
 {
   const TpgNode* inode = mNode->fanin(pos);
   return Literal(inode->fvar(), false);
-}
-
-// @brief 入力数を返す．
-ymuint
-FvarLitMap::input_size() const
-{
-  return mNode->fanin_num();
 }
 
 
@@ -75,18 +75,18 @@ VectLitMap::VectLitMap(const vector<VarId>& ivars) :
 {
 }
 
-// @brief 入力のリテラルを返す．
-Literal
-VectLitMap::input(ymuint pos) const
-{
-  return Literal(mIvars[pos], false);
-}
-
 // @brief 入力数を返す．
 ymuint
 VectLitMap::input_size() const
 {
   return mIvars.size();
+}
+
+// @brief 入力のリテラルを返す．
+Literal
+VectLitMap::input(ymuint pos) const
+{
+  return Literal(mIvars[pos], false);
 }
 
 END_NAMESPACE_YM_SATPG

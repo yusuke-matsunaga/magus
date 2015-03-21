@@ -49,7 +49,7 @@ SatEngineSingle2::SatEngineSingle2(ymuint th_val,
 				   BackTracer& bt,
 				   DetectOp& dop,
 				   UntestOp& uop) :
-  SatEngine(sat_type, sat_option, sat_outp, network, bt, dop, uop),
+  SatEngineSingleBase(sat_type, sat_option, sat_outp, network, bt, dop, uop),
   mThVal(th_val),
   mMark(network.max_node_id(), 0)
 {
@@ -62,7 +62,7 @@ SatEngineSingle2::~SatEngineSingle2()
 
 // @brief テストパタン生成を行なう．
 void
-SatEngineSingle2::run(TpgFault* fault)
+SatEngineSingle2::run_single(TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
   int fval = fault->val();
@@ -145,11 +145,9 @@ SatEngineSingle2::run(TpgFault* fault)
       }
     }
 
-    if ( use_dominator() ) {
-      // dominator ノードの dvar は1でなければならない．
-      for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-	tmp_lits_add(Literal(node->dvar(), false));
-      }
+    // dominator ノードの dvar は1でなければならない．
+    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      tmp_lits_add(Literal(node->dvar(), false));
     }
 
     SatStats prev_stats;
@@ -212,14 +210,9 @@ SatEngineSingle2::run(TpgFault* fault)
 
     tmp_lits_begin();
 
-    if ( use_dominator() ) {
-      // dominator ノードの dvar は1でなければならない．
-      for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-	tmp_lits_add(Literal(node->dvar(), false));
-      }
-    }
-    else {
-      solver.add_clause(Literal(fnode->dvar(), false));
+    // dominator ノードの dvar は1でなければならない．
+    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      tmp_lits_add(Literal(node->dvar(), false));
     }
 
     solve(solver, fault);
@@ -231,18 +224,6 @@ SatEngineSingle2::run(TpgFault* fault)
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     mMark[node->id()] = 0;
-  }
-}
-
-// @brief テスト生成を行なう．
-// @param[in] flist 対象の故障リスト
-void
-SatEngineSingle2::run(const vector<TpgFault*>& flist)
-{
-  for (vector<TpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    TpgFault* f = *p;
-    run(f);
   }
 }
 

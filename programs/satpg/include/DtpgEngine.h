@@ -59,13 +59,13 @@ public:
   /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run(TpgFault* f_tgt) = 0;
+  run_single(TpgFault* f_tgt) = 0;
 
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run(const vector<TpgFault*>& flist) = 0;
+  run_multi(const vector<TpgFault*>& flist) = 0;
 
 };
 

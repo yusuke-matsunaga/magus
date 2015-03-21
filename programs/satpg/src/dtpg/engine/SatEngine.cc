@@ -28,6 +28,7 @@ BEGIN_NONAMESPACE
 // @brief ノードに正常回路用の変数を設定する．
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
+inline
 void
 set_gvar(SatSolver& solver,
 	 TpgNode* node)
@@ -37,9 +38,10 @@ set_gvar(SatSolver& solver,
   node->set_gvar(gvar);
 }
 
-// @brief ノードに正常回路用の変数を設定する．
+// @brief ノードに故障回路用の変数を設定する．
 // @param[in] solver SAT ソルバー
 // @param[in] node 対象のノード
+inline
 void
 set_fvar(SatSolver& solver,
 	 TpgNode* node)
@@ -50,7 +52,10 @@ set_fvar(SatSolver& solver,
   node->set_fvar(fvar, dvar);
 }
 
-// バッファの入出力の関係を表す CNF 式を生成する．
+// @brief バッファの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_buff_cnf(SatSolver& solver,
@@ -61,7 +66,10 @@ make_buff_cnf(SatSolver& solver,
   solver.add_clause(~i,  o);
 }
 
-// 2入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 2入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_and2_cnf(SatSolver& solver,
@@ -74,7 +82,10 @@ make_and2_cnf(SatSolver& solver,
   solver.add_clause(~i0, ~i1, o);
 }
 
-// 3入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 3入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1, i2 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_and3_cnf(SatSolver& solver,
@@ -89,7 +100,10 @@ make_and3_cnf(SatSolver& solver,
   solver.add_clause(~i0, ~i1, ~i2, o);
 }
 
-// 4入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 4入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1, i2, i3 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_and4_cnf(SatSolver& solver,
@@ -106,7 +120,10 @@ make_and4_cnf(SatSolver& solver,
   solver.add_clause(~i0, ~i1, ~i2, ~i3, o);
 }
 
-// 多入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 多入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] litmap 入力のリテラルを返すファンクタオブジェクト
+// @param[in] output 出力のリテラル
 inline
 void
 make_and_cnf(SatSolver& solver,
@@ -125,14 +142,18 @@ make_and_cnf(SatSolver& solver,
 
   vector<Literal> tmp(n + 1);
   for (ymuint i = 0; i < n; ++ i) {
-    solver.add_clause(litmap.input(i), ~output);
-    tmp[i] = ~litmap.input(i);
+    Literal input = litmap.input(i);
+    solver.add_clause(input, ~output);
+    tmp[i] = ~input;
   }
   tmp[n] = output;
   solver.add_clause(tmp);
 }
 
-// 2入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 2入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_or2_cnf(SatSolver& solver,
@@ -145,7 +166,10 @@ make_or2_cnf(SatSolver& solver,
   solver.add_clause( i0,  i1, ~o);
 }
 
-// 3入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 3入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1, i2 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_or3_cnf(SatSolver& solver,
@@ -160,7 +184,10 @@ make_or3_cnf(SatSolver& solver,
   solver.add_clause( i0,  i1, i2, ~o);
 }
 
-// 4入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 4入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1, i2, i3 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_or4_cnf(SatSolver& solver,
@@ -177,7 +204,10 @@ make_or4_cnf(SatSolver& solver,
   solver.add_clause( i0,  i1, i2, i3, ~o);
 }
 
-// 多入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 多入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] litmap 入力のリテラルを返すファンクタオブジェクト
+// @param[in] output 出力のリテラル
 inline
 void
 make_or_cnf(SatSolver& solver,
@@ -203,7 +233,10 @@ make_or_cnf(SatSolver& solver,
   solver.add_clause(tmp);
 }
 
-// 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_xor2_cnf(SatSolver& solver,
@@ -217,7 +250,10 @@ make_xor2_cnf(SatSolver& solver,
   solver.add_clause(~i0, ~i1, ~o);
 }
 
-// 3入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 3入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] i0, i1, i2 入力のリテラル
+// @param[in] o 出力のリテラル
 inline
 void
 make_xor3_cnf(SatSolver& solver,
@@ -236,7 +272,10 @@ make_xor3_cnf(SatSolver& solver,
   solver.add_clause(~i0, ~i1, ~i2,  o);
 }
 
-// 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// @brief 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+// @param[in] solver SAT ソルバー
+// @param[in] litmap 入力のリテラルを返すファンクタオブジェクト
+// @param[in] output 出力のリテラル
 inline
 void
 make_xor_cnf(SatSolver& solver,
@@ -270,6 +309,145 @@ make_xor_cnf(SatSolver& solver,
   }
 }
 
+// @brief ゲートの入出力の関係を表す CNF を作る．
+// @param[in] solver SATソルバ
+// @param[in] type ゲートの種類
+// @param[in] litmap 入出力のリテラルを保持するクラス
+void
+make_gate_cnf(SatSolver& solver,
+	      tTgGateType type,
+	      const LitMap& litmap,
+	      Literal output)
+{
+  ymuint ni = litmap.input_size();
+  switch ( type ) {
+  case kTgGateNot:
+    output = ~output;
+    // わざと次に続く
+
+  case kTgGateBuff:
+    make_buff_cnf(solver, litmap.input(0), output);
+    break;
+
+  case kTgGateNand:
+    output = ~output;
+    // わざと次に続く
+  case kTgGateAnd:
+    make_and_cnf(solver, litmap, output);
+    break;
+
+  case kTgGateNor:
+    output = ~output;
+    // わざと次に続く
+
+  case kTgGateOr:
+    make_or_cnf(solver, litmap, output);
+    break;
+
+  case kTgGateXnor:
+    output = ~output;
+    // わざと次に続く
+
+  case kTgGateXor:
+    make_xor_cnf(solver, litmap, output);
+    break;
+
+  default:
+    assert_not_reached(__FILE__, __LINE__);
+    break;
+  }
+}
+
+// @brief ノードの入出力の関係を表す CNF を作る．
+// @param[in] solver SATソルバ
+// @param[in] node 対象のノード
+// @param[in] litmap 入出力のリテラルを保持するクラス
+void
+make_node_cnf(SatSolver& solver,
+	      TpgNode* node,
+	      const LitMap& litmap,
+	      Literal output)
+{
+  if ( node->is_input() ) {
+    return;
+  }
+
+  if ( node->is_output() ) {
+    Literal input = litmap.input(0);
+    make_buff_cnf(solver, input, output);
+    return;
+  }
+
+  if ( node->is_logic() ) {
+    make_gate_cnf(solver, node->gate_type(), litmap, output);
+    return;
+  }
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar 故障変数
+// @param[in] ovar 出力の変数
+void
+make_flt0_cnf(SatSolver& solver,
+	      VarId ivar,
+	      VarId fvar,
+	      VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal flit(fvar, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause( ilit,        ~olit);
+  solver.add_clause(       ~flit, ~olit);
+  solver.add_clause(~ilit,  flit,  olit);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar 故障変数
+// @param[in] ovar 出力の変数
+void
+make_flt1_cnf(SatSolver& solver,
+	      VarId ivar,
+	      VarId fvar,
+	      VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal flit(fvar, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause(~ilit,         olit);
+  solver.add_clause(       ~flit,  olit);
+  solver.add_clause( ilit,  flit, ~olit);
+}
+
+// @brief 故障挿入回路を表す CNF 式を作る．
+// @param[in] solver SAT ソルバー
+// @param[in] ivar 入力の変数
+// @param[in] fvar0 故障変数
+// @param[in] fvar1 故障変数
+// @param[in] ovar 出力の変数
+void
+make_flt01_cnf(SatSolver& solver,
+	       VarId ivar,
+	       VarId fvar0,
+	       VarId fvar1,
+	       VarId ovar)
+{
+  Literal ilit(ivar, false);
+  Literal f0lit(fvar0, false);
+  Literal f1lit(fvar1, false);
+  Literal olit(ovar, false);
+
+  solver.add_clause(       ~f0lit,         ~olit);
+  solver.add_clause(               ~f1lit,  olit);
+  solver.add_clause( ilit,  f0lit,  f1lit, ~olit);
+  solver.add_clause(~ilit,  f0lit,  f1lit,  olit);
+}
+
 END_NONAMESPACE
 
 
@@ -289,11 +467,6 @@ SatEngine::SatEngine(const string& sat_type,
   mDetectOp(dop),
   mUntestOp(uop)
 {
-  mNemesis = false;
-  mExtNemesis = false;
-  mTgGrasp = false;
-  mExtTgGrasp = false;
-  mUseDominator = false;
   mTimerEnable = false;
 }
 
@@ -312,34 +485,6 @@ SatEngine::set_option(const string& option_str)
       continue;
     }
     string option = option_str.substr(next, pos - next);
-    if ( option == "NEMESIS" ) {
-      mNemesis = true;
-      mExtNemesis = false;
-      mTgGrasp = false;
-      mExtTgGrasp = false;
-    }
-    else if ( option == "EXT-NEMESIS" ) {
-      mNemesis = true;
-      mExtNemesis = true;
-      mTgGrasp = false;
-      mExtTgGrasp = false;
-    }
-    else if ( option == "TG-GRASP" ) {
-      mNemesis = false;
-      mTgGrasp = true;
-      mExtTgGrasp = false;
-    }
-    else if ( option == "EXT-TG-GRASP" ) {
-      mNemesis = false;
-      mTgGrasp = true;
-      mExtTgGrasp = true;
-    }
-    else if ( option == "DOM" ) {
-      mUseDominator = true;
-    }
-    else if ( option == "NODOM" ) {
-      mUseDominator = false;
-    }
     if ( pos == string::npos ) {
       break;
     }
@@ -555,11 +700,19 @@ void
 SatEngine::make_fnode_cnf(SatSolver& solver,
 			  TpgNode* node)
 {
-  if ( !node->has_flt_var() ) {
-    Literal output(node->fvar(), false);
-    make_node_cnf(solver, node, FvarLitMap(node), output);
-    return;
-  }
+  // node そのものには故障箇所がない場合は
+  // ただ fvar を使った CNF を作れば良い．
+  Literal output(node->fvar(), false);
+  make_node_cnf(solver, node, FvarLitMap(node), output);
+}
+
+// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+// @param[in] solver SATソルバ
+// @param[in] node 対象のノード
+void
+SatEngine::make_fnode_cnf2(SatSolver& solver,
+			   TpgNode* node)
+{
   ymuint ni = node->fanin_num();
   vector<VarId> ivars(ni);
   for (ymuint i = 0; i < ni; ++ i) {
@@ -699,198 +852,6 @@ SatEngine::make_fault_cnf(SatSolver& solver,
   }
 }
 
-void
-SatEngine::make_dchain_cnf(SatSolver& solver,
-			   TpgNode* node,
-			   TpgFault* fault)
-{
-  Literal glit(node->gvar(), false);
-  Literal flit(node->fvar(), false);
-  Literal dlit(node->dvar(), false);
-
-  // dlit -> XOR(glit, flit) を追加する．
-  // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
-  solver.add_clause(~glit, ~flit, ~dlit);
-  solver.add_clause( glit,  flit, ~dlit);
-
-  if ( mNemesis ) {
-    if ( !node->is_output() ) {
-      // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
-      ymuint nfo = node->active_fanout_num();
-      tmp_lits_begin(nfo + 1);
-      tmp_lits_add(~dlit);
-      for (ymuint j = 0; j < nfo; ++ j) {
-	TpgNode* onode = node->active_fanout(j);
-	tmp_lits_add(Literal(onode->dvar(), false));
-      }
-      tmp_lits_end(solver);
-
-      if ( mExtNemesis ) {
-	for (TpgNode* idom = node->imm_dom();
-	     idom != NULL; idom = idom->imm_dom() ) {
-	  Literal idlit(idom->dvar(), false);
-	  solver.add_clause(~dlit, idlit);
-	}
-      }
-    }
-  }
-  if ( mTgGrasp ) {
-    // XOR(glit, flit) -> dlit を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-
-    if ( mExtTgGrasp ) {
-      if ( node != fault->node() ) {
-	make_dlit_cnf(solver, node);
-      }
-    }
-  }
-}
-
-void
-SatEngine::make_dchain_cnf(SatSolver& solver,
-			   TpgNode* node)
-{
-  Literal glit(node->gvar(), false);
-  Literal flit(node->fvar(), false);
-  Literal dlit(node->dvar(), false);
-
-  // 正常回路と故障回路で異なっているとき dlit が 1 となる．
-  solver.add_clause(~glit, ~flit, ~dlit);
-  solver.add_clause( glit,  flit, ~dlit);
-
-  if ( mTgGrasp ) {
-    // XOR(glit, flit, dlit) を追加する．
-    // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-
-    solver.add_clause(~glit,  flit,  dlit);
-    solver.add_clause( glit, ~flit,  dlit);
-
-    if ( mExtTgGrasp ) {
-      // 全てのファンインに故障差が伝搬していなければ
-      // このゲートの出力にも故障差は伝搬しない．
-      // ただし，このゲートの出力に故障がある場合を
-      // 考慮しなければならない．
-      if ( node->has_flt_var() ) {
-	ymuint ni = node->fanin_num();
-	tmp_lits_begin(ni * 3 + 3);
-	tmp_lits_add(~dlit);
-	if ( node->of0var() != kVarIdIllegal ) {
-	  tmp_lits_add(Literal(node->of0var(), false));
-	}
-	if ( node->of1var() != kVarIdIllegal ) {
-	  tmp_lits_add(Literal(node->of1var(), false));
-	}
-	for (ymuint i = 0; i < ni; ++ i) {
-	  TpgNode* inode = node->fanin(i);
-	  if ( inode->has_fvar() ) {
-	    Literal idlit(inode->dvar(), false);
-	    tmp_lits_add(idlit);
-	  }
-	  if ( node->if0var(i) != kVarIdIllegal ) {
-	    tmp_lits_add(Literal(node->if0var(i), false));
-	  }
-	  if ( node->if1var(i) != kVarIdIllegal ) {
-	    tmp_lits_add(Literal(node->if1var(i), false));
-	  }
-	}
-      }
-      else {
-	make_dlit_cnf(solver, node);
-      }
-    }
-  }
-
-  if ( mNemesis ) {
-    if ( !node->is_output() ) {
-      ymuint nfo = node->active_fanout_num();
-      tmp_lits_begin(nfo + 1);
-      tmp_lits_add(~dlit);
-      for (ymuint j = 0; j < nfo; ++ j) {
-	TpgNode* onode = node->active_fanout(j);
-	tmp_lits_add(Literal(onode->dvar(), false));
-      }
-      tmp_lits_end(solver);
-    }
-  }
-}
-
-// @brief ノードの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
-// @param[in] node 対象のノード
-// @param[in] litmap 入出力のリテラルを保持するクラス
-void
-SatEngine::make_node_cnf(SatSolver& solver,
-			 TpgNode* node,
-			 const LitMap& litmap,
-			 Literal output)
-{
-  if ( node->is_input() ) {
-    return;
-  }
-
-  if ( node->is_output() ) {
-    Literal input = litmap.input(0);
-    make_buff_cnf(solver, input, output);
-    return;
-  }
-
-  if ( node->is_logic() ) {
-    make_gate_cnf(solver, node->gate_type(), litmap, output);
-    return;
-  }
-}
-
-// @brief ゲートの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
-// @param[in] type ゲートの種類
-// @param[in] litmap 入出力のリテラルを保持するクラス
-void
-SatEngine::make_gate_cnf(SatSolver& solver,
-			 tTgGateType type,
-			 const LitMap& litmap,
-			 Literal output)
-{
-  ymuint ni = litmap.input_size();
-  switch ( type ) {
-  case kTgGateNot:
-    output = ~output;
-    // わざと次に続く
-
-  case kTgGateBuff:
-    make_buff_cnf(solver, litmap.input(0), output);
-    break;
-
-  case kTgGateNand:
-    output = ~output;
-    // わざと次に続く
-  case kTgGateAnd:
-    make_and_cnf(solver, litmap, output);
-    break;
-
-  case kTgGateNor:
-    output = ~output;
-    // わざと次に続く
-
-  case kTgGateOr:
-    make_or_cnf(solver, litmap, output);
-    break;
-
-  case kTgGateXnor:
-    output = ~output;
-    // わざと次に続く
-
-  case kTgGateXor:
-    make_xor_cnf(solver, litmap, output);
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
-  }
-}
-
 // @brief ノードの故障差関数を表すCNFを作る．
 void
 SatEngine::make_dlit_cnf(SatSolver& solver,
@@ -968,70 +929,6 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
     }
   }
   tmp_lits_end(solver);
-}
-
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar 故障変数
-// @param[in] ovar 出力の変数
-void
-SatEngine::make_flt0_cnf(SatSolver& solver,
-			 VarId ivar,
-			 VarId fvar,
-			 VarId ovar)
-{
-  Literal ilit(ivar, false);
-  Literal flit(fvar, false);
-  Literal olit(ovar, false);
-
-  solver.add_clause( ilit,        ~olit);
-  solver.add_clause(       ~flit, ~olit);
-  solver.add_clause(~ilit,  flit,  olit);
-}
-
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar 故障変数
-// @param[in] ovar 出力の変数
-void
-SatEngine::make_flt1_cnf(SatSolver& solver,
-			 VarId ivar,
-			 VarId fvar,
-			 VarId ovar)
-{
-  Literal ilit(ivar, false);
-  Literal flit(fvar, false);
-  Literal olit(ovar, false);
-
-  solver.add_clause(~ilit,         olit);
-  solver.add_clause(       ~flit,  olit);
-  solver.add_clause( ilit,  flit, ~olit);
-}
-
-// @brief 故障挿入回路を表す CNF 式を作る．
-// @param[in] solver SAT ソルバー
-// @param[in] ivar 入力の変数
-// @param[in] fvar0 故障変数
-// @param[in] fvar1 故障変数
-// @param[in] ovar 出力の変数
-void
-SatEngine::make_flt01_cnf(SatSolver& solver,
-			  VarId ivar,
-			  VarId fvar0,
-			  VarId fvar1,
-			  VarId ovar)
-{
-  Literal ilit(ivar, false);
-  Literal f0lit(fvar0, false);
-  Literal f1lit(fvar1, false);
-  Literal olit(ovar, false);
-
-  solver.add_clause(       ~f0lit,         ~olit);
-  solver.add_clause(               ~f1lit,  olit);
-  solver.add_clause( ilit,  f0lit,  f1lit, ~olit);
-  solver.add_clause(~ilit,  f0lit,  f1lit,  olit);
 }
 
 // @brief 一つの SAT問題を解く．

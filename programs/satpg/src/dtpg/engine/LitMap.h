@@ -18,19 +18,22 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 /// @class LitMap LitMap.h "LitMap.h"
 /// @brief make_gate_cnf で用いられるファンクター
+///
+/// ゲートの入力に対応するリテラルを返すファクターオブジェクト
 //////////////////////////////////////////////////////////////////////
 struct LitMap
 {
-
-  /// @brief 入力のリテラルを返す．
-  virtual
-  Literal
-  input(ymuint pos) const = 0;
 
   /// @brief 入力数を返す．
   virtual
   ymuint
   input_size() const = 0;
+
+  /// @brief 入力のリテラルを返す．
+  /// @param[in] pos 入力位置 ( 0 <= pos < input_size() )
+  virtual
+  Literal
+  input(ymuint pos) const = 0;
 
 };
 
@@ -47,15 +50,15 @@ public:
   /// @brief コンストラクタ
   GvarLitMap(const TpgNode* node);
 
-  /// @brief 入力のリテラルを返す．
-  virtual
-  Literal
-  input(ymuint pos) const;
-
   /// @brief 入力数を返す．
   virtual
   ymuint
   input_size() const;
+
+  /// @brief 入力のリテラルを返す．
+  virtual
+  Literal
+  input(ymuint pos) const;
 
 
 private:
@@ -81,15 +84,15 @@ public:
   /// @brief コンストラクタ
   FvarLitMap(const TpgNode* node);
 
-  /// @brief 入力のリテラルを返す．
-  virtual
-  Literal
-  input(ymuint pos) const;
-
   /// @brief 入力数を返す．
   virtual
   ymuint
   input_size() const;
+
+  /// @brief 入力のリテラルを返す．
+  virtual
+  Literal
+  input(ymuint pos) const;
 
 
 private:
@@ -115,15 +118,15 @@ public:
   /// @brief コンストラクタ
   VectLitMap(const vector<VarId>& ivars);
 
-  /// @brief 入力のリテラルを返す．
-  virtual
-  Literal
-  input(ymuint pos) const;
-
   /// @brief 入力数を返す．
   virtual
   ymuint
   input_size() const;
+
+  /// @brief 入力のリテラルを返す．
+  virtual
+  Literal
+  input(ymuint pos) const;
 
 
 private:

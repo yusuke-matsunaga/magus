@@ -12,6 +12,8 @@
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "FaultMgr.h"
+#include "TpgNetwork.h"
+#include "TpgNode.h"
 #include "TpgFault.h"
 #include "Fsim.h"
 #include "KDet.h"
@@ -34,6 +36,35 @@ new_MinPat()
   return new MinPatImpl();
 }
 
+BEGIN_NONAMESPACE
+
+void
+dfs_mffc(TpgNode* node,
+	 vector<bool>& mark,
+	 vector<TpgFault*>& fault_list)
+{
+  mark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( mark[inode->id()] == false && inode->imm_dom() != NULL ) {
+      dfs_mffc(inode, mark, fault_list);
+    }
+  }
+
+  if ( !node->is_output() ) {
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      if ( f->status() == kFsDetected ) {
+	fault_list.push_back(f);
+      }
+    }
+  }
+}
+
+END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス MinPatImpl
@@ -50,6 +81,7 @@ MinPatImpl::~MinPatImpl()
 }
 
 // @brief テストベクタの最小化を行なう．
+// @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ
@@ -57,7 +89,8 @@ MinPatImpl::~MinPatImpl()
 // @param[inout] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
-MinPatImpl::run(TvMgr& tvmgr,
+MinPatImpl::run(TpgNetwork& network,
+		TvMgr& tvmgr,
 		FaultMgr& fmgr,
 		Fsim& fsim2,
 		Fsim& fsim3,
@@ -74,12 +107,6 @@ MinPatImpl::run(TvMgr& tvmgr,
 
   Verifier ver(fmgr, fsim3);
 
-  if ( 0 ) {
-    if ( ver.check(tv_list) ) {
-      cout << "No Errors(1)" << endl;
-    }
-  }
-
   // 故障番号の最大値を求める．
   ymuint max_fault_id = 0;
   const vector<TpgFault*>& f_list = fmgr.det_list();
@@ -90,6 +117,34 @@ MinPatImpl::run(TvMgr& tvmgr,
     }
   }
   ++ max_fault_id;
+
+  {
+    ymuint n = network.active_node_num();
+    ymuint nm = 0;
+    for (ymuint i = 0; i < n; ++ i) {
+      TpgNode* node = network.active_node(i);
+      if ( node->imm_dom() == NULL ) {
+	++ nm;
+      }
+    }
+    cout << "# of faults:   " << f_list.size() << endl;
+    cout << "# of MFFCs:    " << nm << endl;
+    cout << "# of patterns: " << orig_num << endl;
+  }
+
+  {
+    ymuint n = network.active_node_num();
+    ymuint nm = 0;
+    vector<bool> mark(network.max_node_id(), false);
+    for (ymuint i = 0; i < n; ++ i) {
+      TpgNode* node = network.active_node(i);
+      if ( node->imm_dom() == NULL ) {
+	vector<TpgFault*> fault_list;
+	dfs_mffc(node, mark, fault_list);
+	cout << "Fault Group: " << fault_list.size() << endl;
+      }
+    }
+  }
 
   KDet kdet(fsim3, f_list, max_fault_id);
 

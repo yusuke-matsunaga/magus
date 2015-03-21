@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINEMULTI_H
-#define SATENGINEMULTI_H
+﻿#ifndef SATENGINESINGLEBASE_H
+#define SATENGINESINGLEBASE_H
 
-/// @file SatEngineMulti.h
-/// @brief SatEngineMulti のヘッダファイル
+/// @file SatEngineSingleBase.h
+/// @brief SatEngineSingleBase のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,17 +10,17 @@
 /// All rights reserved.
 
 
-#include "SatEngineMultiBase.h"
+#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineMulti SatEngineMulti.h "SatEngineMulti.h"
-/// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
+/// @class SatEngineSingleBase SatEngineSingleBase.h "SatEngineSingleBase.h"
+/// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineMulti :
-  public SatEngineMultiBase
+class SatEngineSingleBase :
+  public SatEngine
 {
 public:
 
@@ -32,18 +32,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineMulti(const string& sat_type,
-		 const string& sat_option,
-		 ostream* sat_outp,
-		 const TpgNetwork& network,
-		 BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop,
-		 bool forget);
+  SatEngineSingleBase(const string& sat_type,
+		      const string& sat_option,
+		      ostream* sat_outp,
+		      const TpgNetwork& network,
+		      BackTracer& bt,
+		      DetectOp& dop,
+		      UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineMulti();
+  ~SatEngineSingleBase();
 
 
 public:
@@ -58,19 +57,19 @@ public:
   run_multi(const vector<TpgFault*>& flist);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
+  // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
-
-  // forget フラグ
-  bool mForget;
+  /// @brief D-Chain 制約のCNFを作る．
+  void
+  make_dchain_cnf(SatSolver& solver,
+		  TpgNode* node,
+		  TpgFault* fault);
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEMULTI_H
+#endif // SATENGINESINGLEBASE_H

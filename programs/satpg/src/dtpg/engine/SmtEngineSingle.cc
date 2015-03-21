@@ -66,7 +66,7 @@ SmtEngineSingle::~SmtEngineSingle()
 // @brief テストパタン生成を行なう．
 // @param[in] f_tgt 対象の故障
 void
-SmtEngineSingle::run(TpgFault* f_tgt)
+SmtEngineSingle::run_single(TpgFault* f_tgt)
 {
   TpgNode* fnode = f_tgt->node();
   int fval = f_tgt->val();
@@ -167,12 +167,12 @@ SmtEngineSingle::run(TpgFault* f_tgt)
 // @brief テスト生成を行なう．
 // @param[in] flist 対象の故障リスト
 void
-SmtEngineSingle::run(const vector<TpgFault*>& flist)
+SmtEngineSingle::run_multi(const vector<TpgFault*>& flist)
 {
   for (vector<TpgFault*>::const_iterator p = flist.begin();
        p != flist.end(); ++ p) {
     TpgFault* f = *p;
-    run(f);
+    run_single(f);
   }
 }
 
