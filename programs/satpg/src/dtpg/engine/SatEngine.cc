@@ -9,48 +9,14 @@
 
 #include "SatEngine.h"
 
-#include "DetectOp.h"
-#include "UntestOp.h"
-#include "DtpgStats.h"
-#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "BackTracer.h"
-#include "LitMap.h"
 #include "YmLogic/SatSolver.h"
-#include "YmLogic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
-
-// @brief ノードに正常回路用の変数を設定する．
-// @param[in] solver SAT ソルバー
-// @param[in] node 対象のノード
-inline
-void
-set_gvar(SatSolver& solver,
-	 TpgNode* node)
-{
-  // ノードそのものに割り当てる．
-  VarId gvar = solver.new_var();
-  node->set_gvar(gvar);
-}
-
-// @brief ノードに故障回路用の変数を設定する．
-// @param[in] solver SAT ソルバー
-// @param[in] node 対象のノード
-inline
-void
-set_fvar(SatSolver& solver,
-	 TpgNode* node)
-{
-  // ノードそのものに割り当てる．
-  VarId fvar = solver.new_var();
-  VarId dvar = solver.new_var();
-  node->set_fvar(fvar, dvar);
-}
 
 // @brief バッファの入出力の関係を表す CNF 式を生成する．
 // @param[in] solver SAT ソルバー
@@ -132,7 +98,7 @@ make_and_cnf(SatSolver& solver,
 {
   ymuint n = litmap.input_size();
   switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
+  case 0: ASSERT_NOT_REACHED; break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
   case 2: make_and2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
   case 3: make_and3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;
@@ -216,7 +182,7 @@ make_or_cnf(SatSolver& solver,
 {
   ymuint n = litmap.input_size();
   switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
+  case 0: ASSERT_NOT_REACHED; break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
   case 2: make_or2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
   case 3: make_or3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;
@@ -284,7 +250,7 @@ make_xor_cnf(SatSolver& solver,
 {
   ymuint n = litmap.input_size();
   switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
+  case 0: ASSERT_NOT_REACHED; break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
   case 2: make_xor2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
   case 3: make_xor3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;
@@ -313,6 +279,7 @@ make_xor_cnf(SatSolver& solver,
 // @param[in] solver SATソルバ
 // @param[in] type ゲートの種類
 // @param[in] litmap 入出力のリテラルを保持するクラス
+inline
 void
 make_gate_cnf(SatSolver& solver,
 	      tTgGateType type,
@@ -353,7 +320,7 @@ make_gate_cnf(SatSolver& solver,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 }
@@ -362,6 +329,7 @@ make_gate_cnf(SatSolver& solver,
 // @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 // @param[in] litmap 入出力のリテラルを保持するクラス
+inline
 void
 make_node_cnf(SatSolver& solver,
 	      TpgNode* node,
@@ -389,6 +357,7 @@ make_node_cnf(SatSolver& solver,
 // @param[in] ivar 入力の変数
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
+inline
 void
 make_flt0_cnf(SatSolver& solver,
 	      VarId ivar,
@@ -409,6 +378,7 @@ make_flt0_cnf(SatSolver& solver,
 // @param[in] ivar 入力の変数
 // @param[in] fvar 故障変数
 // @param[in] ovar 出力の変数
+inline
 void
 make_flt1_cnf(SatSolver& solver,
 	      VarId ivar,
@@ -430,6 +400,7 @@ make_flt1_cnf(SatSolver& solver,
 // @param[in] fvar0 故障変数
 // @param[in] fvar1 故障変数
 // @param[in] ovar 出力の変数
+inline
 void
 make_flt01_cnf(SatSolver& solver,
 	       VarId ivar,
@@ -452,22 +423,14 @@ END_NONAMESPACE
 
 
 // @brief コンストラクタ
+// @param[in] sat_type SATソルバの種類を表す文字列
+// @param[in] sat_option SATソルバに渡すオプション文字列
+// @param[in] sat_outp SATソルバ用の出力ストリーム
 SatEngine::SatEngine(const string& sat_type,
 		     const string& sat_option,
-		     ostream* sat_outp,
-		     const TpgNetwork& network,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop) :
-  mSatType(sat_type),
-  mSatOption(sat_option),
-  mSatOutP(sat_outp),
-  mNetwork(network),
-  mBackTracer(bt),
-  mDetectOp(dop),
-  mUntestOp(uop)
+		     ostream* sat_outp) :
+  mSolver(sat_type, sat_option, sat_outp)
 {
-  mTimerEnable = false;
 }
 
 // @brief デストラクタ
@@ -475,243 +438,30 @@ SatEngine::~SatEngine()
 {
 }
 
-// @brief オプションを設定する．
-void
-SatEngine::set_option(const string& option_str)
-{
-  for (string::size_type next = 0; ; ++ next) {
-    string::size_type pos = option_str.find(':', next);
-    if ( pos == next ) {
-      continue;
-    }
-    string option = option_str.substr(next, pos - next);
-    if ( pos == string::npos ) {
-      break;
-    }
-    next = pos;
-  }
-}
-
-// @brief 統計情報をクリアする．
-void
-SatEngine::clear_stats()
-{
-  mStats.mCnfGenCount = 0;
-  mStats.mCnfGenTime.set(0.0, 0.0, 0.0);
-
-  mStats.mDetCount = 0;
-  mStats.mDetTime.set(0.0, 0.0, 0.0);
-  clear_sat_stats(mStats.mDetStats);
-  clear_sat_stats(mStats.mDetStatsMax);
-
-  mStats.mRedCount = 0;
-  mStats.mRedTime.set(0.0, 0.0, 0.0);
-  clear_sat_stats(mStats.mRedStats);
-  clear_sat_stats(mStats.mRedStatsMax);
-
-  mStats.mPartRedCount = 0;
-  mStats.mPartRedTime.set(0.0, 0.0, 0.0);
-  clear_sat_stats(mStats.mPartRedStats);
-  clear_sat_stats(mStats.mPartRedStatsMax);
-
-  mStats.mAbortCount = 0;
-  mStats.mAbortTime.set(0.0, 0.0, 0.0);
-}
-
-// @brief 統計情報を得る．
-// @param[in] stats 結果を格納する構造体
-void
-SatEngine::get_stats(DtpgStats& stats) const
-{
-  stats = mStats;
-}
-
-// @breif 時間計測を制御する．
-void
-SatEngine::timer_enable(bool enable)
-{
-  mTimerEnable = enable;
-}
-
-
-BEGIN_NONAMESPACE
-
-struct Lt
-{
-  bool
-  operator()(TpgNode* left,
-	     TpgNode* right)
-  {
-    return left->output_id2() < right->output_id2();
-  }
-};
-
-END_NONAMESPACE
-
-// @brief 故障位置を与えてその TFO の TFI リストを作る．
-// @param[in] solver SAT ソルバ
-// @param[in] fnode_list 故障位置のノードのリスト
-//
-// 結果は mTfoList に格納される．
-// 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
-void
-SatEngine::mark_region(SatSolver& solver,
-		       const vector<TpgNode*>& fnode_list)
-{
-  mMarkArray.clear();
-  mMarkArray.resize(mNetwork.max_node_id(), 0U);
-
-  mTfoList.clear();
-  mTfoList.reserve(mNetwork.max_node_id());
-
-  mInputList.clear();
-  mOutputList.clear();
-
-  // 故障のあるノードの TFO を mTfoList に入れる．
-  // TFO の TFI のノードを mTfiList に入れる．
-  ymuint nf = fnode_list.size();
-  for (ymuint i = 0; i < nf; ++ i) {
-    TpgNode* fnode = fnode_list[i];
-    if ( !tfo_mark(fnode) ) {
-      set_tfo_mark(fnode);
-      if ( fnode->is_input() ) {
-	mInputList.push_back(fnode);
-      }
-      set_gvar(solver, fnode);
-      set_fvar(solver, fnode);
-    }
-  }
-
-  for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
-    TpgNode* node = mTfoList[rpos];
-    ymuint nfo = node->active_fanout_num();
-    for (ymuint i = 0; i < nfo; ++ i) {
-      TpgNode* fonode = node->active_fanout(i);
-      if ( !tfo_mark(fonode) ) {
-	set_tfo_mark(fonode);
-	set_gvar(solver, fonode);
-	set_fvar(solver, fonode);
-      }
-    }
-  }
-
-  mTfoEnd = mTfoList.size();
-  for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
-    TpgNode* node = mTfoList[rpos];
-    ymuint ni = node->fanin_num();
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* finode = node->fanin(i);
-      if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
-	set_tfi_mark(finode);
-	set_gvar(solver, finode);
-      }
-    }
-  }
-
-  sort(mOutputList.begin(), mOutputList.end(), Lt());
-}
-
-// @brief 入力ノードを得る．
-// @param[in] ipos 入力番号
-TpgNode*
-SatEngine::input_node(ymuint ipos) const
-{
-  return mNetwork.input(ipos);
-}
-
-// @brief 節の作成用の作業領域の使用を開始する．
-// @param[in] exp_size 予想されるサイズ
-void
-SatEngine::tmp_lits_begin(ymuint exp_size)
-{
-  mTmpLits.clear();
-  if ( exp_size > 0 ) {
-    mTmpLits.reserve(exp_size);
-  }
-}
-
-// @brief 作業領域にリテラルを追加する．
-void
-SatEngine::tmp_lits_add(Literal lit)
-{
-  mTmpLits.push_back(lit);
-}
-
-// @brief 作業領域の冊を SAT ソルバに加える．
-void
-SatEngine::tmp_lits_end(SatSolver& solver)
-{
-  solver.add_clause(mTmpLits);
-}
-
-// @brief タイマーをスタートする．
-void
-SatEngine::cnf_begin()
-{
-  timer_start();
-}
-
-// @brief タイマーを止めて CNF 作成時間に加える．
-void
-SatEngine::cnf_end()
-{
-  USTime time = timer_stop();
-  mStats.mCnfGenTime += time;
-  ++ mStats.mCnfGenCount;
-}
-
-// @brief 時間計測を開始する．
-void
-SatEngine::timer_start()
-{
-  if ( mTimerEnable ) {
-    mTimer.reset();
-    mTimer.start();
-  }
-}
-
-/// @brief 時間計測を終了する．
-USTime
-SatEngine::timer_stop()
-{
-  USTime time(0, 0, 0);
-  if ( mTimerEnable ) {
-    mTimer.stop();
-    time = mTimer.time();
-  }
-  return time;
-}
-
 // @brief 正常回路のノードの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SatEngine::make_gnode_cnf(SatSolver& solver,
-			  TpgNode* node)
+SatEngine::make_gnode_cnf(TpgNode* node)
 {
   Literal output(node->gvar(), false);
-  make_node_cnf(solver, node, GvarLitMap(node), output);
+  make_node_cnf(mSolver, node, GvarLitMap(node), output);
 }
 
 // @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SatEngine::make_fnode_cnf(SatSolver& solver,
-			  TpgNode* node)
+SatEngine::make_fnode_cnf(TpgNode* node)
 {
   // node そのものには故障箇所がない場合は
   // ただ fvar を使った CNF を作れば良い．
   Literal output(node->fvar(), false);
-  make_node_cnf(solver, node, FvarLitMap(node), output);
+  make_node_cnf(mSolver, node, FvarLitMap(node), output);
 }
 
 // @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
 // @param[in] node 対象のノード
 void
-SatEngine::make_fnode_cnf2(SatSolver& solver,
-			   TpgNode* node)
+SatEngine::make_fnode_cnf2(TpgNode* node)
 {
   ymuint ni = node->fanin_num();
   vector<VarId> ivars(ni);
@@ -724,20 +474,20 @@ SatEngine::make_fnode_cnf2(SatSolver& solver,
 	ivars[i] = inode->fvar();
       }
       else {
-	VarId tmp_var = solver.new_var();
-	make_flt1_cnf(solver, inode->fvar(), f1_var, tmp_var);
+	VarId tmp_var = mSolver.new_var();
+	make_flt1_cnf(mSolver, inode->fvar(), f1_var, tmp_var);
 	ivars[i] = tmp_var;
       }
     }
     else {
       if ( f1_var == kVarIdIllegal ) {
-	VarId tmp_var = solver.new_var();
-	make_flt0_cnf(solver, inode->fvar(), f0_var, tmp_var);
+	VarId tmp_var = mSolver.new_var();
+	make_flt0_cnf(mSolver, inode->fvar(), f0_var, tmp_var);
 	ivars[i] = tmp_var;
       }
       else {
-	VarId tmp_var = solver.new_var();
-	make_flt01_cnf(solver, inode->fvar(), f0_var, f1_var, tmp_var);
+	VarId tmp_var = mSolver.new_var();
+	make_flt01_cnf(mSolver, inode->fvar(), f0_var, f1_var, tmp_var);
 	ivars[i] = tmp_var;
       }
     }
@@ -751,35 +501,34 @@ SatEngine::make_fnode_cnf2(SatSolver& solver,
       ;
     }
     else {
-      ovar = solver.new_var();
-      make_flt1_cnf(solver, ovar, f1_var, node->fvar());
+      ovar = mSolver.new_var();
+      make_flt1_cnf(mSolver, ovar, f1_var, node->fvar());
     }
   }
   else {
     if ( f1_var == kVarIdIllegal ) {
-      ovar = solver.new_var();
-      make_flt0_cnf(solver, ovar, f0_var, node->fvar());
+      ovar = mSolver.new_var();
+      make_flt0_cnf(mSolver, ovar, f0_var, node->fvar());
     }
     else {
-      ovar = solver.new_var();
-      make_flt01_cnf(solver, ovar, f0_var, f1_var, node->fvar());
+      ovar = mSolver.new_var();
+      make_flt01_cnf(mSolver, ovar, f0_var, f1_var, node->fvar());
     }
   }
   Literal output(ovar, false);
 
   if ( node->is_input() ) {
     Literal glit(node->gvar(), false);
-    make_buff_cnf(solver, glit, output);
+    make_buff_cnf(mSolver, glit, output);
   }
   else {
-    make_node_cnf(solver, node, VectLitMap(ivars), output);
+    make_node_cnf(mSolver, node, VectLitMap(ivars), output);
   }
 }
 
 // @brief 故障ゲートの CNF を作る．
 void
-SatEngine::make_fault_cnf(SatSolver& solver,
-			  TpgFault* fault)
+SatEngine::make_fault_cnf(TpgFault* fault)
 {
   TpgNode* node = fault->node();
   int fval = fault->val();
@@ -787,10 +536,10 @@ SatEngine::make_fault_cnf(SatSolver& solver,
   if ( fault->is_output_fault() ) {
     Literal flit(node->fvar(), false);
     if ( fval == 0 ) {
-      solver.add_clause(~flit);
+      mSolver.add_clause(~flit);
     }
     else {
-      solver.add_clause(flit);
+      mSolver.add_clause(flit);
     }
   }
   else {
@@ -813,7 +562,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
     switch ( node->gate_type() ) {
     case kTgGateBuff:
     case kTgGateNot:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
 
     case kTgGateNand:
@@ -821,8 +570,8 @@ SatEngine::make_fault_cnf(SatSolver& solver,
       // わざと次に続く
 
     case kTgGateAnd:
-      assert_cond( fval == 1, __FILE__, __LINE__);
-      make_and_cnf(solver, VectLitMap(ivars), output);
+      ASSERT_COND( fval == 1 );
+      make_and_cnf(mSolver, VectLitMap(ivars), output);
       break;
 
     case kTgGateNor:
@@ -830,8 +579,8 @@ SatEngine::make_fault_cnf(SatSolver& solver,
       // わざと次に続く
 
     case kTgGateOr:
-      assert_cond( fval == 0, __FILE__, __LINE__);
-      make_or_cnf(solver, VectLitMap(ivars), output);
+      ASSERT_COND( fval == 0 );
+      make_or_cnf(mSolver, VectLitMap(ivars), output);
       break;
 
     case kTgGateXnor:
@@ -842,11 +591,11 @@ SatEngine::make_fault_cnf(SatSolver& solver,
       if ( fval == 1 ) {
 	output = ~output;
       }
-      make_xor_cnf(solver, VectLitMap(ivars), output);
+      make_xor_cnf(mSolver, VectLitMap(ivars), output);
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }
@@ -854,8 +603,7 @@ SatEngine::make_fault_cnf(SatSolver& solver,
 
 // @brief ノードの故障差関数を表すCNFを作る．
 void
-SatEngine::make_dlit_cnf(SatSolver& solver,
-			 TpgNode* node)
+SatEngine::make_dlit_cnf(TpgNode* node)
 {
   Literal dlit(node->dvar());
 
@@ -877,12 +625,12 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
 	  // side input が 0 かつ故障差が伝搬していなければ dlit も 0
 	  Literal iglit(inode->gvar(), false);
 	  Literal iflit(inode->fvar(), false);
-	  solver.add_clause(iglit, iflit, ~dlit);
+	  mSolver.add_clause(iglit, iflit, ~dlit);
 	}
 	else {
 	  // side input が 0 なら dlit も 0
 	  Literal iglit(inode->gvar(), false);
-	  solver.add_clause(iglit, ~dlit);
+	  mSolver.add_clause(iglit, ~dlit);
 	}
       }
       break;
@@ -895,12 +643,12 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
 	  // side input が 1 かつ故障差が伝搬していなければ dlit も 0
 	  Literal iglit(inode->gvar(), false);
 	  Literal iflit(inode->fvar(), false);
-	  solver.add_clause(~iglit, ~iflit, ~dlit);
+	  mSolver.add_clause(~iglit, ~iflit, ~dlit);
 	}
 	else {
 	  // side input が 1 なら dlit も 0
 	  Literal iglit(inode->gvar(), false);
-	  solver.add_clause(~iglit, ~dlit);
+	  mSolver.add_clause(~iglit, ~dlit);
 	}
       }
       break;
@@ -928,206 +676,39 @@ SatEngine::make_dlit_cnf(SatSolver& solver,
       tmp_lits_add(idlit);
     }
   }
-  tmp_lits_end(solver);
+  tmp_lits_end();
 }
 
-// @brief 一つの SAT問題を解く．
-Bool3
-SatEngine::solve(SatSolver& solver,
-		 TpgFault* f,
-		 bool option)
+// @brief 故障伝搬条件を表すCNFを作る．
+void
+SatEngine::make_dchain_cnf(TpgNode* node)
 {
-  SatStats prev_stats;
-  solver.get_stats(prev_stats);
+  Literal glit(node->gvar(), false);
+  Literal flit(node->fvar(), false);
+  Literal dlit(node->dvar(), false);
 
-  timer_start();
+  // dlit -> XOR(glit, flit) を追加する．
+  // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
+  add_clause(~glit, ~flit, ~dlit);
+  add_clause( glit,  flit, ~dlit);
 
-  Bool3 ans = solver.solve(mTmpLits, mModel);
-
-  USTime time = timer_stop();
-
-  SatStats sat_stats;
-  solver.get_stats(sat_stats);
-
-  sub_sat_stats(sat_stats, prev_stats);
-
-  if ( ans == kB3True ) {
-    // パタンが求まった．
-    detect_op(f, sat_stats, time);
-  }
-  else if ( !option ) {
-    if ( ans == kB3False ) {
-      // 検出不能と判定された．
-      untest_op(f, sat_stats, time);
+  if ( !node->is_output() ) {
+    // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
+    ymuint nfo = node->active_fanout_num();
+    tmp_lits_begin(nfo + 1);
+    tmp_lits_add(~dlit);
+    for (ymuint j = 0; j < nfo; ++ j) {
+      TpgNode* onode = node->active_fanout(j);
+      tmp_lits_add(Literal(onode->dvar(), false));
     }
-    else { // ans == kB3X つまりアボート
-      abort_op(f, sat_stats, time);
+    tmp_lits_end();
+
+    // dominator の dlit が 0 なら自分も 0
+    for (TpgNode* idom = node->imm_dom();
+	 idom != NULL; idom = idom->imm_dom() ) {
+      Literal idlit(idom->dvar(), false);
+      add_clause(~dlit, idlit);
     }
-  }
-  return ans;
-}
-
-// @brief 最後に生成されたパタンを得る．
-TestVector*
-SatEngine::last_pat()
-{
-  return mLastPat;
-}
-
-// @brief 一つの SAT問題を解く．
-Bool3
-SatEngine::_solve(SatSolver& solver)
-{
-  Bool3 ans = solver.solve(mTmpLits, mModel);
-
-  return ans;
-}
-
-// @brief 検出した場合の処理
-void
-SatEngine::detect_op(TpgFault* fault,
-		     const SatStats& sat_stats,
-		     const USTime& time)
-{
-  // バックトレースを行う．
-  TestVector* tv = mBackTracer(fault->node(), mModel, mInputList, mOutputList);
-
-  // パタンの登録などを行う．
-  mDetectOp(fault, tv);
-
-  mLastPat = tv;
-
-  ++ mStats.mDetCount;
-  mStats.mDetTime += time;
-  add_sat_stats(mStats.mDetStats, sat_stats);
-  max_sat_stats(mStats.mDetStatsMax, sat_stats);
-}
-
-// @brief 検出不能と判定した時の処理
-void
-SatEngine::untest_op(TpgFault* fault,
-		     const SatStats& sat_stats,
-		     const USTime& time)
-{
-  mUntestOp(fault);
-
-  ++ mStats.mRedCount;
-  mStats.mRedTime += time;
-  add_sat_stats(mStats.mRedStats, sat_stats);
-  max_sat_stats(mStats.mRedStatsMax, sat_stats);
-}
-
-// @brief 部分的な検出不能と判定した時の処理
-void
-SatEngine::partially_untest_op(TpgFault* fault,
-			       const SatStats& sat_stats,
-			       const USTime& time)
-{
-  ++ mStats.mPartRedCount;
-  mStats.mPartRedTime += time;
-  add_sat_stats(mStats.mPartRedStats, sat_stats);
-  max_sat_stats(mStats.mPartRedStatsMax, sat_stats);
-}
-
-// @brief アボートした時の処理
-void
-SatEngine::abort_op(TpgFault* fault,
-		    const SatStats& sat_stats,
-		    const USTime& time)
-{
-  ++ mStats.mAbortCount;
-  mStats.mAbortTime += time;
-}
-
-// SatStats をクリアする．
-void
-SatEngine::clear_sat_stats(SatStats& stats)
-{
-  stats.mRestart = 0;
-  stats.mVarNum = 0;
-  stats.mConstrClauseNum = 0;
-  stats.mConstrLitNum = 0;
-  stats.mLearntClauseNum = 0;
-  stats.mLearntLitNum = 0;
-  stats.mConflictNum = 0;
-  stats.mDecisionNum = 0;
-  stats.mPropagationNum = 0;
-}
-
-// SatStats をたす．
-void
-SatEngine::add_sat_stats(SatStats& dst_stats,
-			 const SatStats& src_stats)
-{
-  dst_stats.mRestart += src_stats.mRestart;
-  dst_stats.mVarNum += src_stats.mVarNum;
-  dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
-  dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
-  dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
-  dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
-  dst_stats.mConflictNum += src_stats.mConflictNum;
-  dst_stats.mDecisionNum += src_stats.mDecisionNum;
-  dst_stats.mPropagationNum += src_stats.mPropagationNum;
-}
-
-// SatStats を引く
-void
-SatEngine::sub_sat_stats(SatStats& dst_stats,
-			 const SatStats& src_stats)
-{
-  dst_stats.mRestart -= src_stats.mRestart;
-  dst_stats.mVarNum -= src_stats.mVarNum;
-  dst_stats.mConstrClauseNum -= src_stats.mConstrClauseNum;
-  dst_stats.mConstrLitNum -= src_stats.mConstrLitNum;
-  dst_stats.mLearntClauseNum -= src_stats.mLearntClauseNum;
-  dst_stats.mLearntLitNum -= src_stats.mLearntLitNum;
-  dst_stats.mConflictNum -= src_stats.mConflictNum;
-  dst_stats.mDecisionNum -= src_stats.mDecisionNum;
-  dst_stats.mPropagationNum -= src_stats.mPropagationNum;
-}
-
-// SatStats の各々の最大値をとる．
-void
-SatEngine::max_sat_stats(SatStats& dst_stats,
-			 const SatStats& src_stats)
-{
-  if ( dst_stats.mRestart < src_stats.mRestart ) {
-    dst_stats.mRestart = src_stats.mRestart;
-  }
-  if ( dst_stats.mVarNum < src_stats.mVarNum ) {
-    dst_stats.mVarNum += src_stats.mVarNum;
-  }
-  if ( dst_stats.mConstrClauseNum < src_stats.mConstrClauseNum ) {
-    dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
-  }
-  if ( dst_stats.mConstrLitNum < src_stats.mConstrLitNum ) {
-    dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
-  }
-  if ( dst_stats.mLearntClauseNum < src_stats.mLearntClauseNum ) {
-    dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
-  }
-  if ( dst_stats.mLearntLitNum < src_stats.mLearntLitNum ) {
-    dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
-  }
-  if ( dst_stats.mConflictNum < src_stats.mConflictNum ) {
-    dst_stats.mConflictNum += src_stats.mConflictNum;
-  }
-  if ( dst_stats.mDecisionNum < src_stats.mDecisionNum ) {
-    dst_stats.mDecisionNum += src_stats.mDecisionNum;
-  }
-  if ( dst_stats.mPropagationNum < src_stats.mPropagationNum ) {
-    dst_stats.mPropagationNum += src_stats.mPropagationNum;
-  }
-}
-
-// @brief ノードの変数割り当てフラグを消す．
-void
-SatEngine::clear_node_mark()
-{
-  for (vector<TpgNode*>::iterator p = mTfoList.begin();
-       p != mTfoList.end(); ++ p) {
-    TpgNode* node = *p;
-    node->clear_var();
   }
 }
 

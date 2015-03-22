@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINEMULTIBASE_H
-#define SATENGINEMULTIBASE_H
+﻿#ifndef DTPGSATS2_H
+#define DTPGSATS2_H
 
-/// @file SatEngineMultiBase.h
-/// @brief SatEngineMultiBase のヘッダファイル
+/// @file DtpgSatS2.h
+/// @brief DtpgSatS2 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,21 +10,22 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgSatBaseS.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineMultiBase SatEngineMultiBase.h "SatEngineMultiBase.h"
-/// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
+/// @class DtpgSatS2 DtpgSatS2.h "DtpgSatS2.h"
+/// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineMultiBase :
-  public SatEngine
+class DtpgSatS2 :
+  public DtpgSatBaseS
 {
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] th_val しきい値
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
@@ -32,17 +33,18 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineMultiBase(const string& sat_type,
-		     const string& sat_option,
-		     ostream* sat_outp,
-		     const TpgNetwork& network,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop);
+  DtpgSatS2(ymuint th_val,
+	    const string& sat_type,
+	    const string& sat_option,
+	    ostream* sat_outp,
+	    const TpgNetwork& network,
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineMultiBase();
+  ~DtpgSatS2();
 
 
 public:
@@ -57,38 +59,19 @@ public:
   run_single(TpgFault* f_tgt);
 
 
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief D-Chain 制約のCNFを作る．
-  void
-  make_dchain_cnf(SatSolver& solver,
-		  TpgNode* node);
-
-  /// @brief 故障に関係するノードのリストを作る．
-  /// @param[in] flist 故障のリスト
-  /// @param[out] fnode_list 故障に関係するノードのリスト
-  void
-  make_fnode_list(const vector<TpgFault*>& flist,
-		  vector<TpgNode*>& fnode_list);
-
-  /// @brief fnode の情報をクリアする．
-  void
-  clear_fnode_list(const vector<TpgNode*>& fnode_list);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 作業用の配列
-  vector<bool> mDone;
+  // しきい値
+  ymuint32 mThVal;
+
+  // 処理済みのノードのマーク
+  vector<ymuint> mMark;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEMULTI_H
+#endif // DTPGSATS2_H

@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINESINGLEBASE_H
-#define SATENGINESINGLEBASE_H
+﻿#ifndef DTPGSATKDET_H
+#define DTPGSATKDET_H
 
-/// @file SatEngineSingleBase.h
-/// @brief SatEngineSingleBase のヘッダファイル
+/// @file DtpgSatKDet.h
+/// @brief DtpgSatKDet のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,17 +10,17 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgSatBaseS.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineSingleBase SatEngineSingleBase.h "SatEngineSingleBase.h"
+/// @class DtpgSatKDet DtpgSatKDet.h "DtpgSatKDet.h"
 /// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineSingleBase :
-  public SatEngine
+class DtpgSatKDet :
+  public DtpgSatBaseS
 {
 public:
 
@@ -32,17 +32,19 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineSingleBase(const string& sat_type,
-		      const string& sat_option,
-		      ostream* sat_outp,
-		      const TpgNetwork& network,
-		      BackTracer& bt,
-		      DetectOp& dop,
-		      UntestOp& uop);
+  /// @param[in] kdet 多重度
+  DtpgSatKDet(const string& sat_type,
+	      const string& sat_option,
+	      ostream* sat_outp,
+	      const TpgNetwork& network,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop,
+	      ymuint kdet);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineSingleBase();
+  ~DtpgSatKDet();
 
 
 public:
@@ -51,25 +53,22 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
+  /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run_multi(const vector<TpgFault*>& flist);
+  run_single(TpgFault* f_tgt);
 
 
-protected:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
+  // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief D-Chain 制約のCNFを作る．
-  void
-  make_dchain_cnf(SatSolver& solver,
-		  TpgNode* node,
-		  TpgFault* fault);
+  // 多重度
+  ymuint mCount;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINESINGLEBASE_H
+#endif // DTPGSATKDET_H

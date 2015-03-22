@@ -1,19 +1,19 @@
 ﻿
-/// @file SatEngineSingle.cc
-/// @brief SatEngineSingle の実装ファイル
+/// @file DtpgSatS.cc
+/// @brief DtpgSatS の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngineSingle.h"
+#include "DtpgSatS.h"
 
 #include "DtpgStats.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
-#include "YmLogic/SatSolver.h"
+#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -27,45 +27,45 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineSingle(const string& sat_type,
-		    const string& sat_option,
-		    ostream* sat_outp,
-		    const TpgNetwork& network,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop)
+new_DtpgSatS(const string& sat_type,
+	     const string& sat_option,
+	     ostream* sat_outp,
+	     const TpgNetwork& network,
+	     BackTracer& bt,
+	     DetectOp& dop,
+	     UntestOp& uop)
 {
-  return new SatEngineSingle(sat_type, sat_option, sat_outp, network, bt, dop, uop);
+  return new DtpgSatS(sat_type, sat_option, sat_outp, network, bt, dop, uop);
 }
 
 // @brief コンストラクタ
-SatEngineSingle::SatEngineSingle(const string& sat_type,
-				 const string& sat_option,
-				 ostream* sat_outp,
-				 const TpgNetwork& network,
-				 BackTracer& bt,
-				 DetectOp& dop,
-				 UntestOp& uop) :
-  SatEngineSingleBase(sat_type, sat_option, sat_outp, network, bt, dop, uop)
+DtpgSatS::DtpgSatS(const string& sat_type,
+		   const string& sat_option,
+		   ostream* sat_outp,
+		   const TpgNetwork& network,
+		   BackTracer& bt,
+		   DetectOp& dop,
+		   UntestOp& uop) :
+  DtpgSatBaseS(sat_type, sat_option, sat_outp, network, bt, dop, uop)
 {
 }
 
 // @brief デストラクタ
-SatEngineSingle::~SatEngineSingle()
+DtpgSatS::~DtpgSatS()
 {
 }
 
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 void
-SatEngineSingle::run_single(TpgFault* fault)
+DtpgSatS::run_single(TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
   int fval = fault->val();
 
-  SatSolver solver(sat_type(), sat_option(), sat_outp());
+  SatEngine engine(sat_type(), sat_option(), sat_outp());
 
-  mark_region(solver, vector<TpgNode*>(1, fnode));
+  mark_region(engine, vector<TpgNode*>(1, fnode));
 
   cnf_begin();
 
@@ -74,7 +74,7 @@ SatEngineSingle::run_single(TpgFault* fault)
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_gnode_cnf(solver, node);
+    engine.make_gnode_cnf(node);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -85,14 +85,14 @@ SatEngineSingle::run_single(TpgFault* fault)
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
-      make_fault_cnf(solver, fault);
+      engine.make_fault_cnf(fault);
     }
     else {
-      make_fnode_cnf(solver, node);
+      engine.make_fnode_cnf(node);
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(solver, node, fault);
+    engine.make_dchain_cnf(node);
   }
 
 
@@ -100,26 +100,26 @@ SatEngineSingle::run_single(TpgFault* fault)
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
   ymuint npo = output_list().size();
-  tmp_lits_begin(npo);
+  engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
     TpgNode* node = output_list()[i];
     Literal dlit(node->dvar(), false);
-    tmp_lits_add(dlit);
+    engine.tmp_lits_add(dlit);
   }
-  tmp_lits_end(solver);
+  engine.tmp_lits_end();
 
   // dominator ノードの dvar は1でなければならない．
   for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
     Literal dlit(node->dvar(), false);
-    solver.add_clause(dlit);
+    engine.add_clause(dlit);
   }
 
   cnf_end();
 
   // 故障に対するテスト生成を行なう．
-  tmp_lits_begin();
+  engine.assumption_begin();
 
-  solve(solver, fault);
+  solve(engine, fault);
 
   clear_node_mark();
 }

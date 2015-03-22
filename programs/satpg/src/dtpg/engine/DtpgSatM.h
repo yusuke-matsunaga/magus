@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINESINGLEKDET_H
-#define SATENGINESINGLEKDET_H
+﻿#ifndef DTPGSATM_H
+#define DTPGSATM_H
 
-/// @file SatEngineSingleKDet.h
-/// @brief SatEngineSingleKDet のヘッダファイル
+/// @file DtpgSatM.h
+/// @brief DtpgSatM のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,17 +10,17 @@
 /// All rights reserved.
 
 
-#include "SatEngineSingleBase.h"
+#include "DtpgSatBaseM.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineSingleKDet SatEngineSingleKDet.h "SatEngineSingleKDet.h"
-/// @brief 1つの故障を対象とした CNF を生成する SatEngine
+/// @class DtpgSatM DtpgSatM.h "DtpgSatM.h"
+/// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineSingleKDet :
-  public SatEngineSingleBase
+class DtpgSatM :
+  public DtpgSatBaseM
 {
 public:
 
@@ -32,19 +32,18 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  /// @param[in] kdet 多重度
-  SatEngineSingleKDet(const string& sat_type,
-		      const string& sat_option,
-		      ostream* sat_outp,
-		      const TpgNetwork& network,
-		      BackTracer& bt,
-		      DetectOp& dop,
-		      UntestOp& uop,
-		      ymuint kdet);
+  DtpgSatM(const string& sat_type,
+	   const string& sat_option,
+	   ostream* sat_outp,
+	   const TpgNetwork& network,
+	   BackTracer& bt,
+	   DetectOp& dop,
+	   UntestOp& uop,
+	   bool forget);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineSingleKDet();
+  ~DtpgSatM();
 
 
 public:
@@ -53,10 +52,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] f_tgt 対象の故障
+  /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run_single(TpgFault* f_tgt);
+  run_multi(const vector<TpgFault*>& flist);
 
 
 private:
@@ -64,11 +63,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 多重度
-  ymuint mCount;
+  // 作業用のノードリスト
+  vector<TpgNode*> mTmpNodeList;
+
+  // forget フラグ
+  bool mForget;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINESINGLEKDET_H
+#endif // DTPGSATM_H

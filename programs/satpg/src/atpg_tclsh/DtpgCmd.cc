@@ -252,32 +252,32 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgEngine* engine = NULL;
   if ( engine_type == "single" ) {
-    engine = new_SatEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
+    engine = new_DtpgSatS(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
   else if ( engine_type == "single_kdet" ) {
-    engine = new_SatEngineSingleKDet(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, kdet_val);
+    engine = new_DtpgSatKDet(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, kdet_val);
   }
   else if ( engine_type == "single2" ) {
-    engine = new_SatEngineSingle2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
+    engine = new_DtpgSatS2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
   else if ( engine_type == "multi" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, false);
+    engine = new_DtpgSatM(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, false);
   }
   else if ( engine_type == "multi_forget" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
+    engine = new_DtpgSatM(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
   }
   else if ( engine_type == "multi2" ) {
-    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, false);
+    engine = new_DtpgSatM2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, false);
   }
   else if ( engine_type == "multi2_forget" ) {
-    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
+    engine = new_DtpgSatM2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
   }
   else if ( engine_type == "smt_single" ) {
     engine = new_SmtEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
   else {
     // デフォルトフォールバック
-    engine = new_SatEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
+    engine = new_DtpgSatS(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
 
   engine->set_option(option_str);

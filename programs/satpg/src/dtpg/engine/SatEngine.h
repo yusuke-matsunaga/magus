@@ -10,15 +10,14 @@
 /// All rights reserved.
 
 
-#include "DtpgEngine.h"
+#include "satpg_nsdef.h"
+
 #include "TpgNode.h"
-#include "DtpgStats.h"
 #include "LitMap.h"
 #include "YmLogic/Literal.h"
 #include "YmLogic/Bool3.h"
-#include "YmLogic/sat_nsdef.h"
+#include "YmLogic/SatSolver.h"
 #include "YmLogic/SatStats.h"
-#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -27,8 +26,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @class SatEngine SatEngine.h "SatEngine.h"
 /// @brief SatEngine の実装用の基底クラス
 //////////////////////////////////////////////////////////////////////
-class SatEngine :
-  public DtpgEngine
+class SatEngine
 {
 public:
 
@@ -36,17 +34,9 @@ public:
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
-  /// @param[in] network 対象のネットワーク
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   SatEngine(const string& sat_type,
 	    const string& sat_option,
-	    ostream* sat_outp,
-	    const TpgNetwork& network,
-	    BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
+	    ostream* sat_outp);
 
   /// @brief デストラクタ
   virtual
@@ -58,104 +48,42 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief オプションを設定する．
-  virtual
+  /// @brief ノードに正常回路用の変数を割り当てる．
+  /// @param[in] node 対象のノード
   void
-  set_option(const string& option_str);
+  set_gvar(TpgNode* node);
 
-  /// @brief 統計情報をクリアする．
-  virtual
+  /// @brief ノードに故障回路用の変数を割り当てる．
+  /// @param[in] node 対象のノード
   void
-  clear_stats();
+  set_fvar(TpgNode* node);
 
-  /// @brief 統計情報を得る．
-  /// @param[in] stats 結果を格納する構造体
-  virtual
+  /// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] node 対象のノード
   void
-  get_stats(DtpgStats& stats) const;
+  make_gnode_cnf(TpgNode* node);
 
-  /// @breif 時間計測を制御する．
-  virtual
+  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] node 対象のノード
   void
-  timer_enable(bool enable);
+  make_fnode_cnf(TpgNode* node);
 
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief SATソルバのタイプを得る．
-  string
-  sat_type() const;
-
-  /// @brief SATソルバのオプションを得る．
-  string
-  sat_option() const;
-
-  /// @brief SATソルバのログ出力を得る．
-  ostream*
-  sat_outp() const;
-
-  /// @brief CNF 作成を開始する．
+  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] node 対象のノード
   void
-  cnf_begin();
+  make_fnode_cnf2(TpgNode* node);
 
-  /// @brief CNF 作成を終了する．
+  /// @brief 故障ゲートの CNF を作る．
   void
-  cnf_end();
+  make_fault_cnf(TpgFault* fault);
 
-  /// @brief 最後に生成されたパタンを得る．
-  TestVector*
-  last_pat();
-
-  /// @brief 時間計測を開始する．
+  /// @brief ノードの故障差関数を表すCNFを作る．
   void
-  timer_start();
+  make_dlit_cnf(TpgNode* node);
 
-  /// @brief 時間計測を終了する．
-  USTime
-  timer_stop();
-
-  /// @brief 故障位置を与えてその TFO の TFI リストを作る．
-  /// @param[in] solver SAT ソルバ
-  /// @param[in] fnode_list 故障位置のノードのリスト
-  /// @param[in] max_id ノード番号の最大値
-  ///
-  /// 結果は mTfoList に格納される．
-  /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
+  /// @brief 故障伝搬条件を表すCNFを作る．
   void
-  mark_region(SatSolver& solver,
-	      const vector<TpgNode*>& fnode_list);
-
-  /// @brief 入力ノードを得る．
-  /// @param[in] ipos 入力番号
-  TpgNode*
-  input_node(ymuint ipos) const;
-
-  /// @brief TFO ノードの数を得る．
-  ymuint
-  tfo_size() const;
-
-  /// @brief TFI ノードの数を得る．
-  ymuint
-  tfi_size() const;
-
-  /// @brief TFO ノードと TFI ノードの総数を得る．
-  ymuint
-  tfo_tfi_size() const;
-
-  /// @brief TFO/TFI ノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < tfo_tfi_size() )
-  ///
-  /// pos が tfo_size() 未満のときは TFO ノード
-  /// それ以上は TFI ノードとなっている．
-  TpgNode*
-  tfo_tfi_node(ymuint pos) const;
-
-  /// @brief 出力のノードのリストを返す．
-  const vector<TpgNode*>&
-  output_list() const;
+  make_dchain_cnf(TpgNode* node);
 
   /// @brief 節の作成用の作業領域の使用を開始する．
   /// @param[in] exp_size 予想されるサイズ
@@ -163,119 +91,76 @@ protected:
   tmp_lits_begin(ymuint exp_size = 0);
 
   /// @brief 作業領域にリテラルを追加する．
+  /// @param[in] lit 追加するリテラル
   void
   tmp_lits_add(Literal lit);
 
   /// @brief 作業領域の冊を SAT ソルバに加える．
   void
-  tmp_lits_end(SatSolver& solver);
+  tmp_lits_end();
 
-  /// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] node 対象のノード
-  static
+  /// @brief 仮定リストの使用を開始する．
+  /// @param[in] exp_size 予想されるサイズ
+  ///
+  /// 実際のサイズが exp_size を超えても正しく動く
   void
-  make_gnode_cnf(SatSolver& solver,
-		 TpgNode* node);
+  assumption_begin(ymuint exp_size = 0);
 
-  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] node 対象のノード
-  static
+  /// @brief 仮定を追加する．
+  /// @param[in] lit 仮定のリテラル
   void
-  make_fnode_cnf(SatSolver& solver,
-		 TpgNode* node);
+  assumption_add(Literal lit);
 
-  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] node 対象のノード
-  static
+  /// @brief 変数を追加する．
+  /// @return 新しい変数番号を返す．
+  /// @note 変数番号は 0 から始まる．
+  VarId
+  new_var();
+
+  /// @brief 節を追加する．
+  /// @param[in] lits リテラルのベクタ
   void
-  make_fnode_cnf2(SatSolver& solver,
-		  TpgNode* node);
+  add_clause(const vector<Literal>& lits);
 
-  /// @brief 故障ゲートの CNF を作る．
-  static
+  /// @brief 1項の節(リテラル)を追加する．
   void
-  make_fault_cnf(SatSolver& solver,
-		 TpgFault* fault);
+  add_clause(Literal lit1);
 
-  /// @brief ノードの故障差関数を表すCNFを作る．
+  /// @brief 2項の節を追加する．
   void
-  make_dlit_cnf(SatSolver& solver,
-		TpgNode* node);
+  add_clause(Literal lit1,
+	     Literal lit2);
 
-  /// @brief 一つの SAT問題を解く．
+  /// @brief 3項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3);
+
+  /// @brief 4項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4);
+
+  /// @brief 5項の節を追加する．
+  void
+  add_clause(Literal lit1,
+	     Literal lit2,
+	     Literal lit3,
+	     Literal lit4,
+	     Literal lit5);
+
+  /// @brief SAT 問題を解く．
+  /// @param[out] model 結果の割当を格納するベクタ
   Bool3
-  solve(SatSolver& solver,
-	TpgFault* f,
-	bool option = false);
+  solve(vector<Bool3>& model);
 
-  /// @brief 一つの SAT問題を解く．
-  Bool3
-  _solve(SatSolver& solver);
-
-  /// @brief 検出した場合の処理
+  /// @brief 現在の内部状態を得る．
+  /// @param[out] stats 状態を格納する構造体
   void
-  detect_op(TpgFault* fault,
-	    const SatStats& sat_stats,
-	    const USTime& time);
-
-  /// @brief 検出不能と判定した時の処理
-  void
-  untest_op(TpgFault* fault,
-	    const SatStats& sat_stats,
-	    const USTime& time);
-
-  /// @brief 部分的な検出不能と判定した時の処理
-  void
-  partially_untest_op(TpgFault* fault,
-		      const SatStats& sat_stats,
-		      const USTime& time);
-
-  /// @brief アボートした時の処理
-  void
-  abort_op(TpgFault* fault,
-	   const SatStats& sat_stats,
-	   const USTime& time);
-
-  /// @brief ノードの変数割り当てフラグを消す．
-  void
-  clear_node_mark();
-
-  /// @brief tmp マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tmp_mark(TpgNode* node);
-
-  /// @brief tmp マークを消す．
-  /// @param[in] node 対象のノード
-  void
-  clear_tmp_mark(TpgNode* node);
-
-  /// @brief tmp マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tmp_mark(TpgNode* node);
-
-  static
-  void
-  clear_sat_stats(SatStats& stats);
-
-  static
-  void
-  add_sat_stats(SatStats& dst_stats,
-		const SatStats& src_stats);
-
-  static
-  void
-  sub_sat_stats(SatStats& dst_stats,
-		const SatStats& src_stats);
-
-  static
-  void
-  max_sat_stats(SatStats& dst_stats,
-		const SatStats& src_stats);
+  get_stats(SatStats& stats) const;
 
 
 private:
@@ -283,88 +168,20 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief tfo マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tfo_mark(TpgNode* node);
-
-  /// @brief tfo マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tfo_mark(TpgNode* node);
-
-  /// @brief tfi マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tfi_mark(TpgNode* node);
-
-  /// @brief tfi マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tfi_mark(TpgNode* node);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // SAT solver のタイプ
-  string mSatType;
-
-  // SAT solver のオプション
-  string mSatOption;
-
-  // SAT solver の記録用ストリーム
-  ostream* mSatOutP;
-
-  // ノードのIDの最大値
-  ymuint32 mMaxNodeId;
-
-  // バックトレーサー
-  BackTracer& mBackTracer;
-
-  // 検出時に呼ばれるファンクタ
-  DetectOp& mDetectOp;
-
-  // 検出不能時に呼ばれるファンクタ
-  UntestOp& mUntestOp;
-
-  // 対象のネットワーク
-  const TpgNetwork& mNetwork;
-
-  // SAT の結果を格納する配列
-  vector<Bool3> mModel;
-
-  // ノードごとのいくつかのフラグをまとめた配列
-  vector<ymuint8> mMarkArray;
-
-  // 故障の TFO のノードリスト
-  vector<TpgNode*> mTfoList;
-
-  // TFO ノードの最後の位置
-  ymuint32 mTfoEnd;
-
-  // 現在の故障に関係のありそうな外部入力のリスト
-  vector<TpgNode*> mInputList;
-
-  // 現在の故障に関係ありそうな外部出力のリスト
-  vector<TpgNode*> mOutputList;
+  // SAT ソルバ
+  SatSolver mSolver;
 
   // 作業用のリテラルのリスト
   vector<Literal> mTmpLits;
 
-  // 最後に生成されたテストパタン
-  TestVector* mLastPat;
-
-  // 時間計測を行なうかどうかの制御フラグ
-  bool mTimerEnable;
-
-  // 時間計測用のタイマー
-  StopWatch mTimer;
-
-  // DTPG の統計情報
-  DtpgStats mStats;
+  // 仮定のリテラルを収めるリスト
+  vector<Literal> mAssumptions;
 
 };
 
@@ -373,138 +190,167 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief SATソルバのタイプを得る．
+// @brief ノードに正常回路用の変数を設定する．
+// @param[in] node 対象のノード
 inline
-string
-SatEngine::sat_type() const
+void
+SatEngine::set_gvar(TpgNode* node)
 {
-  return mSatType;
+  // ノードそのものに割り当てる．
+  VarId gvar = new_var();
+  node->set_gvar(gvar);
 }
 
-// @brief SATソルバのオプションを得る．
+// @brief ノードに故障回路用の変数を設定する．
+// @param[in] node 対象のノード
 inline
-string
-SatEngine::sat_option() const
+void
+SatEngine::set_fvar(TpgNode* node)
 {
-  return mSatOption;
+  // ノードそのものに割り当てる．
+  VarId fvar = new_var();
+  VarId dvar = new_var();
+  node->set_fvar(fvar, dvar);
 }
 
-// @brief SATソルバのログ出力を得る．
+// @brief 節の作成用の作業領域の使用を開始する．
+// @param[in] exp_size 予想されるサイズ
 inline
-ostream*
-SatEngine::sat_outp() const
+void
+SatEngine::tmp_lits_begin(ymuint exp_size)
 {
-  return mSatOutP;
+  mTmpLits.clear();
+  if ( exp_size > 0 ) {
+    mTmpLits.reserve(exp_size);
+  }
 }
 
-// @brief TFO ノードの数を得る．
+// @brief 作業領域にリテラルを追加する．
 inline
-ymuint
-SatEngine::tfo_size() const
+void
+SatEngine::tmp_lits_add(Literal lit)
 {
-  return mTfoEnd;
+  mTmpLits.push_back(lit);
 }
 
-// @brief TFI ノードの数を得る．
+// @brief 作業領域の冊を SAT ソルバに加える．
 inline
-ymuint
-SatEngine::tfi_size() const
+void
+SatEngine::tmp_lits_end()
 {
-  return mTfoList.size() - mTfoEnd;
+  mSolver.add_clause(mTmpLits);
 }
 
-// @brief TFO ノードと TFI ノードの総数を得る．
-inline
-ymuint
-SatEngine::tfo_tfi_size() const
-{
-  return mTfoList.size();
-}
-
-// @brief TFO/TFI ノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < tfo_tfi_size() )
+// @brief 仮定リストの使用を開始する．
+// @param[in] exp_size 予想されるサイズ
 //
-// pos が tfo_size() 未満のときは TFO ノード
-// それ以上は TFI ノードとなっている．
-inline
-TpgNode*
-SatEngine::tfo_tfi_node(ymuint pos) const
-{
-  return mTfoList[pos];
-}
-
-// @brief 出力のノードのリストを返す．
-inline
-const vector<TpgNode*>&
-SatEngine::output_list() const
-{
-  return mOutputList;
-}
-
-// tfo マークをつける．
+// 実際のサイズが exp_size を超えても正しく動く
 inline
 void
-SatEngine::set_tfo_mark(TpgNode* node)
+SatEngine::assumption_begin(ymuint exp_size)
 {
-  mMarkArray[node->id()] |= 1U;
-  mTfoList.push_back(node);
-  if ( node->is_output() ) {
-    mOutputList.push_back(node);
+  mAssumptions.clear();
+  if ( exp_size > 0 ) {
+    mAssumptions.reserve(exp_size);
   }
 }
 
-// @brief tfo マークを読む．
-inline
-bool
-SatEngine::tfo_mark(TpgNode* node)
-{
-  return static_cast<bool>((mMarkArray[node->id()] >> 0) & 1U);
-}
-
-// tfi マークをつける．
+// @brief 仮定を追加する．
+// @param[in] lit 仮定のリテラル
 inline
 void
-SatEngine::set_tfi_mark(TpgNode* node)
+SatEngine::assumption_add(Literal lit)
 {
-  mMarkArray[node->id()] |= 2U;
-  mTfoList.push_back(node);
-  if ( node->is_input() ) {
-    mInputList.push_back(node);
-  }
+  mAssumptions.push_back(lit);
 }
 
-// @brief tfi マークを読む．
+// @brief 変数を追加する．
+// @return 新しい変数番号を返す．
+// @note 変数番号は 0 から始まる．
 inline
-bool
-SatEngine::tfi_mark(TpgNode* node)
+VarId
+SatEngine::new_var()
 {
-  return static_cast<bool>((mMarkArray[node->id()] >> 1) & 1U);
+  return mSolver.new_var();
 }
 
-// @brief tmp マークをつける．
-inline
-void
-SatEngine::set_tmp_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] |= 4U;
-}
-
-// @brief tmp マークを消す．
+// @brief 節を追加する．
+// @param[in] lits リテラルのベクタ
 inline
 void
-SatEngine::clear_tmp_mark(TpgNode* node)
+SatEngine::add_clause(const vector<Literal>& lits)
 {
-  mMarkArray[node->id()] &= ~4U;
+  mSolver.add_clause(lits);
 }
 
-// @brief tmp マークを読む．
+// @brief 1項の節(リテラル)を追加する．
 inline
-bool
-SatEngine::tmp_mark(TpgNode* node)
+void
+SatEngine::add_clause(Literal lit1)
 {
-  return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
+  mSolver.add_clause(lit1);
+}
+
+// @brief 2項の節を追加する．
+inline
+void
+SatEngine::add_clause(Literal lit1,
+		      Literal lit2)
+{
+  mSolver.add_clause(lit1, lit2);
+}
+
+// @brief 3項の節を追加する．
+inline
+void
+SatEngine::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3)
+{
+  mSolver.add_clause(lit1, lit2, lit3);
+}
+
+// @brief 4項の節を追加する．
+inline
+void
+SatEngine::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4)
+{
+  mSolver.add_clause(lit1, lit2, lit3, lit4);
+}
+
+/// @brief 5項の節を追加する．
+inline
+void
+SatEngine::add_clause(Literal lit1,
+		      Literal lit2,
+		      Literal lit3,
+		      Literal lit4,
+		      Literal lit5)
+{
+  mSolver.add_clause(lit1, lit2, lit3, lit4, lit5);
+}
+
+// @brief SAT 問題を解く．
+// @param[out] model 結果の割当を格納するベクタ
+inline
+Bool3
+SatEngine::solve(vector<Bool3>& model)
+{
+  return mSolver.solve(mAssumptions, model);
+}
+
+// @brief 現在の内部状態を得る．
+// @param[out] stats 状態を格納する構造体
+inline
+void
+SatEngine::get_stats(SatStats& stats) const
+{
+  mSolver.get_stats(stats);
 }
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEBASE_H
+#endif // SATENGINE_H

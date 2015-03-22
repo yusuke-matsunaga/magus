@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINESINGLE_H
-#define SATENGINESINGLE_H
+﻿#ifndef DTPGSATS_H
+#define DTPGSATS_H
 
-/// @file SatEngineSingle.h
-/// @brief SatEngineSingle のヘッダファイル
+/// @file DtpgSatS.h
+/// @brief DtpgSatS のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,17 +10,17 @@
 /// All rights reserved.
 
 
-#include "SatEngineSingleBase.h"
+#include "DtpgSatBaseS.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineSingle SatEngineSingle.h "SatEngineSingle.h"
-/// @brief 1つの故障を対象とした CNF を生成する SatEngine
+/// @class DtpgSatS DtpgSatS.h "DtpgSatS.h"
+/// @brief 1つの故障を対象とした CNF を生成する DtpgSat
 //////////////////////////////////////////////////////////////////////
-class SatEngineSingle :
-  public SatEngineSingleBase
+class DtpgSatS :
+  public DtpgSatBaseS
 {
 public:
 
@@ -32,17 +32,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineSingle(const string& sat_type,
-		  const string& sat_option,
-		  ostream* sat_outp,
-		  const TpgNetwork& network,
-		  BackTracer& bt,
-		  DetectOp& dop,
-		  UntestOp& uop);
+  DtpgSatS(const string& sat_type,
+	   const string& sat_option,
+	   ostream* sat_outp,
+	   const TpgNetwork& network,
+	   BackTracer& bt,
+	   DetectOp& dop,
+	   UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineSingle();
+  ~DtpgSatS();
 
 
 public:
@@ -60,4 +60,4 @@ public:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINESINGLE_H
+#endif // DTPGSATS_H

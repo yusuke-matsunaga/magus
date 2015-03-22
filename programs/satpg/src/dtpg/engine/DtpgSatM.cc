@@ -1,19 +1,19 @@
 ﻿
-/// @file SatEngineMulti.cc
-/// @brief SatEngineMulti の実装ファイル
+/// @file DtpgSatM.cc
+/// @brief DtpgSatM の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngineMulti.h"
+#include "DtpgSatM.h"
 
 #include "DtpgStats.h"
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "YmLogic/SatSolver.h"
+#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -27,45 +27,45 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineMulti(const string& sat_type,
+new_DtpgSatM(const string& sat_type,
+	     const string& sat_option,
+	     ostream* sat_outp,
+	     const TpgNetwork& network,
+	     BackTracer& bt,
+	     DetectOp& dop,
+	     UntestOp& uop,
+	     bool forget)
+{
+  return new DtpgSatM(sat_type, sat_option, sat_outp, network, bt, dop, uop, forget);
+}
+
+// @brief コンストラクタ
+DtpgSatM::DtpgSatM(const string& sat_type,
 		   const string& sat_option,
 		   ostream* sat_outp,
 		   const TpgNetwork& network,
 		   BackTracer& bt,
 		   DetectOp& dop,
 		   UntestOp& uop,
-		   bool forget)
-{
-  return new SatEngineMulti(sat_type, sat_option, sat_outp, network, bt, dop, uop, forget);
-}
-
-// @brief コンストラクタ
-SatEngineMulti::SatEngineMulti(const string& sat_type,
-			       const string& sat_option,
-			       ostream* sat_outp,
-			       const TpgNetwork& network,
-			       BackTracer& bt,
-			       DetectOp& dop,
-			       UntestOp& uop,
-			       bool forget) :
-  SatEngineMultiBase(sat_type, sat_option, sat_outp, network, bt, dop, uop),
+		   bool forget) :
+  DtpgSatBaseM(sat_type, sat_option, sat_outp, network, bt, dop, uop),
   mForget(forget)
 {
 }
 
 // @brief デストラクタ
-SatEngineMulti::~SatEngineMulti()
+DtpgSatM::~DtpgSatM()
 {
 }
 
 // @brief テストパタン生成を行なう．
 // @param[in] flist 故障リスト
 void
-SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
+DtpgSatM::run_multi(const vector<TpgFault*>& flist)
 {
   cnf_begin();
 
-  SatSolver solver(sat_type(), sat_option(), sat_outp());
+  SatEngine engine(sat_type(), sat_option(), sat_outp());
 
   ymuint nf = flist.size();
 
@@ -76,7 +76,7 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
   make_fnode_list(flist, fnode_list);
 
   for (ymuint i = 0; i < nf; ++ i) {
-    VarId fvar = solver.new_var();
+    VarId fvar = engine.new_var();
     flt_var[i] = fvar;
     TpgFault* f = flist[i];
     int fval = f->val();
@@ -91,7 +91,7 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
     }
   }
 
-  mark_region(solver, fnode_list);
+  mark_region(engine, fnode_list);
 
 
   //////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_gnode_cnf(solver, node);
+    engine.make_gnode_cnf(node);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -109,26 +109,26 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
     TpgNode* node = tfo_tfi_node(i);
 
     if ( node->has_flt_var() ) {
-      make_fnode_cnf2(solver, node);
+      engine.make_fnode_cnf2(node);
     }
     else {
-      make_fnode_cnf(solver, node);
+      engine.make_fnode_cnf(node);
     }
 
-    make_dchain_cnf(solver, node);
+    engine.make_dchain_cnf(node);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
   ymuint npo = output_list().size();
-  tmp_lits_begin(npo);
+  engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
     TpgNode* node = output_list()[i];
     Literal dlit(node->dvar(), false);
-    tmp_lits_add(dlit);
+    engine.tmp_lits_add(dlit);
   }
-  tmp_lits_end(solver);
+  engine.tmp_lits_end();
 
   cnf_end();
 
@@ -141,16 +141,12 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
       continue;
     }
 
-    if ( mForget ) {
-      solver.forget_learnt_clause();
-    }
-
-    tmp_lits_begin();
+    engine.assumption_begin();
 
     // 該当の故障に対する変数のみ1にする．
     for (ymuint j = 0; j < nf; ++ j) {
       bool inv = (j != fid);
-      tmp_lits_add(Literal(flt_var[j], inv));
+      engine.assumption_add(Literal(flt_var[j], inv));
     }
 
     TpgNode* fnode = flist[fid]->node();
@@ -175,7 +171,7 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
       TpgNode* node = tfo_tfi_node(i);
       if ( node->has_fvar() && !tmp_mark(node) ) {
 	Literal dlit(node->dvar(), true);
-	tmp_lits_add(dlit);
+	engine.assumption_add(dlit);
       }
     }
     for (vector<TpgNode*>::iterator p = mTmpNodeList.begin();
@@ -188,10 +184,10 @@ SatEngineMulti::run_multi(const vector<TpgFault*>& flist)
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
       Literal dlit(node->dvar(), false);
-      tmp_lits_add(dlit);
+      engine.assumption_add(dlit);
     }
 
-    solve(solver, f);
+    solve(engine, f);
   }
   clear_node_mark();
 
