@@ -8,6 +8,9 @@
 
 
 #include "LitMap.h"
+#include "GvarLitMap.h"
+#include "FvarLitMap.h"
+#include "VectLitMap.h"
 #include "TpgNode.h"
 
 

@@ -17,6 +17,9 @@
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "LitMap.h"
+#include "GvarLitMap.h"
+#include "FvarLitMap.h"
+#include "VectLitMap.h"
 #include "../../graphsat/GraphSat.h"
 #include "YmLogic/SatStats.h"
 
