@@ -43,18 +43,17 @@ set (dtpg_SOURCES
 
   src/dtpg/driver/DtpgDriverImpl.cc
 
-  src/dtpg/engine/LitMap.cc
   src/dtpg/engine/SatEngine.cc
-  src/dtpg/engine/DtpgSat.cc
-  src/dtpg/engine/DtpgSatBaseS.cc
-  src/dtpg/engine/DtpgSatBaseM.cc
-  src/dtpg/engine/DtpgSatS.cc
-  src/dtpg/engine/DtpgSatS2.cc
-  src/dtpg/engine/DtpgSatM.cc
-  src/dtpg/engine/DtpgSatM2.cc
-  src/dtpg/engine/DtpgSatKDet.cc
-  src/dtpg/engine/SmtEngine.cc
-  src/dtpg/engine/SmtEngineSingle.cc
+
+  src/dtpg/dtpg_engine/LitMap.cc
+  src/dtpg/dtpg_engine/DtpgSat.cc
+  src/dtpg/dtpg_engine/DtpgSatBaseS.cc
+  src/dtpg/dtpg_engine/DtpgSatBaseM.cc
+  src/dtpg/dtpg_engine/DtpgSatS.cc
+  src/dtpg/dtpg_engine/DtpgSatS2.cc
+  src/dtpg/dtpg_engine/DtpgSatM.cc
+  src/dtpg/dtpg_engine/DtpgSatM2.cc
+  src/dtpg/dtpg_engine/DtpgSatKDet.cc
 
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc

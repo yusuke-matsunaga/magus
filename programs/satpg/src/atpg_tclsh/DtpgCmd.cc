@@ -182,9 +182,11 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     }
     mode_val = mPoptMulti2->val();
   }
+#if 0
   else if ( mPoptSmtSingle->is_specified() ) {
     engine_type = "smt_single";
   }
+#endif
 
   string option_str = mPoptOpt->val();
 
@@ -272,9 +274,11 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   else if ( engine_type == "multi2_forget" ) {
     engine = new_DtpgSatM2(mode_val, sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list, true);
   }
+#if 0
   else if ( engine_type == "smt_single" ) {
     engine = new_SmtEngineSingle(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
   }
+#endif
   else {
     // デフォルトフォールバック
     engine = new_DtpgSatS(sat_type, sat_option, outp, _network(), *bt, dop_list, uop_list);
