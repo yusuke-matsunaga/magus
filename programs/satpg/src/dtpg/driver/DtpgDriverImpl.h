@@ -11,7 +11,6 @@
 
 
 #include "DtpgDriver.h"
-#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -64,39 +63,34 @@ private:
 
   /// @brief activate された部分回路に大してテスト生成を行う．
   /// @param[in] mode メインモード
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  /// @param[in] engine DTPG エンジン
   void
   dtpg1(tDtpgMode mode,
-	DtpgEngine& sat_engine);
+	DtpgEngine& engine);
 
   /// @brief single モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  /// @param[in] engine DTPG エンジン
   void
-  single_mode(DtpgEngine& sat_engine);
+  single_mode(DtpgEngine& engine);
 
   /// @brief ffr モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  /// @param[in] engine DTPG エンジン
   void
-  ffr_mode(DtpgEngine& sat_engine);
+  ffr_mode(DtpgEngine& engine);
 
   /// @brief mffc モードでテスト生成を行なう．
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
+  /// @param[in] engine DTPG エンジン
   void
-  mffc_mode(DtpgEngine& sat_engine);
+  mffc_mode(DtpgEngine& engine);
 
   /// @brief DFS で FFR を求める．
+  /// @param[in] node 対象のノード
   void
   dfs_ffr(TpgNode* node);
 
   /// @brief DFS で MFFC を求める．
+  /// @param[in] node 対象のノード
+  /// @param[inout] mark 処理済みのマーク
   void
   dfs_mffc(TpgNode* node,
 	   vector<bool>& mark);
@@ -106,12 +100,14 @@ private:
   clear_faults();
 
   /// @brief ノードの故障を追加する．
+  /// @param[in] node 対象のノード
   void
   add_node_faults(TpgNode* node);
 
   /// @brief テストパタン生成を行なう．
+  /// @param[in] engine DTPG エンジン
   void
-  do_dtpg(DtpgEngine& sat_engine);
+  do_dtpg(DtpgEngine& engine);
 
 
 private:
