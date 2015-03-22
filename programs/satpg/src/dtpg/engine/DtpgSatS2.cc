@@ -106,7 +106,7 @@ DtpgSatS2::run_single(TpgFault* fault)
       if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
 	mMark[node->id()] = opos + 1;
 
-	engine.make_gnode_cnf(node);
+	make_gval_cnf(engine, node);
       }
     }
 
@@ -121,13 +121,13 @@ DtpgSatS2::run_single(TpgFault* fault)
 
       // 故障回路のゲートの入出力関係を表すCNFを作る．
       if ( node == fnode ) {
-	engine.make_fault_cnf(fault);
+	make_fault_cnf(engine, fault);
       }
       else {
-	engine.make_fnode_cnf(node);
+	make_fval_cnf(engine, node);
       }
 
-      engine.make_dchain_cnf(node);
+      make_dchain_cnf(engine, node);
     }
 
     cnf_end();
@@ -190,7 +190,7 @@ DtpgSatS2::run_single(TpgFault* fault)
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	engine.make_gnode_cnf(node);
+	make_gval_cnf(engine, node);
       }
     }
 
@@ -200,8 +200,8 @@ DtpgSatS2::run_single(TpgFault* fault)
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	engine.make_fnode_cnf(node);
-	engine.make_dchain_cnf(node);
+	make_fval_cnf(engine, node);
+	make_dchain_cnf(engine, node);
       }
     }
 

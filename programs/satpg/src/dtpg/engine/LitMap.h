@@ -35,6 +35,11 @@ struct LitMap
   Literal
   input(ymuint pos) const = 0;
 
+  /// @brief 出力のリテラルを返す．
+  virtual
+  Literal
+  output() const = 0;
+
 };
 
 
@@ -59,6 +64,11 @@ public:
   virtual
   Literal
   input(ymuint pos) const;
+
+  /// @brief 出力のリテラルを返す．
+  virtual
+  Literal
+  output() const;
 
 
 private:
@@ -94,6 +104,11 @@ public:
   Literal
   input(ymuint pos) const;
 
+  /// @brief 出力のリテラルを返す．
+  virtual
+  Literal
+  output() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -116,7 +131,10 @@ class VectLitMap :
 public:
 
   /// @brief コンストラクタ
-  VectLitMap(const vector<VarId>& ivars);
+  /// @param[in] ivars 入力の変数のベクタ
+  /// @param[in] ovar 出力の変数
+  VectLitMap(const vector<VarId>& ivars,
+	     VarId ovar);
 
   /// @brief 入力数を返す．
   virtual
@@ -128,6 +146,11 @@ public:
   Literal
   input(ymuint pos) const;
 
+  /// @brief 出力のリテラルを返す．
+  virtual
+  Literal
+  output() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -136,6 +159,9 @@ private:
 
   // 入力の変数
   vector<VarId> mIvars;
+
+  // 出力の変数
+  VarId mOvar;
 
 };
 

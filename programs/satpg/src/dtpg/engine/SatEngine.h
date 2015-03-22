@@ -12,8 +12,8 @@
 
 #include "satpg_nsdef.h"
 
-#include "TpgNode.h"
 #include "LitMap.h"
+#include "YmNetworks/tgnet.h"
 #include "YmLogic/Literal.h"
 #include "YmLogic/Bool3.h"
 #include "YmLogic/SatSolver.h"
@@ -48,42 +48,72 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノードに正常回路用の変数を割り当てる．
-  /// @param[in] node 対象のノード
+  /// @brief ゲートの入出力の関係を表す CNF を作る．
+  /// @param[in] gate_type ゲートの種類
+  /// @param[in] litmap 入出力のリテラルを保持するクラス
   void
-  set_gvar(TpgNode* node);
+  make_gate_cnf(tTgGateType gate_type,
+		const LitMap& litmap);
 
-  /// @brief ノードに故障回路用の変数を割り当てる．
-  /// @param[in] node 対象のノード
+  /// @brief 多入力 AND ゲートの入出力の関係を表す CNF 式を生成する．
+  /// @param[in] litmap 入出力のリテラルを返すファンクタオブジェクト
+  /// @param[in] inv 出力が反転している時 true にするフラグ
   void
-  set_fvar(TpgNode* node);
+  make_and_cnf(const LitMap& litmap,
+	       bool inv);
 
-  /// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] node 対象のノード
+  /// @brief 多入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
+  /// @param[in] litmap 入出力のリテラルを返すファンクタオブジェクト
+  /// @param[in] inv 出力が反転している時 true にするフラグ
   void
-  make_gnode_cnf(TpgNode* node);
+  make_or_cnf(const LitMap& litmap,
+	      bool inv);
 
-  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] node 対象のノード
+  /// @brief 多入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
+  /// @param[in] litmap 入出力のリテラルを返すファンクタオブジェクト
+  /// @param[in] inv 出力が反転している時 true にするフラグ
   void
-  make_fnode_cnf(TpgNode* node);
+  make_xor_cnf(const LitMap& litmap,
+	       bool inv);
 
-  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] node 対象のノード
+  /// @brief 0縮退故障挿入回路の CNF を作る．
+  /// @param[in] ivar 入力の変数
+  /// @param[in] cvar 故障制御変数
+  /// @param[in] ovar 出力の変数
+  ///
+  /// 通常は ovar <=> ivar だが
+  /// cvar = 1 の時は ovar = 0 となる．
   void
-  make_fnode_cnf2(TpgNode* node);
+  make_flt0_cnf(VarId ivar,
+		VarId cvar,
+		VarId ovar);
 
-  /// @brief 故障ゲートの CNF を作る．
+  /// @brief 1縮退故障挿入回路の CNF を作る．
+  /// @param[in] ivar 入力の変数
+  /// @param[in] cvar 故障制御変数
+  /// @param[in] ovar 出力の変数
+  ///
+  /// 通常は ovar <=> ivar だが
+  /// cvar = 1 の時は ovar = 1 となる．
   void
-  make_fault_cnf(TpgFault* fault);
+  make_flt1_cnf(VarId ivar,
+		VarId cvar,
+		VarId ovar);
 
-  /// @brief ノードの故障差関数を表すCNFを作る．
+  /// @brief 0/1縮退故障挿入回路の CNF を作る．
+  /// @param[in] ivar 入力の変数
+  /// @param[in] c0var 0縮退故障制御変数
+  /// @param[in] c1var 1縮退故障制御変数
+  /// @param[in] ovar 出力の変数
+  ///
+  /// 通常は ovar <=> ivar だが
+  /// c0var = 1 の時は ovar = 0 となる．
+  /// c1var = 1 の時は ovar = 1 となる．
   void
-  make_dlit_cnf(TpgNode* node);
-
-  /// @brief 故障伝搬条件を表すCNFを作る．
-  void
-  make_dchain_cnf(TpgNode* node);
+  make_flt01_cnf(VarId ivar,
+		 VarId c0var,
+		 VarId c1var,
+		 VarId ovar);
 
   /// @brief 節の作成用の作業領域の使用を開始する．
   /// @param[in] exp_size 予想されるサイズ
@@ -95,7 +125,7 @@ public:
   void
   tmp_lits_add(Literal lit);
 
-  /// @brief 作業領域の冊を SAT ソルバに加える．
+  /// @brief 作業領域の節を SAT ソルバに加える．
   void
   tmp_lits_end();
 
@@ -189,29 +219,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief ノードに正常回路用の変数を設定する．
-// @param[in] node 対象のノード
-inline
-void
-SatEngine::set_gvar(TpgNode* node)
-{
-  // ノードそのものに割り当てる．
-  VarId gvar = new_var();
-  node->set_gvar(gvar);
-}
-
-// @brief ノードに故障回路用の変数を設定する．
-// @param[in] node 対象のノード
-inline
-void
-SatEngine::set_fvar(TpgNode* node)
-{
-  // ノードそのものに割り当てる．
-  VarId fvar = new_var();
-  VarId dvar = new_var();
-  node->set_fvar(fvar, dvar);
-}
 
 // @brief 節の作成用の作業領域の使用を開始する．
 // @param[in] exp_size 予想されるサイズ

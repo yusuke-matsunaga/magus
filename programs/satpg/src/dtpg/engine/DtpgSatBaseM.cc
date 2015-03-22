@@ -43,60 +43,6 @@ DtpgSatBaseM::run_single(TpgFault* f_tgt)
   run_multi(vector<TpgFault*>(1, f_tgt));
 }
 
-#if 0
-void
-DtpgSatBaseM::make_dchain_cnf(SatEngine& engine,
-			      TpgNode* node)
-{
-  Literal glit(node->gvar(), false);
-  Literal flit(node->fvar(), false);
-  Literal dlit(node->dvar(), false);
-
-  // 正常回路と故障回路で異なっているとき dlit が 1 となる．
-  engine.add_clause(~glit, ~flit, ~dlit);
-  engine.add_clause( glit,  flit, ~dlit);
-
-  // XOR(glit, flit, dlit) を追加する．
-  // 要するに正常回路と故障回路で異なっているとき dlit が 1 となる．
-
-  engine.add_clause(~glit,  flit,  dlit);
-  engine.add_clause( glit, ~flit,  dlit);
-
-  // 全てのファンインに故障差が伝搬していなければ
-  // このゲートの出力にも故障差は伝搬しない．
-  // ただし，このゲートの出力に故障がある場合を
-  // 考慮しなければならない．
-  if ( node->has_flt_var() ) {
-    ymuint ni = node->fanin_num();
-    engine.tmp_lits_begin(ni * 3 + 3);
-    engine.tmp_lits_add(~dlit);
-    if ( node->of0var() != kVarIdIllegal ) {
-      engine.tmp_lits_add(Literal(node->of0var(), false));
-    }
-    if ( node->of1var() != kVarIdIllegal ) {
-      engine.tmp_lits_add(Literal(node->of1var(), false));
-    }
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      if ( inode->has_fvar() ) {
-	Literal idlit(inode->dvar(), false);
-	engine.tmp_lits_add(idlit);
-      }
-      if ( node->if0var(i) != kVarIdIllegal ) {
-	engine.tmp_lits_add(Literal(node->if0var(i), false));
-      }
-      if ( node->if1var(i) != kVarIdIllegal ) {
-	engine.tmp_lits_add(Literal(node->if1var(i), false));
-      }
-    }
-    engine.tmp_lits_end();
-  }
-  else {
-    engine.make_dlit_cnf(node);
-  }
-}
-#endif
-
 // @brief 故障に関係するノードのリストを作る．
 // @param[in] flist 故障のリスト
 // @param[out] fnode_list 故障に関係するノードのリスト

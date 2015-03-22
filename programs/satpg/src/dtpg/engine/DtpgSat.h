@@ -158,6 +158,46 @@ protected:
   const vector<TpgNode*>&
   output_list() const;
 
+  /// @brief 正常回路用の CNF 式を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
+  static
+  void
+  make_gval_cnf(SatEngine& engine,
+		TpgNode* node);
+
+  /// @brief 故障回路用の CNF 式を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
+  static
+  void
+  make_fval_cnf(SatEngine& engine,
+		TpgNode* node);
+
+  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
+  static
+  void
+  make_fnode_cnf(SatEngine& engine,
+		 TpgNode* node);
+
+  /// @brief 故障箇所の関係を表す CNF を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] fault 対象の故障
+  static
+  void
+  make_fault_cnf(SatEngine& engine,
+		 TpgFault* fault);
+
+  /// @brief 故障伝搬条件を表すCNFを作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
+  static
+  void
+  make_dchain_cnf(SatEngine& engine,
+		  TpgNode* node);
+
   /// @brief 一つの SAT問題を解く．
   /// @param[in] engine SAT エンジン
   Bool3

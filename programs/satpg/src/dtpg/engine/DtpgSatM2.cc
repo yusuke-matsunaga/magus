@@ -133,7 +133,7 @@ DtpgSatM2::run_multi(const vector<TpgFault*>& flist)
       if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
 	mMark[node->id()] = opos + 1;
 
-	engine.make_gnode_cnf(node);
+	make_gval_cnf(engine, node);
       }
     }
 
@@ -147,13 +147,13 @@ DtpgSatM2::run_multi(const vector<TpgFault*>& flist)
       }
 
       if ( node->has_flt_var() ) {
-	engine.make_fnode_cnf2(node);
+	make_fnode_cnf(engine, node);
       }
       else {
-	engine.make_fnode_cnf(node);
+	make_fval_cnf(engine, node);
       }
 
-      engine.make_dchain_cnf(node);
+      make_dchain_cnf(engine, node);
     }
 
     cnf_end();
@@ -271,7 +271,7 @@ DtpgSatM2::run_multi(const vector<TpgFault*>& flist)
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	engine.make_gnode_cnf(node);
+	make_gval_cnf(engine, node);
       }
     }
 
@@ -281,8 +281,8 @@ DtpgSatM2::run_multi(const vector<TpgFault*>& flist)
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	engine.make_fnode_cnf(node);
-	engine.make_dchain_cnf(node);
+	make_fval_cnf(engine, node);
+	make_dchain_cnf(engine, node);
       }
     }
 

@@ -78,7 +78,7 @@ DtpgSatKDet::run_single(TpgFault* fault)
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    engine.make_gnode_cnf(node);
+    make_gval_cnf(engine, node);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -89,14 +89,14 @@ DtpgSatKDet::run_single(TpgFault* fault)
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
-      engine.make_fault_cnf(fault);
+      make_fault_cnf(engine, fault);
     }
     else {
-      engine.make_fnode_cnf(node);
+      make_fval_cnf(engine, node);
     }
 
     // D-Chain 制約を作る．
-    engine.make_dchain_cnf(node);
+    make_dchain_cnf(engine, node);
   }
 
 

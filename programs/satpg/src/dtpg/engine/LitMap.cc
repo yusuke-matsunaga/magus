@@ -38,6 +38,13 @@ GvarLitMap::input(ymuint pos) const
   return Literal(inode->gvar(), false);
 }
 
+// @brief 出力のリテラルを返す．
+Literal
+GvarLitMap::output() const
+{
+  return Literal(mNode->gvar(), false);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス FvarLitMap
@@ -64,14 +71,23 @@ FvarLitMap::input(ymuint pos) const
   return Literal(inode->fvar(), false);
 }
 
+// @brief 出力のリテラルを返す．
+Literal
+FvarLitMap::output() const
+{
+  return Literal(mNode->fvar(), false);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス VectLitMap
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-VectLitMap::VectLitMap(const vector<VarId>& ivars) :
-  mIvars(ivars)
+VectLitMap::VectLitMap(const vector<VarId>& ivars,
+		       VarId ovar) :
+  mIvars(ivars),
+  mOvar(ovar)
 {
 }
 
@@ -87,6 +103,13 @@ Literal
 VectLitMap::input(ymuint pos) const
 {
   return Literal(mIvars[pos], false);
+}
+
+// @brief 出力のリテラルを返す．
+Literal
+VectLitMap::output() const
+{
+  return Literal(mOvar, false);
 }
 
 END_NAMESPACE_YM_SATPG

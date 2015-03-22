@@ -99,7 +99,7 @@ DtpgSatM::run_multi(const vector<TpgFault*>& flist)
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    engine.make_gnode_cnf(node);
+    make_gval_cnf(engine, node);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -109,13 +109,13 @@ DtpgSatM::run_multi(const vector<TpgFault*>& flist)
     TpgNode* node = tfo_tfi_node(i);
 
     if ( node->has_flt_var() ) {
-      engine.make_fnode_cnf2(node);
+      make_fnode_cnf(engine, node);
     }
     else {
-      engine.make_fnode_cnf(node);
+      make_fval_cnf(engine, node);
     }
 
-    engine.make_dchain_cnf(node);
+    make_dchain_cnf(engine, node);
   }
 
   //////////////////////////////////////////////////////////////////////
