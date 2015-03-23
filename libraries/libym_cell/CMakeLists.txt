@@ -107,7 +107,7 @@ set (mislib_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(ym_cell SHARED
+add_library(ym_cell
   ${main_SOURCES}
   ${ci_SOURCES}
   ${dotlib_SOURCES}

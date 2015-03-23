@@ -212,7 +212,7 @@ set (zdd_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(ym_logic SHARED
+add_library(ym_logic
   ${aig_SOURCES}
   ${bdd_SOURCES}
   ${cnfdd_SOURCES}

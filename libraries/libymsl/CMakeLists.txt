@@ -165,7 +165,7 @@ set_source_files_properties ( ${CMAKE_CURRENT_BINARY_DIR}/grammer.cc GENERATED )
 #  ターゲットの設定
 # ===================================================================
 
-add_library(ymsl SHARED
+add_library(ymsl
   ${ymsl_SOURCES}
   )
 

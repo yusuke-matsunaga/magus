@@ -174,7 +174,7 @@ set (textproc_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-add_library(ym_utils SHARED
+add_library(ym_utils
   ${alloc_SOURCES}
   ${btg_SOURCES}
   ${file_SOURCES}

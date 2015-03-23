@@ -135,30 +135,30 @@ set (atpg_tclsh_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(satpg_base STATIC ${base_SOURCES})
+add_library(satpg_base OBJECT ${base_SOURCES})
 
-add_library(satpg_dtpg STATIC ${dtpg_SOURCES})
+add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
 
-add_library(satpg_fsim STATIC ${fsim_SOURCES})
+add_library(satpg_fsim OBJECT ${fsim_SOURCES})
 
-add_library(satpg_graphsat STATIC ${graphsat_SOURCES})
+add_library(satpg_graphsat OBJECT ${graphsat_SOURCES})
 
-add_library(satpg_minpat STATIC ${minpat_SOURCES})
+add_library(satpg_minpat OBJECT ${minpat_SOURCES})
 
-add_library(satpg_rtpg STATIC ${rtpg_SOURCES})
+add_library(satpg_rtpg OBJECT ${rtpg_SOURCES})
 
 if (TCL_FOUND)
   add_executable(atpg_tclsh
     ${atpg_tclsh_SOURCES}
+    $<TARGET_OBJECTS:satpg_dtpg>
+    $<TARGET_OBJECTS:satpg_graphsat>
+    $<TARGET_OBJECTS:satpg_fsim>
+    $<TARGET_OBJECTS:satpg_minpat>
+    $<TARGET_OBJECTS:satpg_rtpg>
+    $<TARGET_OBJECTS:satpg_base>
     )
 
   target_link_libraries(atpg_tclsh
-    satpg_dtpg
-    satpg_graphsat
-    satpg_fsim
-    satpg_minpat
-    satpg_rtpg
-    satpg_base
     ym_networks
     ym_tclpp
     ${TCL_LIBRARIES}
@@ -172,11 +172,13 @@ endif (TCL_FOUND)
 
 add_executable ( satpg_simnode_test
   src/fsim/fsim3/simnode_test.cc
+  $<TARGET_OBJECTS:satpg_fsim>
+  $<TARGET_OBJECTS:satpg_base>
   )
 
 target_link_libraries( satpg_simnode_test
-  satpg_fsim
-  )
+    ym_networks
+    )
 
 add_test (
   NAME satpg_simnode_test_run
