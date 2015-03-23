@@ -65,13 +65,27 @@ void
 DtpgSatKDet::run_single(TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
-  int fval = fault->val();
+
+  mark_region(vector<TpgNode*>(1, fnode));
+
+  cnf_begin();
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
-  mark_region(engine, vector<TpgNode*>(1, fnode));
-
-  cnf_begin();
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId gvar = engine.new_var();
+    node->set_gvar(gvar);
+  }
+  for (ymuint i = 0; i < tfo_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId fvar = engine.new_var();
+    VarId dvar = engine.new_var();
+    node->set_fvar(fvar, dvar);
+  }
 
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
@@ -103,18 +117,9 @@ DtpgSatKDet::run_single(TpgFault* fault)
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  ymuint npo = output_list().size();
-  engine.tmp_lits_begin(npo);
-  for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = output_list()[i];
-    Literal dlit(node->dvar(), false);
-    engine.tmp_lits_add(dlit);
-  }
-  engine.tmp_lits_end();
-
-  // dominator ノードの dvar は1でなければならない．
-  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(node->dvar(), false);
+  // fnode の dvar は 1 でなければならない．
+  {
+    Literal dlit(fnode->dvar(), false);
     engine.add_clause(dlit);
   }
 

@@ -69,22 +69,25 @@ DtpgSatS2::run_single(TpgFault* fault)
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
-  mark_region(engine, vector<TpgNode*>(1, fnode));
+  mark_region(vector<TpgNode*>(1, fnode));
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId gvar = engine.new_var();
+    node->set_gvar(gvar);
+  }
+  for (ymuint i = 0; i < tfo_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId fvar = engine.new_var();
+    VarId dvar = engine.new_var();
+    node->set_fvar(fvar, dvar);
+  }
 
   const vector<TpgNode*>& olist = output_list();
   ymuint no = olist.size();
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障の検出条件
-  //////////////////////////////////////////////////////////////////////
-  engine.tmp_lits_begin(no);
-  for (vector<TpgNode*>::const_iterator p = olist.begin();
-       p != olist.end(); ++ p) {
-    TpgNode* node = *p;
-    Literal dlit(node->dvar(), false);
-    engine.tmp_lits_add(dlit);
-  }
-  engine.tmp_lits_end();
 
   ymuint th_val = mThVal;
   if ( th_val > no ) {
@@ -130,6 +133,12 @@ DtpgSatS2::run_single(TpgFault* fault)
       make_dchain_cnf(engine, node);
     }
 
+    // fnode の dvar は 1 でなければならない．
+    {
+      Literal dlit(fnode->dvar(), false);
+      engine.add_clause(dlit);
+    }
+
     cnf_end();
 
     timer_start();
@@ -142,11 +151,6 @@ DtpgSatS2::run_single(TpgFault* fault)
 	Literal dlit(node->dvar(), false);
 	engine.assumption_add(~dlit);
       }
-    }
-
-    // dominator ノードの dvar は1でなければならない．
-    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-      engine.assumption_add(Literal(node->dvar(), false));
     }
 
     SatStats prev_stats;

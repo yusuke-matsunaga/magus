@@ -75,6 +75,23 @@ DtpgSatM::run_multi(const vector<TpgFault*>& flist)
   vector<TpgNode*> fnode_list;
   make_fnode_list(flist, fnode_list);
 
+  mark_region(fnode_list);
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId gvar = engine.new_var();
+    node->set_gvar(gvar);
+  }
+  for (ymuint i = 0; i < tfo_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId fvar = engine.new_var();
+    VarId dvar = engine.new_var();
+    node->set_fvar(fvar, dvar);
+  }
+
   for (ymuint i = 0; i < nf; ++ i) {
     VarId fvar = engine.new_var();
     flt_var[i] = fvar;
@@ -90,9 +107,6 @@ DtpgSatM::run_multi(const vector<TpgFault*>& flist)
       node->set_ifvar(pos, fval, fvar);
     }
   }
-
-  mark_region(engine, fnode_list);
-
 
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成

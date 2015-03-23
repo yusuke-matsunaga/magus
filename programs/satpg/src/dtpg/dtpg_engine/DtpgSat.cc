@@ -124,14 +124,12 @@ struct Lt
 END_NONAMESPACE
 
 // @brief 故障位置を与えてその TFO の TFI リストを作る．
-// @param[in] engine SAT エンジン
 // @param[in] fnode_list 故障位置のノードのリスト
 //
 // 結果は mTfoList に格納される．
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
-DtpgSat::mark_region(SatEngine& engine,
-		     const vector<TpgNode*>& fnode_list)
+DtpgSat::mark_region(const vector<TpgNode*>& fnode_list)
 {
   mMarkArray.clear();
   mMarkArray.resize(mNetwork.max_node_id(), 0U);
@@ -152,11 +150,6 @@ DtpgSat::mark_region(SatEngine& engine,
       if ( fnode->is_input() ) {
 	mInputList.push_back(fnode);
       }
-      VarId gvar = engine.new_var();
-      VarId fvar = engine.new_var();
-      VarId dvar = engine.new_var();
-      fnode->set_gvar(gvar);
-      fnode->set_fvar(fvar, dvar);
     }
   }
 
@@ -167,11 +160,6 @@ DtpgSat::mark_region(SatEngine& engine,
       TpgNode* fonode = node->active_fanout(i);
       if ( !tfo_mark(fonode) ) {
 	set_tfo_mark(fonode);
-	VarId gvar = engine.new_var();
-	VarId fvar = engine.new_var();
-	VarId dvar = engine.new_var();
-	fonode->set_gvar(gvar);
-	fonode->set_fvar(fvar, dvar);
       }
     }
   }
@@ -184,8 +172,6 @@ DtpgSat::mark_region(SatEngine& engine,
       TpgNode* finode = node->fanin(i);
       if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
 	set_tfi_mark(finode);
-	VarId gvar = engine.new_var();
-	finode->set_gvar(gvar);
       }
     }
   }
@@ -452,7 +438,12 @@ DtpgSat::make_dchain_cnf(SatEngine& engine,
   engine.add_clause(~glit, ~flit, ~dlit);
   engine.add_clause( glit,  flit, ~dlit);
 
-  if ( !node->is_output() ) {
+  if ( node->is_output() ) {
+    // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
+    engine.add_clause(~glit,  flit, dlit);
+    engine.add_clause( glit, ~flit, dlit);
+  }
+  else {
     // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
     ymuint nfo = node->active_fanout_num();
     engine.tmp_lits_begin(nfo + 1);
@@ -464,8 +455,8 @@ DtpgSat::make_dchain_cnf(SatEngine& engine,
     engine.tmp_lits_end();
 
     // dominator の dlit が 0 なら自分も 0
-    for (TpgNode* idom = node->imm_dom();
-	 idom != NULL; idom = idom->imm_dom() ) {
+    TpgNode* idom = node->imm_dom();
+    if ( idom != NULL ) {
       Literal idlit(idom->dvar(), false);
       engine.add_clause(~dlit, idlit);
     }

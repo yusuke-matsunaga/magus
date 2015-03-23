@@ -120,14 +120,12 @@ protected:
   timer_stop();
 
   /// @brief 故障位置を与えてその TFO の TFI リストを作る．
-  /// @param[in] engine SAT エンジン
   /// @param[in] fnode_list 故障位置のノードのリスト
   ///
   /// 結果は mTfoList に格納される．
   /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
   void
-  mark_region(SatEngine& engine,
-	      const vector<TpgNode*>& fnode_list);
+  mark_region(const vector<TpgNode*>& fnode_list);
 
   /// @brief 入力ノードを得る．
   /// @param[in] ipos 入力番号
