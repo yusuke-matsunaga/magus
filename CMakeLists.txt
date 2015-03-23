@@ -18,7 +18,7 @@ set (YMTOOLS_NAMESPACE "nsYm")
 #set (CMAKE_BUILD_TYPE RELEASE)
 
 # デバッグモード
-set (CMAKE_BUILD_TYPE DEBUG)
+#set (CMAKE_BUILD_TYPE DEBUG)
 
 
 # ===================================================================

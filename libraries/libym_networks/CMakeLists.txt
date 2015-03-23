@@ -177,7 +177,6 @@ set ( verilog_SOURCES
 # ===================================================================
 
 add_library( ym_networks
-  SHARED
   ${main_SOURCES}
   ${bdn_SOURCES}
   ${blif_SOURCES}

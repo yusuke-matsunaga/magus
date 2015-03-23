@@ -12,7 +12,7 @@ include_directories(
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(ym_tclpp SHARED
+add_library(ym_tclpp
   src/StrBuf.h
   src/TclBase.cc
   src/TclCmd.cc

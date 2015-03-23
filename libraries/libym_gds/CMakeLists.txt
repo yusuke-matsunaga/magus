@@ -12,7 +12,7 @@ include_directories(
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(ym_gds SHARED
+add_library(ym_gds
   src/GdsAref.cc
   src/GdsBoundary.cc
   src/GdsBox.cc
