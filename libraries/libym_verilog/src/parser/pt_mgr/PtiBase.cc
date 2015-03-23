@@ -229,7 +229,7 @@ decompile_opr(const PtExpr* expr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( need_par ) {
     ans += ")";
@@ -326,7 +326,7 @@ decompile_impl(const PtExpr* expr,
 	case kVpiConstRange: delim = ":"; break;
 	case kVpiPlusRange:  delim = "+:"; break;
 	case kVpiMinusRange: delim = "-:"; break;
-	case kVpiNoRange: assert_not_reached(__FILE__, __LINE__);
+	case kVpiNoRange: ASSERT_NOT_REACHED;
 	}
 	ans += "[" + expr->left_range()->decompile() + delim +
 	  expr->right_range()->decompile() + "]";
@@ -335,7 +335,7 @@ decompile_impl(const PtExpr* expr,
     }
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return string();

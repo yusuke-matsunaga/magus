@@ -21,7 +21,7 @@ gen_vectors(ymuint n,
 	    ymuint k,
 	    ostream& s)
 {
-  assert_cond( n > k, __FILE__, __LINE__);
+  ASSERT_COND( n > k );
 
   // ベクタの数を数える．
   mpz_class nv = 1;

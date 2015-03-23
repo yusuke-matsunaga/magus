@@ -67,7 +67,7 @@ write_bdd(Bdd bdd,
   }
   else {
     unordered_map<Bdd, ymuint32>::const_iterator p = idmap.find(bdd);
-    assert_cond( p != idmap.end(), __FILE__, __LINE__);
+    ASSERT_COND( p != idmap.end() );
     cout << "    goto BDD" << p->second << ";" << endl;
   }
 }
@@ -141,7 +141,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
       bddmap[node->id()] = bdd;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
 #if 0
     cout << " = " << bddmap[node->id()].size();
@@ -174,7 +174,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
     put_bdd(bdd, idmap, bdd_array);
 
     unordered_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
-    assert_cond( q != idmap.end(), __FILE__, __LINE__);
+    ASSERT_COND( q != idmap.end() );
 
     output_id.push_back(q->second);
   }
@@ -204,7 +204,7 @@ LsimBdd2::set_network(const BdnMgr& bdn,
        p != bdd_array.end(); ++ p) {
     Bdd bdd = *p;
     unordered_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
-    assert_cond( q != idmap.end(), __FILE__, __LINE__);
+    ASSERT_COND( q != idmap.end() );
     ymuint32 id = q->second;
     Bdd bdd0;
     Bdd bdd1;

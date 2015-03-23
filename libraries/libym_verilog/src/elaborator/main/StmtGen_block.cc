@@ -115,7 +115,7 @@ StmtGen::instantiate_namedparblock(const VlNamedObj* parent,
 				   const PtStmt* pt_stmt)
 {
   ElbObjHandle* handle = find_obj(parent, pt_stmt->name());
-  assert_cond(handle, __FILE__, __LINE__);
+  ASSERT_COND(handle );
   const VlNamedObj* block = handle->obj();
 
   PtStmtArray pt_stmt_array = pt_stmt->stmt_array();
@@ -149,7 +149,7 @@ StmtGen::instantiate_namedseqblock(const VlNamedObj* parent,
 				   const PtStmt* pt_stmt)
 {
   ElbObjHandle* handle = find_obj(parent, pt_stmt->name());
-  assert_cond(handle, __FILE__, __LINE__);
+  ASSERT_COND(handle );
   const VlNamedObj* block = handle->obj();
 
   PtStmtArray pt_stmt_array = pt_stmt->stmt_array();

@@ -50,7 +50,7 @@ SmtVarFunImpl::is_var() const
 const SmtSort*
 SmtVarFunImpl::var_sort() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -59,7 +59,7 @@ SmtVarFunImpl::var_sort() const
 bool
 SmtVarFunImpl::is_global() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -68,7 +68,7 @@ SmtVarFunImpl::is_global() const
 bool
 SmtVarFunImpl::is_forall() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -77,7 +77,7 @@ SmtVarFunImpl::is_forall() const
 bool
 SmtVarFunImpl::is_exists() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -93,7 +93,7 @@ SmtVarFunImpl::is_fun() const
 ymuint
 SmtVarFunImpl::input_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -103,7 +103,7 @@ SmtVarFunImpl::input_num() const
 const SmtSort*
 SmtVarFunImpl::input_sort(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -114,7 +114,7 @@ SmtVarFunImpl::input_sort(ymuint pos) const
 const SmtVarFun*
 SmtVarFunImpl::input_var(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -123,7 +123,7 @@ SmtVarFunImpl::input_var(ymuint pos) const
 const SmtSort*
 SmtVarFunImpl::output_sort() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -133,7 +133,7 @@ SmtVarFunImpl::output_sort() const
 const SmtTerm*
 SmtVarFunImpl::fun_body() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -142,7 +142,7 @@ SmtVarFunImpl::fun_body() const
 SmtVarFun::tFunAttr
 SmtVarFunImpl::fun_attr() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kNone;
 }
 
@@ -151,7 +151,7 @@ SmtVarFunImpl::fun_attr() const
 ymuint
 SmtVarFunImpl::param_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -337,7 +337,7 @@ SmtFunBase::input_num() const
 const SmtSort*
 SmtFunBase::input_sort(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -348,7 +348,7 @@ SmtFunBase::input_sort(ymuint pos) const
 const SmtVarFun*
 SmtFunBase::input_var(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -447,7 +447,7 @@ SmtDeclFun2::input_num() const
 const SmtSort*
 SmtDeclFun2::input_sort(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 
@@ -457,7 +457,7 @@ SmtDeclFun2::input_sort(ymuint pos) const
 const SmtVarFun*
 SmtDeclFun2::input_var(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return NULL;
 }
 
@@ -544,7 +544,7 @@ SmtDefFun2::input_num() const
 const SmtSort*
 SmtDefFun2::input_sort(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos]->var_sort();
 }
 
@@ -554,7 +554,7 @@ SmtDefFun2::input_sort(ymuint pos) const
 const SmtVarFun*
 SmtDefFun2::input_var(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 

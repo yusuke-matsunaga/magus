@@ -45,7 +45,7 @@ SnInput::nfi() const
 SimNode*
 SnInput::fanin(size_t pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -85,7 +85,7 @@ SnInput::_calc_iobs(tPackedVal obs)
 Bdd
 SnInput::_calc_gfunc()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return Bdd();
 }
 
@@ -93,7 +93,7 @@ SnInput::_calc_gfunc()
 Bdd
 SnInput::_calc_ffunc()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return Bdd();
 }
 

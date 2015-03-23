@@ -102,7 +102,7 @@ VlValue::VlValue(const VlValue& src,
 					  src_bv.base()));
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -183,7 +183,7 @@ operator-(const VlValue& src)
   case VlValue::kErrorType:
     return src;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlValue();
 }
 

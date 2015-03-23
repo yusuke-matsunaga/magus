@@ -43,7 +43,7 @@ operator<<(ostream& s,
   case kTgGateCplx:   s << "CPLX"; break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return s;
 }
@@ -373,7 +373,7 @@ TgNetwork::wrap_up()
       }
     }
   }
-  assert_cond(mSortedArray.size() == nl, __FILE__, __LINE__);
+  ASSERT_COND(mSortedArray.size() == nl );
 }
 
 
@@ -401,7 +401,7 @@ dump_node(ostream& s,
     s << "[Q" << node->lid() << "]";
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

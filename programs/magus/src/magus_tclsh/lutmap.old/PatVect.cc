@@ -63,7 +63,7 @@ PatVect::~PatVect()
 void
 PatVect::copy(const PatVect& src)
 {
-  assert_cond(mSize == src.mSize, __FILE__, __LINE__);
+  ASSERT_COND(mSize == src.mSize );
   for (ymuint i = 0; i < mSize; ++ i) {
     mVect[i] = src.mVect[i];
   }
@@ -113,7 +113,7 @@ PatVect::set_random(RandGen& randgen)
 bool
 PatVect::operator==(const PatVect& src) const
 {
-  assert_cond(mSize == src.mSize, __FILE__, __LINE__);
+  ASSERT_COND(mSize == src.mSize );
   for (ymuint i = 0; i < mSize; ++ i) {
     if ( mVect[i] != src.mVect[i] ) {
       return false;
@@ -136,7 +136,7 @@ PatVect::negate()
 const PatVect&
 PatVect::operator&=(const PatVect& src)
 {
-  assert_cond(mSize == src.mSize, __FILE__, __LINE__);
+  ASSERT_COND(mSize == src.mSize );
   for (ymuint i = 0; i < mSize; ++ i) {
     mVect[i] &= src.mVect[i];
   }
@@ -147,7 +147,7 @@ PatVect::operator&=(const PatVect& src)
 const PatVect&
 PatVect::operator|=(const PatVect& src)
 {
-  assert_cond(mSize == src.mSize, __FILE__, __LINE__);
+  ASSERT_COND(mSize == src.mSize );
   for (ymuint i = 0; i < mSize; ++ i) {
     mVect[i] |= src.mVect[i];
   }
@@ -158,7 +158,7 @@ PatVect::operator|=(const PatVect& src)
 const PatVect&
 PatVect::operator^=(const PatVect& src)
 {
-  assert_cond(mSize == src.mSize, __FILE__, __LINE__);
+  ASSERT_COND(mSize == src.mSize );
   for (ymuint i = 0; i < mSize; ++ i) {
     mVect[i] ^= src.mVect[i];
   }
@@ -174,8 +174,8 @@ eq_with_dc(const PatVect& opr1,
 	   const PatVect& dc)
 {
   ymuint size = opr1.size();
-  assert_cond(opr2.size() == size, __FILE__, __LINE__);
-  assert_cond(dc.size() == size, __FILE__, __LINE__);
+  ASSERT_COND(opr2.size() == size );
+  ASSERT_COND(dc.size() == size );
 
   for (ymuint i = 0; i < size; ++ i) {
     if ( (opr1.block(i) ^ opr2.block(i)) & ~dc.block(i) ) {
@@ -195,9 +195,9 @@ eq_with_dc(const PatVect& opr1,
 	   const PatVect& dc2)
 {
   ymuint size = opr1.size();
-  assert_cond(opr2.size() == size, __FILE__, __LINE__);
-  assert_cond(dc1.size() == size, __FILE__, __LINE__);
-  assert_cond(dc2.size() == size, __FILE__, __LINE__);
+  ASSERT_COND(opr2.size() == size );
+  ASSERT_COND(dc1.size() == size );
+  ASSERT_COND(dc2.size() == size );
 
   for (ymuint i = 0; i < size; ++ i) {
     if ( (opr1.block(i) ^ opr2.block(i)) & ~dc1.block(i) & ~dc2.block(i) ) {
@@ -267,7 +267,7 @@ calc_pat(const Expr& expr,
     }
     return;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 END_NAMESPACE_MAGUS_LUTMAP

@@ -48,7 +48,7 @@ PtMulOp::gen_aig(AigMgr& aigmgr,
 		 ymuint bw,
 		 vector<Aig>& out_array)
 {
-  assert_cond( out_array.size() == bw, __FILE__, __LINE__);
+  ASSERT_COND( out_array.size() == bw );
   vector<Aig> tmp_array1(bw);
   vector<Aig> tmp_array2(bw);
   operand(0)->gen_aig(aigmgr, bvar_array, bw, tmp_array1);

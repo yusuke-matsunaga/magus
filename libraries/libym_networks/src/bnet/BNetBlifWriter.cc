@@ -112,7 +112,7 @@ write_names(const BNode* node,
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; i ++) {
     BNode* inode = node->fanin(i);
-    assert_cond(inode != NULL, __FILE__, __LINE__);
+    ASSERT_COND(inode != NULL );
     s << " " << inode->name();
   }
 
@@ -121,7 +121,7 @@ write_names(const BNode* node,
   // factored form をカバーに変換して出力する．
   const Expr& ff = node->func();
   bool stat = write_cover(ni, ff, s);
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 }
 
 END_NONAMESPACE

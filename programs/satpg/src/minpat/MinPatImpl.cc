@@ -191,7 +191,7 @@ MinPatImpl::run(TpgNetwork& network,
       ymuint id = *p;
       TestVector* tv = tv_list[id];
       bool stat = new_tv->merge(*tv);
-      assert_cond( stat, __FILE__, __LINE__);
+      ASSERT_COND( stat );
     }
     // 残った X にランダムに 0/1 を割り当てる．
     new_tv->fix_x_from_random(randgen);

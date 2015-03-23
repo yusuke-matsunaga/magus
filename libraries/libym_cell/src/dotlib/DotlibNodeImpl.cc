@@ -121,7 +121,7 @@ DotlibNodeImpl::int_value() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -132,7 +132,7 @@ DotlibNodeImpl::float_value() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0.0;
 }
 
@@ -143,7 +143,7 @@ DotlibNodeImpl::string_value() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ShString();
 }
 
@@ -154,7 +154,7 @@ DotlibNodeImpl::vector_size() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -166,7 +166,7 @@ DotlibNodeImpl::vector_elem(ymuint pos) const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0.0;
 }
 
@@ -178,7 +178,7 @@ DotlibNodeImpl::get_vector(vector<double>& vector) const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 第一オペランドを返す．
@@ -188,7 +188,7 @@ DotlibNodeImpl::opr1() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -199,7 +199,7 @@ DotlibNodeImpl::opr2() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -210,7 +210,7 @@ DotlibNodeImpl::list_size() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -222,7 +222,7 @@ DotlibNodeImpl::list_elem(ymuint pos) const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -233,7 +233,7 @@ DotlibNodeImpl::group_value() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -244,7 +244,7 @@ DotlibNodeImpl::attr_top() const
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -256,7 +256,7 @@ DotlibNodeImpl::add_node(DotlibNodeImpl* node)
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief attribute を設定する．
@@ -267,7 +267,7 @@ DotlibNodeImpl::add_attr(DotlibAttr* attr)
 {
   dump(cout);
   cout << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 
@@ -685,7 +685,7 @@ DotlibOpr::dump(ostream& s,
   case kOr:    s << " | "; break;
   case kXor:   s << " ^ "; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   opr2()->dump(s, 0);
   s << " )";

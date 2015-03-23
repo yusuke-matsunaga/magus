@@ -121,7 +121,7 @@ Parser::new_Module1995(const FileRegion& file_region,
     case kPtIO_Output: dir = kVlOutput; break;
     case kPtIO_Inout:  dir = kVlInout; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     for (ymuint j = 0; j < io_head->item_num(); ++ j) {
       const PtIOItem* elem = io_head->item(j);

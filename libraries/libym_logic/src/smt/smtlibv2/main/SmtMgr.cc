@@ -173,7 +173,7 @@ SmtMgr::set_logic(tSmtLogic logic)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -187,21 +187,21 @@ SmtMgr::Core_init()
   // :sorts
   // (Bool 0)
   const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
-  assert_cond( bool_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( bool_id != NULL );
   sort_mgr().reg_sort(bool_id, 0);
 
   const SmtSort* bool_sort = sort_mgr().make_sort(bool_id, vector<const SmtSort*>(0));
-  assert_cond( bool_sort != NULL, __FILE__, __LINE__);
+  ASSERT_COND( bool_sort != NULL );
 
   // :funs
   // (true Bool)
   const SmtId* true_id = mIdMgr->make_id(ShString("true"));
-  assert_cond( true_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( true_id != NULL );
   name_mgr().reg_fun(true_id, vector<const SmtSort*>(0), bool_sort);
 
   // (false Bool)
   const SmtId* false_id = mIdMgr->make_id(ShString("false"));
-  assert_cond( false_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( false_id != NULL );
   name_mgr().reg_fun(false_id, vector<const SmtSort*>(0), bool_sort);
 
   vector<const SmtSort*> b1_list(1);
@@ -209,7 +209,7 @@ SmtMgr::Core_init()
 
   // (not Bool Bool)
   const SmtId* not_id = mIdMgr->make_id(ShString("not"));
-  assert_cond( not_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( not_id != NULL );
   name_mgr().reg_fun(not_id, b1_list, bool_sort);
 
   vector<const SmtSort*> b2_list(2);
@@ -218,22 +218,22 @@ SmtMgr::Core_init()
 
   // (and Bool Bool Bool :right-assoc)
   const SmtId* and_id = mIdMgr->make_id(ShString("and"));
-  assert_cond( and_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( and_id != NULL );
   name_mgr().reg_fun(and_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   // (or Bool Bool Bool :right-assoc)
   const SmtId* or_id = mIdMgr->make_id(ShString("or"));
-  assert_cond( or_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( or_id != NULL );
   name_mgr().reg_fun(or_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   // (xor Bool Bool Bool :right-assoc)
   const SmtId* xor_id = mIdMgr->make_id(ShString("xor"));
-  assert_cond( xor_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( xor_id != NULL );
   name_mgr().reg_fun(xor_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   // (=> Bool Bool Bool :right-assoc)
   const SmtId* imp_id = mIdMgr->make_id(ShString("=>"));
-  assert_cond( imp_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( imp_id != NULL );
   name_mgr().reg_fun(imp_id, b2_list, bool_sort, SmtVarFun::kRightAssoc);
 
   const SmtSort* A_sort = sort_mgr().make_param_sort(0);
@@ -243,12 +243,12 @@ SmtMgr::Core_init()
 
   // (par (A) (= A A Bool :chainable))
   const SmtId* eq_id = mIdMgr->make_id(ShString("="));
-  assert_cond( eq_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( eq_id != NULL );
   name_mgr().reg_fun(eq_id, a2_list, bool_sort, SmtVarFun::kChainable);
 
   // (par (A) (distinct A A Bool :pairwise))
   const SmtId* dis_id = mIdMgr->make_id(ShString("distinct"));
-  assert_cond( dis_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( dis_id != NULL );
   name_mgr().reg_fun(dis_id, a2_list, bool_sort, SmtVarFun::kPairwise);
 
   vector<const SmtSort*> ite_list(3);
@@ -258,7 +258,7 @@ SmtMgr::Core_init()
 
   // (par (A) (ite Bool A A A)
   const SmtId* ite_id = mIdMgr->make_id(ShString("ite"));
-  assert_cond( ite_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( ite_id != NULL );
   name_mgr().reg_fun(ite_id, ite_list, A_sort, SmtVarFun::kNone);
 }
 
@@ -269,16 +269,16 @@ SmtMgr::Ints_init()
   // :sorts
   // (Int 0)
   const SmtId* int_id = mIdMgr->make_id(ShString("Int"));
-  assert_cond( int_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( int_id != NULL );
   sort_mgr().reg_sort(int_id, 0);
 
   const SmtSort* int_sort = sort_mgr().make_sort(int_id, vector<const SmtSort*>(0));
-  assert_cond( int_sort != NULL, __FILE__, __LINE__);
+  ASSERT_COND( int_sort != NULL );
 
   // :funs
   // (- Int Int)
   const SmtId* minus_id = mIdMgr->make_id(ShString("-"));
-  assert_cond( minus_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( minus_id != NULL );
   name_mgr().reg_fun(minus_id, vector<const SmtSort*>(1, int_sort), int_sort);
 
   vector<const SmtSort*> i2_list(2);
@@ -290,37 +290,37 @@ SmtMgr::Ints_init()
 
   // (+ Int Int Int :left-assoc)
   const SmtId* plus_id = mIdMgr->make_id(ShString("+"));
-  assert_cond( plus_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( plus_id != NULL );
   name_mgr().reg_fun(plus_id, i2_list, int_sort, SmtVarFun::kLeftAssoc);
 
   // (* Int Int Int :left-assoc)
   const SmtId* star_id = mIdMgr->make_id(ShString("*"));
-  assert_cond( star_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( star_id != NULL );
   name_mgr().reg_fun(star_id, i2_list, int_sort, SmtVarFun::kLeftAssoc);
 
   const SmtId* bool_id = mIdMgr->make_id(ShString("Bool"));
-  assert_cond( bool_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( bool_id != NULL );
   const SmtSort* bool_sort = sort_mgr().make_sort(bool_id, vector<const SmtSort*>(0));
-  assert_cond( bool_sort != NULL, __FILE__, __LINE__);
+  ASSERT_COND( bool_sort != NULL );
 
   // (<= Int Int Bool :chainable)
   const SmtId* le_id = mIdMgr->make_id(ShString("<="));
-  assert_cond( le_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( le_id != NULL );
   name_mgr().reg_fun(le_id, i2_list, bool_sort, SmtVarFun::kChainable);
 
   // (< Int Int Bool :chainable)
   const SmtId* lt_id = mIdMgr->make_id(ShString("<"));
-  assert_cond( lt_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( lt_id != NULL );
   name_mgr().reg_fun(lt_id, i2_list, bool_sort, SmtVarFun::kChainable);
 
   // (>= Int Int Bool :chainable)
   const SmtId* ge_id = mIdMgr->make_id(ShString(">="));
-  assert_cond( ge_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( ge_id != NULL );
   name_mgr().reg_fun(ge_id, i2_list, bool_sort, SmtVarFun::kChainable);
 
   // (> Int Int Bool :chainable)
   const SmtId* gt_id = mIdMgr->make_id(ShString(">"));
-  assert_cond( gt_id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( gt_id != NULL );
   name_mgr().reg_fun(gt_id, i2_list, bool_sort, SmtVarFun::kChainable);
 }
 
@@ -702,7 +702,7 @@ SmtMgr::make_list_term(const vector<const SmtTerm*>& term_list)
 SmtSortMgr&
 SmtMgr::sort_mgr()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mSortMgr;
 }
 
@@ -710,7 +710,7 @@ SmtMgr::sort_mgr()
 SmtNameMgr&
 SmtMgr::name_mgr()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mNameMgr;
 }
 
@@ -718,7 +718,7 @@ SmtMgr::name_mgr()
 Alloc&
 SmtMgr::alloc()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mAlloc;
 }
 
@@ -726,7 +726,7 @@ SmtMgr::alloc()
 vector<const SmtTerm*>&
 SmtMgr::assertion_list()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mTermList;
 }
 

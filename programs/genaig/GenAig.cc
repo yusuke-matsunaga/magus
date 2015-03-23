@@ -265,7 +265,7 @@ GenAig::npn_expand(ymuint32 fv,
   if ( mNi == 3 ) {
     unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(fv);
-    assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
+    ASSERT_COND( p != mNpnHash.end() );
     const vector<FuncXform>& xf_list = p->second;
     for (vector<FuncXform>::const_iterator q = xf_list.begin();
 	 q != xf_list.end(); ++ q) {
@@ -278,7 +278,7 @@ GenAig::npn_expand(ymuint32 fv,
   else {
     unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(fv);
-    assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
+    ASSERT_COND( p != mNpnHash.end() );
     const vector<FuncXform>& xf_list = p->second;
     for (vector<FuncXform>::const_iterator q = xf_list.begin();
 	 q != xf_list.end(); ++ q) {
@@ -438,7 +438,7 @@ GenAig::add_cand(Aig aig,
   AigPat aigpat(aig, func, level);
 #if 0
   bool stat = sanity_check(aigpat);
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 #endif
   while ( mCandListArray.size() <= level ) {
     mCandListArray.push_back(vector<AigPat>());
@@ -513,7 +513,7 @@ aig_to_func(Aig aig)
     case 1: func = 0xcccc; break;
     case 2: func = 0xf0f0; break;
     case 3: func = 0xff00; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
   }
   else if ( aig.is_and() ) {
@@ -522,7 +522,7 @@ aig_to_func(Aig aig)
     func = func0 & func1;
   }
   else if ( aig.is_const() ) {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( aig.inv() ) {
     func = ~func;
@@ -741,7 +741,7 @@ GenAig::xf3_sub(Aig aig,
     return ans;
   }
   cout << "Error : aig is constant." << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return Aig();
 }
 
@@ -785,7 +785,7 @@ GenAig::xf4_sub(Aig aig,
     return ans;
   }
   cout << "Error : aig is constant." << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return Aig();
 }
 

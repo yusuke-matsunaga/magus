@@ -94,7 +94,7 @@ Parser::new_Udp1995(const FileRegion& file_region,
       }
 
       // これは YACC の文法が正しくかけていれば成り立つはず．
-      assert_cond(io->item_num() == 1, __FILE__, __LINE__);
+      ASSERT_COND(io->item_num() == 1 );
 
       out_item = io->item(0);
 
@@ -186,10 +186,10 @@ Parser::new_Udp1995(const FileRegion& file_region,
     const PtDeclHead* reghead = decl_array[0];
     if ( reghead ) {
       is_seq = true;
-      assert_cond(reghead->type() == kPtDecl_Reg, __FILE__, __LINE__);
-      assert_cond(reghead->item_num() == 1, __FILE__, __LINE__);
+      ASSERT_COND(reghead->type() == kPtDecl_Reg );
+      ASSERT_COND(reghead->item_num() == 1 );
       const PtDeclItem* regitem = reghead->item(0);
-      assert_cond(regitem, __FILE__, __LINE__);
+      ASSERT_COND(regitem );
       if ( strcmp(regitem->name(), out_item->name()) != 0 ) {
 	// output と名前が違う
 	ostringstream buf;
@@ -236,10 +236,10 @@ Parser::new_Udp2001(const FileRegion& file_region,
 
   // YACC の文法が正しく書かれていれば最初のヘッダが出力で
   // 要素数が1となっているはず．
-  assert_cond(iohead_array.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(iohead_array.size() > 0 );
   const PtIOHead* out_head = iohead_array[0];
-  assert_cond(out_head->type() == kPtIO_Output, __FILE__, __LINE__);
-  assert_cond(out_head->item_num() == 1, __FILE__, __LINE__);
+  ASSERT_COND(out_head->type() == kPtIO_Output );
+  ASSERT_COND(out_head->item_num() == 1 );
   const PtIOItem* out_item = out_head->item(0);
 
   if ( out_head->aux_type() == kVpiAuxReg ) {

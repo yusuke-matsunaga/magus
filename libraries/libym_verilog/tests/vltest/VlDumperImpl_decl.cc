@@ -41,7 +41,7 @@ VlDumperImpl::put_iodecl(const char* label,
   case kVlInput:  nm = "Input"; break;
   case kVlOutput: nm = "Output"; break;
   case kVlInout:  nm = "Inout"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   VlDumpHeader x(this, label, nm);
 
@@ -524,7 +524,7 @@ VlDumperImpl::put_net_array(const char* label,
 			cosnt VlObj* obj)
 {
   VlDecl* net_array = dynamic_cast<const VlDecl*>(obj);
-  assert_cond( net_array , __FILE__, __LINE__);
+  ASSERT_COND( net_array  );
 
   VlDumpHeader x(this, label, "NetArray");
 
@@ -565,7 +565,7 @@ VlDumperImpl::put_reg(const char* label,
 		      const VlObj* obj)
 {
   VlDecl* reg = dynamic_cast<const VlDecl*>(obj);
-  assert_cond( reg , __FILE__, __LINE__);
+  ASSERT_COND( reg  );
 
   VlDumpHeader x(this, label, "Reg");
 
@@ -690,7 +690,7 @@ VlDumperImpl::put_reg_array(const char* label,
 			const VlObj* obj)
 {
   VlDecl* reg_array = dynamic_cast<const VlDecl*>(obj);
-  assert_cond( reg_array , __FILE__, __LINE__);
+  ASSERT_COND( reg_array  );
 
   VlDumpHeader x(this, label, "RegArray");
 
@@ -730,14 +730,14 @@ VlDumperImpl::put_variables(const char* label,
 			const VlObj* obj)
 {
   VlDecl* var = dynamic_cast<const VlDecl*>(obj);
-  assert_cond( var , __FILE__, __LINE__);
+  ASSERT_COND( var  );
 
   const char* nm = NULL;
   switch ( var->type() ) {
   case vpiIntegerVar: nm = "integer var"; break;
   case vpiTimeVar:    nm = "time var"; break;
   case vpiRealVar:    nm = "real var"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   VlDumpHeader x(this, label, nm);
 

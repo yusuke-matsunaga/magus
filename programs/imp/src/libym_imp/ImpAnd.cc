@@ -63,7 +63,7 @@ ImpAnd::val() const
     return kB3True;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return kB3X;
@@ -115,7 +115,7 @@ ImpAnd::cur_state_str() const
   case kSt01_0: return "01:0";
   case kSt11_1: return "11:1";
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return "";
@@ -225,7 +225,7 @@ ImpAnd::get_justification(ymuint pos)
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ImpDst(NULL, 0);
 }
 
@@ -266,7 +266,7 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -309,7 +309,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -352,7 +352,7 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -395,7 +395,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -435,7 +435,7 @@ ImpAnd::bwd_imp0(ImpMgr& mgr,
     return false;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -477,7 +477,7 @@ ImpAnd::bwd_imp1(ImpMgr& mgr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -518,7 +518,7 @@ ImpAnd::fwd0_imp0(ImpMgr& mgr)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -559,7 +559,7 @@ ImpAnd::fwd0_imp1(ImpMgr& mgr)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -600,7 +600,7 @@ ImpAnd::fwd1_imp0(ImpMgr& mgr)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -641,7 +641,7 @@ ImpAnd::fwd1_imp1(ImpMgr& mgr)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -679,7 +679,7 @@ ImpAnd::bwd_imp0(ImpMgr& mgr)
     return false;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -719,7 +719,7 @@ ImpAnd::bwd_imp1(ImpMgr& mgr)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -772,13 +772,13 @@ ImpAnd::prop_const(ImpMgr& mgr,
       }
     }
     else {
-      assert_cond( val == 1, __FILE__, __LINE__);
+      ASSERT_COND( val == 1 );
     }
     break;
 
   case kSt1X_X:
     if ( ipos == 0 ) {
-      assert_cond( val == 1, __FILE__, __LINE__);
+      ASSERT_COND( val == 1 );
     }
     else {
       if ( val == 0 ) {
@@ -818,13 +818,13 @@ ImpAnd::prop_const(ImpMgr& mgr,
       // どうでもいい
     }
     else {
-      assert_cond( val == 0, __FILE__, __LINE__);
+      ASSERT_COND( val == 0 );
     }
     break;
 
   case kSt0X_0:
     if ( ipos == 0 ) {
-      assert_cond( val == 0, __FILE__, __LINE__);
+      ASSERT_COND( val == 0 );
     }
     else {
       // どうでもいい
@@ -832,33 +832,33 @@ ImpAnd::prop_const(ImpMgr& mgr,
     break;
 
   case kSt00_0:
-    assert_cond( val == 0, __FILE__, __LINE__);
+    ASSERT_COND( val == 0 );
     break;
 
   case kSt01_0:
     if ( ipos == 0 ) {
-      assert_cond( val == 0, __FILE__, __LINE__);
+      ASSERT_COND( val == 0 );
     }
     else {
-      assert_cond( val == 1, __FILE__, __LINE__);
+      ASSERT_COND( val == 1 );
     }
     break;
 
   case kSt10_0:
     if ( ipos == 0 ) {
-      assert_cond( val == 1, __FILE__, __LINE__);
+      ASSERT_COND( val == 1 );
     }
     else {
-      assert_cond( val == 0, __FILE__, __LINE__);
+      ASSERT_COND( val == 0 );
     }
     break;
 
   case kSt11_1:
-    assert_cond( val == 1, __FILE__, __LINE__);
+    ASSERT_COND( val == 1 );
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 }

@@ -228,7 +228,7 @@ EiPrimary::lhs_elem_num() const
 const VlExpr*
 EiPrimary::lhs_elem(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return this;
 }
 
@@ -321,7 +321,7 @@ EiDeclPrimary::lhs_elem_num() const
 const VlExpr*
 EiDeclPrimary::lhs_elem(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return this;
 }
 
@@ -517,7 +517,7 @@ EiArrayElemPrimary::lhs_elem_num() const
 const VlExpr*
 EiArrayElemPrimary::lhs_elem(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return this;
 }
 
@@ -634,7 +634,7 @@ EiConstArrayElemPrimary::lhs_elem_num() const
 const VlExpr*
 EiConstArrayElemPrimary::lhs_elem(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return this;
 }
 

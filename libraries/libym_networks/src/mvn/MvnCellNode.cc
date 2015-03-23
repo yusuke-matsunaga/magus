@@ -131,10 +131,10 @@ MvnMgr::new_cell(MvnModule* module,
     }
     else if ( pin->is_inout() ) {
       cout << cell->name() << " has inout pins." << endl;
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 

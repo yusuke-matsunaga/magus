@@ -27,7 +27,7 @@ SnGate::SnGate(ymuint32 id,
   ymuint max_level = 0;
   for (ymuint i = 0; i < mNfi; ++ i) {
     SimNode* input = inputs[i];
-    assert_cond(input, __FILE__, __LINE__);
+    ASSERT_COND(input );
     mFanins[i] = input;
     ymuint level = input->level() + 1;
     if ( max_level < level ) {
@@ -68,8 +68,8 @@ SnGate1::SnGate1(ymuint32 id,
 		 const vector<SimNode*>& inputs) :
   SimNode(id)
 {
-  assert_cond(inputs.size() == 1, __FILE__, __LINE__);
-  assert_cond(inputs[0], __FILE__, __LINE__);
+  ASSERT_COND(inputs.size() == 1 );
+  ASSERT_COND(inputs[0] );
   mFanin = inputs[0];
   set_level(mFanin->level() + 1);
 }
@@ -104,9 +104,9 @@ SnGate2::SnGate2(ymuint32 id,
 		 const vector<SimNode*>& inputs) :
   SimNode(id)
 {
-  assert_cond(inputs.size() == 2, __FILE__, __LINE__);
-  assert_cond(inputs[0], __FILE__, __LINE__);
-  assert_cond(inputs[1], __FILE__, __LINE__);
+  ASSERT_COND(inputs.size() == 2 );
+  ASSERT_COND(inputs[0] );
+  ASSERT_COND(inputs[1] );
   mFanins[0] = inputs[0];
   mFanins[1] = inputs[1];
   ymuint level = mFanins[0]->level();
@@ -146,10 +146,10 @@ SnGate3::SnGate3(ymuint32 id,
 		 const vector<SimNode*>& inputs) :
   SimNode(id)
 {
-  assert_cond(inputs.size() == 3, __FILE__, __LINE__);
-  assert_cond(inputs[0], __FILE__, __LINE__);
-  assert_cond(inputs[1], __FILE__, __LINE__);
-  assert_cond(inputs[2], __FILE__, __LINE__);
+  ASSERT_COND(inputs.size() == 3 );
+  ASSERT_COND(inputs[0] );
+  ASSERT_COND(inputs[1] );
+  ASSERT_COND(inputs[2] );
   mFanins[0] = inputs[0];
   mFanins[1] = inputs[1];
   mFanins[2] = inputs[2];
@@ -193,11 +193,11 @@ SnGate4::SnGate4(ymuint32 id,
 		 const vector<SimNode*>& inputs) :
   SimNode(id)
 {
-  assert_cond(inputs.size() == 4, __FILE__, __LINE__);
-  assert_cond(inputs[0], __FILE__, __LINE__);
-  assert_cond(inputs[1], __FILE__, __LINE__);
-  assert_cond(inputs[2], __FILE__, __LINE__);
-  assert_cond(inputs[3], __FILE__, __LINE__);
+  ASSERT_COND(inputs.size() == 4 );
+  ASSERT_COND(inputs[0] );
+  ASSERT_COND(inputs[1] );
+  ASSERT_COND(inputs[2] );
+  ASSERT_COND(inputs[3] );
   mFanins[0] = inputs[0];
   mFanins[1] = inputs[1];
   mFanins[2] = inputs[2];

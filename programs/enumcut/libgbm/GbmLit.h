@@ -236,7 +236,7 @@ inline
 VarId
 GbmLit::var_id() const
 {
-  assert_cond( is_lit(), __FILE__, __LINE__);
+  ASSERT_COND( is_lit() );
   return VarId((mVal / 2) - 1);
 }
 

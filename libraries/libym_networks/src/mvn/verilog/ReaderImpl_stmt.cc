@@ -158,7 +158,7 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   ymuint ne = caseitem->expr_num();
   if ( ne == 0 ) {
     // default caseitem
-    assert_cond( pos == n - 1, __FILE__, __LINE__);
+    ASSERT_COND( pos == n - 1 );
 
     return gen_stmt(module, caseitem->body_stmt(), env, merge);
   }
@@ -214,7 +214,7 @@ ReaderImpl::gen_caseitem(MvnModule* module,
       mMvnMgr->connect(cond_list[i], 0, all_cond, i);
     }
   }
-  assert_cond( all_cond != NULL, __FILE__, __LINE__);
+  ASSERT_COND( all_cond != NULL );
 
   ProcEnv then_env(env);
   gen_stmt(module, caseitem->body_stmt(), then_env, merge);
@@ -257,14 +257,13 @@ ReaderImpl::gen_assign(MvnModule* module,
 	old_dst = env.get_info(lhs_declarray, lhs_offset);
       }
       else {
-	assert_cond( lhs1->declarray_dimension() == lhs_declarray->dimension(),
-		     __FILE__, __LINE__ );
+	ASSERT_COND( lhs1->declarray_dimension() == lhs_declarray->dimension() );
 	// lhs_offset は lhs->declarray_index() から計算される．
 #warning "TODO: 配列の可変インデックス時の処理"
       }
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
 
     MvnNode* dst_node = NULL;
@@ -386,7 +385,7 @@ ReaderImpl::gen_assign(MvnModule* module,
       }
 #endif
     }
-    assert_cond( dst_node, __FILE__, __LINE__);
+    ASSERT_COND( dst_node );
     if ( lhs_decl ) {
       env.add(lhs_decl, dst_node, stmt->is_blocking());
     }

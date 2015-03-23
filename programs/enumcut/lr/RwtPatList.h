@@ -107,7 +107,7 @@ inline
 const RwtPat&
 RwtPatList::pat(ymuint pos) const
 {
-  assert_cond( pos < mPatNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mPatNum );
   return mPatList[pos];
 }
 

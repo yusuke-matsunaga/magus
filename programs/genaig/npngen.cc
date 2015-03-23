@@ -15,7 +15,7 @@ BEGIN_NAMESPACE_YM
 void
 npngen(ymuint ni)
 {
-  assert_cond( ni == 3 || ni == 4, __FILE__, __LINE__);
+  ASSERT_COND( ni == 3 || ni == 4 );
 
 
   const char* comma0 = "";

@@ -163,7 +163,7 @@ SupOp::scc_step(BddEdge e,
     }
     return;
   }
-  assert_cond( !e.is_zero(), __FILE__, __LINE__);
+  ASSERT_COND( !e.is_zero() );
 
   if ( !e.mark() ) {
     e.set_mark();

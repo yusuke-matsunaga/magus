@@ -219,7 +219,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 
 	if ( node0->is_const() ) {
 	  // ファンイン0が定数だった．
-	  assert_cond( !node1->is_const(), __FILE__, __LINE__);
+	  ASSERT_COND( !node1->is_const() );
 	  // ファンイン1の条件をそのままコピー
 	  dst0_list.merge(imp_lists[idx1_0]);
 	  dst0_list.set_change1();
@@ -228,7 +228,7 @@ NaImp::learning(ImpMgr& imp_mgr,
 	}
 	else if ( node1->is_const() ) {
 	  // ファンイン1が定数だった．
-	  // assert_cond( !imp_mgr.is_const(id0), __FILE__, __LINE__); 不要
+	  // ASSERT_COND( !imp_mgr.is_const(id0) ); 不要
 	  // ファンイン0の条件をそのままコピー
 	  dst0_list.merge(imp_lists[idx0_0]);
 	  dst0_list.set_change1();

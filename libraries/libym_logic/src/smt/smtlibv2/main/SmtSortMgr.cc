@@ -211,7 +211,7 @@ SmtSortMgr::make_sort(const SmtId* name_id,
   if ( sort_tmpl != NULL ) {
     // テンプレートから実際の型を作る．
     ymuint n = sort_tmpl->elem_num();
-    assert_cond( n > 0, __FILE__, __LINE__);
+    ASSERT_COND( n > 0 );
 
     vector<const SmtSort*> elem_list(n);
     for (ymuint i = 0; i < n; ++ i) {
@@ -256,7 +256,7 @@ SmtSortMgr::replace_param(const SmtSort* templ,
     if ( templ->is_param() ) {
       // パラメータ型
       ymuint pid = templ->param_id();
-      assert_cond( pid < param_list.size(), __FILE__, __LINE__);
+      ASSERT_COND( pid < param_list.size() );
       return param_list[pid];
     }
     else {

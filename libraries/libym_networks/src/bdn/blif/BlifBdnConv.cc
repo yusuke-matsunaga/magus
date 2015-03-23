@@ -151,7 +151,7 @@ BlifBdnConv::make_node(const BlifNetwork& blif_network,
   const BlifNode* blif_node = blif_network.node(node_id);
   BdnNodeHandle node_handle;
   if ( !get_node(blif_node, node_handle) ) {
-    assert_cond( blif_node->type() == BlifNode::kLogic, __FILE__, __LINE__);
+    ASSERT_COND( blif_node->type() == BlifNode::kLogic );
     ymuint ni = blif_node->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -175,7 +175,7 @@ BlifBdnConv::make_node(const BlifNetwork& blif_network,
 	  }
 	}
 	ymuint n = and_leaves.size();
-	assert_cond( n > 0, __FILE__, __LINE__);
+	ASSERT_COND( n > 0 );
 	or_leaves.push_back(mNetwork->new_and(and_leaves));
       }
       ymuint n = or_leaves.size();
@@ -202,7 +202,7 @@ BlifBdnConv::make_node(const BlifNetwork& blif_network,
 	  }
 	}
 	ymuint n = or_leaves.size();
-	assert_cond( n > 0, __FILE__, __LINE__);
+	ASSERT_COND( n > 0 );
 	and_leaves.push_back(mNetwork->new_or(or_leaves));
       }
       ymuint n = and_leaves.size();

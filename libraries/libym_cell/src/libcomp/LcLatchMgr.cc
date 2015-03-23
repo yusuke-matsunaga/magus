@@ -102,7 +102,7 @@ LcLatchMgr::init()
 ymuint
 LcLatchMgr::latch_class(ymuint id) const
 {
-  assert_cond( id < 4, __FILE__, __LINE__);
+  ASSERT_COND( id < 4 );
   return mLatchClass[id];
 }
 

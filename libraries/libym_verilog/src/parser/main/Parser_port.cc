@@ -143,7 +143,7 @@ Parser::new_PortArray(PtIOHeadArray iohead_array)
       case kPtIO_Input:  dir = kVlInput; break;
       case kPtIO_Output: dir = kVlOutput; break;
       case kPtIO_Inout:  dir = kVlInout; break;
-      default: assert_not_reached(__FILE__, __LINE__);
+      default: ASSERT_NOT_REACHED;
       }
       port->_set_portref_dir(0, dir);
       array[n] = port;

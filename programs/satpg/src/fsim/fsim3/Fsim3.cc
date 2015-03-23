@@ -103,7 +103,7 @@ Fsim3::set_network(const TpgNetwork& network)
       for (ymuint i = 0; i < ni; ++ i) {
 	const TpgNode* itpgnode = tpgnode->fanin(i);
 	SimNode* inode = find_simnode(itpgnode);
-	assert_cond(inode, __FILE__, __LINE__);
+	ASSERT_COND(inode );
 	inputs[i] = inode;
       }
 

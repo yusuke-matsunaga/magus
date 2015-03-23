@@ -177,7 +177,7 @@ BdnDumper::operator()(ostream& s,
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
-    assert_cond( node->is_input(), __FILE__, __LINE__);
+    ASSERT_COND( node->is_input() );
     s << node_idstr(node) << ": ";
     switch ( node->input_type() ) {
     case BdnNode::kPRIMARY_INPUT:
@@ -196,7 +196,7 @@ BdnDumper::operator()(ostream& s,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     s << endl;
@@ -206,7 +206,7 @@ BdnDumper::operator()(ostream& s,
   for (BdnNodeList::const_iterator p = lnode_list.begin();
        p != lnode_list.end(); ++ p) {
     const BdnNode* node = *p;
-    assert_cond( node->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND( node->is_logic() );
     s << node_idstr(node);
     s << " :  = LOGIC( ";
     const char* f0 = node->fanin0_inv() ? "~" : "";
@@ -222,7 +222,7 @@ BdnDumper::operator()(ostream& s,
   for (BdnNodeList::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     const BdnNode* node = *p;
-    assert_cond( node->is_output(), __FILE__, __LINE__);
+    ASSERT_COND( node->is_output() );
     s << node_idstr(node) << ": ";
     switch ( node->output_type() ) {
     case BdnNode::kPRIMARY_OUTPUT:
@@ -265,7 +265,7 @@ BdnDumper::operator()(ostream& s,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     s << " = ";

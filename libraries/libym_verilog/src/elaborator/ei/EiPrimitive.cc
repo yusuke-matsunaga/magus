@@ -202,7 +202,7 @@ EiPrimHead::def_name() const
   case kVpiCellPrim:     nm = "cell"; break;
   case kVpiSeqPrim:
   case kVpiCombPrim:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return nm;
@@ -582,7 +582,7 @@ EiPrimArray::elem_by_index(int index) const
   }
   else {
     // 範囲外
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return NULL;
   }
 }
@@ -604,7 +604,7 @@ EiPrimArray::_primitive_by_index(int index) const
   }
   else {
     // 範囲外
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return NULL;
   }
 }
@@ -744,7 +744,7 @@ EiPrimitive::init_port(EiPrimTerm* term_array)
     ymuint input_num;
     int stat = get_port_size(prim_type(), port_num(),
 			     output_num, inout_num, input_num);
-    assert_cond(stat == 0, __FILE__, __LINE__);
+    ASSERT_COND(stat == 0 );
 
     ymuint index = 0;
     for (ymuint i = 0; i < output_num; ++ i, ++ index) {
@@ -772,7 +772,7 @@ EiPrimitive::init_port(EiPrimTerm* term_array)
 	dir = kVlInout;
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
       mPortArray[i].set(this, i, dir);
     }

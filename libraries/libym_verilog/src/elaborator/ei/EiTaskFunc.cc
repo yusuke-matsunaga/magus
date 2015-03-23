@@ -41,7 +41,7 @@ EiFactory::new_Function(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
-  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+  ASSERT_COND( left != NULL && right != NULL );
 
   // IO数を数え配列を初期化する．
   ymuint io_num = pt_item->ioitem_num();
@@ -299,14 +299,14 @@ EiTask::bit_size() const
 void
 EiTask::set_ovar(ElbDecl* ovar)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief constant function の時に true を返す．
 bool
 EiTask::is_constant_function() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -363,7 +363,7 @@ EiFunction::func_type() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiIntFunc;
 }
 
@@ -434,7 +434,7 @@ EiFunction::bit_size() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 

@@ -136,7 +136,7 @@ LsimNaive2::eval(const vector<ymuint64>& iv,
 		 vector<ymuint64>& ov)
 {
   ymuint ni = mInputList.size();
-  assert_cond( ni == iv.size(), __FILE__, __LINE__);
+  ASSERT_COND( ni == iv.size() );
   for (ymuint i = 0; i < ni; ++ i) {
     mInputList[i].mVal = iv[i];
   }

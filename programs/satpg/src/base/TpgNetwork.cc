@@ -57,7 +57,7 @@ extra_node_count(const Expr& expr,
   for (ymuint i = 0; i < ni; ++ i) {
     ymuint p_num = expr.litnum(VarId(i), false);
     ymuint n_num = expr.litnum(VarId(i), true);
-    assert_cond( p_num > 0 || n_num > 0, __FILE__, __LINE__);
+    ASSERT_COND( p_num > 0 || n_num > 0 );
     if ( n_num == 0 ) {
       if ( p_num > 1 ) {
 	n = 1;
@@ -145,7 +145,7 @@ ccv_sub(const Expr& expr,
     return val;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kB3X;
 }
 
@@ -198,7 +198,7 @@ c_val(tTgGateType type,
 
   case kTgGateCplx:
     // これは使わない．
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return kB3X;
 
   default:
@@ -501,7 +501,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     mOutputArray[i] = node;
   }
 
-  assert_cond( mNodeNum == nn, __FILE__, __LINE__);
+  ASSERT_COND( mNodeNum == nn );
 
 
   //////////////////////////////////////////////////////////////////////
@@ -529,7 +529,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     make_faults(tgnode, en_hash);
   }
 
-  assert_cond( mFaultNum == nfault, __FILE__, __LINE__);
+  ASSERT_COND( mFaultNum == nfault );
 
   // 代表故障のリストを作る．
   ymuint nrep = 0;
@@ -613,7 +613,7 @@ TpgNetwork::activate_po(ymuint po_pos)
 void
 TpgNetwork::activate_po(TpgNode* po)
 {
-  assert_cond( po->is_output(), __FILE__, __LINE__);
+  ASSERT_COND( po->is_output() );
 
   // po から到達可能なノードにマークをつける．
   tfimark(po);
@@ -746,7 +746,7 @@ TpgNetwork::activate_sub()
     TpgNode* node = mActNodeArray[mActNodeNum - i - 1];
     ymuint nfo = node->active_fanout_num();
     if ( nfo == 0 ) {
-      assert_cond( node->is_output(), __FILE__, __LINE__);
+      ASSERT_COND( node->is_output() );
       node->mImmDom = NULL;
     }
     else {
@@ -782,7 +782,7 @@ TpgNode*
 TpgNetwork::node(ymuint pos)
 {
   // アドレス計算のために TpgNode の定義が必要なのでここに置く．
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mNodeNum );
   return &mNodeArray[pos];
 }
 
@@ -791,7 +791,7 @@ const TpgNode*
 TpgNetwork::node(ymuint pos) const
 {
   // アドレス計算のために TpgNode の定義が必要なのでここに置く．
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mNodeNum );
   return &mNodeArray[pos];
 }
 
@@ -950,7 +950,7 @@ TpgNetwork::make_cplx_node(const Expr& expr,
     gate_type = kTgGateXor;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   ymuint nc = expr.child_num();
@@ -1050,7 +1050,7 @@ TpgNetwork::init_node(TpgNode* node,
 TpgNode*
 TpgNetwork::new_node()
 {
-  assert_cond( mMaxNodeId < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( mMaxNodeId < mNodeNum );
   TpgNode* node = &mNodeArray[mMaxNodeId];
   node->mId = mMaxNodeId;
   ++ mMaxNodeId;
@@ -1067,7 +1067,7 @@ TpgNetwork::connect(TpgNode* src,
 		    TpgNode* dst,
 		    ymuint ipos)
 {
-  assert_cond( src->mFanoutNum < src->mFanoutsSize, __FILE__, __LINE__);
+  ASSERT_COND( src->mFanoutNum < src->mFanoutsSize );
   dst->mFanins[ipos] = src;
   src->mFanouts[src->mFanoutNum] = dst;
   ++ src->mFanoutNum;
@@ -1119,7 +1119,7 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 	break;
       }
     }
-    assert_cond( ipos < ni, __FILE__, __LINE__);
+    ASSERT_COND( ipos < ni );
     TpgNode* onode = mNodeMap[tgonode->gid()];
     TpgNode* inode = onode->input_map(ipos);
     ymuint tpg_ipos = onode->ipos_map(ipos);
@@ -1206,7 +1206,7 @@ TpgNetwork::make_faults(const TgNode* tgnode,
       }
     }
   }
-  assert_cond( nf == pos, __FILE__, __LINE__);
+  ASSERT_COND( nf == pos );
 }
 
 // @brief 出力の故障を作る．

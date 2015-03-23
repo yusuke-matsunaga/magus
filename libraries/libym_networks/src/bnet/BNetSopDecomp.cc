@@ -56,8 +56,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
 			      const Expr& expr,
 			      BNode* root_node)
 {
-  assert_cond(!expr.is_zero() && !expr.is_one() && !expr.is_literal(),
-	      __FILE__, __LINE__);
+  ASSERT_COND( !expr.is_zero() && !expr.is_one() && !expr.is_literal() );
 
   if ( expr.is_and() ) {
     BNodeVector fanin_list;
@@ -66,7 +65,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
     ymuint ni = expr.child_num();
     for (ymuint i = 0; i < ni; i ++) {
       Expr opr1 = expr.child(i);
-      assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
+      ASSERT_COND(!opr1.is_zero() && !opr1.is_one() );
       if ( opr1.is_literal() ) {
 	VarId var = opr1.varid();
 	ymuint pos = var.val();
@@ -83,7 +82,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
     }
     // 根のノードにセットする．
     bool stat = mManip->change_logic(root_node, new_expr, fanin_list);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
   else if ( expr.is_or() ) {
     BNodeVector fanin_list;
@@ -92,7 +91,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
     ymuint ni = expr.child_num();
     for (ymuint i = 0; i < ni; i ++) {
       Expr opr1 = expr.child(i);
-      assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
+      ASSERT_COND(!opr1.is_zero() && !opr1.is_one() );
       if ( opr1.is_literal() ) {
 	VarId var = opr1.varid();
 	ymuint pos = var.val();
@@ -106,7 +105,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
 	ymuint ni1 = opr1.child_num();
 	for (ymuint j = 0; j < ni1; j ++) {
 	  Expr opr2 = opr1.child(j);
-	  assert_cond(!opr2.is_zero() && !opr2.is_one(), __FILE__, __LINE__);
+	  ASSERT_COND(!opr2.is_zero() && !opr2.is_one() );
 	  if ( opr2.is_literal() ) {
 	    VarId var= opr2.varid();
 	    ymuint pos= var.val();
@@ -135,7 +134,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
     }
     // 根のノードにセットする．
     bool stat = mManip->change_logic(root_node, new_expr, fanin_list);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
   else if ( expr.is_xor() ) {
     // まず2入力XORに分解してそれを SOP 形式で表す．
@@ -145,7 +144,7 @@ BNetSopDecomp::sop_decomp_sub(BNode* orig_node,
     ymuint ni = expr.child_num();
     for (ymuint i = 0; i < ni; i ++) {
       Expr opr1 = expr.child(i);
-      assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
+      ASSERT_COND(!opr1.is_zero() && !opr1.is_one() );
       if ( opr1.is_literal() ) {
 	VarId var = opr1.varid();
 	ymuint pos = var.val();
@@ -176,7 +175,7 @@ BNetSopDecomp::build_xorsop_tree(ymuint b,
 				 bool inv,
 				 BNode* root_node)
 {
-  assert_cond(ni > 1, __FILE__, __LINE__);
+  ASSERT_COND(ni > 1 );
 
   vector<BNode*> fanins(2);
 
@@ -215,7 +214,7 @@ BNetSopDecomp::build_xorsop_tree(ymuint b,
     root_node = mManip->new_logic();
   }
   bool stat = mManip->change_logic(root_node, expr, fanins);
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 
   return root_node;
 }

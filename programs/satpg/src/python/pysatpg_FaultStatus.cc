@@ -116,7 +116,7 @@ FaultStatus_repr(FaultStatusObject* self)
   case kFsUntestable: result = Py_kFsUntestableString; break;
   case kFsAborted:    result = Py_kFsAbortedString; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -235,7 +235,7 @@ PyFaultStatus_FromFaultStatus(FaultStatus val)
   case kFsUntestable: result = Py_kFsUntestable; break;
   case kFsAborted:    result = Py_kFsAborted; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

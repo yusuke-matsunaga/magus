@@ -42,7 +42,7 @@ BNetBlifHandler::set_network(BNetwork* network)
 bool
 BNetBlifHandler::init()
 {
-  assert_cond( mManip == NULL, __FILE__, __LINE__);
+  ASSERT_COND( mManip == NULL );
 
   mManip = new BNetManip(mNetwork);
   mNetwork->clear();
@@ -225,7 +225,7 @@ BNetBlifHandler::end(const FileRegion& loc)
        p != mNetwork->outputs_end(); ++ p) {
     BNode* onode = *p;
     BNode* node = mNetwork->find_node(onode->name());
-    assert_cond(node, __FILE__, __LINE__);
+    ASSERT_COND(node );
     mManip->change_output(onode, node);
   }
   return true;

@@ -87,7 +87,7 @@ init_table()
 LogExpr
 optff3(const TvFunc& func)
 {
-  assert_cond(func.ni() == 3, __FILE__, __LINE__);
+  ASSERT_COND(func.ni() == 3 );
 
   NpnMgr mgr;
   NpnMap cmap;

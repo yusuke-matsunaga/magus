@@ -65,7 +65,7 @@ END_NONAMESPACE
 TgNode*
 NameHash::find_node(const char* name)
 {
-  assert_cond(name, __FILE__, __LINE__);
+  ASSERT_COND(name );
   size_t pos = hash_func(name) % mTableSize;
   for (StrIdCell* cell = mHashTable[pos]; cell; cell = cell->mLink) {
     if ( strcmp(cell->mStr, name) == 0 ) {

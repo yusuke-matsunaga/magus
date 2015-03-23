@@ -114,7 +114,7 @@ Xmask::clear_all()
 const Xmask&
 Xmask::operator|=(const Xmask& right)
 {
-  assert_cond( bit_width() == right.bit_width(), __FILE__, __LINE__);
+  ASSERT_COND( bit_width() == right.bit_width() );
   if ( right.has_x() ) {
     alloc();
     ymuint32* dst_end = mBits + blksize();

@@ -226,7 +226,7 @@ operator<<(ostream& s,
   case ERROR :     type_str = "error"; break;
   case END:        type_str = "end-of-file"; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   s << type_str;
   return s;

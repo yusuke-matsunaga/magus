@@ -58,7 +58,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
 		     const PtStmt* pt_stmt,
 		     bool cf)
 {
-  assert_cond(pt_stmt != NULL, __FILE__, __LINE__);
+  ASSERT_COND(pt_stmt != NULL );
 
   switch ( pt_stmt->type() ) {
   case kPtDisableStmt:
@@ -131,7 +131,7 @@ StmtGen::phase1_stmt(const VlNamedObj* parent,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -146,7 +146,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
 			  const ElbEnv& env,
 			  const PtStmt* pt_stmt)
 {
-  assert_cond(pt_stmt != NULL, __FILE__, __LINE__);
+  ASSERT_COND(pt_stmt != NULL );
 
   ElbStmt* stmt = NULL;
   switch ( pt_stmt->type() ) {
@@ -182,7 +182,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     break;
 
   case kPtNbAssignStmt:
-    assert_cond(!env.inside_function(), __FILE__, __LINE__);
+    ASSERT_COND(!env.inside_function() );
     stmt = instantiate_assign(parent, process, env,
 			      pt_stmt, false);
     break;
@@ -308,7 +308,7 @@ StmtGen::instantiate_stmt(const VlNamedObj* parent,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( stmt ) {
 #if 0
@@ -429,7 +429,7 @@ StmtGen::instantiate_enable(const VlNamedObj* parent,
 		    buf.str());
   }
   ElbTaskFunc* task = cell->taskfunc();
-  assert_cond( task != NULL, __FILE__, __LINE__);
+  ASSERT_COND( task != NULL );
 
   // 引数を生成する．
   ElbExpr** arg_list = factory().new_ExprList(pt_stmt->arg_num());

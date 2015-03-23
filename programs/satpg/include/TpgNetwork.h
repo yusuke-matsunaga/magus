@@ -456,7 +456,7 @@ inline
 TpgNode*
 TpgNetwork::input(ymuint pos) const
 {
-  assert_cond( pos < input_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num2() );
   return mInputArray[pos];
 }
 
@@ -482,7 +482,7 @@ inline
 TpgNode*
 TpgNetwork::output(ymuint pos) const
 {
-  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num2() );
   return mOutputArray[pos];
 }
 
@@ -491,7 +491,7 @@ inline
 TpgNode*
 TpgNetwork::output2(ymuint pos) const
 {
-  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num2() );
   return mOutputArray2[pos];
 }
 
@@ -525,7 +525,7 @@ inline
 TpgNode*
 TpgNetwork::active_node(ymuint pos)
 {
-  assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActNodeNum );
   return mActNodeArray[pos];
 }
 
@@ -535,7 +535,7 @@ inline
 const TpgNode*
 TpgNetwork::active_node(ymuint pos) const
 {
-  assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActNodeNum );
   return mActNodeArray[pos];
 }
 

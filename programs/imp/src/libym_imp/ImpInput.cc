@@ -52,7 +52,7 @@ ImpInput::val() const
 
   default:
     cout << "mState = " << mState << endl;
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return kB3X;
@@ -62,7 +62,7 @@ ImpInput::val() const
 void
 ImpInput::calc_bitval()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 状態を初期化する．
@@ -89,7 +89,7 @@ ImpInput::cur_state_str() const
   case kSt1: return "1";
   default:
     cout << "mState = " << mState << endl;
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return "";
@@ -123,7 +123,7 @@ ImpInput::justification_num()
 ImpDst
 ImpInput::get_justification(ymuint pos)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ImpDst(NULL, 0);
 }
 
@@ -134,7 +134,7 @@ bool
 ImpInput::fwd0_imp0(ImpMgr& mgr,
 		    ImpRec& rec)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -145,7 +145,7 @@ bool
 ImpInput::fwd0_imp1(ImpMgr& mgr,
 		    ImpRec& rec)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -156,7 +156,7 @@ bool
 ImpInput::fwd1_imp0(ImpMgr& mgr,
 		    ImpRec& rec)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -167,7 +167,7 @@ bool
 ImpInput::fwd1_imp1(ImpMgr& mgr,
 		    ImpRec& rec)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -191,7 +191,7 @@ ImpInput::bwd_imp0(ImpMgr& mgr,
     return false;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -219,7 +219,7 @@ ImpInput::bwd_imp1(ImpMgr& mgr,
 
   default:
     cout << "mState = " << mState << endl;
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;
@@ -230,7 +230,7 @@ ImpInput::bwd_imp1(ImpMgr& mgr,
 bool
 ImpInput::fwd0_imp0(ImpMgr& mgr)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -239,7 +239,7 @@ ImpInput::fwd0_imp0(ImpMgr& mgr)
 bool
 ImpInput::fwd0_imp1(ImpMgr& mgr)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -248,7 +248,7 @@ ImpInput::fwd0_imp1(ImpMgr& mgr)
 bool
 ImpInput::fwd1_imp0(ImpMgr& mgr)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -257,7 +257,7 @@ ImpInput::fwd1_imp0(ImpMgr& mgr)
 bool
 ImpInput::fwd1_imp1(ImpMgr& mgr)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -279,7 +279,7 @@ ImpInput::bwd_imp0(ImpMgr& mgr)
     return false;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -305,7 +305,7 @@ ImpInput::bwd_imp1(ImpMgr& mgr)
 
   default:
     cout << "mState = " << mState << endl;
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;

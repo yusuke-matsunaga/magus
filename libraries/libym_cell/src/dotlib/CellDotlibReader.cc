@@ -76,7 +76,7 @@ dot2expr(const DotlibNode* node,
     if ( v == 1 ) {
       return Expr::make_one();
     }
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return Expr();
   }
   if ( node->is_string() ) {
@@ -108,11 +108,11 @@ dot2expr(const DotlibNode* node,
       case DotlibNode::kXor: return expr1 ^ expr2;
       default: break;
       }
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       return Expr();
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return Expr();
 }
 
@@ -310,7 +310,7 @@ gen_pin(CellLibrary* library,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 }
@@ -530,7 +530,7 @@ gen_timing(CellLibrary* library,
 	  break;
 
 	default:
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	  break;
 	}
       }
@@ -680,7 +680,7 @@ gen_library(const DotlibNode* dt_library)
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 
@@ -754,14 +754,14 @@ gen_library(const DotlibNode* dt_library)
 	  break;
 
 	default:
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	  break;
 	}
       }
       if ( error ) {
 	continue;
       }
-      assert_cond( pg_id == npg, __FILE__, __LINE__);
+      ASSERT_COND( pg_id == npg );
     }
     ymuint ni2 = ni + nio;
 
@@ -791,8 +791,8 @@ gen_library(const DotlibNode* dt_library)
 	  break;
 	}
       }
-      assert_cond( ipos == ni2, __FILE__, __LINE__);
-      assert_cond( itpos == nit, __FILE__, __LINE__);
+      ASSERT_COND( ipos == ni2 );
+      ASSERT_COND( itpos == nit );
     }
 
     // FF情報の読み出し
@@ -938,7 +938,7 @@ gen_library(const DotlibNode* dt_library)
       for (ymuint i = 0; i < nop; ++ i) {
 	ShString oname = pin_info.name(i);
 	const CellPin* opin = cell->pin((const char*)oname);
-	assert_cond( opin != NULL, __FILE__, __LINE__);
+	ASSERT_COND( opin != NULL );
 	ymuint oid = opin->output_id();
 	bool has_logic = cell->has_logic(oid);
 	TvFunc tv_function;
@@ -982,7 +982,7 @@ gen_library(const DotlibNode* dt_library)
 	}
       }
     }
-    assert_cond( timing_id == nt, __FILE__, __LINE__);
+    ASSERT_COND( timing_id == nt );
   }
 
   library->compile();

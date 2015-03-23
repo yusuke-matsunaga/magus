@@ -76,7 +76,7 @@ get_ipin_names(const MislibNode* expr_node,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -129,7 +129,7 @@ MislibParserImpl::read_file(const string& filename,
   const MislibNode* gate_list = mgr->gate_list();
   HashMap<ShString, const MislibNode*> cell_map;
   for (const MislibNode* gate = gate_list->top(); gate; gate = gate->next()) {
-    assert_cond( gate->type() == MislibNode::kGate, __FILE__, __LINE__);
+    ASSERT_COND( gate->type() == MislibNode::kGate );
     ShString name = gate->name()->str();
     const MislibNode* dummy_node;
     if ( cell_map.find(name, dummy_node) ) {

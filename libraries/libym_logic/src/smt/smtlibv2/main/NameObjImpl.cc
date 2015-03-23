@@ -45,7 +45,7 @@ NameObjImpl::is_var() const
 const SmtFun*
 NameObImpl::fun() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

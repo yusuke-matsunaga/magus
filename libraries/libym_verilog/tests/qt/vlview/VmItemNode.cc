@@ -632,7 +632,7 @@ functype2str(tVpiFuncType type)
   case kVpiTimeFunc:        return "vpiTimeFunc";
   case kVpiSizedFunc:       return "vpiSizedFunc";
   case kVpiSizedSignedFunc: return "vpiSizedSignedFunc";
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   return NULL;
 }
@@ -855,7 +855,7 @@ VmPrimitiveNode::data(int column,
       case kVpiGate:   nm = "vpiGate"; break;
       case kVpiSwitch: nm = "vpiSwitch"; break;
       case kVpiUdp:    nm = "vpiUdp"; break;
-      default: assert_not_reached(__FILE__, __LINE__);
+      default: ASSERT_NOT_REACHED;
       }
       return nm;
     }

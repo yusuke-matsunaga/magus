@@ -92,7 +92,7 @@ CellPatType_repr(CellPatTypeObject* self)
   case kCellPatInput: result = kCellPatInputString; break;
   case kCellPatAnd:   result = kCellPatAndString; break;
   case kCellPatXor:   result = kCellPatXorString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -224,7 +224,7 @@ PyCellPatType_FromCellPatType(tCellPatType val)
   case kCellPatInput: result = Py_kCellPatInput; break;
   case kCellPatAnd:   result = Py_kCellPatAnd; break;
   case kCellPatXor:   result = Py_kCellPatXor; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

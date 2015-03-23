@@ -158,7 +158,7 @@ GbmSolver::solve(const RcfNetwork& network,
 	cout << "Verify failed" << endl;
       }
     }
-    assert_cond( vstat, __FILE__, __LINE__);
+    ASSERT_COND( vstat );
   }
 
   return stat;
@@ -182,7 +182,7 @@ GbmSolver::verify(const RcfNetwork& network,
 
   ymuint npi = func.input_num();
   // これは network.input_num() と等しいはず
-  assert_cond( npi == network.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( npi == network.input_num() );
   for (ymuint i = 0; i < npi; ++ i) {
     const RcfNode* node = network.input_node(i);
     ymuint id = node->id();

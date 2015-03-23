@@ -144,7 +144,7 @@ make_lut2(Bdd bdd,
     for (ymuint b = 0U; b < 1024U; ++ b) {
       Bdd leaf = eval_bdd(bdd, base, p);
       unordered_map<Bdd, ymuint32>::const_iterator p = lutmap.find(leaf);
-      assert_cond( p != lutmap.end(), __FILE__, __LINE__);
+      ASSERT_COND( p != lutmap.end() );
     }
   }
   else {
@@ -221,7 +221,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
       bddmap[node->id()] = bdd;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
 #if 0
     cout << " = " << bddmap[node->id()].size();
@@ -264,7 +264,7 @@ LsimBdd3::set_network(const BdnMgr& bdn,
     put_bdd(bdd, idmap, bdd_array);
 
     unordered_map<Bdd, ymuint32>::iterator q = idmap.find(bdd);
-    assert_cond( q != idmap.end(), __FILE__, __LINE__);
+    ASSERT_COND( q != idmap.end() );
 
     output_id.push_back(q->second);
 

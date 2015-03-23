@@ -145,9 +145,9 @@ BddMgrModern::BddMgrModern(const string& name,
   // 変数テーブルの初期化
   mVarTableSize = VARTABLE_INIT_SIZE;
   mVarTable = alloc_vartable(mVarTableSize);
-  assert_cond(mVarTable, __FILE__, __LINE__);
+  ASSERT_COND(mVarTable );
   mVarHashTable = alloc_vartable(mVarTableSize);
-  assert_cond(mVarHashTable, __FILE__, __LINE__);
+  ASSERT_COND(mVarHashTable );
   mVarNum = 0;
   mMaxLevel = 0;
 
@@ -155,28 +155,28 @@ BddMgrModern::BddMgrModern(const string& name,
   mTblTop = NULL;
 
   mCmpTable = new CompTbl1(this, "compose_table");
-  assert_cond(mCmpTable, __FILE__, __LINE__);
+  ASSERT_COND(mCmpTable );
 
   mSmTable = new CompTbl1(this, "sm_table");
-  assert_cond(mSmTable, __FILE__, __LINE__);
+  ASSERT_COND(mSmTable );
   mAeTable = new CompTbl2(this, "ae_table");
-  assert_cond(mAeTable, __FILE__, __LINE__);
+  ASSERT_COND(mAeTable );
   mCubedivTable = new CompTbl1(this, "cubediv_table");
-  assert_cond(mCubedivTable, __FILE__, __LINE__);
+  ASSERT_COND(mCubedivTable );
 
   mMinsupTable = new CompTbl2(this, "minsup_table");
-  assert_cond(mMinsupTable, __FILE__, __LINE__);
+  ASSERT_COND(mMinsupTable );
   mIsopTable = new IsopTbl(this, "isop_table");
-  assert_cond(mIsopTable, __FILE__, __LINE__);
+  ASSERT_COND(mIsopTable );
   mPcTable = new IsopTbl(this, "pc_table");
-  assert_cond(mPcTable, __FILE__, __LINE__);
+  ASSERT_COND(mPcTable );
 
   mCsTable = new CompTbl2(this, "cs_table");
-  assert_cond(mCsTable, __FILE__, __LINE__);
+  ASSERT_COND(mCsTable );
   mCs1Table = new CompTbl3(this, "cs1_table");
-  assert_cond(mCs1Table, __FILE__, __LINE__);
+  ASSERT_COND(mCs1Table );
   mCs2Table = new CompTbl2(this, "cs2_table");
-  assert_cond(mCs2Table, __FILE__, __LINE__);
+  ASSERT_COND(mCs2Table );
 }
 
 // デストラクタ
@@ -212,7 +212,7 @@ BddMgrModern::~BddMgrModern()
   dealloc_vartable(mVarHashTable, mVarTableSize);
 
   // このマネージャに関わるメモリはすべて解放したはず．
-  assert_cond( mUsedMem == 0, __FILE__, __LINE__);
+  ASSERT_COND( mUsedMem == 0 );
 }
 
 // 変数を確保する．
@@ -257,7 +257,7 @@ BddMgrModern::alloc_var(VarId varid)
     mVarHashTable = new_hash;
     mVarTableSize = new_size;
   }
-  assert_cond(mVarTableSize > mVarNum, __FILE__, __LINE__);
+  ASSERT_COND(mVarTableSize > mVarNum );
   BmmVar* var = new BmmVar(this, varid);
   if ( var ) {
     reg_var(var);
@@ -714,7 +714,7 @@ BddMgrModern::clear_varmark()
 BmmVar*
 BddMgrModern::var_at(ymuint level) const
 {
-  assert_cond(level < mVarNum, __FILE__, __LINE__);
+  ASSERT_COND(level < mVarNum );
   return mVarTable[level];
 }
 

@@ -39,7 +39,7 @@ operator<<(ostream& s,
   case kCellDelayPiecewiseCmos: s << "piecewise_cmos"; break;
   case kCellDelayCmos2:         s << "cmos2"; break;
   case kCellDelayDcm:           s << "dcm"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   return s;
 }
@@ -56,7 +56,7 @@ operator<<(ostream& s,
   case kCellPosiUnate: s << "posi_unate"; break;
   case kCellNegaUnate: s << "nega_unate"; break;
   case kCellNonUnate:  s << "non_unate"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   return s;
 }
@@ -112,7 +112,7 @@ operator<<(ostream& s,
   case kCellTimingNochangeLowHigh:       s << "nochange_low_high"; break;
   case kCellTimingNochangeLowLow:        s << "nochange_low_low"; break;
 
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   return s;
 }
@@ -175,7 +175,7 @@ operator<<(ostream& s,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return s;
 }
@@ -292,7 +292,7 @@ display_timing(ostream& s,
       s << "negative unate";
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     s << endl;
     if ( !timing->timing_cond().is_one() ) {
@@ -497,7 +497,7 @@ display_library(ostream& s,
   switch ( library.technology() ) {
   case kCellTechCmos: s << "cmos"; break;
   case kCellTechFpga: s << "fpga"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
   s << endl;
 
@@ -563,7 +563,7 @@ display_library(ostream& s,
     const Cell* cell = library.cell(i);
     {
       const Cell* cell1 = library.cell(cell->name());
-      assert_cond( cell1 == cell, __FILE__, __LINE__);
+      ASSERT_COND( cell1 == cell );
     }
     // セル名とセルの種類を出力
     s << "Cell#" << cell->id() << " (" << cell->name() << ") : ";
@@ -580,7 +580,7 @@ display_library(ostream& s,
       s << "FSM";
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     s << endl;
 
@@ -729,7 +729,7 @@ display_library(ostream& s,
     case kCellPatInput: s << "INPUT#" << library.pg_input_id(i) ; break;
     case kCellPatAnd:   s << "AND"; break;
     case kCellPatXor:   s << "XOR"; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
     s << endl;
   }

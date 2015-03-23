@@ -111,7 +111,7 @@ nega_equiv(const ExprNode* node0,
     return inv;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
   return false;
 }
@@ -156,7 +156,7 @@ ExprNode::eval(const vector<ymulong>& vals,
     }
     return ans;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0UL;
 }
 
@@ -201,7 +201,7 @@ ExprNode::make_tv(ymuint ni) const
     }
     return ans;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return TvFunc();
 }
 

@@ -110,7 +110,7 @@ UdpGen::instantiate_udp(const PtUdp* pt_udp)
   }
   if ( pt_init_value ) {
     // このチェックはパース時に済んでいるはずなので念のため．
-    assert_cond(ptype == kVpiSeqPrim, __FILE__, __LINE__);
+    ASSERT_COND(ptype == kVpiSeqPrim );
 
     const FileRegion& ifr = pt_init_value->file_region();
 

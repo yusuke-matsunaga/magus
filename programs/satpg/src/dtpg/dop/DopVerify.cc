@@ -46,7 +46,7 @@ DopVerify::operator()(TpgFault* f,
 		      TestVector* tv)
 {
   bool detect = mFsim.spsfp(tv, f);
-  assert_cond( detect, __FILE__, __LINE__);
+  ASSERT_COND( detect );
 }
 
 END_NAMESPACE_YM_SATPG

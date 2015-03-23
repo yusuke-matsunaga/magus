@@ -44,7 +44,7 @@ ConstPartSelectConv::operator()(const MvnNode* node,
     ymuint bw = node->bit_width();
     ymuint msb = node->msb();
     ymuint lsb = node->lsb();
-    assert_cond( bw == msb - lsb + 1, __FILE__, __LINE__);
+    ASSERT_COND( bw == msb - lsb + 1 );
     for (ymuint i = 0; i < bw; ++ i) {
       BdnNodeHandle handle0 = nodemap.get(src_node, i + lsb);
       nodemap.put(node, i, handle0);

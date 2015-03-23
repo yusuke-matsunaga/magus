@@ -50,12 +50,12 @@ add_fanin(BNetManip& manip,
   Expr expr = onode->func();
   Expr new_expr;
   if ( expr.is_posiliteral() ) {
-    assert_cond(ipos == 0 && ni == 1, __FILE__, __LINE__);
+    ASSERT_COND(ipos == 0 && ni == 1 );
     new_expr = Expr::make_posiliteral(VarId(0)) &
       Expr::make_posiliteral(VarId(1));
   }
   else if ( expr.is_negaliteral() ) {
-    assert_cond(ipos == 0 && ni == 1, __FILE__, __LINE__);
+    ASSERT_COND(ipos == 0 && ni == 1 );
     new_expr = Expr::make_negaliteral(VarId(0)) &
       Expr::make_negaliteral(VarId(1));
   }
@@ -82,7 +82,7 @@ add_fanin(BNetManip& manip,
 	return;
       }
     }
-    assert_cond( phase != 0 , __FILE__, __LINE__);
+    ASSERT_COND( phase != 0  );
     if ( phase > 0 ) {
       new_expr &= Expr::make_posiliteral(VarId(ni));
     }
@@ -113,7 +113,7 @@ add_fanin(BNetManip& manip,
 	return;
       }
     }
-    assert_cond( phase != 0 , __FILE__, __LINE__);
+    ASSERT_COND( phase != 0  );
     if ( phase > 0 ) {
       new_expr |= Expr::make_posiliteral(VarId(ni));
     }
@@ -125,7 +125,7 @@ add_fanin(BNetManip& manip,
     return;
   }
   bool stat = manip.change_logic(onode, new_expr, fanins);
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 }
 
 END_NONAMESPACE
@@ -183,7 +183,7 @@ DupCmd::cmd_proc(TclObjVector& objv)
     // node の複製を作る．
     BNode* node1 = manip.new_logic();
     bool stat = manip.change_logic(node1, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
 
     // ファンアウトを修正する．
     for (BNodeFoList::const_iterator p = node->fanouts_begin();

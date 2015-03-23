@@ -60,7 +60,7 @@ SmtFunTerm::input_num() const
 const SmtTerm*
 SmtFunTerm::input(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 

@@ -225,7 +225,7 @@ GenPat::operator()(ymuint slack)
     sort(flist.begin(), flist.end());
     for (vector<ymuint16>::iterator p = flist.begin(); p != flist.end(); ++ p) {
       unordered_map<ymuint16, vector<GpHandle> >::iterator q = pat_list.find(*p);
-      assert_cond( q != pat_list.end(), __FILE__, __LINE__);
+      ASSERT_COND( q != pat_list.end() );
       vector<GpHandle>& handle_list = q->second;
       cout << "Function: " << setw(4) << setfill('0') << hex << *p << dec << endl;
       mMgr.dump_handle(cout, handle_list);
@@ -403,7 +403,7 @@ GenPat::add_pat(GpHandle handle,
 
     unordered_map<ymuint32, vector<FuncXform> >::const_iterator p;
     p = mNpnHash.find(chandle.func());
-    assert_cond( p != mNpnHash.end(), __FILE__, __LINE__);
+    ASSERT_COND( p != mNpnHash.end() );
     const vector<FuncXform>& xf_list = p->second;
     for (vector<FuncXform>::const_iterator q = xf_list.begin();
 	 q != xf_list.end(); ++ q) {

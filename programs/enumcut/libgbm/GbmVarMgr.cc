@@ -72,7 +72,7 @@ void
 GbmConfVarMgr::set_node_var(ymuint id,
 			    GbmLit lit)
 {
-  assert_cond( id < mNodeVarArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( id < mNodeVarArray.size() );
   mNodeVarArray[id] = lit;
   if ( debug() ) {
     cout << "Node#" << id << ": " << lit << endl;

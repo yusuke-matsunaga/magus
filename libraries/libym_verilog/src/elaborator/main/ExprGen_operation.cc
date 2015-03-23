@@ -39,7 +39,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   switch ( op_type ) {
   case kVlPosedgeOp:
   case kVlNegedgeOp:
-    assert_cond(opr_size == 1, __FILE__, __LINE__);
+    ASSERT_COND(opr_size == 1 );
     error_illegal_edge_descriptor(pt_expr);
     return NULL;
 
@@ -53,7 +53,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   case kVlPlusOp:
   case kVlMinusOp:
   case kVlNotOp:
-    assert_cond(opr_size == 1, __FILE__, __LINE__);
+    ASSERT_COND(opr_size == 1 );
     opr0 = instantiate_expr(parent, env, pt_expr->operand(0));
     if ( !opr0 ) {
       return NULL;
@@ -88,7 +88,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
   case kVlGtOp:
   case kVlLeOp:
   case kVlLtOp:
-    assert_cond(opr_size == 2, __FILE__, __LINE__);
+    ASSERT_COND(opr_size == 2 );
     opr0 = instantiate_expr(parent, env, pt_expr->operand(0));
     opr1 = instantiate_expr(parent, env, pt_expr->operand(1));
     if ( !opr0 || !opr1 ) {
@@ -109,7 +109,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
 
   case kVlConditionOp:
   case kVlMinTypMaxOp:
-    assert_cond(opr_size == 3, __FILE__, __LINE__);
+    ASSERT_COND(opr_size == 3 );
     opr0 = instantiate_expr(parent, env, pt_expr->operand(0));
     opr1 = instantiate_expr(parent, env, pt_expr->operand(1));
     opr2 = instantiate_expr(parent, env, pt_expr->operand(2));
@@ -169,7 +169,7 @@ ExprGen::instantiate_opr(const VlNamedObj* parent,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return NULL;
   }
 
@@ -264,7 +264,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return VlValue();
   }
 
@@ -377,7 +377,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
 
   case kVlMinTypMaxOp:
     // 本当はエラー
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 
   case kVlConcatOp:
@@ -387,7 +387,7 @@ ExprGen::evaluate_opr(const VlNamedObj* parent,
     return multi_concat(val);
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 

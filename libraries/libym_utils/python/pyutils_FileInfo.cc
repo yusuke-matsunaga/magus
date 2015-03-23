@@ -78,7 +78,7 @@ FileInfo_init(FileInfoObject* self,
   }
 
   if ( obj1 != NULL ) {
-    assert_cond( filename != NULL, __FILE__, __LINE__);
+    ASSERT_COND( filename != NULL );
     FileLoc parent_loc = PyFileLoc_AsFileLoc(obj1);
     self->mFileInfo = FileInfo(filename, parent_loc);
   }

@@ -92,7 +92,7 @@ CellTimingSense_repr(CellTimingSenseObject* self)
   case kCellPosiUnate: result = kCellPosiUnateString; break;
   case kCellNegaUnate: result = kCellNegaUnateString; break;
   case kCellNonUnate:  result = kCellNonUnateString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -224,7 +224,7 @@ PyCellTimingSense_FromCellTimingSense(tCellTimingSense val)
   case kCellPosiUnate: result = Py_kCellPosiUnate; break;
   case kCellNegaUnate: result = Py_kCellNegaUnate; break;
   case kCellNonUnate:  result = Py_kCellNonUnate; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

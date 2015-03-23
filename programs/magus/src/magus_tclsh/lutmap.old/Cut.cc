@@ -85,7 +85,7 @@ calc_expr_for_node(const SbjNode* node,
       ans = p->second;
     }
     else {
-      assert_cond( node->is_logic(), __FILE__, __LINE__);
+      ASSERT_COND( node->is_logic() );
 
       Expr cexp0 = calc_expr_for_node(node->fanin(0), logmap);
       Expr cexp1 = calc_expr_for_node(node->fanin(1), logmap);
@@ -99,7 +99,7 @@ calc_expr_for_node(const SbjNode* node,
       case 0xa: // 1010
       case 0xc: // 1100
       case 0xf: // 1111
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	break;
       case 0x1: // 0001
 	ans = ~cexp0 & ~cexp1;

@@ -216,7 +216,7 @@ Cut*
 CutHolder::alloc_cut(ymuint ni)
 {
   ymuint size = sizeof(Cut) + (ni - 1) * sizeof(SbjNode*);
-  assert_cond(size < kPageSize, __FILE__, __LINE__);
+  ASSERT_COND(size < kPageSize );
   if ( mCurChunk == NULL || mLast + size > kPageSize ) {
     mCurChunk = new char[kPageSize];
     mLast = 0;

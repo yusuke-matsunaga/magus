@@ -342,7 +342,7 @@ Symbol::Symbol(GateType type,
   case kGtXor:    set_to_xor(ni, false); break;
   case kGtXnor:   set_to_xor(ni, true); break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -375,7 +375,7 @@ Symbol::ipin_num() const
 QPoint
 Symbol::ipin_location(ymuint pos) const
 {
-  assert_cond( pos < mIpinList.size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mIpinList.size() );
   return mIpinList[pos];
 }
 
@@ -391,7 +391,7 @@ Symbol::opin_num() const
 QPoint
 Symbol::opin_location(ymuint pos) const
 {
-  assert_cond( pos < mOpinList.size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mOpinList.size() );
   return mOpinList[pos];
 }
 
@@ -521,7 +521,7 @@ Symbol::set_to_and(ymuint ni,
   }
 
   if ( nseg > 1 ) {
-    assert_cond( nseg >= 3, __FILE__, __LINE__);
+    ASSERT_COND( nseg >= 3 );
     // 上下に入力辺を伸ばす．
     ymuint nseg_u = nseg / 2;
     QPointF p0(0.0, kGateUY - (nseg_u * kGateH));
@@ -565,7 +565,7 @@ Symbol::set_to_or(ymuint ni,
   }
 
   if ( nseg > 1 ) {
-    assert_cond( nseg >= 3, __FILE__, __LINE__);
+    ASSERT_COND( nseg >= 3 );
     // 上下に入力辺を伸ばす．
     ymuint nseg_u = nseg / 2;
     DrawObj* uedge_obj = create_or_edge(nseg_u, QPointF(0.0, - kGateH * nseg_u));
@@ -610,7 +610,7 @@ Symbol::set_to_xor(ymuint ni,
   obj_list.push_back(iedge_obj);
 
   if ( nseg > 1 ) {
-    assert_cond( nseg >= 3, __FILE__, __LINE__);
+    ASSERT_COND( nseg >= 3 );
     // 上下に入力辺を伸ばす．
     DrawObj* uedge_obj = create_or_edge(nseg_u, QPointF(kXorM, - kGateH * nseg_u));
     obj_list.push_back(uedge_obj);
@@ -673,7 +673,7 @@ distribute_pins(ymuint ni,
 		vector<ymuint>& npins)
 {
   if ( ni >= 6 && ni <= 10 ) {
-    assert_cond( npins.size() == 3, __FILE__, __LINE__);
+    ASSERT_COND( npins.size() == 3 );
     switch (ni) {
     case 6:
       npins[0] = 2;

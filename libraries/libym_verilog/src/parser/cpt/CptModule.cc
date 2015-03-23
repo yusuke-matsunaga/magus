@@ -375,7 +375,7 @@ CptPort::portref_size() const
 const PtExpr*
 CptPort::portref_elem(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -384,7 +384,7 @@ CptPort::portref_elem(ymuint pos) const
 tVlDirection
 CptPort::portref_dir(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVlNoDirection;
 }
 
@@ -395,7 +395,7 @@ void
 CptPort::_set_portref_dir(ymuint pos,
 			  tVlDirection dir)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 
@@ -436,7 +436,7 @@ CptPort1::portref_size() const
 const PtExpr*
 CptPort1::portref_elem(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return mPortRef;
 }
 
@@ -455,7 +455,7 @@ void
 CptPort1::_set_portref_dir(ymuint pos,
 			   tVlDirection dir)
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   mDir = dir;
 }
 

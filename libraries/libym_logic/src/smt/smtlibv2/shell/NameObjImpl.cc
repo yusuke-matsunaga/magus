@@ -69,7 +69,7 @@ NameObjImpl::is_term() const
 tSmtFunType
 NameObjImpl::fun_type() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kSmtFun_UserDef;
 }
 
@@ -78,7 +78,7 @@ NameObjImpl::fun_type() const
 const SmtFun*
 NameObjImpl::fun() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -87,7 +87,7 @@ NameObjImpl::fun() const
 const SmtVar*
 NameObjImpl::var() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -96,7 +96,7 @@ NameObjImpl::var() const
 const SmtTerm*
 NameObjImpl::term() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

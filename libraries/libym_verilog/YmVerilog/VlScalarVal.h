@@ -423,7 +423,7 @@ VlScalarVal::to_logic() const
   case kScalarX:
   case kScalarZ: return VlScalarVal(kScalarX);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   // ダミー
   return VlScalarVal::x();
 }
@@ -469,7 +469,7 @@ VlScalarVal::operator!() const
   case kScalarX:
   case kScalarZ: return VlScalarVal(kScalarX);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   // ダミー
   return VlScalarVal::x();
 }

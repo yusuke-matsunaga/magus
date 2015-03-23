@@ -116,7 +116,7 @@ BoolResub::node_subst(LnGraph& lutnetwork,
        p != mNodeList.rend(); ++ p) {
     LnNode* node = *p;
     if ( mDmark[node->id()] ) {
-      assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+      ASSERT_COND(node->n_fanout() == 0 );
       mLutNetwork->delete_lut(node);
     }
   }
@@ -195,7 +195,7 @@ BoolResub::node_merge(LnGraph& lutgraph,
        p != mNodeList.rend(); ++ p) {
     LnNode* node = *p;
     if ( mDmark[node->id()] ) {
-      assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+      ASSERT_COND(node->n_fanout() == 0 );
       mLutNetwork->delete_lut(node);
     }
   }
@@ -1068,7 +1068,7 @@ BoolResub::make_cnf(SatSolver* solver,
 		    const vector<Literal>& inputs)
 {
   if ( lexp.is_literal() ) {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return;
   }
   if ( lexp.is_one() ) {
@@ -1157,7 +1157,7 @@ BoolResub::find_support(const vector<LnNode*>& support,
 {
   ymuint ni = support.size();
   ymuint np = vect.size();
-  assert_cond((1U << ni) == np, __FILE__, __LINE__);
+  ASSERT_COND((1U << ni) == np );
 
   if ( ni <= mMaxNi ) {
     new_support.resize(ni);
@@ -1191,7 +1191,7 @@ BoolResub::tv2expr(ymuint ni,
 		   const vector<int>& tv)
 {
   ymuint np = 1U << ni;
-  assert_cond(np == tv.size(), __FILE__, __LINE__);
+  ASSERT_COND(np == tv.size() );
 
   Expr ans = Expr::make_zero();
   for (ymuint p = 0U; p < np; ++ p) {

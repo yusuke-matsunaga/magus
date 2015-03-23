@@ -86,7 +86,7 @@ LcPatMgr::pat_num() const
 LcPatHandle
 LcPatMgr::pat_root(ymuint id) const
 {
-  assert_cond( id < pat_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < pat_num() );
   return mPatList[id];
 }
 
@@ -407,7 +407,7 @@ LcPatMgr::pg_sub(const Expr& expr,
 	  break;
 
 	default:
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	  break;
 	}
       }
@@ -455,7 +455,7 @@ LcPatMgr::make_input(VarId var)
     mInputList.push_back(node);
   }
   LcPatNode* node = mInputList[id];
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
 
   return node;
 }
@@ -470,8 +470,8 @@ LcPatMgr::make_node(const Expr& expr,
 {
   LcPatNode* l_node = l_handle.node();
   LcPatNode* r_node = r_handle.node();
-  assert_cond( l_node != NULL, __FILE__, __LINE__);
-  assert_cond( r_node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( l_node != NULL );
+  ASSERT_COND( r_node != NULL );
   bool l_inv = l_handle.inv();
   bool r_inv = r_handle.inv();
 
@@ -493,7 +493,7 @@ LcPatMgr::make_node(const Expr& expr,
     r_inv = false;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( l_inv ) {
     type |= 4U;
@@ -677,7 +677,7 @@ LcPatMgr::display(ostream& s) const
 	s << "Xor";
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
       s << "( ";
       display_edge(s, node, 0);

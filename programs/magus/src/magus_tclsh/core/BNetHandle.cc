@@ -79,7 +79,7 @@ BNetHandle::copy(const NetHandle* src,
     return false;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return true;

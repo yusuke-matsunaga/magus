@@ -105,7 +105,7 @@ Expr::make_negaliteral(VarId varid)
 Expr
 Expr::make_and(const ExprVector& chd_list)
 {
-  assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(chd_list.size() > 0 );
   ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   for (ExprVector::const_iterator p = chd_list.begin();
@@ -118,7 +118,7 @@ Expr::make_and(const ExprVector& chd_list)
 Expr
 Expr::make_and(const ExprList& chd_list)
 {
-  assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(chd_list.size() > 0 );
   ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   for (ExprList::const_iterator p = chd_list.begin();
@@ -132,7 +132,7 @@ Expr::make_and(const ExprList& chd_list)
 Expr
 Expr::make_or(const ExprVector& chd_list)
 {
-  assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(chd_list.size() > 0 );
   ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   for (ExprVector::const_iterator p = chd_list.begin();
@@ -145,7 +145,7 @@ Expr::make_or(const ExprVector& chd_list)
 Expr
 Expr::make_or(const ExprList& chd_list)
 {
-  assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(chd_list.size() > 0 );
   ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   for (ExprList::const_iterator p = chd_list.begin();
@@ -159,7 +159,7 @@ Expr::make_or(const ExprList& chd_list)
 Expr
 Expr::make_xor(const ExprVector& chd_list)
 {
-  assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(chd_list.size() > 0 );
   ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   for (ExprVector::const_iterator p = chd_list.begin();
@@ -172,7 +172,7 @@ Expr::make_xor(const ExprVector& chd_list)
 Expr
 Expr::make_xor(const ExprList& chd_list)
 {
-  assert_cond(chd_list.size() > 0, __FILE__, __LINE__);
+  ASSERT_COND(chd_list.size() > 0 );
   ExprMgr& mgr = ExprMgr::the_obj();
   ymuint begin = mgr.nodestack_top();
   for (ExprList::const_iterator p = chd_list.begin();
@@ -683,7 +683,7 @@ write_expr(ODO& s,
     type = 6;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   ymuint32 nc = expr.child_num();
@@ -741,7 +741,7 @@ read_expr(IDO& s)
     return Expr::make_xor(child_list);
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   // ダミー

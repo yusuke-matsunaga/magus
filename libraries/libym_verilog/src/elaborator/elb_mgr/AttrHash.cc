@@ -57,7 +57,7 @@ AttrHash::add(const VlObj* obj,
     cell = new_cell(obj);
   }
   ymuint pos = (def) ? 1 : 0;
-  assert_cond(cell->mAttrList[pos] == NULL, __FILE__, __LINE__);
+  ASSERT_COND(cell->mAttrList[pos] == NULL );
   cell->mAttrList[pos] = attr_list;
 }
 

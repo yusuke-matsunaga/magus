@@ -384,7 +384,7 @@ CptDefParam::CptDefParam(const FileRegion& file_region,
   mName(tail_name),
   mExpr(value)
 {
-  assert_cond(value, __FILE__, __LINE__);
+  ASSERT_COND(value );
 }
 
 // デストラクタ
@@ -604,7 +604,7 @@ CptProcess::CptProcess(const FileRegion& file_region,
   mTopLoc(file_region.start_loc()),
   mBody(body)
 {
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(body );
 }
 
 // デストラクタ

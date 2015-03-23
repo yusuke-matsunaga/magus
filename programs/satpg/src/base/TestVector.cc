@@ -46,7 +46,7 @@ bool
 TestVector::is_conflict(const TestVector& tv1,
 			const TestVector& tv2)
 {
-  assert_cond( tv1.input_num() == tv2.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( tv1.input_num() == tv2.input_num() );
   ymuint nb = block_num(tv1.input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     ymuint i0 = i;
@@ -66,7 +66,7 @@ TestVector::is_conflict(const TestVector& tv1,
 bool
 TestVector::operator==(const TestVector& right) const
 {
-  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( input_num() == right.input_num() );
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; ++ i) {
     if ( mPat[i] != right.mPat[i] ) {
@@ -83,7 +83,7 @@ TestVector::operator==(const TestVector& right) const
 bool
 TestVector::operator<(const TestVector& right) const
 {
-  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( input_num() == right.input_num() );
   ymuint nb = block_num(input_num());
   bool diff = false;
   for (ymuint i = 0; i < nb; ++ i) {
@@ -107,7 +107,7 @@ TestVector::operator<(const TestVector& right) const
 bool
 TestVector::operator<=(const TestVector& right) const
 {
-  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( input_num() == right.input_num() );
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; ++ i) {
     PackedVal val1 = mPat[i];

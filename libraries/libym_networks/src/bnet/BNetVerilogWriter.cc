@@ -137,7 +137,7 @@ BNetVerilogWriter::dump(ostream& s,
     ymuint n = node->fanin_num();
     for (ymuint i = 0; i < n; i ++) {
       BNode* inode = node->fanin(i);
-      assert_cond( inode != 0, __FILE__, __LINE__);
+      ASSERT_COND( inode != 0 );
       fanin_name.add(VarId(i), inode->name());
     }
     const Expr& f = node->func();

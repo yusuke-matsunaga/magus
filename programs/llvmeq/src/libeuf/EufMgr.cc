@@ -115,7 +115,7 @@ EufNode*
 EufMgr::new_equality(EufNode* left,
 		     EufNode* right)
 {
-  assert_cond( left->is_boolean() == right->is_boolean(), __FILE__, __LINE__);
+  ASSERT_COND( left->is_boolean() == right->is_boolean() );
 
   // left と right は対称なので正規化する．
   if ( left->id() > right->id() ) {
@@ -142,8 +142,8 @@ EufNode*
 EufMgr::new_conjunction(EufNode* left,
 			EufNode* right)
 {
-  assert_cond( left->is_boolean(), __FILE__, __LINE__);
-  assert_cond( right->is_boolean(), __FILE__, __LINE__);
+  ASSERT_COND( left->is_boolean() );
+  ASSERT_COND( right->is_boolean() );
 
   // left と right は対称なので正規化する．
   if ( left->id() > right->id() ) {
@@ -175,8 +175,8 @@ EufNode*
 EufMgr::new_disjunction(EufNode* left,
 			EufNode* right)
 {
-  assert_cond( left->is_boolean(), __FILE__, __LINE__);
-  assert_cond( right->is_boolean(), __FILE__, __LINE__);
+  ASSERT_COND( left->is_boolean() );
+  ASSERT_COND( right->is_boolean() );
 
   // left と right は対称なので正規化する．
   if ( left->id() > right->id() ) {
@@ -206,7 +206,7 @@ EufMgr::new_disjunction(EufNode* left,
 EufNode*
 EufMgr::new_negation(EufNode* operand)
 {
-  assert_cond( operand->is_boolean(), __FILE__, __LINE__);
+  ASSERT_COND( operand->is_boolean() );
 
   EufNode* node = mBinMgr->find_negation(operand);
   if ( node == NULL ) {
@@ -230,7 +230,7 @@ bool
 EufMgr::check_validity(const vector<EufNode*>& node_assumption,
 		       EufNode* node)
 {
-  assert_cond( node->is_boolean(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_boolean() );
 
   vector<Literal> assumption;
   assumption.reserve(node_assumption.size() + 1);

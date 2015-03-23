@@ -42,7 +42,7 @@ ZddMgr::ZddMgr(const string& type,
 	       const string& option)
 {
   mImpl = new ZddMgrImpl(name, option);
-  assert_cond(mImpl, __FILE__, __LINE__);
+  ASSERT_COND(mImpl );
 }
 
 // デストラクタ

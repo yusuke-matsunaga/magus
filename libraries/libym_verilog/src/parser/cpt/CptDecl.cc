@@ -1144,7 +1144,7 @@ CptDeclItemI::CptDeclItemI(const FileRegion& file_region,
   CptDeclItem(file_region, name),
   mInitValue(init_value)
 {
-  assert_cond(init_value, __FILE__, __LINE__);
+  ASSERT_COND(init_value );
 }
 
 // デストラクタ

@@ -64,7 +64,7 @@ EiFactory::new_UnaryOp(const PtExpr* pt_expr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return expr;
@@ -166,7 +166,7 @@ EiBitNegOp::EiBitNegOp(const PtExpr* pt_expr,
   // オペランドの型とサイズをそのまま使う．
   mType = opr1->value_type();
 
-  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
+  ASSERT_COND( !mType.is_real_type() );
 }
 
 // @brief デストラクタ
@@ -203,7 +203,7 @@ EiReductionOp::EiReductionOp(const PtExpr* pt_expr,
 			     ElbExpr* opr1) :
   EiUnaryOp(pt_expr, opr1)
 {
-  assert_cond( !opr1->value_type().is_real_type(), __FILE__, __LINE__);
+  ASSERT_COND( !opr1->value_type().is_real_type() );
 
   // オペランドのサイズは self determined
   opr1->set_selfsize();

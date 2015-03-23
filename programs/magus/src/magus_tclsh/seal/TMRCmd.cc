@@ -72,7 +72,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
       fanins[i] = map1[node->fanin(i)->id()];
     }
     stat = manip.change_logic(node1, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     map1[node->id()] = node1;
 
     // 2つめの複製
@@ -81,7 +81,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
       fanins[i] = map2[node->fanin(i)->id()];
     }
     stat = manip.change_logic(node2, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     map2[node->id()] = node2;
   }
 
@@ -102,7 +102,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
     Expr lexp = ibnode->func();
     BNode* ibnode0 = manip.new_logic();
     bool stat = manip.change_logic(ibnode0, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
 
     // その3つの多数決論理を作る．
     fanins.resize(3);
@@ -110,7 +110,7 @@ TMRCmd::cmd_proc(TclObjVector& objv)
     fanins[1] = map1[ibnode->id()];
     fanins[2] = map2[ibnode->id()];
     stat = manip.change_logic(ibnode, maj_exp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 
   return TCL_OK;

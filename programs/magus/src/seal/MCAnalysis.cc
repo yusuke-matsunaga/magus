@@ -239,7 +239,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
-      assert_cond( !error, __FILE__, __LINE__);
+      ASSERT_COND( !error );
 
       // 正常回路の遷移確率行列の比較
       for (unordered_map<ymuint, double>::iterator p = mTransProb1.begin();
@@ -251,10 +251,10 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	State cur_state = mReachableStates1[csid];
 	State next_state = mReachableStates1[nsid];
 	unordered_map<State, ymuint>::iterator s = state_map2.find(cur_state);
-	assert_cond( s != state_map2.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != state_map2.end() );
 	ymuint csid2 = s->second;
 	s = state_map2.find(next_state);
-	assert_cond( s != state_map2.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != state_map2.end() );
 	ymuint nsid2 = s->second;
 	ymuint tmp2 = csid2 * state_num + nsid2;
 	unordered_map<ymuint, double>::iterator q = trans_map2.find(tmp2);
@@ -278,10 +278,10 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	State cur_state = c_states2[csid];
 	State next_state = c_states2[nsid];
 	unordered_map<State, ymuint>::iterator s = state_map1.find(cur_state);
-	assert_cond( s != state_map1.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != state_map1.end() );
 	ymuint csid2 = s->second;
 	s = state_map1.find(next_state);
-	assert_cond( s != state_map1.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != state_map1.end() );
 	ymuint nsid2 = s->second;
 	ymuint tmp2 = csid2 * state_num + nsid2;
 	unordered_map<ymuint, double>::iterator q = mTransProb1.find(tmp2);
@@ -291,7 +291,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
-      assert_cond(!error, __FILE__, __LINE__);
+      ASSERT_COND(!error );
 
       // 回路対の到達可能状態の比較
       ymuint pair_num = pair_vec2.size();
@@ -328,7 +328,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
-      assert_cond( !error, __FILE__, __LINE__);
+      ASSERT_COND( !error );
 
       if ( mTransProb2.size() != trans2_map2.size() ) {
 	cout << "mTransProb2.size() != trans2_map2.size()" << endl;
@@ -344,10 +344,10 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	State next_state = mReachableStates2[nsid];
 	unordered_map<State, ymuint>::iterator s;
 	s = pair_map2.find(cur_state);
-	assert_cond( s != pair_map2.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != pair_map2.end() );
 	ymuint csid2 = s->second;
 	s = pair_map2.find(next_state);
-	assert_cond( s != pair_map2.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != pair_map2.end() );
 	ymuint nsid2 = s->second;
 	ymuint tmp2 = csid2 * pair_num + nsid2;
 	unordered_map<ymuint, double>::iterator q = trans2_map2.find(tmp2);
@@ -374,10 +374,10 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	State next_state = pair_vec2[nsid];
 	unordered_map<State, ymuint>::iterator s;
 	s = pair_map1.find(cur_state);
-	assert_cond( s != pair_map1.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != pair_map1.end() );
 	ymuint csid2 = s->second;
 	s = pair_map1.find(next_state);
-	assert_cond( s != pair_map1.end(), __FILE__, __LINE__);
+	ASSERT_COND( s != pair_map1.end() );
 	ymuint nsid2 = s->second;
 	ymuint tmp2 = csid2 * pair_num + nsid2;
 	unordered_map<ymuint, double>::iterator q = mTransProb2.find(tmp2);
@@ -392,9 +392,9 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
       for (ymuint i = 0; i < pair_num; ++ i) {
 	State cur_state = mReachableStates2[i];
 	unordered_map<State, ymuint>::iterator p = pair_map2.find(cur_state);
-	assert_cond( p != state_map2.end(), __FILE__, __LINE__);
+	ASSERT_COND( p != state_map2.end() );
 	ymuint id2 = p->second;
-	assert_cond( pair_vec2[id2] == cur_state, __FILE__, __LINE__);
+	ASSERT_COND( pair_vec2[id2] == cur_state );
 
 	if ( mFailureProb0[i] != fprob2[id2] ) {
 	  cout << cur_state << ": failure probability mismatch : "
@@ -403,7 +403,7 @@ MCAnalysis::enum_states(const BNetwork& bnetwork,
 	  error = true;
 	}
       }
-      assert_cond(!error, __FILE__, __LINE__);
+      ASSERT_COND(!error );
 #endif
     }
   }
@@ -443,7 +443,7 @@ MCAnalysis::calc_steady_prob()
 #else
   bool stat = lu_decomp(m, mSteadyProb);
 #endif
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 }
 
 // @brief SEU による初期状態確率を計算する．
@@ -552,7 +552,7 @@ MCAnalysis::calc_failure_prob()
 	  d -= prob;
 	}
 	else {
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	}
       }
       mFailureProb[gid] = ans / d;
@@ -601,12 +601,11 @@ MCAnalysis::calc_failure_prob()
 	}
 	{ // 検証
 	  for (DfsNode* node = dfs.repnode(g); node; node = node->mLink) {
-	    assert_cond( node->mSelected , __FILE__, __LINE__);
+	    ASSERT_COND( node->mSelected  );
 	    for (vector<DfsNode*>::iterator p = node->mAdjList.begin();
 		 p != node->mAdjList.end(); ++ p) {
 	      DfsNode* next = *p;
-	      assert_cond( fixed[next->mId] ||
-			   next->mSelected,  __FILE__, __LINE__);
+	      ASSERT_COND( fixed[next->mId] || next->mSelected );
 	    }
 	  }
 	}
@@ -626,7 +625,7 @@ MCAnalysis::calc_failure_prob()
 	  }
 	  else {
 	    ymuint lnid = lmap[nid];
-	    assert_cond( lnid < n, __FILE__, __LINE__);
+	    ASSERT_COND( lnid < n );
 	    if ( lnid == i ) {
 	      d = true;
 	      m.set_value(i, i, 1.0 - prob);

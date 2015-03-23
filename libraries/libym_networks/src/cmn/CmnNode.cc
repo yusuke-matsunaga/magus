@@ -74,7 +74,7 @@ CmnNode::is_logic() const
 CmnNode::tInputType
 CmnNode::input_type() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kPRIMARY_INPUT;
 }
 
@@ -82,7 +82,7 @@ CmnNode::input_type() const
 CmnNode::tOutputType
 CmnNode::output_type() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kPRIMARY_OUTPUT;
 }
 
@@ -142,7 +142,7 @@ CmnNode::fanin_num() const
 const CmnNode*
 CmnNode::fanin(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -153,7 +153,7 @@ CmnNode::fanin(ymuint pos) const
 const CmnEdge*
 CmnNode::fanin_edge(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -164,7 +164,7 @@ CmnNode::fanin_edge(ymuint pos) const
 CmnEdge*
 CmnNode::_fanin_edge(ymuint pos)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -172,7 +172,7 @@ CmnNode::_fanin_edge(ymuint pos)
 const Cell*
 CmnNode::cell() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -448,7 +448,7 @@ CmnNodeOutput::fanin_num() const
 const CmnNode*
 CmnNodeOutput::fanin(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return mFanin.from();
 }
 
@@ -459,7 +459,7 @@ CmnNodeOutput::fanin(ymuint pos) const
 const CmnEdge*
 CmnNodeOutput::fanin_edge(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return &mFanin;
 }
 
@@ -470,7 +470,7 @@ CmnNodeOutput::fanin_edge(ymuint pos) const
 CmnEdge*
 CmnNodeOutput::_fanin_edge(ymuint pos)
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return &mFanin;
 }
 

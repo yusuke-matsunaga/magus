@@ -88,7 +88,7 @@ IdCell*
 Iscas89IdHash::find(const char* str,
 		    bool create)
 {
-  assert_cond(str, __FILE__, __LINE__);
+  ASSERT_COND(str );
   size_t pos0 = hash_func(str);
   size_t pos = pos0 % mTableSize;
   for (IdCell* cell = mTable[pos]; cell; cell = cell->mLink) {

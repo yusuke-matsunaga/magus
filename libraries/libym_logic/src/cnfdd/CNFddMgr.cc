@@ -42,7 +42,7 @@ CNFddMgr::CNFddMgr(const string& type,
 	       const string& option)
 {
   mImpl = new CNFddMgrImpl(name, option);
-  assert_cond(mImpl, __FILE__, __LINE__);
+  ASSERT_COND(mImpl );
 }
 
 // デストラクタ

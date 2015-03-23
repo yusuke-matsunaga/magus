@@ -112,7 +112,7 @@ Val3_repr(Val3Object* self)
   case kVal1: return Py_kVal1String;
   default: break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -340,7 +340,7 @@ PyVal3_FromVal3(Val3 val)
   case kValX: result = Py_kValX; break;
   case kVal0: result = Py_kVal0; break;
   case kVal1: result = Py_kVal1; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

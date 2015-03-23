@@ -179,7 +179,7 @@ SmtLibParser::read_sexp(SmtLibNode*& node,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     if ( type != kNlToken ) {
       return type;

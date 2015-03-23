@@ -74,7 +74,7 @@ EiFactory::new_Constant(const PtExpr* pt_expr)
     }
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 

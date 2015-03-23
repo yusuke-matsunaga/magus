@@ -74,7 +74,7 @@ BtJust2::operator()(TpgNode* fnode,
       }
     }
   }
-  assert_cond( nmin > 0, __FILE__, __LINE__);
+  ASSERT_COND( nmin > 0 );
 
   TestVector* tv = new_vector();
 
@@ -93,7 +93,7 @@ BtJust2::operator()(TpgNode* fnode,
 void
 BtJust2::clear_justified_hook(TpgNode* node)
 {
-  assert_cond( node->id() < mJustArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( node->id() < mJustArray.size() );
   list_free(mJustArray[node->id()]);
   mJustArray[node->id()] = NULL;
 }
@@ -189,7 +189,7 @@ BtJust2::justify(TpgNode* node,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 

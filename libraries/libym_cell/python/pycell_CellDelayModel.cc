@@ -110,7 +110,7 @@ CellDelayModel_repr(CellDelayModelObject* self)
   case kCellDelayPiecewiseCmos: result = kCellDelayPiecewiseCmosString; break;
   case kCellDelayCmos2:         result = kCellDelayCmos2String; break;
   case kCellDelayDcm:           result = kCellDelayDcmString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -244,7 +244,7 @@ PyCellDelayModel_FromCellDelayModel(tCellDelayModel val)
   case kCellDelayPiecewiseCmos: result = Py_kCellDelayPiecewiseCmos; break;
   case kCellDelayCmos2:         result = Py_kCellDelayCmos2; break;
   case kCellDelayDcm:           result = Py_kCellDelayDcm; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

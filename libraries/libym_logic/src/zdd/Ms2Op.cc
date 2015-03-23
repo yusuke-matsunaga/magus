@@ -60,7 +60,7 @@ Ms2Op::apply_step(ZddEdge e,
     return ZddEdge::make_one();
   }
 
-  assert_cond( !e.is_zero(), __FILE__, __LINE__);
+  ASSERT_COND( !e.is_zero() );
 
   // この時点で e は終端ではない．
   pair<ZddEdge, ymuint> ans;
@@ -86,7 +86,7 @@ Ms2Op::apply_step(ZddEdge e,
       r = new_node(level, ZddEdge::make_zero(), r_1);
     }
   }
-  assert_cond( nelem > 0, __FILE__, __LINE__);
+  ASSERT_COND( nelem > 0 );
 
   mHash.add(e, make_pair(r, nelem));
 

@@ -30,7 +30,7 @@ Dg::Dg()
 Dg::Dg(tDgEdge root,
        DgMgr* mgr)
 {
-  assert_cond(mgr, __FILE__, __LINE__);
+  ASSERT_COND(mgr );
   mRoot = root;
   mMgr = mgr;
   mMgr->inc_ref(mRoot);

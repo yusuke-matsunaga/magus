@@ -70,7 +70,7 @@ SimNbDelayNode::~SimNbDelayNode()
 void
 SimNbDelayNode::exec()
 {
-  assert_cond(mUpdate, __FILE__, __LINE__);
+  ASSERT_COND(mUpdate );
   engine()->reg_nonblocking_event(mUpdate, delay());
 
   //schedule_next();

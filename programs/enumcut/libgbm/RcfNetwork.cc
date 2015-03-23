@@ -113,7 +113,7 @@ void
 RcfNetwork::set_input_pred(ymuint pos,
 			   ymuint pred)
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   mInputPredList[pos] = (pred << 1) | 1U;
 }
 
@@ -130,7 +130,7 @@ RcfNetwork::node_num() const
 const RcfNode*
 RcfNetwork::node(ymuint id) const
 {
-  assert_cond( id < node_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < node_num() );
   return mNodeList[id];
 }
 
@@ -146,7 +146,7 @@ RcfNetwork::input_num() const
 const RcfNode*
 RcfNetwork::input_node(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 
@@ -162,7 +162,7 @@ RcfNetwork::func_node_num() const
 const RcfNode*
 RcfNetwork::func_node(ymuint pos) const
 {
-  assert_cond( pos < mFuncNodeList.size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mFuncNodeList.size() );
   return mFuncNodeList[pos];
 }
 
@@ -178,7 +178,7 @@ RcfNetwork::and_num() const
 const RcfNode*
 RcfNetwork::and_node(ymuint pos) const
 {
-  assert_cond( pos < and_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < and_num() );
   return mAndList[pos];
 }
 
@@ -194,7 +194,7 @@ RcfNetwork::lut_num() const
 const RcfNode*
 RcfNetwork::lut_node(ymuint pos) const
 {
-  assert_cond( pos < lut_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < lut_num() );
   return mLutList[pos];
 }
 
@@ -210,7 +210,7 @@ RcfNetwork::mux_num() const
 const RcfNode*
 RcfNetwork::mux_node(ymuint pos) const
 {
-  assert_cond( pos < mux_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mux_num() );
   return mMuxList[pos];
 }
 
@@ -228,7 +228,7 @@ bool
 RcfNetwork::get_pred(ymuint pos,
 		     ymuint& pred) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   ymuint v = mInputPredList[pos];
   if ( v == 0U ) {
     return false;
@@ -253,9 +253,9 @@ RcfNetwork::simulate(const vector<bool>& ival_list,
 		     const vector<bool>& conf_bits) const
 {
   ymuint ni = input_num();
-  assert_cond( ival_list.size(), __FILE__, __LINE__);
+  ASSERT_COND( ival_list.size() );
   ymuint nc = conf_var_num();
-  assert_cond( conf_bits.size(), __FILE__, __LINE__);
+  ASSERT_COND( conf_bits.size() );
 
   ymuint nn = node_num();
   vector<bool> val_list(nn);

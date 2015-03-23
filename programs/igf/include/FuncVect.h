@@ -125,7 +125,7 @@ inline
 ymuint
 FuncVect::val(ymuint id) const
 {
-  assert_cond( id < mInputSize, __FILE__, __LINE__);
+  ASSERT_COND( id < mInputSize );
   return mVector[id];
 }
 
@@ -137,8 +137,8 @@ void
 FuncVect::set_val(ymuint id,
 		  ymuint val)
 {
-  assert_cond( id < mInputSize, __FILE__, __LINE__);
-  assert_cond( val < mMaxVal, __FILE__, __LINE__);
+  ASSERT_COND( id < mInputSize );
+  ASSERT_COND( val < mMaxVal );
   mVector[id] = val;
 }
 

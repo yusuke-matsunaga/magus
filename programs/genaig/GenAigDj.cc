@@ -53,7 +53,7 @@ GenAigDj::operator()(ymuint ni)
     case 2: fv = 0xf0f0f0f0; break;
     case 3: fv = 0xff00ff00; break;
     case 4: fv = 0xffff0000; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
 
     fv &= mMask;

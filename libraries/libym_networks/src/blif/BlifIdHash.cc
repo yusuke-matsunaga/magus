@@ -89,7 +89,7 @@ IdCell*
 BlifIdHash::find(const char* str,
 		 bool create)
 {
-  assert_cond(str, __FILE__, __LINE__);
+  ASSERT_COND(str );
   ymuint32 pos0 = hash_func(str);
   ymuint32 pos = pos0 % mTableSize;
   for (IdCell* cell = mTable[pos]; cell; cell = cell->mLink) {

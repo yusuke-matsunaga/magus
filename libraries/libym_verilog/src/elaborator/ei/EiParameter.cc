@@ -48,8 +48,8 @@ EiFactory::new_ParamHead(const VlNamedObj* parent,
 			 int left_val,
 			 int right_val)
 {
-  assert_cond( left != NULL, __FILE__, __LINE__);
-  assert_cond( right != NULL, __FILE__, __LINE__);
+  ASSERT_COND( left != NULL );
+  ASSERT_COND( right != NULL );
 
   void* p = mAlloc.get_memory(sizeof(EiParamHeadV));
   EiParamHead* head = new (p) EiParamHeadV(parent, pt_head,
@@ -84,7 +84,7 @@ EiFactory::new_Parameter(ElbParamHead* head,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -124,7 +124,7 @@ EiParamHead::type() const
     return kVpiSpecParam;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return kVpiParameter;
@@ -244,7 +244,7 @@ EiParamHead::bit_size(const VlValue& val) const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiSizeInteger;
 }
 
@@ -289,7 +289,7 @@ EiParamHead::calc_bit_offset(int index,
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -316,7 +316,7 @@ EiParamHead::value_type(const VlValue& val) const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlValueType();
 }
 

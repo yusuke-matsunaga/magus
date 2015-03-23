@@ -56,7 +56,7 @@ DagDCoverFactory::operator()(const string& args)
   else if ( args == "fodr" ) {
     return new WeightDCover(3);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

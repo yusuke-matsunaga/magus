@@ -91,7 +91,7 @@ conv(char symbol)
   default:
     cerr << "Illegal symbol char: " << symbol
 	 << " (" << static_cast<ymuint>(symbol) << ")" << endl;
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return kVpiUdpValNC;
@@ -126,7 +126,7 @@ VlUdpVal::VlUdpVal(char symbol)
   default:
     cerr << "Illegal symbol char: " << symbol
 	 << " (" << static_cast<ymuint>(symbol) << ")" << endl;
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -147,7 +147,7 @@ VlUdpVal::VlUdpVal(char symbol1,
     case 'b': mData = kVpiUdpVal0B; break;
     case '?': mData = kVpiUdpVal0Q; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -162,7 +162,7 @@ VlUdpVal::VlUdpVal(char symbol1,
     case 'b': mData = kVpiUdpVal1B; break;
     case '?': mData = kVpiUdpVal1Q; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -178,7 +178,7 @@ VlUdpVal::VlUdpVal(char symbol1,
     case 'b': mData = kVpiUdpValXB; break;
     case '?': mData = kVpiUdpValXQ; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -194,7 +194,7 @@ VlUdpVal::VlUdpVal(char symbol1,
     case 'b': mData = kVpiUdpValBB; break;
     case '?': mData = kVpiUdpValBQ; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -209,13 +209,13 @@ VlUdpVal::VlUdpVal(char symbol1,
     case 'b': mData = kVpiUdpValQB; break;
     case '?': mData = kVpiUdpValQQ; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 }

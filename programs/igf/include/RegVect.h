@@ -120,7 +120,7 @@ inline
 ymuint
 RegVect::val(ymuint pos) const
 {
-  assert_cond( pos < size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < size() );
   ymuint nblk = pos / 64;
   ymuint shft = pos % 64;
   return (mBody[nblk] >> shft) & 1U;

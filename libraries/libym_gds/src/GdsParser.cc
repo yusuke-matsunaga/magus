@@ -1008,7 +1008,7 @@ GdsParser::yylex(nsParser::YYSTYPE& lval)
   case kGdsELFLAGS:       lval.bitarray_type = new_bitarray(); break;
   case kGdsLIBSECUR:      lval.acl_type = new_acl(); break;
   default:
-    assert_cond( table.data_num(rtype) <= 1, __FILE__, __LINE__);
+    ASSERT_COND( table.data_num(rtype) <= 1 );
     {
       GdsDtype dtype = mScanner.cur_dtype();
       switch ( dtype ) {
@@ -1018,7 +1018,7 @@ GdsParser::yylex(nsParser::YYSTYPE& lval)
       case kGdsString: lval.string_type = new_string(); break;
       case kGdsNodata: break;
       default:
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	break;
       }
     }
@@ -1063,7 +1063,7 @@ GdsACL*
 GdsParser::new_acl()
 {
   ymuint dsize = mScanner.cur_dsize();
-  assert_cond( dsize % 6 == 0, __FILE__, __LINE__);
+  ASSERT_COND( dsize % 6 == 0 );
   ymuint n = dsize / 6;
   GdsACL* top = NULL;
   GdsACL** pprev = &top;
@@ -1157,7 +1157,7 @@ GdsXY*
 GdsParser::new_xy()
 {
   ymuint dsize = mScanner.cur_dsize();
-  assert_cond( dsize % 8 == 0, __FILE__, __LINE__);
+  ASSERT_COND( dsize % 8 == 0 );
   ymuint num = dsize / 4;
 
   void* p = mAlloc.get_memory(sizeof(GdsXY) + sizeof(ymint32) * (num - 1));

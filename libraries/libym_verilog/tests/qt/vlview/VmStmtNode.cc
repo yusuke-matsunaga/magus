@@ -40,7 +40,7 @@ void
 VmNode1::add_stmt(const QString& label,
 		  const VlStmt* stmt) const
 {
-  assert_cond( stmt != NULL, __FILE__, __LINE__);
+  ASSERT_COND( stmt != NULL );
   add_child( new VmStmtNode(vl_mgr(), label, stmt) );
 }
 
@@ -142,7 +142,7 @@ VmProcessNode::data(int column,
       switch ( mProcess->type() ) {
       case kVpiInitial: return "vpiInitial";
       case kVpiAlways:  return "vpiAlways";
-      default: assert_not_reached(__FILE__, __LINE__);
+      default: ASSERT_NOT_REACHED;
       }
     }
   }
@@ -315,7 +315,7 @@ VmStmtNode::expand() const
   case kVpiNamedFork:
     {
       const VlNamedObj* scope = mStmt->scope();
-      assert_cond( scope, __FILE__, __LINE__);
+      ASSERT_COND( scope );
       add_str("vpiFullName", scope->full_name());
       add_scope_item(scope);
     }
@@ -417,7 +417,7 @@ VmStmtNode::expand() const
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

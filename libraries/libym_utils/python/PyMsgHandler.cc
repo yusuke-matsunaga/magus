@@ -25,7 +25,7 @@ PyMsgHandler::PyMsgHandler(PyObject* obj,
   MsgHandler(mask),
   mFuncObj(obj)
 {
-  assert_cond( PyCallable_Check(obj), __FILE__, __LINE__);
+  ASSERT_COND( PyCallable_Check(obj) );
 }
 
 // @brief デストラクタ

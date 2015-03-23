@@ -67,7 +67,7 @@ GbmBddEngineEnum::init_vars(const RcfNetwork& network)
     VarId vid(i);
     mConfVarArray[i] = vid;
     bool stat = mMgr.new_var(vid);
-    assert_cond( stat, __FILE__, __LINE__);
+    ASSERT_COND( stat );
   }
 
   mSolution = mMgr.make_one();
@@ -125,7 +125,7 @@ GbmBddEngineEnum::make_bdd(const RcfNetwork& network,
     mSolution &= ~mNodeBddArray[oid];
   }
 
-  assert_cond( !mSolution.is_invalid(), __FILE__, __LINE__);
+  ASSERT_COND( !mSolution.is_invalid() );
 
   if ( mSolution.is_zero() ) {
     return false;
@@ -185,20 +185,20 @@ GbmBddEngineEnum::get_conf_bits(const vector<Bool3>& model,
 void
 GbmBddEngineEnum::make_node_func(const RcfNode* node)
 {
-  assert_cond( !node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND( !node->is_input() );
 
   ymuint ni = node->fanin_num();
   vector<Bdd> inputs(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     RcfNodeHandle ih = node->fanin(i);
-    assert_cond( !ih.is_const(), __FILE__, __LINE__);
+    ASSERT_COND( !ih.is_const() );
     ymuint id = ih.id();
     Bdd f = mNodeBddArray[id];
     if ( ih.inv() ) {
       f = ~f;
     }
     inputs[i] = f;
-    assert_cond( !f.is_invalid(), __FILE__, __LINE__);
+    ASSERT_COND( !f.is_invalid() );
   }
 
   Bdd output;
@@ -227,7 +227,7 @@ GbmBddEngineEnum::make_node_func(const RcfNode* node)
     output = make_MUX(inputs, s_vars);
   }
 
-  assert_cond( !output.is_invalid(), __FILE__, __LINE__);
+  ASSERT_COND( !output.is_invalid() );
   mNodeBddArray[node->id()] = output;
 }
 
@@ -250,7 +250,7 @@ GbmBddEngineEnum::make_MUX(const vector<Bdd>& inputs,
 {
   ymuint nd = inputs.size();
   ymuint ns = s_vars.size();
-  assert_cond( (1U << ns) == nd, __FILE__, __LINE__);
+  ASSERT_COND( (1U << ns) == nd );
   Bdd output = mMgr.make_zero();
   for (ymuint b = 0; b < nd; ++ b) {
     Bdd dvar = inputs[b];

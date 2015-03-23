@@ -256,7 +256,7 @@ DotlibPin::num() const
 ShString
 DotlibPin::name(ymuint pos) const
 {
-  assert_cond( pos < num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < num() );
   return mNameList[pos];
 }
 

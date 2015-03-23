@@ -123,7 +123,7 @@ Match::set_leaf(ymuint pos,
 		const BdnNode* leaf_node,
 		bool leaf_inv)
 {
-  assert_cond( pos < leaf_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < leaf_num() );
   mLeafArray[pos] = leaf_node;
   mInvArray |= (static_cast<ymuint>(leaf_inv) << pos);
 }

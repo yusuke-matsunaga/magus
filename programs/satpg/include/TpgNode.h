@@ -458,7 +458,7 @@ inline
 ymuint
 TpgNode::input_id() const
 {
-  assert_cond( is_input(), __FILE__, __LINE__);
+  ASSERT_COND( is_input() );
   return (mTypeId >> 3);
 }
 
@@ -476,7 +476,7 @@ inline
 ymuint
 TpgNode::output_id() const
 {
-  assert_cond( is_output(), __FILE__, __LINE__);
+  ASSERT_COND( is_output() );
   return (mTypeId >> 3);
 }
 
@@ -485,7 +485,7 @@ inline
 ymuint
 TpgNode::output_id2() const
 {
-  assert_cond( is_output(), __FILE__, __LINE__);
+  ASSERT_COND( is_output() );
   return mFanoutNum;
 }
 
@@ -502,7 +502,7 @@ inline
 tTgGateType
 TpgNode::gate_type() const
 {
-  assert_cond( is_logic(), __FILE__, __LINE__);
+  ASSERT_COND( is_logic() );
   return static_cast<tTgGateType>((mTypeId >> 3) & 15U);
 }
 
@@ -540,7 +540,7 @@ inline
 TpgNode*
 TpgNode::fanin(ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mFanins[pos];
 }
 
@@ -561,7 +561,7 @@ inline
 TpgNode*
 TpgNode::fanout(ymuint pos) const
 {
-  assert_cond( pos < fanout_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < fanout_num() );
   return mFanouts[pos];
 }
 
@@ -579,7 +579,7 @@ inline
 TpgNode*
 TpgNode::active_fanout(ymuint pos) const
 {
-  assert_cond( pos < mActFanoutNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActFanoutNum );
   return mActFanouts[pos];
 }
 
@@ -600,7 +600,7 @@ TpgFault*
 TpgNode::input_fault(int val,
 		     ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mInputFault[pos * 2 + (val % 2)];
 }
 
@@ -618,7 +618,7 @@ inline
 TpgFault*
 TpgNode::fault(ymuint pos) const
 {
-  assert_cond( pos < mFaultNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaultNum );
   return mFaultList[pos];
 }
 
@@ -822,7 +822,7 @@ TpgNode::set_ifvar(ymuint pos,
 		   int val,
 		   VarId var)
 {
-  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < fanin_num() );
   mIfVars[pos * 2 + (val % 2)] = var;
   mMarks |= 64U;
 }

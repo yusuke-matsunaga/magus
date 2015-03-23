@@ -41,7 +41,7 @@ CmnDumper::operator()(ostream& s,
     s << "PORT#" << i << "(" << port->name() << "): ";
 
     ymuint nb = port->bit_width();
-    assert_cond( nb > 0, __FILE__, __LINE__);
+    ASSERT_COND( nb > 0 );
     if ( nb == 1 ) {
       const CmnNode* input = port->input(0);
       const CmnNode* output = port->output(0);

@@ -122,7 +122,7 @@ LsimBdd10::set_network(const BdnMgr& bdn,
       bddmap[node->id()] = bdd;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
 #if 0
     cout << " = " << bddmap[node->id()].size();

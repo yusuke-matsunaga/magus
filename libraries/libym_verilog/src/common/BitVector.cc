@@ -306,7 +306,7 @@ BitVector::BitVector(const VlScalarVal& value,
     val1 = kAll0;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   for (ymuint32 i = 0; i < n - 1; ++ i) {
     mVal0[i] = val0;
@@ -664,7 +664,7 @@ BitVector::operator=(const VlScalarVal& value)
     mVal1[0] = 0;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return *this;
 }
@@ -2650,7 +2650,7 @@ BitVector::set_value(int pos,
     mVal1[blk] &= ~msk;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -2855,7 +2855,7 @@ BitVector::verilog_string(ymuint32 opt_base) const
       ans += 'Z';
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
   else {
@@ -2956,7 +2956,7 @@ BitVector::bin_str(bool skip_zeros) const
       ans += 'Z';
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     first = false;
   }
@@ -3085,7 +3085,7 @@ BitVector::set(ymuint32 val0,
 	       bool has_sign,
 	       int base)
 {
-  assert_cond(size <= kBlockSize, __FILE__, __LINE__);
+  ASSERT_COND(size <= kBlockSize );
 
   resize(size);
   set_type(has_size, has_sign, base);

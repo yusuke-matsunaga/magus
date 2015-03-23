@@ -252,7 +252,7 @@ WeightDCover::select(SbjNode* node,
       break;
     }
   }
-  assert_cond(cut, __FILE__, __LINE__);
+  ASSERT_COND(cut );
   maprec.set_cut(node, cut);
   -- rd;
   for (ymuint i = 0; i < cut->ni(); ++ i) {

@@ -41,7 +41,7 @@ ThroughConv::operator()(const MvnNode* node,
     const MvnInputPin* ipin = node->input(0);
     const MvnNode* src_node = ipin->src_node();
     ymuint bw = src_node->bit_width();
-    assert_cond( node->bit_width(), __FILE__, __LINE__);
+    ASSERT_COND( node->bit_width() );
     for (ymuint i = 0; i < bw; ++ i) {
       BdnNodeHandle handle = nodemap.get(src_node, i);
       nodemap.put(node, i, handle);

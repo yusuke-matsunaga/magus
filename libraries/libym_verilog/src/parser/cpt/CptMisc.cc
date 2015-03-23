@@ -78,7 +78,7 @@ CptDelayControl::CptDelayControl(const FileRegion& file_region,
   mTopLoc(file_region.start_loc()),
   mDelay(delay)
 {
-  assert_cond(delay, __FILE__, __LINE__);
+  ASSERT_COND(delay );
 }
 
 // デストラクタ
@@ -170,7 +170,7 @@ CptRepeatControl::CptRepeatControl(const FileRegion& file_region,
   mRepExpr(expr),
   mEventArray(event_array)
 {
-  assert_cond(expr, __FILE__, __LINE__);
+  ASSERT_COND(expr );
 }
 
 // デストラクタ

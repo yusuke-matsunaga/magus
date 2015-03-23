@@ -823,7 +823,7 @@ w2refine2(const NpnConf& conf,
 	 << "w2refine2(g0 = " << g0 << ")" << endl;
   }
 
-  assert_cond( conf.group_size(g0) == 1, __FILE__, __LINE__);
+  ASSERT_COND( conf.group_size(g0) == 1 );
   ymuint c0 = conf.group_begin(g0);
   if ( conf.ic_pol(c0) == 0 ) {
     // 極性が確定していない．
@@ -855,7 +855,7 @@ NpnMgrImpl::w2max_recur(vector<NpnConf>& conf_list,
 {
   ymuint cend;
   {
-    assert_cond( !conf_list.empty(), __FILE__, __LINE__);
+    ASSERT_COND( !conf_list.empty() );
     const NpnConf& conf = conf_list.front();
     cend = conf.group_end(conf.group_num() - 1);
   }
@@ -933,7 +933,7 @@ NpnMgrImpl::w2max_recur(vector<NpnConf>& conf_list,
 	ymuint c0 = conf.group_begin(g0);
 	ymuint pos0 = conf.ic_rep(c0);
 	ymuint pol0 = conf.ic_pol(c0);
-	assert_cond( pol0 != 0, __FILE__, __LINE__);
+	ASSERT_COND( pol0 != 0 );
 	int tmp_w2[TvFunc::kMaxNi];
 	for (ymuint c1 = c0 + 1; c1 < cend; ++ c1) {
 	  ymuint pos1 = conf.ic_rep(c1);

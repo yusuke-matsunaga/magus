@@ -85,7 +85,7 @@ SaUIP1::capture(SatReason creason,
       }
     }
     else {
-      assert_cond( !first, __FILE__, __LINE__);
+      ASSERT_COND( !first );
       Literal q = creason.literal();
       VarId var = q.varid();
       int var_level = decision_level(var);
@@ -119,7 +119,7 @@ SaUIP1::capture(SatReason creason,
       }
 #if defined(DEBUG)
       // ここは重いのでコメントアウトしておく
-      assert_cond(last > 0, __FILE__, __LINE__);
+      ASSERT_COND(last > 0 );
 #endif
     }
     if ( count == 0 ) {

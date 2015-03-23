@@ -61,7 +61,7 @@ EiBlockScope::type() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiScope;
 }
 

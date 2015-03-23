@@ -43,7 +43,7 @@ make_tficone(BdnNodeHandle handle,
 
   BdnNode* node = handle.node();
   if ( nodemap[node->id()] == CecHandle() ) {
-    assert_cond(node->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND(node->is_logic() );
     BdnNode* node0 = node->fanin0();
     bool inv0 = node->fanin0_inv();
     BdnNodeHandle ih0(node0, inv0);

@@ -40,7 +40,7 @@ BNodeMap::max_bnode_id() const
 ImpNodeHandle
 BNodeMap::bnode_handle(ymuint bnode_id) const
 {
-  assert_cond( bnode_id < max_bnode_id(), __FILE__, __LINE__);
+  ASSERT_COND( bnode_id < max_bnode_id() );
   return mBNodeMap[bnode_id];
 }
 
@@ -95,7 +95,7 @@ BNodeMap::bind(ymuint bnode_id,
 	       ImpNode* node,
 	       bool inv)
 {
-  assert_cond( bnode_id < max_bnode_id(), __FILE__, __LINE__);
+  ASSERT_COND( bnode_id < max_bnode_id() );
   mBNodeMap[bnode_id] = ImpNodeHandle(node, inv);
   if ( node != NULL ) {
     ymuint id = node->id();

@@ -173,7 +173,7 @@ DotlibLibrary::set_data(const DotlibNode* lib_node)
   }
   if ( clu ) {
     // clu は ComplexHandler で読んでいるからリストのはず．
-    assert_cond( clu->is_list(), __FILE__, __LINE__);
+    ASSERT_COND( clu->is_list() );
     if ( clu->list_size() != 2 ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      clu->loc(),

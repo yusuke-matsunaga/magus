@@ -110,7 +110,7 @@ AigTemplate::make_aig_sub(AtNode* node,
     return mgr.make_xor(input0, input1);
   }
   
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return mgr.make_zero();
 }
   
@@ -570,7 +570,7 @@ AigTemplate::set_copy_sub(AtNode* node,
     if ( node->mType == kAtXor ) {
       return get_anode(kAtXor, node0, !node->mInv1, node1, node->mInv2);
     }
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return NULL;
   }
 }
@@ -599,7 +599,7 @@ AigTemplate::set_dual_sub(AtNode* node)
   if ( node->mType == kAtXor ) {
     return get_anode(kAtXor, node0, !node->mInv1, node1, node->mInv2);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -608,7 +608,7 @@ AtNode*
 AigTemplate::set_compose_sub(AtNode* node,
 			     const vector<AtNode*>& nmap)
 {
-  assert_cond( node->mType != kAtLiteral, __FILE__, __LINE__);
+  ASSERT_COND( node->mType != kAtLiteral );
   
   if ( node->mType == kAtConst0 || node->mType == kAtConst1 ) {
     return get_cnode(node->mType);

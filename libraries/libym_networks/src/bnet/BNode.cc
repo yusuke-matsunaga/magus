@@ -30,8 +30,8 @@ BNode::BNode() :
 // デストラクタ
 BNode::~BNode()
 {
-  assert_cond( fanout_num() == 0, __FILE__, __LINE__);
-  assert_cond( fanin_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND( fanout_num() == 0 );
+  ASSERT_COND( fanin_num() == 0 );
 }
 
 // ノードタイプをセットする．
@@ -53,7 +53,7 @@ BNode::set_type(tType type)
     mFunc = Expr::make_zero();
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

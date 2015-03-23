@@ -30,7 +30,7 @@ SmtTermImpl::~SmtTermImpl()
 ymuint32
 SmtTermImpl::int_value() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -38,7 +38,7 @@ SmtTermImpl::int_value() const
 ShString
 SmtTermImpl::str_value() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ShString();
 }
 
@@ -47,7 +47,7 @@ SmtTermImpl::str_value() const
 const SmtId*
 SmtTermImpl::identifier() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -56,7 +56,7 @@ SmtTermImpl::identifier() const
 const SmtSort*
 SmtTermImpl::identifier_sort() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 #else
@@ -64,7 +64,7 @@ SmtTermImpl::identifier_sort() const
 const SmtVarFun*
 SmtTermImpl::var() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 #endif
@@ -73,7 +73,7 @@ SmtTermImpl::var() const
 const SmtVarFun*
 SmtTermImpl::function() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -81,7 +81,7 @@ SmtTermImpl::function() const
 ymuint
 SmtTermImpl::input_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -90,7 +90,7 @@ SmtTermImpl::input_num() const
 const SmtTerm*
 SmtTermImpl::input(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -98,7 +98,7 @@ SmtTermImpl::input(ymuint pos) const
 ymuint
 SmtTermImpl::var_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -107,7 +107,7 @@ SmtTermImpl::var_num() const
 const SmtVarFun*
 SmtTermImpl::bound_var(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -115,7 +115,7 @@ SmtTermImpl::bound_var(ymuint pos) const
 ymuint
 SmtTermImpl::attr_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -124,7 +124,7 @@ SmtTermImpl::attr_num() const
 ShString
 SmtTermImpl::attr_keyword(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ShString();
 }
 
@@ -133,7 +133,7 @@ SmtTermImpl::attr_keyword(ymuint pos) const
 const SmtTerm*
 SmtTermImpl::attr_value(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -141,7 +141,7 @@ SmtTermImpl::attr_value(ymuint pos) const
 const SmtTerm*
 SmtTermImpl::body() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -149,7 +149,7 @@ SmtTermImpl::body() const
 ymuint
 SmtTermImpl::elem_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -158,7 +158,7 @@ SmtTermImpl::elem_num() const
 const SmtTerm*
 SmtTermImpl::elem(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

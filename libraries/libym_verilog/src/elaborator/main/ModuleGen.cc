@@ -136,7 +136,7 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	  continue;
 	}
 	ElbParameter* param = handle->parameter();
-	assert_cond( param, __FILE__, __LINE__);
+	ASSERT_COND( param );
 
 	const PtExpr* expr = param_con->expr(i);
 	VlValue value = param_con->value(i);
@@ -184,10 +184,10 @@ ModuleGen::phase1_module_item(ElbModule* module,
 	  const PtConnection* pt_con = param_con->pt_con(i);
 	  const char* tmp_name = paramport_list[i];
 	  ElbObjHandle* handle = find_obj(module, tmp_name);
-	  assert_cond( handle, __FILE__, __LINE__);
+	  ASSERT_COND( handle );
 
 	  ElbParameter* param = handle->parameter();
-	  assert_cond( param, __FILE__, __LINE__);
+	  ASSERT_COND( param );
 
 	  const PtExpr* expr = param_con->expr(i);
 	  VlValue value = param_con->value(i);

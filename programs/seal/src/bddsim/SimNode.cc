@@ -56,7 +56,7 @@ SimNode::SimNode(ymuint32 id,
   size_t max_level = 0;
   for (size_t i = 0; i < mNfi; ++ i) {
     SimNode* input = inputs[i];
-    assert_cond(input, __FILE__, __LINE__);
+    ASSERT_COND(input );
     mFanins[i] = input;
     if ( max_level < input->level() ) {
       max_level = input->level();
@@ -83,13 +83,13 @@ SimNode::SimNode(ymuint32 id,
   mFlags(0UL),
   mLink(NULL)
 {
-  assert_cond(type >= kTgUsrDef, __FILE__, __LINE__);
+  ASSERT_COND(type >= kTgUsrDef );
   mExpr = lexp;
   
   size_t max_level = 0;
   for (size_t i = 0; i < mNfi; ++ i) {
     SimNode* input = inputs[i];
-    assert_cond(input, __FILE__, __LINE__);
+    ASSERT_COND(input );
     mFanins[i] = input;
     if ( max_level < input->level() ) {
       max_level = input->level();
@@ -146,7 +146,7 @@ SimNode::calc_gfunc()
   case kTgUndef:
   case kTgInput:
   case kTgOutput:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 
   case kTgBuff:
@@ -302,7 +302,7 @@ SimNode::calc_ffunc()
   case kTgUndef:
   case kTgInput:
   case kTgOutput:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 
   case kTgBuff:
@@ -459,7 +459,7 @@ SimNode::calc_iobs(const Bdd& obs,
     switch ( gate_type() ) {
     case kTgUndef:
     case kTgOutput:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
 
     case kTgInput:

@@ -46,7 +46,7 @@ EiFactory::new_TernaryOp(const PtExpr* pt_expr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return expr;

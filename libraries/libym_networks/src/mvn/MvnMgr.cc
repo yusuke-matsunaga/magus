@@ -370,7 +370,7 @@ MvnNode*
 MvnMgr::select_from_concat(MvnNode* src_node,
 			   ymuint bitpos)
 {
-  assert_cond( src_node->type() == MvnNode::kConcat, __FILE__, __LINE__);
+  ASSERT_COND( src_node->type() == MvnNode::kConcat );
   ymuint ni = src_node->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     ymuint idx = ni - i - 1;
@@ -395,7 +395,7 @@ MvnMgr::select_from_concat(MvnNode* src_node,
     }
     bitpos -= bw;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -406,11 +406,11 @@ MvnNode*
 MvnMgr::select_from_partselect(MvnNode* src_node,
 			       ymuint bitpos)
 {
-  assert_cond( src_node->type() == MvnNode::kConstPartSelect,
-	       __FILE__, __LINE__);
+  ASSERT_COND( src_node->type() == MvnNode::kConstPartSelect );
+
   const MvnInputPin* ipin = src_node->input(0);
   ymuint bw = ipin->bit_width();
-  assert_cond( bitpos < bw, __FILE__, __LINE__);
+  ASSERT_COND( bitpos < bw );
   ymuint msb = src_node->msb();
   ymuint lsb = src_node->lsb();
   if ( msb > lsb ) {
@@ -490,7 +490,7 @@ MvnMgr::disconnect(MvnNode* src_node,
 		   ymuint dst_pin_pos)
 {
   MvnInputPin* dst_pin = dst_node->_input(dst_pin_pos);
-  assert_cond( dst_pin->mSrcNode == src_node, __FILE__, __LINE__);
+  ASSERT_COND( dst_pin->mSrcNode == src_node );
   src_node->mDstPinList.erase(dst_pin);
   dst_pin->mSrcNode = NULL;
 }

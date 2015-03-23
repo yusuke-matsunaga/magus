@@ -64,7 +64,7 @@ PyObject*
   PyObject* result = NULL;
   switch ( self->mVal ) {
 %%%PART_B%%%
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -194,7 +194,7 @@ Py%%TYPE_NAME%%_From%%TYPE_NAME%%(%%CTYPE_NAME%% val)
   PyObject* result = NULL;
   switch ( val ) {
 %%%PART_C%%%
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

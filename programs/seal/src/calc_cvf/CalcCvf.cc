@@ -110,7 +110,7 @@ CalcCvf::set_network(const TgNetwork& network,
     for (size_t i = 0; i < ni; ++ i) {
       const TgNode* itgnode = tgnode->fanin(i);
       SimNode* inode = find_simnode(itgnode);
-      assert_cond(inode, __FILE__, __LINE__);
+      ASSERT_COND(inode );
       inputs[i] = inode;
     }
 
@@ -409,7 +409,7 @@ CalcCvf::find_dss(bool new_algorithm)
 		}
 	      }
 	    }
-	    assert_cond(q_next.num() > 0, __FILE__, __LINE__);
+	    ASSERT_COND(q_next.num() > 0 );
 	    if ( q_next.num() == 1 ) {
 	      dss.push_back(q_next.node(0));
 	      break;
@@ -469,12 +469,12 @@ CalcCvf::make_logic(const Expr& lexp,
   if ( lexp.is_posiliteral() ) {
     size_t pos = lexp.varid();
     node = inputs[pos];
-    assert_cond(node, __FILE__, __LINE__);
+    ASSERT_COND(node );
   }
   else if ( lexp.is_negaliteral() ) {
     size_t pos = lexp.varid();
     SimNode* inode = inputs[pos];
-    assert_cond(inode, __FILE__, __LINE__);
+    ASSERT_COND(inode );
     node = make_node(kTgNot, vector<SimNode*>(1, inode));
   }
   else {
@@ -646,7 +646,7 @@ CalcCvf::make_node(tTgGateType type,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   mNodeArray.push_back(node);

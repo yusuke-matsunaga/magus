@@ -108,7 +108,7 @@ GateMgr::new_gate(const QPoint& pos,
   case kGtXor:    symbol = new_symbol(type, ni, mXorSymbols); break;
   case kGtXnor:   symbol = new_symbol(type, ni, mXnorSymbols); break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -139,7 +139,7 @@ GateMgr::new_symbol(GateType type,
 		    ymuint ni,
 		    vector<Symbol*>& symbol_array)
 {
-  assert_cond( ni >= 2, __FILE__, __LINE__);
+  ASSERT_COND( ni >= 2 );
   ymuint index = ni - 2;
 
   // 必要なサイズまで NULL でパディングする．

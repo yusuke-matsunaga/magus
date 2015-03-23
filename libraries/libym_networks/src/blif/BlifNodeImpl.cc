@@ -57,7 +57,7 @@ BlifNodeImpl::fanin_num() const
 ymuint32
 BlifNodeImpl::fanin_id(ymuint32 pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -65,7 +65,7 @@ BlifNodeImpl::fanin_id(ymuint32 pos) const
 ymuint32
 BlifNodeImpl::cube_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -77,7 +77,7 @@ char
 BlifNodeImpl::cube_pat(ymuint32 c_pos,
 		       ymuint32 i_pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return '-';
 }
 
@@ -86,7 +86,7 @@ BlifNodeImpl::cube_pat(ymuint32 c_pos,
 char
 BlifNodeImpl::opat() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return '0';
 }
 
@@ -94,7 +94,7 @@ BlifNodeImpl::opat() const
 const Cell*
 BlifNodeImpl::cell() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -102,7 +102,7 @@ BlifNodeImpl::cell() const
 ymuint32
 BlifNodeImpl::inode_id() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -110,7 +110,7 @@ BlifNodeImpl::inode_id() const
 char
 BlifNodeImpl::reset_val() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ' ';
 }
 
@@ -145,7 +145,7 @@ BlifInputNode::type() const
 void
 BlifInputNode::write_blif(ostream& s) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 
@@ -185,7 +185,7 @@ BlifNodeImpl2::fanin_num() const
 ymuint32
 BlifNodeImpl2::fanin_id(ymuint32 pos) const
 {
-  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < fanin_num() );
   return mFanins[pos];
 }
 
@@ -250,8 +250,8 @@ char
 BlifLogicNode::cube_pat(ymuint32 c_pos,
 			ymuint32 i_pos) const
 {
-  assert_cond( c_pos < cube_num(), __FILE__, __LINE__);
-  assert_cond( i_pos < fanin_num(), __FILE__, __LINE__);
+  ASSERT_COND( c_pos < cube_num() );
+  ASSERT_COND( i_pos < fanin_num() );
   return mCoverPat[c_pos * fanin_num() + i_pos];
 }
 

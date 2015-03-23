@@ -52,7 +52,7 @@ GpMgr::make_const1()
 GpHandle
 GpMgr::make_input(ymuint32 input_id)
 {
-  assert_cond( input_id < 4, __FILE__, __LINE__);
+  ASSERT_COND( input_id < 4 );
 
   while ( mInputList.size() <= input_id ) {
     GpNode* node = new_node();
