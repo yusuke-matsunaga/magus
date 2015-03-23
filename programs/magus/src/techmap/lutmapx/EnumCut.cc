@@ -91,7 +91,7 @@ EnumCut::operator()(const BdnMgr& sbjgraph,
   for (vector<const BdnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     const BdnNode* node = *p;
-    assert_cond( node->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND( node->is_logic() );
 
     mMarkedNodesLast = 0;
 
@@ -135,8 +135,8 @@ EnumCut::operator()(const BdnMgr& sbjgraph,
     enum_recur();
     pop_node();
     clear_state(node);
-    assert_cond(frontier_is_empty(), __FILE__, __LINE__);
-    assert_cond(mInputPos == 0, __FILE__, __LINE__);
+    ASSERT_COND(frontier_is_empty() );
+    ASSERT_COND(mInputPos == 0 );
 
     // 今の列挙で用いたノードを cut_node_list に格納しておく
     vector<const BdnNode*>& clist = cnode_list(node);
@@ -224,7 +224,7 @@ EnumCut::get_frontier(const BdnNode* node,
   if ( node->depth() < root_depth ) {
     if ( temp2mark(node) ) {
       // 境界ノードなので入力とする．
-      assert_cond(mInputPos < mLimit, __FILE__, __LINE__);
+      ASSERT_COND(mInputPos < mLimit );
       set_state2(node);
       mInputs[mInputPos] = node;
       ++ mInputPos;
@@ -324,8 +324,8 @@ EnumCut::enum_recur()
 #endif
 
     // 速度に効くのでコメントアウトしている
-    //assert_cond(node->bmark() == 1, __FILE__, __LINE__);
-    //assert_cond(node->is_logic(), __FILE__, __LINE__);
+    //ASSERT_COND(node->bmark() == 1 );
+    //ASSERT_COND(node->is_logic() );
 
     bool has_cuts = false;
 

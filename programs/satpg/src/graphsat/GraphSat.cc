@@ -368,7 +368,7 @@ GraphSat::solve(const vector<Literal>& assumptions,
     goto end;
   }
 
-  assert_cond(decision_level() == 0, __FILE__, __LINE__);
+  ASSERT_COND(decision_level() == 0 );
 
   // assumption の割り当てを行う．
   for (vector<Literal>::const_iterator p = assumptions.begin();
@@ -449,7 +449,7 @@ GraphSat::solve(const vector<Literal>& assumptions,
     model.resize(mVarNum);
     for (ymuint i = 0; i < mVarNum; ++ i) {
       Bool3 val = cur_val(mVal[i]);
-      assert_cond(val != kB3X, __FILE__, __LINE__);
+      ASSERT_COND(val != kB3X );
       model[i] = val;
     }
   }
@@ -477,7 +477,7 @@ GraphSat::solve(const vector<Literal>& assumptions,
     case kB3True:  cout << "SAT" << endl; break;
     case kB3False: cout << "UNSAT" << endl; break;
     case kB3X:     cout << "UNKNOWN" << endl; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
   }
 
@@ -728,7 +728,7 @@ GraphSat::implication()
 	    // この assert は重いのでデバッグ時にしかオンにしない．
 	    // ※ debug と debug_implication が const なので結果が0の
 	    // ときにはコンパイル時に消されることに注意
-	    assert_cond(c->wl1() == nl, __FILE__, __LINE__);
+	    ASSERT_COND(c->wl1() == nl );
 	  }
 	}
 
@@ -843,7 +843,7 @@ GraphSat::implication()
   if ( stat == -1 ) {
     // PGraph が空になった．
     // 現在の block_list を矛盾の原因としてバックトラックする．
-    assert_cond( !mBlockList.empty(), __FILE__, __LINE__);
+    ASSERT_COND( !mBlockList.empty() );
     SatReason conflict = add_pgraph_clause(mBlockList);
     return conflict;
   }
@@ -979,7 +979,7 @@ GraphSat::sweep_clause()
   if ( !mSane ) {
     return;
   }
-  assert_cond(decision_level() == 0, __FILE__, __LINE__);
+  ASSERT_COND(decision_level() == 0 );
 
   if ( implication() != kNullSatReason ) {
     mSane = false;
@@ -1339,7 +1339,7 @@ GraphSat::add_learnt_clause()
   }
 
   // learnt clause の場合には必ず unit clause になっているはず．
-  assert_cond(eval(l0) != kB3False, __FILE__, __LINE__);
+  ASSERT_COND(eval(l0) != kB3False );
   if ( debug & debug_assign ) {
     cout << "\tassign " << l0 << " @" << decision_level()
 	 << " from " << reason << endl;
@@ -1387,7 +1387,7 @@ GraphSat::delete_clause(SatClause* clause)
     cout << " delete_clause: " << (*clause) << endl;
   }
 
-  assert_cond( clause->lit_num() > 2, __FILE__, __LINE__);
+  ASSERT_COND( clause->lit_num() > 2 );
 
   // watch list を更新
   del_watcher(~clause->wl0(), SatReason(clause));
@@ -1426,7 +1426,7 @@ GraphSat::del_watcher(Literal watch_lit,
       break;
     }
   }
-  assert_cond( wpos < n, __FILE__, __LINE__);
+  ASSERT_COND( wpos < n );
   -- n;
   for ( ; wpos < n; ++ wpos) {
     Watcher w = wlist.elem(wpos + 1);
@@ -1581,7 +1581,7 @@ GraphSat::search_pgraph()
   if ( stat == -1 ) {
     // PGraph が空になった．
     // 現在の block_list を矛盾の原因としてバックトラックする．
-    assert_cond( !mBlockList.empty(), __FILE__, __LINE__);
+    ASSERT_COND( !mBlockList.empty() );
     SatClause* clause = add_pgraph_clause(mBlockList);
     return SatReason(clause);
   }
@@ -1718,7 +1718,7 @@ SatReason
 GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list)
 {
   ymuint n = block_list.size();
-  assert_cond( n > 1, __FILE__, __LINE__);
+  ASSERT_COND( n > 1 );
 
   alloc_lits(n);
   for (ymuint i = 0; i < n; ++ i) {
@@ -1746,7 +1746,7 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list)
   else {
     // 節の生成
     SatClause* clause = new_clause(n);
-    assert_cond( n > 2, __FILE__, __LINE__);
+    ASSERT_COND( n > 2 );
     mConstrClause.push_back(clause);
 
     if ( debug & debug_assign ) {
@@ -1768,7 +1768,7 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
 			    TpgNode* free_node)
 {
   ymuint n = block_list.size();
-  assert_cond( n > 0, __FILE__, __LINE__);
+  ASSERT_COND( n > 0 );
 
   ymuint n1 = n + 1;
   alloc_lits(n1);
@@ -1798,7 +1798,7 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
   else {
     // 節の生成
     SatClause* clause = new_clause(n1);
-    assert_cond( n1 > 2, __FILE__, __LINE__);
+    ASSERT_COND( n1 > 2 );
     mConstrClause.push_back(clause);
 
     if ( debug & debug_assign ) {

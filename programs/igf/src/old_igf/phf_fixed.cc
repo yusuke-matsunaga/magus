@@ -165,7 +165,7 @@ phf(int argc,
 	      r_list.push_back(i);
 	    }
 	  }
-	  assert_cond( r_list.size() == p, __FILE__, __LINE__);
+	  ASSERT_COND( r_list.size() == p );
 	  RandCombiGen rcg2(p, nr);
 	  rcg2.generate(rg);
 	  for (ymuint i = 0; i < nr; ++ i) {

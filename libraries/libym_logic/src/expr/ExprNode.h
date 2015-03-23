@@ -378,7 +378,7 @@ inline
 const ExprNode*
 ExprNode::child(ymuint pos) const
 {
-  assert_cond(pos < child_num(), __FILE__, __LINE__);
+  ASSERT_COND(pos < child_num() );
   return mChildArray[pos];
 }
 

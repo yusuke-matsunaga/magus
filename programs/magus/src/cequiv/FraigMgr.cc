@@ -132,13 +132,13 @@ FraigMgr::make_logic(const Expr& expr,
   if ( expr.is_posiliteral() ) {
     VarId var = expr.varid();
     ymuint id = var.val();
-    assert_cond(id < inputs.size(), __FILE__, __LINE__);
+    ASSERT_COND(id < inputs.size() );
     return inputs[id];
   }
   if ( expr.is_negaliteral() ) {
     VarId var = expr.varid();
     ymuint id = var.val();
-    assert_cond(id < inputs.size(), __FILE__, __LINE__);
+    ASSERT_COND(id < inputs.size() );
     return ~inputs[id];
   }
   if ( expr.is_and() ) {
@@ -168,7 +168,7 @@ FraigMgr::make_logic(const Expr& expr,
     }
     return ans;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return make_zero();
 }
 

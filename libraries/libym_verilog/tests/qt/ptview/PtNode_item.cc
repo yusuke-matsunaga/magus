@@ -199,7 +199,7 @@ ItemNode::expand() const
     {
       ymuint n = 2;
       if ( mItem->left_range() ) {
-	assert_cond(mItem->right_range(), __FILE__, __LINE__);
+	ASSERT_COND(mItem->right_range() );
 	n += 3;
       }
       if ( mItem->iohead_array().size() > 0 ) {
@@ -601,7 +601,7 @@ InstNode::expand() const
 {
   ymuint n = 1;
   if ( mInst->left_range() ) {
-    assert_cond(mInst->right_range(), __FILE__, __LINE__);
+    ASSERT_COND(mInst->right_range() );
     n += 2;
   }
   mChildren.reserve(n);

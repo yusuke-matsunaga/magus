@@ -117,7 +117,7 @@ void
 CnfClause::set_literal(ymuint pos,
 		       Literal lit)
 {
-  assert_cond( pos < literal_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < literal_num() );
   mLitList[pos] = lit;
 }
 
@@ -135,7 +135,7 @@ inline
 Literal
 CnfClause::literal(ymuint pos) const
 {
-  assert_cond( pos < literal_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < literal_num() );
   return mLitList[pos];
 }
 

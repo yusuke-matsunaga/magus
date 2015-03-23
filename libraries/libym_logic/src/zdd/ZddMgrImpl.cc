@@ -127,7 +127,7 @@ ZddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
     mDefaultMgr = new ZddMgrImpl("default manager");
-    assert_cond(mDefaultMgr, __FILE__, __LINE__);
+    ASSERT_COND(mDefaultMgr );
   }
   return mDefaultMgr;
 }
@@ -193,7 +193,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
   // 変数テーブルの初期化
   mVarTableSize = VARTABLE_INIT_SIZE;
   mVarHashTable = alloc_vartable(mVarTableSize);
-  assert_cond(mVarHashTable, __FILE__, __LINE__);
+  ASSERT_COND(mVarHashTable );
   mVarNum = 0;
   mVarTop = NULL;
 
@@ -215,7 +215,7 @@ ZddMgrImpl::ZddMgrImpl(const string& name,
 // デストラクタ
 ZddMgrImpl::~ZddMgrImpl()
 {
-  assert_cond(this != mDefaultMgr, __FILE__, __LINE__);
+  ASSERT_COND(this != mDefaultMgr );
 
   // ZDD の解放
   // と言っても Zdd のオブジェクトを削除するわけには行かないので
@@ -268,7 +268,7 @@ ZddMgrImpl::~ZddMgrImpl()
   }
 
   // このマネージャに関わるメモリはすべて解放したはず．
-  assert_cond( mUsedMem == 0, __FILE__, __LINE__);
+  ASSERT_COND( mUsedMem == 0 );
 
 }
 

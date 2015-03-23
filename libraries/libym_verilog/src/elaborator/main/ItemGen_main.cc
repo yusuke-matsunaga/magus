@@ -377,7 +377,7 @@ ItemGen::phase1_genfor(const VlNamedObj* parent,
   const FileRegion& fr = pt_genfor->file_region();
 
   const char* name0 = pt_genfor->name();
-  assert_cond(name0 != NULL, __FILE__, __LINE__);
+  ASSERT_COND(name0 != NULL );
 
   ElbObjHandle* handle = find_obj(parent, pt_genfor->loop_var());
   if ( !handle ) {

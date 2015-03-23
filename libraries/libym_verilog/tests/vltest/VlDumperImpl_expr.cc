@@ -106,7 +106,7 @@ VlDumperImpl::put_expr(const char* label,
       case kVpiConstRange: rm_str = "constant_range"; break;
       case kVpiPlusRange:  rm_str = "plus_range"; break;
       case kVpiMinusRange:  rm_str = "minus_range"; break;
-      default: assert_not_reached(__FILE__, __LINE__);
+      default: ASSERT_NOT_REACHED;
       }
       put("range_mode", rm_str);
       if ( expr->is_constant_select() ) {
@@ -122,7 +122,7 @@ VlDumperImpl::put_expr(const char* label,
       put_primary(mgr, expr);
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     break;
   }
@@ -173,7 +173,7 @@ VlDumperImpl::put_primary(const VlMgr& mgr,
     put_expr("parent", mgr, expr->parent_expr());
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

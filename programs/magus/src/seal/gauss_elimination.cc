@@ -150,7 +150,7 @@ gaussian_elimination(const Matrix& src_matrix,
     }
 #endif
   }
-  assert_cond(!error, __FILE__, __LINE__);
+  ASSERT_COND(!error );
 #endif
 
   return true;
@@ -325,7 +325,7 @@ gaussian_elimination(const SMatrix& src_matrix,
     }
 #endif
   }
-  assert_cond(!error, __FILE__, __LINE__);
+  ASSERT_COND(!error );
 #endif
 
   watch.stop();

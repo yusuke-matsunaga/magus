@@ -68,7 +68,7 @@ dfs(const MislibNode* node,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 
@@ -249,7 +249,7 @@ gen_library(const string& lib_name,
 	break;
 
       default:
-	assert_not_reached(__FILE__, __LINE__); break;
+	ASSERT_NOT_REACHED; break;
       }
 
       if ( sense != sense_real ) {

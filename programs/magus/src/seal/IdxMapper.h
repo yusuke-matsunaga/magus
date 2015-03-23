@@ -205,7 +205,7 @@ IdxMapper::make_error_state(State normal_state,
 			    ymuint error_pos) const
 {
   State error_state = normal_state;
-  assert_cond( error_pos < error_state.size(), __FILE__, __LINE__);
+  ASSERT_COND( error_pos < error_state.size() );
   if ( error_state[error_pos] == '1' ) {
     error_state[error_pos] = '0';
   }

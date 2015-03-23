@@ -45,7 +45,7 @@ DagACoverFactory::operator()(const string& args)
   if ( args == "for" ) {
     return new WeightCover(3);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

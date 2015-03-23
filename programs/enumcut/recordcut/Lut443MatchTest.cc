@@ -24,8 +24,8 @@ make_lutfunc(ymuint ni,
 	     const vector<TvFunc>& inputs)
 {
   ymuint nexp = 1U << nfi;
-  assert_cond( nexp == tv.size(), __FILE__, __LINE__);
-  assert_cond( nfi == inputs.size(), __FILE__, __LINE__);
+  ASSERT_COND( nexp == tv.size() );
+  ASSERT_COND( nfi == inputs.size() );
   TvFunc func = TvFunc::const_zero(ni);
   for (ymuint b = 0; b < nexp; ++ b) {
     if ( tv[b] ) {

@@ -136,7 +136,7 @@ RwtMgr::init()
   for (ymuint i = 1; s_RwtPracticalClasses[i] != 0x0000; ++ i) {
     ymuint16 func = s_RwtPracticalClasses[i];
     RwtNode* node = find_node(func);
-    assert_cond( node != NULL, __FILE__, __LINE__);
+    ASSERT_COND( node != NULL );
   }
 
   cout << "read_abc_table end. # of nodes = " << mNodeNum << endl;
@@ -208,7 +208,7 @@ RwtMgr::node_num() const
 RwtNode*
 RwtMgr::node(ymuint pos) const
 {
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mNodeNum );
   return &mNodeArray[pos];
 }
 
@@ -241,7 +241,7 @@ RwtMgr::dump(ostream& s) const
       case 0xcccc: s << "VAR1"; break;
       case 0xf0f0: s << "VAR2"; break;
       case 0xff00: s << "VAR3"; break;
-      default: assert_not_reached(__FILE__, __LINE__);
+      default: ASSERT_NOT_REACHED;
       }
     }
     else {

@@ -165,7 +165,7 @@ ExprWriter::dump_sub(ostream& s,
       delim = xor_str();
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     s << "( ";
     string delim1 = "";

@@ -258,7 +258,7 @@ LcGroupMgr::dump(ODO& bos) const
   bos << ng;
   for (ymuint i = 0; i < ng; ++ i) {
     const LcGroup* group = this->group(i);
-    assert_cond( group->id() == i, __FILE__, __LINE__);
+    ASSERT_COND( group->id() == i );
 
     // 論理クラスに対する変換マップをダンプする．
     const NpnMapM& map = group->map();
@@ -301,7 +301,7 @@ LcGroupMgr::dump(ODO& bos) const
   bos << nc;
   for (ymuint i = 0; i < nc; ++ i) {
     const LcClass* rep = npn_class(i);
-    assert_cond( rep->id() == i , __FILE__, __LINE__);
+    ASSERT_COND( rep->id() == i  );
     const vector<LcGroup*>& group_list = rep->group_list();
     ymuint32 ng = group_list.size();
     bos << ng;

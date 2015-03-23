@@ -226,7 +226,7 @@ ItvlList::add_node(Node* node,
   }
   else {
     // 重複した追加はエラー
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return false;
 }

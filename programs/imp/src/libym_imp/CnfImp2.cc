@@ -107,7 +107,7 @@ CnfImp2::learning(const BdnMgr& network,
       cnf |= cnf3;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 #if 0

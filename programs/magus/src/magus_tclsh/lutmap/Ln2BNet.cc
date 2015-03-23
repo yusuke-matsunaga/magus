@@ -78,7 +78,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
       for (ymuint i = 0; i < ni; ++ i) {
 	LnNode* src_inode = src_node->fanin(i);
 	BNode* dst_inode = node_assoc[src_inode->id()];
-	assert_cond(dst_inode, __FILE__, __LINE__);
+	ASSERT_COND(dst_inode );
 	dst_inodes[i] = dst_inode;
       }
       Expr expr = Expr::make_zero();
@@ -100,7 +100,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
       }
       dst_node = manip.new_logic();
       bool stat = manip.change_logic(dst_node, expr, dst_inodes, false);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
     }
     node_assoc[src_node->id()] = dst_node;
   }
@@ -112,7 +112,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
     LnNode* onode = *p;
     LnNode* inode = onode->fanin(0);
     BNode* dst_inode = node_assoc[inode->id()];
-    assert_cond(dst_inode, __FILE__, __LINE__);
+    ASSERT_COND(dst_inode );
 
     string name;
     const LnPort* port = src_network.port(onode);
@@ -129,7 +129,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
     }
     BNode* dst_onode = manip.new_output(name);
     bool stat = manip.change_output(dst_onode, dst_inode);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 
   // DFF ノードの入力を接続を行う．
@@ -138,10 +138,10 @@ Ln2BNet::operator()(const LnGraph& src_network,
     LnNode* onode = *p;
     LnNode* inode = onode->fanin(0);
     BNode* dst_inode = node_assoc[inode->id()];
-    assert_cond(dst_inode, __FILE__, __LINE__);
+    ASSERT_COND(dst_inode );
     BNode* dst_onode = node_assoc[onode->id()];
     bool stat = manip.change_latch(dst_onode, dst_inode, 2);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 }
 

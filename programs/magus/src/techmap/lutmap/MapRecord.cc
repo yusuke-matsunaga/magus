@@ -220,11 +220,11 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
       const BdnNode* output = sbjport->output(j);
       if ( input ) {
 	node = mNodeInfo[input->id()].mMapNode[0];
-	assert_cond( node != NULL, __FILE__, __LINE__);
+	ASSERT_COND( node != NULL );
       }
       else if ( output ) {
 	node = mNodeInfo[output->id()].mMapNode[0];
-	assert_cond( node != NULL, __FILE__, __LINE__);
+	ASSERT_COND( node != NULL );
       }
       tmp[j] = node;
     }
@@ -309,7 +309,7 @@ MapRecord::back_trace(const BdnNode* node,
 
   if ( node->is_input() ) {
     // ということは inv = true のはず．
-    assert_cond(inv, __FILE__, __LINE__);
+    ASSERT_COND(inv );
     // NOT ゲートを表す LUT を作る．
     vector<LnNode*> inputs(1, node_info.mMapNode[0]);
     vector<int> tv(2);

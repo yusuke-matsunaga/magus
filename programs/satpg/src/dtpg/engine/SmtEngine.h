@@ -196,8 +196,7 @@ protected:
   void
   make_node_cnf(Solver& solver,
 		TpgNode* node,
-		const LitMap& litmap,
-		Literal output);
+		const LitMap& litmap);
 
   /// @brief ゲートの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
@@ -207,8 +206,7 @@ protected:
   void
   make_gate_cnf(Solver& solver,
 		tTgGateType type,
-		const LitMap& litmap,
-		Literal output);
+		const LitMap& litmap);
 
   /// @brief ノードの故障差関数を表すCNFを作る．
   void
@@ -380,7 +378,7 @@ protected:
   void
   make_and_cnf(Solver& solver,
 	       const LitMap& litmap,
-	       Literal output);
+	       bool inv);
 
   // 2入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
   static
@@ -414,7 +412,7 @@ protected:
   void
   make_or_cnf(Solver& solver,
 	      const LitMap& litmap,
-	      Literal output);
+	      bool inv);
 
   // 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
   static
@@ -438,7 +436,7 @@ protected:
   void
   make_xor_cnf(Solver& solver,
 	       const LitMap& litmap,
-	       Literal output);
+	       bool inv);
 
 
 private:

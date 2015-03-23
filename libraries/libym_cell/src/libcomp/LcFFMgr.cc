@@ -110,7 +110,7 @@ LcFFMgr::init()
 ymuint
 LcFFMgr::ff_class(ymuint id) const
 {
-  assert_cond( id < 4, __FILE__, __LINE__);
+  ASSERT_COND( id < 4 );
   return mFFClass[id];
 }
 

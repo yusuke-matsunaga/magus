@@ -163,7 +163,7 @@ search_aigtable(ymuint32 ni,
       if ( npn3rep[id0] == 0xFFU ) {
 	// npn3rep に pat0 のエントリが無かった．
 	// テーブルのデータがミスっていることになる．
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     AigTemplate& tmp0 = aig3table[id0];
@@ -176,7 +176,7 @@ search_aigtable(ymuint32 ni,
     return false;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 #endif
@@ -222,7 +222,7 @@ EnumPat::enum_pat2(ymuint32 pat,
   case 0xF: return mAigMgr.make_one();
   default: break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return input0;
 }
 
@@ -413,7 +413,7 @@ EnumPat::try_anddecomp(ymuint32 pat,
     }
   }
   ymuint32 n = pos_array.size();
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
 
   ymuint32 np = 1U << n;
   for (ymuint32 p = 0U; p < np; ++ p) {
@@ -438,7 +438,7 @@ EnumPat::try_anddecomp(ymuint32 pat,
 
     list<Aig> pat_a_list;
     bool stat1 = enum_pat3(pat_a, parent_list, pat_a_list);
-    assert_cond(stat1, __FILE__, __LINE__);
+    ASSERT_COND(stat1 );
 
     for (ymuint32 q = 1U; q < np; ++ q) {
       ymuint32 pat_b = 0U;
@@ -464,7 +464,7 @@ EnumPat::try_anddecomp(ymuint32 pat,
 
       list<Aig> pat_b_list;
       bool stat2 = enum_pat3(pat_b, parent_list, pat_b_list);
-      assert_cond(stat2, __FILE__, __LINE__);
+      ASSERT_COND(stat2 );
 
       for (list<Aig>::iterator p = pat_a_list.begin();
 	   p != pat_a_list.end(); ++ p) {
@@ -506,7 +506,7 @@ EnumPat::try_ordecomp(ymuint32 pat,
     }
   }
   ymuint32 n = pos_array.size();
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
 
   ymuint32 np = 1U << n;
   for (ymuint32 p = 0U; p < np; ++ p) {
@@ -529,7 +529,7 @@ EnumPat::try_ordecomp(ymuint32 pat,
 
     list<Aig> pat_a_list;
     bool stat1 = enum_pat3(pat_a, parent_list, pat_a_list);
-    assert_cond(stat1, __FILE__, __LINE__);
+    ASSERT_COND(stat1 );
 
     for (ymuint32 q = 1U; q < np; ++ q) {
       ymuint32 pat_b = 0U;
@@ -553,7 +553,7 @@ EnumPat::try_ordecomp(ymuint32 pat,
 
       list<Aig> pat_b_list;
       bool stat2 = enum_pat3(pat_b, parent_list, pat_b_list);
-      assert_cond(stat2, __FILE__, __LINE__);
+      ASSERT_COND(stat2 );
 
       for (list<Aig>::iterator p = pat_a_list.begin();
 	   p != pat_a_list.end(); ++ p) {
@@ -593,7 +593,7 @@ EnumPat::try_xordecomp(ymuint32 pat,
     }
   }
   ymuint32 n = pos_array.size();
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
 
   for (ymuint32 p = 0U; p < nip; ++ p) {
     ymuint32 pat_a = (1U << pos0) | p;
@@ -611,7 +611,7 @@ EnumPat::try_xordecomp(ymuint32 pat,
 
     list<Aig> pat_a_list;
     bool stat1 = enum_pat3(pat_a, parent_list, pat_a_list);
-    assert_cond(stat1, __FILE__, __LINE__);
+    ASSERT_COND(stat1 );
 
     ymuint32 pat_b = pat ^ pat_a;
 
@@ -628,7 +628,7 @@ EnumPat::try_xordecomp(ymuint32 pat,
 
     list<Aig> pat_b_list;
     bool stat2 = enum_pat3(pat_b, parent_list, pat_b_list);
-    assert_cond(stat2, __FILE__, __LINE__);
+    ASSERT_COND(stat2 );
 
     for (list<Aig>::iterator p = pat_a_list.begin();
 	 p != pat_a_list.end(); ++ p) {
@@ -758,7 +758,7 @@ init_table3()
   for (ymuint32 pat = 0U; pat < 256U; ++ pat) {
     AigTemplate templ;
     bool stat = search_aigtable(3, pat, templ);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     ostringstream buf;
     buf << "aig3table[" << pat << "]";
     templ.dump_code(cout, buf.str());

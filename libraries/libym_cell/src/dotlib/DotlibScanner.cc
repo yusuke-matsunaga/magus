@@ -145,7 +145,7 @@ DotlibScanner::scan()
 		    "syntax error");
     return ERROR;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
  ST_MINUS: // '-' を読み込んだ時
   c = peek();

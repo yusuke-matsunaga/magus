@@ -87,6 +87,9 @@ color_node(GcNode* node,
 	node_heap.update(node1);
       }
     }
+    else {
+      node1->add_adj_color(color);
+    }
   }
 }
 
@@ -160,33 +163,48 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
   while ( !node_heap.empty() ) {
     GcNode* max_node = node_heap.get_min();
     // max_node につけることのできる最小の色番号を求める．
-    clear_count();
     ymuint cnum = 0;
     const vector<GcNode*>& node_list = max_node->link_list();
+    vector<GcNode*> free_list;
+    free_list.reserve(node_list.size());
     for (vector<GcNode*>::const_iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
       GcNode* node1 = *p;
       ymuint c = node1->color();
-      if ( c > 0 ) {
-	if ( !mCountArray[c - 1] ) {
-	  mCountArray[c - 1] = true;
-	  ++ cnum;
-	  if ( cnum == mMaxColor ) {
-	    break;
-	  }
-	}
+      if ( c == 0 ) {
+	free_list.push_back(node1);
+      }
+    }
+    vector<ymuint> color_list;
+    color_list.reserve(mMaxColor);
+    for (ymuint c = 0; c < mMaxColor; ++ c) {
+      if ( !max_node->check_adj_color(c + 1) ) {
+	color_list.push_back(c + 1);
       }
     }
     ymuint min_col = 0;
-    for (ymuint c = 0; c < mMaxColor; ++ c) {
-      if ( !mCountArray[c] ) {
-	min_col = c + 1;
-	break;
-      }
-    }
-    if ( min_col == 0 ) {
+    if ( color_list.empty() ) {
       ++ mMaxColor;
       min_col = mMaxColor;
+    }
+    else {
+      ymuint min_count = free_list.size() + 1;
+      for (vector<ymuint>::iterator p = color_list.begin();
+	   p != color_list.end(); ++ p) {
+	ymuint col = *p;
+	ymuint n = 0;
+	for (vector<GcNode*>::const_iterator q = free_list.begin();
+	     q != free_list.end(); ++ q) {
+	  GcNode* node1 = *q;
+	  if ( !node1->check_adj_color(col) ) {
+	    ++ n;
+	  }
+	}
+	if ( min_count > n ) {
+	  min_count = n;
+	  min_col = col;
+	}
+      }
     }
     color_node(max_node, min_col, node_heap);
   }
@@ -225,14 +243,6 @@ GcSolver::coloring(vector<vector<ymuint> >& color_group)
   }
 
   return mMaxColor;
-}
-
-// @brief mCountArray をクリアする．
-void
-GcSolver::clear_count()
-{
-  mCountArray.clear();
-  mCountArray.resize(mMaxColor, false);
 }
 
 

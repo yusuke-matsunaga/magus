@@ -121,8 +121,8 @@ TopDown::operator()(const BdnMgr& network,
     pop_node();
     clear_state(node);
 
-    assert_cond( frontier_is_empty(), __FILE__, __LINE__);
-    assert_cond( mInputPos == 0, __FILE__, __LINE__);
+    ASSERT_COND( frontier_is_empty() );
+    ASSERT_COND( mInputPos == 0 );
 
     // 今の列挙で使われたノードを footprint_node_list に格納する．
     vector<const BdnNode*>& fplist = fpnode_list(node);

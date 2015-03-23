@@ -123,7 +123,7 @@ Pol_repr(PolObject* self)
     result = Py_kPolNegaString;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   Py_INCREF(result);
   return result;

@@ -313,7 +313,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	break;
       }
     }
-    assert_cond( clock_node != NULL, __FILE__, __LINE__);
+    ASSERT_COND( clock_node != NULL );
 
     ProcEnv top_env(mGlobalEnv);
     EnvMerger2 merger(mMvnMgr, mGlobalEnv);
@@ -326,7 +326,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       if ( rhs == NULL ) {
 	continue;
       }
-      assert_cond( info1.mCond == NULL, __FILE__, __LINE__);
+      ASSERT_COND( info1.mCond == NULL );
       MvnNode* node0 = mGlobalEnv.get_from_id(i);
       // FF を挿入
       // このノードに関係しているコントロールを調べる．
@@ -547,11 +547,11 @@ ReaderImpl::gen_moduleinst(MvnModule* parent_module,
       // hi は単純な参照か連結のみ
       //connect_port2(port, hi);
       // TODO: connect_port2 を作る
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }
@@ -581,7 +581,7 @@ ReaderImpl::gen_cellinst(MvnModule* parent_module,
       mMvnMgr->connect(node, 0, onode, input_id);
     }
     else if ( pin->is_output() ) {
-      assert_cond( pin->output_id() == 0, __FILE__, __LINE__);
+      ASSERT_COND( pin->output_id() == 0 );
       MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
       connect_lhs(dst_node, expr, onode, prim->file_region());
     }

@@ -112,7 +112,7 @@ CalcSvf::set_network(const TgNetwork& network,
 		     size_t time_frame,
 		     bool dss)
 {
-  assert_cond(time_frame > 0, __FILE__, __LINE__);
+  ASSERT_COND(time_frame > 0 );
 
   clear();
 
@@ -150,7 +150,7 @@ CalcSvf::set_network(const TgNetwork& network,
     for (size_t i = 0; i < ni; ++ i) {
       const TgNode* itgnode = tgnode->fanin(i);
       SimNode* inode = find_simnode(itgnode, 0);
-      assert_cond(inode, __FILE__, __LINE__);
+      ASSERT_COND(inode );
       inputs[i] = inode;
     }
 
@@ -202,9 +202,9 @@ CalcSvf::set_network(const TgNetwork& network,
     // フリップフロップは前の時刻の入力の値をコピーする．
     for (size_t i = ni1; i < ni; ++ i) {
       const TgNode* tgnode = mNetwork->input(i);
-      assert_cond(tgnode->is_ffout(), __FILE__, __LINE__);
+      ASSERT_COND(tgnode->is_ffout() );
       const TgNode* tginode = tgnode->alt_node();
-      assert_cond(tginode != NULL && tginode->is_ffin(), __FILE__, __LINE__);
+      ASSERT_COND(tginode != NULL && tginode->is_ffin() );
       SimNode* inode = find_simnode(tginode->fanin(0), tf - 1);
       mSimMap[tgnode->gid() + offset] = inode;
     }
@@ -217,7 +217,7 @@ CalcSvf::set_network(const TgNetwork& network,
       for (size_t i = 0; i < ni; ++ i) {
 	const TgNode* itgnode = tgnode->fanin(i);
 	SimNode* inode = find_simnode(itgnode, tf);
-	assert_cond(inode, __FILE__, __LINE__);
+	ASSERT_COND(inode );
 	inputs[i] = inode;
       }
 
@@ -555,7 +555,7 @@ CalcSvf::find_dss()
 	      }
 	    }
 	  }
-	  assert_cond(q_next.num() > 0, __FILE__, __LINE__);
+	  ASSERT_COND(q_next.num() > 0 );
 	  if ( q_next.num() == 1 ) {
 	    dss.push_back(q_next.node(0));
 	    break;
@@ -593,12 +593,12 @@ CalcSvf::make_logic(const Expr& lexp,
   if ( lexp.is_posiliteral() ) {
     size_t pos = lexp.varid();
     node = inputs[pos];
-    assert_cond(node, __FILE__, __LINE__);
+    ASSERT_COND(node );
   }
   else if ( lexp.is_negaliteral() ) {
     size_t pos = lexp.varid();
     SimNode* inode = inputs[pos];
-    assert_cond(inode, __FILE__, __LINE__);
+    ASSERT_COND(inode );
     node = make_node(kTgNot, vector<SimNode*>(1, inode));
   }
   else {
@@ -770,7 +770,7 @@ CalcSvf::make_node(tTgGateType type,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   mNodeArray.push_back(node);

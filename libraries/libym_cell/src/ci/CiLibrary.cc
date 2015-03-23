@@ -189,7 +189,7 @@ CiLibrary::lu_table_template_num() const
 const CellLutTemplate*
 CiLibrary::lu_table_template(ymuint pos) const
 {
-  assert_cond( pos < lu_table_template_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < lu_table_template_num() );
   return mLutTemplateArray[pos];
 }
 
@@ -224,7 +224,7 @@ CiLibrary::cell_num() const
 const Cell*
 CiLibrary::cell(ymuint pos) const
 {
-  assert_cond( pos < cell_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < cell_num() );
   return mCellArray[pos];
 }
 
@@ -254,7 +254,7 @@ CiLibrary::group_num() const
 const CellGroup*
 CiLibrary::group(ymuint id) const
 {
-  assert_cond( id < group_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < group_num() );
   return &mGroupArray[id];
 }
 
@@ -270,7 +270,7 @@ CiLibrary::npn_class_num() const
 const CellClass*
 CiLibrary::npn_class(ymuint id) const
 {
-  assert_cond( id < npn_class_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < npn_class_num() );
   return &mClassArray[id];
 }
 
@@ -576,7 +576,7 @@ CiLibrary::set_attr(const string& attr_name,
 void
 CiLibrary::set_lu_table_template_num(ymuint num)
 {
-  assert_cond( mLutTemplateNum == 0, __FILE__, __LINE__);
+  ASSERT_COND( mLutTemplateNum == 0 );
   void* p = mAlloc.get_memory(sizeof(CellLutTemplate*) * num);
   mLutTemplateNum = num;
   mLutTemplateArray = new (p) CiLutTemplate*[num];
@@ -593,7 +593,7 @@ CiLibrary::new_lut_template1(ymuint id,
 			     tCellVarType var_type1,
 			     const vector<double>& index_list1)
 {
-  assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < lu_table_template_num() );
   void* p = mAlloc.get_memory(sizeof(CiLutTemplate1D));
   CiLutTemplate* tmpl = new (p) CiLutTemplate1D(ShString(name),
 						var_type1, index_list1);
@@ -616,7 +616,7 @@ CiLibrary::new_lut_template2(ymuint id,
 			     tCellVarType var_type2,
 			     const vector<double>& index_list2)
 {
-  assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < lu_table_template_num() );
   void* p = mAlloc.get_memory(sizeof(CiLutTemplate2D));
   CiLutTemplate* tmpl = new (p) CiLutTemplate2D(ShString(name),
 						  var_type1, index_list1,
@@ -644,7 +644,7 @@ CiLibrary::new_lut_template3(ymuint id,
 			     tCellVarType var_type3,
 			     const vector<double>& index_list3)
 {
-  assert_cond( id < lu_table_template_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < lu_table_template_num() );
   void* p = mAlloc.get_memory(sizeof(CiLutTemplate3D));
   CiLutTemplate* tmpl = new (p) CiLutTemplate3D(ShString(name),
 						var_type1, index_list1,
@@ -659,7 +659,7 @@ CiLibrary::new_lut_template3(ymuint id,
 void
 CiLibrary::set_cell_num(ymuint num)
 {
-  assert_cond( mCellNum == 0, __FILE__, __LINE__);
+  ASSERT_COND( mCellNum == 0 );
   mCellNum = num;
   void* p = mAlloc.get_memory(sizeof(CiCell*) * num);
   mCellArray = new (p) CiCell*[num];
@@ -670,7 +670,7 @@ CiLibrary::set_cell_num(ymuint num)
 Cell*
 CiLibrary::cell(ymuint pos)
 {
-  assert_cond( pos < mCellNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mCellNum );
   return mCellArray[pos];
 }
 
@@ -1272,7 +1272,7 @@ CiLibrary::set_timing(ymuint cell_id,
   switch ( timing_sense ) {
   case kCellPosiUnate: base += 0; break;
   case kCellNegaUnate: base += 1; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   ymuint n = tid_list.size();
@@ -1391,7 +1391,7 @@ CiLibrary::compile()
       NpnMapM map = cgroup->map();
       ymuint pos_array[6] = { 0, 0, 0, 0, 0, 0 };
       ymuint ni = map.input_num() - 2;
-      assert_cond( ni <= 4, __FILE__, __LINE__);
+      ASSERT_COND( ni <= 4 );
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
 	ymuint pos = imap.var().val();
@@ -1414,7 +1414,7 @@ CiLibrary::compile()
       NpnMapM map = cgroup->map();
       ymuint pos_array[5] = { 0, 0, 0, 0, 0 };
       ymuint ni = map.input_num() - 2;
-      assert_cond( ni <= 4, __FILE__, __LINE__);
+      ASSERT_COND( ni <= 4 );
       for (ymuint i = 0; i < ni; ++ i) {
 	NpnVmap imap = map.imap(VarId(i));
 	ymuint pos = imap.var().val();
@@ -1752,7 +1752,7 @@ CiLibrary::restore(IDO& s)
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
 
@@ -1929,7 +1929,7 @@ CiLibrary::restore(IDO& s)
 	break;
 
       default:
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	break;
       }
     }
@@ -2138,7 +2138,7 @@ CiLibrary::restore_lut(IDO& s)
   }
 
   const CellLutTemplate* templ = lu_table_template(template_name.c_str());
-  assert_cond( templ != NULL, __FILE__, __LINE__);
+  ASSERT_COND( templ != NULL );
 
   ymuint d = templ->dimension();
   switch ( d ) {
@@ -2242,7 +2242,7 @@ CiLibrary::restore_lut(IDO& s)
     }
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return NULL;

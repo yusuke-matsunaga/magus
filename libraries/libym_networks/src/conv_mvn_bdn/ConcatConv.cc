@@ -52,7 +52,7 @@ ConcatConv::operator()(const MvnNode* node,
 	nodemap.put(node, index, handle0);
       }
     }
-    assert_cond( offset == 0U, __FILE__, __LINE__);
+    ASSERT_COND( offset == 0U );
     return true;
   }
   return false;

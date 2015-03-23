@@ -181,7 +181,7 @@ VarHeap::put(Variable* var,
     }
     delete [] old_array;
   }
-  assert_cond( mVarNum < mHeapSize, __FILE__, __LINE__);
+  ASSERT_COND( mVarNum < mHeapSize );
   ymuint pos = mVarNum;
   ++ mVarNum;
   mHeap[pos].mVar = var;
@@ -195,7 +195,7 @@ inline
 Variable*
 VarHeap::get_min()
 {
-  assert_cond( !empty(), __FILE__, __LINE__);
+  ASSERT_COND( !empty() );
   Variable* var = mHeap[0].mVar;
   -- mVarNum;
   if ( mVarNum > 0 ) {

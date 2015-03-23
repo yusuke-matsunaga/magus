@@ -214,7 +214,7 @@ lu_decomp(const Matrix& src_matrix,
     }
 #endif
   }
-  assert_cond(!error, __FILE__, __LINE__);
+  ASSERT_COND(!error );
 #endif
 
   return true;

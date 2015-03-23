@@ -59,7 +59,7 @@ lut2bnet(const LnGraph& src_network,
       for (ymuint i = 0; i < ni; ++ i) {
 	LnNode* src_inode = src_node->fanin(i);
 	BNode* dst_inode = node_assoc[src_inode->id()];
-	assert_cond(dst_inode, __FILE__, __LINE__);
+	ASSERT_COND(dst_inode );
 	dst_inodes[i] = dst_inode;
       }
       Expr expr = Expr::make_zero();
@@ -84,7 +84,7 @@ lut2bnet(const LnGraph& src_network,
       }
       dst_node = manip.new_logic(name);
       bool stat = manip.change_logic(dst_node, expr, dst_inodes, false);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
     }
     node_assoc[src_node->id()] = dst_node;
   }
@@ -96,10 +96,10 @@ lut2bnet(const LnGraph& src_network,
     LnNode* onode = *p;
     LnNode* inode = onode->fanin(0);
     BNode* dst_inode = node_assoc[inode->id()];
-    assert_cond(dst_inode, __FILE__, __LINE__);
+    ASSERT_COND(dst_inode );
     BNode* dst_onode = manip.new_output(onode->name());
     bool stat = manip.change_output(dst_onode, dst_inode);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 }
 

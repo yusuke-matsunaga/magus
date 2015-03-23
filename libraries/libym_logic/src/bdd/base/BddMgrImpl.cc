@@ -120,7 +120,7 @@ BddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
     mDefaultMgr = new BddMgrClassic("default manager");
-    assert_cond(mDefaultMgr, __FILE__, __LINE__);
+    ASSERT_COND(mDefaultMgr );
   }
   return mDefaultMgr;
 }
@@ -208,7 +208,7 @@ BddMgrImpl::BddMgrImpl(const string& name) :
 // デストラクタ
 BddMgrImpl::~BddMgrImpl()
 {
-  assert_cond(this != mDefaultMgr, __FILE__, __LINE__);
+  ASSERT_COND(this != mDefaultMgr );
 
   // BDD の解放
   // と言っても Bdd のオブジェクトを削除するわけには行かないので
@@ -284,7 +284,7 @@ BddMgrImpl::tvec_sub(const vector<int>& v,
 		     const vector<BddEdge>& var_vector,
 		     ymuint var_idx)
 {
-  assert_cond(size > 0, __FILE__, __LINE__);
+  ASSERT_COND(size > 0 );
   if ( size == 1 ) {
     if ( v[top] ) {
       return BddEdge::make_one();

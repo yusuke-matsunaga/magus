@@ -177,23 +177,6 @@ public:
   active_node(ymuint pos) const;
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 必要割り当てに関する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief f の検出に必要な割り当てを求める．
-  /// @param[in] f 対象の故障
-  /// @param[in] ma_list 割り当て結果を格納するリスト
-  /// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
-  /// @note TpgNetwork のメンバにはアクセスしないので static メンバになっている．
-  /// @note ma_list の内容は TpgNode::id() * 2 + val (0 / 1)
-  static
-  bool
-  get_mandatory_assignment(TpgFault* f,
-			   vector<ymuint32>& ma_list);
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
@@ -473,7 +456,7 @@ inline
 TpgNode*
 TpgNetwork::input(ymuint pos) const
 {
-  assert_cond( pos < input_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num2() );
   return mInputArray[pos];
 }
 
@@ -499,7 +482,7 @@ inline
 TpgNode*
 TpgNetwork::output(ymuint pos) const
 {
-  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num2() );
   return mOutputArray[pos];
 }
 
@@ -508,7 +491,7 @@ inline
 TpgNode*
 TpgNetwork::output2(ymuint pos) const
 {
-  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num2() );
   return mOutputArray2[pos];
 }
 
@@ -542,7 +525,7 @@ inline
 TpgNode*
 TpgNetwork::active_node(ymuint pos)
 {
-  assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActNodeNum );
   return mActNodeArray[pos];
 }
 
@@ -552,7 +535,7 @@ inline
 const TpgNode*
 TpgNetwork::active_node(ymuint pos) const
 {
-  assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActNodeNum );
   return mActNodeArray[pos];
 }
 

@@ -238,7 +238,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       case MvnNode::kInput: val = 1U; break;
       case MvnNode::kOutput: val = 2U; break;
       case MvnNode::kInout: val = 3U; break;
-      default: assert_not_reached(__FILE__, __LINE__); break;
+      default: ASSERT_NOT_REACHED; break;
       }
       if ( port_ref->is_simple() ) {
 	for (ymuint k = 0; k < nb1; ++ k) {
@@ -259,7 +259,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
 	}
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     BdnPort* bdnport = bdnetwork.new_port(port->name(), iovect);
@@ -290,7 +290,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
 	}
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
   }
@@ -391,7 +391,7 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       }
     }
     if ( !done ) {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     enqueue(node, queue, mark);
   }
@@ -404,14 +404,14 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       // データ入力
       const MvnInputPin* data_ipin = node->input(0);
       const MvnNode* data_src_node = data_ipin->src_node();
-      assert_cond( data_src_node != NULL, __FILE__, __LINE__);
+      ASSERT_COND( data_src_node != NULL );
       ymuint bw = data_ipin->bit_width();
 
       // クロック
       const MvnInputPin* clock_ipin = node->input(1);
       const MvnNode* clock_src_node = clock_ipin->src_node();
-      assert_cond( clock_src_node != NULL, __FILE__, __LINE__);
-      assert_cond( clock_src_node->bit_width() == 1, __FILE__, __LINE__);
+      ASSERT_COND( clock_src_node != NULL );
+      ASSERT_COND( clock_src_node->bit_width() == 1 );
       BdnNodeHandle clock_ihandle = mvnode_map.get(clock_src_node);
       if ( node->clock_pol() == 0 ) {
 	clock_ihandle = ~clock_ihandle;
@@ -459,14 +459,14 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
       // データ入力
       const MvnInputPin* data_ipin = node->input(0);
       const MvnNode* data_src_node = data_ipin->src_node();
-      assert_cond( data_src_node != NULL, __FILE__, __LINE__);
+      ASSERT_COND( data_src_node != NULL );
       ymuint bw = data_ipin->bit_width();
 
       // イネーブル
       const MvnInputPin* enable_ipin = node->input(1);
       const MvnNode* enable_src_node = enable_ipin->src_node();
-      assert_cond( enable_src_node != NULL, __FILE__, __LINE__);
-      assert_cond( enable_src_node->bit_width() == 1, __FILE__, __LINE__);
+      ASSERT_COND( enable_src_node != NULL );
+      ASSERT_COND( enable_src_node->bit_width() == 1 );
       BdnNodeHandle enable_ihandle = mvnode_map.get(enable_src_node);
 
       const vector<BdnLatch*>& latch_array = latch_map[node->id()];
@@ -490,9 +490,9 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
     ymuint bw = ipin->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       BdnNodeHandle handle = mvnode_map.get(node, j);
-      assert_cond( handle.inv() == false, __FILE__, __LINE__);
+      ASSERT_COND( handle.inv() == false );
       BdnNode* onode = handle.node();
-      assert_cond( onode != NULL, __FILE__, __LINE__);
+      ASSERT_COND( onode != NULL );
       BdnNodeHandle ihandle = mvnode_map.get(src_node, j);
       bdnetwork.change_output_fanin(onode, ihandle);
     }
@@ -508,9 +508,9 @@ MvnBdnConv::operator()(const MvnMgr& mvmgr,
     ymuint bw = ipin->bit_width();
     for (ymuint j = 0; j < bw; ++ j) {
       BdnNodeHandle handle = mvnode_map.get(node, j);
-      assert_cond( handle.inv() == false, __FILE__, __LINE__);
+      ASSERT_COND( handle.inv() == false );
       BdnNode* input = handle.node();
-      assert_cond( input != NULL, __FILE__, __LINE__);
+      ASSERT_COND( input != NULL );
       BdnNodeHandle ihandle = mvnode_map.get(src_node, j);
       bdnetwork.change_output_fanin(input, ihandle);
     }

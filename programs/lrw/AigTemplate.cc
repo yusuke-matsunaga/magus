@@ -124,7 +124,7 @@ AigTemplate::make_aig(AigManip& manip,
 	ans = manip.make_xor(input0, input1);
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     node_map[node->id()] = ans;

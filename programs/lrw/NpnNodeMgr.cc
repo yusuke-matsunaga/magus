@@ -55,7 +55,7 @@ NpnNodeMgr::NpnNodeMgr() :
   mConstNode->mSupVect = 0U;
   mConstNode->mXorSupVect = 0U;
   mConstNode->mSlink = NULL;
-  assert_cond( mConstNode->id() == 0, __FILE__, __LINE__);
+  ASSERT_COND( mConstNode->id() == 0 );
 
   // 入力ノードの生成
   mInputNode = alloc_node();
@@ -65,7 +65,7 @@ NpnNodeMgr::NpnNodeMgr() :
   mInputNode->mXorSupVect = 1U;
   mInputNode->mSlink = NULL;
   mInputNode->mIdentList.push_back(NpnXform());
-  assert_cond( mInputNode->id() == 1, __FILE__, __LINE__);
+  ASSERT_COND( mInputNode->id() == 1 );
 }
 
 // @brief デストラクタ
@@ -102,7 +102,7 @@ NpnNodeMgr::make_input(ymuint input_id)
   case 2: return NpnHandle(1, NpnXform(12, 0U));
   case 3: return NpnHandle(1, NpnXform(18, 0U));
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NpnHandle();
 }
 
@@ -302,7 +302,7 @@ NpnNodeMgr::new_node(bool is_xor,
       print_func(cout, new_func2);
       cout << endl;
     }
-    assert_cond( new_func2 == o_func, __FILE__, __LINE__);
+    ASSERT_COND( new_func2 == o_func );
   }
 
   // Phase2: 左右の子供の順序を正規化する．
@@ -322,7 +322,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	     << "new_func   = ";
 	print_func(cout, new_func);
       }
-      assert_cond( new_func == o_func, __FILE__, __LINE__);
+      ASSERT_COND( new_func == o_func );
     }
   }
   else if ( node0 > node1 ) {
@@ -335,7 +335,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	     << "new_func   = ";
 	print_func(cout, new_func);
       }
-      assert_cond( new_func == o_func, __FILE__, __LINE__);
+      ASSERT_COND( new_func == o_func );
     }
   }
   else { // node0 == node1
@@ -351,7 +351,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	     << "new_func   = ";
 	print_func(cout, new_func);
       }
-      assert_cond( new_func == o_func, __FILE__, __LINE__);
+      ASSERT_COND( new_func == o_func );
     }
 
     NpnHandle new2_fanin0;
@@ -366,7 +366,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	     << "new_func   = ";
 	print_func(cout, new_func);
       }
-      assert_cond( new_func == o_func, __FILE__, __LINE__);
+      ASSERT_COND( new_func == o_func );
     }
 
     NpnXform a = new1_fanin1.npn_xform();
@@ -450,7 +450,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	     << "node->mXorSupVect = " << hex << static_cast<ymuint>(node->mXorSupVect) << endl
 	     << "xorsup            = " << hex << xorsup << endl;
       }
-      assert_cond( node->mXorSupVect == xorsup, __FILE__, __LINE__);
+      ASSERT_COND( node->mXorSupVect == xorsup );
 #endif
     }
 
@@ -500,7 +500,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	    // 構造に対する同位体変換だから必ず
 	    // 関数に対しても同位体変換でなければならない．
 	    ymuint tmp_func = xform_func(node_func, ixf);
-	    assert_cond( tmp_func == node_func, __FILE__, __LINE__);
+	    ASSERT_COND( tmp_func == node_func );
 	  }
 	}
       }
@@ -523,7 +523,7 @@ NpnNodeMgr::new_node(bool is_xor,
 	    // 構造に対する同位体変換だから必ず
 	    // 関数に対しても同位体変換でなければならない．
 	    ymuint tmp_func = xform_func(node_func, xf);
-	    assert_cond( tmp_func == node_func, __FILE__, __LINE__);
+	    ASSERT_COND( tmp_func == node_func );
 	  }
 	}
       }
@@ -542,7 +542,7 @@ NpnNodeMgr::new_node(bool is_xor,
       cout << "o_func = ";
       print_func(cout, o_func);
     }
-    assert_cond( o_func == func1, __FILE__, __LINE__);
+    ASSERT_COND( o_func == func1 );
 
     cout << "node->id() = " << node->id()
 	 << ", oxf = " << oxf << endl;

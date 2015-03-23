@@ -137,14 +137,14 @@ TagDict::hash_func(const VlNamedObj* parent,
 void
 TagDictCell::add_decl(ElbDecl* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // 宣言要素の先頭を得る．
 const ElbDecl*
 TagDictCell::decl()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -152,14 +152,14 @@ TagDictCell::decl()
 void
 TagDictCell::add_declarray(ElbDeclArray* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // 宣言要素配列の先頭を得る．
 const ElbDeclArray*
 TagDictCell::declarray()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -167,14 +167,14 @@ TagDictCell::declarray()
 void
 TagDictCell::add_parameter(ElbParameter* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief  パラメータの先頭を得る．
 const ElbParameter*
 TagDictCell::parameter()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -182,14 +182,14 @@ TagDictCell::parameter()
 void
 TagDictCell::add_defparam(ElbDefParam* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // defparam の先頭を得る．
 const ElbDefParam*
 TagDictCell::defparam()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -197,14 +197,14 @@ TagDictCell::defparam()
 void
 TagDictCell::add_paramassign(ElbParamAssign* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // param assign の先頭を得る．
 const ElbParamAssign*
 TagDictCell::paramassign()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -212,14 +212,14 @@ TagDictCell::paramassign()
 void
 TagDictCell::add_modulearray(ElbModuleArray* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // module array の先頭を得る．
 const ElbModuleArray*
 TagDictCell::modulearray()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -227,14 +227,14 @@ TagDictCell::modulearray()
 void
 TagDictCell::add_module(ElbModule* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // module の先頭を得る．
 const ElbModule*
 TagDictCell::module()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -242,14 +242,14 @@ TagDictCell::module()
 void
 TagDictCell::add_primarray(ElbPrimArray* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // primitive array の先頭を得る．
 const ElbPrimArray*
 TagDictCell::primarray()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -257,14 +257,14 @@ TagDictCell::primarray()
 void
 TagDictCell::add_primitive(ElbPrimitive* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // primitive の先頭を得る．
 const ElbPrimitive*
 TagDictCell::primitive()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -272,14 +272,14 @@ TagDictCell::primitive()
 void
 TagDictCell::add_task(ElbTaskFunc* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief タスクの先頭を得る．
 const ElbTaskFunc*
 TagDictCell::task()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -287,14 +287,14 @@ TagDictCell::task()
 void
 TagDictCell::add_function(ElbTaskFunc* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 関数の先頭を得る．
 const ElbTaskFunc*
 TagDictCell::function()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -302,14 +302,14 @@ TagDictCell::function()
 void
 TagDictCell::add_contassign(ElbContAssign* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // continuous assignment の先頭を得る．
 const ElbContAssign*
 TagDictCell::contassign()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -317,14 +317,14 @@ TagDictCell::contassign()
 void
 TagDictCell::add_process(ElbProcess* process)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // process の先頭を得る．
 const ElbProcess*
 TagDictCell::process()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -332,14 +332,14 @@ TagDictCell::process()
 void
 TagDictCell::add_internalscope(ElbScope* obj)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // internal scope の先頭を得る．
 const ElbScope*
 TagDictCell::internalscope()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

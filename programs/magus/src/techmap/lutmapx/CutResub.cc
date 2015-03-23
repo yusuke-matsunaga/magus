@@ -247,7 +247,7 @@ CutResub::back_trace(const BdnNode* sbjnode,
     mNodeArray[sbjnode->id()] = node;
     node->set_sbjnode(sbjnode);
     const Cut* cut = maprec.get_cut(sbjnode);
-    assert_cond(cut != NULL, __FILE__, __LINE__);
+    ASSERT_COND(cut != NULL );
     node->set_cut(cut);
 
     // ファンインのノードのカットを選ぶ．

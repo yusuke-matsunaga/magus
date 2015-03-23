@@ -45,7 +45,7 @@ EqConv::operator()(const MvnNode* node,
     const MvnNode* src_node1 = ipin1->src_node();
 
     ymuint bw = src_node0->bit_width();
-    assert_cond( src_node1->bit_width() == bw, __FILE__, __LINE__);
+    ASSERT_COND( src_node1->bit_width() == bw );
 
     vector<BdnNodeHandle> input_array(bw);
     for (ymuint i = 0; i < bw; ++ i) {

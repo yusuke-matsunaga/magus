@@ -81,7 +81,7 @@ ExprMgr::make_posiliteral(VarId id)
 {
   make_literals(id);
   ymuint pos = id.val() << 1;
-  assert_cond(pos < mLiteralArray.size(), __FILE__, __LINE__);
+  ASSERT_COND(pos < mLiteralArray.size() );
   return mLiteralArray[pos];
 }
 
@@ -91,7 +91,7 @@ ExprMgr::make_negaliteral(VarId id)
 {
   make_literals(id);
   ymuint pos = (id.val() << 1) + 1;
-  assert_cond(pos < mLiteralArray.size(), __FILE__, __LINE__);
+  ASSERT_COND(pos < mLiteralArray.size() );
   return mLiteralArray[pos];
 }
 
@@ -347,7 +347,7 @@ ExprMgr::nodestack_top()
 void
 ExprMgr::nodestack_pop(ymuint oldtop)
 {
-  assert_cond(oldtop < mNodeStack.size(), __FILE__, __LINE__);
+  ASSERT_COND(oldtop < mNodeStack.size() );
   mNodeStack.erase(mNodeStack.begin() + oldtop, mNodeStack.end());
 }
 
@@ -395,7 +395,7 @@ ExprMgr::complement(const ExprNode* node)
   }
 
   // ここに来ることはない．
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
   return 0;
 }
@@ -449,7 +449,7 @@ ExprMgr::compose(const ExprNode* node,
     break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -507,7 +507,7 @@ ExprMgr::compose(const ExprNode* node,
   default:   break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -564,7 +564,7 @@ ExprMgr::remap_var(const ExprNode* node,
   default:   break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -606,7 +606,7 @@ ExprMgr::simplify(const ExprNode* node)
   }
 
   // ここに来ることはない．
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
   return NULL;
 }

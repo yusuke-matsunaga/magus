@@ -36,7 +36,7 @@ VlDumperImpl::put_primarray_list(const char* label,
     case kVpiGateArray:   nm = "GateArray"; break;
     case kVpiSwitchArray: nm = "SwitchArray"; break;
     case kVpiUdpArray:    nm = "UdpArray"; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
     VlDumpHeader x(this, label, nm);
 
@@ -67,7 +67,7 @@ VlDumperImpl::put_primitive(const char* label,
   case kVpiGate:   nm = "Gate"; break;
   case kVpiSwitch: nm = "Switch"; break;
   case kVpiUdp:    nm = "Udp"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   VlDumpHeader x(this, label, nm);
 

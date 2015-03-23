@@ -271,9 +271,9 @@ BlifNetworkImpl::write_blif(ostream& s) const
     const BlifNode* node = *p;
     ymuint32 ni = node->fanin_num();
     const Cell* cell = node->cell();
-    assert_cond( ni == cell->input_num(), __FILE__, __LINE__);
-    assert_cond( cell->output_num() == 1, __FILE__, __LINE__);
-    assert_cond( cell->inout_num() == 0, __FILE__, __LINE__);
+    ASSERT_COND( ni == cell->input_num() );
+    ASSERT_COND( cell->output_num() == 1 );
+    ASSERT_COND( cell->inout_num() == 0 );
     s << ".gate " << cell->name();
     for (ymuint32 i = 0; i < ni; ++ i) {
       const CellPin* ipin = cell->input(i);

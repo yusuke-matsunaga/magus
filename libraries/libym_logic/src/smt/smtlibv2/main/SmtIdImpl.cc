@@ -57,7 +57,7 @@ SmtIdImpl::index_size() const
 ymuint32
 SmtIdImpl::index(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -97,7 +97,7 @@ SmtIndexId::index_size() const
 ymuint32
 SmtIndexId::index(ymuint pos) const
 {
-  assert_cond( pos < index_size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < index_size() );
   return mIndexList[pos];
 }
 

@@ -173,11 +173,11 @@ SbjGraph::copy(const SbjGraph& src,
 
     const SbjNode* src_inode0 = src_node->fanin(0);
     SbjNode* input0 = nodemap[src_inode0->id()];
-    assert_cond(input0, __FILE__, __LINE__);
+    ASSERT_COND(input0 );
 
     const SbjNode* src_inode1 = src_node->fanin(1);
     SbjNode* input1 = nodemap[src_inode1->id()];
-    assert_cond(input1, __FILE__, __LINE__);
+    ASSERT_COND(input1 );
 
     SbjNode* dst_node = new_logic(src_node->fcode(), input0, input1);
     dst_node->mMark = src_node->mMark;
@@ -287,7 +287,7 @@ SbjGraph::clear()
     ++ p;
     delete_input(node);
   }
-  assert_cond(mInputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mInputList.empty() );
 
   for (SbjNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ) {
@@ -297,7 +297,7 @@ SbjGraph::clear()
     ++ p;
     delete_output(node);
   }
-  assert_cond(mOutputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mOutputList.empty() );
 
   for (SbjNodeList::iterator p = mLnodeList.begin();
        p != mLnodeList.end(); ) {
@@ -307,7 +307,7 @@ SbjGraph::clear()
     ++ p;
     delete_logic(node);
   }
-  assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mLnodeList.empty() );
 
   for (SbjNodeList::iterator p = mDffList.begin();
        p != mDffList.end(); ) {
@@ -317,7 +317,7 @@ SbjGraph::clear()
     ++ p;
     delete_dff(node);
   }
-  assert_cond(mDffList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mDffList.empty() );
 
   mInputArray.clear();
   mInputPortArray.clear();
@@ -348,7 +348,7 @@ SbjGraph::add_port(const string& name,
       port_info.mPos = i;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 }
@@ -481,7 +481,7 @@ SbjGraph::sort(vector<const SbjNode*>& node_list) const
     ++ rpos;
     sort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == lnode_num() );
 }
 
 
@@ -544,7 +544,7 @@ SbjGraph::rsort(vector<const SbjNode*>& node_list) const
     ++ rpos;
     rsort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == lnode_num() );
 }
 
 // 入力ノードを作る．
@@ -685,7 +685,7 @@ SbjGraph::_new_and(const vector<SbjHandle>& ihandle_list,
 		   ymuint start,
 		   ymuint num)
 {
-  assert_cond( num > 0, __FILE__, __LINE__);
+  ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
@@ -767,7 +767,7 @@ SbjGraph::_new_or(const vector<SbjHandle>& ihandle_list,
 		  ymuint start,
 		  ymuint num)
 {
-  assert_cond( num > 0, __FILE__, __LINE__);
+  ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
@@ -847,7 +847,7 @@ SbjGraph::_new_xor(const vector<SbjHandle>& ihandle_list,
 		   ymuint start,
 		   ymuint num)
 {
-  assert_cond( num > 0, __FILE__, __LINE__);
+  ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
@@ -878,7 +878,7 @@ SbjGraph::new_dff(SbjNode* inode,
 void
 SbjGraph::delete_input(SbjNode* node)
 {
-  assert_cond(node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_input() );
   mInputList.erase(node);
   delete_node(node, 0);
 }
@@ -887,7 +887,7 @@ SbjGraph::delete_input(SbjNode* node)
 void
 SbjGraph::delete_output(SbjNode* node)
 {
-  assert_cond(node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_output() );
   mOutputList.erase(node);
   delete_node(node, 1);
 
@@ -899,8 +899,8 @@ SbjGraph::delete_output(SbjNode* node)
 void
 SbjGraph::delete_logic(SbjNode* node)
 {
-  assert_cond(node->is_logic(), __FILE__, __LINE__);
-  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND(node->is_logic() );
+  ASSERT_COND(node->fanout_num() == 0 );
   connect(NULL, node, 0);
   connect(NULL, node, 1);
 
@@ -912,7 +912,7 @@ SbjGraph::delete_logic(SbjNode* node)
 void
 SbjGraph::delete_dff(SbjNode* node)
 {
-  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_dff() );
   mDffList.erase(node);
   delete_node(node, 4);
 
@@ -971,7 +971,7 @@ void
 SbjGraph::change_output(SbjNode* node,
 			SbjHandle ihandle)
 {
-  assert_cond( node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_output() );
   node->set_output(node->subid(), ihandle.inv());
   connect(ihandle.node(), node, 0);
 }
@@ -983,7 +983,7 @@ void
 SbjGraph::set_dff_data(SbjNode* node,
 		       SbjHandle ihandle)
 {
-  assert_cond( node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_dff() );
   node->set_dff(ihandle.inv());
   connect(ihandle.node(), node, 0);
 }
@@ -995,7 +995,7 @@ void
 SbjGraph::set_dff_clock(SbjNode* node,
 			SbjHandle ihandle)
 {
-  assert_cond( node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_dff() );
   node->set_dff_clock(ihandle.inv());
   connect(ihandle.node(), node, 1);
 }
@@ -1007,7 +1007,7 @@ void
 SbjGraph::set_dff_set(SbjNode* node,
 		      SbjHandle ihandle)
 {
-  assert_cond( node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_dff() );
   node->set_dff_set(ihandle.inv());
   connect(ihandle.node(), node, 2);
 }
@@ -1019,7 +1019,7 @@ void
 SbjGraph::set_dff_rst(SbjNode* node,
 		      SbjHandle ihandle)
 {
-  assert_cond( node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_dff() );
   node->set_dff_rst(ihandle.inv());
   connect(ihandle.node(), node, 3);
 }

@@ -52,7 +52,7 @@ END_NONAMESPACE
 PySatMsgHandler::PySatMsgHandler(PyObject* func_obj) :
   mFuncObj(func_obj)
 {
-  assert_cond( PyCallable_Check(func_obj), __FILE__, __LINE__);
+  ASSERT_COND( PyCallable_Check(func_obj) );
   Py_INCREF(func_obj);
 
   mPrintHeaderObj = Py_BuildValue("s", "print_header");

@@ -198,7 +198,7 @@ WeightLBD::count(SbjNode* node,
       return cost->area() / node->n_fanout();
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 

@@ -62,11 +62,11 @@ check_builtin(const Expr& lexp,
     return kTgGateConst1;
   }
   if ( lexp.is_posiliteral() ) {
-    assert_cond(lexp.varid().val() == 0, __FILE__, __LINE__);
+    ASSERT_COND(lexp.varid().val() == 0 );
     return kTgGateBuff;
   }
   if ( lexp.is_negaliteral() ) {
-    assert_cond(lexp.varid().val() == 0, __FILE__, __LINE__);
+    ASSERT_COND(lexp.varid().val() == 0 );
     return kTgGateNot;
   }
   ymuint np = 1 << ni;

@@ -65,7 +65,7 @@ GenAigNaive::aig_mode(ymuint slack)
     case 1: fv = 0xcccc; break;
     case 2: fv = 0xf0f0; break;
     case 3: fv = 0xff00; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
     fv &= mMask;
     Aig iaig = mMgr.make_input(VarId(i));
@@ -243,7 +243,7 @@ GenAigNaive::add_cand(Aig aig,
   AigPat aigpat(aig, func, level);
 #if 0
   bool stat = sanity_check(aigpat);
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 #endif
   while ( mCandListArray.size() <= level ) {
     mCandListArray.push_back(vector<AigPat>());
@@ -264,7 +264,7 @@ aig_to_func(Aig aig)
     case 1: func = 0xcccc; break;
     case 2: func = 0xf0f0; break;
     case 3: func = 0xff00; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
   }
   else if ( aig.is_and() ) {
@@ -273,7 +273,7 @@ aig_to_func(Aig aig)
     func = func0 & func1;
   }
   else if ( aig.is_const() ) {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( aig.inv() ) {
     func = ~func;

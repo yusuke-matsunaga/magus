@@ -39,7 +39,7 @@ AndConv::operator()(const MvnNode* node,
 {
   if ( node->type() == MvnNode::kAnd ) {
     ymuint ni = node->input_num();
-    assert_cond( ni >= 2, __FILE__, __LINE__);
+    ASSERT_COND( ni >= 2 );
 
     ymuint bw = node->bit_width();
     vector<vector<BdnNodeHandle> > input_list_array(bw);
@@ -49,7 +49,7 @@ AndConv::operator()(const MvnNode* node,
     for (ymuint i = 0; i < ni; ++ i) {
       const MvnInputPin* ipin = node->input(i);
       const MvnNode* src_node = ipin->src_node();
-      assert_cond( src_node->bit_width() == bw, __FILE__, __LINE__);
+      ASSERT_COND( src_node->bit_width() == bw );
       for (ymuint b = 0; b < bw; ++ b) {
 	input_list_array[b][i] = nodemap.get(src_node, b);
       }

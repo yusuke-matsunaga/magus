@@ -243,7 +243,7 @@ VlDumperImpl::put(const char* label,
   case kVpiConstant:
     {
       const VlExpr* expr = dynamic_cast<const VlExpr*>(obj);
-      assert_cond( expr , __FILE__, __LINE__);
+      ASSERT_COND( expr  );
       put_expr(label, mgr, expr);
     }
     break;

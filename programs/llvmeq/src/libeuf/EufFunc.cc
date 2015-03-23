@@ -70,7 +70,7 @@ EufFunc::arg_num() const
 EufNode*
 EufFunc::arg(ymuint pos) const
 {
-  assert_cond( pos < mArgList.size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mArgList.size() );
   return mArgList[pos];
 }
 

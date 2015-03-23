@@ -197,14 +197,14 @@ CnfImp::learning(ImpMgr& imp_mgr,
 	// 出力が0になる条件は入力が0になる条件のユニオン
 	if ( imp_mgr.is_const(id0) ) {
 	  // ファンイン0が定数だった．
-	  assert_cond( !imp_mgr.is_const(id1), __FILE__, __LINE__);
+	  ASSERT_COND( !imp_mgr.is_const(id1) );
 	  // ファンイン1の条件をそのままコピー
 	  imp_lists[idx_0] |= imp_lists[idx1_0];
 	  imp_lists[idx_1] |= imp_lists[idx1_1];
 	}
 	else if ( imp_mgr.is_const(id1) ) {
 	  // ファンイン1が定数だった．
-	  assert_cond( !imp_mgr.is_const(id0), __FILE__, __LINE__);
+	  ASSERT_COND( !imp_mgr.is_const(id0) );
 	  // ファンイン0の条件をそのままコピー
 	  imp_lists[idx_0] |= imp_lists[idx0_0];
 	  imp_lists[idx_1] |= imp_lists[idx0_1];
@@ -422,7 +422,7 @@ CnfImp::learning(ImpMgr& imp_mgr,
 	const CNFdd& imp_list = imp_lists[dst_id * 2 + dst_val];
 	CNFdd tmp = imp_list.cut_off(1);
 	for ( ; ; ) {
-	  assert_cond( !tmp.is_invalid(), __FILE__, __LINE__);
+	  ASSERT_COND( !tmp.is_invalid() );
 	  CNFdd f_0;
 	  CNFdd f_p;
 	  CNFdd f_n;

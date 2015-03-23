@@ -156,7 +156,7 @@ SimEngine::cur_time() const
 void
 SimEngine::reg_active_event(SimNode* event)
 {
-  assert_cond(mCurActiveQptr, __FILE__, __LINE__);
+  ASSERT_COND(mCurActiveQptr );
   mCurActiveQptr->push(event);
 }
 
@@ -164,7 +164,7 @@ SimEngine::reg_active_event(SimNode* event)
 void
 SimEngine::reg_inactive_event(SimNode* event)
 {
-  assert_cond(mCurInactiveQptr, __FILE__, __LINE__);
+  ASSERT_COND(mCurInactiveQptr );
   mCurInactiveQptr->push(event);
 }
 
@@ -172,7 +172,7 @@ SimEngine::reg_inactive_event(SimNode* event)
 void
 SimEngine::reg_nonblocking_event(SimNode* event)
 {
-  assert_cond(mCurNonblockingQptr, __FILE__, __LINE__);
+  ASSERT_COND(mCurNonblockingQptr );
   mCurNonblockingQptr->push(event);
 }
 
@@ -536,7 +536,7 @@ SimEqSetMgr::find(const VlTime& time) const
 SimEqSet*
 SimEqSetMgr::get_min()
 {
-  assert_cond( !mHeap.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mHeap.empty() );
 
   // 最小の要素は常に先頭にある．
   SimEqSet* min_eqset = mHeap[0];
@@ -600,7 +600,7 @@ SimEqSetMgr::get_min()
   SimEqSet** pprev = &mHash[pos];
   for ( ; ; ) {
     SimEqSet* tmp = *pprev;
-    assert_cond(tmp, __FILE__, __LINE__);
+    ASSERT_COND(tmp );
     if ( tmp == min_eqset ) {
       *pprev = min_eqset->mHashLink;
       break;

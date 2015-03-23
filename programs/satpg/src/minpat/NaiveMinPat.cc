@@ -48,6 +48,7 @@ NaiveMinPat::~NaiveMinPat()
 }
 
 // @brief テストベクタの最小化を行なう．
+// @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ
@@ -55,7 +56,8 @@ NaiveMinPat::~NaiveMinPat()
 // @param[inout] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
-NaiveMinPat::run(TvMgr& tvmgr,
+NaiveMinPat::run(TpgNetwork& network,
+		 TvMgr& tvmgr,
 		 FaultMgr& fmgr,
 		 Fsim& fsim2,
 		 Fsim& fsim3,
@@ -198,7 +200,7 @@ NaiveMinPat::run(TvMgr& tvmgr,
 	ymuint id = *p;
 	TestVector* tv = tv3_list[id];
 	bool stat = new_tv->merge(*tv);
-	assert_cond( stat, __FILE__, __LINE__);
+	ASSERT_COND( stat );
       }
       // 残った X にランダムに 0/1 を割り当てる．
       new_tv->fix_x_from_random(randgen);

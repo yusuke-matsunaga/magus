@@ -374,7 +374,7 @@ Bidec::set(const Bdd& f,
 	sig |= 1;
       }
       else {
-	assert_cond(m.is_zero(), __FILE__, __LINE__);
+	ASSERT_COND(m.is_zero() );
       }
     }
 
@@ -385,7 +385,7 @@ Bidec::set(const Bdd& f,
 	sig |= 2;
       }
       else {
-	assert_cond(m.is_zero(), __FILE__, __LINE__);
+	ASSERT_COND(m.is_zero() );
       }
     }
 
@@ -396,7 +396,7 @@ Bidec::set(const Bdd& f,
 	sig |= 4;
       }
       else {
-	assert_cond(m.is_zero(), __FILE__, __LINE__);
+	ASSERT_COND(m.is_zero() );
       }
     }
 
@@ -407,7 +407,7 @@ Bidec::set(const Bdd& f,
 	sig |= 8;
       }
       else {
-	assert_cond(m.is_zero(), __FILE__, __LINE__);
+	ASSERT_COND(m.is_zero() );
       }
     }
 

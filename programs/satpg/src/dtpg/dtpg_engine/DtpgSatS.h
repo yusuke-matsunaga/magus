@@ -1,26 +1,26 @@
-﻿#ifndef SATENGINESINGLE_H
-#define SATENGINESINGLE_H
+﻿#ifndef DTPGSATS_H
+#define DTPGSATS_H
 
-/// @file SatEngineSingle.h
-/// @brief SatEngineSingle のヘッダファイル
+/// @file DtpgSatS.h
+/// @brief DtpgSatS のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgSatBaseS.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineSingle SatEngineSingle.h "SatEngineSingle.h"
-/// @brief 1つの故障を対象とした CNF を生成する SatEngine
+/// @class DtpgSatS DtpgSatS.h "DtpgSatS.h"
+/// @brief 1つの故障を対象とした CNF を生成する DtpgSat
 //////////////////////////////////////////////////////////////////////
-class SatEngineSingle :
-  public SatEngine
+class DtpgSatS :
+  public DtpgSatBaseS
 {
 public:
 
@@ -32,17 +32,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineSingle(const string& sat_type,
-		  const string& sat_option,
-		  ostream* sat_outp,
-		  const TpgNetwork& network,
-		  BackTracer& bt,
-		  DetectOp& dop,
-		  UntestOp& uop);
+  DtpgSatS(const string& sat_type,
+	   const string& sat_option,
+	   ostream* sat_outp,
+	   const TpgNetwork& network,
+	   BackTracer& bt,
+	   DetectOp& dop,
+	   UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineSingle();
+  ~DtpgSatS();
 
 
 public:
@@ -54,16 +54,10 @@ public:
   /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run(TpgFault* f_tgt);
-
-  /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
-  virtual
-  void
-  run(const vector<TpgFault*>& flist);
+  run_single(TpgFault* f_tgt);
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINESINGLE_H
+#endif // DTPGSATS_H

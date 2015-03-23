@@ -155,7 +155,7 @@ RvMgr::index_size() const
 void
 RvMgr::set_size(ymuint size)
 {
-  assert_cond( mVectSize == 0, __FILE__, __LINE__);
+  ASSERT_COND( mVectSize == 0 );
   mVectSize = size;
   mBlockSize = (size + 63) / 64;
   mRvSize = sizeof(RegVect) + 8 * (mBlockSize - 1);

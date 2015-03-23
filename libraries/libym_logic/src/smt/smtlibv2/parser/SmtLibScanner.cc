@@ -177,7 +177,7 @@ SmtLibScanner::scan()
     // それ以外はエラー
     goto SYNTAX_ERROR;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
  ST_ZERO: // 一文字目が 0 の時
   c = peek();

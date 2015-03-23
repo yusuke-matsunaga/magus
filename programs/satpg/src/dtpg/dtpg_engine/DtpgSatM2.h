@@ -1,8 +1,8 @@
-﻿#ifndef SATENGINEMULTI_H
-#define SATENGINEMULTI_H
+﻿#ifndef DTPGSATM2_H
+#define DTPGSATM2_H
 
-/// @file SatEngineMulti.h
-/// @brief SatEngineMulti のヘッダファイル
+/// @file DtpgSatM2.h
+/// @brief DtpgSatM2 のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,21 +10,22 @@
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgSatBaseM.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineMulti SatEngineMulti.h "SatEngineMulti.h"
+/// @class DtpgSatM2 DtpgSatM2.h "DtpgSatM2.h"
 /// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineMulti :
-  public SatEngine
+class DtpgSatM2 :
+  public DtpgSatBaseM
 {
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] th_val しきい値
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
@@ -32,18 +33,19 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineMulti(const string& sat_type,
-		 const string& sat_option,
-		 ostream* sat_outp,
-		 const TpgNetwork& network,
-		 BackTracer& bt,
-		 DetectOp& dop,
-		 UntestOp& uop,
-		 bool forget);
+  DtpgSatM2(ymuint th_val,
+	    const string& sat_type,
+	    const string& sat_option,
+	    ostream* sat_outp,
+	    const TpgNetwork& network,
+	    BackTracer& bt,
+	    DetectOp& dop,
+	    UntestOp& uop,
+	    bool forget);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineMulti();
+  ~DtpgSatM2();
 
 
 public:
@@ -52,16 +54,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] f_tgt 対象の故障
-  virtual
-  void
-  run(TpgFault* f_tgt);
-
-  /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run(const vector<TpgFault*>& flist);
+  run_multi(const vector<TpgFault*>& flist);
 
 
 private:
@@ -69,11 +65,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // しきい値
+  ymuint32 mThVal;
+
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
 
-  // 作業用の配列
-  vector<bool> mDone;
+  // 処理済みのノードのマーク
+  vector<ymuint> mMark;
 
   // forget フラグ
   bool mForget;
@@ -82,4 +81,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEMULTI_H
+#endif // DTPGSATM2_H

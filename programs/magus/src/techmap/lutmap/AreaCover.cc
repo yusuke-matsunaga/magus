@@ -139,8 +139,8 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 	best_cut = cut;
       }
     }
-    assert_cond(min_cost < DBL_MAX, __FILE__, __LINE__);
-    assert_cond( best_cut != NULL, __FILE__, __LINE__);
+    ASSERT_COND(min_cost < DBL_MAX );
+    ASSERT_COND( best_cut != NULL );
     maprec.set_cut(node, best_cut);
     mBestCost[node->id()] = min_cost;
   }

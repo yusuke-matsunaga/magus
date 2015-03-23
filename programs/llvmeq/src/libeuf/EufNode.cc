@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_LLVMEQ
 EufNode*
 EufNode::left() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -30,7 +30,7 @@ EufNode::left() const
 EufNode*
 EufNode::right() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -39,7 +39,7 @@ EufNode::right() const
 string
 EufNode::id_name() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return string();
 }
 
@@ -48,7 +48,7 @@ EufNode::id_name() const
 ymuint
 EufNode::arg_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -58,7 +58,7 @@ EufNode::arg_num() const
 EufNode*
 EufNode::arg(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

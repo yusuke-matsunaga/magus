@@ -196,7 +196,7 @@ PhfGraph::acyclic_check(vector<PhfEdge*>& edge_list) const
       }
       cout << endl;
     }
-    assert_cond( !error, __FILE__, __LINE__);
+    ASSERT_COND( !error );
   }
 
   return true;
@@ -350,7 +350,7 @@ PhfGraph::cf_partition(vector<ymuint>& block_map)
     return false;
   }
 
-  assert_cond( edge_list.size() == ne, __FILE__, __LINE__);
+  ASSERT_COND( edge_list.size() == ne );
   for (ymuint i = 0; i < ne; ++ i) {
     ymuint eid = edge_list[i];
     ymuint v1;
@@ -375,7 +375,7 @@ PhfGraph::cf_partition(vector<ymuint>& block_map)
     PhfEdge* edge = mEdgeList[i];
     ymuint pos = block_map[edge->id()];
     PhfNode* node = edge->node(pos);
-    assert_cond( !v_array[node->id()], __FILE__, __LINE__);
+    ASSERT_COND( !v_array[node->id()] );
     v_array[node->id()] = true;
   }
 
@@ -388,7 +388,7 @@ void
 PhfGraph::gen_graph(const vector<const FuncVect*>& func_list)
 {
   ymuint nf = func_list.size();
-  assert_cond( nf > 1, __FILE__, __LINE__);
+  ASSERT_COND( nf > 1 );
 
   mDegree = nf;
 
@@ -463,7 +463,7 @@ bool
 PhfGraph::displace_decomposition(vector<ymuint>& displace_map,
 				 bool use_xor)
 {
-  assert_cond( mDegree == 2, __FILE__, __LINE__);
+  ASSERT_COND( mDegree == 2 );
 
   ymuint orange = mNodeArraySize / 2;
   vector<pair<ymuint, PhfNode*> > node1_list;
@@ -476,13 +476,13 @@ PhfGraph::displace_decomposition(vector<ymuint>& displace_map,
     if ( node == NULL ) {
       continue;
     }
-    assert_cond( node->edge_num() > 0, __FILE__, __LINE__);
+    ASSERT_COND( node->edge_num() > 0 );
     PhfEdge* edge0 = node->edge(0);
     if ( edge0->node(0) == node ) {
       node1_list.push_back(make_pair(node->edge_num(), node));
     }
     else {
-      assert_cond( edge0->node(1) == node, __FILE__, __LINE__);
+      ASSERT_COND( edge0->node(1) == node );
       node2_list.push_back(make_pair(node->edge_num(), node));
     }
   }

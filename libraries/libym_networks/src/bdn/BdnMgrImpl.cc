@@ -131,18 +131,18 @@ BdnMgrImpl::copy(const BdnMgr& src)
 
     const BdnNode* src_inode0 = src_node->fanin0();
     BdnNode* input0 = nodemap[src_inode0->id()];
-    assert_cond(input0, __FILE__, __LINE__);
+    ASSERT_COND(input0 );
     bool inv0 = src_node->fanin0_inv();
 
     const BdnNode* src_inode1 = src_node->fanin1();
     BdnNode* input1 = nodemap[src_inode1->id()];
-    assert_cond(input1, __FILE__, __LINE__);
+    ASSERT_COND(input1 );
     bool inv1 = src_node->fanin1_inv();
 
     BdnNodeHandle tmp_h = set_logic(NULL, src_node->is_xor(),
 				    BdnNodeHandle(input0, inv0),
 				    BdnNodeHandle(input1, inv1));
-    assert_cond(tmp_h.inv() == false, __FILE__, __LINE__);
+    ASSERT_COND(tmp_h.inv() == false );
     BdnNode* dst_node = tmp_h.node();
     nodemap[src_node->id()] = dst_node;
   }
@@ -233,7 +233,7 @@ BdnMgrImpl::sort(vector<const BdnNode*>& node_list) const
     sort_sub(node, marks, node_list);
   }
   // うまくいっていれば全ての論理ノードが node_list に入っているはず．
-  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == lnode_num() );
 }
 
 BEGIN_NONAMESPACE
@@ -287,7 +287,7 @@ BdnMgrImpl::_sort(vector<BdnNode*>& node_list)
     sort_sub(node, marks, node_list);
   }
   // うまくいっていれば全ての論理ノードが node_list に入っているはず．
-  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == lnode_num() );
 }
 
 
@@ -346,7 +346,7 @@ BdnMgrImpl::rsort(vector<const BdnNode*>& node_list) const
     rsort_sub(node->fanin1(), marks, node_list);
   }
   // うまくいっていればすべての論理ノードが node_list に入っているはず．
-  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == lnode_num() );
 }
 
 // @brief 名前を設定する．
@@ -430,7 +430,7 @@ BdnMgrImpl::new_dff(const char* name)
 {
   // 空いているIDを探して配列へ登録
   int id = mDffItvlMgr.avail_num();
-  assert_cond( id >= 0, __FILE__, __LINE__);
+  ASSERT_COND( id >= 0 );
   mDffItvlMgr.erase(id);
 
   ymuint uid = static_cast<ymuint>(id);
@@ -444,7 +444,7 @@ BdnMgrImpl::new_dff(const char* name)
     mDffArray.push_back(dff);
   }
   else {
-    assert_cond( mDffArray.size() > uid, __FILE__, __LINE__);
+    ASSERT_COND( mDffArray.size() > uid );
   }
 
   BdnDff* dff = mDffArray[uid];
@@ -511,7 +511,7 @@ BdnMgrImpl::new_latch(const char* name)
 {
   // 空いているIDを探して配列へ登録する．
   int id = mLatchItvlMgr.avail_num();
-  assert_cond( id >= 0, __FILE__, __LINE__);
+  ASSERT_COND( id >= 0 );
   mLatchItvlMgr.erase(id);
 
   ymuint uid = static_cast<ymuint>(id);
@@ -525,7 +525,7 @@ BdnMgrImpl::new_latch(const char* name)
     mLatchArray.push_back(latch);
   }
   else {
-    assert_cond( mLatchArray.size() > uid, __FILE__, __LINE__);
+    ASSERT_COND( mLatchArray.size() > uid );
   }
   BdnLatch* latch = mLatchArray[uid];
 
@@ -601,7 +601,7 @@ BdnMgrImpl::make_tree(BdnNode* node,
 {
   switch ( num ) {
   case 0:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
 
   case 1:
     if ( iinv ) {
@@ -686,11 +686,11 @@ BdnMgrImpl::change_output_fanin(BdnNode* node,
   if ( node->is_input() ) {
     // BdnNode::alt_node() と同じコードだが const がつかない．
     const BdnPort* port = node->port();
-    assert_cond( port != NULL, __FILE__, __LINE__);
+    ASSERT_COND( port != NULL );
     node = port->mOutputArray[node->port_bitpos()];
-    assert_cond( node != NULL, __FILE__, __LINE__);
+    ASSERT_COND( node != NULL );
   }
-  assert_cond( node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_output() );
 
   bool inv = inode_handle.inv();
   node->set_output_fanin_inv(inv);
@@ -1003,7 +1003,7 @@ BdnMgrImpl::alloc_node()
 {
   // 空いているIDを探してノード配列へ登録
   int id = mNodeItvlMgr.avail_num();
-  assert_cond( id >= 0, __FILE__, __LINE__);
+  ASSERT_COND( id >= 0 );
   mNodeItvlMgr.erase(id);
 
   ymuint uid = static_cast<ymuint>(id);
@@ -1014,7 +1014,7 @@ BdnMgrImpl::alloc_node()
     mNodeArray.push_back(node);
   }
   else {
-    assert_cond( mNodeArray.size() > uid, __FILE__, __LINE__);
+    ASSERT_COND( mNodeArray.size() > uid );
   }
   BdnNode* node = mNodeArray[uid];
 

@@ -36,7 +36,7 @@ SmtLibNode::~SmtLibNode()
 ShString
 SmtLibNode::str_value() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ShString();
 }
 
@@ -44,7 +44,7 @@ SmtLibNode::str_value() const
 ymint32
 SmtLibNode::int_value() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -52,7 +52,7 @@ SmtLibNode::int_value() const
 ymuint
 SmtLibNode::child_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -60,7 +60,7 @@ SmtLibNode::child_num() const
 const SmtLibNode*
 SmtLibNode::child() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -106,7 +106,7 @@ display(ostream& s,
   case kKeywordToken: type_str = "Keyword"; break;
   case kListToken:    type_str = "List"; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   print_space(s, ident_level);
   s << "Type: " << type_str << endl;
@@ -161,7 +161,7 @@ print(ostream& s,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 }

@@ -112,7 +112,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   for (vector<const SbjNode*>::const_iterator p = sbjnode_list.begin();
        p != sbjnode_list.end(); ++ p) {
     const SbjNode* sbjnode = *p;
-    assert_cond( sbjnode->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND( sbjnode->is_logic() );
     ymuint id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
     mLogicNodeList.push_back(node);
@@ -147,7 +147,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
       const SbjNode* sbjfonode = sbjedge->to();
       if ( sbjfonode->is_ppo() ) continue;
       SmdNode* fonode = &mNodeArray[sbjfonode->id()];
-      assert_cond( fonode->id() == sbjfonode->id(), __FILE__, __LINE__);
+      ASSERT_COND( fonode->id() == sbjfonode->id() );
       SmdEdge* edge = NULL;
       if ( sbjedge->pos() == 0 ) {
 	edge = fonode->fanin0_edge();
@@ -155,8 +155,8 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
       else {
 	edge = fonode->fanin1_edge();
       }
-      assert_cond( edge->to() == fonode, __FILE__, __LINE__);
-      assert_cond( edge->from() == node, __FILE__, __LINE__);
+      ASSERT_COND( edge->to() == fonode );
+      ASSERT_COND( edge->from() == node );
       node->set_fanout(pos, edge);
     }
   }

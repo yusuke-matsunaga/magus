@@ -88,7 +88,7 @@ string
 edge_name(const BdnNode* node,
 	  bool inv)
 {
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
 
   ostringstream buf;
   if ( inv ) {
@@ -126,7 +126,7 @@ dump_port(ostream& s,
       s << node_name(output, false);
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
   s << rcb << ")";

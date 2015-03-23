@@ -158,7 +158,7 @@ inline
 PhfEdge*
 PhfNode::edge(ymuint pos) const
 {
-  assert_cond( pos < mEdgeList.size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mEdgeList.size() );
   return mEdgeList[pos];
 }
 
@@ -191,7 +191,7 @@ inline
 void
 PhfNode::set_val(ymuint32 val)
 {
-  assert_cond( mAssigned == false, __FILE__, __LINE__);
+  ASSERT_COND( mAssigned == false );
   mVal = val;
   mAssigned = true;
 }

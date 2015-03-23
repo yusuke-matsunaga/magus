@@ -433,7 +433,7 @@ VlWriter::put_expr(const Expr& expr,
       op_str = " ^ ";
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     put_str("(");
     ymuint n = expr.child_num();
@@ -446,7 +446,7 @@ VlWriter::put_expr(const Expr& expr,
     put_str(")");
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

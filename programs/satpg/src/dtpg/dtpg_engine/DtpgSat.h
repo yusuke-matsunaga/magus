@@ -1,12 +1,12 @@
-﻿#ifndef SATENGINE_H
-#define SATENGINE_H
+﻿#ifndef DTPGSAT_H
+#define DTPGSAT_H
 
-/// @file SatEngine.h
-/// @brief SatEngine のヘッダファイル
+/// @file DtpgSat.h
+/// @brief DtpgSat のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -23,11 +23,13 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+class SatEngine;
+
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngine SatEngine.h "SatEngine.h"
-/// @brief SatEngine の実装用の基底クラス
+/// @class DtpgSat DtpgSat.h "DtpgSat.h"
+/// @brief DtpgSat の実装用の基底クラス
 //////////////////////////////////////////////////////////////////////
-class SatEngine :
+class DtpgSat :
   public DtpgEngine
 {
 public:
@@ -40,17 +42,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngine(const string& sat_type,
-	    const string& sat_option,
-	    ostream* sat_outp,
-	    const TpgNetwork& network,
-	    BackTracer& bt,
-	    DetectOp& dop,
-	    UntestOp& uop);
+  DtpgSat(const string& sat_type,
+	  const string& sat_option,
+	  ostream* sat_outp,
+	  const TpgNetwork& network,
+	  BackTracer& bt,
+	  DetectOp& dop,
+	  UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngine();
+  ~DtpgSat();
 
 
 public:
@@ -97,26 +99,6 @@ protected:
   ostream*
   sat_outp() const;
 
-  /// @brief NEMESIS モード(含む EXT-NEMESIS)の時 true を返す．
-  bool
-  nemesis_mode() const;
-
-  /// @brief EXT-NEMESIS モードの時 true を返す．
-  bool
-  ext_nemesis_mode() const;
-
-  /// @brief TG-GRASP モード(含む EXT-TG-GRASP)の時 true を返す．
-  bool
-  tg_grasp_mode() const;
-
-  /// @brief EXT-TG-GRASP モードの時 true を返す．
-  bool
-  ext_tg_grasp_mode() const;
-
-  /// @brief dominator を用いた unique sensitization を行う時 true を返す．
-  bool
-  use_dominator() const;
-
   /// @brief CNF 作成を開始する．
   void
   cnf_begin();
@@ -138,15 +120,12 @@ protected:
   timer_stop();
 
   /// @brief 故障位置を与えてその TFO の TFI リストを作る．
-  /// @param[in] solver SAT ソルバ
   /// @param[in] fnode_list 故障位置のノードのリスト
-  /// @param[in] max_id ノード番号の最大値
   ///
   /// 結果は mTfoList に格納される．
   /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
   void
-  mark_region(SatSolver& solver,
-	      const vector<TpgNode*>& fnode_list);
+  mark_region(const vector<TpgNode*>& fnode_list);
 
   /// @brief 入力ノードを得る．
   /// @param[in] ipos 入力番号
@@ -177,126 +156,57 @@ protected:
   const vector<TpgNode*>&
   output_list() const;
 
-  /// @brief 節の作成用の作業領域の使用を開始する．
-  /// @param[in] exp_size 予想されるサイズ
-  void
-  tmp_lits_begin(ymuint exp_size = 0);
-
-  /// @brief 作業領域にリテラルを追加する．
-  void
-  tmp_lits_add(Literal lit);
-
-  /// @brief 作業領域の冊を SAT ソルバに加える．
-  void
-  tmp_lits_end(SatSolver& solver);
-
-  /// @brief 正常回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
+  /// @brief 正常回路用の CNF 式を作る．
+  /// @param[in] engine SAT エンジン
   /// @param[in] node 対象のノード
   static
   void
-  make_gnode_cnf(SatSolver& solver,
-		 TpgNode* node);
-
-  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] node 対象のノード
-  static
-  void
-  make_fnode_cnf(SatSolver& solver,
-		 TpgNode* node);
-
-  /// @brief 故障ゲートの CNF を作る．
-  static
-  void
-  make_fault_cnf(SatSolver& solver,
-		 TpgFault* fault);
-
-  /// @brief D-Chain 制約のCNFを作る．
-  void
-  make_dchain_cnf(SatSolver& solver,
-		  TpgNode* node,
-		  TpgFault* fault);
-
-  /// @brief D-Chain 制約のCNFを作る．
-  void
-  make_dchain_cnf(SatSolver& solver,
-		  TpgNode* node);
-
-  /// @brief ノードの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] node 対象のノード
-  /// @param[in] litmap 入出力のリテラルを保持するクラス
-  static
-  void
-  make_node_cnf(SatSolver& solver,
-		TpgNode* node,
-		const LitMap& litmap,
-		Literal output);
-
-  /// @brief ゲートの入出力の関係を表す CNF を作る．
-  /// @param[in] solver SATソルバ
-  /// @param[in] type ゲートの種類
-  /// @param[in] litmap 入出力のリテラルを保持するクラス
-  static
-  void
-  make_gate_cnf(SatSolver& solver,
-		tTgGateType type,
-		const LitMap& litmap,
-		Literal output);
-
-  /// @brief ノードの故障差関数を表すCNFを作る．
-  void
-  make_dlit_cnf(SatSolver& solver,
+  make_gval_cnf(SatEngine& engine,
 		TpgNode* node);
 
-  /// @brief 故障挿入回路を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバー
-  /// @param[in] ivar 入力の変数
-  /// @param[in] fvar 故障変数
-  /// @param[in] ovar 出力の変数
+  /// @brief 故障回路用の CNF 式を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
   static
   void
-  make_flt0_cnf(SatSolver& solver,
-		VarId ivar,
-		VarId fvar,
-		VarId ovar);
+  make_fval_cnf(SatEngine& engine,
+		TpgNode* node);
 
-  /// @brief 故障挿入回路を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバー
-  /// @param[in] ivar 入力の変数
-  /// @param[in] fvar 故障変数
-  /// @param[in] ovar 出力の変数
+  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
   static
   void
-  make_flt1_cnf(SatSolver& solver,
-		VarId ivar,
-		VarId fvar,
-		VarId ovar);
+  make_fnode_cnf(SatEngine& engine,
+		 TpgNode* node);
 
-  /// @brief 故障挿入回路を表す CNF 式を作る．
-  /// @param[in] solver SAT ソルバー
-  /// @param[in] ivar 入力の変数
-  /// @param[in] fvar0 故障変数
-  /// @param[in] fvar1 故障変数
-  /// @param[in] ovar 出力の変数
+  /// @brief 故障箇所の関係を表す CNF を作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] fault 対象の故障
   static
   void
-  make_flt01_cnf(SatSolver& solver,
-		 VarId ivar,
-		 VarId fvar0,
-		 VarId fvar1,
-		 VarId ovar);
+  make_fault_cnf(SatEngine& engine,
+		 TpgFault* fault);
+
+  /// @brief 故障伝搬条件を表すCNFを作る．
+  /// @param[in] engine SAT エンジン
+  /// @param[in] node 対象のノード
+  static
+  void
+  make_dchain_cnf(SatEngine& engine,
+		  TpgNode* node);
 
   /// @brief 一つの SAT問題を解く．
+  /// @param[in] engine SAT エンジン
   Bool3
-  solve(SatSolver& solver,
+  solve(SatEngine& engine,
 	TpgFault* f,
 	bool option = false);
 
   /// @brief 一つの SAT問題を解く．
+  /// @param[in] engine SAT エンジン
   Bool3
-  _solve(SatSolver& solver);
+  _solve(SatEngine& engine);
 
   /// @brief 検出した場合の処理
   void
@@ -413,21 +323,6 @@ private:
   // 検出不能時に呼ばれるファンクタ
   UntestOp& mUntestOp;
 
-  // NEMESIS モード
-  bool mNemesis;
-
-  // extected NEMESIS モード
-  bool mExtNemesis;
-
-  // TG-GRASP モード
-  bool mTgGrasp;
-
-  // extended TG-GRASP モード
-  bool mExtTgGrasp;
-
-  // unique sensitization を使う
-  bool mUseDominator;
-
   // 対象のネットワーク
   const TpgNetwork& mNetwork;
 
@@ -448,9 +343,6 @@ private:
 
   // 現在の故障に関係ありそうな外部出力のリスト
   vector<TpgNode*> mOutputList;
-
-  // 作業用のリテラルのリスト
-  vector<Literal> mTmpLits;
 
   // 最後に生成されたテストパタン
   TestVector* mLastPat;
@@ -474,7 +366,7 @@ private:
 // @brief SATソルバのタイプを得る．
 inline
 string
-SatEngine::sat_type() const
+DtpgSat::sat_type() const
 {
   return mSatType;
 }
@@ -482,7 +374,7 @@ SatEngine::sat_type() const
 // @brief SATソルバのオプションを得る．
 inline
 string
-SatEngine::sat_option() const
+DtpgSat::sat_option() const
 {
   return mSatOption;
 }
@@ -490,55 +382,15 @@ SatEngine::sat_option() const
 // @brief SATソルバのログ出力を得る．
 inline
 ostream*
-SatEngine::sat_outp() const
+DtpgSat::sat_outp() const
 {
   return mSatOutP;
-}
-
-// @brief NEMESIS モード(含む EXT-NEMESIS)の時 true を返す．
-inline
-bool
-SatEngine::nemesis_mode() const
-{
-  return mNemesis;
-}
-
-// @brief EXT-NEMESIS モードの時 true を返す．
-inline
-bool
-SatEngine::ext_nemesis_mode() const
-{
-  return mExtNemesis;
-}
-
-// @brief TG-GRASP モード(含む EXT-TG-GRASP)の時 true を返す．
-inline
-bool
-SatEngine::tg_grasp_mode() const
-{
-  return mTgGrasp;
-}
-
-// @brief EXT-TG-GRASP モードの時 true を返す．
-inline
-bool
-SatEngine::ext_tg_grasp_mode() const
-{
-  return mExtTgGrasp;
-}
-
-// @brief dominator を用いた unique sensitization を行う時 true を返す．
-inline
-bool
-SatEngine::use_dominator() const
-{
-  return mUseDominator;
 }
 
 // @brief TFO ノードの数を得る．
 inline
 ymuint
-SatEngine::tfo_size() const
+DtpgSat::tfo_size() const
 {
   return mTfoEnd;
 }
@@ -546,7 +398,7 @@ SatEngine::tfo_size() const
 // @brief TFI ノードの数を得る．
 inline
 ymuint
-SatEngine::tfi_size() const
+DtpgSat::tfi_size() const
 {
   return mTfoList.size() - mTfoEnd;
 }
@@ -554,7 +406,7 @@ SatEngine::tfi_size() const
 // @brief TFO ノードと TFI ノードの総数を得る．
 inline
 ymuint
-SatEngine::tfo_tfi_size() const
+DtpgSat::tfo_tfi_size() const
 {
   return mTfoList.size();
 }
@@ -566,7 +418,7 @@ SatEngine::tfo_tfi_size() const
 // それ以上は TFI ノードとなっている．
 inline
 TpgNode*
-SatEngine::tfo_tfi_node(ymuint pos) const
+DtpgSat::tfo_tfi_node(ymuint pos) const
 {
   return mTfoList[pos];
 }
@@ -574,7 +426,7 @@ SatEngine::tfo_tfi_node(ymuint pos) const
 // @brief 出力のノードのリストを返す．
 inline
 const vector<TpgNode*>&
-SatEngine::output_list() const
+DtpgSat::output_list() const
 {
   return mOutputList;
 }
@@ -582,7 +434,7 @@ SatEngine::output_list() const
 // tfo マークをつける．
 inline
 void
-SatEngine::set_tfo_mark(TpgNode* node)
+DtpgSat::set_tfo_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 1U;
   mTfoList.push_back(node);
@@ -594,7 +446,7 @@ SatEngine::set_tfo_mark(TpgNode* node)
 // @brief tfo マークを読む．
 inline
 bool
-SatEngine::tfo_mark(TpgNode* node)
+DtpgSat::tfo_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 0) & 1U);
 }
@@ -602,7 +454,7 @@ SatEngine::tfo_mark(TpgNode* node)
 // tfi マークをつける．
 inline
 void
-SatEngine::set_tfi_mark(TpgNode* node)
+DtpgSat::set_tfi_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 2U;
   mTfoList.push_back(node);
@@ -614,7 +466,7 @@ SatEngine::set_tfi_mark(TpgNode* node)
 // @brief tfi マークを読む．
 inline
 bool
-SatEngine::tfi_mark(TpgNode* node)
+DtpgSat::tfi_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 1) & 1U);
 }
@@ -622,7 +474,7 @@ SatEngine::tfi_mark(TpgNode* node)
 // @brief tmp マークをつける．
 inline
 void
-SatEngine::set_tmp_mark(TpgNode* node)
+DtpgSat::set_tmp_mark(TpgNode* node)
 {
   mMarkArray[node->id()] |= 4U;
 }
@@ -630,7 +482,7 @@ SatEngine::set_tmp_mark(TpgNode* node)
 // @brief tmp マークを消す．
 inline
 void
-SatEngine::clear_tmp_mark(TpgNode* node)
+DtpgSat::clear_tmp_mark(TpgNode* node)
 {
   mMarkArray[node->id()] &= ~4U;
 }
@@ -638,11 +490,11 @@ SatEngine::clear_tmp_mark(TpgNode* node)
 // @brief tmp マークを読む．
 inline
 bool
-SatEngine::tmp_mark(TpgNode* node)
+DtpgSat::tmp_mark(TpgNode* node)
 {
   return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
 }
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEBASE_H
+#endif // DTPGSAT_H

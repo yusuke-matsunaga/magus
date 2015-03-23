@@ -60,7 +60,7 @@ BtJust1::operator()(TpgNode* fnode,
       break;
     }
   }
-  assert_cond( onode != NULL, __FILE__, __LINE__);
+  ASSERT_COND( onode != NULL );
 
   // 正当化を行う．
   justify(onode, model);
@@ -160,7 +160,7 @@ BtJust1::justify(TpgNode* node,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 }

@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SMT
 tSmtSortId
 SmtBool0Validator::input_sort(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kSmtSort_None;
 }
 
@@ -74,7 +74,7 @@ SmtBool0Validator::check_all(const vector<tSmtSortId>& input_sort_list,
 tSmtSortId
 SmtBool1Validator::input_sort(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return kSmtSort_Bool;
 }
 
@@ -273,7 +273,7 @@ SmtEqValidator::check_all(const vector<tSmtSortId>& input_sort_list,
 tSmtSortId
 SmtIteValidator::input_sort(ymuint pos) const
 {
-  assert_cond( pos < 3, __FILE__, __LINE__);
+  ASSERT_COND( pos < 3 );
   if ( pos == 0 ) {
     // 最初は Bool 型
     return kSmtSort_Bool;
@@ -349,7 +349,7 @@ SmtIteValidator::check_all(const vector<tSmtSortId>& input_sort_list,
 tSmtSortId
 SmtUminusValidator::input_sort(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return kSmtSort_Num;
 }
 

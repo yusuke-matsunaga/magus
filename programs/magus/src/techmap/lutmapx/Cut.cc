@@ -45,7 +45,7 @@ calc_expr_for_node(const BdnNode* node,
       ans = p->second;
     }
     else {
-      assert_cond( node->is_logic(), __FILE__, __LINE__);
+      ASSERT_COND( node->is_logic() );
 
       Expr cexp0 = calc_expr_for_node(node->fanin0(), logmap);
       Expr cexp1 = calc_expr_for_node(node->fanin1(), logmap);

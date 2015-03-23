@@ -87,12 +87,12 @@ VerilogWriterImpl::dump(ostream& s,
     s << "// node" << node->id() << " : ";
     if ( node_map.is_single_elem(i) ) {
       const VlDecl* decl = node_map.get_single_elem(i);
-      assert_cond( decl != NULL, __FILE__, __LINE__);
+      ASSERT_COND( decl != NULL );
       s << decl->full_name();
     }
     else if ( node_map.is_array_elem(i) ) {
       const VlDeclArray* declarray = node_map.get_array_elem(i);
-      assert_cond( declarray != NULL, __FILE__, __LINE__);
+      ASSERT_COND( declarray != NULL );
       ymuint offset = node_map.get_array_offset(i);
       ymuint d = declarray->dimension();
       vector<int> index_array(d);
@@ -133,7 +133,7 @@ VerilogWriterImpl::dump_module(ostream& s,
   for (ymuint i = 0; i < ni; ++ i) {
     const MvnNode* node = module->input(i);
     ymuint bw = node->bit_width();
-    assert_cond( bw > 0, __FILE__, __LINE__);
+    ASSERT_COND( bw > 0 );
     if ( bw == 1 ) {
       s << "  input ";
     }
@@ -147,7 +147,7 @@ VerilogWriterImpl::dump_module(ostream& s,
   for (ymuint i = 0; i < no; ++ i) {
     const MvnNode* node = module->output(i);
     ymuint bw = node->input(0)->bit_width();
-    assert_cond( bw > 0, __FILE__, __LINE__);
+    ASSERT_COND( bw > 0 );
     if ( bw == 1 ) {
       s << "  output ";
     }
@@ -161,7 +161,7 @@ VerilogWriterImpl::dump_module(ostream& s,
   for (ymuint i = 0; i < nio; ++ i) {
     const MvnNode* node = module->inout(i);
     ymuint bw = node->input(0)->bit_width();
-    assert_cond( bw > 0, __FILE__, __LINE__);
+    ASSERT_COND( bw > 0 );
     if ( bw == 1 ) {
       s << "  inout ";
     }
@@ -271,14 +271,14 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kInput:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 0, __FILE__, __LINE__);
+      ASSERT_COND( ni == 0 );
     }
     break;
 
   case MvnNode::kOutput:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
+      ASSERT_COND( ni == 1 );
 
       const MvnInputPin* ipin = node->input(0);
       const MvnNode* src_node = ipin->src_node();
@@ -293,7 +293,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kInout:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
+      ASSERT_COND( ni == 1 );
 
       const MvnInputPin* ipin = node->input(0);
       const MvnNode* src_node = ipin->src_node();
@@ -308,14 +308,14 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kDff:
     { // ピン位置と属性は決め打ち
       ymuint ni = node->input_num();
-      assert_cond( ni >= 2, __FILE__, __LINE__);
+      ASSERT_COND( ni >= 2 );
 
       const MvnInputPin* ipin0 = node->input(0);
       const MvnNode* src_node0 = ipin0->src_node();
-      assert_cond( src_node0 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( src_node0 != NULL );
       const MvnInputPin* ipin1 = node->input(1);
       const MvnNode* src_node1 = ipin1->src_node();
-      assert_cond( src_node1 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( src_node1 != NULL );
 
       s << "  always @ ( ";
       if ( node->clock_pol() == 1 ) {
@@ -361,14 +361,14 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kLatch:
     { // ピン位置と属性は決め打ち
       ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
+      ASSERT_COND( ni == 2 );
 
       const MvnInputPin* ipin0 = node->input(0);
       const MvnNode* src_node0 = ipin0->src_node();
-       assert_cond( src_node0 != NULL, __FILE__, __LINE__);
+       ASSERT_COND( src_node0 != NULL );
       const MvnInputPin* ipin1 = node->input(1);
       const MvnNode* src_node1 = ipin1->src_node();
-      assert_cond( src_node1 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( src_node1 != NULL );
 
       s << "  always @ ( * )" << endl
 	<< "    if ( " << node_name(src_node1) << " )" << endl
@@ -421,7 +421,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kCaseEq:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
+      ASSERT_COND( ni == 2 );
 
       const MvnInputPin* ipin0 = node->input(0);
       const MvnNode* src_node0 = ipin0->src_node();
@@ -495,7 +495,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kIte:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 3, __FILE__, __LINE__);
+      ASSERT_COND( ni == 3 );
 
       const MvnInputPin* ipin0 = node->input(0);
       const MvnNode* src_node0 = ipin0->src_node();
@@ -533,7 +533,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kConstBitSelect:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
+      ASSERT_COND( ni == 1 );
 
       const MvnInputPin* ipin = node->input(0);
       const MvnNode* src_node = ipin->src_node();
@@ -546,7 +546,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kConstPartSelect:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 1, __FILE__, __LINE__);
+      ASSERT_COND( ni == 1 );
 
       const MvnInputPin* ipin = node->input(0);
       const MvnNode* src_node = ipin->src_node();
@@ -561,7 +561,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kBitSelect:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
+      ASSERT_COND( ni == 2 );
 
       const MvnInputPin* ipin = node->input(0);
       const MvnNode* src_node = ipin->src_node();
@@ -578,7 +578,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kPartSelect:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 2, __FILE__, __LINE__);
+      ASSERT_COND( ni == 2 );
 
       const MvnInputPin* ipin = node->input(0);
       const MvnNode* src_node = ipin->src_node();
@@ -600,7 +600,7 @@ VerilogWriterImpl::dump_node(ostream& s,
   case MvnNode::kConst:
     {
       ymuint ni = node->input_num();
-      assert_cond( ni == 0, __FILE__, __LINE__);
+      ASSERT_COND( ni == 0 );
 
       ymuint bw = node->bit_width();
       s << "  assign " << node_name(node)
@@ -628,8 +628,8 @@ VerilogWriterImpl::dump_node(ostream& s,
       ymuint ni = cell->input_num();
       ymuint no = cell->output_num();
       ymuint nio = cell->inout_num();
-      assert_cond( no == 1, __FILE__, __LINE__);
-      assert_cond( nio == 0, __FILE__, __LINE__);
+      ASSERT_COND( no == 1 );
+      ASSERT_COND( nio == 0 );
 
       s << cell->name() << " " << node_name(node)
 	<< " (";
@@ -663,7 +663,7 @@ VerilogWriterImpl::dump_uop(ostream& s,
 			    const char* opr_str)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni == 1, __FILE__, __LINE__);
+  ASSERT_COND( ni == 1 );
 
   const MvnInputPin* ipin = node->input(0);
   const MvnNode* src_node = ipin->src_node();
@@ -679,7 +679,7 @@ VerilogWriterImpl::dump_binop(ostream& s,
 			      bool need_paren)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni == 2, __FILE__, __LINE__);
+  ASSERT_COND( ni == 2 );
 
   const MvnInputPin* ipin0 = node->input(0);
   const MvnNode* src_node0 = ipin0->src_node();
@@ -706,7 +706,7 @@ VerilogWriterImpl::dump_nop(ostream& s,
 			    const char* opr_str)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni >= 2, __FILE__, __LINE__);
+  ASSERT_COND( ni >= 2 );
 
   const MvnInputPin* ipin0 = node->input(0);
   const MvnNode* src_node0 = ipin0->src_node();

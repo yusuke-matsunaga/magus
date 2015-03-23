@@ -45,7 +45,7 @@ SnInput::nfi() const
 SimNode*
 SnInput::fanin(size_t pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

@@ -59,13 +59,13 @@ public:
   /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run(TpgFault* f_tgt) = 0;
+  run_single(TpgFault* f_tgt) = 0;
 
   /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run(const vector<TpgFault*>& flist) = 0;
+  run_multi(const vector<TpgFault*>& flist) = 0;
 
 };
 
@@ -79,14 +79,13 @@ public:
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineSingle(const string& sat_type,
-		    const string& sat_option,
-		    ostream* sat_outp,
-		    const TpgNetwork& network,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop);
-
+new_DtpgSatS(const string& sat_type,
+	     const string& sat_option,
+	     ostream* sat_outp,
+	     const TpgNetwork& network,
+	     BackTracer& bt,
+	     DetectOp& dop,
+	     UntestOp& uop);
 
 /// @brief Single(k-det) エンジンを作る．
 /// @param[in] sat_type SATソルバの種類を表す文字列
@@ -98,14 +97,14 @@ new_SatEngineSingle(const string& sat_type,
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 /// @param[in] kdet 多重度
 DtpgEngine*
-new_SatEngineSingleKDet(const string& sat_type,
-			const string& sat_option,
-			ostream* sat_outp,
-			const TpgNetwork& network,
-			BackTracer& bt,
-			DetectOp& dop,
-			UntestOp& uop,
-			ymuint kdet);
+new_DtpgSatKDet(const string& sat_type,
+		const string& sat_option,
+		ostream* sat_outp,
+		const TpgNetwork& network,
+		BackTracer& bt,
+		DetectOp& dop,
+		UntestOp& uop,
+		ymuint kdet);
 
 /// @brief Single2 エンジンを作る．
 /// @param[in] th_val しきい値
@@ -118,14 +117,14 @@ new_SatEngineSingleKDet(const string& sat_type,
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineSingle2(ymuint th_val,
-		     const string& sat_type,
-		     const string& sat_option,
-		     ostream* sat_outp,
-		     const TpgNetwork& network,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop);
+new_DtpgSatS2(ymuint th_val,
+	      const string& sat_type,
+	      const string& sat_option,
+	      ostream* sat_outp,
+	      const TpgNetwork& network,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop);
 
 /// @brief Multi エンジンを作る．
 /// @param[in] sat_type SATソルバの種類を表す文字列
@@ -137,14 +136,14 @@ new_SatEngineSingle2(ymuint th_val,
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineMulti(const string& sat_type,
-		   const string& sat_option,
-		   ostream* sat_outp,
-		   const TpgNetwork& network,
-		   BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop,
-		   bool forget);
+new_DtpgSatM(const string& sat_type,
+	     const string& sat_option,
+	     ostream* sat_outp,
+	     const TpgNetwork& network,
+	     BackTracer& bt,
+	     DetectOp& dop,
+	     UntestOp& uop,
+	     bool forget);
 
 /// @brief Multi2 エンジンを作る．
 /// @param[in] th_val しきい値
@@ -157,15 +156,15 @@ new_SatEngineMulti(const string& sat_type,
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineMulti2(ymuint th_val,
-		    const string& sat_type,
-		    const string& sat_option,
-		    ostream* sat_outp,
-		    const TpgNetwork& network,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop,
-		    bool forget);
+new_DtpgSatM2(ymuint th_val,
+	      const string& sat_type,
+	      const string& sat_option,
+	      ostream* sat_outp,
+	      const TpgNetwork& network,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop,
+	      bool forget);
 
 /// @brief SmtSingle エンジンを作る．
 /// @param[in] sat_type SATソルバの種類を表す文字列

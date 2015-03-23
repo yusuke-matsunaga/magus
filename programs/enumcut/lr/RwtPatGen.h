@@ -205,7 +205,7 @@ inline
 const PgNode*
 RwtPatGen::node(ymuint id) const
 {
-  assert_cond( id < node_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < node_num() );
   return mNodeArray[id];
 }
 
@@ -223,7 +223,7 @@ inline
 TvFunc
 RwtPatGen::func(ymuint pos) const
 {
-  assert_cond( pos < func_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < func_num() );
   return mFuncList[pos];
 }
 
@@ -233,7 +233,7 @@ inline
 const vector<PgPat*>&
 RwtPatGen::pat_list(ymuint pos) const
 {
-  assert_cond( pos < func_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < func_num() );
   return mPatList[pos];
 }
 

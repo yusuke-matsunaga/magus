@@ -315,7 +315,7 @@ DgMgr::make_node(tType type,
     return make_xor(inputs, opol);
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   // ダミー
   return 0;
@@ -1552,7 +1552,7 @@ DgMgr::make_or(const vector<tDgEdge>& inputs,
 {
   ymuint n = inputs.size();
 
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
 
   if ( n == 1 ) {
     // 1入力ならノードをつくる必要はない．
@@ -1639,7 +1639,7 @@ DgMgr::make_xor(const vector<tDgEdge>& inputs,
 {
   ymuint n = inputs.size();
 
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
 
   if ( n == 1 ) {
     // 1入力ならノードをつくる必要はない．

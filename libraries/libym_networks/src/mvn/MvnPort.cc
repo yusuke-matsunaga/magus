@@ -40,7 +40,7 @@ MvnPortRef::bit_width() const
       return n->bit_width();
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 

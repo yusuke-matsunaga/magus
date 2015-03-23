@@ -53,7 +53,7 @@ BddMgr::BddMgr(const string& type,
 	       const string& option)
 {
   mImpl = BddMgrImpl::new_mgr(type, name, option);
-  assert_cond(mImpl, __FILE__, __LINE__);
+  ASSERT_COND(mImpl );
 }
 
 // デストラクタ
@@ -183,7 +183,7 @@ BddMgr::tvec_to_bdd(const vector<int>& v,
       ans1 |= minterm;
     }
   }
-  assert_cond(ans0 == ans1, __FILE__, __LINE__);
+  ASSERT_COND(ans0 == ans1 );
   return ans0;
 #endif
 }
@@ -234,7 +234,7 @@ BddMgr::expr_to_bdd(const Expr& expr,
   if ( expr.is_xor() ) {
     return bdd_list.xor_op();
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return make_error();
 }
 

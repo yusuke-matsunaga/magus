@@ -36,7 +36,7 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int right_val,
 			bool delay)
 {
-  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+  ASSERT_COND( left != NULL && right != NULL );
 
   EiDeclHead* head = NULL;
   if ( delay ) {
@@ -92,7 +92,7 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
-  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+  ASSERT_COND( left != NULL && right != NULL );
 
   void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt2V));
   EiDeclHead* head = new (p) EiDeclHeadPt2V(parent, pt_head, aux_type,
@@ -130,7 +130,7 @@ EiFactory::new_DeclHead(const VlNamedObj* parent,
 			int left_val,
 			int right_val)
 {
-  assert_cond( left != NULL && right != NULL, __FILE__, __LINE__);
+  ASSERT_COND( left != NULL && right != NULL );
 
   void* p = mAlloc.get_memory(sizeof(EiDeclHeadPt3V));
   EiDeclHead* head = new (p) EiDeclHeadPt3V(parent, pt_item,
@@ -229,7 +229,7 @@ EiDeclHeadPt::type() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiParameter;
 }
 
@@ -333,7 +333,7 @@ EiDeclHeadPt::bit_size() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -388,7 +388,7 @@ EiDeclHeadPt::calc_bit_offset(int index,
   case kPtDecl_Event:
     // イベントオブジェクトは部分指定できない．
     // というかたぶん，ここには来ないはず．
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return false;
 
   case kPtDecl_SpecParam:
@@ -403,7 +403,7 @@ EiDeclHeadPt::calc_bit_offset(int index,
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -698,7 +698,7 @@ EiDeclHeadPt2::type() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiNet;
 }
 
@@ -783,7 +783,7 @@ EiDeclHeadPt2::bit_size() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -836,7 +836,7 @@ EiDeclHeadPt2::calc_bit_offset(int index,
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -992,7 +992,7 @@ EiDeclHeadPt3::type() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiReg;
 }
 
@@ -1071,7 +1071,7 @@ EiDeclHeadPt3::bit_size() const
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -1116,7 +1116,7 @@ EiDeclHeadPt3::calc_bit_offset(int index,
   default:
     break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 

@@ -55,12 +55,12 @@ SimNode::new_node(ymuint32 id,
   ymuint ni = inputs.size();
   switch ( type ) {
   case kTgGateBuff:
-    assert_cond(ni == 1, __FILE__, __LINE__);
+    ASSERT_COND(ni == 1 );
     node = new SnBuff(id, inputs);
     break;
 
   case kTgGateNot:
-    assert_cond(ni == 1, __FILE__, __LINE__);
+    ASSERT_COND(ni == 1 );
     node = new SnNot(id, inputs);
     break;
 
@@ -115,7 +115,7 @@ SimNode::new_node(ymuint32 id,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return node;
 }

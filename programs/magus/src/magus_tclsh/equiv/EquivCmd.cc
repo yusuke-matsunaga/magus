@@ -309,8 +309,8 @@ EquivCmdBase::assoc_by_order(const BdnMgr& network1,
     ++ p1;
     ++ p2;
   }
-  assert_cond(p1 == inputs1.end(), __FILE__, __LINE__);
-  assert_cond(p2 == inputs2.end(), __FILE__, __LINE__);
+  ASSERT_COND(p1 == inputs1.end() );
+  ASSERT_COND(p2 == inputs2.end() );
 
   // 次は外部出力ノードの対応関係を取る．
   const BdnNodeList& outputs1 = network1.output_list();
@@ -325,8 +325,8 @@ EquivCmdBase::assoc_by_order(const BdnMgr& network1,
     ++ p1;
     ++ p2;
   }
-  assert_cond(p1 == outputs1.end(), __FILE__, __LINE__);
-  assert_cond(p2 == outputs2.end(), __FILE__, __LINE__);
+  ASSERT_COND(p1 == outputs1.end() );
+  ASSERT_COND(p2 == outputs2.end() );
 }
 
 // 名前で対応を取る．
@@ -382,15 +382,15 @@ EquivCmdBase::assoc_by_name(const BdnMgr& network1,
 	  if ( iov1[k] & 1 ) {
 	    const BdnNode* node1 = port1->input(k);
 	    const BdnNode* node2 = port2->input(k);
-	    assert_cond( node1 != NULL, __FILE__, __LINE__);
-	    assert_cond( node2 != NULL, __FILE__, __LINE__);
+	    ASSERT_COND( node1 != NULL );
+	    ASSERT_COND( node2 != NULL );
 	    iassoc.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	  if ( iov1[k] & 2 ) {
 	    const BdnNode* node1 = port1->output(k);
 	    const BdnNode* node2 = port2->output(k);
-	    assert_cond( node1 != NULL, __FILE__, __LINE__);
-	    assert_cond( node2 != NULL, __FILE__, __LINE__);
+	    ASSERT_COND( node1 != NULL );
+	    ASSERT_COND( node2 != NULL );
 	    oassoc.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	}

@@ -191,7 +191,7 @@ BddFsm::rs_sub(Bdd rel,
   else {
     MpInt mc = rel.minterm_count(input_num());
 #if 0
-    assert_cond(mc.fits_uint_p(), __FILE__, __LINE__);
+    ASSERT_COND(mc.fits_uint_p() );
     double prob = static_cast<double>(mc.get_ui()) * mWeight;
 #else
 #warning "未完"
@@ -298,7 +298,7 @@ BddFsm::bdd2cur_states(Bdd bdd_states,
 	cout << " id = " << id
 	     << ", cur_base = " << cur_varid(0)
 	     << ", ff_num = " << ff_num() << endl;
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     ymuint dcsize = 0;
@@ -357,7 +357,7 @@ BddFsm::bdd2next_states(Bdd bdd_states,
 	cout << " id = " << id
 	     << ", next_base = " << next_varid(0)
 	     << ", ff_num = " << ff_num() << endl;
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     ymuint dcsize = 0;

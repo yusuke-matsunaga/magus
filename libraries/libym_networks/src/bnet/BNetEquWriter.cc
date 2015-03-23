@@ -26,7 +26,7 @@ write_expr(const Expr& f,
   HashMap<VarId, string> fanins;
   for (ymuint i = 0; i < node->fanin_num(); i ++) {
     BNode* inode = node->fanin(i);
-    assert_cond(inode != 0, __FILE__, __LINE__);
+    ASSERT_COND(inode != 0 );
     fanins.add(VarId(i), inode->name());
   }
   writer.dump(s, f, fanins);

@@ -48,8 +48,8 @@ IteConv::operator()(const MvnNode* node,
     const MvnNode* src_node2 = ipin2->src_node();
 
     ymuint bw = node->bit_width();
-    assert_cond( src_node1->bit_width() == bw, __FILE__, __LINE__);
-    assert_cond( src_node2->bit_width() == bw, __FILE__, __LINE__);
+    ASSERT_COND( src_node1->bit_width() == bw );
+    ASSERT_COND( src_node2->bit_width() == bw );
     BdnNodeHandle handle0 = nodemap.get(src_node0);
 
     for (ymuint i = 0; i < bw; ++ i) {

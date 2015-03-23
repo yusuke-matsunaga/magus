@@ -315,7 +315,7 @@ DecompCmd::cmd_proc(TclObjVector& objv)
     decomp(*(cur_network()), max_fanin, xor_decomp);
   }
   else {
-    assert_cond(random, __FILE__, __LINE__);
+    ASSERT_COND(random );
     RandGen randgen;
     if ( mPoptRandomSeed->is_specified() ) {
       randgen.init(mPoptRandomSeed->val());
@@ -418,7 +418,7 @@ GateDecompCmd::cmd_proc(TclObjVector& objv)
     decomp(*(cur_network()), type_mask, max_fanin);
   }
   else {
-    assert_cond(random, __FILE__, __LINE__);
+    ASSERT_COND(random );
     RandGen randgen;
     if ( mPoptRandomSeed->is_specified() ) {
       randgen.init(mPoptRandomSeed->val());

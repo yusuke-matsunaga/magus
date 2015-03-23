@@ -609,7 +609,7 @@ EiCaseStmt::case_type() const
   case kPtCaseZStmt: return kVpiCaseZ;
   default: break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiCaseExact;
 }
 

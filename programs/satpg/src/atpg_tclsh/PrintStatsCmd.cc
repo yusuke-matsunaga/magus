@@ -8,7 +8,6 @@
 
 
 #include "PrintStatsCmd.h"
-#include "AtpgMgr.h"
 #include "TpgNetwork.h"
 #include "FaultMgr.h"
 
@@ -50,13 +49,12 @@ PrintStatsCmd::cmd_proc(TclObjVector& objv)
   USTime m_time = misc_time();
 
   FaultMgr& fmgr = _fault_mgr();
-  ymuint num = _tv_list().size();
 
-  fprintf(stdout, "#A: # of total faults       = %7d\n", _network().rep_faults().size());
-  fprintf(stdout, "#B: # of detected faults    = %7d\n", fmgr.det_list().size());
-  fprintf(stdout, "#C: # of redundant faults   = %7d\n", fmgr.untest_list().size());
-  fprintf(stdout, "#D: # of undetected faults  = %7d\n", fmgr.remain_list().size());
-  fprintf(stdout, "#E: # of generated patterns = %7d\n", num);
+  fprintf(stdout, "#A: # of total faults       = %7lu\n", _network().rep_faults().size());
+  fprintf(stdout, "#B: # of detected faults    = %7lu\n", fmgr.det_list().size());
+  fprintf(stdout, "#C: # of redundant faults   = %7lu\n", fmgr.untest_list().size());
+  fprintf(stdout, "#D: # of undetected faults  = %7lu\n", fmgr.remain_list().size());
+  fprintf(stdout, "#E: # of generated patterns = %7lu\n", _tv_list().size());
   fprintf(stdout, "#F:   Total CPU time        = %7.2fu %7.2fs\n",
 	  lap.usr_time(), lap.sys_time());
   fprintf(stdout, "#G:    (read time           = %7.2f)\n",

@@ -225,7 +225,7 @@ CellLibrary_init(CellLibraryObject* self,
   }
 
   const CellLibrary* library = self->mLibrary;
-  assert_cond( library != NULL, __FILE__, __LINE__);
+  ASSERT_COND( library != NULL );
 
   ymuint nc = library->cell_num();
   self->mCellList = new PyObject*[nc];

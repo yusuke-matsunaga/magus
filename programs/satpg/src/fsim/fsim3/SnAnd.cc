@@ -198,7 +198,7 @@ SnAnd3::calc_gobs3(ymuint ipos)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 

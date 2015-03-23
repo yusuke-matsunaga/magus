@@ -215,7 +215,7 @@ inline
 ymuint
 RcfNodeHandle::id() const
 {
-  assert_cond( !is_const(), __FILE__, __LINE__);
+  ASSERT_COND( !is_const() );
   return (mData - 2) >> 1;
 }
 

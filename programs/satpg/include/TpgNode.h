@@ -312,52 +312,6 @@ public:
   clear_mark3();
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // mandatory assignment 用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 後方含意で出力に0を割り当てる．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_prop(TpgNode* from_node,
-	   Bool3 val,
-	   vector<TpgNode*>& node_list);
-
-  /// @brief ファンアウト先に0を伝播する．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop(TpgNode* from_node,
-	      Bool3 val,
-	      vector<TpgNode*>& node_list);
-
-  /// @brief controling value を得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
-  cval() const;
-
-  /// @brief noncontroling valueを得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
-  nval() const;
-
-  /// @brief 値を得る．
-  Bool3
-  ma_value() const;
-
-  /// @brief 値をクリアする．
-  void
-  clear_ma_value();
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
@@ -370,26 +324,6 @@ private:
   /// @brief アクティブフラグを消す．
   void
   clear_active();
-
-  /// @brief 後方含意を行う．
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_imp(Bool3 val,
-	  vector<TpgNode*>& node_list);
-
-  /// @brief 前方含意を行う．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fwd_imp(TpgNode* from_node,
-	  Bool3 val,
-	  vector<TpgNode*>& node_list);
 
 
 private:
@@ -474,15 +408,6 @@ private:
   // immediate dominator
   TpgNode* mImmDom;
 
-  // controling value
-  Bool3 mCval;
-
-  // noncontroling value
-  Bool3 mNval;
-
-  // mandatory assignments 用の値
-  Bool3 mMaVal;
-
 };
 
 
@@ -533,7 +458,7 @@ inline
 ymuint
 TpgNode::input_id() const
 {
-  assert_cond( is_input(), __FILE__, __LINE__);
+  ASSERT_COND( is_input() );
   return (mTypeId >> 3);
 }
 
@@ -551,7 +476,7 @@ inline
 ymuint
 TpgNode::output_id() const
 {
-  assert_cond( is_output(), __FILE__, __LINE__);
+  ASSERT_COND( is_output() );
   return (mTypeId >> 3);
 }
 
@@ -560,7 +485,7 @@ inline
 ymuint
 TpgNode::output_id2() const
 {
-  assert_cond( is_output(), __FILE__, __LINE__);
+  ASSERT_COND( is_output() );
   return mFanoutNum;
 }
 
@@ -577,7 +502,7 @@ inline
 tTgGateType
 TpgNode::gate_type() const
 {
-  assert_cond( is_logic(), __FILE__, __LINE__);
+  ASSERT_COND( is_logic() );
   return static_cast<tTgGateType>((mTypeId >> 3) & 15U);
 }
 
@@ -615,7 +540,7 @@ inline
 TpgNode*
 TpgNode::fanin(ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mFanins[pos];
 }
 
@@ -636,7 +561,7 @@ inline
 TpgNode*
 TpgNode::fanout(ymuint pos) const
 {
-  assert_cond( pos < fanout_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < fanout_num() );
   return mFanouts[pos];
 }
 
@@ -654,7 +579,7 @@ inline
 TpgNode*
 TpgNode::active_fanout(ymuint pos) const
 {
-  assert_cond( pos < mActFanoutNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActFanoutNum );
   return mActFanouts[pos];
 }
 
@@ -675,7 +600,7 @@ TpgFault*
 TpgNode::input_fault(int val,
 		     ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mInputFault[pos * 2 + (val % 2)];
 }
 
@@ -693,7 +618,7 @@ inline
 TpgFault*
 TpgNode::fault(ymuint pos) const
 {
-  assert_cond( pos < mFaultNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaultNum );
   return mFaultList[pos];
 }
 
@@ -897,7 +822,7 @@ TpgNode::set_ifvar(ymuint pos,
 		   int val,
 		   VarId var)
 {
-  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < fanin_num() );
   mIfVars[pos * 2 + (val % 2)] = var;
   mMarks |= 64U;
 }
@@ -960,40 +885,6 @@ VarId
 TpgNode::if1var(ymuint pos) const
 {
   return mIfVars[pos * 2 + 1];
-}
-
-// @brief controling value を得る．
-// @note ない場合は kB3X を返す．
-inline
-Bool3
-TpgNode::cval() const
-{
-  return mCval;
-}
-
-// @brief noncontroling valueを得る．
-// @note ない場合は kB3X を返す．
-inline
-Bool3
-TpgNode::nval() const
-{
-  return mNval;
-}
-
-// @brief 値を得る．
-inline
-Bool3
-TpgNode::ma_value() const
-{
-  return mMaVal;
-}
-
-// @brief 値をクリアする．
-inline
-void
-TpgNode::clear_ma_value()
-{
-  mMaVal = kB3X;
 }
 
 END_NAMESPACE_YM_SATPG

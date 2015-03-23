@@ -62,7 +62,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   }
 
   MinPatStats stats;
-  minpat->run(_tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);
+  minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);
 
   delete minpat;
 

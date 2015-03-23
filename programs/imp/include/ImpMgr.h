@@ -338,7 +338,7 @@ inline
 ImpNode*
 ImpMgr::input_node(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputArray[pos];
 }
 
@@ -356,8 +356,8 @@ inline
 ImpNode*
 ImpMgr::node(ymuint id) const
 {
-  assert_cond( id < mNodeArray.size(), __FILE__, __LINE__);
-  assert_cond( mNodeArray[id]->id() == id, __FILE__, __LINE__);
+  ASSERT_COND( id < mNodeArray.size() );
+  ASSERT_COND( mNodeArray[id]->id() == id );
   return mNodeArray[id];
 }
 

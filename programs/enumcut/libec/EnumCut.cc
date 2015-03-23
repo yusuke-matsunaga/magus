@@ -84,7 +84,7 @@ EnumCut::found_cut(const BdnNode* root,
 void
 EnumCut::node_end(const BdnNode* node)
 {
-  assert_cond( node == mCurNode, __FILE__, __LINE__);
+  ASSERT_COND( node == mCurNode );
   ++ mCurPos;
   mNcAll += mNcCur;
 

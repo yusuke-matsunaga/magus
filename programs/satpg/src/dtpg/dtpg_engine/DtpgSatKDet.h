@@ -1,31 +1,30 @@
-﻿#ifndef SATENGINEMULTI2_H
-#define SATENGINEMULTI2_H
+﻿#ifndef DTPGSATKDET_H
+#define DTPGSATKDET_H
 
-/// @file SatEngineMulti2.h
-/// @brief SatEngineMulti2 のヘッダファイル
+/// @file DtpgSatKDet.h
+/// @brief DtpgSatKDet のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgSatBaseS.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineMulti2 SatEngineMulti2.h "SatEngineMulti2.h"
-/// @brief 複数の故障の検出に使える CNF 式を生成するタイプの SatEngine
+/// @class DtpgSatKDet DtpgSatKDet.h "DtpgSatKDet.h"
+/// @brief 1つの故障を対象とした CNF を生成する SatEngine
 //////////////////////////////////////////////////////////////////////
-class SatEngineMulti2 :
-  public SatEngine
+class DtpgSatKDet :
+  public DtpgSatBaseS
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] th_val しきい値
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
@@ -33,19 +32,19 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  SatEngineMulti2(ymuint th_val,
-		  const string& sat_type,
-		  const string& sat_option,
-		  ostream* sat_outp,
-		  const TpgNetwork& network,
-		  BackTracer& bt,
-		  DetectOp& dop,
-		  UntestOp& uop,
-		  bool forget);
+  /// @param[in] kdet 多重度
+  DtpgSatKDet(const string& sat_type,
+	      const string& sat_option,
+	      ostream* sat_outp,
+	      const TpgNetwork& network,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop,
+	      ymuint kdet);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineMulti2();
+  ~DtpgSatKDet();
 
 
 public:
@@ -57,13 +56,7 @@ public:
   /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run(TpgFault* f_tgt);
-
-  /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
-  virtual
-  void
-  run(const vector<TpgFault*>& flist);
+  run_single(TpgFault* f_tgt);
 
 
 private:
@@ -71,23 +64,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // しきい値
-  ymuint32 mThVal;
-
-  // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
-
-  // 作業用の配列
-  vector<bool> mDone;
-
-  // 処理済みのノードのマーク
-  vector<ymuint> mMark;
-
-  // forget フラグ
-  bool mForget;
+  // 多重度
+  ymuint mCount;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINEMULTI2_H
+#endif // DTPGSATKDET_H

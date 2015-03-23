@@ -232,7 +232,7 @@ LibComp::group_num() const
 LcGroup*
 LibComp::group(ymuint id) const
 {
-  assert_cond( id < group_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < group_num() );
   return mGroupList[id];
 }
 
@@ -248,7 +248,7 @@ LibComp::npn_class_num() const
 LcClass*
 LibComp::npn_class(ymuint id) const
 {
-  assert_cond( id < npn_class_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < npn_class_num() );
   return mClassList[id];
 }
 
@@ -317,7 +317,7 @@ LibComp::reg_expr(const Expr& expr,
 
   // expr を変換したパタンを登録する．
   Expr cexpr = xform_expr(expr, fgroup->map());
-  assert_cond( !cexpr.is_constant(), __FILE__, __LINE__);
+  ASSERT_COND( !cexpr.is_constant() );
 
   if ( ni <= 8 ) {
     mPatMgr.reg_pat(cexpr, fclass->id());
@@ -361,7 +361,7 @@ LibComp::display(ostream& s) const
   s << "*** Cell Group BEGIN ***" << endl;
   for (ymuint i = 0; i < group_num(); ++ i) {
     const LcGroup* group = this->group(i);
-    assert_cond( group->id() == i, __FILE__, __LINE__);
+    ASSERT_COND( group->id() == i );
     s << "GROUP#" << i
       << ": CLASS#" << group->parent()->id()
       << ": " << group->map()
@@ -382,7 +382,7 @@ LibComp::display(ostream& s) const
   s << "*** NPN Class BEGIN ***" << endl;
   for (ymuint i = 0; i < npn_class_num(); ++ i) {
     const LcClass* cclass = npn_class(i);
-    assert_cond( cclass->id() == i, __FILE__, __LINE__);
+    ASSERT_COND( cclass->id() == i );
     s << "CLASS#" << i << ": ";
     cclass->repfunc().print(s, 2);
     s << endl;

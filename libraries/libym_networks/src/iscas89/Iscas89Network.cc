@@ -175,7 +175,7 @@ Iscas89Network::write_iscas89(ostream& s) const
     case kGt89NOR:  s << "NOR"; break;
     case kGt89XOR:  s << "XOR"; break;
     case kGt89XNOR: s << "XNOR"; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    default: ASSERT_NOT_REACHED; break;
     }
     s << "(";
     const char* comma = "";

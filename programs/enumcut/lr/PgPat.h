@@ -108,7 +108,7 @@ inline
 ymuint32
 PgPat::node(ymuint pos) const
 {
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mNodeNum );
   return mNodeList[pos];
 }
 

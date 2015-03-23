@@ -68,7 +68,7 @@ BtZdd::operator()(TpgNode* fnode,
   for (vector<TpgNode*>::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     TpgNode* node = *p;
-    assert_cond( node->is_input(), __FILE__, __LINE__);
+    ASSERT_COND( node->is_input() );
     ymuint iid = node->input_id();
     mMgr.new_var(VarId(iid));
     input_map.insert(make_pair(iid, node));
@@ -89,10 +89,10 @@ BtZdd::operator()(TpgNode* fnode,
   ans = mMgr.minimum_set(ans);
 
   while ( !ans.is_one() ) {
-    assert_cond( ans.edge0().is_zero(), __FILE__, __LINE__);
+    ASSERT_COND( ans.edge0().is_zero() );
     VarId vid = ans.root_var();
     IdNodeMap::iterator p = input_map.find(vid.val());
-    assert_cond( p != input_map.end(), __FILE__, __LINE__);
+    ASSERT_COND( p != input_map.end() );
     TpgNode* node = p->second;
     record_value(node, model);
     ans = ans.edge1();
@@ -195,7 +195,7 @@ BtZdd::justify(TpgNode* node,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }

@@ -102,7 +102,7 @@ VerilogWriterImpl::dump(ostream& s,
       sep = ", ";
 
       ymuint nb = port->bit_width();
-      assert_cond( nb > 0, __FILE__, __LINE__);
+      ASSERT_COND( nb > 0 );
       if ( nb == 1 ) {
 	const CmnNode* input = port->input(0);
 	const CmnNode* output = port->output(0);
@@ -113,7 +113,7 @@ VerilogWriterImpl::dump(ostream& s,
 	  set_node_name(output, port->name());
 	}
 	else {
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	}
       }
     }
@@ -123,7 +123,7 @@ VerilogWriterImpl::dump(ostream& s,
     const CmnPort* port = network.port(i);
     string port_name = port->name();
     ymuint nb = port->bit_width();
-    assert_cond( nb > 0, __FILE__, __LINE__);
+    ASSERT_COND( nb > 0 );
     if ( nb == 1 ) {
       const CmnNode* input = port->input(0);
       const CmnNode* output = port->output(0);
@@ -144,7 +144,7 @@ VerilogWriterImpl::dump(ostream& s,
 	writer.put_elem(port_name);
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     else {
@@ -208,7 +208,7 @@ VerilogWriterImpl::dump(ostream& s,
       continue;
     }
     const CmnNode* inode = node->fanin(0);
-    assert_cond( inode != NULL, __FILE__, __LINE__);
+    ASSERT_COND( inode != NULL );
 
     VlwAssign vlw_assign(writer);
     if ( node->alt_node() ) {
@@ -293,7 +293,7 @@ VerilogWriterImpl::dump(ostream& s,
        p != logic_list.end(); ++ p) {
     const CmnNode* node = *p;
     const Cell* cell = node->cell();
-    assert_cond( cell != NULL, __FILE__, __LINE__);
+    ASSERT_COND( cell != NULL );
 
     VlwInst vlw_inst(writer, cell->name());
 
@@ -305,14 +305,14 @@ VerilogWriterImpl::dump(ostream& s,
     ymuint ni = cell->input_num();
     for (ymuint ipos = 0; ipos < ni; ++ ipos) {
       const CellPin* pin = cell->input(ipos);
-      assert_cond( pin->is_input(), __FILE__, __LINE__);
+      ASSERT_COND( pin->is_input() );
       const CmnNode* node1 = node->fanin(ipos);
       vlw_elem.put_pinassign(pin->name(), node_name(node1));
     }
     ymuint no = cell->output_num();
-    assert_cond( no == 1, __FILE__, __LINE__);
+    ASSERT_COND( no == 1 );
     const CellPin* pin = cell->output(0);
-    assert_cond( pin->is_output(), __FILE__, __LINE__);
+    ASSERT_COND( pin->is_output() );
     vlw_elem.put_pinassign(pin->name(), node_name(node));
   }
 }
@@ -342,7 +342,7 @@ string
 VerilogWriterImpl::dff_node_name(const CmnNode* node) const
 {
   const CmnNode* inode = node->fanin(0);
-  assert_cond( inode != NULL, __FILE__, __LINE__);
+  ASSERT_COND( inode != NULL );
   return node_name(inode);
 }
 

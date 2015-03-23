@@ -22,10 +22,10 @@ BEGIN_NAMESPACE_YM_DOTLIB
 ShString
 DotlibNode::get_string_from_value_list() const
 {
-  assert_cond( is_list(), __FILE__, __LINE__);
-  assert_cond( list_size() == 1, __FILE__, __LINE__);
+  ASSERT_COND( is_list() );
+  ASSERT_COND( list_size() == 1 );
   const DotlibNode* value = list_elem(0);
-  assert_cond( value->is_string(), __FILE__, __LINE__);
+  ASSERT_COND( value->is_string() );
   return value->string_value();
 }
 
@@ -39,7 +39,7 @@ bool
 DotlibNode::get_string_pair(ShString& str1,
 			    ShString& str2) const
 {
-  assert_cond ( is_list(), __FILE__, __LINE__);
+  ASSERT_COND ( is_list() );
   if ( list_size() != 2 ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    loc(),
@@ -49,7 +49,7 @@ DotlibNode::get_string_pair(ShString& str1,
     return false;
   }
   const DotlibNode* node1 = list_elem(0);
-  assert_cond( node1 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node1 != NULL );
   if ( !node1->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    node1->loc(),
@@ -59,7 +59,7 @@ DotlibNode::get_string_pair(ShString& str1,
     return false;
   }
   const DotlibNode* node2 = list_elem(1);
-  assert_cond( node2 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node2 != NULL );
   if ( !node2->is_string() ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    node2->loc(),

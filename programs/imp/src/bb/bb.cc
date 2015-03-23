@@ -182,7 +182,7 @@ bb(const char* file_name,
       for (vector<Aig>::iterator p = root_list.begin();
 	   p != root_list.end(); ++ p) {
 	Aig root = *p;
-	assert_cond( !root.is_zero(), __FILE__, __LINE__);
+	ASSERT_COND( !root.is_zero() );
 	if ( root.is_one() ) {
 	  continue;
 	}

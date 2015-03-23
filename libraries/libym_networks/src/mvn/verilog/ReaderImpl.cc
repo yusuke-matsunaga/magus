@@ -193,7 +193,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
       if ( driver != prev ) {
 	tmp2.push_back(driver);
 	prev = driver;
-	assert_cond( driver.rhs_node() != NULL, __FILE__, __LINE__);
+	ASSERT_COND( driver.rhs_node() != NULL );
       }
     }
 
@@ -207,7 +207,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
       vector<ymuint> bw_array(nd);
       for (ymuint i = 0; i < nd; ++ i) {
 	const Driver& driver = tmp2[i];
-	assert_cond( driver.rhs_node() != NULL, __FILE__, __LINE__);
+	ASSERT_COND( driver.rhs_node() != NULL );
 	if ( driver.has_bitselect() ) {
 	  bw_array[i] = 1;
 	}
@@ -215,7 +215,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
 	  bw_array[i] = driver.msb() - driver.lsb() + 1;
 	}
 	else {
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	}
       }
       MvnNode* node1 = mMvnMgr->new_concat(module0, bw_array);
@@ -318,7 +318,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     mIODeclMap.add(decl, node);
@@ -341,7 +341,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     const VlPort* port = vl_module->port(i);
     const VlExpr* expr = port->low_conn();
     if ( expr->is_operation() ) {
-      assert_cond( expr->op_type() == kVlConcatOp, __FILE__, __LINE__);
+      ASSERT_COND( expr->op_type() == kVlConcatOp );
       ymuint n = expr->operand_num();
       mMvnMgr->init_port(module, i, port->name(), n);
       for (ymuint j = 0; j < n; ++ j) {
@@ -362,7 +362,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
 	  break;
 
 	default:
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	  break;
 	}
       }
@@ -386,7 +386,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
 	break;
 
       default:
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	break;
       }
     }
@@ -528,7 +528,7 @@ ReaderImpl::gen_portref(const VlExpr* expr,
 			ymuint& lsb)
 {
   const VlDecl* decl = expr->decl_obj();
-  assert_cond( decl != NULL, __FILE__, __LINE__);
+  ASSERT_COND( decl != NULL );
   node = mIODeclMap.get(decl);
   if ( node == NULL ) {
     ostringstream buf;
@@ -542,16 +542,16 @@ ReaderImpl::gen_portref(const VlExpr* expr,
   }
 
   if ( expr->is_bitselect() ) {
-    assert_cond( node != NULL, __FILE__, __LINE__);
-    assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-    assert_cond( expr->declarray_dimension() == 0, __FILE__, __LINE__);
+    ASSERT_COND( node != NULL );
+    ASSERT_COND( expr->is_constant_select() );
+    ASSERT_COND( expr->declarray_dimension() == 0 );
     msb = expr->index_val();
     return 1;
   }
   if ( expr->is_partselect() ) {
-    assert_cond( node != NULL, __FILE__, __LINE__);
-    assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
-    assert_cond( expr->declarray_dimension() == 0, __FILE__, __LINE__);
+    ASSERT_COND( node != NULL );
+    ASSERT_COND( expr->is_constant_select() );
+    ASSERT_COND( expr->declarray_dimension() == 0 );
     msb = expr->left_range_val();
     lsb = expr->right_range_val();
     return 2;
@@ -573,9 +573,9 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     reg_driver(dst_node, Driver(src_loc, src_node));
   }
   else if ( expr->is_bitselect() ) {
-    assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
+    ASSERT_COND( expr->is_constant_select() );
     const VlDeclBase* decl = expr->decl_base();
-    assert_cond( decl != NULL, __FILE__, __LINE__);
+    ASSERT_COND( decl != NULL );
     ymuint offset;
     if ( !decl->calc_bit_offset(expr->index_val(), offset) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
@@ -588,9 +588,9 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     reg_driver(dst_node, Driver(src_loc, src_node, offset));
   }
   else if ( expr->is_partselect() ) {
-    assert_cond( expr->is_constant_select(), __FILE__, __LINE__);
+    ASSERT_COND( expr->is_constant_select() );
     const VlDeclBase* decl = expr->decl_base();
-    assert_cond( decl != NULL, __FILE__, __LINE__);
+    ASSERT_COND( decl != NULL );
     ymuint msb;
     if ( !decl->calc_bit_offset(expr->left_range_val(), msb) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
@@ -609,7 +609,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
 		      "Right index is out of range.");
       return;
     }
-    assert_cond( src_node->bit_width() == msb - lsb + 1, __FILE__, __LINE__);
+    ASSERT_COND( src_node->bit_width() == msb - lsb + 1 );
     reg_driver(dst_node, Driver(src_loc, src_node, msb, lsb));
   }
 }
@@ -679,7 +679,7 @@ ReaderImpl::reg_driver(MvnNode* node,
 vector<Driver>&
 ReaderImpl::driver_list(MvnNode* node)
 {
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
   ymuint id = node->id();
   while ( mDriverList.size() <= id ) {
     mDriverList.push_back(vector<Driver>());

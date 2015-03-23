@@ -395,7 +395,7 @@ SptDefParam::SptDefParam(const FileRegion& file_region,
   mName(tail_name),
   mExpr(value)
 {
-  assert_cond(value, __FILE__, __LINE__);
+  ASSERT_COND(value );
 }
 
 // デストラクタ
@@ -554,7 +554,7 @@ SptProcess::SptProcess(const FileRegion& file_region,
   SptItem(file_region, type),
   mBody(body)
 {
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(body );
 }
 
 // デストラクタ

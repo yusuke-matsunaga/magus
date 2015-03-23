@@ -476,7 +476,7 @@ SatImp::learning(ImpMgr& imp_mgr,
     vector<bool> cnf_mark(n, false);
     for (ymuint id = 0; id < n; ++ id) {
       VarId vid = solver.new_var();
-      assert_cond( vid.val() == id, __FILE__, __LINE__);
+      ASSERT_COND( vid.val() == id );
       if ( imp_mgr.is_const0(id) ) {
 	Literal lit(vid, true);
 	solver.add_clause(lit);

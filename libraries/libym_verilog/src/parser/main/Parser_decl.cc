@@ -141,7 +141,7 @@ void
 Parser::flush_io()
 {
   if ( !mIOItemList.empty() ) {
-    assert_cond( !mCurIOHeadList->empty(), __FILE__, __LINE__);
+    ASSERT_COND( !mCurIOHeadList->empty() );
     PtiIOHead* last = mCurIOHeadList->back();
     last->set_elem(mIOItemList.to_array(mAlloc));
     mIOItemList.clear();
@@ -245,7 +245,7 @@ void
 Parser::flush_paramport()
 {
   if ( !mDeclItemList.empty() ) {
-    assert_cond( !mParamPortHeadList.empty(), __FILE__, __LINE__);
+    ASSERT_COND( !mParamPortHeadList.empty() );
     PtiDeclHead* last = mParamPortHeadList.back();
     last->set_elem(mDeclItemList.to_array(mAlloc));
     mDeclItemList.clear();

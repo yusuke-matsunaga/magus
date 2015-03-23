@@ -28,7 +28,7 @@ TclHandler::~TclHandler(void)
 {
   // 登録されているハンドラがあってはいけない．
   // ここでは派生クラスの仮想関数を呼ぶ事ができない．
-  assert_cond( !is_registered(), __FILE__, __LINE__);
+  ASSERT_COND( !is_registered() );
 }
 
 // ハンドラを登録する．

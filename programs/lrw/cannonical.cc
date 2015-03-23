@@ -87,7 +87,7 @@ cannonical4(ymuint16 func,
       return fv1;
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 

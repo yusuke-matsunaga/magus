@@ -189,7 +189,7 @@ NpnXform::perm_id(ymuint perm[])
        << perm[1] << ", "
        << perm[2] << ", "
        << perm[3] << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 

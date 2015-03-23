@@ -217,7 +217,7 @@ check_const(ImpMgr& imp_mgr,
 	  continue;
 	}
 	if ( pval.id() == impval.id() ) {
-	  assert_cond( pval.val() != impval.val(), __FILE__, __LINE__);
+	  ASSERT_COND( pval.val() != impval.val() );
 	  imp_mgr.set_const(id, val ^ 1);
 	  cout << "Node#" << id << " is const-" << (val ^ 1) << endl;
 	  ++ nc;
@@ -281,7 +281,7 @@ verify(const ImpMgr& imp_mgr,
   SatSolver solver1;
   for (ymuint id = 0; id < n; ++ id) {
     VarId vid = solver1.new_var();
-    assert_cond( vid.val() == id, __FILE__, __LINE__);
+    ASSERT_COND( vid.val() == id );
   }
 
   // ImpMgr から CNF を作る．

@@ -38,15 +38,16 @@ DtpgDriverImpl::~DtpgDriverImpl()
 // @param[in] tpgnetwork 対象のネットワーク
 // @param[in] mode メインモード
 // @param[in] po_mode PO分割モード
+// @param[in] engine DTPG エンジン
 // @param[in] stats 結果を格納する構造体
 void
 DtpgDriverImpl::run(TpgNetwork& tgnetwork,
 		    tDtpgMode mode,
 		    tDtpgPoMode po_mode,
-		    DtpgEngine& sat_engine,
+		    DtpgEngine& engine,
 		    DtpgStats& stats)
 {
-  sat_engine.clear_stats();
+  engine.clear_stats();
 
   mNetwork = &tgnetwork;
 
@@ -56,7 +57,7 @@ DtpgDriverImpl::run(TpgNetwork& tgnetwork,
 
     mNetwork->activate_all();
 
-    dtpg1(mode, sat_engine);
+    dtpg1(mode, engine);
 
     break;
 
@@ -66,7 +67,7 @@ DtpgDriverImpl::run(TpgNetwork& tgnetwork,
       for (ymuint po_pos = 0; po_pos < no; ++ po_pos) {
 	mNetwork->activate_po(po_pos);
 
-	dtpg1(mode, sat_engine);
+	dtpg1(mode, engine);
       }
     }
     break;
@@ -78,39 +79,41 @@ DtpgDriverImpl::run(TpgNetwork& tgnetwork,
 	ymuint po_pos = no - i - 1;
 	mNetwork->activate_po(po_pos);
 
-	dtpg1(mode, sat_engine);
+	dtpg1(mode, engine);
       }
     }
     break;
   }
 
-  sat_engine.get_stats(stats);
+  engine.get_stats(stats);
 }
 
 // @brief activate された部分回路に大してテスト生成を行う．
 // @param[in] mode メインモード
+// @param[in] engine DTPG エンジン
 void
 DtpgDriverImpl::dtpg1(tDtpgMode mode,
-		      DtpgEngine& sat_engine)
+		      DtpgEngine& engine)
 {
   switch ( mode ) {
   case kDtpgSingle:
-    single_mode(sat_engine);
+    single_mode(engine);
     break;
 
   case kDtpgFFR:
-    ffr_mode(sat_engine);
+    ffr_mode(engine);
     break;
 
   case kDtpgMFFC:
-    mffc_mode(sat_engine);
+    mffc_mode(engine);
     break;
   }
 }
 
 // @brief single モードでテスト生成を行なう．
+// @param[in] engine DTPG エンジン
 void
-DtpgDriverImpl::single_mode(DtpgEngine& sat_engine)
+DtpgDriverImpl::single_mode(DtpgEngine& engine)
 {
   ymuint nn = mNetwork->active_node_num();
   for (ymuint i = 0; i < nn; ++ i) {
@@ -124,15 +127,16 @@ DtpgDriverImpl::single_mode(DtpgEngine& sat_engine)
       TpgFault* f = node->fault(i);
       if ( f->status() != kFsDetected &&
 	   !f->is_skip() ) {
-	sat_engine.run(f);
+	engine.run_single(f);
       }
     }
   }
 }
 
 // @brief ffr モードでテスト生成を行なう．
+// @param[in] engine DTPG エンジン
 void
-DtpgDriverImpl::ffr_mode(DtpgEngine& sat_engine)
+DtpgDriverImpl::ffr_mode(DtpgEngine& engine)
 {
   ymuint n = mNetwork->active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
@@ -143,11 +147,13 @@ DtpgDriverImpl::ffr_mode(DtpgEngine& sat_engine)
 
       dfs_ffr(node);
 
-      do_dtpg(sat_engine);
+      do_dtpg(engine);
     }
   }
 }
 
+// @brief DFS で FFR を求める．
+// @param[in] node 対象のノード
 void
 DtpgDriverImpl::dfs_ffr(TpgNode* node)
 {
@@ -163,8 +169,9 @@ DtpgDriverImpl::dfs_ffr(TpgNode* node)
 }
 
 // @brief mffc モードでテスト生成を行なう．
+// @param[in] engine DTPG エンジン
 void
-DtpgDriverImpl::mffc_mode(DtpgEngine& sat_engine)
+DtpgDriverImpl::mffc_mode(DtpgEngine& engine)
 {
   ymuint n = mNetwork->active_node_num();
   vector<bool> mark(mNetwork->max_node_id(), false);
@@ -175,11 +182,14 @@ DtpgDriverImpl::mffc_mode(DtpgEngine& sat_engine)
 
       dfs_mffc(node, mark);
 
-      do_dtpg(sat_engine);
+      do_dtpg(engine);
     }
   }
 }
 
+// @brief DFS で MFFC を求める．
+// @param[in] node 対象のノード
+// @param[inout] mark 処理済みのマーク
 void
 DtpgDriverImpl::dfs_mffc(TpgNode* node,
 			 vector<bool>& mark)
@@ -207,6 +217,7 @@ DtpgDriverImpl::clear_faults()
 }
 
 // @brief ノードの故障を追加する．
+// @param[in] node 対象のノード
 void
 DtpgDriverImpl::add_node_faults(TpgNode* node)
 {
@@ -221,14 +232,15 @@ DtpgDriverImpl::add_node_faults(TpgNode* node)
 }
 
 // @brief テストパタン生成を行なう．
+// @param[in] engine DTPG エンジン
 void
-DtpgDriverImpl::do_dtpg(DtpgEngine& sat_engine)
+DtpgDriverImpl::do_dtpg(DtpgEngine& engine)
 {
   if ( mFaultList.empty() ) {
     return;
   }
 
-  sat_engine.run(mFaultList);
+  engine.run_multi(mFaultList);
 }
 
 END_NAMESPACE_YM_SATPG

@@ -101,7 +101,7 @@ CellPinDir_repr(CellPinDirObject* self)
   case kCellPinOutput:   result = kCellPinOutputString; break;
   case kCellPinInout:    result = kCellPinInoutString; break;
   case kCellPinInternal: result = kCellPinInternalString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -275,7 +275,7 @@ PyCellPinDir_FromCellPinDir(tCellPinDirection val)
   case kCellPinOutput:   result = Py_kCellPinOutput; break;
   case kCellPinInout:    result = Py_kCellPinInout; break;
   case kCellPinInternal: result = Py_kCellPinInternal; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

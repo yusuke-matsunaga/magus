@@ -154,7 +154,7 @@ inline
 Expr
 LogicMgr::get_expr(ymuint32 id) const
 {
-  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < logic_num() );
   return mCellArray[id]->mExpr;
 }
 
@@ -164,7 +164,7 @@ inline
 const TvFunc&
 LogicMgr::get_func(ymuint32 id) const
 {
-  assert_cond( id < logic_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < logic_num() );
   return mCellArray[id]->mTvFunc;
 }
 

@@ -36,13 +36,13 @@ UnaryOpDumper::operator()(ostream& s,
 			  const MvnNode* node)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni == 1, __FILE__, __LINE__);
+  ASSERT_COND( ni == 1 );
   ymuint no = node->output_num();
-  assert_cond( no == 1, __FILE__, __LINE__);
+  ASSERT_COND( no == 1 );
 
   const MvnInputPin* ipin = node->input(0);
   const MvnOutputPin* src_pin = ipin->src_pin();
-  assert_cond( src_pin != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin != NULL );
 
   s << mOprStr << net_name(src_pin);
 }
@@ -75,17 +75,17 @@ BinaryOpDumper::operator()(ostream& s,
 			   const MvnNode* node)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni == 2, __FILE__, __LINE__);
+  ASSERT_COND( ni == 2 );
   ymuint no = node->output_num();
-  assert_cond( no == 1, __FILE__, __LINE__);
+  ASSERT_COND( no == 1 );
 
   const MvnInputPin* ipin0 = node->input(0);
   const MvnOutputPin* src_pin0 = ipin0->src_pin();
-  assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin0 != NULL );
 
   const MvnInputPin* ipin1 = node->input(1);
   const MvnOutputPin* src_pin1 = ipin1->src_pin();
-  assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin1 != NULL );
 
   const char* lp = "";
   const char* rp = "";
@@ -126,21 +126,21 @@ TernaryOpDumper::operator()(ostream& s,
 			    const MvnNode* node)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni == 3, __FILE__, __LINE__);
+  ASSERT_COND( ni == 3 );
   ymuint no = node->output_num();
-  assert_cond( no == 1, __FILE__, __LINE__);
+  ASSERT_COND( no == 1 );
 
   const MvnInputPin* ipin0 = node->input(0);
   const MvnOutputPin* src_pin0 = ipin0->src_pin();
-  assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin0 != NULL );
 
   const MvnInputPin* ipin1 = node->input(1);
   const MvnOutputPin* src_pin1 = ipin1->src_pin();
-  assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin1 != NULL );
 
   const MvnInputPin* ipin2 = node->input(2);
   const MvnOutputPin* src_pin2 = ipin2->src_pin();
-  assert_cond( src_pin2 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin2 != NULL );
 
   s << net_name(src_pin0) << " " << mOprStr1 << " "
     << net_name(src_pin1) << " " << mOprStr2 << " "
@@ -172,19 +172,19 @@ NaryOpDumper::operator()(ostream& s,
 			 const MvnNode* node)
 {
   ymuint ni = node->input_num();
-  assert_cond( ni >= 2, __FILE__, __LINE__);
+  ASSERT_COND( ni >= 2 );
   ymuint no = node->output_num();
-  assert_cond( no == 1, __FILE__, __LINE__);
+  ASSERT_COND( no == 1 );
 
   const MvnInputPin* ipin0 = node->input(0);
   const MvnOutputPin* src_pin0 = ipin0->src_pin();
-  assert_cond( src_pin0 != NULL, __FILE__, __LINE__);
+  ASSERT_COND( src_pin0 != NULL );
 
   s << net_name(src_pin0);
   for (ymuint i = 1; i < ni; ++ i) {
     const MvnInputPin* ipin1 = node->input(i);
     const MvnOutputPin* src_pin1 = ipin1->src_pin();
-    assert_cond( src_pin1 != NULL, __FILE__, __LINE__);
+    ASSERT_COND( src_pin1 != NULL );
     s << " " << mOprStr << " " << net_name(src_pin1);
   }
 }
@@ -212,7 +212,7 @@ ConcatDumper::operator()(ostream& s,
 			 const MvnNode* node)
 {
   ymuint no = node->output_num();
-  assert_cond( no == 1, __FILE__, __LINE__);
+  ASSERT_COND( no == 1 );
 
   s << "{";
   const char* comma = "";
@@ -220,7 +220,7 @@ ConcatDumper::operator()(ostream& s,
   for (ymuint i = 0; i < ni; ++ i) {
     const MvnInputPin* ipin = node->input(i);
     const MvnOutputPin* opin = ipin->src_pin();
-    assert_cond( opin != NULL, __FILE__, __LINE__);
+    ASSERT_COND( opin != NULL );
 
     s << comma << net_name(opin);
     comma = ", ";

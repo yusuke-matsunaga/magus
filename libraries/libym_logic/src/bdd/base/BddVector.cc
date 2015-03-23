@@ -46,7 +46,7 @@ BddVector::BddVector(BddMgr& mgr,
   vector<Bdd>(n),
   mMgr(mgr)
 {
-  assert_cond( size() == n, __FILE__, __LINE__);
+  ASSERT_COND( size() == n );
 }
 
 // @brief デストラクタ

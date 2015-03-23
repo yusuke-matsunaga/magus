@@ -264,7 +264,7 @@ CiGroup::cell_num() const
 const Cell*
 CiGroup::cell(ymuint pos) const
 {
-  assert_cond( pos < mCellNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mCellNum );
   return mCellList[pos];
 }
 

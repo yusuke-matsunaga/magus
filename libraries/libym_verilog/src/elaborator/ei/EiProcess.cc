@@ -62,7 +62,7 @@ EiProcess::type() const
   case kPtItem_Always:  return kVpiAlways;
   default: break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kVpiInitial;
 }
 

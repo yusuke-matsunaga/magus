@@ -265,7 +265,7 @@ PtDumper::put(const PtModule* m)
 	put("mIndex", pr->index(0));
       }
       else {
-	assert_cond( pr->index_num() == 0, __FILE__, __LINE__);
+	ASSERT_COND( pr->index_num() == 0 );
       }
       if ( pr->range_mode() != kVpiNoRange ) {
 	put("mRangeMode", pr->range_mode());
@@ -296,7 +296,7 @@ PtDumper::put(const char* label,
   case kPtIO_Input:  nm = "Input"; break;
   case kPtIO_Output: nm = "Output"; break;
   case kPtIO_Inout:  nm = "Inout"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   PtHeader x(*this, label, nm);
 
@@ -339,7 +339,7 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Parameter(real)"; break;
     case kVpiVarTime:            nm = "Parameter(time)"; break;
     case kVpiVarRealtime:        nm = "Parameter(realtime)"; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    default: ASSERT_NOT_REACHED; break;
     }
     break;
   case kPtDecl_LocalParam:
@@ -349,7 +349,7 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Localparam(real)"; break;
     case kVpiVarTime:            nm = "Localparam(time)"; break;
     case kVpiVarRealtime:        nm = "Localparam(realtime)"; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    default: ASSERT_NOT_REACHED; break;
     }
     break;
   case kPtDecl_Reg:            nm = "Reg";        break;
@@ -359,8 +359,8 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Real";       break;
     case kVpiVarTime:            nm = "Time";       break;
     case kVpiVarRealtime:        nm = "Realtime";  break;
-    case kVpiVarNone: assert_not_reached(__FILE__, __LINE__);
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    case kVpiVarNone: ASSERT_NOT_REACHED;
+    default: ASSERT_NOT_REACHED; break;
     }
     break;
   case kPtDecl_Genvar:         nm = "Genvar";     break;
@@ -380,10 +380,10 @@ PtDumper::put(const char* label,
     case kVpiWand:               nm = "Wand"; break;
     case kVpiWor:                nm = "Wor"; break;
     case kVpiNone:               nm = "None"; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    default: ASSERT_NOT_REACHED; break;
     }
     break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
   PtHeader x(*this, label, nm);
 
@@ -441,7 +441,7 @@ PtDumper::put(const char* label,
     case kVpiVarReal:            nm = "Function(real)"; break;
     case kVpiVarTime:            nm = "Function(time)"; break;
     case kVpiVarRealtime:        nm = "Function(realtime)"; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    default: ASSERT_NOT_REACHED; break;
     }
     break;
   case kPtItem_GateInst:        nm = "GateHeader"; break;
@@ -452,7 +452,7 @@ PtDumper::put(const char* label,
     case kVpiPulsestyleOnDetect: nm = "Pulse_ondetect"; break;
     case kVpiShowcancelled:      nm = "Showcancelled"; break;
     case kVpiNoshowcancelled:    nm = "Noshowcancelld"; break;
-    default: assert_not_reached(__FILE__, __LINE__); break;
+    default: ASSERT_NOT_REACHED; break;
     }
   case kPtItem_SpecPath:        nm = "SpecPath"; break;
   case kPtItem_Generate:        nm = "Generate"; break;
@@ -460,7 +460,7 @@ PtDumper::put(const char* label,
   case kPtItem_GenIf:           nm = "GenIf"; break;
   case kPtItem_GenCase:         nm = "GenCase"; break;
   case kPtItem_GenFor:          nm = "GenFor"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
   PtHeader x(*this, label, nm);
 
@@ -628,7 +628,7 @@ PtDumper::put(const char* label,
     put_decl_item("mBody", item->declhead_array(), item->item_array());
     break;
 
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -754,7 +754,7 @@ PtDumper::put(const char* label,
   case kPtSeqBlockStmt:      nm = "Begin"; break;
   case kPtNamedParBlockStmt: nm = "Fork"; break;
   case kPtNamedSeqBlockStmt: nm = "Begin"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
   PtHeader x(*this, label, nm);
 
@@ -863,7 +863,7 @@ PtDumper::put(const char* label,
     }
     break;
 
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -968,7 +968,7 @@ PtDumper::put(const char* label,
     }
     break;
 
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1106,7 +1106,7 @@ PtDumper::put(const char* label,
   case kVpiAuxNet:  mStream << "net"; break;
   case kVpiAuxReg:  mStream << "reg"; break;
   case kVpiAuxVar:  mStream << "var"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1131,7 +1131,7 @@ PtDumper::put(const char* label,
   case kVpiWand:    mStream << "wand"; break;
   case kVpiWor:     mStream << "wor"; break;
   case kVpiNone:    mStream << "none"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1149,7 +1149,7 @@ PtDumper::put(const char* label,
   case kVpiVarTime:     mStream << "time"; break;
   case kVpiVarRealtime: mStream << "realtime"; break;
   case kVpiVarNone:     mStream << "none"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1176,7 +1176,7 @@ PtDumper::put(const char* label,
   case kVpiHighZ: mStream << "high-Z"; break;
   case kVpiPull1: mStream << "pull-1"; break;
   case kVpiPull0: mStream << "pull-0"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1195,7 +1195,7 @@ PtDumper::put(const char* label,
   case kVpiDelayModeUnit:    mStream << "unit"; break;
   case kVpiDelayModeZero:    mStream << "zero"; break;
   case kVpiDelayModeMTM:     mStream << "min-typ-max"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1236,7 +1236,7 @@ PtDumper::put(const char* label,
   case kVpiPulldownPrim: mStream << "pulldown"; break;
   case kVpiSeqPrim:      mStream << "seq"; break;
   case kVpiCombPrim:     mStream << "comb"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1292,7 +1292,7 @@ PtDumper::put(const char* label,
   case kVlArithLShiftOp: mStream << "arithmetic left shift"; break;
   case kVlArithRShiftOp: mStream << "arithmetic right shift"; break;
   case kVlPowerOp:       mStream << "power"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1316,7 +1316,7 @@ PtDumper::put(const char* label,
   case kVpiSignedBinaryConst: mStream << "signed binary"; break;
   case kVpiSignedOctConst:    mStream << "signed oct"; break;
   case kVpiSignedHexConst:    mStream << "signed hex"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1338,7 +1338,7 @@ PtDumper::put(const char* label,
   case kVpiMediumCharge: mStream << "medium"; break;
   case kVpiSmallCharge:  mStream << "small"; break;
   case kVpiHiZ:          mStream << "high-Z"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1354,7 +1354,7 @@ PtDumper::put(const char* label,
   case kVpiVsNone:   mStream << "none"; break;
   case kVpiVectored: mStream << "vectored"; break;
   case kVpiScalared: mStream << "scalared"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1371,7 +1371,7 @@ PtDumper::put(const char* label,
   case kVpiConstRange: mStream << "constant range"; break;
   case kVpiPlusRange:  mStream << "plus range"; break;
   case kVpiMinusRange: mStream << "minus range"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
 }
 
@@ -1500,7 +1500,7 @@ PtDumper::put(const char* label,
   case kPtDelayControl:  nm = "DelayControl"; break;
   case kPtEventControl:  nm = "EventControl"; break;
   case kPtRepeatControl: nm = "RepeatControl"; break;
-  default: assert_not_reached(__FILE__, __LINE__); break;
+  default: ASSERT_NOT_REACHED; break;
   }
   PtHeader x(*this, label, nm);
 

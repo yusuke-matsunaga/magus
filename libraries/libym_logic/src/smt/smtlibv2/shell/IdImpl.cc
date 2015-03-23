@@ -75,7 +75,7 @@ IdImpl::index_size() const
 ymuint32
 IdImpl::index(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -115,7 +115,7 @@ IndexId::index_size() const
 ymuint32
 IndexId::index(ymuint pos) const
 {
-  assert_cond( pos < index_size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < index_size() );
   return mIndexList[pos];
 }
 

@@ -82,7 +82,7 @@ EiFactory::new_BinaryOp(const PtExpr* pt_expr,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   return expr;
@@ -245,7 +245,7 @@ EiBinaryBitOp::EiBinaryBitOp(const PtExpr* pt_expr,
 
   mType = calc_type(type1, type2);
 
-  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
+  ASSERT_COND( !mType.is_real_type() );
 }
 
 // @brief デストラクタ
@@ -381,9 +381,9 @@ EiShiftOp::EiShiftOp(const PtExpr* pt_expr,
 {
   // シフト演算子は第1オペランドの型とサイズをそのまま引き継ぐ
   mType = opr1->value_type();
-  assert_cond( !mType.is_real_type(), __FILE__, __LINE__);
+  ASSERT_COND( !mType.is_real_type() );
 
-  assert_cond( !opr2->value_type().is_real_type(), __FILE__, __LINE__);
+  ASSERT_COND( !opr2->value_type().is_real_type() );
 
   // 第2オペランドのサイズは self determined
   opr2->set_selfsize();

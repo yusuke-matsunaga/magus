@@ -214,7 +214,7 @@ BNetManip::replace_node(BNode* old_node,
   }
 
   // ここで mFanouts は空になっているはず．
-  assert_cond( old_node->fanout_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND( old_node->fanout_num() == 0 );
 
   return true;
 }

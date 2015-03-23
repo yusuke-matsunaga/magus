@@ -96,7 +96,7 @@ dump_trans(ostream& s,
       }
       if ( count == 0 ) {
 	s << ipat << '|' << cspat << '|' << "------" << endl;
-	//assert_not_reached(__FILE__, __LINE__);
+	//ASSERT_NOT_REACHED;
       }
     }
   }

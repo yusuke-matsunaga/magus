@@ -57,7 +57,7 @@ void
 BtBase::record_value(TpgNode* node,
 		     const vector<Bool3>& model)
 {
-  assert_cond( node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_input() );
 
   Bool3 v = node_gval(node, model);
   ymuint iid = node->input_id();

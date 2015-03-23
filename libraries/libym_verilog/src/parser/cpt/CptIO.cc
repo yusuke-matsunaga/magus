@@ -271,7 +271,7 @@ CptIOItemI::CptIOItemI(const FileRegion& file_region,
   CptIOItem(file_region, name),
   mInitValue(init_value)
 {
-  assert_cond(init_value, __FILE__, __LINE__);
+  ASSERT_COND(init_value );
 }
 
 // @brief デストラクタ

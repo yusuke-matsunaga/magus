@@ -281,7 +281,7 @@ BddMgr_expr_to_bdd(BddMgrObject* self,
     ymuint n = PyList_GET_SIZE(item_list);
     for (ymuint i = 0; i < n; ++ i) {
       PyObject* item = PyList_GET_ITEM(item_list, i);
-      assert_cond( PyTuple_Check(item) && PyTuple_GET_SIZE(item) == 2, __FILE__, __LINE__);
+      ASSERT_COND( PyTuple_Check(item) && PyTuple_GET_SIZE(item) == 2 );
 
       PyObject* vid1_obj = PyTuple_GET_ITEM(item, 0);
       PyObject* vid2_obj = PyTuple_GET_ITEM(item, 1);

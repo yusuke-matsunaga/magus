@@ -1,26 +1,26 @@
-﻿#ifndef SATENGINESINGLEKDET_H
-#define SATENGINESINGLEKDET_H
+﻿#ifndef DTPGSATBASES_H
+#define DTPGSATBASES_H
 
-/// @file SatEngineSingleKDet.h
-/// @brief SatEngineSingleKDet のヘッダファイル
+/// @file DtpgSatBaseS.h
+/// @brief DtpgSatBaseS のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2012-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatEngine.h"
+#include "DtpgSat.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatEngineSingleKDet SatEngineSingleKDet.h "SatEngineSingleKDet.h"
-/// @brief 1つの故障を対象とした CNF を生成する SatEngine
+/// @class DtpgSatBaseS DtpgSatBaseS.h "DtpgSatBaseS.h"
+/// @brief 1つの故障を対象とした CNF を生成する DtpgSat
 //////////////////////////////////////////////////////////////////////
-class SatEngineSingleKDet :
-  public SatEngine
+class DtpgSatBaseS :
+  public DtpgSat
 {
 public:
 
@@ -32,19 +32,17 @@ public:
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  /// @param[in] kdet 多重度
-  SatEngineSingleKDet(const string& sat_type,
-		      const string& sat_option,
-		      ostream* sat_outp,
-		      const TpgNetwork& network,
-		      BackTracer& bt,
-		      DetectOp& dop,
-		      UntestOp& uop,
-		      ymuint kdet);
+  DtpgSatBaseS(const string& sat_type,
+	       const string& sat_option,
+	       ostream* sat_outp,
+	       const TpgNetwork& network,
+	       BackTracer& bt,
+	       DetectOp& dop,
+	       UntestOp& uop);
 
   /// @brief デストラクタ
   virtual
-  ~SatEngineSingleKDet();
+  ~DtpgSatBaseS();
 
 
 public:
@@ -53,28 +51,19 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] f_tgt 対象の故障
-  virtual
-  void
-  run(TpgFault* f_tgt);
-
-  /// @brief テスト生成を行なう．
   /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run(const vector<TpgFault*>& flist);
+  run_multi(const vector<TpgFault*>& flist);
 
 
-private:
+protected:
   //////////////////////////////////////////////////////////////////////
-  // データメンバ
+  // 継承クラスから用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  // 多重度
-  ymuint mCount;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // SATENGINESINGLEKDET_H
+#endif // DTPGSATBASES_H

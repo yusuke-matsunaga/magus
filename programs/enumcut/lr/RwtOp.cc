@@ -108,7 +108,7 @@ RwtOp::found_cut(const BdnNode* root,
     ymuint nn = pat.node_num();
     for (ymuint i = 0; i < ni; ++ i) {
       const RwtNode* pat_node = pat.node(i);
-      assert_cond( pat_node->is_input(), __FILE__, __LINE__);
+      ASSERT_COND( pat_node->is_input() );
       ymuint iid = pat_node->input_id();
       NpnVmap vmap = cmap.imap(VarId(iid));
       const BdnNode* inode = inputs[vmap.var().val()];
@@ -163,7 +163,7 @@ RwtOp::found_cut(const BdnNode* root,
       continue;
     }
     mNodeInfo[root->id()].mMark = 1U;
-    assert_cond( root->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND( root->is_logic() );
     ymuint n = 0;
     n += count_node(root->fanin0());
     n += count_node(root->fanin1());
@@ -196,7 +196,7 @@ RwtOp::calc_func(const BdnNode* node)
 #endif
   node_info.mMark = 1U;
 
-  assert_cond( node->is_logic(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_logic() );
   const BdnNode* inode0 = node->fanin0();
   const BdnNode* inode1 = node->fanin1();
   calc_func(inode0);

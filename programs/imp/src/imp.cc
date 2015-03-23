@@ -181,7 +181,7 @@ imp(const string& filename,
 	++ xor_node;
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
   }

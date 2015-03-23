@@ -84,7 +84,7 @@ EiIOHead::direction() const
   case kPtIO_Input:  return kVlInput;
   case kPtIO_Output: return kVlOutput;
   case kPtIO_Inout:  return kVlInout;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   // ダミー
   return kVlNoDirection;

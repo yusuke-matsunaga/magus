@@ -137,7 +137,7 @@ test_lut(const CellLut* lut)
 
   case 3: return test_lut3(lut);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 

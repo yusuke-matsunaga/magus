@@ -179,7 +179,7 @@ OdcNode::make_tree(const Expr& expr,
     node->mGf = f;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return node;
 }
@@ -378,10 +378,10 @@ CalcOdc::operator()(const Expr& expr,
 		    vector<Bdd>& leaf_odc)
 {
   ymuint32 n_leaf = leaf_gf.size();
-  assert_cond(n_leaf == leaf_odc.size(), __FILE__, __LINE__);
+  ASSERT_COND(n_leaf == leaf_odc.size() );
   BddMgrRef bddmgr = root_odc.mgr();
   for (ymuint32 i = 0; i < n_leaf; ++ i) {
-    assert_cond(bddmgr == leaf_gf[i].mgr(), __FILE__, __LINE__);
+    ASSERT_COND(bddmgr == leaf_gf[i].mgr() );
   }
   
   // OdcNode を作成する．
@@ -396,7 +396,7 @@ CalcOdc::operator()(const Expr& expr,
   // OdcNode を削除する．
   OdcNode::delete_tree(root_node, mAlloc);
 
-  assert_cond( check_odc(expr, root_odc, leaf_gf, leaf_odc), __FILE__, __LINE__);
+  ASSERT_COND( check_odc(expr, root_odc, leaf_gf, leaf_odc) );
 }
 
 END_NAMESPACE_MAGUS_LUTMAP

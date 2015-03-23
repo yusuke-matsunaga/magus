@@ -74,7 +74,7 @@ EiFactory::new_Decl(ElbDeclHead* head,
     break;
 
   case kVpiNamedEvent:
-    assert_cond(init == NULL, __FILE__, __LINE__);
+    ASSERT_COND(init == NULL );
     {
       void* p = mAlloc.get_memory(sizeof(EiDeclN));
       decl = new (p) EiDeclN(head, pt_item);
@@ -84,7 +84,7 @@ EiFactory::new_Decl(ElbDeclHead* head,
   case kVpiParameter:
   case kVpiSpecParam:
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -164,7 +164,7 @@ EiDecl::value_type() const
   case kVpiSpecParam:
   case kVpiConstant:
     // ここにはこない
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 
   default:
@@ -359,7 +359,7 @@ EiDeclN::~EiDeclN()
 VlScalarVal
 EiDeclN::get_scalar() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlScalarVal::x();
 }
 
@@ -367,14 +367,14 @@ EiDeclN::get_scalar() const
 void
 EiDeclN::set_scalar(const VlScalarVal& val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 論理値を返す．
 VlScalarVal
 EiDeclN::get_logic() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlScalarVal::x();
 }
 
@@ -382,7 +382,7 @@ EiDeclN::get_logic() const
 double
 EiDeclN::get_real() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0.0;
 }
 
@@ -390,7 +390,7 @@ EiDeclN::get_real() const
 void
 EiDeclN::set_real(double val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief bitvector 型の値を返す．
@@ -398,14 +398,14 @@ void
 EiDeclN::get_bitvector(BitVector& bitvector,
 		       const VlValueType& req_type) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief bitvector 型の値を設定する．
 void
 EiDeclN::set_bitvector(const BitVector& val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief ビット選択値を返す．
@@ -413,7 +413,7 @@ EiDeclN::set_bitvector(const BitVector& val)
 VlScalarVal
 EiDeclN::get_bitselect(int index) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlScalarVal::x();
 }
 
@@ -424,7 +424,7 @@ void
 EiDeclN::set_bitselect(int index,
 		       const VlScalarVal& val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 範囲選択値を返す．
@@ -436,7 +436,7 @@ EiDeclN::get_partselect(int left,
 			int right,
 			BitVector& val) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 範囲値を設定する．
@@ -448,7 +448,7 @@ EiDeclN::set_partselect(int left,
 			int right,
 			const BitVector& val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 
@@ -662,7 +662,7 @@ EiDeclR::set_bitvector(const BitVector& val)
 VlScalarVal
 EiDeclR::get_bitselect(int index) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlScalarVal::x();
 }
 
@@ -673,7 +673,7 @@ void
 EiDeclR::set_bitselect(int index,
 		       const VlScalarVal& val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 範囲選択値を返す．
@@ -685,7 +685,7 @@ EiDeclR::get_partselect(int left,
 			int right,
 			BitVector& val) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 範囲値を設定する．
@@ -697,7 +697,7 @@ EiDeclR::set_partselect(int left,
 			int right,
 			const BitVector& val)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 

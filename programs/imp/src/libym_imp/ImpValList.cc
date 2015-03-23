@@ -51,7 +51,7 @@ void
 ImpValList::set(ImpMgr& mgr,
 		const vector<ImpVal>& val_list)
 {
-  assert_cond( mDummyTop.mLink == NULL, __FILE__, __LINE__);
+  ASSERT_COND( mDummyTop.mLink == NULL );
   Cell* last = &mDummyTop;
   for (vector<ImpVal>::const_iterator p = val_list.begin();
        p != val_list.end(); ++ p) {

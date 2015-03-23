@@ -126,7 +126,7 @@ SimNbEventNode::emit()
 {
   deactivate();
 
-  assert_cond(mUpdate, __FILE__, __LINE__);
+  ASSERT_COND(mUpdate );
   engine()->reg_nonblocking_event(mUpdate);
 }
 
