@@ -998,23 +998,6 @@ TpgNetwork::make_prim_node(tTgGateType type,
     node->mTypeId |= 1U;
   }
 
-  switch ( type ) {
-  case kTgGateAnd:
-  case kTgGateNand:
-    node->mCval = kB3False;
-    node->mNval = kB3True;
-    break;
-
-  case kTgGateOr:
-  case kTgGateNor:
-    node->mCval = kB3True;
-    node->mNval = kB3False;
-    break;
-
-  default:
-    break;
-  }
-
   return node;
 }
 
@@ -1027,10 +1010,6 @@ TpgNetwork::init_node(TpgNode* node,
 		      ymuint nfo)
 {
   node->mName = NULL;
-
-  node->mCval = kB3X;
-  node->mNval = kB3X;
-  node->mMaVal = kB3X;
 
   node->mFaninNum = ni;
   if ( ni > 0 ) {
@@ -1284,128 +1263,6 @@ TpgNetwork::new_fault(TpgNode* node,
   ++ mFaultNum;
 
   return f;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// 必要割り当て関係のコード
-//////////////////////////////////////////////////////////////////////
-
-BEGIN_NONAMESPACE
-
-// node のファンアウトに mark1 をつける．
-void
-set_tfo_mark(TpgNode* node)
-{
-  if ( node->mark1() ) {
-    return;
-  }
-  node->set_mark1();
-
-  ymuint n = node->active_fanout_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* onode = node->active_fanout(i);
-    set_tfo_mark(onode);
-  }
-}
-
-// node のファンアウトに mark1 をつける．
-void
-clear_tfo_mark(TpgNode* node)
-{
-  if ( !node->mark1() ) {
-    return;
-  }
-  node->clear_mark1();
-
-  ymuint n = node->active_fanout_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* onode = node->active_fanout(i);
-    clear_tfo_mark(onode);
-  }
-}
-
-END_NONAMESPACE
-
-// @brief f の検出に必要な割り当てを求める．
-// @param[in] f 対象の故障
-// @param[in] ma_list 割り当て結果を格納するリスト
-// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
-// @note TpgNetwork のメンバにはアクセスしないので static メンバになっている．
-// @note ma_list の内容は TpgNode::id() * 2 + val (0 / 1)
-bool
-TpgNetwork::get_mandatory_assignment(TpgFault* f,
-				     vector<ymuint32>& ma_list)
-{
-  TpgNode* fnode = f->node();
-  TpgNode* fsrc = fnode;
-  if ( f->is_input_fault() ) {
-    fsrc = fnode->fanin(f->pos());
-  }
-
-  vector<TpgNode*> node_list;
-  Bool3 gval;
-  if ( f->val() == 1 ) {
-    gval = kB3False;
-  }
-  else {
-    gval = kB3True;
-  }
-  bool stat = fsrc->bwd_prop(NULL, gval, node_list);
-  if ( !stat ) {
-    goto untestable;
-  }
-
-  if ( f->is_input_fault() ) {
-    Bool3 nval = fnode->nval();
-    if ( nval != kB3X ) {
-      ymuint ni = fnode->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	if ( i == f->pos() ) continue;
-	TpgNode* inode = fnode->fanin(i);
-	if ( !inode->bwd_prop(fnode, nval, node_list) ) {
-	  goto untestable;
-	}
-      }
-    }
-  }
-  if ( fnode->imm_dom() != NULL ) {
-    set_tfo_mark(fnode);
-    for (TpgNode* dom = fnode->imm_dom(); dom != NULL; dom = dom->imm_dom()) {
-      Bool3 nval = dom->nval();
-      if ( nval != kB3X ) {
-	ymuint ni = dom->fanin_num();
-	for (ymuint i = 0; i < ni; ++ i) {
-	  TpgNode* inode = dom->fanin(i);
-	  if ( inode->mark1() ) continue;
-	  if ( !inode->bwd_prop(dom, nval, node_list) ) {
-	    clear_tfo_mark(fnode);
-	    goto untestable;
-	  }
-	}
-      }
-    }
-    clear_tfo_mark(fnode);
-  }
-
-  for (vector<TpgNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    TpgNode* node = *p;
-    assert_cond( node->ma_value() != kB3X, __FILE__, __LINE__);
-    int val = node->ma_value() == kB3True ? 1 : 0;
-    ma_list.push_back(node->id() * 2 + val);
-    node->clear_ma_value();
-  }
-  sort(ma_list.begin(), ma_list.end());
-  return true;
-
- untestable:
-  for (vector<TpgNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    TpgNode* node = *p;
-    node->clear_ma_value();
-  }
-  return false;
 }
 
 END_NAMESPACE_YM_SATPG

@@ -312,52 +312,6 @@ public:
   clear_mark3();
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // mandatory assignment 用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 後方含意で出力に0を割り当てる．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_prop(TpgNode* from_node,
-	   Bool3 val,
-	   vector<TpgNode*>& node_list);
-
-  /// @brief ファンアウト先に0を伝播する．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop(TpgNode* from_node,
-	      Bool3 val,
-	      vector<TpgNode*>& node_list);
-
-  /// @brief controling value を得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
-  cval() const;
-
-  /// @brief noncontroling valueを得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
-  nval() const;
-
-  /// @brief 値を得る．
-  Bool3
-  ma_value() const;
-
-  /// @brief 値をクリアする．
-  void
-  clear_ma_value();
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
@@ -370,26 +324,6 @@ private:
   /// @brief アクティブフラグを消す．
   void
   clear_active();
-
-  /// @brief 後方含意を行う．
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_imp(Bool3 val,
-	  vector<TpgNode*>& node_list);
-
-  /// @brief 前方含意を行う．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fwd_imp(TpgNode* from_node,
-	  Bool3 val,
-	  vector<TpgNode*>& node_list);
 
 
 private:
@@ -473,15 +407,6 @@ private:
 
   // immediate dominator
   TpgNode* mImmDom;
-
-  // controling value
-  Bool3 mCval;
-
-  // noncontroling value
-  Bool3 mNval;
-
-  // mandatory assignments 用の値
-  Bool3 mMaVal;
 
 };
 
@@ -960,40 +885,6 @@ VarId
 TpgNode::if1var(ymuint pos) const
 {
   return mIfVars[pos * 2 + 1];
-}
-
-// @brief controling value を得る．
-// @note ない場合は kB3X を返す．
-inline
-Bool3
-TpgNode::cval() const
-{
-  return mCval;
-}
-
-// @brief noncontroling valueを得る．
-// @note ない場合は kB3X を返す．
-inline
-Bool3
-TpgNode::nval() const
-{
-  return mNval;
-}
-
-// @brief 値を得る．
-inline
-Bool3
-TpgNode::ma_value() const
-{
-  return mMaVal;
-}
-
-// @brief 値をクリアする．
-inline
-void
-TpgNode::clear_ma_value()
-{
-  mMaVal = kB3X;
 }
 
 END_NAMESPACE_YM_SATPG
