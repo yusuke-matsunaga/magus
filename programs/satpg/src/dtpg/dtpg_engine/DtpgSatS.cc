@@ -110,16 +110,25 @@ DtpgSatS::run_single(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  // fnode の dvar は 1 でなければならない．
-  {
-    Literal dlit(fnode->dvar(), false);
-    engine.add_clause(dlit);
+  ymuint npo = output_list().size();
+  engine.tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    TpgNode* node = output_list()[i];
+    Literal dlit(node->dvar(), false);
+    engine.tmp_lits_add(dlit);
   }
+  engine.tmp_lits_end();
 
   cnf_end();
 
   // 故障に対するテスト生成を行なう．
   engine.assumption_begin();
+
+  // dominator ノードの dvar は1でなければならない．
+  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(node->dvar(), false);
+    engine.assumption_add(dlit);
+  }
 
   solve(engine, fault);
 

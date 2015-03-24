@@ -358,15 +358,25 @@ DtpgSat::make_fault_cnf(SatEngine& engine,
 
     ymuint fpos = fault->pos();
     // fpos 以外の入力を ivars[] に入れる．
+    // fpos の入力の値は故障値の逆にする．
     ymuint ni = node->fanin_num();
     vector<VarId> ivars;
     ivars.reserve(ni - 1);
     for (ymuint i = 0; i < ni; ++ i) {
-      if ( i == fpos ) {
-	continue;
-      }
       TpgNode* inode = node->fanin(i);
-      ivars.push_back(inode->gvar());
+      VarId ivar = inode->gvar();
+      if ( i == fpos ) {
+	Literal ilit(ivar, false);
+	if ( fval == 0 ) {
+	  engine.add_clause(ilit);
+	}
+	else {
+	  engine.add_clause(~ilit);
+	}
+      }
+      else {
+	ivars.push_back(ivar);
+      }
     }
     VarId ovar = node->fvar();
 
