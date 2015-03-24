@@ -195,13 +195,17 @@ protected:
   /// @param[in] engine SAT エンジン
   Bool3
   solve(SatEngine& engine,
-	TpgFault* f,
-	bool option = false);
+	TpgFault* f);
 
   /// @brief 一つの SAT問題を解く．
   /// @param[in] engine SAT エンジン
+  /// @param[out] sat_stats 統計情報
+  /// @param[out] time 処理時間
+  /// @return 結果を返す．
   Bool3
-  _solve(SatEngine& engine);
+  solve(SatEngine& engine,
+	SatStats& sat_stats,
+	USTime& time);
 
   /// @brief 検出した場合の処理
   void

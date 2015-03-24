@@ -115,21 +115,49 @@ DtpgSatKDet::run_single(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  // fnode の dvar は 1 でなければならない．
-  {
-    Literal dlit(fnode->dvar(), false);
-    engine.add_clause(dlit);
+  ymuint npo = output_list().size();
+  engine.tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    TpgNode* node = output_list()[i];
+    Literal dlit(node->dvar(), false);
+    engine.tmp_lits_add(dlit);
   }
+  engine.tmp_lits_end();
 
   cnf_end();
 
   for (ymuint i = 0; i < mCount; ++ i) {
     // 故障に対するテスト生成を行なう．
     engine.assumption_begin();
-    bool option = (i > 0);
-    Bool3 stat = solve(engine, fault, option);
-    if ( stat != kB3True ) {
-      break;
+
+    // dominator ノードの dvar は1でなければならない．
+    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(node->dvar(), false);
+    engine.assumption_add(dlit);
+    }
+
+    SatStats sat_stats;
+    USTime time;
+    Bool3 ans = solve(engine, sat_stats, time);
+
+    if ( ans == kB3True ) {
+      // パタンが求まった．
+      detect_op(fault, sat_stats, time);
+    }
+    else {
+      if ( i == 0 ) {
+	if ( ans == kB3False ) {
+	  // 検出不能と判定された．
+	  untest_op(fault, sat_stats, time);
+	}
+	else { // ans == kB3X つまりアボート
+	  abort_op(fault, sat_stats, time);
+	}
+      }
+      else {
+	// 二回目以降は無視
+	break;
+      }
     }
 
     TestVector* pat = last_pat();

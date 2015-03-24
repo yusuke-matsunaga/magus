@@ -468,36 +468,49 @@ DtpgSat::make_dchain_cnf(SatEngine& engine,
 // @brief 一つの SAT問題を解く．
 Bool3
 DtpgSat::solve(SatEngine& engine,
-	       TpgFault* f,
-	       bool option)
+	       TpgFault* f)
+{
+  SatStats sat_stats;
+  USTime time;
+  Bool3 ans = solve(engine, sat_stats, time);
+
+  if ( ans == kB3True ) {
+    // パタンが求まった．
+    detect_op(f, sat_stats, time);
+  }
+  else if ( ans == kB3False ) {
+    // 検出不能と判定された．
+    untest_op(f, sat_stats, time);
+  }
+  else { // ans == kB3X つまりアボート
+    abort_op(f, sat_stats, time);
+  }
+  return ans;
+}
+
+// @brief 一つの SAT問題を解く．
+// @param[in] engine SAT エンジン
+// @param[out] sat_stats 統計情報
+// @param[out] time 処理時間
+// @return 結果を返す．
+Bool3
+DtpgSat::solve(SatEngine& engine,
+	       SatStats& sat_stats,
+	       USTime& time)
 {
   SatStats prev_stats;
   engine.get_stats(prev_stats);
 
   timer_start();
 
-  Bool3 ans = _solve(engine);
+  Bool3 ans = engine.solve(mModel);
 
-  USTime time = timer_stop();
+  time = timer_stop();
 
-  SatStats sat_stats;
   engine.get_stats(sat_stats);
 
   sub_sat_stats(sat_stats, prev_stats);
 
-  if ( ans == kB3True ) {
-    // パタンが求まった．
-    detect_op(f, sat_stats, time);
-  }
-  else if ( !option ) {
-    if ( ans == kB3False ) {
-      // 検出不能と判定された．
-      untest_op(f, sat_stats, time);
-    }
-    else { // ans == kB3X つまりアボート
-      abort_op(f, sat_stats, time);
-    }
-  }
   return ans;
 }
 
@@ -506,15 +519,6 @@ TestVector*
 DtpgSat::last_pat()
 {
   return mLastPat;
-}
-
-// @brief 一つの SAT問題を解く．
-Bool3
-DtpgSat::_solve(SatEngine& engine)
-{
-  Bool3 ans = engine.solve(mModel);
-
-  return ans;
 }
 
 // @brief 検出した場合の処理

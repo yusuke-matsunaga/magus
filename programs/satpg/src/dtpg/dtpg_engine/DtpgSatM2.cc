@@ -234,20 +234,13 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 	engine.assumption_add(dlit);
       }
 
-      SatStats prev_stats;
-      engine.get_stats(prev_stats);
-
-      Bool3 ans = _solve(engine);
-
       SatStats sat_stats;
-      engine.get_stats(sat_stats);
-
-      sub_sat_stats(sat_stats, prev_stats);
-
-      USTime time = timer_stop();
+      USTime time;
+      Bool3 ans = solve(engine, sat_stats, time);
 
       if ( ans == kB3True ) {
 	detect_op(f, sat_stats, time);
+
       }
       else if ( ans == kB3False ) {
 	if ( opos == no - 1 ) {
