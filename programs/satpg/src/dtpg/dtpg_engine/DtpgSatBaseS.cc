@@ -9,9 +9,9 @@
 
 #include "DtpgSatBaseS.h"
 
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,11 +20,10 @@ BEGIN_NAMESPACE_YM_SATPG
 DtpgSatBaseS::DtpgSatBaseS(const string& sat_type,
 			   const string& sat_option,
 			   ostream* sat_outp,
-			   const TpgNetwork& network,
 			   BackTracer& bt,
 			   DetectOp& dop,
 			   UntestOp& uop) :
-  DtpgSat(sat_type, sat_option, sat_outp, network, bt, dop, uop)
+  DtpgSat(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
 }
 
@@ -34,15 +33,35 @@ DtpgSatBaseS::~DtpgSatBaseS()
 }
 
 // @brief テスト生成を行なう．
-// @param[in] flist 対象の故障リスト
+// @param[in] network 対象のネットワーク
+// @param[in] stats 結果を格納する構造体
 void
-DtpgSatBaseS::run_multi(const vector<TpgFault*>& flist)
+DtpgSatBaseS::run(TpgNetwork& network,
+		  DtpgStats& stats)
 {
-  for (vector<TpgFault*>::const_iterator p = flist.begin();
-       p != flist.end(); ++ p) {
-    TpgFault* f = *p;
-    run_single(f);
+  clear_stats();
+
+  ymuint nn = network.active_node_num();
+  ymuint max_id = network.max_node_id();
+  for (ymuint i = 0; i < nn; ++ i) {
+    TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+
+    mark_region(max_id, vector<TpgNode*>(1, node));
+
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      if ( f->status() != kFsDetected &&
+	   !f->is_skip() ) {
+	run_single(network, f);
+      }
+    }
   }
+
+  get_stats(stats);
 }
 
 END_NAMESPACE_YM_SATPG

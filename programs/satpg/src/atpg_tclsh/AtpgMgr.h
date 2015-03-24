@@ -11,7 +11,7 @@
 
 
 #include "satpg_nsdef.h"
-#include "DtpgMode.h"
+
 #include "YmCell/cell_nsdef.h"
 #include "YmUtils/Binder.h"
 #include "YmUtils/MStopWatch.h"

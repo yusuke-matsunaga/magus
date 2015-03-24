@@ -10,6 +10,7 @@
 #include "DtpgSatKDet.h"
 
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
@@ -22,7 +23,6 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -31,25 +31,23 @@ DtpgEngine*
 new_DtpgSatKDet(const string& sat_type,
 		const string& sat_option,
 		ostream* sat_outp,
-		const TpgNetwork& network,
 		BackTracer& bt,
 		DetectOp& dop,
 		UntestOp& uop,
 		ymuint kdet)
 {
-  return new DtpgSatKDet(sat_type, sat_option, sat_outp, network, bt, dop, uop, kdet);
+  return new DtpgSatKDet(sat_type, sat_option, sat_outp, bt, dop, uop, kdet);
 }
 
 // @brief コンストラクタ
 DtpgSatKDet::DtpgSatKDet(const string& sat_type,
 			 const string& sat_option,
 			 ostream* sat_outp,
-			 const TpgNetwork& network,
 			 BackTracer& bt,
 			 DetectOp& dop,
 			 UntestOp& uop,
 			 ymuint kdet) :
-  DtpgSatBaseS(sat_type, sat_option, sat_outp, network, bt, dop, uop),
+  DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop),
   mCount(kdet)
 {
 }
@@ -60,13 +58,13 @@ DtpgSatKDet::~DtpgSatKDet()
 }
 
 // @brief テストパタン生成を行なう．
+// @param[in] network 対象のネットワーク
 // @param[in] flist 故障リスト
 void
-DtpgSatKDet::run_single(TpgFault* fault)
+DtpgSatKDet::run_single(TpgNetwork& network,
+			TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
-
-  mark_region(vector<TpgNode*>(1, fnode));
 
   cnf_begin();
 
@@ -138,7 +136,7 @@ DtpgSatKDet::run_single(TpgFault* fault)
     ymuint ni = pat->input_num();
     engine.tmp_lits_begin(ni - pat->x_num());
     for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* node = input_node(i);
+      TpgNode* node = network.input(i);
       Literal lit(node->gvar());
       switch ( pat->val3(i) ) {
       case kVal1:

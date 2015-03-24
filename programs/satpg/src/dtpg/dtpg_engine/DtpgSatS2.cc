@@ -23,7 +23,6 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -32,12 +31,11 @@ new_DtpgSatS2(ymuint th_val,
 	      const string& sat_type,
 	      const string& sat_option,
 	      ostream* sat_outp,
-	      const TpgNetwork& network,
 	      BackTracer& bt,
 	      DetectOp& dop,
 	      UntestOp& uop)
 {
-  return new DtpgSatS2(th_val, sat_type, sat_option, sat_outp, network, bt, dop, uop);
+  return new DtpgSatS2(th_val, sat_type, sat_option, sat_outp, bt, dop, uop);
 }
 
 // @brief コンストラクタ
@@ -45,13 +43,11 @@ DtpgSatS2::DtpgSatS2(ymuint th_val,
 		     const string& sat_type,
 		     const string& sat_option,
 		     ostream* sat_outp,
-		     const TpgNetwork& network,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop) :
-  DtpgSatBaseS(sat_type, sat_option, sat_outp, network, bt, dop, uop),
-  mThVal(th_val),
-  mMark(network.max_node_id(), 0)
+  DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop),
+  mThVal(th_val)
 {
 }
 
@@ -62,14 +58,15 @@ DtpgSatS2::~DtpgSatS2()
 
 // @brief テストパタン生成を行なう．
 void
-DtpgSatS2::run_single(TpgFault* fault)
+DtpgSatS2::run_single(TpgNetwork& network,
+		      TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
-  int fval = fault->val();
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
-  mark_region(vector<TpgNode*>(1, fnode));
+  mMark.clear();
+  mMark.resize(network.max_node_id(), 0);
 
   //////////////////////////////////////////////////////////////////////
   // 変数の割当

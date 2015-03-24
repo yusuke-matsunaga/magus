@@ -41,8 +41,6 @@ set (dtpg_SOURCES
   src/dtpg/dop/DopVerify.cc
   src/dtpg/dop/FopDrop.cc
 
-  src/dtpg/driver/DtpgDriverImpl.cc
-
   src/dtpg/engine/SatEngine.cc
 
   src/dtpg/dtpg_engine/LitMap.cc

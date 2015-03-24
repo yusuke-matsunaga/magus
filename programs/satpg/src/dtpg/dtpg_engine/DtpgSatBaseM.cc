@@ -12,7 +12,6 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -21,12 +20,10 @@ BEGIN_NAMESPACE_YM_SATPG
 DtpgSatBaseM::DtpgSatBaseM(const string& sat_type,
 			   const string& sat_option,
 			   ostream* sat_outp,
-			   const TpgNetwork& network,
 			   BackTracer& bt,
 			   DetectOp& dop,
 			   UntestOp& uop) :
-  DtpgSat(sat_type, sat_option, sat_outp, network, bt, dop, uop),
-  mDone(network.max_node_id(), false)
+  DtpgSat(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
 }
 
@@ -36,42 +33,61 @@ DtpgSatBaseM::~DtpgSatBaseM()
 }
 
 // @brief テスト生成を行なう．
-// @param[in] f_tgt 対象の故障
+// @param[in] network 対象のネットワーク
+// @param[in] stats 結果を格納する構造体
 void
-DtpgSatBaseM::run_single(TpgFault* f_tgt)
+DtpgSatBaseM::run(TpgNetwork& network,
+		  DtpgStats& stats)
 {
-  run_multi(vector<TpgFault*>(1, f_tgt));
-}
+  clear_stats();
 
-// @brief 故障に関係するノードのリストを作る．
-// @param[in] flist 故障のリスト
-// @param[out] fnode_list 故障に関係するノードのリスト
-void
-DtpgSatBaseM::make_fnode_list(const vector<TpgFault*>& flist,
-			      vector<TpgNode*>& fnode_list)
-{
-  ymuint nf = flist.size();
-  fnode_list.clear();
-  fnode_list.reserve(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = flist[i];
-    TpgNode* node = f->node();
-    if ( !mDone[node->id()] ) {
-      mDone[node->id()] = true;
-      fnode_list.push_back(node);
+  mMark.clear();
+  mMark.resize(network.max_node_id(), false);
+  ymuint n = network.active_node_num();
+  ymuint max_id = network.max_node_id();
+  for (ymuint i = 0; i < n; ++ i) {
+    TpgNode* node = network.active_node(i);
+    if ( node->imm_dom() == NULL ) {
+      mFaultNodeList.clear();
+      mFaultList.clear();
+
+      dfs_mffc(node);
+
+      if ( !mFaultList.empty() ) {
+	mark_region(max_id, mFaultNodeList);
+	run_multi(network, mFaultNodeList, mFaultList);
+      }
     }
   }
+
+  get_stats(stats);
 }
 
-// @brief fnode の情報をクリアする．
+// @brief DFS で MFFC を求める．
+// @param[in] node 対象のノード
 void
-DtpgSatBaseM::clear_fnode_list(const vector<TpgNode*>& fnode_list)
+DtpgSatBaseM::dfs_mffc(TpgNode* node)
 {
-  ymuint nf = fnode_list.size();
-  for (ymuint i = 0; i < nf; ++ i) {
-    TpgNode* node = fnode_list[i];
-    node->clear_oifvar();
-    mDone[node->id()] = false;
+  mMark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( mMark[inode->id()] == false && inode->imm_dom() != NULL ) {
+      dfs_mffc(inode);
+    }
+  }
+
+  if ( !node->is_output() ) {
+    mFaultNodeList.push_back(node);
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      if ( f->status() != kFsDetected &&
+	   !f->is_skip() ) {
+	mFaultList.push_back(f);
+      }
+    }
   }
 }
 

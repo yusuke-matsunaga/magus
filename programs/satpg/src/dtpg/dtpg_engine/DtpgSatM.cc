@@ -22,7 +22,6 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -30,26 +29,21 @@ DtpgEngine*
 new_DtpgSatM(const string& sat_type,
 	     const string& sat_option,
 	     ostream* sat_outp,
-	     const TpgNetwork& network,
 	     BackTracer& bt,
 	     DetectOp& dop,
-	     UntestOp& uop,
-	     bool forget)
+	     UntestOp& uop)
 {
-  return new DtpgSatM(sat_type, sat_option, sat_outp, network, bt, dop, uop, forget);
+  return new DtpgSatM(sat_type, sat_option, sat_outp, bt, dop, uop);
 }
 
 // @brief コンストラクタ
 DtpgSatM::DtpgSatM(const string& sat_type,
 		   const string& sat_option,
 		   ostream* sat_outp,
-		   const TpgNetwork& network,
 		   BackTracer& bt,
 		   DetectOp& dop,
-		   UntestOp& uop,
-		   bool forget) :
-  DtpgSatBaseM(sat_type, sat_option, sat_outp, network, bt, dop, uop),
-  mForget(forget)
+		   UntestOp& uop) :
+  DtpgSatBaseM(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
 }
 
@@ -59,23 +53,19 @@ DtpgSatM::~DtpgSatM()
 }
 
 // @brief テストパタン生成を行なう．
+// @param[in] network 対象のネットワーク
+// @param[in] fnode_list 対象の故障を持つノードのリスト
 // @param[in] flist 故障リスト
 void
-DtpgSatM::run_multi(const vector<TpgFault*>& flist)
+DtpgSatM::run_multi(TpgNetwork& network,
+		    const vector<TpgNode*>& fnode_list,
+		    const vector<TpgFault*>& flist)
 {
   cnf_begin();
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
   ymuint nf = flist.size();
-
-  // 故障を活性化するとき true にする変数．
-  vector<VarId> flt_var(nf);
-  // FnodeInfo を持つノードのリスト
-  vector<TpgNode*> fnode_list;
-  make_fnode_list(flist, fnode_list);
-
-  mark_region(fnode_list);
 
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
@@ -92,6 +82,8 @@ DtpgSatM::run_multi(const vector<TpgFault*>& flist)
     node->set_fvar(fvar, dvar);
   }
 
+  // 故障を活性化するとき true にする変数．
+  vector<VarId> flt_var(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     VarId fvar = engine.new_var();
     flt_var[i] = fvar;
@@ -205,7 +197,11 @@ DtpgSatM::run_multi(const vector<TpgFault*>& flist)
   }
   clear_node_mark();
 
-  clear_fnode_list(fnode_list);
+  for (vector<TpgNode*>::const_iterator p = fnode_list.begin();
+       p != fnode_list.end(); ++ p) {
+    TpgNode* node = *p;
+    node->clear_oifvar();
+  }
 }
 
 END_NAMESPACE_YM_SATPG

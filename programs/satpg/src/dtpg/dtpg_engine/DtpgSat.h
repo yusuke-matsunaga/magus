@@ -38,14 +38,12 @@ public:
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
-  /// @param[in] network 対象のネットワーク
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   DtpgSat(const string& sat_type,
 	  const string& sat_option,
 	  ostream* sat_outp,
-	  const TpgNetwork& network,
 	  BackTracer& bt,
 	  DetectOp& dop,
 	  UntestOp& uop);
@@ -120,17 +118,14 @@ protected:
   timer_stop();
 
   /// @brief 故障位置を与えてその TFO の TFI リストを作る．
+  /// @param[in] max_node_id ノード番号の最大値
   /// @param[in] fnode_list 故障位置のノードのリスト
   ///
   /// 結果は mTfoList に格納される．
   /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
   void
-  mark_region(const vector<TpgNode*>& fnode_list);
-
-  /// @brief 入力ノードを得る．
-  /// @param[in] ipos 入力番号
-  TpgNode*
-  input_node(ymuint ipos) const;
+  mark_region(ymuint max_node_id,
+	      const vector<TpgNode*>& fnode_list);
 
   /// @brief TFO ノードの数を得る．
   ymuint
@@ -322,9 +317,6 @@ private:
 
   // 検出不能時に呼ばれるファンクタ
   UntestOp& mUntestOp;
-
-  // 対象のネットワーク
-  const TpgNetwork& mNetwork;
 
   // SAT の結果を格納する配列
   vector<Bool3> mModel;

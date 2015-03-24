@@ -28,14 +28,12 @@ public:
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
-  /// @param[in] network 対象のネットワーク
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   DtpgSatBaseM(const string& sat_type,
 	       const string& sat_option,
 	       ostream* sat_outp,
-	       const TpgNetwork& network,
 	       BackTracer& bt,
 	       DetectOp& dop,
 	       UntestOp& uop);
@@ -51,27 +49,33 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] f_tgt 対象の故障
+  /// @param[in] network 対象のネットワーク
+  /// @param[in] stats 結果を格納する構造体
   virtual
   void
-  run_single(TpgFault* f_tgt);
+  run(TpgNetwork& network,
+      DtpgStats& stats);
 
 
-protected:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
+  // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 故障に関係するノードのリストを作る．
-  /// @param[in] flist 故障のリスト
-  /// @param[out] fnode_list 故障に関係するノードのリスト
+  /// @brief テスト生成を行なう．
+  /// @param[in] network 対象のネットワーク
+  /// @param[in] fnode_list 対象の故障を持つノードのリスト
+  /// @param[in] flist 対象の故障リスト
+  virtual
   void
-  make_fnode_list(const vector<TpgFault*>& flist,
-		  vector<TpgNode*>& fnode_list);
+  run_multi(TpgNetwork& network,
+	    const vector<TpgNode*>& fnode_list,
+	    const vector<TpgFault*>& flist) = 0;
 
-  /// @brief fnode の情報をクリアする．
+  /// @brief DFS で MFFC を求める．
+  /// @param[in] node 対象のノード
   void
-  clear_fnode_list(const vector<TpgNode*>& fnode_list);
+  dfs_mffc(TpgNode* node);
 
 
 private:
@@ -79,8 +83,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 作業用の配列
-  vector<bool> mDone;
+  // 故障を持つノードのリスト
+  vector<TpgNode*> mFaultNodeList;
+
+  // 対象の故障リスト
+  vector<TpgFault*> mFaultList;
+
+  // 作業用のマーク
+  vector<bool> mMark;
 
 };
 

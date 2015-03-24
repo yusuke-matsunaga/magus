@@ -30,14 +30,12 @@ BEGIN_NAMESPACE_YM_SATPG
 DtpgSat::DtpgSat(const string& sat_type,
 		 const string& sat_option,
 		 ostream* sat_outp,
-		 const TpgNetwork& network,
 		 BackTracer& bt,
 		 DetectOp& dop,
 		 UntestOp& uop) :
   mSatType(sat_type),
   mSatOption(sat_option),
   mSatOutP(sat_outp),
-  mNetwork(network),
   mBackTracer(bt),
   mDetectOp(dop),
   mUntestOp(uop)
@@ -124,18 +122,20 @@ struct Lt
 END_NONAMESPACE
 
 // @brief 故障位置を与えてその TFO の TFI リストを作る．
+// @param[in] max_node_id ノード番号の最大値
 // @param[in] fnode_list 故障位置のノードのリスト
 //
 // 結果は mTfoList に格納される．
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
-DtpgSat::mark_region(const vector<TpgNode*>& fnode_list)
+DtpgSat::mark_region(ymuint max_node_id,
+		     const vector<TpgNode*>& fnode_list)
 {
   mMarkArray.clear();
-  mMarkArray.resize(mNetwork.max_node_id(), 0U);
+  mMarkArray.resize(max_node_id, 0U);
 
   mTfoList.clear();
-  mTfoList.reserve(mNetwork.max_node_id());
+  mTfoList.reserve(max_node_id);
 
   mInputList.clear();
   mOutputList.clear();
@@ -177,14 +177,6 @@ DtpgSat::mark_region(const vector<TpgNode*>& fnode_list)
   }
 
   sort(mOutputList.begin(), mOutputList.end(), Lt());
-}
-
-// @brief 入力ノードを得る．
-// @param[in] ipos 入力番号
-TpgNode*
-DtpgSat::input_node(ymuint ipos) const
-{
-  return mNetwork.input(ipos);
 }
 
 // @brief タイマーをスタートする．

@@ -10,6 +10,7 @@
 #include "DtpgSatS.h"
 
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
@@ -22,7 +23,6 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -30,23 +30,21 @@ DtpgEngine*
 new_DtpgSatS(const string& sat_type,
 	     const string& sat_option,
 	     ostream* sat_outp,
-	     const TpgNetwork& network,
 	     BackTracer& bt,
 	     DetectOp& dop,
 	     UntestOp& uop)
 {
-  return new DtpgSatS(sat_type, sat_option, sat_outp, network, bt, dop, uop);
+  return new DtpgSatS(sat_type, sat_option, sat_outp, bt, dop, uop);
 }
 
 // @brief コンストラクタ
 DtpgSatS::DtpgSatS(const string& sat_type,
 		   const string& sat_option,
 		   ostream* sat_outp,
-		   const TpgNetwork& network,
 		   BackTracer& bt,
 		   DetectOp& dop,
 		   UntestOp& uop) :
-  DtpgSatBaseS(sat_type, sat_option, sat_outp, network, bt, dop, uop)
+  DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
 }
 
@@ -56,13 +54,13 @@ DtpgSatS::~DtpgSatS()
 }
 
 // @brief テストパタン生成を行なう．
+// @param[in] network 対象のネットワーク
 // @param[in] flist 故障リスト
 void
-DtpgSatS::run_single(TpgFault* fault)
+DtpgSatS::run_single(TpgNetwork& network,
+		     TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
-
-  mark_region(vector<TpgNode*>(1, fnode));
 
   cnf_begin();
 
