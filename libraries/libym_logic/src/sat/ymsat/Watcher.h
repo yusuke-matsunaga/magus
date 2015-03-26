@@ -199,6 +199,7 @@ inline
 Watcher
 WatcherList::elem(ymuint pos) const
 {
+  ASSERT_COND( pos < mNum );
   return mArray[pos];
 }
 
@@ -208,6 +209,7 @@ void
 WatcherList::set_elem(ymuint pos,
 		      Watcher elem)
 {
+  ASSERT_COND( pos < mSize );
   mArray[pos] = elem;
 }
 

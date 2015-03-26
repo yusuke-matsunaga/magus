@@ -40,7 +40,7 @@ const ymuint debug_all         = 0xffffffff;
 //const ymuint debug = debug_solve | debug_assign;
 //const ymuint debug = debug_all;
 //const ymuint debug = debug_none;
-ymuint debug = debug_none;
+const ymuint debug = debug_none;
 
 bool debug_first = true;
 
@@ -312,6 +312,7 @@ YmSat::solve(const vector<Literal>& assumptions,
 	 p != mConstrClause.end(); ++ p) {
       cout << "  " << *(*p) << endl;
     }
+    cout << " VarNum: " << mVarNum << endl;
   }
 
   // メッセージハンドラにヘッダの出力を行わせる．
@@ -368,15 +369,17 @@ YmSat::solve(const vector<Literal>& assumptions,
       }
     }
 
-    // 条件式のなかに重要な手続きが書いてあるあんまり良くないコード
-    // だけど implication() は stat == true の時しか実行しないのでしょうがない．
-    if ( !stat || implication() != kNullSatReason ) {
-      // 矛盾が起こった．
-      backtrack(0);
-
-      sat_stat = kB3False;
-      goto end;
+    if ( stat ) {
+      SatReason reason = implication();
+      if ( reason == kNullSatReason ) {
+	// 矛盾が起きていなければ次の仮定をアサートする．
+	continue;
+      }
     }
+    // 矛盾が起こった．
+    backtrack(0);
+    sat_stat = kB3False;
+    goto end;
   }
 
   // 以降，現在のレベルが基底レベルとなる．
@@ -842,6 +845,7 @@ YmSat::next_decision()
   while ( !mVarHeap.empty() ) {
     // activity の高い変数を取り出す．
     ymuint vindex = mVarHeap.pop_top();
+    ASSERT_COND( vindex < mVarNum );
     ymuint8 x = mVal[vindex];
     if ( (x & 3U) != conv_from_Bool3(kB3X) ) {
       // すでに確定していたらスキップする．
@@ -964,8 +968,8 @@ YmSat::sweep_clause()
   }
 
   vector<VarId> var_list;
-  var_list.reserve(mVarSize);
-  for (ymuint i = 0; i < mVarSize; ++ i) {
+  var_list.reserve(mVarNum);
+  for (ymuint i = 0; i < mVarNum; ++ i) {
     var_list.push_back(VarId(i));
   }
   mVarHeap.build(var_list);
