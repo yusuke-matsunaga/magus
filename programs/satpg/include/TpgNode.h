@@ -207,6 +207,10 @@ public:
   void
   clear_var();
 
+  /// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
+  bool
+  has_gvar() const;
+
   /// @brief 正常値を表す変数番号を得る．
   VarId
   gvar() const;
@@ -768,11 +772,20 @@ TpgNode::clear_var()
   mMarks &= ~6U;
 }
 
+// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
+inline
+bool
+TpgNode::has_gvar() const
+{
+  return static_cast<bool>((mMarks >> 1) & 1U);
+}
+
 // @brief 正常値を表す変数番号を得る．
 inline
 VarId
 TpgNode::gvar() const
 {
+  ASSERT_COND( has_gvar() );
   return mGid;
 }
 
@@ -789,6 +802,7 @@ inline
 VarId
 TpgNode::fvar() const
 {
+  ASSERT_COND( has_gvar() );
   return mFid;
 }
 
@@ -797,6 +811,7 @@ inline
 VarId
 TpgNode::dvar() const
 {
+  ASSERT_COND( has_fvar() );
   return mDid;
 }
 

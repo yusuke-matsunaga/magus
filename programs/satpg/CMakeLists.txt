@@ -49,9 +49,11 @@ set (dtpg_SOURCES
   src/dtpg/dtpg_engine/DtpgSatBaseM.cc
   src/dtpg/dtpg_engine/DtpgSatS.cc
   src/dtpg/dtpg_engine/DtpgSatS2.cc
+  src/dtpg/dtpg_engine/DtpgSatS3.cc
   src/dtpg/dtpg_engine/DtpgSatM.cc
   src/dtpg/dtpg_engine/DtpgSatM2.cc
   src/dtpg/dtpg_engine/DtpgSatKDet.cc
+  src/dtpg/dtpg_engine/DtpgSatC.cc
 
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc

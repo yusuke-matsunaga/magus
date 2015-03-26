@@ -50,10 +50,14 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "single mode");
   mPoptSingle2 = new TclPoptInt(this, "single2",
 				"single2 mode <INT>");
+  mPoptSingle3 = new TclPopt(this, "single3",
+			     "single3 mode");
   mPoptMulti = new TclPopt(this, "multi",
 			   "multi mode");
   mPoptMulti2 = new TclPoptInt(this, "multi2",
 			       "multi2 mode <INT>");
+  mPoptConcurrent = new TclPopt(this, "concurrent",
+				"concurrent mode");
   mPoptSmtSingle = new TclPopt(this, "smt_single",
 			       "smt_single mode");
   mPoptX = new TclPoptInt(this, "x",
@@ -141,12 +145,18 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     engine_type = "single2";
     mode_val = mPoptSingle2->val();
   }
+  else if ( mPoptSingle3->is_specified() ) {
+    engine_type = "single3";
+  }
   else if ( mPoptMulti->is_specified() ) {
     engine_type = "multi";
   }
   else if ( mPoptMulti2->is_specified() ) {
     engine_type = "multi2";
     mode_val = mPoptMulti2->val();
+  }
+  else if ( mPoptConcurrent->is_specified() ) {
+    engine_type = "concurrent";
   }
 #if 0
   else if ( mPoptSmtSingle->is_specified() ) {
@@ -206,11 +216,17 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   else if ( engine_type == "single2" ) {
     engine = new_DtpgSatS2(mode_val, sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }
+  else if ( engine_type == "single3" ) {
+    engine = new_DtpgSatS3(sat_type, sat_option, outp, *bt, dop_list, uop_list);
+  }
   else if ( engine_type == "multi" ) {
     engine = new_DtpgSatM(sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }
   else if ( engine_type == "multi2" ) {
     engine = new_DtpgSatM2(mode_val, sat_type, sat_option, outp, *bt, dop_list, uop_list);
+  }
+  else if ( engine_type == "concurrent" ) {
+    engine = new_DtpgSatC(sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }
 #if 0
   else if ( engine_type == "smt_single" ) {

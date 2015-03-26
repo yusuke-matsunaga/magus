@@ -11,6 +11,7 @@
 
 #include "BackTracer.h"
 #include "TpgNode.h"
+#include "AssignList.h"
 #include "YmLogic/Literal.h"
 
 
@@ -123,6 +124,9 @@ private:
 
   // 現在処理中のテストベクタ
   TestVector* mCurPattern;
+
+  // 現在の割当リスト
+  AssignList mCurAssignList;
 
 };
 
