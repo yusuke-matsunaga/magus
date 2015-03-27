@@ -13,8 +13,10 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
-#include "TestVector.h"
+//#include "TestVector.h"
 #include "SatEngine.h"
+#include "AssignList.h"
+#include "BtJust3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -131,16 +133,19 @@ DtpgSatS3::run_single(TpgNetwork& network,
   }
 
   cout << fault->str() << endl;
-  Bool3 sat_ans = solve(engine, fault);
+
+  vector<Bool3> sat_model;
+  Bool3 sat_ans = engine.solve(sat_model);
   if ( sat_ans == kB3True ) {
+    AssignList as_list;
+    backtrace(network, sat_model, as_list);
+
     // 必要割当を求める．
-    TestVector* tv = last_pat();
-    ymuint ni = tv->input_num();
     vector<Bool3> tmp_model;
-    for (ymuint i = 0; i < ni; ++ i) {
-      if ( tv->val3(i) == kValX ) {
-	continue;
-      }
+    ymuint n = as_list.size();
+    for (ymuint i = 0; i < n; ++ i) {
+      Assign as = as_list.elem(i);
+      TpgNode* node = network.node(as.node_id());
 
       engine.assumption_begin();
 
@@ -150,8 +155,8 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	engine.assumption_add(dlit);
       }
       // node の割当の反対を試す．
-      bool inv = (tv->val3(i) == kVal1);
-      Literal alit(network.input(i)->gvar(), inv);
+      bool inv = as.val();
+      Literal alit(node->gvar(), inv);
       engine.assumption_add(alit);
 
       Bool3 tmp_stat = engine.solve(tmp_model);
@@ -160,7 +165,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	;
       }
       else if ( tmp_stat == kB3False ) {
-	cout << "   Node#" << network.input(i)->id() << " is a mandatory assignment" << endl;
+	cout << "   Node#" << node->id() << " is a mandatory assignment" << endl;
       }
       else {
 	// アボート．とりあえず無視
@@ -170,6 +175,81 @@ DtpgSatS3::run_single(TpgNetwork& network,
   }
 
   clear_node_mark();
+}
+
+BEGIN_NONAMESPACE
+
+// @brief ノードの正常値を読み出す．
+// @param[in] node 対象のノード
+// @param[in] model SAT の割り当て結果
+inline
+Bool3
+node_gval(TpgNode* node,
+	  const vector<Bool3>& model)
+{
+  return read_value(node->gvar(), model);
+}
+
+// @brief ノードの故障値を読み出す．
+// @param[in] node 対象のノード
+// @param[in] model SAT の割り当て結果
+inline
+Bool3
+node_fval(TpgNode* node,
+	  const vector<Bool3>& model)
+{
+  return read_value(node->fvar(), model);
+}
+
+// @brief ノードの故障差を読み出す．
+// @param[in] node 対象のノード
+// @param[in] model SAT の割り当て結果
+inline
+Bool3
+node_dval(TpgNode* node,
+	  const vector<Bool3>& model)
+{
+  return read_value(node->dvar(), model);
+}
+
+// @brief 変数番号に対応する値を読み出す．
+// @param[in] vid 変数番号
+// @param[in] model SAT の割り当て結果
+inline
+Bool3
+read_value(VarId vid,
+	   const vector<Bool3>& model)
+{
+  return model[vid.val()];
+}
+
+END_NONAMESPACE
+
+// @brief バックトレースを行う．
+void
+DtpgSatS3::backtrace(TpgNetwork& network,
+		     const vector<Bool3>& model,
+		     AssignList& as_list)
+{
+  // 故障差の伝搬している外部出力を選ぶ．
+  ymuint nmin = 0;
+  AssignList best_list;
+  for (vector<TpgNode*>::const_iterator p = output_list().begin();
+       p != output_list().end(); ++ p) {
+    TpgNode* node = *p;
+    if ( node_dval(node, model) == kB3True ) {
+      // 正当化を行う．
+      AssignList as_list1;
+      justify(node, model, as_list1);
+      ymuint n = as_list1.size();
+      if ( nmin == 0 || nmin > n ) {
+	nmin = n;
+	best_list = as_list1;
+      }
+    }
+  }
+  ASSERT_COND( nmin > 0 );
+  as_list = best_list;
 }
 
 END_NAMESPACE_YM_SATPG
