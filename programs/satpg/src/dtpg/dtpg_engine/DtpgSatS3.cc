@@ -149,7 +149,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
     ymuint n = as_list.size();
     NodeValList ma_list;
     for (ymuint i = 0; i < n; ++ i) {
-      Assign as = as_list[i];
+      NodeVal nv = as_list[i];
 
       engine.assumption_begin();
 
@@ -160,8 +160,8 @@ DtpgSatS3::run_single(TpgNetwork& network,
       }
 
       // node の割当の反対を試す．
-      TpgNode* node = network.node(as.node_id());
-      bool inv = as.val();
+      TpgNode* node = nv.node();
+      bool inv = nv.val();
       Literal alit(node->gvar(), inv);
       engine.assumption_add(alit);
 
@@ -171,7 +171,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	;
       }
       else if ( tmp_stat == kB3False ) {
-	ma_list.add(node->id(), as.val());
+	ma_list.add(node, nv.val());
       }
       else {
 	// アボート．とりあえず無視
@@ -179,9 +179,9 @@ DtpgSatS3::run_single(TpgNetwork& network,
       }
     }
     for (ymuint i = 0; i < ma_list.size(); ++ i) {
-      Assign as = ma_list[i];
-      cout << " Node#" << as.node_id()
-	   << ":" << as.val();
+      NodeVal nv = ma_list[i];
+      cout << " Node#" << nv.node()->id()
+	   << ":" << nv.val();
     }
     cout << endl;
   }

@@ -281,9 +281,9 @@ Fsim2::sppfp(const NodeValList& assign_list,
 
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
-    Assign as = assign_list[i];
-    if ( as.val() ) {
-      SimNode* simnode = mInputArray[as.node_id()];
+    NodeVal nv = assign_list[i];
+    if ( nv.val() ) {
+      SimNode* simnode = mInputArray[nv.node()->input_id()];
       simnode->set_gval(kPvAll1);
     }
   }
@@ -492,9 +492,9 @@ Fsim2::spsfp(const NodeValList& assign_list,
 
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
-    Assign as = assign_list[i];
-    if ( as.val() ) {
-      SimNode* simnode = mInputArray[as.node_id()];
+    NodeVal nv = assign_list[i];
+    if ( nv.val() ) {
+      SimNode* simnode = mInputArray[nv.node()->input_id()];
       simnode->set_gval(kPvAll1);
     }
   }

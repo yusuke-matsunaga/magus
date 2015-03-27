@@ -15,23 +15,31 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class Assign NodeValList.h "NodeValList.h"
+/// @class NodeVal NodeValList.h "NodeValList.h"
 /// @brief ノードに対する値の割当を表すクラス
+///
+/// 昔の C でよく使われていたポインタの下位ビットが0であることを
+/// 利用して，そこにフラグを埋め込むテクニック
+/// C++ の時代では醜いことこのうえない．
 //////////////////////////////////////////////////////////////////////
-class Assign
+class NodeVal
 {
 public:
 
   /// @brief 空のコンストラクタ
   ///
   /// 内容は不定
-  Assign();
+  NodeVal();
 
   /// @brief 値を指定したコンストラクタ
-  /// @param[in] node_id ノードID
+  /// @param[in] node ノード
   /// @param[in] val 値
-  Assign(ymuint node_id,
-	 bool val);
+  NodeVal(TpgNode* node,
+	  bool val);
+
+  /// @brief 内容を直接指定したコンストラクタ
+  /// @param[in] pval パックされた値
+  NodeVal(ympuint pval);
 
 
 public:
@@ -39,9 +47,9 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノード番号を返す．
-  ymuint
-  node_id() const;
+  /// @brief ノードを返す．
+  TpgNode*
+  node() const;
 
   /// @brief 値を返す．
   bool
@@ -54,7 +62,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // パックした値
-  ymuint32 mVal;
+  ympuint mPackVal;
 
 };
 
@@ -86,10 +94,10 @@ public:
   clear();
 
   /// @brief 値を追加する．
-  /// @param[in] node_id ノードID
+  /// @param[in] node ノード
   /// @param[in] val 値
   void
-  add(ymuint node_id,
+  add(TpgNode* node,
       bool val);
 
   /// @brief 要素数を返す．
@@ -98,7 +106,7 @@ public:
 
   /// @brief 要素を返す．
   /// @param[in] pos 位置 ( 0 <= pos < size() )
-  Assign
+  NodeVal
   operator[](ymuint pos) const;
 
 
@@ -113,8 +121,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値割当のリスト
-  vector<ymuint32> mAsList;
+  // 値割り当てのリスト
+  vector<ympuint> mAsList;
 
 };
 
@@ -127,35 +135,43 @@ private:
 //
 // 内容は不定
 inline
-Assign::Assign() :
-  mVal(0)
+NodeVal::NodeVal() :
+  mPackVal(0UL)
 {
 }
 
 // @brief 値を指定したコンストラクタ
-// @param[in] node_id ノードID
+// @param[in] node ノード
 // @param[in] val 値
 inline
-Assign::Assign(ymuint node_id,
-	       bool val) :
-  mVal((node_id << 1) | val)
+NodeVal::NodeVal(TpgNode* node,
+		 bool val) :
+  mPackVal(reinterpret_cast<ympuint>(node) | val)
 {
 }
 
-// @brief ノード番号を返す．
+// @brief 内容を直接指定したコンストラクタ
+// @param[in] pval パックされた値
 inline
-ymuint
-Assign::node_id() const
+NodeVal::NodeVal(ympuint pval) :
+  mPackVal(pval)
 {
-  return mVal >> 1;
+}
+
+// @brief ノードを返す．
+inline
+TpgNode*
+NodeVal::node() const
+{
+  return reinterpret_cast<TpgNode*>(mPackVal & ~1UL);
 }
 
 // @brief 値を返す．
 inline
 bool
-Assign::val() const
+NodeVal::val() const
 {
-  return static_cast<bool>(mVal & 1U);
+  return static_cast<bool>(mPackVal & 1UL);
 }
 
 // @brief コンストラクタ
@@ -179,14 +195,14 @@ NodeValList::clear()
 }
 
 // @brief 値を追加する．
-// @param[in] node_id ノードID
+// @param[in] node ノード
 // @param[in] val 値
 inline
 void
-NodeValList::add(ymuint node_id,
-		bool val)
+NodeValList::add(TpgNode* node,
+		 bool val)
 {
-  ymuint32 packval = (node_id << 1) | val;
+  ympuint packval = reinterpret_cast<ympuint>(node) | val;
   mAsList.push_back(packval);
 }
 
@@ -201,12 +217,12 @@ NodeValList::size() const
 // @brief 要素を返す．
 // @param[in] pos 位置 ( 0 <= pos < size() )
 inline
-Assign
+NodeVal
 NodeValList::operator[](ymuint pos) const
 {
   ASSERT_COND( pos < size() );
-  ymuint32 packval = mAsList[pos];
-  return Assign((packval >> 1), packval & 1U);
+  ympuint packval = mAsList[pos];
+  return NodeVal(packval);
 }
 
 END_NAMESPACE_YM_SATPG

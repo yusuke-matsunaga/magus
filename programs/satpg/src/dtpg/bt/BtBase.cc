@@ -44,14 +44,12 @@ BtBase::record_value(TpgNode* node,
 		     const vector<Bool3>& model,
 		     NodeValList& assign_list)
 {
-  if ( node->is_input() ) {
-    Bool3 v = node_gval(node, model);
-    if ( v == kB3False ) {
-      assign_list.add(node->input_id(), false);
-    }
-    else if ( v == kB3True ) {
-      assign_list.add(node->input_id(), true);
-    }
+  Bool3 v = node_gval(node, model);
+  if ( v == kB3False ) {
+    assign_list.add(node, false);
+  }
+  else if ( v == kB3True ) {
+    assign_list.add(node, true);
   }
 }
 

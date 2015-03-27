@@ -78,13 +78,7 @@ BtJust3::operator()(TpgNode* fnode,
   assign_list.clear();
   for (NodeList* tmp = best_list; tmp; tmp = tmp->mLink) {
     TpgNode* node = tmp->mNode;
-    Bool3 v = node_gval(node, model);
-    if ( v == kB3False ) {
-      assign_list.add(node->id(), false);
-    }
-    else {
-      assign_list.add(node->id(), true);
-    }
+    record_value(node, model, assign_list);
   }
 
   // 一連の処理でつけたマークを消す．

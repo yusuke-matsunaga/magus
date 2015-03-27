@@ -9,6 +9,7 @@
 
 #include "DopTvList.h"
 #include "TvMgr.h"
+#include "TpgNode.h"
 #include "NodeValList.h"
 
 
@@ -54,13 +55,16 @@ DopTvList::operator()(TpgFault* f,
   TestVector* tv = mTvMgr.new_vector();
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
-    Assign as = assign_list[i];
-    ymuint id = as.node_id();
-    if ( as.val() ) {
-      tv->set_val(id, kVal1);
-    }
-    else {
-      tv->set_val(id, kVal0);
+    NodeVal nv = assign_list[i];
+    TpgNode* node = nv.node();
+    if ( node->is_input() ) {
+      ymuint id = node->input_id();
+      if ( nv.val() ) {
+	tv->set_val(id, kVal1);
+      }
+      else {
+	tv->set_val(id, kVal0);
+      }
     }
   }
   mTvList.push_back(tv);
