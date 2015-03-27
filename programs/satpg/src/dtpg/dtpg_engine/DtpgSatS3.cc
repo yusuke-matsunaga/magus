@@ -47,7 +47,7 @@ DtpgSatS3::DtpgSatS3(const string& sat_type,
 		     UntestOp& uop) :
   DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
-  mBt = new_BtJust2();
+  mBt = new_BtJust3();
 }
 
 // @brief デストラクタ
@@ -135,19 +135,19 @@ DtpgSatS3::run_single(TpgNetwork& network,
     engine.assumption_add(dlit);
   }
 
-  cout << fault->str() << endl;
+  cout << fault->str() << ":";
+  cout.flush();
 
   vector<Bool3> sat_model;
-  cout << "sat_model.size() = " << sat_model.size() << endl;
   Bool3 sat_ans = engine.solve(sat_model);
   if ( sat_ans == kB3True ) {
-    cout << "sat_model.size() = " << sat_model.size() << endl;
     NodeValList as_list;
     (*mBt)(fault->node(), sat_model, input_list(), output_list(), as_list);
 
     // 必要割当を求める．
     vector<Bool3> tmp_model;
     ymuint n = as_list.size();
+    NodeValList ma_list;
     for (ymuint i = 0; i < n; ++ i) {
       Assign as = as_list[i];
 
@@ -160,8 +160,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
       }
 
       // node の割当の反対を試す．
-      //TpgNode* node = network.node(as.node_id());
-      TpgNode* node = network.input(as.node_id());
+      TpgNode* node = network.node(as.node_id());
       bool inv = as.val();
       Literal alit(node->gvar(), inv);
       engine.assumption_add(alit);
@@ -172,13 +171,19 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	;
       }
       else if ( tmp_stat == kB3False ) {
-	cout << "   Node#" << node->id() << " is a mandatory assignment" << endl;
+	ma_list.add(node->id(), as.val());
       }
       else {
 	// アボート．とりあえず無視
 	;
       }
     }
+    for (ymuint i = 0; i < ma_list.size(); ++ i) {
+      Assign as = ma_list[i];
+      cout << " Node#" << as.node_id()
+	   << ":" << as.val();
+    }
+    cout << endl;
   }
 
   clear_node_mark();

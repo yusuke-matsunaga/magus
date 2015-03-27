@@ -119,10 +119,7 @@ BtJust3::justify(TpgNode* node,
   }
   set_justified(node);
 
-  if ( node->is_input() || !node->has_fvar() ) {
-    // val を記録
-    mJustArray[node->id()] = new_list_cell(node);
-  }
+  mJustArray[node->id()] = new_list_cell(node);
 
   if ( node->is_input() ) {
     return mJustArray[node->id()];
