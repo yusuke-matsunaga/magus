@@ -10,7 +10,6 @@
 
 
 #include "satpg_nsdef.h"
-#include "AssignList.h"
 #include "YmLogic/Bool3.h"
 
 
@@ -52,7 +51,7 @@ public:
 	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list,
-	     AssignList& assign_list) = 0;
+	     NodeValList& assign_list) = 0;
 
 };
 
@@ -68,9 +67,9 @@ new_BtJust1();
 BackTracer*
 new_BtJust2();
 
-/// @brief 'Zdd' タイプの生成を行なう．
+/// @brief 'Just3' タイプの生成を行なう．
 BackTracer*
-new_BtZdd();
+new_BtJust3();
 
 END_NAMESPACE_YM_SATPG
 

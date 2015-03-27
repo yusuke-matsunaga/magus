@@ -25,8 +25,7 @@ class BtJust3 :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] tvmgr TvMgr
-  BtJust3(TvMgr& tvmgr);
+  BtJust3();
 
   /// @brief デストラクタ
   virtual
@@ -56,7 +55,7 @@ public:
 	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list,
-	     AssignList& assign_list);
+	     NodeValList& assign_list);
 
 
 protected:

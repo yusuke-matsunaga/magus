@@ -14,7 +14,8 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
-#include "AssignList.h"
+#include "NodeValList.h"
+#include "BackTracer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -46,11 +47,13 @@ DtpgSatS3::DtpgSatS3(const string& sat_type,
 		     UntestOp& uop) :
   DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
+  mBt = new_BtJust2();
 }
 
 // @brief デストラクタ
 DtpgSatS3::~DtpgSatS3()
 {
+  delete mBt;
 }
 
 // @brief テストパタン生成を行なう．
@@ -60,6 +63,8 @@ void
 DtpgSatS3::run_single(TpgNetwork& network,
 		      TpgFault* fault)
 {
+  mBt->set_max_id(network.max_node_id());
+
   TpgNode* fnode = fault->node();
 
   cnf_begin();
@@ -133,18 +138,18 @@ DtpgSatS3::run_single(TpgNetwork& network,
   cout << fault->str() << endl;
 
   vector<Bool3> sat_model;
+  cout << "sat_model.size() = " << sat_model.size() << endl;
   Bool3 sat_ans = engine.solve(sat_model);
   if ( sat_ans == kB3True ) {
-#if 0
-    AssignList as_list;
-    backtrace(network, sat_model, as_list);
+    cout << "sat_model.size() = " << sat_model.size() << endl;
+    NodeValList as_list;
+    (*mBt)(fault->node(), sat_model, input_list(), output_list(), as_list);
 
     // 必要割当を求める．
     vector<Bool3> tmp_model;
     ymuint n = as_list.size();
     for (ymuint i = 0; i < n; ++ i) {
-      Assign as = as_list.elem(i);
-      TpgNode* node = network.node(as.node_id());
+      Assign as = as_list[i];
 
       engine.assumption_begin();
 
@@ -153,7 +158,10 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	Literal dlit(node->dvar(), false);
 	engine.assumption_add(dlit);
       }
+
       // node の割当の反対を試す．
+      //TpgNode* node = network.node(as.node_id());
+      TpgNode* node = network.input(as.node_id());
       bool inv = as.val();
       Literal alit(node->gvar(), inv);
       engine.assumption_add(alit);
@@ -171,7 +179,6 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	;
       }
     }
-#endif
   }
 
   clear_node_mark();

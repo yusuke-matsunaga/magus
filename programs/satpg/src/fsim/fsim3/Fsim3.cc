@@ -13,7 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
-#include "AssignList.h"
+#include "NodeValList.h"
 #include "SimNode.h"
 #include "SimFFR.h"
 #include "YmUtils/HashSet.h"
@@ -283,7 +283,7 @@ Fsim3::spsfp(TestVector* tv,
 // @retval true 故障の検出が行えた．
 // @retval false 故障の検出が行えなかった．
 bool
-Fsim3::spsfp(const AssignList& assign_list,
+Fsim3::spsfp(const NodeValList& assign_list,
 	     TpgFault* f)
 {
   // assign_list を全ビットにセットしていく．
@@ -291,7 +291,7 @@ Fsim3::spsfp(const AssignList& assign_list,
 
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
-    const Assign& as = assign_list.elem(i);
+    Assign as = assign_list[i];
     SimNode* simnode = mInputArray[as.node_id()];
     if ( as.val() ) {
       simnode->set_gval(kPvAll0, kPvAll1);
@@ -392,7 +392,7 @@ Fsim3::sppfp(TestVector* tv,
 // @param[in] assign_list 値の割当リスト
 // @param[in] op 検出した時に起動されるファンクタオブジェクト
 void
-Fsim3::sppfp(const AssignList& assign_list,
+Fsim3::sppfp(const NodeValList& assign_list,
 	     FsimOp& op)
 {
   // assign_list を全ビットにセットしていく．
@@ -400,7 +400,7 @@ Fsim3::sppfp(const AssignList& assign_list,
 
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
-    const Assign& as = assign_list.elem(i);
+    Assign as = assign_list[i];
     SimNode* simnode = mInputArray[as.node_id()];
     if ( as.val() ) {
       simnode->set_gval(kPvAll0, kPvAll1);

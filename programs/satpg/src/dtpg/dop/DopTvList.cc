@@ -9,7 +9,7 @@
 
 #include "DopTvList.h"
 #include "TvMgr.h"
-#include "AssignList.h"
+#include "NodeValList.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -49,12 +49,12 @@ DopTvList::~DopTvList()
 // @param[in] assign_list 値割当のリスト
 void
 DopTvList::operator()(TpgFault* f,
-		      const AssignList& assign_list)
+		      const NodeValList& assign_list)
 {
   TestVector* tv = mTvMgr.new_vector();
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
-    const Assign& as = assign_list.elem(i);
+    Assign as = assign_list[i];
     ymuint id = as.node_id();
     if ( as.val() ) {
       tv->set_val(id, kVal1);

@@ -43,7 +43,7 @@ DopBase::~DopBase()
 // @param[in] assign_list 値割当のリスト
 void
 DopBase::operator()(TpgFault* f,
-		    const AssignList& assign_list)
+		    const NodeValList& assign_list)
 
 {
   mMgr.set_status(f, kFsDetected);

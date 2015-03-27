@@ -186,9 +186,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   switch ( xmode ) {
   case 1: bt = new_BtJust1(); break;
   case 2: bt = new_BtJust2(); break;
-#if 0
-  case 3: bt = new_BtZdd(); break;
-#endif
+  case 3: bt = new_BtJust3(); break;
   default: bt = new_BtSimple(); break;
   }
   if ( bt != NULL ) {

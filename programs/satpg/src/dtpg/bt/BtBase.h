@@ -11,7 +11,7 @@
 
 #include "BackTracer.h"
 #include "TpgNode.h"
-#include "AssignList.h"
+#include "NodeValList.h"
 #include "YmLogic/Literal.h"
 
 
@@ -61,7 +61,7 @@ protected:
   void
   record_value(TpgNode* node,
 	       const vector<Bool3>& model,
-	       AssignList& assign_list);
+	       NodeValList& assign_list);
 
   /// @brief ノードの正常値を読み出す．
   /// @param[in] node 対象のノード
@@ -114,9 +114,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 現在の割当リスト
-  AssignList mCurAssignList;
 
 };
 

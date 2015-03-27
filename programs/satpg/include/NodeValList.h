@@ -1,8 +1,8 @@
-#ifndef ASSIGNLIST_H
-#define ASSIGNLIST_H
+#ifndef NODEVALLIST_H
+#define NODEVALLIST_H
 
-/// @file AssignList.h
-/// @brief AssignList のヘッダファイル
+/// @file NodeValList.h
+/// @brief NodeValList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class Assign AssignList.h "AssignList.h"
+/// @class Assign NodeValList.h "NodeValList.h"
 /// @brief ノードに対する値の割当を表すクラス
 //////////////////////////////////////////////////////////////////////
 class Assign
@@ -60,20 +60,20 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AssignList AssignList.h "AssignList.h"
+/// @class NodeValList NodeValList.h "NodeValList.h"
 /// @brief ノードに対する値の割当を記録するクラス
 //////////////////////////////////////////////////////////////////////
-class AssignList
+class NodeValList
 {
 public:
 
   /// @brief コンストラクタ
   ///
   /// 空のリストが生成される．
-  AssignList();
+  NodeValList();
 
   /// @brief デストラクタ
-  ~AssignList();
+  ~NodeValList();
 
 
 public:
@@ -99,7 +99,7 @@ public:
   /// @brief 要素を返す．
   /// @param[in] pos 位置 ( 0 <= pos < size() )
   Assign
-  elem(ymuint pos) const;
+  operator[](ymuint pos) const;
 
 
 private:
@@ -114,7 +114,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値割当のリスト
-  vector<Assign> mAsList;
+  vector<ymuint32> mAsList;
 
 };
 
@@ -160,20 +160,20 @@ Assign::val() const
 
 // @brief コンストラクタ
 inline
-AssignList::AssignList()
+NodeValList::NodeValList()
 {
 }
 
 // @brief デストラクタ
 inline
-AssignList::~AssignList()
+NodeValList::~NodeValList()
 {
 }
 
 // @brief 内容を空にする．
 inline
 void
-AssignList::clear()
+NodeValList::clear()
 {
   mAsList.clear();
 }
@@ -183,16 +183,17 @@ AssignList::clear()
 // @param[in] val 値
 inline
 void
-AssignList::add(ymuint node_id,
+NodeValList::add(ymuint node_id,
 		bool val)
 {
-  mAsList.push_back(Assign(node_id, val));
+  ymuint32 packval = (node_id << 1) | val;
+  mAsList.push_back(packval);
 }
 
 // @brief 要素数を返す．
 inline
 ymuint
-AssignList::size() const
+NodeValList::size() const
 {
   return mAsList.size();
 }
@@ -201,12 +202,13 @@ AssignList::size() const
 // @param[in] pos 位置 ( 0 <= pos < size() )
 inline
 Assign
-AssignList::elem(ymuint pos) const
+NodeValList::operator[](ymuint pos) const
 {
   ASSERT_COND( pos < size() );
-  return mAsList[pos];
+  ymuint32 packval = mAsList[pos];
+  return Assign((packval >> 1), packval & 1U);
 }
 
 END_NAMESPACE_YM_SATPG
 
-#endif // ASSIGNLIST_H
+#endif // NODEVALLIST_H

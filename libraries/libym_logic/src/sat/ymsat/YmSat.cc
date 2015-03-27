@@ -315,6 +315,9 @@ YmSat::solve(const vector<Literal>& assumptions,
     cout << " VarNum: " << mVarNum << endl;
   }
 
+  model.clear();
+  model.resize(mVarNum, kB3X);
+
   // メッセージハンドラにヘッダの出力を行わせる．
   for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
        p != mMsgHandlerList.end(); ++ p) {
@@ -428,7 +431,6 @@ YmSat::solve(const vector<Literal>& assumptions,
   }
   if ( sat_stat == kB3True ) {
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
-    model.resize(mVarNum);
     for (ymuint i = 0; i < mVarNum; ++ i) {
       Bool3 val = cur_val(mVal[i]);
       ASSERT_COND(val != kB3X );

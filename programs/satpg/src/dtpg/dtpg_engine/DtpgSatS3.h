@@ -11,7 +11,6 @@
 
 
 #include "DtpgSatBaseS.h"
-#include "AssignList.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -63,11 +62,14 @@ private:
   run_single(TpgNetwork& network,
 	     TpgFault* f_tgt);
 
-  /// @brief バックトレースを行う．
-  void
-  backtrace(TpgNetwork& network,
-	    const vector<Bool3>& model,
-	    AssignList& as_list);
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // バックトレーサー
+  BackTracer* mBt;
 
 };
 

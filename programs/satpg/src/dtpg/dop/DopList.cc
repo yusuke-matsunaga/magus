@@ -42,7 +42,7 @@ DopList::add(DetectOp* dop)
 // @param[in] assign_list 値の割当リスト
 void
 DopList::operator()(TpgFault* f,
-		    const AssignList& assign_list)
+		    const NodeValList& assign_list)
 {
   for (vector<DetectOp*>::iterator p = mDopList.begin();
        p != mDopList.end(); ++ p) {

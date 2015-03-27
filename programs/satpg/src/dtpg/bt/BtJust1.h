@@ -48,7 +48,7 @@ public:
 	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list,
-	     AssignList& assign_list);
+	     NodeValList& assign_list);
 
 
 protected:
@@ -66,7 +66,7 @@ protected:
   void
   justify(TpgNode* node,
 	  const vector<Bool3>& model,
-	  AssignList& assign_list);
+	  NodeValList& assign_list);
 
   /// @brief すべてのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
@@ -75,7 +75,7 @@ protected:
   void
   just_sub1(TpgNode* node,
 	    const vector<Bool3>& model,
-	    AssignList& assign_list);
+	    NodeValList& assign_list);
 
   /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
@@ -86,7 +86,7 @@ protected:
   just_sub2(TpgNode* node,
 	    const vector<Bool3>& model,
 	    Bool3 val,
-	    AssignList& assign_list);
+	    NodeValList& assign_list);
 
 };
 

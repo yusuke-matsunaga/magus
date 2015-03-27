@@ -76,7 +76,7 @@ public:
   /// @retval false 故障の検出が行えなかった．
   virtual
   bool
-  spsfp(const AssignList& assign_list,
+  spsfp(const NodeValList& assign_list,
 	TpgFault* f) = 0;
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
@@ -92,7 +92,7 @@ public:
   /// @param[in] op 検出した時に起動されるファンクタオブジェクト
   virtual
   void
-  sppfp(const AssignList& assign_list,
+  sppfp(const NodeValList& assign_list,
 	FsimOp& op) = 0;
 
   /// @brief 複数のパタンで故障シミュレーションを行う．

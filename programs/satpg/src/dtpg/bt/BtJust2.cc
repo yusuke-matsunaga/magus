@@ -55,7 +55,7 @@ BtJust2::operator()(TpgNode* fnode,
 		    const vector<Bool3>& model,
 		    const vector<TpgNode*>& input_list,
 		    const vector<TpgNode*>& output_list,
-		    AssignList& assign_list)
+		    NodeValList& assign_list)
 {
   // 故障差の伝搬している外部出力を選ぶ．
   ymuint nmin = 0;

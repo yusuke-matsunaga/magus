@@ -16,6 +16,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
+#include "NodeValList.h"
 #include "LitMap.h"
 #include "GvarLitMap.h"
 #include "FvarLitMap.h"
@@ -528,7 +529,7 @@ DtpgSat::detect_op(TpgFault* fault,
 		   const USTime& time)
 {
   // バックトレースを行う．
-  AssignList assign_list;
+  NodeValList assign_list;
   mBackTracer(fault->node(), mModel, mInputList, mOutputList, assign_list);
 
   // パタンの登録などを行う．

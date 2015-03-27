@@ -30,6 +30,7 @@ set (dtpg_SOURCES
   src/dtpg/bt/BtBase.cc
   src/dtpg/bt/BtJust1.cc
   src/dtpg/bt/BtJust2.cc
+  src/dtpg/bt/BtJust3.cc
   src/dtpg/bt/BtJustBase.cc
   src/dtpg/bt/BtSimple.cc
 

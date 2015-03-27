@@ -44,7 +44,7 @@ public:
 	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
 	     const vector<TpgNode*>& output_list,
-	     AssignList& assign_list);
+	     NodeValList& assign_list);
 
 };
 

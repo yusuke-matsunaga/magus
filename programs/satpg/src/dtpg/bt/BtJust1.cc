@@ -45,7 +45,7 @@ BtJust1::operator()(TpgNode* fnode,
 		    const vector<Bool3>& model,
 		    const vector<TpgNode*>& input_list,
 		    const vector<TpgNode*>& output_list,
-		    AssignList& assign_list)
+		    NodeValList& assign_list)
 {
   assign_list.clear();
 
@@ -77,7 +77,7 @@ BtJust1::operator()(TpgNode* fnode,
 void
 BtJust1::justify(TpgNode* node,
 		 const vector<Bool3>& model,
-		 AssignList& assign_list)
+		 NodeValList& assign_list)
 {
   if ( justified_mark(node) ) {
     return;
@@ -170,7 +170,7 @@ BtJust1::justify(TpgNode* node,
 void
 BtJust1::just_sub1(TpgNode* node,
 		   const vector<Bool3>& model,
-		   AssignList& assign_list)
+		   NodeValList& assign_list)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -188,7 +188,7 @@ void
 BtJust1::just_sub2(TpgNode* node,
 		   const vector<Bool3>& model,
 		   Bool3 val,
-		   AssignList& assign_list)
+		   NodeValList& assign_list)
 {
   bool gfound = false;
   bool ffound = false;

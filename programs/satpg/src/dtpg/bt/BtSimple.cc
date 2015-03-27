@@ -40,7 +40,7 @@ BtSimple::operator()(TpgNode* fnode,
 		     const vector<Bool3>& model,
 		     const vector<TpgNode*>& input_list,
 		     const vector<TpgNode*>& output_list,
-		     AssignList& assign_list)
+		     NodeValList& assign_list)
 {
   assign_list.clear();
   for (vector<TpgNode*>::const_iterator p = input_list.begin();

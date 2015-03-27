@@ -43,7 +43,7 @@ public:
   virtual
   void
   operator()(TpgFault* f,
-	     const AssignList& assign_list);
+	     const NodeValList& assign_list);
 
 
 private:

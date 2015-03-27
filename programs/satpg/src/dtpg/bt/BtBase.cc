@@ -42,7 +42,7 @@ BtBase::set_max_id(ymuint max_id)
 void
 BtBase::record_value(TpgNode* node,
 		     const vector<Bool3>& model,
-		     AssignList& assign_list)
+		     NodeValList& assign_list)
 {
   if ( node->is_input() ) {
     Bool3 v = node_gval(node, model);

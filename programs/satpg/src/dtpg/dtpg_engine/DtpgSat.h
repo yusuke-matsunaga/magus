@@ -147,6 +147,10 @@ protected:
   TpgNode*
   tfo_tfi_node(ymuint pos) const;
 
+  /// @brief 入力のノードのリストを返す．
+  const vector<TpgNode*>&
+  input_list() const;
+
   /// @brief 出力のノードのリストを返す．
   const vector<TpgNode*>&
   output_list() const;
@@ -417,6 +421,14 @@ TpgNode*
 DtpgSat::tfo_tfi_node(ymuint pos) const
 {
   return mTfoList[pos];
+}
+
+// @brief 入力のノードのリストを返す．
+inline
+const vector<TpgNode*>&
+DtpgSat::input_list() const
+{
+  return mInputList;
 }
 
 // @brief 出力のノードのリストを返す．
