@@ -528,12 +528,11 @@ DtpgSat::detect_op(TpgFault* fault,
 		   const USTime& time)
 {
   // バックトレースを行う．
-  TestVector* tv = mBackTracer(fault->node(), mModel, mInputList, mOutputList);
+  AssignList assign_list;
+  mBackTracer(fault->node(), mModel, mInputList, mOutputList, assign_list);
 
   // パタンの登録などを行う．
-  mDetectOp(fault, tv);
-
-  mLastPat = tv;
+  mDetectOp(fault, assign_list);
 
   ++ mStats.mDetCount;
   mStats.mDetTime += time;

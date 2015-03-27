@@ -25,8 +25,7 @@ class BtJustBase :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] tvmgr TvMgr
-  BtJustBase(TvMgr& tvmgr);
+  BtJustBase();
 
   /// @brief デストラクタ
   virtual

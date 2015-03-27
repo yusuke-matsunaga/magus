@@ -27,8 +27,7 @@ class BtBase :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] tvmgr TvMgr
-  BtBase(TvMgr& tvmgr);
+  BtBase();
 
   /// @brief デストラクタ
   virtual
@@ -54,18 +53,15 @@ protected:
   // 継承クラスから用いられる便利関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief テストベクタを生成する．
-  /// @note 結果は mCurPattern に格納される．
-  TestVector*
-  new_vector();
-
   /// @brief 入力ノードの値を記録する．
   /// @param[in] node 対象の外部入力ノード
   /// @param[in] model SAT の割り当て結果
-  /// @note node の値を mCurPattern に記録する．
+  /// @param[out] assign_list 値の割当リスト
+  static
   void
   record_value(TpgNode* node,
-	       const vector<Bool3>& model);
+	       const vector<Bool3>& model,
+	       AssignList& assign_list);
 
   /// @brief ノードの正常値を読み出す．
   /// @param[in] node 対象のノード
@@ -118,12 +114,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // TvMgr
-  TvMgr& mTvMgr;
-
-  // 現在処理中のテストベクタ
-  TestVector* mCurPattern;
 
   // 現在の割当リスト
   AssignList mCurAssignList;

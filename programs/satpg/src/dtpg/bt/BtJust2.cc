@@ -13,11 +13,10 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'Just2' タイプの生成を行なう．
-// @param[in] tvmgr TvMgr
 BackTracer*
-new_BtJust2(TvMgr& tvmgr)
+new_BtJust2()
 {
-  return new BtJust2(tvmgr);
+  return new BtJust2();
 }
 
 
@@ -26,9 +25,7 @@ new_BtJust2(TvMgr& tvmgr)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] tvmgr TvMgr
-BtJust2::BtJust2(TvMgr& tvmgr) :
-  BtJustBase(tvmgr),
+BtJust2::BtJust2() :
   mAlloc(sizeof(NodeList), 1024)
 {
 }
@@ -52,11 +49,13 @@ BtJust2::set_max_id(ymuint max_id)
 // @param[in] model SATの値の割り当て結果を収めた配列
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
-TestVector*
+// @param[out] assign_list 値の割当リスト
+void
 BtJust2::operator()(TpgNode* fnode,
 		    const vector<Bool3>& model,
 		    const vector<TpgNode*>& input_list,
-		    const vector<TpgNode*>& output_list)
+		    const vector<TpgNode*>& output_list,
+		    AssignList& assign_list)
 {
   // 故障差の伝搬している外部出力を選ぶ．
   ymuint nmin = 0;
@@ -76,17 +75,14 @@ BtJust2::operator()(TpgNode* fnode,
   }
   ASSERT_COND( nmin > 0 );
 
-  TestVector* tv = new_vector();
-
+  assign_list.clear();
   for (NodeList* tmp = best_list; tmp; tmp = tmp->mLink) {
     TpgNode* node = tmp->mNode;
-    record_value(node, model);
+    record_value(node, model, assign_list);
   }
 
   // 一連の処理でつけたマークを消す．
   clear_justified();
-
-  return tv;
 }
 
 // @brief clear_justified() 中で呼ばれるフック関数
@@ -108,10 +104,6 @@ BtJust2::NodeList*
 BtJust2::justify(TpgNode* node,
 		 const vector<Bool3>& model)
 {
-  while ( node->id() >= mJustArray.size() ) {
-    mJustArray.push_back(NULL);
-  }
-
   if ( justified_mark(node) ) {
     return mJustArray[node->id()];
   }

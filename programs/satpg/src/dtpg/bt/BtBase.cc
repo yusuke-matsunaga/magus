@@ -8,8 +8,6 @@
 
 
 #include "BtBase.h"
-#include "TvMgr.h"
-#include "TestVector.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -19,9 +17,7 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] tvmgr TvMgr
-BtBase::BtBase(TvMgr& tvmgr) :
-  mTvMgr(tvmgr)
+BtBase::BtBase()
 {
 }
 
@@ -39,33 +35,23 @@ BtBase::set_max_id(ymuint max_id)
 {
 }
 
-// @brief テストベクタを生成する．
-// @note 結果は mCurPattern に格納される．
-TestVector*
-BtBase::new_vector()
-{
-  mCurPattern = mTvMgr.new_vector();
-
-  return mCurPattern;
-}
-
 // @brief 入力ノードの値を記録する．
 // @param[in] node 対象の外部入力ノード
 // @param[in] model SAT の割り当て結果
-// @note node の値を mCurPattern に記録する．
+// @param[out] assign_list 値の割当リスト
 void
 BtBase::record_value(TpgNode* node,
-		     const vector<Bool3>& model)
+		     const vector<Bool3>& model,
+		     AssignList& assign_list)
 {
-  ASSERT_COND( node->is_input() );
-
-  Bool3 v = node_gval(node, model);
-  ymuint iid = node->input_id();
-  if ( v == kB3False ) {
-    mCurPattern->set_val(iid, kVal0);
-  }
-  else if ( v == kB3True ) {
-    mCurPattern->set_val(iid, kVal1);
+  if ( node->is_input() ) {
+    Bool3 v = node_gval(node, model);
+    if ( v == kB3False ) {
+      assign_list.add(node->input_id(), false);
+    }
+    else if ( v == kB3True ) {
+      assign_list.add(node->input_id(), true);
+    }
   }
 }
 

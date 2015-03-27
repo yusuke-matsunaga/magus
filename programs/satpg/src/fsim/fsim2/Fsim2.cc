@@ -13,6 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
+#include "AssignList.h"
 #include "DetectOp.h"
 #include "SimNode.h"
 #include "SimFFR.h"
@@ -260,6 +261,41 @@ Fsim2::sppfp(TestVector* tv,
     simnode->set_gval(val);
   }
 
+  _sppfp(op);
+}
+
+// @brief ひとつのパタンで故障シミュレーションを行う．
+// @param[in] assign_list 値の割当リスト
+// @param[in] op 検出した時に起動されるファンクタオブジェクト
+void
+Fsim2::sppfp(const AssignList& assign_list,
+	     FsimOp& op)
+{
+  ymuint npi = mNetwork->input_num2();
+
+  // デフォルトで 0 にする．
+  for (ymuint i = 0; i < npi; ++ i) {
+    SimNode* simnode = mInputArray[i];
+    simnode->set_gval(kPvAll0);
+  }
+
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const Assign& as = assign_list.elem(i);
+    if ( as.val() ) {
+      SimNode* simnode = mInputArray[as.node_id()];
+      simnode->set_gval(kPvAll1);
+    }
+  }
+
+  _sppfp(op);
+}
+
+// @brief SPPFP故障シミュレーションの本体
+// @param[in] op 検出した時に起動されるファンクタオブジェクト
+void
+Fsim2::_sppfp(FsimOp& op)
+{
   // 正常値の計算を行う．
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
        q != mLogicArray.end(); ++ q) {
@@ -434,6 +470,45 @@ Fsim2::spsfp(TestVector* tv,
     simnode->set_gval(val);
   }
 
+  return _spsfp(f);
+}
+
+// @brief SPSFP故障シミュレーションを行う．
+// @param[in] assign_list 値の割当リスト
+// @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
+bool
+Fsim2::spsfp(const AssignList& assign_list,
+	     TpgFault* f)
+{
+  ymuint npi = mNetwork->input_num2();
+
+  // assign_list にないノードの値は 0 にしておく．
+  for (ymuint i = 0; i < npi; ++ i) {
+    SimNode* simnode = mInputArray[i];
+    simnode->set_gval(kPvAll0);
+  }
+
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const Assign& as = assign_list.elem(i);
+    if ( as.val() ) {
+      SimNode* simnode = mInputArray[as.node_id()];
+      simnode->set_gval(kPvAll1);
+    }
+  }
+
+  return _spsfp(f);
+}
+
+// @brief SPSFP故障シミュレーションの本体
+// @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
+bool
+Fsim2::_spsfp(TpgFault* f)
+{
   // 正常値の計算を行う．
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
        q != mLogicArray.end(); ++ q) {

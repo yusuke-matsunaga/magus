@@ -70,6 +70,8 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "specify option string <STR>");
   mPoptVerify = new TclPopt(this, "verify",
 			    "verify generated pattern");
+  mPoptNoPat = new TclPopt(this, "no_pat",
+			   "do not generate patterns");
   mPoptTimer = new TclPopt(this, "timer",
 			   "enable timer");
   mPoptNoTimer = new TclPopt(this, "notimer",
@@ -169,7 +171,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   DopList dop_list;
   UopList uop_list;
 
-  dop_list.add(new_DopTvList(_tv_list()));
+  if ( !mPoptNoPat->is_specified() ) {
+    dop_list.add(new_DopTvList(_tv_mgr(), _tv_list()));
+  }
   dop_list.add(new_DopBase(_fault_mgr()));
   uop_list.add(new_UopBase(_fault_mgr()));
 
@@ -177,15 +181,15 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   if ( mPoptX->is_specified() ) {
     xmode = mPoptX->val();
   }
-  TvMgr& tvmgr = _tv_mgr();
+
   BackTracer* bt = NULL;
   switch ( xmode ) {
-  case 1: bt = new_BtJust1(tvmgr); break;
-  case 2: bt = new_BtJust2(tvmgr); break;
+  case 1: bt = new_BtJust1(); break;
+  case 2: bt = new_BtJust2(); break;
 #if 0
-  case 3: bt = new_BtZdd(tvmgr); break;
+  case 3: bt = new_BtZdd(); break;
 #endif
-  default: bt = new_BtSimple(tvmgr); break;
+  default: bt = new_BtSimple(); break;
   }
   if ( bt != NULL ) {
     bt->set_max_id(_network().max_node_id());

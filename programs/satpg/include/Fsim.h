@@ -69,12 +69,30 @@ public:
   spsfp(TestVector* tv,
 	TpgFault* f) = 0;
 
+  /// @brief SPSFP故障シミュレーションを行う．
+  /// @param[in] assign_list 値の割当リスト
+  /// @param[in] f 対象の故障
+  /// @retval true 故障の検出が行えた．
+  /// @retval false 故障の検出が行えなかった．
+  virtual
+  bool
+  spsfp(const AssignList& assign_list,
+	TpgFault* f) = 0;
+
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
   /// @param[in] op 検出した時に起動されるファンクタオブジェクト
   virtual
   void
   sppfp(TestVector* tv,
+	FsimOp& op) = 0;
+
+  /// @brief ひとつのパタンで故障シミュレーションを行う．
+  /// @param[in] assign_list 値の割当リスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
+  virtual
+  void
+  sppfp(const AssignList& assign_list,
 	FsimOp& op) = 0;
 
   /// @brief 複数のパタンで故障シミュレーションを行う．

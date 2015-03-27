@@ -24,8 +24,7 @@ class BtJust1 :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] tvmgr TvMgr
-  BtJust1(TvMgr& tvmgr);
+  BtJust1();
 
   /// @brief デストラクタ
   virtual
@@ -42,11 +41,14 @@ public:
   /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @param[in] input_list テストパタンに関係のある入力のリスト
   /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
-  TestVector*
+  /// @param[out] assign_list 値の割当リスト
+  virtual
+  void
   operator()(TpgNode* fnode,
 	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
-	     const vector<TpgNode*>& output_list);
+	     const vector<TpgNode*>& output_list,
+	     AssignList& assign_list);
 
 
 protected:
@@ -57,28 +59,34 @@ protected:
   /// @brief solve 中で変数割り当ての正当化を行なう．
   /// @param[in] node 対象のノード
   /// @param[in] model SATの値の割り当て結果を収めた配列
+  /// @param[out] assign_list 値の割当リスト
   /// @note node の値割り当てを正当化する．
   /// @note 正当化に用いられているノードには mark3 がつく．
   /// @note mark3 がついたノードは mBwdNodeList に格納される．
   void
   justify(TpgNode* node,
-	  const vector<Bool3>& model);
+	  const vector<Bool3>& model,
+	  AssignList& assign_list);
 
   /// @brief すべてのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
   /// @param[in] model SATの値の割り当て結果を収めた配列
+  /// @param[out] assign_list 値の割当リスト
   void
   just_sub1(TpgNode* node,
-	    const vector<Bool3>& model);
+	    const vector<Bool3>& model,
+	    AssignList& assign_list);
 
   /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
   /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @param[in] val 値
+  /// @param[out] assign_list 値の割当リスト
   void
   just_sub2(TpgNode* node,
 	    const vector<Bool3>& model,
-	    Bool3 val);
+	    Bool3 val,
+	    AssignList& assign_list);
 
 };
 

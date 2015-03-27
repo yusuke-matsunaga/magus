@@ -38,11 +38,11 @@ public:
 
   /// @brief テストパタンが見つかった時の処理
   /// @param[in] f 故障
-  /// @param[in] tv テストパタン
+  /// @param[in] assign_list 値の割当リスト
   virtual
   void
   operator()(TpgFault* f,
-	     TestVector* tv);
+	     const AssignList& assign_list);
 
 
 private:

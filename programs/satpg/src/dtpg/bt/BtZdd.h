@@ -49,11 +49,14 @@ public:
   /// @param[in] model SATの値の割り当て結果を収めた配列
   /// @param[in] input_list テストパタンに関係のある入力のリスト
   /// @param[in] output_list 故障伝搬の可能性のある出力のリスト
-  TestVector*
+  /// @param[out] assign_list 値の割当リスト
+  virtual
+  void
   operator()(TpgNode* fnode,
 	     const vector<Bool3>& model,
 	     const vector<TpgNode*>& input_list,
-	     const vector<TpgNode*>& output_list);
+	     const vector<TpgNode*>& output_list,
+	     AssignList& assign_list);
 
 
 protected:

@@ -68,6 +68,8 @@ class AssignList
 public:
 
   /// @brief コンストラクタ
+  ///
+  /// 空のリストが生成される．
   AssignList();
 
   /// @brief デストラクタ
@@ -78,6 +80,10 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 内容を空にする．
+  void
+  clear();
 
   /// @brief 値を追加する．
   /// @param[in] node_id ノードID
@@ -162,6 +168,14 @@ AssignList::AssignList()
 inline
 AssignList::~AssignList()
 {
+}
+
+// @brief 内容を空にする．
+inline
+void
+AssignList::clear()
+{
+  mAsList.clear();
 }
 
 // @brief 値を追加する．

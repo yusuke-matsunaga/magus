@@ -94,6 +94,9 @@ private:
   // k_det オプションの解析用オブジェクト
   TclPoptInt* mPoptKDet;
 
+  // no_pat オプションの解析用オブジェクト
+  TclPopt* mPoptNoPat;
+
   // オプション文字列オプションの解析用オブジェクト
   TclPoptStr* mPoptOpt;
 

@@ -40,12 +40,12 @@ DopVerify::~DopVerify()
 
 // @brief テストパタンが見つかった時の処理
 // @param[in] f 故障
-// @param[in] tv テストパタン
+// @param[in] assign_list 値割当のリスト
 void
 DopVerify::operator()(TpgFault* f,
-		      TestVector* tv)
+		      const AssignList& assign_list)
 {
-  bool detect = mFsim.spsfp(tv, f);
+  bool detect = mFsim.spsfp(assign_list, f);
   ASSERT_COND( detect );
 }
 

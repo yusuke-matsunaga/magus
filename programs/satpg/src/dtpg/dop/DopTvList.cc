@@ -8,17 +8,20 @@
 
 
 #include "DopTvList.h"
-#include "FaultMgr.h"
+#include "TvMgr.h"
+#include "AssignList.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'base' タイプを生成する．
+// @param[in] tvmgr テストベクタのマネージャ
 // @param[in] tvlist テストベクタのリスト
 DetectOp*
-new_DopTvList(vector<TestVector*>& tvlist)
+new_DopTvList(TvMgr& tvmgr,
+	      vector<TestVector*>& tvlist)
 {
-  return new DopTvList(tvlist);
+  return new DopTvList(tvmgr, tvlist);
 }
 
 
@@ -27,8 +30,11 @@ new_DopTvList(vector<TestVector*>& tvlist)
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] tvmgr テストベクタのマネージャ
 // @param[in] tvlist テストベクタのリスト
-DopTvList::DopTvList(vector<TestVector*>& tvlist) :
+DopTvList::DopTvList(TvMgr& tvmgr,
+		     vector<TestVector*>& tvlist) :
+  mTvMgr(tvmgr),
   mTvList(tvlist)
 {
 }
@@ -40,11 +46,23 @@ DopTvList::~DopTvList()
 
 // @brief テストパタンが見つかった時の処理
 // @param[in] f 故障
-// @param[in] tv テストパタン
+// @param[in] assign_list 値割当のリスト
 void
 DopTvList::operator()(TpgFault* f,
-		      TestVector* tv)
+		      const AssignList& assign_list)
 {
+  TestVector* tv = mTvMgr.new_vector();
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const Assign& as = assign_list.elem(i);
+    ymuint id = as.node_id();
+    if ( as.val() ) {
+      tv->set_val(id, kVal1);
+    }
+    else {
+      tv->set_val(id, kVal0);
+    }
+  }
   mTvList.push_back(tv);
 }
 

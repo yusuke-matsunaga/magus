@@ -13,6 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
+#include "AssignList.h"
 #include "SimNode.h"
 #include "SimFFR.h"
 #include "YmUtils/HashSet.h"
@@ -259,10 +260,10 @@ bool
 Fsim3::spsfp(TestVector* tv,
 	     TpgFault* f)
 {
-  ymuint npi = mNetwork->input_num2();
-
   // tv を全ビットにセットしていく．
   mGvalClearArray.clear();
+
+  ymuint npi = mNetwork->input_num2();
   for (ymuint i = 0; i < npi; ++ i) {
     SimNode* simnode = mInputArray[i];
     switch ( tv->val3(i) ) {
@@ -273,6 +274,44 @@ Fsim3::spsfp(TestVector* tv,
     update_gval(simnode);
   }
 
+  return _spsfp(f);
+}
+
+// @brief SPSFP故障シミュレーションを行う．
+// @param[in] assign_list 値の割当リスト
+// @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
+bool
+Fsim3::spsfp(const AssignList& assign_list,
+	     TpgFault* f)
+{
+  // assign_list を全ビットにセットしていく．
+  mGvalClearArray.clear();
+
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const Assign& as = assign_list.elem(i);
+    SimNode* simnode = mInputArray[as.node_id()];
+    if ( as.val() ) {
+      simnode->set_gval(kPvAll0, kPvAll1);
+    }
+    else {
+      simnode->set_gval(kPvAll1, kPvAll0);
+    }
+    update_gval(simnode);
+  }
+
+  return _spsfp(f);
+}
+
+// @brief SPSFP故障シミュレーションの本体
+// @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
+bool
+Fsim3::_spsfp(TpgFault* f)
+{
   // 正常値の計算を行う．
   calc_gval();
 
@@ -336,18 +375,50 @@ Fsim3::sppfp(TestVector* tv,
 
   // tv を全ビットにセットしていく．
   mGvalClearArray.clear();
-  {
-    for (ymuint i = 0; i < npi; ++ i) {
-      SimNode* simnode = mInputArray[i];
-      switch ( tv->val3(i) ) {
-      case kVal0: simnode->set_gval(kPvAll1, kPvAll0); break;
-      case kVal1: simnode->set_gval(kPvAll0, kPvAll1); break;
-      case kValX: continue; // 直前の clear_gval() で X になっているはず．
-      }
-      update_gval(simnode);
+  for (ymuint i = 0; i < npi; ++ i) {
+    SimNode* simnode = mInputArray[i];
+    switch ( tv->val3(i) ) {
+    case kVal0: simnode->set_gval(kPvAll1, kPvAll0); break;
+    case kVal1: simnode->set_gval(kPvAll0, kPvAll1); break;
+    case kValX: continue; // 直前の clear_gval() で X になっているはず．
     }
+    update_gval(simnode);
   }
 
+  _sppfp(op);
+}
+
+// @brief ひとつのパタンで故障シミュレーションを行う．
+// @param[in] assign_list 値の割当リスト
+// @param[in] op 検出した時に起動されるファンクタオブジェクト
+void
+Fsim3::sppfp(const AssignList& assign_list,
+	     FsimOp& op)
+{
+  // assign_list を全ビットにセットしていく．
+  mGvalClearArray.clear();
+
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const Assign& as = assign_list.elem(i);
+    SimNode* simnode = mInputArray[as.node_id()];
+    if ( as.val() ) {
+      simnode->set_gval(kPvAll0, kPvAll1);
+    }
+    else {
+      simnode->set_gval(kPvAll1, kPvAll0);
+    }
+    update_gval(simnode);
+  }
+
+  _sppfp(op);
+}
+
+// @brief SPPFP故障シミュレーションの本体
+// @param[in] op 検出した時に起動されるファンクタオブジェクト
+void
+Fsim3::_sppfp(FsimOp& op)
+{
   // 正常値の計算を行う．
   calc_gval();
 

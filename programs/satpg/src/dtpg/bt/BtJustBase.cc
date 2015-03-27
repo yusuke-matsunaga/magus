@@ -17,9 +17,7 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] tvmgr TvMgr
-BtJustBase::BtJustBase(TvMgr& tvmgr) :
-  BtBase(tvmgr)
+BtJustBase::BtJustBase()
 {
 }
 

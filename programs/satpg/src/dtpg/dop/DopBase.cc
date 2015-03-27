@@ -40,10 +40,11 @@ DopBase::~DopBase()
 
 // @brief テストパタンが見つかった時の処理
 // @param[in] f 故障
-// @param[in] tv テストパタン
+// @param[in] assign_list 値割当のリスト
 void
 DopBase::operator()(TpgFault* f,
-		    TestVector* tv)
+		    const AssignList& assign_list)
+
 {
   mMgr.set_status(f, kFsDetected);
 }
