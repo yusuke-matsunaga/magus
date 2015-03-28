@@ -104,21 +104,19 @@ BtJust3::NodeList*
 BtJust3::justify(TpgNode* node,
 		 const vector<Bool3>& model)
 {
-  while ( node->id() >= mJustArray.size() ) {
-    mJustArray.push_back(NULL);
-  }
+  ASSERT_COND( node->id() < mJustArray.size() );
 
   if ( justified_mark(node) ) {
     return mJustArray[node->id()];
   }
   set_justified(node);
 
-  mJustArray[node->id()] = new_list_cell(node);
-
-  if ( node->is_input() ) {
+  if ( !node->has_fvar() || node_dval(node, model) == kB3False || node->is_input() ) {
+    mJustArray[node->id()] = new_list_cell(node);
     return mJustArray[node->id()];
   }
 
+#if 0
   Bool3 gval = node_gval(node, model);
   Bool3 fval = node_fval(node, model);
 
@@ -188,6 +186,9 @@ BtJust3::justify(TpgNode* node,
     ASSERT_NOT_REACHED;
     break;
   }
+#else
+  return just_sub1(node, model);
+#endif
 
   return NULL;
 }

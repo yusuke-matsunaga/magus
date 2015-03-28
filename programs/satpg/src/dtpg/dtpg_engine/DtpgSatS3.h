@@ -10,7 +10,8 @@
 /// All rights reserved.
 
 
-#include "DtpgSatBaseS.h"
+#include "DtpgSat.h"
+#include "NodeValList.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,7 +21,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 1つの故障を対象とした CNF を生成する DtpgSat
 //////////////////////////////////////////////////////////////////////
 class DtpgSatS3 :
-  public DtpgSatBaseS
+  public DtpgSat
 {
 public:
 
@@ -48,6 +49,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief テスト生成を行なう．
+  /// @param[in] network 対象のネットワーク
+  /// @param[in] stats 結果を格納する構造体
+  virtual
+  void
+  run(TpgNetwork& network,
+      DtpgStats& stats);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -57,10 +66,43 @@ private:
   /// @brief テスト生成を行なう．
   /// @param[in] network 対象のネットワーク
   /// @param[in] f_tgt 対象の故障
-  virtual
-  void
+  bool
   run_single(TpgNetwork& network,
 	     TpgFault* f_tgt);
+
+  /// @brief 他の故障との関係を調べる．
+  void
+  check_other_faults(TpgNetwork& network,
+		     TpgFault* f_tgt,
+		     const vector<TpgFault*>& fault_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // このクラスで使われるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 各故障ごとの情報をまとめた構造体
+  struct FaultInfo
+  {
+    /// @brief コンストラクタ
+    FaultInfo();
+
+    /// @brief デストラクタ
+    ~FaultInfo();
+
+    // 検出可能フラグ
+    bool mDetected;
+
+    // 必要割当リスト
+    NodeValList mMaList;
+
+    // 排他的な故障のリスト
+    vector<ymuint> mConflictList;
+
+    // 支配している故障のリスト
+    vector<ymuint> mDominateList;
+  };
 
 
 private:
@@ -70,6 +112,9 @@ private:
 
   // バックトレーサー
   BackTracer* mBt;
+
+  // 各故障の情報を収める配列
+  vector<FaultInfo> mFaultInfoArray;
 
 };
 

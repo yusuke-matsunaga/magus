@@ -45,7 +45,7 @@ DtpgSatS3::DtpgSatS3(const string& sat_type,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop) :
-  DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop)
+  DtpgSat(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
   mBt = new_BtJust3();
 }
@@ -56,10 +56,92 @@ DtpgSatS3::~DtpgSatS3()
   delete mBt;
 }
 
+// @brief テスト生成を行なう．
+// @param[in] network 対象のネットワーク
+// @param[in] stats 結果を格納する構造体
+void
+DtpgSatS3::run(TpgNetwork& network,
+	       DtpgStats& stats)
+{
+  clear_stats();
+
+  ymuint nn = network.active_node_num();
+  ymuint max_fault_id = 0;
+  for (ymuint i = 0; i < nn; ++ i) {
+    TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      if ( f->status() != kFsDetected &&
+	   !f->is_skip() ) {
+	ymuint fid = f->id();
+	if ( max_fault_id < fid ) {
+	  max_fault_id = fid;
+	}
+      }
+    }
+  }
+
+  ++ max_fault_id;
+  mFaultInfoArray.clear();
+  mFaultInfoArray.resize(max_fault_id);
+
+  // 一回目は普通のテスト生成と必要割当の検査
+  vector<TpgFault*> fault_list;
+  ymuint max_id = network.max_node_id();
+  for (ymuint i = 0; i < nn; ++ i) {
+    TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+
+    mark_region(max_id, vector<TpgNode*>(1, node));
+
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      FaultInfo& fi = mFaultInfoArray[f->id()];
+      fi.mDetected = run_single(network, f);
+      if ( fi.mDetected ) {
+	fault_list.push_back(f);
+      }
+    }
+
+    clear_node_mark();
+  }
+
+  // 二回目は包含関係と排他性の検査
+  for (ymuint i = 0; i < nn; ++ i) {
+    TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+
+    mark_region(max_id, vector<TpgNode*>(1, node));
+
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* f = node->fault(i);
+      FaultInfo& fi = mFaultInfoArray[f->id()];
+      if ( fi.mDetected ) {
+	check_other_faults(network, f, fault_list);
+      }
+    }
+
+    clear_node_mark();
+  }
+
+  get_stats(stats);
+}
+
 // @brief テストパタン生成を行なう．
 // @param[in] network 対象のネットワーク
 // @param[in] flist 故障リスト
-void
+bool
 DtpgSatS3::run_single(TpgNetwork& network,
 		      TpgFault* fault)
 {
@@ -135,9 +217,6 @@ DtpgSatS3::run_single(TpgNetwork& network,
     engine.assumption_add(dlit);
   }
 
-  cout << fault->str() << ":";
-  cout.flush();
-
   vector<Bool3> sat_model;
   Bool3 sat_ans = engine.solve(sat_model);
   if ( sat_ans == kB3True ) {
@@ -147,7 +226,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
     // 必要割当を求める．
     vector<Bool3> tmp_model;
     ymuint n = as_list.size();
-    NodeValList ma_list;
+    NodeValList& ma_list = mFaultInfoArray[fault->id()].mMaList;
     for (ymuint i = 0; i < n; ++ i) {
       NodeVal nv = as_list[i];
 
@@ -178,15 +257,155 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	;
       }
     }
-    for (ymuint i = 0; i < ma_list.size(); ++ i) {
-      NodeVal nv = ma_list[i];
-      cout << " Node#" << nv.node()->id()
-	   << ":" << nv.val();
-    }
-    cout << endl;
+    cout << fault->str() << ": necessary assignment = " << as_list.size()
+	 << ", mandatory assignment = " << ma_list.size() << endl;
   }
 
-  clear_node_mark();
+  return sat_ans == kB3True;
+}
+
+// @brief 他の故障との関係を調べる．
+void
+DtpgSatS3::check_other_faults(TpgNetwork& network,
+			      TpgFault* f1,
+			      const vector<TpgFault*>& fault_list)
+{
+  TpgNode* fnode = f1->node();
+
+  cnf_begin();
+
+  SatEngine engine(sat_type(), sat_option(), sat_outp());
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId gvar = engine.new_var();
+    node->set_gvar(gvar);
+  }
+  for (ymuint i = 0; i < tfo_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    VarId fvar = engine.new_var();
+    VarId dvar = engine.new_var();
+    node->set_fvar(fvar, dvar);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+    make_gval_cnf(engine, node);
+    cout << "Node#" << node->id() << ": gvar = " << node->gvar() << endl;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < tfo_size(); ++ i) {
+    TpgNode* node = tfo_tfi_node(i);
+
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      make_fault_cnf(engine, f1);
+    }
+    else {
+      make_fval_cnf(engine, node);
+    }
+
+    // D-Chain 制約を作る．
+    make_dchain_cnf(engine, node);
+
+    cout << "Node#" << node->id() << ": fvar = " << node->fvar()
+	 << ", dvar = " << node->dvar() << endl;
+  }
+
+  VarId switch_var = engine.new_var();
+  Literal switch_lit(switch_var, false);
+
+  cout << "switch_var = " << switch_var << endl;
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = output_list().size();
+  engine.tmp_lits_begin(npo + 1);
+  for (ymuint i = 0; i < npo; ++ i) {
+    TpgNode* node = output_list()[i];
+    Literal dlit(node->dvar(), false);
+    engine.tmp_lits_add(dlit);
+  }
+  engine.tmp_lits_add(~switch_lit);
+  engine.tmp_lits_end();
+
+  cnf_end();
+
+  for (vector<TpgFault*>::const_iterator p = fault_list.begin();
+       p != fault_list.end(); ++ p) {
+    TpgFault* f2 = *p;
+
+    // f2 の必要割当のもとで f1 が求められるか調べる．
+
+    // 故障に対するテスト生成を行なう．
+    engine.assumption_begin();
+
+    engine.assumption_add(switch_lit);
+
+    // dominator ノードの dvar は1でなければならない．
+    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(node->dvar(), false);
+      engine.assumption_add(dlit);
+    }
+
+    bool assumed = false;
+    const NodeValList& ma_list = mFaultInfoArray[f2->id()].mMaList;
+    for (ymuint i = 0; i < ma_list.size(); ++ i) {
+      NodeVal nv = ma_list[i];
+      TpgNode* node1 = nv.node();
+      if ( node1->has_gvar() ) {
+	assumed = true;
+	Literal mlit(node1->gvar(), false);
+	if ( nv.val() ) {
+	  engine.assumption_add(mlit);
+	}
+	else {
+	  engine.assumption_add(~mlit);
+	}
+	cout << " mlit = " << mlit << ", Node#" << node1->id() << endl;
+      }
+    }
+
+    if ( !assumed ) {
+      continue;
+    }
+
+    vector<Bool3> tmp_model;
+    Bool3 tmp_stat = engine.solve(tmp_model);
+    if ( tmp_stat == kB3True ) {
+      // 検出できた．
+      ;
+    }
+    else if ( tmp_stat == kB3False ) {
+      // 検出できなかった．
+      cout << f1->str() << " and " << f2->str() << " conflict with each other" << endl;
+    }
+    else {
+      // アボート．とりあえず無視
+      ;
+    }
+  }
+}
+
+// @brief コンストラクタ
+DtpgSatS3::FaultInfo::FaultInfo()
+{
+  mDetected = false;
+}
+
+// @brief デストラクタ
+DtpgSatS3::FaultInfo::~FaultInfo()
+{
 }
 
 END_NAMESPACE_YM_SATPG
