@@ -411,6 +411,13 @@ private:
 
 };
 
+/// @brief TpgNetwork の内容を出力する関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] network 対象のネットワーク
+void
+print_network(ostream& s,
+	      const TpgNetwork& network);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義

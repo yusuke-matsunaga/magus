@@ -1265,4 +1265,43 @@ TpgNetwork::new_fault(TpgNode* node,
   return f;
 }
 
+// @brief TpgNetwork の内容を出力する関数
+// @param[in] s 出力先のストリーム
+// @param[in] network 対象のネットワーク
+void
+print_network(ostream& s,
+	      const TpgNetwork& network)
+{
+  ymuint n = network.node_num();
+  for (ymuint i = 0; i < n; ++ i) {
+    const TpgNode* node = network.node(i);
+    cout << "Node#" << node->id() << ": ";
+    if ( node->is_input() ) {
+      cout << "INPUT#" << node->input_id();
+    }
+    else if ( node->is_output() ) {
+      cout << "OUTPUT#" << node->output_id();
+      const TpgNode* inode = node->fanin(0);
+      cout << " = Node#" << inode->id();
+    }
+    else if ( node->is_logic() ) {
+      cout << node->gate_type();
+      ymuint ni = node->fanin_num();
+      if ( ni > 0 ) {
+	cout << "(";
+	for (ymuint j = 0; j < ni; ++ j) {
+	  const TpgNode* inode = node->fanin(j);
+	  cout << " Node#" << inode->id();
+	}
+	cout << ")";
+      }
+    }
+    else {
+      ASSERT_NOT_REACHED;
+    }
+    cout << endl;
+  }
+  cout << endl;
+}
+
 END_NAMESPACE_YM_SATPG

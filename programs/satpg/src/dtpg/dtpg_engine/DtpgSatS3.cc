@@ -20,6 +20,10 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+const bool do_verify = false;
+END_NONAMESPACE
+
 // @brief Single エンジンを作る．
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
@@ -113,7 +117,7 @@ DtpgSatS3::run(TpgNetwork& network,
 
     clear_node_mark();
   }
-
+#if 0
   // 二回目は包含関係と排他性の検査
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = network.active_node(i);
@@ -131,9 +135,9 @@ DtpgSatS3::run(TpgNetwork& network,
 	check_other_faults(network, f, fault_list);
       }
     }
-
     clear_node_mark();
   }
+#endif
 
   get_stats(stats);
 }
@@ -219,49 +223,152 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
   vector<Bool3> sat_model;
   Bool3 sat_ans = engine.solve(sat_model);
-  if ( sat_ans == kB3True ) {
-    NodeValList as_list;
-    (*mBt)(fault->node(), sat_model, input_list(), output_list(), as_list);
-
-    // 必要割当を求める．
-    vector<Bool3> tmp_model;
-    ymuint n = as_list.size();
-    NodeValList& ma_list = mFaultInfoArray[fault->id()].mMaList;
-    for (ymuint i = 0; i < n; ++ i) {
-      NodeVal nv = as_list[i];
-
-      engine.assumption_begin();
-
-      // dominator ノードの dvar は1でなければならない．
-      for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-	Literal dlit(node->dvar(), false);
-	engine.assumption_add(dlit);
-      }
-
-      // node の割当の反対を試す．
-      TpgNode* node = nv.node();
-      bool inv = nv.val();
-      Literal alit(node->gvar(), inv);
-      engine.assumption_add(alit);
-
-      Bool3 tmp_stat = engine.solve(tmp_model);
-      if ( tmp_stat == kB3True ) {
-	// 反対でも検出できたので必要割当ではない．
-	;
-      }
-      else if ( tmp_stat == kB3False ) {
-	ma_list.add(node, nv.val());
-      }
-      else {
-	// アボート．とりあえず無視
-	;
-      }
-    }
-    cout << fault->str() << ": necessary assignment = " << as_list.size()
-	 << ", mandatory assignment = " << ma_list.size() << endl;
+  if ( sat_ans != kB3True ) {
+    return false;
   }
 
-  return sat_ans == kB3True;
+  // 十分割当を求める．
+  NodeValList& suf_list = mFaultInfoArray[fault->id()].mSufList;
+  (*mBt)(fault->node(), sat_model, input_list(), output_list(), suf_list);
+
+  if ( do_verify ) { // 検証
+    SatEngine engine(sat_type(), sat_option(), sat_outp());
+
+    //////////////////////////////////////////////////////////////////////
+    // 変数の割当
+    //////////////////////////////////////////////////////////////////////
+    for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+      TpgNode* node = tfo_tfi_node(i);
+      VarId gvar = engine.new_var();
+      node->set_gvar(gvar);
+    }
+    for (ymuint i = 0; i < tfo_size(); ++ i) {
+      TpgNode* node = tfo_tfi_node(i);
+      VarId fvar = engine.new_var();
+      VarId dvar = engine.new_var();
+      node->set_fvar(fvar, dvar);
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // 正常回路の CNF を生成
+    //////////////////////////////////////////////////////////////////////
+    for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
+      TpgNode* node = tfo_tfi_node(i);
+      make_gval_cnf(engine, node);
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // 故障回路の CNF を生成
+    //////////////////////////////////////////////////////////////////////
+    for (ymuint i = 0; i < tfo_size(); ++ i) {
+      TpgNode* node = tfo_tfi_node(i);
+
+      // 故障回路のゲートの入出力関係を表すCNFを作る．
+      if ( node == fnode ) {
+	make_fault_cnf(engine, fault);
+      }
+      else {
+	make_fval_cnf(engine, node);
+      }
+
+      // D-Chain 制約を作る．
+      make_dchain_cnf(engine, node);
+    }
+
+    // 上の割当のもとでは常に故障が検出できることを検証する．
+    engine.assumption_begin();
+
+    ymuint n = suf_list.size();
+    for (ymuint i = 0; i < n; ++ i) {
+      NodeVal nv = suf_list[i];
+      TpgNode* node = nv.node();
+      VarId vid = node->gvar();
+      bool inv = nv.val();
+      Literal alit(vid, !inv);
+      engine.assumption_add(alit);
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // 故障の非検出条件
+    //////////////////////////////////////////////////////////////////////
+    ymuint npo = output_list().size();
+    for (ymuint i = 0; i < npo; ++ i) {
+      TpgNode* node = output_list()[i];
+      Literal dlit(node->dvar(), false);
+      engine.assumption_add(~dlit);
+    }
+    vector<Bool3> tmp_model;
+    Bool3 tmp_stat = engine.solve(tmp_model);
+    if ( tmp_stat == kB3True ) {
+      cout << "ERROR: not a sufficient condition" << endl;
+      print_network(cout, network);
+      for (ymuint i = 0; i < n; ++ i) {
+	NodeVal nv = suf_list[i];
+	TpgNode* node = nv.node();
+	cout << "Node#" << node->id()
+	     << ", gval = " << tmp_model[node->gvar().val()];
+	if ( node->has_fvar() ) {
+	  cout << ", fval = " << tmp_model[node->fvar().val()]
+	       << ", dval = " << tmp_model[node->dvar().val()];
+	}
+	cout << endl;
+      }
+      cout << fault->str() << endl;
+      for (ymuint i = 0; i < n; ++ i) {
+	NodeVal nv = suf_list[i];
+	TpgNode* node = nv.node();
+	cout << " Node#" << node->id() << ":";
+	if ( nv.val() ) {
+	  cout << "1";
+	}
+	else {
+	  cout << "0";
+	}
+      }
+      cout << endl;
+      abort();
+    }
+  }
+
+  // 必要割当を求める．
+  vector<Bool3> tmp_model;
+  ymuint n = suf_list.size();
+  NodeValList& ma_list = mFaultInfoArray[fault->id()].mMaList;
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = suf_list[i];
+
+    engine.assumption_begin();
+
+    // dominator ノードの dvar は1でなければならない．
+    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(node->dvar(), false);
+      engine.assumption_add(dlit);
+    }
+
+    // node の割当の反対を試す．
+    TpgNode* node = nv.node();
+    bool inv = nv.val();
+    Literal alit(node->gvar(), inv);
+    engine.assumption_add(alit);
+
+    Bool3 tmp_stat = engine.solve(tmp_model);
+    if ( tmp_stat == kB3True ) {
+      // 反対でも検出できたので必要割当ではない．
+      ;
+    }
+    else if ( tmp_stat == kB3False ) {
+      // 失敗したということはこの割当は必要である．
+      ma_list.add(node, nv.val());
+    }
+    else {
+      // アボート．とりあえず無視
+      ;
+    }
+  }
+  cout << fault->str() << ": sufficient assignment = " << suf_list.size()
+       << ", mandatory assignment = " << ma_list.size() << endl;
+
+  return true;
 }
 
 // @brief 他の故障との関係を調べる．

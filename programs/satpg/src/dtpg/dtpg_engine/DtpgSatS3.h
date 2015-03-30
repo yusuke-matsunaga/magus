@@ -94,6 +94,9 @@ private:
     // 検出可能フラグ
     bool mDetected;
 
+    // 十分割当リスト
+    NodeValList mSufList;
+
     // 必要割当リスト
     NodeValList mMaList;
 
