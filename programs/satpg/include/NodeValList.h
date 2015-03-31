@@ -55,6 +55,12 @@ public:
   bool
   val() const;
 
+  /// @brief 大小関係の比較関数
+  friend
+  bool
+  operator<(const NodeVal& left,
+	    const NodeVal& right);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -100,6 +106,13 @@ public:
   add(TpgNode* node,
       bool val);
 
+  /// @brief マージする．
+  /// @param[in] src_list マージするリスト
+  ///
+  /// 矛盾する割当があった場合の動作は不定
+  void
+  merge(const NodeValList& src_list);
+
   /// @brief 要素数を返す．
   ymuint
   size() const;
@@ -125,6 +138,16 @@ private:
   vector<ympuint> mAsList;
 
 };
+
+/// @brief 2つの割当リストが矛盾しているか調べる．
+bool
+check_conflict(const NodeValList& src_list1,
+	       const NodeValList& src_list2);
+
+/// @brief 割当リストの内容を出力する．
+ostream&
+operator<<(ostream& s,
+	   const NodeValList& src_list);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -172,6 +195,15 @@ bool
 NodeVal::val() const
 {
   return static_cast<bool>(mPackVal & 1UL);
+}
+
+// @brief 大小関係の比較関数
+inline
+bool
+operator<(const NodeVal& left,
+	  const NodeVal& right)
+{
+  return left.mPackVal < right.mPackVal;
 }
 
 // @brief コンストラクタ

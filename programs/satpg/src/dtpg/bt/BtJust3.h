@@ -11,6 +11,7 @@
 
 #include "BtJustBase.h"
 #include "YmUtils/HashSet.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -57,11 +58,23 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  bool
+  dfs(TpgNode* node,
+      const vector<Bool3>& model,
+      HashMap<ymuint, bool>& mark,
+      vector<TpgNode*>& node_list);
+
   void
   record_recur(TpgNode* node,
 	       const vector<Bool3>& model,
 	       HashSet<ymuint>& mark,
 	       NodeValList& assign_list);
+
+  void
+  record_recur2(TpgNode* node,
+		const vector<Bool3>& model,
+		HashSet<ymuint>& mark,
+		NodeValList& assign_list);
 
 private:
   //////////////////////////////////////////////////////////////////////

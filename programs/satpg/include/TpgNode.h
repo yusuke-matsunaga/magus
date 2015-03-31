@@ -93,6 +93,16 @@ public:
   tTgGateType
   gate_type() const;
 
+  /// @brief controling value を得る．
+  /// @note ない場合は kB3X を返す．
+  Bool3
+  cval() const;
+
+  /// @brief noncontroling valueを得る．
+  /// @note ない場合は kB3X を返す．
+  Bool3
+  nval() const;
+
   /// @brief 値のノードの時 true を返す．
   ///
   /// is_logic() が true の時のみ意味を持つ．
@@ -411,6 +421,12 @@ private:
 
   // immediate dominator
   TpgNode* mImmDom;
+
+  // controling value
+  Bool3 mCval;
+
+  // noncontroling value
+  Bool3 mNval;
 
 };
 
@@ -900,6 +916,24 @@ VarId
 TpgNode::if1var(ymuint pos) const
 {
   return mIfVars[pos * 2 + 1];
+}
+
+// @brief controling value を得る．
+// @note ない場合は kB3X を返す．
+inline
+Bool3
+TpgNode::cval() const
+{
+  return mCval;
+}
+
+// @brief noncontroling valueを得る．
+// @note ない場合は kB3X を返す．
+inline
+Bool3
+TpgNode::nval() const
+{
+  return mNval;
 }
 
 END_NAMESPACE_YM_SATPG

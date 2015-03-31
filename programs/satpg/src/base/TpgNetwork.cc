@@ -998,6 +998,23 @@ TpgNetwork::make_prim_node(tTgGateType type,
     node->mTypeId |= 1U;
   }
 
+  switch ( type ) {
+  case kTgGateAnd:
+  case kTgGateNand:
+    node->mCval = kB3False;
+    node->mNval = kB3True;
+    break;
+
+  case kTgGateOr:
+  case kTgGateNor:
+    node->mCval = kB3True;
+    node->mNval = kB3False;
+    break;
+
+  default:
+    break;
+  }
+
   return node;
 }
 
@@ -1010,6 +1027,9 @@ TpgNetwork::init_node(TpgNode* node,
 		      ymuint nfo)
 {
   node->mName = NULL;
+
+  node->mCval = kB3X;
+  node->mNval = kB3X;
 
   node->mFaninNum = ni;
   if ( ni > 0 ) {
