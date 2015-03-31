@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "Val3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -39,13 +40,13 @@ public:
   /// @param[in] node 対象のノード
   virtual
   Val3
-  gval(TpgNode* node) = 0;
+  gval(TpgNode* node) const = 0;
 
   /// @brief ノードの故障値を返す．
   /// @param[in] node 対象のノード
   virtual
   Val3
-  fval(TpgNode* node) = 0;
+  fval(TpgNode* node) const = 0;
 
 };
 

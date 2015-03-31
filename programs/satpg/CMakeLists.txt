@@ -31,7 +31,6 @@ set (dtpg_SOURCES
   src/dtpg/bt/BtBase.cc
   src/dtpg/bt/BtJust1.cc
   src/dtpg/bt/BtJust2.cc
-  src/dtpg/bt/BtJust3.cc
   src/dtpg/bt/BtJustBase.cc
   src/dtpg/bt/BtSimple.cc
 
@@ -45,7 +44,9 @@ set (dtpg_SOURCES
 
   src/dtpg/engine/SatEngine.cc
 
+  src/dtpg/dtpg_engine/Extractor.cc
   src/dtpg/dtpg_engine/LitMap.cc
+  src/dtpg/dtpg_engine/ModelValMap.cc
   src/dtpg/dtpg_engine/DtpgSat.cc
   src/dtpg/dtpg_engine/DtpgSatBaseS.cc
   src/dtpg/dtpg_engine/DtpgSatBaseM.cc

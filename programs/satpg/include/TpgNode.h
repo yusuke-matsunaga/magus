@@ -10,9 +10,9 @@
 
 
 #include "satpg_nsdef.h"
+#include "Val3.h"
 #include "YmNetworks/tgnet.h"
 #include "YmLogic/VarId.h"
-#include "YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -94,13 +94,13 @@ public:
   gate_type() const;
 
   /// @brief controling value を得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
+  /// @note ない場合は kValX を返す．
+  Val3
   cval() const;
 
   /// @brief noncontroling valueを得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
+  /// @note ない場合は kValX を返す．
+  Val3
   nval() const;
 
   /// @brief 値のノードの時 true を返す．
@@ -423,10 +423,10 @@ private:
   TpgNode* mImmDom;
 
   // controling value
-  Bool3 mCval;
+  Val3 mCval;
 
   // noncontroling value
-  Bool3 mNval;
+  Val3 mNval;
 
 };
 
@@ -919,18 +919,18 @@ TpgNode::if1var(ymuint pos) const
 }
 
 // @brief controling value を得る．
-// @note ない場合は kB3X を返す．
+// @note ない場合は kValX を返す．
 inline
-Bool3
+Val3
 TpgNode::cval() const
 {
   return mCval;
 }
 
 // @brief noncontroling valueを得る．
-// @note ない場合は kB3X を返す．
+// @note ない場合は kValX を返す．
 inline
-Bool3
+Val3
 TpgNode::nval() const
 {
   return mNval;

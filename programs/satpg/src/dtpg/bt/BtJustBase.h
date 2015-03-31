@@ -39,8 +39,6 @@ public:
 
   /// @brief ノードID番号の最大値を設定する．
   /// @param[in] max_id ID番号の最大値
-  ///
-  /// このクラスの実装ではなにもしない．
   virtual
   void
   set_max_id(ymuint max_id);

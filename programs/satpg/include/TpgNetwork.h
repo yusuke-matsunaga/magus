@@ -10,9 +10,9 @@
 
 
 #include "satpg_nsdef.h"
+#include "Val3.h"
 #include "YmNetworks/tgnet.h"
 #include "YmCell/cell_nsdef.h"
-#include "YmLogic/Bool3.h"
 #include "YmLogic/expr_nsdef.h"
 #include "YmUtils/SimpleAlloc.h"
 #include "YmUtils/HashMap.h"
@@ -41,7 +41,7 @@ struct CplxInfo
 
   // 制御値を納める配列
   // pos 番目の 0 が mCVal[pos * 2 + 0] に対応する．
-  vector<Bool3> mCVal;
+  vector<Val3> mCVal;
 
 };
 

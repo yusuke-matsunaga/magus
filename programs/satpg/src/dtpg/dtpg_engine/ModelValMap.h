@@ -10,6 +10,7 @@
 
 
 #include "ValMap.h"
+#include "YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -41,13 +42,13 @@ public:
   /// @param[in] node 対象のノード
   virtual
   Val3
-  gval(TpgNode* node);
+  gval(TpgNode* node) const;
 
   /// @brief ノードの故障値を返す．
   /// @param[in] node 対象のノード
   virtual
   Val3
-  fval(TpgNode* node);
+  fval(TpgNode* node) const;
 
 
 private:

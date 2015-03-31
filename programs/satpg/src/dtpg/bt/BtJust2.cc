@@ -46,13 +46,13 @@ BtJust2::set_max_id(ymuint max_id)
 
 // @brief バックトレースを行なう．
 // @param[in] fnode 故障のあるノード
-// @param[in] model SATの値の割り当て結果を収めた配列
+// @param[in] val_map ノードの値の割当を保持するクラス
 // @param[in] input_list テストパタンに関係のある入力のリスト
 // @param[in] output_list 故障伝搬の可能性のある出力のリスト
 // @param[out] assign_list 値の割当リスト
 void
 BtJust2::operator()(TpgNode* fnode,
-		    const vector<Bool3>& model,
+		    const ValMap& val_map,
 		    const vector<TpgNode*>& input_list,
 		    const vector<TpgNode*>& output_list,
 		    NodeValList& assign_list)
@@ -63,9 +63,9 @@ BtJust2::operator()(TpgNode* fnode,
   for (vector<TpgNode*>::const_iterator p = output_list.begin();
        p != output_list.end(); ++ p) {
     TpgNode* node = *p;
-    if ( node_dval(node, model) == kB3True ) {
+    if ( val_map.gval(node) != val_map.fval(node) ) {
       // 正当化を行う．
-      NodeList* node_list = justify(node, model);
+      NodeList* node_list = justify(node, val_map);
       ymuint n = list_size(node_list);
       if ( nmin == 0 || nmin > n ) {
 	nmin = n;
@@ -78,7 +78,7 @@ BtJust2::operator()(TpgNode* fnode,
   assign_list.clear();
   for (NodeList* tmp = best_list; tmp; tmp = tmp->mLink) {
     TpgNode* node = tmp->mNode;
-    record_value(node, model, assign_list);
+    record_value(node, val_map, assign_list);
   }
 
   // 一連の処理でつけたマークを消す．
@@ -96,13 +96,13 @@ BtJust2::clear_justified_hook(TpgNode* node)
 
 // @brief solve 中で変数割り当ての正当化を行なう．
 // @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
+// @param[in] val_map ノードの値の割当を保持するクラス
 // @note node の値割り当てを正当化する．
 // @note 正当化に用いられているノードには mJustifiedMark がつく．
 // @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
 BtJust2::NodeList*
 BtJust2::justify(TpgNode* node,
-		 const vector<Bool3>& model)
+		 const ValMap& val_map)
 {
   if ( justified_mark(node) ) {
     return mJustArray[node->id()];
@@ -115,69 +115,69 @@ BtJust2::justify(TpgNode* node,
     return mJustArray[node->id()];
   }
 
-  Bool3 gval = node_gval(node, model);
-  Bool3 fval = node_fval(node, model);
+  Val3 gval = val_map.gval(node);
+  Val3 fval = val_map.fval(node);
 
   if ( gval != fval ) {
     // 正常値と故障値が異なっていたら
     // すべてのファンインをたどる．
-    return just_sub1(node, model);
+    return just_sub1(node, val_map);
   }
 
   switch ( node->gate_type() ) {
   case kTgGateBuff:
   case kTgGateNot:
     // 無条件で唯一のファンインをたどる．
-    return just_sub1(node, model);
+    return just_sub1(node, val_map);
 
   case kTgGateAnd:
-    if ( gval == kB3True ) {
+    if ( gval == kVal1 ) {
       // すべてのファンインノードをたどる．
-      return just_sub1(node, model);
+      return just_sub1(node, val_map);
     }
-    else if ( gval == kB3False ) {
+    else if ( gval == kVal0 ) {
       // 0の値を持つ最初のノードをたどる．
-      return just_sub2(node, model, kB3False);
+      return just_sub2(node, val_map, kVal0);
     }
     break;
 
   case kTgGateNand:
-    if ( gval == kB3True ) {
+    if ( gval == kVal1 ) {
       // 0の値を持つ最初のノードをたどる．
-      return just_sub2(node, model, kB3False);
+      return just_sub2(node, val_map, kVal0);
     }
-    else if ( gval == kB3False ) {
+    else if ( gval == kVal0 ) {
       // すべてのファンインノードをたどる．
-      return just_sub1(node, model);
+      return just_sub1(node, val_map);
     }
     break;
 
   case kTgGateOr:
-    if ( gval == kB3True ) {
+    if ( gval == kVal1 ) {
       // 1の値を持つ最初のノードをたどる．
-      return just_sub2(node, model, kB3True);
+      return just_sub2(node, val_map, kVal1);
     }
-    else if ( gval == kB3False ) {
+    else if ( gval == kVal0 ) {
       // すべてのファンインノードをたどる．
-      return just_sub1(node, model);
+      return just_sub1(node, val_map);
     }
     break;
 
   case kTgGateNor:
-    if ( gval == kB3True ) {
+    if ( gval == kVal1 ) {
       // すべてのファンインノードをたどる．
-      return just_sub1(node, model);
+      return just_sub1(node, val_map);
     }
-    else if ( gval == kB3False ) {
+    else if ( gval == kVal0 ) {
       // 1の値を持つ最初のノードをたどる．
-      return just_sub2(node, model, kB3True);
+      return just_sub2(node, val_map, kVal1);
     }
     break;
 
   case kTgGateXor:
   case kTgGateXnor:
     // すべてのファンインノードをたどる．
-    return just_sub1(node, model);
+    return just_sub1(node, val_map);
     break;
 
   default:
@@ -191,16 +191,16 @@ BtJust2::justify(TpgNode* node,
 
 // @brief すべてのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
+// @param[in] val_map SATの値の割り当て結果を収めた配列
 BtJust2::NodeList*
 BtJust2::just_sub1(TpgNode* node,
-		   const vector<Bool3>& model)
+		   const ValMap& val_map)
 {
   NodeList*& node_list = mJustArray[node->id()];
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    NodeList* node_list1 = justify(inode, model);
+    NodeList* node_list1 = justify(inode, val_map);
     list_merge(node_list, node_list1);
   }
   return node_list;
@@ -208,12 +208,12 @@ BtJust2::just_sub1(TpgNode* node,
 
 // @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
 // @param[in] node 対象のノード
-// @param[in] model SATの値の割り当て結果を収めた配列
+// @param[in] val_map SATの値の割り当て結果を収めた配列
 // @param[in] val 値
 BtJust2::NodeList*
 BtJust2::just_sub2(TpgNode* node,
-		   const vector<Bool3>& model,
-		   Bool3 val)
+		   const ValMap& val_map,
+		   Val3 val)
 {
   ymuint ni = node->fanin_num();
   // まず gval と fval が等しい場合を探す．
@@ -221,12 +221,12 @@ BtJust2::just_sub2(TpgNode* node,
   ymuint min = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    Bool3 igval = node_gval(inode, model);
-    Bool3 ifval = node_fval(inode, model);
+    Val3 igval = val_map.gval(inode);
+    Val3 ifval = val_map.fval(inode);
     if ( igval != ifval || igval != val ) {
       continue;
     }
-    NodeList* node_list1 = justify(inode, model);
+    NodeList* node_list1 = justify(inode, val_map);
     ymuint n = list_size(node_list1);
     if ( min == 0 || min > n ) {
       pos = i;
@@ -245,12 +245,12 @@ BtJust2::just_sub2(TpgNode* node,
   ymuint fmin = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    Bool3 igval = node_gval(inode, model);
-    Bool3 ifval = node_fval(inode, model);
+    Val3 igval = val_map.gval(inode);
+    Val3 ifval = val_map.fval(inode);
     if ( igval != val && ifval != val ) {
       continue;
     }
-    NodeList* node_list1 = justify(inode, model);
+    NodeList* node_list1 = justify(inode, val_map);
     ymuint n = list_size(node_list1);
     if ( igval == val ) {
       if ( gmin == 0 || gmin > n ) {

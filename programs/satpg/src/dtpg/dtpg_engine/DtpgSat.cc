@@ -23,6 +23,7 @@
 #include "VectLitMap.h"
 #include "SatEngine.h"
 #include "YmLogic/SatStats.h"
+#include "ModelValMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -529,8 +530,9 @@ DtpgSat::detect_op(TpgFault* fault,
 		   const USTime& time)
 {
   // バックトレースを行う．
+  ModelValMap val_map(mModel);
   NodeValList assign_list;
-  mBackTracer(fault->node(), mModel, mInputList, mOutputList, assign_list);
+  mBackTracer(fault->node(), val_map, mInputList, mOutputList, assign_list);
 
   // パタンの登録などを行う．
   mDetectOp(fault, assign_list);

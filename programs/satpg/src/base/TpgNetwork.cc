@@ -79,15 +79,15 @@ extra_node_count(const Expr& expr,
 }
 
 // calc_c_val の下請け関数
-Bool3
+Val3
 ccv_sub(const Expr& expr,
-	const vector<Bool3>& ivals)
+	const vector<Val3>& ivals)
 {
   if ( expr.is_zero() ) {
-    return kB3False;
+    return kVal0;
   }
   if ( expr.is_one() ) {
-    return kB3True;
+    return kVal1;
   }
   if ( expr.is_posiliteral() ) {
     ymuint iid = expr.varid().val();
@@ -102,69 +102,69 @@ ccv_sub(const Expr& expr,
   if ( expr.is_and() ) {
     bool has_x = false;
     for (ymuint i = 0; i < nc; ++ i) {
-      Bool3 ival = ccv_sub(expr.child(i), ivals);
-      if ( ival == kB3False ) {
-	return kB3False;
+      Val3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kVal0 ) {
+	return kVal0;
       }
-      if ( ival == kB3X ) {
+      if ( ival == kValX ) {
 	has_x = true;
       }
     }
     if ( has_x ) {
-      return kB3X;
+      return kValX;
     }
-    return kB3True;
+    return kVal1;
   }
 
   if ( expr.is_or() ) {
     bool has_x = false;
     for (ymuint i = 0; i < nc; ++ i) {
-      Bool3 ival = ccv_sub(expr.child(i), ivals);
-      if ( ival == kB3True ) {
-	return kB3True;
+      Val3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kVal1 ) {
+	return kVal1;
       }
-      if ( ival == kB3X ) {
+      if ( ival == kValX ) {
 	has_x = true;
       }
     }
     if ( has_x ) {
-      return kB3X;
+      return kValX;
     }
-    return kB3False;
+    return kVal0;
   }
 
   if ( expr.is_or() ) {
-    Bool3 val = kB3False;
+    Val3 val = kVal0;
     for (ymuint i = 0; i < nc; ++ i) {
-      Bool3 ival = ccv_sub(expr.child(i), ivals);
-      if ( ival == kB3X ) {
-	return kB3X;
+      Val3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kValX ) {
+	return kValX;
       }
-      val ^= ival;
+      val = val ^ ival;
     }
     return val;
   }
 
   ASSERT_NOT_REACHED;
-  return kB3X;
+  return kValX;
 }
 
 // 制御値の計算を行う．
-Bool3
+Val3
 calc_c_val(const Expr& expr,
 	   ymuint ni,
 	   ymuint ipos,
-	   Bool3 val)
+	   Val3 val)
 {
-  vector<Bool3> ivals(ni, kB3X);
+  vector<Val3> ivals(ni, kValX);
   ivals[ipos] = val;
   return ccv_sub(expr, ivals);
 }
 
 // 制御値の計算を行う．
-Bool3
+Val3
 c_val(tTgGateType type,
-      Bool3 ival)
+      Val3 ival)
 {
   switch ( type ) {
   case kTgGateBuff:
@@ -177,35 +177,35 @@ c_val(tTgGateType type,
 
   case kTgGateAnd:
     // 0 の時のみ 0
-    return ival == kB3False ? kB3False : kB3X;
+    return ival == kVal0 ? kVal0 : kValX;
 
   case kTgGateNand:
     // 0 の時のみ 1
-    return ival == kB3False ? kB3True : kB3X;
+    return ival == kVal0 ? kVal1 : kValX;
 
   case kTgGateOr:
     // 1 の時のみ 1
-    return ival == kB3True ? kB3True : kB3X;
+    return ival == kVal1 ? kVal1 : kValX;
 
   case kTgGateNor:
     // 1 の時のみ 0
-    return ival == kB3True ? kB3False : kB3X;
+    return ival == kVal1 ? kVal0 : kValX;
 
   case kTgGateXor:
   case kTgGateXnor:
     // 常に X
-    return kB3X;
+    return kValX;
 
   case kTgGateCplx:
     // これは使わない．
     ASSERT_NOT_REACHED;
-    return kB3X;
+    return kValX;
 
   default:
     break;
   }
   ASSERT_NOT_REACHED;
-  return kB3X;
+  return kValX;
 }
 
 // immediate dominator リストをマージする．
@@ -435,8 +435,8 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
 	cinfo = new CplxInfo(n, ni);
 	// 入力の制御値を計算する．
 	for (ymuint j = 0; j < ni; ++ j) {
-	  cinfo->mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kB3False);
-	  cinfo->mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kB3True);
+	  cinfo->mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kVal0);
+	  cinfo->mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kVal1);
 	}
 	// ハッシュに登録する．
 	en_hash.add(fid, cinfo);
@@ -1001,14 +1001,14 @@ TpgNetwork::make_prim_node(tTgGateType type,
   switch ( type ) {
   case kTgGateAnd:
   case kTgGateNand:
-    node->mCval = kB3False;
-    node->mNval = kB3True;
+    node->mCval = kVal0;
+    node->mNval = kVal1;
     break;
 
   case kTgGateOr:
   case kTgGateNor:
-    node->mCval = kB3True;
-    node->mNval = kB3False;
+    node->mCval = kVal1;
+    node->mNval = kVal0;
     break;
 
   default:
@@ -1028,8 +1028,8 @@ TpgNetwork::init_node(TpgNode* node,
 {
   node->mName = NULL;
 
-  node->mCval = kB3X;
-  node->mNval = kB3X;
+  node->mCval = kValX;
+  node->mNval = kValX;
 
   node->mFaninNum = ni;
   if ( ni > 0 ) {
@@ -1164,8 +1164,8 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
   ymuint ni = tgnode->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    Bool3 oval0;
-    Bool3 oval1;
+    Val3 oval0;
+    Val3 oval1;
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
       ASSERT_COND( en_hash.check(fid) );
@@ -1174,23 +1174,23 @@ TpgNetwork::make_faults(const TgNode* tgnode,
       oval1 = cinfo->mCVal[i * 2 + 1];
     }
     else {
-      oval0 = c_val(tgnode->gate_type(), kB3False);
-      oval1 = c_val(tgnode->gate_type(), kB3True);
+      oval0 = c_val(tgnode->gate_type(), kVal0);
+      oval1 = c_val(tgnode->gate_type(), kVal1);
     }
 
     TpgFault* rep0 = NULL;
-    if ( oval0 == kB3False ) {
+    if ( oval0 == kVal0 ) {
       rep0 = of0;
     }
-    else if ( oval0 == kB3True ) {
+    else if ( oval0 == kVal1 ) {
       rep0 = of1;
     }
 
     TpgFault* rep1 = NULL;
-    if ( oval1 == kB3False ) {
+    if ( oval1 == kVal0 ) {
       rep1 = of0;
     }
-    else if ( oval1 == kB3True ) {
+    else if ( oval1 == kVal1 ) {
       rep1 = of1;
     }
 

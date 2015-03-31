@@ -8,6 +8,7 @@
 
 
 #include "ModelValMap.h"
+#include "TpgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -47,7 +48,7 @@ ModelValMap::~ModelValMap()
 // @brief ノードの正常値を返す．
 // @param[in] node 対象のノード
 Val3
-ModelValMap::gval(TpgNode* node)
+ModelValMap::gval(TpgNode* node) const
 {
   return bool3_to_val3(mModel[node->gvar().val()]);
 }
@@ -55,7 +56,7 @@ ModelValMap::gval(TpgNode* node)
 // @brief ノードの故障値を返す．
 // @param[in] node 対象のノード
 Val3
-ModelValMap::fval(TpgNode* node)
+ModelValMap::fval(TpgNode* node) const
 {
   return bool3_to_val3(mModel[node->fvar().val()]);
 }

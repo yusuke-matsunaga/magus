@@ -14,8 +14,9 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
+#include "ModelValMap.h"
+#include "Extractor.h"
 #include "NodeValList.h"
-#include "BackTracer.h"
 #include "YmUtils/HashSet.h"
 
 
@@ -52,13 +53,11 @@ DtpgSatS3::DtpgSatS3(const string& sat_type,
 		     UntestOp& uop) :
   DtpgSat(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
-  mBt = new_BtJust3();
 }
 
 // @brief デストラクタ
 DtpgSatS3::~DtpgSatS3()
 {
-  delete mBt;
 }
 
 BEGIN_NONAMESPACE
@@ -325,8 +324,6 @@ bool
 DtpgSatS3::run_single(TpgNetwork& network,
 		      TpgFault* fault)
 {
-  mBt->set_max_id(network.max_node_id());
-
   TpgNode* fnode = fault->node();
 
   cnf_begin();
@@ -404,8 +401,10 @@ DtpgSatS3::run_single(TpgNetwork& network,
   }
 
   // 十分割当を求める．
+  ModelValMap val_map(sat_model);
+  Extractor extract(val_map);
   NodeValList& suf_list = mFaultInfoArray[fault->id()].mSufList;
-  (*mBt)(fault->node(), sat_model, input_list(), output_list(), suf_list);
+  extract(fault->node(), suf_list);
 
   if ( do_verify ) { // 検証
     SatEngine engine(sat_type(), sat_option(), sat_outp());

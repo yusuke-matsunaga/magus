@@ -98,6 +98,7 @@ class TvMgr;
 class Dtpg;
 class DtpgEngine;
 class DtpgStats;
+class ValMap;
 class Rtpg;
 class RtpgStats;
 class MinPat;
