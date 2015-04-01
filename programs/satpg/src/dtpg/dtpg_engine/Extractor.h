@@ -94,11 +94,8 @@ private:
   // 値割当を保持するクラス
   const ValMap& mValMap;
 
-  // sensitized node を格納するリスト
-  vector<TpgNode*> mNodeList;
-
-  // 到達可能性を記録するハッシュ表
-  HashMap<ymuint, bool> mReachabilityMap;
+  // 故障の fanout cone のマーク
+  HashSet<ymuint> mFconeMark;
 
   // 記録済みノードを保持するハッシュ表
   HashSet<ymuint> mRecorded;

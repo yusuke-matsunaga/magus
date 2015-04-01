@@ -14,6 +14,7 @@
 #include "TpgFault.h"
 #include "TestVector.h"
 #include "SatEngine.h"
+#include "GenVidMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -123,19 +124,25 @@ DtpgSatC::run_multi(TpgNetwork& network,
 
   ymuint nf = mFaultList.size();
 
+  GenVidMap gvar_map(network.max_node_id());
+  GenVidMap fvar_map(network.max_node_id());
+  GenVidMap dvar_map(network.max_node_id());
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId gvar = engine.new_var();
-    node->set_gvar(gvar);
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
-    node->set_fvar(fvar, dvar);
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
   }
 
   // 故障を活性化するとき true にする変数．
@@ -161,7 +168,7 @@ DtpgSatC::run_multi(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_gval_cnf(engine, node);
+    engine.make_node_cnf(node, gvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -170,9 +177,9 @@ DtpgSatC::run_multi(TpgNetwork& network,
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     if ( node != root ) {
-      make_fval_cnf(engine, node);
+      engine.make_node_cnf(node, fvar_map);
     }
-    make_dchain_cnf(engine, node);
+    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -182,7 +189,7 @@ DtpgSatC::run_multi(TpgNetwork& network,
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
     TpgNode* node = output_list()[i];
-    Literal dlit(node->dvar(), false);
+    Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
@@ -229,8 +236,8 @@ DtpgSatC::run_multi(TpgNetwork& network,
     }
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      if ( node->has_fvar() && !tmp_mark(node) ) {
-	Literal dlit(node->dvar(), true);
+      if ( tfo_mark(node) && !tmp_mark(node) ) {
+	Literal dlit(dvar_map(node), true);
 	engine.assumption_add(dlit);
 	//assump_base.push_back(dlit);
       }
@@ -244,13 +251,13 @@ DtpgSatC::run_multi(TpgNetwork& network,
 
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), false);
+      Literal dlit(dvar_map(node), false);
       engine.assumption_add(dlit);
       //assump_base.push_back(dlit);
     }
 
     cout << " detecting for " << f->str() << endl;
-    solve(engine, f);
+    solve(engine, f, gvar_map, fvar_map);
     cout << "   done" << endl;
 
 #if 0
@@ -276,7 +283,6 @@ DtpgSatC::run_multi(TpgNetwork& network,
     cout << "   detecting mandatory assignment done" << endl;
 #endif
   }
-  clear_node_mark();
 
   for (vector<TpgNode*>::const_iterator p = mFaultNodeList.begin();
        p != mFaultNodeList.end(); ++ p) {

@@ -15,6 +15,7 @@
 #include "TpgFault.h"
 #include "TestVector.h"
 #include "SatEngine.h"
+#include "GenVidMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -70,19 +71,25 @@ DtpgSatKDet::run_single(TpgNetwork& network,
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
+  GenVidMap gvar_map(network.max_node_id());
+  GenVidMap fvar_map(network.max_node_id());
+  GenVidMap dvar_map(network.max_node_id());
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId gvar = engine.new_var();
-    node->set_gvar(gvar);
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
-    node->set_fvar(fvar, dvar);
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -90,7 +97,7 @@ DtpgSatKDet::run_single(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_gval_cnf(engine, node);
+    engine.make_node_cnf(node, gvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -101,14 +108,14 @@ DtpgSatKDet::run_single(TpgNetwork& network,
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
-      make_fault_cnf(engine, fault);
+      engine.make_fault_cnf(fault, gvar_map, fvar_map);
     }
     else {
-      make_fval_cnf(engine, node);
+      engine.make_node_cnf(node, fvar_map);
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(engine, node);
+    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
   }
 
 
@@ -119,7 +126,7 @@ DtpgSatKDet::run_single(TpgNetwork& network,
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
     TpgNode* node = output_list()[i];
-    Literal dlit(node->dvar(), false);
+    Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
@@ -132,7 +139,7 @@ DtpgSatKDet::run_single(TpgNetwork& network,
 
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), false);
+      Literal dlit(dvar_map(node), false);
     engine.assumption_add(dlit);
     }
 
@@ -142,7 +149,7 @@ DtpgSatKDet::run_single(TpgNetwork& network,
 
     if ( ans == kB3True ) {
       // パタンが求まった．
-      detect_op(fault, sat_stats, time);
+      detect_op(fault, gvar_map, fvar_map, sat_stats, time);
     }
     else {
       if ( i == 0 ) {
@@ -165,7 +172,7 @@ DtpgSatKDet::run_single(TpgNetwork& network,
     engine.tmp_lits_begin(ni - pat->x_num());
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* node = network.input(i);
-      Literal lit(node->gvar());
+      Literal lit(gvar_map(node));
       switch ( pat->val3(i) ) {
       case kVal1:
 	engine.tmp_lits_add(~lit);
@@ -181,8 +188,6 @@ DtpgSatKDet::run_single(TpgNetwork& network,
     }
     engine.tmp_lits_end();
   }
-
-  clear_node_mark();
 }
 
 END_NAMESPACE_YM_SATPG

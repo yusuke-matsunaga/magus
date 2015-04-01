@@ -201,42 +201,6 @@ public:
   // SatEngine 用のアクセス関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 正常回路用の変数番号をセットする．
-  /// @param[in] gvar 正常値を表す変数番号
-  void
-  set_gvar(VarId gvar);
-
-  /// @brief 故障回路用の変数番号をセットする．
-  /// @param[in] fvar 故障値を表す変数番号
-  /// @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
-  void
-  set_fvar(VarId fvar,
-	   VarId dvar);
-
-  /// @brief 変数番号の割り当て情報をクリアする．
-  void
-  clear_var();
-
-  /// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
-  bool
-  has_gvar() const;
-
-  /// @brief 正常値を表す変数番号を得る．
-  VarId
-  gvar() const;
-
-  /// @brief 故障回路用の変数番号が割り当てられていたら true を返す．
-  bool
-  has_fvar() const;
-
-  /// @brief 故障値を表す変数番号を得る．
-  VarId
-  fvar() const;
-
-  /// @brief 故障差を表す変数番号を得る．
-  VarId
-  dvar() const;
-
   /// @brief 出力故障用の変数番号をセットする．
   /// @param[in] val 縮退値 (0/1)
   /// @param[in] var 変数番号
@@ -400,15 +364,6 @@ private:
 
   // いくつかのマークを納めるビットベクタ
   ymuint32 mMarks;
-
-  // 正常回路の変数番号
-  VarId mGid;
-
-  // 故障回路の変数番号
-  VarId mFid;
-
-  // 故障差の変数番号
-  VarId mDid;
 
   // 出力故障用の変数番号
   VarId mOfVar[2];
@@ -754,81 +709,6 @@ TpgNode*
 TpgNode::imm_dom() const
 {
   return mImmDom;
-}
-
-// @brief 正常回路用の変数番号をセットする．
-// @param[in] gvar 正常値を表す変数番号
-inline
-void
-TpgNode::set_gvar(VarId gvar)
-{
-  mGid = gvar;
-  mFid = gvar;
-  mMarks |= 2U;
-}
-
-// @brief 故障回路用の変数番号をセットする．
-// @param[in] fvar 故障値を表す変数番号
-// @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
-inline
-void
-TpgNode::set_fvar(VarId fvar,
-		   VarId dvar)
-{
-  mFid = fvar;
-  mDid = dvar;
-  mMarks |= 4U;
-}
-
-// @brief 変数番号の割り当て情報をクリアする．
-inline
-void
-TpgNode::clear_var()
-{
-  mMarks &= ~6U;
-}
-
-// @brief 正常回路用の変数番号が割り当てられていたら true を返す．
-inline
-bool
-TpgNode::has_gvar() const
-{
-  return static_cast<bool>((mMarks >> 1) & 1U);
-}
-
-// @brief 正常値を表す変数番号を得る．
-inline
-VarId
-TpgNode::gvar() const
-{
-  ASSERT_COND( has_gvar() );
-  return mGid;
-}
-
-// @brief 故障回路用の変数番号が割り当てられていたら true を返す．
-inline
-bool
-TpgNode::has_fvar() const
-{
-  return static_cast<bool>((mMarks >> 2) & 1U);
-}
-
-// @brief 故障値を表す変数番号を得る．
-inline
-VarId
-TpgNode::fvar() const
-{
-  ASSERT_COND( has_gvar() );
-  return mFid;
-}
-
-// @brief 故障差を表す変数番号を得る．
-inline
-VarId
-TpgNode::dvar() const
-{
-  ASSERT_COND( has_fvar() );
-  return mDid;
 }
 
 // @brief 出力故障用の変数番号をセットする．

@@ -14,6 +14,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
+#include "GenVidMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -68,19 +69,25 @@ DtpgSatS2::run_single(TpgNetwork& network,
   mMark.clear();
   mMark.resize(network.max_node_id(), 0);
 
+  GenVidMap gvar_map(network.max_node_id());
+  GenVidMap fvar_map(network.max_node_id());
+  GenVidMap dvar_map(network.max_node_id());
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId gvar = engine.new_var();
-    node->set_gvar(gvar);
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
-    node->set_fvar(fvar, dvar);
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
   }
 
   const vector<TpgNode*>& olist = output_list();
@@ -106,7 +113,7 @@ DtpgSatS2::run_single(TpgNetwork& network,
       if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
 	mMark[node->id()] = opos + 1;
 
-	make_gval_cnf(engine, node);
+	engine.make_node_cnf(node, gvar_map);
       }
     }
 
@@ -121,18 +128,18 @@ DtpgSatS2::run_single(TpgNetwork& network,
 
       // 故障回路のゲートの入出力関係を表すCNFを作る．
       if ( node == fnode ) {
-	make_fault_cnf(engine, fault);
+	engine.make_fault_cnf(fault, gvar_map, fvar_map);
       }
       else {
-	make_fval_cnf(engine, node);
+	engine.make_node_cnf(node, fvar_map);
       }
 
-      make_dchain_cnf(engine, node);
+      engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
     }
 
     // fnode の dvar は 1 でなければならない．
     {
-      Literal dlit(fnode->dvar(), false);
+      Literal dlit(dvar_map(fnode), false);
       engine.add_clause(dlit);
     }
 
@@ -145,7 +152,7 @@ DtpgSatS2::run_single(TpgNetwork& network,
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	Literal dlit(node->dvar(), false);
+	Literal dlit(dvar_map(node), false);
 	engine.assumption_add(~dlit);
       }
     }
@@ -155,7 +162,7 @@ DtpgSatS2::run_single(TpgNetwork& network,
     Bool3 ans = solve(engine, sat_stats, time);
 
     if ( ans == kB3True ) {
-      detect_op(fault, sat_stats, time);
+      detect_op(fault, gvar_map, fvar_map, sat_stats, time);
       break;
     }
     else if ( ans == kB3False ) {
@@ -183,7 +190,7 @@ DtpgSatS2::run_single(TpgNetwork& network,
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	make_gval_cnf(engine, node);
+	engine.make_node_cnf(node, gvar_map);
       }
     }
 
@@ -193,8 +200,8 @@ DtpgSatS2::run_single(TpgNetwork& network,
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	make_fval_cnf(engine, node);
-	make_dchain_cnf(engine, node);
+	engine.make_node_cnf(node, fvar_map);
+	engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
       }
     }
 
@@ -204,13 +211,12 @@ DtpgSatS2::run_single(TpgNetwork& network,
 
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-      engine.assumption_add(Literal(node->dvar(), false));
+      Literal dlit(dvar_map(node), false);
+      engine.assumption_add(dlit);
     }
 
-    solve(engine, fault);
+    solve(engine, fault, gvar_map, fvar_map);
   }
-
-  clear_node_mark();
 
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);

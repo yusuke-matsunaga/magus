@@ -8,14 +8,15 @@
 
 
 #include "LitMap.h"
-#include "GvarLitMap.h"
-#include "FvarLitMap.h"
+//#include "GvarLitMap.h"
+//#include "FvarLitMap.h"
 #include "VectLitMap.h"
 #include "TpgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
+#if 0
 //////////////////////////////////////////////////////////////////////
 // クラス GvarLitMap
 //////////////////////////////////////////////////////////////////////
@@ -80,7 +81,7 @@ FvarLitMap::output() const
 {
   return Literal(mNode->fvar(), false);
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // クラス VectLitMap

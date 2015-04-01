@@ -14,6 +14,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
+#include "GenVidMap.h"
 #include "ModelValMap.h"
 #include "Extractor.h"
 #include "NodeValList.h"
@@ -64,14 +65,15 @@ BEGIN_NONAMESPACE
 
 void
 add_assumption(SatEngine& engine,
-	       const NodeValList& as_list)
+	       const NodeValList& as_list,
+	       const VidMap& gvar_map)
 {
   ymuint n = as_list.size();
   for (ymuint i = 0; i < n; ++ i) {
     NodeVal nv = as_list[i];
     TpgNode* node = nv.node();
     bool val = nv.val();
-    Literal alit(node->gvar(), !val);
+    Literal alit(gvar_map(node), !val);
     engine.assumption_add(alit);
   }
 }
@@ -161,8 +163,6 @@ DtpgSatS3::run(TpgNetwork& network,
 	fault_list.push_back(f);
       }
     }
-
-    clear_node_mark();
   }
 
   for (ymuint i = 0; i < nn; ++ i) {
@@ -227,13 +227,15 @@ DtpgSatS3::run(TpgNetwork& network,
   {
     SatEngine engine(sat_type(), sat_option(), sat_outp());
 
+    GenVidMap gvar_map(network.max_node_id());
+
     //////////////////////////////////////////////////////////////////////
     // 変数の割当
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < nn; ++ i) {
       TpgNode* node = network.active_node(i);
       VarId gvar = engine.new_var();
-      node->set_gvar(gvar);
+      gvar_map.set_vid(node, gvar);
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -241,7 +243,7 @@ DtpgSatS3::run(TpgNetwork& network,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < nn; ++ i) {
       TpgNode* node = network.active_node(i);
-      make_gval_cnf(engine, node);
+      engine.make_node_cnf(node, gvar_map);
     }
 
     ymuint ng = 0;
@@ -314,8 +316,8 @@ DtpgSatS3::run(TpgNetwork& network,
 	// cur_assign + fi.mSufList が充足可能か調べる．
 
 	engine.assumption_begin();
-	add_assumption(engine, cur_assign);
-	add_assumption(engine, fi.mSufList);
+	add_assumption(engine, cur_assign, gvar_map);
+	add_assumption(engine, fi.mSufList, gvar_map);
 
 	vector<Bool3> tmp_model;
 	Bool3 stat = engine.solve(tmp_model);
@@ -368,19 +370,25 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
+  GenVidMap gvar_map(network.max_node_id());
+  GenVidMap fvar_map(network.max_node_id());
+  GenVidMap dvar_map(network.max_node_id());
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId gvar = engine.new_var();
-    node->set_gvar(gvar);
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
-    node->set_fvar(fvar, dvar);
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -388,7 +396,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
-    make_gval_cnf(engine, node);
+    engine.make_node_cnf(node, gvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -399,14 +407,14 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
-      make_fault_cnf(engine, fault);
+      engine.make_fault_cnf(fault, gvar_map, fvar_map);
     }
     else {
-      make_fval_cnf(engine, node);
+      engine.make_node_cnf(node, fvar_map);
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(engine, node);
+    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -416,7 +424,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
     TpgNode* node = output_list()[i];
-    Literal dlit(node->dvar(), false);
+    Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
@@ -428,7 +436,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
   // dominator ノードの dvar は1でなければならない．
   for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(node->dvar(), false);
+    Literal dlit(dvar_map(node), false);
     engine.assumption_add(dlit);
   }
 
@@ -439,7 +447,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
   }
 
   // 十分割当を求める．
-  ModelValMap val_map(sat_model);
+  ModelValMap val_map(gvar_map, fvar_map, sat_model);
   Extractor extract(val_map);
   NodeValList& suf_list = mFaultInfoArray[fault->id()].mSufList;
   extract(fault, suf_list);
@@ -447,19 +455,25 @@ DtpgSatS3::run_single(TpgNetwork& network,
   if ( do_verify ) { // 検証
     SatEngine engine(sat_type(), sat_option(), sat_outp());
 
+    GenVidMap gvar_map(network.max_node_id());
+    GenVidMap fvar_map(network.max_node_id());
+    GenVidMap dvar_map(network.max_node_id());
+
     //////////////////////////////////////////////////////////////////////
     // 変数の割当
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       VarId gvar = engine.new_var();
-      node->set_gvar(gvar);
+      gvar_map.set_vid(node, gvar);
+      fvar_map.set_vid(node, gvar);
     }
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       VarId fvar = engine.new_var();
       VarId dvar = engine.new_var();
-      node->set_fvar(fvar, dvar);
+      fvar_map.set_vid(node, fvar);
+      dvar_map.set_vid(node, dvar);
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -467,7 +481,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
-      make_gval_cnf(engine, node);
+      engine.make_node_cnf(node, gvar_map);
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -478,14 +492,14 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
       // 故障回路のゲートの入出力関係を表すCNFを作る．
       if ( node == fnode ) {
-	make_fault_cnf(engine, fault);
+	engine.make_fault_cnf(fault, gvar_map, fvar_map);
       }
       else {
-	make_fval_cnf(engine, node);
+	engine.make_node_cnf(node, fvar_map);
       }
 
       // D-Chain 制約を作る．
-      make_dchain_cnf(engine, node);
+      engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
     }
 
     // 上の割当のもとでは常に故障が検出できることを検証する．
@@ -495,7 +509,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
     for (ymuint i = 0; i < n; ++ i) {
       NodeVal nv = suf_list[i];
       TpgNode* node = nv.node();
-      VarId vid = node->gvar();
+      VarId vid = gvar_map(node);
       bool inv = nv.val();
       Literal alit(vid, !inv);
       engine.assumption_add(alit);
@@ -507,7 +521,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
     ymuint npo = output_list().size();
     for (ymuint i = 0; i < npo; ++ i) {
       TpgNode* node = output_list()[i];
-      Literal dlit(node->dvar(), false);
+      Literal dlit(dvar_map(node), false);
       engine.assumption_add(~dlit);
     }
     vector<Bool3> tmp_model;
@@ -516,6 +530,8 @@ DtpgSatS3::run_single(TpgNetwork& network,
       cout << fault->str() << endl;
       cout << "ERROR: not a sufficient condition" << endl;
       {
+	ModelValMap tmp_val(gvar_map, fvar_map, tmp_model);
+	ModelValMap sat_val(gvar_map, fvar_map, sat_model);
 	HashSet<ymuint> mark;
 	vector<TpgNode*> node_list;
 	dfs(fault->node(), mark, node_list);
@@ -524,17 +540,17 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	  TpgNode* node = node_list[i];
 
 	  cout << "Node#" << setw(5) << node->id() << ": ";
-	  if ( tmp_model[node->gvar().val()] != sat_model[node->gvar().val()] ||
-	       tmp_model[node->fvar().val()] != sat_model[node->fvar().val()] ) {
+	  if ( tmp_val.gval(node) != sat_val.gval(node) ||
+	       tmp_val.fval(node) != sat_val.fval(node) ) {
 	    cout << "*";
 	  }
 	  else {
 	    cout << " ";
 	  }
-	  cout << tmp_model[node->gvar().val()]
-	       << "/" << tmp_model[node->fvar().val()]
-	       << " <=> " << sat_model[node->gvar().val()]
-	       << "/" << sat_model[node->fvar().val()]
+	  cout << tmp_val.gval(node)
+	       << "/" << tmp_val.fval(node)
+	       << " <=> " << sat_val.gval(node)
+	       << "/" << sat_val.fval(node)
 	       << ": ";
 	  if ( node->is_input() ) {
 	    cout << "INPUT#" << node->input_id();
@@ -561,54 +577,55 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	  }
 	  cout << endl;
 	}
-      }
-      for (ymuint i = 0; i < n; ++ i) {
-	NodeVal nv = suf_list[i];
-	TpgNode* node = nv.node();
-	if ( node->has_fvar() ) {
-	  continue;
-	}
-	cout << "Node#" << node->id() << ": ";
-	cout << ", gval = " << tmp_model[node->gvar().val()]
-	     << ": ";
-	if ( node->is_input() ) {
-	  cout << "INPUT#" << node->input_id();
-	}
-	else if ( node->is_output() ) {
-	  cout << "OUTPUT#" << node->output_id();
-	  const TpgNode* inode = node->fanin(0);
-	  cout << " = Node#" << inode->id();
-	}
-	else if ( node->is_logic() ) {
-	  cout << node->gate_type();
-	  ymuint ni = node->fanin_num();
-	  if ( ni > 0 ) {
-	    cout << "(";
-	    for (ymuint j = 0; j < ni; ++ j) {
-	      const TpgNode* inode = node->fanin(j);
-	      cout << " Node#" << inode->id();
+
+	for (ymuint i = 0; i < n; ++ i) {
+	  NodeVal nv = suf_list[i];
+	  TpgNode* node = nv.node();
+	  if ( tfo_mark(node) ) {
+	    continue;
+	  }
+	  cout << "Node#" << node->id() << ": ";
+	  cout << ", gval = " << tmp_val.gval(node)
+	       << ": ";
+	  if ( node->is_input() ) {
+	    cout << "INPUT#" << node->input_id();
+	  }
+	  else if ( node->is_output() ) {
+	    cout << "OUTPUT#" << node->output_id();
+	    const TpgNode* inode = node->fanin(0);
+	    cout << " = Node#" << inode->id();
+	  }
+	  else if ( node->is_logic() ) {
+	    cout << node->gate_type();
+	    ymuint ni = node->fanin_num();
+	    if ( ni > 0 ) {
+	      cout << "(";
+	      for (ymuint j = 0; j < ni; ++ j) {
+		const TpgNode* inode = node->fanin(j);
+		cout << " Node#" << inode->id();
+	      }
+	      cout << ")";
 	    }
-	    cout << ")";
+	  }
+	  else {
+	    ASSERT_NOT_REACHED;
+	  }
+	  cout << endl;
+	}
+	for (ymuint i = 0; i < n; ++ i) {
+	  NodeVal nv = suf_list[i];
+	  TpgNode* node = nv.node();
+	  cout << " Node#" << node->id() << ":";
+	  if ( nv.val() ) {
+	    cout << "1";
+	  }
+	  else {
+	    cout << "0";
 	  }
 	}
-	else {
-	  ASSERT_NOT_REACHED;
-	}
 	cout << endl;
+	abort();
       }
-      for (ymuint i = 0; i < n; ++ i) {
-	NodeVal nv = suf_list[i];
-	TpgNode* node = nv.node();
-	cout << " Node#" << node->id() << ":";
-	if ( nv.val() ) {
-	  cout << "1";
-	}
-	else {
-	  cout << "0";
-	}
-      }
-      cout << endl;
-      abort();
     }
   }
 
@@ -624,14 +641,14 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), false);
+      Literal dlit(dvar_map(node), false);
       engine.assumption_add(dlit);
     }
 
     // node の割当の反対を試す．
     TpgNode* node = nv.node();
     bool inv = nv.val();
-    Literal alit(node->gvar(), inv);
+    Literal alit(gvar_map(node), inv);
     engine.assumption_add(alit);
 
     Bool3 tmp_stat = engine.solve(tmp_model);
@@ -656,13 +673,13 @@ DtpgSatS3::run_single(TpgNetwork& network,
 
     // dominator ノードの dvar は1でなければならない．
     for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-      Literal dlit(node->dvar(), false);
+      Literal dlit(dvar_map(node), false);
       engine.assumption_add(dlit);
     }
 
     // node の割当の反対を試す．
     bool inv = (nval == kB3True);
-    Literal alit(node->gvar(), inv);
+    Literal alit(gvar_map(node), inv);
     engine.assumption_add(alit);
 
     Bool3 tmp_stat = engine.solve(tmp_model);
@@ -700,19 +717,25 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
+  GenVidMap gvar_map(network.max_node_id());
+  GenVidMap fvar_map(network.max_node_id());
+  GenVidMap dvar_map(network.max_node_id());
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < network.active_node_num(); ++ i) {
     TpgNode* node = network.active_node(i);
     VarId gvar = engine.new_var();
-    node->set_gvar(gvar);
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
-    node->set_fvar(fvar, dvar);
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -720,7 +743,7 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < network.active_node_num(); ++ i) {
     TpgNode* node = network.active_node(i);
-    make_gval_cnf(engine, node);
+    engine.make_node_cnf(node, gvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -731,14 +754,14 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
-      make_fault_cnf(engine, f1);
+      engine.make_fault_cnf(f1, gvar_map, fvar_map);
     }
     else {
-      make_fval_cnf(engine, node);
+      engine.make_node_cnf(node, fvar_map);
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(engine, node);
+    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
   }
 
   for (vector<TpgFault*>::const_iterator p = fault_list.begin();
@@ -760,7 +783,7 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
       ymuint npo = output_list().size();
       for (ymuint i = 0; i < npo; ++ i) {
 	TpgNode* node = output_list()[i];
-	Literal dlit(node->dvar(), false);
+	Literal dlit(dvar_map(node), false);
 	engine.assumption_add(~dlit);
       }
     }
@@ -768,7 +791,7 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
     for (ymuint i = 0; i < suf_list2.size(); ++ i) {
       NodeVal nv = suf_list2[i];
       TpgNode* node1 = nv.node();
-      Literal mlit(node1->gvar(), false);
+      Literal mlit(gvar_map(node1), false);
       if ( nv.val() ) {
 	engine.assumption_add(mlit);
       }

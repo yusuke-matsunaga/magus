@@ -43,10 +43,12 @@ set (dtpg_SOURCES
   src/dtpg/dop/FopDrop.cc
 
   src/dtpg/engine/SatEngine.cc
+  src/dtpg/engine/VidLitMap.cc
 
   src/dtpg/dtpg_engine/Extractor.cc
   src/dtpg/dtpg_engine/LitMap.cc
   src/dtpg/dtpg_engine/ModelValMap.cc
+  src/dtpg/dtpg_engine/GenVidMap.cc
   src/dtpg/dtpg_engine/DtpgSat.cc
   src/dtpg/dtpg_engine/DtpgSatBaseS.cc
   src/dtpg/dtpg_engine/DtpgSatBaseM.cc
@@ -144,7 +146,7 @@ add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
 
 add_library(satpg_fsim OBJECT ${fsim_SOURCES})
 
-add_library(satpg_graphsat OBJECT ${graphsat_SOURCES})
+#add_library(satpg_graphsat OBJECT ${graphsat_SOURCES})
 
 add_library(satpg_minpat OBJECT ${minpat_SOURCES})
 
@@ -154,7 +156,7 @@ if (TCL_FOUND)
   add_executable(atpg_tclsh
     ${atpg_tclsh_SOURCES}
     $<TARGET_OBJECTS:satpg_dtpg>
-    $<TARGET_OBJECTS:satpg_graphsat>
+#    $<TARGET_OBJECTS:satpg_graphsat>
     $<TARGET_OBJECTS:satpg_fsim>
     $<TARGET_OBJECTS:satpg_minpat>
     $<TARGET_OBJECTS:satpg_rtpg>

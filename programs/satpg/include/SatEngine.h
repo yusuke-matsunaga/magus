@@ -12,7 +12,6 @@
 
 #include "satpg_nsdef.h"
 
-#include "LitMap.h"
 #include "YmNetworks/tgnet.h"
 #include "YmLogic/Literal.h"
 #include "YmLogic/Bool3.h"
@@ -53,6 +52,40 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの入出力の関係を表すCNFを作る．
+  /// @param[in] node 対象のノード
+  /// @param[in] vid_map 変数番号のマップ
+  void
+  make_node_cnf(TpgNode* node,
+		const VidMap& vid_map);
+
+  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+  /// @param[in] node 対象のノード
+  void
+  make_fnode_cnf(TpgNode* node,
+		 const VidMap& gvar_map,
+		 const VidMap& fvar_map);
+
+  /// @brief 故障箇所の関係を表す CNF を作る．
+  /// @param[in] fault 対象の故障
+  /// @param[in] gvar_map 正常値の変数マップ
+  /// @param[in] fvar_map 故障値の変数マップ
+  void
+  make_fault_cnf(TpgFault* fault,
+		 const VidMap& gvar_map,
+		 const VidMap& fvar_map);
+
+  /// @brief 故障伝搬条件を表すCNFを作る．
+  /// @param[in] node 対象のノード
+  /// @param[in] gvar_map 正常値の変数マップ
+  /// @param[in] fvar_map 故障値の変数マップ
+  /// @param[in] dvar_map 故障伝搬条件の変数マップ
+  void
+  make_dchain_cnf(TpgNode* node,
+		  const VidMap& gvar_map,
+		  const VidMap& fvar_map,
+		  const VidMap& dvar_map);
 
   /// @brief ゲートの入出力の関係を表す CNF を作る．
   /// @param[in] gate_type ゲートの種類

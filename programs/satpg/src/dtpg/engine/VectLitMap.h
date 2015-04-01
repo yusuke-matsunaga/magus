@@ -1,8 +1,8 @@
-﻿#ifndef FVARLITMAP_H
-#define FVARLITMAP_H
+﻿#ifndef VECTLITMAP_H
+#define VECTLITMAP_H
 
-/// @file FvarLitMap.h
-/// @brief FvarLitMap のヘッダファイル
+/// @file VectLitMap.h
+/// @brief VectLitMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2012-2014, 2015 Yusuke Matsunaga
@@ -15,16 +15,19 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class FvarLitMap LitMap.h "LitMap.h"
-/// @brief TpgNode->fvar() を用いた LitMap
+/// @class VectLitMap LitMap.h "LitMap.h"
+/// @brief すべての変数を指定した FvarLitMap
 //////////////////////////////////////////////////////////////////////
-class FvarLitMap :
+class VectLitMap :
   public LitMap
 {
 public:
 
   /// @brief コンストラクタ
-  FvarLitMap(const TpgNode* node);
+  /// @param[in] ivars 入力の変数のベクタ
+  /// @param[in] ovar 出力の変数
+  VectLitMap(const vector<VarId>& ivars,
+	     VarId ovar);
 
   /// @brief 入力数を返す．
   virtual
@@ -47,11 +50,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ノード
-  const TpgNode* mNode;
+  // 入力の変数
+  vector<VarId> mIvars;
+
+  // 出力の変数
+  VarId mOvar;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // FVARLITMAP_H
+#endif // LITMAP_H

@@ -9,6 +9,7 @@
 
 #include "ModelValMap.h"
 #include "TpgNode.h"
+#include "VidMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -34,8 +35,14 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] gvar_map 正常値の変数マップ
+// @param[in] fvar_map 故障値の変数マップ
 // @param[in] model SATソルバの作ったモデル
-ModelValMap::ModelValMap(const vector<Bool3>& model) :
+ModelValMap::ModelValMap(const VidMap& gvar_map,
+			 const VidMap& fvar_map,
+			 const vector<Bool3>& model) :
+  mGvarMap(gvar_map),
+  mFvarMap(fvar_map),
   mModel(model)
 {
 }
@@ -50,7 +57,7 @@ ModelValMap::~ModelValMap()
 Val3
 ModelValMap::gval(TpgNode* node) const
 {
-  return bool3_to_val3(mModel[node->gvar().val()]);
+  return bool3_to_val3(mModel[mGvarMap(node).val()]);
 }
 
 // @brief ノードの故障値を返す．
@@ -58,7 +65,7 @@ ModelValMap::gval(TpgNode* node) const
 Val3
 ModelValMap::fval(TpgNode* node) const
 {
-  return bool3_to_val3(mModel[node->fvar().val()]);
+  return bool3_to_val3(mModel[mFvarMap(node).val()]);
 }
 
 END_NAMESPACE_YM_SATPG

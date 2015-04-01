@@ -14,6 +14,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
+#include "GenVidMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -72,19 +73,25 @@ DtpgSatM2::run_multi(TpgNetwork& network,
   mMark.clear();
   mMark.resize(network.max_node_id(), 0);
 
+  GenVidMap gvar_map(network.max_node_id());
+  GenVidMap fvar_map(network.max_node_id());
+  GenVidMap dvar_map(network.max_node_id());
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId gvar = engine.new_var();
-    node->set_gvar(gvar);
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < tfo_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
-    node->set_fvar(fvar, dvar);
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
   }
 
   // 故障を活性化するとき true にする変数．
@@ -115,7 +122,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
   for (vector<TpgNode*>::const_iterator p = olist.begin();
        p != olist.end(); ++ p) {
     TpgNode* node = *p;
-    Literal dlit(node->dvar(), false);
+    Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
@@ -140,7 +147,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
 	mMark[node->id()] = opos + 1;
 
-	make_gval_cnf(engine, node);
+	engine.make_node_cnf(node, gvar_map);
       }
     }
 
@@ -154,13 +161,13 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       }
 
       if ( node->has_flt_var() ) {
-	make_fnode_cnf(engine, node);
+	engine.make_fnode_cnf(node, gvar_map, fvar_map);
       }
       else {
-	make_fval_cnf(engine, node);
+	engine.make_node_cnf(node, fvar_map);
       }
 
-      make_dchain_cnf(engine, node);
+      engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
     }
 
     cnf_end();
@@ -175,7 +182,6 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 	// 他の故障のパタンで検出済みになっている場合がある．
 	continue;
       }
-
 
       timer_start();
 
@@ -207,8 +213,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       }
       for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
 	TpgNode* node = tfo_tfi_node(i);
-	if ( node->has_fvar() && !tmp_mark(node) ) {
-	  Literal dlit(node->dvar(), true);
+	if ( tfo_mark(node) && !tmp_mark(node) ) {
+	  Literal dlit(dvar_map(node), true);
 	  engine.assumption_add(dlit);
 	}
       }
@@ -223,14 +229,14 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       for (ymuint j = 0; j < tfo_size(); ++ j) {
 	TpgNode* node = tfo_tfi_node(j);
 	if ( mMark[node->id()] == 0 ) {
-	  Literal dlit(node->dvar(), false);
+	  Literal dlit(dvar_map(node), false);
 	  engine.assumption_add(~dlit);
 	}
       }
 
       // dominator ノードの dvar は1でなければならない．
       for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-	Literal dlit(node->dvar(), false);
+	Literal dlit(dvar_map(node), false);
 	engine.assumption_add(dlit);
       }
 
@@ -239,7 +245,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       Bool3 ans = solve(engine, sat_stats, time);
 
       if ( ans == kB3True ) {
-	detect_op(f, sat_stats, time);
+	detect_op(f, gvar_map, fvar_map, sat_stats, time);
 
       }
       else if ( ans == kB3False ) {
@@ -271,7 +277,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	make_gval_cnf(engine, node);
+	engine.make_node_cnf(node, gvar_map);
       }
     }
 
@@ -281,8 +287,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     for (ymuint i = 0; i < tfo_size(); ++ i) {
       TpgNode* node = tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
-	make_fval_cnf(engine, node);
-	make_dchain_cnf(engine, node);
+	engine.make_node_cnf(node, fvar_map);
+	engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
       }
     }
 
@@ -323,8 +329,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       }
       for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
 	TpgNode* node = tfo_tfi_node(i);
-	if ( node->has_fvar() && !tmp_mark(node) ) {
-	  Literal dlit(node->dvar(), true);
+	if ( tfo_mark(node) && !tmp_mark(node) ) {
+	  Literal dlit(dvar_map(node), true);
 	  engine.assumption_add(dlit);
 	}
       }
@@ -337,15 +343,13 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 
       // dominator ノードの dvar は1でなければならない．
       for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
-	Literal dlit(node->dvar(), false);
+	Literal dlit(dvar_map(node), false);
 	engine.assumption_add(dlit);
       }
 
-      solve(engine, f);
+      solve(engine, f, gvar_map, fvar_map);
     }
   }
-
-  clear_node_mark();
 
   for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
     TpgNode* node = tfo_tfi_node(i);

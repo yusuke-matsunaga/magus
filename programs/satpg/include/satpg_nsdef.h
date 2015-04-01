@@ -99,6 +99,8 @@ class Dtpg;
 class DtpgEngine;
 class DtpgStats;
 class ValMap;
+class VidMap;
+class LitMap;
 class Rtpg;
 class RtpgStats;
 class MinPat;

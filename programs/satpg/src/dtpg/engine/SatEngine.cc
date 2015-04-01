@@ -8,6 +8,11 @@
 
 
 #include "SatEngine.h"
+#include "TpgNode.h"
+#include "TpgFault.h"
+#include "VidMap.h"
+#include "VidLitMap.h"
+#include "VectLitMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -192,6 +197,242 @@ SatEngine::SatEngine(const string& sat_type,
 // @brief デストラクタ
 SatEngine::~SatEngine()
 {
+}
+
+// @brief ノードの入出力の関係を表すCNFを作る．
+// @param[in] node 対象のノード
+// @param[in] vid_map 変数番号のマップ
+void
+SatEngine::make_node_cnf(TpgNode* node,
+			 const VidMap& vid_map)
+{
+  if ( node->is_input() ) {
+    ;
+  }
+  else if ( node->is_output() ) {
+    make_gate_cnf(kTgGateBuff, VidLitMap(node, vid_map));
+  }
+  else if ( node->is_logic() ) {
+    make_gate_cnf(node->gate_type(), VidLitMap(node,vid_map));
+  }
+  else {
+    ASSERT_NOT_REACHED;
+  }
+}
+
+// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
+// @param[in] engine SAT エンジン
+// @param[in] node 対象のノード
+void
+SatEngine::make_fnode_cnf(TpgNode* node,
+			  const VidMap& gvar_map,
+			  const VidMap& fvar_map)
+{
+  ymuint ni = node->fanin_num();
+  vector<VarId> ivars(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    VarId f0_var = node->if0var(i);
+    VarId f1_var = node->if1var(i);
+    if ( f0_var == kVarIdIllegal ) {
+      if ( f1_var == kVarIdIllegal ) {
+	ivars[i] = fvar_map(inode);
+      }
+      else {
+	VarId tmp_var = new_var();
+	make_flt1_cnf(fvar_map(inode), f1_var, tmp_var);
+	ivars[i] = tmp_var;
+      }
+    }
+    else {
+      if ( f1_var == kVarIdIllegal ) {
+	VarId tmp_var = new_var();
+	make_flt0_cnf(fvar_map(inode), f0_var, tmp_var);
+	ivars[i] = tmp_var;
+      }
+      else {
+	VarId tmp_var = new_var();
+	make_flt01_cnf(fvar_map(inode), f0_var, f1_var, tmp_var);
+	ivars[i] = tmp_var;
+      }
+    }
+  }
+
+  VarId f0_var = node->of0var();
+  VarId f1_var = node->of1var();
+  VarId ovar = fvar_map(node);
+  if ( f0_var == kVarIdIllegal ) {
+    if ( f1_var == kVarIdIllegal ) {
+      ;
+    }
+    else {
+      ovar = new_var();
+      make_flt1_cnf(ovar, f1_var, fvar_map(node));
+    }
+  }
+  else {
+    if ( f1_var == kVarIdIllegal ) {
+      ovar = new_var();
+      make_flt0_cnf(ovar, f0_var, fvar_map(node));
+    }
+    else {
+      ovar = new_var();
+      make_flt01_cnf(ovar, f0_var, f1_var, fvar_map(node));
+    }
+  }
+
+  if ( node->is_input() ) {
+    Literal glit(gvar_map(node), false);
+    Literal output(ovar, false);
+    add_clause( glit, ~output);
+    add_clause(~glit,  output);
+  }
+  else {
+    make_gate_cnf(node->gate_type(), VectLitMap(ivars, ovar));
+  }
+}
+
+// @brief 故障箇所の関係を表す CNF を作る．
+// @param[in] fault 対象の故障
+// @param[in] gvar_map 正常値の変数マップ
+// @param[in] fvar_map 故障値の変数マップ
+void
+SatEngine::make_fault_cnf(TpgFault* fault,
+			  const VidMap& gvar_map,
+			  const VidMap& fvar_map)
+{
+  TpgNode* node = fault->node();
+  int fval = fault->val();
+
+  if ( fault->is_output_fault() ) {
+    // 出力の故障の場合
+    // ただ単に故障値を固定するだけ．
+    Literal flit(fvar_map(node), false);
+    if ( fval == 0 ) {
+      add_clause(~flit);
+    }
+    else {
+      add_clause(flit);
+    }
+  }
+  else {
+    // 入力の故障の場合
+    // 故障値は非制御値のはずなので，
+    // side input だけのゲートを仮定する．
+
+    ymuint fpos = fault->pos();
+    // fpos 以外の入力を ivars[] に入れる．
+    // fpos の入力の値は故障値の逆にする．
+    ymuint ni = node->fanin_num();
+    vector<VarId> ivars;
+    ivars.reserve(ni - 1);
+    for (ymuint i = 0; i < ni; ++ i) {
+      TpgNode* inode = node->fanin(i);
+      VarId ivar = gvar_map(inode);
+      if ( i == fpos ) {
+	Literal ilit(ivar, false);
+	if ( fval == 0 ) {
+	  add_clause(ilit);
+	}
+	else {
+	  add_clause(~ilit);
+	}
+      }
+      else {
+	ivars.push_back(ivar);
+      }
+    }
+    VarId ovar = fvar_map(node);
+
+    bool inv = false;
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
+      ASSERT_NOT_REACHED;
+      break;
+
+    case kTgGateNand:
+      ASSERT_COND( fval == 1 );
+      make_and_cnf(VectLitMap(ivars, ovar), true);
+      break;
+
+    case kTgGateAnd:
+      ASSERT_COND( fval == 1 );
+      make_and_cnf(VectLitMap(ivars, ovar), false);
+      break;
+
+    case kTgGateNor:
+      ASSERT_COND( fval == 0 );
+      make_or_cnf(VectLitMap(ivars, ovar), true);
+      break;
+
+    case kTgGateOr:
+      ASSERT_COND( fval == 0 );
+      make_or_cnf(VectLitMap(ivars, ovar), false);
+      break;
+
+    case kTgGateXnor:
+      inv = true;
+      // わざと次に続く
+
+    case kTgGateXor:
+      if ( fval == 1 ) {
+	inv = !inv;
+      }
+      make_xor_cnf(VectLitMap(ivars, ovar), inv);
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
+  }
+}
+
+// @brief 故障伝搬条件を表すCNFを作る．
+// @param[in] node 対象のノード
+// @param[in] gvar_map 正常値の変数マップ
+// @param[in] fvar_map 故障値の変数マップ
+// @param[in] dvar_map 故障伝搬条件の変数マップ
+void
+SatEngine::make_dchain_cnf(TpgNode* node,
+			   const VidMap& gvar_map,
+			   const VidMap& fvar_map,
+			   const VidMap& dvar_map)
+{
+  Literal glit(gvar_map(node), false);
+  Literal flit(fvar_map(node), false);
+  Literal dlit(dvar_map(node), false);
+
+  // dlit -> XOR(glit, flit) を追加する．
+  // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
+  add_clause(~glit, ~flit, ~dlit);
+  add_clause( glit,  flit, ~dlit);
+
+  if ( node->is_output() ) {
+    // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
+    add_clause(~glit,  flit, dlit);
+    add_clause( glit, ~flit, dlit);
+  }
+  else {
+    // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
+    ymuint nfo = node->active_fanout_num();
+    tmp_lits_begin(nfo + 1);
+    tmp_lits_add(~dlit);
+    for (ymuint j = 0; j < nfo; ++ j) {
+      TpgNode* onode = node->active_fanout(j);
+      Literal odlit(dvar_map(onode), false);
+      tmp_lits_add(odlit);
+    }
+    tmp_lits_end();
+
+    // dominator の dlit が 0 なら自分も 0
+    TpgNode* idom = node->imm_dom();
+    if ( idom != NULL ) {
+      Literal idlit(dvar_map(idom), false);
+      add_clause(~dlit, idlit);
+    }
+  }
 }
 
 // @brief ゲートの入出力の関係を表す CNF を作る．

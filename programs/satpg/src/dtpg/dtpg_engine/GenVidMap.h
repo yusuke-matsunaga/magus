@@ -1,40 +1,35 @@
-#ifndef MODELVALMAP_H
-#define MODELVALMAP_H
+#ifndef GENVIDMAP_H
+#define GENVIDMAP_H
 
-/// @file ModelValMap.h
-/// @brief ModelValMap のヘッダファイル
+/// @file GenVidMap.h
+/// @brief GenVidMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "ValMap.h"
-#include "YmLogic/Bool3.h"
+#include "VidMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class ModelValMap ModelValMap.h "ModelValMap.h"
-/// @brief SAT ソルバの model 配列から値を読みだす ValMap
+/// @class GenVidMap GenVidMap.h "GenVidMap.h"
+/// @brief 汎用の VidMap
 //////////////////////////////////////////////////////////////////////
-class ModelValMap :
-  public ValMap
+class GenVidMap :
+  public VidMap
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] gvar_map 正常値の変数マップ
-  /// @param[in] fvar_map 故障値の変数マップ
-  /// @param[in] model SATソルバの作ったモデル
-  ModelValMap(const VidMap& gvar_map,
-	      const VidMap& fvar_map,
-	      const vector<Bool3>& model);
+  /// @param[in] max_id ノード番号の最大値
+  GenVidMap(ymuint max_id);
 
   /// @brief デストラクタ
   virtual
-  ~ModelValMap();
+  ~GenVidMap();
 
 
 public:
@@ -42,17 +37,18 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノードの正常値を返す．
+  /// @brief ノードに関連した変数番号を返す．
   /// @param[in] node 対象のノード
   virtual
-  Val3
-  gval(TpgNode* node) const;
+  VarId
+  operator()(const TpgNode* node) const;
 
-  /// @brief ノードの故障値を返す．
+  /// @brief ノードに関連した変数番号を設定する．
   /// @param[in] node 対象のノード
-  virtual
-  Val3
-  fval(TpgNode* node) const;
+  /// @param[in] vid 変数番号
+  void
+  set_vid(const TpgNode* node,
+	  VarId vid);
 
 
 private:
@@ -66,17 +62,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 正常値の変数マップ
-  const VidMap& mGvarMap;
-
-  // 故障値の変数マップ
-  const VidMap& mFvarMap;
-
-  // モデル
-  const vector<Bool3>& mModel;
+  // 変数番号を格納する配列
+  vector<VarId> mVidArray;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // GVALMODELMAP_H
+#endif // GENVIDMAP_H

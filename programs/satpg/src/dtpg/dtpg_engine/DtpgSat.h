@@ -13,8 +13,6 @@
 #include "DtpgEngine.h"
 #include "TpgNode.h"
 #include "DtpgStats.h"
-#include "LitMap.h"
-#include "YmLogic/Literal.h"
 #include "YmLogic/Bool3.h"
 #include "YmLogic/sat_nsdef.h"
 #include "YmLogic/SatStats.h"
@@ -147,6 +145,16 @@ protected:
   TpgNode*
   tfo_tfi_node(ymuint pos) const;
 
+  /// @brief tfo マークを読む．
+  /// @param[in] node 対象のノード
+  bool
+  tfo_mark(TpgNode* node);
+
+  /// @brief tfi マークを読む．
+  /// @param[in] node 対象のノード
+  bool
+  tfi_mark(TpgNode* node);
+
   /// @brief 入力のノードのリストを返す．
   const vector<TpgNode*>&
   input_list() const;
@@ -155,51 +163,13 @@ protected:
   const vector<TpgNode*>&
   output_list() const;
 
-  /// @brief 正常回路用の CNF 式を作る．
-  /// @param[in] engine SAT エンジン
-  /// @param[in] node 対象のノード
-  static
-  void
-  make_gval_cnf(SatEngine& engine,
-		TpgNode* node);
-
-  /// @brief 故障回路用の CNF 式を作る．
-  /// @param[in] engine SAT エンジン
-  /// @param[in] node 対象のノード
-  static
-  void
-  make_fval_cnf(SatEngine& engine,
-		TpgNode* node);
-
-  /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
-  /// @param[in] engine SAT エンジン
-  /// @param[in] node 対象のノード
-  static
-  void
-  make_fnode_cnf(SatEngine& engine,
-		 TpgNode* node);
-
-  /// @brief 故障箇所の関係を表す CNF を作る．
-  /// @param[in] engine SAT エンジン
-  /// @param[in] fault 対象の故障
-  static
-  void
-  make_fault_cnf(SatEngine& engine,
-		 TpgFault* fault);
-
-  /// @brief 故障伝搬条件を表すCNFを作る．
-  /// @param[in] engine SAT エンジン
-  /// @param[in] node 対象のノード
-  static
-  void
-  make_dchain_cnf(SatEngine& engine,
-		  TpgNode* node);
-
   /// @brief 一つの SAT問題を解く．
   /// @param[in] engine SAT エンジン
   Bool3
   solve(SatEngine& engine,
-	TpgFault* f);
+	TpgFault* f,
+	const VidMap& gvar_map,
+	const VidMap& fvar_map);
 
   /// @brief 一つの SAT問題を解く．
   /// @param[in] engine SAT エンジン
@@ -214,6 +184,8 @@ protected:
   /// @brief 検出した場合の処理
   void
   detect_op(TpgFault* fault,
+	    const VidMap& gvar_map,
+	    const VidMap& fvar_map,
 	    const SatStats& sat_stats,
 	    const USTime& time);
 
@@ -234,10 +206,6 @@ protected:
   abort_op(TpgFault* fault,
 	   const SatStats& sat_stats,
 	   const USTime& time);
-
-  /// @brief ノードの変数割り当てフラグを消す．
-  void
-  clear_node_mark();
 
   /// @brief tmp マークをつける．
   /// @param[in] node 対象のノード
@@ -284,20 +252,10 @@ private:
   void
   set_tfo_mark(TpgNode* node);
 
-  /// @brief tfo マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tfo_mark(TpgNode* node);
-
   /// @brief tfi マークをつける．
   /// @param[in] node 対象のノード
   void
   set_tfi_mark(TpgNode* node);
-
-  /// @brief tfi マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tfi_mark(TpgNode* node);
 
 
 private:

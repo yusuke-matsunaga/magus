@@ -15,6 +15,26 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+void
+dfs(TpgNode* node,
+    HashSet<ymuint>& mark)
+{
+  if ( mark.check(node->id()) ) {
+    return;
+  }
+  mark.add(node->id());
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    TpgNode* onode = node->active_fanout(i);
+    dfs(onode, mark);
+  }
+}
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス Extractor
 //////////////////////////////////////////////////////////////////////
@@ -39,6 +59,9 @@ Extractor::operator()(TpgFault* fault,
 		      NodeValList& assign_list)
 {
   TpgNode* fnode = fault->node();
+
+  mFconeMark.clear();
+  dfs(fnode, mFconeMark);
 
   // 故障差の伝搬している経路を探す．
   TpgNode* spo = find_sensitized_output(fnode);
@@ -118,7 +141,7 @@ Extractor::record_sensitized_node(TpgNode* node,
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    if ( inode->has_fvar() ) {
+    if ( mFconeMark.check(inode->id()) ) {
       if ( mValMap.gval(inode) != mValMap.fval(inode) ) {
 	record_sensitized_node(inode, assign_list);
       }
@@ -164,7 +187,7 @@ Extractor::record_masking_node(TpgNode* node,
   }
   mRecorded.add(node->id());
 
-  if ( !node->has_fvar() ) {
+  if ( !mFconeMark.check(node->id()) ) {
     record_node(node, assign_list);
     return;
   }
@@ -179,7 +202,7 @@ Extractor::record_masking_node(TpgNode* node,
   TpgNode* cnode = NULL;
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    if ( inode->has_fvar() ) {
+    if ( mFconeMark.check(inode->id()) ) {
       if ( mValMap.gval(inode) != mValMap.fval(inode) ) {
 	has_snode = true;
       }
@@ -199,7 +222,7 @@ Extractor::record_masking_node(TpgNode* node,
   // ファンインに再帰する．
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
-    if ( inode->has_fvar() && mValMap.gval(inode) != mValMap.fval(inode) ) {
+    if ( mFconeMark.check(inode->id()) && mValMap.gval(inode) != mValMap.fval(inode) ) {
       record_sensitized_node(inode, assign_list);
     }
     else {
