@@ -165,7 +165,6 @@ DtpgSatS3::run(TpgNetwork& network,
     clear_node_mark();
   }
 
-#if 0
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = network.active_node(i);
     if ( node->is_output() ) {
@@ -183,7 +182,35 @@ DtpgSatS3::run(TpgNetwork& network,
       }
     }
   }
-#endif
+
+  ymuint nf = 0;
+  for (ymuint i = 0; i < fault_list.size(); ++ i) {
+    TpgFault* f = fault_list[i];
+    FaultInfo& fi = mFaultInfoArray[f->id()];
+    if ( fi.mDominaterList.empty() ) {
+      ++ nf;
+    }
+    cout << f->str() << ":";
+    const NodeValList& suf_list = fi.mSufList;
+    for (ymuint j = 0; j < suf_list.size(); ++ j) {
+      NodeVal nv = suf_list[j];
+      cout << " Node#" << nv.node()->id() << ":" << nv.val();
+    }
+    cout << endl;
+    const NodeValList& ma_list = fi.mMaList;
+    cout << "    ";
+    for (ymuint j = 0; j < ma_list.size(); ++ j) {
+      NodeVal nv = ma_list[j];
+      cout << " Node#" << nv.node()->id() << ":" << nv.val();
+    }
+    cout << endl;
+  }
+  cout << "Total " << fault_list.size() << " detectable faults" << endl
+       << "Total " << nf << " representative faults" << endl;
+
+  print_network(cout,
+		network);
+
 #if 0
   // 二回目は正常回路の CNF のみを作る
   {
@@ -703,6 +730,62 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
     make_dchain_cnf(engine, node);
   }
 
+  for (vector<TpgFault*>::const_iterator p = fault_list.begin();
+       p != fault_list.end(); ++ p) {
+    TpgFault* f2 = *p;
+    if ( f1 == f2 ) {
+      continue;
+    }
+
+    // f2 の十分割当のものとで f1 が検出不能かどうか調べる．
+    FaultInfo& fi2 = mFaultInfoArray[f2->id()];
+    //const NodeValList& suf_list2 = fi2.mSufList;
+    const NodeValList& suf_list2 = fi2.mMaList;
+
+    // 故障に対するテスト生成を行なう．
+    engine.assumption_begin();
+
+    {
+      ymuint npo = output_list().size();
+      for (ymuint i = 0; i < npo; ++ i) {
+	TpgNode* node = output_list()[i];
+	Literal dlit(node->dvar(), false);
+	engine.assumption_add(~dlit);
+      }
+    }
+
+    for (ymuint i = 0; i < suf_list2.size(); ++ i) {
+      NodeVal nv = suf_list2[i];
+      TpgNode* node1 = nv.node();
+      Literal mlit(node1->gvar(), false);
+      if ( nv.val() ) {
+	engine.assumption_add(mlit);
+      }
+      else {
+	engine.assumption_add(~mlit);
+      }
+    }
+    vector<Bool3> tmp_model;
+    Bool3 tmp_stat = engine.solve(tmp_model);
+    if ( tmp_stat == kB3True ) {
+      // 検出できなかった．
+      ;
+    }
+    else if ( tmp_stat == kB3False ) {
+      // 検出できた．
+      // ということは f2 を検出する時に常に f1 も検出できることを意味する．
+      mFaultInfoArray[f2->id()].mDominateeList.push_back(f1->id());
+      mFaultInfoArray[f1->id()].mDominaterList.push_back(f2->id());
+      cout << f1->str() << " is dominated by " << f2->str() << endl;
+      ;
+    }
+    else {
+      // アボート．とりあえず無視
+      ;
+    }
+  }
+
+#if 0
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
@@ -764,6 +847,7 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
     }
   }
   cout << endl;
+#endif
 }
 
 // @brief コンストラクタ

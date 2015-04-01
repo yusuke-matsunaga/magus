@@ -104,7 +104,11 @@ private:
     vector<ymuint> mConflictList;
 
     // 支配している故障のリスト
-    vector<ymuint> mDominateList;
+    vector<ymuint> mDominateeList;
+
+    // 支配されている故障のリスト
+    vector<ymuint> mDominaterList;
+
   };
 
 
