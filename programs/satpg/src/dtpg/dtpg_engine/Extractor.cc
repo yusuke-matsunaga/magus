@@ -8,6 +8,7 @@
 
 
 #include "Extractor.h"
+#include "TpgFault.h"
 #include "TpgNode.h"
 #include "NodeValList.h"
 
@@ -31,40 +32,33 @@ Extractor::~Extractor()
 }
 
 // @brief 値割当を求める．
-// @param[in] fnode 故障のあるノード
+// @param[in] fault 故障
 // @param[out] assign_list 値の割当リスト
 void
-Extractor::operator()(TpgNode* fnode,
+Extractor::operator()(TpgFault* fault,
 		      NodeValList& assign_list)
 {
-  // 故障差の伝搬している経路を探す．
-  mNodeList.clear();
-  mReachabilityMap.clear();
-  bool stat = get_sensitized_node(fnode);
-  ASSERT_COND( stat );
+  TpgNode* fnode = fault->node();
 
-  if ( false ) {
-    cout << " propagation path =";
-    for (vector<TpgNode*>::iterator p = mNodeList.begin();
-	 p != mNodeList.end(); ++ p) {
-      TpgNode* node = *p;
-      cout << " Node#" << node->id();
-    }
-    cout << endl;
-  }
+  // 故障差の伝搬している経路を探す．
+  TpgNode* spo = find_sensitized_output(fnode);
+  ASSERT_COND( spo != NULL );
 
   // その経路の side input の値を記録する．
   mRecorded.clear();
   assign_list.clear();
-  for (vector<TpgNode*>::iterator p = mNodeList.begin();
-       p != mNodeList.end(); ++ p) {
-    TpgNode* node = *p;
-    ymuint ni = node->fanin_num();
+
+  mRecorded.add(fnode->id());
+  record_node(fnode, assign_list);
+  if ( fault->is_input_fault() ) {
+    ymuint ni = fnode->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      record_side_inputs(inode, assign_list);
+      TpgNode* inode = fnode->fanin(i);
+      record_node(inode, assign_list);
     }
   }
+
+  record_sensitized_node(spo->fanin(0), assign_list);
 
   if ( false ) {
     ymuint n = assign_list.size();
@@ -85,29 +79,57 @@ Extractor::operator()(TpgNode* fnode,
 
 // @brief 故障の影響を伝搬するノードを求める．
 // @param[in] node 対象のノード
-bool
-Extractor::get_sensitized_node(TpgNode* node)
+TpgNode*
+Extractor::find_sensitized_output(TpgNode* node)
 {
-  // まずすでに計算済みかどうか調べる．
-  bool reached = false;
-  if ( !mReachabilityMap.find(node->id(), reached) ) {
-    reached = node->is_output();
-    if ( mValMap.gval(node) != mValMap.fval(node) ) {
-      // node までは sensitized されていた．
-      ymuint nfo = node->active_fanout_num();
-      for (ymuint i = 0; i < nfo; ++ i) {
-	TpgNode* onode = node->active_fanout(i);
-	if ( get_sensitized_node(onode) ) {
-	  reached = true;
-	}
-      }
-      if ( reached ) {
-	mNodeList.push_back(node);
+  if ( node->is_output() ) {
+    return node;
+  }
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    TpgNode* onode = node->active_fanout(i);
+    if ( mValMap.gval(onode) != mValMap.fval(onode) ) {
+      TpgNode* ans = find_sensitized_output(onode);
+      if ( ans != NULL ) {
+	return ans;
       }
     }
-    mReachabilityMap.add(node->id(), reached);
   }
-  return reached;
+  return NULL;
+}
+
+// @brief 故障の影響の伝搬を阻害する値割当を記録する．
+// @param[in] node 対象のノード
+// @param[out] assign_list 値割当を記録するリスト
+void
+Extractor::record_sensitized_node(TpgNode* node,
+				  NodeValList& assign_list)
+{
+  if ( mRecorded.check(node->id()) ) {
+    return;
+  }
+  mRecorded.add(node->id());
+
+  record_node(node, assign_list);
+
+  ASSERT_COND( mValMap.gval(node) != mValMap.fval(node) );
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    TpgNode* inode = node->fanin(i);
+    if ( inode->has_fvar() ) {
+      if ( mValMap.gval(inode) != mValMap.fval(inode) ) {
+	record_sensitized_node(inode, assign_list);
+      }
+      else {
+	record_masking_node(inode, assign_list);
+      }
+    }
+    else {
+      record_side_inputs(inode, assign_list);
+    }
+  }
 }
 
 // @brief side inputs の値を記録する．
@@ -117,6 +139,10 @@ void
 Extractor::record_side_inputs(TpgNode* node,
 			      NodeValList& assign_list)
 {
+  if ( mValMap.gval(node) != mValMap.fval(node) ) {
+    return;
+  }
+
   if ( mRecorded.check(node->id()) ) {
     return;
   }
@@ -124,42 +150,6 @@ Extractor::record_side_inputs(TpgNode* node,
 
   // node の値を記録する．
   record_node(node, assign_list);
-
-  if ( !node->has_fvar() ) {
-    return;
-  }
-
-  ymuint ni = node->fanin_num();
-
-  if ( mValMap.gval(node) == mValMap.fval(node) ) {
-    // ファンインには sensitized node があって
-    // side input がある場合．
-    bool has_cval = false;
-    bool has_snode = false;
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      if ( !inode->has_fvar() && node->cval() == mValMap.gval(inode) ) {
-	// inode が side input でかつ制御値を持っている．
-	record_side_inputs(inode, assign_list);
-	return;
-      }
-    }
-    // ファンインに再帰する．
-    // ただし，故障の影響の伝搬を止める値の割当のみを記録する．
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      record_masking_node(inode, assign_list);
-    }
-  }
-  else {
-    // ファンインに再帰する．
-    // 実は side inputs ではない sensitized node にも再起しているが
-    // もんだいはない．
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
-      record_side_inputs(inode, assign_list);
-    }
-  }
 }
 
 // @brief 故障の影響の伝搬を阻害する値割当を記録する．
@@ -210,7 +200,7 @@ Extractor::record_masking_node(TpgNode* node,
   for (ymuint i = 0; i < ni; ++ i) {
     TpgNode* inode = node->fanin(i);
     if ( inode->has_fvar() && mValMap.gval(inode) != mValMap.fval(inode) ) {
-      record_side_inputs(inode, assign_list);
+      record_sensitized_node(inode, assign_list);
     }
     else {
       record_masking_node(inode, assign_list);

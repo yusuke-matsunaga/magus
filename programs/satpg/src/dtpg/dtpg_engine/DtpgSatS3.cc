@@ -194,22 +194,33 @@ DtpgSatS3::run(TpgNetwork& network,
     const NodeValList& suf_list = fi.mSufList;
     for (ymuint j = 0; j < suf_list.size(); ++ j) {
       NodeVal nv = suf_list[j];
-      cout << " Node#" << nv.node()->id() << ":" << nv.val();
+      cout << " " << nv.node()->id();
+      if ( nv.val() ) {
+	cout << "P";
+      }
+      else {
+	cout << "N";
+      }
     }
     cout << endl;
     const NodeValList& ma_list = fi.mMaList;
     cout << "    ";
     for (ymuint j = 0; j < ma_list.size(); ++ j) {
       NodeVal nv = ma_list[j];
-      cout << " Node#" << nv.node()->id() << ":" << nv.val();
+      cout << " " << nv.node()->id();
+      if ( nv.val() ) {
+	cout << "P";
+      }
+      else {
+	cout << "N";
+      }
     }
     cout << endl;
   }
   cout << "Total " << fault_list.size() << " detectable faults" << endl
        << "Total " << nf << " representative faults" << endl;
 
-  print_network(cout,
-		network);
+  print_network(cout, network);
 
 #if 0
   // 二回目は正常回路の CNF のみを作る
@@ -431,7 +442,7 @@ DtpgSatS3::run_single(TpgNetwork& network,
   ModelValMap val_map(sat_model);
   Extractor extract(val_map);
   NodeValList& suf_list = mFaultInfoArray[fault->id()].mSufList;
-  extract(fault->node(), suf_list);
+  extract(fault, suf_list);
 
   if ( do_verify ) { // 検証
     SatEngine engine(sat_type(), sat_option(), sat_outp());
