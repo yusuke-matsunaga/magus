@@ -486,9 +486,17 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	  TpgNode* node = node_list[i];
 
 	  cout << "Node#" << setw(5) << node->id() << ": ";
-	  cout << ", gval = " << tmp_model[node->gvar().val()]
-	       << ", fval = " << tmp_model[node->fvar().val()]
-	       << ", dval = " << tmp_model[node->dvar().val()]
+	  if ( tmp_model[node->gvar().val()] != sat_model[node->gvar().val()] ||
+	       tmp_model[node->fvar().val()] != sat_model[node->fvar().val()] ) {
+	    cout << "*";
+	  }
+	  else {
+	    cout << " ";
+	  }
+	  cout << tmp_model[node->gvar().val()]
+	       << "/" << tmp_model[node->fvar().val()]
+	       << " <=> " << sat_model[node->gvar().val()]
+	       << "/" << sat_model[node->fvar().val()]
 	       << ": ";
 	  if ( node->is_input() ) {
 	    cout << "INPUT#" << node->input_id();
@@ -514,10 +522,6 @@ DtpgSatS3::run_single(TpgNetwork& network,
 	    ASSERT_NOT_REACHED;
 	  }
 	  cout << endl;
-	  cout << "            "
-	       << ", gval = " << sat_model[node->gvar().val()]
-	       << ", fval = " << sat_model[node->fvar().val()]
-	       << ", dval = " << sat_model[node->dvar().val()] << endl << endl;
 	}
       }
       for (ymuint i = 0; i < n; ++ i) {

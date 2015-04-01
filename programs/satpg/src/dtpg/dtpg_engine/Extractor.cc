@@ -138,7 +138,7 @@ Extractor::record_side_inputs(TpgNode* node,
     bool has_snode = false;
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* inode = node->fanin(i);
-      if ( !inode->has_fvar() && inode->cval() == mValMap.gval(inode) ) {
+      if ( !inode->has_fvar() && node->cval() == mValMap.gval(inode) ) {
 	// inode が side input でかつ制御値を持っている．
 	record_side_inputs(inode, assign_list);
 	return;
@@ -195,10 +195,9 @@ Extractor::record_masking_node(TpgNode* node,
       }
     }
     else {
-      if ( inode->cval() == mValMap.gval(inode) ) {
+      if ( node->cval() == mValMap.gval(inode) ) {
 	has_cval = true;
 	cnode = inode;
-	break;
       }
     }
     if ( has_snode && has_cval ) {
