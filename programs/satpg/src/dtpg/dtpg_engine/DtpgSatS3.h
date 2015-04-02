@@ -12,6 +12,7 @@
 
 #include "DtpgSat.h"
 #include "NodeValList.h"
+#include "ConflictSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -58,6 +59,44 @@ public:
       DtpgStats& stats);
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // このクラスで使われるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 各故障ごとの情報をまとめた構造体
+  struct FaultInfo
+  {
+    /// @brief コンストラクタ
+    FaultInfo();
+
+    /// @brief デストラクタ
+    ~FaultInfo();
+
+    // ID番号
+    ymuint mId;
+
+    // 対応する故障
+    TpgFault* mFault;
+
+    // 検出フラグ
+    bool mDetected;
+
+    // 支配フラグ
+    bool mDominated;
+
+    // 関係する入力番号のリスト
+    vector<ymuint> mInputList;
+
+    // 十分割当リスト
+    NodeValList mSufList;
+
+    // 必要割当リスト
+    NodeValList mMaList;
+
+  };
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
@@ -74,43 +113,9 @@ private:
   void
   check_other_faults(TpgNetwork& network,
 		     const NodeSet& node_set,
-		     TpgFault* f_tgt,
-		     const vector<TpgFault*>& fault_list);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // このクラスで使われるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 各故障ごとの情報をまとめた構造体
-  struct FaultInfo
-  {
-    /// @brief コンストラクタ
-    FaultInfo();
-
-    /// @brief デストラクタ
-    ~FaultInfo();
-
-    // 検出可能フラグ
-    bool mDetected;
-
-    // 十分割当リスト
-    NodeValList mSufList;
-
-    // 必要割当リスト
-    NodeValList mMaList;
-
-    // 排他的な故障のリスト
-    vector<ymuint> mConflictList;
-
-    // 支配している故障のリスト
-    vector<ymuint> mDominateeList;
-
-    // 支配されている故障のリスト
-    vector<ymuint> mDominaterList;
-
-  };
+		     ConflictSet& conflict_set,
+		     FaultInfo* f_tgt,
+		     const vector<FaultInfo*>& fault_list);
 
 
 private:

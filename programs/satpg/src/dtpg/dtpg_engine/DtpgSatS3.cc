@@ -108,6 +108,44 @@ struct NodeLt
   }
 };
 
+bool
+check_intersect(const vector<ymuint>& list1,
+		const vector<ymuint>& list2)
+{
+  ymuint n1 = list1.size();
+  ymuint n2 = list2.size();
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  while ( i1 < n2 && i2 < n2 ) {
+    ymuint v1 = list1[i1];
+    ymuint v2 = list2[i2];
+    if ( v1 < v2 ) {
+      ++ i1;
+    }
+    else if ( v1 > v2 ) {
+      ++ i2;
+    }
+    else {
+      return true;
+    }
+  }
+  return false;
+}
+
+END_NONAMESPACE
+
+BEGIN_NONAMESPACE
+
+struct FiLt
+{
+  bool
+  operator()(DtpgSatS3::FaultInfo* left,
+	     DtpgSatS3::FaultInfo* right)
+  {
+    return left->mMaList.size() > right->mMaList.size();
+  }
+};
+
 END_NONAMESPACE
 
 // @brief テスト生成を行なう．
@@ -121,33 +159,32 @@ DtpgSatS3::run(TpgNetwork& network,
 
   ymuint nn = network.active_node_num();
   ymuint max_fault_id = 0;
-  for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = network.active_node(i);
-    if ( node->is_output() ) {
-      continue;
-    }
+  { // fault_id の最大値を求める．
+    for (ymuint i = 0; i < nn; ++ i) {
+      TpgNode* node = network.active_node(i);
+      if ( node->is_output() ) {
+	continue;
+      }
 
-    ymuint nf = node->fault_num();
-    for (ymuint i = 0; i < nf; ++ i) {
-      TpgFault* f = node->fault(i);
-      if ( f->status() != kFsDetected &&
-	   !f->is_skip() ) {
+      ymuint nf = node->fault_num();
+      for (ymuint i = 0; i < nf; ++ i) {
+	TpgFault* f = node->fault(i);
 	ymuint fid = f->id();
 	if ( max_fault_id < fid ) {
 	  max_fault_id = fid;
 	}
       }
     }
+    ++ max_fault_id;
   }
 
-  ++ max_fault_id;
   mFaultInfoArray.clear();
   mFaultInfoArray.resize(max_fault_id);
 
   NodeSet node_set;
 
   // 一回目は普通のテスト生成と必要割当の検査
-  vector<TpgFault*> fault_list;
+  vector<FaultInfo*> fault_list;
   ymuint max_id = network.max_node_id();
   for (ymuint i = 0; i < nn; ++ i) {
     TpgNode* node = network.active_node(i);
@@ -161,31 +198,107 @@ DtpgSatS3::run(TpgNetwork& network,
     for (ymuint i = 0; i < nf; ++ i) {
       TpgFault* f = node->fault(i);
       FaultInfo& fi = mFaultInfoArray[f->id()];
+      fi.mId = f->id();
+      fi.mFault = f;
       fi.mDetected = run_single(node_set, f);
+      fi.mDominated = false;
       if ( fi.mDetected ) {
-	fault_list.push_back(f);
+	fault_list.push_back(&fi);
+	for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+	  TpgNode* node = node_set.tfo_tfi_node(i);
+	  if ( node->is_input() ) {
+	    fi.mInputList.push_back(node->id());
+	  }
+	}
       }
     }
   }
 
-  for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = network.active_node(i);
-    if ( node->is_output() ) {
+  ConflictSet conflict_set(max_fault_id);
+
+  // ma_list からわかる関係を調べる．
+  ymuint nf = fault_list.size();
+  for (ymuint i1 = 0; i1 < nf; ++ i1) {
+    FaultInfo* fi1 = fault_list[i1];
+    for (ymuint i2 = 0; i2 < nf; ++ i2) {
+      if ( i1 == i2 ) {
+	continue;
+      }
+
+      FaultInfo* fi2 = fault_list[i2];
+      if ( fi2->mDominated ) {
+	continue;
+      }
+      if ( check_conflict(fi1->mMaList, fi2->mMaList) ) {
+	conflict_set.add(fi1->mId, fi2->mId);
+	cout << fi1->mFault->str() << " and " << fi2->mFault->str() << " conflict" << endl;
+      }
+      if ( check_contain(fi1->mMaList, fi2->mSufList) ) {
+	fi2->mDominated = true;
+	cout << fi1->mFault->str() << " dominates " << fi2->mFault->str() << endl;
+      }
+    }
+  }
+
+  vector<FaultInfo*> tmp_list;
+  tmp_list.reserve(fault_list.size());
+  for (ymuint i = 0; i < nf; ++ i) {
+    FaultInfo* fi = fault_list[i];
+    if ( !fi->mDominated ) {
+      tmp_list.push_back(fi);
+    }
+  }
+  sort(tmp_list.begin(), tmp_list.end(), FiLt());
+  ymuint wpos = 0;
+  for (ymuint i = 0; i < tmp_list.size(); ++ i) {
+    FaultInfo* fi1 = tmp_list[i];
+    bool contained = false;
+    for (ymuint j = 0; j < i; ++ j) {
+      FaultInfo* fi2 = tmp_list[j];
+      if ( check_contain(fi2->mMaList, fi1->mMaList) ) {
+	contained = true;
+	break;
+      }
+    }
+    if ( contained ) {
+      continue;
+    }
+    if ( wpos < i ) {
+      tmp_list[wpos] = fi1;
+    }
+    ++ wpos;
+  }
+  if ( wpos < nf ) {
+    tmp_list.erase(tmp_list.begin() + wpos, tmp_list.end());
+  }
+
+  for (ymuint i = 0; i < nf; ++ i) {
+    FaultInfo* fi = fault_list[nf - i - 1];
+    if ( fi->mDominated ) {
       continue;
     }
 
-    node_set.mark_region(max_id, vector<TpgNode*>(1, node));
+    TpgFault* f = fi->mFault;
+    TpgNode* fnode = f->node();
 
-    ymuint nf = node->fault_num();
-    for (ymuint i = 0; i < nf; ++ i) {
-      TpgFault* f = node->fault(i);
-      FaultInfo& fi = mFaultInfoArray[f->id()];
-      if ( fi.mDetected ) {
-	check_other_faults(network, node_set, f, fault_list);
-      }
-    }
+    node_set.mark_region(max_id, vector<TpgNode*>(1, fnode));
+
+    check_other_faults(network, node_set, conflict_set, fi, tmp_list);
   }
 
+  ymuint nf2 = 0;
+  for (ymuint i = 0; i < nf; ++ i) {
+    FaultInfo* fi = fault_list[i];
+    if ( !fi->mDominated ) {
+      ++ nf2;
+    }
+  }
+  cout << "Total " << nf << " detectable faults" << endl
+       << "Total " << nf2 << " representative faults" << endl;
+
+  //print_network(cout, network);
+
+#if 0
   ymuint nf = 0;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
     TpgFault* f = fault_list[i];
@@ -224,7 +337,7 @@ DtpgSatS3::run(TpgNetwork& network,
        << "Total " << nf << " representative faults" << endl;
 
   print_network(cout, network);
-
+#endif
 #if 0
   // 二回目は正常回路の CNF のみを作る
   {
@@ -720,10 +833,14 @@ DtpgSatS3::run_single(const NodeSet& node_set,
 void
 DtpgSatS3::check_other_faults(TpgNetwork& network,
 			      const NodeSet& node_set,
-			      TpgFault* f1,
-			      const vector<TpgFault*>& fault_list)
+			      ConflictSet& conflict_set,
+			      FaultInfo* fi1,
+			      const vector<FaultInfo*>& fault_list)
 {
+  TpgFault* f1 = fi1->mFault;
   TpgNode* fnode = f1->node();
+
+  cout << "check_other_faults(" << f1->str() << ")" << endl;
 
   cnf_begin();
 
@@ -738,8 +855,8 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    TpgNode* node = network.active_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
@@ -755,8 +872,8 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    TpgNode* node = network.active_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     engine.make_node_cnf(node, gvar_map);
   }
 
@@ -778,20 +895,56 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
     engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
   }
 
-  for (vector<TpgFault*>::const_iterator p = fault_list.begin();
-       p != fault_list.end(); ++ p) {
-    TpgFault* f2 = *p;
-    if ( f1 == f2 ) {
+  ymuint nf = fault_list.size();
+  for (ymuint i = 0; i < nf; ++ i) {
+    FaultInfo* fi2 = fault_list[i];
+    if ( fi2->mDominated ) {
       continue;
     }
 
-    // f2 の十分割当のものとで f1 が検出不能かどうか調べる．
-    FaultInfo& fi2 = mFaultInfoArray[f2->id()];
-    //const NodeValList& suf_list2 = fi2.mSufList;
-    const NodeValList& suf_list2 = fi2.mMaList;
+    if ( fi1 == fi2 ) {
+      continue;
+    }
+
+    if ( conflict_set.check(fi1->mId, fi2->mId) ) {
+      continue;
+    }
+
+    if ( !check_intersect(fi1->mInputList, fi2->mInputList) ) {
+      continue;
+    }
+
+    // f2 の必要割当のものとで f1 が検出不能かどうか調べる．
+    const NodeValList& ma_list2 = fi2->mMaList;
 
     // 故障に対するテスト生成を行なう．
     engine.assumption_begin();
+
+    for (ymuint i = 0; i < ma_list2.size(); ++ i) {
+      NodeVal nv = ma_list2[i];
+      TpgNode* node1 = nv.node();
+      if ( !node_set.tfi_mark(node1) ) {
+	continue;
+      }
+
+      Literal mlit(gvar_map(node1), false);
+      if ( nv.val() ) {
+	engine.assumption_add(mlit);
+      }
+      else {
+	engine.assumption_add(~mlit);
+      }
+    }
+    {
+      vector<Bool3> tmp_model;
+      SatStats sat_stats;
+      USTime sat_time;
+      Bool3 tmp_stat = engine.solve(tmp_model, sat_stats, sat_time);
+      if ( tmp_stat == kB3False ) {
+	// f2 の必要割当が矛盾
+	continue;
+      }
+    }
 
     {
       ymuint npo = node_set.output_list().size();
@@ -802,17 +955,6 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
       }
     }
 
-    for (ymuint i = 0; i < suf_list2.size(); ++ i) {
-      NodeVal nv = suf_list2[i];
-      TpgNode* node1 = nv.node();
-      Literal mlit(gvar_map(node1), false);
-      if ( nv.val() ) {
-	engine.assumption_add(mlit);
-      }
-      else {
-	engine.assumption_add(~mlit);
-      }
-    }
     vector<Bool3> tmp_model;
     SatStats sat_stats;
     USTime sat_time;
@@ -824,10 +966,11 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
     else if ( tmp_stat == kB3False ) {
       // 検出できた．
       // ということは f2 を検出する時に常に f1 も検出できることを意味する．
-      mFaultInfoArray[f2->id()].mDominateeList.push_back(f1->id());
-      mFaultInfoArray[f1->id()].mDominaterList.push_back(f2->id());
-      cout << f1->str() << " is dominated by " << f2->str() << endl;
-      ;
+      fi1->mDominated = true;
+      cout << fi1->mFault->str() << " is dominated by " << fi2->mFault->str() << endl;
+      cout << " " << fi2->mFault->str()
+	   << "'s ma_list = " << ma_list2 << endl;
+      break;
     }
     else {
       // アボート．とりあえず無視
@@ -904,6 +1047,7 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
 DtpgSatS3::FaultInfo::FaultInfo()
 {
   mDetected = false;
+  mDominated = false;
 }
 
 // @brief デストラクタ

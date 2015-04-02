@@ -84,6 +84,37 @@ check_conflict(const NodeValList& src_list1,
   return false;
 }
 
+// @brief 包含関係を調べる．
+bool
+check_contain(const NodeValList& src_list1,
+	      const NodeValList& src_list2)
+{
+  ymuint n1 = src_list1.size();
+  ymuint n2 = src_list2.size();
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  while ( i1 < n1 && i2 < n2 ) {
+    NodeVal nv1 = src_list1[i1];
+    NodeVal nv2 = src_list2[i2];
+    if ( nv1 < nv2 ) {
+      ++ i1;
+    }
+    else if ( nv1 > nv2 ) {
+      return false;
+    }
+    else {
+      ++ i1;
+      ++ i2;
+    }
+  }
+  if ( i2 < n2 ) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
 // @brief 割当リストの内容を出力する．
 ostream&
 operator<<(ostream& s,

@@ -144,6 +144,11 @@ bool
 check_conflict(const NodeValList& src_list1,
 	       const NodeValList& src_list2);
 
+/// @brief 包含関係を調べる．
+bool
+check_contain(const NodeValList& src_list1,
+	      const NodeValList& src_list2);
+
 /// @brief 割当リストの内容を出力する．
 ostream&
 operator<<(ostream& s,
@@ -204,6 +209,33 @@ operator<(const NodeVal& left,
 	  const NodeVal& right)
 {
   return left.mPackVal < right.mPackVal;
+}
+
+// @brief 大小関係の比較関数
+inline
+bool
+operator>(const NodeVal& left,
+	  const NodeVal& right)
+{
+  return operator<(right, left);
+}
+
+// @brief 大小関係の比較関数
+inline
+bool
+operator<=(const NodeVal& left,
+	   const NodeVal& right)
+{
+  return !operator<(right, left);
+}
+
+// @brief 大小関係の比較関数
+inline
+bool
+operator>=(const NodeVal& left,
+	   const NodeVal& right)
+{
+  return !operator<(left, right);
 }
 
 // @brief コンストラクタ
