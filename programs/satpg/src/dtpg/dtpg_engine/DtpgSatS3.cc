@@ -446,7 +446,9 @@ DtpgSatS3::run_single(const NodeSet& node_set,
   }
 
   vector<Bool3> sat_model;
-  Bool3 sat_ans = engine.solve(sat_model);
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
   if ( sat_ans != kB3True ) {
     return false;
   }
@@ -530,7 +532,9 @@ DtpgSatS3::run_single(const NodeSet& node_set,
       engine.assumption_add(~dlit);
     }
     vector<Bool3> tmp_model;
-    Bool3 tmp_stat = engine.solve(tmp_model);
+    SatStats sat_stats;
+    USTime sat_time;
+    Bool3 tmp_stat = engine.solve(tmp_model, sat_stats, sat_time);
     if ( tmp_stat == kB3True ) {
       cout << fault->str() << endl;
       cout << "ERROR: not a sufficient condition" << endl;
@@ -656,7 +660,9 @@ DtpgSatS3::run_single(const NodeSet& node_set,
     Literal alit(gvar_map(node), inv);
     engine.assumption_add(alit);
 
-    Bool3 tmp_stat = engine.solve(tmp_model);
+    SatStats sat_stats;
+    USTime sat_time;
+    Bool3 tmp_stat = engine.solve(tmp_model, sat_stats, sat_time);
     if ( tmp_stat == kB3True ) {
       // 反対でも検出できたので必要割当ではない．
       ;
@@ -808,7 +814,9 @@ DtpgSatS3::check_other_faults(TpgNetwork& network,
       }
     }
     vector<Bool3> tmp_model;
-    Bool3 tmp_stat = engine.solve(tmp_model);
+    SatStats sat_stats;
+    USTime sat_time;
+    Bool3 tmp_stat = engine.solve(tmp_model, sat_stats, sat_time);
     if ( tmp_stat == kB3True ) {
       // 検出できなかった．
       ;

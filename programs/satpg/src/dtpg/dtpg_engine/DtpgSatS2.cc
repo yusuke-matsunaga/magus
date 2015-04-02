@@ -15,6 +15,7 @@
 #include "TpgFault.h"
 #include "SatEngine.h"
 #include "GenVidMap.h"
+#include "ModelValMap.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -159,12 +160,14 @@ DtpgSatS2::run_single(const NodeSet& node_set,
       }
     }
 
+    vector<Bool3> sat_model;
     SatStats sat_stats;
     USTime time;
-    Bool3 ans = solve(engine, sat_stats, time);
+    Bool3 ans = engine.solve(sat_model, sat_stats, time);
 
     if ( ans == kB3True ) {
-      detect_op(fault, node_set, gvar_map, fvar_map, sat_stats, time);
+      ModelValMap val_map(gvar_map, fvar_map, sat_model);
+      detect_op(fault, node_set, val_map, sat_stats, time);
       break;
     }
     else if ( ans == kB3False ) {

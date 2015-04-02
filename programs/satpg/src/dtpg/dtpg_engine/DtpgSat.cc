@@ -12,8 +12,6 @@
 #include "DetectOp.h"
 #include "UntestOp.h"
 #include "DtpgStats.h"
-#include "TpgNetwork.h"
-#include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "NodeValList.h"
@@ -72,18 +70,18 @@ DtpgSat::clear_stats()
 
   mStats.mDetCount = 0;
   mStats.mDetTime.set(0.0, 0.0, 0.0);
-  clear_sat_stats(mStats.mDetStats);
-  clear_sat_stats(mStats.mDetStatsMax);
+  mStats.mDetStats.clear();
+  mStats.mDetStatsMax.clear();
 
   mStats.mRedCount = 0;
   mStats.mRedTime.set(0.0, 0.0, 0.0);
-  clear_sat_stats(mStats.mRedStats);
-  clear_sat_stats(mStats.mRedStatsMax);
+  mStats.mRedStats.clear();
+  mStats.mRedStatsMax.clear();
 
   mStats.mPartRedCount = 0;
   mStats.mPartRedTime.set(0.0, 0.0, 0.0);
-  clear_sat_stats(mStats.mPartRedStats);
-  clear_sat_stats(mStats.mPartRedStatsMax);
+  mStats.mPartRedStats.clear();
+  mStats.mPartRedStatsMax.clear();
 
   mStats.mAbortCount = 0;
   mStats.mAbortTime.set(0.0, 0.0, 0.0);
@@ -150,13 +148,15 @@ DtpgSat::solve(SatEngine& engine,
 	       const VidMap& gvar_map,
 	       const VidMap& fvar_map)
 {
+  vector<Bool3> model;
   SatStats sat_stats;
   USTime time;
-  Bool3 ans = solve(engine, sat_stats, time);
+  Bool3 ans = engine.solve(model, sat_stats, time);
 
   if ( ans == kB3True ) {
     // パタンが求まった．
-    detect_op(f, node_set, gvar_map, fvar_map, sat_stats, time);
+    ModelValMap val_map(gvar_map, fvar_map, model);
+    detect_op(f, node_set, val_map, sat_stats, time);
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
@@ -165,32 +165,6 @@ DtpgSat::solve(SatEngine& engine,
   else { // ans == kB3X つまりアボート
     abort_op(f, sat_stats, time);
   }
-  return ans;
-}
-
-// @brief 一つの SAT問題を解く．
-// @param[in] engine SAT エンジン
-// @param[out] sat_stats 統計情報
-// @param[out] time 処理時間
-// @return 結果を返す．
-Bool3
-DtpgSat::solve(SatEngine& engine,
-	       SatStats& sat_stats,
-	       USTime& time)
-{
-  SatStats prev_stats;
-  engine.get_stats(prev_stats);
-
-  timer_start();
-
-  Bool3 ans = engine.solve(mModel);
-
-  time = timer_stop();
-
-  engine.get_stats(sat_stats);
-
-  sub_sat_stats(sat_stats, prev_stats);
-
   return ans;
 }
 
@@ -205,13 +179,11 @@ DtpgSat::last_assign()
 void
 DtpgSat::detect_op(TpgFault* fault,
 		   const NodeSet& node_set,
-		   const VidMap& gvar_map,
-		   const VidMap& fvar_map,
+		   const ValMap& val_map,
 		   const SatStats& sat_stats,
 		   const USTime& time)
 {
   // バックトレースを行う．
-  ModelValMap val_map(gvar_map, fvar_map, mModel);
   mBackTracer(fault->node(), node_set, val_map, mLastAssign);
 
   // パタンの登録などを行う．
@@ -219,8 +191,8 @@ DtpgSat::detect_op(TpgFault* fault,
 
   ++ mStats.mDetCount;
   mStats.mDetTime += time;
-  add_sat_stats(mStats.mDetStats, sat_stats);
-  max_sat_stats(mStats.mDetStatsMax, sat_stats);
+  mStats.mDetStats += sat_stats;
+  mStats.mDetStatsMax.max_assign(sat_stats);
 }
 
 // @brief 検出不能と判定した時の処理
@@ -233,8 +205,8 @@ DtpgSat::untest_op(TpgFault* fault,
 
   ++ mStats.mRedCount;
   mStats.mRedTime += time;
-  add_sat_stats(mStats.mRedStats, sat_stats);
-  max_sat_stats(mStats.mRedStatsMax, sat_stats);
+  mStats.mRedStats += sat_stats;
+  mStats.mRedStatsMax.max_assign(sat_stats);
 }
 
 // @brief 部分的な検出不能と判定した時の処理
@@ -245,8 +217,8 @@ DtpgSat::partially_untest_op(TpgFault* fault,
 {
   ++ mStats.mPartRedCount;
   mStats.mPartRedTime += time;
-  add_sat_stats(mStats.mPartRedStats, sat_stats);
-  max_sat_stats(mStats.mPartRedStatsMax, sat_stats);
+  mStats.mPartRedStats += sat_stats;
+  mStats.mPartRedStatsMax.max_assign(sat_stats);
 }
 
 // @brief アボートした時の処理
@@ -257,87 +229,6 @@ DtpgSat::abort_op(TpgFault* fault,
 {
   ++ mStats.mAbortCount;
   mStats.mAbortTime += time;
-}
-
-// SatStats をクリアする．
-void
-DtpgSat::clear_sat_stats(SatStats& stats)
-{
-  stats.mRestart = 0;
-  stats.mVarNum = 0;
-  stats.mConstrClauseNum = 0;
-  stats.mConstrLitNum = 0;
-  stats.mLearntClauseNum = 0;
-  stats.mLearntLitNum = 0;
-  stats.mConflictNum = 0;
-  stats.mDecisionNum = 0;
-  stats.mPropagationNum = 0;
-}
-
-// SatStats をたす．
-void
-DtpgSat::add_sat_stats(SatStats& dst_stats,
-		       const SatStats& src_stats)
-{
-  dst_stats.mRestart += src_stats.mRestart;
-  dst_stats.mVarNum += src_stats.mVarNum;
-  dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
-  dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
-  dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
-  dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
-  dst_stats.mConflictNum += src_stats.mConflictNum;
-  dst_stats.mDecisionNum += src_stats.mDecisionNum;
-  dst_stats.mPropagationNum += src_stats.mPropagationNum;
-}
-
-// SatStats を引く
-void
-DtpgSat::sub_sat_stats(SatStats& dst_stats,
-		       const SatStats& src_stats)
-{
-  dst_stats.mRestart -= src_stats.mRestart;
-  dst_stats.mVarNum -= src_stats.mVarNum;
-  dst_stats.mConstrClauseNum -= src_stats.mConstrClauseNum;
-  dst_stats.mConstrLitNum -= src_stats.mConstrLitNum;
-  dst_stats.mLearntClauseNum -= src_stats.mLearntClauseNum;
-  dst_stats.mLearntLitNum -= src_stats.mLearntLitNum;
-  dst_stats.mConflictNum -= src_stats.mConflictNum;
-  dst_stats.mDecisionNum -= src_stats.mDecisionNum;
-  dst_stats.mPropagationNum -= src_stats.mPropagationNum;
-}
-
-// SatStats の各々の最大値をとる．
-void
-DtpgSat::max_sat_stats(SatStats& dst_stats,
-		       const SatStats& src_stats)
-{
-  if ( dst_stats.mRestart < src_stats.mRestart ) {
-    dst_stats.mRestart = src_stats.mRestart;
-  }
-  if ( dst_stats.mVarNum < src_stats.mVarNum ) {
-    dst_stats.mVarNum += src_stats.mVarNum;
-  }
-  if ( dst_stats.mConstrClauseNum < src_stats.mConstrClauseNum ) {
-    dst_stats.mConstrClauseNum += src_stats.mConstrClauseNum;
-  }
-  if ( dst_stats.mConstrLitNum < src_stats.mConstrLitNum ) {
-    dst_stats.mConstrLitNum += src_stats.mConstrLitNum;
-  }
-  if ( dst_stats.mLearntClauseNum < src_stats.mLearntClauseNum ) {
-    dst_stats.mLearntClauseNum += src_stats.mLearntClauseNum;
-  }
-  if ( dst_stats.mLearntLitNum < src_stats.mLearntLitNum ) {
-    dst_stats.mLearntLitNum += src_stats.mLearntLitNum;
-  }
-  if ( dst_stats.mConflictNum < src_stats.mConflictNum ) {
-    dst_stats.mConflictNum += src_stats.mConflictNum;
-  }
-  if ( dst_stats.mDecisionNum < src_stats.mDecisionNum ) {
-    dst_stats.mDecisionNum += src_stats.mDecisionNum;
-  }
-  if ( dst_stats.mPropagationNum < src_stats.mPropagationNum ) {
-    dst_stats.mPropagationNum += src_stats.mPropagationNum;
-  }
 }
 
 END_NAMESPACE_YM_SATPG

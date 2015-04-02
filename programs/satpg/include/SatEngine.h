@@ -17,6 +17,7 @@
 #include "YmLogic/Bool3.h"
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatStats.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -223,13 +224,12 @@ public:
 
   /// @brief SAT 問題を解く．
   /// @param[out] model 結果の割当を格納するベクタ
+  /// @param[out] sat_stats 統計情報
+  /// @param[out] time 処理時間
   Bool3
-  solve(vector<Bool3>& model);
-
-  /// @brief 現在の内部状態を得る．
-  /// @param[out] stats 状態を格納する構造体
-  void
-  get_stats(SatStats& stats) const;
+  solve(vector<Bool3>& model,
+	SatStats& sat_stats,
+	USTime& time);
 
 
 private:
@@ -251,6 +251,9 @@ private:
 
   // 仮定のリテラルを収めるリスト
   vector<Literal> mAssumptions;
+
+  // 時間計測用のタイマー
+  StopWatch mTimer;
 
 };
 
@@ -381,20 +384,30 @@ SatEngine::add_clause(Literal lit1,
 
 // @brief SAT 問題を解く．
 // @param[out] model 結果の割当を格納するベクタ
+// @param[out] sat_stats 統計情報
+// @param[out] time 処理時間
 inline
 Bool3
-SatEngine::solve(vector<Bool3>& model)
+SatEngine::solve(vector<Bool3>& model,
+		 SatStats& sat_stats,
+		 USTime& time)
 {
-  return mSolver.solve(mAssumptions, model);
-}
+  SatStats prev_stats;
+  mSolver.get_stats(prev_stats);
 
-// @brief 現在の内部状態を得る．
-// @param[out] stats 状態を格納する構造体
-inline
-void
-SatEngine::get_stats(SatStats& stats) const
-{
-  mSolver.get_stats(stats);
+  mTimer.reset();
+  mTimer.start();
+
+  Bool3 ans = mSolver.solve(mAssumptions, model);
+
+  mTimer.stop();
+  time = mTimer.time();
+
+  mSolver.get_stats(sat_stats);
+
+  sat_stats -= prev_stats;
+
+  return ans;
 }
 
 END_NAMESPACE_YM_SATPG

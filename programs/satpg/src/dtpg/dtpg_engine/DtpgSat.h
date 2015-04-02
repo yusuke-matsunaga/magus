@@ -125,22 +125,11 @@ protected:
 	const VidMap& gvar_map,
 	const VidMap& fvar_map);
 
-  /// @brief 一つの SAT問題を解く．
-  /// @param[in] engine SAT エンジン
-  /// @param[out] sat_stats 統計情報
-  /// @param[out] time 処理時間
-  /// @return 結果を返す．
-  Bool3
-  solve(SatEngine& engine,
-	SatStats& sat_stats,
-	USTime& time);
-
   /// @brief 検出した場合の処理
   void
   detect_op(TpgFault* fault,
 	    const NodeSet& node_set,
-	    const VidMap& gvar_map,
-	    const VidMap& fvar_map,
+	    const ValMap& val_map,
 	    const SatStats& sat_stats,
 	    const USTime& time);
 
@@ -177,25 +166,6 @@ protected:
   bool
   tmp_mark(TpgNode* node);
 
-  static
-  void
-  clear_sat_stats(SatStats& stats);
-
-  static
-  void
-  add_sat_stats(SatStats& dst_stats,
-		const SatStats& src_stats);
-
-  static
-  void
-  sub_sat_stats(SatStats& dst_stats,
-		const SatStats& src_stats);
-
-  static
-  void
-  max_sat_stats(SatStats& dst_stats,
-		const SatStats& src_stats);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -222,9 +192,6 @@ private:
 
   // 検出不能時に呼ばれるファンクタ
   UntestOp& mUntestOp;
-
-  // SAT の結果を格納する配列
-  vector<Bool3> mModel;
 
   // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
