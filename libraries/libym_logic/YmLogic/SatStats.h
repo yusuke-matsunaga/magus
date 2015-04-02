@@ -23,6 +23,22 @@ BEGIN_NAMESPACE_YM_SAT
 //////////////////////////////////////////////////////////////////////
 struct SatStats
 {
+  /// @brief 内容をクリアする ．
+  void
+  clear();
+
+  /// @brief 加算付き代入
+  const SatStats&
+  operator+=(const SatStats& right);
+
+  /// @brief 減算付き代入
+  const SatStats&
+  operator-=(const SatStats& right);
+
+  /// @brief MAX演算つき代入
+  const SatStats&
+  max_assign(const SatStats& right);
+
   /// @brief restartの回数
   ymuint mRestart;
 
@@ -60,6 +76,33 @@ struct SatStats
   USTime mTime;
 
 };
+
+/// @brief 加算
+inline
+SatStats
+operator+(const SatStats& left,
+	  const SatStats& right)
+{
+  return SatStats(left).operator+=(right);
+}
+
+/// @brief 減算
+inline
+SatStats
+operator-(const SatStats& left,
+	  const SatStats& right)
+{
+  return SatStats(left).operator-=(right);
+}
+
+/// @brief MAX演算
+inline
+SatStats
+max(const SatStats& left,
+    const SatStats& right)
+{
+  return SatStats(left).max_assign(right);
+}
 
 END_NAMESPACE_YM_SAT
 

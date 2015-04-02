@@ -127,6 +127,7 @@ set (npn_SOURCES
 set (sat_SOURCES
   src/sat/SatMsgHandlerImpl1.cc
   src/sat/SatSolver.cc
+  src/sat/SatStats.cc
 
   src/sat/MiniSat/Main.C
   src/sat/MiniSat/SatSolverMiniSat.cc
