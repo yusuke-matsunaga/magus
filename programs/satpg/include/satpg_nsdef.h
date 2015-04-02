@@ -89,6 +89,7 @@ class TpgFault;
 class FaultMgr;
 class TpgNetwork;
 class TpgNode;
+class NodeSet;
 class NodeValList;
 class BackTracer;
 class DetectOp;

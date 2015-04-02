@@ -10,7 +10,7 @@
 #include "DtpgSatM.h"
 
 #include "DtpgStats.h"
-#include "TpgNetwork.h"
+#include "NodeSet.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
@@ -54,11 +54,11 @@ DtpgSatM::~DtpgSatM()
 }
 
 // @brief テストパタン生成を行なう．
-// @param[in] network 対象のネットワーク
+// @param[in] node_set 対象のノード集合
 // @param[in] fnode_list 対象の故障を持つノードのリスト
 // @param[in] flist 故障リスト
 void
-DtpgSatM::run_multi(TpgNetwork& network,
+DtpgSatM::run_multi(const NodeSet& node_set,
 		    const vector<TpgNode*>& fnode_list,
 		    const vector<TpgFault*>& flist)
 {
@@ -68,21 +68,23 @@ DtpgSatM::run_multi(TpgNetwork& network,
 
   ymuint nf = flist.size();
 
-  GenVidMap gvar_map(network.max_node_id());
-  GenVidMap fvar_map(network.max_node_id());
-  GenVidMap dvar_map(network.max_node_id());
+  ymuint max_id = node_set.max_id();
+
+  GenVidMap gvar_map(max_id);
+  GenVidMap fvar_map(max_id);
+  GenVidMap dvar_map(max_id);
 
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
-  for (ymuint i = 0; i < tfo_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
@@ -110,16 +112,16 @@ DtpgSatM::run_multi(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     engine.make_node_cnf(node, gvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
 
     if ( node->has_flt_var() ) {
       engine.make_fnode_cnf(node, gvar_map, fvar_map);
@@ -134,10 +136,10 @@ DtpgSatM::run_multi(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  ymuint npo = output_list().size();
+  ymuint npo = node_set.output_list().size();
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = output_list()[i];
+    TpgNode* node = node_set.output_list()[i];
     Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
@@ -166,7 +168,7 @@ DtpgSatM::run_multi(TpgNetwork& network,
 
     // 故障ノードの TFO 以外の dlit を0にする．
     mTmpNodeList.clear();
-    mTmpNodeList.reserve(tfo_tfi_size());
+    mTmpNodeList.reserve(node_set.tfo_tfi_size());
     set_tmp_mark(fnode);
     mTmpNodeList.push_back(fnode);
     for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
@@ -180,9 +182,9 @@ DtpgSatM::run_multi(TpgNetwork& network,
 	}
       }
     }
-    for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-      TpgNode* node = tfo_tfi_node(i);
-      if ( tfo_mark(node) && !tmp_mark(node) ) {
+    for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+      TpgNode* node = node_set.tfo_tfi_node(i);
+      if ( node_set.tfo_mark(node) && !tmp_mark(node) ) {
 	Literal dlit(dvar_map(node), true);
 	engine.assumption_add(dlit);
       }
@@ -200,7 +202,7 @@ DtpgSatM::run_multi(TpgNetwork& network,
       engine.assumption_add(dlit);
     }
 
-    solve(engine, f, gvar_map, fvar_map);
+    solve(engine, f, node_set, gvar_map, fvar_map);
   }
 
   for (vector<TpgNode*>::const_iterator p = fnode_list.begin();

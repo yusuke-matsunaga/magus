@@ -13,6 +13,7 @@
 #include "DtpgEngine.h"
 #include "TpgNode.h"
 #include "DtpgStats.h"
+#include "NodeValList.h"
 #include "YmLogic/Bool3.h"
 #include "YmLogic/sat_nsdef.h"
 #include "YmLogic/SatStats.h"
@@ -103,9 +104,9 @@ protected:
   void
   cnf_end();
 
-  /// @brief 最後に生成されたパタンを得る．
-  TestVector*
-  last_pat();
+  /// @brief 最後に生成された値割当リストを得る．
+  const NodeValList&
+  last_assign();
 
   /// @brief 時間計測を開始する．
   void
@@ -115,59 +116,12 @@ protected:
   USTime
   timer_stop();
 
-  /// @brief 故障位置を与えてその TFO の TFI リストを作る．
-  /// @param[in] max_node_id ノード番号の最大値
-  /// @param[in] fnode_list 故障位置のノードのリスト
-  ///
-  /// 結果は mTfoList に格納される．
-  /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
-  void
-  mark_region(ymuint max_node_id,
-	      const vector<TpgNode*>& fnode_list);
-
-  /// @brief TFO ノードの数を得る．
-  ymuint
-  tfo_size() const;
-
-  /// @brief TFI ノードの数を得る．
-  ymuint
-  tfi_size() const;
-
-  /// @brief TFO ノードと TFI ノードの総数を得る．
-  ymuint
-  tfo_tfi_size() const;
-
-  /// @brief TFO/TFI ノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < tfo_tfi_size() )
-  ///
-  /// pos が tfo_size() 未満のときは TFO ノード
-  /// それ以上は TFI ノードとなっている．
-  TpgNode*
-  tfo_tfi_node(ymuint pos) const;
-
-  /// @brief tfo マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tfo_mark(TpgNode* node);
-
-  /// @brief tfi マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tfi_mark(TpgNode* node);
-
-  /// @brief 入力のノードのリストを返す．
-  const vector<TpgNode*>&
-  input_list() const;
-
-  /// @brief 出力のノードのリストを返す．
-  const vector<TpgNode*>&
-  output_list() const;
-
   /// @brief 一つの SAT問題を解く．
   /// @param[in] engine SAT エンジン
   Bool3
   solve(SatEngine& engine,
 	TpgFault* f,
+	const NodeSet& node_set,
 	const VidMap& gvar_map,
 	const VidMap& fvar_map);
 
@@ -184,6 +138,7 @@ protected:
   /// @brief 検出した場合の処理
   void
   detect_op(TpgFault* fault,
+	    const NodeSet& node_set,
 	    const VidMap& gvar_map,
 	    const VidMap& fvar_map,
 	    const SatStats& sat_stats,
@@ -244,22 +199,6 @@ protected:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる下請け関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief tfo マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tfo_mark(TpgNode* node);
-
-  /// @brief tfi マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tfi_mark(TpgNode* node);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -290,20 +229,8 @@ private:
   // ノードごとのいくつかのフラグをまとめた配列
   vector<ymuint8> mMarkArray;
 
-  // 故障の TFO のノードリスト
-  vector<TpgNode*> mTfoList;
-
-  // TFO ノードの最後の位置
-  ymuint32 mTfoEnd;
-
-  // 現在の故障に関係のありそうな外部入力のリスト
-  vector<TpgNode*> mInputList;
-
-  // 現在の故障に関係ありそうな外部出力のリスト
-  vector<TpgNode*> mOutputList;
-
-  // 最後に生成されたテストパタン
-  TestVector* mLastPat;
+  // 最後に生成された値割当
+  NodeValList mLastAssign;
 
   // 時間計測を行なうかどうかの制御フラグ
   bool mTimerEnable;
@@ -343,98 +270,6 @@ ostream*
 DtpgSat::sat_outp() const
 {
   return mSatOutP;
-}
-
-// @brief TFO ノードの数を得る．
-inline
-ymuint
-DtpgSat::tfo_size() const
-{
-  return mTfoEnd;
-}
-
-// @brief TFI ノードの数を得る．
-inline
-ymuint
-DtpgSat::tfi_size() const
-{
-  return mTfoList.size() - mTfoEnd;
-}
-
-// @brief TFO ノードと TFI ノードの総数を得る．
-inline
-ymuint
-DtpgSat::tfo_tfi_size() const
-{
-  return mTfoList.size();
-}
-
-// @brief TFO/TFI ノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < tfo_tfi_size() )
-//
-// pos が tfo_size() 未満のときは TFO ノード
-// それ以上は TFI ノードとなっている．
-inline
-TpgNode*
-DtpgSat::tfo_tfi_node(ymuint pos) const
-{
-  return mTfoList[pos];
-}
-
-// @brief 入力のノードのリストを返す．
-inline
-const vector<TpgNode*>&
-DtpgSat::input_list() const
-{
-  return mInputList;
-}
-
-// @brief 出力のノードのリストを返す．
-inline
-const vector<TpgNode*>&
-DtpgSat::output_list() const
-{
-  return mOutputList;
-}
-
-// tfo マークをつける．
-inline
-void
-DtpgSat::set_tfo_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] |= 1U;
-  mTfoList.push_back(node);
-  if ( node->is_output() ) {
-    mOutputList.push_back(node);
-  }
-}
-
-// @brief tfo マークを読む．
-inline
-bool
-DtpgSat::tfo_mark(TpgNode* node)
-{
-  return static_cast<bool>((mMarkArray[node->id()] >> 0) & 1U);
-}
-
-// tfi マークをつける．
-inline
-void
-DtpgSat::set_tfi_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] |= 2U;
-  mTfoList.push_back(node);
-  if ( node->is_input() ) {
-    mInputList.push_back(node);
-  }
-}
-
-// @brief tfi マークを読む．
-inline
-bool
-DtpgSat::tfi_mark(TpgNode* node)
-{
-  return static_cast<bool>((mMarkArray[node->id()] >> 1) & 1U);
 }
 
 // @brief tmp マークをつける．

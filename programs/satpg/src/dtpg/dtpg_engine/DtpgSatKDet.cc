@@ -10,7 +10,7 @@
 #include "DtpgSatKDet.h"
 
 #include "DtpgStats.h"
-#include "TpgNetwork.h"
+#include "NodeSet.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
@@ -59,10 +59,10 @@ DtpgSatKDet::~DtpgSatKDet()
 }
 
 // @brief テストパタン生成を行なう．
-// @param[in] network 対象のネットワーク
+// @param[in] node_set 対象のノード集合
 // @param[in] flist 故障リスト
 void
-DtpgSatKDet::run_single(TpgNetwork& network,
+DtpgSatKDet::run_single(const NodeSet& node_set,
 			TpgFault* fault)
 {
   TpgNode* fnode = fault->node();
@@ -71,21 +71,23 @@ DtpgSatKDet::run_single(TpgNetwork& network,
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
-  GenVidMap gvar_map(network.max_node_id());
-  GenVidMap fvar_map(network.max_node_id());
-  GenVidMap dvar_map(network.max_node_id());
+  ymuint max_id = node_set.max_id();
+
+  GenVidMap gvar_map(max_id);
+  GenVidMap fvar_map(max_id);
+  GenVidMap dvar_map(max_id);
 
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
-  for (ymuint i = 0; i < tfo_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
@@ -95,16 +97,16 @@ DtpgSatKDet::run_single(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     engine.make_node_cnf(node, gvar_map);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
@@ -122,10 +124,10 @@ DtpgSatKDet::run_single(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  ymuint npo = output_list().size();
+  ymuint npo = node_set.output_list().size();
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = output_list()[i];
+    TpgNode* node = node_set.output_list()[i];
     Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
@@ -149,7 +151,7 @@ DtpgSatKDet::run_single(TpgNetwork& network,
 
     if ( ans == kB3True ) {
       // パタンが求まった．
-      detect_op(fault, gvar_map, fvar_map, sat_stats, time);
+      detect_op(fault, node_set, gvar_map, fvar_map, sat_stats, time);
     }
     else {
       if ( i == 0 ) {
@@ -167,23 +169,17 @@ DtpgSatKDet::run_single(TpgNetwork& network,
       }
     }
 
-    TestVector* pat = last_pat();
-    ymuint ni = pat->input_num();
-    engine.tmp_lits_begin(ni - pat->x_num());
-    for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* node = network.input(i);
+    ymuint n = last_assign().size();
+    engine.tmp_lits_begin(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      NodeVal nv = last_assign()[i];
+      TpgNode* node = nv.node();
       Literal lit(gvar_map(node));
-      switch ( pat->val3(i) ) {
-      case kVal1:
+      if ( nv.val() ) {
 	engine.tmp_lits_add(~lit);
-	break;
-
-      case kVal0:
+      }
+      else {
 	engine.tmp_lits_add(lit);
-	break;
-
-      default:
-	break;
       }
     }
     engine.tmp_lits_end();

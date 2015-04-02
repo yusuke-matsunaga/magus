@@ -64,15 +64,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] network 対象のネットワーク
+  /// @param[in] node_set ノード集合
   /// @param[in] f_tgt 対象の故障
   bool
-  run_single(TpgNetwork& network,
+  run_single(const NodeSet& node_set,
 	     TpgFault* f_tgt);
 
   /// @brief 他の故障との関係を調べる．
   void
   check_other_faults(TpgNetwork& network,
+		     const NodeSet& node_set,
 		     TpgFault* f_tgt,
 		     const vector<TpgFault*>& fault_list);
 

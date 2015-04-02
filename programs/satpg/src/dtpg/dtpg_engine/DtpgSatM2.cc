@@ -10,7 +10,7 @@
 #include "DtpgSatM2.h"
 
 #include "DtpgStats.h"
-#include "TpgNetwork.h"
+#include "NodeSet.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "SatEngine.h"
@@ -58,11 +58,11 @@ DtpgSatM2::~DtpgSatM2()
 }
 
 // @brief テストパタン生成を行なう．
-// @param[in] network 対象のネットワーク
+// @param[in] node_set 対象のノード集合
 // @param[in] fnode_list 対象の故障を持つノードのリスト
 // @param[in] flist 故障リスト
 void
-DtpgSatM2::run_multi(TpgNetwork& network,
+DtpgSatM2::run_multi(const NodeSet& node_set,
 		     const vector<TpgNode*>& fnode_list,
 		     const vector<TpgFault*>& flist)
 {
@@ -70,24 +70,26 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 
   ymuint nf = flist.size();
 
-  mMark.clear();
-  mMark.resize(network.max_node_id(), 0);
+  ymuint max_id = node_set.max_id();
 
-  GenVidMap gvar_map(network.max_node_id());
-  GenVidMap fvar_map(network.max_node_id());
-  GenVidMap dvar_map(network.max_node_id());
+  mMark.clear();
+  mMark.resize(max_id, 0);
+
+  GenVidMap gvar_map(max_id);
+  GenVidMap fvar_map(max_id);
+  GenVidMap dvar_map(max_id);
 
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
-  for (ymuint i = 0; i < tfo_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
@@ -112,7 +114,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     }
   }
 
-  const vector<TpgNode*>& olist = output_list();
+  const vector<TpgNode*>& olist = node_set.output_list();
   ymuint no = olist.size();
 
   //////////////////////////////////////////////////////////////////////
@@ -142,8 +144,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     //////////////////////////////////////////////////////////////////////
     // 正常回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
-    for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-      TpgNode* node = tfo_tfi_node(i);
+    for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+      TpgNode* node = node_set.tfo_tfi_node(i);
       if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
 	mMark[node->id()] = opos + 1;
 
@@ -154,8 +156,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     //////////////////////////////////////////////////////////////////////
     // 故障回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
-    for (ymuint i = 0; i < tfo_size(); ++ i) {
-      TpgNode* node = tfo_tfi_node(i);
+    for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+      TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] != (opos + 1) ) {
 	continue;
       }
@@ -197,7 +199,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 
       // 故障ノードの TFO 以外の dlit を0にする．
       mTmpNodeList.clear();
-      mTmpNodeList.reserve(tfo_tfi_size());
+      mTmpNodeList.reserve(node_set.tfo_tfi_size());
       set_tmp_mark(fnode);
       mTmpNodeList.push_back(fnode);
       for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
@@ -211,9 +213,9 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 	  }
 	}
       }
-      for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-	TpgNode* node = tfo_tfi_node(i);
-	if ( tfo_mark(node) && !tmp_mark(node) ) {
+      for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+	TpgNode* node = node_set.tfo_tfi_node(i);
+	if ( node_set.tfo_mark(node) && !tmp_mark(node) ) {
 	  Literal dlit(dvar_map(node), true);
 	  engine.assumption_add(dlit);
 	}
@@ -226,8 +228,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       mTmpNodeList.clear();
 
       // まだ作っていない部分の dlit を 0 にする．
-      for (ymuint j = 0; j < tfo_size(); ++ j) {
-	TpgNode* node = tfo_tfi_node(j);
+      for (ymuint j = 0; j < node_set.tfo_size(); ++ j) {
+	TpgNode* node = node_set.tfo_tfi_node(j);
 	if ( mMark[node->id()] == 0 ) {
 	  Literal dlit(dvar_map(node), false);
 	  engine.assumption_add(~dlit);
@@ -245,7 +247,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
       Bool3 ans = solve(engine, sat_stats, time);
 
       if ( ans == kB3True ) {
-	detect_op(f, gvar_map, fvar_map, sat_stats, time);
+	detect_op(f, node_set, gvar_map, fvar_map, sat_stats, time);
 
       }
       else if ( ans == kB3False ) {
@@ -274,8 +276,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     //////////////////////////////////////////////////////////////////////
     // 正常回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
-    for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-      TpgNode* node = tfo_tfi_node(i);
+    for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+      TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
 	engine.make_node_cnf(node, gvar_map);
       }
@@ -284,8 +286,8 @@ DtpgSatM2::run_multi(TpgNetwork& network,
     //////////////////////////////////////////////////////////////////////
     // 故障回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
-    for (ymuint i = 0; i < tfo_size(); ++ i) {
-      TpgNode* node = tfo_tfi_node(i);
+    for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+      TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
 	engine.make_node_cnf(node, fvar_map);
 	engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
@@ -313,7 +315,7 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 
       // 故障ノードの TFO 以外の dlit を0にする．
       mTmpNodeList.clear();
-      mTmpNodeList.reserve(tfo_tfi_size());
+      mTmpNodeList.reserve(node_set.tfo_tfi_size());
       set_tmp_mark(fnode);
       mTmpNodeList.push_back(fnode);
       for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
@@ -327,9 +329,9 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 	  }
 	}
       }
-      for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-	TpgNode* node = tfo_tfi_node(i);
-	if ( tfo_mark(node) && !tmp_mark(node) ) {
+      for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+	TpgNode* node = node_set.tfo_tfi_node(i);
+	if ( node_set.tfo_mark(node) && !tmp_mark(node) ) {
 	  Literal dlit(dvar_map(node), true);
 	  engine.assumption_add(dlit);
 	}
@@ -347,12 +349,12 @@ DtpgSatM2::run_multi(TpgNetwork& network,
 	engine.assumption_add(dlit);
       }
 
-      solve(engine, f, gvar_map, fvar_map);
+      solve(engine, f, node_set, gvar_map, fvar_map);
     }
   }
 
-  for (ymuint i = 0; i < tfo_tfi_size(); ++ i) {
-    TpgNode* node = tfo_tfi_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    TpgNode* node = node_set.tfo_tfi_node(i);
     mMark[node->id()] = 0;
   }
 

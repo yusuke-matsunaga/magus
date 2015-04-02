@@ -12,6 +12,7 @@
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "NodeSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -41,10 +42,13 @@ DtpgSatBaseM::run(TpgNetwork& network,
 {
   clear_stats();
 
-  mMark.clear();
-  mMark.resize(network.max_node_id(), false);
-  ymuint n = network.active_node_num();
+  NodeSet node_set;
+
   ymuint max_id = network.max_node_id();
+
+  mMark.clear();
+  mMark.resize(max_id, false);
+  ymuint n = network.active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
     TpgNode* node = network.active_node(i);
     if ( node->imm_dom() == NULL ) {
@@ -54,8 +58,8 @@ DtpgSatBaseM::run(TpgNetwork& network,
       dfs_mffc(node);
 
       if ( !mFaultList.empty() ) {
-	mark_region(max_id, mFaultNodeList);
-	run_multi(network, mFaultNodeList, mFaultList);
+	node_set.mark_region(max_id, mFaultNodeList);
+	run_multi(node_set, mFaultNodeList, mFaultList);
       }
     }
   }

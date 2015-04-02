@@ -63,12 +63,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テスト生成を行なう．
-  /// @param[in] network 対象のネットワーク
+  /// @param[in] node_set 対象のノード集合
   /// @param[in] fnode_list 対象の故障を持つノードのリスト
   /// @param[in] flist 対象の故障リスト
   virtual
   void
-  run_multi(TpgNetwork& network,
+  run_multi(const NodeSet& node_set,
 	    const vector<TpgNode*>& fnode_list,
 	    const vector<TpgFault*>& flist) = 0;
 

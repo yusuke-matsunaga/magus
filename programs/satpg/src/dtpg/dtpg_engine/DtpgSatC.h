@@ -69,7 +69,7 @@ private:
 
   /// @brief 複数の故障を同時に検出するパタンを求める．
   void
-  run_multi(TpgNetwork& network,
+  run_multi(NodeSet& node_set,
 	    TpgNode* root);
 
 

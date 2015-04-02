@@ -18,6 +18,7 @@ endif (TCL_FOUND)
 
 set (base_SOURCES
   src/base/FaultMgr.cc
+  src/base/NodeSet.cc
   src/base/NodeValList.cc
   src/base/TestVector.cc
   src/base/TpgFault.cc
