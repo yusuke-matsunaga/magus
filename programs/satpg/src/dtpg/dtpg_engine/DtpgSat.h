@@ -151,21 +151,6 @@ protected:
 	   const SatStats& sat_stats,
 	   const USTime& time);
 
-  /// @brief tmp マークをつける．
-  /// @param[in] node 対象のノード
-  void
-  set_tmp_mark(TpgNode* node);
-
-  /// @brief tmp マークを消す．
-  /// @param[in] node 対象のノード
-  void
-  clear_tmp_mark(TpgNode* node);
-
-  /// @brief tmp マークを読む．
-  /// @param[in] node 対象のノード
-  bool
-  tmp_mark(TpgNode* node);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -192,9 +177,6 @@ private:
 
   // 検出不能時に呼ばれるファンクタ
   UntestOp& mUntestOp;
-
-  // ノードごとのいくつかのフラグをまとめた配列
-  vector<ymuint8> mMarkArray;
 
   // 最後に生成された値割当
   NodeValList mLastAssign;
@@ -237,30 +219,6 @@ ostream*
 DtpgSat::sat_outp() const
 {
   return mSatOutP;
-}
-
-// @brief tmp マークをつける．
-inline
-void
-DtpgSat::set_tmp_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] |= 4U;
-}
-
-// @brief tmp マークを消す．
-inline
-void
-DtpgSat::clear_tmp_mark(TpgNode* node)
-{
-  mMarkArray[node->id()] &= ~4U;
-}
-
-// @brief tmp マークを読む．
-inline
-bool
-DtpgSat::tmp_mark(TpgNode* node)
-{
-  return static_cast<bool>((mMarkArray[node->id()] >> 2) & 1U);
 }
 
 END_NAMESPACE_YM_SATPG

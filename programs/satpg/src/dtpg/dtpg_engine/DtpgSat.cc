@@ -156,6 +156,7 @@ DtpgSat::solve(SatEngine& engine,
   if ( ans == kB3True ) {
     // パタンが求まった．
     ModelValMap val_map(gvar_map, fvar_map, model);
+
     detect_op(f, node_set, val_map, sat_stats, time);
   }
   else if ( ans == kB3False ) {
@@ -189,10 +190,7 @@ DtpgSat::detect_op(TpgFault* fault,
   // パタンの登録などを行う．
   mDetectOp(fault, mLastAssign);
 
-  ++ mStats.mDetCount;
-  mStats.mDetTime += time;
-  mStats.mDetStats += sat_stats;
-  mStats.mDetStatsMax.max_assign(sat_stats);
+  mStats.update_det(sat_stats, time);
 }
 
 // @brief 検出不能と判定した時の処理
@@ -203,10 +201,7 @@ DtpgSat::untest_op(TpgFault* fault,
 {
   mUntestOp(fault);
 
-  ++ mStats.mRedCount;
-  mStats.mRedTime += time;
-  mStats.mRedStats += sat_stats;
-  mStats.mRedStatsMax.max_assign(sat_stats);
+  mStats.update_red(sat_stats, time);
 }
 
 // @brief 部分的な検出不能と判定した時の処理
@@ -215,10 +210,7 @@ DtpgSat::partially_untest_op(TpgFault* fault,
 			     const SatStats& sat_stats,
 			     const USTime& time)
 {
-  ++ mStats.mPartRedCount;
-  mStats.mPartRedTime += time;
-  mStats.mPartRedStats += sat_stats;
-  mStats.mPartRedStatsMax.max_assign(sat_stats);
+  mStats.update_partred(sat_stats, time);
 }
 
 // @brief アボートした時の処理
@@ -227,8 +219,7 @@ DtpgSat::abort_op(TpgFault* fault,
 		  const SatStats& sat_stats,
 		  const USTime& time)
 {
-  ++ mStats.mAbortCount;
-  mStats.mAbortTime += time;
+  mStats.update_abort(sat_stats, time);
 }
 
 END_NAMESPACE_YM_SATPG

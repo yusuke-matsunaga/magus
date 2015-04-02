@@ -73,6 +73,9 @@ private:
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
 
+  // 作業用のマーク配列
+  vector<bool> mMarkArray;
+
 };
 
 END_NAMESPACE_YM_SATPG

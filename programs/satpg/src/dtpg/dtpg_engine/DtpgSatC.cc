@@ -133,6 +133,9 @@ DtpgSatC::run_multi(NodeSet& node_set,
   GenVidMap fvar_map(max_id);
   GenVidMap dvar_map(max_id);
 
+  mTmpMark.clear();
+  mTmpMark.resize(max_id, false);
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
@@ -226,22 +229,22 @@ DtpgSatC::run_multi(NodeSet& node_set,
     // 故障ノードの TFO 以外の dlit を0にする．
     mTmpNodeList.clear();
     mTmpNodeList.reserve(node_set.tfo_tfi_size());
-    set_tmp_mark(fnode);
+    mTmpMark[fnode->id()] = true;
     mTmpNodeList.push_back(fnode);
     for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
       TpgNode* node = mTmpNodeList[rpos];
       ymuint nfo = node->active_fanout_num();
       for (ymuint i = 0; i < nfo; ++ i) {
 	TpgNode* fonode = node->active_fanout(i);
-	if ( !tmp_mark(fonode) ) {
-	  set_tmp_mark(fonode);
+	if ( !mTmpMark[fonode->id()] ) {
+	  mTmpMark[fonode->id()] = true;
 	  mTmpNodeList.push_back(fonode);
 	}
       }
     }
     for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
       TpgNode* node = node_set.tfo_tfi_node(i);
-      if ( node_set.tfo_mark(node) && !tmp_mark(node) ) {
+      if ( node_set.tfo_mark(node) && !mTmpMark[node->id()] ) {
 	Literal dlit(dvar_map(node), true);
 	engine.assumption_add(dlit);
 	//assump_base.push_back(dlit);
@@ -250,7 +253,7 @@ DtpgSatC::run_multi(NodeSet& node_set,
     for (vector<TpgNode*>::iterator p = mTmpNodeList.begin();
 	 p != mTmpNodeList.end(); ++ p) {
       TpgNode* node = *p;
-      clear_tmp_mark(node);
+      mTmpMark[node->id()] = false;
     }
     mTmpNodeList.clear();
 

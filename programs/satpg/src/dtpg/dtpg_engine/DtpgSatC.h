@@ -88,6 +88,9 @@ private:
   vector<TpgNode*> mTmpNodeList;
 
   // 作業用のマーク
+  vector<bool> mTmpMark;
+
+  // 作業用のマーク
   vector<bool> mMark;
 
 };

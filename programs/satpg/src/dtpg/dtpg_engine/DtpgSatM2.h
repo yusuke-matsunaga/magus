@@ -78,6 +78,9 @@ private:
   // 作業用のノードリスト
   vector<TpgNode*> mTmpNodeList;
 
+  // 作業用のマーク
+  vector<bool> mTmpMark;
+
   // 処理済みのノードのマーク
   vector<ymuint> mMark;
 

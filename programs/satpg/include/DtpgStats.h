@@ -23,6 +23,27 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 struct DtpgStats
 {
+
+  /// @brief DetStats を更新する
+  void
+  update_det(const SatStats& sat_stats,
+	     const USTime& time);
+
+  /// @brief RedStats を更新する
+  void
+  update_red(const SatStats& sat_stats,
+	     const USTime& time);
+
+  /// @brief PartRedStats を更新する
+  void
+  update_partred(const SatStats& sat_stats,
+		 const USTime& time);
+
+  /// @brief AbortStats を更新する
+  void
+  update_abort(const SatStats& sat_stats,
+	       const USTime& time);
+
   /// @brief CNF 式を生成した回数
   ymuint32 mCnfGenCount;
 
@@ -78,6 +99,57 @@ struct DtpgStats
   USTime mAbortTime;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief DetStats を更新する
+inline
+void
+DtpgStats::update_det(const SatStats& sat_stats,
+		      const USTime& time)
+{
+  ++ mDetCount;
+  mDetTime += time;
+  mDetStats += sat_stats;
+  mDetStatsMax.max_assign(sat_stats);
+}
+
+// @brief RedStats を更新する
+inline
+void
+DtpgStats::update_red(const SatStats& sat_stats,
+		      const USTime& time)
+{
+  ++ mRedCount;
+  mRedTime += time;
+  mRedStats += sat_stats;
+  mRedStatsMax.max_assign(sat_stats);
+}
+
+// @brief PartRedStats を更新する
+inline
+void
+DtpgStats::update_partred(const SatStats& sat_stats,
+			  const USTime& time)
+{
+  ++ mPartRedCount;
+  mPartRedTime += time;
+  mPartRedStats += sat_stats;
+  mPartRedStatsMax.max_assign(sat_stats);
+}
+
+// @brief AbortStats を更新する
+inline
+void
+DtpgStats::update_abort(const SatStats& sat_stats,
+			const USTime& time)
+{
+  ++ mAbortCount;
+  mAbortTime += time;
+}
 
 END_NAMESPACE_YM_SATPG
 
