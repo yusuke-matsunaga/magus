@@ -113,6 +113,8 @@ set (minpat_SOURCES
   src/minpat/GcNodeHeap.cc
   src/minpat/GcSolver.cc
   src/minpat/McMatrix.cc
+  src/minpat/MinPat2.cc
+  src/minpat/fault_analyzer.cc
   )
 
 set (rtpg_SOURCES
@@ -135,6 +137,7 @@ set (atpg_tclsh_SOURCES
   src/atpg_tclsh/RtpgCmd.cc
   src/atpg_tclsh/DtpgCmd.cc
   src/atpg_tclsh/MinPatCmd.cc
+  src/atpg_tclsh/MinPat2Cmd.cc
   )
 
 

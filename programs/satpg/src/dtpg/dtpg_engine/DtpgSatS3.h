@@ -117,6 +117,23 @@ private:
 		     FaultInfo* f_tgt,
 		     const vector<FaultInfo*>& fault_list);
 
+  bool
+  dominance_check(ymuint max_id,
+		  FaultInfo* fi1,
+		  FaultInfo* fi2);
+
+  bool
+  conflict_check(ymuint max_id,
+		 FaultInfo* fi1,
+		 FaultInfo* fi2);
+
+  /// @brief 十分割当リストの検証を行う．
+  void
+  verify_suf_list(TpgFault* fault,
+		  const NodeSet& node_set,
+		  const NodeValList& suf_list,
+		  const vector<Bool3>& ref_model);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

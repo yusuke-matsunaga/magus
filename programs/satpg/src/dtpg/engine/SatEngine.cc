@@ -322,23 +322,13 @@ SatEngine::make_fault_cnf(TpgFault* fault,
 
     ymuint fpos = fault->pos();
     // fpos 以外の入力を ivars[] に入れる．
-    // fpos の入力の値は故障値の逆にする．
     ymuint ni = node->fanin_num();
     vector<VarId> ivars;
     ivars.reserve(ni - 1);
     for (ymuint i = 0; i < ni; ++ i) {
       TpgNode* inode = node->fanin(i);
       VarId ivar = gvar_map(inode);
-      if ( i == fpos ) {
-	Literal ilit(ivar, false);
-	if ( fval == 0 ) {
-	  add_clause(ilit);
-	}
-	else {
-	  add_clause(~ilit);
-	}
-      }
-      else {
+      if ( i != fpos ) {
 	ivars.push_back(ivar);
       }
     }
@@ -428,7 +418,7 @@ SatEngine::make_dchain_cnf(TpgNode* node,
 
     // dominator の dlit が 0 なら自分も 0
     TpgNode* idom = node->imm_dom();
-    if ( idom != NULL ) {
+    if ( idom != NULL && idom != node->active_fanout(0) ) {
       Literal idlit(dvar_map(idom), false);
       add_clause(~dlit, idlit);
     }

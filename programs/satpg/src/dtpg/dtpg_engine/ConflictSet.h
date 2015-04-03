@@ -50,6 +50,10 @@ public:
   check(ymuint id1,
 	ymuint id2) const;
 
+  /// @brief 要素数を返す．
+  ymuint
+  size() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -126,6 +130,14 @@ ConflictSet::check(ymuint id1,
     key = id2 * mMaxId + id1;
   }
   return mHash.check(key);
+}
+
+// @brief 要素数を返す．
+inline
+ymuint
+ConflictSet::size() const
+{
+  return mHash.num();
 }
 
 END_NAMESPACE_YM_SATPG

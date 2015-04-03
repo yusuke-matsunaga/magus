@@ -9,9 +9,30 @@
 
 #include "KDet.h"
 #include "Fsim.h"
+#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
+
+BEGIN_NONAMESPACE
+
+// fault_list 中の故障番号の最大値+1を返す．
+ymuint
+get_max_id(const vector<TpgFault*>& fault_list)
+{
+  ymuint max_fault_id = 0;
+  ymuint num = fault_list.size();
+  for (ymuint i = 0; i < num; ++ i) {
+    TpgFault* f = fault_list[i];
+    if ( max_fault_id < f->id() ) {
+      max_fault_id = f->id();
+    }
+  }
+  ++ max_fault_id;
+  return max_fault_id;
+}
+
+END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス KDet
@@ -20,13 +41,10 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 // @param[in] fsm 故障シミュレータ
 // @param[in] f_list 故障のリスト
-// @param[in] max_fault_id 故障IDの最大値+1
 KDet::KDet(Fsim& fsim,
-	   const vector<TpgFault*>& f_list,
-	   ymuint max_fault_id) :
-
+	   const vector<TpgFault*>& f_list) :
   mFsim(fsim),
-  mOp(fsim, f_list, max_fault_id)
+  mOp(fsim, f_list, get_max_id(f_list))
 {
 }
 
@@ -74,6 +92,7 @@ KDet::run(const vector<TestVector*>& pat_list,
     }
     mOp.clear_det_list();
   }
+  ASSERT_COND( wpos == np );
 }
 
 END_NAMESPACE_YM_SATPG

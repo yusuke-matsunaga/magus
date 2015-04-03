@@ -1,31 +1,34 @@
-﻿#ifndef MINPAT_H
-#define MINPAT_H
+﻿#ifndef MINPAT2_H
+#define MINPAT2_H
 
-/// @file MinPat.h
-/// @brief MinPat のヘッダファイル
-///
+/// @file MinPat2.h
+/// @brief MinPat2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "satpg_nsdef.h"
+#include "MinPat.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPat MinPat.h "MinPat.h"
-/// @brief テストベクタの最小化を行うクラス
+/// @class MinPat2 MinPat2.h "MinPat2.h"
+/// @brief MinPat の実装クラス
 //////////////////////////////////////////////////////////////////////
-class MinPat
+class MinPat2 :
+  public MinPat
 {
 public:
 
+  /// @brief コンストラクタ
+  MinPat2();
+
   /// @brief デストラクタ
   virtual
-  ~MinPat() {}
+  ~MinPat2();
 
 
 public:
@@ -49,31 +52,10 @@ public:
       Fsim& fsim2,
       Fsim& fsim3,
       vector<TestVector*>& tv_list,
-      MinPatStats& stats) = 0;
+      MinPatStats& stats);
 
 };
 
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_MinPat();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_MinPat2();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_GreedyMinPat();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_NaiveMinPat();
-
 END_NAMESPACE_YM_SATPG
 
-#endif // MINPAT_H
+#endif // MINPAT2_H

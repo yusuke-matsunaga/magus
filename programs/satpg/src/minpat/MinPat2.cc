@@ -1,13 +1,13 @@
 ﻿
-/// @file MinPatImpl.cc
-/// @brief MinPatImpl の実装ファイル
+/// @file MinPat2.cc
+/// @brief MinPat2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPatImpl.h"
+#include "MinPat2.h"
 #include "MinPatStats.h"
 #include "TvMgr.h"
 #include "TestVector.h"
@@ -31,9 +31,9 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 MinPat*
-new_MinPat()
+new_MinPat2()
 {
-  return new MinPatImpl();
+  return new MinPat2();
 }
 
 BEGIN_NONAMESPACE
@@ -66,17 +66,29 @@ dfs_mffc(TpgNode* node,
 
 END_NONAMESPACE
 
+extern
+bool
+check_dominance(TpgFault* f1,
+		TpgFault* f2,
+		ymuint max_id);
+
+extern
+bool
+check_conflict(TpgFault* f1,
+	       TpgFault* f2,
+	       ymuint max_id);
+
 //////////////////////////////////////////////////////////////////////
-// クラス MinPatImpl
+// クラス MinPat2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MinPatImpl::MinPatImpl()
+MinPat2::MinPat2()
 {
 }
 
 // @brief デストラクタ
-MinPatImpl::~MinPatImpl()
+MinPat2::~MinPat2()
 {
 }
 
@@ -89,13 +101,13 @@ MinPatImpl::~MinPatImpl()
 // @param[inout] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
-MinPatImpl::run(TpgNetwork& network,
-		TvMgr& tvmgr,
-		FaultMgr& fmgr,
-		Fsim& fsim2,
-		Fsim& fsim3,
-		vector<TestVector*>& tv_list,
-		MinPatStats& stats)
+MinPat2::run(TpgNetwork& network,
+	     TvMgr& tvmgr,
+	     FaultMgr& fmgr,
+	     Fsim& fsim2,
+	     Fsim& fsim3,
+	     vector<TestVector*>& tv_list,
+	     MinPatStats& stats)
 {
   StopWatch local_timer;
 
@@ -110,7 +122,8 @@ MinPatImpl::run(TpgNetwork& network,
   // 故障番号の最大値を求める．
   ymuint max_fault_id = 0;
   const vector<TpgFault*>& f_list = fmgr.det_list();
-  for (ymuint i = 0; i < f_list.size(); ++ i) {
+  ymuint fault_num = f_list.size();
+  for (ymuint i = 0; i < fault_num; ++ i) {
     TpgFault* f = f_list[i];
     if ( max_fault_id < f->id() ) {
       max_fault_id = f->id();
@@ -119,43 +132,158 @@ MinPatImpl::run(TpgNetwork& network,
   ++ max_fault_id;
 
   {
-    ymuint n = network.active_node_num();
-    ymuint nm = 0;
-    for (ymuint i = 0; i < n; ++ i) {
-      TpgNode* node = network.active_node(i);
-      if ( node->imm_dom() == NULL ) {
-	++ nm;
-      }
-    }
-    cout << "# of faults:   " << f_list.size() << endl;
-    cout << "# of MFFCs:    " << nm << endl;
+    cout << "# of faults:   " << fault_num << endl;
     cout << "# of patterns: " << orig_num << endl;
   }
 
+  ymuint max_node_id = network.max_node_id();
+
+  KDet kdet(fsim3, f_list);
+
+  vector<vector<ymuint> > det_list_array;
+  ymuint npat0 = 100;
+  ymuint npat = orig_num + npat0;
+  ymuint k = npat;
+
+  cout << "  fault simulation (npat = " << npat << ", k = " << k << ") starts."
+       << endl;
   {
-    ymuint n = network.active_node_num();
-    ymuint nm = 0;
-    vector<bool> mark(network.max_node_id(), false);
-    for (ymuint i = 0; i < n; ++ i) {
-      TpgNode* node = network.active_node(i);
-      if ( node->imm_dom() == NULL ) {
-	vector<TpgFault*> fault_list;
-	dfs_mffc(node, mark, fault_list);
-	cout << "Fault Group: " << fault_list.size() << endl;
+    RandGen rg;
+    vector<TestVector*> tmp_tv_list(npat);
+    for (ymuint i = 0; i < orig_num; ++ i) {
+      TestVector* tv = tv_list[i];
+      tmp_tv_list[i] = tv;
+    }
+    for (ymuint i = 0; i < npat0; ++ i) {
+      TestVector* tv = tvmgr.new_vector();
+      tv->set_from_random(rg);
+      tmp_tv_list[i + orig_num] = tv;
+    }
+
+    kdet.run(tmp_tv_list, k, det_list_array);
+
+    for (ymuint i = 0; i < npat0; ++ i) {
+      TestVector* tv = tmp_tv_list[i + orig_num];
+      tvmgr.delete_vector(tv);
+    }
+  }
+
+  cout << "  fault simulation ends." << endl;
+
+  ymuint n_sat = 0;
+
+  vector<bool> dom_flag(max_fault_id, false);
+  // シミュレーション結果から故障の排他性と支配関係のヒントを作る．
+  { // とりあえずナイーブな方法
+    // 故障ごとに検出パタンのリストを作る．
+    vector<vector<ymuint> > tv_list_array(max_fault_id);
+    for (ymuint i = 0; i < npat; ++ i) {
+      const vector<ymuint>& det_list = det_list_array[i];
+      ymuint nf = det_list.size();
+      for (ymuint j = 0; j < nf; ++ j) {
+	ymuint f_id = det_list[j];
+	tv_list_array[f_id].push_back(i);
+      }
+    }
+    for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+      TpgFault* f1 = f_list[i1];
+      const vector<ymuint>& tv_list1 = tv_list_array[f1->id()];
+      for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
+	TpgFault* f2 = f_list[i2];
+	if ( dom_flag[f2->id()] ) {
+	  continue;
+	}
+	const vector<ymuint>& tv_list2 = tv_list_array[f2->id()];
+
+	if ( false ) {
+	  cout << f1->str() << ":";
+	  for (ymuint i = 0; i < tv_list1.size(); ++ i) {
+	    cout << " " << tv_list1[i];
+	  }
+	  cout << endl;
+	  cout << f2->str() << ":";
+	  for (ymuint i = 0; i < tv_list2.size(); ++ i) {
+	    cout << " " << tv_list2[i];
+	  }
+	  cout << endl;
+	}
+
+	bool flag_10 = false;
+	bool flag_01 = false;
+	bool flag_11 = false;
+	ymuint n1 = tv_list1.size();
+	ymuint n2 = tv_list2.size();
+	ymuint p1 = 0;
+	ymuint p2 = 0;
+	while ( p1 < n1 && p2 < n2 ) {
+	  ymuint v1 = tv_list1[p1];
+	  ymuint v2 = tv_list2[p2];
+	  if ( v1 < v2 ) {
+	    flag_10 = true;
+	    ++ p1;
+	  }
+	  else if ( v1 > v2 ) {
+	    flag_01 = true;
+	    ++ p2;
+	  }
+	  else {
+	    flag_11 = true;
+	    ++ p1;
+	    ++ p2;
+	  }
+	  if ( flag_10 && flag_01 && flag_11 ) {
+	    break;
+	  }
+	}
+	if ( p1 < n1 ) {
+	  flag_10 = true;
+	}
+	if ( p2 < n2 ) {
+	  flag_01 = true;
+	}
+
+	if ( !flag_10 ) {
+	  // f1 が 0 のときは f2 も 0 だった．
+	  ++ n_sat;
+	  if ( check_dominance(f1, f2, max_node_id) ) {
+	    cout << f2->str() << " is dominated by " << f1->str() << endl;
+	    dom_flag[f2->id()] = true;
+	  }
+	}
+	if ( !flag_01 ) {
+	  // f2 が 0 のときは f1 も 0 だった．
+	  ++ n_sat;
+	  if ( check_dominance(f2, f1, max_node_id) ) {
+	    cout << f1->str() << " is dominated by " << f2->str() << endl;
+	    dom_flag[f1->id()] = true;
+	    break;
+	  }
+	}
+#if 0
+	if ( !flag_11 ) {
+	  // f1 と f2 が同時に 1 になることがない．
+	  ++ n_sat;
+	  if ( check_conflict(f1, f2, max_node_id) ) {
+	    cout << f1->str() << " conflicts with " << f2->str() << endl;
+	  }
+	}
+#endif
       }
     }
   }
 
-  KDet kdet(fsim3, f_list);
+  ymuint nrep = 0;
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    TpgFault* f = f_list[i];
+    if ( !dom_flag[f->id()] ) {
+      ++ nrep;
+    }
+  }
+  cout << "Total " << fault_num << " original faults" << endl;
+  cout << "Total " << nrep << " representative faults" << endl;
+  cout << "Total " << n_sat << " sat invocation" << endl;
 
-  cout << "  fault simulation starts." << endl;
-
-  vector<vector<ymuint> > det_list_array;
-  ymuint k = 2000;
-  kdet.run(tv_list, k, det_list_array);
-
-  cout << "  fault simulation ends." << endl;
-
+#if 0
   // マージできないテストパタンの間に枝を持つグラフを作る．
   ymuint n = tv_list.size();
   GcSolver gcsolver(n);
@@ -176,7 +304,8 @@ MinPatImpl::run(TpgNetwork& network,
       node1->add_fault(*p);
     }
   }
-
+#endif
+#if 0
   // このグラフ上での最小彩色問題を解くことで3値のパタンを圧縮する．
   vector<vector<ymuint> > color_group;
   ymuint nc = gcsolver.coloring(color_group);
@@ -210,7 +339,7 @@ MinPatImpl::run(TpgNetwork& network,
   tv_list = new_tv_list;
 
   {
-    KDet kdet(fsim3, f_list);
+    KDet kdet(fsim3, f_list, max_fault_id);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 40;
@@ -254,13 +383,16 @@ MinPatImpl::run(TpgNetwork& network,
     }
   }
   cout << "Minimum Covering End: " << tv_list.size() << endl;
+#endif
 
+#if 0
   {
     // 検証しておく．
     if ( ver.check(tv_list) ) {
       cout << "No Errors(4)" << endl;
     }
   }
+#endif
 
   local_timer.stop();
   USTime time = local_timer.time();

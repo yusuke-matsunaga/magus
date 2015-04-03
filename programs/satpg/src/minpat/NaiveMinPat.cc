@@ -92,7 +92,7 @@ NaiveMinPat::run(TpgNetwork& network,
   ++ max_fault_id;
   {
 
-    KDet kdet(fsim3, f_list, max_fault_id);
+    KDet kdet(fsim3, f_list);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 2000;
@@ -220,7 +220,7 @@ NaiveMinPat::run(TpgNetwork& network,
   tv_list = tv2_list;
 
   {
-    KDet kdet(fsim3, f_list, max_fault_id);
+    KDet kdet(fsim3, f_list);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 4000;

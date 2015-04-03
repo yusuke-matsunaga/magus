@@ -131,7 +131,7 @@ GreedyMinPat::run(TpgNetwork& network,
   vector<ymuint> fid_list;
   {
 
-    KDet kdet(fsim3, f_list, max_fault_id);
+    KDet kdet(fsim3, f_list);
 
     vector<vector<ymuint> > det_list_array;
     ymuint k = 10;
