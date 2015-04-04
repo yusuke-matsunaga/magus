@@ -62,31 +62,6 @@ check_dominance(TpgFault* f1,
   node_set1.mark_region(max_id, vector<TpgNode*>(1, fnode1));
   node_set2.mark_region(max_id, vector<TpgNode*>(1, fnode2));
 
-  if ( false ) {
-    // 入力が共通部分を持たなければ絶対に関係はない．
-    vector<ymuint> input_list1;
-    for (ymuint i = 0; i < node_set1.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set1.tfo_tfi_node(i);
-      if ( node->is_input() ) {
-	input_list1.push_back(node->input_id());
-      }
-    }
-    sort(input_list1.begin(), input_list1.end());
-
-    vector<ymuint> input_list2;
-    for (ymuint i = 0; i < node_set2.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set2.tfo_tfi_node(i);
-      if ( node->is_input() ) {
-	input_list2.push_back(node->input_id());
-      }
-    }
-    sort(input_list2.begin(), input_list2.end());
-
-    if ( !check_intersect(input_list1, input_list2) ) {
-      return false;
-    }
-  }
-
   GenVidMap gvar_map(max_id);
 
   GenVidMap fvar1_map(max_id);
@@ -236,31 +211,6 @@ check_conflict(TpgFault* f1,
 
   node_set1.mark_region(max_id, vector<TpgNode*>(1, fnode1));
   node_set2.mark_region(max_id, vector<TpgNode*>(1, fnode2));
-
-  {
-    // 入力が共通部分を持たなければ絶対に関係はない．
-    vector<ymuint> input_list1;
-    for (ymuint i = 0; i < node_set1.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set1.tfo_tfi_node(i);
-      if ( node->is_input() ) {
-	input_list1.push_back(node->input_id());
-      }
-    }
-    sort(input_list1.begin(), input_list1.end());
-
-    vector<ymuint> input_list2;
-    for (ymuint i = 0; i < node_set2.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set2.tfo_tfi_node(i);
-      if ( node->is_input() ) {
-	input_list2.push_back(node->input_id());
-      }
-    }
-    sort(input_list2.begin(), input_list2.end());
-
-    if ( !check_intersect(input_list1, input_list2) ) {
-      return false;
-    }
-  }
 
   GenVidMap gvar_map(max_id);
 

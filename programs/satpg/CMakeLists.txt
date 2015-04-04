@@ -105,6 +105,8 @@ set (minpat_SOURCES
   src/minpat/FopRofsim.cc
   src/minpat/KDet.cc
   src/minpat/KDetOp.cc
+  src/minpat/KDet2.cc
+  src/minpat/KDet2Op.cc
   src/minpat/MinPatImpl.cc
   src/minpat/Verifier.cc
   src/minpat/GreedyMinPat.cc
