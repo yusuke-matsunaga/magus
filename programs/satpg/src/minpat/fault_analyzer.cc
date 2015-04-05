@@ -59,7 +59,6 @@ struct NodeLt
 
 END_NONAMESPACE
 
-
 void
 verify_suf_list(TpgFault* fault,
 		const NodeSet& node_set,
@@ -67,176 +66,11 @@ verify_suf_list(TpgFault* fault,
 		const vector<Bool3>& ref_model);
 
 void
-make_gval_cnf(SatEngine& engine,
-	      GenVidMap& gvar_map,
-	      TpgNetwork& network)
-{
-  //////////////////////////////////////////////////////////////////////
-  // 変数の割当
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
-    VarId gvar = engine.new_var();
-    gvar_map.set_vid(node, gvar);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
-    engine.make_node_cnf(node, gvar_map);
-  }
-}
-
-void
-make_fval_cnf(SatEngine& engine,
-	      NodeSet& node_set,
-	      GenVidMap& gvar_map,
-	      GenVidMap& fvar_map,
-	      GenVidMap& dvar_map,
-	      TpgFault* fault,
-	      ymuint max_id)
-{
-  const TpgNode* fnode = fault->node();
-
-  node_set.mark_region(max_id, fnode);
-
-  //////////////////////////////////////////////////////////////////////
-  // 変数の割当
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    VarId gvar = engine.new_var();
-    gvar_map.set_vid(node, gvar);
-    fvar_map.set_vid(node, gvar);
-  }
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    VarId fvar = engine.new_var();
-    VarId dvar = engine.new_var();
-    fvar_map.set_vid(node, fvar);
-    dvar_map.set_vid(node, dvar);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    engine.make_node_cnf(node, gvar_map);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-
-    // 故障回路のゲートの入出力関係を表すCNFを作る．
-    if ( node == fnode ) {
-      engine.make_fault_cnf(fault, gvar_map, fvar_map);
-    }
-    else {
-      engine.make_node_cnf(node, fvar_map);
-    }
-
-    // D-Chain 制約を作る．
-    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障の検出条件
-  //////////////////////////////////////////////////////////////////////
-  ymuint npo = node_set.output_list().size();
-  engine.tmp_lits_begin(npo);
-  for (ymuint i = 0; i < npo; ++ i) {
-    const TpgNode* node = node_set.output_list()[i];
-    Literal dlit(dvar_map(node), false);
-    engine.tmp_lits_add(dlit);
-  }
-  engine.tmp_lits_end();
-}
-
-void
-make_fval_cnf(SatEngine& engine,
-	      NodeSet& node_set,
-	      GenVidMap& gvar_map,
-	      GenVidMap& fvar_map,
-	      GenVidMap& dvar_map,
-	      TpgFault* fault,
-	      TpgNetwork& network)
-{
-  const TpgNode* fnode = fault->node();
-
-  ymuint max_id = network.max_node_id();
-
-  node_set.mark_region(max_id, fnode);
-
-  //////////////////////////////////////////////////////////////////////
-  // 変数の割当
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
-    VarId gvar = engine.new_var();
-    gvar_map.set_vid(node, gvar);
-    fvar_map.set_vid(node, gvar);
-  }
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    VarId fvar = engine.new_var();
-    VarId dvar = engine.new_var();
-    fvar_map.set_vid(node, fvar);
-    dvar_map.set_vid(node, dvar);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
-    engine.make_node_cnf(node, gvar_map);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-
-    // 故障回路のゲートの入出力関係を表すCNFを作る．
-    if ( node == fnode ) {
-      engine.make_fault_cnf(fault, gvar_map, fvar_map);
-    }
-    else {
-      engine.make_node_cnf(node, fvar_map);
-    }
-
-    // D-Chain 制約を作る．
-    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障の検出条件
-  //////////////////////////////////////////////////////////////////////
-  ymuint npo = node_set.output_list().size();
-  engine.tmp_lits_begin(npo);
-  for (ymuint i = 0; i < npo; ++ i) {
-    const TpgNode* node = node_set.output_list()[i];
-    Literal dlit(dvar_map(node), false);
-    engine.tmp_lits_add(dlit);
-  }
-  engine.tmp_lits_end();
-}
-
-void
 analyze_fault(TpgFault* fault,
 	      NodeValList& suf_list,
 	      NodeValList& ma_list,
 	      ymuint max_id)
 {
-  const TpgNode* fnode = fault->node();
-
   SatEngine engine(string(), string(), NULL);
 
   NodeSet node_set;
@@ -245,7 +79,64 @@ analyze_fault(TpgFault* fault,
   GenVidMap fvar_map(max_id);
   GenVidMap dvar_map(max_id);
 
-  make_fval_cnf(engine, node_set, gvar_map, fvar_map, dvar_map, fault, max_id);
+  const TpgNode* fnode = fault->node();
+
+  node_set.mark_region(max_id, fnode);
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId gvar = engine.new_var();
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
+  }
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId fvar = engine.new_var();
+    VarId dvar = engine.new_var();
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    engine.make_node_cnf(node, gvar_map);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      engine.make_fault_cnf(fault, gvar_map, fvar_map);
+    }
+    else {
+      engine.make_node_cnf(node, fvar_map);
+    }
+
+    // D-Chain 制約を作る．
+    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = node_set.output_list().size();
+  engine.tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    const TpgNode* node = node_set.output_list()[i];
+    Literal dlit(dvar_map(node), false);
+    engine.tmp_lits_add(dlit);
+  }
+  engine.tmp_lits_end();
 
   // 故障に対するテスト生成を行なう．
   engine.assumption_begin();
@@ -306,12 +197,6 @@ analyze_fault(TpgFault* fault,
       ;
     }
   }
-
-#if 0
-  cout << fault->str() << ": sufficient assignment = " << suf_list.size()
-       << ", mandatory assignment = " << ma_list.size() << endl;
-#endif
-
 }
 
 bool
@@ -337,7 +222,6 @@ check_dominance(TpgFault* f1,
 
   GenVidMap fvar2_map(max_id);
   GenVidMap dvar2_map(max_id);
-
 
   vector<bool> mark(max_id);
   vector<const TpgNode*> all_list;
@@ -419,6 +303,12 @@ check_dominance(TpgFault* f1,
   }
   engine.tmp_lits_end();
 
+  // dominator ノードの dvar は1でなければならない．
+  for (const TpgNode* node = fnode1; node != NULL; node = node->imm_dom()) {
+    Literal dlit(dvar1_map(node), false);
+    engine.add_clause(dlit);
+  }
+
   //////////////////////////////////////////////////////////////////////
   // 故障回路2の CNF を生成
   //////////////////////////////////////////////////////////////////////
@@ -439,12 +329,6 @@ check_dominance(TpgFault* f1,
 
   // f1 が検出可能で f2 が検出不可能な入力があるか調べる．
   engine.assumption_begin();
-
-  // dominator ノードの dvar は1でなければならない．
-  for (const TpgNode* node = fnode1; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar1_map(node), false);
-    engine.assumption_add(dlit);
-  }
 
   ymuint npo2 = node_set2.output_list().size();
   for (ymuint i = 0; i < npo2; ++ i) {
@@ -568,13 +452,12 @@ check_conflict(TpgFault* f1,
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
-#if 0
+
   // dominator ノードの dvar は1でなければならない．
   for (const TpgNode* node = fnode1; node != NULL; node = node->imm_dom()) {
     Literal dlit(dvar1_map(node), false);
     engine.add_clause(dlit);
   }
-#endif
 
   //////////////////////////////////////////////////////////////////////
   // 故障回路2の CNF を生成
@@ -605,27 +488,14 @@ check_conflict(TpgFault* f1,
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
-#if 0
+
   for (const TpgNode* node = fnode2; node != NULL; node = node->imm_dom()) {
     Literal dlit(dvar2_map(node), false);
     engine.add_clause(dlit);
   }
-#endif
 
   // 両方故障に対するテスト生成を行なう．
   engine.assumption_begin();
-
-#if 1
-  // dominator ノードの dvar は1でなければならない．
-  for (const TpgNode* node = fnode1; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar1_map(node), false);
-    engine.assumption_add(dlit);
-  }
-  for (const TpgNode* node = fnode2; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar2_map(node), false);
-    engine.assumption_add(dlit);
-  }
-#endif
 
   vector<Bool3> sat_model;
   SatStats sat_stats;

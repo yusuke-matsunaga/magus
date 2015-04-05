@@ -22,7 +22,7 @@
 #include "Verifier.h"
 #include "GcSolver.h"
 #include "GcNode.h"
-#include "SatEngine.h"
+#include "FaultAnalyzer.h"
 #include "GenVidMap.h"
 #include "ModelValMap.h"
 #include "YmUtils/Graph.h"
@@ -34,26 +34,6 @@
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-bool debug_flag = false;
-
-ymuint g_max_id;
-
-extern
-void
-make_gval_cnf(SatEngine& engine,
-	      GenVidMap& gvar_map,
-	      TpgNetwork& network);
-
-extern
-void
-make_fval_cnf(SatEngine& engine,
-	      NodeSet& node_set,
-	      GenVidMap& gvar_map,
-	      GenVidMap& fvar_map,
-	      GenVidMap& dvar_map,
-	      TpgFault* fault,
-	      TpgNetwork& network);
 
 extern
 void
@@ -136,143 +116,6 @@ check_pat_list(const vector<ymuint>& tv_list1,
     ans |= 2U;
   }
   return ans;
-}
-
-inline
-void
-add_assumption(SatEngine& engine,
-	       const VidMap& var_map,
-	       NodeVal nv)
-{
-  const TpgNode* node = nv.node();
-  Literal alit(var_map(node), false);
-  if ( nv.val() ) {
-    engine.assumption_add(alit);
-  }
-  else {
-    engine.assumption_add(~alit);
-  }
-}
-
-bool
-check_intersect(SatEngine& engine,
-		const VidMap& var_map,
-		const NodeValList& list1,
-		const NodeValList& list2)
-{
-  if ( check_conflict(list1, list2) ) {
-    return false;
-  }
-
-  engine.assumption_begin();
-  for (ymuint i = 0; i < list1.size(); ++ i) {
-    NodeVal nv = list1[i];
-    add_assumption(engine, var_map, nv);
-  }
-
-  for (ymuint i = 0; i < list2.size(); ++ i) {
-    NodeVal nv = list2[i];
-    add_assumption(engine, var_map, nv);
-  }
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
-  if ( sat_ans == kB3True ) {
-    return true;
-  }
-  return false;
-}
-
-bool
-check_intersect(SatEngine& engine,
-		TpgFault* fault,
-		NodeSet& node_set,
-		const VidMap& gvar_map,
-		const VidMap& fvar_map,
-		const VidMap& dvar_map,
-		const NodeValList& list)
-{
-  engine.assumption_begin();
-  for (ymuint i = 0; i < list.size(); ++ i) {
-    NodeVal nv = list[i];
-    add_assumption(engine, gvar_map, nv);
-  }
-
-  const TpgNode* fnode = fault->node();
-  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar_map(node), false);
-    engine.assumption_add(dlit);
-  }
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
-  if ( sat_ans == kB3True ) {
-    return true;
-  }
-  return false;
-}
-
-bool
-check_conflict(SatEngine& engine,
-	       const VidMap& var_map,
-	       const NodeValList& list1,
-	       const NodeValList& list2)
-{
-  engine.assumption_begin();
-  for (ymuint i = 0; i < list1.size(); ++ i) {
-    NodeVal nv = list1[i];
-    add_assumption(engine, var_map, nv);
-  }
-
-  for (ymuint i = 0; i < list2.size(); ++ i) {
-    NodeVal nv = list2[i];
-    add_assumption(engine, var_map, nv);
-  }
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
-  if ( sat_ans == kB3False ) {
-    return true;
-  }
-  return false;
-}
-
-bool
-check_conflict(SatEngine& engine,
-	       TpgFault* fault,
-	       NodeSet& node_set,
-	       const VidMap& gvar_map,
-	       const VidMap& fvar_map,
-	       const VidMap& dvar_map,
-	       const NodeValList& list)
-{
-  engine.assumption_begin();
-
-  for (ymuint i = 0; i < list.size(); ++ i) {
-    NodeVal nv = list[i];
-    add_assumption(engine, gvar_map, nv);
-  }
-
-  const TpgNode* fnode = fault->node();
-  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar_map(node), false);
-    engine.assumption_add(dlit);
-  }
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
-  if ( sat_ans == kB3False ) {
-    return true;
-  }
-  return false;
 }
 
 END_NONAMESPACE
@@ -497,11 +340,9 @@ MinPat2::run(TpgNetwork& network,
   local_timer.reset();
   local_timer.start();
 
-  SatEngine g_engine(string(), string(), NULL);
+  FaultAnalyzer g_fa(string(), string(), NULL);
 
-  GenVidMap g_gvar_map(max_node_id);
-
-  make_gval_cnf(g_engine, g_gvar_map, network);
+  g_fa.make_gval_cnf(network);
 
   ymuint n_sat2 = 0;
   ymuint n_conf = 0;
@@ -514,15 +355,11 @@ MinPat2::run(TpgNetwork& network,
     for (ymuint i1 = 0; i1 < rep_fault_num; ++ i1) {
       TpgFault* f1 = rep_fault_list[i1];
 
-      SatEngine f_engine(string(), string(), NULL);
+      FaultAnalyzer f_fa(string(), string(), NULL);
 
       NodeSet node_set;
 
-      GenVidMap gvar_map(max_node_id);
-      GenVidMap fvar_map(max_node_id);
-      GenVidMap dvar_map(max_node_id);
-
-      make_fval_cnf(f_engine, node_set, gvar_map, fvar_map, dvar_map, f1, network);
+      f_fa.make_fval_cnf(network, f1);
 
       // input_list1 の要素をハッシュに登録する．
       const vector<ymuint>& input_list1 = input_list_array[f1->node()->id()];
@@ -573,29 +410,27 @@ MinPat2::run(TpgNetwork& network,
 	  continue;
 	}
 
-	if ( check_intersect(g_engine, g_gvar_map, suf_list1, suf_list2) ) {
+	if ( g_fa.check_intersect(suf_list1, suf_list2) ) {
 	  // 十分割当が交わっていたらコンフリクトはない．
 	  ++ n_int1;
 	  continue;
 	}
 
-	if ( check_conflict(g_engine, g_gvar_map, ma_list1, ma_list2) ) {
+	if ( g_fa.check_conflict(ma_list1, ma_list2) ) {
 	  // 必要割当がコンフリクトしていたら故障もコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf1;
 	  continue;
 	}
 
-	if ( check_conflict(f_engine, f1, node_set, gvar_map, fvar_map, dvar_map,
-			    ma_list2) ) {
+	if ( f_fa.check_conflict(ma_list2) ) {
 	  // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf2;
 	  continue;
 	}
 
-	if ( check_intersect(f_engine, f1, node_set, gvar_map, fvar_map, dvar_map,
-			      suf_list2) ) {
+	if ( f_fa.check_intersect(suf_list2) ) {
 	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
 	  ++ n_int2;
 	  continue;

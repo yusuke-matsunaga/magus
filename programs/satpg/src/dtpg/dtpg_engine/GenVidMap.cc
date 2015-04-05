@@ -30,7 +30,17 @@ GenVidMap::~GenVidMap()
 VarId
 GenVidMap::operator()(const TpgNode* node) const
 {
+  ASSERT_COND( node->id() < mVidArray.size() );
   return mVidArray[node->id()];
+}
+
+// @brief 初期化する．
+// @param[in] max_id ノード番号の最大値
+void
+GenVidMap::init(ymuint max_id)
+{
+  mVidArray.clear();
+  mVidArray.resize(max_id);
 }
 
 // @brief ノードに関連した変数番号を設定する．
@@ -40,6 +50,7 @@ void
 GenVidMap::set_vid(const TpgNode* node,
 		   VarId vid)
 {
+  ASSERT_COND( node->id() < mVidArray.size() );
   mVidArray[node->id()] = vid;
 }
 

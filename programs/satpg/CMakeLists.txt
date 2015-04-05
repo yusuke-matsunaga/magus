@@ -116,6 +116,7 @@ set (minpat_SOURCES
   src/minpat/GcSolver.cc
   src/minpat/McMatrix.cc
   src/minpat/MinPat2.cc
+  src/minpat/FaultAnalyzer.cc
   src/minpat/fault_analyzer.cc
   )
 

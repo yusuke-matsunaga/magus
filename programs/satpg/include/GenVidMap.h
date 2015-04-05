@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] max_id ノード番号の最大値
-  GenVidMap(ymuint max_id);
+  GenVidMap(ymuint max_id = 0);
 
   /// @brief デストラクタ
   virtual
@@ -42,6 +42,11 @@ public:
   virtual
   VarId
   operator()(const TpgNode* node) const;
+
+  /// @brief 初期化する．
+  /// @param[in] max_id ノード番号の最大値
+  void
+  init(ymuint max_id);
 
   /// @brief ノードに関連した変数番号を設定する．
   /// @param[in] node 対象のノード
