@@ -69,13 +69,13 @@ private:
   virtual
   void
   run_multi(const NodeSet& node_set,
-	    const vector<TpgNode*>& fnode_list,
+	    const vector<const TpgNode*>& fnode_list,
 	    const vector<TpgFault*>& flist) = 0;
 
   /// @brief DFS で MFFC を求める．
   /// @param[in] node 対象のノード
   void
-  dfs_mffc(TpgNode* node);
+  dfs_mffc(const TpgNode* node);
 
 
 private:
@@ -84,7 +84,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 故障を持つノードのリスト
-  vector<TpgNode*> mFaultNodeList;
+  vector<const TpgNode*> mFaultNodeList;
 
   // 対象の故障リスト
   vector<TpgFault*> mFaultList;

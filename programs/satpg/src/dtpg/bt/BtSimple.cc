@@ -36,15 +36,15 @@ BtSimple::BtSimple()
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtSimple::operator()(TpgNode* fnode,
+BtSimple::operator()(const TpgNode* fnode,
 		     const NodeSet& node_set,
 		     const ValMap& val_map,
 		     NodeValList& assign_list)
 {
   assign_list.clear();
-  for (vector<TpgNode*>::const_iterator p = node_set.input_list().begin();
+  for (vector<const TpgNode*>::const_iterator p = node_set.input_list().begin();
        p != node_set.input_list().end(); ++ p) {
-    TpgNode* node = *p;
+    const TpgNode* node = *p;
     record_value(node, val_map, assign_list);
   }
 }

@@ -61,7 +61,7 @@ private:
   virtual
   void
   run_multi(const NodeSet& node_set,
-	    const vector<TpgNode*>& fnode_list,
+	    const vector<const TpgNode*>& fnode_list,
 	    const vector<TpgFault*>& flist);
 
 
@@ -71,7 +71,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
+  vector<const TpgNode*> mTmpNodeList;
 
   // 作業用のマーク配列
   vector<bool> mMarkArray;

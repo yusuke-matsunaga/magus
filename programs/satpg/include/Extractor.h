@@ -54,35 +54,35 @@ private:
   /// @brief 故障の影響を伝搬するノードを求める．
   /// @param[in] node 対象のノード
   /// @return node から外部出力まで故障の影響が伝搬していたら true を返す．
-  TpgNode*
-  find_sensitized_output(TpgNode* node);
+  const TpgNode*
+  find_sensitized_output(const TpgNode* node);
 
   /// @brief 故障の影響の伝搬を阻害する値割当を記録する．
   /// @param[in] node 対象のノード
   /// @param[out] assign_list 値割当を記録するリスト
   void
-  record_sensitized_node(TpgNode* node,
+  record_sensitized_node(const TpgNode* node,
 			 NodeValList& assign_list);
 
   /// @brief side inputs の値を記録する．
   /// @param[in] node 対象のノード
   /// @param[out] assign_list 値割当を記録するリスト
   void
-  record_side_inputs(TpgNode* node,
+  record_side_inputs(const TpgNode* node,
 		     NodeValList& assign_list);
 
   /// @brief 故障の影響の伝搬を阻害する値割当を記録する．
   /// @param[in] node 対象のノード
   /// @param[out] assign_list 値割当を記録するリスト
   void
-  record_masking_node(TpgNode* node,
+  record_masking_node(const TpgNode* node,
 		      NodeValList& assign_list);
 
   /// @brief ノードの割当を記録する．
   /// @param[in] node 対象のノード
   /// @param[out] assign_list 値割当を記録するリスト
   void
-  record_node(TpgNode* node,
+  record_node(const TpgNode* node,
 	      NodeValList& assign_list);
 
 

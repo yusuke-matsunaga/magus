@@ -41,9 +41,9 @@ BtJustBase::set_max_id(ymuint max_id)
 void
 BtJustBase::clear_justified()
 {
-  for (vector<TpgNode*>::iterator p = mJustifiedNodeList.begin();
+  for (vector<const TpgNode*>::iterator p = mJustifiedNodeList.begin();
        p != mJustifiedNodeList.end(); ++ p) {
-    TpgNode* node = *p;
+    const TpgNode* node = *p;
     ASSERT_COND( node->id() < mJustifiedMarkArray.size() );
     mJustifiedMarkArray[node->id()] = false;
     clear_justified_hook(node);
@@ -54,7 +54,7 @@ BtJustBase::clear_justified()
 // @brief clear_justified() 中で呼ばれるフック関数
 // @note デフォルトの実装はなにもしない．
 void
-BtJustBase::clear_justified_hook(TpgNode* node)
+BtJustBase::clear_justified_hook(const TpgNode* node)
 {
 }
 

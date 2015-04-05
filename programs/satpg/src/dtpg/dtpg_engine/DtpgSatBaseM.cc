@@ -50,7 +50,7 @@ DtpgSatBaseM::run(TpgNetwork& network,
   mMark.resize(max_id, false);
   ymuint n = network.active_node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* node = network.active_node(i);
+    const TpgNode* node = network.active_node(i);
     if ( node->imm_dom() == NULL ) {
       mFaultNodeList.clear();
       mFaultList.clear();
@@ -70,13 +70,13 @@ DtpgSatBaseM::run(TpgNetwork& network,
 // @brief DFS で MFFC を求める．
 // @param[in] node 対象のノード
 void
-DtpgSatBaseM::dfs_mffc(TpgNode* node)
+DtpgSatBaseM::dfs_mffc(const TpgNode* node)
 {
   mMark[node->id()] = true;
 
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     if ( mMark[inode->id()] == false && inode->imm_dom() != NULL ) {
       dfs_mffc(inode);
     }

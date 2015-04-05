@@ -50,7 +50,7 @@ public:
   /// @param[out] assign_list 値の割当リスト
   virtual
   void
-  operator()(TpgNode* fnode,
+  operator()(const TpgNode* fnode,
 	     const NodeSet& node_set,
 	     const ValMap& val_map,
 	     NodeValList& assign_list);
@@ -64,7 +64,7 @@ protected:
   /// @brief clear_justified() 中で呼ばれるフック関数
   virtual
   void
-  clear_justified_hook(TpgNode* node);
+  clear_justified_hook(const TpgNode* node);
 
 
 private:
@@ -74,7 +74,7 @@ private:
 
   struct NodeList
   {
-    TpgNode* mNode;
+    const TpgNode* mNode;
 
     NodeList* mLink;
   };
@@ -92,14 +92,14 @@ private:
   /// @note 正当化に用いられているノードには mark3 がつく．
   /// @note mark3 がついたノードは mBwdNodeList に格納される．
   NodeList*
-  justify(TpgNode* node,
+  justify(const TpgNode* node,
 	  const ValMap& val_map);
 
   /// @brief すべてのファンインに対して justify() を呼ぶ．
   /// @param[in] node 対象のノード
   /// @param[in] val_map ノードの値の割当を保持するクラス
   NodeList*
-  just_sub1(TpgNode* node,
+  just_sub1(const TpgNode* node,
 	    const ValMap& val_map);
 
   /// @brief 指定した値を持つのファンインに対して justify() を呼ぶ．
@@ -107,13 +107,13 @@ private:
   /// @param[in] val_map ノードの値の割当を保持するクラス
   /// @param[in] val 値
   NodeList*
-  just_sub2(TpgNode* node,
+  just_sub2(const TpgNode* node,
 	    const ValMap& val_map,
 	    Val3 val);
 
   /// @brief 新しいリストのセルを返す．
   NodeList*
-  new_list_cell(TpgNode* node);
+  new_list_cell(const TpgNode* node);
 
   /// @brief リストをマージする．
   void

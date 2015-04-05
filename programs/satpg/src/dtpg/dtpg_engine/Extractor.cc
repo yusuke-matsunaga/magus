@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_SATPG
 BEGIN_NONAMESPACE
 
 void
-dfs(TpgNode* node,
+dfs(const TpgNode* node,
     HashSet<ymuint>& mark)
 {
   if ( mark.check(node->id()) ) {
@@ -28,7 +28,7 @@ dfs(TpgNode* node,
 
   ymuint nfo = node->active_fanout_num();
   for (ymuint i = 0; i < nfo; ++ i) {
-    TpgNode* onode = node->active_fanout(i);
+    const TpgNode* onode = node->active_fanout(i);
     dfs(onode, mark);
   }
 }
@@ -58,13 +58,13 @@ void
 Extractor::operator()(TpgFault* fault,
 		      NodeValList& assign_list)
 {
-  TpgNode* fnode = fault->node();
+  const TpgNode* fnode = fault->node();
 
   mFconeMark.clear();
   dfs(fnode, mFconeMark);
 
   // 故障差の伝搬している経路を探す．
-  TpgNode* spo = find_sensitized_output(fnode);
+  const TpgNode* spo = find_sensitized_output(fnode);
   ASSERT_COND( spo != NULL );
 
   // その経路の side input の値を記録する．
@@ -76,7 +76,7 @@ Extractor::operator()(TpgFault* fault,
   if ( fault->is_input_fault() ) {
     ymuint ni = fnode->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = fnode->fanin(i);
+      const TpgNode* inode = fnode->fanin(i);
       record_node(inode, assign_list);
     }
   }
@@ -87,7 +87,7 @@ Extractor::operator()(TpgFault* fault,
     ymuint n = assign_list.size();
     for (ymuint i = 0; i < n; ++ i) {
       NodeVal nv = assign_list[i];
-      TpgNode* node = nv.node();
+      const TpgNode* node = nv.node();
       cout << " Node#" << node->id() << ":";
       if ( nv.val() ) {
 	cout << "1";
@@ -102,8 +102,8 @@ Extractor::operator()(TpgFault* fault,
 
 // @brief 故障の影響を伝搬するノードを求める．
 // @param[in] node 対象のノード
-TpgNode*
-Extractor::find_sensitized_output(TpgNode* node)
+const TpgNode*
+Extractor::find_sensitized_output(const TpgNode* node)
 {
   if ( node->is_output() ) {
     return node;
@@ -111,9 +111,9 @@ Extractor::find_sensitized_output(TpgNode* node)
 
   ymuint nfo = node->active_fanout_num();
   for (ymuint i = 0; i < nfo; ++ i) {
-    TpgNode* onode = node->active_fanout(i);
+    const TpgNode* onode = node->active_fanout(i);
     if ( mValMap.gval(onode) != mValMap.fval(onode) ) {
-      TpgNode* ans = find_sensitized_output(onode);
+      const TpgNode* ans = find_sensitized_output(onode);
       if ( ans != NULL ) {
 	return ans;
       }
@@ -126,7 +126,7 @@ Extractor::find_sensitized_output(TpgNode* node)
 // @param[in] node 対象のノード
 // @param[out] assign_list 値割当を記録するリスト
 void
-Extractor::record_sensitized_node(TpgNode* node,
+Extractor::record_sensitized_node(const TpgNode* node,
 				  NodeValList& assign_list)
 {
   if ( mRecorded.check(node->id()) ) {
@@ -140,7 +140,7 @@ Extractor::record_sensitized_node(TpgNode* node,
 
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     if ( mFconeMark.check(inode->id()) ) {
       if ( mValMap.gval(inode) != mValMap.fval(inode) ) {
 	record_sensitized_node(inode, assign_list);
@@ -159,7 +159,7 @@ Extractor::record_sensitized_node(TpgNode* node,
 // @param[in] node 対象のノード
 // @param[out] assign_list 値割当を記録するリスト
 void
-Extractor::record_side_inputs(TpgNode* node,
+Extractor::record_side_inputs(const TpgNode* node,
 			      NodeValList& assign_list)
 {
   if ( mValMap.gval(node) != mValMap.fval(node) ) {
@@ -179,7 +179,7 @@ Extractor::record_side_inputs(TpgNode* node,
 // @param[in] node 対象のノード
 // @param[out] assign_list 値割当を記録するリスト
 void
-Extractor::record_masking_node(TpgNode* node,
+Extractor::record_masking_node(const TpgNode* node,
 			       NodeValList& assign_list)
 {
   if ( mRecorded.check(node->id()) ) {
@@ -199,9 +199,9 @@ Extractor::record_masking_node(TpgNode* node,
   // side input がある場合．
   bool has_cval = false;
   bool has_snode = false;
-  TpgNode* cnode = NULL;
+  const TpgNode* cnode = NULL;
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     if ( mFconeMark.check(inode->id()) ) {
       if ( mValMap.gval(inode) != mValMap.fval(inode) ) {
 	has_snode = true;
@@ -221,7 +221,7 @@ Extractor::record_masking_node(TpgNode* node,
 
   // ファンインに再帰する．
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     if ( mFconeMark.check(inode->id()) && mValMap.gval(inode) != mValMap.fval(inode) ) {
       record_sensitized_node(inode, assign_list);
     }
@@ -235,7 +235,7 @@ Extractor::record_masking_node(TpgNode* node,
 // @param[in] node 対象のノード
 // @param[out] assign_list 値割当を記録するリスト
 void
-Extractor::record_node(TpgNode* node,
+Extractor::record_node(const TpgNode* node,
 		       NodeValList& assign_list)
 {
   bool val = (mValMap.gval(node) == kVal1);

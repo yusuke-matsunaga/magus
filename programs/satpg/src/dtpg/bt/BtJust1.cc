@@ -41,7 +41,7 @@ BtJust1::~BtJust1()
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtJust1::operator()(TpgNode* fnode,
+BtJust1::operator()(const TpgNode* fnode,
 		    const NodeSet& node_set,
 		    const ValMap& val_map,
 		    NodeValList& assign_list)
@@ -49,10 +49,10 @@ BtJust1::operator()(TpgNode* fnode,
   assign_list.clear();
 
   // 故障差の伝搬している外部出力を選ぶ．
-  TpgNode* onode = NULL;
-  for (vector<TpgNode*>::const_iterator p = node_set.output_list().begin();
+  const TpgNode* onode = NULL;
+  for (vector<const TpgNode*>::const_iterator p = node_set.output_list().begin();
        p != node_set.output_list().end(); ++ p) {
-    TpgNode* node = *p;
+    const TpgNode* node = *p;
     if ( val_map.gval(node) != val_map.fval(node) ) {
       onode = node;
       break;
@@ -74,7 +74,7 @@ BtJust1::operator()(TpgNode* fnode,
 // @note 正当化に用いられているノードには mJustifiedMark がつく．
 // @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
 void
-BtJust1::justify(TpgNode* node,
+BtJust1::justify(const TpgNode* node,
 		 const ValMap& val_map,
 		 NodeValList& assign_list)
 {
@@ -167,13 +167,13 @@ BtJust1::justify(TpgNode* node,
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtJust1::just_sub1(TpgNode* node,
+BtJust1::just_sub1(const TpgNode* node,
 		   const ValMap& val_map,
 		   NodeValList& assign_list)
 {
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     justify(inode, val_map, assign_list);
   }
 }
@@ -184,7 +184,7 @@ BtJust1::just_sub1(TpgNode* node,
 // @param[in] val 値
 // @param[out] assign_list 値の割当リスト
 void
-BtJust1::just_sub2(TpgNode* node,
+BtJust1::just_sub2(const TpgNode* node,
 		   const ValMap& val_map,
 		   Val3 val,
 		   NodeValList& assign_list)
@@ -193,7 +193,7 @@ BtJust1::just_sub2(TpgNode* node,
   bool ffound = false;
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     Val3 igval = val_map.gval(inode);
     Val3 ifval = val_map.fval(inode);
     if ( !gfound && igval == val ) {

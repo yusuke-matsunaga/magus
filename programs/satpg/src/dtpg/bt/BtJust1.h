@@ -43,7 +43,7 @@ public:
   /// @param[out] assign_list 値の割当リスト
   virtual
   void
-  operator()(TpgNode* fnode,
+  operator()(const TpgNode* fnode,
 	     const NodeSet& node_set,
 	     const ValMap& val_map,
 	     NodeValList& assign_list);
@@ -62,7 +62,7 @@ protected:
   /// @note 正当化に用いられているノードには mark3 がつく．
   /// @note mark3 がついたノードは mBwdNodeList に格納される．
   void
-  justify(TpgNode* node,
+  justify(const TpgNode* node,
 	  const ValMap& val_map,
 	  NodeValList& assign_list);
 
@@ -71,7 +71,7 @@ protected:
   /// @param[in] val_map ノードの値の割当を保持するクラス
   /// @param[out] assign_list 値の割当リスト
   void
-  just_sub1(TpgNode* node,
+  just_sub1(const TpgNode* node,
 	    const ValMap& val_map,
 	    NodeValList& assign_list);
 
@@ -81,7 +81,7 @@ protected:
   /// @param[in] val 値
   /// @param[out] assign_list 値の割当リスト
   void
-  just_sub2(TpgNode* node,
+  just_sub2(const TpgNode* node,
 	    const ValMap& val_map,
 	    Val3 val,
 	    NodeValList& assign_list);

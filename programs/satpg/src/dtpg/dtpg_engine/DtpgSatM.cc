@@ -59,7 +59,7 @@ DtpgSatM::~DtpgSatM()
 // @param[in] flist 故障リスト
 void
 DtpgSatM::run_multi(const NodeSet& node_set,
-		    const vector<TpgNode*>& fnode_list,
+		    const vector<const TpgNode*>& fnode_list,
 		    const vector<TpgFault*>& flist)
 {
   cnf_begin();
@@ -81,13 +81,13 @@ DtpgSatM::run_multi(const NodeSet& node_set,
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
@@ -101,14 +101,14 @@ DtpgSatM::run_multi(const NodeSet& node_set,
     flt_var[i] = fvar;
     TpgFault* f = flist[i];
     int fval = f->val();
-    TpgNode* node = f->node();
+    const TpgNode* node = f->node();
 
     if ( f->is_output_fault() ) {
-      node->set_ofvar(fval, fvar);
+      //node->set_ofvar(fval, fvar);
     }
     else {
       ymuint pos = f->pos();
-      node->set_ifvar(pos, fval, fvar);
+      //node->set_ifvar(pos, fval, fvar);
     }
   }
 
@@ -116,7 +116,7 @@ DtpgSatM::run_multi(const NodeSet& node_set,
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     engine.make_node_cnf(node, gvar_map);
   }
 
@@ -124,7 +124,7 @@ DtpgSatM::run_multi(const NodeSet& node_set,
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
 
     if ( node->has_flt_var() ) {
       engine.make_fnode_cnf(node, gvar_map, fvar_map);
@@ -142,7 +142,7 @@ DtpgSatM::run_multi(const NodeSet& node_set,
   ymuint npo = node_set.output_list().size();
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = node_set.output_list()[i];
+    const TpgNode* node = node_set.output_list()[i];
     Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
@@ -167,7 +167,7 @@ DtpgSatM::run_multi(const NodeSet& node_set,
       engine.assumption_add(Literal(flt_var[j], inv));
     }
 
-    TpgNode* fnode = flist[fid]->node();
+    const TpgNode* fnode = flist[fid]->node();
 
     // 故障ノードの TFO 以外の dlit を0にする．
     mTmpNodeList.clear();
@@ -175,10 +175,10 @@ DtpgSatM::run_multi(const NodeSet& node_set,
     mMarkArray[fnode->id()] = true;
     mTmpNodeList.push_back(fnode);
     for (ymuint rpos = 0; rpos < mTmpNodeList.size(); ++ rpos) {
-      TpgNode* node = mTmpNodeList[rpos];
+      const TpgNode* node = mTmpNodeList[rpos];
       ymuint nfo = node->active_fanout_num();
       for (ymuint i = 0; i < nfo; ++ i) {
-	TpgNode* fonode = node->active_fanout(i);
+	const TpgNode* fonode = node->active_fanout(i);
 	if ( !mMarkArray[fonode->id()] ) {
 	  mMarkArray[fonode->id()] = true;
 	  mTmpNodeList.push_back(fonode);
@@ -186,21 +186,21 @@ DtpgSatM::run_multi(const NodeSet& node_set,
       }
     }
     for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set.tfo_tfi_node(i);
+      const TpgNode* node = node_set.tfo_tfi_node(i);
       if ( node_set.tfo_mark(node) && !mMarkArray[node->id()] ) {
 	Literal dlit(dvar_map(node), true);
 	engine.assumption_add(dlit);
       }
     }
-    for (vector<TpgNode*>::iterator p = mTmpNodeList.begin();
+    for (vector<const TpgNode*>::iterator p = mTmpNodeList.begin();
 	 p != mTmpNodeList.end(); ++ p) {
-      TpgNode* node = *p;
+      const TpgNode* node = *p;
       mMarkArray[node->id()] = false;
     }
     mTmpNodeList.clear();
 
     // dominator ノードの dvar は1でなければならない．
-    for (TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = f->node(); node != NULL; node = node->imm_dom()) {
       Literal dlit(dvar_map(node), false);
       engine.assumption_add(dlit);
     }
@@ -208,10 +208,10 @@ DtpgSatM::run_multi(const NodeSet& node_set,
     solve(engine, f, node_set, gvar_map, fvar_map);
   }
 
-  for (vector<TpgNode*>::const_iterator p = fnode_list.begin();
+  for (vector<const TpgNode*>::const_iterator p = fnode_list.begin();
        p != fnode_list.end(); ++ p) {
-    TpgNode* node = *p;
-    node->clear_oifvar();
+    const TpgNode* node = *p;
+    //node->clear_oifvar();
   }
 }
 

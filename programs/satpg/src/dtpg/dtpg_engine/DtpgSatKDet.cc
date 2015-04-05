@@ -66,7 +66,7 @@ void
 DtpgSatKDet::run_single(const NodeSet& node_set,
 			TpgFault* fault)
 {
-  TpgNode* fnode = fault->node();
+  const TpgNode* fnode = fault->node();
 
   cnf_begin();
 
@@ -82,13 +82,13 @@ DtpgSatKDet::run_single(const NodeSet& node_set,
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
@@ -99,7 +99,7 @@ DtpgSatKDet::run_single(const NodeSet& node_set,
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     engine.make_node_cnf(node, gvar_map);
   }
 
@@ -107,7 +107,7 @@ DtpgSatKDet::run_single(const NodeSet& node_set,
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
@@ -128,7 +128,7 @@ DtpgSatKDet::run_single(const NodeSet& node_set,
   ymuint npo = node_set.output_list().size();
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = node_set.output_list()[i];
+    const TpgNode* node = node_set.output_list()[i];
     Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
@@ -141,7 +141,7 @@ DtpgSatKDet::run_single(const NodeSet& node_set,
     engine.assumption_begin();
 
     // dominator ノードの dvar は1でなければならない．
-    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
       Literal dlit(dvar_map(node), false);
     engine.assumption_add(dlit);
     }
@@ -176,7 +176,7 @@ DtpgSatKDet::run_single(const NodeSet& node_set,
     engine.tmp_lits_begin(n);
     for (ymuint i = 0; i < n; ++ i) {
       NodeVal nv = last_assign()[i];
-      TpgNode* node = nv.node();
+      const TpgNode* node = nv.node();
       Literal lit(gvar_map(node));
       if ( nv.val() ) {
 	engine.tmp_lits_add(~lit);

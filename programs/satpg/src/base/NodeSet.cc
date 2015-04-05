@@ -29,8 +29,8 @@ BEGIN_NONAMESPACE
 struct Lt
 {
   bool
-  operator()(TpgNode* left,
-	     TpgNode* right)
+  operator()(const TpgNode* left,
+	     const TpgNode* right)
   {
     return left->output_id2() < right->output_id2();
   }
@@ -46,7 +46,7 @@ END_NONAMESPACE
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
 NodeSet::mark_region(ymuint max_node_id,
-		     const vector<TpgNode*>& fnode_list)
+		     const vector<const TpgNode*>& fnode_list)
 {
   mMaxNodeId = max_node_id;
 
@@ -63,7 +63,7 @@ NodeSet::mark_region(ymuint max_node_id,
   // TFO の TFI のノードを mTfiList に入れる．
   ymuint nf = fnode_list.size();
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgNode* fnode = fnode_list[i];
+    const TpgNode* fnode = fnode_list[i];
     if ( !tfo_mark(fnode) ) {
       set_tfo_mark(fnode);
       if ( fnode->is_input() ) {
@@ -73,10 +73,10 @@ NodeSet::mark_region(ymuint max_node_id,
   }
 
   for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
-    TpgNode* node = mTfoList[rpos];
+    const TpgNode* node = mTfoList[rpos];
     ymuint nfo = node->active_fanout_num();
     for (ymuint i = 0; i < nfo; ++ i) {
-      TpgNode* fonode = node->active_fanout(i);
+      const TpgNode* fonode = node->active_fanout(i);
       if ( !tfo_mark(fonode) ) {
 	set_tfo_mark(fonode);
       }
@@ -85,10 +85,10 @@ NodeSet::mark_region(ymuint max_node_id,
 
   mTfoEnd = mTfoList.size();
   for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
-    TpgNode* node = mTfoList[rpos];
+    const TpgNode* node = mTfoList[rpos];
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* finode = node->fanin(i);
+      const TpgNode* finode = node->fanin(i);
       if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
 	set_tfi_mark(finode);
       }

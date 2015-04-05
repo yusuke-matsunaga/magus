@@ -58,7 +58,7 @@ protected:
   /// @param[out] assign_list 値の割当リスト
   static
   void
-  record_value(TpgNode* node,
+  record_value(const TpgNode* node,
 	       const ValMap& val_map,
 	       NodeValList& assign_list);
 
@@ -80,7 +80,7 @@ private:
 // @param[out] assign_list 値の割当リスト
 inline
 void
-BtBase::record_value(TpgNode* node,
+BtBase::record_value(const TpgNode* node,
 		     const ValMap& val_map,
 		     NodeValList& assign_list)
 {

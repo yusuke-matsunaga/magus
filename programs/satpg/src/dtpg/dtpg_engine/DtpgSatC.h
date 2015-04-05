@@ -65,12 +65,12 @@ private:
   /// @brief DFS で MFFC を求める．
   /// @param[in] node 対象のノード
   void
-  dfs_mffc(TpgNode* node);
+  dfs_mffc(const TpgNode* node);
 
   /// @brief 複数の故障を同時に検出するパタンを求める．
   void
   run_multi(NodeSet& node_set,
-	    TpgNode* root);
+	    const TpgNode* root);
 
 
 private:
@@ -79,13 +79,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 故障を持つノードのリスト
-  vector<TpgNode*> mFaultNodeList;
+  vector<const TpgNode*> mFaultNodeList;
 
   // 対象の故障リスト
   vector<TpgFault*> mFaultList;
 
   // 作業用のノードリスト
-  vector<TpgNode*> mTmpNodeList;
+  vector<const TpgNode*> mTmpNodeList;
 
   // 作業用のマーク
   vector<bool> mTmpMark;

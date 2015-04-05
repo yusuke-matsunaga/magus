@@ -52,12 +52,12 @@ protected:
   /// @brief justified マークをつけ，mJustifiedNodeList に加える．
   /// @param[in] node 対象のノード
   void
-  set_justified(TpgNode* node);
+  set_justified(const TpgNode* node);
 
   /// @brief justified マークを読む．
   /// @param[in] node 対象のノード
   bool
-  justified_mark(TpgNode* node);
+  justified_mark(const TpgNode* node);
 
   /// @brief justified マークを消す．
   void
@@ -67,7 +67,7 @@ protected:
   /// @note デフォルトの実装はなにもしない．
   virtual
   void
-  clear_justified_hook(TpgNode* node);
+  clear_justified_hook(const TpgNode* node);
 
 
 private:
@@ -76,7 +76,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 正当化されたノードのリスト
-  vector<TpgNode*> mJustifiedNodeList;
+  vector<const TpgNode*> mJustifiedNodeList;
 
   // 正当化マークの配列
   // インデックスは TpgNode::id()
@@ -93,7 +93,7 @@ private:
 // @param[in] node 対象のノード
 inline
 void
-BtJustBase::set_justified(TpgNode* node)
+BtJustBase::set_justified(const TpgNode* node)
 {
   ASSERT_COND( node->id() < mJustifiedMarkArray.size() );
   mJustifiedMarkArray[node->id()] = true;
@@ -104,7 +104,7 @@ BtJustBase::set_justified(TpgNode* node)
 // @param[in] node 対象のノード
 inline
 bool
-BtJustBase::justified_mark(TpgNode* node)
+BtJustBase::justified_mark(const TpgNode* node)
 {
   ASSERT_COND( node->id() < mJustifiedMarkArray.size() );
   return mJustifiedMarkArray[node->id()];

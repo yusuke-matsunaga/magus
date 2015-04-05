@@ -63,7 +63,7 @@ void
 DtpgSatS2::run_single(const NodeSet& node_set,
 		      TpgFault* fault)
 {
-  TpgNode* fnode = fault->node();
+  const TpgNode* fnode = fault->node();
 
   SatEngine engine(sat_type(), sat_option(), sat_outp());
 
@@ -80,20 +80,20 @@ DtpgSatS2::run_single(const NodeSet& node_set,
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
     dvar_map.set_vid(node, dvar);
   }
 
-  const vector<TpgNode*>& olist = node_set.output_list();
+  const vector<const TpgNode*>& olist = node_set.output_list();
   ymuint no = olist.size();
 
   ymuint th_val = mThVal;
@@ -103,7 +103,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
   bool fault_remain = false;
   for (ymuint opos = 0; opos < th_val; ++ opos) {
     // onode に関係する部分の CNF を生成する．
-    TpgNode* onode = olist[opos];
+    const TpgNode* onode = olist[opos];
     ymuint oid = onode->output_id2();
 
     cnf_begin();
@@ -112,7 +112,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
     // 正常回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set.tfo_tfi_node(i);
+      const TpgNode* node = node_set.tfo_tfi_node(i);
       if ( node->is_in_TFI_of(oid) && mMark[node->id()] == 0 ) {
 	mMark[node->id()] = opos + 1;
 
@@ -124,7 +124,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
     // 故障回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-      TpgNode* node = node_set.tfo_tfi_node(i);
+      const TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] != (opos + 1) ) {
 	continue;
       }
@@ -153,7 +153,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
     // まだ作っていない部分の dlit を 0 にする．
     engine.assumption_begin();
     for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-      TpgNode* node = node_set.tfo_tfi_node(i);
+      const TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
 	Literal dlit(dvar_map(node), false);
 	engine.assumption_add(~dlit);
@@ -193,7 +193,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
     // 正常回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-      TpgNode* node = node_set.tfo_tfi_node(i);
+      const TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
 	engine.make_node_cnf(node, gvar_map);
       }
@@ -203,7 +203,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
     // 故障回路の CNF を生成
     //////////////////////////////////////////////////////////////////////
     for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-      TpgNode* node = node_set.tfo_tfi_node(i);
+      const TpgNode* node = node_set.tfo_tfi_node(i);
       if ( mMark[node->id()] == 0 ) {
 	engine.make_node_cnf(node, fvar_map);
 	engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
@@ -215,7 +215,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
     engine.assumption_begin();
 
     // dominator ノードの dvar は1でなければならない．
-    for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
       Literal dlit(dvar_map(node), false);
       engine.assumption_add(dlit);
     }
@@ -224,7 +224,7 @@ DtpgSatS2::run_single(const NodeSet& node_set,
   }
 
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     mMark[node->id()] = 0;
   }
 }

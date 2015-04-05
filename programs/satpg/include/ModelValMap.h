@@ -46,13 +46,13 @@ public:
   /// @param[in] node 対象のノード
   virtual
   Val3
-  gval(TpgNode* node) const;
+  gval(const TpgNode* node) const;
 
   /// @brief ノードの故障値を返す．
   /// @param[in] node 対象のノード
   virtual
   Val3
-  fval(TpgNode* node) const;
+  fval(const TpgNode* node) const;
 
 
 private:

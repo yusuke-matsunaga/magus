@@ -58,13 +58,13 @@ public:
   /// @param[in] node 対象のノード
   /// @param[in] vid_map 変数番号のマップ
   void
-  make_node_cnf(TpgNode* node,
+  make_node_cnf(const TpgNode* node,
 		const VidMap& vid_map);
 
   /// @brief 故障回路のノードの入出力の関係を表す CNF を作る．
   /// @param[in] node 対象のノード
   void
-  make_fnode_cnf(TpgNode* node,
+  make_fnode_cnf(const TpgNode* node,
 		 const VidMap& gvar_map,
 		 const VidMap& fvar_map);
 
@@ -83,7 +83,7 @@ public:
   /// @param[in] fvar_map 故障値の変数マップ
   /// @param[in] dvar_map 故障伝搬条件の変数マップ
   void
-  make_dchain_cnf(TpgNode* node,
+  make_dchain_cnf(const TpgNode* node,
 		  const VidMap& gvar_map,
 		  const VidMap& fvar_map,
 		  const VidMap& dvar_map);

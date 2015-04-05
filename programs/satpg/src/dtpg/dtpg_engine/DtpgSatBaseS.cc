@@ -52,7 +52,7 @@ DtpgSatBaseS::run(TpgNetwork& network,
       continue;
     }
 
-    node_set.mark_region(max_id, vector<TpgNode*>(1, node));
+    node_set.mark_region(max_id, node);
 
     ymuint nf = node->fault_num();
     for (ymuint i = 0; i < nf; ++ i) {

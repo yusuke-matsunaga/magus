@@ -51,7 +51,7 @@ BtJust2::set_max_id(ymuint max_id)
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtJust2::operator()(TpgNode* fnode,
+BtJust2::operator()(const TpgNode* fnode,
 		    const NodeSet& node_set,
 		    const ValMap& val_map,
 		    NodeValList& assign_list)
@@ -59,9 +59,9 @@ BtJust2::operator()(TpgNode* fnode,
   // 故障差の伝搬している外部出力を選ぶ．
   ymuint nmin = 0;
   NodeList* best_list = NULL;
-  for (vector<TpgNode*>::const_iterator p = node_set.output_list().begin();
+  for (vector<const TpgNode*>::const_iterator p = node_set.output_list().begin();
        p != node_set.output_list().end(); ++ p) {
-    TpgNode* node = *p;
+    const TpgNode* node = *p;
     if ( val_map.gval(node) != val_map.fval(node) ) {
       // 正当化を行う．
       NodeList* node_list = justify(node, val_map);
@@ -76,7 +76,7 @@ BtJust2::operator()(TpgNode* fnode,
 
   assign_list.clear();
   for (NodeList* tmp = best_list; tmp; tmp = tmp->mLink) {
-    TpgNode* node = tmp->mNode;
+    const TpgNode* node = tmp->mNode;
     record_value(node, val_map, assign_list);
   }
 
@@ -86,7 +86,7 @@ BtJust2::operator()(TpgNode* fnode,
 
 // @brief clear_justified() 中で呼ばれるフック関数
 void
-BtJust2::clear_justified_hook(TpgNode* node)
+BtJust2::clear_justified_hook(const TpgNode* node)
 {
   ASSERT_COND( node->id() < mJustArray.size() );
   list_free(mJustArray[node->id()]);
@@ -100,7 +100,7 @@ BtJust2::clear_justified_hook(TpgNode* node)
 // @note 正当化に用いられているノードには mJustifiedMark がつく．
 // @note mJustifiedMmark がついたノードは mJustifiedNodeList に格納される．
 BtJust2::NodeList*
-BtJust2::justify(TpgNode* node,
+BtJust2::justify(const TpgNode* node,
 		 const ValMap& val_map)
 {
   if ( justified_mark(node) ) {
@@ -192,13 +192,13 @@ BtJust2::justify(TpgNode* node,
 // @param[in] node 対象のノード
 // @param[in] val_map SATの値の割り当て結果を収めた配列
 BtJust2::NodeList*
-BtJust2::just_sub1(TpgNode* node,
+BtJust2::just_sub1(const TpgNode* node,
 		   const ValMap& val_map)
 {
   NodeList*& node_list = mJustArray[node->id()];
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     NodeList* node_list1 = justify(inode, val_map);
     list_merge(node_list, node_list1);
   }
@@ -210,7 +210,7 @@ BtJust2::just_sub1(TpgNode* node,
 // @param[in] val_map SATの値の割り当て結果を収めた配列
 // @param[in] val 値
 BtJust2::NodeList*
-BtJust2::just_sub2(TpgNode* node,
+BtJust2::just_sub2(const TpgNode* node,
 		   const ValMap& val_map,
 		   Val3 val)
 {
@@ -219,7 +219,7 @@ BtJust2::just_sub2(TpgNode* node,
   ymuint pos = ni;
   ymuint min = 0;
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     Val3 igval = val_map.gval(inode);
     Val3 ifval = val_map.fval(inode);
     if ( igval != ifval || igval != val ) {
@@ -243,7 +243,7 @@ BtJust2::just_sub2(TpgNode* node,
   ymuint gmin = 0;
   ymuint fmin = 0;
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     Val3 igval = val_map.gval(inode);
     Val3 ifval = val_map.fval(inode);
     if ( igval != val && ifval != val ) {
@@ -275,7 +275,7 @@ BtJust2::just_sub2(TpgNode* node,
 
 // @brief 新しいリストのセルを返す．
 BtJust2::NodeList*
-BtJust2::new_list_cell(TpgNode* node)
+BtJust2::new_list_cell(const TpgNode* node)
 {
   void* p = mAlloc.get_memory(sizeof(NodeList));
   NodeList* tmp = new (p) NodeList;

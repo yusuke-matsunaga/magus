@@ -203,7 +203,7 @@ SatEngine::~SatEngine()
 // @param[in] node 対象のノード
 // @param[in] vid_map 変数番号のマップ
 void
-SatEngine::make_node_cnf(TpgNode* node,
+SatEngine::make_node_cnf(const TpgNode* node,
 			 const VidMap& vid_map)
 {
   if ( node->is_input() ) {
@@ -224,14 +224,14 @@ SatEngine::make_node_cnf(TpgNode* node,
 // @param[in] engine SAT エンジン
 // @param[in] node 対象のノード
 void
-SatEngine::make_fnode_cnf(TpgNode* node,
+SatEngine::make_fnode_cnf(const TpgNode* node,
 			  const VidMap& gvar_map,
 			  const VidMap& fvar_map)
 {
   ymuint ni = node->fanin_num();
   vector<VarId> ivars(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    TpgNode* inode = node->fanin(i);
+    const TpgNode* inode = node->fanin(i);
     VarId f0_var = node->if0var(i);
     VarId f1_var = node->if1var(i);
     if ( f0_var == kVarIdIllegal ) {
@@ -301,7 +301,7 @@ SatEngine::make_fault_cnf(TpgFault* fault,
 			  const VidMap& gvar_map,
 			  const VidMap& fvar_map)
 {
-  TpgNode* node = fault->node();
+  const TpgNode* node = fault->node();
   int fval = fault->val();
 
   if ( fault->is_output_fault() ) {
@@ -326,7 +326,7 @@ SatEngine::make_fault_cnf(TpgFault* fault,
     vector<VarId> ivars;
     ivars.reserve(ni - 1);
     for (ymuint i = 0; i < ni; ++ i) {
-      TpgNode* inode = node->fanin(i);
+      const TpgNode* inode = node->fanin(i);
       VarId ivar = gvar_map(inode);
       if ( i != fpos ) {
 	ivars.push_back(ivar);
@@ -385,7 +385,7 @@ SatEngine::make_fault_cnf(TpgFault* fault,
 // @param[in] fvar_map 故障値の変数マップ
 // @param[in] dvar_map 故障伝搬条件の変数マップ
 void
-SatEngine::make_dchain_cnf(TpgNode* node,
+SatEngine::make_dchain_cnf(const TpgNode* node,
 			   const VidMap& gvar_map,
 			   const VidMap& fvar_map,
 			   const VidMap& dvar_map)
@@ -410,14 +410,14 @@ SatEngine::make_dchain_cnf(TpgNode* node,
     tmp_lits_begin(nfo + 1);
     tmp_lits_add(~dlit);
     for (ymuint j = 0; j < nfo; ++ j) {
-      TpgNode* onode = node->active_fanout(j);
+      const TpgNode* onode = node->active_fanout(j);
       Literal odlit(dvar_map(onode), false);
       tmp_lits_add(odlit);
     }
     tmp_lits_end();
 
     // dominator の dlit が 0 なら自分も 0
-    TpgNode* idom = node->imm_dom();
+    const TpgNode* idom = node->imm_dom();
     if ( idom != NULL && idom != node->active_fanout(0) ) {
       Literal idlit(dvar_map(idom), false);
       add_clause(~dlit, idlit);

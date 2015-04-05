@@ -55,7 +55,7 @@ ModelValMap::~ModelValMap()
 // @brief ノードの正常値を返す．
 // @param[in] node 対象のノード
 Val3
-ModelValMap::gval(TpgNode* node) const
+ModelValMap::gval(const TpgNode* node) const
 {
   return bool3_to_val3(mModel[mGvarMap(node).val()]);
 }
@@ -63,7 +63,7 @@ ModelValMap::gval(TpgNode* node) const
 // @brief ノードの故障値を返す．
 // @param[in] node 対象のノード
 Val3
-ModelValMap::fval(TpgNode* node) const
+ModelValMap::fval(const TpgNode* node) const
 {
   return bool3_to_val3(mModel[mFvarMap(node).val()]);
 }

@@ -18,9 +18,13 @@
 #include "Fsim.h"
 #include "KDet2.h"
 #include "NodeSet.h"
+#include "NodeValList.h"
 #include "Verifier.h"
 #include "GcSolver.h"
 #include "GcNode.h"
+#include "SatEngine.h"
+#include "GenVidMap.h"
+#include "ModelValMap.h"
 #include "YmUtils/Graph.h"
 #include "YmUtils/MinCov.h"
 #include "YmUtils/RandGen.h"
@@ -31,6 +35,45 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+bool debug_flag = false;
+
+ymuint g_max_id;
+
+extern
+void
+make_gval_cnf(SatEngine& engine,
+	      GenVidMap& gvar_map,
+	      TpgNetwork& network);
+
+extern
+void
+make_fval_cnf(SatEngine& engine,
+	      NodeSet& node_set,
+	      GenVidMap& gvar_map,
+	      GenVidMap& fvar_map,
+	      GenVidMap& dvar_map,
+	      TpgFault* fault,
+	      TpgNetwork& network);
+
+extern
+void
+analyze_fault(TpgFault* f,
+	      NodeValList& suf_list,
+	      NodeValList& ma_list,
+	      ymuint max_id);
+
+extern
+bool
+check_dominance(TpgFault* f1,
+		TpgFault* f2,
+		ymuint max_id);
+
+extern
+bool
+check_conflict(TpgFault* f1,
+	       TpgFault* f2,
+	       ymuint max_id);
+
 // @brief インスタンスを生成する関数
 MinPat*
 new_MinPat2()
@@ -40,31 +83,13 @@ new_MinPat2()
 
 BEGIN_NONAMESPACE
 
-// 2つのリストに共通要素があるときに true を返す．
-// リストの内容は昇順にソートされていると仮定する．
-bool
-check_intersect(const vector<ymuint>& list1,
-		const vector<ymuint>& list2)
+struct FaultInfo
 {
-  ymuint n1 = list1.size();
-  ymuint n2 = list2.size();
-  ymuint i1 = 0;
-  ymuint i2 = 0;
-  while ( i1 < n1 && i2 < n2 ) {
-    ymuint v1 = list1[i1];
-    ymuint v2 = list2[i2];
-    if ( v1 < v2 ) {
-      ++ i1;
-    }
-    else if ( v1 > v2 ) {
-      ++ i2;
-    }
-    else {
-      return true;
-    }
-  }
-  return false;
-}
+
+  NodeValList mSufList;
+
+  NodeValList mMaList;
+};
 
 // パタン番号リストの包含関係を調べる．
 // 0 bit: list1 のみの要素がある．
@@ -113,19 +138,144 @@ check_pat_list(const vector<ymuint>& tv_list1,
   return ans;
 }
 
+inline
+void
+add_assumption(SatEngine& engine,
+	       const VidMap& var_map,
+	       NodeVal nv)
+{
+  const TpgNode* node = nv.node();
+  Literal alit(var_map(node), false);
+  if ( nv.val() ) {
+    engine.assumption_add(alit);
+  }
+  else {
+    engine.assumption_add(~alit);
+  }
+}
+
+bool
+check_intersect(SatEngine& engine,
+		const VidMap& var_map,
+		const NodeValList& list1,
+		const NodeValList& list2)
+{
+  if ( check_conflict(list1, list2) ) {
+    return false;
+  }
+
+  engine.assumption_begin();
+  for (ymuint i = 0; i < list1.size(); ++ i) {
+    NodeVal nv = list1[i];
+    add_assumption(engine, var_map, nv);
+  }
+
+  for (ymuint i = 0; i < list2.size(); ++ i) {
+    NodeVal nv = list2[i];
+    add_assumption(engine, var_map, nv);
+  }
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  if ( sat_ans == kB3True ) {
+    return true;
+  }
+  return false;
+}
+
+bool
+check_intersect(SatEngine& engine,
+		TpgFault* fault,
+		NodeSet& node_set,
+		const VidMap& gvar_map,
+		const VidMap& fvar_map,
+		const VidMap& dvar_map,
+		const NodeValList& list)
+{
+  engine.assumption_begin();
+  for (ymuint i = 0; i < list.size(); ++ i) {
+    NodeVal nv = list[i];
+    add_assumption(engine, gvar_map, nv);
+  }
+
+  const TpgNode* fnode = fault->node();
+  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(dvar_map(node), false);
+    engine.assumption_add(dlit);
+  }
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  if ( sat_ans == kB3True ) {
+    return true;
+  }
+  return false;
+}
+
+bool
+check_conflict(SatEngine& engine,
+	       const VidMap& var_map,
+	       const NodeValList& list1,
+	       const NodeValList& list2)
+{
+  engine.assumption_begin();
+  for (ymuint i = 0; i < list1.size(); ++ i) {
+    NodeVal nv = list1[i];
+    add_assumption(engine, var_map, nv);
+  }
+
+  for (ymuint i = 0; i < list2.size(); ++ i) {
+    NodeVal nv = list2[i];
+    add_assumption(engine, var_map, nv);
+  }
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  if ( sat_ans == kB3False ) {
+    return true;
+  }
+  return false;
+}
+
+bool
+check_conflict(SatEngine& engine,
+	       TpgFault* fault,
+	       NodeSet& node_set,
+	       const VidMap& gvar_map,
+	       const VidMap& fvar_map,
+	       const VidMap& dvar_map,
+	       const NodeValList& list)
+{
+  engine.assumption_begin();
+
+  for (ymuint i = 0; i < list.size(); ++ i) {
+    NodeVal nv = list[i];
+    add_assumption(engine, gvar_map, nv);
+  }
+
+  const TpgNode* fnode = fault->node();
+  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(dvar_map(node), false);
+    engine.assumption_add(dlit);
+  }
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  if ( sat_ans == kB3False ) {
+    return true;
+  }
+  return false;
+}
+
 END_NONAMESPACE
-
-extern
-bool
-check_dominance(TpgFault* f1,
-		TpgFault* f2,
-		ymuint max_id);
-
-extern
-bool
-check_conflict(TpgFault* f1,
-	       TpgFault* f2,
-	       ymuint max_id);
 
 //////////////////////////////////////////////////////////////////////
 // クラス MinPat2
@@ -194,14 +344,14 @@ MinPat2::run(TpgNetwork& network,
     NodeSet node_set;
     for (ymuint i = 0; i < fault_num; ++ i) {
       TpgFault* f = f_list[i];
-      TpgNode* node = f->node();
+      const TpgNode* node = f->node();
       vector<ymuint>& input_list = input_list_array[node->id()];
       if ( !input_list.empty() ) {
 	continue;
       }
-      node_set.mark_region(max_node_id, vector<TpgNode*>(1, node));
+      node_set.mark_region(max_node_id, node);
       for (ymuint j = 0; j < node_set.tfo_tfi_size(); ++ j) {
-	TpgNode* node1 = node_set.tfo_tfi_node(j);
+	const TpgNode* node1 = node_set.tfo_tfi_node(j);
 	if ( node1->is_input() ) {
 	  input_list.push_back(node1->input_id());
 	}
@@ -310,14 +460,69 @@ MinPat2::run(TpgNetwork& network,
     }
   }
 
+  // 支配されていない故障を rep_fault_list に入れる．
+  vector<TpgFault*> rep_fault_list;
+  rep_fault_list.reserve(fault_num);
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    TpgFault* f = f_list[i];
+    if ( !dom_flag[f->id()] ) {
+      rep_fault_list.push_back(f);
+    }
+  }
+  ymuint rep_fault_num = rep_fault_list.size();
+
+  local_timer.stop();
+
+  cout << "Total    " << fault_num << " original faults" << endl;
+  cout << "Total    " << rep_fault_num << " representative faults" << endl;
+  cout << "Total    " << n_sat1 << " dominance test" << endl;
+  cout << "CPU time " << local_timer.time() << endl;
+
+  local_timer.reset();
+  local_timer.start();
+
+  vector<FaultInfo> fault_info_array(max_fault_id);
+
+  for (ymuint i = 0; i < rep_fault_num; ++ i) {
+    TpgFault* f = rep_fault_list[i];
+    NodeValList& suf_list = fault_info_array[f->id()].mSufList;
+    NodeValList& ma_list = fault_info_array[f->id()].mMaList;;
+    analyze_fault(f, suf_list, ma_list, max_node_id);
+  }
+
+  local_timer.stop();
+
+  cout << "CPU time " << local_timer.time() << endl;
+
+  local_timer.reset();
+  local_timer.start();
+
+  SatEngine g_engine(string(), string(), NULL);
+
+  GenVidMap g_gvar_map(max_node_id);
+
+  make_gval_cnf(g_engine, g_gvar_map, network);
+
   ymuint n_sat2 = 0;
   ymuint n_conf = 0;
-  {
-    for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-      TpgFault* f1 = f_list[i1];
-      if ( dom_flag[f1->id()] ) {
-	continue;
-      }
+  ymuint n_conf1 = 0;
+  ymuint n_conf2 = 0;
+  ymuint n_conf3 = 0;
+  ymuint n_int1 = 0;
+  ymuint n_int2 = 0;
+  { // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
+    for (ymuint i1 = 0; i1 < rep_fault_num; ++ i1) {
+      TpgFault* f1 = rep_fault_list[i1];
+
+      SatEngine f_engine(string(), string(), NULL);
+
+      NodeSet node_set;
+
+      GenVidMap gvar_map(max_node_id);
+      GenVidMap fvar_map(max_node_id);
+      GenVidMap dvar_map(max_node_id);
+
+      make_fval_cnf(f_engine, node_set, gvar_map, fvar_map, dvar_map, f1, network);
 
       // input_list1 の要素をハッシュに登録する．
       const vector<ymuint>& input_list1 = input_list_array[f1->node()->id()];
@@ -327,11 +532,12 @@ MinPat2::run(TpgNetwork& network,
       }
 
       const vector<ymuint>& tv_list1 = pat_list_array[f1->id()];
-      for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
-	TpgFault* f2 = f_list[i2];
-	if ( dom_flag[f2->id()] ) {
-	  continue;
-	}
+      FaultInfo& fi1 = fault_info_array[f1->id()];
+      NodeValList& suf_list1 = fi1.mSufList;
+      NodeValList& ma_list1 = fi1.mMaList;
+
+      for (ymuint i2 = i1 + 1; i2 < rep_fault_num; ++ i2) {
+	TpgFault* f2 = rep_fault_list[i2];
 
 	// input_list2 の要素でハッシュに登録されている要素があれば
 	// input_list1 と input_list2 は共通部分を持つ．
@@ -351,30 +557,71 @@ MinPat2::run(TpgNetwork& network,
 	const vector<ymuint>& tv_list2 = pat_list_array[f2->id()];
 
 	ymuint stat = check_pat_list(tv_list1, tv_list2);
-	if ( (stat & 4U) == 0U ) {
-	  // f1 と f2 が同時に 1 になることがない．
-	  ++ n_sat2;
-	  if ( check_conflict(f1, f2, max_node_id) ) {
-	    //cout << f1->str() << " conflicts with " << f2->str() << endl;
-	    ++ n_conf;
-	  }
+	if ( (stat & 4U) != 0U ) {
+	  // f1 と f2 が同時に1なのでコンフリクトしない．
+	  continue;
+	}
+
+	FaultInfo& fi2 = fault_info_array[f2->id()];
+	NodeValList& suf_list2 = fi2.mSufList;
+	NodeValList& ma_list2 = fi2.mMaList;
+
+	if ( check_conflict(ma_list1, ma_list2) ) {
+	  // 必要割当そのものがコンフリクトしている．
+	  ++ n_conf;
+	  ++ n_conf1;
+	  continue;
+	}
+
+	if ( check_intersect(g_engine, g_gvar_map, suf_list1, suf_list2) ) {
+	  // 十分割当が交わっていたらコンフリクトはない．
+	  ++ n_int1;
+	  continue;
+	}
+
+	if ( check_conflict(g_engine, g_gvar_map, ma_list1, ma_list2) ) {
+	  // 必要割当がコンフリクトしていたら故障もコンフリクトしている．
+	  ++ n_conf;
+	  ++ n_conf1;
+	  continue;
+	}
+
+	if ( check_conflict(f_engine, f1, node_set, gvar_map, fvar_map, dvar_map,
+			    ma_list2) ) {
+	  // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
+	  ++ n_conf;
+	  ++ n_conf2;
+	  continue;
+	}
+
+	if ( check_intersect(f_engine, f1, node_set, gvar_map, fvar_map, dvar_map,
+			      suf_list2) ) {
+	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+	  ++ n_int2;
+	  continue;
+	}
+
+	// f1 と f2 が同時に 1 になることがない．
+	++ n_sat2;
+	if ( check_conflict(f1, f2, max_node_id) ) {
+	  //cout << f1->str() << " conflicts with " << f2->str() << endl;
+	  ++ n_conf;
+	  ++ n_conf3;
 	}
       }
     }
   }
 
-  ymuint nrep = 0;
-  for (ymuint i = 0; i < fault_num; ++ i) {
-    TpgFault* f = f_list[i];
-    if ( !dom_flag[f->id()] ) {
-      ++ nrep;
-    }
-  }
-  cout << "Total " << fault_num << " original faults" << endl;
-  cout << "Total " << nrep << " representative faults" << endl;
-  cout << "Total " << n_sat1 << " dominance tespt" << endl;
-  cout << "Total " << n_sat2 << " conflict test" << endl;
-  cout << "Total " << n_conf << " conflicts" << endl;
+  local_timer.stop();
+
+  cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
+  cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
+  cout << "Total    " << setw(6) << n_conf2 << " conflicts (single)" << endl;
+  cout << "Total    " << setw(6) << n_conf3 << " conflicts (exact)" << endl;
+  cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
+  cout << "Total    " << setw(6) << n_int1  << " simple intersection check" << endl;
+  cout << "Total    " << setw(6) << n_int2  << " SAT intersection check" << endl;
+  cout << "CPU time " << local_timer.time() << endl;
 
 #if 0
   // マージできないテストパタンの間に枝を持つグラフを作る．

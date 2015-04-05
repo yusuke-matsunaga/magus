@@ -61,7 +61,7 @@ void
 DtpgSatS::run_single(const NodeSet& node_set,
 		     TpgFault* fault)
 {
-  TpgNode* fnode = fault->node();
+  const TpgNode* fnode = fault->node();
 
   cnf_begin();
 
@@ -76,13 +76,13 @@ DtpgSatS::run_single(const NodeSet& node_set,
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = engine.new_var();
     gvar_map.set_vid(node, gvar);
     fvar_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId fvar = engine.new_var();
     VarId dvar = engine.new_var();
     fvar_map.set_vid(node, fvar);
@@ -93,7 +93,7 @@ DtpgSatS::run_single(const NodeSet& node_set,
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     engine.make_node_cnf(node, gvar_map);
   }
 
@@ -101,7 +101,7 @@ DtpgSatS::run_single(const NodeSet& node_set,
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    TpgNode* node = node_set.tfo_tfi_node(i);
+    const TpgNode* node = node_set.tfo_tfi_node(i);
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
@@ -121,22 +121,22 @@ DtpgSatS::run_single(const NodeSet& node_set,
   ymuint npo = node_set.output_list().size();
   engine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
-    TpgNode* node = node_set.output_list()[i];
+    const TpgNode* node = node_set.output_list()[i];
     Literal dlit(dvar_map(node), false);
     engine.tmp_lits_add(dlit);
   }
   engine.tmp_lits_end();
 
+  // dominator ノードの dvar は1でなければならない．
+  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(dvar_map(node), false);
+    engine.add_clause(dlit);
+  }
+
   cnf_end();
 
   // 故障に対するテスト生成を行なう．
   engine.assumption_begin();
-
-  // dominator ノードの dvar は1でなければならない．
-  for (TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar_map(node), false);
-    engine.assumption_add(dlit);
-  }
 
   solve(engine, fault, node_set, gvar_map, fvar_map);
 }

@@ -34,7 +34,7 @@ public:
   /// @brief 値を指定したコンストラクタ
   /// @param[in] node ノード
   /// @param[in] val 値
-  NodeVal(TpgNode* node,
+  NodeVal(const TpgNode* node,
 	  bool val);
 
   /// @brief 内容を直接指定したコンストラクタ
@@ -48,7 +48,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノードを返す．
-  TpgNode*
+  const TpgNode*
   node() const;
 
   /// @brief 値を返す．
@@ -103,7 +103,7 @@ public:
   /// @param[in] node ノード
   /// @param[in] val 値
   void
-  add(TpgNode* node,
+  add(const TpgNode* node,
       bool val);
 
   /// @brief マージする．
@@ -172,7 +172,7 @@ NodeVal::NodeVal() :
 // @param[in] node ノード
 // @param[in] val 値
 inline
-NodeVal::NodeVal(TpgNode* node,
+NodeVal::NodeVal(const TpgNode* node,
 		 bool val) :
   mPackVal(reinterpret_cast<ympuint>(node) | val)
 {
@@ -188,10 +188,10 @@ NodeVal::NodeVal(ympuint pval) :
 
 // @brief ノードを返す．
 inline
-TpgNode*
+const TpgNode*
 NodeVal::node() const
 {
-  return reinterpret_cast<TpgNode*>(mPackVal & ~1UL);
+  return reinterpret_cast<const TpgNode*>(mPackVal & ~1UL);
 }
 
 // @brief 値を返す．
@@ -263,7 +263,7 @@ NodeValList::clear()
 // @param[in] val 値
 inline
 void
-NodeValList::add(TpgNode* node,
+NodeValList::add(const TpgNode* node,
 		 bool val)
 {
   ympuint packval = reinterpret_cast<ympuint>(node) | val;

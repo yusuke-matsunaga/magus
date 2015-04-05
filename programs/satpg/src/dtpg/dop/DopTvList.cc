@@ -56,7 +56,7 @@ DopTvList::operator()(TpgFault* f,
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
     NodeVal nv = assign_list[i];
-    TpgNode* node = nv.node();
+    const TpgNode* node = nv.node();
     if ( node->is_input() ) {
       ymuint id = node->input_id();
       if ( nv.val() ) {
