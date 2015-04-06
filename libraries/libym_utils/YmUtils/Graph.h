@@ -94,8 +94,8 @@ coloring(const Graph& graph,
 /// @return 要素数を返す．
 extern
 ymuint
-max_independent_set(const Graph& graph,
-		    vector<ymuint>& node_set);
+independent_set(const Graph& graph,
+		vector<ymuint>& node_set);
 
 /// @brief 最大クリークを求める．
 /// @param[in] graph 対象のグラフ
