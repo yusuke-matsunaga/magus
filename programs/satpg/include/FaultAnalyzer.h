@@ -41,6 +41,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 初期化する．
+  void
+  init(ymuint max_id);
+
   /// @brief 正常回路のCNFを作る．
   /// @param[in] network 対象のネットワーク
   void
@@ -86,6 +90,10 @@ private:
   void
   add_assumptions(const NodeValList& assign_list);
 
+  /// @brief ノードのCNFを作る．
+  void
+  make_gval_cnf(const TpgNode* node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -103,6 +111,9 @@ private:
 
   // 故障伝搬値
   GenVidMap mDvarMap;
+
+  // 正常回路のCNFを作ってあるノードのマーク
+  vector<bool> mNodeMark;
 
 };
 

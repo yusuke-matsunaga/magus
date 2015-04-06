@@ -342,10 +342,17 @@ MinPat2::run(TpgNetwork& network,
   local_timer.reset();
   local_timer.start();
 
+#if 0
   FaultAnalyzer g_fa(string(), string(), NULL);
 
+#if 0
   g_fa.make_gval_cnf(network);
+#else
+  g_fa.init(network.max_node_id());
+#endif
+#endif
 
+  StopWatch conf1_timer;
   StopWatch conf2_timer;
   StopWatch conf3_timer;
   StopWatch conf4_timer;
@@ -412,13 +419,17 @@ MinPat2::run(TpgNetwork& network,
 	NodeValList& suf_list2 = fi2.mSufList;
 	NodeValList& ma_list2 = fi2.mMaList;
 
+	conf1_timer.start();
 	if ( check_conflict(ma_list1, ma_list2) ) {
 	  // 必要割当そのものがコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf1;
+	  conf1_timer.stop();
 	  continue;
 	}
+	conf1_timer.stop();
 
+#if 0
 	int1_timer.start();
 	if ( g_fa.check_intersect(suf_list1, suf_list2) ) {
 	  // 十分割当が交わっていたらコンフリクトはない．
@@ -437,7 +448,18 @@ MinPat2::run(TpgNetwork& network,
 	  continue;
 	}
 	conf2_timer.stop();
+#endif
 
+#if 1
+	int2_timer.start();
+	if ( !check_conflict(suf_list1, suf_list2) && f_fa.check_intersect(suf_list2) ) {
+	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+	  ++ n_int2;
+	  int2_timer.stop();
+	  continue;
+	}
+	int2_timer.stop();
+#endif
 	conf3_timer.start();
 	if ( f_fa.check_conflict(ma_list2) ) {
 	  // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
@@ -447,16 +469,7 @@ MinPat2::run(TpgNetwork& network,
 	  continue;
 	}
 	conf3_timer.stop();
-
-	int2_timer.start();
-	if ( f_fa.check_intersect(suf_list2) ) {
-	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
-	  ++ n_int2;
-	  int2_timer.stop();
-	  continue;
-	}
-	int2_timer.stop();
-
+#if 1
 	conf4_timer.start();
 	// f1 と f2 が同時に 1 になることがない．
 	++ n_sat2;
@@ -466,6 +479,7 @@ MinPat2::run(TpgNetwork& network,
 	  ++ n_conf4;
 	}
 	conf4_timer.stop();
+#endif
       }
     }
   }
@@ -481,6 +495,7 @@ MinPat2::run(TpgNetwork& network,
   cout << "Total    " << setw(6) << n_int1  << " simple intersection check" << endl;
   cout << "Total    " << setw(6) << n_int2  << " SAT intersection check" << endl;
   cout << "Total CPU time " << local_timer.time() << endl;
+  cout << "CPU time (simple ma_list)    " << conf1_timer.time() << endl;
   cout << "CPU time (ma_list with SAT)  " << conf2_timer.time() << endl;
   cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
   cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;

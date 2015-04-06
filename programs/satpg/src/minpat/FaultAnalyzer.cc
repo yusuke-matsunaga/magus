@@ -37,12 +37,25 @@ FaultAnalyzer::~FaultAnalyzer()
 {
 }
 
+// @brief 初期化する．
+void
+FaultAnalyzer::init(ymuint max_id)
+{
+  mNodeMark.clear();
+  mNodeMark.resize(max_id, false);
+
+  mGvarMap.init(max_id);
+}
+
 // @brief 正常回路のCNFを作る．
 // @param[in] network 対象のネットワーク
 void
 FaultAnalyzer::make_gval_cnf(TpgNetwork& network)
 {
   ymuint max_id = network.max_node_id();
+
+  mNodeMark.clear();
+  mNodeMark.resize(max_id, false);
 
   mGvarMap.init(max_id);
 
@@ -53,6 +66,7 @@ FaultAnalyzer::make_gval_cnf(TpgNetwork& network)
     const TpgNode* node = network.active_node(i);
     VarId gvar = mEngine.new_var();
     mGvarMap.set_vid(node, gvar);
+    mNodeMark[node->id()] = true;
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -115,6 +129,9 @@ FaultAnalyzer::make_fval_cnf(TpgNetwork& network,
 {
   ymuint max_id = network.max_node_id();
 
+  mNodeMark.clear();
+  mNodeMark.resize(max_id, false);
+
   mGvarMap.init(max_id);
   mFvarMap.init(max_id);
   mDvarMap.init(max_id);
@@ -128,11 +145,12 @@ FaultAnalyzer::make_fval_cnf(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     VarId gvar = mEngine.new_var();
     mGvarMap.set_vid(node, gvar);
     mFvarMap.set_vid(node, gvar);
+    mNodeMark[node->id()] = true;
   }
   for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
     const TpgNode* node = node_set.tfo_tfi_node(i);
@@ -145,8 +163,8 @@ FaultAnalyzer::make_fval_cnf(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
     mEngine.make_node_cnf(node, mGvarMap);
   }
 
@@ -232,6 +250,7 @@ FaultAnalyzer::add_assumptions(const NodeValList& assign_list)
   for (ymuint i = 0; i < assign_list.size(); ++ i) {
     NodeVal nv = assign_list[i];
     const TpgNode* node = nv.node();
+    make_gval_cnf(node);
     Literal alit(mGvarMap(node), false);
     if ( nv.val() ) {
       mEngine.assumption_add(alit);
@@ -240,6 +259,26 @@ FaultAnalyzer::add_assumptions(const NodeValList& assign_list)
       mEngine.assumption_add(~alit);
     }
   }
+}
+
+// @brief ノードのCNFを作る．
+void
+FaultAnalyzer::make_gval_cnf(const TpgNode* node)
+{
+  if ( mNodeMark[node->id()] ) {
+    return;
+  }
+  mNodeMark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TpgNode* inode = node->fanin(i);
+    make_gval_cnf(inode);
+  }
+
+  VarId gvar = mEngine.new_var();
+  mGvarMap.set_vid(node, gvar);
+  mEngine.make_node_cnf(node, mGvarMap);
 }
 
 END_NAMESPACE_YM_SATPG
