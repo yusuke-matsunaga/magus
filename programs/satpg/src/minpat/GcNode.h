@@ -43,13 +43,13 @@ public:
   ymuint
   id() const;
 
-  /// @brief パタンをセットする．
+  /// @brief 故障をセットする．
   void
-  set_pat(TestVector* tv);
+  set_fault(TpgFault* fault);
 
-  /// @brief パタンを返す．
-  TestVector*
-  pat() const;
+  /// @brief 故障を返す．
+  TpgFault*
+  fault() const;
 
   /// @brief 隣接するノードのリストを得る．
   const vector<GcNode*>&
@@ -94,14 +94,6 @@ public:
   void
   set_heap_location(ymuint pos);
 
-  /// @brief 故障を追加する．
-  void
-  add_fault(ymuint f);
-
-  /// @brief 故障リストを返す．
-  const vector<ymuint>&
-  fault_list() const;
-
   /// @brief 選択マークをつける．
   void
   set_selected();
@@ -136,8 +128,8 @@ private:
   // ヒープ中の位置(+1)
   ymuint mHeapIdx;
 
-  // テストパタン
-  TestVector* mPat;
+  // 故障
+  TpgFault* mFault;
 
   // 隣接するノードのリスト
   vector<GcNode*> mLinkList;
@@ -154,9 +146,6 @@ private:
   // 色番号
   // 0 が未彩色
   ymuint mColor;
-
-  // 関連する故障番号のリスト
-  vector<ymuint> mFaultList;
 
   // 選択マーク
   bool mSelected;
@@ -179,20 +168,20 @@ GcNode::id() const
   return mId;
 }
 
-// @brief パタンをセットする．
+// @brief 故障をセットする．
 inline
 void
-GcNode::set_pat(TestVector* tv)
+GcNode::set_fault(TpgFault* fault)
 {
-  mPat = tv;
+  mFault = fault;
 }
 
-// @brief パタンを返す．
+// @brief 故障を返す．
 inline
-TestVector*
-GcNode::pat() const
+TpgFault*
+GcNode::fault() const
 {
-  return mPat;
+  return mFault;
 }
 
 // @brief 隣接するノードのリストを得る．
@@ -273,22 +262,6 @@ void
 GcNode::set_heap_location(ymuint pos)
 {
   mHeapIdx = pos;
-}
-
-// @brief 故障を追加する．
-inline
-void
-GcNode::add_fault(ymuint f)
-{
-  mFaultList.push_back(f);
-}
-
-// @brief 故障リストを返す．
-inline
-const vector<ymuint>&
-GcNode::fault_list() const
-{
-  return mFaultList;
 }
 
 // @brief 選択マークをつける．

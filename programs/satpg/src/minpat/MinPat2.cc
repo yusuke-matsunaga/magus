@@ -22,9 +22,7 @@
 #include "Verifier.h"
 #include "GcSolver.h"
 #include "GcNode.h"
-#include "FaultAnalyzer.h"
-#include "GenVidMap.h"
-#include "ModelValMap.h"
+#include "TpgCnf1.h"
 #include "YmUtils/Graph.h"
 #include "YmUtils/MinCov.h"
 #include "YmUtils/RandGen.h"
@@ -321,7 +319,7 @@ MinPat2::run(TpgNetwork& network,
   cout << "Total    " << fault_num << " original faults" << endl;
   cout << "Total    " << rep_fault_num << " representative faults" << endl;
   cout << "Total    " << n_sat1 << " dominance test" << endl;
-  cout << "CPU time " << local_timer.time() << endl;
+  cout << "CPU time for dominance test" << local_timer.time() << endl;
 
   local_timer.reset();
   local_timer.start();
@@ -337,20 +335,12 @@ MinPat2::run(TpgNetwork& network,
 
   local_timer.stop();
 
-  cout << "CPU time " << local_timer.time() << endl;
+  cout << "CPU time for fault analysis" << local_timer.time() << endl;
 
   local_timer.reset();
   local_timer.start();
 
-#if 0
-  FaultAnalyzer g_fa(string(), string(), NULL);
-
-#if 0
-  g_fa.make_gval_cnf(network);
-#else
-  g_fa.init(network.max_node_id());
-#endif
-#endif
+  GcSolver gcsolver(rep_fault_num, network.max_node_id());
 
   StopWatch conf1_timer;
   StopWatch conf2_timer;
@@ -371,11 +361,12 @@ MinPat2::run(TpgNetwork& network,
     for (ymuint i1 = 0; i1 < rep_fault_num; ++ i1) {
       TpgFault* f1 = rep_fault_list[i1];
 
-      FaultAnalyzer f_fa(string(), string(), NULL);
+      GcNode* gcnode1 = gcsolver.node(i1);
+      gcnode1->set_fault(f1);
 
-      NodeSet node_set;
+      TpgCnf1 tpg_cnf(string(), string(), NULL);
 
-      f_fa.make_fval_cnf(network, f1);
+      tpg_cnf.make_fval_cnf(f1, network.max_node_id());
 
       // input_list1 の要素をハッシュに登録する．
       const vector<ymuint>& input_list1 = input_list_array[f1->node()->id()];
@@ -391,6 +382,8 @@ MinPat2::run(TpgNetwork& network,
 
       for (ymuint i2 = i1 + 1; i2 < rep_fault_num; ++ i2) {
 	TpgFault* f2 = rep_fault_list[i2];
+
+	GcNode* gcnode2 = gcsolver.node(i2);
 
 	// input_list2 の要素でハッシュに登録されている要素があれば
 	// input_list1 と input_list2 は共通部分を持つ．
@@ -424,52 +417,32 @@ MinPat2::run(TpgNetwork& network,
 	  // 必要割当そのものがコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf1;
+	  connect(gcnode1, gcnode2);
 	  conf1_timer.stop();
 	  continue;
 	}
 	conf1_timer.stop();
 
-#if 0
-	int1_timer.start();
-	if ( g_fa.check_intersect(suf_list1, suf_list2) ) {
-	  // 十分割当が交わっていたらコンフリクトはない．
-	  ++ n_int1;
-	  int1_timer.stop();
-	  continue;
-	}
-	int1_timer.stop();
-
-	conf2_timer.start();
-	if ( g_fa.check_conflict(ma_list1, ma_list2) ) {
-	  // 必要割当がコンフリクトしていたら故障もコンフリクトしている．
-	  ++ n_conf;
-	  ++ n_conf2;
-	  conf2_timer.stop();
-	  continue;
-	}
-	conf2_timer.stop();
-#endif
-
-#if 1
 	int2_timer.start();
-	if ( !check_conflict(suf_list1, suf_list2) && f_fa.check_intersect(suf_list2) ) {
+	if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
 	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
 	  ++ n_int2;
 	  int2_timer.stop();
 	  continue;
 	}
 	int2_timer.stop();
-#endif
+
 	conf3_timer.start();
-	if ( f_fa.check_conflict(ma_list2) ) {
+	if ( tpg_cnf.check_conflict(ma_list2) ) {
 	  // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf3;
+	  connect(gcnode1, gcnode2);
 	  conf3_timer.stop();
 	  continue;
 	}
 	conf3_timer.stop();
-#if 1
+
 	conf4_timer.start();
 	// f1 と f2 が同時に 1 になることがない．
 	++ n_sat2;
@@ -477,9 +450,9 @@ MinPat2::run(TpgNetwork& network,
 	  //cout << f1->str() << " conflicts with " << f2->str() << endl;
 	  ++ n_conf;
 	  ++ n_conf4;
+	  connect(gcnode1, gcnode2);
 	}
 	conf4_timer.stop();
-#endif
       }
     }
   }
@@ -488,19 +461,21 @@ MinPat2::run(TpgNetwork& network,
 
   cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
   cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
-  cout << "Total    " << setw(6) << n_conf2 << " conflicts (ma_list with SAT)" << endl;
-  cout << "Total    " << setw(6) << n_conf3 << " conflicts (single)" << endl;
+  cout << "Total    " << setw(6) << n_conf3 << " conflicts (single suf_list)" << endl;
   cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
   cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
-  cout << "Total    " << setw(6) << n_int1  << " simple intersection check" << endl;
-  cout << "Total    " << setw(6) << n_int2  << " SAT intersection check" << endl;
+  cout << "Total    " << setw(6) << n_int2  << " suf_list intersection check" << endl;
   cout << "Total CPU time " << local_timer.time() << endl;
   cout << "CPU time (simple ma_list)    " << conf1_timer.time() << endl;
-  cout << "CPU time (ma_list with SAT)  " << conf2_timer.time() << endl;
   cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
   cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
-  cout << "CPU time (suf_list with SAT) " << int1_timer.time() << endl;
   cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
+
+  cout << "coloring start" << endl;
+  // このグラフ上での最小彩色問題を解く
+  vector<vector<ymuint> > color_group;
+  ymuint nc = gcsolver.coloring(color_group);
+  cout << " # of fault groups = " << nc << endl;
 
 #if 0
   // マージできないテストパタンの間に枝を持つグラフを作る．

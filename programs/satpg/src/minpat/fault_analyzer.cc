@@ -327,15 +327,15 @@ check_dominance(TpgFault* f1,
     engine.make_dchain_cnf(node, gvar_map, fvar2_map, dvar2_map);
   }
 
-  // f1 が検出可能で f2 が検出不可能な入力があるか調べる．
-  engine.assumption_begin();
-
   ymuint npo2 = node_set2.output_list().size();
   for (ymuint i = 0; i < npo2; ++ i) {
     const TpgNode* node = node_set2.output_list()[i];
     Literal dlit(dvar2_map(node), false);
-    engine.assumption_add(~dlit);
+    engine.add_clause(~dlit);
   }
+
+  // f1 が検出可能で f2 が検出不可能な入力があるか調べる．
+  engine.assumption_begin();
 
   vector<Bool3> sat_model;
   SatStats sat_stats;

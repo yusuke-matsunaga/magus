@@ -155,7 +155,7 @@ MinPatImpl::run(TpgNetwork& network,
   kdet.run(tv_list, k, det_list_array);
 
   cout << "  fault simulation ends." << endl;
-
+#if 0
   // マージできないテストパタンの間に枝を持つグラフを作る．
   ymuint n = tv_list.size();
   GcSolver gcsolver(n);
@@ -261,7 +261,7 @@ MinPatImpl::run(TpgNetwork& network,
       cout << "No Errors(4)" << endl;
     }
   }
-
+#endif
   local_timer.stop();
   USTime time = local_timer.time();
 

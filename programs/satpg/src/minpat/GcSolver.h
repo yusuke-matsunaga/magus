@@ -26,7 +26,8 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] node_num ノード数
-  GcSolver(ymuint node_num);
+  GcSolver(ymuint node_num,
+	   ymuint max_id);
 
   /// @brief デストラクタ
   ~GcSolver();
@@ -58,10 +59,6 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ノードがカバーしている故障に印をつける．
-  void
-  cover_fault(GcNode* node);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -77,11 +74,8 @@ private:
   // 現在の最大色番号
   ymuint32 mMaxColor;
 
-  // 最大故障番号 + 1
-  ymuint mMaxFaultId;
-
-  // 故障のカバー状況を記録する配列
-  vector<bool> mFaultMark;
+  // TpgNode のノード番号の最大値
+  ymuint mMaxId;
 
 };
 

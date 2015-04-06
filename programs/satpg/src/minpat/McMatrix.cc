@@ -949,7 +949,7 @@ McMatrix::check_dominance(ymuint id1,
 {
   const GcNode* node1 = &mNodeArray[id1];
   const GcNode* node2 = &mNodeArray[id2];
-#if 0
+#if 1
   const vector<GcNode*>& adj_list1 = node1->link_list();
   const vector<GcNode*>& adj_list2 = node2->link_list();
 
