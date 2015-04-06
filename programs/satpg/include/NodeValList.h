@@ -37,10 +37,6 @@ public:
   NodeVal(const TpgNode* node,
 	  bool val);
 
-  /// @brief 内容を直接指定したコンストラクタ
-  /// @param[in] pval パックされた値
-  NodeVal(ympuint pval);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -106,6 +102,10 @@ public:
   add(const TpgNode* node,
       bool val);
 
+  /// @brief ソートする．
+  void
+  sort();
+
   /// @brief マージする．
   /// @param[in] src_list マージするリスト
   ///
@@ -135,7 +135,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値割り当てのリスト
-  vector<ympuint> mAsList;
+  vector<NodeVal> mAsList;
 
 };
 
@@ -175,14 +175,6 @@ inline
 NodeVal::NodeVal(const TpgNode* node,
 		 bool val) :
   mPackVal(reinterpret_cast<ympuint>(node) | val)
-{
-}
-
-// @brief 内容を直接指定したコンストラクタ
-// @param[in] pval パックされた値
-inline
-NodeVal::NodeVal(ympuint pval) :
-  mPackVal(pval)
 {
 }
 
@@ -258,6 +250,22 @@ NodeValList::clear()
   mAsList.clear();
 }
 
+// @brief 要素数を返す．
+inline
+ymuint
+NodeValList::size() const
+{
+  return mAsList.size();
+}
+
+// @brief ソートする．
+inline
+void
+NodeValList::sort()
+{
+  std::sort(mAsList.begin(), mAsList.end());
+}
+
 // @brief 値を追加する．
 // @param[in] node ノード
 // @param[in] val 値
@@ -266,16 +274,7 @@ void
 NodeValList::add(const TpgNode* node,
 		 bool val)
 {
-  ympuint packval = reinterpret_cast<ympuint>(node) | val;
-  mAsList.push_back(packval);
-}
-
-// @brief 要素数を返す．
-inline
-ymuint
-NodeValList::size() const
-{
-  return mAsList.size();
+  mAsList.push_back(NodeVal(node, val));
 }
 
 // @brief 要素を返す．
@@ -285,8 +284,7 @@ NodeVal
 NodeValList::operator[](ymuint pos) const
 {
   ASSERT_COND( pos < size() );
-  ympuint packval = mAsList[pos];
-  return NodeVal(packval);
+  return mAsList[pos];
 }
 
 END_NAMESPACE_YM_SATPG

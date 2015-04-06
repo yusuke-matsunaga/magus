@@ -20,15 +20,15 @@ BEGIN_NAMESPACE_YM_SATPG
 void
 NodeValList::merge(const NodeValList& src_list)
 {
-  vector<ympuint> tmp_list;
+  vector<NodeVal> tmp_list;
   ymuint n1 = mAsList.size();
   ymuint n2 = src_list.mAsList.size();
   tmp_list.reserve(n1 + n2);
   ymuint i1 = 0;
   ymuint i2 = 0;
   while ( i1 < n1 && i2 < n2 ) {
-    ympuint v1 = mAsList[i1];
-    ympuint v2 = src_list.mAsList[i2];
+    NodeVal v1 = mAsList[i1];
+    NodeVal v2 = src_list.mAsList[i2];
     if ( v1 < v2 ) {
       tmp_list.push_back(v1);
       ++ i1;
@@ -44,11 +44,11 @@ NodeValList::merge(const NodeValList& src_list)
     }
   }
   for ( ; i1 < n1; ++ i1) {
-    ympuint v1 = mAsList[i1];
+    NodeVal v1 = mAsList[i1];
     tmp_list.push_back(v1);
   }
   for ( ; i2 < n2; ++ i2) {
-    ympuint v2 = src_list.mAsList[i2];
+    NodeVal v2 = src_list.mAsList[i2];
     tmp_list.push_back(v2);
   }
 

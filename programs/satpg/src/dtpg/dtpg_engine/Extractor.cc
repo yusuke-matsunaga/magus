@@ -83,6 +83,8 @@ Extractor::operator()(TpgFault* fault,
 
   record_sensitized_node(spo->fanin(0), assign_list);
 
+  assign_list.sort();
+
   if ( false ) {
     ymuint n = assign_list.size();
     for (ymuint i = 0; i < n; ++ i) {

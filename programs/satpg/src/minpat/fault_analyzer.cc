@@ -21,7 +21,7 @@
 
 
 BEGIN_NONAMESPACE
-const bool do_verify = true;
+const bool do_verify = false;
 END_NONAMESPACE
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -223,30 +223,31 @@ check_dominance(TpgFault* f1,
   GenVidMap fvar2_map(max_id);
   GenVidMap dvar2_map(max_id);
 
+  // node_set1 と node_set2 の union を all_list に入れる．
   vector<bool> mark(max_id);
   vector<const TpgNode*> all_list;
   all_list.reserve(node_set1.tfo_tfi_size() + node_set2.tfo_tfi_size());
-  //////////////////////////////////////////////////////////////////////
-  // 変数の割当
-  //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set1.tfo_tfi_size(); ++ i) {
     const TpgNode* node = node_set1.tfo_tfi_node(i);
     mark[node->id()] = true;
     all_list.push_back(node);
-    VarId gvar = engine.new_var();
-    gvar_map.set_vid(node, gvar);
-    fvar1_map.set_vid(node, gvar);
-    fvar2_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < node_set2.tfo_tfi_size(); ++ i) {
     const TpgNode* node = node_set2.tfo_tfi_node(i);
     if ( !mark[node->id()] ) {
       all_list.push_back(node);
-      VarId gvar = engine.new_var();
-      gvar_map.set_vid(node, gvar);
-      fvar1_map.set_vid(node, gvar);
-      fvar2_map.set_vid(node, gvar);
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < all_list.size(); ++ i) {
+    const TpgNode* node = all_list[i];
+    VarId gvar = engine.new_var();
+    gvar_map.set_vid(node, gvar);
+    fvar1_map.set_vid(node, gvar);
+    fvar2_map.set_vid(node, gvar);
   }
 
   for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
@@ -372,31 +373,31 @@ check_conflict(TpgFault* f1,
   GenVidMap fvar2_map(max_id);
   GenVidMap dvar2_map(max_id);
 
-
+  // node_set1 と node_set2 の union を all_list に入れる．
   vector<bool> mark(max_id);
   vector<const TpgNode*> all_list;
   all_list.reserve(node_set1.tfo_tfi_size() + node_set2.tfo_tfi_size());
-  //////////////////////////////////////////////////////////////////////
-  // 変数の割当
-  //////////////////////////////////////////////////////////////////////
   for (ymuint i = 0; i < node_set1.tfo_tfi_size(); ++ i) {
     const TpgNode* node = node_set1.tfo_tfi_node(i);
     mark[node->id()] = true;
     all_list.push_back(node);
-    VarId gvar = engine.new_var();
-    gvar_map.set_vid(node, gvar);
-    fvar1_map.set_vid(node, gvar);
-    fvar2_map.set_vid(node, gvar);
   }
   for (ymuint i = 0; i < node_set2.tfo_tfi_size(); ++ i) {
     const TpgNode* node = node_set2.tfo_tfi_node(i);
     if ( !mark[node->id()] ) {
       all_list.push_back(node);
-      VarId gvar = engine.new_var();
-      gvar_map.set_vid(node, gvar);
-      fvar1_map.set_vid(node, gvar);
-      fvar2_map.set_vid(node, gvar);
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < all_list.size(); ++ i) {
+    const TpgNode* node = all_list[i];
+    VarId gvar = engine.new_var();
+    gvar_map.set_vid(node, gvar);
+    fvar1_map.set_vid(node, gvar);
+    fvar2_map.set_vid(node, gvar);
   }
 
   for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {

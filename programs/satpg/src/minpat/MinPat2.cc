@@ -21,12 +21,13 @@
 #include "NodeValList.h"
 #include "Verifier.h"
 #include "GcSolver.h"
+#include "GcSolver2.h"
+#include "GcSolver3.h"
 #include "GcNode.h"
 #include "TpgCnf1.h"
-#include "YmUtils/Graph.h"
-#include "YmUtils/MinCov.h"
+#include "TpgCnf0.h"
+
 #include "YmUtils/RandGen.h"
-#include "YmUtils/RandPermGen.h"
 #include "YmUtils/StopWatch.h"
 #include "YmUtils/HashSet.h"
 
@@ -154,8 +155,6 @@ MinPat2::run(TpgNetwork& network,
 
   total_timer.start();
   local_timer.start();
-
-  RandGen randgen;
 
   ymuint orig_num = tv_list.size();
 
@@ -290,7 +289,7 @@ MinPat2::run(TpgNetwork& network,
 	    dom_flag[f2->id()] = true;
 	  }
 	}
-	if ( (stat & 2U) == 0U ) {
+	if ( !dom_flag[f2->id()] && (stat & 2U) == 0U ) {
 	  // f2 が 0 のときは f1 も 0 だった．
 	  ++ n_sat1;
 	  if ( check_dominance(f2, f1, max_node_id) ) {
@@ -340,7 +339,7 @@ MinPat2::run(TpgNetwork& network,
   local_timer.reset();
   local_timer.start();
 
-  GcSolver gcsolver(rep_fault_num, network.max_node_id());
+  GcSolver2 gcsolver(rep_fault_list, network.max_node_id());
 
   StopWatch conf1_timer;
   StopWatch conf2_timer;
@@ -361,9 +360,6 @@ MinPat2::run(TpgNetwork& network,
     for (ymuint i1 = 0; i1 < rep_fault_num; ++ i1) {
       TpgFault* f1 = rep_fault_list[i1];
 
-      GcNode* gcnode1 = gcsolver.node(i1);
-      gcnode1->set_fault(f1);
-
       TpgCnf1 tpg_cnf(string(), string(), NULL);
 
       tpg_cnf.make_fval_cnf(f1, network.max_node_id());
@@ -382,8 +378,6 @@ MinPat2::run(TpgNetwork& network,
 
       for (ymuint i2 = i1 + 1; i2 < rep_fault_num; ++ i2) {
 	TpgFault* f2 = rep_fault_list[i2];
-
-	GcNode* gcnode2 = gcsolver.node(i2);
 
 	// input_list2 の要素でハッシュに登録されている要素があれば
 	// input_list1 と input_list2 は共通部分を持つ．
@@ -417,7 +411,7 @@ MinPat2::run(TpgNetwork& network,
 	  // 必要割当そのものがコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf1;
-	  connect(gcnode1, gcnode2);
+	  gcsolver.connect(i1, i2);
 	  conf1_timer.stop();
 	  continue;
 	}
@@ -437,7 +431,7 @@ MinPat2::run(TpgNetwork& network,
 	  // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
 	  ++ n_conf;
 	  ++ n_conf3;
-	  connect(gcnode1, gcnode2);
+	  gcsolver.connect(i1, i2);
 	  conf3_timer.stop();
 	  continue;
 	}
@@ -447,10 +441,9 @@ MinPat2::run(TpgNetwork& network,
 	// f1 と f2 が同時に 1 になることがない．
 	++ n_sat2;
 	if ( check_conflict(f1, f2, max_node_id) ) {
-	  //cout << f1->str() << " conflicts with " << f2->str() << endl;
 	  ++ n_conf;
 	  ++ n_conf4;
-	  connect(gcnode1, gcnode2);
+	  gcsolver.connect(i1, i2);
 	}
 	conf4_timer.stop();
       }
@@ -471,122 +464,43 @@ MinPat2::run(TpgNetwork& network,
   cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
   cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
 
+  local_timer.reset();
+  local_timer.start();
   cout << "coloring start" << endl;
-  // このグラフ上での最小彩色問題を解く
-  vector<vector<ymuint> > color_group;
-  ymuint nc = gcsolver.coloring(color_group);
+  ymuint nc = gcsolver.coloring();
   cout << " # of fault groups = " << nc << endl;
+  local_timer.stop();
+  cout << "CPU time (coloring)          " << local_timer.time() << endl;
 
-#if 0
-  // マージできないテストパタンの間に枝を持つグラフを作る．
-  ymuint n = tv_list.size();
-  GcSolver gcsolver(n);
-
-  for (ymuint i1 = 1; i1 < n; ++ i1) {
-    TestVector* tv1 = tv_list[i1];
-    GcNode* node1 = gcsolver.node(i1);
-    for (ymuint i2 = 0; i2 < i1; ++ i2) {
-      TestVector* tv2 = tv_list[i2];
-      GcNode* node2 = gcsolver.node(i2);
-      if ( TestVector::is_conflict(*tv1, *tv2) ) {
-	connect(node1, node2);
-      }
-    }
-    node1->set_pat(tv1);
-    for (vector<ymuint>::const_iterator p = det_list_array[i1].begin();
-	 p != det_list_array[i1].end(); ++ p) {
-      node1->add_fault(*p);
-    }
-  }
-#endif
-#if 0
-  // このグラフ上での最小彩色問題を解くことで3値のパタンを圧縮する．
-  vector<vector<ymuint> > color_group;
-  ymuint nc = gcsolver.coloring(color_group);
-
+  // テストパタンを作る．
+  TpgCnf0 tpg_cnf0(string(), string(), NULL);
   vector<TestVector*> new_tv_list;
-  for (ymuint i = 0; i < nc; ++ i) {
-    // 同じ色のグループのパタンを一つにマージする．
-    TestVector* new_tv = tvmgr.new_vector();
-    const vector<ymuint>& id_list = color_group[i];
-    for (vector<ymuint>::const_iterator p = id_list.begin();
-	 p != id_list.end(); ++ p) {
-      ymuint id = *p;
-      TestVector* tv = tv_list[id];
-      bool stat = new_tv->merge(*tv);
-      ASSERT_COND( stat );
-    }
-    // 残った X にランダムに 0/1 を割り当てる．
-    new_tv->fix_x_from_random(randgen);
-
-    new_tv_list.push_back(new_tv);
-  }
-  if ( false ) {
-    // 検証しておく．
-    if ( ver.check(new_tv_list) ) {
-      cout << "No Errors(3)" << endl;
+  new_tv_list.reserve(nc);
+  for (ymuint col = 1; col <= nc; ++ col) {
+    const NodeValList& suf_list = gcsolver.suf_list(col);
+    TestVector* tv = tvmgr.new_vector();
+    bool stat = tpg_cnf0.get_testvector(network, suf_list, tv);
+    ASSERT_COND( stat );
+    new_tv_list.push_back(tv);
+    if ( false ) {
+      cout << "#" << col << endl
+	   << " faults: ";
+      const vector<TpgFault*>& fault_list = gcsolver.fault_list(col);
+      for (ymuint i = 0; i < fault_list.size(); ++ i) {
+	TpgFault* f = fault_list[i];
+	cout << " " << f->str();
+      }
+      cout << endl;
+      cout << tv << endl;
     }
   }
-  cout << "Graph Coloring End: " << new_tv_list.size() << endl;
-
-  // 最小被覆問題を解く．
   tv_list = new_tv_list;
-
-  {
-    KDet kdet(fsim3, f_list, max_fault_id);
-
-    vector<vector<ymuint> > det_list_array;
-    ymuint k = 40;
-    kdet.run(tv_list, k, det_list_array);
-    vector<bool> fmark(max_fault_id);
-    vector<ymuint> fmap(max_fault_id);
-
-    MinCov mincov;
-
-    ymuint fnum = 0;
-    ymuint pnum = tv_list.size();
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	if ( !fmark[f] ) {
-	  fmark[f] = true;
-	  fmap[f] = fnum;
-	  ++ fnum;
-	}
-      }
-    }
-
-    mincov.set_size(fnum, pnum);
-    for (ymuint i = 0; i < pnum; ++ i) {
-      const vector<ymuint>& det_list = det_list_array[i];
-      for (ymuint j = 0; j < det_list.size(); ++ j) {
-	ymuint f = det_list[j];
-	ymuint r = fmap[f];
-	mincov.insert_elem(r, i);
-      }
-    }
-    vector<ymuint32> pat_list;
-    double cost = mincov.heuristic(pat_list, MinCov::kGreedy);
-    if ( pat_list.size() < tv_list.size() ) {
-      vector<TestVector*> tv_tmp_list(tv_list);
-      tv_list.clear();
-      for (ymuint i = 0; i < pat_list.size(); ++ i) {
-	tv_list.push_back(tv_tmp_list[pat_list[i]]);
-      }
-    }
-  }
-  cout << "Minimum Covering End: " << tv_list.size() << endl;
-#endif
-
-#if 0
   {
     // 検証しておく．
     if ( ver.check(tv_list) ) {
-      cout << "No Errors(4)" << endl;
+      cout << "No Errors" << endl;
     }
   }
-#endif
 
   total_timer.stop();
   USTime time = total_timer.time();

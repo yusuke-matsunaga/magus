@@ -19,6 +19,247 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+bool do_verify = false;
+
+void
+dfs(const TpgNode* node,
+    HashSet<ymuint>& mark,
+    vector<const TpgNode*>& node_list)
+{
+  if ( mark.check(node->id()) ) {
+    return;
+  }
+  mark.add(node->id());
+
+  node_list.push_back(node);
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    const TpgNode* onode = node->active_fanout(i);
+    dfs(onode, mark, node_list);
+  }
+}
+
+struct NodeLt
+{
+  bool
+  operator()(const TpgNode* left,
+	     const TpgNode* right)
+  {
+    return left->id() < right->id();
+  }
+};
+
+void
+mark_dfs(const TpgNode* node,
+	 SatEngine& engine,
+	 GenVidMap& gvar_map,
+	 vector<bool>&mark)
+{
+  if ( mark[node->id()] ) {
+    return;
+  }
+  mark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TpgNode* inode = node->fanin(i);
+    mark_dfs(inode, engine, gvar_map, mark);
+  }
+
+  VarId gvar = engine.new_var();
+  gvar_map.set_vid(node, gvar);
+  engine.make_node_cnf(node, gvar_map);
+}
+
+END_NONAMESPACE
+
+void
+verify_suf_list(TpgFault* fault,
+		ymuint max_id,
+		const NodeValList& suf_list)
+{
+  SatEngine engine(string(), string(), NULL);
+
+  NodeSet node_set;
+
+  const TpgNode* fnode = fault->node();
+
+  node_set.mark_region(max_id, fnode);
+
+  GenVidMap gvar_map(max_id);
+  GenVidMap fvar_map(max_id);
+  GenVidMap dvar_map(max_id);
+
+  vector<bool> mark(max_id, false);
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId gvar = engine.new_var();
+    gvar_map.set_vid(node, gvar);
+    fvar_map.set_vid(node, gvar);
+    mark[node->id()] = true;
+  }
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId fvar = engine.new_var();
+    VarId dvar = engine.new_var();
+    fvar_map.set_vid(node, fvar);
+    dvar_map.set_vid(node, dvar);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    engine.make_node_cnf(node, gvar_map);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      engine.make_fault_cnf(fault, gvar_map, fvar_map);
+    }
+    else {
+      engine.make_node_cnf(node, fvar_map);
+    }
+
+    // D-Chain 制約を作る．
+    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
+  }
+
+  // 上の割当のもとでは常に故障が検出できることを検証する．
+  engine.assumption_begin();
+
+  ymuint n = suf_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = suf_list[i];
+    const TpgNode* node = nv.node();
+    mark_dfs(node, engine, gvar_map, mark);
+    VarId vid = gvar_map(node);
+    bool inv = nv.val();
+    Literal alit(vid, !inv);
+    engine.assumption_add(alit);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障の非検出条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = node_set.output_list().size();
+  for (ymuint i = 0; i < npo; ++ i) {
+    const TpgNode* node = node_set.output_list()[i];
+    Literal dlit(dvar_map(node), false);
+    engine.assumption_add(~dlit);
+  }
+  vector<Bool3> tmp_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 tmp_stat = engine.solve(tmp_model, sat_stats, sat_time);
+  if ( tmp_stat == kB3True ) {
+    cout << fault->str() << endl;
+    cout << "ERROR: not a sufficient condition" << endl;
+    {
+      ModelValMap tmp_val(gvar_map, fvar_map, tmp_model);
+      HashSet<ymuint> mark;
+      vector<const TpgNode*> node_list;
+      dfs(fault->node(), mark, node_list);
+      sort(node_list.begin(), node_list.end(), NodeLt());
+      for (ymuint i = 0; i < node_list.size(); ++ i) {
+	const TpgNode* node = node_list[i];
+
+	cout << "Node#" << setw(5) << node->id() << ": ";
+	cout << tmp_val.gval(node)
+	     << "/" << tmp_val.fval(node)
+	     << ": ";
+	if ( node->is_input() ) {
+	  cout << "INPUT#" << node->input_id();
+	}
+	else if ( node->is_output() ) {
+	  cout << "OUTPUT#" << node->output_id();
+	  const TpgNode* inode = node->fanin(0);
+	  cout << " = Node#" << inode->id();
+	}
+	else if ( node->is_logic() ) {
+	  cout << node->gate_type();
+	  ymuint ni = node->fanin_num();
+	  if ( ni > 0 ) {
+	    cout << "(";
+	    for (ymuint j = 0; j < ni; ++ j) {
+	      const TpgNode* inode = node->fanin(j);
+	      cout << " Node#" << inode->id();
+	    }
+	    cout << ")";
+	  }
+	}
+	else {
+	  ASSERT_NOT_REACHED;
+	}
+	cout << endl;
+      }
+
+      for (ymuint i = 0; i < n; ++ i) {
+	NodeVal nv = suf_list[i];
+	const TpgNode* node = nv.node();
+	if ( node_set.tfo_mark(node) ) {
+	  continue;
+	}
+	cout << "Node#" << node->id() << ": ";
+	cout << ", gval = " << tmp_val.gval(node)
+	     << ": ";
+	if ( node->is_input() ) {
+	  cout << "INPUT#" << node->input_id();
+	}
+	else if ( node->is_output() ) {
+	  cout << "OUTPUT#" << node->output_id();
+	  const TpgNode* inode = node->fanin(0);
+	  cout << " = Node#" << inode->id();
+	}
+	else if ( node->is_logic() ) {
+	  cout << node->gate_type();
+	  ymuint ni = node->fanin_num();
+	  if ( ni > 0 ) {
+	    cout << "(";
+	    for (ymuint j = 0; j < ni; ++ j) {
+	      const TpgNode* inode = node->fanin(j);
+	      cout << " Node#" << inode->id();
+	    }
+	    cout << ")";
+	  }
+	}
+	else {
+	  ASSERT_NOT_REACHED;
+	}
+	cout << endl;
+      }
+      for (ymuint i = 0; i < n; ++ i) {
+	NodeVal nv = suf_list[i];
+	const TpgNode* node = nv.node();
+	cout << " Node#" << node->id() << ":";
+	if ( nv.val() ) {
+	  cout << "1";
+	}
+	else {
+	  cout << "0";
+	}
+      }
+      cout << endl;
+    }
+    exit(1);
+  }
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // クラス TpgCnf1
 //////////////////////////////////////////////////////////////////////
@@ -47,6 +288,8 @@ TpgCnf1::make_fval_cnf(TpgFault* fault,
 		       ymuint max_id)
 {
   mFault = fault;
+
+  mMaxId = max_id;
 
   mNodeMark.clear();
   mNodeMark.resize(max_id, false);
@@ -162,13 +405,15 @@ TpgCnf1::check_conflict(const NodeValList& list)
 }
 
 // @brief 故障回路のCNFのもとで割当が両立するか調べる．
-// @param[inout] list 割当リスト
+// @param[in] src_list もとの割当リスト
+// @param[in] new_list 新しい割当リスト
 bool
-TpgCnf1::get_suf_list(NodeValList& list)
+TpgCnf1::get_suf_list(const NodeValList& src_list,
+		      NodeValList& new_list)
 {
   mEngine.assumption_begin();
 
-  add_assumptions(list);
+  add_assumptions(src_list);
 
   vector<Bool3> sat_model;
   SatStats sat_stats;
@@ -177,9 +422,12 @@ TpgCnf1::get_suf_list(NodeValList& list)
   if ( sat_ans == kB3True ) {
     ModelValMap val_map(mGvarMap, mFvarMap, sat_model);
     Extractor extract(val_map);
-    NodeValList list1;
-    extract(mFault, list1);
-    list.merge(list1);
+    extract(mFault, new_list);
+
+    if ( do_verify ) {
+      verify_suf_list(mFault, mMaxId, new_list);
+    }
+
     return true;
   }
   return false;

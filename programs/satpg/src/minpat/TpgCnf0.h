@@ -1,8 +1,8 @@
-#ifndef TPGCNF1_H
-#define TPGCNF1_H
+#ifndef TPGCNF0_H
+#define TPGCNF0_H
 
-/// @file TpgCnf1.h
-/// @brief TpgCnf1 のヘッダファイル
+/// @file TpgCnf0.h
+/// @brief TpgCnf0 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -17,10 +17,10 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class TpgCnf1 TpgCnf1.h "TpgCnf1.h"
-/// @brief 単一の故障解析器
+/// @class TpgCnf0 TpgCnf0.h "TpgCnf0.h"
+/// @brief 正常回路のCNFを表すクラス
 //////////////////////////////////////////////////////////////////////
-class TpgCnf1
+class TpgCnf0
 {
 public:
 
@@ -28,12 +28,12 @@ public:
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
-  TpgCnf1(const string& sat_type,
+  TpgCnf0(const string& sat_type,
 	  const string& sat_option,
 	  ostream* sat_outp);
 
   /// @brief デストラクタ
-  ~TpgCnf1();
+  ~TpgCnf0();
 
 
 public:
@@ -41,29 +41,14 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 正常回路と故障回路のCNFを作る．
-  /// @param[in] fault 故障
-  /// @param[in] max_id ノードの最大番号
-  void
-  make_fval_cnf(TpgFault* fault,
-		ymuint max_id);
-
-  /// @brief 故障回路のCNFのもとで割当が両立するか調べる．
+  /// @brief 割当を満たすパタンを作る．
+  /// @param[in] network ネットワーク
   /// @param[in] list 割当リスト
+  /// @param[in] testvector パタン
   bool
-  check_intersect(const NodeValList& list);
-
-  /// @brief 故障回路のCNFのもとで割当が矛盾するか調べる．
-  /// @param[in] list 割当リスト
-  bool
-  check_conflict(const NodeValList& list);
-
-  /// @brief 故障回路のCNFのもとで割当が両立するか調べる．
-  /// @param[in] src_list もとの割当リスト
-  /// @param[in] new_list 新しい割当リスト
-  bool
-  get_suf_list(const NodeValList& src_list,
-	       NodeValList& new_list);
+  get_testvector(TpgNetwork& network,
+		 const NodeValList& list,
+		 TestVector* testvector);
 
 
 private:
@@ -76,10 +61,6 @@ private:
   void
   add_assumptions(const NodeValList& assign_list);
 
-  /// @brief ノードのCNFを作る．
-  void
-  make_gval_cnf(const TpgNode* node);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -89,26 +70,11 @@ private:
   // SATエンジン
   SatEngine mEngine;
 
-  // ノード番号の最大値
-  ymuint mMaxId;
-
   // 正常値
   GenVidMap mGvarMap;
-
-  // 故障値
-  GenVidMap mFvarMap;
-
-  // 故障伝搬値
-  GenVidMap mDvarMap;
-
-  // 正常回路のCNFを作ってあるノードのマーク
-  vector<bool> mNodeMark;
-
-  // 故障
-  TpgFault* mFault;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // TPGCNF1_H
+#endif // TPGCNF0_H

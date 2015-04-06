@@ -19,12 +19,6 @@ int
 compare(GcNode* node1,
 	GcNode* node2)
 {
-  if ( node1->is_selected() && !node2->is_selected() ) {
-    return -1;
-  }
-  if ( !node1->is_selected() && node2->is_selected() ) {
-    return 1;
-  }
   if ( node1->sat_degree() < node2->sat_degree() ) {
     return 1;
   }

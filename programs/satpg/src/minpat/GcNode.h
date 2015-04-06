@@ -35,17 +35,17 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
+  /// @param[in] id 番号
+  /// @param[in] fault 故障
+  /// @param[in] vectlen ベクタ長
   void
   init(ymuint id,
+       TpgFault* fault,
        ymuint vectlen);
 
   /// @brief ID番号を得る．
   ymuint
   id() const;
-
-  /// @brief 故障をセットする．
-  void
-  set_fault(TpgFault* fault);
 
   /// @brief 故障を返す．
   TpgFault*
@@ -94,23 +94,6 @@ public:
   void
   set_heap_location(ymuint pos);
 
-  /// @brief 選択マークをつける．
-  void
-  set_selected();
-
-  /// @brief 選択マークを返す．
-  bool
-  is_selected();
-
-  /// @brief 削除マークをつける．
-  void
-  set_deleted();
-
-  /// @brief 削除マークを得る．
-  bool
-  is_deleted();
-
-  /// @brief 2つのノードを接続する．
   friend
   void
   connect(GcNode* node1,
@@ -147,12 +130,6 @@ private:
   // 0 が未彩色
   ymuint mColor;
 
-  // 選択マーク
-  bool mSelected;
-
-  // 削除マーク
-  bool mDeleted;
-
 };
 
 
@@ -166,14 +143,6 @@ ymuint
 GcNode::id() const
 {
   return mId;
-}
-
-// @brief 故障をセットする．
-inline
-void
-GcNode::set_fault(TpgFault* fault)
-{
-  mFault = fault;
 }
 
 // @brief 故障を返す．
@@ -264,39 +233,6 @@ GcNode::set_heap_location(ymuint pos)
   mHeapIdx = pos;
 }
 
-// @brief 選択マークをつける．
-inline
-void
-GcNode::set_selected()
-{
-  mSelected = true;
-}
-
-// @brief 選択マークを返す．
-inline
-bool
-GcNode::is_selected()
-{
-  return mSelected;
-}
-
-// @brief 削除マークをつける．
-inline
-void
-GcNode::set_deleted()
-{
-  mDeleted = true;
-}
-
-// @brief 削除マークを得る．
-inline
-bool
-GcNode::is_deleted()
-{
-  return mDeleted;
-}
-
-// @brief 2つのノードを接続する．
 inline
 void
 connect(GcNode* node1,

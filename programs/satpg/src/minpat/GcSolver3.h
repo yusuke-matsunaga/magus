@@ -1,5 +1,5 @@
-﻿#ifndef GCSOLVER_H
-#define GCSOLVER_H
+﻿#ifndef GCSOLVER3_H
+#define GCSOLVER3_H
 
 /// @file GcSolver.h
 /// @brief GcSolver のヘッダファイル
@@ -11,6 +11,7 @@
 
 #include "satpg_nsdef.h"
 #include "NodeValList.h"
+#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -18,21 +19,21 @@ BEGIN_NAMESPACE_YM_SATPG
 class GcNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class GcSolver GcSolver.h "GcSolver.h"
+/// @class GcSolver3 GcSolver3.h "GcSolver3.h"
 /// @brief 彩色問題を解くためのクラス
 //////////////////////////////////////////////////////////////////////
-class GcSolver
+class GcSolver3
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] fault_list 故障リスト
   /// @param[in] max_id ノード番号の最大値
-  GcSolver(const vector<TpgFault*>& fault_list,
-	   ymuint max_id);
+  GcSolver3(const vector<TpgFault*>& fault_list,
+	    ymuint max_id);
 
   /// @brief デストラクタ
-  ~GcSolver();
+  ~GcSolver3();
 
 
 public:
@@ -90,6 +91,13 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 彩色する．
+  /// @return 彩色数を返す．
+  ymuint
+  coloring1(RandGen& rg,
+	    const vector<TpgFault*>& fault_list,
+	    vector<ColInfo*>& col_list);
+
   /// @brief 新しい色を割り当てる．
   void
   new_color(TpgFault* fault,
@@ -117,4 +125,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // GCSOLVER_H
+#endif // GCSOLVER3_H

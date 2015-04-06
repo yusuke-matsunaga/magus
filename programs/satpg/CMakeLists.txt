@@ -102,20 +102,15 @@ set (graphsat_SOURCES
   )
 
 set (minpat_SOURCES
-  src/minpat/FopRofsim.cc
-  src/minpat/KDet.cc
-  src/minpat/KDetOp.cc
   src/minpat/KDet2.cc
   src/minpat/KDet2Op.cc
-  src/minpat/MinPatImpl.cc
   src/minpat/Verifier.cc
-  src/minpat/GreedyMinPat.cc
-  src/minpat/NaiveMinPat.cc
-  src/minpat/MaxCompat.cc
   src/minpat/GcNodeHeap.cc
   src/minpat/GcSolver.cc
-  src/minpat/McMatrix.cc
+  src/minpat/GcSolver2.cc
+  src/minpat/GcSolver3.cc
   src/minpat/MinPat2.cc
+  src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
   src/minpat/FaultAnalyzer.cc
   src/minpat/fault_analyzer.cc
