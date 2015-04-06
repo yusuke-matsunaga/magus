@@ -151,8 +151,10 @@ MinPat2::run(TpgNetwork& network,
 	     vector<TestVector*>& tv_list,
 	     MinPatStats& stats)
 {
+  StopWatch total_timer;
   StopWatch local_timer;
 
+  total_timer.start();
   local_timer.start();
 
   RandGen randgen;
@@ -344,11 +346,18 @@ MinPat2::run(TpgNetwork& network,
 
   g_fa.make_gval_cnf(network);
 
+  StopWatch conf2_timer;
+  StopWatch conf3_timer;
+  StopWatch conf4_timer;
+  StopWatch int1_timer;
+  StopWatch int2_timer;
+
   ymuint n_sat2 = 0;
   ymuint n_conf = 0;
   ymuint n_conf1 = 0;
   ymuint n_conf2 = 0;
   ymuint n_conf3 = 0;
+  ymuint n_conf4 = 0;
   ymuint n_int1 = 0;
   ymuint n_int2 = 0;
   { // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
@@ -410,39 +419,53 @@ MinPat2::run(TpgNetwork& network,
 	  continue;
 	}
 
+	int1_timer.start();
 	if ( g_fa.check_intersect(suf_list1, suf_list2) ) {
 	  // 十分割当が交わっていたらコンフリクトはない．
 	  ++ n_int1;
+	  int1_timer.stop();
 	  continue;
 	}
+	int1_timer.stop();
 
+	conf2_timer.start();
 	if ( g_fa.check_conflict(ma_list1, ma_list2) ) {
 	  // 必要割当がコンフリクトしていたら故障もコンフリクトしている．
 	  ++ n_conf;
-	  ++ n_conf1;
+	  ++ n_conf2;
+	  conf2_timer.stop();
 	  continue;
 	}
+	conf2_timer.stop();
 
+	conf3_timer.start();
 	if ( f_fa.check_conflict(ma_list2) ) {
 	  // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
 	  ++ n_conf;
-	  ++ n_conf2;
+	  ++ n_conf3;
+	  conf3_timer.stop();
 	  continue;
 	}
+	conf3_timer.stop();
 
+	int2_timer.start();
 	if ( f_fa.check_intersect(suf_list2) ) {
 	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
 	  ++ n_int2;
+	  int2_timer.stop();
 	  continue;
 	}
+	int2_timer.stop();
 
+	conf4_timer.start();
 	// f1 と f2 が同時に 1 になることがない．
 	++ n_sat2;
 	if ( check_conflict(f1, f2, max_node_id) ) {
 	  //cout << f1->str() << " conflicts with " << f2->str() << endl;
 	  ++ n_conf;
-	  ++ n_conf3;
+	  ++ n_conf4;
 	}
+	conf4_timer.stop();
       }
     }
   }
@@ -451,12 +474,18 @@ MinPat2::run(TpgNetwork& network,
 
   cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
   cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
-  cout << "Total    " << setw(6) << n_conf2 << " conflicts (single)" << endl;
-  cout << "Total    " << setw(6) << n_conf3 << " conflicts (exact)" << endl;
+  cout << "Total    " << setw(6) << n_conf2 << " conflicts (ma_list with SAT)" << endl;
+  cout << "Total    " << setw(6) << n_conf3 << " conflicts (single)" << endl;
+  cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
   cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
   cout << "Total    " << setw(6) << n_int1  << " simple intersection check" << endl;
   cout << "Total    " << setw(6) << n_int2  << " SAT intersection check" << endl;
-  cout << "CPU time " << local_timer.time() << endl;
+  cout << "Total CPU time " << local_timer.time() << endl;
+  cout << "CPU time (ma_list with SAT)  " << conf2_timer.time() << endl;
+  cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
+  cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
+  cout << "CPU time (suf_list with SAT) " << int1_timer.time() << endl;
+  cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
 
 #if 0
   // マージできないテストパタンの間に枝を持つグラフを作る．
@@ -569,8 +598,8 @@ MinPat2::run(TpgNetwork& network,
   }
 #endif
 
-  local_timer.stop();
-  USTime time = local_timer.time();
+  total_timer.stop();
+  USTime time = total_timer.time();
 
   stats.set(orig_num, tv_list.size(), time);
 }
