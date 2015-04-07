@@ -46,10 +46,12 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  MinPat* minpat = mPoptSimple->is_specified() ? new_MinPat3() : new_MinPat2();
+  MinPat* minpat = new_MinPat();
+
+  bool simple = mPoptSimple->is_specified();
 
   MinPatStats stats;
-  minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);
+  minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), simple, _tv_list(), stats);
 
   delete minpat;
 

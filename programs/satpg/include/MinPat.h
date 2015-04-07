@@ -37,9 +37,9 @@ public:
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim2 2値の故障シミュレータ
-  /// @param[in] fsim3 3値の故障シミュレータ
-  /// @param[inout] tv_list テストベクタのリスト
+  /// @param[in] fsim2 2値の故障シミュレータ(検証用)
+  /// @param[in] simple simple モードの時に true にするフラグ
+  /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
   void
@@ -47,7 +47,7 @@ public:
       TvMgr& tvmgr,
       FaultMgr& fmgr,
       Fsim& fsim2,
-      Fsim& fsim3,
+      bool simple,
       vector<TestVector*>& tv_list,
       MinPatStats& stats) = 0;
 
@@ -58,26 +58,6 @@ public:
 extern
 MinPat*
 new_MinPat();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_MinPat2();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_MinPat3();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_GreedyMinPat();
-
-/// @brief インスタンスを生成する関数
-extern
-MinPat*
-new_NaiveMinPat();
 
 END_NAMESPACE_YM_SATPG
 

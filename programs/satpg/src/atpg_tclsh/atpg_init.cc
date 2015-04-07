@@ -15,7 +15,6 @@
 #include "RtpgCmd.h"
 #include "DtpgCmd.h"
 #include "MinPatCmd.h"
-#include "MinPat2Cmd.h"
 #include "PrintFaultCmd.h"
 #include "PrintPatCmd.h"
 #include "PrintPatStatsCmd.h"

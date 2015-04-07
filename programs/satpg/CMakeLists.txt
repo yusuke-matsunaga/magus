@@ -108,8 +108,7 @@ set (minpat_SOURCES
   src/minpat/GcSolver.cc
   src/minpat/GcSolver2.cc
   src/minpat/GcSolver3.cc
-  src/minpat/MinPat2.cc
-  src/minpat/MinPat3.cc
+  src/minpat/MinPatImpl.cc
   src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
   src/minpat/TpgCnf2.cc

@@ -1,8 +1,8 @@
-﻿#ifndef MINPAT2_H
-#define MINPAT2_H
+﻿#ifndef MINPATIMPL_H
+#define MINPATIMPL_H
 
-/// @file MinPat2.h
-/// @brief MinPat2 のヘッダファイル
+/// @file MinPatImpl.h
+/// @brief MinPatImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
@@ -15,20 +15,20 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPat2 MinPat2.h "MinPat2.h"
+/// @class MinPatImpl MinPatImpl.h "MinPatImpl.h"
 /// @brief MinPat の実装クラス
 //////////////////////////////////////////////////////////////////////
-class MinPat2 :
+class MinPatImpl :
   public MinPat
 {
 public:
 
   /// @brief コンストラクタ
-  MinPat2();
+  MinPatImpl();
 
   /// @brief デストラクタ
   virtual
-  ~MinPat2();
+  ~MinPatImpl();
 
 
 public:
@@ -40,9 +40,9 @@ public:
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim2 2値の故障シミュレータ
-  /// @param[in] fsim3 3値の故障シミュレータ
-  /// @param[inout] tv_list テストベクタのリスト
+  /// @param[in] fsim2 2値の故障シミュレータ(検証用)
+  /// @param[in] simple simple モードの時に true にするフラグ
+  /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
   void
@@ -50,7 +50,7 @@ public:
       TvMgr& tvmgr,
       FaultMgr& fmgr,
       Fsim& fsim2,
-      Fsim& fsim3,
+      bool simple,
       vector<TestVector*>& tv_list,
       MinPatStats& stats);
 
@@ -58,4 +58,4 @@ public:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // MINPAT2_H
+#endif // MINPATIMPL_H

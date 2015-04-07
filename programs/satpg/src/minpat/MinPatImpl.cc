@@ -1,13 +1,13 @@
 ﻿
-/// @file MinPat2.cc
-/// @brief MinPat2 の実装ファイル
+/// @file MinPatImpl.cc
+/// @brief MinPatImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPat2.h"
+#include "MinPatImpl.h"
 #include "MinPatStats.h"
 #include "TvMgr.h"
 #include "TestVector.h"
@@ -38,9 +38,9 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 MinPat*
-new_MinPat2()
+new_MinPat()
 {
-  return new MinPat2();
+  return new MinPatImpl();
 }
 
 BEGIN_NONAMESPACE
@@ -137,16 +137,16 @@ END_NONAMESPACE
 
 
 //////////////////////////////////////////////////////////////////////
-// クラス MinPat2
+// クラス MinPatImpl
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MinPat2::MinPat2()
+MinPatImpl::MinPatImpl()
 {
 }
 
 // @brief デストラクタ
-MinPat2::~MinPat2()
+MinPatImpl::~MinPatImpl()
 {
 }
 
@@ -154,18 +154,18 @@ MinPat2::~MinPat2()
 // @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fmgr 故障マネージャ
-// @param[in] fsim2 2値の故障シミュレータ
-// @param[in] fsim3 3値の故障シミュレータ
-// @param[inout] tv_list テストベクタのリスト
+// @param[in] fsim2 2値の故障シミュレータ(検証用)
+// @param[in] simple simple モードの時に true にするフラグ
+// @param[out] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
-MinPat2::run(TpgNetwork& network,
-	     TvMgr& tvmgr,
-	     FaultMgr& fmgr,
-	     Fsim& fsim2,
-	     Fsim& fsim3,
-	     vector<TestVector*>& tv_list,
-	     MinPatStats& stats)
+MinPatImpl::run(TpgNetwork& network,
+		TvMgr& tvmgr,
+		FaultMgr& fmgr,
+		Fsim& fsim2,
+		bool simple,
+		vector<TestVector*>& tv_list,
+		MinPatStats& stats)
 {
   StopWatch total_timer;
   StopWatch local_timer;
@@ -175,7 +175,7 @@ MinPat2::run(TpgNetwork& network,
 
   ymuint orig_num = tv_list.size();
 
-  Verifier ver(fmgr, fsim3);
+  Verifier ver(fmgr, fsim2);
 
   // 故障番号の最大値を求める．
   ymuint max_fault_id = 0;
@@ -221,7 +221,7 @@ MinPat2::run(TpgNetwork& network,
   }
 
   // ドロップ無しの故障シミュレーター
-  KDet2 kdet(fsim3, f_list);
+  KDet2 kdet(fsim2, f_list);
 
   vector<vector<ymuint> > pat_list_array;
   ymuint npat0 = 1000;
@@ -445,14 +445,16 @@ MinPat2::run(TpgNetwork& network,
 	}
 	int1_timer.stop();
 
-	int2_timer.start();
-	if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
-	  // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
-	  ++ n_int2;
+	if ( !simple ) {
+	  int2_timer.start();
+	  if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
+	    // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+	    ++ n_int2;
+	    int2_timer.stop();
+	    continue;
+	  }
 	  int2_timer.stop();
-	  continue;
 	}
-	int2_timer.stop();
 
 	conf3_timer.start();
 	if ( tpg_cnf.check_conflict(ma_list2) ) {
@@ -465,16 +467,18 @@ MinPat2::run(TpgNetwork& network,
 	}
 	conf3_timer.stop();
 
-	conf4_timer.start();
-	// f1 と f2 が同時に 1 になることがない．
-	++ n_sat2;
-	TpgCnf2 tpg_cnf2(string(), string(), NULL);
-	if ( tpg_cnf2.check_conflict(f1, f2, max_node_id) ) {
-	  ++ n_conf;
-	  ++ n_conf4;
-	  gcsolver.connect(i1, i2);
+	if ( !simple ) {
+	  conf4_timer.start();
+	  // f1 と f2 が同時に 1 になることがない．
+	  ++ n_sat2;
+	  TpgCnf2 tpg_cnf2(string(), string(), NULL);
+	  if ( tpg_cnf2.check_conflict(f1, f2, max_node_id) ) {
+	    ++ n_conf;
+	    ++ n_conf4;
+	    gcsolver.connect(i1, i2);
+	  }
+	  conf4_timer.stop();
 	}
-	conf4_timer.stop();
       }
     }
   }
