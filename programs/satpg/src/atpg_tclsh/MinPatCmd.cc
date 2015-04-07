@@ -23,13 +23,10 @@ BEGIN_NAMESPACE_YM_SATPG
 MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
-  mPoptGreedy = new TclPopt(this, "greedy",
-			    "greedy heuristic");
-  mPoptNaive = new TclPopt(this, "naive",
-			   "naive heuristic");
+  mPoptSimple = new TclPopt(this, "simple",
+			    "simple heuristic");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
-  new_popt_group(mPoptGreedy, mPoptNaive);
 }
 
 // @brief デストラクタ
@@ -49,7 +46,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  MinPat* minpat = new_MinPat2();
+  MinPat* minpat = mPoptSimple->is_specified() ? new_MinPat3() : new_MinPat2();
 
   MinPatStats stats;
   minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), _fsim3(), _tv_list(), stats);

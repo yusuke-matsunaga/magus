@@ -109,6 +109,7 @@ set (minpat_SOURCES
   src/minpat/GcSolver2.cc
   src/minpat/GcSolver3.cc
   src/minpat/MinPat2.cc
+  src/minpat/MinPat3.cc
   src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
   src/minpat/TpgCnf2.cc
@@ -134,7 +135,6 @@ set (atpg_tclsh_SOURCES
   src/atpg_tclsh/RtpgCmd.cc
   src/atpg_tclsh/DtpgCmd.cc
   src/atpg_tclsh/MinPatCmd.cc
-  src/atpg_tclsh/MinPat2Cmd.cc
   )
 
 

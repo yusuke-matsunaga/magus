@@ -43,11 +43,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // greedy オプション
-  TclPopt* mPoptGreedy;
-
-  // naive オプション
-  TclPopt* mPoptNaive;
+  // simple オプション
+  TclPopt* mPoptSimple;
 
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
