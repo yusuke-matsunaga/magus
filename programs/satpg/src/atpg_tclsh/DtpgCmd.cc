@@ -217,9 +217,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   else if ( engine_type == "single2" ) {
     engine = new_DtpgSatS2(mode_val, sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }
-  else if ( engine_type == "single3" ) {
-    engine = new_DtpgSatS3(sat_type, sat_option, outp, *bt, dop_list, uop_list);
-  }
   else if ( engine_type == "multi" ) {
     engine = new_DtpgSatM(sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }

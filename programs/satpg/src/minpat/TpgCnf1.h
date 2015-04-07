@@ -11,7 +11,9 @@
 
 #include "satpg_nsdef.h"
 #include "SatEngine.h"
+#include "NodeSet.h"
 #include "GenVidMap.h"
+#include "BackTracer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -65,6 +67,13 @@ public:
   get_suf_list(const NodeValList& src_list,
 	       NodeValList& new_list);
 
+  /// @brief 故障を検出する十分割当を求める．
+  /// @param[out] suf_list 十分割当
+  /// @param[out] pi_suf_list 外部入力のみの十分割当
+  bool
+  get_suf_list2(NodeValList& suf_list,
+		NodeValList& pi_suf_list);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -101,11 +110,17 @@ private:
   // 故障伝搬値
   GenVidMap mDvarMap;
 
+  // 関係のあるノード集合
+  NodeSet mNodeSet;
+
   // 正常回路のCNFを作ってあるノードのマーク
   vector<bool> mNodeMark;
 
   // 故障
   TpgFault* mFault;
+
+  // バックトレーサー
+  BackTracer* mBackTracer;
 
 };
 

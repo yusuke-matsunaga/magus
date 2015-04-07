@@ -24,8 +24,10 @@
 #include "GcSolver2.h"
 #include "GcSolver3.h"
 #include "GcNode.h"
-#include "TpgCnf1.h"
+
 #include "TpgCnf0.h"
+#include "TpgCnf1.h"
+#include "TpgCnf2.h"
 
 #include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
@@ -33,25 +35,6 @@
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-extern
-void
-analyze_fault(TpgFault* f,
-	      NodeValList& suf_list,
-	      NodeValList& ma_list,
-	      ymuint max_id);
-
-extern
-bool
-check_dominance(TpgFault* f1,
-		TpgFault* f2,
-		ymuint max_id);
-
-extern
-bool
-check_conflict(TpgFault* f1,
-	       TpgFault* f2,
-	       ymuint max_id);
 
 // @brief インスタンスを生成する関数
 MinPat*
@@ -66,6 +49,8 @@ struct FaultInfo
 {
 
   NodeValList mSufList;
+
+  NodeValList mPiSufList;
 
   NodeValList mMaList;
 };
@@ -117,7 +102,39 @@ check_pat_list(const vector<ymuint>& tv_list1,
   return ans;
 }
 
+void
+analyze_fault(TpgFault* fault,
+	      FaultInfo& fault_info,
+	      ymuint max_id)
+{
+  TpgCnf1 tpg_cnf(string(), string(), NULL);
+
+  tpg_cnf.make_fval_cnf(fault, max_id);
+
+  NodeValList& suf_list = fault_info.mSufList;
+  NodeValList& pi_suf_list = fault_info.mPiSufList;
+  NodeValList& ma_list = fault_info.mMaList;;
+
+  bool stat = tpg_cnf.get_suf_list2(suf_list, pi_suf_list);
+  ASSERT_COND( stat );
+
+  // 必要割当を求める．
+  ymuint n = suf_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = suf_list[i];
+
+    NodeValList list1;
+    const TpgNode* node = nv.node();
+    bool val = nv.val();
+    list1.add(node, !val);
+    if ( tpg_cnf.check_conflict(list1) ) {
+      ma_list.add(node, val);
+    }
+  }
+}
+
 END_NONAMESPACE
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MinPat2
@@ -284,7 +301,8 @@ MinPat2::run(TpgNetwork& network,
 	if ( (stat & 1U) == 0U ) {
 	  // f1 が 0 のときは f2 も 0 だった．
 	  ++ n_sat1;
-	  if ( check_dominance(f1, f2, max_node_id) ) {
+	  TpgCnf2 tpg_cnf(string(), string(), NULL);
+	  if ( tpg_cnf.check_dominance(f1, f2, max_node_id) ) {
 	    //cout << f2->str() << " is dominated by " << f1->str() << endl;
 	    dom_flag[f2->id()] = true;
 	  }
@@ -292,7 +310,8 @@ MinPat2::run(TpgNetwork& network,
 	if ( !dom_flag[f2->id()] && (stat & 2U) == 0U ) {
 	  // f2 が 0 のときは f1 も 0 だった．
 	  ++ n_sat1;
-	  if ( check_dominance(f2, f1, max_node_id) ) {
+	  TpgCnf2 tpg_cnf(string(), string(), NULL);
+	  if ( tpg_cnf.check_dominance(f2, f1, max_node_id) ) {
 	    //cout << f1->str() << " is dominated by " << f2->str() << endl;
 	    dom_flag[f1->id()] = true;
 	    break;
@@ -327,9 +346,7 @@ MinPat2::run(TpgNetwork& network,
 
   for (ymuint i = 0; i < rep_fault_num; ++ i) {
     TpgFault* f = rep_fault_list[i];
-    NodeValList& suf_list = fault_info_array[f->id()].mSufList;
-    NodeValList& ma_list = fault_info_array[f->id()].mMaList;;
-    analyze_fault(f, suf_list, ma_list, max_node_id);
+    analyze_fault(f, fault_info_array[f->id()], max_node_id);
   }
 
   local_timer.stop();
@@ -339,7 +356,7 @@ MinPat2::run(TpgNetwork& network,
   local_timer.reset();
   local_timer.start();
 
-  GcSolver2 gcsolver(rep_fault_list, network.max_node_id());
+  GcSolver gcsolver(rep_fault_list, network.max_node_id());
 
   StopWatch conf1_timer;
   StopWatch conf2_timer;
@@ -373,8 +390,9 @@ MinPat2::run(TpgNetwork& network,
 
       const vector<ymuint>& tv_list1 = pat_list_array[f1->id()];
       FaultInfo& fi1 = fault_info_array[f1->id()];
-      NodeValList& suf_list1 = fi1.mSufList;
-      NodeValList& ma_list1 = fi1.mMaList;
+      const NodeValList& suf_list1 = fi1.mSufList;
+      const NodeValList& pi_suf_list1 = fi1.mPiSufList;
+      const NodeValList& ma_list1 = fi1.mMaList;
 
       for (ymuint i2 = i1 + 1; i2 < rep_fault_num; ++ i2) {
 	TpgFault* f2 = rep_fault_list[i2];
@@ -403,8 +421,9 @@ MinPat2::run(TpgNetwork& network,
 	}
 
 	FaultInfo& fi2 = fault_info_array[f2->id()];
-	NodeValList& suf_list2 = fi2.mSufList;
-	NodeValList& ma_list2 = fi2.mMaList;
+	const NodeValList& suf_list2 = fi2.mSufList;
+	const NodeValList& pi_suf_list2 = fi2.mPiSufList;
+	const NodeValList& ma_list2 = fi2.mMaList;
 
 	conf1_timer.start();
 	if ( check_conflict(ma_list1, ma_list2) ) {
@@ -416,6 +435,15 @@ MinPat2::run(TpgNetwork& network,
 	  continue;
 	}
 	conf1_timer.stop();
+
+	int1_timer.start();
+	if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
+	  // 十分割当が両立しているのでコンフリクトしない．
+	  ++ n_int1;
+	  int1_timer.stop();
+	  continue;
+	}
+	int1_timer.stop();
 
 	int2_timer.start();
 	if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
@@ -440,7 +468,8 @@ MinPat2::run(TpgNetwork& network,
 	conf4_timer.start();
 	// f1 と f2 が同時に 1 になることがない．
 	++ n_sat2;
-	if ( check_conflict(f1, f2, max_node_id) ) {
+	TpgCnf2 tpg_cnf2(string(), string(), NULL);
+	if ( tpg_cnf2.check_conflict(f1, f2, max_node_id) ) {
 	  ++ n_conf;
 	  ++ n_conf4;
 	  gcsolver.connect(i1, i2);
@@ -457,11 +486,13 @@ MinPat2::run(TpgNetwork& network,
   cout << "Total    " << setw(6) << n_conf3 << " conflicts (single suf_list)" << endl;
   cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
   cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
+  cout << "Total    " << setw(6) << n_int1  << " pi_suf_list intersection check" << endl;
   cout << "Total    " << setw(6) << n_int2  << " suf_list intersection check" << endl;
   cout << "Total CPU time " << local_timer.time() << endl;
   cout << "CPU time (simple ma_list)    " << conf1_timer.time() << endl;
   cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
   cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
+  cout << "CPU time (siple pi_suf_list) " << int1_timer.time() << endl;
   cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
 
   local_timer.reset();

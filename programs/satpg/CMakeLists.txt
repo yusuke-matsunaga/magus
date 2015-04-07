@@ -55,7 +55,6 @@ set (dtpg_SOURCES
   src/dtpg/dtpg_engine/DtpgSatBaseM.cc
   src/dtpg/dtpg_engine/DtpgSatS.cc
   src/dtpg/dtpg_engine/DtpgSatS2.cc
-  src/dtpg/dtpg_engine/DtpgSatS3.cc
   src/dtpg/dtpg_engine/DtpgSatM.cc
   src/dtpg/dtpg_engine/DtpgSatM2.cc
   src/dtpg/dtpg_engine/DtpgSatKDet.cc
@@ -112,8 +111,7 @@ set (minpat_SOURCES
   src/minpat/MinPat2.cc
   src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
-  src/minpat/FaultAnalyzer.cc
-  src/minpat/fault_analyzer.cc
+  src/minpat/TpgCnf2.cc
   )
 
 set (rtpg_SOURCES

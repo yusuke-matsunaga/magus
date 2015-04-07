@@ -273,6 +273,7 @@ TpgCnf1::TpgCnf1(const string& sat_type,
 		 ostream* sat_outp) :
   mEngine(sat_type, sat_option, sat_outp)
 {
+  mBackTracer = new_BtJust2();
 }
 
 // @brief デストラクタ
@@ -300,22 +301,20 @@ TpgCnf1::make_fval_cnf(TpgFault* fault,
 
   TpgNode* fnode = fault->node();
 
-  NodeSet node_set;
-
-  node_set.mark_region(max_id, fnode);
+  mNodeSet.mark_region(max_id, fnode);
 
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
+  for (ymuint i = 0; i < mNodeSet.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
     VarId gvar = mEngine.new_var();
     mGvarMap.set_vid(node, gvar);
     mFvarMap.set_vid(node, gvar);
     mNodeMark[node->id()] = true;
   }
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
+  for (ymuint i = 0; i < mNodeSet.tfo_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
     VarId fvar = mEngine.new_var();
     VarId dvar = mEngine.new_var();
     mFvarMap.set_vid(node, fvar);
@@ -325,16 +324,16 @@ TpgCnf1::make_fval_cnf(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
+  for (ymuint i = 0; i < mNodeSet.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
     mEngine.make_node_cnf(node, mGvarMap);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 故障回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
+  for (ymuint i = 0; i < mNodeSet.tfo_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
 
     // 故障回路のゲートの入出力関係を表すCNFを作る．
     if ( node == fnode ) {
@@ -351,10 +350,10 @@ TpgCnf1::make_fval_cnf(TpgFault* fault,
   //////////////////////////////////////////////////////////////////////
   // 故障の検出条件
   //////////////////////////////////////////////////////////////////////
-  ymuint npo = node_set.output_list().size();
+  ymuint npo = mNodeSet.output_list().size();
   mEngine.tmp_lits_begin(npo);
   for (ymuint i = 0; i < npo; ++ i) {
-    const TpgNode* node = node_set.output_list()[i];
+    const TpgNode* node = mNodeSet.output_list()[i];
     Literal dlit(mDvarMap(node), false);
     mEngine.tmp_lits_add(dlit);
   }
@@ -427,6 +426,39 @@ TpgCnf1::get_suf_list(const NodeValList& src_list,
     if ( do_verify ) {
       verify_suf_list(mFault, mMaxId, new_list);
     }
+
+    return true;
+  }
+  return false;
+}
+
+// @brief 故障を検出する十分割当を求める．
+// @param[out] suf_list 十分割当
+// @param[out] pi_suf_list 外部入力のみの十分割当
+bool
+TpgCnf1::get_suf_list2(NodeValList& suf_list,
+		       NodeValList& pi_suf_list)
+{
+  mEngine.assumption_begin();
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = mEngine.solve(sat_model, sat_stats, sat_time);
+  if ( sat_ans == kB3True ) {
+    ModelValMap val_map(mGvarMap, mFvarMap, sat_model);
+    Extractor extract(val_map);
+    extract(mFault, suf_list);
+
+    if ( do_verify ) {
+      verify_suf_list(mFault, mMaxId, suf_list);
+    }
+
+    mBackTracer->set_max_id(mMaxId);
+
+    (*mBackTracer)(mFault->node(), mNodeSet, val_map, pi_suf_list);
+
+    verify_suf_list(mFault, mMaxId, pi_suf_list);
 
     return true;
   }
