@@ -63,6 +63,7 @@ set (graph_SOURCES
   src/graph/Graph.cc
   src/graph/independent_set.cc
   src/graph/max_clique.cc
+  src/graph/max_clique_exact.cc
   )
 
 set (io_SOURCES

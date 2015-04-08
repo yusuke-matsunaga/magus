@@ -106,6 +106,15 @@ ymuint
 max_clique(const Graph& graph,
 	   vector<ymuint>& node_set);
 
+/// @brief 最大クリークを求める．
+/// @param[in] graph 対象のグラフ
+/// @param[out] node_set クリークの要素(ノード番号)を収める配列
+/// @return 要素数を返す．
+extern
+ymuint
+max_clique_exact(const Graph& graph,
+		 vector<ymuint>& node_set);
+
 END_NAMESPACE_YM
 
 #endif // YMUTILS_GRAPH_H

@@ -73,33 +73,39 @@ max_clique(const Graph& graph,
 
   NodeHeap<Node, MaxCliqueComp> node_heap(node_num);
 
-  // 隣接するノードの情報を link_array に入れる．
-  vector<vector<ymuint> > link_array(node_num);
-  for (ymuint i = 0; i < graph.edge_num(); ++ i) {
-    pair<ymuint, ymuint> p = graph.edge(i);
-    ymuint id1 = p.first;
-    ymuint id2 = p.second;
-    link_array[id1].push_back(id2);
-    link_array[id2].push_back(id1);
-  }
+  // Node のメモリ確保用のアロケータ
   SimpleAlloc alloc;
+  // 処理対象のノードを収めるリスト
   vector<Node*> node_list;
-  for (ymuint i = 0; i < node_num; ++ i) {
-    Node* node1 = &node_array[i];
-    const vector<ymuint>& link_list = link_array[i];
-    ymuint link_num = link_list.size();
-    void* p = alloc.get_memory(sizeof(Node*) * link_num);
-    Node** adj_link = new (p) Node*[link_num];
-    for (ymuint j = 0; j < link_num; ++ j) {
-      Node* node2 = &node_array[link_list[j]];
-      adj_link[j] = node2;
+  {
+    // 隣接するノードの情報を link_array に入れる．
+    vector<vector<ymuint> > link_array(node_num);
+    for (ymuint i = 0; i < graph.edge_num(); ++ i) {
+      pair<ymuint, ymuint> p = graph.edge(i);
+      ymuint id1 = p.first;
+      ymuint id2 = p.second;
+      link_array[id1].push_back(id2);
+      link_array[id2].push_back(id1);
     }
-    node1->set_adj_link(link_num, adj_link);
+    // link_array の情報を Node に移す．
+    for (ymuint i = 0; i < node_num; ++ i) {
+      Node* node1 = &node_array[i];
+      const vector<ymuint>& link_list = link_array[i];
+      ymuint link_num = link_list.size();
+      void* p = alloc.get_memory(sizeof(Node*) * link_num);
+      Node** adj_link = new (p) Node*[link_num];
+      for (ymuint j = 0; j < link_num; ++ j) {
+	Node* node2 = &node_array[link_list[j]];
+	adj_link[j] = node2;
+      }
+      node1->set_adj_link(link_num, adj_link);
 
-    node_heap.put_node(node1);
-    node_list.push_back(node1);
+      node_heap.put_node(node1);
+      node_list.push_back(node1);
+    }
   }
 
+  // 作業用のフラグ配列
   void* p = alloc.get_memory(sizeof(bool) * node_num);
   bool* tmp_mark = new (p) bool[node_num];
   for (ymuint i = 0; i < node_num; ++ i) {
@@ -116,12 +122,19 @@ max_clique(const Graph& graph,
       Node* node2 = best_node->adj_node(i);
       tmp_mark[node2->id()] = true;
     }
+
     // マークのついていないノードを削除する．
+    // node_list を直接操作するのは面倒なので
+    // 一旦 tmp_list にコピーする．
     vector<Node*> tmp_list;
     tmp_list.reserve(node_list.size());
     for (vector<Node*>::iterator p = node_list.begin();
 	 p != node_list.end(); ++ p) {
-      tmp_list.push_back(*p);
+      Node* node = *p;
+      if ( node != best_node ) {
+	ASSERT_COND( !node->deleted() );
+	tmp_list.push_back(node);
+      }
     }
     node_list.clear();
     for (vector<Node*>::iterator p = tmp_list.begin();
@@ -133,19 +146,19 @@ max_clique(const Graph& graph,
       else {
 	// このノードを削除する．
 	node_heap.delete_node(node);
-	// さらにこのノードに隣接しているノードの mNum を減らす．
-	for (ymuint j = 0; j < node->adj_size(); ++ j) {
-	  Node* node3 = node->adj_node(j);
-	  if ( !node3->deleted() ) {
-	    node3->dec_adj_num();
-	    node_heap.update(node3);
+	// さらにこのノードに隣接しているノードの隣接数を減らす．
+	for (ymuint i = 0; i < node->adj_size(); ++ i) {
+	  Node* node1 = node->adj_node(i);
+	  if ( !node1->deleted() ) {
+	    node1->dec_adj_num();
+	    node_heap.update(node1);
 	  }
 	}
       }
     }
     // マークを消す．
     for (ymuint i = 0; i < best_node->adj_size(); ++ i) {
-      // best_node に隣接しているノードにマークをつける．
+      // best_node に隣接しているノードのマークを消す．
       Node* node2 = best_node->adj_node(i);
       tmp_mark[node2->id()] = false;
     }
