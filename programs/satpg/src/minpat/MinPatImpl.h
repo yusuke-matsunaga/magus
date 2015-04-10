@@ -10,6 +10,7 @@
 
 
 #include "MinPat.h"
+#include "NodeValList.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -53,6 +54,61 @@ public:
       bool simple,
       vector<TestVector*>& tv_list,
       MinPatStats& stats);
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  struct FaultInfo
+  {
+
+    // 検出するパタン番号のリスト
+    vector<ymuint> mPatList;
+
+    NodeValList mSufList;
+
+    NodeValList mPiSufList;
+
+    NodeValList mMaList;
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 支配故障を求める．
+  void
+  get_dom_faults(const vector<TpgFault*>& fault_list,
+		 vector<TpgFault*>& dom_fault_list);
+
+  void
+  analyze_faults(const vector<TpgFault*> fault_list);
+
+  /// @brief 故障間の衝突性を調べる．
+  void
+  analyze_conflict(const vector<TpgFault*>& fault_list,
+		   vector<pair<ymuint, ymuint> >& conf_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 最大ノード番号
+  ymuint mMaxNodeId;
+
+  // 最大故障番号
+  ymuint mMaxFaultId;
+
+  // ノードごとに関係する入力の番号のリストを収める配列
+  vector<vector<ymuint> > mInputListArray;
+
+  // 故障ごとの情報を収める配列
+  vector<FaultInfo> mFaultInfoArray;
 
 };
 
