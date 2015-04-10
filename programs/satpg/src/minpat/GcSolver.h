@@ -76,9 +76,6 @@ private:
     // 故障リスト
     vector<TpgFault*> mFaultList;
 
-    // 故障ごとの十分割当リスト
-    vector<NodeValList> mFaultSufList;
-
     // 十分割当リスト
     NodeValList mSufList;
 
@@ -92,8 +89,7 @@ private:
 
   /// @brief 新しい色を割り当てる．
   void
-  new_color(TpgFault* fault,
-	    vector<ColInfo*>& col_list);
+  new_color(TpgFault* fault);
 
 
 private:
