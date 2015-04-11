@@ -113,6 +113,11 @@ public:
   void
   merge(const NodeValList& src_list);
 
+  /// @brief 差分を計算する．
+  /// @param[in] src_list 差分の対象のリスト
+  void
+  diff(const NodeValList& src_list);
+
   /// @brief 要素数を返す．
   ymuint
   size() const;

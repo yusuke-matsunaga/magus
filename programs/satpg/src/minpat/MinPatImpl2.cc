@@ -209,11 +209,59 @@ MinPatImpl2::run(TpgNetwork& network,
 
   cout << "  fault simulation ends." << endl;
 
+  vector<TpgFault*> f_list2;
+  f_list2.reserve(fault_num);
+  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
+    const TpgNode* node = network.active_node(i);
+    ymuint ni = node->fanin_num();
+    bool has_ncfault = false;
+    for (ymuint j = 0; j < ni; ++ j) {
+      TpgFault* f0 = node->input_fault(0, j);
+      if ( f0 != NULL ) {
+	if ( f0->is_rep() && f0->status() == kFsDetected ) {
+	  f_list2.push_back(f0);
+	}
+	if ( node->nval() == kVal0 && f0->rep_fault()->status() == kFsDetected ) {
+	  has_ncfault = true;
+	}
+      }
+      TpgFault* f1 = node->input_fault(1, j);
+      if ( f1 != NULL ) {
+	if ( f1->is_rep() && f1->status() == kFsDetected ) {
+	  f_list2.push_back(f1);
+	}
+	if ( node->nval() == kVal1 && f1->rep_fault()->status() == kFsDetected ) {
+	  has_ncfault = true;
+	}
+      }
+    }
+    TpgFault* f0 = node->output_fault(0);
+    if ( f0 != NULL && f0->is_rep() && f0->status() == kFsDetected ) {
+      if ( node->noval() != kVal0 || !has_ncfault ) {
+	f_list2.push_back(f0);
+      }
+    }
+    TpgFault* f1 = node->output_fault(1);
+    if ( f1 != NULL && f1->is_rep() && f1->status() == kFsDetected ) {
+      if ( node->noval() != kVal1 || !has_ncfault ) {
+	f_list2.push_back(f1);
+      }
+    }
+  }
+
   vector<TpgFault*> dom_fault_list;
 
-  get_dom_faults(f_list, dom_fault_list);
+#if 0
+  analyze_faults1(f_list2);
 
-  analyze_faults(dom_fault_list);
+  get_dom_faults2(f_list2, dom_fault_list);
+
+  analyze_faults2(dom_fault_list);
+#else
+  get_dom_faults1(f_list2, dom_fault_list);
+
+  analyze_faults2(dom_fault_list);
+#endif
 
   analyze_conflict(dom_fault_list);
 
@@ -265,8 +313,8 @@ MinPatImpl2::run(TpgNetwork& network,
 
 // @brief 支配故障を求める．
 void
-MinPatImpl2::get_dom_faults(const vector<TpgFault*>& fault_list,
-			   vector<TpgFault*>& dom_fault_list)
+MinPatImpl2::get_dom_faults1(const vector<TpgFault*>& fault_list,
+			     vector<TpgFault*>& dom_fault_list)
 {
   StopWatch local_timer;
 
@@ -281,9 +329,6 @@ MinPatImpl2::get_dom_faults(const vector<TpgFault*>& fault_list,
   ymuint fault_num = fault_list.size();
   // シミュレーション結果から故障の支配関係のヒントを作り，
   // SAT で正確に判定する．
-
-  ymuint total_num = fault_num * (fault_num - 1) / 2;
-  ymuint cur_num = 0;
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     TpgFault* f1 = fault_list[i1];
 
@@ -295,12 +340,8 @@ MinPatImpl2::get_dom_faults(const vector<TpgFault*>& fault_list,
     }
 
     const vector<ymuint>& tv_list1 = mFaultInfoArray[f1->id()].pat_list();
-
     for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
       TpgFault* f2 = fault_list[i2];
-
-      ++ cur_num;
-
       if ( dom_flag[f2->id()] ) {
 	continue;
       }
@@ -323,10 +364,6 @@ MinPatImpl2::get_dom_faults(const vector<TpgFault*>& fault_list,
       const vector<ymuint>& tv_list2 = mFaultInfoArray[f2->id()].pat_list();
 
       ymuint stat = check_pat_list(tv_list1, tv_list2);
-
-      cout << "\r                  ";
-      cout << "\r" << i1 << " / " << i2;
-      cout.flush();
 
       if ( (stat & 1U) == 0U ) {
 	// f1 が 0 のときは f2 も 0 だった．
@@ -364,15 +401,137 @@ MinPatImpl2::get_dom_faults(const vector<TpgFault*>& fault_list,
 
   local_timer.stop();
 
-  cout << endl;
   cout << "Total    " << fault_num << " original faults" << endl;
   cout << "Total    " << dom_fault_num << " dominator faults" << endl;
   cout << "Total    " << n_sat1 << " dominance test" << endl;
   cout << "CPU time for dominance test" << local_timer.time() << endl;
 }
 
+// @brief 支配故障を求める．
 void
-MinPatImpl2::analyze_faults(const vector<TpgFault*> fault_list)
+MinPatImpl2::get_dom_faults2(const vector<TpgFault*>& fault_list,
+			     vector<TpgFault*>& dom_fault_list)
+{
+  StopWatch local_timer;
+
+  local_timer.start();
+
+  HashSet<ymuint> input_hash;
+
+  ymuint n_sat1 = 0;
+  ymuint n_sat2 = 0;
+
+  vector<bool> dom_flag(mMaxFaultId, false);
+
+  ymuint fault_num = fault_list.size();
+  // シミュレーション結果から故障の支配関係のヒントを作り，
+  // SAT で正確に判定する．
+
+  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+    TpgFault* f1 = fault_list[i1];
+
+    // input_list1 の要素をハッシュに登録する．
+    const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
+    input_hash.clear();
+    for (ymuint i = 0; i < input_list1.size(); ++ i) {
+      input_hash.add(input_list1[i]);
+    }
+
+#if 0
+    cout << "\r                  ";
+    cout << "\r" << i1 << " / " << fault_num;
+    cout.flush();
+#endif
+
+    FaultInfo& fi1 = mFaultInfoArray[f1->id()];
+
+    const vector<ymuint>& tv_list1 = fi1.pat_list();
+    const NodeValList& suf_list1 = fi1.mSufList;
+    const NodeValList& pi_suf_list1 = fi1.mPiSufList;
+    const NodeValList& ma_list1 = fi1.mMaList;
+
+    TpgCnf1 tpg_cnf1(string(), string(), NULL);
+
+    tpg_cnf1.make_fval_cnf2(f1, mMaxNodeId);
+
+    for (ymuint i2 = 0; i2 < fault_num; ++ i2) {
+      if ( i2 == i1 ) {
+	continue;
+      }
+
+      TpgFault* f2 = fault_list[i2];
+
+      if ( dom_flag[f2->id()] ) {
+	continue;
+      }
+
+      // input_list2 の要素でハッシュに登録されている要素があれば
+      // input_list1 と input_list2 は共通部分を持つ．
+      const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
+      bool intersect = false;
+      for (ymuint i = 0; i < input_list2.size(); ++ i) {
+	if ( input_hash.check(input_list2[i]) ) {
+	  intersect = true;
+	  break;
+	}
+      }
+      if ( !intersect ) {
+	// 共通部分を持たない故障は独立
+	continue;
+      }
+
+      FaultInfo& fi2 = mFaultInfoArray[f2->id()];
+      const vector<ymuint>& tv_list2 = fi2.pat_list();
+      const NodeValList& suf_list2 = fi2.mSufList;
+      const NodeValList& pi_suf_list2 = fi2.mPiSufList;
+      const NodeValList& ma_list2 = fi2.mMaList;
+
+      ymuint stat = check_pat_list(tv_list1, tv_list2);
+
+      if ( (stat & 2U) == 0U ) {
+	// f2 が 0 のときは f1 も 0 だった．
+	if ( tpg_cnf1.check_conflict(ma_list2) ) {
+	  dom_flag[f1->id()] = true;
+	  ++ n_sat2;
+	  break;
+	}
+	if ( false ) {
+	++ n_sat1;
+	TpgCnf2 tpg_cnf(string(), string(), NULL);
+	if ( tpg_cnf.check_dominance(f2, f1, mMaxNodeId) ) {
+	  //cout << f1->str() << " is dominated by " << f2->str() << endl;
+	  dom_flag[f1->id()] = true;
+	  break;
+	}
+	}
+      }
+    }
+  }
+
+  // 支配されていない故障を dom_fault_list に入れる．
+  dom_fault_list.clear();
+  dom_fault_list.reserve(fault_num);
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    TpgFault* f = fault_list[i];
+    if ( !dom_flag[f->id()] ) {
+      dom_fault_list.push_back(f);
+    }
+  }
+
+  ymuint dom_fault_num = dom_fault_list.size();
+
+  local_timer.stop();
+
+  cout << endl;
+  cout << "Total    " << fault_num << " original faults" << endl;
+  cout << "Total    " << dom_fault_num << " dominator faults" << endl;
+  cout << "Total    " << n_sat1 << " dominance test" << endl;
+  cout << "Total    " << n_sat2 << " simple dominance test passwd" << endl;
+  cout << "CPU time for dominance test" << local_timer.time() << endl;
+}
+
+void
+MinPatImpl2::analyze_faults1(const vector<TpgFault*> fault_list)
 {
   StopWatch local_timer;
 
@@ -391,7 +550,52 @@ MinPatImpl2::analyze_faults(const vector<TpgFault*> fault_list)
     NodeValList& pi_suf_list = fault_info.mPiSufList;
     NodeValList& ma_list = fault_info.mMaList;;
 
-    bool stat = tpg_cnf.get_suf_list2(suf_list, pi_suf_list);
+    bool stat = tpg_cnf.get_pi_suf_list(suf_list, pi_suf_list);
+    ASSERT_COND( stat );
+
+    // 必要割当を求める．
+    ymuint n = suf_list.size();
+    for (ymuint i = 0; i < n; ++ i) {
+      NodeVal nv = suf_list[i];
+
+      NodeValList list1;
+      const TpgNode* node = nv.node();
+      bool val = nv.val();
+      list1.add(node, !val);
+      if ( tpg_cnf.check_conflict(list1) ) {
+	ma_list.add(node, val);
+      }
+    }
+    suf_list.clear();
+    pi_suf_list.clear();
+  }
+
+  local_timer.stop();
+
+  cout << "CPU time for fault analysis" << local_timer.time() << endl;
+}
+
+void
+MinPatImpl2::analyze_faults2(const vector<TpgFault*> fault_list)
+{
+  StopWatch local_timer;
+
+  local_timer.start();
+
+  ymuint fnum = fault_list.size();
+  for (ymuint i = 0; i < fnum; ++ i) {
+    TpgFault* fault = fault_list[i];
+    FaultInfo& fault_info = mFaultInfoArray[fault->id()];
+
+    TpgCnf1 tpg_cnf(string(), string(), NULL);
+
+    tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+
+    NodeValList& suf_list = fault_info.mSufList;
+    NodeValList& pi_suf_list = fault_info.mPiSufList;
+    NodeValList& ma_list = fault_info.mMaList;;
+
+    bool stat = tpg_cnf.get_pi_suf_list(suf_list, pi_suf_list);
     ASSERT_COND( stat );
 
     // 必要割当を求める．
@@ -559,7 +763,7 @@ MinPatImpl2::analyze_conflict(const vector<TpgFault*>& fault_list)
 
   cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
   cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
-  cout << "Total    " << setw(6) << n_conf3 << " conflicts (single suf_list)" << endl;
+  cout << "Total    " << setw(6) << n_conf3 << " conflicts (single ma_list)" << endl;
   cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
   cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
   cout << "Total    " << setw(6) << n_int1  << " pi_suf_list intersection check" << endl;

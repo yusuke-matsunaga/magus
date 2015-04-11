@@ -1015,6 +1015,23 @@ TpgNetwork::make_prim_node(tTgGateType type,
     break;
   }
 
+  switch ( type ) {
+  case kTgGateAnd:
+  case kTgGateNor:
+    node->mCOval = kVal0;
+    node->mNOval = kVal1;
+    break;
+
+  case kTgGateOr:
+  case kTgGateNand:
+    node->mCOval = kVal1;
+    node->mNOval = kVal0;
+    break;
+
+  default:
+    break;
+  }
+
   return node;
 }
 
@@ -1030,6 +1047,8 @@ TpgNetwork::init_node(TpgNode* node,
 
   node->mCval = kValX;
   node->mNval = kValX;
+  node->mCOval = kValX;
+  node->mNOval = kValX;
 
   node->mFaninNum = ni;
   if ( ni > 0 ) {

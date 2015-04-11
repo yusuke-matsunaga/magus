@@ -365,6 +365,83 @@ TpgCnf1::make_fval_cnf(TpgFault* fault,
   }
 }
 
+// @brief 正常回路と故障回路のCNFを作る．
+// @param[in] fault 故障
+// @param[in] max_id ノードの最大番号
+void
+TpgCnf1::make_fval_cnf2(TpgFault* fault,
+			ymuint max_id)
+{
+  mFault = fault;
+
+  mMaxId = max_id;
+
+  mNodeMark.clear();
+  mNodeMark.resize(max_id, false);
+
+  mGvarMap.init(max_id);
+  mFvarMap.init(max_id);
+  mDvarMap.init(max_id);
+
+  TpgNode* fnode = fault->node();
+
+  mNodeSet.mark_region(max_id, fnode);
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < mNodeSet.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
+    VarId gvar = mEngine.new_var();
+    mGvarMap.set_vid(node, gvar);
+    mFvarMap.set_vid(node, gvar);
+    mNodeMark[node->id()] = true;
+  }
+  for (ymuint i = 0; i < mNodeSet.tfo_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
+    VarId fvar = mEngine.new_var();
+    VarId dvar = mEngine.new_var();
+    mFvarMap.set_vid(node, fvar);
+    mDvarMap.set_vid(node, dvar);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < mNodeSet.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
+    mEngine.make_node_cnf(node, mGvarMap);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < mNodeSet.tfo_size(); ++ i) {
+    const TpgNode* node = mNodeSet.tfo_tfi_node(i);
+
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      mEngine.make_fault_cnf(fault, mGvarMap, mFvarMap);
+    }
+    else {
+      mEngine.make_node_cnf(node, mFvarMap);
+    }
+
+    // D-Chain 制約を作る．
+    mEngine.make_dchain_cnf(node, mGvarMap, mFvarMap, mDvarMap);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障を検出しない条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = mNodeSet.output_list().size();
+  for (ymuint i = 0; i < npo; ++ i) {
+    const TpgNode* node = mNodeSet.output_list()[i];
+    Literal dlit(mDvarMap(node), false);
+    mEngine.add_clause(~dlit);
+  }
+}
+
 // @brief 故障回路のCNFのもとで割当が両立するか調べる．
 // @param[in] list 割当リスト
 bool
@@ -436,8 +513,8 @@ TpgCnf1::get_suf_list(const NodeValList& src_list,
 // @param[out] suf_list 十分割当
 // @param[out] pi_suf_list 外部入力のみの十分割当
 bool
-TpgCnf1::get_suf_list2(NodeValList& suf_list,
-		       NodeValList& pi_suf_list)
+TpgCnf1::get_pi_suf_list(NodeValList& suf_list,
+			 NodeValList& pi_suf_list)
 {
   mEngine.assumption_begin();
 

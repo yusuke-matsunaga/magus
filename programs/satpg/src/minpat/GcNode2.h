@@ -103,6 +103,18 @@ public:
   void
   clear_cnf();
 
+  /// @brief 両立性のチェックの要求を記録する．
+  void
+  reg_check(ymuint col_id);
+
+  /// @brief ペンディングしているチェック要求の数を返す．
+  ymuint
+  pending_num();
+
+  /// @brief ペンディングしているチェック要求を1つ取り出す．
+  ymuint
+  get_check();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -131,7 +143,14 @@ private:
   // 十分割り当てリストの配列
   vector<NodeValList> mSufListArray;
 
+  // チェック用のCNF式
   TpgCnf1* mTpgCnf;
+
+  // チェックをペンディングしているグループを表すフラグ配列
+  vector<bool> mPendingArray;
+
+  // ペンディングしているグループ数
+  ymuint mPendingNum;
 
 };
 
@@ -260,6 +279,44 @@ void
 GcNode2::clear_cnf()
 {
   delete mTpgCnf;
+}
+
+// @brief 両立性のチェックの要求を記録する．
+inline
+void
+GcNode2::reg_check(ymuint col_id)
+{
+  while ( mPendingArray.size() <= col_id ) {
+    mPendingArray.push_back(false);
+  }
+  if ( !mPendingArray[col_id] ) {
+    mPendingArray[col_id] = true;
+    ++ mPendingNum;
+  }
+}
+
+// @brief ペンディングしているチェック要求の数を返す．
+inline
+ymuint
+GcNode2::pending_num()
+{
+  return mPendingNum;
+}
+
+// @brief ペンディングしているチェック要求を1つ取り出す．
+inline
+ymuint
+GcNode2::get_check()
+{
+  for (ymuint i = 0; i < mPendingArray.size(); ++ i) {
+    if ( mPendingArray[i] ) {
+      mPendingArray[i] = false;
+      -- mPendingNum;
+      return i;
+    }
+  }
+  ASSERT_NOT_REACHED;
+  return 0;
 }
 
 END_NAMESPACE_YM_SATPG

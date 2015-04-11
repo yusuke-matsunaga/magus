@@ -21,6 +21,7 @@ BEGIN_NAMESPACE_YM_SATPG
 ymuint n_int;
 ymuint n_conf;
 ymuint n_compat;
+ymuint n_triv;
 
 extern
 void
@@ -86,6 +87,7 @@ GcSolver2::coloring(const vector<TpgFault*>& fault_list,
   n_int = 0;
   n_conf = 0;
   n_compat = 0;
+  n_triv = 0;
 
   // min_node と衝突する故障を探す．
   TpgFault* fault0 = min_node->fault();
@@ -96,15 +98,15 @@ GcSolver2::coloring(const vector<TpgFault*>& fault_list,
     }
     ++ n_compat;
     check_compat(mColList[c0 - 1], node, fault_info_array, input_list_array);
-    node_heap.put_node(node);
+    //node_heap.put_node(node);
   }
 
-
+#if 0
   // 2: saturation degree が最大の未彩色ノードを選び最小の色番号で彩色する．
   while ( !node_heap.empty() ) {
     GcNode2* max_node = node_heap.get_min();
     cout << "\r                       ";
-    cout << "\r   " << node_heap.size();
+    cout << "\r   " << node_heap.size() << " | " << mColList.size();
     cout.flush();
 
     // max_node につけることのできる最小の色番号を求める．
@@ -162,15 +164,118 @@ GcSolver2::coloring(const vector<TpgFault*>& fault_list,
 	}
       }
     }
-    cout << " ==> " << min_col;
-    cout.flush();
   }
+#else
+  ymuint remain = fault_num - 1;
+  for ( ; ; ) {
+    GcNode2* max_node = NULL;
+    ymuint max_sat = 0;
+    ymuint max_sat2 = 0;
+    for (ymuint i = 0; i < fault_num; ++ i) {
+      GcNode2* node = &node_array[i];
+      if ( node->color() > 0 ) {
+	continue;
+      }
+      ymuint sat = node->sat_degree();
+      ymuint pnum = node->pending_num();
+      ymuint sat2 = sat + pnum;
+      if ( max_node == NULL || max_sat2 < sat2 ||
+	   (max_sat2 == sat2 && max_sat < sat) ) {
+	max_sat = sat;
+	max_sat2 = sat2;
+	max_node = node;
+      }
+    }
+    if ( max_node == NULL ) {
+      break;
+    }
+
+    if ( max_sat < max_sat2 ) {
+      // ペンディング要求がある．
+      ASSERT_COND( max_node->pending_num() > 0 );
+      while ( max_node->pending_num() > 0 ) {
+	ymuint cid = max_node->get_check();
+	if ( _check_compat(mColList[cid], max_node) ) {
+	  if ( max_node->suf_list(cid).size() == 0 ) {
+	    // 他の故障に影響を与えない．
+	    max_node->set_color(cid + 1);
+	    ++ n_triv;
+	    break;
+	  }
+	}
+      }
+      continue;
+    }
+
+    -- remain;
+    cout << "\r                       ";
+    cout << "\r   " << remain << " | " << mColList.size();
+    cout.flush();
+
+    // max_node につけることのできる最小の色番号を求める．
+    ymuint min_col = 0;
+    for (ymuint c = 0; c < mColList.size(); ++ c) {
+      if ( !max_node->check_adj_color(c) ) {
+	min_col = c + 1;
+	break;
+      }
+    }
+    TpgFault* f1 = max_node->fault();
+    if ( min_col == 0 ) {
+      // 新しい色を割り当てる．
+      min_col = new_color(f1);
+      max_node->set_color(min_col);
+      for (ymuint i = 0; i < fault_num; ++ i) {
+	GcNode2* node = &node_array[i];
+	if ( node->color() > 0 ) {
+	  continue;
+	}
+	++ n_compat;
+	if ( !check_compat(mColList[min_col - 1], node, fault_info_array, input_list_array) ) {
+	  //node_heap.update(node);
+	}
+      }
+    }
+    else {
+      ColInfo* cip0 = mColList[min_col - 1];
+      cip0->mFaultList.push_back(f1);
+      const NodeValList& suf_list = max_node->suf_list(min_col - 1);
+      if ( suf_list.size() == 0 ) {
+	TpgCnf1& tpg_cnf = max_node->tpg_cnf(mMaxId);
+	const NodeValList& suf_list0 = cip0->mSufList;
+	NodeValList suf_list;
+	bool stat = tpg_cnf.get_suf_list(suf_list0, suf_list);
+	ASSERT_COND( stat );
+	cip0->mSufList.merge(suf_list);
+      }
+      else {
+	cip0->mSufList.merge(suf_list);
+      }
+      max_node->set_color(min_col);
+      max_node->clear_cnf();
+
+      vector<GcNode2*> tmp_compat_list = cip0->mCompatList;
+      cip0->mCompatList.clear();
+      for (ymuint i = 0; i < tmp_compat_list.size(); ++ i) {
+	GcNode2* node = tmp_compat_list[i];
+	if ( node->color() > 0 ) {
+	  continue;
+	}
+	++ n_compat;
+	if ( !check_compat(cip0, node, fault_info_array, input_list_array) ) {
+	  //node_heap.update(node);
+	}
+      }
+    }
+  }
+#endif
 
   cout << endl;
   cout << " # of compat check: " << n_compat << endl;
   cout << " # of structual independent: " << n_int << endl;
   cout << " # of conflict test: " << n_conf << endl;
   cout << " # of compatible case: " << n_compat << endl;
+  cout << " # of trivial case: " << n_triv << endl;
 
   if ( false ) { // 検証
     for (ymuint i = 0; i < mColList.size(); ++ i) {
@@ -284,12 +389,39 @@ GcSolver2::check_compat(ColInfo* cip,
     }
   }
 
+  node->reg_check(cip->mColId);
+  return true;
+#if 0
   TpgCnf1& tpg_cnf = node->tpg_cnf(mMaxId);
 
   const NodeValList& suf_list0 = cip->mSufList;
   NodeValList suf_list;
   if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
     cip->mCompatList.push_back(node);
+    node->set_suf_list(cip->mColId, suf_list);
+    ++ n_compat;
+    return true;
+  }
+  else {
+    node->add_adj_color(cip->mColId);
+    return false;
+  }
+#endif
+}
+
+
+// @brief 両立チェックの本体
+bool
+GcSolver2::_check_compat(ColInfo* cip,
+			 GcNode2* node)
+{
+  TpgCnf1& tpg_cnf = node->tpg_cnf(mMaxId);
+
+  const NodeValList& suf_list0 = cip->mSufList;
+  NodeValList suf_list;
+  if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
+    cip->mCompatList.push_back(node);
+    suf_list.diff(suf_list0);
     node->set_suf_list(cip->mColId, suf_list);
     ++ n_compat;
     return true;
@@ -311,6 +443,7 @@ GcNode2::GcNode2()
   mSatDegree = 0;
   mColor = 0;
   mTpgCnf = NULL;
+  mPendingNum = 0;
 }
 
 // @brief デストラクタ

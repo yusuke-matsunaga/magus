@@ -382,7 +382,7 @@ MinPatImpl::analyze_faults(const vector<TpgFault*> fault_list)
     NodeValList& pi_suf_list = fault_info.mPiSufList;
     NodeValList& ma_list = fault_info.mMaList;;
 
-    bool stat = tpg_cnf.get_suf_list2(suf_list, pi_suf_list);
+    bool stat = tpg_cnf.get_pi_suf_list(suf_list, pi_suf_list);
     ASSERT_COND( stat );
 
     // 必要割当を求める．

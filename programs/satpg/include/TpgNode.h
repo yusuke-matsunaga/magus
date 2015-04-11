@@ -103,6 +103,16 @@ public:
   Val3
   nval() const;
 
+  /// @brief controling output value を得る．
+  /// @note ない場合は kValX を返す．
+  Val3
+  coval() const;
+
+  /// @brief noncontroling output value を得る．
+  /// @note ない場合は kValX を返す．
+  Val3
+  noval() const;
+
   /// @brief 値のノードの時 true を返す．
   ///
   /// is_logic() が true の時のみ意味を持つ．
@@ -382,6 +392,12 @@ private:
 
   // noncontroling value
   Val3 mNval;
+
+  // controling output value
+  Val3 mCOval;
+
+  // noncontroling output value
+  Val3 mNOval;
 
 };
 
@@ -814,6 +830,24 @@ Val3
 TpgNode::nval() const
 {
   return mNval;
+}
+
+// @brief controling output value を得る．
+// @note ない場合は kValX を返す．
+inline
+Val3
+TpgNode::coval() const
+{
+  return mCOval;
+}
+
+// @brief noncontroling output value を得る．
+// @note ない場合は kValX を返す．
+inline
+Val3
+TpgNode::noval() const
+{
+  return mNOval;
 }
 
 END_NAMESPACE_YM_SATPG

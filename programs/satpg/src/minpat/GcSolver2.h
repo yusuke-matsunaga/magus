@@ -96,6 +96,11 @@ private:
 	       const vector<FaultInfo>& fault_info_array,
 	       const vector<vector<ymuint> >& input_list_array);
 
+  /// @brief 両立チェックの本体
+  bool
+  _check_compat(ColInfo* cip,
+		GcNode2* node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

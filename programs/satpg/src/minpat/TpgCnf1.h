@@ -50,6 +50,13 @@ public:
   make_fval_cnf(TpgFault* fault,
 		ymuint max_id);
 
+  /// @brief 正常回路と故障回路のCNFを作る．
+  /// @param[in] fault 故障
+  /// @param[in] max_id ノードの最大番号
+  void
+  make_fval_cnf2(TpgFault* fault,
+		 ymuint max_id);
+
   /// @brief 故障回路のCNFのもとで割当が両立するか調べる．
   /// @param[in] list 割当リスト
   bool
@@ -71,8 +78,8 @@ public:
   /// @param[out] suf_list 十分割当
   /// @param[out] pi_suf_list 外部入力のみの十分割当
   bool
-  get_suf_list2(NodeValList& suf_list,
-		NodeValList& pi_suf_list);
+  get_pi_suf_list(NodeValList& suf_list,
+		  NodeValList& pi_suf_list);
 
 
 private:

@@ -55,6 +55,40 @@ NodeValList::merge(const NodeValList& src_list)
   mAsList = tmp_list;
 }
 
+// @brief 差分を計算する．
+// @param[in] src_list 差分の対象のリスト
+void
+NodeValList::diff(const NodeValList& src_list)
+{
+  vector<NodeVal> tmp_list;
+  ymuint n1 = mAsList.size();
+  ymuint n2 = src_list.mAsList.size();
+  tmp_list.reserve(n1);
+  ymuint i1 = 0;
+  ymuint i2 = 0;
+  while ( i1 < n1 && i2 < n2 ) {
+    NodeVal v1 = mAsList[i1];
+    NodeVal v2 = src_list.mAsList[i2];
+    if ( v1 < v2 ) {
+      tmp_list.push_back(v1);
+      ++ i1;
+    }
+    else if ( v1 > v2 ) {
+      ++ i2;
+    }
+    else {
+      ++ i1;
+      ++ i2;
+    }
+  }
+  for ( ; i1 < n1; ++ i1) {
+    NodeVal v1 = mAsList[i1];
+    tmp_list.push_back(v1);
+  }
+
+  mAsList = tmp_list;
+}
+
 // @brief 2つの割当リストが矛盾しているか調べる．
 bool
 check_conflict(const NodeValList& src_list1,
