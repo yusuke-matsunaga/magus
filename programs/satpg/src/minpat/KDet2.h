@@ -11,6 +11,7 @@
 
 #include "satpg_nsdef.h"
 #include "KDet2Op.h"
+#include "FaultInfo.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -40,10 +41,10 @@ public:
 
   /// @brief 各故障に対して k 回検出するまでは故障シミュレーションを行う．
   /// @param[in] pat_list パタンのリスト
-  /// @param[in] det_list_array 各パタンが検出する故障番号のリストの配列
+  /// @param[in] fault_info_array 故障ごとの情報を収める配列
   void
   run(const vector<TestVector*>& pat_list,
-      vector<vector<ymuint> >& pat_list_array);
+      vector<FaultInfo>& fault_info_array);
 
 
 private:

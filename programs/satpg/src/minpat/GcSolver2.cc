@@ -8,13 +8,19 @@
 
 
 #include "GcSolver2.h"
-#include "GcNode.h"
-#include "GcNodeHeap.h"
+#include "GcNode2.h"
+#include "GcNodeHeap2.h"
 #include "TpgFault.h"
 #include "TpgCnf1.h"
+#include "TpgCnf2.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
+
+ymuint n_int;
+ymuint n_conf;
+ymuint n_compat;
 
 extern
 void
@@ -22,60 +28,14 @@ verify_suf_list(TpgFault* fault,
 		ymuint max_id,
 		const NodeValList& suf_list);
 
-BEGIN_NONAMESPACE
-
-// @brief ノードに彩色して情報を更新する．
-void
-color_node(GcNode* node,
-	   ymuint color,
-	   GcNodeHeap& node_heap)
-{
-  // node に color の色を割り当てる．
-  node->set_color(color);
-
-  // node に隣接するノードの SAT degree を更新する．
-  const vector<GcNode*>& node_list = node->link_list();
-  for (vector<GcNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    GcNode* node1 = *p;
-    if ( node1->color() == 0 ) {
-      // node1 が未着色の場合
-      if ( !node1->check_adj_color(color) ) {
-	// node1 にとって color は新規の隣り合う色だった．
-	node1->add_adj_color(color);
-
-	// SAT degree が変わったのでヒープ上の位置も更新する．
-	node_heap.update(node1);
-      }
-    }
-  }
-}
-
-struct ColLt
-{
-  bool
-  operator()(const pair<ymuint, ymuint>& left,
-	     const pair<ymuint, ymuint>& right)
-  {
-    return left.first < right.first;
-  }
-};
-
-END_NONAMESPACE
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス GcSolver2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] fault_list 故障リスト
-// @param[in] max_id ノード番号の最大値
-GcSolver2::GcSolver2(const vector<TpgFault*>& fault_list,
-		     ymuint max_id) :
-  mFaultList(fault_list)
+GcSolver2::GcSolver2()
 {
-  mMaxId = max_id;
 }
 
 // @brief デストラクタ
@@ -86,188 +46,147 @@ GcSolver2::~GcSolver2()
   }
 }
 
-// @brief 枝を追加する．
-// @param[in] id1, id2 ノード番号 ( 0 <= id1, id2 < node_num() )
-void
-GcSolver2::connect(ymuint id1,
-		   ymuint id2)
-{
-  ASSERT_COND( id1 < mFaultList.size() );
-  ASSERT_COND( id2 < mFaultList.size() );
-  mEdgeList.push_back(make_pair(id1, id2));
-}
-
 // @brief 彩色する．
 // @return 彩色数を返す．
 ymuint
-GcSolver2::coloring()
+GcSolver2::coloring(const vector<TpgFault*>& fault_list,
+		    const vector<FaultInfo>& fault_info_array,
+		    const vector<vector<ymuint> >& input_list_array,
+		    ymuint max_node_id)
 {
-  RandGen rg;
-  ymuint min_col = mFaultList.size();
-  for (ymuint i = 0; i < 50; ++ i) {
-    vector<ColInfo*> col_list;
-    int nc = coloring1(rg, mFaultList, col_list);
-    cout << "# of colors = " << nc << endl;
-    if ( min_col > nc ) {
-#if 0
-      for (ymuint j = 0; j < mColList.size(); ++ j) {
-	delete [] mColList[j];
-      }
-#endif
-      min_col = nc;
-      mColList = col_list;
-    }
-  }
-  return mColList.size();
-}
-
-// @brief 彩色する．
-// @return 彩色数を返す．
-ymuint
-GcSolver2::coloring1(RandGen& rg,
-		     const vector<TpgFault*>& fault_list,
-		     vector<ColInfo*>& col_list)
-{
+  mMaxId = max_node_id;
   ymuint fault_num = fault_list.size();
   ymuint vectlen = (fault_num + 63) / 64;
-  GcNode* node_array = new GcNode[fault_num];
+  GcNode2* node_array = new GcNode2[fault_num];
   for (ymuint i = 0; i < fault_num; ++ i) {
-    GcNode* node = &node_array[i];
-    node->init(i, fault_list[i], vectlen);
-  }
-  for (ymuint i = 0; i < mEdgeList.size(); ++ i) {
-    ymuint id1 = mEdgeList[i].first;
-    ymuint id2 = mEdgeList[i].second;
-    GcNode* node1 = &node_array[id1];
-    GcNode* node2 = &node_array[id2];
-    nsYm::nsSatpg::connect(node1, node2);
+    GcNode2* node = &node_array[i];
+    TpgFault* fault = fault_list[i];
+    node->init(i, fault, vectlen);
   }
 
   // dsatur アルゴリズムを用いる．
-
-  GcNodeHeap node_heap(fault_num);
-
+  // 最初は同時検出故障数の少ない故障を選ぶ．
+  GcNode2* min_node = NULL;
+  ymuint min_count = 0;
   for (ymuint i = 0; i < fault_num; ++ i) {
-    GcNode* node = &node_array[i];
+    GcNode2* node = &node_array[i];
+    ymuint fnum = fault_info_array[node->fault()->id()].fnum();
+    if ( min_count == 0 || min_count > fnum ) {
+      min_count = fnum;
+      min_node = node;
+    }
+  }
+
+  ymuint c0 = new_color(min_node->fault());
+  min_node->set_color(c0);
+
+  GcNodeHeap2 node_heap(fault_num);
+
+  ymuint n_compat = 0;
+  n_int = 0;
+  n_conf = 0;
+  n_compat = 0;
+
+  // min_node と衝突する故障を探す．
+  TpgFault* fault0 = min_node->fault();
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    GcNode2* node = &node_array[i];
+    if ( node == min_node ) {
+      continue;
+    }
+    ++ n_compat;
+    check_compat(mColList[c0 - 1], node, fault_info_array, input_list_array);
     node_heap.put_node(node);
   }
 
-  // 1: 隣接するノード数が最大のノードを選び彩色する．
-  //    ソートしているので先頭のノードを選べば良い．
-  GcNode* max_node = node_heap.get_min();
-  new_color(max_node->fault(), col_list);
-  color_node(max_node, col_list.size(), node_heap);
 
   // 2: saturation degree が最大の未彩色ノードを選び最小の色番号で彩色する．
   while ( !node_heap.empty() ) {
-    GcNode* max_node = node_heap.get_min();
-
-    const vector<GcNode*>& node_list = max_node->link_list();
-
-    // max_node に隣接しているノードで未彩色のノードを free_list に入れる．
-    vector<GcNode*> free_list;
-    free_list.reserve(node_list.size());
-    for (vector<GcNode*>::const_iterator p = node_list.begin();
-	 p != node_list.end(); ++ p) {
-      GcNode* node1 = *p;
-      ymuint c = node1->color();
-      if ( c == 0 ) {
-	free_list.push_back(node1);
-      }
-    }
-
-    // max_node に隣接しているノードに付いていない色を color_list に入れる．
-    vector<pair<ymuint, ymuint> > color_list;
-    color_list.reserve(col_list.size());
-    for (ymuint c = 1; c <= col_list.size(); ++ c) {
-      if ( max_node->check_adj_color(c) ) {
-	continue;
-      }
-      ymuint n = 0;
-      for (vector<GcNode*>::const_iterator q = free_list.begin();
-	   q != free_list.end(); ++ q) {
-	GcNode* node1 = *q;
-	if ( !node1->check_adj_color(c) ) {
-	  ++ n;
-	}
-      }
-      color_list.push_back(make_pair(c, n));
-    }
-
-    TpgFault* fault = max_node->fault();
+    GcNode2* max_node = node_heap.get_min();
+    cout << "\r                       ";
+    cout << "\r   " << node_heap.size();
+    cout.flush();
 
     // max_node につけることのできる最小の色番号を求める．
     ymuint min_col = 0;
-    if ( color_list.empty() ) {
+    for (ymuint c = 0; c < mColList.size(); ++ c) {
+      if ( !max_node->check_adj_color(c) ) {
+	min_col = c + 1;
+	break;
+      }
+    }
+    TpgFault* f1 = max_node->fault();
+    if ( min_col == 0 ) {
       // 新しい色を割り当てる．
-      new_color(fault, col_list);
-      min_col = col_list.size();
+      min_col = new_color(f1);
+      max_node->set_color(min_col);
+      for (ymuint i = 0; i < fault_num; ++ i) {
+	GcNode2* node = &node_array[i];
+	if ( node->color() > 0 ) {
+	  continue;
+	}
+	++ n_compat;
+	if ( !check_compat(mColList[min_col - 1], node, fault_info_array, input_list_array) ) {
+	  node_heap.update(node);
+	}
+      }
     }
     else {
-      TpgCnf1 tpg_cnf(string(), string(), NULL);
-      tpg_cnf.make_fval_cnf(max_node->fault(), mMaxId);
-
-      for (ymuint nc = color_list.size(); nc > 0; ) {
-	ymuint pos = rg.int32() % nc;
-	ymuint col = color_list[pos].first;
-	if ( pos < nc - 1 ) {
-	  color_list[pos] = color_list[nc - 1];
-	}
-	-- nc;
-	const NodeValList& suf_list0 = col_list[col - 1]->mSufList;
+      ColInfo* cip0 = mColList[min_col - 1];
+      cip0->mFaultList.push_back(f1);
+      const NodeValList& suf_list = max_node->suf_list(min_col - 1);
+      if ( suf_list.size() == 0 ) {
+	TpgCnf1& tpg_cnf = max_node->tpg_cnf(mMaxId);
+	const NodeValList& suf_list0 = cip0->mSufList;
 	NodeValList suf_list;
-	if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
-	  ColInfo* cip = col_list[col - 1];
-	  cip->mFaultList.push_back(max_node->fault());
-	  cip->mFaultSufList.push_back(suf_list);
-	  cip->mSufList.merge(suf_list);
-	  min_col = col;
-	  break;
-	}
+	bool stat = tpg_cnf.get_suf_list(suf_list0, suf_list);
+	ASSERT_COND( stat );
+	cip0->mSufList.merge(suf_list);
       }
+      else {
+	cip0->mSufList.merge(suf_list);
+      }
+      max_node->set_color(min_col);
+      max_node->clear_cnf();
 
-      if ( min_col == 0 ) {
-	// 新しい色を割り当てる．
-	new_color(fault, col_list);
-	min_col = col_list.size();
+      vector<GcNode2*> tmp_compat_list = cip0->mCompatList;
+      cip0->mCompatList.clear();
+      for (ymuint i = 0; i < tmp_compat_list.size(); ++ i) {
+	GcNode2* node = tmp_compat_list[i];
+	if ( node->color() > 0 ) {
+	  continue;
+	}
+	++ n_compat;
+	if ( !check_compat(cip0, node, fault_info_array, input_list_array) ) {
+	  node_heap.update(node);
+	}
       }
     }
-
-    color_node(max_node, min_col, node_heap);
+    cout << " ==> " << min_col;
+    cout.flush();
   }
+
+  cout << endl;
+  cout << " # of compat check: " << n_compat << endl;
+  cout << " # of structual independent: " << n_int << endl;
+  cout << " # of conflict test: " << n_conf << endl;
+  cout << " # of compatible case: " << n_compat << endl;
 
   if ( false ) { // 検証
-    for (ymuint i = 0; i < col_list.size(); ++ i) {
-      ColInfo* cip = col_list[i];
+    for (ymuint i = 0; i < mColList.size(); ++ i) {
+      ColInfo* cip = mColList[i];
+      cout << "Color Group#" << cip->mColId << endl;
       for (ymuint j = 0; j < cip->mFaultList.size(); ++ j) {
 	TpgFault* f = cip->mFaultList[j];
+	cout << "   " << f->str() << endl;
 	verify_suf_list(f, mMaxId, cip->mSufList);
-      }
-    }
-  }
-  // 検証
-  // もちろん最小色数ではないが，同じ色が隣接していないことを確認する．
-  // また，未彩色のノードがないことも確認する．
-  // 違反が見つかったら例外を送出する．
-  if ( true ) {
-    for (ymuint i = 0; i < fault_num; ++ i) {
-      GcNode* node = &node_array[i];
-      ymuint c0 = node->color();
-      ASSERT_COND( c0 > 0 );
-
-      const vector<GcNode*>& node_list = node->link_list();
-      for (vector<GcNode*>::const_iterator p = node_list.begin();
-	   p != node_list.end(); ++ p) {
-	GcNode* node1 = *p;
-	ymuint c1 = node1->color();
-	ASSERT_COND( c0 != c1 );
       }
     }
   }
 
   delete [] node_array;
 
-  return col_list.size();
+  return mColList.size();
 }
 
 // @brief 故障リストを返す．
@@ -289,23 +208,129 @@ GcSolver2::suf_list(ymuint col) const
 }
 
 // @brief 新しい色を割り当てる．
-void
-GcSolver2::new_color(TpgFault* fault,
-		     vector<ColInfo*>& col_list)
+ymuint
+GcSolver2::new_color(TpgFault* fault)
 {
   TpgCnf1 tpg_cnf(string(), string(), NULL);
 
   tpg_cnf.make_fval_cnf(fault, mMaxId);
 
   ColInfo* cip = new ColInfo;
-  cip->mColId = col_list.size();
+  cip->mColId = mColList.size();
   cip->mFaultList.push_back(fault);
   NodeValList suf_list;
   bool stat = tpg_cnf.get_suf_list(NodeValList(), suf_list);
   ASSERT_COND( stat );
-  cip->mFaultSufList.push_back(suf_list);
   cip->mSufList = suf_list;
-  col_list.push_back(cip);
+  mColList.push_back(cip);
+  return cip->mColId + 1;
+}
+
+// @brief 故障が両立するか調べる．
+bool
+GcSolver2::check_compat(ColInfo* cip,
+			GcNode2* node,
+			const vector<FaultInfo>& fault_info_array,
+			const vector<vector<ymuint> >& input_list_array)
+{
+  if ( true ) {
+    HashSet<ymuint> input_hash;
+    TpgNode* node1 = node->fault()->node();
+    const vector<ymuint>& input_list1 = input_list_array[node1->id()];
+    for (ymuint i = 0; i < input_list1.size(); ++ i) {
+      input_hash.add(input_list1[i]);
+    }
+    bool intersect = false;
+    for (ymuint i = 0; i < cip->mFaultList.size(); ++i) {
+      TpgFault* f = cip->mFaultList[i];
+      TpgNode* node2 = f->node();
+      const vector<ymuint>& input_list2 = input_list_array[node2->id()];
+      for (ymuint j = 0; j < input_list2.size(); ++ j) {
+	if ( input_hash.check(input_list2[j]) ) {
+	  intersect = true;
+	  break;
+	}
+      }
+    }
+    if ( !intersect ) {
+      // 構造的に独立なので両立する．
+      cip->mCompatList.push_back(node);
+      node->set_suf_list(cip->mColId, NodeValList());
+      ++ n_int;
+      return true;
+    }
+  }
+  TpgFault* fault1 = node->fault();
+
+  if ( true ) {
+    const FaultInfo& fi1 = fault_info_array[fault1->id()];
+
+    HashSet<ymuint> conf_hash;
+    for (ymuint i = 0; i < cip->mFaultList.size(); ++ i) {
+      TpgFault* fault2 = cip->mFaultList[i];
+      conf_hash.add(fault2->id());
+    }
+    bool conflict = false;
+    for (ymuint i = 0; i < fi1.mConflictList.size(); ++ i) {
+      if ( conf_hash.check(fi1.mConflictList[i]) ) {
+	conflict = true;
+	break;
+      }
+    }
+    if ( conflict ) {
+      node->add_adj_color(cip->mColId);
+      ++ n_conf;
+      return false;
+    }
+  }
+
+  TpgCnf1& tpg_cnf = node->tpg_cnf(mMaxId);
+
+  const NodeValList& suf_list0 = cip->mSufList;
+  NodeValList suf_list;
+  if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
+    cip->mCompatList.push_back(node);
+    node->set_suf_list(cip->mColId, suf_list);
+    ++ n_compat;
+    return true;
+  }
+  else {
+    node->add_adj_color(cip->mColId);
+    return false;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+// クラス GcNode2
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+GcNode2::GcNode2()
+{
+  mColorSet = NULL;
+  mSatDegree = 0;
+  mColor = 0;
+  mTpgCnf = NULL;
+}
+
+// @brief デストラクタ
+GcNode2::~GcNode2()
+{
+  delete [] mColorSet;
+}
+
+// @brief 初期化する．
+void
+GcNode2::init(ymuint id,
+	      TpgFault* fault,
+	      ymuint vectlen)
+{
+  mId = id;
+  mFault = fault;
+  mColorSet = new ymuint64[vectlen];
+  for (ymuint i = 0; i < vectlen; ++ i) {
+    mColorSet[i] = 0UL;
+  }
 }
 
 END_NAMESPACE_YM_SATPG

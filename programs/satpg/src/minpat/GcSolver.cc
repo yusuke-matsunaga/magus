@@ -73,13 +73,8 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] fault_list 故障リスト
-// @param[in] max_id ノード番号の最大値
-GcSolver::GcSolver(const vector<TpgFault*>& fault_list,
-		   ymuint max_id) :
-  mFaultList(fault_list)
+GcSolver::GcSolver()
 {
-  mMaxId = max_id;
 }
 
 // @brief デストラクタ
@@ -90,42 +85,36 @@ GcSolver::~GcSolver()
   }
 }
 
-// @brief 枝を追加する．
-// @param[in] id1, id2 ノード番号 ( 0 <= id1, id2 < node_num() )
-void
-GcSolver::connect(ymuint id1,
-		  ymuint id2)
-{
-  ASSERT_COND( id1 < mFaultList.size() );
-  ASSERT_COND( id2 < mFaultList.size() );
-  mEdgeList.push_back(make_pair(id1, id2));
-}
-
 // @brief 彩色する．
 // @return 彩色数を返す．
 ymuint
-GcSolver::coloring()
+GcSolver::coloring(const vector<TpgFault*>& fault_list,
+		   const vector<FaultInfo>& fault_info_array,
+		   const vector<pair<ymuint, ymuint> >& edge_list,
+		   ymuint max_node_id)
 {
+  mMaxId = max_node_id;
   // データ構造を作る．
   ymuint max_fault_id = 0;
-  ymuint fault_num = mFaultList.size();
+  ymuint fault_num = fault_list.size();
   ymuint vectlen = (fault_num + 63) / 64;
   GcNode* node_array = new GcNode[fault_num];
   for (ymuint i = 0; i < fault_num; ++ i) {
     GcNode* node = &node_array[i];
-    TpgFault* fault = mFaultList[i];
+    TpgFault* fault = fault_list[i];
     node->init(i, fault, vectlen);
     if ( max_fault_id < fault->id() ) {
       max_fault_id = fault->id();
     }
   }
   ++ max_fault_id;
-  for (ymuint i = 0; i < mEdgeList.size(); ++ i) {
-    ymuint id1 = mEdgeList[i].first;
-    ymuint id2 = mEdgeList[i].second;
+
+  for (ymuint i = 0; i < edge_list.size(); ++ i) {
+    ymuint id1 = edge_list[i].first;
+    ymuint id2 = edge_list[i].second;
     GcNode* node1 = &node_array[id1];
     GcNode* node2 = &node_array[id2];
-    nsYm::nsSatpg::connect(node1, node2);
+    connect(node1, node2);
   }
   if ( false ) {
     Graph graph(fault_num);
@@ -146,6 +135,7 @@ GcSolver::coloring()
 #if 1
   // dsatur アルゴリズムを用いる．
 
+#if 0
   GcNodeHeap node_heap(fault_num);
 
   for (ymuint i = 0; i < fault_num; ++ i) {
@@ -158,6 +148,29 @@ GcSolver::coloring()
   GcNode* max_node = node_heap.get_min();
   new_color(max_node->fault());
   color_node(max_node, mColList.size(), node_heap);
+#else
+  GcNode* min_node = NULL;
+  ymuint min_count = 0;
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    GcNode* node = &node_array[i];
+    ymuint fnum = fault_info_array[node->fault()->id()].fnum();
+    if ( min_count == 0 || min_count > fnum ) {
+      min_count = fnum;
+      min_node = node;
+    }
+  }
+
+  GcNodeHeap node_heap(fault_num);
+
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    GcNode* node = &node_array[i];
+    if ( node != min_node ) {
+      node_heap.put_node(node);
+    }
+  }
+  new_color(min_node->fault());
+  color_node(min_node, mColList.size(), node_heap);
+#endif
 
   // 2: saturation degree が最大の未彩色ノードを選び最小の色番号で彩色する．
   while ( !node_heap.empty() ) {

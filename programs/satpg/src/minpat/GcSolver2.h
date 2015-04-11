@@ -11,12 +11,12 @@
 
 #include "satpg_nsdef.h"
 #include "NodeValList.h"
-#include "YmUtils/RandGen.h"
+#include "FaultInfo.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-class GcNode;
+class GcNode2;
 
 //////////////////////////////////////////////////////////////////////
 /// @class GcSolver2 GcSolver2.h "GcSolver2.h"
@@ -27,10 +27,7 @@ class GcSolver2
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fault_list 故障リスト
-  /// @param[in] max_id ノード番号の最大値
-  GcSolver2(const vector<TpgFault*>& fault_list,
-	    ymuint max_id);
+  GcSolver2();
 
   /// @brief デストラクタ
   ~GcSolver2();
@@ -41,16 +38,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 枝を追加する．
-  /// @param[in] id1, id2 故障番号 ( 0 <= id1, id2 < node_num() )
-  void
-  connect(ymuint id1,
-	  ymuint id2);
-
   /// @brief 彩色する．
   /// @return 彩色数を返す．
   ymuint
-  coloring();
+  coloring(const vector<TpgFault*>& fault_list,
+	   const vector<FaultInfo>& fault_info_array,
+	   const vector<vector<ymuint> >& input_list_array,
+	   ymuint max_node_id);
 
   /// @brief 故障リストを返す．
   /// @param[in] col 色番号(1が最初)
@@ -77,8 +71,8 @@ private:
     // 故障リスト
     vector<TpgFault*> mFaultList;
 
-    // 故障ごとの十分割当リスト
-    vector<NodeValList> mFaultSufList;
+    // 両立故障リスト
+    vector<GcNode2*> mCompatList;
 
     // 十分割当リスト
     NodeValList mSufList;
@@ -91,29 +85,22 @@ private:
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 彩色する．
-  /// @return 彩色数を返す．
-  ymuint
-  coloring1(RandGen& rg,
-	    const vector<TpgFault*>& fault_list,
-	    vector<ColInfo*>& col_list);
-
   /// @brief 新しい色を割り当てる．
-  void
-  new_color(TpgFault* fault,
-	    vector<ColInfo*>& col_list);
+  ymuint
+  new_color(TpgFault* fault);
+
+  /// @brief 故障が両立するか調べる．
+  bool
+  check_compat(ColInfo* cip,
+	       GcNode2* node,
+	       const vector<FaultInfo>& fault_info_array,
+	       const vector<vector<ymuint> >& input_list_array);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 故障リスト
-  vector<TpgFault*> mFaultList;
-
-  // 枝のリスト
-  vector<pair<ymuint, ymuint> > mEdgeList;
 
   // TpgNode のノード番号の最大値
   ymuint mMaxId;

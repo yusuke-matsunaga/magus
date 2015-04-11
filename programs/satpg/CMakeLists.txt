@@ -105,10 +105,11 @@ set (minpat_SOURCES
   src/minpat/KDet2Op.cc
   src/minpat/Verifier.cc
   src/minpat/GcNodeHeap.cc
+  src/minpat/GcNodeHeap2.cc
   src/minpat/GcSolver.cc
   src/minpat/GcSolver2.cc
-  src/minpat/GcSolver3.cc
   src/minpat/MinPatImpl.cc
+  src/minpat/MinPatImpl2.cc
   src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
   src/minpat/TpgCnf2.cc

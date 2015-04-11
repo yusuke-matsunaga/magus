@@ -38,7 +38,6 @@ public:
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
-  /// @param[in] simple simple モードの時に true にするフラグ
   /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
@@ -47,7 +46,6 @@ public:
       TvMgr& tvmgr,
       FaultMgr& fmgr,
       Fsim& fsim2,
-      bool simple,
       vector<TestVector*>& tv_list,
       MinPatStats& stats) = 0;
 
@@ -58,6 +56,11 @@ public:
 extern
 MinPat*
 new_MinPat();
+
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_MinPat2();
 
 END_NAMESPACE_YM_SATPG
 

@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "FaultInfo.h"
 #include "NodeValList.h"
 
 
@@ -26,10 +27,7 @@ class GcSolver
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] fault_list 故障リスト
-  /// @param[in] max_id ノード番号の最大値
-  GcSolver(const vector<TpgFault*>& fault_list,
-	   ymuint max_id);
+  GcSolver();
 
   /// @brief デストラクタ
   ~GcSolver();
@@ -40,16 +38,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 枝を追加する．
-  /// @param[in] id1, id2 故障番号 ( 0 <= id1, id2 < node_num() )
-  void
-  connect(ymuint id1,
-	  ymuint id2);
-
   /// @brief 彩色する．
   /// @return 彩色数を返す．
   ymuint
-  coloring();
+  coloring(const vector<TpgFault*>& fault_list,
+	   const vector<FaultInfo>& fault_info_array,
+	   const vector<pair<ymuint, ymuint> >& edge_list,
+	   ymuint max_node_id);
 
   /// @brief 故障リストを返す．
   /// @param[in] col 色番号(1が最初)
