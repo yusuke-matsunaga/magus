@@ -215,7 +215,6 @@ MinPatImpl::run(TpgNetwork& network,
 
   analyze_faults(dom_fault_list);
 
-
   vector<pair<ymuint, ymuint> > edge_list;
   analyze_conflict(dom_fault_list, edge_list);
 
