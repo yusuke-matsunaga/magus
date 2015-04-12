@@ -138,7 +138,8 @@ GcSolver2::coloring(const vector<TpgFault*>& fault_list,
       cip0->mFaultList.push_back(f1);
       const NodeValList& suf_list = max_node->suf_list(min_col - 1);
       if ( suf_list.size() == 0 ) {
-	TpgCnf1& tpg_cnf = max_node->tpg_cnf(mMaxId);
+	TpgCnf1 tpg_cnf(string(), string(), NULL);
+	tpg_cnf.make_fval_cnf(max_node->fault(), mMaxId);
 	const NodeValList& suf_list0 = cip0->mSufList;
 	NodeValList suf_list;
 	bool stat = tpg_cnf.get_suf_list(suf_list0, suf_list);
@@ -193,17 +194,7 @@ GcSolver2::coloring(const vector<TpgFault*>& fault_list,
     if ( max_sat < max_sat2 ) {
       // ペンディング要求がある．
       ASSERT_COND( max_node->pending_num() > 0 );
-      while ( max_node->pending_num() > 0 ) {
-	ymuint cid = max_node->get_check();
-	if ( _check_compat(mColList[cid], max_node) ) {
-	  if ( max_node->suf_list(cid).size() == 0 ) {
-	    // 他の故障に影響を与えない．
-	    max_node->set_color(cid + 1);
-	    ++ n_triv;
-	    break;
-	  }
-	}
-      }
+      _check_compat(max_node);
       continue;
     }
 
@@ -241,7 +232,8 @@ GcSolver2::coloring(const vector<TpgFault*>& fault_list,
       cip0->mFaultList.push_back(f1);
       const NodeValList& suf_list = max_node->suf_list(min_col - 1);
       if ( suf_list.size() == 0 ) {
-	TpgCnf1& tpg_cnf = max_node->tpg_cnf(mMaxId);
+	TpgCnf1 tpg_cnf(string(), string(), NULL);
+	tpg_cnf.make_fval_cnf(max_node->fault(), mMaxId);
 	const NodeValList& suf_list0 = cip0->mSufList;
 	NodeValList suf_list;
 	bool stat = tpg_cnf.get_suf_list(suf_list0, suf_list);
@@ -367,7 +359,7 @@ GcSolver2::check_compat(ColInfo* cip,
   }
   TpgFault* fault1 = node->fault();
 
-  if ( true ) {
+  if ( false ) {
     const FaultInfo& fi1 = fault_info_array[fault1->id()];
 
     HashSet<ymuint> conf_hash;
@@ -391,46 +383,38 @@ GcSolver2::check_compat(ColInfo* cip,
 
   node->reg_check(cip->mColId);
   return true;
-#if 0
-  TpgCnf1& tpg_cnf = node->tpg_cnf(mMaxId);
-
-  const NodeValList& suf_list0 = cip->mSufList;
-  NodeValList suf_list;
-  if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
-    cip->mCompatList.push_back(node);
-    node->set_suf_list(cip->mColId, suf_list);
-    ++ n_compat;
-    return true;
-  }
-  else {
-    node->add_adj_color(cip->mColId);
-    return false;
-  }
-#endif
 }
-
 
 // @brief 両立チェックの本体
-bool
-GcSolver2::_check_compat(ColInfo* cip,
-			 GcNode2* node)
+void
+GcSolver2::_check_compat(GcNode2* node)
 {
-  TpgCnf1& tpg_cnf = node->tpg_cnf(mMaxId);
+  TpgCnf1 tpg_cnf(string(), string(), NULL);
+  tpg_cnf.make_fval_cnf(node->fault(), mMaxId);
 
-  const NodeValList& suf_list0 = cip->mSufList;
-  NodeValList suf_list;
-  if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
-    cip->mCompatList.push_back(node);
-    suf_list.diff(suf_list0);
-    node->set_suf_list(cip->mColId, suf_list);
-    ++ n_compat;
-    return true;
-  }
-  else {
-    node->add_adj_color(cip->mColId);
-    return false;
+  while ( node->pending_num() > 0 ) {
+    ymuint cid = node->get_check();
+    ColInfo* cip = mColList[cid];
+    const NodeValList& suf_list0 = cip->mSufList;
+    NodeValList suf_list;
+    if ( tpg_cnf.get_suf_list(suf_list0, suf_list) ) {
+      cip->mCompatList.push_back(node);
+      suf_list.diff(suf_list0);
+      node->set_suf_list(cip->mColId, suf_list);
+      ++ n_compat;
+      if ( suf_list.size() == 0 ) {
+	// 他の故障に影響を与えない．
+	node->set_color(cid + 1);
+	++ n_triv;
+	break;
+      }
+    }
+    else {
+      node->add_adj_color(cip->mColId);
+    }
   }
 }
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス GcNode2

@@ -93,12 +93,6 @@ public:
   const NodeValList&
   suf_list(ymuint color);
 
-  /// @brief CNFを返す．
-  ///
-  /// なければ作る．
-  TpgCnf1&
-  tpg_cnf(ymuint max_id);
-
   /// @brief CNFを削除する．
   void
   clear_cnf();
@@ -257,20 +251,6 @@ const NodeValList&
 GcNode2::suf_list(ymuint color)
 {
   return mSufListArray[color];
-}
-
-// @brief CNFを返す．
-//
-// なければ作る．
-inline
-TpgCnf1&
-GcNode2::tpg_cnf(ymuint max_id)
-{
-  if ( mTpgCnf == NULL ) {
-    mTpgCnf = new TpgCnf1(string(), string(), NULL);
-    mTpgCnf->make_fval_cnf(mFault, max_id);
-  }
-  return *mTpgCnf;
 }
 
 // @brief CNFを削除する．

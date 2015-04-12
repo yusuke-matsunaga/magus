@@ -291,9 +291,11 @@ MinPatImpl2::run(TpgNetwork& network,
 
   get_dom_faults1(f_list2, dom_fault_list);
 
+#if 0
   analyze_faults2(dom_fault_list);
 
   analyze_conflict(dom_fault_list);
+#endif
 
   local_timer.reset();
   local_timer.start();

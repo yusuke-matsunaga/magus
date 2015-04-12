@@ -97,9 +97,8 @@ private:
 	       const vector<vector<ymuint> >& input_list_array);
 
   /// @brief 両立チェックの本体
-  bool
-  _check_compat(ColInfo* cip,
-		GcNode2* node);
+  void
+  _check_compat(GcNode2* node);
 
 
 private:
