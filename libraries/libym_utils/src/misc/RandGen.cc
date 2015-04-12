@@ -169,6 +169,15 @@ RandGen::int32()
   return y;
 }
 
+// @brief 64 ビット整数の乱数を発生させる．
+ymuint64
+RandGen::uint64()
+{
+  ymuint64 tmp1 = int32();
+  ymuint64 tmp2 = int32();
+  return (tmp1 << 32) | tmp2;
+}
+
 // @brief unsigned long の整数の乱数を発生させる．
 ymulong
 RandGen::ulong()
