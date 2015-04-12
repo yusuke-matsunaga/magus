@@ -185,7 +185,7 @@ TestVector::set_from_random(RandGen& randgen)
 {
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
-    PackedVal v = randgen.ulong();
+    PackedVal v = randgen.uint64();
     ymuint i0 = i;
     ymuint i1 = i + 1;
     if ( i == nb - 2 ) {
@@ -215,7 +215,7 @@ TestVector::fix_x_from_random(RandGen& randgen)
     if ( mask == kPvAll0 ) {
       continue;
     }
-    PackedVal v = randgen.ulong();
+    PackedVal v = randgen.uint64();
     mPat[i0] |= ~v & mask;
     mPat[i1] |=  v & mask;
   }
