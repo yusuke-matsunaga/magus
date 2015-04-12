@@ -12,6 +12,7 @@
 #include "MinPat.h"
 #include "NodeValList.h"
 #include "FaultInfo.h"
+#include "NodeSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -97,6 +98,9 @@ private:
 
   // ノードごとに関係する入力の番号のリストを収める配列
   vector<vector<ymuint> > mInputList2Array;
+
+  // ノードごとに NodeSet を収める配列
+  vector<NodeSet> mNodeSetArray;
 
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;

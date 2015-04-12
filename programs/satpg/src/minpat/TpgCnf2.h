@@ -46,7 +46,9 @@ public:
   /// @param[in] max_id ノード番号の最大値
   bool
   check_dominance(TpgFault* f1,
+		  NodeSet& node_set1,
 		  TpgFault* f2,
+		  NodeSet& node_set2,
 		  ymuint max_id);
 
   /// @brief f1 と f2 がコンフリクトしているか調べる．
@@ -54,7 +56,9 @@ public:
   /// @param[in] max_id ノード番号の最大値
   bool
   check_conflict(TpgFault* f1,
+		 NodeSet& node_set1,
 		 TpgFault* f2,
+		 NodeSet& node_set2,
 		 ymuint max_id);
 
 
@@ -69,7 +73,9 @@ private:
   /// @param[in] max_id ノードの最大番号
   void
   make_fval_cnf(TpgFault* f1,
+		NodeSet& node_set1,
 		TpgFault* f2,
+		NodeSet& node_set2,
 		bool detect_f2,
 		ymuint max_id);
 

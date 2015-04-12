@@ -97,7 +97,7 @@ private:
 	       const vector<vector<ymuint> >& input_list_array);
 
   /// @brief 両立チェックの本体
-  void
+  bool
   _check_compat(GcNode2* node);
 
 

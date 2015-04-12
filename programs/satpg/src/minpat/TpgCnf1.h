@@ -54,6 +54,14 @@ public:
   /// @param[in] fault 故障
   /// @param[in] max_id ノードの最大番号
   void
+  make_fval_cnf(TpgFault* fault,
+		const NodeSet& node_set,
+		ymuint max_id);
+
+  /// @brief 正常回路と故障回路のCNFを作る．
+  /// @param[in] fault 故障
+  /// @param[in] max_id ノードの最大番号
+  void
   make_fval_cnf2(TpgFault* fault,
 		 ymuint max_id);
 

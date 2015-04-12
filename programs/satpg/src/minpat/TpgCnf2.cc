@@ -43,10 +43,12 @@ TpgCnf2::~TpgCnf2()
 // @param[in] max_id ノード番号の最大値
 bool
 TpgCnf2::check_dominance(TpgFault* f1,
+			 NodeSet& node_set1,
 			 TpgFault* f2,
+			 NodeSet& node_set2,
 			 ymuint max_id)
 {
-  make_fval_cnf(f1, f2, false, max_id);
+  make_fval_cnf(f1, node_set1, f2, node_set2, false, max_id);
 
   // 両方故障に対するテスト生成を行なう．
   mEngine.assumption_begin();
@@ -67,10 +69,12 @@ TpgCnf2::check_dominance(TpgFault* f1,
 // @param[in] max_id ノード番号の最大値
 bool
 TpgCnf2::check_conflict(TpgFault* f1,
+			NodeSet& node_set1,
 			TpgFault* f2,
+			NodeSet& node_set2,
 			ymuint max_id)
 {
-  make_fval_cnf(f1, f2, true, max_id);
+  make_fval_cnf(f1, node_set1, f2, node_set2, true, max_id);
 
   // 両方故障に対するテスト生成を行なう．
   mEngine.assumption_begin();
@@ -92,7 +96,9 @@ TpgCnf2::check_conflict(TpgFault* f1,
 // @param[in] max_id ノードの最大番号
 void
 TpgCnf2::make_fval_cnf(TpgFault* f1,
+		       NodeSet& node_set1,
 		       TpgFault* f2,
+		       NodeSet& node_set2,
 		       bool detect_f2,
 		       ymuint max_id)
 {
@@ -104,14 +110,8 @@ TpgCnf2::make_fval_cnf(TpgFault* f1,
   mFvar2Map.init(max_id);
   mDvar2Map.init(max_id);
 
-  NodeSet node_set1;
-  NodeSet node_set2;
-
   const TpgNode* fnode1 = f1->node();
   const TpgNode* fnode2 = f2->node();
-
-  node_set1.mark_region(max_id, fnode1);
-  node_set2.mark_region(max_id, fnode2);
 
   // node_set1 と node_set2 の union を all_list に入れる．
   vector<bool> mark(max_id);

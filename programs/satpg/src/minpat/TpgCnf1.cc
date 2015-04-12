@@ -369,6 +369,89 @@ TpgCnf1::make_fval_cnf(TpgFault* fault,
 // @param[in] fault 故障
 // @param[in] max_id ノードの最大番号
 void
+TpgCnf1::make_fval_cnf(TpgFault* fault,
+		       const NodeSet& node_set,
+		       ymuint max_id)
+{
+  mFault = fault;
+
+  mMaxId = max_id;
+
+  mNodeMark.clear();
+  mNodeMark.resize(max_id, false);
+
+  mGvarMap.init(max_id);
+  mFvarMap.init(max_id);
+  mDvarMap.init(max_id);
+
+  TpgNode* fnode = fault->node();
+
+  //////////////////////////////////////////////////////////////////////
+  // 変数の割当
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId gvar = mEngine.new_var();
+    mGvarMap.set_vid(node, gvar);
+    mFvarMap.set_vid(node, gvar);
+    mNodeMark[node->id()] = true;
+  }
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId fvar = mEngine.new_var();
+    VarId dvar = mEngine.new_var();
+    mFvarMap.set_vid(node, fvar);
+    mDvarMap.set_vid(node, dvar);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 正常回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    mEngine.make_node_cnf(node, mGvarMap);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障回路の CNF を生成
+  //////////////////////////////////////////////////////////////////////
+  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      mEngine.make_fault_cnf(fault, mGvarMap, mFvarMap);
+    }
+    else {
+      mEngine.make_node_cnf(node, mFvarMap);
+    }
+
+    // D-Chain 制約を作る．
+    mEngine.make_dchain_cnf(node, mGvarMap, mFvarMap, mDvarMap);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // 故障の検出条件
+  //////////////////////////////////////////////////////////////////////
+  ymuint npo = node_set.output_list().size();
+  mEngine.tmp_lits_begin(npo);
+  for (ymuint i = 0; i < npo; ++ i) {
+    const TpgNode* node = node_set.output_list()[i];
+    Literal dlit(mDvarMap(node), false);
+    mEngine.tmp_lits_add(dlit);
+  }
+  mEngine.tmp_lits_end();
+
+  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    Literal dlit(mDvarMap(node), false);
+    mEngine.add_clause(dlit);
+  }
+}
+
+// @brief 正常回路と故障回路のCNFを作る．
+// @param[in] fault 故障
+// @param[in] max_id ノードの最大番号
+void
 TpgCnf1::make_fval_cnf2(TpgFault* fault,
 			ymuint max_id)
 {

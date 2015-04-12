@@ -324,7 +324,11 @@ MinPatImpl::get_dom_faults(const vector<TpgFault*>& fault_list,
 	// f1 が 0 のときは f2 も 0 だった．
 	++ n_sat1;
 	TpgCnf2 tpg_cnf(string(), string(), NULL);
-	if ( tpg_cnf.check_dominance(f1, f2, mMaxNodeId) ) {
+	NodeSet node_set1;
+	NodeSet node_set2;
+	node_set1.mark_region(mMaxNodeId,f1->node());
+	node_set2.mark_region(mMaxNodeId, f2->node());
+	if ( tpg_cnf.check_dominance(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
 	  //cout << f2->str() << " is dominated by " << f1->str() << endl;
 	  dom_flag[f2->id()] = true;
 	}
@@ -333,7 +337,11 @@ MinPatImpl::get_dom_faults(const vector<TpgFault*>& fault_list,
 	// f2 が 0 のときは f1 も 0 だった．
 	++ n_sat1;
 	TpgCnf2 tpg_cnf(string(), string(), NULL);
-	if ( tpg_cnf.check_dominance(f2, f1, mMaxNodeId) ) {
+	NodeSet node_set1;
+	NodeSet node_set2;
+	node_set1.mark_region(mMaxNodeId, f1->node());
+	node_set2.mark_region(mMaxNodeId, f2->node());
+	if ( tpg_cnf.check_dominance(f2, node_set2, f1, node_set1, mMaxNodeId) ) {
 	  //cout << f1->str() << " is dominated by " << f2->str() << endl;
 	  dom_flag[f1->id()] = true;
 	  break;
@@ -528,7 +536,11 @@ MinPatImpl::analyze_conflict(const vector<TpgFault*>& fault_list,
       // f1 と f2 が同時に 1 になることがない．
       ++ n_sat2;
       TpgCnf2 tpg_cnf2(string(), string(), NULL);
-      if ( tpg_cnf2.check_conflict(f1, f2, mMaxNodeId) ) {
+      NodeSet node_set1;
+      NodeSet node_set2;
+      node_set1.mark_region(mMaxNodeId, f1->node());
+      node_set2.mark_region(mMaxNodeId, f2->node());
+      if ( tpg_cnf2.check_conflict(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
 	++ n_conf;
 	++ n_conf4;
 	edge_list.push_back(make_pair(i1, i2));
