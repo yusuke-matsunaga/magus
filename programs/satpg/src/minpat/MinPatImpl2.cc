@@ -90,6 +90,28 @@ check_pat_list(const vector<ymuint>& tv_list1,
   return ans;
 }
 
+void
+mark_tfi(const TpgNode* node,
+	 HashSet<ymuint>& tfi_mark,
+	 vector<ymuint>& input_list)
+{
+  if ( tfi_mark.check(node->id()) ) {
+    return;
+  }
+  tfi_mark.add(node->id());
+
+  if ( node->is_input() ) {
+    input_list.push_back(node->input_id());
+  }
+  else {
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      const TpgNode* inode = node->fanin(i);
+      mark_tfi(inode, tfi_mark, input_list);
+    }
+  }
+}
+
 END_NONAMESPACE
 
 
@@ -149,6 +171,9 @@ MinPatImpl2::run(TpgNetwork& network,
   mInputListArray.clear();
   mInputListArray.resize(mMaxNodeId);
 
+  mInputList2Array.clear();
+  mInputList2Array.resize(mMaxNodeId);
+
   mFaultInfoArray.clear();
   mFaultInfoArray.resize(mMaxFaultId);
 
@@ -173,6 +198,19 @@ MinPatImpl2::run(TpgNetwork& network,
       // ソートしておく．
       sort(input_list.begin(), input_list.end());
     }
+  }
+
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    TpgFault* f = f_list[i];
+    const TpgNode* node = f->node();
+    vector<ymuint>& input_list = mInputList2Array[node->id()];
+    if ( !input_list.empty() ) {
+      continue;
+    }
+    HashSet<ymuint> tfi_mark;
+    mark_tfi(node, tfi_mark, input_list);
+    // ソートしておく．
+    sort(input_list.begin(), input_list.end());
   }
 
   // ドロップ無しの故障シミュレーター
@@ -251,17 +289,9 @@ MinPatImpl2::run(TpgNetwork& network,
 
   vector<TpgFault*> dom_fault_list;
 
-#if 0
-  analyze_faults1(f_list2);
-
-  get_dom_faults2(f_list2, dom_fault_list);
-
-  analyze_faults2(dom_fault_list);
-#else
   get_dom_faults1(f_list2, dom_fault_list);
 
   analyze_faults2(dom_fault_list);
-#endif
 
   analyze_conflict(dom_fault_list);
 
@@ -310,10 +340,290 @@ MinPatImpl2::run(TpgNetwork& network,
   stats.set(orig_num, tv_list.size(), time);
 }
 
+BEGIN_NONAMESPACE
+
+void
+mark_tfo(TpgNode* node,
+	 vector<TpgNode*>& tfo_list,
+	 HashSet<ymuint>& tfo_hash)
+{
+  if ( tfo_hash.check(node->id()) ) {
+    return;
+  }
+  tfo_hash.add(node->id());
+  tfo_list.push_back(node);
+
+  ymuint nfo = node->active_fanout_num();
+  for (ymuint i = 0; i < nfo; ++ i) {
+    TpgNode* onode = node->active_fanout(i);
+    mark_tfo(onode, tfo_list, tfo_hash);
+  }
+}
+
+END_NONAMESPACE
 
 // @brief 支配故障を求める．
 void
 MinPatImpl2::get_dom_faults1(const vector<TpgFault*>& fault_list,
+			     vector<TpgFault*>& dom_fault_list)
+{
+  StopWatch local_timer;
+
+  local_timer.start();
+
+  ymuint n_sat1 = 0;
+
+  vector<bool> dom_flag(mMaxFaultId, false);
+
+  ymuint fault_num = fault_list.size();
+
+  HashSet<ymuint> checked;
+
+  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+    TpgFault* f1 = fault_list[i1];
+    if ( dom_flag[f1->id()] ) {
+      continue;
+    }
+
+    cout << "\r                  ";
+    cout << "\r" << i1 << " / " << fault_num;
+    cout.flush();
+
+    // f1 の TFO のみを調べる．
+    HashSet<ymuint> tfo_hash;
+    vector<TpgNode*> tfo_list;
+    mark_tfo(f1->node(), tfo_list, tfo_hash);
+
+    const vector<ymuint>& tv_list1 = mFaultInfoArray[f1->id()].pat_list();
+
+    for (ymuint i2 = 0; i2 < tfo_list.size(); ++ i2) {
+      TpgNode* node = tfo_list[i2];
+      for (ymuint i3 = 0; i3 < node->fault_num(); ++ i3) {
+	TpgFault* f2 = node->fault(i3);
+	if ( f2 == f1 ) {
+	  continue;
+	}
+	if ( f2->status() != kFsDetected ) {
+	  continue;
+	}
+	if ( dom_flag[f2->id()] ) {
+	  continue;
+	}
+
+	if ( f1->id() < f2->id() ) {
+	  checked.add(f1->id() * mMaxFaultId + f2->id());
+	}
+	else {
+	  checked.add(f2->id() * mMaxFaultId + f1->id());
+	}
+
+	const vector<ymuint>& tv_list2 = mFaultInfoArray[f2->id()].pat_list();
+
+	ymuint stat = check_pat_list(tv_list1, tv_list2);
+
+	if ( (stat & 1U) == 0U ) {
+	  // f1 が 0 のときは f2 も 0 だった．
+	  ++ n_sat1;
+	  TpgCnf2 tpg_cnf(string(), string(), NULL);
+	  if ( tpg_cnf.check_dominance(f1, f2, mMaxNodeId) ) {
+	    //cout << f2->str() << " is dominated by " << f1->str() << endl;
+	    dom_flag[f2->id()] = true;
+	    continue;
+	  }
+	}
+	if ( (stat & 2U) == 0U ) {
+	  // f2 が 0 のときは f1 も 0 だった．
+	  ++ n_sat1;
+	  TpgCnf2 tpg_cnf(string(), string(), NULL);
+	  if ( tpg_cnf.check_dominance(f2, f1, mMaxNodeId) ) {
+	    //cout << f1->str() << " is dominated by " << f2->str() << endl;
+	    dom_flag[f1->id()] = true;
+	    break;
+	  }
+	}
+      }
+    }
+  }
+  cout << endl;
+
+  // シミュレーション結果から故障の支配関係のヒントを作り，
+  // SAT で正確に判定する．
+  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+    TpgFault* f1 = fault_list[i1];
+    if ( dom_flag[f1->id()] ) {
+      continue;
+    }
+
+    cout << "\r                  ";
+    cout << "\r" << i1 << " / " << fault_num;
+    cout.flush();
+
+    // input_list1 の要素をハッシュに登録する．
+    const vector<ymuint>& input_list1 = mInputList2Array[f1->node()->id()];
+    HashSet<ymuint> input_hash;
+    for (ymuint i = 0; i < input_list1.size(); ++ i) {
+      input_hash.add(input_list1[i]);
+    }
+
+    const vector<ymuint>& tv_list1 = mFaultInfoArray[f1->id()].pat_list();
+    for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
+      TpgFault* f2 = fault_list[i2];
+      if ( dom_flag[f2->id()] ) {
+	continue;
+      }
+      if ( checked.check(f1->id() * mMaxFaultId + f2->id()) ||
+	   checked.check(f2->id() * mMaxFaultId + f1->id()) ) {
+	// 上のループで調べている．
+	continue;
+      }
+
+      // input_list2 の要素でハッシュに登録されている要素があれば
+      // input_list1 と input_list2 は共通部分を持つ．
+      const vector<ymuint>& input_list2 = mInputList2Array[f2->node()->id()];
+      bool intersect = false;
+      for (ymuint i = 0; i < input_list2.size(); ++ i) {
+	if ( input_hash.check(input_list2[i]) ) {
+	  intersect = true;
+	  break;
+	}
+      }
+      if ( !intersect ) {
+	// 共通部分を持たない故障は独立
+	continue;
+      }
+
+      if ( f1->id() < f2->id() ) {
+	checked.add(f1->id() * mMaxFaultId + f2->id());
+      }
+      else {
+	checked.add(f2->id() * mMaxFaultId + f1->id());
+      }
+
+      const vector<ymuint>& tv_list2 = mFaultInfoArray[f2->id()].pat_list();
+
+      ymuint stat = check_pat_list(tv_list1, tv_list2);
+
+      if ( (stat & 1U) == 0U ) {
+	// f1 が 0 のときは f2 も 0 だった．
+	++ n_sat1;
+	TpgCnf2 tpg_cnf(string(), string(), NULL);
+	if ( tpg_cnf.check_dominance(f1, f2, mMaxNodeId) ) {
+	  //cout << f2->str() << " is dominated by " << f1->str() << endl;
+	  dom_flag[f2->id()] = true;
+	  continue;
+	}
+      }
+      if ( (stat & 2U) == 0U ) {
+	// f2 が 0 のときは f1 も 0 だった．
+	++ n_sat1;
+	TpgCnf2 tpg_cnf(string(), string(), NULL);
+	if ( tpg_cnf.check_dominance(f2, f1, mMaxNodeId) ) {
+	  //cout << f1->str() << " is dominated by " << f2->str() << endl;
+	  dom_flag[f1->id()] = true;
+	  break;
+	}
+      }
+    }
+  }
+  cout << endl;
+
+  // シミュレーション結果から故障の支配関係のヒントを作り，
+  // SAT で正確に判定する．
+  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+    TpgFault* f1 = fault_list[i1];
+    if ( dom_flag[f1->id()] ) {
+      continue;
+    }
+
+    cout << "\r                  ";
+    cout << "\r" << i1 << " / " << fault_num;
+    cout.flush();
+
+    // input_list1 の要素をハッシュに登録する．
+    const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
+    HashSet<ymuint> input_hash;
+    for (ymuint i = 0; i < input_list1.size(); ++ i) {
+      input_hash.add(input_list1[i]);
+    }
+
+    const vector<ymuint>& tv_list1 = mFaultInfoArray[f1->id()].pat_list();
+    for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
+      TpgFault* f2 = fault_list[i2];
+      if ( dom_flag[f2->id()] ) {
+	continue;
+      }
+      if ( checked.check(f1->id() * mMaxFaultId + f2->id()) ||
+	   checked.check(f2->id() * mMaxFaultId + f1->id()) ) {
+	// 上のループで調べている．
+	continue;
+      }
+
+      // input_list2 の要素でハッシュに登録されている要素があれば
+      // input_list1 と input_list2 は共通部分を持つ．
+      const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
+      bool intersect = false;
+      for (ymuint i = 0; i < input_list2.size(); ++ i) {
+	if ( input_hash.check(input_list2[i]) ) {
+	  intersect = true;
+	  break;
+	}
+      }
+      if ( !intersect ) {
+	// 共通部分を持たない故障は独立
+	continue;
+      }
+
+      const vector<ymuint>& tv_list2 = mFaultInfoArray[f2->id()].pat_list();
+
+      ymuint stat = check_pat_list(tv_list1, tv_list2);
+
+      if ( (stat & 1U) == 0U ) {
+	// f1 が 0 のときは f2 も 0 だった．
+	++ n_sat1;
+	TpgCnf2 tpg_cnf(string(), string(), NULL);
+	if ( tpg_cnf.check_dominance(f1, f2, mMaxNodeId) ) {
+	  //cout << f2->str() << " is dominated by " << f1->str() << endl;
+	  dom_flag[f2->id()] = true;
+	  continue;
+	}
+      }
+      if ( (stat & 2U) == 0U ) {
+	// f2 が 0 のときは f1 も 0 だった．
+	++ n_sat1;
+	TpgCnf2 tpg_cnf(string(), string(), NULL);
+	if ( tpg_cnf.check_dominance(f2, f1, mMaxNodeId) ) {
+	  //cout << f1->str() << " is dominated by " << f2->str() << endl;
+	  dom_flag[f1->id()] = true;
+	  break;
+	}
+      }
+    }
+  }
+  cout << endl;
+
+  // 支配されていない故障を dom_fault_list に入れる．
+  dom_fault_list.clear();
+  dom_fault_list.reserve(fault_num);
+  for (ymuint i = 0; i < fault_num; ++ i) {
+    TpgFault* f = fault_list[i];
+    if ( !dom_flag[f->id()] ) {
+      dom_fault_list.push_back(f);
+    }
+  }
+
+  ymuint dom_fault_num = dom_fault_list.size();
+
+  local_timer.stop();
+
+  cout << "Total    " << fault_num << " original faults" << endl;
+  cout << "Total    " << dom_fault_num << " dominator faults" << endl;
+  cout << "Total    " << n_sat1 << " dominance test" << endl;
+  cout << "CPU time for dominance test" << local_timer.time() << endl;
+}
+
+// @brief 支配故障を求める．
+void
+MinPatImpl2::get_dom_faults2(const vector<TpgFault*>& fault_list,
 			     vector<TpgFault*>& dom_fault_list)
 {
   StopWatch local_timer;
@@ -407,6 +717,7 @@ MinPatImpl2::get_dom_faults1(const vector<TpgFault*>& fault_list,
   cout << "CPU time for dominance test" << local_timer.time() << endl;
 }
 
+#if 0
 // @brief 支配故障を求める．
 void
 MinPatImpl2::get_dom_faults2(const vector<TpgFault*>& fault_list,
@@ -529,6 +840,7 @@ MinPatImpl2::get_dom_faults2(const vector<TpgFault*>& fault_list,
   cout << "Total    " << n_sat2 << " simple dominance test passwd" << endl;
   cout << "CPU time for dominance test" << local_timer.time() << endl;
 }
+#endif
 
 void
 MinPatImpl2::analyze_faults1(const vector<TpgFault*> fault_list)

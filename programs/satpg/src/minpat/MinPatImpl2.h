@@ -95,6 +95,9 @@ private:
   // ノードごとに関係する入力の番号のリストを収める配列
   vector<vector<ymuint> > mInputListArray;
 
+  // ノードごとに関係する入力の番号のリストを収める配列
+  vector<vector<ymuint> > mInputList2Array;
+
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;
 
