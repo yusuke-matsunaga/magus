@@ -63,10 +63,11 @@ public:
 	       ymuint npat);
 
   /// @brief 支配故障を求める．
+  /// @param[in] fast 手抜きの高速化を行うとき true にするフラグ
   ///
   /// 結果は mDomFaultList に格納される．
   void
-  get_dom_faults();
+  get_dom_faults(bool fast);
 
   /// @brief 十分割当と必要割当を求める．
   ///
@@ -77,6 +78,15 @@ public:
   /// @brief 故障間の衝突性を調べる．
   void
   analyze_conflict();
+
+  /// @brief 1つの故障と複数の故障間の衝突性を調べる．
+  /// @param[in] f1 対象の故障
+  /// @param[in] f2_list f1 との衝突性を調べる故障のリスト
+  /// @param[out] f1 と衝突する故障のリスト
+  void
+  analyze_conflict(TpgFault* f1,
+		   const vector<TpgFault*>& f2_list,
+		   vector<TpgFault*>& conf_list);
 
   /// @brief 衝突リストを得る．
   void

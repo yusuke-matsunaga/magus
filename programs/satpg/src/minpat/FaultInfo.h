@@ -95,8 +95,6 @@ public:
 
   vector<ymuint> mConflictList;
 
-  vector<TpgFault*> mPendingList;
-
 };
 
 

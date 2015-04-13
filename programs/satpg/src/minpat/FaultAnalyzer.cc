@@ -332,7 +332,7 @@ FaultAnalyzer::get_pat_list(Fsim& fsim,
 //
 // 結果は mDomFaultList に格納される．
 void
-FaultAnalyzer::get_dom_faults()
+FaultAnalyzer::get_dom_faults(bool fast)
 {
   StopWatch local_timer;
 
@@ -344,6 +344,8 @@ FaultAnalyzer::get_dom_faults()
 
   ymuint n_sat2 = 0;
   ymuint n_dom2 = 0;
+
+  vector<vector<TpgFault*> > pending_list(mMaxFaultId);
 
   // シミュレーション結果から故障の支配関係のヒントを作り，
   // SAT で正確に判定する．
@@ -387,7 +389,9 @@ FaultAnalyzer::get_dom_faults()
       bool intersect2 = check_intersect(input_list1_2, input_list2_2);
       if ( !intersect2 ) {
 	// TFI が共通部分を持たない場合は望みが薄いので後回し．
-	mFaultInfoArray[f1_id].mPendingList.push_back(f2);
+	if ( !fast ) {
+	  pending_list[f1_id].push_back(f2);
+	}
 	continue;
       }
 
@@ -457,7 +461,7 @@ FaultAnalyzer::get_dom_faults()
 
     NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
 
-    const vector<TpgFault*>& f_list = mFaultInfoArray[f1_id].mPendingList;
+    const vector<TpgFault*>& f_list = pending_list[f1_id];
     for (ymuint i2 = 0; i2 < f_list.size(); ++ i2) {
       TpgFault* f2 = f_list[i2];
       ymuint f2_id = f2->id();
@@ -566,8 +570,6 @@ FaultAnalyzer::analyze_faults()
 	ma_list.add(node, val);
       }
     }
-    //suf_list.clear();
-    //pi_suf_list.clear();
   }
 
   local_timer.stop();
@@ -612,7 +614,7 @@ FaultAnalyzer::analyze_conflict()
       cout << "\r" << i1 << " / " << fault_num;
       cout.flush();
     }
-
+#if 0
     TpgCnf1 tpg_cnf(string(), string(), NULL);
 
     NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
@@ -705,12 +707,165 @@ FaultAnalyzer::analyze_conflict()
       }
       conf4_timer.stop();
     }
+#else
+    vector<TpgFault*> f2_list;
+    f2_list.reserve(fault_num - i1 - 1);
+    for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
+      TpgFault* f2 = mDomFaultList[i2];
+      f2_list.push_back(f2);
+    }
+    vector<TpgFault*> conf_list;
+    analyze_conflict(f1, f2_list, conf_list);
+    for (ymuint i = 0; i < conf_list.size(); ++ i) {
+      TpgFault* f2 = conf_list[i];
+      mFaultInfoArray[f1->id()].mConflictList.push_back(f2->id());
+      mFaultInfoArray[f2->id()].mConflictList.push_back(f1->id());
+    }
+#endif
   }
 
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     TpgFault* f1 = mDomFaultList[i1];
     FaultInfo& fi = mFaultInfoArray[f1->id()];
     sort(fi.mConflictList.begin(), fi.mConflictList.end());
+  }
+
+  local_timer.stop();
+
+  if ( mVerbose ) {
+    cout << endl;
+    cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
+    cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
+    cout << "Total    " << setw(6) << n_conf3 << " conflicts (single ma_list)" << endl;
+    cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
+    cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
+    cout << "Total    " << setw(6) << n_int1  << " pi_suf_list intersection check" << endl;
+    cout << "Total    " << setw(6) << n_int2  << " suf_list intersection check" << endl;
+    cout << "Total CPU time " << local_timer.time() << endl;
+    cout << "CPU time (simple ma_list)    " << conf1_timer.time() << endl;
+    cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
+    cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
+    cout << "CPU time (siple pi_suf_list) " << int1_timer.time() << endl;
+    cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
+  }
+}
+
+// @brief 1つの故障と複数の故障間の衝突性を調べる．
+void
+FaultAnalyzer::analyze_conflict(TpgFault* f1,
+				const vector<TpgFault*>& f2_list,
+				vector<TpgFault*>& conf_list)
+{
+  StopWatch local_timer;
+
+  local_timer.start();
+
+  StopWatch conf1_timer;
+  StopWatch conf2_timer;
+  StopWatch conf3_timer;
+  StopWatch conf4_timer;
+  StopWatch int1_timer;
+  StopWatch int2_timer;
+
+  ymuint n_sat2 = 0;
+  ymuint n_conf = 0;
+  ymuint n_conf1 = 0;
+  ymuint n_conf2 = 0;
+  ymuint n_conf3 = 0;
+  ymuint n_conf4 = 0;
+  ymuint n_int1 = 0;
+  ymuint n_int2 = 0;
+
+  // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
+  TpgCnf1 tpg_cnf(string(), string(), NULL);
+
+  NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
+  tpg_cnf.make_fval_cnf(f1, node_set1, mMaxNodeId);
+
+  const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
+
+  FaultInfo& fi1 = mFaultInfoArray[f1->id()];
+  const vector<ymuint>& tv_list1 = fi1.pat_list();
+  const NodeValList& suf_list1 = fi1.mSufList;
+  const NodeValList& pi_suf_list1 = fi1.mPiSufList;
+  const NodeValList& ma_list1 = fi1.mMaList;
+
+  conf_list.reserve(f2_list.size());
+  for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
+    TpgFault* f2 = f2_list[i2];
+
+    const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
+
+    bool intersect = check_intersect(input_list1, input_list2);
+    if ( !intersect ) {
+      // 共通部分を持たない故障は独立
+      continue;
+    }
+
+    FaultInfo& fi2 = mFaultInfoArray[f2->id()];
+    const vector<ymuint>& tv_list2 = fi2.pat_list();
+
+    bool stat = check_pat_list2(tv_list1, tv_list2);
+    if ( stat ) {
+      // f1 と f2 が同時に1なのでコンフリクトしない．
+      continue;
+    }
+
+    const NodeValList& suf_list2 = fi2.mSufList;
+    const NodeValList& pi_suf_list2 = fi2.mPiSufList;
+    const NodeValList& ma_list2 = fi2.mMaList;
+
+    conf1_timer.start();
+    if ( check_conflict(ma_list1, ma_list2) ) {
+      // 必要割当そのものがコンフリクトしている．
+      ++ n_conf;
+      ++ n_conf1;
+      conf_list.push_back(f2);
+      conf1_timer.stop();
+      continue;
+    }
+    conf1_timer.stop();
+
+    int1_timer.start();
+    if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
+      // 十分割当が両立しているのでコンフリクトしない．
+      ++ n_int1;
+      int1_timer.stop();
+      continue;
+    }
+    int1_timer.stop();
+
+    int2_timer.start();
+    if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
+      // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+      ++ n_int2;
+      int2_timer.stop();
+      continue;
+    }
+    int2_timer.stop();
+
+    conf3_timer.start();
+    if ( tpg_cnf.check_conflict(ma_list2) ) {
+      // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
+      ++ n_conf;
+      ++ n_conf3;
+      conf_list.push_back(f2);
+      conf3_timer.stop();
+      continue;
+    }
+    conf3_timer.stop();
+
+    conf4_timer.start();
+    ++ n_sat2;
+    TpgCnf2 tpg_cnf2(string(), string(), NULL);
+    NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
+    NodeSet& node_set2 = mNodeSetArray[f2->node()->id()];
+    if ( tpg_cnf2.check_conflict(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
+      ++ n_conf;
+      ++ n_conf4;
+      conf_list.push_back(f2);
+    }
+    conf4_timer.stop();
   }
 
   local_timer.stop();

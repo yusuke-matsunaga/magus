@@ -142,7 +142,8 @@ MinPatImpl::run(TpgNetwork& network,
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg, npat0);
 
-  analyzer.get_dom_faults();
+  bool dom_fast = false;
+  analyzer.get_dom_faults(dom_fast);
 
   analyzer.analyze_faults();
 
