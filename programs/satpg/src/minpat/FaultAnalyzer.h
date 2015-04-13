@@ -13,6 +13,7 @@
 #include "NodeValList.h"
 #include "FaultInfo.h"
 #include "NodeSet.h"
+#include "YmUtils/StopWatch.h"
 #include "YmUtils/RandGen.h"
 
 
@@ -86,7 +87,8 @@ public:
   void
   analyze_conflict(TpgFault* f1,
 		   const vector<TpgFault*>& f2_list,
-		   vector<TpgFault*>& conf_list);
+		   vector<TpgFault*>& conf_list,
+		   bool local_verbose);
 
   /// @brief 衝突リストを得る．
   void
@@ -109,6 +111,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief analyze_conflict の統計情報を出力する．
+  void
+  print_conflict_stats(ostream& s);
 
 
 private:
@@ -143,6 +149,26 @@ private:
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;
 
+  // analyze_conflict 用の統計情報
+  struct {
+    // コンフリクト回数
+    ymuint conf_count;
+    ymuint conf1_count;
+    ymuint conf2_count;
+    ymuint conf3_count;
+    ymuint conf4_count;
+    ymuint conf4_check_count;
+    ymuint int1_count;
+    ymuint int2_count;
+
+    StopWatch conf_timer;
+    StopWatch conf1_timer;
+    StopWatch conf2_timer;
+    StopWatch conf3_timer;
+    StopWatch conf4_timer;
+    StopWatch int1_timer;
+    StopWatch int2_timer;
+  } mConflictStats;
 };
 
 END_NAMESPACE_YM_SATPG

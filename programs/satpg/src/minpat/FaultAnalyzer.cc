@@ -585,24 +585,22 @@ void
 FaultAnalyzer::analyze_conflict()
 {
   StopWatch local_timer;
-
   local_timer.start();
 
-  StopWatch conf1_timer;
-  StopWatch conf2_timer;
-  StopWatch conf3_timer;
-  StopWatch conf4_timer;
-  StopWatch int1_timer;
-  StopWatch int2_timer;
-
-  ymuint n_sat2 = 0;
-  ymuint n_conf = 0;
-  ymuint n_conf1 = 0;
-  ymuint n_conf2 = 0;
-  ymuint n_conf3 = 0;
-  ymuint n_conf4 = 0;
-  ymuint n_int1 = 0;
-  ymuint n_int2 = 0;
+  mConflictStats.conf_timer.reset();
+  mConflictStats.conf1_timer.reset();
+  mConflictStats.conf2_timer.reset();
+  mConflictStats.conf3_timer.reset();
+  mConflictStats.conf4_timer.reset();
+  mConflictStats.int1_timer.reset();
+  mConflictStats.int2_timer.reset();
+  mConflictStats.conf1_count = 0;
+  mConflictStats.conf2_count = 0;
+  mConflictStats.conf3_count = 0;
+  mConflictStats.conf4_count = 0;
+  mConflictStats.conf4_check_count = 0;
+  mConflictStats.int1_count = 0;
+  mConflictStats.int2_count = 0;
 
   // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
   ymuint fault_num = mDomFaultList.size();
@@ -614,100 +612,6 @@ FaultAnalyzer::analyze_conflict()
       cout << "\r" << i1 << " / " << fault_num;
       cout.flush();
     }
-#if 0
-    TpgCnf1 tpg_cnf(string(), string(), NULL);
-
-    NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
-    tpg_cnf.make_fval_cnf(f1, node_set1, mMaxNodeId);
-
-    const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
-
-    FaultInfo& fi1 = mFaultInfoArray[f1->id()];
-    const vector<ymuint>& tv_list1 = fi1.pat_list();
-    const NodeValList& suf_list1 = fi1.mSufList;
-    const NodeValList& pi_suf_list1 = fi1.mPiSufList;
-    const NodeValList& ma_list1 = fi1.mMaList;
-
-    for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
-      TpgFault* f2 = mDomFaultList[i2];
-
-      const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
-
-      bool intersect = check_intersect(input_list1, input_list2);
-      if ( !intersect ) {
-	// 共通部分を持たない故障は独立
-	continue;
-      }
-
-      FaultInfo& fi2 = mFaultInfoArray[f2->id()];
-      const vector<ymuint>& tv_list2 = fi2.pat_list();
-
-      bool stat = check_pat_list2(tv_list1, tv_list2);
-      if ( stat ) {
-	// f1 と f2 が同時に1なのでコンフリクトしない．
-	continue;
-      }
-
-      const NodeValList& suf_list2 = fi2.mSufList;
-      const NodeValList& pi_suf_list2 = fi2.mPiSufList;
-      const NodeValList& ma_list2 = fi2.mMaList;
-
-      conf1_timer.start();
-      if ( check_conflict(ma_list1, ma_list2) ) {
-	// 必要割当そのものがコンフリクトしている．
-	++ n_conf;
-	++ n_conf1;
-	fi1.mConflictList.push_back(f2->id());
-	fi2.mConflictList.push_back(f1->id());
-	conf1_timer.stop();
-	continue;
-      }
-      conf1_timer.stop();
-
-      int1_timer.start();
-      if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
-	// 十分割当が両立しているのでコンフリクトしない．
-	++ n_int1;
-	int1_timer.stop();
-	continue;
-      }
-      int1_timer.stop();
-
-      int2_timer.start();
-      if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
-	// f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
-	++ n_int2;
-	int2_timer.stop();
-	continue;
-      }
-      int2_timer.stop();
-
-      conf3_timer.start();
-      if ( tpg_cnf.check_conflict(ma_list2) ) {
-	// f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
-	++ n_conf;
-	++ n_conf3;
-	fi1.mConflictList.push_back(f2->id());
-	fi2.mConflictList.push_back(f1->id());
-	conf3_timer.stop();
-	continue;
-      }
-      conf3_timer.stop();
-
-      conf4_timer.start();
-      ++ n_sat2;
-      TpgCnf2 tpg_cnf2(string(), string(), NULL);
-      NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
-      NodeSet& node_set2 = mNodeSetArray[f2->node()->id()];
-      if ( tpg_cnf2.check_conflict(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
-	++ n_conf;
-	++ n_conf4;
-	fi1.mConflictList.push_back(f2->id());
-	fi2.mConflictList.push_back(f1->id());
-      }
-      conf4_timer.stop();
-    }
-#else
     vector<TpgFault*> f2_list;
     f2_list.reserve(fault_num - i1 - 1);
     for (ymuint i2 = i1 + 1; i2 < fault_num; ++ i2) {
@@ -715,13 +619,12 @@ FaultAnalyzer::analyze_conflict()
       f2_list.push_back(f2);
     }
     vector<TpgFault*> conf_list;
-    analyze_conflict(f1, f2_list, conf_list);
+    analyze_conflict(f1, f2_list, conf_list, false);
     for (ymuint i = 0; i < conf_list.size(); ++ i) {
       TpgFault* f2 = conf_list[i];
       mFaultInfoArray[f1->id()].mConflictList.push_back(f2->id());
       mFaultInfoArray[f2->id()].mConflictList.push_back(f1->id());
     }
-#endif
   }
 
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
@@ -734,19 +637,8 @@ FaultAnalyzer::analyze_conflict()
 
   if ( mVerbose ) {
     cout << endl;
-    cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
-    cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
-    cout << "Total    " << setw(6) << n_conf3 << " conflicts (single ma_list)" << endl;
-    cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
-    cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
-    cout << "Total    " << setw(6) << n_int1  << " pi_suf_list intersection check" << endl;
-    cout << "Total    " << setw(6) << n_int2  << " suf_list intersection check" << endl;
+    print_conflict_stats(cout);
     cout << "Total CPU time " << local_timer.time() << endl;
-    cout << "CPU time (simple ma_list)    " << conf1_timer.time() << endl;
-    cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
-    cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
-    cout << "CPU time (siple pi_suf_list) " << int1_timer.time() << endl;
-    cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
   }
 }
 
@@ -754,27 +646,10 @@ FaultAnalyzer::analyze_conflict()
 void
 FaultAnalyzer::analyze_conflict(TpgFault* f1,
 				const vector<TpgFault*>& f2_list,
-				vector<TpgFault*>& conf_list)
+				vector<TpgFault*>& conf_list,
+				bool local_verbose)
 {
-  StopWatch local_timer;
-
-  local_timer.start();
-
-  StopWatch conf1_timer;
-  StopWatch conf2_timer;
-  StopWatch conf3_timer;
-  StopWatch conf4_timer;
-  StopWatch int1_timer;
-  StopWatch int2_timer;
-
-  ymuint n_sat2 = 0;
-  ymuint n_conf = 0;
-  ymuint n_conf1 = 0;
-  ymuint n_conf2 = 0;
-  ymuint n_conf3 = 0;
-  ymuint n_conf4 = 0;
-  ymuint n_int1 = 0;
-  ymuint n_int2 = 0;
+  mConflictStats.conf_timer.start();
 
   // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
   TpgCnf1 tpg_cnf(string(), string(), NULL);
@@ -815,76 +690,64 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
     const NodeValList& pi_suf_list2 = fi2.mPiSufList;
     const NodeValList& ma_list2 = fi2.mMaList;
 
-    conf1_timer.start();
+    mConflictStats.conf1_timer.start();
     if ( check_conflict(ma_list1, ma_list2) ) {
       // 必要割当そのものがコンフリクトしている．
-      ++ n_conf;
-      ++ n_conf1;
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf1_count;
       conf_list.push_back(f2);
-      conf1_timer.stop();
+      mConflictStats.conf1_timer.stop();
       continue;
     }
-    conf1_timer.stop();
+    mConflictStats.conf1_timer.stop();
 
-    int1_timer.start();
+    mConflictStats.int1_timer.start();
     if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
       // 十分割当が両立しているのでコンフリクトしない．
-      ++ n_int1;
-      int1_timer.stop();
+      ++ mConflictStats.int1_count;
+      mConflictStats.int1_timer.stop();
       continue;
     }
-    int1_timer.stop();
+    mConflictStats.int1_timer.stop();
 
-    int2_timer.start();
+    mConflictStats.int2_timer.start();
     if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
       // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
-      ++ n_int2;
-      int2_timer.stop();
+      ++ mConflictStats.int2_count;
+      mConflictStats.int2_timer.stop();
       continue;
     }
-    int2_timer.stop();
+    mConflictStats.int2_timer.stop();
 
-    conf3_timer.start();
+    mConflictStats.conf3_timer.start();
     if ( tpg_cnf.check_conflict(ma_list2) ) {
       // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
-      ++ n_conf;
-      ++ n_conf3;
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf3_count;
       conf_list.push_back(f2);
-      conf3_timer.stop();
+      mConflictStats.conf3_timer.stop();
       continue;
     }
-    conf3_timer.stop();
+    mConflictStats.conf3_timer.stop();
 
-    conf4_timer.start();
-    ++ n_sat2;
+    mConflictStats.conf4_timer.start();
+    ++ mConflictStats.conf4_check_count;
     TpgCnf2 tpg_cnf2(string(), string(), NULL);
     NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
     NodeSet& node_set2 = mNodeSetArray[f2->node()->id()];
     if ( tpg_cnf2.check_conflict(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
-      ++ n_conf;
-      ++ n_conf4;
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf4_count;
       conf_list.push_back(f2);
     }
-    conf4_timer.stop();
+    mConflictStats.conf4_timer.stop();
   }
 
-  local_timer.stop();
+  mConflictStats.conf_timer.stop();
 
-  if ( mVerbose ) {
+  if ( mVerbose && local_verbose ) {
     cout << endl;
-    cout << "Total    " << setw(6) << n_conf  << " conflicts" << endl;
-    cout << "Total    " << setw(6) << n_conf1 << " conflicts (ma_list)" << endl;
-    cout << "Total    " << setw(6) << n_conf3 << " conflicts (single ma_list)" << endl;
-    cout << "Total    " << setw(6) << n_conf4 << " conflicts (exact)" << endl;
-    cout << "Total    " << setw(6) << n_sat2  << " exact test" << endl;
-    cout << "Total    " << setw(6) << n_int1  << " pi_suf_list intersection check" << endl;
-    cout << "Total    " << setw(6) << n_int2  << " suf_list intersection check" << endl;
-    cout << "Total CPU time " << local_timer.time() << endl;
-    cout << "CPU time (simple ma_list)    " << conf1_timer.time() << endl;
-    cout << "CPU time (single conflict)   " << conf3_timer.time() << endl;
-    cout << "CPU time (exact conflict)    " << conf4_timer.time() << endl;
-    cout << "CPU time (siple pi_suf_list) " << int1_timer.time() << endl;
-    cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
+    print_conflict_stats(cout);
   }
 }
 
@@ -927,6 +790,25 @@ const vector<vector<ymuint> >&
 FaultAnalyzer::input_list_array() const
 {
   return mInputListArray;
+}
+
+// @brief analyze_conflict の統計情報を出力する．
+void
+FaultAnalyzer::print_conflict_stats(ostream& s)
+{
+  s << "Total    " << setw(6) << mConflictStats.conf_count  << " conflicts" << endl;
+  s << "Total    " << setw(6) << mConflictStats.conf1_count << " conflicts (ma_list)" << endl;
+  s << "Total    " << setw(6) << mConflictStats.conf3_count << " conflicts (single ma_list)" << endl;
+  s << "Total    " << setw(6) << mConflictStats.conf4_count << " conflicts (exact) / "
+       << setw(6) << mConflictStats.conf4_check_count << endl;
+  s << "Total    " << setw(6) << mConflictStats.int1_count  << " pi_suf_list intersection check" << endl;
+  s << "Total    " << setw(6) << mConflictStats.int2_count  << " suf_list intersection check" << endl;
+  s << "CPU time (conflict check)    " << mConflictStats.conf_timer.time() << endl;
+  s << "CPU time (simple ma_list)    " << mConflictStats.conf1_timer.time() << endl;
+  s << "CPU time (single conflict)   " << mConflictStats.conf3_timer.time() << endl;
+  s << "CPU time (exact conflict)    " << mConflictStats.conf4_timer.time() << endl;
+  s << "CPU time (siple pi_suf_list) " << mConflictStats.int1_timer.time() << endl;
+  s << "CPU time (single suf_list)   " << mConflictStats.int2_timer.time() << endl;
 }
 
 END_NAMESPACE_YM_SATPG
