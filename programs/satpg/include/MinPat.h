@@ -62,6 +62,11 @@ extern
 MinPat*
 new_MinPat2();
 
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_MinPatDsatur();
+
 END_NAMESPACE_YM_SATPG
 
 #endif // MINPAT_H

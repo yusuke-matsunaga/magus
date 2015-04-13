@@ -25,6 +25,8 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 {
   mPoptSimple = new TclPopt(this, "simple",
 			    "simple heuristic");
+  mPoptDsatur = new TclPopt(this, "dsatur",
+			    "Dsatur heuristic");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
 }
@@ -47,8 +49,19 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool print_stats = mPoptPrintStats->is_specified();
 
   bool simple = mPoptSimple->is_specified();
+  bool dsatur = mPoptDsatur->is_specified();
 
-  MinPat* minpat = simple ? new_MinPat2() : new_MinPat();
+  MinPat* minpat = NULL;
+
+  if ( simple ) {
+    minpat = new_MinPat2();
+  }
+  else if ( dsatur ) {
+    minpat = new_MinPatDsatur();
+  }
+  else {
+    minpat = new_MinPat();
+  }
 
   MinPatStats stats;
   minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), _tv_list(), stats);

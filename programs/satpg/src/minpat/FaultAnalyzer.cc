@@ -445,7 +445,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
   }
   ymuint fault_num2 = fault_list2.size();
   if ( mVerbose ) {
-    cout << " --> " << fault_num2 << ": " << n_dom2 << " / " << n_sat2
+    cout << " --> " << setw(6) << fault_num2 << ": " << setw(6) << n_dom2 << " / " << setw(6) << n_sat2
 	 << ": Lap CPU time " << local_timer.time() << endl;
   }
 
@@ -524,7 +524,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
   local_timer.stop();
 
   if ( mVerbose ) {
-    cout << " --> " << dom_fault_num << " : " << n_dom3 << " / " << n_sat3 << endl;
+    cout << " --> " << setw(6) << dom_fault_num << ": " << setw(6) << n_dom3 << " / " << setw(6) << n_sat3 << endl;
     cout << "Total    " << fault_num << " original faults" << endl;
     cout << "Total    " << dom_fault_num << " dominator faults" << endl;
     cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
@@ -790,6 +790,15 @@ const vector<FaultInfo>&
 FaultAnalyzer::fault_info_array() const
 {
   return mFaultInfoArray;
+}
+
+// @brief 個別の故障の情報を得る．
+// @param[in] fid 故障番号
+const FaultInfo&
+FaultAnalyzer::fault_info(ymuint fid) const
+{
+  ASSERT_COND( fid < mMaxFaultId );
+  return mFaultInfoArray[fid];
 }
 
 // @brief 入力番号リストを得る．

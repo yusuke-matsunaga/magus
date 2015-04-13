@@ -134,10 +134,11 @@ MinPatNaive::get_first_fault()
 }
 
 // @brief 次に処理すべき故障を選ぶ．
+// @param[in] fgmgr 故障グループを管理するオブジェクト
 //
 // 故障が残っていなければ NULL を返す．
 TpgFault*
-MinPatNaive::get_next_fault()
+MinPatNaive::get_next_fault(FgMgr& fgmgr)
 {
   if ( mNextPos < mFaultList.size() ) {
     TpgFault* fault = mFaultList[mNextPos];

@@ -63,10 +63,11 @@ MinPatBase::run(TpgNetwork& network,
   // 未処理の故障がある限り以下の処理を繰り返す．
   for (ymuint c = 0; ; ++ c) {
     cout << "\r                       ";
-    cout << "\r   " << c << " | " << nf;
+    cout << "\r   " << setw(6) << c << " / " << setw(6) << nf
+	 << " : " << setw(4) << fgmgr.group_num();
     cout.flush();
     // 故障を選ぶ．
-    TpgFault* fault = get_next_fault();
+    TpgFault* fault = get_next_fault(fgmgr);
     if ( fault == NULL ) {
       break;
     }
@@ -86,11 +87,17 @@ MinPatBase::run(TpgNetwork& network,
   local_timer.stop();
   cout << endl;
   cout << " # of fault groups = " << fgmgr.group_num() << endl;
-  cout << "CPU time (coloring)          " << local_timer.time() << endl;
+  cout << "CPU time (coloring)              " << local_timer.time() << endl;
 
   // テストパタンを作る．
+  local_timer.reset();
+  local_timer.start();
+
   vector<TestVector*> new_tv_list;
   fgmgr.make_testvector(network, tvmgr, new_tv_list);
+
+  local_timer.stop();
+  cout << "CPU time (testvector generation) " << local_timer.time() << endl;
 
   ymuint orig_num = tv_list.size();
 

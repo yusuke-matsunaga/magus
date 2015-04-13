@@ -106,6 +106,11 @@ public:
   const vector<FaultInfo>&
   fault_info_array() const;
 
+  /// @brief 個別の故障の情報を得る．
+  /// @param[in] fid 故障番号
+  const FaultInfo&
+  fault_info(ymuint fid) const;
+
   /// @brief 入力番号リストを得る．
   const vector<vector<ymuint> >&
   input_list_array() const;

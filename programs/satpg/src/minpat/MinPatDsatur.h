@@ -1,8 +1,8 @@
-#ifndef MINPATNAIVE_H
-#define MINPATNAIVE_H
+#ifndef MINPATDSATUR_H
+#define MINPATDSATUR_H
 
-/// @file MinPatNaive.h
-/// @brief MinPatNaive のヘッダファイル
+/// @file MinPatDsatur.h
+/// @brief MinPatDsatur のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -10,40 +10,31 @@
 
 
 #include "MinPatBase.h"
+#include "FaultAnalyzer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPatNaive MinPatNaive.h "MinPatNaive.h"
-/// @brief 単純な MinPat
+/// @class MinPatDsatur MinPatDsatur.h "MinPatDsatur.h"
+/// @brief 'Dsatur' っぽい MinPat
 //////////////////////////////////////////////////////////////////////
-class MinPatNaive :
+class MinPatDsatur :
   public MinPatBase
 {
 public:
 
   /// @brief コンストラクタ
-  MinPatNaive();
+  MinPatDsatur();
 
   /// @brief デストラクタ
-  ~MinPatNaive();
+  ~MinPatDsatur();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスからもちいられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ノード番号の最大値を得る．
-  ymuint
-  max_node_id() const;
 
 
 private:
@@ -92,20 +83,57 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  // 故障ごとの情報
+  struct FaultStruct
+  {
+    // 故障
+    TpgFault* mFault;
+
+    // 選択済みマーク
+    bool mSelected;
+
+    // 衝突数
+    ymuint mConflictNum;
+
+    // 衝突したグループ番号のマップ
+    vector<bool> mConflictMap;
+
+    // ペンディング数
+    ymuint mPendingNum;
+
+    // ペンディングしているグループ番号のマップ
+    vector<bool> mPendingMap;
+  };
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
 
-  // 故障リスト
-  vector<TpgFault*> mFaultList;
+  // 故障番号の最大値
+  ymuint mMaxFaultId;
 
-  // 次の故障の位置
-  ymuint mNextPos;
+  // 故障解析器
+  FaultAnalyzer mAnalyzer;
+
+  // 故障用の作業領域のリスト
+  vector<FaultStruct> mFaultStructList;
+
+  // 未処理の故障数
+  ymuint mRemainNum;
+
+  // 前回更新されたグループ番号
+  ymuint mPrevGid;
 
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // MINPATNAIVE_H
+#endif // MINPATDSATUR_H

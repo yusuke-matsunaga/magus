@@ -46,6 +46,9 @@ private:
   // simple オプション
   TclPopt* mPoptSimple;
 
+  // dsature オプション
+  TclPopt* mPoptDsatur;
+
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
 

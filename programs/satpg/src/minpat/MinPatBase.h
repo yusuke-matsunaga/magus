@@ -71,11 +71,12 @@ private:
   get_first_fault() = 0;
 
   /// @brief 次に処理すべき故障を選ぶ．
+  /// @param[in] fgmgr 故障グループを管理するオブジェクト
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
   TpgFault*
-  get_next_fault() = 0;
+  get_next_fault(FgMgr& fgmgr) = 0;
 
   /// @brief 故障を追加するグループを選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
