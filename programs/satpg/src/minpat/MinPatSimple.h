@@ -1,0 +1,65 @@
+﻿#ifndef MINPATSIMPLE_H
+#define MINPATSIMPLE_H
+
+/// @file MinPatSimple.h
+/// @brief MinPatSimple のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "MinPatNaive.h"
+
+
+BEGIN_NAMESPACE_YM_SATPG
+
+//////////////////////////////////////////////////////////////////////
+/// @class MinPatSimple MinPatSimple.h "MinPatSimple.h"
+/// @brief MinPatNaive の find_group() を改良したクラス
+//////////////////////////////////////////////////////////////////////
+class MinPatSimple :
+  public MinPatNaive
+{
+public:
+
+  /// @brief コンストラクタ
+  MinPatSimple();
+
+  /// @brief デストラクタ
+  virtual
+  ~MinPatSimple();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 故障を追加するグループを選ぶ．
+  /// @param[in] fgmgr 故障グループを管理するオブジェクト
+  /// @param[in] fault 故障
+  ///
+  /// グループが見つからなければ fgmgr.group_num() を返す．
+  virtual
+  ymuint
+  find_group(FgMgr& fgmgr,
+	     TpgFault* fault);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+};
+
+END_NAMESPACE_YM_SATPG
+
+#endif // MINPATSIMPLE_H

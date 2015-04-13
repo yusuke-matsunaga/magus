@@ -9,13 +9,10 @@
 
 #include "MinPatBase.h"
 #include "MinPatStats.h"
-#include "TvMgr.h"
-#include "FaultMgr.h"
+#include "FgMgr.h"
 #include "TpgNetwork.h"
-#include "FaultAnalyzer.h"
 #include "Verifier.h"
 
-#include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
 
 
@@ -24,16 +21,6 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 // クラス MinPatBase
 //////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-MinPatBase::MinPatBase()
-{
-}
-
-// @brief デストラクタ
-MinPatBase::~MinPatBase()
-{
-}
 
 // @brief テストベクタの最小化を行なう．
 // @param[in] network 対象のネットワーク
@@ -55,31 +42,11 @@ MinPatBase::run(TpgNetwork& network,
 
   ymuint max_node_id = network.max_node_id();
 
-#if 0
-  bool verbose = true;
-  FaultAnalyzer analyzer(verbose);
-
-  const vector<TpgFault*>& fault_list = fmgr.det_list();
-  analyzer.init(max_node_id, fault_list);
-
-  ymuint npat0 = 10000;
-  RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg, npat0);
-
-  bool dom_fast = false;
-  analyzer.get_dom_faults(dom_fast);
-
-  analyzer.analyze_faults();
-
-  analyzer.analyze_conflict();
-
-  vector<pair<ymuint, ymuint> > edge_list;
-  analyzer.get_conf_list(edge_list);
-#endif
+  ymuint nf = init(network, tvmgr, fmgr, fsim2, tv_list);
 
   StopWatch local_timer;
   local_timer.start();
-  cout << "coloring start" << endl;
+  cout << "grouping start" << endl;
 
   FgMgr fgmgr(max_node_id);
 
@@ -94,7 +61,10 @@ MinPatBase::run(TpgNetwork& network,
   }
 
   // 未処理の故障がある限り以下の処理を繰り返す．
-  for ( ; ; ) {
+  for (ymuint c = 0; ; ++ c) {
+    cout << "\r                       ";
+    cout << "\r   " << c << " | " << nf;
+    cout.flush();
     // 故障を選ぶ．
     TpgFault* fault = get_next_fault();
     if ( fault == NULL ) {
@@ -114,6 +84,7 @@ MinPatBase::run(TpgNetwork& network,
   }
 
   local_timer.stop();
+  cout << endl;
   cout << " # of fault groups = " << fgmgr.group_num() << endl;
   cout << "CPU time (coloring)          " << local_timer.time() << endl;
 

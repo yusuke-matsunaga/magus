@@ -108,9 +108,11 @@ set (minpat_SOURCES
   src/minpat/GcNodeHeap2.cc
   src/minpat/GcSolver.cc
   src/minpat/GcSolver2.cc
-  src/minpat/MinPatImpl.cc
-  src/minpat/MinPatImpl2.cc
+  src/minpat/MinPatBase.cc
+  src/minpat/MinPatNaive.cc
+  src/minpat/MinPatSimple.cc
   src/minpat/FaultAnalyzer.cc
+  src/minpat/FgMgr.cc
   src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
   src/minpat/TpgCnf2.cc

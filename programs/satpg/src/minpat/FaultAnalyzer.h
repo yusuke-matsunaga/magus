@@ -28,8 +28,7 @@ class FaultAnalyzer
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] verbose 表示を制御するフラグ
-  FaultAnalyzer(bool verbose);
+  FaultAnalyzer();
 
   /// @brief デストラクタ
   virtual
@@ -40,6 +39,11 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief verbose フラグを設定する．
+  /// @param[in] verbose 表示を制御するフラグ
+  void
+  set_verbose(bool verbose);
 
   /// @brief 初期化する．
   /// @param[in] max_node_id ノード番号の最大値 + 1

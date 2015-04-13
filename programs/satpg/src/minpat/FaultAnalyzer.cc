@@ -195,15 +195,22 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] verbose 表示を制御するフラグ
-FaultAnalyzer::FaultAnalyzer(bool verbose) :
-  mVerbose(verbose)
+FaultAnalyzer::FaultAnalyzer()
 {
+  mVerbose = false;
 }
 
 // @brief デストラクタ
 FaultAnalyzer::~FaultAnalyzer()
 {
+}
+
+// @brief verbose フラグを設定する．
+// @param[in] verbose 表示を制御するフラグ
+void
+FaultAnalyzer::set_verbose(bool verbose)
+{
+  mVerbose = verbose;
 }
 
 // @brief 初期化する．
@@ -355,7 +362,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
     if ( mVerbose ) {
       cout << "\r                  ";
-      cout << "\r" << i1 << " / " << fault_num;
+      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
 
@@ -453,7 +460,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
     if ( mVerbose ) {
       cout << "\r                  ";
-      cout << "\r" << i1 << " / " << fault_num2;
+      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num2;
       cout.flush();
     }
 
@@ -539,7 +546,7 @@ FaultAnalyzer::analyze_faults()
   for (ymuint i = 0; i < fnum; ++ i) {
     if ( mVerbose ) {
       cout << "\r                  ";
-      cout << "\r" << i << " / " << fnum;
+      cout << "\r" << setw(6) << i << " / " << setw(6) << fnum;
       cout.flush();
     }
 
