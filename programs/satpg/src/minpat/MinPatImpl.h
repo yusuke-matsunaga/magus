@@ -59,6 +59,7 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   /// @brief 支配故障を求める．
   void
   get_dom_faults(const vector<TpgFault*>& fault_list,
@@ -71,13 +72,14 @@ private:
   void
   analyze_conflict(const vector<TpgFault*>& fault_list,
 		   vector<pair<ymuint, ymuint> >& edge_list);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // 最大ノード番号
   ymuint mMaxNodeId;
 
@@ -89,6 +91,7 @@ private:
 
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;
+#endif
 
 };
 

@@ -58,52 +58,8 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 支配故障を求める．
-  void
-  get_dom_faults1(const vector<TpgFault*>& fault_list,
-		  vector<TpgFault*>& dom_fault_list);
-
-  /// @brief 支配故障を求める．
-  void
-  get_dom_faults2(const vector<TpgFault*>& fault_list,
-		  vector<TpgFault*>& dom_fault_list);
-
-  void
-  analyze_faults1(const vector<TpgFault*> fault_list);
-
-  void
-  analyze_faults2(const vector<TpgFault*> fault_list);
-
-  /// @brief 故障間の衝突性を調べる．
-  void
-  analyze_conflict(const vector<TpgFault*>& fault_list);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 最大ノード番号
-  ymuint mMaxNodeId;
-
-  // 最大故障番号
-  ymuint mMaxFaultId;
-
-  // ノードごとに関係する入力の番号のリストを収める配列
-  vector<vector<ymuint> > mInputListArray;
-
-  // ノードごとに関係する入力の番号のリストを収める配列
-  vector<vector<ymuint> > mInputList2Array;
-
-  // ノードごとに NodeSet を収める配列
-  vector<NodeSet> mNodeSetArray;
-
-  // 故障ごとの情報を収める配列
-  vector<FaultInfo> mFaultInfoArray;
 
 };
 

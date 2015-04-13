@@ -17,6 +17,7 @@
 #include "TpgFault.h"
 #include "Fsim.h"
 #include "KDet2.h"
+#include "FaultAnalyzer.h"
 #include "NodeSet.h"
 #include "NodeValList.h"
 #include "Verifier.h"
@@ -126,104 +127,37 @@ MinPatImpl::run(TpgNetwork& network,
   StopWatch local_timer;
 
   total_timer.start();
-  local_timer.start();
 
   ymuint orig_num = tv_list.size();
 
   Verifier ver(fmgr, fsim2);
 
-  // 故障番号の最大値を求める．
-  mMaxFaultId = 0;
-  const vector<TpgFault*>& f_list = fmgr.det_list();
-  ymuint fault_num = f_list.size();
-  for (ymuint i = 0; i < fault_num; ++ i) {
-    TpgFault* f = f_list[i];
-    if ( mMaxFaultId < f->id() ) {
-      mMaxFaultId = f->id();
-    }
-  }
-  ++ mMaxFaultId;
+  bool verbose = true;
+  FaultAnalyzer analyzer(verbose);
 
-  mMaxNodeId = network.max_node_id();
+  const vector<TpgFault*>& fault_list = fmgr.det_list();
+  analyzer.init(network.max_node_id(), fault_list);
 
-  mInputListArray.clear();
-  mInputListArray.resize(mMaxNodeId);
+  ymuint npat0 = 10000;
+  RandGen rg;
+  analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg, npat0);
 
-  mFaultInfoArray.clear();
-  mFaultInfoArray.resize(mMaxFaultId);
+  analyzer.get_dom_faults();
 
-  { // 各故障(に関連したノード)に関係する入力番号のリストを作る．
-    // ここでいう関係とは TFI of TFO of fault location のこと
-    // 計算には NodeSet を使う．
-    NodeSet node_set;
-    for (ymuint i = 0; i < fault_num; ++ i) {
-      TpgFault* f = f_list[i];
-      const TpgNode* node = f->node();
-      vector<ymuint>& input_list = mInputListArray[node->id()];
-      if ( !input_list.empty() ) {
-	continue;
-      }
-      node_set.mark_region(mMaxNodeId, node);
-      for (ymuint j = 0; j < node_set.tfo_tfi_size(); ++ j) {
-	const TpgNode* node1 = node_set.tfo_tfi_node(j);
-	if ( node1->is_input() ) {
-	  input_list.push_back(node1->input_id());
-	}
-      }
-      // ソートしておく．
-      sort(input_list.begin(), input_list.end());
-    }
-  }
+  analyzer.analyze_faults();
 
-  // ドロップ無しの故障シミュレーター
-  KDet2 kdet(fsim2, f_list);
-
-  ymuint npat0 = 1000;
-  ymuint npat = orig_num + npat0;
-
-  cout << "  fault simulation (npat = " << npat << ") starts."
-       << endl;
-
-  { // もともとのパタンに乱数パタンを npat0 個加える．
-    // 結果は各故障ごとに検出パタン番号を pat_list_array に入れる．
-    RandGen rg;
-    vector<TestVector*> tmp_tv_list(npat);
-    for (ymuint i = 0; i < orig_num; ++ i) {
-      TestVector* tv = tv_list[i];
-      tmp_tv_list[i] = tv;
-    }
-    for (ymuint i = 0; i < npat0; ++ i) {
-      TestVector* tv = tvmgr.new_vector();
-      tv->set_from_random(rg);
-      tmp_tv_list[i + orig_num] = tv;
-    }
-
-    kdet.run(tmp_tv_list, mFaultInfoArray);
-
-    // 乱数パタンは削除しておく．
-    for (ymuint i = 0; i < npat0; ++ i) {
-      TestVector* tv = tmp_tv_list[i + orig_num];
-      tvmgr.delete_vector(tv);
-    }
-  }
-
-  cout << "  fault simulation ends." << endl;
-
-  vector<TpgFault*> dom_fault_list;
-
-  get_dom_faults(f_list, dom_fault_list);
-
-  analyze_faults(dom_fault_list);
+  analyzer.analyze_conflict();
 
   vector<pair<ymuint, ymuint> > edge_list;
-  analyze_conflict(dom_fault_list, edge_list);
-
-  GcSolver gcsolver;
+  analyzer.get_conf_list(edge_list);
 
   local_timer.reset();
   local_timer.start();
   cout << "coloring start" << endl;
-  ymuint nc = gcsolver.coloring(dom_fault_list, mFaultInfoArray, edge_list, mMaxNodeId);
+  GcSolver gcsolver;
+  const vector<TpgFault*>& dom_fault_list = analyzer.dom_fault_list();
+  const vector<FaultInfo>& fault_info_array = analyzer.fault_info_array();
+  ymuint nc = gcsolver.coloring(dom_fault_list, fault_info_array, edge_list, network.max_node_id());
   cout << " # of fault groups = " << nc << endl;
   local_timer.stop();
   cout << "CPU time (coloring)          " << local_timer.time() << endl;
@@ -264,6 +198,7 @@ MinPatImpl::run(TpgNetwork& network,
   stats.set(orig_num, tv_list.size(), time);
 }
 
+#if 0
 
 // @brief 支配故障を求める．
 void
@@ -564,5 +499,6 @@ MinPatImpl::analyze_conflict(const vector<TpgFault*>& fault_list,
   cout << "CPU time (siple pi_suf_list) " << int1_timer.time() << endl;
   cout << "CPU time (single suf_list)   " << int2_timer.time() << endl;
 }
+#endif
 
 END_NAMESPACE_YM_SATPG
