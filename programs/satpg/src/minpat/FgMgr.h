@@ -69,13 +69,13 @@ public:
   suf_list(ymuint gid) const;
 
   /// @brief テストパタンを作る．
+  /// @param[in] gid グループ番号
   /// @param[in] network ネットワーク
-  /// @param[in] tvmgr テストベクタを管理するオブジェクト
-  /// @param[out] tv_list 生成されたテストベクタを格納するリスト
+  /// @param[in] tv テストベクタ
   void
-  make_testvector(TpgNetwork& network,
-		  TvMgr& tvmgr,
-		  vector<TestVector*>& tv_list);
+  make_testvector(ymuint gid,
+		  TpgNetwork& network,
+		  TestVector* tv);
 
 
 private:

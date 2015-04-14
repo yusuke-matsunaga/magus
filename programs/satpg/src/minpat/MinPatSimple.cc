@@ -129,7 +129,7 @@ MinPatSimple::init(TpgNetwork& network,
 
   analyzer.analyze_faults();
 
-  ymuint sample_num = 2000;
+  ymuint sample_num = 1000;
   vector<double> conf_prob_array;
   analyzer.estimate_conflict(sample_num, conf_prob_array);
 

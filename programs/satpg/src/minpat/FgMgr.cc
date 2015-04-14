@@ -102,23 +102,19 @@ FgMgr::suf_list(ymuint gid) const
 }
 
 // @brief テストパタンを作る．
+// @param[in] gid グループ番号
 // @param[in] network ネットワーク
-// @param[in] tvmgr テストベクタを管理するオブジェクト
-// @param[out] tv_list 生成されたテストベクタを格納するリスト
+// @param[in] tv テストベクタ
 void
-FgMgr::make_testvector(TpgNetwork& network,
-		       TvMgr& tvmgr,
-		       vector<TestVector*>& tv_list)
+FgMgr::make_testvector(ymuint gid,
+		       TpgNetwork& network,
+		       TestVector* tv)
 {
-  tv_list.reserve(group_num());
-  for (ymuint gid = 0; gid < group_num(); ++ gid) {
-    const NodeValList& suf_list = mGroupList[gid]->mSufList;
-    TestVector* tv = tvmgr.new_vector();
-    TpgCnf0 tpg_cnf0(string(), string(), NULL);
-    bool stat = tpg_cnf0.get_testvector(network, suf_list, tv);
-    ASSERT_COND( stat );
-    tv_list.push_back(tv);
-  }
+  ASSERT_COND( gid < group_num() );
+  const NodeValList& suf_list = mGroupList[gid]->mSufList;
+  TpgCnf0 tpg_cnf0(string(), string(), NULL);
+  bool stat = tpg_cnf0.get_testvector(network, suf_list, tv);
+  ASSERT_COND( stat );
 }
 
 END_NAMESPACE_YM_SATPG
