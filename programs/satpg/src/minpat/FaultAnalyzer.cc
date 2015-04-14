@@ -616,7 +616,7 @@ FaultAnalyzer::analyze_conflict()
 
     if ( mVerbose ) {
       cout << "\r                  ";
-      cout << "\r" << i1 << " / " << fault_num;
+      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
     vector<TpgFault*> f2_list;
@@ -626,7 +626,7 @@ FaultAnalyzer::analyze_conflict()
       f2_list.push_back(f2);
     }
     vector<TpgFault*> conf_list;
-    analyze_conflict(f1, f2_list, conf_list, false);
+    analyze_conflict(f1, f2_list, conf_list, false, false);
     for (ymuint i = 0; i < conf_list.size(); ++ i) {
       TpgFault* f2 = conf_list[i];
       mFaultInfoArray[f1->id()].mConflictList.push_back(f2->id());
@@ -649,11 +649,80 @@ FaultAnalyzer::analyze_conflict()
   }
 }
 
+// @brief 故障間の衝突性を調べる．
+void
+FaultAnalyzer::estimate_conflict(ymuint sample_num,
+				 vector<double>& conf_prob_array)
+{
+  StopWatch local_timer;
+  local_timer.start();
+
+  mConflictStats.conf_timer.reset();
+  mConflictStats.conf1_timer.reset();
+  mConflictStats.conf2_timer.reset();
+  mConflictStats.conf3_timer.reset();
+  mConflictStats.conf4_timer.reset();
+  mConflictStats.int1_timer.reset();
+  mConflictStats.int2_timer.reset();
+  mConflictStats.conf1_count = 0;
+  mConflictStats.conf2_count = 0;
+  mConflictStats.conf3_count = 0;
+  mConflictStats.conf4_count = 0;
+  mConflictStats.conf4_check_count = 0;
+  mConflictStats.int1_count = 0;
+  mConflictStats.int2_count = 0;
+
+  RandGen rg;
+
+  conf_prob_array.clear();
+  conf_prob_array.resize(mMaxFaultId);
+
+  // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
+  ymuint fault_num = mDomFaultList.size();
+  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+    TpgFault* f1 = mDomFaultList[i1];
+
+    if ( mVerbose ) {
+      cout << "\r                  ";
+      cout << "\r" << i1 << " / " << fault_num;
+      cout.flush();
+    }
+    vector<TpgFault*> f2_list;
+    if ( sample_num < fault_num ) {
+      f2_list.reserve(sample_num);
+      for (ymuint i2 = 0; i2 < sample_num; ++ i2) {
+	ymuint pos = rg.int32() % fault_num;
+	TpgFault* f2 = mDomFaultList[pos];
+	f2_list.push_back(f2);
+      }
+    }
+    else {
+      f2_list.reserve(fault_num);
+      for (ymuint i2 = 0; i2 < fault_num; ++ i2) {
+	TpgFault* f2 = mDomFaultList[i2];
+	f2_list.push_back(f2);
+      }
+    }
+    vector<TpgFault*> conf_list;
+    analyze_conflict(f1, f2_list, conf_list, true, false);
+    conf_prob_array[f1->id()] = static_cast<double>(conf_list.size()) / sample_num;
+  }
+
+  local_timer.stop();
+
+  if ( mVerbose ) {
+    cout << endl;
+    print_conflict_stats(cout);
+    cout << "Total CPU time " << local_timer.time() << endl;
+  }
+}
+
 // @brief 1つの故障と複数の故障間の衝突性を調べる．
 void
 FaultAnalyzer::analyze_conflict(TpgFault* f1,
 				const vector<TpgFault*>& f2_list,
 				vector<TpgFault*>& conf_list,
+				bool simple,
 				bool local_verbose)
 {
   mConflictStats.conf_timer.start();
@@ -736,6 +805,10 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
       continue;
     }
     mConflictStats.conf3_timer.stop();
+
+    if ( simple ) {
+      continue;
+    }
 
     mConflictStats.conf4_timer.start();
     ++ mConflictStats.conf4_check_count;

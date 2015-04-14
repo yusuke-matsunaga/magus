@@ -46,11 +46,17 @@ private:
   // simple オプション
   TclPopt* mPoptSimple;
 
-  // dsature オプション
+  // dsatur オプション
   TclPopt* mPoptDsatur;
+
+  // dsatur2 オプション
+  TclPopt* mPoptDsatur2;
 
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
+
+  // verbose オプションの解析用オブジェクト
+  TclPopt* mPoptVerbose;
 
 };
 

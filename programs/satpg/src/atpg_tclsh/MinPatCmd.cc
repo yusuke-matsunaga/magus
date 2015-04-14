@@ -27,8 +27,12 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 			    "simple heuristic");
   mPoptDsatur = new TclPopt(this, "dsatur",
 			    "Dsatur heuristic");
+  mPoptDsatur2 = new TclPopt(this, "dsatur2",
+			    "Dsatur-2 heuristic");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
+  mPoptVerbose = new TclPopt(this, "verbose",
+			     "print statistics");
 }
 
 // @brief デストラクタ
@@ -50,6 +54,8 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   bool simple = mPoptSimple->is_specified();
   bool dsatur = mPoptDsatur->is_specified();
+  bool dsatur2 = mPoptDsatur2->is_specified();
+  bool verbose = mPoptVerbose->is_specified();
 
   MinPat* minpat = NULL;
 
@@ -59,9 +65,14 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   else if ( dsatur ) {
     minpat = new_MinPatDsatur();
   }
+  else if ( dsatur2 ) {
+    minpat = new_MinPatDsatur2();
+  }
   else {
     minpat = new_MinPat();
   }
+
+  minpat->set_verbose(verbose);
 
   MinPatStats stats;
   minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), _tv_list(), stats);

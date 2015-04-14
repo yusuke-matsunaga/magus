@@ -26,6 +26,20 @@ new_MinPat()
   return new MinPatNaive();
 }
 
+BEGIN_NONAMESPACE
+
+struct FaultLt
+{
+  bool
+  operator()(const pair<ymuint, TpgFault*>& left,
+	     const pair<ymuint, TpgFault*>& right)
+  {
+    return left.first < right.first;
+  }
+};
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス MinPatNaive
 //////////////////////////////////////////////////////////////////////
@@ -58,8 +72,7 @@ MinPatNaive::init(TpgNetwork& network,
 
   FaultAnalyzer analyzer;
 
-  bool verbose = true;
-  analyzer.set_verbose(verbose);
+  analyzer.set_verbose(verbose());
 
 #if 0
   const vector<TpgFault*>& fault_list = fmgr.det_list();
@@ -111,15 +124,22 @@ MinPatNaive::init(TpgNetwork& network,
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg, npat0);
 
-  bool dom_fast = false;
+  bool dom_fast = true;
   analyzer.get_dom_faults(dom_fast);
 
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
+  vector<pair<ymuint, TpgFault*> > tmp_list(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    TpgFault* f = src_list[i];
+    ymuint fnum = analyzer.fault_info(f->id()).fnum();
+    tmp_list[i] = make_pair(fnum, f);
+  }
+  sort(tmp_list.begin(), tmp_list.end(), FaultLt());
   mFaultList.clear();
   mFaultList.resize(nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    mFaultList[i] = src_list[i];
+    mFaultList[i] = tmp_list[i].second;
   }
 
   return nf;

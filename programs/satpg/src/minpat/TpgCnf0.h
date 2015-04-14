@@ -61,6 +61,10 @@ private:
   void
   add_assumptions(const NodeValList& assign_list);
 
+  /// @brief node とその TFI の部分の CNF を作る．
+  void
+  mark_dfs(const TpgNode* node);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -72,6 +76,9 @@ private:
 
   // 正常値
   GenVidMap mGvarMap;
+
+  // mark_dfs() で用いるマーク配列
+  vector<bool> mMark;
 
 };
 

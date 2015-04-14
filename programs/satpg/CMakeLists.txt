@@ -112,6 +112,7 @@ set (minpat_SOURCES
   src/minpat/MinPatNaive.cc
   src/minpat/MinPatSimple.cc
   src/minpat/MinPatDsatur.cc
+  src/minpat/MinPatDsatur2.cc
   src/minpat/FaultAnalyzer.cc
   src/minpat/FgMgr.cc
   src/minpat/TpgCnf0.cc

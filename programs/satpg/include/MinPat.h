@@ -49,6 +49,11 @@ public:
       vector<TestVector*>& tv_list,
       MinPatStats& stats) = 0;
 
+  /// @brief verbose フラグをセットする．
+  virtual
+  void
+  set_verbose(bool verbose) = 0;
+
 };
 
 
@@ -66,6 +71,11 @@ new_MinPat2();
 extern
 MinPat*
 new_MinPatDsatur();
+
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_MinPatDsatur2();
 
 END_NAMESPACE_YM_SATPG
 

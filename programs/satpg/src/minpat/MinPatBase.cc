@@ -22,6 +22,17 @@ BEGIN_NAMESPACE_YM_SATPG
 // クラス MinPatBase
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+MinPatBase::MinPatBase()
+{
+  mVerbose = false;
+}
+
+// @brief デストラクタ
+MinPatBase::~MinPatBase()
+{
+}
+
 // @brief テストベクタの最小化を行なう．
 // @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
@@ -46,7 +57,9 @@ MinPatBase::run(TpgNetwork& network,
 
   StopWatch local_timer;
   local_timer.start();
-  cout << "grouping start" << endl;
+  if ( verbose() ) {
+    cout << "grouping start" << endl;
+  }
 
   FgMgr fgmgr(max_node_id);
 
@@ -62,10 +75,14 @@ MinPatBase::run(TpgNetwork& network,
 
   // 未処理の故障がある限り以下の処理を繰り返す．
   for (ymuint c = 0; ; ++ c) {
-    cout << "\r                       ";
-    cout << "\r   " << setw(6) << c << " / " << setw(6) << nf
-	 << " : " << setw(4) << fgmgr.group_num();
-    cout.flush();
+
+    if ( verbose() ) {
+      cout << "\r                       ";
+      cout << "\r   " << setw(6) << c << " / " << setw(6) << nf
+	   << " : " << setw(4) << fgmgr.group_num();
+      cout.flush();
+    }
+
     // 故障を選ぶ．
     TpgFault* fault = get_next_fault(fgmgr);
     if ( fault == NULL ) {
@@ -85,9 +102,11 @@ MinPatBase::run(TpgNetwork& network,
   }
 
   local_timer.stop();
-  cout << endl;
-  cout << " # of fault groups = " << fgmgr.group_num() << endl;
-  cout << "CPU time (coloring)              " << local_timer.time() << endl;
+  if ( verbose() ) {
+    cout << endl;
+    cout << " # of fault groups = " << fgmgr.group_num() << endl;
+    cout << "CPU time (coloring)              " << local_timer.time() << endl;
+  }
 
   // テストパタンを作る．
   local_timer.reset();
@@ -97,7 +116,9 @@ MinPatBase::run(TpgNetwork& network,
   fgmgr.make_testvector(network, tvmgr, new_tv_list);
 
   local_timer.stop();
-  cout << "CPU time (testvector generation) " << local_timer.time() << endl;
+  if ( verbose() ) {
+    cout << "CPU time (testvector generation) " << local_timer.time() << endl;
+  }
 
   ymuint orig_num = tv_list.size();
 
@@ -115,6 +136,20 @@ MinPatBase::run(TpgNetwork& network,
   USTime time = total_timer.time();
 
   stats.set(orig_num, tv_list.size(), time);
+}
+
+// @brief verbose フラグをセットする．
+void
+MinPatBase::set_verbose(bool verbose)
+{
+  mVerbose = verbose;
+}
+
+// @brief verbose フラグを得る．
+bool
+MinPatBase::verbose() const
+{
+  return mVerbose;
 }
 
 END_NAMESPACE_YM_SATPG

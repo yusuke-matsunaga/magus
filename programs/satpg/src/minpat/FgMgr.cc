@@ -110,11 +110,11 @@ FgMgr::make_testvector(TpgNetwork& network,
 		       TvMgr& tvmgr,
 		       vector<TestVector*>& tv_list)
 {
-  TpgCnf0 tpg_cnf0(string(), string(), NULL);
   tv_list.reserve(group_num());
   for (ymuint gid = 0; gid < group_num(); ++ gid) {
     const NodeValList& suf_list = mGroupList[gid]->mSufList;
     TestVector* tv = tvmgr.new_vector();
+    TpgCnf0 tpg_cnf0(string(), string(), NULL);
     bool stat = tpg_cnf0.get_testvector(network, suf_list, tv);
     ASSERT_COND( stat );
     tv_list.push_back(tv);

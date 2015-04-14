@@ -126,12 +126,18 @@ private:
   // 故障用の作業領域のリスト
   vector<FaultStruct> mFaultStructList;
 
+  // 故障番号から FaultStruct の位置を引くためのマップ
+  vector<ymuint> mFaultMap;
+
   // 未処理の故障数
   ymuint mRemainNum;
 
   // 前回更新されたグループ番号
   ymuint mPrevGid;
 
+  ymuint mSimpleConfNum;
+  ymuint mSatConfNum;
+  ymuint mCompatNum;
 };
 
 END_NAMESPACE_YM_SATPG

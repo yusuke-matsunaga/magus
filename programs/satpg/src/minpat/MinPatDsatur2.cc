@@ -1,13 +1,13 @@
 
-/// @file MinPatDsatur.cc
-/// @brief MinPatDsatur の実装ファイル
+/// @file MinPatDsatur2.cc
+/// @brief MinPatDsatur2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPatDsatur.h"
+#include "MinPatDsatur2.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
 #include "FaultMgr.h"
@@ -21,22 +21,22 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 MinPat*
-new_MinPatDsatur()
+new_MinPatDsatur2()
 {
-  return new MinPatDsatur();
+  return new MinPatDsatur2();
 }
 
 //////////////////////////////////////////////////////////////////////
-// クラス MinPatDsatur
+// クラス MinPatDsatur2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MinPatDsatur::MinPatDsatur()
+MinPatDsatur2::MinPatDsatur2()
 {
 }
 
 // @brief デストラクタ
-MinPatDsatur::~MinPatDsatur()
+MinPatDsatur2::~MinPatDsatur2()
 {
 }
 
@@ -48,11 +48,11 @@ MinPatDsatur::~MinPatDsatur()
 // @param[in] tv_list テストベクタのリスト
 // @return 支配故障数を返す．
 ymuint
-MinPatDsatur::init(TpgNetwork& network,
-		   TvMgr& tvmgr,
-		   FaultMgr& fmgr,
-		   Fsim& fsim2,
-		   vector<TestVector*>& tv_list)
+MinPatDsatur2::init(TpgNetwork& network,
+		    TvMgr& tvmgr,
+		    FaultMgr& fmgr,
+		    Fsim& fsim2,
+		    vector<TestVector*>& tv_list)
 {
   mMaxNodeId = network.max_node_id();
 
@@ -115,6 +115,8 @@ MinPatDsatur::init(TpgNetwork& network,
 
   analyzer.analyze_faults();
 
+  analyzer.analyze_conflict();
+
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
 
@@ -133,49 +135,43 @@ MinPatDsatur::init(TpgNetwork& network,
   mFaultMap.resize(mMaxFaultId);
 
   for (ymuint i = 0; i < nf; ++ i) {
-    FaultStruct& fs = mFaultStructList[i];
     TpgFault* fault = src_list[i];
+    FaultStruct& fs = mFaultStructList[i];
     fs.mFault = fault;
     fs.mSelected = false;
+    fs.mConflictList = analyzer.fault_info(fault->id()).mConflictList;
     fs.mConflictNum = 0;
     fs.mConflictMap.resize(1, false);
-    fs.mPendingNum = 0;
-    fs.mPendingMap.resize(1, false);
     mFaultMap[fault->id()] = i;
   }
-  mRemainNum = nf;
 
-  mSimpleConfNum = 0;
-  mSatConfNum = 0;
-  mCompatNum = 0;
+  mRemainNum = nf;
 
   return nf;
 }
 
 // @brief 最初の故障を選ぶ．
 TpgFault*
-MinPatDsatur::get_first_fault()
+MinPatDsatur2::get_first_fault()
 {
   ASSERT_COND( mRemainNum > 0 );
 
-  // 最初は同時検出故障数の少ない故障を選ぶ．
-  TpgFault* min_fault = NULL;
-  ymuint min_count = 0;
-  ymuint min_pos = 0;
+  // 最初は衝突数の多い故障を選ぶ．
+  ymuint max_count = 0;
+  ymuint max_pos = 0;
   ymuint fault_num = mFaultStructList.size();
   for (ymuint i = 0; i < fault_num; ++ i) {
-    TpgFault* fault = mFaultStructList[i].mFault;
-    ymuint fnum = mAnalyzer.fault_info(fault->id()).fnum();
-    if ( min_fault == NULL || min_count > fnum ) {
-      min_count = fnum;
-      min_fault = fault;
-      min_pos = i;
+    FaultStruct& fs = mFaultStructList[i];
+    if ( max_count < fs.mConflictList.size() ) {
+      max_count = fs.mConflictList.size();
+      max_pos = i;
     }
   }
-  mPrevGid = 0;
-  mFaultStructList[min_pos].mSelected = true;
+  mFaultStructList[max_pos].mSelected = true;
   -- mRemainNum;
-  return min_fault;
+  mPrevFpos = max_pos;
+  mPrevGid = 0;
+  return mFaultStructList[max_pos].mFault;
 }
 
 // @brief 次に処理すべき故障を選ぶ．
@@ -183,15 +179,9 @@ MinPatDsatur::get_first_fault()
 //
 // 故障が残っていなければ NULL を返す．
 TpgFault*
-MinPatDsatur::get_next_fault(FgMgr& fgmgr)
+MinPatDsatur2::get_next_fault(FgMgr& fgmgr)
 {
   if ( mRemainNum == 0 ) {
-    if ( verbose() ) {
-      cout << endl;
-      cout << "SimpleConfNum: " << mSimpleConfNum << endl
-	   << "SatConfNum:    " << mSatConfNum << endl
-	   << "CompatNum:     " << mCompatNum << endl;
-    }
     return NULL;
   }
 
@@ -203,77 +193,54 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr)
 
   bool first = true;
   ymuint max_satur = 0;
+  ymuint max_conf = 0;
   for (ymuint i = 0; i < fault_num; ++ i) {
     FaultStruct& fs = mFaultStructList[i];
     if ( fs.mSelected ) {
       continue;
     }
-    if ( !fs.mConflictMap[mPrevGid] && !fs.mPendingMap[mPrevGid] ) {
-      fs.mPendingMap[mPrevGid] = true;
-      ++ fs.mPendingNum;
+    if ( !fs.mConflictMap[mPrevGid] ) {
+      FaultStruct& fs2 = mFaultStructList[mPrevFpos];
+      for (ymuint j = 0; j < fs2.mConflictList.size(); ++ j) {
+	ymuint fid = fs2.mConflictList[j];
+	if ( fid == fs.mFault->id() ) {
+	  fs.mConflictMap[mPrevGid] = true;
+	  ++ fs.mConflictNum;
+	  break;
+	}
+      }
     }
     if ( first || max_satur < fs.mConflictNum ) {
       first = false;
       max_satur = fs.mConflictNum;
       max_pos = i;
-    }
-  }
-
-  for ( ; ; ) {
-    ymuint max2 = max_satur;
-    ymuint max2_pos = 0;
-    for (ymuint i = 0; i < fault_num; ++ i) {
-      FaultStruct& fs = mFaultStructList[i];
-      if ( fs.mSelected ) {
-	continue;
-      }
-      if ( max2 < fs.mConflictNum + fs.mPendingNum ) {
-	max2 = fs.mConflictNum + fs.mPendingNum;
-	max2_pos = i;
-      }
-    }
-    if ( max2 > max_satur ) {
-      ymuint slack = max2 - max_satur;
-      FaultStruct& fs = mFaultStructList[max2_pos];
-      TpgCnf1 tpg_cnf(string(), string(), NULL);
-      tpg_cnf.make_fval_cnf(fs.mFault, mMaxNodeId);
-      const NodeValList& ma_list = mAnalyzer.fault_info(fs.mFault->id()).mMaList;
-      for (ymuint gid = 0; gid < ng; ++ gid) {
-	if ( fs.mPendingMap[gid] ) {
-	  fs.mPendingMap[gid] = false;
-	  -- fs.mPendingNum;
-	  const NodeValList& suf_list0 = fgmgr.suf_list(gid);
-	  if ( check_conflict(suf_list0, ma_list) ) {
-	    ++ fs.mConflictNum;
-	    fs.mConflictMap[gid] = true;
-	    ++ mSimpleConfNum;
-	  }
-	  else if ( !tpg_cnf.check_intersect(suf_list0) ) {
-	    ++ fs.mConflictNum;
-	    fs.mConflictMap[gid] = true;
-	    ++ mSatConfNum;
-	  }
-	  else {
-	    ++ mCompatNum;
-	    -- slack;
-	    if ( slack == 0 ) {
-	      break;
-	    }
-	  }
+      ymuint conf_num = 0;
+      for (ymuint j = 0; j < fs.mConflictList.size(); ++ j) {
+	ymuint fid = fs.mConflictList[j];
+	if ( !mFaultStructList[mFaultMap[fid]].mSelected ) {
+	  ++ conf_num;
 	}
       }
-      if ( slack > 0 ) {
-	max_satur = fs.mConflictNum;
-	max_pos = max2_pos;
+      max_conf = conf_num;
+    }
+    else if ( max_satur == fs.mConflictNum ) {
+      // 同点の場合には未選択の故障と多く衝突するものを選ぶ．
+      ymuint conf_num = 0;
+      for (ymuint j = 0; j < fs.mConflictList.size(); ++ j) {
+	ymuint fid = fs.mConflictList[j];
+	if ( !mFaultStructList[mFaultMap[fid]].mSelected ) {
+	  ++ conf_num;
+	}
+      }
+      if ( max_conf < conf_num ) {
+	max_conf = conf_num;
+	max_pos = i;
       }
     }
-    else {
-      break;
-    }
   }
-
   mFaultStructList[max_pos].mSelected = true;
   -- mRemainNum;
+  mPrevFpos = max_pos;
   return mFaultStructList[max_pos].mFault;
 }
 
@@ -283,32 +250,34 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr)
 //
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
-MinPatDsatur::find_group(FgMgr& fgmgr,
-			 TpgFault* fault)
+MinPatDsatur2::find_group(FgMgr& fgmgr,
+			  TpgFault* fault)
 {
-  TpgCnf1 tpg_cnf(string(), string(), NULL);
-  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
-
-  FaultStruct& fs0 = mFaultStructList[mFaultMap[fault->id()]];
-
   ymuint ng = fgmgr.group_num();
-  for (ymuint gid = 0; gid < ng; ++ gid) {
-    if ( fs0.mConflictMap[gid] ) {
-      continue;
-    }
-    const NodeValList& suf_list0 = fgmgr.suf_list(gid);
-    if ( tpg_cnf.check_intersect(suf_list0) ) {
-      mPrevGid = gid;
-      return gid;
+  FaultStruct& fs0 = mFaultStructList[mFaultMap[fault->id()]];
+  if ( fs0.mConflictNum < ng ) {
+    TpgCnf1 tpg_cnf(string(), string(), NULL);
+    tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+
+    for (ymuint gid = 0; gid < ng; ++ gid) {
+      if ( fs0.mConflictMap[gid] ) {
+	continue;
+      }
+      const NodeValList& suf_list0 = fgmgr.suf_list(gid);
+      if ( tpg_cnf.check_intersect(suf_list0) ) {
+	mPrevGid = gid;
+	return gid;
+      }
     }
   }
+
+  // 新しいグループを作ることになる．
   for (ymuint i = 0; i < mFaultStructList.size(); ++ i) {
     FaultStruct& fs = mFaultStructList[i];
     if ( fs.mSelected ) {
       continue;
     }
     fs.mConflictMap.resize(ng + 1, false);
-    fs.mPendingMap.resize(ng + 1, false);
   }
   mPrevGid = ng;
   return ng;

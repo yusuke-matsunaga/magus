@@ -1,67 +1,40 @@
-﻿#ifndef MINPATBASE_H
-#define MINPATBASE_H
+#ifndef MINPATDSATUR2_H
+#define MINPATDSATUR2_H
 
-/// @file MinPatBase.h
-/// @brief MinPatBase のヘッダファイル
+/// @file MinPatDsatur2.h
+/// @brief MinPatDsatur2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013-2014, 2015 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPat.h"
+#include "MinPatBase.h"
+#include "FaultAnalyzer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
-class FgMgr;
-
 //////////////////////////////////////////////////////////////////////
-/// @class MinPatBase MinPatBase.h "MinPatBase.h"
-/// @brief MinPat の実装クラス
+/// @class MinPatDsatur2 MinPatDsatur2.h "MinPatDsatur2.h"
+/// @brief 'Dsatur' っぽい MinPat
 //////////////////////////////////////////////////////////////////////
-class MinPatBase :
-  public MinPat
+class MinPatDsatur2 :
+  public MinPatBase
 {
 public:
 
   /// @brief コンストラクタ
-  MinPatBase();
+  MinPatDsatur2();
 
   /// @brief デストラクタ
-  virtual
-  ~MinPatBase();
+  ~MinPatDsatur2();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief テストベクタの最小化を行なう．
-  /// @param[in] network 対象のネットワーク
-  /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim2 2値の故障シミュレータ(検証用)
-  /// @param[out] tv_list テストベクタのリスト
-  /// @param[out] stats 実行結果の情報を格納する変数
-  virtual
-  void
-  run(TpgNetwork& network,
-      TvMgr& tvmgr,
-      FaultMgr& fmgr,
-      Fsim& fsim2,
-      vector<TestVector*>& tv_list,
-      MinPatStats& stats);
-
-  /// @brief verbose フラグをセットする．
-  virtual
-  void
-  set_verbose(bool verbose);
-
-  /// @brief verbose フラグを得る．
-  bool
-  verbose() const;
 
 
 private:
@@ -82,12 +55,12 @@ private:
        TvMgr& tvmgr,
        FaultMgr& fmgr,
        Fsim& fsim2,
-       vector<TestVector*>& tv_list) = 0;
+       vector<TestVector*>& tv_list);
 
   /// @brief 最初の故障を選ぶ．
   virtual
   TpgFault*
-  get_first_fault() = 0;
+  get_first_fault();
 
   /// @brief 次に処理すべき故障を選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
@@ -95,7 +68,7 @@ private:
   /// 故障が残っていなければ NULL を返す．
   virtual
   TpgFault*
-  get_next_fault(FgMgr& fgmgr) = 0;
+  get_next_fault(FgMgr& fgmgr);
 
   /// @brief 故障を追加するグループを選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
@@ -105,7 +78,33 @@ private:
   virtual
   ymuint
   find_group(FgMgr& fgmgr,
-	     TpgFault* fault) = 0;
+	     TpgFault* fault);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  // 故障ごとの情報
+  struct FaultStruct
+  {
+    // 故障
+    TpgFault* mFault;
+
+    // 選択済みマーク
+    bool mSelected;
+
+    // 衝突している故障番号のリスト
+    vector<ymuint> mConflictList;
+
+    // 衝突数
+    ymuint mConflictNum;
+
+    // 衝突したグループ番号のマップ
+    vector<bool> mConflictMap;
+
+  };
 
 
 private:
@@ -113,11 +112,31 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // verbose フラグ
-  bool mVerbose;
+  // ノード番号の最大値
+  ymuint mMaxNodeId;
 
+  // 故障番号の最大値
+  ymuint mMaxFaultId;
+
+  // 故障解析器
+  FaultAnalyzer mAnalyzer;
+
+  // 故障用の作業領域のリスト
+  vector<FaultStruct> mFaultStructList;
+
+  // 故障番号から FaultStruct の位置を引くためのマップ
+  vector<ymuint> mFaultMap;
+
+  // 未処理の故障数
+  ymuint mRemainNum;
+
+  // 前回選ばれた故障
+  ymuint mPrevFpos;
+
+  // 前回選ばれたグループ番号
+  ymuint mPrevGid;
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // MINPATBASE_H
+#endif // MINPATDSATUR2_H

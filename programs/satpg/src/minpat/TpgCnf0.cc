@@ -17,6 +17,10 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス TpgCnf0
 //////////////////////////////////////////////////////////////////////
@@ -50,6 +54,9 @@ TpgCnf0::get_testvector(TpgNetwork& network,
 
   mGvarMap.init(max_id);
 
+  mMark.clear();
+  mMark.resize(max_id, false);
+
   //////////////////////////////////////////////////////////////////////
   // 変数の割当
   //////////////////////////////////////////////////////////////////////
@@ -62,10 +69,6 @@ TpgCnf0::get_testvector(TpgNetwork& network,
   //////////////////////////////////////////////////////////////////////
   // 正常回路の CNF を生成
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < network.active_node_num(); ++ i) {
-    const TpgNode* node = network.active_node(i);
-    mEngine.make_node_cnf(node, mGvarMap);
-  }
   mEngine.assumption_begin();
 
   add_assumptions(list);
@@ -95,6 +98,7 @@ TpgCnf0::add_assumptions(const NodeValList& assign_list)
   for (ymuint i = 0; i < assign_list.size(); ++ i) {
     NodeVal nv = assign_list[i];
     const TpgNode* node = nv.node();
+    mark_dfs(node);
     Literal alit(mGvarMap(node), false);
     if ( nv.val() ) {
       mEngine.assumption_add(alit);
@@ -103,6 +107,23 @@ TpgCnf0::add_assumptions(const NodeValList& assign_list)
       mEngine.assumption_add(~alit);
     }
   }
+}
+
+void
+TpgCnf0::mark_dfs(const TpgNode* node)
+{
+  if ( mMark[node->id()] ) {
+    return;
+  }
+  mMark[node->id()] = true;
+
+  ymuint ni = node->fanin_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TpgNode* inode = node->fanin(i);
+    mark_dfs(inode);
+  }
+
+  mEngine.make_node_cnf(node, mGvarMap);
 }
 
 END_NAMESPACE_YM_SATPG
