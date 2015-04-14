@@ -522,7 +522,6 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
   ymuint dom_fault_num = mDomFaultList.size();
   local_timer.stop();
-
   if ( mVerbose ) {
     cout << " --> " << setw(6) << dom_fault_num << ": " << setw(6) << n_dom3 << " / " << setw(6) << n_sat3 << endl;
     cout << "Total    " << fault_num << " original faults" << endl;

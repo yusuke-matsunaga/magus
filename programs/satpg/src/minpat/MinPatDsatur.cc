@@ -286,31 +286,19 @@ ymuint
 MinPatDsatur::find_group(FgMgr& fgmgr,
 			 TpgFault* fault)
 {
-  TpgCnf1 tpg_cnf(string(), string(), NULL);
-  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
-
-  FaultStruct& fs0 = mFaultStructList[mFaultMap[fault->id()]];
-
+  ymuint gid = fgmgr.find_group(fault);
+  mPrevGid = gid;
   ymuint ng = fgmgr.group_num();
-  for (ymuint gid = 0; gid < ng; ++ gid) {
-    if ( fs0.mConflictMap[gid] ) {
-      continue;
-    }
-    const NodeValList& suf_list0 = fgmgr.suf_list(gid);
-    if ( tpg_cnf.check_intersect(suf_list0) ) {
-      mPrevGid = gid;
-      return gid;
+  if ( gid == ng ) {
+    for (ymuint i = 0; i < mFaultStructList.size(); ++ i) {
+      FaultStruct& fs = mFaultStructList[i];
+      if ( fs.mSelected ) {
+	continue;
+      }
+      fs.mConflictMap.resize(ng + 1, false);
+      fs.mPendingMap.resize(ng + 1, false);
     }
   }
-  for (ymuint i = 0; i < mFaultStructList.size(); ++ i) {
-    FaultStruct& fs = mFaultStructList[i];
-    if ( fs.mSelected ) {
-      continue;
-    }
-    fs.mConflictMap.resize(ng + 1, false);
-    fs.mPendingMap.resize(ng + 1, false);
-  }
-  mPrevGid = ng;
   return ng;
 }
 

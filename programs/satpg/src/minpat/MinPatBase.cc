@@ -104,82 +104,23 @@ MinPatBase::run(TpgNetwork& network,
     fgmgr.add_fault(gid, fault);
   }
 
-  ymuint ng = fgmgr.group_num();
-  vector<ymuint> group_list(ng);
-  { // 後処理
-    for (ymuint i = 0; i < ng; ++ i) {
-      group_list[i] = i;
-    }
-    vector<bool> locked(ng, false);
-    for ( ; ; ) {
-      ymuint min_group = ng;
-      ymuint min_size = fmgr.det_list().size();
-      for (ymuint i = 0; i < group_list.size(); ++ i) {
-	ymuint gid = group_list[i];
-	if ( locked[gid] ) {
-	  continue;
-	}
-	const vector<TpgFault*>& fault_list = fgmgr.fault_list(gid);
-	ymuint size = fault_list.size();
-	if ( min_size > size ) {
-	  min_size = size;
-	  min_group = gid;
-	}
-      }
-      if ( min_group == ng ) {
-	break;
-      }
-      const vector<TpgFault*>& fault_list = fgmgr.fault_list(min_group);
-      bool red = true;
-      for (ymuint i = 0; i < min_size; ++ i) {
-	TpgFault* fault = fault_list[i];
-	// fault がマージできる他のグループを探す．
-	TpgCnf1 tpg_cnf(string(), string(), NULL);
-	tpg_cnf.make_fval_cnf(fault, max_node_id);
-
-	bool found = false;
-	for (ymuint j = 0; j < group_list.size(); ++ j) {
-	  ymuint gid = group_list[j];
-	  if ( gid == min_group ) {
-	    continue;
-	  }
-	  const NodeValList& suf_list = fgmgr.suf_list(gid);
-	  if ( tpg_cnf.check_intersect(suf_list) ) {
-	    fgmgr.add_fault(gid, fault);
-	    found = true;
-	    break;
-	  }
-	}
-	if ( !found ) {
-	  // 見つからなかった．
-	  red = false;
-	  break;
-	}
-      }
-      if ( red ) {
-	vector<ymuint> tmp_list(group_list.size());
-	for (ymuint i = 0; i < group_list.size(); ++ i) {
-	  tmp_list[i] = group_list[i];
-	}
-	group_list.clear();
-	for (ymuint i = 0; i < tmp_list.size(); ++ i) {
-	  ymuint gid = tmp_list[i];
-	  if ( gid != min_group ) {
-	    group_list.push_back(gid);
-	  }
-	}
-	cout << "Group#" << min_group << ": " << min_size
-	     << " --> deleted" << endl;
-      }
-      locked[min_group] = true;
-    }
+  local_timer.stop();
+  if ( verbose() ) {
+    cout << endl;
+    cout << " # of fault groups = " << fgmgr.group_num() << endl;
+    cout << "CPU time (coloring)              " << local_timer.time() << endl;
   }
+
+  // 後処理
+  local_timer.start();
+  vector<ymuint> group_list;
+  fgmgr.compaction(group_list);
 
   local_timer.stop();
   if ( verbose() ) {
     cout << endl;
     cout << " # of fault groups = " << group_list.size() << endl;
-    cout << "CPU time (coloring)              " << local_timer.time() << endl;
+    cout << "CPU time (compaction)              " << local_timer.time() << endl;
   }
 
   // テストパタンを作る．

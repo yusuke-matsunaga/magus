@@ -254,33 +254,19 @@ MinPatDsatur2::find_group(FgMgr& fgmgr,
 			  TpgFault* fault)
 {
   ymuint ng = fgmgr.group_num();
-  FaultStruct& fs0 = mFaultStructList[mFaultMap[fault->id()]];
-  if ( fs0.mConflictNum < ng ) {
-    TpgCnf1 tpg_cnf(string(), string(), NULL);
-    tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
-
-    for (ymuint gid = 0; gid < ng; ++ gid) {
-      if ( fs0.mConflictMap[gid] ) {
+  ymuint gid = fgmgr.find_group(fault);
+  mPrevGid = gid;
+  if ( gid == ng ) {
+    // 新しいグループを作ることになる．
+    for (ymuint i = 0; i < mFaultStructList.size(); ++ i) {
+      FaultStruct& fs = mFaultStructList[i];
+      if ( fs.mSelected ) {
 	continue;
       }
-      const NodeValList& suf_list0 = fgmgr.suf_list(gid);
-      if ( tpg_cnf.check_intersect(suf_list0) ) {
-	mPrevGid = gid;
-	return gid;
-      }
+      fs.mConflictMap.resize(ng + 1, false);
     }
   }
-
-  // 新しいグループを作ることになる．
-  for (ymuint i = 0; i < mFaultStructList.size(); ++ i) {
-    FaultStruct& fs = mFaultStructList[i];
-    if ( fs.mSelected ) {
-      continue;
-    }
-    fs.mConflictMap.resize(ng + 1, false);
-  }
-  mPrevGid = ng;
-  return ng;
+  return gid;
 }
 
 END_NAMESPACE_YM_SATPG

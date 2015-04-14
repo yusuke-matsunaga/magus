@@ -11,6 +11,8 @@
 #include "TvMgr.h"
 #include "TpgCnf0.h"
 #include "TpgCnf1.h"
+#include "TpgFault.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -77,8 +79,84 @@ FgMgr::add_fault(ymuint gid,
   bool stat = tpg_cnf.get_suf_list(fg->mSufList, suf_list);
   ASSERT_COND( stat );
 
-  fg->mFaultList.push_back(fault);
-  fg->mSufList.merge(suf_list);
+  fg->add_fault(fault, suf_list);
+}
+
+// @brief 故障を取り除く
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @param[in] fault_list 故障リスト
+void
+FgMgr::delete_fault(ymuint gid,
+		    const vector<TpgFault*>& fault_list)
+{
+  ASSERT_COND( gid < group_num() );
+  FaultGroup* fg = mGroupList[gid];
+
+  HashSet<ymuint> fault_hash;
+  for (ymuint i = 0; i < fault_list.size(); ++ i) {
+    TpgFault* fault = fault_list[i];
+    fault_hash.add(fault->id());
+  }
+
+  fg->mSufList = NodeValList();
+  ymuint nf = fg->mFaultList.size();
+  ymuint wpos = 0;
+  for (ymuint i = 0; i < nf; ++ i) {
+    TpgFault* fault = fg->mFaultList[i];
+    if ( fault_hash.check(fault->id()) ) {
+      continue;
+    }
+    if ( wpos != i ) {
+      fg->mFaultList[wpos] = fault;
+      fg->mFaultSufList[wpos] = fg->mFaultSufList[i];
+    }
+    ++ wpos;
+    fg->mSufList.merge(fg->mFaultSufList[i]);
+  }
+  fg->mFaultList.erase(fg->mFaultList.begin() + wpos, fg->mFaultList.end());
+  fg->mFaultSufList.erase(fg->mFaultSufList.begin() + wpos, fg->mFaultSufList.end());
+}
+
+// @brief 故障を追加することのできるグループを求める．
+//
+// 見つからない場合には group_num() を返す．
+ymuint
+FgMgr::find_group(TpgFault* fault)
+{
+  TpgCnf1 tpg_cnf(string(), string(), NULL);
+  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+
+  ymuint ng = group_num();
+  for (ymuint gid = 0; gid < ng; ++ gid) {
+    const NodeValList& suf_list0 = mGroupList[gid]->mSufList;
+    if ( tpg_cnf.check_intersect(suf_list0) ) {
+      return gid;
+    }
+  }
+  return ng;
+}
+
+// @brief 故障グループの圧縮を行う．
+// @param[out] group_list グループ番号のリスト
+void
+FgMgr::compaction(vector<ymuint>& group_list)
+{
+  ymuint ng = mGroupList.size();
+  group_list.clear();
+  group_list.reserve(ng);
+  for (ymuint i = 0; i < ng; ++ i) {
+    group_list.push_back(i);
+  }
+
+  for ( ; ; ) {
+    ymuint ng0 = group_list.size();
+    phase1(group_list);
+    if ( group_list.size() == ng0 ) {
+      break;
+    }
+
+    phase2(group_list);
+  }
 }
 
 // @brief 故障リストを返す．
@@ -115,6 +193,179 @@ FgMgr::make_testvector(ymuint gid,
   TpgCnf0 tpg_cnf0(string(), string(), NULL);
   bool stat = tpg_cnf0.get_testvector(network, suf_list, tv);
   ASSERT_COND( stat );
+}
+
+// @brief phase-1
+// @param[inout] group_list 選択されたグループ番号のリスト
+//
+// 他のグループに移動させることでグループを削除する．
+void
+FgMgr::phase1(vector<ymuint>& group_list)
+{
+  ymuint max_group_id = mGroupList.size();
+
+  vector<bool> locked(max_group_id, false);
+  for ( ; ; ) {
+    ymuint min_gid = max_group_id;
+    ymuint min_size = 0;
+    ymuint ng = group_list.size();
+
+    // 現在の情報を tmp_group にコピーしておく
+    vector<FaultGroup> tmp_group(max_group_id);
+    for (ymuint i = 0; i < ng; ++ i) {
+      ymuint gid = group_list[i];
+      tmp_group[gid] = *mGroupList[gid];
+    }
+
+    // 要素数が最小のグループを求める．
+    for (ymuint i = 0; i < ng; ++ i) {
+      ymuint gid = group_list[i];
+      if ( locked[gid] ) {
+	continue;
+      }
+      const vector<TpgFault*>& fault_list = tmp_group[gid].mFaultList;
+      ymuint size = fault_list.size();
+      if ( min_size == 0 || min_size > size ) {
+	min_size = size;
+	min_gid = gid;
+      }
+    }
+    if ( min_gid == max_group_id ) {
+      // すべてのグループが調査済みだった．
+      break;
+    }
+
+    // min_gid のグループの故障を他のグループへ移動できるか調べる．
+    bool red = true;
+    const vector<TpgFault*>& fault_list = tmp_group[min_gid].mFaultList;
+    for (ymuint i = 0; i < fault_list.size(); ++ i) {
+      TpgFault* fault = fault_list[i];
+
+      TpgCnf1 tpg_cnf(string(), string(), NULL);
+      tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+
+      // fault がマージできる他のグループを探す．
+      bool found = false;
+      for (ymuint j = 0; j < ng; ++ j) {
+	ymuint gid = group_list[j];
+	if ( gid == min_gid ) {
+	  continue;
+	}
+	const NodeValList& suf_list0 = tmp_group[gid].mSufList;
+	if ( tpg_cnf.check_intersect(suf_list0) ) {
+	  TpgCnf1 tpg_cnf(string(), string(), NULL);
+	  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+	  NodeValList suf_list;
+	  bool stat = tpg_cnf.get_suf_list(suf_list0, suf_list);
+	  ASSERT_COND( stat );
+	  tmp_group[gid].add_fault(fault, suf_list);
+	  found = true;
+	  break;
+	}
+      }
+      if ( !found ) {
+	// 見つからなかった．
+	red = false;
+	break;
+      }
+    }
+    if ( red ) {
+      // group_list から min_group を除く．
+      ymuint wpos = 0;
+      for (ymuint rpos = 0; rpos < group_list.size(); ++ rpos) {
+	ymuint gid = group_list[rpos];
+	if ( gid != min_gid ) {
+	  if ( wpos != rpos ) {
+	    group_list[wpos] = gid;
+	  }
+	  ++ wpos;
+	}
+      }
+      group_list.erase(group_list.begin() + wpos, group_list.end());
+
+      // tmp_group の内容を mGroupList に書き戻す．
+      for (ymuint i = 0; i < group_list.size(); ++ i) {
+	ymuint gid = group_list[i];
+	const FaultGroup* src_fg = &tmp_group[gid];
+	FaultGroup* fg = mGroupList[gid];
+	if ( fg->mFaultList.size() != src_fg->mFaultList.size() ) {
+	  *fg = *src_fg;
+	}
+      }
+    }
+    locked[min_gid] = true;
+  }
+}
+
+// @brief phase-2
+// @param[inout] group_list 選択されたグループ番号のリスト
+//
+// 他のグループに移動させることでグループを削除する．
+void
+FgMgr::phase2(vector<ymuint>& group_list)
+{
+  ymuint max_group_id = mGroupList.size();
+  ymuint ng = group_list.size();
+
+  vector<bool> locked(max_group_id, false);
+  for ( ; ; ) {
+    ymuint min_pos = 0;
+    ymuint min_gid = max_group_id;
+    ymuint min_size = 0;
+
+    // 要素数が最小のグループを求める．
+    for (ymuint i = 0; i < ng; ++ i) {
+      ymuint gid = group_list[i];
+      if ( locked[gid] ) {
+	continue;
+      }
+      const vector<TpgFault*>& fault_list = mGroupList[gid]->mFaultList;
+      ymuint size = fault_list.size();
+      if ( min_size == 0 || min_size > size ) {
+	min_size = size;
+	min_pos = i;
+	min_gid = gid;
+      }
+    }
+    if ( min_gid == max_group_id ) {
+      // すべてのグループが調査済みだった．
+      break;
+    }
+
+    // 可能な限り故障を他のグループに移動する．
+    const vector<TpgFault*>& fault_list = mGroupList[min_gid]->mFaultList;
+    vector<TpgFault*> del_fault_list;
+    del_fault_list.reserve(fault_list.size());
+    for (ymuint i = 0; i < fault_list.size(); ++ i) {
+      TpgFault* fault = fault_list[i];
+
+      TpgCnf1 tpg_cnf(string(), string(), NULL);
+      tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+
+      // fault がマージできる他のグループを探す．
+      bool found = false;
+      for (ymuint j = 0; j < ng; ++ j) {
+	ymuint gid = group_list[j];
+	if ( gid == min_gid ) {
+	  continue;
+	}
+	if ( locked[gid] ) {
+	  // 処理済みのグループには移動しない．
+	  continue;
+	}
+	const NodeValList& suf_list0 = mGroupList[gid]->mSufList;
+	if ( tpg_cnf.check_intersect(suf_list0) ) {
+	  add_fault(gid, fault);
+	  del_fault_list.push_back(fault);
+	  break;
+	}
+      }
+    }
+    if ( !del_fault_list.empty() ) {
+      delete_fault(min_gid, del_fault_list);
+    }
+    locked[min_gid] = true;
+  }
 }
 
 END_NAMESPACE_YM_SATPG

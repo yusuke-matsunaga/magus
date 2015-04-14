@@ -58,6 +58,24 @@ public:
   add_fault(ymuint gid,
 	    TpgFault* fault);
 
+  /// @brief 故障を取り除く
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] fault_list 故障リスト
+  void
+  delete_fault(ymuint gid,
+	       const vector<TpgFault*>& fault_list);
+
+  /// @brief 故障を追加することのできるグループを求める．
+  ///
+  /// 見つからない場合には group_num() を返す．
+  ymuint
+  find_group(TpgFault* fault);
+
+  /// @brief 故障グループの圧縮を行う．
+  /// @param[out] group_list グループ番号のリスト
+  void
+  compaction(vector<ymuint>& group_list);
+
   /// @brief 故障リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   const vector<TpgFault*>&
@@ -86,11 +104,24 @@ private:
   // 故障グループを表す構造体
   struct FaultGroup
   {
+    /// @brief 故障を追加する．
+    void
+    add_fault(TpgFault* fault,
+	      const NodeValList& suf_list)
+    {
+      mFaultList.push_back(fault);
+      mFaultSufList.push_back(suf_list);
+      mSufList.merge(suf_list);
+    }
+
     // グループ番号
     ymuint mId;
 
     // 故障リスト
     vector<TpgFault*> mFaultList;
+
+    // 故障ごとの十分割当リスト
+    vector<NodeValList> mFaultSufList;
 
     // 十分割当リスト
     NodeValList mSufList;
@@ -102,6 +133,20 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief phase-1
+  /// @param[inout] group_list 選択されたグループ番号のリスト
+  ///
+  /// 他のグループに移動させることでグループを削除する．
+  void
+  phase1(vector<ymuint>& group_list);
+
+  /// @brief phase-2
+  /// @param[inout] group_list 選択されたグループ番号のリスト
+  ///
+  /// 要素数の少ないグループの故障を他のグループに移動する．
+  void
+  phase2(vector<ymuint>& group_list);
 
 
 private:

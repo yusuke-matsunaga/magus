@@ -179,17 +179,7 @@ ymuint
 MinPatNaive::find_group(FgMgr& fgmgr,
 			TpgFault* fault)
 {
-  TpgCnf1 tpg_cnf(string(), string(), NULL);
-  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
-
-  ymuint ng = fgmgr.group_num();
-  for (ymuint gid = 0; gid < ng; ++ gid) {
-    const NodeValList& suf_list0 = fgmgr.suf_list(gid);
-    if ( tpg_cnf.check_intersect(suf_list0) ) {
-      return gid;
-    }
-  }
-  return ng;
+  return fgmgr.find_group(fault);
 }
 
 // @brief ノード番号の最大値を得る．
