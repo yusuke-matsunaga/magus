@@ -31,8 +31,8 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 			    "Dsatur-2 heuristic");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
-  mPoptVerbose = new TclPopt(this, "verbose",
-			     "print statistics");
+  mPoptVerbose = new TclPoptInt(this, "verbose",
+				"<int>: specify verbose-level");
 }
 
 // @brief デストラクタ
@@ -55,7 +55,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool simple = mPoptSimple->is_specified();
   bool dsatur = mPoptDsatur->is_specified();
   bool dsatur2 = mPoptDsatur2->is_specified();
-  bool verbose = mPoptVerbose->is_specified();
+  int verbose = mPoptVerbose->is_specified() ? mPoptVerbose->val() : 0;
 
   MinPat* minpat = NULL;
 

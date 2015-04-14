@@ -79,7 +79,7 @@ MinPatBase::run(TpgNetwork& network,
   // 未処理の故障がある限り以下の処理を繰り返す．
   for (ymuint c = 0; ; ++ c) {
 
-    if ( verbose() ) {
+    if ( verbose() > 1 ) {
       cout << "\r                       ";
       cout << "\r   " << setw(6) << c << " / " << setw(6) << nf
 	   << " : " << setw(4) << fgmgr.group_num();
@@ -162,13 +162,13 @@ MinPatBase::run(TpgNetwork& network,
 
 // @brief verbose フラグをセットする．
 void
-MinPatBase::set_verbose(bool verbose)
+MinPatBase::set_verbose(int verbose)
 {
   mVerbose = verbose;
 }
 
 // @brief verbose フラグを得る．
-bool
+int
 MinPatBase::verbose() const
 {
   return mVerbose;

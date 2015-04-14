@@ -57,10 +57,10 @@ public:
   /// @brief verbose フラグをセットする．
   virtual
   void
-  set_verbose(bool verbose);
+  set_verbose(int verbose);
 
   /// @brief verbose フラグを得る．
-  bool
+  int
   verbose() const;
 
 
@@ -114,7 +114,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // verbose フラグ
-  bool mVerbose;
+  int mVerbose;
 
 };
 

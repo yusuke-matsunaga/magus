@@ -43,7 +43,7 @@ public:
   /// @brief verbose フラグを設定する．
   /// @param[in] verbose 表示を制御するフラグ
   void
-  set_verbose(bool verbose);
+  set_verbose(int verbose);
 
   /// @brief 初期化する．
   /// @param[in] max_node_id ノード番号の最大値 + 1
@@ -140,7 +140,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 表示を制御するフラグ
-  bool mVerbose;
+  int mVerbose;
 
   // 最大ノード番号
   ymuint mMaxNodeId;

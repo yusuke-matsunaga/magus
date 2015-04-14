@@ -56,7 +56,7 @@ private:
   TclPopt* mPoptPrintStats;
 
   // verbose オプションの解析用オブジェクト
-  TclPopt* mPoptVerbose;
+  TclPoptInt* mPoptVerbose;
 
 };
 

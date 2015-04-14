@@ -52,7 +52,7 @@ public:
   /// @brief verbose フラグをセットする．
   virtual
   void
-  set_verbose(bool verbose) = 0;
+  set_verbose(int verbose) = 0;
 
 };
 

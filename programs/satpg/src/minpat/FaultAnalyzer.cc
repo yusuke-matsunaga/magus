@@ -208,7 +208,7 @@ FaultAnalyzer::~FaultAnalyzer()
 // @brief verbose フラグを設定する．
 // @param[in] verbose 表示を制御するフラグ
 void
-FaultAnalyzer::set_verbose(bool verbose)
+FaultAnalyzer::set_verbose(int verbose)
 {
   mVerbose = verbose;
 }
@@ -360,7 +360,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
     TpgFault* f1 = mOrigFaultList[i1];
     ymuint f1_id = f1->id();
 
-    if ( mVerbose ) {
+    if ( mVerbose > 1 ) {
       cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
@@ -458,7 +458,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
     TpgFault* f1 = fault_list2[i1];
     ymuint f1_id = f1->id();
 
-    if ( mVerbose ) {
+    if ( mVerbose > 1 ) {
       cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num2;
       cout.flush();
@@ -543,7 +543,7 @@ FaultAnalyzer::analyze_faults()
 
   ymuint fnum = mDomFaultList.size();
   for (ymuint i = 0; i < fnum; ++ i) {
-    if ( mVerbose ) {
+    if ( mVerbose > 1 ) {
       cout << "\r                  ";
       cout << "\r" << setw(6) << i << " / " << setw(6) << fnum;
       cout.flush();
@@ -613,7 +613,7 @@ FaultAnalyzer::analyze_conflict()
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     TpgFault* f1 = mDomFaultList[i1];
 
-    if ( mVerbose ) {
+    if ( mVerbose > 1 ) {
       cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
@@ -681,9 +681,9 @@ FaultAnalyzer::estimate_conflict(ymuint sample_num,
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     TpgFault* f1 = mDomFaultList[i1];
 
-    if ( mVerbose ) {
+    if ( mVerbose > 1 ) {
       cout << "\r                  ";
-      cout << "\r" << i1 << " / " << fault_num;
+      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
     vector<TpgFault*> f2_list;
@@ -709,8 +709,10 @@ FaultAnalyzer::estimate_conflict(ymuint sample_num,
 
   local_timer.stop();
 
-  if ( mVerbose ) {
+  if ( mVerbose > 1 ) {
     cout << endl;
+  }
+  if ( mVerbose > 0 ) {
     print_conflict_stats(cout);
     cout << "Total CPU time " << local_timer.time() << endl;
   }
@@ -824,8 +826,10 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 
   mConflictStats.conf_timer.stop();
 
-  if ( mVerbose && local_verbose ) {
-    cout << endl;
+  if ( mVerbose > 0 && local_verbose ) {
+    if ( mVerbose > 1 ) {
+      cout << endl;
+    }
     print_conflict_stats(cout);
   }
 }
