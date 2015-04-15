@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "DtpgSatBaseS.h"
+#include "DtpgSat.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 1つの故障を対象とした CNF を生成する DtpgSat
 //////////////////////////////////////////////////////////////////////
 class DtpgSatS :
-  public DtpgSatBaseS
+  public DtpgSat
 {
 public:
 
@@ -48,19 +48,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief テスト生成を行なう．
+  /// @param[in] network 対象のネットワーク
+  /// @param[in] stats 結果を格納する構造体
+  virtual
+  void
+  run(TpgNetwork& network,
+      DtpgStats& stats);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief テスト生成を行なう．
-  /// @param[in] node_set 対象のノード集合
-  /// @param[in] f_tgt 対象の故障
-  virtual
-  void
-  run_single(const NodeSet& node_set,
-	     TpgFault* f_tgt);
 
 };
 

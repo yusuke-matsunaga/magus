@@ -73,8 +73,7 @@ private:
   /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run_single(const NodeSet& node_set,
-	     TpgFault* f_tgt) = 0;
+  run_single(TpgFault* f_tgt) = 0;
 
 };
 

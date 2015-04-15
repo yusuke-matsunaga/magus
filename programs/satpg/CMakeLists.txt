@@ -45,20 +45,17 @@ set (dtpg_SOURCES
 
   src/dtpg/engine/SatEngine.cc
   src/dtpg/engine/VidLitMap.cc
+  src/dtpg/engine/GvalCnf.cc
+  src/dtpg/engine/FvalCnf.cc
 
   src/dtpg/dtpg_engine/Extractor.cc
   src/dtpg/dtpg_engine/LitMap.cc
   src/dtpg/dtpg_engine/ModelValMap.cc
   src/dtpg/dtpg_engine/GenVidMap.cc
   src/dtpg/dtpg_engine/DtpgSat.cc
-  src/dtpg/dtpg_engine/DtpgSatBaseS.cc
   src/dtpg/dtpg_engine/DtpgSatBaseM.cc
   src/dtpg/dtpg_engine/DtpgSatS.cc
-  src/dtpg/dtpg_engine/DtpgSatS2.cc
   src/dtpg/dtpg_engine/DtpgSatM.cc
-  src/dtpg/dtpg_engine/DtpgSatM2.cc
-  src/dtpg/dtpg_engine/DtpgSatKDet.cc
-  src/dtpg/dtpg_engine/DtpgSatC.cc
 
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc

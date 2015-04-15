@@ -8,14 +8,13 @@
 
 
 #include "DtpgSatS.h"
-
 #include "DtpgStats.h"
+#include "GvalCnf.h"
+#include "FvalCnf.h"
 #include "NodeSet.h"
-#include "TpgNode.h"
-#include "TpgFault.h"
-#include "TestVector.h"
 #include "SatEngine.h"
-#include "GenVidMap.h"
+#include "TpgFault.h"
+#include "TpgNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -45,7 +44,7 @@ DtpgSatS::DtpgSatS(const string& sat_type,
 		   BackTracer& bt,
 		   DetectOp& dop,
 		   UntestOp& uop) :
-  DtpgSatBaseS(sat_type, sat_option, sat_outp, bt, dop, uop)
+  DtpgSat(sat_type, sat_option, sat_outp, bt, dop, uop)
 {
 }
 
@@ -54,91 +53,54 @@ DtpgSatS::~DtpgSatS()
 {
 }
 
-// @brief テストパタン生成を行なう．
-// @param[in] node_set 対象のノード集合
-// @param[in] flist 故障リスト
+// @brief テスト生成を行なう．
+// @param[in] network 対象のネットワーク
+// @param[in] stats 結果を格納する構造体
 void
-DtpgSatS::run_single(const NodeSet& node_set,
-		     TpgFault* fault)
+DtpgSatS::run(TpgNetwork& network,
+	      DtpgStats& stats)
 {
-  const TpgNode* fnode = fault->node();
+  clear_stats();
 
-  cnf_begin();
-
-  SatEngine engine(sat_type(), sat_option(), sat_outp());
-
-  ymuint max_id = node_set.max_id();
-  GenVidMap gvar_map(max_id);
-  GenVidMap fvar_map(max_id);
-  GenVidMap dvar_map(max_id);
-
-  //////////////////////////////////////////////////////////////////////
-  // 変数の割当
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    VarId gvar = engine.new_var();
-    gvar_map.set_vid(node, gvar);
-    fvar_map.set_vid(node, gvar);
-  }
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    VarId fvar = engine.new_var();
-    VarId dvar = engine.new_var();
-    fvar_map.set_vid(node, fvar);
-    dvar_map.set_vid(node, dvar);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 正常回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_tfi_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-    engine.make_node_cnf(node, gvar_map);
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // 故障回路の CNF を生成
-  //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < node_set.tfo_size(); ++ i) {
-    const TpgNode* node = node_set.tfo_tfi_node(i);
-
-    // 故障回路のゲートの入出力関係を表すCNFを作る．
-    if ( node == fnode ) {
-      engine.make_fault_cnf(fault, gvar_map, fvar_map);
-    }
-    else {
-      engine.make_node_cnf(node, fvar_map);
+  ymuint nn = network.active_node_num();
+  ymuint max_id = network.max_node_id();
+  for (ymuint i = 0; i < nn; ++ i) {
+    TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
+      continue;
     }
 
-    // D-Chain 制約を作る．
-    engine.make_dchain_cnf(node, gvar_map, fvar_map, dvar_map);
+    NodeSet node_set;
+    node_set.mark_region(max_id, node);
+
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* fault = node->fault(i);
+      if ( fault->status() == kFsDetected ) {
+	continue;
+      }
+
+      cnf_begin();
+
+      SatEngine engine(sat_type(), sat_option(), sat_outp());
+
+      GvalCnf gval_cnf(max_id);
+      FvalCnf fval_cnf(max_id, gval_cnf);
+
+      fval_cnf.make_cnf(engine, fault);
+
+      cnf_end();
+
+      // 故障に対するテスト生成を行なう．
+      engine.assumption_begin();
+
+      engine.assumption_add(Literal(fval_cnf.fd_var()));
+
+      solve(engine, fault, node_set, gval_cnf.var_map(), fval_cnf.var_map());
+    }
   }
 
-  //////////////////////////////////////////////////////////////////////
-  // 故障の検出条件
-  //////////////////////////////////////////////////////////////////////
-  ymuint npo = node_set.output_list().size();
-  engine.tmp_lits_begin(npo);
-  for (ymuint i = 0; i < npo; ++ i) {
-    const TpgNode* node = node_set.output_list()[i];
-    Literal dlit(dvar_map(node), false);
-    engine.tmp_lits_add(dlit);
-  }
-  engine.tmp_lits_end();
-
-  // dominator ノードの dvar は1でなければならない．
-  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(dvar_map(node), false);
-    engine.add_clause(dlit);
-  }
-
-  cnf_end();
-
-  // 故障に対するテスト生成を行なう．
-  engine.assumption_begin();
-
-  solve(engine, fault, node_set, gvar_map, fvar_map);
+  get_stats(stats);
 }
 
 END_NAMESPACE_YM_SATPG

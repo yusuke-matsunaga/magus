@@ -211,26 +211,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   if ( engine_type == "single" ) {
     engine = new_DtpgSatS(sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }
-  else if ( engine_type == "single_kdet" ) {
-    engine = new_DtpgSatKDet(sat_type, sat_option, outp, *bt, dop_list, uop_list, kdet_val);
-  }
-  else if ( engine_type == "single2" ) {
-    engine = new_DtpgSatS2(mode_val, sat_type, sat_option, outp, *bt, dop_list, uop_list);
-  }
   else if ( engine_type == "multi" ) {
     engine = new_DtpgSatM(sat_type, sat_option, outp, *bt, dop_list, uop_list);
   }
-  else if ( engine_type == "multi2" ) {
-    engine = new_DtpgSatM2(mode_val, sat_type, sat_option, outp, *bt, dop_list, uop_list);
-  }
-  else if ( engine_type == "concurrent" ) {
-    engine = new_DtpgSatC(sat_type, sat_option, outp, *bt, dop_list, uop_list);
-  }
-#if 0
-  else if ( engine_type == "smt_single" ) {
-    engine = new_SmtEngineSingle(sat_type, sat_option, outp, *bt, dop_list, uop_list);
-  }
-#endif
   else {
     // デフォルトフォールバック
     engine = new_DtpgSatS(sat_type, sat_option, outp, *bt, dop_list, uop_list);
