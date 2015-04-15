@@ -129,6 +129,16 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief f1 が f2 を支配しているか調べる．
+  bool
+  check_fault_dominance(TpgFault* f1,
+			TpgFault* f2);
+
+  /// @brief f1 と f2 が衝突しているか調べる．
+  bool
+  check_fault_conflict(TpgFault* f1,
+		       TpgFault* f2);
+
   /// @brief analyze_conflict の統計情報を出力する．
   void
   print_conflict_stats(ostream& s);

@@ -47,6 +47,21 @@ public:
   /// @brief 故障回路のCNFを作る．
   /// @param[in] engine SATエンジン
   /// @param[in] fault 故障
+  /// @param[in] node_set 関係するノード集合
+  /// @param[in] detect 検出条件
+  ///
+  /// detect = kVal0: 検出しないCNFを作る．
+  ///        = kVal1: 検出するCNFを作る．
+  ///        = kValX: fd_var() で制御するCNFを作る．
+  void
+  make_cnf(SatEngine& engine,
+	   TpgFault* fault,
+	   const NodeSet& node_set,
+	   Val3 detect);
+
+  /// @brief 故障回路のCNFを作る．
+  /// @param[in] engine SATエンジン
+  /// @param[in] fault 故障
   /// @param[in] detect 検出条件
   ///
   /// detect = kVal0: 検出しないCNFを作る．

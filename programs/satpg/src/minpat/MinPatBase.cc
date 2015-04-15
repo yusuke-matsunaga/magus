@@ -14,8 +14,6 @@
 #include "TvMgr.h"
 #include "Verifier.h"
 
-#include "TpgCnf1.h"
-
 #include "YmUtils/StopWatch.h"
 
 

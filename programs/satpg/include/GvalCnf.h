@@ -41,6 +41,15 @@ public:
   void
   init(ymuint max_node_id);
 
+  /// @brief NodeSet の内容に応じてCNFを作る．
+  /// @param[in] engine SATエンジン
+  /// @param[in] node_set 対象のノード集合
+  ///
+  /// 具体的には tfi_tfo_node() を対象にする．
+  void
+  make_cnf(SatEngine& engine,
+	   const NodeSet& node_set);
+
   /// @brief ノードのTFI全体のCNFを作る．
   /// @param[in] engine SATエンジン
   /// @param[in] node ノード

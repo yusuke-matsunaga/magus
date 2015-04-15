@@ -84,10 +84,10 @@ FgMgr::add_fault(ymuint gid,
   bool stat = tpg_cnf.get_suf_list(fg->mSufList, suf_list);
   ASSERT_COND( stat );
 #else
-  SatEngine engine(string(), string(), NULL);
 
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
 
   fval_cnf.make_cnf(engine, fault, kVal1);
 
@@ -150,23 +150,10 @@ FgMgr::delete_fault(ymuint gid,
 ymuint
 FgMgr::find_group(TpgFault* fault)
 {
-#if 0
-  TpgCnf1 tpg_cnf(string(), string(), NULL);
-  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
-
-  ymuint ng = group_num();
-  for (ymuint gid = 0; gid < ng; ++ gid) {
-    const NodeValList& suf_list0 = mGroupList[gid]->mSufList;
-    if ( tpg_cnf.check_intersect(suf_list0) ) {
-      return gid;
-    }
-  }
-  return ng;
-#else
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-
   SatEngine engine(string(), string(), NULL);
+
   fval_cnf.make_cnf(engine, fault, kVal1);
 
   ymuint ng = group_num();
@@ -177,7 +164,6 @@ FgMgr::find_group(TpgFault* fault)
     }
   }
   return ng;
-#endif
 }
 
 // @brief 故障グループの圧縮を行う．
@@ -313,7 +299,7 @@ FgMgr::phase1(vector<ymuint>& group_list)
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
       TpgFault* fault = fault_list[i];
 
-#if 0
+#if 1
       TpgCnf1 tpg_cnf(string(), string(), NULL);
       tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
 #else
@@ -331,7 +317,7 @@ FgMgr::phase1(vector<ymuint>& group_list)
 	  continue;
 	}
 	const NodeValList& suf_list0 = tmp_group[gid].mSufList;
-#if 0
+#if 1
 	if ( tpg_cnf.check_intersect(suf_list0) ) {
 	  TpgCnf1 tpg_cnf(string(), string(), NULL);
 	  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);

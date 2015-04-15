@@ -108,9 +108,7 @@ set (minpat_SOURCES
   src/minpat/MinPatDsatur2.cc
   src/minpat/FaultAnalyzer.cc
   src/minpat/FgMgr.cc
-  src/minpat/TpgCnf0.cc
   src/minpat/TpgCnf1.cc
-  src/minpat/TpgCnf2.cc
   src/minpat/TpgCnfX.cc
   )
 

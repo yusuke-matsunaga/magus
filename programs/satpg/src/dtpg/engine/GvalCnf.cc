@@ -8,6 +8,7 @@
 
 
 #include "GvalCnf.h"
+#include "NodeSet.h"
 #include "NodeValList.h"
 #include "SatEngine.h"
 #include "TpgNode.h"
@@ -42,6 +43,34 @@ GvalCnf::init(ymuint max_node_id)
   mMark.clear();
   mMark.resize(max_node_id, false);
   mVarMap.init(max_node_id);
+}
+
+// @brief NodeSet の内容に応じてCNFを作る．
+// @param[in] engine SATエンジン
+// @param[in] node_set 対象のノード集合
+//
+// 具体的には tfo_tfi_node() を対象にする．
+void
+GvalCnf::make_cnf(SatEngine& engine,
+		  const NodeSet& node_set)
+{
+  ymuint n = node_set.tfo_tfi_size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    if ( mMark[node->id()] ) {
+      continue;
+    }
+    VarId gvar = engine.new_var();
+    mVarMap.set_vid(node, gvar);
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    if ( mMark[node->id()] ) {
+      continue;
+    }
+    mMark[node->id()] = true;
+    engine.make_node_cnf(node, mVarMap);
+  }
 }
 
 // @brief ノードのTFI全体のCNFを作る．

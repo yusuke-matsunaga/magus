@@ -17,8 +17,11 @@
 #include "NodeSet.h"
 #include "NodeValList.h"
 
+#include "GvalCnf.h"
+#include "FvalCnf.h"
+#include "SatEngine.h"
+
 #include "TpgCnf1.h"
-#include "TpgCnf2.h"
 
 #include "YmUtils/StopWatch.h"
 #include "YmUtils/HashSet.h"
@@ -351,6 +354,8 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
   ymuint n_sat2 = 0;
   ymuint n_dom2 = 0;
+  ymuint n_pcheck1 = 0;
+  ymuint n_pcheck2 = 0;
 
   vector<vector<TpgFault*> > pending_list(mMaxFaultId);
 
@@ -404,6 +409,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
       const vector<ymuint>& pat_list2 = mFaultInfoArray[f2_id].pat_list();
 
+      ++ n_pcheck1;
       ymuint stat = check_pat_list1(pat_list1, pat_list2);
       if ( stat == 3U ) {
 	continue;
@@ -414,8 +420,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
       if ( (stat & 1U) == 0U ) {
 	// f1 が 0 のときは f2 も 0 だった．
 	++ n_sat2;
-	TpgCnf2 tpg_cnf(string(), string(), NULL);
-	if ( tpg_cnf.check_dominance(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
+	if ( check_fault_dominance(f1, f2) ) {
 	  //cout << f2->str() << " is dominated by " << f1->str() << endl;
 	  dom_flag[f2_id] = true;
 	  ++ n_dom2;
@@ -425,8 +430,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
       if ( (stat & 2U) == 0U ) {
 	// f2 が 0 のときは f1 も 0 だった．
 	++ n_sat2;
-	TpgCnf2 tpg_cnf(string(), string(), NULL);
-	if ( tpg_cnf.check_dominance(f2, node_set2, f1, node_set1, mMaxNodeId) ) {
+	if ( check_fault_dominance(f2, f1) ) {
 	  //cout << f1->str() << " is dominated by " << f2->str() << endl;
 	  dom_flag[f1_id] = true;
 	  ++ n_dom2;
@@ -478,6 +482,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
       const vector<ymuint>& pat_list2 = mFaultInfoArray[f2_id].pat_list();
 
+      ++ n_pcheck2;
       ymuint stat = check_pat_list1(pat_list1, pat_list2);
       if ( stat == 3U ) {
 	continue;
@@ -488,8 +493,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
       if ( (stat & 1U) == 0U ) {
 	// f1 が 0 のときは f2 も 0 だった．
 	++ n_sat3;
-	TpgCnf2 tpg_cnf(string(), string(), NULL);
-	if ( tpg_cnf.check_dominance(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
+	if ( check_fault_dominance(f1, f2) ) {
 	  //cout << f2->str() << " is dominated by " << f1->str() << endl;
 	  dom_flag[f2_id] = true;
 	  ++ n_dom3;
@@ -499,8 +503,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
       if ( (stat & 2U) == 0U ) {
 	// f2 が 0 のときは f1 も 0 だった．
 	++ n_sat3;
-	TpgCnf2 tpg_cnf(string(), string(), NULL);
-	if ( tpg_cnf.check_dominance(f2, node_set2, f1, node_set1, mMaxNodeId) ) {
+	if ( check_fault_dominance(f2, f1) ) {
 	  //cout << f1->str() << " is dominated by " << f2->str() << endl;
 	  dom_flag[f1_id] = true;
 	  ++ n_dom3;
@@ -527,6 +530,7 @@ FaultAnalyzer::get_dom_faults(bool fast)
     cout << "Total    " << fault_num << " original faults" << endl;
     cout << "Total    " << dom_fault_num << " dominator faults" << endl;
     cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
+    cout << "Total    " << n_pcheck1 << " + " << n_pcheck2 << " pattern check" << endl;
     cout << "CPU time for dominance test" << local_timer.time() << endl;
   }
 }
@@ -731,6 +735,7 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 {
   mConflictStats.conf_timer.start();
 
+#if 1
   // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
   TpgCnf1 tpg_cnf(string(), string(), NULL);
 
@@ -817,16 +822,108 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 
     mConflictStats.conf4_timer.start();
     ++ mConflictStats.conf4_check_count;
-    TpgCnf2 tpg_cnf2(string(), string(), NULL);
-    NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
-    NodeSet& node_set2 = mNodeSetArray[f2->node()->id()];
-    if ( tpg_cnf2.check_conflict(f1, node_set1, f2, node_set2, mMaxNodeId) ) {
+    if ( check_fault_conflict(f1, f2) ) {
       ++ mConflictStats.conf_count;
       ++ mConflictStats.conf4_count;
       conf_list.push_back(f2);
     }
     mConflictStats.conf4_timer.stop();
   }
+#else
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
+
+  fval_cnf.make_cnf(engine, f1, kVal1);
+
+  const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
+
+  FaultInfo& fi1 = mFaultInfoArray[f1->id()];
+  const vector<ymuint>& tv_list1 = fi1.pat_list();
+  const NodeValList& suf_list1 = fi1.mSufList;
+  const NodeValList& pi_suf_list1 = fi1.mPiSufList;
+  const NodeValList& ma_list1 = fi1.mMaList;
+
+  conf_list.reserve(f2_list.size());
+  for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
+    TpgFault* f2 = f2_list[i2];
+
+    const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
+
+    bool intersect = check_intersect(input_list1, input_list2);
+    if ( !intersect ) {
+      // 共通部分を持たない故障は独立
+      continue;
+    }
+
+    FaultInfo& fi2 = mFaultInfoArray[f2->id()];
+    const vector<ymuint>& tv_list2 = fi2.pat_list();
+
+    bool stat = check_pat_list2(tv_list1, tv_list2);
+    if ( stat ) {
+      // f1 と f2 が同時に1なのでコンフリクトしない．
+      continue;
+    }
+
+    const NodeValList& suf_list2 = fi2.mSufList;
+    const NodeValList& pi_suf_list2 = fi2.mPiSufList;
+    const NodeValList& ma_list2 = fi2.mMaList;
+
+    mConflictStats.conf1_timer.start();
+    if ( check_conflict(ma_list1, ma_list2) ) {
+      // 必要割当そのものがコンフリクトしている．
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf1_count;
+      conf_list.push_back(f2);
+      mConflictStats.conf1_timer.stop();
+      continue;
+    }
+    mConflictStats.conf1_timer.stop();
+
+
+    mConflictStats.int1_timer.start();
+    if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
+      // 十分割当が両立しているのでコンフリクトしない．
+      ++ mConflictStats.int1_count;
+      mConflictStats.int1_timer.stop();
+      continue;
+    }
+    mConflictStats.int1_timer.stop();
+
+    mConflictStats.int2_timer.start();
+    if ( !check_conflict(suf_list1, suf_list2) && engine.check_sat(gval_cnf, suf_list2) == kB3True ) {
+      // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+      ++ mConflictStats.int2_count;
+      mConflictStats.int2_timer.stop();
+      continue;
+    }
+    mConflictStats.int2_timer.stop();
+
+    mConflictStats.conf3_timer.start();
+    if ( engine.check_sat(gval_cnf, ma_list2) == kB3False ) {
+      // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf3_count;
+      conf_list.push_back(f2);
+      mConflictStats.conf3_timer.stop();
+      continue;
+    }
+    mConflictStats.conf3_timer.stop();
+
+    if ( simple ) {
+      continue;
+    }
+
+    mConflictStats.conf4_timer.start();
+    ++ mConflictStats.conf4_check_count;
+    if ( check_fault_conflict(f1, f2) ) {
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf4_count;
+      conf_list.push_back(f2);
+    }
+    mConflictStats.conf4_timer.stop();
+  }
+#endif
 
   mConflictStats.conf_timer.stop();
 
@@ -886,6 +983,44 @@ const vector<vector<ymuint> >&
 FaultAnalyzer::input_list_array() const
 {
   return mInputListArray;
+}
+
+// @brief f1 が f2 を支配しているか調べる．
+bool
+FaultAnalyzer::check_fault_dominance(TpgFault* f1,
+				     TpgFault* f2)
+{
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+  FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
+
+  NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
+  NodeSet& node_set2 = mNodeSetArray[f2->node()->id()];
+
+  fval_cnf1.make_cnf(engine, f1, node_set1, kVal1);
+  fval_cnf2.make_cnf(engine, f2, node_set2, kVal0);
+
+  return engine.check_sat() == kB3False;
+}
+
+/// @brief f1 と f2 が衝突しているか調べる．
+bool
+FaultAnalyzer::check_fault_conflict(TpgFault* f1,
+				    TpgFault* f2)
+{
+  GvalCnf gval_cnf2(mMaxNodeId);
+  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf2);
+  FvalCnf fval_cnf2(mMaxNodeId, gval_cnf2);
+  SatEngine engine(string(), string(), NULL);
+
+  NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
+  NodeSet& node_set2 = mNodeSetArray[f2->node()->id()];
+
+  fval_cnf1.make_cnf(engine, f1, node_set1, kVal1);
+  fval_cnf2.make_cnf(engine, f2, node_set2, kVal1);
+
+  return engine.check_sat() == kB3False;
 }
 
 // @brief analyze_conflict の統計情報を出力する．
