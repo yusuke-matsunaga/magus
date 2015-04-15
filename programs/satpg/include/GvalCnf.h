@@ -48,6 +48,13 @@ public:
   make_cnf(SatEngine& engine,
 	   const TpgNode* node);
 
+  /// @brief 割当リストに対応する仮定を追加する．
+  /// @param[in] engine SATエンジン
+  /// @param[in] assign_list 割当リスト
+  void
+  add_assumption(SatEngine& engine,
+		 const NodeValList& assign_list);
+
   /// @brief 変数マップを得る．
   const VidMap&
   var_map() const;

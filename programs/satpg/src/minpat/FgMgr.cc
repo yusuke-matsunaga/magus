@@ -9,9 +9,13 @@
 
 #include "FgMgr.h"
 #include "TvMgr.h"
-#include "TpgCnf0.h"
+#include "GvalCnf.h"
+#include "FvalCnf.h"
+#include "ModelValMap.h"
+#include "Extractor.h"
 #include "TpgCnf1.h"
 #include "TpgFault.h"
+#include "TpgNetwork.h"
 #include "YmUtils/HashSet.h"
 
 
@@ -72,12 +76,35 @@ FgMgr::add_fault(ymuint gid,
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
 
+#if 0
   TpgCnf1 tpg_cnf(string(), string(), NULL);
   tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
 
   NodeValList suf_list;
   bool stat = tpg_cnf.get_suf_list(fg->mSufList, suf_list);
   ASSERT_COND( stat );
+#else
+  SatEngine engine(string(), string(), NULL);
+
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+
+  fval_cnf.make_cnf(engine, fault, kVal1);
+
+  engine.assumption_begin();
+  fval_cnf.add_assumption(engine, fg->mSufList);
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  ASSERT_COND ( sat_ans == kB3True );
+
+  ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
+  Extractor extract(val_map);
+  NodeValList suf_list;
+  extract(fault, suf_list);
+#endif
 
   fg->add_fault(fault, suf_list);
 }
@@ -123,6 +150,7 @@ FgMgr::delete_fault(ymuint gid,
 ymuint
 FgMgr::find_group(TpgFault* fault)
 {
+#if 0
   TpgCnf1 tpg_cnf(string(), string(), NULL);
   tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
 
@@ -134,6 +162,22 @@ FgMgr::find_group(TpgFault* fault)
     }
   }
   return ng;
+#else
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+
+  SatEngine engine(string(), string(), NULL);
+  fval_cnf.make_cnf(engine, fault, kVal1);
+
+  ymuint ng = group_num();
+  for (ymuint gid = 0; gid < ng; ++ gid) {
+    const NodeValList& suf_list0 = mGroupList[gid]->mSufList;
+    if ( engine.check_sat(gval_cnf, suf_list0) == kB3True ) {
+      return gid;
+    }
+  }
+  return ng;
+#endif
 }
 
 // @brief 故障グループの圧縮を行う．
@@ -190,9 +234,37 @@ FgMgr::make_testvector(ymuint gid,
 {
   ASSERT_COND( gid < group_num() );
   const NodeValList& suf_list = mGroupList[gid]->mSufList;
-  TpgCnf0 tpg_cnf0(string(), string(), NULL);
-  bool stat = tpg_cnf0.get_testvector(network, suf_list, tv);
-  ASSERT_COND( stat );
+
+  ymuint max_node_id = network.max_node_id();
+
+  GvalCnf gval_cnf(max_node_id);
+
+  SatEngine engine(string(), string(), NULL);
+
+  engine.assumption_begin();
+  gval_cnf.add_assumption(engine, suf_list);
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  ASSERT_COND ( sat_ans == kB3True );
+
+  const VidMap& var_map = gval_cnf.var_map();
+  ModelValMap val_map(var_map, var_map, sat_model);
+  ymuint ni = network.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const TpgNode* node = network.input(i);
+    ymuint input_id = node->input_id();
+    Val3 val;
+    if ( var_map(node) == kVarIdIllegal ) {
+      val = kVal0;
+    }
+    else {
+      val = val_map.gval(node);
+    }
+    tv->set_val(input_id, val);
+  }
 }
 
 // @brief phase-1
@@ -241,8 +313,15 @@ FgMgr::phase1(vector<ymuint>& group_list)
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
       TpgFault* fault = fault_list[i];
 
+#if 0
       TpgCnf1 tpg_cnf(string(), string(), NULL);
       tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
+#else
+      SatEngine engine(string(), string(), NULL);
+      GvalCnf gval_cnf(mMaxNodeId);
+      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+      fval_cnf.make_cnf(engine, fault, kVal1);
+#endif
 
       // fault がマージできる他のグループを探す．
       bool found = false;
@@ -252,6 +331,7 @@ FgMgr::phase1(vector<ymuint>& group_list)
 	  continue;
 	}
 	const NodeValList& suf_list0 = tmp_group[gid].mSufList;
+#if 0
 	if ( tpg_cnf.check_intersect(suf_list0) ) {
 	  TpgCnf1 tpg_cnf(string(), string(), NULL);
 	  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
@@ -262,6 +342,29 @@ FgMgr::phase1(vector<ymuint>& group_list)
 	  found = true;
 	  break;
 	}
+#else
+	engine.assumption_begin();
+	fval_cnf.add_assumption(engine, suf_list0);
+	if ( engine.check_sat() == kB3True ) {
+	  SatEngine engine(string(), string(), NULL);
+	  GvalCnf gval_cnf(mMaxNodeId);
+	  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+	  fval_cnf.make_cnf(engine, fault, kVal1);
+	  engine.assumption_begin();
+	  fval_cnf.add_assumption(engine, suf_list0);
+
+	  vector<Bool3> sat_model;
+	  SatStats sat_stats;
+	  USTime sat_time;
+	  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+	  ASSERT_COND ( sat_ans == kB3True );
+
+	  ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
+	  Extractor extract(val_map);
+	  NodeValList suf_list;
+	  extract(fault, suf_list);
+	}
+#endif
       }
       if ( !found ) {
 	// 見つからなかった．

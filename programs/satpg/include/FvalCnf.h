@@ -11,6 +11,7 @@
 
 #include "satpg_nsdef.h"
 #include "GenVidMap.h"
+#include "Val3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -46,13 +47,39 @@ public:
   /// @brief 故障回路のCNFを作る．
   /// @param[in] engine SATエンジン
   /// @param[in] fault 故障
+  /// @param[in] detect 検出条件
+  ///
+  /// detect = kVal0: 検出しないCNFを作る．
+  ///        = kVal1: 検出するCNFを作る．
+  ///        = kValX: fd_var() で制御するCNFを作る．
   void
   make_cnf(SatEngine& engine,
-	   TpgFault* fault);
+	   TpgFault* fault,
+	   Val3 detect);
 
-  /// @brief 変数マップを得る．
+  /// @brief 割当リストに対応する仮定を追加する．
+  /// @param[in] engine SATエンジン
+  /// @param[in] assign_list 割当リスト
+  void
+  add_assumption(SatEngine& engine,
+		 const NodeValList& assign_list);
+
+  /// @brief 割当リストのもとでチェックを行う．
+  /// @param[in] engine SATエンジン
+  /// @param[in] assign_list 割当リスト
+  /// @param[out] suf_list 十分割当リストを格納する変数
+  void
+  get_suf_list(SatEngine& engine,
+	       const NodeValList& assign_list,
+	       NodeValList& suf_list);
+
+  /// @brief 正常回路の変数マップを得る．
   const VidMap&
-  var_map() const;
+  gvar_map() const;
+
+  /// @brief 故障回路の変数マップを得る．
+  const VidMap&
+  fvar_map() const;
 
   /// @brief 故障検出用の変数番号を返す．
   VarId

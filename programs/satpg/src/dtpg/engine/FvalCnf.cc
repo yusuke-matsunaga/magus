@@ -53,9 +53,14 @@ FvalCnf::init(ymuint max_node_id)
 // @brief 故障回路のCNFを作る．
 // @param[in] engine SATエンジン
 // @param[in] fault 故障
+//
+// detect = kVal0: 検出しないCNFを作る．
+//        = kVal1: 検出するCNFを作る．
+//        = kValX: fd_var() で制御するCNFを作る．
 void
 FvalCnf::make_cnf(SatEngine& engine,
-		  TpgFault* fault)
+		  TpgFault* fault,
+		  Val3 detect)
 {
   const TpgNode* fnode = fault->node();
 
@@ -92,26 +97,92 @@ FvalCnf::make_cnf(SatEngine& engine,
   }
 
   ymuint npo = mOutputList.size();
-  engine.tmp_lits_begin(npo + 1);
-  Literal fdlit(mFdVar);
-  for (ymuint i = 0; i < npo; ++ i) {
-    const TpgNode* node = mOutputList[i];
-    Literal dlit(mDvarMap(node));
-    engine.tmp_lits_add(dlit);
-    engine.add_clause(fdlit, ~dlit);
+  if ( detect == kVal0 ) {
+    for (ymuint i = 0; i < npo; ++ i) {
+      const TpgNode* node = mOutputList[i];
+      Literal dlit(mDvarMap(node));
+      engine.add_clause(~dlit);
+    }
   }
-  engine.tmp_lits_add(~fdlit);
-  engine.tmp_lits_end();
+  else if ( detect == kVal1 ) {
+    engine.tmp_lits_begin(npo);
+    for (ymuint i = 0; i < npo; ++ i) {
+      const TpgNode* node = mOutputList[i];
+      Literal dlit(mDvarMap(node));
+      engine.tmp_lits_add(dlit);
+    }
+    engine.tmp_lits_end();
 
-  for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
-    Literal dlit(mDvarMap(node), false);
-    engine.add_clause(~fdlit, dlit);
+    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(mDvarMap(node), false);
+      engine.add_clause(dlit);
+    }
+  }
+  else {
+    engine.tmp_lits_begin(npo + 1);
+    Literal fdlit(mFdVar);
+    for (ymuint i = 0; i < npo; ++ i) {
+      const TpgNode* node = mOutputList[i];
+      Literal dlit(mDvarMap(node));
+      engine.tmp_lits_add(dlit);
+      engine.add_clause(fdlit, ~dlit);
+    }
+    engine.tmp_lits_add(~fdlit);
+    engine.tmp_lits_end();
+
+    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(mDvarMap(node), false);
+      engine.add_clause(~fdlit, dlit);
+    }
   }
 }
 
-// @brief 変数マップを得る．
+// @brief 割当リストに対応する仮定を追加する．
+// @param[in] engine SATエンジン
+// @param[in] assign_list 割当リスト
+void
+FvalCnf::add_assumption(SatEngine& engine,
+			const NodeValList& assign_list)
+{
+  mGvalCnf.add_assumption(engine, assign_list);
+}
+
+#if 0
+// @brief 割当リストのもとでチェックを行う．
+// @param[in] engine SATエンジン
+// @param[in] assign_list 割当リスト
+// @param[out] suf_list 十分割当リストを格納する変数
+void
+FvalCnf::get_suf_list(SatEngine& engine,
+		      const NodeValList& assign_list,
+		      NodeValList& suf_list)
+{
+  engine.assumption_add();
+  mGvalCnf.add_assumption(engine, assign_list);
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+
+  ModelValMap val_map(gvar_map(), fvar_map(), sat_model);
+  Extractor extract(val_map);
+  extract(fault, suf_list);
+
+  return sat_ans;
+}
+#endif
+
+// @brief 正常回路の変数マップを得る．
 const VidMap&
-FvalCnf::var_map() const
+FvalCnf::gvar_map() const
+{
+  return mGvalCnf.var_map();
+}
+
+// @brief 故障変数マップを得る．
+const VidMap&
+FvalCnf::fvar_map() const
 {
   return mFvarMap;
 }

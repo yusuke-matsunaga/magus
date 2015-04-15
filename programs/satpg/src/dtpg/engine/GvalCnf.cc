@@ -8,6 +8,7 @@
 
 
 #include "GvalCnf.h"
+#include "NodeValList.h"
 #include "SatEngine.h"
 #include "TpgNode.h"
 
@@ -64,6 +65,28 @@ GvalCnf::make_cnf(SatEngine& engine,
   VarId gvar = engine.new_var();
   mVarMap.set_vid(node, gvar);
   engine.make_node_cnf(node, mVarMap);
+}
+
+// @brief 割当リストに対応する仮定を追加する．
+// @param[in] engine SATエンジン
+// @param[in] assign_list 割当リスト
+void
+GvalCnf::add_assumption(SatEngine& engine,
+			const NodeValList& assign_list)
+{
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    const TpgNode* node = nv.node();
+    make_cnf(engine, node);
+    Literal alit(mVarMap(node), false);
+    if ( nv.val() ) {
+      engine.assumption_add(alit);
+    }
+    else {
+      engine.assumption_add(~alit);
+    }
+  }
 }
 
 // @brief 変数マップを得る．

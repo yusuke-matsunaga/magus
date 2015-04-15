@@ -87,16 +87,14 @@ DtpgSatS::run(TpgNetwork& network,
       GvalCnf gval_cnf(max_id);
       FvalCnf fval_cnf(max_id, gval_cnf);
 
-      fval_cnf.make_cnf(engine, fault);
+      fval_cnf.make_cnf(engine, fault, kVal1);
 
       cnf_end();
 
       // 故障に対するテスト生成を行なう．
       engine.assumption_begin();
 
-      engine.assumption_add(Literal(fval_cnf.fd_var()));
-
-      solve(engine, fault, node_set, gval_cnf.var_map(), fval_cnf.var_map());
+      solve(engine, fault, node_set, fval_cnf.gvar_map(), fval_cnf.fvar_map());
     }
   }
 

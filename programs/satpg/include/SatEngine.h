@@ -54,6 +54,49 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+#if 0
+  /// @brief 正常回路のCNFを作る．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] node ノード
+  ///
+  /// node の TFI 全体のCNF式を作る．
+  void
+  make_gval_cnf(GvalCnf& gval_cnf,
+		const TpgNode* node);
+
+  /// @brief 故障回路のCNFを作る．
+  /// @param[in] fval_cnf 故障回路用のデータ構造
+  /// @param[in] fault 故障
+  /// @param[in] detect 検出条件
+  ///
+  /// detect = kVal0: 検出しないCNFを作る．
+  ///        = kVal1: 検出するCNFを作る．
+  ///        = kValX: fd_var() で制御するCNFを作る．
+  void
+  make_fval_cnf(FvalCnf&  fval_cnf,
+		TpgFault* fault,
+		Val3 detect);
+#endif
+
+  /// @brief 割当リストのもとでチェックを行う．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assign_list 割当リスト
+  Bool3
+  check_sat(GvalCnf& gval_cnf,
+	    const NodeValList& assign_list);
+
+#if 0
+  /// @brief 割当リストのもとで十分割当リストを求める．
+  /// @param[in] fault 故障
+  /// @param[in] assign_list 割当リスト
+  /// @param[out] suf_list 十分割当リストを格納する変数
+  void
+  get_suf_list(const VidMap& gvar_map,
+	       const VidMap& fvar_map,
+	       const NodeValList& assign_list,
+	       NodeValList& suf_list);
+#endif
+
   /// @brief ノードの入出力の関係を表すCNFを作る．
   /// @param[in] node 対象のノード
   /// @param[in] vid_map 変数番号のマップ
@@ -231,6 +274,12 @@ public:
 	SatStats& sat_stats,
 	USTime& time);
 
+  /// @brief SAT 問題を得．
+  ///
+  /// こちらは結果のみを返す．
+  Bool3
+  check_sat();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -407,6 +456,18 @@ SatEngine::solve(vector<Bool3>& model,
 
   sat_stats -= prev_stats;
 
+  return ans;
+}
+
+// @brief SAT 問題を得．
+//
+// こちらは結果のみを返す．
+inline
+Bool3
+SatEngine::check_sat()
+{
+  vector<Bool3> model;
+  Bool3 ans = mSolver.solve(mAssumptions, model);
   return ans;
 }
 
