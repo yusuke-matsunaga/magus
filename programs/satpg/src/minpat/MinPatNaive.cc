@@ -127,6 +127,7 @@ MinPatNaive::init(TpgNetwork& network,
   bool dom_fast = true;
   analyzer.get_dom_faults(dom_fast);
 
+  // 故障を同時検出数の少ない順に並べる．
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
   vector<pair<ymuint, TpgFault*> > tmp_list(nf);

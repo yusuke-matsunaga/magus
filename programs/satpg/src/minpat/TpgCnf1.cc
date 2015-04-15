@@ -618,7 +618,9 @@ TpgCnf1::get_pi_suf_list(NodeValList& suf_list,
 
     (*mBackTracer)(mFault->node(), mNodeSet, val_map, pi_suf_list);
 
-    verify_suf_list(mFault, mMaxId, pi_suf_list);
+    if ( do_verify ) {
+      verify_suf_list(mFault, mMaxId, pi_suf_list);
+    }
 
     return true;
   }

@@ -580,8 +580,10 @@ FaultAnalyzer::analyze_faults()
 
   local_timer.stop();
 
-  if ( mVerbose ) {
-    cout << endl;
+  if ( mVerbose > 0 ) {
+    if ( mVerbose > 1 ) {
+      cout << endl;
+    }
     cout << "CPU time for fault analysis" << local_timer.time() << endl;
   }
 }
@@ -663,6 +665,7 @@ FaultAnalyzer::estimate_conflict(ymuint sample_num,
   mConflictStats.conf4_timer.reset();
   mConflictStats.int1_timer.reset();
   mConflictStats.int2_timer.reset();
+  mConflictStats.conf_count = 0;
   mConflictStats.conf1_count = 0;
   mConflictStats.conf2_count = 0;
   mConflictStats.conf3_count = 0;
@@ -777,6 +780,7 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
       continue;
     }
     mConflictStats.conf1_timer.stop();
+
 
     mConflictStats.int1_timer.start();
     if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {

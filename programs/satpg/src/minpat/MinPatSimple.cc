@@ -133,6 +133,7 @@ MinPatSimple::init(TpgNetwork& network,
   vector<double> conf_prob_array;
   analyzer.estimate_conflict(sample_num, conf_prob_array);
 
+  // 故障を衝突数の多い順に並べる．
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
   vector<pair<double, TpgFault*> > tmp_list(nf);

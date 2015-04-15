@@ -28,7 +28,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 MinPatBase::MinPatBase()
 {
-  mVerbose = false;
+  mVerbose = 0;
 }
 
 // @brief デストラクタ
@@ -60,9 +60,6 @@ MinPatBase::run(TpgNetwork& network,
 
   StopWatch local_timer;
   local_timer.start();
-  if ( verbose() ) {
-    cout << "grouping start" << endl;
-  }
 
   FgMgr fgmgr(max_node_id);
 
@@ -105,20 +102,23 @@ MinPatBase::run(TpgNetwork& network,
   }
 
   local_timer.stop();
-  if ( verbose() ) {
-    cout << endl;
+  if ( verbose() > 0 ) {
+    if ( verbose() > 1 ) {
+      cout << endl;
+    }
     cout << " # of fault groups = " << fgmgr.group_num() << endl;
     cout << "CPU time (coloring)              " << local_timer.time() << endl;
   }
 
   // 後処理
+  local_timer.reset();
   local_timer.start();
+
   vector<ymuint> group_list;
   fgmgr.compaction(group_list);
 
   local_timer.stop();
-  if ( verbose() ) {
-    cout << endl;
+  if ( verbose() > 0 ) {
     cout << " # of fault groups = " << group_list.size() << endl;
     cout << "CPU time (compaction)              " << local_timer.time() << endl;
   }
@@ -127,18 +127,17 @@ MinPatBase::run(TpgNetwork& network,
   local_timer.reset();
   local_timer.start();
 
-  vector<TestVector*> new_tv_list;
   ymuint new_ng = group_list.size();
-  new_tv_list.reserve(new_ng);
+  vector<TestVector*> new_tv_list(new_ng);
   for (ymuint i = 0; i < new_ng; ++ i) {
     ymuint gid = group_list[i];
     TestVector* tv = tvmgr.new_vector();
     fgmgr.make_testvector(gid, network, tv);
-    new_tv_list.push_back(tv);
+    new_tv_list[i] = tv;
   }
 
   local_timer.stop();
-  if ( verbose() ) {
+  if ( verbose() > 0 ) {
     cout << "CPU time (testvector generation) " << local_timer.time() << endl;
   }
 
