@@ -120,9 +120,8 @@ MinPatNaive::init(TpgNetwork& network,
 
   analyzer.init(mMaxNodeId, fault_list);
 
-  ymuint npat0 = 10000;
   RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg, npat0);
+  analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg);
 
   bool dom_fast = true;
   analyzer.get_dom_faults(dom_fast);

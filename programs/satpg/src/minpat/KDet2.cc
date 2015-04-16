@@ -46,6 +46,7 @@ KDet2::~KDet2()
 // @brief 各故障に対して k 回検出するまでは故障シミュレーションを行う．
 // @param[in] pat_list パタンのリスト
 // @param[in] fault_info_array 故障ごとの情報を収める配列
+// @param[in] det_list_array パタンごとに検出した故障番号を収める配列
 void
 KDet2::run(const vector<TestVector*>& pat_list,
 	   vector<FaultInfo>& fault_info_array)
@@ -61,12 +62,7 @@ KDet2::run(const vector<TestVector*>& pat_list,
       mFsim.ppsfp(cur_array, mOp);
       for (ymuint j = 0; j < kPvBitLen; ++ j) {
 	const vector<ymuint>& det_list = mOp.det_list(j);
-	for (ymuint k = 0; k < det_list.size(); ++ k) {
-	  ymuint f_id = det_list[k];
-	  FaultInfo& fi = fault_info_array[f_id];
-	  fi.add_pat(base + j);
-	  fi.add_fnum(det_list.size());
-	}
+	record_pat(det_list, base + j, fault_info_array);
       }
       cur_array.clear();
       mOp.clear_det_list();
@@ -77,18 +73,59 @@ KDet2::run(const vector<TestVector*>& pat_list,
     mFsim.ppsfp(cur_array, mOp);
     for (ymuint j = 0; j < cur_array.size(); ++ j) {
       const vector<ymuint>& det_list = mOp.det_list(j);
-      for (ymuint k = 0; k < det_list.size(); ++ k) {
-	ymuint f_id = det_list[k];
-	FaultInfo& fi = fault_info_array[f_id];
-	fi.add_pat(base + j);
-	fi.add_fnum(det_list.size());
-      }
+      record_pat(det_list, base + j, fault_info_array);
     }
     mOp.clear_det_list();
   }
 
   for (ymuint i = 0; i < mMaxFaultId; ++ i) {
     fault_info_array[i].sort_pat_list();
+  }
+}
+
+void
+KDet2::record_pat(const vector<ymuint>& det_list,
+		  ymuint pat_id,
+		  vector<FaultInfo>& fault_info_array)
+{
+  ymuint n = det_list.size();
+  vector<bool> det_flag(mMaxFaultId, false);
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint f_id = det_list[i];
+    det_flag[f_id] = true;
+    FaultInfo& fi = fault_info_array[f_id];
+    fi.add_pat(pat_id);
+    fi.add_fnum(n);
+  }
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint f_id = det_list[i];
+    FaultInfo& fi = fault_info_array[f_id];
+    if ( fi.mFirstDetect ) {
+      fi.mFirstDetect = false;
+      fi.mDomCandList.reserve(n - 1);
+      for (ymuint j = 0; j < n; ++ j) {
+	ymuint f_id2 = det_list[j];
+	if ( f_id2 == f_id ) {
+	  continue;
+	}
+	fi.mDomCandList.push_back(f_id2);
+      }
+    }
+    else {
+      ymuint wpos = 0;
+      for (ymuint j = 0; j < fi.mDomCandList.size(); ++ j) {
+	ymuint f_id2 = fi.mDomCandList[j];
+	if ( det_flag[f_id2] ) {
+	  if ( wpos != j ) {
+	    fi.mDomCandList[wpos] = f_id2;
+	  }
+	  ++ wpos;
+	}
+      }
+      if ( wpos < fi.mDomCandList.size() ) {
+	fi.mDomCandList.erase(fi.mDomCandList.begin() + wpos, fi.mDomCandList.end());
+      }
+    }
   }
 }
 

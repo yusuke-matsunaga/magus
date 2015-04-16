@@ -97,6 +97,10 @@ public:
 
   bool mExact;
 
+  bool mFirstDetect;
+
+  vector<ymuint> mDomCandList;
+
 };
 
 
@@ -110,6 +114,7 @@ FaultInfo::FaultInfo()
 {
   mFnum = 0;
   mExact = false;
+  mFirstDetect = true;
 }
 
 // @brief デストラクタ

@@ -57,15 +57,13 @@ public:
   /// @param[in] tvmgr テストベクタのマネージャ
   /// @param[in] tv_list テストベクタのリスト
   /// @param[in] rg 乱数生成器
-  /// @param[in] npat 内部で生成する乱数パタンの数
   ///
   /// 結果は mFaultInfoArray の pat_list に格納される．
   void
   get_pat_list(Fsim& fsim,
 	       TvMgr& tvmgr,
 	       const vector<TestVector*>& tv_list,
-	       RandGen& rg,
-	       ymuint npat);
+	       RandGen& rg);
 
   /// @brief 支配故障を求める．
   /// @param[in] fast 手抜きの高速化を行うとき true にするフラグ
@@ -129,6 +127,11 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障シミュレーションの後処理
+  ymuint
+  record_pat(const vector<ymuint>& det_list,
+	     ymuint pat_id);
+
   /// @brief f1 が f2 を支配しているか調べる．
   bool
   check_fault_dominance(TpgFault* f1,
@@ -160,6 +163,9 @@ private:
 
   // オリジナルの故障リスト
   vector<TpgFault*> mOrigFaultList;
+
+  // パタンごとの検出故障リスト
+  vector<vector<ymuint> > mDetListArray;
 
   // 支配故障リスト
   vector<TpgFault*> mDomFaultList;
