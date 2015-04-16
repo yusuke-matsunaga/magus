@@ -95,6 +95,8 @@ public:
 
   vector<ymuint> mConflictList;
 
+  bool mExact;
+
 };
 
 
@@ -107,6 +109,7 @@ inline
 FaultInfo::FaultInfo()
 {
   mFnum = 0;
+  mExact = false;
 }
 
 // @brief デストラクタ

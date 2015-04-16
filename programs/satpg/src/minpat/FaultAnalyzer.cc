@@ -545,6 +545,7 @@ FaultAnalyzer::analyze_faults()
 
   local_timer.start();
 
+  ymuint n_exact = 0;
   ymuint fnum = mDomFaultList.size();
   for (ymuint i = 0; i < fnum; ++ i) {
     if ( mVerbose > 1 ) {
@@ -580,6 +581,10 @@ FaultAnalyzer::analyze_faults()
 	ma_list.add(node, val);
       }
     }
+    if ( suf_list.size() == ma_list.size() ) {
+      fault_info.mExact = true;
+      ++ n_exact;
+    }
   }
 
   local_timer.stop();
@@ -589,6 +594,7 @@ FaultAnalyzer::analyze_faults()
       cout << endl;
     }
     cout << "CPU time for fault analysis" << local_timer.time() << endl;
+    cout << "  " << n_exact << " exact faults" << endl;
   }
 }
 
@@ -735,101 +741,6 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 {
   mConflictStats.conf_timer.start();
 
-#if 1
-  // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
-  TpgCnf1 tpg_cnf(string(), string(), NULL);
-
-  NodeSet& node_set1 = mNodeSetArray[f1->node()->id()];
-  tpg_cnf.make_fval_cnf(f1, node_set1, mMaxNodeId);
-
-  const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
-
-  FaultInfo& fi1 = mFaultInfoArray[f1->id()];
-  const vector<ymuint>& tv_list1 = fi1.pat_list();
-  const NodeValList& suf_list1 = fi1.mSufList;
-  const NodeValList& pi_suf_list1 = fi1.mPiSufList;
-  const NodeValList& ma_list1 = fi1.mMaList;
-
-  conf_list.reserve(f2_list.size());
-  for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
-    TpgFault* f2 = f2_list[i2];
-
-    const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
-
-    bool intersect = check_intersect(input_list1, input_list2);
-    if ( !intersect ) {
-      // 共通部分を持たない故障は独立
-      continue;
-    }
-
-    FaultInfo& fi2 = mFaultInfoArray[f2->id()];
-    const vector<ymuint>& tv_list2 = fi2.pat_list();
-
-    bool stat = check_pat_list2(tv_list1, tv_list2);
-    if ( stat ) {
-      // f1 と f2 が同時に1なのでコンフリクトしない．
-      continue;
-    }
-
-    const NodeValList& suf_list2 = fi2.mSufList;
-    const NodeValList& pi_suf_list2 = fi2.mPiSufList;
-    const NodeValList& ma_list2 = fi2.mMaList;
-
-    mConflictStats.conf1_timer.start();
-    if ( check_conflict(ma_list1, ma_list2) ) {
-      // 必要割当そのものがコンフリクトしている．
-      ++ mConflictStats.conf_count;
-      ++ mConflictStats.conf1_count;
-      conf_list.push_back(f2);
-      mConflictStats.conf1_timer.stop();
-      continue;
-    }
-    mConflictStats.conf1_timer.stop();
-
-
-    mConflictStats.int1_timer.start();
-    if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
-      // 十分割当が両立しているのでコンフリクトしない．
-      ++ mConflictStats.int1_count;
-      mConflictStats.int1_timer.stop();
-      continue;
-    }
-    mConflictStats.int1_timer.stop();
-
-    mConflictStats.int2_timer.start();
-    if ( !check_conflict(suf_list1, suf_list2) && tpg_cnf.check_intersect(suf_list2) ) {
-      // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
-      ++ mConflictStats.int2_count;
-      mConflictStats.int2_timer.stop();
-      continue;
-    }
-    mConflictStats.int2_timer.stop();
-
-    mConflictStats.conf3_timer.start();
-    if ( tpg_cnf.check_conflict(ma_list2) ) {
-      // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
-      ++ mConflictStats.conf_count;
-      ++ mConflictStats.conf3_count;
-      conf_list.push_back(f2);
-      mConflictStats.conf3_timer.stop();
-      continue;
-    }
-    mConflictStats.conf3_timer.stop();
-
-    if ( simple ) {
-      continue;
-    }
-
-    mConflictStats.conf4_timer.start();
-    ++ mConflictStats.conf4_check_count;
-    if ( check_fault_conflict(f1, f2) ) {
-      ++ mConflictStats.conf_count;
-      ++ mConflictStats.conf4_count;
-      conf_list.push_back(f2);
-    }
-    mConflictStats.conf4_timer.stop();
-  }
-#else
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
@@ -891,14 +802,32 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
     mConflictStats.int1_timer.stop();
 
     mConflictStats.int2_timer.start();
+#if 1
     if ( !check_conflict(suf_list1, suf_list2) && engine.check_sat(gval_cnf, suf_list2) == kB3True ) {
       // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
       ++ mConflictStats.int2_count;
       mConflictStats.int2_timer.stop();
       continue;
     }
+#else
+    if ( engine.check_sat(gval_cnf, suf_list2) == kB3True ) {
+      ASSERT_COND( !check_conflict(suf_list1, suf_list2) );
+      // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+      ++ mConflictStats.int2_count;
+      mConflictStats.int2_timer.stop();
+      continue;
+    }
+#endif
     mConflictStats.int2_timer.stop();
-
+#if 0
+    if ( fi2.mExact && !check_conflict(suf_list1, suf_list2) ) {
+      // f2 の十分割当と必要割当が等しければ上のチェックで終わり．
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf3_count;
+      conf_list.push_back(f2);
+      continue;
+    }
+#endif
     mConflictStats.conf3_timer.start();
     if ( engine.check_sat(gval_cnf, ma_list2) == kB3False ) {
       // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
@@ -923,7 +852,6 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
     }
     mConflictStats.conf4_timer.stop();
   }
-#endif
 
   mConflictStats.conf_timer.stop();
 
