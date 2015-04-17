@@ -45,17 +45,14 @@ private:
   /// @brief 初期化を行う．
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
-  /// @param[in] tv_list テストベクタのリスト
-  /// @return 支配故障数を返す．
+  /// @param[out] fault_list 検出された故障のリスト
   virtual
-  ymuint
+  void
   init(TpgNetwork& network,
        TvMgr& tvmgr,
-       FaultMgr& fmgr,
        Fsim& fsim2,
-       vector<TestVector*>& tv_list);
+       vector<TpgFault*>& fault_list);
 
   /// @brief 最初の故障を選ぶ．
   virtual

@@ -45,14 +45,12 @@ MinPatDsatur::~MinPatDsatur()
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
-// @param[in] tv_list テストベクタのリスト
-// @return 支配故障数を返す．
-ymuint
+// @param[out] fault_list 検出された故障のリスト
+void
 MinPatDsatur::init(TpgNetwork& network,
 		   TvMgr& tvmgr,
-		   FaultMgr& fmgr,
 		   Fsim& fsim2,
-		   vector<TestVector*>& tv_list)
+		   vector<TpgFault*>& fault_list)
 {
   mMaxNodeId = network.max_node_id();
 
@@ -61,8 +59,6 @@ MinPatDsatur::init(TpgNetwork& network,
   analyzer.set_verbose(verbose());
 
 #if 0
-  const vector<TpgFault*>& fault_list = fmgr.det_list();
-#else
   vector<TpgFault*> f_list2;
   for (ymuint i = 0; i < network.active_node_num(); ++ i) {
     const TpgNode* node = network.active_node(i);
@@ -104,14 +100,12 @@ MinPatDsatur::init(TpgNetwork& network,
   const vector<TpgFault*>& fault_list = f_list2;
 #endif
 
-  analyzer.init(network);
+  analyzer.init(network, tvmgr);
 
   RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg);
+  analyzer.get_pat_list(fsim2, tvmgr, rg);
 
   analyzer.get_dom_faults();
-
-  analyzer.analyze_faults();
 
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
@@ -146,8 +140,6 @@ MinPatDsatur::init(TpgNetwork& network,
   mSimpleConfNum = 0;
   mSatConfNum = 0;
   mCompatNum = 0;
-
-  return nf;
 }
 
 // @brief 最初の故障を選ぶ．
@@ -235,7 +227,7 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr)
       FaultStruct& fs = mFaultStructList[max2_pos];
       TpgCnf1 tpg_cnf(string(), string(), NULL);
       tpg_cnf.make_fval_cnf(fs.mFault, mMaxNodeId);
-      const NodeValList& ma_list = mAnalyzer.fault_info(fs.mFault->id()).mMaList;
+      const NodeValList& ma_list = mAnalyzer.fault_info(fs.mFault->id()).mandatory_assignment();
       for (ymuint gid = 0; gid < ng; ++ gid) {
 	if ( fs.mPendingMap[gid] ) {
 	  fs.mPendingMap[gid] = false;

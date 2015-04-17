@@ -80,18 +80,16 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   minpat->set_verbose(verbose);
 
-  MinPatStats stats;
-  minpat->run(_network(), _tv_mgr(), _fault_mgr(), _fsim(), _tv_list(), stats);
+  USTime time;
+  minpat->run(_network(), _tv_mgr(),  _fsim(), _tv_list(), time);
 
   delete minpat;
 
   if ( print_stats ) {
     cout << "********** minpat **********" << endl
-	 << setw(10) << stats.original_patterns()
-	 << ": # of original patterns" << endl
-	 << setw(10) << stats.minimized_patterns()
+	 << setw(10) << _tv_list().size()
 	 << ": # of minimized patterns" << endl
-	 << stats.time() << endl;
+	 << time << endl;
   }
 
   return TCL_OK;

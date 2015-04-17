@@ -11,7 +11,6 @@
 
 #include "ModelValMap.h"
 #include "Extractor.h"
-#include "BackTracer.h"
 
 #include "TpgNetwork.h"
 #include "TpgNode.h"
@@ -29,6 +28,7 @@
 
 #include "TpgCnf1.h"
 
+#include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
 #include "YmUtils/HashSet.h"
 
@@ -242,8 +242,10 @@ FaultAnalyzer::set_verbose(int verbose)
 
 // @brief 初期化する．
 // @param[in] network ネットワーク
+// @param[in] tvmgr テストベクタのマネージャ
 void
-FaultAnalyzer::init(const TpgNetwork& network)
+FaultAnalyzer::init(const TpgNetwork& network,
+		    TvMgr& tvmgr)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -279,8 +281,8 @@ FaultAnalyzer::init(const TpgNetwork& network)
   mFaultInfoArray.clear();
   mFaultInfoArray.resize(mMaxFaultId);
 
-  BackTracer* bt = new_BtJust2();
-  bt->set_max_id(mMaxNodeId);
+  mBackTracer = new_BtJust2();
+  mBackTracer->set_max_id(mMaxNodeId);
 
   ymuint f_all = 0;
   ymuint f_det = 0;
@@ -288,6 +290,9 @@ FaultAnalyzer::init(const TpgNetwork& network)
   ymuint f_abt = 0;
   ymuint n_single_cube = 0;
 
+  RandGen rg;
+
+  mTestVectorList.clear();
   for (ymuint i = 0; i < nn; ++ i) {
     const TpgNode* node = network.active_node(i);
     if ( node->is_output() ) {
@@ -317,6 +322,22 @@ FaultAnalyzer::init(const TpgNetwork& network)
     ymuint nf = node->fault_num();
     for (ymuint i = 0; i < nf; ++ i) {
       TpgFault* fault = node->fault(i);
+      Bool3 stat = analyze_fault(fault, tvmgr);
+      ++ f_all;
+      switch ( stat ) {
+      case kB3True:
+	++ f_det;
+	break;
+
+      case kB3False:
+	++ f_red;
+	break;
+
+      case kB3X:
+	++ f_abt;
+      }
+
+#if 0
       ymuint f_id = fault->id();
       FaultInfo& fi = mFaultInfoArray[f_id];
       fi.init(fault);
@@ -346,6 +367,25 @@ FaultAnalyzer::init(const TpgNetwork& network)
 	extract(fault, suf_list);
 	(*bt)(node, node_set, val_map, fi.mPiSufList);
 
+	// テストベクタを作る．
+	TestVector* tv = tvmgr.new_vector();
+	ymuint n = fi.mPiSufList.size();
+	for (ymuint i = 0; i < n; ++ i) {
+	  NodeVal nv = fi.mPiSufList[i];
+	  const TpgNode* node = nv.node();
+	  ASSERT_COND ( node->is_input() );
+	  ymuint id = node->input_id();
+	  if ( nv.val() ) {
+	    tv->set_val(id, kVal1);
+	  }
+	  else {
+	    tv->set_val(id, kVal0);
+	  }
+	}
+	// X の部分をランダムに設定しておく
+	tv->fix_x_from_random(mRandGen);
+	mTestVectorList.push_back(tv);
+
 	// 必要割当を求める．
 	NodeValList& ma_list = fi.mMaList;
 	ymuint n = suf_list.size();
@@ -373,6 +413,7 @@ FaultAnalyzer::init(const TpgNetwork& network)
       else {
 	++ f_abt;
       }
+#endif
     }
   }
 
@@ -382,7 +423,8 @@ FaultAnalyzer::init(const TpgNetwork& network)
     mDomFaultList.push_back(mOrigFaultList[i]);
   }
 
-  delete bt;
+  delete mBackTracer;
+  mBackTracer = NULL;
 
   local_timer.stop();
 
@@ -400,7 +442,6 @@ FaultAnalyzer::init(const TpgNetwork& network)
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fsim 故障シミュレータ
 // @param[in] tvmgr テストベクタのマネージャ
-// @param[in] tv_list テストベクタのリスト
 // @param[in] rg 乱数生成器
 // @param[in] npat 内部で生成する乱数パタンの数
 //
@@ -408,26 +449,21 @@ FaultAnalyzer::init(const TpgNetwork& network)
 void
 FaultAnalyzer::get_pat_list(Fsim& fsim,
 			    TvMgr& tvmgr,
-			    const vector<TestVector*>& tv_list,
 			    RandGen& rg)
 {
   StopWatch local_timer;
   local_timer.start();
-
-  if ( mVerbose ) {
-    cout << "  fault simulation (npat = " << tv_list.size() << ") starts."
-	 << endl;
-  }
 
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
   KDet2Op op(fsim, mOrigFaultList);
 
-  ymuint npat = tv_list.size();
+  ymuint npat = mOrigFaultList.size();
   ymuint base = 0;
-  for (ymuint i = 0; i < tv_list.size(); ++ i) {
-    TestVector* tv = tv_list[i];
+  for (ymuint i = 0; i < mOrigFaultList.size(); ++ i) {
+    FaultInfo& fi = mFaultInfoArray[mOrigFaultList[i]->id()];
+    TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
       if ( mVerbose > 1 ) {
@@ -508,8 +544,7 @@ FaultAnalyzer::get_pat_list(Fsim& fsim,
   local_timer.stop();
 
   if ( mVerbose ) {
-    cout << "  fault simulation ends." << endl
-	 << "CPU time (fault simulation)  " << local_timer.time() << endl
+    cout << "CPU time (fault simulation)  " << local_timer.time() << endl
 	 << "Total " << base << " patterns simulated" << endl;
   }
 
@@ -957,6 +992,89 @@ FaultAnalyzer::get_dom_faults()
 }
 #endif
 
+// @brief 故障の解析を行う．
+// @param[in] fault 故障
+// @param[in] tvmgr テストベクタのマネージャ
+Bool3
+FaultAnalyzer::analyze_fault(TpgFault* fault,
+			     TvMgr& tvmgr)
+{
+  ymuint f_id = fault->id();
+  FaultInfo& fi = mFaultInfoArray[f_id];
+
+  fi.mFault = fault;
+
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
+
+  const TpgNode* fnode = fault->node();
+  NodeSet& node_set = mNodeSetArray[fnode->id()];
+
+  // fault を検出するCNFを作る．
+  fval_cnf.make_cnf(engine, fault, node_set, kVal1);
+
+  // 故障に対するテスト生成を行なう．
+  engine.assumption_begin();
+
+  vector<Bool3> sat_model;
+  SatStats sat_stats;
+  USTime sat_time;
+  fi.mStat = engine.solve(sat_model, sat_stats, sat_time);
+  if ( fi.mStat == kB3True ) {
+    ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
+    Extractor extract(val_map);
+
+    NodeValList& suf_list = fi.mSufficientAssignment;
+    extract(fault, suf_list);
+
+    NodeValList& pi_suf_list = fi.mPiSufficientAssignment;
+    (*mBackTracer)(fnode, node_set, val_map, pi_suf_list);
+
+    // テストベクタを作る．
+    TestVector* tv = tvmgr.new_vector();
+    ymuint npi = pi_suf_list.size();
+    for (ymuint i = 0; i < npi; ++ i) {
+      NodeVal nv = pi_suf_list[i];
+      const TpgNode* node = nv.node();
+      ASSERT_COND ( node->is_input() );
+      ymuint id = node->input_id();
+      if ( nv.val() ) {
+	tv->set_val(id, kVal1);
+      }
+      else {
+	tv->set_val(id, kVal0);
+      }
+    }
+    // X の部分をランダムに設定しておく
+    tv->fix_x_from_random(mRandGen);
+
+    fi.mTestVector = tv;
+
+    // 必要割当を求める．
+    NodeValList& ma_list = fi.mMandatoryAssignment;
+    ymuint n = suf_list.size();
+    for (ymuint i = 0; i < n; ++ i) {
+      NodeVal nv = suf_list[i];
+
+      NodeValList list1;
+      const TpgNode* node = nv.node();
+      bool val = nv.val();
+      list1.add(node, !val);
+      if ( engine.check_sat(gval_cnf, list1) == kB3False ) {
+	// node の値を反転したら検出できなかった．
+	// -> この割当は必須割当
+	ma_list.add(node, val);
+      }
+    }
+    if ( suf_list.size() == ma_list.size() ) {
+      fi.mSingleCube = true;
+    }
+  }
+  return fi.mStat;
+}
+
+#if 0
 // @brief 十分割当と必要割当を求める．
 //
 // 結果は mFaultInfoArray に格納される．
@@ -1019,6 +1137,7 @@ FaultAnalyzer::analyze_faults()
     cout << "  " << n_exact << " exact faults" << endl;
   }
 }
+#endif
 
 // @brief 故障間の衝突性を調べる．
 void
@@ -1178,9 +1297,9 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 
   FaultInfo& fi1 = mFaultInfoArray[f1->id()];
   const vector<ymuint>& tv_list1 = fi1.pat_list();
-  const NodeValList& suf_list1 = fi1.mSufList;
-  const NodeValList& pi_suf_list1 = fi1.mPiSufList;
-  const NodeValList& ma_list1 = fi1.mMaList;
+  const NodeValList& suf_list1 = fi1.sufficient_assignment();
+  const NodeValList& pi_suf_list1 = fi1.pi_sufficient_assignment();
+  const NodeValList& ma_list1 = fi1.mandatory_assignment();
 
   conf_list.reserve(f2_list.size());
   for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
@@ -1203,9 +1322,9 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
       continue;
     }
 
-    const NodeValList& suf_list2 = fi2.mSufList;
-    const NodeValList& pi_suf_list2 = fi2.mPiSufList;
-    const NodeValList& ma_list2 = fi2.mMaList;
+    const NodeValList& suf_list2 = fi2.sufficient_assignment();
+    const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
+    const NodeValList& ma_list2 = fi2.mandatory_assignment();
 
     mConflictStats.conf1_timer.start();
     if ( check_conflict(ma_list1, ma_list2) ) {
@@ -1300,8 +1419,8 @@ FaultAnalyzer::analyze_conflict2(TpgFault* f1,
 
   FaultInfo& fi1 = mFaultInfoArray[f1->id()];
   const vector<ymuint>& tv_list1 = fi1.pat_list();
-  const NodeValList& suf_list1 = fi1.mSufList;
-  const NodeValList& pi_suf_list1 = fi1.mPiSufList;
+  const NodeValList& suf_list1 = fi1.sufficient_assignment();
+  const NodeValList& pi_suf_list1 = fi1.pi_sufficient_assignment();
 
   conf_list.reserve(f2_list.size());
   for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
@@ -1324,9 +1443,9 @@ FaultAnalyzer::analyze_conflict2(TpgFault* f1,
       continue;
     }
 
-    const NodeValList& suf_list2 = fi2.mSufList;
-    const NodeValList& pi_suf_list2 = fi2.mPiSufList;
-    const NodeValList& ma_list2 = fi2.mMaList;
+    const NodeValList& suf_list2 = fi2.sufficient_assignment();
+    const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
+    const NodeValList& ma_list2 = fi2.mandatory_assignment();
 
     mConflictStats.conf1_timer.start();
     if ( check_conflict(suf_list1, ma_list2) ) {

@@ -43,16 +43,13 @@ MinPatDsatur2::~MinPatDsatur2()
 // @brief 初期化を行う．
 // @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
-// @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
-// @param[in] tv_list テストベクタのリスト
-// @return 支配故障数を返す．
-ymuint
+// @param[out] fault_list 検出された故障のリスト
+void
 MinPatDsatur2::init(TpgNetwork& network,
 		    TvMgr& tvmgr,
-		    FaultMgr& fmgr,
 		    Fsim& fsim2,
-		    vector<TestVector*>& tv_list)
+		    vector<TpgFault*>& fault_list)
 {
   mMaxNodeId = network.max_node_id();
 
@@ -61,8 +58,6 @@ MinPatDsatur2::init(TpgNetwork& network,
   analyzer.set_verbose(verbose());
 
 #if 0
-  const vector<TpgFault*>& fault_list = fmgr.det_list();
-#else
   vector<TpgFault*> f_list2;
   for (ymuint i = 0; i < network.active_node_num(); ++ i) {
     const TpgNode* node = network.active_node(i);
@@ -104,14 +99,12 @@ MinPatDsatur2::init(TpgNetwork& network,
   const vector<TpgFault*>& fault_list = f_list2;
 #endif
 
-  analyzer.init(network);
+  analyzer.init(network, tvmgr);
 
   RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg);
+  analyzer.get_pat_list(fsim2, tvmgr, rg);
 
   analyzer.get_dom_faults();
-
-  analyzer.analyze_faults();
 
   analyzer.analyze_conflict();
 
@@ -144,8 +137,6 @@ MinPatDsatur2::init(TpgNetwork& network,
   }
 
   mRemainNum = nf;
-
-  return nf;
 }
 
 // @brief 最初の故障を選ぶ．

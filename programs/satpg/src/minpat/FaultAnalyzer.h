@@ -10,11 +10,12 @@
 
 
 #include "satpg_nsdef.h"
+#include "BackTracer.h"
 #include "NodeValList.h"
 #include "FaultInfo.h"
 #include "NodeSet.h"
-#include "YmUtils/StopWatch.h"
 #include "YmUtils/RandGen.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -47,20 +48,20 @@ public:
 
   /// @brief 初期化する．
   /// @param[in] network ネットワーク
+  /// @param[in] tvmgr テストベクタのマネージャ
   void
-  init(const TpgNetwork& network);
+  init(const TpgNetwork& network,
+       TvMgr& tvmgr);
 
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fsim 故障シミュレータ
   /// @param[in] tvmgr テストベクタのマネージャ
-  /// @param[in] tv_list テストベクタのリスト
   /// @param[in] rg 乱数生成器
   ///
   /// 結果は mFaultInfoArray の pat_list に格納される．
   void
   get_pat_list(Fsim& fsim,
 	       TvMgr& tvmgr,
-	       const vector<TestVector*>& tv_list,
 	       RandGen& rg);
 
   /// @brief 支配故障を求める．
@@ -68,12 +69,6 @@ public:
   /// 結果は mDomFaultList に格納される．
   void
   get_dom_faults();
-
-  /// @brief 十分割当と必要割当を求める．
-  ///
-  /// 結果は mFaultInfoArray に格納される．
-  void
-  analyze_faults();
 
   /// @brief 故障間の衝突性を調べる．
   void
@@ -124,6 +119,13 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障の解析を行う．
+  /// @param[in] fault 故障
+  /// @param[in] tvmgr テストベクタのマネージャ
+  Bool3
+  analyze_fault(TpgFault* fault,
+		TvMgr& tvmgr);
+
   /// @brief 1つの故障と複数の故障間の衝突性を調べる．
   /// @param[in] f1 対象の故障
   /// @param[in] f2_list f1 との衝突性を調べる故障のリスト
@@ -171,8 +173,17 @@ private:
   // 最大故障番号
   ymuint mMaxFaultId;
 
+  // バックトレーサー
+  BackTracer* mBackTracer;
+
+  // テストベクタ用の乱数生成器
+  RandGen mRandGen;
+
   // オリジナルの故障リスト
   vector<TpgFault*> mOrigFaultList;
+
+  // 検出可能故障用のテストベクタリスト
+  vector<TestVector*> mTestVectorList;
 
   // パタンごとの検出故障リスト
   vector<vector<ymuint> > mDetListArray;

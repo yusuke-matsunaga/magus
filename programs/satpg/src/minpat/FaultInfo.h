@@ -22,6 +22,8 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 class FaultInfo
 {
+  friend class FaultAnalyzer;
+
 public:
 
   /// @brief コンストラクタ
@@ -36,14 +38,25 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 初期化する．
-  /// @param[in] fault 対象の故障
-  void
-  init(TpgFault* fault);
-
   /// @brief 故障を得る．
   TpgFault*
   fault() const;
+
+  /// @brief 故障を検出するテストベクタを返す．
+  TestVector*
+  testvector() const;
+
+  /// @biref 必要割当を返す．
+  const NodeValList&
+  mandatory_assignment() const;
+
+  /// @brief 十分割当を返す．
+  const NodeValList&
+  sufficient_assignment() const;
+
+  /// @brief 外部入力上の十分割当(つまりテストベクタ)を返す．
+  const NodeValList&
+  pi_sufficient_assignment() const;
 
   /// @brief パタンリストを得る．
   const vector<ymuint>&
@@ -84,6 +97,18 @@ private:
   // 故障
   TpgFault* mFault;
 
+  // テストベクタ
+  TestVector* mTestVector;
+
+  // 必要割当
+  NodeValList mMandatoryAssignment;
+
+  // 十分割当
+  NodeValList mSufficientAssignment;
+
+  // 外部入力上の十分割当
+  NodeValList mPiSufficientAssignment;
+
   // この故障を検出するパタン番号のリスト
   vector<ymuint> mPatList;
 
@@ -96,12 +121,6 @@ private:
 public:
 
   Bool3 mStat;
-
-  NodeValList mSufList;
-
-  NodeValList mPiSufList;
-
-  NodeValList mMaList;
 
   vector<ymuint> mConflictList;
 
@@ -137,21 +156,44 @@ FaultInfo::~FaultInfo()
 {
 }
 
-// @brief 初期化する．
-// @param[in] fault 対象の故障
-inline
-void
-FaultInfo::init(TpgFault* fault)
-{
-  mFault = fault;
-}
-
 // @brief 故障を得る．
 inline
 TpgFault*
 FaultInfo::fault() const
 {
   return mFault;
+}
+
+// @brief 故障を検出するテストベクタを返す．
+inline
+TestVector*
+FaultInfo::testvector() const
+{
+  return mTestVector;
+}
+
+// @biref 必要割当を返す．
+inline
+const NodeValList&
+FaultInfo::mandatory_assignment() const
+{
+  return mMandatoryAssignment;
+}
+
+// @brief 十分割当を返す．
+inline
+const NodeValList&
+FaultInfo::sufficient_assignment() const
+{
+  return mSufficientAssignment;
+}
+
+// @brief 外部入力上の十分割当(つまりテストベクタ)を返す．
+inline
+const NodeValList&
+FaultInfo::pi_sufficient_assignment() const
+{
+  return mPiSufficientAssignment;
 }
 
 // @brief パタンリストを得る．

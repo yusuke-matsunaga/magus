@@ -44,7 +44,6 @@ public:
   /// @brief テストベクタの最小化を行なう．
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
@@ -52,10 +51,9 @@ public:
   void
   run(TpgNetwork& network,
       TvMgr& tvmgr,
-      FaultMgr& fmgr,
       Fsim& fsim2,
       vector<TestVector*>& tv_list,
-      MinPatStats& stats);
+      USTime& time);
 
   /// @brief verbose フラグをセットする．
   virtual
@@ -75,17 +73,14 @@ private:
   /// @brief 初期化を行う．
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fmgr 故障マネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
-  /// @param[in] tv_list テストベクタのリスト
-  /// @return 支配故障数を返す．
+  /// @param[out] fault_list 検出された故障のリスト
   virtual
-  ymuint
+  void
   init(TpgNetwork& network,
        TvMgr& tvmgr,
-       FaultMgr& fmgr,
        Fsim& fsim2,
-       vector<TestVector*>& tv_list) = 0;
+       vector<TpgFault*>& fault_list) = 0;
 
   /// @brief 最初の故障を選ぶ．
   virtual

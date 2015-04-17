@@ -8,7 +8,6 @@
 
 
 #include "MinPatBase.h"
-#include "MinPatStats.h"
 #include "FgMgr.h"
 #include "TpgNetwork.h"
 #include "TvMgr.h"
@@ -42,24 +41,24 @@ MinPatBase::~MinPatBase()
 // @brief テストベクタの最小化を行なう．
 // @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
-// @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 // @param[out] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
 MinPatBase::run(TpgNetwork& network,
 		TvMgr& tvmgr,
-		FaultMgr& fmgr,
 		Fsim& fsim2,
 		vector<TestVector*>& tv_list,
-		MinPatStats& stats)
+		USTime& time)
 {
   StopWatch total_timer;
   total_timer.start();
 
   ymuint max_node_id = network.max_node_id();
 
-  ymuint nf = init(network, tvmgr, fmgr, fsim2, tv_list);
+  vector<TpgFault*> fault_list;
+  init(network, tvmgr, fsim2, fault_list);
+  ymuint nf = fault_list.size();
 
   StopWatch local_timer;
   local_timer.start();
@@ -147,12 +146,13 @@ MinPatBase::run(TpgNetwork& network,
   local_timer.start();
 
   ymuint new_ng = group_list.size();
-  vector<TestVector*> new_tv_list(new_ng);
+  tv_list.clear();
+  tv_list.reserve(new_ng);
   for (ymuint i = 0; i < new_ng; ++ i) {
     ymuint gid = group_list[i];
     TestVector* tv = tvmgr.new_vector();
     fgmgr.make_testvector(gid, network, tv);
-    new_tv_list[i] = tv;
+    tv_list.push_back(tv);
   }
 
   local_timer.stop();
@@ -160,22 +160,16 @@ MinPatBase::run(TpgNetwork& network,
     cout << "CPU time (testvector generation) " << local_timer.time() << endl;
   }
 
-  ymuint orig_num = tv_list.size();
-
-  tv_list = new_tv_list;
-
   {
     // 検証しておく．
-    Verifier ver(fmgr, fsim2);
-    if ( ver.check(tv_list) ) {
+    Verifier ver;
+    if ( ver.check(fsim2, fault_list, tv_list) ) {
       cout << "No Errors" << endl;
     }
   }
 
   total_timer.stop();
-  USTime time = total_timer.time();
-
-  stats.set(orig_num, tv_list.size(), time);
+  time = total_timer.time();
 }
 
 // @brief verbose フラグをセットする．
