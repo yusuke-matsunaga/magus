@@ -311,9 +311,12 @@ FaultAnalyzer::init(ymuint max_node_id,
   mMaxFaultId = 0;
   mOrigFaultList.clear();
   mOrigFaultList.reserve(fault_list.size());
+  mDomFaultList.clear();
+  mDomFaultList.reserve(fault_list.size());
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
     TpgFault* f = fault_list[i];
     mOrigFaultList.push_back(f);
+    mDomFaultList.push_back(f);
     if ( mMaxFaultId < f->id() ) {
       mMaxFaultId = f->id();
     }
@@ -414,7 +417,7 @@ FaultAnalyzer::get_pat_list(Fsim& fsim,
     }
     op.clear_det_list();
   }
-
+#if 0
   cur_array.clear();
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     TestVector* tv = tvmgr.new_vector();
@@ -440,7 +443,7 @@ FaultAnalyzer::get_pat_list(Fsim& fsim,
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     tvmgr.delete_vector(cur_array[i]);
   }
-
+#endif
   local_timer.stop();
 
   if ( mVerbose ) {
@@ -448,6 +451,8 @@ FaultAnalyzer::get_pat_list(Fsim& fsim,
 	 << "CPU time (fault simulation)  " << local_timer.time() << endl
 	 << "Total " << npat << " patterns simulated" << endl;
   }
+
+
 }
 
 ymuint
@@ -456,14 +461,16 @@ FaultAnalyzer::record_pat(const vector<ymuint>& det_list,
 {
   ymuint n = det_list.size();
   ymuint nchg = 0;
-  vector<bool> det_flag(mMaxFaultId, false);
+  //vector<bool> det_flag(mMaxFaultId, false);
   for (ymuint i = 0; i < n; ++ i) {
     ymuint f_id = det_list[i];
-    det_flag[f_id] = true;
+    //det_flag[f_id] = true;
     FaultInfo& fi = mFaultInfoArray[f_id];
     fi.add_pat(pat_id);
     fi.add_fnum(n);
+    mDetListArray.push_back(det_list);
   }
+#if 0
   for (ymuint i = 0; i < n; ++ i) {
     ymuint f_id = det_list[i];
     FaultInfo& fi = mFaultInfoArray[f_id];
@@ -495,6 +502,7 @@ FaultAnalyzer::record_pat(const vector<ymuint>& det_list,
       }
     }
   }
+#endif
   return nchg;
 }
 
@@ -711,8 +719,6 @@ FaultAnalyzer::get_dom_faults(bool fast)
 
   ymuint n_sat2 = 0;
   ymuint n_dom2 = 0;
-  ymuint n_pcheck1 = 0;
-  ymuint n_pcheck2 = 0;
   ymuint n_indep = 0;
 
   vector<vector<TpgFault*> > pending_list(mMaxFaultId);
@@ -844,7 +850,6 @@ FaultAnalyzer::get_dom_faults(bool fast)
     cout << "Total    " << fault_num << " original faults" << endl;
     cout << "Total    " << dom_fault_num << " dominator faults" << endl;
     cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
-    cout << "Total    " << n_pcheck1 << " + " << n_pcheck2 << " pattern check" << endl;
     cout << "Total    " << n_indep << " structurally independent faults" << endl;
     cout << "CPU time for dominance test" << local_timer.time() << endl;
   }
@@ -1055,6 +1060,11 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 				bool simple,
 				bool local_verbose)
 {
+  if ( mFaultInfoArray[f1->id()].mExact ) {
+    analyze_conflict2(f1, f2_list, conf_list, simple, local_verbose);
+    return;
+  }
+
   mConflictStats.conf_timer.start();
 
   GvalCnf gval_cnf(mMaxNodeId);
@@ -1118,32 +1128,26 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
     mConflictStats.int1_timer.stop();
 
     mConflictStats.int2_timer.start();
-#if 1
-    if ( !check_conflict(suf_list1, suf_list2) && engine.check_sat(gval_cnf, suf_list2) == kB3True ) {
-      // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
-      ++ mConflictStats.int2_count;
-      mConflictStats.int2_timer.stop();
-      continue;
-    }
-#else
-    if ( engine.check_sat(gval_cnf, suf_list2) == kB3True ) {
+    Bool3 sat_stat = engine.check_sat(gval_cnf, suf_list2);
+    if ( sat_stat == kB3True ) {
       ASSERT_COND( !check_conflict(suf_list1, suf_list2) );
       // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
       ++ mConflictStats.int2_count;
       mConflictStats.int2_timer.stop();
       continue;
     }
-#endif
     mConflictStats.int2_timer.stop();
-#if 0
-    if ( fi2.mExact && !check_conflict(suf_list1, suf_list2) ) {
+
+    if ( fi2.mExact ) {
+      if ( sat_stat == kB3False ) {
+	++ mConflictStats.conf_count;
+	++ mConflictStats.conf3_count;
+	conf_list.push_back(f2);
+      }
       // f2 の十分割当と必要割当が等しければ上のチェックで終わり．
-      ++ mConflictStats.conf_count;
-      ++ mConflictStats.conf3_count;
-      conf_list.push_back(f2);
       continue;
     }
-#endif
+
     mConflictStats.conf3_timer.start();
     if ( engine.check_sat(gval_cnf, ma_list2) == kB3False ) {
       // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
@@ -1165,6 +1169,133 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
       ++ mConflictStats.conf_count;
       ++ mConflictStats.conf4_count;
       conf_list.push_back(f2);
+    }
+    mConflictStats.conf4_timer.stop();
+  }
+
+  mConflictStats.conf_timer.stop();
+
+  if ( mVerbose > 0 && local_verbose ) {
+    if ( mVerbose > 1 ) {
+      cout << endl;
+    }
+    print_conflict_stats(cout);
+  }
+}
+
+// @brief 1つの故障と複数の故障間の衝突性を調べる．
+void
+FaultAnalyzer::analyze_conflict2(TpgFault* f1,
+				 const vector<TpgFault*>& f2_list,
+				 vector<TpgFault*>& conf_list,
+				 bool simple,
+				 bool local_verbose)
+{
+  mConflictStats.conf_timer.start();
+
+  GvalCnf gval_cnf(mMaxNodeId);
+  SatEngine engine(string(), string(), NULL);
+
+  const vector<ymuint>& input_list1 = mInputListArray[f1->node()->id()];
+
+  FaultInfo& fi1 = mFaultInfoArray[f1->id()];
+  const vector<ymuint>& tv_list1 = fi1.pat_list();
+  const NodeValList& suf_list1 = fi1.mSufList;
+  const NodeValList& pi_suf_list1 = fi1.mPiSufList;
+
+  conf_list.reserve(f2_list.size());
+  for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
+    TpgFault* f2 = f2_list[i2];
+
+    const vector<ymuint>& input_list2 = mInputListArray[f2->node()->id()];
+
+    bool intersect = check_intersect(input_list1, input_list2);
+    if ( !intersect ) {
+      // 共通部分を持たない故障は独立
+      continue;
+    }
+
+    FaultInfo& fi2 = mFaultInfoArray[f2->id()];
+    const vector<ymuint>& tv_list2 = fi2.pat_list();
+
+    bool stat = check_pat_list2(tv_list1, tv_list2);
+    if ( stat ) {
+      // f1 と f2 が同時に1なのでコンフリクトしない．
+      continue;
+    }
+
+    const NodeValList& suf_list2 = fi2.mSufList;
+    const NodeValList& pi_suf_list2 = fi2.mPiSufList;
+    const NodeValList& ma_list2 = fi2.mMaList;
+
+    mConflictStats.conf1_timer.start();
+    if ( check_conflict(suf_list1, ma_list2) ) {
+      // 必要割当そのものがコンフリクトしている．
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf1_count;
+      conf_list.push_back(f2);
+      mConflictStats.conf1_timer.stop();
+      continue;
+    }
+    mConflictStats.conf1_timer.stop();
+
+
+    mConflictStats.int1_timer.start();
+    if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
+      // 十分割当が両立しているのでコンフリクトしない．
+      ++ mConflictStats.int1_count;
+      mConflictStats.int1_timer.stop();
+      continue;
+    }
+    mConflictStats.int1_timer.stop();
+
+    mConflictStats.int2_timer.start();
+    Bool3 sat_stat = engine.check_sat(gval_cnf, suf_list1, suf_list2);
+    if ( sat_stat == kB3True ) {
+      // f2 の十分割当のもとで f1 が検出できれば f1 と f2 はコンフリクトしない．
+      ++ mConflictStats.int2_count;
+      mConflictStats.int2_timer.stop();
+      continue;
+    }
+    mConflictStats.int2_timer.stop();
+
+    if ( fi2.mExact ) {
+      if ( sat_stat == kB3False ) {
+	++ mConflictStats.conf_count;
+	++ mConflictStats.conf3_count;
+	conf_list.push_back(f2);
+      }
+      // f2 の十分割当と必要割当が等しければ上のチェックで終わり．
+      continue;
+    }
+
+    mConflictStats.conf3_timer.start();
+    if ( engine.check_sat(gval_cnf, suf_list1, ma_list2) == kB3False ) {
+      // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
+      ++ mConflictStats.conf_count;
+      ++ mConflictStats.conf3_count;
+      conf_list.push_back(f2);
+      mConflictStats.conf3_timer.stop();
+      continue;
+    }
+    mConflictStats.conf3_timer.stop();
+
+    if ( simple ) {
+      continue;
+    }
+
+    mConflictStats.conf4_timer.start();
+    ++ mConflictStats.conf4_check_count;
+    {
+      GvalCnf gval_cnf(mMaxNodeId);
+      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+      SatEngine engine(string(), string(), NULL);
+      fval_cnf.make_cnf(engine, f2, kVal1);
+      if ( engine.check_sat(gval_cnf, suf_list1) == kB3False ) {
+	++ mConflictStats.conf_count;
+	++ mConflictStats.conf4_count;
+	conf_list.push_back(f2);
+      }
     }
     mConflictStats.conf4_timer.stop();
   }

@@ -127,6 +127,19 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 1つの故障と複数の故障間の衝突性を調べる．
+  /// @param[in] f1 対象の故障
+  /// @param[in] f2_list f1 との衝突性を調べる故障のリスト
+  /// @param[out] f1 と衝突する故障のリスト
+  /// @param[in] simple 高速化ヒューリスティック
+  /// @param[in] local_verbose 出力制御フラグ
+  void
+  analyze_conflict2(TpgFault* f1,
+		    const vector<TpgFault*>& f2_list,
+		    vector<TpgFault*>& conf_list,
+		    bool simple,
+		    bool local_verbose);
+
   /// @brief 故障シミュレーションの後処理
   ymuint
   record_pat(const vector<ymuint>& det_list,

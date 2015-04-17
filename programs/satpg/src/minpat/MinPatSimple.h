@@ -24,7 +24,8 @@ class MinPatSimple :
 public:
 
   /// @brief コンストラクタ
-  MinPatSimple();
+  /// @param[in] group_dominance グループ支配を計算する．
+  MinPatSimple(bool group_dominance);
 
   /// @brief デストラクタ
   virtual

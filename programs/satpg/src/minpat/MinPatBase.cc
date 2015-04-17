@@ -24,9 +24,14 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MinPatBase::MinPatBase()
+// @param[in] group_dominance グループ支配を計算する．
+// @param[in] fault_dominace 故障支配を計算する．
+MinPatBase::MinPatBase(bool group_dominance,
+		       bool fault_dominance)
 {
   mVerbose = 0;
+  mGroupDominance = group_dominance;
+  mFaultDominance = fault_dominance;
 }
 
 // @brief デストラクタ
@@ -85,6 +90,22 @@ MinPatBase::run(TpgNetwork& network,
     TpgFault* fault = get_next_fault(fgmgr);
     if ( fault == NULL ) {
       break;
+    }
+
+    // 故障を支配しているグループを見つける．
+    if ( mGroupDominance ) {
+      ymuint gid = fgmgr.find_dom_group(fault);
+      if ( gid < fgmgr.group_num() ) {
+	// 見つけた．
+	if ( mFaultDominance ) {
+	  if ( fgmgr.check_fault_dominance(gid, fault) ) {
+	    // 個別の故障に支配されていたら fault は考慮しなくて良い．
+	    continue;
+	  }
+	}
+	fgmgr.add_fault(gid, fault);
+	continue;
+      }
     }
 
     // 故障を追加できるグループを見つける．

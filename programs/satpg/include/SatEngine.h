@@ -85,6 +85,14 @@ public:
   check_sat(GvalCnf& gval_cnf,
 	    const NodeValList& assign_list);
 
+  /// @brief 割当リストのもとでチェックを行う．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assign_list1, assign_list2 割当リスト
+  Bool3
+  check_sat(GvalCnf& gval_cnf,
+	    const NodeValList& assign_list1,
+	    const NodeValList& assign_list2);
+
 #if 0
   /// @brief 割当リストのもとで十分割当リストを求める．
   /// @param[in] fault 故障

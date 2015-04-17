@@ -65,7 +65,23 @@ public:
   delete_fault(ymuint gid,
 	       const vector<TpgFault*>& fault_list);
 
+  /// @brief 故障を支配しているグループを求める．
+  /// @param[in] fault 故障
+  ///
+  /// 見つからない場合には group_num() を返す．
+  ymuint
+  find_dom_group(TpgFault* fault);
+
+  /// @brief 単一の故障に対する支配関係をチェックする．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] fault 故障
+  /// @return gid のグループ内の故障で fault を支配しているものがあったら true を返す．
+  bool
+  check_fault_dominance(ymuint gid,
+			TpgFault* fault);
+
   /// @brief 故障を追加することのできるグループを求める．
+  /// @param[in] fault 故障
   ///
   /// 見つからない場合には group_num() を返す．
   ymuint

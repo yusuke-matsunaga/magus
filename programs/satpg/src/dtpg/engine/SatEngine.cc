@@ -240,6 +240,7 @@ SatEngine::check_sat(GvalCnf& gval_cnf,
 {
   assumption_begin();
   const VidMap& var_map = gval_cnf.var_map();
+
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
     NodeVal nv = assign_list[i];
@@ -253,6 +254,49 @@ SatEngine::check_sat(GvalCnf& gval_cnf,
       assumption_add(~alit);
     }
   }
+
+  return check_sat();
+}
+
+// @brief 割当リストのもとでチェックを行う．
+// @param[in] gval_cnf 正常回路用のデータ構造
+// @param[in] assign_list1, assign_list2 割当リスト
+Bool3
+SatEngine::check_sat(GvalCnf& gval_cnf,
+		     const NodeValList& assign_list1,
+		     const NodeValList& assign_list2)
+{
+  assumption_begin();
+  const VidMap& var_map = gval_cnf.var_map();
+
+  ymuint n1 = assign_list1.size();
+  for (ymuint i = 0; i < n1; ++ i) {
+    NodeVal nv = assign_list1[i];
+    const TpgNode* node = nv.node();
+    gval_cnf.make_cnf(*this, node);
+    Literal alit(var_map(node), false);
+    if ( nv.val() ) {
+      assumption_add(alit);
+    }
+    else {
+      assumption_add(~alit);
+    }
+  }
+
+  ymuint n2 = assign_list2.size();
+  for (ymuint i = 0; i < n2; ++ i) {
+    NodeVal nv = assign_list2[i];
+    const TpgNode* node = nv.node();
+    gval_cnf.make_cnf(*this, node);
+    Literal alit(var_map(node), false);
+    if ( nv.val() ) {
+      assumption_add(alit);
+    }
+    else {
+      assumption_add(~alit);
+    }
+  }
+
   return check_sat();
 }
 

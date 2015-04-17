@@ -24,7 +24,10 @@ class MinPatNaive :
 public:
 
   /// @brief コンストラクタ
-  MinPatNaive();
+  /// @param[in] group_dominance グループ支配を計算する．
+  /// @param[in] fault_dominace 故障支配を計算する．
+  MinPatNaive(bool group_dominance,
+	      bool fault_dominance);
 
   /// @brief デストラクタ
   ~MinPatNaive();

@@ -26,7 +26,10 @@ class MinPatBase :
 public:
 
   /// @brief コンストラクタ
-  MinPatBase();
+  /// @param[in] group_dominance グループ支配を計算する．
+  /// @param[in] fault_dominace 故障支配を計算する．
+  MinPatBase(bool group_dominance = false,
+	     bool fault_dominance = false);
 
   /// @brief デストラクタ
   virtual
@@ -115,6 +118,12 @@ private:
 
   // verbose フラグ
   int mVerbose;
+
+  // グループ支配を計算するとき true にするフラグ
+  bool mGroupDominance;
+
+  // 故障支配を計算する時 true にするフラグ
+  bool mFaultDominance;
 
 };
 

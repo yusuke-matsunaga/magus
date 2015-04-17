@@ -20,10 +20,11 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
+// @param[in] group_dominance グループ支配を計算する．
 MinPat*
-new_MinPat2()
+new_MinPat2(bool group_dominance)
 {
-  return new MinPatSimple();
+  return new MinPatSimple(group_dominance);
 }
 
 BEGIN_NONAMESPACE
@@ -45,7 +46,9 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MinPatSimple::MinPatSimple()
+// @param[in] group_dominance グループ支配を計算する．
+MinPatSimple::MinPatSimple(bool group_dominance) :
+  MinPatBase(group_dominance)
 {
 }
 

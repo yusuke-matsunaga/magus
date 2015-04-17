@@ -28,7 +28,11 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
   mPoptDsatur = new TclPopt(this, "dsatur",
 			    "Dsatur heuristic");
   mPoptDsatur2 = new TclPopt(this, "dsatur2",
-			    "Dsatur-2 heuristic");
+			     "Dsatur-2 heuristic");
+  mPoptGroupDominance = new TclPopt(this, "group-dominance",
+				    "use group dominance");
+  mPoptFaultDominance = new TclPopt(this, "fault-dominance",
+				    "use fault dominance");
   mPoptPrintStats = new TclPopt(this, "print_stats",
 				"print statistics");
   mPoptVerbose = new TclPoptInt(this, "verbose",
@@ -56,11 +60,13 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool dsatur = mPoptDsatur->is_specified();
   bool dsatur2 = mPoptDsatur2->is_specified();
   int verbose = mPoptVerbose->is_specified() ? mPoptVerbose->val() : 0;
+  bool group_dominance = mPoptGroupDominance->is_specified();
+  bool fault_dominance = mPoptFaultDominance->is_specified();
 
   MinPat* minpat = NULL;
 
   if ( simple ) {
-    minpat = new_MinPat2();
+    minpat = new_MinPat2(group_dominance);
   }
   else if ( dsatur ) {
     minpat = new_MinPatDsatur();
@@ -69,7 +75,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
     minpat = new_MinPatDsatur2();
   }
   else {
-    minpat = new_MinPat();
+    minpat = new_MinPat(group_dominance, fault_dominance);
   }
 
   minpat->set_verbose(verbose);

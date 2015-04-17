@@ -76,15 +76,6 @@ FgMgr::add_fault(ymuint gid,
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
 
-#if 0
-  TpgCnf1 tpg_cnf(string(), string(), NULL);
-  tpg_cnf.make_fval_cnf(fault, mMaxNodeId);
-
-  NodeValList suf_list;
-  bool stat = tpg_cnf.get_suf_list(fg->mSufList, suf_list);
-  ASSERT_COND( stat );
-#else
-
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
@@ -104,7 +95,6 @@ FgMgr::add_fault(ymuint gid,
   Extractor extract(val_map);
   NodeValList suf_list;
   extract(fault, suf_list);
-#endif
 
   fg->add_fault(fault, suf_list);
 }
@@ -144,6 +134,64 @@ FgMgr::delete_fault(ymuint gid,
   fg->mFaultSufList.erase(fg->mFaultSufList.begin() + wpos, fg->mFaultSufList.end());
 }
 
+// @brief 故障を支配しているグループを求める．
+// @param[in] fault 故障
+//
+// 見つからない場合には group_num() を返す．
+ymuint
+FgMgr::find_dom_group(TpgFault* fault)
+{
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
+
+  // fault が見つからない条件を作る．
+  fval_cnf.make_cnf(engine, fault, kVal0);
+
+  ymuint ng = group_num();
+  for (ymuint gid = 0; gid < ng; ++ gid) {
+    const NodeValList& suf_list0 = mGroupList[gid]->mSufList;
+    if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
+      // suf_list0 のもとで fault が見つからないことがない
+      // -> 無条件で fault が見つかるということ．
+      return gid;
+    }
+  }
+  return ng;
+}
+
+// @brief 単一の故障に対する支配関係をチェックする．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @param[in] fault 故障
+// @return gid のグループ内の故障で fault を支配しているものがあったら true を返す．
+bool
+FgMgr::check_fault_dominance(ymuint gid,
+			     TpgFault* fault)
+{
+  NodeSet node_set1;
+  node_set1.mark_region(mMaxNodeId, fault->node());
+
+  const vector<TpgFault*>& f_list = mGroupList[gid]->mFaultList;
+  for (ymuint i = 0; i < f_list.size(); ++ i) {
+    TpgFault* fault2 = f_list[i];
+    GvalCnf gval_cnf(mMaxNodeId);
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    SatEngine engine(string(), string(), NULL);
+
+    NodeSet node_set2;
+    node_set2.mark_region(mMaxNodeId, fault2->node());
+
+    fval_cnf1.make_cnf(engine, fault, node_set1, kVal0);
+    fval_cnf2.make_cnf(engine, fault2, node_set2, kVal1);
+
+    if ( engine.check_sat() == kB3False ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // @brief 故障を追加することのできるグループを求める．
 //
 // 見つからない場合には group_num() を返す．
@@ -154,6 +202,7 @@ FgMgr::find_group(TpgFault* fault)
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
 
+  // fault が見つかる条件を作る．
   fval_cnf.make_cnf(engine, fault, kVal1);
 
   ymuint ng = group_num();
