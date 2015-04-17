@@ -125,7 +125,7 @@ MinPatNaive::init(TpgNetwork& network,
   const vector<TpgFault*>& fault_list = f_list2;
 #endif
 
-  analyzer.init(mMaxNodeId, fault_list);
+  analyzer.init(network);
 
 #if 0
   RandGen rg;

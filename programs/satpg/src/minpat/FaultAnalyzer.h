@@ -46,11 +46,9 @@ public:
   set_verbose(int verbose);
 
   /// @brief 初期化する．
-  /// @param[in] max_node_id ノード番号の最大値 + 1
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] network ネットワーク
   void
-  init(ymuint max_node_id,
-       const vector<TpgFault*>& fault_list);
+  init(const TpgNetwork& network);
 
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fsim 故障シミュレータ

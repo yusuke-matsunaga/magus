@@ -9,6 +9,11 @@
 
 #include "FaultAnalyzer.h"
 
+#include "ModelValMap.h"
+#include "Extractor.h"
+#include "BackTracer.h"
+
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TvMgr.h"
@@ -83,77 +88,6 @@ check_intersect(const vector<ymuint>& list1,
     }
   }
   return false;
-}
-
-void
-print_list(ostream& s,
-	   const vector<ymuint>& src_list)
-{
-  for (ymuint i = 0; i < src_list.size(); ++ i) {
-    s << " " << src_list[i];
-  }
-  s << endl;
-}
-
-void
-cap_list(vector<ymuint>& dst_list,
-	 const vector<ymuint>& src_list)
-{
-#if 0
-  cout << "CAP_LIST" << endl;
-  cout << "dst_list:";
-  print_list(cout, dst_list);
-  cout << "src_list:";
-  print_list(cout, src_list);
-#endif
-
-  ymuint rpos1 = 0;
-  ymuint wpos1 = 0;
-  ymuint n1 = dst_list.size();
-  ymuint rpos2 = 0;
-  ymuint n2 = src_list.size();
-  ymuint v1 = dst_list[rpos1];
-  ymuint v2 = src_list[rpos2];
-  for ( ; ; ) {
-    if ( v1 < v2 ) {
-      ++ rpos1;
-      if ( rpos1 >= n1 ) {
-	break;
-      }
-      v1 = dst_list[rpos1];
-    }
-    else if ( v1 > v2 ) {
-      ++ rpos2;
-      if ( rpos2 >= n2 ) {
-	break;
-      }
-      v2 = src_list[rpos2];
-    }
-    else {
-      if ( wpos1 != rpos1 ) {
-	dst_list[wpos1] = v1;
-      }
-      ++ wpos1;
-      ++ rpos1;
-      ++ rpos2;
-      if ( rpos1 >= n1 ) {
-	break;
-      }
-      if ( rpos2 >= n2 ) {
-	break;
-      }
-      v1 = dst_list[rpos1];
-      v2 = src_list[rpos2];
-    }
-  }
-  if ( wpos1 < n1 ) {
-    dst_list.erase(dst_list.begin() + wpos1, dst_list.end());
-  }
-#if 0
-  cout << "==>";
-  print_list(cout, dst_list);
-  cout << endl;
-#endif
 }
 
 // パタン番号リストの包含関係を調べる．
@@ -307,25 +241,28 @@ FaultAnalyzer::set_verbose(int verbose)
 }
 
 // @brief 初期化する．
-// @param[in] max_node_id ノード番号の最大値 + 1
-// @param[in] fault_list 故障リスト
+// @param[in] network ネットワーク
 void
-FaultAnalyzer::init(ymuint max_node_id,
-		    const vector<TpgFault*>& fault_list)
+FaultAnalyzer::init(const TpgNetwork& network)
 {
-  mMaxNodeId = max_node_id;
+  StopWatch local_timer;
+  local_timer.start();
 
+  ymuint nn = network.active_node_num();
+  mMaxNodeId = network.max_node_id();
   mMaxFaultId = 0;
-  mOrigFaultList.clear();
-  mOrigFaultList.reserve(fault_list.size());
-  mDomFaultList.clear();
-  mDomFaultList.reserve(fault_list.size());
-  for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    TpgFault* f = fault_list[i];
-    mOrigFaultList.push_back(f);
-    mDomFaultList.push_back(f);
-    if ( mMaxFaultId < f->id() ) {
-      mMaxFaultId = f->id();
+  for (ymuint i = 0; i < nn; ++ i) {
+    const TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
+      continue;
+    }
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* fault = node->fault(i);
+      ymuint f_id = fault->id();
+      if ( mMaxFaultId < f_id ) {
+	mMaxFaultId = f_id;
+      }
     }
   }
   ++ mMaxFaultId;
@@ -342,19 +279,25 @@ FaultAnalyzer::init(ymuint max_node_id,
   mFaultInfoArray.clear();
   mFaultInfoArray.resize(mMaxFaultId);
 
-  // 各故障(に関連したノード)に関係する入力番号のリストを作る．
-  // ここでいう関係とは TFI of TFO of fault location のこと
-  // 計算には NodeSet を使う．
-  for (ymuint i = 0; i < mOrigFaultList.size(); ++ i) {
-    TpgFault* f = mOrigFaultList[i];
-    mFaultInfoArray[f->id()].init(f);
-    const TpgNode* node = f->node();
-    vector<ymuint>& input_list = mInputListArray[node->id()];
-    if ( !input_list.empty() ) {
+  BackTracer* bt = new_BtJust2();
+  bt->set_max_id(mMaxNodeId);
+
+  ymuint f_all = 0;
+  ymuint f_det = 0;
+  ymuint f_red = 0;
+  ymuint f_abt = 0;
+  ymuint n_single_cube = 0;
+
+  for (ymuint i = 0; i < nn; ++ i) {
+    const TpgNode* node = network.active_node(i);
+    if ( node->is_output() ) {
       continue;
     }
+
     NodeSet& node_set = mNodeSetArray[node->id()];
     node_set.mark_region(mMaxNodeId, node);
+
+    vector<ymuint>& input_list = mInputListArray[node->id()];
     for (ymuint j = 0; j < node_set.tfo_tfi_size(); ++ j) {
       const TpgNode* node1 = node_set.tfo_tfi_node(j);
       if ( node1->is_input() ) {
@@ -370,6 +313,87 @@ FaultAnalyzer::init(ymuint max_node_id,
     mark_tfi(node, tfi_mark, input_list2);
     // ソートしておく．
     sort(input_list2.begin(), input_list2.end());
+
+    ymuint nf = node->fault_num();
+    for (ymuint i = 0; i < nf; ++ i) {
+      TpgFault* fault = node->fault(i);
+      ymuint f_id = fault->id();
+      FaultInfo& fi = mFaultInfoArray[f_id];
+      fi.init(fault);
+
+      ++ f_all;
+
+      GvalCnf gval_cnf(mMaxNodeId);
+      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+      SatEngine engine(string(), string(), NULL);
+
+      // fault を検出するCNFを作る．
+      fval_cnf.make_cnf(engine, fault, node_set, kVal1);
+
+      // 故障に対するテスト生成を行なう．
+      engine.assumption_begin();
+
+      vector<Bool3> sat_model;
+      SatStats sat_stats;
+      USTime sat_time;
+      fi.mStat = engine.solve(sat_model, sat_stats, sat_time);
+      if ( fi.mStat == kB3True ) {
+	++ f_det;
+	mOrigFaultList.push_back(fault);
+	ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
+	Extractor extract(val_map);
+	NodeValList& suf_list = fi.mSufList;
+	extract(fault, suf_list);
+	(*bt)(node, node_set, val_map, fi.mPiSufList);
+
+	// 必要割当を求める．
+	NodeValList& ma_list = fi.mMaList;
+	ymuint n = suf_list.size();
+	for (ymuint i = 0; i < n; ++ i) {
+	  NodeVal nv = suf_list[i];
+
+	  NodeValList list1;
+	  const TpgNode* node = nv.node();
+	  bool val = nv.val();
+	  list1.add(node, !val);
+	  if ( engine.check_sat(gval_cnf, list1) == kB3False ) {
+	    // node の値を反転したら検出できなかった．
+	    // -> この割当は必須割当
+	    ma_list.add(node, val);
+	  }
+	}
+	if ( suf_list.size() == ma_list.size() ) {
+	  fi.mSingleCube = true;
+	  ++ n_single_cube;
+	}
+      }
+      else if ( fi.mStat == kB3False ) {
+	++ f_red;
+      }
+      else {
+	++ f_abt;
+      }
+    }
+  }
+
+  mDomFaultList.clear();
+  mDomFaultList.reserve(mOrigFaultList.size());
+  for (ymuint i = 0; i < mOrigFaultList.size(); ++ i) {
+    mDomFaultList.push_back(mOrigFaultList[i]);
+  }
+
+  delete bt;
+
+  local_timer.stop();
+
+  if ( mVerbose > 0 ) {
+    cout << "Total " << setw(6) << f_all << " faults" << endl
+	 << "Total " << setw(6) << f_det << " detected faults" << endl
+	 << "     (" << setw(6) << n_single_cube << ") single cube assignment" << endl
+	 << "Total " << setw(6) << f_red << " redundant faults" << endl
+	 << "Total " << setw(6) << f_abt << " aborted faults" << endl
+	 << "CPU time " << local_timer.time() << endl
+	 << endl;
   }
 }
 
@@ -802,6 +826,8 @@ FaultAnalyzer::get_dom_faults()
     if ( dom_flag[f1_id] ) {
       continue;
     }
+
+    FaultInfo& fi1 = mFaultInfoArray[f1_id];
     const vector<ymuint>& cand_list = fi1.mDomCandList;
     if ( cand_list.empty() ) {
       continue;
@@ -814,7 +840,6 @@ FaultAnalyzer::get_dom_faults()
       cout.flush();
     }
 
-    FaultInfo& fi1 = mFaultInfoArray[f1_id];
     TpgFault* f1 = fi1.fault();
     TpgNode* f1node = f1->node();
     ymuint f1node_id = f1node->id();
@@ -979,7 +1004,7 @@ FaultAnalyzer::analyze_faults()
       }
     }
     if ( suf_list.size() == ma_list.size() ) {
-      fault_info.mExact = true;
+      fault_info.mSingleCube = true;
       ++ n_exact;
     }
   }
@@ -1136,7 +1161,7 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
 				bool simple,
 				bool local_verbose)
 {
-  if ( mFaultInfoArray[f1->id()].mExact ) {
+  if ( mFaultInfoArray[f1->id()].mSingleCube ) {
     analyze_conflict2(f1, f2_list, conf_list, simple, local_verbose);
     return;
   }
@@ -1213,7 +1238,7 @@ FaultAnalyzer::analyze_conflict(TpgFault* f1,
     }
     mConflictStats.int2_timer.stop();
 
-    if ( fi2.mExact ) {
+    if ( fi2.mSingleCube ) {
       if ( sat_stat == kB3False ) {
 	++ mConflictStats.conf_count;
 	++ mConflictStats.conf3_count;
@@ -1334,7 +1359,7 @@ FaultAnalyzer::analyze_conflict2(TpgFault* f1,
     }
     mConflictStats.int2_timer.stop();
 
-    if ( fi2.mExact ) {
+    if ( fi2.mSingleCube ) {
       if ( sat_stat == kB3False ) {
 	++ mConflictStats.conf_count;
 	++ mConflictStats.conf3_count;

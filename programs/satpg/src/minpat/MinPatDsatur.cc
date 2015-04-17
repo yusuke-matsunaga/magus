@@ -104,7 +104,7 @@ MinPatDsatur::init(TpgNetwork& network,
   const vector<TpgFault*>& fault_list = f_list2;
 #endif
 
-  analyzer.init(mMaxNodeId, fault_list);
+  analyzer.init(network);
 
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg);

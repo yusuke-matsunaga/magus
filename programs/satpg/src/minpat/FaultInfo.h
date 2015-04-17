@@ -11,6 +11,7 @@
 
 #include "satpg_nsdef.h"
 #include "NodeValList.h"
+#include "YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -94,6 +95,8 @@ private:
 
 public:
 
+  Bool3 mStat;
+
   NodeValList mSufList;
 
   NodeValList mPiSufList;
@@ -102,7 +105,7 @@ public:
 
   vector<ymuint> mConflictList;
 
-  bool mExact;
+  bool mSingleCube;
 
   bool mFirstDetect;
 
@@ -124,7 +127,7 @@ inline
 FaultInfo::FaultInfo()
 {
   mFnum = 0;
-  mExact = false;
+  mSingleCube = false;
   mFirstDetect = true;
 }
 
