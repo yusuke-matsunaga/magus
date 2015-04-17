@@ -781,7 +781,8 @@ FaultAnalyzer::get_dom_faults()
   ymuint n_sat2 = 0;
   ymuint n_dom2 = 0;
 
-  vector<vector<TpgFault*> > pending_list(mMaxFaultId);
+  vector<ymuint> pending_f1_list;
+  vector<vector<ymuint> > pending_list_array(mMaxFaultId);
 
   // 故障を支配故障候補数の少ない順に並べる．
   vector<ymuint> fault_list(fault_num);
@@ -801,6 +802,11 @@ FaultAnalyzer::get_dom_faults()
     if ( dom_flag[f1_id] ) {
       continue;
     }
+    const vector<ymuint>& cand_list = fi1.mDomCandList;
+    if ( cand_list.empty() ) {
+      continue;
+    }
+
     if ( mVerbose > 1 ) {
       cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num
@@ -814,7 +820,7 @@ FaultAnalyzer::get_dom_faults()
     ymuint f1node_id = f1node->id();
     const vector<ymuint>& input_list1_2 = mInputList2Array[f1node_id];
 
-    const vector<ymuint>& cand_list = fi1.mDomCandList;
+    bool pending = false;
     for (ymuint i2 = 0; i2 < cand_list.size(); ++ i2) {
       ymuint f2_id = cand_list[i2];
       if ( dom_flag[f2_id] ) {
@@ -830,7 +836,11 @@ FaultAnalyzer::get_dom_faults()
       bool intersect2 = check_intersect(input_list1_2, input_list2_2);
       if ( !intersect2 ) {
 	// TFI が共通部分を持たない場合は望みが薄いので後回し．
-	pending_list[f1_id].push_back(f2);
+	pending_list_array[f1_id].push_back(f2_id);
+	if ( !pending ) {
+	  pending = true;
+	  pending_f1_list.push_back(f1_id);
+	}
 	continue;
       }
 
@@ -864,27 +874,30 @@ FaultAnalyzer::get_dom_faults()
 
   // シミュレーション結果から故障の支配関係のヒントを作り，
   // SAT で正確に判定する．
-  for (ymuint i1 = 0; i1 < fault_num2; ++ i1) {
-    TpgFault* f1 = fault_list2[i1];
-    ymuint f1_id = f1->id();
+  for (ymuint i1 = 0; i1 < pending_f1_list.size(); ++ i1) {
+    ymuint f1_id = pending_f1_list[i1];
     if ( dom_flag[f1_id] ) {
       continue;
     }
-
     if ( mVerbose > 1 ) {
       cout << "\r                  ";
-      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num2
+      cout << "\r" << setw(6) << i1 << " / " << setw(6) << pending_f1_list.size()
 	   << " / " << setw(6) << cur_num;
       cout.flush();
     }
 
-    const vector<TpgFault*>& f_list = pending_list[f1_id];
+    FaultInfo& fi1 = mFaultInfoArray[f1_id];
+    TpgFault* f1 = fi1.fault();
+
+    const vector<ymuint>& f_list = pending_list_array[f1_id];
     for (ymuint i2 = 0; i2 < f_list.size(); ++ i2) {
-      TpgFault* f2 = f_list[i2];
-      ymuint f2_id = f2->id();
+      ymuint f2_id = f_list[i2];
       if ( dom_flag[f2_id] ) {
 	continue;
       }
+
+      FaultInfo& fi2 = mFaultInfoArray[f2_id];
+      TpgFault* f2 = fi2.fault();
 
       ++ n_sat3;
       if ( check_fault_dominance(f1, f2) ) {
