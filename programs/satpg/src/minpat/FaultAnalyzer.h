@@ -66,11 +66,10 @@ public:
 	       RandGen& rg);
 
   /// @brief 支配故障を求める．
-  /// @param[in] fast 手抜きの高速化を行うとき true にするフラグ
   ///
   /// 結果は mDomFaultList に格納される．
   void
-  get_dom_faults(bool fast);
+  get_dom_faults();
 
   /// @brief 十分割当と必要割当を求める．
   ///

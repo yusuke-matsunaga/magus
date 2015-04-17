@@ -133,8 +133,7 @@ MinPatNaive::init(TpgNetwork& network,
 #endif
 
 #if 0
-  bool dom_fast = true;
-  analyzer.get_dom_faults(dom_fast);
+  analyzer.get_dom_faults();
 #endif
 
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();

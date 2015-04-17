@@ -39,6 +39,24 @@ struct FaultLt
   }
 };
 
+struct FaultLt2
+{
+  FaultLt2(const vector<FaultInfo>& fault_info_array) :
+    mFaultInfoArray(fault_info_array)
+  {
+  }
+
+  bool
+  operator()(TpgFault* left,
+	     TpgFault* right)
+  {
+    return mFaultInfoArray[left->id()].detnum() < mFaultInfoArray[right->id()].detnum();
+  }
+
+  const vector<FaultInfo>& mFaultInfoArray;
+
+};
+
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
@@ -126,18 +144,20 @@ MinPatSimple::init(TpgNetwork& network,
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, tv_list, rg);
 
-  bool dom_fast = false;
-  analyzer.get_dom_faults(dom_fast);
+  analyzer.get_dom_faults();
 
+#if 0
   analyzer.analyze_faults();
 
   ymuint sample_num = 1000;
   vector<double> conf_prob_array;
   analyzer.estimate_conflict(sample_num, conf_prob_array);
+#endif
 
-  // 故障を衝突数の多い順に並べる．
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
+#if 0
+  // 故障を衝突数の多い順に並べる．
   vector<pair<double, TpgFault*> > tmp_list(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     TpgFault* f = src_list[i];
@@ -150,6 +170,11 @@ MinPatSimple::init(TpgNetwork& network,
   for (ymuint i = 0; i < nf; ++ i) {
     mFaultList[i] = tmp_list[i].second;
   }
+#else
+  // 故障を検出パタン数の少ない順に並べる．
+  mFaultList = src_list;
+  sort(mFaultList.begin(), mFaultList.end(), FaultLt2(analyzer.fault_info_array()));
+#endif
 
   return nf;
 }

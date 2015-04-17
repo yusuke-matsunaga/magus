@@ -52,6 +52,10 @@ public:
   void
   add_pat(ymuint pat);
 
+  /// @brief この故障を検出するパタン数を返す．
+  ymuint
+  detnum() const;
+
   /// @brief パタンリストをソートする．
   void
   sort_pat_list();
@@ -82,6 +86,9 @@ private:
   // この故障を検出するパタン番号のリスト
   vector<ymuint> mPatList;
 
+  // この故障を検出するパタン数
+  ymuint mDetNum;
+
   // 同時に検出可能な故障数の和
   ymuint mFnum;
 
@@ -100,6 +107,10 @@ public:
   bool mFirstDetect;
 
   vector<ymuint> mDomCandList;
+
+  ymuint mDomCandListSize;
+
+  vector<ymuint> mConflictCandList;
 
 };
 
@@ -154,6 +165,15 @@ void
 FaultInfo::add_pat(ymuint pat)
 {
   mPatList.push_back(pat);
+  ++ mDetNum;
+}
+
+// @brief この故障を検出するパタン数を返す．
+inline
+ymuint
+FaultInfo::detnum() const
+{
+  return mDetNum;
 }
 
 // @brief パタンリストをソートする．
