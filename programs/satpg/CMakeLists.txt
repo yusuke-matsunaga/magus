@@ -108,8 +108,8 @@ set (minpat_SOURCES
   src/minpat/MinPatDsatur2.cc
   src/minpat/FaultAnalyzer.cc
   src/minpat/FgMgr.cc
+  src/minpat/Compactor.cc
   src/minpat/TpgCnf1.cc
-  src/minpat/TpgCnfX.cc
   )
 
 set (rtpg_SOURCES

@@ -68,7 +68,25 @@ public:
   ///
   /// 結果は mDomFaultList に格納される．
   void
-  get_dom_faults();
+  get_dom_faults(ymuint method);
+
+  /// @brief 支配故障を求める．
+  ///
+  /// 結果は mDomFaultList に格納される．
+  void
+  get_dom_faults0();
+
+  /// @brief 支配故障を求める．
+  ///
+  /// 結果は mDomFaultList に格納される．
+  void
+  get_dom_faults1();
+
+  /// @brief 支配故障を求める．
+  ///
+  /// 結果は mDomFaultList に格納される．
+  void
+  get_dom_faults2(ymuint option = 0);
 
   /// @brief 故障間の衝突性を調べる．
   void

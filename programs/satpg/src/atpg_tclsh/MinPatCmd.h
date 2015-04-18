@@ -64,6 +64,9 @@ private:
   // verbose オプションの解析用オブジェクト
   TclPoptInt* mPoptVerbose;
 
+  // dom_method オプションの解析用オブジェクト
+  TclPoptInt* mPoptDomMethod;
+
 };
 
 END_NAMESPACE_YM_SATPG

@@ -51,6 +51,26 @@ public:
   ymuint
   new_group();
 
+  /// @brief グループを複製する．
+  /// @param[in] src_gid 複製元のグループ番号
+  /// @return 新しいグループ番号を返す．
+  ymuint
+  duplicate_group(ymuint src_gid);
+
+  /// @brief グループを置き換える．
+  /// @param[in] old_gid 置き換え対象のグループ番号
+  /// @param[in] new_gid 置き換えるグループ番号
+  ///
+  /// new_gid は削除される．
+  void
+  replace_group(ymuint old_gid,
+		ymuint new_gid);
+
+  /// @brief グループを削除する．
+  /// @param[in] gid グループ番号
+  void
+  delete_group(ymuint gid);
+
   /// @brief 既存のグループに故障を追加する．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   /// @param[in] fault 故障
@@ -65,33 +85,6 @@ public:
   delete_fault(ymuint gid,
 	       const vector<TpgFault*>& fault_list);
 
-  /// @brief 故障を支配しているグループを求める．
-  /// @param[in] fault 故障
-  ///
-  /// 見つからない場合には group_num() を返す．
-  ymuint
-  find_dom_group(TpgFault* fault);
-
-  /// @brief 単一の故障に対する支配関係をチェックする．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fault 故障
-  /// @return gid のグループ内の故障で fault を支配しているものがあったら true を返す．
-  bool
-  check_fault_dominance(ymuint gid,
-			TpgFault* fault);
-
-  /// @brief 故障を追加することのできるグループを求める．
-  /// @param[in] fault 故障
-  ///
-  /// 見つからない場合には group_num() を返す．
-  ymuint
-  find_group(TpgFault* fault);
-
-  /// @brief 故障グループの圧縮を行う．
-  /// @param[out] group_list グループ番号のリスト
-  void
-  compaction(vector<ymuint>& group_list);
-
   /// @brief 故障リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   const vector<TpgFault*>&
@@ -100,16 +93,7 @@ public:
   /// @brief 十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   const NodeValList&
-  suf_list(ymuint gid) const;
-
-  /// @brief テストパタンを作る．
-  /// @param[in] gid グループ番号
-  /// @param[in] network ネットワーク
-  /// @param[in] tv テストベクタ
-  void
-  make_testvector(ymuint gid,
-		  TpgNetwork& network,
-		  TestVector* tv);
+  sufficient_assignment(ymuint gid) const;
 
 
 private:
@@ -149,20 +133,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief phase-1
-  /// @param[inout] group_list 選択されたグループ番号のリスト
-  ///
-  /// 他のグループに移動させることでグループを削除する．
-  void
-  phase1(vector<ymuint>& group_list);
-
-  /// @brief phase-2
-  /// @param[inout] group_list 選択されたグループ番号のリスト
-  ///
-  /// 要素数の少ないグループの故障を他のグループに移動する．
-  void
-  phase2(vector<ymuint>& group_list);
 
 
 private:

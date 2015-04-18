@@ -64,8 +64,17 @@ public:
   int
   verbose() const;
 
+  /// @brief dom_method を指定する．
+  virtual
+  void
+  set_dom_method(ymuint dom_method);
 
-private:
+  /// @brief get_dom_faults() のアルゴリズムを指定する．
+  ymuint
+  dom_method() const;
+
+
+protected:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
@@ -89,27 +98,44 @@ private:
 
   /// @brief 次に処理すべき故障を選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
+  /// @param[in] group_list 現在のグループリスト
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
   TpgFault*
-  get_next_fault(FgMgr& fgmgr) = 0;
+  get_next_fault(FgMgr& fgmgr,
+		 const vector<ymuint>& group_list) = 0;
 
   /// @brief 故障を追加するグループを選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
   /// @param[in] fault 故障
+  /// @param[in] group_list 現在のグループリスト
   ///
   /// グループが見つからなければ fgmgr.group_num() を返す．
+  /// デフォルト実装では group_list のなかで最初にヒットしたものを返す．
   virtual
   ymuint
   find_group(FgMgr& fgmgr,
-	     TpgFault* fault) = 0;
+	     TpgFault* fault,
+	     const vector<ymuint>& group_list);
+
+  /// @brief テストパタンを作る．
+  /// @param[in] network ネットワーク
+  /// @param[in] suf_list 十分割当リスト
+  /// @param[in] tv テストベクタ
+  void
+  make_testvector(TpgNetwork& network,
+		  const NodeValList& suf_list,
+		  TestVector* tv);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // ノード番号の最大値＋１
+  ymuint mMaxNodeId;
 
   // verbose フラグ
   int mVerbose;
@@ -119,6 +145,9 @@ private:
 
   // 故障支配を計算する時 true にするフラグ
   bool mFaultDominance;
+
+  // get_dom_fatuls() のアルゴリズム
+  ymuint mDomMethod;
 
 };
 

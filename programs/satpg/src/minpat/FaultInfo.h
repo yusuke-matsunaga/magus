@@ -132,6 +132,8 @@ public:
 
   ymuint mDomCandListSize;
 
+  vector<ymuint> mDomCandList2;
+
   vector<ymuint> mConflictCandList;
 
 };

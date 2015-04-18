@@ -61,21 +61,25 @@ private:
 
   /// @brief 次に処理すべき故障を選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
+  /// @param[in] group_list 現在のグループリスト
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
   TpgFault*
-  get_next_fault(FgMgr& fgmgr);
+  get_next_fault(FgMgr& fgmgr,
+		 const vector<ymuint>& group_list);
 
   /// @brief 故障を追加するグループを選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
   /// @param[in] fault 故障
+  /// @param[in] group_list 現在のグループリスト
   ///
   /// グループが見つからなければ fgmgr.group_num() を返す．
   virtual
   ymuint
   find_group(FgMgr& fgmgr,
-	     TpgFault* fault);
+	     TpgFault* fault,
+	     const vector<ymuint>& group_list);
 
 
 private:
@@ -113,9 +117,6 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
-
-  // 故障番号の最大値
-  ymuint mMaxFaultId;
 
   // 故障解析器
   FaultAnalyzer mAnalyzer;

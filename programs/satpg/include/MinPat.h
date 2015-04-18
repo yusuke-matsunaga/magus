@@ -53,6 +53,11 @@ public:
   void
   set_verbose(int verbose) = 0;
 
+  /// @brief dom_method を指定する．
+  virtual
+  void
+  set_dom_method(ymuint dom_method) = 0;
+
 };
 
 
