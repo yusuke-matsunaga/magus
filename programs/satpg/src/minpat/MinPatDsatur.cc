@@ -13,7 +13,10 @@
 #include "FaultMgr.h"
 #include "FaultAnalyzer.h"
 #include "FgMgr.h"
-#include "TpgCnf1.h"
+#include "GvalCnf.h"
+#include "FvalCnf.h"
+#include "SatEngine.h"
+
 #include "YmUtils/RandGen.h"
 
 
@@ -195,20 +198,23 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
     if ( max2 > max_satur ) {
       ymuint slack = max2 - max_satur;
       FaultStruct& fs = mFaultStructList[max2_pos];
-      TpgCnf1 tpg_cnf(string(), string(), NULL);
-      tpg_cnf.make_fval_cnf(fs.mFault, mMaxNodeId);
+
+      GvalCnf gval_cnf(mMaxNodeId);
+      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+      SatEngine engine(string(), string(), NULL);
+      fval_cnf.make_cnf(engine, fs.mFault, kVal1);
       const NodeValList& ma_list = mAnalyzer.fault_info(fs.mFault->id()).mandatory_assignment();
       for (ymuint gid = 0; gid < ng; ++ gid) {
 	if ( fs.mPendingMap[gid] ) {
 	  fs.mPendingMap[gid] = false;
 	  -- fs.mPendingNum;
 	  const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
-	  if ( check_conflict(suf_list0, ma_list) ) {
+	  if ( engine.check_sat(gval_cnf, ma_list) == kB3False ) {
 	    ++ fs.mConflictNum;
 	    fs.mConflictMap[gid] = true;
 	    ++ mSimpleConfNum;
 	  }
-	  else if ( !tpg_cnf.check_intersect(suf_list0) ) {
+	  else if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
 	    ++ fs.mConflictNum;
 	    fs.mConflictMap[gid] = true;
 	    ++ mSatConfNum;

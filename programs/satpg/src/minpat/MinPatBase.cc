@@ -14,7 +14,6 @@
 #include "TpgFault.h"
 #include "TvMgr.h"
 #include "Verifier.h"
-
 #include "GvalCnf.h"
 #include "FvalCnf.h"
 #include "SatEngine.h"

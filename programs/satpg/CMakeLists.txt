@@ -29,7 +29,8 @@ set (base_SOURCES
   )
 
 set (dtpg_SOURCES
-  src/dtpg/bt/BtBase.cc
+  src/dtpg/bt/BackTracer.cc
+  src/dtpg/bt/BtImpl.cc
   src/dtpg/bt/BtJust1.cc
   src/dtpg/bt/BtJust2.cc
   src/dtpg/bt/BtJustBase.cc
@@ -110,7 +111,6 @@ set (minpat_SOURCES
   src/minpat/FaultAnalyzer.cc
   src/minpat/FgMgr.cc
   src/minpat/Compactor.cc
-  src/minpat/TpgCnf1.cc
   )
 
 set (rtpg_SOURCES

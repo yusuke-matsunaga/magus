@@ -1,28 +1,28 @@
 ﻿
-/// @file BtBase.cc
-/// @brief BtBase の実装ファイル
+/// @file BtImpl.cc
+/// @brief BtImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BtBase.h"
+#include "BtImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス BtBase
+// クラス BtImpl
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-BtBase::BtBase()
+BtImpl::BtImpl()
 {
 }
 
 // @brief デストラクタ
-BtBase::~BtBase()
+BtImpl::~BtImpl()
 {
 }
 
@@ -31,7 +31,7 @@ BtBase::~BtBase()
 //
 // このクラスの実装ではなにもしない．
 void
-BtBase::set_max_id(ymuint max_id)
+BtImpl::set_max_id(ymuint max_id)
 {
 }
 

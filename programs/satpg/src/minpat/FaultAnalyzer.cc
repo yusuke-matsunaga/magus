@@ -333,9 +333,6 @@ FaultAnalyzer::init(const TpgNetwork& network,
   mFaultInfoArray.clear();
   mFaultInfoArray.resize(mMaxFaultId);
 
-  mBackTracer = new_BtJust2();
-  mBackTracer->set_max_id(mMaxNodeId);
-
   ymuint f_all = 0;
   ymuint f_det = 0;
   ymuint f_red = 0;
@@ -441,9 +438,6 @@ FaultAnalyzer::init(const TpgNetwork& network,
   for (ymuint i = 0; i < mOrigFaultList.size(); ++ i) {
     mDomFaultList.push_back(mOrigFaultList[i]);
   }
-
-  delete mBackTracer;
-  mBackTracer = NULL;
 
   local_timer.stop();
 
@@ -1120,23 +1114,10 @@ FaultAnalyzer::analyze_fault(TpgFault* fault,
   // fault を検出するCNFを作る．
   fval_cnf.make_cnf(engine, fault, node_set, kVal1);
 
-  // 故障に対するテスト生成を行なう．
-  engine.assumption_begin();
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  fi.mStat = engine.solve(sat_model, sat_stats, sat_time);
+  NodeValList& suf_list = fi.mSufficientAssignment;
+  NodeValList& pi_suf_list = fi.mPiSufficientAssignment;
+  fi.mStat = engine.get_pi_suf_list(fval_cnf, fault, NodeValList(), suf_list, pi_suf_list);
   if ( fi.mStat == kB3True ) {
-    ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
-    Extractor extract(val_map);
-
-    NodeValList& suf_list = fi.mSufficientAssignment;
-    extract(fault, suf_list);
-
-    NodeValList& pi_suf_list = fi.mPiSufficientAssignment;
-    (*mBackTracer)(fnode, node_set, val_map, pi_suf_list);
-
     // テストベクタを作る．
     TestVector* tv = tvmgr.new_vector();
     ymuint npi = pi_suf_list.size();

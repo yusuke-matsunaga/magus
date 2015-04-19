@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "BtBase.h"
+#include "BtImpl.h"
 #include "TpgNode.h"
 
 
@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 必要なノードのみ正当化する BackTracer の基底クラス
 //////////////////////////////////////////////////////////////////////
 class BtJustBase :
-  public BtBase
+  public BtImpl
 {
 public:
 

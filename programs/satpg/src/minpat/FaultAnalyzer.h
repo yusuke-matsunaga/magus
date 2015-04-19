@@ -10,7 +10,6 @@
 
 
 #include "satpg_nsdef.h"
-#include "BackTracer.h"
 #include "NodeValList.h"
 #include "FaultInfo.h"
 #include "NodeSet.h"
@@ -188,9 +187,6 @@ private:
 
   // 最大故障番号
   ymuint mMaxFaultId;
-
-  // バックトレーサー
-  BackTracer* mBackTracer;
 
   // テストベクタ用の乱数生成器
   RandGen mRandGen;

@@ -93,17 +93,30 @@ public:
 	    const NodeValList& assign_list1,
 	    const NodeValList& assign_list2);
 
-#if 0
   /// @brief 割当リストのもとで十分割当リストを求める．
+  /// @param[in] fval_cnf 故障回路用のデータ構造
   /// @param[in] fault 故障
   /// @param[in] assign_list 割当リスト
   /// @param[out] suf_list 十分割当リストを格納する変数
-  void
-  get_suf_list(const VidMap& gvar_map,
-	       const VidMap& fvar_map,
+  Bool3
+  get_suf_list(FvalCnf& fval_cnf,
+	       TpgFault* fault,
 	       const NodeValList& assign_list,
 	       NodeValList& suf_list);
-#endif
+
+  /// @brief 割当リストのもとで十分割当リストを求める．
+  /// @param[in] fval_cnf 故障回路用のデータ構造
+  /// @param[in] fault 故障
+  /// @param[in] assign_list 割当リスト
+  /// @param[out] suf_list 十分割当リストを格納する変数
+  /// @param[out] pi_suf_list 外部入力上の十分割当リストを格納する変数
+  Bool3
+  get_pi_suf_list(FvalCnf& fval_cnf,
+		  TpgFault* fault,
+		  const NodeValList& assign_list,
+		  NodeValList& suf_list,
+		  NodeValList& pi_suf_list);
+
 
   /// @brief ノードの入出力の関係を表すCNFを作る．
   /// @param[in] node 対象のノード

@@ -13,14 +13,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-// @brief 'Just2' タイプの生成を行なう．
-BackTracer*
-new_BtJust2()
-{
-  return new BtJust2();
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // クラス BtJust2
 //////////////////////////////////////////////////////////////////////
@@ -51,10 +43,10 @@ BtJust2::set_max_id(ymuint max_id)
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtJust2::operator()(const TpgNode* fnode,
-		    const NodeSet& node_set,
-		    const ValMap& val_map,
-		    NodeValList& assign_list)
+BtJust2::run(const TpgNode* fnode,
+	     const NodeSet& node_set,
+	     const ValMap& val_map,
+	     NodeValList& assign_list)
 {
   // 故障差の伝搬している外部出力を選ぶ．
   ymuint nmin = 0;

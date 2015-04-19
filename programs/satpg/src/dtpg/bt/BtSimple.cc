@@ -13,14 +13,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-// @brief 'Simple' タイプの生成を行なう．
-BackTracer*
-new_BtSimple()
-{
-  return new BtSimple();
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // クラス BtSimple
 //////////////////////////////////////////////////////////////////////
@@ -36,10 +28,10 @@ BtSimple::BtSimple()
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtSimple::operator()(const TpgNode* fnode,
-		     const NodeSet& node_set,
-		     const ValMap& val_map,
-		     NodeValList& assign_list)
+BtSimple::run(const TpgNode* fnode,
+	      const NodeSet& node_set,
+	      const ValMap& val_map,
+	      NodeValList& assign_list)
 {
   assign_list.clear();
   for (vector<const TpgNode*>::const_iterator p = node_set.input_list().begin();

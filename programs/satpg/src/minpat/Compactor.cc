@@ -12,6 +12,7 @@
 #include "GvalCnf.h"
 #include "FvalCnf.h"
 #include "SatEngine.h"
+#include "YmUtils/MinCov.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -60,7 +61,7 @@ Compactor::run(FgMgr& fgmgr,
       cout << "# of groups = " << new_group_list.size();
       cout.flush();
     }
-#if 0
+#if 1
     phase0(fgmgr, new_group_list);
 #endif
     ymuint ng0 = new_group_list.size();
@@ -86,7 +87,7 @@ Compactor::phase0(FgMgr& fgmgr,
 		  vector<ymuint>& group_list)
 {
   ymuint max_group_id = fgmgr.group_num();
-
+#if 0
   vector<bool> locked(max_group_id, false);
   for ( ; ; ) {
     ymuint min_gid = max_group_id;
@@ -161,6 +162,36 @@ Compactor::phase0(FgMgr& fgmgr,
     }
     locked[min_gid] = true;
   }
+#else
+  vector<TpgFault*> all_list;
+  ymuint ng = group_list.size();
+  for (ymuint i = 0; i < ng; ++ i) {
+    ymuint gid = group_list[i];
+    const vector<TpgFault*>& fault_list = fgmgr.fault_list(gid);
+    for (ymuint j = 0; j < fault_list.size(); ++ j) {
+      TpgFault* fault = fault_list[j];
+      all_list.push_back(fault);
+    }
+  }
+
+  MinCov mincov;
+
+  mincov.set_size(all_list.size(), ng);
+
+  for (ymuint i = 0; i < all_list.size(); ++ i) {
+    TpgFault* fault = all_list[i];
+
+    GvalCnf gval_cnf(mMaxNodeId);
+    FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+    SatEngine engine(string(), string(), NULL);
+
+    fval_cnf.make_cnf(engine, fault, kVal0);
+  }
+
+  vector<ymuint> col_set;
+  ymuint new_ng = mincov.heuristic(col_set);
+  cout << "new_ng = " << col_set.size() << endl;
+#endif
 }
 
 // @brief phase-1

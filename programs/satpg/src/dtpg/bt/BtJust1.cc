@@ -13,14 +13,6 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
-// @brief 'Just1' タイプの生成を行なう．
-BackTracer*
-new_BtJust1()
-{
-  return new BtJust1();
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // クラス BtJust1
 //////////////////////////////////////////////////////////////////////
@@ -41,10 +33,10 @@ BtJust1::~BtJust1()
 // @param[in] val_map ノードの値の割当を保持するクラス
 // @param[out] assign_list 値の割当リスト
 void
-BtJust1::operator()(const TpgNode* fnode,
-		    const NodeSet& node_set,
-		    const ValMap& val_map,
-		    NodeValList& assign_list)
+BtJust1::run(const TpgNode* fnode,
+	     const NodeSet& node_set,
+	     const ValMap& val_map,
+	     NodeValList& assign_list)
 {
   assign_list.clear();
 

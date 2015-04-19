@@ -13,7 +13,6 @@
 #include "FaultMgr.h"
 #include "FaultAnalyzer.h"
 #include "FgMgr.h"
-#include "TpgCnf1.h"
 #include "YmUtils/RandGen.h"
 
 

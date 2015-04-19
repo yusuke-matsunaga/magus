@@ -13,8 +13,7 @@
 #include "FvalCnf.h"
 #include "SatEngine.h"
 #include "ModelValMap.h"
-#include "Extractor.h"
-
+#include "NodeSet.h"
 #include "TpgFault.h"
 #include "YmUtils/HashSet.h"
 
@@ -139,23 +138,17 @@ FgMgr::add_fault(ymuint gid,
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
 
-  fval_cnf.make_cnf(engine, fault, kVal1);
+  NodeSet node_set;
+  node_set.mark_region(mMaxNodeId, fault->node());
 
-  engine.assumption_begin();
-  fval_cnf.add_assumption(engine, fg->mSufList);
+  fval_cnf.make_cnf(engine, fault, node_set, kVal1);
 
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
-  ASSERT_COND ( sat_ans == kB3True );
-
-  ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
-  Extractor extract(val_map);
   NodeValList suf_list;
-  extract(fault, suf_list);
+  NodeValList pi_suf_list;
+  Bool3 sat_ans = engine.get_pi_suf_list(fval_cnf, fault, fg->mSufList, suf_list, pi_suf_list);
+  ASSERT_COND( sat_ans == kB3True );
 
-  fg->add_fault(fault, suf_list);
+  fg->add_fault(fault, suf_list, pi_suf_list);
 }
 
 // @brief 故障を取り除く
@@ -211,6 +204,16 @@ FgMgr::sufficient_assignment(ymuint gid) const
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
   return fg->mSufList;
+}
+
+// @brief 外部入力上の十分割当リストを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+const NodeValList&
+FgMgr::pi_sufficient_assignment(ymuint gid) const
+{
+  ASSERT_COND( gid < group_num() );
+  FaultGroup* fg = mGroupList[gid];
+  return fg->mPiSufList;
 }
 
 END_NAMESPACE_YM_SATPG

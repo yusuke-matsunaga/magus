@@ -125,4 +125,11 @@ GvalCnf::var_map() const
   return mVarMap;
 }
 
+// @brief ノード番号の最大値を返す．
+ymuint
+GvalCnf::max_node_id() const
+{
+  return mMaxId;
+}
+
 END_NAMESPACE_YM_SATPG

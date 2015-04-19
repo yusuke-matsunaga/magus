@@ -95,6 +95,11 @@ public:
   const NodeValList&
   sufficient_assignment(ymuint gid) const;
 
+  /// @brief 外部入力上の十分割当リストを返す．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  const NodeValList&
+  pi_sufficient_assignment(ymuint gid) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -107,11 +112,14 @@ private:
     /// @brief 故障を追加する．
     void
     add_fault(TpgFault* fault,
-	      const NodeValList& suf_list)
+	      const NodeValList& suf_list,
+	      const NodeValList& pi_suf_list)
     {
       mFaultList.push_back(fault);
       mFaultSufList.push_back(suf_list);
+      mFaultPiSufList.push_back(pi_suf_list);
       mSufList.merge(suf_list);
+      mPiSufList.merge(pi_suf_list);
     }
 
     // グループ番号
@@ -123,8 +131,14 @@ private:
     // 故障ごとの十分割当リスト
     vector<NodeValList> mFaultSufList;
 
+    // 故障ごとの外部入力十分割当リスト
+    vector<NodeValList> mFaultPiSufList;
+
     // 十分割当リスト
     NodeValList mSufList;
+
+    // 外部入力十分割当リスト
+    NodeValList mPiSufList;
 
   };
 

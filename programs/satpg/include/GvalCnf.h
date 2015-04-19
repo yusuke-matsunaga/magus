@@ -68,6 +68,10 @@ public:
   const VidMap&
   var_map() const;
 
+  /// @brief ノード番号の最大値を返す．
+  ymuint
+  max_node_id() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

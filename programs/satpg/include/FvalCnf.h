@@ -88,6 +88,10 @@ public:
 	       const NodeValList& assign_list,
 	       NodeValList& suf_list);
 
+  /// @brief 正常回路のCNFを生成するクラスを返す．
+  GvalCnf&
+  gval_cnf();
+
   /// @brief 正常回路の変数マップを得る．
   const VidMap&
   gvar_map() const;
@@ -99,6 +103,10 @@ public:
   /// @brief 故障検出用の変数番号を返す．
   VarId
   fd_var() const;
+
+  /// @brief ノード番号の最大値を返す．
+  ymuint
+  max_node_id() const;
 
 
 private:

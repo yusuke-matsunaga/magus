@@ -182,15 +182,7 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     xmode = mPoptX->val();
   }
 
-  BackTracer* bt = NULL;
-  switch ( xmode ) {
-  case 1: bt = new_BtJust1(); break;
-  case 2: bt = new_BtJust2(); break;
-  default: bt = new_BtSimple(); break;
-  }
-  if ( bt != NULL ) {
-    bt->set_max_id(_network().max_node_id());
-  }
+  BackTracer bt(_network().max_node_id());
 
   if ( mPoptDrop->is_specified() ) {
     dop_list.add(new_DopDrop(_fault_mgr(), _fsim3()));
@@ -209,14 +201,14 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   DtpgEngine* engine = NULL;
   if ( engine_type == "single" ) {
-    engine = new_DtpgSatS(sat_type, sat_option, outp, *bt, dop_list, uop_list);
+    engine = new_DtpgSatS(sat_type, sat_option, outp, bt, dop_list, uop_list);
   }
   else if ( engine_type == "multi" ) {
-    engine = new_DtpgSatM(sat_type, sat_option, outp, *bt, dop_list, uop_list);
+    engine = new_DtpgSatM(sat_type, sat_option, outp, bt, dop_list, uop_list);
   }
   else {
     // デフォルトフォールバック
-    engine = new_DtpgSatS(sat_type, sat_option, outp, *bt, dop_list, uop_list);
+    engine = new_DtpgSatS(sat_type, sat_option, outp, bt, dop_list, uop_list);
   }
 
   engine->set_option(option_str);

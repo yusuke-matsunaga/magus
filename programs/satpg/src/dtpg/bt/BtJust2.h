@@ -50,10 +50,10 @@ public:
   /// @param[out] assign_list 値の割当リスト
   virtual
   void
-  operator()(const TpgNode* fnode,
-	     const NodeSet& node_set,
-	     const ValMap& val_map,
-	     NodeValList& assign_list);
+  run(const TpgNode* fnode,
+      const NodeSet& node_set,
+      const ValMap& val_map,
+      NodeValList& assign_list);
 
 
 protected:

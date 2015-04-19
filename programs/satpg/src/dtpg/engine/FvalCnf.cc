@@ -195,6 +195,13 @@ FvalCnf::get_suf_list(SatEngine& engine,
 }
 #endif
 
+// @brief 正常回路のCNFを生成するクラスを返す．
+GvalCnf&
+FvalCnf::gval_cnf()
+{
+  return mGvalCnf;
+}
+
 // @brief 正常回路の変数マップを得る．
 const VidMap&
 FvalCnf::gvar_map() const
@@ -214,6 +221,13 @@ VarId
 FvalCnf::fd_var() const
 {
   return mFdVar;
+}
+
+// @brief ノード番号の最大値を返す．
+ymuint
+FvalCnf::max_node_id() const
+{
+  return mMaxId;
 }
 
 // @brief TFO にマークをつけてCNF式を作る．

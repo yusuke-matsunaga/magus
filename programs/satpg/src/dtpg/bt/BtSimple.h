@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "BtBase.h"
+#include "BtImpl.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 簡単な BackTracer
 //////////////////////////////////////////////////////////////////////
 class BtSimple :
-  public BtBase
+  public BtImpl
 {
 public:
 
@@ -39,10 +39,10 @@ public:
   /// @param[out] assign_list 値の割当リスト
   virtual
   void
-  operator()(const TpgNode* fnode,
-	     const NodeSet& node_set,
-	     const ValMap& val_map,
-	     NodeValList& assign_list);
+  run(const TpgNode* fnode,
+      const NodeSet& node_set,
+      const ValMap& val_map,
+      NodeValList& assign_list);
 
 };
 
