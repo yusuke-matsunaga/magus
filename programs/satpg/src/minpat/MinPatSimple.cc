@@ -10,6 +10,7 @@
 #include "MinPatSimple.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
+#include "DomChecker.h"
 
 #include "YmUtils/RandGen.h"
 
@@ -26,10 +27,10 @@ new_MinPatSimple(bool group_dominance)
 
 BEGIN_NONAMESPACE
 
-struct FaultLt2
+struct FaultLt
 {
-  FaultLt2(const vector<FaultInfo>& fault_info_array) :
-    mFaultInfoArray(fault_info_array)
+  FaultLt(DomChecker& checker) :
+    mChecker(checker)
   {
   }
 
@@ -37,14 +38,15 @@ struct FaultLt2
   operator()(TpgFault* left,
 	     TpgFault* right)
   {
-    return mFaultInfoArray[left->id()].detnum() < mFaultInfoArray[right->id()].detnum();
+    return mChecker.det_count(left->id()) < mChecker.det_count(right->id());
   }
 
-  const vector<FaultInfo>& mFaultInfoArray;
+  DomChecker mChecker;
 
 };
 
 END_NONAMESPACE
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス MinPatSimple
@@ -81,18 +83,14 @@ MinPatSimple::init(TpgNetwork& network,
 
   fault_list = analyzer.fault_list();
 
-  RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, rg);
+  DomChecker checker(analyzer, fsim2, tvmgr);
 
-  analyzer.get_dom_faults(dom_method());
+  vector<TpgFault*> dom_fault_list;
+  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
-  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
-  ymuint nf = src_list.size();
+  sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker));
 
-  // 故障を検出パタン数の少ない順に並べる．
-  vector<TpgFault*> tmp_list = src_list;
-  sort(tmp_list.begin(), tmp_list.end(), FaultLt2(analyzer.fault_info_array()));
-  set_fault_list(tmp_list);
+  set_fault_list(dom_fault_list);
 }
 
 END_NAMESPACE_YM_SATPG

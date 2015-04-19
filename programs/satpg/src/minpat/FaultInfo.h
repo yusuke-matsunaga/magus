@@ -58,29 +58,9 @@ public:
   const NodeValList&
   pi_sufficient_assignment() const;
 
-  /// @brief パタンリストを得る．
-  const vector<ymuint>&
-  pat_list() const;
-
-  /// @brief パタンを追加する．
-  void
-  add_pat(ymuint pat);
-
-  /// @brief この故障を検出するパタン数を返す．
-  ymuint
-  detnum() const;
-
-  /// @brief パタンリストをソートする．
-  void
-  sort_pat_list();
-
-  /// @brief 同時に検出可能な故障数を得る．
-  ymuint
-  fnum() const;
-
-  /// @brief fnum を加える．
-  void
-  add_fnum(ymuint fnum);
+  /// @brief 条件が single cube の時 true を返す．
+  bool
+  single_cube() const;
 
 
 private:
@@ -109,32 +89,7 @@ private:
   // 外部入力上の十分割当
   NodeValList mPiSufficientAssignment;
 
-  // この故障を検出するパタン番号のリスト
-  vector<ymuint> mPatList;
-
-  // この故障を検出するパタン数
-  ymuint mDetNum;
-
-  // 同時に検出可能な故障数の和
-  ymuint mFnum;
-
-public:
-
-  Bool3 mStat;
-
-  vector<ymuint> mConflictList;
-
   bool mSingleCube;
-
-  bool mFirstDetect;
-
-  vector<ymuint> mDomCandList;
-
-  ymuint mDomCandListSize;
-
-  vector<ymuint> mDomCandList2;
-
-  vector<ymuint> mConflictCandList;
 
 };
 
@@ -147,9 +102,7 @@ public:
 inline
 FaultInfo::FaultInfo()
 {
-  mFnum = 0;
   mSingleCube = false;
-  mFirstDetect = true;
 }
 
 // @brief デストラクタ
@@ -198,53 +151,12 @@ FaultInfo::pi_sufficient_assignment() const
   return mPiSufficientAssignment;
 }
 
-// @brief パタンリストを得る．
+// @brief 条件が single cube の時 true を返す．
 inline
-const vector<ymuint>&
-FaultInfo::pat_list() const
+bool
+FaultInfo::single_cube() const
 {
-  return mPatList;
-}
-
-// @brief パタンを追加する．
-inline
-void
-FaultInfo::add_pat(ymuint pat)
-{
-  mPatList.push_back(pat);
-  ++ mDetNum;
-}
-
-// @brief この故障を検出するパタン数を返す．
-inline
-ymuint
-FaultInfo::detnum() const
-{
-  return mDetNum;
-}
-
-// @brief パタンリストをソートする．
-inline
-void
-FaultInfo::sort_pat_list()
-{
-  sort(mPatList.begin(), mPatList.end());
-}
-
-// @brief 同時に検出可能な故障数を得る．
-inline
-ymuint
-FaultInfo::fnum() const
-{
-  return mFnum;
-}
-
-// @brief fnum を加える．
-inline
-void
-FaultInfo::add_fnum(ymuint fnum)
-{
-  mFnum += fnum;
+  return mSingleCube;
 }
 
 END_NAMESPACE_YM_SATPG

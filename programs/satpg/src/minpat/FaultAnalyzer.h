@@ -45,6 +45,10 @@ public:
   void
   set_verbose(int verbose);
 
+  /// @brief verbose フラグを得る．
+  int
+  verbose() const;
+
   /// @brief 初期化する．
   /// @param[in] network ネットワーク
   /// @param[in] tvmgr テストベクタのマネージャ
@@ -52,69 +56,41 @@ public:
   init(const TpgNetwork& network,
        TvMgr& tvmgr);
 
-  /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
-  /// @param[in] fsim 故障シミュレータ
-  /// @param[in] tvmgr テストベクタのマネージャ
-  /// @param[in] rg 乱数生成器
-  ///
-  /// 結果は mFaultInfoArray の pat_list に格納される．
-  void
-  get_pat_list(Fsim& fsim,
-	       TvMgr& tvmgr,
-	       RandGen& rg);
+  /// @brief ノード番号の最大値を得る．
+  ymuint
+  max_node_id() const;
 
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults(ymuint method);
-
-  /// @brief 故障間の衝突性を調べる．
-  void
-  analyze_conflict();
-
-  /// @brief 故障間の衝突性を調べる．
-  void
-  estimate_conflict(ymuint sample_num,
-		    vector<double>& conf_prob_array);
-
-  /// @brief 1つの故障と複数の故障間の衝突性を調べる．
-  /// @param[in] f1 対象の故障
-  /// @param[in] f2_list f1 との衝突性を調べる故障のリスト
-  /// @param[out] f1 と衝突する故障のリスト
-  /// @param[in] simple 高速化ヒューリスティック
-  /// @param[in] local_verbose 出力制御フラグ
-  void
-  analyze_conflict(TpgFault* f1,
-		   const vector<TpgFault*>& f2_list,
-		   vector<TpgFault*>& conf_list,
-		   bool simple,
-		   bool local_verbose);
-
-  /// @brief 衝突リストを得る．
-  void
-  get_conf_list(vector<pair<ymuint, ymuint> >& conf_list);
+  /// @brief 故障番号の最大値を得る．
+  ymuint
+  max_fault_id() const;
 
   /// @brief 検出可能な故障のリストを得る．
   const vector<TpgFault*>&
   fault_list() const;
 
-  /// @brief 支配故障リストを得る．
-  const vector<TpgFault*>&
-  dom_fault_list() const;
-
-  /// @brief 故障の情報を得る．
-  const vector<FaultInfo>&
-  fault_info_array() const;
+  /// @brief 故障を得る．
+  /// @param[in] fid 故障番号
+  TpgFault*
+  fault(ymuint fid);
 
   /// @brief 個別の故障の情報を得る．
   /// @param[in] fid 故障番号
   const FaultInfo&
   fault_info(ymuint fid) const;
 
-  /// @brief 入力番号リストを得る．
-  const vector<vector<ymuint> >&
-  input_list_array() const;
+  /// @brief 故障のTFOのTFIに含まれる入力番号のリスト返す．
+  /// @param[in] fid 故障番号
+  const vector<ymuint>&
+  input_list(ymuint fid);
+
+  /// @brief 故障のTFIに含まれる入力番号のリスト返す．
+  /// @param[in] fid 故障番号
+  const vector<ymuint>&
+  input_list2(ymuint fid);
+
+  /// @brief 故障に関連するノード集合を返す．
+  const NodeSet&
+  node_set(ymuint fid);
 
 
 private:
@@ -128,50 +104,6 @@ private:
   Bool3
   analyze_fault(TpgFault* fault,
 		TvMgr& tvmgr);
-
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults1();
-
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults2(ymuint option = 0);
-
-  /// @brief 1つの故障と複数の故障間の衝突性を調べる．
-  /// @param[in] f1 対象の故障
-  /// @param[in] f2_list f1 との衝突性を調べる故障のリスト
-  /// @param[out] f1 と衝突する故障のリスト
-  /// @param[in] simple 高速化ヒューリスティック
-  /// @param[in] local_verbose 出力制御フラグ
-  void
-  analyze_conflict2(TpgFault* f1,
-		    const vector<TpgFault*>& f2_list,
-		    vector<TpgFault*>& conf_list,
-		    bool simple,
-		    bool local_verbose);
-
-  /// @brief 故障シミュレーションの後処理
-  ymuint
-  record_pat(const vector<ymuint>& det_list,
-	     ymuint pat_id);
-
-  /// @brief f1 が f2 を支配しているか調べる．
-  bool
-  check_fault_dominance(TpgFault* f1,
-			TpgFault* f2);
-
-  /// @brief f1 と f2 が衝突しているか調べる．
-  bool
-  check_fault_conflict(TpgFault* f1,
-		       TpgFault* f2);
-
-  /// @brief analyze_conflict の統計情報を出力する．
-  void
-  print_conflict_stats(ostream& s);
 
 
 private:
@@ -197,12 +129,6 @@ private:
   // 検出可能故障用のテストベクタリスト
   vector<TestVector*> mTestVectorList;
 
-  // パタンごとの検出故障リスト
-  vector<vector<ymuint> > mDetListArray;
-
-  // 支配故障リスト
-  vector<TpgFault*> mDomFaultList;
-
   // ノードごとに関係する入力の番号のリストを収める配列
   vector<vector<ymuint> > mInputListArray;
 
@@ -215,26 +141,6 @@ private:
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;
 
-  // analyze_conflict 用の統計情報
-  struct {
-    // コンフリクト回数
-    ymuint conf_count;
-    ymuint conf1_count;
-    ymuint conf2_count;
-    ymuint conf3_count;
-    ymuint conf4_count;
-    ymuint conf4_check_count;
-    ymuint int1_count;
-    ymuint int2_count;
-
-    StopWatch conf_timer;
-    StopWatch conf1_timer;
-    StopWatch conf2_timer;
-    StopWatch conf3_timer;
-    StopWatch conf4_timer;
-    StopWatch int1_timer;
-    StopWatch int2_timer;
-  } mConflictStats;
 };
 
 END_NAMESPACE_YM_SATPG

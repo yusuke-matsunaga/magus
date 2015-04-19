@@ -12,6 +12,7 @@
 #include "TpgFault.h"
 #include "FaultMgr.h"
 #include "FaultAnalyzer.h"
+#include "DomChecker.h"
 #include "FgMgr.h"
 #include "GvalCnf.h"
 #include "FvalCnf.h"
@@ -65,17 +66,16 @@ MinPatDsatur::init(TpgNetwork& network,
 
   fault_list = analyzer.fault_list();
 
-  RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, rg);
+  DomChecker checker(analyzer, fsim2, tvmgr);
 
-  analyzer.get_dom_faults(dom_method());
+  vector<TpgFault*> dom_fault_list;
+  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
-  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
-  ymuint nf = src_list.size();
+  ymuint nf = dom_fault_list.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = src_list[i];
+    TpgFault* fault = dom_fault_list[i];
     if ( max_fault_id < fault->id() ) {
       max_fault_id = fault->id();
     }
@@ -89,8 +89,9 @@ MinPatDsatur::init(TpgNetwork& network,
 
   for (ymuint i = 0; i < nf; ++ i) {
     FaultStruct& fs = mFaultStructList[i];
-    TpgFault* fault = src_list[i];
+    TpgFault* fault = dom_fault_list[i];
     fs.mFault = fault;
+    fs.mPatNum = checker.det_count(fault->id());
     fs.mSelected = false;
     fs.mConflictNum = 0;
     fs.mConflictMap.resize(1, false);
@@ -125,11 +126,11 @@ MinPatDsatur::get_first_fault()
   ymuint min_pos = 0;
   ymuint fault_num = mFaultStructList.size();
   for (ymuint i = 0; i < fault_num; ++ i) {
-    TpgFault* fault = mFaultStructList[i].mFault;
-    ymuint fnum = mAnalyzer.fault_info(fault->id()).fnum();
+    FaultStruct& fs = mFaultStructList[i];
+    ymuint fnum = fs.mPatNum;
     if ( min_fault == NULL || min_count > fnum ) {
       min_count = fnum;
-      min_fault = fault;
+      min_fault = fs.mFault;
       min_pos = i;
     }
   }

@@ -10,8 +10,9 @@
 #include "MinPatDsatur2.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
-#include "FaultMgr.h"
 #include "FaultAnalyzer.h"
+#include "DomChecker.h"
+#include "ConflictChecker.h"
 #include "FgMgr.h"
 #include "YmUtils/RandGen.h"
 
@@ -58,19 +59,19 @@ MinPatDsatur2::init(TpgNetwork& network,
 
   fault_list = analyzer.fault_list();
 
-  RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, rg);
+  DomChecker checker(analyzer, fsim2, tvmgr);
 
-  analyzer.get_dom_faults(dom_method());
+  vector<TpgFault*> dom_fault_list;
+  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
-  analyzer.analyze_conflict();
+  ConflictChecker checker2(analyzer, fsim2, tvmgr);
+  checker2.analyze_conflict(dom_fault_list);
 
-  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
-  ymuint nf = src_list.size();
+  ymuint nf = dom_fault_list.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = src_list[i];
+    TpgFault* fault = dom_fault_list[i];
     if ( max_fault_id < fault->id() ) {
       max_fault_id = fault->id();
     }
@@ -83,11 +84,11 @@ MinPatDsatur2::init(TpgNetwork& network,
   mFaultMap.resize(max_fault_id);
 
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = src_list[i];
+    TpgFault* fault = dom_fault_list[i];
     FaultStruct& fs = mFaultStructList[i];
     fs.mFault = fault;
     fs.mSelected = false;
-    fs.mConflictList = analyzer.fault_info(fault->id()).mConflictList;
+    fs.mConflictList = checker2.conflict_list(fault->id());
     fs.mConflictNum = 0;
     fs.mConflictMap.resize(1, false);
     mFaultMap[fault->id()] = i;

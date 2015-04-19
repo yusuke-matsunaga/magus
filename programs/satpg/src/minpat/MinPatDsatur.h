@@ -98,6 +98,9 @@ private:
     // 故障
     TpgFault* mFault;
 
+    // 検出パタン数
+    ymuint mPatNum;
+
     // 選択済みマーク
     bool mSelected;
 

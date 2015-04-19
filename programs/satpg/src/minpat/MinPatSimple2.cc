@@ -10,8 +10,8 @@
 #include "MinPatSimple2.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
-
-#include "YmUtils/RandGen.h"
+#include "DomChecker.h"
+#include "ConflictChecker.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -73,22 +73,23 @@ MinPatSimple2::init(TpgNetwork& network,
 
   fault_list = analyzer.fault_list();
 
-  RandGen rg;
-  analyzer.get_pat_list(fsim2, tvmgr, rg);
+  DomChecker checker(analyzer, fsim2, tvmgr);
 
-  analyzer.get_dom_faults(dom_method());
+  vector<TpgFault*> dom_fault_list;
+  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
-  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
-  ymuint nf = src_list.size();
+  ymuint nf = dom_fault_list.size();
 
   // 故障を衝突数の多い順に並べる．
+  ConflictChecker checker2(analyzer, fsim2, tvmgr);
+
   ymuint sample_num = 1000;
   vector<double> conf_prob_array;
-  analyzer.estimate_conflict(sample_num, conf_prob_array);
+  checker2.estimate_conflict(dom_fault_list, sample_num, conf_prob_array);
   vector<pair<double, TpgFault*> > tmp_list(nf);
   vector<TpgFault*> tmp_list2(nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = src_list[i];
+    TpgFault* f = dom_fault_list[i];
     double cnum = conf_prob_array[f->id()];
     tmp_list[i] = make_pair(cnum, f);
   }

@@ -99,7 +99,6 @@ set (graphsat_SOURCES
   )
 
 set (minpat_SOURCES
-  src/minpat/KDet2.cc
   src/minpat/KDet2Op.cc
   src/minpat/Verifier.cc
   src/minpat/MinPatBase.cc
@@ -109,6 +108,8 @@ set (minpat_SOURCES
   src/minpat/MinPatDsatur.cc
   src/minpat/MinPatDsatur2.cc
   src/minpat/FaultAnalyzer.cc
+  src/minpat/DomChecker.cc
+  src/minpat/ConflictChecker.cc
   src/minpat/FgMgr.cc
   src/minpat/Compactor.cc
   )

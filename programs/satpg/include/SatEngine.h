@@ -78,6 +78,23 @@ public:
 		Val3 detect);
 #endif
 
+  /// @brief f1 が f2 を支配しているか調べる．
+  /// @param[in] f1 支配候補の故障
+  /// @param[in] f2 被支配候補の故障
+  /// @param[in] max_node_id ノード番号の最大値
+  bool
+  check_fault_dominance(TpgFault* f1,
+			TpgFault* f2,
+			ymuint max_node_id);
+
+  /// @brief f1 と f2 が衝突しているか調べる．
+  /// @param[in] f1, f2 チェック対象の故障
+  /// @param[in] max_node_id ノード番号の最大値
+  bool
+  check_fault_conflict(TpgFault* f1,
+		       TpgFault* f2,
+		       ymuint max_node_id);
+
   /// @brief 割当リストのもとでチェックを行う．
   /// @param[in] gval_cnf 正常回路用のデータ構造
   /// @param[in] assign_list 割当リスト
