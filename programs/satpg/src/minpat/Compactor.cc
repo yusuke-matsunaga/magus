@@ -9,6 +9,7 @@
 
 #include "Compactor.h"
 #include "FgMgr.h"
+#include "TpgFault.h"
 #include "GvalCnf.h"
 #include "FvalCnf.h"
 #include "SatEngine.h"
@@ -61,7 +62,7 @@ Compactor::run(FgMgr& fgmgr,
       cout << "# of groups = " << new_group_list.size();
       cout.flush();
     }
-#if 1
+#if 0
     phase0(fgmgr, new_group_list);
 #endif
     ymuint ng0 = new_group_list.size();
@@ -185,7 +186,8 @@ Compactor::phase0(FgMgr& fgmgr,
     FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
     SatEngine engine(string(), string(), NULL);
 
-    fval_cnf.make_cnf(engine, fault, kVal0);
+    engine.make_fval_cnf(fval_cnf, fault, kVal0);
+
     for (ymuint j = 0; j < ng; ++ j) {
       ymuint gid = group_list[j];
       const NodeValList& suf_list = fgmgr.sufficient_assignment(gid);
@@ -249,7 +251,7 @@ Compactor::phase1(FgMgr& fgmgr,
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
 
       // fault を検出するための CNF を作る．
-      fval_cnf.make_cnf(engine, fault, kVal1);
+      engine.make_fval_cnf(fval_cnf, fault, kVal1);
 
       // fault がマージできる他のグループを探す．
       bool found = false;
@@ -361,7 +363,7 @@ Compactor::phase2(FgMgr& fgmgr,
       SatEngine engine(string(), string(), NULL);
 
       // fault を検出する CNF を作る．
-      fval_cnf.make_cnf(engine, fault, kVal1);
+      engine.make_fval_cnf(fval_cnf, fault, kVal1);
 
       // fault がマージできる他のグループを探す．
       for (ymuint j = 0; j < ng; ++ j) {

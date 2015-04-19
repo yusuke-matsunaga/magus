@@ -61,10 +61,11 @@ MinPatBase::run(TpgNetwork& network,
   mMaxNodeId = network.max_node_id();
 
   mAnalyzer.set_verbose(verbose());
-  mAnalyzer.init(network, tvmgr);
 
   vector<TpgFault*> fault_list;
-  init(network, tvmgr, fsim2, fault_list);
+  mAnalyzer.init(network, tvmgr, fault_list);
+
+  init(fault_list, tvmgr, fsim2);
 
   StopWatch local_timer;
   local_timer.start();
@@ -160,7 +161,9 @@ MinPatBase::run(TpgNetwork& network,
     // 検証しておく．
     Verifier ver;
     if ( ver.check(fsim2, fault_list, tv_list) ) {
-      cout << "No Errors" << endl;
+      if ( verbose() > 0 ) {
+	cout << "  No errors" << endl;
+      }
     }
   }
 
@@ -207,13 +210,15 @@ MinPatBase::find_group(FgMgr& fgmgr,
 		       TpgFault* fault,
 		       const vector<ymuint>& group_list)
 {
+  const NodeSet& node_set = analyzer().node_set(fault->id());
+
   if ( mGroupDominance ) {
     GvalCnf gval_cnf(mMaxNodeId);
     FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
     SatEngine engine(string(), string(), NULL);
 
     // fault が見つからない条件を作る．
-    fval_cnf.make_cnf(engine, fault, kVal0);
+    engine.make_fval_cnf(fval_cnf, fault, node_set, kVal0);
 
     for (ymuint i = 0; i < group_list.size(); ++ i) {
       ymuint gid = group_list[i];
@@ -230,7 +235,7 @@ MinPatBase::find_group(FgMgr& fgmgr,
   SatEngine engine(string(), string(), NULL);
 
   // fault が見つかる条件を作る．
-  fval_cnf.make_cnf(engine, fault, kVal1);
+  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
 
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
@@ -255,13 +260,8 @@ MinPatBase::make_testvector(TpgNetwork& network,
 
   SatEngine engine(string(), string(), NULL);
 
-  engine.assumption_begin();
-  gval_cnf.add_assumption(engine, suf_list);
-
   vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
+  Bool3 sat_ans = engine.check_sat(gval_cnf, suf_list, sat_model);
   ASSERT_COND ( sat_ans == kB3True );
 
   const VidMap& var_map = gval_cnf.var_map();

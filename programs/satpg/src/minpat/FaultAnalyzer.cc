@@ -9,9 +9,6 @@
 
 #include "FaultAnalyzer.h"
 
-#include "ModelValMap.h"
-#include "Extractor.h"
-
 #include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
@@ -91,9 +88,11 @@ FaultAnalyzer::verbose() const
 // @brief 初期化する．
 // @param[in] network ネットワーク
 // @param[in] tvmgr テストベクタのマネージャ
+// @param[out] fault_list 検出された故障のリスト
 void
 FaultAnalyzer::init(const TpgNetwork& network,
-		    TvMgr& tvmgr)
+		    TvMgr& tvmgr,
+		    vector<TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -227,6 +226,8 @@ FaultAnalyzer::init(const TpgNetwork& network,
     }
   }
 
+  fault_list = mOrigFaultList;
+
   local_timer.stop();
 
   if ( mVerbose > 0 ) {
@@ -256,16 +257,16 @@ FaultAnalyzer::analyze_fault(TpgFault* fault,
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
 
-  const TpgNode* fnode = fault->node();
-  NodeSet& node_set = mNodeSetArray[fnode->id()];
+  engine.make_fval_cnf(fval_cnf, fault, node_set(f_id), kVal1);
 
-  // fault を検出するCNFを作る．
-  fval_cnf.make_cnf(engine, fault, node_set, kVal1);
+  vector<Bool3> sat_model;
+  Bool3 sat_stat = engine.check_sat(sat_model);
+  if ( sat_stat == kB3True ) {
+    NodeValList& suf_list = fi.mSufficientAssignment;
+    NodeValList& pi_suf_list = fi.mPiSufficientAssignment;
 
-  NodeValList& suf_list = fi.mSufficientAssignment;
-  NodeValList& pi_suf_list = fi.mPiSufficientAssignment;
-  Bool3 stat = engine.get_pi_suf_list(fval_cnf, fault, NodeValList(), suf_list, pi_suf_list);
-  if ( stat == kB3True ) {
+    fval_cnf.get_pi_suf_list(sat_model, fault, node_set(f_id), suf_list, pi_suf_list);
+
     // テストベクタを作る．
     TestVector* tv = tvmgr.new_vector();
     ymuint npi = pi_suf_list.size();
@@ -306,7 +307,7 @@ FaultAnalyzer::analyze_fault(TpgFault* fault,
       fi.mSingleCube = true;
     }
   }
-  return stat;
+  return sat_stat;
 }
 
 // @brief ノード番号の最大値を得る．

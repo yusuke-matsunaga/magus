@@ -9,12 +9,11 @@
 
 #include "FgMgr.h"
 
+#include "TpgFault.h"
+#include "NodeSet.h"
 #include "GvalCnf.h"
 #include "FvalCnf.h"
 #include "SatEngine.h"
-#include "ModelValMap.h"
-#include "NodeSet.h"
-#include "TpgFault.h"
 #include "YmUtils/HashSet.h"
 
 
@@ -141,12 +140,15 @@ FgMgr::add_fault(ymuint gid,
   NodeSet node_set;
   node_set.mark_region(mMaxNodeId, fault->node());
 
-  fval_cnf.make_cnf(engine, fault, node_set, kVal1);
+  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
+
+  vector<Bool3> sat_model;
+  Bool3 sat_ans = engine.check_sat(gval_cnf, fg->mSufList, sat_model);
+  ASSERT_COND( sat_ans == kB3True );
 
   NodeValList suf_list;
   NodeValList pi_suf_list;
-  Bool3 sat_ans = engine.get_pi_suf_list(fval_cnf, fault, fg->mSufList, suf_list, pi_suf_list);
-  ASSERT_COND( sat_ans == kB3True );
+  fval_cnf.get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
 
   fg->add_fault(fault, suf_list, pi_suf_list);
 }

@@ -21,6 +21,9 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 class GvalCnf
 {
+  friend class SatEngine;
+  friend class FvalCnf;
+
 public:
 
   /// @brief コンストラクタ
@@ -40,6 +43,20 @@ public:
   /// @param[in] max_node_id ノード番号の最大値
   void
   init(ymuint max_node_id);
+
+  /// @brief 変数マップを得る．
+  const VidMap&
+  var_map() const;
+
+  /// @brief ノード番号の最大値を返す．
+  ymuint
+  max_node_id() const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief NodeSet の内容に応じてCNFを作る．
   /// @param[in] engine SATエンジン
@@ -63,20 +80,6 @@ public:
   void
   add_assumption(SatEngine& engine,
 		 const NodeValList& assign_list);
-
-  /// @brief 変数マップを得る．
-  const VidMap&
-  var_map() const;
-
-  /// @brief ノード番号の最大値を返す．
-  ymuint
-  max_node_id() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
 
 private:

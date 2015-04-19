@@ -12,6 +12,7 @@
 #include "satpg_nsdef.h"
 #include "GenVidMap.h"
 #include "Val3.h"
+#include "YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -22,6 +23,8 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 class FvalCnf
 {
+  friend class SatEngine;
+
 public:
 
   /// @brief コンストラクタ
@@ -44,49 +47,18 @@ public:
   void
   init(ymuint max_node_id);
 
-  /// @brief 故障回路のCNFを作る．
-  /// @param[in] engine SATエンジン
+  /// @brief 十分割当リストを求める．
+  /// @param[in] sat_model SAT問題の解
   /// @param[in] fault 故障
-  /// @param[in] node_set 関係するノード集合
-  /// @param[in] detect 検出条件
-  ///
-  /// detect = kVal0: 検出しないCNFを作る．
-  ///        = kVal1: 検出するCNFを作る．
-  ///        = kValX: fd_var() で制御するCNFを作る．
-  void
-  make_cnf(SatEngine& engine,
-	   TpgFault* fault,
-	   const NodeSet& node_set,
-	   Val3 detect);
-
-  /// @brief 故障回路のCNFを作る．
-  /// @param[in] engine SATエンジン
-  /// @param[in] fault 故障
-  /// @param[in] detect 検出条件
-  ///
-  /// detect = kVal0: 検出しないCNFを作る．
-  ///        = kVal1: 検出するCNFを作る．
-  ///        = kValX: fd_var() で制御するCNFを作る．
-  void
-  make_cnf(SatEngine& engine,
-	   TpgFault* fault,
-	   Val3 detect);
-
-  /// @brief 割当リストに対応する仮定を追加する．
-  /// @param[in] engine SATエンジン
-  /// @param[in] assign_list 割当リスト
-  void
-  add_assumption(SatEngine& engine,
-		 const NodeValList& assign_list);
-
-  /// @brief 割当リストのもとでチェックを行う．
-  /// @param[in] engine SATエンジン
-  /// @param[in] assign_list 割当リスト
+  /// @param[in] node_set 故障に関連するノード集合
   /// @param[out] suf_list 十分割当リストを格納する変数
+  /// @param[out] pi_suf_list 外部入力上の十分割当リストを格納する変数
   void
-  get_suf_list(SatEngine& engine,
-	       const NodeValList& assign_list,
-	       NodeValList& suf_list);
+  get_pi_suf_list(const vector<Bool3>& sat_model,
+		  TpgFault* fault,
+		  const NodeSet& node_set,
+		  NodeValList& suf_list,
+		  NodeValList& pi_suf_list);
 
   /// @brief 正常回路のCNFを生成するクラスを返す．
   GvalCnf&
@@ -113,6 +85,21 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 故障回路のCNFを作る．
+  /// @param[in] engine SATエンジン
+  /// @param[in] fault 故障
+  /// @param[in] node_set 関係するノード集合
+  /// @param[in] detect 検出条件
+  ///
+  /// detect = kVal0: 検出しないCNFを作る．
+  ///        = kVal1: 検出するCNFを作る．
+  ///        = kValX: fd_var() で制御するCNFを作る．
+  void
+  make_cnf(SatEngine& engine,
+	   TpgFault* fault,
+	   const NodeSet& node_set,
+	   Val3 detect);
 
   /// @brief TFO にマークをつけてCNF式を作る．
   /// @param[in] engine SATエンジン

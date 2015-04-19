@@ -42,16 +42,14 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
-  /// @param[in] network 対象のネットワーク
+  /// @param[in] fault_list 検出された故障のリスト
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
-  /// @param[out] fault_list 検出された故障のリスト
   virtual
   void
-  init(TpgNetwork& network,
+  init(const vector<TpgFault*>& fault_list,
        TvMgr& tvmgr,
-       Fsim& fsim2,
-       vector<TpgFault*>& fault_list);
+       Fsim& fsim2);
 
   /// @brief 対象の全故障数を返す．
   virtual

@@ -11,7 +11,7 @@
 
 
 #include "satpg_nsdef.h"
-
+#include "Val3.h"
 #include "YmNetworks/tgnet.h"
 #include "YmLogic/Literal.h"
 #include "YmLogic/Bool3.h"
@@ -54,15 +54,20 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-#if 0
-  /// @brief 正常回路のCNFを作る．
-  /// @param[in] gval_cnf 正常回路用のデータ構造
-  /// @param[in] node ノード
+  /// @brief 故障回路のCNFを作る．
+  /// @param[in] fval_cnf 故障回路用のデータ構造
+  /// @param[in] fault 故障
+  /// @param[in] node_set 故障に関係するノード集合
+  /// @param[in] detect 検出条件
   ///
-  /// node の TFI 全体のCNF式を作る．
+  /// detect = kVal0: 検出しないCNFを作る．
+  ///        = kVal1: 検出するCNFを作る．
+  ///        = kValX: fd_var() で制御するCNFを作る．
   void
-  make_gval_cnf(GvalCnf& gval_cnf,
-		const TpgNode* node);
+  make_fval_cnf(FvalCnf& fval_cnf,
+		TpgFault* fault,
+		const NodeSet& node_set,
+		Val3 detect);
 
   /// @brief 故障回路のCNFを作る．
   /// @param[in] fval_cnf 故障回路用のデータ構造
@@ -73,31 +78,24 @@ public:
   ///        = kVal1: 検出するCNFを作る．
   ///        = kValX: fd_var() で制御するCNFを作る．
   void
-  make_fval_cnf(FvalCnf&  fval_cnf,
+  make_fval_cnf(FvalCnf& fval_cnf,
 		TpgFault* fault,
 		Val3 detect);
-#endif
-
-  /// @brief f1 が f2 を支配しているか調べる．
-  /// @param[in] f1 支配候補の故障
-  /// @param[in] f2 被支配候補の故障
-  /// @param[in] max_node_id ノード番号の最大値
-  bool
-  check_fault_dominance(TpgFault* f1,
-			TpgFault* f2,
-			ymuint max_node_id);
-
-  /// @brief f1 と f2 が衝突しているか調べる．
-  /// @param[in] f1, f2 チェック対象の故障
-  /// @param[in] max_node_id ノード番号の最大値
-  bool
-  check_fault_conflict(TpgFault* f1,
-		       TpgFault* f2,
-		       ymuint max_node_id);
 
   /// @brief 割当リストのもとでチェックを行う．
   /// @param[in] gval_cnf 正常回路用のデータ構造
   /// @param[in] assign_list 割当リスト
+  /// @param[out] sat_model SATの場合の解
+  Bool3
+  check_sat(GvalCnf& gval_cnf,
+	    const NodeValList& assign_list,
+	    vector<Bool3>& sat_model);
+
+  /// @brief 割当リストのもとでチェックを行う．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assign_list 割当リスト
+  ///
+  /// こちらは結果のみを返す．
   Bool3
   check_sat(GvalCnf& gval_cnf,
 	    const NodeValList& assign_list);
@@ -105,34 +103,33 @@ public:
   /// @brief 割当リストのもとでチェックを行う．
   /// @param[in] gval_cnf 正常回路用のデータ構造
   /// @param[in] assign_list1, assign_list2 割当リスト
+  /// @param[out] sat_model SATの場合の解
+  Bool3
+  check_sat(GvalCnf& gval_cnf,
+	    const NodeValList& assign_list1,
+	    const NodeValList& assign_list2,
+	    vector<Bool3>& sat_model);
+
+  /// @brief 割当リストのもとでチェックを行う．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assign_list1, assign_list2 割当リスト
+  ///
+  /// こちらは結果のみを返す．
   Bool3
   check_sat(GvalCnf& gval_cnf,
 	    const NodeValList& assign_list1,
 	    const NodeValList& assign_list2);
 
-  /// @brief 割当リストのもとで十分割当リストを求める．
-  /// @param[in] fval_cnf 故障回路用のデータ構造
-  /// @param[in] fault 故障
-  /// @param[in] assign_list 割当リスト
-  /// @param[out] suf_list 十分割当リストを格納する変数
+  /// @brief SAT 問題を解く．
+  /// @param[out] sat_model SATの場合の解
   Bool3
-  get_suf_list(FvalCnf& fval_cnf,
-	       TpgFault* fault,
-	       const NodeValList& assign_list,
-	       NodeValList& suf_list);
+  check_sat(vector<Bool3>& sat_model);
 
-  /// @brief 割当リストのもとで十分割当リストを求める．
-  /// @param[in] fval_cnf 故障回路用のデータ構造
-  /// @param[in] fault 故障
-  /// @param[in] assign_list 割当リスト
-  /// @param[out] suf_list 十分割当リストを格納する変数
-  /// @param[out] pi_suf_list 外部入力上の十分割当リストを格納する変数
+  /// @brief SAT 問題を解く．
+  ///
+  /// こちらは結果のみを返す．
   Bool3
-  get_pi_suf_list(FvalCnf& fval_cnf,
-		  TpgFault* fault,
-		  const NodeValList& assign_list,
-		  NodeValList& suf_list,
-		  NodeValList& pi_suf_list);
+  check_sat();
 
 
   /// @brief ノードの入出力の関係を表すCNFを作る．
@@ -311,12 +308,6 @@ public:
   solve(vector<Bool3>& model,
 	SatStats& sat_stats,
 	USTime& time);
-
-  /// @brief SAT 問題を得．
-  ///
-  /// こちらは結果のみを返す．
-  Bool3
-  check_sat();
 
 
 private:
@@ -497,7 +488,44 @@ SatEngine::solve(vector<Bool3>& model,
   return ans;
 }
 
-// @brief SAT 問題を得．
+// @brief 割当リストのもとでチェックを行う．
+// @param[in] gval_cnf 正常回路用のデータ構造
+// @param[in] assign_list 割当リスト
+inline
+Bool3
+SatEngine::check_sat(GvalCnf& gval_cnf,
+		     const NodeValList& assign_list)
+{
+  vector<Bool3> model;
+  return check_sat(gval_cnf, assign_list, model);
+}
+
+// @brief 割当リストのもとでチェックを行う．
+// @param[in] gval_cnf 正常回路用のデータ構造
+// @param[in] assign_list1, assign_list2 割当リスト
+inline
+Bool3
+SatEngine::check_sat(GvalCnf& gval_cnf,
+		     const NodeValList& assign_list1,
+		     const NodeValList& assign_list2)
+{
+  vector<Bool3> model;
+  return check_sat(gval_cnf, assign_list1, assign_list2, model);
+}
+
+// @brief SAT 問題を解く．
+// @param[out] sat_model SATの場合の解
+//
+// こちらは結果のみを返す．
+inline
+Bool3
+SatEngine::check_sat(vector<Bool3>& sat_model)
+{
+  Bool3 ans = mSolver.solve(mAssumptions, sat_model);
+  return ans;
+}
+
+// @brief SAT 問題を解く．
 //
 // こちらは結果のみを返す．
 inline
@@ -505,8 +533,7 @@ Bool3
 SatEngine::check_sat()
 {
   vector<Bool3> model;
-  Bool3 ans = mSolver.solve(mAssumptions, model);
-  return ans;
+  return check_sat(model);
 }
 
 END_NAMESPACE_YM_SATPG

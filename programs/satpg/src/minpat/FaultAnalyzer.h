@@ -52,9 +52,11 @@ public:
   /// @brief 初期化する．
   /// @param[in] network ネットワーク
   /// @param[in] tvmgr テストベクタのマネージャ
+  /// @param[out] fault_list 検出された故障のリスト
   void
   init(const TpgNetwork& network,
-       TvMgr& tvmgr);
+       TvMgr& tvmgr,
+       vector<TpgFault*>& fault_list);
 
   /// @brief ノード番号の最大値を得る．
   ymuint

@@ -97,10 +97,9 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   delete minpat;
 
   if ( print_stats ) {
-    cout << "********** minpat **********" << endl
+    cout << " # of patterns: "
 	 << setw(10) << _tv_list().size()
-	 << ": # of minimized patterns" << endl
-	 << time << endl;
+	 << ": " << time << endl;
   }
 
   return TCL_OK;

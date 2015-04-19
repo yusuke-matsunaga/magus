@@ -39,18 +39,15 @@ MinPatNaive::~MinPatNaive()
 }
 
 // @brief 初期化を行う．
-// @param[in] network 対象のネットワーク
+// @param[in] fault_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
-// @param[out] fault_list 検出された故障のリスト
 void
-MinPatNaive::init(TpgNetwork& network,
+MinPatNaive::init(const vector<TpgFault*>& fault_list,
 		  TvMgr& tvmgr,
-		  Fsim& fsim2,
-		  vector<TpgFault*>& fault_list)
+		  Fsim& fsim2)
 {
-  const vector<TpgFault*>& src_list = analyzer().fault_list();
-  set_fault_list(src_list);
+  set_fault_list(fault_list);
 }
 
 // @brief 故障リストを設定する．

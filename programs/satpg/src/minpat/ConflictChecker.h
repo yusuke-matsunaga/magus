@@ -29,8 +29,8 @@ public:
   /// @brief コンストラクタ
   /// @param[in] analyzer 故障の情報を持つクラス
   ConflictChecker(FaultAnalyzer& analyzer,
-		  Fsim& fsim,
-		  TvMgr& tvmgr);
+		  TvMgr& tvmgr,
+		  Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
@@ -140,11 +140,11 @@ private:
   // 故障の情報を持つクラス
   FaultAnalyzer& mAnalyzer;
 
-  // 故障シミュレータ
-  Fsim& mFsim;
-
   // テストベクタを管理するクラス
   TvMgr& mTvMgr;
+
+  // 故障シミュレータ
+  Fsim& mFsim;
 
   // 最大ノード番号
   ymuint mMaxNodeId;

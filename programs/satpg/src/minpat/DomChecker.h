@@ -28,11 +28,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] analyzer 故障の情報を持つクラス
-  /// @param[in] fsim 故障シミュレータ
   /// @param[in] tvmgr テストベクタのマネージャ
+  /// @param[in] fsim 故障シミュレータ
   DomChecker(FaultAnalyzer& analyzer,
-	     Fsim& fsim,
-	     TvMgr& tvmgr);
+	     TvMgr& tvmgr,
+	     Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
@@ -141,11 +141,11 @@ private:
   // 故障の情報を持つクラス
   FaultAnalyzer& mAnalyzer;
 
-  // 故障シミュレータ
-  Fsim& mFsim;
-
   // テストベクタを管理するクラス
   TvMgr& mTvMgr;
+
+  // 故障シミュレータ
+  Fsim& mFsim;
 
   // 最大ノード番号
   ymuint mMaxNodeId;
@@ -158,6 +158,9 @@ private:
 
   // 故障ごとのデータ配列
   vector<FaultData> mFaultDataArray;
+
+  // record_pat() 中で用いる配列
+  vector<bool> mDetFlag;
 
 };
 

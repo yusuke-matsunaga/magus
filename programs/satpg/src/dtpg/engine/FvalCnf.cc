@@ -13,6 +13,9 @@
 #include "SatEngine.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "ModelValMap.h"
+#include "Extractor.h"
+#include "BackTracer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -141,59 +144,27 @@ FvalCnf::make_cnf(SatEngine& engine,
   }
 }
 
-// @brief 故障回路のCNFを作る．
-// @param[in] engine SATエンジン
+// @brief 十分割当リストを求める．
+// @param[in] sat_model SAT問題の解
 // @param[in] fault 故障
-//
-// detect = kVal0: 検出しないCNFを作る．
-//        = kVal1: 検出するCNFを作る．
-//        = kValX: fd_var() で制御するCNFを作る．
-void
-FvalCnf::make_cnf(SatEngine& engine,
-		  TpgFault* fault,
-		  Val3 detect)
-{
-  const TpgNode* fnode = fault->node();
-  NodeSet node_set;
-  node_set.mark_region(mMaxId, fnode);
-  make_cnf(engine, fault, node_set, detect);
-}
-
-// @brief 割当リストに対応する仮定を追加する．
-// @param[in] engine SATエンジン
-// @param[in] assign_list 割当リスト
-void
-FvalCnf::add_assumption(SatEngine& engine,
-			const NodeValList& assign_list)
-{
-  mGvalCnf.add_assumption(engine, assign_list);
-}
-
-#if 0
-// @brief 割当リストのもとでチェックを行う．
-// @param[in] engine SATエンジン
-// @param[in] assign_list 割当リスト
+// @param[in] node_set 故障に関連するノード集合
 // @param[out] suf_list 十分割当リストを格納する変数
+// @param[out] pi_suf_list 外部入力上の十分割当リストを格納する変数
 void
-FvalCnf::get_suf_list(SatEngine& engine,
-		      const NodeValList& assign_list,
-		      NodeValList& suf_list)
+FvalCnf::get_pi_suf_list(const vector<Bool3>& sat_model,
+			 TpgFault* fault,
+			 const NodeSet& node_set,
+			 NodeValList& suf_list,
+			 NodeValList& pi_suf_list)
 {
-  engine.assumption_add();
-  mGvalCnf.add_assumption(engine, assign_list);
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = engine.solve(sat_model, sat_stats, sat_time);
-
   ModelValMap val_map(gvar_map(), fvar_map(), sat_model);
-  Extractor extract(val_map);
-  extract(fault, suf_list);
 
-  return sat_ans;
+  Extractor extractor(val_map);
+  extractor(fault, suf_list);
+
+  BackTracer backtracer(mMaxId);
+  backtracer(fault->node(), node_set, val_map, pi_suf_list);
 }
-#endif
 
 // @brief 正常回路のCNFを生成するクラスを返す．
 GvalCnf&

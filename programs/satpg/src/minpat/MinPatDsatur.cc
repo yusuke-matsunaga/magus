@@ -45,22 +45,17 @@ MinPatDsatur::~MinPatDsatur()
 }
 
 // @brief 初期化を行う．
-// @param[in] network 対象のネットワーク
+// @param[in] fault_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
-// @param[in] fmgr 故障マネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
-// @param[out] fault_list 検出された故障のリスト
 void
-MinPatDsatur::init(TpgNetwork& network,
+MinPatDsatur::init(const vector<TpgFault*>& fault_list,
 		   TvMgr& tvmgr,
-		   Fsim& fsim2,
-		   vector<TpgFault*>& fault_list)
+		   Fsim& fsim2)
 {
-  mMaxNodeId = network.max_node_id();
+  mMaxNodeId = analyzer().max_node_id();
 
-  fault_list = analyzer().fault_list();
-
-  DomChecker checker(analyzer(), fsim2, tvmgr);
+  DomChecker checker(analyzer(), tvmgr, fsim2);
 
   vector<TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
@@ -197,8 +192,11 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
-      fval_cnf.make_cnf(engine, fs.mFault, kVal1);
-      const NodeValList& ma_list = analyzer().fault_info(fs.mFault->id()).mandatory_assignment();
+
+      TpgFault* fault = fs.mFault;
+      engine.make_fval_cnf(fval_cnf, fault, analyzer().node_set(fault->id()), kVal1);
+
+      const NodeValList& ma_list = analyzer().fault_info(fault->id()).mandatory_assignment();
       for (ymuint gid = 0; gid < ng; ++ gid) {
 	if ( fs.mPendingMap[gid] ) {
 	  fs.mPendingMap[gid] = false;

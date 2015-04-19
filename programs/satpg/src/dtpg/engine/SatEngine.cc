@@ -17,9 +17,9 @@
 #include "VidMap.h"
 #include "VidLitMap.h"
 #include "VectLitMap.h"
-#include "ModelValMap.h"
-#include "Extractor.h"
-#include "BackTracer.h"
+//#include "ModelValMap.h"
+//#include "Extractor.h"
+//#include "BackTracer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -206,17 +206,22 @@ SatEngine::~SatEngine()
 {
 }
 
-#if 0
-// @brief 正常回路のCNFを作る．
-// @param[in] gval_cnf 正常回路用のデータ構造
-// @param[in] node ノード
+// @brief 故障回路のCNFを作る．
+// @param[in] fval_cnf 故障回路用のデータ構造
+// @param[in] fault 故障
+// @param[in] node_set 故障に関係するノード集合
+// @param[in] detect 検出条件
 //
-// node の TFI 全体のCNF式を作る．
+// detect = kVal0: 検出しないCNFを作る．
+//        = kVal1: 検出するCNFを作る．
+//        = kValX: fd_var() で制御するCNFを作る．
 void
-SatEngine::make_gval_cnf(GvalCnf& gval_cnf,
-			 const TpgNode* node)
+SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
+			 TpgFault* fault,
+			 const NodeSet& node_set,
+			 Val3 detect)
 {
-  gval_cnf.make_cnf(*this, node);
+  fval_cnf.make_cnf(*this, fault, node_set, detect);
 }
 
 // @brief 故障回路のCNFを作る．
@@ -228,24 +233,27 @@ SatEngine::make_gval_cnf(GvalCnf& gval_cnf,
 //        = kVal1: 検出するCNFを作る．
 //        = kValX: fd_var() で制御するCNFを作る．
 void
-SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
+SatEngine::make_fval_cnf(FvalCnf& fval_cnf,
 			 TpgFault* fault,
 			 Val3 detect)
 {
-  fval_cnf.make_cnf(*this, fault, detect);
+  NodeSet node_set;
+  node_set.mark_region(fval_cnf.max_node_id(), fault->node());
+  make_fval_cnf(fval_cnf, fault, node_set, detect);
 }
-#endif
 
 // @brief 割当リストのもとでチェックを行う．
 // @param[in] gval_cnf 正常回路用のデータ構造
 // @param[in] assign_list 割当リスト
+// @param[out] sat_model SATの場合の解
 Bool3
 SatEngine::check_sat(GvalCnf& gval_cnf,
-		     const NodeValList& assign_list)
+		     const NodeValList& assign_list,
+		     vector<Bool3>& sat_model)
 {
-  assumption_begin();
   const VidMap& var_map = gval_cnf.var_map();
 
+  assumption_begin();
   ymuint n = assign_list.size();
   for (ymuint i = 0; i < n; ++ i) {
     NodeVal nv = assign_list[i];
@@ -260,19 +268,22 @@ SatEngine::check_sat(GvalCnf& gval_cnf,
     }
   }
 
-  return check_sat();
+  return check_sat(sat_model);
 }
 
 // @brief 割当リストのもとでチェックを行う．
 // @param[in] gval_cnf 正常回路用のデータ構造
 // @param[in] assign_list1, assign_list2 割当リスト
+// @param[out] sat_model SATの場合の解
 Bool3
 SatEngine::check_sat(GvalCnf& gval_cnf,
 		     const NodeValList& assign_list1,
-		     const NodeValList& assign_list2)
+		     const NodeValList& assign_list2,
+		     vector<Bool3>& sat_model)
 {
-  assumption_begin();
   const VidMap& var_map = gval_cnf.var_map();
+
+  assumption_begin();
 
   ymuint n1 = assign_list1.size();
   for (ymuint i = 0; i < n1; ++ i) {
@@ -302,9 +313,10 @@ SatEngine::check_sat(GvalCnf& gval_cnf,
     }
   }
 
-  return check_sat();
+  return check_sat(sat_model);
 }
 
+#if 0
 // @brief 割当リストのもとで十分割当リストを求める．
 // @param[in] fval_cnf 故障回路用のデータ構造
 // @param[in] fault 故障
@@ -316,69 +328,30 @@ SatEngine::get_suf_list(FvalCnf& fval_cnf,
 			const NodeValList& assign_list,
 			NodeValList& suf_list)
 {
-  const VidMap& var_map = fval_cnf.gvar_map();
-
-  assumption_begin();
-  ymuint n = assign_list.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    NodeVal nv = assign_list[i];
-    const TpgNode* node = nv.node();
-    fval_cnf.gval_cnf().make_cnf(*this, node);
-    Literal alit(var_map(node), false);
-    if ( nv.val() ) {
-      assumption_add(alit);
-    }
-    else {
-      assumption_add(~alit);
-    }
-  }
-
-  vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = solve(sat_model, sat_stats, sat_time);
-  if ( sat_ans == kB3True ) {
-    ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
-    Extractor extract(val_map);
-    extract(fault, suf_list);
-  }
-
-  return sat_ans;
+  NodeSet node_set;
+  node_set.mark_region(fval_cnf.max_node_id(), fault->node());
+  NodeValList dummy;
+  return get_pi_suf_list(fval_cnf, fault, node_set, assign_list, suf_list, dummy);
 }
 
 // @brief 割当リストのもとで十分割当リストを求める．
 // @param[in] fval_cnf 故障回路用のデータ構造
 // @param[in] fault 故障
+// @param[in] node_set 故障に関係するノード集合
 // @param[in] assign_list 割当リスト
 // @param[out] suf_list 十分割当リストを格納する変数
 Bool3
 SatEngine::get_pi_suf_list(FvalCnf& fval_cnf,
 			   TpgFault* fault,
+			   const NodeSet& node_set,
 			   const NodeValList& assign_list,
 			   NodeValList& suf_list,
 			   NodeValList& pi_suf_list)
 {
-  const VidMap& var_map = fval_cnf.gvar_map();
-
-  assumption_begin();
-  ymuint n = assign_list.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    NodeVal nv = assign_list[i];
-    const TpgNode* node = nv.node();
-    fval_cnf.gval_cnf().make_cnf(*this, node);
-    Literal alit(var_map(node), false);
-    if ( nv.val() ) {
-      assumption_add(alit);
-    }
-    else {
-      assumption_add(~alit);
-    }
-  }
+  make_fval_cnf(fval_cnf, fault, node_set, kVal1);
 
   vector<Bool3> sat_model;
-  SatStats sat_stats;
-  USTime sat_time;
-  Bool3 sat_ans = solve(sat_model, sat_stats, sat_time);
+  Bool3 sat_ans = check_sat(fval_cnf.gval_cnf(), assign_list, sat_model);
   if ( sat_ans == kB3True ) {
     ModelValMap val_map(fval_cnf.gvar_map(), fval_cnf.fvar_map(), sat_model);
     Extractor extractor(val_map);
@@ -393,6 +366,7 @@ SatEngine::get_pi_suf_list(FvalCnf& fval_cnf,
 
   return sat_ans;
 }
+#endif
 
 // @brief ノードの入出力の関係を表すCNFを作る．
 // @param[in] node 対象のノード

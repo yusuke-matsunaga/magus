@@ -65,19 +65,15 @@ MinPatSimple::~MinPatSimple()
 }
 
 // @brief 初期化を行う．
-// @param[in] network 対象のネットワーク
+// @param[in] fault_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
-// @param[out] fault_list 検出された故障のリスト
 void
-MinPatSimple::init(TpgNetwork& network,
+MinPatSimple::init(const vector<TpgFault*>& fault_list,
 		   TvMgr& tvmgr,
-		   Fsim& fsim2,
-		   vector<TpgFault*>& fault_list)
+		   Fsim& fsim2)
 {
-  fault_list = analyzer().fault_list();
-
-  DomChecker checker(analyzer(), fsim2, tvmgr);
+  DomChecker checker(analyzer(), tvmgr, fsim2);
 
   vector<TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);

@@ -86,7 +86,7 @@ DtpgSatS::run(TpgNetwork& network,
       FvalCnf fval_cnf(max_id, gval_cnf);
       SatEngine engine(sat_type(), sat_option(), sat_outp());
 
-      fval_cnf.make_cnf(engine, fault, node_set, kVal1);
+      engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
 
       cnf_end();
 

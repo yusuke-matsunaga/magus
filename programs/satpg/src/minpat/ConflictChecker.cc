@@ -11,15 +11,12 @@
 
 #include "FaultAnalyzer.h"
 
-//#include "TpgNetwork.h"
-//#include "TpgNode.h"
 #include "TpgFault.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
 #include "KDet2Op.h"
 #include "NodeSet.h"
-//#include "NodeValList.h"
 
 #include "GvalCnf.h"
 #include "FvalCnf.h"
@@ -180,11 +177,11 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 ConflictChecker::ConflictChecker(FaultAnalyzer& analyzer,
-				 Fsim& fsim,
-				 TvMgr& tvmgr) :
+				 TvMgr& tvmgr,
+				 Fsim& fsim) :
   mAnalyzer(analyzer),
-  mFsim(fsim),
-  mTvMgr(tvmgr)
+  mTvMgr(tvmgr),
+  mFsim(fsim)
 {
   mVerbose = mAnalyzer.verbose();
   mMaxNodeId = mAnalyzer.max_node_id();
@@ -370,7 +367,7 @@ ConflictChecker::analyze_conflict(TpgFault* f1,
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
 
-  fval_cnf.make_cnf(engine, f1, kVal1);
+  engine.make_fval_cnf(fval_cnf, f1, mAnalyzer.node_set(f1->id()), kVal1);
 
   const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1->id());
 
@@ -588,7 +585,8 @@ ConflictChecker::analyze_conflict2(TpgFault* f1,
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
-      fval_cnf.make_cnf(engine, f2, kVal1);
+
+      engine.make_fval_cnf(fval_cnf, f2, mAnalyzer.node_set(f2->id()), kVal1);
       if ( engine.check_sat(gval_cnf, suf_list1) == kB3False ) {
 	++ mConflictStats.conf_count;
 	++ mConflictStats.conf4_count;
@@ -621,8 +619,9 @@ ConflictChecker::check_fault_conflict(TpgFault* f1,
   const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
   const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
 
-  fval_cnf1.make_cnf(engine, f1, node_set1, kVal1);
-  fval_cnf2.make_cnf(engine, f2, node_set2, kVal1);
+  // f1 と f2 を検出する CNF を生成
+  engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+  engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal1);
 
   return engine.check_sat() == kB3False;
 }
