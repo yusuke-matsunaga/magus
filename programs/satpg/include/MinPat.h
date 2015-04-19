@@ -71,7 +71,13 @@ new_MinPat(bool group_dominance);
 // @param[in] group_dominance グループ支配を計算する．
 extern
 MinPat*
-new_MinPat2(bool group_dominance);
+new_MinPatSimple(bool group_dominance);
+
+/// @brief インスタンスを生成する関数
+// @param[in] group_dominance グループ支配を計算する．
+extern
+MinPat*
+new_MinPatSimple2(bool group_dominance);
 
 /// @brief インスタンスを生成する関数
 extern

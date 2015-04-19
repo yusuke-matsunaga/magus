@@ -60,6 +60,7 @@ MinPatNaive::init(TpgNetwork& network,
 }
 
 // @brief 故障リストを設定する．
+void
 MinPatNaive::set_fault_list(const vector<TpgFault*>& src_list)
 {
   ymuint nf = src_list.size();

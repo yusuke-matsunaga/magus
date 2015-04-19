@@ -46,6 +46,9 @@ private:
   // simple オプション
   TclPopt* mPoptSimple;
 
+  // simple2 オプション
+  TclPopt* mPoptSimple2;
+
   // dsatur オプション
   TclPopt* mPoptDsatur;
 

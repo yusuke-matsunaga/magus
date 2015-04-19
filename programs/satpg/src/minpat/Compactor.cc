@@ -23,11 +23,20 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief コンストラクタ
 Compactor::Compactor()
 {
+  mVerbose = 0;
 }
 
 // @brief デストラクタ
 Compactor::~Compactor()
 {
+}
+
+// @brief verbose フラグを設定する．
+// @param[in] verbose 指定する値
+void
+Compactor::set_verbose(ymuint verbose)
+{
+  mVerbose = verbose;
 }
 
 // @brief 故障グループを圧縮する．
@@ -46,9 +55,11 @@ Compactor::run(FgMgr& fgmgr,
   new_group_list = group_list;
 
   for ( ; ; ) {
-    cout << "\r";
-    cout << "# of groups = " << new_group_list.size();
-    cout.flush();
+    if ( mVerbose > 1 ) {
+      cout << "\r";
+      cout << "# of groups = " << new_group_list.size();
+      cout.flush();
+    }
 #if 0
     phase0(fgmgr, new_group_list);
 #endif
@@ -59,6 +70,9 @@ Compactor::run(FgMgr& fgmgr,
     }
 
     phase2(fgmgr, new_group_list);
+  }
+  if ( mVerbose > 1 ) {
+    cout << endl;
   }
 }
 

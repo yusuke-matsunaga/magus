@@ -47,6 +47,11 @@ public:
       const vector<ymuint>& group_list,
       vector<ymuint>& new_group_list);
 
+  /// @brief verbose フラグを設定する．
+  /// @param[in] verbose 指定する値
+  void
+  set_verbose(ymuint verbose);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -85,6 +90,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // verbose フラグ
+  ymuint mVerbose;
 
   // ノード番号の最大値
   ymuint mMaxNodeId;

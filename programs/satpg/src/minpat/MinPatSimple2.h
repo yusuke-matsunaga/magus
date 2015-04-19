@@ -1,50 +1,41 @@
-#ifndef MINPATNAIVE_H
-#define MINPATNAIVE_H
+﻿#ifndef MINPATSIMPLE2_H
+#define MINPATSIMPLE2_H
 
-/// @file MinPatNaive.h
-/// @brief MinPatNaive のヘッダファイル
+/// @file MinPatSimple2.h
+/// @brief MinPatSimple2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPatBase.h"
+#include "MinPatNaive.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPatNaive MinPatNaive.h "MinPatNaive.h"
-/// @brief 単純な MinPat
+/// @class MinPatSimple2 MinPatSimple2.h "MinPatSimple2.h"
+/// @brief MinPatNaive の故障の順番を改良したクラス
 //////////////////////////////////////////////////////////////////////
-class MinPatNaive :
-  public MinPatBase
+class MinPatSimple2 :
+  public MinPatNaive
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] group_dominance グループ支配を計算する．
-  MinPatNaive(bool group_dominance);
+  MinPatSimple2(bool group_dominance);
 
   /// @brief デストラクタ
-  ~MinPatNaive();
+  virtual
+  ~MinPatSimple2();
 
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-
-protected:
-  //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 故障リストを設定する．
-  void
-  set_fault_list(const vector<TpgFault*>& src_list);
 
 
 private:
@@ -64,40 +55,14 @@ private:
        Fsim& fsim2,
        vector<TpgFault*>& fault_list);
 
-  /// @brief 対象の全故障数を返す．
-  virtual
-  ymuint
-  fault_num();
-
-  /// @brief 最初の故障を選ぶ．
-  virtual
-  TpgFault*
-  get_first_fault();
-
-  /// @brief 次に処理すべき故障を選ぶ．
-  /// @param[in] fgmgr 故障グループを管理するオブジェクト
-  /// @param[in] group_list 現在のグループリスト
-  ///
-  /// 故障が残っていなければ NULL を返す．
-  virtual
-  TpgFault*
-  get_next_fault(FgMgr& fgmgr,
-		 const vector<ymuint>& group_list);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 故障リスト
-  vector<TpgFault*> mFaultList;
-
-  // 次の故障の位置
-  ymuint mNextPos;
-
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // MINPATNAIVE_H
+#endif // MINPATSIMPLE2_H

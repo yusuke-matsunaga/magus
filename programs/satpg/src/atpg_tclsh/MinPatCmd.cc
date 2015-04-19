@@ -25,6 +25,8 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 {
   mPoptSimple = new TclPopt(this, "simple",
 			    "simple heuristic");
+  mPoptSimple2 = new TclPopt(this, "simple2",
+			     "simple2 heuristic");
   mPoptDsatur = new TclPopt(this, "dsatur",
 			    "Dsatur heuristic");
   mPoptDsatur2 = new TclPopt(this, "dsatur2",
@@ -59,6 +61,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool print_stats = mPoptPrintStats->is_specified();
 
   bool simple = mPoptSimple->is_specified();
+  bool simple2 = mPoptSimple2->is_specified();
   bool dsatur = mPoptDsatur->is_specified();
   bool dsatur2 = mPoptDsatur2->is_specified();
   int verbose = mPoptVerbose->is_specified() ? mPoptVerbose->val() : 0;
@@ -67,7 +70,10 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   MinPat* minpat = NULL;
 
   if ( simple ) {
-    minpat = new_MinPat2(group_dominance);
+    minpat = new_MinPatSimple(group_dominance);
+  }
+  else if ( simple2 ) {
+    minpat = new_MinPatSimple2(group_dominance);
   }
   else if ( dsatur ) {
     minpat = new_MinPatDsatur();

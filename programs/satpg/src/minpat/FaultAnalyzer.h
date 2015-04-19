@@ -97,7 +97,7 @@ public:
   get_conf_list(vector<pair<ymuint, ymuint> >& conf_list);
 
   /// @brief 検出可能な故障のリストを得る．
-  cont vector<TpgFault*>&
+  const vector<TpgFault*>&
   fault_list() const;
 
   /// @brief 支配故障リストを得る．

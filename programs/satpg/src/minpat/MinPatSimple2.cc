@@ -1,13 +1,13 @@
 ﻿
-/// @file MinPatSimple.cc
-/// @brief MinPatSimple の実装ファイル
+/// @file MinPatSimple2.cc
+/// @brief MinPatSimple2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPatSimple.h"
+#include "MinPatSimple2.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
 
@@ -19,46 +19,38 @@ BEGIN_NAMESPACE_YM_SATPG
 // @brief インスタンスを生成する関数
 // @param[in] group_dominance グループ支配を計算する．
 MinPat*
-new_MinPatSimple(bool group_dominance)
+new_MinPatSimple2(bool group_dominance)
 {
-  return new MinPatSimple(group_dominance);
+  return new MinPatSimple2(group_dominance);
 }
 
 BEGIN_NONAMESPACE
 
-struct FaultLt2
+struct FaultLt
 {
-  FaultLt2(const vector<FaultInfo>& fault_info_array) :
-    mFaultInfoArray(fault_info_array)
-  {
-  }
-
   bool
-  operator()(TpgFault* left,
-	     TpgFault* right)
+  operator()(const pair<double, TpgFault*>& left,
+	     const pair<double, TpgFault*>& right)
   {
-    return mFaultInfoArray[left->id()].detnum() < mFaultInfoArray[right->id()].detnum();
+    return left.first > right.first;
   }
-
-  const vector<FaultInfo>& mFaultInfoArray;
-
 };
 
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
-// クラス MinPatSimple
+// クラス MinPatSimple2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] group_dominance グループ支配を計算する．
-MinPatSimple::MinPatSimple(bool group_dominance) :
+MinPatSimple2::MinPatSimple2(bool group_dominance) :
   MinPatNaive(group_dominance)
 {
 }
 
 // @brief デストラクタ
-MinPatSimple::~MinPatSimple()
+MinPatSimple2::~MinPatSimple2()
 {
 }
 
@@ -68,10 +60,10 @@ MinPatSimple::~MinPatSimple()
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 // @param[out] fault_list 検出された故障のリスト
 void
-MinPatSimple::init(TpgNetwork& network,
-		   TvMgr& tvmgr,
-		   Fsim& fsim2,
-		   vector<TpgFault*>& fault_list)
+MinPatSimple2::init(TpgNetwork& network,
+		    TvMgr& tvmgr,
+		    Fsim& fsim2,
+		    vector<TpgFault*>& fault_list)
 {
   FaultAnalyzer analyzer;
 
@@ -89,10 +81,23 @@ MinPatSimple::init(TpgNetwork& network,
   const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
   ymuint nf = src_list.size();
 
-  // 故障を検出パタン数の少ない順に並べる．
-  vector<TpgFault*> tmp_list = src_list;
-  sort(tmp_list.begin(), tmp_list.end(), FaultLt2(analyzer.fault_info_array()));
-  set_fault_list(tmp_list);
+  // 故障を衝突数の多い順に並べる．
+  ymuint sample_num = 1000;
+  vector<double> conf_prob_array;
+  analyzer.estimate_conflict(sample_num, conf_prob_array);
+  vector<pair<double, TpgFault*> > tmp_list(nf);
+  vector<TpgFault*> tmp_list2(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    TpgFault* f = src_list[i];
+    double cnum = conf_prob_array[f->id()];
+    tmp_list[i] = make_pair(cnum, f);
+  }
+  sort(tmp_list.begin(), tmp_list.end(), FaultLt());
+  for (ymuint i = 0; i < nf; ++ i) {
+    tmp_list2[i] = tmp_list[i].second;
+  }
+  set_fault_list(tmp_list2);
+
 }
 
 END_NAMESPACE_YM_SATPG

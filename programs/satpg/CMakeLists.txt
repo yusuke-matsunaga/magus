@@ -104,6 +104,7 @@ set (minpat_SOURCES
   src/minpat/MinPatBase.cc
   src/minpat/MinPatNaive.cc
   src/minpat/MinPatSimple.cc
+  src/minpat/MinPatSimple2.cc
   src/minpat/MinPatDsatur.cc
   src/minpat/MinPatDsatur2.cc
   src/minpat/FaultAnalyzer.cc
