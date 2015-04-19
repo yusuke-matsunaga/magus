@@ -49,13 +49,7 @@ MinPatNaive::init(TpgNetwork& network,
 		  Fsim& fsim2,
 		  vector<TpgFault*>& fault_list)
 {
-  FaultAnalyzer analyzer;
-
-  analyzer.set_verbose(verbose());
-
-  analyzer.init(network, tvmgr);
-
-  const vector<TpgFault*>& src_list = analyzer.fault_list();
+  const vector<TpgFault*>& src_list = analyzer().fault_list();
   set_fault_list(src_list);
 }
 

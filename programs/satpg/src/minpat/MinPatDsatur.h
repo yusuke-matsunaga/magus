@@ -129,9 +129,6 @@ private:
   // 故障数
   ymuint mFaultNum;
 
-  // 故障解析器
-  FaultAnalyzer mAnalyzer;
-
   // 故障用の作業領域のリスト
   vector<FaultStruct> mFaultStructList;
 

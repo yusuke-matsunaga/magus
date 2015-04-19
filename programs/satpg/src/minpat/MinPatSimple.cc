@@ -75,15 +75,9 @@ MinPatSimple::init(TpgNetwork& network,
 		   Fsim& fsim2,
 		   vector<TpgFault*>& fault_list)
 {
-  FaultAnalyzer analyzer;
+  fault_list = analyzer().fault_list();
 
-  analyzer.set_verbose(verbose());
-
-  analyzer.init(network, tvmgr);
-
-  fault_list = analyzer.fault_list();
-
-  DomChecker checker(analyzer, fsim2, tvmgr);
+  DomChecker checker(analyzer(), fsim2, tvmgr);
 
   vector<TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);

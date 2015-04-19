@@ -58,15 +58,9 @@ MinPatDsatur::init(TpgNetwork& network,
 {
   mMaxNodeId = network.max_node_id();
 
-  FaultAnalyzer& analyzer = mAnalyzer;
+  fault_list = analyzer().fault_list();
 
-  analyzer.set_verbose(verbose());
-
-  analyzer.init(network, tvmgr);
-
-  fault_list = analyzer.fault_list();
-
-  DomChecker checker(analyzer, fsim2, tvmgr);
+  DomChecker checker(analyzer(), fsim2, tvmgr);
 
   vector<TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
@@ -204,7 +198,7 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
       fval_cnf.make_cnf(engine, fs.mFault, kVal1);
-      const NodeValList& ma_list = mAnalyzer.fault_info(fs.mFault->id()).mandatory_assignment();
+      const NodeValList& ma_list = analyzer().fault_info(fs.mFault->id()).mandatory_assignment();
       for (ymuint gid = 0; gid < ng; ++ gid) {
 	if ( fs.mPendingMap[gid] ) {
 	  fs.mPendingMap[gid] = false;

@@ -10,6 +10,7 @@
 
 
 #include "MinPat.h"
+#include "FaultAnalyzer.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -131,6 +132,10 @@ protected:
 		  const NodeValList& suf_list,
 		  TestVector* tv);
 
+  /// @brief 故障解析器を返す．
+  FaultAnalyzer&
+  analyzer();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -148,6 +153,9 @@ private:
 
   // get_dom_fatuls() のアルゴリズム
   ymuint mDomMethod;
+
+  // 故障解析器
+  FaultAnalyzer mAnalyzer;
 
 };
 

@@ -186,6 +186,13 @@ Compactor::phase0(FgMgr& fgmgr,
     SatEngine engine(string(), string(), NULL);
 
     fval_cnf.make_cnf(engine, fault, kVal0);
+    for (ymuint j = 0; j < ng; ++ j) {
+      ymuint gid = group_list[j];
+      const NodeValList& suf_list = fgmgr.sufficient_assignment(gid);
+      if ( engine.check_sat(gval_cnf, suf_list) == kB3False ) {
+	mincov.insert_elem(i, j);
+      }
+    }
   }
 
   vector<ymuint> col_set;

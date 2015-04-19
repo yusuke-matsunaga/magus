@@ -60,6 +60,9 @@ MinPatBase::run(TpgNetwork& network,
 
   mMaxNodeId = network.max_node_id();
 
+  mAnalyzer.set_verbose(verbose());
+  mAnalyzer.init(network, tvmgr);
+
   vector<TpgFault*> fault_list;
   init(network, tvmgr, fsim2, fault_list);
 
@@ -276,6 +279,13 @@ MinPatBase::make_testvector(TpgNetwork& network,
     }
     tv->set_val(input_id, val);
   }
+}
+
+// @brief 故障解析器を返す．
+FaultAnalyzer&
+MinPatBase::analyzer()
+{
+  return mAnalyzer;
 }
 
 END_NAMESPACE_YM_SATPG
