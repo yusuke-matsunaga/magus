@@ -27,9 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] group_dominance グループ支配を計算する．
-  /// @param[in] fault_dominace 故障支配を計算する．
-  MinPatBase(bool group_dominance = false,
-	     bool fault_dominance = false);
+  MinPatBase(bool group_dominance = false);
 
   /// @brief デストラクタ
   virtual
@@ -91,6 +89,11 @@ protected:
        Fsim& fsim2,
        vector<TpgFault*>& fault_list) = 0;
 
+  /// @brief 対象の全故障数を返す．
+  virtual
+  ymuint
+  fault_num() = 0;
+
   /// @brief 最初の故障を選ぶ．
   virtual
   TpgFault*
@@ -140,11 +143,8 @@ private:
   // verbose フラグ
   int mVerbose;
 
-  // グループ支配を計算するとき true にするフラグ
+  // group dominance フラグ
   bool mGroupDominance;
-
-  // 故障支配を計算する時 true にするフラグ
-  bool mFaultDominance;
 
   // get_dom_fatuls() のアルゴリズム
   ymuint mDomMethod;

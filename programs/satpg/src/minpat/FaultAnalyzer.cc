@@ -1589,6 +1589,13 @@ FaultAnalyzer::get_conf_list(vector<pair<ymuint, ymuint> >& conf_list)
   }
 }
 
+// @brief 検出可能な故障のリストを得る．
+cont vector<TpgFault*>&
+FaultAnalyzer::fault_list() const
+{
+  return mOrigFaultList;
+}
+
 // @brief 支配故障リストを得る．
 const vector<TpgFault*>&
 FaultAnalyzer::dom_fault_list() const

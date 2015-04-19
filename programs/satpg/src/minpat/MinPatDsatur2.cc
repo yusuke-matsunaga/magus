@@ -57,6 +57,8 @@ MinPatDsatur2::init(TpgNetwork& network,
 
   analyzer.init(network, tvmgr);
 
+  fault_list = analyzer.fault_list();
+
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, rg);
 
@@ -92,7 +94,15 @@ MinPatDsatur2::init(TpgNetwork& network,
     mFaultMap[fault->id()] = i;
   }
 
+  mFaultNum = nf;
   mRemainNum = nf;
+}
+
+// @brief 対象の全故障数を返す．
+ymuint
+MinPatDsatur2::fault_num()
+{
+  return mFaultNum;
 }
 
 // @brief 最初の故障を選ぶ．

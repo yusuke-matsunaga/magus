@@ -25,9 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] group_dominance グループ支配を計算する．
-  /// @param[in] fault_dominace 故障支配を計算する．
-  MinPatNaive(bool group_dominance,
-	      bool fault_dominance);
+  MinPatNaive(bool group_dominance);
 
   /// @brief デストラクタ
   ~MinPatNaive();
@@ -37,6 +35,15 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 故障リストを設定する．
+  set_fault_list(const vector<TpgFault*>& src_list);
 
 
 private:
@@ -55,6 +62,11 @@ private:
        TvMgr& tvmgr,
        Fsim& fsim2,
        vector<TpgFault*>& fault_list);
+
+  /// @brief 対象の全故障数を返す．
+  virtual
+  ymuint
+  fault_num();
 
   /// @brief 最初の故障を選ぶ．
   virtual

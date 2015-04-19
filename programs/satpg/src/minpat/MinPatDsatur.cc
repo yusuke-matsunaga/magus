@@ -60,6 +60,8 @@ MinPatDsatur::init(TpgNetwork& network,
 
   analyzer.init(network, tvmgr);
 
+  fault_list = analyzer.fault_list();
+
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, rg);
 
@@ -93,11 +95,19 @@ MinPatDsatur::init(TpgNetwork& network,
     fs.mPendingMap.resize(1, false);
     mFaultMap[fault->id()] = i;
   }
+  mFaultNum = nf;
   mRemainNum = nf;
 
   mSimpleConfNum = 0;
   mSatConfNum = 0;
   mCompatNum = 0;
+}
+
+// @brief 対象の全故障数を返す．
+ymuint
+MinPatDsatur::fault_num()
+{
+  return mFaultNum;
 }
 
 // @brief 最初の故障を選ぶ．

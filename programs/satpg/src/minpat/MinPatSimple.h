@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "MinPatBase.h"
+#include "MinPatNaive.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief MinPatNaive の故障の順番を改良したクラス
 //////////////////////////////////////////////////////////////////////
 class MinPatSimple :
-  public MinPatBase
+  public MinPatNaive
 {
 public:
 
@@ -55,6 +55,7 @@ private:
        Fsim& fsim2,
        vector<TpgFault*>& fault_list);
 
+#if 0
   /// @brief 最初の故障を選ぶ．
   virtual
   TpgFault*
@@ -69,18 +70,20 @@ private:
   TpgFault*
   get_next_fault(FgMgr& fgmgr,
 		 const vector<ymuint>& group_list);
-
+#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+#if 0
   // 故障リスト
   vector<TpgFault*> mFaultList;
 
   // 次の故障の位置
   ymuint mNextPos;
+#endif
 
 };
 

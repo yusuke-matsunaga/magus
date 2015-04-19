@@ -8,10 +8,10 @@
 
 
 #include "MinPatSimple.h"
-#include "TpgNetwork.h"
+//#include "TpgNetwork.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
-#include "FgMgr.h"
+
 #include "YmUtils/RandGen.h"
 
 
@@ -90,65 +90,40 @@ MinPatSimple::init(TpgNetwork& network,
 
   analyzer.init(network, tvmgr);
 
+  fault_list = analyzer.fault_list();
+
   RandGen rg;
   analyzer.get_pat_list(fsim2, tvmgr, rg);
 
   analyzer.get_dom_faults(dom_method());
 
+  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
+  ymuint nf = src_list.size();
+
 #if 0
+  // 故障を衝突数の多い順に並べる．
   ymuint sample_num = 1000;
   vector<double> conf_prob_array;
   analyzer.estimate_conflict(sample_num, conf_prob_array);
-#endif
-
-  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
-  ymuint nf = src_list.size();
-#if 0
-  // 故障を衝突数の多い順に並べる．
   vector<pair<double, TpgFault*> > tmp_list(nf);
+  vector<TpgFault*> tmp_list2(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     TpgFault* f = src_list[i];
     double cnum = conf_prob_array[f->id()];
     tmp_list[i] = make_pair(cnum, f);
   }
   sort(tmp_list.begin(), tmp_list.end(), FaultLt());
-  mFaultList.clear();
-  mFaultList.resize(nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    mFaultList[i] = tmp_list[i].second;
+    tmp_list2[i] = tmp_list[i].second;
   }
+  set_fault_list(tmp_list2);
 #else
   // 故障を検出パタン数の少ない順に並べる．
-  mFaultList = src_list;
-  sort(mFaultList.begin(), mFaultList.end(), FaultLt2(analyzer.fault_info_array()));
+  vector<TpgFault*> tmp_list = src_list;
+  sort(tmp_list.begin(), tmp_list.end(), FaultLt2(analyzer.fault_info_array()));
+  set_fault_list(tmp_list);
 #endif
-}
 
-// @brief 最初の故障を選ぶ．
-TpgFault*
-MinPatSimple::get_first_fault()
-{
-  mNextPos = 1;
-  return mFaultList[0];
-}
-
-// @brief 次に処理すべき故障を選ぶ．
-// @param[in] fgmgr 故障グループを管理するオブジェクト
-// @param[in] group_list 現在のグループリスト
-//
-// 故障が残っていなければ NULL を返す．
-TpgFault*
-MinPatSimple::get_next_fault(FgMgr& fgmgr,
-			     const vector<ymuint>& group_list)
-{
-  if ( mNextPos < mFaultList.size() ) {
-    TpgFault* fault = mFaultList[mNextPos];
-    ++ mNextPos;
-    return fault;
-  }
-  else {
-    return NULL;
-  }
 }
 
 END_NAMESPACE_YM_SATPG

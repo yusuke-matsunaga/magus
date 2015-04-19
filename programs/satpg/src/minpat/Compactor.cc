@@ -46,6 +46,12 @@ Compactor::run(FgMgr& fgmgr,
   new_group_list = group_list;
 
   for ( ; ; ) {
+    cout << "\r";
+    cout << "# of groups = " << new_group_list.size();
+    cout.flush();
+#if 0
+    phase0(fgmgr, new_group_list);
+#endif
     ymuint ng0 = new_group_list.size();
     phase1(fgmgr, new_group_list);
     if ( new_group_list.size() == ng0 ) {
@@ -53,6 +59,93 @@ Compactor::run(FgMgr& fgmgr,
     }
 
     phase2(fgmgr, new_group_list);
+  }
+}
+
+// @brief phase-0
+// @param[in] fmgr 故障グループマネージャ
+// @param[inout] group_list 選択されたグループ番号のリスト
+//
+// 他のグループに追加条件なしで移動できる故障を見つけ，移動させる．
+void
+Compactor::phase0(FgMgr& fgmgr,
+		  vector<ymuint>& group_list)
+{
+  ymuint max_group_id = fgmgr.group_num();
+
+  vector<bool> locked(max_group_id, false);
+  for ( ; ; ) {
+    ymuint min_gid = max_group_id;
+    ymuint min_size = 0;
+    ymuint ng = group_list.size();
+
+    // 要素数が最小のグループを求める．
+    for (ymuint i = 0; i < ng; ++ i) {
+      ymuint gid = group_list[i];
+      if ( locked[gid] ) {
+	continue;
+      }
+
+      ymuint size = fgmgr.fault_list(gid).size();
+      if ( min_size == 0 || min_size > size ) {
+	min_size = size;
+	min_gid = gid;
+      }
+    }
+    if ( min_gid == max_group_id ) {
+      // すべてのグループが調査済みだった．
+      break;
+    }
+
+    // min_gid のグループの故障を他のグループへ移動できるか調べる．
+    bool red = true;
+    const vector<TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
+    vector<TpgFault*> del_list;
+    for (ymuint i = 0; i < fault_list.size(); ++ i) {
+      TpgFault* fault = fault_list[i];
+
+      SatEngine engine(string(), string(), NULL);
+      GvalCnf gval_cnf(mMaxNodeId);
+      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+
+      // fault を検出できない条件 CNF を作る．
+      fval_cnf.make_cnf(engine, fault, kVal0);
+
+      // fault がマージできる他のグループを探す．
+      bool found = false;
+      for (ymuint j = 0; j < ng; ++ j) {
+	ymuint gid = group_list[j];
+	if ( gid == min_gid ) {
+	  continue;
+	}
+
+	const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
+	if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
+	  fgmgr.add_fault(gid, fault);
+	  del_list.push_back(fault);
+	  break;
+	}
+      }
+    }
+    if ( del_list.size() == fault_list.size() ) {
+      fgmgr.delete_group(min_gid);
+      // group_list から min_gid を除く．
+      ymuint wpos = 0;
+      for (ymuint rpos = 0; rpos < ng; ++ rpos) {
+	ymuint gid = group_list[rpos];
+	if ( gid != min_gid ) {
+	  if ( wpos != rpos ) {
+	    group_list[wpos] = gid;
+	  }
+	  ++ wpos;
+	}
+      }
+      group_list.erase(group_list.begin() + wpos, group_list.end());
+    }
+    else if ( !del_list.empty() ) {
+      fgmgr.delete_fault(min_gid, del_list);
+    }
+    locked[min_gid] = true;
   }
 }
 

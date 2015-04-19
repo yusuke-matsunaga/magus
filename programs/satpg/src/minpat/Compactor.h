@@ -53,6 +53,15 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief phase-0
+  /// @param[in] fmgr 故障グループマネージャ
+  /// @param[inout] group_list 選択されたグループ番号のリスト
+  ///
+  /// 他のグループに追加条件なしで移動できる故障を見つけ，移動させる．
+  void
+  phase0(FgMgr& fgmgr,
+	 vector<ymuint>& group_list);
+
   /// @brief phase-1
   /// @param[in] fmgr 故障グループマネージャ
   /// @param[inout] group_list 選択されたグループ番号のリスト

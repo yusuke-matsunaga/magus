@@ -54,6 +54,11 @@ private:
        Fsim& fsim2,
        vector<TpgFault*>& fault_list);
 
+  /// @brief 対象の全故障数を返す．
+  virtual
+  ymuint
+  fault_num();
+
   /// @brief 最初の故障を選ぶ．
   virtual
   TpgFault*
@@ -117,6 +122,9 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
+
+  // 故障数
+  ymuint mFaultNum;
 
   // 故障解析器
   FaultAnalyzer mAnalyzer;

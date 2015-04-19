@@ -63,7 +63,6 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool dsatur2 = mPoptDsatur2->is_specified();
   int verbose = mPoptVerbose->is_specified() ? mPoptVerbose->val() : 0;
   bool group_dominance = mPoptGroupDominance->is_specified();
-  bool fault_dominance = mPoptFaultDominance->is_specified();
 
   MinPat* minpat = NULL;
 
@@ -77,7 +76,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
     minpat = new_MinPatDsatur2();
   }
   else {
-    minpat = new_MinPat(group_dominance, fault_dominance);
+    minpat = new_MinPat(group_dominance);
   }
 
   minpat->set_verbose(verbose);

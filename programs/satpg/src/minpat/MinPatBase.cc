@@ -31,14 +31,10 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] group_dominance グループ支配を計算する．
-// @param[in] fault_dominace 故障支配を計算する．
-MinPatBase::MinPatBase(bool group_dominance,
-		       bool fault_dominance)
+MinPatBase::MinPatBase(bool group_dominance)
 {
   mVerbose = 0;
   mGroupDominance = group_dominance;
-  mFaultDominance = fault_dominance;
   mDomMethod = 2;
 }
 
@@ -67,13 +63,13 @@ MinPatBase::run(TpgNetwork& network,
 
   vector<TpgFault*> fault_list;
   init(network, tvmgr, fsim2, fault_list);
-  ymuint nf = fault_list.size();
 
   StopWatch local_timer;
   local_timer.start();
 
   FgMgr fgmgr(mMaxNodeId);
   vector<ymuint> group_list;
+  ymuint nf = fault_num();
 
   { // 最初の故障を選ぶ
     TpgFault* fault = get_first_fault();
@@ -90,9 +86,8 @@ MinPatBase::run(TpgNetwork& network,
   for (ymuint c = 0; ; ++ c) {
 
     if ( verbose() > 1 ) {
-      cout << "\r                       ";
       cout << "\r   " << setw(6) << c << " / " << setw(6) << nf
-	   << " : " << setw(4) << fgmgr.group_num();
+	   << " : " << setw(6) << fgmgr.group_num();
       cout.flush();
     }
 
@@ -100,60 +95,6 @@ MinPatBase::run(TpgNetwork& network,
     TpgFault* fault = get_next_fault(fgmgr, group_list);
     if ( fault == NULL ) {
       break;
-    }
-
-    // 故障を支配しているグループを見つける．
-    if ( mGroupDominance ) {
-      GvalCnf gval_cnf(mMaxNodeId);
-      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-      SatEngine engine(string(), string(), NULL);
-
-      NodeSet node_set1;
-      node_set1.mark_region(mMaxNodeId, fault->node());
-
-      // fault が見つからない条件を作る．
-      fval_cnf.make_cnf(engine, fault, node_set1, kVal0);
-
-      bool found = false;
-      for (ymuint i = 0; i < group_list.size(); ++ i) {
-	ymuint gid = group_list[i];
-	const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
-	if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
-	  // suf_list0 のもとで fault が見つからないことがない
-	  // -> 無条件で fault が見つかるということ．
-	  found = true;
-	  bool single_dom = false;
-	  if ( mFaultDominance ) {
-	    const vector<TpgFault*>& fault_list = fgmgr.fault_list(gid);
-	    for (ymuint i = 0; i < fault_list.size(); ++ i) {
-	      TpgFault* fault2 = fault_list[i];
-	      GvalCnf gval_cnf(mMaxNodeId);
-	      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-	      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-	      SatEngine engine(string(), string(), NULL);
-
-	      NodeSet node_set2;
-	      node_set2.mark_region(mMaxNodeId, fault2->node());
-
-	      fval_cnf1.make_cnf(engine, fault, node_set1, kVal0);
-	      fval_cnf2.make_cnf(engine, fault2, node_set2, kVal1);
-
-	      if ( engine.check_sat() == kB3False ) {
-		single_dom = true;
-		break;
-	      }
-	    }
-
-	  }
-	  if ( !single_dom ) {
-	    fgmgr.add_fault(gid, fault);
-	  }
-	  break;
-	}
-      }
-      if ( found ) {
-	continue;
-      }
     }
 
     // 故障を追加できるグループを見つける．
@@ -264,6 +205,24 @@ MinPatBase::find_group(FgMgr& fgmgr,
 		       TpgFault* fault,
 		       const vector<ymuint>& group_list)
 {
+  if ( mGroupDominance ) {
+    GvalCnf gval_cnf(mMaxNodeId);
+    FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+    SatEngine engine(string(), string(), NULL);
+
+    // fault が見つからない条件を作る．
+    fval_cnf.make_cnf(engine, fault, kVal0);
+
+    for (ymuint i = 0; i < group_list.size(); ++ i) {
+      ymuint gid = group_list[i];
+      const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
+      if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
+	// suf_lib0 のもとでは必ず見つかるということ．
+	return gid;
+      }
+    }
+  }
+
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);

@@ -53,6 +53,11 @@ private:
        Fsim& fsim2,
        vector<TpgFault*>& fault_list);
 
+  /// @brief 対象の全故障数を返す．
+  virtual
+  ymuint
+  fault_num();
+
   /// @brief 最初の故障を選ぶ．
   virtual
   TpgFault*
@@ -117,6 +122,9 @@ private:
 
   // 故障番号から FaultStruct の位置を引くためのマップ
   vector<ymuint> mFaultMap;
+
+  // 故障数
+  ymuint mFaultNum;
 
   // 未処理の故障数
   ymuint mRemainNum;

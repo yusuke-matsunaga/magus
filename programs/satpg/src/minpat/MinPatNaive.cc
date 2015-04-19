@@ -15,12 +15,10 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 // @param[in] group_dominance グループ支配を計算する．
-// @param[in] fault_dominace 故障支配を計算する．
 MinPat*
-new_MinPat(bool group_dominance,
-	   bool fault_dominance)
+new_MinPat(bool group_dominance)
 {
-  return new MinPatNaive(group_dominance, fault_dominance);
+  return new MinPatNaive(group_dominance);
 }
 
 
@@ -30,10 +28,8 @@ new_MinPat(bool group_dominance,
 
 // @brief コンストラクタ
 // @param[in] group_dominance グループ支配を計算する．
-// @param[in] fault_dominace 故障支配を計算する．
-MinPatNaive::MinPatNaive(bool group_dominance,
-			 bool fault_dominance) :
-  MinPatBase(group_dominance, fault_dominance)
+MinPatNaive::MinPatNaive(bool group_dominance) :
+  MinPatBase(group_dominance)
 {
 }
 
@@ -59,14 +55,26 @@ MinPatNaive::init(TpgNetwork& network,
 
   analyzer.init(network, tvmgr);
 
-  const vector<TpgFault*>& src_list = analyzer.dom_fault_list();
-  ymuint nf = src_list.size();
+  const vector<TpgFault*>& src_list = analyzer.fault_list();
+  set_fault_list(src_list);
+}
 
+// @brief 故障リストを設定する．
+MinPatNaive::set_fault_list(const vector<TpgFault*>& src_list)
+{
+  ymuint nf = src_list.size();
   mFaultList.clear();
   mFaultList.resize(nf);
   for (ymuint i = 0; i < nf; ++ i) {
     mFaultList[i] = src_list[i];
   }
+}
+
+// @brief 対象の全故障数を返す．
+ymuint
+MinPatNaive::fault_num()
+{
+  return mFaultList.size();
 }
 
 // @brief 最初の故障を選ぶ．

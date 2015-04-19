@@ -63,11 +63,9 @@ public:
 
 /// @brief インスタンスを生成する関数
 // @param[in] group_dominance グループ支配を計算する．
-// @param[in] fault_dominace 故障支配を計算する．
 extern
 MinPat*
-new_MinPat(bool group_dominance,
-	   bool fault_dominance);
+new_MinPat(bool group_dominance);
 
 /// @brief インスタンスを生成する関数
 // @param[in] group_dominance グループ支配を計算する．

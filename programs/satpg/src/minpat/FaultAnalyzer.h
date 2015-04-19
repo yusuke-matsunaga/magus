@@ -70,24 +70,6 @@ public:
   void
   get_dom_faults(ymuint method);
 
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults0();
-
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults1();
-
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults2(ymuint option = 0);
-
   /// @brief 故障間の衝突性を調べる．
   void
   analyze_conflict();
@@ -113,6 +95,10 @@ public:
   /// @brief 衝突リストを得る．
   void
   get_conf_list(vector<pair<ymuint, ymuint> >& conf_list);
+
+  /// @brief 検出可能な故障のリストを得る．
+  cont vector<TpgFault*>&
+  fault_list() const;
 
   /// @brief 支配故障リストを得る．
   const vector<TpgFault*>&
@@ -143,6 +129,18 @@ private:
   Bool3
   analyze_fault(TpgFault* fault,
 		TvMgr& tvmgr);
+
+  /// @brief 支配故障を求める．
+  ///
+  /// 結果は mDomFaultList に格納される．
+  void
+  get_dom_faults1();
+
+  /// @brief 支配故障を求める．
+  ///
+  /// 結果は mDomFaultList に格納される．
+  void
+  get_dom_faults2(ymuint option = 0);
 
   /// @brief 1つの故障と複数の故障間の衝突性を調べる．
   /// @param[in] f1 対象の故障
