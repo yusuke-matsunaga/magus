@@ -66,6 +66,108 @@ check_intersect(const vector<ymuint>& list1,
   return false;
 }
 
+// パタン番号リストの包含関係を調べる．
+// 0 bit: list1 のみの要素がある．
+// 1 bit: list2 のみの要素がある．
+//
+// リストの内容は昇順にソートされていると仮定する．
+inline
+ymuint
+check_pat_list1(const vector<ymuint>& tv_list1,
+		const vector<ymuint>& tv_list2)
+{
+  bool flag_10 = false;
+  bool flag_01 = false;
+  bool flag_11 = false;
+  ymuint ans = 0U;
+  ymuint n1 = tv_list1.size();
+  ymuint n2 = tv_list2.size();
+  ymuint p1 = 0;
+  ymuint p2 = 0;
+  ymuint v1 = tv_list1[p1];
+  ymuint v2 = tv_list2[p2];
+  for ( ; ; ) {
+    if ( v1 < v2 ) {
+      ans |= 1U;
+      ++ p1;
+      if ( p1 >= n1 ) {
+	break;
+      }
+      v1 = tv_list1[p1];
+    }
+    else if ( v1 > v2 ) {
+      ans |= 2U;
+      ++ p2;
+      if ( p2 >= n2 ) {
+	break;
+      }
+      v2 = tv_list2[p2];
+    }
+    else {
+      ++ p1;
+      ++ p2;
+      if ( p1 >= n1 ) {
+	break;
+      }
+      v1 = tv_list1[p1];
+      if ( p2 >= n2 ) {
+	break;
+      }
+      v2 = tv_list2[p2];
+    }
+    if ( ans == 3U ) {
+      return ans;
+    }
+  }
+  if ( p1 < n1 ) {
+    ans |= 1U;
+  }
+  if ( p2 < n2 ) {
+    ans |= 2U;
+  }
+  return ans;
+}
+
+// パタン番号リストの包含関係を調べる．
+// true  list1 と list2 に共通の要素がある．
+//
+// リストの内容は昇順にソートされていると仮定する．
+inline
+bool
+check_pat_list2(const vector<ymuint>& tv_list1,
+		const vector<ymuint>& tv_list2)
+{
+  bool flag_10 = false;
+  bool flag_01 = false;
+  bool flag_11 = false;
+  ymuint n1 = tv_list1.size();
+  ymuint n2 = tv_list2.size();
+  ymuint p1 = 0;
+  ymuint p2 = 0;
+  ymuint v1 = tv_list1[p1];
+  ymuint v2 = tv_list2[p2];
+  for ( ; ; ) {
+    if ( v1 < v2 ) {
+      ++ p1;
+      if ( p1 >= n1 ) {
+	return false;
+      }
+      v1 = tv_list1[p1];
+    }
+    else if ( v1 > v2 ) {
+      ++ p2;
+      if ( p2 >= n2 ) {
+	return false;
+      }
+      v2 = tv_list2[p2];
+    }
+    else {
+      return true;
+    }
+  }
+  return false;
+}
+
 END_NONAMESPACE
 
 
@@ -117,7 +219,6 @@ ConflictChecker::analyze_conflict(const vector<TpgFault*>& fault_list)
   mConflictStats.conf4_timer.reset();
   mConflictStats.int1_timer.reset();
   mConflictStats.int2_timer.reset();
-  mConflictStats.conf_count = 0;
   mConflictStats.conf1_count = 0;
   mConflictStats.conf2_count = 0;
   mConflictStats.conf3_count = 0;

@@ -28,12 +28,20 @@ BEGIN_NONAMESPACE
 
 struct FaultLt
 {
-  bool
-  operator()(const pair<double, TpgFault*>& left,
-	     const pair<double, TpgFault*>& right)
+  FaultLt(ConflictChecker& checker) :
+    mChecker(checker)
   {
-    return left.first > right.first;
   }
+
+  bool
+  operator()(TpgFault* left,
+	     TpgFault* right)
+  {
+    return mChecker.conflict_list(left->id()).size() > mChecker.conflict_list(right->id()).size();
+  }
+
+  ConflictChecker& mChecker;
+
 };
 
 END_NONAMESPACE
@@ -73,21 +81,16 @@ MinPatSimple2::init(const vector<TpgFault*>& fault_list,
   // 故障を衝突数の多い順に並べる．
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
 
+#if 0
   ymuint sample_num = 1000;
   vector<double> conf_prob_array;
   checker2.estimate_conflict(dom_fault_list, sample_num, conf_prob_array);
-  vector<pair<double, TpgFault*> > tmp_list(nf);
-  vector<TpgFault*> tmp_list2(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = dom_fault_list[i];
-    double cnum = conf_prob_array[f->id()];
-    tmp_list[i] = make_pair(cnum, f);
-  }
-  sort(tmp_list.begin(), tmp_list.end(), FaultLt());
-  for (ymuint i = 0; i < nf; ++ i) {
-    tmp_list2[i] = tmp_list[i].second;
-  }
-  set_fault_list(tmp_list2);
+#else
+  checker2.analyze_conflict(dom_fault_list);
+#endif
+  vector<TpgFault*> tmp_list = dom_fault_list;
+  sort(tmp_list.begin(), tmp_list.end(), FaultLt(checker2));
+  set_fault_list(tmp_list);
 
 }
 
