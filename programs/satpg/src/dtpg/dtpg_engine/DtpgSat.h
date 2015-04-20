@@ -15,6 +15,7 @@
 #include "DtpgStats.h"
 #include "NodeValList.h"
 #include "YmLogic/Bool3.h"
+#include "YmLogic/Literal.h"
 #include "YmLogic/sat_nsdef.h"
 #include "YmLogic/SatStats.h"
 #include "YmUtils/StopWatch.h"
@@ -120,6 +121,7 @@ protected:
   /// @param[in] engine SAT エンジン
   Bool3
   solve(SatEngine& engine,
+	const vector<Literal>& assumptions,
 	TpgFault* f,
 	const NodeSet& node_set,
 	const VidMap& gvar_map,

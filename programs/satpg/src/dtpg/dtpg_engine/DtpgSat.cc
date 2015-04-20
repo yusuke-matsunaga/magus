@@ -143,6 +143,7 @@ DtpgSat::timer_stop()
 // @brief 一つの SAT問題を解く．
 Bool3
 DtpgSat::solve(SatEngine& engine,
+	       const vector<Literal>& assumptions,
 	       TpgFault* f,
 	       const NodeSet& node_set,
 	       const VidMap& gvar_map,
@@ -151,7 +152,7 @@ DtpgSat::solve(SatEngine& engine,
   vector<Bool3> model;
   SatStats sat_stats;
   USTime time;
-  Bool3 ans = engine.solve(model, sat_stats, time);
+  Bool3 ans = engine.solve(assumptions, model, sat_stats, time);
 
   if ( ans == kB3True ) {
     // パタンが求まった．

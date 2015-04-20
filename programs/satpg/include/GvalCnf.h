@@ -22,9 +22,6 @@ BEGIN_NAMESPACE_YM_SATPG
 //////////////////////////////////////////////////////////////////////
 class GvalCnf
 {
-  friend class SatEngine;
-  friend class FvalCnf;
-
 public:
 
   /// @brief コンストラクタ
@@ -72,7 +69,7 @@ public:
   /// @param[in] node ノード
   /// @param[in] var 変数番号
   void
-  set_vid(const TpgNode* node,
+  set_var(const TpgNode* node,
 	  VarId var);
 
 
@@ -80,30 +77,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-#if 0
-  /// @brief NodeSet の内容に応じてCNFを作る．
-  /// @param[in] engine SATエンジン
-  /// @param[in] node_set 対象のノード集合
-  ///
-  /// 具体的には tfi_tfo_node() を対象にする．
-  void
-  make_cnf(SatEngine& engine,
-	   const NodeSet& node_set);
 
-  /// @brief ノードのTFI全体のCNFを作る．
-  /// @param[in] engine SATエンジン
-  /// @param[in] node ノード
-  void
-  make_cnf(SatEngine& engine,
-	   const TpgNode* node);
-
-  /// @brief 割当リストに対応する仮定を追加する．
-  /// @param[in] engine SATエンジン
-  /// @param[in] assign_list 割当リスト
-  void
-  add_assumption(SatEngine& engine,
-		 const NodeValList& assign_list);
-#endif
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -127,6 +101,7 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // @brief ノード番号の最大値を返す．
+inline
 ymuint
 GvalCnf::max_node_id() const
 {
@@ -134,6 +109,7 @@ GvalCnf::max_node_id() const
 }
 
 // @brief 変数マップを得る．
+inline
 const VidMap&
 GvalCnf::var_map() const
 {
@@ -172,10 +148,9 @@ GvalCnf::set_mark(const TpgNode* node)
 // @param[in] var 変数番号
 inline
 void
-GvalCnf::set_vid(TpgNode* node,
+GvalCnf::set_var(const TpgNode* node,
 		 VarId var)
 {
-  ASSERT_COND( id < mMaxId );
   mVarMap.set_vid(node, var);
 }
 

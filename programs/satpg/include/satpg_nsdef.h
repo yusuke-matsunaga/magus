@@ -102,6 +102,7 @@ class DtpgStats;
 class SatEngine;
 class GvalCnf;
 class FvalCnf;
+class MvalCnf;
 class ValMap;
 class VidMap;
 class LitMap;

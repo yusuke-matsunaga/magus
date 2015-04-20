@@ -31,7 +31,6 @@ FvalCnf::FvalCnf(ymuint max_node_id,
 		 GvalCnf& gval_cnf) :
   mMaxId(max_node_id),
   mGvalCnf(gval_cnf),
-  mMark(max_node_id),
   mFvarMap(max_node_id),
   mDvarMap(max_node_id)
 {
@@ -48,12 +47,11 @@ void
 FvalCnf::init(ymuint max_node_id)
 {
   mMaxId = max_node_id;
-  mMark.clear();
-  mMark.resize(max_node_id, false);
   mFvarMap.init(max_node_id);
   mDvarMap.init(max_node_id);
 }
 
+#if 0
 // @brief 故障回路のCNFを作る．
 // @param[in] engine SATエンジン
 // @param[in] fault 故障
@@ -143,6 +141,7 @@ FvalCnf::make_cnf(SatEngine& engine,
     }
   }
 }
+#endif
 
 // @brief 十分割当リストを求める．
 // @param[in] sat_model SAT問題の解
@@ -166,6 +165,7 @@ FvalCnf::get_pi_suf_list(const vector<Bool3>& sat_model,
   backtracer(fault->node(), node_set, val_map, pi_suf_list);
 }
 
+#if 0
 // @brief 正常回路のCNFを生成するクラスを返す．
 GvalCnf&
 FvalCnf::gval_cnf()
@@ -200,34 +200,6 @@ FvalCnf::max_node_id() const
 {
   return mMaxId;
 }
-
-// @brief TFO にマークをつけてCNF式を作る．
-// @param[in] engine SATエンジン
-// @param[in] node ノード
-void
-FvalCnf::mark_tfo(SatEngine& engine,
-		  const TpgNode* node)
-{
-  if ( mMark[node->id()] ) {
-    return;
-  }
-  mMark[node->id()] = true;
-
-  VarId fvar = engine.new_var();
-  mFvarMap.set_vid(node, fvar);
-  VarId dvar = engine.new_var();
-  mDvarMap.set_vid(node, dvar);
-
-  mFconeList.push_back(node);
-  if ( node->is_output() ) {
-    mOutputList.push_back(node);
-  }
-
-  ymuint nfo = node->active_fanout_num();
-  for (ymuint i = 0; i < nfo; ++ i) {
-    const TpgNode* onode = node->active_fanout(i);
-    mark_tfo(engine, onode);
-  }
-}
+#endif
 
 END_NAMESPACE_YM_SATPG

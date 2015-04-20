@@ -48,6 +48,7 @@ set (dtpg_SOURCES
   src/dtpg/engine/VidLitMap.cc
   src/dtpg/engine/GvalCnf.cc
   src/dtpg/engine/FvalCnf.cc
+  src/dtpg/engine/MvalCnf.cc
 
   src/dtpg/dtpg_engine/Extractor.cc
   src/dtpg/dtpg_engine/LitMap.cc

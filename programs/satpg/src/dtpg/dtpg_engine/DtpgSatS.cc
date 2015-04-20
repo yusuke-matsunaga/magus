@@ -91,9 +91,7 @@ DtpgSatS::run(TpgNetwork& network,
       cnf_end();
 
       // 故障に対するテスト生成を行なう．
-      engine.assumption_begin();
-
-      solve(engine, fault, node_set, fval_cnf.gvar_map(), fval_cnf.fvar_map());
+      solve(engine, vector<Literal>(), fault, node_set, fval_cnf.gvar_map(), fval_cnf.fvar_map());
     }
   }
 
