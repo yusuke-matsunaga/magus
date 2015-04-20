@@ -54,6 +54,22 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief NodeSet の内容に応じて正常回路のCNFを作る．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] node_set 対象のノード集合
+  ///
+  /// 具体的には tfo_tfi_node() を対象にする．
+  void
+  make_gval_cnf(GvalCnf& gval_cnf,
+		const NodeSet& node_set);
+
+  /// @brief ノードのTFI全体の正常回路のCNFを作る．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] node ノード
+  void
+  make_gval_cnf(GvalCnf& gval_cnf,
+		const TpgNode* node);
+
   /// @brief 故障回路のCNFを作る．
   /// @param[in] fval_cnf 故障回路用のデータ構造
   /// @param[in] fault 故障
@@ -81,6 +97,13 @@ public:
   make_fval_cnf(FvalCnf& fval_cnf,
 		TpgFault* fault,
 		Val3 detect);
+
+  /// @brief 割当リストに対応する仮定を追加する．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assign_list 割当リスト
+  void
+  add_assumption(GvalCnf& gval_cnf,
+		 const NodeValList& assign_list);
 
   /// @brief 割当リストのもとでチェックを行う．
   /// @param[in] gval_cnf 正常回路用のデータ構造
@@ -165,6 +188,9 @@ public:
 		  const VidMap& gvar_map,
 		  const VidMap& fvar_map,
 		  const VidMap& dvar_map);
+
+
+private:
 
   /// @brief ゲートの入出力の関係を表す CNF を作る．
   /// @param[in] gate_type ゲートの種類
@@ -491,6 +517,8 @@ SatEngine::solve(vector<Bool3>& model,
 // @brief 割当リストのもとでチェックを行う．
 // @param[in] gval_cnf 正常回路用のデータ構造
 // @param[in] assign_list 割当リスト
+//
+// こちらは結果のみを返す．
 inline
 Bool3
 SatEngine::check_sat(GvalCnf& gval_cnf,
@@ -503,6 +531,8 @@ SatEngine::check_sat(GvalCnf& gval_cnf,
 // @brief 割当リストのもとでチェックを行う．
 // @param[in] gval_cnf 正常回路用のデータ構造
 // @param[in] assign_list1, assign_list2 割当リスト
+//
+// こちらは結果のみを返す．
 inline
 Bool3
 SatEngine::check_sat(GvalCnf& gval_cnf,
@@ -515,8 +545,6 @@ SatEngine::check_sat(GvalCnf& gval_cnf,
 
 // @brief SAT 問題を解く．
 // @param[out] sat_model SATの場合の解
-//
-// こちらは結果のみを返す．
 inline
 Bool3
 SatEngine::check_sat(vector<Bool3>& sat_model)

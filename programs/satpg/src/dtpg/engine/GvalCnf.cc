@@ -45,6 +45,7 @@ GvalCnf::init(ymuint max_node_id)
   mVarMap.init(max_node_id);
 }
 
+#if 0
 // @brief NodeSet の内容に応じてCNFを作る．
 // @param[in] engine SATエンジン
 // @param[in] node_set 対象のノード集合
@@ -117,19 +118,6 @@ GvalCnf::add_assumption(SatEngine& engine,
     }
   }
 }
-
-// @brief 変数マップを得る．
-const VidMap&
-GvalCnf::var_map() const
-{
-  return mVarMap;
-}
-
-// @brief ノード番号の最大値を返す．
-ymuint
-GvalCnf::max_node_id() const
-{
-  return mMaxId;
-}
+#endif
 
 END_NAMESPACE_YM_SATPG

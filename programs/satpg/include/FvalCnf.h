@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "TpgNode.h"
 #include "GenVidMap.h"
 #include "Val3.h"
 #include "YmLogic/Bool3.h"
@@ -80,6 +81,25 @@ public:
   ymuint
   max_node_id() const;
 
+  /// @brief ノードのマークを調べる．
+  /// @param[in] node ノード
+  bool
+  mark(const TpgNode* node) const;
+
+  /// @brief ノードにマークをつける．
+  /// @param[in] node ノード
+  void
+  set_mark(const TpgNode* node);
+
+  /// @brief ノードに故障値用の変数番号を割り当てる．
+  /// @param[in] node ノード
+  /// @param[in] fvar 故障値の変数番号
+  /// @param[in] dvar 伝搬値の変数番号
+  void
+  set_vid(const TpgNode* node,
+	  VarId fvar,
+	  VarId dvar);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -139,6 +159,43 @@ private:
   vector<const TpgNode*> mOutputList;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief ノードのマークを調べる．
+// @param[in] node ノード
+inline
+bool
+FvalCnf::mark(const TpgNode* node) const
+{
+  return mMark[node->id()];
+}
+
+// @brief ノードにマークをつける．
+// @param[in] node ノード
+inline
+void
+FvalCnf::set_mark(const TpgNode* node)
+{
+  mMark[node->id()] = true;
+}
+
+// @brief ノードに故障値用の変数番号を割り当てる．
+// @param[in] node ノード
+// @param[in] fvar 故障値の変数番号
+// @param[in] dvar 伝搬値の変数番号
+inline
+void
+FvalCnf::set_vid(const TpgNode* node,
+		 VarId fvar,
+		 VarId dvar)
+{
+  mFvarMap.set_vid(node, fvar);
+  mDvarMap.set_vid(node, dvar);
+}
 
 END_NAMESPACE_YM_SATPG
 
