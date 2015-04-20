@@ -12,5 +12,5 @@ if [string match *.blif $filename] {
   exit 1
 }
 
-puts "$filename *** minpat $options *** results"
+puts "minpat $options"
 eval atpg::minpat -print_stats $options
