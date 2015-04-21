@@ -45,13 +45,13 @@ MinPatDsatur2::~MinPatDsatur2()
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatDsatur2::init(const vector<TpgFault*>& fault_list,
+MinPatDsatur2::init(const vector<const TpgFault*>& fault_list,
 		    TvMgr& tvmgr,
 		    Fsim& fsim2)
 {
   DomChecker checker(analyzer(), tvmgr, fsim2);
 
-  vector<TpgFault*> dom_fault_list;
+  vector<const TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
@@ -61,7 +61,7 @@ MinPatDsatur2::init(const vector<TpgFault*>& fault_list,
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = dom_fault_list[i];
+    const TpgFault* fault = dom_fault_list[i];
     if ( max_fault_id < fault->id() ) {
       max_fault_id = fault->id();
     }
@@ -74,7 +74,7 @@ MinPatDsatur2::init(const vector<TpgFault*>& fault_list,
   mFaultMap.resize(max_fault_id);
 
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = dom_fault_list[i];
+    const TpgFault* fault = dom_fault_list[i];
     FaultStruct& fs = mFaultStructList[i];
     fs.mFault = fault;
     fs.mSelected = false;
@@ -96,7 +96,7 @@ MinPatDsatur2::fault_num()
 }
 
 // @brief 最初の故障を選ぶ．
-TpgFault*
+const TpgFault*
 MinPatDsatur2::get_first_fault()
 {
   ASSERT_COND( mRemainNum > 0 );
@@ -124,7 +124,7 @@ MinPatDsatur2::get_first_fault()
 // @param[in] group_list 現在のグループリスト
 //
 // 故障が残っていなければ NULL を返す．
-TpgFault*
+const TpgFault*
 MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
 			      const vector<ymuint>& group_list)
 {
@@ -199,7 +199,7 @@ MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatDsatur2::find_group(FgMgr& fgmgr,
-			  TpgFault* fault,
+			  const TpgFault* fault,
 			  const vector<ymuint>& group_list)
 {
   ymuint gid = MinPatBase::find_group(fgmgr, fault, group_list);

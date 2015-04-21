@@ -84,7 +84,7 @@ protected:
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<TpgFault*>& fault_list,
+  init(const vector<const TpgFault*>& fault_list,
        TvMgr& tvmgr,
        Fsim& fsim2) = 0;
 
@@ -95,7 +95,7 @@ protected:
 
   /// @brief 最初の故障を選ぶ．
   virtual
-  TpgFault*
+  const TpgFault*
   get_first_fault() = 0;
 
   /// @brief 次に処理すべき故障を選ぶ．
@@ -104,7 +104,7 @@ protected:
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
-  TpgFault*
+  const TpgFault*
   get_next_fault(FgMgr& fgmgr,
 		 const vector<ymuint>& group_list) = 0;
 
@@ -118,7 +118,7 @@ protected:
   virtual
   ymuint
   find_group(FgMgr& fgmgr,
-	     TpgFault* fault,
+	     const TpgFault* fault,
 	     const vector<ymuint>& group_list);
 
   /// @brief テストパタンを作る．

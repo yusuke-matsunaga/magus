@@ -62,7 +62,7 @@ MinPatBase::run(TpgNetwork& network,
 
   mAnalyzer.set_verbose(verbose());
 
-  vector<TpgFault*> fault_list;
+  vector<const TpgFault*> fault_list;
   mAnalyzer.init(network, tvmgr, fault_list);
 
   init(fault_list, tvmgr, fsim2);
@@ -75,7 +75,7 @@ MinPatBase::run(TpgNetwork& network,
   ymuint nf = fault_num();
 
   { // 最初の故障を選ぶ
-    TpgFault* fault = get_first_fault();
+    const TpgFault* fault = get_first_fault();
 
     // 最初のグループを作る．
     ymuint gid = fgmgr.new_group();
@@ -95,7 +95,7 @@ MinPatBase::run(TpgNetwork& network,
     }
 
     // 故障を選ぶ．
-    TpgFault* fault = get_next_fault(fgmgr, group_list);
+    const TpgFault* fault = get_next_fault(fgmgr, group_list);
     if ( fault == NULL ) {
       break;
     }
@@ -207,7 +207,7 @@ MinPatBase::dom_method() const
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatBase::find_group(FgMgr& fgmgr,
-		       TpgFault* fault,
+		       const TpgFault* fault,
 		       const vector<ymuint>& group_list)
 {
   const NodeSet& node_set = analyzer().node_set(fault->id());

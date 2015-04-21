@@ -182,12 +182,12 @@ Fsim2::set_network(const TpgNetwork& network)
   //////////////////////////////////////////////////////////////////////
   // 故障リストの設定
   //////////////////////////////////////////////////////////////////////
-  const vector<TpgFault*>& rep_faults = network.rep_faults();
+  const vector<const TpgFault*>& rep_faults = network.rep_faults();
   ymuint nf = rep_faults.size();
   mSimFaults.resize(nf);
   mFaultArray.resize(network.max_fault_id());
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = rep_faults[i];
+    const TpgFault* f = rep_faults[i];
     const TpgNode* node = f->node();
     SimNode* simnode = find_simnode(node);
     ymuint ipos = 0;
@@ -208,7 +208,7 @@ Fsim2::set_network(const TpgNetwork& network)
 
 // @brief 故障にスキップマークをつける．
 void
-Fsim2::set_skip(TpgFault* f)
+Fsim2::set_skip(const TpgFault* f)
 {
   mFaultArray[f->id()]->mSkip = true;
 }
@@ -218,7 +218,7 @@ Fsim2::set_skip(TpgFault* f)
 //
 // スキップマークは消される．
 void
-Fsim2::set_faults(const vector<TpgFault*>& fault_list)
+Fsim2::set_faults(const vector<const TpgFault*>& fault_list)
 {
   HashSet<ymuint> fault_set;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
@@ -445,7 +445,7 @@ Fsim2::ppsfp(const vector<TestVector*>& tv_array,
       }
       PackedVal dpat = obs & ff->mObsMask;
       if ( dpat ) {
-	TpgFault* f = ff->mOrigF;
+	const TpgFault* f = ff->mOrigF;
 	op(f, dpat);
       }
     }
@@ -459,7 +459,7 @@ Fsim2::ppsfp(const vector<TestVector*>& tv_array,
 // @retval false 故障の検出が行えなかった．
 bool
 Fsim2::spsfp(TestVector* tv,
-	     TpgFault* f)
+	     const TpgFault* f)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -480,7 +480,7 @@ Fsim2::spsfp(TestVector* tv,
 // @retval false 故障の検出が行えなかった．
 bool
 Fsim2::spsfp(const NodeValList& assign_list,
-	     TpgFault* f)
+	     const TpgFault* f)
 {
   ymuint npi = mNetwork->input_num2();
 
@@ -507,7 +507,7 @@ Fsim2::spsfp(const NodeValList& assign_list,
 // @retval true 故障の検出が行えた．
 // @retval false 故障の検出が行えなかった．
 bool
-Fsim2::_spsfp(TpgFault* f)
+Fsim2::_spsfp(const TpgFault* f)
 {
   // 正常値の計算を行う．
   for (vector<SimNode*>::iterator q = mLogicArray.begin();
@@ -606,7 +606,7 @@ Fsim2::ffr_simulate(SimFFR* ffr)
     SimNode* simnode = ff->mNode;
     PackedVal lobs = simnode->calc_lobs();
     PackedVal valdiff = ff->mInode->gval();
-    TpgFault* f = ff->mOrigF;
+    const TpgFault* f = ff->mOrigF;
     if ( f->is_input_fault() ) {
       // 入力の故障
       ymuint ipos = ff->mIpos;
@@ -674,7 +674,7 @@ Fsim2::fault_sweep(SimFFR* ffr,
        p != flist.end(); ++ p) {
     SimFault* ff = *p;
     if ( !ff->mSkip && ff->mObsMask != kPvAll0 ) {
-      TpgFault* f = ff->mOrigF;
+      const TpgFault* f = ff->mOrigF;
       op(f, kPvAll1);
     }
   }

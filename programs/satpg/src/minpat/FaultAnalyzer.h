@@ -56,7 +56,7 @@ public:
   void
   init(const TpgNetwork& network,
        TvMgr& tvmgr,
-       vector<TpgFault*>& fault_list);
+       vector<const TpgFault*>& fault_list);
 
   /// @brief ノード番号の最大値を得る．
   ymuint
@@ -67,12 +67,12 @@ public:
   max_fault_id() const;
 
   /// @brief 検出可能な故障のリストを得る．
-  const vector<TpgFault*>&
+  const vector<const TpgFault*>&
   fault_list() const;
 
   /// @brief 故障を得る．
   /// @param[in] fid 故障番号
-  TpgFault*
+  const TpgFault*
   fault(ymuint fid);
 
   /// @brief 個別の故障の情報を得る．
@@ -104,7 +104,7 @@ private:
   /// @param[in] fault 故障
   /// @param[in] tvmgr テストベクタのマネージャ
   Bool3
-  analyze_fault(TpgFault* fault,
+  analyze_fault(const TpgFault* fault,
 		TvMgr& tvmgr);
 
 
@@ -126,7 +126,7 @@ private:
   RandGen mRandGen;
 
   // オリジナルの故障リスト
-  vector<TpgFault*> mOrigFaultList;
+  vector<const TpgFault*> mOrigFaultList;
 
   // 検出可能故障用のテストベクタリスト
   vector<TestVector*> mTestVectorList;

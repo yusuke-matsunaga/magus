@@ -266,7 +266,7 @@ SatEngine::make_gval_cnf(GvalCnf& gval_cnf,
 //        = kValX: fd_var() で制御するCNFを作る．
 void
 SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
-			 TpgFault* fault,
+			 const TpgFault* fault,
 			 const NodeSet& node_set,
 			 Val3 detect)
 {
@@ -355,7 +355,7 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
 //        = kValX: fd_var() で制御するCNFを作る．
 void
 SatEngine::make_fval_cnf(FvalCnf& fval_cnf,
-			 TpgFault* fault,
+			 const TpgFault* fault,
 			 Val3 detect)
 {
   NodeSet node_set;
@@ -370,7 +370,7 @@ SatEngine::make_fval_cnf(FvalCnf& fval_cnf,
 // @param[in] node_set 故障に関係するノード集合
 void
 SatEngine::make_mval_cnf(MvalCnf& mval_cnf,
-			 const vector<TpgFault*>& fault_list,
+			 const vector<const TpgFault*>& fault_list,
 			 const vector<const TpgNode*>& fnode_list,
 			 const NodeSet& node_set)
 {
@@ -397,7 +397,7 @@ SatEngine::make_mval_cnf(MvalCnf& mval_cnf,
   for (ymuint i = 0; i < nf; ++ i) {
     VarId fdvar = new_var();
     mval_cnf.set_fault_var(i, fdvar);
-    TpgFault* f = fault_list[i];
+    const TpgFault* f = fault_list[i];
     int fval = f->val();
     const TpgNode* node = f->node();
 
@@ -571,7 +571,7 @@ SatEngine::make_fnode_cnf(const TpgNode* node,
 // @param[in] gvar_map 正常値の変数マップ
 // @param[in] fvar_map 故障値の変数マップ
 void
-SatEngine::make_fault_cnf(TpgFault* fault,
+SatEngine::make_fault_cnf(const TpgFault* fault,
 			  const VidMap& gvar_map,
 			  const VidMap& fvar_map)
 {

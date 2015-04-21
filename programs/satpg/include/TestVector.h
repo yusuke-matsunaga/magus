@@ -105,6 +105,13 @@ public:
   set_val(ymuint pos,
 	  Val3 val);
 
+  /// @brief 割当リストから内容を設定する．
+  /// @param[in] assign_list 割当リスト
+  ///
+  /// assign_list に外部入力以外の割当が含まれている場合無視する．
+  void
+  set_from_assign_list(const NodeValList& assign_list);
+
   /// @brief HEX文字列から内容を設定する．
   /// @param[in] hex_string HEX 文字列
   /// @return hex_string に不適切な文字が含まれていたら false を返す．

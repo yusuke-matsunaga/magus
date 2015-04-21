@@ -44,7 +44,7 @@ protected:
 
   /// @brief 故障リストを設定する．
   void
-  set_fault_list(const vector<TpgFault*>& src_list);
+  set_fault_list(const vector<const TpgFault*>& src_list);
 
 
 private:
@@ -58,7 +58,7 @@ private:
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<TpgFault*>& fault_list,
+  init(const vector<const TpgFault*>& fault_list,
        TvMgr& tvmgr,
        Fsim& fsim2);
 
@@ -69,7 +69,7 @@ private:
 
   /// @brief 最初の故障を選ぶ．
   virtual
-  TpgFault*
+  const TpgFault*
   get_first_fault();
 
   /// @brief 次に処理すべき故障を選ぶ．
@@ -78,7 +78,7 @@ private:
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
-  TpgFault*
+  const TpgFault*
   get_next_fault(FgMgr& fgmgr,
 		 const vector<ymuint>& group_list);
 
@@ -89,7 +89,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 故障リスト
-  vector<TpgFault*> mFaultList;
+  vector<const TpgFault*> mFaultList;
 
   // 次の故障の位置
   ymuint mNextPos;

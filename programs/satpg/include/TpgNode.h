@@ -186,13 +186,13 @@ public:
 
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
-  TpgFault*
+  const TpgFault*
   output_fault(int val) const;
 
   /// @brief 入力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
   /// @param[in] pos 入力の位置番号
-  TpgFault*
+  const TpgFault*
   input_fault(int val,
 	      ymuint pos) const;
 
@@ -202,7 +202,7 @@ public:
 
   /// @brief このノードに関係する故障を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < fault_num() )
-  TpgFault*
+  const TpgFault*
   fault(ymuint pos) const;
 
 
@@ -267,13 +267,13 @@ private:
   TpgMap* mInputMap;
 
   // 出力の故障
-  TpgFault* mOutputFault[2];
+  const TpgFault* mOutputFault[2];
 
   // 入力の故障
-  TpgFault** mInputFault;
+  const TpgFault** mInputFault;
 
   // 故障リスト
-  TpgFault** mFaultList;
+  const TpgFault** mFaultList;
 
   // 故障リストの要素数
   ymuint32 mFaultNum;
@@ -477,7 +477,7 @@ TpgNode::active_fanout(ymuint pos) const
 // @brief 出力の故障を得る．
 // @param[in] val 故障値 ( 0 / 1 )
 inline
-TpgFault*
+const TpgFault*
 TpgNode::output_fault(int val) const
 {
   return mOutputFault[val % 2];
@@ -487,7 +487,7 @@ TpgNode::output_fault(int val) const
 // @param[in] val 故障値 ( 0 / 1 )
 // @param[in] pos 入力の位置番号
 inline
-TpgFault*
+const TpgFault*
 TpgNode::input_fault(int val,
 		     ymuint pos) const
 {
@@ -506,7 +506,7 @@ TpgNode::fault_num() const
 // @brief このノードに関係する故障を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < fault_num() )
 inline
-TpgFault*
+const TpgFault*
 TpgNode::fault(ymuint pos) const
 {
   ASSERT_COND( pos < mFaultNum );

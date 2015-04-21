@@ -196,9 +196,6 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     timer_enable = false;
   }
 
-  Fsim& fsim3 = _fsim3();
-  fsim3.set_faults(_fault_mgr().remain_list());
-
   DtpgEngine* engine = NULL;
   if ( engine_type == "single" ) {
     engine = new_DtpgSatS(sat_type, sat_option, outp, bt, dop_list, uop_list);
@@ -214,8 +211,9 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
   engine->set_option(option_str);
   engine->timer_enable(timer_enable);
 
+  const vector<const TpgFault*>& fault_list = _fault_mgr().remain_list();
   DtpgStats stats;
-  engine->run(_network(), stats);
+  engine->run(_network(), _fault_mgr(), _fsim3(), fault_list, stats);
 
   delete engine;
 

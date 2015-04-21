@@ -49,7 +49,7 @@ public:
 
   /// @brief 衝突の解析を行う．
   void
-  analyze_conflict(const vector<TpgFault*>& fault_list);
+  analyze_conflict(const vector<const TpgFault*>& fault_list);
 
   /// @brief 衝突リストを得る．
   const vector<ymuint>&
@@ -57,7 +57,7 @@ public:
 
   /// @brief 衝突数の見積もりを行う．
   void
-  estimate_conflict(const vector<TpgFault*>& fault_list,
+  estimate_conflict(const vector<const TpgFault*>& fault_list,
 		    ymuint sample_num,
 		    vector<double>& conf_prob_array);
 
@@ -74,9 +74,9 @@ private:
   /// @param[in] simple 高速化ヒューリスティック
   /// @param[in] local_verbose 出力制御フラグ
   void
-  analyze_conflict(TpgFault* f1,
+  analyze_conflict(const TpgFault* f1,
 		   const vector<ymuint>& f2_list,
-		   vector<TpgFault*>& conf_list,
+		   vector<const TpgFault*>& conf_list,
 		   bool simple,
 		   bool local_verbose);
 
@@ -87,27 +87,27 @@ private:
   /// @param[in] simple 高速化ヒューリスティック
   /// @param[in] local_verbose 出力制御フラグ
   void
-  analyze_conflict2(TpgFault* f1,
+  analyze_conflict2(const TpgFault* f1,
 		    const vector<ymuint>& f2_list,
-		    vector<TpgFault*>& conf_list,
+		    vector<const TpgFault*>& conf_list,
 		    bool simple,
 		    bool local_verbose);
 
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fault_list 故障リスト
   void
-  get_pat_list(const vector<TpgFault*>& fault_list);
+  get_pat_list(const vector<const TpgFault*>& fault_list);
 
   /// @brief 故障シミュレーションの後処理
   ymuint
   record_pat(const vector<ymuint>& det_list,
-	     const vector<TpgFault*>& fault_list,
+	     const vector<const TpgFault*>& fault_list,
 	     ymuint pat_id);
 
   /// @brief f1 が f2 を支配しているか調べる．
   bool
-  check_fault_conflict(TpgFault* f1,
-		       TpgFault* f2);
+  check_fault_conflict(const TpgFault* f1,
+		       const TpgFault* f2);
 
   /// @brief analyze_conflict の統計情報を出力する．
   void

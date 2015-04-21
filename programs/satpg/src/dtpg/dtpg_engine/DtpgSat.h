@@ -122,36 +122,10 @@ protected:
   Bool3
   solve(SatEngine& engine,
 	const vector<Literal>& assumptions,
-	TpgFault* f,
+	const TpgFault* fault,
 	const NodeSet& node_set,
 	const VidMap& gvar_map,
 	const VidMap& fvar_map);
-
-  /// @brief 検出した場合の処理
-  void
-  detect_op(TpgFault* fault,
-	    const NodeSet& node_set,
-	    const ValMap& val_map,
-	    const SatStats& sat_stats,
-	    const USTime& time);
-
-  /// @brief 検出不能と判定した時の処理
-  void
-  untest_op(TpgFault* fault,
-	    const SatStats& sat_stats,
-	    const USTime& time);
-
-  /// @brief 部分的な検出不能と判定した時の処理
-  void
-  partially_untest_op(TpgFault* fault,
-		      const SatStats& sat_stats,
-		      const USTime& time);
-
-  /// @brief アボートした時の処理
-  void
-  abort_op(TpgFault* fault,
-	   const SatStats& sat_stats,
-	   const USTime& time);
 
 
 private:

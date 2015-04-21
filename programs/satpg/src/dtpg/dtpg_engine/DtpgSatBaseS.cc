@@ -13,6 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "NodeSet.h"
+#include "FaultMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -35,9 +36,11 @@ DtpgSatBaseS::~DtpgSatBaseS()
 
 // @brief テスト生成を行なう．
 // @param[in] network 対象のネットワーク
+// @param[in] fault_mgr 故障を管理するクラス
 // @param[in] stats 結果を格納する構造体
 void
 DtpgSatBaseS::run(TpgNetwork& network,
+		  FaultMgr& fault_mgr,
 		  DtpgStats& stats)
 {
   clear_stats();
@@ -47,7 +50,7 @@ DtpgSatBaseS::run(TpgNetwork& network,
   ymuint nn = network.active_node_num();
   ymuint max_id = network.max_node_id();
   for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = network.active_node(i);
+    const TpgNode* node = network.active_node(i);
     if ( node->is_output() ) {
       continue;
     }
@@ -56,9 +59,8 @@ DtpgSatBaseS::run(TpgNetwork& network,
 
     ymuint nf = node->fault_num();
     for (ymuint i = 0; i < nf; ++ i) {
-      TpgFault* f = node->fault(i);
-      if ( f->status() != kFsDetected &&
-	   !f->is_skip() ) {
+      const TpgFault* f = node->fault(i);
+      if ( fault_mgr.status(f) != kFsDetected ) {
 	run_single(node_set, f);
       }
     }

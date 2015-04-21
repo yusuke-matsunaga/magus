@@ -55,7 +55,7 @@ Extractor::~Extractor()
 // @param[in] fault 故障
 // @param[out] assign_list 値の割当リスト
 void
-Extractor::operator()(TpgFault* fault,
+Extractor::operator()(const TpgFault* fault,
 		      NodeValList& assign_list)
 {
   const TpgNode* fnode = fault->node();

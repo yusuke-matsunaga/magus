@@ -59,7 +59,7 @@ public:
   /// @param[out] pi_suf_list 外部入力上の十分割当リストを格納する変数
   void
   get_pi_suf_list(const vector<Bool3>& sat_model,
-		  TpgFault* fault,
+		  const TpgFault* fault,
 		  const NodeSet& node_set,
 		  NodeValList& suf_list,
 		  NodeValList& pi_suf_list);

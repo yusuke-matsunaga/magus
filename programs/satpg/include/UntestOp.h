@@ -36,7 +36,7 @@ public:
   /// @param[in] f 故障
   virtual
   void
-  operator()(TpgFault* f) = 0;
+  operator()(const TpgFault* f) = 0;
 
 };
 
@@ -47,8 +47,10 @@ new_UopBase(FaultMgr& fmgr);
 
 /// @brief 'skip' タイプを生成する．
 /// @param[in] threshold しきい値
+/// @param[in] max_fault_id 故障番号の最大値
 UntestOp*
-new_UopSkip(ymuint threshold);
+new_UopSkip(ymuint threshold,
+	    ymuint max_fault_id);
 
 /// @brief 'dummy' タイプを生成する．
 UntestOp*

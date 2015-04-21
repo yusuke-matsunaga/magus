@@ -15,6 +15,8 @@
 #include "SatEngine.h"
 #include "TpgFault.h"
 #include "TpgNetwork.h"
+#include "FaultMgr.h"
+#include "Fsim.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -55,17 +57,45 @@ DtpgSatS::~DtpgSatS()
 
 // @brief テスト生成を行なう．
 // @param[in] network 対象のネットワーク
-// @param[in] stats 結果を格納する構造体
+// @param[in] fmgr 故障マネージャ
+// @param[in] fsim 故障シミュレータ
+// @param[in] fault_list 対象の故障リスト
+// @param[out] stats 結果を格納する構造体
 void
 DtpgSatS::run(TpgNetwork& network,
+	      FaultMgr& fmgr,
+	      Fsim& fsim,
+	      const vector<const TpgFault*>& fault_list,
 	      DtpgStats& stats)
 {
   clear_stats();
 
+  // 故障シミュレータに故障リストをセットする．
+  fsim.set_faults(fault_list);
+
+  // 故障番号の最大値を求める．
+  ymuint max_fault_id = 0;
+  for (ymuint i = 0; i < fault_list.size(); ++ i) {
+    const TpgFault* fault = fault_list[i];
+    ymuint fid = fault->id();
+    if ( max_fault_id < fid ) {
+      max_fault_id = fid;
+    }
+  }
+  ++ max_fault_id;
+
+  // fault_list に含まれる故障に印をつける．
+  vector<bool> fault_mark(max_fault_id, false);
+  for (ymuint i = 0; i < fault_list.size(); ++ i) {
+    const TpgFault* fault = fault_list[i];
+    ymuint fid = fault->id();
+    fault_mark[fid] = true;
+  }
+
   ymuint nn = network.active_node_num();
   ymuint max_id = network.max_node_id();
   for (ymuint i = 0; i < nn; ++ i) {
-    TpgNode* node = network.active_node(i);
+    const TpgNode* node = network.active_node(i);
     if ( node->is_output() ) {
       continue;
     }
@@ -75,8 +105,8 @@ DtpgSatS::run(TpgNetwork& network,
 
     ymuint nf = node->fault_num();
     for (ymuint i = 0; i < nf; ++ i) {
-      TpgFault* fault = node->fault(i);
-      if ( fault->status() == kFsDetected ) {
+      const TpgFault* fault = node->fault(i);
+      if ( !fault_mark[fault->id()] || fmgr.status(fault) != kFsUndetected ) {
 	continue;
       }
 

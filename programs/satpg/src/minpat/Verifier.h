@@ -39,7 +39,7 @@ public:
   /// @param[in] pat_list パタンのリスト
   bool
   check(Fsim& fsim,
-	const vector<TpgFault*>& fault_list,
+	const vector<const TpgFault*>& fault_list,
 	const vector<TestVector*>& pat_list);
 
 

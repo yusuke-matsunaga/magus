@@ -188,12 +188,12 @@ Fsim3::set_network(const TpgNetwork& network)
   //////////////////////////////////////////////////////////////////////
   // 故障リストの設定
   //////////////////////////////////////////////////////////////////////
-  const vector<TpgFault*>& rep_faults = network.rep_faults();
+  const vector<const TpgFault*>& rep_faults = network.rep_faults();
   ymuint nf = rep_faults.size();
   mSimFaults.resize(nf);
   mFaultArray.resize(network.max_fault_id());
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = rep_faults[i];
+    const TpgFault* f = rep_faults[i];
     const TpgNode* node = f->node();
     SimNode* simnode = find_simnode(node);
     ymuint ipos = 0;
@@ -214,7 +214,7 @@ Fsim3::set_network(const TpgNetwork& network)
 
 // @brief 故障にスキップマークをつける．
 void
-Fsim3::set_skip(TpgFault* f)
+Fsim3::set_skip(const TpgFault* f)
 {
   mFaultArray[f->id()]->mSkip = true;
 }
@@ -224,7 +224,7 @@ Fsim3::set_skip(TpgFault* f)
 //
 // スキップマークは消される．
 void
-Fsim3::set_faults(const vector<TpgFault*>& fault_list)
+Fsim3::set_faults(const vector<const TpgFault*>& fault_list)
 {
   HashSet<ymuint> fault_set;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
@@ -258,7 +258,7 @@ Fsim3::set_faults(const vector<TpgFault*>& fault_list)
 // @retval false 故障の検出が行えなかった．
 bool
 Fsim3::spsfp(TestVector* tv,
-	     TpgFault* f)
+	     const TpgFault* f)
 {
   // tv を全ビットにセットしていく．
   mGvalClearArray.clear();
@@ -284,7 +284,7 @@ Fsim3::spsfp(TestVector* tv,
 // @retval false 故障の検出が行えなかった．
 bool
 Fsim3::spsfp(const NodeValList& assign_list,
-	     TpgFault* f)
+	     const TpgFault* f)
 {
   // assign_list を全ビットにセットしていく．
   mGvalClearArray.clear();
@@ -310,7 +310,7 @@ Fsim3::spsfp(const NodeValList& assign_list,
 // @retval true 故障の検出が行えた．
 // @retval false 故障の検出が行えなかった．
 bool
-Fsim3::_spsfp(TpgFault* f)
+Fsim3::_spsfp(const TpgFault* f)
 {
   // 正常値の計算を行う．
   calc_gval();
@@ -594,7 +594,7 @@ Fsim3::ppsfp(const vector<TestVector*>& tv_array,
       SimFault* ff = *p_ff;
       PackedVal dbits = obs & ff->mObsMask;
       if ( dbits ) {
-	TpgFault* f = ff->mOrigF;
+	const TpgFault* f = ff->mOrigF;
 	op(f, dbits);
       }
     }
@@ -656,7 +656,7 @@ Fsim3::ffr_simulate(SimFFR* ffr)
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     SimFault* ff = flist[rpos];
-    TpgFault* f = ff->mOrigF;
+    const TpgFault* f = ff->mOrigF;
     if ( ff->mSkip ) {
       continue;
     }
@@ -781,7 +781,7 @@ Fsim3::fault_sweep(SimFFR* ffr,
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     SimFault* ff = flist[rpos];
     if ( ff->mObsMask ) {
-      TpgFault* f = ff->mOrigF;
+      const TpgFault* f = ff->mOrigF;
       op(f, kPvAll1);
     }
   }

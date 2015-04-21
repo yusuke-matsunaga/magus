@@ -41,7 +41,7 @@ public:
   /// @param[in] assign_list 値の割当リスト
   virtual
   void
-  operator()(TpgFault* f,
+  operator()(const TpgFault* f,
 	     const NodeValList& assign_list);
 
 

@@ -183,7 +183,7 @@ DomChecker::set_verbose(int verbose)
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-DomChecker::get_pat_list(const vector<TpgFault*>& fault_list)
+DomChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -196,7 +196,7 @@ DomChecker::get_pat_list(const vector<TpgFault*>& fault_list)
   ymuint npat = fault_list.size();
   ymuint base = 0;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    TpgFault* fault = fault_list[i];
+    const TpgFault* fault = fault_list[i];
     const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
     TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
@@ -269,7 +269,7 @@ DomChecker::get_pat_list(const vector<TpgFault*>& fault_list)
 
   // mDomCandList の後始末．
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    TpgFault* fault = fault_list[i];
+    const TpgFault* fault = fault_list[i];
     FaultData& fd = mFaultDataArray[fault->id()];
     if ( fd.mDomCandList.size() != fd.mDomCandListSize ) {
       fd.mDomCandList.erase(fd.mDomCandList.begin() + fd.mDomCandListSize, fd.mDomCandList.end());
@@ -355,8 +355,8 @@ DomChecker::record_pat(const vector<ymuint>& det_list,
 // 結果は mDomFaultList に格納される．
 void
 DomChecker::get_dom_faults(ymuint method,
-			   const vector<TpgFault*>& src_list,
-			   vector<TpgFault*>& dom_fault_list)
+			   const vector<const TpgFault*>& src_list,
+			   vector<const TpgFault*>& dom_fault_list)
 {
   get_pat_list(src_list);
   switch ( method ) {
@@ -373,8 +373,8 @@ DomChecker::get_dom_faults(ymuint method,
 //
 // 結果は mDomFaultList に格納される．
 void
-DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
-			    vector<TpgFault*>& dom_fault_list)
+DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
+			    vector<const TpgFault*>& dom_fault_list)
 {
   StopWatch local_timer;
 
@@ -426,7 +426,7 @@ DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
     }
 
     const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-    TpgFault* f1 = fi1.fault();
+    const TpgFault* f1 = fi1.fault();
     const vector<ymuint>& input_list1_2 = mAnalyzer.input_list2(f1_id);
 
     bool pending = false;
@@ -449,7 +449,7 @@ DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
 	continue;
       }
 
-      TpgFault* f2 = mAnalyzer.fault(f2_id);
+      const TpgFault* f2 = mAnalyzer.fault(f2_id);
 
       ++ n_sat1;
       GvalCnf gval_cnf(mMaxNodeId);
@@ -507,7 +507,7 @@ DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
     }
 
     const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-    TpgFault* f1 = fi1.fault();
+    const TpgFault* f1 = fi1.fault();
 
     const vector<ymuint>& f_list = pending_list_array[f1_id];
     for (ymuint i2 = 0; i2 < f_list.size(); ++ i2) {
@@ -516,7 +516,7 @@ DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
 	continue;
       }
 
-      TpgFault* f2 = mAnalyzer.fault(f2_id);
+      const TpgFault* f2 = mAnalyzer.fault(f2_id);
 
       ++ n_sat1;
       GvalCnf gval_cnf(mMaxNodeId);
@@ -548,7 +548,7 @@ DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
   for (ymuint i = 0; i < fault_num2; ++ i) {
     ymuint f_id = fault_list2[i];
     if ( !dom_flag[f_id] ) {
-      TpgFault* fault = mAnalyzer.fault(f_id);
+      const TpgFault* fault = mAnalyzer.fault(f_id);
       dom_fault_list.push_back(fault);
     }
   }
@@ -571,8 +571,8 @@ DomChecker::get_dom_faults1(const vector<TpgFault*>& src_list,
 // 結果は dom_fault_list に格納される．
 void
 DomChecker::get_dom_faults2(ymuint option,
-			    const vector<TpgFault*>& src_list,
-			    vector<TpgFault*>& dom_fault_list)
+			    const vector<const TpgFault*>& src_list,
+			    vector<const TpgFault*>& dom_fault_list)
 {
   StopWatch local_timer;
 
@@ -659,7 +659,7 @@ DomChecker::get_dom_faults2(ymuint option,
       cout.flush();
     }
 
-    TpgFault* f1 = mAnalyzer.fault(f1_id);
+    const TpgFault* f1 = mAnalyzer.fault(f1_id);
     const vector<ymuint>& input_list1_2 = mAnalyzer.input_list2(f1_id);
 
     GvalCnf gval_cnf(mMaxNodeId);
@@ -676,7 +676,7 @@ DomChecker::get_dom_faults2(ymuint option,
       }
 
       const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-      TpgFault* f2 = fi2.fault();
+      const TpgFault* f2 = fi2.fault();
       const vector<ymuint>& input_list2_2 = mAnalyzer.input_list2(f2_id);
 
       bool intersect2 = check_intersect(input_list1_2, input_list2_2);
@@ -746,7 +746,7 @@ DomChecker::get_dom_faults2(ymuint option,
       cout.flush();
     }
 
-    TpgFault* f1 = mAnalyzer.fault(f1_id);
+    const TpgFault* f1 = mAnalyzer.fault(f1_id);
 
     GvalCnf gval_cnf(mMaxNodeId);
     FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
@@ -763,7 +763,7 @@ DomChecker::get_dom_faults2(ymuint option,
       }
 
       const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-      TpgFault* f2 = fi2.fault();
+      const TpgFault* f2 = fi2.fault();
 
       ++ n_sat1;
       // これが f2 の十分割当のもとで成り立ったら支配しない
@@ -795,7 +795,7 @@ DomChecker::get_dom_faults2(ymuint option,
   for (ymuint i = 0; i < fault_num2; ++ i) {
     ymuint f_id = fault_list2[i];
     if ( !dom_flag[f_id] ) {
-      TpgFault* fault = mAnalyzer.fault(f_id);
+      const TpgFault* fault = mAnalyzer.fault(f_id);
       dom_fault_list.push_back(fault);
     }
   }
@@ -815,8 +815,8 @@ DomChecker::get_dom_faults2(ymuint option,
 
 // @brief f1 が f2 を支配しているか調べる．
 bool
-DomChecker::check_fault_dominance(TpgFault* f1,
-				  TpgFault* f2)
+DomChecker::check_fault_dominance(const TpgFault* f1,
+				  const TpgFault* f2)
 {
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);

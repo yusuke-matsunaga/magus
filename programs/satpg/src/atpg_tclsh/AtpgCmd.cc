@@ -167,7 +167,7 @@ BEGIN_NONAMESPACE
 
 // 故障を表す TclObj を作る
 TclObj
-f2obj(TpgFault* f)
+f2obj(const TpgFault* f)
 {
   TclObjVector tmp(3);
   tmp[0] = f->node()->name();
@@ -198,8 +198,8 @@ AtpgCmd::after_update_faults()
   FaultMgr& fault_mgr = _fault_mgr();
 
   // 諸元を TCL 変数にセットしておく
-  const vector<TpgFault*>& remain_list = fault_mgr.remain_list();
-  const vector<TpgFault*>& untest_list = fault_mgr.untest_list();
+  const vector<const TpgFault*>& remain_list = fault_mgr.remain_list();
+  const vector<const TpgFault*>& untest_list = fault_mgr.untest_list();
   ymuint n_all = _network().max_fault_id();
   ymuint n_rep = _network().rep_faults().size();
   ymuint n_remain = remain_list.size();
@@ -216,36 +216,36 @@ AtpgCmd::after_update_faults()
 #if 0
   {
     TclObjVector tmp_list;
-    for (vector<TpgFault*>::const_iterator p = all_list.begin();
+    for (vector<const TpgFault*>::const_iterator p = all_list.begin();
 	 p != all_list.end(); ++ p) {
-      TpgFault* f = *p;
+      const TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "all_fault_list", tmp_list, varflag);
   }
   {
     TclObjVector tmp_list;
-    for (vector<TpgFault*>::const_iterator p = rep_list.begin();
+    for (vector<const TpgFault*>::const_iterator p = rep_list.begin();
 	 p != rep_list.end(); ++ p) {
-      TpgFault* f = *p;
+      const TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "rep_fault_list", tmp_list, varflag);
   }
   {
     TclObjVector tmp_list;
-    for (vector<TpgFault*>::const_iterator p = remain_list.begin();
+    for (vector<const TpgFault*>::const_iterator p = remain_list.begin();
 	 p != remain_list.end(); ++ p) {
-      TpgFault* f = *p;
+      const TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "remain_fault_list", tmp_list, varflag);
   }
   {
     TclObjVector tmp_list;
-    for (vector<TpgFault*>::const_iterator p = untest_list.begin();
+    for (vector<const TpgFault*>::const_iterator p = untest_list.begin();
 	 p != untest_list.end(); ++ p) {
-      TpgFault* f = *p;
+      const TpgFault* f = *p;
       tmp_list.push_back(f2obj(f));
     }
     set_var(varname, "untest_fault_list", tmp_list, varflag);

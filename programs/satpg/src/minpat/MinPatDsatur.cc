@@ -49,7 +49,7 @@ MinPatDsatur::~MinPatDsatur()
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatDsatur::init(const vector<TpgFault*>& fault_list,
+MinPatDsatur::init(const vector<const TpgFault*>& fault_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
@@ -57,14 +57,14 @@ MinPatDsatur::init(const vector<TpgFault*>& fault_list,
 
   DomChecker checker(analyzer(), tvmgr, fsim2);
 
-  vector<TpgFault*> dom_fault_list;
+  vector<const TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
   ymuint nf = dom_fault_list.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = dom_fault_list[i];
+    const TpgFault* fault = dom_fault_list[i];
     if ( max_fault_id < fault->id() ) {
       max_fault_id = fault->id();
     }
@@ -78,7 +78,7 @@ MinPatDsatur::init(const vector<TpgFault*>& fault_list,
 
   for (ymuint i = 0; i < nf; ++ i) {
     FaultStruct& fs = mFaultStructList[i];
-    TpgFault* fault = dom_fault_list[i];
+    const TpgFault* fault = dom_fault_list[i];
     fs.mFault = fault;
     fs.mPatNum = checker.det_count(fault->id());
     fs.mSelected = false;
@@ -104,13 +104,13 @@ MinPatDsatur::fault_num()
 }
 
 // @brief 最初の故障を選ぶ．
-TpgFault*
+const TpgFault*
 MinPatDsatur::get_first_fault()
 {
   ASSERT_COND( mRemainNum > 0 );
 
   // 最初は同時検出故障数の少ない故障を選ぶ．
-  TpgFault* min_fault = NULL;
+  const TpgFault* min_fault = NULL;
   ymuint min_count = 0;
   ymuint min_pos = 0;
   ymuint fault_num = mFaultStructList.size();
@@ -134,7 +134,7 @@ MinPatDsatur::get_first_fault()
 // @param[in] group_list 現在のグループリスト
 //
 // 故障が残っていなければ NULL を返す．
-TpgFault*
+const TpgFault*
 MinPatDsatur::get_next_fault(FgMgr& fgmgr,
 			     const vector<ymuint>& group_list)
 {
@@ -193,7 +193,7 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
 
-      TpgFault* fault = fs.mFault;
+      const TpgFault* fault = fs.mFault;
       engine.make_fval_cnf(fval_cnf, fault, analyzer().node_set(fault->id()), kVal1);
 
       const NodeValList& ma_list = analyzer().fault_info(fault->id()).mandatory_assignment();
@@ -244,7 +244,7 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatDsatur::find_group(FgMgr& fgmgr,
-			 TpgFault* fault,
+			 const TpgFault* fault,
 			 const vector<ymuint>& group_list)
 {
   ymuint gid = MinPatBase::find_group(fgmgr, fault, group_list);

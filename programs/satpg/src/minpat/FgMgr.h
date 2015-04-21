@@ -76,18 +76,18 @@ public:
   /// @param[in] fault 故障
   void
   add_fault(ymuint gid,
-	    TpgFault* fault);
+	    const TpgFault* fault);
 
   /// @brief 故障を取り除く
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   /// @param[in] fault_list 故障リスト
   void
   delete_fault(ymuint gid,
-	       const vector<TpgFault*>& fault_list);
+	       const vector<const TpgFault*>& fault_list);
 
   /// @brief 故障リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  const vector<TpgFault*>&
+  const vector<const TpgFault*>&
   fault_list(ymuint gid) const;
 
   /// @brief 十分割当リストを返す．
@@ -111,7 +111,7 @@ private:
   {
     /// @brief 故障を追加する．
     void
-    add_fault(TpgFault* fault,
+    add_fault(const TpgFault* fault,
 	      const NodeValList& suf_list,
 	      const NodeValList& pi_suf_list)
     {
@@ -126,7 +126,7 @@ private:
     ymuint mId;
 
     // 故障リスト
-    vector<TpgFault*> mFaultList;
+    vector<const TpgFault*> mFaultList;
 
     // 故障ごとの十分割当リスト
     vector<NodeValList> mFaultSufList;

@@ -27,7 +27,7 @@ public:
   /// @param[in] fsim 故障シミュレータ
   /// @param[in] f_list 故障のリスト
   KDet2Op(Fsim& fsim,
-	  const vector<TpgFault*>& f_list);
+	  const vector<const TpgFault*>& f_list);
 
   /// @brief デストラクタ
   virtual
@@ -44,7 +44,7 @@ public:
   /// @param[in] dpat 検出したパタンを表すビットベクタ
   virtual
   void
-  operator()(TpgFault* f,
+  operator()(const TpgFault* f,
 	     PackedVal dpat);
 
   /// @brief 検出された故障のID番号のリストを返す．

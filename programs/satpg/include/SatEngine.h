@@ -81,7 +81,7 @@ public:
   ///        = kValX: fd_var() で制御するCNFを作る．
   void
   make_fval_cnf(FvalCnf& fval_cnf,
-		TpgFault* fault,
+		const TpgFault* fault,
 		const NodeSet& node_set,
 		Val3 detect);
 
@@ -95,7 +95,7 @@ public:
   ///        = kValX: fd_var() で制御するCNFを作る．
   void
   make_fval_cnf(FvalCnf& fval_cnf,
-		TpgFault* fault,
+		const TpgFault* fault,
 		Val3 detect);
 
   /// @brief 複数故障検出回路のCNFを作る．
@@ -105,7 +105,7 @@ public:
   /// @param[in] node_set 故障に関係するノード集合
   void
   make_mval_cnf(MvalCnf& mval_cnf,
-		const vector<TpgFault*>& fault_list,
+		const vector<const TpgFault*>& fault_list,
 		const vector<const TpgNode*>& fnode_list,
 		const NodeSet& node_set);
 
@@ -207,7 +207,7 @@ private:
   /// @param[in] gvar_map 正常値の変数マップ
   /// @param[in] fvar_map 故障値の変数マップ
   void
-  make_fault_cnf(TpgFault* fault,
+  make_fault_cnf(const TpgFault* fault,
 		 const VidMap& gvar_map,
 		 const VidMap& fvar_map);
 

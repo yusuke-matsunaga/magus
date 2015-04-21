@@ -115,10 +115,10 @@ Compactor::phase0(FgMgr& fgmgr,
 
     // min_gid のグループの故障を他のグループへ移動できるか調べる．
     bool red = true;
-    const vector<TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
-    vector<TpgFault*> del_list;
+    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
+    vector<const TpgFault*> del_list;
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
-      TpgFault* fault = fault_list[i];
+      const TpgFault* fault = fault_list[i];
 
       SatEngine engine(string(), string(), NULL);
       GvalCnf gval_cnf(mMaxNodeId);
@@ -164,13 +164,13 @@ Compactor::phase0(FgMgr& fgmgr,
     locked[min_gid] = true;
   }
 #else
-  vector<TpgFault*> all_list;
+  vector<const TpgFault*> all_list;
   ymuint ng = group_list.size();
   for (ymuint i = 0; i < ng; ++ i) {
     ymuint gid = group_list[i];
-    const vector<TpgFault*>& fault_list = fgmgr.fault_list(gid);
+    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(gid);
     for (ymuint j = 0; j < fault_list.size(); ++ j) {
-      TpgFault* fault = fault_list[j];
+      const TpgFault* fault = fault_list[j];
       all_list.push_back(fault);
     }
   }
@@ -180,7 +180,7 @@ Compactor::phase0(FgMgr& fgmgr,
   mincov.set_size(all_list.size(), ng);
 
   for (ymuint i = 0; i < all_list.size(); ++ i) {
-    TpgFault* fault = all_list[i];
+    const TpgFault* fault = all_list[i];
 
     GvalCnf gval_cnf(mMaxNodeId);
     FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
@@ -242,9 +242,9 @@ Compactor::phase1(FgMgr& fgmgr,
 
     // min_gid のグループの故障を他のグループへ移動できるか調べる．
     bool red = true;
-    const vector<TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
+    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
-      TpgFault* fault = fault_list[i];
+      const TpgFault* fault = fault_list[i];
 
       SatEngine engine(string(), string(), NULL);
       GvalCnf gval_cnf(mMaxNodeId);
@@ -352,11 +352,11 @@ Compactor::phase2(FgMgr& fgmgr,
     }
 
     // 可能な限り故障を他のグループに移動する．
-    const vector<TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
-    vector<TpgFault*> del_fault_list;
+    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
+    vector<const TpgFault*> del_fault_list;
     del_fault_list.reserve(fault_list.size());
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
-      TpgFault* fault = fault_list[i];
+      const TpgFault* fault = fault_list[i];
 
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);

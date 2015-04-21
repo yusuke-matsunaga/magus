@@ -37,7 +37,7 @@ FopDrop::~FopDrop()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-FopDrop::operator()(TpgFault* f,
+FopDrop::operator()(const TpgFault* f,
 		    PackedVal dpat)
 {
   mMgr.set_status(f, kFsDetected);

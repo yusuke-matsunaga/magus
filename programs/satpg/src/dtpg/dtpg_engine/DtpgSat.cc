@@ -144,7 +144,7 @@ DtpgSat::timer_stop()
 Bool3
 DtpgSat::solve(SatEngine& engine,
 	       const vector<Literal>& assumptions,
-	       TpgFault* f,
+	       const TpgFault* fault,
 	       const NodeSet& node_set,
 	       const VidMap& gvar_map,
 	       const VidMap& fvar_map)
@@ -158,14 +158,22 @@ DtpgSat::solve(SatEngine& engine,
     // パタンが求まった．
     ModelValMap val_map(gvar_map, fvar_map, model);
 
-    detect_op(f, node_set, val_map, sat_stats, time);
+    // バックトレースを行う．
+    mBackTracer(fault->node(), node_set, val_map, mLastAssign);
+
+    // パタンの登録などを行う．
+    mDetectOp(fault, mLastAssign);
+
+    mStats.update_det(sat_stats, time);
   }
   else if ( ans == kB3False ) {
     // 検出不能と判定された．
-    untest_op(f, sat_stats, time);
+    mUntestOp(fault);
+
+    mStats.update_red(sat_stats, time);
   }
   else { // ans == kB3X つまりアボート
-    abort_op(f, sat_stats, time);
+    mStats.update_abort(sat_stats, time);
   }
   return ans;
 }
@@ -175,52 +183,6 @@ const NodeValList&
 DtpgSat::last_assign()
 {
   return mLastAssign;
-}
-
-// @brief 検出した場合の処理
-void
-DtpgSat::detect_op(TpgFault* fault,
-		   const NodeSet& node_set,
-		   const ValMap& val_map,
-		   const SatStats& sat_stats,
-		   const USTime& time)
-{
-  // バックトレースを行う．
-  mBackTracer(fault->node(), node_set, val_map, mLastAssign);
-
-  // パタンの登録などを行う．
-  mDetectOp(fault, mLastAssign);
-
-  mStats.update_det(sat_stats, time);
-}
-
-// @brief 検出不能と判定した時の処理
-void
-DtpgSat::untest_op(TpgFault* fault,
-		   const SatStats& sat_stats,
-		   const USTime& time)
-{
-  mUntestOp(fault);
-
-  mStats.update_red(sat_stats, time);
-}
-
-// @brief 部分的な検出不能と判定した時の処理
-void
-DtpgSat::partially_untest_op(TpgFault* fault,
-			     const SatStats& sat_stats,
-			     const USTime& time)
-{
-  mStats.update_partred(sat_stats, time);
-}
-
-// @brief アボートした時の処理
-void
-DtpgSat::abort_op(TpgFault* fault,
-		  const SatStats& sat_stats,
-		  const USTime& time)
-{
-  mStats.update_abort(sat_stats, time);
 }
 
 END_NAMESPACE_YM_SATPG

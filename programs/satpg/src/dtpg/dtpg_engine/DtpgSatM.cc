@@ -60,7 +60,7 @@ DtpgSatM::~DtpgSatM()
 void
 DtpgSatM::run_multi(const NodeSet& node_set,
 		    const vector<const TpgNode*>& fnode_list,
-		    const vector<TpgFault*>& flist)
+		    const vector<const TpgFault*>& flist)
 {
   cnf_begin();
 
@@ -81,12 +81,14 @@ DtpgSatM::run_multi(const NodeSet& node_set,
 
   // 個々の故障に対するテスト生成を行なう．
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = flist[i];
+    const TpgFault* f = flist[i];
 
+#if 0
     if ( f->status() == kFsDetected ) {
       // 他の故障のパタンで検出済みになっている場合がある．
       continue;
     }
+#endif
 
     vector<Literal> assumptions;
 

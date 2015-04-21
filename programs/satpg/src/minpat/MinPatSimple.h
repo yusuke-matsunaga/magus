@@ -49,7 +49,7 @@ private:
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<TpgFault*>& fault_list,
+  init(const vector<const TpgFault*>& fault_list,
        TvMgr& tvmgr,
        Fsim& fsim2);
 

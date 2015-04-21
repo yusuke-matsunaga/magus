@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] fsim 故障シミュレータ
 // @param[in] f_list 故障のリスト
 KDet2Op::KDet2Op(Fsim& fsim,
-		 const vector<TpgFault*>& f_list) :
+		 const vector<const TpgFault*>& f_list) :
   mFsim(fsim)
 {
   mFsim.set_faults(f_list);
@@ -37,7 +37,7 @@ KDet2Op::~KDet2Op()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-KDet2Op::operator()(TpgFault* f,
+KDet2Op::operator()(const TpgFault* f,
 		    PackedVal dpat)
 {
   ymuint f_id = f->id();

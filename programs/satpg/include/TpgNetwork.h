@@ -89,12 +89,6 @@ public:
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < node_num() )
   /// @note node->id() == id となるノードを返す．
-  TpgNode*
-  node(ymuint id);
-
-  /// @brief ノードを得る．
-  /// @param[in] id ID番号 ( 0 <= id < node_num() )
-  /// @note node->id() == id となるノードを返す．
   const TpgNode*
   node(ymuint id) const;
 
@@ -135,7 +129,7 @@ public:
   output2(ymuint pos) const;
 
   /// @brief 代表故障のリストを得る．
-  const vector<TpgFault*>&
+  const vector<const TpgFault*>&
   rep_faults() const;
 
   /// @brief 故障IDの最大値+1を返す．
@@ -165,11 +159,6 @@ public:
   /// @brief アクティブなノード数を得る．
   ymuint
   active_node_num() const;
-
-  /// @brief アクティブなノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
-  TpgNode*
-  active_node(ymuint pos);
 
   /// @brief アクティブなノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
@@ -280,10 +269,10 @@ private:
   /// @param[in] rep 代表故障
   ///
   /// 自分自身が代表故障の場合には rep に NULL を入れる．
-  TpgFault*
+  const TpgFault*
   new_ofault(TpgNode* node,
 	     ymuint val,
-	     TpgFault* rep);
+	     const TpgFault* rep);
 
   /// @brief 入力の故障を作る．
   /// @param[in] node 故障位置のノード
@@ -292,11 +281,11 @@ private:
   /// @param[in] rep 代表故障
   ///
   /// 自分自身が代表故障の場合には rep に NULL を入れる．
-  TpgFault*
+  const TpgFault*
   new_ifault(TpgNode* ode,
 	     ymuint ipos,
 	     ymuint val,
-	     TpgFault* rep);
+	     const TpgFault* rep);
 
   /// @brief 故障を生成する．
   /// @param[in] node 対象のノード
@@ -304,12 +293,12 @@ private:
   /// @param[in] ipos 入力の故障の時に入力番号を表す
   /// @param[in] val 縮退している値
   /// @param[in] rep 代表故障
-  TpgFault*
+  const TpgFault*
   new_fault(TpgNode* node,
 	    bool is_output,
 	    ymuint ipos,
 	    ymuint val,
-	    TpgFault* rep);
+	    const TpgFault* rep);
 
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
@@ -407,7 +396,7 @@ private:
   TpgFault* mFaultChunk;
 
   // 代表故障のリスト
-  vector<TpgFault*> mRepFaults;
+  vector<const TpgFault*> mRepFaults;
 
 };
 
@@ -504,7 +493,7 @@ TpgNetwork::output2(ymuint pos) const
 
 // @brief 代表故障のリストを得る．
 inline
-const vector<TpgFault*>&
+const vector<const TpgFault*>&
 TpgNetwork::rep_faults() const
 {
   return mRepFaults;
@@ -524,16 +513,6 @@ ymuint
 TpgNetwork::active_node_num() const
 {
   return mActNodeNum;
-}
-
-// @brief アクティブなノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
-inline
-TpgNode*
-TpgNetwork::active_node(ymuint pos)
-{
-  ASSERT_COND( pos < mActNodeNum );
-  return mActNodeArray[pos];
 }
 
 // @brief アクティブなノードを得る．

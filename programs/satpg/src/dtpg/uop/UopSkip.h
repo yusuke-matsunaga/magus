@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] threshold しきい値
-  UopSkip(ymuint threshold);
+  /// @param[in] max_fault_id 故障番号の最大値
+  UopSkip(ymuint threshold,
+	  ymuint max_fault_id);
 
   /// @brief デストラクタ
   virtual
@@ -41,7 +43,7 @@ public:
   /// @param[in] f 故障
   virtual
   void
-  operator()(TpgFault* f);
+  operator()(const TpgFault* f);
 
   /// @brief 検出不能回数とスキップフラグをクリアする．
   void
@@ -56,11 +58,14 @@ private:
   // スキップフラグをセットするしきい値
   ymuint32 mThreshold;
 
-  // 検出不能となった故障を保持するリスト
-  vector<TpgFault*> mUntestList;
+  // 故障の検出不能回数を保持する配列
+  vector<ymuint> mUntestCountArray;
 
-  // スキップフラグがセットされた故障を保持するリスト
-  vector<TpgFault*> mSkipList;
+  // 検出不能となった故障の番号を保持するリスト
+  vector<ymuint> mUntestList;
+
+  // スキップフラグがセットされた故障の番号を保持するリスト
+  vector<ymuint> mSkipList;
 
 };
 

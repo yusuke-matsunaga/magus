@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] f_list 故障のリスト
 // @param[in] max_fault_id 故障IDの最大値+1
 FopKDet::FopKDet(Fsim& fsim,
-		 const vector<TpgFault*>& f_list,
+		 const vector<const TpgFault*>& f_list,
 		 ymuint max_fault_id) :
   mFsim(fsim),
   mLimit(1),
@@ -41,7 +41,7 @@ FopKDet::~FopKDet()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-FopKDet::operator()(TpgFault* f,
+FopKDet::operator()(const TpgFault* f,
 		    PackedVal dpat)
 {
   ymuint f_id = f->id();

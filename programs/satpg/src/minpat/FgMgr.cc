@@ -128,7 +128,7 @@ FgMgr::delete_group(ymuint gid)
 // @param[in] fault 故障
 void
 FgMgr::add_fault(ymuint gid,
-		 TpgFault* fault)
+		 const TpgFault* fault)
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
@@ -158,14 +158,14 @@ FgMgr::add_fault(ymuint gid,
 // @param[in] fault_list 故障リスト
 void
 FgMgr::delete_fault(ymuint gid,
-		    const vector<TpgFault*>& fault_list)
+		    const vector<const TpgFault*>& fault_list)
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
 
   HashSet<ymuint> fault_hash;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    TpgFault* fault = fault_list[i];
+    const TpgFault* fault = fault_list[i];
     fault_hash.add(fault->id());
   }
 
@@ -173,7 +173,7 @@ FgMgr::delete_fault(ymuint gid,
   ymuint nf = fg->mFaultList.size();
   ymuint wpos = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* fault = fg->mFaultList[i];
+    const TpgFault* fault = fg->mFaultList[i];
     if ( fault_hash.check(fault->id()) ) {
       continue;
     }
@@ -190,7 +190,7 @@ FgMgr::delete_fault(ymuint gid,
 
 // @brief 故障リストを返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-const vector<TpgFault*>&
+const vector<const TpgFault*>&
 FgMgr::fault_list(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );

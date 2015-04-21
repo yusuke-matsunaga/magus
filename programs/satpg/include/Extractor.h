@@ -42,7 +42,7 @@ public:
   /// @param[in] fault 故障
   /// @param[out] assign_list 値の割当リスト
   void
-  operator()(TpgFault* fault,
+  operator()(const TpgFault* fault,
 	     NodeValList& assign_list);
 
 

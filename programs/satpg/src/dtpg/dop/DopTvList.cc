@@ -49,24 +49,11 @@ DopTvList::~DopTvList()
 // @param[in] f 故障
 // @param[in] assign_list 値割当のリスト
 void
-DopTvList::operator()(TpgFault* f,
+DopTvList::operator()(const TpgFault* f,
 		      const NodeValList& assign_list)
 {
   TestVector* tv = mTvMgr.new_vector();
-  ymuint n = assign_list.size();
-  for (ymuint i = 0; i < n; ++ i) {
-    NodeVal nv = assign_list[i];
-    const TpgNode* node = nv.node();
-    if ( node->is_input() ) {
-      ymuint id = node->input_id();
-      if ( nv.val() ) {
-	tv->set_val(id, kVal1);
-      }
-      else {
-	tv->set_val(id, kVal0);
-      }
-    }
-  }
+  tv->set_from_assign_list(assign_list);
   mTvList.push_back(tv);
 }
 

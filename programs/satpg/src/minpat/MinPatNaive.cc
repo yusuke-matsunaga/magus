@@ -43,7 +43,7 @@ MinPatNaive::~MinPatNaive()
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatNaive::init(const vector<TpgFault*>& fault_list,
+MinPatNaive::init(const vector<const TpgFault*>& fault_list,
 		  TvMgr& tvmgr,
 		  Fsim& fsim2)
 {
@@ -52,7 +52,7 @@ MinPatNaive::init(const vector<TpgFault*>& fault_list,
 
 // @brief 故障リストを設定する．
 void
-MinPatNaive::set_fault_list(const vector<TpgFault*>& src_list)
+MinPatNaive::set_fault_list(const vector<const TpgFault*>& src_list)
 {
   ymuint nf = src_list.size();
   mFaultList.clear();
@@ -70,7 +70,7 @@ MinPatNaive::fault_num()
 }
 
 // @brief 最初の故障を選ぶ．
-TpgFault*
+const TpgFault*
 MinPatNaive::get_first_fault()
 {
   mNextPos = 1;
@@ -82,12 +82,12 @@ MinPatNaive::get_first_fault()
 // @param[in] group_list 現在のグループリスト
 //
 // 故障が残っていなければ NULL を返す．
-TpgFault*
+const TpgFault*
 MinPatNaive::get_next_fault(FgMgr& fgmgr,
 			    const vector<ymuint>& group_list)
 {
   if ( mNextPos < mFaultList.size() ) {
-    TpgFault* fault = mFaultList[mNextPos];
+    const TpgFault* fault = mFaultList[mNextPos];
     ++ mNextPos;
     return fault;
   }

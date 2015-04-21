@@ -42,7 +42,7 @@ DopVerify::~DopVerify()
 // @param[in] f 故障
 // @param[in] assign_list 値割当のリスト
 void
-DopVerify::operator()(TpgFault* f,
+DopVerify::operator()(const TpgFault* f,
 		      const NodeValList& assign_list)
 {
   bool detect = mFsim.spsfp(assign_list, f);

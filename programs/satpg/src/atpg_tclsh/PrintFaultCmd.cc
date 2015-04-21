@@ -46,8 +46,8 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
 
   FaultMgr& fmgr = _fault_mgr();
 
-  vector<TpgFault*>::const_iterator b = fmgr.remain_list().begin();
-  vector<TpgFault*>::const_iterator e = fmgr.remain_list().end();
+  vector<const TpgFault*>::const_iterator b = fmgr.remain_list().begin();
+  vector<const TpgFault*>::const_iterator e = fmgr.remain_list().end();
 
   if ( mPoptType->is_specified() ) {
     string tmp = mPoptType->val();
@@ -68,8 +68,8 @@ PrintFaultCmd::cmd_proc(TclObjVector& objv)
     }
   }
 
-  for (vector<TpgFault*>::const_iterator p = b; p != e; ++ p) {
-    TpgFault* f = *p;
+  for (vector<const TpgFault*>::const_iterator p = b; p != e; ++ p) {
+    const TpgFault* f = *p;
     cout << f->str() << endl;
   }
 

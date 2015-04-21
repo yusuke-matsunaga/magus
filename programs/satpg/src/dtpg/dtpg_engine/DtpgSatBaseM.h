@@ -50,10 +50,16 @@ public:
 
   /// @brief テスト生成を行なう．
   /// @param[in] network 対象のネットワーク
-  /// @param[in] stats 結果を格納する構造体
+  /// @param[in] fmgr 故障マネージャ
+  /// @param[in] fsim 故障シミュレータ
+  /// @param[in] fault_list 対象の故障リスト
+  /// @param[out] stats 結果を格納する構造体
   virtual
   void
   run(TpgNetwork& network,
+      FaultMgr& fmgr,
+      Fsim& fsim,
+      const vector<const TpgFault*>& fault_list,
       DtpgStats& stats);
 
 
@@ -70,12 +76,14 @@ private:
   void
   run_multi(const NodeSet& node_set,
 	    const vector<const TpgNode*>& fnode_list,
-	    const vector<TpgFault*>& flist) = 0;
+	    const vector<const TpgFault*>& flist) = 0;
 
   /// @brief DFS で MFFC を求める．
   /// @param[in] node 対象のノード
+  /// @param[in] fmgr 故障マネージャ
   void
-  dfs_mffc(const TpgNode* node);
+  dfs_mffc(const TpgNode* node,
+	   FaultMgr& fmgr);
 
 
 private:
@@ -87,7 +95,10 @@ private:
   vector<const TpgNode*> mFaultNodeList;
 
   // 対象の故障リスト
-  vector<TpgFault*> mFaultList;
+  vector<const TpgFault*> mFaultList;
+
+  // 対象の故障を表すマーク配列
+  vector<bool> mFaultMark;
 
   // 作業用のマーク
   vector<bool> mMark;

@@ -41,7 +41,7 @@ UopBase::~UopBase()
 // @brief テスト不能故障と判定された時の処理
 // @param[in] f 故障
 void
-UopBase::operator()(TpgFault* f)
+UopBase::operator()(const TpgFault* f)
 {
   mMgr.set_status(f, kFsUntestable);
 }

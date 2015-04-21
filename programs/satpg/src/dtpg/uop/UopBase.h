@@ -41,7 +41,7 @@ public:
   /// @param[in] f 故障
   virtual
   void
-  operator()(TpgFault* f);
+  operator()(const TpgFault* f);
 
 
 private:

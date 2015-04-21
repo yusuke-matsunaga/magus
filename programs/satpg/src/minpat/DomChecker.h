@@ -54,8 +54,8 @@ public:
   /// 結果は mDomFaultList に格納される．
   void
   get_dom_faults(ymuint method,
-		 const vector<TpgFault*>& src_list,
-		 vector<TpgFault*>& dom_fault_list);
+		 const vector<const TpgFault*>& src_list,
+		 vector<const TpgFault*>& dom_fault_list);
 
   /// @brief シミュレーション時の検出パタン数を返す．
   ymuint
@@ -79,21 +79,21 @@ private:
   ///
   /// 結果は mDomFaultList に格納される．
   void
-  get_dom_faults1(const vector<TpgFault*>& src_list,
-		  vector<TpgFault*>& dom_fault_list);
+  get_dom_faults1(const vector<const TpgFault*>& src_list,
+		  vector<const TpgFault*>& dom_fault_list);
 
   /// @brief 支配故障を求める．
   ///
   /// 結果は mDomFaultList に格納される．
   void
   get_dom_faults2(ymuint option ,
-		  const vector<TpgFault*>& src_list,
-		  vector<TpgFault*>& dom_fault_list);
+		  const vector<const TpgFault*>& src_list,
+		  vector<const TpgFault*>& dom_fault_list);
 
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fault_list 故障リスト
   void
-  get_pat_list(const vector<TpgFault*>& fault_list);
+  get_pat_list(const vector<const TpgFault*>& fault_list);
 
   /// @brief 故障シミュレーションの後処理
   ymuint
@@ -102,8 +102,8 @@ private:
 
   /// @brief f1 が f2 を支配しているか調べる．
   bool
-  check_fault_dominance(TpgFault* f1,
-			TpgFault* f2);
+  check_fault_dominance(const TpgFault* f1,
+			const TpgFault* f2);
 
 
 private:

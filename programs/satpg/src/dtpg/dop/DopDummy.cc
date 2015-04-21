@@ -38,7 +38,7 @@ DopDummy::~DopDummy()
 // @param[in] f 故障
 // @param[in] assign_list 値の割当リスト
 void
-DopDummy::operator()(TpgFault* f,
+DopDummy::operator()(const TpgFault* f,
 		     const NodeValList& assign_list)
 {
 }

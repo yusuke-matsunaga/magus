@@ -39,7 +39,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 故障を得る．
-  TpgFault*
+  const TpgFault*
   fault() const;
 
   /// @brief 故障を検出するテストベクタを返す．
@@ -75,7 +75,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 故障
-  TpgFault* mFault;
+  const TpgFault* mFault;
 
   // テストベクタ
   TestVector* mTestVector;
@@ -113,7 +113,7 @@ FaultInfo::~FaultInfo()
 
 // @brief 故障を得る．
 inline
-TpgFault*
+const TpgFault*
 FaultInfo::fault() const
 {
   return mFault;

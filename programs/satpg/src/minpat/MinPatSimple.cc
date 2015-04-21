@@ -35,8 +35,8 @@ struct FaultLt
   }
 
   bool
-  operator()(TpgFault* left,
-	     TpgFault* right)
+  operator()(const TpgFault* left,
+	     const TpgFault* right)
   {
     return mChecker.det_count(left->id()) < mChecker.det_count(right->id());
   }
@@ -69,13 +69,13 @@ MinPatSimple::~MinPatSimple()
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatSimple::init(const vector<TpgFault*>& fault_list,
+MinPatSimple::init(const vector<const TpgFault*>& fault_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
   DomChecker checker(analyzer(), tvmgr, fsim2);
 
-  vector<TpgFault*> dom_fault_list;
+  vector<const TpgFault*> dom_fault_list;
   checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
 
   sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker));

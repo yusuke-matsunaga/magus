@@ -44,7 +44,7 @@ public:
   /// @param[in] dpat 検出したパタンを表すビットベクタ
   virtual
   void
-  operator()(TpgFault* f,
+  operator()(const TpgFault* f,
 	     PackedVal dpat);
 
 

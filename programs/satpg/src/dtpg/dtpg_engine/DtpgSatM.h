@@ -62,7 +62,7 @@ private:
   void
   run_multi(const NodeSet& node_set,
 	    const vector<const TpgNode*>& fnode_list,
-	    const vector<TpgFault*>& flist);
+	    const vector<const TpgFault*>& flist);
 
 
 private:

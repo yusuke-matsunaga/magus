@@ -50,10 +50,12 @@ public:
 
   /// @brief テスト生成を行なう．
   /// @param[in] network 対象のネットワーク
+  /// @param[in] fault_mgr 故障を管理するクラス
   /// @param[in] stats 結果を格納する構造体
   virtual
   void
   run(TpgNetwork& network,
+      FaultMgr& fault_mgr,
       DtpgStats& stats);
 
 
@@ -73,7 +75,7 @@ private:
   /// @param[in] f_tgt 対象の故障
   virtual
   void
-  run_single(TpgFault* f_tgt) = 0;
+  run_single(const TpgFault* f_tgt) = 0;
 
 };
 

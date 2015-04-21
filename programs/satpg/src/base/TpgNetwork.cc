@@ -778,15 +778,6 @@ TpgNetwork::clear_tfimark()
 }
 
 // @brief ノードを得る．
-TpgNode*
-TpgNetwork::node(ymuint pos)
-{
-  // アドレス計算のために TpgNode の定義が必要なのでここに置く．
-  ASSERT_COND( pos < mNodeNum );
-  return &mNodeArray[pos];
-}
-
-// @brief ノードを得る．
 const TpgNode*
 TpgNetwork::node(ymuint pos) const
 {
@@ -1053,17 +1044,11 @@ TpgNetwork::init_node(TpgNode* node,
   node->mFaninNum = ni;
   if ( ni > 0 ) {
     node->mFanins = alloc_array<TpgNode*>(mAlloc, ni);
-    node->mInputFault = alloc_array<TpgFault*>(mAlloc, ni * 2);
-#if 0
-    node->mIfVars = alloc_array<VarId>(mAlloc, ni * 2);
-#endif
+    node->mInputFault = alloc_array<const TpgFault*>(mAlloc, ni * 2);
   }
   else {
     node->mFanins = NULL;
     node->mInputFault = NULL;
-#if 0
-    node->mIfVars = NULL;
-#endif
   }
 
   node->mFanoutsSize = nfo;
@@ -1082,10 +1067,6 @@ TpgNetwork::init_node(TpgNode* node,
   node->mOutputFault[1] = NULL;
 
   node->mMarks = 0U;
-
-#if 0
-  node->clear_oifvar();
-#endif
 }
 
 // @brief TpgNode を生成する．
@@ -1147,8 +1128,8 @@ void
 TpgNetwork::make_faults(const TgNode* tgnode,
 			const HashMap<ymuint, CplxInfo*>& en_hash)
 {
-  TpgFault* rep0 = NULL;
-  TpgFault* rep1 = NULL;
+  const TpgFault* rep0 = NULL;
+  const TpgFault* rep1 = NULL;
 
   if ( tgnode->fanout_num() == 1 &&
        !tgnode->fanout(0)->is_output() ) {
@@ -1176,8 +1157,8 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
 
   // 出力の故障を生成
-  TpgFault* of0 = new_ofault(node, 0, rep0);
-  TpgFault* of1 = new_ofault(node, 1, rep1);
+  const TpgFault* of0 = new_ofault(node, 0, rep0);
+  const TpgFault* of1 = new_ofault(node, 1, rep1);
 
   ymuint nf = 0;
   if ( of0->is_rep() ) {
@@ -1203,7 +1184,7 @@ TpgNetwork::make_faults(const TgNode* tgnode,
       oval1 = c_val(tgnode->gate_type(), kVal1);
     }
 
-    TpgFault* rep0 = NULL;
+    const TpgFault* rep0 = NULL;
     if ( oval0 == kVal0 ) {
       rep0 = of0;
     }
@@ -1211,7 +1192,7 @@ TpgNetwork::make_faults(const TgNode* tgnode,
       rep0 = of1;
     }
 
-    TpgFault* rep1 = NULL;
+    const TpgFault* rep1 = NULL;
     if ( oval1 == kVal0 ) {
       rep1 = of0;
     }
@@ -1221,8 +1202,8 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
     TpgNode* inode = node->input_map(i);
     ymuint ipos = node->ipos_map(i);
-    TpgFault* if0 = new_ifault(inode, ipos, 0, rep0);
-    TpgFault* if1 = new_ifault(inode, ipos, 1, rep1);
+    const TpgFault* if0 = new_ifault(inode, ipos, 0, rep0);
+    const TpgFault* if1 = new_ifault(inode, ipos, 1, rep1);
     if ( if0->is_rep() ) {
       ++ nf;
     }
@@ -1233,10 +1214,10 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
   // 代表故障を mFaultList に入れる．
   node->mFaultNum = nf;
-  node->mFaultList = alloc_array<TpgFault*>(mAlloc, nf);
+  node->mFaultList = alloc_array<const TpgFault*>(mAlloc, nf);
   ymuint pos = 0;
   for (ymuint val = 0; val < 2; ++ val) {
-    TpgFault* f = node->mOutputFault[val];
+    const TpgFault* f = node->mOutputFault[val];
     if ( f->is_rep() ) {
       node->mFaultList[pos] = f;
       ++ pos;
@@ -1244,7 +1225,7 @@ TpgNetwork::make_faults(const TgNode* tgnode,
   }
   for (ymuint i = 0; i < ni; ++ i) {
     for (ymuint val = 0; val < 2; ++ val) {
-      TpgFault* f = node->mInputFault[i * 2 + val];
+      const TpgFault* f = node->mInputFault[i * 2 + val];
       if ( f->is_rep() ) {
 	node->mFaultList[pos] = f;
 	++ pos;
@@ -1260,12 +1241,12 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 // @param[in] rep 代表故障
 //
 // 自分自身が代表故障の場合には rep に NULL を入れる．
-TpgFault*
+const TpgFault*
 TpgNetwork::new_ofault(TpgNode* node,
 		       ymuint val,
-		       TpgFault* rep)
+		       const TpgFault* rep)
 {
-  TpgFault* f = new_fault(node, true, 0, val, rep);
+  const TpgFault* f = new_fault(node, true, 0, val, rep);
   node->mOutputFault[val % 2] = f;
 
   return f;
@@ -1278,13 +1259,13 @@ TpgNetwork::new_ofault(TpgNode* node,
 // @param[in] rep 代表故障
 //
 // 自分自身が代表故障の場合には rep に NULL を入れる．
-TpgFault*
+const TpgFault*
 TpgNetwork::new_ifault(TpgNode* node,
 		       ymuint ipos,
 		       ymuint val,
-		       TpgFault* rep)
+		       const TpgFault* rep)
 {
-  TpgFault* f = new_fault(node, false, ipos, val, rep);
+  const TpgFault* f = new_fault(node, false, ipos, val, rep);
   node->mInputFault[ipos * 2 + (val % 2)] = f;
 
   return f;
@@ -1296,12 +1277,12 @@ TpgNetwork::new_ifault(TpgNode* node,
 // @param[in] ipos 入力の故障の時に入力番号を表す
 // @param[in] val 縮退している値
 // @param[in] rep 代表故障
-TpgFault*
+const TpgFault*
 TpgNetwork::new_fault(TpgNode* node,
 		      bool is_output,
 		      ymuint ipos,
 		      ymuint val,
-		      TpgFault* rep)
+		      const TpgFault* rep)
 {
   TpgFault* f = &mFaultChunk[mFaultNum];
   f->set(mFaultNum, node, is_output, ipos, val, rep);

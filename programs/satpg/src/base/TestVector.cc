@@ -8,6 +8,8 @@
 
 
 #include "TestVector.h"
+#include "NodeValList.h"
+#include "TpgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -129,6 +131,29 @@ TestVector::init()
     ymuint i1 = i + 1;
     mPat[i0] = kPvAll0;
     mPat[i1] = kPvAll0;
+  }
+}
+
+// @brief 割当リストから内容を設定する．
+// @param[in] assign_list 割当リスト
+//
+// assign_list に外部入力以外の割当が含まれている場合無視する．
+void
+TestVector::set_from_assign_list(const NodeValList& assign_list)
+{
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    const TpgNode* node = nv.node();
+    if ( node->is_input() ) {
+      ymuint id = node->input_id();
+      if ( nv.val() ) {
+	set_val(id, kVal1);
+      }
+      else {
+	set_val(id, kVal0);
+      }
+    }
   }
 }
 

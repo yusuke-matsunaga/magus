@@ -21,11 +21,8 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] fsim 故障シミュレータ
-// @param[in] fmgr 故障マネージャ
-FopRtpg::FopRtpg(Fsim& fsim,
-		 FaultMgr& fmgr) :
-  mFsim(fsim),
-  mFaultMgr(fmgr)
+FopRtpg::FopRtpg(Fsim& fsim) :
+  mFsim(fsim)
 {
   clear_count();
 }
@@ -39,12 +36,10 @@ FopRtpg::~FopRtpg()
 // @param[in] f 故障
 // @param[in] dpat 検出したパタンを表すビットベクタ
 void
-FopRtpg::operator()(TpgFault* f,
+FopRtpg::operator()(const TpgFault* f,
 		    PackedVal dpat)
 {
-  if ( f->status() == kFsUndetected ) {
-    mFaultMgr.set_status(f, kFsDetected);
-  }
+  mFaultList.push_back(f);
   mFsim.set_skip(f);
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     if ( dpat & (1UL << i) ) {
@@ -52,6 +47,14 @@ FopRtpg::operator()(TpgFault* f,
       break;
     }
   }
+}
+
+// @brief 初期化する．
+void
+FopRtpg::init()
+{
+  clear_count();
+  mFaultList.clear();
 }
 
 // @brief 検出回数をクリアする．
@@ -69,6 +72,13 @@ ymuint
 FopRtpg::count(ymuint bitpos)
 {
   return mCount[bitpos];
+}
+
+// @brief 検出された故障のリストを得る．
+const vector<const TpgFault*>&
+FopRtpg::fault_list() const
+{
+  return mFaultList;
 }
 
 END_NAMESPACE_YM_SATPG

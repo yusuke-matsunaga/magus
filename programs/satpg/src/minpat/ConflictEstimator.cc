@@ -207,7 +207,7 @@ ConflictChecker::set_verbose(int verbose)
 
 // @brief 故障間の衝突性を調べる．
 void
-ConflictChecker::analyze_conflict(const vector<TpgFault*>& fault_list)
+ConflictChecker::analyze_conflict(const vector<const TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -232,24 +232,24 @@ ConflictChecker::analyze_conflict(const vector<TpgFault*>& fault_list)
 
   ymuint fault_num = fault_list.size();
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    TpgFault* f1 = fault_list[i1];
+    const TpgFault* f1 = fault_list[i1];
 
     if ( mVerbose > 1 ) {
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
     vector<ymuint>& f2_list = mFaultDataArray[f1->id()].mCandList;
-    vector<TpgFault*> conf_list;
+    vector<const TpgFault*> conf_list;
     analyze_conflict(f1, f2_list, conf_list, false, false);
     for (ymuint i = 0; i < conf_list.size(); ++ i) {
-      TpgFault* f2 = conf_list[i];
+      const TpgFault* f2 = conf_list[i];
       mFaultDataArray[f1->id()].mConflictList.push_back(f2->id());
       mFaultDataArray[f2->id()].mConflictList.push_back(f1->id());
     }
   }
 
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    TpgFault* f1 = fault_list[i1];
+    const TpgFault* f1 = fault_list[i1];
     FaultData& fd = mFaultDataArray[f1->id()];
     sort(fd.mConflictList.begin(), fd.mConflictList.end());
   }
@@ -273,7 +273,7 @@ ConflictChecker::conflict_list(ymuint fid)
 
 // @brief 故障間の衝突性を調べる．
 void
-ConflictChecker::estimate_conflict(const vector<TpgFault*>& fault_list,
+ConflictChecker::estimate_conflict(const vector<const TpgFault*>& fault_list,
 				   ymuint sample_num,
 				   vector<double>& conf_prob_array)
 {
@@ -307,30 +307,30 @@ ConflictChecker::estimate_conflict(const vector<TpgFault*>& fault_list,
 #if 0
   ymuint fault_num = fault_list.size();
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    TpgFault* f1 = fault_list[i1];
+    const TpgFault* f1 = fault_list[i1];
 
     if ( mVerbose > 1 ) {
       cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
-    vector<TpgFault*> f2_list;
+    vector<const TpgFault*> f2_list;
     if ( sample_num < fault_num ) {
       f2_list.reserve(sample_num);
       for (ymuint i2 = 0; i2 < sample_num; ++ i2) {
 	ymuint pos = rg.int32() % fault_num;
-	TpgFault* f2 = fault_list[pos];
+	const TpgFault* f2 = fault_list[pos];
 	f2_list.push_back(f2);
       }
     }
     else {
       f2_list.reserve(fault_num);
       for (ymuint i2 = 0; i2 < fault_num; ++ i2) {
-	TpgFault* f2 = fault_list[i2];
+	const TpgFault* f2 = fault_list[i2];
 	f2_list.push_back(f2);
       }
     }
-    vector<TpgFault*> conf_list;
+    vector<const TpgFault*> conf_list;
     analyze_conflict(f1, f2_list, conf_list, true, false);
     conf_prob_array[f1->id()] = static_cast<double>(conf_list.size()) / sample_num;
   }
@@ -349,9 +349,9 @@ ConflictChecker::estimate_conflict(const vector<TpgFault*>& fault_list,
 
 // @brief 1つの故障と複数の故障間の衝突性を調べる．
 void
-ConflictChecker::analyze_conflict(TpgFault* f1,
+ConflictChecker::analyze_conflict(const TpgFault* f1,
 				  const vector<ymuint>& f2_list,
-				  vector<TpgFault*>& conf_list,
+				  vector<const TpgFault*>& conf_list,
 				  bool simple,
 				  bool local_verbose)
 {
@@ -381,7 +381,7 @@ ConflictChecker::analyze_conflict(TpgFault* f1,
     }
 
     const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-    TpgFault* f2 = fi2.fault();
+    const TpgFault* f2 = fi2.fault();
     const NodeValList& suf_list2 = fi2.sufficient_assignment();
     const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
     const NodeValList& ma_list2 = fi2.mandatory_assignment();
@@ -463,9 +463,9 @@ ConflictChecker::analyze_conflict(TpgFault* f1,
 
 // @brief 1つの故障と複数の故障間の衝突性を調べる．
 void
-ConflictChecker::analyze_conflict2(TpgFault* f1,
+ConflictChecker::analyze_conflict2(const TpgFault* f1,
 				   const vector<ymuint>& f2_list,
-				   vector<TpgFault*>& conf_list,
+				   vector<const TpgFault*>& conf_list,
 				   bool simple,
 				   bool local_verbose)
 {
@@ -483,7 +483,7 @@ ConflictChecker::analyze_conflict2(TpgFault* f1,
     ymuint f2_id = f2_list[i2];
 
     const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-    TpgFault* f2 = fi2.fault();
+    const TpgFault* f2 = fi2.fault();
     const NodeValList& suf_list2 = fi2.sufficient_assignment();
     const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
     const NodeValList& ma_list2 = fi2.mandatory_assignment();
@@ -568,8 +568,8 @@ ConflictChecker::analyze_conflict2(TpgFault* f1,
 
 /// @brief f1 と f2 が衝突しているか調べる．
 bool
-ConflictChecker::check_fault_conflict(TpgFault* f1,
-				      TpgFault* f2)
+ConflictChecker::check_fault_conflict(const TpgFault* f1,
+				      const TpgFault* f2)
 {
   GvalCnf gval_cnf2(mMaxNodeId);
   FvalCnf fval_cnf1(mMaxNodeId, gval_cnf2);
@@ -608,7 +608,7 @@ ConflictChecker::print_conflict_stats(ostream& s)
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-ConflictChecker::get_pat_list(const vector<TpgFault*>& fault_list)
+ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -621,7 +621,7 @@ ConflictChecker::get_pat_list(const vector<TpgFault*>& fault_list)
   ymuint npat = fault_list.size();
   ymuint base = 0;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    TpgFault* fault = fault_list[i];
+    const TpgFault* fault = fault_list[i];
     const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
     TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
@@ -694,7 +694,7 @@ ConflictChecker::get_pat_list(const vector<TpgFault*>& fault_list)
 
   // mCandList の後始末．
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    TpgFault* fault = fault_list[i];
+    const TpgFault* fault = fault_list[i];
     FaultData& fd = mFaultDataArray[fault->id()];
     if ( fd.mCandList.size() != fd.mCandListSize ) {
       fd.mCandList.erase(fd.mCandList.begin() + fd.mCandListSize, fd.mCandList.end());
@@ -712,7 +712,7 @@ ConflictChecker::get_pat_list(const vector<TpgFault*>& fault_list)
 
 ymuint
 ConflictChecker::record_pat(const vector<ymuint>& det_list,
-			    const vector<TpgFault*>& fault_list,
+			    const vector<const TpgFault*>& fault_list,
 			    ymuint pat_id)
 {
   ymuint n = det_list.size();
@@ -733,7 +733,7 @@ ConflictChecker::record_pat(const vector<ymuint>& det_list,
       // 構造的に独立でない故障を候補にする．
       const vector<ymuint>& input_list1 = mAnalyzer.input_list(f_id);
       for (ymuint j = 0; j < fault_list.size(); ++ j) {
-	TpgFault* f2 = fault_list[j];
+	const TpgFault* f2 = fault_list[j];
 	ymuint f2_id = f2->id();
 	if ( f2_id == f_id ) {
 	  continue;

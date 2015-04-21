@@ -44,7 +44,7 @@ public:
   /// @param[in] f 故障
   virtual
   void
-  operator()(TpgFault* f,
+  operator()(const TpgFault* f,
 	     PackedVal dpat);
 
   /// @brief det_flag を下ろす．
@@ -53,7 +53,7 @@ public:
 
   /// @brief 故障が見つかったら true を返す．
   bool
-  is_detected(TpgFault* f);
+  is_detected(const TpgFault* f);
 
 
 private:
@@ -89,7 +89,7 @@ FopVer::~FopVer()
 // @brief 故障を検出したときの処理
 // @param[in] f 故障
 void
-FopVer::operator()(TpgFault* fault,
+FopVer::operator()(const TpgFault* fault,
 		   PackedVal dpat)
 {
   mFsim.set_skip(fault);
@@ -105,7 +105,7 @@ FopVer::clear_det_flag()
 
 // @brief 故障が見つかったら true を返す．
 bool
-FopVer::is_detected(TpgFault* fault)
+FopVer::is_detected(const TpgFault* fault)
 {
   return mDetSet.check(fault->id());
 }
@@ -131,7 +131,7 @@ Verifier::~Verifier()
 // @param[in] pat_list パタンのリスト
 bool
 Verifier::check(Fsim& fsim,
-		const vector<TpgFault*>& fault_list,
+		const vector<const TpgFault*>& fault_list,
 		const vector<TestVector*>& pat_list)
 {
   FopVer op(fsim);
@@ -154,9 +154,9 @@ Verifier::check(Fsim& fsim,
   }
 
   bool no_error = true;
-  for (vector<TpgFault*>::const_iterator p = fault_list.begin();
+  for (vector<const TpgFault*>::const_iterator p = fault_list.begin();
        p != fault_list.end(); ++ p) {
-    TpgFault* fault = *p;
+    const TpgFault* fault = *p;
     if ( !op.is_detected(fault) ) {
       cout << "Error: " << fault << " has no patterns" << endl;
       no_error = false;

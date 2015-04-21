@@ -49,7 +49,7 @@ public:
   /// @brief 故障にスキップマークをつける．
   virtual
   void
-  set_skip(TpgFault* f) = 0;
+  set_skip(const TpgFault* f) = 0;
 
   /// @brief 故障リストを設定する．
   /// @param[in] fault_list 対象の故障リスト
@@ -57,7 +57,7 @@ public:
   /// スキップマークは消される．
   virtual
   void
-  set_faults(const vector<TpgFault*>& fault_list) = 0;
+  set_faults(const vector<const TpgFault*>& fault_list) = 0;
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -67,7 +67,7 @@ public:
   virtual
   bool
   spsfp(TestVector* tv,
-	TpgFault* f) = 0;
+	const TpgFault* f) = 0;
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] assign_list 値の割当リスト
@@ -77,7 +77,7 @@ public:
   virtual
   bool
   spsfp(const NodeValList& assign_list,
-	TpgFault* f) = 0;
+	const TpgFault* f) = 0;
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ

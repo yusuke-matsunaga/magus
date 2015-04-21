@@ -49,7 +49,7 @@ DopDrop::~DopDrop()
 // @param[in] f 故障
 // @param[in] assign_list 値割当のリスト
 void
-DopDrop::operator()(TpgFault* f,
+DopDrop::operator()(const TpgFault* f,
 		    const NodeValList& assign_list)
 {
   mFsim.sppfp(assign_list, mOp);

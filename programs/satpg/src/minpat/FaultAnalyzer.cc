@@ -92,7 +92,7 @@ FaultAnalyzer::verbose() const
 void
 FaultAnalyzer::init(const TpgNetwork& network,
 		    TvMgr& tvmgr,
-		    vector<TpgFault*>& fault_list)
+		    vector<const TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -107,7 +107,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
     }
     ymuint nf = node->fault_num();
     for (ymuint i = 0; i < nf; ++ i) {
-      TpgFault* fault = node->fault(i);
+      const TpgFault* fault = node->fault(i);
       ymuint f_id = fault->id();
       if ( mMaxFaultId < f_id ) {
 	mMaxFaultId = f_id;
@@ -164,7 +164,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
 
     ymuint nf = node->fault_num();
     for (ymuint i = 0; i < nf; ++ i) {
-      TpgFault* fault = node->fault(i);
+      const TpgFault* fault = node->fault(i);
       Bool3 stat = analyze_fault(fault, tvmgr);
       ++ f_all;
       switch ( stat ) {
@@ -193,7 +193,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
     ymuint ni = node->fanin_num();
     bool has_ncfault = false;
     for (ymuint j = 0; j < ni; ++ j) {
-      TpgFault* f0 = node->input_fault(0, j);
+      const TpgFault* f0 = node->input_fault(0, j);
       if ( f0 != NULL ) {
 	if ( f0->is_rep() && det_flag[f0->id()] ) {
 	  mOrigFaultList.push_back(f0);
@@ -202,7 +202,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
 	  has_ncfault = true;
 	}
       }
-      TpgFault* f1 = node->input_fault(1, j);
+      const TpgFault* f1 = node->input_fault(1, j);
       if ( f1 != NULL ) {
 	if ( f1->is_rep() && det_flag[f1->id()] ) {
 	  mOrigFaultList.push_back(f1);
@@ -212,13 +212,13 @@ FaultAnalyzer::init(const TpgNetwork& network,
 	}
       }
     }
-    TpgFault* f0 = node->output_fault(0);
+    const TpgFault* f0 = node->output_fault(0);
     if ( f0 != NULL && f0->is_rep() && det_flag[f0->id()] ) {
       if ( node->noval() != kVal0 || !has_ncfault ) {
 	mOrigFaultList.push_back(f0);
       }
     }
-    TpgFault* f1 = node->output_fault(1);
+    const TpgFault* f1 = node->output_fault(1);
     if ( f1 != NULL && f1->is_rep() && det_flag[f1->id()] ) {
       if ( node->noval() != kVal1 || !has_ncfault ) {
 	mOrigFaultList.push_back(f1);
@@ -245,7 +245,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
 // @param[in] fault 故障
 // @param[in] tvmgr テストベクタのマネージャ
 Bool3
-FaultAnalyzer::analyze_fault(TpgFault* fault,
+FaultAnalyzer::analyze_fault(const TpgFault* fault,
 			     TvMgr& tvmgr)
 {
   ymuint f_id = fault->id();
@@ -325,7 +325,7 @@ FaultAnalyzer::max_fault_id() const
 }
 
 // @brief 検出可能な故障のリストを得る．
-const vector<TpgFault*>&
+const vector<const TpgFault*>&
 FaultAnalyzer::fault_list() const
 {
   return mOrigFaultList;
@@ -333,7 +333,7 @@ FaultAnalyzer::fault_list() const
 
 // @brief 故障を得る．
 // @param[in] fid 故障番号
-TpgFault*
+const TpgFault*
 FaultAnalyzer::fault(ymuint fid)
 {
   ASSERT_COND( fid < mMaxFaultId );
@@ -355,7 +355,7 @@ const vector<ymuint>&
 FaultAnalyzer::input_list(ymuint fid)
 {
   ASSERT_COND( fid < mMaxFaultId );
-  TpgFault* fault = mFaultInfoArray[fid].fault();
+  const TpgFault* fault = mFaultInfoArray[fid].fault();
   return mInputListArray[fault->node()->id()];
 }
 
@@ -365,7 +365,7 @@ const vector<ymuint>&
 FaultAnalyzer::input_list2(ymuint fid)
 {
   ASSERT_COND( fid < mMaxFaultId );
-  TpgFault* fault = mFaultInfoArray[fid].fault();
+  const TpgFault* fault = mFaultInfoArray[fid].fault();
   return mInputList2Array[fault->node()->id()];
 }
 
@@ -374,7 +374,7 @@ const NodeSet&
 FaultAnalyzer::node_set(ymuint fid)
 {
   ASSERT_COND( fid < mMaxFaultId );
-  TpgFault* fault = mFaultInfoArray[fid].fault();
+  const TpgFault* fault = mFaultInfoArray[fid].fault();
   return mNodeSetArray[fault->node()->id()];
 }
 

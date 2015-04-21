@@ -10,6 +10,7 @@
 
 #include "satpg_nsdef.h"
 #include "FaultStatus.h"
+#include "TpgFault.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -25,6 +26,8 @@ BEGIN_NAMESPACE_YM_SATPG
 /// FaultMgr はそれぞれの状態ごとの故障リストを持つ．
 /// 故障の状態変化が FaultMgr::set_status() によって
 /// 通知されるとその内容にしたがって故障リストを変更する．
+///
+/// ただし故障リストの更新は実際に読み出されるまで遅延される．
 //////////////////////////////////////////////////////////////////////
 class FaultMgr
 {
@@ -42,29 +45,33 @@ public:
   // read-only のメソッド
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障の状態を得る．
+  FaultStatus
+  status(const TpgFault* fault) const;
+
   /// @brief 検出済みの代表故障のリストを得る．
-  const vector<TpgFault*>&
-  det_list();
+  const vector<const TpgFault*>&
+  det_list() const;
 
   /// @brief 検出済みの代表故障数を得る．
   ymuint
-  det_num();
+  det_num() const;
 
   /// @brief 未検出の代表故障のリストを得る．
-  const vector<TpgFault*>&
-  remain_list();
+  const vector<const TpgFault*>&
+  remain_list() const;
 
   /// @brief 未検出の代表故障数を得る．
   ymuint
-  remain_num();
+  remain_num() const;
 
   /// @brief 検出不能故障のリストを得る．
-  const vector<TpgFault*>&
-  untest_list();
+  const vector<const TpgFault*>&
+  untest_list() const;
 
   /// @brief 検出不能故障数を得る．
   ymuint
-  untest_num();
+  untest_num() const;
 
 
 public:
@@ -79,13 +86,13 @@ public:
   /// @brief network の故障を設定する．
   /// @param[in] network 対象のネットワーク
   void
-  set_faults(TpgNetwork& network);
+  set_faults(const TpgNetwork& network);
 
   /// @brief fault の状態を変更する．
   /// @param[in] fault 対象の故障
   /// @param[in] stat 故障の状態
   void
-  set_status(TpgFault* fault,
+  set_status(const TpgFault* fault,
 	     FaultStatus stat);
 
 
@@ -96,7 +103,7 @@ private:
 
   /// @brief 故障リストをスキャンして未検出リストを更新する．
   void
-  update();
+  update() const;
 
 
 private:
@@ -104,16 +111,23 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 故障の状態を保持する配列
+  vector<FaultStatus> mStatusArray;
+
   // 検出済みの故障を保持しておくリスト
-  vector<TpgFault*> mDetList;
+  mutable
+  vector<const TpgFault*> mDetList;
 
   // 未検出の故障を保持しておくリスト
-  vector<TpgFault*> mRemainList;
+  mutable
+  vector<const TpgFault*> mRemainList;
 
   // 検出不能故障を保持しておくリスト
-  vector<TpgFault*> mUntestList;
+  mutable
+  vector<const TpgFault*> mUntestList;
 
   // 故障リストに変化があったことを記録するフラグ
+  mutable
   bool mChanged;
 
 };
@@ -123,10 +137,19 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief 故障の状態を得る．
+inline
+FaultStatus
+FaultMgr::status(const TpgFault* fault) const
+{
+  ASSERT_COND( fault->id() < mStatusArray.size() );
+  return mStatusArray[fault->id()];
+}
+
 // @brief 検出済みの代表故障のリストを得る．
 inline
-const vector<TpgFault*>&
-FaultMgr::det_list()
+const vector<const TpgFault*>&
+FaultMgr::det_list() const
 {
   update();
   return mDetList;
@@ -135,7 +158,7 @@ FaultMgr::det_list()
 // @brief 検出済みの代表故障数を得る．
 inline
 ymuint
-FaultMgr::det_num()
+FaultMgr::det_num() const
 {
   update();
   return mDetList.size();
@@ -143,8 +166,8 @@ FaultMgr::det_num()
 
 // @brief 未検出の故障のリストを得る．
 inline
-const vector<TpgFault*>&
-FaultMgr::remain_list()
+const vector<const TpgFault*>&
+FaultMgr::remain_list() const
 {
   update();
   return mRemainList;
@@ -153,7 +176,7 @@ FaultMgr::remain_list()
 // @brief 未検出の代表故障数を得る．
 inline
 ymuint
-FaultMgr::remain_num()
+FaultMgr::remain_num() const
 {
   update();
   return mRemainList.size();
@@ -161,8 +184,8 @@ FaultMgr::remain_num()
 
 // @brief 検出不能故障のリストを得る．
 inline
-const vector<TpgFault*>&
-FaultMgr::untest_list()
+const vector<const TpgFault*>&
+FaultMgr::untest_list() const
 {
   update();
   return mUntestList;
@@ -171,7 +194,7 @@ FaultMgr::untest_list()
 // @brief 検出不能故障数を得る．
 inline
 ymuint
-FaultMgr::untest_num()
+FaultMgr::untest_num() const
 {
   update();
   return mUntestList.size();
