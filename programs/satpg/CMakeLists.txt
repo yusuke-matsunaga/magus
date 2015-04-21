@@ -111,7 +111,8 @@ set (minpat_SOURCES
   src/minpat/FaultAnalyzer.cc
   src/minpat/DomChecker.cc
   src/minpat/ConflictChecker.cc
-  src/minpat/FgMgr.cc
+  src/minpat/FgMgr1.cc
+  src/minpat/FgMgr2.cc
   src/minpat/Compactor.cc
   )
 

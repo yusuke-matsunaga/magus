@@ -41,6 +41,10 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 				"<int>: specify verbose-level");
   mPoptDomMethod = new TclPoptInt(this, "dom-method",
 				  "<int>: specify dominance check method(0-2)");
+  mPoptExact = new TclPopt(this, "exact",
+			   "exact fault grouping");
+  mPoptCompaction = new TclPopt(this, "compaction",
+				"do compaction");
 }
 
 // @brief デストラクタ
@@ -66,6 +70,8 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool dsatur2 = mPoptDsatur2->is_specified();
   int verbose = mPoptVerbose->is_specified() ? mPoptVerbose->val() : 0;
   bool group_dominance = mPoptGroupDominance->is_specified();
+  bool exact = mPoptExact->is_specified();
+  bool compaction = mPoptCompaction->is_specified();
 
   MinPat* minpat = NULL;
 
@@ -92,7 +98,7 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   }
 
   USTime time;
-  minpat->run(_network(), _tv_mgr(),  _fsim(), _tv_list(), time);
+  minpat->run(_network(), _tv_mgr(),  _fsim(), exact, compaction, _tv_list(), time);
 
   delete minpat;
 

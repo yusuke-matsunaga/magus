@@ -1,13 +1,13 @@
 
-/// @file FgMgr.cc
-/// @brief FgMgr の実装ファイル
+/// @file FgMgr1.cc
+/// @brief FgMgr1 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "FgMgr.h"
+#include "FgMgr1.h"
 
 #include "TpgFault.h"
 #include "NodeSet.h"
@@ -20,25 +20,25 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-// クラス FgMgr
+// クラス FgMgr1
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] max_node_id ノード番号の最大値 + 1
-FgMgr::FgMgr(ymuint max_node_id) :
+FgMgr1::FgMgr1(ymuint max_node_id) :
   mMaxNodeId(max_node_id)
 {
 }
 
 // @brief デストラクタ
-FgMgr::~FgMgr()
+FgMgr1::~FgMgr1()
 {
   clear();
 }
 
 // @brief クリアする．
 void
-FgMgr::clear()
+FgMgr1::clear()
 {
   for (ymuint gid = 0; gid < mGroupList.size(); ++ gid) {
     delete mGroupList[gid];
@@ -48,7 +48,7 @@ FgMgr::clear()
 
 // @brief 現在のグループ数を返す．
 ymuint
-FgMgr::group_num() const
+FgMgr1::group_num() const
 {
   return mGroupList.size();
 }
@@ -56,7 +56,7 @@ FgMgr::group_num() const
 // @brief 新しいグループを作る．
 // @return グループ番号を返す．
 ymuint
-FgMgr::new_group()
+FgMgr1::new_group()
 {
   FaultGroup* fg = new FaultGroup;
   bool found = false;
@@ -79,7 +79,7 @@ FgMgr::new_group()
 // @param[in] src_gid 複製元のグループ番号
 // @return 新しいグループ番号を返す．
 ymuint
-FgMgr::duplicate_group(ymuint src_gid)
+FgMgr1::duplicate_group(ymuint src_gid)
 {
   ASSERT_COND( src_gid < mGroupList.size() );
   FaultGroup* src_fg = mGroupList[src_gid];
@@ -98,7 +98,7 @@ FgMgr::duplicate_group(ymuint src_gid)
 //
 // new_gid は削除される．
 void
-FgMgr::replace_group(ymuint old_gid,
+FgMgr1::replace_group(ymuint old_gid,
 		     ymuint new_gid)
 {
   delete_group(old_gid);
@@ -114,7 +114,7 @@ FgMgr::replace_group(ymuint old_gid,
 // @brief グループを削除する．
 // @param[in] gid グループ番号
 void
-FgMgr::delete_group(ymuint gid)
+FgMgr1::delete_group(ymuint gid)
 {
   ASSERT_COND( gid < mGroupList.size() );
   FaultGroup* fg = mGroupList[gid];
@@ -123,11 +123,96 @@ FgMgr::delete_group(ymuint gid)
   mGroupList[gid] = NULL;
 }
 
+// @brief 新たな条件なしで追加できる既存グループを見つける．
+// @param[in] fault 対象の故障
+// @param[in] group_list 探索最小のグループ番号のリスト
+// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
+// @param[out] gid_list 対象のグループ番号を収めるリスト
+// @return 最初のグループ番号を返す．
+//
+// 見つからない場合は group_num() を返す．
+// gid_list は first_hit == true の時，意味を持たない．
+ymuint
+FgMgr1::find_dom_group(const TpgFault* fault,
+		      const vector<ymuint>& group_list,
+		      bool first_hit,
+		      vector<ymuint>& gid_list)
+{
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
+
+  NodeSet node_set;
+  node_set.mark_region(mMaxNodeId, fault->node());
+
+  // fault が見つからない条件を作る．
+  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal0);
+
+  ymuint first_gid = group_num();
+  for (ymuint i = 0; i < group_list.size(); ++ i) {
+    ymuint gid = group_list[i];
+    const NodeValList& suf_list0 = sufficient_assignment(gid);
+    if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
+      // suf_lib0 のもとでは必ず見つかるということ．
+      if ( first_gid == group_num() ) {
+	first_gid = gid;
+	if ( first_hit ) {
+	  break;
+	}
+      }
+      gid_list.push_back(gid);
+    }
+  }
+  return first_gid;
+}
+
+// @brief 追加できる既存グループを見つける．
+// @param[in] fault 対象の故障
+// @param[in] group_list 探索最小のグループ番号のリスト
+// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
+// @param[out] gid_list 対象のグループ番号を収めるリスト
+// @return 最初のグループ番号を返す．
+//
+// 見つからない場合は group_num() を返す．
+// gid_list は first_hit == true の時，意味を持たない．
+ymuint
+FgMgr1::find_group(const TpgFault* fault,
+		  const vector<ymuint>& group_list,
+		  bool first_hit,
+		  vector<ymuint>& gid_list)
+{
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  SatEngine engine(string(), string(), NULL);
+
+  NodeSet node_set;
+  node_set.mark_region(mMaxNodeId, fault->node());
+
+  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
+
+  ymuint first_gid = group_num();
+  for (ymuint i = 0; i < group_list.size(); ++ i) {
+    ymuint gid = group_list[i];
+    const NodeValList& suf_list0 = sufficient_assignment(gid);
+    Bool3 sat_ans = engine.check_sat(gval_cnf, suf_list0);
+    if ( sat_ans == kB3True ) {
+      if ( first_gid == group_num() ) {
+	first_gid = gid;
+	if ( first_hit ) {
+	  break;
+	}
+      }
+      gid_list.push_back(gid);
+    }
+  }
+  return first_gid;
+}
+
 // @brief 既存のグループに故障を追加する．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 // @param[in] fault 故障
 void
-FgMgr::add_fault(ymuint gid,
+FgMgr1::add_fault(ymuint gid,
 		 const TpgFault* fault)
 {
   ASSERT_COND( gid < group_num() );
@@ -157,7 +242,7 @@ FgMgr::add_fault(ymuint gid,
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 // @param[in] fault_list 故障リスト
 void
-FgMgr::delete_fault(ymuint gid,
+FgMgr1::delete_fault(ymuint gid,
 		    const vector<const TpgFault*>& fault_list)
 {
   ASSERT_COND( gid < group_num() );
@@ -191,7 +276,7 @@ FgMgr::delete_fault(ymuint gid,
 // @brief 故障リストを返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 const vector<const TpgFault*>&
-FgMgr::fault_list(ymuint gid) const
+FgMgr1::fault_list(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
@@ -201,7 +286,7 @@ FgMgr::fault_list(ymuint gid) const
 // @brief 十分割当リストを返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 const NodeValList&
-FgMgr::sufficient_assignment(ymuint gid) const
+FgMgr1::sufficient_assignment(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
@@ -211,7 +296,7 @@ FgMgr::sufficient_assignment(ymuint gid) const
 // @brief 外部入力上の十分割当リストを返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 const NodeValList&
-FgMgr::pi_sufficient_assignment(ymuint gid) const
+FgMgr1::pi_sufficient_assignment(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];

@@ -8,7 +8,8 @@
 
 
 #include "MinPatBase.h"
-#include "FgMgr.h"
+#include "FgMgr1.h"
+#include "FgMgr2.h"
 #include "Compactor.h"
 #include "TpgNetwork.h"
 #include "TpgFault.h"
@@ -52,6 +53,8 @@ void
 MinPatBase::run(TpgNetwork& network,
 		TvMgr& tvmgr,
 		Fsim& fsim2,
+		bool exact,
+		bool compaction,
 		vector<TestVector*>& tv_list,
 		USTime& time)
 {
@@ -70,7 +73,9 @@ MinPatBase::run(TpgNetwork& network,
   StopWatch local_timer;
   local_timer.start();
 
-  FgMgr fgmgr(mMaxNodeId);
+  FgMgr1 fgmgr1(mMaxNodeId);
+  FgMgr2 fgmgr2(mMaxNodeId);
+  FgMgr& fgmgr = exact ? static_cast<FgMgr&>(fgmgr2) : static_cast<FgMgr&>(fgmgr1);
   vector<ymuint> group_list;
   ymuint nf = fault_num();
 
@@ -118,34 +123,37 @@ MinPatBase::run(TpgNetwork& network,
     if ( verbose() > 1 ) {
       cout << endl;
     }
-    cout << " # of fault groups = " << group_list.size() << endl;
+    cout << " # of fault groups = " << setw(4) << group_list.size() << endl;
     cout << "CPU time (coloring)              " << local_timer.time() << endl;
   }
 
-  // 後処理
-  local_timer.reset();
-  local_timer.start();
+  if ( compaction ) {
+    // 後処理
+    local_timer.reset();
+    local_timer.start();
 
-  Compactor compactor;
+    Compactor compactor;
 
-  vector<ymuint> new_group_list;
-  compactor.run(fgmgr, mMaxNodeId, group_list, new_group_list);
+    vector<ymuint> new_group_list;
+    compactor.run(fgmgr, mMaxNodeId, group_list, new_group_list);
+    group_list = new_group_list;
 
-  local_timer.stop();
-  if ( verbose() > 0 ) {
-    cout << " # of fault groups = " << new_group_list.size() << endl;
-    cout << "CPU time (compaction)              " << local_timer.time() << endl;
+    local_timer.stop();
+    if ( verbose() > 0 ) {
+      cout << " # of fault groups = " << setw(4) << group_list.size() << endl;
+      cout << "CPU time (compaction)              " << local_timer.time() << endl;
+    }
   }
 
   // テストパタンを作る．
   local_timer.reset();
   local_timer.start();
 
-  ymuint new_ng = new_group_list.size();
+  ymuint new_ng = group_list.size();
   tv_list.clear();
   tv_list.reserve(new_ng);
   for (ymuint i = 0; i < new_ng; ++ i) {
-    ymuint gid = new_group_list[i];
+    ymuint gid = group_list[i];
     const NodeValList& suf_list = fgmgr.sufficient_assignment(gid);
     TestVector* tv = tvmgr.new_vector();
     make_testvector(network, suf_list, tv);
@@ -210,6 +218,7 @@ MinPatBase::find_group(FgMgr& fgmgr,
 		       const TpgFault* fault,
 		       const vector<ymuint>& group_list)
 {
+#if 0
   const NodeSet& node_set = analyzer().node_set(fault->id());
 
   if ( mGroupDominance ) {
@@ -244,7 +253,21 @@ MinPatBase::find_group(FgMgr& fgmgr,
       return gid;
     }
   }
+
   return fgmgr.group_num();
+#else
+  if ( mGroupDominance ) {
+    vector<ymuint> dummy;
+    ymuint gid = fgmgr.find_dom_group(fault, group_list, true, dummy);
+    if ( gid != fgmgr.group_num() ) {
+      return gid;
+    }
+  }
+
+  vector<ymuint> dummy;
+  ymuint gid = fgmgr.find_group(fault, group_list, true, dummy);
+  return gid;
+#endif
 }
 
 // @brief テストパタンを作る．

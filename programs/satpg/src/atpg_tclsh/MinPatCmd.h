@@ -70,6 +70,11 @@ private:
   // dom_method オプションの解析用オブジェクト
   TclPoptInt* mPoptDomMethod;
 
+  // exact オプションの解析用オブジェクト
+  TclPopt* mPoptExact;
+
+  // compaction オプションの解析用オブジェクト
+  TclPopt* mPoptCompaction;
 };
 
 END_NAMESPACE_YM_SATPG
