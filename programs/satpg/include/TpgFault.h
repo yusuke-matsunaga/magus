@@ -93,18 +93,6 @@ public:
   // 微妙な関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief スキップフラグを返す．
-  bool
-  is_skip() const;
-
-  /// @brief スキップフラグをセットする．
-  void
-  set_skip();
-
-  /// @brief スキップフラグをクリアする．
-  void
-  clear_skip();
-
   /// @brief 故障の支配関係を設定する．
   /// @param[in] dom_f 支配する故障
   void
@@ -268,35 +256,6 @@ TpgFault::dom_list() const
 {
   return mDomList;
 }
-
-#if 0
-// @brief スキップフラグを返す．
-inline
-bool
-TpgFault::is_skip() const
-{
-  if ( status() == kFsDetected ) {
-    return true;
-  }
-  return static_cast<bool>((mPosVal >> 2) & 1U);
-}
-
-// @brief スキップフラグをセットする．
-inline
-void
-TpgFault::set_skip()
-{
-  mPosVal |= 4U;
-}
-
-// @brief スキップフラグをクリアする．
-inline
-void
-TpgFault::clear_skip()
-{
-  mPosVal &= ~4U;
-}
-#endif
 
 // @brief 故障の支配関係を設定する．
 // @param[in] dom_f 支配する故障
