@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+class FaultAnalyzer;
+
 //////////////////////////////////////////////////////////////////////
 /// @class FgMgr2 FgMgr2.h "FgMgr2.h"
 /// @brief fault group manager
@@ -28,7 +30,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] max_node_id ノード番号の最大値 + 1
-  FgMgr2(ymuint max_node_id);
+  /// @param[in] analyzer 故障解析器
+  FgMgr2(ymuint max_node_id,
+	 const FaultAnalyzer& analyzer);
 
   /// @brief デストラクタ
   virtual
@@ -158,13 +162,12 @@ private:
     void
     add_fault(const TpgFault* fault,
 	      const NodeValList& suf_list,
-	      const NodeValList& pi_suf_list)
+	      const NodeValList& ma_list)
     {
       mFaultList.push_back(fault);
       mFaultSufList.push_back(suf_list);
-      mFaultPiSufList.push_back(pi_suf_list);
       mSufList.merge(suf_list);
-      mPiSufList.merge(pi_suf_list);
+      mMaList.merge(ma_list);
     }
 
     // グループ番号
@@ -176,14 +179,11 @@ private:
     // 故障ごとの十分割当リスト
     vector<NodeValList> mFaultSufList;
 
-    // 故障ごとの外部入力十分割当リスト
-    vector<NodeValList> mFaultPiSufList;
-
     // 十分割当リスト
     NodeValList mSufList;
 
-    // 外部入力十分割当リスト
-    NodeValList mPiSufList;
+    // 必要割当リスト
+    NodeValList mMaList;
 
   };
 
@@ -201,6 +201,9 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
+
+  // 故障解析器
+  const FaultAnalyzer& mAnalyzer;
 
   // 故障グループの配列
   vector<FaultGroup*> mGroupList;

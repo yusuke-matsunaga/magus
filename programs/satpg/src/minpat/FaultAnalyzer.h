@@ -73,7 +73,7 @@ public:
   /// @brief 故障を得る．
   /// @param[in] fid 故障番号
   const TpgFault*
-  fault(ymuint fid);
+  fault(ymuint fid) const;
 
   /// @brief 個別の故障の情報を得る．
   /// @param[in] fid 故障番号
@@ -83,16 +83,16 @@ public:
   /// @brief 故障のTFOのTFIに含まれる入力番号のリスト返す．
   /// @param[in] fid 故障番号
   const vector<ymuint>&
-  input_list(ymuint fid);
+  input_list(ymuint fid) const;
 
   /// @brief 故障のTFIに含まれる入力番号のリスト返す．
   /// @param[in] fid 故障番号
   const vector<ymuint>&
-  input_list2(ymuint fid);
+  input_list2(ymuint fid) const;
 
   /// @brief 故障に関連するノード集合を返す．
   const NodeSet&
-  node_set(ymuint fid);
+  node_set(ymuint fid) const;
 
 
 private:

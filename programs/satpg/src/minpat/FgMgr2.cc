@@ -14,6 +14,7 @@
 #include "GvalCnf.h"
 #include "FvalCnf.h"
 #include "SatEngine.h"
+#include "FaultAnalyzer.h"
 #include "YmUtils/HashSet.h"
 
 
@@ -25,8 +26,11 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief コンストラクタ
 // @param[in] max_node_id ノード番号の最大値 + 1
-FgMgr2::FgMgr2(ymuint max_node_id) :
-  mMaxNodeId(max_node_id)
+// @param[in] analyzer 故障解析器
+FgMgr2::FgMgr2(ymuint max_node_id,
+	       const FaultAnalyzer& analyzer) :
+  mMaxNodeId(max_node_id),
+  mAnalyzer(analyzer)
 {
 }
 
@@ -89,6 +93,7 @@ FgMgr2::duplicate_group(ymuint src_gid)
   dst_fg->mFaultList = src_fg->mFaultList;
   dst_fg->mFaultSufList = src_fg->mFaultSufList;
   dst_fg->mSufList = src_fg->mSufList;
+  dst_fg->mMaList = dst_fg->mMaList;
   return gid;
 }
 
@@ -196,15 +201,28 @@ FgMgr2::find_group(const TpgFault* fault,
 		   vector<ymuint>& gid_list)
 {
   ymuint first_gid = group_num();
+
+  GvalCnf gval_cnf0(mMaxNodeId);
+  FvalCnf fval_cnf0(mMaxNodeId, gval_cnf0);
+  SatEngine engine0(string(), string(), NULL);
+
+  const NodeSet& node_set = mAnalyzer.node_set(fault->id());
+
+  engine0.make_fval_cnf(fval_cnf0, fault, node_set, kVal1);
+
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
+
+    const NodeValList& ma_list = mGroupList[gid]->mMaList;
+    if ( engine0.check_sat(gval_cnf0, ma_list) == kB3False ) {
+      continue;
+    }
 
     GvalCnf gval_cnf(mMaxNodeId);
     FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
     SatEngine engine(string(), string(), NULL);
 
-    NodeSet node_set;
-    node_set.mark_region(mMaxNodeId, fault->node());
+    const NodeSet& node_set = mAnalyzer.node_set(fault->id());
 
     engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
 
@@ -271,7 +289,6 @@ FgMgr2::add_fault(ymuint gid,
   Bool3 sat_ans = engine.check_sat(sat_model);
   ASSERT_COND( sat_ans == kB3True );
   fg->mSufList.clear();
-  fg->mPiSufList.clear();
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fg->mFaultList[i];
     const NodeSet& node_set = node_set_array[i];
@@ -279,9 +296,7 @@ FgMgr2::add_fault(ymuint gid,
     NodeValList pi_suf_list;
     fval_cnf_array[i]->get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
     fg->mFaultSufList[i] = suf_list;
-    fg->mFaultPiSufList[i] = pi_suf_list;
     fg->mSufList.merge(suf_list);
-    fg->mPiSufList.merge(pi_suf_list);
     delete fval_cnf_array[i];
   }
 
@@ -289,7 +304,8 @@ FgMgr2::add_fault(ymuint gid,
   NodeValList pi_suf_list;
   fval_cnf.get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
 
-  fg->add_fault(fault, suf_list, pi_suf_list);
+  const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+  fg->add_fault(fault, suf_list, fi.mandatory_assignment());
 }
 
 // @brief 故障を取り除く
@@ -354,7 +370,7 @@ FgMgr2::pi_sufficient_assignment(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
-  return fg->mPiSufList;
+  return fg->mSufList;
 }
 
 END_NAMESPACE_YM_SATPG

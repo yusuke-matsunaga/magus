@@ -74,7 +74,7 @@ MinPatBase::run(TpgNetwork& network,
   local_timer.start();
 
   FgMgr1 fgmgr1(mMaxNodeId);
-  FgMgr2 fgmgr2(mMaxNodeId);
+  FgMgr2 fgmgr2(mMaxNodeId, analyzer());
   FgMgr& fgmgr = exact ? static_cast<FgMgr&>(fgmgr2) : static_cast<FgMgr&>(fgmgr1);
   vector<ymuint> group_list;
   ymuint nf = fault_num();

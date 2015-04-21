@@ -334,7 +334,7 @@ FaultAnalyzer::fault_list() const
 // @brief 故障を得る．
 // @param[in] fid 故障番号
 const TpgFault*
-FaultAnalyzer::fault(ymuint fid)
+FaultAnalyzer::fault(ymuint fid) const
 {
   ASSERT_COND( fid < mMaxFaultId );
   return mFaultInfoArray[fid].fault();
@@ -352,7 +352,7 @@ FaultAnalyzer::fault_info(ymuint fid) const
 // @brief 故障のTFOのTFIに含まれる入力番号のリスト返す．
 // @param[in] fid 故障番号
 const vector<ymuint>&
-FaultAnalyzer::input_list(ymuint fid)
+FaultAnalyzer::input_list(ymuint fid) const
 {
   ASSERT_COND( fid < mMaxFaultId );
   const TpgFault* fault = mFaultInfoArray[fid].fault();
@@ -362,7 +362,7 @@ FaultAnalyzer::input_list(ymuint fid)
 // @brief 故障のTFIに含まれる入力番号のリスト返す．
 // @param[in] fid 故障番号
 const vector<ymuint>&
-FaultAnalyzer::input_list2(ymuint fid)
+FaultAnalyzer::input_list2(ymuint fid) const
 {
   ASSERT_COND( fid < mMaxFaultId );
   const TpgFault* fault = mFaultInfoArray[fid].fault();
@@ -371,7 +371,7 @@ FaultAnalyzer::input_list2(ymuint fid)
 
 // @brief 故障に関連するノード集合を返す．
 const NodeSet&
-FaultAnalyzer::node_set(ymuint fid)
+FaultAnalyzer::node_set(ymuint fid) const
 {
   ASSERT_COND( fid < mMaxFaultId );
   const TpgFault* fault = mFaultInfoArray[fid].fault();
