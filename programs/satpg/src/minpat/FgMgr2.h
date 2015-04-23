@@ -9,13 +9,10 @@
 /// All rights reserved.
 
 
-#include "FgMgr.h"
-#include "NodeValList.h"
+#include "FgMgrBase.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-class FaultAnalyzer;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FgMgr2 FgMgr2.h "FgMgr2.h"
@@ -24,7 +21,7 @@ class FaultAnalyzer;
 /// 故障グループを管理するクラス
 //////////////////////////////////////////////////////////////////////
 class FgMgr2 :
-  public FgMgr
+  public FgMgrBase
 {
 public:
 
@@ -43,45 +40,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief クリアする．
-  virtual
-  void
-  clear();
-
-  /// @brief 現在のグループ数を返す．
-  virtual
-  ymuint
-  group_num() const;
-
-  /// @brief 新しいグループを作る．
-  /// @return グループ番号を返す．
-  virtual
-  ymuint
-  new_group();
-
-  /// @brief グループを複製する．
-  /// @param[in] src_gid 複製元のグループ番号
-  /// @return 新しいグループ番号を返す．
-  virtual
-  ymuint
-  duplicate_group(ymuint src_gid);
-
-  /// @brief グループを置き換える．
-  /// @param[in] old_gid 置き換え対象のグループ番号
-  /// @param[in] new_gid 置き換えるグループ番号
-  ///
-  /// new_gid は削除される．
-  virtual
-  void
-  replace_group(ymuint old_gid,
-		ymuint new_gid);
-
-  /// @brief グループを削除する．
-  /// @param[in] gid グループ番号
-  virtual
-  void
-  delete_group(ymuint gid);
 
   /// @brief 新たな条件なしで追加できる既存グループを見つける．
   /// @param[in] fault 対象の故障
@@ -131,88 +89,6 @@ public:
   delete_fault(ymuint gid,
 	       const vector<const TpgFault*>& fault_list);
 
-  /// @brief グループの故障数を返す．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  virtual
-  ymuint
-  fault_num(ymuint gid) const;
-
-  /// @brief グループの故障を返す．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] pos ( 0 <= pos < fault_num(gid) )
-  virtual
-  const TpgFault*
-  fault(ymuint gid,
-	ymuint pos) const;
-
-  /// @brief 十分割当リストを返す．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  virtual
-  const NodeValList&
-  sufficient_assignment(ymuint gid) const;
-
-  /// @brief 必要割当リストを返す．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  virtual
-  const NodeValList&
-  mandatory_assignment(ymuint gid) const;
-
-  /// @brief 外部入力上の十分割当リストを返す．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  virtual
-  const NodeValList&
-  pi_sufficient_assignment(ymuint gid) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // 故障グループを表す構造体
-  struct FaultGroup
-  {
-    /// @brief 故障を追加する．
-    void
-    add_fault(const TpgFault* fault,
-	      const NodeValList& suf_list,
-	      const NodeValList& ma_list)
-    {
-      mFaultList.push_back(fault);
-      mFaultSufList.push_back(suf_list);
-      mSufList.merge(suf_list);
-      mMaList.merge(ma_list);
-    }
-
-    ymuint
-    fault_num() const
-    {
-      return mFaultList.size();
-    }
-
-    const TpgFault*
-    fault(ymuint pos) const
-    {
-      return mFaultList[pos];
-    }
-
-    // グループ番号
-    ymuint mId;
-
-    // 故障リスト
-    vector<const TpgFault*> mFaultList;
-
-    // 故障ごとの十分割当リスト
-    vector<NodeValList> mFaultSufList;
-
-    // 十分割当リスト
-    NodeValList mSufList;
-
-    // 必要割当リスト
-    NodeValList mMaList;
-
-  };
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -224,15 +100,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // ノード番号の最大値
-  ymuint mMaxNodeId;
-
-  // 故障解析器
-  const FaultAnalyzer& mAnalyzer;
-
-  // 故障グループの配列
-  vector<FaultGroup*> mGroupList;
 
 };
 
