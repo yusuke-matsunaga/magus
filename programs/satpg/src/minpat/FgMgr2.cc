@@ -157,12 +157,11 @@ FgMgr2::find_dom_group(const TpgFault* fault,
 
     engine.make_fval_cnf(fval_cnf, fault, node_set, kVal0);
 
-    const vector<const TpgFault*>& flist = fault_list(gid);
-    ymuint nf = flist.size();
+    ymuint nf = fault_num(gid);
     vector<FvalCnf*> fval_cnf_array(nf);
     vector<NodeSet> node_set_array(nf);
     for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = flist[i];
+      const TpgFault* fault = this->fault(gid, i);
       FvalCnf* fval_cnfp = new FvalCnf(mMaxNodeId, gval_cnf);
       fval_cnf_array[i] = fval_cnfp;
       node_set_array[i].mark_region(mMaxNodeId, fault->node());
@@ -239,12 +238,11 @@ FgMgr2::find_group(const TpgFault* fault,
 
     engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
 
-    const vector<const TpgFault*>& flist = fault_list(gid);
-    ymuint nf = flist.size();
+    ymuint nf = fault_num(gid);
     vector<FvalCnf*> fval_cnf_array(nf, NULL);
     NodeValList suf_list1;
     for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = flist[i];
+      const TpgFault* fault = this->fault(gid, i);
       const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
       if ( fi.single_cube() ) {
 	const NodeValList& suf_list2 = fi.sufficient_assignment();
@@ -374,14 +372,26 @@ FgMgr2::delete_fault(ymuint gid,
   fg->mFaultSufList.erase(fg->mFaultSufList.begin() + wpos, fg->mFaultSufList.end());
 }
 
-// @brief 故障リストを返す．
+// @brief グループの故障数を返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-const vector<const TpgFault*>&
-FgMgr2::fault_list(ymuint gid) const
+ymuint
+FgMgr2::fault_num(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
-  return fg->mFaultList;
+  return fg->fault_num();
+}
+
+// @brief グループの故障を返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @param[in] pos ( 0 <= pos < fault_num(gid) )
+const TpgFault*
+FgMgr2::fault(ymuint gid,
+	      ymuint pos) const
+{
+  ASSERT_COND( gid < group_num() );
+  FaultGroup* fg = mGroupList[gid];
+  return fg->fault(pos);
 }
 
 // @brief 十分割当リストを返す．
@@ -392,6 +402,16 @@ FgMgr2::sufficient_assignment(ymuint gid) const
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
   return fg->mSufList;
+}
+
+// @brief 必要割当リストを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+const NodeValList&
+FgMgr2::mandatory_assignment(ymuint gid) const
+{
+  ASSERT_COND( gid < group_num() );
+  FaultGroup* fg = mGroupList[gid];
+  return fg->mMaList;
 }
 
 // @brief 外部入力上の十分割当リストを返す．

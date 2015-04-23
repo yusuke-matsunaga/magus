@@ -73,7 +73,7 @@ MinPatBase::run(TpgNetwork& network,
   StopWatch local_timer;
   local_timer.start();
 
-  FgMgr1 fgmgr1(mMaxNodeId);
+  FgMgr1 fgmgr1(mMaxNodeId, analyzer());
   FgMgr2 fgmgr2(mMaxNodeId, analyzer());
   FgMgr& fgmgr = exact ? static_cast<FgMgr&>(fgmgr2) : static_cast<FgMgr&>(fgmgr1);
   vector<ymuint> group_list;

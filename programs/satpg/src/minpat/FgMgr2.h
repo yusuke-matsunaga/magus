@@ -137,11 +137,13 @@ public:
   ymuint
   fault_num(ymuint gid) const;
 
-  /// @brief 故障リストを返す．
+  /// @brief グループの故障を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] pos ( 0 <= pos < fault_num(gid) )
   virtual
-  const vector<const TpgFault*>&
-  fault_list(ymuint gid) const;
+  const TpgFault*
+  fault(ymuint gid,
+	ymuint pos) const;
 
   /// @brief 十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -180,6 +182,18 @@ private:
       mFaultSufList.push_back(suf_list);
       mSufList.merge(suf_list);
       mMaList.merge(ma_list);
+    }
+
+    ymuint
+    fault_num() const
+    {
+      return mFaultList.size();
+    }
+
+    const TpgFault*
+    fault(ymuint pos) const
+    {
+      return mFaultList[pos];
     }
 
     // グループ番号

@@ -15,6 +15,8 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+class FaultAnalyzer;
+
 //////////////////////////////////////////////////////////////////////
 /// @class FgMgr1 FgMgr1.h "FgMgr1.h"
 /// @brief fault group manager
@@ -28,7 +30,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] max_node_id ノード番号の最大値 + 1
-  FgMgr1(ymuint max_node_id);
+  /// @param[in] analyzer 故障解析器
+  FgMgr1(ymuint max_node_id,
+	 const FaultAnalyzer& analyzer);
 
   /// @brief デストラクタ
   ~FgMgr1();
@@ -132,11 +136,13 @@ public:
   ymuint
   fault_num(ymuint gid) const;
 
-  /// @brief 故障リストを返す．
+  /// @brief グループの故障を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] pos ( 0 <= pos < fault_num(gid) )
   virtual
-  const vector<const TpgFault*>&
-  fault_list(ymuint gid) const;
+  const TpgFault*
+  fault(ymuint gid,
+	ymuint pos) const;
 
   /// @brief 十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -162,52 +168,110 @@ private:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  // 故障ごとの情報を表す構造体
-  struct FaultData
-  {
-    // コンストラクタ
-    FaultData(const TpgFault* fault,
-	      bool single_cube,
-	      const NodeValList& suf_list,
-	      const NodeValList& pi_suf_list);
-
-    // 故障
-    const TpgFault* mFault;
-
-    // single cube 条件
-    bool mSingleCube;
-
-    // 十分割当リスト
-    NodeValList mSufList;
-
-    // 外部入力上の十分割当リスト
-    NodeValList mPiSufList;
-
-  };
-
   // 故障グループを表す構造体
-  struct FaultGroup
+  class FaultGroup
   {
-    // コンストラクタ
-    FaultGroup();
+  public:
+
+    /// @brief コンストラクタ
+    /// @param[in] id ID番号
+    FaultGroup(ymuint id);
+
+    /// @brief デストラクタ
+    ~FaultGroup();
+
+
+  public:
+    //////////////////////////////////////////////////////////////////////
+    // 外部インターフェイス
+    //////////////////////////////////////////////////////////////////////
+
+    /// @brief ID番号を返す．
+    ymuint
+    id() const;
+
+    /// @brief 故障数を返す．
+    ymuint
+    fault_num() const;
+
+    /// @brief single cube でない故障数を返す．
+    ymuint
+    complex_fault_num() const;
+
+    /// @brief 故障を返す．
+    const TpgFault*
+    fault(ymuint pos) const;
+
+    /// @brief 十分割当を返す．
+    const NodeValList&
+    sufficient_assignment() const;
+
+    /// @brief 必要割当を返す．
+    const NodeValList&
+    mandatory_assignment() const;
+
+    /// @brief 外部入力上の十分割当を返す．
+    const NodeValList&
+    pi_sufficient_assignment() const;
+
+    /// @brief ID番号以外の内容をコピーする
+    void
+    copy(const FaultGroup& dst);
+
+    /// @brief ID番号をセットする．
+    void
+    set_id(ymuint id);
 
     /// @brief 故障を追加する．
     void
     add_fault(const TpgFault* fault,
+	      bool single_cube,
 	      const NodeValList& suf_list,
+	      const NodeValList& ma_list,
 	      const NodeValList& pi_suf_list);
 
-    // 故障数を返す．
-    ymuint
-    fault_num() const;
+    /// @brief 故障を削除する．
+    void
+    delete_faults(const vector<const TpgFault*>& fault_list);
 
-    // single cube でない故障数を返す．
-    ymuint
-    complex_fault_num() const;
 
-    // 故障を返す．
-    const TpgFault*
-    fault(ymuint pos) const;
+  private:
+    //////////////////////////////////////////////////////////////////////
+    // 内部で用いられるデータ構造
+    //////////////////////////////////////////////////////////////////////
+
+    // 故障ごとの情報を表す構造体
+    struct FaultData
+    {
+      // コンストラクタ
+      FaultData(const TpgFault* fault,
+		bool single_cube,
+		const NodeValList& suf_list,
+		const NodeValList& ma_list,
+		const NodeValList& pi_suf_list);
+
+      // 故障
+      const TpgFault* mFault;
+
+      // single cube 条件
+      bool mSingleCube;
+
+      // 十分割当リスト
+      NodeValList mSufList;
+
+      // 必要割当リスト
+      NodeValList mMaList;
+
+      // 外部入力上の十分割当リスト
+      NodeValList mPiSufList;
+
+    };
+
+
+  private:
+    //////////////////////////////////////////////////////////////////////
+    // データメンバ
+    //////////////////////////////////////////////////////////////////////
 
     // グループ番号
     ymuint mId;
@@ -221,11 +285,11 @@ private:
     // 十分割当リスト
     NodeValList mSufList;
 
-    // 外部入力の十分割当リスト
-    NodeValList mPiSufList;
-
     // 必要割当リスト
     NodeValList mMaList;
+
+    // 外部入力の十分割当リスト
+    NodeValList mPiSufList;
 
   };
 
@@ -243,6 +307,9 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
+
+  // 故障解析器
+  const FaultAnalyzer& mAnalyzer;
 
   // 故障グループの配列
   vector<FaultGroup*> mGroupList;
