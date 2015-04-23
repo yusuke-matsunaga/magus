@@ -15,6 +15,7 @@
 #include "FvalCnf.h"
 #include "SatEngine.h"
 #include "FaultAnalyzer.h"
+#include "FaultInfo.h"
 #include "YmUtils/HashSet.h"
 
 
@@ -213,6 +214,18 @@ FgMgr2::find_group(const TpgFault* fault,
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
 
+    const NodeValList& suf_list = mGroupList[gid]->mSufList;
+    if ( engine0.check_sat(gval_cnf0, suf_list) == kB3True ) {
+      if ( first_gid == group_num() ) {
+	first_gid = gid;
+	if ( first_hit ) {
+	  break;
+	}
+      }
+      gid_list.push_back(gid);
+      continue;
+    }
+
     const NodeValList& ma_list = mGroupList[gid]->mMaList;
     if ( engine0.check_sat(gval_cnf0, ma_list) == kB3False ) {
       continue;
@@ -228,20 +241,24 @@ FgMgr2::find_group(const TpgFault* fault,
 
     const vector<const TpgFault*>& flist = fault_list(gid);
     ymuint nf = flist.size();
-    vector<FvalCnf*> fval_cnf_array(nf);
-    vector<NodeSet> node_set_array(nf);
+    vector<FvalCnf*> fval_cnf_array(nf, NULL);
+    NodeValList suf_list1;
     for (ymuint i = 0; i < nf; ++ i) {
       const TpgFault* fault = flist[i];
-      FvalCnf* fval_cnfp = new FvalCnf(mMaxNodeId, gval_cnf);
-      fval_cnf_array[i] = fval_cnfp;
-      node_set_array[i].mark_region(mMaxNodeId, fault->node());
+      const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+      if ( fi.single_cube() ) {
+	const NodeValList& suf_list2 = fi.sufficient_assignment();
+	suf_list1.merge(suf_list2);
+      }
+      else {
+	FvalCnf* fval_cnfp = new FvalCnf(mMaxNodeId, gval_cnf);
+	fval_cnf_array[i] = fval_cnfp;
+	const NodeSet& node_set = mAnalyzer.node_set(fault->id());
 
-      engine.make_fval_cnf(*fval_cnfp, fault, node_set_array[i], kVal1);
+	engine.make_fval_cnf(*fval_cnfp, fault, node_set, kVal1);
+      }
     }
-    Bool3 sat_ans = engine.check_sat();
-    for (ymuint i = 0; i < nf; ++ i) {
-      delete fval_cnf_array[i];
-    }
+    Bool3 sat_ans = engine.check_sat(gval_cnf, suf_list1);
     if ( sat_ans == kB3True ) {
       if ( first_gid == group_num() ) {
 	first_gid = gid;
@@ -250,6 +267,9 @@ FgMgr2::find_group(const TpgFault* fault,
 	}
       }
       gid_list.push_back(gid);
+    }
+    for (ymuint i = 0; i < nf; ++ i) {
+      delete fval_cnf_array[i];
     }
   }
   return first_gid;
@@ -260,7 +280,7 @@ FgMgr2::find_group(const TpgFault* fault,
 // @param[in] fault 故障
 void
 FgMgr2::add_fault(ymuint gid,
-		 const TpgFault* fault)
+		  const TpgFault* fault)
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
@@ -269,35 +289,46 @@ FgMgr2::add_fault(ymuint gid,
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
 
-  NodeSet node_set;
-  node_set.mark_region(mMaxNodeId, fault->node());
+  const NodeSet& node_set = mAnalyzer.node_set(fault->id());
 
   engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
 
   ymuint nf = fg->mFaultList.size();
   vector<FvalCnf*> fval_cnf_array(nf);
-  vector<NodeSet> node_set_array(nf);
+  NodeValList suf_list1;
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fg->mFaultList[i];
-    FvalCnf* fval_cnfp = new FvalCnf(mMaxNodeId, gval_cnf);
-    fval_cnf_array[i] = fval_cnfp;
-    node_set_array[i].mark_region(mMaxNodeId, fault->node());
-
-    engine.make_fval_cnf(*fval_cnfp, fault, node_set_array[i], kVal1);
+    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+    if ( fi.single_cube() ) {
+      const NodeValList& suf_list2 = fi.sufficient_assignment();
+      suf_list1.merge(suf_list2);
+    }
+    else {
+      FvalCnf* fval_cnfp = new FvalCnf(mMaxNodeId, gval_cnf);
+      fval_cnf_array[i] = fval_cnfp;
+      const NodeSet& node_set = mAnalyzer.node_set(fault->id());
+      engine.make_fval_cnf(*fval_cnfp, fault, node_set, kVal1);
+    }
   }
   vector<Bool3> sat_model;
-  Bool3 sat_ans = engine.check_sat(sat_model);
+  Bool3 sat_ans = engine.check_sat(gval_cnf, suf_list1, sat_model);
   ASSERT_COND( sat_ans == kB3True );
   fg->mSufList.clear();
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fg->mFaultList[i];
-    const NodeSet& node_set = node_set_array[i];
-    NodeValList suf_list;
-    NodeValList pi_suf_list;
-    fval_cnf_array[i]->get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
-    fg->mFaultSufList[i] = suf_list;
-    fg->mSufList.merge(suf_list);
-    delete fval_cnf_array[i];
+    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+    if ( fi.single_cube() ) {
+      fg->mSufList.merge(fi.sufficient_assignment());
+    }
+    else {
+      const NodeSet& node_set = mAnalyzer.node_set(fault->id());
+      NodeValList suf_list;
+      NodeValList pi_suf_list;
+      fval_cnf_array[i]->get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
+      fg->mFaultSufList[i] = suf_list;
+      fg->mSufList.merge(suf_list);
+      delete fval_cnf_array[i];
+    }
   }
 
   NodeValList suf_list;
