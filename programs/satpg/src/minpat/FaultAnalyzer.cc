@@ -137,6 +137,11 @@ FaultAnalyzer::init(const TpgNetwork& network,
   mTestVectorList.clear();
   vector<bool> det_flag(mMaxFaultId, false);
   for (ymuint i = 0; i < nn; ++ i) {
+    if ( verbose() > 1 ) {
+      cout << "\r" << setw(6) << i << " / " << setw(6) << nn;
+      cout.flush();
+    }
+
     const TpgNode* node = network.active_node(i);
     if ( node->is_output() ) {
       continue;
@@ -163,8 +168,8 @@ FaultAnalyzer::init(const TpgNetwork& network,
     sort(input_list2.begin(), input_list2.end());
 
     ymuint nf = node->fault_num();
-    for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = node->fault(i);
+    for (ymuint j = 0; j < nf; ++ j) {
+      const TpgFault* fault = node->fault(j);
       Bool3 stat = analyze_fault(fault, tvmgr);
       ++ f_all;
       switch ( stat ) {
@@ -230,14 +235,16 @@ FaultAnalyzer::init(const TpgNetwork& network,
 
   local_timer.stop();
 
-  if ( mVerbose > 0 ) {
+  if ( verbose() > 0 ) {
+    if ( verbose() > 1 ) {
+      cout << endl;
+    }
     cout << "Total " << setw(6) << f_all << " faults" << endl
 	 << "Total " << setw(6) << f_det << " detected faults" << endl
 	 << "     (" << setw(6) << n_single_cube << ") single cube assignment" << endl
 	 << "Total " << setw(6) << f_red << " redundant faults" << endl
 	 << "Total " << setw(6) << f_abt << " aborted faults" << endl
-	 << "CPU time " << local_timer.time() << endl
-	 << endl;
+	 << "CPU time " << local_timer.time() << endl;
   }
 }
 

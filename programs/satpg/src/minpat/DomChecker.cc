@@ -419,7 +419,6 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
     }
 
     if ( mVerbose > 1 ) {
-      cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num
 	   << " / " << setw(6) << cur_num;
       cout.flush();
