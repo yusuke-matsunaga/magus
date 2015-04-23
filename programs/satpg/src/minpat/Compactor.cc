@@ -246,6 +246,7 @@ Compactor::phase1(FgMgr& fgmgr,
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
       const TpgFault* fault = fault_list[i];
 
+#if 0
       SatEngine engine(string(), string(), NULL);
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
@@ -278,6 +279,36 @@ Compactor::phase1(FgMgr& fgmgr,
 	red = false;
 	break;
       }
+#else
+      vector<ymuint> tmp_group_list1;
+      tmp_group_list1.reserve(ng - 1);
+      for (ymuint i = 0; i < ng; ++ i) {
+	ymuint gid = tmp_group_list[i];
+	if ( gid != min_gid ) {
+	  tmp_group_list1.push_back(gid);
+	}
+      }
+      vector<ymuint> dummy;
+      ymuint gid = fgmgr.find_group(fault, tmp_group_list1, true, dummy);
+      if ( gid != fgmgr.group_num() ) {
+	ymuint ipos = 0;
+	for (ipos = 0; ipos < ng; ++ ipos) {
+	  if ( tmp_group_list[ipos] == gid ) {
+	    break;
+	  }
+	}
+	ASSERT_COND( ipos < ng );
+	ymuint gid2 = gid;
+	if ( group_list[ipos] == gid ) {
+	  gid2 = fgmgr.duplicate_group(gid);
+	  tmp_group_list[ipos] = gid2;
+	}
+	fgmgr.add_fault(gid2, fault);
+      }
+      else {
+	red = false;
+      }
+#endif
     }
     if ( red ) {
       // 変更を反映させる．
@@ -358,6 +389,7 @@ Compactor::phase2(FgMgr& fgmgr,
     for (ymuint i = 0; i < fault_list.size(); ++ i) {
       const TpgFault* fault = fault_list[i];
 
+#if 0
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
@@ -382,6 +414,22 @@ Compactor::phase2(FgMgr& fgmgr,
 	  break;
 	}
       }
+#else
+      vector<ymuint> tmp_group_list;
+      tmp_group_list.reserve(ng - 1);
+      for (ymuint i = 0; i < ng; ++ i) {
+	ymuint gid = group_list[i];
+	if ( gid != min_gid && !locked[gid] ) {
+	  tmp_group_list.push_back(gid);
+	}
+      }
+      vector<ymuint> dummy;
+      ymuint gid = fgmgr.find_group(fault, tmp_group_list, true, dummy);
+      if ( gid != fgmgr.group_num() ) {
+	fgmgr.add_fault(gid, fault);
+	del_fault_list.push_back(fault);
+      }
+#endif
     }
     if ( !del_fault_list.empty() ) {
       fgmgr.delete_fault(min_gid, del_fault_list);
