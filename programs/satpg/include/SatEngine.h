@@ -109,6 +109,13 @@ public:
 		const vector<const TpgNode*>& fnode_list,
 		const NodeSet& node_set);
 
+  /// @brief 割当リストの否定の節を加える．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assignment 割当リスト
+  void
+  add_negation(GvalCnf& gval_cnf,
+	       const NodeValList& assignment);
+
   /// @brief 割当リストのもとでチェックを行う．
   /// @param[in] gval_cnf 正常回路用のデータ構造
   /// @param[in] assign_list 割当リスト

@@ -132,7 +132,6 @@ FaultAnalyzer::init(const TpgNetwork& network,
   ymuint f_det = 0;
   ymuint f_red = 0;
   ymuint f_abt = 0;
-  ymuint n_single_cube = 0;
 
   mTestVectorList.clear();
   vector<bool> det_flag(mMaxFaultId, false);
@@ -176,9 +175,6 @@ FaultAnalyzer::init(const TpgNetwork& network,
       case kB3True:
 	++ f_det;
 	det_flag[fault->id()] = true;
-	if ( mFaultInfoArray[fault->id()].mSingleCube ) {
-	  ++ n_single_cube;
-	}
 	break;
 
       case kB3False:
@@ -241,7 +237,6 @@ FaultAnalyzer::init(const TpgNetwork& network,
     }
     cout << "Total " << setw(6) << f_all << " faults" << endl
 	 << "Total " << setw(6) << f_det << " detected faults" << endl
-	 << "     (" << setw(6) << n_single_cube << ") single cube assignment" << endl
 	 << "Total " << setw(6) << f_red << " redundant faults" << endl
 	 << "Total " << setw(6) << f_abt << " aborted faults" << endl
 	 << "CPU time " << local_timer.time() << endl;
@@ -312,6 +307,27 @@ FaultAnalyzer::analyze_fault(const TpgFault* fault,
     }
     if ( suf_list.size() == ma_list.size() ) {
       fi.mSingleCube = true;
+    }
+    else {
+      NodeValList diff_list = suf_list;
+      diff_list.diff(ma_list);
+      ASSERT_COND( diff_list.size() > 0 );
+      engine.add_negation(gval_cnf, diff_list);
+      vector<Bool3> sat_model;
+      Bool3 sat_ans = engine.check_sat(sat_model);
+      ASSERT_COND( sat_ans == kB3True );
+      for (ymuint i = 0; i < 2; ++ i) {
+	NodeValList suf_list;
+	fval_cnf.get_suf_list(sat_model, fault, node_set(f_id), suf_list);
+	suf_list.diff(ma_list);
+
+	fi.mOtherSufListArray.push_back(suf_list);
+	engine.add_negation(gval_cnf, suf_list);
+	sat_ans = engine.check_sat(sat_model);
+	if ( sat_ans == kB3False ) {
+	  break;
+	}
+      }
     }
   }
   return sat_stat;

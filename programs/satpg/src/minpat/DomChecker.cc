@@ -541,6 +541,9 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
     }
   }
 
+  ymuint n_single = 0;
+  ymuint n_double = 0;
+  ymuint n_triple = 0;
   // 支配されていない故障を dom_fault_list に入れる．
   dom_fault_list.clear();
   dom_fault_list.reserve(fault_num2);
@@ -549,6 +552,19 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
     if ( !dom_flag[f_id] ) {
       const TpgFault* fault = mAnalyzer.fault(f_id);
       dom_fault_list.push_back(fault);
+      const FaultInfo& fi = mAnalyzer.fault_info(f_id);
+      if ( fi.single_cube() ) {
+	++ n_single;
+      }
+      else {
+	ymuint n = fi.other_sufficient_assignment_num();
+	if ( n == 1 ) {
+	  ++ n_double;
+	}
+	else if ( n == 2 ) {
+	  ++ n_triple;
+	}
+      }
     }
   }
 
@@ -558,6 +574,9 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
     cout << " --> " << setw(6) << dom_fault_num << ": " << setw(6) << n_dom3 << " / " << setw(6) << n_sat3 << endl;
     cout << "Total    " << fault_num << " original faults" << endl;
     cout << "Total    " << dom_fault_num << " dominator faults" << endl;
+    cout << "Total    " << n_single << " single cube faults" << endl;
+    cout << "Total    " << n_double << " double cube faults" << endl;
+    cout << "Total    " << n_triple << " triple cube faults" << endl;
     cout << "Total    " << n_sat1 << " simple non-dominance test" << endl;
     cout << "Total    " << n_nodom  << " non-dominance" << endl;
     cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
@@ -788,6 +807,9 @@ DomChecker::get_dom_faults2(ymuint option,
     }
   }
 
+  ymuint n_single = 0;
+  ymuint n_double = 0;
+  ymuint n_triple = 0;
   // 支配されていない故障を dom_fault_list に入れる．
   dom_fault_list.clear();
   dom_fault_list.reserve(fault_num2);
@@ -796,6 +818,19 @@ DomChecker::get_dom_faults2(ymuint option,
     if ( !dom_flag[f_id] ) {
       const TpgFault* fault = mAnalyzer.fault(f_id);
       dom_fault_list.push_back(fault);
+      const FaultInfo& fi = mAnalyzer.fault_info(f_id);
+      if ( fi.single_cube() ) {
+	++ n_single;
+      }
+      else {
+	ymuint n = fi.other_sufficient_assignment_num();
+	if ( n == 1 ) {
+	  ++ n_double;
+	}
+	else if ( n == 2 ) {
+	  ++ n_triple;
+	}
+      }
     }
   }
 
@@ -805,6 +840,9 @@ DomChecker::get_dom_faults2(ymuint option,
     cout << " --> " << setw(6) << dom_fault_num << ": " << setw(6) << n_dom3 << " / " << setw(6) << n_sat3 << endl;
     cout << "Total    " << fault_num << " original faults" << endl;
     cout << "Total    " << dom_fault_num << " dominator faults" << endl;
+    cout << "Total    " << n_single << " single cube faults" << endl;
+    cout << "Total    " << n_double << " double cube faults" << endl;
+    cout << "Total    " << n_triple << " triple cube faults" << endl;
     cout << "Total    " << n_sat1 << " simple non-dominance test" << endl;
     cout << "Total    " << n_nodom  << " non-dominance" << endl;
     cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;

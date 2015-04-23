@@ -56,6 +56,17 @@ public:
   /// @param[in] fault 故障
   /// @param[in] node_set 故障に関連するノード集合
   /// @param[out] suf_list 十分割当リストを格納する変数
+  void
+  get_suf_list(const vector<Bool3>& sat_model,
+	       const TpgFault* fault,
+	       const NodeSet& node_set,
+	       NodeValList& suf_list);
+
+  /// @brief 十分割当リストを求める．
+  /// @param[in] sat_model SAT問題の解
+  /// @param[in] fault 故障
+  /// @param[in] node_set 故障に関連するノード集合
+  /// @param[out] suf_list 十分割当リストを格納する変数
   /// @param[out] pi_suf_list 外部入力上の十分割当リストを格納する変数
   void
   get_pi_suf_list(const vector<Bool3>& sat_model,

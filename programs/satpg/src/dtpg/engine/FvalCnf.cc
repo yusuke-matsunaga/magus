@@ -13,6 +13,7 @@
 #include "SatEngine.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
+#include "NodeValList.h"
 #include "ModelValMap.h"
 #include "Extractor.h"
 #include "BackTracer.h"
@@ -49,6 +50,21 @@ FvalCnf::init(ymuint max_node_id)
   mMaxId = max_node_id;
   mFvarMap.init(max_node_id);
   mDvarMap.init(max_node_id);
+}
+
+// @brief 十分割当リストを求める．
+// @param[in] sat_model SAT問題の解
+// @param[in] fault 故障
+// @param[in] node_set 故障に関連するノード集合
+// @param[out] suf_list 十分割当リストを格納する変数
+void
+FvalCnf::get_suf_list(const vector<Bool3>& sat_model,
+		      const TpgFault* fault,
+		      const NodeSet& node_set,
+		      NodeValList& suf_list)
+{
+  NodeValList dummy;
+  get_pi_suf_list(sat_model, fault, node_set, suf_list, dummy);
 }
 
 // @brief 十分割当リストを求める．

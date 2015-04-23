@@ -54,6 +54,15 @@ public:
   const NodeValList&
   sufficient_assignment() const;
 
+  /// @brief 2番目以降の十分割当のキューブ数を返す．
+  ymuint
+  other_sufficient_assignment_num() const;
+
+  /// @brief 2番め以降の十分割当を返す．
+  /// @param[in] pos 位置番号 ( 0 <= pos < other_sufficient_assignment_num() )
+  const NodeValList&
+  other_sufficient_assignment(ymuint pos) const;
+
   /// @brief 外部入力上の十分割当(つまりテストベクタ)を返す．
   const NodeValList&
   pi_sufficient_assignment() const;
@@ -90,6 +99,8 @@ private:
   NodeValList mPiSufficientAssignment;
 
   bool mSingleCube;
+
+  vector<NodeValList> mOtherSufListArray;
 
 };
 
@@ -141,6 +152,24 @@ const NodeValList&
 FaultInfo::sufficient_assignment() const
 {
   return mSufficientAssignment;
+}
+
+// @brief 2番目以降の十分割当のキューブ数を返す．
+inline
+ymuint
+FaultInfo::other_sufficient_assignment_num() const
+{
+  return mOtherSufListArray.size();
+}
+
+// @brief 2番め以降の十分割当を返す．
+// @param[in] pos 位置番号 ( 0 <= pos < other_sufficient_assignment_num() )
+inline
+const NodeValList&
+FaultInfo::other_sufficient_assignment(ymuint pos) const
+{
+  ASSERT_COND( pos < other_sufficient_assignment_num() );
+  return mOtherSufListArray[pos];
 }
 
 // @brief 外部入力上の十分割当(つまりテストベクタ)を返す．
