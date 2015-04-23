@@ -121,7 +121,13 @@ public:
   delete_fault(ymuint gid,
 	       const vector<const TpgFault*>& fault_list) = 0;
 
-  /// @brief 故障リストを返す．
+  /// @brief グループの故障数を返す．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  virtual
+  ymuint
+  fault_num(ymuint gid) const = 0;
+
+  /// @brief グループの故障リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   virtual
   const vector<const TpgFault*>&
@@ -132,6 +138,12 @@ public:
   virtual
   const NodeValList&
   sufficient_assignment(ymuint gid) const = 0;
+
+  /// @brief 必要割当リストを返す．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  virtual
+  const NodeValList&
+  mandatory_assignment(ymuint gid) const = 0;
 
   /// @brief 外部入力上の十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )

@@ -126,6 +126,12 @@ public:
   delete_fault(ymuint gid,
 	       const vector<const TpgFault*>& fault_list);
 
+  /// @brief グループの故障数を返す．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  virtual
+  ymuint
+  fault_num(ymuint gid) const;
+
   /// @brief 故障リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   virtual
@@ -137,6 +143,12 @@ public:
   virtual
   const NodeValList&
   sufficient_assignment(ymuint gid) const;
+
+  /// @brief 必要割当リストを返す．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  virtual
+  const NodeValList&
+  mandatory_assignment(ymuint gid) const;
 
   /// @brief 外部入力上の十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -150,39 +162,70 @@ private:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  // 故障グループを表す構造体
-  struct FaultGroup
+  // 故障ごとの情報を表す構造体
+  struct FaultData
   {
-    /// @brief 故障を追加する．
-    void
-    add_fault(const TpgFault* fault,
+    // コンストラクタ
+    FaultData(const TpgFault* fault,
+	      bool single_cube,
 	      const NodeValList& suf_list,
-	      const NodeValList& pi_suf_list)
-    {
-      mFaultList.push_back(fault);
-      mFaultSufList.push_back(suf_list);
-      mFaultPiSufList.push_back(pi_suf_list);
-      mSufList.merge(suf_list);
-      mPiSufList.merge(pi_suf_list);
-    }
+	      const NodeValList& pi_suf_list);
 
-    // グループ番号
-    ymuint mId;
+    // 故障
+    const TpgFault* mFault;
 
-    // 故障リスト
-    vector<const TpgFault*> mFaultList;
-
-    // 故障ごとの十分割当リスト
-    vector<NodeValList> mFaultSufList;
-
-    // 故障ごとの外部入力十分割当リスト
-    vector<NodeValList> mFaultPiSufList;
+    // single cube 条件
+    bool mSingleCube;
 
     // 十分割当リスト
     NodeValList mSufList;
 
-    // 外部入力十分割当リスト
+    // 外部入力上の十分割当リスト
     NodeValList mPiSufList;
+
+  };
+
+  // 故障グループを表す構造体
+  struct FaultGroup
+  {
+    // コンストラクタ
+    FaultGroup();
+
+    /// @brief 故障を追加する．
+    void
+    add_fault(const TpgFault* fault,
+	      const NodeValList& suf_list,
+	      const NodeValList& pi_suf_list);
+
+    // 故障数を返す．
+    ymuint
+    fault_num() const;
+
+    // single cube でない故障数を返す．
+    ymuint
+    complex_fault_num() const;
+
+    // 故障を返す．
+    const TpgFault*
+    fault(ymuint pos) const;
+
+    // グループ番号
+    ymuint mId;
+
+    // 故障データのリスト
+    vector<FaultData> mFaultDataList;
+
+    // single cube でない条件を持つ故障数
+    ymuint mCplxNum;
+
+    // 十分割当リスト
+    NodeValList mSufList;
+
+    // 外部入力の十分割当リスト
+    NodeValList mPiSufList;
+
+    // 必要割当リスト
+    NodeValList mMaList;
 
   };
 

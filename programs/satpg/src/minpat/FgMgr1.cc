@@ -86,9 +86,9 @@ FgMgr1::duplicate_group(ymuint src_gid)
   ASSERT_COND( src_fg != NULL );
   ymuint gid = new_group();
   FaultGroup* dst_fg = mGroupList[gid];
-  dst_fg->mFaultList = src_fg->mFaultList;
-  dst_fg->mFaultSufList = src_fg->mFaultSufList;
+  dst_fg->mFaultDataList = src_fg->mFaultDataList;
   dst_fg->mSufList = src_fg->mSufList;
+  dst_fg->mMaList = src_fg->mMaList;
   return gid;
 }
 
@@ -248,6 +248,7 @@ FgMgr1::delete_fault(ymuint gid,
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
 
+  // 削除対象の故障番号を持つハッシュ表
   HashSet<ymuint> fault_hash;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
     const TpgFault* fault = fault_list[i];
@@ -255,24 +256,23 @@ FgMgr1::delete_fault(ymuint gid,
   }
 
   fg->mSufList = NodeValList();
-  ymuint nf = fg->mFaultList.size();
+  ymuint nf = fg->fault_num();
   ymuint wpos = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fg->mFaultList[i];
+    const TpgFault* fault = fg->fault(i);
     if ( fault_hash.check(fault->id()) ) {
       continue;
     }
     if ( wpos != i ) {
-      fg->mFaultList[wpos] = fault;
-      fg->mFaultSufList[wpos] = fg->mFaultSufList[i];
+      fg->mFaultDataList[wpos] = fg->mFaultDataList[i];
     }
     ++ wpos;
-    fg->mSufList.merge(fg->mFaultSufList[i]);
+    fg->mSufList.merge(fg->mFaultDataList[i].mSufList);
   }
-  fg->mFaultList.erase(fg->mFaultList.begin() + wpos, fg->mFaultList.end());
-  fg->mFaultSufList.erase(fg->mFaultSufList.begin() + wpos, fg->mFaultSufList.end());
+  fg->mFaultDataList.erase(fg->mFaultDataList.begin() + wpos, fg->mFaultDataList.end());
 }
 
+#if 0
 // @brief 故障リストを返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 const vector<const TpgFault*>&
@@ -282,6 +282,7 @@ FgMgr1::fault_list(ymuint gid) const
   FaultGroup* fg = mGroupList[gid];
   return fg->mFaultList;
 }
+#endif
 
 // @brief 十分割当リストを返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -301,6 +302,67 @@ FgMgr1::pi_sufficient_assignment(ymuint gid) const
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
   return fg->mPiSufList;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス FgMgr1::FaultData
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+FgMgr1::FaultData::FaultData(const TpgFault* fault,
+		     bool single_cube,
+		     const NodeValList& suf_list,
+		     const NodeValList& pi_suf_list) :
+  mFault(fault),
+  mSingleCube(single_cube),
+  mSufList(suf_list),
+  mPiSufList(pi_suf_list)
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス FgMgr1::FaultGroup
+//////////////////////////////////////////////////////////////////////
+
+// コンストラクタ
+FgMgr1::FaultGroup::FaultGroup()
+{
+  mCplxNum = 0;
+}
+
+// @brief 故障を追加する．
+void
+FgMgr1::FaultGroup::add_fault(const TpgFault* fault,
+			      const NodeValList& suf_list,
+			      const NodeValList& pi_suf_list)
+{
+  mFaultDataList.push_back(FaultData(fault, true, suf_list, pi_suf_list));
+  mSufList.merge(suf_list);
+  mPiSufList.merge(pi_suf_list);
+}
+
+// 故障数を返す．
+ymuint
+FgMgr1::FaultGroup::fault_num() const
+{
+  return mFaultDataList.size();
+}
+
+// single cube でない故障数を返す．
+ymuint
+FgMgr1::FaultGroup::complex_fault_num() const
+{
+  return mCplxNum;
+}
+
+// 故障を返す．
+const TpgFault*
+FgMgr1::FaultGroup::fault(ymuint pos) const
+{
+  ASSERT_COND( pos < fault_num() );
+  return mFaultDataList[pos].mFault;
 }
 
 END_NAMESPACE_YM_SATPG
