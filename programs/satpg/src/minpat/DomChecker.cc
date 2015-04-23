@@ -677,14 +677,22 @@ DomChecker::get_dom_faults2(ymuint option,
       cout.flush();
     }
 
-    const TpgFault* f1 = mAnalyzer.fault(f1_id);
+    const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
+    const TpgFault* f1 = fi1.fault();
     const vector<ymuint>& input_list1_2 = mAnalyzer.input_list2(f1_id);
 
-    GvalCnf gval_cnf(mMaxNodeId);
-    FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
     SatEngine engine(string(), string(), NULL);
-    // f1 を検出しない CNF を作成
-    engine.make_fval_cnf(fval_cnf, f1, mAnalyzer.node_set(f1_id), kVal0);
+    GvalCnf gval_cnf(mMaxNodeId);
+
+    if ( fi1.single_cube() ) {
+      // f1 を検出しない CNF を作成
+      engine.add_negation(gval_cnf, fi1.sufficient_assignment());
+    }
+    else {
+      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+      // f1 を検出しない CNF を作成
+      engine.make_fval_cnf(fval_cnf, f1, mAnalyzer.node_set(f1_id), kVal0);
+    }
 
     bool pending = false;
     for (ymuint i2 = 0; i2 < cand_list.size(); ++ i2) {
@@ -815,7 +823,10 @@ DomChecker::get_dom_faults2(ymuint option,
   dom_fault_list.reserve(fault_num2);
   for (ymuint i = 0; i < fault_num2; ++ i) {
     ymuint f_id = fault_list2[i];
-    if ( !dom_flag[f_id] ) {
+    if ( dom_flag[f_id] ) {
+      mAnalyzer.clear_fault_info(f_id);
+    }
+    else {
       const TpgFault* fault = mAnalyzer.fault(f_id);
       dom_fault_list.push_back(fault);
       const FaultInfo& fi = mAnalyzer.fault_info(f_id);
@@ -855,18 +866,23 @@ bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
 				  const TpgFault* f2)
 {
+  SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-  FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-  SatEngine engine(string(), string(), NULL);
-
   const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-  const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-
-  // f1 を検出して f2 を検出しない CNF を生成
   engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
-  engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
 
+  const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+  if ( fi2.single_cube() ) {
+    // f2 を検出しない CNF を生成
+    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+  }
+  else {
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+    // f1 を検出して f2 を検出しない CNF を生成
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+  }
   return engine.check_sat() == kB3False;
 }
 

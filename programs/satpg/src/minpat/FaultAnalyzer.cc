@@ -305,9 +305,11 @@ FaultAnalyzer::analyze_fault(const TpgFault* fault,
 	ma_list.add(node, val);
       }
     }
+
     if ( suf_list.size() == ma_list.size() ) {
       fi.mSingleCube = true;
     }
+#if 0
     else {
       NodeValList diff_list = suf_list;
       diff_list.diff(ma_list);
@@ -329,8 +331,23 @@ FaultAnalyzer::analyze_fault(const TpgFault* fault,
 	}
       }
     }
+#endif
   }
   return sat_stat;
+}
+
+// @brief 故障の情報をクリアする．
+//
+// 非支配故障の情報をクリアすることでメモリを減らす．
+void
+FaultAnalyzer::clear_fault_info(ymuint fid)
+{
+  ASSERT_COND( fid < mMaxFaultId );
+  FaultInfo& fi = mFaultInfoArray[fid];
+  fi.mMandatoryAssignment.clear();
+  fi.mSufficientAssignment.clear();
+  fi.mPiSufficientAssignment.clear();
+  fi.mOtherSufListArray.clear();
 }
 
 // @brief ノード番号の最大値を得る．

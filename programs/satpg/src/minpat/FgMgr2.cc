@@ -94,45 +94,58 @@ FgMgr2::find_group(const TpgFault* fault,
 {
   ymuint first_gid = group_num();
 
-  GvalCnf gval_cnf0(max_node_id());
-  FvalCnf fval_cnf0(max_node_id(), gval_cnf0);
   SatEngine engine0(string(), string(), NULL);
+  GvalCnf gval_cnf0(max_node_id());
 
-  const NodeSet& node_set = this->node_set(fault);
-
-  engine0.make_fval_cnf(fval_cnf0, fault, node_set, kVal1);
-
+  const FaultInfo& fi0 = fault_info(fault);
+  NodeValList suf_list0;
+  if ( fi0.single_cube() ) {
+    // fault を検出する条件を追加
+    suf_list0 = fi0.sufficient_assignment();
+  }
+  else {
+    // fault を検出する CNF を生成
+    FvalCnf fval_cnf0(max_node_id(), gval_cnf0);
+    engine0.make_fval_cnf(fval_cnf0, fault, node_set(fault), kVal1);
+  }
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
 
-    const NodeValList& suf_list = sufficient_assignment(gid);
-    if ( engine0.check_sat(gval_cnf0, suf_list) == kB3True ) {
-      if ( first_gid == group_num() ) {
-	first_gid = gid;
-	if ( first_hit ) {
-	  break;
+    {
+      const NodeValList& suf_list1 = sufficient_assignment(gid);
+      if ( engine0.check_sat(gval_cnf0, suf_list0, suf_list1) == kB3True ) {
+	if ( first_gid == group_num() ) {
+	  first_gid = gid;
+	  if ( first_hit ) {
+	    break;
+	  }
 	}
+	gid_list.push_back(gid);
+	continue;
       }
-      gid_list.push_back(gid);
-      continue;
     }
 
-    const NodeValList& ma_list = mandatory_assignment(gid);
-    if ( engine0.check_sat(gval_cnf0, ma_list) == kB3False ) {
-      continue;
+    {
+      const NodeValList& ma_list1 = mandatory_assignment(gid);
+      if ( engine0.check_sat(gval_cnf0, suf_list0, ma_list1) == kB3False ) {
+	continue;
+      }
     }
 
-    GvalCnf gval_cnf(max_node_id());
-    FvalCnf fval_cnf(max_node_id(), gval_cnf);
     SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(max_node_id());
 
-    const NodeSet& node_set = this->node_set(fault);
-
-    engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
-
+    NodeValList suf_list1;
+    if ( fi0.single_cube() ) {
+      // fault を検出する条件を追加
+      suf_list1 = fi0.sufficient_assignment();
+    }
+    else {
+      FvalCnf fval_cnf(max_node_id(), gval_cnf);
+      engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+    }
     ymuint nf = fault_num(gid);
     vector<FvalCnf*> fval_cnf_array(nf, NULL);
-    NodeValList suf_list1;
     for (ymuint i = 0; i < nf; ++ i) {
       const TpgFault* fault = this->fault(gid, i);
       const FaultInfo& fi = fault_info(fault);
@@ -143,10 +156,11 @@ FgMgr2::find_group(const TpgFault* fault,
       else {
 	FvalCnf* fval_cnfp = new FvalCnf(max_node_id(), gval_cnf);
 	fval_cnf_array[i] = fval_cnfp;
-	const NodeSet& node_set = this->node_set(fault);
-
-	engine.make_fval_cnf(*fval_cnfp, fault, node_set, kVal1);
+	engine.make_fval_cnf(*fval_cnfp, fault, node_set(fault), kVal1);
       }
+    }
+    for (ymuint i = 0; i < nf; ++ i) {
+      delete fval_cnf_array[i];
     }
     if ( engine.check_sat(gval_cnf, suf_list1) == kB3True ) {
       if ( first_gid == group_num() ) {
@@ -156,9 +170,6 @@ FgMgr2::find_group(const TpgFault* fault,
 	}
       }
       gid_list.push_back(gid);
-    }
-    for (ymuint i = 0; i < nf; ++ i) {
-      delete fval_cnf_array[i];
     }
   }
   return first_gid;

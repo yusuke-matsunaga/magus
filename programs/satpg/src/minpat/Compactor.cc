@@ -57,11 +57,6 @@ Compactor::run(FgMgr& fgmgr,
   new_group_list = group_list;
 
   for ( ; ; ) {
-    if ( mVerbose > 1 ) {
-      cout << "\r";
-      cout << "# of groups = " << new_group_list.size();
-      cout.flush();
-    }
 #if 0
     phase0(fgmgr, new_group_list);
 #endif
@@ -211,8 +206,13 @@ void
 Compactor::phase1(FgMgr& fgmgr,
 		  vector<ymuint>& group_list)
 {
+  if ( mVerbose > 0 ) {
+    cout << "phase1: initial # of groups = " << group_list.size() << endl;
+  }
+
   ymuint max_group_id = fgmgr.group_num();
 
+  ymuint count = 0;
   vector<bool> locked(max_group_id, false);
   for ( ; ; ) {
     ymuint min_gid = max_group_id;
@@ -235,6 +235,12 @@ Compactor::phase1(FgMgr& fgmgr,
     if ( min_gid == max_group_id ) {
       // すべてのグループが調査済みだった．
       break;
+    }
+
+    if ( mVerbose > 1 ) {
+      cout << "\r"
+	   << setw(4) << count << " / " << setw(4) << ng;
+      cout.flush();
     }
 
     // 現在の情報を tmp_group_list にコピーしておく
@@ -272,6 +278,7 @@ Compactor::phase1(FgMgr& fgmgr,
       }
       else {
 	red = false;
+	break;
       }
     }
     if ( red ) {
@@ -307,6 +314,13 @@ Compactor::phase1(FgMgr& fgmgr,
       }
     }
     locked[min_gid] = true;
+    ++ count;
+  }
+  if ( mVerbose > 0 ) {
+    if ( mVerbose > 1 ) {
+      cout << endl;
+    }
+    cout << "        final # of groups = " << group_list.size() << endl;
   }
 }
 
@@ -318,9 +332,14 @@ void
 Compactor::phase2(FgMgr& fgmgr,
 		  vector<ymuint>& group_list)
 {
+  if ( mVerbose > 0 ) {
+    cout << "phase2: initial # of groups = " << group_list.size() << endl;
+  }
+
   ymuint max_group_id = fgmgr.group_num();
   ymuint ng = group_list.size();
 
+  ymuint count = 0;
   vector<bool> locked(max_group_id, false);
   for ( ; ; ) {
     ymuint min_pos = 0;
@@ -344,6 +363,12 @@ Compactor::phase2(FgMgr& fgmgr,
     if ( min_gid == max_group_id ) {
       // すべてのグループが調査済みだった．
       break;
+    }
+
+    if ( mVerbose > 1 ) {
+      cout << "\r"
+	   << setw(4) << count << " / " << setw(4) << ng;
+      cout.flush();
     }
 
     // 可能な限り故障を他のグループに移動する．
@@ -371,6 +396,13 @@ Compactor::phase2(FgMgr& fgmgr,
       fgmgr.delete_fault(min_gid, del_fault_list);
     }
     locked[min_gid] = true;
+    ++ count;
+  }
+  if ( mVerbose > 0 ) {
+    if ( mVerbose > 1 ) {
+      cout << endl;
+    }
+    cout << "        final # of groups = " << group_list.size() << endl;
   }
 }
 

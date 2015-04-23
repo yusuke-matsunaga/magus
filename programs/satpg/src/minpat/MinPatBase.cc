@@ -133,6 +133,7 @@ MinPatBase::run(TpgNetwork& network,
     local_timer.start();
 
     Compactor compactor;
+    compactor.set_verbose(verbose());
 
     vector<ymuint> new_group_list;
     compactor.run(fgmgr, mMaxNodeId, group_list, new_group_list);

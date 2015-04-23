@@ -80,6 +80,12 @@ public:
   const FaultInfo&
   fault_info(ymuint fid) const;
 
+  /// @brief 故障の情報をクリアする．
+  ///
+  /// 非支配故障の情報をクリアすることでメモリを減らす．
+  void
+  clear_fault_info(ymuint fid);
+
   /// @brief 故障のTFOのTFIに含まれる入力番号のリスト返す．
   /// @param[in] fid 故障番号
   const vector<ymuint>&
