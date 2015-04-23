@@ -168,9 +168,9 @@ Compactor::phase0(FgMgr& fgmgr,
   ymuint ng = group_list.size();
   for (ymuint i = 0; i < ng; ++ i) {
     ymuint gid = group_list[i];
-    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(gid);
-    for (ymuint j = 0; j < fault_list.size(); ++ j) {
-      const TpgFault* fault = fault_list[j];
+    ymuint nf = fgmgr.fault_num(gid);
+    for (ymuint j = 0; j < nf; ++ j) {
+      const TpgFault* fault = fgmgr.fault(gid, j);
       all_list.push_back(fault);
     }
   }
@@ -226,7 +226,7 @@ Compactor::phase1(FgMgr& fgmgr,
 	continue;
       }
 
-      ymuint size = fgmgr.fault_list(gid).size();
+      ymuint size = fgmgr.fault_num(gid);
       if ( min_size == 0 || min_size > size ) {
 	min_size = size;
 	min_gid = gid;
@@ -242,44 +242,9 @@ Compactor::phase1(FgMgr& fgmgr,
 
     // min_gid のグループの故障を他のグループへ移動できるか調べる．
     bool red = true;
-    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
-    for (ymuint i = 0; i < fault_list.size(); ++ i) {
-      const TpgFault* fault = fault_list[i];
-
-#if 0
-      SatEngine engine(string(), string(), NULL);
-      GvalCnf gval_cnf(mMaxNodeId);
-      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-
-      // fault を検出するための CNF を作る．
-      engine.make_fval_cnf(fval_cnf, fault, kVal1);
-
-      // fault がマージできる他のグループを探す．
-      bool found = false;
-      for (ymuint j = 0; j < ng; ++ j) {
-	ymuint gid = tmp_group_list[j];
-	if ( gid == min_gid ) {
-	  continue;
-	}
-
-	const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
-	if ( engine.check_sat(gval_cnf, suf_list0) == kB3True ) {
-	  ymuint gid2 = gid;
-	  if ( tmp_group_list[j] == group_list[j] ) {
-	    gid2 = fgmgr.duplicate_group(gid);
-	    tmp_group_list[j] = gid2;
-	  }
-	  fgmgr.add_fault(gid2, fault);
-	  found = true;
-	  break;
-	}
-      }
-      if ( !found ) {
-	// 見つからなかった．
-	red = false;
-	break;
-      }
-#else
+    ymuint nf = fgmgr.fault_num(min_gid);
+    for (ymuint i = 0; i < nf; ++ i) {
+      const TpgFault* fault = fgmgr.fault(min_gid, i);
       vector<ymuint> tmp_group_list1;
       tmp_group_list1.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
@@ -308,7 +273,6 @@ Compactor::phase1(FgMgr& fgmgr,
       else {
 	red = false;
       }
-#endif
     }
     if ( red ) {
       // 変更を反映させる．
@@ -370,7 +334,7 @@ Compactor::phase2(FgMgr& fgmgr,
 	continue;
       }
 
-      ymuint size = fgmgr.fault_list(gid).size();
+      ymuint size = fgmgr.fault_num(gid);
       if ( min_size == 0 || min_size > size ) {
 	min_size = size;
 	min_pos = i;
@@ -383,38 +347,11 @@ Compactor::phase2(FgMgr& fgmgr,
     }
 
     // 可能な限り故障を他のグループに移動する．
-    const vector<const TpgFault*>& fault_list = fgmgr.fault_list(min_gid);
+    ymuint nf = fgmgr.fault_num(min_gid);
     vector<const TpgFault*> del_fault_list;
-    del_fault_list.reserve(fault_list.size());
-    for (ymuint i = 0; i < fault_list.size(); ++ i) {
-      const TpgFault* fault = fault_list[i];
-
-#if 0
-      GvalCnf gval_cnf(mMaxNodeId);
-      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-      SatEngine engine(string(), string(), NULL);
-
-      // fault を検出する CNF を作る．
-      engine.make_fval_cnf(fval_cnf, fault, kVal1);
-
-      // fault がマージできる他のグループを探す．
-      for (ymuint j = 0; j < ng; ++ j) {
-	ymuint gid = group_list[j];
-	if ( gid == min_gid ) {
-	  continue;
-	}
-	if ( locked[gid] ) {
-	  // 処理済みのグループには移動しない．
-	  continue;
-	}
-	const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
-	if ( engine.check_sat(gval_cnf, suf_list0) == kB3True ) {
-	  fgmgr.add_fault(gid, fault);
-	  del_fault_list.push_back(fault);
-	  break;
-	}
-      }
-#else
+    del_fault_list.reserve(nf);
+    for (ymuint i = 0; i < nf; ++ i) {
+      const TpgFault* fault = fgmgr.fault(min_gid, i);
       vector<ymuint> tmp_group_list;
       tmp_group_list.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
@@ -429,7 +366,6 @@ Compactor::phase2(FgMgr& fgmgr,
 	fgmgr.add_fault(gid, fault);
 	del_fault_list.push_back(fault);
       }
-#endif
     }
     if ( !del_fault_list.empty() ) {
       fgmgr.delete_fault(min_gid, del_fault_list);

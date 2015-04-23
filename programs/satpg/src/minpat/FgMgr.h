@@ -127,11 +127,13 @@ public:
   ymuint
   fault_num(ymuint gid) const = 0;
 
-  /// @brief グループの故障リストを返す．
+  /// @brief グループの故障を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] pos ( 0 <= pos < fault_num(gid) )
   virtual
-  const vector<const TpgFault*>&
-  fault_list(ymuint gid) const = 0;
+  const TpgFault*
+  fault(ymuint gid,
+	ymuint pos) const = 0;
 
   /// @brief 十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
