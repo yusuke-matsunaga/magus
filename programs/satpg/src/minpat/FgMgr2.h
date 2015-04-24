@@ -89,6 +89,22 @@ public:
   delete_fault(ymuint gid,
 	       const vector<const TpgFault*>& fault_list);
 
+  /// @brief 複数故障の検出検査回数
+  ymuint
+  mfault_num() const;
+
+  /// @brief 複数故障の平均多重度
+  double
+  mfault_avg() const;
+
+  /// @brief 複数故障の最大値
+  ymuint
+  mfault_max() const;
+
+  /// @brief 統計データをクリアする．
+  void
+  clear_count();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -100,6 +116,12 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  ymuint mMnum;
+
+  ymuint mFsum;
+
+  ymuint mFmax;
 
 };
 

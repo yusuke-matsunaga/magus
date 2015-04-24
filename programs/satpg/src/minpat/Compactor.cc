@@ -55,21 +55,20 @@ Compactor::run(FgMgr& fgmgr,
   mMaxNodeId = max_node_id;
 
   new_group_list = group_list;
+#if 0
+  phase0(fgmgr, new_group_list);
+#endif
+
+  phase1(fgmgr, new_group_list);
 
   for ( ; ; ) {
-#if 0
-    phase0(fgmgr, new_group_list);
-#endif
     ymuint ng0 = new_group_list.size();
+    phase2(fgmgr, new_group_list);
+
     phase1(fgmgr, new_group_list);
     if ( new_group_list.size() == ng0 ) {
       break;
     }
-
-    phase2(fgmgr, new_group_list);
-  }
-  if ( mVerbose > 1 ) {
-    cout << endl;
   }
 }
 
@@ -206,8 +205,12 @@ void
 Compactor::phase1(FgMgr& fgmgr,
 		  vector<ymuint>& group_list)
 {
+  StopWatch local_timer;
+  local_timer.start();
+
   if ( mVerbose > 0 ) {
-    cout << "phase1: initial # of groups = " << group_list.size() << endl;
+    cout << "phase1:      initial # of groups = "
+	 << setw(4) << group_list.size() << endl;
   }
 
   ymuint max_group_id = fgmgr.group_num();
@@ -316,11 +319,14 @@ Compactor::phase1(FgMgr& fgmgr,
     locked[min_gid] = true;
     ++ count;
   }
+
+  local_timer.stop();
   if ( mVerbose > 0 ) {
-    if ( mVerbose > 1 ) {
-      cout << endl;
+    if ( mVerbose == 1 ) {
+      cout << "           ";
     }
-    cout << "        final # of groups = " << group_list.size() << endl;
+    cout << "  final # of groups   = " << setw(4) << group_list.size()
+	 << ":  CPU time" << local_timer.time() << endl;
   }
 }
 
@@ -332,8 +338,12 @@ void
 Compactor::phase2(FgMgr& fgmgr,
 		  vector<ymuint>& group_list)
 {
+  StopWatch local_timer;
+  local_timer.start();
+
   if ( mVerbose > 0 ) {
-    cout << "phase2: initial # of groups = " << group_list.size() << endl;
+    cout << "phase2:      initial # of groups = "
+	 << setw(4) << group_list.size() << endl;
   }
 
   ymuint max_group_id = fgmgr.group_num();
@@ -398,11 +408,14 @@ Compactor::phase2(FgMgr& fgmgr,
     locked[min_gid] = true;
     ++ count;
   }
+
+  local_timer.stop();
   if ( mVerbose > 0 ) {
-    if ( mVerbose > 1 ) {
-      cout << endl;
+    if ( mVerbose == 1 ) {
+      cout << "           ";
     }
-    cout << "        final # of groups = " << group_list.size() << endl;
+    cout << "  final # of groups   = " << setw(4) << group_list.size()
+	 << ":  CPU time" << local_timer.time() << endl;
   }
 }
 

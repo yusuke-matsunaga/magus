@@ -28,6 +28,7 @@ FgMgr2::FgMgr2(ymuint max_node_id,
 	       const FaultAnalyzer& analyzer) :
   FgMgrBase(max_node_id, analyzer)
 {
+  clear_count();
 }
 
 // @brief デストラクタ
@@ -135,6 +136,7 @@ FgMgr2::find_group(const TpgFault* fault,
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(max_node_id());
 
+    ymuint fnum = 0;
     NodeValList suf_list1;
     if ( fi0.single_cube() ) {
       // fault を検出する条件を追加
@@ -157,11 +159,17 @@ FgMgr2::find_group(const TpgFault* fault,
 	FvalCnf* fval_cnfp = new FvalCnf(max_node_id(), gval_cnf);
 	fval_cnf_array[i] = fval_cnfp;
 	engine.make_fval_cnf(*fval_cnfp, fault, node_set(fault), kVal1);
+	++ fnum;
       }
     }
     for (ymuint i = 0; i < nf; ++ i) {
       delete fval_cnf_array[i];
     }
+    mFsum += fnum;
+    if ( mFmax < fnum ) {
+      mFmax = fnum;
+    }
+    ++ mMnum;
     if ( engine.check_sat(gval_cnf, suf_list1) == kB3True ) {
       if ( first_gid == group_num() ) {
 	first_gid = gid;
@@ -202,6 +210,7 @@ FgMgr2::add_fault(ymuint gid,
     engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
   }
 
+  ymuint fnum = 0;
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fg->fault(i);
     const FaultInfo& fi = fault_info(fault);
@@ -213,6 +222,7 @@ FgMgr2::add_fault(ymuint gid,
       FvalCnf* fval_cnfp = new FvalCnf(max_node_id(), gval_cnf);
       fval_cnf_array[i] = fval_cnfp;
       engine.make_fval_cnf(*fval_cnfp, fault, node_set(fault), kVal1);
+      ++ fnum;
     }
   }
 
@@ -232,6 +242,12 @@ FgMgr2::add_fault(ymuint gid,
       delete fval_cnf_array[i];
     }
   }
+  ++ mMnum;
+  if ( mFmax < fnum ) {
+    mFmax = fnum;
+  }
+  mFsum += fnum;
+
   fg->update();
 
   if ( fi.single_cube() ) {
@@ -255,6 +271,39 @@ FgMgr2::delete_fault(ymuint gid,
 {
   FaultGroup* fg = fault_group(gid);
   fg->delete_faults(fault_list);
+}
+
+// @brief 複数故障の検出検査回数
+ymuint
+FgMgr2::mfault_num() const
+{
+  return mMnum;
+}
+
+// @brief 複数故障の平均多重度
+double
+FgMgr2::mfault_avg() const
+{
+  if ( mMnum == 0 ) {
+    return 0.0;
+  }
+  return static_cast<double>(mFsum) / static_cast<double>(mMnum);
+}
+
+// @brief 複数故障の最大値
+ymuint
+FgMgr2::mfault_max() const
+{
+  return mFmax;
+}
+
+// @brief 統計データをクリアする．
+void
+FgMgr2::clear_count()
+{
+  mMnum = 0;
+  mFsum = 0;
+  mFmax = 0;
 }
 
 END_NAMESPACE_YM_SATPG

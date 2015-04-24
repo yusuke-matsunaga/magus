@@ -166,6 +166,11 @@ MinPatBase::run(TpgNetwork& network,
     cout << "CPU time (testvector generation) " << local_timer.time() << endl;
   }
 
+  if ( exact && verbose() > 0 ) {
+    cout << "Total   " << setw(8) << fgmgr2.mfault_num() << " exact compatibility check" << endl
+	 << "Avarage " << setw(8) << fgmgr2.mfault_avg() << " faults per check" << endl
+	 << "Max     " << setw(8) << fgmgr2.mfault_max() << " faults" << endl;
+  }
   {
     // 検証しておく．
     Verifier ver;
