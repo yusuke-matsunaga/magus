@@ -75,6 +75,11 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 等価故障の代表故障を求める．
+  void
+  get_rep_faults(const vector<const TpgFault*>& src_list,
+		 vector<const TpgFault*>& rep_fault_list);
+
   /// @brief 支配故障を求める．
   ///
   /// 結果は mDomFaultList に格納される．
@@ -104,6 +109,11 @@ private:
   bool
   check_fault_dominance(const TpgFault* f1,
 			const TpgFault* f2);
+
+  /// @brief f1 と f2 が等価かどうか調べる．
+  bool
+  check_fault_equivalence(const TpgFault* f1,
+			  const TpgFault* f2);
 
 
 private:
@@ -161,6 +171,9 @@ private:
 
   // record_pat() 中で用いる配列
   vector<bool> mDetFlag;
+
+  // 等価故障の候補リスト
+  vector<vector<ymuint> > mEqClassList;
 
 };
 
