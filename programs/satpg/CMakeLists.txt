@@ -115,6 +115,7 @@ set (minpat_SOURCES
   src/minpat/FgMgr1.cc
   src/minpat/FgMgr2.cc
   src/minpat/Compactor.cc
+  src/minpat/EqSet.cc
   )
 
 set (rtpg_SOURCES
