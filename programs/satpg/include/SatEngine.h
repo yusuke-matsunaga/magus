@@ -325,6 +325,8 @@ private:
   VarId
   new_var();
 
+public:
+
   /// @brief 節を追加する．
   /// @param[in] lits リテラルのベクタ
   void

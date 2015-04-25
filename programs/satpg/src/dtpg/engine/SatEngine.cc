@@ -327,8 +327,10 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
     }
   }
   else {
+    VarId fdvar = new_var();
+    fval_cnf.set_fdvar(fdvar);
     tmp_lits_begin(npo + 1);
-    Literal fdlit(fval_cnf.fd_var());
+    Literal fdlit(fdvar);
     for (ymuint i = 0; i < npo; ++ i) {
       const TpgNode* node = output_list[i];
       Literal dlit(fval_cnf.dvar(node));

@@ -125,6 +125,10 @@ public:
   set_dvar(const TpgNode* node,
 	   VarId dvar);
 
+  /// @brief 故障検出用の変数番号を割り当てる．
+  void
+  set_fdvar(VarId fdvar);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -259,6 +263,14 @@ FvalCnf::set_dvar(const TpgNode* node,
 		  VarId dvar)
 {
   mDvarMap.set_vid(node, dvar);
+}
+
+// @brief 故障検出用の変数番号を割り当てる．
+inline
+void
+FvalCnf::set_fdvar(VarId fdvar)
+{
+  mFdVar = fdvar;
 }
 
 END_NAMESPACE_YM_SATPG
