@@ -188,6 +188,15 @@ DomChecker::get_dom_faults(ymuint method,
 			   const vector<const TpgFault*>& src_list,
 			   vector<const TpgFault*>& dom_fault_list)
 {
+  {
+    vector<ymuint> elem_list;
+    elem_list.reserve(src_list.size());
+    for (ymuint i = 0; i < src_list.size(); ++ i) {
+      elem_list.push_back(src_list[i]->id());
+    }
+    mEqSet.init(elem_list);
+  }
+
   get_pat_list(src_list);
 
   vector<const TpgFault*> rep_fault_list;
@@ -217,11 +226,6 @@ DomChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
   KDet2Op op(mFsim, fault_list);
 
   ymuint nf = fault_list.size();
-  mEqClassList.push_back(vector<ymuint>());
-  for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fault_list[i];
-    mEqClassList[0].push_back(fault->id());
-  }
 
   ymuint npat = nf;
   ymuint base = 0;
@@ -319,45 +323,14 @@ ymuint
 DomChecker::record_pat(const vector<ymuint>& det_list,
 		       ymuint pat_id)
 {
+  mEqSet.refinement(det_list);
+
   ymuint n = det_list.size();
   ymuint nchg = 0;
 
   for (ymuint i = 0; i < n; ++ i) {
     ymuint f_id = det_list[i];
     mDetFlag[f_id] = true;
-  }
-
-  // 検出結果を用いて等価故障のリストを更新する．
-  ymuint ne = mEqClassList.size();
-  for (ymuint i = 0; i < ne; ++ i) {
-    const vector<ymuint>& src_list = mEqClassList[i];
-    ASSERT_COND( !src_list.empty() );
-    if ( src_list.size() == 1 ) {
-      continue;
-    }
-    vector<ymuint> dst_list0;
-    vector<ymuint> dst_list1;
-    for (ymuint rpos = 0; rpos < src_list.size(); ++ rpos) {
-      ymuint fid = src_list[rpos];
-      if ( mDetFlag[fid] ) {
-	dst_list1.push_back(fid);
-      }
-      else {
-	dst_list0.push_back(fid);
-      }
-    }
-    if ( dst_list1.empty() ) {
-      ASSERT_COND( dst_list0.size() == src_list.size() );
-      // なにもしない．
-    }
-    else if ( dst_list0.empty() ) {
-      ASSERT_COND( dst_list1.size() == src_list.size() );
-      // なにもしない．
-    }
-    else {
-      mEqClassList[i] = dst_list1;
-      mEqClassList.push_back(dst_list0);
-    }
   }
 
   // 検出結果を用いて支配される故障の候補リストを作る．
@@ -425,19 +398,20 @@ DomChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
   ymuint n_success = 0;
 
   vector<bool> mark(mMaxFaultId, false);
-  ymuint ne = mEqClassList.size();
-  for (ymuint i = 0; i < ne; ++ i) {
-    const vector<ymuint>& eq_list = mEqClassList[i];
-    ymuint n = eq_list.size();
+  ymuint nc = mEqSet.class_num();
+  for (ymuint i = 0; i < nc; ++ i) {
+    vector<ymuint> elem_list;
+    mEqSet.class_list(i, elem_list);
+    ymuint n = elem_list.size();
     for (ymuint i1 = 0; i1 < n; ++ i1) {
-      ymuint f1_id = eq_list[i1];
+      ymuint f1_id = elem_list[i1];
       if ( mark[f1_id] ) {
 	continue;
       }
 
       if ( mVerbose > 1 ) {
 	cout << "\r"
-	     << setw(6) << i << " / " << setw(6) << ne
+	     << setw(6) << i << " / " << setw(6) << nc
 	     << "  " << setw(6) << i1;
       }
 
@@ -445,7 +419,7 @@ DomChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
       const TpgFault* f1 = fi1.fault();
       rep_fault_list.push_back(f1);
       for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
-	ymuint f2_id = eq_list[i2];
+	ymuint f2_id = elem_list[i2];
 	if ( mark[f2_id] ) {
 	  continue;
 	}

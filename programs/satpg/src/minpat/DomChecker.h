@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "EqSet.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
 
@@ -172,8 +173,8 @@ private:
   // record_pat() 中で用いる配列
   vector<bool> mDetFlag;
 
-  // 等価故障の候補リスト
-  vector<vector<ymuint> > mEqClassList;
+  // 等価故障の候補リストを表すクラス
+  EqSet mEqSet;
 
 };
 
