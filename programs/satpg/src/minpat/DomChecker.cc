@@ -180,6 +180,29 @@ DomChecker::set_verbose(int verbose)
   mVerbose = verbose;
 }
 
+// @brief 支配故障を求める．
+//
+// 結果は mDomFaultList に格納される．
+void
+DomChecker::get_dom_faults(ymuint method,
+			   const vector<const TpgFault*>& src_list,
+			   vector<const TpgFault*>& dom_fault_list)
+{
+  get_pat_list(src_list);
+
+  vector<const TpgFault*> rep_fault_list;
+  get_rep_faults(src_list, rep_fault_list);
+
+  switch ( method ) {
+  case 1: get_dom_faults1(rep_fault_list, dom_fault_list); break;
+  case 2: get_dom_faults2(0, rep_fault_list, dom_fault_list); break;
+  case 3: get_dom_faults2(1, rep_fault_list, dom_fault_list); break;
+  case 4: get_dom_faults2(2, rep_fault_list, dom_fault_list); break;
+  case 5: get_dom_faults2(3, rep_fault_list, dom_fault_list); break;
+  default: ASSERT_NOT_REACHED;
+  }
+}
+
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
@@ -388,29 +411,6 @@ DomChecker::record_pat(const vector<ymuint>& det_list,
   }
 
   return nchg;
-}
-
-// @brief 支配故障を求める．
-//
-// 結果は mDomFaultList に格納される．
-void
-DomChecker::get_dom_faults(ymuint method,
-			   const vector<const TpgFault*>& src_list,
-			   vector<const TpgFault*>& dom_fault_list)
-{
-  get_pat_list(src_list);
-
-  vector<const TpgFault*> rep_fault_list;
-  get_rep_faults(src_list, rep_fault_list);
-
-  switch ( method ) {
-  case 1: get_dom_faults1(rep_fault_list, dom_fault_list); break;
-  case 2: get_dom_faults2(0, rep_fault_list, dom_fault_list); break;
-  case 3: get_dom_faults2(1, rep_fault_list, dom_fault_list); break;
-  case 4: get_dom_faults2(2, rep_fault_list, dom_fault_list); break;
-  case 5: get_dom_faults2(3, rep_fault_list, dom_fault_list); break;
-  default: ASSERT_NOT_REACHED;
-  }
 }
 
 // @brief 等価故障の代表故障を求める．
