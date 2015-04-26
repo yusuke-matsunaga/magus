@@ -143,6 +143,7 @@ YmSat::new_var()
   if ( decision_level() != 0 ) {
     // エラー
     cout << "Error!: decision_level() != 0" << endl;
+    ASSERT_NOT_REACHED;
     return kVarIdIllegal;
   }
 
@@ -1061,11 +1062,13 @@ YmSat::add_clause_sub(ymuint lit_num)
   if ( decision_level() != 0 ) {
     // エラー
     cout << "Error![YmSat]: decision_level() != 0" << endl;
+    ASSERT_NOT_REACHED;
     return;
   }
 
   if ( !mSane ) {
-    //cout << "Error![YmSat]: mSane == false" << endl;
+    cout << "Error![YmSat]: mSane == false" << endl;
+    ASSERT_NOT_REACHED;
     return;
   }
 
@@ -1131,6 +1134,7 @@ YmSat::add_clause_sub(ymuint lit_num)
       // TODO: エラー対策．
       cout << "Error![YmSat]: literal(" << l << "): out of range"
 	   << endl;
+      ASSERT_NOT_REACHED;
       return;
     }
     // 追加する．
