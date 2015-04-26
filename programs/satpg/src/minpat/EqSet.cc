@@ -68,7 +68,8 @@ EqSet::init(const vector<ymuint>& elem_list)
 
 // @brief 細分化を行う．
 // @param[in] elem_list 一方の部分集合の要素のリスト
-void
+// @return 変化があったら true を返す．
+bool
 EqSet::refinement(const vector<ymuint>& elem_list)
 {
   // elem_list に含まれる要素に印をつける．
@@ -76,6 +77,8 @@ EqSet::refinement(const vector<ymuint>& elem_list)
     ymuint id = elem_list[i];
     mMarkArray[id] = true;
   }
+
+  bool chg = false;
 
   // 個々の同値類候補リストを mMarkArray の内容にしたがって分類する．
   Elem* next = NULL;
@@ -116,6 +119,7 @@ EqSet::refinement(const vector<ymuint>& elem_list)
 	top0->mNextTop = top1;
 	top1->mNextTop = next;
 	mNeedFinalize = true;
+	chg = true;
       }
     }
     else {
@@ -123,6 +127,7 @@ EqSet::refinement(const vector<ymuint>& elem_list)
 	top1->mNextTop = top0;
 	top0->mNextTop = next;
 	mNeedFinalize = true;
+	chg = true;
       }
     }
   }
@@ -132,6 +137,8 @@ EqSet::refinement(const vector<ymuint>& elem_list)
     ymuint id = elem_list[i];
     mMarkArray[id] = false;
   }
+
+  return chg;
 }
 
 // @brief 同値類候補数を返す．

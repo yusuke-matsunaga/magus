@@ -41,7 +41,8 @@ public:
 
   /// @brief 細分化を行う．
   /// @param[in] elem_list 一方の部分集合の要素のリスト
-  void
+  /// @return 変化があったら true を返す．
+  bool
   refinement(const vector<ymuint>& elem_list);
 
   /// @brief 同値類候補数を返す．
