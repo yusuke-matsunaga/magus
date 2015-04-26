@@ -197,10 +197,12 @@ DomChecker::get_dom_faults(ymuint method,
     mEqSet.init(elem_list);
   }
 
-  get_pat_list(src_list);
+  do_fsim1(src_list);
 
   vector<const TpgFault*> rep_fault_list;
   get_rep_faults(src_list, rep_fault_list);
+
+  do_fsim2(rep_fault_list);
 
   switch ( method ) {
   case 1: get_dom_faults1(rep_fault_list, dom_fault_list); break;
@@ -215,7 +217,103 @@ DomChecker::get_dom_faults(ymuint method,
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-DomChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
+DomChecker::do_fsim1(const vector<const TpgFault*>& fault_list)
+{
+  StopWatch local_timer;
+  local_timer.start();
+
+  vector<TestVector*> cur_array;
+  cur_array.reserve(kPvBitLen);
+
+  KDet2Op op(mFsim, fault_list);
+
+  ymuint nf = fault_list.size();
+
+  ymuint npat = nf;
+  for (ymuint i = 0; i < nf; ++ i) {
+    const TpgFault* fault = fault_list[i];
+    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+    TestVector* tv = fi.testvector();
+    cur_array.push_back(tv);
+    if ( cur_array.size() == kPvBitLen ) {
+      if ( mVerbose > 1 ) {
+	cout << "\r " << i;
+	cout.flush();
+      }
+      mFsim.ppsfp(cur_array, op);
+      for (ymuint j = 0; j < kPvBitLen; ++ j) {
+	const vector<ymuint>& det_list = op.det_list(j);
+	mEqSet.refinement(det_list);
+      }
+      cur_array.clear();
+      op.clear_det_list();
+    }
+  }
+  if ( !cur_array.empty() ) {
+    mFsim.ppsfp(cur_array, op);
+    for (ymuint j = 0; j < cur_array.size(); ++ j) {
+      const vector<ymuint>& det_list = op.det_list(j);
+      mEqSet.refinement(det_list);
+    }
+    op.clear_det_list();
+    cur_array.clear();
+  }
+
+  for (ymuint i = 0; i < kPvBitLen; ++ i) {
+    TestVector* tv = mTvMgr.new_vector();
+    cur_array.push_back(tv);
+  }
+  ymuint nochg_count = 0;
+  for ( ; ; ) {
+    npat += kPvBitLen;
+    for (ymuint i = 0; i < kPvBitLen; ++ i) {
+      cur_array[i]->set_from_random(mRandGen);
+    }
+    mFsim.ppsfp(cur_array, op);
+    ymuint nchg = 0;
+    for (ymuint j = 0; j < kPvBitLen; ++ j) {
+      const vector<ymuint>& det_list = op.det_list(j);
+      if ( mEqSet.refinement(det_list) ) {
+	++ nchg;
+      }
+    }
+    cur_array.clear();
+    op.clear_det_list();
+    if ( nchg == 0 ) {
+      ++ nochg_count;
+      if ( nochg_count > 3 ) {
+	break;
+      }
+    }
+    else {
+      nochg_count = 0;
+    }
+    if ( mVerbose > 1 ) {
+      cout << "\r " << npat;
+      cout.flush();
+    }
+  }
+  if ( mVerbose > 1 ) {
+    cout << endl;
+  }
+
+  // 乱数パタンは削除しておく．
+  for (ymuint i = 0; i < kPvBitLen; ++ i) {
+    mTvMgr.delete_vector(cur_array[i]);
+  }
+
+  local_timer.stop();
+
+  if ( mVerbose ) {
+    cout << "CPU time (fault simulation1)  " << local_timer.time() << endl
+	 << "Total " << npat << " patterns simulated" << endl;
+  }
+}
+
+// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
+// @param[in] fault_list 故障リスト
+void
+DomChecker::do_fsim2(const vector<const TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -313,18 +411,15 @@ DomChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
   local_timer.stop();
 
   if ( mVerbose ) {
-    cout << "CPU time (fault simulation)  " << local_timer.time() << endl
+    cout << "CPU time (fault simulation2)  " << local_timer.time() << endl
 	 << "Total " << base << " patterns simulated" << endl;
   }
-
 }
 
 ymuint
 DomChecker::record_pat(const vector<ymuint>& det_list,
 		       ymuint pat_id)
 {
-  mEqSet.refinement(det_list);
-
   ymuint n = det_list.size();
   ymuint nchg = 0;
 
@@ -418,18 +513,19 @@ DomChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
       const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
       const TpgFault* f1 = fi1.fault();
       rep_fault_list.push_back(f1);
+
       for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
 	ymuint f2_id = elem_list[i2];
 	if ( mark[f2_id] ) {
 	  continue;
 	}
+
 	const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
 	const TpgFault* f2 = fi2.fault();
 	++ n_check;
 	if ( check_fault_equivalence(f1, f2) ) {
 	  mark[f2_id] = true;
 	  ++ n_success;
-	  continue;
 	}
       }
     }
@@ -445,6 +541,9 @@ DomChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
 	 << ": " << local_timer.time() << endl;
     cout << "  " << n_check << " checkes" << endl
 	 << "  " << n_success << " success" << endl;
+    cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
+	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
+	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
   }
 }
 
@@ -945,6 +1044,9 @@ bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
 				  const TpgFault* f2)
 {
+  StopWatch timer;
+  timer.start();
+
   SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(mMaxNodeId);
   FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
@@ -962,7 +1064,30 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     // f1 を検出して f2 を検出しない CNF を生成
     engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
   }
-  return engine.check_sat() == kB3False;
+  Bool3 ans = engine.check_sat();
+  timer.stop();
+  USTime time = timer.time();
+  if ( ans == kB3False ) {
+    mSuccessTime += time;
+    if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
+      mSuccessMax = time;
+    }
+    return true;
+  }
+  else if ( ans == kB3True ) {
+    mFailureTime += time;
+    if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
+      mFailureMax = time;
+    }
+    return false;
+  }
+  else {
+    mAbortTime += timer.time();
+    if ( mAbortMax.usr_time_usec() < time.usr_time_usec() ) {
+      mAbortMax = time;
+    }
+    return false;
+  }
 }
 
 // @brief f1 と f2 が等価かどうか調べる．
@@ -970,88 +1095,85 @@ bool
 DomChecker::check_fault_equivalence(const TpgFault* f1,
 				    const TpgFault* f2)
 {
-#if 0
+  return check_fault_dominance2(f1, f2) && check_fault_dominance2(f2, f1);
+}
+
+// @brief f1 が f2 を支配しているか調べる．
+bool
+DomChecker::check_fault_dominance2(const TpgFault* f1,
+				   const TpgFault* f2)
+{
+  StopWatch timer;
+  timer.start();
+
   SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(mMaxNodeId);
-  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-  const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-  engine.make_fval_cnf(fval_cnf1, f1, node_set1, kValX);
 
-  FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-  const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-  engine.make_fval_cnf(fval_cnf2, f2, node_set2, kValX);
-
-  Literal fd1lit(fval_cnf1.fd_var());
-  Literal fd2lit(fval_cnf2.fd_var());
-  engine.add_clause( fd1lit,  fd2lit);
-  engine.add_clause(~fd1lit, ~fd2lit);
-  return engine.check_sat() == kB3False;
-#else
-#if 1
-  return check_fault_dominance(f1, f2) && check_fault_dominance(f2, f1);
-#else
   const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
   const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
 
-  {
-    SatEngine engine(string(), string(), NULL);
-    GvalCnf gval_cnf(mMaxNodeId);
-
-    NodeValList suf_list1;
-    if ( fi1.single_cube() ) {
-      suf_list1 = fi1.sufficient_assignment();
-    }
-    else {
-      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-      const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-      engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
-    }
-
-    if ( fi2.single_cube() ) {
-      // f2 を検出しない CNF を生成
-      engine.add_negation(gval_cnf, fi2.sufficient_assignment());
-    }
-    else {
-      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-      // f1 を検出して f2 を検出しない CNF を生成
-      engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
-    }
-    if ( engine.check_sat(gval_cnf, suf_list1) != kB3False ) {
-      return false;
-    }
+  if ( fi2.single_cube() ) {
+    // f2 を検出しない CNF を生成
+    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
   }
-  {
-    SatEngine engine(string(), string(), NULL);
-    GvalCnf gval_cnf(mMaxNodeId);
+  else {
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+    // f2 を検出しない CNF を生成
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+  }
 
-    NodeValList suf_list1;
-    if ( fi2.single_cube() ) {
-      suf_list1 = fi2.sufficient_assignment();
-    }
-    else {
-      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-      engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal1);
-    }
+  if ( engine.check_sat(gval_cnf, fi1.mandatory_assignment()) == kB3False ) {
+    return true;
+  }
 
-    if ( fi1.single_cube() ) {
-      // f1 を検出しない CNF を生成
-      engine.add_negation(gval_cnf, fi1.sufficient_assignment());
+  if ( fi1.single_cube() ) {
+    // sufficient_assignment() == mandatory_assignment() なので答は出ている．
+    return false;
+  }
+
+  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+  const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
+  // f1 を検出する CNF を生成
+  engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+  Bool3 ans = engine.check_sat();
+  timer.stop();
+  USTime time = timer.time();
+  if ( ans == kB3False ) {
+    mSuccessTime += time;
+    if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
+      if ( time.usr_time() > 1.0 ) {
+	cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
+	cout << "f1->sufficient_assignment() = " << fi1.sufficient_assignment() << endl
+	     << "f1->mandatory_assignment()  = " << fi1.mandatory_assignment() << endl
+	     << "f2->sufficient_assignment() = " << fi2.sufficient_assignment() << endl
+	     << "f2->mandatory_assignment()  = " << fi2.mandatory_assignment() << endl;
+      }
+      mSuccessMax = time;
     }
-    else {
-      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-      const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-      // f2 を検出して f1 を検出しない CNF を生成
-      engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal0);
-    }
-    if ( engine.check_sat(gval_cnf, suf_list1) == kB3False ) {
-      return true;
+    return true;
+  }
+  else if ( ans == kB3True ) {
+    mFailureTime += time;
+    if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
+      if ( time.usr_time() > 1.0 ) {
+	cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
+      }
+      mFailureMax = time;
     }
     return false;
   }
-#endif
-#endif
+  else {
+    mAbortTime += timer.time();
+    if ( mAbortMax.usr_time_usec() < time.usr_time_usec() ) {
+      if ( time.usr_time() > 1.0 ) {
+	cout << "ABORT: " << f1 << ": " << f2 << "  " << time << endl;
+      }
+      mAbortMax = time;
+    }
+    return false;
+  }
 }
 
 // @brief シミュレーション時の検出パタン数を返す．

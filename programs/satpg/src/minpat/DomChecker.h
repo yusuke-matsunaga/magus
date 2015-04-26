@@ -99,7 +99,12 @@ private:
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fault_list 故障リスト
   void
-  get_pat_list(const vector<const TpgFault*>& fault_list);
+  do_fsim1(const vector<const TpgFault*>& fault_list);
+
+  /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
+  /// @param[in] fault_list 故障リスト
+  void
+  do_fsim2(const vector<const TpgFault*>& fault_list);
 
   /// @brief 故障シミュレーションの後処理
   ymuint
@@ -115,6 +120,11 @@ private:
   bool
   check_fault_equivalence(const TpgFault* f1,
 			  const TpgFault* f2);
+
+  /// @brief f1 が f2 を支配しているか調べる．
+  bool
+  check_fault_dominance2(const TpgFault* f1,
+			 const TpgFault* f2);
 
 
 private:
@@ -176,6 +186,17 @@ private:
   // 等価故障の候補リストを表すクラス
   EqSet mEqSet;
 
+  USTime mSuccessTime;
+
+  USTime mSuccessMax;
+
+  USTime mFailureTime;
+
+  USTime mFailureMax;
+
+  USTime mAbortTime;
+
+  USTime mAbortMax;
 };
 
 END_NAMESPACE_YM_SATPG

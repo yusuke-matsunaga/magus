@@ -365,6 +365,100 @@ SatEngine::make_fval_cnf(FvalCnf& fval_cnf,
   make_fval_cnf(fval_cnf, fault, node_set, detect);
 }
 
+// @brief 2つの故障を持つ故障回路のCNFを作る．
+// @param[in] fval_cnf 故障回路用のデータ構造
+// @param[in] fault1, fault2 故障
+// @param[in] node_set1, node_set2 故障に関係するノード集合
+// @param[in] detect 検出条件
+//
+// detect = kVal0: 検出しないCNFを作る．
+//        = kVal1: 検出するCNFを作る．
+//        = kValX: fd_var() で制御するCNFを作る．
+void
+SatEngine::make_fval_cnf2(FvalCnf2&  fval_cnf,
+			  const TpgFault* fault1,
+			  const TpgFault* fault2,
+			  const NodeSet& node_set1,
+			  const NodeSet& node_set2,
+			  Val3 detect)
+{
+  make_gval_cnf(fval_cnf.gval_cnf(), node_set);
+
+  ymuint n = node_set.tfo_size();
+  for (ymuint i = 0; i < n; ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    VarId fvar = new_var();
+    VarId dvar = new_var();
+    fval_cnf.set_fvar(node, fvar);
+    fval_cnf.set_dvar(node, dvar);
+  }
+  ymuint n0 = node_set.tfo_tfi_size();
+  for (ymuint i = n; i < n0; ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+    fval_cnf.set_fvar(node, fval_cnf.gvar(node));
+  }
+
+  const TpgNode* fnode = fault->node();
+  for (ymuint i = 0; i < n; ++ i) {
+    const TpgNode* node = node_set.tfo_tfi_node(i);
+
+    // 故障回路のゲートの入出力関係を表すCNFを作る．
+    if ( node == fnode ) {
+      make_fault_cnf(fault, fval_cnf.gvar_map(), fval_cnf.fvar_map());
+    }
+    else {
+      make_node_cnf(node, fval_cnf.fvar_map());
+    }
+
+    // D-Chain 制約を作る．
+    make_dchain_cnf(node, fval_cnf.gvar_map(), fval_cnf.fvar_map(), fval_cnf.dvar_map());
+  }
+
+  const vector<const TpgNode*>& output_list = node_set.output_list();
+  ymuint npo = output_list.size();
+
+  if ( detect == kVal0 ) {
+    for (ymuint i = 0; i < npo; ++ i) {
+      const TpgNode* node = output_list[i];
+      Literal dlit(fval_cnf.dvar(node));
+      add_clause(~dlit);
+    }
+  }
+  else if ( detect == kVal1 ) {
+    tmp_lits_begin(npo);
+    for (ymuint i = 0; i < npo; ++ i) {
+      const TpgNode* node = output_list[i];
+      Literal dlit(fval_cnf.dvar(node));
+      tmp_lits_add(dlit);
+    }
+    tmp_lits_end();
+
+    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(fval_cnf.dvar(node));
+      add_clause(dlit);
+    }
+  }
+  else {
+    VarId fdvar = new_var();
+    fval_cnf.set_fdvar(fdvar);
+    tmp_lits_begin(npo + 1);
+    Literal fdlit(fdvar);
+    for (ymuint i = 0; i < npo; ++ i) {
+      const TpgNode* node = output_list[i];
+      Literal dlit(fval_cnf.dvar(node));
+      tmp_lits_add(dlit);
+      add_clause(fdlit, ~dlit);
+    }
+    tmp_lits_add(~fdlit);
+    tmp_lits_end();
+
+    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+      Literal dlit(fval_cnf.dvar(node));
+      add_clause(~fdlit, dlit);
+    }
+  }
+}
+
 // @brief 複数故障検出回路のCNFを作る．
 // @param[in] mval_cnf 故障回路用のデータ構造
 // @param[in] fault_list 故障リスト
