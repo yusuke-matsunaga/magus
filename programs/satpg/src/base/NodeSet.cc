@@ -98,4 +98,64 @@ NodeSet::mark_region(ymuint max_node_id,
   sort(mOutputList.begin(), mOutputList.end(), Lt());
 }
 
+// @brief 故障位置を与えてその TFO の TFI リストを作る．
+// @param[in] max_node_id ノード番号の最大値
+// @param[in] fnode 故障位置のノード
+// @param[in] dom_node dominator ノード
+//
+// 結果は mTfoList に格納される．
+// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
+// こちらは fnode の直近の dominator までを対象とする．
+void
+NodeSet::mark_region2(ymuint max_node_id,
+		      const TpgNode* fnode,
+		      const TpgNode* dom_node)
+{
+  mMaxNodeId = max_node_id;
+
+  mMarkArray.clear();
+  mMarkArray.resize(max_node_id, 0U);
+
+  mTfoList.clear();
+  mTfoList.reserve(max_node_id);
+
+  mInputList.clear();
+  mOutputList.clear();
+
+   // 故障のあるノードの TFO を mTfoList に入れる．
+  // TFO の TFI のノードを mTfiList に入れる．
+  if ( !tfo_mark(fnode) ) {
+     set_tfo_mark(fnode);
+    if ( fnode->is_input() ) {
+      mInputList.push_back(fnode);
+    }
+  }
+
+  for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
+    const TpgNode* node = mTfoList[rpos];
+    if ( node == dom_node ) {
+      continue;
+    }
+     ymuint nfo = node->active_fanout_num();
+    for (ymuint i = 0; i < nfo; ++ i) {
+      const TpgNode* fonode = node->active_fanout(i);
+      if ( !tfo_mark(fonode) ) {
+	set_tfo_mark(fonode);
+      }
+    }
+  }
+
+  mTfoEnd = mTfoList.size();
+  for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
+    const TpgNode* node = mTfoList[rpos];
+    ymuint ni = node->fanin_num();
+    for (ymuint i = 0; i < ni; ++ i) {
+      const TpgNode* finode = node->fanin(i);
+      if ( !tfo_mark(finode) && !tfi_mark(finode) ) {
+	set_tfi_mark(finode);
+      }
+    }
+  }
+}
+
 END_NAMESPACE_YM_SATPG

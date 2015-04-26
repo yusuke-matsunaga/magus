@@ -58,8 +58,6 @@ MinPatBase::run(TpgNetwork& network,
 		vector<TestVector*>& tv_list,
 		USTime& time)
 {
-  print_network(cout, network);
-
   StopWatch total_timer;
   total_timer.start();
 

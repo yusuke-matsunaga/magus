@@ -138,6 +138,33 @@ check_intersect(const vector<ymuint>& list1,
   return false;
 }
 
+const TpgNode*
+common_node(const TpgNode* node1,
+	    const TpgNode* node2)
+{
+  ymuint id1 = node1->id();
+  ymuint id2 = node2->id();
+  for ( ; ; ) {
+    if ( node1 == node2 ) {
+      return node1;
+    }
+    if ( id1 < id2 ) {
+      node1 = node1->imm_dom();
+      if ( node1 == NULL ) {
+	return NULL;
+      }
+      id1 = node1->id();
+    }
+    else if ( id1 > id2 ) {
+      node2 = node2->imm_dom();
+      if ( node2 == NULL ) {
+	return NULL;
+      }
+      id2 = node2->id();
+    }
+  }
+}
+
 END_NONAMESPACE
 
 
@@ -1036,6 +1063,9 @@ DomChecker::get_dom_faults2(ymuint option,
     cout << "Total    " << n_nodom  << " non-dominance" << endl;
     cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
     cout << "CPU time for dominance test" << local_timer.time() << endl;
+    cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
+	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
+	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
   }
 }
 
@@ -1044,6 +1074,40 @@ bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
 				  const TpgFault* f2)
 {
+  const TpgNode* fnode1 = f1->node();
+  const TpgNode* fnode2 = f2->node();
+  const TpgNode* dom_node = common_node(fnode1, fnode2);
+
+  if ( dom_node != NULL ) {
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(mMaxNodeId);
+
+    NodeSet node_set0;
+    node_set0.mark_region(mMaxNodeId, dom_node);
+
+    NodeSet node_set1;
+    node_set1.mark_region2(mMaxNodeId, fnode1, dom_node);
+
+    NodeSet node_set2;
+    node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
+
+    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+
+    engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
+			  dom_node, f1, f2,
+			  node_set0, node_set1, node_set2);
+
+    Literal dlit1(fval_cnf1.dvar(dom_node));
+    Literal dlit2(fval_cnf2.dvar(dom_node));
+
+    vector<Literal> assumption(2);
+    assumption[0] = dlit1;
+    assumption[1] = ~dlit2;
+    return ( engine.check_sat(assumption) == kB3False );
+  }
+
   StopWatch timer;
   timer.start();
 
@@ -1095,7 +1159,50 @@ bool
 DomChecker::check_fault_equivalence(const TpgFault* f1,
 				    const TpgFault* f2)
 {
-  return check_fault_dominance2(f1, f2) && check_fault_dominance2(f2, f1);
+  const TpgNode* fnode1 = f1->node();
+  const TpgNode* fnode2 = f2->node();
+  const TpgNode* dom_node = common_node(fnode1, fnode2);
+
+  if ( dom_node != NULL ) {
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(mMaxNodeId);
+
+    NodeSet node_set0;
+    node_set0.mark_region(mMaxNodeId, dom_node);
+
+    NodeSet node_set1;
+    node_set1.mark_region2(mMaxNodeId, fnode1, dom_node);
+
+    NodeSet node_set2;
+    node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
+
+    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+
+    engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
+			  dom_node, f1, f2,
+			  node_set0, node_set1, node_set2);
+
+    Literal dlit1(fval_cnf1.dvar(dom_node));
+    Literal dlit2(fval_cnf2.dvar(dom_node));
+
+    vector<Literal> assumption(2);
+    assumption[0] = dlit1;
+    assumption[1] = ~dlit2;
+    if ( engine.check_sat(assumption) != kB3False ) {
+      return false;
+    }
+    assumption[0] = ~dlit1;
+    assumption[1] = dlit2;
+    if ( engine.check_sat(assumption) != kB3False ) {
+      return false;
+    }
+    return true;
+  }
+  else {
+    return check_fault_dominance2(f1, f2) && check_fault_dominance2(f2, f1);
+  }
 }
 
 // @brief f1 が f2 を支配しているか調べる．
@@ -1109,35 +1216,69 @@ DomChecker::check_fault_dominance2(const TpgFault* f1,
   SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(mMaxNodeId);
 
-  const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
-  const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+  const TpgNode* fnode1 = f1->node();
+  const TpgNode* fnode2 = f2->node();
+  const TpgNode* dom_node = common_node(fnode1, fnode2);
 
-  if ( fi2.single_cube() ) {
-    // f2 を検出しない CNF を生成
-    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+  Bool3 ans;
+  if ( dom_node != NULL ) {
+    NodeSet node_set0;
+    node_set0.mark_region(mMaxNodeId, dom_node);
+
+    NodeSet node_set1;
+    node_set1.mark_region2(mMaxNodeId, fnode1, dom_node);
+
+    NodeSet node_set2;
+    node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
+
+    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+
+    engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
+			  dom_node, f1, f2,
+			  node_set0, node_set1, node_set2);
+
+    Literal dlit1(fval_cnf1.dvar(dom_node));
+    Literal dlit2(fval_cnf2.dvar(dom_node));
+
+    vector<Literal> assumption(2);
+    assumption[0] = dlit1;
+    assumption[1] = ~dlit2;
+    ans = engine.check_sat(assumption);
   }
   else {
-    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-    const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-    // f2 を検出しない CNF を生成
-    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+    const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
+    const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+
+    if ( fi2.single_cube() ) {
+      // f2 を検出しない CNF を生成
+      engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+    }
+    else {
+      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+      // f2 を検出しない CNF を生成
+      engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+    }
+
+    if ( engine.check_sat(gval_cnf, fi1.mandatory_assignment()) == kB3False ) {
+      return true;
+    }
+
+    if ( fi1.single_cube() ) {
+      // sufficient_assignment() == mandatory_assignment() なので答は出ている．
+      return false;
+    }
+
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
+    // f1 を検出する CNF を生成
+    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+    ans = engine.check_sat();
   }
 
-  if ( engine.check_sat(gval_cnf, fi1.mandatory_assignment()) == kB3False ) {
-    return true;
-  }
-
-  if ( fi1.single_cube() ) {
-    // sufficient_assignment() == mandatory_assignment() なので答は出ている．
-    return false;
-  }
-
-  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-  const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-  // f1 を検出する CNF を生成
-  engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
-
-  Bool3 ans = engine.check_sat();
   timer.stop();
   USTime time = timer.time();
   if ( ans == kB3False ) {
@@ -1145,10 +1286,12 @@ DomChecker::check_fault_dominance2(const TpgFault* f1,
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
       if ( time.usr_time() > 1.0 ) {
 	cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
+#if 0
 	cout << "f1->sufficient_assignment() = " << fi1.sufficient_assignment() << endl
 	     << "f1->mandatory_assignment()  = " << fi1.mandatory_assignment() << endl
 	     << "f2->sufficient_assignment() = " << fi2.sufficient_assignment() << endl
 	     << "f2->mandatory_assignment()  = " << fi2.mandatory_assignment() << endl;
+#endif
       }
       mSuccessMax = time;
     }

@@ -56,6 +56,19 @@ public:
   mark_region(ymuint max_node_id,
 	      const vector<const TpgNode*>& fnode_list);
 
+  /// @brief 故障位置を与えてその TFO の TFI リストを作る．
+  /// @param[in] max_node_id ノード番号の最大値
+  /// @param[in] fnode 故障位置のノード
+  /// @param[in] dom_node dominator ノード
+  ///
+  /// 結果は mTfoList に格納される．
+  /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
+  /// こちらは fnode の直近の dominator までを対象とする．
+  void
+  mark_region2(ymuint max_node_id,
+	       const TpgNode* fnode,
+	       const TpgNode* dom_node);
+
   /// @brief ノード番号の最大値を返す．
   ymuint
   max_id() const;
