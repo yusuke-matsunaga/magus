@@ -125,18 +125,17 @@ NodeSet::mark_region2(ymuint max_node_id,
    // 故障のあるノードの TFO を mTfoList に入れる．
   // TFO の TFI のノードを mTfiList に入れる．
   if ( !tfo_mark(fnode) ) {
-     set_tfo_mark(fnode);
+    set_tfo_mark(fnode);
     if ( fnode->is_input() ) {
       mInputList.push_back(fnode);
     }
   }
-
   for (ymuint rpos = 0; rpos < mTfoList.size(); ++ rpos) {
     const TpgNode* node = mTfoList[rpos];
     if ( node == dom_node ) {
       continue;
     }
-     ymuint nfo = node->active_fanout_num();
+    ymuint nfo = node->active_fanout_num();
     for (ymuint i = 0; i < nfo; ++ i) {
       const TpgNode* fonode = node->active_fanout(i);
       if ( !tfo_mark(fonode) ) {

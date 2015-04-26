@@ -224,10 +224,14 @@ DomChecker::get_dom_faults(ymuint method,
     mEqSet.init(elem_list);
   }
 
+  mDomCheckCount = 0;
+
   do_fsim1(src_list);
 
   vector<const TpgFault*> rep_fault_list;
   get_rep_faults(src_list, rep_fault_list);
+
+  mDomCheckCount = 0;
 
   do_fsim2(rep_fault_list);
 
@@ -886,6 +890,7 @@ DomChecker::get_dom_faults2(ymuint option,
     const TpgFault* f1 = fi1.fault();
     const vector<ymuint>& input_list1_2 = mAnalyzer.input_list2(f1_id);
 
+#if 1
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
@@ -898,6 +903,7 @@ DomChecker::get_dom_faults2(ymuint option,
       // f1 を検出しない CNF を作成
       engine.make_fval_cnf(fval_cnf, f1, mAnalyzer.node_set(f1_id), kVal0);
     }
+#endif
 
     bool pending = false;
     for (ymuint i2 = 0; i2 < cand_list.size(); ++ i2) {
@@ -921,6 +927,7 @@ DomChecker::get_dom_faults2(ymuint option,
 	continue;
       }
 
+#if 0
       ++ n_sat1;
       // これが f2 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi2.sufficient_assignment()) == kB3True ) {
@@ -934,6 +941,7 @@ DomChecker::get_dom_faults2(ymuint option,
 	-- cur_num;
 	break;
       }
+#endif
 
       // 実際にチェックを行う．
       ++ n_sat2;
@@ -1066,6 +1074,7 @@ DomChecker::get_dom_faults2(ymuint option,
     cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
 	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
 	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
+    cout << "         " << mDomCheckCount << " smart dom check" << endl;
   }
 }
 
@@ -1079,6 +1088,8 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
   const TpgNode* dom_node = common_node(fnode1, fnode2);
 
   if ( dom_node != NULL ) {
+    ++ mDomCheckCount;
+
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
@@ -1105,7 +1116,56 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     vector<Literal> assumption(2);
     assumption[0] = dlit1;
     assumption[1] = ~dlit2;
-    return ( engine.check_sat(assumption) == kB3False );
+    bool ans1 = ( engine.check_sat(assumption) == kB3False );
+    bool ans2;
+    {
+      SatEngine engine(string(), string(), NULL);
+      GvalCnf gval_cnf(mMaxNodeId);
+      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+      const NodeSet& _node_set1 = mAnalyzer.node_set(f1->id());
+      engine.make_fval_cnf(fval_cnf1, f1, _node_set1, kVal1);
+
+      const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+      if ( false && fi2.single_cube() ) {
+	// f2 を検出しない CNF を生成
+	engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+      }
+      else {
+	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+	// f1 を検出して f2 を検出しない CNF を生成
+	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+      }
+      Bool3 sat_stat = engine.check_sat();
+      ans2 = ( sat_stat == kB3False );
+      if ( ans1 != ans2 ) {
+	cout << endl;
+	cout << "Error" << endl;
+	cout << f1 << " " << f2 << endl;
+	cout << " ans1 = " << ans1 << endl
+	     << " ans2 = " << ans2 << endl;
+	{
+	  cout << "dom_node = " << dom_node->id() << endl;
+	  cout << "NodeSet0" << endl;
+	  for (ymuint i = 0; i < node_set0.tfo_size(); ++ i) {
+	    cout << " " << node_set0.tfo_tfi_node(i)->id();
+	  }
+	  cout << endl;
+	  cout << "NodeSet1" << endl;
+	  for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
+	    cout << " " << node_set1.tfo_tfi_node(i)->id();
+	  }
+	  cout << endl;
+	  cout << "NodeSet2" << endl;
+	  for (ymuint i = 0; i < node_set2.tfo_size(); ++ i) {
+	    cout << " " << node_set2.tfo_tfi_node(i)->id();
+	  }
+	  cout << endl;
+	}
+      }
+    }
+
+    return ans2;
   }
 
   StopWatch timer;
@@ -1164,6 +1224,8 @@ DomChecker::check_fault_equivalence(const TpgFault* f1,
   const TpgNode* dom_node = common_node(fnode1, fnode2);
 
   if ( dom_node != NULL ) {
+    ++ mDomCheckCount;
+
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
@@ -1222,6 +1284,8 @@ DomChecker::check_fault_dominance2(const TpgFault* f1,
 
   Bool3 ans;
   if ( dom_node != NULL ) {
+    ++ mDomCheckCount;
+
     NodeSet node_set0;
     node_set0.mark_region(mMaxNodeId, dom_node);
 
@@ -1286,12 +1350,6 @@ DomChecker::check_fault_dominance2(const TpgFault* f1,
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
       if ( time.usr_time() > 1.0 ) {
 	cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
-#if 0
-	cout << "f1->sufficient_assignment() = " << fi1.sufficient_assignment() << endl
-	     << "f1->mandatory_assignment()  = " << fi1.mandatory_assignment() << endl
-	     << "f2->sufficient_assignment() = " << fi2.sufficient_assignment() << endl
-	     << "f2->mandatory_assignment()  = " << fi2.mandatory_assignment() << endl;
-#endif
       }
       mSuccessMax = time;
     }

@@ -197,6 +197,9 @@ private:
   USTime mAbortTime;
 
   USTime mAbortMax;
+
+  ymuint mDomCheckCount;
+
 };
 
 END_NAMESPACE_YM_SATPG
