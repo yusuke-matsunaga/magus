@@ -1,8 +1,8 @@
-﻿#ifndef DOMCHECKER_H
-#define DOMCHECKER_H
+﻿#ifndef EQCHECKER_H
+#define EQCHECKER_H
 
-/// @file DomChecker.h
-/// @brief DomChecker のヘッダファイル
+/// @file EqChecker.h
+/// @brief EqChecker のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
@@ -10,7 +10,7 @@
 
 
 #include "satpg_nsdef.h"
-#include "PackedVal.h"
+#include "EqSet.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
 
@@ -20,10 +20,10 @@ BEGIN_NAMESPACE_YM_SATPG
 class FaultAnalyzer;
 
 //////////////////////////////////////////////////////////////////////
-/// @class DomChecker DomChecker.h "DomChecker.h"
+/// @class EqChecker EqChecker.h "EqChecker.h"
 /// @brief 故障間の支配関係を解析するクラス
 //////////////////////////////////////////////////////////////////////
-class DomChecker
+class EqChecker
 {
 public:
 
@@ -31,13 +31,13 @@ public:
   /// @param[in] analyzer 故障の情報を持つクラス
   /// @param[in] tvmgr テストベクタのマネージャ
   /// @param[in] fsim 故障シミュレータ
-  DomChecker(FaultAnalyzer& analyzer,
-	     TvMgr& tvmgr,
-	     Fsim& fsim);
+  EqChecker(FaultAnalyzer& analyzer,
+	    TvMgr& tvmgr,
+	    Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
-  ~DomChecker();
+  ~EqChecker();
 
 
 public:
@@ -50,25 +50,12 @@ public:
   void
   set_verbose(int verbose);
 
-  /// @brief 支配故障を求める．
+  /// @brief 代表故障を求める．
   ///
-  /// 結果は mDomFaultList に格納される．
+  /// 結果は rep_fault_list に格納される．
   void
-  get_dom_faults(ymuint method,
-		 const vector<const TpgFault*>& src_list,
-		 vector<const TpgFault*>& dom_fault_list);
-
-  /// @brief シミュレーション時の検出パタン数を返す．
-  ymuint
-  det_count(ymuint f_id);
-
-  /// @brief 非支配故障候補数を返す．
-  ymuint
-  dom_cand_size(ymuint f_id);
-
-  /// @brief 支配故障候補数を返す．
-  ymuint
-  dom_cand2_size(ymuint f_id);
+  get_rep_faults(const vector<const TpgFault*>& src_list,
+		 vector<const TpgFault*>& rep_fault_list);
 
 
 private:
@@ -76,58 +63,26 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults1(const vector<const TpgFault*>& src_list,
-		  vector<const TpgFault*>& dom_fault_list);
-
-  /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
-  void
-  get_dom_faults2(ymuint option ,
-		  const vector<const TpgFault*>& src_list,
-		  vector<const TpgFault*>& dom_fault_list);
-
-  /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
+  /// @brief 故障シミュレーションを行い，等価故障の候補リストを作る．
   /// @param[in] fault_list 故障リスト
   void
   do_fsim(const vector<const TpgFault*>& fault_list);
 
-  /// @brief 故障シミュレーションの後処理
-  ymuint
-  record_pat(const vector<pair<ymuint, PackedVal> >& det_list);
+  /// @brief f1 と f2 が等価かどうか調べる．
+  bool
+  check_fault_equivalence(const TpgFault* f1,
+			  const TpgFault* f2);
 
   /// @brief f1 が f2 を支配しているか調べる．
   bool
-  check_fault_dominance(const TpgFault* f1,
-			const TpgFault* f2);
+  check_fault_dominance2(const TpgFault* f1,
+			 const TpgFault* f2);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
-
-  // 故障ごとのデータ
-  struct FaultData
-  {
-
-    // 被支配故障候補のリスト
-    vector<ymuint> mDomCandList;
-
-    // mDomCandList の本当の要素数
-    ymuint mDomCandListSize;
-
-    // 支配故障候補のリスト
-    vector<ymuint> mDomCandList2;
-
-    // 検出パタン数
-    ymuint mDetCount;
-
-  };
 
 
 private:
@@ -156,11 +111,8 @@ private:
   // テストベクタ用の乱数生成器
   RandGen mRandGen;
 
-  // 故障ごとのデータ配列
-  vector<FaultData> mFaultDataArray;
-
-  // record_pat() 中で用いる配列
-  vector<PackedVal> mDetFlag;
+  // 等価故障の候補リストを表すクラス
+  EqSet mEqSet;
 
   USTime mSuccessTime;
 
@@ -180,4 +132,4 @@ private:
 
 END_NAMESPACE_YM_SATPG
 
-#endif // DOMCHECKER_H
+#endif // EQCHECKER_H

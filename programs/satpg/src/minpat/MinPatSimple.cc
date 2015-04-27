@@ -10,6 +10,7 @@
 #include "MinPatSimple.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
+#include "EqChecker.h"
 #include "DomChecker.h"
 
 #include "YmUtils/RandGen.h"
@@ -73,12 +74,16 @@ MinPatSimple::init(const vector<const TpgFault*>& fault_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
-  DomChecker checker(analyzer(), tvmgr, fsim2);
+  EqChecker checker1(analyzer(), tvmgr, fsim2);
+  DomChecker checker2(analyzer(), tvmgr, fsim2);
+
+  vector<const TpgFault*> rep_fault_list;
+  checker1.get_rep_faults(fault_list, rep_fault_list);
 
   vector<const TpgFault*> dom_fault_list;
-  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
+  checker2.get_dom_faults(dom_method(), rep_fault_list, dom_fault_list);
 
-  sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker));
+  sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker2));
 
   set_fault_list(dom_fault_list);
 }

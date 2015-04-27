@@ -110,6 +110,7 @@ set (minpat_SOURCES
   src/minpat/MinPatDsatur.cc
   src/minpat/MinPatDsatur2.cc
   src/minpat/FaultAnalyzer.cc
+  src/minpat/EqChecker.cc
   src/minpat/DomChecker.cc
   src/minpat/ConflictChecker.cc
   src/minpat/FgMgrBase.cc
