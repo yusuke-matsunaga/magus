@@ -252,11 +252,13 @@ private:
 
   /// @brief 故障伝搬条件を表すCNFを作る．
   /// @param[in] node 対象のノード
+  /// @param[in] dst_node 伝搬条件の終点のノード
   /// @param[in] gvar_map 正常値の変数マップ
   /// @param[in] fvar_map 故障値の変数マップ
   /// @param[in] dvar_map 故障伝搬条件の変数マップ
   void
   make_dchain_cnf2(const TpgNode* node,
+		   const TpgNode* dst_node,
 		   const VidMap& gvar_map,
 		   const VidMap& fvar_map,
 		   const VidMap& dvar_map);
@@ -356,8 +358,6 @@ private:
   /// @note 変数番号は 0 から始まる．
   VarId
   new_var();
-
-public:
 
   /// @brief 節を追加する．
   /// @param[in] lits リテラルのベクタ

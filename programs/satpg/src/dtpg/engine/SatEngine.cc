@@ -442,12 +442,20 @@ SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
 
   for (ymuint i = 0; i < node_set0.tfo_size(); ++ i) {
     const TpgNode* node = node_set0.tfo_tfi_node(i);
-    make_node_cnf(node, fval_cnf0.fvar_map());
+
+    if ( node == root_node ) {
+      Literal glit(fval_cnf0.gvar(root_node));
+      Literal flit(fval_cnf0.fvar(root_node));
+      add_clause( glit,  flit);
+      add_clause(~glit, ~flit);
+    }
+    else {
+      make_node_cnf(node, fval_cnf0.fvar_map());
+    }
 
     // D-Chain 制約を作る．
     make_dchain_cnf(node, fval_cnf0.gvar_map(), fval_cnf0.fvar_map(), fval_cnf0.dvar_map());
   }
-  add_clause(Literal(fval_cnf0.dvar(root_node)));
 
   const TpgNode* fnode1 = fault1->node();
   for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
@@ -461,10 +469,8 @@ SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
       make_node_cnf(node, fval_cnf1.fvar_map());
     }
 
-    if ( node != root_node ) {
-      // D-Chain 制約を作る．
-      make_dchain_cnf2(node, fval_cnf1.gvar_map(), fval_cnf1.fvar_map(), fval_cnf1.dvar_map());
-    }
+    // D-Chain 制約を作る．
+    make_dchain_cnf2(node, root_node, fval_cnf1.gvar_map(), fval_cnf1.fvar_map(), fval_cnf1.dvar_map());
   }
 
   const TpgNode* fnode2 = fault2->node();
@@ -479,10 +485,8 @@ SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
       make_node_cnf(node, fval_cnf2.fvar_map());
     }
 
-    if ( node != root_node ) {
-      // D-Chain 制約を作る．
-      make_dchain_cnf2(node, fval_cnf2.gvar_map(), fval_cnf2.fvar_map(), fval_cnf2.dvar_map());
-    }
+    // D-Chain 制約を作る．
+    make_dchain_cnf2(node, root_node, fval_cnf2.gvar_map(), fval_cnf2.fvar_map(), fval_cnf2.dvar_map());
   }
 
   {
@@ -865,11 +869,13 @@ SatEngine::make_dchain_cnf(const TpgNode* node,
 
 // @brief 故障伝搬条件を表すCNFを作る．
 // @param[in] node 対象のノード
+// @param[in] dst_node 伝搬条件の終点のノード
 // @param[in] gvar_map 正常値の変数マップ
 // @param[in] fvar_map 故障値の変数マップ
 // @param[in] dvar_map 故障伝搬条件の変数マップ
 void
 SatEngine::make_dchain_cnf2(const TpgNode* node,
+			    const TpgNode* dst_node,
 			    const VidMap& gvar_map,
 			    const VidMap& fvar_map,
 			    const VidMap& dvar_map)
@@ -883,7 +889,7 @@ SatEngine::make_dchain_cnf2(const TpgNode* node,
   add_clause(~glit, ~flit, ~dlit);
   add_clause( glit,  flit, ~dlit);
 
-  if ( node->is_output() ) {
+  if ( node == dst_node ) {
     // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
     add_clause(~glit,  flit, dlit);
     add_clause( glit, ~flit, dlit);
