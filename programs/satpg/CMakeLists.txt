@@ -101,6 +101,7 @@ set (graphsat_SOURCES
 
 set (minpat_SOURCES
   src/minpat/KDet2Op.cc
+  src/minpat/DetOp.cc
   src/minpat/Verifier.cc
   src/minpat/MinPatBase.cc
   src/minpat/MinPatNaive.cc

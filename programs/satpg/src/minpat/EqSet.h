@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "PackedVal.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -44,6 +45,12 @@ public:
   /// @return 変化があったら true を返す．
   bool
   refinement(const vector<ymuint>& elem_list);
+
+  /// @brief 細分化を行う．
+  /// @param[in] elem_bv_list 要素とビットベクタ対のリスト
+  /// @return 変化があったら true を返す．
+  bool
+  multi_refinement(const vector<pair<ymuint, PackedVal> >& elem_bv_list);
 
   /// @brief 同値類候補数を返す．
   ymuint
@@ -106,7 +113,7 @@ private:
   Elem* mTop;
 
   // 作業用の配列
-  vector<bool> mMarkArray;
+  vector<PackedVal> mMarkArray;
 
   // 代表候補の配列
   mutable

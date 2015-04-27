@@ -16,6 +16,7 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "KDet2Op.h"
+#include "DetOp.h"
 #include "NodeSet.h"
 
 #include "GvalCnf.h"
@@ -258,10 +259,11 @@ DomChecker::do_fsim1(const vector<const TpgFault*>& fault_list)
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  KDet2Op op(mFsim, fault_list);
+  mFsim.set_faults(fault_list);
+
+  DetOp op;
 
   ymuint nf = fault_list.size();
-
   ymuint npat = nf;
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fault_list[i];
@@ -274,20 +276,16 @@ DomChecker::do_fsim1(const vector<const TpgFault*>& fault_list)
 	cout.flush();
       }
       mFsim.ppsfp(cur_array, op);
-      for (ymuint j = 0; j < kPvBitLen; ++ j) {
-	const vector<ymuint>& det_list = op.det_list(j);
-	mEqSet.refinement(det_list);
-      }
+      const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+      mEqSet.multi_refinement(det_list);
       cur_array.clear();
       op.clear_det_list();
     }
   }
   if ( !cur_array.empty() ) {
     mFsim.ppsfp(cur_array, op);
-    for (ymuint j = 0; j < cur_array.size(); ++ j) {
-      const vector<ymuint>& det_list = op.det_list(j);
-      mEqSet.refinement(det_list);
-    }
+    const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+    mEqSet.multi_refinement(det_list);
     op.clear_det_list();
     cur_array.clear();
   }
@@ -304,11 +302,9 @@ DomChecker::do_fsim1(const vector<const TpgFault*>& fault_list)
     }
     mFsim.ppsfp(cur_array, op);
     ymuint nchg = 0;
-    for (ymuint j = 0; j < kPvBitLen; ++ j) {
-      const vector<ymuint>& det_list = op.det_list(j);
-      if ( mEqSet.refinement(det_list) ) {
-	++ nchg;
-      }
+    const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+    if ( mEqSet.multi_refinement(det_list) ) {
+      ++ nchg;
     }
     cur_array.clear();
     op.clear_det_list();

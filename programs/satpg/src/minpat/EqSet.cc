@@ -75,7 +75,7 @@ EqSet::refinement(const vector<ymuint>& elem_list)
   // elem_list に含まれる要素に印をつける．
   for (ymuint i = 0; i < elem_list.size(); ++ i) {
     ymuint id = elem_list[i];
-    mMarkArray[id] = true;
+    mMarkArray[id] = 1UL;
   }
 
   bool chg = false;
@@ -135,7 +135,72 @@ EqSet::refinement(const vector<ymuint>& elem_list)
   // mMarkArray の印を消す．
   for (ymuint i = 0; i < elem_list.size(); ++ i) {
     ymuint id = elem_list[i];
-    mMarkArray[id] = false;
+    mMarkArray[id] = 0UL;
+  }
+
+  return chg;
+}
+
+// @brief 細分化を行う．
+// @param[in] elem_bv_list 要素とビットベクタ対のリスト
+// @return 変化があったら true を返す．
+bool
+EqSet::multi_refinement(const vector<pair<ymuint, PackedVal> >& elem_bv_list)
+{
+  // elem_bv_list の内容を mMarkArray に転写する．
+  for (ymuint i = 0; i < elem_bv_list.size(); ++ i) {
+    ymuint id = elem_bv_list[i].first;
+    PackedVal bv = elem_bv_list[i].second;
+    mMarkArray[id] = bv;
+  }
+
+  bool chg = false;
+  Elem* next = NULL;
+  for (Elem* top = mTop; top != NULL; top = next) {
+    next = top->mNextTop;
+    top->mNextTop = NULL;
+    Elem* cur_top = NULL;
+    Elem* cur_last = NULL;
+    Elem* tmp_link = NULL;
+    for (Elem* tmp = top; tmp != NULL; tmp = tmp_link) {
+      tmp_link = tmp->mLink;
+      tmp->mLink = NULL;
+      PackedVal bv = mMarkArray[tmp->mId];
+      Elem* rep = NULL;
+      for (Elem* tmp2 = cur_top; tmp2 != NULL; tmp2 = tmp2->mNextTop) {
+	if ( mMarkArray[tmp2->mId] == bv ) {
+	  rep = tmp2;
+	  break;
+	}
+      }
+      if ( rep == NULL ) {
+	if ( cur_last == NULL ) {
+	  cur_top = tmp;
+	}
+	else {
+	  cur_last->mNextTop = tmp;
+	}
+	cur_last = tmp;
+      }
+      else {
+	Elem* tmp2 = rep;
+	for ( ; tmp2->mLink != NULL; tmp2 = tmp2->mLink) { }
+	tmp2->mLink = tmp;
+      }
+    }
+    ASSERT_COND( cur_top == top );
+    ASSERT_COND( cur_last->mNextTop == NULL );
+    cur_last->mNextTop = next;
+    if ( cur_top != cur_last ) {
+      mNeedFinalize = true;
+      chg = true;
+    }
+  }
+
+  // mMarkArray の印を消す．
+  for (ymuint i = 0; i < elem_bv_list.size(); ++ i) {
+    ymuint id = elem_bv_list[i].first;
+    mMarkArray[id] = 0UL;
   }
 
   return chg;
