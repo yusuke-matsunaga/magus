@@ -190,7 +190,7 @@ DomChecker::DomChecker(FaultAnalyzer& analyzer,
   mMaxNodeId = mAnalyzer.max_node_id();
   mMaxFaultId = mAnalyzer.max_fault_id();
   mFaultDataArray.resize(mMaxFaultId);
-  mDetFlag.resize(mMaxFaultId, false);
+  mDetFlag.resize(mMaxFaultId, 0UL);
 
   for (ymuint i = 0; i < mMaxFaultId; ++ i) {
     mFaultDataArray[i].mDetCount = 0;
@@ -290,32 +290,27 @@ DomChecker::do_fsim1(const vector<const TpgFault*>& fault_list)
     cur_array.clear();
   }
 
+  vector<TestVector*> cur_array2(kPvBitLen);
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     TestVector* tv = mTvMgr.new_vector();
-    cur_array.push_back(tv);
+    cur_array2[i] = tv;
   }
-  ymuint nochg_count = 0;
+
   for ( ; ; ) {
     npat += kPvBitLen;
     for (ymuint i = 0; i < kPvBitLen; ++ i) {
-      cur_array[i]->set_from_random(mRandGen);
+      cur_array2[i]->set_from_random(mRandGen);
     }
-    mFsim.ppsfp(cur_array, op);
+    mFsim.ppsfp(cur_array2, op);
     ymuint nchg = 0;
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
     if ( mEqSet.multi_refinement(det_list) ) {
       ++ nchg;
     }
-    cur_array.clear();
+
     op.clear_det_list();
     if ( nchg == 0 ) {
-      ++ nochg_count;
-      if ( nochg_count > 3 ) {
-	break;
-      }
-    }
-    else {
-      nochg_count = 0;
+      break;
     }
     if ( mVerbose > 1 ) {
       cout << "\r " << npat;
@@ -328,7 +323,7 @@ DomChecker::do_fsim1(const vector<const TpgFault*>& fault_list)
 
   // 乱数パタンは削除しておく．
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    mTvMgr.delete_vector(cur_array[i]);
+    mTvMgr.delete_vector(cur_array2[i]);
   }
 
   local_timer.stop();
@@ -350,10 +345,9 @@ DomChecker::do_fsim2(const vector<const TpgFault*>& fault_list)
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  KDet2Op op(mFsim, fault_list);
+  DetOp op;
 
   ymuint nf = fault_list.size();
-
   ymuint npat = nf;
   ymuint base = 0;
   for (ymuint i = 0; i < nf; ++ i) {
@@ -367,10 +361,8 @@ DomChecker::do_fsim2(const vector<const TpgFault*>& fault_list)
 	cout.flush();
       }
       mFsim.ppsfp(cur_array, op);
-      for (ymuint j = 0; j < kPvBitLen; ++ j) {
-	const vector<ymuint>& det_list = op.det_list(j);
-	record_pat(det_list, base + j);
-      }
+      const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+      record_pat(det_list);
       cur_array.clear();
       op.clear_det_list();
       base += kPvBitLen;
@@ -378,41 +370,31 @@ DomChecker::do_fsim2(const vector<const TpgFault*>& fault_list)
   }
   if ( !cur_array.empty() ) {
     mFsim.ppsfp(cur_array, op);
-    for (ymuint j = 0; j < cur_array.size(); ++ j) {
-      const vector<ymuint>& det_list = op.det_list(j);
-      record_pat(det_list, base + j);
-    }
+    const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+    record_pat(det_list);
     op.clear_det_list();
     base += cur_array.size();
     cur_array.clear();
   }
 
+  vector<TestVector*> cur_array2(kPvBitLen);
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
     TestVector* tv = mTvMgr.new_vector();
-    cur_array.push_back(tv);
+    cur_array2[i] = tv;
   }
-  ymuint nochg_count = 0;
+
   for ( ; ; ) {
     for (ymuint i = 0; i < kPvBitLen; ++ i) {
-      cur_array[i]->set_from_random(mRandGen);
+      cur_array2[i]->set_from_random(mRandGen);
     }
-    mFsim.ppsfp(cur_array, op);
+    mFsim.ppsfp(cur_array2, op);
     ymuint nchg = 0;
-    for (ymuint j = 0; j < kPvBitLen; ++ j) {
-      const vector<ymuint>& det_list = op.det_list(j);
-      nchg += record_pat(det_list, base + j);
-    }
-    cur_array.clear();
+    const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+    nchg += record_pat(det_list);
     op.clear_det_list();
     base += kPvBitLen;
     if ( nchg == 0 ) {
-      ++ nochg_count;
-      if ( nochg_count > 3 ) {
-	break;
-      }
-    }
-    else {
-      nochg_count = 0;
+      break;
     }
     if ( mVerbose > 1 ) {
       cout << "\r " << base;
@@ -425,15 +407,32 @@ DomChecker::do_fsim2(const vector<const TpgFault*>& fault_list)
 
   // 乱数パタンは削除しておく．
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
-    mTvMgr.delete_vector(cur_array[i]);
+    mTvMgr.delete_vector(cur_array2[i]);
   }
 
-  // mDomCandList の後始末．
-  for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    const TpgFault* fault = fault_list[i];
-    FaultData& fd = mFaultDataArray[fault->id()];
-    if ( fd.mDomCandList.size() != fd.mDomCandListSize ) {
-      fd.mDomCandList.erase(fd.mDomCandList.begin() + fd.mDomCandListSize, fd.mDomCandList.end());
+  // 構造的に独立な故障対を対象外にする．
+  for (ymuint i1 = 0; i1 < nf; ++ i1) {
+    const TpgFault* f1 = fault_list[i1];
+    FaultData& fd1 = mFaultDataArray[f1->id()];
+    const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1->id());
+
+    vector<ymuint>& dst_list = fd1.mDomCandList;
+    ymuint wpos = 0;
+    for (ymuint rpos = 0; rpos < dst_list.size(); ++ rpos) {
+      ymuint f2_id = dst_list[rpos];
+      const vector<ymuint>& input_list2 = mAnalyzer.input_list(f2_id);
+      bool intersect = check_intersect(input_list1, input_list2);
+      if ( !intersect ) {
+	// 共通部分を持たない故障は独立
+	continue;
+      }
+      if ( wpos < rpos ) {
+	dst_list[wpos] = f2_id;
+      }
+      ++ wpos;
+    }
+    if ( wpos < dst_list.size() ) {
+      dst_list.erase(dst_list.begin() + wpos, dst_list.end());
     }
   }
 
@@ -446,65 +445,72 @@ DomChecker::do_fsim2(const vector<const TpgFault*>& fault_list)
 }
 
 ymuint
-DomChecker::record_pat(const vector<ymuint>& det_list,
-		       ymuint pat_id)
+DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
 {
   ymuint n = det_list.size();
   ymuint nchg = 0;
 
+  vector<pair<ymuint, PackedVal> > det_list_array[kPvBitLen];
   for (ymuint i = 0; i < n; ++ i) {
-    ymuint f_id = det_list[i];
-    mDetFlag[f_id] = true;
+    ymuint f_id = det_list[i].first;
+    PackedVal bv = det_list[i].second;
+    ymuint b = count_ones(bv);
+    ASSERT_COND( b > 0 );
+    det_list_array[b - 1].push_back(det_list[i]);
+    mDetFlag[f_id] = bv;
   }
 
   // 検出結果を用いて支配される故障の候補リストを作る．
-  for (ymuint i = 0; i < n; ++ i) {
-    ymuint f_id = det_list[i];
-    FaultData& fd = mFaultDataArray[f_id];
-    if ( fd.mDetCount == 0 ) {
-      fd.mDomCandList.reserve(n - 1);
+  for (ymuint i1 = 0; i1 < n; ++ i1) {
+    ymuint f1_id = det_list[i1].first;
+    PackedVal bv1 = det_list[i1].second;
+    FaultData& fd1 = mFaultDataArray[f1_id];
+    vector<ymuint>& dst_list = fd1.mDomCandList;
+    if ( fd1.mDetCount == 0 ) {
       // 初めて検出された場合
-      // 構造的に独立でない故障を候補にする．
-      const vector<ymuint>& input_list1 = mAnalyzer.input_list(f_id);
-      for (ymuint j = 0; j < n; ++ j) {
-	ymuint f_id2 = det_list[j];
-	if ( f_id2 == f_id ) {
-	  continue;
+      ymuint b1 = count_ones(bv1);
+      for (ymuint b = b1; b < kPvBitLen; ++ b) {
+	const vector<pair<ymuint, PackedVal> >& tmp_list = det_list_array[b - 1];
+	ymuint n2 = tmp_list.size();
+	for (ymuint i2 = 0; i2 < n2; ++ i2) {
+	  ymuint f2_id = tmp_list[i2].first;
+	  if ( f2_id == f1_id ) {
+	    continue;
+	  }
+	  PackedVal bv2 = tmp_list[i2].second;
+	  if ( (bv1 & bv2) == bv1 ) {
+	    // bv1 が 1 の部分は bv2 も 1
+	    dst_list.push_back(f2_id);
+	  }
 	}
-	const vector<ymuint>& input_list2 = mAnalyzer.input_list(f_id2);
-	bool intersect = check_intersect(input_list1, input_list2);
-	if ( !intersect ) {
-	  // 共通部分を持たない故障は独立
-	  continue;
-	}
-	fd.mDomCandList.push_back(f_id2);
       }
-      fd.mDomCandListSize = fd.mDomCandList.size();
     }
     else {
       // 二回目以降
-      // 候補のうち，今回検出されなかった故障を外す．
+      // dst_list と src_list の intersection を取る．
+      ymuint n = dst_list.size();
       ymuint wpos = 0;
-      for (ymuint j = 0; j < fd.mDomCandListSize; ++ j) {
-	ymuint f_id2 = fd.mDomCandList[j];
-	if ( mDetFlag[f_id2] ) {
-	  if ( wpos != j ) {
-	    fd.mDomCandList[wpos] = f_id2;
+      for (ymuint rpos = 0; rpos < n; ++ rpos) {
+	ymuint f2_id = dst_list[rpos];
+	PackedVal bv2 = mDetFlag[f2_id];
+	if ( (bv1 & bv2) == bv1 ) {
+	  if ( wpos < rpos ) {
+	    dst_list[wpos] = f2_id;
 	  }
 	  ++ wpos;
 	}
       }
-      if ( wpos < fd.mDomCandListSize ) {
-	nchg += fd.mDomCandListSize - wpos;
-	fd.mDomCandListSize = wpos;
+      if ( wpos < dst_list.size() ) {
+	nchg += dst_list.size() - wpos;
+	dst_list.erase(dst_list.begin() + wpos, dst_list.end());
       }
     }
-    ++ fd.mDetCount;
+    fd1.mDetCount += count_ones(bv1);
   }
 
-  for (ymuint i = 0; i < n; ++ i) {
-    ymuint f_id = det_list[i];
-    mDetFlag[f_id] = false;
+  for (ymuint i1 = 0; i1 < n; ++ i1) {
+    ymuint f1_id = det_list[i1].first;
+    mDetFlag[f1_id] = 0UL;
   }
 
   return nchg;
@@ -827,6 +833,7 @@ DomChecker::get_dom_faults2(ymuint option,
     sort(fault_list.begin(), fault_list.end(), comp);
   }
 
+#if 1
   // 非支配故障の候補から支配故障の候補を作る．
   for (ymuint i = 0; i < fault_num; ++ i) {
     ymuint f1_id = fault_list[i];
@@ -838,6 +845,7 @@ DomChecker::get_dom_faults2(ymuint option,
       fd2.mDomCandList2.push_back(f1_id);
     }
   }
+#endif
 
   if ( option == 0 ) {
     // 故障を被支配故障数の少ない順に並べる．

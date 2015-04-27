@@ -108,8 +108,7 @@ private:
 
   /// @brief 故障シミュレーションの後処理
   ymuint
-  record_pat(const vector<ymuint>& det_list,
-	     ymuint pat_id);
+  record_pat(const vector<pair<ymuint, PackedVal> >& det_list);
 
   /// @brief f1 が f2 を支配しているか調べる．
   bool
@@ -181,7 +180,7 @@ private:
   vector<FaultData> mFaultDataArray;
 
   // record_pat() 中で用いる配列
-  vector<bool> mDetFlag;
+  vector<PackedVal> mDetFlag;
 
   // 等価故障の候補リストを表すクラス
   EqSet mEqSet;
