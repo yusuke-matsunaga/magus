@@ -239,8 +239,8 @@ DomChecker::get_dom_faults(ymuint method,
     cout << "Total    " << setw(8) << src_list.size() << " original faults" << endl;
     cout << "Total    " << setw(8) << dom_fault_num << " dominator faults" << endl;
     cout << "         " << setw(8) << mSingleNum << " single cube faults" << endl;
-    cout << "         " << setw(8) << mSat1 << " simple non-dominance test" << endl;
-    cout << "         " << setw(8) << mNoDom  << " non-dominance" << endl;
+    cout << "         " << setw(8) << mSingleSat2 + mSingleSat3 << " sigle cube test" << endl;
+    cout << "         " << setw(8) << mNoDom2 + mNoDom3  << " non-dominance" << endl;
     cout << "         " << setw(8) << mSat2 + mSat3 << " dominance test" << endl;
     cout << "         " << setw(8) << mDomCheckCount << " smart dom check" << endl;
     cout << "         " << setw(8) << mPat << " patterns simulated" << endl;
@@ -276,7 +276,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
       }
       mFsim.ppsfp(cur_array, op);
       const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
-      record_pat(det_list);
+      get_dom_cand(det_list);
       cur_array.clear();
       op.clear_det_list();
       npat += kPvBitLen;
@@ -285,7 +285,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
   if ( !cur_array.empty() ) {
     mFsim.ppsfp(cur_array, op);
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
-    record_pat(det_list);
+    get_dom_cand(det_list);
     op.clear_det_list();
     npat += cur_array.size();
     cur_array.clear();
@@ -304,7 +304,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     mFsim.ppsfp(cur_array2, op);
     ymuint nchg = 0;
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
-    nchg += record_pat(det_list);
+    nchg += get_dom_cand(det_list);
     op.clear_det_list();
     npat += kPvBitLen;
     if ( nchg == 0 ) {
@@ -353,12 +353,23 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
   }
 }
 
+// シミュレーション結果を用いて被支配故障の候補リストを作る．
+//
+// 基本的に f1 のビットベクタが f2 のビットベクタに含まれているときに
+// f1 が f2 を支配している可能性がある．
+// 複数回のシミュレーションでその候補を絞ってゆく．
+// この関数は変更のあった故障の数を返す．
+//
+// 逆に支配故障のリストを直接作れないかと考えたが，この場合，
+// 最初に候補となる故障は det_list に含まれない(ビットベクタが0)の故障
+// を含むので効率のよいやり方が思いつかなかった．
 ymuint
-DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
+DomChecker::get_dom_cand(const vector<pair<ymuint, PackedVal> >& det_list)
 {
   ymuint n = det_list.size();
   ymuint nchg = 0;
 
+  // det_list の内容を mDetFlag に転写する．
   for (ymuint i = 0; i < n; ++ i) {
     ymuint f_id = det_list[i].first;
     PackedVal bv = det_list[i].second;
@@ -367,6 +378,7 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
 
   // 新しくリストを作る時の作業用
   // 要素数の最大値を指定しておく．
+  // reserve() を各故障に対してやってしまうとメモリが無駄になる．
   vector<ymuint> tmp_list;
   tmp_list.reserve(n);
 
@@ -375,7 +387,6 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
     ymuint f1_id = det_list[i1].first;
     PackedVal bv1 = det_list[i1].second;
     FaultData& fd1 = mFaultDataArray[f1_id];
-    vector<ymuint>& dst_list = fd1.mDomCandList1;
     if ( fd1.mDetCount == 0 ) {
       // 初めて検出された場合
       tmp_list.clear();
@@ -390,12 +401,13 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
 	  tmp_list.push_back(f2_id);
 	}
       }
-      // 最後に要素数が確定してから dst_list にコピーする．
-      dst_list = tmp_list;
+      // 最後に要素数が確定してから mDomCandList1 にコピーする．
+      fd1.mDomCandList1 = tmp_list;
     }
     else {
       // 二回目以降
-      // dst_list と src_list の intersection を取る．
+      // dst_list の要素で bv1 を含まないものを落とす．
+      vector<ymuint>& dst_list = fd1.mDomCandList1;
       ymuint n = dst_list.size();
       ymuint wpos = 0;
       for (ymuint rpos = 0; rpos < n; ++ rpos) {
@@ -413,9 +425,13 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
 	dst_list.erase(dst_list.begin() + wpos, dst_list.end());
       }
     }
+
+    // 直接は使わないが，ヒューリスティックの評価値として
+    // 検出回数を用いる．
     fd1.mDetCount += count_ones(bv1);
   }
 
+  // mDetFlag をクリアしておく．
   for (ymuint i1 = 0; i1 < n; ++ i1) {
     ymuint f1_id = det_list[i1].first;
     mDetFlag[f1_id] = 0UL;
@@ -423,192 +439,6 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
 
   return nchg;
 }
-
-#if 0
-// @brief 支配故障を求める．
-//
-// 結果は mDomFaultList に格納される．
-void
-DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
-			    vector<const TpgFault*>& dom_fault_list)
-{
-  vector<bool> dom_flag(mMaxFaultId, false);
-
-  ymuint fault_num = src_list.size();
-
-  mSat1 = 0;
-  mSat2 = 0;
-  mDom2 = 0;
-  mNoDom = 0;
-
-  vector<ymuint> pending_f1_list;
-  vector<vector<ymuint> > pending_list_array(mMaxFaultId);
-
-  // 故障を支配故障候補数の少ない順に並べる．
-  vector<ymuint> fault_list(fault_num);
-  for (ymuint i = 0; i < fault_num; ++ i) {
-    fault_list[i] = src_list[i]->id();
-  }
-
-  FaultLt fault_lt(*this);
-  sort(fault_list.begin(), fault_list.end(), fault_lt);
-
-  ymuint cur_num = fault_num;
-
-  // シミュレーション結果から故障の支配関係のヒントを作り，
-  // SAT で正確に判定する．
-  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    ymuint f1_id = fault_list[i1];
-    if ( dom_flag[f1_id] ) {
-      continue;
-    }
-
-    FaultData& fd1 = mFaultDataArray[f1_id];
-    const vector<ymuint>& cand_list = fd1.mDomCandList;
-    if ( cand_list.empty() ) {
-      continue;
-    }
-
-    if ( mVerbose > 1 ) {
-      cout << "\rDOM1: " << setw(6) << i1 << " / " << setw(6) << fault_num
-	   << " / " << setw(6) << cur_num;
-      cout.flush();
-    }
-
-    const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-    const TpgFault* f1 = fi1.fault();
-    const vector<ymuint>& input_list1_2 = mAnalyzer.input_list2(f1_id);
-
-    bool pending = false;
-    for (ymuint i2 = 0; i2 < cand_list.size(); ++ i2) {
-      ymuint f2_id = cand_list[i2];
-      if ( dom_flag[f2_id] ) {
-	continue;
-      }
-
-      const vector<ymuint>& input_list2_2 = mAnalyzer.input_list2(f2_id);
-
-      bool intersect2 = check_intersect(input_list1_2, input_list2_2);
-      if ( !intersect2 ) {
-	// TFI が共通部分を持たない場合は望みが薄いので後回し．
-	pending_list_array[f1_id].push_back(f2_id);
-	if ( !pending ) {
-	  pending = true;
-	  pending_f1_list.push_back(f1_id);
-	}
-	continue;
-      }
-
-      const TpgFault* f2 = mAnalyzer.fault(f2_id);
-
-      ++ mSat1;
-      GvalCnf gval_cnf(mMaxNodeId);
-      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-      SatEngine engine(string(), string(), NULL);
-      // f2 を検出しない CNF を作成
-      engine.make_fval_cnf(fval_cnf, f2, mAnalyzer.node_set(f2_id), kVal0);
-
-      // これが f1 の十分割当のもとで成り立ったら支配しない
-      if ( engine.check_sat(gval_cnf, fi1.sufficient_assignment()) == kB3True ) {
-	++ mNoDom;
-	continue;
-      }
-
-      // 実際にチェックを行う．
-      ++ mSat2;
-      if ( check_fault_dominance(f1, f2) ) {
-	dom_flag[f2_id] = true;
-	++ mDom2;
-	-- cur_num;
-	continue;
-      }
-    }
-  }
-  vector<ymuint> fault_list2;
-  fault_list2.reserve(fault_num);
-  for (ymuint i = 0; i < fault_num; ++ i) {
-    ymuint f_id = fault_list[i];
-    if ( !dom_flag[f_id] ) {
-      fault_list2.push_back(f_id);
-    }
-  }
-  ymuint fault_num2 = fault_list2.size();
-  if ( mVerbose ) {
-    cout << " (" << setw(6) << mDom2 << " / " << setw(6) << mSat2 << ")" << endl;
-  }
-
-  mSat3 = 0;
-  mDom3 = 0;
-
-  // シミュレーション結果から故障の支配関係のヒントを作り，
-  // SAT で正確に判定する．
-  for (ymuint i1 = 0; i1 < pending_f1_list.size(); ++ i1) {
-    ymuint f1_id = pending_f1_list[i1];
-    if ( dom_flag[f1_id] ) {
-      continue;
-    }
-    if ( mVerbose > 1 ) {
-      cout << "\rDOM2: " << setw(6) << i1 << " / " << setw(6) << pending_f1_list.size()
-	   << " / " << setw(6) << cur_num;
-      cout.flush();
-    }
-
-    const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-    const TpgFault* f1 = fi1.fault();
-
-    const vector<ymuint>& f_list = pending_list_array[f1_id];
-    for (ymuint i2 = 0; i2 < f_list.size(); ++ i2) {
-      ymuint f2_id = f_list[i2];
-      if ( dom_flag[f2_id] ) {
-	continue;
-      }
-
-      const TpgFault* f2 = mAnalyzer.fault(f2_id);
-
-      ++ mSat1;
-      GvalCnf gval_cnf(mMaxNodeId);
-      FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-      SatEngine engine(string(), string(), NULL);
-      // f2 を検出しない CNF を作成
-      engine.make_fval_cnf(fval_cnf, f2, mAnalyzer.node_set(f2_id), kVal0);
-
-      // これが f1 の十分割当のもとで成り立ったら支配しない
-      if ( engine.check_sat(gval_cnf, fi1.sufficient_assignment()) == kB3True ) {
-	++ mNoDom;
-	continue;
-      }
-
-      ++ mSat3;
-      if ( check_fault_dominance(f1, f2) ) {
-	//cout << f2->str() << " is dominated by " << f1->str() << endl;
-	dom_flag[f2_id] = true;
-	++ mDom3;
-	-- cur_num;
-	continue;
-      }
-    }
-  }
-  if ( mVerbose ) {
-    cout << " (" << setw(6) << mDom3 << " / " << setw(6) << mSat3 << ")" << endl;
-  }
-
-  mSingleNum = 0;
-  // 支配されていない故障を dom_fault_list に入れる．
-  dom_fault_list.clear();
-  dom_fault_list.reserve(fault_num2);
-  for (ymuint i = 0; i < fault_num2; ++ i) {
-    ymuint f_id = fault_list2[i];
-    if ( !dom_flag[f_id] ) {
-      const TpgFault* fault = mAnalyzer.fault(f_id);
-      dom_fault_list.push_back(fault);
-      const FaultInfo& fi = mAnalyzer.fault_info(f_id);
-      if ( fi.single_cube() ) {
-	++ mSingleNum;
-      }
-    }
-  }
-}
-#endif
 
 // @brief 支配故障を求める．
 //
@@ -618,16 +448,19 @@ DomChecker::get_dom_faults2(ymuint option,
 			    const vector<const TpgFault*>& src_list,
 			    vector<const TpgFault*>& dom_fault_list)
 {
-  vector<bool> dom_flag(mMaxFaultId, false);
-
   ymuint fault_num = src_list.size();
 
   mSat1 = 0;
   mSat2 = 0;
+  mSingleSat2 = 0;
   mSat3 = 0;
+  mSingleSat3 = 0;
   mDom2 = 0;
+  mSingleDom2 = 0;
   mDom3 = 0;
-  mNoDom = 0;
+  mSingleDom3 = 0;
+  mNoDom2 = 0;
+  mNoDom3 = 0;
 
   vector<ymuint> pending_f1_list;
   vector<vector<ymuint> > pending_list_array(mMaxFaultId);
@@ -675,14 +508,11 @@ DomChecker::get_dom_faults2(ymuint option,
     FaultGt2 comp(*this);
     sort(fault_list.begin(), fault_list.end(), comp);
   }
-  else if ( option == 4 ) {
-    // オリジナル順
-  }
 
   ymuint cur_num = fault_num;
 
-  // シミュレーション結果から故障の支配関係のヒントを作り，
-  // SAT で正確に判定する．
+  // 被支配故障につけるマーク
+  vector<bool> dom_flag(mMaxFaultId, false);
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     ymuint f1_id = fault_list[i1];
     if ( dom_flag[f1_id] ) {
@@ -690,6 +520,8 @@ DomChecker::get_dom_faults2(ymuint option,
     }
 
     FaultData& fd1 = mFaultDataArray[f1_id];
+
+    // f1 を支配する可能性のある故障番号のリスト
     const vector<ymuint>& cand_list = fd1.mDomCandList2;
     if ( cand_list.empty() ) {
       continue;
@@ -740,16 +572,16 @@ DomChecker::get_dom_faults2(ymuint option,
 	continue;
       }
 
-      ++ mSat1;
+      ++ mSingleSat2;
       // これが f2 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi2.sufficient_assignment()) == kB3True ) {
-	++ mNoDom;
+	++ mNoDom2;
 	continue;
       }
       if ( fi2.single_cube() ) {
 	// これ以上のチェックは必要ない．
 	dom_flag[f1_id] = true;
-	++ mDom2;
+	++ mSingleDom2;
 	-- cur_num;
 	break;
       }
@@ -765,6 +597,7 @@ DomChecker::get_dom_faults2(ymuint option,
     }
   }
 
+  // dom_flag がついた故障を落とす．
   vector<ymuint> fault_list2;
   fault_list2.reserve(fault_num);
   for (ymuint i = 0; i < fault_num; ++ i) {
@@ -775,11 +608,13 @@ DomChecker::get_dom_faults2(ymuint option,
   }
 
   if ( mVerbose ) {
-    cout << " (" << setw(6) << mDom2 << " / " << setw(6) << mSat2 << ")" << endl;
+    cout << " ("
+	 << setw(6) << mNoDom2 << ", " << setw(6) << mSingleDom2
+	 << ") / " << mSingleSat2 << "  ("
+	 << setw(6) << mDom2 << " / " << setw(6) << mSat2 << ")" << endl;
   }
 
-  // シミュレーション結果から故障の支配関係のヒントを作り，
-  // SAT で正確に判定する．
+  // 前のループで後回しにした故障の処理
   for (ymuint i1 = 0; i1 < pending_f1_list.size(); ++ i1) {
     ymuint f1_id = pending_f1_list[i1];
     if ( dom_flag[f1_id] ) {
@@ -810,16 +645,16 @@ DomChecker::get_dom_faults2(ymuint option,
       const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
       const TpgFault* f2 = fi2.fault();
 
-      ++ mSat1;
+      ++ mSingleSat3;
       // これが f2 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi2.sufficient_assignment()) == kB3True ) {
-	++ mNoDom;
+	++ mNoDom3;
 	continue;
       }
       if ( fi2.single_cube() ) {
 	// これ以上のチェックは必要ない．
 	dom_flag[f1_id] = true;
-	++ mDom2;
+	++ mSingleDom3;
 	-- cur_num;
 	break;
       }
@@ -834,7 +669,10 @@ DomChecker::get_dom_faults2(ymuint option,
     }
   }
   if ( mVerbose ) {
-    cout << " (" << setw(6) << mDom3 << " / " << setw(6) << mSat3 << ")" << endl;
+    cout << " ("
+	 << setw(6) << mNoDom3 << ", " << setw(6) << mSingleDom3
+	 << ") / " << setw(6) << mSingleSat3 << "  ("
+	 << setw(6) << mDom3 << " / " << setw(6) << mSat3 << ")" << endl;
   }
 
   // 支配されていない故障を dom_fault_list に入れる．
@@ -863,22 +701,30 @@ bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
 				  const TpgFault* f2)
 {
+  StopWatch timer;
+  timer.start();
+
   const TpgNode* fnode1 = f1->node();
   const TpgNode* fnode2 = f2->node();
   const TpgNode* dom_node = common_node(fnode1, fnode2);
 
+  Bool3 sat_stat = kB3X;
   if ( dom_node != NULL ) {
+    // 伝搬経路に共通な dominator がある時
     ++ mDomCheckCount;
 
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
+    // 共通部分のノード集合
     NodeSet node_set0;
     node_set0.mark_region(mMaxNodeId, dom_node);
 
+    // 故障1に固有のノード集合
     NodeSet node_set1;
     node_set1.mark_region2(mMaxNodeId, fnode1, dom_node);
 
+    // 故障2に固有のノード集合
     NodeSet node_set2;
     node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
 
@@ -896,7 +742,8 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     vector<Literal> assumption(2);
     assumption[0] = dlit1;
     assumption[1] = ~dlit2;
-    bool ans = ( engine.check_sat(assumption) == kB3False );
+    sat_stat = engine.check_sat(assumption);
+
     if ( verify_dom_check ) {
       SatEngine engine(string(), string(), NULL);
       GvalCnf gval_cnf(mMaxNodeId);
@@ -905,7 +752,7 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
       engine.make_fval_cnf(fval_cnf1, f1, _node_set1, kVal1);
 
       const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
-      if ( false && fi2.single_cube() ) {
+      if ( fi2.single_cube() ) {
 	// f2 を検出しない CNF を生成
 	engine.add_negation(gval_cnf, fi2.sufficient_assignment());
       }
@@ -915,14 +762,13 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
 	// f1 を検出して f2 を検出しない CNF を生成
 	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
       }
-      Bool3 sat_stat = engine.check_sat();
-      bool ans2 = ( sat_stat == kB3False );
-      if ( ans != ans2 ) {
+      Bool3 sat_stat2 = engine.check_sat();
+      if ( sat_stat != sat_stat2 ) {
 	cout << endl;
 	cout << "Error" << endl;
 	cout << f1 << " " << f2 << endl;
-	cout << " ans1 = " << ans << endl
-	     << " ans2 = " << ans2 << endl;
+	cout << " sat_stat  = " << sat_stat << endl
+	     << " sat_stat2 = " << sat_stat2 << endl;
 	{
 	  cout << "dom_node = " << dom_node->id() << endl;
 	  cout << "NodeSet0" << endl;
@@ -943,41 +789,39 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
 	}
       }
     }
-
-    return ans;
-  }
-
-  StopWatch timer;
-  timer.start();
-
-  SatEngine engine(string(), string(), NULL);
-  GvalCnf gval_cnf(mMaxNodeId);
-  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-  const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-  engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
-
-  const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
-  if ( fi2.single_cube() ) {
-    // f2 を検出しない CNF を生成
-    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
   }
   else {
-    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-    const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-    // f1 を検出して f2 を検出しない CNF を生成
-    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(mMaxNodeId);
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
+    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+    const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+    if ( fi2.single_cube() ) {
+      // f2 を検出しない CNF を生成
+      engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+    }
+    else {
+      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+      // f1 を検出して f2 を検出しない CNF を生成
+      engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+    }
+
+    sat_stat = engine.check_sat();
   }
-  Bool3 ans = engine.check_sat();
+
   timer.stop();
   USTime time = timer.time();
-  if ( ans == kB3False ) {
+  if ( sat_stat == kB3False ) {
     mSuccessTime += time;
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
       mSuccessMax = time;
     }
     return true;
   }
-  else if ( ans == kB3True ) {
+  else if ( sat_stat == kB3True ) {
     mFailureTime += time;
     if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
       mFailureMax = time;

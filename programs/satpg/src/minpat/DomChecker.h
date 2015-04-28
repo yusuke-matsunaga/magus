@@ -100,7 +100,7 @@ private:
 
   /// @brief 故障シミュレーションの後処理
   ymuint
-  record_pat(const vector<pair<ymuint, PackedVal> >& det_list);
+  get_dom_cand(const vector<pair<ymuint, PackedVal> >& det_list);
 
   /// @brief f1 が f2 を支配しているか調べる．
   bool
@@ -158,7 +158,7 @@ private:
   // 故障ごとのデータ配列
   vector<FaultData> mFaultDataArray;
 
-  // record_pat() 中で用いる配列
+  // get_dom_cand() 中で用いる配列
   vector<PackedVal> mDetFlag;
 
   USTime mSuccessTime;
@@ -179,10 +179,15 @@ private:
 
   ymuint mSat1;
   ymuint mSat2;
+  ymuint mSingleSat2;
   ymuint mSat3;
+  ymuint mSingleSat3;
   ymuint mDom2;
+  ymuint mSingleDom2;
   ymuint mDom3;
-  ymuint mNoDom;
+  ymuint mSingleDom3;
+  ymuint mNoDom2;
+  ymuint mNoDom3;
   ymuint mPat;
 };
 
