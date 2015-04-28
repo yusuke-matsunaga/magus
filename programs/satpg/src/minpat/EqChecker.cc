@@ -143,6 +143,8 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
 
   do_fsim(src_list);
 
+  USTime fsim_time = local_timer.time();
+
   ymuint n_check = 0;
   ymuint n_success = 0;
 
@@ -161,7 +163,7 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
       }
 
       if ( mVerbose > 1 ) {
-	cout << "\r"
+	cout << "\rEQ:   "
 	     << setw(6) << i << " / " << setw(6) << nc
 	     << "  " << setw(6) << i1;
       }
@@ -193,13 +195,17 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
     if ( mVerbose > 1 ) {
       cout << endl;
     }
-    cout << src_list.size() << " ==> " << rep_fault_list.size()
-	 << ": " << local_timer.time() << endl;
-    cout << "  " << n_check << " checkes" << endl
-	 << "  " << n_success << " success" << endl;
-    cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
-	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
-	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
+    cout << "# original faults:       " << setw(8) << src_list.size() << endl
+	 << "# representative faults: " << setw(8) << rep_fault_list.size() << endl
+	 << "  # equivalence checks:  " << setw(8) << n_check << endl
+	 << "  # sucess:              " << setw(8) << n_success << endl
+	 << "  # smart checks:        " << setw(8) << mDomCheckCount << endl
+	 << "  # patterns simulated:  " << setw(8) << mPat << endl
+	 << "CPU time:                " << local_timer.time() << endl
+	 << "  CPU time (fsim)        " << fsim_time << endl
+	 << "  CPU time (success)     " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
+	 << "  CPU time (failure)     " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
+	 << "  CPU time (abort)       " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
   }
 }
 
@@ -208,9 +214,6 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
 void
 EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 {
-  StopWatch local_timer;
-  local_timer.start();
-
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
@@ -227,7 +230,7 @@ EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
       if ( mVerbose > 1 ) {
-	cout << "\r " << i;
+	cout << "\rFSIM: " << setw(6) << i;
 	cout.flush();
       }
       mFsim.ppsfp(cur_array, op);
@@ -268,7 +271,7 @@ EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
       break;
     }
     if ( mVerbose > 1 ) {
-      cout << "\r " << npat;
+      cout << "\rFSIM: " << setw(6) << npat;
       cout.flush();
     }
   }
@@ -281,12 +284,7 @@ EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     mTvMgr.delete_vector(cur_array2[i]);
   }
 
-  local_timer.stop();
-
-  if ( mVerbose ) {
-    cout << "CPU time (fault simulation1)  " << local_timer.time() << endl
-	 << "Total " << npat << " patterns simulated" << endl;
-  }
+  mPat = npat;
 }
 
 // @brief f1 と f2 が等価かどうか調べる．

@@ -176,6 +176,15 @@ private:
 
   ymuint mDomCheckCount;
 
+  ymuint mSingleNum;
+
+  ymuint mSat1;
+  ymuint mSat2;
+  ymuint mSat3;
+  ymuint mDom2;
+  ymuint mDom3;
+  ymuint mNoDom;
+  ymuint mPat;
 };
 
 END_NAMESPACE_YM_SATPG

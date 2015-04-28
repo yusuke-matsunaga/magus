@@ -128,6 +128,7 @@ private:
 
   ymuint mDomCheckCount;
 
+  ymuint mPat;
 };
 
 END_NAMESPACE_YM_SATPG

@@ -213,9 +213,14 @@ DomChecker::get_dom_faults(ymuint method,
 			   const vector<const TpgFault*>& src_list,
 			   vector<const TpgFault*>& dom_fault_list)
 {
+  StopWatch local_timer;
+  local_timer.start();
+
   mDomCheckCount = 0;
 
   do_fsim(src_list);
+
+  USTime fsim_time = local_timer.time();
 
   switch ( method ) {
   case 1: get_dom_faults1(src_list, dom_fault_list); break;
@@ -225,6 +230,24 @@ DomChecker::get_dom_faults(ymuint method,
   case 5: get_dom_faults2(3, src_list, dom_fault_list); break;
   default: ASSERT_NOT_REACHED;
   }
+
+  ymuint dom_fault_num = dom_fault_list.size();
+  local_timer.stop();
+  if ( mVerbose ) {
+    cout << "Total    " << setw(8) << src_list.size() << " original faults" << endl;
+    cout << "Total    " << setw(8) << dom_fault_num << " dominator faults" << endl;
+    cout << "         " << setw(8) << mSingleNum << " single cube faults" << endl;
+    cout << "         " << setw(8) << mSat1 << " simple non-dominance test" << endl;
+    cout << "         " << setw(8) << mNoDom  << " non-dominance" << endl;
+    cout << "         " << setw(8) << mSat2 + mSat3 << " dominance test" << endl;
+    cout << "         " << setw(8) << mDomCheckCount << " smart dom check" << endl;
+    cout << "         " << setw(8) << mPat << " patterns simulated" << endl;
+    cout << "CPU time for dominance test" << local_timer.time() << endl
+	 << "  CPU time (fsim)    " << fsim_time << endl;
+    cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
+	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
+	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
+  }
 }
 
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
@@ -232,17 +255,13 @@ DomChecker::get_dom_faults(ymuint method,
 void
 DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 {
-  StopWatch local_timer;
-  local_timer.start();
-
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
   DetOp op;
 
   ymuint nf = fault_list.size();
-  ymuint npat = nf;
-  ymuint base = 0;
+  ymuint npat = 0;
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fault_list[i];
     const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
@@ -250,7 +269,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
       if ( mVerbose > 1 ) {
-	cout << "\r " << base;
+	cout << "\rFSIM: " << setw(6) << npat;
 	cout.flush();
       }
       mFsim.ppsfp(cur_array, op);
@@ -258,7 +277,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
       record_pat(det_list);
       cur_array.clear();
       op.clear_det_list();
-      base += kPvBitLen;
+      npat += kPvBitLen;
     }
   }
   if ( !cur_array.empty() ) {
@@ -266,7 +285,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
     record_pat(det_list);
     op.clear_det_list();
-    base += cur_array.size();
+    npat += cur_array.size();
     cur_array.clear();
   }
 
@@ -285,18 +304,20 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
     nchg += record_pat(det_list);
     op.clear_det_list();
-    base += kPvBitLen;
+    npat += kPvBitLen;
     if ( nchg == 0 ) {
       break;
     }
     if ( mVerbose > 1 ) {
-      cout << "\r " << base;
+      cout << "\rFSIM: " << setw(6) << npat;
       cout.flush();
     }
   }
   if ( mVerbose > 1 ) {
     cout << endl;
   }
+
+  mPat = npat;
 
   // 乱数パタンは削除しておく．
   for (ymuint i = 0; i < kPvBitLen; ++ i) {
@@ -327,13 +348,6 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     if ( wpos < dst_list.size() ) {
       dst_list.erase(dst_list.begin() + wpos, dst_list.end());
     }
-  }
-
-  local_timer.stop();
-
-  if ( mVerbose ) {
-    cout << "CPU time (fault simulation2)  " << local_timer.time() << endl
-	 << "Total " << base << " patterns simulated" << endl;
   }
 }
 
@@ -416,19 +430,14 @@ void
 DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
 			    vector<const TpgFault*>& dom_fault_list)
 {
-  StopWatch local_timer;
-
-  local_timer.start();
-
   vector<bool> dom_flag(mMaxFaultId, false);
 
   ymuint fault_num = src_list.size();
 
-  ymuint n_sat2 = 0;
-  ymuint n_dom2 = 0;
-
-  ymuint n_sat1 = 0;
-  ymuint n_nodom = 0;
+  mSat1 = 0;
+  mSat2 = 0;
+  mDom2 = 0;
+  mNoDom = 0;
 
   vector<ymuint> pending_f1_list;
   vector<vector<ymuint> > pending_list_array(mMaxFaultId);
@@ -459,7 +468,7 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
     }
 
     if ( mVerbose > 1 ) {
-      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num
+      cout << "\rDOM1: " << setw(6) << i1 << " / " << setw(6) << fault_num
 	   << " / " << setw(6) << cur_num;
       cout.flush();
     }
@@ -490,7 +499,7 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
 
       const TpgFault* f2 = mAnalyzer.fault(f2_id);
 
-      ++ n_sat1;
+      ++ mSat1;
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
@@ -499,16 +508,15 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
 
       // これが f1 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi1.sufficient_assignment()) == kB3True ) {
-	++ n_nodom;
+	++ mNoDom;
 	continue;
       }
 
       // 実際にチェックを行う．
-      ++ n_sat2;
+      ++ mSat2;
       if ( check_fault_dominance(f1, f2) ) {
-	//cout << f2->str() << " is dominated by " << f1->str() << endl;
 	dom_flag[f2_id] = true;
-	++ n_dom2;
+	++ mDom2;
 	-- cur_num;
 	continue;
       }
@@ -524,12 +532,11 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
   }
   ymuint fault_num2 = fault_list2.size();
   if ( mVerbose ) {
-    cout << " --> " << setw(6) << fault_num2 << ": " << setw(6) << n_dom2 << " / " << setw(6) << n_sat2
-	 << ": Lap CPU time " << local_timer.time() << endl;
+    cout << " (" << setw(6) << mDom2 << " / " << setw(6) << mSat2 << ")" << endl;
   }
 
-  ymuint n_sat3 = 0;
-  ymuint n_dom3 = 0;
+  mSat3 = 0;
+  mDom3 = 0;
 
   // シミュレーション結果から故障の支配関係のヒントを作り，
   // SAT で正確に判定する．
@@ -539,8 +546,7 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
       continue;
     }
     if ( mVerbose > 1 ) {
-      cout << "\r                  ";
-      cout << "\r" << setw(6) << i1 << " / " << setw(6) << pending_f1_list.size()
+      cout << "\rDOM2: " << setw(6) << i1 << " / " << setw(6) << pending_f1_list.size()
 	   << " / " << setw(6) << cur_num;
       cout.flush();
     }
@@ -557,7 +563,7 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
 
       const TpgFault* f2 = mAnalyzer.fault(f2_id);
 
-      ++ n_sat1;
+      ++ mSat1;
       GvalCnf gval_cnf(mMaxNodeId);
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
@@ -566,24 +572,25 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
 
       // これが f1 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi1.sufficient_assignment()) == kB3True ) {
-	++ n_nodom;
+	++ mNoDom;
 	continue;
       }
 
-      ++ n_sat3;
+      ++ mSat3;
       if ( check_fault_dominance(f1, f2) ) {
 	//cout << f2->str() << " is dominated by " << f1->str() << endl;
 	dom_flag[f2_id] = true;
-	++ n_dom3;
+	++ mDom3;
 	-- cur_num;
 	continue;
       }
     }
   }
+  if ( mVerbose ) {
+    cout << " (" << setw(6) << mDom3 << " / " << setw(6) << mSat3 << ")" << endl;
+  }
 
-  ymuint n_single = 0;
-  ymuint n_double = 0;
-  ymuint n_triple = 0;
+  mSingleNum = 0;
   // 支配されていない故障を dom_fault_list に入れる．
   dom_fault_list.clear();
   dom_fault_list.reserve(fault_num2);
@@ -594,33 +601,9 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
       dom_fault_list.push_back(fault);
       const FaultInfo& fi = mAnalyzer.fault_info(f_id);
       if ( fi.single_cube() ) {
-	++ n_single;
-      }
-      else {
-	ymuint n = fi.other_sufficient_assignment_num();
-	if ( n == 1 ) {
-	  ++ n_double;
-	}
-	else if ( n == 2 ) {
-	  ++ n_triple;
-	}
+	++ mSingleNum;
       }
     }
-  }
-
-  ymuint dom_fault_num = dom_fault_list.size();
-  local_timer.stop();
-  if ( mVerbose ) {
-    cout << " --> " << setw(6) << dom_fault_num << ": " << setw(6) << n_dom3 << " / " << setw(6) << n_sat3 << endl;
-    cout << "Total    " << fault_num << " original faults" << endl;
-    cout << "Total    " << dom_fault_num << " dominator faults" << endl;
-    cout << "Total    " << n_single << " single cube faults" << endl;
-    cout << "Total    " << n_double << " double cube faults" << endl;
-    cout << "Total    " << n_triple << " triple cube faults" << endl;
-    cout << "Total    " << n_sat1 << " simple non-dominance test" << endl;
-    cout << "Total    " << n_nodom  << " non-dominance" << endl;
-    cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
-    cout << "CPU time for dominance test" << local_timer.time() << endl;
   }
 }
 
@@ -632,19 +615,16 @@ DomChecker::get_dom_faults2(ymuint option,
 			    const vector<const TpgFault*>& src_list,
 			    vector<const TpgFault*>& dom_fault_list)
 {
-  StopWatch local_timer;
-
-  local_timer.start();
-
   vector<bool> dom_flag(mMaxFaultId, false);
 
   ymuint fault_num = src_list.size();
 
-  ymuint n_sat2 = 0;
-  ymuint n_dom2 = 0;
-
-  ymuint n_sat1 = 0;
-  ymuint n_nodom = 0;
+  mSat1 = 0;
+  mSat2 = 0;
+  mSat3 = 0;
+  mDom2 = 0;
+  mDom3 = 0;
+  mNoDom = 0;
 
   vector<ymuint> pending_f1_list;
   vector<vector<ymuint> > pending_list_array(mMaxFaultId);
@@ -715,8 +695,7 @@ DomChecker::get_dom_faults2(ymuint option,
     }
 
     if ( mVerbose > 1 ) {
-      cout << "\r                  ";
-      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num
+      cout << "\rDOM1: " << setw(6) << i1 << " / " << setw(6) << fault_num
 	   << " / " << setw(6) << cur_num;
       cout.flush();
     }
@@ -760,25 +739,25 @@ DomChecker::get_dom_faults2(ymuint option,
 	continue;
       }
 
-      ++ n_sat1;
+      ++ mSat1;
       // これが f2 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi2.sufficient_assignment()) == kB3True ) {
-	++ n_nodom;
+	++ mNoDom;
 	continue;
       }
       if ( fi2.single_cube() ) {
 	// これ以上のチェックは必要ない．
 	dom_flag[f1_id] = true;
-	++ n_dom2;
+	++ mDom2;
 	-- cur_num;
 	break;
       }
 
       // 実際にチェックを行う．
-      ++ n_sat2;
+      ++ mSat2;
       if ( check_fault_dominance(f2, f1) ) {
 	dom_flag[f1_id] = true;
-	++ n_dom2;
+	++ mDom2;
 	-- cur_num;
 	break;
       }
@@ -793,14 +772,10 @@ DomChecker::get_dom_faults2(ymuint option,
       fault_list2.push_back(f_id);
     }
   }
-  ymuint fault_num2 = fault_list2.size();
-  if ( mVerbose ) {
-    cout << " --> " << setw(6) << fault_num2 << ": " << setw(6) << n_dom2 << " / " << setw(6) << n_sat2
-	 << ": Lap CPU time " << local_timer.time() << endl;
-  }
 
-  ymuint n_sat3 = 0;
-  ymuint n_dom3 = 0;
+  if ( mVerbose ) {
+    cout << " (" << setw(6) << mDom2 << " / " << setw(6) << mSat2 << ")" << endl;
+  }
 
   // シミュレーション結果から故障の支配関係のヒントを作り，
   // SAT で正確に判定する．
@@ -810,8 +785,7 @@ DomChecker::get_dom_faults2(ymuint option,
       continue;
     }
     if ( mVerbose > 1 ) {
-      cout << "\r                  ";
-      cout << "\r" << setw(6) << i1 << " / " << setw(6) << pending_f1_list.size()
+      cout << "\rDOM2: " << setw(6) << i1 << " / " << setw(6) << pending_f1_list.size()
 	   << " / " << setw(6) << cur_num;
       cout.flush();
     }
@@ -835,36 +809,38 @@ DomChecker::get_dom_faults2(ymuint option,
       const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
       const TpgFault* f2 = fi2.fault();
 
-      ++ n_sat1;
+      ++ mSat1;
       // これが f2 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi2.sufficient_assignment()) == kB3True ) {
-	++ n_nodom;
+	++ mNoDom;
 	continue;
       }
       if ( fi2.single_cube() ) {
 	// これ以上のチェックは必要ない．
 	dom_flag[f1_id] = true;
-	++ n_dom2;
+	++ mDom2;
 	-- cur_num;
 	break;
       }
 
-      ++ n_sat3;
+      ++ mSat3;
       if ( check_fault_dominance(f2, f1) ) {
 	dom_flag[f1_id] = true;
-	++ n_dom3;
+	++ mDom3;
 	-- cur_num;
 	break;
       }
     }
   }
+  if ( mVerbose ) {
+    cout << " (" << setw(6) << mDom3 << " / " << setw(6) << mSat3 << ")" << endl;
+  }
 
-  ymuint n_single = 0;
-  ymuint n_double = 0;
-  ymuint n_triple = 0;
   // 支配されていない故障を dom_fault_list に入れる．
+  ymuint fault_num2 = fault_list2.size();
   dom_fault_list.clear();
   dom_fault_list.reserve(fault_num2);
+  mSingleNum = 0;
   for (ymuint i = 0; i < fault_num2; ++ i) {
     ymuint f_id = fault_list2[i];
     if ( dom_flag[f_id] ) {
@@ -875,37 +851,9 @@ DomChecker::get_dom_faults2(ymuint option,
       dom_fault_list.push_back(fault);
       const FaultInfo& fi = mAnalyzer.fault_info(f_id);
       if ( fi.single_cube() ) {
-	++ n_single;
-      }
-      else {
-	ymuint n = fi.other_sufficient_assignment_num();
-	if ( n == 1 ) {
-	  ++ n_double;
-	}
-	else if ( n == 2 ) {
-	  ++ n_triple;
-	}
+	++ mSingleNum;
       }
     }
-  }
-
-  ymuint dom_fault_num = dom_fault_list.size();
-  local_timer.stop();
-  if ( mVerbose ) {
-    cout << " --> " << setw(6) << dom_fault_num << ": " << setw(6) << n_dom3 << " / " << setw(6) << n_sat3 << endl;
-    cout << "Total    " << fault_num << " original faults" << endl;
-    cout << "Total    " << dom_fault_num << " dominator faults" << endl;
-    cout << "Total    " << n_single << " single cube faults" << endl;
-    cout << "Total    " << n_double << " double cube faults" << endl;
-    cout << "Total    " << n_triple << " triple cube faults" << endl;
-    cout << "Total    " << n_sat1 << " simple non-dominance test" << endl;
-    cout << "Total    " << n_nodom  << " non-dominance" << endl;
-    cout << "Total    " << n_sat2 + n_sat3 << " dominance test" << endl;
-    cout << "CPU time for dominance test" << local_timer.time() << endl;
-    cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
-	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
-	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
-    cout << "         " << mDomCheckCount << " smart dom check" << endl;
   }
 }
 
