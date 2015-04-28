@@ -27,41 +27,6 @@ BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
-// 2つのリストが共通要素を持つとき true を返す．
-// リストはソートされていると仮定する．
-inline
-bool
-check_intersect(const vector<ymuint>& list1,
-		const vector<ymuint>& list2)
-{
-  ymuint n1 = list1.size();
-  ymuint n2 = list2.size();
-  ymuint i1 = 0;
-  ymuint i2 = 0;
-  ymuint v1 = list1[i1];
-  ymuint v2 = list2[i2];
-  for ( ; ; ) {
-    if ( v1 < v2 ) {
-      ++ i1;
-      if ( i1 >= n1 ) {
-	return false;
-      }
-      v1 = list1[i1];
-    }
-    else if ( v1 > v2 ) {
-      ++ i2;
-      if ( i2 >= n2 ) {
-	return false;
-      }
-      v2 = list2[i2];
-    }
-    else {
-      return true;
-    }
-  }
-  return false;
-}
-
 const TpgNode*
 common_node(const TpgNode* node1,
 	    const TpgNode* node2)
@@ -299,6 +264,9 @@ EqChecker::check_fault_equivalence(const TpgFault* f1,
   if ( dom_node != NULL ) {
     ++ mDomCheckCount;
 
+    StopWatch local_timer;
+    local_timer.start();
+
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
@@ -322,16 +290,49 @@ EqChecker::check_fault_equivalence(const TpgFault* f1,
     Literal dlit1(fval_cnf1.dvar(dom_node));
     Literal dlit2(fval_cnf2.dvar(dom_node));
 
+    // TODO 時間の計測集計用のコードをまとめる．
+
     vector<Literal> assumption(2);
     assumption[0] = dlit1;
     assumption[1] = ~dlit2;
     if ( engine.check_sat(assumption) != kB3False ) {
+      local_timer.stop();
+      USTime time = local_timer.time();
+      mFailureTime += time;
+      if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
+	if ( time.usr_time() > 1.0 ) {
+	  cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
+	}
+	mFailureMax = time;
+      }
+
       return false;
     }
     assumption[0] = ~dlit1;
     assumption[1] = dlit2;
     if ( engine.check_sat(assumption) != kB3False ) {
+      local_timer.stop();
+      USTime time = local_timer.time();
+      mFailureTime += time;
+      if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
+	if ( time.usr_time() > 1.0 ) {
+	  cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
+	}
+	mFailureMax = time;
+      }
+
       return false;
+    }
+    {
+      local_timer.stop();
+      USTime time = local_timer.time();
+      mSuccessTime += time;
+      if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
+	if ( time.usr_time() > 1.0 ) {
+	  cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
+	}
+	mSuccessMax = time;
+      }
     }
     return true;
   }
@@ -381,6 +382,7 @@ EqChecker::check_fault_dominance2(const TpgFault* f1,
 
   Bool3 sat_stat = engine.check_sat();
 
+  // TODO 時間の計測集計用のコードをまとめる．
   timer.stop();
   USTime time = timer.time();
   if ( sat_stat == kB3False ) {

@@ -223,7 +223,9 @@ DomChecker::get_dom_faults(ymuint method,
   USTime fsim_time = local_timer.time();
 
   switch ( method ) {
+#if 0
   case 1: get_dom_faults1(src_list, dom_fault_list); break;
+#endif
   case 2: get_dom_faults2(0, src_list, dom_fault_list); break;
   case 3: get_dom_faults2(1, src_list, dom_fault_list); break;
   case 4: get_dom_faults2(2, src_list, dom_fault_list); break;
@@ -330,7 +332,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     FaultData& fd1 = mFaultDataArray[f1->id()];
     const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1->id());
 
-    vector<ymuint>& dst_list = fd1.mDomCandList;
+    vector<ymuint>& dst_list = fd1.mDomCandList1;
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < dst_list.size(); ++ rpos) {
       ymuint f2_id = dst_list[rpos];
@@ -357,40 +359,39 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
   ymuint n = det_list.size();
   ymuint nchg = 0;
 
-  vector<pair<ymuint, PackedVal> > det_list_array[kPvBitLen];
   for (ymuint i = 0; i < n; ++ i) {
     ymuint f_id = det_list[i].first;
     PackedVal bv = det_list[i].second;
-    ymuint b = count_ones(bv);
-    ASSERT_COND( b > 0 );
-    det_list_array[b - 1].push_back(det_list[i]);
     mDetFlag[f_id] = bv;
   }
+
+  // 新しくリストを作る時の作業用
+  // 要素数の最大値を指定しておく．
+  vector<ymuint> tmp_list;
+  tmp_list.reserve(n);
 
   // 検出結果を用いて支配される故障の候補リストを作る．
   for (ymuint i1 = 0; i1 < n; ++ i1) {
     ymuint f1_id = det_list[i1].first;
     PackedVal bv1 = det_list[i1].second;
     FaultData& fd1 = mFaultDataArray[f1_id];
-    vector<ymuint>& dst_list = fd1.mDomCandList;
+    vector<ymuint>& dst_list = fd1.mDomCandList1;
     if ( fd1.mDetCount == 0 ) {
       // 初めて検出された場合
-      ymuint b1 = count_ones(bv1);
-      for (ymuint b = b1; b < kPvBitLen; ++ b) {
-	const vector<pair<ymuint, PackedVal> >& tmp_list = det_list_array[b - 1];
-	ymuint n2 = tmp_list.size();
-	for (ymuint i2 = 0; i2 < n2; ++ i2) {
-	  ymuint f2_id = tmp_list[i2].first;
-	  if ( f2_id == f1_id ) {
-	    continue;
-	  }
-	  PackedVal bv2 = tmp_list[i2].second;
-	  if ( (bv1 & bv2) == bv1 ) {
-	    // bv1 が 1 の部分は bv2 も 1
-	    dst_list.push_back(f2_id);
-	  }
+      tmp_list.clear();
+      for (ymuint i2 = 0; i2 < n; ++ i2) {
+	if ( i2 == i1 ) {
+	  continue;
+	}
+	ymuint f2_id = det_list[i2].first;
+	PackedVal bv2 = det_list[i2].second;
+	if ( (bv1 & bv2) == bv1 ) {
+	  // bv1 が 1 の部分は bv2 も 1
+	  tmp_list.push_back(f2_id);
 	}
       }
+      // 最後に要素数が確定してから dst_list にコピーする．
+      dst_list = tmp_list;
     }
     else {
       // 二回目以降
@@ -405,7 +406,7 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
 	    dst_list[wpos] = f2_id;
 	  }
 	  ++ wpos;
-	}
+        }
       }
       if ( wpos < dst_list.size() ) {
 	nchg += dst_list.size() - wpos;
@@ -423,6 +424,7 @@ DomChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list)
   return nchg;
 }
 
+#if 0
 // @brief 支配故障を求める．
 //
 // 結果は mDomFaultList に格納される．
@@ -606,6 +608,7 @@ DomChecker::get_dom_faults1(const vector<const TpgFault*>& src_list,
     }
   }
 }
+#endif
 
 // @brief 支配故障を求める．
 //
@@ -640,19 +643,17 @@ DomChecker::get_dom_faults2(ymuint option,
     sort(fault_list.begin(), fault_list.end(), comp);
   }
 
-#if 1
-  // 非支配故障の候補から支配故障の候補を作る．
+  // 被支配故障の候補から支配故障の候補を作る．
   for (ymuint i = 0; i < fault_num; ++ i) {
     ymuint f1_id = fault_list[i];
     FaultData& fd1 = mFaultDataArray[f1_id];
-    const vector<ymuint>& cand_list = fd1.mDomCandList;
+    const vector<ymuint>& cand_list = fd1.mDomCandList1;
     for (ymuint j = 0; j < cand_list.size(); ++ j) {
       ymuint f2_id = cand_list[j];
       FaultData& fd2 = mFaultDataArray[f2_id];
       fd2.mDomCandList2.push_back(f1_id);
     }
   }
-#endif
 
   if ( option == 0 ) {
     // 故障を被支配故障数の少ない順に並べる．
@@ -1005,7 +1006,7 @@ ymuint
 DomChecker::dom_cand_size(ymuint f_id)
 {
   ASSERT_COND( f_id < mMaxFaultId );
-  return mFaultDataArray[f_id].mDomCandList.size();
+  return mFaultDataArray[f_id].mDomCandList1.size();
 }
 
 // @brief 支配故障候補数を返す．

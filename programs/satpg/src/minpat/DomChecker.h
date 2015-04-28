@@ -14,6 +14,8 @@
 #include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
 
+#define USE_CANDLIST1 1
+
 
 BEGIN_NAMESPACE_YM_SATPG
 
@@ -116,10 +118,7 @@ private:
   {
 
     // 被支配故障候補のリスト
-    vector<ymuint> mDomCandList;
-
-    // mDomCandList の本当の要素数
-    ymuint mDomCandListSize;
+    vector<ymuint> mDomCandList1;
 
     // 支配故障候補のリスト
     vector<ymuint> mDomCandList2;
