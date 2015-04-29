@@ -1067,8 +1067,7 @@ YmSat::add_clause_sub(ymuint lit_num)
   }
 
   if ( !mSane ) {
-    cout << "Error![YmSat]: mSane == false" << endl;
-    ASSERT_NOT_REACHED;
+    // すでに充足不能になっていたらなにもしない．
     return;
   }
 
