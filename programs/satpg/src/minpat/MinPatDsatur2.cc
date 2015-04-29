@@ -52,7 +52,7 @@ MinPatDsatur2::init(const vector<const TpgFault*>& fault_list,
   DomChecker checker(analyzer(), tvmgr, fsim2);
 
   vector<const TpgFault*> dom_fault_list;
-  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
+  checker.get_dom_faults(fault_list, dom_fault_list);
 
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
   checker2.analyze_conflict(dom_fault_list);

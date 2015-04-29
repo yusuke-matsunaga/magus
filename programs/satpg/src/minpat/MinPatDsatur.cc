@@ -58,7 +58,7 @@ MinPatDsatur::init(const vector<const TpgFault*>& fault_list,
   DomChecker checker(analyzer(), tvmgr, fsim2);
 
   vector<const TpgFault*> dom_fault_list;
-  checker.get_dom_faults(dom_method(), fault_list, dom_fault_list);
+  checker.get_dom_faults(fault_list, dom_fault_list);
 
   ymuint nf = dom_fault_list.size();
 

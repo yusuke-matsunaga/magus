@@ -53,16 +53,17 @@ public:
   set_verbose(int verbose);
 
   /// @brief 支配故障を求める．
-  ///
-  /// 結果は mDomFaultList に格納される．
   void
-  get_dom_faults(ymuint method,
-		 const vector<const TpgFault*>& src_list,
+  get_dom_faults(const vector<const TpgFault*>& src_list,
 		 vector<const TpgFault*>& dom_fault_list);
 
   /// @brief シミュレーション時の検出パタン数を返す．
   ymuint
   det_count(ymuint f_id);
+
+  /// @brief single cube condition かどうかを返す．
+  bool
+  single_cube(ymuint f_id);
 
   /// @brief 非支配故障候補数を返す．
   ymuint
@@ -86,7 +87,7 @@ private:
     vector<ymuint> mDomCandList1;
 
     // 支配故障候補のリスト
-    vector<ymuint> mDomCandList2[3];
+    vector<ymuint> mDomCandList2[2];
 
     // 検出パタン数
     ymuint mDetCount;
@@ -200,6 +201,7 @@ private:
   DomStats mStats[3];
 
   ymuint mPat;
+
 };
 
 END_NAMESPACE_YM_SATPG

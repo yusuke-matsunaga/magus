@@ -28,6 +28,7 @@ BEGIN_NAMESPACE_YM_SATPG
 BEGIN_NONAMESPACE
 
 const bool verify_dom_check = false;
+const bool print_dom_detail = false;
 
 struct FaultLt
 {
@@ -47,24 +48,6 @@ struct FaultLt
 
 };
 
-struct FaultLt2
-{
-  FaultLt2(DomChecker& checker) :
-    mChecker(checker)
-  {
-  }
-
-  bool
-  operator()(ymuint left,
-	     ymuint right)
-  {
-    return mChecker.dom_cand2_size(left) < mChecker.dom_cand2_size(right);
-  }
-
-  DomChecker& mChecker;
-
-};
-
 struct FaultGt
 {
   FaultGt(DomChecker& checker) :
@@ -76,25 +59,16 @@ struct FaultGt
   operator()(ymuint left,
 	     ymuint right)
   {
+    if ( mChecker.single_cube(left) ) {
+      if ( mChecker.single_cube(right) ) {
+	return mChecker.dom_cand_size(left) > mChecker.dom_cand_size(right);
+      }
+      return true;
+    }
+    else if ( mChecker.single_cube(right) ) {
+      return false;
+    }
     return mChecker.dom_cand_size(left) > mChecker.dom_cand_size(right);
-  }
-
-  DomChecker& mChecker;
-
-};
-
-struct FaultGt2
-{
-  FaultGt2(DomChecker& checker) :
-    mChecker(checker)
-  {
-  }
-
-  bool
-  operator()(ymuint left,
-	     ymuint right)
-  {
-    return mChecker.dom_cand2_size(left) > mChecker.dom_cand2_size(right);
   }
 
   DomChecker& mChecker;
@@ -210,8 +184,7 @@ DomChecker::set_verbose(int verbose)
 //
 // 結果は mDomFaultList に格納される．
 void
-DomChecker::get_dom_faults(ymuint method,
-			   const vector<const TpgFault*>& src_list,
+DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
 			   vector<const TpgFault*>& dom_fault_list)
 {
   StopWatch local_timer;
@@ -229,42 +202,24 @@ DomChecker::get_dom_faults(ymuint method,
     fault_list[i] = src_list[i]->id();
   }
   {
-    ymuint option = method - 2;
-    if ( option == 0 ) {
-      // 故障を被支配故障数の少ない順に並べる．
-      FaultLt comp(*this);
-      sort(fault_list.begin(), fault_list.end(), comp);
-    }
-    else if ( option == 1 ) {
-      // 故障を被支配故障数の多い順に並べる．
-      FaultGt comp(*this);
-      sort(fault_list.begin(), fault_list.end(), comp);
-    }
-    else if ( option == 2 ) {
-      // 故障を支配故障数の少ない順に並べる．
-      FaultLt2 comp(*this);
-      sort(fault_list.begin(), fault_list.end(), comp);
-    }
-    else if ( option == 3 ) {
-      // 故障を支配故障数の多い順に並べる．
-      FaultGt2 comp(*this);
-      sort(fault_list.begin(), fault_list.end(), comp);
-    }
+    // 故障を被支配故障数の少ない順に並べる．
+    FaultLt comp(*this);
+    sort(fault_list.begin(), fault_list.end(), comp);
   }
 
-  vector<ymuint> fault_list2;
-  get_dom_faults1(fault_list,  0, fault_list2);
+  vector<ymuint> fault_list1;
+  get_dom_faults1(fault_list,  0, fault_list1);
 
-  vector<ymuint> fault_list3;
-  get_dom_faults1(fault_list2, 1, fault_list3);
+  vector<ymuint> fault_list2;
+  get_dom_faults1(fault_list1, 1, fault_list2);
 
   // 支配されていない故障を dom_fault_list に入れる．
-  ymuint fault_num3 = fault_list3.size();
+  ymuint dom_fault_num = fault_list2.size();
   dom_fault_list.clear();
-  dom_fault_list.reserve(fault_num3);
+  dom_fault_list.reserve(dom_fault_num);
   ymuint single_num = 0;
-  for (ymuint i = 0; i < fault_num3; ++ i) {
-    ymuint f_id = fault_list3[i];
+  for (ymuint i = 0; i < dom_fault_num; ++ i) {
+    ymuint f_id = fault_list2[i];
     const TpgFault* fault = mAnalyzer.fault(f_id);
     dom_fault_list.push_back(fault);
 
@@ -274,7 +229,6 @@ DomChecker::get_dom_faults(ymuint method,
     }
   }
 
-  ymuint dom_fault_num = dom_fault_list.size();
   local_timer.stop();
   if ( mVerbose ) {
     DomStats sum;
@@ -417,6 +371,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 
   // 故障を被支配故障候補数の多い順に並べる．
   {
+    // 正確にはさらに single cube condition の故障を先にする
     FaultGt comp(*this);
     sort(fid_list.begin(), fid_list.end(), comp);
   }
@@ -432,6 +387,7 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
       ymuint f2_id = cand_list[j];
       FaultData& fd2 = mFaultDataArray[f2_id];
       const vector<ymuint>& input_list2_2 = mAnalyzer.input_list2(f2_id);
+      // TFI が共通部分をもつかどうかでリストを分ける．
       if ( check_intersect(input_list1_2, input_list2_2) ) {
 	fd2.mDomCandList2[0].push_back(f1_id);
       }
@@ -589,11 +545,17 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 
       // これが f2 の十分割当のもとで成り立ったら支配しない
       if ( engine.check_sat(gval_cnf, fi2.sufficient_assignment()) == kB3True ) {
+	if ( print_dom_detail ) {
+	  cout << "NODOM(1) " << f1_id << " " << f2_id << endl;
+	}
 	++ stats.mNoDom;
 	continue;
       }
       if ( fi2.single_cube() ) {
 	// これ以上のチェックは必要ない．
+	if ( print_dom_detail ) {
+	  cout << "DOM(2) " << f1_id << " " << f2_id << endl;
+	}
 	mDomFlag[f1_id] = true;
 	++ stats.mSingleDom;
 	-- cur_num;
@@ -603,10 +565,16 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
       // 実際にチェックを行う．
       ++ stats.mSat;
       if ( check_fault_dominance(f2, f1) ) {
+	if ( print_dom_detail ) {
+	  cout << "DOM(3) " << f1_id << " " << f2_id << endl;
+	}
 	mDomFlag[f1_id] = true;
 	++ stats.mDom;
 	-- cur_num;
 	break;
+      }
+      if ( print_dom_detail ) {
+	cout << "NODOM(4) " << f1_id << " " << f2_id << endl;
       }
     }
   }
@@ -726,9 +694,19 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
   else {
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
-    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-    const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+    NodeValList suf_list;
+
+    const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
+    if ( fi1.single_cube() ) {
+      // f1 を検出する条件
+      suf_list = fi1.sufficient_assignment();
+    }
+    else {
+      // f1 を検出する CNF を生成
+      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+      const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
+      engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+    }
 
     const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
     if ( fi2.single_cube() ) {
@@ -742,11 +720,16 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
       engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
     }
 
-    sat_stat = engine.check_sat();
+    sat_stat = engine.check_sat(gval_cnf, suf_list);
   }
 
   timer.stop();
   USTime time = timer.time();
+  if ( mVerbose > 1 ) {
+    if ( time.usr_time() > 1.0 ) {
+      cout << " >1sec" << endl;
+    }
+  }
   if ( sat_stat == kB3False ) {
     mSuccessTime += time;
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
@@ -776,6 +759,14 @@ DomChecker::det_count(ymuint f_id)
 {
   ASSERT_COND( f_id < mMaxFaultId );
   return mFaultDataArray[f_id].mDetCount;
+}
+
+// @brief single cube condition かどうかを返す．
+bool
+DomChecker::single_cube(ymuint f_id)
+{
+  ASSERT_COND( f_id < mMaxFaultId );
+  return mAnalyzer.fault_info(f_id).single_cube();
 }
 
 // @brief 非支配故障候補数を返す．
