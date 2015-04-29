@@ -10,6 +10,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "PackedVal.h"
 #include "YmUtils/RandGen.h"
 #include "YmUtils/StopWatch.h"
 
@@ -52,14 +53,27 @@ public:
   analyze_conflict(const vector<const TpgFault*>& fault_list);
 
   /// @brief 衝突リストを得る．
+  ///
+  /// 事前に analyze_conflict() を実行しておく必要がある．
   const vector<ymuint>&
   conflict_list(ymuint fid);
+
+  /// @brief 1つの故障に対する衝突の解析を行う．
+  void
+  analyze_conflict(const TpgFault* f1,
+		   const vector<const TpgFault*>& fault_list,
+		   vector<ymuint>& conf_list);
 
   /// @brief 衝突数の見積もりを行う．
   void
   estimate_conflict(const vector<const TpgFault*>& fault_list,
 		    ymuint sample_num,
 		    vector<double>& conf_prob_array);
+
+  /// @brief 衝突数の見積もりを行う．
+  void
+  estimate_conflict(const vector<const TpgFault*>& fault_list,
+		    vector<ymuint>& conf_num_array);
 
 
 private:
@@ -76,7 +90,7 @@ private:
   void
   analyze_conflict(const TpgFault* f1,
 		   const vector<ymuint>& f2_list,
-		   vector<const TpgFault*>& conf_list,
+		   vector<ymuint>& conf_list,
 		   bool simple,
 		   bool local_verbose);
 
@@ -89,20 +103,19 @@ private:
   void
   analyze_conflict2(const TpgFault* f1,
 		    const vector<ymuint>& f2_list,
-		    vector<const TpgFault*>& conf_list,
+		    vector<ymuint>& conf_list,
 		    bool simple,
 		    bool local_verbose);
 
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fault_list 故障リスト
   void
-  get_pat_list(const vector<const TpgFault*>& fault_list);
+  do_fsim(const vector<const TpgFault*>& fault_list);
 
   /// @brief 故障シミュレーションの後処理
   ymuint
-  record_pat(const vector<ymuint>& det_list,
-	     const vector<const TpgFault*>& fault_list,
-	     ymuint pat_id);
+  record_pat(const vector<pair<ymuint, PackedVal> >& det_list,
+	     const vector<const TpgFault*>& fault_list);
 
   /// @brief f1 が f2 を支配しているか調べる．
   bool
@@ -128,6 +141,8 @@ private:
     vector<ymuint> mCandList;
 
     ymuint mCandListSize;
+
+    vector<ymuint> mMaConflictList;
 
     // 衝突している故障のリスト
     vector<ymuint> mConflictList;

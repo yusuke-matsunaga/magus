@@ -11,6 +11,7 @@
 #include "TpgNetwork.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
+#include "EqChecker.h"
 #include "DomChecker.h"
 #include "ConflictChecker.h"
 #include "FgMgr.h"
@@ -49,10 +50,19 @@ MinPatDsatur2::init(const vector<const TpgFault*>& fault_list,
 		    TvMgr& tvmgr,
 		    Fsim& fsim2)
 {
-  DomChecker checker(analyzer(), tvmgr, fsim2);
+  // 代表故障のリスト
+  vector<const TpgFault*> rep_fault_list;
+  {
+    EqChecker checker(analyzer(), tvmgr, fsim2);
+    checker.get_rep_faults(fault_list, rep_fault_list);
+  }
 
+  // 支配故障のリスト
   vector<const TpgFault*> dom_fault_list;
-  checker.get_dom_faults(fault_list, dom_fault_list);
+  {
+    DomChecker checker(analyzer(), tvmgr, fsim2);
+    checker.get_dom_faults(rep_fault_list, dom_fault_list);
+  }
 
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
   checker2.analyze_conflict(dom_fault_list);

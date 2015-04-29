@@ -12,6 +12,7 @@
 #include "TpgFault.h"
 #include "FaultMgr.h"
 #include "FaultAnalyzer.h"
+#include "EqChecker.h"
 #include "DomChecker.h"
 #include "FgMgr.h"
 #include "GvalCnf.h"
@@ -55,10 +56,15 @@ MinPatDsatur::init(const vector<const TpgFault*>& fault_list,
 {
   mMaxNodeId = analyzer().max_node_id();
 
-  DomChecker checker(analyzer(), tvmgr, fsim2);
+  vector<const TpgFault*> rep_fault_list;
+  {
+    EqChecker checker(analyzer(), tvmgr, fsim2);
+    checker.get_rep_faults(fault_list, rep_fault_list);
+  }
 
   vector<const TpgFault*> dom_fault_list;
-  checker.get_dom_faults(fault_list, dom_fault_list);
+  DomChecker checker(analyzer(), tvmgr, fsim2);
+  checker.get_dom_faults(rep_fault_list, dom_fault_list);
 
   ymuint nf = dom_fault_list.size();
 

@@ -10,6 +10,7 @@
 #include "MinPatSimple2.h"
 #include "TpgFault.h"
 #include "FaultAnalyzer.h"
+#include "EqChecker.h"
 #include "DomChecker.h"
 #include "ConflictChecker.h"
 
@@ -26,10 +27,10 @@ new_MinPatSimple2(bool group_dominance)
 
 BEGIN_NONAMESPACE
 
-struct FaultLt
+struct FaultGt
 {
-  FaultLt(ConflictChecker& checker) :
-    mChecker(checker)
+  FaultGt(const vector<ymuint>& conf_num_array) :
+    mConfNumArray(conf_num_array)
   {
   }
 
@@ -37,10 +38,10 @@ struct FaultLt
   operator()(const TpgFault* left,
 	     const TpgFault* right)
   {
-    return mChecker.conflict_list(left->id()).size() > mChecker.conflict_list(right->id()).size();
+    return mConfNumArray[left->id()] > mConfNumArray[right->id()];
   }
 
-  ConflictChecker& mChecker;
+  const vector<ymuint>& mConfNumArray;
 
 };
 
@@ -71,25 +72,29 @@ MinPatSimple2::init(const vector<const TpgFault*>& fault_list,
 		    TvMgr& tvmgr,
 		    Fsim& fsim2)
 {
-  DomChecker checker(analyzer(), tvmgr, fsim2);
+  // 代表故障のリスト
+  vector<const TpgFault*> rep_fault_list;
+  {
+    EqChecker checker1(analyzer(), tvmgr, fsim2);
+    checker1.get_rep_faults(fault_list, rep_fault_list);
+  }
 
+  // 支配故障のリスト
   vector<const TpgFault*> dom_fault_list;
-  checker.get_dom_faults(fault_list, dom_fault_list);
+  {
+    DomChecker checker(analyzer(), tvmgr, fsim2);
+    checker.get_dom_faults(rep_fault_list, dom_fault_list);
+  }
 
   ymuint nf = dom_fault_list.size();
 
   // 故障を衝突数の多い順に並べる．
+  vector<ymuint> conf_num_array;
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
+  checker2.estimate_conflict(dom_fault_list, conf_num_array);
 
-#if 0
-  ymuint sample_num = 1000;
-  vector<double> conf_prob_array;
-  checker2.estimate_conflict(dom_fault_list, sample_num, conf_prob_array);
-#else
-  checker2.analyze_conflict(dom_fault_list);
-#endif
   vector<const TpgFault*> tmp_list = dom_fault_list;
-  sort(tmp_list.begin(), tmp_list.end(), FaultLt(checker2));
+  sort(tmp_list.begin(), tmp_list.end(), FaultGt(conf_num_array));
   set_fault_list(tmp_list);
 
 }

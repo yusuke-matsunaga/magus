@@ -15,7 +15,7 @@
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
-#include "KDet2Op.h"
+#include "DetOp.h"
 #include "NodeSet.h"
 
 #include "GvalCnf.h"
@@ -127,23 +127,32 @@ ConflictChecker::analyze_conflict(const vector<const TpgFault*>& fault_list)
   mConflictStats.int2_count = 0;
 
   // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
-  get_pat_list(fault_list);
+  do_fsim(fault_list);
 
   ymuint fault_num = fault_list.size();
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     const TpgFault* f1 = fault_list[i1];
 
     if ( mVerbose > 1 ) {
-      cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
+      cout << "\rCFL: " << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
-    vector<ymuint>& f2_list = mFaultDataArray[f1->id()].mCandList;
-    vector<const TpgFault*> conf_list;
+
+    ymuint f1_id = f1->id();
+
+    const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
+    for (ymuint i = 0; i < ma_conf_list.size(); ++ i) {
+      ymuint f2_id = ma_conf_list[i];
+      mFaultDataArray[f1_id].mConflictList.push_back(f2_id);
+    }
+
+    vector<ymuint>& f2_list = mFaultDataArray[f1_id].mCandList;
+    vector<ymuint> conf_list;
     analyze_conflict(f1, f2_list, conf_list, false, false);
     for (ymuint i = 0; i < conf_list.size(); ++ i) {
-      const TpgFault* f2 = conf_list[i];
-      mFaultDataArray[f1->id()].mConflictList.push_back(f2->id());
-      mFaultDataArray[f2->id()].mConflictList.push_back(f1->id());
+      ymuint f2_id = conf_list[i];
+      mFaultDataArray[f1_id].mConflictList.push_back(f2_id);
+      mFaultDataArray[f2_id].mConflictList.push_back(f1_id);
     }
   }
 
@@ -168,6 +177,54 @@ ConflictChecker::conflict_list(ymuint fid)
 {
   ASSERT_COND( fid < mMaxFaultId );
   return mFaultDataArray[fid].mConflictList;
+}
+
+// @brief 1つの故障に対する衝突の解析を行う．
+void
+ConflictChecker::analyze_conflict(const TpgFault* f1,
+				  const vector<const TpgFault*>& fault_list,
+				  vector<ymuint>& conf_list)
+{
+  // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
+  do_fsim(fault_list);
+
+  ymuint f1_id = f1->id();
+
+  const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
+  vector<ymuint>& f2_list = mFaultDataArray[f1_id].mCandList;
+  vector<ymuint> conf1_list;
+  analyze_conflict(f1, f2_list, conf1_list, false, false);
+
+  conf_list.clear();
+  conf_list.reserve(ma_conf_list.size() + conf1_list.size());
+  for (ymuint i = 0; i < ma_conf_list.size(); ++ i) {
+    ymuint f2_id = ma_conf_list[i];
+    conf_list.push_back(f2_id);
+  }
+  for (ymuint i = 0; i < conf1_list.size(); ++ i) {
+    ymuint f2_id = conf1_list[i];
+    conf_list.push_back(f2_id);
+  }
+}
+
+// @brief 衝突数の見積もりを行う．
+void
+ConflictChecker::estimate_conflict(const vector<const TpgFault*>& fault_list,
+				   vector<ymuint>& conf_num_array)
+{
+  do_fsim(fault_list);
+
+  conf_num_array.clear();
+  conf_num_array.resize(mMaxFaultId, 0);
+  ymuint fault_num = fault_list.size();
+  for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
+    const TpgFault* f1 = fault_list[i1];
+    ymuint f1_id = f1->id();
+
+    const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
+    vector<ymuint>& f2_list = mFaultDataArray[f1_id].mCandList;
+    conf_num_array[i1] = ma_conf_list.size() + f2_list.size();
+  }
 }
 
 // @brief 故障間の衝突性を調べる．
@@ -202,14 +259,13 @@ ConflictChecker::estimate_conflict(const vector<const TpgFault*>& fault_list,
 
   // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
 
-  get_pat_list(fault_list);
+  do_fsim(fault_list);
 #if 0
   ymuint fault_num = fault_list.size();
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
     const TpgFault* f1 = fault_list[i1];
 
     if ( mVerbose > 1 ) {
-      cout << "\r                  ";
       cout << "\r" << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
@@ -250,7 +306,7 @@ ConflictChecker::estimate_conflict(const vector<const TpgFault*>& fault_list,
 void
 ConflictChecker::analyze_conflict(const TpgFault* f1,
 				  const vector<ymuint>& f2_list,
-				  vector<const TpgFault*>& conf_list,
+				  vector<ymuint>& conf_list,
 				  bool simple,
 				  bool local_verbose)
 {
@@ -261,49 +317,32 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
 
   mConflictStats.conf_timer.start();
 
-  GvalCnf gval_cnf(mMaxNodeId);
-  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  ymuint f1_id = f1->id();
+
   SatEngine engine(string(), string(), NULL);
+  GvalCnf gval_cnf(mMaxNodeId);
 
-  engine.make_fval_cnf(fval_cnf, f1, mAnalyzer.node_set(f1->id()), kVal1);
+  // f1 を検出する CNF を生成
+  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
+  const NodeSet& node_set1 = mAnalyzer.node_set(f1_id);
+  engine.make_fval_cnf(fval_cnf, f1, node_set1, kVal1);
 
-  const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
+  const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
   const NodeValList& suf_list1 = fi1.sufficient_assignment();
-  const NodeValList& pi_suf_list1 = fi1.pi_sufficient_assignment();
   const NodeValList& ma_list1 = fi1.mandatory_assignment();
 
   conf_list.reserve(f2_list.size());
   for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
     ymuint f2_id = f2_list[i2];
-    if ( f1->id() > f2_id ) {
+
+    if ( f1_id > f2_id ) {
       continue;
     }
 
     const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
     const TpgFault* f2 = fi2.fault();
     const NodeValList& suf_list2 = fi2.sufficient_assignment();
-    const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
     const NodeValList& ma_list2 = fi2.mandatory_assignment();
-
-    mConflictStats.conf1_timer.start();
-    if ( check_conflict(ma_list1, ma_list2) ) {
-      // 必要割当そのものがコンフリクトしている．
-      ++ mConflictStats.conf_count;
-      ++ mConflictStats.conf1_count;
-      conf_list.push_back(f2);
-      mConflictStats.conf1_timer.stop();
-      continue;
-    }
-    mConflictStats.conf1_timer.stop();
-
-    mConflictStats.int1_timer.start();
-    if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
-      // 十分割当が両立しているのでコンフリクトしない．
-      ++ mConflictStats.int1_count;
-      mConflictStats.int1_timer.stop();
-      continue;
-    }
-    mConflictStats.int1_timer.stop();
 
     mConflictStats.int2_timer.start();
     Bool3 sat_stat = engine.check_sat(gval_cnf, suf_list2);
@@ -319,7 +358,7 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
       if ( sat_stat == kB3False ) {
 	++ mConflictStats.conf_count;
 	++ mConflictStats.conf3_count;
-	conf_list.push_back(f2);
+	conf_list.push_back(f2_id);
       }
       // f2 の十分割当と必要割当が等しければ上のチェックで終わり．
       continue;
@@ -330,7 +369,7 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
       // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
       ++ mConflictStats.conf_count;
       ++ mConflictStats.conf3_count;
-      conf_list.push_back(f2);
+      conf_list.push_back(f2_id);
       mConflictStats.conf3_timer.stop();
       continue;
     }
@@ -345,7 +384,7 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
     if ( check_fault_conflict(f1, f2) ) {
       ++ mConflictStats.conf_count;
       ++ mConflictStats.conf4_count;
-      conf_list.push_back(f2);
+      conf_list.push_back(f2_id);
     }
     mConflictStats.conf4_timer.stop();
   }
@@ -364,7 +403,7 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
 void
 ConflictChecker::analyze_conflict2(const TpgFault* f1,
 				   const vector<ymuint>& f2_list,
-				   vector<const TpgFault*>& conf_list,
+				   vector<ymuint>& conf_list,
 				   bool simple,
 				   bool local_verbose)
 {
@@ -373,39 +412,23 @@ ConflictChecker::analyze_conflict2(const TpgFault* f1,
   GvalCnf gval_cnf(mMaxNodeId);
   SatEngine engine(string(), string(), NULL);
 
-  const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
+  ymuint f1_id = f1->id();
+
+  const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
   const NodeValList& suf_list1 = fi1.sufficient_assignment();
-  const NodeValList& pi_suf_list1 = fi1.pi_sufficient_assignment();
 
   conf_list.reserve(f2_list.size());
   for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
     ymuint f2_id = f2_list[i2];
 
+    if ( f1_id > f2_id ) {
+      continue;
+    }
+
     const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
     const TpgFault* f2 = fi2.fault();
     const NodeValList& suf_list2 = fi2.sufficient_assignment();
-    const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
     const NodeValList& ma_list2 = fi2.mandatory_assignment();
-
-    mConflictStats.conf1_timer.start();
-    if ( check_conflict(suf_list1, ma_list2) ) {
-      // 必要割当そのものがコンフリクトしている．
-      ++ mConflictStats.conf_count;
-      ++ mConflictStats.conf1_count;
-      conf_list.push_back(f2);
-      mConflictStats.conf1_timer.stop();
-      continue;
-    }
-    mConflictStats.conf1_timer.stop();
-
-    mConflictStats.int1_timer.start();
-    if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
-      // 十分割当が両立しているのでコンフリクトしない．
-      ++ mConflictStats.int1_count;
-      mConflictStats.int1_timer.stop();
-      continue;
-    }
-    mConflictStats.int1_timer.stop();
 
     mConflictStats.int2_timer.start();
     Bool3 sat_stat = engine.check_sat(gval_cnf, suf_list1, suf_list2);
@@ -421,7 +444,7 @@ ConflictChecker::analyze_conflict2(const TpgFault* f1,
       if ( sat_stat == kB3False ) {
 	++ mConflictStats.conf_count;
 	++ mConflictStats.conf3_count;
-	conf_list.push_back(f2);
+	conf_list.push_back(f2_id);
       }
       // f2 の十分割当と必要割当が等しければ上のチェックで終わり．
       continue;
@@ -432,7 +455,7 @@ ConflictChecker::analyze_conflict2(const TpgFault* f1,
       // f2 の必要割当のもとで f1 が検出できなければ f1 と f2 はコンフリクトしている．
       ++ mConflictStats.conf_count;
       ++ mConflictStats.conf3_count;
-      conf_list.push_back(f2);
+      conf_list.push_back(f2_id);
       mConflictStats.conf3_timer.stop();
       continue;
     }
@@ -449,7 +472,7 @@ ConflictChecker::analyze_conflict2(const TpgFault* f1,
       if ( engine.check_sat(gval_cnf, suf_list1) == kB3False ) {
 	++ mConflictStats.conf_count;
 	++ mConflictStats.conf4_count;
-	conf_list.push_back(f2);
+	conf_list.push_back(f2_id);
       }
     }
     mConflictStats.conf4_timer.stop();
@@ -470,9 +493,9 @@ bool
 ConflictChecker::check_fault_conflict(const TpgFault* f1,
 				      const TpgFault* f2)
 {
-  GvalCnf gval_cnf2(mMaxNodeId);
-  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf2);
-  FvalCnf fval_cnf2(mMaxNodeId, gval_cnf2);
+  GvalCnf gval_cnf(mMaxNodeId);
+  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+  FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
 
   const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
@@ -490,24 +513,20 @@ void
 ConflictChecker::print_conflict_stats(ostream& s)
 {
   s << "Total    " << setw(6) << mConflictStats.conf_count  << " conflicts" << endl;
-  s << "Total    " << setw(6) << mConflictStats.conf1_count << " conflicts (ma_list)" << endl;
   s << "Total    " << setw(6) << mConflictStats.conf3_count << " conflicts (single ma_list)" << endl;
   s << "Total    " << setw(6) << mConflictStats.conf4_count << " conflicts (exact) / "
        << setw(6) << mConflictStats.conf4_check_count << endl;
-  s << "Total    " << setw(6) << mConflictStats.int1_count  << " pi_suf_list intersection check" << endl;
   s << "Total    " << setw(6) << mConflictStats.int2_count  << " suf_list intersection check" << endl;
   s << "CPU time (conflict check)    " << mConflictStats.conf_timer.time() << endl;
-  s << "CPU time (simple ma_list)    " << mConflictStats.conf1_timer.time() << endl;
   s << "CPU time (single conflict)   " << mConflictStats.conf3_timer.time() << endl;
   s << "CPU time (exact conflict)    " << mConflictStats.conf4_timer.time() << endl;
-  s << "CPU time (siple pi_suf_list) " << mConflictStats.int1_timer.time() << endl;
   s << "CPU time (single suf_list)   " << mConflictStats.int2_timer.time() << endl;
 }
 
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
+ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -515,7 +534,7 @@ ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  KDet2Op op(mFsim, fault_list);
+  DetOp op;
 
   ymuint npat = fault_list.size();
   ymuint base = 0;
@@ -526,14 +545,12 @@ ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
       if ( mVerbose > 1 ) {
-	cout << "\r " << base;
+	cout << "\rFSIM: " << base;
 	cout.flush();
       }
       mFsim.ppsfp(cur_array, op);
-      for (ymuint j = 0; j < kPvBitLen; ++ j) {
-	const vector<ymuint>& det_list = op.det_list(j);
-	record_pat(det_list, fault_list, base + j);
-      }
+      const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+      record_pat(det_list, fault_list);
       cur_array.clear();
       op.clear_det_list();
       base += kPvBitLen;
@@ -541,10 +558,8 @@ ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
   }
   if ( !cur_array.empty() ) {
     mFsim.ppsfp(cur_array, op);
-    for (ymuint j = 0; j < cur_array.size(); ++ j) {
-      const vector<ymuint>& det_list = op.det_list(j);
-      record_pat(det_list, fault_list, base + j);
-    }
+    const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+    record_pat(det_list, fault_list);
     op.clear_det_list();
     base += cur_array.size();
     cur_array.clear();
@@ -561,10 +576,8 @@ ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
     }
     mFsim.ppsfp(cur_array, op);
     ymuint nchg = 0;
-    for (ymuint j = 0; j < kPvBitLen; ++ j) {
-      const vector<ymuint>& det_list = op.det_list(j);
-      nchg += record_pat(det_list, fault_list, base + j);
-    }
+    const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
+    nchg += record_pat(det_list, fault_list);
     cur_array.clear();
     op.clear_det_list();
     base += kPvBitLen;
@@ -578,7 +591,7 @@ ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
       nochg_count = 0;
     }
     if ( mVerbose > 1 ) {
-      cout << "\r " << base;
+      cout << "\rFSIM: " << base;
       cout.flush();
     }
   }
@@ -610,61 +623,89 @@ ConflictChecker::get_pat_list(const vector<const TpgFault*>& fault_list)
 }
 
 ymuint
-ConflictChecker::record_pat(const vector<ymuint>& det_list,
-			    const vector<const TpgFault*>& fault_list,
-			    ymuint pat_id)
+ConflictChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list,
+			    const vector<const TpgFault*>& fault_list)
 {
   ymuint n = det_list.size();
   ymuint nchg = 0;
-  vector<bool> det_flag(mMaxFaultId, false);
+  vector<PackedVal> det_flag(mMaxFaultId, false);
   for (ymuint i = 0; i < n; ++ i) {
-    ymuint f_id = det_list[i];
-    det_flag[f_id] = true;
+    ymuint f_id = det_list[i].first;
+    PackedVal pv = det_list[i].second;
+    det_flag[f_id] = pv;
   }
 
   // 検出結果を用いて支配される故障の候補リストを作る．
   for (ymuint i = 0; i < n; ++ i) {
-    ymuint f_id = det_list[i];
-    FaultData& fd = mFaultDataArray[f_id];
-    ++ fd.mDetCount;
-    if ( fd.mDetCount == 1 ) {
+    ymuint f1_id = det_list[i].first;
+    PackedVal bv1 = det_list[i].second;
+    FaultData& fd1 = mFaultDataArray[f1_id];
+
+    if ( fd1.mDetCount == 0 ) {
       // 初めて検出された場合
       // 構造的に独立でない故障を候補にする．
-      const vector<ymuint>& input_list1 = mAnalyzer.input_list(f_id);
+      const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
+      const NodeValList& pi_suf_list1 = fi1.pi_sufficient_assignment();
+      const NodeValList& ma_list1 = fi1.mandatory_assignment();
+      const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1_id);
       for (ymuint j = 0; j < fault_list.size(); ++ j) {
 	const TpgFault* f2 = fault_list[j];
 	ymuint f2_id = f2->id();
-	if ( f2_id == f_id ) {
+	if ( f2_id == f1_id ) {
 	  continue;
 	}
+	if ( (det_flag[f2_id] & bv1) != 0UL ) {
+	  // 同時に検出された故障は除外
+	  continue;
+	}
+
 	const vector<ymuint>& input_list2 = mAnalyzer.input_list(f2_id);
 	bool intersect = check_intersect(input_list1, input_list2);
 	if ( !intersect ) {
 	  // 共通部分を持たない故障は独立
 	  continue;
 	}
-	fd.mCandList.push_back(f2_id);
+
+	const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
+	const NodeValList& pi_suf_list2 = fi2.pi_sufficient_assignment();
+	const NodeValList& ma_list2 = fi2.mandatory_assignment();
+
+	if ( check_conflict(ma_list1, ma_list2) ) {
+	  // 必要割当が衝突している．
+	  fd1.mMaConflictList.push_back(f2_id);
+	  continue;
+	}
+
+	if ( !check_conflict(pi_suf_list1, pi_suf_list2) ) {
+	  // 外部入力における十分割当が両立している．
+	  continue;
+	}
+
+	fd1.mCandList.push_back(f2_id);
       }
-      fd.mCandListSize = fd.mCandList.size();
+      fd1.mCandListSize = fd1.mCandList.size();
+      nchg = fd1.mCandListSize;
     }
     else {
       // 二回目以降
       // 候補のうち，今回検出された故障を外す．
       ymuint wpos = 0;
-      for (ymuint j = 0; j < fd.mCandListSize; ++ j) {
-	ymuint f2_id = fd.mCandList[j];
-	if ( !det_flag[f2_id] ) {
-	  if ( wpos != j ) {
-	    fd.mCandList[wpos] = f2_id;
-	  }
-	  ++ wpos;
+      for (ymuint j = 0; j < fd1.mCandListSize; ++ j) {
+	ymuint f2_id = fd1.mCandList[j];
+	if ( (det_flag[f2_id] & bv1) != 0 ) {
+	  continue;
 	}
+	if ( wpos != j ) {
+	  fd1.mCandList[wpos] = f2_id;
+	}
+	++ wpos;
       }
-      if ( wpos < fd.mCandListSize ) {
-	nchg += fd.mCandListSize - wpos;
-	fd.mCandListSize = wpos;
+      if ( wpos < fd1.mCandListSize ) {
+	nchg += fd1.mCandListSize - wpos;
+	fd1.mCandListSize = wpos;
       }
     }
+    fd1.mDetCount += count_ones(bv1);
   }
 
   return nchg;
