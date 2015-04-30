@@ -224,44 +224,6 @@ MinPatBase::find_group(FgMgr& fgmgr,
 		       const TpgFault* fault,
 		       const vector<ymuint>& group_list)
 {
-#if 0
-  const NodeSet& node_set = analyzer().node_set(fault->id());
-
-  if ( mGroupDominance ) {
-    GvalCnf gval_cnf(mMaxNodeId);
-    FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-    SatEngine engine(string(), string(), NULL);
-
-    // fault が見つからない条件を作る．
-    engine.make_fval_cnf(fval_cnf, fault, node_set, kVal0);
-
-    for (ymuint i = 0; i < group_list.size(); ++ i) {
-      ymuint gid = group_list[i];
-      const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
-      if ( engine.check_sat(gval_cnf, suf_list0) == kB3False ) {
-	// suf_lib0 のもとでは必ず見つかるということ．
-	return gid;
-      }
-    }
-  }
-
-  GvalCnf gval_cnf(mMaxNodeId);
-  FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-  SatEngine engine(string(), string(), NULL);
-
-  // fault が見つかる条件を作る．
-  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
-
-  for (ymuint i = 0; i < group_list.size(); ++ i) {
-    ymuint gid = group_list[i];
-    const NodeValList& suf_list0 = fgmgr.sufficient_assignment(gid);
-    if ( engine.check_sat(gval_cnf, suf_list0) == kB3True ) {
-      return gid;
-    }
-  }
-
-  return fgmgr.group_num();
-#else
   if ( mGroupDominance ) {
     vector<ymuint> dummy;
     ymuint gid = fgmgr.find_dom_group(fault, group_list, true, dummy);
@@ -273,7 +235,6 @@ MinPatBase::find_group(FgMgr& fgmgr,
   vector<ymuint> dummy;
   ymuint gid = fgmgr.find_group(fault, group_list, true, dummy);
   return gid;
-#endif
 }
 
 // @brief テストパタンを作る．
