@@ -58,7 +58,14 @@ public:
   const vector<ymuint>&
   conflict_list(ymuint fid);
 
+  /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
+  /// @param[in] fault_list 故障リスト
+  void
+  do_fsim(const vector<const TpgFault*>& fault_list);
+
   /// @brief 1つの故障に対する衝突の解析を行う．
+  ///
+  /// 事前に do_fsim() を実行しておく必要がある．
   void
   analyze_conflict(const TpgFault* f1,
 		   const vector<const TpgFault*>& fault_list,
@@ -71,6 +78,8 @@ public:
 		    vector<double>& conf_prob_array);
 
   /// @brief 衝突数の見積もりを行う．
+  ///
+  /// 事前に do_fsim() を実行しておく必要がある．
   void
   estimate_conflict(const vector<const TpgFault*>& fault_list,
 		    vector<ymuint>& conf_num_array);
@@ -106,11 +115,6 @@ private:
 		    vector<ymuint>& conf_list,
 		    bool simple,
 		    bool local_verbose);
-
-  /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
-  /// @param[in] fault_list 故障リスト
-  void
-  do_fsim(const vector<const TpgFault*>& fault_list);
 
   /// @brief 故障シミュレーションの後処理
   ymuint

@@ -185,9 +185,6 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
 				  const vector<const TpgFault*>& fault_list,
 				  vector<ymuint>& conf_list)
 {
-  // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
-  do_fsim(fault_list);
-
   ymuint f1_id = f1->id();
 
   const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
@@ -212,8 +209,6 @@ void
 ConflictChecker::estimate_conflict(const vector<const TpgFault*>& fault_list,
 				   vector<ymuint>& conf_num_array)
 {
-  do_fsim(fault_list);
-
   conf_num_array.clear();
   conf_num_array.resize(mMaxFaultId, 0);
   ymuint fault_num = fault_list.size();
