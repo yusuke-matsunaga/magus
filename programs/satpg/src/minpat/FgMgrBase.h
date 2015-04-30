@@ -206,7 +206,6 @@ protected:
     /// @brief 故障を追加する．
     void
     add_fault(const TpgFault* fault,
-	      bool single_cube,
 	      const NodeValList& suf_list,
 	      const NodeValList& ma_list,
 	      const NodeValList& pi_suf_list);
@@ -236,16 +235,12 @@ protected:
     {
       // コンストラクタ
       FaultData(const TpgFault* fault,
-		bool single_cube,
 		const NodeValList& suf_list,
 		const NodeValList& ma_list,
 		const NodeValList& pi_suf_list);
 
       // 故障
       const TpgFault* mFault;
-
-      // single cube 条件
-      bool mSingleCube;
 
       // 十分割当リスト
       NodeValList mSufList;

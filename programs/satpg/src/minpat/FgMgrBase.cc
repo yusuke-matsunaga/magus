@@ -296,12 +296,11 @@ FgMgrBase::FaultGroup::set_id(ymuint id)
 // @brief 故障を追加する．
 void
 FgMgrBase::FaultGroup::add_fault(const TpgFault* fault,
-				 bool single_cube,
 				 const NodeValList& suf_list,
 				 const NodeValList& ma_list,
 				 const NodeValList& pi_suf_list)
 {
-  mFaultDataList.push_back(FaultData(fault, single_cube, suf_list, ma_list, pi_suf_list));
+  mFaultDataList.push_back(FaultData(fault, suf_list, ma_list, pi_suf_list));
   mSufList.merge(suf_list);
   mMaList.merge(ma_list);
   mPiSufList.merge(pi_suf_list);
@@ -368,12 +367,10 @@ FgMgrBase::FaultGroup::update()
 
 // コンストラクタ
 FgMgrBase::FaultGroup::FaultData::FaultData(const TpgFault* fault,
-					    bool single_cube,
 					    const NodeValList& suf_list,
 					    const NodeValList& ma_list,
 					    const NodeValList& pi_suf_list) :
   mFault(fault),
-  mSingleCube(single_cube),
   mSufList(suf_list),
   mMaList(ma_list),
   mPiSufList(pi_suf_list)

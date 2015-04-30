@@ -139,7 +139,7 @@ FgMgr1::add_fault(ymuint gid,
 
   if ( fi.single_cube() ) {
     const NodeValList& pi_suf_list = fi.pi_sufficient_assignment();
-    fg->add_fault(fault, true, ma_list, ma_list, pi_suf_list);
+    fg->add_fault(fault, ma_list, ma_list, pi_suf_list);
   }
   else {
     GvalCnf gval_cnf(max_node_id());
@@ -158,7 +158,7 @@ FgMgr1::add_fault(ymuint gid,
     NodeValList pi_suf_list;
     fval_cnf.get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
 
-    fg->add_fault(fault, false, suf_list, ma_list, pi_suf_list);
+    fg->add_fault(fault, suf_list, ma_list, pi_suf_list);
   }
 }
 
