@@ -12,6 +12,7 @@
 #include "FaultAnalyzer.h"
 #include "EqChecker.h"
 #include "DomChecker.h"
+#include "ConflictChecker.h"
 
 #include "YmUtils/RandGen.h"
 
@@ -84,9 +85,11 @@ MinPatSimple::init(const vector<const TpgFault*>& fault_list,
   // 支配故障のリスト
   vector<const TpgFault*> dom_fault_list;
   {
-    DomChecker checker2(analyzer(), tvmgr, fsim2);
-    checker2.get_dom_faults(rep_fault_list, dom_fault_list);
-    sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker2));
+    DomChecker checker(analyzer(), tvmgr, fsim2);
+    checker.get_dom_faults(rep_fault_list, dom_fault_list);
+
+    // 検出パタン数の少ない順に並べる．
+    sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker));
   }
 
   set_fault_list(dom_fault_list);
