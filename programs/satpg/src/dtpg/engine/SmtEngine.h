@@ -46,14 +46,14 @@ public:
   /// @param[in] sat_type SATソルバの種類を表す文字列
   /// @param[in] sat_option SATソルバに渡すオプション文字列
   /// @param[in] sat_outp SATソルバ用の出力ストリーム
-  /// @param[in] max_id ノード番号の最大値 + 1
+  /// @param[in] network 対象のネットワーク
   /// @param[in] bt バックトレーサー
   /// @param[in] dop パタンが求められた時に実行されるファンクタ
   /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
   SmtEngine(const string& sat_type,
 	    const string& sat_option,
 	    ostream* sat_outp,
-	    ymuint max_id,
+	    const TpgNetwork& network,
 	    BackTracer& bt,
 	    DetectOp& dop,
 	    UntestOp& uop);
@@ -115,17 +115,19 @@ protected:
   void
   cnf_end();
 
+  /// @brief ノードの最大番号を返す．
+  ymuint
+  max_node_id() const;
+
   /// @brief 故障位置を与えてその TFO の TFI リストを作る．
   /// @param[in] solver SAT ソルバ
   /// @param[in] fnode_list 故障位置のノードのリスト
-  /// @param[in] max_id ノード番号の最大値
   ///
   /// 結果は mTfoList に格納される．
   /// 故障位置の TFO が mTfoList の [0: mTfoEnd - 1] に格納される．
   void
   mark_region(Solver& solver,
-	      const vector<TpgNode*>& fnode_list,
-	      ymuint max_id);
+	      const vector<TpgNode*>& fnode_list);
 
   /// @brief TFO ノードの数を得る．
   ymuint
@@ -194,8 +196,7 @@ protected:
   void
   make_node_cnf(Solver& solver,
 		TpgNode* node,
-		const LitMap& litmap,
-		Literal output);
+		const LitMap& litmap);
 
   /// @brief ゲートの入出力の関係を表す CNF を作る．
   /// @param[in] solver SATソルバ
@@ -205,8 +206,7 @@ protected:
   void
   make_gate_cnf(Solver& solver,
 		tTgGateType type,
-		const LitMap& litmap,
-		Literal output);
+		const LitMap& litmap);
 
   /// @brief ノードの故障差関数を表すCNFを作る．
   void
@@ -378,7 +378,7 @@ protected:
   void
   make_and_cnf(Solver& solver,
 	       const LitMap& litmap,
-	       Literal output);
+	       bool inv);
 
   // 2入力 OR ゲートの入出力の関係を表す CNF 式を生成する．
   static
@@ -412,7 +412,7 @@ protected:
   void
   make_or_cnf(Solver& solver,
 	      const LitMap& litmap,
-	      Literal output);
+	      bool inv);
 
   // 2入力 XOR ゲートの入出力の関係を表す CNF 式を生成する．
   static
@@ -436,7 +436,7 @@ protected:
   void
   make_xor_cnf(Solver& solver,
 	       const LitMap& litmap,
-	       Literal output);
+	       bool inv);
 
 
 private:
@@ -479,8 +479,8 @@ protected:
   // SAT solver の記録用ストリーム
   ostream* mSatOutP;
 
-  // ノードのIDの最大値
-  ymuint32 mMaxNodeId;
+  // ネットワーク
+  const TpgNetwork& mNetwork;
 
   // バックトレーサー
   BackTracer& mBackTracer;

@@ -267,7 +267,7 @@ DelayCover::select(const BdnNode* node,
       break;
     }
   }
-  assert_cond(cut, __FILE__, __LINE__);
+  ASSERT_COND(cut );
   maprec.set_cut(node, cut);
   -- rd;
   for (ymuint i = 0; i < cut->input_num(); ++ i) {

@@ -171,7 +171,7 @@ MagCmd::find_or_new_nethandle(const string& name,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }
@@ -232,7 +232,7 @@ NetHandle*
 MagCmd::cur_nethandle() const
 {
   NetHandle* neth = mMagMgr->cur_nethandle();
-  assert_cond(neth != NULL, __FILE__, __LINE__);
+  ASSERT_COND(neth != NULL );
   return neth;
 }
 

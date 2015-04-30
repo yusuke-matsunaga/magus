@@ -15,10 +15,12 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief 'skip' タイプを生成する．
 // @param[in] threshold しきい値
+// @param[in] max_fault_id 故障番号の最大値
 UntestOp*
-new_UopSkip(ymuint threshold)
+new_UopSkip(ymuint threshold,
+	    ymuint max_fault_id)
 {
-  return new UopSkip(threshold);
+  return new UopSkip(threshold, max_fault_id);
 }
 
 
@@ -28,7 +30,10 @@ new_UopSkip(ymuint threshold)
 
 // @brief コンストラクタ
 // @param[in] threshold しきい値
-UopSkip::UopSkip(ymuint threshold)
+// @param[in] max_fault_id 故障番号の最大値
+UopSkip::UopSkip(ymuint threshold,
+		 ymuint max_fault_id) :
+  mUntestCountArray(max_fault_id, 0)
 {
   mThreshold = threshold;
 }
@@ -42,20 +47,21 @@ UopSkip::~UopSkip()
 // @brief テスト不能故障と判定された時の処理
 // @param[in] f 故障
 void
-UopSkip::operator()(TpgFault* f)
+UopSkip::operator()(const TpgFault* f)
 {
-  if ( f->untest_num() == 0 ) {
+  ymuint& untest_count = mUntestCountArray[f->id()];
+  if ( untest_count == 0 ) {
     // はじめて検出不能になった．
-    mUntestList.push_back(f);
+    mUntestList.push_back(f->id());
   }
 
   // 検出不能回数を1増やす．
-  f->inc_untest_num();
+  ++ untest_count;
 
-  if ( f->untest_num() >= mThreshold ) {
+  if ( untest_count >= mThreshold ) {
     // 検出不能回数がしきい値を越えたのでスキップする．
-    f->set_skip();
-    mSkipList.push_back(f);
+    //f->set_skip();
+    mSkipList.push_back(f->id());
   }
 }
 
@@ -63,15 +69,15 @@ UopSkip::operator()(TpgFault* f)
 void
 UopSkip::clear()
 {
-  for (vector<TpgFault*>::iterator p = mUntestList.begin();
+  for (vector<ymuint>::iterator p = mUntestList.begin();
        p != mUntestList.end(); ++ p) {
-    TpgFault* f = *p;
-    f->clear_untest_num();
+    ymuint fid = *p;
+    mUntestCountArray[fid] = 0;
   }
-  for (vector<TpgFault*>::iterator p = mSkipList.begin();
+  for (vector<ymuint>::iterator p = mSkipList.begin();
        p != mSkipList.end(); ++ p) {
-    TpgFault* f = *p;
-    f->clear_skip();
+    ymuint fid = *p;
+    //f->clear_skip();
   }
   mUntestList.clear();
   mSkipList.clear();

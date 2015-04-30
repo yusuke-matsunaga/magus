@@ -102,7 +102,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
 	reg_decl(vpiNet, decl);
 
 	handle = find_obj(parent, name);
-	assert_cond(handle, __FILE__, __LINE__);
+	ASSERT_COND(handle );
       }
     }
     if ( handle == NULL ) {
@@ -187,7 +187,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
   }
 
   const VlDeclBase* decl_base = primary->decl_base();
-  assert_cond( decl_base != NULL, __FILE__, __LINE__);
+  ASSERT_COND( decl_base != NULL );
   tVpiObjType decl_type = decl_base->type();
 
   if ( !check_decl(env, pt_expr, decl_type, is_array,
@@ -370,7 +370,7 @@ ExprGen::instantiate_primary(const VlNamedObj* parent,
       }
 
     case kVpiNoRange:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }
@@ -384,9 +384,9 @@ ElbExpr*
 ExprGen::instantiate_namedevent(const VlNamedObj* parent,
 				const PtExpr* pt_expr)
 {
-  assert_cond(pt_expr->type() == kPtPrimaryExpr, __FILE__, __LINE__);
-  assert_cond(pt_expr->left_range() == NULL, __FILE__, __LINE__);
-  assert_cond(pt_expr->right_range() == NULL, __FILE__, __LINE__);
+  ASSERT_COND(pt_expr->type() == kPtPrimaryExpr );
+  ASSERT_COND(pt_expr->left_range() == NULL );
+  ASSERT_COND(pt_expr->right_range() == NULL );
 
   // 識別子の階層
   PtNameBranchArray nb_array = pt_expr->namebranch_array();
@@ -422,7 +422,7 @@ ExprGen::instantiate_namedevent(const VlNamedObj* parent,
   }
 
   const VlDeclBase* decl_base = primary->decl_base();
-  assert_cond( decl_base != NULL, __FILE__, __LINE__);
+  ASSERT_COND( decl_base != NULL );
   tVpiObjType decl_type = decl_base->type();
   if ( decl_type != kVpiNamedEvent ) {
     // 型が違う
@@ -890,11 +890,11 @@ ExprGen::evaluate_primary(const VlNamedObj* parent,
 	  index2 = index1;
 	  index1 = index1 - range + 1;
 	}
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	break;
 
       case kVpiNoRange:
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	break;
       }
       ymuint msb_offset;

@@ -24,8 +24,10 @@ class DopTvList :
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] tvmgr テストベクタのマネージャ
   /// @param[in] tvlist テストベクタのリスト
-  DopTvList(vector<TestVector*>& tvlist);
+  DopTvList(TvMgr& tvmgr,
+	    vector<TestVector*>& tvlist);
 
   /// @brief デストラクタ
   virtual
@@ -39,17 +41,20 @@ public:
 
   /// @brief テストパタンが見つかった時の処理
   /// @param[in] f 故障
-  /// @param[in] tv テストパタン
+  /// @param[in] assign_list 値割当のリスト
   virtual
   void
-  operator()(TpgFault* f,
-	     TestVector* tv);
+  operator()(const TpgFault* f,
+	     const NodeValList& assign_list);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // テストベクタのマネージャ
+  TvMgr& mTvMgr;
 
   // テストベクタのリスト
   vector<TestVector*>& mTvList;

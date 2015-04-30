@@ -159,7 +159,7 @@ ILPGen::found(SbjNode* root,
     SbjNode* inode = cut->input(i);
     if ( inode->is_input() ) continue;
     const list<ILPGenCut*>& cut_list = mAllCut[inode->id()];
-    assert_cond(!cut_list.empty(), __FILE__, __LINE__);
+    ASSERT_COND(!cut_list.empty() );
     for (list<ILPGenCut*>::const_iterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
       ILPGenCut* cut1 = *p;

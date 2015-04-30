@@ -26,7 +26,7 @@ dump(ostream& s,
     s << "PORT#" << i << "(" << port->name() << "): ";
 
     ymuint nb = port->bit_width();
-    assert_cond( nb > 0 , __FILE__, __LINE__);
+    ASSERT_COND( nb > 0  );
     if ( nb == 1 ) {
       const LnNode* node = port->bit(0);
       s << node->id_str();
@@ -137,7 +137,7 @@ lut_name(const LnNode* node)
   vector<int> tv;
   node->tv(tv);
   ymuint nip = 1U << ni;
-  assert_cond( tv.size() == nip, __FILE__, __LINE__);
+  ASSERT_COND( tv.size() == nip );
 
   ostringstream buf;
   buf << "lut" << ni << "_";
@@ -177,7 +177,7 @@ dump_lut(ostream& s,
 
   vector<int> tv;
   node->tv(tv);
-  assert_cond( tv.size() == nip, __FILE__, __LINE__);
+  ASSERT_COND( tv.size() == nip );
 
   s << endl;
   s << "primitive " << name << " ( ";
@@ -257,7 +257,7 @@ dump_verilog(ostream& s,
     const LnPort* port = lngraph.port(i);
     s << sep << "." << port->name() << "(";
     ymuint nb = port->bit_width();
-    assert_cond( nb > 0 , __FILE__, __LINE__);
+    ASSERT_COND( nb > 0  );
     if ( nb == 1 ) {
       const LnNode* node = port->bit(0);
       s << node_name(node);
@@ -309,7 +309,7 @@ dump_verilog(ostream& s,
     const LnNode* node = *p;
     const LnEdge* e = node->fanin_edge(0);
     const LnNode* inode = e->from();
-    assert_cond( inode != NULL, __FILE__, __LINE__);
+    ASSERT_COND( inode != NULL );
     s << "  assign " << node_name(node)
       << " = " << node_name(inode) << ";" << endl;
   }

@@ -276,7 +276,7 @@ void
 PyCellGroup_set_rep(PyObject* py_obj,
 		    PyObject* rep_obj)
 {
-  assert_cond( PyCellGroup_Check(py_obj), __FILE__, __LINE__);
+  ASSERT_COND( PyCellGroup_Check(py_obj) );
 
   CellGroupObject* group_obj = (CellGroupObject*)py_obj;
   group_obj->mRepClass = rep_obj;

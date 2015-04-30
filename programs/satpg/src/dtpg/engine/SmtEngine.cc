@@ -12,10 +12,14 @@
 #include "DetectOp.h"
 #include "UntestOp.h"
 #include "DtpgStats.h"
+#include "TpgNetwork.h"
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "BackTracer.h"
 #include "LitMap.h"
+#include "GvarLitMap.h"
+#include "FvarLitMap.h"
+#include "VectLitMap.h"
 #include "../../graphsat/GraphSat.h"
 #include "YmLogic/SatStats.h"
 
@@ -26,21 +30,21 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] sat_type SATソルバの種類を表す文字列
 // @param[in] sat_option SATソルバに渡すオプション文字列
 // @param[in] sat_outp SATソルバ用の出力ストリーム
-// @param[in] max_id ノード番号の最大値 + 1
+// @param[in] network 対象のネットワーク
 // @param[in] bt バックトレーサー
 // @param[in] dop パタンが求められた時に実行されるファンクタ
 // @param[in] uop 検出不能と判定された時に実行されるファンクタ
 SmtEngine::SmtEngine(const string& sat_type,
 		     const string& sat_option,
 		     ostream* sat_outp,
-		     ymuint max_id,
+		     const TpgNetwork& network,
 		     BackTracer& bt,
 		     DetectOp& dop,
 		     UntestOp& uop) :
   mSatType(sat_type),
   mSatOption(sat_option),
   mSatOutP(sat_outp),
-  mMaxNodeId(max_id),
+  mNetwork(network),
   mBackTracer(bt),
   mDetectOp(dop),
   mUntestOp(uop)
@@ -112,20 +116,18 @@ END_NONAMESPACE
 // @brief 故障位置を与えてその TFO の TFI リストを作る．
 // @param[in] solver SAT ソルバ
 // @param[in] fnode_list 故障位置のノードのリスト
-// @param[in] max_id ノード番号の最大値
 //
 // 結果は mTfoList に格納される．
 // 故障位置の TFO が mTfoList の [0: mTfoEnd1 - 1] に格納される．
 void
 SmtEngine::mark_region(Solver& solver,
-		       const vector<TpgNode*>& fnode_list,
-		       ymuint max_id)
+		       const vector<TpgNode*>& fnode_list)
 {
   mMarkArray.clear();
-  mMarkArray.resize(max_id, 0U);
+  mMarkArray.resize(mNetwork.max_node_id(), 0U);
 
   mTfoList.clear();
-  mTfoList.reserve(max_id);
+  mTfoList.reserve(mNetwork.max_node_id());
 
   mInputList.clear();
   mOutputList.clear();
@@ -172,6 +174,13 @@ SmtEngine::mark_region(Solver& solver,
   }
 
   sort(mOutputList.begin(), mOutputList.end(), Lt());
+}
+
+// @brief ノードの最大番号を返す．
+ymuint
+SmtEngine::max_node_id() const
+{
+  return mNetwork.max_node_id();
 }
 
 // @brief 節の作成用の作業領域の使用を開始する．
@@ -227,8 +236,7 @@ void
 SmtEngine::make_gnode_cnf(Solver& solver,
 			  TpgNode* node)
 {
-  Literal output(node->gvar(), false);
-  make_node_cnf(solver, node, GvarLitMap(node), output);
+  make_node_cnf(solver, node, GvarLitMap(node));
 }
 
 // @brief 故障回路のノードの入出力の関係を表す CNF を作る．
@@ -239,8 +247,7 @@ SmtEngine::make_fnode_cnf(Solver& solver,
 			  TpgNode* node)
 {
   if ( !node->has_flt_var() ) {
-    Literal output(node->fvar(), false);
-    make_node_cnf(solver, node, FvarLitMap(node), output);
+    make_node_cnf(solver, node, FvarLitMap(node));
     return;
   }
   ymuint ni = node->fanin_num();
@@ -302,7 +309,7 @@ SmtEngine::make_fnode_cnf(Solver& solver,
     make_buff_cnf(solver, glit, output);
   }
   else {
-    make_node_cnf(solver, node, VectLitMap(ivars), output);
+    make_node_cnf(solver, node, VectLitMap(ivars, ovar));
   }
 }
 
@@ -326,8 +333,6 @@ SmtEngine::make_fault_cnf(Solver& solver,
   else {
     ymuint fpos = fault->pos();
 
-    Literal output(node->fvar(), false);
-
     // fpos 以外の入力を ivars[] に入れる．
     ymuint ni = node->fanin_num();
     vector<VarId> ivars;
@@ -339,44 +344,48 @@ SmtEngine::make_fault_cnf(Solver& solver,
       TpgNode* inode = node->fanin(i);
       ivars.push_back(inode->gvar());
     }
+    VarId ovar = node->fvar();
 
+    bool inv = false;
     switch ( node->gate_type() ) {
     case kTgGateBuff:
     case kTgGateNot:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
 
     case kTgGateNand:
-      output = ~output;
-      // わざと次に続く
+      ASSERT_COND( fval == 1 );
+      make_and_cnf(solver, VectLitMap(ivars, ovar), true);
+      break;
 
     case kTgGateAnd:
-      assert_cond( fval == 1, __FILE__, __LINE__);
-      make_and_cnf(solver, VectLitMap(ivars), output);
+      ASSERT_COND( fval == 1 );
+      make_and_cnf(solver, VectLitMap(ivars, ovar), false);
       break;
 
     case kTgGateNor:
-      output = ~output;
-      // わざと次に続く
+      ASSERT_COND( fval == 0 );
+      make_or_cnf(solver, VectLitMap(ivars, ovar), true);
+      break;
 
     case kTgGateOr:
-      assert_cond( fval == 0, __FILE__, __LINE__);
-      make_or_cnf(solver, VectLitMap(ivars), output);
+      ASSERT_COND( fval == 0 );
+      make_or_cnf(solver, VectLitMap(ivars, ovar), false);
       break;
 
     case kTgGateXnor:
-      output = ~output;
+      inv = true;
       // わざと次に続く
 
     case kTgGateXor:
       if ( fval == 1 ) {
-	output = ~output;
+	inv = !inv;
       }
-      make_xor_cnf(solver, VectLitMap(ivars), output);
+      make_xor_cnf(solver, VectLitMap(ivars, ovar), inv);
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }
@@ -389,8 +398,7 @@ SmtEngine::make_fault_cnf(Solver& solver,
 void
 SmtEngine::make_node_cnf(Solver& solver,
 			 TpgNode* node,
-			 const LitMap& litmap,
-			 Literal output)
+			 const LitMap& litmap)
 {
   if ( node->is_input() ) {
     return;
@@ -398,62 +406,51 @@ SmtEngine::make_node_cnf(Solver& solver,
 
   if ( node->is_output() ) {
     Literal input = litmap.input(0);
+    Literal output = litmap.output();
     make_buff_cnf(solver, input, output);
     return;
   }
 
   if ( node->is_logic() ) {
-    make_gate_cnf(solver, node->gate_type(), litmap, output);
+    Literal output = litmap.output();
+    switch ( node->gate_type() ) {
+    case kTgGateNot:
+      make_buff_cnf(solver, litmap.input(0), ~output);
+      break;
+
+    case kTgGateBuff:
+      make_buff_cnf(solver, litmap.input(0), output);
+      break;
+
+    case kTgGateNand:
+      make_and_cnf(solver, litmap, true);
+      break;
+
+    case kTgGateAnd:
+      make_and_cnf(solver, litmap, false);
+      break;
+
+    case kTgGateNor:
+      make_or_cnf(solver, litmap, true);
+      break;
+
+    case kTgGateOr:
+      make_or_cnf(solver, litmap, false);
+      break;
+
+    case kTgGateXnor:
+      make_xor_cnf(solver, litmap, true);
+      break;
+
+    case kTgGateXor:
+      make_xor_cnf(solver, litmap, false);
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
     return;
-  }
-}
-
-// @brief ゲートの入出力の関係を表す CNF を作る．
-// @param[in] solver SATソルバ
-// @param[in] type ゲートの種類
-// @param[in] litmap 入出力のリテラルを保持するクラス
-void
-SmtEngine::make_gate_cnf(Solver& solver,
-			 tTgGateType type,
-			 const LitMap& litmap,
-			 Literal output)
-{
-  ymuint ni = litmap.input_size();
-  switch ( type ) {
-  case kTgGateNot:
-    output = ~output;
-    // わざと次に続く
-
-  case kTgGateBuff:
-    make_buff_cnf(solver, litmap.input(0), output);
-    break;
-
-  case kTgGateNand:
-    output = ~output;
-    // わざと次に続く
-  case kTgGateAnd:
-    make_and_cnf(solver, litmap, output);
-    break;
-
-  case kTgGateNor:
-    output = ~output;
-    // わざと次に続く
-
-  case kTgGateOr:
-    make_or_cnf(solver, litmap, output);
-    break;
-
-  case kTgGateXnor:
-    output = ~output;
-    // わざと次に続く
-
-  case kTgGateXor:
-    make_xor_cnf(solver, litmap, output);
-    break;
-
-  default:
-    assert_not_reached(__FILE__, __LINE__);
-    break;
   }
 }
 
@@ -872,11 +869,12 @@ inline
 void
 SmtEngine::make_and_cnf(Solver& solver,
 			const LitMap& litmap,
-			Literal output)
+			bool inv)
 {
   ymuint n = litmap.input_size();
+  Literal output = inv ? ~litmap.output() : litmap.output();
   switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
+  case 0: ASSERT_NOT_REACHED; break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
   case 2: make_and2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
   case 3: make_and3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;
@@ -943,11 +941,12 @@ inline
 void
 SmtEngine::make_or_cnf(Solver& solver,
 		       const LitMap& litmap,
-		       Literal output)
+		       bool inv)
 {
   ymuint n = litmap.input_size();
+  Literal output = inv ? ~litmap.output() : litmap.output();
   switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
+  case 0: ASSERT_NOT_REACHED; break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
   case 2: make_or2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
   case 3: make_or3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;
@@ -1002,11 +1001,12 @@ inline
 void
 SmtEngine::make_xor_cnf(Solver& solver,
 			const LitMap& litmap,
-			Literal output)
+			bool inv)
 {
   ymuint n = litmap.input_size();
+  Literal output = inv ? ~litmap.output() : litmap.output();
   switch ( n ) {
-  case 0: assert_not_reached(__FILE__, __LINE__); break;
+  case 0: ASSERT_NOT_REACHED; break;
   case 1: make_buff_cnf(solver, litmap.input(0), output); return;
   case 2: make_xor2_cnf(solver, litmap.input(0), litmap.input(1), output); return;
   case 3: make_xor3_cnf(solver, litmap.input(0), litmap.input(1), litmap.input(2), output); return;

@@ -75,7 +75,7 @@ LsimNaive::eval(const vector<ymuint64>& iv,
   }
 
   ymuint ni = mInputList.size();
-  assert_cond( ni == iv.size(), __FILE__, __LINE__);
+  ASSERT_COND( ni == iv.size() );
   for (ymuint i = 0; i < ni; ++ i) {
     const BdnNode* node = mInputList[i];
     mValArray[node->id()] = iv[i];

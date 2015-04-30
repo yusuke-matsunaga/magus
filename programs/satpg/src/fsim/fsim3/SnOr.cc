@@ -199,7 +199,7 @@ SnOr3::calc_gobs3(ymuint ipos)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   PackedVal pat0 = mFanins[idx1]->gval_0();
@@ -287,7 +287,7 @@ SnOr4::calc_gobs3(ymuint ipos)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   PackedVal pat0 = mFanins[idx1]->gval_0();

@@ -30,6 +30,8 @@ FaultMgr::~FaultMgr()
 void
 FaultMgr::clear()
 {
+  mStatusArray.clear();
+
   mDetList.clear();
   mRemainList.clear();
   mUntestList.clear();
@@ -39,44 +41,57 @@ FaultMgr::clear()
 
 // @brief network の故障を設定する．
 void
-FaultMgr::set_faults(TpgNetwork& network)
+FaultMgr::set_faults(const TpgNetwork& network)
 {
   clear();
 
-  const vector<TpgFault*>& rep_faults = network.rep_faults();
+  const vector<const TpgFault*>& rep_faults = network.rep_faults();
+
+  ymuint max_id = 0;
+  for (ymuint i = 0; i < rep_faults.size(); ++ i) {
+    const TpgFault* f = rep_faults[i];
+    if ( max_id < f->id() ) {
+      max_id = f->id();
+    }
+  }
+  ++ max_id;
+
+  mStatusArray.resize(max_id, kFsUndetected);
 
   // 最初はすべての故障が mRemainList に属する．
   for (ymuint i = 0; i < rep_faults.size(); ++ i) {
-    TpgFault* f = rep_faults[i];
+    const TpgFault* f = rep_faults[i];
     // ただし，外部出力に到達できない故障は検出不能となる．
     if ( f->node()->is_active() ) {
       mRemainList.push_back(f);
     }
     else {
       mUntestList.push_back(f);
+      set_status(f, kFsUntestable);
     }
   }
 }
 
 // @brief fault の状態を変更する．
 void
-FaultMgr::set_status(TpgFault* fault,
+FaultMgr::set_status(const TpgFault* fault,
 		     FaultStatus stat)
 {
-  fault->mStatus = stat;
+  ASSERT_COND( fault->id() < mStatusArray.size() );
+  mStatusArray[fault->id()] = stat;
   mChanged = true;
 }
 
 // @brief 故障リストをスキャンして未検出リストを更新する．
 void
-FaultMgr::update()
+FaultMgr::update() const
 {
   if ( mChanged ) {
     ymuint n = mRemainList.size();
     ymuint wpos = 0;
     for (ymuint rpos = 0; rpos < n; ++ rpos) {
-      TpgFault* f = mRemainList[rpos];
-      switch ( f->status() ) {
+      const TpgFault* f = mRemainList[rpos];
+      switch ( status(f) ) {
       case kFsUndetected:
 	if ( wpos != rpos ) {
 	  mRemainList[wpos] = f;
@@ -93,7 +108,6 @@ FaultMgr::update()
 	break;
 
       case kFsAborted:
-	set_status(f, kFsUndetected);
 	if ( wpos != rpos ) {
 	  mRemainList[wpos] = f;
 	}

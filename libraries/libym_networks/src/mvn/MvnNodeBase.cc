@@ -59,7 +59,7 @@ MvnNodeBase::input_num() const
 const MvnInputPin*
 MvnNodeBase::input(ymuint pos) const
 {
-  assert_cond( pos < mInputNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mInputNum );
   return mInputArray + pos;
 }
 
@@ -68,7 +68,7 @@ MvnNodeBase::input(ymuint pos) const
 MvnInputPin*
 MvnNodeBase::_input(ymuint pos)
 {
-  assert_cond( pos < mInputNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mInputNum );
   return mInputArray + pos;
 }
 

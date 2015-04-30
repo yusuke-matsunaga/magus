@@ -183,7 +183,7 @@ EiBitSelect::lhs_elem_num() const
 const VlExpr*
 EiBitSelect::lhs_elem(ymuint pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return this;
 }
 

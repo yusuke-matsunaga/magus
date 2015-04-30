@@ -43,9 +43,38 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // simple オプション
+  TclPopt* mPoptSimple;
+
+  // simple2 オプション
+  TclPopt* mPoptSimple2;
+
+  // dsatur オプション
+  TclPopt* mPoptDsatur;
+
+  // dsatur2 オプション
+  TclPopt* mPoptDsatur2;
+
+  // group-dominance オプション
+  TclPopt* mPoptGroupDominance;
+
+  // fault-dominance オプション
+  TclPopt* mPoptFaultDominance;
+
   // print_stats オプションの解析用オブジェクト
   TclPopt* mPoptPrintStats;
 
+  // verbose オプションの解析用オブジェクト
+  TclPoptInt* mPoptVerbose;
+
+  // dom_method オプションの解析用オブジェクト
+  TclPoptInt* mPoptDomMethod;
+
+  // exact オプションの解析用オブジェクト
+  TclPopt* mPoptExact;
+
+  // compaction オプションの解析用オブジェクト
+  TclPopt* mPoptCompaction;
 };
 
 END_NAMESPACE_YM_SATPG

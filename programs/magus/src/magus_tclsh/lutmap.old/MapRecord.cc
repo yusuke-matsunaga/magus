@@ -201,7 +201,7 @@ MapRecord::back_trace(SbjNode* node,
 
   if ( node->is_input() ) {
     // ということは inv = true のはず．
-    assert_cond(inv, __FILE__, __LINE__);
+    ASSERT_COND(inv );
     // NOT ゲートを表す LUT を作る．
     vector<LnNode*> inputs(1, node_info.mMapNode[0]);
     Expr expr; // ダミー

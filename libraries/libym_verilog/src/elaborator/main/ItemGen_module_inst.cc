@@ -363,7 +363,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
     if ( conn_by_name ) {
       // 名前による割り当ての場合はポート名で探す．
       const char* port_name = pt_con->name();
-      assert_cond(port_name != NULL, __FILE__, __LINE__);
+      ASSERT_COND(port_name != NULL );
       if ( !port_index.find(port_name, index) ) {
 	ostringstream buf;
 	buf << port_name << " : does not exist in the port list.";
@@ -423,7 +423,7 @@ ItemGen::link_module_array(ElbModuleArray* module_array,
 	}
       }
       else if ( port_size * module_size == expr_size ) {
-	assert_cond( module_size > 1, __FILE__, __LINE__);
+	ASSERT_COND( module_size > 1 );
 	// tmp を 分割する．
 	for (ymuint i = 0; i < module_size; ++ i) {
 	  ElbModule* module1 = module_array->_module(i);

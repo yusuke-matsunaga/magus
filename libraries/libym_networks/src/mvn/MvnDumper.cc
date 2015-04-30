@@ -144,7 +144,7 @@ dump_node(ostream& s,
     }
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   s << endl;
 

@@ -157,7 +157,7 @@ TvFunc::TvFunc(ymuint ni,
   mBlockNum(nblock(ni)),
   mVector(new ymuint64[mBlockNum])
 {
-  assert_cond( varid.val() < ni, __FILE__, __LINE__);
+  ASSERT_COND( varid.val() < ni );
   switch ( ni ) {
   case 1:
     if ( inv ) {
@@ -189,7 +189,7 @@ TvFunc::TvFunc(ymuint ni,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -224,7 +224,7 @@ TvFunc::TvFunc(ymuint ni,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -268,7 +268,7 @@ TvFunc::TvFunc(ymuint ni,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -321,7 +321,7 @@ TvFunc::TvFunc(ymuint ni,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -383,7 +383,7 @@ TvFunc::TvFunc(ymuint ni,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     break;
@@ -430,7 +430,7 @@ TvFunc::TvFunc(ymuint ni,
   mVector(new ymuint64[mBlockNum])
 {
   ymuint ni_pow = 1U << ni;
-  assert_cond(values.size() == ni_pow, __FILE__, __LINE__);
+  ASSERT_COND(values.size() == ni_pow );
   if ( ni <= NIPW ) {
     ymuint64 pat = 0UL;
     for (ymuint i = 0; i < ni_pow; ++ i) {
@@ -838,7 +838,7 @@ TvFunc::walsh_1(VarId varid) const
 {
   ymuint pos = varid.val();
   switch ( input_num() ) {
-  case 0: assert_not_reached(__FILE__, __LINE__);
+  case 0: ASSERT_NOT_REACHED;
   case 1: return (1 << 1) - count_onebits_1(mVector[0] ^ c_masks[pos]) * 2;
   case 2: return (1 << 2) - count_onebits_2(mVector[0] ^ c_masks[pos]) * 2;
   case 3: return (1 << 3) - count_onebits_3(mVector[0] ^ c_masks[pos]) * 2;
@@ -892,7 +892,7 @@ TvFunc::walsh_2(VarId var1,
   switch ( input_num() ) {
   case 0:
   case 1:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 
   case 2:
@@ -1773,7 +1773,7 @@ TvFunc::walsh_01(ymint vec[]) const
   default:
     ;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -3297,7 +3297,7 @@ TvFunc::walsh_012(int vec1[],
   default:
     ;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -3327,7 +3327,7 @@ walsh_w0_2(ymuint64* src_vec,
     c = (tmp >> (3 ^ ibits)) & 1;
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     nall = 0;
     c = 0;
   }
@@ -3366,7 +3366,7 @@ walsh_w0_3(ymuint64* src_vec,
     c = (tmp >> (7 ^ ibits)) & 1;
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     nall = 0;
     c = 0;
   }
@@ -3416,7 +3416,7 @@ walsh_w0_4(ymuint64* src_vec,
     c = (tmp >> (15 ^ ibits)) & 1;
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     nall = 0;
     c = 0;
   }
@@ -3530,7 +3530,7 @@ walsh_w0_5(ymuint64* src_vec,
   case 4: return walsh_w0_5_4(src_vec, ibits);
   case 5: return walsh_w0_5_5(src_vec, ibits);
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return 0;
@@ -3685,7 +3685,7 @@ walsh_w0_6(ymuint64* src_vec,
   case 5: return walsh_w0_6_5(src_vec, ibits);
   case 6: return walsh_w0_6_6(src_vec, ibits);
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return 0;
@@ -3805,7 +3805,7 @@ walsh_w0_7(ymuint64* src_vec,
   case 6: return walsh_w0_7_6(src_vec, ibits);
   case 7: return walsh_w0_7_7(src_vec, ibits);
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return 0;
@@ -3939,7 +3939,7 @@ walsh_w0_8(ymuint64* src_vec,
   case 7: return walsh_w0_8_7(src_vec, ibits);
   case 8: return walsh_w0_8_8(src_vec, ibits);
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return 0;
@@ -4087,7 +4087,7 @@ walsh_w0_9(ymuint64* src_vec,
   case 8: return walsh_w0_9_8(src_vec, ibits);
   case 9: return walsh_w0_9_9(src_vec, ibits);
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return 0;
@@ -4249,7 +4249,7 @@ walsh_w0_10(ymuint64* src_vec,
   case 9: return walsh_w0_10_9(src_vec, ibits);
   case 10: return walsh_w0_10_10(src_vec, ibits);
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return 0;
@@ -4292,7 +4292,7 @@ TvFunc::walsh_w0(ymuint w,
     case 10: ans = walsh_w0_11_10(mVector, ibits); break;
     case 11: ans = walsh_w0_11_11(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 12:
@@ -4311,7 +4311,7 @@ TvFunc::walsh_w0(ymuint w,
     case 11: ans = walsh_w0_12_11(mVector, ibits); break;
     case 12: ans = walsh_w0_12_12(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 13:
@@ -4331,7 +4331,7 @@ TvFunc::walsh_w0(ymuint w,
     case 12: ans = walsh_w0_13_12(mVector, ibits); break;
     case 13: ans = walsh_w0_13_13(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 14:
@@ -4352,7 +4352,7 @@ TvFunc::walsh_w0(ymuint w,
     case 13: ans = walsh_w0_14_13(mVector, ibits); break;
     case 14: ans = walsh_w0_14_14(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 15:
@@ -4374,7 +4374,7 @@ TvFunc::walsh_w0(ymuint w,
     case 14: ans = walsh_w0_15_14(mVector, ibits); break;
     case 15: ans = walsh_w0_15_15(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 16:
@@ -4397,7 +4397,7 @@ TvFunc::walsh_w0(ymuint w,
     case 15: ans = walsh_w0_16_15(mVector, ibits); break;
     case 16: ans = walsh_w0_16_16(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 17:
@@ -4421,7 +4421,7 @@ TvFunc::walsh_w0(ymuint w,
     case 16: ans = walsh_w0_17_16(mVector, ibits); break;
     case 17: ans = walsh_w0_17_17(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 18:
@@ -4446,7 +4446,7 @@ TvFunc::walsh_w0(ymuint w,
     case 17: ans = walsh_w0_18_17(mVector, ibits); break;
     case 18: ans = walsh_w0_18_18(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 19:
@@ -4472,7 +4472,7 @@ TvFunc::walsh_w0(ymuint w,
     case 18: ans = walsh_w0_19_18(mVector, ibits); break;
     case 19: ans = walsh_w0_19_19(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__); break;
+    ASSERT_NOT_REACHED; break;
     break;
 
   case 20:
@@ -4499,7 +4499,7 @@ TvFunc::walsh_w0(ymuint w,
     case 19: ans = walsh_w0_20_19(mVector, ibits); break;
     case 20: ans = walsh_w0_20_20(mVector, ibits); break;
     }
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 #endif
   default: // input_num() > 20
@@ -4714,7 +4714,7 @@ TvFunc::walsh_w1(VarId var,
 	c = (tmp >> (31 ^ ibits)) & 1;
 	break;
       default:
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
 	nall = 0;
 	c = 0;
       }
@@ -5072,7 +5072,7 @@ TvFunc::print(ostream& s,
     }
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

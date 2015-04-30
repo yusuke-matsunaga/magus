@@ -73,7 +73,7 @@ copy_logic(const BdnMgr& src_network,
   src_network.sort(node_list);
 
   ymuint nv = src_network.lnode_num();
-  assert_cond( nv == node_list.size(), __FILE__, __LINE__);
+  ASSERT_COND( nv == node_list.size() );
   for (ymuint i = 0; i < nv; ++ i) {
     const BdnNode* src_node = node_list[i];
     bool is_and = src_node->is_and();

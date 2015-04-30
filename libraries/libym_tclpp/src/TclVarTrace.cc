@@ -118,7 +118,7 @@ TclVarTrace::vartrace_callback(ClientData clientData,
 
   // 念のため trace_obj の持っているインタプリタと interp が一致
   // する事を確かめておく．
-  assert_cond( interp == trace_obj->interp(), __FILE__, __LINE__);
+  ASSERT_COND( interp == trace_obj->interp() );
 
   char* result = NULL;
 

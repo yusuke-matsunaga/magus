@@ -167,7 +167,7 @@ NetCmd::after_cmd_proc()
     // 上書きを考慮して関数を直接呼ばずに Tcl スクリプト
     // を評価させる．
     int stat = eval("::magus::pop_current_network");
-    assert_cond( stat == TCL_OK, __FILE__, __LINE__);
+    ASSERT_COND( stat == TCL_OK );
     mNetworkSpecified = false;
 
     set_result(result_obj);

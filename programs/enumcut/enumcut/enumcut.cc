@@ -132,7 +132,7 @@ SimpleOp::found_cut(BdnNode* root,
 void
 SimpleOp::node_end(BdnNode* node)
 {
-  assert_cond( node == mCurNode, __FILE__, __LINE__);
+  ASSERT_COND( node == mCurNode );
   ++ mCurPos;
   mNcAll += mNcCur;
 

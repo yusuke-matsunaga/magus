@@ -83,7 +83,7 @@ CellTechnology_repr(CellTechnologyObject* self)
   switch ( self->mVal ) {
   case kCellTechCmos: result = kCellTechCmosString; break;
   case kCellTechFpga: result = kCellTechFpgaString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -214,7 +214,7 @@ PyCellTechnology_FromCellTechnology(tCellTechnology val)
   switch ( val ) {
   case kCellTechCmos: result = Py_kCellTechCmos; break;
   case kCellTechFpga: result = Py_kCellTechFpga; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

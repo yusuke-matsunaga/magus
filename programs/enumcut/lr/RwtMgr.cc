@@ -102,7 +102,7 @@ RwtMgr::set_node(ymuint id,
 		 bool inv0,
 		 bool inv1)
 {
-  assert_cond( id < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( id < mNodeNum );
 
   RwtNode* node = &mNodeArray[id];
   RwtNode* node0 = &mNodeArray[fanin0];
@@ -168,7 +168,7 @@ traverse2(const RwtNode* node,
   }
 
   if ( !node->is_const0() ) {
-    assert_cond( !node->is_input(), __FILE__, __LINE__);
+    ASSERT_COND( !node->is_input() );
 
     traverse2(node->fanin0_node(), mark, node_list, last);
     traverse2(node->fanin1_node(), mark, node_list, last);
@@ -205,8 +205,8 @@ RwtMgr::set_func(RwtNode* node,
   }
   ymuint last = pat->mInputNum;
   traverse2(node, mark, pat->mNodeList, last);
-  assert_cond( last == n, __FILE__, __LINE__);
-  assert_cond( pat->mNodeList[n - 1] == node, __FILE__, __LINE__);
+  ASSERT_COND( last == n );
+  ASSERT_COND( pat->mNodeList[n - 1] == node );
 
   mNpnMgr.cannonical(f, pat->mCmap);
   TvFunc f1 = f.xform(pat->mCmap);

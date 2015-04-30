@@ -180,7 +180,7 @@ make_node_sub(BdnMgr& bdn,
   if ( func.is_xor() ) {
     return bdn.new_xor(child_nodes);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return BdnNodeHandle(); // ダミー
 }
 
@@ -192,7 +192,7 @@ BNetBdnConv::make_node(const BNode* bnode)
 {
   BdnNodeHandle node_handle;
   if ( !get_node(bnode, node_handle) ) {
-    assert_cond( bnode->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND( bnode->is_logic() );
     ymuint ni = bnode->fanin_num();
     vector<BdnNodeHandle> fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {

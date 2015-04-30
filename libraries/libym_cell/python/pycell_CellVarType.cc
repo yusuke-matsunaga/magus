@@ -173,7 +173,7 @@ CellVarType_repr(CellVarTypeObject* self)
   case kCellVarConstrainedPinTransition:            result = kCellVarConstrainedPinTransitionString; break;
   case kCellVarRelatedPinTransition:                result = kCellVarRelatedPinTransitionString; break;
   case kCellVarNone:                                result = kCellVarNoneString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -314,7 +314,7 @@ PyCellVarType_FromCellVarType(tCellVarType val)
   case kCellVarConstrainedPinTransition:            result = Py_kCellVarConstrainedPinTransition; break;
   case kCellVarRelatedPinTransition:                result = Py_kCellVarRelatedPinTransition; break;
   case kCellVarNone:                                result = Py_kCellVarNone; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

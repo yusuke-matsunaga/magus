@@ -343,7 +343,7 @@ DeclHeadNode::data(int column,
 	case kVpiVarTime:        return "Time";
 	case kVpiVarRealtime:    return "Realtime";
 	case kVpiVarNone:
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	}
 	break;
 

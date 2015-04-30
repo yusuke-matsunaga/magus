@@ -275,7 +275,7 @@ AigMgr::make_logic(const Expr& expr,
     }
     return make_xor(tmp_list);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return make_zero();
 }
 

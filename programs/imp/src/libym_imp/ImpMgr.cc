@@ -234,7 +234,7 @@ ImpMgr::make_tree(const Expr& expr,
   if ( expr.is_xor() ) {
     return make_xor(child_array, 0, nc);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ImpNodeHandle::make_zero();
 }
 
@@ -248,7 +248,7 @@ ImpMgr::make_and(const vector<ImpNodeHandle>& fanins,
 		 ymuint end)
 {
   ymuint n = end - begin;
-  assert_cond( n > 0, __FILE__, __LINE__);
+  ASSERT_COND( n > 0 );
 
   if ( n == 1 ) {
     return fanins[begin];
@@ -276,7 +276,7 @@ ImpMgr::make_xor(const vector<ImpNodeHandle>& fanins,
 		 ymuint end)
 {
   ymuint n = end - begin;
-  assert_cond( n > 0, __FILE__, __LINE__);
+  ASSERT_COND( n > 0 );
 
   if ( n == 1 ) {
     return fanins[begin];
@@ -470,7 +470,7 @@ ImpMgr::get_unodelist(vector<ImpNode*>& unode_list) const
 void
 ImpMgr::set_unjustified(ImpNode* node)
 {
-  assert_cond( node->mListIter == mUnodeList.end(), __FILE__, __LINE__);
+  ASSERT_COND( node->mListIter == mUnodeList.end() );
   mUnodeList.push_back(node);
   node->mListIter = mUnodeList.end();
   -- node->mListIter;
@@ -490,7 +490,7 @@ ImpMgr::set_ind_imp(ImpNode* src_node,
 		    ymuint src_val,
 		    const vector<ImpVal>& imp_list)
 {
-  assert_cond( src_val == 0 || src_val == 1, __FILE__, __LINE__);
+  ASSERT_COND( src_val == 0 || src_val == 1 );
   vector<ImpDst>& dst_list = src_node->mImpList[src_val];
   dst_list.clear();
   dst_list.reserve(imp_list.size());

@@ -427,8 +427,8 @@ CptCtrlStmt::CptCtrlStmt(const FileRegion& file_region,
   mDelay(delay),
   mBody(body)
 {
-  assert_cond(delay, __FILE__, __LINE__);
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(delay );
+  ASSERT_COND(body );
 }
 
 // デストラクタ
@@ -513,8 +513,8 @@ CptWait::CptWait(const FileRegion& file_region,
   mCond(cond),
   mBody(body)
 {
-  assert_cond(cond, __FILE__, __LINE__);
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(cond );
+  ASSERT_COND(body );
 }
 
 // デストラクタ
@@ -554,7 +554,7 @@ CptAssignBase::CptAssignBase(const FileRegion& file_region,
   CptStmt(file_region),
   mLhs(lhs)
 {
-  assert_cond(lhs, __FILE__, __LINE__);
+  ASSERT_COND(lhs );
 }
 
 // デストラクタ
@@ -581,7 +581,7 @@ CptAssign::CptAssign(const FileRegion& file_region,
   CptAssignBase(file_region, lhs),
   mRhs(rhs)
 {
-  assert_cond(rhs, __FILE__, __LINE__);
+  ASSERT_COND(rhs );
 }
 
 // デストラクタ
@@ -616,7 +616,7 @@ CptAssignC::CptAssignC(const FileRegion& file_region,
   CptAssign(file_region, lhs, rhs),
   mControl(control)
 {
-  assert_cond(control, __FILE__, __LINE__);
+  ASSERT_COND(control );
 }
 
 // デストラクタ
@@ -694,7 +694,7 @@ CptPcAssign::CptPcAssign(const FileRegion& file_region,
   CptAssignBase(file_region, lhs),
   mRhs(rhs)
 {
-  assert_cond(rhs, __FILE__, __LINE__);
+  ASSERT_COND(rhs );
 }
 
 // デストラクタ
@@ -800,7 +800,7 @@ CptEventStmt::CptEventStmt(const FileRegion& file_region,
   CptStmt(file_region),
   mPrimary(event)
 {
-  assert_cond(event, __FILE__, __LINE__);
+  ASSERT_COND(event );
 }
 
 // デストラクタ
@@ -858,7 +858,7 @@ CptIf::CptIf(const FileRegion& file_region,
   mCond(expr),
   mThen(then_body)
 {
-  assert_cond(expr, __FILE__, __LINE__);
+  ASSERT_COND(expr );
 }
 
 // デストラクタ
@@ -900,7 +900,7 @@ CptIfElse::CptIfElse(const FileRegion& file_region,
   CptIf(file_region, expr, then_body),
   mElse(else_body)
 {
-  assert_cond(expr, __FILE__, __LINE__);
+  ASSERT_COND(expr );
 }
 
 // デストラクタ
@@ -928,7 +928,7 @@ CptCase::CptCase(const FileRegion& file_region,
   mExpr(expr),
   mCaseItemArray(caseitem_array)
 {
-  assert_cond(expr, __FILE__, __LINE__);
+  ASSERT_COND(expr );
 }
 
 // デストラクタ
@@ -1027,7 +1027,7 @@ CptCaseItem::CptCaseItem(const FileRegion& file_region,
   mLabelArray(label_array),
   mBody(body)
 {
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(body );
 }
 
 // デストラクタ
@@ -1076,7 +1076,7 @@ CptLoopStmt::CptLoopStmt(const FileRegion& file_region,
   CptStmt(file_region),
   mBody(body)
 {
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(body );
 }
 
 // デストラクタ
@@ -1127,7 +1127,7 @@ CptRepeat::CptRepeat(const FileRegion& file_region,
   CptLoopStmt(file_region, body),
   mExpr(expr)
 {
-  assert_cond(expr, __FILE__, __LINE__);
+  ASSERT_COND(expr );
 }
 
 // デストラクタ
@@ -1189,8 +1189,8 @@ CptFor::CptFor(const FileRegion& file_region,
   mInit(init),
   mNext(next)
 {
-  assert_cond(init, __FILE__, __LINE__);
-  assert_cond(next, __FILE__, __LINE__);
+  ASSERT_COND(init );
+  ASSERT_COND(next );
 }
 
 // デストラクタ

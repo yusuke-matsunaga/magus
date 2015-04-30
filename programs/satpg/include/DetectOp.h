@@ -34,11 +34,11 @@ public:
 
   /// @brief テストパタンが見つかった時の処理
   /// @param[in] f 故障
-  /// @param[in] tv テストパタン
+  /// @param[in] assign_list 値割当のリスト
   virtual
   void
-  operator()(TpgFault* f,
-	     TestVector* tv) = 0;
+  operator()(const TpgFault* f,
+	     const NodeValList& assign_list) = 0;
 
 };
 
@@ -55,9 +55,11 @@ new_DopDrop(FaultMgr& fmgr,
 	    Fsim& fsim);
 
 /// @brief 'tvlist' タイプを生成する．
+/// @param[in] tvmgr テストベクタのマネージャ
 /// @param[in] tvlist テストベクタのリスト
 DetectOp*
-new_DopTvList(vector<TestVector*>& tvlist);
+new_DopTvList(TvMgr& tvmgr,
+	      vector<TestVector*>& tvlist);
 
 /// @brief 'verify' タイプを生成する．
 /// @param[in] fsim 故障シミュレータ

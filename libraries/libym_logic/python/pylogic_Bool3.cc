@@ -117,7 +117,7 @@ Bool3_repr(Bool3Object* self)
   case kB3False: obj = Py_kB3FalseString; break;
   case kB3X:     obj = Py_kB3XString; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 

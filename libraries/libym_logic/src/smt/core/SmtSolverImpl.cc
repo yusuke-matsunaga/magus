@@ -182,7 +182,7 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -193,7 +193,7 @@ SmtSolverImpl::set_logic(tSmtLogic logic)
 void
 SmtSolverImpl::Core_init()
 {
-  assert_cond( kSmtSort_Bool < mSortArraySize, __FILE__, __LINE__);
+  ASSERT_COND( kSmtSort_Bool < mSortArraySize );
 
   // Bool 型の生成
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
@@ -242,7 +242,7 @@ SmtSolverImpl::Core_init()
 void
 SmtSolverImpl::Ints_init()
 {
-  assert_cond( kSmtSort_Int < mSortArraySize, __FILE__, __LINE__);
+  ASSERT_COND( kSmtSort_Int < mSortArraySize );
 
   // Int 型の生成
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
@@ -279,7 +279,7 @@ SmtSolverImpl::Ints_init()
 void
 SmtSolverImpl::Reals_init()
 {
-  assert_cond( kSmtSort_Real < mSortArraySize, __FILE__, __LINE__);
+  ASSERT_COND( kSmtSort_Real < mSortArraySize );
 
   // Real 型の生成
   void* p = mAlloc.get_memory(sizeof(SmtSimpleSort));
@@ -397,7 +397,7 @@ SmtSolverImpl::make_var(tSmtSortId sort,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 

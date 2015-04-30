@@ -120,7 +120,7 @@ inline
 const ImpVal&
 ImpVals::val(ymuint pos) const
 {
-  assert_cond( pos < mNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mNum );
   return mArray[pos];
 }
 
@@ -138,7 +138,7 @@ ImpVals::add(const ImpVal& val)
       break;
     }
   }
-  assert_cond( mNum < 5, __FILE__, __LINE__);
+  ASSERT_COND( mNum < 5 );
   if ( i < mNum ) {
     for (ymuint j = mNum - 1; j > i; --j) {
       mArray[j] = mArray[j - 1];

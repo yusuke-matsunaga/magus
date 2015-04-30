@@ -344,7 +344,7 @@ CellTimingType_repr(CellTimingTypeObject* self)
   case kCellTimingNochangeHighLow:       result = kCellTimingNochangeHighLowString; break;
   case kCellTimingNochangeLowHigh:       result = kCellTimingNochangeLowHighString; break;
   case kCellTimingNochangeLowLow:        result = kCellTimingNochangeLowLowString; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);
@@ -504,7 +504,7 @@ PyCellTimingType_FromCellTimingType(tCellTimingType val)
   case kCellTimingNochangeHighLow:       result = Py_kCellTimingNochangeHighLow; break;
   case kCellTimingNochangeLowHigh:       result = Py_kCellTimingNochangeLowHigh; break;
   case kCellTimingNochangeLowLow:        result = Py_kCellTimingNochangeLowLow; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

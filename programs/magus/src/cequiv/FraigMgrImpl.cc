@@ -323,7 +323,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       }
       if ( stat == kB3False ) {
 	add_pat(node);
-	assert_cond(node->check_1mark(), __FILE__, __LINE__);
+	ASSERT_COND(node->check_1mark() );
 	continue;
       }
       break;
@@ -337,7 +337,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       }
       if ( stat == kB3False ) {
 	add_pat(node);
-	assert_cond(node->check_0mark(), __FILE__, __LINE__);
+	ASSERT_COND(node->check_0mark() );
 	continue;
       }
       break;
@@ -365,7 +365,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
 
     if ( rehash ) {
       add_pat(node);
-      assert_cond(!compare_pat(node2, node, inv2), __FILE__, __LINE__);
+      ASSERT_COND(!compare_pat(node2, node, inv2) );
     }
     else {
       break;
@@ -505,7 +505,7 @@ FraigMgrImpl::set_loop_limit(ymuint val)
 void
 FraigMgrImpl::init_pat(FraigNode* node)
 {
-  assert_cond(node->mPat == NULL, __FILE__, __LINE__);
+  ASSERT_COND(node->mPat == NULL );
   node->mPat = new ymuint32[mPatSize];
 }
 
@@ -559,7 +559,7 @@ FraigMgrImpl::new_node()
   void* p = mAlloc.get_memory(sizeof(FraigNode));
   FraigNode* node = new (p) FraigNode();
   node->mVarId = mSolver.new_var();
-  assert_cond(node->mVarId.val() == mAllNodes.size(), __FILE__, __LINE__);
+  ASSERT_COND(node->mVarId.val() == mAllNodes.size() );
   init_pat(node);
   mAllNodes.push_back(node);
   return node;
@@ -697,7 +697,7 @@ FraigMgrImpl::check_condition(Literal lit1)
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
     VarId id = solver.new_var();
-    assert_cond(id == node->varid(), __FILE__, __LINE__);
+    ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
       Literal lito(id, false);
       Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
@@ -748,7 +748,7 @@ FraigMgrImpl::check_condition(Literal lit1,
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
     VarId id = solver.new_var();
-    assert_cond(id == node->varid(), __FILE__, __LINE__);
+    ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
       Literal lito(id, false);
       Literal lit1(node->fanin0()->varid(), node->fanin0_inv());

@@ -186,16 +186,16 @@ MislibMgrImpl::new_gate(const FileRegion& loc,
 			const MislibNode* pt_expr,
 			const MislibNode* pt_ipin_list)
 {
-  assert_cond(pt_name, __FILE__, __LINE__);
-  assert_cond(pt_name->type() == MislibNode::kStr, __FILE__, __LINE__);
-  assert_cond(pt_area, __FILE__, __LINE__);
-  assert_cond(pt_area->type() == MislibNode::kNum, __FILE__, __LINE__);
-  assert_cond(pt_oname, __FILE__, __LINE__);
-  assert_cond(pt_oname->type() == MislibNode::kStr, __FILE__, __LINE__);
-  assert_cond(pt_expr, __FILE__, __LINE__);
-  assert_cond(pt_expr->is_expr(), __FILE__, __LINE__);
-  assert_cond(pt_ipin_list, __FILE__, __LINE__);
-  assert_cond(pt_ipin_list->type() == MislibNode::kList, __FILE__, __LINE__);
+  ASSERT_COND(pt_name );
+  ASSERT_COND(pt_name->type() == MislibNode::kStr );
+  ASSERT_COND(pt_area );
+  ASSERT_COND(pt_area->type() == MislibNode::kNum );
+  ASSERT_COND(pt_oname );
+  ASSERT_COND(pt_oname->type() == MislibNode::kStr );
+  ASSERT_COND(pt_expr );
+  ASSERT_COND(pt_expr->is_expr() );
+  ASSERT_COND(pt_ipin_list );
+  ASSERT_COND(pt_ipin_list->type() == MislibNode::kList );
 
   void* p = mAlloc.get_memory(sizeof(MislibGate));
   MislibNodeImpl* gate = new (p) MislibGate(loc, pt_name, pt_area,

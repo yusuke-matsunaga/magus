@@ -105,7 +105,7 @@ RcfNodeImpl::is_mux() const
 ymuint
 RcfNodeImpl::input_id() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -123,7 +123,7 @@ RcfNodeImpl::fanin_num() const
 RcfNodeHandle
 RcfNodeImpl::fanin(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return RcfNodeHandle();
 }
 
@@ -131,7 +131,7 @@ RcfNodeImpl::fanin(ymuint pos) const
 ymuint
 RcfNodeImpl::conf_base() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -184,7 +184,7 @@ TvFunc
 RcfInputNode::calc_func(const vector<TvFunc>& func_array,
 			const vector<bool>& conf_bits) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return TvFunc::const_zero(0);
 }
 
@@ -195,7 +195,7 @@ bool
 RcfInputNode::simulate(const vector<bool>& val_array,
 		       const vector<bool>& conf_bits) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -242,7 +242,7 @@ RcfAndNode::fanin_num() const
 RcfNodeHandle
 RcfAndNode::fanin(ymuint pos) const
 {
-  assert_cond( pos < 2, __FILE__, __LINE__);
+  ASSERT_COND( pos < 2 );
   return mFanin[pos];
 }
 
@@ -319,7 +319,7 @@ RcfLutNode::fanin_num() const
 RcfNodeHandle
 RcfLutNode::fanin(ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mFanin[pos];
 }
 
@@ -434,7 +434,7 @@ RcfMuxNode::fanin_num() const
 RcfNodeHandle
 RcfMuxNode::fanin(ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mFanin[pos];
 }
 
@@ -465,7 +465,7 @@ RcfMuxNode::calc_func(const vector<TvFunc>& func_array,
       pos += (1U << i);
     }
   }
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return handle2func(mFanin[pos], func_array);
 }
 
@@ -482,7 +482,7 @@ RcfMuxNode::simulate(const vector<bool>& val_array,
       pos += (1U << i);
     }
   }
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return handle2val(mFanin[pos], val_array);
 }
 

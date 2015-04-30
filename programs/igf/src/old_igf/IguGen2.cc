@@ -75,7 +75,7 @@ IguGen2::solve(const vector<const Variable*>& variable_list,
 	       ymuint best_so_far,
 	       vector<const Variable*>& solution)
 {
-  assert_cond( !mVectorList.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mVectorList.empty() );
   mVectorLength = mVectorList[0]->size();
 
   mDsAll = mBddMgr.make_zero();
@@ -353,7 +353,7 @@ ymuint
 IguGen2::elem_count(Bdd f)
 {
   mpz_class mpz_val = f.minterm_count(mVectorLength * 2);
-  assert_cond( mpz_val.fits_uint_p(), __FILE__, __LINE__);
+  ASSERT_COND( mpz_val.fits_uint_p() );
   return mpz_val.get_ui();
 }
 
@@ -407,7 +407,7 @@ IguGen2::vects_to_bdd(const vector<const RegVect*>& vect_list0,
   }
 
   ymuint nvars = vect_list0[0]->size();
-  assert_cond( pos < nvars, __FILE__, __LINE__);
+  ASSERT_COND( pos < nvars );
 
   ymuint n0 = vect_list0.size();
   vector<const RegVect*> list0_0;

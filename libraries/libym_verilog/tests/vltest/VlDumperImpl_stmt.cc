@@ -33,7 +33,7 @@ VlDumperImpl::put_process(const char* label,
   switch ( process->type() ) {
   case kVpiInitial: nm = "Initial"; break;
   case kVpiAlways:  nm = "Always"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   VlDumpHeader x(this, label, nm);
 
@@ -204,7 +204,7 @@ VlDumperImpl::put_stmt(const char* label,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

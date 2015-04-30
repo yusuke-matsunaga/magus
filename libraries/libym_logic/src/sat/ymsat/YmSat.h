@@ -539,6 +539,7 @@ WatcherList&
 YmSat::watcher_list(Literal lit)
 {
   ymuint index = lit.index();
+  ASSERT_COND( index < (mVarNum * 2) );
   return mWatcherList[index];
 }
 
@@ -575,6 +576,7 @@ inline
 Bool3
 YmSat::eval(VarId id) const
 {
+  ASSERT_COND( id.val() < mVarNum );
   return cur_val(mVal[id.val()]);
 }
 
@@ -584,6 +586,7 @@ Bool3
 YmSat::eval(Literal l) const
 {
   ymuint index = l.index();
+  ASSERT_COND( (index / 2) < mVarNum );
   ymuint x = mVal[index / 2] & 3U;
   ymuint inv = index & 1U;
   int d = 1 - (inv * 2);
@@ -626,6 +629,7 @@ YmSat::assign(Literal lit,
   ymuint vindex = lindex / 2;
   ymuint inv = lindex & 1U;
   ymuint8 x = 2 - inv * 2;
+  ASSERT_COND( vindex < mVarNum );
   mVal[vindex] = x;
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
@@ -647,6 +651,7 @@ inline
 int
 YmSat::decision_level(VarId varid) const
 {
+  ASSERT_COND( varid.val() < mVarNum );
   return mDecisionLevel[varid.val()];
 }
 
@@ -655,6 +660,7 @@ inline
 SatReason
 YmSat::reason(VarId varid) const
 {
+  ASSERT_COND( varid.val() < mVarNum );
   return mReason[varid.val()];
 }
 

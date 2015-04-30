@@ -38,7 +38,7 @@ BNetIscas89Handler::set_network(BNetwork* network)
 bool
 BNetIscas89Handler::init()
 {
-  assert_cond( mManip == NULL, __FILE__, __LINE__);
+  ASSERT_COND( mManip == NULL );
 
   mManip = new BNetManip(mNetwork);
   mNetwork->clear();
@@ -103,47 +103,47 @@ BNetIscas89Handler::read_gate(const FileRegion& loc,
   BNode* onode = get_node(oname_id);
   switch ( type ) {
   case kGt89BUFF:
-    assert_cond(mCurFanins.size() == 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() == 1 );
     status = mManip->change_to_buffer(onode, mCurFanins[0]);
     break;
 
   case kGt89NOT:
-    assert_cond(mCurFanins.size() == 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() == 1 );
     status = mManip->change_to_inverter(onode, mCurFanins[0]);
     break;
 
   case kGt89AND:
-    assert_cond(mCurFanins.size() > 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() > 1 );
     status = mManip->change_to_and(onode, mCurFanins);
     break;
 
   case kGt89NAND:
-    assert_cond(mCurFanins.size() > 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() > 1 );
     status = mManip->change_to_nand(onode, mCurFanins);
     break;
 
   case kGt89OR:
-    assert_cond(mCurFanins.size() > 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() > 1 );
     status = mManip->change_to_or(onode, mCurFanins);
     break;
 
   case kGt89NOR:
-    assert_cond(mCurFanins.size() > 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() > 1 );
     status = mManip->change_to_nor(onode, mCurFanins);
     break;
 
   case kGt89XOR:
-    assert_cond(mCurFanins.size() > 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() > 1 );
     status = mManip->change_to_xor(onode, mCurFanins);
     break;
 
   case kGt89XNOR:
-    assert_cond(mCurFanins.size() > 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() > 1 );
     status = mManip->change_to_xnor(onode, mCurFanins);
     break;
 
   case kGt89DFF:
-    assert_cond(mCurFanins.size() == 1, __FILE__, __LINE__);
+    ASSERT_COND(mCurFanins.size() == 1 );
     status = mManip->change_latch(onode, mCurFanins[0], 2);
   }
   return status;
@@ -157,7 +157,7 @@ BNetIscas89Handler::normal_exit()
        p != mNetwork->outputs_end(); ++ p) {
     BNode* onode = *p;
     BNode* node = mNetwork->find_node(onode->name());
-    assert_cond(node, __FILE__, __LINE__);
+    ASSERT_COND(node );
     mManip->change_output(onode, node);
   }
   delete mManip;

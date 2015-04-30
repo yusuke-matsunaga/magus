@@ -28,7 +28,7 @@ public:
   /// @param[in] f_list 故障のリスト
   /// @param[in] max_fault_id 故障IDの最大値+1
   FopKDet(Fsim& fsim,
-	  const vector<TpgFault*>& f_list,
+	  const vector<const TpgFault*>& f_list,
 	  ymuint max_fault_id);
 
   /// @brief デストラクタ
@@ -46,7 +46,7 @@ public:
   /// @param[in] dpat 検出したパタンを表すビットベクタ
   virtual
   void
-  operator()(TpgFault* f,
+  operator()(const TpgFault* f,
 	     PackedVal dpat);
 
   /// @brief 検出回数をクリアする．

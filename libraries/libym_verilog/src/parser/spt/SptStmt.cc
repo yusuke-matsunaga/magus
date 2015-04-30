@@ -282,7 +282,7 @@ SptCaseItem::SptCaseItem(const FileRegion& file_region,
   mLabelArray(label_array),
   mBody(body)
 {
-  assert_cond(body, __FILE__, __LINE__);
+  ASSERT_COND(body );
 }
 
 // デストラクタ

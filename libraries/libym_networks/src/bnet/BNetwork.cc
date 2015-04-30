@@ -219,10 +219,10 @@ void
 BNetwork::copy(const BNetwork& src)
 {
   // ネットワークは『真っ白』でなければならない．
-  assert_cond(input_num() == 0, __FILE__, __LINE__);
-  assert_cond(output_num() == 0, __FILE__, __LINE__);
-  assert_cond(logic_node_num() == 0, __FILE__, __LINE__);
-  assert_cond(latch_node_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND(input_num() == 0 );
+  ASSERT_COND(output_num() == 0 );
+  ASSERT_COND(logic_node_num() == 0 );
+  ASSERT_COND(latch_node_num() == 0 );
 
   // 対応付けのための連想配列
   size_t n = src.max_node_id();
@@ -244,7 +244,7 @@ BNetwork::copy(const BNetwork& src)
     BNode* src_node = *p;
     const char* src_name = src.node_name(src_node);
     BNode* dst_node = manip.new_input(src_name);
-    assert_cond( dst_node != 0, __FILE__, __LINE__);
+    ASSERT_COND( dst_node != 0 );
     node_assoc[src_node->id()] = dst_node;
   }
 
@@ -254,7 +254,7 @@ BNetwork::copy(const BNetwork& src)
     BNode* src_node = *p;
     const char* src_name = src.node_name(src_node);
     BNode* dst_node = manip.new_output(src_name);
-    assert_cond( dst_node != 0, __FILE__, __LINE__);
+    ASSERT_COND( dst_node != 0 );
     node_assoc[src_node->id()] = dst_node;
   }
 
@@ -264,7 +264,7 @@ BNetwork::copy(const BNetwork& src)
     BNode* src_node = *p;
     const char* src_name = src.node_name(src_node);
     BNode* dst_node = manip.new_logic(src_name);
-    assert_cond( dst_node != 0, __FILE__, __LINE__);
+    ASSERT_COND( dst_node != 0 );
     node_assoc[src_node->id()] = dst_node;
   }
 
@@ -274,7 +274,7 @@ BNetwork::copy(const BNetwork& src)
     BNode* src_node = *p;
     const char* src_name = src.node_name(src_node);
     BNode* dst_node = manip.new_latch(src_name);
-    assert_cond( dst_node != 0, __FILE__, __LINE__);
+    ASSERT_COND( dst_node != 0 );
     node_assoc[src_node->id()] = dst_node;
   }
 
@@ -288,13 +288,13 @@ BNetwork::copy(const BNetwork& src)
        p != src.outputs_end(); ++p) {
     BNode* src_node = *p;
     BNode* dst_node = node_assoc[src_node->id()];
-    assert_cond(dst_node != NULL, __FILE__, __LINE__);
+    ASSERT_COND(dst_node != NULL );
 
     BNode* src_fanin = src_node->fanin(0);
     BNode* dst_fanin = node_assoc[src_fanin->id()];
-    assert_cond(dst_fanin != NULL, __FILE__, __LINE__);
+    ASSERT_COND(dst_fanin != NULL );
     bool stat = manip.change_output(dst_node, dst_fanin);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 
   // 中間ノード
@@ -303,7 +303,7 @@ BNetwork::copy(const BNetwork& src)
        p != src.logic_nodes_end(); ++p) {
     BNode* src_node = *p;
     BNode* dst_node = node_assoc[src_node->id()];
-    assert_cond(dst_node != NULL, __FILE__, __LINE__);
+    ASSERT_COND(dst_node != NULL );
 
     size_t n = src_node->fanin_num();
     fanins.clear();
@@ -311,11 +311,11 @@ BNetwork::copy(const BNetwork& src)
     for (size_t i = 0; i < n; i ++) {
       BNode* src_fanin = src_node->fanin(i);
       BNode* new_fanin = node_assoc[src_fanin->id()];
-      assert_cond( new_fanin != NULL, __FILE__, __LINE__);
+      ASSERT_COND( new_fanin != NULL );
       fanins[i] = new_fanin;
     }
     bool stat = manip.change_logic(dst_node, src_node->func(), fanins, false);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 
   // latch ノード
@@ -323,13 +323,13 @@ BNetwork::copy(const BNetwork& src)
        p != src.latch_nodes_end(); ++p) {
     BNode* src_node = *p;
     BNode* dst_node = node_assoc[src_node->id()];
-    assert_cond(dst_node != NULL, __FILE__, __LINE__);
+    ASSERT_COND(dst_node != NULL );
 
     BNode* src_fanin = src_node->fanin(0);
     BNode* dst_fanin = node_assoc[src_fanin->id()];
-    assert_cond(dst_fanin != NULL, __FILE__, __LINE__);
+    ASSERT_COND(dst_fanin != NULL );
     bool stat = manip.change_latch(dst_node, dst_fanin, src_node->reset_value());
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 }
 
@@ -473,7 +473,7 @@ BNetwork::delete_unused_input()
        p != array.end(); ++ p) {
     BNode* node = *p;
     bool stat = delete_node(node);
-    assert_cond( stat, __FILE__, __LINE__);
+    ASSERT_COND( stat );
   }
 }
 
@@ -593,7 +593,7 @@ BNetwork::delete_node(BNode* node)
     mLatchList.remove(node);
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   mNodeList.remove(node);
 
@@ -639,7 +639,7 @@ BNetwork::set_node_type(BNode* node,
     mLatchList.remove(node);
     break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   node->set_type(type);
@@ -801,7 +801,7 @@ BNetwork::change_edge_fanin(BNodeEdge* edge,
 			    BNode* old_node,
 			    BNode* new_node)
 {
-  assert_cond(edge->mFrom == old_node, __FILE__, __LINE__);
+  ASSERT_COND(edge->mFrom == old_node );
   if ( old_node ) {
     old_node->mFanouts.erase(edge);
   }
@@ -873,7 +873,7 @@ BNetwork::tsort(BNodeVector& node_list,
     BNode* node = *p;
     tsort_sub(node, node_list);
   }
-  assert_cond(node_list.size() == nv, __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == nv );
 
   for (BNodeList::const_iterator p = inputs_begin();
        p != inputs_end(); ++p) {

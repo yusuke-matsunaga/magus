@@ -341,13 +341,13 @@ normalize4(ymuint16 func,
 	 xf.input_inv(3) == neg[3] ) {
       cperm = perm_data;
       ymuint16 fv1 = xform_func4(func, perm_data);
-      //assert_cond( is_normal(fv1), __FILE__, __LINE__ );
+      //ASSERT_COND( is_normal(fv1)  );
       return fv1;
     }
   }
   cout << "func: " << setw(4) << setfill('0')
        << hex << func << dec << endl;
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 

@@ -214,7 +214,7 @@ ShellImpl::eval_line()
     goto syntax_error;
 
   case SmtLibParser::kEOF:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
 
   case SmtLibParser::kOpen:
@@ -694,11 +694,11 @@ ShellImpl::declare_fun(const SmtLibNode* arg_top)
 
   // 関数を作る．
   const SmtFun* fun = mSolver->make_fun(input_sort_list, output_sort);
-  assert_cond( fun != NULL, __FILE__, __LINE__);
+  ASSERT_COND( fun != NULL );
 
   // 関数を登録する．
   bool stat = name_mgr().reg_fun(name, fun);
-  assert_cond( stat, __FILE__, __LINE__);
+  ASSERT_COND( stat );
 
   return true;
 }
@@ -778,11 +778,11 @@ ShellImpl::define_fun(const SmtLibNode* arg_top)
 
   // 関数を作る．
   const SmtFun* fun = mSolver->make_fun(var_list, body);
-  assert_cond( fun != NULL, __FILE__, __LINE__);
+  ASSERT_COND( fun != NULL );
 
   // 関数を登録する．
   bool stat = name_mgr().reg_fun(name, fun);
-  assert_cond( stat, __FILE__, __LINE__);
+  ASSERT_COND( stat );
 
   return true;
 }
@@ -1213,7 +1213,7 @@ funtype_to_input_sort(tSmtFunType fun_type,
     return kSmtSort_Real;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return kSmtSort_None;
 }
@@ -1289,7 +1289,7 @@ ShellImpl::eval_as_term(const SmtLibNode* node,
     {
       ShString name = node->str_value();
       const SmtId* id = mIdMgr->make_id(name);
-      assert_cond( id != NULL, __FILE__, __LINE__);
+      ASSERT_COND( id != NULL );
 
       const NameObj* obj = find_obj(id);
       if ( obj != NULL ) {
@@ -1499,7 +1499,7 @@ const SmtTerm*
 ShellImpl::eval_as_let(const SmtLibNode* node,
 		       tSmtSortId req_sort)
 {
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
 
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
@@ -1555,7 +1555,7 @@ const SmtTerm*
 ShellImpl::eval_as_forall(const SmtLibNode* node,
 			  tSmtSortId req_sort)
 {
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
 
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
@@ -1619,7 +1619,7 @@ const SmtTerm*
 ShellImpl::eval_as_exists(const SmtLibNode* node,
 			  tSmtSortId req_sort)
 {
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
 
   vector<const SmtLibNode*> arg_list(2);
   if ( !parse_args(node, 2, arg_list) ) {
@@ -1683,7 +1683,7 @@ const SmtTerm*
 ShellImpl::eval_as_attr_term(const SmtLibNode* node,
 			     tSmtSortId req_sort)
 {
-  assert_cond( node != NULL, __FILE__, __LINE__);
+  ASSERT_COND( node != NULL );
 
   const SmtLibNode* attr_top = node->sibling();
   if ( attr_top == NULL ) {
@@ -1723,11 +1723,11 @@ ShellImpl::eval_as_attr_term(const SmtLibNode* node,
 
   // 関数を作る．
   const SmtFun* fun = mSolver->make_fun(vector<const SmtVar*>(0), body);
-  assert_cond( fun != NULL, __FILE__, __LINE__);
+  ASSERT_COND( fun != NULL );
 
   // 関数を登録する．
   bool stat = name_mgr().reg_fun(name, fun);
-  assert_cond( stat, __FILE__, __LINE__);
+  ASSERT_COND( stat );
 
   return body;
 }
@@ -1837,7 +1837,7 @@ ShellImpl::bind_builtin_sort(const char* name,
 			     tSmtSortId sort_id)
 {
   const SmtId* id = mIdMgr->make_id(ShString(name));
-  assert_cond( id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( id != NULL );
 
   mBuiltinSortMap.add(id->id(), sort_id);
 }
@@ -1850,10 +1850,10 @@ ShellImpl::bind_builtin_fun(const char* name,
 			    tSmtFunType fun_type)
 {
   const SmtId* id = mIdMgr->make_id(ShString(name));
-  assert_cond( id != NULL, __FILE__, __LINE__);
+  ASSERT_COND( id != NULL );
 
   bool stat = name_mgr().reg_builtin_fun(id, fun_type);
-  assert_cond( stat, __FILE__, __LINE__);
+  ASSERT_COND( stat );
 
 }
 
@@ -1861,7 +1861,7 @@ ShellImpl::bind_builtin_fun(const char* name,
 SortMgr&
 ShellImpl::sort_mgr()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mSortMgr;
 }
 
@@ -1869,7 +1869,7 @@ ShellImpl::sort_mgr()
 NameMgr&
 ShellImpl::name_mgr()
 {
-  assert_cond( mCurNameMgr != NULL, __FILE__, __LINE__);
+  ASSERT_COND( mCurNameMgr != NULL );
   return *mCurNameMgr;
 }
 
@@ -1877,7 +1877,7 @@ ShellImpl::name_mgr()
 Alloc&
 ShellImpl::alloc()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mAlloc;
 }
 
@@ -1885,7 +1885,7 @@ ShellImpl::alloc()
 vector<const SmtTerm*>&
 ShellImpl::assertion_list()
 {
-  assert_cond( !mStack.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mStack.empty() );
   return mStack.back()->mTermList;
 }
 

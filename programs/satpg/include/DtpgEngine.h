@@ -56,16 +56,18 @@ public:
   timer_enable(bool enable) = 0;
 
   /// @brief テスト生成を行なう．
-  /// @param[in] f_tgt 対象の故障
+  /// @param[in] tpgnetwork 対象のネットワーク
+  /// @param[in] fmgr 故障マネージャ
+  /// @param[in] fsim 故障シミュレータ
+  /// @param[in] fault_list 対象の故障リスト
+  /// @param[out] stats 結果を格納する構造体
   virtual
   void
-  run(TpgFault* f_tgt) = 0;
-
-  /// @brief テスト生成を行なう．
-  /// @param[in] flist 対象の故障リスト
-  virtual
-  void
-  run(const vector<TpgFault*>& flist) = 0;
+  run(TpgNetwork& tgnetwork,
+      FaultMgr& fmgr,
+      Fsim& fsim,
+      const vector<const TpgFault*>& fault_list,
+      DtpgStats& stats) = 0;
 
 };
 
@@ -74,18 +76,16 @@ public:
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
-/// @param[in] max_id ノード番号の最大値 + 1
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineSingle(const string& sat_type,
-		    const string& sat_option,
-		    ostream* sat_outp,
-		    ymuint max_id,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop);
+new_DtpgSatS(const string& sat_type,
+	     const string& sat_option,
+	     ostream* sat_outp,
+	     BackTracer& bt,
+	     DetectOp& dop,
+	     UntestOp& uop);
 
 /// @brief Single2 エンジンを作る．
 /// @param[in] th_val しきい値
@@ -97,14 +97,13 @@ new_SatEngineSingle(const string& sat_type,
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineSingle2(ymuint th_val,
-		     const string& sat_type,
-		     const string& sat_option,
-		     ostream* sat_outp,
-		     ymuint max_id,
-		     BackTracer& bt,
-		     DetectOp& dop,
-		     UntestOp& uop);
+new_DtpgSatS2(ymuint th_val,
+	      const string& sat_type,
+	      const string& sat_option,
+	      ostream* sat_outp,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop);
 
 /// @brief Multi エンジンを作る．
 /// @param[in] sat_type SATソルバの種類を表す文字列
@@ -115,14 +114,12 @@ new_SatEngineSingle2(ymuint th_val,
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineMulti(const string& sat_type,
-		   const string& sat_option,
-		   ostream* sat_outp,
-		   ymuint max_id,
-		   BackTracer& bt,
-		   DetectOp& dop,
-		   UntestOp& uop,
-		   bool forget);
+new_DtpgSatM(const string& sat_type,
+	     const string& sat_option,
+	     ostream* sat_outp,
+	     BackTracer& bt,
+	     DetectOp& dop,
+	     UntestOp& uop);
 
 /// @brief Multi2 エンジンを作る．
 /// @param[in] th_val しきい値
@@ -134,21 +131,18 @@ new_SatEngineMulti(const string& sat_type,
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
 DtpgEngine*
-new_SatEngineMulti2(ymuint th_val,
-		    const string& sat_type,
-		    const string& sat_option,
-		    ostream* sat_outp,
-		    ymuint max_id,
-		    BackTracer& bt,
-		    DetectOp& dop,
-		    UntestOp& uop,
-		    bool forget);
+new_DtpgSatM2(ymuint th_val,
+	      const string& sat_type,
+	      const string& sat_option,
+	      ostream* sat_outp,
+	      BackTracer& bt,
+	      DetectOp& dop,
+	      UntestOp& uop);
 
 /// @brief SmtSingle エンジンを作る．
 /// @param[in] sat_type SATソルバの種類を表す文字列
 /// @param[in] sat_option SATソルバに渡すオプション文字列
 /// @param[in] sat_outp SATソルバ用の出力ストリーム
-/// @param[in] max_id ノード番号の最大値 + 1
 /// @param[in] bt バックトレーサー
 /// @param[in] dop パタンが求められた時に実行されるファンクタ
 /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
@@ -156,7 +150,6 @@ DtpgEngine*
 new_SmtEngineSingle(const string& sat_type,
 		    const string& sat_option,
 		    ostream* sat_outp,
-		    ymuint max_id,
 		    BackTracer& bt,
 		    DetectOp& dop,
 		    UntestOp& uop);

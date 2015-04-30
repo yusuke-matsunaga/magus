@@ -44,7 +44,7 @@ GateObj::bounding_box() const
 Point
 GateObj::ipin_location(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   Point tmp = mGateTemplate->ipin_location(pos);
   return tmp.move(mLocation);
 }
@@ -53,7 +53,7 @@ GateObj::ipin_location(ymuint pos) const
 Point
 GateObj::opin_location(ymuint pos) const
 {
-  assert_cond( pos < output_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num() );
   Point tmp = mGateTemplate->opin_location(pos);
   return tmp.move(mLocation);
 }

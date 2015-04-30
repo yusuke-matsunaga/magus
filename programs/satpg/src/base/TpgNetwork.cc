@@ -57,7 +57,7 @@ extra_node_count(const Expr& expr,
   for (ymuint i = 0; i < ni; ++ i) {
     ymuint p_num = expr.litnum(VarId(i), false);
     ymuint n_num = expr.litnum(VarId(i), true);
-    assert_cond( p_num > 0 || n_num > 0, __FILE__, __LINE__);
+    ASSERT_COND( p_num > 0 || n_num > 0 );
     if ( n_num == 0 ) {
       if ( p_num > 1 ) {
 	n = 1;
@@ -79,15 +79,15 @@ extra_node_count(const Expr& expr,
 }
 
 // calc_c_val の下請け関数
-Bool3
+Val3
 ccv_sub(const Expr& expr,
-	const vector<Bool3>& ivals)
+	const vector<Val3>& ivals)
 {
   if ( expr.is_zero() ) {
-    return kB3False;
+    return kVal0;
   }
   if ( expr.is_one() ) {
-    return kB3True;
+    return kVal1;
   }
   if ( expr.is_posiliteral() ) {
     ymuint iid = expr.varid().val();
@@ -102,69 +102,69 @@ ccv_sub(const Expr& expr,
   if ( expr.is_and() ) {
     bool has_x = false;
     for (ymuint i = 0; i < nc; ++ i) {
-      Bool3 ival = ccv_sub(expr.child(i), ivals);
-      if ( ival == kB3False ) {
-	return kB3False;
+      Val3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kVal0 ) {
+	return kVal0;
       }
-      if ( ival == kB3X ) {
+      if ( ival == kValX ) {
 	has_x = true;
       }
     }
     if ( has_x ) {
-      return kB3X;
+      return kValX;
     }
-    return kB3True;
+    return kVal1;
   }
 
   if ( expr.is_or() ) {
     bool has_x = false;
     for (ymuint i = 0; i < nc; ++ i) {
-      Bool3 ival = ccv_sub(expr.child(i), ivals);
-      if ( ival == kB3True ) {
-	return kB3True;
+      Val3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kVal1 ) {
+	return kVal1;
       }
-      if ( ival == kB3X ) {
+      if ( ival == kValX ) {
 	has_x = true;
       }
     }
     if ( has_x ) {
-      return kB3X;
+      return kValX;
     }
-    return kB3False;
+    return kVal0;
   }
 
   if ( expr.is_or() ) {
-    Bool3 val = kB3False;
+    Val3 val = kVal0;
     for (ymuint i = 0; i < nc; ++ i) {
-      Bool3 ival = ccv_sub(expr.child(i), ivals);
-      if ( ival == kB3X ) {
-	return kB3X;
+      Val3 ival = ccv_sub(expr.child(i), ivals);
+      if ( ival == kValX ) {
+	return kValX;
       }
-      val ^= ival;
+      val = val ^ ival;
     }
     return val;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
-  return kB3X;
+  ASSERT_NOT_REACHED;
+  return kValX;
 }
 
 // 制御値の計算を行う．
-Bool3
+Val3
 calc_c_val(const Expr& expr,
 	   ymuint ni,
 	   ymuint ipos,
-	   Bool3 val)
+	   Val3 val)
 {
-  vector<Bool3> ivals(ni, kB3X);
+  vector<Val3> ivals(ni, kValX);
   ivals[ipos] = val;
   return ccv_sub(expr, ivals);
 }
 
 // 制御値の計算を行う．
-Bool3
+Val3
 c_val(tTgGateType type,
-      Bool3 ival)
+      Val3 ival)
 {
   switch ( type ) {
   case kTgGateBuff:
@@ -177,35 +177,35 @@ c_val(tTgGateType type,
 
   case kTgGateAnd:
     // 0 の時のみ 0
-    return ival == kB3False ? kB3False : kB3X;
+    return ival == kVal0 ? kVal0 : kValX;
 
   case kTgGateNand:
     // 0 の時のみ 1
-    return ival == kB3False ? kB3True : kB3X;
+    return ival == kVal0 ? kVal1 : kValX;
 
   case kTgGateOr:
     // 1 の時のみ 1
-    return ival == kB3True ? kB3True : kB3X;
+    return ival == kVal1 ? kVal1 : kValX;
 
   case kTgGateNor:
     // 1 の時のみ 0
-    return ival == kB3True ? kB3False : kB3X;
+    return ival == kVal1 ? kVal0 : kValX;
 
   case kTgGateXor:
   case kTgGateXnor:
     // 常に X
-    return kB3X;
+    return kValX;
 
   case kTgGateCplx:
     // これは使わない．
-    assert_not_reached(__FILE__, __LINE__);
-    return kB3X;
+    ASSERT_NOT_REACHED;
+    return kValX;
 
   default:
     break;
   }
   ASSERT_NOT_REACHED;
-  return kB3X;
+  return kValX;
 }
 
 // immediate dominator リストをマージする．
@@ -435,8 +435,8 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
 	cinfo = new CplxInfo(n, ni);
 	// 入力の制御値を計算する．
 	for (ymuint j = 0; j < ni; ++ j) {
-	  cinfo->mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kB3False);
-	  cinfo->mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kB3True);
+	  cinfo->mCVal[j * 2 + 0] = calc_c_val(expr, ni, j, kVal0);
+	  cinfo->mCVal[j * 2 + 1] = calc_c_val(expr, ni, j, kVal1);
 	}
 	// ハッシュに登録する．
 	en_hash.add(fid, cinfo);
@@ -501,7 +501,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     mOutputArray[i] = node;
   }
 
-  assert_cond( mNodeNum == nn, __FILE__, __LINE__);
+  ASSERT_COND( mNodeNum == nn );
 
 
   //////////////////////////////////////////////////////////////////////
@@ -529,7 +529,7 @@ TpgNetwork::TpgNetwork(const TgNetwork& tgnetwork) :
     make_faults(tgnode, en_hash);
   }
 
-  assert_cond( mFaultNum == nfault, __FILE__, __LINE__);
+  ASSERT_COND( mFaultNum == nfault );
 
   // 代表故障のリストを作る．
   ymuint nrep = 0;
@@ -613,7 +613,7 @@ TpgNetwork::activate_po(ymuint po_pos)
 void
 TpgNetwork::activate_po(TpgNode* po)
 {
-  assert_cond( po->is_output(), __FILE__, __LINE__);
+  ASSERT_COND( po->is_output() );
 
   // po から到達可能なノードにマークをつける．
   tfimark(po);
@@ -695,18 +695,19 @@ TpgNetwork::activate_sub()
   mActNodeNum = 0;
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     TpgNode* node = &mNodeArray[i];
-    if ( !mTmpMark[i] ) {
-      node->clear_active();
-      continue;
+    if ( mTmpMark[i] ) {
+      node->set_active();
+      mActNodeArray[mActNodeNum] = node;
+      ++ mActNodeNum;
     }
-    node->set_active();
-    mActNodeArray[mActNodeNum] = node;
-    ++ mActNodeNum;
+    else {
+      node->clear_active();
+    }
   }
 
   for (ymuint i = 0; i < mActNodeNum; ++ i) {
     ymuint id = mActNodeNum - i - 1;
-    TpgNode* node = &mNodeArray[id];
+    TpgNode* node = mActNodeArray[id];
 
     // ファンアウトをPOまでのレベルの小さい順にならべる．
     ymuint nfo = node->fanout_num();
@@ -719,6 +720,7 @@ TpgNetwork::activate_sub()
       }
     }
     if ( tmp_folist.empty() ) {
+      ASSERT_COND( node->is_output() );
       node->mActFanoutNum = 0;
       level_array[node->id()] = 0;
     }
@@ -744,7 +746,7 @@ TpgNetwork::activate_sub()
     TpgNode* node = mActNodeArray[mActNodeNum - i - 1];
     ymuint nfo = node->active_fanout_num();
     if ( nfo == 0 ) {
-      assert_cond( node->is_output(), __FILE__, __LINE__);
+      ASSERT_COND( node->is_output() );
       node->mImmDom = NULL;
     }
     else {
@@ -769,18 +771,10 @@ void
 TpgNetwork::clear_tfimark()
 {
   for (ymuint i = 0; i < mTmpNodeNum; ++ i) {
+    ASSERT_COND( mTmpMark[mTmpNodeList[i]->id()] );
     mTmpMark[mTmpNodeList[i]->id()] = false;
   }
   mTmpNodeNum = 0;
-}
-
-// @brief ノードを得る．
-TpgNode*
-TpgNetwork::node(ymuint pos)
-{
-  // アドレス計算のために TpgNode の定義が必要なのでここに置く．
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
-  return &mNodeArray[pos];
 }
 
 // @brief ノードを得る．
@@ -788,7 +782,7 @@ const TpgNode*
 TpgNetwork::node(ymuint pos) const
 {
   // アドレス計算のために TpgNode の定義が必要なのでここに置く．
-  assert_cond( pos < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mNodeNum );
   return &mNodeArray[pos];
 }
 
@@ -947,7 +941,7 @@ TpgNetwork::make_cplx_node(const Expr& expr,
     gate_type = kTgGateXor;
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   ymuint nc = expr.child_num();
@@ -998,14 +992,31 @@ TpgNetwork::make_prim_node(tTgGateType type,
   switch ( type ) {
   case kTgGateAnd:
   case kTgGateNand:
-    node->mCval = kB3False;
-    node->mNval = kB3True;
+    node->mCval = kVal0;
+    node->mNval = kVal1;
     break;
 
   case kTgGateOr:
   case kTgGateNor:
-    node->mCval = kB3True;
-    node->mNval = kB3False;
+    node->mCval = kVal1;
+    node->mNval = kVal0;
+    break;
+
+  default:
+    break;
+  }
+
+  switch ( type ) {
+  case kTgGateAnd:
+  case kTgGateNor:
+    node->mCOval = kVal0;
+    node->mNOval = kVal1;
+    break;
+
+  case kTgGateOr:
+  case kTgGateNand:
+    node->mCOval = kVal1;
+    node->mNOval = kVal0;
     break;
 
   default:
@@ -1025,20 +1036,19 @@ TpgNetwork::init_node(TpgNode* node,
 {
   node->mName = NULL;
 
-  node->mCval = kB3X;
-  node->mNval = kB3X;
-  node->mMaVal = kB3X;
+  node->mCval = kValX;
+  node->mNval = kValX;
+  node->mCOval = kValX;
+  node->mNOval = kValX;
 
   node->mFaninNum = ni;
   if ( ni > 0 ) {
     node->mFanins = alloc_array<TpgNode*>(mAlloc, ni);
-    node->mInputFault = alloc_array<TpgFault*>(mAlloc, ni * 2);
-    node->mIfVars = alloc_array<VarId>(mAlloc, ni * 2);
+    node->mInputFault = alloc_array<const TpgFault*>(mAlloc, ni * 2);
   }
   else {
     node->mFanins = NULL;
     node->mInputFault = NULL;
-    node->mIfVars = NULL;
   }
 
   node->mFanoutsSize = nfo;
@@ -1057,8 +1067,6 @@ TpgNetwork::init_node(TpgNode* node,
   node->mOutputFault[1] = NULL;
 
   node->mMarks = 0U;
-
-  node->clear_oifvar();
 }
 
 // @brief TpgNode を生成する．
@@ -1068,7 +1076,7 @@ TpgNetwork::init_node(TpgNode* node,
 TpgNode*
 TpgNetwork::new_node()
 {
-  assert_cond( mMaxNodeId < mNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( mMaxNodeId < mNodeNum );
   TpgNode* node = &mNodeArray[mMaxNodeId];
   node->mId = mMaxNodeId;
   ++ mMaxNodeId;
@@ -1085,7 +1093,7 @@ TpgNetwork::connect(TpgNode* src,
 		    TpgNode* dst,
 		    ymuint ipos)
 {
-  assert_cond( src->mFanoutNum < src->mFanoutsSize, __FILE__, __LINE__);
+  ASSERT_COND( src->mFanoutNum < src->mFanoutsSize );
   dst->mFanins[ipos] = src;
   src->mFanouts[src->mFanoutNum] = dst;
   ++ src->mFanoutNum;
@@ -1120,8 +1128,8 @@ void
 TpgNetwork::make_faults(const TgNode* tgnode,
 			const HashMap<ymuint, CplxInfo*>& en_hash)
 {
-  TpgFault* rep0 = NULL;
-  TpgFault* rep1 = NULL;
+  const TpgFault* rep0 = NULL;
+  const TpgFault* rep1 = NULL;
 
   if ( tgnode->fanout_num() == 1 &&
        !tgnode->fanout(0)->is_output() ) {
@@ -1137,7 +1145,7 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 	break;
       }
     }
-    assert_cond( ipos < ni, __FILE__, __LINE__);
+    ASSERT_COND( ipos < ni );
     TpgNode* onode = mNodeMap[tgonode->gid()];
     TpgNode* inode = onode->input_map(ipos);
     ymuint tpg_ipos = onode->ipos_map(ipos);
@@ -1149,8 +1157,8 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
 
   // 出力の故障を生成
-  TpgFault* of0 = new_ofault(node, 0, rep0);
-  TpgFault* of1 = new_ofault(node, 1, rep1);
+  const TpgFault* of0 = new_ofault(node, 0, rep0);
+  const TpgFault* of1 = new_ofault(node, 1, rep1);
 
   ymuint nf = 0;
   if ( of0->is_rep() ) {
@@ -1162,8 +1170,8 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
   ymuint ni = tgnode->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    Bool3 oval0;
-    Bool3 oval1;
+    Val3 oval0;
+    Val3 oval1;
     if ( tgnode->is_cplx_logic() ) {
       ymuint fid = tgnode->func_id();
       ASSERT_COND( en_hash.check(fid) );
@@ -1172,30 +1180,30 @@ TpgNetwork::make_faults(const TgNode* tgnode,
       oval1 = cinfo->mCVal[i * 2 + 1];
     }
     else {
-      oval0 = c_val(tgnode->gate_type(), kB3False);
-      oval1 = c_val(tgnode->gate_type(), kB3True);
+      oval0 = c_val(tgnode->gate_type(), kVal0);
+      oval1 = c_val(tgnode->gate_type(), kVal1);
     }
 
-    TpgFault* rep0 = NULL;
-    if ( oval0 == kB3False ) {
+    const TpgFault* rep0 = NULL;
+    if ( oval0 == kVal0 ) {
       rep0 = of0;
     }
-    else if ( oval0 == kB3True ) {
+    else if ( oval0 == kVal1 ) {
       rep0 = of1;
     }
 
-    TpgFault* rep1 = NULL;
-    if ( oval1 == kB3False ) {
+    const TpgFault* rep1 = NULL;
+    if ( oval1 == kVal0 ) {
       rep1 = of0;
     }
-    else if ( oval1 == kB3True ) {
+    else if ( oval1 == kVal1 ) {
       rep1 = of1;
     }
 
     TpgNode* inode = node->input_map(i);
     ymuint ipos = node->ipos_map(i);
-    TpgFault* if0 = new_ifault(inode, ipos, 0, rep0);
-    TpgFault* if1 = new_ifault(inode, ipos, 1, rep1);
+    const TpgFault* if0 = new_ifault(inode, ipos, 0, rep0);
+    const TpgFault* if1 = new_ifault(inode, ipos, 1, rep1);
     if ( if0->is_rep() ) {
       ++ nf;
     }
@@ -1206,10 +1214,10 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 
   // 代表故障を mFaultList に入れる．
   node->mFaultNum = nf;
-  node->mFaultList = alloc_array<TpgFault*>(mAlloc, nf);
+  node->mFaultList = alloc_array<const TpgFault*>(mAlloc, nf);
   ymuint pos = 0;
   for (ymuint val = 0; val < 2; ++ val) {
-    TpgFault* f = node->mOutputFault[val];
+    const TpgFault* f = node->mOutputFault[val];
     if ( f->is_rep() ) {
       node->mFaultList[pos] = f;
       ++ pos;
@@ -1217,14 +1225,14 @@ TpgNetwork::make_faults(const TgNode* tgnode,
   }
   for (ymuint i = 0; i < ni; ++ i) {
     for (ymuint val = 0; val < 2; ++ val) {
-      TpgFault* f = node->mInputFault[i * 2 + val];
+      const TpgFault* f = node->mInputFault[i * 2 + val];
       if ( f->is_rep() ) {
 	node->mFaultList[pos] = f;
 	++ pos;
       }
     }
   }
-  assert_cond( nf == pos, __FILE__, __LINE__);
+  ASSERT_COND( nf == pos );
 }
 
 // @brief 出力の故障を作る．
@@ -1233,12 +1241,12 @@ TpgNetwork::make_faults(const TgNode* tgnode,
 // @param[in] rep 代表故障
 //
 // 自分自身が代表故障の場合には rep に NULL を入れる．
-TpgFault*
+const TpgFault*
 TpgNetwork::new_ofault(TpgNode* node,
 		       ymuint val,
-		       TpgFault* rep)
+		       const TpgFault* rep)
 {
-  TpgFault* f = new_fault(node, true, 0, val, rep);
+  const TpgFault* f = new_fault(node, true, 0, val, rep);
   node->mOutputFault[val % 2] = f;
 
   return f;
@@ -1251,13 +1259,13 @@ TpgNetwork::new_ofault(TpgNode* node,
 // @param[in] rep 代表故障
 //
 // 自分自身が代表故障の場合には rep に NULL を入れる．
-TpgFault*
+const TpgFault*
 TpgNetwork::new_ifault(TpgNode* node,
 		       ymuint ipos,
 		       ymuint val,
-		       TpgFault* rep)
+		       const TpgFault* rep)
 {
-  TpgFault* f = new_fault(node, false, ipos, val, rep);
+  const TpgFault* f = new_fault(node, false, ipos, val, rep);
   node->mInputFault[ipos * 2 + (val % 2)] = f;
 
   return f;
@@ -1269,12 +1277,12 @@ TpgNetwork::new_ifault(TpgNode* node,
 // @param[in] ipos 入力の故障の時に入力番号を表す
 // @param[in] val 縮退している値
 // @param[in] rep 代表故障
-TpgFault*
+const TpgFault*
 TpgNetwork::new_fault(TpgNode* node,
 		      bool is_output,
 		      ymuint ipos,
 		      ymuint val,
-		      TpgFault* rep)
+		      const TpgFault* rep)
 {
   TpgFault* f = &mFaultChunk[mFaultNum];
   f->set(mFaultNum, node, is_output, ipos, val, rep);
@@ -1283,126 +1291,43 @@ TpgNetwork::new_fault(TpgNode* node,
   return f;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// 必要割り当て関係のコード
-//////////////////////////////////////////////////////////////////////
-
-BEGIN_NONAMESPACE
-
-// node のファンアウトに mark1 をつける．
+// @brief TpgNetwork の内容を出力する関数
+// @param[in] s 出力先のストリーム
+// @param[in] network 対象のネットワーク
 void
-set_tfo_mark(TpgNode* node)
+print_network(ostream& s,
+	      const TpgNetwork& network)
 {
-  if ( node->mark1() ) {
-    return;
-  }
-  node->set_mark1();
-
-  ymuint n = node->active_fanout_num();
+  ymuint n = network.node_num();
   for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* onode = node->active_fanout(i);
-    set_tfo_mark(onode);
-  }
-}
-
-// node のファンアウトに mark1 をつける．
-void
-clear_tfo_mark(TpgNode* node)
-{
-  if ( !node->mark1() ) {
-    return;
-  }
-  node->clear_mark1();
-
-  ymuint n = node->active_fanout_num();
-  for (ymuint i = 0; i < n; ++ i) {
-    TpgNode* onode = node->active_fanout(i);
-    clear_tfo_mark(onode);
-  }
-}
-
-END_NONAMESPACE
-
-// @brief f の検出に必要な割り当てを求める．
-// @param[in] f 対象の故障
-// @param[in] ma_list 割り当て結果を格納するリスト
-// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
-// @note TpgNetwork のメンバにはアクセスしないので static メンバになっている．
-// @note ma_list の内容は TpgNode::id() * 2 + val (0 / 1)
-bool
-TpgNetwork::get_mandatory_assignment(TpgFault* f,
-				     vector<ymuint32>& ma_list)
-{
-  TpgNode* fnode = f->node();
-  TpgNode* fsrc = fnode;
-  if ( f->is_input_fault() ) {
-    fsrc = fnode->fanin(f->pos());
-  }
-
-  vector<TpgNode*> node_list;
-  Bool3 gval;
-  if ( f->val() == 1 ) {
-    gval = kB3False;
-  }
-  else {
-    gval = kB3True;
-  }
-  bool stat = fsrc->bwd_prop(NULL, gval, node_list);
-  if ( !stat ) {
-    goto untestable;
-  }
-
-  if ( f->is_input_fault() ) {
-    Bool3 nval = fnode->nval();
-    if ( nval != kB3X ) {
-      ymuint ni = fnode->fanin_num();
-      for (ymuint i = 0; i < ni; ++ i) {
-	if ( i == f->pos() ) continue;
-	TpgNode* inode = fnode->fanin(i);
-	if ( !inode->bwd_prop(fnode, nval, node_list) ) {
-	  goto untestable;
+    const TpgNode* node = network.node(i);
+    cout << "Node#" << node->id() << ": ";
+    if ( node->is_input() ) {
+      cout << "INPUT#" << node->input_id();
+    }
+    else if ( node->is_output() ) {
+      cout << "OUTPUT#" << node->output_id();
+      const TpgNode* inode = node->fanin(0);
+      cout << " = Node#" << inode->id();
+    }
+    else if ( node->is_logic() ) {
+      cout << node->gate_type();
+      ymuint ni = node->fanin_num();
+      if ( ni > 0 ) {
+	cout << "(";
+	for (ymuint j = 0; j < ni; ++ j) {
+	  const TpgNode* inode = node->fanin(j);
+	  cout << " Node#" << inode->id();
 	}
+	cout << ")";
       }
     }
-  }
-  if ( fnode->imm_dom() != NULL ) {
-    set_tfo_mark(fnode);
-    for (TpgNode* dom = fnode->imm_dom(); dom != NULL; dom = dom->imm_dom()) {
-      Bool3 nval = dom->nval();
-      if ( nval != kB3X ) {
-	ymuint ni = dom->fanin_num();
-	for (ymuint i = 0; i < ni; ++ i) {
-	  TpgNode* inode = dom->fanin(i);
-	  if ( inode->mark1() ) continue;
-	  if ( !inode->bwd_prop(dom, nval, node_list) ) {
-	    clear_tfo_mark(fnode);
-	    goto untestable;
-	  }
-	}
-      }
+    else {
+      ASSERT_NOT_REACHED;
     }
-    clear_tfo_mark(fnode);
+    cout << endl;
   }
-
-  for (vector<TpgNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    TpgNode* node = *p;
-    assert_cond( node->ma_value() != kB3X, __FILE__, __LINE__);
-    int val = node->ma_value() == kB3True ? 1 : 0;
-    ma_list.push_back(node->id() * 2 + val);
-    node->clear_ma_value();
-  }
-  sort(ma_list.begin(), ma_list.end());
-  return true;
-
- untestable:
-  for (vector<TpgNode*>::iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    TpgNode* node = *p;
-    node->clear_ma_value();
-  }
-  return false;
+  cout << endl;
 }
 
 END_NAMESPACE_YM_SATPG

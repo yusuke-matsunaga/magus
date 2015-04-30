@@ -451,7 +451,7 @@ NaImp2::learning(ImpMgr& imp_mgr,
     SatSolver solver1;
     for (ymuint id = 0; id < n; ++ id) {
       VarId vid = solver1.new_var();
-      assert_cond( vid.val() == id, __FILE__, __LINE__);
+      ASSERT_COND( vid.val() == id );
     }
 
     // ImpMgr から CNF を作る．
@@ -460,7 +460,7 @@ NaImp2::learning(ImpMgr& imp_mgr,
       if ( node == NULL ) continue;
       if ( node->is_input() ) continue;
 
-      assert_cond( node->is_and(), __FILE__, __LINE__);
+      ASSERT_COND( node->is_and() );
 
       Literal lit(VarId(id), kPolPosi);
 
@@ -488,7 +488,7 @@ NaImp2::learning(ImpMgr& imp_mgr,
 	  const ImpCell& imp = *p;
 	  ymuint dst_id = imp.dst_id();
 	  ymuint dst_val = imp.dst_val();
-	  assert_cond( imp_info.check(src_id, src_val, dst_id, dst_val),
+	  ASSERT_COND( imp_info.check(src_id, src_val, dst_id, dst_val),
 		       __FILE__, __LINE__);
 	  Literal lit1(to_literal(dst_id, dst_val));
 	  vector<Literal> tmp(2);

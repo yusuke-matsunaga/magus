@@ -142,7 +142,7 @@ compress(const char* infile,
       action = LZMA_FINISH;
     }
 
-    assert_cond( lze.avail_in() == 0, __FILE__, __LINE__);
+    ASSERT_COND( lze.avail_in() == 0 );
     lze.set_inbuf(rbuff, static_cast<ymuint>(res));
     do {
       ret = lze.code(action);

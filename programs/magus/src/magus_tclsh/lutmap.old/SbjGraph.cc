@@ -155,11 +155,11 @@ SbjGraph::copy(const SbjGraph& src,
 
     SbjNode* src_inode0 = src_node->fanin(0);
     SbjNode* input0 = nodemap[src_inode0->id()];
-    assert_cond(input0, __FILE__, __LINE__);
+    ASSERT_COND(input0 );
 
     SbjNode* src_inode1 = src_node->fanin(1);
     SbjNode* input1 = nodemap[src_inode1->id()];
-    assert_cond(input1, __FILE__, __LINE__);
+    ASSERT_COND(input1 );
 
     SbjNode* dst_node = new_logic(src_node->name(),
 				  src_node->fcode(),
@@ -211,7 +211,7 @@ SbjGraph::clear()
     ++ p;
     delete_input(node);
   }
-  assert_cond(mInputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mInputList.empty() );
 
   for (SbjNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ) {
@@ -221,7 +221,7 @@ SbjGraph::clear()
     ++ p;
     delete_output(node);
   }
-  assert_cond(mOutputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mOutputList.empty() );
 
   for (SbjNodeList::iterator p = mLnodeList.begin();
        p != mLnodeList.end(); ) {
@@ -231,7 +231,7 @@ SbjGraph::clear()
     ++ p;
     delete_logic(node);
   }
-  assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mLnodeList.empty() );
 
   mInputArray.clear();
   mOutputArray.clear();
@@ -295,7 +295,7 @@ SbjGraph::sort(vector<SbjNode*>& node_list) const
       }
     }
   }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == n_lnodes() );
 
   for (SbjNodeList::const_iterator p = mInputList.begin();
        p != mInputList.end(); ++ p) {
@@ -366,7 +366,7 @@ SbjGraph::rsort(vector<SbjNode*>& node_list) const
       }
     }
   }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == n_lnodes() );
 
   for (SbjNodeList::const_iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
@@ -444,7 +444,7 @@ SbjGraph::new_logic(const string& name,
 void
 SbjGraph::delete_input(SbjNode* node)
 {
-  assert_cond(node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_input() );
   mInputList.erase(node);
   delete_node(node);
 }
@@ -453,7 +453,7 @@ SbjGraph::delete_input(SbjNode* node)
 void
 SbjGraph::delete_output(SbjNode* node)
 {
-  assert_cond(node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_output() );
   mOutputList.erase(node);
   delete_node(node);
 
@@ -465,8 +465,8 @@ SbjGraph::delete_output(SbjNode* node)
 void
 SbjGraph::delete_logic(SbjNode* node)
 {
-  assert_cond(node->is_logic(), __FILE__, __LINE__);
-  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+  ASSERT_COND(node->is_logic() );
+  ASSERT_COND(node->n_fanout() == 0 );
   connect(NULL, node, 0);
   connect(NULL, node, 1);
 
@@ -829,7 +829,7 @@ write_blif(ostream& s,
     case 0xa: // 1010
     case 0xc: // 1100
     case 0xf: // 1111
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     case 0x1: // 0001
       s << "00 1" << endl;

@@ -55,7 +55,7 @@ make_func(const BdnNode* node,
     return p->second;
   }
 
-  assert_cond( node->type() == BdnNode::kLOGIC, __FILE__, __LINE__);
+  ASSERT_COND( node->type() == BdnNode::kLOGIC );
 
   TvFunc func0 = make_func(node->fanin0(), f_map);
   if ( node->fanin0_inv() ) {
@@ -93,7 +93,7 @@ make_aig(const BdnNode* node,
     }
   }
 
-  assert_cond( node->type() == BdnNode::kLOGIC, __FILE__, __LINE__);
+  ASSERT_COND( node->type() == BdnNode::kLOGIC );
 
   Aig aig0 = make_aig(node->fanin0(), aigmgr, aig_map);
   if ( node->fanin0_inv() ) {

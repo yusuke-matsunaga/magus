@@ -167,6 +167,7 @@ inline
 void
 AssignList::put(Literal lit)
 {
+  ASSERT_COND( mTail < mSize );
   mList[mTail ++] = lit;
 }
 
@@ -215,6 +216,7 @@ inline
 Literal
 AssignList::get(ymuint pos) const
 {
+  ASSERT_COND( pos < mSize );
   return mList[pos];
 }
 
@@ -231,6 +233,7 @@ inline
 void
 AssignList::set_marker()
 {
+  ASSERT_COND( mCurLevel < mSize );
   mMarker[mCurLevel ++] = mTail;
 }
 
@@ -239,6 +242,7 @@ inline
 void
 AssignList::backtrack(int level)
 {
+  ASSERT_COND( level < mSize );
   mHead = mMarker[level];
   mCurLevel = level;
 }

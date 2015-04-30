@@ -45,7 +45,7 @@ SuperNode::init(size_t id,
 {
   mId = id;
   if ( inode0 != NULL && inode1 != NULL ) {
-    assert_cond(inode0 != inode1, __FILE__, __LINE__);
+    ASSERT_COND(inode0 != inode1 );
     mInputs.resize(2);
     mInputs[0] = inode0;
     inode0->mFanouts.push_back(this);
@@ -104,7 +104,7 @@ SuperNode::eliminate(NodeHeap& node_heap)
 	++ wpos;
       }
     }
-    assert_cond(wpos == ino - 1, __FILE__, __LINE__);
+    ASSERT_COND(wpos == ino - 1 );
     inode->mFanouts.erase(inode->mFanouts.end() - 1,
 			  inode->mFanouts.end());
     if ( !inode->mMark ) {
@@ -135,7 +135,7 @@ SuperNode::eliminate(NodeHeap& node_heap)
 	}
       }
     }
-    assert_cond(first_pos < oni, __FILE__, __LINE__);
+    ASSERT_COND(first_pos < oni );
 
     for (size_t i = 0; i < input_num(); ++ i) {
       SuperNode* inode0 = input(i);

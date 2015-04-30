@@ -127,6 +127,7 @@ set (npn_SOURCES
 set (sat_SOURCES
   src/sat/SatMsgHandlerImpl1.cc
   src/sat/SatSolver.cc
+  src/sat/SatStats.cc
 
   src/sat/MiniSat/Main.C
   src/sat/MiniSat/SatSolverMiniSat.cc
@@ -212,7 +213,7 @@ set (zdd_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(ym_logic SHARED
+add_library(ym_logic
   ${aig_SOURCES}
   ${bdd_SOURCES}
   ${cnfdd_SOURCES}

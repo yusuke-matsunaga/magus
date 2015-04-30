@@ -98,7 +98,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
     }
 
     ymuint ni = node->fanin_num();
-    assert_cond(expr.child_num() == ni, __FILE__, __LINE__);
+    ASSERT_COND(expr.child_num() == ni );
 
     ymuint best_cost = ni + 2;
     ymuint32 best_type = 0;
@@ -265,7 +265,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
 	}
       }
     }
-    assert_cond(best_cost < ni + 2, __FILE__, __LINE__);
+    ASSERT_COND(best_cost < ni + 2 );
 
     BNodeVector new_fanins(ni);
     for (ymuint i = 0; i < ni; ++ i) {
@@ -280,7 +280,7 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       }
       else {
 	new_node = node_map(node1, false);
-	assert_cond(new_node, __FILE__, __LINE__);
+	ASSERT_COND(new_node );
       }
       new_fanins[i] = new_node;
     }
@@ -309,19 +309,19 @@ BNetGateDecomp::decomp_sub(BNetwork& network,
       new_expr = ~Expr::make_xor(lit_array);
     }
     else {
-      assert_cond(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     if ( best_oinv ) {
       BNode* new_node = manip.new_logic();
       bool stat1 = manip.change_logic(new_node, new_expr, new_fanins);
-      assert_cond(stat1, __FILE__, __LINE__);
+      ASSERT_COND( stat1 );
       node_map(node, true) = new_node;
       bool stat2 = manip.change_to_inverter(node, new_node);
-      assert_cond(stat2, __FILE__, __LINE__);
+      ASSERT_COND( stat2 );
     }
     else {
       bool stat = manip.change_logic(node, new_expr, new_fanins);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND( stat );
     }
     node_map(node, false) = node;
   }

@@ -259,7 +259,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::node(ymuint32 id) const
 {
-  assert_cond( id < max_node_id(), __FILE__, __LINE__);
+  ASSERT_COND( id < max_node_id() );
   return mNodeArray[id];
 }
 
@@ -277,7 +277,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::pi(ymuint32 pos) const
 {
-  assert_cond( pos < pi_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < pi_num() );
   return mPIArray[pos];
 }
 
@@ -295,7 +295,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::po(ymuint32 pos) const
 {
-  assert_cond( pos < po_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < po_num() );
   return node(mPOArray[pos]);
 }
 
@@ -313,7 +313,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::ff(ymuint32 pos) const
 {
-  assert_cond( pos < ff_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < ff_num() );
   return mFFArray[pos];
 }
 
@@ -332,7 +332,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::logic(ymuint32 pos) const
 {
-  assert_cond( pos < logic_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < logic_num() );
   return mLogicArray[pos];
 }
 
@@ -350,7 +350,7 @@ inline
 const BlifNode*
 BlifNetworkImpl::gate(ymuint32 pos) const
 {
-  assert_cond( pos < gate_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < gate_num() );
   return mGateArray[pos];
 }
 

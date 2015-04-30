@@ -10,9 +10,9 @@
 
 
 #include "satpg_nsdef.h"
+#include "Val3.h"
 #include "YmNetworks/tgnet.h"
 #include "YmCell/cell_nsdef.h"
-#include "YmLogic/Bool3.h"
 #include "YmLogic/expr_nsdef.h"
 #include "YmUtils/SimpleAlloc.h"
 #include "YmUtils/HashMap.h"
@@ -41,7 +41,7 @@ struct CplxInfo
 
   // 制御値を納める配列
   // pos 番目の 0 が mCVal[pos * 2 + 0] に対応する．
-  vector<Bool3> mCVal;
+  vector<Val3> mCVal;
 
 };
 
@@ -89,12 +89,6 @@ public:
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < node_num() )
   /// @note node->id() == id となるノードを返す．
-  TpgNode*
-  node(ymuint id);
-
-  /// @brief ノードを得る．
-  /// @param[in] id ID番号 ( 0 <= id < node_num() )
-  /// @note node->id() == id となるノードを返す．
   const TpgNode*
   node(ymuint id) const;
 
@@ -135,7 +129,7 @@ public:
   output2(ymuint pos) const;
 
   /// @brief 代表故障のリストを得る．
-  const vector<TpgFault*>&
+  const vector<const TpgFault*>&
   rep_faults() const;
 
   /// @brief 故障IDの最大値+1を返す．
@@ -168,30 +162,8 @@ public:
 
   /// @brief アクティブなノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
-  TpgNode*
-  active_node(ymuint pos);
-
-  /// @brief アクティブなノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
   const TpgNode*
   active_node(ymuint pos) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 必要割り当てに関する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief f の検出に必要な割り当てを求める．
-  /// @param[in] f 対象の故障
-  /// @param[in] ma_list 割り当て結果を格納するリスト
-  /// @return 矛盾が生じたら(fが冗長故障の場合) false を返す．
-  /// @note TpgNetwork のメンバにはアクセスしないので static メンバになっている．
-  /// @note ma_list の内容は TpgNode::id() * 2 + val (0 / 1)
-  static
-  bool
-  get_mandatory_assignment(TpgFault* f,
-			   vector<ymuint32>& ma_list);
 
 
 private:
@@ -297,10 +269,10 @@ private:
   /// @param[in] rep 代表故障
   ///
   /// 自分自身が代表故障の場合には rep に NULL を入れる．
-  TpgFault*
+  const TpgFault*
   new_ofault(TpgNode* node,
 	     ymuint val,
-	     TpgFault* rep);
+	     const TpgFault* rep);
 
   /// @brief 入力の故障を作る．
   /// @param[in] node 故障位置のノード
@@ -309,11 +281,11 @@ private:
   /// @param[in] rep 代表故障
   ///
   /// 自分自身が代表故障の場合には rep に NULL を入れる．
-  TpgFault*
+  const TpgFault*
   new_ifault(TpgNode* ode,
 	     ymuint ipos,
 	     ymuint val,
-	     TpgFault* rep);
+	     const TpgFault* rep);
 
   /// @brief 故障を生成する．
   /// @param[in] node 対象のノード
@@ -321,12 +293,12 @@ private:
   /// @param[in] ipos 入力の故障の時に入力番号を表す
   /// @param[in] val 縮退している値
   /// @param[in] rep 代表故障
-  TpgFault*
+  const TpgFault*
   new_fault(TpgNode* node,
 	    bool is_output,
 	    ymuint ipos,
 	    ymuint val,
-	    TpgFault* rep);
+	    const TpgFault* rep);
 
   /// @brief ノードの TFI にマークをつける．
   /// @note 結果は mTmpMark[node->id()] に格納される．
@@ -424,9 +396,16 @@ private:
   TpgFault* mFaultChunk;
 
   // 代表故障のリスト
-  vector<TpgFault*> mRepFaults;
+  vector<const TpgFault*> mRepFaults;
 
 };
+
+/// @brief TpgNetwork の内容を出力する関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] network 対象のネットワーク
+void
+print_network(ostream& s,
+	      const TpgNetwork& network);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -473,7 +452,7 @@ inline
 TpgNode*
 TpgNetwork::input(ymuint pos) const
 {
-  assert_cond( pos < input_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num2() );
   return mInputArray[pos];
 }
 
@@ -499,7 +478,7 @@ inline
 TpgNode*
 TpgNetwork::output(ymuint pos) const
 {
-  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num2() );
   return mOutputArray[pos];
 }
 
@@ -508,13 +487,13 @@ inline
 TpgNode*
 TpgNetwork::output2(ymuint pos) const
 {
-  assert_cond( pos < output_num2(), __FILE__, __LINE__);
+  ASSERT_COND( pos < output_num2() );
   return mOutputArray2[pos];
 }
 
 // @brief 代表故障のリストを得る．
 inline
-const vector<TpgFault*>&
+const vector<const TpgFault*>&
 TpgNetwork::rep_faults() const
 {
   return mRepFaults;
@@ -539,20 +518,10 @@ TpgNetwork::active_node_num() const
 // @brief アクティブなノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
 inline
-TpgNode*
-TpgNetwork::active_node(ymuint pos)
-{
-  assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
-  return mActNodeArray[pos];
-}
-
-// @brief アクティブなノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < active_node_num() )
-inline
 const TpgNode*
 TpgNetwork::active_node(ymuint pos) const
 {
-  assert_cond( pos < mActNodeNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActNodeNum );
   return mActNodeArray[pos];
 }
 

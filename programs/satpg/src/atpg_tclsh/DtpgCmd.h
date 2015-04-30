@@ -79,32 +79,23 @@ private:
   // multi2 オプションの解析用オブジェクト
   TclPoptInt* mPoptMulti2;
 
+  // concurrent オプションの解析用オブジェクト
+  TclPopt* mPoptConcurrent;
+
   // smt_single オプションの解析用オブジェクト
   TclPopt* mPoptSmtSingle;
-
-  // forget オプションの解析用オブジェクト
-  TclPopt* mPoptForget;
-
-  // ffr オプションの解析用オブジェクト
-  TclPopt* mPoptFFR;
-
-  // mffc オプションの解析用オブジェクト
-  TclPopt* mPoptMFFC;
-
-  // po オプションの解析用オブジェクト
-  TclPopt* mPoptPo;
-
-  // rpo オプションの解析用オブジェクト
-  TclPopt* mPoptRpo;
-
-  // skip オプションの解析用オブジェクト
-  TclPoptInt* mPoptSkip;
 
   // X抽出オプションの解析用オブジェクト
   TclPoptInt* mPoptX;
 
   // drop オプションの解析用オブジェクト
   TclPopt* mPoptDrop;
+
+  // k_det オプションの解析用オブジェクト
+  TclPoptInt* mPoptKDet;
+
+  // no_pat オプションの解析用オブジェクト
+  TclPopt* mPoptNoPat;
 
   // オプション文字列オプションの解析用オブジェクト
   TclPoptStr* mPoptOpt;

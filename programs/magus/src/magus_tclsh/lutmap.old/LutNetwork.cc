@@ -165,7 +165,7 @@ LnGraph::copy(const LnGraph& src,
     for (ymuint j = 0; j < ni; ++ j) {
       LnNode* src_inode = src_node->fanin(j);
       LnNode* input = nodemap[src_inode->id()];
-      assert_cond(input, __FILE__, __LINE__);
+      ASSERT_COND(input );
       dst_inputs[j] = input;
     }
     src_node->tv(tv);
@@ -217,7 +217,7 @@ LnGraph::clear()
     ++ p;
     delete_input(node);
   }
-  assert_cond(mInputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mInputList.empty() );
 
   for (LnNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ) {
@@ -227,7 +227,7 @@ LnGraph::clear()
     ++ p;
     delete_output(node);
   }
-  assert_cond(mOutputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mOutputList.empty() );
 
   for (LnNodeList::iterator p = mLnodeList.begin();
        p != mLnodeList.end(); ) {
@@ -237,7 +237,7 @@ LnGraph::clear()
     ++ p;
     delete_lut(node);
   }
-  assert_cond(mLnodeList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mLnodeList.empty() );
 
   mInputArray.clear();
   mOutputArray.clear();
@@ -316,7 +316,7 @@ LnGraph::sort(vector<LnNode*>& node_list) const
       }
     }
   }
-  assert_cond(node_list.size() == n_lnodes(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == n_lnodes() );
 }
 
 // @brief 入力ノードを作る．
@@ -398,7 +398,7 @@ LnGraph::new_lut(const string& name,
 void
 LnGraph::delete_input(LnNode* node)
 {
-  assert_cond(node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_input() );
   mInputList.erase(node);
   delete_node(node);
 }
@@ -407,7 +407,7 @@ LnGraph::delete_input(LnNode* node)
 void
 LnGraph::delete_output(LnNode* node)
 {
-  assert_cond(node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_output() );
   mOutputList.erase(node);
   delete_node(node);
 
@@ -419,8 +419,8 @@ LnGraph::delete_output(LnNode* node)
 void
 LnGraph::delete_lut(LnNode* node)
 {
-  assert_cond(node->is_lut(), __FILE__, __LINE__);
-  assert_cond(node->n_fanout() == 0, __FILE__, __LINE__);
+  ASSERT_COND(node->is_lut() );
+  ASSERT_COND(node->n_fanout() == 0 );
   ymuint ni = node->ni();
   for (ymuint i = 0; i < ni; ++ i) {
     connect(NULL, node, i);
@@ -504,7 +504,7 @@ LnGraph::change_lut(LnNode* node,
 {
   node->set_lut();
   node->mExpr = expr;
-  assert_cond(tv.size() == (1U << inodes.size()), __FILE__, __LINE__);
+  ASSERT_COND(tv.size() == (1U << inodes.size()) );
   node->mTv = tv;
   change_node_fanins(node, inodes);
 }
@@ -559,7 +559,7 @@ LnGraph::subst_node(LnNode* old_node,
   for (vector<LnEdge*>::iterator r = tmp_list.begin();
        r != tmp_list.end(); ++ r) {
     LnEdge* edge = *r;
-    assert_cond(edge->from() == old_node, __FILE__, __LINE__);
+    ASSERT_COND(edge->from() == old_node );
     LnNode* onode = edge->to();
     ymuint ni = onode->ni();
     vector<LnNode*> inodes(ni);

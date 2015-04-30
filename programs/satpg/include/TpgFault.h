@@ -10,7 +10,6 @@
 
 #include "satpg_nsdef.h"
 #include "Val3.h"
-#include "FaultStatus.h"
 #include "YmUtils/HashFunc.h"
 
 
@@ -23,7 +22,6 @@ BEGIN_NAMESPACE_YM_SATPG
 class TpgFault
 {
   friend class TpgNetwork;
-  friend class FaultMgr;
 
 public:
 
@@ -44,11 +42,11 @@ public:
   id() const;
 
   /// @brief 対象のゲートを返す．
-  TpgNode*
+  const TpgNode*
   node() const;
 
   /// @brief 故障の入力側のゲートを返す．
-  TpgNode*
+  const TpgNode*
   source_node() const;
 
   /// @brief 入力の故障の時 true を返す．
@@ -76,59 +74,29 @@ public:
   string
   str() const;
 
-  /// @brief 状態を返す．
-  FaultStatus
-  status() const;
-
   /// @brief 代表故障の時 true を返す．
   bool
   is_rep() const;
 
   /// @brief 代表故障を返す．
   /// @note 代表故障の時は自分自身を返す．
-  TpgFault*
+  const TpgFault*
   rep_fault() const;
 
   /// @brief 支配故障のリストを返す．
-  const vector<TpgFault*>&
+  const vector<const TpgFault*>&
   dom_list() const;
 
-  /// @brief 作業用に用いられる一時的なID番号を設定する．
-  void
-  set_tmp_id(ymuint id);
 
-  /// @brief 作業用に用いられる一時的なID番号を得る．
-  ymuint
-  tmp_id() const;
-
-  /// @brief スキップフラグを返す．
-  bool
-  is_skip() const;
-
-  /// @brief スキップフラグをセットする．
-  void
-  set_skip();
-
-  /// @brief スキップフラグをクリアする．
-  void
-  clear_skip();
-
-  /// @brief POモードで検出不能と判定された回数を得る．
-  ymuint
-  untest_num() const;
-
-  /// @brief POモードで検出不能と判定された回数を1増やす．
-  void
-  inc_untest_num();
-
-  /// @brief POモードで検出不能と判定された回数をクリアする．
-  void
-  clear_untest_num();
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 微妙な関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 故障の支配関係を設定する．
   /// @param[in] dom_f 支配する故障
   void
-  set_dominance(TpgFault* dom_f);
+  set_dominance(const TpgFault* dom_f);
 
 
 private:
@@ -145,11 +113,11 @@ private:
   /// @param[in] rep_fault 代表故障
   void
   set(ymuint id,
-      TpgNode* node,
+      const TpgNode* node,
       bool output,
       ymuint pos,
       int val,
-      TpgFault* rep_fault);
+      const TpgFault* rep_fault);
 
 
 private:
@@ -161,25 +129,19 @@ private:
   ymuint32 mId;
 
   // 対象のノード
-  TpgNode* mNode;
+  const TpgNode* mNode;
 
   // 故障位置と故障値をパックしたもの
   ymuint32 mPosVal;
 
-  // 状態
-  FaultStatus mStatus;
-
   // 代表故障
-  TpgFault* mRepFault;
-
-  // 一時的なID番号
-  ymuint32 mTmpId;
+  const TpgFault* mRepFault;
 
   // POモードで検出不能と判定された回数
   ymuint32 mUntestNum;
 
   // 支配故障のリスト
-  vector<TpgFault*> mDomList;
+  vector<const TpgFault*> mDomList;
 
 };
 
@@ -218,7 +180,7 @@ TpgFault::id() const
 
 // @brief 対象のゲートを返す．
 inline
-TpgNode*
+const TpgNode*
 TpgFault::node() const
 {
   return mNode;
@@ -270,14 +232,6 @@ TpgFault::val3() const
   }
 }
 
-// @brief 状態を返す．
-inline
-FaultStatus
-TpgFault::status() const
-{
-  return mStatus;
-}
-
 // @brief 代表故障の時 true を返す．
 inline
 bool
@@ -289,7 +243,7 @@ TpgFault::is_rep() const
 // @brief 代表故障を返す．
 // @note 代表故障の時は自分自身を返す．
 inline
-TpgFault*
+const TpgFault*
 TpgFault::rep_fault() const
 {
   return mRepFault;
@@ -297,84 +251,17 @@ TpgFault::rep_fault() const
 
 // @brief 支配故障のリストを返す．
 inline
-const vector<TpgFault*>&
+const vector<const TpgFault*>&
 TpgFault::dom_list() const
 {
   return mDomList;
-}
-
-// @brief 作業用に用いられる一時的なID番号を設定する．
-inline
-void
-TpgFault::set_tmp_id(ymuint id)
-{
-  mTmpId = id;
-}
-
-// @brief 作業用に用いられる一時的なID番号を得る．
-inline
-ymuint
-TpgFault::tmp_id() const
-{
-  return mTmpId;
-}
-
-// @brief スキップフラグを返す．
-inline
-bool
-TpgFault::is_skip() const
-{
-  if ( status() == kFsDetected ) {
-    return true;
-  }
-  return static_cast<bool>((mPosVal >> 2) & 1U);
-}
-
-// @brief スキップフラグをセットする．
-inline
-void
-TpgFault::set_skip()
-{
-  mPosVal |= 4U;
-}
-
-// @brief スキップフラグをクリアする．
-inline
-void
-TpgFault::clear_skip()
-{
-  mPosVal &= ~4U;
-}
-
-// @brief POモードで検出不能と判定された回数を得る．
-inline
-ymuint
-TpgFault::untest_num() const
-{
-  return mUntestNum;
-}
-
-// @brief POモードで検出不能と判定された回数を1増やす．
-inline
-void
-TpgFault::inc_untest_num()
-{
-  ++ mUntestNum;
-}
-
-// @brief POモードで検出不能と判定された回数をクリアする．
-inline
-void
-TpgFault::clear_untest_num()
-{
-  mUntestNum = 0;
 }
 
 // @brief 故障の支配関係を設定する．
 // @param[in] dom_f 支配する故障
 inline
 void
-TpgFault::set_dominance(TpgFault* dom_f)
+TpgFault::set_dominance(const TpgFault* dom_f)
 {
   mDomList.push_back(dom_f);
 }

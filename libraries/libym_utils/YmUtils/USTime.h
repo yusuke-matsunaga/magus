@@ -166,7 +166,10 @@ operator<<(ostream& s,
 
 // 空のコンストラクタ
 inline
-USTime::USTime()
+USTime::USTime() :
+  mUtime(0.0),
+  mStime(0.0),
+  mRtime(0.0)
 {
 }
 

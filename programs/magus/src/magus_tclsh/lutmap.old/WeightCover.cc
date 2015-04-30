@@ -111,7 +111,7 @@ WeightCover::record_cuts(const SbjGraph& sbjgraph,
 	  best_cut = cut;
 	}
       }
-      //assert_cond(min_cost < DBL_MAX, __FILE__, __LINE__);
+      //ASSERT_COND(min_cost < DBL_MAX );
       // unselected の状態によっては解がない場合もある．
       if ( best_cut ) {
 	maprec.set_cut(node, best_cut);

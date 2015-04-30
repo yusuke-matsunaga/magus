@@ -39,7 +39,7 @@ SnInput::nfi() const
 SimNode*
 SnInput::fanin(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -47,7 +47,7 @@ SnInput::fanin(ymuint pos) const
 void
 SnInput::_calc_gval3()
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief 故障値の計算を行う．(3値版)
@@ -56,7 +56,7 @@ SnInput::_calc_gval3()
 void
 SnInput::_calc_fval3(PackedVal mask)
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief ゲートの入力から出力までの可観測性を計算する．(3値版)

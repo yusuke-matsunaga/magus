@@ -130,7 +130,7 @@ ExprGen::instantiate_funccall(const VlNamedObj* parent,
       return NULL;
     }
     child_func = handle->taskfunc();
-    assert_cond(child_func, __FILE__, __LINE__);
+    ASSERT_COND(child_func );
   }
 
   // 引数の生成

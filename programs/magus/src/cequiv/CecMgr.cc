@@ -368,7 +368,7 @@ CecMgr::new_node()
   void* p = mAlloc.get_memory(sizeof(CecNode));
   CecNode* node = new (p) CecNode();
   node->mVarId = mSolver.new_var();
-  assert_cond(node->mVarId.val() == mAllNodes.size(), __FILE__, __LINE__);
+  ASSERT_COND(node->mVarId.val() == mAllNodes.size() );
   mAllNodes.push_back(node);
   return node;
 }
@@ -505,7 +505,7 @@ CecMgr::check_condition(Literal lit1)
        p != mAllNodes.end(); ++ p) {
     CecNode* node = *p;
     VarId id = solver.new_var();
-    assert_cond(id == node->varid(), __FILE__, __LINE__);
+    ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
       Literal lito(id, false);
       Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
@@ -556,7 +556,7 @@ CecMgr::check_condition(Literal lit1,
        p != mAllNodes.end(); ++ p) {
     CecNode* node = *p;
     VarId id = solver.new_var();
-    assert_cond(id == node->varid(), __FILE__, __LINE__);
+    ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
       Literal lito(id, false);
       Literal lit1(node->fanin0()->varid(), node->fanin0_inv());

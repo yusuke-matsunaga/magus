@@ -67,7 +67,7 @@ Pat2Matcher::operator()(const BdnNode* sbj_root,
     break;
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
   bind(sbj_root, root_id, false);
@@ -81,7 +81,7 @@ Pat2Matcher::operator()(const BdnNode* sbj_root,
     ymuint from_id = mLibrary.pg2_edge_from(edge_id);
     ymuint f_pos = mLibrary.pg2_edge_pos(edge_id);
     const BdnNode* to_node = mSbjMap[to_id];
-    assert_cond( to_node->is_logic(), __FILE__, __LINE__);
+    ASSERT_COND( to_node->is_logic() );
     const BdnNode* from_node = to_node->fanin(f_pos);
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
@@ -115,7 +115,7 @@ Pat2Matcher::operator()(const BdnNode* sbj_root,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     if ( !bind(from_node, from_id, inv) ) {
@@ -160,7 +160,7 @@ Pat2Matcher::match_sub(const CellPat2Graph& pat_graph,
   ymuint f_pos = mLibrary.pg2_edge_pos(edge_id);
   ymuint ni = mLibrary.pg2_fanin_num(to_id);
   const BdnNode* to_node = mSbjMap[to_id];
-  assert_cond( to_node->is_logic(), __FILE__, __LINE__);
+  ASSERT_COND( to_node->is_logic() );
 
   // to_node から ni 入力のクラスタを切り出す．
   for ( ; ; ) {
@@ -197,7 +197,7 @@ Pat2Matcher::match_sub(const CellPat2Graph& pat_graph,
       break;
 
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
     if ( !bind(from_node, from_id, inv) ) {

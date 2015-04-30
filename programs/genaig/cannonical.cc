@@ -140,7 +140,7 @@ cannonical3(ymuint32 func,
       return fv1;
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -165,14 +165,14 @@ cannonical4(ymuint32 func,
       return fv1;
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
 void
 cannonical(ymuint ni)
 {
-  assert_cond( ni == 3 || ni == 4, __FILE__, __LINE__);
+  ASSERT_COND( ni == 3 || ni == 4 );
 
   if ( ni == 3 ) {
     for (ymuint32 func = 0; func < 256; ++ func) {

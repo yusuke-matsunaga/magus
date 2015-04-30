@@ -137,7 +137,7 @@ bnet2sbj(const BNetwork& network,
       SbjNode* inode;
       bool inv;
       bool stat = assoc.get(bnode->fanin(0), inode, inv);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       if ( bnode->is_buffer() ) {
 	assoc.put(bnode, inode, inv);
       }
@@ -152,8 +152,8 @@ bnet2sbj(const BNetwork& network,
     }
     else if ( ni == 2 ) {
       Expr expr = bnode->func();
-      assert_cond(expr.child(0).is_literal(), __FILE__, __LINE__);
-      assert_cond(expr.child(1).is_literal(), __FILE__, __LINE__);
+      ASSERT_COND(expr.child(0).is_literal() );
+      ASSERT_COND(expr.child(1).is_literal() );
       
       SbjNode* inode0;
       SbjNode* inode1;
@@ -161,9 +161,9 @@ bnet2sbj(const BNetwork& network,
       bool inv1;
 
       bool stat0 = assoc.get(bnode->fanin(0), inode0, inv0);
-      assert_cond(stat0, __FILE__, __LINE__);
+      ASSERT_COND(stat0 );
       bool stat1 = assoc.get(bnode->fanin(1), inode1, inv1);
-      assert_cond(stat1, __FILE__, __LINE__);
+      ASSERT_COND(stat1 );
 
       if ( expr.child(0).is_negaliteral() ) {
 	if ( expr.child(0).varid() == 0 ) {
@@ -229,7 +229,7 @@ bnet2sbj(const BNetwork& network,
 	}
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
       SbjNode* node = sbjgraph.new_logic(bnode->name(), fcode,
 					 inode0, inode1);

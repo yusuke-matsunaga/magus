@@ -241,7 +241,7 @@ CptOpr1::CptOpr1(const FileRegion& file_region,
   mFileRegion(file_region),
   mOpr(opr)
 {
-  assert_cond(opr, __FILE__, __LINE__);
+  ASSERT_COND(opr );
 }
 
 // デストラクタ
@@ -321,8 +321,8 @@ CptOpr2::CptOpr2(tVlOpType op_type,
 {
   mOpr[0] = opr1;
   mOpr[1] = opr2;
-  assert_cond(opr1, __FILE__, __LINE__);
-  assert_cond(opr2, __FILE__, __LINE__);
+  ASSERT_COND(opr1 );
+  ASSERT_COND(opr2 );
 }
 
 // デストラクタ
@@ -374,9 +374,9 @@ CptOpr3::CptOpr3(tVlOpType op_type,
   mOpr[0] = opr1;
   mOpr[1] = opr2;
   mOpr[2] = opr3;
-  assert_cond(opr1, __FILE__, __LINE__);
-  assert_cond(opr2, __FILE__, __LINE__);
-  assert_cond(opr3, __FILE__, __LINE__);
+  ASSERT_COND(opr1 );
+  ASSERT_COND(opr2 );
+  ASSERT_COND(opr3 );
 }
 
 // デストラクタ
@@ -506,9 +506,9 @@ CptMinTypMax::CptMinTypMax(const PtExpr* val0,
   mValue[0] = val0;
   mValue[1] = val1;
   mValue[2] = val2;
-  assert_cond(val0, __FILE__, __LINE__);
-  assert_cond(val1, __FILE__, __LINE__);
-  assert_cond(val2, __FILE__, __LINE__);
+  ASSERT_COND(val0 );
+  ASSERT_COND(val1 );
+  ASSERT_COND(val2 );
 }
 
 // デストラクタ

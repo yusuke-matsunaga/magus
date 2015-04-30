@@ -75,7 +75,7 @@ CmnMgrImpl::copy(const CmnMgrImpl& src)
       iovect[b] = pat;
     }
     CmnPort* port = new_port(src_port->name(), iovect);
-    assert_cond( port->id() == i, __FILE__, __LINE__);
+    ASSERT_COND( port->id() == i );
 
     for (ymuint i = 0; i < nb; ++ i) {
       const CmnNode* src_input = src_port->input(i);
@@ -166,7 +166,7 @@ CmnMgrImpl::copy(const CmnMgrImpl& src)
     for (ymuint j = 0; j < ni; ++ j) {
       const CmnNode* src_inode = src_node->fanin(j);
       CmnNode* input = nodemap[src_inode->id()];
-      assert_cond(input, __FILE__, __LINE__);
+      ASSERT_COND(input );
       dst_inputs[j] = input;
     }
     const Cell* cell = src_node->cell();
@@ -254,7 +254,7 @@ CmnMgrImpl::sort(vector<const CmnNode*>& node_list) const
     ++ rpos;
     sort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == logic_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == logic_num() );
 }
 
 // 空にする．
@@ -665,7 +665,7 @@ CmnMgrImpl::unreg_node(CmnNode* node)
 void
 CmnMgrImpl::delete_input(CmnNode* node)
 {
-  assert_cond(node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_input() );
   mInputList.erase(node);
   unreg_node(node);
 }
@@ -674,7 +674,7 @@ CmnMgrImpl::delete_input(CmnNode* node)
 void
 CmnMgrImpl::delete_output(CmnNode* node)
 {
-  assert_cond(node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_output() );
   mOutputList.erase(node);
   unreg_node(node);
 }
@@ -683,8 +683,8 @@ CmnMgrImpl::delete_output(CmnNode* node)
 void
 CmnMgrImpl::delete_logic(CmnNode* node)
 {
-  assert_cond(node->is_logic(), __FILE__, __LINE__);
-  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND(node->is_logic() );
+  ASSERT_COND(node->fanout_num() == 0 );
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     connect(NULL, node, i);

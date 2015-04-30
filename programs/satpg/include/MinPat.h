@@ -11,6 +11,7 @@
 
 
 #include "satpg_nsdef.h"
+#include "YmUtils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -34,28 +35,63 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief テストベクタの最小化を行なう．
+  /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fmgr 故障マネージャ
-  /// @param[in] fsim2 2値の故障シミュレータ
-  /// @param[in] fsim3 3値の故障シミュレータ
-  /// @param[inout] tv_list テストベクタのリスト
+  /// @param[in] fsim2 2値の故障シミュレータ(検証用)
+  /// @param[in] exact 故障グループの両立性判定を厳密に行うときに true とする．
+  /// @param[in] compaction 最後に圧縮を行うときに true とする．
+  /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
   void
-  run(TvMgr& tvmgr,
-      FaultMgr& fmgr,
+  run(TpgNetwork& network,
+      TvMgr& tvmgr,
       Fsim& fsim2,
-      Fsim& fsim3,
+      bool exact,
+      bool compaction,
       vector<TestVector*>& tv_list,
-      MinPatStats& stats) = 0;
+      USTime& time) = 0;
+
+  /// @brief verbose フラグをセットする．
+  virtual
+  void
+  set_verbose(int verbose) = 0;
+
+  /// @brief dom_method を指定する．
+  virtual
+  void
+  set_dom_method(ymuint dom_method) = 0;
 
 };
 
 
 /// @brief インスタンスを生成する関数
+// @param[in] group_dominance グループ支配を計算する．
 extern
 MinPat*
-new_MinPat();
+new_MinPat(bool group_dominance);
+
+/// @brief インスタンスを生成する関数
+// @param[in] group_dominance グループ支配を計算する．
+extern
+MinPat*
+new_MinPatSimple(bool group_dominance);
+
+/// @brief インスタンスを生成する関数
+// @param[in] group_dominance グループ支配を計算する．
+extern
+MinPat*
+new_MinPatSimple2(bool group_dominance);
+
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_MinPatDsatur();
+
+/// @brief インスタンスを生成する関数
+extern
+MinPat*
+new_MinPatDsatur2();
 
 END_NAMESPACE_YM_SATPG
 

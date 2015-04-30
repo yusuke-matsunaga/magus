@@ -118,7 +118,7 @@ GbmBddCegarBinary::_solve(const RcfNetwork& network,
       return true;
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 

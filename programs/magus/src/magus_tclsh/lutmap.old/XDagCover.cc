@@ -132,7 +132,7 @@ XDagCover::search(const SbjGraph& sbjgraph,
     return;
   }
   
-  assert_cond(lb <= ub, __FILE__, __LINE__);
+  ASSERT_COND(lb <= ub );
 
   if ( ub < mBest ) {
     // 最適解の更新

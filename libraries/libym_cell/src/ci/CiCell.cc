@@ -322,7 +322,7 @@ CiCell::timing_num() const
 const CellTiming*
 CiCell::timing(ymuint pos) const
 {
-  assert_cond( pos < timing_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < timing_num() );
   return mTimingArray[pos];
 }
 
@@ -340,7 +340,7 @@ CiCell::timing_num(ymuint ipos,
   case kCellPosiUnate: base += 0; break;
   case kCellNegaUnate: base += 1; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( mTimingMap[base] == NULL ) {
     return 0;
@@ -360,13 +360,13 @@ CiCell::timing(ymuint ipos,
 	       tCellTimingSense sense,
 	       ymuint pos) const
 {
-  assert_cond( pos < timing_num(ipos, opos, sense), __FILE__, __LINE__);
+  ASSERT_COND( pos < timing_num(ipos, opos, sense) );
   ymuint base = (opos * input_num2() + ipos) * 2;
   switch ( sense ) {
   case kCellPosiUnate: base += 0; break;
   case kCellNegaUnate: base += 1; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return mTimingMap[base]->mArray[pos];
 }
@@ -571,7 +571,7 @@ CiCell::dump(ODO& s) const
   }
   else {
     // 無視？
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   ymuint32 ni = input_num();
   ymuint32 no = output_num();

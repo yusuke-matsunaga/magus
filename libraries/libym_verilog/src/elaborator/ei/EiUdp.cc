@@ -270,7 +270,7 @@ EiUdpIO::direction() const
   switch ( mPtHeader->type() ) {
   case kPtIO_Input:  return kVlInput;
   case kPtIO_Output: return kVlOutput;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   // ダミー
   return kVlNoDirection;

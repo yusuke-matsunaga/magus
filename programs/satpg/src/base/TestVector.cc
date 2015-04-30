@@ -8,6 +8,8 @@
 
 
 #include "TestVector.h"
+#include "NodeValList.h"
+#include "TpgNode.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -46,7 +48,7 @@ bool
 TestVector::is_conflict(const TestVector& tv1,
 			const TestVector& tv2)
 {
-  assert_cond( tv1.input_num() == tv2.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( tv1.input_num() == tv2.input_num() );
   ymuint nb = block_num(tv1.input_num());
   for (ymuint i = 0; i < nb; i += 2) {
     ymuint i0 = i;
@@ -66,7 +68,7 @@ TestVector::is_conflict(const TestVector& tv1,
 bool
 TestVector::operator==(const TestVector& right) const
 {
-  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( input_num() == right.input_num() );
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; ++ i) {
     if ( mPat[i] != right.mPat[i] ) {
@@ -83,7 +85,7 @@ TestVector::operator==(const TestVector& right) const
 bool
 TestVector::operator<(const TestVector& right) const
 {
-  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( input_num() == right.input_num() );
   ymuint nb = block_num(input_num());
   bool diff = false;
   for (ymuint i = 0; i < nb; ++ i) {
@@ -107,7 +109,7 @@ TestVector::operator<(const TestVector& right) const
 bool
 TestVector::operator<=(const TestVector& right) const
 {
-  assert_cond( input_num() == right.input_num(), __FILE__, __LINE__);
+  ASSERT_COND( input_num() == right.input_num() );
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; ++ i) {
     PackedVal val1 = mPat[i];
@@ -129,6 +131,29 @@ TestVector::init()
     ymuint i1 = i + 1;
     mPat[i0] = kPvAll0;
     mPat[i1] = kPvAll0;
+  }
+}
+
+// @brief 割当リストから内容を設定する．
+// @param[in] assign_list 割当リスト
+//
+// assign_list に外部入力以外の割当が含まれている場合無視する．
+void
+TestVector::set_from_assign_list(const NodeValList& assign_list)
+{
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    const TpgNode* node = nv.node();
+    if ( node->is_input() ) {
+      ymuint id = node->input_id();
+      if ( nv.val() ) {
+	set_val(id, kVal1);
+      }
+      else {
+	set_val(id, kVal0);
+      }
+    }
   }
 }
 
@@ -185,7 +210,7 @@ TestVector::set_from_random(RandGen& randgen)
 {
   ymuint nb = block_num(input_num());
   for (ymuint i = 0; i < nb; i += 2) {
-    PackedVal v = randgen.ulong();
+    PackedVal v = randgen.uint64();
     ymuint i0 = i;
     ymuint i1 = i + 1;
     if ( i == nb - 2 ) {
@@ -215,7 +240,7 @@ TestVector::fix_x_from_random(RandGen& randgen)
     if ( mask == kPvAll0 ) {
       continue;
     }
-    PackedVal v = randgen.ulong();
+    PackedVal v = randgen.uint64();
     mPat[i0] |= ~v & mask;
     mPat[i1] |=  v & mask;
   }

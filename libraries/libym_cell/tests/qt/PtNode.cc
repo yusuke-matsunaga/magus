@@ -29,7 +29,7 @@ opr_str(DotlibNode::tType type)
   case DotlibNode::kDiv:   return "/";
   default: break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return "";
 }
 
@@ -133,7 +133,7 @@ PtRootNode::child_num() const
 PtNode*
 PtRootNode::child(int pos) const
 {
-  assert_cond( pos == 0, __FILE__, __LINE__);
+  ASSERT_COND( pos == 0 );
   return mRoot;
 }
 

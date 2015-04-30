@@ -74,7 +74,7 @@ GbmBddEngineBinary::init_vars(const RcfNetwork& network,
       VarId vid(i * mIorderBitWidth + j);
       mIorderVarArray[i * mIorderBitWidth + j] = vid;
       bool stat = mMgr.new_var(vid);
-      assert_cond( stat, __FILE__, __LINE__);
+      ASSERT_COND( stat );
     }
   }
 
@@ -84,7 +84,7 @@ GbmBddEngineBinary::init_vars(const RcfNetwork& network,
     VarId vid(base0 + i);
     mConfVarArray[i] = vid;
     bool stat = mMgr.new_var(vid);
-    assert_cond( stat, __FILE__, __LINE__);
+    ASSERT_COND( stat );
   }
 
 #if 0
@@ -240,7 +240,7 @@ GbmBddEngineBinary::make_bdd(const RcfNetwork& network,
 void
 GbmBddEngineBinary::get_model(vector<Bool3>& model)
 {
-  assert_cond( !mSolution.is_invalid(), __FILE__, __LINE__);
+  ASSERT_COND( !mSolution.is_invalid() );
 
   if ( mSolution.is_zero() ) {
     return;
@@ -378,13 +378,13 @@ GbmBddEngineBinary::make_iorder_bdd(ymuint level,
 void
 GbmBddEngineBinary::make_node_func(const RcfNode* node)
 {
-  assert_cond( !node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND( !node->is_input() );
 
   ymuint ni = node->fanin_num();
   vector<Bdd> inputs(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     RcfNodeHandle ih = node->fanin(i);
-    assert_cond( !ih.is_const(), __FILE__, __LINE__);
+    ASSERT_COND( !ih.is_const() );
     ymuint id = ih.id();
     Bdd f = mNodeBddArray[id];
     if ( ih.inv() ) {
@@ -441,7 +441,7 @@ GbmBddEngineBinary::make_MUX(const vector<Bdd>& inputs,
 {
   ymuint nd = inputs.size();
   ymuint ns = s_vars.size();
-  assert_cond( (1U << ns) == nd, __FILE__, __LINE__);
+  ASSERT_COND( (1U << ns) == nd );
   Bdd output = mMgr.make_zero();
   for (ymuint b = 0; b < nd; ++ b) {
     Bdd dvar = inputs[b];

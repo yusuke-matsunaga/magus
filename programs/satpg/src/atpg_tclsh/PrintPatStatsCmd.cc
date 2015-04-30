@@ -55,7 +55,7 @@ PrintPatStatsCmd::cmd_proc(TclObjVector& objv)
     for (ymuint i = 0; i < n; ++ i) {
       TestVector* tv = tvlist[i];
       ymuint nx = tv->x_num();
-      assert_cond( nx <= ni, __FILE__, __LINE__);
+      ASSERT_COND( nx <= ni );
       ++ hist[nx];
     }
     cout << endl

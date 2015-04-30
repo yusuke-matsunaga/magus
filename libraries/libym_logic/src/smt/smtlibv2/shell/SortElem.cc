@@ -33,7 +33,7 @@ SortElem::is_param() const
 ymuint
 SortElem::param_id() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -42,7 +42,7 @@ SortElem::param_id() const
 const SmtId*
 SortElem::name() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -58,7 +58,7 @@ SortElem::elem_num() const
 const SortElem*
 SortElem::elem(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -154,7 +154,7 @@ ComplexSort::elem_num() const
 const SortElem*
 ComplexSort::elem(ymuint pos) const
 {
-  assert_cond( pos < elem_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < elem_num() );
   return mElemList[pos];
 }
 

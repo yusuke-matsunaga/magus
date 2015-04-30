@@ -53,7 +53,7 @@ public:
   /// @brief 故障にスキップマークをつける．
   virtual
   void
-  set_skip(TpgFault* f);
+  set_skip(const TpgFault* f);
 
   /// @brief 故障リストを設定する．
   /// @param[in] fault_list 対象の故障リスト
@@ -61,7 +61,7 @@ public:
   /// スキップマークは消される．
   virtual
   void
-  set_faults(const vector<TpgFault*>& fault_list);
+  set_faults(const vector<const TpgFault*>& fault_list);
 
   /// @brief SPSFP故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -71,7 +71,17 @@ public:
   virtual
   bool
   spsfp(TestVector* tv,
-	TpgFault* f);
+	const TpgFault* f);
+
+  /// @brief SPSFP故障シミュレーションを行う．
+  /// @param[in] assign_list 値の割当リスト
+  /// @param[in] f 対象の故障
+  /// @retval true 故障の検出が行えた．
+  /// @retval false 故障の検出が行えなかった．
+  virtual
+  bool
+  spsfp(const NodeValList& assign_list,
+	const TpgFault* f);
 
   /// @brief ひとつのパタンで故障シミュレーションを行う．
   /// @param[in] tv テストベクタ
@@ -79,6 +89,14 @@ public:
   virtual
   void
   sppfp(TestVector* tv,
+	FsimOp& op);
+
+  /// @brief ひとつのパタンで故障シミュレーションを行う．
+  /// @param[in] assign_list 値の割当リスト
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
+  virtual
+  void
+  sppfp(const NodeValList& assign_list,
 	FsimOp& op);
 
   /// @brief 複数のパタンで故障シミュレーションを行う．
@@ -94,6 +112,18 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief SPSFP故障シミュレーションの本体
+  /// @param[in] f 対象の故障
+  /// @retval true 故障の検出が行えた．
+  /// @retval false 故障の検出が行えなかった．
+  bool
+  _spsfp(const TpgFault* f);
+
+  /// @brief SPPFP故障シミュレーションの本体
+  /// @param[in] op 検出した時に起動されるファンクタオブジェクト
+  void
+  _sppfp(FsimOp& op);
 
   /// @brief FFR 内の故障シミュレーションを行う．
   PackedVal

@@ -130,8 +130,8 @@ TopDown2::operator()(const BdnMgr& network,
       pop_node();
       clear_state(node);
 
-      assert_cond( frontier_is_empty(), __FILE__, __LINE__);
-      assert_cond( mInputPos == 0, __FILE__, __LINE__);
+      ASSERT_COND( frontier_is_empty() );
+      ASSERT_COND( mInputPos == 0 );
 
       // 今の列挙で使われたノードを footprint_node_list に格納する．
       vector<const BdnNode*>& fplist = fpnode_list(node);
@@ -194,7 +194,7 @@ TopDown2::enum_recur()
 
   const BdnNode* node = pop_node();
 
-  assert_cond( node->is_logic(), __FILE__, __LINE__);
+  ASSERT_COND( node->is_logic() );
 
 #if defined(DEBUG_ENUM_RECUR)
   cout << "POP[1] " << node->id() << endl;
@@ -251,8 +251,8 @@ TopDown2::enum_recur()
       }
     }
     else {
-      assert_cond( !temp2mark(inode0), __FILE__, __LINE__);
-      assert_cond( inode0->is_logic(), __FILE__, __LINE__);
+      ASSERT_COND( !temp2mark(inode0) );
+      ASSERT_COND( inode0->is_logic() );
       // inode0 をフロンティアスタックに積む．
       push_node(inode0);
       inode0_stat = true;
@@ -284,8 +284,8 @@ TopDown2::enum_recur()
 	}
       }
       else {
-	assert_cond( !temp2mark(inode1), __FILE__, __LINE__);
-	assert_cond( inode1->is_logic(), __FILE__, __LINE__);
+	ASSERT_COND( !temp2mark(inode1) );
+	ASSERT_COND( inode1->is_logic() );
 	// inode1 をフロンティアスタックに積む．
 	push_node(inode1);
 	inode1_stat = true;

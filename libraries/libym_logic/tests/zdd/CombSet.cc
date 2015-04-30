@@ -71,7 +71,7 @@ CombSet
 operator&(const CombSet& left,
 	  const CombSet& right)
 {
-  assert_cond( left.num() == right.num(), __FILE__, __LINE__);
+  ASSERT_COND( left.num() == right.num() );
   vector<ymuint32>::const_iterator p1 = left.mBody.begin();
   vector<ymuint32>::const_iterator e1 = left.mBody.end();
   vector<ymuint32>::const_iterator p2 = right.mBody.begin();
@@ -106,7 +106,7 @@ CombSet
 operator|(const CombSet& left,
 	  const CombSet& right)
 {
-  assert_cond( left.num() == right.num(), __FILE__, __LINE__);
+  ASSERT_COND( left.num() == right.num() );
   vector<ymuint32>::const_iterator p1 = left.mBody.begin();
   vector<ymuint32>::const_iterator e1 = left.mBody.end();
   vector<ymuint32>::const_iterator p2 = right.mBody.begin();
@@ -143,7 +143,7 @@ CombSet
 operator-(const CombSet& left,
 	  const CombSet& right)
 {
-  assert_cond( left.num() == right.num(), __FILE__, __LINE__);
+  ASSERT_COND( left.num() == right.num() );
   vector<ymuint32>::const_iterator p1 = left.mBody.begin();
   vector<ymuint32>::const_iterator e1 = left.mBody.end();
   vector<ymuint32>::const_iterator p2 = right.mBody.begin();

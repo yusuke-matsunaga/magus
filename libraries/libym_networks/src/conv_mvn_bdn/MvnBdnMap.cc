@@ -46,7 +46,7 @@ MvnBdnMap::put(const MvnNode* mvnode,
 	       ymuint index,
 	       BdnNodeHandle nodehandle)
 {
-  assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
+  ASSERT_COND( mArray.size() > mvnode->id() );
   vector<BdnNodeHandle>& array = mArray[mvnode->id()];
   if ( array.size() != mvnode->bit_width() ) {
     array.resize(mvnode->bit_width());
@@ -69,13 +69,12 @@ BdnNodeHandle
 MvnBdnMap::get(const MvnNode* mvnode,
 	       ymuint index) const
 {
-  assert_cond( mArray.size() > mvnode->id(), __FILE__, __LINE__);
+  ASSERT_COND( mArray.size() > mvnode->id() );
   const vector<BdnNodeHandle>& array = mArray[mvnode->id()];
   if ( array.empty() ) {
     return BdnNodeHandle(NULL, false);
   }
-  assert_cond( array.size() == mvnode->bit_width(),
-	       __FILE__, __LINE__);
+  ASSERT_COND( array.size() == mvnode->bit_width() );
   return array[index];
 }
 

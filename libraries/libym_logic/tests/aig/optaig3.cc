@@ -362,7 +362,7 @@ search_aigtable(size_t ni,
       if ( npn3rep[id0] == 0xFFU ) {
 	// npn3rep に pat0 のエントリが無かった．
 	// テーブルのデータがミスっていることになる．
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     AigTemplate& tmp0 = aig3table[id0];
@@ -379,9 +379,9 @@ search_aigtable(size_t ni,
     // pat0 に対応するエントリを探す．
     // いくつかの sanity check を行う．
     hash_map<ymuint32, size_t>::const_iterator p = npn4map.find(pat0);
-    assert_cond(p != npn4map.end(), __FILE__, __LINE__);
+    ASSERT_COND(p != npn4map.end() );
     size_t id0 = p->second;
-    assert_cond(npn4rep[id0] == pat0, __FILE__, __LINE__);
+    ASSERT_COND(npn4rep[id0] == pat0 );
     
     AigTemplate& tmp0 = aig4table[id0];
     if ( tmp0.set() ) {
@@ -397,9 +397,9 @@ search_aigtable(size_t ni,
     // pat0 に対応するエントリを探す．
     // いくつかの sanity check を行う．
     hash_map<ymuint32, size_t>::const_iterator p = npn5map.find(pat0);
-    assert_cond(p != npn5map.end(), __FILE__, __LINE__);
+    ASSERT_COND(p != npn5map.end() );
     size_t id0 = p->second;
-    assert_cond(npn5rep[id0] == pat0, __FILE__, __LINE__);
+    ASSERT_COND(npn5rep[id0] == pat0 );
     
     AigTemplate& tmp0 = aig5table[id0];
     if ( tmp0.set() ) {
@@ -411,7 +411,7 @@ search_aigtable(size_t ni,
     return false;
   }
   
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -662,7 +662,7 @@ decomp4(ymuint32 pat,
       }
       AigTemplate tmp;
       bool stat = search_aigtable(3, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       templ.set_copy(tmp, vmap);
       return true;
     }
@@ -686,7 +686,7 @@ decomp4(ymuint32 pat,
       lit1.set_literal(i, false);
       AigTemplate tmp;
       bool stat = search_aigtable(3, pat1[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_and(lit1, false, expr1, false);
       return true;
@@ -711,7 +711,7 @@ decomp4(ymuint32 pat,
       lit1.set_literal(i, true);
       AigTemplate tmp;
       bool stat = search_aigtable(3, pat1[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_or(lit1, false, expr1, false);
       return true;
@@ -731,7 +731,7 @@ decomp4(ymuint32 pat,
       lit1.set_literal(i, true);
       AigTemplate tmp;
       bool stat = search_aigtable(3, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_and(lit1, false, expr1, false);
       return true;
@@ -751,7 +751,7 @@ decomp4(ymuint32 pat,
       lit1.set_literal(i, false);
       AigTemplate tmp;
       bool stat = search_aigtable(3, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_or(lit1, false, expr1, false);
       return true;
@@ -771,7 +771,7 @@ decomp4(ymuint32 pat,
       lit1.set_literal(i, false);
       AigTemplate tmp;
       bool stat = search_aigtable(3, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_xor(lit1, false, expr1, false);
       return true;
@@ -791,12 +791,12 @@ decomp4(ymuint32 pat,
       for (x3 = 0; x3 < 4; ++ x3) {
 	if ( x3 != x1 && x3 != x2 ) break;
       }
-      assert_cond(x3 < 4, __FILE__, __LINE__);
+      ASSERT_COND(x3 < 4 );
       size_t x4;
       for (x4 = x3 + 1; x4 < 4; ++ x4) {
 	if ( x4 != x1 && x4 != x2 ) break;
       }
-      assert_cond(x4 < 4, __FILE__, __LINE__);
+      ASSERT_COND(x4 < 4 );
 
       size_t mask1 = 1U << x1;
       size_t mask2 = 1U << x2;
@@ -889,7 +889,7 @@ decomp4(ymuint32 pat,
       }
 
       if ( groupc == 0U ) {
-	assert_cond( groupa + groupb == 15U, __FILE__, __LINE__);
+	ASSERT_COND( groupa + groupb == 15U );
 	// コファクターが2つのパタンからなる．
 	switch ( groupa ) {
 	case 1U:  // 00         : 10, 01, 11
@@ -903,7 +903,7 @@ decomp4(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 4);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(3, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -927,7 +927,7 @@ decomp4(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 4);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(3, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -951,7 +951,7 @@ decomp4(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 4);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(3, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -975,7 +975,7 @@ decomp4(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 4);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(3, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -999,7 +999,7 @@ decomp4(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 4);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(3, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -1014,7 +1014,7 @@ decomp4(ymuint32 pat,
 
 	default:
 	  // これはありえない
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	  break;
 	}
       }
@@ -1037,12 +1037,12 @@ ndecomp4(ymuint32 pat,
       for (x3 = 0; x3 < 3; ++ x3) {
 	if ( x3 != x1 && x3 != x2 ) break;
       }
-      assert_cond(x3 < 3, __FILE__, __LINE__);
+      ASSERT_COND(x3 < 3 );
       size_t x4;
       for (x4 = x3 + 1; x4 < 4; ++ x4) {
 	if ( x4 != x1 && x4 != x2 ) break;
       }
-      assert_cond(x4 < 4, __FILE__, __LINE__);
+      ASSERT_COND(x4 < 4 );
       
       // x1: h のみに入力している変数
       // x2: h と g に入力している変数
@@ -1058,7 +1058,7 @@ ndecomp4(ymuint32 pat,
       // h と g の真理値を表すSAT変数を生成
       for (size_t i = 0; i < 16; ++ i) {
 	tVarId id = solver->new_var();
-	assert_cond(id == i, __FILE__, __LINE__);
+	ASSERT_COND(id == i );
       }
 
       // f の各々の真理値に対するSAT節を生成
@@ -1119,7 +1119,7 @@ ndecomp4(ymuint32 pat,
 	lit4.set_literal(x4, false);
 	AigTemplate tmp1;
 	bool stat1 = search_aigtable(3, pat_g, tmp1);
-	assert_cond(stat1, __FILE__, __LINE__);
+	ASSERT_COND(stat1 );
 	vector<AigTemplate> tmap1;
 	tmap1.push_back(lit2);
 	tmap1.push_back(lit3);
@@ -1128,7 +1128,7 @@ ndecomp4(ymuint32 pat,
 	g.set_compose(tmp1, tmap1);
 	AigTemplate tmp2;
 	bool stat2 = search_aigtable(3, pat_h, tmp2);
-	assert_cond(stat2, __FILE__, __LINE__);
+	ASSERT_COND(stat2 );
 	vector<AigTemplate> tmap2;
 	tmap2.push_back(lit1);
 	tmap2.push_back(lit2);
@@ -1247,7 +1247,7 @@ decomp5(ymuint32 pat,
       }
       AigTemplate tmp;
       bool stat = search_aigtable(4, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       templ.set_copy(tmp, vmap);
       return true;
     }
@@ -1271,7 +1271,7 @@ decomp5(ymuint32 pat,
       lit1.set_literal(i, false);
       AigTemplate tmp;
       bool stat = search_aigtable(4, pat1[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_and(lit1, false, expr1, false);
       return true;
@@ -1296,7 +1296,7 @@ decomp5(ymuint32 pat,
       lit1.set_literal(i, true);
       AigTemplate tmp;
       bool stat = search_aigtable(4, pat1[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_or(lit1, false, expr1, false);
       return true;
@@ -1316,7 +1316,7 @@ decomp5(ymuint32 pat,
       lit1.set_literal(i, true);
       AigTemplate tmp;
       bool stat = search_aigtable(4, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_and(lit1, false, expr1, false);
       return true;
@@ -1336,7 +1336,7 @@ decomp5(ymuint32 pat,
       lit1.set_literal(i, false);
       AigTemplate tmp;
       bool stat = search_aigtable(4, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_or(lit1, false, expr1, false);
       return true;
@@ -1356,7 +1356,7 @@ decomp5(ymuint32 pat,
       lit1.set_literal(i, false);
       AigTemplate tmp;
       bool stat = search_aigtable(4, pat0[i], tmp);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       AigTemplate expr1(tmp, vmap);
       templ.set_xor(lit1, false, expr1, false);
       return true;
@@ -1376,17 +1376,17 @@ decomp5(ymuint32 pat,
       for (x3 = 0; x3 < 5; ++ x3) {
 	if ( x3 != x1 && x3 != x2 ) break;
       }
-      assert_cond(x3 < 5, __FILE__, __LINE__);
+      ASSERT_COND(x3 < 5 );
       size_t x4;
       for (x4 = x3 + 1; x4 < 5; ++ x4) {
 	if ( x4 != x1 && x4 != x2 ) break;
       }
-      assert_cond(x4 < 5, __FILE__, __LINE__);
+      ASSERT_COND(x4 < 5 );
       size_t x5;
       for (x5 = x4 + 1; x5 < 5; ++ x5) {
 	if ( x5 != x1 && x5 != x2 ) break;
       }
-      assert_cond(x5 < 5, __FILE__, __LINE__);
+      ASSERT_COND(x5 < 5 );
 
       size_t mask1 = 1U << x1;
       size_t mask2 = 1U << x2;
@@ -1498,7 +1498,7 @@ decomp5(ymuint32 pat,
       }
 
       if ( groupc == 0U ) {
-	assert_cond( groupa + groupb == 15U, __FILE__, __LINE__);
+	ASSERT_COND( groupa + groupb == 15U );
 	// コファクターが2つのパタンからなる．
 	switch ( groupa ) {
 	case 1U:  // 00         : 10, 01, 11
@@ -1512,7 +1512,7 @@ decomp5(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 8);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(4, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -1539,7 +1539,7 @@ decomp5(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 8);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(4, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -1566,7 +1566,7 @@ decomp5(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 8);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(4, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -1593,7 +1593,7 @@ decomp5(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 8);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(4, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -1620,7 +1620,7 @@ decomp5(ymuint32 pat,
 	    ymuint32 pat1 = pata | (patb << 8);
 	    AigTemplate tmp;
 	    bool stat = search_aigtable(4, pat1, tmp);
-	    assert_cond(stat, __FILE__, __LINE__);
+	    ASSERT_COND(stat );
 	    AigTemplate lit3;
 	    lit3.set_literal(x3, false);
 	    AigTemplate lit4;
@@ -1638,7 +1638,7 @@ decomp5(ymuint32 pat,
 
 	default:
 	  // これはありえない
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	  break;
 	}
       }
@@ -1654,12 +1654,12 @@ decomp5(ymuint32 pat,
 	for (x4 = 0; x4 < 5; ++ x4) {
 	  if ( x4 != x1 && x4 != x2 && x4 != x3 ) break;
 	}
-	assert_cond(x4 < 5, __FILE__, __LINE__);
+	ASSERT_COND(x4 < 5 );
 	size_t x5;
 	for (x5 = x4 + 1; x5 < 5; ++ x5) {
 	  if ( x5 != x1 && x5 != x2 && x5 != x3 ) break;
 	}
-	assert_cond(x5 < 5, __FILE__, __LINE__);
+	ASSERT_COND(x5 < 5 );
 
 	size_t mask1 = 1U << x1;
 	size_t mask2 = 1U << x2;
@@ -1772,12 +1772,12 @@ decomp5(ymuint32 pat,
 	  }
 	}
 	if ( groupc == 0U ) {
-	  assert_cond( groupa + groupb == 255U, __FILE__, __LINE__);
+	  ASSERT_COND( groupa + groupb == 255U );
 	  // コファクターのパタンが2種類からなる．
 
 	  AigTemplate tmp;
 	  bool stat1 = search_aigtable(3, groupb, tmp);
-	  assert_cond(stat1, __FILE__, __LINE__);
+	  ASSERT_COND(stat1 );
 	  vector<AigTemplate> tmap1;
 	  AigTemplate lit1;
 	  lit1.set_literal(x1, false);
@@ -1793,7 +1793,7 @@ decomp5(ymuint32 pat,
 
 	  ymuint32 pat1 = pata | (patb << 4);
 	  bool stat2 = search_aigtable(3, pat1, tmp);
-	  assert_cond(stat2, __FILE__, __LINE__);
+	  ASSERT_COND(stat2 );
 	  vector<AigTemplate> tmap2;
 	  AigTemplate lit4;
 	  lit4.set_literal(x4, false);
@@ -1840,7 +1840,7 @@ try_ordecomp(size_t ni,
     }
   }
   size_t n = pos_array.size();
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
   
   size_t np = 1U << n;
   for (size_t p = 0U; p < np; ++ p) {
@@ -1908,7 +1908,7 @@ try_xordecomp(size_t ni,
     }
   }
   size_t n = pos_array.size();
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
   
   for (size_t p = 0U; p < nip; ++ p) {
     ymuint32 pat_a = (1U << pos0) | p;
@@ -2132,7 +2132,7 @@ init_table3()
   for (ymuint32 pat = 0U; pat < 256U; ++ pat) {
     AigTemplate templ;
     bool stat = search_aigtable(3, pat, templ);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     ostringstream buf;
     buf << "aig3table[" << pat << "]";
     templ.dump_code(cout, buf.str());
@@ -2298,7 +2298,7 @@ test3()
   for (ymuint32 pat = 0U; pat < 256; ++ pat) {
     AigTemplate templ;
     bool stat = search_aigtable(3, pat, templ);
-    assert_cond( stat, __FILE__, __LINE__);
+    ASSERT_COND( stat );
     cout << "pat  = ";
     dump_pat(cout, 3, pat);
     cout << endl;

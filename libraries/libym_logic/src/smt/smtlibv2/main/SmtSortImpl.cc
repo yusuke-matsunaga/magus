@@ -47,7 +47,7 @@ SmtSortImpl::is_param() const
 ymuint
 SmtSortImpl::param_id() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -64,7 +64,7 @@ SmtSortImpl::elem_num() const
 const SmtSort*
 SmtSortImpl::elem(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -113,7 +113,7 @@ SmtCplxSort::elem_num() const
 const SmtSort*
 SmtCplxSort::elem(ymuint pos) const
 {
-  assert_cond( pos < elem_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < elem_num() );
   return mElemList[pos];
 }
 
@@ -169,7 +169,7 @@ SmtParamSort::elem_num() const
 const SmtSort*
 SmtParamSort::elem(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

@@ -39,15 +39,15 @@ DopList::add(DetectOp* dop)
 
 // @brief テストパタンが見つかった時の処理
 // @param[in] f 故障
-// @param[in] tv テストパタン
+// @param[in] assign_list 値の割当リスト
 void
-DopList::operator()(TpgFault* f,
-		    TestVector* tv)
+DopList::operator()(const TpgFault* f,
+		    const NodeValList& assign_list)
 {
   for (vector<DetectOp*>::iterator p = mDopList.begin();
        p != mDopList.end(); ++ p) {
     DetectOp& dop = **p;
-    dop(f, tv);
+    dop(f, assign_list);
   }
 }
 

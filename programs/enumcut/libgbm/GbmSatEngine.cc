@@ -78,7 +78,7 @@ void
 GbmSatEngine::set_node_var(ymuint id,
 			   GbmLit lit)
 {
-  assert_cond( id < mNodeVarArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( id < mNodeVarArray.size() );
   mNodeVarArray[id] = lit;
   if ( debug() ) {
     cout << "Node#" << id << ": " << lit << endl;
@@ -374,7 +374,7 @@ GbmSatEngine::make_MUX(const vector<GbmLit>& d_vars,
 {
   ymuint nd = d_vars.size();
   ymuint ns = s_vars.size();
-  assert_cond( (1U << ns) == nd, __FILE__, __LINE__);
+  ASSERT_COND( (1U << ns) == nd );
   for (ymuint b = 0; b < nd; ++ b) {
     const GbmLit& dvar = d_vars[b];
     vector<Literal> tmp_list;

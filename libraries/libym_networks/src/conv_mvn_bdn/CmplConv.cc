@@ -42,7 +42,7 @@ CmplConv::operator()(const MvnNode* node,
     const MvnNode* src_node0 = ipin0->src_node();
 
     ymuint bw = node->bit_width();
-    assert_cond( src_node0->bit_width() == bw, __FILE__, __LINE__);
+    ASSERT_COND( src_node0->bit_width() == bw );
 
     BdnNodeHandle cin(BdnNodeHandle::make_one());
     vector<BdnNodeHandle> tmp_list(3);

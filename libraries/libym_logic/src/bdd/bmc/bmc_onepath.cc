@@ -124,7 +124,7 @@ BddMgrClassic::shortest_onepath_len(BddEdge e)
   }
   HashMap<BddEdge, ymint> assoc;
   ymint tmp = spl_step(e, assoc);
-  assert_cond(tmp >= 0, __FILE__, __LINE__);
+  ASSERT_COND(tmp >= 0 );
   return static_cast<ymuint>(tmp);
 }
 

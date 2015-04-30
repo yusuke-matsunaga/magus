@@ -11,7 +11,6 @@
 #include "YmTclpp/TclPopt.h"
 #include "AtpgMgr.h"
 #include "TpgNetwork.h"
-#include "DtpgDriver.h"
 #include "DtpgStats.h"
 #include "DtpgEngine.h"
 #include "FaultMgr.h"
@@ -51,32 +50,28 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 			    "single mode");
   mPoptSingle2 = new TclPoptInt(this, "single2",
 				"single2 mode <INT>");
+  mPoptSingle3 = new TclPopt(this, "single3",
+			     "single3 mode");
   mPoptMulti = new TclPopt(this, "multi",
 			   "multi mode");
   mPoptMulti2 = new TclPoptInt(this, "multi2",
 			       "multi2 mode <INT>");
+  mPoptConcurrent = new TclPopt(this, "concurrent",
+				"concurrent mode");
   mPoptSmtSingle = new TclPopt(this, "smt_single",
 			       "smt_single mode");
-  mPoptForget = new TclPopt(this, "forget",
-			    "forget mode");
-  mPoptFFR = new TclPopt(this, "ffr",
-			  "FFR mode");
-  mPoptMFFC = new TclPopt(this, "mffc",
-			  "MFFC mode");
-  mPoptPo = new TclPopt(this, "po",
-			"po-split mode");
-  mPoptRpo = new TclPopt(this, "rpo",
-			 "po-split (reverse order) mode");
-  mPoptSkip = new TclPoptInt(this, "skip",
-			     "specify skip count <INT>");
   mPoptX = new TclPoptInt(this, "x",
 			  "X-extract mode [0-2]");
   mPoptDrop = new TclPopt(this, "drop",
 			  "with fault drop");
+  mPoptKDet = new TclPoptInt(this, "k_det",
+			     "detection count");
   mPoptOpt = new TclPoptStr(this, "option",
 			    "specify option string <STR>");
   mPoptVerify = new TclPopt(this, "verify",
 			    "verify generated pattern");
+  mPoptNoPat = new TclPopt(this, "no_pat",
+			   "do not generate patterns");
   mPoptTimer = new TclPopt(this, "timer",
 			   "enable timer");
   mPoptNoTimer = new TclPopt(this, "notimer",
@@ -84,10 +79,7 @@ DtpgCmd::DtpgCmd(AtpgMgr* mgr) :
 
   new_popt_group(mPoptSat, mPoptMiniSat, mPoptMiniSat2, mPoptSatRec);
   new_popt_group(mPoptSingle, mPoptSingle2, mPoptMulti, mPoptMulti2, mPoptSmtSingle);
-  new_popt_group(mPoptFFR, mPoptMFFC);
   new_popt_group(mPoptTimer, mPoptNoTimer);
-
-  new_popt_group(mPoptPo, mPoptRpo);
 }
 
 // @brief デストラクタ
@@ -139,82 +131,58 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
 
   bool print_stats = mPoptPrintStats->is_specified();
 
-  tDtpgMode mode = kDtpgSingle;
-  if ( mPoptFFR->is_specified() ) {
-    mode = kDtpgFFR;
-  }
-  else if ( mPoptMFFC->is_specified() ) {
-    mode = kDtpgMFFC;
-  }
-
   string engine_type;
   ymuint mode_val = 0;
+  ymuint kdet_val = 0;
   if ( mPoptSingle->is_specified() ) {
-    engine_type = "single";
+    if ( mPoptKDet->is_specified() ) {
+      engine_type = "single_kdet";
+      kdet_val = mPoptKDet->val();
+    }
+    else {
+      engine_type = "single";
+    }
   }
   else if ( mPoptSingle2->is_specified() ) {
     engine_type = "single2";
     mode_val = mPoptSingle2->val();
   }
+  else if ( mPoptSingle3->is_specified() ) {
+    engine_type = "single3";
+  }
   else if ( mPoptMulti->is_specified() ) {
-    if ( mPoptForget->is_specified() ) {
-      engine_type = "multi_forget";
-    }
-    else {
-      engine_type = "multi";
-    }
+    engine_type = "multi";
   }
   else if ( mPoptMulti2->is_specified() ) {
-    if ( mPoptForget->is_specified() ) {
-      engine_type = "multi2_forget";
-    }
-    else {
-      engine_type = "multi2";
-    }
+    engine_type = "multi2";
     mode_val = mPoptMulti2->val();
   }
+  else if ( mPoptConcurrent->is_specified() ) {
+    engine_type = "concurrent";
+  }
+#if 0
   else if ( mPoptSmtSingle->is_specified() ) {
     engine_type = "smt_single";
   }
+#endif
 
   string option_str = mPoptOpt->val();
 
   DopList dop_list;
   UopList uop_list;
 
-  dop_list.add(new_DopTvList(_tv_list()));
+  if ( !mPoptNoPat->is_specified() ) {
+    dop_list.add(new_DopTvList(_tv_mgr(), _tv_list()));
+  }
   dop_list.add(new_DopBase(_fault_mgr()));
-
-  bool po_flag = mPoptPo->is_specified();
-  bool rpo_flag = mPoptRpo->is_specified();
-  int skip_count = 0;
-  if ( (po_flag || rpo_flag) && mPoptSkip->is_specified() ) {
-    skip_count = mPoptSkip->val();
-  }
-  if ( skip_count > 0 ) {
-    uop_list.add(new_UopSkip(skip_count));
-  }
-  else {
-    uop_list.add(new_UopBase(_fault_mgr()));
-  }
+  uop_list.add(new_UopBase(_fault_mgr()));
 
   ymuint xmode = 0;
   if ( mPoptX->is_specified() ) {
     xmode = mPoptX->val();
   }
-  TvMgr& tvmgr = _tv_mgr();
-  BackTracer* bt = NULL;
-  switch ( xmode ) {
-  case 1: bt = new_BtJust1(tvmgr); break;
-  case 2: bt = new_BtJust2(tvmgr); break;
-#if 0
-  case 3: bt = new_BtZdd(tvmgr); break;
-#endif
-  default: bt = new_BtSimple(tvmgr); break;
-  }
-  if ( bt != NULL ) {
-    bt->set_max_id(_network().max_node_id());
-  }
+
+  BackTracer bt(_network().max_node_id());
 
   if ( mPoptDrop->is_specified() ) {
     dop_list.add(new_DopDrop(_fault_mgr(), _fsim3()));
@@ -228,54 +196,25 @@ DtpgCmd::cmd_proc(TclObjVector& objv)
     timer_enable = false;
   }
 
-  tDtpgPoMode po_mode = kDtpgPoNone;
-  if ( po_flag ) {
-    po_mode = kDtpgPoInc;
-  }
-  if ( rpo_flag ) {
-    po_mode = kDtpgPoDec;
-  }
-
-  Fsim& fsim3 = _fsim3();
-  fsim3.set_faults(_fault_mgr().remain_list());
-
-  DtpgDriver* dtpg = new_DtpgDriver();
-
-  ymuint max_id = _network().max_node_id();
-
   DtpgEngine* engine = NULL;
   if ( engine_type == "single" ) {
-    engine = new_SatEngineSingle(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
-  }
-  else if ( engine_type == "single2" ) {
-    engine = new_SatEngineSingle2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+    engine = new_DtpgSatS(sat_type, sat_option, outp, bt, dop_list, uop_list);
   }
   else if ( engine_type == "multi" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, false);
-  }
-  else if ( engine_type == "multi_forget" ) {
-    engine = new_SatEngineMulti(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, true);
-  }
-  else if ( engine_type == "multi2" ) {
-    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, false);
-  }
-  else if ( engine_type == "multi2_forget" ) {
-    engine = new_SatEngineMulti2(mode_val, sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list, true);
-  }
-  else if ( engine_type == "smt_single" ) {
-    engine = new_SmtEngineSingle(sat_type, sat_option, outp, max_id, *bt, dop_list, uop_list);
+    engine = new_DtpgSatM(sat_type, sat_option, outp, bt, dop_list, uop_list);
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    // デフォルトフォールバック
+    engine = new_DtpgSatS(sat_type, sat_option, outp, bt, dop_list, uop_list);
   }
 
   engine->set_option(option_str);
   engine->timer_enable(timer_enable);
 
+  const vector<const TpgFault*>& fault_list = _fault_mgr().remain_list();
   DtpgStats stats;
-  dtpg->run(_network(), mode, po_mode, *engine, stats);
+  engine->run(_network(), _fault_mgr(), _fsim3(), fault_list, stats);
 
-  delete dtpg;
   delete engine;
 
   after_update_faults();

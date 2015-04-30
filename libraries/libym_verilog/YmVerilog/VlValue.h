@@ -995,7 +995,7 @@ VlValue::is_signed() const
   case kBitVectorType:
     return bitvector_value().is_signed();
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return false;
 }
 
@@ -1024,7 +1024,7 @@ VlValue::bit_size() const
   case kErrorType:
     return 0;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -1055,7 +1055,7 @@ VlValue::value_type() const
   case kErrorType:
     return VlValueType();
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return VlValueType();
 }
 

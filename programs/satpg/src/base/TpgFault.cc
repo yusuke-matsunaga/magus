@@ -8,7 +8,6 @@
 
 
 #include "TpgFault.h"
-#include "TpgNetwork.h"
 #include "TpgNode.h"
 
 
@@ -27,11 +26,11 @@ BEGIN_NAMESPACE_YM_SATPG
 // @param[in] rep_fault 代表故障
 void
 TpgFault::set(ymuint id,
-	      TpgNode* node,
+	      const TpgNode* node,
 	      bool output,
 	      ymuint pos,
 	      int val,
-	      TpgFault* rep_fault)
+	      const TpgFault* rep_fault)
 {
   mId = id;
   mNode = node;
@@ -45,8 +44,6 @@ TpgFault::set(ymuint id,
   }
   mPosVal |= (pos << 3);
 
-  mStatus = kFsUndetected;
-
   if ( rep_fault != NULL ) {
     mRepFault = rep_fault;
   }
@@ -56,7 +53,7 @@ TpgFault::set(ymuint id,
 }
 
 // @brief 故障の入力側のゲートを返す．
-TpgNode*
+const TpgNode*
 TpgFault::source_node() const
 {
   if ( is_output_fault() ) {

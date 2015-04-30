@@ -47,14 +47,14 @@ read_table(int argc,
     }
     else {
       RwtNode* l = rwt_node->child0();
-      assert_cond( l != NULL, __FILE__, __LINE__);
+      ASSERT_COND( l != NULL );
       NpnHandle h0 = handle_map[l->id()];
       if ( rwt_node->inv0() ) {
 	h0 = ~h0;
       }
 
       RwtNode* r = rwt_node->child1();
-      assert_cond( r != NULL, __FILE__, __LINE__);
+      ASSERT_COND( r != NULL );
       NpnHandle h1 = handle_map[r->id()];
       if ( rwt_node->inv1() ) {
 	h1 = ~h1;

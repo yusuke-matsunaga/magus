@@ -186,7 +186,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
-    assert_cond( node->is_input(), __FILE__, __LINE__);
+    ASSERT_COND( node->is_input() );
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
     switch ( node->input_type() ) {
@@ -311,7 +311,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
       has_match = true;
       add_inv(node, false, inv_func, maprec);
     }
-    assert_cond( has_match, __FILE__, __LINE__);
+    ASSERT_COND( has_match );
   }
 }
 
@@ -343,7 +343,7 @@ AreaCover::add_inv(const BdnNode* node,
       inv_cell = cell;
     }
   }
-  assert_cond( inv_cell, __FILE__, __LINE__);
+  ASSERT_COND( inv_cell );
   min_cost += alt_cost;
   if ( cur_cost > min_cost ) {
     cur_cost = min_cost;
@@ -365,7 +365,7 @@ AreaCover::calc_weight(const BdnNode* node,
       }
       return;
     }
-    assert_cond( !node->is_input(), __FILE__, __LINE__);
+    ASSERT_COND( !node->is_input() );
 
     const BdnNode* inode0 = node->fanin(0);
     double cur_weight0 = cur_weight / inode0->fanout_num();

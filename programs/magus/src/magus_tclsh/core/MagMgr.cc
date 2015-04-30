@@ -54,7 +54,7 @@ MagMgr::~MagMgr()
        p != name_list.end(); ++ p) {
     string name = *p;
     bool stat = delete_nethandle(name);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 }
 
@@ -312,7 +312,7 @@ MagMgr::pop_cur_nethandle(ostream* ostream)
 NetHandle*
 MagMgr::cur_nethandle() const
 {
-  assert_cond( mCurNet != NULL, __FILE__, __LINE__);
+  ASSERT_COND( mCurNet != NULL );
   return mCurNet;
 }
 
@@ -422,7 +422,7 @@ MagMgr::_delete_nethandle(NetHandle* net_handle)
       return;
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 }
 
 // @brief ハッシュ表を拡大する．

@@ -81,7 +81,7 @@ IguGen::solve(ymuint multi,
 	      ymuint best_so_far,
 	      vector<const Variable*>& solution)
 {
-  assert_cond( !mVectorList.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !mVectorList.empty() );
   mVectorLength = mVectorList[0]->size();
 
   // imbalance measure の昇順に並び替える．
@@ -308,7 +308,7 @@ IguGen::solve_recur(const VectSetList& vector_list,
   }
 
   ymuint slack = mBestSoFar - mSelectedVariables.size();
-  assert_cond( slack > 1, __FILE__, __LINE__);
+  ASSERT_COND( slack > 1 );
 
   // ambiguity measure の昇順に並び替える．
   vector<pair<ymuint, const Variable*> > tmp_list;

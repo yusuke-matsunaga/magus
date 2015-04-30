@@ -87,7 +87,7 @@ LexPluginDict::reg_plugin(LexPlugin* plugin)
       }
       else {
 	// コンパイラディレクティブは上書きできない．
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     prev = &p->mLink;

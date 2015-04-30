@@ -116,7 +116,7 @@ TvMgr_delete_vector(TvMgrObject* self,
   }
 
   TestVector* tv = PyTestVector_AsTestVectorPtr(obj1);
-  assert_cond( tv != NULL, __FILE__, __LINE__);
+  ASSERT_COND( tv != NULL );
 
   self->mPtr->delete_vector(tv);
 

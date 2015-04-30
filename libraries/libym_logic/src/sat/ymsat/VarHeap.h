@@ -245,7 +245,7 @@ ymuint
 VarHeap::pop_top()
 {
   // この assert は重いのでコメントアウトしておく
-  //assert_cond(mHeapNum > 0, __FILE__, __LINE__);
+  //ASSERT_COND(mHeapNum > 0 );
   ymuint ans = mHeap[0];
   mHeapPos[ans] = -1;
   -- mHeapNum;

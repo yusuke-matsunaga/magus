@@ -365,6 +365,7 @@ BtgMatchImpl::calc_match2()
 	    queue.push_back(v3);
 	    parent[v1->id()] = edge;
 	    found = true;
+	    break;
 	  }
 	}
 	if ( !found ) {

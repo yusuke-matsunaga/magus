@@ -395,7 +395,7 @@ SortMgr::replace_param(const SortElem* templ,
   if ( templ->is_param() ) {
     // パラメータ型
     ymuint pid = templ->param_id();
-    assert_cond( pid < param_list.size(), __FILE__, __LINE__);
+    ASSERT_COND( pid < param_list.size() );
     return param_list[pid];
   }
 

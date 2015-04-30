@@ -164,7 +164,7 @@ EiFuncCall::value_type() const
     return VlValueType(true, true, mFunc->bit_size());
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return VlValueType();
 }
@@ -235,7 +235,7 @@ EiSysFuncCall::type() const
 VlValueType
 EiSysFuncCall::value_type() const
 {
-  assert_cond( mUserSystf->system_function(), __FILE__, __LINE__);
+  ASSERT_COND( mUserSystf->system_function() );
 
   switch ( mUserSystf->function_type() ) {
   case vpiIntFunc:
@@ -254,7 +254,7 @@ EiSysFuncCall::value_type() const
     return VlValueType(true, true, mUserSystf->size());
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return VlValueType();
 }

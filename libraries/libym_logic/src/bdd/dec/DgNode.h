@@ -466,7 +466,7 @@ inline
 tVarId
 DgNode::literal_var() const
 {
-  assert_cond(mType == kLitP, __FILE__, __LINE__);
+  ASSERT_COND(mType == kLitP );
   return mTopVarId;
 }
 

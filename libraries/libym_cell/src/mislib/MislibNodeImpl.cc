@@ -82,7 +82,7 @@ Expr
 MislibNodeImpl::to_expr(const HashMap<ShString, ymuint>& name_map) const
 {
   // デフォルトではエラーとなる．
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return Expr();
 }
 

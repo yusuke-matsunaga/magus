@@ -27,7 +27,7 @@ SmtTermImpl::~SmtTermImpl()
 ymuint32
 SmtTermImpl::int_value() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -35,7 +35,7 @@ SmtTermImpl::int_value() const
 ShString
 SmtTermImpl::str_value() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return ShString();
 }
 
@@ -43,7 +43,7 @@ SmtTermImpl::str_value() const
 const SmtVar*
 SmtTermImpl::var() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -51,7 +51,7 @@ SmtTermImpl::var() const
 tSmtFunType
 SmtTermImpl::function_type() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kSmtFun_UserDef;
 }
 
@@ -59,7 +59,7 @@ SmtTermImpl::function_type() const
 const SmtFun*
 SmtTermImpl::function() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -67,7 +67,7 @@ SmtTermImpl::function() const
 ymuint
 SmtTermImpl::input_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -76,7 +76,7 @@ SmtTermImpl::input_num() const
 const SmtTerm*
 SmtTermImpl::input(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -84,7 +84,7 @@ SmtTermImpl::input(ymuint pos) const
 ymuint
 SmtTermImpl::var_num() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -93,7 +93,7 @@ SmtTermImpl::var_num() const
 const SmtVar*
 SmtTermImpl::bound_var(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -101,7 +101,7 @@ SmtTermImpl::bound_var(ymuint pos) const
 const SmtTerm*
 SmtTermImpl::body() const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -369,7 +369,7 @@ SmtFunTerm1::input_num() const
 const SmtTerm*
 SmtFunTerm1::input(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -408,7 +408,7 @@ SmtFunTerm2::input_num() const
 const SmtTerm*
 SmtFunTerm2::input(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 
@@ -470,7 +470,7 @@ SmtFunTerm3::sort() const
     break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kSmtSort_None;
 }
 
@@ -501,7 +501,7 @@ SmtFunTerm3::input_num() const
 const SmtTerm*
 SmtFunTerm3::input(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -540,7 +540,7 @@ SmtFunTerm4::input_num() const
 const SmtTerm*
 SmtFunTerm4::input(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 
@@ -586,7 +586,7 @@ SmtQualTerm::var_num() const
 const SmtVar*
 SmtQualTerm::bound_var(ymuint pos) const
 {
-  assert_cond( pos < var_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < var_num() );
   return mVarList[pos];
 }
 

@@ -58,13 +58,13 @@ SealCmd::cmd_proc(TclObjVector& objv)
     Expr lexp = ibnode->func();
     BNode* ibnode0 = manip.new_logic();
     bool stat = manip.change_logic(ibnode0, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     BNode* ibnode1 = manip.new_logic();
     stat = manip.change_logic(ibnode1, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     BNode* ibnode2 = manip.new_logic();
     stat = manip.change_logic(ibnode2, lexp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
 
     // その3つの多数決論理を作る．
     fanins.resize(3);
@@ -72,7 +72,7 @@ SealCmd::cmd_proc(TclObjVector& objv)
     fanins[1] = ibnode1;
     fanins[2] = ibnode2;
     stat = manip.change_logic(ibnode, maj_exp, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
   }
 
   return TCL_OK;

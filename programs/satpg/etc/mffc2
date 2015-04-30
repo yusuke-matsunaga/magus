@@ -1,0 +1,15 @@
+set filename $argv
+
+if [string match *.blif $filename] {
+  atpg::read_blif $filename
+} elseif [string match *.bench $filename] {
+  atpg::read_iscas89 $filename
+} else {
+  puts "Error: illeagal filename: $filename"
+}
+
+puts ""
+atpg::dtpg2 -mffc -print_stats
+puts ""
+puts "$filename ***mffc*** results"
+atpg::print_stats

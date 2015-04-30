@@ -50,7 +50,7 @@ LBFactory::operator()(const string& args) const
     // 本当はその後ろの数字を読む．
     return new XLB(1);
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 

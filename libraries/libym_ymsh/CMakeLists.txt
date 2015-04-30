@@ -30,7 +30,7 @@ set (ymsh_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-add_library(ym_ymsh SHARED
+add_library(ym_ymsh
   ${ymsh_SOURCES}
   )
 

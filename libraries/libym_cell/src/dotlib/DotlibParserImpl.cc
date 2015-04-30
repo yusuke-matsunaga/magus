@@ -148,8 +148,8 @@ DotlibParserImpl::expect(tTokenType req_type)
   case FLOAT_NUM:  type_str = "FLOAT"; break;
   case EXPRESSION: type_str = "EXPRESSION"; break;
   case NL:         type_str = "new-line"; break;
-  case ERROR:      assert_not_reached(__FILE__, __LINE__);
-  case END:        assert_not_reached(__FILE__, __LINE__);
+  case ERROR:      ASSERT_NOT_REACHED;
+  case END:        ASSERT_NOT_REACHED;
   }
   ostringstream buf;
   buf << "syntax error. " << type_str << " is expected.";

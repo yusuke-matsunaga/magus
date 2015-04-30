@@ -534,7 +534,7 @@ init_table()
 LogExpr
 optff3(const TvFunc& func)
 {
-  assert_cond(func.ni() == 3, __FILE__, __LINE__);
+  ASSERT_COND(func.ni() == 3 );
 
   ymuint32 pat = 0UL;
   for (size_t pos = 0; pos < 8; ++ pos) {
@@ -791,7 +791,7 @@ step1(ymuint32 pat)
     groupc |= 8U;
   }
   if ( groupc == 0U ) {
-    assert_cond( groupa + groupb == 15U, __FILE__, __LINE__);
+    ASSERT_COND( groupa + groupb == 15U );
     // コファクターが2つのパタンからなる．
     switch ( groupa ) {
     case 1U:  // 0n1n             : 0p1n, 0n1p, 0p1p
@@ -817,14 +817,14 @@ step1(ymuint32 pat)
     case 12U: // 0n1p, 0p1p       : 0n1n, 0p1n
     case 14U: // 0p1n, 0n1p, 0p1p : 0n1n
       // 0n1n はかならず groupa に含まれる．
-      assert_cond(__FILE__, __LINE__);
+      ASSERT_COND(__FILE__, __LINE__);
       break;
       
     case 3U:  // 0n1n, 0p1n       : 0n1p, 0p1p
     case 5U:  // 0n1n, 0n1p       : 0p1n, 0p1p
     case 15U: // 0n1n, 0p1n, 0n1p, 0p1p
       // これはありえない
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     }
   }

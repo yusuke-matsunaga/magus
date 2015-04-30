@@ -13,6 +13,7 @@
 #include "TpgNode.h"
 #include "TpgFault.h"
 #include "TestVector.h"
+#include "NodeValList.h"
 #include "SimNode.h"
 #include "SimFFR.h"
 #include "YmUtils/HashSet.h"
@@ -103,7 +104,7 @@ Fsim3::set_network(const TpgNetwork& network)
       for (ymuint i = 0; i < ni; ++ i) {
 	const TpgNode* itpgnode = tpgnode->fanin(i);
 	SimNode* inode = find_simnode(itpgnode);
-	assert_cond(inode, __FILE__, __LINE__);
+	ASSERT_COND(inode );
 	inputs[i] = inode;
       }
 
@@ -187,12 +188,12 @@ Fsim3::set_network(const TpgNetwork& network)
   //////////////////////////////////////////////////////////////////////
   // 故障リストの設定
   //////////////////////////////////////////////////////////////////////
-  const vector<TpgFault*>& rep_faults = network.rep_faults();
+  const vector<const TpgFault*>& rep_faults = network.rep_faults();
   ymuint nf = rep_faults.size();
   mSimFaults.resize(nf);
   mFaultArray.resize(network.max_fault_id());
   for (ymuint i = 0; i < nf; ++ i) {
-    TpgFault* f = rep_faults[i];
+    const TpgFault* f = rep_faults[i];
     const TpgNode* node = f->node();
     SimNode* simnode = find_simnode(node);
     ymuint ipos = 0;
@@ -213,7 +214,7 @@ Fsim3::set_network(const TpgNetwork& network)
 
 // @brief 故障にスキップマークをつける．
 void
-Fsim3::set_skip(TpgFault* f)
+Fsim3::set_skip(const TpgFault* f)
 {
   mFaultArray[f->id()]->mSkip = true;
 }
@@ -223,7 +224,7 @@ Fsim3::set_skip(TpgFault* f)
 //
 // スキップマークは消される．
 void
-Fsim3::set_faults(const vector<TpgFault*>& fault_list)
+Fsim3::set_faults(const vector<const TpgFault*>& fault_list)
 {
   HashSet<ymuint> fault_set;
   for (ymuint i = 0; i < fault_list.size(); ++ i) {
@@ -257,12 +258,12 @@ Fsim3::set_faults(const vector<TpgFault*>& fault_list)
 // @retval false 故障の検出が行えなかった．
 bool
 Fsim3::spsfp(TestVector* tv,
-	     TpgFault* f)
+	     const TpgFault* f)
 {
-  ymuint npi = mNetwork->input_num2();
-
   // tv を全ビットにセットしていく．
   mGvalClearArray.clear();
+
+  ymuint npi = mNetwork->input_num2();
   for (ymuint i = 0; i < npi; ++ i) {
     SimNode* simnode = mInputArray[i];
     switch ( tv->val3(i) ) {
@@ -273,6 +274,44 @@ Fsim3::spsfp(TestVector* tv,
     update_gval(simnode);
   }
 
+  return _spsfp(f);
+}
+
+// @brief SPSFP故障シミュレーションを行う．
+// @param[in] assign_list 値の割当リスト
+// @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
+bool
+Fsim3::spsfp(const NodeValList& assign_list,
+	     const TpgFault* f)
+{
+  // assign_list を全ビットにセットしていく．
+  mGvalClearArray.clear();
+
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    SimNode* simnode = mInputArray[nv.node()->input_id()];
+    if ( nv.val() ) {
+      simnode->set_gval(kPvAll0, kPvAll1);
+    }
+    else {
+      simnode->set_gval(kPvAll1, kPvAll0);
+    }
+    update_gval(simnode);
+  }
+
+  return _spsfp(f);
+}
+
+// @brief SPSFP故障シミュレーションの本体
+// @param[in] f 対象の故障
+// @retval true 故障の検出が行えた．
+// @retval false 故障の検出が行えなかった．
+bool
+Fsim3::_spsfp(const TpgFault* f)
+{
   // 正常値の計算を行う．
   calc_gval();
 
@@ -336,18 +375,50 @@ Fsim3::sppfp(TestVector* tv,
 
   // tv を全ビットにセットしていく．
   mGvalClearArray.clear();
-  {
-    for (ymuint i = 0; i < npi; ++ i) {
-      SimNode* simnode = mInputArray[i];
-      switch ( tv->val3(i) ) {
-      case kVal0: simnode->set_gval(kPvAll1, kPvAll0); break;
-      case kVal1: simnode->set_gval(kPvAll0, kPvAll1); break;
-      case kValX: continue; // 直前の clear_gval() で X になっているはず．
-      }
-      update_gval(simnode);
+  for (ymuint i = 0; i < npi; ++ i) {
+    SimNode* simnode = mInputArray[i];
+    switch ( tv->val3(i) ) {
+    case kVal0: simnode->set_gval(kPvAll1, kPvAll0); break;
+    case kVal1: simnode->set_gval(kPvAll0, kPvAll1); break;
+    case kValX: continue; // 直前の clear_gval() で X になっているはず．
     }
+    update_gval(simnode);
   }
 
+  _sppfp(op);
+}
+
+// @brief ひとつのパタンで故障シミュレーションを行う．
+// @param[in] assign_list 値の割当リスト
+// @param[in] op 検出した時に起動されるファンクタオブジェクト
+void
+Fsim3::sppfp(const NodeValList& assign_list,
+	     FsimOp& op)
+{
+  // assign_list を全ビットにセットしていく．
+  mGvalClearArray.clear();
+
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    SimNode* simnode = mInputArray[nv.node()->input_id()];
+    if ( nv.val() ) {
+      simnode->set_gval(kPvAll0, kPvAll1);
+    }
+    else {
+      simnode->set_gval(kPvAll1, kPvAll0);
+    }
+    update_gval(simnode);
+  }
+
+  _sppfp(op);
+}
+
+// @brief SPPFP故障シミュレーションの本体
+// @param[in] op 検出した時に起動されるファンクタオブジェクト
+void
+Fsim3::_sppfp(FsimOp& op)
+{
   // 正常値の計算を行う．
   calc_gval();
 
@@ -523,7 +594,7 @@ Fsim3::ppsfp(const vector<TestVector*>& tv_array,
       SimFault* ff = *p_ff;
       PackedVal dbits = obs & ff->mObsMask;
       if ( dbits ) {
-	TpgFault* f = ff->mOrigF;
+	const TpgFault* f = ff->mOrigF;
 	op(f, dbits);
       }
     }
@@ -585,7 +656,7 @@ Fsim3::ffr_simulate(SimFFR* ffr)
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     SimFault* ff = flist[rpos];
-    TpgFault* f = ff->mOrigF;
+    const TpgFault* f = ff->mOrigF;
     if ( ff->mSkip ) {
       continue;
     }
@@ -710,7 +781,7 @@ Fsim3::fault_sweep(SimFFR* ffr,
   for (ymuint rpos = 0; rpos < fnum; ++ rpos) {
     SimFault* ff = flist[rpos];
     if ( ff->mObsMask ) {
-      TpgFault* f = ff->mOrigF;
+      const TpgFault* f = ff->mOrigF;
       op(f, kPvAll1);
     }
   }

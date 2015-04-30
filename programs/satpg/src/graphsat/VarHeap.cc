@@ -107,7 +107,7 @@ VarHeap::build(const vector<VarId>& var_list)
     mHeapPos[i] = -1;
   }
   mHeapNum = 0;
-  assert_cond( var_list.size() <= mVarSize, __FILE__, __LINE__);
+  ASSERT_COND( var_list.size() <= mVarSize );
 
   for (ymuint i = 0; i < var_list.size(); ++ i) {
     VarId var = var_list[i];
@@ -167,12 +167,11 @@ VarHeap::dump(ostream& s) const
   const char* spc = "";
   for (ymuint i = 0; i < mHeapNum; ++ i) {
     ymuint vindex = mHeap[i];
-    assert_cond(mHeapPos[vindex] == static_cast<ymint>(i),
-		__FILE__, __LINE__);
+    ASSERT_COND( mHeapPos[vindex] == static_cast<ymint>(i) );
     if ( i > 0 ) {
       ymint p = parent(i);
       ymuint pindex = mHeap[p];
-      assert_cond(mActivity[pindex] >= mActivity[vindex], __FILE__, __LINE__);
+      ASSERT_COND( mActivity[pindex] >= mActivity[vindex] );
     }
     s << spc << vindex << "("
       << mActivity[vindex]

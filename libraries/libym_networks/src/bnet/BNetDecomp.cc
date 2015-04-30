@@ -165,15 +165,14 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
 			     BNode* root_node,
 			     bool no_xor)
 {
-  assert_cond(!expr.is_zero() && !expr.is_one() && !expr.is_literal(),
-	      __FILE__, __LINE__);
+  ASSERT_COND( !expr.is_zero() && !expr.is_one() && !expr.is_literal() );
 
   HeapTree<Node, CompFunc> work;
 
   ymuint ni = expr.child_num();
   for (ymuint i = 0; i < ni; i ++) {
     Expr opr1 = expr.child(i);
-    assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
+    ASSERT_COND(!opr1.is_zero() && !opr1.is_one() );
 
     BNode* node1;
     bool inv1;
@@ -224,15 +223,15 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
     }
     else if ( expr.is_xor() ) {
       if ( no_xor ) {
-	assert_cond(max_fanin == 2, __FILE__, __LINE__);
+	ASSERT_COND(max_fanin == 2 );
 	Expr lit1 = literals[0];
 	Expr lit2 = literals[1];
 	BNode* and1 = mManip->new_logic();
 	bool stat1 = mManip->change_logic(and1, lit1 & ~lit2, fanins);
-	assert_cond(stat1, __FILE__, __LINE__);
+	ASSERT_COND(stat1 );
 	BNode* and2 = mManip->new_logic();
 	bool stat2 = mManip->change_logic(and2, ~lit1 & lit2, fanins);
-	assert_cond(stat2, __FILE__, __LINE__);
+	ASSERT_COND(stat2 );
 	fanins[0] = and1;
 	fanins[1] = and2;
 	tmp_expr = lit1 | lit2;
@@ -242,7 +241,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       }
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
 
     BNode* node = NULL;
@@ -254,7 +253,7 @@ BNetDecomp::decomp_type1_sub(BNode* orig_node,
       node = mManip->new_logic();
     }
     bool stat = mManip->change_logic(node, tmp_expr, fanins);
-    assert_cond(stat, __FILE__, __LINE__);
+    ASSERT_COND(stat );
     int d = calc_depth(node);
     if ( work.empty() ) {
       return;
@@ -275,14 +274,13 @@ BNetDecomp::decomp_type2_sub(BNode* orig_node,
 			     BNode* root_node,
 			     bool no_xor)
 {
-  assert_cond(!expr.is_zero() && !expr.is_one() && !expr.is_literal(),
-	      __FILE__, __LINE__);
+  ASSERT_COND( !expr.is_zero() && !expr.is_one() && !expr.is_literal() );
 
   ymuint ni = expr.child_num();
   vector<pair<BNode*, bool> > tmp_fanins(ni);
   for (ymuint i = 0; i < ni; i ++) {
     Expr opr1 = expr.child(i);
-    assert_cond(!opr1.is_zero() && !opr1.is_one(), __FILE__, __LINE__);
+    ASSERT_COND(!opr1.is_zero() && !opr1.is_one() );
 
     BNode* node1;
     bool inv1;
@@ -333,8 +331,8 @@ BNetDecomp::build_tree(ymuint b,
 		       BNode* root_node,
 		       bool no_xor)
 {
-  assert_cond(ni > 1, __FILE__, __LINE__);
-  assert_cond(max_fanin > 1, __FILE__, __LINE__);
+  ASSERT_COND(ni > 1 );
+  ASSERT_COND(max_fanin > 1 );
 
   // 個々の部分木の入力数
   ymuint new_ni = ni / max_fanin;
@@ -379,15 +377,15 @@ BNetDecomp::build_tree(ymuint b,
   }
   else if ( type_expr.is_xor() ) {
     if ( no_xor ) {
-      assert_cond(real_fanin == 2, __FILE__, __LINE__);
+      ASSERT_COND(real_fanin == 2 );
       Expr lit1 = literals[0];
       Expr lit2 = literals[1];
       BNode* and1 = mManip->new_logic();
       bool stat1 = mManip->change_logic(and1, lit1 & ~lit2, fanins);
-      assert_cond(stat1, __FILE__, __LINE__);
+      ASSERT_COND(stat1 );
       BNode* and2 = mManip->new_logic();
       bool stat2 = mManip->change_logic(and2, ~lit1 & lit2, fanins);
-      assert_cond(stat2, __FILE__, __LINE__);
+      ASSERT_COND(stat2 );
       fanins[0] = and1;
       fanins[1] = and2;
       expr = lit1 | lit2;
@@ -397,13 +395,13 @@ BNetDecomp::build_tree(ymuint b,
     }
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   if ( root_node == NULL ) {
     root_node = mManip->new_logic();
   }
   bool stat = mManip->change_logic(root_node, expr, fanins);
-  assert_cond(stat, __FILE__, __LINE__);
+  ASSERT_COND(stat );
 
   return root_node;
 }

@@ -89,7 +89,7 @@ CiLutTemplate1D::dimension() const
 tCellVarType
 CiLutTemplate1D::variable_type(ymuint32 var) const
 {
-  assert_cond( var == 0, __FILE__, __LINE__);
+  ASSERT_COND( var == 0 );
   return mVarType;
 }
 
@@ -98,7 +98,7 @@ CiLutTemplate1D::variable_type(ymuint32 var) const
 ymuint32
 CiLutTemplate1D::index_num(ymuint32 var) const
 {
-  assert_cond( var == 0, __FILE__, __LINE__);
+  ASSERT_COND( var == 0 );
   return mIndexArray.size();
 }
 
@@ -109,8 +109,8 @@ double
 CiLutTemplate1D::index(ymuint32 var,
 		       ymuint32 pos) const
 {
-  assert_cond( var == 0, __FILE__, __LINE__);
-  assert_cond( pos < index_num(0), __FILE__, __LINE__);
+  ASSERT_COND( var == 0 );
+  ASSERT_COND( pos < index_num(0) );
   return mIndexArray[pos];
 }
 
@@ -159,7 +159,7 @@ CiLutTemplate2D::dimension() const
 tCellVarType
 CiLutTemplate2D::variable_type(ymuint32 var) const
 {
-  assert_cond( var < 2 , __FILE__, __LINE__);
+  ASSERT_COND( var < 2  );
   return mVarType[var];
 }
 
@@ -168,7 +168,7 @@ CiLutTemplate2D::variable_type(ymuint32 var) const
 ymuint32
 CiLutTemplate2D::index_num(ymuint32 var) const
 {
-  assert_cond( var < 2 , __FILE__, __LINE__);
+  ASSERT_COND( var < 2  );
   return mIndexArray[var].size();
 }
 
@@ -179,8 +179,8 @@ double
 CiLutTemplate2D::index(ymuint32 var,
 			 ymuint32 pos) const
 {
-  assert_cond( var < 2 , __FILE__, __LINE__);
-  assert_cond( pos < index_num(var) , __FILE__, __LINE__);
+  ASSERT_COND( var < 2  );
+  ASSERT_COND( pos < index_num(var)  );
   return mIndexArray[var][pos];
 }
 
@@ -238,7 +238,7 @@ CiLutTemplate3D::dimension() const
 tCellVarType
 CiLutTemplate3D::variable_type(ymuint32 var) const
 {
-  assert_cond( var < 3 , __FILE__, __LINE__);
+  ASSERT_COND( var < 3  );
   return mVarType[var];
 }
 
@@ -247,7 +247,7 @@ CiLutTemplate3D::variable_type(ymuint32 var) const
 ymuint32
 CiLutTemplate3D::index_num(ymuint32 var) const
 {
-  assert_cond( var < 3 , __FILE__, __LINE__);
+  ASSERT_COND( var < 3  );
   return mIndexArray[var].size();
 }
 
@@ -258,8 +258,8 @@ double
 CiLutTemplate3D::index(ymuint32 var,
 			 ymuint32 pos) const
 {
-  assert_cond( var < 3 , __FILE__, __LINE__);
-  assert_cond( pos < index_num(var) , __FILE__, __LINE__);
+  ASSERT_COND( var < 3  );
+  ASSERT_COND( pos < index_num(var)  );
   return mIndexArray[var][pos];
 }
 

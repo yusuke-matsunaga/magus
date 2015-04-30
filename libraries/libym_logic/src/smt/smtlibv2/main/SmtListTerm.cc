@@ -50,7 +50,7 @@ SmtListTerm::elem_num() const
 const SmtTerm*
 SmtListTerm::elem(ymuint pos) const
 {
-  assert_cond( pos < elem_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < elem_num() );
   return mElemList[pos];
 }
 

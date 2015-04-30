@@ -111,7 +111,7 @@ Str1ComplexHandler::set_value(const ShString& attr_name,
 			      DotlibNodeImpl* value,
 			      const FileRegion& end_loc)
 {
-  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  ASSERT_COND( value->is_list()  );
   if ( value->list_size() != 1 ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),
@@ -161,7 +161,7 @@ VectorComplexHandler::set_value(const ShString& attr_name,
 				DotlibNodeImpl* value,
 				const FileRegion& end_loc)
 {
-  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  ASSERT_COND( value->is_list()  );
   if ( value->list_size() != 1 ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),
@@ -170,7 +170,7 @@ VectorComplexHandler::set_value(const ShString& attr_name,
 		    "Syntax error, one vector expected.");
     return false;
   }
-  assert_cond( value->list_elem(0)->is_vector(), __FILE__, __LINE__);
+  ASSERT_COND( value->list_elem(0)->is_vector() );
   return ComplexHandler::set_value(attr_name, attr_loc, value, end_loc);
 }
 
@@ -209,7 +209,7 @@ VectorListComplexHandler::set_value(const ShString& attr_name,
 				    DotlibNodeImpl* value,
 				    const FileRegion& end_loc)
 {
-  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  ASSERT_COND( value->is_list()  );
   ymuint n = value->list_size();
   if ( n == 0 ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -221,7 +221,7 @@ VectorListComplexHandler::set_value(const ShString& attr_name,
   }
   for (ymuint i = 0; i < n; ++ i) {
     const DotlibNode* elem = value->list_elem(i);
-    assert_cond( elem->is_vector(), __FILE__, __LINE__);
+    ASSERT_COND( elem->is_vector() );
   }
 
   return ComplexHandler::set_value(attr_name, attr_loc, value, end_loc);
@@ -255,7 +255,7 @@ UnitComplexHandler::set_value(const ShString& attr_name,
 			      DotlibNodeImpl* value,
 			      const FileRegion& end_loc)
 {
-  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  ASSERT_COND( value->is_list()  );
   if ( value->list_size() != 2 ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),
@@ -314,7 +314,7 @@ PwComplexHandler::set_value(const ShString& attr_name,
 			    DotlibNodeImpl* value,
 			    const FileRegion& end_loc)
 {
-  assert_cond( value->is_list(), __FILE__, __LINE__ );
+  ASSERT_COND( value->is_list()  );
   if ( value->list_size() != 2 ) {
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    value->loc(),

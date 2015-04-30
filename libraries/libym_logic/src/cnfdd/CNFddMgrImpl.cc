@@ -112,7 +112,7 @@ CNFddMgrImpl::default_mgr()
 {
   if ( !mDefaultMgr ) {
     mDefaultMgr = new CNFddMgrImpl("default manager");
-    assert_cond(mDefaultMgr, __FILE__, __LINE__);
+    ASSERT_COND(mDefaultMgr );
   }
   return mDefaultMgr;
 }
@@ -178,7 +178,7 @@ CNFddMgrImpl::CNFddMgrImpl(const string& name,
   // 変数テーブルの初期化
   mVarTableSize = VARTABLE_INIT_SIZE;
   mVarHashTable = alloc_vartable(mVarTableSize);
-  assert_cond(mVarHashTable, __FILE__, __LINE__);
+  ASSERT_COND(mVarHashTable );
   mVarNum = 0;
   mVarTop = NULL;
 
@@ -204,7 +204,7 @@ CNFddMgrImpl::CNFddMgrImpl(const string& name,
 // デストラクタ
 CNFddMgrImpl::~CNFddMgrImpl()
 {
-  assert_cond(this != mDefaultMgr, __FILE__, __LINE__);
+  ASSERT_COND(this != mDefaultMgr );
 
   // CNFDD の解放
   // と言っても CNFdd のオブジェクトを削除するわけには行かないので
@@ -258,7 +258,7 @@ CNFddMgrImpl::~CNFddMgrImpl()
   }
 
   // このマネージャに関わるメモリはすべて解放したはず．
-  assert_cond( mUsedMem == 0, __FILE__, __LINE__);
+  ASSERT_COND( mUsedMem == 0 );
 
 }
 

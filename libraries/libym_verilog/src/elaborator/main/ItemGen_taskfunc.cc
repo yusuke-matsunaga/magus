@@ -58,7 +58,7 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
     reg_task(taskfunc);
   }
   else {
-    assert_cond( pt_item->type() == kPtItem_Func, __FILE__, __LINE__);
+    ASSERT_COND( pt_item->type() == kPtItem_Func );
 
     const PtExpr* pt_left = pt_item->left_range();
     const PtExpr* pt_right = pt_item->right_range();
@@ -78,7 +78,7 @@ ItemGen::phase1_tf(const VlNamedObj* parent,
     else {
       taskfunc = factory().new_Function(parent,	pt_item);
     }
-    assert_cond( taskfunc != NULL, __FILE__, __LINE__);
+    ASSERT_COND( taskfunc != NULL );
 
     reg_function(taskfunc);
   }
@@ -151,7 +151,7 @@ ItemGen::phase2_tf(ElbTaskFunc* taskfunc,
     else {
       head = factory().new_DeclHead(taskfunc, pt_item);
     }
-    assert_cond( head, __FILE__, __LINE__);
+    ASSERT_COND( head );
 
     ElbDecl* decl = factory().new_Decl(head, pt_item);
     int tag = vpiVariables;
@@ -243,8 +243,8 @@ ItemGen::instantiate_constant_function(const VlNamedObj* parent,
     func = factory().new_Function(parent, pt_function);
     head = factory().new_DeclHead(func, pt_function);
   }
-  assert_cond( func, __FILE__, __LINE__);
-  assert_cond( head, __FILE__, __LINE__);
+  ASSERT_COND( func );
+  ASSERT_COND( head );
 
   // 登録しておく．
   reg_constant_function(parent, pt_function->name(), func);

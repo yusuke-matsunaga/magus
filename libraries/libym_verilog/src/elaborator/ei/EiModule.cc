@@ -769,7 +769,7 @@ EiModuleArray::elem_by_index(int index) const
   }
   else {
     // index が範囲外だった．
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     return NULL;
   }
 }

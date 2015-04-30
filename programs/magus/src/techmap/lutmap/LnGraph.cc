@@ -159,7 +159,7 @@ LnGraph::copy(const LnGraph& src,
     for (ymuint j = 0; j < ni; ++ j) {
       LnNode* src_inode = src_node->fanin(j);
       LnNode* input = nodemap[src_inode->id()];
-      assert_cond(input, __FILE__, __LINE__);
+      ASSERT_COND(input );
       dst_inputs[j] = input;
     }
     src_node->tv(tv);
@@ -347,7 +347,7 @@ LnGraph::sort(vector<LnNode*>& node_list) const
     ++ rpos;
     sort_sub(node, mark, node_list);
   }
-  assert_cond(node_list.size() == lnode_num(), __FILE__, __LINE__);
+  ASSERT_COND(node_list.size() == lnode_num() );
 }
 
 // @brief モジュール名を設定する．
@@ -380,7 +380,7 @@ LnGraph::add_port(const string& name,
       port_info.mPos = i;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
 }
@@ -448,7 +448,7 @@ LnGraph::new_lut(const vector<LnNode*>& inodes,
   node->set_lut();
 
   // 真理値ベクタを設定
-  assert_cond(tv.size() == (1U << ni), __FILE__, __LINE__);
+  ASSERT_COND(tv.size() == (1U << ni) );
   node->mTv = tv;
 
   // ファンインの設定
@@ -482,7 +482,7 @@ void
 LnGraph::set_dff_input(LnNode* node,
 		       LnNode* inode)
 {
-  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_dff() );
 
   connect(inode, node, 0);
 }
@@ -494,7 +494,7 @@ void
 LnGraph::set_dff_clock(LnNode* node,
 		       LnNode* inode)
 {
-  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_dff() );
 
   connect(inode, node, 1);
 }
@@ -506,7 +506,7 @@ void
 LnGraph::set_dff_set(LnNode* node,
 		     LnNode* inode)
 {
-  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_dff() );
 
   connect(inode, node, 2);
 }
@@ -518,7 +518,7 @@ void
 LnGraph::set_dff_rst(LnNode* node,
 		     LnNode* inode)
 {
-  assert_cond(node->is_dff(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_dff() );
 
   connect(inode, node, 3);
 }
@@ -602,7 +602,7 @@ LnGraph::clear()
     ++ p;
     delete_input(node);
   }
-  assert_cond(mInputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mInputList.empty() );
 
   for (LnNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ) {
@@ -612,7 +612,7 @@ LnGraph::clear()
     ++ p;
     delete_output(node);
   }
-  assert_cond(mOutputList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mOutputList.empty() );
 
   for (LnNodeList::iterator p = mLutList.begin();
        p != mLutList.end(); ) {
@@ -622,7 +622,7 @@ LnGraph::clear()
     ++ p;
     delete_lut(node);
   }
-  assert_cond(mLutList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mLutList.empty() );
 
   for (LnNodeList::iterator p = mDffList.begin();
        p != mDffList.end(); ) {
@@ -632,7 +632,7 @@ LnGraph::clear()
     ++ p;
     delete_dff(node);
   }
-  assert_cond(mDffList.empty(), __FILE__, __LINE__);
+  ASSERT_COND(mDffList.empty() );
 
   mInputArray.clear();
   mOutputArray.clear();
@@ -642,7 +642,7 @@ LnGraph::clear()
 void
 LnGraph::delete_input(LnNode* node)
 {
-  assert_cond(node->is_input(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_input() );
   mInputList.erase(node);
   delete_node(node);
 }
@@ -651,7 +651,7 @@ LnGraph::delete_input(LnNode* node)
 void
 LnGraph::delete_output(LnNode* node)
 {
-  assert_cond(node->is_output(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_output() );
   mOutputList.erase(node);
   delete_node(node);
 
@@ -663,8 +663,8 @@ LnGraph::delete_output(LnNode* node)
 void
 LnGraph::delete_lut(LnNode* node)
 {
-  assert_cond(node->is_lut(), __FILE__, __LINE__);
-  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND(node->is_lut() );
+  ASSERT_COND(node->fanout_num() == 0 );
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
     connect(NULL, node, i);
@@ -680,8 +680,8 @@ LnGraph::delete_lut(LnNode* node)
 void
 LnGraph::delete_dff(LnNode* node)
 {
-  assert_cond(node->is_dff(), __FILE__, __LINE__);
-  assert_cond(node->fanout_num() == 0, __FILE__, __LINE__);
+  ASSERT_COND(node->is_dff() );
+  ASSERT_COND(node->fanout_num() == 0 );
   connect(NULL, node, 0);
 
   mDffList.erase(node);

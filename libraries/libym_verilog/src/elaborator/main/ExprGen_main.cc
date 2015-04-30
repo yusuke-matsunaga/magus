@@ -84,7 +84,7 @@ ExprGen::instantiate_expr(const VlNamedObj* parent,
     return instantiate_primary(parent, env, pt_expr);
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return NULL;
@@ -125,7 +125,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
     case kVlPosedgeOp:
     case kVlNegedgeOp:
       { // これのみがイベント式の特徴
-	assert_cond(pt_expr->operand_num() == 1, __FILE__, __LINE__);
+	ASSERT_COND(pt_expr->operand_num() == 1 );
 	ElbExpr* opr0 = instantiate_expr(parent, env, pt_expr->operand(0));
 	if ( !opr0 ) {
 	  return NULL;
@@ -175,7 +175,7 @@ ExprGen::instantiate_event_expr(const VlNamedObj* parent,
     break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
 
   return NULL;
 }
@@ -276,7 +276,7 @@ ExprGen::instantiate_lhs(const VlNamedObj* parent,
     break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -351,7 +351,7 @@ ExprGen::instantiate_lhs_sub(const VlNamedObj* parent,
     break;
   }
 
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -481,7 +481,7 @@ ExprGen::evaluate_expr(const VlNamedObj* parent,
     return evaluate_primary(parent, pt_expr, put_error);
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   return VlValue();
@@ -535,7 +535,7 @@ ExprGen::evaluate_const(const VlNamedObj* parent,
     return VlValue(BitVector(pt_expr->const_str()));
 
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
     break;
   }
 
@@ -557,7 +557,7 @@ ExprGen::instantiate_delay(const VlNamedObj* parent,
     if ( expr == NULL ) break;
     expr_array[n] = expr;
   }
-  assert_cond(n > 0, __FILE__, __LINE__);
+  ASSERT_COND(n > 0 );
 
   return instantiate_delay_sub(parent, pt_delay, n, expr_array);
 }
@@ -572,7 +572,7 @@ ExprGen::instantiate_delay(const VlNamedObj* parent,
 			   const PtItem* pt_header)
 {
   ymuint n = pt_header->paramassign_array().size();
-  assert_cond( n == 1, __FILE__, __LINE__);
+  ASSERT_COND( n == 1 );
 
   const PtExpr* expr_array[1];
   const PtConnection* pt_con = pt_header->paramassign_array()[0];
@@ -593,7 +593,7 @@ ExprGen::instantiate_delay_sub(const VlNamedObj* parent,
 			       ymuint n,
 			       const PtExpr* expr_array[])
 {
-  assert_cond( n <= 3, __FILE__, __LINE__);
+  ASSERT_COND( n <= 3 );
 
   // TODO : 環境の条件をチェック
   ElbEnv env;

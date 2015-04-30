@@ -10,9 +10,9 @@
 
 
 #include "satpg_nsdef.h"
+#include "Val3.h"
 #include "YmNetworks/tgnet.h"
 #include "YmLogic/VarId.h"
-#include "YmLogic/Bool3.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -93,6 +93,26 @@ public:
   tTgGateType
   gate_type() const;
 
+  /// @brief controling value を得る．
+  /// @note ない場合は kValX を返す．
+  Val3
+  cval() const;
+
+  /// @brief noncontroling valueを得る．
+  /// @note ない場合は kValX を返す．
+  Val3
+  nval() const;
+
+  /// @brief controling output value を得る．
+  /// @note ない場合は kValX を返す．
+  Val3
+  coval() const;
+
+  /// @brief noncontroling output value を得る．
+  /// @note ない場合は kValX を返す．
+  Val3
+  noval() const;
+
   /// @brief 値のノードの時 true を返す．
   ///
   /// is_logic() が true の時のみ意味を持つ．
@@ -166,13 +186,13 @@ public:
 
   /// @brief 出力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
-  TpgFault*
+  const TpgFault*
   output_fault(int val) const;
 
   /// @brief 入力の故障を得る．
   /// @param[in] val 故障値 ( 0 / 1 )
   /// @param[in] pos 入力の位置番号
-  TpgFault*
+  const TpgFault*
   input_fault(int val,
 	      ymuint pos) const;
 
@@ -182,180 +202,8 @@ public:
 
   /// @brief このノードに関係する故障を返す．
   /// @param[in] pos 位置番号 ( 0 <= pos < fault_num() )
-  TpgFault*
+  const TpgFault*
   fault(ymuint pos) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // SatEngine 用のアクセス関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 正常回路用の変数番号をセットする．
-  /// @param[in] gvar 正常値を表す変数番号
-  void
-  set_gvar(VarId gvar);
-
-  /// @brief 故障回路用の変数番号をセットする．
-  /// @param[in] fvar 故障値を表す変数番号
-  /// @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
-  void
-  set_fvar(VarId fvar,
-	   VarId dvar);
-
-  /// @brief 変数番号の割り当て情報をクリアする．
-  void
-  clear_var();
-
-  /// @brief 正常値を表す変数番号を得る．
-  VarId
-  gvar() const;
-
-  /// @brief 故障回路用の変数番号が割り当てられていたら true を返す．
-  bool
-  has_fvar() const;
-
-  /// @brief 故障値を表す変数番号を得る．
-  VarId
-  fvar() const;
-
-  /// @brief 故障差を表す変数番号を得る．
-  VarId
-  dvar() const;
-
-  /// @brief 出力故障用の変数番号をセットする．
-  /// @param[in] val 縮退値 (0/1)
-  /// @param[in] var 変数番号
-  void
-  set_ofvar(int val,
-	    VarId var);
-
-  /// @brief 入力故障用の変数番号をセットする．
-  /// @param[in] pos 入力位置
-  /// @param[in] val 縮退値 (0/1)
-  /// @param[in] var 変数番号
-  void
-  set_ifvar(ymuint pos,
-	    int val,
-	    VarId var);
-
-  /// @brief 故障用の変数番号をクリアする．
-  void
-  clear_oifvar();
-
-  /// @brief 故障用の変数番号を持っている時に true を返す．
-  bool
-  has_flt_var() const;
-
-  /// @brief 出力の0縮退故障用の変数番号を得る．
-  /// 設定されていない場合には kVarIdIllegal を返す．
-  VarId
-  of0var() const;
-
-  /// @brief 出力の1縮退故障用の変数番号を得る．
-  /// 設定されていない場合には kVarIdIllegal を返す．
-  VarId
-  of1var() const;
-
-  /// @brief 入力の0縮退故障用の変数番号を得る．
-  /// @param[in] pos 入力位置
-  /// 設定されていない場合には kVarIdIllegal を返す．
-  VarId
-  if0var(ymuint pos) const;
-
-  /// @brief 入力の1縮退故障用の変数番号を得る．
-  /// @param[in] pos 入力位置
-  /// 設定されていない場合には kVarIdIllegal を返す．
-  VarId
-  if1var(ymuint pos) const;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 汎用のマークを扱う関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief mark1 を得る．
-  bool
-  mark1() const;
-
-  /// @brief mark1 をつける．
-  void
-  set_mark1();
-
-  /// @brief mark1 を消す．
-  void
-  clear_mark1();
-
-  /// @brief mark2 を得る．
-  bool
-  mark2() const;
-
-  /// @brief mark2 をつける．
-  void
-  set_mark2();
-
-  /// @brief mark2 を消す．
-  void
-  clear_mark2();
-
-  /// @brief mark3 を得る．
-  bool
-  mark3() const;
-
-  /// @brief mark3 をつける．
-  void
-  set_mark3();
-
-  /// @brief mark3 を消す．
-  void
-  clear_mark3();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // mandatory assignment 用の関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 後方含意で出力に0を割り当てる．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_prop(TpgNode* from_node,
-	   Bool3 val,
-	   vector<TpgNode*>& node_list);
-
-  /// @brief ファンアウト先に0を伝播する．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fanout_prop(TpgNode* from_node,
-	      Bool3 val,
-	      vector<TpgNode*>& node_list);
-
-  /// @brief controling value を得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
-  cval() const;
-
-  /// @brief noncontroling valueを得る．
-  /// @note ない場合は kB3X を返す．
-  Bool3
-  nval() const;
-
-  /// @brief 値を得る．
-  Bool3
-  ma_value() const;
-
-  /// @brief 値をクリアする．
-  void
-  clear_ma_value();
 
 
 private:
@@ -370,26 +218,6 @@ private:
   /// @brief アクティブフラグを消す．
   void
   clear_active();
-
-  /// @brief 後方含意を行う．
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  bwd_imp(Bool3 val,
-	  vector<TpgNode*>& node_list);
-
-  /// @brief 前方含意を行う．
-  /// @param[in] from_node 含意元のノード
-  /// @param[in] val 値
-  /// @param[in] node_list 割り当ての行われたノードを格納するリスト
-  /// @retval true 矛盾なく含意が行われた．
-  /// @retval false 矛盾が発生した．
-  bool
-  fwd_imp(TpgNode* from_node,
-	  Bool3 val,
-	  vector<TpgNode*>& node_list);
 
 
 private:
@@ -439,34 +267,19 @@ private:
   TpgMap* mInputMap;
 
   // 出力の故障
-  TpgFault* mOutputFault[2];
+  const TpgFault* mOutputFault[2];
 
   // 入力の故障
-  TpgFault** mInputFault;
+  const TpgFault** mInputFault;
 
   // 故障リスト
-  TpgFault** mFaultList;
+  const TpgFault** mFaultList;
 
   // 故障リストの要素数
   ymuint32 mFaultNum;
 
   // いくつかのマークを納めるビットベクタ
   ymuint32 mMarks;
-
-  // 正常回路の変数番号
-  VarId mGid;
-
-  // 故障回路の変数番号
-  VarId mFid;
-
-  // 故障差の変数番号
-  VarId mDid;
-
-  // 出力故障用の変数番号
-  VarId mOfVar[2];
-
-  // 入力故障用の変数番号の配列
-  VarId* mIfVars;
 
   // TFIマークを表すビットアレイ
   ymuint64* mTFIbits;
@@ -475,13 +288,16 @@ private:
   TpgNode* mImmDom;
 
   // controling value
-  Bool3 mCval;
+  Val3 mCval;
 
   // noncontroling value
-  Bool3 mNval;
+  Val3 mNval;
 
-  // mandatory assignments 用の値
-  Bool3 mMaVal;
+  // controling output value
+  Val3 mCOval;
+
+  // noncontroling output value
+  Val3 mNOval;
 
 };
 
@@ -533,7 +349,7 @@ inline
 ymuint
 TpgNode::input_id() const
 {
-  assert_cond( is_input(), __FILE__, __LINE__);
+  ASSERT_COND( is_input() );
   return (mTypeId >> 3);
 }
 
@@ -551,7 +367,7 @@ inline
 ymuint
 TpgNode::output_id() const
 {
-  assert_cond( is_output(), __FILE__, __LINE__);
+  ASSERT_COND( is_output() );
   return (mTypeId >> 3);
 }
 
@@ -560,7 +376,7 @@ inline
 ymuint
 TpgNode::output_id2() const
 {
-  assert_cond( is_output(), __FILE__, __LINE__);
+  ASSERT_COND( is_output() );
   return mFanoutNum;
 }
 
@@ -577,7 +393,7 @@ inline
 tTgGateType
 TpgNode::gate_type() const
 {
-  assert_cond( is_logic(), __FILE__, __LINE__);
+  ASSERT_COND( is_logic() );
   return static_cast<tTgGateType>((mTypeId >> 3) & 15U);
 }
 
@@ -615,7 +431,7 @@ inline
 TpgNode*
 TpgNode::fanin(ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mFanins[pos];
 }
 
@@ -636,7 +452,7 @@ inline
 TpgNode*
 TpgNode::fanout(ymuint pos) const
 {
-  assert_cond( pos < fanout_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < fanout_num() );
   return mFanouts[pos];
 }
 
@@ -654,14 +470,14 @@ inline
 TpgNode*
 TpgNode::active_fanout(ymuint pos) const
 {
-  assert_cond( pos < mActFanoutNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mActFanoutNum );
   return mActFanouts[pos];
 }
 
 // @brief 出力の故障を得る．
 // @param[in] val 故障値 ( 0 / 1 )
 inline
-TpgFault*
+const TpgFault*
 TpgNode::output_fault(int val) const
 {
   return mOutputFault[val % 2];
@@ -671,11 +487,11 @@ TpgNode::output_fault(int val) const
 // @param[in] val 故障値 ( 0 / 1 )
 // @param[in] pos 入力の位置番号
 inline
-TpgFault*
+const TpgFault*
 TpgNode::input_fault(int val,
 		     ymuint pos) const
 {
-  assert_cond( pos < mFaninNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaninNum );
   return mInputFault[pos * 2 + (val % 2)];
 }
 
@@ -690,83 +506,11 @@ TpgNode::fault_num() const
 // @brief このノードに関係する故障を返す．
 // @param[in] pos 位置番号 ( 0 <= pos < fault_num() )
 inline
-TpgFault*
+const TpgFault*
 TpgNode::fault(ymuint pos) const
 {
-  assert_cond( pos < mFaultNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mFaultNum );
   return mFaultList[pos];
-}
-
-// @brief mark1 を得る．
-inline
-bool
-TpgNode::mark1() const
-{
-  return static_cast<bool>((mMarks >> 3) & 1U);
-}
-
-// @brief mark1 をつける．
-inline
-void
-TpgNode::set_mark1()
-{
-  mMarks |= 8U;
-}
-
-// @brief mark1 を消す．
-inline
-void
-TpgNode::clear_mark1()
-{
-  mMarks &= ~8U;
-}
-
-// @brief mark2 を得る．
-inline
-bool
-TpgNode::mark2() const
-{
-  return static_cast<bool>((mMarks >> 4) & 1U);
-}
-
-// @brief mark2 をつける．
-inline
-void
-TpgNode::set_mark2()
-{
-  mMarks |= 16U;
-}
-
-// @brief mark2 を消す．
-inline
-void
-TpgNode::clear_mark2()
-{
-  mMarks &= ~16U;
-}
-
-// @brief mark3 を得る．
-inline
-bool
-TpgNode::mark3() const
-{
-  return static_cast<bool>((mMarks >> 5) & 1U);
-}
-
-// @brief mark3 をつける．
-inline
-void
-TpgNode::set_mark3()
-{
-  mMarks |= 32U;
-}
-
-// @brief mark3 を消す．
-inline
-void
-TpgNode::clear_mark3()
-{
-  mMarks &= ~32U;
 }
 
 // @brief アクティブの場合 true を返す．
@@ -811,189 +555,40 @@ TpgNode::imm_dom() const
   return mImmDom;
 }
 
-// @brief 正常回路用の変数番号をセットする．
-// @param[in] gvar 正常値を表す変数番号
-inline
-void
-TpgNode::set_gvar(VarId gvar)
-{
-  mGid = gvar;
-  mFid = gvar;
-  mMarks |= 2U;
-}
-
-// @brief 故障回路用の変数番号をセットする．
-// @param[in] fvar 故障値を表す変数番号
-// @param[in] dvar 故障差(正常値 xor 故障値)を表す変数番号
-inline
-void
-TpgNode::set_fvar(VarId fvar,
-		   VarId dvar)
-{
-  mFid = fvar;
-  mDid = dvar;
-  mMarks |= 4U;
-}
-
-// @brief 変数番号の割り当て情報をクリアする．
-inline
-void
-TpgNode::clear_var()
-{
-  mMarks &= ~6U;
-}
-
-// @brief 正常値を表す変数番号を得る．
-inline
-VarId
-TpgNode::gvar() const
-{
-  return mGid;
-}
-
-// @brief 故障回路用の変数番号が割り当てられていたら true を返す．
-inline
-bool
-TpgNode::has_fvar() const
-{
-  return static_cast<bool>((mMarks >> 2) & 1U);
-}
-
-// @brief 故障値を表す変数番号を得る．
-inline
-VarId
-TpgNode::fvar() const
-{
-  return mFid;
-}
-
-// @brief 故障差を表す変数番号を得る．
-inline
-VarId
-TpgNode::dvar() const
-{
-  return mDid;
-}
-
-// @brief 出力故障用の変数番号をセットする．
-// @param[in] val 縮退値 (0/1)
-// @param[in] var 変数番号
-inline
-void
-TpgNode::set_ofvar(int val,
-		   VarId var)
-{
-  mOfVar[val % 2] = var;
-  mMarks |= 64U;
-}
-
-// @brief 入力故障用の変数番号をセットする．
-// @param[in] pos 入力位置
-// @param[in] val 縮退値 (0/1)
-// @param[in] var 変数番号
-inline
-void
-TpgNode::set_ifvar(ymuint pos,
-		   int val,
-		   VarId var)
-{
-  assert_cond( pos < fanin_num(), __FILE__, __LINE__);
-  mIfVars[pos * 2 + (val % 2)] = var;
-  mMarks |= 64U;
-}
-
-// @brief 故障用の変数番号をクリアする．
-inline
-void
-TpgNode::clear_oifvar()
-{
-  mOfVar[0] = kVarIdIllegal;
-  mOfVar[1] = kVarIdIllegal;
-  for (ymuint i = 0; i < fanin_num(); ++ i) {
-    mIfVars[i * 2 + 0] = kVarIdIllegal;
-    mIfVars[i * 2 + 1] = kVarIdIllegal;
-  }
-  mMarks &= ~64U;
-}
-
-// @brief 故障用の変数番号を持っている時に true を返す．
-inline
-bool
-TpgNode::has_flt_var() const
-{
-  return static_cast<bool>((mMarks >> 6) & 1U);
-}
-
-// @brief 出力の0縮退故障用の変数番号を得る．
-// 設定されていない場合には kVarIdIllegal を返す．
-inline
-VarId
-TpgNode::of0var() const
-{
-  return mOfVar[0];
-}
-
-// @brief 出力の1縮退故障用の変数番号を得る．
-// 設定されていない場合には kVarIdIllegal を返す．
-inline
-VarId
-TpgNode::of1var() const
-{
-  return mOfVar[1];
-}
-
-// @brief 入力の0縮退故障用の変数番号を得る．
-// @param[in] pos 入力位置
-// 設定されていない場合には kVarIdIllegal を返す．
-inline
-VarId
-TpgNode::if0var(ymuint pos) const
-{
-  return mIfVars[pos * 2 + 0];
-}
-
-// @brief 入力の1縮退故障用の変数番号を得る．
-// @param[in] pos 入力位置
-// 設定されていない場合には kVarIdIllegal を返す．
-inline
-VarId
-TpgNode::if1var(ymuint pos) const
-{
-  return mIfVars[pos * 2 + 1];
-}
-
 // @brief controling value を得る．
-// @note ない場合は kB3X を返す．
+// @note ない場合は kValX を返す．
 inline
-Bool3
+Val3
 TpgNode::cval() const
 {
   return mCval;
 }
 
 // @brief noncontroling valueを得る．
-// @note ない場合は kB3X を返す．
+// @note ない場合は kValX を返す．
 inline
-Bool3
+Val3
 TpgNode::nval() const
 {
   return mNval;
 }
 
-// @brief 値を得る．
+// @brief controling output value を得る．
+// @note ない場合は kValX を返す．
 inline
-Bool3
-TpgNode::ma_value() const
+Val3
+TpgNode::coval() const
 {
-  return mMaVal;
+  return mCOval;
 }
 
-// @brief 値をクリアする．
+// @brief noncontroling output value を得る．
+// @note ない場合は kValX を返す．
 inline
-void
-TpgNode::clear_ma_value()
+Val3
+TpgNode::noval() const
 {
-  mMaVal = kB3X;
+  return mNOval;
 }
 
 END_NAMESPACE_YM_SATPG

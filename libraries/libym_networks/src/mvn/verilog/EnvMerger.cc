@@ -131,7 +131,7 @@ EnvMerger1::operator()(MvnModule* parent_module,
     else if ( node1 == NULL ) {
       // node1 が NULL
       // cond1 も NULL
-      assert_cond( node2 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( node2 != NULL );
       new_node = node2;
       new_block = info2.mBlock;
 
@@ -151,7 +151,7 @@ EnvMerger1::operator()(MvnModule* parent_module,
     else if ( node2 == NULL ) {
       // node2 が NULL
       // cond2 も NULL
-      assert_cond( node1 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( node1 != NULL );
       new_node = node1;
       new_block = info1.mBlock;
 
@@ -222,15 +222,15 @@ EnvMerger2::operator()(MvnModule* parent_module,
   for (ymuint i = 0; i < n; ++ i) {
     AssignInfo info0 = env.get_from_id(i);
     MvnNode* node0 = info0.mRhs;
-    assert_cond( info0.mCond == NULL, __FILE__, __LINE__);
+    ASSERT_COND( info0.mCond == NULL );
 
     AssignInfo info1 = then_env.get_from_id(i);
     MvnNode* node1 = info1.mRhs;
-    assert_cond( info1.mCond == NULL, __FILE__, __LINE__);
+    ASSERT_COND( info1.mCond == NULL );
 
     AssignInfo info2 = else_env.get_from_id(i);
     MvnNode* node2 = info2.mRhs;
-    assert_cond( info2.mCond == NULL, __FILE__, __LINE__);
+    ASSERT_COND( info2.mCond == NULL );
 
     MvnNode* new_node = NULL;
     bool new_block = false;
@@ -249,7 +249,7 @@ EnvMerger2::operator()(MvnModule* parent_module,
     }
     else if ( node1 == NULL ) {
       // node1 が NULL
-      assert_cond( node2 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( node2 != NULL );
       if ( node0 == NULL ) {
 	node0 = mGlobalEnv.get_from_id(i);
       }
@@ -266,7 +266,7 @@ EnvMerger2::operator()(MvnModule* parent_module,
     }
     else if ( node2 == NULL ) {
       // node2 が NULL
-      assert_cond( node1 != NULL, __FILE__, __LINE__);
+      ASSERT_COND( node1 != NULL );
       if ( node0 == NULL ) {
 	node0 = mGlobalEnv.get_from_id(i);
       }
@@ -283,7 +283,7 @@ EnvMerger2::operator()(MvnModule* parent_module,
     }
     else {
       // node1 も node2 も NULL ではない．
-      //assert_cond( node0 != NULL, __FILE__, __LINE__);
+      //ASSERT_COND( node0 != NULL );
       ymuint bw = node1->bit_width();
       if ( node1->bit_width() != bw ) {
 	// ビット幅が異なる．

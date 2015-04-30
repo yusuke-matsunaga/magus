@@ -38,7 +38,7 @@ SbjDumper::dump(ostream& s,
     const SbjPort* port = sbjgraph.port(i);
     s << " " << port->name() << " = ";
     ymuint nb = port->bit_width();
-    assert_cond( nb > 0, __FILE__, __LINE__);
+    ASSERT_COND( nb > 0 );
     if ( nb == 1 ) {
       const SbjNode* node = port->bit(0);
       s << " " << node->id_str();
@@ -283,7 +283,7 @@ SbjDumper::dump_verilog(ostream& s,
     const SbjPort* port = sbjgraph.port(i);
     s << sep << "." << port->name() << "(";
     ymuint nb = port->bit_width();
-    assert_cond( nb > 0 , __FILE__, __LINE__);
+    ASSERT_COND( nb > 0  );
     if ( nb == 1 ) {
       const SbjNode* node = port->bit(0);
       s << node_name(node);
@@ -393,7 +393,7 @@ SbjDumper::dump_verilog(ostream& s,
     bool sinv = node->fanin_set_inv();
     const SbjNode* rnode = node->fanin_rst();
     bool rinv = node->fanin_rst_inv();
-    assert_cond( cnode != NULL, __FILE__, __LINE__);
+    ASSERT_COND( cnode != NULL );
     s << "  always @ ( ";
     if ( cinv ) {
       s << "negedge";

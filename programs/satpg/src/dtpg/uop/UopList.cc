@@ -40,7 +40,7 @@ UopList::add(UntestOp* uop)
 // @brief テスト不能故障と判定された時の処理
 // @param[in] f 故障
 void
-UopList::operator()(TpgFault* f)
+UopList::operator()(const TpgFault* f)
 {
   for (vector<UntestOp*>::iterator p = mUopList.begin();
        p != mUopList.end(); ++ p) {

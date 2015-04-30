@@ -109,6 +109,10 @@ public:
   ymint32
   int31();
 
+  /// @brief 64 ビット整数の乱数を発生させる．
+  ymuint64
+  uint64();
+
   /// @brief unsigned long の整数の乱数を発生させる．
   ymulong
   ulong();

@@ -96,12 +96,12 @@ TvFuncM::TvFuncM(ymuint ni,
 // @note src_list の関数の入力数は等しくなければならない．
 TvFuncM::TvFuncM(const vector<TvFunc>& src_list)
 {
-  assert_cond( !src_list.empty(), __FILE__, __LINE__);
+  ASSERT_COND( !src_list.empty() );
   const TvFunc& first = src_list.front();
   ymuint ni = first.input_num();
   ymuint no = src_list.size();
   for (ymuint i = 1; i < no; ++ i) {
-    assert_cond( src_list[i].input_num() == ni, __FILE__, __LINE__);
+    ASSERT_COND( src_list[i].input_num() == ni );
   }
 
   mInputNum = ni;
@@ -629,7 +629,7 @@ TvFuncM::print(ostream& s,
     }
   }
   else {
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 }
 

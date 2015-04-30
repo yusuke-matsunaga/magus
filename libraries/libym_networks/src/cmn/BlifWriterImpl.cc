@@ -67,7 +67,7 @@ BlifWriterImpl::dump(ostream& s,
 	set_node_name(output, port_name);
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     else if ( nb > 1 ) {
@@ -86,7 +86,7 @@ BlifWriterImpl::dump(ostream& s,
 	  set_node_name(output, port_name1);
 	}
 	else {
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	}
       }
     }
@@ -99,7 +99,7 @@ BlifWriterImpl::dump(ostream& s,
       continue;
     }
     const CmnNode* inode = node->fanin(0);
-    assert_cond( inode != NULL, __FILE__, __LINE__);
+    ASSERT_COND( inode != NULL );
     s << ".names " << node_name(inode) << " ";
     if ( node->alt_node() ) {
       s << node_name(node->alt_node());
@@ -184,18 +184,18 @@ BlifWriterImpl::dump(ostream& s,
        p != logic_list.end(); ++ p) {
     const CmnNode* node = *p;
     const Cell* cell = node->cell();
-    assert_cond( cell != NULL, __FILE__, __LINE__);
+    ASSERT_COND( cell != NULL );
     ymuint ni = cell->input_num();
     ymuint no = cell->output_num();
-    assert_cond( no == 1, __FILE__, __LINE__);
+    ASSERT_COND( no == 1 );
     const CellPin* pin = cell->output(0);
-    assert_cond( pin->is_output(), __FILE__, __LINE__);
+    ASSERT_COND( pin->is_output() );
 
     s << ".gate " << cell->name()
       << " " << pin->name() << "=" << node_name(node);
     for (ymuint i = 0; i < ni; ++ i) {
       const CellPin* pin = cell->input(i);
-      assert_cond( pin->is_input(), __FILE__, __LINE__);
+      ASSERT_COND( pin->is_input() );
       const CmnNode* node1 = node->fanin(i);
       s << " " << pin->name() << "=" << node_name(node1);
     }
@@ -230,7 +230,7 @@ string
 BlifWriterImpl::dff_node_name(const CmnNode* node) const
 {
   const CmnNode* inode = node->fanin(0);
-  assert_cond( inode != NULL, __FILE__, __LINE__);
+  ASSERT_COND( inode != NULL );
   return node_name(inode);
 }
 

@@ -148,7 +148,7 @@ LsimMpx::set_network(const BdnMgr& bdn,
       bddmap[node->id()] = bdd;
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
 #if 0
     cout << " = " << bddmap[node->id()].size();
@@ -234,7 +234,7 @@ LsimMpx::eval(const vector<ymuint64>& iv,
 	      vector<ymuint64>& ov)
 {
   ymuint ni = mInputList.size();
-  assert_cond( ni == iv.size(), __FILE__, __LINE__);
+  ASSERT_COND( ni == iv.size() );
 
   ymuint nn = mNodeList.size();
   for (ymuint i = 0; i < nn; ++ i) {

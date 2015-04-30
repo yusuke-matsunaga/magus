@@ -75,7 +75,7 @@ FlowNodeHeap::getmin()
 void
 FlowNodeHeap::move(ymuint pos)
 {
-  assert_cond( pos < mArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( pos < mArray.size() );
   move_up(pos);
   move_down(pos);
 }

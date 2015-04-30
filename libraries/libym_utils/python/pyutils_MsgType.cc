@@ -137,7 +137,7 @@ MsgType_repr(MsgTypeObject* self)
   case kMsgDebug:   return Py_kMsgDebugString;
   default: break;
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -287,7 +287,7 @@ PyMsgType_FromMsgType(tMsgType type)
   case kMsgFailure: result = Py_kMsgFailure; break;
   case kMsgInfo:    result = Py_kMsgInfo; break;
   case kMsgDebug:   result = Py_kMsgDebug; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
 
   Py_INCREF(result);

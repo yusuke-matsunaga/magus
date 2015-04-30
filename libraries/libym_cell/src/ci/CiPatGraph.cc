@@ -71,7 +71,7 @@ CiPatGraph::edge_num() const
 ymuint
 CiPatGraph::edge(ymuint pos) const
 {
-  assert_cond( pos < edge_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < edge_num() );
   return mEdgeList[pos];
 }
 
@@ -128,7 +128,7 @@ void
 CiPatGraph::set_edge(ymuint pos,
 		     ymuint edge)
 {
-  assert_cond( pos < edge_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < edge_num() );
   mEdgeList[pos] = edge;
 }
 

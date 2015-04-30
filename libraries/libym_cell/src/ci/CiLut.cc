@@ -111,7 +111,7 @@ CiLut::search(double val,
       return i;
     }
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return 0;
 }
 
@@ -141,13 +141,13 @@ CiLut1D::CiLut1D(const CellLutTemplate* lut_template,
       mIndexArray[i] = index_array[i];
     }
   }
-  assert_cond( n != 0, __FILE__, __LINE__);
+  ASSERT_COND( n != 0 );
   mIndexWidthArray.resize(n - 1);
   for (ymuint i = 0; i < n - 1; ++ i) {
     mIndexWidthArray[i] = mIndexArray[i + 1] - mIndexArray[i];
   }
 
-  assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  ASSERT_COND( value_array.size() == n );
   mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
@@ -171,7 +171,7 @@ CiLut1D::dimension() const
 ymuint32
 CiLut1D::index_num(ymuint32 var) const
 {
-  assert_cond( var < 1 , __FILE__, __LINE__);
+  ASSERT_COND( var < 1  );
   return mIndexArray.size();
 }
 
@@ -182,8 +182,8 @@ double
 CiLut1D::index(ymuint32 var,
 	       ymuint32 pos) const
 {
-  assert_cond( var < 1 , __FILE__, __LINE__);
-  assert_cond( pos < index_num(var) , __FILE__, __LINE__);
+  ASSERT_COND( var < 1  );
+  ASSERT_COND( pos < index_num(var)  );
   return mIndexArray[pos];
 }
 
@@ -193,9 +193,9 @@ CiLut1D::index(ymuint32 var,
 double
 CiLut1D::grid_value(const vector<ymuint32>& pos_array) const
 {
-  assert_cond( pos_array.size() == 1, __FILE__, __LINE__);
+  ASSERT_COND( pos_array.size() == 1 );
   ymuint pos1 = pos_array[0];
-  assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
+  ASSERT_COND( pos1 < index_num(0) );
   return mValueArray[pos1];
 }
 
@@ -205,7 +205,7 @@ CiLut1D::grid_value(const vector<ymuint32>& pos_array) const
 double
 CiLut1D::value(const vector<double>& val_array) const
 {
-  assert_cond( val_array.size() == 1, __FILE__, __LINE__);
+  ASSERT_COND( val_array.size() == 1 );
 
   double val = val_array[0];
 
@@ -248,7 +248,7 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
       mIndexArray[0][i] = index_array1[i];
     }
   }
-  assert_cond( n1 != 0, __FILE__, __LINE__);
+  ASSERT_COND( n1 != 0 );
   mIndexWidthArray[0].resize(n1 - 1);
   for (ymuint i = 0; i < n1 - 1; ++ i) {
     mIndexWidthArray[0][i] = mIndexArray[0][i + 1] - mIndexArray[0][i];
@@ -269,14 +269,14 @@ CiLut2D::CiLut2D(const CellLutTemplate* lut_template,
       mIndexArray[1][i] = index_array2[i];
     }
   }
-  assert_cond( n2 != 0, __FILE__, __LINE__);
+  ASSERT_COND( n2 != 0 );
   mIndexWidthArray[1].resize(n2 - 1);
   for (ymuint i = 0; i < n2 - 1; ++ i) {
     mIndexWidthArray[1][i] = mIndexArray[1][i + 1] - mIndexArray[1][i];
   }
 
   ymuint n = n1 * n2;
-  assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  ASSERT_COND( value_array.size() == n );
   mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
@@ -300,7 +300,7 @@ CiLut2D::dimension() const
 ymuint32
 CiLut2D::index_num(ymuint32 var) const
 {
-  assert_cond( var < 2, __FILE__, __LINE__);
+  ASSERT_COND( var < 2 );
   return mIndexArray[var].size();
 }
 
@@ -311,8 +311,8 @@ double
 CiLut2D::index(ymuint32 var,
 	       ymuint32 pos) const
 {
-  assert_cond( var < 2, __FILE__, __LINE__);
-  assert_cond( pos < index_num(var), __FILE__, __LINE__);
+  ASSERT_COND( var < 2 );
+  ASSERT_COND( pos < index_num(var) );
   return mIndexArray[var][pos];
 }
 
@@ -322,11 +322,11 @@ CiLut2D::index(ymuint32 var,
 double
 CiLut2D::grid_value(const vector<ymuint32>& pos_array) const
 {
-  assert_cond( pos_array.size() == 2, __FILE__, __LINE__);
+  ASSERT_COND( pos_array.size() == 2 );
   ymuint pos1 = pos_array[0];
   ymuint pos2 = pos_array[1];
-  assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
-  assert_cond( pos2 < index_num(1), __FILE__, __LINE__);
+  ASSERT_COND( pos1 < index_num(0) );
+  ASSERT_COND( pos2 < index_num(1) );
   return mValueArray[idx(pos1, pos2)];
 }
 
@@ -336,7 +336,7 @@ CiLut2D::grid_value(const vector<ymuint32>& pos_array) const
 double
 CiLut2D::value(const vector<double>& val_array) const
 {
-  assert_cond( val_array.size() == 2, __FILE__, __LINE__);
+  ASSERT_COND( val_array.size() == 2 );
 
   double val1 = val_array[0];
   ymuint idx1_a = search(val1, mIndexArray[0]);
@@ -394,7 +394,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[0][i] = index_array1[i];
     }
   }
-  assert_cond( n1 != 0, __FILE__, __LINE__);
+  ASSERT_COND( n1 != 0 );
   mIndexWidthArray[0].resize(n1 - 1);
   for (ymuint i = 0; i < n1 - 1; ++ i) {
     mIndexWidthArray[0][i] = mIndexArray[0][i + 1] - mIndexArray[0][i];
@@ -415,7 +415,7 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[1][i] = index_array2[i];
     }
   }
-  assert_cond( n2 != 0, __FILE__, __LINE__);
+  ASSERT_COND( n2 != 0 );
   mIndexWidthArray[1].resize(n2 - 1);
   for (ymuint i = 0; i < n2 - 1; ++ i) {
     mIndexWidthArray[1][i] = mIndexArray[1][i + 1] - mIndexArray[1][i];
@@ -436,14 +436,14 @@ CiLut3D::CiLut3D(const CellLutTemplate* lut_template,
       mIndexArray[2][i] = index_array3[i];
     }
   }
-  assert_cond( n3 != 0, __FILE__, __LINE__);
+  ASSERT_COND( n3 != 0 );
   mIndexWidthArray[2].resize(n3 - 1);
   for (ymuint i = 0; i < n3 - 1; ++ i) {
     mIndexWidthArray[2][i] = mIndexArray[2][i + 1] - mIndexArray[2][i];
   }
 
   ymuint n = n1 * n2 * n3;
-  assert_cond( value_array.size() == n, __FILE__, __LINE__);
+  ASSERT_COND( value_array.size() == n );
   mValueArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mValueArray[i] = value_array[i];
@@ -467,7 +467,7 @@ CiLut3D::dimension() const
 ymuint32
 CiLut3D::index_num(ymuint32 var) const
 {
-  assert_cond( var < 3, __FILE__, __LINE__);
+  ASSERT_COND( var < 3 );
   return mIndexArray[var].size();
 }
 
@@ -478,8 +478,8 @@ double
 CiLut3D::index(ymuint32 var,
 	       ymuint32 pos) const
 {
-  assert_cond( var < 3, __FILE__, __LINE__);
-  assert_cond( pos < index_num(var), __FILE__, __LINE__);
+  ASSERT_COND( var < 3 );
+  ASSERT_COND( pos < index_num(var) );
   return mIndexArray[var][pos];
 }
 
@@ -489,13 +489,13 @@ CiLut3D::index(ymuint32 var,
 double
 CiLut3D::grid_value(const vector<ymuint32>& pos_array) const
 {
-  assert_cond( pos_array.size() == 3, __FILE__, __LINE__);
+  ASSERT_COND( pos_array.size() == 3 );
   ymuint pos1 = pos_array[0];
   ymuint pos2 = pos_array[1];
   ymuint pos3 = pos_array[2];
-  assert_cond( pos1 < index_num(0), __FILE__, __LINE__);
-  assert_cond( pos2 < index_num(1), __FILE__, __LINE__);
-  assert_cond( pos3 < index_num(2), __FILE__, __LINE__);
+  ASSERT_COND( pos1 < index_num(0) );
+  ASSERT_COND( pos2 < index_num(1) );
+  ASSERT_COND( pos3 < index_num(2) );
   return mValueArray[idx(pos1, pos2, pos3)];
 }
 
@@ -505,7 +505,7 @@ CiLut3D::grid_value(const vector<ymuint32>& pos_array) const
 double
 CiLut3D::value(const vector<double>& val_array) const
 {
-  assert_cond( val_array.size() == 3, __FILE__, __LINE__);
+  ASSERT_COND( val_array.size() == 3 );
   double val1 = val_array[0];
   ymuint idx1_a = search(val1, mIndexArray[0]);
   ymuint idx1_b = idx1_a + 1;

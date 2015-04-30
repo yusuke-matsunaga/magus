@@ -65,8 +65,8 @@ NpnConf::operator=(const NpnConf& src)
 NpnConf::NpnConf(const NpnConf& src,
 		 int pol)
 {
-  assert_cond(pol == 1 || pol == 2, __FILE__, __LINE__);
-  assert_cond( src.opol() == 0, __FILE__, __LINE__);
+  ASSERT_COND(pol == 1 || pol == 2 );
+  ASSERT_COND( src.opol() == 0 );
 
   copy(src);
   mOpol = pol;
@@ -102,7 +102,7 @@ NpnConf::NpnConf(const NpnConf& src,
 
   ymuint b = src.group_begin(g);
   ymuint e = src.group_end(g);
-  assert_cond( b <= c && c < e, __FILE__, __LINE__);
+  ASSERT_COND( b <= c && c < e );
   for (ymuint i = 0; i < b; ++ i) {
     mIcList[i] = src.mIcList[i];
   }
@@ -114,7 +114,7 @@ NpnConf::NpnConf(const NpnConf& src,
       ++ k;
     }
   }
-  assert_cond(k == e, __FILE__, __LINE__);
+  ASSERT_COND(k == e );
   for (ymuint i = e; i < nc(); ++ i) {
     mIcList[i] = src.mIcList[i];
   }
@@ -174,7 +174,7 @@ NpnConf::validate_iorder() const
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
-  assert_cond( k == input_num(), __FILE__, __LINE__);
+  ASSERT_COND( k == input_num() );
   mIorderValid = true;
 }
 
@@ -221,7 +221,7 @@ void
 NpnConf::set_ic_pol(ymuint pos,
 		    int val)
 {
-  assert_cond( ic_pol(pos) == 0, __FILE__, __LINE__);
+  ASSERT_COND( ic_pol(pos) == 0 );
   mIcList[pos] &= ~3;
   mIcList[pos] |= val;
   ymuint p = ic_rep(pos);
@@ -275,7 +275,7 @@ NpnConf::set_map(NpnMap& map) const
     ++ k;
     rep = mBaseConf->ic_link(rep);
   }
-  assert_cond( k == input_num(), __FILE__, __LINE__);
+  ASSERT_COND( k == input_num() );
 }
 
 // @brief 内容を出力する．
@@ -288,7 +288,7 @@ NpnConf::print(ostream& s) const
   case 1: s << "P"; break;
   case 2: s << "N"; break;
   default:
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   s << endl;
   s << "ipol:";
@@ -299,7 +299,7 @@ NpnConf::print(ostream& s) const
     case 1: s << "P"; break;
     case 2: s << "N"; break;
     default:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
   }
   s << endl;

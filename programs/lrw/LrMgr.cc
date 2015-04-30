@@ -163,7 +163,7 @@ mark_nnode(AigNode* node,
   }
 
   marks[node->id()] |= 4U;
-  assert_cond(node->is_and(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_and() );
   mark_nnode(node->fanin0(), marks);
   mark_nnode(node->fanin1(), marks);
 }
@@ -185,7 +185,7 @@ mark_dnode_sub(AigNode* node,
     return;
   }
   marks[node->id()] |= 1U;
-  assert_cond(node->is_and(), __FILE__, __LINE__);
+  ASSERT_COND(node->is_and() );
   mark_dnode_sub(node->fanin0(), marks);
   mark_dnode_sub(node->fanin1(), marks);
 }
@@ -203,7 +203,7 @@ clear_nnode(AigNode* node,
   }
   if ( (marks[node->id()] & 4U) == 4U ) {
     marks[node->id()] &= ~4U;
-    assert_cond(node->is_and(), __FILE__, __LINE__);
+    ASSERT_COND(node->is_and() );
     clear_nnode(node->fanin0(), marks);
     clear_nnode(node->fanin1(), marks);
   }
@@ -268,7 +268,7 @@ LrMgr::local_rewrite(AigMgr& aig_mgr)
       ymuint32 pat = cut->lf_vector();
       AigTemplate templ;
       bool stat = find_aig(cut->input_num(), pat, templ);
-      assert_cond(stat, __FILE__, __LINE__);
+      ASSERT_COND(stat );
       int gain = calc_gain(cut, marks) - templ.cost();
       if ( best_gain < gain ) {
 	best_gain = gain;
@@ -325,7 +325,7 @@ LrMgr::find_aig(ymuint ni,
     ymuint16 perm;
     ymuint16 cpat = cannonical4(pat, perm);
     unordered_map<ymuint32, ymuint8>::const_iterator p = npn4map.find(cpat);
-    assert_cond(p != npn4map.end(), __FILE__, __LINE__);
+    ASSERT_COND(p != npn4map.end() );
     ymuint id = p->second;
     templ = aig4table[id];
     templ.xform(perm);

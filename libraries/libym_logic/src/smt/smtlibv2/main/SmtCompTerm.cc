@@ -70,7 +70,7 @@ SmtQualTerm::var_num() const
 const SmtVarFun*
 SmtQualTerm::bound_var(ymuint pos) const
 {
-  assert_cond( pos < var_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < var_num() );
   return mVarList[pos];
 }
 
@@ -168,7 +168,7 @@ SmtAttrTerm::attr_num() const
 ShString
 SmtAttrTerm::attr_keyword(ymuint pos) const
 {
-  assert_cond( pos < attr_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < attr_num() );
   return mAttrList[pos].mKeyword;
 }
 
@@ -177,7 +177,7 @@ SmtAttrTerm::attr_keyword(ymuint pos) const
 const SmtTerm*
 SmtAttrTerm::attr_value(ymuint pos) const
 {
-  assert_cond( pos < attr_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < attr_num() );
   return mAttrList[pos].mValue;
 }
 

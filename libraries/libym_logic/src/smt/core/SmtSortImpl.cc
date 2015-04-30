@@ -48,7 +48,7 @@ SmtSortImpl::elem_num() const
 tSmtSortId
 SmtSortImpl::elem(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kSmtSort_None;
 }
 
@@ -107,7 +107,7 @@ SmtComplexSort::elem_num() const
 tSmtSortId
 SmtComplexSort::elem(ymuint pos) const
 {
-  assert_cond( pos < elem_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < elem_num() );
   return mElemList[pos];
 }
 

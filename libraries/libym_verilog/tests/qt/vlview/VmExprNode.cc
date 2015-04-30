@@ -165,7 +165,7 @@ type2str(tVpiObjType type)
   case kVpiRegBit:      return "vpiRegBit";
   default:              return "Reference";
   }
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return "";
 }
 
@@ -251,7 +251,7 @@ op_type_str(tVlOpType type)
   case kVlArithLShiftOp: return "arithmetic left shift";
   case kVlArithRShiftOp: return "arithmetic right shift";
   case kVlPowerOp:       return "power";
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   return "";
 }
@@ -272,7 +272,7 @@ constant_type_str(tVpiConstType type)
   case kVpiSignedBinaryConst: return "vpiSignedBinaryConst";
   case kVpiSignedOctConst:    return "vpiSignedOctConst";
   case kVpiSignedHexConst:    return "vpiSignedHexConst";
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   return "";
 }
@@ -395,11 +395,11 @@ VmExprNode::expand() const
 	add_str("primitive obj", mExpr->primitive_obj()->full_name());
       }
       else {
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
     }
     else {
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
     }
     break;
   }

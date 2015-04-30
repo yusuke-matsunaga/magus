@@ -25,9 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] fsim 故障シミュレータ
-  /// @param[in] fmgr 故障マネージャ
-  FopRtpg(Fsim& fsim,
-	  FaultMgr& fmgr);
+  FopRtpg(Fsim& fsim);
 
   /// @brief デストラクタ
   virtual
@@ -44,8 +42,12 @@ public:
   /// @param[in] dpat 検出したパタンを表すビットベクタ
   virtual
   void
-  operator()(TpgFault* f,
+  operator()(const TpgFault* f,
 	     PackedVal dpat);
+
+  /// @brief 初期化する．
+  void
+  init();
 
   /// @brief 検出回数をクリアする．
   void
@@ -56,6 +58,10 @@ public:
   ymuint
   count(ymuint bitpos);
 
+  /// @brief 検出された故障のリストを得る．
+  const vector<const TpgFault*>&
+  fault_list() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -65,11 +71,11 @@ private:
   // 故障シミュレータ
   Fsim& mFsim;
 
-  // 故障マネージャ
-  FaultMgr& mFaultMgr;
-
   // 検出回数
   ymuint32 mCount[kPvBitLen];
+
+  // 検出された故障のリスト
+  vector<const TpgFault*> mFaultList;
 
 };
 

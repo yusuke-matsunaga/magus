@@ -41,7 +41,7 @@ SmtFunImpl::input_num() const
 tSmtSortId
 SmtFunImpl::input_sort(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return kSmtSort_None;
 }
 
@@ -51,7 +51,7 @@ SmtFunImpl::input_sort(ymuint pos) const
 const SmtVar*
 SmtFunImpl::input_var(ymuint pos) const
 {
-  assert_not_reached(__FILE__, __LINE__);
+  ASSERT_NOT_REACHED;
   return NULL;
 }
 
@@ -122,7 +122,7 @@ SmtDeclFun2::input_num() const
 tSmtSortId
 SmtDeclFun2::input_sort(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 
@@ -132,7 +132,7 @@ SmtDeclFun2::input_sort(ymuint pos) const
 const SmtVar*
 SmtDeclFun2::input_var(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return NULL;
 }
 
@@ -201,7 +201,7 @@ SmtDefFun2::input_num() const
 tSmtSortId
 SmtDefFun2::input_sort(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos]->sort();
 }
 
@@ -211,7 +211,7 @@ SmtDefFun2::input_sort(ymuint pos) const
 const SmtVar*
 SmtDefFun2::input_var(ymuint pos) const
 {
-  assert_cond( pos < input_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < input_num() );
   return mInputList[pos];
 }
 

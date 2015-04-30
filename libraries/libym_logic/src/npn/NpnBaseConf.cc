@@ -249,7 +249,7 @@ NpnBaseConf::print_pols(ostream& s) const
   case 0: s << "-"; break;
   case 1: s << "P"; break;
   case 2: s << "N"; break;
-  default: assert_not_reached(__FILE__, __LINE__);
+  default: ASSERT_NOT_REACHED;
   }
   s << endl
     << "ipol:";
@@ -259,7 +259,7 @@ NpnBaseConf::print_pols(ostream& s) const
     case 0: s << "-"; break;
     case 1: s << "P"; break;
     case 2: s << "N"; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
   }
   s << endl;

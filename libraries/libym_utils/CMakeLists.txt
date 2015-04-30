@@ -46,10 +46,6 @@ set (file_SOURCES
   src/file/FileInfoMgr.cc
   )
 
-set (gcsolver_SOURCES
-  src/gcsolver/GcSolver.cc
-  )
-
 set (gen_SOURCES
   src/gen/CombiGen.cc
   src/gen/GenBase.cc
@@ -60,6 +56,14 @@ set (gen_SOURCES
   src/gen/MultiSetGenBase.cc
   src/gen/MultiSetPermGen.cc
   src/gen/PermGen.cc
+  )
+
+set (graph_SOURCES
+  src/graph/GcSolver.cc
+  src/graph/Graph.cc
+  src/graph/independent_set.cc
+  src/graph/max_clique.cc
+  src/graph/max_clique_exact.cc
   )
 
 set (io_SOURCES
@@ -114,6 +118,7 @@ set (mincov_SOURCES
   src/mincov/LbMAX.cc
   src/mincov/LbMIS1.cc
   src/mincov/LbMIS2.cc
+  src/mincov/LbMIS3.cc
   src/mincov/MaxClique.cc
   src/mincov/McMatrix.cc
   src/mincov/McSolver.cc
@@ -170,12 +175,12 @@ set (textproc_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-add_library(ym_utils SHARED
+add_library(ym_utils
   ${alloc_SOURCES}
   ${btg_SOURCES}
   ${file_SOURCES}
-  ${gcsolver_SOURCES}
   ${gen_SOURCES}
+  ${graph_SOURCES}
   ${io_SOURCES}
   ${itvl_SOURCES}
   ${mfset_SOURCES}

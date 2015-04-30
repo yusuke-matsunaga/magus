@@ -18,6 +18,8 @@ endif (TCL_FOUND)
 
 set (base_SOURCES
   src/base/FaultMgr.cc
+  src/base/NodeSet.cc
+  src/base/NodeValList.cc
   src/base/TestVector.cc
   src/base/TpgFault.cc
   src/base/TpgMap.cc
@@ -27,7 +29,8 @@ set (base_SOURCES
   )
 
 set (dtpg_SOURCES
-  src/dtpg/bt/BtBase.cc
+  src/dtpg/bt/BackTracer.cc
+  src/dtpg/bt/BtImpl.cc
   src/dtpg/bt/BtJust1.cc
   src/dtpg/bt/BtJust2.cc
   src/dtpg/bt/BtJustBase.cc
@@ -41,16 +44,20 @@ set (dtpg_SOURCES
   src/dtpg/dop/DopVerify.cc
   src/dtpg/dop/FopDrop.cc
 
-  src/dtpg/driver/DtpgDriverImpl.cc
-
-  src/dtpg/engine/LitMap.cc
   src/dtpg/engine/SatEngine.cc
-  src/dtpg/engine/SatEngineMulti.cc
-  src/dtpg/engine/SatEngineMulti2.cc
-  src/dtpg/engine/SatEngineSingle.cc
-  src/dtpg/engine/SatEngineSingle2.cc
-  src/dtpg/engine/SmtEngine.cc
-  src/dtpg/engine/SmtEngineSingle.cc
+  src/dtpg/engine/VidLitMap.cc
+  src/dtpg/engine/GvalCnf.cc
+  src/dtpg/engine/FvalCnf.cc
+  src/dtpg/engine/MvalCnf.cc
+
+  src/dtpg/dtpg_engine/Extractor.cc
+  src/dtpg/dtpg_engine/LitMap.cc
+  src/dtpg/dtpg_engine/ModelValMap.cc
+  src/dtpg/dtpg_engine/GenVidMap.cc
+  src/dtpg/dtpg_engine/DtpgSat.cc
+  src/dtpg/dtpg_engine/DtpgSatBaseM.cc
+  src/dtpg/dtpg_engine/DtpgSatS.cc
+  src/dtpg/dtpg_engine/DtpgSatM.cc
 
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc
@@ -93,11 +100,23 @@ set (graphsat_SOURCES
   )
 
 set (minpat_SOURCES
-  src/minpat/FopRofsim.cc
-  src/minpat/KDet.cc
-  src/minpat/KDetOp.cc
-  src/minpat/MinPatImpl.cc
+  src/minpat/DetOp.cc
   src/minpat/Verifier.cc
+  src/minpat/MinPatBase.cc
+  src/minpat/MinPatNaive.cc
+  src/minpat/MinPatSimple.cc
+  src/minpat/MinPatSimple2.cc
+  src/minpat/MinPatDsatur.cc
+  src/minpat/MinPatDsatur2.cc
+  src/minpat/FaultAnalyzer.cc
+  src/minpat/EqChecker.cc
+  src/minpat/DomChecker.cc
+  src/minpat/ConflictChecker.cc
+  src/minpat/FgMgrBase.cc
+  src/minpat/FgMgr1.cc
+  src/minpat/FgMgr2.cc
+  src/minpat/Compactor.cc
+  src/minpat/EqSet.cc
   )
 
 set (rtpg_SOURCES
@@ -126,30 +145,30 @@ set (atpg_tclsh_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(satpg_base STATIC ${base_SOURCES})
+add_library(satpg_base OBJECT ${base_SOURCES})
 
-add_library(satpg_dtpg STATIC ${dtpg_SOURCES})
+add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
 
-add_library(satpg_fsim STATIC ${fsim_SOURCES})
+add_library(satpg_fsim OBJECT ${fsim_SOURCES})
 
-add_library(satpg_graphsat STATIC ${graphsat_SOURCES})
+#add_library(satpg_graphsat OBJECT ${graphsat_SOURCES})
 
-add_library(satpg_minpat STATIC ${minpat_SOURCES})
+add_library(satpg_minpat OBJECT ${minpat_SOURCES})
 
-add_library(satpg_rtpg STATIC ${rtpg_SOURCES})
+add_library(satpg_rtpg OBJECT ${rtpg_SOURCES})
 
 if (TCL_FOUND)
   add_executable(atpg_tclsh
     ${atpg_tclsh_SOURCES}
+    $<TARGET_OBJECTS:satpg_dtpg>
+#    $<TARGET_OBJECTS:satpg_graphsat>
+    $<TARGET_OBJECTS:satpg_fsim>
+    $<TARGET_OBJECTS:satpg_minpat>
+    $<TARGET_OBJECTS:satpg_rtpg>
+    $<TARGET_OBJECTS:satpg_base>
     )
 
   target_link_libraries(atpg_tclsh
-    satpg_dtpg
-    satpg_graphsat
-    satpg_fsim
-    satpg_minpat
-    satpg_rtpg
-    satpg_base
     ym_networks
     ym_tclpp
     ${TCL_LIBRARIES}
@@ -163,11 +182,13 @@ endif (TCL_FOUND)
 
 add_executable ( satpg_simnode_test
   src/fsim/fsim3/simnode_test.cc
+  $<TARGET_OBJECTS:satpg_fsim>
+  $<TARGET_OBJECTS:satpg_base>
   )
 
 target_link_libraries( satpg_simnode_test
-  satpg_fsim
-  )
+    ym_networks
+    )
 
 add_test (
   NAME satpg_simnode_test_run

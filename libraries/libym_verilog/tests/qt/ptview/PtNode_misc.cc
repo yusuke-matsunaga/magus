@@ -249,15 +249,15 @@ void
 StrengthNode::expand() const
 {
   if ( mStrength->drive0() != kVpiNoStrength ) {
-    assert_cond(mStrength->drive1() != kVpiNoStrength, __FILE__, __LINE__);
-    assert_cond(mStrength->charge() == kVpiNoStrength, __FILE__, __LINE__);
+    ASSERT_COND(mStrength->drive1() != kVpiNoStrength );
+    ASSERT_COND(mStrength->charge() == kVpiNoStrength );
     mChildren.reserve(2);
     mChildren.push_back( new StrengthValNode("Drive 0", mStrength->drive0()) );
     mChildren.push_back( new StrengthValNode("Drive 1", mStrength->drive1()) );
   }
   else {
-    assert_cond(mStrength->drive1() == kVpiNoStrength, __FILE__, __LINE__);
-    assert_cond(mStrength->charge() != kVpiNoStrength, __FILE__, __LINE__);
+    ASSERT_COND(mStrength->drive1() == kVpiNoStrength );
+    ASSERT_COND(mStrength->charge() != kVpiNoStrength );
     mChildren.reserve(1);
     mChildren.push_back( new StrengthValNode("Charge", mStrength->charge()) );
   }

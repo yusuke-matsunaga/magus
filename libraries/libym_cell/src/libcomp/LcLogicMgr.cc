@@ -73,7 +73,7 @@ LcLogicMgr::init()
 ymuint
 LcLogicMgr::logic_group(ymuint id) const
 {
-  assert_cond( id < 4, __FILE__, __LINE__);
+  ASSERT_COND( id < 4 );
   return mLogicGroup[id];
 }
 
@@ -167,7 +167,7 @@ LcLogicMgr::find_idmap_list(const TvFuncM& func,
 	     << "func = " << func << endl
 	     << "xmap1 = " << xmap1 << endl;
       }
-      assert_cond( f1 == f2, __FILE__, __LINE__);
+      ASSERT_COND( f1 == f2 );
     }
     vector<NpnMap> tmp_list;
     mNpnMgr.all_map(tmp_list);

@@ -11,7 +11,7 @@
 
 
 #include "satpg_nsdef.h"
-#include "DtpgMode.h"
+
 #include "YmCell/cell_nsdef.h"
 #include "YmUtils/Binder.h"
 #include "YmUtils/MStopWatch.h"
@@ -92,64 +92,6 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 故障シミュレーションを行なう関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 乱数生成器を初期化する．
-  void
-  rtpg_init(ymuint32 seed);
-
-  /// @brief 乱数パタンを用いた故障シミュレーションを行なう．
-  /// @param[in] min_f 1回のシミュレーションで検出する故障数の下限
-  /// @param[in] max_i 故障検出できないシミュレーション回数の上限
-  /// @param[in] max_pat 最大のパタン数
-  /// @param[in] stats 実行結果の情報を格納する変数
-  void
-  rtpg(ymuint min_f,
-       ymuint max_i,
-       ymuint max_pat,
-       RtpgStats& stats);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // DTPG を行なう関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief テストパタン生成を行なう．
-  /// @param[in] mode メインモード
-  /// @param[in] po_mode PO分割モード
-  /// @param[in] option_str オプション文字列
-  /// @param[in] bt バックトレーサー
-  /// @param[in] dop パタンが求められた時に実行されるファンクタ
-  /// @param[in] uop 検出不能と判定された時に実行されるファンクタ
-  /// @param[in] stats 結果を格納する構造体
-  void
-  dtpg(DtpgMode mode,
-       tDtpgPoMode po_mode,
-       const string& option_str,
-       const string& sat_type,
-       const string& sat_option,
-       ostream* outp,
-       bool timer_enable,
-       BackTracer& bt,
-       DetectOp& dop,
-       UntestOp& uop,
-       DtpgStats& stats);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // テストパタン圧縮を行なう関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief テストパタン圧縮を行なう．
-  void
-  minpat(MinPatStats& stats);
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
   // イベントハンドラの登録
   //////////////////////////////////////////////////////////////////////
 
@@ -216,12 +158,6 @@ private:
 
   // 3値の故障シミュレータ
   Fsim* mFsim3;
-
-  // RTPG
-  Rtpg* mRtpg;
-
-  // パタン圧縮器
-  MinPat* mMinPat;
 
   // ネットワークが変更された時に呼ばれるイベントハンドラ
   T2BindMgr<const TpgNetwork&, FaultMgr&> mNtwkBindMgr;

@@ -193,7 +193,7 @@ igf(int argc,
     vector<ymuint> hist(2, 0);
     for (ymuint i = 0; i < exp_p; ++ i) {
       ymuint m = multi_dist[i];
-      assert_cond( m <= 1, __FILE__, __LINE__);
+      ASSERT_COND( m <= 1 );
       ++ hist[m];
     }
     cout << "Distributions" << endl;

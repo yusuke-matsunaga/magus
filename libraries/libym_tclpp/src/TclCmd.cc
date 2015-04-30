@@ -40,7 +40,7 @@ cmd_command_callback(ClientData clientData,
   TclCmd* cmd = cmd_obj(clientData);
   // 念のため cmd の持っているインタプリタと interp が一致する事を
   // 確かめておく．
-  assert_cond( interp == cmd->interp(), __FILE__, __LINE__);
+  ASSERT_COND( interp == cmd->interp() );
 
   // TclObj の配列に入れ直す．
   TclObjVector obj_array(objc);

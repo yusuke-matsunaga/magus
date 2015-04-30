@@ -244,7 +244,7 @@ ExprNode::expand() const
       mChildren.push_back ( new ExprNode("Index", mExpr->index(i)) );
     }
     if ( mExpr->left_range() ) {
-      assert_cond( mExpr->right_range(), __FILE__, __LINE__);
+      ASSERT_COND( mExpr->right_range() );
       mChildren.push_back( new RangeModeNode( mExpr->range_mode() ) );
       mChildren.push_back( new ExprNode( "Left Range", mExpr->left_range() ) );
       mChildren.push_back( new ExprNode( "Right Range", mExpr->right_range() ) );

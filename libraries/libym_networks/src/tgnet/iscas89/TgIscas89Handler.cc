@@ -108,12 +108,12 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     break;
 
   case kGt89BUFF:
-    assert_cond(ni == 1, __FILE__, __LINE__);
+    ASSERT_COND(ni == 1 );
     mNetwork->set_to_builtin_logic(node, kTgGateBuff, 1);
     break;
 
   case kGt89NOT:
-    assert_cond(ni == 1, __FILE__, __LINE__);
+    ASSERT_COND(ni == 1 );
     mNetwork->set_to_builtin_logic(node, kTgGateNot, 1);
     break;
 
@@ -121,7 +121,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     switch ( ni ) {
     case 0:
     case 1:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     default:
       mNetwork->set_to_builtin_logic(node, kTgGateAnd, ni);
@@ -133,7 +133,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     switch ( ni ) {
     case 0:
     case 1:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     default:
       mNetwork->set_to_builtin_logic(node, kTgGateNand, ni);
@@ -145,7 +145,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     switch ( ni ) {
     case 0:
     case 1:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     default:
       mNetwork->set_to_builtin_logic(node, kTgGateOr, ni);
@@ -157,7 +157,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     switch ( ni ) {
     case 0:
     case 1:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     default:
       mNetwork->set_to_builtin_logic(node, kTgGateNor, ni);
@@ -169,7 +169,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     switch ( ni ) {
     case 0:
     case 1:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     default:
       mNetwork->set_to_builtin_logic(node, kTgGateXor, ni);
@@ -181,7 +181,7 @@ TgIscas89Handler::read_gate(const FileRegion& loc,
     switch ( ni ) {
     case 0:
     case 1:
-      assert_not_reached(__FILE__, __LINE__);
+      ASSERT_NOT_REACHED;
       break;
     default:
       mNetwork->set_to_builtin_logic(node, kTgGateXnor, ni);

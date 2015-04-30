@@ -462,7 +462,7 @@ struct PatList
 void
 genpat(ymuint ni)
 {
-  assert_cond(ni <= 5, __FILE__, __LINE__);
+  ASSERT_COND(ni <= 5 );
 
   cout << endl;
   cout << "genpat(" << ni << ")" << endl;
@@ -490,15 +490,15 @@ genpat(ymuint ni)
     case 2: fv = 0xf0f0f0f0; break;
     case 3: fv = 0xff00ff00; break;
     case 4: fv = 0xffff0000; break;
-    default: assert_not_reached(__FILE__, __LINE__);
+    default: ASSERT_NOT_REACHED;
     }
     fv &= mask;
     GpHandle h = gpmgr.make_input(i, fv);
     GpNode* node = h.node();
-    assert_cond(node, __FILE__, __LINE__);
-    assert_cond(node->is_input() && node->input_id() == i, __FILE__, __LINE__);
-    assert_cond(h.inv() == false, __FILE__, __LINE__);
-    assert_cond((fv & 1U) == 0, __FILE__, __LINE__);
+    ASSERT_COND(node );
+    ASSERT_COND(node->is_input() && node->input_id() == i );
+    ASSERT_COND(h.inv() == false );
+    ASSERT_COND((fv & 1U) == 0 );
     func_table[fv].push_back(h);
     pat_list.push_back(node);
   }

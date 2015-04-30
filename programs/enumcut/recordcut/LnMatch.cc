@@ -136,7 +136,7 @@ LnMatch::templ_num() const
 ymuint
 LnMatch::get_templ_count(ymuint pos) const
 {
-  assert_cond( pos < templ_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < templ_num() );
   return mAllList[pos]->mCount;
 }
 
@@ -145,7 +145,7 @@ LnMatch::get_templ_count(ymuint pos) const
 ymuint
 LnMatch::get_templ_loop_count(ymuint pos) const
 {
-  assert_cond( pos < templ_num(), __FILE__, __LINE__);
+  ASSERT_COND( pos < templ_num() );
   return mAllList[pos]->mLoopCount;
 }
 
@@ -175,8 +175,8 @@ void
 LnMatch::add_templ(ymuint input_num,
 		   RcfNetwork* network)
 {
-  assert_cond( input_num >= mMinInputs, __FILE__, __LINE__);
-  assert_cond( input_num <= mMaxInputs, __FILE__, __LINE__);
+  ASSERT_COND( input_num >= mMinInputs );
+  ASSERT_COND( input_num <= mMaxInputs );
   RcfTempl* templ = new RcfTempl;
   templ->mNetwork = network;
   templ->mCount = 0;

@@ -57,7 +57,7 @@ CiPatMgr::max_input() const
 const CellPatGraph&
 CiPatMgr::pat(ymuint id) const
 {
-  assert_cond( id < pat_num(), __FILE__, __LINE__);
+  ASSERT_COND( id < pat_num() );
   return mPatArray[id];
 }
 
@@ -149,7 +149,7 @@ CiPatMgr::restore(IDO& bis,
 	>> mEdgeArray[i * 2]
 	>> mEdgeArray[i * 2 + 1];
     if ( node_type(i) == kCellPatInput ) {
-      assert_cond( input_id(i) == i, __FILE__, __LINE__);
+      ASSERT_COND( input_id(i) == i );
     }
   }
 

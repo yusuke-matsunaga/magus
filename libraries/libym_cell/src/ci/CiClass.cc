@@ -55,7 +55,7 @@ CiClass::idmap_num() const
 const NpnMapM&
 CiClass::idmap(ymuint pos) const
 {
-  assert_cond( pos < mIdmapNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mIdmapNum );
   return mIdmapList[pos];
 }
 
@@ -71,7 +71,7 @@ CiClass::group_num() const
 const CellGroup*
 CiClass::cell_group(ymuint pos) const
 {
-  assert_cond( pos < mGroupNum, __FILE__, __LINE__);
+  ASSERT_COND( pos < mGroupNum );
   return mGroupList[pos];
 }
 

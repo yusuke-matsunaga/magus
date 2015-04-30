@@ -93,8 +93,8 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 			    PtIOHeadArray pt_head_array)
 {
   // module と taskfunc は排他的
-  assert_cond( module != NULL || taskfunc != NULL, __FILE__, __LINE__);
-  assert_cond( module == NULL || taskfunc == NULL, __FILE__, __LINE__);
+  ASSERT_COND( module != NULL || taskfunc != NULL );
+  ASSERT_COND( module == NULL || taskfunc == NULL );
 
   VlNamedObj* namedobj = NULL;
   if ( module ) {
@@ -105,7 +105,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
   }
   else {
     // 冗長
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
 
   ymuint index = 0;
@@ -142,7 +142,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	head = factory().new_FunctionIOHead(taskfunc, pt_head);
       }
     }
-    assert_cond( head != NULL, __FILE__, __LINE__);
+    ASSERT_COND( head != NULL );
 
     for (ymuint j = 0; j < pt_head->item_num(); ++ j) {
       const PtIOItem* pt_item = pt_head->item(j);
@@ -323,7 +323,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	    head = factory().new_DeclHead(taskfunc, pt_head, aux_type);
 	  }
 	}
-	assert_cond( head != NULL, __FILE__, __LINE__);
+	ASSERT_COND( head != NULL );
 
 	// 初期値を生成する．
 	const PtExpr* pt_init = pt_item->init_value();
@@ -351,7 +351,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	}
 	else {
 	  // task/function の IO 宣言には初期値はない．
-	  assert_cond( pt_init == NULL, __FILE__, __LINE__);
+	  ASSERT_COND( pt_init == NULL );
 	}
 
 	decl = factory().new_Decl(head, pt_item, init);
@@ -361,7 +361,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
 	case kVpiAuxReg: tag = vpiReg; break;
 	case kVpiAuxVar: tag = vpiVariables; break;
 	default:
-	  assert_not_reached(__FILE__, __LINE__);
+	  ASSERT_NOT_REACHED;
 	}
 	reg_decl(tag, decl);
       }
@@ -374,7 +374,7 @@ DeclGen::instantiate_iodecl(ElbModule* module,
       }
       else {
 	// かなりしつこく冗長
-	assert_not_reached(__FILE__, __LINE__);
+	ASSERT_NOT_REACHED;
       }
       ++ index;
 
@@ -472,7 +472,7 @@ DeclGen::instantiate_param_head(const VlNamedObj* parent,
     ElbParameter* param = factory().new_Parameter(param_head,
 						  pt_item,
 						  is_local);
-    assert_cond(param, __FILE__, __LINE__);
+    ASSERT_COND(param );
     reg_parameter(kVpiParameter, param);
 
 #if 0
@@ -534,7 +534,7 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
   else {
     net_head = factory().new_DeclHead(parent, pt_head);
   }
-  assert_cond( net_head, __FILE__, __LINE__);
+  ASSERT_COND( net_head );
 
   if ( pt_delay ) {
     add_phase3stub(make_stub(this, &DeclGen::link_net_delay,
@@ -551,7 +551,7 @@ DeclGen::instantiate_net_head(const VlNamedObj* parent,
       // 配列
 
       // 初期割り当ては構文規則上持てないはず
-      assert_cond( !pt_init, __FILE__, __LINE__);
+      ASSERT_COND( !pt_init );
 
       // 範囲の配列を作る．
       vector<ElbRangeSrc> range_src;
@@ -671,7 +671,7 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
   else {
     reg_head = factory().new_DeclHead(parent, pt_head);
   }
-  assert_cond( reg_head != NULL, __FILE__, __LINE__);
+  ASSERT_COND( reg_head != NULL );
 
   for (ymuint i = 0; i < pt_head->item_num(); ++ i) {
     const PtDeclItem* pt_item = pt_head->item(i);
@@ -681,7 +681,7 @@ DeclGen::instantiate_reg_head(const VlNamedObj* parent,
       // 配列の場合
 
       // 配列は初期値を持たない．
-      assert_cond( !pt_init, __FILE__, __LINE__);
+      ASSERT_COND( !pt_init );
 
       // 範囲の配列を作る．
       vector<ElbRangeSrc> range_src;
@@ -748,7 +748,7 @@ void
 DeclGen::instantiate_var_head(const VlNamedObj* parent,
 			      const PtDeclHead* pt_head)
 {
-  assert_cond(pt_head->data_type() != kVpiVarNone, __FILE__, __LINE__);
+  ASSERT_COND(pt_head->data_type() != kVpiVarNone );
 
   ElbDeclHead* var_head = factory().new_DeclHead(parent, pt_head);
 
@@ -760,7 +760,7 @@ DeclGen::instantiate_var_head(const VlNamedObj* parent,
       // 配列の場合
 
       // 配列は初期値を持たない．
-      assert_cond( !pt_init, __FILE__, __LINE__);
+      ASSERT_COND( !pt_init );
 
       // 範囲の配列を作る．
       vector<ElbRangeSrc> range_src;

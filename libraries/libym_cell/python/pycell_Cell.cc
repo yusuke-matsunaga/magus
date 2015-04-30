@@ -442,7 +442,7 @@ void
 PyCellCell_set_group(PyObject* py_obj,
 		     PyObject* group_obj)
 {
-  assert_cond( PyCellCell_Check(py_obj), __FILE__, __LINE__);
+  ASSERT_COND( PyCellCell_Check(py_obj) );
   CellObject* cell_obj = (CellObject*)py_obj;
   cell_obj->mGroup = group_obj;
   Py_INCREF(group_obj);

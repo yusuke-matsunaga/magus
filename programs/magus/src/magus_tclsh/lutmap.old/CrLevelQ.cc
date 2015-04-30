@@ -93,7 +93,7 @@ CrLevelQ::getmin()
 	return node;
       }
     }
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return NULL;
 }
@@ -113,7 +113,7 @@ CrLevelQ::getmax()
 	return node;
       }
     }
-    assert_not_reached(__FILE__, __LINE__);
+    ASSERT_NOT_REACHED;
   }
   return NULL;
 }

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "BtBase.h"
+#include "BtImpl.h"
 #include "TpgNode.h"
 
 
@@ -20,13 +20,12 @@ BEGIN_NAMESPACE_YM_SATPG
 /// @brief 必要なノードのみ正当化する BackTracer の基底クラス
 //////////////////////////////////////////////////////////////////////
 class BtJustBase :
-  public BtBase
+  public BtImpl
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] tvmgr TvMgr
-  BtJustBase(TvMgr& tvmgr);
+  BtJustBase();
 
   /// @brief デストラクタ
   virtual
@@ -40,8 +39,6 @@ public:
 
   /// @brief ノードID番号の最大値を設定する．
   /// @param[in] max_id ID番号の最大値
-  ///
-  /// このクラスの実装ではなにもしない．
   virtual
   void
   set_max_id(ymuint max_id);
@@ -55,12 +52,12 @@ protected:
   /// @brief justified マークをつけ，mJustifiedNodeList に加える．
   /// @param[in] node 対象のノード
   void
-  set_justified(TpgNode* node);
+  set_justified(const TpgNode* node);
 
   /// @brief justified マークを読む．
   /// @param[in] node 対象のノード
   bool
-  justified_mark(TpgNode* node);
+  justified_mark(const TpgNode* node);
 
   /// @brief justified マークを消す．
   void
@@ -70,7 +67,7 @@ protected:
   /// @note デフォルトの実装はなにもしない．
   virtual
   void
-  clear_justified_hook(TpgNode* node);
+  clear_justified_hook(const TpgNode* node);
 
 
 private:
@@ -79,7 +76,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 正当化されたノードのリスト
-  vector<TpgNode*> mJustifiedNodeList;
+  vector<const TpgNode*> mJustifiedNodeList;
 
   // 正当化マークの配列
   // インデックスは TpgNode::id()
@@ -96,9 +93,9 @@ private:
 // @param[in] node 対象のノード
 inline
 void
-BtJustBase::set_justified(TpgNode* node)
+BtJustBase::set_justified(const TpgNode* node)
 {
-  assert_cond( node->id() < mJustifiedMarkArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( node->id() < mJustifiedMarkArray.size() );
   mJustifiedMarkArray[node->id()] = true;
   mJustifiedNodeList.push_back(node);
 }
@@ -107,9 +104,9 @@ BtJustBase::set_justified(TpgNode* node)
 // @param[in] node 対象のノード
 inline
 bool
-BtJustBase::justified_mark(TpgNode* node)
+BtJustBase::justified_mark(const TpgNode* node)
 {
-  assert_cond( node->id() < mJustifiedMarkArray.size(), __FILE__, __LINE__);
+  ASSERT_COND( node->id() < mJustifiedMarkArray.size() );
   return mJustifiedMarkArray[node->id()];
 }
 
