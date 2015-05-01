@@ -43,6 +43,7 @@ atpg_init(Tcl_Interp* interp)
 
   TclCmdBinder1<ReadBlif, AtpgMgr*>::reg(interp, mgr, "::atpg::read_blif");
   TclCmdBinder1<ReadIscas89, AtpgMgr*>::reg(interp, mgr, "::atpg::read_iscas89");
+  TclCmdBinder1<WriteNetwork, AtpgMgr*>::reg(interp, mgr, "::atpg::write_network");
   TclCmdBinder1<PrintFaultCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_fault");
   TclCmdBinder1<PrintStatsCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_stats");
   TclCmdBinder1<PrintPatCmd, AtpgMgr*>::reg(interp, mgr, "::atpg::print_pat");
