@@ -1300,17 +1300,16 @@ print_network(ostream& s,
   ymuint n = network.node_num();
   for (ymuint i = 0; i < n; ++ i) {
     const TpgNode* node = network.node(i);
-    s << "Node#" << node->id() << ": ";
-    if ( node->name() != NULL ) {
-      s << node->name() << " ";
-    }
+    print_node(s, node);
+    s << ": ";
     if ( node->is_input() ) {
       s << "INPUT#" << node->input_id();
     }
     else if ( node->is_output() ) {
       s << "OUTPUT#" << node->output_id();
       const TpgNode* inode = node->fanin(0);
-      s << " = Node#" << inode->id();
+      s << " = ";
+      print_node(s, inode);
     }
     else if ( node->is_logic() ) {
       s << node->gate_type();
@@ -1319,9 +1318,10 @@ print_network(ostream& s,
 	s << "(";
 	for (ymuint j = 0; j < ni; ++ j) {
 	  const TpgNode* inode = node->fanin(j);
-	  s << " Node#" << inode->id();
+	  s << " ";
+	  print_node(s, inode);
 	}
-	s << ")";
+	s << " )";
       }
     }
     else {
@@ -1330,6 +1330,21 @@ print_network(ostream& s,
     s << endl;
   }
   s << endl;
+}
+
+// @brief ノード名を出力する
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+void
+print_node(ostream& s,
+	   const TpgNode* node)
+{
+  if ( node->name() != NULL ) {
+    s << node->name();
+  }
+  else {
+    s << "[#" << node->id() << "]";
+  }
 }
 
 END_NAMESPACE_YM_SATPG

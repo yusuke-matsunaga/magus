@@ -301,6 +301,14 @@ private:
 
 };
 
+/// @relates TpgNode
+/// @brief ノード名を出力する
+/// @param[in] s 出力先のストリーム
+/// @param[in] node 対象のノード
+void
+print_node(ostream& s,
+	   const TpgNode* node);
+
 
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
