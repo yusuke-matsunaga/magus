@@ -355,18 +355,17 @@ EqChecker::check_fault_dominance2(const TpgFault* f1,
   const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
   const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
 
-  if ( fi2.single_cube() ) {
-    // f2 を検出しない CNF を生成
-    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
-  }
-  else {
+  engine.add_assignments(gval_cnf, fi1.mandatory_assignment());
+  engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+
+  if ( !fi2.single_cube() ) {
     FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
     const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
     // f2 を検出しない CNF を生成
     engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
   }
 
-  if ( engine.check_sat(gval_cnf, fi1.mandatory_assignment()) == kB3False ) {
+  if ( engine.check_sat() == kB3False ) {
     return true;
   }
 

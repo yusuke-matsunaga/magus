@@ -314,17 +314,19 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
 
   ymuint f1_id = f1->id();
 
+  const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
+  const NodeValList& suf_list1 = fi1.sufficient_assignment();
+  const NodeValList& ma_list1 = fi1.mandatory_assignment();
+
   SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(mMaxNodeId);
+
+  engine.add_assignments(gval_cnf, ma_list1);
 
   // f1 を検出する CNF を生成
   FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
   const NodeSet& node_set1 = mAnalyzer.node_set(f1_id);
   engine.make_fval_cnf(fval_cnf, f1, node_set1, kVal1);
-
-  const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-  const NodeValList& suf_list1 = fi1.sufficient_assignment();
-  const NodeValList& ma_list1 = fi1.mandatory_assignment();
 
   conf_list.reserve(f2_list.size());
   for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
@@ -412,6 +414,8 @@ ConflictChecker::analyze_conflict2(const TpgFault* f1,
   const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
   const NodeValList& suf_list1 = fi1.sufficient_assignment();
 
+  engine.add_assignments(gval_cnf, suf_list1);
+
   conf_list.reserve(f2_list.size());
   for (ymuint i2 = 0; i2 < f2_list.size(); ++ i2) {
     ymuint f2_id = f2_list[i2];
@@ -492,6 +496,12 @@ ConflictChecker::check_fault_conflict(const TpgFault* f1,
   FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
   FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
   SatEngine engine(string(), string(), NULL);
+
+  const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
+  const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+
+  engine.add_assignments(gval_cnf, fi1.mandatory_assignment());
+  engine.add_assignments(gval_cnf, fi2.mandatory_assignment());
 
   const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
   const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());

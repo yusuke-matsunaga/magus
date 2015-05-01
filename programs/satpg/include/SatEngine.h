@@ -130,6 +130,13 @@ public:
 		const vector<const TpgNode*>& fnode_list,
 		const NodeSet& node_set);
 
+  /// @brief 割当リストに従って値を固定する．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assignment 割当リスト
+  void
+  add_assignments(GvalCnf& gval_cnf,
+		  const NodeValList& assignment);
+
   /// @brief 割当リストの否定の節を加える．
   /// @param[in] gval_cnf 正常回路用のデータ構造
   /// @param[in] assignment 割当リスト

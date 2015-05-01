@@ -591,6 +591,28 @@ SatEngine::make_mval_cnf(MvalCnf& mval_cnf,
   tmp_lits_end();
 }
 
+// @brief 割当リストに従って値を固定する．
+// @param[in] gval_cnf 正常回路用のデータ構造
+// @param[in] assign_list 割当リスト
+void
+SatEngine::add_assignments(GvalCnf& gval_cnf,
+			   const NodeValList& assign_list)
+{
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    const TpgNode* node = nv.node();
+    make_gval_cnf(gval_cnf, node);
+    Literal alit(gval_cnf.var(node), false);
+    if ( nv.val() ) {
+      add_clause(alit);
+    }
+    else {
+      add_clause(~alit);
+    }
+  }
+}
+
 // @brief 割当リストの否定の節を加える．
 // @param[in] gval_cnf 正常回路用のデータ構造
 // @param[in] assign_list 割当リスト

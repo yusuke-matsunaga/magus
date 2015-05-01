@@ -207,9 +207,11 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
     sort(fault_list.begin(), fault_list.end(), comp);
   }
 
+  // まず TFI に共通部分を持つ故障間の dominance check を行う．
   vector<ymuint> fault_list1;
   get_dom_faults1(fault_list,  0, fault_list1);
 
+  // 次に残った故障間の dominance check を行う．
   vector<ymuint> fault_list2;
   get_dom_faults1(fault_list1, 1, fault_list2);
 
@@ -522,13 +524,12 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
-    if ( fi1.single_cube() ) {
+    // f1 の条件が single cube ならこれだけで十分
+    engine.add_negation(gval_cnf, fi1.sufficient_assignment());
+
+    if ( !fi1.single_cube() ) {
       // f1 を検出しない CNF を作成
-      engine.add_negation(gval_cnf, fi1.sufficient_assignment());
-    }
-    else {
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
-      // f1 を検出しない CNF を作成
       engine.make_fval_cnf(fval_cnf, f1, mAnalyzer.node_set(f1_id), kVal0);
     }
 
@@ -633,6 +634,12 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
     FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
 
+    const NodeValList& ma_list1 = mAnalyzer.fault_info(f1->id()).mandatory_assignment();
+    engine.add_assignments(gval_cnf, ma_list1);
+
+    const NodeValList& suf_list2 = mAnalyzer.fault_info(f2->id()).sufficient_assignment();
+    engine.add_negation(gval_cnf, suf_list2);
+
     engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
 			  dom_node, f1, f2,
 			  node_set0, node_set1, node_set2);
@@ -694,40 +701,41 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
   else {
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
-    NodeValList suf_list;
 
     const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
-    if ( fi1.single_cube() ) {
-      // f1 を検出する条件
-      suf_list = fi1.sufficient_assignment();
-    }
-    else {
+    const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+
+    const NodeValList& ma_list1 = fi1.mandatory_assignment();
+    engine.add_assignments(gval_cnf, ma_list1);
+
+    const NodeValList& suf_list2 = fi2.sufficient_assignment();
+    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+
+    if ( !fi1.single_cube() ) {
       // f1 を検出する CNF を生成
       FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
       const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
       engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
     }
 
-    const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
-    if ( fi2.single_cube() ) {
-      // f2 を検出しない CNF を生成
-      engine.add_negation(gval_cnf, fi2.sufficient_assignment());
-    }
-    else {
+    if ( !fi2.single_cube() ) {
       FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
       const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-      // f1 を検出して f2 を検出しない CNF を生成
+
+      // f2 を検出しない CNF を生成
       engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
     }
 
-    sat_stat = engine.check_sat(gval_cnf, suf_list);
+    sat_stat = engine.check_sat();
   }
 
   timer.stop();
   USTime time = timer.time();
   if ( mVerbose > 1 ) {
     if ( time.usr_time() > 1.0 ) {
-      cout << " >1sec" << endl;
+      cout << endl
+	   << "  Check dominance of" << f1 << " --> " << f2 << " requires "
+	   << time.usr_time() << "(s)" << endl;
     }
   }
   if ( sat_stat == kB3False ) {

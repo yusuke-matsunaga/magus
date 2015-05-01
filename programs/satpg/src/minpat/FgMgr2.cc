@@ -99,6 +99,9 @@ FgMgr2::find_group(const TpgFault* fault,
   GvalCnf gval_cnf0(max_node_id());
 
   const FaultInfo& fi0 = fault_info(fault);
+  const NodeValList ma_list0 = fi0.mandatory_assignment();
+  engine0.add_assignments(gval_cnf0, ma_list0);
+
   NodeValList suf_list0;
   if ( fi0.single_cube() ) {
     // fault を検出する条件を追加
@@ -135,6 +138,9 @@ FgMgr2::find_group(const TpgFault* fault,
 
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(max_node_id());
+
+    engine.add_assignments(gval_cnf, ma_list0);
+    engine.add_assignments(gval_cnf, mandatory_assignment(gid));
 
     ymuint fnum = 0;
     NodeValList suf_list1;
@@ -198,6 +204,9 @@ FgMgr2::add_fault(ymuint gid,
   GvalCnf gval_cnf(max_node_id());
   FvalCnf fval_cnf(max_node_id(), gval_cnf);
   SatEngine engine(string(), string(), NULL);
+
+  engine.add_assignments(gval_cnf, ma_list);
+  engine.add_assignments(gval_cnf, mandatory_assignment(gid));
 
   ymuint nf = fg->fault_num();
   vector<FvalCnf*> fval_cnf_array(nf, NULL);
