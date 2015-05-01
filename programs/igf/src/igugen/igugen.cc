@@ -266,6 +266,8 @@ igugen(int argc,
     }
   }
 
+  cout << "Phase-1 end" << endl;
+
   ymuint comp = 1;
   if ( popt_c.is_specified() ) {
     comp = popt_c.val();
@@ -299,9 +301,12 @@ igugen(int argc,
   RandHashGen rhg;
   RandGen rg;
   for ( ; ; ++ p1) {
+    cout << " trying p = " << p1 << endl;
     bool found = false;
     RandCombiGen rcg1(var_list.size(), p1);
     for (ymuint count = 0; count < count_limit; ++ count) {
+      cout << "  " << count << " ...";
+      cout.flush();
       vector<const FuncVect*> fv_list(m);
       for (ymuint i = 0; i < m; ++ i) {
 	InputFunc* f = NULL;
@@ -325,6 +330,7 @@ igugen(int argc,
 	fv_list[i] = rv_mgr.gen_hash_vect(*f);
 	delete f;
       }
+      cout << endl;
 
       vector<ymuint> block_map;
       bool stat = false;

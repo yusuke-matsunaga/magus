@@ -1,5 +1,5 @@
 ﻿#ifndef PHFNODE_H
-#define PFHNODE_H
+#define PHFNODE_H
 
 /// @file PhfNode.h
 /// @brief PhfNode のヘッダファイル

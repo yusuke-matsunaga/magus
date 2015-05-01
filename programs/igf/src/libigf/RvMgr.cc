@@ -106,6 +106,7 @@ RvMgr::read_data(istream& s)
       }
     }
     bool found = false;
+#if 0
     for (vector<const RegVect*>::iterator p = mVectList.begin();
 	 p != mVectList.end(); ++ p) {
       const RegVect* rv1 = *p;
@@ -121,6 +122,7 @@ RvMgr::read_data(istream& s)
 	break;
       }
     }
+#endif
     if ( found ) {
       // 重複したデータ
       delete_vector(rv);
