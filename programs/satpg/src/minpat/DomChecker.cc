@@ -21,7 +21,7 @@
 #include "GvalCnf.h"
 #include "FvalCnf.h"
 #include "SatEngine.h"
-
+#include "ModelValMap.h"
 
 BEGIN_NAMESPACE_YM_SATPG
 
@@ -603,6 +603,9 @@ bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
 				  const TpgFault* f2)
 {
+  cout << endl
+       << "check_fault_dominance(" << f1 << ", " << f2 << ")" << endl;
+
   StopWatch timer;
   timer.start();
 
@@ -699,6 +702,24 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     }
   }
   else {
+    const TpgNode* target_node = NULL;
+    {
+      // f1 の支配節点にマークをつける．
+      vector<bool> dom_mark(mMaxNodeId, false);
+      for (const TpgNode* node = f1->node(); node != NULL; node = node->imm_dom()) {
+	dom_mark[node->id()] = true;
+      }
+      // f2 の TFO との共通部分を求める．
+      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+      for (ymuint i = 0; i < node_set2.tfo_size(); ++ i) {
+	const TpgNode* node = node_set2.tfo_tfi_node(i);
+	if ( dom_mark[node->id()] ) {
+	  target_node = node;
+	  break;
+	}
+      }
+    }
+
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
 
@@ -709,7 +730,7 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     engine.add_assignments(gval_cnf, ma_list1);
 
     const NodeValList& suf_list2 = fi2.sufficient_assignment();
-    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
+    engine.add_negation(gval_cnf, suf_list2);
 
     if ( !fi1.single_cube() ) {
       // f1 を検出する CNF を生成
@@ -719,11 +740,74 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     }
 
     if ( !fi2.single_cube() ) {
-      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-
       // f2 を検出しない CNF を生成
-      engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+      if ( target_node != NULL ) {
+#if 0
+	NodeSet node_set3;
+	node_set3.mark_region2(mMaxNodeId, f2->node(), target_node);
+	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+	engine.make_fval_cnf(fval_cnf2, f2, node_set3, kVal0);
+#else
+	Bool3 sat_stat1;
+	vector<Bool3> sat_model1;
+
+	SatEngine engine_(string(), string(), NULL);
+	GvalCnf gval_cnf_(mMaxNodeId);
+
+	FvalCnf fval_cnf1_(mMaxNodeId, gval_cnf_);
+	const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
+	engine_.make_fval_cnf(fval_cnf1_, f1, node_set1, kVal1);
+
+	NodeSet node_set3;
+	node_set3.mark_region2(mMaxNodeId, f2->node(), target_node);
+	FvalCnf fval_cnf2_(mMaxNodeId, gval_cnf_);
+	engine.make_fval_cnf(fval_cnf2_, f2, node_set3, kVal0);
+	sat_stat1 = engine.check_sat(sat_model1);
+
+	ModelValMap valmap1(fval_cnf1_.gvar_map(), fval_cnf1_.fvar_map(), sat_model1);
+	ModelValMap valmap2(fval_cnf2_.gvar_map(), fval_cnf2_.fvar_map(), sat_model1);
+
+	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+
+	vector<Bool3> sat_model2;
+	Bool3 sat_stat2 = engine.check_sat(sat_model2);
+	if ( sat_stat1 != sat_stat2 ) {
+	  cout << endl
+	       << "Error: " << f1 << " --> " << f2 << endl
+	       << " sat_stat1 = " << sat_stat1 << endl
+	       << " sat_stat2 = " << sat_stat2 << endl
+	       << " target_node = ";
+	  print_node(cout, target_node);
+	  cout << endl;
+	  {
+	    cout << "NodeSet1" << endl;
+	    for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
+	      const TpgNode* node = node_set1.tfo_tfi_node(i);
+	      cout << "  ";
+	      print_node(cout, node);
+	      cout << "  " << valmap1.gval(node) << " / " << valmap1.fval(node) << endl;
+	    }
+	    cout << endl;
+	    cout << "NodeSet3" << endl;
+	    for (ymuint i = 0; i < node_set3.tfo_size(); ++ i) {
+	      const TpgNode* node = node_set3.tfo_tfi_node(i);
+	      cout << "  ";
+	      print_node(cout, node);
+	      cout << "  " << valmap2.gval(node) << " / " << valmap2.fval(node) << endl;
+	    }
+	    cout << endl;
+	  }
+	  exit(1);
+	}
+#endif
+      }
+      else {
+	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+      }
     }
 
     sat_stat = engine.check_sat();
@@ -741,6 +825,7 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     }
   }
   if ( sat_stat == kB3False ) {
+    cout << "YES" << endl;
     mSuccessTime += time;
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
       mSuccessMax = time;
@@ -748,6 +833,7 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     return true;
   }
   else if ( sat_stat == kB3True ) {
+    cout << "NO" << endl;
     mFailureTime += time;
     if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
       mFailureMax = time;

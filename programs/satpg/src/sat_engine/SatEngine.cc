@@ -272,6 +272,8 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
 {
   make_gval_cnf(fval_cnf.gval_cnf(), node_set);
 
+  const TpgNode* dom_node = node_set.dom_node();
+
   ymuint n = node_set.tfo_size();
   for (ymuint i = 0; i < n; ++ i) {
     const TpgNode* node = node_set.tfo_tfi_node(i);
@@ -299,7 +301,7 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(node, fval_cnf.gvar_map(), fval_cnf.fvar_map(), fval_cnf.dvar_map());
+    make_dchain_cnf(node, dom_node, fval_cnf.gvar_map(), fval_cnf.fvar_map(), fval_cnf.dvar_map());
   }
 
   const vector<const TpgNode*>& output_list = node_set.output_list();
@@ -311,17 +313,25 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
       Literal dlit(fval_cnf.dvar(node));
       add_clause(~dlit);
     }
+    if ( dom_node != NULL ) {
+      Literal dlit(fval_cnf.dvar(dom_node));
+      add_clause(~dlit);
+    }
   }
   else if ( detect == kVal1 ) {
-    tmp_lits_begin(npo);
+    tmp_lits_begin(npo + 1);
     for (ymuint i = 0; i < npo; ++ i) {
       const TpgNode* node = output_list[i];
       Literal dlit(fval_cnf.dvar(node));
       tmp_lits_add(dlit);
     }
+    if ( dom_node != NULL ) {
+      Literal dlit(fval_cnf.dvar(dom_node));
+      tmp_lits_add(dlit);
+    }
     tmp_lits_end();
 
-    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = fnode; node != NULL && node != dom_node; node = node->imm_dom()) {
       Literal dlit(fval_cnf.dvar(node));
       add_clause(dlit);
     }
@@ -340,7 +350,7 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
     tmp_lits_add(~fdlit);
     tmp_lits_end();
 
-    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = fnode; node != NULL && node != dom_node; node = node->imm_dom()) {
       Literal dlit(fval_cnf.dvar(node));
       add_clause(~fdlit, dlit);
     }
@@ -454,7 +464,7 @@ SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(node, fval_cnf0.gvar_map(), fval_cnf0.fvar_map(), fval_cnf0.dvar_map());
+    make_dchain_cnf(node, node_set0.dom_node(), fval_cnf0.gvar_map(), fval_cnf0.fvar_map(), fval_cnf0.dvar_map());
   }
 
   const TpgNode* fnode1 = fault1->node();
@@ -470,7 +480,7 @@ SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf2(node, root_node, fval_cnf1.gvar_map(), fval_cnf1.fvar_map(), fval_cnf1.dvar_map());
+    make_dchain_cnf(node, node_set1.dom_node(), fval_cnf1.gvar_map(), fval_cnf1.fvar_map(), fval_cnf1.dvar_map());
   }
 
   const TpgNode* fnode2 = fault2->node();
@@ -486,7 +496,7 @@ SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf2(node, root_node, fval_cnf2.gvar_map(), fval_cnf2.fvar_map(), fval_cnf2.dvar_map());
+    make_dchain_cnf(node, node_set2.dom_node(), fval_cnf2.gvar_map(), fval_cnf2.fvar_map(), fval_cnf2.dvar_map());
   }
 
   {
@@ -575,7 +585,7 @@ SatEngine::make_mval_cnf(MvalCnf& mval_cnf,
       make_node_cnf(node, mval_cnf.fvar_map());
     }
 
-    make_dchain_cnf(node, mval_cnf.gvar_map(), mval_cnf.fvar_map(), mval_cnf.dvar_map());
+    make_dchain_cnf(node, node_set.dom_node(), mval_cnf.gvar_map(), mval_cnf.fvar_map(), mval_cnf.dvar_map());
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -845,11 +855,13 @@ SatEngine::make_fault_cnf(const TpgFault* fault,
 
 // @brief 故障伝搬条件を表すCNFを作る．
 // @param[in] node 対象のノード
+// @param[in] dst_node 伝搬条件の終点のノード
 // @param[in] gvar_map 正常値の変数マップ
 // @param[in] fvar_map 故障値の変数マップ
 // @param[in] dvar_map 故障伝搬条件の変数マップ
 void
 SatEngine::make_dchain_cnf(const TpgNode* node,
+			   const TpgNode* dst_node,
 			   const VidMap& gvar_map,
 			   const VidMap& fvar_map,
 			   const VidMap& dvar_map)
@@ -863,55 +875,7 @@ SatEngine::make_dchain_cnf(const TpgNode* node,
   add_clause(~glit, ~flit, ~dlit);
   add_clause( glit,  flit, ~dlit);
 
-  if ( node->is_output() ) {
-    // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
-    add_clause(~glit,  flit, dlit);
-    add_clause( glit, ~flit, dlit);
-  }
-  else {
-    // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
-    ymuint nfo = node->active_fanout_num();
-    tmp_lits_begin(nfo + 1);
-    tmp_lits_add(~dlit);
-    for (ymuint j = 0; j < nfo; ++ j) {
-      const TpgNode* onode = node->active_fanout(j);
-      Literal odlit(dvar_map(onode), false);
-      tmp_lits_add(odlit);
-    }
-    tmp_lits_end();
-
-    // dominator の dlit が 0 なら自分も 0
-    const TpgNode* idom = node->imm_dom();
-    if ( idom != NULL && idom != node->active_fanout(0) ) {
-      Literal idlit(dvar_map(idom), false);
-      add_clause(~dlit, idlit);
-    }
-  }
-}
-
-// @brief 故障伝搬条件を表すCNFを作る．
-// @param[in] node 対象のノード
-// @param[in] dst_node 伝搬条件の終点のノード
-// @param[in] gvar_map 正常値の変数マップ
-// @param[in] fvar_map 故障値の変数マップ
-// @param[in] dvar_map 故障伝搬条件の変数マップ
-void
-SatEngine::make_dchain_cnf2(const TpgNode* node,
-			    const TpgNode* dst_node,
-			    const VidMap& gvar_map,
-			    const VidMap& fvar_map,
-			    const VidMap& dvar_map)
-{
-  Literal glit(gvar_map(node), false);
-  Literal flit(fvar_map(node), false);
-  Literal dlit(dvar_map(node), false);
-
-  // dlit -> XOR(glit, flit) を追加する．
-  // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
-  add_clause(~glit, ~flit, ~dlit);
-  add_clause( glit,  flit, ~dlit);
-
-  if ( node == dst_node ) {
+  if ( node->is_output() || node == dst_node ) {
     // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
     add_clause(~glit,  flit, dlit);
     add_clause( glit, ~flit, dlit);
