@@ -734,8 +734,10 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
   if ( mVerbose > 1 ) {
     if ( time.usr_time() > 1.0 ) {
       cout << endl
-	   << "  Check dominance of" << f1 << " --> " << f2 << " requires "
-	   << time.usr_time() << "(s)" << endl;
+	   << "  Check dominance of " << f1 << " --> " << f2 << " requires "
+	   << time.usr_time() << "(s)" << endl
+	   << "  result = " << sat_stat << endl
+	   << endl;
     }
   }
   if ( sat_stat == kB3False ) {
