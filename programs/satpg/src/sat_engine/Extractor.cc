@@ -86,19 +86,21 @@ Extractor::operator()(const TpgFault* fault,
   assign_list.sort();
 
   if ( false ) {
+    ostream& dbg_out = cout;
     ymuint n = assign_list.size();
     for (ymuint i = 0; i < n; ++ i) {
       NodeVal nv = assign_list[i];
       const TpgNode* node = nv.node();
-      cout << " Node#" << node->id() << ":";
+      print_node(dbg_out, node);
+      dbg_out << ":";
       if ( nv.val() ) {
-	cout << "1";
+	dbg_out << "1";
       }
       else {
-	cout << "0";
+	dbg_out << "0";
       }
     }
-    cout << endl;
+    dbg_out << endl;
   }
 }
 

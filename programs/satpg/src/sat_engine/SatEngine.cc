@@ -685,7 +685,7 @@ SatEngine::make_node_cnf(const TpgNode* node,
     make_gate_cnf(kTgGateBuff, VidLitMap(node, vid_map));
   }
   else if ( node->is_logic() ) {
-    make_gate_cnf(node->gate_type(), VidLitMap(node,vid_map));
+    make_gate_cnf(node->gate_type(), VidLitMap(node, vid_map));
   }
   else {
     ASSERT_NOT_REACHED;
@@ -793,19 +793,20 @@ SatEngine::make_fault_cnf(const TpgFault* fault,
     // 入力の故障の場合
     // 故障値は非制御値のはずなので，
     // side input だけのゲートを仮定する．
-
     ymuint fpos = fault->pos();
     // fpos 以外の入力を ivars[] に入れる．
     ymuint ni = node->fanin_num();
     vector<VarId> ivars;
     ivars.reserve(ni - 1);
     for (ymuint i = 0; i < ni; ++ i) {
+      if ( i == fpos ) {
+	continue;
+      }
       const TpgNode* inode = node->fanin(i);
       VarId ivar = gvar_map(inode);
-      if ( i != fpos ) {
-	ivars.push_back(ivar);
-      }
+      ivars.push_back(ivar);
     }
+
     VarId ovar = fvar_map(node);
 
     bool inv = false;
