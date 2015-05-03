@@ -490,6 +490,9 @@ DomChecker::record_dom_cand(const vector<pair<ymuint, PackedVal> >& det_list)
 }
 
 // @brief 支配故障を求める基本処理
+// @param[in] src_list 対象の故障のリスト
+// @param[in] idx 故障候補リストのインデックス
+// @param[in] dst_list 支配されていない故障のリスト
 void
 DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 			    ymuint idx,
@@ -608,17 +611,31 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
   StopWatch timer;
   timer.start();
 
+  const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
+  const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
+
   const TpgNode* fnode1 = f1->node();
   const TpgNode* fnode2 = f2->node();
   const TpgNode* dom_node = common_node(fnode1, fnode2);
+
+  SatEngine engine(string(), string(), NULL);
+  GvalCnf gval_cnf(mMaxNodeId);
+
+  // f1 を検出し，f2 を検出できない条件の CNF を作り
+  // それが UNSAT かどうかを調べる．
+
+  // f1 の必要割当を加える．
+  const NodeValList& ma_list1 = fi1.mandatory_assignment();
+  engine.add_assignments(gval_cnf, ma_list1);
+
+  // f2 の十分割当の否定を加える．
+  const NodeValList& suf_list2 = fi2.sufficient_assignment();
+  engine.add_negation(gval_cnf, suf_list2);
 
   Bool3 sat_stat = kB3X;
   if ( dom_node != NULL ) {
     // 伝搬経路に共通な dominator がある時
     ++ mDomCheckCount;
-
-    SatEngine engine(string(), string(), NULL);
-    GvalCnf gval_cnf(mMaxNodeId);
 
     // 共通部分のノード集合
     NodeSet node_set0;
@@ -632,15 +649,10 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     NodeSet node_set2;
     node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
 
+#if 1
     FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
     FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
     FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-
-    const NodeValList& ma_list1 = mAnalyzer.fault_info(f1->id()).mandatory_assignment();
-    engine.add_assignments(gval_cnf, ma_list1);
-
-    const NodeValList& suf_list2 = mAnalyzer.fault_info(f2->id()).sufficient_assignment();
-    engine.add_negation(gval_cnf, suf_list2);
 
     engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
 			  dom_node, f1, f2,
@@ -653,29 +665,34 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     assumption[0] = dlit1;
     assumption[1] = ~dlit2;
     sat_stat = engine.check_sat(assumption);
+#else
+    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
+    engine.make_fval_cnf(fval_cnf0, dom_node, node_set0, kVal1);
+
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+
+    sat_stat = engine.check_sat();
+#endif
   }
   else {
-
-    SatEngine engine(string(), string(), NULL);
-    GvalCnf gval_cnf(mMaxNodeId);
-
-    const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
-    const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
-
-    const NodeValList& ma_list1 = fi1.mandatory_assignment();
-    engine.add_assignments(gval_cnf, ma_list1);
-
-    const NodeValList& suf_list2 = fi2.sufficient_assignment();
-    engine.add_negation(gval_cnf, suf_list2);
-
     if ( !fi1.single_cube() ) {
-      // f1 を検出する CNF を生成
+      // f1 の条件が単純な場合は上の必要割当だけで十分
+
+      // そうでなければちゃんと f1 の検出条件を作る．
       FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
       const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
       engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
     }
 
     if ( !fi2.single_cube() ) {
+      // f2 の条件が単純な場合は上の十分割当の否定だけで十分
+
+      // そうでなければちゃんと f2 を検出できない条件を作る．
+      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
 
       const TpgNode* target_node = NULL;
       NodeSet node_set3;
@@ -719,13 +736,9 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
       // f2 を検出しない CNF を生成
       if ( target_node != NULL ) {
 	++ mSmartDomCheck;
-	NodeSet node_set3;
-	node_set3.mark_region2(mMaxNodeId, f2->node(), target_node);
-	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
 	engine.make_fval_cnf(fval_cnf2, f2, node_set3, kVal0);
       }
       else {
-	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
 	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
 	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
       }
@@ -736,14 +749,12 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
 
   timer.stop();
   USTime time = timer.time();
-  if ( mVerbose > 1 ) {
-    if ( time.usr_time() > 1.0 ) {
-      cout << endl
-	   << "  Check dominance of " << f1 << " --> " << f2 << " requires "
-	   << time.usr_time() << "(s)" << endl
-	   << "  result = " << sat_stat << endl
-	   << endl;
-    }
+  if ( time.usr_time() > 1.0 && print_dom_detail ) {
+    cout << endl
+	 << "  Check dominance of " << f1 << " --> " << f2 << " requires "
+	 << time.usr_time() << "(s)" << endl
+	 << "  result = " << sat_stat << endl
+	 << endl;
   }
 
   if ( verify_dom_check ) {

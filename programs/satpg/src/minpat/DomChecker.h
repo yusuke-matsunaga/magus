@@ -123,11 +123,6 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  void
-  get_dom_faults2(ymuint option,
-		  const vector<const TpgFault*>& src_list,
-		  vector<const TpgFault*>& dom_fault_list);
-
   /// @brief 故障シミュレーションを行い，支配故障の候補リストを作る．
   /// @param[in] fault_list 故障リスト
   void
@@ -138,6 +133,9 @@ private:
   record_dom_cand(const vector<pair<ymuint, PackedVal> >& det_list);
 
   /// @brief 支配故障を求める基本処理
+  /// @param[in] src_list 対象の故障のリスト
+  /// @param[in] idx 故障候補リストのインデックス
+  /// @param[in] dst_list 支配されていない故障のリスト
   void
   get_dom_faults1(const vector<ymuint>& src_list,
 		  ymuint idx,
