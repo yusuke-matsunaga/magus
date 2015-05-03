@@ -202,6 +202,8 @@ private:
 
   ymuint mPat;
 
+  ymuint mSmartDomCheck;
+
 };
 
 END_NAMESPACE_YM_SATPG

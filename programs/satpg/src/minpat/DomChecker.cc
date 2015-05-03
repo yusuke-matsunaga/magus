@@ -191,6 +191,7 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
   local_timer.start();
 
   mDomCheckCount = 0;
+  mSmartDomCheck = 0;
 
   do_fsim(src_list);
 
@@ -250,6 +251,7 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
     cout << "         " << setw(8) << sum.mSat       << " dominance test" << endl;
     cout << "         " << setw(8) << sum.mDom       << " dominance" << endl;
     cout << "         " << setw(8) << mDomCheckCount << " smart dom check" << endl;
+    cout << "         " << setw(8) << mSmartDomCheck << " smart dom check (2)" << endl;
     cout << "         " << setw(8) << mPat << " patterns simulated" << endl;
     cout << "CPU time for dominance test" << local_timer.time() << endl
 	 << "  CPU time (fsim)    " << fsim_time << endl;
@@ -603,9 +605,6 @@ bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
 				  const TpgFault* f2)
 {
-  cout << endl
-       << "check_fault_dominance(" << f1 << ", " << f2 << ")" << endl;
-
   StopWatch timer;
   timer.start();
 
@@ -654,71 +653,8 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     assumption[0] = dlit1;
     assumption[1] = ~dlit2;
     sat_stat = engine.check_sat(assumption);
-
-    if ( verify_dom_check ) {
-      SatEngine engine(string(), string(), NULL);
-      GvalCnf gval_cnf(mMaxNodeId);
-      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-      const NodeSet& _node_set1 = mAnalyzer.node_set(f1->id());
-      engine.make_fval_cnf(fval_cnf1, f1, _node_set1, kVal1);
-
-      const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
-      if ( fi2.single_cube() ) {
-	// f2 を検出しない CNF を生成
-	engine.add_negation(gval_cnf, fi2.sufficient_assignment());
-      }
-      else {
-	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-	// f1 を検出して f2 を検出しない CNF を生成
-	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
-      }
-      Bool3 sat_stat2 = engine.check_sat();
-      if ( sat_stat != sat_stat2 ) {
-	cout << endl;
-	cout << "Error" << endl;
-	cout << f1 << " " << f2 << endl;
-	cout << " sat_stat  = " << sat_stat << endl
-	     << " sat_stat2 = " << sat_stat2 << endl;
-	{
-	  cout << "dom_node = " << dom_node->id() << endl;
-	  cout << "NodeSet0" << endl;
-	  for (ymuint i = 0; i < node_set0.tfo_size(); ++ i) {
-	    cout << " " << node_set0.tfo_tfi_node(i)->id();
-	  }
-	  cout << endl;
-	  cout << "NodeSet1" << endl;
-	  for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
-	    cout << " " << node_set1.tfo_tfi_node(i)->id();
-	  }
-	  cout << endl;
-	  cout << "NodeSet2" << endl;
-	  for (ymuint i = 0; i < node_set2.tfo_size(); ++ i) {
-	    cout << " " << node_set2.tfo_tfi_node(i)->id();
-	  }
-	  cout << endl;
-	}
-      }
-    }
   }
   else {
-    const TpgNode* target_node = NULL;
-    {
-      // f1 の支配節点にマークをつける．
-      vector<bool> dom_mark(mMaxNodeId, false);
-      for (const TpgNode* node = f1->node(); node != NULL; node = node->imm_dom()) {
-	dom_mark[node->id()] = true;
-      }
-      // f2 の TFO との共通部分を求める．
-      const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-      for (ymuint i = 0; i < node_set2.tfo_size(); ++ i) {
-	const TpgNode* node = node_set2.tfo_tfi_node(i);
-	if ( dom_mark[node->id()] ) {
-	  target_node = node;
-	  break;
-	}
-      }
-    }
 
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
@@ -740,68 +676,53 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     }
 
     if ( !fi2.single_cube() ) {
+
+      const TpgNode* target_node = NULL;
+      NodeSet node_set3;
+      {
+	// f1 の支配節点にマークをつける．
+	vector<bool> dom_mark(mMaxNodeId, false);
+	for (const TpgNode* node = f1->node(); node != NULL; node = node->imm_dom()) {
+	  dom_mark[node->id()] = true;
+	}
+	// f2 の TFO との共通部分を求める．
+	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+	for (ymuint i = 0; i < node_set2.tfo_size(); ++ i) {
+	  const TpgNode* node = node_set2.tfo_tfi_node(i);
+	  if ( dom_mark[node->id()] ) {
+	    target_node = node;
+
+	    node_set3.mark_region2(mMaxNodeId, f2->node(), target_node);
+	    bool intersect = false;
+
+	    vector<bool> mark(mMaxNodeId, false);
+	    for (ymuint i = 0; i < node_set3.output_list().size(); ++ i) {
+	      const TpgNode* node = node_set3.output_list()[i];
+	      mark[node->id()] = true;
+	    }
+	    const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
+	    for (ymuint i = 0; i < node_set1.output_list().size(); ++ i) {
+	      const TpgNode* node = node_set1.output_list()[i];
+	      if ( mark[node->id()] ) {
+		intersect = true;
+		break;
+	      }
+	    }
+	    if ( intersect ) {
+	      target_node = NULL;
+	    }
+	    break;
+	  }
+	}
+      }
+
       // f2 を検出しない CNF を生成
       if ( target_node != NULL ) {
-#if 0
+	++ mSmartDomCheck;
 	NodeSet node_set3;
 	node_set3.mark_region2(mMaxNodeId, f2->node(), target_node);
 	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
 	engine.make_fval_cnf(fval_cnf2, f2, node_set3, kVal0);
-#else
-	Bool3 sat_stat1;
-	vector<Bool3> sat_model1;
-
-	SatEngine engine_(string(), string(), NULL);
-	GvalCnf gval_cnf_(mMaxNodeId);
-
-	FvalCnf fval_cnf1_(mMaxNodeId, gval_cnf_);
-	const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-	engine_.make_fval_cnf(fval_cnf1_, f1, node_set1, kVal1);
-
-	NodeSet node_set3;
-	node_set3.mark_region2(mMaxNodeId, f2->node(), target_node);
-	FvalCnf fval_cnf2_(mMaxNodeId, gval_cnf_);
-	engine.make_fval_cnf(fval_cnf2_, f2, node_set3, kVal0);
-	sat_stat1 = engine.check_sat(sat_model1);
-
-	ModelValMap valmap1(fval_cnf1_.gvar_map(), fval_cnf1_.fvar_map(), sat_model1);
-	ModelValMap valmap2(fval_cnf2_.gvar_map(), fval_cnf2_.fvar_map(), sat_model1);
-
-	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-	const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-	engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
-
-	vector<Bool3> sat_model2;
-	Bool3 sat_stat2 = engine.check_sat(sat_model2);
-	if ( sat_stat1 != sat_stat2 ) {
-	  cout << endl
-	       << "Error: " << f1 << " --> " << f2 << endl
-	       << " sat_stat1 = " << sat_stat1 << endl
-	       << " sat_stat2 = " << sat_stat2 << endl
-	       << " target_node = ";
-	  print_node(cout, target_node);
-	  cout << endl;
-	  {
-	    cout << "NodeSet1" << endl;
-	    for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
-	      const TpgNode* node = node_set1.tfo_tfi_node(i);
-	      cout << "  ";
-	      print_node(cout, node);
-	      cout << "  " << valmap1.gval(node) << " / " << valmap1.fval(node) << endl;
-	    }
-	    cout << endl;
-	    cout << "NodeSet3" << endl;
-	    for (ymuint i = 0; i < node_set3.tfo_size(); ++ i) {
-	      const TpgNode* node = node_set3.tfo_tfi_node(i);
-	      cout << "  ";
-	      print_node(cout, node);
-	      cout << "  " << valmap2.gval(node) << " / " << valmap2.fval(node) << endl;
-	    }
-	    cout << endl;
-	  }
-	  exit(1);
-	}
-#endif
       }
       else {
 	FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
@@ -824,8 +745,33 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
 	   << endl;
     }
   }
+
+  if ( verify_dom_check ) {
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(mMaxNodeId);
+
+    // f1 を検出する条件を生成
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    const NodeSet& _node_set1 = mAnalyzer.node_set(f1->id());
+    engine.make_fval_cnf(fval_cnf1, f1, _node_set1, kVal1);
+
+    // f2 を検出しない CNF を生成
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+
+    Bool3 sat_stat2 = engine.check_sat();
+    if ( sat_stat != sat_stat2 ) {
+      cout << endl;
+      cout << "Error" << endl;
+      cout << f1 << " " << f2 << endl;
+      cout << " sat_stat  = " << sat_stat << endl
+	   << " sat_stat2 = " << sat_stat2 << endl;
+      exit(1);
+    }
+  }
+
   if ( sat_stat == kB3False ) {
-    cout << "YES" << endl;
     mSuccessTime += time;
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
       mSuccessMax = time;
@@ -833,7 +779,6 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     return true;
   }
   else if ( sat_stat == kB3True ) {
-    cout << "NO" << endl;
     mFailureTime += time;
     if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
       mFailureMax = time;
