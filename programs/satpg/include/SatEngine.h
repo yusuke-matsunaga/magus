@@ -94,6 +94,8 @@ public:
   /// detect = kVal0: 検出しないCNFを作る．
   ///        = kVal1: 検出するCNFを作る．
   ///        = kValX: fd_var() で制御するCNFを作る．
+  ///
+  /// 内部で make_fval_cnf(src_node) と make_fault_cnf() を呼んでいる．
   void
   make_fval_cnf(FvalCnf& fval_cnf,
 		const TpgFault* fault,
@@ -113,27 +115,6 @@ public:
 		const TpgFault* fault,
 		Val3 detect);
 
-  /// @brief 2つの故障を持つ故障回路のCNFを作る．
-  /// @param[in] fval_cnf0 共通部分の故障回路用のデータ構造
-  /// @param[in] fval_cnf1 故障1の故障回路用のデータ構造
-  /// @param[in] fval_cnf2 故障2の故障回路用のデータ構造
-  /// @param[in] root_node 共通部分の開始点
-  /// @param[in] fault1 故障1
-  /// @param[in] fault2 故障2
-  /// @param[in] node_set0 共通部分に関係するノード集合
-  /// @param[in] node_set1 故障1に関係するノード集合
-  /// @param[in] node_set2 故障2に関係するノード集合
-  void
-  make_fval_cnf2(FvalCnf& fval_cnf0,
-		 FvalCnf& fval_cnf1,
-		 FvalCnf& fval_cnf2,
-		 const TpgNode* root_node,
-		 const TpgFault* fault1,
-		 const TpgFault* fault2,
-		 const NodeSet& node_set0,
-		 const NodeSet& node_set1,
-		 const NodeSet& node_set2);
-
   /// @brief 複数故障検出回路のCNFを作る．
   /// @param[in] mval_cnf 故障回路用のデータ構造
   /// @param[in] fault_list 故障リスト
@@ -144,6 +125,18 @@ public:
 		const vector<const TpgFault*>& fault_list,
 		const vector<const TpgNode*>& fnode_list,
 		const NodeSet& node_set);
+
+  /// @brief 2つの変数の値が等しいという制約を追加する．
+  /// @param[in] var1, var2 変数番号
+  void
+  add_eq_clause(VarId var1,
+		VarId var2);
+
+  /// @brief 2つの変数の値が異なるという制約を追加する．
+  /// @param[in] var1, var2 変数番号
+  void
+  add_diff_clause(VarId var1,
+		  VarId var2);
 
   /// @brief 割当リストに従って値を固定する．
   /// @param[in] gval_cnf 正常回路用のデータ構造
@@ -260,6 +253,17 @@ private:
   make_fault_cnf(const TpgFault* fault,
 		 const VidMap& gvar_map,
 		 const VidMap& fvar_map);
+
+  /// @brief 故障箇所の関係を表す CNF を作る．
+  /// @param[in] fault 対象の故障
+  /// @param[in] gvar_map 正常値の変数マップ
+  /// @param[in] fvar_map 故障値の変数マップ
+  ///
+  /// こちらは fault を検出する条件を追加するバージョン
+  void
+  make_fault_cnf_d(const TpgFault* fault,
+		   const VidMap& gvar_map,
+		   const VidMap& fvar_map);
 
   /// @brief 故障伝搬条件を表すCNFを作る．
   /// @param[in] node 対象のノード

@@ -73,10 +73,25 @@ private:
   check_fault_equivalence(const TpgFault* f1,
 			  const TpgFault* f2);
 
+  /// @brief f1 と f2 が等価かどうか調べる．
+  bool
+  check_fault_equivalence1(const TpgFault* f1,
+			   const TpgFault* f2);
+
+  /// @brief f1 と f2 が等価かどうか調べる．
+  bool
+  check_fault_equivalence2(const TpgFault* f1,
+			   const TpgFault* f2);
+
+  /// @brief f1 と f2 が等価かどうか調べる．
+  bool
+  check_fault_equivalence3(const TpgFault* f1,
+			   const TpgFault* f2);
+
   /// @brief f1 が f2 を支配しているか調べる．
   bool
-  check_fault_dominance2(const TpgFault* f1,
-			 const TpgFault* f2);
+  check_fault_dominance(const TpgFault* f1,
+			const TpgFault* f2);
 
 
 private:
@@ -113,20 +128,6 @@ private:
 
   // 等価故障の候補リストを表すクラス
   EqSet mEqSet;
-
-  USTime mSuccessTime;
-
-  USTime mSuccessMax;
-
-  USTime mFailureTime;
-
-  USTime mFailureMax;
-
-  USTime mAbortTime;
-
-  USTime mAbortMax;
-
-  ymuint mDomCheckCount;
 
   ymuint mPat;
 };

@@ -255,9 +255,7 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
     cout << "         " << setw(8) << mPat << " patterns simulated" << endl;
     cout << "CPU time for dominance test" << local_timer.time() << endl
 	 << "  CPU time (fsim)    " << fsim_time << endl;
-    cout << "  CPU time (success) " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
-	 << "  CPU time (failure) " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
-	 << "  CPU time (abort)   " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
+    mAnalyzer.print_stats(cout);
   }
 }
 
@@ -603,6 +601,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
   }
 }
 
+#if 1
 // @brief f1 が f2 を支配しているか調べる．
 bool
 DomChecker::check_fault_dominance(const TpgFault* f1,
@@ -649,25 +648,9 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     NodeSet node_set2;
     node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
 
-#if 1
-    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
-    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-
-    engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
-			  dom_node, f1, f2,
-			  node_set0, node_set1, node_set2);
-
-    Literal dlit1(fval_cnf1.dvar(dom_node));
-    Literal dlit2(fval_cnf2.dvar(dom_node));
-
-    vector<Literal> assumption(2);
-    assumption[0] = dlit1;
-    assumption[1] = ~dlit2;
-    sat_stat = engine.check_sat(assumption);
-#else
     FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
     engine.make_fval_cnf(fval_cnf0, dom_node, node_set0, kVal1);
+    engine.add_diff_clause(fval_cnf0.gvar(dom_node), fval_cnf0.fvar(dom_node));
 
     FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
     engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
@@ -676,7 +659,6 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
 
     sat_stat = engine.check_sat();
-#endif
   }
   else {
     if ( !fi1.single_cube() ) {
@@ -804,6 +786,7 @@ DomChecker::check_fault_dominance(const TpgFault* f1,
     return false;
   }
 }
+#endif
 
 // @brief シミュレーション時の検出パタン数を返す．
 ymuint

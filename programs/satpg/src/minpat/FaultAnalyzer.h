@@ -100,6 +100,45 @@ public:
   const NodeSet&
   node_set(ymuint fid) const;
 
+  /// @brief 故障の等価性をチェックする．
+  /// @param[in] f1, f2 対象の故障
+  /// @retval true f1 と f2 が等価だった．
+  /// @retval false f1 と f2 は等価ではなかった．
+  ///
+  /// f1 を検出するパタン集合と f2 を検出するパタン集合
+  /// が完全に一致するとき f1 と f2 が等価であると言う．
+  /// f1 が f2 を支配し，f2 が f1 を支配することと同値
+  bool
+  check_equivalence(const TpgFault* f1,
+		    const TpgFault* f2) const;
+
+  /// @brief 故障の支配関係をチェックする．
+  /// @param[in] f1, f2 対象の故障
+  /// @retval true f1 が f2 を支配している．
+  /// @retval false f1 が f2 を支配していない．
+  ///
+  /// f1 を検出するいかなるパタンも f2 を検出する時
+  /// f1 が f2 を支配すると言う．
+  bool
+  check_dominance(const TpgFault* f1,
+		  const TpgFault* f2) const;
+
+  /// @brief 故障の両立性をチェックする．
+  /// @param[in] f1, f2 対象の故障
+  /// @retval true f1 と f2 が両立する．
+  /// @retval false f1 と f2 が衝突している．
+  ///
+  /// f1 を検出するパタン集合と f2 を検出するパタン集合
+  /// の共通部分がからでない時 f1 と f2 は両立すると言う．
+  bool
+  check_compatibility(const TpgFault* f1,
+		      const TpgFault* f2) const;
+
+  /// @brief 処理時間の情報を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print_stats(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -148,6 +187,27 @@ private:
 
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;
+
+  mutable
+  USTime mSuccessTime;
+
+  mutable
+  USTime mSuccessMax;
+
+  mutable
+  USTime mFailureTime;
+
+  mutable
+  USTime mFailureMax;
+
+  mutable
+  USTime mAbortTime;
+
+  mutable
+  USTime mAbortMax;
+
+  mutable
+  ymuint mDomCheckCount;
 
 };
 
