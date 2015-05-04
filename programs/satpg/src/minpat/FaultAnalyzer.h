@@ -101,27 +101,27 @@ public:
   node_set(ymuint fid) const;
 
   /// @brief 故障の等価性をチェックする．
-  /// @param[in] f1, f2 対象の故障
-  /// @retval true f1 と f2 が等価だった．
-  /// @retval false f1 と f2 は等価ではなかった．
+  /// @param[in] f1_id, f2_id 対象の故障番号
+  /// @retval true f1_id と f2_id が等価だった．
+  /// @retval false f1_id と f2_id は等価ではなかった．
   ///
   /// f1 を検出するパタン集合と f2 を検出するパタン集合
   /// が完全に一致するとき f1 と f2 が等価であると言う．
   /// f1 が f2 を支配し，f2 が f1 を支配することと同値
   bool
-  check_equivalence(const TpgFault* f1,
-		    const TpgFault* f2) const;
+  check_equivalence(ymuint f1_id,
+		    ymuint f2_id) const;
 
   /// @brief 故障の支配関係をチェックする．
-  /// @param[in] f1, f2 対象の故障
-  /// @retval true f1 が f2 を支配している．
-  /// @retval false f1 が f2 を支配していない．
+  /// @param[in] f1_id, f2_id 対象の故障
+  /// @retval true f1_id が f2_id を支配している．
+  /// @retval false f1_id が f2_id を支配していない．
   ///
   /// f1 を検出するいかなるパタンも f2 を検出する時
   /// f1 が f2 を支配すると言う．
   bool
-  check_dominance(const TpgFault* f1,
-		  const TpgFault* f2) const;
+  check_dominance(ymuint f1_id,
+		  ymuint f2_id) const;
 
   /// @brief 故障の両立性をチェックする．
   /// @param[in] f1, f2 対象の故障

@@ -181,8 +181,6 @@ DomChecker::set_verbose(int verbose)
 }
 
 // @brief 支配故障を求める．
-//
-// 結果は mDomFaultList に格納される．
 void
 DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
 			   vector<const TpgFault*>& dom_fault_list)
@@ -506,9 +504,8 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
       continue;
     }
 
-    FaultData& fd1 = mFaultDataArray[f1_id];
-
     // f1 を支配する可能性のある故障番号のリスト
+    FaultData& fd1 = mFaultDataArray[f1_id];
     const vector<ymuint>& cand_list = fd1.mDomCandList2[idx];
     if ( cand_list.empty() ) {
       continue;
@@ -520,8 +517,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
       cout.flush();
     }
 
-    const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-    const TpgFault* f1 = fi1.fault();
+    const TpgFault* f1 = mAnalyzer.fault(f1_id);
 
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(mMaxNodeId);
@@ -548,7 +544,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 	}
 	++ stats.mNoDom;
 	if ( verify_dom_check ) {
-	  bool check = mAnalyzer.check_dominance(f2, f1);
+	  bool check = mAnalyzer.check_dominance(f2_id, f1_id);
 	  if ( check ) {
 	    cout << "ERROR in check_dominance(" << f2 << ", " << f1 << ")[NODOM(1)]" << endl;
 	    exit(1);
@@ -565,7 +561,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 	++ stats.mSingleDom;
 	-- cur_num;
 	if ( verify_dom_check ) {
-	  bool check = mAnalyzer.check_dominance(f2, f1);
+	  bool check = mAnalyzer.check_dominance(f2_id, f1_id);
 	  if ( !check ) {
 	    cout << "ERROR in check_dominance(" << f2 << ", " << f1 << ")[DOM(2)]" << endl;
 	    exit(1);
@@ -576,7 +572,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 
       // 実際にチェックを行う．
       ++ stats.mSat;
-      if ( mAnalyzer.check_dominance(f2, f1) ) {
+      if ( mAnalyzer.check_dominance(f2_id, f1_id) ) {
 	if ( print_dom_detail ) {
 	  cout << "DOM(3) " << f1_id << " " << f2_id << endl;
 	}

@@ -400,18 +400,18 @@ FaultAnalyzer::node_set(ymuint fid) const
 }
 
 // @brief 故障の等価性をチェックする．
-// @param[in] f1, f2 対象の故障
-// @retval true f1 と f2 が等価だった．
-// @retval false f1 と f2 は等価ではなかった．
+// @param[in] f1_id, f2_id 対象の故障
+// @retval true f1_id と f2_id が等価だった．
+// @retval false f1_id と f2_id は等価ではなかった．
 //
 // f1 を検出するパタン集合と f2 を検出するパタン集合
 // が完全に一致するとき f1 と f2 が等価であると言う．
 // f1 が f2 を支配し，f2 が f1 を支配することと同値
 bool
-FaultAnalyzer::check_equivalence(const TpgFault* f1,
-				 const TpgFault* f2) const
+FaultAnalyzer::check_equivalence(ymuint f1_id,
+				 ymuint f2_id) const
 {
-  return check_dominance(f1, f2) && check_dominance(f2, f1);
+  return check_dominance(f1_id, f2_id) && check_dominance(f2_id, f1_id);
 }
 
 BEGIN_NONAMESPACE
@@ -446,24 +446,24 @@ common_node(const TpgNode* node1,
 END_NONAMESPACE
 
 // @brief 故障の支配関係をチェックする．
-// @param[in] f1, f2 対象の故障
-// @retval true f1 が f2 を支配している．
-// @retval false f1 が f2 を支配していない．
+// @param[in] f1_id, f2_id 対象の故障
+// @retval true f1_id が f2_id を支配している．
+// @retval false f1_id が f2_id を支配していない．
 //
 // f1 を検出するいかなるパタンも f2 を検出する時
 // f1 が f2 を支配すると言う．
 bool
-FaultAnalyzer::check_dominance(const TpgFault* f1,
-			       const TpgFault* f2) const
+FaultAnalyzer::check_dominance(ymuint f1_id,
+			       ymuint f2_id) const
 {
   StopWatch timer;
   timer.start();
 
-  ymuint f1_id = f1->id();
-  ymuint f2_id = f2->id();
-
   const FaultInfo& fi1 = fault_info(f1_id);
   const FaultInfo& fi2 = fault_info(f2_id);
+
+  const TpgFault* f1 = fault(f1_id);
+  const TpgFault* f2 = fault(f2_id);
 
   const TpgNode* fnode1 = f1->node();
   const TpgNode* fnode2 = f2->node();

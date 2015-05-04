@@ -16,11 +16,6 @@
 #include "TestVector.h"
 #include "Fsim.h"
 #include "DetOp.h"
-#include "NodeSet.h"
-
-#include "GvalCnf.h"
-#include "FvalCnf.h"
-#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -41,7 +36,6 @@ EqChecker::EqChecker(FaultAnalyzer& analyzer,
   mFsim(fsim)
 {
   mVerbose = mAnalyzer.verbose();
-  mMaxNodeId = mAnalyzer.max_node_id();
   mMaxFaultId = mAnalyzer.max_fault_id();
 }
 
@@ -59,33 +53,42 @@ EqChecker::set_verbose(int verbose)
 }
 
 // @brief 等価故障の代表故障を求める．
+// @param[in] src_fault_list 故障リスト
+// @param[out] rep_fault_list 結果の代表故障を格納するスト
 void
-EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
+EqChecker::get_rep_faults(const vector<const TpgFault*>& src_fault_list,
 			  vector<const TpgFault*>& rep_fault_list)
 {
   StopWatch local_timer;
   local_timer.start();
-  {
+
+  { // 故障番号を elem_list に入れ，mEqSet を初期化する．
     vector<ymuint> elem_list;
-    elem_list.reserve(src_list.size());
-    for (ymuint i = 0; i < src_list.size(); ++ i) {
-      elem_list.push_back(src_list[i]->id());
+    elem_list.reserve(src_fault_list.size());
+    for (ymuint i = 0; i < src_fault_list.size(); ++ i) {
+      elem_list.push_back(src_fault_list[i]->id());
     }
     mEqSet.init(elem_list);
   }
 
-  do_fsim(src_list);
+  // 故障シミュレーションを行う．
+  do_fsim(src_fault_list);
 
   USTime fsim_time = local_timer.time();
 
   ymuint n_check = 0;
   ymuint n_success = 0;
 
+  // 等価故障を持つ故障につけるマーク
   vector<bool> mark(mMaxFaultId, false);
+
   ymuint nc = mEqSet.class_num();
   for (ymuint i = 0; i < nc; ++ i) {
+    // 1つの等価故障候補グループを取り出す．
     vector<ymuint> elem_list;
     mEqSet.class_list(i, elem_list);
+
+    // グループから要素を1つ取り出す．
     ymuint n = elem_list.size();
     for (ymuint i1 = 0; i1 < n; ++ i1) {
       ymuint f1_id = elem_list[i1];
@@ -99,20 +102,21 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
 	     << "  " << setw(6) << i1;
       }
 
-      const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-      const TpgFault* f1 = fi1.fault();
+      const TpgFault* f1 = mAnalyzer.fault(f1_id);
       rep_fault_list.push_back(f1);
 
+      // グループから別の要素を取り出す．
       for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
 	ymuint f2_id = elem_list[i2];
 	if ( mark[f2_id] ) {
 	  continue;
 	}
 
-	const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-	const TpgFault* f2 = fi2.fault();
+	// 等価性のチェックを行う．
 	++ n_check;
-	if ( mAnalyzer.check_equivalence(f1, f2) ) {
+	if ( mAnalyzer.check_equivalence(f1_id, f2_id) ) {
+	  // f1 と f2 が等価だった．
+	  // f2 は以降スキップする．
 	  mark[f2_id] = true;
 	  ++ n_success;
 	}
@@ -126,7 +130,7 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
     if ( mVerbose > 1 ) {
       cout << endl;
     }
-    cout << "# original faults:       " << setw(8) << src_list.size() << endl
+    cout << "# original faults:       " << setw(8) << src_fault_list.size() << endl
 	 << "# representative faults: " << setw(8) << rep_fault_list.size() << endl
 	 << "  # equivalence checks:  " << setw(8) << n_check << endl
 	 << "  # sucess:              " << setw(8) << n_success << endl
