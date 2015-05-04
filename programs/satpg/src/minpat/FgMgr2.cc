@@ -102,12 +102,7 @@ FgMgr2::find_group(const TpgFault* fault,
   const NodeValList ma_list0 = fi0.mandatory_assignment();
   engine0.add_assignments(gval_cnf0, ma_list0);
 
-  NodeValList suf_list0;
-  if ( fi0.single_cube() ) {
-    // fault を検出する条件を追加
-    suf_list0 = fi0.sufficient_assignment();
-  }
-  else {
+  if ( !fi0.single_cube() ) {
     // fault を検出する CNF を生成
     FvalCnf fval_cnf0(max_node_id(), gval_cnf0);
     engine0.make_fval_cnf(fval_cnf0, fault, node_set(fault), kVal1);
@@ -117,7 +112,7 @@ FgMgr2::find_group(const TpgFault* fault,
 
     {
       const NodeValList& suf_list1 = sufficient_assignment(gid);
-      if ( engine0.check_sat(gval_cnf0, suf_list0, suf_list1) == kB3True ) {
+      if ( engine0.check_sat(gval_cnf0, suf_list1) == kB3True ) {
 	if ( first_gid == group_num() ) {
 	  first_gid = gid;
 	  if ( first_hit ) {
@@ -131,7 +126,7 @@ FgMgr2::find_group(const TpgFault* fault,
 
     {
       const NodeValList& ma_list1 = mandatory_assignment(gid);
-      if ( engine0.check_sat(gval_cnf0, suf_list0, ma_list1) == kB3False ) {
+      if ( engine0.check_sat(gval_cnf0, ma_list1) == kB3False ) {
 	continue;
       }
     }
@@ -142,41 +137,38 @@ FgMgr2::find_group(const TpgFault* fault,
     engine.add_assignments(gval_cnf, ma_list0);
     engine.add_assignments(gval_cnf, mandatory_assignment(gid));
 
-    ymuint fnum = 0;
-    NodeValList suf_list1;
-    if ( fi0.single_cube() ) {
-      // fault を検出する条件を追加
-      suf_list1 = fi0.sufficient_assignment();
-    }
-    else {
-      FvalCnf fval_cnf(max_node_id(), gval_cnf);
-      engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
-    }
     ymuint nf = fault_num(gid);
-    vector<FvalCnf*> fval_cnf_array(nf, NULL);
     for (ymuint i = 0; i < nf; ++ i) {
       const TpgFault* fault = this->fault(gid, i);
       const FaultInfo& fi = fault_info(fault);
-      if ( fi.single_cube() ) {
-	const NodeValList& suf_list2 = fi.sufficient_assignment();
-	suf_list1.merge(suf_list2);
-      }
-      else {
-	FvalCnf* fval_cnfp = new FvalCnf(max_node_id(), gval_cnf);
-	fval_cnf_array[i] = fval_cnfp;
-	engine.make_fval_cnf(*fval_cnfp, fault, node_set(fault), kVal1);
+      const NodeValList& ma_list = fi.mandatory_assignment();
+      engine.add_assignments(gval_cnf, ma_list);
+    }
+
+    ymuint fnum = 0;
+
+    if ( !fi0.single_cube() ) {
+      // fault を検出する条件を追加
+      FvalCnf fval_cnf(max_node_id(), gval_cnf);
+      engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+    }
+
+    vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
+    for (ymuint i = 0; i < nf; ++ i) {
+      const TpgFault* fault = this->fault(gid, i);
+      const FaultInfo& fi = fault_info(fault);
+      if ( !fi.single_cube() ) {
+	FvalCnf& fval_cnf = fval_cnf_array[i];
+	engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
 	++ fnum;
       }
-    }
-    for (ymuint i = 0; i < nf; ++ i) {
-      delete fval_cnf_array[i];
     }
     mFsum += fnum;
     if ( mFmax < fnum ) {
       mFmax = fnum;
     }
     ++ mMnum;
-    if ( engine.check_sat(gval_cnf, suf_list1) == kB3True ) {
+    if ( engine.check_sat() == kB3True ) {
       if ( first_gid == group_num() ) {
 	first_gid = gid;
 	if ( first_hit ) {
@@ -199,44 +191,47 @@ FgMgr2::add_fault(ymuint gid,
   FaultGroup* fg = fault_group(gid);
 
   const FaultInfo& fi = fault_info(fault);
-  const NodeValList& ma_list = fi.mandatory_assignment();
 
+  SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(max_node_id());
   FvalCnf fval_cnf(max_node_id(), gval_cnf);
-  SatEngine engine(string(), string(), NULL);
 
+  const NodeValList& ma_list = fi.mandatory_assignment();
   engine.add_assignments(gval_cnf, ma_list);
-  engine.add_assignments(gval_cnf, mandatory_assignment(gid));
+
+  const NodeValList& group_ma_list = mandatory_assignment(gid);
+  engine.add_assignments(gval_cnf, group_ma_list);
 
   ymuint nf = fg->fault_num();
-  vector<FvalCnf*> fval_cnf_array(nf, NULL);
-  NodeValList suf_list1;
-
-  if ( fi.single_cube() ) {
-    suf_list1 = ma_list;
+  for (ymuint i = 0; i < nf; ++ i) {
+    const TpgFault* fault = fg->fault(i);
+    const FaultInfo& fi = fault_info(fault);
+    // fault を検出する条件を追加
+    const NodeValList& ma_list = fi.mandatory_assignment();
+    engine.add_assignments(gval_cnf, ma_list);
   }
-  else {
+
+  if ( !fi.single_cube() ) {
+    // fault を検出する条件を追加
     engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
   }
+
+  vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
 
   ymuint fnum = 0;
   for (ymuint i = 0; i < nf; ++ i) {
     const TpgFault* fault = fg->fault(i);
     const FaultInfo& fi = fault_info(fault);
-    if ( fi.single_cube() ) {
-      const NodeValList& suf_list2 = fi.sufficient_assignment();
-      suf_list1.merge(suf_list2);
-    }
-    else {
-      FvalCnf* fval_cnfp = new FvalCnf(max_node_id(), gval_cnf);
-      fval_cnf_array[i] = fval_cnfp;
-      engine.make_fval_cnf(*fval_cnfp, fault, node_set(fault), kVal1);
+    // fault を検出する条件を追加
+    if ( !fi.single_cube() ) {
+      FvalCnf& fval_cnf = fval_cnf_array[i];
+      engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
       ++ fnum;
     }
   }
 
   vector<Bool3> sat_model;
-  Bool3 sat_ans = engine.check_sat(gval_cnf, suf_list1, sat_model);
+  Bool3 sat_ans = engine.check_sat(sat_model);
   ASSERT_COND( sat_ans == kB3True );
 
   for (ymuint i = 0; i < nf; ++ i) {
@@ -245,10 +240,9 @@ FgMgr2::add_fault(ymuint gid,
     if ( !fi.single_cube() ) {
       NodeValList suf_list;
       NodeValList pi_suf_list;
-      fval_cnf_array[i]->get_pi_suf_list(sat_model, fault, node_set(fault),
-					 suf_list, pi_suf_list);
+      fval_cnf_array[i].get_pi_suf_list(sat_model, fault, node_set(fault),
+					suf_list, pi_suf_list);
       fg->set_suf_list(i, suf_list, pi_suf_list);
-      delete fval_cnf_array[i];
     }
   }
   ++ mMnum;
