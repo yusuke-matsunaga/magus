@@ -30,6 +30,8 @@ BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
+const bool verify_dom_check = false;
+
 void
 mark_tfi(const TpgNode* node,
 	 HashSet<ymuint>& tfi_mark,
@@ -311,29 +313,6 @@ FaultAnalyzer::analyze_fault(const TpgFault* fault,
     if ( suf_list.size() == ma_list.size() ) {
       fi.mSingleCube = true;
     }
-#if 0
-    else {
-      NodeValList diff_list = suf_list;
-      diff_list.diff(ma_list);
-      ASSERT_COND( diff_list.size() > 0 );
-      engine.add_negation(gval_cnf, diff_list);
-      vector<Bool3> sat_model;
-      Bool3 sat_ans = engine.check_sat(sat_model);
-      ASSERT_COND( sat_ans == kB3True );
-      for (ymuint i = 0; i < 2; ++ i) {
-	NodeValList suf_list;
-	fval_cnf.get_suf_list(sat_model, fault, node_set(f_id), suf_list);
-	suf_list.diff(ma_list);
-
-	fi.mOtherSufListArray.push_back(suf_list);
-	engine.add_negation(gval_cnf, suf_list);
-	sat_ans = engine.check_sat(sat_model);
-	if ( sat_ans == kB3False ) {
-	  break;
-	}
-      }
-    }
-#endif
   }
   return sat_stat;
 }
@@ -497,16 +476,6 @@ FaultAnalyzer::check_dominance(const TpgFault* f1,
   const NodeValList& ma_list1 = fi1.mandatory_assignment();
   engine.add_assignments(gval_cnf, ma_list1);
 
-  // f2 の十分条件の否定を追加する．
-  const NodeValList& suf_list2 = fi2.sufficient_assignment();
-  engine.add_negation(gval_cnf, suf_list2);
-
-  // これだけで充足不能なら答は YES
-  Bool3 sat_stat = engine.check_sat();
-  if ( sat_stat == kB3False ) {
-    goto end;
-  }
-
   if ( dom_node != NULL ) {
     // 伝搬経路に共通な dominator がある時
     ++ mDomCheckCount;
@@ -535,8 +504,6 @@ FaultAnalyzer::check_dominance(const TpgFault* f1,
     // f2 を検出しない条件を追加する．
     FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
     engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
-
-    sat_stat = engine.check_sat();
   }
   else {
     if ( !fi1.single_cube() ) {
@@ -544,30 +511,51 @@ FaultAnalyzer::check_dominance(const TpgFault* f1,
       FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
       const NodeSet& node_set1 = node_set(f1_id);
       engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
-
-      sat_stat = engine.check_sat();
-      if ( sat_stat == kB3False ) {
-	goto end;
-      }
     }
 
-    if ( !fi2.single_cube() ) {
-      // f2 を検出しない CNF を生成
-      FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-      const NodeSet& node_set2 = node_set(f2_id);
-      engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
-
-      sat_stat = engine.check_sat();
-      if ( sat_stat == kB3False ) {
-	goto end;
-      }
-    }
+    // f2 を検出しない CNF を生成
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = node_set(f2_id);
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
   }
 
- end:
+  Bool3 sat_stat = engine.check_sat();
 
   timer.stop();
   USTime time = timer.time();
+
+  if ( verify_dom_check ) {
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(mMaxNodeId);
+
+    // f1 を検出する CNF を生成
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set1 = node_set(f1_id);
+    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+    // f2 を検出しない CNF を生成
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = node_set(f2_id);
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+
+    Bool3 sat_stat2 = engine.check_sat();
+    if ( sat_stat != sat_stat2 ) {
+      cout << "ERROR in check_dominance(" << f1 << ", " << f2 << ")" << endl
+	   << "  sat_stat  = " << sat_stat << endl
+	   << "  sat_stat2 = " << sat_stat2 << endl;
+      if ( dom_node ) {
+	cout << "  smart dom check" << endl;
+      }
+      if ( fi1.single_cube() ) {
+	cout << "  f1 is single cube" << endl;
+      }
+      if ( fi2.single_cube() ) {
+	cout << "  f2 is single cube" << endl;
+      }
+      exit(1);
+    }
+  }
+
   if ( sat_stat == kB3False ) {
     mSuccessTime += time;
     if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
