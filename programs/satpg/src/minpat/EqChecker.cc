@@ -11,7 +11,6 @@
 
 #include "FaultAnalyzer.h"
 
-#include "TpgFault.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
@@ -56,23 +55,17 @@ EqChecker::set_verbose(int verbose)
 // @param[in] src_fault_list 故障リスト
 // @param[out] rep_fault_list 結果の代表故障を格納するスト
 void
-EqChecker::get_rep_faults(const vector<const TpgFault*>& src_fault_list,
-			  vector<const TpgFault*>& rep_fault_list)
+EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
+			  vector<ymuint>& rep_fid_list)
 {
   StopWatch local_timer;
   local_timer.start();
 
-  { // 故障番号を elem_list に入れ，mEqSet を初期化する．
-    vector<ymuint> elem_list;
-    elem_list.reserve(src_fault_list.size());
-    for (ymuint i = 0; i < src_fault_list.size(); ++ i) {
-      elem_list.push_back(src_fault_list[i]->id());
-    }
-    mEqSet.init(elem_list);
-  }
+  // mEqSet を初期化する．
+  mEqSet.init(src_fid_list);
 
   // 故障シミュレーションを行う．
-  do_fsim(src_fault_list);
+  do_fsim(src_fid_list);
 
   USTime fsim_time = local_timer.time();
 
@@ -102,8 +95,7 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_fault_list,
 	     << "  " << setw(6) << i1;
       }
 
-      const TpgFault* f1 = mAnalyzer.fault(f1_id);
-      rep_fault_list.push_back(f1);
+      rep_fid_list.push_back(f1_id);
 
       // グループから別の要素を取り出す．
       for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
@@ -130,8 +122,8 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_fault_list,
     if ( mVerbose > 1 ) {
       cout << endl;
     }
-    cout << "# original faults:       " << setw(8) << src_fault_list.size() << endl
-	 << "# representative faults: " << setw(8) << rep_fault_list.size() << endl
+    cout << "# original faults:       " << setw(8) << src_fid_list.size() << endl
+	 << "# representative faults: " << setw(8) << rep_fid_list.size() << endl
 	 << "  # equivalence checks:  " << setw(8) << n_check << endl
 	 << "  # sucess:              " << setw(8) << n_success << endl
 	 << "  # patterns simulated:  " << setw(8) << mPat << endl
@@ -144,20 +136,31 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_fault_list,
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
+EqChecker::do_fsim(const vector<ymuint>& fid_list)
 {
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  mFsim.set_faults(fault_list);
+  {
+    ymuint nf = fid_list.size();
+    vector<const TpgFault*> fault_list;
+    fault_list.reserve(nf);
+    for (ymuint i = 0; i < nf; ++ i) {
+      ymuint fid = fid_list[i];
+      const TpgFault* fault = mAnalyzer.fault(fid);
+      fault_list.push_back(fault);
+    }
+
+    mFsim.set_faults(fault_list);
+  }
 
   DetOp op;
 
-  ymuint nf = fault_list.size();
+  ymuint nf = fid_list.size();
   ymuint npat = nf;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fault_list[i];
-    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+    ymuint fid = fid_list[i];
+    const FaultInfo& fi = mAnalyzer.fault_info(fid);
     TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {

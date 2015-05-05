@@ -11,7 +11,6 @@
 
 #include "FaultAnalyzer.h"
 
-#include "TpgFault.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
@@ -182,8 +181,8 @@ DomChecker::set_verbose(int verbose)
 
 // @brief 支配故障を求める．
 void
-DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
-			   vector<const TpgFault*>& dom_fault_list)
+DomChecker::get_dom_faults(const vector<ymuint>& src_fid_list,
+			   vector<ymuint>& dom_fid_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -191,24 +190,21 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
   mDomCheckCount = 0;
   mSmartDomCheck = 0;
 
-  do_fsim(src_list);
+  do_fsim(src_fid_list);
 
   USTime fsim_time = local_timer.time();
 
-  ymuint fault_num = src_list.size();
-  vector<ymuint> fault_list(fault_num);
-  for (ymuint i = 0; i < fault_num; ++ i) {
-    fault_list[i] = src_list[i]->id();
-  }
+  ymuint fault_num = src_fid_list.size();
+  vector<ymuint> tmp_list = src_fid_list;
   {
     // 故障を被支配故障数の少ない順に並べる．
     FaultLt comp(*this);
-    sort(fault_list.begin(), fault_list.end(), comp);
+    sort(tmp_list.begin(), tmp_list.end(), comp);
   }
 
   // まず TFI に共通部分を持つ故障間の dominance check を行う．
   vector<ymuint> fault_list1;
-  get_dom_faults1(fault_list,  0, fault_list1);
+  get_dom_faults1(tmp_list,  0, fault_list1);
 
   // 次に残った故障間の dominance check を行う．
   vector<ymuint> fault_list2;
@@ -216,13 +212,12 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
 
   // 支配されていない故障を dom_fault_list に入れる．
   ymuint dom_fault_num = fault_list2.size();
-  dom_fault_list.clear();
-  dom_fault_list.reserve(dom_fault_num);
+  dom_fid_list.clear();
+  dom_fid_list.reserve(dom_fault_num);
   ymuint single_num = 0;
   for (ymuint i = 0; i < dom_fault_num; ++ i) {
     ymuint f_id = fault_list2[i];
-    const TpgFault* fault = mAnalyzer.fault(f_id);
-    dom_fault_list.push_back(fault);
+    dom_fid_list.push_back(f_id);
 
     const FaultInfo& fi = mAnalyzer.fault_info(f_id);
     if ( fi.single_cube() ) {
@@ -238,7 +233,7 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
       sum += mStats[i];
     }
 
-    cout << "Total    " << setw(8) << src_list.size()  << " original faults" << endl;
+    cout << "Total    " << setw(8) << src_fid_list.size()  << " original faults" << endl;
     cout << "Total    " << setw(8) << dom_fault_num   << " dominator faults" << endl;
     cout << "        (" << setw(8) << single_num      << ") single cube faults" << endl;
     cout << "-------------------------------------------------------------" << endl;
@@ -259,18 +254,18 @@ DomChecker::get_dom_faults(const vector<const TpgFault*>& src_list,
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
+DomChecker::do_fsim(const vector<ymuint>& fid_list)
 {
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
   DetOp op;
 
-  ymuint nf = fault_list.size();
+  ymuint nf = fid_list.size();
   ymuint npat = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fault_list[i];
-    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+    ymuint fid = fid_list[i];
+    const FaultInfo& fi = mAnalyzer.fault_info(fid);
     TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
@@ -339,9 +334,9 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 
   // 構造的に独立な故障対を対象外にする．
   for (ymuint i1 = 0; i1 < nf; ++ i1) {
-    const TpgFault* f1 = fault_list[i1];
-    FaultData& fd1 = mFaultDataArray[f1->id()];
-    const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1->id());
+    ymuint f1_id = fid_list[i1];
+    FaultData& fd1 = mFaultDataArray[f1_id];
+    const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1_id);
 
     vector<ymuint>& dst_list = fd1.mDomCandList1;
     ymuint wpos = 0;
@@ -363,21 +358,18 @@ DomChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     }
   }
 
-  vector<ymuint> fid_list(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    fid_list[i] = fault_list[i]->id();
-  }
+  vector<ymuint> tmp_fid_list = fid_list;
 
   // 故障を被支配故障候補数の多い順に並べる．
   {
     // 正確にはさらに single cube condition の故障を先にする
     FaultGt comp(*this);
-    sort(fid_list.begin(), fid_list.end(), comp);
+    sort(tmp_fid_list.begin(), tmp_fid_list.end(), comp);
   }
 
   // 被支配故障の候補から支配故障の候補を作る．
   for (ymuint i = 0; i < nf; ++ i) {
-    ymuint f1_id = fid_list[i];
+    ymuint f1_id = tmp_fid_list[i];
     FaultData& fd1 = mFaultDataArray[f1_id];
     const vector<ymuint>& input_list1_2 = mAnalyzer.input_list2(f1_id);
 

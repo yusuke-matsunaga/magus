@@ -8,7 +8,6 @@
 
 
 #include "MinPatSimple2.h"
-#include "TpgFault.h"
 #include "FaultAnalyzer.h"
 #include "EqChecker.h"
 #include "DomChecker.h"
@@ -35,10 +34,10 @@ struct FaultGt
   }
 
   bool
-  operator()(const TpgFault* left,
-	     const TpgFault* right)
+  operator()(ymuint left,
+	     ymuint right)
   {
-    return mConfNumArray[left->id()] > mConfNumArray[right->id()];
+    return mConfNumArray[left] > mConfNumArray[right];
   }
 
   const vector<ymuint>& mConfNumArray;
@@ -64,43 +63,37 @@ MinPatSimple2::~MinPatSimple2()
 }
 
 // @brief 初期化を行う．
-// @param[in] fault_list 検出された故障のリスト
+// @param[in] fid_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatSimple2::init(const vector<const TpgFault*>& fault_list,
+MinPatSimple2::init(const vector<ymuint>& fid_list,
 		    TvMgr& tvmgr,
 		    Fsim& fsim2)
 {
   // 代表故障のリスト
-  vector<const TpgFault*> rep_fault_list;
+  vector<ymuint> rep_fid_list;
   {
     EqChecker checker1(analyzer(), tvmgr, fsim2);
-    checker1.get_rep_faults(fault_list, rep_fault_list);
+    checker1.get_rep_faults(fid_list, rep_fid_list);
   }
 
   // 支配故障のリスト
-  vector<const TpgFault*> dom_fault_list;
+  vector<ymuint> dom_fid_list;
   {
     DomChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_dom_faults(rep_fault_list, dom_fault_list);
+    checker.get_dom_faults(rep_fid_list, dom_fid_list);
   }
 
-  ymuint nf = dom_fault_list.size();
+  ymuint nf = dom_fid_list.size();
 
   // 故障を衝突数の多い順に並べる．
   vector<ymuint> conf_num_array;
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
-  checker2.estimate_conflict(dom_fault_list, conf_num_array);
+  checker2.estimate_conflict(dom_fid_list, conf_num_array);
 
-  sort(dom_fault_list.begin(), dom_fault_list.end(), FaultGt(conf_num_array));
+  sort(dom_fid_list.begin(), dom_fid_list.end(), FaultGt(conf_num_array));
 
-  ymuint nd = dom_fault_list.size();
-  vector<ymuint> dom_fid_list;
-  dom_fid_list.reserve(nd);
-  for (ymuint i = 0; i < nd; ++ i) {
-    dom_fid_list.push_back(dom_fault_list[i]->id());
-  }
   set_fid_list(dom_fid_list);
 
 }

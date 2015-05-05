@@ -44,12 +44,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
-  /// @param[in] fault_list 検出された故障のリスト
+  /// @param[in] fid_list 検出された故障のリスト
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<const TpgFault*>& fault_list,
+  init(const vector<ymuint>& fid_list,
        TvMgr& tvmgr,
        Fsim& fsim2);
 

@@ -11,7 +11,6 @@
 
 #include "FaultAnalyzer.h"
 
-#include "TpgFault.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
@@ -105,7 +104,7 @@ ConflictChecker::set_verbose(int verbose)
 
 // @brief 故障間の衝突性を調べる．
 void
-ConflictChecker::analyze_conflict(const vector<const TpgFault*>& fault_list)
+ConflictChecker::analyze_conflict(const vector<ymuint>& fid_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -127,18 +126,16 @@ ConflictChecker::analyze_conflict(const vector<const TpgFault*>& fault_list)
   mConflictStats.int2_count = 0;
 
   // シミュレーション結果を用いてコンフリクトチェックのスクリーニングを行う．
-  do_fsim(fault_list);
+  do_fsim(fid_list);
 
-  ymuint fault_num = fault_list.size();
+  ymuint fault_num = fid_list.size();
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    const TpgFault* f1 = fault_list[i1];
+    ymuint f1_id = fid_list[i1];
 
     if ( mVerbose > 1 ) {
       cout << "\rCFL: " << setw(6) << i1 << " / " << setw(6) << fault_num;
       cout.flush();
     }
-
-    ymuint f1_id = f1->id();
 
     const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
     for (ymuint i = 0; i < ma_conf_list.size(); ++ i) {
@@ -157,8 +154,8 @@ ConflictChecker::analyze_conflict(const vector<const TpgFault*>& fault_list)
   }
 
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    const TpgFault* f1 = fault_list[i1];
-    FaultData& fd = mFaultDataArray[f1->id()];
+    ymuint f1_id = fid_list[i1];
+    FaultData& fd = mFaultDataArray[f1_id];
     sort(fd.mConflictList.begin(), fd.mConflictList.end());
   }
 
@@ -181,12 +178,10 @@ ConflictChecker::conflict_list(ymuint fid)
 
 // @brief 1つの故障に対する衝突の解析を行う．
 void
-ConflictChecker::analyze_conflict(const TpgFault* f1,
-				  const vector<const TpgFault*>& fault_list,
+ConflictChecker::analyze_conflict(ymuint f1_id,
+				  const vector<ymuint>& fid_list,
 				  vector<ymuint>& conf_list)
 {
-  ymuint f1_id = f1->id();
-
   const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
   vector<ymuint>& f2_list = mFaultDataArray[f1_id].mCandList;
   vector<ymuint> conf1_list;
@@ -206,15 +201,14 @@ ConflictChecker::analyze_conflict(const TpgFault* f1,
 
 // @brief 衝突数の見積もりを行う．
 void
-ConflictChecker::estimate_conflict(const vector<const TpgFault*>& fault_list,
+ConflictChecker::estimate_conflict(const vector<ymuint>& fid_list,
 				   vector<ymuint>& conf_num_array)
 {
   conf_num_array.clear();
   conf_num_array.resize(mMaxFaultId, 0);
-  ymuint fault_num = fault_list.size();
+  ymuint fault_num = fid_list.size();
   for (ymuint i1 = 0; i1 < fault_num; ++ i1) {
-    const TpgFault* f1 = fault_list[i1];
-    ymuint f1_id = f1->id();
+    ymuint f1_id = fid_list[i1];
 
     const vector<ymuint>& ma_conf_list = mFaultDataArray[f1_id].mMaConflictList;
     vector<ymuint>& f2_list = mFaultDataArray[f1_id].mCandList;
@@ -257,7 +251,6 @@ ConflictChecker::analyze_conflict(ymuint f1_id,
     }
 
     const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-    const TpgFault* f2 = fi2.fault();
     const NodeValList& suf_list2 = fi2.sufficient_assignment();
     const NodeValList& ma_list2 = fi2.mandatory_assignment();
 
@@ -356,9 +349,9 @@ ConflictChecker::print_conflict_stats(ostream& s)
 }
 
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
-// @param[in] fault_list 故障リスト
+// @param[in] fid_list 故障リスト
 void
-ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
+ConflictChecker::do_fsim(const vector<ymuint>& fid_list)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -368,11 +361,11 @@ ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 
   DetOp op;
 
-  ymuint npat = fault_list.size();
+  ymuint npat = fid_list.size();
   ymuint base = 0;
-  for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    const TpgFault* fault = fault_list[i];
-    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+  for (ymuint i = 0; i < fid_list.size(); ++ i) {
+    ymuint fid = fid_list[i];
+    const FaultInfo& fi = mAnalyzer.fault_info(fid);
     TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
@@ -382,7 +375,7 @@ ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
       }
       mFsim.ppsfp(cur_array, op);
       const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
-      record_pat(det_list, fault_list);
+      record_pat(det_list, fid_list);
       cur_array.clear();
       op.clear_det_list();
       base += kPvBitLen;
@@ -391,7 +384,7 @@ ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
   if ( !cur_array.empty() ) {
     mFsim.ppsfp(cur_array, op);
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
-    record_pat(det_list, fault_list);
+    record_pat(det_list, fid_list);
     op.clear_det_list();
     base += cur_array.size();
     cur_array.clear();
@@ -409,7 +402,7 @@ ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
     mFsim.ppsfp(cur_array, op);
     ymuint nchg = 0;
     const vector<pair<ymuint, PackedVal> >& det_list = op.det_list();
-    nchg += record_pat(det_list, fault_list);
+    nchg += record_pat(det_list, fid_list);
     cur_array.clear();
     op.clear_det_list();
     base += kPvBitLen;
@@ -437,9 +430,9 @@ ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
   }
 
   // mCandList の後始末．
-  for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    const TpgFault* fault = fault_list[i];
-    FaultData& fd = mFaultDataArray[fault->id()];
+  for (ymuint i = 0; i < fid_list.size(); ++ i) {
+    ymuint fid = fid_list[i];
+    FaultData& fd = mFaultDataArray[fid];
     if ( fd.mCandList.size() != fd.mCandListSize ) {
       fd.mCandList.erase(fd.mCandList.begin() + fd.mCandListSize, fd.mCandList.end());
     }
@@ -456,7 +449,7 @@ ConflictChecker::do_fsim(const vector<const TpgFault*>& fault_list)
 
 ymuint
 ConflictChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list,
-			    const vector<const TpgFault*>& fault_list)
+			    const vector<ymuint>& fid_list)
 {
   ymuint n = det_list.size();
   ymuint nchg = 0;
@@ -480,9 +473,8 @@ ConflictChecker::record_pat(const vector<pair<ymuint, PackedVal> >& det_list,
       const NodeValList& pi_suf_list1 = fi1.pi_sufficient_assignment();
       const NodeValList& ma_list1 = fi1.mandatory_assignment();
       const vector<ymuint>& input_list1 = mAnalyzer.input_list(f1_id);
-      for (ymuint j = 0; j < fault_list.size(); ++ j) {
-	const TpgFault* f2 = fault_list[j];
-	ymuint f2_id = f2->id();
+      for (ymuint j = 0; j < fid_list.size(); ++ j) {
+	ymuint f2_id = fid_list[j];
 	if ( f2_id == f1_id ) {
 	  continue;
 	}

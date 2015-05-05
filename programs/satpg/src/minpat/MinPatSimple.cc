@@ -8,7 +8,6 @@
 
 
 #include "MinPatSimple.h"
-#include "TpgFault.h"
 #include "FaultAnalyzer.h"
 #include "EqChecker.h"
 #include "DomChecker.h"
@@ -37,10 +36,10 @@ struct FaultLt
   }
 
   bool
-  operator()(const TpgFault* left,
-	     const TpgFault* right)
+  operator()(ymuint left,
+	     ymuint right)
   {
-    return mChecker.det_count(left->id()) < mChecker.det_count(right->id());
+    return mChecker.det_count(left) < mChecker.det_count(right);
   }
 
   DomChecker mChecker;
@@ -75,38 +74,23 @@ MinPatSimple::init(const vector<ymuint>& fid_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
-  ymuint n = fid_list.size();
-  vector<const TpgFault*> fault_list;
-  fault_list.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    ymuint fid = fid_list[i];
-    const TpgFault* fault = analyzer().fault(fid);
-    fault_list.push_back(fault);
-  }
-
   // 代表故障のリスト
-  vector<const TpgFault*> rep_fault_list;
+  vector<ymuint> rep_fid_list;
   {
-    EqChecker checker1(analyzer(), tvmgr, fsim2);
-    checker1.get_rep_faults(fault_list, rep_fault_list);
+    EqChecker checker(analyzer(), tvmgr, fsim2);
+    checker.get_rep_faults(fid_list, rep_fid_list);
   }
 
   // 支配故障のリスト
-  vector<const TpgFault*> dom_fault_list;
+  vector<ymuint> dom_fid_list;
   {
     DomChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_dom_faults(rep_fault_list, dom_fault_list);
+    checker.get_dom_faults(rep_fid_list, dom_fid_list);
 
     // 検出パタン数の少ない順に並べる．
-    sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker));
+    sort(dom_fid_list.begin(), dom_fid_list.end(), FaultLt(checker));
   }
 
-  ymuint n1 = dom_fault_list.size();
-  vector<ymuint> dom_fid_list;
-  dom_fid_list.reserve(n1);
-  for (ymuint i = 0; i < n1; ++ i) {
-    dom_fid_list.push_back(dom_fault_list[i]->id());
-  }
   set_fid_list(dom_fid_list);
 }
 

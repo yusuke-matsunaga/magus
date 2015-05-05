@@ -93,8 +93,8 @@ private:
   // 故障ごとの情報
   struct FaultStruct
   {
-    // 故障
-    const TpgFault* mFault;
+    // 故障番号
+    ymuint mFaultId;
 
     // 検出パタン数
     ymuint mPatNum;

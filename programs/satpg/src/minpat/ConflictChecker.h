@@ -50,7 +50,7 @@ public:
 
   /// @brief 衝突の解析を行う．
   void
-  analyze_conflict(const vector<const TpgFault*>& fault_list);
+  analyze_conflict(const vector<ymuint>& fid_list);
 
   /// @brief 衝突リストを得る．
   ///
@@ -61,21 +61,21 @@ public:
   /// @brief 故障シミュレーションを行い，故障検出パタンを記録する．
   /// @param[in] fault_list 故障リスト
   void
-  do_fsim(const vector<const TpgFault*>& fault_list);
+  do_fsim(const vector<ymuint>& fid_list);
 
   /// @brief 1つの故障に対する衝突の解析を行う．
   ///
   /// 事前に do_fsim() を実行しておく必要がある．
   void
-  analyze_conflict(const TpgFault* f1,
-		   const vector<const TpgFault*>& fault_list,
+  analyze_conflict(ymuint f1_id,
+		   const vector<ymuint>& fid_list,
 		   vector<ymuint>& conf_list);
 
   /// @brief 衝突数の見積もりを行う．
   ///
   /// 事前に do_fsim() を実行しておく必要がある．
   void
-  estimate_conflict(const vector<const TpgFault*>& fault_list,
+  estimate_conflict(const vector<ymuint>& fid_list,
 		    vector<ymuint>& conf_num_array);
 
 
@@ -100,7 +100,7 @@ private:
   /// @brief 故障シミュレーションの後処理
   ymuint
   record_pat(const vector<pair<ymuint, PackedVal> >& det_list,
-	     const vector<const TpgFault*>& fault_list);
+	     const vector<ymuint>& fid_list);
 
   /// @brief analyze_conflict の統計情報を出力する．
   void

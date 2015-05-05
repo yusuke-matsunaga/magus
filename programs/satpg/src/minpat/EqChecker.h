@@ -51,11 +51,11 @@ public:
   set_verbose(int verbose);
 
   /// @brief 代表故障を求める．
-  /// @param[in] src_fault_list 故障リスト
-  /// @param[out] rep_fault_list 結果の代表故障を格納するスト
+  /// @param[in] src_fid_list 故障リスト
+  /// @param[out] rep_fid_list 結果の代表故障を格納するスト
   void
-  get_rep_faults(const vector<const TpgFault*>& src_fault_list,
-		 vector<const TpgFault*>& rep_fault_list);
+  get_rep_faults(const vector<ymuint>& src_fid_list,
+		 vector<ymuint>& rep_fid_list);
 
 
 private:
@@ -64,11 +64,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 故障シミュレーションを行い，等価故障の候補リストを作る．
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] fid_list 故障リスト
   ///
   /// 結果は mEqSet に格納される．
   void
-  do_fsim(const vector<const TpgFault*>& fault_list);
+  do_fsim(const vector<ymuint>& fid_list);
 
 
 private:
