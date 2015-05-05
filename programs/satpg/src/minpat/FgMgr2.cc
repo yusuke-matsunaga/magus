@@ -37,7 +37,7 @@ FgMgr2::~FgMgr2()
 }
 
 // @brief 新たな条件なしで追加できる既存グループを見つける．
-// @param[in] fault 対象の故障
+// @param[in] fid 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
 // @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
 // @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -46,19 +46,19 @@ FgMgr2::~FgMgr2()
 // 見つからない場合は group_num() を返す．
 // gid_list は first_hit == true の時，意味を持たない．
 ymuint
-FgMgr2::find_dom_group(const TpgFault* fault,
-		      const vector<ymuint>& group_list,
-		      bool first_hit,
-		      vector<ymuint>& gid_list)
+FgMgr2::find_dom_group(ymuint fid,
+		       const vector<ymuint>& group_list,
+		       bool first_hit,
+		       vector<ymuint>& gid_list)
 {
+  SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(max_node_id());
   FvalCnf fval_cnf(max_node_id(), gval_cnf);
-  SatEngine engine(string(), string(), NULL);
 
-  const NodeSet& node_set = this->node_set(fault);
+  const NodeSet& node_set = this->node_set(fid);
 
   // fault が見つからない条件を作る．
-  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal0);
+  engine.make_fval_cnf(fval_cnf, fault(fid), node_set, kVal0);
 
   ymuint first_gid = group_num();
   for (ymuint i = 0; i < group_list.size(); ++ i) {
@@ -79,7 +79,7 @@ FgMgr2::find_dom_group(const TpgFault* fault,
 }
 
 // @brief 追加できる既存グループを見つける．
-// @param[in] fault 対象の故障
+// @param[in] fid 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
 // @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
 // @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -88,7 +88,7 @@ FgMgr2::find_dom_group(const TpgFault* fault,
 // 見つからない場合は group_num() を返す．
 // gid_list は first_hit == true の時，意味を持たない．
 ymuint
-FgMgr2::find_group(const TpgFault* fault,
+FgMgr2::find_group(ymuint fid,
 		   const vector<ymuint>& group_list,
 		   bool first_hit,
 		   vector<ymuint>& gid_list)
@@ -98,14 +98,14 @@ FgMgr2::find_group(const TpgFault* fault,
   SatEngine engine0(string(), string(), NULL);
   GvalCnf gval_cnf0(max_node_id());
 
-  const FaultInfo& fi0 = fault_info(fault);
+  const FaultInfo& fi0 = fault_info(fid);
   const NodeValList ma_list0 = fi0.mandatory_assignment();
   engine0.add_assignments(gval_cnf0, ma_list0);
 
   if ( !fi0.single_cube() ) {
     // fault を検出する CNF を生成
     FvalCnf fval_cnf0(max_node_id(), gval_cnf0);
-    engine0.make_fval_cnf(fval_cnf0, fault, node_set(fault), kVal1);
+    engine0.make_fval_cnf(fval_cnf0, fault(fid), node_set(fid), kVal1);
   }
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
@@ -139,8 +139,8 @@ FgMgr2::find_group(const TpgFault* fault,
 
     ymuint nf = fault_num(gid);
     for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = this->fault(gid, i);
-      const FaultInfo& fi = fault_info(fault);
+      ymuint fid = fault_id(gid, i);
+      const FaultInfo& fi = fault_info(fid);
       const NodeValList& ma_list = fi.mandatory_assignment();
       engine.add_assignments(gval_cnf, ma_list);
     }
@@ -150,16 +150,16 @@ FgMgr2::find_group(const TpgFault* fault,
     if ( !fi0.single_cube() ) {
       // fault を検出する条件を追加
       FvalCnf fval_cnf(max_node_id(), gval_cnf);
-      engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+      engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
     }
 
     vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
     for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = this->fault(gid, i);
-      const FaultInfo& fi = fault_info(fault);
+      ymuint fid = fault_id(gid, i);
+      const FaultInfo& fi = fault_info(fid);
       if ( !fi.single_cube() ) {
 	FvalCnf& fval_cnf = fval_cnf_array[i];
-	engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+	engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
 	++ fnum;
       }
     }
@@ -183,14 +183,14 @@ FgMgr2::find_group(const TpgFault* fault,
 
 // @brief 既存のグループに故障を追加する．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-// @param[in] fault 故障
+// @param[in] fid 故障番号
 void
 FgMgr2::add_fault(ymuint gid,
-		  const TpgFault* fault)
+		  ymuint fid)
 {
   FaultGroup* fg = fault_group(gid);
 
-  const FaultInfo& fi = fault_info(fault);
+  const FaultInfo& fi = fault_info(fid);
 
   SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(max_node_id());
@@ -204,8 +204,8 @@ FgMgr2::add_fault(ymuint gid,
 
   ymuint nf = fg->fault_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fg->fault(i);
-    const FaultInfo& fi = fault_info(fault);
+    ymuint fid = fg->fault_id(i);
+    const FaultInfo& fi = fault_info(fid);
     // fault を検出する条件を追加
     const NodeValList& ma_list = fi.mandatory_assignment();
     engine.add_assignments(gval_cnf, ma_list);
@@ -213,19 +213,19 @@ FgMgr2::add_fault(ymuint gid,
 
   if ( !fi.single_cube() ) {
     // fault を検出する条件を追加
-    engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+    engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
   }
 
   vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
 
   ymuint fnum = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fg->fault(i);
-    const FaultInfo& fi = fault_info(fault);
+    ymuint fid = fg->fault_id(i);
+    const FaultInfo& fi = fault_info(fid);
     // fault を検出する条件を追加
     if ( !fi.single_cube() ) {
       FvalCnf& fval_cnf = fval_cnf_array[i];
-      engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+      engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
       ++ fnum;
     }
   }
@@ -235,12 +235,12 @@ FgMgr2::add_fault(ymuint gid,
   ASSERT_COND( sat_ans == kB3True );
 
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fg->fault(i);
-    const FaultInfo& fi = fault_info(fault);
+    ymuint fid = fg->fault_id(i);
+    const FaultInfo& fi = fault_info(fid);
     if ( !fi.single_cube() ) {
       NodeValList suf_list;
       NodeValList pi_suf_list;
-      fval_cnf_array[i].get_pi_suf_list(sat_model, fault, node_set(fault),
+      fval_cnf_array[i].get_pi_suf_list(sat_model, fault(fid), node_set(fid),
 					suf_list, pi_suf_list);
       fg->set_suf_list(i, suf_list, pi_suf_list);
     }
@@ -255,25 +255,14 @@ FgMgr2::add_fault(ymuint gid,
 
   if ( fi.single_cube() ) {
     const NodeValList& pi_suf_list = fi.pi_sufficient_assignment();
-    fg->add_fault(fault, ma_list, ma_list, pi_suf_list);
+    fg->add_fault(fid, ma_list, ma_list, pi_suf_list);
   }
   else {
     NodeValList suf_list;
     NodeValList pi_suf_list;
-    fval_cnf.get_pi_suf_list(sat_model, fault, node_set(fault), suf_list, pi_suf_list);
-    fg->add_fault(fault, suf_list, ma_list, pi_suf_list);
+    fval_cnf.get_pi_suf_list(sat_model, fault(fid), node_set(fid), suf_list, pi_suf_list);
+    fg->add_fault(fid, suf_list, ma_list, pi_suf_list);
   }
-}
-
-// @brief 故障を取り除く
-// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-// @param[in] fault_list 故障リスト
-void
-FgMgr2::delete_fault(ymuint gid,
-		     const vector<const TpgFault*>& fault_list)
-{
-  FaultGroup* fg = fault_group(gid);
-  fg->delete_faults(fault_list);
 }
 
 // @brief 複数故障の検出検査回数

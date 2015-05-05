@@ -12,7 +12,6 @@
 #include "FgMgr2.h"
 #include "Compactor.h"
 #include "TpgNetwork.h"
-//#include "TpgFault.h"
 #include "TvMgr.h"
 #include "Verifier.h"
 #include "GvalCnf.h"
@@ -87,8 +86,7 @@ MinPatBase::run(TpgNetwork& network,
     group_list.push_back(gid);
 
     // 故障を追加する．
-    const TpgFault* fault = mAnalyzer.fault(fid);
-    fgmgr.add_fault(gid, fault);
+    fgmgr.add_fault(gid, fid);
   }
 
   // 未処理の故障がある限り以下の処理を繰り返す．
@@ -113,8 +111,7 @@ MinPatBase::run(TpgNetwork& network,
     }
 
     // 故障を追加する．
-    const TpgFault* fault = mAnalyzer.fault(fid);
-    fgmgr.add_fault(gid, fault);
+    fgmgr.add_fault(gid, fid);
   }
 
   local_timer.stop();
@@ -231,17 +228,15 @@ MinPatBase::find_group(FgMgr& fgmgr,
 		       ymuint fid,
 		       const vector<ymuint>& group_list)
 {
-  const TpgFault* fault = analyzer().fault(fid);
-
   vector<ymuint> dummy;
   if ( mGroupDominance ) {
-    ymuint gid = fgmgr.find_dom_group(fault, group_list, true, dummy);
+    ymuint gid = fgmgr.find_dom_group(fid, group_list, true, dummy);
     if ( gid != fgmgr.group_num() ) {
       return gid;
     }
   }
 
-  ymuint gid = fgmgr.find_group(fault, group_list, true, dummy);
+  ymuint gid = fgmgr.find_group(fid, group_list, true, dummy);
   return gid;
 }
 

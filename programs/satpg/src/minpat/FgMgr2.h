@@ -42,7 +42,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 新たな条件なしで追加できる既存グループを見つける．
-  /// @param[in] fault 対象の故障
+  /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
   /// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
   /// @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -52,13 +52,13 @@ public:
   /// gid_list は first_hit == true の時，意味を持たない．
   virtual
   ymuint
-  find_dom_group(const TpgFault* fault,
+  find_dom_group(ymuint fid,
 		 const vector<ymuint>& group_list,
 		 bool first_hit,
 		 vector<ymuint>& gid_list);
 
   /// @brief 追加できる既存グループを見つける．
-  /// @param[in] fault 対象の故障
+  /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
   /// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
   /// @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -68,26 +68,18 @@ public:
   /// gid_list は first_hit == true の時，意味を持たない．
   virtual
   ymuint
-  find_group(const TpgFault* fault,
+  find_group(ymuint fid,
 	     const vector<ymuint>& group_list,
 	     bool first_hit,
 	     vector<ymuint>& gid_list);
 
   /// @brief 既存のグループに故障を追加する．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fault 故障
+  /// @param[in] fid 故障番号
   virtual
   void
   add_fault(ymuint gid,
-	    const TpgFault* fault);
-
-  /// @brief 故障を取り除く
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fault_list 故障リスト
-  virtual
-  void
-  delete_fault(ymuint gid,
-	       const vector<const TpgFault*>& fault_list);
+	    ymuint fid);
 
   /// @brief 複数故障の検出検査回数
   ymuint

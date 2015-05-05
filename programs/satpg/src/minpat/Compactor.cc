@@ -9,11 +9,7 @@
 
 #include "Compactor.h"
 #include "FgMgr.h"
-#include "TpgFault.h"
-#include "GvalCnf.h"
-#include "FvalCnf.h"
-#include "SatEngine.h"
-#include "YmUtils/MinCov.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -82,6 +78,7 @@ Compactor::phase0(FgMgr& fgmgr,
 		  vector<ymuint>& group_list)
 {
   ymuint max_group_id = fgmgr.group_num();
+#if 0
 #if 0
   vector<bool> locked(max_group_id, false);
   for ( ; ; ) {
@@ -195,6 +192,7 @@ Compactor::phase0(FgMgr& fgmgr,
   ymuint new_ng = mincov.heuristic(col_set);
   cout << "new_ng = " << col_set.size() << endl;
 #endif
+#endif
 }
 
 // @brief phase-1
@@ -253,7 +251,7 @@ Compactor::phase1(FgMgr& fgmgr,
     bool red = true;
     ymuint nf = fgmgr.fault_num(min_gid);
     for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = fgmgr.fault(min_gid, i);
+      ymuint fid = fgmgr.fault_id(min_gid, i);
       vector<ymuint> tmp_group_list1;
       tmp_group_list1.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
@@ -263,7 +261,7 @@ Compactor::phase1(FgMgr& fgmgr,
 	}
       }
       vector<ymuint> dummy;
-      ymuint gid = fgmgr.find_group(fault, tmp_group_list1, true, dummy);
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list1, true, dummy);
       if ( gid != fgmgr.group_num() ) {
 	ymuint ipos = 0;
 	for (ipos = 0; ipos < ng; ++ ipos) {
@@ -277,7 +275,7 @@ Compactor::phase1(FgMgr& fgmgr,
 	  gid2 = fgmgr.duplicate_group(gid);
 	  tmp_group_list[ipos] = gid2;
 	}
-	fgmgr.add_fault(gid2, fault);
+	fgmgr.add_fault(gid2, fid);
       }
       else {
 	red = false;
@@ -383,10 +381,10 @@ Compactor::phase2(FgMgr& fgmgr,
 
     // 可能な限り故障を他のグループに移動する．
     ymuint nf = fgmgr.fault_num(min_gid);
-    vector<const TpgFault*> del_fault_list;
-    del_fault_list.reserve(nf);
+    vector<ymuint> del_fid_list;
+    del_fid_list.reserve(nf);
     for (ymuint i = 0; i < nf; ++ i) {
-      const TpgFault* fault = fgmgr.fault(min_gid, i);
+      ymuint fid = fgmgr.fault_id(min_gid, i);
       vector<ymuint> tmp_group_list;
       tmp_group_list.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
@@ -396,14 +394,14 @@ Compactor::phase2(FgMgr& fgmgr,
 	}
       }
       vector<ymuint> dummy;
-      ymuint gid = fgmgr.find_group(fault, tmp_group_list, true, dummy);
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list, true, dummy);
       if ( gid != fgmgr.group_num() ) {
-	fgmgr.add_fault(gid, fault);
-	del_fault_list.push_back(fault);
+	fgmgr.add_fault(gid, fid);
+	del_fid_list.push_back(fid);
       }
     }
-    if ( !del_fault_list.empty() ) {
-      fgmgr.delete_fault(min_gid, del_fault_list);
+    if ( !del_fid_list.empty() ) {
+      fgmgr.delete_faults(min_gid, del_fid_list);
     }
     locked[min_gid] = true;
     ++ count;

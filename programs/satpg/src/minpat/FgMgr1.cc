@@ -36,7 +36,7 @@ FgMgr1::~FgMgr1()
 }
 
 // @brief 新たな条件なしで追加できる既存グループを見つける．
-// @param[in] fault 対象の故障
+// @param[in] fid 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
 // @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
 // @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -45,19 +45,17 @@ FgMgr1::~FgMgr1()
 // 見つからない場合は group_num() を返す．
 // gid_list は first_hit == true の時，意味を持たない．
 ymuint
-FgMgr1::find_dom_group(const TpgFault* fault,
-		      const vector<ymuint>& group_list,
-		      bool first_hit,
-		      vector<ymuint>& gid_list)
+FgMgr1::find_dom_group(ymuint fid,
+		       const vector<ymuint>& group_list,
+		       bool first_hit,
+		       vector<ymuint>& gid_list)
 {
+  SatEngine engine(string(), string(), NULL);
   GvalCnf gval_cnf(max_node_id());
   FvalCnf fval_cnf(max_node_id(), gval_cnf);
-  SatEngine engine(string(), string(), NULL);
-
-  const NodeSet& node_set = this->node_set(fault);
 
   // fault が見つからない条件を作る．
-  engine.make_fval_cnf(fval_cnf, fault, node_set, kVal0);
+  engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal0);
 
   ymuint first_gid = group_num();
   for (ymuint i = 0; i < group_list.size(); ++ i) {
@@ -78,7 +76,7 @@ FgMgr1::find_dom_group(const TpgFault* fault,
 }
 
 // @brief 追加できる既存グループを見つける．
-// @param[in] fault 対象の故障
+// @param[in] fid 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
 // @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
 // @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -87,16 +85,15 @@ FgMgr1::find_dom_group(const TpgFault* fault,
 // 見つからない場合は group_num() を返す．
 // gid_list は first_hit == true の時，意味を持たない．
 ymuint
-FgMgr1::find_group(const TpgFault* fault,
-		  const vector<ymuint>& group_list,
-		  bool first_hit,
-		  vector<ymuint>& gid_list)
+FgMgr1::find_group(ymuint fid,
+		   const vector<ymuint>& group_list,
+		   bool first_hit,
+		   vector<ymuint>& gid_list)
 {
-  const FaultInfo& fi = fault_info(fault);
+  const FaultInfo& fi = fault_info(fid);
 
   GvalCnf gval_cnf(max_node_id());
   SatEngine engine(string(), string(), NULL);
-
 
   NodeValList suf_list0;
   if ( fi.single_cube() ) {
@@ -104,7 +101,7 @@ FgMgr1::find_group(const TpgFault* fault,
   }
   else {
     FvalCnf fval_cnf(max_node_id(), gval_cnf);
-    engine.make_fval_cnf(fval_cnf, fault, node_set(fault), kVal1);
+    engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
   }
 
   ymuint first_gid = group_num();
@@ -127,28 +124,26 @@ FgMgr1::find_group(const TpgFault* fault,
 
 // @brief 既存のグループに故障を追加する．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-// @param[in] fault 故障
+// @param[in] fid 故障番号
 void
 FgMgr1::add_fault(ymuint gid,
-		 const TpgFault* fault)
+		  ymuint fid)
 {
   FgMgrBase::FaultGroup* fg = fault_group(gid);
 
-  const FaultInfo& fi = fault_info(fault);
+  const FaultInfo& fi = fault_info(fid);
   const NodeValList& ma_list = fi.mandatory_assignment();
 
   if ( fi.single_cube() ) {
     const NodeValList& pi_suf_list = fi.pi_sufficient_assignment();
-    fg->add_fault(fault, ma_list, ma_list, pi_suf_list);
+    fg->add_fault(fid, ma_list, ma_list, pi_suf_list);
   }
   else {
     GvalCnf gval_cnf(max_node_id());
     FvalCnf fval_cnf(max_node_id(), gval_cnf);
     SatEngine engine(string(), string(), NULL);
 
-    const NodeSet& node_set = this->node_set(fault);
-
-    engine.make_fval_cnf(fval_cnf, fault, node_set, kVal1);
+    engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
 
     vector<Bool3> sat_model;
     Bool3 sat_ans = engine.check_sat(gval_cnf, fg->sufficient_assignment(), sat_model);
@@ -156,21 +151,10 @@ FgMgr1::add_fault(ymuint gid,
 
     NodeValList suf_list;
     NodeValList pi_suf_list;
-    fval_cnf.get_pi_suf_list(sat_model, fault, node_set, suf_list, pi_suf_list);
+    fval_cnf.get_pi_suf_list(sat_model, fault(fid), node_set(fid), suf_list, pi_suf_list);
 
-    fg->add_fault(fault, suf_list, ma_list, pi_suf_list);
+    fg->add_fault(fid, suf_list, ma_list, pi_suf_list);
   }
-}
-
-// @brief 故障を取り除く
-// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-// @param[in] fault_list 故障リスト
-void
-FgMgr1::delete_fault(ymuint gid,
-		     const vector<const TpgFault*>& fault_list)
-{
-  FaultGroup* fg = fault_group(gid);
-  fg->delete_faults(fault_list);
 }
 
 END_NAMESPACE_YM_SATPG

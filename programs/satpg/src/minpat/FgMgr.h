@@ -74,7 +74,7 @@ public:
   delete_group(ymuint gid) = 0;
 
   /// @brief 新たな条件なしで追加できる既存グループを見つける．
-  /// @param[in] fault 対象の故障
+  /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
   /// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
   /// @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -84,13 +84,13 @@ public:
   /// gid_list は first_hit == true の時，意味を持たない．
   virtual
   ymuint
-  find_dom_group(const TpgFault* fault,
+  find_dom_group(ymuint fid,
 		 const vector<ymuint>& group_list,
 		 bool first_hit,
 		 vector<ymuint>& gid_list) = 0;
 
   /// @brief 追加できる既存グループを見つける．
-  /// @param[in] fault 対象の故障
+  /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
   /// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
   /// @param[out] gid_list 対象のグループ番号を収めるリスト
@@ -100,26 +100,26 @@ public:
   /// gid_list は first_hit == true の時，意味を持たない．
   virtual
   ymuint
-  find_group(const TpgFault* fault,
+  find_group(ymuint fid,
 	     const vector<ymuint>& group_list,
 	     bool first_hit,
 	     vector<ymuint>& gid_list) = 0;
 
   /// @brief 既存のグループに故障を追加する．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fault 故障
+  /// @param[in] fid 故障番号
   virtual
   void
   add_fault(ymuint gid,
-	    const TpgFault* fault) = 0;
+	    ymuint fid) = 0;
 
   /// @brief 故障を取り除く
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] fid_list 削除する故障番号のリスト
   virtual
   void
-  delete_fault(ymuint gid,
-	       const vector<const TpgFault*>& fault_list) = 0;
+  delete_faults(ymuint gid,
+		const vector<ymuint>& fid_list) = 0;
 
   /// @brief グループの故障数を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -130,10 +130,11 @@ public:
   /// @brief グループの故障を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   /// @param[in] pos ( 0 <= pos < fault_num(gid) )
+  /// @return 故障番号を返す．
   virtual
-  const TpgFault*
-  fault(ymuint gid,
-	ymuint pos) const = 0;
+  ymuint
+  fault_id(ymuint gid,
+	   ymuint pos) const = 0;
 
   /// @brief 十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
