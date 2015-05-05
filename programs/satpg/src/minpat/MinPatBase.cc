@@ -12,7 +12,7 @@
 #include "FgMgr2.h"
 #include "Compactor.h"
 #include "TpgNetwork.h"
-#include "TpgFault.h"
+//#include "TpgFault.h"
 #include "TvMgr.h"
 #include "Verifier.h"
 #include "GvalCnf.h"
@@ -65,10 +65,10 @@ MinPatBase::run(TpgNetwork& network,
 
   mAnalyzer.set_verbose(verbose());
 
-  vector<const TpgFault*> fault_list;
-  mAnalyzer.init(network, tvmgr, fault_list);
+  mAnalyzer.init(network, tvmgr);
 
-  init(fault_list, tvmgr, fsim2);
+  const vector<ymuint>& fid_list = mAnalyzer.fid_list();
+  init(fid_list, tvmgr, fsim2);
 
   StopWatch local_timer;
   local_timer.start();
@@ -80,18 +80,19 @@ MinPatBase::run(TpgNetwork& network,
   ymuint nf = fault_num();
 
   { // 最初の故障を選ぶ
-    const TpgFault* fault = get_first_fault();
+    ymuint fid = get_first_fault();
 
     // 最初のグループを作る．
     ymuint gid = fgmgr.new_group();
     group_list.push_back(gid);
 
     // 故障を追加する．
+    const TpgFault* fault = mAnalyzer.fault(fid);
     fgmgr.add_fault(gid, fault);
   }
 
   // 未処理の故障がある限り以下の処理を繰り返す．
-  for (ymuint c = 0; ; ++ c) {
+  for (ymuint c = 1; c < nf; ++ c) {
 
     if ( verbose() > 1 ) {
       cout << "\r   " << setw(6) << c << " / " << setw(6) << nf
@@ -100,13 +101,10 @@ MinPatBase::run(TpgNetwork& network,
     }
 
     // 故障を選ぶ．
-    const TpgFault* fault = get_next_fault(fgmgr, group_list);
-    if ( fault == NULL ) {
-      break;
-    }
+    ymuint fid = get_next_fault(fgmgr, group_list);
 
     // 故障を追加できるグループを見つける．
-    ymuint gid = find_group(fgmgr, fault, group_list);
+    ymuint gid = find_group(fgmgr, fid, group_list);
     if ( gid == fgmgr.group_num() ) {
       // 見つからなかった．
       // 新たなグループを作る．
@@ -115,6 +113,7 @@ MinPatBase::run(TpgNetwork& network,
     }
 
     // 故障を追加する．
+    const TpgFault* fault = mAnalyzer.fault(fid);
     fgmgr.add_fault(gid, fault);
   }
 
@@ -171,8 +170,16 @@ MinPatBase::run(TpgNetwork& network,
 	 << "Avarage " << setw(8) << fgmgr2.mfault_avg() << " faults per check" << endl
 	 << "Max     " << setw(8) << fgmgr2.mfault_max() << " faults" << endl;
   }
-  {
-    // 検証しておく．
+
+  { // 検証しておく．
+    vector<const TpgFault*> fault_list;
+    fault_list.reserve(nf);
+    for (ymuint i = 0; i < nf; ++ i) {
+      ymuint fid = fid_list[i];
+      const TpgFault* fault = mAnalyzer.fault(fid);
+      fault_list.push_back(fault);
+    }
+
     Verifier ver;
     if ( ver.check(fsim2, fault_list, tv_list) ) {
       if ( verbose() > 0 ) {
@@ -215,24 +222,25 @@ MinPatBase::dom_method() const
 
 // @brief 故障を追加するグループを選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
-// @param[in] fault 故障
+// @param[in] fid 故障番号
 // @param[in] group_list 現在のグループリスト
 //
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatBase::find_group(FgMgr& fgmgr,
-		       const TpgFault* fault,
+		       ymuint fid,
 		       const vector<ymuint>& group_list)
 {
+  const TpgFault* fault = analyzer().fault(fid);
+
+  vector<ymuint> dummy;
   if ( mGroupDominance ) {
-    vector<ymuint> dummy;
     ymuint gid = fgmgr.find_dom_group(fault, group_list, true, dummy);
     if ( gid != fgmgr.group_num() ) {
       return gid;
     }
   }
 
-  vector<ymuint> dummy;
   ymuint gid = fgmgr.find_group(fault, group_list, true, dummy);
   return gid;
 }

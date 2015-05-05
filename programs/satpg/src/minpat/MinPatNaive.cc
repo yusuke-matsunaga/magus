@@ -39,26 +39,26 @@ MinPatNaive::~MinPatNaive()
 }
 
 // @brief 初期化を行う．
-// @param[in] fault_list 検出された故障のリスト
+// @param[in] fid_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatNaive::init(const vector<const TpgFault*>& fault_list,
+MinPatNaive::init(const vector<ymuint>& fid_list,
 		  TvMgr& tvmgr,
 		  Fsim& fsim2)
 {
-  set_fault_list(fault_list);
+  set_fid_list(fid_list);
 }
 
 // @brief 故障リストを設定する．
 void
-MinPatNaive::set_fault_list(const vector<const TpgFault*>& src_list)
+MinPatNaive::set_fid_list(const vector<ymuint>& src_list)
 {
   ymuint nf = src_list.size();
-  mFaultList.clear();
-  mFaultList.resize(nf);
+  mFidList.clear();
+  mFidList.resize(nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    mFaultList[i] = src_list[i];
+    mFidList[i] = src_list[i];
   }
 }
 
@@ -66,33 +66,31 @@ MinPatNaive::set_fault_list(const vector<const TpgFault*>& src_list)
 ymuint
 MinPatNaive::fault_num()
 {
-  return mFaultList.size();
+  return mFidList.size();
 }
 
 // @brief 最初の故障を選ぶ．
-const TpgFault*
+ymuint
 MinPatNaive::get_first_fault()
 {
   mNextPos = 1;
-  return mFaultList[0];
+  return mFidList[0];
 }
 
 // @brief 次に処理すべき故障を選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
 // @param[in] group_list 現在のグループリスト
-//
-// 故障が残っていなければ NULL を返す．
-const TpgFault*
+ymuint
 MinPatNaive::get_next_fault(FgMgr& fgmgr,
 			    const vector<ymuint>& group_list)
 {
-  if ( mNextPos < mFaultList.size() ) {
-    const TpgFault* fault = mFaultList[mNextPos];
+  if ( mNextPos < mFidList.size() ) {
+    ymuint fid = mFidList[mNextPos];
     ++ mNextPos;
-    return fault;
+    return fid;
   }
   else {
-    return NULL;
+    return 0;
   }
 }
 

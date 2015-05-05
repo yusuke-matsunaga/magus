@@ -52,11 +52,11 @@ public:
   /// @brief 初期化する．
   /// @param[in] network ネットワーク
   /// @param[in] tvmgr テストベクタのマネージャ
-  /// @param[out] fault_list 検出された故障のリスト
+  ///
+  /// 結果には fid_list() でアクセスできる．
   void
   init(const TpgNetwork& network,
-       TvMgr& tvmgr,
-       vector<const TpgFault*>& fault_list);
+       TvMgr& tvmgr);
 
   /// @brief ノード番号の最大値を得る．
   ymuint
@@ -66,9 +66,9 @@ public:
   ymuint
   max_fault_id() const;
 
-  /// @brief 検出可能な故障のリストを得る．
-  const vector<const TpgFault*>&
-  fault_list() const;
+  /// @brief 検出可能な故障番号のリストを得る．
+  const vector<ymuint>&
+  fid_list() const;
 
   /// @brief 故障を得る．
   /// @param[in] fid 故障番号
@@ -124,15 +124,15 @@ public:
 		  ymuint f2_id) const;
 
   /// @brief 故障の両立性をチェックする．
-  /// @param[in] f1, f2 対象の故障
+  /// @param[in] f1_id, f2_id 対象の故障
   /// @retval true f1 と f2 が両立する．
   /// @retval false f1 と f2 が衝突している．
   ///
   /// f1 を検出するパタン集合と f2 を検出するパタン集合
   /// の共通部分がからでない時 f1 と f2 は両立すると言う．
   bool
-  check_compatibility(const TpgFault* f1,
-		      const TpgFault* f2) const;
+  check_compatibility(ymuint f1_id,
+		      ymuint f2_id) const;
 
   /// @brief 処理時間の情報を出力する．
   /// @param[in] s 出力先のストリーム
@@ -170,8 +170,8 @@ private:
   // テストベクタ用の乱数生成器
   RandGen mRandGen;
 
-  // オリジナルの故障リスト
-  vector<const TpgFault*> mOrigFaultList;
+  // 故障番号リスト
+  vector<ymuint> mOrigFidList;
 
   // 検出可能故障用のテストベクタリスト
   vector<TestVector*> mTestVectorList;

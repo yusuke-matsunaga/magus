@@ -90,11 +90,9 @@ FaultAnalyzer::verbose() const
 // @brief 初期化する．
 // @param[in] network ネットワーク
 // @param[in] tvmgr テストベクタのマネージャ
-// @param[out] fault_list 検出された故障のリスト
 void
 FaultAnalyzer::init(const TpgNetwork& network,
-		    TvMgr& tvmgr,
-		    vector<const TpgFault*>& fault_list)
+		    TvMgr& tvmgr)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -191,8 +189,8 @@ FaultAnalyzer::init(const TpgNetwork& network,
     }
   }
 
-  mOrigFaultList.clear();
-  mOrigFaultList.reserve(f_det);
+  mOrigFidList.clear();
+  mOrigFidList.reserve(f_det);
   for (ymuint i = 0; i < network.active_node_num(); ++ i) {
     const TpgNode* node = network.active_node(i);
     ymuint ni = node->fanin_num();
@@ -201,7 +199,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
       const TpgFault* f0 = node->input_fault(0, j);
       if ( f0 != NULL ) {
 	if ( f0->is_rep() && det_flag[f0->id()] ) {
-	  mOrigFaultList.push_back(f0);
+	  mOrigFidList.push_back(f0->id());
 	}
 	if ( node->nval() == kVal0 && det_flag[f0->rep_fault()->id()] ) {
 	  has_ncfault = true;
@@ -210,7 +208,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
       const TpgFault* f1 = node->input_fault(1, j);
       if ( f1 != NULL ) {
 	if ( f1->is_rep() && det_flag[f1->id()] ) {
-	  mOrigFaultList.push_back(f1);
+	  mOrigFidList.push_back(f1->id());
 	}
 	if ( node->nval() == kVal1 && det_flag[f1->rep_fault()->id()] ) {
 	  has_ncfault = true;
@@ -220,18 +218,16 @@ FaultAnalyzer::init(const TpgNetwork& network,
     const TpgFault* f0 = node->output_fault(0);
     if ( f0 != NULL && f0->is_rep() && det_flag[f0->id()] ) {
       if ( node->noval() != kVal0 || !has_ncfault ) {
-	mOrigFaultList.push_back(f0);
+	mOrigFidList.push_back(f0->id());
       }
     }
     const TpgFault* f1 = node->output_fault(1);
     if ( f1 != NULL && f1->is_rep() && det_flag[f1->id()] ) {
       if ( node->noval() != kVal1 || !has_ncfault ) {
-	mOrigFaultList.push_back(f1);
+	mOrigFidList.push_back(f1->id());
       }
     }
   }
-
-  fault_list = mOrigFaultList;
 
   local_timer.stop();
 
@@ -346,10 +342,10 @@ FaultAnalyzer::max_fault_id() const
 }
 
 // @brief 検出可能な故障のリストを得る．
-const vector<const TpgFault*>&
-FaultAnalyzer::fault_list() const
+const vector<ymuint>&
+FaultAnalyzer::fid_list() const
 {
-  return mOrigFaultList;
+  return mOrigFidList;
 }
 
 // @brief 故障を得る．
@@ -589,15 +585,15 @@ FaultAnalyzer::check_dominance(ymuint f1_id,
 }
 
 // @brief 故障の両立性をチェックする．
-// @param[in] f1, f2 対象の故障
+// @param[in] f1_id, f2_id 対象の故障
 // @retval true f1 と f2 が両立する．
 // @retval false f1 と f2 が衝突している．
 //
 // f1 を検出するパタン集合と f2 を検出するパタン集合
 // の共通部分がからでない時 f1 と f2 は両立すると言う．
 bool
-FaultAnalyzer::check_compatibility(const TpgFault* f1,
-				   const TpgFault* f2) const
+FaultAnalyzer::check_compatibility(ymuint f1_id,
+				   ymuint f2_id) const
 {
   return false;
 }

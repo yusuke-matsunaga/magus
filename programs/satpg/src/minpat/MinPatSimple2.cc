@@ -93,9 +93,15 @@ MinPatSimple2::init(const vector<const TpgFault*>& fault_list,
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
   checker2.estimate_conflict(dom_fault_list, conf_num_array);
 
-  vector<const TpgFault*> tmp_list = dom_fault_list;
-  sort(tmp_list.begin(), tmp_list.end(), FaultGt(conf_num_array));
-  set_fault_list(tmp_list);
+  sort(dom_fault_list.begin(), dom_fault_list.end(), FaultGt(conf_num_array));
+
+  ymuint nd = dom_fault_list.size();
+  vector<ymuint> dom_fid_list;
+  dom_fid_list.reserve(nd);
+  for (ymuint i = 0; i < nd; ++ i) {
+    dom_fid_list.push_back(dom_fault_list[i]->id());
+  }
+  set_fid_list(dom_fid_list);
 
 }
 

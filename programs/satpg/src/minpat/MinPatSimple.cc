@@ -67,14 +67,23 @@ MinPatSimple::~MinPatSimple()
 }
 
 // @brief 初期化を行う．
-// @param[in] fault_list 検出された故障のリスト
+// @param[in] fid_list 検出された故障番号のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatSimple::init(const vector<const TpgFault*>& fault_list,
+MinPatSimple::init(const vector<ymuint>& fid_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
+  ymuint n = fid_list.size();
+  vector<const TpgFault*> fault_list;
+  fault_list.reserve(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint fid = fid_list[i];
+    const TpgFault* fault = analyzer().fault(fid);
+    fault_list.push_back(fault);
+  }
+
   // 代表故障のリスト
   vector<const TpgFault*> rep_fault_list;
   {
@@ -92,7 +101,13 @@ MinPatSimple::init(const vector<const TpgFault*>& fault_list,
     sort(dom_fault_list.begin(), dom_fault_list.end(), FaultLt(checker));
   }
 
-  set_fault_list(dom_fault_list);
+  ymuint n1 = dom_fault_list.size();
+  vector<ymuint> dom_fid_list;
+  dom_fid_list.reserve(n1);
+  for (ymuint i = 0; i < n1; ++ i) {
+    dom_fid_list.push_back(dom_fault_list[i]->id());
+  }
+  set_fid_list(dom_fid_list);
 }
 
 END_NAMESPACE_YM_SATPG

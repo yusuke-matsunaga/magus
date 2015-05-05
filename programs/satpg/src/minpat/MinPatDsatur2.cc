@@ -42,14 +42,23 @@ MinPatDsatur2::~MinPatDsatur2()
 }
 
 // @brief 初期化を行う．
-// @param[in] fault_list 検出された故障のリスト
+// @param[in] fid_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatDsatur2::init(const vector<const TpgFault*>& fault_list,
+MinPatDsatur2::init(const vector<ymuint>& fid_list,
 		    TvMgr& tvmgr,
 		    Fsim& fsim2)
 {
+  ymuint n = fid_list.size();
+  vector<const TpgFault*> fault_list;
+  fault_list.reserve(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    ymuint fid = fid_list[i];
+    const TpgFault* fault = analyzer().fault(fid);
+    fault_list.push_back(fault);
+  }
+
   // 代表故障のリスト
   vector<const TpgFault*> rep_fault_list;
   {
@@ -106,7 +115,7 @@ MinPatDsatur2::fault_num()
 }
 
 // @brief 最初の故障を選ぶ．
-const TpgFault*
+ymuint
 MinPatDsatur2::get_first_fault()
 {
   ASSERT_COND( mRemainNum > 0 );
@@ -126,7 +135,7 @@ MinPatDsatur2::get_first_fault()
   -- mRemainNum;
   mPrevFpos = max_pos;
   mPrevGid = 0;
-  return mFaultStructList[max_pos].mFault;
+  return mFaultStructList[max_pos].mFault->id();
 }
 
 // @brief 次に処理すべき故障を選ぶ．
@@ -134,13 +143,11 @@ MinPatDsatur2::get_first_fault()
 // @param[in] group_list 現在のグループリスト
 //
 // 故障が残っていなければ NULL を返す．
-const TpgFault*
+ymuint
 MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
 			      const vector<ymuint>& group_list)
 {
-  if ( mRemainNum == 0 ) {
-    return NULL;
-  }
+  ASSERT_COND( mRemainNum > 0 );
 
   // 飽和度最大の故障を選ぶ．
   ymuint ng = fgmgr.group_num();
@@ -198,21 +205,21 @@ MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
   mFaultStructList[max_pos].mSelected = true;
   -- mRemainNum;
   mPrevFpos = max_pos;
-  return mFaultStructList[max_pos].mFault;
+  return mFaultStructList[max_pos].mFault->id();
 }
 
 // @brief 故障を追加するグループを選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
-// @param[in] fault 故障
+// @param[in] fid 故障番号
 // @param[in] group_list 現在のグループリスト
 //
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatDsatur2::find_group(FgMgr& fgmgr,
-			  const TpgFault* fault,
+			  ymuint fid,
 			  const vector<ymuint>& group_list)
 {
-  ymuint gid = MinPatBase::find_group(fgmgr, fault, group_list);
+  ymuint gid = MinPatBase::find_group(fgmgr, fid, group_list);
   mPrevGid = gid;
   ymuint ng = fgmgr.group_num();
   if ( gid == ng ) {
