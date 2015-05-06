@@ -78,8 +78,30 @@ EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
   ymuint nc = mEqSet.class_num();
   for (ymuint i = 0; i < nc; ++ i) {
     // 1つの等価故障候補グループを取り出す．
+    vector<ymuint> tmp_list;
+    mEqSet.class_list(i, tmp_list);
+
     vector<ymuint> elem_list;
-    mEqSet.class_list(i, elem_list);
+    elem_list.reserve(tmp_list.size());
+    { // single cube 条件の故障が前に来るようにする．
+      ymuint wpos = 0;
+      for (ymuint i = 0; i < tmp_list.size(); ++ i) {
+	ymuint fid = tmp_list[i];
+	if ( mAnalyzer.fault_info(fid).single_cube() ) {
+	  elem_list.push_back(fid);
+	}
+	else {
+	  if ( wpos < i ) {
+	    tmp_list[wpos] = fid;
+	  }
+	  ++ wpos;
+	}
+      }
+      for (ymuint i = 0; i < wpos; ++ i) {
+	ymuint fid = tmp_list[i];
+	elem_list.push_back(fid);
+      }
+    }
 
     // グループから要素を1つ取り出す．
     ymuint n = elem_list.size();
