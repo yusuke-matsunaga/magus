@@ -107,6 +107,7 @@ FgMgr2::find_group(ymuint fid,
     FvalCnf fval_cnf0(max_node_id(), gval_cnf0);
     engine0.make_fval_cnf(fval_cnf0, fault(fid), node_set(fid), kVal1);
   }
+
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
 
@@ -137,22 +138,16 @@ FgMgr2::find_group(ymuint fid,
     engine.add_assignments(gval_cnf, ma_list0);
     engine.add_assignments(gval_cnf, mandatory_assignment(gid));
 
-    ymuint nf = fault_num(gid);
-    for (ymuint i = 0; i < nf; ++ i) {
-      ymuint fid = fault_id(gid, i);
-      const FaultInfo& fi = fault_info(fid);
-      const NodeValList& ma_list = fi.mandatory_assignment();
-      engine.add_assignments(gval_cnf, ma_list);
-    }
-
     ymuint fnum = 0;
 
     if ( !fi0.single_cube() ) {
       // fault を検出する条件を追加
       FvalCnf fval_cnf(max_node_id(), gval_cnf);
       engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
+      ++ fnum;
     }
 
+    ymuint nf = fault_num(gid);
     vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fault_id(gid, i);
@@ -202,23 +197,15 @@ FgMgr2::add_fault(ymuint gid,
   const NodeValList& group_ma_list = mandatory_assignment(gid);
   engine.add_assignments(gval_cnf, group_ma_list);
 
-  ymuint nf = fg->fault_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    ymuint fid = fg->fault_id(i);
-    const FaultInfo& fi = fault_info(fid);
-    // fault を検出する条件を追加
-    const NodeValList& ma_list = fi.mandatory_assignment();
-    engine.add_assignments(gval_cnf, ma_list);
-  }
-
+  ymuint fnum = 0;
   if ( !fi.single_cube() ) {
     // fault を検出する条件を追加
     engine.make_fval_cnf(fval_cnf, fault(fid), node_set(fid), kVal1);
+    ++ fnum;
   }
 
+  ymuint nf = fg->fault_num();
   vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
-
-  ymuint fnum = 0;
   for (ymuint i = 0; i < nf; ++ i) {
     ymuint fid = fg->fault_id(i);
     const FaultInfo& fi = fault_info(fid);
