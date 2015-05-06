@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] group_dominance グループ支配を計算する．
-  MinPatSimple(bool group_dominance);
+  /// @param[in] rep_faults 等価故障の検出を行う．
+  MinPatSimple(bool group_dominance,
+	       bool rep_faults);
 
   /// @brief デストラクタ
   virtual
@@ -58,6 +60,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 等価故障の検出を行うとき true にするフラグ
+  bool mRepFaults;
 
 };
 

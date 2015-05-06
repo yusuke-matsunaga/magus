@@ -45,6 +45,8 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 			   "exact fault grouping");
   mPoptCompaction = new TclPopt(this, "compaction",
 				"do compaction");
+  mPoptRepFaults = new TclPopt(this, "rep-faults",
+			       "get representative faults");
 }
 
 // @brief デストラクタ
@@ -72,11 +74,12 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool group_dominance = mPoptGroupDominance->is_specified();
   bool exact = mPoptExact->is_specified();
   bool compaction = mPoptCompaction->is_specified();
+  bool rep_faults = mPoptRepFaults->is_specified();
 
   MinPat* minpat = NULL;
 
   if ( simple ) {
-    minpat = new_MinPatSimple(group_dominance);
+    minpat = new_MinPatSimple(group_dominance, rep_faults);
   }
   else if ( simple2 ) {
     minpat = new_MinPatSimple2(group_dominance);

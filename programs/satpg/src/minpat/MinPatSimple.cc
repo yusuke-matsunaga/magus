@@ -20,10 +20,12 @@ BEGIN_NAMESPACE_YM_SATPG
 
 // @brief インスタンスを生成する関数
 // @param[in] group_dominance グループ支配を計算する．
+// @param[in] rep_faults 等価故障の検出を行う．
 MinPat*
-new_MinPatSimple(bool group_dominance)
+new_MinPatSimple(bool group_dominance,
+		 bool rep_faults)
 {
-  return new MinPatSimple(group_dominance);
+  return new MinPatSimple(group_dominance, rep_faults);
 }
 
 BEGIN_NONAMESPACE
@@ -55,8 +57,11 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 // @param[in] group_dominance グループ支配を計算する．
-MinPatSimple::MinPatSimple(bool group_dominance) :
-  MinPatNaive(group_dominance)
+// @param[in] rep_faults 等価故障の検出を行う．
+MinPatSimple::MinPatSimple(bool group_dominance,
+			   bool rep_faults) :
+  MinPatNaive(group_dominance),
+  mRepFaults(rep_faults)
 {
 }
 
@@ -74,23 +79,33 @@ MinPatSimple::init(const vector<ymuint>& fid_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
-  // 代表故障のリスト
-  vector<ymuint> rep_fid_list;
-  {
-    EqChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_rep_faults(fid_list, rep_fid_list);
-  }
-
   // 支配故障のリスト
   vector<ymuint> dom_fid_list;
-  {
-    DomChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_dom_faults(rep_fid_list, dom_fid_list);
 
-    // 検出パタン数の少ない順に並べる．
-    sort(dom_fid_list.begin(), dom_fid_list.end(), FaultLt(checker));
+  if ( mRepFaults ) {
+    // 代表故障のリスト
+    vector<ymuint> rep_fid_list;
+    {
+      EqChecker checker(analyzer(), tvmgr, fsim2);
+      checker.get_rep_faults(fid_list, rep_fid_list);
+    }
+    {
+      DomChecker checker(analyzer(), tvmgr, fsim2);
+      checker.get_dom_faults(rep_fid_list, dom_fid_list);
+
+      // 検出パタン数の少ない順に並べる．
+      sort(dom_fid_list.begin(), dom_fid_list.end(), FaultLt(checker));
+    }
   }
+  else {
+    {
+      DomChecker checker(analyzer(), tvmgr, fsim2);
+      checker.get_dom_faults(fid_list, dom_fid_list);
 
+      // 検出パタン数の少ない順に並べる．
+      sort(dom_fid_list.begin(), dom_fid_list.end(), FaultLt(checker));
+    }
+  }
   set_fid_list(dom_fid_list);
 }
 

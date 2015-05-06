@@ -66,19 +66,21 @@ public:
 
 
 /// @brief インスタンスを生成する関数
-// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] group_dominance グループ支配を計算する．
 extern
 MinPat*
 new_MinPat(bool group_dominance);
 
 /// @brief インスタンスを生成する関数
-// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] rep_faults 等価故障の検出を行う．
 extern
 MinPat*
-new_MinPatSimple(bool group_dominance);
+new_MinPatSimple(bool group_dominance,
+		 bool rep_faults);
 
 /// @brief インスタンスを生成する関数
-// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] group_dominance グループ支配を計算する．
 extern
 MinPat*
 new_MinPatSimple2(bool group_dominance);
