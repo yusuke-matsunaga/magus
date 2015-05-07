@@ -252,6 +252,9 @@ Compactor::phase1(FgMgr& fgmgr,
     ymuint nf = fgmgr.fault_num(min_gid);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fgmgr.fault_id(min_gid, i);
+
+      // fid の移動先を見つけるための作業用のグループ番号リスト
+      // min_gid 以外のグループ番号をコピーしておく
       vector<ymuint> tmp_group_list1;
       tmp_group_list1.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
@@ -260,9 +263,13 @@ Compactor::phase1(FgMgr& fgmgr,
 	  tmp_group_list1.push_back(gid);
 	}
       }
-      vector<ymuint> dummy;
-      ymuint gid = fgmgr.find_group(fid, tmp_group_list1, true, dummy);
+
+      // fid を移動可能なグループを見つける．
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list1);
       if ( gid != fgmgr.group_num() ) {
+	// 見つけた．
+
+	// tmp_group_list 中の位置を求める．
 	ymuint ipos = 0;
 	for (ipos = 0; ipos < ng; ++ ipos) {
 	  if ( tmp_group_list[ipos] == gid ) {
@@ -270,14 +277,18 @@ Compactor::phase1(FgMgr& fgmgr,
 	  }
 	}
 	ASSERT_COND( ipos < ng );
+
 	ymuint gid2 = gid;
 	if ( group_list[ipos] == gid ) {
+	  // 変更を加える前にコピーを作る．
 	  gid2 = fgmgr.duplicate_group(gid);
 	  tmp_group_list[ipos] = gid2;
 	}
 	fgmgr.add_fault(gid2, fid);
       }
       else {
+	// 見つからなかった．
+	// このグループの処理は中止する．
 	red = false;
 	break;
       }
@@ -393,8 +404,8 @@ Compactor::phase2(FgMgr& fgmgr,
 	  tmp_group_list.push_back(gid);
 	}
       }
-      vector<ymuint> dummy;
-      ymuint gid = fgmgr.find_group(fid, tmp_group_list, true, dummy);
+
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list);
       if ( gid != fgmgr.group_num() ) {
 	fgmgr.add_fault(gid, fid);
 	del_fid_list.push_back(fid);

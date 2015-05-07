@@ -89,6 +89,16 @@ public:
 		 bool first_hit,
 		 vector<ymuint>& gid_list) = 0;
 
+  /// @brief 新たな条件なしで追加できる既存グループを見つける．
+  /// @param[in] fid 対象の故障番号
+  /// @param[in] group_list 探索最小のグループ番号のリスト
+  /// @return 最初のグループ番号を返す．
+  ///
+  /// 見つからない場合は group_num() を返す．
+  ymuint
+  find_dom_group(ymuint fid,
+		 const vector<ymuint>& group_list);
+
   /// @brief 追加できる既存グループを見つける．
   /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
@@ -104,6 +114,16 @@ public:
 	     const vector<ymuint>& group_list,
 	     bool first_hit,
 	     vector<ymuint>& gid_list) = 0;
+
+  /// @brief 追加できる既存グループを見つける．
+  /// @param[in] fid 対象の故障番号
+  /// @param[in] group_list 探索最小のグループ番号のリスト
+  /// @return 最初のグループ番号を返す．
+  ///
+  /// 見つからない場合は group_num() を返す．
+  ymuint
+  find_group(ymuint fid,
+	     const vector<ymuint>& group_list);
 
   /// @brief 既存のグループに故障を追加する．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -155,6 +175,41 @@ public:
   pi_sufficient_assignment(ymuint gid) const = 0;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 新たな条件なしで追加できる既存グループを見つける．
+// @param[in] fid 対象の故障番号
+// @param[in] group_list 探索最小のグループ番号のリスト
+// @return 最初のグループ番号を返す．
+//
+// 見つからない場合は group_num() を返す．
+inline
+ymuint
+FgMgr::find_dom_group(ymuint fid,
+		      const vector<ymuint>& group_list)
+{
+  vector<ymuint> dummy;
+  return find_dom_group(fid, group_list, true, dummy);
+}
+
+// @brief 追加できる既存グループを見つける．
+// @param[in] fid 対象の故障番号
+// @param[in] group_list 探索最小のグループ番号のリスト
+// @return 最初のグループ番号を返す．
+//
+// 見つからない場合は group_num() を返す．
+inline
+ymuint
+FgMgr::find_group(ymuint fid,
+		  const vector<ymuint>& group_list)
+{
+  vector<ymuint> dummy;
+  return find_group(fid, group_list, true, dummy);
+}
 
 END_NAMESPACE_YM_SATPG
 
