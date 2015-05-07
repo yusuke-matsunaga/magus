@@ -59,6 +59,8 @@ NodeSet::mark_region(ymuint max_node_id,
   mInputList.clear();
   mOutputList.clear();
 
+  mDomNode = NULL;
+
   // 故障のあるノードの TFO を mTfoList に入れる．
   // TFO の TFI のノードを mTfiList に入れる．
   ymuint nf = fnode_list.size();
@@ -121,6 +123,8 @@ NodeSet::mark_region2(ymuint max_node_id,
 
   mInputList.clear();
   mOutputList.clear();
+
+  mDomNode = dom_node;
 
    // 故障のあるノードの TFO を mTfoList に入れる．
   // TFO の TFI のノードを mTfiList に入れる．

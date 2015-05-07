@@ -9,7 +9,6 @@
 
 #include "FgMgrBase.h"
 
-#include "TpgFault.h"
 #include "NodeSet.h"
 #include "GvalCnf.h"
 #include "FvalCnf.h"
@@ -124,6 +123,19 @@ FgMgrBase::delete_group(ymuint gid)
   mGroupList[gid] = NULL;
 }
 
+// @brief 故障を取り除く
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @param[in] fid_list 削除する故障番号のリスト
+void
+FgMgrBase::delete_faults(ymuint gid,
+			 const vector<ymuint>& fid_list)
+{
+  ASSERT_COND( gid < group_num() );
+  FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
+  fg->delete_faults(fid_list);
+}
+
 // @brief グループの故障数を返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 ymuint
@@ -131,19 +143,21 @@ FgMgrBase::fault_num(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
   return fg->fault_num();
 }
 
 // @brief グループの故障を返す．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 // @param[in] pos ( 0 <= pos < fault_num(gid) )
-const TpgFault*
-FgMgrBase::fault(ymuint gid,
-		 ymuint pos) const
+ymuint
+FgMgrBase::fault_id(ymuint gid,
+		    ymuint pos) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
-  return fg->fault(pos);
+  ASSERT_COND( fg != NULL );
+  return fg->fault_id(pos);
 }
 
 // @brief 十分割当リストを返す．
@@ -153,6 +167,7 @@ FgMgrBase::sufficient_assignment(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
   return fg->sufficient_assignment();
 }
 
@@ -163,6 +178,7 @@ FgMgrBase::mandatory_assignment(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
   return fg->mandatory_assignment();
 }
 
@@ -173,6 +189,7 @@ FgMgrBase::pi_sufficient_assignment(ymuint gid) const
 {
   ASSERT_COND( gid < group_num() );
   FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
   return fg->pi_sufficient_assignment();
 }
 
@@ -183,19 +200,28 @@ FgMgrBase::max_node_id() const
   return mMaxNodeId;
 }
 
-// @brief 故障の解析情報を返す．
-// @param[in] fault 故障
-const FaultInfo&
-FgMgrBase::fault_info(const TpgFault* fault) const
+// @brief 故障を返す．
+// @param[in] fid 故障番号
+const TpgFault*
+FgMgrBase::fault(ymuint fid) const
 {
-  return mAnalyzer.fault_info(fault->id());
+  return fault_info(fid).fault();
+}
+
+// @brief 故障の解析情報を返す．
+// @param[in] fid 故障番号
+const FaultInfo&
+FgMgrBase::fault_info(ymuint fid) const
+{
+  return mAnalyzer.fault_info(fid);
 }
 
 // @brief 故障に関係するノード集合を返す．
+// @param[in] fid 故障番号
 const NodeSet&
-FgMgrBase::node_set(const TpgFault* fault) const
+FgMgrBase::node_set(ymuint fid) const
 {
-  return mAnalyzer.node_set(fault->id());
+  return mAnalyzer.node_set(fid);
 }
 
 // @brief 故障グループを返す．
@@ -247,11 +273,11 @@ FgMgrBase::FaultGroup::complex_fault_num() const
 }
 
 // 故障を返す．
-const TpgFault*
-FgMgrBase::FaultGroup::fault(ymuint pos) const
+ymuint
+FgMgrBase::FaultGroup::fault_id(ymuint pos) const
 {
   ASSERT_COND( pos < fault_num() );
-  return mFaultDataList[pos].mFault;
+  return mFaultDataList[pos].mFaultId;
 }
 
 // @brief 十分割当を返す．
@@ -295,12 +321,12 @@ FgMgrBase::FaultGroup::set_id(ymuint id)
 
 // @brief 故障を追加する．
 void
-FgMgrBase::FaultGroup::add_fault(const TpgFault* fault,
+FgMgrBase::FaultGroup::add_fault(ymuint fid,
 				 const NodeValList& suf_list,
 				 const NodeValList& ma_list,
 				 const NodeValList& pi_suf_list)
 {
-  mFaultDataList.push_back(FaultData(fault, suf_list, ma_list, pi_suf_list));
+  mFaultDataList.push_back(FaultData(fid, suf_list, ma_list, pi_suf_list));
   mSufList.merge(suf_list);
   mMaList.merge(ma_list);
   mPiSufList.merge(pi_suf_list);
@@ -308,20 +334,20 @@ FgMgrBase::FaultGroup::add_fault(const TpgFault* fault,
 
 // @brief 故障を削除する．
 void
-FgMgrBase::FaultGroup::delete_faults(const vector<const TpgFault*>& fault_list)
+FgMgrBase::FaultGroup::delete_faults(const vector<ymuint>& fid_list)
 {
   // 削除対象の故障番号を持つハッシュ表
   HashSet<ymuint> fault_hash;
-  for (ymuint i = 0; i < fault_list.size(); ++ i) {
-    const TpgFault* fault = fault_list[i];
-    fault_hash.add(fault->id());
+  for (ymuint i = 0; i < fid_list.size(); ++ i) {
+    ymuint fid = fid_list[i];
+    fault_hash.add(fid);
   }
 
   ymuint nf = fault_num();
   ymuint wpos = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = this->fault(i);
-    if ( fault_hash.check(fault->id()) ) {
+    ymuint fid = fault_id(i);
+    if ( fault_hash.check(fid) ) {
       continue;
     }
     if ( wpos != i ) {
@@ -354,7 +380,6 @@ FgMgrBase::FaultGroup::update()
   ymuint nf = fault_num();
   ymuint wpos = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = this->fault(i);
     mSufList.merge(mFaultDataList[i].mSufList);
     mMaList.merge(mFaultDataList[i].mMaList);
   }
@@ -366,11 +391,11 @@ FgMgrBase::FaultGroup::update()
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-FgMgrBase::FaultGroup::FaultData::FaultData(const TpgFault* fault,
+FgMgrBase::FaultGroup::FaultData::FaultData(ymuint fid,
 					    const NodeValList& suf_list,
 					    const NodeValList& ma_list,
 					    const NodeValList& pi_suf_list) :
-  mFault(fault),
+  mFaultId(fid),
   mSufList(suf_list),
   mMaList(ma_list),
   mPiSufList(pi_suf_list)

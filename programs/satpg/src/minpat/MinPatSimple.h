@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] group_dominance グループ支配を計算する．
-  MinPatSimple(bool group_dominance);
+  /// @param[in] rep_faults 等価故障の検出を行う．
+  MinPatSimple(bool group_dominance,
+	       bool rep_faults);
 
   /// @brief デストラクタ
   virtual
@@ -44,12 +46,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
-  /// @param[in] fault_list 検出された故障のリスト
+  /// @param[in] fid_list 検出された故障番号のリスト
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<const TpgFault*>& fault_list,
+  init(const vector<ymuint>& fid_list,
        TvMgr& tvmgr,
        Fsim& fsim2);
 
@@ -58,6 +60,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 等価故障の検出を行うとき true にするフラグ
+  bool mRepFaults;
 
 };
 

@@ -257,7 +257,7 @@ SatEngine::make_gval_cnf(GvalCnf& gval_cnf,
 
 // @brief 故障回路のCNFを作る．
 // @param[in] fval_cnf 故障回路用のデータ構造
-// @param[in] fault 故障
+// @param[in] src_node 故障位置のノード
 // @param[in] node_set 故障に関係するノード集合
 // @param[in] detect 検出条件
 //
@@ -266,11 +266,13 @@ SatEngine::make_gval_cnf(GvalCnf& gval_cnf,
 //        = kValX: fd_var() で制御するCNFを作る．
 void
 SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
-			 const TpgFault* fault,
+			 const TpgNode* src_node,
 			 const NodeSet& node_set,
 			 Val3 detect)
 {
   make_gval_cnf(fval_cnf.gval_cnf(), node_set);
+
+  const TpgNode* dom_node = node_set.dom_node();
 
   ymuint n = node_set.tfo_size();
   for (ymuint i = 0; i < n; ++ i) {
@@ -286,20 +288,16 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
     fval_cnf.set_fvar(node, fval_cnf.gvar(node));
   }
 
-  const TpgNode* fnode = fault->node();
   for (ymuint i = 0; i < n; ++ i) {
     const TpgNode* node = node_set.tfo_tfi_node(i);
 
-    // 故障回路のゲートの入出力関係を表すCNFを作る．
-    if ( node == fnode ) {
-      make_fault_cnf(fault, fval_cnf.gvar_map(), fval_cnf.fvar_map());
-    }
-    else {
+    if ( node != src_node ) {
+      // 故障回路のゲートの入出力関係を表すCNFを作る．
       make_node_cnf(node, fval_cnf.fvar_map());
     }
 
     // D-Chain 制約を作る．
-    make_dchain_cnf(node, fval_cnf.gvar_map(), fval_cnf.fvar_map(), fval_cnf.dvar_map());
+    make_dchain_cnf(node, dom_node, fval_cnf.gvar_map(), fval_cnf.fvar_map(), fval_cnf.dvar_map());
   }
 
   const vector<const TpgNode*>& output_list = node_set.output_list();
@@ -311,17 +309,25 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
       Literal dlit(fval_cnf.dvar(node));
       add_clause(~dlit);
     }
+    if ( dom_node != NULL ) {
+      Literal dlit(fval_cnf.dvar(dom_node));
+      add_clause(~dlit);
+    }
   }
   else if ( detect == kVal1 ) {
-    tmp_lits_begin(npo);
+    tmp_lits_begin(npo + 1);
     for (ymuint i = 0; i < npo; ++ i) {
       const TpgNode* node = output_list[i];
       Literal dlit(fval_cnf.dvar(node));
       tmp_lits_add(dlit);
     }
+    if ( dom_node != NULL ) {
+      Literal dlit(fval_cnf.dvar(dom_node));
+      tmp_lits_add(dlit);
+    }
     tmp_lits_end();
 
-    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = src_node; node != NULL && node != dom_node; node = node->imm_dom()) {
       Literal dlit(fval_cnf.dvar(node));
       add_clause(dlit);
     }
@@ -340,10 +346,34 @@ SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
     tmp_lits_add(~fdlit);
     tmp_lits_end();
 
-    for (const TpgNode* node = fnode; node != NULL; node = node->imm_dom()) {
+    for (const TpgNode* node = src_node; node != NULL && node != dom_node; node = node->imm_dom()) {
       Literal dlit(fval_cnf.dvar(node));
       add_clause(~fdlit, dlit);
     }
+  }
+}
+
+// @brief 故障回路のCNFを作る．
+// @param[in] fval_cnf 故障回路用のデータ構造
+// @param[in] fault 故障
+// @param[in] node_set 故障に関係するノード集合
+// @param[in] detect 検出条件
+//
+// detect = kVal0: 検出しないCNFを作る．
+//        = kVal1: 検出するCNFを作る．
+//        = kValX: fd_var() で制御するCNFを作る．
+void
+SatEngine::make_fval_cnf(FvalCnf&  fval_cnf,
+			 const TpgFault* fault,
+			 const NodeSet& node_set,
+			 Val3 detect)
+{
+  make_fval_cnf(fval_cnf, fault->node(), node_set, detect);
+  if ( detect == kVal1 ) {
+    make_fault_cnf_d(fault, fval_cnf.gvar_map(), fval_cnf.fvar_map());
+  }
+  else {
+    make_fault_cnf(fault, fval_cnf.gvar_map(), fval_cnf.fvar_map());
   }
 }
 
@@ -363,148 +393,6 @@ SatEngine::make_fval_cnf(FvalCnf& fval_cnf,
   NodeSet node_set;
   node_set.mark_region(fval_cnf.max_node_id(), fault->node());
   make_fval_cnf(fval_cnf, fault, node_set, detect);
-}
-
-// @brief 2つの故障を持つ故障回路のCNFを作る．
-// @param[in] fval_cnf0 共通部分の故障回路用のデータ構造
-// @param[in] fval_cnf1 故障1の故障回路用のデータ構造
-// @param[in] fval_cnf2 故障2の故障回路用のデータ構造
-// @param[in] root_node 共通部分の開始点
-// @param[in] fault1 故障1
-// @param[in] fault2 故障2
-// @param[in] node_set0 共通部分に関係するノード集合
-// @param[in] node_set1 故障1に関係するノード集合
-// @param[in] node_set2 故障2に関係するノード集合
-void
-SatEngine::make_fval_cnf2(FvalCnf& fval_cnf0,
-			  FvalCnf& fval_cnf1,
-			  FvalCnf& fval_cnf2,
-			  const TpgNode* root_node,
-			  const TpgFault* fault1,
-			  const TpgFault* fault2,
-			  const NodeSet& node_set0,
-			  const NodeSet& node_set1,
-			  const NodeSet& node_set2)
-{
-  GvalCnf& gval_cnf = fval_cnf0.gval_cnf();
-  ASSERT_COND( &fval_cnf1.gval_cnf() == &gval_cnf );
-  ASSERT_COND( &fval_cnf2.gval_cnf() == &gval_cnf );
-
-  make_gval_cnf(gval_cnf, node_set0);
-  make_gval_cnf(gval_cnf, node_set1);
-  make_gval_cnf(gval_cnf, node_set2);
-
-  {
-    ymuint n = node_set0.tfo_size();
-    for (ymuint i = 0; i < n; ++ i) {
-      const TpgNode* node = node_set0.tfo_tfi_node(i);
-      VarId fvar = new_var();
-      VarId dvar = new_var();
-      fval_cnf0.set_fvar(node, fvar);
-      fval_cnf0.set_dvar(node, dvar);
-    }
-    ymuint n0 = node_set0.tfo_tfi_size();
-    for (ymuint i = n; i < n0; ++ i) {
-      const TpgNode* node = node_set0.tfo_tfi_node(i);
-      fval_cnf0.set_fvar(node, fval_cnf0.gvar(node));
-    }
-  }
-  {
-    ymuint n = node_set1.tfo_size();
-    for (ymuint i = 0; i < n; ++ i) {
-      const TpgNode* node = node_set1.tfo_tfi_node(i);
-      VarId fvar = new_var();
-      VarId dvar = new_var();
-      fval_cnf1.set_fvar(node, fvar);
-      fval_cnf1.set_dvar(node, dvar);
-    }
-    ymuint n0 = node_set1.tfo_tfi_size();
-    for (ymuint i = n; i < n0; ++ i) {
-      const TpgNode* node = node_set1.tfo_tfi_node(i);
-      fval_cnf1.set_fvar(node, fval_cnf0.gvar(node));
-    }
-  }
-  {
-    ymuint n = node_set2.tfo_size();
-    for (ymuint i = 0; i < n; ++ i) {
-      const TpgNode* node = node_set2.tfo_tfi_node(i);
-      VarId fvar = new_var();
-      VarId dvar = new_var();
-      fval_cnf2.set_fvar(node, fvar);
-      fval_cnf2.set_dvar(node, dvar);
-    }
-    ymuint n0 = node_set2.tfo_tfi_size();
-    for (ymuint i = n; i < n0; ++ i) {
-      const TpgNode* node = node_set2.tfo_tfi_node(i);
-      fval_cnf2.set_fvar(node, fval_cnf0.gvar(node));
-    }
-  }
-
-  for (ymuint i = 0; i < node_set0.tfo_size(); ++ i) {
-    const TpgNode* node = node_set0.tfo_tfi_node(i);
-
-    if ( node == root_node ) {
-      Literal glit(fval_cnf0.gvar(root_node));
-      Literal flit(fval_cnf0.fvar(root_node));
-      add_clause( glit,  flit);
-      add_clause(~glit, ~flit);
-    }
-    else {
-      make_node_cnf(node, fval_cnf0.fvar_map());
-    }
-
-    // D-Chain 制約を作る．
-    make_dchain_cnf(node, fval_cnf0.gvar_map(), fval_cnf0.fvar_map(), fval_cnf0.dvar_map());
-  }
-
-  const TpgNode* fnode1 = fault1->node();
-  for (ymuint i = 0; i < node_set1.tfo_size(); ++ i) {
-    const TpgNode* node = node_set1.tfo_tfi_node(i);
-
-    // 故障回路のゲートの入出力関係を表すCNFを作る．
-    if ( node == fnode1 ) {
-      make_fault_cnf(fault1, fval_cnf1.gvar_map(), fval_cnf1.fvar_map());
-    }
-    else {
-      make_node_cnf(node, fval_cnf1.fvar_map());
-    }
-
-    // D-Chain 制約を作る．
-    make_dchain_cnf2(node, root_node, fval_cnf1.gvar_map(), fval_cnf1.fvar_map(), fval_cnf1.dvar_map());
-  }
-
-  const TpgNode* fnode2 = fault2->node();
-  for (ymuint i = 0; i < node_set2.tfo_size(); ++ i) {
-    const TpgNode* node = node_set2.tfo_tfi_node(i);
-
-    // 故障回路のゲートの入出力関係を表すCNFを作る．
-    if ( node == fnode2 ) {
-      make_fault_cnf(fault2, fval_cnf2.gvar_map(), fval_cnf2.fvar_map());
-    }
-    else {
-      make_node_cnf(node, fval_cnf2.fvar_map());
-    }
-
-    // D-Chain 制約を作る．
-    make_dchain_cnf2(node, root_node, fval_cnf2.gvar_map(), fval_cnf2.fvar_map(), fval_cnf2.dvar_map());
-  }
-
-  {
-    const vector<const TpgNode*>& output_list = node_set0.output_list();
-    ymuint npo = output_list.size();
-    tmp_lits_begin(npo);
-    for (ymuint i = 0; i < npo; ++ i) {
-      const TpgNode* node = output_list[i];
-      Literal dlit(fval_cnf0.dvar(node));
-      tmp_lits_add(dlit);
-    }
-    tmp_lits_end();
-
-    for (const TpgNode* node = root_node; node != NULL; node = node->imm_dom()) {
-      Literal dlit(fval_cnf0.dvar(node));
-      add_clause(dlit);
-    }
-  }
 }
 
 // @brief 複数故障検出回路のCNFを作る．
@@ -575,7 +463,7 @@ SatEngine::make_mval_cnf(MvalCnf& mval_cnf,
       make_node_cnf(node, mval_cnf.fvar_map());
     }
 
-    make_dchain_cnf(node, mval_cnf.gvar_map(), mval_cnf.fvar_map(), mval_cnf.dvar_map());
+    make_dchain_cnf(node, node_set.dom_node(), mval_cnf.gvar_map(), mval_cnf.fvar_map(), mval_cnf.dvar_map());
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -589,6 +477,52 @@ SatEngine::make_mval_cnf(MvalCnf& mval_cnf,
     tmp_lits_add(dlit);
   }
   tmp_lits_end();
+}
+
+// @brief 2つの変数の値が等しいという制約を追加する．
+// @param[in] var1, var2 変数番号
+void
+SatEngine::add_eq_clause(VarId var1,
+			 VarId var2)
+{
+  Literal lit1(var1);
+  Literal lit2(var2);
+  add_clause( lit1, ~lit2);
+  add_clause(~lit1,  lit2);
+}
+
+// @brief 2つの変数の値が異なるという制約を追加する．
+// @param[in] var1, var2 変数番号
+void
+SatEngine::add_diff_clause(VarId var1,
+			   VarId var2)
+{
+  Literal lit1(var1);
+  Literal lit2(var2);
+  add_clause( lit1,  lit2);
+  add_clause(~lit1, ~lit2);
+}
+
+// @brief 割当リストに従って値を固定する．
+// @param[in] gval_cnf 正常回路用のデータ構造
+// @param[in] assign_list 割当リスト
+void
+SatEngine::add_assignments(GvalCnf& gval_cnf,
+			   const NodeValList& assign_list)
+{
+  ymuint n = assign_list.size();
+  for (ymuint i = 0; i < n; ++ i) {
+    NodeVal nv = assign_list[i];
+    const TpgNode* node = nv.node();
+    make_gval_cnf(gval_cnf, node);
+    Literal alit(gval_cnf.var(node), false);
+    if ( nv.val() ) {
+      add_clause(alit);
+    }
+    else {
+      add_clause(~alit);
+    }
+  }
 }
 
 // @brief 割当リストの否定の節を加える．
@@ -653,7 +587,7 @@ SatEngine::make_node_cnf(const TpgNode* node,
     make_gate_cnf(kTgGateBuff, VidLitMap(node, vid_map));
   }
   else if ( node->is_logic() ) {
-    make_gate_cnf(node->gate_type(), VidLitMap(node,vid_map));
+    make_gate_cnf(node->gate_type(), VidLitMap(node, vid_map));
   }
   else {
     ASSERT_NOT_REACHED;
@@ -754,26 +688,27 @@ SatEngine::make_fault_cnf(const TpgFault* fault,
       add_clause(~flit);
     }
     else {
-      add_clause(flit);
+      add_clause( flit);
     }
   }
   else {
     // 入力の故障の場合
     // 故障値は非制御値のはずなので，
     // side input だけのゲートを仮定する．
-
     ymuint fpos = fault->pos();
     // fpos 以外の入力を ivars[] に入れる．
     ymuint ni = node->fanin_num();
     vector<VarId> ivars;
     ivars.reserve(ni - 1);
     for (ymuint i = 0; i < ni; ++ i) {
+      if ( i == fpos ) {
+	continue;
+      }
       const TpgNode* inode = node->fanin(i);
       VarId ivar = gvar_map(inode);
-      if ( i != fpos ) {
-	ivars.push_back(ivar);
-      }
+      ivars.push_back(ivar);
     }
+
     VarId ovar = fvar_map(node);
 
     bool inv = false;
@@ -821,13 +756,127 @@ SatEngine::make_fault_cnf(const TpgFault* fault,
   }
 }
 
+// @brief 故障箇所の関係を表す CNF を作る．
+// @param[in] fault 対象の故障
+// @param[in] gvar_map 正常値の変数マップ
+// @param[in] fvar_map 故障値の変数マップ
+void
+SatEngine::make_fault_cnf_d(const TpgFault* fault,
+			    const VidMap& gvar_map,
+			    const VidMap& fvar_map)
+{
+  const TpgNode* node = fault->node();
+  int fval = fault->val();
+
+  if ( fault->is_output_fault() ) {
+    // 出力の故障の場合
+    // ただ単に故障値を固定するだけ．
+    Literal glit(gvar_map(node), false);
+    Literal flit(fvar_map(node), false);
+    if ( fval == 0 ) {
+      add_clause( glit);
+      add_clause(~flit);
+    }
+    else {
+      add_clause(~glit);
+      add_clause( flit);
+    }
+  }
+  else {
+    // 入力の故障の場合
+    // 故障値は非制御値のはずなので，
+    // side input だけのゲートを仮定する．
+    ymuint fpos = fault->pos();
+    // fpos 以外の入力を ivars[] に入れる．
+    ymuint ni = node->fanin_num();
+    vector<VarId> ivars;
+    vector<Literal> ilits;
+    ivars.reserve(ni - 1);
+    ilits.reserve(ni - 1);
+    for (ymuint i = 0; i < ni; ++ i) {
+      if ( i == fpos ) {
+	continue;
+      }
+      const TpgNode* inode = node->fanin(i);
+      VarId ivar = gvar_map(inode);
+      ivars.push_back(ivar);
+      ilits.push_back(Literal(ivar));
+    }
+
+    VarId ofvar = fvar_map(node);
+    Literal oglit(gvar_map(node));
+    Literal oflit(ofvar);
+
+    bool inv = false;
+    switch ( node->gate_type() ) {
+    case kTgGateBuff:
+    case kTgGateNot:
+      ASSERT_NOT_REACHED;
+      break;
+
+    case kTgGateNand:
+      ASSERT_COND( fval == 1 );
+      for (ymuint i = 0; i < ni - 1; ++ i) {
+	add_clause(ilits[i]);
+      }
+      add_clause( oglit);
+      add_clause(~oflit);
+      break;
+
+    case kTgGateAnd:
+      ASSERT_COND( fval == 1 );
+      for (ymuint i = 0; i < ni - 1; ++ i) {
+	add_clause(ilits[i]);
+      }
+      add_clause(~oglit);
+      add_clause( oflit);
+      break;
+
+    case kTgGateNor:
+      ASSERT_COND( fval == 0 );
+      for (ymuint i = 0; i < ni - 1; ++ i) {
+	add_clause(~ilits[i]);
+      }
+      add_clause(~oglit);
+      add_clause( oflit);
+      break;
+
+    case kTgGateOr:
+      ASSERT_COND( fval == 0 );
+      for (ymuint i = 0; i < ni - 1; ++ i) {
+	add_clause(~ilits[i]);
+      }
+      add_clause( oglit);
+      add_clause(~oflit);
+      break;
+
+    case kTgGateXnor:
+      inv = true;
+      // わざと次に続く
+
+    case kTgGateXor:
+      if ( fval == 1 ) {
+	inv = !inv;
+      }
+      make_xor_cnf(VectLitMap(ivars, ofvar), inv);
+      break;
+
+    default:
+      ASSERT_NOT_REACHED;
+      break;
+    }
+  }
+}
+
 // @brief 故障伝搬条件を表すCNFを作る．
 // @param[in] node 対象のノード
+// @param[in] dst_node 伝搬条件の終点のノード
 // @param[in] gvar_map 正常値の変数マップ
 // @param[in] fvar_map 故障値の変数マップ
 // @param[in] dvar_map 故障伝搬条件の変数マップ
 void
 SatEngine::make_dchain_cnf(const TpgNode* node,
+			   const TpgNode* dst_node,
 			   const VidMap& gvar_map,
 			   const VidMap& fvar_map,
 			   const VidMap& dvar_map)
@@ -841,55 +890,7 @@ SatEngine::make_dchain_cnf(const TpgNode* node,
   add_clause(~glit, ~flit, ~dlit);
   add_clause( glit,  flit, ~dlit);
 
-  if ( node->is_output() ) {
-    // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
-    add_clause(~glit,  flit, dlit);
-    add_clause( glit, ~flit, dlit);
-  }
-  else {
-    // dlit が 1 の時，ファンアウトの dlit が最低1つは 1 でなければならない．
-    ymuint nfo = node->active_fanout_num();
-    tmp_lits_begin(nfo + 1);
-    tmp_lits_add(~dlit);
-    for (ymuint j = 0; j < nfo; ++ j) {
-      const TpgNode* onode = node->active_fanout(j);
-      Literal odlit(dvar_map(onode), false);
-      tmp_lits_add(odlit);
-    }
-    tmp_lits_end();
-
-    // dominator の dlit が 0 なら自分も 0
-    const TpgNode* idom = node->imm_dom();
-    if ( idom != NULL && idom != node->active_fanout(0) ) {
-      Literal idlit(dvar_map(idom), false);
-      add_clause(~dlit, idlit);
-    }
-  }
-}
-
-// @brief 故障伝搬条件を表すCNFを作る．
-// @param[in] node 対象のノード
-// @param[in] dst_node 伝搬条件の終点のノード
-// @param[in] gvar_map 正常値の変数マップ
-// @param[in] fvar_map 故障値の変数マップ
-// @param[in] dvar_map 故障伝搬条件の変数マップ
-void
-SatEngine::make_dchain_cnf2(const TpgNode* node,
-			    const TpgNode* dst_node,
-			    const VidMap& gvar_map,
-			    const VidMap& fvar_map,
-			    const VidMap& dvar_map)
-{
-  Literal glit(gvar_map(node), false);
-  Literal flit(fvar_map(node), false);
-  Literal dlit(dvar_map(node), false);
-
-  // dlit -> XOR(glit, flit) を追加する．
-  // 要するに dlit が 1 の時，正常回路と故障回路で異なっていなければならない．
-  add_clause(~glit, ~flit, ~dlit);
-  add_clause( glit,  flit, ~dlit);
-
-  if ( node == dst_node ) {
+  if ( node->is_output() || node == dst_node ) {
     // 出力ノードの場合，XOR(glit, flit) -> dlit となる．
     add_clause(~glit,  flit, dlit);
     add_clause( glit, ~flit, dlit);

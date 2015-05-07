@@ -75,6 +75,10 @@ private:
 
   // compaction オプションの解析用オブジェクト
   TclPopt* mPoptCompaction;
+
+  // rep-faults オプションの解析用オブジェクト
+  TclPopt* mPoptRepFaults;
+
 };
 
 END_NAMESPACE_YM_SATPG

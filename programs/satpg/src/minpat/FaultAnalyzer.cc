@@ -30,6 +30,8 @@ BEGIN_NAMESPACE_YM_SATPG
 
 BEGIN_NONAMESPACE
 
+const bool verify_dom_check = false;
+
 void
 mark_tfi(const TpgNode* node,
 	 HashSet<ymuint>& tfi_mark,
@@ -88,11 +90,9 @@ FaultAnalyzer::verbose() const
 // @brief 初期化する．
 // @param[in] network ネットワーク
 // @param[in] tvmgr テストベクタのマネージャ
-// @param[out] fault_list 検出された故障のリスト
 void
 FaultAnalyzer::init(const TpgNetwork& network,
-		    TvMgr& tvmgr,
-		    vector<const TpgFault*>& fault_list)
+		    TvMgr& tvmgr)
 {
   StopWatch local_timer;
   local_timer.start();
@@ -127,6 +127,8 @@ FaultAnalyzer::init(const TpgNetwork& network,
 
   mFaultInfoArray.clear();
   mFaultInfoArray.resize(mMaxFaultId);
+
+  mDomCheckCount = 0;
 
   ymuint f_all = 0;
   ymuint f_det = 0;
@@ -187,8 +189,8 @@ FaultAnalyzer::init(const TpgNetwork& network,
     }
   }
 
-  mOrigFaultList.clear();
-  mOrigFaultList.reserve(f_det);
+  mOrigFidList.clear();
+  mOrigFidList.reserve(f_det);
   for (ymuint i = 0; i < network.active_node_num(); ++ i) {
     const TpgNode* node = network.active_node(i);
     ymuint ni = node->fanin_num();
@@ -197,7 +199,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
       const TpgFault* f0 = node->input_fault(0, j);
       if ( f0 != NULL ) {
 	if ( f0->is_rep() && det_flag[f0->id()] ) {
-	  mOrigFaultList.push_back(f0);
+	  mOrigFidList.push_back(f0->id());
 	}
 	if ( node->nval() == kVal0 && det_flag[f0->rep_fault()->id()] ) {
 	  has_ncfault = true;
@@ -206,7 +208,7 @@ FaultAnalyzer::init(const TpgNetwork& network,
       const TpgFault* f1 = node->input_fault(1, j);
       if ( f1 != NULL ) {
 	if ( f1->is_rep() && det_flag[f1->id()] ) {
-	  mOrigFaultList.push_back(f1);
+	  mOrigFidList.push_back(f1->id());
 	}
 	if ( node->nval() == kVal1 && det_flag[f1->rep_fault()->id()] ) {
 	  has_ncfault = true;
@@ -216,18 +218,16 @@ FaultAnalyzer::init(const TpgNetwork& network,
     const TpgFault* f0 = node->output_fault(0);
     if ( f0 != NULL && f0->is_rep() && det_flag[f0->id()] ) {
       if ( node->noval() != kVal0 || !has_ncfault ) {
-	mOrigFaultList.push_back(f0);
+	mOrigFidList.push_back(f0->id());
       }
     }
     const TpgFault* f1 = node->output_fault(1);
     if ( f1 != NULL && f1->is_rep() && det_flag[f1->id()] ) {
       if ( node->noval() != kVal1 || !has_ncfault ) {
-	mOrigFaultList.push_back(f1);
+	mOrigFidList.push_back(f1->id());
       }
     }
   }
-
-  fault_list = mOrigFaultList;
 
   local_timer.stop();
 
@@ -309,29 +309,6 @@ FaultAnalyzer::analyze_fault(const TpgFault* fault,
     if ( suf_list.size() == ma_list.size() ) {
       fi.mSingleCube = true;
     }
-#if 0
-    else {
-      NodeValList diff_list = suf_list;
-      diff_list.diff(ma_list);
-      ASSERT_COND( diff_list.size() > 0 );
-      engine.add_negation(gval_cnf, diff_list);
-      vector<Bool3> sat_model;
-      Bool3 sat_ans = engine.check_sat(sat_model);
-      ASSERT_COND( sat_ans == kB3True );
-      for (ymuint i = 0; i < 2; ++ i) {
-	NodeValList suf_list;
-	fval_cnf.get_suf_list(sat_model, fault, node_set(f_id), suf_list);
-	suf_list.diff(ma_list);
-
-	fi.mOtherSufListArray.push_back(suf_list);
-	engine.add_negation(gval_cnf, suf_list);
-	sat_ans = engine.check_sat(sat_model);
-	if ( sat_ans == kB3False ) {
-	  break;
-	}
-      }
-    }
-#endif
   }
   return sat_stat;
 }
@@ -365,10 +342,10 @@ FaultAnalyzer::max_fault_id() const
 }
 
 // @brief 検出可能な故障のリストを得る．
-const vector<const TpgFault*>&
-FaultAnalyzer::fault_list() const
+const vector<ymuint>&
+FaultAnalyzer::fid_list() const
 {
-  return mOrigFaultList;
+  return mOrigFidList;
 }
 
 // @brief 故障を得る．
@@ -416,6 +393,220 @@ FaultAnalyzer::node_set(ymuint fid) const
   ASSERT_COND( fid < mMaxFaultId );
   const TpgFault* fault = mFaultInfoArray[fid].fault();
   return mNodeSetArray[fault->node()->id()];
+}
+
+// @brief 故障の等価性をチェックする．
+// @param[in] f1_id, f2_id 対象の故障
+// @retval true f1_id と f2_id が等価だった．
+// @retval false f1_id と f2_id は等価ではなかった．
+//
+// f1 を検出するパタン集合と f2 を検出するパタン集合
+// が完全に一致するとき f1 と f2 が等価であると言う．
+// f1 が f2 を支配し，f2 が f1 を支配することと同値
+bool
+FaultAnalyzer::check_equivalence(ymuint f1_id,
+				 ymuint f2_id) const
+{
+  return check_dominance(f1_id, f2_id) && check_dominance(f2_id, f1_id);
+}
+
+BEGIN_NONAMESPACE
+
+const TpgNode*
+common_node(const TpgNode* node1,
+	    const TpgNode* node2)
+{
+  ymuint id1 = node1->id();
+  ymuint id2 = node2->id();
+  for ( ; ; ) {
+    if ( node1 == node2 ) {
+      return node1;
+    }
+    if ( id1 < id2 ) {
+      node1 = node1->imm_dom();
+      if ( node1 == NULL ) {
+	return NULL;
+      }
+      id1 = node1->id();
+    }
+    else if ( id1 > id2 ) {
+      node2 = node2->imm_dom();
+      if ( node2 == NULL ) {
+	return NULL;
+      }
+      id2 = node2->id();
+    }
+  }
+}
+
+END_NONAMESPACE
+
+// @brief 故障の支配関係をチェックする．
+// @param[in] f1_id, f2_id 対象の故障
+// @retval true f1_id が f2_id を支配している．
+// @retval false f1_id が f2_id を支配していない．
+//
+// f1 を検出するいかなるパタンも f2 を検出する時
+// f1 が f2 を支配すると言う．
+bool
+FaultAnalyzer::check_dominance(ymuint f1_id,
+			       ymuint f2_id) const
+{
+  StopWatch timer;
+  timer.start();
+
+  const FaultInfo& fi1 = fault_info(f1_id);
+  const FaultInfo& fi2 = fault_info(f2_id);
+
+  const TpgFault* f1 = fault(f1_id);
+  const TpgFault* f2 = fault(f2_id);
+
+  const TpgNode* fnode1 = f1->node();
+  const TpgNode* fnode2 = f2->node();
+  const TpgNode* dom_node = common_node(fnode1, fnode2);
+
+  SatEngine engine(string(), string(), NULL);
+  GvalCnf gval_cnf(mMaxNodeId);
+
+  // f1 の必要条件を追加する．
+  const NodeValList& ma_list1 = fi1.mandatory_assignment();
+  engine.add_assignments(gval_cnf, ma_list1);
+
+  if ( dom_node != NULL ) {
+    // 伝搬経路に共通な dominator がある時
+    ++ mDomCheckCount;
+
+    // 共通部分のノード集合
+    NodeSet node_set0;
+    node_set0.mark_region(mMaxNodeId, dom_node);
+
+    // 故障1に固有のノード集合
+    NodeSet node_set1;
+    node_set1.mark_region2(mMaxNodeId, fnode1, dom_node);
+
+    // 故障2に固有のノード集合
+    NodeSet node_set2;
+    node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
+
+    // dom_node から出力までの故障伝搬条件を作る．
+    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
+    engine.make_fval_cnf(fval_cnf0, dom_node, node_set0, kVal1);
+    engine.add_diff_clause(fval_cnf0.gvar(dom_node), fval_cnf0.fvar(dom_node));
+
+    // f1 を検出する条件を追加する．
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+    // f2 を検出しない条件を追加する．
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+  }
+  else {
+    if ( !fi1.single_cube() ) {
+      // f1 を検出する CNF を生成
+      FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+      const NodeSet& node_set1 = node_set(f1_id);
+      engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+    }
+
+    // f2 を検出しない CNF を生成
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = node_set(f2_id);
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+  }
+
+  Bool3 sat_stat = engine.check_sat();
+
+  timer.stop();
+  USTime time = timer.time();
+
+  if ( verify_dom_check ) {
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(mMaxNodeId);
+
+    // f1 を検出する CNF を生成
+    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set1 = node_set(f1_id);
+    engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
+
+    // f2 を検出しない CNF を生成
+    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
+    const NodeSet& node_set2 = node_set(f2_id);
+    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
+
+    Bool3 sat_stat2 = engine.check_sat();
+    if ( sat_stat != sat_stat2 ) {
+      cout << "ERROR in check_dominance(" << f1 << ", " << f2 << ")" << endl
+	   << "  sat_stat  = " << sat_stat << endl
+	   << "  sat_stat2 = " << sat_stat2 << endl;
+      if ( dom_node ) {
+	cout << "  smart dom check" << endl;
+      }
+      if ( fi1.single_cube() ) {
+	cout << "  f1 is single cube" << endl;
+      }
+      if ( fi2.single_cube() ) {
+	cout << "  f2 is single cube" << endl;
+      }
+      exit(1);
+    }
+  }
+
+  if ( sat_stat == kB3False ) {
+    mSuccessTime += time;
+    if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
+      if ( time.usr_time() > 1.0 ) {
+	cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
+      }
+      mSuccessMax = time;
+    }
+    return true;
+  }
+  else if ( sat_stat == kB3True ) {
+    mFailureTime += time;
+    if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
+      if ( time.usr_time() > 1.0 ) {
+	cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
+      }
+      mFailureMax = time;
+    }
+    return false;
+  }
+  else {
+    mAbortTime += timer.time();
+    if ( mAbortMax.usr_time_usec() < time.usr_time_usec() ) {
+      if ( time.usr_time() > 1.0 ) {
+	cout << "ABORT: " << f1 << ": " << f2 << "  " << time << endl;
+      }
+      mAbortMax = time;
+    }
+    return false;
+  }
+}
+
+// @brief 故障の両立性をチェックする．
+// @param[in] f1_id, f2_id 対象の故障
+// @retval true f1 と f2 が両立する．
+// @retval false f1 と f2 が衝突している．
+//
+// f1 を検出するパタン集合と f2 を検出するパタン集合
+// の共通部分がからでない時 f1 と f2 は両立すると言う．
+bool
+FaultAnalyzer::check_compatibility(ymuint f1_id,
+				   ymuint f2_id) const
+{
+  return false;
+}
+
+// @brief 処理時間の情報を出力する．
+// @param[in] s 出力先のストリーム
+void
+FaultAnalyzer::print_stats(ostream& s) const
+{
+  s << "  CPU time (success)     " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
+    << "  CPU time (failure)     " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
+    << "  CPU time (abort)       " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl
+    << "  # of common dominator checkes " << mDomCheckCount << endl;
 }
 
 END_NAMESPACE_YM_SATPG

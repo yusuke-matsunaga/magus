@@ -9,7 +9,6 @@
 
 #include "MinPatDsatur2.h"
 #include "TpgNetwork.h"
-#include "TpgFault.h"
 #include "FaultAnalyzer.h"
 #include "EqChecker.h"
 #include "DomChecker.h"
@@ -42,38 +41,38 @@ MinPatDsatur2::~MinPatDsatur2()
 }
 
 // @brief 初期化を行う．
-// @param[in] fault_list 検出された故障のリスト
+// @param[in] fid_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatDsatur2::init(const vector<const TpgFault*>& fault_list,
+MinPatDsatur2::init(const vector<ymuint>& fid_list,
 		    TvMgr& tvmgr,
 		    Fsim& fsim2)
 {
   // 代表故障のリスト
-  vector<const TpgFault*> rep_fault_list;
+  vector<ymuint> rep_fid_list;
   {
     EqChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_rep_faults(fault_list, rep_fault_list);
+    checker.get_rep_faults(fid_list, rep_fid_list);
   }
 
   // 支配故障のリスト
-  vector<const TpgFault*> dom_fault_list;
+  vector<ymuint> dom_fid_list;
   {
     DomChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_dom_faults(rep_fault_list, dom_fault_list);
+    checker.get_dom_faults(rep_fid_list, dom_fid_list);
   }
 
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
-  checker2.analyze_conflict(dom_fault_list);
+  checker2.analyze_conflict(dom_fid_list);
 
-  ymuint nf = dom_fault_list.size();
+  ymuint nf = dom_fid_list.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = dom_fault_list[i];
-    if ( max_fault_id < fault->id() ) {
-      max_fault_id = fault->id();
+    ymuint fid = dom_fid_list[i];
+    if ( max_fault_id < fid ) {
+      max_fault_id = fid;
     }
   }
   ++ max_fault_id;
@@ -84,14 +83,14 @@ MinPatDsatur2::init(const vector<const TpgFault*>& fault_list,
   mFaultMap.resize(max_fault_id);
 
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = dom_fault_list[i];
+    ymuint fid = dom_fid_list[i];
     FaultStruct& fs = mFaultStructList[i];
-    fs.mFault = fault;
+    fs.mFaultId = fid;
     fs.mSelected = false;
-    fs.mConflictList = checker2.conflict_list(fault->id());
+    fs.mConflictList = checker2.conflict_list(fid);
     fs.mConflictNum = 0;
     fs.mConflictMap.resize(1, false);
-    mFaultMap[fault->id()] = i;
+    mFaultMap[fid] = i;
   }
 
   mFaultNum = nf;
@@ -106,7 +105,7 @@ MinPatDsatur2::fault_num()
 }
 
 // @brief 最初の故障を選ぶ．
-const TpgFault*
+ymuint
 MinPatDsatur2::get_first_fault()
 {
   ASSERT_COND( mRemainNum > 0 );
@@ -126,7 +125,7 @@ MinPatDsatur2::get_first_fault()
   -- mRemainNum;
   mPrevFpos = max_pos;
   mPrevGid = 0;
-  return mFaultStructList[max_pos].mFault;
+  return mFaultStructList[max_pos].mFaultId;
 }
 
 // @brief 次に処理すべき故障を選ぶ．
@@ -134,13 +133,11 @@ MinPatDsatur2::get_first_fault()
 // @param[in] group_list 現在のグループリスト
 //
 // 故障が残っていなければ NULL を返す．
-const TpgFault*
+ymuint
 MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
 			      const vector<ymuint>& group_list)
 {
-  if ( mRemainNum == 0 ) {
-    return NULL;
-  }
+  ASSERT_COND( mRemainNum > 0 );
 
   // 飽和度最大の故障を選ぶ．
   ymuint ng = fgmgr.group_num();
@@ -160,7 +157,7 @@ MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
       FaultStruct& fs2 = mFaultStructList[mPrevFpos];
       for (ymuint j = 0; j < fs2.mConflictList.size(); ++ j) {
 	ymuint fid = fs2.mConflictList[j];
-	if ( fid == fs.mFault->id() ) {
+	if ( fid == fs.mFaultId ) {
 	  fs.mConflictMap[mPrevGid] = true;
 	  ++ fs.mConflictNum;
 	  break;
@@ -198,21 +195,21 @@ MinPatDsatur2::get_next_fault(FgMgr& fgmgr,
   mFaultStructList[max_pos].mSelected = true;
   -- mRemainNum;
   mPrevFpos = max_pos;
-  return mFaultStructList[max_pos].mFault;
+  return mFaultStructList[max_pos].mFaultId;
 }
 
 // @brief 故障を追加するグループを選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
-// @param[in] fault 故障
+// @param[in] fid 故障番号
 // @param[in] group_list 現在のグループリスト
 //
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatDsatur2::find_group(FgMgr& fgmgr,
-			  const TpgFault* fault,
+			  ymuint fid,
 			  const vector<ymuint>& group_list)
 {
-  ymuint gid = MinPatBase::find_group(fgmgr, fault, group_list);
+  ymuint gid = MinPatBase::find_group(fgmgr, fid, group_list);
   mPrevGid = gid;
   ymuint ng = fgmgr.group_num();
   if ( gid == ng ) {

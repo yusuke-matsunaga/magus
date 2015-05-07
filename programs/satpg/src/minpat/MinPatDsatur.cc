@@ -9,7 +9,6 @@
 
 #include "MinPatDsatur.h"
 #include "TpgNetwork.h"
-#include "TpgFault.h"
 #include "FaultMgr.h"
 #include "FaultAnalyzer.h"
 #include "EqChecker.h"
@@ -46,33 +45,33 @@ MinPatDsatur::~MinPatDsatur()
 }
 
 // @brief 初期化を行う．
-// @param[in] fault_list 検出された故障のリスト
+// @param[in] fid_list 検出された故障のリスト
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
 void
-MinPatDsatur::init(const vector<const TpgFault*>& fault_list,
+MinPatDsatur::init(const vector<ymuint>& fid_list,
 		   TvMgr& tvmgr,
 		   Fsim& fsim2)
 {
   mMaxNodeId = analyzer().max_node_id();
 
-  vector<const TpgFault*> rep_fault_list;
+  vector<ymuint> rep_fid_list;
   {
     EqChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_rep_faults(fault_list, rep_fault_list);
+    checker.get_rep_faults(fid_list, rep_fid_list);
   }
 
-  vector<const TpgFault*> dom_fault_list;
+  vector<ymuint> dom_fid_list;
   DomChecker checker(analyzer(), tvmgr, fsim2);
-  checker.get_dom_faults(rep_fault_list, dom_fault_list);
+  checker.get_dom_faults(rep_fid_list, dom_fid_list);
 
-  ymuint nf = dom_fault_list.size();
+  ymuint nf = dom_fid_list.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = dom_fault_list[i];
-    if ( max_fault_id < fault->id() ) {
-      max_fault_id = fault->id();
+    ymuint fid = dom_fid_list[i];
+    if ( max_fault_id < fid ) {
+      max_fault_id = fid;;
     }
   }
   ++ max_fault_id;
@@ -84,15 +83,15 @@ MinPatDsatur::init(const vector<const TpgFault*>& fault_list,
 
   for (ymuint i = 0; i < nf; ++ i) {
     FaultStruct& fs = mFaultStructList[i];
-    const TpgFault* fault = dom_fault_list[i];
-    fs.mFault = fault;
-    fs.mPatNum = checker.det_count(fault->id());
+    ymuint fid = dom_fid_list[i];
+    fs.mFaultId = fid;
+    fs.mPatNum = checker.det_count(fid);
     fs.mSelected = false;
     fs.mConflictNum = 0;
     fs.mConflictMap.resize(1, false);
     fs.mPendingNum = 0;
     fs.mPendingMap.resize(1, false);
-    mFaultMap[fault->id()] = i;
+    mFaultMap[fid] = i;
   }
   mFaultNum = nf;
   mRemainNum = nf;
@@ -110,37 +109,35 @@ MinPatDsatur::fault_num()
 }
 
 // @brief 最初の故障を選ぶ．
-const TpgFault*
+ymuint
 MinPatDsatur::get_first_fault()
 {
   ASSERT_COND( mRemainNum > 0 );
 
   // 最初は同時検出故障数の少ない故障を選ぶ．
-  const TpgFault* min_fault = NULL;
+  ymuint min_fid = 0;
   ymuint min_count = 0;
   ymuint min_pos = 0;
   ymuint fault_num = mFaultStructList.size();
   for (ymuint i = 0; i < fault_num; ++ i) {
     FaultStruct& fs = mFaultStructList[i];
     ymuint fnum = fs.mPatNum;
-    if ( min_fault == NULL || min_count > fnum ) {
+    if ( min_count == 0 || min_count > fnum ) {
       min_count = fnum;
-      min_fault = fs.mFault;
+      min_fid = fs.mFaultId;
       min_pos = i;
     }
   }
   mPrevGid = 0;
   mFaultStructList[min_pos].mSelected = true;
   -- mRemainNum;
-  return min_fault;
+  return min_fid;
 }
 
 // @brief 次に処理すべき故障を選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
 // @param[in] group_list 現在のグループリスト
-//
-// 故障が残っていなければ NULL を返す．
-const TpgFault*
+ymuint
 MinPatDsatur::get_next_fault(FgMgr& fgmgr,
 			     const vector<ymuint>& group_list)
 {
@@ -151,7 +148,7 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
 	   << "SatConfNum:    " << mSatConfNum << endl
 	   << "CompatNum:     " << mCompatNum << endl;
     }
-    return NULL;
+    return 0;
   }
 
   // 飽和度最大の故障を選ぶ．
@@ -199,10 +196,11 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
       FvalCnf fval_cnf(mMaxNodeId, gval_cnf);
       SatEngine engine(string(), string(), NULL);
 
-      const TpgFault* fault = fs.mFault;
-      engine.make_fval_cnf(fval_cnf, fault, analyzer().node_set(fault->id()), kVal1);
+      ymuint fid = fs.mFaultId;
+      const TpgFault* fault = analyzer().fault(fid);
+      engine.make_fval_cnf(fval_cnf, fault, analyzer().node_set(fid), kVal1);
 
-      const NodeValList& ma_list = analyzer().fault_info(fault->id()).mandatory_assignment();
+      const NodeValList& ma_list = analyzer().fault_info(fid).mandatory_assignment();
       for (ymuint gid = 0; gid < ng; ++ gid) {
 	if ( fs.mPendingMap[gid] ) {
 	  fs.mPendingMap[gid] = false;
@@ -239,21 +237,21 @@ MinPatDsatur::get_next_fault(FgMgr& fgmgr,
 
   mFaultStructList[max_pos].mSelected = true;
   -- mRemainNum;
-  return mFaultStructList[max_pos].mFault;
+  return mFaultStructList[max_pos].mFaultId;
 }
 
 // @brief 故障を追加するグループを選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
-// @param[in] fault 故障
+// @param[in] fid 故障番号
 // @param[in] group_list 現在のグループリスト
 //
 // グループが見つからなければ fgmgr.group_num() を返す．
 ymuint
 MinPatDsatur::find_group(FgMgr& fgmgr,
-			 const TpgFault* fault,
+			 ymuint fid,
 			 const vector<ymuint>& group_list)
 {
-  ymuint gid = MinPatBase::find_group(fgmgr, fault, group_list);
+  ymuint gid = MinPatBase::find_group(fgmgr, fid, group_list);
   mPrevGid = gid;
   ymuint ng = fgmgr.group_num();
   if ( gid == ng ) {

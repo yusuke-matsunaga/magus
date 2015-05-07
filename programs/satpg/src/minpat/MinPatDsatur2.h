@@ -42,12 +42,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
-  /// @param[in] fault_list 検出された故障のリスト
+  /// @param[in] fid_list 検出された故障のリスト
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<const TpgFault*>& fault_list,
+  init(const vector<ymuint>& fid_list,
        TvMgr& tvmgr,
        Fsim& fsim2);
 
@@ -58,7 +58,7 @@ private:
 
   /// @brief 最初の故障を選ぶ．
   virtual
-  const TpgFault*
+  ymuint
   get_first_fault();
 
   /// @brief 次に処理すべき故障を選ぶ．
@@ -67,20 +67,20 @@ private:
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
-  const TpgFault*
+  ymuint
   get_next_fault(FgMgr& fgmgr,
 		 const vector<ymuint>& group_list);
 
   /// @brief 故障を追加するグループを選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
-  /// @param[in] fault 故障
+  /// @param[in] fid 故障番号
   /// @param[in] group_list 現在のグループリスト
   ///
   /// グループが見つからなければ fgmgr.group_num() を返す．
   virtual
   ymuint
   find_group(FgMgr& fgmgr,
-	     const TpgFault* fault,
+	     ymuint fid,
 	     const vector<ymuint>& group_list);
 
 
@@ -92,8 +92,8 @@ private:
   // 故障ごとの情報
   struct FaultStruct
   {
-    // 故障
-    const TpgFault* mFault;
+    // 故障番号
+    ymuint mFaultId;
 
     // 選択済みマーク
     bool mSelected;

@@ -87,6 +87,14 @@ public:
   void
   delete_group(ymuint gid);
 
+  /// @brief 故障を取り除く
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] fid_list 削除する故障番号のリスト
+  virtual
+  void
+  delete_faults(ymuint gid,
+		const vector<ymuint>& fid_list);
+
   /// @brief グループの故障数を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   virtual
@@ -96,10 +104,11 @@ public:
   /// @brief グループの故障を返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   /// @param[in] pos ( 0 <= pos < fault_num(gid) )
+  /// @return 故障番号を返す．
   virtual
-  const TpgFault*
-  fault(ymuint gid,
-	ymuint pos) const;
+  ymuint
+  fault_id(ymuint gid,
+	   ymuint pos) const;
 
   /// @brief 十分割当リストを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -129,14 +138,20 @@ protected:
   ymuint
   max_node_id() const;
 
+  /// @brief 故障を返す．
+  /// @param[in] fid 故障番号
+  const TpgFault*
+  fault(ymuint fid) const;
+
   /// @brief 故障の解析情報を返す．
-  /// @param[in] fault 故障
+  /// @param[in] fid 故障番号
   const FaultInfo&
-  fault_info(const TpgFault* fault) const;
+  fault_info(ymuint fid) const;
 
   /// @brief 故障に関係するノード集合を返す．
+  /// @param[in] fid 故障番号
   const NodeSet&
-  node_set(const TpgFault* fault) const;
+  node_set(ymuint fid) const;
 
   /// @brief 故障グループを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -167,7 +182,7 @@ protected:
     // 外部インターフェイス
     //////////////////////////////////////////////////////////////////////
 
-    /// @brief ID番号を返す．
+    /// @brief グループID番号を返す．
     ymuint
     id() const;
 
@@ -179,9 +194,9 @@ protected:
     ymuint
     complex_fault_num() const;
 
-    /// @brief 故障を返す．
-    const TpgFault*
-    fault(ymuint pos) const;
+    /// @brief 故障番号を返す．
+    ymuint
+    fault_id(ymuint pos) const;
 
     /// @brief 十分割当を返す．
     const NodeValList&
@@ -205,14 +220,14 @@ protected:
 
     /// @brief 故障を追加する．
     void
-    add_fault(const TpgFault* fault,
+    add_fault(ymuint fid,
 	      const NodeValList& suf_list,
 	      const NodeValList& ma_list,
 	      const NodeValList& pi_suf_list);
 
     /// @brief 故障を削除する．
     void
-    delete_faults(const vector<const TpgFault*>& fault_list);
+    delete_faults(const vector<ymuint>& fid_list);
 
     /// @brief 故障の十分割当リストを設定する．
     void
@@ -234,13 +249,13 @@ protected:
     struct FaultData
     {
       // コンストラクタ
-      FaultData(const TpgFault* fault,
+      FaultData(ymuint fid,
 		const NodeValList& suf_list,
 		const NodeValList& ma_list,
 		const NodeValList& pi_suf_list);
 
-      // 故障
-      const TpgFault* mFault;
+      // 故障番号
+      ymuint mFaultId;
 
       // 十分割当リスト
       NodeValList mSufList;
