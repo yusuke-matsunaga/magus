@@ -132,6 +132,8 @@ FgMgr2::find_group(ymuint fid0,
       }
     }
 
+    ++ mCheckCount;
+
     // 簡易検査ではわからなかったので正式に調べる．
     SatEngine engine(string(), string(), NULL);
     GvalCnf gval_cnf(max_node_id());
@@ -169,6 +171,7 @@ FgMgr2::find_group(ymuint fid0,
     ++ mMnum;
 
     if ( engine.check_sat() == kB3True ) {
+      ++ mFoundCount;
       if ( first_gid == group_num() ) {
 	first_gid = gid;
 	if ( first_hit ) {
@@ -283,6 +286,20 @@ FgMgr2::mfault_max() const
   return mFmax;
 }
 
+// @brief チェック回数
+ymuint
+FgMgr2::check_count() const
+{
+  return mCheckCount;
+}
+
+// @brief 成功回数
+ymuint
+FgMgr2::found_count() const
+{
+  return mFoundCount;
+}
+
 // @brief 統計データをクリアする．
 void
 FgMgr2::clear_count()
@@ -290,6 +307,8 @@ FgMgr2::clear_count()
   mMnum = 0;
   mFsum = 0;
   mFmax = 0;
+  mCheckCount = 0;
+  mFoundCount = 0;
 }
 
 END_NAMESPACE_YM_SATPG

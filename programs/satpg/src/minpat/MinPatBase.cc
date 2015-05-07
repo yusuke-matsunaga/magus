@@ -181,6 +181,8 @@ MinPatBase::run(TpgNetwork& network,
 
   if ( exact && verbose() > 0 ) {
     cout << "Total   " << setw(8) << fgmgr2.mfault_num() << " exact compatibility check" << endl
+	 << "Total   " << setw(8) << fgmgr2.check_count() << " SAT checks" << endl
+	 << "        " << setw(8) << fgmgr2.found_count() << "  success" << endl
 	 << "Avarage " << setw(8) << fgmgr2.mfault_avg() << " faults per check" << endl
 	 << "Max     " << setw(8) << fgmgr2.mfault_max() << " faults" << endl;
   }

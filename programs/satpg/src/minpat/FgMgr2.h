@@ -93,6 +93,14 @@ public:
   ymuint
   mfault_max() const;
 
+  /// @brief チェック回数
+  ymuint
+  check_count() const;
+
+  /// @brief 成功回数
+  ymuint
+  found_count() const;
+
   /// @brief 統計データをクリアする．
   void
   clear_count();
@@ -114,6 +122,10 @@ private:
   ymuint mFsum;
 
   ymuint mFmax;
+
+  ymuint mCheckCount;
+
+  ymuint mFoundCount;
 
 };
 
