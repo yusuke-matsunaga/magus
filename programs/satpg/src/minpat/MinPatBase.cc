@@ -66,7 +66,24 @@ MinPatBase::run(TpgNetwork& network,
 
   mAnalyzer.init(network, tvmgr);
 
+  // 検出された故障番号のリスト
   const vector<ymuint>& fid_list = mAnalyzer.fid_list();
+
+  // 故障のリストを作る(Fsim用)
+  vector<const TpgFault*> fault_list;
+  {
+    ymuint nf = fid_list.size();
+    fault_list.reserve(nf);
+    for (ymuint i = 0; i < nf; ++ i) {
+      ymuint fid = fid_list[i];
+      const TpgFault* fault = mAnalyzer.fault(fid);
+      fault_list.push_back(fault);
+    }
+  }
+
+  // 故障シミュレータに故障リストをセットする．
+  fsim2.set_faults(fault_list);
+
   init(fid_list, tvmgr, fsim2);
 
   StopWatch local_timer;
@@ -169,14 +186,6 @@ MinPatBase::run(TpgNetwork& network,
   }
 
   { // 検証しておく．
-    vector<const TpgFault*> fault_list;
-    fault_list.reserve(nf);
-    for (ymuint i = 0; i < nf; ++ i) {
-      ymuint fid = fid_list[i];
-      const TpgFault* fault = mAnalyzer.fault(fid);
-      fault_list.push_back(fault);
-    }
-
     Verifier ver;
     if ( ver.check(fsim2, fault_list, tv_list) ) {
       if ( verbose() > 0 ) {

@@ -163,19 +163,6 @@ EqChecker::do_fsim(const vector<ymuint>& fid_list)
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  {
-    ymuint nf = fid_list.size();
-    vector<const TpgFault*> fault_list;
-    fault_list.reserve(nf);
-    for (ymuint i = 0; i < nf; ++ i) {
-      ymuint fid = fid_list[i];
-      const TpgFault* fault = mAnalyzer.fault(fid);
-      fault_list.push_back(fault);
-    }
-
-    mFsim.set_faults(fault_list);
-  }
-
   DetOp op;
 
   ymuint nf = fid_list.size();
