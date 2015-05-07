@@ -365,6 +365,7 @@ Compactor::phase2(FgMgr& fgmgr,
     ymuint min_gid = max_group_id;
     ymuint min_size = 0;
 
+#if 0
     // 要素数が最小のグループを求める．
     for (ymuint i = 0; i < ng; ++ i) {
       ymuint gid = group_list[i];
@@ -379,6 +380,22 @@ Compactor::phase2(FgMgr& fgmgr,
 	min_gid = gid;
       }
     }
+#else
+    // 要素数が最大のグループを求める．
+    for (ymuint i = 0; i < ng; ++ i) {
+      ymuint gid = group_list[i];
+      if ( locked[gid] ) {
+	continue;
+      }
+
+      ymuint size = fgmgr.fault_num(gid);
+      if ( min_size == 0 || min_size < size ) {
+	min_size = size;
+	min_pos = i;
+	min_gid = gid;
+      }
+    }
+#endif
     if ( min_gid == max_group_id ) {
       // すべてのグループが調査済みだった．
       break;
@@ -396,6 +413,7 @@ Compactor::phase2(FgMgr& fgmgr,
     del_fid_list.reserve(nf);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fgmgr.fault_id(min_gid, i);
+
       vector<ymuint> tmp_group_list;
       tmp_group_list.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
