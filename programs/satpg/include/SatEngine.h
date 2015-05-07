@@ -102,19 +102,6 @@ public:
 		const NodeSet& node_set,
 		Val3 detect);
 
-  /// @brief 故障回路のCNFを作る．
-  /// @param[in] fval_cnf 故障回路用のデータ構造
-  /// @param[in] fault 故障
-  /// @param[in] detect 検出条件
-  ///
-  /// detect = kVal0: 検出しないCNFを作る．
-  ///        = kVal1: 検出するCNFを作る．
-  ///        = kValX: fd_var() で制御するCNFを作る．
-  void
-  make_fval_cnf(FvalCnf& fval_cnf,
-		const TpgFault* fault,
-		Val3 detect);
-
   /// @brief 複数故障検出回路のCNFを作る．
   /// @param[in] mval_cnf 故障回路用のデータ構造
   /// @param[in] fault_list 故障リスト
