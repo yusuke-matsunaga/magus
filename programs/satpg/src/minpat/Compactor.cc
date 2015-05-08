@@ -340,6 +340,28 @@ Compactor::phase1(FgMgr& fgmgr,
   }
 }
 
+BEGIN_NONAMESPACE
+
+struct GroupLt
+{
+  GroupLt(const FgMgr& fgmgr) :
+    mFgMgr(fgmgr)
+  {
+  }
+
+  bool
+  operator()(ymuint left,
+	     ymuint right)
+  {
+    return mFgMgr.fault_num(left) < mFgMgr.fault_num(right);
+  }
+
+  const FgMgr& mFgMgr;
+
+};
+
+END_NONAMESPACE
+
 // @brief phase-2
 // @param[inout] group_list 選択されたグループ番号のリスト
 //
@@ -428,6 +450,7 @@ Compactor::phase2(FgMgr& fgmgr,
 	  tmp_group_list.push_back(gid);
 	}
       }
+      sort(tmp_group_list.begin(), tmp_group_list.end(), GroupLt(fgmgr));
 
       ymuint gid = fgmgr.find_group(fid, tmp_group_list);
       if ( gid != fgmgr.group_num() ) {
