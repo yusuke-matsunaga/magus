@@ -9,6 +9,7 @@
 
 #include "Compactor.h"
 #include "FgMgr.h"
+#include "YmUtils/HashSet.h"
 #include "YmUtils/StopWatch.h"
 
 
@@ -358,6 +359,7 @@ Compactor::phase2(FgMgr& fgmgr,
   ymuint max_group_id = fgmgr.group_num();
   ymuint ng = group_list.size();
 
+  HashSet<ymuint> fault_lock;
   ymuint count = 0;
   vector<bool> locked(max_group_id, false);
   for ( ; ; ) {
@@ -365,7 +367,7 @@ Compactor::phase2(FgMgr& fgmgr,
     ymuint min_gid = max_group_id;
     ymuint min_size = 0;
 
-#if 0
+#if 1
     // 要素数が最小のグループを求める．
     for (ymuint i = 0; i < ng; ++ i) {
       ymuint gid = group_list[i];
@@ -413,6 +415,10 @@ Compactor::phase2(FgMgr& fgmgr,
     del_fid_list.reserve(nf);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fgmgr.fault_id(min_gid, i);
+      if ( fault_lock.check(fid) ) {
+	continue;
+      }
+      fault_lock.add(fid);
 
       vector<ymuint> tmp_group_list;
       tmp_group_list.reserve(ng - 1);
