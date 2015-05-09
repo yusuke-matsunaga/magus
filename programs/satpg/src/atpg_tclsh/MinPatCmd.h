@@ -76,6 +76,9 @@ private:
   // fast-compaction オプションの解析用オブジェクト
   TclPopt* mPoptFastCompaction;
 
+  // mc-compaction オプションの解析用オブジェクト
+  TclPopt* mPoptMcCompaction;
+
   // rep-faults オプションの解析用オブジェクト
   TclPopt* mPoptRepFaults;
 

@@ -51,6 +51,28 @@ EqChecker::set_verbose(int verbose)
   mVerbose = verbose;
 }
 
+BEGIN_NONAMESPACE
+
+struct FaultLt
+{
+  FaultLt(const vector<ymuint>& size_array) :
+    mSizeArray(size_array)
+  {
+  }
+
+  bool
+  operator()(ymuint left,
+	     ymuint right)
+  {
+    return mSizeArray[left] < mSizeArray[right];
+  }
+
+  const vector<ymuint>& mSizeArray;
+
+};
+
+END_NONAMESPACE
+
 // @brief 等価故障の代表故障を求める．
 // @param[in] src_fault_list 故障リスト
 // @param[out] rep_fault_list 結果の代表故障を格納するスト
@@ -78,10 +100,28 @@ EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
   ymuint nc = mEqSet.class_num();
   for (ymuint i = 0; i < nc; ++ i) {
     // 1つの等価故障候補グループを取り出す．
+    vector<ymuint> elem_list;
+#if 1
+    mEqSet.class_list(i, elem_list);
+
+    {
+      vector<ymuint> size_array(mMaxFaultId);
+      for (ymuint j = 0; j < elem_list.size(); ++ j) {
+	ymuint fid = elem_list[j];
+	const FaultInfo& fi = mAnalyzer.fault_info(fid);
+	if ( fi.single_cube() ) {
+	  size_array[fid] = 0;
+	}
+	else {
+	  size_array[fid] = fi.sufficient_assignment().size() - fi.mandatory_assignment().size();
+	}
+      }
+      stable_sort(elem_list.begin(), elem_list.end(), FaultLt(size_array));
+    }
+#else
     vector<ymuint> tmp_list;
     mEqSet.class_list(i, tmp_list);
 
-    vector<ymuint> elem_list;
     elem_list.reserve(tmp_list.size());
     { // single cube 条件の故障が前に来るようにする．
       ymuint wpos = 0;
@@ -102,6 +142,7 @@ EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
 	elem_list.push_back(fid);
       }
     }
+#endif
 
     // グループから要素を1つ取り出す．
     ymuint n = elem_list.size();

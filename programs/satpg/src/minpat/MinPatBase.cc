@@ -10,6 +10,7 @@
 #include "MinPatBase.h"
 #include "FgMgr2.h"
 #include "Compactor.h"
+#include "McCompactor.h"
 #include "TpgNetwork.h"
 #include "TvMgr.h"
 #include "Verifier.h"
@@ -44,15 +45,22 @@ MinPatBase::~MinPatBase()
 // @param[in] network 対象のネットワーク
 // @param[in] tvmgr テストベクタマネージャ
 // @param[in] fsim2 2値の故障シミュレータ(検証用)
+// @param[in] fsim3 3値の故障シミュレータ
+// @param[in] exact 故障グループの両立性判定を厳密に行うときに true とする．
+// @param[in] compaction 最後に圧縮を行うときに true とする．
+// @param[in] fast_compaction 最後に高速圧縮を行うときに true とする．
+// @param[in] mc_compaction 最後に最小被覆圧縮を行うときに true とする．
 // @param[out] tv_list テストベクタのリスト
 // @param[out] stats 実行結果の情報を格納する変数
 void
 MinPatBase::run(TpgNetwork& network,
 		TvMgr& tvmgr,
 		Fsim& fsim2,
+		Fsim& fsim3,
 		bool exact,
 		bool compaction,
 		bool fast_compaction,
+		bool mc_compaction,
 		vector<TestVector*>& tv_list,
 		USTime& time)
 {
@@ -72,11 +80,15 @@ MinPatBase::run(TpgNetwork& network,
 
   // 故障のリストを作る(Fsim用)
   vector<const TpgFault*> fault_list;
+  ymuint max_fault_id = 0;
   {
     ymuint nf = fid_list.size();
     fault_list.reserve(nf);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fid_list[i];
+      if ( max_fault_id < fid ) {
+	max_fault_id = fid;
+      }
       const TpgFault* fault = mAnalyzer.fault(fid);
       fault_list.push_back(fault);
     }
@@ -84,6 +96,7 @@ MinPatBase::run(TpgNetwork& network,
 
   // 故障シミュレータに故障リストをセットする．
   fsim2.set_faults(fault_list);
+  fsim3.set_faults(fault_list);
 
   init(fid_list, tvmgr, fsim2);
 
@@ -157,6 +170,11 @@ MinPatBase::run(TpgNetwork& network,
       cout << "CPU time (compaction)              " << local_timer.time() << endl;
     }
   }
+  else if ( mc_compaction ) {
+    // 後処理
+    local_timer.reset();
+    local_timer.start();
+  }
 
   // テストパタンを作る．
   local_timer.reset();
@@ -176,6 +194,25 @@ MinPatBase::run(TpgNetwork& network,
   local_timer.stop();
   if ( verbose() > 0 ) {
     cout << "CPU time (testvector generation) " << local_timer.time() << endl;
+  }
+
+  if ( mc_compaction ) {
+    local_timer.reset();
+    local_timer.start();
+
+    McCompactor compactor(fsim3);
+    compactor.set_verbose(verbose());
+
+    vector<TestVector*> new_tv_list;
+    compactor.run(fault_list, tv_list, new_tv_list);
+
+    tv_list = new_tv_list;
+
+    local_timer.stop();
+    if ( verbose() > 0 ) {
+      cout << "# of Test Patterns = " << tv_list.size() << endl;
+      cout << "CPU time (minimum covering) " << local_timer.time() << endl;
+    }
   }
 
   if ( verbose() > 0 ) {
