@@ -47,7 +47,6 @@ McOp::operator()(const TpgFault* f,
   if ( row_pos > 0 ) {
     -- row_pos;
     mMinCov.insert_elem(row_pos, mColPos);
-    cout << " " << f->id() << " , " << mColPos << endl;
   }
 }
 

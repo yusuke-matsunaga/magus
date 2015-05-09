@@ -294,6 +294,7 @@ Compactor::phase1(FgMgr& fgmgr,
     ymuint min_gid = group_list[i];
     bool red = true;
     ymuint nf = fgmgr.fault_num(min_gid);
+
     vector<ymuint> move_list(nf);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fgmgr.fault_id(min_gid, i);
@@ -403,6 +404,7 @@ Compactor::phase2(FgMgr& fgmgr,
 
     // 可能な限り故障を他のグループに移動する．
     ymuint nf = fgmgr.fault_num(min_gid);
+
     vector<ymuint> del_fid_list;
     del_fid_list.reserve(nf);
     for (ymuint fpos = 0; fpos < nf; ++ fpos) {

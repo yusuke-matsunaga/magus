@@ -101,7 +101,7 @@ EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
   for (ymuint i = 0; i < nc; ++ i) {
     // 1つの等価故障候補グループを取り出す．
     vector<ymuint> elem_list;
-#if 1
+#if 0
     mEqSet.class_list(i, elem_list);
 
     {
