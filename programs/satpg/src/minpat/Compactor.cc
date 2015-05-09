@@ -15,6 +15,29 @@
 
 BEGIN_NAMESPACE_YM_SATPG
 
+BEGIN_NONAMESPACE
+
+// グループの要素数の昇順に並べるための比較関数
+struct GroupLt
+{
+  GroupLt(const FgMgr& fgmgr) :
+    mFgMgr(fgmgr)
+  {
+  }
+
+  bool
+  operator()(ymuint left,
+	     ymuint right)
+  {
+    return mFgMgr.fault_num(left) < mFgMgr.fault_num(right);
+  }
+
+  const FgMgr& mFgMgr;
+
+};
+
+END_NONAMESPACE
+
 //////////////////////////////////////////////////////////////////////
 // クラス Compactor
 //////////////////////////////////////////////////////////////////////
@@ -23,6 +46,7 @@ BEGIN_NAMESPACE_YM_SATPG
 Compactor::Compactor()
 {
   mVerbose = 0;
+  mPrintDetail = false;
 }
 
 // @brief デストラクタ
@@ -36,6 +60,13 @@ void
 Compactor::set_verbose(ymuint verbose)
 {
   mVerbose = verbose;
+}
+
+// @brief print_detail フラグを設定する．
+void
+Compactor::set_print_detail(bool flag)
+{
+  mPrintDetail = flag;
 }
 
 // @brief 故障グループを圧縮する．
@@ -52,6 +83,11 @@ Compactor::run(FgMgr& fgmgr,
   mMaxNodeId = max_node_id;
 
   new_group_list = group_list;
+
+  if ( mPrintDetail ) {
+    fgmgr.print_group_list(cout, new_group_list);
+  }
+
 #if 0
   phase0(fgmgr, new_group_list);
 #endif
@@ -59,8 +95,17 @@ Compactor::run(FgMgr& fgmgr,
   phase1(fgmgr, new_group_list);
 
   for ( ; ; ) {
+
+    if ( mPrintDetail ) {
+      fgmgr.print_group_list(cout, new_group_list);
+    }
+
     ymuint ng0 = new_group_list.size();
     phase2(fgmgr, new_group_list);
+
+    if ( mPrintDetail ) {
+      fgmgr.print_group_list(cout, new_group_list);
+    }
 
     phase1(fgmgr, new_group_list);
     if ( new_group_list.size() == ng0 ) {
@@ -339,28 +384,6 @@ Compactor::phase1(FgMgr& fgmgr,
 	 << ":  CPU time" << local_timer.time() << endl;
   }
 }
-
-BEGIN_NONAMESPACE
-
-struct GroupLt
-{
-  GroupLt(const FgMgr& fgmgr) :
-    mFgMgr(fgmgr)
-  {
-  }
-
-  bool
-  operator()(ymuint left,
-	     ymuint right)
-  {
-    return mFgMgr.fault_num(left) < mFgMgr.fault_num(right);
-  }
-
-  const FgMgr& mFgMgr;
-
-};
-
-END_NONAMESPACE
 
 // @brief phase-2
 // @param[inout] group_list 選択されたグループ番号のリスト

@@ -52,6 +52,10 @@ public:
   void
   set_verbose(ymuint verbose);
 
+  /// @brief print_detail フラグを設定する．
+  void
+  set_print_detail(bool flag);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -96,6 +100,9 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
+
+  // print_detail フラグ
+  bool mPrintDetail;
 
 };
 
