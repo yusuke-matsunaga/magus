@@ -47,7 +47,7 @@ Compactor::Compactor()
 {
   mVerbose = 0;
   mFast = false;
-  mPrintDetail = true;
+  mPrintDetail = false;
 }
 
 // @brief デストラクタ
