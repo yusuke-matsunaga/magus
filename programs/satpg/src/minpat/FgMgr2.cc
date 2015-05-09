@@ -79,6 +79,7 @@ FgMgr2::find_dom_group(ymuint fid,
 // @brief 追加できる既存グループを見つける．
 // @param[in] fid0 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
+// @param[in] fast 高速ヒューリスティック
 // @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
 // @param[out] gid_list 対象のグループ番号を収めるリスト
 // @return 最初のグループ番号を返す．
@@ -88,6 +89,7 @@ FgMgr2::find_dom_group(ymuint fid,
 ymuint
 FgMgr2::find_group(ymuint fid0,
 		   const vector<ymuint>& group_list,
+		   bool fast,
 		   bool first_hit,
 		   vector<ymuint>& gid_list)
 {
@@ -123,6 +125,9 @@ FgMgr2::find_group(ymuint fid0,
 	gid_list.push_back(gid);
 	continue;
       }
+    }
+    if ( fast ) {
+      continue;
     }
 
     { // グループの必要割当が成り立たなかったら衝突している．

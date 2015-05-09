@@ -40,11 +40,13 @@ public:
   /// @param[in] fmgr 故障グループマネージャ
   /// @param[in] max_node_id ノード番号の最大値
   /// @param[in] group_list もとのグループ番号リスト
-  /// @param[in] new_group_list 圧縮後のグループ番号リスト
+  /// @param[in] fast 高速ヒューリスティック
+  /// @param[out] new_group_list 圧縮後のグループ番号リスト
   void
   run(FgMgr& fgmgr,
       ymuint max_node_id,
       const vector<ymuint>& group_list,
+      bool fast,
       vector<ymuint>& new_group_list);
 
   /// @brief verbose フラグを設定する．
@@ -100,6 +102,9 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
+
+  // fast フラグ
+  bool mFast;
 
   // print_detail フラグ
   bool mPrintDetail;

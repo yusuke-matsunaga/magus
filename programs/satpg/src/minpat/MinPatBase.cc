@@ -8,7 +8,6 @@
 
 
 #include "MinPatBase.h"
-#include "FgMgr1.h"
 #include "FgMgr2.h"
 #include "Compactor.h"
 #include "TpgNetwork.h"
@@ -34,7 +33,6 @@ MinPatBase::MinPatBase(bool group_dominance)
 {
   mVerbose = 0;
   mGroupDominance = group_dominance;
-  mDomMethod = 2;
 }
 
 // @brief デストラクタ
@@ -54,11 +52,14 @@ MinPatBase::run(TpgNetwork& network,
 		Fsim& fsim2,
 		bool exact,
 		bool compaction,
+		bool fast_compaction,
 		vector<TestVector*>& tv_list,
 		USTime& time)
 {
   StopWatch total_timer;
   total_timer.start();
+
+  mFast = !exact;
 
   mMaxNodeId = network.max_node_id();
 
@@ -89,9 +90,7 @@ MinPatBase::run(TpgNetwork& network,
   StopWatch local_timer;
   local_timer.start();
 
-  FgMgr1 fgmgr1(mMaxNodeId, analyzer());
-  FgMgr2 fgmgr2(mMaxNodeId, analyzer());
-  FgMgr& fgmgr = exact ? static_cast<FgMgr&>(fgmgr2) : static_cast<FgMgr&>(fgmgr1);
+  FgMgr2 fgmgr(mMaxNodeId, mAnalyzer);
   vector<ymuint> group_list;
   ymuint nf = fault_num();
 
@@ -140,7 +139,7 @@ MinPatBase::run(TpgNetwork& network,
     cout << "CPU time (coloring)              " << local_timer.time() << endl;
   }
 
-  if ( compaction ) {
+  if ( compaction || fast_compaction ) {
     // 後処理
     local_timer.reset();
     local_timer.start();
@@ -149,7 +148,7 @@ MinPatBase::run(TpgNetwork& network,
     compactor.set_verbose(verbose());
 
     vector<ymuint> new_group_list;
-    compactor.run(fgmgr, mMaxNodeId, group_list, new_group_list);
+    compactor.run(fgmgr, mMaxNodeId, group_list, fast_compaction, new_group_list);
     group_list = new_group_list;
 
     local_timer.stop();
@@ -179,12 +178,12 @@ MinPatBase::run(TpgNetwork& network,
     cout << "CPU time (testvector generation) " << local_timer.time() << endl;
   }
 
-  if ( exact && verbose() > 0 ) {
-    cout << "Total   " << setw(8) << fgmgr2.mfault_num() << " exact compatibility check" << endl
-	 << "Total   " << setw(8) << fgmgr2.check_count() << " SAT checks" << endl
-	 << "        " << setw(8) << fgmgr2.found_count() << "  success" << endl
-	 << "Avarage " << setw(8) << fgmgr2.mfault_avg() << " faults per check" << endl
-	 << "Max     " << setw(8) << fgmgr2.mfault_max() << " faults" << endl;
+  if ( verbose() > 0 ) {
+    cout << "Total   " << setw(8) << fgmgr.mfault_num() << " exact compatibility check" << endl
+	 << "Total   " << setw(8) << fgmgr.check_count() << " SAT checks" << endl
+	 << "        " << setw(8) << fgmgr.found_count() << "  success" << endl
+	 << "Avarage " << setw(8) << fgmgr.mfault_avg() << " faults per check" << endl
+	 << "Max     " << setw(8) << fgmgr.mfault_max() << " faults" << endl;
   }
 
   { // 検証しておく．
@@ -214,20 +213,6 @@ MinPatBase::verbose() const
   return mVerbose;
 }
 
-// @brief dom_method を指定する．
-void
-MinPatBase::set_dom_method(ymuint dom_method)
-{
-  mDomMethod = dom_method;
-}
-
-// @brief get_dom_faults() のアルゴリズムを指定する．
-ymuint
-MinPatBase::dom_method() const
-{
-  return mDomMethod;
-}
-
 // @brief 故障を追加するグループを選ぶ．
 // @param[in] fgmgr 故障グループを管理するオブジェクト
 // @param[in] fid 故障番号
@@ -239,15 +224,14 @@ MinPatBase::find_group(FgMgr& fgmgr,
 		       ymuint fid,
 		       const vector<ymuint>& group_list)
 {
-  vector<ymuint> dummy;
   if ( mGroupDominance ) {
-    ymuint gid = fgmgr.find_dom_group(fid, group_list, true, dummy);
+    ymuint gid = fgmgr.find_dom_group(fid, group_list);
     if ( gid != fgmgr.group_num() ) {
       return gid;
     }
   }
 
-  ymuint gid = fgmgr.find_group(fid, group_list, true, dummy);
+  ymuint gid = fgmgr.find_group(fid, group_list, mFast);
   return gid;
 }
 

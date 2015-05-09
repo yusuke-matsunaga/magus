@@ -46,6 +46,7 @@ public:
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   /// @param[in] exact 故障グループの両立性判定を厳密に行うときに true とする．
   /// @param[in] compaction 最後に圧縮を行うときに true とする．
+  /// @param[in] fast_compaction 最後に高速圧縮を行うときに true とする．
   /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
@@ -55,6 +56,7 @@ public:
       Fsim& fsim2,
       bool exact,
       bool compaction,
+      bool fast_compaction,
       vector<TestVector*>& tv_list,
       USTime& time);
 
@@ -66,15 +68,6 @@ public:
   /// @brief verbose フラグを得る．
   int
   verbose() const;
-
-  /// @brief dom_method を指定する．
-  virtual
-  void
-  set_dom_method(ymuint dom_method);
-
-  /// @brief get_dom_faults() のアルゴリズムを指定する．
-  ymuint
-  dom_method() const;
 
 
 protected:
@@ -151,8 +144,8 @@ private:
   // group dominance フラグ
   bool mGroupDominance;
 
-  // get_dom_fatuls() のアルゴリズム
-  ymuint mDomMethod;
+  // fast フラグ
+  bool mFast;
 
   // 故障解析器
   FaultAnalyzer mAnalyzer;

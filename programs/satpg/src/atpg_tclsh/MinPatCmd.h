@@ -67,14 +67,14 @@ private:
   // verbose オプションの解析用オブジェクト
   TclPoptInt* mPoptVerbose;
 
-  // dom_method オプションの解析用オブジェクト
-  TclPoptInt* mPoptDomMethod;
-
   // exact オプションの解析用オブジェクト
   TclPopt* mPoptExact;
 
   // compaction オプションの解析用オブジェクト
   TclPopt* mPoptCompaction;
+
+  // fast-compaction オプションの解析用オブジェクト
+  TclPopt* mPoptFastCompaction;
 
   // rep-faults オプションの解析用オブジェクト
   TclPopt* mPoptRepFaults;

@@ -102,6 +102,7 @@ public:
   /// @brief 追加できる既存グループを見つける．
   /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
+  /// @param[in] fast 高速ヒューリスティック
   /// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
   /// @param[out] gid_list 対象のグループ番号を収めるリスト
   /// @return 最初のグループ番号を返す．
@@ -112,18 +113,21 @@ public:
   ymuint
   find_group(ymuint fid,
 	     const vector<ymuint>& group_list,
+	     bool fast,
 	     bool first_hit,
 	     vector<ymuint>& gid_list) = 0;
 
   /// @brief 追加できる既存グループを見つける．
   /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
+  /// @param[in] fast 高速ヒューリスティック
   /// @return 最初のグループ番号を返す．
   ///
   /// 見つからない場合は group_num() を返す．
   ymuint
   find_group(ymuint fid,
-	     const vector<ymuint>& group_list);
+	     const vector<ymuint>& group_list,
+	     bool fast);
 
   /// @brief 既存のグループに故障を追加する．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
@@ -206,16 +210,18 @@ FgMgr::find_dom_group(ymuint fid,
 // @brief 追加できる既存グループを見つける．
 // @param[in] fid 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
+// @param[in] fast 高速ヒューリスティック
 // @return 最初のグループ番号を返す．
 //
 // 見つからない場合は group_num() を返す．
 inline
 ymuint
 FgMgr::find_group(ymuint fid,
-		  const vector<ymuint>& group_list)
+		  const vector<ymuint>& group_list,
+		  bool fast)
 {
   vector<ymuint> dummy;
-  return find_group(fid, group_list, true, dummy);
+  return find_group(fid, group_list, fast, true, dummy);
 }
 
 END_NAMESPACE_YM_SATPG

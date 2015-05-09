@@ -46,7 +46,8 @@ END_NONAMESPACE
 Compactor::Compactor()
 {
   mVerbose = 0;
-  mPrintDetail = false;
+  mFast = false;
+  mPrintDetail = true;
 }
 
 // @brief デストラクタ
@@ -73,14 +74,18 @@ Compactor::set_print_detail(bool flag)
 // @param[in] fmgr 故障グループマネージャ
 // @param[in] max_node_id ノード番号の最大値
 // @param[in] group_list もとのグループ番号リスト
-// @param[in] new_group_list 圧縮後のグループ番号リスト
+// @param[in] fast 高速ヒューリスティック
+// @param[out] new_group_list 圧縮後のグループ番号リスト
 void
 Compactor::run(FgMgr& fgmgr,
 	       ymuint max_node_id,
 	       const vector<ymuint>& group_list,
+	       bool fast,
 	       vector<ymuint>& new_group_list)
 {
   mMaxNodeId = max_node_id;
+
+  mFast = fast;
 
   new_group_list = group_list;
 
@@ -259,78 +264,46 @@ Compactor::phase1(FgMgr& fgmgr,
 
   ymuint max_group_id = fgmgr.group_num();
 
-  ymuint count = 0;
-  vector<bool> locked(max_group_id, false);
-  for ( ; ; ) {
-    ymuint min_gid = max_group_id;
-    ymuint min_size = 0;
-    ymuint ng = group_list.size();
-
-    // 要素数が最小のグループを求める．
-    for (ymuint i = 0; i < ng; ++ i) {
-      ymuint gid = group_list[i];
-      if ( locked[gid] ) {
-	continue;
-      }
-
-      ymuint size = fgmgr.fault_num(gid);
-      if ( min_size == 0 || min_size > size ) {
-	min_size = size;
-	min_gid = gid;
-      }
-    }
-    if ( min_gid == max_group_id ) {
-      // すべてのグループが調査済みだった．
-      break;
-    }
-
+  ymuint ng = group_list.size();
+  vector<bool> deleted(max_group_id, false);
+  for (ymuint i = 0; i < ng; ++ i) {
     if ( mVerbose > 1 ) {
       cout << "\r"
-	   << setw(4) << count << " / " << setw(4) << ng;
+	   << setw(4) << i << " / " << setw(4) << ng;
       cout.flush();
     }
 
     // 現在の情報を tmp_group_list にコピーしておく
-    vector<ymuint> tmp_group_list = group_list;
+    vector<ymuint> tmp_group_list(ng);
+    for (ymuint j = i + 1; j < ng; ++ j) {
+      ymuint gid = group_list[j];
+      ymuint gid2 = fgmgr.duplicate_group(gid);
+      tmp_group_list[j] = gid2;
+    }
+
+    // fid の移動先を見つけるための作業用のグループ番号リスト
+    // min_gid 以外のグループ番号をコピーしておく
+    vector<ymuint> tmp_group_list1;
+    tmp_group_list1.reserve(ng - i - 1);
+    for (ymuint j = ng - 1; j > i; -- j) {
+      ymuint gid = tmp_group_list[j];
+      tmp_group_list1.push_back(gid);
+    }
 
     // min_gid のグループの故障を他のグループへ移動できるか調べる．
+    ymuint min_gid = group_list[i];
     bool red = true;
     ymuint nf = fgmgr.fault_num(min_gid);
+    vector<ymuint> move_list(nf);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fgmgr.fault_id(min_gid, i);
 
-      // fid の移動先を見つけるための作業用のグループ番号リスト
-      // min_gid 以外のグループ番号をコピーしておく
-      vector<ymuint> tmp_group_list1;
-      tmp_group_list1.reserve(ng - 1);
-      for (ymuint i = 0; i < ng; ++ i) {
-	ymuint gid = tmp_group_list[i];
-	if ( gid != min_gid ) {
-	  tmp_group_list1.push_back(gid);
-	}
-      }
-
       // fid を移動可能なグループを見つける．
-      ymuint gid = fgmgr.find_group(fid, tmp_group_list1);
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list1, mFast);
       if ( gid != fgmgr.group_num() ) {
 	// 見つけた．
-
-	// tmp_group_list 中の位置を求める．
-	ymuint ipos = 0;
-	for (ipos = 0; ipos < ng; ++ ipos) {
-	  if ( tmp_group_list[ipos] == gid ) {
-	    break;
-	  }
-	}
-	ASSERT_COND( ipos < ng );
-
-	ymuint gid2 = gid;
-	if ( group_list[ipos] == gid ) {
-	  // 変更を加える前にコピーを作る．
-	  gid2 = fgmgr.duplicate_group(gid);
-	  tmp_group_list[ipos] = gid2;
-	}
-	fgmgr.add_fault(gid2, fid);
+	fgmgr.add_fault(gid, fid);
+	move_list[i] = gid;
       }
       else {
 	// 見つからなかった．
@@ -340,40 +313,50 @@ Compactor::phase1(FgMgr& fgmgr,
       }
     }
     if ( red ) {
-      // 変更を反映させる．
-      for (ymuint i = 0; i < ng; ++ i) {
-	ymuint gid1 = group_list[i];
-	ymuint gid2 = tmp_group_list[i];
-	if ( gid1 != gid2 ) {
+      // 変更を確定する．
+      vector<ymuint> gmap(fgmgr.group_num());
+      for (ymuint j = i + 1; j < ng; ++ j) {
+	ymuint gid1 = group_list[j];
+	ymuint gid2 = tmp_group_list[j];
+	if ( fgmgr.fault_num(gid1) != fgmgr.fault_num(gid2) ) {
 	  fgmgr.replace_group(gid1, gid2);
+	  gmap[gid2] = gid1;
 	}
-      }
-      // group_list から min_group を除く．
-      ymuint wpos = 0;
-      for (ymuint rpos = 0; rpos < ng; ++ rpos) {
-	ymuint gid = group_list[rpos];
-	if ( gid != min_gid ) {
-	  if ( wpos != rpos ) {
-	    group_list[wpos] = gid;
-	  }
-	  ++ wpos;
-	}
-      }
-      group_list.erase(group_list.begin() + wpos, group_list.end());
-    }
-    else {
-      // 変更を破棄する．
-      for (ymuint i = 0; i < ng; ++ i) {
-	ymuint gid1 = group_list[i];
-	ymuint gid2 = tmp_group_list[i];
-	if ( gid1 != gid2 ) {
+	else {
 	  fgmgr.delete_group(gid2);
 	}
       }
+      deleted[min_gid] = true;
+      if ( mPrintDetail ) {
+	for (ymuint i = 0; i < nf; ++ i) {
+	  cout << "  MOVE " << fgmgr.fault_id(min_gid, i)
+	       << " from #" << min_gid << " to #"
+	       << gmap[move_list[i]] << endl;
+	}
+	cout << "  DELETE #" << min_gid << endl;
+      }
     }
-    locked[min_gid] = true;
-    ++ count;
+    else {
+      // 変更を破棄する．
+      for (ymuint j = i + 1; j < ng; ++ j) {
+	ymuint gid = tmp_group_list[j];
+	fgmgr.delete_group(gid);
+      }
+    }
   }
+
+  // group_list から削除されたグループをを除く．
+  ymuint wpos = 0;
+  for (ymuint rpos = 0; rpos < ng; ++ rpos) {
+    ymuint gid = group_list[rpos];
+    if ( !deleted[gid] ) {
+      if ( wpos != rpos ) {
+	group_list[wpos] = gid;
+      }
+      ++ wpos;
+    }
+  }
+  group_list.erase(group_list.begin() + wpos, group_list.end());
 
   local_timer.stop();
   if ( mVerbose > 0 ) {
@@ -404,53 +387,17 @@ Compactor::phase2(FgMgr& fgmgr,
   ymuint max_group_id = fgmgr.group_num();
   ymuint ng = group_list.size();
 
+  // 要素数の昇順に並べる．
+  vector<ymuint> tmp_group_list = group_list;
+  sort(tmp_group_list.begin(), tmp_group_list.end(), GroupLt(fgmgr));
+
   HashSet<ymuint> fault_lock;
-  ymuint count = 0;
-  vector<bool> locked(max_group_id, false);
-  for ( ; ; ) {
-    ymuint min_pos = 0;
-    ymuint min_gid = max_group_id;
-    ymuint min_size = 0;
-
-#if 1
-    // 要素数が最小のグループを求める．
-    for (ymuint i = 0; i < ng; ++ i) {
-      ymuint gid = group_list[i];
-      if ( locked[gid] ) {
-	continue;
-      }
-
-      ymuint size = fgmgr.fault_num(gid);
-      if ( min_size == 0 || min_size > size ) {
-	min_size = size;
-	min_pos = i;
-	min_gid = gid;
-      }
-    }
-#else
-    // 要素数が最大のグループを求める．
-    for (ymuint i = 0; i < ng; ++ i) {
-      ymuint gid = group_list[i];
-      if ( locked[gid] ) {
-	continue;
-      }
-
-      ymuint size = fgmgr.fault_num(gid);
-      if ( min_size == 0 || min_size < size ) {
-	min_size = size;
-	min_pos = i;
-	min_gid = gid;
-      }
-    }
-#endif
-    if ( min_gid == max_group_id ) {
-      // すべてのグループが調査済みだった．
-      break;
-    }
+  for (ymuint i = 0; i < ng; ++ i) {
+    ymuint min_gid = tmp_group_list[i];
 
     if ( mVerbose > 1 ) {
       cout << "\r"
-	   << setw(4) << count << " / " << setw(4) << ng;
+	   << setw(4) << i << " / " << setw(4) << ng;
       cout.flush();
     }
 
@@ -458,24 +405,21 @@ Compactor::phase2(FgMgr& fgmgr,
     ymuint nf = fgmgr.fault_num(min_gid);
     vector<ymuint> del_fid_list;
     del_fid_list.reserve(nf);
-    for (ymuint i = 0; i < nf; ++ i) {
-      ymuint fid = fgmgr.fault_id(min_gid, i);
+    for (ymuint fpos = 0; fpos < nf; ++ fpos) {
+      ymuint fid = fgmgr.fault_id(min_gid, fpos);
       if ( fault_lock.check(fid) ) {
 	continue;
       }
       fault_lock.add(fid);
 
-      vector<ymuint> tmp_group_list;
-      tmp_group_list.reserve(ng - 1);
-      for (ymuint i = 0; i < ng; ++ i) {
-	ymuint gid = group_list[i];
-	if ( gid != min_gid && !locked[gid] ) {
-	  tmp_group_list.push_back(gid);
-	}
+      vector<ymuint> tmp_group_list1;
+      tmp_group_list.reserve(ng - i - 1);
+      for (ymuint j = i + 1; j < ng; ++ j) {
+	ymuint gid = tmp_group_list[j];
+	tmp_group_list1.push_back(gid);
       }
-      sort(tmp_group_list.begin(), tmp_group_list.end(), GroupLt(fgmgr));
 
-      ymuint gid = fgmgr.find_group(fid, tmp_group_list);
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list1, mFast);
       if ( gid != fgmgr.group_num() ) {
 	fgmgr.add_fault(gid, fid);
 	del_fid_list.push_back(fid);
@@ -484,8 +428,6 @@ Compactor::phase2(FgMgr& fgmgr,
     if ( !del_fid_list.empty() ) {
       fgmgr.delete_faults(min_gid, del_fid_list);
     }
-    locked[min_gid] = true;
-    ++ count;
   }
 
   local_timer.stop();

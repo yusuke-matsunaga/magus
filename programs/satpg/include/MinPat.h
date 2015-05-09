@@ -40,6 +40,7 @@ public:
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   /// @param[in] exact 故障グループの両立性判定を厳密に行うときに true とする．
   /// @param[in] compaction 最後に圧縮を行うときに true とする．
+  /// @param[in] fast_compaction 最後に高速圧縮を行うときに true とする．
   /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
@@ -49,6 +50,7 @@ public:
       Fsim& fsim2,
       bool exact,
       bool compaction,
+      bool fast_compaction,
       vector<TestVector*>& tv_list,
       USTime& time) = 0;
 
@@ -56,11 +58,6 @@ public:
   virtual
   void
   set_verbose(int verbose) = 0;
-
-  /// @brief dom_method を指定する．
-  virtual
-  void
-  set_dom_method(ymuint dom_method) = 0;
 
 };
 

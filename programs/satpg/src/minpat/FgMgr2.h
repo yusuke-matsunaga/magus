@@ -60,6 +60,7 @@ public:
   /// @brief 追加できる既存グループを見つける．
   /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
+  /// @param[in] fast 高速ヒューリスティック
   /// @param[in] first_hit 最初のグループのみを求めるとき true にするフラグ
   /// @param[out] gid_list 対象のグループ番号を収めるリスト
   /// @return 最初のグループ番号を返す．
@@ -70,6 +71,7 @@ public:
   ymuint
   find_group(ymuint fid,
 	     const vector<ymuint>& group_list,
+	     bool fast,
 	     bool first_hit,
 	     vector<ymuint>& gid_list);
 
