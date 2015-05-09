@@ -20,6 +20,32 @@
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
+// クラス FgMgr
+//////////////////////////////////////////////////////////////////////
+
+// @brief 故障グループのリストを出力する．
+// @param[in] s 出力先のストリーム
+// @param[in] group_list グループ番号のリスト
+void
+FgMgr::print_group_list(ostream& s,
+			const vector<ymuint>& group_list) const
+{
+  ymuint ng = group_list.size();
+  for (ymuint i = 0; i < ng; ++ i) {
+    ymuint gid = group_list[i];
+    s << setw(4) << i << ": Group#" << gid;
+    ymuint nf = fault_num(gid);
+    for (ymuint j = 0; j < nf; ++ j) {
+      ymuint fid = fault_id(gid, j);
+      s << " " << fid;
+    }
+    s << endl;
+  }
+  s << endl;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // クラス FgMgrBase
 //////////////////////////////////////////////////////////////////////
 

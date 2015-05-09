@@ -174,6 +174,13 @@ public:
   const NodeValList&
   pi_sufficient_assignment(ymuint gid) const = 0;
 
+  /// @brief 故障グループのリストを出力する．
+  /// @param[in] s 出力先のストリーム
+  /// @param[in] group_list グループ番号のリスト
+  void
+  print_group_list(ostream& s,
+		   const vector<ymuint>& group_list) const;
+
 };
 
 
