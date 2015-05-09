@@ -79,6 +79,9 @@ private:
   // mc-compaction オプションの解析用オブジェクト
   TclPopt* mPoptMcCompaction;
 
+  // thval オプションの解析用オブジェクト
+  TclPoptInt* mPoptThVal;
+
   // rep-faults オプションの解析用オブジェクト
   TclPopt* mPoptRepFaults;
 

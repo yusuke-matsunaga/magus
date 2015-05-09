@@ -46,7 +46,9 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
   mPoptFastCompaction = new TclPopt(this, "fast-compaction",
 				    "do fast compaction");
   mPoptMcCompaction = new TclPopt(this, "mc-compaction",
-				    "do mincov compaction");
+				  "do mincov compaction");
+  mPoptThVal = new TclPoptInt(this, "thval",
+			      "specify threshold value");
   mPoptRepFaults = new TclPopt(this, "rep-faults",
 			       "get representative faults");
 }
@@ -78,6 +80,8 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool compaction = mPoptCompaction->is_specified();
   bool fast_compaction = mPoptFastCompaction->is_specified();
   bool mc_compaction = mPoptMcCompaction->is_specified();
+  bool has_thval = mPoptThVal->is_specified();
+  ymuint thval = mPoptThVal->val();
   bool rep_faults = mPoptRepFaults->is_specified();
 
   MinPat* minpat = NULL;
@@ -101,7 +105,9 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   minpat->set_verbose(verbose);
 
   USTime time;
-  minpat->run(_network(), _tv_mgr(),  _fsim(), _fsim3(), exact, compaction, fast_compaction, mc_compaction, _tv_list(), time);
+  minpat->run(_network(), _tv_mgr(),  _fsim(), _fsim3(),
+	      exact, compaction, fast_compaction, mc_compaction, has_thval, thval,
+	      _tv_list(), time);
 
   delete minpat;
 

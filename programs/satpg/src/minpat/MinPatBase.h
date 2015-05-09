@@ -61,6 +61,8 @@ public:
       bool compaction,
       bool fast_compaction,
       bool mc_compaction,
+      bool has_thval,
+      ymuint thval,
       vector<TestVector*>& tv_list,
       USTime& time);
 

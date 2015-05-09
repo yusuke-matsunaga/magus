@@ -58,6 +58,10 @@ public:
   void
   set_print_detail(bool flag);
 
+  /// @brief しきい値を設定する．
+  void
+  set_thval(ymuint val);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -108,6 +112,9 @@ private:
 
   // print_detail フラグ
   bool mPrintDetail;
+
+  // しきい値
+  ymuint mThVal;
 
 };
 

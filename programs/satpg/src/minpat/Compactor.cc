@@ -48,6 +48,7 @@ Compactor::Compactor()
   mVerbose = 0;
   mFast = false;
   mPrintDetail = false;
+  mThVal = UINT_MAX;
 }
 
 // @brief デストラクタ
@@ -68,6 +69,13 @@ void
 Compactor::set_print_detail(bool flag)
 {
   mPrintDetail = flag;
+}
+
+// @brief しきい値を設定する．
+void
+Compactor::set_thval(ymuint val)
+{
+  mThVal = val;
 }
 
 // @brief 故障グループを圧縮する．
@@ -294,7 +302,9 @@ Compactor::phase1(FgMgr& fgmgr,
     ymuint min_gid = group_list[i];
     bool red = true;
     ymuint nf = fgmgr.fault_num(min_gid);
-
+    if ( nf > mThVal ) {
+      continue;
+    }
     vector<ymuint> move_list(nf);
     for (ymuint i = 0; i < nf; ++ i) {
       ymuint fid = fgmgr.fault_id(min_gid, i);
@@ -404,7 +414,9 @@ Compactor::phase2(FgMgr& fgmgr,
 
     // 可能な限り故障を他のグループに移動する．
     ymuint nf = fgmgr.fault_num(min_gid);
-
+    if ( nf > mThVal ) {
+      continue;
+    }
     vector<ymuint> del_fid_list;
     del_fid_list.reserve(nf);
     for (ymuint fpos = 0; fpos < nf; ++ fpos) {

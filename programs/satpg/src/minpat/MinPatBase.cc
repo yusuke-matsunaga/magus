@@ -61,6 +61,8 @@ MinPatBase::run(TpgNetwork& network,
 		bool compaction,
 		bool fast_compaction,
 		bool mc_compaction,
+		bool has_thval,
+		ymuint thval,
 		vector<TestVector*>& tv_list,
 		USTime& time)
 {
@@ -159,6 +161,10 @@ MinPatBase::run(TpgNetwork& network,
 
     Compactor compactor;
     compactor.set_verbose(verbose());
+
+    if ( has_thval ) {
+      compactor.set_thval(thval);
+    }
 
     vector<ymuint> new_group_list;
     compactor.run(fgmgr, mMaxNodeId, group_list, fast_compaction, new_group_list);
