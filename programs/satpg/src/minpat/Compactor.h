@@ -86,6 +86,22 @@ private:
   phase1(FgMgr& fgmgr,
 	 vector<ymuint>& group_list);
 
+  /// @brief 故障グループが削除できるか調べる．
+  /// @param[in] fmgr 故障グループマネージャ
+  /// @param[in] gid 対象のグループ番号
+  /// @param[in] group_list グループ番号のリスト
+  /// @param[in] deleted 削除済みフラグの配列
+  /// @return 削除できたら true を返す．
+  ///
+  /// 削除が成功した場合，gid に含まれていた故障は
+  /// 他のグループに移動される．
+  bool
+  remove_group(FgMgr& fgmgr,
+	       ymuint gid,
+	       const vector<ymuint>& group_list,
+	       ymuint count,
+	       const vector<bool>& deleted);
+
   /// @brief phase-2
   /// @param[in] fmgr 故障グループマネージャ
   /// @param[inout] group_list 選択されたグループ番号のリスト
