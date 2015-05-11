@@ -102,6 +102,31 @@ MinPatBase::run(TpgNetwork& network,
 
   init(fid_list, tvmgr, fsim2);
 
+  if ( false ) {
+    vector<ymuint> dom_fid_list = this->fid_list();
+    sort(dom_fid_list.begin(), dom_fid_list.end());
+    for (ymuint i = 0; i < dom_fid_list.size(); ++ i) {
+      ymuint fid = dom_fid_list[i];
+      const FaultInfo& fi = mAnalyzer.fault_info(fid);
+      vector<ymuint> eq_list = fi.eq_list();
+      vector<ymuint> dom_list = fi.dom_list();
+      sort(eq_list.begin(), eq_list.end());
+      sort(dom_list.begin(), dom_list.end());
+      cout << fid << endl
+	   << " EQ:  ";
+      for (ymuint j = 0; j < eq_list.size(); ++ j) {
+	cout << " " << eq_list[j];
+      }
+      cout << endl;
+      cout << " DOM: ";
+      for (ymuint j = 0; j < dom_list.size(); ++ j) {
+	cout << " " << dom_list[j];
+      }
+      cout << endl
+	   << endl;
+    }
+  }
+
   StopWatch local_timer;
   local_timer.start();
 

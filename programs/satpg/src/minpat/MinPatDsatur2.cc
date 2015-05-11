@@ -57,20 +57,20 @@ MinPatDsatur2::init(const vector<ymuint>& fid_list,
   }
 
   // 支配故障のリスト
-  vector<ymuint> dom_fid_list;
   {
+    mDomFidList.clear();
     DomChecker checker(analyzer(), tvmgr, fsim2);
-    checker.get_dom_faults(rep_fid_list, dom_fid_list);
+    checker.get_dom_faults(rep_fid_list, mDomFidList);
   }
 
   ConflictChecker checker2(analyzer(), tvmgr, fsim2);
-  checker2.analyze_conflict(dom_fid_list);
+  checker2.analyze_conflict(mDomFidList);
 
-  ymuint nf = dom_fid_list.size();
+  ymuint nf = mDomFidList.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    ymuint fid = dom_fid_list[i];
+    ymuint fid = mDomFidList[i];
     if ( max_fault_id < fid ) {
       max_fault_id = fid;
     }
@@ -83,7 +83,7 @@ MinPatDsatur2::init(const vector<ymuint>& fid_list,
   mFaultMap.resize(max_fault_id);
 
   for (ymuint i = 0; i < nf; ++ i) {
-    ymuint fid = dom_fid_list[i];
+    ymuint fid = mDomFidList[i];
     FaultStruct& fs = mFaultStructList[i];
     fs.mFaultId = fid;
     fs.mSelected = false;
@@ -102,6 +102,13 @@ ymuint
 MinPatDsatur2::fault_num()
 {
   return mFaultNum;
+}
+
+// @brief 故障番号のリストを返す．
+const vector<ymuint>&
+MinPatDsatur2::fid_list()
+{
+  return mDomFidList;
 }
 
 // @brief 最初の故障を選ぶ．

@@ -100,6 +100,16 @@ public:
   const NodeSet&
   node_set(ymuint fid) const;
 
+  /// @brief 等価故障を記録する．
+  void
+  add_eq_fault(ymuint fid1,
+	       ymuint fid2);
+
+  /// @brief 支配故障を記録する．
+  void
+  add_dom_fault(ymuint fid1,
+		ymuint fid2);
+
   /// @brief 故障の等価性をチェックする．
   /// @param[in] f1_id, f2_id 対象の故障番号
   /// @retval true f1_id と f2_id が等価だった．

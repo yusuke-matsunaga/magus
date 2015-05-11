@@ -395,6 +395,25 @@ FaultAnalyzer::node_set(ymuint fid) const
   return mNodeSetArray[fault->node()->id()];
 }
 
+// @brief 等価故障を記録する．
+void
+FaultAnalyzer::add_eq_fault(ymuint fid1,
+			    ymuint fid2)
+{
+  mFaultInfoArray[fid1].mEqList.push_back(fid2);
+}
+
+// @brief 支配故障を記録する．
+void
+FaultAnalyzer::add_dom_fault(ymuint fid1,
+			     ymuint fid2)
+{
+  FaultInfo& fi1 = mFaultInfoArray[fid1];
+  FaultInfo& fi2 = mFaultInfoArray[fid2];
+  fi1.mDomList.push_back(fid2);
+  fi1.mDomList.insert(fi1.mDomList.end(), fi2.mDomList.begin(), fi2.mDomList.end());
+}
+
 // @brief 故障の等価性をチェックする．
 // @param[in] f1_id, f2_id 対象の故障
 // @retval true f1_id と f2_id が等価だった．

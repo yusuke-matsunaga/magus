@@ -96,6 +96,11 @@ protected:
   ymuint
   fault_num() = 0;
 
+  /// @brief 故障番号のリストを返す．
+  virtual
+  const vector<ymuint>&
+  fid_list() = 0;
+
   /// @brief 最初の故障を選ぶ．
   virtual
   ymuint

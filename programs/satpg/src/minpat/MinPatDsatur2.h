@@ -56,6 +56,11 @@ private:
   ymuint
   fault_num();
 
+  /// @brief 故障番号のリストを返す．
+  virtual
+  const vector<ymuint>&
+  fid_list();
+
   /// @brief 最初の故障を選ぶ．
   virtual
   ymuint
@@ -123,6 +128,9 @@ private:
 
   // 故障数
   ymuint mFaultNum;
+
+  // 支配故障のリスト
+  vector<ymuint> mDomFidList;
 
   // 未処理の故障数
   ymuint mRemainNum;

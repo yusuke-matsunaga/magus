@@ -58,7 +58,8 @@ MinPatNaive::set_fid_list(const vector<ymuint>& src_list)
   mFidList.clear();
   mFidList.resize(nf);
   for (ymuint i = 0; i < nf; ++ i) {
-    mFidList[i] = src_list[i];
+    ymuint fid = src_list[i];
+    mFidList[i] = fid;
   }
 }
 
@@ -67,6 +68,13 @@ ymuint
 MinPatNaive::fault_num()
 {
   return mFidList.size();
+}
+
+// @brief 故障番号のリストを返す．
+const vector<ymuint>&
+MinPatNaive::fid_list()
+{
+  return mFidList;
 }
 
 // @brief 最初の故障を選ぶ．

@@ -173,6 +173,7 @@ EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
 	  // f1 と f2 が等価だった．
 	  // f2 は以降スキップする．
 	  mark[f2_id] = true;
+	  mAnalyzer.add_eq_fault(f1_id, f2_id);
 	  ++ n_success;
 	}
       }

@@ -61,15 +61,15 @@ MinPatDsatur::init(const vector<ymuint>& fid_list,
     checker.get_rep_faults(fid_list, rep_fid_list);
   }
 
-  vector<ymuint> dom_fid_list;
+  mDomFidList.clear();
   DomChecker checker(analyzer(), tvmgr, fsim2);
-  checker.get_dom_faults(rep_fid_list, dom_fid_list);
+  checker.get_dom_faults(rep_fid_list, mDomFidList);
 
-  ymuint nf = dom_fid_list.size();
+  ymuint nf = mDomFidList.size();
 
   ymuint max_fault_id = 0;
   for (ymuint i = 0; i < nf; ++ i) {
-    ymuint fid = dom_fid_list[i];
+    ymuint fid = mDomFidList[i];
     if ( max_fault_id < fid ) {
       max_fault_id = fid;;
     }
@@ -83,7 +83,7 @@ MinPatDsatur::init(const vector<ymuint>& fid_list,
 
   for (ymuint i = 0; i < nf; ++ i) {
     FaultStruct& fs = mFaultStructList[i];
-    ymuint fid = dom_fid_list[i];
+    ymuint fid = mDomFidList[i];
     fs.mFaultId = fid;
     fs.mPatNum = checker.det_count(fid);
     fs.mSelected = false;
@@ -106,6 +106,13 @@ ymuint
 MinPatDsatur::fault_num()
 {
   return mFaultNum;
+}
+
+// @brief 故障番号のリストを返す．
+const vector<ymuint>&
+MinPatDsatur::fid_list()
+{
+  return mDomFidList;
 }
 
 // @brief 最初の故障を選ぶ．

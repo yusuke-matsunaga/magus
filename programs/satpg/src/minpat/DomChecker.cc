@@ -550,6 +550,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 	  cout << "DOM(2) " << f1_id << " " << f2_id << endl;
 	}
 	mDomFlag[f1_id] = true;
+	mAnalyzer.add_dom_fault(f2_id, f1_id);
 	++ stats.mSingleDom;
 	-- cur_num;
 	if ( verify_dom_check ) {
@@ -569,6 +570,7 @@ DomChecker::get_dom_faults1(const vector<ymuint>& src_list,
 	  cout << "DOM(3) " << f1_id << " " << f2_id << endl;
 	}
 	mDomFlag[f1_id] = true;
+	mAnalyzer.add_dom_fault(f2_id, f1_id);
 	++ stats.mDom;
 	-- cur_num;
 	break;
