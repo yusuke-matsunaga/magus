@@ -10,6 +10,7 @@
 
 
 #include "FgMgrBase.h"
+#include "YmUtils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -99,6 +100,10 @@ public:
   ymuint
   check_count() const;
 
+  /// @brief チェック時間
+  USTime
+  check_time() const;
+
   /// @brief 成功回数
   ymuint
   found_count() const;
@@ -128,6 +133,8 @@ private:
   ymuint mCheckCount;
 
   ymuint mFoundCount;
+
+  USTime mCheckTime;
 
 };
 

@@ -177,7 +177,15 @@ MinPatBase::run(TpgNetwork& network,
     }
     cout << " # of fault groups = " << setw(4) << group_list.size() << endl;
     cout << "CPU time (coloring)              " << local_timer.time() << endl;
+    cout << "Total   " << setw(8) << fgmgr.mfault_num() << " exact compatibility check" << endl
+	 << "Total   " << setw(8) << fgmgr.check_count() << " SAT checks" << endl
+	 << "        " << setw(8) << fgmgr.found_count() << "  success" << endl
+	 << "        " << fgmgr.check_time() << " CPU time for SAT checks" << endl
+	 << "Avarage " << setw(8) << fgmgr.mfault_avg() << " faults per check" << endl
+	 << "Max     " << setw(8) << fgmgr.mfault_max() << " faults" << endl;
   }
+
+  fgmgr.clear_count();
 
   if ( compaction || fast_compaction ) {
     // 後処理
@@ -200,11 +208,6 @@ MinPatBase::run(TpgNetwork& network,
       cout << " # of fault groups = " << setw(4) << group_list.size() << endl;
       cout << "CPU time (compaction)              " << local_timer.time() << endl;
     }
-  }
-  else if ( mc_compaction ) {
-    // 後処理
-    local_timer.reset();
-    local_timer.start();
   }
 
   // テストパタンを作る．
@@ -250,6 +253,7 @@ MinPatBase::run(TpgNetwork& network,
     cout << "Total   " << setw(8) << fgmgr.mfault_num() << " exact compatibility check" << endl
 	 << "Total   " << setw(8) << fgmgr.check_count() << " SAT checks" << endl
 	 << "        " << setw(8) << fgmgr.found_count() << "  success" << endl
+	 << "        " << fgmgr.check_time() << " CPU time for SAT checks" << endl
 	 << "Avarage " << setw(8) << fgmgr.mfault_avg() << " faults per check" << endl
 	 << "Max     " << setw(8) << fgmgr.mfault_max() << " faults" << endl;
   }

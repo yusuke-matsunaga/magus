@@ -11,6 +11,7 @@
 
 #include "FgMgr.h"
 #include "NodeValList.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -158,6 +159,31 @@ protected:
   FaultGroup*
   fault_group(ymuint gid);
 
+  /// @brief 故障グループを返す．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  const FaultGroup*
+  fault_group(ymuint gid) const;
+
+  /// @brief 両立キャッシュに登録する．
+  void
+  add_compat_cache(ymuint gid,
+		   ymuint fid);
+
+  /// @brief 両立キャッシュを調べる．
+  bool
+  check_compat_cache(ymuint gid,
+		     ymuint fid);
+
+  /// @brief 衝突キャッシュに登録する
+  void
+  add_conflict_cache(ymuint gid,
+		     ymuint fid);
+
+  /// @brief 衝突キャッシュを調べる．
+  bool
+  check_conflict_cache(ymuint gid,
+		       ymuint fid);
+
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -209,6 +235,22 @@ protected:
     /// @brief 外部入力上の十分割当を返す．
     const NodeValList&
     pi_sufficient_assignment() const;
+
+    /// @brief 両立キャッシュに登録する．
+    void
+    add_compat_cache(ymuint fid);
+
+    /// @brief 両立キャッシュを調べる．
+    bool
+    check_compat_cache(ymuint fid) const;
+
+    /// @brief 衝突キャッシュに登録する．
+    void
+    add_conflict_cache(ymuint fid);
+
+    /// @brief 衝突キャッシュを調べる．
+    bool
+    check_conflict_cache(ymuint fid) const;
 
     /// @brief ID番号以外の内容をコピーする
     void
@@ -291,6 +333,12 @@ protected:
 
     // 外部入力の十分割当リスト
     NodeValList mPiSufList;
+
+    // 両立する故障の集合
+    HashSet<ymuint> mCompatCache;
+
+    // 衝突する故障の集合
+    HashSet<ymuint> mConflictCache;
 
   };
 

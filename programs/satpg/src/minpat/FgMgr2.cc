@@ -13,6 +13,7 @@
 #include "FvalCnf.h"
 #include "SatEngine.h"
 #include "FaultInfo.h"
+#include "YmUtils/StopWatch.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
@@ -93,6 +94,9 @@ FgMgr2::find_group(ymuint fid0,
 		   bool first_hit,
 		   vector<ymuint>& gid_list)
 {
+  StopWatch local_timer;
+  local_timer.start();
+
   ymuint first_gid = group_num();
 
   const FaultInfo& fi0 = fault_info(fid0);
@@ -113,9 +117,24 @@ FgMgr2::find_group(ymuint fid0,
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
 
+    if ( check_compat_cache(gid, fid0) ) {
+      if ( first_gid == group_num() ) {
+	first_gid = gid;
+	if ( first_hit ) {
+	  break;
+	}
+      }
+      gid_list.push_back(gid);
+      continue;
+    }
+    if ( check_conflict_cache(gid, fid0) ) {
+      continue;
+    }
+
     { // グループの十分割当が成り立っていたら両立している．
       const NodeValList& suf_list1 = sufficient_assignment(gid);
       if ( engine0.check_sat(gval_cnf0, suf_list1) == kB3True ) {
+	add_compat_cache(gid, fid0);
 	if ( first_gid == group_num() ) {
 	  first_gid = gid;
 	  if ( first_hit ) {
@@ -133,6 +152,7 @@ FgMgr2::find_group(ymuint fid0,
     { // グループの必要割当が成り立たなかったら衝突している．
       const NodeValList& ma_list1 = mandatory_assignment(gid);
       if ( engine0.check_sat(gval_cnf0, ma_list1) == kB3False ) {
+	add_conflict_cache(gid, fid0);
 	continue;
       }
     }
@@ -176,6 +196,7 @@ FgMgr2::find_group(ymuint fid0,
     ++ mMnum;
 
     if ( engine.check_sat() == kB3True ) {
+      add_compat_cache(gid, fid0);
       ++ mFoundCount;
       if ( first_gid == group_num() ) {
 	first_gid = gid;
@@ -185,7 +206,14 @@ FgMgr2::find_group(ymuint fid0,
       }
       gid_list.push_back(gid);
     }
+    else {
+      add_conflict_cache(gid, fid0);
+    }
   }
+
+  local_timer.stop();
+  mCheckTime += local_timer.time();
+
   return first_gid;
 }
 
@@ -298,6 +326,13 @@ FgMgr2::check_count() const
   return mCheckCount;
 }
 
+// @brief チェック時間
+USTime
+FgMgr2::check_time() const
+{
+  return mCheckTime;
+}
+
 // @brief 成功回数
 ymuint
 FgMgr2::found_count() const
@@ -314,6 +349,7 @@ FgMgr2::clear_count()
   mFmax = 0;
   mCheckCount = 0;
   mFoundCount = 0;
+  mCheckTime.set(0.0, 0.0, 0.0);
 }
 
 END_NAMESPACE_YM_SATPG

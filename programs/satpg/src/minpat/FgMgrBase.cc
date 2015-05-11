@@ -16,6 +16,8 @@
 #include "FaultAnalyzer.h"
 #include "YmUtils/HashSet.h"
 
+#define USE_CACHE 1
+
 
 BEGIN_NAMESPACE_YM_SATPG
 
@@ -142,9 +144,7 @@ FgMgrBase::replace_group(ymuint old_gid,
 void
 FgMgrBase::delete_group(ymuint gid)
 {
-  ASSERT_COND( gid < mGroupList.size() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  FaultGroup* fg = fault_group(gid);
   delete fg;
   mGroupList[gid] = NULL;
 }
@@ -156,9 +156,7 @@ void
 FgMgrBase::delete_faults(ymuint gid,
 			 const vector<ymuint>& fid_list)
 {
-  ASSERT_COND( gid < group_num() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  FaultGroup* fg = fault_group(gid);
   fg->delete_faults(fid_list);
 }
 
@@ -167,9 +165,7 @@ FgMgrBase::delete_faults(ymuint gid,
 ymuint
 FgMgrBase::fault_num(ymuint gid) const
 {
-  ASSERT_COND( gid < group_num() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  const FaultGroup* fg = fault_group(gid);
   return fg->fault_num();
 }
 
@@ -180,9 +176,7 @@ ymuint
 FgMgrBase::fault_id(ymuint gid,
 		    ymuint pos) const
 {
-  ASSERT_COND( gid < group_num() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  const FaultGroup* fg = fault_group(gid);
   return fg->fault_id(pos);
 }
 
@@ -191,9 +185,7 @@ FgMgrBase::fault_id(ymuint gid,
 const NodeValList&
 FgMgrBase::sufficient_assignment(ymuint gid) const
 {
-  ASSERT_COND( gid < group_num() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  const FaultGroup* fg = fault_group(gid);
   return fg->sufficient_assignment();
 }
 
@@ -202,9 +194,7 @@ FgMgrBase::sufficient_assignment(ymuint gid) const
 const NodeValList&
 FgMgrBase::mandatory_assignment(ymuint gid) const
 {
-  ASSERT_COND( gid < group_num() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  const FaultGroup* fg = fault_group(gid);
   return fg->mandatory_assignment();
 }
 
@@ -213,9 +203,7 @@ FgMgrBase::mandatory_assignment(ymuint gid) const
 const NodeValList&
 FgMgrBase::pi_sufficient_assignment(ymuint gid) const
 {
-  ASSERT_COND( gid < group_num() );
-  FaultGroup* fg = mGroupList[gid];
-  ASSERT_COND( fg != NULL );
+  const FaultGroup* fg = fault_group(gid);
   return fg->pi_sufficient_assignment();
 }
 
@@ -256,7 +244,56 @@ FgMgrBase::FaultGroup*
 FgMgrBase::fault_group(ymuint gid)
 {
   ASSERT_COND( gid < group_num() );
-  return mGroupList[gid];
+  FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
+  return fg;
+}
+
+// @brief 故障グループを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+const FgMgrBase::FaultGroup*
+FgMgrBase::fault_group(ymuint gid) const
+{
+  ASSERT_COND( gid < group_num() );
+  const FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
+  return fg;
+}
+
+// @brief 両立キャッシュに登録する．
+void
+FgMgrBase::add_compat_cache(ymuint gid,
+			    ymuint fid)
+{
+  FaultGroup* fg = fault_group(gid);
+  fg->add_compat_cache(fid);
+}
+
+// @brief 両立キャッシュを調べる．
+bool
+FgMgrBase::check_compat_cache(ymuint gid,
+			      ymuint fid)
+{
+  FaultGroup* fg = fault_group(gid);
+  return fg->check_compat_cache(fid);
+}
+
+// @brief 衝突キャッシュに登録する
+void
+FgMgrBase::add_conflict_cache(ymuint gid,
+			      ymuint fid)
+{
+  FaultGroup* fg = fault_group(gid);
+  fg->add_conflict_cache(fid);
+}
+
+// @brief 衝突キャッシュを調べる．
+bool
+FgMgrBase::check_conflict_cache(ymuint gid,
+				ymuint fid)
+{
+  FaultGroup* fg = fault_group(gid);
+  return fg->check_conflict_cache(fid);
 }
 
 
@@ -327,6 +364,46 @@ FgMgrBase::FaultGroup::pi_sufficient_assignment() const
   return mPiSufList;
 }
 
+// @brief 両立キャッシュに登録する．
+void
+FgMgrBase::FaultGroup::add_compat_cache(ymuint fid)
+{
+#if defined(USE_CACHE)
+  mCompatCache.add(fid);
+#endif
+}
+
+// @brief 両立キャッシュを調べる．
+bool
+FgMgrBase::FaultGroup::check_compat_cache(ymuint fid) const
+{
+#if defined(USE_CACHE)
+  return mCompatCache.check(fid);
+#else
+  return false;
+#endif
+}
+
+// @brief 衝突キャッシュに登録する．
+void
+FgMgrBase::FaultGroup::add_conflict_cache(ymuint fid)
+{
+#if defined(USE_CACHE)
+  mConflictCache.add(fid);
+#endif
+}
+
+// @brief 衝突キャッシュを調べる．
+bool
+FgMgrBase::FaultGroup::check_conflict_cache(ymuint fid) const
+{
+#if defined(USE_CACHE)
+  return mConflictCache.check(fid);
+#else
+  return false;
+#endif
+}
+
 // @brief ID番号以外の内容をコピーする
 void
 FgMgrBase::FaultGroup::copy(const FaultGroup& dst)
@@ -356,6 +433,7 @@ FgMgrBase::FaultGroup::add_fault(ymuint fid,
   mSufList.merge(suf_list);
   mMaList.merge(ma_list);
   mPiSufList.merge(pi_suf_list);
+  mCompatCache.clear();
 }
 
 // @brief 故障を削除する．
@@ -382,6 +460,8 @@ FgMgrBase::FaultGroup::delete_faults(const vector<ymuint>& fid_list)
     ++ wpos;
   }
   mFaultDataList.erase(mFaultDataList.begin() + wpos, mFaultDataList.end());
+
+  mConflictCache.clear();
 
   update();
 }
