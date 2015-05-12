@@ -217,6 +217,159 @@ FgMgr2::find_group(ymuint fid0,
   return first_gid;
 }
 
+// @brief 追加できる既存グループを見つけて追加する．
+// @param[in] fid 対象の故障番号
+// @param[in] group_list 探索最小のグループ番号のリスト
+// @param[in] fast 高速ヒューリスティック
+// @retval true 追加できた．
+// @retval false 追加できなかった．
+bool
+FgMgr2::find_group2(ymuint fid0,
+		    const vector<ymuint>& group_list,
+		    bool fast)
+{
+  StopWatch local_timer;
+  local_timer.start();
+
+  const FaultInfo& fi0 = fault_info(fid0);
+
+  SatEngine engine0(string(), string(), NULL);
+  GvalCnf gval_cnf0(max_node_id());
+
+  // fi0 の必要割当を追加
+  const NodeValList ma_list0 = fi0.mandatory_assignment();
+  engine0.add_assignments(gval_cnf0, ma_list0);
+
+  FvalCnf fval_cnf0(max_node_id(), gval_cnf0);
+  if ( !fi0.single_cube() ) {
+    // fault を検出する CNF を生成
+    engine0.make_fval_cnf(fval_cnf0, fault(fid0), node_set(fid0), kVal1);
+  }
+
+  bool found = false;
+  for (ymuint i = 0; i < group_list.size(); ++ i) {
+    ymuint gid = group_list[i];
+
+    if ( check_conflict_cache(gid, fid0) ) {
+      continue;
+    }
+
+    { // グループの十分割当が成り立っていたら両立している．
+      const NodeValList& suf_list1 = sufficient_assignment(gid);
+      vector<Bool3> sat_model;
+      if ( engine0.check_sat(gval_cnf0, suf_list1, sat_model) == kB3True ) {
+	add_compat_cache(gid, fid0);
+
+	FaultGroup* fg = fault_group(gid);
+	if ( fi0.single_cube() ) {
+	  const NodeValList& pi_suf_list = fi0.pi_sufficient_assignment();
+	  fg->add_fault(fid0, ma_list0, ma_list0, pi_suf_list);
+	}
+	else {
+	  NodeValList suf_list;
+	  NodeValList pi_suf_list;
+	  fval_cnf0.get_pi_suf_list(sat_model, fault(fid0), node_set(fid0), suf_list, pi_suf_list);
+	  fg->add_fault(fid0, suf_list, ma_list0, pi_suf_list);
+	}
+	found = true;
+	break;
+      }
+    }
+    if ( fast ) {
+      continue;
+    }
+
+    { // グループの必要割当が成り立たなかったら衝突している．
+      const NodeValList& ma_list1 = mandatory_assignment(gid);
+      if ( engine0.check_sat(gval_cnf0, ma_list1) == kB3False ) {
+	add_conflict_cache(gid, fid0);
+	continue;
+      }
+    }
+
+    ++ mCheckCount;
+
+    // 簡易検査ではわからなかったので正式に調べる．
+    SatEngine engine(string(), string(), NULL);
+    GvalCnf gval_cnf(max_node_id());
+
+    // fid0 の必要割当を追加
+    engine.add_assignments(gval_cnf, ma_list0);
+    // グループの必要割当を追加
+    engine.add_assignments(gval_cnf, mandatory_assignment(gid));
+
+    ymuint fnum = 0;
+
+    FvalCnf fval_cnf0(max_node_id(), gval_cnf);
+    if ( !fi0.single_cube() ) {
+      // fid0 を検出する条件を追加
+      engine.make_fval_cnf(fval_cnf0, fault(fid0), node_set(fid0), kVal1);
+      ++ fnum;
+    }
+
+    ymuint nf = fault_num(gid);
+    vector<FvalCnf> fval_cnf_array(nf, FvalCnf(max_node_id(), gval_cnf));
+    for (ymuint i = 0; i < nf; ++ i) {
+      ymuint fid1 = fault_id(gid, i);
+      const FaultInfo& fi1 = fault_info(fid1);
+      if ( !fi1.single_cube() ) {
+	// fid1 の検出条件を生成
+	engine.make_fval_cnf(fval_cnf_array[i], fault(fid1), node_set(fid1), kVal1);
+	++ fnum;
+      }
+    }
+
+    mFsum += fnum;
+    if ( mFmax < fnum ) {
+      mFmax = fnum;
+    }
+    ++ mMnum;
+
+    vector<Bool3> sat_model;
+    if ( engine.check_sat(sat_model) == kB3True ) {
+      add_compat_cache(gid, fid0);
+      ++ mFoundCount;
+
+      FaultGroup* fg = fault_group(gid);
+
+      for (ymuint i = 0; i < nf; ++ i) {
+	ymuint fid1 = fg->fault_id(i);
+	const FaultInfo& fi1 = fault_info(fid1);
+	if ( !fi1.single_cube() ) {
+	  NodeValList suf_list;
+	  NodeValList pi_suf_list;
+	  fval_cnf_array[i].get_pi_suf_list(sat_model, fault(fid1), node_set(fid1),
+					    suf_list, pi_suf_list);
+	  fg->set_suf_list(i, suf_list, pi_suf_list);
+	}
+      }
+
+      fg->update();
+
+      if ( fi0.single_cube() ) {
+	const NodeValList& pi_suf_list = fi0.pi_sufficient_assignment();
+	fg->add_fault(fid0, ma_list0, ma_list0, pi_suf_list);
+      }
+      else {
+	NodeValList suf_list;
+	NodeValList pi_suf_list;
+	fval_cnf0.get_pi_suf_list(sat_model, fault(fid0), node_set(fid0), suf_list, pi_suf_list);
+	fg->add_fault(fid0, suf_list, ma_list0, pi_suf_list);
+      }
+      found = true;
+      break;
+    }
+    else {
+      add_conflict_cache(gid, fid0);
+    }
+  }
+
+  local_timer.stop();
+  mCheckTime += local_timer.time();
+
+  return found;
+}
+
 // @brief 既存のグループに故障を追加する．
 // @param[in] gid グループ番号 ( 0 <= gid < group_num() )
 // @param[in] fid0 故障番号

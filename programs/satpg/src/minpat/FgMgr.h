@@ -129,6 +129,18 @@ public:
 	     const vector<ymuint>& group_list,
 	     bool fast);
 
+  /// @brief 追加できる既存グループを見つけて追加する．
+  /// @param[in] fid 対象の故障番号
+  /// @param[in] group_list 探索最小のグループ番号のリスト
+  /// @param[in] fast 高速ヒューリスティック
+  /// @retval true 追加できた．
+  /// @retval false 追加できなかった．
+  virtual
+  bool
+  find_group2(ymuint fid,
+	      const vector<ymuint>& group_list,
+	      bool fast) = 0;
+
   /// @brief 既存のグループに故障を追加する．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   /// @param[in] fid 故障番号

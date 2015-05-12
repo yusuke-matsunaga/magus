@@ -157,6 +157,7 @@ MinPatBase::run(TpgNetwork& network,
     // 故障を選ぶ．
     ymuint fid = get_next_fault(fgmgr, group_list);
 
+#if 0
     // 故障を追加できるグループを見つける．
     ymuint gid = find_group(fgmgr, fid, group_list);
     if ( gid == fgmgr.group_num() ) {
@@ -168,6 +169,18 @@ MinPatBase::run(TpgNetwork& network,
 
     // 故障を追加する．
     fgmgr.add_fault(gid, fid);
+#else
+    // 故障を追加できるグループを見つける．
+    if ( !fgmgr.find_group2(fid, group_list, mFast) ) {
+      // 見つからなかった．
+      // 新たなグループを作る．
+      ymuint gid = fgmgr.new_group();
+      group_list.push_back(gid);
+
+      // 故障を追加する．
+      fgmgr.add_fault(gid, fid);
+    }
+#endif
   }
 
   local_timer.stop();
