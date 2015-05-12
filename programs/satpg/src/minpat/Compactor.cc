@@ -354,11 +354,16 @@ Compactor::remove_group(FgMgr& fgmgr,
 			ymuint count,
 			const vector<bool>& deleted)
 {
-  // 現在の情報を tmp_group_list にコピーしておく
-  vector<ymuint> tmp_group_list = group_list;
-
   // グループ数
   ymuint ng = group_list.size();
+
+  // 現在の情報を tmp_group_list にコピーしておく
+  vector<ymuint> tmp_group_list(ng);
+  for (ymuint i = 0; i < ng; ++ i) {
+    ymuint gid1 = group_list[i];
+    ymuint gid2 = fgmgr.duplicate_group(gid1);
+    tmp_group_list[i] = gid2;
+  }
 
   // gid のグループの故障を他のグループへ移動できるか調べる．
   bool red = true;
@@ -379,14 +384,16 @@ Compactor::remove_group(FgMgr& fgmgr,
     {
       cand_list.reserve(ng - 1);
       for (ymuint i = 0; i < ng; ++ i) {
-	ymuint gid1 = tmp_group_list[ng - i - 1];
+	ymuint gid1 = group_list[ng - i - 1];
+	ymuint gid2 = tmp_group_list[ng - i - 1];
 	if ( !deleted[gid1] && gid1 != gid0 ) {
-	  cand_list.push_back(gid1);
+	  cand_list.push_back(gid2);
 	}
       }
     }
 
     // fid を移動可能なグループを見つける．
+#if 0
     ymuint gid1 = fgmgr.find_group(fid, cand_list, mFast);
     if ( gid1 != fgmgr.group_num() ) {
       // 見つけた．
@@ -400,13 +407,7 @@ Compactor::remove_group(FgMgr& fgmgr,
       }
       ASSERT_COND( ipos < ng );
 
-      ymuint gid2 = gid1;
-      if ( group_list[ipos] == gid1 ) {
-	// 変更を加える前にコピーを作る．
-	gid2 = fgmgr.duplicate_group(gid1);
-	tmp_group_list[ipos] = gid2;
-      }
-      fgmgr.add_fault(gid2, fid);
+      fgmgr.add_fault(gid1, fid);
 
       if ( mPrintDetail ) {
 	move_list[fpos] = group_list[ipos];
@@ -418,6 +419,27 @@ Compactor::remove_group(FgMgr& fgmgr,
       red = false;
       break;
     }
+#else
+    ymuint gid1 = fgmgr.find_group2(fid, cand_list, mFast);
+    if ( gid1 != fgmgr.group_num() ) {
+      // 見つけた．
+      if ( mPrintDetail ) {
+	ymuint ipos = 0;
+	for (ipos = 0; ipos < ng; ++ ipos) {
+	  if ( tmp_group_list[ipos] == gid1 ) {
+	    break;
+	  }
+	}
+	move_list[fpos] = group_list[ipos];
+      }
+    }
+    else {
+      // 見つからなかった．
+      // このグループの処理は中止する．
+      red = false;
+      break;
+    }
+#endif
   }
   if ( red ) {
     // 変更を反映させる．
@@ -443,11 +465,8 @@ Compactor::remove_group(FgMgr& fgmgr,
   else {
     // 変更を破棄する．
     for (ymuint i = 0; i < ng; ++ i) {
-      ymuint gid1 = group_list[i];
       ymuint gid2 = tmp_group_list[i];
-      if ( gid1 != gid2 ) {
-	fgmgr.delete_group(gid2);
-      }
+      fgmgr.delete_group(gid2);
     }
   }
   return red;
@@ -510,6 +529,7 @@ Compactor::phase2(FgMgr& fgmgr,
 	cand_list.push_back(gid);
       }
 
+#if 0
       ymuint gid = fgmgr.find_group(fid, cand_list, mFast);
       if ( gid != fgmgr.group_num() ) {
 	fgmgr.add_fault(gid, fid);
@@ -522,6 +542,19 @@ Compactor::phase2(FgMgr& fgmgr,
 	       << "  to #" << gid << endl;
 	}
       }
+#else
+      ymuint gid = fgmgr.find_group2(fid, cand_list, mFast);
+      if ( gid != fgmgr.group_num() ) {
+	del_fid_list.push_back(fid);
+	if ( mPrintDetail ) {
+	  if ( mVerbose > 1 ) {
+	    cout << endl;
+	  }
+	  cout << "  MOVE " << fid << " from #" << min_gid
+	       << "  to #" << gid << endl;
+	}
+      }
+#endif
     }
     if ( !del_fid_list.empty() ) {
       fgmgr.delete_faults(min_gid, del_fid_list);

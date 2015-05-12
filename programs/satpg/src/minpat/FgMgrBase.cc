@@ -85,9 +85,37 @@ FgMgrBase::group_num() const
 }
 
 // @brief 新しいグループを作る．
+// @param[in] fid 故障番号
+// @return グループ番号を返す．
+//
+// fid のみを要素に持つ．
+ymuint
+FgMgrBase::new_group(ymuint fid)
+{
+  ymuint gid = _new_group();
+  add_fault(gid, fid);
+  return gid;
+}
+
+// @brief グループを複製する．
+// @param[in] src_gid 複製元のグループ番号
+// @return 新しいグループ番号を返す．
+ymuint
+FgMgrBase::duplicate_group(ymuint src_gid)
+{
+  ASSERT_COND( src_gid < mGroupList.size() );
+  FaultGroup* src_fg = mGroupList[src_gid];
+  ASSERT_COND( src_fg != NULL );
+  ymuint gid = _new_group();
+  FaultGroup* dst_fg = mGroupList[gid];
+  dst_fg->copy(*src_fg);
+  return gid;
+}
+
+// @brief 新しいグループを作る．
 // @return グループ番号を返す．
 ymuint
-FgMgrBase::new_group()
+FgMgrBase::_new_group()
 {
   FaultGroup* fg = NULL;
   for (ymuint i = 0; i < mGroupList.size(); ++ i) {
@@ -102,21 +130,7 @@ FgMgrBase::new_group()
     fg = new FaultGroup(id);
     mGroupList.push_back(fg);
   }
-  return fg->id();
-}
-
-// @brief グループを複製する．
-// @param[in] src_gid 複製元のグループ番号
-// @return 新しいグループ番号を返す．
-ymuint
-FgMgrBase::duplicate_group(ymuint src_gid)
-{
-  ASSERT_COND( src_gid < mGroupList.size() );
-  FaultGroup* src_fg = mGroupList[src_gid];
-  ASSERT_COND( src_fg != NULL );
-  ymuint gid = new_group();
-  FaultGroup* dst_fg = mGroupList[gid];
-  dst_fg->copy(*src_fg);
+  ymuint gid = fg->id();
   return gid;
 }
 

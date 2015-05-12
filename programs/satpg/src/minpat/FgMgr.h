@@ -45,10 +45,13 @@ public:
   group_num() const = 0;
 
   /// @brief 新しいグループを作る．
+  /// @param[in] fid 故障番号
   /// @return グループ番号を返す．
+  ///
+  /// fid のみを要素に持つ．
   virtual
   ymuint
-  new_group() = 0;
+  new_group(ymuint fid) = 0;
 
   /// @brief グループを複製する．
   /// @param[in] src_gid 複製元のグループ番号
@@ -133,21 +136,14 @@ public:
   /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
   /// @param[in] fast 高速ヒューリスティック
-  /// @retval true 追加できた．
-  /// @retval false 追加できなかった．
+  /// @return 見つかったグループ番号を返す．
+  ///
+  /// 見つからない場合は group_num() を返す．
   virtual
-  bool
+  ymuint
   find_group2(ymuint fid,
 	      const vector<ymuint>& group_list,
 	      bool fast) = 0;
-
-  /// @brief 既存のグループに故障を追加する．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fid 故障番号
-  virtual
-  void
-  add_fault(ymuint gid,
-	    ymuint fid) = 0;
 
   /// @brief 故障を取り除く
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )

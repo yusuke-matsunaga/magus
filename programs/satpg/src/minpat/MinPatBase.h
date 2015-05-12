@@ -127,6 +127,16 @@ protected:
 	     ymuint fid,
 	     const vector<ymuint>& group_list);
 
+  /// @brief 故障解析器を返す．
+  FaultAnalyzer&
+  analyzer();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で使われる関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief テストパタンを作る．
   /// @param[in] network ネットワーク
   /// @param[in] suf_list 十分割当リスト
@@ -135,10 +145,6 @@ protected:
   make_testvector(TpgNetwork& network,
 		  const NodeValList& suf_list,
 		  TestVector* tv);
-
-  /// @brief 故障解析器を返す．
-  FaultAnalyzer&
-  analyzer();
 
 
 private:

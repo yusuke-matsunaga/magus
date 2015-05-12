@@ -221,9 +221,10 @@ FgMgr2::find_group(ymuint fid0,
 // @param[in] fid 対象の故障番号
 // @param[in] group_list 探索最小のグループ番号のリスト
 // @param[in] fast 高速ヒューリスティック
-// @retval true 追加できた．
-// @retval false 追加できなかった．
-bool
+// @return 見つかったグループ番号を返す．
+//
+// 見つからない場合は group_num() を返す．
+ymuint
 FgMgr2::find_group2(ymuint fid0,
 		    const vector<ymuint>& group_list,
 		    bool fast)
@@ -246,7 +247,7 @@ FgMgr2::find_group2(ymuint fid0,
     engine0.make_fval_cnf(fval_cnf0, fault(fid0), node_set(fid0), kVal1);
   }
 
-  bool found = false;
+  ymuint ans_gid = group_num();
   for (ymuint i = 0; i < group_list.size(); ++ i) {
     ymuint gid = group_list[i];
 
@@ -271,7 +272,7 @@ FgMgr2::find_group2(ymuint fid0,
 	  fval_cnf0.get_pi_suf_list(sat_model, fault(fid0), node_set(fid0), suf_list, pi_suf_list);
 	  fg->add_fault(fid0, suf_list, ma_list0, pi_suf_list);
 	}
-	found = true;
+	ans_gid = gid;
 	break;
       }
     }
@@ -356,7 +357,7 @@ FgMgr2::find_group2(ymuint fid0,
 	fval_cnf0.get_pi_suf_list(sat_model, fault(fid0), node_set(fid0), suf_list, pi_suf_list);
 	fg->add_fault(fid0, suf_list, ma_list0, pi_suf_list);
       }
-      found = true;
+      ans_gid = gid;
       break;
     }
     else {
@@ -367,7 +368,7 @@ FgMgr2::find_group2(ymuint fid0,
   local_timer.stop();
   mCheckTime += local_timer.time();
 
-  return found;
+  return ans_gid;
 }
 
 // @brief 既存のグループに故障を追加する．

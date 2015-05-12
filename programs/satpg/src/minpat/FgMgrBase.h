@@ -60,10 +60,13 @@ public:
   group_num() const;
 
   /// @brief 新しいグループを作る．
+  /// @param[in] fid 故障番号
   /// @return グループ番号を返す．
+  ///
+  /// fid のみを要素に持つ．
   virtual
   ymuint
-  new_group();
+  new_group(ymuint fid);
 
   /// @brief グループを複製する．
   /// @param[in] src_gid 複製元のグループ番号
@@ -138,6 +141,19 @@ protected:
   /// @brief ノード番号の最大値を返す．
   ymuint
   max_node_id() const;
+
+  /// @brief 新しいグループを作る．
+  /// @return グループ番号を返す．
+  ymuint
+  _new_group();
+
+  /// @brief 既存のグループに故障を追加する．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] fid 故障番号
+  virtual
+  void
+  add_fault(ymuint gid,
+	    ymuint fid) = 0;
 
   /// @brief 故障を返す．
   /// @param[in] fid 故障番号

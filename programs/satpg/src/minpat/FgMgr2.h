@@ -80,10 +80,11 @@ public:
   /// @param[in] fid 対象の故障番号
   /// @param[in] group_list 探索最小のグループ番号のリスト
   /// @param[in] fast 高速ヒューリスティック
-  /// @retval true 追加できた．
-  /// @retval false 追加できなかった．
+  /// @return 見つかったグループ番号を返す．
+  ///
+  /// 見つからない場合は group_num() を返す．
   virtual
-  bool
+  ymuint
   find_group2(ymuint fid,
 	      const vector<ymuint>& group_list,
 	      bool fast);

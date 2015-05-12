@@ -138,11 +138,8 @@ MinPatBase::run(TpgNetwork& network,
     ymuint fid = get_first_fault();
 
     // 最初のグループを作る．
-    ymuint gid = fgmgr.new_group();
+    ymuint gid = fgmgr.new_group(fid);
     group_list.push_back(gid);
-
-    // 故障を追加する．
-    fgmgr.add_fault(gid, fid);
   }
 
   // 未処理の故障がある限り以下の処理を繰り返す．
@@ -163,22 +160,21 @@ MinPatBase::run(TpgNetwork& network,
     if ( gid == fgmgr.group_num() ) {
       // 見つからなかった．
       // 新たなグループを作る．
-      gid = fgmgr.new_group();
+      gid = fgmgr.new_group(fid);
       group_list.push_back(gid);
     }
-
-    // 故障を追加する．
-    fgmgr.add_fault(gid, fid);
-#else
-    // 故障を追加できるグループを見つける．
-    if ( !fgmgr.find_group2(fid, group_list, mFast) ) {
-      // 見つからなかった．
-      // 新たなグループを作る．
-      ymuint gid = fgmgr.new_group();
-      group_list.push_back(gid);
-
+    else {
       // 故障を追加する．
       fgmgr.add_fault(gid, fid);
+    }
+#else
+    // 故障を追加できるグループを見つける．
+    ymuint gid = fgmgr.find_group2(fid, group_list, mFast);
+    if ( gid == fgmgr.group_num() ) {
+      // 見つからなかった．
+      // 新たなグループを作る．
+      ymuint gid = fgmgr.new_group(fid);
+      group_list.push_back(gid);
     }
 #endif
   }
@@ -320,6 +316,13 @@ MinPatBase::find_group(FgMgr& fgmgr,
   return gid;
 }
 
+// @brief 故障解析器を返す．
+FaultAnalyzer&
+MinPatBase::analyzer()
+{
+  return mAnalyzer;
+}
+
 // @brief テストパタンを作る．
 // @param[in] gid グループ番号
 // @param[in] network ネットワーク
@@ -352,13 +355,6 @@ MinPatBase::make_testvector(TpgNetwork& network,
     }
     tv->set_val(input_id, val);
   }
-}
-
-// @brief 故障解析器を返す．
-FaultAnalyzer&
-MinPatBase::analyzer()
-{
-  return mAnalyzer;
 }
 
 END_NAMESPACE_YM_SATPG
