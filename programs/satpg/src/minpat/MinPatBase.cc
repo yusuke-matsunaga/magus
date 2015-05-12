@@ -8,7 +8,7 @@
 
 
 #include "MinPatBase.h"
-#include "FgMgr2.h"
+#include "FgMgrBase.h"
 #include "Compactor.h"
 #include "McCompactor.h"
 #include "TpgNetwork.h"
@@ -130,7 +130,7 @@ MinPatBase::run(TpgNetwork& network,
   StopWatch local_timer;
   local_timer.start();
 
-  FgMgr2 fgmgr(mMaxNodeId, mAnalyzer);
+  FgMgrBase fgmgr(mMaxNodeId, mAnalyzer);
   vector<ymuint> group_list;
   ymuint nf = fault_num();
 

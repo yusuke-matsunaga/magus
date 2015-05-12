@@ -115,7 +115,6 @@ set (minpat_SOURCES
   src/minpat/DomChecker.cc
   src/minpat/ConflictChecker.cc
   src/minpat/FgMgrBase.cc
-  src/minpat/FgMgr2.cc
   src/minpat/Compactor.cc
   src/minpat/EqSet.cc
   src/minpat/McOp.cc
