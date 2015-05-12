@@ -11,14 +11,13 @@
 
 #include "FgMgr.h"
 #include "NodeValList.h"
+#include "FaultAnalyzer.h"
+#include "FaultInfo.h"
 #include "YmUtils/HashSet.h"
 #include "YmUtils/USTime.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-class FaultAnalyzer;
-class FaultInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FgMgrBase FgMgrBase.h "FgMgrBase.h"
@@ -29,7 +28,7 @@ class FaultInfo;
 class FgMgrBase :
   public FgMgr
 {
-protected:
+private:
 
   class FaultGroup;
 
@@ -139,6 +138,14 @@ public:
 	      const vector<ymuint>& group_list,
 	      bool fast);
 
+  /// @brief 既存のグループに故障を追加する．
+  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+  /// @param[in] fid 故障番号
+  virtual
+  void
+  add_fault(ymuint gid,
+	    ymuint fid);
+
   /// @brief 故障を取り除く
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   /// @param[in] fid_list 削除する故障番号のリスト
@@ -209,9 +216,9 @@ public:
   clear_count();
 
 
-protected:
+private:
   //////////////////////////////////////////////////////////////////////
-  // 継承クラスから用いられる関数
+  // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノード番号の最大値を返す．
@@ -219,51 +226,34 @@ protected:
   max_node_id() const;
 
   /// @brief 新しいグループを作る．
-  /// @return グループ番号を返す．
-  ymuint
+  /// @return グループを返す．
+  FaultGroup*
   _new_group();
-
-  /// @brief 既存のグループに故障を追加する．
-  /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
-  /// @param[in] fid 故障番号
-  void
-  add_fault(ymuint gid,
-	    ymuint fid);
 
   /// @brief 故障を返す．
   /// @param[in] fid 故障番号
   const TpgFault*
-  fault(ymuint fid) const;
+  _fault(ymuint fid) const;
 
   /// @brief 故障の解析情報を返す．
   /// @param[in] fid 故障番号
   const FaultInfo&
-  fault_info(ymuint fid) const;
+  _fault_info(ymuint fid) const;
 
   /// @brief 故障に関係するノード集合を返す．
   /// @param[in] fid 故障番号
   const NodeSet&
-  node_set(ymuint fid) const;
+  _node_set(ymuint fid) const;
 
   /// @brief 故障グループを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   FaultGroup*
-  fault_group(ymuint gid);
+  _fault_group(ymuint gid);
 
   /// @brief 故障グループを返す．
   /// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
   const FaultGroup*
-  fault_group(ymuint gid) const;
-
-  /// @brief 両立キャッシュに登録する．
-  void
-  add_compat_cache(ymuint gid,
-		   ymuint fid);
-
-  /// @brief 両立キャッシュを調べる．
-  bool
-  check_compat_cache(ymuint gid,
-		     ymuint fid);
+  _fault_group(ymuint gid) const;
 
   /// @brief 衝突キャッシュに登録する
   void
@@ -276,7 +266,7 @@ protected:
 		       ymuint fid);
 
 
-protected:
+private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
@@ -326,14 +316,6 @@ protected:
     /// @brief 外部入力上の十分割当を返す．
     const NodeValList&
     pi_sufficient_assignment() const;
-
-    /// @brief 両立キャッシュに登録する．
-    void
-    add_compat_cache(ymuint fid);
-
-    /// @brief 両立キャッシュを調べる．
-    bool
-    check_compat_cache(ymuint fid) const;
 
     /// @brief 衝突キャッシュに登録する．
     void
@@ -425,9 +407,6 @@ protected:
     // 外部入力の十分割当リスト
     NodeValList mPiSufList;
 
-    // 両立する故障の集合
-    HashSet<ymuint> mCompatCache;
-
     // 衝突する故障の集合
     HashSet<ymuint> mConflictCache;
 
@@ -467,6 +446,154 @@ private:
   USTime mCheckTime;
 
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief ノード番号の最大値を返す．
+inline
+ymuint
+FgMgrBase::max_node_id() const
+{
+  return mMaxNodeId;
+}
+
+// @brief 故障を取り除く
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @param[in] fid_list 削除する故障番号のリスト
+inline
+void
+FgMgrBase::delete_faults(ymuint gid,
+			 const vector<ymuint>& fid_list)
+{
+  FaultGroup* fg = _fault_group(gid);
+  fg->delete_faults(fid_list);
+}
+
+// @brief グループの故障数を返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+inline
+ymuint
+FgMgrBase::fault_num(ymuint gid) const
+{
+  const FaultGroup* fg = _fault_group(gid);
+  return fg->fault_num();
+}
+
+// @brief グループの故障を返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+// @param[in] pos ( 0 <= pos < fault_num(gid) )
+inline
+ymuint
+FgMgrBase::fault_id(ymuint gid,
+		    ymuint pos) const
+{
+  const FaultGroup* fg = _fault_group(gid);
+  return fg->fault_id(pos);
+}
+
+// @brief 十分割当リストを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+inline
+const NodeValList&
+FgMgrBase::sufficient_assignment(ymuint gid) const
+{
+  const FaultGroup* fg = _fault_group(gid);
+  return fg->sufficient_assignment();
+}
+
+// @brief 必要割当リストを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+inline
+const NodeValList&
+FgMgrBase::mandatory_assignment(ymuint gid) const
+{
+  const FaultGroup* fg = _fault_group(gid);
+  return fg->mandatory_assignment();
+}
+
+// @brief 外部入力上の十分割当リストを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+inline
+const NodeValList&
+FgMgrBase::pi_sufficient_assignment(ymuint gid) const
+{
+  const FaultGroup* fg = _fault_group(gid);
+  return fg->pi_sufficient_assignment();
+}
+
+// @brief 衝突キャッシュに登録する
+inline
+void
+FgMgrBase::add_conflict_cache(ymuint gid,
+			      ymuint fid)
+{
+  FaultGroup* fg = _fault_group(gid);
+  fg->add_conflict_cache(fid);
+}
+
+// @brief 衝突キャッシュを調べる．
+inline
+bool
+FgMgrBase::check_conflict_cache(ymuint gid,
+				ymuint fid)
+{
+  FaultGroup* fg = _fault_group(gid);
+  return fg->check_conflict_cache(fid);
+}
+
+// @brief 故障を返す．
+// @param[in] fid 故障番号
+inline
+const TpgFault*
+FgMgrBase::_fault(ymuint fid) const
+{
+  return _fault_info(fid).fault();
+}
+
+// @brief 故障の解析情報を返す．
+// @param[in] fid 故障番号
+inline
+const FaultInfo&
+FgMgrBase::_fault_info(ymuint fid) const
+{
+  return mAnalyzer.fault_info(fid);
+}
+
+// @brief 故障に関係するノード集合を返す．
+// @param[in] fid 故障番号
+inline
+const NodeSet&
+FgMgrBase::_node_set(ymuint fid) const
+{
+  return mAnalyzer.node_set(fid);
+}
+
+// @brief 故障グループを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+inline
+FgMgrBase::FaultGroup*
+FgMgrBase::_fault_group(ymuint gid)
+{
+  ASSERT_COND( gid < group_num() );
+  FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
+  return fg;
+}
+
+// @brief 故障グループを返す．
+// @param[in] gid グループ番号 ( 0 <= gid < group_num() )
+inline
+const FgMgrBase::FaultGroup*
+FgMgrBase::_fault_group(ymuint gid) const
+{
+  ASSERT_COND( gid < group_num() );
+  const FaultGroup* fg = mGroupList[gid];
+  ASSERT_COND( fg != NULL );
+  return fg;
+}
 
 END_NAMESPACE_YM_SATPG
 
