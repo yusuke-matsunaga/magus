@@ -393,33 +393,6 @@ Compactor::remove_group(FgMgr& fgmgr,
     }
 
     // fid を移動可能なグループを見つける．
-#if 0
-    ymuint gid1 = fgmgr.find_group(fid, cand_list, mFast);
-    if ( gid1 != fgmgr.group_num() ) {
-      // 見つけた．
-
-      // tmp_group_list 中の位置を求める．
-      ymuint ipos = 0;
-      for (ipos = 0; ipos < ng; ++ ipos) {
-	if ( tmp_group_list[ipos] == gid1 ) {
-	  break;
-	}
-      }
-      ASSERT_COND( ipos < ng );
-
-      fgmgr.add_fault(gid1, fid);
-
-      if ( mPrintDetail ) {
-	move_list[fpos] = group_list[ipos];
-      }
-    }
-    else {
-      // 見つからなかった．
-      // このグループの処理は中止する．
-      red = false;
-      break;
-    }
-#else
     ymuint gid1 = fgmgr.find_group2(fid, cand_list, mFast);
     if ( gid1 != fgmgr.group_num() ) {
       // 見つけた．
@@ -439,14 +412,13 @@ Compactor::remove_group(FgMgr& fgmgr,
       red = false;
       break;
     }
-#endif
   }
   if ( red ) {
     // 変更を反映させる．
     for (ymuint i = 0; i < ng; ++ i) {
       ymuint gid1 = group_list[i];
       ymuint gid2 = tmp_group_list[i];
-      if ( gid1 != gid2 ) {
+      if ( fgmgr.fault_num(gid1) != fgmgr.fault_num(gid2) ) {
 	fgmgr.replace_group(gid1, gid2);
       }
     }
@@ -529,20 +501,6 @@ Compactor::phase2(FgMgr& fgmgr,
 	cand_list.push_back(gid);
       }
 
-#if 0
-      ymuint gid = fgmgr.find_group(fid, cand_list, mFast);
-      if ( gid != fgmgr.group_num() ) {
-	fgmgr.add_fault(gid, fid);
-	del_fid_list.push_back(fid);
-	if ( mPrintDetail ) {
-	  if ( mVerbose > 1 ) {
-	    cout << endl;
-	  }
-	  cout << "  MOVE " << fid << " from #" << min_gid
-	       << "  to #" << gid << endl;
-	}
-      }
-#else
       ymuint gid = fgmgr.find_group2(fid, cand_list, mFast);
       if ( gid != fgmgr.group_num() ) {
 	del_fid_list.push_back(fid);
@@ -554,7 +512,6 @@ Compactor::phase2(FgMgr& fgmgr,
 	       << "  to #" << gid << endl;
 	}
       }
-#endif
     }
     if ( !del_fid_list.empty() ) {
       fgmgr.delete_faults(min_gid, del_fid_list);
