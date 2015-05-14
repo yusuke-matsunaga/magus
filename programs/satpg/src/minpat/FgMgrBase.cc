@@ -714,6 +714,13 @@ FgMgrBase::FaultGroup::copy(const FaultGroup& dst)
   mSufList = dst.mSufList;
   mMaList = dst.mMaList;
   mPiSufList = dst.mPiSufList;
+
+  mConflictCache.clear();
+  for (HashSetIterator<ymuint> p = dst.mConflictCache.begin();
+       p != dst.mConflictCache.end(); ++ p) {
+    ymuint fid = p.key();
+    mConflictCache.add(fid);
+  }
 }
 
 // @brief ID番号をセットする．
