@@ -16,7 +16,7 @@ endif (TCL_FOUND)
 #  ソースファイルの設定
 # ===================================================================
 
-set (base_SOURCES
+set (nlink_SOURCES
   src/NlProblem.cc
   )
 
@@ -24,36 +24,43 @@ set (base_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(satpg_base OBJECT ${base_SOURCES})
+#add_library(satpg_base OBJECT ${base_SOURCES})
 
-add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
+#add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
 
-add_library(satpg_fsim OBJECT ${fsim_SOURCES})
+#add_library(satpg_fsim OBJECT ${fsim_SOURCES})
 
 #add_library(satpg_graphsat OBJECT ${graphsat_SOURCES})
 
-add_library(satpg_minpat OBJECT ${minpat_SOURCES})
+#add_library(satpg_minpat OBJECT ${minpat_SOURCES})
 
-add_library(satpg_rtpg OBJECT ${rtpg_SOURCES})
+#add_library(satpg_rtpg OBJECT ${rtpg_SOURCES})
 
-if (TCL_FOUND)
-  add_executable(atpg_tclsh
-    ${atpg_tclsh_SOURCES}
-    $<TARGET_OBJECTS:satpg_dtpg>
+#if (TCL_FOUND)
+#  add_executable(nlink
+#    ${nlink_SOURCES}
+#    $<TARGET_OBJECTS:satpg_dtpg>
 #    $<TARGET_OBJECTS:satpg_graphsat>
-    $<TARGET_OBJECTS:satpg_fsim>
-    $<TARGET_OBJECTS:satpg_minpat>
-    $<TARGET_OBJECTS:satpg_rtpg>
-    $<TARGET_OBJECTS:satpg_base>
-    )
+#    $<TARGET_OBJECTS:satpg_fsim>
+#    $<TARGET_OBJECTS:satpg_minpat>
+#    $<TARGET_OBJECTS:satpg_rtpg>
+#    $<TARGET_OBJECTS:satpg_base>
+#    )
+#
+#  target_link_libraries(nlink
+#    ym_logic
+#    ym_tclpp
+#    ${TCL_LIBRARIES}
+#    )
+#endif (TCL_FOUND)
 
-  target_link_libraries(atpg_tclsh
-    ym_networks
-    ym_tclpp
-    ${TCL_LIBRARIES}
-    )
-endif (TCL_FOUND)
+add_executable(nlink
+  ${nlink_SOURCES}
+  )
 
+target_link_libraries(nlink
+  ym_logic
+  )
 
 # ===================================================================
 #  テストの設定
