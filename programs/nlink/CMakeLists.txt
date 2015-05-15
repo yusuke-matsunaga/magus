@@ -17,7 +17,9 @@ endif (TCL_FOUND)
 # ===================================================================
 
 set (nlink_SOURCES
+  src/nlink.cc
   src/NlProblem.cc
+  src/NlScanner.cc
   )
 
 

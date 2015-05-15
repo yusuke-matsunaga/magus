@@ -10,6 +10,7 @@
 
 
 #include "nlink_nsdef.h"
+#include "NlPoint.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK

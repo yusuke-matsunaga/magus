@@ -25,7 +25,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] x X座標
   /// @param[in] y Y座標
-  NlPoint(ymuint x = 0
+  NlPoint(ymuint x = 0,
 	  ymuint y = 0);
 
   /// @brief デストラクタ

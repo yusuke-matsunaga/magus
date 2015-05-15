@@ -8,6 +8,8 @@
 
 
 #include "NlProblem.h"
+#include "NlScanner.h"
+#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -56,10 +58,11 @@ NlProblem::Builder::set_size(ymuint width,
 void
 NlProblem::Builder::add_elem(const NlConnection& connection)
 {
-  ASSERT_COND( connection.start_point.x() < mWidth );
-  ASSERT_COND( connection.start_point.y() < mHeight );
-  ASSERT_COND( connection.end_point.x() < mWidth );
-  ASSERT_COND( connection.end_point.y() < mHeight );
+  ASSERT_COND( connection.start_point().x() < mWidth );
+  ASSERT_COND( connection.start_point().y() < mHeight );
+  ASSERT_COND( connection.end_point().x() < mWidth );
+  ASSERT_COND( connection.end_point().y() < mHeight );
+
   mElemArray.push_back(connection);
 }
 
@@ -75,7 +78,7 @@ NlProblem::Builder::add_elem(const NlPoint& start_point,
 
 // @brief 盤の幅を返す．
 ymuint
-NlProblem::Builer::width() const
+NlProblem::Builder::width() const
 {
   return mWidth;
 }
@@ -128,7 +131,7 @@ NlProblem::~NlProblem()
 
 // @brief 盤の幅を返す．
 ymuint
-NlProbmlem::width() const
+NlProblem::width() const
 {
   return mWidth;
 }
@@ -175,6 +178,56 @@ NlProblem::end_point(ymuint idx) const
 }
 
 // @relates NlProblem
+// @brief 問題を読み込む．
+// @param[in] filename ファイル名
+// @return 問題を返す．
+NlProblem
+read_problem(const string& filename)
+{
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
+    cerr << filename << ": no such file" << endl;
+    goto error;
+  }
+
+  {
+    NlScanner scanner(ido);
+
+    NlProblem::Builder builder;
+
+    ymuint width;
+    ymuint height;
+    ymuint num;
+
+    if ( !scanner.read_SIZE(width, height) ) {
+      cerr << "read error: expecting 'SIZE'" << endl;
+      goto error;
+    }
+
+    builder.set_size(width, height);
+
+    if ( !scanner.read_LINE_NUM(num) ) {
+      cerr << "read error: expecting 'LINE_NUM'" << endl;
+      goto error;
+    }
+
+    for (ymuint i = 0; i < num; ++ i) {
+      ymuint x1, y1, x2, y2;
+      if ( !scanner.read_LINE(x1, y1, x2, y2) ) {
+	cerr << "read error: expecting 'LINE#" << (i + 1) << "'" << endl;
+	goto error;
+      }
+      builder.add_elem(NlPoint(x1, y1), NlPoint(x2, y2));
+    }
+
+    return NlProblem(builder);
+  }
+
+ error:
+  return NlProblem(NlProblem::Builder());
+}
+
+// @relates NlProblem
 // @brief 問題の内容を出力する
 // @param[in] s 出力先のストリーム
 // @param[in] problem 問題
@@ -184,7 +237,7 @@ print_problem(ostream& s,
 {
   s << "SIZE        " << problem.width() << "X" << problem.height() << endl
     << "LINE_NUM    " << problem.elem_num() << endl;
-  for (ymuint i = 0; i < problem.elem_num() ++ i) {
+  for (ymuint i = 0; i < problem.elem_num(); ++ i) {
     NlConnection con = problem.connection(i);
     s << "LINE#" << (i + 1) << " ("
       << con.start_point().x() << ", " << con.start_point().y() << ") - ("

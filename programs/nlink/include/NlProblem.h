@@ -167,10 +167,10 @@ private:
 
 /// @relates NlProblem
 /// @brief 問題を読み込む．
-/// @param[in] s 入力元のストリーム
+/// @param[in] filename ファイル名
 /// @return 問題を返す．
 NlProblem
-read_problem(ostream& s);
+read_problem(const string& filename);
 
 /// @relates NlProblem
 /// @brief 問題の内容を出力する
