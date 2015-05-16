@@ -115,7 +115,6 @@ zero_two_hot4(SatSolver& solver,
 void
 print_solution(const NlProblem& problem,
 	       const vector<Bool3>& model,
-	       const vector<Literal>& node_array,
 	       const vector<Literal>& h_array,
 	       const vector<Literal>& v_array)
 {
@@ -124,11 +123,30 @@ print_solution(const NlProblem& problem,
   ymuint n = problem.elem_num();
 
   for (ymuint y = 0; y < h; ++ y) {
-    for (ymuint x = 0; x < w; ++ x) {
-      ymuint base = ((x * h) + y) * n;
+    if ( y > 0 ) {
+      for (ymuint x = 0; x < w; ++ x) {
+	bool fill = false;
+	for (ymuint k = 0; k < n; ++ k) {
+	  Literal lit = v_array[((y - 1) * w + x) *n + k];
+	  VarId var = lit.varid();
+	  if ( model[var.val()] == kB3True ) {
+	    cout << " " << setw(2) << (k + 1);
+	    fill = true;
+	    break;
+	  }
+	}
+	if ( !fill ) {
+	  cout << "   ";
+	}
+	cout << "   ";
+      }
+      cout << endl;
+    }
+    cout << "   ";
+    for (ymuint x = 1; x < w; ++ x) {
       bool fill = false;
       for (ymuint k = 0; k < n; ++ k) {
-	Literal lit = node_array[base + k];
+	Literal lit = h_array[((x - 1) * h + y) * n + k];
 	VarId var = lit.varid();
 	if ( model[var.val()] == kB3True ) {
 	  cout << " " << setw(2) << (k + 1);
@@ -139,6 +157,7 @@ print_solution(const NlProblem& problem,
       if ( !fill ) {
 	cout << "   ";
       }
+      cout << "   ";
     }
     cout << endl;
   }
@@ -150,7 +169,8 @@ END_NONAMESPACE
 void
 NlSolver::solve(const NlProblem& problem)
 {
-  SatSolver solver("minisat2", string(), NULL);
+  //SatSolver solver("minisat2", string(), NULL);
+  SatSolver solver("satrec", string(), &cout);
 
   ymuint w = problem.width();
   ymuint h = problem.height();
@@ -161,34 +181,52 @@ NlSolver::solve(const NlProblem& problem)
   ASSERT_COND( n > 0 );
 
   vector<ymuint> end_mark(w * h, 0);
-  vector<Literal> node_array(w * h * n);
-  vector<Literal> h_array((w - 1) * h);
-  vector<Literal> v_array(w * (h - 1));
-
-  // ノードの変数
-  // 各位置に対して n 個用意する．
-  for (ymuint x = 0; x < w; ++ x) {
-    for (ymuint y = 0; y < h; ++ y) {
-      for (ymuint k = 0; k < n; ++ k) {
-	VarId var = solver.new_var();
-	node_array[(x * h + y) * n + k] = Literal(var);
-      }
-    }
-  }
+  vector<Literal> h_array((w - 1) * h * n);
+  vector<Literal> v_array(w * (h - 1) * n);
 
   // 横方向の枝の変数
+  // 各位置に対して n 個用意する．
   for (ymuint x = 1; x < w; ++ x) {
     for (ymuint y = 0; y < h; ++ y) {
-      VarId var = solver.new_var();
-      h_array[(x - 1) * h + y] = Literal(var);
+      vector<Literal> tmp_lits(n);
+      for (ymuint k = 0; k < n; ++ k) {
+	VarId var = solver.new_var();
+	Literal lit = Literal(var);
+	h_array[((x - 1) * h + y) * n + k] = lit;
+	tmp_lits[k] = lit;
+      }
+      // one hot 制約
+      for (ymuint k1 = 0; k1 < n; ++ k1) {
+	Literal lit1 = tmp_lits[k1];
+	for (ymuint k2 = k1 + 1; k2 < n; ++ k2) {
+	  Literal lit2 = tmp_lits[k2];
+	  solver.add_clause(~lit1, ~lit2);
+	}
+      }
+      //solver.add_clause(tmp_lits);
     }
   }
 
   // 縦方向の枝の変数
+  // 各位置に対して n 個用意する．
   for (ymuint y = 1; y < h; ++ y) {
     for (ymuint x = 0; x < w; ++ x) {
-      VarId var = solver.new_var();
-      v_array[(y - 1) * w + x] = Literal(var);
+      vector<Literal> tmp_lits(n);
+      for (ymuint k = 0; k < n; ++ k) {
+	VarId var = solver.new_var();
+	Literal lit = Literal(var);
+	v_array[((y - 1) * w + x) *n + k] = lit;
+	tmp_lits[k] = lit;
+      }
+      // one hot 制約
+      for (ymuint k1 = 0; k1 < n; ++ k1) {
+	Literal lit1 = tmp_lits[k1];
+	for (ymuint k2 = k1 + 1; k2 < n; ++ k2) {
+	  Literal lit2 = tmp_lits[k2];
+	  solver.add_clause(~lit1, ~lit2);
+	}
+      }
+      //solver.add_clause(tmp_lits);
     }
   }
 
@@ -199,132 +237,126 @@ NlSolver::solve(const NlProblem& problem)
       NlPoint start_point = con.start_point();
       ymuint x1 = start_point.x();
       ymuint y1 = start_point.y();
-      Literal lit1 = node_array[(x1 * h + y1) * n + k];
-      solver.add_clause(lit1);
       end_mark[x1 * h + y1] = k + 1;
     }
     {
       NlPoint end_point = con.end_point();
       ymuint x2 = end_point.x();
       ymuint y2 = end_point.y();
-      Literal lit2 = node_array[(x2 * h + y2) * n + k];
-      solver.add_clause(lit2);
       end_mark[x2 * h + y2] = k + 1;
-    }
-  }
-
-  // one-hot 制約を作る．
-  // 一つのノードでは高々1つの変数しか1にならない．
-  for (ymuint x = 0; x < w; ++ x) {
-    for (ymuint y = 0; y < h; ++ y) {
-      ymuint base = (x * h + y) * n;
-      for (ymuint k1 = 0; k1 < n; ++ k1) {
-	Literal lit1 = node_array[base + k1];
-	for (ymuint k2 = k1 + 1; k2 < n; ++ k2) {
-	  Literal lit2 = node_array[base + k2];
-	  solver.add_clause(~lit1, ~lit2);
-	}
-      }
     }
   }
 
   // 枝の条件を作る．
   for (ymuint x = 0; x < w; ++ x) {
     for (ymuint y = 0; y < h; ++ y) {
-      // (x, y) のノードに隣接する枝のリストを作る．
-      vector<Literal> edge_list;
+      vector<ymuint> adj_list;
       if ( x > 0 ) {
 	// 左の枝を加える．
-	Literal lit = h_array[(x - 1) * h + y];
-	edge_list.push_back(lit);
+	ymuint index = ((x - 1) * h + y) * n;
+	adj_list.push_back(index);
       }
       if ( x < w - 1 ) {
 	// 右の枝を加える．
-	Literal lit = h_array[x * h + y];
-	edge_list.push_back(lit);
+	ymuint index = (x * h + y) * n;
+	adj_list.push_back(index);
       }
       if ( y > 0 ) {
 	// 上の枝を加える．
-	Literal lit = v_array[(y - 1) * w + x];
-	edge_list.push_back(lit);
+	ymuint index = ((y - 1) * w + x) * n;
+	adj_list.push_back(index);
       }
       if ( y < h - 1 ) {
 	// 下の枝を加える．
-	Literal lit = v_array[y * w + x];
-	edge_list.push_back(lit);
+	ymuint index = (y * w + x) * n;
+	adj_list.push_back(index);
       }
 
-      if ( end_mark[x * h + y] > 0 ) {
-	// 端点の場合
-	// 必ずただ1つの枝が選ばれる．
-	switch ( edge_list.size() ) {
-	case 2:
-	  one_hot2(solver, edge_list[0], edge_list[1]);
-	  break;
+      for (ymuint k = 0; k < n; ++ k) {
+	// (x, y) のノードに隣接する枝のリストを作る．
+	vector<Literal> edge_list;
+	edge_list.reserve(adj_list.size());
+	for (ymuint i = 0; i < adj_list.size(); ++ i) {
+	  Literal lit = h_array[adj_list[i] + k];
+	  edge_list.push_back(lit);
+	}
 
-	case 3:
-	  one_hot3(solver, edge_list[0], edge_list[1], edge_list[2]);
-	  break;
+	if ( end_mark[x * h + y] > 0 ) {
+	  if ( end_mark[x * h + y] == k + 1 ) {
+	    // 端点の場合
+	    // 必ずただ1つの枝が選ばれる．
+	    switch ( edge_list.size() ) {
+	    case 2:
+	      one_hot2(solver, edge_list[0], edge_list[1]);
+	      break;
 
-	case 4:
-	  one_hot4(solver, edge_list[0], edge_list[1], edge_list[2], edge_list[3]);
-	  break;
+	    case 3:
+	      one_hot3(solver, edge_list[0], edge_list[1], edge_list[2]);
+	      break;
 
-	default:
-	  ASSERT_NOT_REACHED;
+	    case 4:
+	      one_hot4(solver, edge_list[0], edge_list[1], edge_list[2], edge_list[3]);
+	      break;
+
+	    default:
+	      ASSERT_NOT_REACHED;
+	    }
+	  }
+	  else {
+	    // 選ばれない．
+	    switch ( edge_list.size() ) {
+	    case 2:
+	      solver.add_clause(~edge_list[0]);
+	      solver.add_clause(~edge_list[1]);
+	      break;
+
+	    case 3:
+	      solver.add_clause(~edge_list[0]);
+	      solver.add_clause(~edge_list[1]);
+	      solver.add_clause(~edge_list[2]);
+	      break;
+
+	    case 4:
+	      solver.add_clause(~edge_list[0]);
+	      solver.add_clause(~edge_list[1]);
+	      solver.add_clause(~edge_list[2]);
+	      solver.add_clause(~edge_list[3]);
+	      break;
+
+	    default:
+	      ASSERT_NOT_REACHED;
+	    }
+	  }
+	}
+	else {
+	  // そうでない場合
+	  // 0個か2個の枝が選ばれる．
+	  switch ( edge_list.size() ) {
+	  case 2:
+	    zero_two_hot2(solver, edge_list[0], edge_list[1]);
+	    break;
+
+	  case 3:
+	    zero_two_hot3(solver, edge_list[0], edge_list[1], edge_list[2]);
+	    break;
+
+	  case 4:
+	    zero_two_hot4(solver, edge_list[0], edge_list[1], edge_list[2], edge_list[3]);
+	    break;
+
+	  default:
+	    ASSERT_NOT_REACHED;
+	  }
 	}
       }
-      else {
-	// そうでない場合
-	// 0個か2個の枝が選ばれる．
-	switch ( edge_list.size() ) {
-	case 2:
-	  zero_two_hot2(solver, edge_list[0], edge_list[1]);
-	  break;
+      // 排他条件
+      for (ymuint k1 = 0; k1 < n; ++ k1) {
+	for (ymuint k2 = k1 + 1; k2 < n; ++ k2) {
+	  for (ymuint i1 = 0; i1 < adj_list.size(); ++ i1) {
+	    for (ymuint i2 = i1 + 1; i2 < adj_list.size(); ++ i2) {
+	      Literal lit1 =
 
-	case 3:
-	  zero_two_hot3(solver, edge_list[0], edge_list[1], edge_list[2]);
-	  break;
-
-	case 4:
-	  zero_two_hot4(solver, edge_list[0], edge_list[1], edge_list[2], edge_list[3]);
-	  break;
-
-	default:
-	  ASSERT_NOT_REACHED;
 	}
-      }
-    }
-  }
-
-  // 横方向の隣接関係の条件を作る．
-  for (ymuint x2 = 1; x2 < w; ++ x2) {
-    ymuint x1 = x2 - 1;
-    for (ymuint y = 0; y < h; ++ y) {
-      Literal e_lit = h_array[x1 * h + y];
-      ymuint base1 = ((x1 * h) + y) * n;
-      ymuint base2 = ((x2 * h) + y) * n;
-      for (ymuint k = 0; k < n; ++ k) {
-	Literal v_lit1 = node_array[base1 + k];
-	Literal v_lit2 = node_array[base2 + k];
-	solver.add_clause(~e_lit,  v_lit1, ~v_lit2);
-	solver.add_clause(~e_lit, ~v_lit1,  v_lit2);
-      }
-    }
-  }
-
-  // 縦方向の隣接関係の条件を作る．
-  for (ymuint y2 = 1; y2 < h; ++ y2) {
-    ymuint y1 = y2 - 1;
-    for (ymuint x = 0; x < w; ++ x) {
-      Literal e_lit = v_array[y1 * w + x];
-      ymuint base1 = ((x * h) + y1) * n;
-      ymuint base2 = ((x * h) + y2) * n;
-      for (ymuint k = 0; k < n; ++ k) {
-	Literal v_lit1 = node_array[base1 + k];
-	Literal v_lit2 = node_array[base2 + k];
-	solver.add_clause(~e_lit,  v_lit1, ~v_lit2);
-	solver.add_clause(~e_lit, ~v_lit1,  v_lit2);
       }
     }
   }
@@ -363,7 +395,7 @@ NlSolver::solve(const NlProblem& problem)
   switch ( stat ) {
   case kB3True:
     cout << "SAT" << endl;
-    print_solution(problem, model, node_array, h_array, v_array);
+    print_solution(problem, model, h_array, v_array);
     break;
 
   case kB3False:

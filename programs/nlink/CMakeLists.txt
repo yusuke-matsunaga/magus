@@ -18,8 +18,10 @@ endif (TCL_FOUND)
 
 set (nlink_SOURCES
   src/nlink.cc
+  src/MazeRouter.cc
   src/NlProblem.cc
   src/NlScanner.cc
+  src/NlSolver2.cc
   )
 
 

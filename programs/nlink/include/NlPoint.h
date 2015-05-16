@@ -66,6 +66,13 @@ private:
 };
 
 
+/// @relates NlPoint
+/// @brief NlPoint の内容を出力する．
+ostream&
+operator<<(ostream& s,
+	   const NlPoint& point);
+
+
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
@@ -101,6 +108,17 @@ ymuint
 NlPoint::y() const
 {
   return mY;
+}
+
+// @relates NlPoint
+// @brief NlPoint の内容を出力する．
+inline
+ostream&
+operator<<(ostream& s,
+	   const NlPoint& point)
+{
+  s << "(" << point.x() << ", " << point.y() << ")";
+  return s;
 }
 
 END_NAMESPACE_YM_NLINK

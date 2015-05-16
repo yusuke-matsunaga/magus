@@ -235,6 +235,7 @@ void
 print_problem(ostream& s,
 	      const NlProblem& problem)
 {
+#if 0
   s << "SIZE        " << problem.width() << "X" << problem.height() << endl
     << "LINE_NUM    " << problem.elem_num() << endl;
   for (ymuint i = 0; i < problem.elem_num(); ++ i) {
@@ -242,6 +243,34 @@ print_problem(ostream& s,
     s << "LINE#" << (i + 1) << " ("
       << con.start_point().x() << ", " << con.start_point().y() << ") - ("
       << con.end_point().x() << ", " << con.end_point().y() << ")" << endl;
+  }
+#endif
+  ymuint w = problem.width();
+  ymuint h = problem.height();
+  ymuint n = problem.elem_num();
+  vector<ymuint> mark(w * h, 0);
+  for (ymuint i = 0; i < n; ++ i) {
+    NlConnection con = problem.connection(i);
+    mark[con.start_point().x() * h + con.start_point().y()] = i + 1;
+    mark[con.end_point().x() * h + con.end_point().y()] = i + 1;
+  }
+  cout << "   ";
+  for (ymuint x = 0; x < w; ++ x) {
+    cout << " " << setw(2) << x;
+  }
+  cout << endl;
+  for (ymuint y = 0; y < h; ++ y) {
+    cout << " " << setw(2) << y;
+    for (ymuint x = 0; x < w; ++ x) {
+      ymuint label = mark[x * h + y];
+      if ( label > 0 ) {
+	cout << " " << setw(2) << label;
+      }
+      else {
+	cout << "   ";
+      }
+    }
+    cout << endl;
   }
 }
 
