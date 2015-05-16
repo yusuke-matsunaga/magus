@@ -21,6 +21,15 @@ set (nlink_SOURCES
   src/MazeRouter.cc
   src/NlProblem.cc
   src/NlScanner.cc
+  src/NlSolver.cc
+  src/NlSolver2.cc
+  )
+
+set (nlink2_SOURCES
+  src/nlink.cc
+  src/NlProblem.cc
+  src/NlScanner.cc
+  src/NlSolver.cc
   src/NlSolver2.cc
   )
 
@@ -65,6 +74,15 @@ add_executable(nlink
 target_link_libraries(nlink
   ym_logic
   )
+
+add_executable(nlink2
+  ${nlink2_SOURCES}
+  )
+
+target_link_libraries(nlink2
+  ym_logic
+  )
+
 
 # ===================================================================
 #  テストの設定
