@@ -62,6 +62,10 @@ private:
   struct Node
   {
 
+    // 端点番号
+    // 0 で無印
+    ymuint mEndMark;
+
     // 接続する辺のリスト
     vector<Edge*> mEdgeList;
 
@@ -87,6 +91,12 @@ private:
        ymuint width,
        ymuint height,
        ymuint num);
+
+  /// @brief ノードを得る．
+  /// @param[in] x, y 座標
+  Node*
+  _node(ymuint x,
+	ymuint y);
 
   /// @brief 左の辺を得る．
   /// @param[in] x, y 辺の右端の座標

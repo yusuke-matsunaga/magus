@@ -130,8 +130,6 @@ NlSolver2::solve(const NlProblem& problem)
 
   init(solver, w, h, n);
 
-  vector<ymuint> end_mark(w * h, 0);
-
   // 横の辺に対する one-hot 制約を作る．
   for (ymuint x = 1; x < w; ++ x) {
     for (ymuint y = 0; y < h; ++ y) {
@@ -179,20 +177,22 @@ NlSolver2::solve(const NlProblem& problem)
       NlPoint start_point = con.start_point();
       ymuint x1 = start_point.x();
       ymuint y1 = start_point.y();
-      end_mark[x1 * h + y1] = k + 1;
+      Node* node1 = _node(x1, y1);
+      node1->mEndMark = k + 1;
     }
     {
       NlPoint end_point = con.end_point();
       ymuint x2 = end_point.x();
       ymuint y2 = end_point.y();
-      end_mark[x2 * h + y2] = k + 1;
+      Node* node2 = _node(x2, y2);
+      node2->mEndMark = k + 1;
     }
   }
 
   // 枝の条件を作る．
   for (ymuint x = 0; x < w; ++ x) {
     for (ymuint y = 0; y < h; ++ y) {
-      Node* node = mNodeArray[x * mHeight + y];
+      Node* node = _node(x, y);
       const vector<Edge*>& adj_list = node->mEdgeList;
       ymuint na = adj_list.size();
       for (ymuint k = 0; k < n; ++ k) {
@@ -206,8 +206,8 @@ NlSolver2::solve(const NlProblem& problem)
 	  edge_list.push_back(lit);
 	}
 
-	if ( end_mark[x * h + y] > 0 ) {
-	  if ( end_mark[x * h + y] == k + 1 ) {
+	if ( node->mEndMark > 0 ) {
+	  if ( node->mEndMark == k + 1 ) {
 	    // 端点の場合
 	    // 必ずただ1つの枝が選ばれる．
 	    switch ( edge_list.size() ) {
@@ -380,12 +380,13 @@ NlSolver2::init(SatSolver& solver,
   for (ymuint i = 0; i < nn; ++ i) {
     Node* node = new Node;
     mNodeArray[i] = node;
+    node->mEndMark = 0;
   }
 
   // 辺の隣接関係を作る．
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
-      Node* node = mNodeArray[x * mHeight + y];
+      Node* node = _node(x, y);
       node->mEdgeList.reserve(4);
       if ( x > 0 ) {
 	// 左に辺がある．
@@ -421,6 +422,20 @@ NlSolver2::init(SatSolver& solver,
       }
     }
   }
+}
+
+// @brief ノードを得る．
+// @param[in] x, y 座標
+NlSolver2::Node*
+NlSolver2::_node(ymuint x,
+		 ymuint y)
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mNodeArray[x * mHeight + y];
 }
 
 // @brief 左の辺を得る．
@@ -488,7 +503,7 @@ NlSolver2::print_solution(ostream& s,
 {
   for (ymuint y = 0; y < mHeight; ++ y) {
     for (ymuint x = 0; x < mWidth; ++ x) {
-      Node* node = mNodeArray[x * mHeight + y];
+      Node* node = _node(x, y);
       const vector<Edge*>& edge_list = node->mEdgeList;
       bool found = false;
       for (ymuint i = 0; i < edge_list.size(); ++ i) {
