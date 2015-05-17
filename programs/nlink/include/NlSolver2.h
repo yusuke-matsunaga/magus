@@ -10,7 +10,6 @@
 
 
 #include "nlink_nsdef.h"
-#include "NlProblem.h"
 #include "YmLogic/SatSolver.h"
 
 

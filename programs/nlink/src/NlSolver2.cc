@@ -8,6 +8,7 @@
 
 
 #include "NlSolver2.h"
+#include "NlProblem.h"
 #include "NlSolution.h"
 #include "YmLogic/SatSolver.h"
 

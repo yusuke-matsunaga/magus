@@ -24,6 +24,7 @@ set (nlink_SOURCES
   src/NlScanner.cc
   src/NlSolver.cc
   src/NlSolver2.cc
+  src/NlSolver3.cc
   )
 
 set (nlink2_SOURCES
@@ -33,6 +34,7 @@ set (nlink2_SOURCES
   src/NlScanner.cc
   src/NlSolver.cc
   src/NlSolver2.cc
+  src/NlSolver3.cc
   )
 
 

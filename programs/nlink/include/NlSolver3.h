@@ -1,8 +1,8 @@
-#ifndef NLSOLVER_H
-#define NLSOLVER_H
+#ifndef NLSOLVER3_H
+#define NLSOLVER3_H
 
-/// @file NlSolver.h
-/// @brief NlSolver のヘッダファイル
+/// @file NlSolver3.h
+/// @brief NlSolver3 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -16,18 +16,18 @@
 BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
-/// @class NlSolver NlSolver.h "NlSolver.h"
+/// @class NlSolver3 NlSolver3.h "NlSolver3.h"
 /// @brief number link を解くためのクラス
 //////////////////////////////////////////////////////////////////////
-class NlSolver
+class NlSolver3
 {
 public:
 
   /// @brief コンストラクタ
-  NlSolver();
+  NlSolver3();
 
   /// @brief デストラクタ
-  ~NlSolver();
+  ~NlSolver3();
 
 
 public:
@@ -52,8 +52,19 @@ private:
   struct Edge
   {
 
-    // 隣接する辺のリスト
-    vector<Edge*> mAdjList;
+    // 枝を表す文字列を返す．
+    string
+    str() const;
+
+    // ID番号
+    ymuint mId;
+
+    // 縦の辺の時 true
+    bool mVertical;
+
+    // 左上の座標
+    ymuint mX0;
+    ymuint mY0;
 
     // 変数番号
     VarId mVar;
@@ -126,19 +137,19 @@ private:
   lower_edge(ymuint x,
 	     ymuint y);
 
+  /// @brief 部分解リストに追加する．
+  void
+  add_sol_list(const vector<ymuint>& cur_sol,
+	       const vector<bool>& cut_mark,
+	       vector<vector<ymuint> >& sol_list,
+	       vector<vector<ymuint> >& sig_list);
+
   /// @brief 解を出力する．
   /// @param[in] model SATの解
   /// @param[in] solution 解
   void
   setup_solution(const vector<Bool3>& model,
 		 NlSolution& solution);
-
-  /// @brief 解を出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] model SATの解
-  void
-  print_solution(ostream& s,
-		 const vector<Bool3>& model);
 
 
 private:
@@ -155,6 +166,12 @@ private:
   // 線分数
   ymuint mNum;
 
+  // 枝の数．
+  ymuint mEdgeNum;
+
+  // 枝の配列
+  vector<Edge*> mEdgeArray;
+
   // 横の辺の配列
   vector<Edge*> mHarray;
 
@@ -169,4 +186,4 @@ private:
 
 END_NAMESPACE_YM_NLINK
 
-#endif // NLSOLVER_H
+#endif // NLSOLVER3_H
