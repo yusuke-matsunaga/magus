@@ -109,6 +109,27 @@ private:
        ymuint height,
        ymuint num);
 
+  void
+  search(ymuint x,
+	 ymuint y,
+	 const vector<ymuint>& orig_sol,
+	 const vector<ymuint>& cur_sol,
+	 vector<vector<ymuint> >& sol_list,
+	 HashSet<vector<ymuint> >& sig_set);
+
+  /// @brief 部分解リストに追加する．
+  void
+  add_sol_list(const vector<ymuint>& cur_sol,
+	       vector<vector<ymuint> >& sol_list,
+	       HashSet<vector<ymuint> >& sig_set);
+
+  /// @brief 解を出力する．
+  /// @param[in] model SATの解
+  /// @param[in] solution 解
+  void
+  setup_solution(const vector<Bool3>& model,
+		 NlSolution& solution);
+
   /// @brief ノードを得る．
   Node*
   _node(ymuint x,
@@ -137,19 +158,6 @@ private:
   Edge*
   lower_edge(ymuint x,
 	     ymuint y);
-
-  /// @brief 部分解リストに追加する．
-  void
-  add_sol_list(const vector<ymuint>& cur_sol,
-	       vector<vector<ymuint> >& sol_list,
-	       HashSet<vector<ymuint> >& sig_set);
-
-  /// @brief 解を出力する．
-  /// @param[in] model SATの解
-  /// @param[in] solution 解
-  void
-  setup_solution(const vector<Bool3>& model,
-		 NlSolution& solution);
 
 
 private:

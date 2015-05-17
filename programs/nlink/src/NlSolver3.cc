@@ -286,197 +286,30 @@ NlSolver3::solve(const NlProblem& problem,
   // の順にたどる．
   vector<vector<ymuint> > cur_sol_list;
   cur_sol_list.push_back(vector<ymuint>(mEdgeNum, 0));
-  for (ymuint i = 0; i < mEdgeNum; ++ i) {
-    mCutMark[i] = false;
-  }
   for (ymuint x = 0; x < mWidth; ++ x) {
-    for (ymuint y = 0; y < mHeight; ++ y) {
-      cout << "Processing (" << x << ", " << y << ")" << endl;
-      Node* node = _node(x, y);
-      // (x, y) のノードを加える．
-      // 上と左の枝が消えて
-      // 下と右の枝が加わる．
-      vector<Edge*> old_edge_list;
-      vector<Edge*> new_edge_list;
-      if ( x > 0 ) {
-	Edge* edge = left_edge(x, y);
-	old_edge_list.push_back(edge);
-	mCutMark[edge->mId] = false;
+    cout << "Processing (" << x << ", 0)" << endl;
+
+    if ( x < mWidth - 1 ) {
+      for (ymuint y = 0; y < mHeight; ++ y) {
+	mCutMark[right_edge(x, y)->mId] = true;
       }
-      if ( y > 0 ) {
-	Edge* edge = upper_edge(x, y);
-	old_edge_list.push_back(edge);
-	mCutMark[edge->mId] = false;
+    }
+
+    vector<vector<ymuint> > new_sol_list;
+    HashSet<vector<ymuint> > sig_set;
+    for (ymuint i = 0; i < cur_sol_list.size(); ++ i) {
+      const vector<ymuint>& cur_sol = cur_sol_list[i];
+
+      search(x, 0, cur_sol, cur_sol, new_sol_list, sig_set);
+    }
+
+    cout << " --> " << new_sol_list.size() << endl;
+    cur_sol_list = new_sol_list;
+
+    if ( x < mWidth - 1 ) {
+      for (ymuint y = 0; y < mHeight; ++ y) {
+	mCutMark[right_edge(x, y)->mId] = false;
       }
-      if ( x < mWidth - 1 ) {
-	Edge* edge = right_edge(x, y);
-	new_edge_list.push_back(edge);
-	mCutMark[edge->mId] = true;
-      }
-      if ( y < mHeight - 1 ) {
-	Edge* edge = lower_edge(x, y);
-	new_edge_list.push_back(edge);
-	mCutMark[edge->mId] = true;
-      }
-
-      if ( false ) {
-	cout << "cut = ";
-	for (ymuint i = 0; i < mEdgeNum; ++ i) {
-	  if ( mCutMark[i] ) {
-	    cout << " " << mEdgeArray[i]->str();
-	  }
-	}
-	cout << endl;
-      }
-
-      vector<vector<ymuint> > new_sol_list;
-      HashSet<vector<ymuint> > sig_set;
-      for (ymuint i = 0; i < cur_sol_list.size(); ++ i) {
-	const vector<ymuint>& cur_sol = cur_sol_list[i];
-
-	// 今，加えた節点に接続するすでにこちら側に含まれている
-	// 枝のうち，選ばれているものの数を数える．
-	ymuint old_count = 0;
-	ymuint old_val = 0;
-	for (ymuint j = 0; j < old_edge_list.size(); ++ j) {
-	  Edge* edge = old_edge_list[j];
-	  if ( cur_sol[edge->mId] > 0 ) {
-	    ++ old_count;
-	    old_val = cur_sol[edge->mId];
-	  }
-	}
-
-	if ( node->mEndMark > 0 ) {
-	  switch ( old_count ) {
-	  case 0:
-	    // new_edge_list のなかから1つとりだしてその枝を選択する．
-	    for (ymuint j = 0;j < new_edge_list.size(); ++ j) {
-	      Edge* edge = new_edge_list[j];
-	      vector<ymuint> new_sol = cur_sol;
-	      // 番号は端子番号となる．
-	      new_sol[edge->mId] = node->mEndMark;
-	      add_sol_list(new_sol, new_sol_list, sig_set);
-	    }
-	    break;
-
-	  case 1:
-	    // 新しい枝を選択しない．
-	    // ただし，old_val の番号を持つ線分は端子番号で置き換える．
-	    // ただし，old_val が別の端子番号の場合は追加しない．
-	    if ( old_val > mNum || old_val == node->mEndMark ) {
-	      vector<ymuint> new_sol = cur_sol;
-	      for (ymuint i = 0; i < cur_sol.size(); ++ i) {
-		if ( new_sol[i] == old_val ) {
-		  new_sol[i] = node->mEndMark;
-		}
-	      }
-	      add_sol_list(new_sol, new_sol_list, sig_set);
-	    }
-	    break;
-
-	  default:
-	    ASSERT_NOT_REACHED;
-	    break;
-	  }
-	}
-	else {
-	  switch ( old_count ) {
-	  case 0:
-	    // new_edge_list のなかから2つ取り出して接続する．
-	    if ( new_edge_list.size() < 2 ) {
-	      // 解はない．
-	    }
-	    else {
-	      Edge* edge1 = new_edge_list[0];
-	      Edge* edge2 = new_edge_list[1];
-	      ymuint val = edge1->mId;
-	      if ( val > edge2->mId ) {
-		val = edge2->mId;
-	      }
-	      vector<ymuint> new_sol = cur_sol;
-	      // 番号は2つの枝の番号のうち小さい番号となる．
-	      new_sol[edge1->mId] = val + mNum + 1;
-	      new_sol[edge2->mId] = val + mNum + 1;
-	      add_sol_list(new_sol, new_sol_list, sig_set);
-	    }
-	    break;
-
-	  case 1:
-	    // new_edge_list の中から1つ取り出して接続する．
-	    for (ymuint j = 0; j < new_edge_list.size(); ++ j) {
-	      Edge* edge = new_edge_list[j];
-	      vector<ymuint> new_sol = cur_sol;
-	      // 番号はもう一方と同じ番号となる．
-	      new_sol[edge->mId] = old_val;
-	      add_sol_list(new_sol, new_sol_list, sig_set);
-	    }
-	    break;
-
-	  case 2:
-	    {
-	      Edge* edge1 = old_edge_list[0];
-	      Edge* edge2 = old_edge_list[1];
-	      ymuint old_val1 = cur_sol[edge1->mId];
-	      ymuint old_val2 = cur_sol[edge2->mId];
-	      if ( old_val1 != old_val2 ) {
-		vector<ymuint> new_sol = cur_sol;
-		if ( old_val1 <= mNum ) {
-		  if ( old_val2 <= mNum ) {
-		    // 異なる端子は繋げない．
-		  }
-		  else {
-		    // old_val2 を old_val1 に置き換える．
-		    for (ymuint i = 0; i < cur_sol.size(); ++ i) {
-		      if ( new_sol[i] == old_val2 ) {
-			new_sol[i] = old_val1;
-		      }
-		    }
-		    add_sol_list(new_sol, new_sol_list, sig_set);
-		  }
-		}
-		else if ( old_val2 <= mNum ) {
-		  // old_val1 を old_val2 に置き換える．
-		  for (ymuint i = 0; i < cur_sol.size(); ++ i) {
-		    if ( new_sol[i] == old_val1 ) {
-		      new_sol[i] = old_val2;
-		    }
-		  }
-		  add_sol_list(new_sol, new_sol_list, sig_set);
-		}
-		else if ( old_val1 < old_val2 ) {
-		  // old_val2 を old_val1 に置き換える．
-		  for (ymuint i = 0; i < cur_sol.size(); ++ i) {
-		    if ( new_sol[i] == old_val2 ) {
-		      new_sol[i] = old_val1;
-		    }
-		  }
-		  add_sol_list(new_sol, new_sol_list, sig_set);
-		}
-		else {
-		  // old_val1 を old_val2 に置き換える．
-		  for (ymuint i = 0; i < cur_sol.size(); ++ i) {
-		    if ( new_sol[i] == old_val1 ) {
-		      new_sol[i] = old_val2;
-		    }
-		  }
-		  add_sol_list(new_sol, new_sol_list, sig_set);
-		}
-	      }
-	      else {
-		add_sol_list(cur_sol, new_sol_list, sig_set);
-	      }
-	    }
-	    break;
-
-	  default:
-	    ASSERT_NOT_REACHED;
-	    break;
-	  }
-	}
-      }
-
-      cout << " --> " << new_sol_list.size() << endl;
-      cur_sol_list = new_sol_list;
     }
   }
 
@@ -614,95 +447,248 @@ NlSolver3::init(SatSolver& solver,
   }
 }
 
-// @brief ノードを得る．
-NlSolver3::Node*
-NlSolver3::_node(ymuint x,
-		 ymuint y)
-{
-  ASSERT_COND( x > 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y > 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mNodeArray[x * mHeight + y];
-}
-
-// @brief 左の辺を得る．
-// @param[in] x, y 辺の右端の座標
-NlSolver3::Edge*
-NlSolver3::left_edge(ymuint x,
-		     ymuint y)
-{
-  ASSERT_COND( x > 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mHarray[(x - 1) * mHeight + y];
-}
-
-// @brief 右の辺を得る．
-// @param[in] x, y 辺の左端の座標
-NlSolver3::Edge*
-NlSolver3::right_edge(ymuint x,
-		      ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth - 1 );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mHarray[x * mHeight + y];
-}
-
-// @brief 上の辺を得る．
-// @param[in] x, y 辺の下端の座標
-NlSolver3::Edge*
-NlSolver3::upper_edge(ymuint x,
-		      ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y > 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mVarray[(y - 1) * mWidth + x];
-}
-
-// @brief 下の辺を得る．
-// @param[in] x, y 辺の上端の座標
-NlSolver3::Edge*
-NlSolver3::lower_edge(ymuint x,
-		      ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight - 1 );
-
-  return mVarray[y * mWidth + x];
-}
-
-// @brief 解を出力する．
-// @param[in] model SATの解
-// @param[in] solution 解
 void
-NlSolver3::setup_solution(const vector<Bool3>& model,
-			  NlSolution& solution)
+NlSolver3::search(ymuint x,
+		  ymuint y,
+		  const vector<ymuint>& orig_sol,
+		  const vector<ymuint>& cur_sol,
+		  vector<vector<ymuint> >& sol_list,
+		  HashSet<vector<ymuint> >& sig_set)
 {
-  for (ymuint y = 0; y < mHeight; ++ y) {
-    for (ymuint x = 0; x < mWidth; ++ x) {
-      if ( solution.get(x, y) < 0 ) {
-	continue;
+  if ( y == mHeight ) {
+    if ( false ) {
+#if 0
+      cout << endl;
+      cout << "orig_sol = ";
+      for (ymuint i = 0; i < mEdgeNum; ++ i) {
+	ymuint num = orig_sol[i];
+	if ( num == 0 ) {
+	  continue;
+	}
+	Edge* edge = mEdgeArray[i];
+	cout << " " << edge->str() << ": " << num;
       }
-      Node* node = _node(x, y);
-      for (ymuint k = 0; k < mNum; ++ k) {
-	VarId var = node->mVarArray[k];
-	if ( model[var.val()] == kB3True ) {
-	  solution.set(x, y, k + 1);
-	  break;
+      cout << endl;
+      cout << "cur_sol = ";
+      for (ymuint i = 0; i < mEdgeNum; ++ i) {
+	ymuint num = cur_sol[i];
+	if ( num == 0 ) {
+	  continue;
+	}
+	Edge* edge = mEdgeArray[i];
+	cout << " " << edge->str() << ": " << num;
+      }
+      cout << endl;
+      cout << endl;
+#endif
+      for (ymuint y = 0; y < mHeight; ++ y) {
+	for (ymuint x = 0; x < mWidth - 1; ++ x) {
+	  Edge* edge = right_edge(x, y);
+	  ymuint num = cur_sol[edge->mId];
+	  cout << "   " << setw(3) << num;
+	}
+	cout << endl;
+	if ( y < mHeight - 1) {
+	  for (ymuint x = 0; x < mWidth; ++ x) {
+	    Edge* edge = lower_edge(x, y);
+	    ymuint num = cur_sol[edge->mId];
+	    cout << setw(3) << num << "   ";
+	  }
+	  cout << endl;
 	}
       }
+      cout << endl;
+    }
+    add_sol_list(cur_sol, sol_list, sig_set);
+    return;
+  }
+
+  if ( false ) {
+    cout << "search(" << x << ", " << y << ")" << endl;
+#if 0
+    for (ymuint i = 0; i < mEdgeNum; ++ i) {
+      ymuint num = cur_sol[i];
+      if ( num == 0 ) {
+	continue;
+      }
+      Edge* edge = mEdgeArray[i];
+      cout << " " << edge->str() << ": " << num;
+    }
+    cout << endl;
+#endif
+    for (ymuint y = 0; y < mHeight; ++ y) {
+      for (ymuint x = 0; x < mWidth - 1; ++ x) {
+	Edge* edge = right_edge(x, y);
+	ymuint num = cur_sol[edge->mId];
+	cout << "   " << setw(3) << num;
+      }
+      cout << endl;
+      if ( y < mHeight - 1 ) {
+	for (ymuint x = 0; x < mWidth; ++ x) {
+	  Edge* edge = lower_edge(x, y);
+	  ymuint num = cur_sol[edge->mId];
+	  cout << setw(3) << num << "   ";
+	}
+	cout << endl;
+      }
+    }
+    cout << endl;
+  }
+
+  vector<ymuint> tmp_sol(cur_sol);
+
+  Node* node = _node(x, y);
+
+  // 上から付けられるラベル．
+  ymuint u_val = 0;
+  if ( y > 0 ) {
+    Edge* u_edge = upper_edge(x, y);
+    u_val = cur_sol[u_edge->mId];
+  }
+
+  // 左から付けられるラベル．
+  ymuint l_val = 0;
+  if ( x > 0 ) {
+    Edge* l_edge = left_edge(x, y);
+    l_val = cur_sol[l_edge->mId];
+  }
+
+  ymuint node_val = node->mEndMark;
+  if ( node_val > 0 ) {
+    // 端点の場合
+    if ( u_val > 0 ) {
+      if ( l_val > 0 ) {
+	// 2つの線分が端点で交わることはない．
+	if ( false ) {
+	  cout << "*** u_val = " << u_val
+	       << ", l_val = " << l_val
+	       << ", node_val = " << node_val << endl;
+	}
+	return;
+      }
+      if ( u_val != node_val ) {
+	if ( u_val <= mNum ) {
+	  // 他の線分と端点が繋がることはない．
+	  if ( false ) {
+	    cout << "*** u_val = " << u_val
+		 << ", node_val = " << node_val << endl;
+	  }
+	  return;
+	}
+	// u_val を node_val に置き換える．
+	for (ymuint i = 0; i < mEdgeNum; ++ i) {
+	  if ( tmp_sol[i] == u_val ) {
+	    tmp_sol[i] = node_val;
+	  }
+	}
+      }
+      search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+    }
+    else if ( l_val > 0 ) {
+      if ( l_val != node_val ) {
+	if ( l_val <= mNum ) {
+	  // 他の線分と端点が繋がることはない．
+	  if ( false ) {
+	    cout << "*** l_val = " << l_val
+		 << ", node_val = " << node_val << endl;
+	  }
+	  return;
+	}
+	// l_val を node_val に置き換える．
+	for (ymuint i = 0; i < mEdgeNum; ++ i) {
+	  if ( tmp_sol[i] == l_val ) {
+	    tmp_sol[i] = node_val;
+	  }
+	}
+      }
+      search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+    }
+    else {
+      if ( x < mWidth - 1 ) {
+	ymuint r_id = right_edge(x, y)->mId;
+	tmp_sol[r_id] = node_val;
+	search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+	tmp_sol[r_id] = 0;
+      }
+      if ( y < mHeight - 1 ) {
+	ymuint d_id = lower_edge(x, y)->mId;
+	tmp_sol[d_id] = node_val;
+	search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+      }
+    }
+  }
+  else {
+    // 普通のノードの場合
+    if ( u_val > 0 ) {
+      if ( l_val > 0 ) {
+	// 2つの線分が交わった．
+	if ( u_val <= mNum && l_val <= mNum ) {
+	  // 異なる線分が交わることはできない．
+	  if ( false ) {
+	    cout << "*** u_val = " << u_val
+		 << ", l_val = " << l_val << endl;
+	  }
+	  return;
+	}
+	if ( u_val < l_val ) {
+	  // l_val を u_val で置き換える．
+	  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+	    if ( tmp_sol[i] == l_val ) {
+	      tmp_sol[i] = u_val;
+	    }
+	  }
+	}
+	else if ( u_val > l_val ) {
+	  // u_val を l_val で置き換える．
+	  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+	    if ( tmp_sol[i] == u_val ) {
+	      tmp_sol[i] = l_val;
+	    }
+	  }
+	}
+	search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+      }
+      else {
+	if ( x < mWidth - 1 ) {
+	  ymuint r_id = right_edge(x, y)->mId;
+	  tmp_sol[r_id] = u_val;
+	  search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+	  tmp_sol[r_id] = 0;
+	}
+	if ( y < mHeight - 1 ) {
+	  ymuint d_id = lower_edge(x, y)->mId;
+	  tmp_sol[d_id] = u_val;
+	  search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+	}
+      }
+    }
+    else if ( l_val > 0 ) {
+      if ( x < mWidth - 1 ) {
+	ymuint r_id = right_edge(x, y)->mId;
+	tmp_sol[r_id] = l_val;
+	search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+	tmp_sol[r_id] = 0;
+      }
+      if ( y < mHeight - 1 ) {
+	ymuint d_id = lower_edge(x, y)->mId;
+	tmp_sol[d_id] = l_val;
+	search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
+      }
+    }
+    else {
+      if ( x == mWidth - 1 || y == mHeight - 1 ) {
+	return;
+      }
+      ymuint r_id = right_edge(x, y)->mId;
+      ymuint d_id = lower_edge(x, y)->mId;
+      ymuint val = r_id;
+      if ( val > d_id ) {
+	val = d_id;
+      }
+      val += mNum + 1;
+      tmp_sol[r_id] = val;
+      tmp_sol[d_id] = val;
+      search(x, y + 1, orig_sol, tmp_sol, sol_list, sig_set);
     }
   }
 }
@@ -786,6 +772,99 @@ NlSolver3::add_sol_list(const vector<ymuint>& cur_sol,
   if ( !sig_set.check(signature) ) {
     sol_list.push_back(cur_sol);
     sig_set.add(signature);
+  }
+}
+
+// @brief ノードを得る．
+NlSolver3::Node*
+NlSolver3::_node(ymuint x,
+		 ymuint y)
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mNodeArray[x * mHeight + y];
+}
+
+// @brief 左の辺を得る．
+// @param[in] x, y 辺の右端の座標
+NlSolver3::Edge*
+NlSolver3::left_edge(ymuint x,
+		     ymuint y)
+{
+  ASSERT_COND( x > 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mHarray[(x - 1) * mHeight + y];
+}
+
+// @brief 右の辺を得る．
+// @param[in] x, y 辺の左端の座標
+NlSolver3::Edge*
+NlSolver3::right_edge(ymuint x,
+		      ymuint y)
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth - 1 );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mHarray[x * mHeight + y];
+}
+
+// @brief 上の辺を得る．
+// @param[in] x, y 辺の下端の座標
+NlSolver3::Edge*
+NlSolver3::upper_edge(ymuint x,
+		      ymuint y)
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y > 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mVarray[(y - 1) * mWidth + x];
+}
+
+// @brief 下の辺を得る．
+// @param[in] x, y 辺の上端の座標
+NlSolver3::Edge*
+NlSolver3::lower_edge(ymuint x,
+		      ymuint y)
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight - 1 );
+
+  return mVarray[y * mWidth + x];
+}
+
+// @brief 解を出力する．
+// @param[in] model SATの解
+// @param[in] solution 解
+void
+NlSolver3::setup_solution(const vector<Bool3>& model,
+			  NlSolution& solution)
+{
+  for (ymuint y = 0; y < mHeight; ++ y) {
+    for (ymuint x = 0; x < mWidth; ++ x) {
+      if ( solution.get(x, y) < 0 ) {
+	continue;
+      }
+      Node* node = _node(x, y);
+      for (ymuint k = 0; k < mNum; ++ k) {
+	VarId var = node->mVarArray[k];
+	if ( model[var.val()] == kB3True ) {
+	  solution.set(x, y, k + 1);
+	  break;
+	}
+      }
+    }
   }
 }
 

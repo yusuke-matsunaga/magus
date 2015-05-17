@@ -397,9 +397,9 @@ NlSolver::Node*
 NlSolver::_node(ymuint x,
 		ymuint y)
 {
-  ASSERT_COND( x > 0 );
+  ASSERT_COND( x >= 0 );
   ASSERT_COND( x < mWidth );
-  ASSERT_COND( y > 0 );
+  ASSERT_COND( y >= 0 );
   ASSERT_COND( y < mHeight );
 
   return mNodeArray[x * mHeight + y];
