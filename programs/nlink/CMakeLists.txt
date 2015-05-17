@@ -17,42 +17,37 @@ endif (TCL_FOUND)
 # ===================================================================
 
 set (common_SOURCES
-  src/MazeRouter.cc
-  src/NlProblem.cc
-  src/NlSolution.cc
-  src/NlScanner.cc
+  src/common/NlProblem.cc
+  src/common/NlSolution.cc
+  src/common/NlScanner.cc
   )
 
 set (nlink_SOURCES
   src/nlink.cc
-  src/NlSolver.cc
+  src/solver/NlSolver.cc
   )
 
 set (nlink2_SOURCES
   src/nlink2.cc
-  src/NlSolver2.cc
+  src/solver/NlSolver2.cc
   )
 
 set (nlink3_SOURCES
   src/nlink3.cc
-  src/NlSolver3.cc
+  src/solver/NlSolver3.cc
+  )
+
+set (nlview_SOURCES
+  src/gui/NlView.cc
+  src/gui/nlview.cc
+  src/solver/NlSolver2.cc
   )
 
 
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-#add_library(satpg_base OBJECT ${base_SOURCES})
-
-#add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
-
-#add_library(satpg_fsim OBJECT ${fsim_SOURCES})
-
-#add_library(satpg_graphsat OBJECT ${graphsat_SOURCES})
-
-#add_library(satpg_minpat OBJECT ${minpat_SOURCES})
-
-#add_library(satpg_rtpg OBJECT ${rtpg_SOURCES})
+add_library(nlink_common OBJECT ${common_SOURCES})
 
 #if (TCL_FOUND)
 #  add_executable(nlink
@@ -74,7 +69,7 @@ set (nlink3_SOURCES
 
 add_executable(nlink
   ${nlink_SOURCES}
-  ${common_SOURCES}
+  $<TARGET_OBJECTS:nlink_common>
   )
 
 target_link_libraries(nlink
@@ -83,7 +78,7 @@ target_link_libraries(nlink
 
 add_executable(nlink2
   ${nlink2_SOURCES}
-  ${common_SOURCES}
+  $<TARGET_OBJECTS:nlink_common>
   )
 
 target_link_libraries(nlink2
@@ -92,12 +87,31 @@ target_link_libraries(nlink2
 
 add_executable(nlink3
   ${nlink3_SOURCES}
-  ${common_SOURCES}
+  $<TARGET_OBJECTS:nlink_common>
   )
 
 target_link_libraries(nlink3
   ym_logic
   )
+
+if (Qt4_FOUND)
+  QT4_WRAP_CPP(HEADERS_MOC
+    src/gui/NlView.h
+    )
+
+  add_executable(nlview
+    ${nlview_SOURCES}
+    ${HEADERS_MOC}
+    $<TARGET_OBJECTS:nlink_common>
+    )
+
+  target_link_libraries(nlview
+    ym_logic
+    ym_utils
+    ${QT_LIBRARIES}
+    )
+
+endif (Qt4_FOUND)
 
 
 # ===================================================================
