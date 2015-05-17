@@ -16,24 +16,25 @@ endif (TCL_FOUND)
 #  ソースファイルの設定
 # ===================================================================
 
-set (nlink_SOURCES
-  src/nlink.cc
+set (common_SOURCES
   src/MazeRouter.cc
   src/NlProblem.cc
   src/NlSolution.cc
   src/NlScanner.cc
+  )
+
+set (nlink_SOURCES
+  src/nlink.cc
   src/NlSolver.cc
-  src/NlSolver2.cc
-  src/NlSolver3.cc
   )
 
 set (nlink2_SOURCES
-  src/nlink.cc
-  src/NlProblem.cc
-  src/NlSolution.cc
-  src/NlScanner.cc
-  src/NlSolver.cc
+  src/nlink2.cc
   src/NlSolver2.cc
+  )
+
+set (nlink3_SOURCES
+  src/nlink3.cc
   src/NlSolver3.cc
   )
 
@@ -73,6 +74,7 @@ set (nlink2_SOURCES
 
 add_executable(nlink
   ${nlink_SOURCES}
+  ${common_SOURCES}
   )
 
 target_link_libraries(nlink
@@ -81,9 +83,19 @@ target_link_libraries(nlink
 
 add_executable(nlink2
   ${nlink2_SOURCES}
+  ${common_SOURCES}
   )
 
 target_link_libraries(nlink2
+  ym_logic
+  )
+
+add_executable(nlink3
+  ${nlink3_SOURCES}
+  ${common_SOURCES}
+  )
+
+target_link_libraries(nlink3
   ym_logic
   )
 

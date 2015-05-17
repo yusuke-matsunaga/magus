@@ -13,7 +13,26 @@
 #include "MazeRouter.h"
 #include "YmLogic/SatSolver.h"
 #include "YmUtils/HashMap.h"
+#include "YmUtils/HashSet.h"
 
+BEGIN_NAMESPACE_YM
+
+template<>
+struct
+HashFunc<vector<ymuint> >
+{
+  ymuint
+  operator()(const vector<ymuint>& key) const
+  {
+    ymuint ans = 0U;
+    for (ymuint i = 0; i < key.size(); ++ i) {
+      ans += ans * 117 + ans;
+    }
+    return ans;
+  }
+};
+
+END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_NLINK
 
@@ -267,7 +286,9 @@ NlSolver3::solve(const NlProblem& problem,
   // の順にたどる．
   vector<vector<ymuint> > cur_sol_list;
   cur_sol_list.push_back(vector<ymuint>(mEdgeNum, 0));
-  vector<bool> cut_mark(mEdgeNum, false);
+  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+    mCutMark[i] = false;
+  }
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
       cout << "Processing (" << x << ", " << y << ")" << endl;
@@ -280,28 +301,28 @@ NlSolver3::solve(const NlProblem& problem,
       if ( x > 0 ) {
 	Edge* edge = left_edge(x, y);
 	old_edge_list.push_back(edge);
-	cut_mark[edge->mId] = false;
+	mCutMark[edge->mId] = false;
       }
       if ( y > 0 ) {
 	Edge* edge = upper_edge(x, y);
 	old_edge_list.push_back(edge);
-	cut_mark[edge->mId] = false;
+	mCutMark[edge->mId] = false;
       }
       if ( x < mWidth - 1 ) {
 	Edge* edge = right_edge(x, y);
 	new_edge_list.push_back(edge);
-	cut_mark[edge->mId] = true;
+	mCutMark[edge->mId] = true;
       }
       if ( y < mHeight - 1 ) {
 	Edge* edge = lower_edge(x, y);
 	new_edge_list.push_back(edge);
-	cut_mark[edge->mId] = true;
+	mCutMark[edge->mId] = true;
       }
 
-      {
+      if ( false ) {
 	cout << "cut = ";
 	for (ymuint i = 0; i < mEdgeNum; ++ i) {
-	  if ( cut_mark[i] ) {
+	  if ( mCutMark[i] ) {
 	    cout << " " << mEdgeArray[i]->str();
 	  }
 	}
@@ -309,7 +330,7 @@ NlSolver3::solve(const NlProblem& problem,
       }
 
       vector<vector<ymuint> > new_sol_list;
-      vector<vector<ymuint> > sig_list;
+      HashSet<vector<ymuint> > sig_set;
       for (ymuint i = 0; i < cur_sol_list.size(); ++ i) {
 	const vector<ymuint>& cur_sol = cur_sol_list[i];
 
@@ -334,7 +355,7 @@ NlSolver3::solve(const NlProblem& problem,
 	      vector<ymuint> new_sol = cur_sol;
 	      // 番号は端子番号となる．
 	      new_sol[edge->mId] = node->mEndMark;
-	      add_sol_list(new_sol, cut_mark, new_sol_list, sig_list);
+	      add_sol_list(new_sol, new_sol_list, sig_set);
 	    }
 	    break;
 
@@ -349,7 +370,7 @@ NlSolver3::solve(const NlProblem& problem,
 		  new_sol[i] = node->mEndMark;
 		}
 	      }
-	      add_sol_list(new_sol, cut_mark, new_sol_list, sig_list);
+	      add_sol_list(new_sol, new_sol_list, sig_set);
 	    }
 	    break;
 
@@ -376,7 +397,7 @@ NlSolver3::solve(const NlProblem& problem,
 	      // 番号は2つの枝の番号のうち小さい番号となる．
 	      new_sol[edge1->mId] = val + mNum + 1;
 	      new_sol[edge2->mId] = val + mNum + 1;
-	      add_sol_list(new_sol, cut_mark, new_sol_list, sig_list);
+	      add_sol_list(new_sol, new_sol_list, sig_set);
 	    }
 	    break;
 
@@ -387,13 +408,64 @@ NlSolver3::solve(const NlProblem& problem,
 	      vector<ymuint> new_sol = cur_sol;
 	      // 番号はもう一方と同じ番号となる．
 	      new_sol[edge->mId] = old_val;
-	      add_sol_list(new_sol, cut_mark, new_sol_list, sig_list);
+	      add_sol_list(new_sol, new_sol_list, sig_set);
 	    }
 	    break;
 
 	  case 2:
-	    // 新しい枝を選択しない．
-	    add_sol_list(cur_sol, cut_mark, new_sol_list, sig_list);
+	    {
+	      Edge* edge1 = old_edge_list[0];
+	      Edge* edge2 = old_edge_list[1];
+	      ymuint old_val1 = cur_sol[edge1->mId];
+	      ymuint old_val2 = cur_sol[edge2->mId];
+	      if ( old_val1 != old_val2 ) {
+		vector<ymuint> new_sol = cur_sol;
+		if ( old_val1 <= mNum ) {
+		  if ( old_val2 <= mNum ) {
+		    // 異なる端子は繋げない．
+		  }
+		  else {
+		    // old_val2 を old_val1 に置き換える．
+		    for (ymuint i = 0; i < cur_sol.size(); ++ i) {
+		      if ( new_sol[i] == old_val2 ) {
+			new_sol[i] = old_val1;
+		      }
+		    }
+		    add_sol_list(new_sol, new_sol_list, sig_set);
+		  }
+		}
+		else if ( old_val2 <= mNum ) {
+		  // old_val1 を old_val2 に置き換える．
+		  for (ymuint i = 0; i < cur_sol.size(); ++ i) {
+		    if ( new_sol[i] == old_val1 ) {
+		      new_sol[i] = old_val2;
+		    }
+		  }
+		  add_sol_list(new_sol, new_sol_list, sig_set);
+		}
+		else if ( old_val1 < old_val2 ) {
+		  // old_val2 を old_val1 に置き換える．
+		  for (ymuint i = 0; i < cur_sol.size(); ++ i) {
+		    if ( new_sol[i] == old_val2 ) {
+		      new_sol[i] = old_val1;
+		    }
+		  }
+		  add_sol_list(new_sol, new_sol_list, sig_set);
+		}
+		else {
+		  // old_val1 を old_val2 に置き換える．
+		  for (ymuint i = 0; i < cur_sol.size(); ++ i) {
+		    if ( new_sol[i] == old_val1 ) {
+		      new_sol[i] = old_val2;
+		    }
+		  }
+		  add_sol_list(new_sol, new_sol_list, sig_set);
+		}
+	      }
+	      else {
+		add_sol_list(cur_sol, new_sol_list, sig_set);
+	      }
+	    }
 	    break;
 
 	  default:
@@ -466,6 +538,8 @@ NlSolver3::init(SatSolver& solver,
   // 横の辺を作る．
   ymuint nh = (width - 1) * height;
   ymuint nv = (height - 1) * width;
+
+  mEdgeNum = nh + nv;
   mEdgeArray.reserve(nh + nv);
   mHarray.resize(nh);
   for (ymuint i = 0; i < nh; ++ i) {
@@ -494,7 +568,8 @@ NlSolver3::init(SatSolver& solver,
     edge->mX0 = i % width;
   }
 
-  mEdgeNum = nh + nv;
+  mCutMark.clear();
+  mCutMark.resize(mEdgeNum, false);
 
   // ノードを作る．
   ymuint nn = width * height;
@@ -634,14 +709,13 @@ NlSolver3::setup_solution(const vector<Bool3>& model,
 
 void
 NlSolver3::add_sol_list(const vector<ymuint>& cur_sol,
-			const vector<bool>& cut_mark,
 			vector<vector<ymuint> >& sol_list,
-			vector<vector<ymuint> >& sig_list)
+			HashSet<vector<ymuint> >& sig_set)
 {
   // シグネチャを計算する．
   vector<ymuint> cut_list;
   for (ymuint i = 0; i < mEdgeNum; ++ i) {
-    if ( cut_mark[i] ) {
+    if ( mCutMark[i] ) {
       cut_list.push_back(i);
     }
   }
@@ -668,51 +742,51 @@ NlSolver3::add_sol_list(const vector<ymuint>& cur_sol,
     }
   }
 
-  for (ymuint i = 0; i < mEdgeNum; ++ i) {
-    ymuint num = cur_sol[i];
-    if ( num == 0 ) {
-      continue;
+  if ( false ) {
+    for (ymuint i = 0; i < mEdgeNum; ++ i) {
+      ymuint num = cur_sol[i];
+      if ( num == 0 && !mCutMark[i] ) {
+	continue;
+      }
+      Edge* edge = mEdgeArray[i];
+      cout << " " << edge->str();
+      if ( mCutMark[i] ) {
+	cout << "*";
+      }
+      cout << ": ";
+      if ( num == 0 ) {
+	cout << "__";
+      }
+      else if ( num <= mNum ) {
+	cout << "#" << num;
+      }
+      else {
+	cout << "@" << (num - mNum);
+      }
     }
-    Edge* edge = mEdgeArray[i];
-    cout << " " << edge->str();
-    if ( cut_mark[i] ) {
-      cout << "*";
+    cout << endl;
+    cout << " signature = ";
+    for (ymuint i = 0; i < n; ++ i) {
+      ymuint val = signature[i];
+      cout << " ";
+      if ( val == 0 ) {
+	cout << " __";
+      }
+      else if ( val <= mNum ) {
+	cout << "#" << val;
+      }
+      else {
+	cout << "@" << val;
+      }
     }
-    cout << ": ";
-    if ( num <= mNum ) {
-      cout << "#" << num;
-    }
-    else {
-      cout << "@" << (num - mNum);
-    }
+    cout << endl;
   }
-  cout << endl;
-  cout << " signature = ";
-  for (ymuint i = 0; i < n; ++ i) {
-    ymuint val = signature[i];
-    cout << " ";
-    if ( val == 0 ) {
-      cout << " __";
-    }
-    else if ( val <= mNum ) {
-      cout << "#" << val;
-    }
-    else {
-      cout << "@" << val;
-    }
-  }
-  cout << endl
-       << endl;
 
   // シグネチャのチェックを行う．
-  for (ymuint i = 0; i < sig_list.size(); ++i) {
-    if ( sig_list[i] == signature ) {
-      return;
-    }
+  if ( !sig_set.check(signature) ) {
+    sol_list.push_back(cur_sol);
+    sig_set.add(signature);
   }
-
-  sol_list.push_back(cur_sol);
-  sig_list.push_back(signature);
 }
 
 // 枝を表す文字列を返す．

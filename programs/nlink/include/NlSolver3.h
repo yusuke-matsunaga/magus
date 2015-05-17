@@ -11,6 +11,7 @@
 
 #include "nlink_nsdef.h"
 #include "YmLogic/SatSolver.h"
+#include "YmUtils/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -140,9 +141,8 @@ private:
   /// @brief 部分解リストに追加する．
   void
   add_sol_list(const vector<ymuint>& cur_sol,
-	       const vector<bool>& cut_mark,
 	       vector<vector<ymuint> >& sol_list,
-	       vector<vector<ymuint> >& sig_list);
+	       HashSet<vector<ymuint> >& sig_set);
 
   /// @brief 解を出力する．
   /// @param[in] model SATの解
@@ -181,6 +181,11 @@ private:
   // ノードの配列
   vector<Node*> mNodeArray;
 
+  // 所持済みのノードリスト
+  vector<ymuint> mDoneList;
+
+  // 現在のカットマーク
+  vector<bool> mCutMark;
 
 };
 
