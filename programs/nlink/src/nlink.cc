@@ -9,6 +9,7 @@
 
 #include "nlink_nsdef.h"
 #include "NlProblem.h"
+#include "NlSolution.h"
 #include "NlSolver.h"
 
 
@@ -22,8 +23,11 @@ nlink(const string& filename)
   print_problem(cout, problem);
 
   NlSolver solver;
+  NlSolution solution;
 
-  solver.solve(problem);
+  solver.solve(problem, solution);
+
+  print_solution(cout, solution);
 }
 
 END_NAMESPACE_YM_NLINK

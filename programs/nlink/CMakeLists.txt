@@ -20,6 +20,7 @@ set (nlink_SOURCES
   src/nlink.cc
   src/MazeRouter.cc
   src/NlProblem.cc
+  src/NlSolution.cc
   src/NlScanner.cc
   src/NlSolver.cc
   src/NlSolver2.cc
@@ -28,6 +29,7 @@ set (nlink_SOURCES
 set (nlink2_SOURCES
   src/nlink.cc
   src/NlProblem.cc
+  src/NlSolution.cc
   src/NlScanner.cc
   src/NlSolver.cc
   src/NlSolver2.cc

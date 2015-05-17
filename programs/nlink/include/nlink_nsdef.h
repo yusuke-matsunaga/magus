@@ -38,6 +38,7 @@ BEGIN_NAMESPACE_YM_NLINK
 class NlConnection;
 class NlPoint;
 class NlProblem;
+class NlSolution;
 class NlSolver;
 
 END_NAMESPACE_YM_NLINK

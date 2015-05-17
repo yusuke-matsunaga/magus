@@ -8,6 +8,7 @@
 
 
 #include "NlSolver2.h"
+#include "NlSolution.h"
 #include "YmLogic/SatSolver.h"
 
 
@@ -114,9 +115,13 @@ zero_two_hot4(SatSolver& solver,
 
 END_NONAMESPACE
 
+
 // @brief 問題を解く
+// @param[in] problem 問題
+// @param[out] solution 解
 void
-NlSolver2::solve(const NlProblem& problem)
+NlSolver2::solve(const NlProblem& problem,
+		 NlSolution& solution)
 {
   SatSolver solver("minisat2", string(), NULL);
 
@@ -293,20 +298,21 @@ NlSolver2::solve(const NlProblem& problem)
     }
   }
 
+  solution.init(problem);
+
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
   switch ( stat ) {
   case kB3True:
-    cout << "SAT" << endl;
-    print_solution(cout, model);
+    setup_solution(model, solution);
     break;
 
   case kB3False:
-    cout << "UNSAT" << endl;
+    cerr << "UNSAT" << endl;
     break;
 
   case kB3X:
-    cout << "ABORT" << endl;
+    cerr << "ABORT" << endl;
     break;
   }
 }
@@ -492,6 +498,39 @@ NlSolver2::lower_edge(ymuint x,
   ASSERT_COND( y < mHeight - 1 );
 
   return mVarray[y * mWidth + x];
+}
+
+// @brief 解を出力する．
+// @param[in] model SATの解
+// @param[in] solution 解
+void
+NlSolver2::setup_solution(const vector<Bool3>& model,
+			  NlSolution& solution)
+{
+  for (ymuint y = 0; y < mHeight; ++ y) {
+    for (ymuint x = 0; x < mWidth; ++ x) {
+      if ( solution.get(x, y) < 0 ) {
+	continue;
+      }
+      Node* node = _node(x, y);
+      const vector<Edge*>& edge_list = node->mEdgeList;
+      bool found = false;
+      for (ymuint i = 0; i < edge_list.size(); ++ i) {
+	Edge* edge = edge_list[i];
+	for (ymuint k = 0; k < mNum; ++ k) {
+	  VarId var = edge->mVarArray[k];
+	  if ( model[var.val()] == kB3True ) {
+	    solution.set(x, y, k + 1);
+	    found = true;
+	    break;
+	  }
+	}
+	if ( found ) {
+	  break;
+	}
+      }
+    }
+  }
 }
 
 // @brief 解を出力する．

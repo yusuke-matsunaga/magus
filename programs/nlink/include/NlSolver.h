@@ -37,8 +37,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 問題を解く
+  /// @param[in] problem 問題
+  /// @param[out] solution 解
   void
-  solve(const NlProblem& problem);
+  solve(const NlProblem& problem,
+	NlSolution& solution);
 
 
 private:
@@ -123,6 +126,13 @@ private:
   Edge*
   lower_edge(ymuint x,
 	     ymuint y);
+
+  /// @brief 解を出力する．
+  /// @param[in] model SATの解
+  /// @param[in] solution 解
+  void
+  setup_solution(const vector<Bool3>& model,
+		 NlSolution& solution);
 
   /// @brief 解を出力する．
   /// @param[in] s 出力先のストリーム
