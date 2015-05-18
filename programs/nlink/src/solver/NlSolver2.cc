@@ -130,11 +130,7 @@ NlSolver2::solve(const NlProblem& problem,
   ymuint h = problem.height();
   ymuint n = problem.elem_num();
 
-  ASSERT_COND( w > 0 );
-  ASSERT_COND( h > 0 );
-  ASSERT_COND( n > 0 );
-
-  init(solver, w, h, n);
+  init(w, h, n);
 
   // 横の辺に対する one-hot 制約を作る．
   for (ymuint x = 1; x < w; ++ x) {
@@ -142,7 +138,8 @@ NlSolver2::solve(const NlProblem& problem,
       Edge* edge = left_edge(x, y);
       vector<Literal> tmp_lits(n);
       for (ymuint k = 0; k < n; ++ k) {
-	VarId var = edge->mVarArray[k];
+	VarId var = solver.new_var();
+	edge->mVarArray[k] = var;
 	Literal lit = Literal(var);
 	tmp_lits[k] = lit;
       }
@@ -162,7 +159,8 @@ NlSolver2::solve(const NlProblem& problem,
       Edge* edge = upper_edge(x, y);
       vector<Literal> tmp_lits(n);
       for (ymuint k = 0; k < n; ++ k) {
-	VarId var = edge->mVarArray[k];
+	VarId var = solver.new_var();
+	edge->mVarArray[k] = var;
 	Literal lit = Literal(var);
 	tmp_lits[k] = lit;
       }
@@ -281,6 +279,7 @@ NlSolver2::solve(const NlProblem& problem,
 	}
       }
 
+      // このノード上で異なる番号の線分が交わることはない．
       for (ymuint i1 = 0; i1 < na; ++ i1) {
 	Edge* edge1 = adj_list[i1];
 	for (ymuint i2 = 0; i2 < na; ++ i2) {
@@ -301,6 +300,76 @@ NlSolver2::solve(const NlProblem& problem,
 
   solution.init(problem);
 
+  {
+    // trivial に見える線分を引いてしまう．
+    vector<ymuint> idx_list;
+    for (ymuint k = 0; k < n; ++ k) {
+      NlConnection con = problem.connection(k);
+      NlPoint start_point = con.start_point();
+      ymuint x1 = start_point.x();
+      ymuint y1 = start_point.y();
+
+      NlPoint end_point = con.end_point();
+      ymuint x2 = end_point.x();
+      ymuint y2 = end_point.y();
+
+      if ( x1 == x2 || y1 == y2 ) {
+	idx_list.push_back(k);
+      }
+    }
+
+    if ( !idx_list.empty() ) {
+      cout << "found trivial route";
+      for (ymuint i = 0; i < idx_list.size(); ++ i) {
+	cout << " " << (idx_list[i] + 1);
+      }
+      cout << endl;
+      vector<Literal> assumption;
+      for (ymuint i = 0; i < idx_list.size(); ++ i) {
+	ymuint idx = idx_list[i];
+	trivial_route(idx, problem.connection(idx), assumption);
+      }
+      vector<Bool3> model;
+      Bool3 stat = solver.solve(assumption, model);
+      if ( stat == kB3True ) {
+	cout << "SAT with trivial route" << endl;
+	setup_solution(model, solution);
+	return;
+      }
+      else if ( stat == kB3False ) {
+	cout << "UNSAT with trivial route" << endl;
+	for (ymuint n1 = idx_list.size() - 1; n1 > 0; -- n1) {
+	  cout << "  trivial route";
+	  for (ymuint i = 0; i < n1; ++ i) {
+	    cout << " " << (idx_list[i] + 1);
+	  }
+	  cout << endl;
+	  vector<Literal> assumption;
+	  for (ymuint k = 0; k < n1; ++ k) {
+	    ymuint idx = idx_list[k];
+	    trivial_route(idx, problem.connection(idx), assumption);
+	  }
+	  vector<Bool3> model;
+	  Bool3 stat = solver.solve(assumption, model);
+	  if ( stat == kB3True ) {
+	    cout << "SAT with trivial route#" << n1 << endl;
+	    setup_solution(model, solution);
+	    return;
+	  }
+	  else if ( stat == kB3False ) {
+	    cout << "UNSAT with trivial route#" << n1 << endl;
+	  }
+	  else if ( stat == kB3X ) {
+	    cout << "ABORT with trivial route#" << n1 << endl;
+	  }
+	}
+      }
+      else if ( stat == kB3X ) {
+	cout << "ABORT with trivial route" << endl;
+      }
+    }
+  }
+
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
   switch ( stat ) {
@@ -315,6 +384,48 @@ NlSolver2::solve(const NlProblem& problem,
   case kB3X:
     cerr << "ABORT" << endl;
     break;
+  }
+}
+
+// @brief 自明な線分を引いたうえで解を求める．
+void
+NlSolver2::trivial_route(ymuint k,
+			 const NlConnection& con,
+			 vector<Literal>& assumption)
+{
+  NlPoint start_point = con.start_point();
+  ymuint x1 = start_point.x();
+  ymuint y1 = start_point.y();
+  Node* node1 = _node(x1, y1);
+
+  NlPoint end_point = con.end_point();
+  ymuint x2 = end_point.x();
+  ymuint y2 = end_point.y();
+  Node* node2 = _node(x2, y2);
+
+  if ( x1 == x2 ) {
+    if ( y1 > y2 ) {
+      ymuint tmp = y1;
+      y1 = y2;
+      y2 = tmp;
+    }
+    for (ymuint y = y1 + 1; y < y2; ++ y) {
+      Edge* edge = upper_edge(x1, y);
+      Literal lit(edge->mVarArray[k]);
+      assumption.push_back(lit);
+    }
+  }
+  else if ( y1 == y2 ) {
+    if ( x1 > x2 ) {
+      ymuint tmp = x1;
+      x1 = x2;
+      x2 = tmp;
+    }
+    for (ymuint x = x1 + 1; x < x2; ++ x) {
+      Edge* edge = left_edge(x, y1);
+      Literal lit(edge->mVarArray[k]);
+      assumption.push_back(lit);
+    }
   }
 }
 
@@ -339,16 +450,18 @@ NlSolver2::clear()
 }
 
 // @brief 内容を初期化する．
-// @param[in] solver SAT ソルバ
 // @param[in] width 幅
 // @param[in] height 高さ
 // @param[in] num 線分数
 void
-NlSolver2::init(SatSolver& solver,
-		ymuint width,
+NlSolver2::init(ymuint width,
 		ymuint height,
 		ymuint num)
 {
+  ASSERT_COND( w > 0 );
+  ASSERT_COND( h > 0 );
+  ASSERT_COND( n > 0 );
+
   clear();
 
   mWidth = width;
@@ -362,10 +475,6 @@ NlSolver2::init(SatSolver& solver,
     Edge* edge = new Edge;
     mHarray[i] = edge;
     edge->mVarArray.resize(num);
-    for (ymuint j = 0; j < num; ++ j) {
-      VarId var = solver.new_var();
-      edge->mVarArray[j] = var;
-    }
   }
 
   // 縦の辺を作る．
@@ -375,10 +484,6 @@ NlSolver2::init(SatSolver& solver,
     Edge* edge = new Edge;
     mVarray[i] = edge;
     edge->mVarArray.resize(num);
-    for (ymuint j = 0; j < num; ++ j) {
-      VarId var = solver.new_var();
-      edge->mVarArray[j] = var;
-    }
   }
 
   // ノードを作る．
@@ -414,18 +519,6 @@ NlSolver2::init(SatSolver& solver,
 	// 下に辺がある．
 	Edge* edge = lower_edge(x, y);
 	node->mEdgeList.push_back(edge);
-      }
-      ymuint n = node->mEdgeList.size();
-      for (ymuint i = 0; i < n; ++ i) {
-	Edge* edge0 = node->mEdgeList[i];
-	edge0->mAdjList.reserve(n - 1);
-	for (ymuint j = 0; j < n; ++ j) {
-	  if ( j == i ) {
-	    continue;
-	  }
-	  Edge* edge = node->mEdgeList[j];
-	  edge0->mAdjList.push_back(edge);
-	}
       }
     }
   }

@@ -18,11 +18,7 @@ BEGIN_NAMESPACE_YM_NLINK
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MazeRouter::MazeRouter(const NlProblem& problem) :
-  mProblem(problem),
-  mWidth(problem.width()),
-  mHeight(problem.height()),
-  mCellArray((mWidth + 1) * (mHeight + 1))
+MazeRouter::MazeRouter()
 {
 }
 
@@ -31,52 +27,85 @@ MazeRouter::~MazeRouter()
 {
 }
 
-// @brief ラベル付けを行う．
-// @param[in] idx 線分番号
-// @return 最短経路長を返す．
-ymuint
-MazeRouter::labeling(ymuint idx)
+// @brief 問題をセットする．
+void
+MazeRouter::set_problem(const NlProblem& problem)
 {
-  ASSERT_COND( idx < mProblem.elem_num() );
-
-  ymuint h = mProblem.height();
-  NlConnection con = mProblem.connection(idx);
-  NlPoint start_point = con.start_point();
-  NlPoint end_point = con.end_point();
-
+  mWidth = problem.width();
+  mHeight = problem.height();
+  mNum = problem.elem_num();
+  mCellArray.clear();
+  mCellArray.resize((mWidth + 1) * (mHeight + 1) + 1);
   for (ymuint i = 0; i < mCellArray.size(); ++ i) {
-    mCellArray[i] = -2;
+    mCellArray[i] = -2; // 範囲外
   }
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
-      ymuint index = xy_to_index(x, y);
-      mCellArray[index] = -1;
+      mCellArray[xy_to_index(x, y)] = 0;
     }
   }
-  for (ymuint i = 0; i < mProblem.elem_num(); ++ i) {
-    if ( i == idx ) {
-      continue;
-    }
-    NlConnection con = mProblem.connection(i);
-    NlPoint start_point = con.start_point();
-    NlPoint end_point = con.end_point();
-    mCellArray[point_to_index(start_point)] = -2;
-    mCellArray[point_to_index(end_point)] = -2;
+
+  mConList.clear();
+  mConList.reserve(mNum);
+  for (ymuint i = 0; i < mNum; ++ i) {
+    NlConnection con = problem.connection(i);
+    mConList.push_back(con);
+    mCellArray[point_to_index(con.start_point())] = -1;
+    mCellArray[point_to_index(con.end_point())] = -1;
   }
+}
+
+// @brief 幅を得る．
+ymuint
+MazeRouter::width() const
+{
+  return mWidth;
+}
+
+// @brief 高さを得る．
+ymuint
+MazeRouter::height() const
+{
+  return mHeight;
+}
+
+// @brief 結線数を得る．
+ymuint
+MazeRouter::num() const
+{
+  return mNum;
+}
+
+// @brief 最短経路を求める．
+// @param[in] idx 線分番号
+// @param[out] point_list 経路
+// @return 迂回長を返す．
+ymuint
+MazeRouter::find_route(ymuint idx,
+		       vector<NlPoint>& point_list)
+{
+  ASSERT_COND( idx < mNum );
+
+  NlConnection con = mProblem.connection(idx);
+  NlPoint start_point = con.start_point();
+  NlPoint end_point = con.end_point();
 
   ymuint dx = mHeight + 1;
   ymuint dy = 1;
   mQueue.clear();
   mQueue.reserve(mCellArray.size());
-  ymuint rpos = 0;
   ymuint index0 = point_to_index(start_point);
-  label1(index0, 0);
+  mCellArray[index0] = 0;
+  mQueue.push_back(index0);
   ymuint index1 = point_to_index(end_point);
+  ymuint rpos = 0;
+  bool reached = false;
   for (ymuint rpos = 0; rpos < mQueue.size(); ++ rpos) {
     ymuint index = mQueue[rpos];
     ymuint label = mCellArray[index];
     if ( index == index1 ) {
-      return label;
+      reached = true;
+      break;
     }
     label1(index - dy, label + 1);
     label1(index + dy, label + 1);
@@ -84,23 +113,12 @@ MazeRouter::labeling(ymuint idx)
     label1(index + dx, label + 1);
   }
 
-  ASSERT_NOT_REACHED;
-  return 0;
-}
-
-// @brief 直前のラベル付けの結果を得る．
-// @param[in] label ラベル値
-// @param[out] cell_list ラベル値を持つセルのリスト
-void
-MazeRouter::get_cell_list(ymuint label,
-			  vector<NlPoint>& cell_list) const
-{
-  cell_list.clear();
-  for (ymuint i = 0; i < mCellArray.size(); ++ i) {
-    if ( mCellArray[i] == label ) {
-      cell_list.push_back(index_to_point(i));
-    }
+  if ( !reached ) {
+    return MAX_UINT;
   }
+
+
+  return 0;
 }
 
 // @brief ラベル付けの基本処理
@@ -108,7 +126,7 @@ void
 MazeRouter::label1(ymuint index,
 		   ymuint label)
 {
-  if ( mCellArray[index] == -1 ) {
+  if ( mCellArray[index] == 0 ) {
     mCellArray[index] = label;
     mQueue.push_back(index);
   }

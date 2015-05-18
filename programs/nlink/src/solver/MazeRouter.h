@@ -23,7 +23,7 @@ class MazeRouter
 public:
 
   /// @brief コンストラクタ
-  MazeRouter(const NlProblem& problem);
+  MazeRouter();
 
   /// @brief デストラクタ
   ~MazeRouter();
@@ -34,18 +34,29 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ラベル付けを行う．
-  /// @param[in] idx 線分番号
-  /// @return 最短経路長を返す．
-  ymuint
-  labeling(ymuint idx);
-
-  /// @brief 直前のラベル付けの結果を得る．
-  /// @param[in] label ラベル値
-  /// @param[out] cell_list ラベル値を持つセルのリスト
+  /// @brief 問題をセットする．
   void
-  get_cell_list(ymuint label,
-		vector<NlPoint>& cell_list) const;
+  set_problem(const NlProblem& problem);
+
+  /// @brief 幅を得る．
+  ymuint
+  width() const;
+
+  /// @brief 高さを得る．
+  ymuint
+  height() const;
+
+  /// @brief 結線数を得る．
+  ymuint
+  num() const;
+
+  /// @brief 最短経路を求める．
+  /// @param[in] idx 線分番号
+  /// @param[out] point_list 経路
+  /// @return 迂回長を返す．
+  ymuint
+  find_route(ymuint idx,
+	     vector<NlPoint>& point_list);
 
 
 private:
@@ -83,14 +94,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 問題
-  const NlProblem& mProblem;
-
   // 幅
   ymuint mWidth;
 
   // 高さ
   ymuint mHeight;
+
+  // 結線数
+  ymuint mNum;
+
+  // 結線の配列
+  vector<NlConnection> mConList;
 
   // セルの配列
   vector<int> mCellArray;

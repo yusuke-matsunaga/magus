@@ -52,9 +52,6 @@ private:
   struct Edge
   {
 
-    // 隣接する辺のリスト
-    vector<Edge*> mAdjList;
-
     // 変数番号の配列
     vector<VarId> mVarArray;
 
@@ -84,15 +81,19 @@ private:
   clear();
 
   /// @brief 内容を初期化する．
-  /// @param[in] solver SAT ソルバ
   /// @param[in] width 幅
   /// @param[in] height 高さ
   /// @param[in] num 線分数
   void
-  init(SatSolver& solver,
-       ymuint width,
+  init(ymuint width,
        ymuint height,
        ymuint num);
+
+  /// @brief 自明な線分を引いたうえで解を求める．
+  void
+  trivial_route(ymuint k,
+		const NlConnection& con,
+		vector<Literal>& assumption);
 
   /// @brief ノードを得る．
   /// @param[in] x, y 座標
