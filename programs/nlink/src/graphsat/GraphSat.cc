@@ -12,7 +12,7 @@
 #include "YmLogic/SatMsgHandler.h"
 #include "SatAnalyzer.h"
 #include "SatClause.h"
-#include "TpgNode.h"
+#include "NlGraph.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -264,11 +264,9 @@ GraphSat::add_clause(Literal lit1,
   add_clause_sub(5);
 }
 
-// @brief PGraph の始点と終点をセットする．
+// @brief NlGraph をセットする．
 void
-GraphSat::set_pgraph(TpgNode* source,
-		     const vector<TpgNode*>& sink_list,
-		     ymuint max_id)
+GraphSat::set_graph(const NlGraph& graph)
 {
   if ( decision_level() != 0 ) {
     // エラー
@@ -276,11 +274,9 @@ GraphSat::set_pgraph(TpgNode* source,
     return;
   }
 
-  mSource = source;
-  mSinkList = sink_list;
-  mMaxId = max_id;
+  mGraph = &graph;
   mMark.clear();
-  mMark.resize(mMaxId, 0);
+  //mMark.resize(mMaxId, 0);
   mReached = false;
 }
 
@@ -652,219 +648,221 @@ GraphSat::implication()
 {
   SatReason conflict = kNullSatReason;
   for ( ; ; ) {
-  while ( mAssignList.has_elem() ) {
-    Literal l = mAssignList.get_next();
-    ++ mPropagationNum;
-    -- mSweep_props;
+    while ( mAssignList.has_elem() ) {
+      Literal l = mAssignList.get_next();
+      ++ mPropagationNum;
+      -- mSweep_props;
 
-    if ( debug & debug_implication ) {
-      cout << "\tpick up " << l << endl;
-    }
-    // l の割り当てによって無効化された watcher-list の更新を行う．
-    Literal nl = ~l;
-
-    WatcherList& wlist = watcher_list(l);
-    ymuint n = wlist.num();
-    ymuint rpos = 0;
-    ymuint wpos = 0;
-    while ( rpos < n ) {
-      Watcher w = wlist.elem(rpos);
-      wlist.set_elem(wpos, w);
-      ++ rpos;
-      ++ wpos;
-      if ( w.is_literal() ) {
-	// 2-リテラル節の場合は相方のリテラルに基づく値の割り当てを行う．
-	Literal l0 = w.literal();
-	Bool3 val0 = eval(l0);
-	if ( val0 == kB3True ) {
-	  // すでに充足していた．
-	  continue;
-	}
-	if ( debug & debug_assign ) {
-	  cout << "\tassign " << l0 << " @" << decision_level()
-	       << " from (" << l0
-	       << " + " << ~l << "): " << l << endl;
-	}
-	if ( val0 == kB3X ) {
-	  assign(l0, SatReason(nl));
-	}
-	else { // val0 == kB3False
-	  // 矛盾がおこった．
-	  if ( debug & debug_assign ) {
-	    cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
-		 << "\t    " << ~l0 << " was assigned at level "
-		 << decision_level(l0.varid()) << endl;
-	  }
-
-	  // ループを抜けるためにキューの末尾まで先頭を動かす．
-	  mAssignList.skip_all();
-
-	  // 矛盾の理由を表す節を作る．
-	  mTmpBinClause->set(l0, nl);
-	  conflict = SatReason(mTmpBinClause);
-	  break;
-	}
+      if ( debug & debug_implication ) {
+	cout << "\tpick up " << l << endl;
       }
-      else { // w.is_clause()
-	// 3つ以上のリテラルを持つ節の場合は，
-	// - nl(~l) を wl1() にする．(場合によっては wl0 を入れ替える)
-	// - wl0() が充足していたらなにもしない．
-	// - wl0() が不定，もしくは偽なら，nl の代わりの watch literal を探す．
-	// - 代わりが見つかったらそのリテラルを wl1() にする．
-	// - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
-	SatClause* c = w.clause();
-	Literal l0 = c->wl0();
-	if ( l0 == nl ) {
-	  if ( eval(c->wl1()) == kB3True ) {
+      // l の割り当てによって無効化された watcher-list の更新を行う．
+      Literal nl = ~l;
+
+      WatcherList& wlist = watcher_list(l);
+      ymuint n = wlist.num();
+      ymuint rpos = 0;
+      ymuint wpos = 0;
+      while ( rpos < n ) {
+	Watcher w = wlist.elem(rpos);
+	wlist.set_elem(wpos, w);
+	++ rpos;
+	++ wpos;
+	if ( w.is_literal() ) {
+	  // 2-リテラル節の場合は相方のリテラルに基づく値の割り当てを行う．
+	  Literal l0 = w.literal();
+	  Bool3 val0 = eval(l0);
+	  if ( val0 == kB3True ) {
+	    // すでに充足していた．
 	    continue;
 	  }
-	  // nl を 1番めのリテラルにする．
-	  c->xchange_wl();
-	  // 新しい wl0 を得る．
-	  l0 = c->wl0();
-	}
-	else { // l1 == nl
-	  if ( debug & debug_implication ) {
-	    // この assert は重いのでデバッグ時にしかオンにしない．
-	    // ※ debug と debug_implication が const なので結果が0の
-	    // ときにはコンパイル時に消されることに注意
-	    ASSERT_COND(c->wl1() == nl );
+	  if ( debug & debug_assign ) {
+	    cout << "\tassign " << l0 << " @" << decision_level()
+		 << " from (" << l0
+		 << " + " << ~l << "): " << l << endl;
 	  }
-	}
-
-	Bool3 val0 = eval(l0);
-	if ( val0 == kB3True ) {
-	  // すでに充足していた．
-	  continue;
-	}
-
-	if ( debug & debug_implication ) {
-	  cout << "\t\texamining watcher clause " << (*c) << endl;
-	}
-
-	// nl の替わりのリテラルを見つける．
-	// この時，替わりのリテラルが未定かすでに充足しているかどうか
-	// は問題でない．
-	bool found = false;
-	ymuint n = c->lit_num();
-	for (ymuint i = 2; i < n; ++ i) {
-	  Literal l2 = c->lit(i);
-	  Bool3 v = eval(l2);
-	  if ( v != kB3False ) {
-	    // l2 を 1番めの watch literal にする．
-	    c->xchange_wl1(i);
-	    if ( debug & debug_implication ) {
-	      cout << "\t\t\tsecond watching literal becomes "
-		   << l2 << endl;
+	  if ( val0 == kB3X ) {
+	    assign(l0, SatReason(nl));
+	  }
+	  else { // val0 == kB3False
+	    // 矛盾がおこった．
+	    if ( debug & debug_assign ) {
+	      cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
+		   << "\t    " << ~l0 << " was assigned at level "
+		   << decision_level(l0.varid()) << endl;
 	    }
-	    // l の watcher list から取り除く
-	    -- wpos;
-	    // ~l2 の watcher list に追加する．
-	    add_watcher(~l2, w);
 
-	    found = true;
+	    // ループを抜けるためにキューの末尾まで先頭を動かす．
+	    mAssignList.skip_all();
+
+	    // 矛盾の理由を表す節を作る．
+	    mTmpBinClause->set(l0, nl);
+	    conflict = SatReason(mTmpBinClause);
 	    break;
 	  }
 	}
-	if ( found ) {
-	  continue;
-	}
-
-	if ( debug & debug_implication ) {
-	  cout << "\t\tno other watching literals" << endl;
-	}
-
-	// 見付からなかったので l0 に従った割り当てを行う．
-	if ( debug & debug_assign ) {
-	  cout << "\tassign " << l0 << " @" << decision_level()
-	       << " from " << w << ": " << l << endl;
-	}
-	if ( val0 == kB3X ) {
-	  assign(l0, w);
-
-	  if ( mParams.mUseLbd ) {
-	    ymuint lbd = calc_lbd(c) + 1;
-	    if ( c->lbd() > lbd ) {
-	      c->set_lbd(lbd);
+	else { // w.is_clause()
+	  // 3つ以上のリテラルを持つ節の場合は，
+	  // - nl(~l) を wl1() にする．(場合によっては wl0 を入れ替える)
+	  // - wl0() が充足していたらなにもしない．
+	  // - wl0() が不定，もしくは偽なら，nl の代わりの watch literal を探す．
+	  // - 代わりが見つかったらそのリテラルを wl1() にする．
+	  // - なければ wl0() に基づいた割り当てを行う．場合によっては矛盾が起こる．
+	  SatClause* c = w.clause();
+	  Literal l0 = c->wl0();
+	  if ( l0 == nl ) {
+	    if ( eval(c->wl1()) == kB3True ) {
+	      continue;
+	    }
+	    // nl を 1番めのリテラルにする．
+	    c->xchange_wl();
+	    // 新しい wl0 を得る．
+	    l0 = c->wl0();
+	  }
+	  else { // l1 == nl
+	    if ( debug & debug_implication ) {
+	      // この assert は重いのでデバッグ時にしかオンにしない．
+	      // ※ debug と debug_implication が const なので結果が0の
+	      // ときにはコンパイル時に消されることに注意
+	      ASSERT_COND(c->wl1() == nl );
 	    }
 	  }
-	}
-	else {
-	  // 矛盾がおこった．
-	  if ( debug & debug_assign ) {
-	    cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
-		 << "\t    " << ~l0 << " was assigned at level "
-		 << decision_level(l0.varid()) << endl;
+
+	  Bool3 val0 = eval(l0);
+	  if ( val0 == kB3True ) {
+	    // すでに充足していた．
+	    continue;
 	  }
 
-	  // ループを抜けるためにキューの末尾まで先頭を動かす．
-	  mAssignList.skip_all();
+	  if ( debug & debug_implication ) {
+	    cout << "\t\texamining watcher clause " << (*c) << endl;
+	  }
 
-	  // この場合は w が矛盾の理由を表す節になっている．
-	  conflict = w;
-	  break;
+	  // nl の替わりのリテラルを見つける．
+	  // この時，替わりのリテラルが未定かすでに充足しているかどうか
+	  // は問題でない．
+	  bool found = false;
+	  ymuint n = c->lit_num();
+	  for (ymuint i = 2; i < n; ++ i) {
+	    Literal l2 = c->lit(i);
+	    Bool3 v = eval(l2);
+	    if ( v != kB3False ) {
+	      // l2 を 1番めの watch literal にする．
+	      c->xchange_wl1(i);
+	      if ( debug & debug_implication ) {
+		cout << "\t\t\tsecond watching literal becomes "
+		     << l2 << endl;
+	      }
+	      // l の watcher list から取り除く
+	      -- wpos;
+	      // ~l2 の watcher list に追加する．
+	      add_watcher(~l2, w);
+
+	      found = true;
+	      break;
+	    }
+	  }
+	  if ( found ) {
+	    continue;
+	  }
+
+	  if ( debug & debug_implication ) {
+	    cout << "\t\tno other watching literals" << endl;
+	  }
+
+	  // 見付からなかったので l0 に従った割り当てを行う．
+	  if ( debug & debug_assign ) {
+	    cout << "\tassign " << l0 << " @" << decision_level()
+		 << " from " << w << ": " << l << endl;
+	  }
+	  if ( val0 == kB3X ) {
+	    assign(l0, w);
+
+	    if ( mParams.mUseLbd ) {
+	      ymuint lbd = calc_lbd(c) + 1;
+	      if ( c->lbd() > lbd ) {
+		c->set_lbd(lbd);
+	      }
+	    }
+	  }
+	  else {
+	    // 矛盾がおこった．
+	    if ( debug & debug_assign ) {
+	      cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
+		   << "\t    " << ~l0 << " was assigned at level "
+		   << decision_level(l0.varid()) << endl;
+	    }
+
+	    // ループを抜けるためにキューの末尾まで先頭を動かす．
+	    mAssignList.skip_all();
+
+	    // この場合は w が矛盾の理由を表す節になっている．
+	    conflict = w;
+	    break;
+	  }
 	}
       }
-    }
-    // 途中でループを抜けた場合に wlist の後始末をしておく．
-    if ( wpos != rpos ) {
-      for ( ; rpos < n; ++ rpos) {
-	wlist.set_elem(wpos, wlist.elem(rpos));
-	++ wpos;
+      // 途中でループを抜けた場合に wlist の後始末をしておく．
+      if ( wpos != rpos ) {
+	for ( ; rpos < n; ++ rpos) {
+	  wlist.set_elem(wpos, wlist.elem(rpos));
+	  ++ wpos;
+	}
+	wlist.erase(wpos);
       }
-      wlist.erase(wpos);
     }
-  }
 
-  if ( conflict != kNullSatReason ) {
-    return conflict;
-  }
+    if ( conflict != kNullSatReason ) {
+      return conflict;
+    }
 
-  if ( mReached ) {
-    return kNullSatReason;
-  }
+    if ( mReached ) {
+      return kNullSatReason;
+    }
 
-  // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
-  mBlockList.clear();
-  mFrontierList.clear();
-  for (ymuint i = 0; i < mSinkList.size(); ++ i) {
-    TpgNode* node = mSinkList[i];
-    mMark[node->id()] = 2;
-  }
-  int stat = dfs_pgraph(mSource);
-  dfs_clear(mSource);
-  if ( stat == 2 ) {
-    // 終点に到達した．
-    mReached = true;
-    mReachedLevel = decision_level();
-    return kNullSatReason;
-  }
+#if 0
+    // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
+    mBlockList.clear();
+    mFrontierList.clear();
+    for (ymuint i = 0; i < mSinkList.size(); ++ i) {
+      TpgNode* node = mSinkList[i];
+      mMark[node->id()] = 2;
+    }
+    int stat = dfs_pgraph(mSource);
+    dfs_clear(mSource);
+    if ( stat == 2 ) {
+      // 終点に到達した．
+      mReached = true;
+      mReachedLevel = decision_level();
+      return kNullSatReason;
+    }
 
-  if ( stat == -1 ) {
-    // PGraph が空になった．
-    // 現在の block_list を矛盾の原因としてバックトラックする．
-    ASSERT_COND( !mBlockList.empty() );
-    SatReason conflict = add_pgraph_clause(mBlockList);
-    return conflict;
-  }
+    if ( stat == -1 ) {
+      // PGraph が空になった．
+      // 現在の block_list を矛盾の原因としてバックトラックする．
+      ASSERT_COND( !mBlockList.empty() );
+      SatReason conflict = add_pgraph_clause(mBlockList);
+      return conflict;
+    }
 
-  if ( mFrontierList.size() > 1 ) {
-    // implication は起こらない．
-    return kNullSatReason;
-  }
+    if ( mFrontierList.size() > 1 ) {
+      // implication は起こらない．
+      return kNullSatReason;
+    }
 
-  // x_list.size() == 1
-  // x_list の要素が block_list によって割り当てられる．
-  TpgNode* node = mFrontierList[0];
-  Literal dlit(node->dvar(), false);
-  if ( mBlockList.empty() ) {
-    // 強制割り当て
-    // dominator の時はこうなる．
-    assign(dlit);
-  }
-  else {
-    add_pgraph_clause(mBlockList, node);
-  }
+    // x_list.size() == 1
+    // x_list の要素が block_list によって割り当てられる．
+    TpgNode* node = mFrontierList[0];
+    Literal dlit(node->dvar(), false);
+    if ( mBlockList.empty() ) {
+      // 強制割り当て
+      // dominator の時はこうなる．
+      assign(dlit);
+    }
+    else {
+      add_pgraph_clause(mBlockList, node);
+    }
+#endif
   }
   return conflict;
 }
@@ -1646,6 +1644,7 @@ GraphSat::find_path()
 }
 #endif
 
+#if 0
 // @brief PGraph を DFS でたどる．
 // 返り値
 // - -1: 出力に到達不可能
@@ -1713,10 +1712,12 @@ GraphSat::dfs_clear(TpgNode* node)
     }
   }
 }
+#endif
 
+#if 0
 // @brief PGraph 上のブロックリストから学習節を作る．
 SatReason
-GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list)
+GraphSat::add_graph_clause(const vector<TpgNode*>& block_list)
 {
   ymuint n = block_list.size();
   ASSERT_COND( n > 1 );
@@ -1813,5 +1814,6 @@ GraphSat::add_pgraph_clause(const vector<TpgNode*>& block_list,
   }
   assign(dlit, reason);
 }
+#endif
 
 END_NAMESPACE_YM_NLINK

@@ -23,6 +23,18 @@ set (common_SOURCES
   src/common/NlScanner.cc
   )
 
+set (graphsat_SOURCES
+  src/graphsat/AssignList.cc
+  src/graphsat/GraphSat.cc
+  src/graphsat/GraphSatR.cc
+  src/graphsat/SaBase.cc
+  src/graphsat/SaFactory.cc
+  src/graphsat/SaUIP1.cc
+  src/graphsat/SaUIP2.cc
+  src/graphsat/SatClause.cc
+  src/graphsat/VarHeap.cc
+  )
+
 set (nlink_SOURCES
   src/nlink.cc
   src/solver/NlSolver.cc
@@ -48,7 +60,11 @@ set (nlview_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-add_library(nlink_common OBJECT ${common_SOURCES})
+add_library (nlink_common
+  OBJECT
+  ${common_SOURCES}
+  ${graphsat_SOURCES}
+  )
 
 #if (TCL_FOUND)
 #  add_executable(nlink

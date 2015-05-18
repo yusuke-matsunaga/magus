@@ -172,12 +172,10 @@ public:
 	     Literal lit4,
 	     Literal lit5);
 
-  /// @brief PGraph の始点と終点をセットする．
+  /// @brief NlGraph をセットする．
   virtual
   void
-  set_pgraph(TpgNode* source,
-	     const vector<TpgNode*>& sink_list,
-	     ymuint max_id);
+  set_graph(const NlGraph& graph);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -395,7 +393,7 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // PGraph 関係の関数
+  // NlGraph 関係の関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief PGraph 上の mandatory assignment を求める．
@@ -406,22 +404,22 @@ private:
   Literal
   find_path();
 
-  /// @brief PGraph を DFS でたどる．
+  /// @brief グラフをたどる．
   int
-  dfs_pgraph(TpgNode* node);
+  dfs_graph(ymuint idx);
 
   /// @brief mark を消す．
   void
-  dfs_clear(TpgNode* node);
+  dfs_clear();
 
-  /// @brief PGraph 上のブロックリストから学習節を作る．
+  /// @brief ブロックリストから学習節を作る．
   SatReason
-  add_pgraph_clause(const vector<TpgNode*>& block_list);
+  add_graph_clause(const vector<ymuint>& block_list);
 
-  /// @brief PGraph 上のブロックリストから学習節を作る．
+  /// @brief ブロックリストから学習節を作る．
   void
-  add_pgraph_clause(const vector<TpgNode*>& block_list,
-		    TpgNode* free_node);
+  add_graph_clause(const vector<ymuint>& block_list,
+		   ymuint free_edge);
 
 
 private:
@@ -429,23 +427,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // PGraph の始点
-  TpgNode* mSource;
+  // グラフ
+  const NlGraph* mGraph;
 
-  // PGraph の終点のリスト
-  vector<TpgNode*> mSinkList;
-
-  // PGraph の節点番号の最大値 + 1
-  ymuint32 mMaxId;
-
-  // PGraph 探索用のマーク
+  // NlGraph 探索用のマーク
   vector<int> mMark;
 
   // block list
-  vector<TpgNode*> mBlockList;
-
-  // frontier list
-  vector<TpgNode*> mFrontierList;
+  vector<ymuint> mBlockList;
 
   bool mReached;
 
