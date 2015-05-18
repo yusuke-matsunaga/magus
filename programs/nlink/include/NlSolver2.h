@@ -89,6 +89,15 @@ private:
        ymuint height,
        ymuint num);
 
+  /// @brief 問題を設定する．
+  /// @param[in] problem 問題
+  void
+  set_problem(const NlProblem& problem);
+
+  /// @brief 基本的な制約を作る．
+  void
+  make_base_cnf(SatSolver& solver);
+
   /// @brief 自明な線分を引いたうえで解を求める．
   void
   trivial_route(ymuint k,
