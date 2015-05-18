@@ -925,6 +925,7 @@ GraphSat::next_decision()
   while ( !mVarHeap.empty() ) {
     // activity の高い変数を取り出す．
     ymuint vindex = mVarHeap.pop_top();
+    ASSERT_COND( vindex < mVarNum );
     ymuint8 x = mVal[vindex];
     if ( (x & 3U) != conv_from_Bool3(kB3X) ) {
       // すでに確定していたらスキップする．
