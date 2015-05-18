@@ -48,95 +48,34 @@ private:
   // 内部で用いいられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  // 辺を表すデータ構造
-  struct Edge
-  {
-
-    // 隣接する辺のリスト
-    vector<Edge*> mAdjList;
-
-    // 変数番号
-    VarId mVar;
-
-  };
-
-  // ノードを表すデータ構造
-  struct Node
-  {
-
-    // 端点番号
-    // 0 で無印
-    ymuint mEndMark;
-
-    // 接続する辺のリスト
-    vector<Edge*> mEdgeList;
-
-    // 変数番号の配列
-    vector<VarId> mVarArray;
-
-  };
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 内容をクリアする．
-  void
-  clear();
-
-  /// @brief 問題を設定する．
-  /// @param[in] problem 問題
-  void
-  set_problem(const NlProblem& problem);
-
   /// @brief 基本的な制約を作る．
   void
-  make_base_cnf(SatSolver& solver);
-
-  /// @brief ノードを得る．
-  Node*
-  _node(ymuint x,
-	ymuint y);
-
-  /// @brief 左の辺を得る．
-  /// @param[in] x, y 辺の右端の座標
-  Edge*
-  left_edge(ymuint x,
-	    ymuint y);
-
-  /// @brief 右の辺を得る．
-  /// @param[in] x, y 辺の左端の座標
-  Edge*
-  right_edge(ymuint x,
-	     ymuint y);
-
-  /// @brief 上の辺を得る．
-  /// @param[in] x, y 辺の下端の座標
-  Edge*
-  upper_edge(ymuint x,
-	     ymuint y);
-
-  /// @brief 下の辺を得る．
-  /// @param[in] x, y 辺の上端の座標
-  Edge*
-  lower_edge(ymuint x,
-	     ymuint y);
+  make_base_cnf(SatSolver& solver,
+		const NlGraph& graph);
 
   /// @brief 解を出力する．
+  /// @param[in] graph 問題のグラフ
   /// @param[in] model SATの解
   /// @param[in] solution 解
   void
-  setup_solution(const vector<Bool3>& model,
+  setup_solution(const NlGraph& graph,
+		 const vector<Bool3>& model,
 		 NlSolution& solution);
 
-  /// @brief 解を出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] model SATの解
-  void
-  print_solution(ostream& s,
-		 const vector<Bool3>& model);
+  /// @brief ノードの変数を得る．
+  VarId
+  node_var(const NlNode* node,
+	   ymuint idx) const;
+
+  /// @brief 枝の変数を得る．
+  VarId
+  edge_var(ymuint edge) const;
 
 
 private:
@@ -144,24 +83,14 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 幅
-  ymuint mWidth;
-
-  // 高さ
-  ymuint mHeight;
-
   // 線分数
   ymuint mNum;
 
-  // 横の辺の配列
-  vector<Edge*> mHarray;
+  // 枝の変数の配列
+  vector<VarId> mEdgeVarArray;
 
-  // 縦の辺の配列
-  vector<Edge*> mVarray;
-
-  // ノードの配列
-  vector<Node*> mNodeArray;
-
+  // ノードの変数の配列
+  vector<VarId> mNodeVarArray;
 
 };
 

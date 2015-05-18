@@ -17,6 +17,7 @@ endif (TCL_FOUND)
 # ===================================================================
 
 set (common_SOURCES
+  src/common/NlGraph.cc
   src/common/NlProblem.cc
   src/common/NlSolution.cc
   src/common/NlScanner.cc

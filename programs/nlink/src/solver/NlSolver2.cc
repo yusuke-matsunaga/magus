@@ -10,6 +10,7 @@
 #include "NlSolver2.h"
 #include "NlProblem.h"
 #include "NlSolution.h"
+#include "NlGraph.h"
 #include "YmLogic/SatSolver.h"
 
 
@@ -27,7 +28,6 @@ NlSolver2::NlSolver2()
 // @brief デストラクタ
 NlSolver2::~NlSolver2()
 {
-  clear();
 }
 
 BEGIN_NONAMESPACE
@@ -139,21 +139,25 @@ NlSolver2::solve(const NlProblem& problem,
   SatSolver solver("minisat2", string(), NULL);
   //SatSolver solver(string(), string(), NULL);
 
-  set_problem(problem);
+  NlGraph graph;
+
+  graph.set_problem(problem);
 
   vector<VarId> con_array;
-  make_base_cnf(solver, con_array);
+  make_base_cnf(solver, graph, con_array);
 
   solution.init(problem);
 
+  ymuint num = problem.elem_num();
+
   if ( false ) {
     vector<Literal> assumption0;
-    for (ymuint i = 0; i < mNum; ++ i) {
+    for (ymuint i = 0; i < num; ++ i) {
       assumption0.push_back(Literal(con_array[i]));
     }
     // trivial に見える線分を引いてしまう．
     vector<ymuint> idx_list;
-    for (ymuint k = 0; k < mNum; ++ k) {
+    for (ymuint k = 0; k < num; ++ k) {
       NlConnection con = problem.connection(k);
       NlPoint start_point = con.start_point();
       ymuint x1 = start_point.x();
@@ -183,7 +187,7 @@ NlSolver2::solve(const NlProblem& problem,
       Bool3 stat = solver.solve(assumption, model);
       if ( stat == kB3True ) {
 	cout << "SAT with trivial route" << endl;
-	setup_solution(model, solution);
+	setup_solution(graph, model, solution);
 	return;
       }
       else if ( stat == kB3False ) {
@@ -203,7 +207,7 @@ NlSolver2::solve(const NlProblem& problem,
 	  Bool3 stat = solver.solve(assumption, model);
 	  if ( stat == kB3True ) {
 	    cout << "SAT with trivial route#" << n1 << endl;
-	    setup_solution(model, solution);
+	    setup_solution(graph, model, solution);
 	    return;
 	  }
 	  else if ( stat == kB3False ) {
@@ -222,22 +226,22 @@ NlSolver2::solve(const NlProblem& problem,
 
   if ( true ) {
     vector<Literal> assumption;
-    for (ymuint i = 0; i < mNum; ++ i) {
-      cout << "solving partial problem#" << (i + 1) << " / " << mNum << endl;
+    for (ymuint i = 0; i < num; ++ i) {
+      cout << "solving partial problem#" << (i + 1) << " / " << num << endl;
       assumption.push_back(Literal(con_array[i]));
       vector<Bool3> model;
       Bool3 stat = solver.solve(assumption, model);
       switch ( stat ) {
       case kB3True:
 	cout << " SAT" << endl;
-	if ( i < mNum - 1 ) {
+	if ( i < num - 1 ) {
 	  NlSolution solution1;
 	  solution1.init(problem);
-	  setup_solution(model, solution1);
+	  setup_solution(graph, model, solution1);
 	  print_solution(cout, solution1);
 	}
 	else {
-	  setup_solution(model, solution);
+	  setup_solution(graph, model, solution);
 	}
 	break;
 
@@ -254,14 +258,14 @@ NlSolver2::solve(const NlProblem& problem,
   }
   else {
     vector<Literal> assumption;
-    for (ymuint i = 0; i < mNum; ++ i) {
+    for (ymuint i = 0; i < num; ++ i) {
       assumption.push_back(Literal(con_array[i]));
     }
     vector<Bool3> model;
     Bool3 stat = solver.solve(assumption, model);
     switch ( stat ) {
     case kB3True:
-      setup_solution(model, solution);
+      setup_solution(graph, model, solution);
       break;
 
     case kB3False:
@@ -275,142 +279,37 @@ NlSolver2::solve(const NlProblem& problem,
   }
 }
 
-// @brief 内容をクリアする．
-void
-NlSolver2::clear()
-{
-  for (ymuint i = 0; i < mHarray.size(); ++ i) {
-    delete mHarray[i];
-  }
-  mHarray.clear();
-
-  for (ymuint i = 0; i < mVarray.size(); ++ i) {
-    delete mVarray[i];
-  }
-  mVarray.clear();
-
-  for (ymuint i = 0; i < mNodeArray.size(); ++ i) {
-    delete mNodeArray[i];
-  }
-  mNodeArray.clear();
-}
-
-// @brief 問題を設定する．
-// @param[in] problem 問題
-void
-NlSolver2::set_problem(const NlProblem& problem)
-{
-  ymuint width = problem.width();
-  ymuint height = problem.height();
-  ymuint num = problem.elem_num();
-
-  ASSERT_COND( width > 0 );
-  ASSERT_COND( height > 0 );
-  ASSERT_COND( num > 0 );
-
-  clear();
-
-  mWidth = width;
-  mHeight = height;
-  mNum = num;
-
-  // 横の辺を作る．
-  ymuint nh = (width - 1) * height;
-  mHarray.resize(nh);
-  for (ymuint i = 0; i < nh; ++ i) {
-    Edge* edge = new Edge;
-    mHarray[i] = edge;
-    edge->mVarArray.resize(num);
-  }
-
-  // 縦の辺を作る．
-  ymuint nv = (height - 1) * width;
-  mVarray.resize(nv);
-  for (ymuint i = 0; i < nv; ++ i) {
-    Edge* edge = new Edge;
-    mVarray[i] = edge;
-    edge->mVarArray.resize(num);
-  }
-
-  // ノードを作る．
-  ymuint nn = width * height;
-  mNodeArray.resize(nn);
-  for (ymuint i = 0; i < nn; ++ i) {
-    Node* node = new Node;
-    mNodeArray[i] = node;
-    node->mEndMark = 0;
-    node->mVarArray.resize(num);
-  }
-
-  // 辺の隣接関係を作る．
-  for (ymuint x = 0; x < mWidth; ++ x) {
-    for (ymuint y = 0; y < mHeight; ++ y) {
-      Node* node = _node(x, y);
-      node->mEdgeList.reserve(4);
-      if ( x > 0 ) {
-	// 左に辺がある．
-	Edge* edge = left_edge(x, y);
-	node->mEdgeList.push_back(edge);
-      }
-      if ( x < mWidth - 1 ) {
-	// 右に辺がある．
-	Edge* edge = right_edge(x, y);
-	node->mEdgeList.push_back(edge);
-      }
-      if ( y > 0 ) {
-	// 上に辺がある．
-	Edge* edge = upper_edge(x, y);
-	node->mEdgeList.push_back(edge);
-      }
-      if ( y < mHeight - 1 ) {
-	// 下に辺がある．
-	Edge* edge = lower_edge(x, y);
-	node->mEdgeList.push_back(edge);
-      }
-    }
-  }
-
-  // 始点と終点に印をつける．
-  for (ymuint k = 0; k < num; ++ k) {
-    NlConnection con = problem.connection(k);
-    {
-      NlPoint start_point = con.start_point();
-      ymuint x1 = start_point.x();
-      ymuint y1 = start_point.y();
-      Node* node1 = _node(x1, y1);
-      node1->mEndMark = k + 1;
-    }
-    {
-      NlPoint end_point = con.end_point();
-      ymuint x2 = end_point.x();
-      ymuint y2 = end_point.y();
-      Node* node2 = _node(x2, y2);
-      node2->mEndMark = k + 1;
-    }
-  }
-}
-
 // @brief 基本的な制約を作る．
 void
 NlSolver2::make_base_cnf(SatSolver& solver,
+			 const NlGraph& graph,
 			 vector<VarId>& con_array)
 {
+  ymuint width = graph.width();
+  ymuint height = graph.height();
+  ymuint num = graph.num();
+
+  mNum = num;
+  ymuint max_edge_id = graph.max_edge_id();
+  mVarArray.clear();
+  mVarArray.resize(max_edge_id * num);
+
   // 横の辺に対する one-hot 制約を作る．
-  for (ymuint x = 1; x < mWidth; ++ x) {
-    for (ymuint y = 0; y < mHeight; ++ y) {
-      Edge* edge = left_edge(x, y);
-      vector<Literal> tmp_lits(mNum);
+  for (ymuint x = 1; x < width; ++ x) {
+    for (ymuint y = 0; y < height; ++ y) {
+      ymuint edge = graph.left_edge(x, y);
+      vector<Literal> tmp_lits(num);
       // 変数を作る．
-      for (ymuint k = 0; k < mNum; ++ k) {
+      for (ymuint k = 0; k < num; ++ k) {
 	VarId var = solver.new_var();
-	edge->mVarArray[k] = var;
+	set_edge_var(edge, k, var);
 	Literal lit = Literal(var);
 	tmp_lits[k] = lit;
       }
       // 同時に2つ以上の変数が1にならないようにする．
-      for (ymuint k1 = 0; k1 < mNum; ++ k1) {
+      for (ymuint k1 = 0; k1 < num; ++ k1) {
 	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < mNum; ++ k2) {
+	for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
 	  Literal lit2 = tmp_lits[k2];
 	  solver.add_clause(~lit1, ~lit2);
 	}
@@ -419,21 +318,21 @@ NlSolver2::make_base_cnf(SatSolver& solver,
   }
 
   // 縦の辺に対する one-hot 制約を作る．
-  for (ymuint y = 1; y < mHeight; ++ y) {
-    for (ymuint x = 0; x < mWidth; ++ x) {
-      Edge* edge = upper_edge(x, y);
-      vector<Literal> tmp_lits(mNum);
+  for (ymuint y = 1; y < height; ++ y) {
+    for (ymuint x = 0; x < width; ++ x) {
+      ymuint edge = graph.upper_edge(x, y);
+      vector<Literal> tmp_lits(num);
       // 変数を作る．
-      for (ymuint k = 0; k < mNum; ++ k) {
+      for (ymuint k = 0; k < num; ++ k) {
 	VarId var = solver.new_var();
-	edge->mVarArray[k] = var;
+	set_edge_var(edge, k, var);
 	Literal lit = Literal(var);
 	tmp_lits[k] = lit;
       }
       // 同時に2つ以上の変数が1にならないようにする．
-      for (ymuint k1 = 0; k1 < mNum; ++ k1) {
+      for (ymuint k1 = 0; k1 < num; ++ k1) {
 	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < mNum; ++ k2) {
+	for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
 	  Literal lit2 = tmp_lits[k2];
 	  solver.add_clause(~lit1, ~lit2);
 	}
@@ -443,45 +342,46 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 
   // 結線ごとの変数を作る．
   con_array.clear();
-  con_array.resize(mNum);
-  for (ymuint i = 0; i < mNum; ++ i) {
+  con_array.resize(num);
+  for (ymuint i = 0; i < num; ++ i) {
     VarId var = solver.new_var();
     con_array[i] = var;
   }
 
   // 枝の条件を作る．
-  for (ymuint x = 0; x < mWidth; ++ x) {
-    for (ymuint y = 0; y < mHeight; ++ y) {
-      Node* node = _node(x, y);
-      const vector<Edge*>& adj_list = node->mEdgeList;
-      ymuint na = adj_list.size();
-      for (ymuint k = 0; k < mNum; ++ k) {
-	// (x, y) のノードに隣接する枝のリストを作る．
-	vector<Literal> edge_list;
-	edge_list.reserve(na);
-	for (ymuint i = 0; i < na; ++ i) {
-	  Edge* edge = adj_list[i];
-	  VarId var = edge->mVarArray[k];
+  for (ymuint x = 0; x < width; ++ x) {
+    for (ymuint y = 0; y < height; ++ y) {
+      NlNode* node = graph.node(x, y);
+      const vector<ymuint>& edge_list = node->edge_list();
+      ymuint ne = edge_list.size();
+      for (ymuint k = 0; k < num; ++ k) {
+	// (x, y) のノードに隣接する枝のリテラルのリストを作る．
+	vector<Literal> lit_list;
+	lit_list.reserve(ne);
+	for (ymuint i = 0; i < ne; ++ i) {
+	  ymuint edge = edge_list[i];
+	  VarId var = edge_var(edge, k);
 	  Literal lit(var);
-	  edge_list.push_back(lit);
+	  lit_list.push_back(lit);
 	}
 
-	if ( node->mEndMark > 0 ) {
-	  if ( node->mEndMark == k + 1 ) {
+	ymuint term_id = node->terminal_id();
+	if ( term_id > 0 ) {
+	  if ( term_id == k + 1 ) {
 	    // 端点の場合
 	    // 必ずただ1つの枝が選ばれる．
 	    Literal clit(con_array[k]);
-	    switch ( edge_list.size() ) {
+	    switch ( ne ) {
 	    case 2:
-	      one_hot2(solver, clit, edge_list[0], edge_list[1]);
+	      one_hot2(solver, clit, lit_list[0], lit_list[1]);
 	      break;
 
 	    case 3:
-	      one_hot3(solver, clit, edge_list[0], edge_list[1], edge_list[2]);
+	      one_hot3(solver, clit, lit_list[0], lit_list[1], lit_list[2]);
 	      break;
 
 	    case 4:
-	      one_hot4(solver, clit, edge_list[0], edge_list[1], edge_list[2], edge_list[3]);
+	      one_hot4(solver, clit, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
 	      break;
 
 	    default:
@@ -490,23 +390,23 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	  }
 	  else {
 	    // 選ばれない．
-	    switch ( edge_list.size() ) {
+	    switch ( ne ) {
 	    case 2:
-	      solver.add_clause(~edge_list[0]);
-	      solver.add_clause(~edge_list[1]);
+	      solver.add_clause(~lit_list[0]);
+	      solver.add_clause(~lit_list[1]);
 	      break;
 
 	    case 3:
-	      solver.add_clause(~edge_list[0]);
-	      solver.add_clause(~edge_list[1]);
-	      solver.add_clause(~edge_list[2]);
+	      solver.add_clause(~lit_list[0]);
+	      solver.add_clause(~lit_list[1]);
+	      solver.add_clause(~lit_list[2]);
 	      break;
 
 	    case 4:
-	      solver.add_clause(~edge_list[0]);
-	      solver.add_clause(~edge_list[1]);
-	      solver.add_clause(~edge_list[2]);
-	      solver.add_clause(~edge_list[3]);
+	      solver.add_clause(~lit_list[0]);
+	      solver.add_clause(~lit_list[1]);
+	      solver.add_clause(~lit_list[2]);
+	      solver.add_clause(~lit_list[3]);
 	      break;
 
 	    default:
@@ -517,17 +417,17 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	else {
 	  // そうでない場合
 	  // 0個か2個の枝が選ばれる．
-	  switch ( edge_list.size() ) {
+	  switch ( ne ) {
 	  case 2:
-	    zero_two_hot2(solver, edge_list[0], edge_list[1]);
+	    zero_two_hot2(solver, lit_list[0], lit_list[1]);
 	    break;
 
 	  case 3:
-	    zero_two_hot3(solver, edge_list[0], edge_list[1], edge_list[2]);
+	    zero_two_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
 	    break;
 
 	  case 4:
-	    zero_two_hot4(solver, edge_list[0], edge_list[1], edge_list[2], edge_list[3]);
+	    zero_two_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
 	    break;
 
 	  default:
@@ -536,50 +436,27 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	}
       }
 
-#if 1
       // このノード上で異なる番号の線分が交わることはない．
-      for (ymuint i1 = 0; i1 < na; ++ i1) {
-	Edge* edge1 = adj_list[i1];
-	for (ymuint i2 = 0; i2 < na; ++ i2) {
-	  Edge* edge2 = adj_list[i2];
-	  for (ymuint k1 = 0; k1 < mNum; ++ k1) {
-	    VarId var1 = edge1->mVarArray[k1];
+      for (ymuint i1 = 0; i1 < ne; ++ i1) {
+	ymuint edge1 = edge_list[i1];
+	for (ymuint i2 = 0; i2 < ne; ++ i2) {
+	  ymuint edge2 = edge_list[i2];
+	  for (ymuint k1 = 0; k1 < num; ++ k1) {
+	    VarId var1 = edge_var(edge1, k1);
 	    Literal lit1(var1);
-	    for (ymuint k2 = k1 + 1; k2 < mNum; ++ k2) {
-	      VarId var2 = edge2->mVarArray[k2];
+	    for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
+	      VarId var2 = edge_var(edge2, k2);
 	      Literal lit2(var2);
 	      solver.add_clause(~lit1, ~lit2);
 	    }
 	  }
 	}
       }
-#else
-      vector<Literal> tmp_lits(mNum);
-      for (ymuint k = 0; k < mNum; ++ k) {
-	VarId var = solver.new_var();
-	node->mVarArray[k] = var;
-	Literal nlit(var);
-	tmp_lits[k] = nlit;
-
-	for (ymuint i = 0; i < na; ++i) {
-	  Edge* edge = adj_list[i];
-	  VarId evar = edge->mVarArray[k];
-	  Literal elit(evar);
-	  solver.add_clause(~elit, nlit);
-	}
-      }
-      for (ymuint k1 = 0; k1 < mNum - 1; ++ k1) {
-	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < mNum; ++ k2) {
-	  Literal lit2 = tmp_lits[k2];
-	  solver.add_clause(~lit1, ~lit2);
-	}
-      }
-#endif
     }
   }
 }
 
+#if 0
 // @brief 自明な線分を引いたうえで解を求める．
 void
 NlSolver2::trivial_route(ymuint k,
@@ -604,7 +481,7 @@ NlSolver2::trivial_route(ymuint k,
     }
     for (ymuint y = y1 + 1; y < y2; ++ y) {
       Edge* edge = upper_edge(x1, y);
-      Literal lit(edge->mVarArray[k]);
+      Literal lit(edge->var(k));
       assumption.push_back(lit);
     }
   }
@@ -616,101 +493,36 @@ NlSolver2::trivial_route(ymuint k,
     }
     for (ymuint x = x1 + 1; x < x2; ++ x) {
       Edge* edge = left_edge(x, y1);
-      Literal lit(edge->mVarArray[k]);
+      Literal lit(edge->var(k));
       assumption.push_back(lit);
     }
   }
 }
-
-// @brief ノードを得る．
-// @param[in] x, y 座標
-NlSolver2::Node*
-NlSolver2::_node(ymuint x,
-		 ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mNodeArray[x * mHeight + y];
-}
-
-// @brief 左の辺を得る．
-// @param[in] x, y 辺の右端の座標
-NlSolver2::Edge*
-NlSolver2::left_edge(ymuint x,
-		     ymuint y)
-{
-  ASSERT_COND( x > 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mHarray[(x - 1) * mHeight + y];
-}
-
-// @brief 右の辺を得る．
-// @param[in] x, y 辺の左端の座標
-NlSolver2::Edge*
-NlSolver2::right_edge(ymuint x,
-		      ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth - 1 );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mHarray[x * mHeight + y];
-}
-
-// @brief 上の辺を得る．
-// @param[in] x, y 辺の下端の座標
-NlSolver2::Edge*
-NlSolver2::upper_edge(ymuint x,
-		      ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y > 0 );
-  ASSERT_COND( y < mHeight );
-
-  return mVarray[(y - 1) * mWidth + x];
-}
-
-// @brief 下の辺を得る．
-// @param[in] x, y 辺の上端の座標
-NlSolver2::Edge*
-NlSolver2::lower_edge(ymuint x,
-		      ymuint y)
-{
-  ASSERT_COND( x >= 0 );
-  ASSERT_COND( x < mWidth );
-  ASSERT_COND( y >= 0 );
-  ASSERT_COND( y < mHeight - 1 );
-
-  return mVarray[y * mWidth + x];
-}
+#endif
 
 // @brief 解を出力する．
 // @param[in] model SATの解
 // @param[in] solution 解
 void
-NlSolver2::setup_solution(const vector<Bool3>& model,
+NlSolver2::setup_solution(const NlGraph& graph,
+			  const vector<Bool3>& model,
 			  NlSolution& solution)
 {
-  for (ymuint y = 0; y < mHeight; ++ y) {
-    for (ymuint x = 0; x < mWidth; ++ x) {
+  ymuint width = graph.width();
+  ymuint height = graph.height();
+  ymuint num = graph.num();
+  for (ymuint y = 0; y < height; ++ y) {
+    for (ymuint x = 0; x < width; ++ x) {
       if ( solution.get(x, y) < 0 ) {
 	continue;
       }
-      Node* node = _node(x, y);
-      const vector<Edge*>& edge_list = node->mEdgeList;
+      NlNode* node = graph.node(x, y);
+      const vector<ymuint>& edge_list = node->edge_list();
       bool found = false;
       for (ymuint i = 0; i < edge_list.size(); ++ i) {
-	Edge* edge = edge_list[i];
-	for (ymuint k = 0; k < mNum; ++ k) {
-	  VarId var = edge->mVarArray[k];
+	ymuint edge = edge_list[i];
+	for (ymuint k = 0; k < num; ++ k) {
+	  VarId var = edge_var(edge, k);
 	  if ( model[var.val()] == kB3True ) {
 	    solution.set(x, y, k + 1);
 	    found = true;
@@ -723,6 +535,28 @@ NlSolver2::setup_solution(const vector<Bool3>& model,
       }
     }
   }
+}
+
+// @brief 枝の変数番号をセットする．
+// @param[in] edge 枝番号 ( 1 〜 )
+// @param[in] idx 線分番号
+// @param[in] var 変数番号
+void
+NlSolver2::set_edge_var(ymuint edge,
+			ymuint idx,
+			VarId var)
+{
+  mVarArray[(edge - 1) * mNum + idx] = var;
+}
+
+// @brief 枝の変数番号を得る．
+// @param[in] edge 枝番号 ( 1 〜 )
+// @param[in] idx 線分番号
+VarId
+NlSolver2::edge_var(ymuint edge,
+		    ymuint idx)
+{
+  return mVarArray[(edge - 1) * mNum + idx];
 }
 
 END_NAMESPACE_YM_NLINK

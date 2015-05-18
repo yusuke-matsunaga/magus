@@ -36,6 +36,8 @@ BEGIN_NAMESPACE_YM_NLINK
 //////////////////////////////////////////////////////////////////////
 
 class NlConnection;
+class NlGraph;
+class NlNode;
 class NlPoint;
 class NlProblem;
 class NlSolution;

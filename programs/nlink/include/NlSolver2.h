@@ -45,52 +45,13 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いいられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // 辺を表すデータ構造
-  struct Edge
-  {
-
-    // 変数番号の配列
-    vector<VarId> mVarArray;
-
-  };
-
-  // ノードを表すデータ構造
-  struct Node
-  {
-
-    // 端点番号
-    // 0 で無印
-    ymuint mEndMark;
-
-    // 接続する辺のリスト
-    vector<Edge*> mEdgeList;
-
-    // 変数番号の配列
-    vector<VarId> mVarArray;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容をクリアする．
-  void
-  clear();
-
-  /// @brief 問題を設定する．
-  /// @param[in] problem 問題
-  void
-  set_problem(const NlProblem& problem);
 
   /// @brief 基本的な制約を作る．
   void
   make_base_cnf(SatSolver& solver,
+		const NlGraph& graph,
 		vector<VarId>& con_array);
 
   /// @brief 自明な線分を引いたうえで解を求める．
@@ -99,42 +60,30 @@ private:
 		const NlConnection& con,
 		vector<Literal>& assumption);
 
-  /// @brief ノードを得る．
-  /// @param[in] x, y 座標
-  Node*
-  _node(ymuint x,
-	ymuint y);
-
-  /// @brief 左の辺を得る．
-  /// @param[in] x, y 辺の右端の座標
-  Edge*
-  left_edge(ymuint x,
-	    ymuint y);
-
-  /// @brief 右の辺を得る．
-  /// @param[in] x, y 辺の左端の座標
-  Edge*
-  right_edge(ymuint x,
-	     ymuint y);
-
-  /// @brief 上の辺を得る．
-  /// @param[in] x, y 辺の下端の座標
-  Edge*
-  upper_edge(ymuint x,
-	     ymuint y);
-
-  /// @brief 下の辺を得る．
-  /// @param[in] x, y 辺の上端の座標
-  Edge*
-  lower_edge(ymuint x,
-	     ymuint y);
-
   /// @brief 解を出力する．
+  /// @param[in] graph 問題を表すグラフ
   /// @param[in] model SATの解
   /// @param[in] solution 解
   void
-  setup_solution(const vector<Bool3>& model,
+  setup_solution(const NlGraph& graph,
+		 const vector<Bool3>& model,
 		 NlSolution& solution);
+
+  /// @brief 枝の変数番号をセットする．
+  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] idx 線分番号
+  /// @param[in] var 変数番号
+  void
+  set_edge_var(ymuint edge,
+	       ymuint idx,
+	       VarId var);
+
+  /// @brief 枝の変数番号を得る．
+  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] idx 線分番号
+  VarId
+  edge_var(ymuint edge,
+	   ymuint idx);
 
 
 private:
@@ -142,23 +91,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 幅
-  ymuint mWidth;
-
-  // 高さ
-  ymuint mHeight;
-
   // 線分数
   ymuint mNum;
 
-  // 横の辺の配列
-  vector<Edge*> mHarray;
-
-  // 縦の辺の配列
-  vector<Edge*> mVarray;
-
-  // ノードの配列
-  vector<Node*> mNodeArray;
+  // 枝の変数番号の配列
+  // サイズは枝数 x 線分数
+  vector<VarId> mVarArray;
 
 };
 
