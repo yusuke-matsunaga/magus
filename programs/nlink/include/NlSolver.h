@@ -86,16 +86,14 @@ private:
   void
   clear();
 
-  /// @brief 内容を初期化する．
-  /// @param[in] solver SAT ソルバ
-  /// @param[in] width 幅
-  /// @param[in] height 高さ
-  /// @param[in] num 線分数
+  /// @brief 問題を設定する．
+  /// @param[in] problem 問題
   void
-  init(SatSolver& solver,
-       ymuint width,
-       ymuint height,
-       ymuint num);
+  set_problem(const NlProblem& problem);
+
+  /// @brief 基本的な制約を作る．
+  void
+  make_base_cnf(SatSolver& solver);
 
   /// @brief ノードを得る．
   Node*

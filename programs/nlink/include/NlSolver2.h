@@ -68,6 +68,9 @@ private:
     // 接続する辺のリスト
     vector<Edge*> mEdgeList;
 
+    // 変数番号の配列
+    vector<VarId> mVarArray;
+
   };
 
 
@@ -80,15 +83,6 @@ private:
   void
   clear();
 
-  /// @brief 内容を初期化する．
-  /// @param[in] width 幅
-  /// @param[in] height 高さ
-  /// @param[in] num 線分数
-  void
-  init(ymuint width,
-       ymuint height,
-       ymuint num);
-
   /// @brief 問題を設定する．
   /// @param[in] problem 問題
   void
@@ -96,7 +90,8 @@ private:
 
   /// @brief 基本的な制約を作る．
   void
-  make_base_cnf(SatSolver& solver);
+  make_base_cnf(SatSolver& solver,
+		vector<VarId>& con_array);
 
   /// @brief 自明な線分を引いたうえで解を求める．
   void
@@ -140,13 +135,6 @@ private:
   void
   setup_solution(const vector<Bool3>& model,
 		 NlSolution& solution);
-
-  /// @brief 解を出力する．
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] model SATの解
-  void
-  print_solution(ostream& s,
-		 const vector<Bool3>& model);
 
 
 private:
