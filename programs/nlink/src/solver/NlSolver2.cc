@@ -351,7 +351,7 @@ NlSolver2::make_base_cnf(SatSolver& solver,
   // 枝の条件を作る．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
-      NlNode* node = graph.node(x, y);
+      const NlNode* node = graph.node(x, y);
       const vector<ymuint>& edge_list = node->edge_list();
       ymuint ne = edge_list.size();
       for (ymuint k = 0; k < num; ++ k) {
@@ -516,7 +516,7 @@ NlSolver2::setup_solution(const NlGraph& graph,
       if ( solution.get(x, y) < 0 ) {
 	continue;
       }
-      NlNode* node = graph.node(x, y);
+      const NlNode* node = graph.node(x, y);
       const vector<ymuint>& edge_list = node->edge_list();
       bool found = false;
       for (ymuint i = 0; i < edge_list.size(); ++ i) {

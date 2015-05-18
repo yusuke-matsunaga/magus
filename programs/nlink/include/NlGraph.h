@@ -40,6 +40,14 @@ public:
   ymuint
   id() const;
 
+  /// @brief X座標を得る．
+  ymuint
+  x() const;
+
+  /// @brief Y座標を得る．
+  ymuint
+  y() const;
+
   /// @brief 端点番号を得る．
   ///
   /// 端点でない場合は 0 を返す．
@@ -82,6 +90,12 @@ private:
 
   // ID番号
   ymuint mId;
+
+  // X座標
+  ymuint mX;
+
+  // Y座標
+  ymuint mY;
 
   // 端点番号
   // 0 で無印
@@ -148,12 +162,12 @@ public:
 
   /// @brief 始点を返す．
   /// @param[in] idx 番号 ( 0 <= idx < num() )
-  NlNode*
+  const NlNode*
   start_node(ymuint idx) const;
 
   /// @brief 終点を返す．
   /// @param[in] idx 番号 ( 0 <= idx < num() )
-  NlNode*
+  const NlNode*
   end_node(ymuint idx) const;
 
   /// @brief ノード番号の最大値を返す．
@@ -170,7 +184,7 @@ public:
 
   /// @brief ノードを返す．
   /// @param[in] x, y 座標
-  NlNode*
+  const NlNode*
   node(ymuint x,
        ymuint y) const;
 
@@ -210,6 +224,12 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ノードを返す．
+  /// @param[in] x, y 座標
+  NlNode*
+  node(ymuint x,
+       ymuint y);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -243,7 +263,7 @@ private:
   // 端点の配列
   // サイズは mNum * 2 で
   // [0] と [1] に最初の線分の始点と終点が入る．
-  vector<NlNode*> mTermArray;
+  vector<const NlNode*> mTermArray;
 
 };
 

@@ -39,6 +39,20 @@ NlNode::id() const
   return mId;
 }
 
+// @brief X座標を得る．
+ymuint
+NlNode::x() const
+{
+  return mX;
+}
+
+// @brief Y座標を得る．
+ymuint
+NlNode::y() const
+{
+  return mY;
+}
+
 // @brief 端点番号を得る．
 //
 // 端点でない場合は 0 を返す．
@@ -165,6 +179,8 @@ NlGraph::set_problem(const NlProblem& problem)
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
       NlNode* node = this->node(x, y);
+      node->mX = x;
+      node->mY = y;
       node->mEdgeList.reserve(4);
       if ( x > 0 ) {
 	// 左に辺がある．
@@ -238,7 +254,7 @@ NlGraph::num() const
 
 // @brief 始点を返す．
 // @param[in] idx 番号 ( 0 <= idx < num() )
-NlNode*
+const NlNode*
 NlGraph::start_node(ymuint idx) const
 {
   ASSERT_COND( idx < mNum );
@@ -248,7 +264,7 @@ NlGraph::start_node(ymuint idx) const
 
 // @brief 終点を返す．
 // @param[in] idx 番号 ( 0 <= idx < num() )
-NlNode*
+const NlNode*
 NlGraph::end_node(ymuint idx) const
 {
   ASSERT_COND( idx < mNum );
@@ -276,9 +292,23 @@ NlGraph::max_edge_id() const
 
 // @brief ノードを得る．
 // @param[in] x, y 座標
-NlNode*
+const NlNode*
 NlGraph::node(ymuint x,
 	      ymuint y) const
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mNodeArray[x * mHeight + y];
+}
+
+// @brief ノードを得る．
+// @param[in] x, y 座標
+NlNode*
+NlGraph::node(ymuint x,
+	      ymuint y)
 {
   ASSERT_COND( x >= 0 );
   ASSERT_COND( x < mWidth );

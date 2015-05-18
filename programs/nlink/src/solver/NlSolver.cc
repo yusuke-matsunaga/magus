@@ -182,11 +182,11 @@ NlSolver::make_base_cnf(SatSolver& solver,
 
   // 始点と終点に印をつける．
   for (ymuint i = 0; i < mNum; ++ i) {
-    NlNode* node1 = graph.start_node(i);
+    const NlNode* node1 = graph.start_node(i);
     Literal lit1(node_var(node1, i));
     solver.add_clause(lit1);
 
-    NlNode* node2 = graph.end_node(i);
+    const NlNode* node2 = graph.end_node(i);
     Literal lit2(node_var(node2, i));
     solver.add_clause(lit2);
   }
@@ -195,7 +195,7 @@ NlSolver::make_base_cnf(SatSolver& solver,
   // 一つのノードでは高々1つの変数しか1にならない．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
-      NlNode* node = graph.node(x, y);
+      const NlNode* node = graph.node(x, y);
       for (ymuint k1 = 0; k1 < mNum; ++ k1) {
 	Literal lit1(node_var(node, k1));
 	for (ymuint k2 = k1 + 1; k2 < mNum; ++ k2) {
@@ -209,7 +209,7 @@ NlSolver::make_base_cnf(SatSolver& solver,
   // 枝の条件を作る．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
-      NlNode* node = graph.node(x, y);
+      const NlNode* node = graph.node(x, y);
 
       const vector<ymuint>& edge_list = node->edge_list();
       ymuint ne = edge_list.size();
@@ -267,8 +267,8 @@ NlSolver::make_base_cnf(SatSolver& solver,
     for (ymuint y = 0; y < height; ++ y) {
       ymuint edge = graph.right_edge(x, y);
       Literal e_lit(edge_var(edge));
-      NlNode* node1 = graph.node(x, y);
-      NlNode* node2 = graph.node(x + 1, y);
+      const NlNode* node1 = graph.node(x, y);
+      const NlNode* node2 = graph.node(x + 1, y);
       for (ymuint k = 0; k < mNum; ++ k) {
 	Literal v_lit1(node_var(node1, k));
 	Literal v_lit2(node_var(node2, k));
@@ -310,7 +310,7 @@ NlSolver::setup_solution(const NlGraph& graph,
       if ( solution.get(x, y) < 0 ) {
 	continue;
       }
-      NlNode* node = graph.node(x, y);
+      const NlNode* node = graph.node(x, y);
       for (ymuint k = 0; k < mNum; ++ k) {
 	VarId var = node_var(node, k);
 	if ( model[var.val()] == kB3True ) {
