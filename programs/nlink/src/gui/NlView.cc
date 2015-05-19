@@ -121,6 +121,23 @@ NlView::paintEvent(QPaintEvent* event)
 {
   QPainter painter(this);
 
+  painter.setWindow(0, 0, mBanWidth, mBanHeight);
+
+  int w = width();
+  int h = height();
+  double w1_f = (mBanWidth * h) / static_cast<double>(mBanHeight);
+  double h1_f = (mBanHeight * w) / static_cast<double>(mBanWidth);
+  int w1 = static_cast<int>(w1_f);
+  int h1 = static_cast<int>(h1_f);
+
+  if ( w1 > w ) {
+    ASSERT_COND( h1 <= h );
+    painter.setViewport(0, (h - h1) / 2, w, h1);
+  }
+  else {
+    painter.setViewport((w - w1) / 2, 0, w1, h);
+  }
+
   QColor frame_color(180, 150, 100);
   QColor ban_color(0x50, 0x50, 0x50);
   QColor line_color(0, 0, 0);
