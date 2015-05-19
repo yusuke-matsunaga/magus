@@ -27,10 +27,51 @@ NlView::NlView(QWidget* parent,
 	       Qt::WindowFlags flags) :
   QWidget(parent, flags)
 {
+  setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+  mFringeSize = 20;
   mGridSize = 50;
+  mInnerMargin = 5;
+  mWireWidth = 15;
 
   // 適当なサイズを設定しておく．
   set_size(10, 10);
+}
+
+// @brief コンストラクタ
+// @param[in] problem 問題
+// @param[in] parent 親のウィジェット
+// @param[in] flags ウィンドウフラグ
+NlView::NlView(const NlProblem& problem,
+	       QWidget* parent,
+	       Qt::WindowFlags flags)
+{
+  setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+  mFringeSize = 20;
+  mGridSize = 50;
+  mInnerMargin = 5;
+  mWireWidth = 15;
+
+  set_problem(problem);
+}
+
+// @brief コンストラクタ
+// @param[in] solution 解
+// @param[in] parent 親のウィジェット
+// @param[in] flags ウィンドウフラグ
+NlView::NlView(const NlSolution& solution,
+	       QWidget* parent,
+	       Qt::WindowFlags flags)
+{
+  setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+  mFringeSize = 20;
+  mGridSize = 50;
+  mInnerMargin = 5;
+  mWireWidth = 15;
+
+  set_solution(solution);
 }
 
 // @brief デストラクタ
@@ -85,86 +126,89 @@ NlView::paintEvent(QPaintEvent* event)
   QColor line_color(0, 0, 0);
   QColor wire_color(0, 0, 200);
 
-  // 盤
-  painter.fillRect(0, 0, mBanWidth, mBanHeight, ban_color);
+  // 枠
+  painter.fillRect(0, 0, mBanWidth, mBanHeight, frame_color);
 
-  // 枠線
+  // 盤
+  painter.fillRect(mFringeSize, mFringeSize,
+		   mBanWidth - mFringeSize * 2, mBanHeight - mFringeSize * 2,
+		   ban_color);
+
+  // 区切り線
   QPen pen1(line_color);
   pen1.setWidth(3);
 
   painter.save();
   painter.setPen(pen1);
   for (ymuint i = 0; i <= mHeight; ++ i) {
-    int x0 = 0;
-    int y0 = i * mGridSize;
-    int x1 = x0 + mBanWidth;
+    int x0 = mFringeSize;
+    int y0 = i * mGridSize + mFringeSize;
+    int x1 = x0 + mBanWidth - mFringeSize * 2;
     int y1 = y0;
     painter.drawLine(x0, y0, x1, y1);
   }
   for (ymuint i = 0; i <= mWidth; ++ i) {
-    int x0 = i * mGridSize;
-    int y0 = 0;
+    int x0 = i * mGridSize + mFringeSize;
+    int y0 = mFringeSize;
     int x1 = x0;
-    int y1 = y0 + mBanHeight;
+    int y1 = y0 + mBanHeight - mFringeSize * 2;
     painter.drawLine(x0, y0, x1, y1);
   }
   painter.restore();
 
   // 結線の描画
   QPen pen2(wire_color);
-  pen2.setWidth(10);
+  pen2.setWidth(mWireWidth);
 
   painter.save();
   painter.setPen(pen2);
-  for (ymuint x = 0; x < mWidth; ++ x) {
-    int x0 = x * mGridSize;
-    int cx = x0 + mGridSize / 2;
+  for (ymuint x = 0; x < mWidth - 1; ++ x) {
+    int x0 = x * mGridSize + mFringeSize;
     for (ymuint y = 0; y < mHeight; ++ y) {
-      int y0 = y * mGridSize;
+      int y0 = y * mGridSize + mFringeSize;
+
+      int cx0 = x0 + mGridSize / 2;
+      int cx1 = cx0 + mGridSize;
       int cy = y0 + mGridSize / 2;
+
       int val0 = mCellArray[xy_to_index(x, y)];
+      int val1 = mCellArray[xy_to_index(x + 1, y)];
+
       if ( val0 < 0 ) {
-	continue;
+	cx0 = x0 + mGridSize - mInnerMargin + mWireWidth / 2;
+	val0 = -val0;
       }
-      if ( x > 0 ) {
-	int val1 = mCellArray[xy_to_index(x - 1, y)];
-	if ( val1 < 0 ) {
-	  val1 = - val1;
-	}
-	if ( val0 == val1 ) {
-	  int x1 = cx - mGridSize / 2;
-	  painter.drawLine(cx, cy, x1, cy);
-	}
+      if ( val1 < 0 ) {
+	cx1 = x0 + mGridSize + mInnerMargin - mWireWidth / 2;
+	val1 = -val1;
       }
-      if ( x < mWidth - 1 ) {
-	int val1 = mCellArray[xy_to_index(x + 1, y)];
-	if ( val1 < 0 ) {
-	  val1 = - val1;
-	}
-	if ( val0 == val1 ) {
-	  int x1 = cx + mGridSize / 2;
-	  painter.drawLine(cx, cy, x1, cy);
-	}
+      if ( val0 == val1 ) {
+	painter.drawLine(cx0, cy, cx1, cy);
       }
-      if ( y > 0 ) {
-	int val1 = mCellArray[xy_to_index(x, y - 1)];
-	if ( val1 < 0 ) {
-	  val1 = - val1;
-	}
-	if ( val0 == val1 ) {
-	  int y1 = cy - mGridSize / 2;
-	  painter.drawLine(cx, cy, cx, y1);
-	}
+    }
+  }
+  for (ymuint y = 0; y < mHeight - 1; ++ y) {
+    int y0 = y * mGridSize + mFringeSize;
+    for (ymuint x = 0; x < mWidth; ++ x) {
+      int x0 = x * mGridSize + mFringeSize;
+
+      int cx = x0 + mGridSize / 2;
+      int cy0 = y0 + mGridSize / 2;
+      int cy1 = cy0 + mGridSize;
+
+      int val0 = mCellArray[xy_to_index(x, y)];
+      int val1 = mCellArray[xy_to_index(x, y + 1)];
+
+      if ( val0 < 0 ) {
+	cy0 = y0 + mGridSize - mInnerMargin + mWireWidth / 2;
+	val0 = -val0;
       }
-      if ( y < mHeight - 1 ) {
-	int val1 = mCellArray[xy_to_index(x, y + 1)];
-	if ( val1 < 0 ) {
-	  val1 = - val1;
-	}
-	if ( val0 == val1 ) {
-	  int y1 = cy + mGridSize / 2;
-	  painter.drawLine(cx, cy, cx, y1);
-	}
+      if ( val1 < 0 ) {
+	cy1 = y0 + mGridSize + mInnerMargin - mWireWidth / 2;
+	val1 = -val1;
+      }
+      if ( val0 == val1 ) {
+	painter.drawLine(cx, cy0, cx, cy1);
       }
     }
   }
@@ -173,18 +217,29 @@ NlView::paintEvent(QPaintEvent* event)
   // 端点の番号
   QFont font1("Courier", 16, QFont::Bold);
   painter.save();
+  painter.setPen(pen1);
   painter.setFont(font1);
   for (ymuint x = 0; x < mWidth; ++ x) {
-    int x0 = x * mGridSize;
+    int x0 = x * mGridSize + mFringeSize;
     for (ymuint y = 0; y < mHeight; ++ y) {
-      int y0 = y * mGridSize;
+      int y0 = y * mGridSize + mFringeSize;
       int val = mCellArray[xy_to_index(x, y)];
-      if ( val < 0 ) {
-	char buff[3];
-	sprintf(buff, "%2d", - val);
-	painter.drawText(QRect(x0, y0, mGridSize, mGridSize),
-			 Qt::AlignCenter, buff);
+      if ( val >= 0 ) {
+	continue;
       }
+
+      painter.drawRect(x0 + mInnerMargin, y0 + mInnerMargin,
+		       mGridSize - mInnerMargin * 2, mGridSize - mInnerMargin * 2);
+      val = - val;
+      char buff[3];
+      if ( val < 10 ) {
+	sprintf(buff, "%1d", val);
+      }
+      else {
+	sprintf(buff, "%2d", val);
+      }
+      painter.drawText(QRect(x0, y0, mGridSize, mGridSize),
+		       Qt::AlignCenter, buff);
     }
   }
   painter.restore();
@@ -198,8 +253,8 @@ NlView::set_size(ymuint width,
   mWidth = width;
   mHeight = height;
 
-  mBanWidth = width * mGridSize;
-  mBanHeight = height * mGridSize;
+  mBanWidth = width * mGridSize + mFringeSize * 2;
+  mBanHeight = height * mGridSize + mFringeSize * 2;
 
   mCellArray.clear();
   mCellArray.resize(width * height);

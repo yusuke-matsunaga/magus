@@ -33,8 +33,7 @@ main(int argc,
 
   print_solution(cout, solution);
 
-  NlView* view = new NlView();
-  view->set_solution(solution);
+  NlView* view = new NlView(solution);
 
   view->show();
 

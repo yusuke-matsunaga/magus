@@ -32,6 +32,22 @@ public:
   NlView(QWidget* parent = NULL,
 	 Qt::WindowFlags flags = 0);
 
+  /// @brief コンストラクタ
+  /// @param[in] problem 問題
+  /// @param[in] parent 親のウィジェット
+  /// @param[in] flags ウィンドウフラグ
+  NlView(const NlProblem& problem,
+	 QWidget* parent = NULL,
+	 Qt::WindowFlags flags = 0);
+
+  /// @brief コンストラクタ
+  /// @param[in] solution 解
+  /// @param[in] parent 親のウィジェット
+  /// @param[in] flags ウィンドウフラグ
+  NlView(const NlSolution& solution,
+	 QWidget* parent = NULL,
+	 Qt::WindowFlags flags = 0);
+
   /// @brief デストラクタ
   virtual
   ~NlView();
@@ -110,6 +126,18 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 縁の幅
+  ymuint mFringeSize;
+
+  // グリッドサイズ
+  ymuint mGridSize;
+
+  // 端点の時の内側の枠の幅
+  ymuint mInnerMargin;
+
+  // 結線の幅
+  ymuint mWireWidth;
+
   // 問題の幅
   ymuint mWidth;
 
@@ -118,9 +146,6 @@ private:
 
   // セルの配列
   vector<int> mCellArray;
-
-  // グリッドサイズ
-  ymuint mGridSize;
 
   // 盤面の幅
   ymuint mBanWidth;
