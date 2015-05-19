@@ -8,7 +8,7 @@
 
 
 #include "MazeRouter.h"
-#include "NlProblem.h"
+#include "NlGraph.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -27,143 +27,138 @@ MazeRouter::~MazeRouter()
 {
 }
 
-// @brief 問題をセットする．
-void
-MazeRouter::set_problem(const NlProblem& problem)
-{
-  mWidth = problem.width();
-  mHeight = problem.height();
-  mNum = problem.elem_num();
-  mCellArray.clear();
-  mCellArray.resize((mWidth + 1) * (mHeight + 1) + 1);
-  for (ymuint i = 0; i < mCellArray.size(); ++ i) {
-    mCellArray[i] = -2; // 範囲外
-  }
-  for (ymuint x = 0; x < mWidth; ++ x) {
-    for (ymuint y = 0; y < mHeight; ++ y) {
-      mCellArray[xy_to_index(x, y)] = 0;
-    }
-  }
-
-  mConList.clear();
-  mConList.reserve(mNum);
-  for (ymuint i = 0; i < mNum; ++ i) {
-    NlConnection con = problem.connection(i);
-    mConList.push_back(con);
-    mCellArray[point_to_index(con.start_point())] = -1;
-    mCellArray[point_to_index(con.end_point())] = -1;
-  }
-}
-
-// @brief 幅を得る．
-ymuint
-MazeRouter::width() const
-{
-  return mWidth;
-}
-
-// @brief 高さを得る．
-ymuint
-MazeRouter::height() const
-{
-  return mHeight;
-}
-
-// @brief 結線数を得る．
-ymuint
-MazeRouter::num() const
-{
-  return mNum;
-}
-
-// @brief 最短経路を求める．
+// @brief ラベル付を行う．
+// @param[in] graph グラフ
 // @param[in] idx 線分番号
-// @param[out] point_list 経路
-// @return 迂回長を返す．
+// @param[in] dir 向き
+// @param[out] edge_list ラベル付された枝番号のリスト
+// @param[out] index_list 各ラベルごとの末尾のインデックスリスト
+// @return 最短経路長を返す．
 ymuint
-MazeRouter::find_route(ymuint idx,
-		       vector<NlPoint>& point_list)
+MazeRouter::labeling(const NlGraph& graph,
+		     ymuint idx,
+		     bool dir,
+		     vector<ymuint>& edge_list,
+		     vector<ymuint>& index_list)
 {
-  ASSERT_COND( idx < mNum );
+  ASSERT_COND( idx < graph.num() );
 
-  NlConnection con = mProblem.connection(idx);
-  NlPoint start_point = con.start_point();
-  NlPoint end_point = con.end_point();
+  mCellArray.clear();
+  mCellArray.resize(graph.max_node_id());
+  for (ymuint i = 0; i < mCellArray.size(); ++ i) {
+    mCellArray[i] = 0;
+  }
 
-  ymuint dx = mHeight + 1;
-  ymuint dy = 1;
-  mQueue.clear();
-  mQueue.reserve(mCellArray.size());
-  ymuint index0 = point_to_index(start_point);
-  mCellArray[index0] = 0;
-  mQueue.push_back(index0);
-  ymuint index1 = point_to_index(end_point);
-  ymuint rpos = 0;
-  bool reached = false;
-  for (ymuint rpos = 0; rpos < mQueue.size(); ++ rpos) {
-    ymuint index = mQueue[rpos];
-    ymuint label = mCellArray[index];
-    if ( index == index1 ) {
-      reached = true;
+  for (ymuint i = 0; i < graph.num(); ++ i) {
+    if ( i == idx ) {
+      continue;
+    }
+
+    const NlNode* start_node = graph.start_node(i);
+    ymuint index1 = start_node->id();
+    mCellArray[index1] = -1;
+
+    const NlNode* end_node = graph.end_node(i);
+    ymuint index2 = end_node->id();
+    mCellArray[index2] = -1;
+  }
+
+  // 始点
+  const NlNode* s_node = graph.start_node(idx);
+
+  // 終点
+  const NlNode* t_node = graph.end_node(idx);
+
+  if ( dir ) {
+    const NlNode* tmp = s_node;
+    s_node = t_node;
+    t_node = tmp;
+  }
+
+  // 始点のセルを cell_list に積む．
+  vector<const NlNode*> cell_list;
+  vector<ymuint> end_list;
+  index_list.clear();
+
+  ymuint label = 0;
+
+  cell_list.push_back(s_node);
+  end_list.push_back(cell_list.size());
+
+  bool found = false;
+  ymuint rpos0 = 0;
+  for ( ; ; ) {
+    ymuint epos = end_list[label];
+    ++ label;
+    for (ymuint i = rpos0; i < epos; ++ i) {
+      const NlNode* node = cell_list[i];
+      if ( node == t_node ) {
+	found = true;
+	break;
+      }
+      label1(graph, node, DirUp,    label, cell_list, edge_list);
+      label1(graph, node, DirDown,  label, cell_list, edge_list);
+      label1(graph, node, DirLeft,  label, cell_list, edge_list);
+      label1(graph, node, DirRight, label, cell_list, edge_list);
+    }
+    end_list.push_back(cell_list.size());
+    index_list.push_back(edge_list.size());
+    rpos0 = epos;
+    if ( found ) {
       break;
     }
-    label1(index - dy, label + 1);
-    label1(index + dy, label + 1);
-    label1(index - dx, label + 1);
-    label1(index + dx, label + 1);
   }
 
-  if ( !reached ) {
-    return MAX_UINT;
-  }
-
-
-  return 0;
+  return label;
 }
 
 // @brief ラベル付けの基本処理
 void
-MazeRouter::label1(ymuint index,
-		   ymuint label)
+MazeRouter::label1(const NlGraph& graph,
+		   const NlNode* node,
+		   Dir dir,
+		   ymuint label,
+		   vector<const NlNode*>& cell_list,
+		   vector<ymuint>& edge_list)
 {
-  if ( mCellArray[index] == 0 ) {
-    mCellArray[index] = label;
-    mQueue.push_back(index);
+  ymuint x = node->x();
+  ymuint y = node->y();
+  ymuint edge;
+  switch ( dir ) {
+  case DirUp:
+    edge = node->upper_edge();
+    -- y;
+    break;
+
+  case DirDown:
+    edge = node->lower_edge();
+    ++ y;
+    break;
+
+  case DirLeft:
+    edge = node->left_edge();
+    -- x;
+    break;
+
+  case DirRight:
+    edge = node->right_edge();
+    ++ x;
+    break;
   }
-}
+  if ( edge == 0 ) {
+    // 範囲外
+    return;
+  }
 
-// @brief xy 座標からインデックスを計算する．
-ymuint
-MazeRouter::xy_to_index(ymuint x,
-			ymuint y) const
-{
-  return (x + 1) * (mHeight + 1) + (y + 1);
-}
-
-// @brief インデックスから xy座標を計算する．
-void
-MazeRouter::index_to_xy(ymuint index,
-			ymuint& x,
-			ymuint& y) const
-{
-  x = index / (mHeight + 1) - 1;
-  y = (index % (mHeight + 1)) - 1;
-}
-
-// @brief NlPoint からインデックスを計算する．
-ymuint
-MazeRouter::point_to_index(const NlPoint& point) const
-{
-  return xy_to_index(point.x(), point.y());
-}
-
-// @brief インデックスから NlPoint を求める．
-NlPoint
-MazeRouter::index_to_point(ymuint index) const
-{
-  ymuint x, y;
-  index_to_xy(index, x, y);
-  return NlPoint(x, y);
+  const NlNode* node1 = graph.node(x, y);
+  ymuint index1 = node1->id();
+  if ( mCellArray[index1] == 0 ) {
+    mCellArray[index1] = label;
+    cell_list.push_back(node1);
+  }
+  if ( mCellArray[index1] == label ) {
+    edge_list.push_back(edge);
+  }
 }
 
 END_NAMESPACE_YM_NLINK

@@ -212,6 +212,11 @@ public:
   lower_edge(ymuint x,
 	     ymuint y) const;
 
+  /// @brief 枝番号から枝を表す文字列を返す．
+  /// @param[in] edge_id 枝番号
+  string
+  edge_str(ymuint edge_id) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

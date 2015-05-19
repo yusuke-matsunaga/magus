@@ -20,6 +20,15 @@ BEGIN_NAMESPACE_YM_NLINK
 //////////////////////////////////////////////////////////////////////
 class MazeRouter
 {
+private:
+
+  enum Dir {
+    DirUp,
+    DirDown,
+    DirLeft,
+    DirRight
+  };
+
 public:
 
   /// @brief コンストラクタ
@@ -34,29 +43,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 問題をセットする．
-  void
-  set_problem(const NlProblem& problem);
-
-  /// @brief 幅を得る．
-  ymuint
-  width() const;
-
-  /// @brief 高さを得る．
-  ymuint
-  height() const;
-
-  /// @brief 結線数を得る．
-  ymuint
-  num() const;
-
-  /// @brief 最短経路を求める．
+  /// @brief ラベル付を行う．
+  /// @param[in] graph グラフ
   /// @param[in] idx 線分番号
-  /// @param[out] point_list 経路
-  /// @return 迂回長を返す．
+  /// @param[in] dir 向き
+  /// @param[out] edge_list ラベル付された枝番号のリスト
+  /// @param[out] index_list 各ラベルごとの末尾のインデックスリスト
+  /// @return 最短経路長を返す．
   ymuint
-  find_route(ymuint idx,
-	     vector<NlPoint>& point_list);
+  labeling(const NlGraph& graph,
+	   ymuint idx,
+	   bool dir,
+	   vector<ymuint>& edge_list,
+	   vector<ymuint>& index_list);
 
 
 private:
@@ -66,27 +65,12 @@ private:
 
   /// @brief ラベル付けの基本処理
   void
-  label1(ymuint index,
-	 ymuint label);
-
-  /// @brief xy 座標からインデックスを計算する．
-  ymuint
-  xy_to_index(ymuint x,
-	      ymuint y) const;
-
-  /// @brief インデックスから xy座標を計算する．
-  void
-  index_to_xy(ymuint index,
-	      ymuint& x,
-	      ymuint& y) const;
-
-  /// @brief NlPoint からインデックスを計算する．
-  ymuint
-  point_to_index(const NlPoint& point) const;
-
-  /// @brief インデックスから NlPoint を求める．
-  NlPoint
-  index_to_point(ymuint index) const;
+  label1(const NlGraph& graph,
+	 const NlNode* node,
+	 Dir dir,
+	 ymuint label,
+	 vector<const NlNode*>& cell_list,
+	 vector<ymuint>& edge_list);
 
 
 private:
@@ -94,23 +78,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 幅
-  ymuint mWidth;
-
-  // 高さ
-  ymuint mHeight;
-
-  // 結線数
-  ymuint mNum;
-
-  // 結線の配列
-  vector<NlConnection> mConList;
-
   // セルの配列
   vector<int> mCellArray;
-
-  // キュー
-  vector<ymuint> mQueue;
 
 };
 

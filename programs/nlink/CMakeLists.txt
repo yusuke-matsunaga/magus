@@ -38,22 +38,26 @@ set (graphsat_SOURCES
 set (nlink_SOURCES
   src/nlink.cc
   src/solver/NlSolver.cc
+  src/solver/MazeRouter.cc
   )
 
 set (nlink2_SOURCES
   src/nlink2.cc
   src/solver/NlSolver2.cc
+  src/solver/MazeRouter.cc
   )
 
 set (nlink3_SOURCES
   src/nlink3.cc
   src/solver/NlSolver3.cc
+  src/solver/MazeRouter.cc
   )
 
 set (nlview_SOURCES
   src/gui/NlView.cc
   src/gui/nlview.cc
   src/solver/NlSolver2.cc
+  src/solver/MazeRouter.cc
   )
 
 

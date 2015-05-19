@@ -374,4 +374,28 @@ NlGraph::lower_edge(ymuint x,
   return y * mWidth + x + mVbase;
 }
 
+// @brief 枝番号から枝を表す文字列を返す．
+// @param[in] edge_id 枝番号
+string
+NlGraph::edge_str(ymuint edge_id) const
+{
+  if ( edge_id < mHbase ) {
+    return "---";
+  }
+  if ( edge_id < mVbase ) {
+    ymuint tmp = edge_id - mHbase;
+    ymuint x = tmp / mHeight;
+    ymuint y = tmp % mHeight;
+    ostringstream buf;
+    buf << "H(" << x << ", " << y << ")";
+    return buf.str();
+  }
+  ymuint tmp = edge_id - mVbase;
+  ymuint x = tmp % mWidth;
+  ymuint y = tmp / mWidth;
+  ostringstream buf;
+  buf << "V(" << x << ", " << y << ")";
+  return buf.str();
+}
+
 END_NAMESPACE_YM_NLINK
