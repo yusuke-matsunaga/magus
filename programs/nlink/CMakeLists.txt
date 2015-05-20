@@ -33,6 +33,7 @@ set (graphsat_SOURCES
   src/graphsat/SaUIP2.cc
   src/graphsat/SatClause.cc
   src/graphsat/VarHeap.cc
+  src/graphsat/GsGraph.cc
   )
 
 set (nlink_SOURCES
