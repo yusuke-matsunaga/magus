@@ -21,6 +21,8 @@
 #include "AssignList.h"
 #include "Watcher.h"
 #include "VarHeap.h"
+#include "GsGraph.h"
+#include "GsEdge.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -172,10 +174,10 @@ public:
 	     Literal lit4,
 	     Literal lit5);
 
-  /// @brief NlGraph をセットする．
+  /// @brief グラフを追加する．
   virtual
   void
-  set_graph(const NlGraph& graph);
+  add_graph(const GsGraph& graph);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
@@ -393,9 +395,25 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // NlGraph 関係の関数
+  // GsGraph 関係の関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @grief グラフ上で DFS を行い径路を探す．
+  /// @param[in] graph グラフ
+  /// @return 矛盾が生じたら理由を返す．
+  SatReason
+  find_route(GsGraph* graph);
+
+  /// @brief DFS を実際に行う関数
+  /// @param[in] node ノード
+  /// @param[in] from_edge ノードに至る枝
+  /// @retval true 終点に到達する径路が見つかった．
+  /// @retval false 終端に到達できなかった．
+  bool
+  dfs_graph(GsNode* node,
+	    GsEdge* from_edge);
+
+#if 0
   /// @brief PGraph 上の mandatory assignment を求める．
   SatReason
   search_pgraph();
@@ -420,25 +438,13 @@ private:
   void
   add_graph_clause(const vector<ymuint>& block_list,
 		   ymuint free_edge);
+#endif
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // グラフ
-  const NlGraph* mGraph;
-
-  // NlGraph 探索用のマーク
-  vector<int> mMark;
-
-  // block list
-  vector<ymuint> mBlockList;
-
-  bool mReached;
-
-  ymuint32 mReachedLevel;
 
   // 解析器
   SatAnalyzer* mAnalyzer;
@@ -496,6 +502,10 @@ private:
   // サイズは mVarSize * 2
   double* mWeightArray;
 
+  // 対応する GsEdge の配列
+  // サイズは mVarSize
+  GsEdge** mEdgeMap;
+
   // 変数のヒープ木
   VarHeap mVarHeap;
 
@@ -535,6 +545,12 @@ private:
 
   // 時間計測器
   StopWatch mTimer;
+
+  // グラフのリスト
+  vector<GsGraph*> mGraphList;
+
+  // dfs_graph() で使う作業領域
+  vector<VarId> mBlockingList;
 
   // 制御用パラメータ
   Params mParams;
@@ -666,7 +682,7 @@ END_NONAMESPACE
 inline
 void
 GraphSat::assign(Literal lit,
-	      SatReason reason)
+		 SatReason reason)
 {
   ymuint lindex = lit.index();
   ymuint vindex = lindex / 2;
@@ -675,6 +691,15 @@ GraphSat::assign(Literal lit,
   mVal[vindex] = x;
   mDecisionLevel[vindex] = decision_level();
   mReason[vindex] = reason;
+
+  if ( inv ) {
+    // グラフの枝に関連した場合，径路上にあるかを調べる．
+    GsEdge* edge = mEdgeMap[vindex];
+    if ( edge != NULL && edge->selected() ) {
+      // 径路の更新が必要
+      edge->graph()->set_update();
+    }
+  }
 
   // mAssignList に格納する．
   mAssignList.put(lit);

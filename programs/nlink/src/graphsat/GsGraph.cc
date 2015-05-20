@@ -109,11 +109,7 @@ GsGraphBuilder::var(ymuint pos) const
 // @param[in] builder ビルダオブジェクト
 GsGraph::GsGraph(const GsGraphBuilder& builder)
 {
-  mNodeNum = builder.node_num();
-  mNodeArray = new GsNode[mNodeNum];
-
-  mEdgeNum = builder.edge_num();
-  mEdgeArray = new GsEdge[mEdgeNum];
+  set_size(builder.node_num(), builder.edge_num());
 
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     GsNode* node = &mNodeArray[i];
@@ -136,15 +132,75 @@ GsGraph::GsGraph(const GsGraphBuilder& builder)
     ymuint node2_id = builder.node2(i);
     edge1->mNode2 = node(node2_id);
 
+    edge1->mGraph = this;
     edge1->mVar = builder.var(i);
-
     edge1->mSelected = false;
+  }
+
+  mUpdate = false;
+}
+
+// @brief コピーコンストラクタ
+// @param[in] src コピー元のオブジェクト
+GsGraph::GsGraph(const GsGraph& src)
+{
+  set_size(src.node_num(), src.edge_num());
+
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    GsNode* node = &mNodeArray[i];
+    const GsNode* src_node = &src.mNodeArray[i];
+    ymuint n = src_node->edge_num();
+    node->mEdgeNum = n;
+    node->mEdgeList = new GsEdge*[n];
+    for (ymuint j = 0; j < n; ++ j) {
+      ymuint edge_id = src_node->edge(j)->id();
+      node->mEdgeList[j] = &mEdgeArray[edge_id];
+    }
+  }
+
+  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+    GsEdge* edge1 = edge(i);
+    GsEdge* src_edge = &src.mEdgeArray[i];
+
+    ymuint node1_id = src_edge->node1()->id();
+    edge1->mNode1 = node(node1_id);
+
+    ymuint node2_id = src_edge->node2()->id();
+    edge1->mNode2 = node(node2_id);
+
+    edge1->mGraph = this;
+    edge1->mVar = src_edge->var();
+    edge1->mSelected = false;
+  }
+
+  mUpdate = false;
+}
+
+// @brief ノード数と枝数を設定する．
+// @param[in] node_num ノード数
+// @param[in] edge_num
+void
+GsGraph::set_size(ymuint node_num,
+		  ymuint edge_num)
+{
+  mNodeNum = node_num;
+  mNodeArray = new GsNode[mNodeNum];
+  for (ymuint i = 0; i < mNodeNum; ++ i) {
+    mNodeArray[i].mId = i;
+  }
+
+  mEdgeNum = edge_num;
+  mEdgeArray = new GsEdge[mEdgeNum];
+  for (ymuint i = 0; i < mEdgeNum; ++ i) {
+    mEdgeArray[i].mId = i;
   }
 }
 
 // @brief デストラクタ
 GsGraph::~GsGraph()
 {
+  delete [] mEdgeArray;
+  delete [] mNodeArray;
 }
 
 // @brief ノードを返す．
@@ -163,6 +219,40 @@ GsGraph::edge(ymuint pos)
 {
   ASSERT_COND( pos < edge_num() );
   return &mEdgeArray[pos];
+}
+
+// @relates GsGraph
+// @brief デバッグ用にGsGraph の内容を出力する．
+// @param[in] s 出力ストリーム
+// @param[in] graph グラフ
+void
+print_graph(ostream& s,
+	    GsGraph& graph)
+{
+  s << "===<GsGraph>===" << endl
+    << "# of nodes: " << graph.node_num() << endl
+    << "# of edges: " << graph.edge_num() << endl;
+  for (ymuint i = 0; i < graph.node_num(); ++ i) {
+    const GsNode* node = graph.node(i);
+    s << " Node#" << node->id() << ": # of edges: " << node->edge_num() << endl;
+    s << "  ";
+    for (ymuint j = 0; j < node->edge_num(); ++ j) {
+      const GsEdge* edge = node->edge(j);
+      s << " Edge#" << edge->id();
+    }
+    s << endl;
+  }
+  s << endl;
+  s << " StartNode = Node#" << graph.start_node()->id() << endl
+    << " EndNode   = Node#" << graph.end_node()->id() << endl
+    << endl;
+  for (ymuint i = 0; i < graph.edge_num(); ++ i) {
+    const GsEdge* edge = graph.edge(i);
+    s << " Edge#" << edge->id() << ": VarId = " << edge->var()
+      << "(Node#" << edge->node1()->id()
+      << ", Node#" << edge->node2()->id() << ")" << endl;
+  }
+  s << endl;
 }
 
 END_NAMESPACE_YM_NLINK

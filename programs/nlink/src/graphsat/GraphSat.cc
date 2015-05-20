@@ -12,7 +12,9 @@
 #include "YmLogic/SatMsgHandler.h"
 #include "SatAnalyzer.h"
 #include "SatClause.h"
-#include "NlGraph.h"
+#include "GsGraph.h"
+#include "GsNode.h"
+#include "GsEdge.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -76,6 +78,7 @@ GraphSat::GraphSat(const string& option) :
   mReason(NULL),
   mWatcherList(NULL),
   mWeightArray(NULL),
+  mEdgeMap(NULL),
   mLbdTmp(NULL),
   mLbdTmpSize(0),
   mRootLevel(0),
@@ -124,6 +127,7 @@ GraphSat::~GraphSat()
   delete [] mReason;
   delete [] mWatcherList;
   delete [] mWeightArray;
+  delete [] mEdgeMap;
   delete [] mLbdTmp;
   delete [] mTmpLits;
 }
@@ -264,9 +268,9 @@ GraphSat::add_clause(Literal lit1,
   add_clause_sub(5);
 }
 
-// @brief NlGraph をセットする．
+// @brief グラフを追加する．
 void
-GraphSat::set_graph(const NlGraph& graph)
+GraphSat::add_graph(const GsGraph& src_graph)
 {
   if ( decision_level() != 0 ) {
     // エラー
@@ -274,10 +278,13 @@ GraphSat::set_graph(const NlGraph& graph)
     return;
   }
 
-  mGraph = &graph;
-  mMark.clear();
-  //mMark.resize(mMaxId, 0);
-  mReached = false;
+  GsGraph* graph = new GsGraph(src_graph);
+  mGraphList.push_back(graph);
+  for (ymuint i = 0; i < graph->edge_num(); ++ i) {
+    GsEdge* edge = graph->edge(i);
+    VarId var = edge->var();
+    mEdgeMap[var.val()] = edge;
+  }
 }
 
 BEGIN_NONAMESPACE
@@ -816,53 +823,16 @@ GraphSat::implication()
       return conflict;
     }
 
-    if ( mReached ) {
-      return kNullSatReason;
+    // グラフの状態の更新が必要か調べる．
+    for (ymuint i = 0; i < mGraphList.size(); ++ i) {
+      GsGraph* graph = mGraphList[i];
+      if ( graph->update() ) {
+	conflict = find_route(graph);
+	if ( conflict != kNullSatReason ) {
+	  break;
+	}
+      }
     }
-
-#if 0
-    // mSource から dfs を行い，dvar() の値が false と X のノードを求める．
-    mBlockList.clear();
-    mFrontierList.clear();
-    for (ymuint i = 0; i < mSinkList.size(); ++ i) {
-      TpgNode* node = mSinkList[i];
-      mMark[node->id()] = 2;
-    }
-    int stat = dfs_pgraph(mSource);
-    dfs_clear(mSource);
-    if ( stat == 2 ) {
-      // 終点に到達した．
-      mReached = true;
-      mReachedLevel = decision_level();
-      return kNullSatReason;
-    }
-
-    if ( stat == -1 ) {
-      // PGraph が空になった．
-      // 現在の block_list を矛盾の原因としてバックトラックする．
-      ASSERT_COND( !mBlockList.empty() );
-      SatReason conflict = add_pgraph_clause(mBlockList);
-      return conflict;
-    }
-
-    if ( mFrontierList.size() > 1 ) {
-      // implication は起こらない．
-      return kNullSatReason;
-    }
-
-    // x_list.size() == 1
-    // x_list の要素が block_list によって割り当てられる．
-    TpgNode* node = mFrontierList[0];
-    Literal dlit(node->dvar(), false);
-    if ( mBlockList.empty() ) {
-      // 強制割り当て
-      // dominator の時はこうなる．
-      assign(dlit);
-    }
-    else {
-      add_pgraph_clause(mBlockList, node);
-    }
-#endif
   }
   return conflict;
 }
@@ -890,10 +860,6 @@ GraphSat::backtrack(int level)
     }
   }
 
-  if ( level <= mReachedLevel ) {
-    mReached = false;
-  }
-
   if ( debug & (debug_assign | debug_decision) ) {
     cout << endl;
   }
@@ -903,13 +869,6 @@ GraphSat::backtrack(int level)
 Literal
 GraphSat::next_decision()
 {
-#if 0
-  Literal lit = find_path();
-  if ( lit != kLiteralX ) {
-    return lit;
-  }
-#endif
-
   // 一定確率でランダムな変数を選ぶ．
   if ( mRandGen.real1() < mParams.mVarFreq && !mVarHeap.empty() ) {
     ymuint pos = mRandGen.int32() % mVarNum;
@@ -1507,6 +1466,7 @@ GraphSat::alloc_var()
       mVal[i] = conv_from_Bool3(kB3X) | (conv_from_Bool3(kB3X) << 2);
       mWeightArray[i * 2 + 0] = 0.0;
       mWeightArray[i * 2 + 1] = 0.0;
+      mEdgeMap[i] = NULL;
       mVarHeap.add_var(VarId(i));
     }
     mOldVarNum = mVarNum;
@@ -1523,6 +1483,7 @@ GraphSat::expand_var()
   SatReason* old_reason = mReason;
   WatcherList* old_watcher_list = mWatcherList;
   double* old_weight_array = mWeightArray;
+  GsEdge** old_edge_map = mEdgeMap;
   if ( mVarSize == 0 ) {
     mVarSize = 1024;
   }
@@ -1534,10 +1495,12 @@ GraphSat::expand_var()
   mReason = new SatReason[mVarSize];
   mWatcherList = new WatcherList[mVarSize * 2];
   mWeightArray = new double[mVarSize * 2];
+  mEdgeMap = new GsEdge*[mVarSize];
   for (ymuint i = 0; i < mOldVarNum; ++ i) {
     mVal[i] = old_val[i];
     mDecisionLevel[i] = old_decision_level[i];
     mReason[i] = old_reason[i];
+    mEdgeMap[i] = old_edge_map[i];
   }
   ymuint n2 = mOldVarNum * 2;
   for (ymuint i = 0; i < n2; ++ i) {
@@ -1550,10 +1513,125 @@ GraphSat::expand_var()
     delete [] old_reason;
     delete [] old_watcher_list;
     delete [] old_weight_array;
+    delete [] old_edge_map;
   }
   mAssignList.reserve(mVarSize);
   mVarHeap.alloc_var(mVarSize);
   mAnalyzer->alloc_var(mVarSize);
+}
+
+// @grief グラフ上で DFS を行い径路を探す．
+// @param[in] graph グラフ
+// @return 矛盾が生じたら理由を返す．
+SatReason
+GraphSat::find_route(GsGraph* graph)
+{
+  mBlockingList.clear();
+  GsNode* start_node = graph->start_node();
+  GsNode* end_node = graph->end_node();
+  bool res = dfs_graph(start_node, NULL);
+  for (ymuint i = 0; i < graph->node_num(); ++ i) {
+    graph->node(i)->clear_visited();
+  }
+  if ( res ) {
+    // 終点に到達した．
+    // update フラグを降ろしておく．
+    graph->clear_update();
+    return kNullSatReason;
+  }
+
+  // 終点に到達できなかった．
+  // mBlockList に含まれる変数から学習節を作る．
+  ymuint n = mBlockingList.size();
+  ASSERT_COND( n > 1 );
+
+  alloc_lits(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    VarId var = mBlockingList[i];
+    mTmpLits[i] = Literal(var);
+  }
+
+  Literal l0 = mTmpLits[0];
+  Literal l1 = mTmpLits[1];
+
+  if ( n == 2 ) {
+    if ( debug & debug_assign ) {
+      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
+    }
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(l1));
+    add_watcher(~l1, SatReason(l0));
+
+    // binary clause は watcher-list に登録するだけで実体はない．
+    ++ mConstrBinNum;
+
+    mTmpBinClause->set(l0, l1);
+    return SatReason(mTmpBinClause);
+  }
+  else {
+    // 節の生成
+    SatClause* clause = new_clause(n);
+    ASSERT_COND( n > 2 );
+    mConstrClause.push_back(clause);
+
+    if ( debug & debug_assign ) {
+      cout << "add_clause: " << *clause << endl;
+    }
+
+    SatReason conflict(clause);
+
+    // watcher-list の設定
+    add_watcher(~l0, conflict);
+    add_watcher(~l1, conflict);
+    return conflict;
+  }
+}
+
+// @brief DFS を実際に行う関数
+// @param[in] node ノード
+// @param[in] from_edge ノードに至る枝
+// @retval true 終点に到達する径路が見つかった．
+// @retval false 終端に到達できなかった．
+bool
+GraphSat::dfs_graph(GsNode* node,
+		    GsEdge* from_edge)
+{
+  if ( node->visited() ) {
+    return false;
+  }
+  node->set_visited();
+
+  ymuint ne = node->edge_num();
+  bool reached = false;
+  for (ymuint i = 0; i < ne; ++ i) {
+    GsEdge* edge = node->edge(i);
+    if ( edge == from_edge ) {
+      // 来た道は戻らない．
+      continue;
+    }
+    // 反対側のノード
+    GsNode* alt_node = edge->node1();
+    if ( alt_node == node ) {
+      alt_node = edge->node2();
+    }
+    // 関連付けられた変数
+    VarId var = edge->var();
+    if ( eval(var) == kB3False ) {
+      // 二重登録のチェックのため，
+      // 反対側のノードが visited でないか調べる．
+      if ( !alt_node->visited() ) {
+	mBlockingList.push_back(var);
+      }
+    }
+    else {
+      if ( dfs_graph(alt_node, edge) ) {
+	edge->set_selected();
+	reached = true;
+	break;
+      }
+    }
+  }
+  return reached;
 }
 
 #if 0

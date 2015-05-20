@@ -38,6 +38,10 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ID番号を返す．
+  ymuint
+  id() const;
+
   /// @brief 枝数を返す．
   ymuint
   edge_num() const;
@@ -71,6 +75,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ID番号
+  ymuint mId;
+
   // 枝数
   ymuint mEdgeNum;
 
@@ -97,6 +104,14 @@ GsNode::GsNode()
 inline
 GsNode::~GsNode()
 {
+}
+
+// @brief ID番号を返す．
+inline
+ymuint
+GsNode::id() const
+{
+  return mId;
 }
 
 // @brief 枝数を返す．

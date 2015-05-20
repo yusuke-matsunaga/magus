@@ -116,6 +116,10 @@ public:
   /// @param[in] builder ビルダオブジェクト
   GsGraph(const GsGraphBuilder& builder);
 
+  /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
+  GsGraph(const GsGraph& src);
+
   /// @brief デストラクタ
   ~GsGraph();
 
@@ -145,17 +149,36 @@ public:
 
   /// @brief 始点を返す．
   GsNode*
-  start_node();
+  start_node() const;
 
   /// @brief 終点を返す．
   GsNode*
-  end_node();
+  end_node() const;
+
+  /// @brief 'update' フラグを得る．
+  bool
+  update() const;
+
+  /// @brief 'update' フラグを消す．
+  void
+  clear_update();
+
+  /// @brief 'update' フラグを立てる．
+  void
+  set_update();
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノード数と枝数を設定する．
+  /// @param[in] node_num ノード数
+  /// @param[in] edge_num
+  void
+  set_size(ymuint node_num,
+	   ymuint edge_num);
 
 
 private:
@@ -181,7 +204,19 @@ private:
   // 終点のノード
   GsNode* mEndNode;
 
+  // 更新が必要なことを示すフラグ
+  bool mUpdate;
+
 };
+
+
+/// @relates GsGraph
+/// @brief デバッグ用にGsGraph の内容を出力する．
+/// @param[in] s 出力ストリーム
+/// @param[in] graph グラフ
+void
+print_graph(ostream& s,
+	    GsGraph& graph);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -207,7 +242,7 @@ GsGraph::edge_num() const
 // @brief 始点を返す．
 inline
 GsNode*
-GsGraph::start_node()
+GsGraph::start_node() const
 {
   return mStartNode;
 }
@@ -215,9 +250,33 @@ GsGraph::start_node()
 // @brief 終点を返す．
 inline
 GsNode*
-GsGraph::end_node()
+GsGraph::end_node() const
 {
   return mEndNode;
+}
+
+// @brief 'update' フラグを得る．
+inline
+bool
+GsGraph::update() const
+{
+  return mUpdate;
+}
+
+// @brief 'update' フラグを消す．
+inline
+void
+GsGraph::clear_update()
+{
+  mUpdate = false;
+}
+
+// @brief 'update' フラグを立てる．
+inline
+void
+GsGraph::set_update()
+{
+  mUpdate = true;
 }
 
 END_NAMESPACE_YM_NLINK

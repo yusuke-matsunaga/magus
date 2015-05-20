@@ -39,13 +39,25 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ID番号を返す．
+  ymuint
+  id() const;
+
   /// @brief 1つめの節点を返す．
   GsNode*
-  node1();
+  node1() const;
 
   /// @brief 2つめの節点を返す．
   GsNode*
-  node2();
+  node2() const;
+
+  /// @brief この枝が属するグラフを返す．
+  GsGraph*
+  graph() const;
+
+  /// @brief 関連する変数番号を返す．
+  VarId
+  var() const;
 
   /// @brief パス上にあるとき true を返す．
   bool
@@ -59,10 +71,6 @@ public:
   void
   set_selected();
 
-  /// @brief 関連する変数番号を返す．
-  VarId
-  var() const;
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -75,11 +83,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ID番号
+  ymuint mId;
+
   // 1つめの節点
   GsNode* mNode1;
 
   // 2つめの節点
   GsNode* mNode2;
+
+  // この枝が属するグラフ
+  GsGraph* mGraph;
 
   // 関連する変数番号
   VarId mVar;
@@ -106,10 +120,18 @@ GsEdge::~GsEdge()
 {
 }
 
+// @brief ID番号を返す．
+inline
+ymuint
+GsEdge::id() const
+{
+  return mId;
+}
+
 // @brief 1つめの節点を返す．
 inline
 GsNode*
-GsEdge::node1()
+GsEdge::node1() const
 {
   return mNode1;
 }
@@ -117,9 +139,17 @@ GsEdge::node1()
 // @brief 2つめの節点を返す．
 inline
 GsNode*
-GsEdge::node2()
+GsEdge::node2() const
 {
   return mNode2;
+}
+
+// @brief この枝が属するグラフを返す．
+inline
+GsGraph*
+GsEdge::graph() const
+{
+  return mGraph;
 }
 
 // @brief パス上にあるとき true を返す．
