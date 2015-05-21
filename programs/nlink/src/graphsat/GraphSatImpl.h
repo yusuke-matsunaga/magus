@@ -21,6 +21,8 @@
 #include "AssignList.h"
 #include "Watcher.h"
 #include "VarHeap.h"
+#include "GsGraph.h"
+#include "GsEdge.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -399,6 +401,28 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // GsGraph 関係の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @grief グラフ上で DFS を行い径路を探す．
+  /// @param[in] graph グラフ
+  /// @return 矛盾が生じたら理由を返す．
+  SatReason
+  find_route(GsGraph* graph);
+
+  /// @brief DFS を実際に行う関数
+  /// @param[in] node ノード
+  /// @param[in] from_edge ノードに至る枝
+  /// @retval true 終点に到達する径路が見つかった．
+  /// @retval false 終端に到達できなかった．
+  bool
+  dfs_graph(GsNode* node,
+	    GsEdge* from_edge,
+	    vector<bool>& mark);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -534,6 +558,16 @@ private:
   // search() で用いられるリテラル配列
   vector<Literal> mLearntLits;
 
+  // グラフのリスト
+  vector<GsGraph*> mGraphList;
+
+  // 変数に対応する GsEdge の配列
+  // サイズは mVarSize
+  GsEdge** mEdgeMap;
+
+  // dfs_graph() で使う作業領域
+  vector<VarId> mBlockingList;
+
 };
 
 
@@ -555,7 +589,7 @@ GraphSatImpl::watcher_list(Literal lit)
 inline
 void
 GraphSatImpl::add_watcher(Literal watch_lit,
-		   SatReason reason)
+			  SatReason reason)
 {
   watcher_list(watch_lit).add(Watcher(reason), mAlloc);
 }
@@ -631,7 +665,7 @@ END_NONAMESPACE
 inline
 void
 GraphSatImpl::assign(Literal lit,
-	      SatReason reason)
+		     SatReason reason)
 {
   ymuint lindex = lit.index();
   ymuint vindex = lindex / 2;
@@ -644,6 +678,15 @@ GraphSatImpl::assign(Literal lit,
 
   // mAssignList に格納する．
   mAssignList.put(lit);
+
+  if ( inv ) {
+    // グラフの枝に関連した場合，径路上にあるかを調べる．
+    GsEdge* edge = mEdgeMap[vindex];
+    if ( edge != NULL && edge->selected() ) {
+      // 径路の更新が必要
+      edge->graph()->set_update();
+    }
+  }
 }
 
 // 現在の decision level を返す．
