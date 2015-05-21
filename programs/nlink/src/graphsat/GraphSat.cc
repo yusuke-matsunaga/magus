@@ -270,7 +270,7 @@ GraphSat::add_clause(Literal lit1,
 
 // @brief グラフを追加する．
 void
-GraphSat::add_graph(const GsGraph& src_graph)
+GraphSat::add_graph(const GsGraphBuilder& graph_src)
 {
   if ( decision_level() != 0 ) {
     // エラー
@@ -278,7 +278,7 @@ GraphSat::add_graph(const GsGraph& src_graph)
     return;
   }
 
-  GsGraph* graph = new GsGraph(src_graph);
+  GsGraph* graph = new GsGraph(graph_src);
   mGraphList.push_back(graph);
   for (ymuint i = 0; i < graph->edge_num(); ++ i) {
     GsEdge* edge = graph->edge(i);

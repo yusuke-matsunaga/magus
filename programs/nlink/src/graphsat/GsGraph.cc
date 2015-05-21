@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 
+#include "GsGraphBuilder.h"
 #include "GsGraph.h"
 #include "GsNode.h"
 #include "GsEdge.h"

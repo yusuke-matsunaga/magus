@@ -11,8 +11,7 @@
 #include "NlProblem.h"
 #include "NlGraph.h"
 #include "NlSolution.h"
-#include "MazeRouter.h"
-#include "YmLogic/SatSolver.h"
+#include "GraphSat.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -35,7 +34,7 @@ BEGIN_NONAMESPACE
 
 inline
 void
-one_hot2(SatSolver& solver,
+one_hot2(GraphSat& solver,
 	 Literal lit1,
 	 Literal lit2)
 {
@@ -45,7 +44,7 @@ one_hot2(SatSolver& solver,
 
 inline
 void
-one_hot3(SatSolver& solver,
+one_hot3(GraphSat& solver,
 	 Literal lit1,
 	 Literal lit2,
 	 Literal lit3)
@@ -58,7 +57,7 @@ one_hot3(SatSolver& solver,
 
 inline
 void
-one_hot4(SatSolver& solver,
+one_hot4(GraphSat& solver,
 	 Literal lit1,
 	 Literal lit2,
 	 Literal lit3,
@@ -75,7 +74,7 @@ one_hot4(SatSolver& solver,
 
 inline
 void
-zero_two_hot2(SatSolver& solver,
+zero_two_hot2(GraphSat& solver,
 	      Literal lit1,
 	      Literal lit2)
 {
@@ -85,7 +84,7 @@ zero_two_hot2(SatSolver& solver,
 
 inline
 void
-zero_two_hot3(SatSolver& solver,
+zero_two_hot3(GraphSat& solver,
 	      Literal lit1,
 	      Literal lit2,
 	      Literal lit3)
@@ -98,7 +97,7 @@ zero_two_hot3(SatSolver& solver,
 
 inline
 void
-zero_two_hot4(SatSolver& solver,
+zero_two_hot4(GraphSat& solver,
 	      Literal lit1,
 	      Literal lit2,
 	      Literal lit3,
@@ -125,8 +124,7 @@ void
 NlSolver::solve(const NlProblem& problem,
 		NlSolution& solution)
 {
-  SatSolver solver("minisat2", string(), NULL);
-  //SatSolver solver("satrec", string(), &cout);
+  GraphSat solver;
 
   NlGraph graph;
   graph.set_problem(problem);
@@ -155,7 +153,7 @@ NlSolver::solve(const NlProblem& problem,
 
 // @brief 基本的な制約を作る．
 void
-NlSolver::make_base_cnf(SatSolver& solver,
+NlSolver::make_base_cnf(GraphSat& solver,
 			const NlGraph& graph)
 {
   ymuint width = graph.width();

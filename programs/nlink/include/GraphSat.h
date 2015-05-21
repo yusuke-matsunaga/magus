@@ -175,9 +175,10 @@ public:
 	     Literal lit5);
 
   /// @brief グラフを追加する．
+  /// @param[in] graph_src グラフの元となるデータ
   virtual
   void
-  add_graph(const GsGraph& graph);
+  add_graph(const GsGraphBuilder& graph_src);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
