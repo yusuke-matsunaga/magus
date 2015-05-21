@@ -1555,14 +1555,14 @@ GraphSatImpl::find_route(GsGraph* graph)
   //print_graph(cout, *graph);
 
   mBlockingList.clear();
-  vector<bool> mark(graph->node_num(), false);
   GsNode* start_node = graph->start_node();
-  bool res = dfs_graph(start_node, NULL, mark);
-#if 0
   for (ymuint i = 0; i < graph->node_num(); ++ i) {
     graph->node(i)->clear_visited();
   }
-#endif
+  for (ymuint i = 0; i < graph->edge_num(); ++ i) {
+    graph->edge(i)->clear_selected();
+  }
+  bool res = dfs_graph(start_node, NULL);
   if ( res ) {
     // 終点に到達した．
     // update フラグを降ろしておく．
@@ -1624,8 +1624,7 @@ GraphSatImpl::find_route(GsGraph* graph)
 // @retval false 終端に到達できなかった．
 bool
 GraphSatImpl::dfs_graph(GsNode* node,
-			GsEdge* from_edge,
-			vector<bool>& mark)
+			GsEdge* from_edge)
 {
 #if DEBUG_DFS
   cout << "dfs_graph(" << node->id();
@@ -1635,21 +1634,13 @@ GraphSatImpl::dfs_graph(GsNode* node,
   cout << ")" << endl;
 #endif
 
-#if 0
   if ( node->visited() ) {
-    cout << "  visited" << endl;
-    return false;
-  }
-  node->set_visited();
-#else
-  if ( mark[node->id()] ) {
 #if DEBUG_DFS
     cout << "  visited" << endl;
 #endif
     return false;
   }
-  mark[node->id()] = true;
-#endif
+  node->set_visited();
 
   if ( node->terminal_mark() == 2 ) {
     // 終点に到達した
@@ -1684,7 +1675,7 @@ GraphSatImpl::dfs_graph(GsNode* node,
       mBlockingList.push_back(var);
     }
     else {
-      if ( dfs_graph(alt_node, edge, mark) ) {
+      if ( dfs_graph(alt_node, edge) ) {
 	edge->set_selected();
 	reached = true;
 	break;

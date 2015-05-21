@@ -417,8 +417,7 @@ private:
   /// @retval false 終端に到達できなかった．
   bool
   dfs_graph(GsNode* node,
-	    GsEdge* from_edge,
-	    vector<bool>& mark);
+	    GsEdge* from_edge);
 
 
 private:
