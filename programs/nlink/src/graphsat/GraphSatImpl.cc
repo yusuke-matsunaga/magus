@@ -613,47 +613,47 @@ GraphSatImpl::search(ymuint confl_limit)
 
       decay_var_activity();
       decay_clause_activity();
+      continue;
     }
-    else {
-      if ( cur_confl_num >= confl_limit ) {
-	// 矛盾の回数が制限値を越えた．
-	backtrack(mRootLevel);
-	return kB3X;
-      }
 
-      if ( decision_level() == 0 ) {
-	// 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
-	// あるかもしれないのでそれを取り除く．
-	sweep_clause();
-      }
-      if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
-	// 学習節の数が制限値を超えたら整理する．
-	cut_down();
-      }
-
-      // 次の割り当てを選ぶ．
-      Literal lit = next_decision();
-      if ( lit == kLiteralX ) {
-	// すべての変数を割り当てた．
-	// ということは充足しているはず．
-	return kB3True;
-      }
-      ++ mDecisionNum;
-
-      // バックトラックポイントを記録
-      mAssignList.set_marker();
-
-      if ( debug & (debug_assign | debug_decision) ) {
-	cout << endl
-	     << "choose " << lit << " :"
-	     << mVarHeap.activity(lit.varid()) << endl;
-      }
-      // 未割り当ての変数を選んでいるのでエラーになるはずはない．
-      if ( debug & debug_assign ) {
-	cout << "\tassign " << lit << " @" << decision_level() << endl;
-      }
-      assign(lit);
+    if ( cur_confl_num >= confl_limit ) {
+      // 矛盾の回数が制限値を越えた．
+      backtrack(mRootLevel);
+      return kB3X;
     }
+
+    if ( decision_level() == 0 ) {
+      // 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
+      // あるかもしれないのでそれを取り除く．
+      sweep_clause();
+    }
+    if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
+      // 学習節の数が制限値を超えたら整理する．
+      cut_down();
+    }
+
+    // 次の割り当てを選ぶ．
+    Literal lit = next_decision();
+    if ( lit == kLiteralX ) {
+      // すべての変数を割り当てた．
+      // ということは充足しているはず．
+      return kB3True;
+    }
+    ++ mDecisionNum;
+
+    // バックトラックポイントを記録
+    mAssignList.set_marker();
+
+    if ( debug & (debug_assign | debug_decision) ) {
+      cout << endl
+	   << "choose " << lit << " :"
+	   << mVarHeap.activity(lit.varid()) << endl;
+    }
+    // 未割り当ての変数を選んでいるのでエラーになるはずはない．
+    if ( debug & debug_assign ) {
+      cout << "\tassign " << lit << " @" << decision_level() << endl;
+    }
+    assign(lit);
   }
 }
 
@@ -1552,8 +1552,6 @@ GraphSatImpl::expand_var()
 SatReason
 GraphSatImpl::find_route(GsGraph* graph)
 {
-  //print_graph(cout, *graph);
-
   mBlockingList.clear();
   GsNode* start_node = graph->start_node();
   for (ymuint i = 0; i < graph->node_num(); ++ i) {
@@ -1571,7 +1569,7 @@ GraphSatImpl::find_route(GsGraph* graph)
   }
 
   // 終点に到達できなかった．
-  // mBlockList に含まれる変数から学習節を作る．
+  // mBlockList に含まれる変数から節を作り制約に追加する．
   ymuint n = mBlockingList.size();
   ASSERT_COND( n > 1 );
 
