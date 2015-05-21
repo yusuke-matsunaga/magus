@@ -171,12 +171,12 @@ GsGraph::GsGraph(const GsGraphBuilder& builder)
   }
 
   ymuint start_id = builder.start_node();
-  GsNode* start_node = node(start_id);
-  start_node->mTermMark = 1;
+  mStartNode = node(start_id);
+  mStartNode->mTermMark = 1;
 
   ymuint end_id = builder.end_node();
-  GsNode* end_node = node(end_id);
-  end_node->mTermMark = 2;
+  mEndNode = node(end_id);
+  mEndNode->mTermMark = 2;
 
   mUpdate = false;
 }
@@ -215,12 +215,12 @@ GsGraph::GsGraph(const GsGraph& src)
   }
 
   ymuint start_id = src.start_node()->id();
-  GsNode* start_node = node(start_id);
-  start_node->mTermMark = 1;
+  mStartNode = node(start_id);
+  mStartNode->mTermMark = 1;
 
   ymuint end_id = src.end_node()->id();
-  GsNode* end_node = node(end_id);
-  end_node->mTermMark = 2;
+  mEndNode = node(end_id);
+  mEndNode->mTermMark = 2;
 
   mUpdate = false;
 }

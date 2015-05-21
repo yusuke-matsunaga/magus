@@ -25,7 +25,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  SaUIP2(GraphSat* solver);
+  SaUIP2(GraphSatImpl* solver);
 
   /// @brief デストラクタ
   virtual

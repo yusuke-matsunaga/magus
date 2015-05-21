@@ -11,6 +11,7 @@
 #include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
+#include "MazeRouter.h"
 #include "YmLogic/SatSolver.h"
 
 
@@ -136,8 +137,8 @@ void
 NlSolver2::solve(const NlProblem& problem,
 		 NlSolution& solution)
 {
-  SatSolver solver("minisat2", string(), NULL);
-  //SatSolver solver(string(), string(), NULL);
+  //SatSolver solver("minisat2", string(), NULL);
+  SatSolver solver(string(), string(), NULL);
 
   NlGraph graph;
 
@@ -145,6 +146,83 @@ NlSolver2::solve(const NlProblem& problem,
 
   vector<VarId> con_array;
   make_base_cnf(solver, graph, con_array);
+
+  MazeRouter maze;
+  {
+    ymuint num = problem.elem_num();
+    for (ymuint k = 0; k < num; ++ k) {
+      {
+	vector<ymuint> edge_list;
+	vector<ymuint> index_list;
+	ymuint n = maze.labeling(graph, k, false, edge_list, index_list);
+#if 0
+	cout << "#" << k << "F" << endl;
+	ymuint spos = 0;
+	for (ymuint j = 0; j < n; ++ j) {
+	  ymuint epos = index_list[j];
+	  for (ymuint i = spos; i < epos; ++ i) {
+	    ymuint edge = edge_list[i];
+	    cout << " " << graph.edge_str(edge);
+	  }
+	  cout << endl;
+	  spos = epos;
+	}
+	cout << endl;
+#endif
+#if 0
+	ymuint spos = 0;
+	for (ymuint j = 0; j < n - 1; ++ j) {
+	  ymuint epos = index_list[j];
+	  if ( epos - spos == 1 ) {
+	    vector<Literal> tmp_lits;
+	    for (ymuint i = spos; i < epos; ++ i) {
+	      ymuint edge = edge_list[i];
+	      VarId var = edge_var(edge, k);
+	      tmp_lits.push_back(Literal(var));
+	    }
+	    solver.add_clause(tmp_lits);
+	  }
+	  spos = epos;
+	}
+#endif
+      }
+      {
+	vector<ymuint> edge_list;
+	vector<ymuint> index_list;
+	ymuint n = maze.labeling(graph, k, true, edge_list, index_list);
+#if 0
+	cout << "#" << k << "B" << endl;
+	ymuint spos = 0;
+	for (ymuint j = 0; j < n; ++ j) {
+	  ymuint epos = index_list[j];
+	  for (ymuint i = spos; i < epos; ++ i) {
+	    ymuint edge = edge_list[i];
+	    cout << " " << graph.edge_str(edge);
+	  }
+	  cout << endl;
+	  spos = epos;
+	}
+	cout << endl;
+#endif
+#if 0
+	ymuint spos = 0;
+	for (ymuint j = 0; j < n - 1; ++ j) {
+	  ymuint epos = index_list[j];
+	  if ( epos - spos == 1 ) {
+	    vector<Literal> tmp_lits;
+	    for (ymuint i = spos; i < epos; ++ i) {
+	      ymuint edge = edge_list[i];
+	      VarId var = edge_var(edge, k);
+	      tmp_lits.push_back(Literal(var));
+	    }
+	    solver.add_clause(tmp_lits);
+	  }
+	  spos = epos;
+	}
+#endif
+      }
+    }
+  }
 
   solution.init(problem);
 
@@ -224,7 +302,7 @@ NlSolver2::solve(const NlProblem& problem,
     }
   }
 
-  if ( true ) {
+  if ( false ) {
     vector<Literal> assumption;
     for (ymuint i = 0; i < num; ++ i) {
       cout << "solving partial problem#" << (i + 1) << " / " << num << endl;

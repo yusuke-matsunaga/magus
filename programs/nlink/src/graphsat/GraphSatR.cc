@@ -19,7 +19,7 @@ BEGIN_NAMESPACE_YM_NLINK
 // @brief コンストラクタ
 GraphSatR::GraphSatR(ostream& out,
 		     const string& option) :
-  GraphSat(option),
+  GraphSatImpl(option),
   mOut(out)
 {
 }
@@ -35,7 +35,7 @@ GraphSatR::~GraphSatR()
 VarId
 GraphSatR::new_var()
 {
-  VarId id = GraphSat::new_var();
+  VarId id = GraphSatImpl::new_var();
 
   mOut << "N" << endl
        << "# varid = " << id << endl;
@@ -56,7 +56,7 @@ GraphSatR::add_clause(const vector<Literal>& lits)
   }
   mOut << endl;
 
-  GraphSat::add_clause(lits);
+  GraphSatImpl::add_clause(lits);
 }
 
 // @brief 節を追加する．
@@ -73,7 +73,7 @@ GraphSatR::add_clause(ymuint lit_num,
   }
   mOut << endl;
 
-  GraphSat::add_clause(lit_num, lits);
+  GraphSatImpl::add_clause(lit_num, lits);
 }
 
 // @brief 1項の節(リテラル)を追加する．
@@ -84,7 +84,7 @@ GraphSatR::add_clause(Literal lit1)
   put_lit(lit1);
   mOut << endl;
 
-  GraphSat::add_clause(lit1);
+  GraphSatImpl::add_clause(lit1);
 }
 
 // @brief 2項の節を追加する．
@@ -97,7 +97,7 @@ GraphSatR::add_clause(Literal lit1,
   put_lit(lit2);
   mOut << endl;
 
-  GraphSat::add_clause(lit1, lit2);
+  GraphSatImpl::add_clause(lit1, lit2);
 }
 
 // @brief 3項の節を追加する．
@@ -112,7 +112,7 @@ GraphSatR::add_clause(Literal lit1,
   put_lit(lit3);
   mOut << endl;
 
-  GraphSat::add_clause(lit1, lit2, lit3);
+  GraphSatImpl::add_clause(lit1, lit2, lit3);
 }
 
 // @brief 4項の節を追加する．
@@ -129,7 +129,7 @@ GraphSatR::add_clause(Literal lit1,
   put_lit(lit4);
   mOut << endl;
 
-  GraphSat::add_clause(lit1, lit2, lit3, lit4);
+  GraphSatImpl::add_clause(lit1, lit2, lit3, lit4);
 }
 
 // @brief 5項の節を追加する．
@@ -148,7 +148,13 @@ GraphSatR::add_clause(Literal lit1,
   put_lit(lit5);
   mOut << endl;
 
-  GraphSat::add_clause(lit1, lit2, lit3, lit4, lit5);
+  GraphSatImpl::add_clause(lit1, lit2, lit3, lit4, lit5);
+}
+
+// @brief グラフを追加する．
+void
+GraphSatR::add_graph(const GsGraphBuilder& graph_src)
+{
 }
 
 // @brief SAT 問題を解く．
@@ -170,7 +176,7 @@ GraphSatR::solve(const vector<Literal>& assumptions,
   }
   mOut << endl;
 
-  Bool3 ans = GraphSat::solve(assumptions, model);
+  Bool3 ans = GraphSatImpl::solve(assumptions, model);
 
   mOut << "# " << ans << endl;
 

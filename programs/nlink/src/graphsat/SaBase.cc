@@ -8,7 +8,6 @@
 
 
 #include "SaBase.h"
-#include "GraphSat.h"
 #include "SatClause.h"
 
 
@@ -16,7 +15,7 @@ BEGIN_NAMESPACE_YM_NLINK
 
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
-SaBase::SaBase(GraphSat* solver) :
+SaBase::SaBase(GraphSatImpl* solver) :
   SatAnalyzer(solver)
 {
 }

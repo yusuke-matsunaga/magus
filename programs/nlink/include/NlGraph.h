@@ -232,7 +232,7 @@ private:
   /// @brief ノードを返す．
   /// @param[in] x, y 座標
   NlNode*
-  node(ymuint x,
+  _node(ymuint x,
        ymuint y);
 
 

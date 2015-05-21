@@ -178,7 +178,7 @@ NlGraph::set_problem(const NlProblem& problem)
   // 辺の隣接関係を作る．
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
-      NlNode* node = this->node(x, y);
+      NlNode* node = _node(x, y);
       node->mX = x;
       node->mY = y;
       node->mEdgeList.reserve(4);
@@ -216,7 +216,7 @@ NlGraph::set_problem(const NlProblem& problem)
       NlPoint start_point = con.start_point();
       ymuint x1 = start_point.x();
       ymuint y1 = start_point.y();
-      NlNode* node1 = node(x1, y1);
+      NlNode* node1 = _node(x1, y1);
       node1->mTermId = k + 1;
       mTermArray[k * 2 + 0] = node1;
     }
@@ -224,7 +224,7 @@ NlGraph::set_problem(const NlProblem& problem)
       NlPoint end_point = con.end_point();
       ymuint x2 = end_point.x();
       ymuint y2 = end_point.y();
-      NlNode* node2 = node(x2, y2);
+      NlNode* node2 = _node(x2, y2);
       node2->mTermId = k + 1;
       mTermArray[k * 2 + 1] = node2;
     }
@@ -307,8 +307,8 @@ NlGraph::node(ymuint x,
 // @brief ノードを得る．
 // @param[in] x, y 座標
 NlNode*
-NlGraph::node(ymuint x,
-	      ymuint y)
+NlGraph::_node(ymuint x,
+	       ymuint y)
 {
   ASSERT_COND( x >= 0 );
   ASSERT_COND( x < mWidth );

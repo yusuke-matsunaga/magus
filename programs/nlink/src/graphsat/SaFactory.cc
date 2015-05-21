@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_NLINK
 // @param[in] solver SATソルバ
 // @param[in] option どのクラスを生成するかを決めるオプション文字列
 SatAnalyzer*
-SaFactory::gen_analyzer(GraphSat* solver,
+SaFactory::gen_analyzer(GraphSatImpl* solver,
 			const string& option)
 {
   if ( option == "uip1" ) {

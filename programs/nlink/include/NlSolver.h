@@ -10,7 +10,7 @@
 
 
 #include "nlink_nsdef.h"
-#include "YmLogic/SatSolver.h"
+#include "GraphSat.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -56,7 +56,7 @@ private:
 
   /// @brief 基本的な制約を作る．
   void
-  make_base_cnf(SatSolver& solver,
+  make_base_cnf(GraphSat& solver,
 		const NlGraph& graph);
 
   /// @brief 解を出力する．
@@ -68,14 +68,21 @@ private:
 		 const vector<Bool3>& model,
 		 NlSolution& solution);
 
-  /// @brief ノードの変数を得る．
-  VarId
-  node_var(const NlNode* node,
-	   ymuint idx) const;
+  /// @brief 枝の変数番号をセットする．
+  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] idx 線分番号
+  /// @param[in] var 変数番号
+  void
+  set_edge_var(ymuint edge,
+	       ymuint idx,
+	       VarId var);
 
-  /// @brief 枝の変数を得る．
+  /// @brief 枝の変数番号を得る．
+  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] idx 線分番号
   VarId
-  edge_var(ymuint edge) const;
+  edge_var(ymuint edge,
+	   ymuint idx);
 
 
 private:
@@ -87,10 +94,8 @@ private:
   ymuint mNum;
 
   // 枝の変数の配列
-  vector<VarId> mEdgeVarArray;
-
-  // ノードの変数の配列
-  vector<VarId> mNodeVarArray;
+  // サイズは枝数 x 線分数
+  vector<VarId> mVarArray;
 
 };
 

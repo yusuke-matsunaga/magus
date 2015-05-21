@@ -24,9 +24,10 @@ set (common_SOURCES
   )
 
 set (graphsat_SOURCES
-  src/graphsat/AssignList.cc
   src/graphsat/GraphSat.cc
+  src/graphsat/GraphSatImpl.cc
   src/graphsat/GraphSatR.cc
+  src/graphsat/AssignList.cc
   src/graphsat/SaBase.cc
   src/graphsat/SaFactory.cc
   src/graphsat/SaUIP1.cc

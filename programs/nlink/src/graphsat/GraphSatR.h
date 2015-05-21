@@ -5,21 +5,21 @@
 /// @brief GraphSatR のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GraphSat.h"
+#include "GraphSatImpl.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
 /// @class GraphSatR GraphSatR.h "GraphSatR.h"
-/// @brief ログ記録機能付きの GraphSat
+/// @brief ログ記録機能付きの YmSat
 //////////////////////////////////////////////////////////////////////
 class GraphSatR :
-  public GraphSat
+  public GraphSatImpl
 {
 public:
 
@@ -27,7 +27,7 @@ public:
   /// @param[in] out 出力ストリーム
   /// @param[in] option オプション文字列
   GraphSatR(ostream& out,
-	 const string& option = string());
+	    const string& option = string());
 
   /// @brief デストラクタ
   virtual
@@ -94,6 +94,11 @@ public:
 	     Literal lit3,
 	     Literal lit4,
 	     Literal lit5);
+
+  /// @brief グラフを追加する．
+  virtual
+  void
+  add_graph(const GsGraphBuilder& graph_src);
 
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト

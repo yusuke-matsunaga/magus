@@ -5,7 +5,7 @@
 /// @brief SatClause のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 20154 Yusuke Matsunaga
 /// All rights reserved.
 
 

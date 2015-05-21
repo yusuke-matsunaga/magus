@@ -5,11 +5,12 @@
 /// @brief SatAnalyzer のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2015 Yusuke Matsunaga
+/// Copyright (C) 20154 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "GraphSat.h"
+#include "nlink_nsdef.h"
+#include "GraphSatImpl.h"
 #include "SatReason.h"
 
 
@@ -26,8 +27,8 @@ class SatClause;
 /// ただし，学習節の生成法は唯一ではないので，SatAnalyzer を純粋仮想
 /// 基底クラスにして派生クラスでさまざまな手法を実装できるようにしてい
 /// る．
-/// そのため，SatAnalyzer の大きな役割は GraphSat とのインターフェイスを
-/// 提供することである．もう一つの仕事は，派生クラスが GraphSat の
+/// そのため，SatAnalyzer の大きな役割は YmSat とのインターフェイスを
+/// 提供することである．もう一つの仕事は，派生クラスが YmSat の
 /// private メンバ関数にアクセスするための代理関数を提供することである．
 //////////////////////////////////////////////////////////////////////
 class SatAnalyzer
@@ -36,7 +37,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] solver SATソルバ
-  SatAnalyzer(GraphSat* solver);
+  SatAnalyzer(GraphSatImpl* solver);
 
   /// @brief デストラクタ
   virtual
@@ -65,7 +66,7 @@ public:
 
 protected:
   //////////////////////////////////////////////////////////////////////
-  // 派生クラスに直接 GraphSat をアクセスさせないための代理関数
+  // 派生クラスに直接 YmSat をアクセスさせないための代理関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 現在の decision level を取り出す．
@@ -107,8 +108,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // GraphSat へのポインタ
-  GraphSat* mSolver;
+  // YmSat へのポインタ
+  GraphSatImpl* mSolver;
 
 };
 
@@ -126,7 +127,7 @@ public:
   /// @param[in] option どのクラスを生成するかを決めるオプション文字列
   static
   SatAnalyzer*
-  gen_analyzer(GraphSat* solver,
+  gen_analyzer(GraphSatImpl* solver,
 	       const string& option = string());
 
 };
@@ -139,7 +140,7 @@ public:
 // @brief コンストラクタ
 // @param[in] solver SATソルバ
 inline
-SatAnalyzer::SatAnalyzer(GraphSat* solver) :
+SatAnalyzer::SatAnalyzer(GraphSatImpl* solver) :
   mSolver(solver)
 {
 }
