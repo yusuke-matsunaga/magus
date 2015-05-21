@@ -285,6 +285,8 @@ GraphSat::add_graph(const GsGraph& src_graph)
     VarId var = edge->var();
     mEdgeMap[var.val()] = edge;
   }
+  // 最初の経路を求めておく．
+  find_route(graph);
 }
 
 BEGIN_NONAMESPACE
@@ -826,7 +828,7 @@ GraphSat::implication()
     // グラフの状態の更新が必要か調べる．
     for (ymuint i = 0; i < mGraphList.size(); ++ i) {
       GsGraph* graph = mGraphList[i];
-      if ( graph->update() ) {
+      if ( graph->needs_update() ) {
 	conflict = find_route(graph);
 	if ( conflict != kNullSatReason ) {
 	  break;
@@ -1528,7 +1530,6 @@ GraphSat::find_route(GsGraph* graph)
 {
   mBlockingList.clear();
   GsNode* start_node = graph->start_node();
-  GsNode* end_node = graph->end_node();
   bool res = dfs_graph(start_node, NULL);
   for (ymuint i = 0; i < graph->node_num(); ++ i) {
     graph->node(i)->clear_visited();
@@ -1600,6 +1601,11 @@ GraphSat::dfs_graph(GsNode* node,
     return false;
   }
   node->set_visited();
+
+  if ( node->terminal_mark() == 2 ) {
+    // 終点に到達した
+    return true;
+  }
 
   ymuint ne = node->edge_num();
   bool reached = false;

@@ -31,6 +31,24 @@ GsGraphBuilder::~GsGraphBuilder()
 {
 }
 
+// @brief 始点を指定する．
+// @param[in] node_id 始点のノード番号
+void
+GsGraphBuilder::set_start_node(ymuint node_id)
+{
+  ASSERT_COND( node_id < node_num() );
+  mStartId = node_id;
+}
+
+// @brief 終点を指定する．
+// @param[in] node_id 終点のノード番号
+void
+GsGraphBuilder::set_end_node(ymuint node_id)
+{
+  ASSERT_COND( node_id < node_num() );
+  mEndId = node_id;
+}
+
 // @brief 枝を追加する．
 // @param[in] node1_id, node2_id 両端のノード番号
 // @param[in] var 枝の変数番号
@@ -56,6 +74,20 @@ ymuint
 GsGraphBuilder::node_num() const
 {
   return mNodeNum;
+}
+
+// @brief 始点のノード番号を返す．
+ymuint
+GsGraphBuilder::start_node() const
+{
+  return mStartId;
+}
+
+// @brief 終点のノード番号を返す．
+ymuint
+GsGraphBuilder::end_node() const
+{
+  return mEndId;
 }
 
 // @brief ノードの枝番号リストを返す．
@@ -137,6 +169,14 @@ GsGraph::GsGraph(const GsGraphBuilder& builder)
     edge1->mSelected = false;
   }
 
+  ymuint start_id = builder.start_node();
+  GsNode* start_node = node(start_id);
+  start_node->mTermMark = 1;
+
+  ymuint end_id = builder.end_node();
+  GsNode* end_node = node(end_id);
+  end_node->mTermMark = 2;
+
   mUpdate = false;
 }
 
@@ -173,6 +213,14 @@ GsGraph::GsGraph(const GsGraph& src)
     edge1->mSelected = false;
   }
 
+  ymuint start_id = src.start_node()->id();
+  GsNode* start_node = node(start_id);
+  start_node->mTermMark = 1;
+
+  ymuint end_id = src.end_node()->id();
+  GsNode* end_node = node(end_id);
+  end_node->mTermMark = 2;
+
   mUpdate = false;
 }
 
@@ -187,6 +235,7 @@ GsGraph::set_size(ymuint node_num,
   mNodeArray = new GsNode[mNodeNum];
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     mNodeArray[i].mId = i;
+    mNodeArray[i].mTermMark = 0;
   }
 
   mEdgeNum = edge_num;

@@ -51,6 +51,10 @@ public:
   GsEdge*
   edge(ymuint pos) const;
 
+  /// @brief 端子マークを得る．
+  ymuint
+  terminal_mark() const;
+
   /// @brief 'visited' フラグを返す．
   bool
   visited() const;
@@ -77,6 +81,12 @@ private:
 
   // ID番号
   ymuint mId;
+
+  // 端子マーク
+  // 0: 無印
+  // 1: 始点
+  // 2: 終点
+  ymuint mTermMark;
 
   // 枝数
   ymuint mEdgeNum;
@@ -112,6 +122,14 @@ ymuint
 GsNode::id() const
 {
   return mId;
+}
+
+// @brief 端子マークを得る．
+inline
+ymuint
+GsNode::terminal_mark() const
+{
+  return mTermMark;
 }
 
 // @brief 枝数を返す．

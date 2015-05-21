@@ -39,6 +39,16 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 始点を指定する．
+  /// @param[in] node_id 始点のノード番号
+  void
+  set_start_node(ymuint node_id);
+
+  /// @brief 終点を指定する．
+  /// @param[in] node_id 終点のノード番号
+  void
+  set_end_node(ymuint node_id);
+
   /// @brief 枝を追加する．
   /// @param[in] node1_id, node2_id 両端のノード番号
   /// @param[in] var 枝の変数番号
@@ -50,6 +60,14 @@ public:
   /// @brief ノード数を返す．
   ymuint
   node_num() const;
+
+  /// @brief 始点のノード番号を返す．
+  ymuint
+  start_node() const;
+
+  /// @brief 終点のノード番号を返す．
+  ymuint
+  end_node() const;
 
   /// @brief ノードの枝番号リストを返す．
   /// @param[in] pos ノードの番号 ( 0 <= pos < node_num() )
@@ -88,6 +106,12 @@ private:
 
   // ノード数
   ymuint mNodeNum;
+
+  // 始点のノード番号
+  ymuint mStartId;
+
+  // 終点のノード番号
+  ymuint mEndId;
 
   // ノードごとの枝番号リスト
   vector<vector<ymuint> > mEdgeListArray;
@@ -157,7 +181,7 @@ public:
 
   /// @brief 'update' フラグを得る．
   bool
-  update() const;
+  needs_update() const;
 
   /// @brief 'update' フラグを消す．
   void
@@ -258,7 +282,7 @@ GsGraph::end_node() const
 // @brief 'update' フラグを得る．
 inline
 bool
-GsGraph::update() const
+GsGraph::needs_update() const
 {
   return mUpdate;
 }
