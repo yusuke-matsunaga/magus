@@ -10,7 +10,7 @@
 #include "NlView.h"
 #include "NlProblem.h"
 #include "NlSolution.h"
-#include "NlSolver2.h"
+#include "NlSolverGs.h"
 #include <QApplication>
 
 
@@ -26,10 +26,10 @@ main(int argc,
   char* filename = argv[1];
   NlProblem problem = read_problem(filename);
 
-  NlSolver2 solver;
+  NlSolverGs solver;
   NlSolution solution;
 
-  solver.solve(problem, solution);
+  solver.solve(problem, false, solution);
 
   print_solution(cout, solution);
 

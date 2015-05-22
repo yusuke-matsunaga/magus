@@ -172,6 +172,7 @@ END_NONAMESPACE
 // @param[out] solution 解
 void
 NlSolverGs::solve(const NlProblem& problem,
+		  bool verbose,
 		  NlSolution& solution)
 {
   GraphSat solver;
@@ -195,8 +196,10 @@ NlSolverGs::solve(const NlProblem& problem,
 
   solution.init(problem);
 
-  SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
-  solver.reg_msg_handler(msg_handler);
+  if ( verbose ) {
+    SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
+    solver.reg_msg_handler(msg_handler);
+  }
 
   vector<Literal> assumptions;
   vector<Bool3> model;

@@ -34,10 +34,12 @@ public:
 
   /// @brief 問題を解く
   /// @param[in] problem 問題
+  /// @param[in] verbose verbose フラグ
   /// @param[out] solution 解
   virtual
   void
   solve(const NlProblem& problem,
+	bool verbose,
 	NlSolution& solution) = 0;
 
 };

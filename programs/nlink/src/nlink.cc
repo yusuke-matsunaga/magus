@@ -19,7 +19,8 @@ BEGIN_NAMESPACE_YM_NLINK
 
 void
 nlink(const string& filename,
-      ymuint method)
+      ymuint method,
+      bool verbose)
 {
   NlProblem problem = read_problem(filename);
 
@@ -29,15 +30,15 @@ nlink(const string& filename,
 
   if ( method == 0 ) {
     NlSolverGs solver;
-    solver.solve(problem, solution);
+    solver.solve(problem, verbose, solution);
   }
   else if ( method == 1 ) {
     NlSolver1 solver;
-    solver.solve(problem, solution);
+    solver.solve(problem, verbose, solution);
   }
   else if ( method == 2 ) {
     NlSolver2 solver;
-    solver.solve(problem, solution);
+    solver.solve(problem, verbose, solution);
   }
 
   print_solution(cout, solution);
@@ -54,6 +55,7 @@ main(int argc,
   using namespace std;
 
   ymuint method = 0;
+  bool verbose = false;
   int base = 1;
   for (int i = 1; i < argc; ++ i) {
     if ( strcmp(argv[i], "-1") == 0 ) {
@@ -68,13 +70,16 @@ main(int argc,
       method = 0;
       base = 2;
     }
+    else if ( strcmp(argv[i], "-v") == 0 ) {
+      verbose = true;
+    }
     else {
       break;
     }
   }
 
   for (int i = base; i < argc; ++ i) {
-    nlink(argv[i], method);
+    nlink(argv[i], verbose, method);
   }
 
   return 0;

@@ -100,24 +100,6 @@ target_link_libraries(nlink
   ym_logic
   )
 
-add_executable(nlink2
-  ${nlink2_SOURCES}
-  $<TARGET_OBJECTS:nlink_common>
-  )
-
-target_link_libraries(nlink2
-  ym_logic
-  )
-
-add_executable(nlink3
-  ${nlink3_SOURCES}
-  $<TARGET_OBJECTS:nlink_common>
-  )
-
-target_link_libraries(nlink3
-  ym_logic
-  )
-
 if (Qt4_FOUND)
   QT4_WRAP_CPP(HEADERS_MOC
     src/gui/NlView.h

@@ -169,9 +169,11 @@ END_NONAMESPACE
 
 // @brief 問題を解く
 // @param[in] problem 問題
+// @param[in] verbose verbose フラグ
 // @param[out] solution 解
 void
 NlSolver1::solve(const NlProblem& problem,
+		 bool verbose,
 		 NlSolution& solution)
 {
   SatSolver solver("minisat2", string(), NULL);
@@ -187,8 +189,11 @@ NlSolver1::solve(const NlProblem& problem,
 
   ymuint num = problem.elem_num();
 
-  SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
-  solver.reg_msg_handler(msg_handler);
+  if ( verbose ) {
+    SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
+    solver.reg_msg_handler(msg_handler);
+  }
+
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
   switch ( stat ) {
