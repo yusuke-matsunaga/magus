@@ -10,22 +10,35 @@
 #include "nlink_nsdef.h"
 #include "NlProblem.h"
 #include "NlSolution.h"
+#include "NlSolver1.h"
+#include "NlSolver2.h"
 #include "NlSolverGs.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
 
 void
-nlink(const string& filename)
+nlink(const string& filename,
+      ymuint method)
 {
   NlProblem problem = read_problem(filename);
 
   print_problem(cout, problem);
 
-  NlSolverGs solver;
   NlSolution solution;
 
-  solver.solve(problem, solution);
+  if ( method == 0 ) {
+    NlSolverGs solver;
+    solver.solve(problem, solution);
+  }
+  else if ( method == 1 ) {
+    NlSolver1 solver;
+    solver.solve(problem, solution);
+  }
+  else if ( method == 2 ) {
+    NlSolver2 solver;
+    solver.solve(problem, solution);
+  }
 
   print_solution(cout, solution);
 }
@@ -40,8 +53,28 @@ main(int argc,
   using nsYm::nsNlink::nlink;
   using namespace std;
 
+  ymuint method = 0;
+  int base = 1;
   for (int i = 1; i < argc; ++ i) {
-    nlink(argv[i]);
+    if ( strcmp(argv[i], "-1") == 0 ) {
+      method = 1;
+      base = 2;
+    }
+    else if ( strcmp(argv[i], "-2") == 0 ) {
+      method = 2;
+      base = 2;
+    }
+    else if ( strcmp(argv[i], "-gs") == 0 ) {
+      method = 0;
+      base = 2;
+    }
+    else {
+      break;
+    }
+  }
+
+  for (int i = base; i < argc; ++ i) {
+    nlink(argv[i], method);
   }
 
   return 0;

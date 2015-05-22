@@ -304,6 +304,15 @@ NlGraph::node(ymuint x,
   return mNodeArray[x * mHeight + y];
 }
 
+// @brief ノードを返す．
+// @param[in] id ID番号
+const NlNode*
+NlGraph::node(ymuint id) const
+{
+  ASSERT_COND( id < mMaxNodeId );
+  return mNodeArray[id];
+}
+
 // @brief ノードを得る．
 // @param[in] x, y 座標
 NlNode*

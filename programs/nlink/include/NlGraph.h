@@ -188,6 +188,11 @@ public:
   node(ymuint x,
        ymuint y) const;
 
+  /// @brief ノードを返す．
+  /// @param[in] id ID番号
+  const NlNode*
+  node(ymuint id) const;
+
   /// @brief 左の枝番号を返す．
   /// @param[in] x, y 座標
   ymuint

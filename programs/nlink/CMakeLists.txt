@@ -39,6 +39,7 @@ set (graphsat_SOURCES
 
 set (solver_SOURCES
   src/solver/NlSolverGs.cc
+  src/solver/NlSolver1.cc
   src/solver/NlSolver2.cc
   src/solver/NlSolver3.cc
   src/solver/MazeRouter.cc
