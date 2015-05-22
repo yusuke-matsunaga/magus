@@ -13,6 +13,7 @@
 #include "NlGraph.h"
 #include "MazeRouter.h"
 #include "YmLogic/SatSolver.h"
+#include "YmLogic/SatMsgHandlerImpl1.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -87,6 +88,31 @@ one_hot4(SatSolver& solver,
 
 inline
 void
+one_hot(SatSolver& solver,
+	Literal clit,
+	const vector<Literal>& lit_list)
+{
+  ymuint nl = lit_list.size();
+  switch ( nl ) {
+  case 2:
+    one_hot2(solver, clit, lit_list[0], lit_list[1]);
+    break;
+
+  case 3:
+    one_hot3(solver, clit, lit_list[0], lit_list[1], lit_list[2]);
+    break;
+
+  case 4:
+    one_hot4(solver, clit, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+  }
+}
+
+inline
+void
 zero_two_hot2(SatSolver& solver,
 	      Literal lit1,
 	      Literal lit2)
@@ -127,6 +153,30 @@ zero_two_hot4(SatSolver& solver,
   solver.add_clause(~lit1, ~lit2, ~lit3, ~lit4);
 }
 
+inline
+void
+zero_two_hot(SatSolver& solver,
+	     const vector<Literal>& lit_list)
+{
+  ymuint nl = lit_list.size();
+  switch ( nl ) {
+  case 2:
+    zero_two_hot2(solver, lit_list[0], lit_list[1]);
+    break;
+
+  case 3:
+    zero_two_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
+    break;
+
+  case 4:
+    zero_two_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+  }
+}
+
 END_NONAMESPACE
 
 
@@ -137,8 +187,8 @@ void
 NlSolver2::solve(const NlProblem& problem,
 		 NlSolution& solution)
 {
-  //SatSolver solver("minisat2", string(), NULL);
-  SatSolver solver(string(), string(), NULL);
+  SatSolver solver("minisat2", string(), NULL);
+  //SatSolver solver(string(), string(), NULL);
 
   NlGraph graph;
 
@@ -335,6 +385,9 @@ NlSolver2::solve(const NlProblem& problem,
     }
   }
   else {
+    SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
+    solver.reg_msg_handler(msg_handler);
+
     vector<Literal> assumption;
     for (ymuint i = 0; i < num; ++ i) {
       assumption.push_back(Literal(con_array[i]));
@@ -418,6 +471,33 @@ NlSolver2::make_base_cnf(SatSolver& solver,
     }
   }
 
+  for (ymuint x = 0; x < width; ++ x) {
+    for (ymuint y = 0; y < height; ++ y) {
+      const NlNode* node = graph.node(x, y);
+      const vector<ymuint>& edge_list = node->edge_list();
+      ymuint ne = edge_list.size();
+      // このノード上で異なる番号の線分が交わることはない．
+      for (ymuint i1 = 0; i1 < ne; ++ i1) {
+	ymuint edge1 = edge_list[i1];
+	for (ymuint i2 = 0; i2 < ne; ++ i2) {
+	  if ( i1 == i2 ) {
+	    continue;
+	  }
+	  ymuint edge2 = edge_list[i2];
+	  for (ymuint k1 = 0; k1 < num; ++ k1) {
+	    VarId var1 = edge_var(edge1, k1);
+	    Literal lit1(var1);
+	    for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
+	      VarId var2 = edge_var(edge2, k2);
+	      Literal lit2(var2);
+	      solver.add_clause(~lit1, ~lit2);
+	    }
+	  }
+	}
+      }
+    }
+  }
+
   // 結線ごとの変数を作る．
   con_array.clear();
   con_array.resize(num);
@@ -449,85 +529,19 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	    // 端点の場合
 	    // 必ずただ1つの枝が選ばれる．
 	    Literal clit(con_array[k]);
-	    switch ( ne ) {
-	    case 2:
-	      one_hot2(solver, clit, lit_list[0], lit_list[1]);
-	      break;
-
-	    case 3:
-	      one_hot3(solver, clit, lit_list[0], lit_list[1], lit_list[2]);
-	      break;
-
-	    case 4:
-	      one_hot4(solver, clit, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
-	      break;
-
-	    default:
-	      ASSERT_NOT_REACHED;
-	    }
+	    one_hot(solver, clit, lit_list);
 	  }
 	  else {
 	    // 選ばれない．
-	    switch ( ne ) {
-	    case 2:
-	      solver.add_clause(~lit_list[0]);
-	      solver.add_clause(~lit_list[1]);
-	      break;
-
-	    case 3:
-	      solver.add_clause(~lit_list[0]);
-	      solver.add_clause(~lit_list[1]);
-	      solver.add_clause(~lit_list[2]);
-	      break;
-
-	    case 4:
-	      solver.add_clause(~lit_list[0]);
-	      solver.add_clause(~lit_list[1]);
-	      solver.add_clause(~lit_list[2]);
-	      solver.add_clause(~lit_list[3]);
-	      break;
-
-	    default:
-	      ASSERT_NOT_REACHED;
+	    for (ymuint i = 0; i < ne; ++ i) {
+	      solver.add_clause(~lit_list[i]);
 	    }
 	  }
 	}
 	else {
 	  // そうでない場合
 	  // 0個か2個の枝が選ばれる．
-	  switch ( ne ) {
-	  case 2:
-	    zero_two_hot2(solver, lit_list[0], lit_list[1]);
-	    break;
-
-	  case 3:
-	    zero_two_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
-	    break;
-
-	  case 4:
-	    zero_two_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
-	    break;
-
-	  default:
-	    ASSERT_NOT_REACHED;
-	  }
-	}
-      }
-
-      // このノード上で異なる番号の線分が交わることはない．
-      for (ymuint i1 = 0; i1 < ne; ++ i1) {
-	ymuint edge1 = edge_list[i1];
-	for (ymuint i2 = 0; i2 < ne; ++ i2) {
-	  ymuint edge2 = edge_list[i2];
-	  for (ymuint k1 = 0; k1 < num; ++ k1) {
-	    VarId var1 = edge_var(edge1, k1);
-	    Literal lit1(var1);
-	    for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
-	      VarId var2 = edge_var(edge2, k2);
-	      Literal lit2(var2);
-	      solver.add_clause(~lit1, ~lit2);
-	    }
-	  }
+	  zero_two_hot(solver, lit_list);
 	}
       }
     }

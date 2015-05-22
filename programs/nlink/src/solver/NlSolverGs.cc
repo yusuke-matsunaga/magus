@@ -1,33 +1,34 @@
 
-/// @file NlSolver.cc
-/// @brief NlSolver の実装ファイル
+/// @file NlSolverGs.cc
+/// @brief NlSolverGs の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "NlSolver.h"
+#include "NlSolverGs.h"
 #include "NlProblem.h"
 #include "NlGraph.h"
 #include "NlSolution.h"
 #include "GraphSat.h"
 #include "GsGraphBuilder.h"
+#include "YmLogic/SatMsgHandlerImpl1.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
-// クラス NlSolver
+// クラス NlSolverGs
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NlSolver::NlSolver()
+NlSolverGs::NlSolverGs()
 {
 }
 
 // @brief デストラクタ
-NlSolver::~NlSolver()
+NlSolverGs::~NlSolverGs()
 {
 }
 
@@ -75,6 +76,30 @@ one_hot4(GraphSat& solver,
 
 inline
 void
+one_hot(GraphSat& solver,
+	const vector<Literal>& lit_list)
+{
+  ymuint nl = lit_list.size();
+  switch ( nl ) {
+  case 2:
+    one_hot2(solver, lit_list[0], lit_list[1]);
+    break;
+
+  case 3:
+    one_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
+    break;
+
+  case 4:
+    one_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+  }
+}
+
+inline
+void
 zero_two_hot2(GraphSat& solver,
 	      Literal lit1,
 	      Literal lit2)
@@ -115,6 +140,30 @@ zero_two_hot4(GraphSat& solver,
   solver.add_clause(~lit1, ~lit2, ~lit3, ~lit4);
 }
 
+inline
+void
+zero_two_hot(GraphSat& solver,
+	     const vector<Literal>& lit_list)
+{
+  ymuint nl = lit_list.size();
+  switch ( nl ) {
+  case 2:
+    zero_two_hot2(solver, lit_list[0], lit_list[1]);
+    break;
+
+  case 3:
+    zero_two_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
+    break;
+
+  case 4:
+    zero_two_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
+    break;
+
+  default:
+    ASSERT_NOT_REACHED;
+  }
+}
+
 END_NONAMESPACE
 
 
@@ -122,8 +171,8 @@ END_NONAMESPACE
 // @param[in] problem 問題
 // @param[out] solution 解
 void
-NlSolver::solve(const NlProblem& problem,
-		NlSolution& solution)
+NlSolverGs::solve(const NlProblem& problem,
+		  NlSolution& solution)
 {
   GraphSat solver;
 
@@ -199,6 +248,9 @@ NlSolver::solve(const NlProblem& problem,
 
   solution.init(problem);
 
+  SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
+  solver.reg_msg_handler(msg_handler);
+
   vector<Literal> assumptions;
   vector<Bool3> model;
   Bool3 stat = solver.solve(assumptions, model);
@@ -220,8 +272,8 @@ NlSolver::solve(const NlProblem& problem,
 
 // @brief 基本的な制約を作る．
 void
-NlSolver::make_base_cnf(GraphSat& solver,
-			const NlGraph& graph)
+NlSolverGs::make_base_cnf(GraphSat& solver,
+			  const NlGraph& graph)
 {
   ymuint width = graph.width();
   ymuint height = graph.height();
@@ -232,143 +284,40 @@ NlSolver::make_base_cnf(GraphSat& solver,
   mVarArray.clear();
   mVarArray.resize(max_edge_id * num);
 
-  // 横の辺に対する one-hot 制約を作る．
-  for (ymuint x = 1; x < width; ++ x) {
-    for (ymuint y = 0; y < height; ++ y) {
-      ymuint edge = graph.left_edge(x, y);
-      vector<Literal> tmp_lits(num);
-      // 変数を作る．
-      for (ymuint k = 0; k < num; ++ k) {
-	VarId var = solver.new_var();
-	set_edge_var(edge, k, var);
-	Literal lit = Literal(var);
-	tmp_lits[k] = lit;
-      }
-      // 同時に2つ以上の変数が1にならないようにする．
-      for (ymuint k1 = 0; k1 < num; ++ k1) {
-	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
-	  Literal lit2 = tmp_lits[k2];
-	  solver.add_clause(~lit1, ~lit2);
-	}
+  // 枝に対する変数を作る．
+  for (ymuint edge = 1; edge <= max_edge_id; ++ edge) {
+    for (ymuint k = 0; k < num; ++ k) {
+      VarId var = solver.new_var();
+      set_edge_var(edge, k, var);
+    }
+  }
+
+  // 同じ枝上で複数の径路が選ばれないようにする．
+  for (ymuint edge = 1; edge <= max_edge_id; ++ edge) {
+    for (ymuint k1 = 0; k1 < num; ++ k1) {
+      VarId var1 = edge_var(edge, k1);
+      Literal lit1(var1);
+      for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
+	VarId var2 = edge_var(edge, k2);
+	Literal lit2(var2);
+	solver.add_clause(~lit1, ~lit2);
       }
     }
   }
 
-  // 縦の辺に対する one-hot 制約を作る．
-  for (ymuint y = 1; y < height; ++ y) {
-    for (ymuint x = 0; x < width; ++ x) {
-      ymuint edge = graph.upper_edge(x, y);
-      vector<Literal> tmp_lits(num);
-      // 変数を作る．
-      for (ymuint k = 0; k < num; ++ k) {
-	VarId var = solver.new_var();
-	set_edge_var(edge, k, var);
-	Literal lit = Literal(var);
-	tmp_lits[k] = lit;
-      }
-      // 同時に2つ以上の変数が1にならないようにする．
-      for (ymuint k1 = 0; k1 < num; ++ k1) {
-	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
-	  Literal lit2 = tmp_lits[k2];
-	  solver.add_clause(~lit1, ~lit2);
-	}
-      }
-    }
-  }
-
-  // 枝の条件を作る．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
       const NlNode* node = graph.node(x, y);
       const vector<ymuint>& edge_list = node->edge_list();
       ymuint ne = edge_list.size();
-      for (ymuint k = 0; k < num; ++ k) {
-	// (x, y) のノードに隣接する枝のリテラルのリストを作る．
-	vector<Literal> lit_list;
-	lit_list.reserve(ne);
-	for (ymuint i = 0; i < ne; ++ i) {
-	  ymuint edge = edge_list[i];
-	  VarId var = edge_var(edge, k);
-	  Literal lit(var);
-	  lit_list.push_back(lit);
-	}
-
-	ymuint term_id = node->terminal_id();
-	if ( term_id > 0 ) {
-	  if ( term_id == k + 1 ) {
-	    // 端点の場合
-	    // 必ずただ1つの枝が選ばれる．
-	    switch ( ne ) {
-	    case 2:
-	      one_hot2(solver, lit_list[0], lit_list[1]);
-	      break;
-
-	    case 3:
-	      one_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
-	      break;
-
-	    case 4:
-	      one_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
-	      break;
-
-	    default:
-	      ASSERT_NOT_REACHED;
-	    }
-	  }
-	  else {
-	    // 選ばれない．
-	    switch ( ne ) {
-	    case 2:
-	      solver.add_clause(~lit_list[0]);
-	      solver.add_clause(~lit_list[1]);
-	      break;
-
-	    case 3:
-	      solver.add_clause(~lit_list[0]);
-	      solver.add_clause(~lit_list[1]);
-	      solver.add_clause(~lit_list[2]);
-	      break;
-
-	    case 4:
-	      solver.add_clause(~lit_list[0]);
-	      solver.add_clause(~lit_list[1]);
-	      solver.add_clause(~lit_list[2]);
-	      solver.add_clause(~lit_list[3]);
-	      break;
-
-	    default:
-	      ASSERT_NOT_REACHED;
-	    }
-	  }
-	}
-	else {
-	  // そうでない場合
-	  // 0個か2個の枝が選ばれる．
-	  switch ( ne ) {
-	  case 2:
-	    zero_two_hot2(solver, lit_list[0], lit_list[1]);
-	    break;
-
-	  case 3:
-	    zero_two_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
-	    break;
-
-	  case 4:
-	    zero_two_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
-	    break;
-
-	  default:
-	    ASSERT_NOT_REACHED;
-	  }
-	}
-      }
-
       // このノード上で異なる番号の線分が交わることはない．
       for (ymuint i1 = 0; i1 < ne; ++ i1) {
 	ymuint edge1 = edge_list[i1];
 	for (ymuint i2 = 0; i2 < ne; ++ i2) {
+	  if ( i1 == i2 ) {
+	    // 同じ枝に対する制約は上で生成済み
+	    continue;
+	  }
 	  ymuint edge2 = edge_list[i2];
 	  for (ymuint k1 = 0; k1 < num; ++ k1) {
 	    VarId var1 = edge_var(edge1, k1);
@@ -383,15 +332,53 @@ NlSolver::make_base_cnf(GraphSat& solver,
       }
     }
   }
+
+  // 枝の条件を作る．
+  for (ymuint x = 0; x < width; ++ x) {
+    for (ymuint y = 0; y < height; ++ y) {
+      const NlNode* node = graph.node(x, y);
+      const vector<ymuint>& edge_list = node->edge_list();
+      ymuint ne = edge_list.size();
+      for (ymuint k = 0; k < num; ++ k) {
+	// (x, y) のノードに隣接する枝のリテラルのリストを作る．
+	vector<Literal> lit_list(ne);
+	for (ymuint i = 0; i < ne; ++ i) {
+	  ymuint edge = edge_list[i];
+	  VarId var = edge_var(edge, k);
+	  lit_list[i] = Literal(var);
+	}
+
+	ymuint term_id = node->terminal_id();
+	if ( term_id > 0 ) {
+	  if ( term_id == k + 1 ) {
+	    // 端点の場合
+	    // 必ずただ1つの枝が選ばれる．
+	    one_hot(solver, lit_list);
+	  }
+	  else {
+	    // 選ばれない．
+	    for (ymuint i = 0; i < ne; ++ i) {
+	      solver.add_clause(~lit_list[i]);
+	    }
+	  }
+	}
+	else {
+	  // そうでない場合
+	  // 0個か2個の枝が選ばれる．
+	  zero_two_hot(solver, lit_list);
+	}
+      }
+    }
+  }
 }
 
 // @brief 解を出力する．
 // @param[in] model SATの解
 // @param[in] solution 解
 void
-NlSolver::setup_solution(const NlGraph& graph,
-			 const vector<Bool3>& model,
-			 NlSolution& solution)
+NlSolverGs::setup_solution(const NlGraph& graph,
+			   const vector<Bool3>& model,
+			   NlSolution& solution)
 {
   ymuint width = graph.width();
   ymuint height = graph.height();
@@ -427,9 +414,9 @@ NlSolver::setup_solution(const NlGraph& graph,
 // @param[in] idx 線分番号
 // @param[in] var 変数番号
 void
-NlSolver::set_edge_var(ymuint edge,
-		       ymuint idx,
-		       VarId var)
+NlSolverGs::set_edge_var(ymuint edge,
+			 ymuint idx,
+			 VarId var)
 {
   mVarArray[(edge - 1) * mNum + idx] = var;
 }
@@ -438,8 +425,8 @@ NlSolver::set_edge_var(ymuint edge,
 // @param[in] edge 枝番号 ( 1 〜 )
 // @param[in] idx 線分番号
 VarId
-NlSolver::edge_var(ymuint edge,
-		   ymuint idx)
+NlSolverGs::edge_var(ymuint edge,
+		     ymuint idx)
 {
   return mVarArray[(edge - 1) * mNum + idx];
 }

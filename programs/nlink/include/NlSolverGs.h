@@ -1,8 +1,8 @@
-#ifndef NLSOLVER2_H
-#define NLSOLVER2_H
+#ifndef NLSOLVERGS_H
+#define NLSOLVERGS_H
 
-/// @file NlSolver2.h
-/// @brief NlSolver2 のヘッダファイル
+/// @file NlSolverGs.h
+/// @brief NlSolverGs のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -10,26 +10,26 @@
 
 
 #include "NlSolver.h"
-#include "YmLogic/SatSolver.h"
+#include "GraphSat.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
-/// @class NlSolver2 NlSolver2.h "NlSolver2.h"
-/// @brief number link を解くためのクラス
+/// @class NlSolverGs NlSolverGs.h "NlSolverGs.h"
+/// @brief GraphSat を用いた NlSolver
 //////////////////////////////////////////////////////////////////////
-class NlSolver2 :
+class NlSolverGs :
   public NlSolver
 {
 public:
 
   /// @brief コンストラクタ
-  NlSolver2();
+  NlSolverGs();
 
   /// @brief デストラクタ
   virtual
-  ~NlSolver2();
+  ~NlSolverGs();
 
 
 public:
@@ -48,23 +48,22 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いいられるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 基本的な制約を作る．
   void
-  make_base_cnf(SatSolver& solver,
-		const NlGraph& graph,
-		vector<VarId>& con_array);
-
-  /// @brief 自明な線分を引いたうえで解を求める．
-  void
-  trivial_route(ymuint k,
-		const NlConnection& con,
-		vector<Literal>& assumption);
+  make_base_cnf(GraphSat& solver,
+		const NlGraph& graph);
 
   /// @brief 解を出力する．
-  /// @param[in] graph 問題を表すグラフ
+  /// @param[in] graph 問題のグラフ
   /// @param[in] model SATの解
   /// @param[in] solution 解
   void
@@ -97,7 +96,7 @@ private:
   // 線分数
   ymuint mNum;
 
-  // 枝の変数番号の配列
+  // 枝の変数の配列
   // サイズは枝数 x 線分数
   vector<VarId> mVarArray;
 
@@ -105,4 +104,4 @@ private:
 
 END_NAMESPACE_YM_NLINK
 
-#endif // NLSOLVER2_H
+#endif // NLSOLVER_H

@@ -89,7 +89,7 @@ GraphSatImpl::GraphSatImpl(const string& option) :
   mPropagationNum(0),
   mConflictLimit(0),
   mLearntLimit(0),
-  mMaxConflict(1024 * 100)
+  mMaxConflict(1024 * 1024)
 {
   mAnalyzer = SaFactory::gen_analyzer(this, option);
 
@@ -1582,6 +1582,8 @@ GraphSatImpl::find_route(GsGraph* graph)
   Literal l0 = mTmpLits[0];
   Literal l1 = mTmpLits[1];
 
+  mLearntLitNum += n;
+
   if ( n == 2 ) {
     if ( debug & debug_assign ) {
       cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
@@ -1591,7 +1593,7 @@ GraphSatImpl::find_route(GsGraph* graph)
     add_watcher(~l1, SatReason(l0));
 
     // binary clause は watcher-list に登録するだけで実体はない．
-    ++ mConstrBinNum;
+    ++ mLearntBinNum;
 
     mTmpBinClause->set(l0, l1);
     return SatReason(mTmpBinClause);
@@ -1599,11 +1601,10 @@ GraphSatImpl::find_route(GsGraph* graph)
   else {
     // 節の生成
     SatClause* clause = new_clause(n);
-    ASSERT_COND( n > 2 );
-    mConstrClause.push_back(clause);
+    mLearntClause.push_back(clause);
 
     if ( debug & debug_assign ) {
-      cout << "add_clause: " << *clause << endl;
+      cout << "add_learnt_clause: " << *clause << endl;
     }
 
     SatReason conflict(clause);
