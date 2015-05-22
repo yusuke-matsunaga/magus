@@ -1582,7 +1582,7 @@ GraphSatImpl::find_route(GsGraph* graph)
   Literal l0 = mTmpLits[0];
   Literal l1 = mTmpLits[1];
 
-  mLearntLitNum += n;
+  mConstrLitNum += n;
 
   if ( n == 2 ) {
     if ( debug & debug_assign ) {
@@ -1593,7 +1593,7 @@ GraphSatImpl::find_route(GsGraph* graph)
     add_watcher(~l1, SatReason(l0));
 
     // binary clause は watcher-list に登録するだけで実体はない．
-    ++ mLearntBinNum;
+    ++ mConstrBinNum;
 
     mTmpBinClause->set(l0, l1);
     return SatReason(mTmpBinClause);
@@ -1601,7 +1601,7 @@ GraphSatImpl::find_route(GsGraph* graph)
   else {
     // 節の生成
     SatClause* clause = new_clause(n);
-    mLearntClause.push_back(clause);
+    mConstrClause.push_back(clause);
 
     if ( debug & debug_assign ) {
       cout << "add_learnt_clause: " << *clause << endl;

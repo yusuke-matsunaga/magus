@@ -57,6 +57,12 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @grief GraphSat 用のグラフを作る．
+  void
+  make_graph(const NlGraph& graph,
+	     ymuint wire_idx,
+	     GsGraphBuilder& builder);
+
   /// @brief 基本的な制約を作る．
   void
   make_base_cnf(GraphSat& solver,

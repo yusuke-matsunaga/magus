@@ -186,62 +186,9 @@ NlSolverGs::solve(const NlProblem& problem,
   ymuint max_node_id = graph.max_node_id();
   ymuint max_edge_id = graph.max_edge_id();
   for (ymuint wire_idx = 0; wire_idx < graph.num(); ++ wire_idx) {
+    // グラフを作る．
     GsGraphBuilder builder(max_node_id);
-
-    // 横の枝を作る．
-    for (ymuint x = 0; x < w - 1; ++ x) {
-      for (ymuint y = 0; y < h; ++ y) {
-	const NlNode* node1 = graph.node(x,     y);
-	const NlNode* node2 = graph.node(x + 1, y);
-	if ( (node1->terminal_id() > 0 && node1->terminal_id() != wire_idx + 1) ||
-	     (node2->terminal_id() > 0 && node2->terminal_id() != wire_idx + 1) ) {
-	  // この枝は使えない．
-	  continue;
-	}
-	ymuint node1_id = x * h + y;
-	ymuint node2_id = (x + 1) * h + y;
-	ymuint edge_id = node1->right_edge();
-	VarId var = edge_var(edge_id, wire_idx);
-	builder.add_edge(node1_id, node2_id, var);
-      }
-    }
-
-    // 縦の枝を作る．
-    for (ymuint y = 0; y < h - 1; ++ y) {
-      for (ymuint x = 0; x < w; ++ x) {
-	const NlNode* node1 = graph.node(x, y);
-	const NlNode* node2 = graph.node(x, y + 1);
-	if ( (node1->terminal_id() > 0 && node1->terminal_id() != wire_idx + 1) ||
-	     (node2->terminal_id() > 0 && node2->terminal_id() != wire_idx + 1) ) {
-	  // この枝は使えない．
-	  continue;
-	}
-	ymuint node1_id = x * h + y;
-	ymuint node2_id = x * h + y + 1;
-	ymuint edge_id = node1->lower_edge();
-	VarId var = edge_var(edge_id, wire_idx);
-	builder.add_edge(node1_id, node2_id, var);
-      }
-    }
-
-    // 始点の情報をセットする．
-    const NlNode* start_node = graph.start_node(wire_idx);
-    {
-      ymuint x = start_node->x();
-      ymuint y = start_node->y();
-      ymuint node_id = x * h + y;
-      builder.set_start_node(node_id);
-    }
-
-    // 終点の情報をセットする．
-    const NlNode* end_node = graph.end_node(wire_idx);
-    {
-      ymuint x = end_node->x();
-      ymuint y = end_node->y();
-      ymuint node_id = x * h + y;
-      builder.set_end_node(node_id);
-    }
-
+    make_graph(graph, wire_idx, builder);
     // ソルバにセットする．
     solver.add_graph(builder);
   }
@@ -267,6 +214,70 @@ NlSolverGs::solve(const NlProblem& problem,
   case kB3X:
     cout << "ABORT" << endl;
     break;
+  }
+}
+
+// @grief GraphSat 用のグラフを作る．
+void
+NlSolverGs::make_graph(const NlGraph& graph,
+		       ymuint wire_idx,
+		       GsGraphBuilder& builder)
+{
+  ymuint w = graph.width();
+  ymuint h = graph.height();
+
+  // 横の枝を作る．
+  for (ymuint x = 0; x < w - 1; ++ x) {
+    for (ymuint y = 0; y < h; ++ y) {
+      const NlNode* node1 = graph.node(x,     y);
+      const NlNode* node2 = graph.node(x + 1, y);
+      if ( (node1->terminal_id() > 0 && node1->terminal_id() != wire_idx + 1) ||
+	   (node2->terminal_id() > 0 && node2->terminal_id() != wire_idx + 1) ) {
+	// この枝は使えない．
+	continue;
+      }
+      ymuint node1_id = x * h + y;
+      ymuint node2_id = (x + 1) * h + y;
+      ymuint edge_id = node1->right_edge();
+      VarId var = edge_var(edge_id, wire_idx);
+      builder.add_edge(node1_id, node2_id, var);
+    }
+  }
+
+  // 縦の枝を作る．
+  for (ymuint y = 0; y < h - 1; ++ y) {
+    for (ymuint x = 0; x < w; ++ x) {
+      const NlNode* node1 = graph.node(x, y);
+      const NlNode* node2 = graph.node(x, y + 1);
+      if ( (node1->terminal_id() > 0 && node1->terminal_id() != wire_idx + 1) ||
+	   (node2->terminal_id() > 0 && node2->terminal_id() != wire_idx + 1) ) {
+	// この枝は使えない．
+	continue;
+      }
+      ymuint node1_id = x * h + y;
+      ymuint node2_id = x * h + y + 1;
+      ymuint edge_id = node1->lower_edge();
+      VarId var = edge_var(edge_id, wire_idx);
+      builder.add_edge(node1_id, node2_id, var);
+    }
+  }
+
+  // 始点の情報をセットする．
+  const NlNode* start_node = graph.start_node(wire_idx);
+  {
+    ymuint x = start_node->x();
+    ymuint y = start_node->y();
+    ymuint node_id = x * h + y;
+    builder.set_start_node(node_id);
+  }
+
+  // 終点の情報をセットする．
+  const NlNode* end_node = graph.end_node(wire_idx);
+  {
+    ymuint x = end_node->x();
+    ymuint y = end_node->y();
+    ymuint node_id = x * h + y;
+    builder.set_end_node(node_id);
   }
 }
 
