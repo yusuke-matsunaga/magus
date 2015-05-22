@@ -60,18 +60,19 @@ main(int argc,
   for (int i = 1; i < argc; ++ i) {
     if ( strcmp(argv[i], "-1") == 0 ) {
       method = 1;
-      base = 2;
+      ++ base;
     }
     else if ( strcmp(argv[i], "-2") == 0 ) {
       method = 2;
-      base = 2;
+      ++ base;
     }
     else if ( strcmp(argv[i], "-gs") == 0 ) {
       method = 0;
-      base = 2;
+      ++ base;
     }
     else if ( strcmp(argv[i], "-v") == 0 ) {
       verbose = true;
+      ++ base;
     }
     else {
       break;
@@ -79,7 +80,7 @@ main(int argc,
   }
 
   for (int i = base; i < argc; ++ i) {
-    nlink(argv[i], verbose, method);
+    nlink(argv[i], method, verbose);
   }
 
   return 0;
