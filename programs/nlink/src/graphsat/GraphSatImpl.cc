@@ -1571,7 +1571,7 @@ GraphSatImpl::find_route(GsGraph* graph)
     // 経路上の X の枝についてそれがセパレータになって
     // いるか調べる．
     for (ymuint i = 0; i < mXList.size(); ++ i) {
-      GsEdge* edge = mXList[i];
+      GsEdge* edge = mXList[mXList.size() - i - 1];
       mBlockingList.clear();
       for (ymuint j = 0; j < graph->node_num(); ++ j) {
 	graph->node(j)->clear_visited();
@@ -1718,6 +1718,135 @@ GraphSatImpl::dfs_graph(GsNode* node,
     }
   }
   return reached;
+}
+
+// @brief DFS を実際に行う関数
+// @param[in] node ノード
+// @param[in] block_edge ブロックする枝
+// @param[in] from_edge ノードに至る枝
+// @retval true 終点に到達する径路が見つかった．
+// @retval false 終端に到達できなかった．
+bool
+GraphSatImpl::dfs_graph2(GsNode* node,
+			 GsEdge* block_edge,
+			 GsEdge* from_edge)
+{
+#if DEBUG_DFS
+  cout << "dfs_graph2(" << node->id();
+  if ( from_edge != NULL ) {
+    cout << ", E" << from_edge->id();
+  }
+  cout << ")" << endl;
+#endif
+
+  if ( node->visited() ) {
+#if DEBUG_DFS
+    cout << "  visited" << endl;
+#endif
+    return false;
+  }
+  node->set_visited();
+
+  if ( node->terminal_mark() == 2 ) {
+    // 終点に到達した
+#if DEBUG_DFS
+    cout << "  end node" << endl;
+#endif
+    return true;
+  }
+
+  ymuint ne = node->edge_num();
+  bool reached = false;
+  for (ymuint i = 0; i < ne; ++ i) {
+    GsEdge* edge = node->edge(i);
+    if ( edge == from_edge ) {
+      // 来た道は戻らない．
+      continue;
+    }
+    if ( edge == block_edge ) {
+      // この枝は使えない．
+      continue;
+    }
+    // 反対側のノード
+    GsNode* alt_node = edge->node1();
+    if ( alt_node == node ) {
+      alt_node = edge->node2();
+    }
+#if DEBUG_DFS
+    cout << " alt_node = " << alt_node->id() << endl;
+#endif
+    // 関連付けられた変数
+    VarId var = edge->var();
+    Bool3 val = eval(var);
+    if ( val == kB3False ) {
+#if DEBUG_DFS
+      cout << " blocked" << endl;
+#endif
+      mBlockingList.push_back(var);
+    }
+    else {
+      if ( dfs_graph2(alt_node, block_edge, edge) ) {
+	reached = true;
+	break;
+      }
+    }
+  }
+  return reached;
+}
+
+// @brief グラフから節を作る．
+SatReason
+GraphSatImpl::add_graph_clause()
+{
+  alloc_lits(n);
+  for (ymuint i = 0; i < n; ++ i) {
+    VarId var = mBlockingList[i];
+    mTmpLits[i] = Literal(var);
+  }
+
+  Literal l0 = mTmpLits[0];
+  Literal l1 = mTmpLits[1];
+
+#if 0
+  mConstrLitNum += n;
+#else
+  mLearntLitNum += n;
+#endif
+
+  if ( n == 2 ) {
+    if ( debug & debug_assign ) {
+      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
+    }
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(l1));
+    add_watcher(~l1, SatReason(l0));
+
+    // binary clause は watcher-list に登録するだけで実体はない．
+    ++ mConstrBinNum;
+
+    mTmpBinClause->set(l0, l1);
+    return SatReason(mTmpBinClause);
+  }
+  else {
+    // 節の生成
+    SatClause* clause = new_clause(n);
+#if 0
+    mConstrClause.push_back(clause);
+#else
+    mLearntClause.push_back(clause);
+#endif
+
+    if ( debug & debug_assign ) {
+      cout << "add_learnt_clause: " << *clause << endl;
+    }
+
+    SatReason conflict(clause);
+
+    // watcher-list の設定
+    add_watcher(~l0, conflict);
+    add_watcher(~l1, conflict);
+    return conflict;
+  }
 }
 
 END_NAMESPACE_YM_SAT

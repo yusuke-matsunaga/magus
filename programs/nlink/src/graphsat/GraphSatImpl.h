@@ -419,6 +419,21 @@ private:
   dfs_graph(GsNode* node,
 	    GsEdge* from_edge);
 
+  /// @brief DFS を実際に行う関数
+  /// @param[in] node ノード
+  /// @param[in] block_edge ブロックする枝
+  /// @param[in] from_edge ノードに至る枝
+  /// @retval true 終点に到達する径路が見つかった．
+  /// @retval false 終端に到達できなかった．
+  bool
+  dfs_graph2(GsNode* node,
+	     GsEdge* block_edge,
+	     GsEdge* from_edge);
+
+  /// @brief グラフから節を作る．
+  SatReason
+  add_graph_clause();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
