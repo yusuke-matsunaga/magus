@@ -1553,6 +1553,7 @@ SatReason
 GraphSatImpl::find_route(GsGraph* graph)
 {
   mBlockingList.clear();
+  mXList.clear();
   GsNode* start_node = graph->start_node();
   for (ymuint i = 0; i < graph->node_num(); ++ i) {
     graph->node(i)->clear_visited();
@@ -1565,6 +1566,29 @@ GraphSatImpl::find_route(GsGraph* graph)
     // 終点に到達した．
     // update フラグを降ろしておく．
     graph->clear_update();
+
+#if 0
+    // 経路上の X の枝についてそれがセパレータになって
+    // いるか調べる．
+    for (ymuint i = 0; i < mXList.size(); ++ i) {
+      GsEdge* edge = mXList[i];
+      mBlockingList.clear();
+      for (ymuint j = 0; j < graph->node_num(); ++ j) {
+	graph->node(j)->clear_visited();
+      }
+      if ( !dfs_graph2(start_node, edge, NULL) ) {
+	// edge がセパレータになっていた．
+	// mBlockingList と合わせて節を作る．
+	ymuint n = mBlockingList.size();
+	alloc_lits(n + 1);
+	mTmpLits[0] = Literal(edge->var());
+	for (ymuint j = 0; j < n; ++ j) {
+	  mTmpLits[j + 1] = Literal(mBlockingList[j]);
+	}
+      }
+    }
+#endif
+
     return kNullSatReason;
   }
 
@@ -1582,7 +1606,11 @@ GraphSatImpl::find_route(GsGraph* graph)
   Literal l0 = mTmpLits[0];
   Literal l1 = mTmpLits[1];
 
+#if 0
   mConstrLitNum += n;
+#else
+  mLearntLitNum += n;
+#endif
 
   if ( n == 2 ) {
     if ( debug & debug_assign ) {
@@ -1601,7 +1629,11 @@ GraphSatImpl::find_route(GsGraph* graph)
   else {
     // 節の生成
     SatClause* clause = new_clause(n);
+#if 0
     mConstrClause.push_back(clause);
+#else
+    mLearntClause.push_back(clause);
+#endif
 
     if ( debug & debug_assign ) {
       cout << "add_learnt_clause: " << *clause << endl;
@@ -1667,7 +1699,8 @@ GraphSatImpl::dfs_graph(GsNode* node,
 #endif
     // 関連付けられた変数
     VarId var = edge->var();
-    if ( eval(var) == kB3False ) {
+    Bool3 val = eval(var);
+    if ( val == kB3False ) {
 #if DEBUG_DFS
       cout << " blocked" << endl;
 #endif
@@ -1676,6 +1709,9 @@ GraphSatImpl::dfs_graph(GsNode* node,
     else {
       if ( dfs_graph(alt_node, edge) ) {
 	edge->set_selected();
+	if ( val == kB3X ) {
+	  mXList.push_back(edge);
+	}
 	reached = true;
 	break;
       }

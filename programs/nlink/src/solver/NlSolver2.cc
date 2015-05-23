@@ -11,7 +11,7 @@
 #include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
-#include "MazeRouter.h"
+
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
 
@@ -189,8 +189,8 @@ NlSolver2::solve(const NlProblem& problem,
 		 bool verbose,
 		 NlSolution& solution)
 {
-  SatSolver solver("minisat2", string(), NULL);
-  //SatSolver solver(string(), string(), NULL);
+  //SatSolver solver("minisat2", string(), NULL);
+  SatSolver solver(string(), string(), NULL);
 
   NlGraph graph;
 
@@ -199,160 +199,9 @@ NlSolver2::solve(const NlProblem& problem,
   vector<VarId> con_array;
   make_base_cnf(solver, graph, con_array);
 
-  MazeRouter maze;
-  {
-    ymuint num = problem.elem_num();
-    for (ymuint k = 0; k < num; ++ k) {
-      {
-	vector<ymuint> edge_list;
-	vector<ymuint> index_list;
-	ymuint n = maze.labeling(graph, k, false, edge_list, index_list);
-#if 0
-	cout << "#" << k << "F" << endl;
-	ymuint spos = 0;
-	for (ymuint j = 0; j < n; ++ j) {
-	  ymuint epos = index_list[j];
-	  for (ymuint i = spos; i < epos; ++ i) {
-	    ymuint edge = edge_list[i];
-	    cout << " " << graph.edge_str(edge);
-	  }
-	  cout << endl;
-	  spos = epos;
-	}
-	cout << endl;
-#endif
-#if 0
-	ymuint spos = 0;
-	for (ymuint j = 0; j < n - 1; ++ j) {
-	  ymuint epos = index_list[j];
-	  if ( epos - spos == 1 ) {
-	    vector<Literal> tmp_lits;
-	    for (ymuint i = spos; i < epos; ++ i) {
-	      ymuint edge = edge_list[i];
-	      VarId var = edge_var(edge, k);
-	      tmp_lits.push_back(Literal(var));
-	    }
-	    solver.add_clause(tmp_lits);
-	  }
-	  spos = epos;
-	}
-#endif
-      }
-      {
-	vector<ymuint> edge_list;
-	vector<ymuint> index_list;
-	ymuint n = maze.labeling(graph, k, true, edge_list, index_list);
-#if 0
-	cout << "#" << k << "B" << endl;
-	ymuint spos = 0;
-	for (ymuint j = 0; j < n; ++ j) {
-	  ymuint epos = index_list[j];
-	  for (ymuint i = spos; i < epos; ++ i) {
-	    ymuint edge = edge_list[i];
-	    cout << " " << graph.edge_str(edge);
-	  }
-	  cout << endl;
-	  spos = epos;
-	}
-	cout << endl;
-#endif
-#if 0
-	ymuint spos = 0;
-	for (ymuint j = 0; j < n - 1; ++ j) {
-	  ymuint epos = index_list[j];
-	  if ( epos - spos == 1 ) {
-	    vector<Literal> tmp_lits;
-	    for (ymuint i = spos; i < epos; ++ i) {
-	      ymuint edge = edge_list[i];
-	      VarId var = edge_var(edge, k);
-	      tmp_lits.push_back(Literal(var));
-	    }
-	    solver.add_clause(tmp_lits);
-	  }
-	  spos = epos;
-	}
-#endif
-      }
-    }
-  }
-
   solution.init(problem);
 
   ymuint num = problem.elem_num();
-
-  if ( false ) {
-    vector<Literal> assumption0;
-    for (ymuint i = 0; i < num; ++ i) {
-      assumption0.push_back(Literal(con_array[i]));
-    }
-    // trivial に見える線分を引いてしまう．
-    vector<ymuint> idx_list;
-    for (ymuint k = 0; k < num; ++ k) {
-      NlConnection con = problem.connection(k);
-      NlPoint start_point = con.start_point();
-      ymuint x1 = start_point.x();
-      ymuint y1 = start_point.y();
-
-      NlPoint end_point = con.end_point();
-      ymuint x2 = end_point.x();
-      ymuint y2 = end_point.y();
-
-      if ( x1 == x2 || y1 == y2 ) {
-	idx_list.push_back(k);
-      }
-    }
-
-    if ( !idx_list.empty() ) {
-      cout << "found trivial route";
-      for (ymuint i = 0; i < idx_list.size(); ++ i) {
-	cout << " " << (idx_list[i] + 1);
-      }
-      cout << endl;
-      vector<Literal> assumption = assumption0;
-      for (ymuint i = 0; i < idx_list.size(); ++ i) {
-	ymuint idx = idx_list[i];
-	trivial_route(idx, problem.connection(idx), assumption);
-      }
-      vector<Bool3> model;
-      Bool3 stat = solver.solve(assumption, model);
-      if ( stat == kB3True ) {
-	cout << "SAT with trivial route" << endl;
-	setup_solution(graph, model, solution);
-	return;
-      }
-      else if ( stat == kB3False ) {
-	cout << "UNSAT with trivial route" << endl;
-	for (ymuint n1 = idx_list.size() - 1; n1 > 0; -- n1) {
-	  cout << "  trivial route";
-	  for (ymuint i = 0; i < n1; ++ i) {
-	    cout << " " << (idx_list[i] + 1);
-	  }
-	  cout << endl;
-	  vector<Literal> assumption;
-	  for (ymuint k = 0; k < n1; ++ k) {
-	    ymuint idx = idx_list[k];
-	    trivial_route(idx, problem.connection(idx), assumption);
-	  }
-	  vector<Bool3> model;
-	  Bool3 stat = solver.solve(assumption, model);
-	  if ( stat == kB3True ) {
-	    cout << "SAT with trivial route#" << n1 << endl;
-	    setup_solution(graph, model, solution);
-	    return;
-	  }
-	  else if ( stat == kB3False ) {
-	    cout << "UNSAT with trivial route#" << n1 << endl;
-	  }
-	  else if ( stat == kB3X ) {
-	    cout << "ABORT with trivial route#" << n1 << endl;
-	  }
-	}
-      }
-      else if ( stat == kB3X ) {
-	cout << "ABORT with trivial route" << endl;
-      }
-    }
-  }
 
   if ( false ) {
     vector<Literal> assumption;

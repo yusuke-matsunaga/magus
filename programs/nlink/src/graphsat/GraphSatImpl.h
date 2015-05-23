@@ -565,7 +565,12 @@ private:
   GsEdge** mEdgeMap;
 
   // dfs_graph() で使う作業領域
+  // 通れない枝のリスト
   vector<VarId> mBlockingList;
+
+  // dfs_graph() で使う作業領域
+  // 経路上の値が未定の枝のリスト
+  vector<GsEdge*> mXList;
 
 };
 
