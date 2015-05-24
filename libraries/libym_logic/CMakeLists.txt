@@ -150,7 +150,8 @@ set (sat_SOURCES
   src/sat/ymsat/SaUIP2.cc
   src/sat/ymsat/SatClause.cc
   src/sat/ymsat/VarHeap.cc
-  src/sat/ymsat/YmSat.cc
+  src/sat/ymsat/YmSat_base.cc
+  src/sat/ymsat/YmSat_solve.cc
   src/sat/ymsat/YmSatR.cc
   )
 

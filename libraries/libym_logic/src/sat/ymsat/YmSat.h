@@ -276,20 +276,28 @@ private:
 
   /// @brief CNF を簡単化する．
   void
-  sweep_clause();
+  reduce_CNF();
+
+  /// @brief 充足している節を取り除く
+  /// @param[in] clause_list 節のリスト
+  void
+  sweep_clause(vector<SatClause*>& clause_list);
 
   /// @brief 使われていない学習節を削除する．
   void
   cut_down();
 
   /// @brief add_clause() の下請け関数
+  /// @param[in] lit_num リテラル数
+  ///
+  /// リテラルの実体は mTmpLits[] に入っている．
   void
   add_clause_sub(ymuint lit_num);
 
   /// @brief 学習節を追加する．
-  /// @note 追加するリテラルは mLearntLits に入れる．
+  /// @param[in] learnt_lits 追加する節のもととなるリテラルのリスト
   void
-  add_learnt_clause();
+  add_learnt_clause(const vector<Literal>& learnt_lits);
 
   /// @brief mTmpLits を確保する．
   /// @param[in] lit_num リテラル数
@@ -349,6 +357,7 @@ private:
   decision_level(VarId varid) const;
 
   /// @brief LBD を計算する．
+  /// @param[in] clause 対象の節
   ymuint
   calc_lbd(const SatClause* clause);
 
@@ -454,7 +463,7 @@ private:
   VarHeap mVarHeap;
 
   // calc_lbd() 用の作業領域
-  // サイズは decision_level()
+  // サイズは decision_level() + 1
   bool* mLbdTmp;
 
   // mLbdTmp のサイズ．
@@ -523,8 +532,43 @@ private:
   // mTmpLits のサイズ
   ymuint32 mTmpLitsSize;
 
-  // search() で用いられるリテラル配列
-  vector<Literal> mLearntLits;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // デバッグ用の定数，変数
+  //////////////////////////////////////////////////////////////////////
+
+  static
+  const ymuint debug_none        = 0x00;
+
+  static
+  const ymuint debug_implication = 0x01;
+
+  static
+  const ymuint debug_analyze     = 0x02;
+
+  static
+  const ymuint debug_assign      = 0x04;
+
+  static
+  const ymuint debug_decision    = 0x08;
+
+  static
+  const ymuint debug_solve       = 0x10;
+
+  static
+  const ymuint debug_all         = 0xffffffff;
+
+  //const ymuint debug = debug_decision | debug_analyze | debug_assign;
+  //const ymuint debug = debug_assign;
+  //const ymuint debug = debug_assign | debug_implication;
+  //const ymuint debug = debug_assign | debug_analyze;
+  //const ymuint debug = debug_solve | debug_decision;
+  //const ymuint debug = debug_solve | debug_assign;
+  //const ymuint debug = debug_all;
+  //const ymuint debug = debug_none;
+  static
+  const ymuint debug = debug_none;
 
 };
 
