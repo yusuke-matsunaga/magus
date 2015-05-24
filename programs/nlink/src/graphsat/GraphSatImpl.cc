@@ -14,6 +14,7 @@
 #include "SatClause.h"
 #include "GsGraphBuilder.h"
 #include "GsNode.h"
+#include "YmUtils/HashSet.h"
 
 #define DEBUG_DFS 0
 
@@ -42,7 +43,6 @@ const ymuint debug_all         = 0xffffffff;
 //const ymuint debug = debug_solve | debug_decision;
 //const ymuint debug = debug_solve | debug_assign;
 //const ymuint debug = debug_all;
-//const ymuint debug = debug_none;
 const ymuint debug = debug_none;
 
 bool debug_first = true;
@@ -286,8 +286,8 @@ GraphSatImpl::add_graph(const GsGraphBuilder& graph_src)
     mEdgeMap[var.val()] = edge;
   }
   // 最初の経路を求めておく．
-  SatReason reason = find_route(graph);
-  ASSERT_COND( reason == kNullSatReason );
+  bool stat = find_route(graph);
+  ASSERT_COND( stat );
 }
 
 BEGIN_NONAMESPACE
@@ -602,6 +602,99 @@ GraphSatImpl::search(ymuint confl_limit)
 	cout << endl;
       }
 
+      for (ymuint i = 0; i < mLearntLits.size(); ++ i) {
+	Literal l = mLearntLits[i];
+	ASSERT_COND( eval(l) == kB3False );
+      }
+
+      // バックトラック
+      if ( bt_level < mRootLevel ) {
+	bt_level = mRootLevel;
+      }
+      backtrack(bt_level);
+
+      // 学習節の生成
+      add_learnt_clause();
+
+      decay_var_activity();
+      decay_clause_activity();
+      continue;
+    }
+
+    // グラフの状態の更新が必要か調べる．
+    bool has_separator = false;
+    for (ymuint i = 0; i < mGraphList.size(); ++ i) {
+      GsGraph* graph = mGraphList[i];
+      if ( graph->needs_update() ) {
+	bool stat = find_route(graph);
+	if ( stat ) {
+	  // 径路がある．
+#if 1
+	  // 経路上の X の枝についてそれが単一のセパレータに
+	  // なっているか調べる．
+	  for (ymuint i = 0; i < mXList.size(); ++ i) {
+	    GsEdge* edge = mXList[mXList.size() - i - 1];
+	    if ( check_separator(graph, edge) ) {
+	      // edge を 1 にする．
+	      // 理由を表す節を作る．
+	      add_graph_clause2(edge);
+	      has_separator = true;
+	      break;
+	    }
+	  }
+	  if ( has_separator ) {
+	    break;
+	  }
+#endif
+	  graph->clear_update();
+	}
+	else {
+	  // 径路がない．
+
+	  // 矛盾がおこった．
+	  if ( debug & debug_assign ) {
+	    cout << "\t--> conflict(#" << mConflictNum << ") with previous assignment" << endl
+		 << " Graph#" << i << endl;
+	  }
+
+	  // ループを抜けるためにキューの末尾まで先頭を動かす．
+	  mAssignList.skip_all();
+
+	  conflict = add_graph_clause();
+	  break;
+	}
+      }
+    }
+    if ( has_separator ) {
+      // 割当が起こった．
+      continue;
+    }
+    if ( conflict != kNullSatReason ) {
+      // 矛盾が生じた．
+      ++ mConflictNum;
+      ++ cur_confl_num;
+      if ( decision_level() == mRootLevel ) {
+	// トップレベルで矛盾が起きたら充足不可能
+	return kB3False;
+      }
+
+      // 今の矛盾の解消に必要な条件を「学習」する．
+      int bt_level = mAnalyzer->analyze(conflict, mLearntLits);
+
+      if ( debug & debug_analyze ) {
+	cout << endl
+	     << "analyze for " << conflict << endl
+	     << endl
+	     << "learnt clause is ";
+	const char* plus = "";
+	for (ymuint i = 0; i < mLearntLits.size(); ++ i) {
+	  Literal l = mLearntLits[i];
+	  cout << plus << l << " @" << decision_level(l.varid());
+	  plus = " + ";
+	}
+	cout << endl;
+      }
+
       // バックトラック
       if ( bt_level < mRootLevel ) {
 	bt_level = mRootLevel;
@@ -732,7 +825,7 @@ GraphSatImpl::implication()
 	  c->xchange_wl();
 	  // 新しい wl0 を得る．
 	  l0 = c->wl0();
-	}
+	  }
 	else { // l1 == nl
 	  if ( debug & debug_implication ) {
 	    // この assert は重いのでデバッグ時にしかオンにしない．
@@ -770,10 +863,10 @@ GraphSatImpl::implication()
 	    // l の watcher list から取り除く
 	    -- wpos;
 	    // ~l2 の watcher list に追加する．
-	    add_watcher(~l2, w);
+	      add_watcher(~l2, w);
 
-	    found = true;
-	    break;
+	      found = true;
+	      break;
 	  }
 	}
 	if ( found ) {
@@ -823,19 +916,6 @@ GraphSatImpl::implication()
 	++ wpos;
       }
       wlist.erase(wpos);
-    }
-  }
-
-  if ( conflict == kNullSatReason ) {
-    // グラフの状態の更新が必要か調べる．
-    for (ymuint i = 0; i < mGraphList.size(); ++ i) {
-      GsGraph* graph = mGraphList[i];
-      if ( graph->needs_update() ) {
-	conflict = find_route(graph);
-	if ( conflict != kNullSatReason ) {
-	  break;
-	}
-      }
     }
   }
 
@@ -1324,13 +1404,17 @@ GraphSatImpl::add_learnt_clause()
     add_watcher(~l1, reason);
   }
 
-  // learnt clause の場合には必ず unit clause になっているはず．
-  ASSERT_COND(eval(l0) != kB3False );
   if ( debug & debug_assign ) {
     cout << "\tassign " << l0 << " @" << decision_level()
 	 << " from " << reason << endl;
   }
+  if ( eval(l0) == kB3False ) {
+    cout << "  error " << l0 << " is kB3False" << endl;
+    exit(0);
+  }
 
+  // learnt clause の場合には必ず unit clause になっているはず．
+  ASSERT_COND(eval(l0) != kB3False );
   assign(l0, reason);
 }
 
@@ -1549,7 +1633,7 @@ GraphSatImpl::expand_var()
 // @grief グラフ上で DFS を行い径路を探す．
 // @param[in] graph グラフ
 // @return 矛盾が生じたら理由を返す．
-SatReason
+bool
 GraphSatImpl::find_route(GsGraph* graph)
 {
   mBlockingList.clear();
@@ -1562,90 +1646,7 @@ GraphSatImpl::find_route(GsGraph* graph)
     graph->edge(i)->clear_selected();
   }
   bool res = dfs_graph(start_node, NULL);
-  if ( res ) {
-    // 終点に到達した．
-    // update フラグを降ろしておく．
-    graph->clear_update();
-
-#if 0
-    // 経路上の X の枝についてそれがセパレータになって
-    // いるか調べる．
-    for (ymuint i = 0; i < mXList.size(); ++ i) {
-      GsEdge* edge = mXList[mXList.size() - i - 1];
-      mBlockingList.clear();
-      for (ymuint j = 0; j < graph->node_num(); ++ j) {
-	graph->node(j)->clear_visited();
-      }
-      if ( !dfs_graph2(start_node, edge, NULL) ) {
-	// edge がセパレータになっていた．
-	// mBlockingList と合わせて節を作る．
-	ymuint n = mBlockingList.size();
-	alloc_lits(n + 1);
-	mTmpLits[0] = Literal(edge->var());
-	for (ymuint j = 0; j < n; ++ j) {
-	  mTmpLits[j + 1] = Literal(mBlockingList[j]);
-	}
-      }
-    }
-#endif
-
-    return kNullSatReason;
-  }
-
-  // 終点に到達できなかった．
-  // mBlockList に含まれる変数から節を作り制約に追加する．
-  ymuint n = mBlockingList.size();
-  ASSERT_COND( n > 1 );
-
-  alloc_lits(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    VarId var = mBlockingList[i];
-    mTmpLits[i] = Literal(var);
-  }
-
-  Literal l0 = mTmpLits[0];
-  Literal l1 = mTmpLits[1];
-
-#if 0
-  mConstrLitNum += n;
-#else
-  mLearntLitNum += n;
-#endif
-
-  if ( n == 2 ) {
-    if ( debug & debug_assign ) {
-      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
-    }
-    // watcher-list の設定
-    add_watcher(~l0, SatReason(l1));
-    add_watcher(~l1, SatReason(l0));
-
-    // binary clause は watcher-list に登録するだけで実体はない．
-    ++ mConstrBinNum;
-
-    mTmpBinClause->set(l0, l1);
-    return SatReason(mTmpBinClause);
-  }
-  else {
-    // 節の生成
-    SatClause* clause = new_clause(n);
-#if 0
-    mConstrClause.push_back(clause);
-#else
-    mLearntClause.push_back(clause);
-#endif
-
-    if ( debug & debug_assign ) {
-      cout << "add_learnt_clause: " << *clause << endl;
-    }
-
-    SatReason conflict(clause);
-
-    // watcher-list の設定
-    add_watcher(~l0, conflict);
-    add_watcher(~l1, conflict);
-    return conflict;
-  }
+  return res;
 }
 
 // @brief DFS を実際に行う関数
@@ -1720,6 +1721,22 @@ GraphSatImpl::dfs_graph(GsNode* node,
   return reached;
 }
 
+// @brief eda がセパレータになっているか調べる
+// @param[in] graph 対象のグラフ
+// @param[in] edge 対象の枝
+// @return セパレータの時 true を返す．
+bool
+GraphSatImpl::check_separator(GsGraph* graph,
+			      GsEdge* edge)
+{
+  mBlockingList.clear();
+  for (ymuint j = 0; j < graph->node_num(); ++ j) {
+    graph->node(j)->clear_visited();
+  }
+  GsNode* start_node = graph->start_node();
+  return !dfs_graph2(start_node, edge, NULL);
+}
+
 // @brief DFS を実際に行う関数
 // @param[in] node ノード
 // @param[in] block_edge ブロックする枝
@@ -1767,14 +1784,6 @@ GraphSatImpl::dfs_graph2(GsNode* node,
       // この枝は使えない．
       continue;
     }
-    // 反対側のノード
-    GsNode* alt_node = edge->node1();
-    if ( alt_node == node ) {
-      alt_node = edge->node2();
-    }
-#if DEBUG_DFS
-    cout << " alt_node = " << alt_node->id() << endl;
-#endif
     // 関連付けられた変数
     VarId var = edge->var();
     Bool3 val = eval(var);
@@ -1785,6 +1794,14 @@ GraphSatImpl::dfs_graph2(GsNode* node,
       mBlockingList.push_back(var);
     }
     else {
+      // 反対側のノード
+      GsNode* alt_node = edge->node1();
+      if ( alt_node == node ) {
+	alt_node = edge->node2();
+      }
+#if DEBUG_DFS
+      cout << " alt_node = " << alt_node->id() << endl;
+#endif
       if ( dfs_graph2(alt_node, block_edge, edge) ) {
 	reached = true;
 	break;
@@ -1798,11 +1815,51 @@ GraphSatImpl::dfs_graph2(GsNode* node,
 SatReason
 GraphSatImpl::add_graph_clause()
 {
+  ymuint n = mBlockingList.size();
+
   alloc_lits(n);
   for (ymuint i = 0; i < n; ++ i) {
     VarId var = mBlockingList[i];
     mTmpLits[i] = Literal(var);
   }
+
+#if 0
+  // 最後の割当を先頭のリテラルにする．
+  {
+    HashSet<VarId> var_hash;
+    for (ymuint i = 0; i < n; ++ i) {
+      VarId var = mBlockingList[i];
+      var_hash.add(var);
+    }
+    bool found = false;
+    Literal l0;
+    for (ymuint pos = mAssignList.size(); pos > 0; ) {
+      -- pos;
+      Literal l = mAssignList.get(pos);
+      VarId var = l.varid();
+      if ( var_hash.check(var) ) {
+	l0 = ~l;
+	found = true;
+	break;
+      }
+    }
+    ASSERT_COND( found );
+
+    if ( mTmpLits[0] != l0 ) {
+      found = false;
+      for (ymuint i = 1; i < n; ++ i) {
+	Literal l = mTmpLits[i];
+	if ( l == l0 ) {
+	  mTmpLits[i] = mTmpLits[0];
+	  mTmpLits[0] = l0;
+	  found = true;
+	  break;
+	}
+      }
+      ASSERT_COND( found );
+    }
+  }
+#endif
 
   Literal l0 = mTmpLits[0];
   Literal l1 = mTmpLits[1];
@@ -1822,14 +1879,18 @@ GraphSatImpl::add_graph_clause()
     add_watcher(~l1, SatReason(l0));
 
     // binary clause は watcher-list に登録するだけで実体はない．
+#if 0
     ++ mConstrBinNum;
+#else
+    ++ mLearntBinNum;
+#endif
 
     mTmpBinClause->set(l0, l1);
     return SatReason(mTmpBinClause);
   }
   else {
     // 節の生成
-    SatClause* clause = new_clause(n);
+    SatClause* clause = new_clause(n, true);
 #if 0
     mConstrClause.push_back(clause);
 #else
@@ -1847,6 +1908,81 @@ GraphSatImpl::add_graph_clause()
     add_watcher(~l1, conflict);
     return conflict;
   }
+}
+
+// @brief グラフから節を作る．
+void
+GraphSatImpl::add_graph_clause2(GsEdge* edge)
+{
+  ymuint n = mBlockingList.size() + 1;
+
+  alloc_lits(n);
+  mTmpLits[0] = Literal(edge->var());
+  for (ymuint i = 1; i < n; ++ i) {
+    VarId var = mBlockingList[i - 1];
+    mTmpLits[i] = Literal(var);
+  }
+
+  Literal l0 = mTmpLits[0];
+  Literal l1 = mTmpLits[1];
+
+#if 0
+  mConstrLitNum += n;
+#else
+  mLearntLitNum += n;
+#endif
+
+  SatReason reason;
+
+  if ( n == 2 ) {
+    if ( debug & debug_assign ) {
+      cout << "add_graph_clause: (" << l0 << " + " << l1 << ")" << endl;;
+    }
+    // watcher-list の設定
+    add_watcher(~l0, SatReason(l1));
+    add_watcher(~l1, SatReason(l0));
+
+    // binary clause は watcher-list に登録するだけで実体はない．
+#if 0
+    ++ mConstrBinNum;
+#else
+    ++ mLearntBinNum;
+#endif
+
+    reason = SatReason(l1);
+
+    if ( debug & debug_assign ) {
+      cout << "\tassign " << l0 << " @" << decision_level()
+	   << " from (" << l0
+	   << " + " << l1 << "): " << l1 << endl;
+    }
+  }
+  else {
+    // 節の生成
+    SatClause* clause = new_clause(n, true);
+#if 0
+    mConstrClause.push_back(clause);
+#else
+    mLearntClause.push_back(clause);
+#endif
+
+    if ( debug & debug_assign ) {
+      cout << "add_graph_clause: " << *clause << endl;
+    }
+
+    reason = SatReason(clause);
+
+    // watcher-list の設定
+    add_watcher(~l0, reason);
+    add_watcher(~l1, reason);
+
+    if ( debug & debug_assign ) {
+      cout << "\tassign " << l0 << " @" << decision_level()
+	   << " from " << *clause << endl;
+    }
+  }
+
+  assign(l0, reason);
 }
 
 END_NAMESPACE_YM_SAT

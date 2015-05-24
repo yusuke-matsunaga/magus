@@ -52,8 +52,8 @@ SaBase::make_minimal(vector<Literal>& lit_list)
     lmask |= (1UL << (level & 63));
   }
 
-  ymuint wpos = 0;
-  for (ymuint i = 0; i < nl; ++ i) {
+  ymuint wpos = 1;
+  for (ymuint i = 1; i < nl; ++ i) {
     Literal p = lit_list[i];
     VarId var = p.varid();
     ymuint top = mClearQueue.size();
@@ -106,6 +106,7 @@ SaBase::check_recur(VarId varid,
       SatClause* clause = r.clause();
       ymuint n = clause->lit_num();
       Literal p = clause->wl0();
+      ASSERT_COND( p.varid() == varid );
       for (ymuint i = 0; i < n; ++ i) {
 	Literal q = clause->lit(i);
 	if ( q != p ) {

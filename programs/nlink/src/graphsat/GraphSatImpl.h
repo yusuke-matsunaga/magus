@@ -406,8 +406,12 @@ private:
 
   /// @grief グラフ上で DFS を行い径路を探す．
   /// @param[in] graph グラフ
-  /// @return 矛盾が生じたら理由を返す．
-  SatReason
+  /// @return 径路が存在したら true を返す．
+  ///
+  /// - 途中，訪れた kB3False の枝を mBlockingList に積む．
+  /// - 経路上の枝に selected マークをつける．
+  /// - 経路上の kB3X の枝をmXList に積む．
+  bool
   find_route(GsGraph* graph);
 
   /// @brief DFS を実際に行う関数
@@ -418,6 +422,14 @@ private:
   bool
   dfs_graph(GsNode* node,
 	    GsEdge* from_edge);
+
+  /// @brief eda がセパレータになっているか調べる
+  /// @param[in] graph 対象のグラフ
+  /// @param[in] edge 対象の枝
+  /// @return セパレータの時 true を返す．
+  bool
+  check_separator(GsGraph* graph,
+		  GsEdge* edge);
 
   /// @brief DFS を実際に行う関数
   /// @param[in] node ノード
@@ -433,6 +445,10 @@ private:
   /// @brief グラフから節を作る．
   SatReason
   add_graph_clause();
+
+  /// @brief グラフから節を作る．
+  void
+  add_graph_clause2(GsEdge* edge);
 
 
 private:

@@ -10,6 +10,8 @@
 #include "SaUIP1.h"
 #include "SatClause.h"
 
+#define DEBUG_CAPTURE 0
+
 
 BEGIN_NAMESPACE_YM_NLINK
 
@@ -44,15 +46,25 @@ void
 SaUIP1::capture(SatReason creason,
 		vector<Literal>& learnt)
 {
+#if DEBUG_CAPTURE
+  cout << endl
+       << "CAPTURE" << endl
+       << creason << endl;
+#endif
+
   learnt.clear();
   learnt.push_back(Literal()); // place holder
 
   bool first = true;
   ymuint count = 0;
   ymuint last = last_assign();
-  for ( ; ; ) {
-    if ( creason.is_clause() ) {
-      SatClause* cclause = creason.clause();
+  for (SatReason tmp_reason = creason; ; ) {
+#if DEBUG_CAPTURE
+    cout << " tmp_reason = " << tmp_reason << endl;
+#endif
+
+    if ( tmp_reason.is_clause() ) {
+      SatClause* cclause = tmp_reason.clause();
 
       // cclause が学習節なら activity をあげる．
       if ( cclause->is_learnt() ) {
@@ -72,30 +84,48 @@ SaUIP1::capture(SatReason creason,
 	VarId var = q.varid();
 	int var_level = decision_level(var);
 	if ( !get_mark(var) && var_level > 0 ) {
+#if DEBUG_CAPTURE
+	  cout << "  " << q << "  @" << var_level;
+#endif
 	  set_mark_and_putq(var);
 	  bump_var_activity(var);
 	  if ( var_level < decision_level() ) {
 	    learnt.push_back(q);
+#if DEBUG_CAPTURE
+	    cout << "  ==>  learnt" << endl;
+#endif
 	  }
 	  else {
 	    ++ count;
+#if DEBUG_CAPTURE
+	    cout << "  ==>  QUEUE" << endl;
+#endif
 	  }
 	}
       }
     }
     else {
       ASSERT_COND( !first );
-      Literal q = creason.literal();
+      Literal q = tmp_reason.literal();
       VarId var = q.varid();
       int var_level = decision_level(var);
       if ( !get_mark(var) && var_level > 0 ) {
+#if DEBUG_CAPTURE
+	cout << "  " << q << "  @" << var_level;
+#endif
 	set_mark_and_putq(var);
 	bump_var_activity(var);
 	if ( var_level < decision_level() ) {
-	    learnt.push_back(q);
+	  learnt.push_back(q);
+#if DEBUG_CAPTURE
+	  cout << "  ==>  learnt" << endl;
+#endif
 	}
 	else {
 	  ++ count;
+#if DEBUG_CAPTURE
+	  cout << "  ==>  QUEUE" << endl;
+#endif
 	}
       }
     }
@@ -108,24 +138,40 @@ SaUIP1::capture(SatReason creason,
       Literal q = get_assign(last);
       VarId var = q.varid();
       if ( get_mark(var) ) {
+#if DEBUG_CAPTURE
+	cout << "  <== " << q << endl;
+#endif
 	set_mark(var, false);
-	// それを最初のリテラルにする．
-	learnt[0] = ~q;
-	creason = reason(q.varid());
 	-- last;
 	-- count;
+	if ( count > 0 ) {
+	  tmp_reason = reason(q.varid());
+	}
+	else {
+	  // それを最初のリテラルにする．
+	  learnt[0] = ~q;
+#if DEBUG_CAPTURE
+	  cout << " UIP found" << endl;
+#endif
+	}
 	break;
       }
-#if defined(DEBUG)
-      // ここは重いのでコメントアウトしておく
       ASSERT_COND(last > 0 );
-#endif
     }
     if ( count == 0 ) {
       // q は first UIP だった．
       break;
     }
   }
+
+#if DEBUG_CAPTURE
+  cout << "original learnt lits = ";
+  for (ymuint i = 0; i < learnt.size(); ++ i) {
+    cout << " " << learnt[i]
+	 << " @" << decision_level(learnt[i].varid());
+  }
+  cout << endl;
+#endif
 }
 
 END_NAMESPACE_YM_NLINK
