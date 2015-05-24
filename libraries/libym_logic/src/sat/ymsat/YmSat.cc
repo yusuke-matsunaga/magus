@@ -375,15 +375,18 @@ YmSat::solve(const vector<Literal>& assumptions,
 
     if ( stat ) {
       SatReason reason = implication();
-      if ( reason == kNullSatReason ) {
-	// 矛盾が起きていなければ次の仮定をアサートする．
-	continue;
+      if ( reason != kNullSatReason ) {
+	// 矛盾が起こった．
+	stat = false;
       }
     }
-    // 矛盾が起こった．
-    backtrack(0);
-    sat_stat = kB3False;
-    goto end;
+
+    if ( !stat ) {
+      // 矛盾が起こった．
+      backtrack(0);
+      sat_stat = kB3False;
+      goto end;
+    }
   }
 
   // 以降，現在のレベルが基底レベルとなる．
@@ -402,15 +405,19 @@ YmSat::solve(const vector<Literal>& assumptions,
     mLearntLimit = static_cast<ymuint64>(learnt_limit);
 
     ++ mRestart;
+
+    // 探索の本体
     sat_stat = search(mConflictLimit);
 
     // メッセージ出力を行う．
-    SatStats stats;
-    get_stats(stats);
-    for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
-	 p != mMsgHandlerList.end(); ++ p) {
-      SatMsgHandler& handler = *(*p);
-      handler.print_message(stats);
+    {
+      SatStats stats;
+      get_stats(stats);
+      for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
+	   p != mMsgHandlerList.end(); ++ p) {
+	SatMsgHandler& handler = *(*p);
+	handler.print_message(stats);
+      }
     }
 
     if ( sat_stat != kB3X ) {
@@ -430,6 +437,7 @@ YmSat::solve(const vector<Literal>& assumptions,
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit + 100;
   }
+
   if ( sat_stat == kB3True ) {
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
     for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -587,47 +595,51 @@ YmSat::search(ymuint confl_limit)
 
       decay_var_activity();
       decay_clause_activity();
-    }
-    else {
-      if ( cur_confl_num >= confl_limit ) {
-	// 矛盾の回数が制限値を越えた．
-	backtrack(mRootLevel);
-	return kB3X;
-      }
 
-      if ( decision_level() == 0 ) {
-	// 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
-	// あるかもしれないのでそれを取り除く．
-	sweep_clause();
-      }
-      if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
-	// 学習節の数が制限値を超えたら整理する．
-	cut_down();
-      }
+      continue;
+    }
+
+    if ( cur_confl_num >= confl_limit ) {
+      // 矛盾の回数が制限値を越えた．
+      backtrack(mRootLevel);
+      return kB3X;
+    }
+
+    if ( decision_level() == 0 ) {
+      // 一見，無意味に思えるが，学習節を追加した結果，真偽値が確定する節が
+      // あるかもしれないのでそれを取り除く．
+      sweep_clause();
+    }
+    if ( mLearntClause.size() >  mAssignList.size() + mLearntLimit ) {
+      // 学習節の数が制限値を超えたら整理する．
+      cut_down();
+    }
 
       // 次の割り当てを選ぶ．
-      Literal lit = next_decision();
-      if ( lit == kLiteralX ) {
-	// すべての変数を割り当てた．
-	// ということは充足しているはず．
-	return kB3True;
-      }
-      ++ mDecisionNum;
-
-      // バックトラックポイントを記録
-      mAssignList.set_marker();
-
-      if ( debug & (debug_assign | debug_decision) ) {
-	cout << endl
-	     << "choose " << lit << " :"
-	     << mVarHeap.activity(lit.varid()) << endl;
-      }
-      // 未割り当ての変数を選んでいるのでエラーになるはずはない．
-      if ( debug & debug_assign ) {
-	cout << "\tassign " << lit << " @" << decision_level() << endl;
-      }
-      assign(lit);
+    Literal lit = next_decision();
+    if ( lit == kLiteralX ) {
+      // すべての変数を割り当てた．
+      // ということは充足しているはず．
+      return kB3True;
     }
+    ++ mDecisionNum;
+
+    if ( debug & (debug_assign | debug_decision) ) {
+      cout << endl
+	   << "choose " << lit << " :"
+	   << mVarHeap.activity(lit.varid()) << endl;
+    }
+
+    if ( debug & debug_assign ) {
+      cout << "\tassign " << lit << " @" << decision_level() << endl;
+    }
+
+    // バックトラックポイントを記録
+    mAssignList.set_marker();
+
+    // 選ばれたリテラルに基づいた割当を行う．
+    // 未割り当ての変数を選んでいるのでエラーになるはずはない．
+    assign(lit);
   }
 }
 
