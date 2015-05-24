@@ -40,6 +40,10 @@ nlink(const string& filename,
     NlSolver2 solver;
     solver.solve(problem, verbose, solution);
   }
+  else if ( method == 3 ) {
+    NlSolver2 solver("minisat2");
+    solver.solve(problem, verbose, solution);
+  }
 
   print_solution(cout, solution);
 }
@@ -68,6 +72,10 @@ main(int argc,
     }
     else if ( strcmp(argv[i], "-gs") == 0 ) {
       method = 0;
+      ++ base;
+    }
+    else if ( strcmp(argv[i], "-minisat2") == 0 ) {
+      method = 3;
       ++ base;
     }
     else if ( strcmp(argv[i], "-v") == 0 ) {

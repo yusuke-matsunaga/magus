@@ -25,7 +25,7 @@ class NlSolver2 :
 public:
 
   /// @brief コンストラクタ
-  NlSolver2();
+  NlSolver2(const char* option = NULL);
 
   /// @brief デストラクタ
   virtual
@@ -95,6 +95,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // minisat2 を使うとき true にするフラグ
+  bool mMiniSat2;
 
   // 線分数
   ymuint mNum;
