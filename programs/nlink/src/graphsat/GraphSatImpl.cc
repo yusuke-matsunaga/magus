@@ -378,7 +378,7 @@ GraphSatImpl::solve(const vector<Literal>& assumptions,
     goto end;
   }
 
-  ASSERT_COND(decision_level() == 0 );
+  ASSERT_COND( decision_level() == 0 );
 
   // assumption の割り当てを行う．
   for (vector<Literal>::const_iterator p = assumptions.begin();
@@ -401,19 +401,22 @@ GraphSatImpl::solve(const vector<Literal>& assumptions,
 
     if ( stat ) {
       SatReason reason = implication();
-      if ( reason == kNullSatReason ) {
-	// 矛盾が起きていなければ次の仮定をアサートする．
-	continue;
+      if ( reason != kNullSatReason ) {
+	stat = false;
       }
     }
-    // 矛盾が起こった．
-    backtrack(0);
-    sat_stat = kB3False;
-    goto end;
+
+    if ( !stat ) {
+      // 矛盾が起こった．
+      backtrack(0);
+      sat_stat = kB3False;
+      goto end;
+    }
   }
 
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();
+
   if ( debug & (debug_assign | debug_decision) ) {
     cout << "RootLevel = " << mRootLevel << endl;
   }
@@ -428,15 +431,19 @@ GraphSatImpl::solve(const vector<Literal>& assumptions,
     mLearntLimit = static_cast<ymuint64>(learnt_limit);
 
     ++ mRestart;
+
+    // 探索の本体
     sat_stat = search(mConflictLimit);
 
     // メッセージ出力を行う．
-    SatStats stats;
-    get_stats(stats);
-    for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
-	 p != mMsgHandlerList.end(); ++ p) {
-      SatMsgHandler& handler = *(*p);
-      handler.print_message(stats);
+    {
+      SatStats stats;
+      get_stats(stats);
+      for (list<SatMsgHandler*>::iterator p = mMsgHandlerList.begin();
+	   p != mMsgHandlerList.end(); ++ p) {
+	SatMsgHandler& handler = *(*p);
+	handler.print_message(stats);
+      }
     }
 
     if ( sat_stat != kB3X ) {
@@ -456,6 +463,7 @@ GraphSatImpl::solve(const vector<Literal>& assumptions,
     confl_limit = confl_limit * 1.5;
     learnt_limit = learnt_limit + 100;
   }
+
   if ( sat_stat == kB3True ) {
     // SAT ならモデル(充足させる変数割り当てのリスト)を作る．
     for (ymuint i = 0; i < mVarNum; ++ i) {
@@ -1024,19 +1032,48 @@ GraphSatImpl::sweep_clause()
   }
   ASSERT_COND(decision_level() == 0 );
 
+  // 値割当の伝搬を行う．
   if ( implication() != kNullSatReason ) {
     mSane = false;
     return;
   }
 
   if ( mAssignList.size() == mSweep_assigns /*|| mSweep_props > 0*/ ) {
+    // 前回の sweep_clause() から節が変わっていない時はなにもしない．
     return;
   }
 
-  ymuint n = mLearntClause.size();
+  // 学習節の整理
+  sweep_clause_sub(mLearntClause);
+
+  // 制約節の整理
+  sweep_clause_sub(mConstrClause);
+
+  // 変数ヒープを作りなおす．
+  vector<VarId> var_list;
+  var_list.reserve(mVarNum);
+  for (ymuint i = 0; i < mVarNum; ++ i) {
+    var_list.push_back(VarId(i));
+  }
+  mVarHeap.build(var_list);
+
+  // 次回のために現在の状況を記録しておく．
+  mSweep_assigns = mAssignList.size();
+  mSweep_props = mConstrLitNum + mLearntLitNum;
+}
+
+// @brief sweep_clause() の下請け関数
+// @param[in] clause_list 節のリスト
+//
+// 充足している節を取り除く
+void
+GraphSatImpl::sweep_clause_sub(vector<SatClause*>& clause_list)
+{
+  ymuint n = clause_list.size();
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < n; ++ rpos) {
-    SatClause* c = mLearntClause[rpos];
+    SatClause* c = clause_list[rpos];
+    // c が充足しているか調べる．
     ymuint nl = c->lit_num();
     bool satisfied = false;
     for (ymuint i = 0; i < nl; ++ i) {
@@ -1051,53 +1088,14 @@ GraphSatImpl::sweep_clause()
     }
     else {
       if ( wpos != rpos ) {
-	mLearntClause[wpos] = c;
+	clause_list[wpos] = c;
       }
       ++ wpos;
     }
   }
   if ( wpos != n ) {
-    mLearntClause.erase(mLearntClause.begin() + wpos, mLearntClause.end());
+    clause_list.erase(clause_list.begin() + wpos, clause_list.end());
   }
-
-  if( true ) {
-    ymuint n = mConstrClause.size();
-    ymuint wpos = 0;
-    for (ymuint rpos = 0; rpos < n; ++ rpos) {
-      SatClause* c = mConstrClause[rpos];
-      ymuint nl = c->lit_num();
-      bool satisfied = false;
-      for (ymuint i = 0; i < nl; ++ i) {
-	if ( eval(c->lit(i)) == kB3True ) {
-	  satisfied = true;
-	  break;
-	}
-      }
-      if ( satisfied ) {
-	// c を削除する．
-	delete_clause(c);
-      }
-      else {
-	if ( wpos != rpos ) {
-	  mConstrClause[wpos] = c;
-	}
-	++ wpos;
-      }
-    }
-    if ( wpos != n ) {
-      mConstrClause.erase(mConstrClause.begin() + wpos, mConstrClause.end());
-    }
-  }
-
-  vector<VarId> var_list;
-  var_list.reserve(mVarNum);
-  for (ymuint i = 0; i < mVarNum; ++ i) {
-    var_list.push_back(VarId(i));
-  }
-  mVarHeap.build(var_list);
-
-  mSweep_assigns = mAssignList.size();
-  mSweep_props = mConstrLitNum + mLearntLitNum;
 }
 
 BEGIN_NONAMESPACE
@@ -1119,16 +1117,23 @@ void
 GraphSatImpl::cut_down()
 {
   ymuint n = mLearntClause.size();
+  // 総学習節の半分の値
   ymuint n2 = n / 2;
 
   // 足切りのための制限値
   double abs_limit = mClauseBump / n;
 
+  // SatClauseLess に従ってソートする．
   sort(mLearntClause.begin(), mLearntClause.end(), SatClauseLess());
 
   vector<SatClause*>::iterator wpos = mLearntClause.begin();
+  // 最初の半分はほぼ無条件で削除する．
   for (ymuint i = 0; i < n2; ++ i) {
     SatClause* clause = mLearntClause[i];
+    // 残す基準は
+    // - binary clause でもこれはないはず．
+    // - LBD が 2 以下の節
+    // - 値の割当に関わっている節
     if ( clause->lit_num() > 2 && clause->lbd() > 2 && !is_locked(clause) ) {
       delete_clause(clause);
     }
@@ -1137,6 +1142,8 @@ GraphSatImpl::cut_down()
       ++ wpos;
     }
   }
+
+  // 残りの半分はアクテビティが規定値よりも低い節を削除する．
   for (ymuint i = n2; i < n; ++ i) {
     SatClause* clause = mLearntClause[i];
     if ( clause->lit_num() > 2 && clause->lbd() > 2 && !is_locked(clause) &&
@@ -1148,6 +1155,8 @@ GraphSatImpl::cut_down()
       ++ wpos;
     }
   }
+
+  // 削除した分だけ vector の長さを詰める．
   if ( wpos != mLearntClause.end() ) {
     mLearntClause.erase(wpos, mLearntClause.end());
   }
@@ -1157,6 +1166,9 @@ GraphSatImpl::cut_down()
 void
 GraphSatImpl::forget_learnt_clause()
 {
+  ASSERT_COND( decision_level() == 0 );
+
+  // 本当に無条件で学習節を削除する．
   for (vector<SatClause*>::iterator p = mLearntClause.begin();
        p != mLearntClause.end(); ++ p) {
     SatClause* clause = *p;
@@ -1164,6 +1176,7 @@ GraphSatImpl::forget_learnt_clause()
   }
   mLearntClause.clear();
 
+  // 変数ヒープを再構成し，履歴もリセットする．
   mVarHeap.reset_activity();
   vector<VarId> var_list;
   var_list.reserve(mVarSize);

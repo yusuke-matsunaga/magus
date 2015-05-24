@@ -288,6 +288,13 @@ private:
   void
   sweep_clause();
 
+  /// @brief sweep_clause() の下請け関数
+  /// @param[in] clause_list 節のリスト
+  ///
+  /// 充足している節を取り除く
+  void
+  sweep_clause_sub(vector<SatClause*>& clause_list);
+
   /// @brief 使われていない学習節を削除する．
   void
   cut_down();
