@@ -14,6 +14,7 @@
 
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
+#include "YmLogic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -216,6 +217,15 @@ NlSolver2::solve(const NlProblem& problem,
     cerr << "ABORT" << endl;
     break;
   }
+
+  SatStats stats;
+  solver.get_stats(stats);
+  cout << "restarts          : " << stats.mRestart << endl
+       << "conflicts         : " << stats.mConflictNum << endl
+       << "decisions         : " << stats.mDecisionNum << endl
+       << "propagations      : " << stats.mPropagationNum << endl
+       << "conflict literals : " << stats.mLearntLitNum << endl
+       << "CPU time          : " << stats.mTime << endl;
 }
 
 // @brief 基本的な制約を作る．
