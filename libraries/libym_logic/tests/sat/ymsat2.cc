@@ -180,6 +180,18 @@ main(int argc,
 	vector<Bool3> model;
 	solver.solve(lits, model);
       }
+      else if ( c == 'R' ) {
+	if ( verbose > 1 ) {
+	  cout << "R" << endl;
+	}
+	solver.reduce_learnt_clause();
+      }
+      else if ( c == 'F' ) {
+	if ( verbose > 1 ) {
+	  cout << "F" << endl;
+	}
+	solver.forget_learnt_clause();
+      }
     }
 
     SatStats stats;

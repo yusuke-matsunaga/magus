@@ -32,7 +32,6 @@ Params kDefaultParams(0.95, 0.00, 0.999, true, false, false, false);
 YmSat::YmSat(const string& option) :
   mSane(true),
   mAlloc(4096),
-  mConstrBinNum(0),
   mConstrLitNum(0),
   mLearntBinNum(0),
   mLearntLitNum(0),
@@ -263,7 +262,7 @@ YmSat::variable_num() const
 ymuint
 YmSat::clause_num() const
 {
-  return mConstrClause.size() + mConstrBinNum;
+  return mConstrClause.size() + mConstrBinClause.size();
 }
 
 // @brief 制約節のリテラルの総数を得る．
@@ -421,25 +420,26 @@ YmSat::add_clause_sub(ymuint lit_num)
 
   Literal l1 = mTmpLits[1];
 
+  // 節の生成
+  SatClause* clause = new_clause(lit_num);
+
+  if ( debug & debug_assign ) {
+    cout << "add_clause: " << *clause << endl;
+  }
+
+  mAllConstrClause.push_back(clause);
+
   if ( lit_num == 2 ) {
-    if ( debug & debug_assign ) {
-      cout << "add_clause: (" << l0 << " + " << l1 << ")" << endl;;
-    }
+    // 二項節の watcher は相方のリテラルなので clause は使われない
+    // ただし，デバッグ，検証用に別のリストに入れておく．
+    mConstrBinClause.push_back(clause);
+
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
-
-    // binary clause は watcher-list に登録するだけで実体はない．
-    ++ mConstrBinNum;
   }
   else {
-    // 節の生成
-    SatClause* clause = new_clause(lit_num);
     mConstrClause.push_back(clause);
-
-    if ( debug & debug_assign ) {
-      cout << "add_clause: " << *clause << endl;
-    }
 
     // watcher-list の設定
     add_watcher(~l0, SatReason(clause));
@@ -683,6 +683,65 @@ YmSat::expand_var()
   mAssignList.reserve(mVarSize);
   mVarHeap.alloc_var(mVarSize);
   mAnalyzer->alloc_var(mVarSize);
+}
+
+// @brief DIMACS 形式で制約節を出力する．
+// @param[in] s 出力先のストリーム
+void
+YmSat::write_DIMACS(ostream& s) const
+{
+  s << "p cnf " << variable_num() << " " << clause_num() << endl;
+#if 0
+  for (ymuint i = 0; i < mConstrBinClause.size(); ++ i) {
+    SatClause* clause = mConstrBinClause[i];
+    ymuint nl = clause->lit_num();
+    for (ymuint j = 0; j < nl; ++ j) {
+      Literal lit = clause->lit(j);
+      VarId var = lit.varid();
+      ymint idx = var.val() + 1;
+      if ( lit.is_negative() ) {
+	s << " -" << idx;
+      }
+      else {
+	s << " " << idx;
+      }
+    }
+    s << " 0" << endl;
+  }
+  for (ymuint i = 0; i < mConstrClause.size(); ++ i) {
+    SatClause* clause = mConstrClause[i];
+    ymuint nl = clause->lit_num();
+    for (ymuint j = 0; j < nl; ++ j) {
+      Literal lit = clause->lit(j);
+      VarId var = lit.varid();
+      ymint idx = var.val() + 1;
+      if ( lit.is_negative() ) {
+	s << " -" << idx;
+      }
+      else {
+	s << " " << idx;
+      }
+    }
+    s << " 0" << endl;
+  }
+#else
+  for (ymuint i = 0; i < mAllConstrClause.size(); ++ i) {
+    SatClause* clause = mAllConstrClause[i];
+    ymuint nl = clause->lit_num();
+    for (ymuint j = 0; j < nl; ++ j) {
+      Literal lit = clause->lit(j);
+      VarId var = lit.varid();
+      ymint idx = var.val() + 1;
+      if ( lit.is_negative() ) {
+	s << " -" << idx;
+      }
+      else {
+	s << " " << idx;
+      }
+    }
+    s << " 0" << endl;
+  }
+#endif
 }
 
 END_NAMESPACE_YM_SAT

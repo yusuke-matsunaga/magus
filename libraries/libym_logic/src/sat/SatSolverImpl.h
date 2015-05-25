@@ -138,6 +138,12 @@ public:
   ymuint
   literal_num() const = 0;
 
+  /// @brief DIMACS 形式で制約節を出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  write_DIMACS(ostream& s) const = 0;
+
   /// @brief conflict_limit の最大値
   /// @param[in] val 設定する値
   /// @return 以前の設定値を返す．

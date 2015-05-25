@@ -10,7 +10,6 @@
 #include "YmLogic/SatSolver.h"
 
 #include "ymsat/YmSat.h"
-#include "ymsat/YmSatR.h"
 #include "MiniSat/SatSolverMiniSat.h"
 #include "MiniSat2/SatSolverMiniSat2.h"
 
@@ -24,10 +23,10 @@ BEGIN_NAMESPACE_YM_SAT
 // @brief コンストラクタ
 // @param[in] type 実装タイプを表す文字列
 // @param[in] option オプション文字列
-// @param[in] outp ログを記録するストリームへのポインタ
+// @param[in] rec_out ログを記録するストリームへのポインタ
 SatSolver::SatSolver(const string& type,
 		     const string& option,
-		     ostream* outp)
+		     ostream* rec_out)
 {
   if ( type == "minisat" ) {
     // minisat-1.4
@@ -38,13 +37,9 @@ SatSolver::SatSolver(const string& type,
     mImpl = new SatSolverMiniSat2(option);
   }
   else {
-    if ( outp ) {
-      mImpl = new YmSatR(*outp, option);
-    }
-    else {
-      mImpl = new YmSat(option);
-    }
+    mImpl = new YmSat(option);
   }
+  mRecOut = rec_out;
 }
 
 // @brief デストラクタ
@@ -53,20 +48,20 @@ SatSolver::~SatSolver()
   delete mImpl;
 }
 
-// @brief 正しい状態のときに true を返す．
-bool
-SatSolver::sane() const
-{
-  return mImpl->sane();
-}
-
 // @brief 変数を追加する．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
 SatSolver::new_var()
 {
-  return mImpl->new_var();
+  VarId id = mImpl->new_var();
+
+  if ( mRecOut ) {
+    *mRecOut << "N" << endl
+	     << "# varid = " << id << endl;
+  }
+
+  return id;
 }
 
 // @brief 節を追加する．
@@ -74,6 +69,16 @@ SatSolver::new_var()
 void
 SatSolver::add_clause(const vector<Literal>& lits)
 {
+  if ( mRecOut ) {
+    *mRecOut << "A";
+    for (vector<Literal>::const_iterator p = lits.begin();
+	 p != lits.end(); ++ p) {
+      Literal l = *p;
+      put_lit(l);
+    }
+    *mRecOut << endl;
+  }
+
   mImpl->add_clause(lits);
 }
 
@@ -81,6 +86,12 @@ SatSolver::add_clause(const vector<Literal>& lits)
 void
 SatSolver::add_clause(Literal lit1)
 {
+  if ( mRecOut ) {
+    *mRecOut << "A";
+    put_lit(lit1);
+    *mRecOut << endl;
+  }
+
   mImpl->add_clause(1, &lit1);
 }
 
@@ -89,6 +100,13 @@ void
 SatSolver::add_clause(Literal lit1,
 		      Literal lit2)
 {
+  if ( mRecOut ) {
+    *mRecOut << "A";
+    put_lit(lit1);
+    put_lit(lit2);
+    *mRecOut << endl;
+  }
+
   mImpl->add_clause(lit1, lit2);
 }
 
@@ -98,6 +116,14 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit2,
 		      Literal lit3)
 {
+  if ( mRecOut ) {
+    *mRecOut << "A";
+    put_lit(lit1);
+    put_lit(lit2);
+    put_lit(lit3);
+    *mRecOut << endl;
+  }
+
   mImpl->add_clause(lit1, lit2, lit3);
 }
 
@@ -108,6 +134,15 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit3,
 		      Literal lit4)
 {
+  if ( mRecOut ) {
+    *mRecOut << "A";
+    put_lit(lit1);
+    put_lit(lit2);
+    put_lit(lit3);
+    put_lit(lit4);
+    *mRecOut << endl;
+  }
+
   mImpl->add_clause(lit1, lit2, lit3, lit4);
 }
 
@@ -119,6 +154,16 @@ SatSolver::add_clause(Literal lit1,
 		      Literal lit4,
 		      Literal lit5)
 {
+  if ( mRecOut ) {
+    *mRecOut << "A";
+    put_lit(lit1);
+    put_lit(lit2);
+    put_lit(lit3);
+    put_lit(lit4);
+    put_lit(lit5);
+    *mRecOut << endl;
+  }
+
   mImpl->add_clause(lit1, lit2, lit3, lit4, lit5);
 }
 
@@ -132,7 +177,7 @@ Bool3
 SatSolver::solve(vector<Bool3>& model)
 {
   // 空の assumptions を付けて solve() を呼ぶだけ
-  return mImpl->solve(vector<Literal>(), model);
+  return solve(vector<Literal>(), model);
 }
 
 // @brief assumption 付きの SAT 問題を解く．
@@ -146,13 +191,42 @@ Bool3
 SatSolver::solve(const vector<Literal>& assumptions,
 		 vector<Bool3>& model)
 {
+  if ( mRecOut ) {
+    *mRecOut << "S";
+    for (vector<Literal>::const_iterator p = assumptions.begin();
+	 p != assumptions.end(); ++ p) {
+      Literal l = *p;
+      put_lit(l);
+    }
+    *mRecOut << endl;
+  }
+
   return mImpl->solve(assumptions, model);
+}
+
+// @brief リテラルを出力する．
+void
+SatSolver::put_lit(Literal lit) const
+{
+  ASSERT_COND( mRecOut != NULL );
+
+  *mRecOut << " " << lit.varid();
+  if ( lit.is_positive() ) {
+    *mRecOut << "P";
+  }
+  else {
+    *mRecOut << "N";
+  }
 }
 
 // @brief 学習節の整理を行なう．
 void
 SatSolver::reduce_learnt_clause()
 {
+  if ( mRecOut ) {
+    *mRecOut << "R" << endl;
+  }
+
   mImpl->reduce_learnt_clause();
 }
 
@@ -160,7 +234,18 @@ SatSolver::reduce_learnt_clause()
 void
 SatSolver::forget_learnt_clause()
 {
+  if ( mRecOut ) {
+    *mRecOut << "F" << endl;
+  }
+
   mImpl->forget_learnt_clause();
+}
+
+// @brief 正しい状態のときに true を返す．
+bool
+SatSolver::sane() const
+{
+  return mImpl->sane();
 }
 
 // @brief 現在の内部状態を得る．
@@ -190,6 +275,14 @@ ymuint
 SatSolver::literal_num() const
 {
   return mImpl->literal_num();
+}
+
+// @brief DIMACS 形式で制約節を出力する．
+// @param[in] s 出力先のストリーム
+void
+SatSolver::write_DIMACS(ostream& s) const
+{
+  mImpl->write_DIMACS(s);
 }
 
 // @brief conflict_limit の最大値

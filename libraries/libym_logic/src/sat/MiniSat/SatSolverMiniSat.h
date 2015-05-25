@@ -115,6 +115,12 @@ public:
   ymuint64
   set_max_conflict(ymuint64 val);
 
+  /// @brief DIMACS 形式で制約節を出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  write_DIMACS(ostream& s) const;
+
   /// @brief solve() 中のリスタートのたびに呼び出されるメッセージハンドラの登録
   /// @param[in] msg_handler 登録するメッセージハンドラ
   virtual

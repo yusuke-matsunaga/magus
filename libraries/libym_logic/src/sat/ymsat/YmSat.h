@@ -213,6 +213,12 @@ public:
   ymuint
   literal_num() const;
 
+  /// @brief DIMACS 形式で制約節を出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  write_DIMACS(ostream& s) const;
+
   /// @brief conflict_limit の最大値
   /// @param[in] val 設定する値
   /// @return 以前の設定値を返す．
@@ -413,10 +419,16 @@ private:
   FragAlloc mAlloc;
 
   // 制約節の配列
+  // ただし二項節は含まない．
   vector<SatClause*> mConstrClause;
 
-  // 二項制約節の数
-  ymuint64 mConstrBinNum;
+  // 二項制約節の配列
+  // この節は実際には使われない．
+  vector<SatClause*> mConstrBinClause;
+
+  // 全ての制約節の配列
+  // この節は実際には使われない．
+  vector<SatClause*> mAllConstrClause;
 
   // 制約節の総リテラル数 (二項制約節も含む)
   ymuint64 mConstrLitNum;
