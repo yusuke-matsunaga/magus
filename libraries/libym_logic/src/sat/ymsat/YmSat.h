@@ -343,6 +343,11 @@ private:
   del_watcher(Literal watch_lit,
 	      SatReason reason);
 
+  /// @brief 充足された watcher を削除する．
+  /// @param[in] watch_lit リテラル
+  void
+  del_satisfied_watcher(Literal watch_lit);
+
   /// @brief 変数1の評価を行う．
   /// @param[in] id 変数番号
   Bool3
@@ -571,6 +576,7 @@ private:
   static
   const ymuint debug_all         = 0xffffffff;
 
+  static
   //const ymuint debug = debug_decision | debug_analyze | debug_assign;
   //const ymuint debug = debug_assign;
   //const ymuint debug = debug_assign | debug_implication;
@@ -578,8 +584,6 @@ private:
   //const ymuint debug = debug_solve | debug_decision;
   //const ymuint debug = debug_solve | debug_assign;
   //const ymuint debug = debug_all;
-  //const ymuint debug = debug_none;
-  static
   const ymuint debug = debug_none;
 
 };

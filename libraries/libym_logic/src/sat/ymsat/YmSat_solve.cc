@@ -147,6 +147,9 @@ YmSat::solve(const vector<Literal>& assumptions,
     }
   }
 
+  // 充足した節があれば取り除く．
+  reduce_CNF();
+
   // 以降，現在のレベルが基底レベルとなる．
   mRootLevel = decision_level();
   if ( debug & (debug_assign | debug_decision) ) {
@@ -627,7 +630,14 @@ YmSat::reduce_CNF()
   vector<VarId> var_list;
   var_list.reserve(mVarNum);
   for (ymuint i = 0; i < mVarNum; ++ i) {
-    var_list.push_back(VarId(i));
+    VarId var(i);
+    if ( eval(var) == kB3X ) {
+      var_list.push_back(VarId(i));
+    }
+    else {
+      del_satisfied_watcher(Literal(var, false));
+      del_satisfied_watcher(Literal(var, true));
+    }
   }
   mVarHeap.build(var_list);
 

@@ -397,6 +397,7 @@ YmSat::add_clause_sub(ymuint lit_num)
   if ( lit_num == 1 ) {
     // unit clause があったら値の割り当てを行う．
     bool stat = check_and_assign(l0);
+
     if ( debug & debug_assign ) {
       cout << "\tassign " << l0 << " @" << decision_level()
 	   << endl;
@@ -406,8 +407,20 @@ YmSat::add_clause_sub(ymuint lit_num)
 	     << decision_level(l0.varid()) << endl;
       }
     }
+
+    if ( stat ) {
+      // 今の割当に基づく含意を行う．
+      SatReason conflict = implication();
+      if ( conflict != kNullSatReason ) {
+	// 矛盾が起こった．
+	stat = false;
+      }
+    }
+
     if ( !stat ) {
+      // 矛盾が起こった．
       mSane = false;
+      // ここは decision_level() == 0 のはずなのでバックトラックの必要はない．
     }
     return;
   }
@@ -622,6 +635,38 @@ YmSat::del_watcher(Literal watch_lit,
     wlist.set_elem(wpos, w);
   }
   wlist.erase(n);
+}
+
+// @brief 充足された watcher を削除する．
+// @param[in] watch_lit リテラル
+void
+YmSat::del_satisfied_watcher(Literal watch_lit)
+{
+  // watch_lit に関係する watcher リストをスキャンして
+  // literal watcher が充足していたらその watcher を削除する．
+  // watcher リストを配列で実装しているので
+  // あたまからスキャンして該当の要素以降を
+  // 1つづつ前に詰める．
+  WatcherList& wlist = watcher_list(watch_lit);
+  ymuint n = wlist.num();
+  ymuint wpos = 0;
+  for (ymuint rpos; rpos < n; ++ rpos) {
+    Watcher w = wlist.elem(rpos);
+    if ( w.is_literal() ) {
+      Literal l = w.literal();
+      Bool3 val = eval(l);
+      ASSERT_COND( val != kB3False );
+      if ( val == kB3True ) {
+	// この watcher は削除する．
+	continue;
+      }
+    }
+    if ( wpos != rpos ) {
+      wlist.set_elem(wpos, w);
+    }
+    ++ wpos;
+  }
+  wlist.erase(wpos);
 }
 
 // 実際に変数に関するデータ構造を生成する．
