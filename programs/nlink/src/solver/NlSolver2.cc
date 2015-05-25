@@ -43,73 +43,60 @@ BEGIN_NONAMESPACE
 inline
 void
 one_hot2(SatSolver& solver,
-	 Literal clit,
 	 Literal lit1,
 	 Literal lit2)
 {
-  solver.add_clause( clit, ~lit1);
-  solver.add_clause( clit, ~lit2);
   solver.add_clause(~lit1, ~lit2);
-  solver.add_clause(~clit,  lit1,  lit2);
+  solver.add_clause( lit1,  lit2);
 }
 
 inline
 void
 one_hot3(SatSolver& solver,
-	 Literal clit,
 	 Literal lit1,
 	 Literal lit2,
 	 Literal lit3)
 {
-  solver.add_clause( clit, ~lit1);
-  solver.add_clause( clit, ~lit2);
-  solver.add_clause( clit, ~lit3);
   solver.add_clause(~lit1, ~lit2);
   solver.add_clause(~lit1, ~lit3);
   solver.add_clause(~lit2, ~lit3);
-  solver.add_clause(~clit,  lit1,  lit2,  lit3);
+  solver.add_clause( lit1,  lit2,  lit3);
 }
 
 inline
 void
 one_hot4(SatSolver& solver,
-	 Literal clit,
 	 Literal lit1,
 	 Literal lit2,
 	 Literal lit3,
 	 Literal lit4)
 {
-  solver.add_clause( clit, ~lit1);
-  solver.add_clause( clit, ~lit2);
-  solver.add_clause( clit, ~lit3);
-  solver.add_clause( clit, ~lit4);
   solver.add_clause(~lit1, ~lit2);
   solver.add_clause(~lit1, ~lit3);
   solver.add_clause(~lit1, ~lit4);
   solver.add_clause(~lit2, ~lit3);
   solver.add_clause(~lit2, ~lit4);
   solver.add_clause(~lit3, ~lit4);
-  solver.add_clause(~clit,  lit1,  lit2,  lit3,  lit4);
+  solver.add_clause( lit1,  lit2,  lit3,  lit4);
 }
 
 inline
 void
 one_hot(SatSolver& solver,
-	Literal clit,
 	const vector<Literal>& lit_list)
 {
   ymuint nl = lit_list.size();
   switch ( nl ) {
   case 2:
-    one_hot2(solver, clit, lit_list[0], lit_list[1]);
+    one_hot2(solver, lit_list[0], lit_list[1]);
     break;
 
   case 3:
-    one_hot3(solver, clit, lit_list[0], lit_list[1], lit_list[2]);
+    one_hot3(solver, lit_list[0], lit_list[1], lit_list[2]);
     break;
 
   case 4:
-    one_hot4(solver, clit, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
+    one_hot4(solver, lit_list[0], lit_list[1], lit_list[2], lit_list[3]);
     break;
 
   default:
@@ -199,84 +186,42 @@ NlSolver2::solve(const NlProblem& problem,
   if ( mMiniSat2 ) {
     type = "minisat2";
   }
-  SatSolver solver(type, string(), NULL);
+  SatSolver solver(type, string(), &cout);
 
   NlGraph graph;
 
   graph.set_problem(problem);
 
-  vector<VarId> con_array;
-  make_base_cnf(solver, graph, con_array);
+  make_base_cnf(solver, graph);
 
   solution.init(problem);
 
-  ymuint num = problem.elem_num();
-
-  if ( false ) {
-    vector<Literal> assumption;
-    for (ymuint i = 0; i < num; ++ i) {
-      cout << "solving partial problem#" << (i + 1) << " / " << num << endl;
-      assumption.push_back(Literal(con_array[i]));
-      vector<Bool3> model;
-      Bool3 stat = solver.solve(assumption, model);
-      switch ( stat ) {
-      case kB3True:
-	cout << " SAT" << endl;
-	if ( i < num - 1 ) {
-	  NlSolution solution1;
-	  solution1.init(problem);
-	  setup_solution(graph, model, solution1);
-	  print_solution(cout, solution1);
-	}
-	else {
-	  setup_solution(graph, model, solution);
-	}
-	break;
-
-      case kB3False:
-	cout << " UNSAT" << endl;
-	break;
-
-      case kB3X:
-	cout << " ABORT" << endl;
-	break;
-      }
-
-    }
+  if ( verbose ) {
+    SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
+    solver.reg_msg_handler(msg_handler);
   }
-  else {
-    if ( verbose ) {
-      SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
-      solver.reg_msg_handler(msg_handler);
-    }
 
-    vector<Literal> assumption;
-    for (ymuint i = 0; i < num; ++ i) {
-      assumption.push_back(Literal(con_array[i]));
-    }
-    vector<Bool3> model;
-    Bool3 stat = solver.solve(assumption, model);
-    switch ( stat ) {
-    case kB3True:
-      setup_solution(graph, model, solution);
-      break;
+  vector<Bool3> model;
+  Bool3 stat = solver.solve(model);
+  switch ( stat ) {
+  case kB3True:
+    setup_solution(graph, model, solution);
+    break;
 
-    case kB3False:
-      cerr << "UNSAT" << endl;
-      break;
+  case kB3False:
+    cerr << "UNSAT" << endl;
+    break;
 
-    case kB3X:
-      cerr << "ABORT" << endl;
-      break;
-    }
+  case kB3X:
+    cerr << "ABORT" << endl;
+    break;
   }
 }
 
 // @brief 基本的な制約を作る．
 void
 NlSolver2::make_base_cnf(SatSolver& solver,
-			 const NlGraph& graph,
-			 vector<VarId>& con_array)
+			 const NlGraph& graph)
 {
   ymuint width = graph.width();
   ymuint height = graph.height();
@@ -360,14 +305,6 @@ NlSolver2::make_base_cnf(SatSolver& solver,
     }
   }
 
-  // 結線ごとの変数を作る．
-  con_array.clear();
-  con_array.resize(num);
-  for (ymuint i = 0; i < num; ++ i) {
-    VarId var = solver.new_var();
-    con_array[i] = var;
-  }
-
   // 枝の条件を作る．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
@@ -390,8 +327,7 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	  if ( term_id == k + 1 ) {
 	    // 端点の場合
 	    // 必ずただ1つの枝が選ばれる．
-	    Literal clit(con_array[k]);
-	    one_hot(solver, clit, lit_list);
+	    one_hot(solver, lit_list);
 	  }
 	  else {
 	    // 選ばれない．

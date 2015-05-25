@@ -56,14 +56,7 @@ private:
   /// @brief 基本的な制約を作る．
   void
   make_base_cnf(SatSolver& solver,
-		const NlGraph& graph,
-		vector<VarId>& con_array);
-
-  /// @brief 自明な線分を引いたうえで解を求める．
-  void
-  trivial_route(ymuint k,
-		const NlConnection& con,
-		vector<Literal>& assumption);
+		const NlGraph& graph);
 
   /// @brief 解を出力する．
   /// @param[in] graph 問題を表すグラフ
