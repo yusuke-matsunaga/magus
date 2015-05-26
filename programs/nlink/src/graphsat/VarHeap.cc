@@ -96,7 +96,7 @@ VarHeap::bump_var_activity(VarId varid)
 void
 VarHeap::decay_var_activity()
 {
-  mVarBump /= mVarDecay;
+  mVarBump *= (1.0 / mVarDecay);
 }
 
 // @brief 変数のアクティビティを初期化する．
