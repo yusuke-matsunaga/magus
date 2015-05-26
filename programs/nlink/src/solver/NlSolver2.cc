@@ -187,7 +187,7 @@ NlSolver2::solve(const NlProblem& problem,
   if ( mMiniSat2 ) {
     type = "minisat2";
   }
-  SatSolver solver(type, string(), &cout);
+  SatSolver solver(type, string(), NULL);
 
   NlGraph graph;
 
