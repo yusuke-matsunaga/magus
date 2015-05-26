@@ -317,6 +317,9 @@ YmSat::search(ymuint confl_limit)
     }
     ++ mDecisionNum;
 
+    // バックトラックポイントを記録
+    mAssignList.set_marker();
+
     if ( debug & (debug_assign | debug_decision) ) {
       cout << endl
 	   << "choose " << lit << " :"
@@ -326,9 +329,6 @@ YmSat::search(ymuint confl_limit)
     if ( debug & debug_assign ) {
       cout << "\tassign " << lit << " @" << decision_level() << endl;
     }
-
-    // バックトラックポイントを記録
-    mAssignList.set_marker();
 
     // 選ばれたリテラルに基づいた割当を行う．
     // 未割り当ての変数を選んでいるのでエラーになるはずはない．
