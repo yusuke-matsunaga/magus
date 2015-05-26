@@ -500,16 +500,19 @@ YmSat::add_learnt_clause(const vector<Literal>& learnt_lits)
   Literal l1 = learnt_lits[1];
   if ( n == 2 ) {
     // binary-clause の場合
-    reason = SatReason(l1);
 
     if ( debug & debug_assign ) {
       cout << "add_learnt_clause: "
-	   << "(" << l0 << " + " << l1 << ")" << endl;
+	   << "(" << l0 << " + " << l1 << ")" << endl
+	   << "\tassign " << l0 << " @" << decision_level()
+	   << " from (" << l0 << " + " << l1 << ")" << endl;
     }
 
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
+
+    reason = SatReason(l1);
 
     ++ mLearntBinNum;
   }
@@ -522,7 +525,9 @@ YmSat::add_learnt_clause(const vector<Literal>& learnt_lits)
     SatClause* clause = new_clause(n, true);
 
     if ( debug & debug_assign ) {
-      cout << "add_learnt_clause: " << *clause << endl;
+      cout << "add_learnt_clause: " << *clause << endl
+	   << "\tassign " << l0 << " @" << decision_level()
+	   << " from " << *clause << endl;
     }
 
     bump_clause_activity(clause);
@@ -544,10 +549,6 @@ YmSat::add_learnt_clause(const vector<Literal>& learnt_lits)
 
   // learnt clause の場合には必ず unit clause になっているはず．
   ASSERT_COND( eval(l0) != kB3False );
-  if ( debug & debug_assign ) {
-    cout << "\tassign " << l0 << " @" << decision_level()
-	 << " from " << reason << endl;
-  }
 
   assign(l0, reason);
 }
