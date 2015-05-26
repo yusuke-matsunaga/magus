@@ -1,0 +1,66 @@
+#ifndef NLSOLVERFR_H
+#define NLSOLVERFR_H
+
+/// @file NlSolverFr.h
+/// @brief NlSolverFr のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2015 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "NlSolver.h"
+#include "YmLogic/SatSolver.h"
+
+
+BEGIN_NAMESPACE_YM_NLINK
+
+//////////////////////////////////////////////////////////////////////
+/// @class NlSolverFr NlSolverFr.h "NlSolverFr.h"
+/// @brief number link を解くためのクラス
+//////////////////////////////////////////////////////////////////////
+class NlSolverFr :
+  public NlSolver
+{
+public:
+
+  /// @brief コンストラクタ
+  NlSolverFr();
+
+  /// @brief デストラクタ
+  virtual
+  ~NlSolverFr();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 問題を解く
+  /// @param[in] problem 問題
+  /// @param[in] verbose verbose フラグ
+  /// @param[out] solution 解
+  virtual
+  void
+  solve(const NlProblem& problem,
+	bool verbose,
+	NlSolution& solution);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+};
+
+END_NAMESPACE_YM_NLINK
+
+#endif // NLSOLVERFR_H
