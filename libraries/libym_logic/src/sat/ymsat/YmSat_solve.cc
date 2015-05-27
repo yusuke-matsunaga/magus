@@ -198,7 +198,11 @@ YmSat::solve(const vector<Literal>& assumptions,
 #if 0
     confl_limit = confl_limit * 1.5;
 #endif
+#if 0
     learnt_limit = learnt_limit + 100;
+#else
+    learnt_limit *= 1.1;
+#endif
   }
 
   if ( sat_stat == kB3True ) {
