@@ -24,14 +24,10 @@ BEGIN_NAMESPACE_YM_NLINK
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NlSolver2::NlSolver2(const char* option)
+// @param[in] sat_type SATソルバ名
+NlSolver2::NlSolver2(const string& sat_type) :
+  mSatType(sat_type)
 {
-  if ( option != NULL && strcmp(option, "minisat2") == 0 ) {
-    mMiniSat2 = true;
-  }
-  else {
-    mMiniSat2 = false;
-  }
 }
 
 // @brief デストラクタ
@@ -183,11 +179,7 @@ NlSolver2::solve(const NlProblem& problem,
 		 bool verbose,
 		 NlSolution& solution)
 {
-  string type;
-  if ( mMiniSat2 ) {
-    type = "minisat2";
-  }
-  SatSolver solver(type, string(), NULL);
+  SatSolver solver(mSatType, string(), NULL);
 
   NlGraph graph;
 

@@ -25,7 +25,8 @@ class NlSolver2 :
 public:
 
   /// @brief コンストラクタ
-  NlSolver2(const char* option = NULL);
+  /// @param[in] sat_type SATソルバ名
+  NlSolver2(const string& sat_type);
 
   /// @brief デストラクタ
   virtual
@@ -89,8 +90,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // minisat2 を使うとき true にするフラグ
-  bool mMiniSat2;
+  // SATソルバ名
+  string mSatType;
 
   // 線分数
   ymuint mNum;

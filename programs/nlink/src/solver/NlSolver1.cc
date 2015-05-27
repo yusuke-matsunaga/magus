@@ -23,7 +23,9 @@ BEGIN_NAMESPACE_YM_NLINK
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NlSolver1::NlSolver1()
+// @param[in] sat_type SAT ソルバ名
+NlSolver1::NlSolver1(const string& sat_type) :
+  mSatType(sat_type)
 {
 }
 
@@ -176,8 +178,7 @@ NlSolver1::solve(const NlProblem& problem,
 		 bool verbose,
 		 NlSolution& solution)
 {
-  SatSolver solver("minisat2", string(), NULL);
-  //SatSolver solver(string(), string(), NULL);
+  SatSolver solver(mSatType, string(), NULL);
 
   NlGraph graph;
 

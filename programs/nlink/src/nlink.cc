@@ -20,6 +20,7 @@ BEGIN_NAMESPACE_YM_NLINK
 void
 nlink(const string& filename,
       ymuint method,
+      const string& sat_type,
       bool verbose)
 {
   NlProblem problem = read_problem(filename);
@@ -33,15 +34,11 @@ nlink(const string& filename,
     solver.solve(problem, verbose, solution);
   }
   else if ( method == 1 ) {
-    NlSolver1 solver;
+    NlSolver1 solver(sat_type);
     solver.solve(problem, verbose, solution);
   }
   else if ( method == 2 ) {
-    NlSolver2 solver;
-    solver.solve(problem, verbose, solution);
-  }
-  else if ( method == 3 ) {
-    NlSolver2 solver("minisat2");
+    NlSolver2 solver(sat_type);
     solver.solve(problem, verbose, solution);
   }
 
@@ -59,6 +56,7 @@ main(int argc,
   using namespace std;
 
   ymuint method = 0;
+  string sat_type;
   bool verbose = false;
   int base = 1;
   for (int i = 1; i < argc; ++ i) {
@@ -74,8 +72,12 @@ main(int argc,
       method = 0;
       ++ base;
     }
+    else if ( strcmp(argv[i], "-minisat") == 0 ) {
+      sat_type = "minisat";
+      ++ base;
+    }
     else if ( strcmp(argv[i], "-minisat2") == 0 ) {
-      method = 3;
+      sat_type = "minisat2";
       ++ base;
     }
     else if ( strcmp(argv[i], "-v") == 0 ) {
@@ -88,7 +90,7 @@ main(int argc,
   }
 
   for (int i = base; i < argc; ++ i) {
-    nlink(argv[i], method, verbose);
+    nlink(argv[i], method, sat_type, verbose);
   }
 
   return 0;

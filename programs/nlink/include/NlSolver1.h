@@ -25,7 +25,8 @@ class NlSolver1 :
 public:
 
   /// @brief コンストラクタ
-  NlSolver1();
+  /// @param[in] sat_type SATソルバ名
+  NlSolver1(const string& sat_type);
 
   /// @brief デストラクタ
   virtual
@@ -91,6 +92,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // SATソルバ名
+  string mSatType;
 
   // 線分数
   ymuint mNum;
