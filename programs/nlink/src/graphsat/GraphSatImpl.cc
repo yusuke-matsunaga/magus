@@ -461,7 +461,11 @@ GraphSatImpl::solve(const vector<Literal>& assumptions,
 
     // 判定できなかったのでパラメータを更新して次のラウンドへ
     confl_limit = confl_limit * 1.5;
+#if 0
     learnt_limit = learnt_limit + 100;
+#else
+    learnt_limit *= 1.1;
+#endif
   }
 
   if ( sat_stat == kB3True ) {
