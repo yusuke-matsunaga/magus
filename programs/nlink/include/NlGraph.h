@@ -14,110 +14,8 @@
 
 BEGIN_NAMESPACE_YM_NLINK
 
-//////////////////////////////////////////////////////////////////////
-/// @class NlNode NlGraph.h "NlGraph.h"
-/// @brief NlGraph のノードを表すクラス
-//////////////////////////////////////////////////////////////////////
-class NlNode
-{
-  friend class NlGraph;
-
-private:
-
-  /// @brief コンストラクタ
-  NlNode();
-
-  /// @brief デストラクタ
-  ~NlNode();
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief ID番号を返す．
-  ymuint
-  id() const;
-
-  /// @brief X座標を得る．
-  ymuint
-  x() const;
-
-  /// @brief Y座標を得る．
-  ymuint
-  y() const;
-
-  /// @brief 端点番号を得る．
-  ///
-  /// 端点でない場合は 0 を返す．
-  ymuint
-  terminal_id() const;
-
-  /// @brief 接続している枝番号のリストを返す．
-  const vector<ymuint>&
-  edge_list() const;
-
-  /// @brief 左の枝番号を返す．
-  ///
-  /// なければ 0 を返す．
-  ymuint
-  left_edge() const;
-
-  /// @brief 右の枝番号を返す．
-  ///
-  /// なければ 0 を返す．
-  ymuint
-  right_edge() const;
-
-  /// @brief 上の枝番号を返す．
-  ///
-  /// なければ 0 を返す．
-  ymuint
-  upper_edge() const;
-
-  /// @brief 下の枝番号を返す．
-  ///
-  /// なければ 0 を返す．
-  ymuint
-  lower_edge() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // ID番号
-  ymuint mId;
-
-  // X座標
-  ymuint mX;
-
-  // Y座標
-  ymuint mY;
-
-  // 端点番号
-  // 0 で無印
-  ymuint mTermId;
-
-  // 接続する枝番号のリスト
-  vector<ymuint> mEdgeList;
-
-  // 左の枝
-  ymuint mLeftEdge;
-
-  // 右の枝
-  ymuint mRightEdge;
-
-  // 上の枝
-  ymuint mUpperEdge;
-
-  // 下の枝
-  ymuint mLowerEdge;
-
-};
-
+class NlNode;
+class NlEdge;
 
 //////////////////////////////////////////////////////////////////////
 /// @class NlGraph NlGraph.h "NlGraph.h"
@@ -193,29 +91,9 @@ public:
   const NlNode*
   node(ymuint id) const;
 
-  /// @brief 左の枝番号を返す．
-  /// @param[in] x, y 座標
-  ymuint
-  left_edge(ymuint x,
-	    ymuint y) const;
-
-  /// @brief 右の枝番号を返す．
-  /// @param[in] x, y 座標
-  ymuint
-  right_edge(ymuint x,
-	     ymuint y) const;
-
-  /// @brief 上の枝番号を返す．
-  /// @param[in] x, y 座標
-  ymuint
-  upper_edge(ymuint x,
-	     ymuint y) const;
-
-  /// @brief 下の枝番号を返す．
-  /// @param[in] x, y 座標
-  ymuint
-  lower_edge(ymuint x,
-	     ymuint y) const;
+  /// @brief 枝を返す．
+  const NlEdge*
+  edge(ymuint id) const;
 
   /// @brief 枝番号から枝を表す文字列を返す．
   /// @param[in] edge_id 枝番号
@@ -238,7 +116,7 @@ private:
   /// @param[in] x, y 座標
   NlNode*
   _node(ymuint x,
-       ymuint y);
+	ymuint y);
 
 
 private:
@@ -274,6 +152,9 @@ private:
   // サイズは mNum * 2 で
   // [0] と [1] に最初の線分の始点と終点が入る．
   vector<const NlNode*> mTermArray;
+
+  // 枝の配列
+  vector<NlEdge*> mEdgeArray;
 
 };
 

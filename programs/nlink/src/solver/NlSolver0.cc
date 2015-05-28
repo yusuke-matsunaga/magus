@@ -222,8 +222,6 @@ NlSolver0::make_base_cnf(SatSolver& solver,
   ymuint max_node_id = graph.max_node_id();
   ymuint max_edge_id = graph.max_edge_id();
 
-  mNodeVarArray.clear();
-  mNodeVarArray.resize(max_node_id * num);
   mEdgeVarArray.clear();
   mEdgeVarArray.resize(max_edge_id);
 
@@ -261,16 +259,62 @@ NlSolver0::make_base_cnf(SatSolver& solver,
 }
 
 // @brief 枝の割当結果からノードの割当を得る．
+// @param[in] graph 問題を表すグラフ
 // @param[in] model SAT の解
 // @param[in] node_array ノード割当の結果
 void
-NlSolver0::get_node_assignment(const vector<Bool3>& model,
+NlSolver0::get_node_assignment(const NlGraph& graph,
+			       const vector<Bool3>& model,
 			       vector<ymuint>& node_array)
 {
   ymuint nn = mWidth * mHeight;
   node_array.clear();
   node_array.resize(nn);
 
+  ymuint num = graph.num();
+  for (ymuint i = 0; i < num; ++ i) {
+    const NlNode* node1 = graph.start_node(i);
+    const NlNode* node2 = graph.end_node(i);
+    vector<const NlNode*> path_list;
+    search_path(node1, model, path_list);
+    if ( path_list.back() != node2 ) {
+      // 違う端子とつながっていた．
+
+    }
+  }
+}
+
+
+// @brief 経路を求める．
+// @param[in] node ノード
+// @param[in] from_edge,
+// @param[in] model SATの解
+// @param[in] path_list 経路上のノードを納めるリスト
+void
+NlSolver0::search_path(const NlNode* node,
+		       ymuint from_edge,
+		       const vector<Bool3>& model,
+		       vector<const NlNode*>& path_list)
+{
+  path_list.push_back(node);
+
+  const vector<ymuint>& edge_list = node->edge_list();
+  const NlNode* next_node = NULL;
+  ymuint next_edge = 0;
+  for (ymuint i = 0; i < edge_list.size(); ++ i) {
+    ymuint edge = edge_list[i];
+    if ( from_edge == edge ) {
+      continue;
+    }
+    VarId var = edge_var(edge);
+    if ( model[var.val()] == kB3True ) {
+      next_edge = edge;
+      break;
+    }
+  }
+  if ( next_node != NULL ) {
+    sarch_path(next_node, next_edge, model, path_list);
+  }
 }
 
 // @brief 解を出力する．

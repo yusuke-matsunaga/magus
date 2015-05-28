@@ -8,103 +8,12 @@
 
 
 #include "NlGraph.h"
+#include "NlNode.h"
+#include "NlEdge.h"
 #include "NlProblem.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
-
-//////////////////////////////////////////////////////////////////////
-// クラス NlNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-NlNode::NlNode()
-{
-  mTermId = 0;
-  mLeftEdge = 0;
-  mRightEdge = 0;
-  mUpperEdge = 0;
-  mLowerEdge = 0;
-}
-
-// @brief デストラクタ
-NlNode::~NlNode()
-{
-}
-
-// @brief ID番号を返す．
-ymuint
-NlNode::id() const
-{
-  return mId;
-}
-
-// @brief X座標を得る．
-ymuint
-NlNode::x() const
-{
-  return mX;
-}
-
-// @brief Y座標を得る．
-ymuint
-NlNode::y() const
-{
-  return mY;
-}
-
-// @brief 端点番号を得る．
-//
-// 端点でない場合は 0 を返す．
-ymuint
-NlNode::terminal_id() const
-{
-  return mTermId;
-}
-
-// @brief 接続している枝のリストを返す．
-const vector<ymuint>&
-NlNode::edge_list() const
-{
-  return mEdgeList;
-}
-
-// @brief 左の枝を返す．
-//
-// なければ 0 を返す．
-ymuint
-NlNode::left_edge() const
-{
-  return mLeftEdge;
-}
-
-// @brief 右の枝を返す．
-//
-// なければ 0 を返す．
-ymuint
-NlNode::right_edge() const
-{
-  return mRightEdge;
-}
-
-// @brief 上の枝を返す．
-//
-// なければ 0 を返す．
-ymuint
-NlNode::upper_edge() const
-{
-  return mUpperEdge;
-}
-
-// @brief 下の枝を返す．
-//
-// なければ 0 を返す．
-ymuint
-NlNode::lower_edge() const
-{
-  return mLowerEdge;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス NlGraph
@@ -129,6 +38,11 @@ NlGraph::clear()
     delete mNodeArray[i];
   }
   mNodeArray.clear();
+
+  for (ymuint i = 0; i < mEdgeArray.size(); ++ i) {
+    delete mEdgeArray[i];
+  }
+  mEdgeArray.clear();
 
   mTermArray.clear();
 }

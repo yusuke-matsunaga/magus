@@ -60,11 +60,24 @@ private:
 		const NlGraph& graph);
 
   /// @brief 枝の割当結果からノードの割当を得る．
+  /// @param[in] graph 問題を表すグラフ
   /// @param[in] model SAT の解
   /// @param[in] node_array ノード割当の結果
   void
-  get_node_assignment(const vector<Bool3>& model,
+  get_node_assignment(const NlGraph& graph,
+		      const vector<Bool3>& model,
 		      vector<ymuint>& node_array);
+
+  /// @brief 経路を求める．
+  /// @param[in] node ノード
+  /// @param[in] from_edge,
+  /// @param[in] model SATの解
+  /// @param[in] path_list 経路上のノードを納めるリスト
+  void
+  search_path(const NlNode* node,
+	      ymuint from_edge,
+	      const vector<Bool3>& model,
+	      vector<const NlNode*>& path_list);
 
   /// @brief 解を出力する．
   /// @param[in] graph 問題を表すグラフ
