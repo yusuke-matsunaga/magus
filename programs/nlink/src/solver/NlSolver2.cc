@@ -233,63 +233,41 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 
   mNum = num;
   ymuint max_edge_id = graph.max_edge_id();
+
+  // 枝の変数(枝数 x 線分数)を作る．
   mVarArray.clear();
   mVarArray.resize(max_edge_id * num);
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
+    for (ymuint k = 0; k < num; ++ k) {
+      VarId var = solver.new_var();
+      mVarArray[edge_id * num + k] = var;
+    }
+  }
 
-  // 横の辺に対する one-hot 制約を作る．
-  for (ymuint x = 1; x < width; ++ x) {
-    for (ymuint y = 0; y < height; ++ y) {
-      const NlNode* node = graph.node(x, y);
-      const NlEdge* edge = node->left_edge();
-      vector<Literal> tmp_lits(num);
-      // 変数を作る．
-      for (ymuint k = 0; k < num; ++ k) {
-	VarId var = solver.new_var();
-	set_edge_var(edge, k, var);
-	Literal lit = Literal(var);
-	tmp_lits[k] = lit;
-      }
-      // 同時に2つ以上の変数が1にならないようにする．
-      for (ymuint k1 = 0; k1 < num; ++ k1) {
-	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
-	  Literal lit2 = tmp_lits[k2];
-	  solver.add_clause(~lit1, ~lit2);
-	}
+  // 同じ枝上の変数の排他制約を作る．
+  // 上の for ループとマージできるけど一応，わかりやすさ優先で．
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
+    vector<Literal> tmp_lits(num);
+    for (ymuint k = 0; k < num; ++ k) {
+      VarId var = mVarArray[edge_id * num + k];
+      tmp_lits[k] = Literal(var);
+    }
+    // 同時に2つ以上の変数が1にならないようにする．
+    for (ymuint k1 = 0; k1 < num; ++ k1) {
+      Literal lit1 = tmp_lits[k1];
+      for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
+	Literal lit2 = tmp_lits[k2];
+	solver.add_clause(~lit1, ~lit2);
       }
     }
   }
 
-  // 縦の辺に対する one-hot 制約を作る．
-  for (ymuint y = 1; y < height; ++ y) {
-    for (ymuint x = 0; x < width; ++ x) {
-      const NlNode* node = graph.node(x, y);
-      const NlEdge* edge = node->upper_edge();
-      vector<Literal> tmp_lits(num);
-      // 変数を作る．
-      for (ymuint k = 0; k < num; ++ k) {
-	VarId var = solver.new_var();
-	set_edge_var(edge, k, var);
-	Literal lit = Literal(var);
-	tmp_lits[k] = lit;
-      }
-      // 同時に2つ以上の変数が1にならないようにする．
-      for (ymuint k1 = 0; k1 < num; ++ k1) {
-	Literal lit1 = tmp_lits[k1];
-	for (ymuint k2 = k1 + 1; k2 < num; ++ k2) {
-	  Literal lit2 = tmp_lits[k2];
-	  solver.add_clause(~lit1, ~lit2);
-	}
-      }
-    }
-  }
-
+  // 同じノード上で異なる線分が交わらないための条件を作る．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
       const NlNode* node = graph.node(x, y);
       const vector<const NlEdge*>& edge_list = node->edge_list();
       ymuint ne = edge_list.size();
-      // このノード上で異なる番号の線分が交わることはない．
       for (ymuint i1 = 0; i1 < ne; ++ i1) {
 	const NlEdge* edge1 = edge_list[i1];
 	for (ymuint i2 = 0; i2 < ne; ++ i2) {
@@ -311,7 +289,7 @@ NlSolver2::make_base_cnf(SatSolver& solver,
     }
   }
 
-  // 枝の条件を作る．
+  // 枝が径路となる条件を作る．
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
       const NlNode* node = graph.node(x, y);
@@ -319,13 +297,11 @@ NlSolver2::make_base_cnf(SatSolver& solver,
       ymuint ne = edge_list.size();
       for (ymuint k = 0; k < num; ++ k) {
 	// (x, y) のノードに隣接する枝のリテラルのリストを作る．
-	vector<Literal> lit_list;
-	lit_list.reserve(ne);
+	vector<Literal> lit_list(ne);
 	for (ymuint i = 0; i < ne; ++ i) {
 	  const NlEdge* edge = edge_list[i];
 	  VarId var = edge_var(edge, k);
-	  Literal lit(var);
-	  lit_list.push_back(lit);
+	  lit_list[i] = Literal(var);
 	}
 
 	ymuint term_id = node->terminal_id();
@@ -337,6 +313,8 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	  }
 	  else {
 	    // 選ばれない．
+	    // 実はこの条件はなくても他の制約から導かれる．
+	    // けど unit clause はやって損はないので．
 	    for (ymuint i = 0; i < ne; ++ i) {
 	      solver.add_clause(~lit_list[i]);
 	    }
@@ -387,18 +365,6 @@ NlSolver2::setup_solution(const NlGraph& graph,
       }
     }
   }
-}
-
-// @brief 枝の変数番号をセットする．
-// @param[in] edge 枝番号 ( 1 〜 )
-// @param[in] idx 線分番号
-// @param[in] var 変数番号
-void
-NlSolver2::set_edge_var(const NlEdge* edge,
-			ymuint idx,
-			VarId var)
-{
-  mVarArray[edge->id() * mNum + idx] = var;
 }
 
 // @brief 枝の変数番号を得る．
