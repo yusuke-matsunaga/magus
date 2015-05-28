@@ -158,6 +158,104 @@ private:
 
 };
 
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 盤面の幅を返す．
+inline
+ymuint
+NlGraph::width() const
+{
+  return mWidth;
+}
+
+// @brief 盤面の高さを返す．
+inline
+ymuint
+NlGraph::height() const
+{
+  return mHeight;
+}
+
+// @brief 線分数を返す．
+inline
+ymuint
+NlGraph::num() const
+{
+  return mNum;
+}
+
+// @brief 始点を返す．
+// @param[in] idx 番号 ( 0 <= idx < num() )
+inline
+const NlNode*
+NlGraph::start_node(ymuint idx) const
+{
+  ASSERT_COND( idx < mNum );
+
+  return mTermArray[idx * 2 + 0];
+}
+
+// @brief 終点を返す．
+// @param[in] idx 番号 ( 0 <= idx < num() )
+inline
+const NlNode*
+NlGraph::end_node(ymuint idx) const
+{
+  ASSERT_COND( idx < mNum );
+
+  return mTermArray[idx * 2 + 1];
+}
+
+// @brief ノード番号の最大値を返す．
+//
+// 正確には最大値+1を返す．
+inline
+ymuint
+NlGraph::max_node_id() const
+{
+  return mMaxNodeId;
+}
+
+// @brief 枝番号の最大値を返す．
+//
+// 正確には最大値+1を返す．
+inline
+ymuint
+NlGraph::max_edge_id() const
+{
+  return mMaxEdgeId;
+}
+
+// @brief ノードを得る．
+// @param[in] x, y 座標
+inline
+const NlNode*
+NlGraph::node(ymuint x,
+	      ymuint y) const
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return node(x * mHeight + y);
+}
+
+// @brief ノードを返す．
+// @param[in] id ID番号
+inline
+const NlNode*
+NlGraph::node(ymuint id) const
+{
+  ASSERT_COND( id < mMaxNodeId );
+
+  return mNodeArray[id];
+}
+
+
 END_NAMESPACE_YM_NLINK
 
 #endif // NLGRAPH_H
