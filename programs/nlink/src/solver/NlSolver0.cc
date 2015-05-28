@@ -11,7 +11,8 @@
 #include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
-#include "MazeRouter.h"
+#include "NlNode.h"
+#include "NlEdge.h"
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
 
@@ -190,6 +191,9 @@ NlSolver0::solve(const NlProblem& problem,
 
   make_base_cnf(solver, graph);
 
+  mNodeArray.clear();
+  mNodeArray.resize(graph.max_node_id(), 0);
+
   solution.init(problem);
 
   if ( verbose ) {
@@ -197,20 +201,42 @@ NlSolver0::solve(const NlProblem& problem,
     solver.reg_msg_handler(msg_handler);
   }
 
-  vector<Bool3> model;
-  Bool3 stat = solver.solve(model);
-  switch ( stat ) {
-  case kB3True:
-    setup_solution(graph, model, solution);
-    break;
+  for ( ; ; ) {
+    vector<Bool3> model;
+    Bool3 stat = solver.solve(model);
+    if ( stat == kB3X ) {
+      cerr << "ABORT" << endl;
+      return;
+    }
+    if ( stat == kB3False ) {
+      cerr << "UNSAT" << endl;
+      return;
+    }
 
-  case kB3False:
-    cerr << "UNSAT" << endl;
-    break;
+    bool has_error = false;
+    for (ymuint i = 0; i < mNum; ++ i) {
+      const NlNode* node1 = graph.start_node(i);
+      const NlNode* node2 = graph.end_node(i);
+      vector<const NlEdge*> path_list;
+      const NlNode* end_node = search_path(node1, model, path_list);
+      if ( end_node != node2 ) {
+	// 違う端子とつながっていた．
+	// path_list の変数を反例として記録
+	ymuint n = path_list.size();
+	vector<Literal> tmp_list(n);
+	for (ymuint i = 0; i < n; ++ i) {
+	  const NlEdge* edge = path_list[i];
+	  tmp_list[i] = Literal(edge_var(edge), true);
+	}
+	solver.add_clause(tmp_list);
 
-  case kB3X:
-    cerr << "ABORT" << endl;
-    break;
+	has_error = true;
+      }
+    }
+    if ( !has_error ) {
+      setup_solution(graph, model, solution);
+      break;
+    }
   }
 }
 
@@ -226,20 +252,20 @@ NlSolver0::make_base_cnf(SatSolver& solver,
   mEdgeVarArray.resize(max_edge_id);
 
   // 枝の変数を作る．
-  for (ymuint edge = 1; edge <= max_edge_id; ++ edge) {
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
     VarId var = solver.new_var();
-    set_edge_var(edge, var);
+    mEdgeVarArray[edge_id] = var;
   }
 
   // 枝の条件を作る．
   for (ymuint node_id = 0; node_id < max_node_id; ++ node_id) {
     const NlNode* node = graph.node(node_id);
-    const vector<ymuint>& edge_list = node->edge_list();
+    const vector<const NlEdge*>& edge_list = node->edge_list();
     ymuint ne = edge_list.size();
     // ノードに隣接する枝のリテラルのリストを作る．
     vector<Literal> lit_list(ne);
     for (ymuint i = 0; i < ne; ++ i) {
-      ymuint edge = edge_list[i];
+      const NlEdge* edge = edge_list[i];
       VarId var = edge_var(edge);
       lit_list[i] = Literal(var);
     }
@@ -258,62 +284,47 @@ NlSolver0::make_base_cnf(SatSolver& solver,
   }
 }
 
-// @brief 枝の割当結果からノードの割当を得る．
-// @param[in] graph 問題を表すグラフ
-// @param[in] model SAT の解
-// @param[in] node_array ノード割当の結果
-void
-NlSolver0::get_node_assignment(const NlGraph& graph,
-			       const vector<Bool3>& model,
-			       vector<ymuint>& node_array)
-{
-  ymuint nn = mWidth * mHeight;
-  node_array.clear();
-  node_array.resize(nn);
-
-  ymuint num = graph.num();
-  for (ymuint i = 0; i < num; ++ i) {
-    const NlNode* node1 = graph.start_node(i);
-    const NlNode* node2 = graph.end_node(i);
-    vector<const NlNode*> path_list;
-    search_path(node1, model, path_list);
-    if ( path_list.back() != node2 ) {
-      // 違う端子とつながっていた．
-
-    }
-  }
-}
-
-
 // @brief 経路を求める．
 // @param[in] node ノード
-// @param[in] from_edge,
 // @param[in] model SATの解
-// @param[in] path_list 経路上のノードを納めるリスト
-void
+// @param[in] path_list 経路上の枝を納めるリスト
+const NlNode*
 NlSolver0::search_path(const NlNode* node,
-		       ymuint from_edge,
 		       const vector<Bool3>& model,
-		       vector<const NlNode*>& path_list)
+		       vector<const NlEdge*>& path_list)
 {
-  path_list.push_back(node);
+  ymuint idx = node->terminal_id();
 
-  const vector<ymuint>& edge_list = node->edge_list();
-  const NlNode* next_node = NULL;
-  ymuint next_edge = 0;
-  for (ymuint i = 0; i < edge_list.size(); ++ i) {
-    ymuint edge = edge_list[i];
-    if ( from_edge == edge ) {
-      continue;
-    }
-    VarId var = edge_var(edge);
-    if ( model[var.val()] == kB3True ) {
+  const NlEdge* from_edge = NULL;
+  for ( ; ; ) {
+    mNodeArray[node->id()] = idx;
+    const vector<const NlEdge*>& edge_list = node->edge_list();
+    const NlNode* next_node = NULL;
+    const NlEdge* next_edge = NULL;
+    for (ymuint i = 0; i < edge_list.size(); ++ i) {
+      const NlEdge* edge = edge_list[i];
+      if ( from_edge == edge ) {
+	continue;
+      }
+      VarId var = edge_var(edge);
+      if ( model[var.val()] != kB3True ) {
+	continue;
+      }
+
+      next_node = edge->node1();
+      if ( next_node == node ) {
+	next_node = edge->node2();
+      }
       next_edge = edge;
       break;
     }
-  }
-  if ( next_node != NULL ) {
-    sarch_path(next_node, next_edge, model, path_list);
+    if ( next_node == NULL ) {
+      // たぶん，node は終端
+      return node;
+    }
+    node = next_node;
+    from_edge = next_edge;
+    path_list.push_back(next_edge);
   }
 }
 
@@ -325,36 +336,25 @@ NlSolver0::setup_solution(const NlGraph& graph,
 			  const vector<Bool3>& model,
 			  NlSolution& solution)
 {
-  vector<ymuint> node_array;
-  get_node_assignment(model, node_array);
   for (ymuint y = 0; y < mHeight; ++ y) {
     for (ymuint x = 0; x < mWidth; ++ x) {
       if ( solution.get(x, y) < 0 ) {
 	continue;
       }
-      ymuint val = node_array[x * mHeight + y];
+      ymuint val = mNodeArray[x * mHeight + y];
       solution.set(x, y, val);
     }
   }
 }
 
-// @brief 枝の変数番号をセットする．
-// @param[in] edge 枝番号 ( 1 〜 )
-// @param[in] idx 線分番号
-// @param[in] var 変数番号
-void
-NlSolver0::set_edge_var(ymuint edge,
-			VarId var)
-{
-  mEdgeVarArray[edge - 1] = var;
-}
-
 // @brief 枝の変数番号を得る．
-// @param[in] edge 枝番号 ( 1 〜 )
+// @param[in] edge 枝
 VarId
-NlSolver0::edge_var(ymuint edge)
+NlSolver0::edge_var(const NlEdge* edge)
 {
-  return mEdgeVarArray[edge - 1];
+  ASSERT_COND( edge != NULL );
+
+  return mEdgeVarArray[edge->id()];
 }
 
 END_NAMESPACE_YM_NLINK

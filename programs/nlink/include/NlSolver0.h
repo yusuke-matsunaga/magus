@@ -59,25 +59,14 @@ private:
   make_base_cnf(SatSolver& solver,
 		const NlGraph& graph);
 
-  /// @brief 枝の割当結果からノードの割当を得る．
-  /// @param[in] graph 問題を表すグラフ
-  /// @param[in] model SAT の解
-  /// @param[in] node_array ノード割当の結果
-  void
-  get_node_assignment(const NlGraph& graph,
-		      const vector<Bool3>& model,
-		      vector<ymuint>& node_array);
-
   /// @brief 経路を求める．
-  /// @param[in] node ノード
-  /// @param[in] from_edge,
+  /// @param[in] node 始点のノード
   /// @param[in] model SATの解
-  /// @param[in] path_list 経路上のノードを納めるリスト
-  void
+  /// @param[in] path_list 経路上の枝を納めるリスト
+  const NlNode*
   search_path(const NlNode* node,
-	      ymuint from_edge,
 	      const vector<Bool3>& model,
-	      vector<const NlNode*>& path_list);
+	      vector<const NlEdge*>& path_list);
 
   /// @brief 解を出力する．
   /// @param[in] graph 問題を表すグラフ
@@ -88,17 +77,10 @@ private:
 		 const vector<Bool3>& model,
 		 NlSolution& solution);
 
-  /// @brief 枝の変数番号をセットする．
-  /// @param[in] edge 枝番号 ( 1 〜 )
-  /// @param[in] var 変数番号
-  void
-  set_edge_var(ymuint edge,
-	       VarId var);
-
   /// @brief 枝の変数番号を得る．
-  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] edge 枝
   VarId
-  edge_var(ymuint edge);
+  edge_var(const NlEdge* edge);
 
 
 private:
@@ -121,6 +103,9 @@ private:
   // 枝の変数番号の配列
   // サイズは枝数
   vector<VarId> mEdgeVarArray;
+
+  // ノードの番号の配列
+  vector<ymuint> mNodeArray;
 
 };
 

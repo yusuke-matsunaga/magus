@@ -10,6 +10,7 @@
 #include "nlink_nsdef.h"
 #include "NlProblem.h"
 #include "NlSolution.h"
+#include "NlSolver0.h"
 #include "NlSolver1.h"
 #include "NlSolver2.h"
 #include "NlSolverGs.h"
@@ -30,7 +31,7 @@ nlink(const string& filename,
   NlSolution solution;
 
   if ( method == 0 ) {
-    NlSolverGs solver;
+    NlSolver0 solver(sat_type);
     solver.solve(problem, verbose, solution);
   }
   else if ( method == 1 ) {
@@ -39,6 +40,10 @@ nlink(const string& filename,
   }
   else if ( method == 2 ) {
     NlSolver2 solver(sat_type);
+    solver.solve(problem, verbose, solution);
+  }
+  else if ( method == 3 ) {
+    NlSolverGs solver;
     solver.solve(problem, verbose, solution);
   }
 
@@ -55,12 +60,16 @@ main(int argc,
   using nsYm::nsNlink::nlink;
   using namespace std;
 
-  ymuint method = 0;
+  ymuint method = 3;
   string sat_type;
   bool verbose = false;
   int base = 1;
   for (int i = 1; i < argc; ++ i) {
-    if ( strcmp(argv[i], "-1") == 0 ) {
+    if ( strcmp(argv[i], "-0") == 0 ) {
+      method = 0;
+      ++ base;
+    }
+    else if ( strcmp(argv[i], "-1") == 0 ) {
       method = 1;
       ++ base;
     }
@@ -69,7 +78,7 @@ main(int argc,
       ++ base;
     }
     else if ( strcmp(argv[i], "-gs") == 0 ) {
-      method = 0;
+      method = 3;
       ++ base;
     }
     else if ( strcmp(argv[i], "-minisat") == 0 ) {
