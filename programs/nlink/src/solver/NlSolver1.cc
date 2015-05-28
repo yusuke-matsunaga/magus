@@ -11,6 +11,8 @@
 #include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
+#include "NlNode.h"
+#include "NlEdge.h"
 #include "MazeRouter.h"
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
@@ -239,9 +241,9 @@ NlSolver1::make_base_cnf(SatSolver& solver,
   }
 
   // 枝の変数を作る．
-  for (ymuint edge = 1; edge <= max_edge_id; ++ edge) {
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
     VarId var = solver.new_var();
-    set_edge_var(edge, var);
+    mEdgeVarArray[edge_id] = var;
   }
 
   // ノードの変数に対する one-hot 制約を作る．
@@ -275,12 +277,12 @@ NlSolver1::make_base_cnf(SatSolver& solver,
   // 枝の条件を作る．
   for (ymuint node_id = 0; node_id < max_node_id; ++ node_id) {
     const NlNode* node = graph.node(node_id);
-    const vector<ymuint>& edge_list = node->edge_list();
+    const vector<const NlEdge*>& edge_list = node->edge_list();
     ymuint ne = edge_list.size();
     // ノードに隣接する枝のリテラルのリストを作る．
     vector<Literal> lit_list(ne);
     for (ymuint i = 0; i < ne; ++ i) {
-      ymuint edge = edge_list[i];
+      const NlEdge* edge = edge_list[i];
       VarId var = edge_var(edge);
       lit_list[i] = Literal(var);
     }
@@ -303,11 +305,11 @@ NlSolver1::make_base_cnf(SatSolver& solver,
     for (ymuint y = 0; y < height; ++ y) {
       const NlNode* node1 = graph.node(x, y);
       const NlNode* node2 = graph.node(x - 1, y);
-      ymuint edge = node1->left_edge();
+      const NlEdge* edge = node1->left_edge();
       for (ymuint k = 0; k < num; ++ k) {
-	VarId var1 = node_var(node1->id(), k);
+	VarId var1 = node_var(node1, k);
 	Literal lit1(var1);
-	VarId var2 = node_var(node2->id(), k);
+	VarId var2 = node_var(node2, k);
 	Literal lit2(var2);
 	VarId evar = edge_var(edge);
 	Literal elit(evar);
@@ -320,11 +322,11 @@ NlSolver1::make_base_cnf(SatSolver& solver,
     for (ymuint x = 0; x < width; ++ x) {
       const NlNode* node1 = graph.node(x, y);
       const NlNode* node2 = graph.node(x, y - 1);
-      ymuint edge = node1->upper_edge();
+      const NlEdge* edge = node1->upper_edge();
       for (ymuint k = 0; k < num; ++ k) {
-	VarId var1 = node_var(node1->id(), k);
+	VarId var1 = node_var(node1, k);
 	Literal lit1(var1);
-	VarId var2 = node_var(node2->id(), k);
+	VarId var2 = node_var(node2, k);
 	Literal lit2(var2);
 	VarId evar = edge_var(edge);
 	Literal elit(evar);
@@ -353,7 +355,7 @@ NlSolver1::setup_solution(const NlGraph& graph,
       }
       const NlNode* node = graph.node(x, y);
       for (ymuint k = 0; k < num; ++ k) {
-	VarId var = node_var(node->id(), k);
+	VarId var = node_var(node, k);
 	if ( model[var.val()] == kB3True ) {
 	  solution.set(x, y, k + 1);
 	  break;
@@ -364,32 +366,25 @@ NlSolver1::setup_solution(const NlGraph& graph,
 }
 
 // @brief 節点の変数番号を得る．
-// @param[in] node 節点番号
+// @param[in] node 節点
 // @param[in] idx 線分番号
 VarId
-NlSolver1::node_var(ymuint node,
-		    ymuint idx)
+NlSolver1::node_var(const NlNode* node,
+		    ymuint idx) const
 {
-  return mNodeVarArray[node * mNum + idx];
-}
+  ASSERT_COND( node != NULL );
 
-// @brief 枝の変数番号をセットする．
-// @param[in] edge 枝番号 ( 1 〜 )
-// @param[in] idx 線分番号
-// @param[in] var 変数番号
-void
-NlSolver1::set_edge_var(ymuint edge,
-			VarId var)
-{
-  mEdgeVarArray[edge - 1] = var;
+  return mNodeVarArray[node->id() * mNum + idx];
 }
 
 // @brief 枝の変数番号を得る．
-// @param[in] edge 枝番号 ( 1 〜 )
+// @param[in] edge 枝
 VarId
-NlSolver1::edge_var(ymuint edge)
+NlSolver1::edge_var(const NlEdge* edge) const
 {
-  return mEdgeVarArray[edge - 1];
+  ASSERT_COND( edge != NULL );
+
+  return mEdgeVarArray[edge->id()];
 }
 
 END_NAMESPACE_YM_NLINK

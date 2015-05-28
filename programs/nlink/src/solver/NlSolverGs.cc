@@ -10,6 +10,8 @@
 #include "NlSolverGs.h"
 #include "NlProblem.h"
 #include "NlGraph.h"
+#include "NlNode.h"
+#include "NlEdge.h"
 #include "NlSolution.h"
 #include "GraphSat.h"
 #include "GsGraphBuilder.h"
@@ -241,8 +243,8 @@ NlSolverGs::make_graph(const NlGraph& graph,
       }
       ymuint node1_id = x * h + y;
       ymuint node2_id = (x + 1) * h + y;
-      ymuint edge_id = node1->right_edge();
-      VarId var = edge_var(edge_id, wire_idx);
+      const NlEdge* edge = node1->right_edge();
+      VarId var = edge_var(edge, wire_idx);
       builder.add_edge(node1_id, node2_id, var);
     }
   }
@@ -259,8 +261,8 @@ NlSolverGs::make_graph(const NlGraph& graph,
       }
       ymuint node1_id = x * h + y;
       ymuint node2_id = x * h + y + 1;
-      ymuint edge_id = node1->lower_edge();
-      VarId var = edge_var(edge_id, wire_idx);
+      const NlEdge* edge = node1->lower_edge();
+      VarId var = edge_var(edge, wire_idx);
       builder.add_edge(node1_id, node2_id, var);
     }
   }
@@ -299,15 +301,16 @@ NlSolverGs::make_base_cnf(GraphSat& solver,
   mVarArray.resize(max_edge_id * num);
 
   // 枝に対する変数を作る．
-  for (ymuint edge = 1; edge <= max_edge_id; ++ edge) {
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
     for (ymuint k = 0; k < num; ++ k) {
       VarId var = solver.new_var();
-      set_edge_var(edge, k, var);
+      mVarArray[edge_id * num + k] = var;
     }
   }
 
   // 同じ枝上で複数の径路が選ばれないようにする．
-  for (ymuint edge = 1; edge <= max_edge_id; ++ edge) {
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
+    const NlEdge* edge = graph.edge(edge_id);
     for (ymuint k1 = 0; k1 < num; ++ k1) {
       VarId var1 = edge_var(edge, k1);
       Literal lit1(var1);
@@ -322,17 +325,17 @@ NlSolverGs::make_base_cnf(GraphSat& solver,
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
       const NlNode* node = graph.node(x, y);
-      const vector<ymuint>& edge_list = node->edge_list();
+      const vector<const NlEdge*>& edge_list = node->edge_list();
       ymuint ne = edge_list.size();
       // このノード上で異なる番号の線分が交わることはない．
       for (ymuint i1 = 0; i1 < ne; ++ i1) {
-	ymuint edge1 = edge_list[i1];
+	const NlEdge* edge1 = edge_list[i1];
 	for (ymuint i2 = 0; i2 < ne; ++ i2) {
 	  if ( i1 == i2 ) {
 	    // 同じ枝に対する制約は上で生成済み
 	    continue;
 	  }
-	  ymuint edge2 = edge_list[i2];
+	  const NlEdge* edge2 = edge_list[i2];
 	  for (ymuint k1 = 0; k1 < num; ++ k1) {
 	    VarId var1 = edge_var(edge1, k1);
 	    Literal lit1(var1);
@@ -351,13 +354,13 @@ NlSolverGs::make_base_cnf(GraphSat& solver,
   for (ymuint x = 0; x < width; ++ x) {
     for (ymuint y = 0; y < height; ++ y) {
       const NlNode* node = graph.node(x, y);
-      const vector<ymuint>& edge_list = node->edge_list();
+      const vector<const NlEdge*>& edge_list = node->edge_list();
       ymuint ne = edge_list.size();
       for (ymuint k = 0; k < num; ++ k) {
 	// (x, y) のノードに隣接する枝のリテラルのリストを作る．
 	vector<Literal> lit_list(ne);
 	for (ymuint i = 0; i < ne; ++ i) {
-	  ymuint edge = edge_list[i];
+	  const NlEdge* edge = edge_list[i];
 	  VarId var = edge_var(edge, k);
 	  lit_list[i] = Literal(var);
 	}
@@ -403,10 +406,10 @@ NlSolverGs::setup_solution(const NlGraph& graph,
 	continue;
       }
       const NlNode* node = graph.node(x, y);
-      const vector<ymuint>& edge_list = node->edge_list();
+      const vector<const NlEdge*>& edge_list = node->edge_list();
       bool found = false;
       for (ymuint i = 0; i < edge_list.size(); ++ i) {
-	ymuint edge = edge_list[i];
+	const NlEdge* edge = edge_list[i];
 	for (ymuint k = 0; k < num; ++ k) {
 	  VarId var = edge_var(edge, k);
 	  if ( model[var.val()] == kB3True ) {
@@ -423,26 +426,16 @@ NlSolverGs::setup_solution(const NlGraph& graph,
   }
 }
 
-// @brief 枝の変数番号をセットする．
-// @param[in] edge 枝番号 ( 1 〜 )
-// @param[in] idx 線分番号
-// @param[in] var 変数番号
-void
-NlSolverGs::set_edge_var(ymuint edge,
-			 ymuint idx,
-			 VarId var)
-{
-  mVarArray[(edge - 1) * mNum + idx] = var;
-}
-
 // @brief 枝の変数番号を得る．
-// @param[in] edge 枝番号 ( 1 〜 )
+// @param[in] edge 枝
 // @param[in] idx 線分番号
 VarId
-NlSolverGs::edge_var(ymuint edge,
+NlSolverGs::edge_var(const NlEdge* edge,
 		     ymuint idx)
 {
-  return mVarArray[(edge - 1) * mNum + idx];
+  ASSERT_COND( edge != NULL );
+
+  return mVarArray[edge->id() * mNum + idx];
 }
 
 END_NAMESPACE_YM_NLINK

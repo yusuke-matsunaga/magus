@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM_NLINK
 
-class NlEdge;
-
 //////////////////////////////////////////////////////////////////////
 /// @class NlNode NlGraph.h "NlGraph.h"
 /// @brief NlGraph のノードを表すクラス
@@ -27,7 +25,11 @@ class NlNode
 private:
 
   /// @brief コンストラクタ
-  NlNode();
+  /// @param[in] id ID番号
+  /// @param[in] x, y 座標
+  NlNode(ymuint id,
+	 ymuint x,
+	 ymuint y);
 
   /// @brief デストラクタ
   ~NlNode();
@@ -126,10 +128,16 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] x, y 座標
 inline
-NlNode::NlNode()
+NlNode::NlNode(ymuint id,
+	       ymuint x,
+	       ymuint y) :
+  mId(id),
+  mX(x),
+  mY(y)
 {
-  mId = 0;
   mTermId = 0;
   mLeftEdge = NULL;
   mRightEdge = NULL;

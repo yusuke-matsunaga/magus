@@ -14,9 +14,6 @@
 
 BEGIN_NAMESPACE_YM_NLINK
 
-class NlNode;
-class NlEdge;
-
 //////////////////////////////////////////////////////////////////////
 /// @class NlGraph NlGraph.h "NlGraph.h"
 /// @brief number link の問題を表すグラフ
@@ -94,11 +91,6 @@ public:
   /// @brief 枝を返す．
   const NlEdge*
   edge(ymuint id) const;
-
-  /// @brief 枝番号から枝を表す文字列を返す．
-  /// @param[in] edge_id 枝番号
-  string
-  edge_str(ymuint edge_id) const;
 
 
 private:
@@ -255,6 +247,30 @@ NlGraph::node(ymuint id) const
   return mNodeArray[id];
 }
 
+// @brief ノードを返す．
+// @param[in] x, y 座標
+inline
+NlNode*
+NlGraph::_node(ymuint x,
+	       ymuint y)
+{
+  ASSERT_COND( x >= 0 );
+  ASSERT_COND( x < mWidth );
+  ASSERT_COND( y >= 0 );
+  ASSERT_COND( y < mHeight );
+
+  return mNodeArray[x * mHeight + y];
+}
+
+// @brief 枝を返す．
+inline
+const NlEdge*
+NlGraph::edge(ymuint id) const
+{
+  ASSERT_COND( id < mMaxEdgeId );
+
+  return mEdgeArray[id];
+}
 
 END_NAMESPACE_YM_NLINK
 

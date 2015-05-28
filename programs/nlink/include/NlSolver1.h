@@ -68,24 +68,17 @@ private:
 		 const vector<Bool3>& model,
 		 NlSolution& solution);
 
-  /// @brief 枝の変数番号をセットする．
-  /// @param[in] edge 枝番号 ( 1 〜 )
-  /// @param[in] var 変数番号
-  void
-  set_edge_var(ymuint edge,
-	       VarId var);
-
   /// @brief 節点の変数番号を得る．
-  /// @param[in] node 節点番号
+  /// @param[in] node 節点
   /// @param[in] idx 線分番号
   VarId
-  node_var(ymuint edge,
-	   ymuint idx);
+  node_var(const NlNode* node,
+	   ymuint idx) const;
 
   /// @brief 枝の変数番号を得る．
-  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] edge 枝
   VarId
-  edge_var(ymuint edge);
+  edge_var(const NlEdge* edge) const;
 
 
 private:

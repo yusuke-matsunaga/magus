@@ -14,6 +14,8 @@
 
 BEGIN_NAMESPACE_YM_NLINK
 
+class NlEdge;
+
 //////////////////////////////////////////////////////////////////////
 /// @class MazeRouter MazeRouter.h "MazeRouter.h"
 /// @brief number link 用の迷路法
@@ -54,7 +56,7 @@ public:
   labeling(const NlGraph& graph,
 	   ymuint idx,
 	   bool dir,
-	   vector<ymuint>& edge_list,
+	   vector<const NlEdge*>& edge_list,
 	   vector<ymuint>& index_list);
 
 
@@ -70,7 +72,7 @@ private:
 	 Dir dir,
 	 ymuint label,
 	 vector<const NlNode*>& cell_list,
-	 vector<ymuint>& edge_list);
+	 vector<const NlEdge*>& edge_list);
 
 
 private:

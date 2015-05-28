@@ -53,6 +53,46 @@ NlSolverFr::~NlSolverFr()
 {
 }
 
+bool
+update_frontier(FrontierInfo& fr,
+		FrgEdge* edge,
+		bool selected,
+		FrgGraph& graph)
+{
+  vector<bool> mark(graph.max_node_id(), false);
+  vector<ymuint> del_list;
+  del_list.reserve(fr.node_num());
+  for (ymuint i = 0; i < fr.node_num(); ++ i) {
+    ymuint id = fr.node_id(i);
+    mark[id] = true;
+    FrgNode* node = graph.node(id);
+    const vector<FrgEdge*>& edge_list = node->edge_list();
+    bool found = false;
+    for (ymuint j = 0; j < edge_list.size(); ++ j) {
+      FrgEdge* edge1 = edge_list[j];
+      if ( edge1->id() > edge->id() ) {
+	// まだ未処理の枝がある．
+	found = true;
+	break;
+      }
+    }
+    if ( !found ) {
+      // 全て処理した．
+      del_list.push_back(id);
+    }
+  }
+  fr.delete_nodes(del_list);
+
+  FrgNode* node1 = edge->node1();
+  FrgNode* node2 = edge->node2();
+  if ( !mark[node1->id()] ) {
+    ymuint deg = selected ? 1 : 0;
+    int comp_id = node1->id();
+    fr.add_node(node1, deg, comp_id);
+  }
+
+}
+
 // @brief 問題を解く
 // @param[in] problem 問題
 // @param[in] verbose verbose フラグ
@@ -83,13 +123,27 @@ NlSolverFr::solve(const NlProblem& problem,
       // edge を選ばないノードを作る．
       FrNode* node0 = new FrNode(i + 1);
       FrontierInfo& fr0 = node0->frontier_info();
+      // 親のフロンティアをコピーする．
       fr0 = node->frontier_info();
 
-      new_node_list.push_back(node0);
+      // フロンティアの更新
+      // edge が最後の未処理枝だったノードを削除し
+      // edge が最初の処理枝だったノードを追加する．
+      // その際に，削除されるノードが条件を満たさなければ false を返す．
+      bool stat = update_frontier(fr0, edge, false, graph);
+      if ( !stat ) {
+	// node の 0 枝は NULL
+      }
+      else {
+	// node の 0 枝に node0 をセットする．
+
+	new_node_list.push_back(node0);
+      }
 
       // edge を選ぶノードを作る．
       FrNode* node1 = new FrNode(i + 1);
       FrontierInfo& fr1 = node1->frontier_info();
+      // 親のフロンティアをコピーする．
       fr1 = node->frontier_info();
 
       new_node_list.push_back(node1);

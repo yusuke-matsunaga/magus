@@ -70,6 +70,11 @@ public:
   void
   delete_node(ymuint pos);
 
+  /// @brief ノードを削除する．
+  /// @param[in] del_list 削除するノード番号のリスト
+  void
+  delete_nodes(const vector<ymuint>& del_list);
+
   /// @brief ノードを追加する．
   /// @param[in] node_id ノード番号
   /// @param[in] deg 次数

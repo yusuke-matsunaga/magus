@@ -69,20 +69,20 @@ private:
 		 NlSolution& solution);
 
   /// @brief 枝の変数番号をセットする．
-  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] edge 枝
   /// @param[in] idx 線分番号
   /// @param[in] var 変数番号
   void
-  set_edge_var(ymuint edge,
+  set_edge_var(const NlEdge* edge,
 	       ymuint idx,
 	       VarId var);
 
   /// @brief 枝の変数番号を得る．
-  /// @param[in] edge 枝番号 ( 1 〜 )
+  /// @param[in] edge 枝
   /// @param[in] idx 線分番号
   VarId
-  edge_var(ymuint edge,
-	   ymuint idx);
+  edge_var(const NlEdge* edge,
+	   ymuint idx) const;
 
 
 private:

@@ -68,58 +68,85 @@ NlGraph::set_problem(const NlProblem& problem)
 
   mTermArray.resize(num * 2);
 
-  // 横の辺の数
+  // 横の枝の数
   ymuint nh = (width - 1) * height;
-  mHbase = 1;
-
-  // 縦の辺の数
+  // 縦の枝の数
   ymuint nv = (height - 1) * width;
-  mVbase = nh + 1;
-
-  // 辺の数
+  // 枝の数
   mMaxEdgeId = nh + nv;
+  mEdgeArray.resize(mMaxEdgeId);
+
+  // 横の枝を作る．
+  for (ymuint x = 0; x < mWidth - 1; ++ x) {
+    for (ymuint y = 0; y < mHeight; ++ y) {
+      ymuint id = x * mHeight + y;
+      ostringstream buf;
+      buf << "H(" << x << ", " << y << ")";
+      NlEdge* edge = new NlEdge(id, buf.str());
+      mEdgeArray[id] = edge;
+    }
+  }
+
+  // 縦の枝を作る．
+  for (ymuint y = 0; y < mHeight - 1; ++ y) {
+    for (ymuint x = 0; x < mWidth; ++ x) {
+      ymuint id = y * mWidth + x + nh;
+      ostringstream buf;
+      buf << "V(" << x << ", " << y << ")";
+      NlEdge* edge = new NlEdge(id, buf.str());
+      mEdgeArray[id] = edge;
+    }
+  }
+
 
   // ノードを作る．
   mMaxNodeId = width * height;
   mNodeArray.resize(mMaxNodeId);
-  for (ymuint i = 0; i < mMaxNodeId; ++ i) {
-    NlNode* node = new NlNode;
-    mNodeArray[i] = node;
-    node->mId = i;
-    node->mTermId = 0;
-  }
-
-  // 辺の隣接関係を作る．
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
-      NlNode* node = _node(x, y);
-      node->mX = x;
-      node->mY = y;
-      node->mEdgeList.reserve(4);
+      ymuint id = x * mHeight + y;
+      NlNode* node = new NlNode(id, x, y);
+      mNodeArray[id] = node;
+    }
+  }
+
+  // ノードを作り，枝を接続する．
+  for (ymuint x = 0; x < mWidth; ++ x) {
+    for (ymuint y = 0; y < mHeight; ++ y) {
+      ymuint id = x * mHeight + y;
+      NlNode* node = new NlNode(id, x, y);
+      mNodeArray[id] = node;
+      vector<const NlEdge*> tmp_list;
+      tmp_list.reserve(4);
       if ( x > 0 ) {
 	// 左に辺がある．
-	ymuint edge = left_edge(x, y);
-	node->mEdgeList.push_back(edge);
+	NlEdge* edge = mEdgeArray[(x - 1) * mHeight + y];
+	tmp_list.push_back(edge);
 	node->mLeftEdge = edge;
+	edge->mNode2 = node;
       }
       if ( x < mWidth - 1 ) {
 	// 右に辺がある．
-	ymuint edge = right_edge(x, y);
-	node->mEdgeList.push_back(edge);
+	NlEdge* edge = mEdgeArray[x * mHeight + y];
+	tmp_list.push_back(edge);
 	node->mRightEdge = edge;
+	edge->mNode1 = node;
       }
       if ( y > 0 ) {
 	// 上に辺がある．
-	ymuint edge = upper_edge(x, y);
-	node->mEdgeList.push_back(edge);
+	NlEdge* edge = mEdgeArray[(y - 1) * mWidth + x + nh];
+	tmp_list.push_back(edge);
 	node->mUpperEdge = edge;
+	edge->mNode2 = node;
       }
       if ( y < mHeight - 1 ) {
 	// 下に辺がある．
-	ymuint edge = lower_edge(x, y);
-	node->mEdgeList.push_back(edge);
+	NlEdge* edge = mEdgeArray[y * mWidth + x + nh];
+	tmp_list.push_back(edge);
 	node->mLowerEdge = edge;
+	edge->mNode1 = node;
       }
+      node->mEdgeList = tmp_list;
     }
   }
 
@@ -143,30 +170,6 @@ NlGraph::set_problem(const NlProblem& problem)
       mTermArray[k * 2 + 1] = node2;
     }
   }
-}
-
-// @brief 枝番号から枝を表す文字列を返す．
-// @param[in] edge_id 枝番号
-string
-NlGraph::edge_str(ymuint edge_id) const
-{
-  if ( edge_id < mHbase ) {
-    return "---";
-  }
-  if ( edge_id < mVbase ) {
-    ymuint tmp = edge_id - mHbase;
-    ymuint x = tmp / mHeight;
-    ymuint y = tmp % mHeight;
-    ostringstream buf;
-    buf << "H(" << x << ", " << y << ")";
-    return buf.str();
-  }
-  ymuint tmp = edge_id - mVbase;
-  ymuint x = tmp % mWidth;
-  ymuint y = tmp / mWidth;
-  ostringstream buf;
-  buf << "V(" << x << ", " << y << ")";
-  return buf.str();
 }
 
 END_NAMESPACE_YM_NLINK

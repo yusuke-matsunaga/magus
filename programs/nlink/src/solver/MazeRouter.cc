@@ -9,6 +9,8 @@
 
 #include "MazeRouter.h"
 #include "NlGraph.h"
+#include "NlNode.h"
+#include "NlEdge.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -38,7 +40,7 @@ ymuint
 MazeRouter::labeling(const NlGraph& graph,
 		     ymuint idx,
 		     bool dir,
-		     vector<ymuint>& edge_list,
+		     vector<const NlEdge*>& edge_list,
 		     vector<ymuint>& index_list)
 {
   ASSERT_COND( idx < graph.num() );
@@ -119,11 +121,11 @@ MazeRouter::label1(const NlGraph& graph,
 		   Dir dir,
 		   ymuint label,
 		   vector<const NlNode*>& cell_list,
-		   vector<ymuint>& edge_list)
+		   vector<const NlEdge*>& edge_list)
 {
   ymuint x = node->x();
   ymuint y = node->y();
-  ymuint edge;
+  const NlEdge* edge;
   switch ( dir ) {
   case DirUp:
     edge = node->upper_edge();

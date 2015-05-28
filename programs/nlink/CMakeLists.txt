@@ -42,11 +42,6 @@ set (solver_SOURCES
   src/solver/NlSolver1.cc
   src/solver/NlSolver2.cc
   src/solver/NlSolver3.cc
-  src/solver/MazeRouter.cc
-  src/solver/NlSolverFr.cc
-  src/solver/FrontierInfo.cc
-  src/solver/FrNode.cc
-  src/solver/FrgGraph.cc
   )
 
 set (nlink_SOURCES

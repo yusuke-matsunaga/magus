@@ -14,8 +14,6 @@
 
 BEGIN_NAMESPACE_YM_NLINK
 
-class NlNode;
-
 //////////////////////////////////////////////////////////////////////
 /// @class NlEdge NlEdge.h "NlEdge.h"
 /// @brief number link のグラフの枝を表すクラス
@@ -27,7 +25,10 @@ class NlEdge
 public:
 
   /// @brief コンストラクタ
-  NlEdge();
+  /// @param[in] id ID番号
+  /// @param[in] str デバッグ用の文字列
+  NlEdge(ymuint id,
+	 const string& str);
 
   /// @brief デストラクタ
   ~NlEdge();
@@ -50,6 +51,10 @@ public:
   const NlNode*
   node2() const;
 
+  /// @brief 内容を表す文字列を返す．
+  string
+  str() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -71,6 +76,9 @@ private:
   // 接続するノード
   const NlNode* mNode2;
 
+  // 内容を表す文字列
+  string mStr;
+
 };
 
 
@@ -79,10 +87,14 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
+// @param[in] id ID番号
+// @param[in] str デバッグ用の文字列
 inline
-NlEdge::NlEdge()
+NlEdge::NlEdge(ymuint id,
+	       const string& str) :
+  mId(id),
+  mStr(str)
 {
-  mId = 0;
   mNode1 = NULL;
   mNode2 = NULL;
 }
@@ -115,6 +127,14 @@ const NlNode*
 NlEdge::node2() const
 {
   return mNode2;
+}
+
+// @brief 内容を表す文字列を返す．
+inline
+string
+NlEdge::str() const
+{
+  return mStr;
 }
 
 END_NAMESPACE_YM_NLINK
