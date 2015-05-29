@@ -62,11 +62,9 @@ private:
   /// @brief 経路を求める．
   /// @param[in] node 始点のノード
   /// @param[in] model SATの解
-  /// @param[in] path_list 経路上の枝を納めるリスト
   const NlNode*
   search_path(const NlNode* node,
-	      const vector<Bool3>& model,
-	      vector<const NlEdge*>& path_list);
+	      const vector<Bool3>& model);
 
   /// @brief 解を出力する．
   /// @param[in] graph 問題を表すグラフ

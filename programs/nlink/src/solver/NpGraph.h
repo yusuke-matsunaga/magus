@@ -44,16 +44,26 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief chordal graph に変形する．
-  /// @param[in] solver SAT ソルバ
+  /// @brief 経路を反例に加える．
+  /// @param[in] solver SATソルバ
+  /// @param[in] model SATの解
+  /// @param[in] id1, id2 経路の両端のノード番号
   void
-  make_chordal(SatSolver& solver);
+  add_path(SatSolver& solver,
+	   const vector<Bool3>& model,
+	   ymuint id1,
+	   ymuint id2);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief chordal graph に変形する．
+  /// @param[in] solver SAT ソルバ
+  void
+  make_chordal(SatSolver& solver);
 
   /// @brief short-cut 枝を追加する．
   /// @param[in] solver SATソルバ

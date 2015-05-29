@@ -205,34 +205,42 @@ NlSolver0::solve(const NlProblem& problem,
        << "# of clauses:   " << solver.clause_num() << endl
        << "# of literals:  " << solver.literal_num() << endl;
 
-  vector<Bool3> model;
-  Bool3 stat = solver.solve(model);
-  if ( stat == kB3X ) {
-    cerr << "ABORT" << endl;
-    return;
-  }
-  if ( stat == kB3False ) {
-    cerr << "UNSAT" << endl;
-    return;
-  }
 
   mNodeArray.clear();
   mNodeArray.resize(graph.max_node_id(), 0);
 
-  for (ymuint i = 0; i < mNum; ++ i) {
-    const NlNode* node1 = graph.start_node(i);
-    const NlNode* node2 = graph.end_node(i);
-    vector<const NlEdge*> path_list;
-    //cout << " route check #" << (i + 1) << endl;
-    const NlNode* end_node = search_path(node1, model, path_list);
-    if ( end_node == node2 ) {
-      //cout << " route check #" << (i + 1) << " OK" << endl;
+  for ( ; ; ) {
+    vector<Bool3> model;
+    Bool3 stat = solver.solve(model);
+    if ( stat == kB3X ) {
+      cerr << "ABORT" << endl;
+      return;
     }
-    else {
-      cout << " route check #" << (i + 1) << " NG" << endl;
+    if ( stat == kB3False ) {
+      cerr << "UNSAT" << endl;
+      return;
+    }
+
+    bool success = true;
+    for (ymuint i = 0; i < mNum; ++ i) {
+      const NlNode* node1 = graph.start_node(i);
+      const NlNode* node2 = graph.end_node(i);
+          //cout << " route check #" << (i + 1) << endl;
+      const NlNode* end_node = search_path(node1, model);
+      if ( end_node == node2 ) {
+	//cout << " route check #" << (i + 1) << " OK" << endl;
+      }
+      else {
+	cout << " route check #" << (i + 1) << " NG" << endl;
+	np_graph.add_path(solver, node1->id(), node2->id());
+	success = false;
+      }
+    }
+    if ( success ) {
+      setup_solution(graph, model, solution);
+      braek;
     }
   }
-  setup_solution(graph, model, solution);
 }
 
 // @brief 基本的な制約を作る．
@@ -282,17 +290,14 @@ NlSolver0::make_base_cnf(SatSolver& solver,
 // @brief 経路を求める．
 // @param[in] node ノード
 // @param[in] model SATの解
-// @param[in] path_list 経路上の枝を納めるリスト
 const NlNode*
 NlSolver0::search_path(const NlNode* node,
-		       const vector<Bool3>& model,
-		       vector<const NlEdge*>& path_list)
+		       const vector<Bool3>& model)
 {
   ymuint idx = node->terminal_id();
 
   const NlEdge* from_edge = NULL;
   for ( ; ; ) {
-    //cout << " node(" << node->x() << ", " << node->y() << ")" << endl;
     mNodeArray[node->id()] = idx;
     const vector<const NlEdge*>& edge_list = node->edge_list();
     const NlNode* next_node = NULL;
@@ -322,7 +327,6 @@ NlSolver0::search_path(const NlNode* node,
     }
     node = next_node;
     from_edge = next_edge;
-    path_list.push_back(next_edge);
   }
 }
 

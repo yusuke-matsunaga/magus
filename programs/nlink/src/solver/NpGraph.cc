@@ -98,6 +98,151 @@ NpGraph::~NpGraph()
   }
 }
 
+// @brief 経路を反例に加える．
+// @param[in] solver SATソルバ
+// @param[in] id1, id2 経路の両端のノード番号
+void
+NpGraph::add_path(SatSolver& solver,
+		  const vector<Bool3>& model,
+		  ymuint id1,
+		  ymuint id2)
+{
+  NpNode* node1 = mNodeArray[id1];
+  NpNode* node2 = mNodeArray[id2];
+
+  ASSERT_COND( find_edge(node1, node2) == NULL );
+
+  // node1, node2 間の最短経路を求める．
+  vector<int> label(mNodeArray.size(), -1);
+  vector<NpNode*> node_list;
+  node_list.reserve(mNodeArray.size());
+  vector<NpEdge*> edge_list;
+  edge_list.reserve(mNodeArray.size());
+  node_list.push_back(node1);
+  label[node1->id()] = 0;
+
+  bool reached = false;
+  ymuint rpos = 0;
+  for (ymuint l = 0; ; ++ l) {
+    ymuint endmark = node_list.size();
+    for ( ; rpos < endmark; ++ rpos) {
+      NpNode* node = node_list[rpos];
+      if ( node == node2 ) {
+	// ラベルが到達した．
+	reached = true;
+	// バックトレースする．
+	ASSERT_COND( label[node->id()] == l );
+	edge_list.resize(l);
+	for ( ; ; ) {
+	  if ( node == node1 ) {
+	    break;
+	  }
+	  const vector<NpNode*>& adj_list = node->adj_node_list();
+	  const vector<NpEdge*>& edge_list = node->edge_list();
+	  for (ymuint i = 0; i < adj_list.size(); ++ i) {
+	    NpEdge* edge = edge_list[i];
+	    if ( model[edge->var().val()] != kB3True ) {
+	      continue;
+	    }
+	    NpNode* prev_node = adj_list[i];
+	    if ( label[prev_node->id()] == l - 1 ) {
+	      edge_list[l - 1] = edge;
+	      node = prev_node;
+	      break;
+	    }
+	  }
+	}
+	break;
+      }
+      const vector<NpNode*>& adj_list = node->adj_node_list();
+      const vector<NpEdge*>& edge_list = node->edge_list();
+      for (ymuint i = 0; i < adj_list.size(); ++ i) {
+	NpEdge* edge = edge_list[i];
+	if ( model[edge->var().val()] != kB3True ) {
+	  continue;
+	}
+	NpNode* next_node = adj_list[i];
+	if ( label[next_node->id()] >= 0 ) {
+	  continue;
+	}
+	node_list.push_back(next_node);
+	label[next_node->id()] = l + 1;
+      }
+    }
+  }
+
+  // edge_list を三角分割する．
+  split_path(solver, edge_list);
+}
+
+Literal
+NpGraph::split_path(SatSolver& solver,
+		    const vector<NpEdge*>& edge_list)
+{
+  ymuint n = edge_list.size();
+  ASSERT_COND( n > 1 );
+
+  if ( n == 2 ) {
+    NpEdge* edge1 = edge_list[0];
+    NpNode* node1_1 = edge1->node1();
+    NpNode* node1_2 = edge1->node2();
+
+    NpEdge* edge2 = edge_list[1];
+    NpNode* node2_1 = edge2->node1();
+    NpNode* node2_2 = edge2->node2();
+
+    NpNode* s_node;
+    NpNode* e_node;
+
+    if ( node1_1 == node2_1 ) {
+      s_node = node1_2;
+      e_node = node2_2;
+    }
+    else if ( node1_1 == node2_2 ) {
+      s_node = node1_2;
+      e_node = node2_1;
+    }
+    else if ( node1_2 == node2_1 ) {
+      s_node = node1_1;
+      e_node = node2_2;
+    }
+    else { // node1_2 == node2_2
+      s_node = node1_1;
+      e_node = node2_1;
+    }
+
+    VarId var3 = solver.new_var();
+    connect(s_node, e_node, var3, true);
+
+    Literal lit1(edge1->var());
+    Literal lit2(edge2->var());
+    Literal lit3(var);
+
+    solver.add_clause(~lit1, ~lit2,  lit3);
+    solver.add_clause(~lit1,  lit2, ~lit3);
+    solver.add_clause( lit1, ~lit2, ~lit3);
+
+    return lit3;
+  }
+  else {
+    ymuint nl = n / 2;
+    ymuint nr = n - nl;
+    vector<NpEdge*> l_list(nl);
+    for (ymuint i = 0; i < nl; ++ i) {
+      l_list[i] = edge_list[i];
+    }
+    Literal lit1 = split_path(solver, l_list);
+
+    vector<NpEdge*> r_list(nr);
+    for (ymuint i = 0; i < nr; ++ i) {
+      r_list[i] = edge_list[i + nl];
+    }
+    Literal lit2 = split_path(solver, r_list);
+
+
+  }
+}
+
 // @brief chordal graph に変形する．
 // @param[in] solver SAT ソルバ
 void
