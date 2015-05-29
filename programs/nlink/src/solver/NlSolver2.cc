@@ -196,6 +196,10 @@ NlSolver2::solve(const NlProblem& problem,
     solver.reg_msg_handler(msg_handler);
   }
 
+  cout << "# of variables: " << solver.variable_num() << endl
+       << "# of clauses:   " << solver.clause_num() << endl
+       << "# of literals:  " << solver.literal_num() << endl;
+
   vector<Bool3> model;
   Bool3 stat = solver.solve(model);
   switch ( stat ) {

@@ -13,6 +13,7 @@
 #include "NlGraph.h"
 #include "NlNode.h"
 #include "NlEdge.h"
+#include "NpGraph.h"
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
 
@@ -191,8 +192,7 @@ NlSolver0::solve(const NlProblem& problem,
 
   make_base_cnf(solver, graph);
 
-  mNodeArray.clear();
-  mNodeArray.resize(graph.max_node_id(), 0);
+  NpGraph np_graph(solver, graph, mEdgeVarArray);
 
   solution.init(problem);
 
@@ -201,43 +201,38 @@ NlSolver0::solve(const NlProblem& problem,
     solver.reg_msg_handler(msg_handler);
   }
 
-  for ( ; ; ) {
-    vector<Bool3> model;
-    Bool3 stat = solver.solve(model);
-    if ( stat == kB3X ) {
-      cerr << "ABORT" << endl;
-      return;
-    }
-    if ( stat == kB3False ) {
-      cerr << "UNSAT" << endl;
-      return;
-    }
+  cout << "# of variables: " << solver.variable_num() << endl
+       << "# of clauses:   " << solver.clause_num() << endl
+       << "# of literals:  " << solver.literal_num() << endl;
 
-    bool has_error = false;
-    for (ymuint i = 0; i < mNum; ++ i) {
-      const NlNode* node1 = graph.start_node(i);
-      const NlNode* node2 = graph.end_node(i);
-      vector<const NlEdge*> path_list;
-      const NlNode* end_node = search_path(node1, model, path_list);
-      if ( end_node != node2 ) {
-	// 違う端子とつながっていた．
-	// path_list の変数を反例として記録
-	ymuint n = path_list.size();
-	vector<Literal> tmp_list(n);
-	for (ymuint i = 0; i < n; ++ i) {
-	  const NlEdge* edge = path_list[i];
-	  tmp_list[i] = Literal(edge_var(edge), true);
-	}
-	solver.add_clause(tmp_list);
+  vector<Bool3> model;
+  Bool3 stat = solver.solve(model);
+  if ( stat == kB3X ) {
+    cerr << "ABORT" << endl;
+    return;
+  }
+  if ( stat == kB3False ) {
+    cerr << "UNSAT" << endl;
+    return;
+  }
 
-	has_error = true;
-      }
+  mNodeArray.clear();
+  mNodeArray.resize(graph.max_node_id(), 0);
+
+  for (ymuint i = 0; i < mNum; ++ i) {
+    const NlNode* node1 = graph.start_node(i);
+    const NlNode* node2 = graph.end_node(i);
+    vector<const NlEdge*> path_list;
+    //cout << " route check #" << (i + 1) << endl;
+    const NlNode* end_node = search_path(node1, model, path_list);
+    if ( end_node == node2 ) {
+      //cout << " route check #" << (i + 1) << " OK" << endl;
     }
-    if ( !has_error ) {
-      setup_solution(graph, model, solution);
-      break;
+    else {
+      cout << " route check #" << (i + 1) << " NG" << endl;
     }
   }
+  setup_solution(graph, model, solution);
 }
 
 // @brief 基本的な制約を作る．
@@ -297,6 +292,7 @@ NlSolver0::search_path(const NlNode* node,
 
   const NlEdge* from_edge = NULL;
   for ( ; ; ) {
+    //cout << " node(" << node->x() << ", " << node->y() << ")" << endl;
     mNodeArray[node->id()] = idx;
     const vector<const NlEdge*>& edge_list = node->edge_list();
     const NlNode* next_node = NULL;
@@ -310,6 +306,8 @@ NlSolver0::search_path(const NlNode* node,
       if ( model[var.val()] != kB3True ) {
 	continue;
       }
+
+      //cout << "  edge: " << edge->str() << endl;
 
       next_node = edge->node1();
       if ( next_node == node ) {
