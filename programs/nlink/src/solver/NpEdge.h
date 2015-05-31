@@ -49,6 +49,10 @@ public:
   NpNode*
   node2() const;
 
+  /// @brief 反対のノードを返す．
+  NpNode*
+  alt_node(NpNode* node) const;
+
   /// @brief 変数番号を返す．
   VarId
   var() const;
@@ -114,6 +118,14 @@ NpNode*
 NpEdge::node2() const
 {
   return mNode2;
+}
+
+// @brief 反対のノードを返す．
+inline
+NpNode*
+NpEdge::alt_node(NpNode* node) const
+{
+  return (node == mNode1) ? mNode2 : mNode1;
 }
 
 // @brief 変数番号を返す．

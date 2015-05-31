@@ -49,10 +49,10 @@ public:
   /// @param[in] model SATの解
   /// @param[in] id1, id2 経路の両端のノード番号
   void
-  add_path(SatSolver& solver,
-	   const vector<Bool3>& model,
-	   ymuint id1,
-	   ymuint id2);
+  add_path_constr(SatSolver& solver,
+		  const vector<Bool3>& model,
+		  ymuint id1,
+		  ymuint id2);
 
 
 private:
@@ -64,6 +64,17 @@ private:
   /// @param[in] solver SAT ソルバ
   void
   make_chordal(SatSolver& solver);
+
+  /// @brief 経路を表すリテラルを求める．
+  /// @param[in] solver SATソルバ
+  /// @param[in] edge_list 枝のリスト
+  /// @param[in] start_pos 始点
+  /// @param[in] end_pos 終点
+  Literal
+  make_path_literal(SatSolver& solver,
+		    const vector<NpEdge*>& edge_list,
+		    ymuint start_pos,
+		    ymuint end_pos);
 
   /// @brief short-cut 枝を追加する．
   /// @param[in] solver SATソルバ

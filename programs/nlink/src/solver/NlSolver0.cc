@@ -225,20 +225,19 @@ NlSolver0::solve(const NlProblem& problem,
     for (ymuint i = 0; i < mNum; ++ i) {
       const NlNode* node1 = graph.start_node(i);
       const NlNode* node2 = graph.end_node(i);
-          //cout << " route check #" << (i + 1) << endl;
       const NlNode* end_node = search_path(node1, model);
       if ( end_node == node2 ) {
 	//cout << " route check #" << (i + 1) << " OK" << endl;
       }
       else {
 	cout << " route check #" << (i + 1) << " NG" << endl;
-	np_graph.add_path(solver, node1->id(), node2->id());
+	np_graph.add_path_constr(solver, model, node1->id(), end_node->id());
 	success = false;
       }
     }
     if ( success ) {
       setup_solution(graph, model, solution);
-      braek;
+      break;
     }
   }
 }
@@ -296,28 +295,31 @@ NlSolver0::search_path(const NlNode* node,
 {
   ymuint idx = node->terminal_id();
 
+  // SAT の制約で端子から端子までの経路は一意に決まるので
+  // それをたどる．
   const NlEdge* from_edge = NULL;
   for ( ; ; ) {
+    // ノードに番号を書いておく．
     mNodeArray[node->id()] = idx;
+
     const vector<const NlEdge*>& edge_list = node->edge_list();
     const NlNode* next_node = NULL;
     const NlEdge* next_edge = NULL;
     for (ymuint i = 0; i < edge_list.size(); ++ i) {
       const NlEdge* edge = edge_list[i];
       if ( from_edge == edge ) {
+	// 今来た枝は辿らない．
 	continue;
       }
+
       VarId var = edge_var(edge);
       if ( model[var.val()] != kB3True ) {
+	// 選ばれていない枝も辿らない．
 	continue;
       }
 
-      //cout << "  edge: " << edge->str() << endl;
-
-      next_node = edge->node1();
-      if ( next_node == node ) {
-	next_node = edge->node2();
-      }
+      // edge の反対側のノード
+      next_node = edge->alt_node(node);
       next_edge = edge;
       break;
     }

@@ -51,6 +51,11 @@ public:
   const NlNode*
   node2() const;
 
+  /// @brief 相方のノードを返す．
+  /// @param[in] node ノード
+  const NlNode*
+  alt_node(const NlNode* node) const;
+
   /// @brief 内容を表す文字列を返す．
   string
   str() const;
@@ -127,6 +132,15 @@ const NlNode*
 NlEdge::node2() const
 {
   return mNode2;
+}
+
+// @brief 相方のノードを返す．
+// @param[in] node ノード
+inline
+const NlNode*
+NlEdge::alt_node(const NlNode* node) const
+{
+  return (mNode1 == node) ? mNode2 : mNode1;
 }
 
 // @brief 内容を表す文字列を返す．
