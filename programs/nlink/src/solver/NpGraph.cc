@@ -99,6 +99,7 @@ NpGraph::NpGraph(SatSolver& solver,
   }
 #endif
 
+#if 1
   // 対角線に枝を張る．
   ymuint w = src_graph.width();
   ymuint h = src_graph.height();
@@ -108,6 +109,7 @@ NpGraph::NpGraph(SatSolver& solver,
       add_shortcut(solver, src_graph, x + 1, y,     x,     y + 1);
     }
   }
+#endif
 
   make_chordal(solver);
 }
@@ -331,30 +333,27 @@ NpGraph::make_path_literal(SatSolver& solver,
 void
 NpGraph::make_chordal(SatSolver& solver)
 {
+#if 1
   for (ymuint id = 0; id < mNodeArray.size(); ++ id) {
     NpNode* node = mNodeArray[id];
-    const vector<NpNode*>& adj_list = node->adj_node_list();
     const vector<NpEdge*>& edge_list = node->edge_list();
-    vector<NpNode*> tmp_list;
     vector<NpEdge*> tmp_edge_list;
-    tmp_list.reserve(adj_list.size());
-    tmp_edge_list.reserve(adj_list.size());
-    for (ymuint i = 0; i < adj_list.size(); ++ i) {
-      NpNode* node1 = adj_list[i];
+    tmp_edge_list.reserve(edge_list.size());
+    for (ymuint i = 0; i < edge_list.size(); ++ i) {
+      NpEdge* edge1 = edge_list[i];
+      NpNode* node1 = edge1->alt_node(node);
       if ( node1->id() < id ) {
 	continue;
       }
-      tmp_list.push_back(node1);
-      tmp_edge_list.push_back(edge_list[i]);
+      tmp_edge_list.push_back(edge1);
     }
-    for (ymuint i1 = 0; i1 < tmp_list.size(); ++ i1) {
-      NpNode* node1 = tmp_list[i1];
+    for (ymuint i1 = 0; i1 < tmp_edge_list.size(); ++ i1) {
       NpEdge* edge1 = tmp_edge_list[i1];
-      const vector<NpNode*>& adj_list1 = node1->adj_node_list();
-      const vector<NpEdge*>& edge_list1 = node1->edge_list();
-      for (ymuint i2 = i1 + 1; i2 < tmp_list.size(); ++ i2) {
-	NpNode* node2 = tmp_list[i2];
+      NpNode* node1 = edge1->alt_node(node);
+      for (ymuint i2 = i1 + 1; i2 < tmp_edge_list.size(); ++ i2) {
 	NpEdge* edge2 = tmp_edge_list[i2];
+	NpNode* node2 = edge2->alt_node(node);
+
 	NpEdge* edge3 = find_edge(node1, node2);
 	VarId var3;
 	if ( edge3 == NULL ) {
@@ -375,6 +374,81 @@ NpGraph::make_chordal(SatSolver& solver)
       }
     }
   }
+#else
+  vector<bool> mark(mNodeArray.size(), false);
+  for (ymuint i = 0; i < mNodeArray.size(); ++ i) {
+    // もっとも追加する枝が少ない節点を選ぶ．
+    ymuint min_id;
+    ymuint min_num = mNodeArray.size(); // <- 特に意味はない
+    vector<NpEdge*> min_edge_list;
+    for (ymuint id = 0; id < mNodeArray.size(); ++ id) {
+      if ( mark[id] ) {
+	continue;
+      }
+      NpNode* node = mNodeArray[id];
+      const vector<NpEdge*>& edge_list = node->edge_list();
+      vector<NpEdge*> tmp_edge_list;
+      tmp_edge_list.reserve(edge_list.size());
+      for (ymuint i = 0; i < edge_list.size(); ++ i) {
+	NpEdge* edge = edge_list[i];
+	NpNode* node1 = edge->alt_node(node);
+	if ( mark[node1->id()] ) {
+	  continue;
+	}
+	tmp_edge_list.push_back(edge);
+      }
+      ymuint num = 0;
+      for (ymuint i1 = 0; i1 < tmp_edge_list.size(); ++ i1) {
+	NpEdge* edge1 = tmp_edge_list[i1];
+	NpNode* node1 = edge1->alt_node(node);
+	for (ymuint i2 = i1 + 1; i2 < tmp_edge_list.size(); ++ i2) {
+	  NpEdge* edge2 = tmp_edge_list[i2];
+	  NpNode* node2 = edge2->alt_node(node2);
+	  NpEdge* edge3 = find_edge(node1, node2);
+	  VarId var3;
+	  if ( edge3 == NULL ) {
+	    ++ num;
+	  }
+	}
+      }
+      if ( min_num > num ) {
+	min_num = num;
+	min_id = id;
+	min_edge_list = tmp_edge_list;
+      }
+    }
+
+    mark[min_id] = true;
+    NpNode* node = mNodeArray[min_id];
+    for (ymuint i1 = 0; i1 < min_edge_list.size(); ++ i1) {
+      NpEdge* edge1 = min_edge_list[i1];
+      NpNode* node1 = edge1->alt_node(node);
+      for (ymuint i2 = i1 + 1; i2 < min_edge_list.size(); ++ i2) {
+	NpEdge* edge2 = min_edge_list[i2];
+	NpNode* node2 = edge2->alt_node(node);
+	NpEdge* edge3 = find_edge(node1, node2);
+	VarId var3;
+	if ( edge3 == NULL ) {
+	  var3 = solver.new_var();
+	  connect(node1, node2, var3, true);
+	}
+	else {
+	  var3 = edge3->var();
+	}
+
+	// edge1->var(), edge2->var(), var3 の間の推移律を制約に加える．
+	Literal lit1(edge1->var());
+	Literal lit2(edge2->var());
+	Literal lit3(var3);
+	solver.add_clause(~lit1, ~lit2,  lit3);
+	solver.add_clause(~lit1,  lit2, ~lit3);
+	solver.add_clause( lit1, ~lit2, ~lit3);
+      }
+    }
+  }
+
+#endif
+
   cout << "make_chordal end: # of nodes          = " << mNodeArray.size() << endl
        << "                  # of original edges = " << mOrigEdgeList.size() << endl
        << "                  # of auxially edges = " << mAuxEdgeList.size() << endl;
