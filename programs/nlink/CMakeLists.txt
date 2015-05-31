@@ -43,6 +43,7 @@ set (solver_SOURCES
   src/solver/NpGraph.cc
   src/solver/NlSolver1.cc
   src/solver/NlSolver2.cc
+  src/solver/NlSolver2_5.cc
   src/solver/NlSolver3.cc
   )
 

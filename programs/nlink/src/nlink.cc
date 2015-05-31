@@ -13,6 +13,7 @@
 #include "NlSolver0.h"
 #include "NlSolver1.h"
 #include "NlSolver2.h"
+#include "NlSolver2_5.h"
 #include "NlSolverGs.h"
 
 
@@ -40,6 +41,10 @@ nlink(const string& filename,
   }
   else if ( method == 2 ) {
     NlSolver2 solver(sat_type);
+    solver.solve(problem, verbose, solution);
+  }
+  else if ( method == 25 ) {
+    NlSolver2_5 solver(sat_type);
     solver.solve(problem, verbose, solution);
   }
   else if ( method == 3 ) {
@@ -75,6 +80,10 @@ main(int argc,
     }
     else if ( strcmp(argv[i], "-2") == 0 ) {
       method = 2;
+      ++ base;
+    }
+    else if ( strcmp(argv[i], "-2_5") == 0 ) {
+      method = 25;
       ++ base;
     }
     else if ( strcmp(argv[i], "-gs") == 0 ) {

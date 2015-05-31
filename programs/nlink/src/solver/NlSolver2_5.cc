@@ -204,6 +204,7 @@ NlSolver2_5::solve(const NlProblem& problem,
   Bool3 stat = solver.solve(model);
   switch ( stat ) {
   case kB3True:
+    cout << "SAT" << endl;
     setup_solution(graph, model, solution);
     break;
 
@@ -243,98 +244,83 @@ NlSolver2_5::make_base_cnf(SatSolver& solver,
   ymuint max_edge_id = graph.max_edge_id();
 
   // 枝の変数(枝数 x log(線分数 + 1))を作る．
+  mSelVarArray.clear();
+  mSelVarArray.resize(max_edge_id);
   mVarArray.clear();
   mVarArray.resize(max_edge_id * ln);
   for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
+    VarId var = solver.new_var();
+    mSelVarArray[edge_id] = var;
     for (ymuint i = 0; i < ln; ++ i) {
-      VarId var = solvner.new_var();
+      VarId var = solver.new_var();
       mVarArray[edge_id * ln + i] = var;
     }
   }
 
-  // 同じノード上で異なる線分が交わらないための条件を作る．
-  for (ymuint x = 0; x < width; ++ x) {
-    for (ymuint y = 0; y < height; ++ y) {
-      const NlNode* node = graph.node(x, y);
-      const vector<const NlEdge*>& edge_list = node->edge_list();
-      ymuint ne = edge_list.size();
+  // 枝の条件を作る．
+  ymuint max_node_id = graph.max_node_id();
+  for (ymuint node_id = 0; node_id < max_node_id; ++ node_id) {
+    const NlNode* node = graph.node(node_id);
+    const vector<const NlEdge*>& edge_list = node->edge_list();
+    ymuint ne = edge_list.size();
+    // ノードに隣接する枝のリテラルのリストを作る．
+    vector<Literal> lit_list(ne);
+    for (ymuint i = 0; i < ne; ++ i) {
+      const NlEdge* edge = edge_list[i];
+      VarId var = mSelVarArray[edge->id()];
+      lit_list[i] = Literal(var);
+    }
+
+    ymuint term_id = node->terminal_id();
+    if ( term_id > 0 ) {
+      // 端点の場合
+      // 必ずただ1つの枝が選ばれる．
+      one_hot(solver, lit_list);
+
+#if 1
       for (ymuint i1 = 0; i1 < ne; ++ i1) {
 	const NlEdge* edge1 = edge_list[i1];
-	vector<Literal> tmp_lits(ln + 1);
-	for (ymuint i1 = 0; i1 < ln; ++ i1) {
-	  VarId var1 = edge_var(edge1, i1);
-	  Literal lit1(var1);
-	  tmp_lits[i1] = lit1;
-	}
-	for (ymuint i2 = i1 + 1; i2 < ne; ++ i2) {
-	  if ( i1 == i2 ) {
-	    continue;
+	Literal clit = lit_list[i1];
+	for (ymuint j = 0; j < ln; ++ j) {
+	  VarId var = edge_var(edge1, j);
+	  Literal lit(var);
+	  if ( (1U << j) & term_id ) {
+	    solver.add_clause(~clit,  lit);
+	    solver.add_clause( clit, ~lit);
 	  }
-	  const NlEdge* edge2 = edge_list[i2];
-	  for (ymuint i2 = 0; i2 < ln + 1) {
-	    VarId var2 = edge_var(edge2, i2);
-	    Literal lit2(var2);
-	    tmp_lits[ln] = ~lit2;
+	  else {
+	    solver.add_clause(~lit);
 	  }
-	  solver.add_clause(tmp_lits);
 	}
       }
+#endif
     }
-  }
+    else {
+      // そうでない場合
+      // 0個か2個の枝が選ばれる．
+      zero_two_hot(solver, lit_list);
 
-  // 枝が径路となる条件を作る．
-  for (ymuint x = 0; x < width; ++ x) {
-    for (ymuint y = 0; y < height; ++ y) {
-      const NlNode* node = graph.node(x, y);
-      const vector<const NlEdge*>& edge_list = node->edge_list();
-      ymuint ne = edge_list.size();
-      for (ymuint k = 0; k < num; ++ k) {
-	// (x, y) のノードに隣接する枝のリテラルのリストを作る．
-	vector<Literal> lit_list(ne);
-	for (ymuint i = 0; i < ne; ++ i) {
-	  const NlEdge* edge = edge_list[i];
-	  VarId var = edge_var(edge, k);
-	  lit_list[i] = Literal(var);
-	}
+#if 1
+      for (ymuint i1 = 0; i1 < ne; ++ i1) {
+	const NlEdge* edge1 = edge_list[i1];
+	Literal clit1 = lit_list[i1];
 
-	ymuint term_id = node->terminal_id();
-	if ( term_id > 0 ) {
-	  // 端点の場合
-	  // 必ずただ1つの枝が選ばれる．
-	  vector<Literal> tmp_lits(ln + 1);
-	  for (ymuint i1 = 0; i1 < ne; ++ i1) {
-	    const NlEdge* edge = edge_list[i1];
-	    for (ymuint j = 0; j < ln; ++ j) {
-	      VarId var = edge_var(edge, j);
-	      Literal lit(var);
-	      if ( term_id & (1U << j) ) {
-		tmp_lits[j] = ~lit;
-	      }
-	      else {
-		tmp_lits[j] = lit;
-	      }
-	    }
-	    for (ymuint i2 = 0; i2 < ne; ++ i2) {
-	      if ( i1 == i2 ) {
-		continue;
-	      }
-	      const NlEdge* edge2 = edge_list[i2];
-	      for (ymuint j = 0; j < ln; ++ j) {
-		VarId var = edge_var(edge2, j);
-		Literal lit2(var);
-		tmp_lits[ln] = ~lit2;
-	      }
-	      solver.add_clause(tmp_lits);
-	    }
+	for (ymuint i2 = i1 + 1; i2 < ne; ++ i2) {
+	  const NlEdge* edge2 = edge_list[i2];
+	  Literal clit2 = lit_list[i2];
+
+	  for (ymuint j = 0; j < ln; ++ j) {
+	    VarId var1 = edge_var(edge1, j);
+	    Literal lit1(var1);
+	    VarId var2 = edge_var(edge2, j);
+	    Literal lit2(var2);
+
+	    solver.add_clause(~clit1, ~clit2,  lit1, ~lit2);
+	    solver.add_clause(~clit1, ~clit2, ~lit1,  lit2);
 	  }
 	}
-	else {
-	  // そうでない場合
-	  // 0個か2個の枝が選ばれる．
-	  vector<Literal> tmp_lits(ln + 1);
-
-	}
       }
+#endif
     }
   }
 }
@@ -344,8 +330,8 @@ NlSolver2_5::make_base_cnf(SatSolver& solver,
 // @param[in] solution 解
 void
 NlSolver2_5::setup_solution(const NlGraph& graph,
-			  const vector<Bool3>& model,
-			  NlSolution& solution)
+			    const vector<Bool3>& model,
+			    NlSolution& solution)
 {
   ymuint width = graph.width();
   ymuint height = graph.height();
@@ -357,18 +343,17 @@ NlSolver2_5::setup_solution(const NlGraph& graph,
       }
       const NlNode* node = graph.node(x, y);
       const vector<const NlEdge*>& edge_list = node->edge_list();
-      bool found = false;
       for (ymuint i = 0; i < edge_list.size(); ++ i) {
 	const NlEdge* edge = edge_list[i];
-	for (ymuint k = 0; k < num; ++ k) {
-	  VarId var = edge_var(edge, k);
+	ymuint k = 0;
+	for (ymuint j = 0; j < mLogN; ++ j) {
+	  VarId var = edge_var(edge, j);
 	  if ( model[var.val()] == kB3True ) {
-	    solution.set(x, y, k + 1);
-	    found = true;
-	    break;
+	    k += (1U << j);
 	  }
 	}
-	if ( found ) {
+	if ( k > 0 ) {
+	  solution.set(x, y, k);
 	  break;
 	}
       }
@@ -385,7 +370,7 @@ NlSolver2_5::edge_var(const NlEdge* edge,
 {
   ASSERT_COND( edge != NULL );
 
-  return mVarArray[edge->id() * mNum + idx];
+  return mVarArray[edge->id() * mLogN + idx];
 }
 
 END_NAMESPACE_YM_NLINK

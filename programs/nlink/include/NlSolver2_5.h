@@ -90,6 +90,9 @@ private:
   // 線分数の log
   ymuint mLogN;
 
+  // 枝の選択状態を表す変数番号の配列
+  vector<VarId> mSelVarArray;
+
   // 枝の変数番号の配列
   // サイズは枝数 x log(線分数)
   vector<VarId> mVarArray;
