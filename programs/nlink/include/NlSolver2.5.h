@@ -1,8 +1,8 @@
-#ifndef NLSOLVER1_H
-#define NLSOLVER1_H
+#ifndef NLSOLVER2_5_H
+#define NLSOLVER2_5_H
 
-/// @file NlSolver1.h
-/// @brief NlSolver1 のヘッダファイル
+/// @file NlSolver2_5.h
+/// @brief NlSolver2_5 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
@@ -16,21 +16,21 @@
 BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
-/// @class NlSolver1 NlSolver1.h "NlSolver1.h"
+/// @class NlSolver2_5 NlSolver2_5.h "NlSolver2_5.h"
 /// @brief number link を解くためのクラス
 //////////////////////////////////////////////////////////////////////
-class NlSolver1 :
+class NlSolver2_5 :
   public NlSolver
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] sat_type SATソルバ名
-  NlSolver1(const string& sat_type);
+  NlSolver2_5(const string& sat_type);
 
   /// @brief デストラクタ
   virtual
-  ~NlSolver1();
+  ~NlSolver2_5();
 
 
 public:
@@ -68,17 +68,12 @@ private:
 		 const vector<Bool3>& model,
 		 NlSolution& solution);
 
-  /// @brief 節点の変数番号を得る．
-  /// @param[in] node 節点
-  /// @param[in] idx 線分番号
-  VarId
-  node_var(const NlNode* node,
-	   ymuint idx) const;
-
   /// @brief 枝の変数番号を得る．
   /// @param[in] edge 枝
+  /// @param[in] idx 線分番号
   VarId
-  edge_var(const NlEdge* edge) const;
+  edge_var(const NlEdge* edge,
+	   ymuint idx) const;
 
 
 private:
@@ -92,19 +87,15 @@ private:
   // 線分数
   ymuint mNum;
 
-  // mNum の log
+  // 線分数の log
   ymuint mLogN;
 
-  // 節点の変数番号の配列
-  // サイズは節点数 x log(線分数)
-  vector<VarId> mNodeVarArray;
-
   // 枝の変数番号の配列
-  // サイズは枝数
-  vector<VarId> mEdgeVarArray;
+  // サイズは枝数 x log(線分数)
+  vector<VarId> mVarArray;
 
 };
 
 END_NAMESPACE_YM_NLINK
 
-#endif // NLSOLVER1_H
+#endif // NLSOLVER2_5_H
