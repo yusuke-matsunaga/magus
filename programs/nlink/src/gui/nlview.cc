@@ -14,13 +14,12 @@
 #include <QApplication>
 
 
-int
-main(int argc,
-     char** argv)
-{
-  using namespace nsYm::nsNlink;
-  using namespace std;
+BEGIN_NAMESPACE_YM_NLINK
 
+int
+nlview(int argc,
+       char** argv)
+{
   QApplication app(argc, argv);
 
   char* filename = argv[1];
@@ -38,4 +37,13 @@ main(int argc,
   view->show();
 
   return app.exec();
+}
+
+END_NAMESPACE_YM_NLINK
+
+int
+main(int argc,
+     char** argv)
+{
+  return nsYm::nsNlink::nlview(argc, argv);
 }

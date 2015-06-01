@@ -9,6 +9,8 @@
 
 #include "NlSolution.h"
 #include "NlProblem.h"
+#include "NlScanner.h"
+#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -30,14 +32,15 @@ NlSolution::~NlSolution()
 {
 }
 
-// @brief 初期化する．
-// @param[in] problem 問題
+// @brief サイズを設定する．
+// @param[in] width 幅
+// @param[in] height 高さ
 void
-NlSolution::init(const NlProblem& problem)
+NlSolution::set_size(ymuint width,
+		     ymuint height)
 {
-  mWidth = problem.width();
-  mHeight = problem.height();
-  mNum = problem.elem_num();
+  mWidth = width;
+  mHeight = height;
 
   ymuint n = mWidth * mHeight;
   mCellArray.clear();
@@ -45,7 +48,16 @@ NlSolution::init(const NlProblem& problem)
   for (ymuint i = 0; i < n; ++ i) {
     mCellArray[i] = 0;
   }
+}
 
+// @brief 初期化する．
+// @param[in] problem 問題
+void
+NlSolution::init(const NlProblem& problem)
+{
+  set_size(problem.width(), problem.height());
+
+  mNum = problem.elem_num();
   for (ymuint i = 0; i < mNum; ++ i) {
     NlConnection con = problem.connection(i);
     set(con.start_point(), -(i + 1));
@@ -217,6 +229,74 @@ NlSolution::index_to_point(ymuint index) const
   ymuint y;
   index_to_xy(index, x, y);
   return NlPoint(x, y);
+}
+
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+NlSolution::write(ostream& s) const
+{
+  s << "SIZE " << width() << "X" << height() << endl;
+  ios::fmtflags fsave = s.flags();
+  s.fill('0');
+  for (ymuint y = 0; y < height(); ++ y) {
+    const char* comma = "";
+    for (ymuint x = 0; x < width(); ++ x) {
+      int val = get(x, y);
+      if ( val < 0 ) {
+	val = - val;
+      }
+      s << comma << setw(2) << val;
+      comma = ",";
+    }
+    s << endl;
+  }
+  s.flags(fsave);
+}
+
+// @relates NlProblem
+// @brief 問題を読み込む．
+// @param[in] filename ファイル名
+// @return 問題を返す．
+NlSolution
+read_solution(const string& filename)
+{
+  FileIDO ido;
+  if ( !ido.open(filename) ) {
+    cerr << filename << ": no such file" << endl;
+    goto error;
+  }
+
+  {
+    NlScanner scanner(ido);
+
+    ymuint width;
+    ymuint height;
+
+    if ( !scanner.read_SIZE(width, height) ) {
+      cerr << "read error: expecting 'SIZE'" << endl;
+      goto error;
+    }
+
+    NlSolution solution;
+
+    solution.set_size(width, height);
+
+    for (ymuint y = 0; y < height; ++ y) {
+      vector<ymuint> num_array(width);
+      if ( !scanner.read_SOLUTION(width, num_array) ) {
+	goto error;
+      }
+      for (ymuint x = 0; x < width; ++ x) {
+	solution.set(x, y, num_array[x]);
+      }
+    }
+
+    return solution;
+  }
+
+ error:
+  return NlSolution();
 }
 
 // @relates NlSolution

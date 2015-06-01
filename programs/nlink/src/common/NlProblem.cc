@@ -177,6 +177,21 @@ NlProblem::end_point(ymuint idx) const
   return mElemArray[idx].end_point();
 }
 
+// @brief 内容を出力する．
+// @param[in] s 出力先のストリーム
+void
+NlProblem::write(ostream& s) const
+{
+  s << "SIZE        " << width() << "X" << height() << endl
+    << "LINE_NUM    " << elem_num() << endl;
+  for (ymuint i = 0; i < elem_num(); ++ i) {
+    NlConnection con = connection(i);
+    s << "LINE#" << (i + 1) << " ("
+      << con.start_point().x() << ", " << con.start_point().y() << ") - ("
+      << con.end_point().x() << ", " << con.end_point().y() << ")" << endl;
+  }
+}
+
 // @relates NlProblem
 // @brief 問題を読み込む．
 // @param[in] filename ファイル名
@@ -235,16 +250,6 @@ void
 print_problem(ostream& s,
 	      const NlProblem& problem)
 {
-#if 0
-  s << "SIZE        " << problem.width() << "X" << problem.height() << endl
-    << "LINE_NUM    " << problem.elem_num() << endl;
-  for (ymuint i = 0; i < problem.elem_num(); ++ i) {
-    NlConnection con = problem.connection(i);
-    s << "LINE#" << (i + 1) << " ("
-      << con.start_point().x() << ", " << con.start_point().y() << ") - ("
-      << con.end_point().x() << ", " << con.end_point().y() << ")" << endl;
-  }
-#endif
   ymuint w = problem.width();
   ymuint h = problem.height();
   ymuint n = problem.elem_num();

@@ -64,6 +64,15 @@ public:
 	    ymuint& x2,
 	    ymuint& y2);
 
+  /// @brief 解の一行を読み込む．
+  /// @param[in] width 幅
+  /// @param[out] num_array 番号の配列(サイズは width)
+  /// @retval true 読み込みが成功した．
+  /// @retval false 読み込みが失敗した．
+  bool
+  read_SOLUTION(ymuint width,
+		vector<ymuint>& num_array);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

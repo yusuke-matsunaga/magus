@@ -57,7 +57,8 @@ nlink(const string& filename,
     solver.solve(problem, verbose, solution);
   }
 
-  print_solution(cout, solution);
+  //print_solution(cout, solution);
+  solution.write(cout);
 }
 
 END_NAMESPACE_YM_NLINK

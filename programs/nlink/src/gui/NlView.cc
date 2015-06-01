@@ -139,7 +139,7 @@ NlView::paintEvent(QPaintEvent* event)
   }
 
   QColor frame_color(180, 150, 100);
-  QColor ban_color(0x50, 0x50, 0x50);
+  QColor ban_color(0xB0, 0xB0, 0xB0);
   QColor line_color(0, 0, 0);
   QColor wire_color(0, 0, 200);
 
@@ -199,7 +199,7 @@ NlView::paintEvent(QPaintEvent* event)
 	cx1 = x0 + mGridSize + mInnerMargin - mWireWidth / 2;
 	val1 = -val1;
       }
-      if ( val0 == val1 ) {
+      if ( val0 == val1 && val0 > 0 ) {
 	painter.drawLine(cx0, cy, cx1, cy);
       }
     }
@@ -224,7 +224,7 @@ NlView::paintEvent(QPaintEvent* event)
 	cy1 = y0 + mGridSize + mInnerMargin - mWireWidth / 2;
 	val1 = -val1;
       }
-      if ( val0 == val1 ) {
+      if ( val0 == val1 && val0 > 0 ) {
 	painter.drawLine(cx, cy0, cx, cy1);
       }
     }

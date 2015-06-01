@@ -142,6 +142,11 @@ public:
   NlPoint
   end_point(ymuint idx) const;
 
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  write(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////

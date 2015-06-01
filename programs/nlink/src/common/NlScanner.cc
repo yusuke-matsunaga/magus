@@ -156,6 +156,30 @@ NlScanner::read_LINE(ymuint& x1,
   return expect_NL();
 }
 
+// @brief 解の一行を読み込む．
+// @param[in] width 幅
+// @param[out] num_array 番号の配列(サイズは width)
+// @retval true 読み込みが成功した．
+// @retval false 読み込みが失敗した．
+bool
+NlScanner::read_SOLUTION(ymuint width,
+			 vector<ymuint>& num_array)
+{
+  for (ymuint i = 0; i < width; ++ i) {
+    if ( i > 0 ) {
+      if ( !expect_STRING(",") ) {
+	return false;
+      }
+    }
+    ymuint num;
+    if ( !expect_NUMBER(num) ) {
+      return false;
+    }
+    num_array[i] = num;
+  }
+  return true;
+}
+
 // @brief 数字を読み込む．
 // @param[out] num 読み込んだ値を入れる変数
 // @retval true 読み込みが成功した．

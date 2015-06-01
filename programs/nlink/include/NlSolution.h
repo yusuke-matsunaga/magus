@@ -34,6 +34,13 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief サイズを設定する．
+  /// @param[in] width 幅
+  /// @param[in] height 高さ
+  void
+  set_size(ymuint width,
+	   ymuint height);
+
   /// @brief 初期化する．
   /// @param[in] problem 問題
   void
@@ -82,6 +89,11 @@ public:
   bool
   verify() const;
 
+  /// @brief 内容を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  write(ostream& s) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -129,6 +141,13 @@ private:
   vector<int> mCellArray;
 
 };
+
+/// @relates NlProblem
+/// @brief 問題を読み込む．
+/// @param[in] filename ファイル名
+/// @return 問題を返す．
+NlSolution
+read_solution(const string& filename);
 
 /// @relates NlSolution
 /// @brief 解を出力する．
