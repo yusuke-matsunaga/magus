@@ -10,7 +10,6 @@
 #include "NlView.h"
 #include "NlProblem.h"
 #include "NlSolution.h"
-#include "NlSolverGs.h"
 #include <QApplication>
 
 
@@ -22,19 +21,39 @@ nlview(int argc,
 {
   QApplication app(argc, argv);
 
-  char* filename = argv[1];
+  char* solution_filename = NULL;
+  ymuint base = 1;
+  for (ymuint i = 1;i < argc; ++ i) {
+    if ( argv[i][0] != '-' ) {
+      base = i;
+      break;
+    }
+    if ( strcmp(argv[i], "--solution") == 0 ) {
+      ++ i;
+      if ( i >= argc ) {
+	cerr << " --solution requires filename" << endl;
+	return 1;
+      }
+      solution_filename = argv[i];
+    }
+    else {
+      cerr << argv[i] << ": unknown option" << endl;
+      return 1;
+    }
+  }
+
+  char* filename = argv[base];
   NlProblem problem = read_problem(filename);
 
-  NlSolverGs solver;
-  NlSolution solution;
-
-  solver.solve(problem, false, solution);
-
-  print_solution(cout, solution);
-
-  NlView* view = new NlView(solution);
-
-  view->show();
+  if ( solution_filename != NULL ) {
+    NlSolution solution = read_solution(solution_filename, problem);
+    NlView* view = new NlView(solution);
+    view->show();
+  }
+  else {
+    NlView* view = new NlView(problem);
+    view->show();
+  }
 
   return app.exec();
 }
