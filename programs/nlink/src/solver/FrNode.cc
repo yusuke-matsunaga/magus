@@ -27,6 +27,38 @@ FrNode::~FrNode()
 {
 }
 
+// @brief 0終端ノードを作る．
+FrNode*
+FrNode::const0()
+{
+  FrNode* node = new FrNode(0);
+  node->mConstFlag = 0;
+  return node;
+}
+
+// @brief 1終端ノードを作る．
+FrNode*
+FrNode::const1()
+{
+  FrNode* node = new FrNode(0);
+  node->mConstFlag = 1;
+  return node;
+}
+
+// @brief 0終端ノードの時 true を返す．
+bool
+FrNode::is_const0() const
+{
+  return mConstFlag == 0;
+}
+
+// @brief 1終端ノードの時 true を返す．
+bool
+FrNode::is_const1() const
+{
+  return mConstFlag == 1;
+}
+
 // @brief 枝番号を返す．
 ymuint
 FrNode::edge_id() const
@@ -60,6 +92,20 @@ FrNode*
 FrNode::edge1() const
 {
   return mEdge1;
+}
+
+// @brif 0枝をセットする．
+void
+FrNode::set_edge0(FrNode* node)
+{
+  mEdge0 = node;
+}
+
+// @brif 1枝をセットする．
+void
+FrNode::set_edge1(FrNode* node)
+{
+  mEdge1 = node;
 }
 
 END_NAMESPACE_YM_NLINK

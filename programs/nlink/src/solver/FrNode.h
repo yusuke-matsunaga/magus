@@ -30,11 +30,29 @@ public:
   /// @brief デストラクタ
   ~FrNode();
 
+  /// @brief 0終端ノードを作る．
+  static
+  FrNode*
+  const0();
+
+  /// @brief 1終端ノードを作る．
+  static
+  FrNode*
+  const1();
+
 
 public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief 0終端ノードの時 true を返す．
+  bool
+  is_const0() const;
+
+  /// @brief 1終端ノードの時 true を返す．
+  bool
+  is_const1() const;
 
   /// @brief 枝番号を返す．
   ymuint
@@ -52,9 +70,17 @@ public:
   FrNode*
   edge0() const;
 
-  /// @brief 0枝の先のノードを返す．
+  /// @brief 1枝の先のノードを返す．
   FrNode*
   edge1() const;
+
+  /// @brif 0枝をセットする．
+  void
+  set_edge0(FrNode* node);
+
+  /// @brif 1枝をセットする．
+  void
+  set_edge1(FrNode* node);
 
 
 private:
@@ -67,6 +93,12 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // 定数フラグ
+  // 0: 0終端
+  // 1: 1終端
+  // 2: それ以外
+  ymuint mConstFlag;
 
   // 枝番号
   ymuint mEdgeId;

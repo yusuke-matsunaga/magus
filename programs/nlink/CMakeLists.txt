@@ -45,6 +45,9 @@ set (solver_SOURCES
   src/solver/NlSolver2.cc
   src/solver/NlSolver2_5.cc
   src/solver/NlSolver3.cc
+  src/solver/NlSolverFr.cc
+  src/solver/FrontierInfo.cc
+  src/solver/FrNode.cc
   )
 
 set (nlink_SOURCES

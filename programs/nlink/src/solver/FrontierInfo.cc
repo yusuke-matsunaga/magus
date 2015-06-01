@@ -61,6 +61,18 @@ FrontierInfo::deg(ymuint pos) const
   return mNodeList[pos].mDeg;
 }
 
+// @brief 次数を1つ増やす．
+// @param[in] pos ノードの位置番号
+//
+// pos はこのフロンティア内の相対的な位置
+// ノード番号ではない．
+void
+FrontierInfo::inc_deg(ymuint pos)
+{
+  ASSERT_COND( pos < node_num() );
+  ++ mNodeList[pos].mDeg;
+}
+
 // @brief 連結成分番号を返す．
 // @param[in] pos ノードの位置番号
 //
@@ -73,6 +85,20 @@ FrontierInfo::comp(ymuint pos) const
 {
   ASSERT_COND( pos < node_num() );
   return mNodeList[pos].mComp;
+}
+
+// @brief 連結成分番号の書き換えを行う．
+// @param[in] old_comp 旧番号
+// @param[in] new_comp 新番号
+void
+FrontierInfo::replace_comp(int old_comp,
+			   int new_comp)
+{
+  for (ymuint i = 0; i < node_num(); ++ i) {
+    if ( mNodeList[i].mComp == old_comp ) {
+      mNodeList[i].mComp = new_comp;
+    }
+  }
 }
 
 // @brief ノードを削除する．
@@ -94,6 +120,48 @@ FrontierInfo::delete_node(ymuint pos)
   mNodeList.erase(mNodeList.begin() + wpos, mNodeList.end());
 }
 
+// @brief ノードを削除する．
+// @param[in] del_list 削除するノード番号のリスト
+void
+FrontierInfo::delete_nodes(const vector<ymuint>& del_list)
+{
+  ymuint dpos = 0;
+  ymuint rpos = 0;
+  ymuint wpos = 0;
+  while ( rpos < node_num() && dpos < del_list.size() ) {
+    ymuint id = mNodeList[rpos].mId;
+    ymuint did = del_list[dpos];
+    if ( id < did ) {
+      if ( wpos < rpos ) {
+	mNodeList[wpos] = mNodeList[rpos];
+      }
+      ++ wpos;
+      ++ rpos;
+    }
+    else if ( id == did ) {
+      ++ rpos;
+      ++ dpos;
+      if ( dpos >= del_list.size() ) {
+	break;
+      }
+    }
+    else {
+      ++ dpos;
+      if ( dpos >= del_list.size() ) {
+	break;
+      }
+    }
+  }
+  while ( rpos < node_num() ) {
+    if ( wpos < rpos ) {
+      mNodeList[wpos] = mNodeList[rpos];
+    }
+    ++ rpos;
+    ++ wpos;
+  }
+  mNodeList.erase(mNodeList.begin() + wpos, mNodeList.end());
+}
+
 // @brief ノードを追加する．
 // @param[in] node_id ノード番号
 // @param[in] deg 次数
@@ -106,6 +174,17 @@ FrontierInfo::add_node(ymuint node_id,
 		       int comp_id)
 {
   mNodeList.push_back(Node(node_id, deg, comp_id));
+}
+
+// @brief 内容を出力する．
+void
+FrontierInfo::dump(ostream& s) const
+{
+  for (ymuint i = 0; i < node_num(); ++ i) {
+    const Node& node = mNodeList[i];
+    cout << "#" << node.mId << ": " << node.mDeg << ", " << node.mComp << endl;
+  }
+  cout << endl;
 }
 
 END_NAMESPACE_YM_NLINK

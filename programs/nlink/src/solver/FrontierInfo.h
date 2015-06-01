@@ -55,6 +55,14 @@ public:
   ymuint
   deg(ymuint pos) const;
 
+  /// @brief 次数を1つ増やす．
+  /// @param[in] pos ノードの位置番号
+  ///
+  /// pos はこのフロンティア内の相対的な位置
+  /// ノード番号ではない．
+  void
+  inc_deg(ymuint pos);
+
   /// @brief 連結成分番号を返す．
   /// @param[in] pos ノードの位置番号
   ///
@@ -64,6 +72,13 @@ public:
   /// を返す．
   int
   comp(ymuint pos) const;
+
+  /// @brief 連結成分番号の書き換えを行う．
+  /// @param[in] old_comp 旧番号
+  /// @param[in] new_comp 新番号
+  void
+  replace_comp(int old_comp,
+	       int new_comp);
 
   /// @brief ノードを削除する．
   /// @param[in] pos ノードの位置番号
@@ -85,6 +100,10 @@ public:
   add_node(ymuint node_id,
 	   ymuint deg,
 	   int comp_id);
+
+  /// @brief 内容を出力する．
+  void
+  dump(ostream& s) const;
 
 
 private:
