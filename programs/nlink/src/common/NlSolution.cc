@@ -257,9 +257,11 @@ NlSolution::write(ostream& s) const
 // @relates NlProblem
 // @brief 問題を読み込む．
 // @param[in] filename ファイル名
+// @param[in] problem 問題
 // @return 問題を返す．
 NlSolution
-read_solution(const string& filename)
+read_solution(const string& filename,
+	      const NlProblem& problem)
 {
   FileIDO ido;
   if ( !ido.open(filename) ) {
@@ -280,7 +282,12 @@ read_solution(const string& filename)
 
     NlSolution solution;
 
-    solution.set_size(width, height);
+    solution.init(problem);
+
+    if ( solution.width() != width ||
+	 solution.height() != height ) {
+      return solution;
+    }
 
     for (ymuint y = 0; y < height; ++ y) {
       vector<ymuint> num_array(width);
@@ -288,7 +295,9 @@ read_solution(const string& filename)
 	goto error;
       }
       for (ymuint x = 0; x < width; ++ x) {
-	solution.set(x, y, num_array[x]);
+	if ( solution.get(x, y) == 0 ) {
+	  solution.set(x, y, num_array[x]);
+	}
       }
     }
 
@@ -314,14 +323,14 @@ print_solution(ostream& s,
       int val = solution.get(x, y);
       if ( val < 0 ) {
 	val = - val;
-	cout << "*";
+	s << "*";
       }
       else {
-	cout << " ";
+	s << " ";
       }
-      cout << setw(2) << val;
+      s << setw(2) << val;
     }
-    cout << endl;
+    s << endl;
   }
 }
 

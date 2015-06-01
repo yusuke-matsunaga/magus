@@ -167,7 +167,7 @@ NlScanner::read_SOLUTION(ymuint width,
 {
   for (ymuint i = 0; i < width; ++ i) {
     if ( i > 0 ) {
-      if ( !expect_STRING(",") ) {
+      if ( !expect_COMMA() ) {
 	return false;
       }
     }
@@ -177,7 +177,7 @@ NlScanner::read_SOLUTION(ymuint width,
     }
     num_array[i] = num;
   }
-  return true;
+  return expect_NL();
 }
 
 // @brief 数字を読み込む．

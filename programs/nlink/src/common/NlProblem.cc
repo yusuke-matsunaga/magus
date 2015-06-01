@@ -259,23 +259,23 @@ print_problem(ostream& s,
     mark[con.start_point().x() * h + con.start_point().y()] = i + 1;
     mark[con.end_point().x() * h + con.end_point().y()] = i + 1;
   }
-  cout << "   ";
+  s << "   ";
   for (ymuint x = 0; x < w; ++ x) {
-    cout << " " << setw(2) << x;
+    s << " " << setw(2) << x;
   }
-  cout << endl;
+  s << endl;
   for (ymuint y = 0; y < h; ++ y) {
-    cout << " " << setw(2) << y;
+    s << " " << setw(2) << y;
     for (ymuint x = 0; x < w; ++ x) {
       ymuint label = mark[x * h + y];
       if ( label > 0 ) {
-	cout << " " << setw(2) << label;
+	s << " " << setw(2) << label;
       }
       else {
-	cout << "   ";
+	s << "   ";
       }
     }
-    cout << endl;
+    s << endl;
   }
 }
 

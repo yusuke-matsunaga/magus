@@ -145,9 +145,11 @@ private:
 /// @relates NlProblem
 /// @brief 問題を読み込む．
 /// @param[in] filename ファイル名
+/// @param[in] problem 問題
 /// @return 問題を返す．
 NlSolution
-read_solution(const string& filename);
+read_solution(const string& filename,
+	      const NlProblem& problem);
 
 /// @relates NlSolution
 /// @brief 解を出力する．
