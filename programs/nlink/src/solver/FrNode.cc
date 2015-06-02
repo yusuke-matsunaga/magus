@@ -17,8 +17,11 @@ BEGIN_NAMESPACE_YM_NLINK
 
 // @brief コンストラクタ
 // @param[in] edge_id 枝番号
-FrNode::FrNode(ymuint edge_id) :
-  mEdgeId(edge_id)
+// @param[in] fr フロンティアの情報
+FrNode::FrNode(ymuint edge_id,
+	       const FrontierInfo& fr) :
+  mEdgeId(edge_id),
+  mFrontierInfo(fr)
 {
 }
 
@@ -31,7 +34,7 @@ FrNode::~FrNode()
 FrNode*
 FrNode::const0()
 {
-  FrNode* node = new FrNode(0);
+  FrNode* node = new FrNode(0, FrontierInfo());
   node->mConstFlag = 0;
   return node;
 }
@@ -40,7 +43,7 @@ FrNode::const0()
 FrNode*
 FrNode::const1()
 {
-  FrNode* node = new FrNode(0);
+  FrNode* node = new FrNode(0, FrontierInfo());
   node->mConstFlag = 1;
   return node;
 }
@@ -73,13 +76,6 @@ FrNode::frontier_info() const
   return mFrontierInfo;
 }
 
-// @brief フロンティア情報を返す．
-FrontierInfo&
-FrNode::frontier_info()
-{
-  return mFrontierInfo;
-}
-
 // @brief 0枝の先のノードを返す．
 FrNode*
 FrNode::edge0() const
@@ -94,18 +90,13 @@ FrNode::edge1() const
   return mEdge1;
 }
 
-// @brif 0枝をセットする．
+// @brif 0枝と1枝をセットする．
 void
-FrNode::set_edge0(FrNode* node)
+FrNode::set_child(FrNode* node0,
+		  FrNode* node1)
 {
-  mEdge0 = node;
-}
-
-// @brif 1枝をセットする．
-void
-FrNode::set_edge1(FrNode* node)
-{
-  mEdge1 = node;
+  mEdge0 = node0;
+  mEdge1 = node1;
 }
 
 END_NAMESPACE_YM_NLINK

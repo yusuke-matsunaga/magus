@@ -8,6 +8,7 @@
 
 
 #include "FrontierInfo.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -176,15 +177,39 @@ FrontierInfo::add_node(ymuint node_id,
   mNodeList.push_back(Node(node_id, deg, comp_id));
 }
 
+// @brief シグネチャを求める．
+string
+FrontierInfo::signature() const
+{
+  HashMap<int, ymuint> sig_map;
+  ostringstream buf;
+  for (ymuint i = 0; i < node_num(); ++ i) {
+    const Node& node = mNodeList[i];
+    int comp = node.mComp;
+    ymuint val;
+    if ( comp < 0 ) {
+      val = (-comp) * 2;
+    }
+    else {
+      if ( !sig_map.find(comp, val) ) {
+	val = i;
+	sig_map.add(comp, val);
+      }
+      val = val * 2 + 1;
+    }
+    buf << node.mDeg << ":" << val << ":";
+  }
+  return buf.str();
+}
+
 // @brief 内容を出力する．
 void
 FrontierInfo::dump(ostream& s) const
 {
   for (ymuint i = 0; i < node_num(); ++ i) {
     const Node& node = mNodeList[i];
-    cout << "#" << node.mId << ": " << node.mDeg << ", " << node.mComp << endl;
+    s << "#" << node.mId << ": " << node.mDeg << ", " << node.mComp << endl;
   }
-  cout << endl;
 }
 
 END_NAMESPACE_YM_NLINK

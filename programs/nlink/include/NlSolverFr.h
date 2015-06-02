@@ -55,6 +55,12 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 枝の順序付けを行う．
+  void
+  ordering(const NlGraph& graph,
+	   vector<const NlEdge*>& edge_list);
+
+  /// @brief フロンティアの更新を行う．
   bool
   update_frontier(FrontierInfo& fr,
 		  const NlEdge* edge,

@@ -25,7 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] edge_id
-  FrNode(ymuint edge_id);
+  /// @param[in] fr フロンティアの情報
+  FrNode(ymuint edge_id,
+	 const FrontierInfo& fr);
 
   /// @brief デストラクタ
   ~FrNode();
@@ -62,10 +64,6 @@ public:
   const FrontierInfo&
   frontier_info() const;
 
-  /// @brief フロンティア情報を返す．
-  FrontierInfo&
-  frontier_info();
-
   /// @brief 0枝の先のノードを返す．
   FrNode*
   edge0() const;
@@ -74,13 +72,10 @@ public:
   FrNode*
   edge1() const;
 
-  /// @brif 0枝をセットする．
+  /// @brif 0枝と1枝をセットする．
   void
-  set_edge0(FrNode* node);
-
-  /// @brif 1枝をセットする．
-  void
-  set_edge1(FrNode* node);
+  set_child(FrNode* node0,
+	    FrNode* node1);
 
 
 private:
@@ -111,6 +106,11 @@ private:
 
   // 1枝
   FrNode* mEdge1;
+
+
+public:
+
+  string mBits;
 
 };
 

@@ -101,6 +101,10 @@ public:
 	   ymuint deg,
 	   int comp_id);
 
+  /// @brief シグネチャを求める．
+  string
+  signature() const;
+
   /// @brief 内容を出力する．
   void
   dump(ostream& s) const;
