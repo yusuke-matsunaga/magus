@@ -61,6 +61,21 @@ private:
 	   vector<const NlEdge*>& edge_list);
 
   /// @brief フロンティアの更新を行う．
+  /// @param[inout] frontier_nodes フロンティアノードのリスト
+  /// @param[in] edge 新しく加わる枝
+  /// @param[in] del_list 削除されるノードのフロンティアリスト上の位置
+  /// @param[out] pos1, pos2 枝の両端のノードの位置
+  ///
+  /// pos1, pos2 は該当のノードがない場合には -1 を返す．
+  void
+  calc_frontier(vector<const NlNode*>& frontier_nodes,
+		const NlEdge* edge,
+		ymuint max_node_id,
+		vector<ymuint>& del_list,
+		int& pos1,
+		int& pos2);
+
+  /// @brief フロンティアの更新を行う．
   bool
   update_frontier(FrontierInfo& fr,
 		  const NlEdge* edge,

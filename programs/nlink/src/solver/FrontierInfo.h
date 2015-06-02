@@ -81,12 +81,7 @@ public:
 	       int new_comp);
 
   /// @brief ノードを削除する．
-  /// @param[in] pos ノードの位置番号
-  void
-  delete_node(ymuint pos);
-
-  /// @brief ノードを削除する．
-  /// @param[in] del_list 削除するノード番号のリスト
+  /// @param[in] del_list 削除するノードの位置番号のリスト
   void
   delete_nodes(const vector<ymuint>& del_list);
 
@@ -94,8 +89,6 @@ public:
   /// @param[in] node_id ノード番号
   /// @param[in] deg 次数
   /// @param[in] comp_id 連結成分番号
-  ///
-  /// deg は 1 となる．
   void
   add_node(ymuint node_id,
 	   ymuint deg,

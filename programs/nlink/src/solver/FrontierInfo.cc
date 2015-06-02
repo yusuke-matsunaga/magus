@@ -103,61 +103,26 @@ FrontierInfo::replace_comp(int old_comp,
 }
 
 // @brief ノードを削除する．
-// @param[in] pos ノードの位置番号
-void
-FrontierInfo::delete_node(ymuint pos)
-{
-  ASSERT_COND( pos < node_num() );
-  ymuint wpos = 0;
-  for (ymuint rpos = 0; rpos < node_num(); ++ rpos) {
-    if ( pos != rpos ) {
-      const Node& node = mNodeList[rpos];
-      if ( wpos != rpos ) {
-	mNodeList[wpos] = node;
-      }
-      ++ wpos;
-    }
-  }
-  mNodeList.erase(mNodeList.begin() + wpos, mNodeList.end());
-}
-
-// @brief ノードを削除する．
-// @param[in] del_list 削除するノード番号のリスト
+// @param[in] del_list 削除するノードのの位置番号のリスト
 void
 FrontierInfo::delete_nodes(const vector<ymuint>& del_list)
 {
-  ymuint dpos = 0;
   ymuint rpos = 0;
   ymuint wpos = 0;
-  while ( rpos < node_num() && dpos < del_list.size() ) {
-    ymuint id = mNodeList[rpos].mId;
-    ymuint did = del_list[dpos];
-    if ( id < did ) {
+  for (ymuint i = 0; i < del_list.size(); ++ i) {
+    ymuint dpos = del_list[i];
+    for ( ; rpos < dpos; ++ rpos) {
       if ( wpos < rpos ) {
 	mNodeList[wpos] = mNodeList[rpos];
       }
       ++ wpos;
-      ++ rpos;
     }
-    else if ( id == did ) {
-      ++ rpos;
-      ++ dpos;
-      if ( dpos >= del_list.size() ) {
-	break;
-      }
-    }
-    else {
-      ++ dpos;
-      if ( dpos >= del_list.size() ) {
-	break;
-      }
-    }
+    ++ rpos;
   }
-  while ( rpos < node_num() ) {
+  for ( ; rpos < mNodeList.size(); ++ rpos) {
     if ( wpos < rpos ) {
       mNodeList[wpos] = mNodeList[rpos];
     }
-    ++ rpos;
     ++ wpos;
   }
   mNodeList.erase(mNodeList.begin() + wpos, mNodeList.end());
