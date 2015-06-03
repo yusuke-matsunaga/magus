@@ -101,6 +101,7 @@ NlSolverFr::solve(const NlProblem& problem,
     cout << endl;
     cout << "Level#" << i << ": " << node_list.size()
 	 << "  edge = " << edge->str() << endl;
+#if 0
     {
       cout << "Frontiers = ";
       for (ymuint i = 0; i < frontier_nodes.size(); ++ i) {
@@ -108,10 +109,12 @@ NlSolverFr::solve(const NlProblem& problem,
       }
       cout << endl;
     }
+#endif
+    ymuint orig_num = 0;
     HashMap<string, FrNode*> node_hash;
     for (ymuint j = 0; j < node_list.size(); ++ j) {
       FrNode* node = node_list[j];
-#if 1
+#if 0
       cout << endl;
       cout << "FR:" << node->mBits << endl;
       node->frontier_info().dump(cout);
@@ -129,17 +132,21 @@ NlSolverFr::solve(const NlProblem& problem,
 	ymuint deg = fr0.deg(dpos);
 	if ( node->terminal_id() > 0 ) {
 	  if ( deg != 1 ) {
+	    ng1 = true;
+#if 0
 	    cout << "A: " << node->str() << ".deg = " << deg
 		 << ": 1 is expected." << endl;
-	    ng1 = true;
+#endif
 	    break;
 	  }
 	}
 	else {
 	  if ( deg != 0 && deg != 2 ) {
+	    ng1 = true;
+#if 0
 	    cout << "B: " << node->str() << ".deg = " << deg
 		 << ": 0 or 2 is expected." << endl;
-	    ng1 = true;
+#endif
 	    break;
 	  }
 	}
@@ -167,11 +174,12 @@ NlSolverFr::solve(const NlProblem& problem,
 	}
 
 	fr0.delete_nodes(del_list);
-#if 1
+#if 0
 	cout << endl;
 	cout << " FR0:" << node->mBits << "0" << endl;
 	fr0.dump(cout);
 #endif
+	++ orig_num;
 	string sig0 = fr0.signature();
 	if ( node_hash.find(sig0, node0) ) {
 	  // ハッシュに同じノードが登録されていた．
@@ -220,16 +228,20 @@ NlSolverFr::solve(const NlProblem& problem,
 	  ymuint deg = fr1.deg(pos1);
 	  if ( term_id1 > 0 ) {
 	    if ( deg > 1 ) {
+	      ng2 = true;
+#if 0
 	      cout << "E: " << node1->str() << ".deg = " << deg
 		   << ": 1 is expected." << endl;
-	      ng2 = true;
+#endif
 	    }
 	  }
 	  else {
 	    if ( deg > 2 ) {
 	      ng2 = true;
+#if 0
 	      cout << "F: " << node1->str() << ".deg = " << deg
 		   << ": 0 or 2 is expected." << endl;
+#endif
 	    }
 	  }
 	}
@@ -243,16 +255,20 @@ NlSolverFr::solve(const NlProblem& problem,
 	  if ( node->terminal_id() > 0 ) {
 	    if ( deg != 1 ) {
 	      ng2 = true;
+#if 0
 	      cout << "C: " << node->str() << ".deg = " << deg
 		   << ": 1 is expected." << endl;
+#endif
 	      break;
 	    }
 	  }
 	  else {
 	    if ( deg != 0 && deg != 2 ) {
 	      ng2 = true;
+#if 0
 	      cout << "D: " << node->str() << ".deg = " << deg
 		   << ": 0 or 2 is expected." << endl;
+#endif
 	      break;
 	    }
 	  }
@@ -275,15 +291,19 @@ NlSolverFr::solve(const NlProblem& problem,
 	  if ( term_id2 > 0 ) {
 	    if ( deg > 1 ) {
 	      ng2 = true;
+#if 0
 	      cout << "E2: " << node2->str() << ".deg = " << deg
 		   << ": 1 is expected." << endl;
+#endif
 	    }
 	  }
 	  else {
 	    if ( deg > 2 ) {
 	      ng2 = true;
+#if 0
 	      cout << "F2: " << node2->str() << ".deg = " << deg
 		   << ": 0 or 2 is expected." << endl;
+#endif
 	    }
 	  }
 	}
@@ -293,7 +313,7 @@ NlSolverFr::solve(const NlProblem& problem,
 	int comp2 = fr1.comp(new_pos2);
 	if ( comp1 == comp2 && comp1 >= 0 ) {
 	  // サイクルができた．
-#if 1
+#if 0
 	  const NlNode* node1 = edge->node1();
 	  const NlNode* node2 = edge->node2();
 	  cout << "G: node1(" << node1->x() << ", " << node1->y() << ").comp = " << comp1 << endl;
@@ -303,7 +323,7 @@ NlSolverFr::solve(const NlProblem& problem,
 	}
 	else if ( comp1 < 0 && comp2 < 0 && comp1 != comp2 ) {
 	  // 異なる端子番号の先がつながった．
-#if 1
+#if 0
 	  const NlNode* node1 = edge->node1();
 	  const NlNode* node2 = edge->node2();
 	  cout << "H: node1(" << node1->x() << ", " << node1->y() << ").comp = " << comp1 << endl;
@@ -323,11 +343,12 @@ NlSolverFr::solve(const NlProblem& problem,
       if ( !ng2 ) {
 	fr1.delete_nodes(del_list);
 
-#if 1
+#if 0
 	cout << endl;
 	cout << " FR1:" << node->mBits << "1" << endl;
 	fr1.dump(cout);
 #endif
+	++ orig_num;
 	string sig1 = fr1.signature();
 	if ( node_hash.find(sig1, node1) ) {
 	  // ハッシュに同じノードが登録されていた．
@@ -352,6 +373,8 @@ NlSolverFr::solve(const NlProblem& problem,
 
       node->set_child(node0, node1);
     }
+    cout << "orig_num = " << orig_num
+	 << ", hashed num = " << new_node_list.size() << endl;
   }
 
   solution.init(problem);
