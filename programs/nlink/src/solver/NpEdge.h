@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_NLINK
 class NpEdge
 {
   friend class NpGraph;
-
+  friend class NpGraph2;
 private:
 
   /// @brief コンストラクタ

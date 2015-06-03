@@ -14,6 +14,7 @@
 #include "NlSolver1.h"
 #include "NlSolver2.h"
 #include "NlSolver2_5.h"
+#include "NlSolver4.h"
 #include "NlSolverGs.h"
 #include "NlSolverFr.h"
 
@@ -53,6 +54,10 @@ nlink(const string& filename,
     solver.solve(problem, verbose, solution);
   }
   else if ( method == 4 ) {
+    NlSolver4 solver(sat_type);
+    solver.solve(problem, verbose, solution);
+  }
+  else if ( method == 10 ) {
     NlSolverFr solver;
     solver.solve(problem, verbose, solution);
   }
@@ -92,12 +97,16 @@ main(int argc,
       method = 25;
       ++ base;
     }
+    else if ( strcmp(argv[i], "-4") == 0 ) {
+      method = 4;
+      ++ base;
+    }
     else if ( strcmp(argv[i], "-gs") == 0 ) {
       method = 3;
       ++ base;
     }
     else if ( strcmp(argv[i], "-fr") == 0 ) {
-      method = 4;
+      method = 10;
       ++ base;
     }
     else if ( strcmp(argv[i], "-minisat") == 0 ) {

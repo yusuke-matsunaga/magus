@@ -23,6 +23,7 @@ class NpEdge;
 class NpNode
 {
   friend class NpGraph;
+  friend class NpGraph2;
 private:
 
   /// @brief コンストラクタ
