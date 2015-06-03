@@ -104,7 +104,7 @@ NlSolverFr::solve(const NlProblem& problem,
     {
       cout << "Frontiers = ";
       for (ymuint i = 0; i < frontier_nodes.size(); ++ i) {
-	cout << " " << frontier_nodes[i]->id();
+	cout << " " << frontier_nodes[i]->str();
       }
       cout << endl;
     }
@@ -129,12 +129,16 @@ NlSolverFr::solve(const NlProblem& problem,
 	ymuint deg = fr0.deg(dpos);
 	if ( node->terminal_id() > 0 ) {
 	  if ( deg != 1 ) {
+	    cout << "A: " << node->str() << ".deg = " << deg
+		 << ": 1 is expected." << endl;
 	    ng1 = true;
 	    break;
 	  }
 	}
 	else {
 	  if ( deg != 0 && deg != 2 ) {
+	    cout << "B: " << node->str() << ".deg = " << deg
+		 << ": 0 or 2 is expected." << endl;
 	    ng1 = true;
 	    break;
 	  }
@@ -164,6 +168,7 @@ NlSolverFr::solve(const NlProblem& problem,
 
 	fr0.delete_nodes(del_list);
 #if 1
+	cout << endl;
 	cout << " FR0:" << node->mBits << "0" << endl;
 	fr0.dump(cout);
 #endif
@@ -193,25 +198,7 @@ NlSolverFr::solve(const NlProblem& problem,
       // 親のフロンティアをコピーする．
       FrontierInfo fr1 = node->frontier_info();
 
-      // 削除されるノードの次数をチェックする．
       bool ng2 = false;
-      for (ymuint j = 0; j < del_list.size(); ++ j) {
-	ymuint pos = del_list[j];
-	const NlNode* node = graph.node(fr1.node_id(pos));
-	ymuint deg = fr1.deg(pos);
-	if ( node->terminal_id() > 0 ) {
-	  if ( deg != 1 ) {
-	    ng2 = true;
-	    break;
-	  }
-	}
-	else {
-	  if ( deg != 0 && deg != 2 ) {
-	    ng2 = true;
-	    break;
-	  }
-	}
-      }
 
       FrNode* node1;
       ymuint new_pos1 = pos1;
@@ -233,12 +220,40 @@ NlSolverFr::solve(const NlProblem& problem,
 	  ymuint deg = fr1.deg(pos1);
 	  if ( term_id1 > 0 ) {
 	    if ( deg > 1 ) {
+	      cout << "E: " << node1->str() << ".deg = " << deg
+		   << ": 1 is expected." << endl;
 	      ng2 = true;
 	    }
 	  }
 	  else {
 	    if ( deg > 2 ) {
 	      ng2 = true;
+	      cout << "F: " << node1->str() << ".deg = " << deg
+		   << ": 0 or 2 is expected." << endl;
+	    }
+	  }
+	}
+      }
+      if ( !ng2 ) {
+	// 削除されるノードの次数をチェックする．
+	for (ymuint j = 0; j < del_list.size(); ++ j) {
+	  ymuint pos = del_list[j];
+	  const NlNode* node = graph.node(fr1.node_id(pos));
+	  ymuint deg = fr1.deg(pos);
+	  if ( node->terminal_id() > 0 ) {
+	    if ( deg != 1 ) {
+	      ng2 = true;
+	      cout << "C: " << node->str() << ".deg = " << deg
+		   << ": 1 is expected." << endl;
+	      break;
+	    }
+	  }
+	  else {
+	    if ( deg != 0 && deg != 2 ) {
+	      ng2 = true;
+	      cout << "D: " << node->str() << ".deg = " << deg
+		   << ": 0 or 2 is expected." << endl;
+	      break;
 	    }
 	  }
 	}
@@ -260,11 +275,15 @@ NlSolverFr::solve(const NlProblem& problem,
 	  if ( term_id2 > 0 ) {
 	    if ( deg > 1 ) {
 	      ng2 = true;
+	      cout << "E2: " << node2->str() << ".deg = " << deg
+		   << ": 1 is expected." << endl;
 	    }
 	  }
 	  else {
 	    if ( deg > 2 ) {
 	      ng2 = true;
+	      cout << "F2: " << node2->str() << ".deg = " << deg
+		   << ": 0 or 2 is expected." << endl;
 	    }
 	  }
 	}
@@ -274,7 +293,9 @@ NlSolverFr::solve(const NlProblem& problem,
 	int comp2 = fr1.comp(new_pos2);
 	if ( comp1 == comp2 && comp1 >= 0 ) {
 	  // サイクルができた．
-#if 0
+#if 1
+	  const NlNode* node1 = edge->node1();
+	  const NlNode* node2 = edge->node2();
 	  cout << "G: node1(" << node1->x() << ", " << node1->y() << ").comp = " << comp1 << endl;
 	  cout << "G: node2(" << node2->x() << ", " << node2->y() << ").comp = " << comp2 << endl;
 #endif
@@ -282,7 +303,9 @@ NlSolverFr::solve(const NlProblem& problem,
 	}
 	else if ( comp1 < 0 && comp2 < 0 && comp1 != comp2 ) {
 	  // 異なる端子番号の先がつながった．
-#if 0
+#if 1
+	  const NlNode* node1 = edge->node1();
+	  const NlNode* node2 = edge->node2();
 	  cout << "H: node1(" << node1->x() << ", " << node1->y() << ").comp = " << comp1 << endl;
 	  cout << "H: node2(" << node2->x() << ", " << node2->y() << ").comp = " << comp2 << endl;
 #endif
@@ -301,6 +324,7 @@ NlSolverFr::solve(const NlProblem& problem,
 	fr1.delete_nodes(del_list);
 
 #if 1
+	cout << endl;
 	cout << " FR1:" << node->mBits << "1" << endl;
 	fr1.dump(cout);
 #endif
@@ -345,22 +369,27 @@ NlSolverFr::ordering(const NlGraph& graph,
   ymuint w = graph.width();
   ymuint h = graph.height();
 
+  ymuint nall = 0;
   for (ymuint y0 = 0; y0 < h - 1; ++ y0) {
+    ymuint n = 0;
     for (ymuint d = 0; d <= y0; ++ d) {
       ymuint x = d;
       ymuint y = y0 - d;
-      if ( x >= w - 1 ) {
+      if ( x >= w ) {
 	continue;
       }
+      cout << " (" << x << ", " << y << ")";
       const NlNode* node = graph.node(x, y);
       {
+	++ n;
 	const NlEdge* edge = node->lower_edge();
 	ASSERT_COND( edge != NULL );
 	ymuint order = edge_list.size();
 	edge_list.push_back(edge);
 	mEdgeOrder[edge->id()] = order;
       }
-      {
+      if ( x < w - 1 ) {
+	++ n;
 	const NlEdge* edge = node->right_edge();
 	ASSERT_COND( edge != NULL );
 	ymuint order = edge_list.size();
@@ -368,23 +397,29 @@ NlSolverFr::ordering(const NlGraph& graph,
 	mEdgeOrder[edge->id()] = order;
       }
     }
+    cout << "               " << n << endl;
+    nall += n;
   }
   for (ymuint x0 = 1; x0 < w; ++ x0) {
-    for (ymuint d = 0; d < h - 1; ++ d) {
+    ymuint n = 0;
+    for (ymuint d = 0; d < h; ++ d) {
       ymuint x = x0 + d;
       ymuint y = h - d - 1;
       if ( x >= w ) {
 	break;
       }
+      cout << " (" << x << ", " << y << ")";
       const NlNode* node = graph.node(x, y);
       {
+	++ n;
 	const NlEdge* edge = node->left_edge();
 	ASSERT_COND( edge != NULL );
 	ymuint order = edge_list.size();
 	edge_list.push_back(edge);
 	mEdgeOrder[edge->id()] = order;
       }
-      {
+      if ( y > 0 ) {
+	++ n;
 	const NlEdge* edge = node->upper_edge();
 	ASSERT_COND( edge != NULL );
 	ymuint order = edge_list.size();
@@ -392,7 +427,12 @@ NlSolverFr::ordering(const NlGraph& graph,
 	mEdgeOrder[edge->id()] = order;
       }
     }
+    cout << "               " << n << endl;
+    nall += n;
   }
+  cout << "nall = " << nall << ", ne = " << ne << endl;
+
+  ASSERT_COND( edge_list.size() == ne );
 }
 
 // @brief フロンティアの更新を行う．
