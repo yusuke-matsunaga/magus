@@ -12,7 +12,10 @@
 #include "NlGraph.h"
 #include "NlNode.h"
 #include "NlEdge.h"
-#include "NpGraph.h"
+
+//#include "NpGraph.h"
+#include "EqSolver.h"
+
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
 
@@ -179,6 +182,8 @@ NlSolver0::solve(const NlGraph& graph,
 		 bool verbose,
 		 NlSolution& solution)
 {
+  solution.init(graph);
+
   SatSolver solver(mSatType, string(), NULL);
 
   mWidth = graph.width();
@@ -187,9 +192,39 @@ NlSolver0::solve(const NlGraph& graph,
 
   make_base_cnf(solver, graph);
 
-  NpGraph np_graph(solver, graph, mEdgeVarArray);
+  EqSolver eq_solver(graph.max_node_id());
 
-  solution.init(graph);
+  // 枝に対応する等価述語を追加する．
+  for (ymuint i = 0; i < graph.max_edge_id(); ++ i) {
+    const NlEdge* edge = graph.edge(i);
+    const NlNode* node1 = edge->node1();
+    const NlNode* node2 = edge->node2();
+    VarId var1 = edge_var(edge);
+    VarId var2 = eq_solver.add_equal(solver, node1->id(), node2->id());
+    Literal lit1(var1);
+    Literal lit2(var2);
+    solver.add_clause(~lit1, lit2);
+  }
+
+  // 異なる端子間の制約を作る．
+  for (ymuint i1 = 0; i1 < graph.num(); ++ i1) {
+    const NlNode* node1_1 = graph.start_node(i1);
+    const NlNode* node1_2 = graph.end_node(i1);
+    for (ymuint i2 = i1 + 1; i2 < graph.num(); ++ i2) {
+      const NlNode* node2_1 = graph.start_node(i2);
+      const NlNode* node2_2 = graph.end_node(i2);
+      VarId var1 = eq_solver.add_equal(solver, node1_1->id(), node2_1->id());
+      VarId var2 = eq_solver.add_equal(solver, node1_1->id(), node2_2->id());
+      VarId var3 = eq_solver.add_equal(solver, node1_2->id(), node2_1->id());
+      VarId var4 = eq_solver.add_equal(solver, node1_2->id(), node2_2->id());
+      solver.add_clause(~Literal(var1));
+      solver.add_clause(~Literal(var2));
+      solver.add_clause(~Literal(var3));
+      solver.add_clause(~Literal(var4));
+    }
+  }
+
+  eq_solver.make_constr(solver);
 
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
@@ -204,37 +239,29 @@ NlSolver0::solve(const NlGraph& graph,
   mNodeArray.clear();
   mNodeArray.resize(graph.max_node_id(), 0);
 
-  for ( ; ; ) {
-    vector<Bool3> model;
-    Bool3 stat = solver.solve(model);
-    if ( stat == kB3X ) {
-      cerr << "ABORT" << endl;
-      return;
-    }
-    if ( stat == kB3False ) {
-      cerr << "UNSAT" << endl;
-      return;
-    }
+  vector<Bool3> model;
+  Bool3 stat = solver.solve(model);
+  if ( stat == kB3X ) {
+    cerr << "ABORT" << endl;
+    return;
+  }
+  if ( stat == kB3False ) {
+    cerr << "UNSAT" << endl;
+    return;
+  }
 
-    bool success = true;
-    for (ymuint i = 0; i < mNum; ++ i) {
-      const NlNode* node1 = graph.start_node(i);
-      const NlNode* node2 = graph.end_node(i);
-      const NlNode* end_node = search_path(node1, model);
-      if ( end_node == node2 ) {
-	//cout << " route check #" << (i + 1) << " OK" << endl;
-      }
-      else {
-	cout << " route check #" << (i + 1) << " NG" << endl;
-	np_graph.add_path_constr(solver, model, node1->id(), end_node->id());
-	success = false;
-      }
+  for (ymuint i = 0; i < mNum; ++ i) {
+    const NlNode* node1 = graph.start_node(i);
+    const NlNode* node2 = graph.end_node(i);
+    const NlNode* end_node = search_path(node1, model);
+    if ( end_node == node2 ) {
+      //cout << " route check #" << (i + 1) << " OK" << endl;
     }
-    if ( success ) {
-      setup_solution(graph, model, solution);
-      break;
+    else {
+      cout << " route check #" << (i + 1) << " NG" << endl;
     }
   }
+  setup_solution(graph, model, solution);
 }
 
 // @brief 基本的な制約を作る．

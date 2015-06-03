@@ -60,6 +60,15 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 枝を見つける．
+  /// @param[in] solver SATソルバ
+  /// @param[in] node1, node2 両端のノード
+  /// @return 枝を返す．
+  EqEdge*
+  find_edge(SatSolver& solver,
+	    EqNode* node1,
+	    EqNode* node2);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

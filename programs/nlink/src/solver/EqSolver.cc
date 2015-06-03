@@ -55,35 +55,7 @@ EqSolver::add_equal(SatSolver& solver,
   EqNode* node1 = mNodeArray[var1];
   EqNode* node2 = mNodeArray[var2];
 
-  EqEdge* edge = NULL;
-  const vector<EqEdge*>& edge_list1 = node1->edge_list();
-  const vector<EqEdge*>& edge_list2 = node2->edge_list();
-  if ( edge_list1.size() < edge_list2.size() ) {
-    for (ymuint i = 0; i < edge_list1.size(); ++ i) {
-      EqEdge* edge1 = edge_list1[i];
-      if ( edge1->alt_node(node1) == node2 ) {
-	edge = edge1;
-	break;
-      }
-    }
-  }
-  else {
-    for (ymuint i = 0; i < edge_list2.size(); ++ i) {
-      EqEdge* edge1 = edge_list2[i];
-      if ( edge1->alt_node(node2) == node1 ) {
-	edge = edge1;
-	break;
-      }
-    }
-  }
-
-  if ( edge == NULL ) {
-    VarId var = solver.new_var();
-    edge = new EqEdge(node1, node2, var);
-    mEdgeArray.push_back(edge);
-    node1->mEdgeList.push_back(edge);
-    node2->mEdgeList.push_back(edge);
-  }
+  EqEdge* edge = find_edge(solver, node1, node2);
 
   return edge->var();
 }
@@ -115,18 +87,55 @@ EqSolver::make_constr(SatSolver& solver)
       for (ymuint i2 = i1 + 1; i2 < adj_list.size(); ++ i2) {
 	EqEdge* edge2 = edge_list[i2];
 	EqNode* node2 = adj_list[i2];
-	VarId var3 = add_equal(solver, node1->id(), node2->id());
+	EqEdge* edge3 = find_edge(solver, node1, node2);
 
-	// edge1->var(), edge2->var(), var3 の間の推移律を制約に加える．
+	// edge1, edge2, edge3 の間の推移律を制約に加える．
 	Literal lit1(edge1->var());
 	Literal lit2(edge2->var());
-	Literal lit3(var3);
+	Literal lit3(edge3->var());
 	solver.add_clause(~lit1, ~lit2,  lit3);
 	solver.add_clause(~lit1,  lit2, ~lit3);
 	solver.add_clause( lit1, ~lit2, ~lit3);
       }
     }
   }
+}
+
+// @brief 枝を見つける．
+// @param[in] solver SATソルバ
+// @param[in] node1, node2 両端のノード
+// @return 枝を返す．
+EqEdge*
+EqSolver::find_edge(SatSolver& solver,
+		    EqNode* node1,
+		    EqNode* node2)
+{
+  const vector<EqEdge*>& edge_list1 = node1->edge_list();
+  const vector<EqEdge*>& edge_list2 = node2->edge_list();
+  if ( edge_list1.size() < edge_list2.size() ) {
+    for (ymuint i = 0; i < edge_list1.size(); ++ i) {
+      EqEdge* edge = edge_list1[i];
+      if ( edge->alt_node(node1) == node2 ) {
+	return edge;
+      }
+    }
+  }
+  else {
+    for (ymuint i = 0; i < edge_list2.size(); ++ i) {
+      EqEdge* edge = edge_list2[i];
+      if ( edge->alt_node(node2) == node1 ) {
+	return edge;
+      }
+    }
+  }
+
+  VarId var = solver.new_var();
+  EqEdge* edge = new EqEdge(node1, node2, var);
+  mEdgeArray.push_back(edge);
+  node1->mEdgeList.push_back(edge);
+  node2->mEdgeList.push_back(edge);
+
+  return edge;
 }
 
 END_NAMESPACE_YM_NLINK
