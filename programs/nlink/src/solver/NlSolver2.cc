@@ -237,16 +237,44 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 
   mNum = num;
   ymuint max_edge_id = graph.max_edge_id();
+  ymuint max_node_id = graph.max_node_id();
 
   // 枝の変数(枝数 x 線分数)を作る．
   mVarArray.clear();
   mVarArray.resize(max_edge_id * num);
   for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
+    const NlEdge* edge = graph.edge(edge_id);
+    const NlNode* node1 = edge->node1();
+    const NlNode* node2 = edge->node2();
     for (ymuint k = 0; k < num; ++ k) {
       VarId var = solver.new_var();
       mVarArray[edge_id * num + k] = var;
     }
   }
+
+#if 0
+  // 選ばれない枝の条件を加える．
+  for (ymuint id = 0; id < max_node_id; ++ id) {
+    const NlNode* node = graph.node(id);
+    ymuint term_id = node->terminal_id();
+    if ( term_id == 0 ) {
+      continue;
+    }
+    const vector<const NlEdge*>& edge_list = node->edge_list();
+    ymuint ne = edge_list.size();
+    for (ymuint k = 0; k < num; ++ k) {
+      if ( k + 1 == term_id ) {
+	continue;
+      }
+      for (ymuint i = 0; i < ne; ++ i) {
+	const NlEdge* edge = edge_list[i];
+	VarId var = edge_var(edge, k);
+	Literal lit(var);
+	solver.add_clause(~lit);
+      }
+    }
+  }
+#endif
 
   // 同じ枝上の変数の排他制約を作る．
   // 上の for ループとマージできるけど一応，わかりやすさ優先で．
@@ -267,7 +295,6 @@ NlSolver2::make_base_cnf(SatSolver& solver,
   }
 
   // 同じノード上で異なる線分が交わらないための条件を作る．
-  ymuint max_node_id = graph.max_node_id();
   for (ymuint id = 0; id < max_node_id; ++ id) {
     const NlNode* node = graph.node(id);
     const vector<const NlEdge*>& edge_list = node->edge_list();
@@ -276,9 +303,13 @@ NlSolver2::make_base_cnf(SatSolver& solver,
       const NlEdge* edge1 = edge_list[i1];
       for (ymuint i2 = 0; i2 < ne; ++ i2) {
 	if ( i1 == i2 ) {
+	  // 同じ枝上の変数の条件は上で作っている．
 	  continue;
 	}
 	const NlEdge* edge2 = edge_list[i2];
+
+	// 対称性を考慮して edge1 の番号が edge2 よりも若い
+	// という条件をつけている．
 	for (ymuint k1 = 0; k1 < num; ++ k1) {
 	  VarId var1 = edge_var(edge1, k1);
 	  Literal lit1(var1);
@@ -312,6 +343,7 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	  // 必ずただ1つの枝が選ばれる．
 	  one_hot(solver, lit_list);
 	}
+#if 1
 	else {
 	  // 選ばれない．
 	  // 実はこの条件はなくても他の制約から導かれる．
@@ -320,6 +352,7 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	    solver.add_clause(~lit_list[i]);
 	  }
 	}
+#endif
       }
       else {
 	// そうでない場合
