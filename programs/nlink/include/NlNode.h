@@ -86,6 +86,10 @@ public:
   const NlEdge*
   lower_edge() const;
 
+  /// @brief 内容を表す文字列を返す．
+  string
+  str() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -231,6 +235,19 @@ const NlEdge*
 NlNode::lower_edge() const
 {
   return mLowerEdge;
+}
+
+// @brief 内容を表す文字列を返す．
+inline
+string
+NlNode::str() const
+{
+  ostringstream buf;
+  buf << "(" << x() << ", " << y() << ")";
+  if ( terminal_id() > 0 ) {
+    buf << "[" << terminal_id() << "]";
+  }
+  return buf.str();
 }
 
 END_NAMESPACE_YM_NLINK
