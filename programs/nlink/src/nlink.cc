@@ -17,6 +17,7 @@
 #include "NlSolver4.h"
 #include "NlSolverGs.h"
 #include "NlSolverFr.h"
+#include "NlSolverDfs.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -59,6 +60,10 @@ nlink(const string& filename,
   }
   else if ( method == 10 ) {
     NlSolverFr solver;
+    solver.solve(problem, verbose, solution);
+  }
+  else if ( method == 40 ) {
+    NlSolverDfs solver;
     solver.solve(problem, verbose, solution);
   }
 
@@ -107,6 +112,10 @@ main(int argc,
     }
     else if ( strcmp(argv[i], "-fr") == 0 ) {
       method = 10;
+      ++ base;
+    }
+    else if ( strcmp(argv[i], "-dfs") == 0 ) {
+      method = 40;
       ++ base;
     }
     else if ( strcmp(argv[i], "-minisat") == 0 ) {

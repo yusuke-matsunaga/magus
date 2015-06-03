@@ -10,13 +10,29 @@
 
 
 #include "NlSolver.h"
-#include "YmLogic/SatSolver.h"
+#include "NlSolution.h"
 
 
 BEGIN_NAMESPACE_YM_NLINK
 
-class FrontierInfo;
-class Ban;
+struct Ban
+{
+  Ban(const NlGraph& graph);
+
+  bool
+  select(ymuint edge_id);
+
+  bool
+  unselect(ymuint edge_id);
+
+  const NlGraph& mGraph;
+
+  vector<ymuint8> mEdgeArray;
+
+  vector<ymint8> mNodeArray;
+
+};
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class NlSolverDfs NlSolverDfs.h "NlSolverDfs.h"
@@ -56,37 +72,9 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 枝の順序付けを行う．
-  void
-  ordering(const NlGraph& graph,
-	   vector<const NlEdge*>& edge_list);
-
   /// @brief 探索を行う．
-  void
-  dfs_recur(const Ban& ban,
-	    cosnt NlGraph& graph);
-
-  /// @brief フロンティアの更新を行う．
-  /// @param[inout] frontier_nodes フロンティアノードのリスト
-  /// @param[in] edge 新しく加わる枝
-  /// @param[in] del_list 削除されるノードのフロンティアリスト上の位置
-  /// @param[out] pos1, pos2 枝の両端のノードの位置
-  ///
-  /// pos1, pos2 は該当のノードがない場合には -1 を返す．
-  void
-  calc_frontier(vector<const NlNode*>& frontier_nodes,
-		const NlEdge* edge,
-		ymuint max_node_id,
-		vector<ymuint>& del_list,
-		int& pos1,
-		int& pos2);
-
-  /// @brief フロンティアの更新を行う．
   bool
-  update_frontier(FrontierInfo& fr,
-		  const NlEdge* edge,
-		  bool selected,
-		  const NlGraph& graph);
+  dfs_recur(const Ban& ban);
 
 
 private:
@@ -94,8 +82,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 枝の順序を記憶する配列
-  vector<ymuint> mEdgeOrder;
+  NlSolution mSolution;
 
 };
 

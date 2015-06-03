@@ -50,6 +50,7 @@ set (solver_SOURCES
   src/solver/NlSolverFr.cc
   src/solver/FrontierInfo.cc
   src/solver/FrNode.cc
+  src/solver/NlSolverDfs.cc
   )
 
 set (nlink_SOURCES
