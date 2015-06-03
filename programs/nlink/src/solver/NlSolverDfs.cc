@@ -8,7 +8,6 @@
 
 
 #include "NlSolverDfs.h"
-#include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
 #include "NlNode.h"
@@ -140,19 +139,15 @@ NlSolverDfs::~NlSolverDfs()
 }
 
 // @brief 問題を解く
-// @param[in] problem 問題
+// @param[in] graph 問題のグラフ
 // @param[in] verbose verbose フラグ
 // @param[out] solution 解
 void
-NlSolverDfs::solve(const NlProblem& problem,
+NlSolverDfs::solve(const NlGraph& graph,
 		   bool verbose,
 		   NlSolution& solution)
 {
-  NlGraph graph;
-
-  graph.set_problem(problem);
-
-  mSolution.init(problem);
+  mSolution.init(graph);
 
   ymuint ne = graph.max_edge_id();
   vector<const NlEdge*> edge_list;

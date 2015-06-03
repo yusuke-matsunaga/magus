@@ -9,7 +9,9 @@
 
 #include "nlink_nsdef.h"
 #include "NlProblem.h"
+#include "NlGraph.h"
 #include "NlSolution.h"
+
 #include "NlSolver0.h"
 #include "NlSolver1.h"
 #include "NlSolver2.h"
@@ -32,39 +34,42 @@ nlink(const string& filename,
 
   print_problem(cout, problem);
 
+  NlGraph graph;
+  graph.set_problem(problem);
+
   NlSolution solution;
 
   if ( method == 0 ) {
     NlSolver0 solver(sat_type);
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 1 ) {
     NlSolver1 solver(sat_type);
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 2 ) {
     NlSolver2 solver(sat_type);
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 25 ) {
     NlSolver2_5 solver(sat_type);
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 3 ) {
     NlSolverGs solver;
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 4 ) {
     NlSolver4 solver(sat_type);
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 10 ) {
     NlSolverFr solver;
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
   else if ( method == 40 ) {
     NlSolverDfs solver;
-    solver.solve(problem, verbose, solution);
+    solver.solve(graph, verbose, solution);
   }
 
   //print_solution(cout, solution);

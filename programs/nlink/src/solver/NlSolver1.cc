@@ -8,7 +8,6 @@
 
 
 #include "NlSolver1.h"
-#include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
 #include "NlNode.h"
@@ -172,23 +171,19 @@ END_NONAMESPACE
 
 
 // @brief 問題を解く
-// @param[in] problem 問題
+// @param[in] graph 問題のグラフ
 // @param[in] verbose verbose フラグ
 // @param[out] solution 解
 void
-NlSolver1::solve(const NlProblem& problem,
+NlSolver1::solve(const NlGraph& graph,
 		 bool verbose,
 		 NlSolution& solution)
 {
+  solution.init(graph);
+
   SatSolver solver(mSatType, string(), NULL);
 
-  NlGraph graph;
-
-  graph.set_problem(problem);
-
   make_base_cnf(solver, graph);
-
-  solution.init(problem);
 
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);

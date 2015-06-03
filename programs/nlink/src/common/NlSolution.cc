@@ -8,7 +8,9 @@
 
 
 #include "NlSolution.h"
-#include "NlProblem.h"
+#include "NlGraph.h"
+#include "NlNode.h"
+#include "NlPoint.h"
 #include "NlScanner.h"
 #include "YmUtils/FileIDO.h"
 
@@ -51,17 +53,18 @@ NlSolution::set_size(ymuint width,
 }
 
 // @brief 初期化する．
-// @param[in] problem 問題
+// @param[in] graph 問題のグラフ
 void
-NlSolution::init(const NlProblem& problem)
+NlSolution::init(const NlGraph& graph)
 {
-  set_size(problem.width(), problem.height());
+  set_size(graph.width(), graph.height());
 
-  mNum = problem.elem_num();
+  mNum = graph.num();
   for (ymuint i = 0; i < mNum; ++ i) {
-    NlConnection con = problem.connection(i);
-    set(con.start_point(), -(i + 1));
-    set(con.end_point(), -(i + 1));
+    const NlNode* node1 = graph.start_node(i);
+    const NlNode* node2 = graph.end_node(i);
+    set(node1->x(), node1->y(), -(i + 1));
+    set(node2->x(), node2->y(), -(i + 1));
   }
 }
 
@@ -282,7 +285,12 @@ read_solution(const string& filename,
 
     NlSolution solution;
 
-    solution.init(problem);
+    {
+      NlGraph graph;
+      graph.set_problem(problem);
+
+      solution.init(graph);
+    }
 
     if ( solution.width() != width ||
 	 solution.height() != height ) {

@@ -8,7 +8,6 @@
 
 
 #include "NlSolverFr.h"
-#include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
 #include "NlNode.h"
@@ -18,26 +17,6 @@
 
 #include "YmUtils/HashMap.h"
 #include "YmUtils/HashSet.h"
-
-
-BEGIN_NAMESPACE_YM
-
-template<>
-struct
-HashFunc<vector<ymuint> >
-{
-  ymuint
-  operator()(const vector<ymuint>& key) const
-  {
-    ymuint ans = 0U;
-    for (ymuint i = 0; i < key.size(); ++ i) {
-      ans += ans * 117 + ans;
-    }
-    return ans;
-  }
-};
-
-END_NAMESPACE_YM
 
 
 BEGIN_NAMESPACE_YM_NLINK
@@ -57,17 +36,15 @@ NlSolverFr::~NlSolverFr()
 }
 
 // @brief 問題を解く
-// @param[in] problem 問題
+// @param[in] graph 問題のグラフ
 // @param[in] verbose verbose フラグ
 // @param[out] solution 解
 void
-NlSolverFr::solve(const NlProblem& problem,
+NlSolverFr::solve(const NlGraph& graph,
 		  bool verbose,
 		  NlSolution& solution)
 {
-  NlGraph graph;
-
-  graph.set_problem(problem);
+  solution.init(graph);
 
   ymuint ne = graph.max_edge_id();
   vector<const NlEdge*> edge_list;
@@ -376,8 +353,6 @@ NlSolverFr::solve(const NlProblem& problem,
     cout << "orig_num = " << orig_num
 	 << ", hashed num = " << new_node_list.size() << endl;
   }
-
-  solution.init(problem);
 }
 
 // @brief 枝の順序付けを行う．

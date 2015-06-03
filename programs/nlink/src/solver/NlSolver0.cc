@@ -8,7 +8,6 @@
 
 
 #include "NlSolver0.h"
-#include "NlProblem.h"
 #include "NlSolution.h"
 #include "NlGraph.h"
 #include "NlNode.h"
@@ -172,19 +171,15 @@ END_NONAMESPACE
 
 
 // @brief 問題を解く
-// @param[in] problem 問題
+// @param[in] graph 問題のグラフ
 // @param[in] verbose verbose フラグ
 // @param[out] solution 解
 void
-NlSolver0::solve(const NlProblem& problem,
+NlSolver0::solve(const NlGraph& graph,
 		 bool verbose,
 		 NlSolution& solution)
 {
   SatSolver solver(mSatType, string(), NULL);
-
-  NlGraph graph;
-
-  graph.set_problem(problem);
 
   mWidth = graph.width();
   mHeight = graph.height();
@@ -194,7 +189,7 @@ NlSolver0::solve(const NlProblem& problem,
 
   NpGraph np_graph(solver, graph, mEdgeVarArray);
 
-  solution.init(problem);
+  solution.init(graph);
 
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);

@@ -38,12 +38,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 問題を解く
-  /// @param[in] problem 問題
+  /// @param[in] graph 問題のグラフ
   /// @param[in] verbose verbose フラグ
   /// @param[out] solution 解
   virtual
   void
-  solve(const NlProblem& problem,
+  solve(const NlGraph& graph,
 	bool verbose,
 	NlSolution& solution);
 

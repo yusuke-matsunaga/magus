@@ -42,9 +42,9 @@ public:
 	   ymuint height);
 
   /// @brief 初期化する．
-  /// @param[in] problem 問題
+  /// @param[in] graph 問題のグラフ
   void
-  init(const NlProblem& problem);
+  init(const NlGraph& graph);
 
   /// @brief 幅を得る．
   ymuint
