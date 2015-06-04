@@ -185,6 +185,10 @@ NlSolver1::solve(const NlGraph& graph,
 
   make_base_cnf(solver, graph);
 
+  cout << "# of variables: " << solver.variable_num() << endl
+       << "# of clauses:   " << solver.clause_num() << endl
+       << "# of literals:  " << solver.literal_num() << endl;
+
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
     solver.reg_msg_handler(msg_handler);
@@ -229,18 +233,18 @@ NlSolver1::make_base_cnf(SatSolver& solver,
   mEdgeVarArray.clear();
   mEdgeVarArray.resize(max_edge_id);
 
+  // 枝の変数を作る．
+  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
+    VarId var = solver.new_var();
+    mEdgeVarArray[edge_id] = var;
+  }
+
   // ノードの変数を作る．
   for (ymuint node_id = 0; node_id < max_node_id; ++ node_id) {
     for (ymuint i = 0; i < mLogN; ++ i) {
       VarId var = solver.new_var();
       mNodeVarArray[node_id * mLogN + i] = var;
     }
-  }
-
-  // 枝の変数を作る．
-  for (ymuint edge_id = 0; edge_id < max_edge_id; ++ edge_id) {
-    VarId var = solver.new_var();
-    mEdgeVarArray[edge_id] = var;
   }
 
   // ノードの変数に対する feasible 制約を作る．
@@ -260,19 +264,6 @@ NlSolver1::make_base_cnf(SatSolver& solver,
 	}
       }
     }
-#if 0
-    else {
-      for (ymuint k1 = 0; k1 < mNum; ++ k1) {
-	VarId var1 = mNodeVarArray[node_id * mNum + k1];
-	Literal lit1(var1);
-	for (ymuint k2 = k1 + 1; k2 < mNum; ++ k2) {
-	  VarId var2 = mNodeVarArray[node_id * mNum + k2];
-	  Literal lit2(var2);
-	  solver.add_clause(~lit1, ~lit2);
-	}
-      }
-    }
-#endif
   }
 
   // 枝の条件を作る．
