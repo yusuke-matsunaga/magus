@@ -186,6 +186,61 @@ NlSolver2::solve(const NlGraph& graph,
 
   make_base_cnf(solver, graph);
 
+  {
+    add_hint(solver, graph, 15,  4, 1);
+    add_hint(solver, graph, 13, 11, 1);
+    add_hint(solver, graph, 11,  3, 1);
+    add_hint(solver, graph,  8,  2, 1);
+    add_hint(solver, graph,  1, 14, 1);
+
+    add_hint(solver, graph,  3,  1, 1);
+
+    add_hint(solver, graph, 10,  1, 6);
+#if 1
+    add_hint(solver, graph, 12,  0, 10);
+    add_hint(solver, graph, 13,  0, 10);
+    add_hint(solver, graph, 14,  0, 10);
+    add_hint(solver, graph, 15,  0, 10);
+
+    add_hint(solver, graph, 12,  1,  9);
+    add_hint(solver, graph, 13,  1,  9);
+    add_hint(solver, graph, 14,  1,  9);
+    add_hint(solver, graph, 15,  1,  9);
+
+    add_hint(solver, graph, 10, 14,  7);
+    add_hint(solver, graph, 11, 14,  7);
+    add_hint(solver, graph, 12, 14,  7);
+    add_hint(solver, graph, 13, 14,  7);
+    add_hint(solver, graph, 14, 14,  7);
+    add_hint(solver, graph, 15, 14,  7);
+
+    add_hint(solver, graph,  8, 13,  8);
+    add_hint(solver, graph,  9, 13,  8);
+    add_hint(solver, graph, 10, 13,  8);
+    add_hint(solver, graph, 11, 13,  8);
+    add_hint(solver, graph, 12, 13,  8);
+    add_hint(solver, graph, 13, 13,  8);
+    add_hint(solver, graph, 14, 13,  8);
+    add_hint(solver, graph, 15, 13,  8);
+    add_hint(solver, graph, 16, 13,  8);
+    add_hint(solver, graph, 16, 12,  8);
+#endif
+
+#if 1
+    add_hint(solver, graph,  5,  1,  3);
+    add_hint(solver, graph,  5,  2,  3);
+    add_hint(solver, graph,  5,  3,  3);
+    add_hint(solver, graph,  5,  4,  3);
+    add_hint(solver, graph,  5,  5,  3);
+    add_hint(solver, graph,  5,  6,  3);
+    add_hint(solver, graph,  5,  7,  3);
+    add_hint(solver, graph,  5,  8,  3);
+    add_hint(solver, graph,  5,  9,  3);
+    add_hint(solver, graph,  5, 10,  3);
+    add_hint(solver, graph,  5, 11,  3);
+#endif
+  }
+
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
     solver.reg_msg_handler(msg_handler);
@@ -353,6 +408,29 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	// そうでない場合
 	// 0個か2個の枝が選ばれる．
 	zero_two_hot(solver, lit_list);
+      }
+    }
+  }
+}
+
+// @brief ヒントを追加する．
+void
+NlSolver2::add_hint(SatSolver& solver,
+		    const NlGraph& graph,
+		    ymuint x,
+		    ymuint y,
+		    ymuint idx)
+{
+  ymuint num = graph.num();
+  const NlNode* node = graph.node(x, y);
+  const vector<const NlEdge*>& edge_list = node->edge_list();
+  for (ymuint i = 0; i < edge_list.size(); ++ i) {
+    const NlEdge* edge = edge_list[i];
+    for (ymuint j = 0; j < num; ++ j) {
+      if ( j + 1 != idx ) {
+	VarId var = edge_var(edge, j);
+	Literal lit(var);
+	solver.add_clause(~lit);
       }
     }
   }

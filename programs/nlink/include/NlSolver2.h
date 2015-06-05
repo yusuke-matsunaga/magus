@@ -59,6 +59,14 @@ private:
   make_base_cnf(SatSolver& solver,
 		const NlGraph& graph);
 
+  /// @brief ヒントを追加する．
+  void
+  add_hint(SatSolver& solver,
+	   const NlGraph& graph,
+	   ymuint x,
+	   ymuint y,
+	   ymuint idx);
+
   /// @brief 解を出力する．
   /// @param[in] graph 問題を表すグラフ
   /// @param[in] model SATの解
