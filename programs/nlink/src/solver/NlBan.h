@@ -115,6 +115,12 @@ private:
   // 格子の配列
   vector<ymuint> mGridArray;
 
+  // phase1 終了後の外傷上のノードリスト
+  vector<const NlNode*> mFringeList;
+
+  // phase1 終了後の外周上の端子リスト
+  vector<ymuint> mTermPosList;
+
 };
 
 END_NAMESPACE_YM_NLINK

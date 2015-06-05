@@ -98,89 +98,11 @@ NlBan::~NlBan()
 void
 NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
 {
-  // 最初の外周を求める．
-  vector<const NlNode*> fringe_list;
-  for (ymuint x = 0; x < mWidth; ++ x) {
-    const NlNode* node = mGraph.node(x, 0);
-    fringe_list.push_back(node);
-  }
-  for (ymuint y = 1; y < mHeight - 1; ++ y) {
-    const NlNode* node = mGraph.node(mWidth - 1, y);
-    fringe_list.push_back(node);
-  }
-  for (ymuint x = mWidth; x > 0; -- x) {
-    const NlNode* node = mGraph.node(x - 1, mHeight - 1);
-    fringe_list.push_back(node);
-  }
-  for (ymuint y = mHeight - 2; y > 0; -- y) {
-    const NlNode* node = mGraph.node(0, y);
-    fringe_list.push_back(node);
-  }
+  ymuint dir_list[] = { kU__Dir, kR__Dir, kD__Dir, kL__Dir };
 
   for ( ; ; ) {
-#if DEBUG_ROUTE
-    cout << "fringe list =";
-    for (ymuint i = 0; i < fringe_list.size(); ++ i) {
-      const NlNode* node = fringe_list[i];
-      cout << " " << node->str();
-    }
-    cout << endl;
-#endif
-
-    // 外周上で同じ番号の端子が連続しているか調べる．
-    vector<ymuint> termpos_list;
-    for (ymuint i = 0; i < fringe_list.size(); ++ i) {
-      const NlNode* node = fringe_list[i];
-      ymuint tid = node->terminal_id();
-      if ( tid > 0 ) {
-	termpos_list.push_back(i);
-      }
-    }
-
-    if ( termpos_list.size() <= 2 ) {
-      break;
-    }
-
-#if DEBUG_ROUTE
-    cout << "terminal list =";
-    for (ymuint i = 0; i < termpos_list.size(); ++ i) {
-      ymuint pos = termpos_list[i];
-      const NlNode* node = fringe_list[pos];
-      cout << " " << node->terminal_id();
-    }
-    cout << endl;
-#endif
-
-    // 連続していたら外周に沿って線を確定させる．
-    ymuint last_pos = fixed_list.size();
-    ymuint pos1 = termpos_list[0];
-    const NlNode* node1 = fringe_list[pos1];
-    ymuint tid1 = node1->terminal_id();
-    for (ymuint i = 1; i < termpos_list.size(); ++ i) {
-      ymuint pos2 = termpos_list[i];
-      const NlNode* node2 = fringe_list[pos2];
-      ymuint tid2 = node2->terminal_id();
-      if ( tid1 == tid2 ) {
-	fix_route(fringe_list, pos1, pos2, tid1, fixed_list);
-      }
-      pos1 = pos2;
-      node1 = node2;
-      tid1 = tid2;
-    }
-    ymuint pos2 = termpos_list[0];
-    const NlNode* node2 = fringe_list[pos2];
-    ymuint tid2 = node2->terminal_id();
-    if ( tid1 == tid2 ) {
-      fix_route(fringe_list, pos1, fringe_list.size() - 1, tid1, fixed_list);
-      fix_route(fringe_list, 0, pos2, tid1, fixed_list);
-    }
-
-    if ( last_pos == fixed_list.size() ) {
-      // 変化がなくなったら終わる．
-      break;
-    }
-
-    // 新しい外周を求める．
+    // 外周を求める．
+    mFringeList.clear();
 
     // 開始点を探す．
     ymuint x0;
@@ -201,16 +123,13 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
       break;
     }
 
-    ymuint dir_list[] = { kU__Dir, kR__Dir, kD__Dir, kL__Dir };
-
-    // (x0, y0) は少なくとも2つは枠に隣接しているはず．
+    // (x0, y0) から始まる外周を求める．
     // 具体的には上と左
-    fringe_list.clear();
     ymuint x = x0;
     ymuint y = y0;
     ymuint start_pos = 0;
     for ( ; ; ) {
-      fringe_list.push_back(mGraph.node(x, y));
+      mFringeList.push_back(mGraph.node(x, y));
       ymuint fcands = frame_dir(x, y);
 #if DEBUG_ROUTE
       cout << " (" << x << ", " << y << "): fcands = " << dir_str(fcands) << endl;
@@ -237,6 +156,68 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
 	// 一周した．
 	break;
       }
+    }
+
+#if DEBUG_ROUTE
+    cout << "fringe list =";
+    for (ymuint i = 0; i < mFringeList.size(); ++ i) {
+      const NlNode* node = mFringeList[i];
+      cout << " " << node->str();
+    }
+    cout << endl;
+#endif
+
+    // 外周上で同じ番号の端子が連続しているか調べる．
+    mTermPosList.clear();
+    for (ymuint i = 0; i < mFringeList.size(); ++ i) {
+      const NlNode* node = mFringeList[i];
+      ymuint tid = node->terminal_id();
+      if ( tid > 0 ) {
+	mTermPosList.push_back(i);
+      }
+    }
+
+    if ( mTermPosList.size() <= 2 ) {
+      break;
+    }
+
+#if DEBUG_ROUTE
+    cout << "terminal list =";
+    for (ymuint i = 0; i < mTermPosList.size(); ++ i) {
+      ymuint pos = mTermPosList[i];
+      const NlNode* node = mFringeList[pos];
+      cout << " " << node->terminal_id();
+    }
+    cout << endl;
+#endif
+
+    // 連続していたら外周に沿って線を確定させる．
+    ymuint last_pos = fixed_list.size();
+    ymuint pos1 = mTermPosList[0];
+    const NlNode* node1 = mFringeList[pos1];
+    ymuint tid1 = node1->terminal_id();
+    for (ymuint i = 1; i < mTermPosList.size(); ++ i) {
+      ymuint pos2 = mTermPosList[i];
+      const NlNode* node2 = mFringeList[pos2];
+      ymuint tid2 = node2->terminal_id();
+      if ( tid1 == tid2 ) {
+	fix_route(mFringeList, pos1, pos2, tid1, fixed_list);
+      }
+      pos1 = pos2;
+      node1 = node2;
+      tid1 = tid2;
+    }
+    ymuint pos2 = mTermPosList[0];
+    const NlNode* node2 = mFringeList[pos2];
+    ymuint tid2 = node2->terminal_id();
+    if ( tid1 == tid2 ) {
+      fix_route(mFringeList, pos1, mFringeList.size() - 1, tid1, fixed_list);
+      fix_route(mFringeList, 0, pos2, tid1, fixed_list);
+    }
+
+    if ( last_pos == fixed_list.size() ) {
+      // 変化がなくなったら終わる．
+      break;
     }
   }
 }
