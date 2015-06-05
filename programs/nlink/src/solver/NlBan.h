@@ -1,0 +1,82 @@
+#ifndef NLBAN_H
+#define NLBAN_H
+
+/// @file NlBan.h
+/// @brief NlBan のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2015 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "nlink.h"
+
+
+BEGIN_NAMESPACE_YM_NLINK
+
+//////////////////////////////////////////////////////////////////////
+/// @class NlBan NlBan.h "NlBan.h"
+/// @brief number link の盤面を表すクラス
+//////////////////////////////////////////////////////////////////////
+class NlBan
+{
+public:
+
+  /// @brief コンストラクタ
+  /// @param[in] graph 問題を表すグラフ
+  NlBan(const Nlgraph& graph);
+
+  /// @brief デストラクタ
+  ~NlBan();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 外周部の線分を確定させる．
+  void
+  phase1();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 外周に隣接しる格子のリストを求める．
+  void
+  get_fringe_list(vector<const NlNode*>& node_list);
+
+  /// @brief 格子を得る．
+  ymuint&
+  grid(ymuint x,
+       ymuint y);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // グラフ
+  const NlGraph& mGraph;
+
+  // 幅
+  ymuint mWidth;
+
+  // 高さ
+  ymuint mHeight;
+
+  // 線分数
+  ymuint mNum;
+
+  // 格子の配列
+  vector<ymuint> mGridArray;
+
+};
+
+END_NAMESPACE_YM_NLINK
+
+#endif // NLBAN_H
