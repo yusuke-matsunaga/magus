@@ -62,9 +62,8 @@ private:
   /// @brief ヒントを追加する．
   void
   add_hint(SatSolver& solver,
-	   const NlGraph& graph,
-	   ymuint x,
-	   ymuint y,
+	   const NlNode* node,
+	   ymuint num,
 	   ymuint idx);
 
   /// @brief 解を出力する．

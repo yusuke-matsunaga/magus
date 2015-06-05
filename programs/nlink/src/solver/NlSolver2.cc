@@ -12,6 +12,7 @@
 #include "NlGraph.h"
 #include "NlNode.h"
 #include "NlEdge.h"
+#include "NlBan.h"
 
 #include "YmLogic/SatSolver.h"
 #include "YmLogic/SatMsgHandlerImpl1.h"
@@ -186,7 +187,21 @@ NlSolver2::solve(const NlGraph& graph,
 
   make_base_cnf(solver, graph);
 
-  {
+  NlBan ban(graph);
+
+  vector<pair<const NlNode*, ymuint> > fixed_list;
+  ban.phase1(fixed_list);
+
+  ymuint num = graph.num();
+  for (ymuint i = 0; i < fixed_list.size(); ++ i) {
+    const pair<const NlNode*, ymuint>& p = fixed_list[i];
+    const NlNode* node = p.first;
+    ymuint idx = p.second;
+    add_hint(solver, node, num, idx);
+  }
+
+#if 0
+  if ( false ) {
     add_hint(solver, graph, 15,  4, 1);
     add_hint(solver, graph, 13, 11, 1);
     add_hint(solver, graph, 11,  3, 1);
@@ -196,35 +211,6 @@ NlSolver2::solve(const NlGraph& graph,
     add_hint(solver, graph,  3,  1, 1);
 
     add_hint(solver, graph, 10,  1, 6);
-#if 1
-    add_hint(solver, graph, 12,  0, 10);
-    add_hint(solver, graph, 13,  0, 10);
-    add_hint(solver, graph, 14,  0, 10);
-    add_hint(solver, graph, 15,  0, 10);
-
-    add_hint(solver, graph, 12,  1,  9);
-    add_hint(solver, graph, 13,  1,  9);
-    add_hint(solver, graph, 14,  1,  9);
-    add_hint(solver, graph, 15,  1,  9);
-
-    add_hint(solver, graph, 10, 14,  7);
-    add_hint(solver, graph, 11, 14,  7);
-    add_hint(solver, graph, 12, 14,  7);
-    add_hint(solver, graph, 13, 14,  7);
-    add_hint(solver, graph, 14, 14,  7);
-    add_hint(solver, graph, 15, 14,  7);
-
-    add_hint(solver, graph,  8, 13,  8);
-    add_hint(solver, graph,  9, 13,  8);
-    add_hint(solver, graph, 10, 13,  8);
-    add_hint(solver, graph, 11, 13,  8);
-    add_hint(solver, graph, 12, 13,  8);
-    add_hint(solver, graph, 13, 13,  8);
-    add_hint(solver, graph, 14, 13,  8);
-    add_hint(solver, graph, 15, 13,  8);
-    add_hint(solver, graph, 16, 13,  8);
-    add_hint(solver, graph, 16, 12,  8);
-#endif
 
 #if 1
     add_hint(solver, graph,  5,  1,  3);
@@ -240,6 +226,7 @@ NlSolver2::solve(const NlGraph& graph,
     add_hint(solver, graph,  5, 11,  3);
 #endif
   }
+#endif
 
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
@@ -302,7 +289,6 @@ NlSolver2::make_base_cnf(SatSolver& solver,
     }
   }
 
-#if 0
   // 選ばれない枝の条件を加える．
   for (ymuint id = 0; id < max_node_id; ++ id) {
     const NlNode* node = graph.node(id);
@@ -324,7 +310,6 @@ NlSolver2::make_base_cnf(SatSolver& solver,
       }
     }
   }
-#endif
 
   // 同じ枝上の変数の排他制約を作る．
   // 上の for ループとマージできるけど一応，わかりやすさ優先で．
@@ -393,7 +378,7 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	  // 必ずただ1つの枝が選ばれる．
 	  one_hot(solver, lit_list);
 	}
-#if 1
+#if 0
 	else {
 	  // 選ばれない．
 	  // 実はこの条件はなくても他の制約から導かれる．
@@ -416,13 +401,10 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 // @brief ヒントを追加する．
 void
 NlSolver2::add_hint(SatSolver& solver,
-		    const NlGraph& graph,
-		    ymuint x,
-		    ymuint y,
+		    const NlNode* node,
+		    ymuint num,
 		    ymuint idx)
 {
-  ymuint num = graph.num();
-  const NlNode* node = graph.node(x, y);
   const vector<const NlEdge*>& edge_list = node->edge_list();
   for (ymuint i = 0; i < edge_list.size(); ++ i) {
     const NlEdge* edge = edge_list[i];

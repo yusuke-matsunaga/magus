@@ -51,6 +51,7 @@ set (solver_SOURCES
   src/solver/FrNode.cc
   src/solver/NlSolverDfs.cc
   src/solver/EqSolver.cc
+  src/solver/NlBan.cc
   )
 
 set (nlink_SOURCES
