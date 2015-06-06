@@ -59,6 +59,12 @@ private:
   make_base_cnf(SatSolver& solver,
 		const NlGraph& graph);
 
+  /// @brief 基本的な制約を作る．
+  void
+  make_base_cnf(SatSolver& solver,
+		const NlGraph& graph,
+		const vector<bool> sel_list);
+
   /// @brief ヒントを追加する．
   void
   add_hint(SatSolver& solver,

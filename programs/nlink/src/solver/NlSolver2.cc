@@ -183,14 +183,14 @@ NlSolver2::solve(const NlGraph& graph,
 {
   solution.init(graph);
 
-  SatSolver solver(mSatType, string(), NULL);
-
-  make_base_cnf(solver, graph);
-
   NlBan ban(graph);
 
   vector<pair<const NlNode*, ymuint> > fixed_list;
   ban.phase1(fixed_list);
+
+  SatSolver solver(mSatType, string(), NULL);
+
+  make_base_cnf(solver, graph);
 
   ymuint num = graph.num();
   for (ymuint i = 0; i < fixed_list.size(); ++ i) {
@@ -378,16 +378,6 @@ NlSolver2::make_base_cnf(SatSolver& solver,
 	  // 必ずただ1つの枝が選ばれる．
 	  one_hot(solver, lit_list);
 	}
-#if 0
-	else {
-	  // 選ばれない．
-	  // 実はこの条件はなくても他の制約から導かれる．
-	  // けど unit clause はやって損はないので．
-	  for (ymuint i = 0; i < ne; ++ i) {
-	    solver.add_clause(~lit_list[i]);
-	  }
-	}
-#endif
       }
       else {
 	// そうでない場合
@@ -396,6 +386,14 @@ NlSolver2::make_base_cnf(SatSolver& solver,
       }
     }
   }
+}
+
+// @brief 基本的な制約を作る．
+void
+NlSolver2::make_base_cnf(SatSolver& solver,
+			 const NlGraph& graph,
+			 const vector<bool> sel_list)
+{
 }
 
 // @brief ヒントを追加する．
