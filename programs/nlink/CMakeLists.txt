@@ -47,6 +47,7 @@ set (solver_SOURCES
   src/solver/NlSolver4.cc
   src/solver/NpGraph2.cc
   src/solver/NlSolverFr.cc
+  src/solver/FrMgr.cc
   src/solver/FrontierInfo.cc
   src/solver/FrNode.cc
   src/solver/NlSolverDfs.cc

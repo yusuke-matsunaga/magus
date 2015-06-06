@@ -188,6 +188,66 @@ NlSolver2::solve(const NlGraph& graph,
   vector<pair<const NlNode*, ymuint> > fixed_list;
   ban.phase1(fixed_list);
 
+  if ( false ) {
+    ymuint num = graph.num();
+    for (ymuint i1 = 0; i1 < num; ++ i1) {
+      for (ymuint i2 = i1 + 1; i2 < num; ++ i2) {
+	cout << "#" << (i1 + 1) << ",  #" << (i2 + 1) << endl;
+	// #(i1 + 1), #(i2 + 1) の線分だけの制約を作る．
+
+	SatSolver solver(mSatType, string(), NULL);
+
+	vector<bool> sel_list(num);
+	sel_list[i1] = true;
+	sel_list[i2] = true;
+
+	make_base_cnf(solver, graph, sel_list);
+
+	for (ymuint j = 0; j < fixed_list.size(); ++ j) {
+	  const pair<const NlNode*, ymuint>& p = fixed_list[j];
+	  const NlNode* node = p.first;
+	  ymuint idx = p.second;
+	  add_hint(solver, node, num, idx);
+	}
+
+	vector<Bool3> model;
+	Bool3 stat = solver.solve(model);
+	if ( stat != kB3True ) {
+	  cout << "Error: no route for #" << (i1 + 1) << ", #" << (i2 + 1) << endl;
+	}
+
+	vector<const NlEdge*> edge_list1;
+	find_path(graph, model, i1, edge_list1);
+
+	vector<const NlEdge*> edge_list2;
+	find_path(graph, model, i2, edge_list2);
+
+	solver.set_max_conflict(1000);
+
+	vector<Literal> assumptions(1);
+	vector<Bool3> model1;
+	for (ymuint j = 0; j < edge_list1.size(); ++ j) {
+	  const NlEdge* edge = edge_list1[j];
+	  cout << "  " << edge->str() << " for #" << (i1 + 1) << endl;
+	  VarId var = edge_var(edge, i1);
+	  assumptions[0] = ~Literal(var);
+	  if ( solver.solve(assumptions, model1) == kB3False ) {
+	    cout << " " << edge->str() << " is essential for #" << (i1 + 1) << endl;
+	  }
+	}
+	for (ymuint j = 0; j < edge_list2.size(); ++ j) {
+	  const NlEdge* edge = edge_list2[j];
+	  cout << "  " << edge->str() << " for #" << (i2 + 1) << endl;
+	  VarId var = edge_var(edge, i2);
+	  assumptions[0] = ~Literal(var);
+	  if ( solver.solve(assumptions, model1) == kB3False ) {
+	    cout << " " << edge->str() << " is essential for #" << (i2 + 1) << endl;
+	  }
+	}
+      }
+    }
+  }
+
   SatSolver solver(mSatType, string(), NULL);
 
   make_base_cnf(solver, graph);
@@ -267,6 +327,85 @@ NlSolver2::solve(const NlGraph& graph,
 void
 NlSolver2::make_base_cnf(SatSolver& solver,
 			 const NlGraph& graph)
+{
+  make_base(solver, graph);
+
+  // 枝が径路となる条件を作る．
+  ymuint max_node_id = graph.max_node_id();
+  for (ymuint id = 0; id < max_node_id; ++ id) {
+    const NlNode* node = graph.node(id);
+    const vector<const NlEdge*>& edge_list = node->edge_list();
+    ymuint ne = edge_list.size();
+    for (ymuint k = 0; k < mNum; ++ k) {
+      vector<Literal> lit_list(ne);
+      for (ymuint i = 0; i < ne; ++ i) {
+	const NlEdge* edge = edge_list[i];
+	VarId var = edge_var(edge, k);
+	lit_list[i] = Literal(var);
+      }
+
+      ymuint term_id = node->terminal_id();
+      if ( term_id > 0 ) {
+	if ( term_id == k + 1 ) {
+	  // 端点の場合
+	  // 必ずただ1つの枝が選ばれる．
+	  one_hot(solver, lit_list);
+	}
+      }
+      else {
+	// そうでない場合
+	// 0個か2個の枝が選ばれる．
+	zero_two_hot(solver, lit_list);
+      }
+    }
+  }
+}
+
+// @brief 基本的な制約を作る．
+void
+NlSolver2::make_base_cnf(SatSolver& solver,
+			 const NlGraph& graph,
+			 const vector<bool> sel_list)
+{
+  make_base(solver, graph);
+
+  // 枝が径路となる条件を作る．
+  ymuint max_node_id = graph.max_node_id();
+  for (ymuint id = 0; id < max_node_id; ++ id) {
+    const NlNode* node = graph.node(id);
+    const vector<const NlEdge*>& edge_list = node->edge_list();
+    ymuint ne = edge_list.size();
+    for (ymuint k = 0; k < mNum; ++ k) {
+      if ( sel_list[k] ) {
+	vector<Literal> lit_list(ne);
+	for (ymuint i = 0; i < ne; ++ i) {
+	  const NlEdge* edge = edge_list[i];
+	  VarId var = edge_var(edge, k);
+	  lit_list[i] = Literal(var);
+	}
+
+	ymuint term_id = node->terminal_id();
+	if ( term_id > 0 ) {
+	  if ( term_id == k + 1 ) {
+	    // 端点の場合
+	    // 必ずただ1つの枝が選ばれる．
+	    one_hot(solver, lit_list);
+	  }
+	}
+	else {
+	  // そうでない場合
+	  // 0個か2個の枝が選ばれる．
+	  zero_two_hot(solver, lit_list);
+	}
+      }
+    }
+  }
+}
+
+// @brief 枝の変数と基本的な制約を作る．
+void
+NlSolver2::make_base(SatSolver& solver,
+		     const NlGraph& graph)
 {
   ymuint width = graph.width();
   ymuint height = graph.height();
@@ -357,43 +496,6 @@ NlSolver2::make_base_cnf(SatSolver& solver,
       }
     }
   }
-
-  // 枝が径路となる条件を作る．
-  for (ymuint id = 0; id < max_node_id; ++ id) {
-    const NlNode* node = graph.node(id);
-    const vector<const NlEdge*>& edge_list = node->edge_list();
-    ymuint ne = edge_list.size();
-    for (ymuint k = 0; k < num; ++ k) {
-      vector<Literal> lit_list(ne);
-      for (ymuint i = 0; i < ne; ++ i) {
-	const NlEdge* edge = edge_list[i];
-	VarId var = edge_var(edge, k);
-	lit_list[i] = Literal(var);
-      }
-
-      ymuint term_id = node->terminal_id();
-      if ( term_id > 0 ) {
-	if ( term_id == k + 1 ) {
-	  // 端点の場合
-	  // 必ずただ1つの枝が選ばれる．
-	  one_hot(solver, lit_list);
-	}
-      }
-      else {
-	// そうでない場合
-	// 0個か2個の枝が選ばれる．
-	zero_two_hot(solver, lit_list);
-      }
-    }
-  }
-}
-
-// @brief 基本的な制約を作る．
-void
-NlSolver2::make_base_cnf(SatSolver& solver,
-			 const NlGraph& graph,
-			 const vector<bool> sel_list)
-{
 }
 
 // @brief ヒントを追加する．
@@ -404,14 +506,59 @@ NlSolver2::add_hint(SatSolver& solver,
 		    ymuint idx)
 {
   const vector<const NlEdge*>& edge_list = node->edge_list();
-  for (ymuint i = 0; i < edge_list.size(); ++ i) {
+  ymuint ne = edge_list.size();
+
+  // idx 以外の線分が選ばれない制約を加える．
+  for (ymuint i = 0; i < ne; ++ i) {
     const NlEdge* edge = edge_list[i];
     for (ymuint j = 0; j < num; ++ j) {
+      VarId var = edge_var(edge, j);
+      Literal lit(var);
       if ( j + 1 != idx ) {
-	VarId var = edge_var(edge, j);
-	Literal lit(var);
 	solver.add_clause(~lit);
       }
+    }
+  }
+}
+
+// @brief 線分を求める．
+// @param[in] graph 問題を表すグラフ
+// @param[in] model SATの解
+// @param[in] idx 線分番号
+// @param[out] path_list
+void
+NlSolver2::find_path(const NlGraph& graph,
+		     const vector<Bool3>& model,
+		     ymuint idx,
+		     vector<const NlEdge*>& path_list)
+{
+  const NlNode* node1 = graph.start_node(idx);
+  const NlNode* node2 = graph.end_node(idx);
+
+  const NlEdge* prev_edge = NULL;
+  for (const NlNode* node = node1; ; ) {
+    if ( node == node2 ) {
+      break;
+    }
+
+    const vector<const NlEdge*>& edge_list = node->edge_list();
+    bool found = false;
+    for (ymuint i = 0; i < edge_list.size(); ++ i) {
+      const NlEdge* edge = edge_list[i];
+      if ( edge != prev_edge ) {
+	VarId var = edge_var(edge, idx);
+	if ( model[var.val()] == kB3True ) {
+	  node = edge->alt_node(node);
+	  prev_edge = edge;
+	  path_list.push_back(edge);
+	  found = true;
+	  break;
+	}
+      }
+    }
+    if ( !found ) {
+      cout << " ERROR: no route" << endl;
+      return;
     }
   }
 }

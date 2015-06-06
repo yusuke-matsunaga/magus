@@ -65,12 +65,28 @@ private:
 		const NlGraph& graph,
 		const vector<bool> sel_list);
 
+  /// @brief 枝の変数と基本的な制約を作る．
+  void
+  make_base(SatSolver& solver,
+	    const NlGraph& graph);
+
   /// @brief ヒントを追加する．
   void
   add_hint(SatSolver& solver,
 	   const NlNode* node,
 	   ymuint num,
 	   ymuint idx);
+
+  /// @brief 線分を求める．
+  /// @param[in] graph 問題を表すグラフ
+  /// @param[in] model SATの解
+  /// @param[in] idx 線分番号
+  /// @param[out] path_list
+  void
+  find_path(const NlGraph& graph,
+	    const vector<Bool3>& model,
+	    ymuint idx,
+	    vector<const NlEdge*>& path_list);
 
   /// @brief 解を出力する．
   /// @param[in] graph 問題を表すグラフ

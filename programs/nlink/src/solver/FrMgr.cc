@@ -1,14 +1,13 @@
 
-/// @file NlSolverFr.cc
-/// @brief NlSolverFr の実装ファイル
+/// @file FrMgr.cc
+/// @brief FrMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "NlSolverFr.h"
-#include "NlSolution.h"
+#include "FrMgr.h"
 #include "NlGraph.h"
 #include "NlNode.h"
 #include "NlEdge.h"
@@ -22,37 +21,31 @@
 BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
-// クラス NlSolverFr
+// クラス FrMgr
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-NlSolverFr::NlSolverFr()
+FrMgr::FrMgr()
 {
 }
 
 // @brief デストラクタ
-NlSolverFr::~NlSolverFr()
+FrMgr::~FrMgr()
 {
 }
 
-// @brief 問題を解く
+// @brief フロンティア法を用いて経路を求める．
 // @param[in] graph 問題のグラフ
-// @param[in] verbose verbose フラグ
-// @param[out] solution 解
-void
-NlSolverFr::solve(const NlGraph& graph,
-		  bool verbose,
-		  NlSolution& solution)
+// @param[in] sel_list 処理する端子のリスト
+FrNode*
+FrMgr::find_path(const NlGraph& graph,
+		 const vector<bool>& sel_list)
 {
-  solution.init(graph);
-
-  ymuint ne = graph.max_edge_id();
-  vector<const NlEdge*> edge_list;
-
   // 枝の順序付けを行う．
-  ordering(graph, edge_list);
+  ordering(graph);
 
   // 各レベルごとの解集合
+  ymuint ne = graph.max_edge_id();
   vector<vector<FrNode*> > node_list_array(ne + 1);
 
   FrNode* root_node = new FrNode(0, FrontierInfo());
@@ -65,7 +58,7 @@ NlSolverFr::solve(const NlGraph& graph,
   vector<const NlNode*> frontier_nodes;
 
   for (ymuint i = 0; i < ne; ++ i) {
-    const NlEdge* edge = edge_list[i];
+    const NlEdge* edge = mEdgeList[i];
 
     // 新しいフロンティアノードを求める．
     vector<ymuint> del_list;
@@ -106,15 +99,18 @@ NlSolverFr::solve(const NlGraph& graph,
       for (ymuint j = 0; j < del_list.size(); ++ j) {
 	ymuint dpos = del_list[j];
 	const NlNode* node = graph.node(fr0.node_id(dpos));
+	ymuint tid = node->terminal_id();
 	ymuint deg = fr0.deg(dpos);
-	if ( node->terminal_id() > 0 ) {
-	  if ( deg != 1 ) {
-	    ng1 = true;
+	if ( tid > 0 ) {
+	  if ( sel_list[tid - 1] ) {
+	    if ( deg != 1 ) {
+	      ng1 = true;
 #if 0
-	    cout << "A: " << node->str() << ".deg = " << deg
-		 << ": 1 is expected." << endl;
+	      cout << "A: " << node->str() << ".deg = " << deg
+		   << ": 1 is expected." << endl;
 #endif
-	    break;
+	      break;
+	    }
 	  }
 	}
 	else {
@@ -195,7 +191,12 @@ NlSolverFr::solve(const NlGraph& graph,
 	if ( pos1 == -1 ) {
 	  int comp_id = node1->id();
 	  if ( term_id1 > 0 ) {
-	    comp_id = - term_id1;
+	    if ( sel_list[term_id1 - 1] ) {
+	      comp_id = - term_id1;
+	    }
+	    else {
+	      ng2 = true;
+	    }
 	  }
 	  new_pos1 = fr1.node_num();
 	  fr1.add_node(node1->id(), 1, comp_id);
@@ -204,12 +205,17 @@ NlSolverFr::solve(const NlGraph& graph,
 	  fr1.inc_deg(pos1);
 	  ymuint deg = fr1.deg(pos1);
 	  if ( term_id1 > 0 ) {
-	    if ( deg > 1 ) {
-	      ng2 = true;
+	    if ( sel_list[term_id1 - 1] ) {
+	      if ( deg > 1 ) {
+		ng2 = true;
 #if 0
-	      cout << "E: " << node1->str() << ".deg = " << deg
+		cout << "E: " << node1->str() << ".deg = " << deg
 		   << ": 1 is expected." << endl;
 #endif
+	      }
+	    }
+	    else {
+	      ng2 = true;
 	    }
 	  }
 	  else {
@@ -228,15 +234,18 @@ NlSolverFr::solve(const NlGraph& graph,
 	for (ymuint j = 0; j < del_list.size(); ++ j) {
 	  ymuint pos = del_list[j];
 	  const NlNode* node = graph.node(fr1.node_id(pos));
+	  ymuint tid = node->terminal_id();
 	  ymuint deg = fr1.deg(pos);
-	  if ( node->terminal_id() > 0 ) {
-	    if ( deg != 1 ) {
-	      ng2 = true;
+	  if ( tid > 0 ) {
+	    if ( sel_list[tid] ) {
+	      if ( deg != 1 ) {
+		ng2 = true;
 #if 0
-	      cout << "C: " << node->str() << ".deg = " << deg
-		   << ": 1 is expected." << endl;
+		cout << "C: " << node->str() << ".deg = " << deg
+		     << ": 1 is expected." << endl;
 #endif
-	      break;
+		break;
+	      }
 	    }
 	  }
 	  else {
@@ -353,17 +362,22 @@ NlSolverFr::solve(const NlGraph& graph,
     cout << "orig_num = " << orig_num
 	 << ", hashed num = " << new_node_list.size() << endl;
   }
+
+  return root_node;
 }
 
 // @brief 枝の順序付けを行う．
 void
-NlSolverFr::ordering(const NlGraph& graph,
-		     vector<const NlEdge*>& edge_list)
+FrMgr::ordering(const NlGraph& graph)
 {
   ymuint ne = graph.max_edge_id();
-  edge_list.reserve(ne);
+
+  mEdgeList.clear();
+  mEdgeList.reserve(ne);
+
   mEdgeOrder.clear();
   mEdgeOrder.resize(ne);
+
   ymuint w = graph.width();
   ymuint h = graph.height();
 
@@ -382,16 +396,16 @@ NlSolverFr::ordering(const NlGraph& graph,
 	++ n;
 	const NlEdge* edge = node->lower_edge();
 	ASSERT_COND( edge != NULL );
-	ymuint order = edge_list.size();
-	edge_list.push_back(edge);
+	ymuint order = mEdgeList.size();
+	mEdgeList.push_back(edge);
 	mEdgeOrder[edge->id()] = order;
       }
       if ( x < w - 1 ) {
 	++ n;
 	const NlEdge* edge = node->right_edge();
 	ASSERT_COND( edge != NULL );
-	ymuint order = edge_list.size();
-	edge_list.push_back(edge);
+	ymuint order = mEdgeList.size();
+	mEdgeList.push_back(edge);
 	mEdgeOrder[edge->id()] = order;
       }
     }
@@ -412,16 +426,16 @@ NlSolverFr::ordering(const NlGraph& graph,
 	++ n;
 	const NlEdge* edge = node->left_edge();
 	ASSERT_COND( edge != NULL );
-	ymuint order = edge_list.size();
-	edge_list.push_back(edge);
+	ymuint order = mEdgeList.size();
+	mEdgeList.push_back(edge);
 	mEdgeOrder[edge->id()] = order;
       }
       if ( y > 0 ) {
 	++ n;
 	const NlEdge* edge = node->upper_edge();
 	ASSERT_COND( edge != NULL );
-	ymuint order = edge_list.size();
-	edge_list.push_back(edge);
+	ymuint order = mEdgeList.size();
+	mEdgeList.push_back(edge);
 	mEdgeOrder[edge->id()] = order;
       }
     }
@@ -430,7 +444,7 @@ NlSolverFr::ordering(const NlGraph& graph,
   }
   cout << "nall = " << nall << ", ne = " << ne << endl;
 
-  ASSERT_COND( edge_list.size() == ne );
+  ASSERT_COND( mEdgeList.size() == ne );
 }
 
 // @brief フロンティアの更新を行う．
@@ -439,12 +453,12 @@ NlSolverFr::ordering(const NlGraph& graph,
 // @param[in] del_list 削除されるノードのフロンティアリスト上の位置
 // @param[out] pos1, pos2 枝の両端のノードの位置
 void
-NlSolverFr::calc_frontier(vector<const NlNode*>& frontier_nodes,
-			  const NlEdge* edge,
-			  ymuint max_node_id,
-			  vector<ymuint>& del_list,
-			  int& pos1,
-			  int& pos2)
+FrMgr::calc_frontier(vector<const NlNode*>& frontier_nodes,
+		     const NlEdge* edge,
+		     ymuint max_node_id,
+		     vector<ymuint>& del_list,
+		     int& pos1,
+		     int& pos2)
 {
   // ノードIDをキーにしてフロンティア内の位置を保持するマップ
   vector<int> pos_map(max_node_id, -1);
