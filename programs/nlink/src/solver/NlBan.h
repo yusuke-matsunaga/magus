@@ -53,6 +53,16 @@ public:
   void
   phase1(vector<pair<const NlNode*, ymuint> >& fixed_list);
 
+  /// @brief トポロジから経路を確定させる．
+  bool
+  phase2();
+
+  /// @brief ラベルを得る．
+  /// @param[in] x, y 座標
+  ymuint
+  label(ymuint x,
+	ymuint y) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -68,28 +78,38 @@ private:
 	    vector<pair<const NlNode*, ymuint> >& fix_list);
 
   /// @brief 隣の外周ノードを見つける．
+  /// @param[in] x, y 座標
+  /// @param[in] frame_bits 枠のある方向のビット
+  /// @param[in] dir 方向ビット
+  /// @return dir 方向に外周ノードがあれば true を返す．
   bool
   find_neighbor(ymuint& x,
 		ymuint& y,
-		ymuint fcands,
+		ymuint frame_bits,
 		ymuint dir);
 
-  /// @brief 外周のとき true を返す．
-  bool
-  is_frame(ymuint x,
-	   ymuint y) const;
-
-  /// @brief 隣接している外周の方向を求める．
+  /// @brief 隣接している枠の方向を求める．
+  /// @param[in] x, y 座標
+  /// @return 枠のある方向のビット(のOR)を返す．
   ymuint
   frame_dir(ymuint x,
 	    ymuint y) const;
 
+  /// @brief 枠のとき true を返す．
+  /// @param[in] x, y 座標
+  /// @return (x, y) が枠の時 true を返す．
+  bool
+  is_frame(ymuint x,
+	   ymuint y) const;
+
   /// @brief 格子を得る．
+  /// @param[in] x, y 座標
   ymuint&
   grid(ymuint x,
        ymuint y);
 
   /// @brief 格子のインデックスを計算する．
+  /// @param[in] x, y 座標
   ymuint
   index(ymuint x,
 	ymuint y) const;

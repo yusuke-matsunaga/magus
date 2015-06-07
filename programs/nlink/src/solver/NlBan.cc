@@ -61,19 +61,21 @@ NlBan::NlBan(const NlGraph& graph) :
   mNum = graph.num();
 
   mGridArray.resize((mWidth + 2) * (mHeight * 2));
+
+  // 0ビット目は枠フラグ
   for (ymuint i = 0; i < mGridArray.size(); ++ i) {
-    // 0ビット目は外周フラグ
     mGridArray[i] = 1;
   }
 
+  // 枠以外を 0 で初期化する．
   for (ymuint x = 0; x < mWidth; ++ x) {
     for (ymuint y = 0; y < mHeight; ++ y) {
       grid(x, y) = 0;
     }
   }
 
+  // 端子の印(1ビット目)をつける．
   for (ymuint i = 0; i < mNum; ++ i) {
-    // 1ビット目は端子フラグ
     const NlNode* node1 = graph.start_node(i);
     {
       ymuint x = node1->x();
@@ -130,14 +132,14 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
     ymuint start_pos = 0;
     for ( ; ; ) {
       mFringeList.push_back(mGraph.node(x, y));
-      ymuint fcands = frame_dir(x, y);
+      ymuint fbits = frame_dir(x, y);
 #if DEBUG_ROUTE
-      cout << " (" << x << ", " << y << "): fcands = " << dir_str(fcands) << endl;
+      cout << " (" << x << ", " << y << "): fbits = " << dir_str(fbits) << endl;
 #endif
       bool found = false;
       for (ymuint pos = start_pos; ; ) {
 	ymuint dir = dir_list[pos];
-	if ( find_neighbor(x, y, fcands, dir) ) {
+	if ( find_neighbor(x, y, fbits, dir) ) {
 	  ymuint alt_pos = pos ^ 2;
 	  start_pos = (alt_pos + 1) % 4;
 	  found = true;
@@ -171,7 +173,7 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
     mTermPosList.clear();
     for (ymuint i = 0; i < mFringeList.size(); ++ i) {
       const NlNode* node = mFringeList[i];
-      ymuint tid = node->terminal_id();
+      ymuint tid = label(node->x(), node->y());
       if ( tid > 0 ) {
 	mTermPosList.push_back(i);
       }
@@ -186,7 +188,7 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
     for (ymuint i = 0; i < mTermPosList.size(); ++ i) {
       ymuint pos = mTermPosList[i];
       const NlNode* node = mFringeList[pos];
-      cout << " " << node->terminal_id();
+      cout << " " << label(node->x(), node->y());
     }
     cout << endl;
 #endif
@@ -195,11 +197,11 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
     ymuint last_pos = fixed_list.size();
     ymuint pos1 = mTermPosList[0];
     const NlNode* node1 = mFringeList[pos1];
-    ymuint tid1 = node1->terminal_id();
+    ymuint tid1 = label(node1->x(), node1->y());
     for (ymuint i = 1; i < mTermPosList.size(); ++ i) {
       ymuint pos2 = mTermPosList[i];
       const NlNode* node2 = mFringeList[pos2];
-      ymuint tid2 = node2->terminal_id();
+      ymuint tid2 = label(node2->x(), node2->y());
       if ( tid1 == tid2 ) {
 	fix_route(mFringeList, pos1, pos2, tid1, fixed_list);
       }
@@ -209,7 +211,7 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
     }
     ymuint pos2 = mTermPosList[0];
     const NlNode* node2 = mFringeList[pos2];
-    ymuint tid2 = node2->terminal_id();
+    ymuint tid2 = label(node2->x(), node2->y());
     if ( tid1 == tid2 ) {
       fix_route(mFringeList, pos1, mFringeList.size() - 1, tid1, fixed_list);
       fix_route(mFringeList, 0, pos2, tid1, fixed_list);
@@ -222,29 +224,90 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
   }
 }
 
-// @brief 隣の外周ノードを見つける．
+// @brief トポロジから経路を確定させる．
 bool
-NlBan::find_neighbor(ymuint& x,
-		     ymuint& y,
-		     ymuint fcands,
-		     ymuint dir)
+NlBan::phase2()
 {
-  if ( (fcands & dir) == 0 ) {
-    ymuint x1 = x;
-    ymuint y1 = y;
-    switch ( dir ) {
-    case kU__Dir: -- y1; break;
-    case kD__Dir: ++ y1; break;
-    case kR__Dir: ++ x1; break;
-    case kL__Dir: -- x1; break;
-    }
-    if ( frame_dir(x1, y1) != 0 ) {
-      x = x1;
-      y = y1;
-      return true;
+  vector<bool> fringe_mark(mGraph.max_node_id(), false);
+  for (ymuint i = 0; i < mFringeList.size(); ++ i) {
+    const NlNode* node = mFringeList[i];
+    fringe_mark[node->id()] = true;
+  }
+
+  // 外周上に2つの端子がある線分を探す
+  bool found = false;
+  for (ymuint i1 = 0; i1 < mTermPosList.size(); ++ i1) {
+    ymuint pos1 = mTermPosList[i1];
+    const NlNode* node1 = mFringeList[pos1];
+    ymuint tid1 = label(node1->x(), node1->y());
+    for (ymuint i2 = i1 + 1; i2 < mTermPosList.size(); ++ i2) {
+      ymuint pos2 = mTermPosList[i2];
+      const NlNode* node2 = mFringeList[pos2];
+      ymuint tid2 = label(node2->x(), node2->y());
+      if ( tid1 == tid2 ) {
+	cout << "#" << tid1 << endl;
+	// i1 と i2 の間の端子を調べる．
+	ASSERT_COND( i1 + 1 < i2 );
+	for (ymuint i = i1 + 1; i < i2; ++ i) {
+	  ymuint pos = mTermPosList[i];
+	  const NlNode* node = mFringeList[pos];
+	  ymuint tid = label(node->x(), node->y());
+	  cout << "  #" << tid << endl;
+	  // tid の反対側の端子を求める．
+	  const NlNode* s_node = mGraph.start_node(tid - 1);
+	  const NlNode* e_node = mGraph.end_node(tid - 1);
+	  const NlNode* alt_node = (s_node == node) ? e_node : s_node;
+	  if ( fringe_mark[alt_node->id()] ) {
+	    // alt_node も外周上なら無視する．
+	    continue;
+	  }
+	  cout << "    alt_node = " << alt_node->str() << endl;
+	  // alt_node が外周ノードに隣接していたら
+	  // そのノードは tid1 の経路になる．
+	  ymuint x0 = alt_node->x();
+	  ymuint y0 = alt_node->y();
+	  if ( x0 > 0 ) {
+	    ymuint x1 = x0 - 1;
+	    const NlNode* node = mGraph.node(x1, y0);
+	    if ( fringe_mark[node->id()] ) {
+	      grid(x1, y0) = (tid1 << 2) | 2;
+	      cout << " " << node->str() << " : " << tid1 << endl;
+	      found = true;
+	    }
+	  }
+	  if ( x0 < mWidth - 1) {
+	    ymuint x1 = x0 + 1;
+	    const NlNode* node = mGraph.node(x1, y0);
+	    if ( fringe_mark[node->id()] ) {
+	      grid(x1, y0) = (tid1 << 2) | 2;
+	      cout << " " << node->str() << " : " << tid1 << endl;
+	      found = true;
+	    }
+	  }
+	  if ( y0 > 0 ) {
+	    ymuint y1 = y0 - 1;
+	    const NlNode* node = mGraph.node(x0, y1);
+	    if ( fringe_mark[node->id()] ) {
+	      grid(x0, y1) = (tid1 << 2) | 2;
+	      cout << " " << node->str() << " : " << tid1 << endl;
+	      found = true;
+	    }
+	  }
+	  if ( y0 < mHeight - 1 ) {
+	    ymuint y1 = y0 + 1;
+	    const NlNode* node = mGraph.node(x0, y1);
+	    if ( fringe_mark[node->id()] ) {
+	      grid(x0, y1) = (tid1 << 2) | 2;
+	      cout << " " << node->str() << " : " << tid1 << endl;
+	      found = true;
+	    }
+	  }
+	}
+      }
     }
   }
-  return false;
+
+  return found;
 }
 
 // @brief 外周に沿った経路を確定させる．
@@ -267,15 +330,37 @@ NlBan::fix_route(const vector<const NlNode*>& fringe_list,
   }
 }
 
-// @brief 外周のとき true を返す．
+// @brief 隣の外周ノードを見つける．
+// @param[in] x, y 座標
+// @param[in] frame_bits 枠のある方向のビット
+// @param[in] dir 方向ビット
 bool
-NlBan::is_frame(ymuint x,
-		ymuint y) const
+NlBan::find_neighbor(ymuint& x,
+		     ymuint& y,
+		     ymuint frame_bits,
+		     ymuint dir)
 {
-  return static_cast<bool>(mGridArray[index(x, y)] & 1U);
+  if ( (frame_bits & dir) == 0 ) {
+    ymuint x1 = x;
+    ymuint y1 = y;
+    switch ( dir ) {
+    case kU__Dir: -- y1; break;
+    case kD__Dir: ++ y1; break;
+    case kR__Dir: ++ x1; break;
+    case kL__Dir: -- x1; break;
+    }
+    if ( frame_dir(x1, y1) != 0 ) {
+      x = x1;
+      y = y1;
+      return true;
+    }
+  }
+  return false;
 }
 
-// @brief 隣接している外周の方向を求める．
+// @brief 隣接している枠の方向を求める．
+// @param[in] x, y 座標
+// @return 枠のある方向のビット(のOR)を返す．
 ymuint
 NlBan::frame_dir(ymuint x,
 		 ymuint y) const
@@ -313,6 +398,24 @@ NlBan::frame_dir(ymuint x,
   return ans;
 }
 
+// @brief 枠のとき true を返す．
+// @param[in] x, y 座標
+bool
+NlBan::is_frame(ymuint x,
+		ymuint y) const
+{
+  return static_cast<bool>(mGridArray[index(x, y)] & 1U);
+}
+
+// @brief ラベルを得る．
+// @param[in] x, y 座標
+ymuint
+NlBan::label(ymuint x,
+	     ymuint y) const
+{
+  return mGridArray[index(x, y)] >> 2;
+}
+
 ymuint&
 NlBan::grid(ymuint x,
 	    ymuint y)
@@ -321,6 +424,7 @@ NlBan::grid(ymuint x,
 }
 
 // @brief 格子のインデックスを計算する．
+// @param[in] x, y 座標
 ymuint
 NlBan::index(ymuint x,
 	     ymuint y) const

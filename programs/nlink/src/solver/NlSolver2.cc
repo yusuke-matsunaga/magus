@@ -185,9 +185,16 @@ NlSolver2::solve(const NlGraph& graph,
 
   NlBan ban(graph);
 
-  vector<pair<const NlNode*, ymuint> > fixed_list;
-  ban.phase1(fixed_list);
+  for ( ; ; ) {
+    vector<pair<const NlNode*, ymuint> > fixed_list;
+    ban.phase1(fixed_list);
 
+    if ( !ban.phase2() ) {
+      break;
+    }
+  }
+
+#if 0
   if ( false ) {
     ymuint num = graph.num();
     for (ymuint i1 = 0; i1 < num; ++ i1) {
@@ -247,17 +254,21 @@ NlSolver2::solve(const NlGraph& graph,
       }
     }
   }
+#endif
 
   SatSolver solver(mSatType, string(), NULL);
 
   make_base_cnf(solver, graph);
 
-  ymuint num = graph.num();
-  for (ymuint i = 0; i < fixed_list.size(); ++ i) {
-    const pair<const NlNode*, ymuint>& p = fixed_list[i];
-    const NlNode* node = p.first;
-    ymuint idx = p.second;
-    add_hint(solver, node, num, idx);
+  for (ymuint i = 0; i < graph.max_node_id(); ++ i) {
+    const NlNode* node = graph.node(i);
+    if ( node->terminal_id() > 0 ) {
+      continue;
+    }
+    ymuint tid = ban.label(node->x(), node->y());
+    if ( tid > 0 ) {
+      add_hint(solver, node, graph.num(), tid);
+    }
   }
 
 #if 0
@@ -505,6 +516,8 @@ NlSolver2::add_hint(SatSolver& solver,
 		    ymuint num,
 		    ymuint idx)
 {
+  cout << " " << node->str() << ": " << idx << endl;
+
   const vector<const NlEdge*>& edge_list = node->edge_list();
   ymuint ne = edge_list.size();
 
