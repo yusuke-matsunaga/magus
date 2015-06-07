@@ -95,6 +95,21 @@ private:
   frame_dir(ymuint x,
 	    ymuint y) const;
 
+  /// @brief phase2 の下請け関数
+  bool
+  check_bottleneck(ymuint x,
+		   ymuint y,
+		   ymuint tid,
+		   ymuint pos1,
+		   ymuint pos2);
+
+  /// @brief ラベルが確定のとき true を返す．
+  /// @param[in] x, y 座標
+  /// @return (x, y) が枠の時 true を返す．
+  bool
+  is_fixed(ymuint x,
+	   ymuint y) const;
+
   /// @brief 枠のとき true を返す．
   /// @param[in] x, y 座標
   /// @return (x, y) が枠の時 true を返す．
@@ -137,6 +152,12 @@ private:
 
   // phase1 終了後の外傷上のノードリスト
   vector<const NlNode*> mFringeList;
+
+  // mFringeList の逆引きマップ
+  vector<ymuint> mFringePos;
+
+  // mFringeList に含まれるかどうかのマーク
+  vector<bool> mFringeMark;
 
   // phase1 終了後の外周上の端子リスト
   vector<ymuint> mTermPosList;

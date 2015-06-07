@@ -105,6 +105,10 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
   for ( ; ; ) {
     // 外周を求める．
     mFringeList.clear();
+    mFringePos.clear();
+    mFringePos.resize(mGraph.max_node_id(), 0);
+    mFringeMark.clear();
+    mFringeMark.resize(mGraph.max_node_id(), false);
 
     // 開始点を探す．
     ymuint x0;
@@ -131,7 +135,11 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
     ymuint y = y0;
     ymuint start_pos = 0;
     for ( ; ; ) {
-      mFringeList.push_back(mGraph.node(x, y));
+      const NlNode* node = mGraph.node(x, y);
+      mFringePos[node->id()] = mFringeList.size();
+      mFringeMark[node->id()] = true;
+      mFringeList.push_back(node);
+
       ymuint fbits = frame_dir(x, y);
 #if DEBUG_ROUTE
       cout << " (" << x << ", " << y << "): fbits = " << dir_str(fbits) << endl;
@@ -228,12 +236,6 @@ NlBan::phase1(vector<pair<const NlNode*, ymuint> >& fixed_list)
 bool
 NlBan::phase2()
 {
-  vector<bool> fringe_mark(mGraph.max_node_id(), false);
-  for (ymuint i = 0; i < mFringeList.size(); ++ i) {
-    const NlNode* node = mFringeList[i];
-    fringe_mark[node->id()] = true;
-  }
-
   // 外周上に2つの端子がある線分を探す
   bool found = false;
   for (ymuint i1 = 0; i1 < mTermPosList.size(); ++ i1) {
@@ -244,65 +246,80 @@ NlBan::phase2()
       ymuint pos2 = mTermPosList[i2];
       const NlNode* node2 = mFringeList[pos2];
       ymuint tid2 = label(node2->x(), node2->y());
-      if ( tid1 == tid2 ) {
-	cout << "#" << tid1 << endl;
-	// i1 と i2 の間の端子を調べる．
-	ASSERT_COND( i1 + 1 < i2 );
-	for (ymuint i = i1 + 1; i < i2; ++ i) {
-	  ymuint pos = mTermPosList[i];
-	  const NlNode* node = mFringeList[pos];
-	  ymuint tid = label(node->x(), node->y());
-	  cout << "  #" << tid << endl;
-	  // tid の反対側の端子を求める．
-	  const NlNode* s_node = mGraph.start_node(tid - 1);
-	  const NlNode* e_node = mGraph.end_node(tid - 1);
-	  const NlNode* alt_node = (s_node == node) ? e_node : s_node;
-	  if ( fringe_mark[alt_node->id()] ) {
-	    // alt_node も外周上なら無視する．
-	    continue;
-	  }
-	  cout << "    alt_node = " << alt_node->str() << endl;
+      if ( tid1 != tid2 ) {
+	continue;
+      }
+      cout << " #" << tid1 << endl;
+      ASSERT_COND( i1 + 1 < i2 );
+
+      // i1 と i2 の間の端子を調べる．
+      for (ymuint i = i1 + 1; i < i2; ++ i) {
+	ymuint pos = mTermPosList[i];
+	const NlNode* node = mFringeList[pos];
+	ymuint tid = label(node->x(), node->y());
+	// tid の反対側の端子を求める．
+	const NlNode* s_node = mGraph.start_node(tid - 1);
+	const NlNode* e_node = mGraph.end_node(tid - 1);
+	const NlNode* alt_node = (s_node == node) ? e_node : s_node;
+	if ( mFringeMark[alt_node->id()] ) {
+	  // alt_node も外周上なら無視する．
+	  ymuint pos = mFringePos[alt_node->id()];
+	  ASSERT_COND( pos > i1 && pos < i2 );
+	  continue;
+	}
+	cout << "    #" << tid << ": " << alt_node->str() << endl;
+	// alt_node が外周ノードに隣接していたら
+	// そのノードは tid1 の経路になる．
+	ymuint x0 = alt_node->x();
+	ymuint y0 = alt_node->y();
+	if ( x0 > 0 ) {
+	  found |= check_bottleneck(x0 - 1, y0, tid1, pos1, pos2);
+	}
+	if ( x0 < mWidth - 1) {
+	  found |= check_bottleneck(x0 + 1, y0, tid1, pos1, pos2);
+	}
+	if ( y0 > 0 ) {
+	  found |= check_bottleneck(x0, y0 - 1, tid1, pos1, pos2);
+	}
+	if ( y0 < mHeight - 1 ) {
+	  found |= check_bottleneck(x0, y0 + 1, tid1, pos1, pos2);
+	}
+      }
+
+      // i2 と i1 の間の端子を調べる．
+      for (ymuint i = i2 + 1; i != i1; ) {
+	ymuint pos = mTermPosList[i];
+	const NlNode* node = mFringeList[pos];
+	ymuint tid = label(node->x(), node->y());
+	// tid の反対側の端子を求める．
+	const NlNode* s_node = mGraph.start_node(tid - 1);
+	const NlNode* e_node = mGraph.end_node(tid - 1);
+	const NlNode* alt_node = (s_node == node) ? e_node : s_node;
+	if ( mFringeMark[alt_node->id()] ) {
+	  // alt_node も外周上なら無視する．
+	  ymuint pos = mFringePos[alt_node->id()];
+	  ASSERT_COND( pos > i1 && pos < i2 );
+	}
+	else {
+	  cout << "    #" << tid << ": " << alt_node->str() << endl;
 	  // alt_node が外周ノードに隣接していたら
 	  // そのノードは tid1 の経路になる．
 	  ymuint x0 = alt_node->x();
 	  ymuint y0 = alt_node->y();
 	  if ( x0 > 0 ) {
-	    ymuint x1 = x0 - 1;
-	    const NlNode* node = mGraph.node(x1, y0);
-	    if ( fringe_mark[node->id()] ) {
-	      grid(x1, y0) = (tid1 << 2) | 2;
-	      cout << " " << node->str() << " : " << tid1 << endl;
-	      found = true;
-	    }
+	    found |= check_bottleneck(x0 - 1, y0, tid1, pos2, pos1);
 	  }
 	  if ( x0 < mWidth - 1) {
-	    ymuint x1 = x0 + 1;
-	    const NlNode* node = mGraph.node(x1, y0);
-	    if ( fringe_mark[node->id()] ) {
-	      grid(x1, y0) = (tid1 << 2) | 2;
-	      cout << " " << node->str() << " : " << tid1 << endl;
-	      found = true;
-	    }
+	    found |= check_bottleneck(x0 + 1, y0, tid1, pos2, pos1);
 	  }
 	  if ( y0 > 0 ) {
-	    ymuint y1 = y0 - 1;
-	    const NlNode* node = mGraph.node(x0, y1);
-	    if ( fringe_mark[node->id()] ) {
-	      grid(x0, y1) = (tid1 << 2) | 2;
-	      cout << " " << node->str() << " : " << tid1 << endl;
-	      found = true;
-	    }
+	    found |= check_bottleneck(x0, y0 - 1, tid1, pos2, pos1);
 	  }
 	  if ( y0 < mHeight - 1 ) {
-	    ymuint y1 = y0 + 1;
-	    const NlNode* node = mGraph.node(x0, y1);
-	    if ( fringe_mark[node->id()] ) {
-	      grid(x0, y1) = (tid1 << 2) | 2;
-	      cout << " " << node->str() << " : " << tid1 << endl;
-	      found = true;
-	    }
+	    found |= check_bottleneck(x0, y0 + 1, tid1, pos2, pos1);
 	  }
 	}
+	i = (i + 1) % mTermPosList.size();
       }
     }
   }
@@ -398,6 +415,42 @@ NlBan::frame_dir(ymuint x,
   return ans;
 }
 
+// @brief phase2 の下請け関数
+bool
+NlBan::check_bottleneck(ymuint x,
+			ymuint y,
+			ymuint tid,
+			ymuint pos1,
+			ymuint pos2)
+{
+  const NlNode* node = mGraph.node(x, y);
+  if ( !mFringeMark[node->id()] ) {
+    return false;
+  }
+  if ( is_fixed(x, y) ) {
+    return false;
+  }
+  ymuint pos = mFringePos[node->id()];
+  if ( pos1 < pos2 ) {
+    if ( pos > pos1 && pos < pos2 ) {
+      return false;
+    }
+  }
+  else {
+    if ( pos > pos1 || pos < pos2 ) {
+      return false;
+    }
+  }
+  if ( mFringeMark[node->id()] && !is_fixed(x, y) ) {
+    grid(x, y) = (tid << 2) | 2;
+    //#if DEBUG_ROUTE
+    cout << " " << node->str() << " : " << tid << endl;
+    //#endif
+    return true;
+  }
+  return false;
+}
+
 // @brief 枠のとき true を返す．
 // @param[in] x, y 座標
 bool
@@ -405,6 +458,16 @@ NlBan::is_frame(ymuint x,
 		ymuint y) const
 {
   return static_cast<bool>(mGridArray[index(x, y)] & 1U);
+}
+
+// @brief ラベルが確定のとき true を返す．
+// @param[in] x, y 座標
+// @return (x, y) が枠の時 true を返す．
+bool
+NlBan::is_fixed(ymuint x,
+		ymuint y) const
+{
+  return static_cast<bool>((mGridArray[index(x, y)] >> 1) & 1U);
 }
 
 // @brief ラベルを得る．
