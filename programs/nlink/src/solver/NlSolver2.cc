@@ -186,75 +186,18 @@ NlSolver2::solve(const NlGraph& graph,
   NlBan ban(graph);
 
   for ( ; ; ) {
-    vector<pair<const NlNode*, ymuint> > fixed_list;
-    ban.phase1(fixed_list);
+    ban.phase1();
 
-    if ( !ban.phase2() ) {
+    bool stat2 = ban.phase2();
+
+    bool stat3 = ban.phase3();
+
+    if ( !stat2 && !stat3 ) {
       break;
     }
   }
 
-#if 0
-  if ( false ) {
-    ymuint num = graph.num();
-    for (ymuint i1 = 0; i1 < num; ++ i1) {
-      for (ymuint i2 = i1 + 1; i2 < num; ++ i2) {
-	cout << "#" << (i1 + 1) << ",  #" << (i2 + 1) << endl;
-	// #(i1 + 1), #(i2 + 1) の線分だけの制約を作る．
-
-	SatSolver solver(mSatType, string(), NULL);
-
-	vector<bool> sel_list(num);
-	sel_list[i1] = true;
-	sel_list[i2] = true;
-
-	make_base_cnf(solver, graph, sel_list);
-
-	for (ymuint j = 0; j < fixed_list.size(); ++ j) {
-	  const pair<const NlNode*, ymuint>& p = fixed_list[j];
-	  const NlNode* node = p.first;
-	  ymuint idx = p.second;
-	  add_hint(solver, node, num, idx);
-	}
-
-	vector<Bool3> model;
-	Bool3 stat = solver.solve(model);
-	if ( stat != kB3True ) {
-	  cout << "Error: no route for #" << (i1 + 1) << ", #" << (i2 + 1) << endl;
-	}
-
-	vector<const NlEdge*> edge_list1;
-	find_path(graph, model, i1, edge_list1);
-
-	vector<const NlEdge*> edge_list2;
-	find_path(graph, model, i2, edge_list2);
-
-	solver.set_max_conflict(1000);
-
-	vector<Literal> assumptions(1);
-	vector<Bool3> model1;
-	for (ymuint j = 0; j < edge_list1.size(); ++ j) {
-	  const NlEdge* edge = edge_list1[j];
-	  cout << "  " << edge->str() << " for #" << (i1 + 1) << endl;
-	  VarId var = edge_var(edge, i1);
-	  assumptions[0] = ~Literal(var);
-	  if ( solver.solve(assumptions, model1) == kB3False ) {
-	    cout << " " << edge->str() << " is essential for #" << (i1 + 1) << endl;
-	  }
-	}
-	for (ymuint j = 0; j < edge_list2.size(); ++ j) {
-	  const NlEdge* edge = edge_list2[j];
-	  cout << "  " << edge->str() << " for #" << (i2 + 1) << endl;
-	  VarId var = edge_var(edge, i2);
-	  assumptions[0] = ~Literal(var);
-	  if ( solver.solve(assumptions, model1) == kB3False ) {
-	    cout << " " << edge->str() << " is essential for #" << (i2 + 1) << endl;
-	  }
-	}
-      }
-    }
-  }
-#endif
+  ban.dump(cout);
 
   SatSolver solver(mSatType, string(), NULL);
 
@@ -270,34 +213,6 @@ NlSolver2::solve(const NlGraph& graph,
       add_hint(solver, node, graph.num(), tid);
     }
   }
-
-#if 0
-  if ( false ) {
-    add_hint(solver, graph, 15,  4, 1);
-    add_hint(solver, graph, 13, 11, 1);
-    add_hint(solver, graph, 11,  3, 1);
-    add_hint(solver, graph,  8,  2, 1);
-    add_hint(solver, graph,  1, 14, 1);
-
-    add_hint(solver, graph,  3,  1, 1);
-
-    add_hint(solver, graph, 10,  1, 6);
-
-#if 1
-    add_hint(solver, graph,  5,  1,  3);
-    add_hint(solver, graph,  5,  2,  3);
-    add_hint(solver, graph,  5,  3,  3);
-    add_hint(solver, graph,  5,  4,  3);
-    add_hint(solver, graph,  5,  5,  3);
-    add_hint(solver, graph,  5,  6,  3);
-    add_hint(solver, graph,  5,  7,  3);
-    add_hint(solver, graph,  5,  8,  3);
-    add_hint(solver, graph,  5,  9,  3);
-    add_hint(solver, graph,  5, 10,  3);
-    add_hint(solver, graph,  5, 11,  3);
-#endif
-  }
-#endif
 
   if ( verbose ) {
     SatMsgHandler* msg_handler = new SatMsgHandlerImpl1(cout);
@@ -516,8 +431,6 @@ NlSolver2::add_hint(SatSolver& solver,
 		    ymuint num,
 		    ymuint idx)
 {
-  cout << " " << node->str() << ": " << idx << endl;
-
   const vector<const NlEdge*>& edge_list = node->edge_list();
   ymuint ne = edge_list.size();
 

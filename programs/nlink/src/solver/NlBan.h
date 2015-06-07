@@ -51,17 +51,25 @@ public:
 
   /// @brief 外周部の線分を確定させる．
   void
-  phase1(vector<pair<const NlNode*, ymuint> >& fixed_list);
+  phase1();
 
   /// @brief トポロジから経路を確定させる．
   bool
   phase2();
+
+  /// @brief トポロジから経路を確定させる．
+  bool
+  phase3();
 
   /// @brief ラベルを得る．
   /// @param[in] x, y 座標
   ymuint
   label(ymuint x,
 	ymuint y) const;
+
+  /// @brief 内容を出力する．
+  void
+  dump(ostream& s) const;
 
 
 private:
@@ -74,8 +82,7 @@ private:
   fix_route(const vector<const NlNode*>& fringe_list,
 	    ymuint pos1,
 	    ymuint pos2,
-	    ymuint terminal_id,
-	    vector<pair<const NlNode*, ymuint> >& fix_list);
+	    ymuint terminal_id);
 
   /// @brief 隣の外周ノードを見つける．
   /// @param[in] x, y 座標
@@ -103,19 +110,41 @@ private:
 		   ymuint pos1,
 		   ymuint pos2);
 
-  /// @brief ラベルが確定のとき true を返す．
-  /// @param[in] x, y 座標
-  /// @return (x, y) が枠の時 true を返す．
-  bool
-  is_fixed(ymuint x,
-	   ymuint y) const;
-
   /// @brief 枠のとき true を返す．
   /// @param[in] x, y 座標
   /// @return (x, y) が枠の時 true を返す．
   bool
   is_frame(ymuint x,
 	   ymuint y) const;
+
+  /// @brief 端子のとき true を返す．
+  /// @param[in] x, y 座標
+  /// @return (x, y) が端子の時 true を返す．
+  bool
+  is_terminal(ymuint x,
+	      ymuint y) const;
+
+  /// @brief ラベルをつける．
+  /// @param[in] x, y 座標
+  /// @param[in] label ラベル
+  /// @param[in] frame 枠フラグ
+  void
+  set_label(ymuint x,
+	    ymuint y,
+	    ymuint label,
+	    bool frame);
+
+  /// @brief 枠の印をつける．
+  /// @param[in] x, y 座標
+  void
+  set_frame(ymuint x,
+	    ymuint y);
+
+  /// @brief 枠の印を消す．
+  /// @param[in] x, y 座標
+  void
+  clear_frame(ymuint x,
+	      ymuint y);
 
   /// @brief 格子を得る．
   /// @param[in] x, y 座標
