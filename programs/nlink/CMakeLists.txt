@@ -68,6 +68,7 @@ set (nlink3_SOURCES
   )
 
 set (nlview_SOURCES
+  src/gui/NlMainWindow.cc
   src/gui/NlView.cc
   src/gui/nlview.cc
   )
@@ -112,6 +113,7 @@ target_link_libraries(nlink
 
 if (Qt4_FOUND)
   QT4_WRAP_CPP(HEADERS_MOC
+    src/gui/NlMainWindow.h
     src/gui/NlView.h
     )
 
