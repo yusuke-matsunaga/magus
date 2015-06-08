@@ -242,7 +242,7 @@ NlSolver1::make_base_cnf(SatSolver& solver,
   // ノードの変数を作る．
   for (ymuint node_id = 0; node_id < max_node_id; ++ node_id) {
     for (ymuint i = 0; i < mLogN; ++ i) {
-      VarId var = solver.new_var();
+      VarId var = solver.new_var(false);
       mNodeVarArray[node_id * mLogN + i] = var;
     }
   }
