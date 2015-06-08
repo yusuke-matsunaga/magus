@@ -49,12 +49,13 @@ SatSolver::~SatSolver()
 }
 
 // @brief 変数を追加する．
+// @param[in] decision 決定変数の時に true とする．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
-SatSolver::new_var()
+SatSolver::new_var(bool decision)
 {
-  VarId id = mImpl->new_var();
+  VarId id = mImpl->new_var(decision);
 
   if ( mRecOut ) {
     *mRecOut << "N" << endl

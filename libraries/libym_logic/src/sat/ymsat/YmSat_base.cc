@@ -103,10 +103,11 @@ YmSat::sane() const
 }
 
 // @brief 変数を追加する．
+// @param[in] decision 決定変数の時に true とする．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
-YmSat::new_var()
+YmSat::new_var(bool decision)
 {
   if ( decision_level() != 0 ) {
     // エラー
@@ -114,6 +115,8 @@ YmSat::new_var()
     ASSERT_NOT_REACHED;
     return kVarIdIllegal;
   }
+
+  mDvarArray.push_back(decision);
 
   // ここではカウンタを増やすだけ
   // 実際の処理は alloc_var() でまとめて行う．
