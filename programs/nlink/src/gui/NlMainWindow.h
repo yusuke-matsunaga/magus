@@ -74,7 +74,17 @@ private:
   create_statusbar();
 
   void
-  load_file(QString& file_name);
+  load_file(const QString& file_name);
+
+  void
+  set_current_file(const QString& file_name);
+
+  void
+  update_recent_file_actions();
+
+  static
+  QString
+  stripped_name(const QString& full_file_name);
 
 
 private:

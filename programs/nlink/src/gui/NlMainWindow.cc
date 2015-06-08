@@ -29,6 +29,8 @@ NlMainWindow::NlMainWindow()
   create_context_menu();
   create_toolbars();
   create_statusbar();
+
+  set_current_file("");
 }
 
 void
@@ -121,10 +123,59 @@ NlMainWindow::create_statusbar()
 }
 
 void
-NlMainWindow::load_file(QString& file_name)
+NlMainWindow::load_file(const QString& file_name)
 {
   NlProblem problem = read_problem(file_name.toStdString());
   mNlView->set_problem(problem);
+
+  set_current_file(file_name);
+}
+
+void
+NlMainWindow::set_current_file(const QString& file_name)
+{
+  mCurFile = file_name;
+  setWindowModified(false);
+
+  QString show_name = "Untitled";
+  if ( !mCurFile.isEmpty() ) {
+    show_name = stripped_name(mCurFile);
+    mRecentFiles.removeAll(mCurFile);
+    mRecentFiles.prepend(mCurFile);
+    update_recent_file_actions();
+  }
+
+  setWindowTitle(tr("%1[*] - %2").arg(show_name).arg(tr("NumberLink Viewer")));
+}
+
+void
+NlMainWindow::update_recent_file_actions()
+{
+  QMutableStringListIterator i(mRecentFiles);
+  while ( i.hasNext() ) {
+    if ( !QFile::exists(i.next()) ) {
+      i.remove();
+    }
+  }
+
+  for (int j = 0; j < kMaxRecentFiles; ++ j) {
+    if ( j < mRecentFiles.count() ) {
+      QString text = tr("&%1 %2").arg(j + 1).arg(stripped_name(mRecentFiles[j]));
+      mRecentFileActions[j]->setText(text);
+      mRecentFileActions[j]->setData(mRecentFiles[j]);
+      mRecentFileActions[j]->setVisible(true);
+    }
+    else {
+      mRecentFileActions[j]->setVisible(false);
+    }
+  }
+  mSeparatorAction->setVisible(!mRecentFiles.isEmpty());
+}
+
+QString
+NlMainWindow::stripped_name(const QString& full_file_name)
+{
+  return QFileInfo(full_file_name).fileName();
 }
 
 END_NAMESPACE_YM_NLINK
