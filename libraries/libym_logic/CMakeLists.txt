@@ -150,8 +150,8 @@ set (sat_SOURCES
   src/sat/ymsat/SaUIP2.cc
   src/sat/ymsat/SatClause.cc
   src/sat/ymsat/VarHeap.cc
-  src/sat/ymsat/YmSat.cc
-  src/sat/ymsat/YmSatR.cc
+  src/sat/ymsat/YmSat_base.cc
+  src/sat/ymsat/YmSat_solve.cc
   )
 
 set (smt_SOURCES
@@ -234,3 +234,12 @@ if (READLINE_FOUND)
     ${Readline_LIBRARY}
     )
 endif (READLINE_FOUND)
+
+
+add_executable(ymsat
+  tests/sat/ymsat.cc
+  )
+
+target_link_libraries(ymsat
+  ym_logic
+  )

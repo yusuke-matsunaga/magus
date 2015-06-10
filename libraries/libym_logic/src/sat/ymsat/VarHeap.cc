@@ -96,7 +96,7 @@ VarHeap::bump_var_activity(VarId varid)
 void
 VarHeap::decay_var_activity()
 {
-  mVarBump /= mVarDecay;
+  mVarBump *= (1 / mVarDecay);
 }
 
 // @brief 変数のアクティビティを初期化する．
@@ -144,6 +144,8 @@ VarHeap::move_down(ymuint pos)
       // 左右の子どもを持たない場合
       break;
     }
+    // 左右の子供のうちアクティビティの大きい方を pos_c とする．
+    // 同点なら左を選ぶ．
     ymuint pos_c = pos_l;
     ymuint vindex_c = mHeap[pos_c];
     double val_c = mActivity[vindex_c];
@@ -156,6 +158,7 @@ VarHeap::move_down(ymuint pos)
 	val_c = val_r;
       }
     }
+    // 子供のアクティビティが親を上回らなければ終わり
     if ( val_c <= val_p ) {
       break;
     }

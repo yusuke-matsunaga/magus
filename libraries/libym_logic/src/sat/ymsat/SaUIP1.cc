@@ -70,35 +70,13 @@ SaUIP1::capture(SatReason creason,
       for (ymuint i = 0; i < n; ++ i) {
 	Literal q = cclause->lit(i);
 	if ( !first && q == cclause->wl0() ) continue;
-	VarId var = q.varid();
-	int var_level = decision_level(var);
-	if ( !get_mark(var) && var_level > 0 ) {
-	  set_mark_and_putq(var);
-	  bump_var_activity(var);
-	  if ( var_level < decision_level() ) {
-	    learnt.push_back(q);
-	  }
-	  else {
-	    ++ count;
-	  }
-	}
+	put_lit(q, learnt, count);
       }
     }
     else {
       ASSERT_COND( !first );
       Literal q = creason.literal();
-      VarId var = q.varid();
-      int var_level = decision_level(var);
-      if ( !get_mark(var) && var_level > 0 ) {
-	set_mark_and_putq(var);
-	bump_var_activity(var);
-	if ( var_level < decision_level() ) {
-	    learnt.push_back(q);
-	}
-	else {
-	  ++ count;
-	}
-      }
+      put_lit(q, learnt, count);
     }
 
     first = false;
@@ -117,14 +95,34 @@ SaUIP1::capture(SatReason creason,
 	-- count;
 	break;
       }
-#if defined(DEBUG)
-      // ここは重いのでコメントアウトしておく
       ASSERT_COND(last > 0 );
-#endif
     }
     if ( count == 0 ) {
       // q は first UIP だった．
       break;
+    }
+  }
+}
+
+// @brief conflict 節のリテラルに対する処理を行う．
+// @param[in] lit リテラル
+// @param[in] learnt 学習節の要素リスト
+// @param[inout] count ペンディング状態のリテラル数
+void
+SaUIP1::put_lit(Literal lit,
+		vector<Literal>& learnt,
+		ymuint& count)
+{
+  VarId var = lit.varid();
+  int var_level = decision_level(var);
+  if ( !get_mark(var) && var_level > 0 ) {
+    set_mark_and_putq(var);
+    bump_var_activity(var);
+    if ( var_level < decision_level() ) {
+      learnt.push_back(lit);
+    }
+    else {
+      ++ count;
     }
   }
 }

@@ -40,11 +40,12 @@ public:
   sane() const = 0;
 
   /// @brief 変数を追加する．
+  /// @param[in] decision 決定変数の時に true とする．
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
   virtual
   VarId
-  new_var() = 0;
+  new_var(bool decition) = 0;
 
   /// @brief 節を追加する．
   /// @param[in] lits リテラルのベクタ
@@ -137,6 +138,12 @@ public:
   virtual
   ymuint
   literal_num() const = 0;
+
+  /// @brief DIMACS 形式で制約節を出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  write_DIMACS(ostream& s) const = 0;
 
   /// @brief conflict_limit の最大値
   /// @param[in] val 設定する値

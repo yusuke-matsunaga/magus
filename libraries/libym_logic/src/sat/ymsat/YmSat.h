@@ -115,11 +115,12 @@ public:
   sane() const;
 
   /// @brief 変数を追加する．
+  /// @param[in] decision 決定変数の時に true とする．
   /// @return 新しい変数番号を返す．
   /// @note 変数番号は 0 から始まる．
   virtual
   VarId
-  new_var();
+  new_var(bool decision);
 
   /// @brief 節を追加する．
   /// @param[in] lits リテラルのベクタ
@@ -213,6 +214,12 @@ public:
   ymuint
   literal_num() const;
 
+  /// @brief DIMACS 形式で制約節を出力する．
+  /// @param[in] s 出力先のストリーム
+  virtual
+  void
+  write_DIMACS(ostream& s) const;
+
   /// @brief conflict_limit の最大値
   /// @param[in] val 設定する値
   /// @return 以前の設定値を返す．
@@ -276,20 +283,28 @@ private:
 
   /// @brief CNF を簡単化する．
   void
-  sweep_clause();
+  reduce_CNF();
+
+  /// @brief 充足している節を取り除く
+  /// @param[in] clause_list 節のリスト
+  void
+  sweep_clause(vector<SatClause*>& clause_list);
 
   /// @brief 使われていない学習節を削除する．
   void
   cut_down();
 
   /// @brief add_clause() の下請け関数
+  /// @param[in] lit_num リテラル数
+  ///
+  /// リテラルの実体は mTmpLits[] に入っている．
   void
   add_clause_sub(ymuint lit_num);
 
   /// @brief 学習節を追加する．
-  /// @note 追加するリテラルは mLearntLits に入れる．
+  /// @param[in] learnt_lits 追加する節のもととなるリテラルのリスト
   void
-  add_learnt_clause();
+  add_learnt_clause(const vector<Literal>& learnt_lits);
 
   /// @brief mTmpLits を確保する．
   /// @param[in] lit_num リテラル数
@@ -329,6 +344,11 @@ private:
   del_watcher(Literal watch_lit,
 	      SatReason reason);
 
+  /// @brief 充足された watcher を削除する．
+  /// @param[in] watch_lit リテラル
+  void
+  del_satisfied_watcher(Literal watch_lit);
+
   /// @brief 変数1の評価を行う．
   /// @param[in] id 変数番号
   Bool3
@@ -349,6 +369,7 @@ private:
   decision_level(VarId varid) const;
 
   /// @brief LBD を計算する．
+  /// @param[in] clause 対象の節
   ymuint
   calc_lbd(const SatClause* clause);
 
@@ -404,10 +425,16 @@ private:
   FragAlloc mAlloc;
 
   // 制約節の配列
+  // ただし二項節は含まない．
   vector<SatClause*> mConstrClause;
 
-  // 二項制約節の数
-  ymuint64 mConstrBinNum;
+  // 二項制約節の配列
+  // この節は実際には使われない．
+  vector<SatClause*> mConstrBinClause;
+
+  // 全ての制約節の配列
+  // この節は実際には使われない．
+  vector<SatClause*> mAllConstrClause;
 
   // 制約節の総リテラル数 (二項制約節も含む)
   ymuint64 mConstrLitNum;
@@ -420,6 +447,9 @@ private:
 
   // 学習節の総リテラル数 (二項制約節も含む)
   ymuint64 mLearntLitNum;
+
+  // dvar 配列
+  vector<bool> mDvarArray;
 
   // 変数の数
   ymuint32 mVarNum;
@@ -454,7 +484,7 @@ private:
   VarHeap mVarHeap;
 
   // calc_lbd() 用の作業領域
-  // サイズは decision_level()
+  // サイズは decision_level() + 1
   bool* mLbdTmp;
 
   // mLbdTmp のサイズ．
@@ -523,8 +553,42 @@ private:
   // mTmpLits のサイズ
   ymuint32 mTmpLitsSize;
 
-  // search() で用いられるリテラル配列
-  vector<Literal> mLearntLits;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // デバッグ用の定数，変数
+  //////////////////////////////////////////////////////////////////////
+
+  static
+  const ymuint debug_none        = 0x00;
+
+  static
+  const ymuint debug_implication = 0x01;
+
+  static
+  const ymuint debug_analyze     = 0x02;
+
+  static
+  const ymuint debug_assign      = 0x04;
+
+  static
+  const ymuint debug_decision    = 0x08;
+
+  static
+  const ymuint debug_solve       = 0x10;
+
+  static
+  const ymuint debug_all         = 0xffffffff;
+
+  static
+  //const ymuint debug = debug_decision | debug_analyze | debug_assign;
+  //const ymuint debug = debug_assign;
+  //const ymuint debug = debug_assign | debug_implication;
+  //const ymuint debug = debug_assign | debug_analyze;
+  //const ymuint debug = debug_solve | debug_decision;
+  //const ymuint debug = debug_solve | debug_assign;
+  //const ymuint debug = debug_all;
+  const ymuint debug = debug_none;
 
 };
 

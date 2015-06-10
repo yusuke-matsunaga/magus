@@ -40,10 +40,11 @@ SatSolverMiniSat::sane() const
 }
 
 // @brief 変数を追加する．
+// @param[in] decision 決定変数の時に true とする．
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
-SatSolverMiniSat::new_var()
+SatSolverMiniSat::new_var(bool decision)
 {
   return VarId(mSolver.newVar());
 }
@@ -179,6 +180,13 @@ ymuint
 SatSolverMiniSat::literal_num() const
 {
   return mSolver.stats.clauses_literals;
+}
+
+// @brief DIMACS 形式で制約節を出力する．
+// @param[in] s 出力先のストリーム
+void
+SatSolverMiniSat::write_DIMACS(ostream& s) const
+{
 }
 
 // @brief solve() 中のリスタートのたびに呼び出されるメッセージハンドラの登録

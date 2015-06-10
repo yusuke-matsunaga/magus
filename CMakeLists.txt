@@ -30,6 +30,7 @@ option (BUILD_SATPG "build satpg" ON)
 option (BUILD_IGF "build igf" OFF)
 option (BUILD_BNET2AIG "build bnet2aig" OFF)
 option (BUILD_MAKEBDD "build makebdd" OFF)
+option (BUILD_NLINK "build nlink" ON)
 
 
 # ===================================================================
@@ -140,6 +141,10 @@ endif (BUILD_SATPG)
 if (BUILD_MAGUS)
   add_subdirectory (programs/magus)
 endif (BUILD_MAGUS)
+
+if (BUILD_NLINK)
+  add_subdirectory (programs/nlink)
+endif (BUILD_NLINK)
 
 
 # ===================================================================

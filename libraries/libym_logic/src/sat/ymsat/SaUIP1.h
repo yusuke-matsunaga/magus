@@ -56,6 +56,15 @@ protected:
   capture(SatReason creason,
 	  vector<Literal>& learnt);
 
+  /// @brief conflict 節のリテラルに対する処理を行う．
+  /// @param[in] lit リテラル
+  /// @param[in] learnt 学習節の要素リスト
+  /// @param[inout] count ペンディング状態のリテラル数
+  void
+  put_lit(Literal lit,
+	  vector<Literal>& learnt,
+	  ymuint& count);
+
 };
 
 END_NAMESPACE_YM_SAT

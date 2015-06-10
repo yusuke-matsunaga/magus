@@ -1,37 +1,37 @@
-﻿#ifndef YMSATR_H
-#define YMSATR_H
+﻿#ifndef GRAPHSATR_H
+#define GRAPHSATR_H
 
-/// @file YmSatR.h
-/// @brief YmSatR のヘッダファイル
+/// @file GraphSatR.h
+/// @brief GraphSatR のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmSat.h"
+#include "GraphSatImpl.h"
 
 
-BEGIN_NAMESPACE_YM_SAT
+BEGIN_NAMESPACE_YM_NLINK
 
 //////////////////////////////////////////////////////////////////////
-/// @class YmSatR YmSatR.h "YmSatR.h"
+/// @class GraphSatR GraphSatR.h "GraphSatR.h"
 /// @brief ログ記録機能付きの YmSat
 //////////////////////////////////////////////////////////////////////
-class YmSatR :
-  public YmSat
+class GraphSatR :
+  public GraphSatImpl
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] out 出力ストリーム
   /// @param[in] option オプション文字列
-  YmSatR(ostream& out,
-	 const string& option = string());
+  GraphSatR(ostream& out,
+	    const string& option = string());
 
   /// @brief デストラクタ
   virtual
-  ~YmSatR();
+  ~GraphSatR();
 
 
 public:
@@ -95,6 +95,11 @@ public:
 	     Literal lit4,
 	     Literal lit5);
 
+  /// @brief グラフを追加する．
+  virtual
+  void
+  add_graph(const GsGraphBuilder& graph_src);
+
   /// @brief SAT 問題を解く．
   /// @param[in] assumptions あらかじめ仮定する変数の値割り当てリスト
   /// @param[out] model 充足するときの値の割り当てを格納する配列．
@@ -128,6 +133,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_SAT
+END_NAMESPACE_YM_NLINK
 
-#endif // YMSATR_H
+#endif // GRAPHSATR_H
