@@ -40,17 +40,27 @@ public:
   /// @param[in] fmgr 故障グループマネージャ
   /// @param[in] max_node_id ノード番号の最大値
   /// @param[in] group_list もとのグループ番号リスト
-  /// @param[in] new_group_list 圧縮後のグループ番号リスト
+  /// @param[in] fast 高速ヒューリスティック
+  /// @param[out] new_group_list 圧縮後のグループ番号リスト
   void
   run(FgMgr& fgmgr,
       ymuint max_node_id,
       const vector<ymuint>& group_list,
+      bool fast,
       vector<ymuint>& new_group_list);
 
   /// @brief verbose フラグを設定する．
   /// @param[in] verbose 指定する値
   void
   set_verbose(ymuint verbose);
+
+  /// @brief print_detail フラグを設定する．
+  void
+  set_print_detail(bool flag);
+
+  /// @brief しきい値を設定する．
+  void
+  set_thval(ymuint val);
 
 
 private:
@@ -76,6 +86,22 @@ private:
   phase1(FgMgr& fgmgr,
 	 vector<ymuint>& group_list);
 
+  /// @brief 故障グループが削除できるか調べる．
+  /// @param[in] fmgr 故障グループマネージャ
+  /// @param[in] gid 対象のグループ番号
+  /// @param[in] group_list グループ番号のリスト
+  /// @param[in] deleted 削除済みフラグの配列
+  /// @return 削除できたら true を返す．
+  ///
+  /// 削除が成功した場合，gid に含まれていた故障は
+  /// 他のグループに移動される．
+  bool
+  remove_group(FgMgr& fgmgr,
+	       ymuint gid,
+	       const vector<ymuint>& group_list,
+	       ymuint count,
+	       const vector<bool>& deleted);
+
   /// @brief phase-2
   /// @param[in] fmgr 故障グループマネージャ
   /// @param[inout] group_list 選択されたグループ番号のリスト
@@ -96,6 +122,15 @@ private:
 
   // ノード番号の最大値
   ymuint mMaxNodeId;
+
+  // fast フラグ
+  bool mFast;
+
+  // print_detail フラグ
+  bool mPrintDetail;
+
+  // しきい値
+  ymuint mThVal;
 
 };
 

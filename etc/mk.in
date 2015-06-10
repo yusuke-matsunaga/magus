@@ -13,7 +13,7 @@ case $1 in
 	(cd debug;   $CMAKE $srcdir -DCMAKE_BUILD_TYPE=DEBUG)
 	;;
 
-    make)
+    ""|make)
 	(cd release; $MAKE all)
 	(cd debug;   $MAKE all)
 	;;

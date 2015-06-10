@@ -5,7 +5,7 @@
 /// @brief EqChecker のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2013-2014, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -51,11 +51,11 @@ public:
   set_verbose(int verbose);
 
   /// @brief 代表故障を求める．
-  ///
-  /// 結果は rep_fault_list に格納される．
+  /// @param[in] src_fid_list 故障リスト
+  /// @param[out] rep_fid_list 結果の代表故障を格納するスト
   void
-  get_rep_faults(const vector<const TpgFault*>& src_list,
-		 vector<const TpgFault*>& rep_fault_list);
+  get_rep_faults(const vector<ymuint>& src_fid_list,
+		 vector<ymuint>& rep_fid_list);
 
 
 private:
@@ -64,19 +64,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 故障シミュレーションを行い，等価故障の候補リストを作る．
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] fid_list 故障リスト
+  ///
+  /// 結果は mEqSet に格納される．
   void
-  do_fsim(const vector<const TpgFault*>& fault_list);
-
-  /// @brief f1 と f2 が等価かどうか調べる．
-  bool
-  check_fault_equivalence(const TpgFault* f1,
-			  const TpgFault* f2);
-
-  /// @brief f1 が f2 を支配しているか調べる．
-  bool
-  check_fault_dominance2(const TpgFault* f1,
-			 const TpgFault* f2);
+  do_fsim(const vector<ymuint>& fid_list);
 
 
 private:
@@ -102,9 +94,6 @@ private:
   // 故障シミュレータ
   Fsim& mFsim;
 
-  // 最大ノード番号
-  ymuint mMaxNodeId;
-
   // 最大故障番号
   ymuint mMaxFaultId;
 
@@ -114,21 +103,9 @@ private:
   // 等価故障の候補リストを表すクラス
   EqSet mEqSet;
 
-  USTime mSuccessTime;
-
-  USTime mSuccessMax;
-
-  USTime mFailureTime;
-
-  USTime mFailureMax;
-
-  USTime mAbortTime;
-
-  USTime mAbortMax;
-
-  ymuint mDomCheckCount;
-
+  // 故障シミュレーションで用いられたパタン数
   ymuint mPat;
+
 };
 
 END_NAMESPACE_YM_SATPG

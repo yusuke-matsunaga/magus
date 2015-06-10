@@ -38,8 +38,11 @@ public:
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
+  /// @param[in] fsim3 3値の故障シミュレータ
   /// @param[in] exact 故障グループの両立性判定を厳密に行うときに true とする．
   /// @param[in] compaction 最後に圧縮を行うときに true とする．
+  /// @param[in] fast_compaction 最後に高速圧縮を行うときに true とする．
+  /// @param[in] mc_compaction 最後に高速圧縮を行うときに true とする．
   /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
@@ -47,8 +50,13 @@ public:
   run(TpgNetwork& network,
       TvMgr& tvmgr,
       Fsim& fsim2,
+      Fsim& fsim3,
       bool exact,
       bool compaction,
+      bool fast_compaction,
+      bool mc_compaction,
+      bool has_thval,
+      ymuint thval,
       vector<TestVector*>& tv_list,
       USTime& time) = 0;
 
@@ -57,28 +65,25 @@ public:
   void
   set_verbose(int verbose) = 0;
 
-  /// @brief dom_method を指定する．
-  virtual
-  void
-  set_dom_method(ymuint dom_method) = 0;
-
 };
 
 
 /// @brief インスタンスを生成する関数
-// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] group_dominance グループ支配を計算する．
 extern
 MinPat*
 new_MinPat(bool group_dominance);
 
 /// @brief インスタンスを生成する関数
-// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] rep_faults 等価故障の検出を行う．
 extern
 MinPat*
-new_MinPatSimple(bool group_dominance);
+new_MinPatSimple(bool group_dominance,
+		 bool rep_faults);
 
 /// @brief インスタンスを生成する関数
-// @param[in] group_dominance グループ支配を計算する．
+/// @param[in] group_dominance グループ支配を計算する．
 extern
 MinPat*
 new_MinPatSimple2(bool group_dominance);

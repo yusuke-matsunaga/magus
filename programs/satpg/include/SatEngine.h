@@ -72,7 +72,7 @@ public:
 
   /// @brief 故障回路のCNFを作る．
   /// @param[in] fval_cnf 故障回路用のデータ構造
-  /// @param[in] fault 故障
+  /// @param[in] src_node 故障位置のノード
   /// @param[in] node_set 故障に関係するノード集合
   /// @param[in] detect 検出条件
   ///
@@ -81,43 +81,26 @@ public:
   ///        = kValX: fd_var() で制御するCNFを作る．
   void
   make_fval_cnf(FvalCnf& fval_cnf,
-		const TpgFault* fault,
+		const TpgNode* src_node,
 		const NodeSet& node_set,
 		Val3 detect);
 
   /// @brief 故障回路のCNFを作る．
   /// @param[in] fval_cnf 故障回路用のデータ構造
   /// @param[in] fault 故障
+  /// @param[in] node_set 故障に関係するノード集合
   /// @param[in] detect 検出条件
   ///
   /// detect = kVal0: 検出しないCNFを作る．
   ///        = kVal1: 検出するCNFを作る．
   ///        = kValX: fd_var() で制御するCNFを作る．
+  ///
+  /// 内部で make_fval_cnf(src_node) と make_fault_cnf() を呼んでいる．
   void
   make_fval_cnf(FvalCnf& fval_cnf,
 		const TpgFault* fault,
+		const NodeSet& node_set,
 		Val3 detect);
-
-  /// @brief 2つの故障を持つ故障回路のCNFを作る．
-  /// @param[in] fval_cnf0 共通部分の故障回路用のデータ構造
-  /// @param[in] fval_cnf1 故障1の故障回路用のデータ構造
-  /// @param[in] fval_cnf2 故障2の故障回路用のデータ構造
-  /// @param[in] root_node 共通部分の開始点
-  /// @param[in] fault1 故障1
-  /// @param[in] fault2 故障2
-  /// @param[in] node_set0 共通部分に関係するノード集合
-  /// @param[in] node_set1 故障1に関係するノード集合
-  /// @param[in] node_set2 故障2に関係するノード集合
-  void
-  make_fval_cnf2(FvalCnf& fval_cnf0,
-		 FvalCnf& fval_cnf1,
-		 FvalCnf& fval_cnf2,
-		 const TpgNode* root_node,
-		 const TpgFault* fault1,
-		 const TpgFault* fault2,
-		 const NodeSet& node_set0,
-		 const NodeSet& node_set1,
-		 const NodeSet& node_set2);
 
   /// @brief 複数故障検出回路のCNFを作る．
   /// @param[in] mval_cnf 故障回路用のデータ構造
@@ -129,6 +112,25 @@ public:
 		const vector<const TpgFault*>& fault_list,
 		const vector<const TpgNode*>& fnode_list,
 		const NodeSet& node_set);
+
+  /// @brief 2つの変数の値が等しいという制約を追加する．
+  /// @param[in] var1, var2 変数番号
+  void
+  add_eq_clause(VarId var1,
+		VarId var2);
+
+  /// @brief 2つの変数の値が異なるという制約を追加する．
+  /// @param[in] var1, var2 変数番号
+  void
+  add_diff_clause(VarId var1,
+		  VarId var2);
+
+  /// @brief 割当リストに従って値を固定する．
+  /// @param[in] gval_cnf 正常回路用のデータ構造
+  /// @param[in] assignment 割当リスト
+  void
+  add_assignments(GvalCnf& gval_cnf,
+		  const NodeValList& assignment);
 
   /// @brief 割当リストの否定の節を加える．
   /// @param[in] gval_cnf 正常回路用のデータ構造
@@ -239,16 +241,16 @@ private:
 		 const VidMap& gvar_map,
 		 const VidMap& fvar_map);
 
-  /// @brief 故障伝搬条件を表すCNFを作る．
-  /// @param[in] node 対象のノード
+  /// @brief 故障箇所の関係を表す CNF を作る．
+  /// @param[in] fault 対象の故障
   /// @param[in] gvar_map 正常値の変数マップ
   /// @param[in] fvar_map 故障値の変数マップ
-  /// @param[in] dvar_map 故障伝搬条件の変数マップ
+  ///
+  /// こちらは fault を検出する条件を追加するバージョン
   void
-  make_dchain_cnf(const TpgNode* node,
-		  const VidMap& gvar_map,
-		  const VidMap& fvar_map,
-		  const VidMap& dvar_map);
+  make_fault_cnf_d(const TpgFault* fault,
+		   const VidMap& gvar_map,
+		   const VidMap& fvar_map);
 
   /// @brief 故障伝搬条件を表すCNFを作る．
   /// @param[in] node 対象のノード
@@ -257,11 +259,11 @@ private:
   /// @param[in] fvar_map 故障値の変数マップ
   /// @param[in] dvar_map 故障伝搬条件の変数マップ
   void
-  make_dchain_cnf2(const TpgNode* node,
-		   const TpgNode* dst_node,
-		   const VidMap& gvar_map,
-		   const VidMap& fvar_map,
-		   const VidMap& dvar_map);
+  make_dchain_cnf(const TpgNode* node,
+		  const TpgNode* dst_node,
+		  const VidMap& gvar_map,
+		  const VidMap& fvar_map,
+		  const VidMap& dvar_map);
 
   /// @brief ゲートの入出力の関係を表す CNF を作る．
   /// @param[in] gate_type ゲートの種類

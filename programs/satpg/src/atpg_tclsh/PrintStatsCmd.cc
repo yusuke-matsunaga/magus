@@ -22,6 +22,7 @@ BEGIN_NAMESPACE_YM_SATPG
 PrintStatsCmd::PrintStatsCmd(AtpgMgr* mgr) :
   AtpgCmd(mgr)
 {
+  set_usage_string("?filename?");
   mStopWatch.start();
 }
 
@@ -34,11 +35,30 @@ PrintStatsCmd::~PrintStatsCmd()
 int
 PrintStatsCmd::cmd_proc(TclObjVector& objv)
 {
+  // このコマンドはファイル名のみを引数に取る．
+  // 引数がなければ標準出力に出す．
   ymuint objc = objv.size();
-  if ( objc != 1 ) {
+  if ( objc > 2 ) {
     print_usage();
     return TCL_ERROR;
   }
+
+  // 出力先のストリームを開く
+  ostream* osp = &cout;
+  ofstream ofs;
+  if ( objc == 2 ) {
+    string filename = objv[1];
+    if ( !open_ofile(ofs, filename) ) {
+      // ファイルが開けなかった．
+      return TCL_ERROR;
+    }
+    osp = &ofs;
+  }
+
+  // 参照を使いたいのでめんどくさいことをやっている．
+  ostream& out = *osp;
+
+#warning "TODO: ostream を使うようにする．"
 
   USTime lap = mStopWatch.time();
 

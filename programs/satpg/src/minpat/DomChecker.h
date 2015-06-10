@@ -53,9 +53,11 @@ public:
   set_verbose(int verbose);
 
   /// @brief 支配故障を求める．
+  /// @param[in] src_fid_list 入力の故障番号リスト
+  /// @param[out] dom_fid_list 支配故障番号リスト
   void
-  get_dom_faults(const vector<const TpgFault*>& src_list,
-		 vector<const TpgFault*>& dom_fault_list);
+  get_dom_faults(const vector<ymuint>& src_fid_list,
+		 vector<ymuint>& dom_fid_list);
 
   /// @brief シミュレーション時の検出パタン数を返す．
   ymuint
@@ -123,30 +125,23 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  void
-  get_dom_faults2(ymuint option,
-		  const vector<const TpgFault*>& src_list,
-		  vector<const TpgFault*>& dom_fault_list);
-
   /// @brief 故障シミュレーションを行い，支配故障の候補リストを作る．
-  /// @param[in] fault_list 故障リスト
+  /// @param[in] fid_list 故障リスト
   void
-  do_fsim(const vector<const TpgFault*>& fault_list);
+  do_fsim(const vector<ymuint>& fid_list);
 
   /// @brief do_fsim() の下請け処理
   ymuint
   record_dom_cand(const vector<pair<ymuint, PackedVal> >& det_list);
 
   /// @brief 支配故障を求める基本処理
+  /// @param[in] src_fid_list 対象の故障のリスト
+  /// @param[in] idx 故障候補リストのインデックス
+  /// @param[in] dst_fid_list 支配されていない故障のリスト
   void
-  get_dom_faults1(const vector<ymuint>& src_list,
+  get_dom_faults1(const vector<ymuint>& src_fid_list,
 		  ymuint idx,
-		  vector<ymuint>& dst_list);
-
-  /// @brief f1 が f2 を支配しているか調べる．
-  bool
-  check_fault_dominance(const TpgFault* f1,
-			const TpgFault* f2);
+		  vector<ymuint>& dst_fid_list);
 
 
 private:
@@ -201,6 +196,8 @@ private:
   DomStats mStats[3];
 
   ymuint mPat;
+
+  ymuint mSmartDomCheck;
 
 };
 

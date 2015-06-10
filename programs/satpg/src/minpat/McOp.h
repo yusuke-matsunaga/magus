@@ -1,35 +1,39 @@
-﻿#ifndef MINPATSIMPLE2_H
-#define MINPATSIMPLE2_H
+#ifndef MCOP_H
+#define MCOP_H
 
-/// @file MinPatSimple2.h
-/// @brief MinPatSimple2 のヘッダファイル
+/// @file McOp.h
+/// @brief McOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2013-2014 Yusuke Matsunaga
+/// Copyright (C) 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "MinPatNaive.h"
+#include "FsimOp.h"
+#include "YmUtils/MinCov.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinPatSimple2 MinPatSimple2.h "MinPatSimple2.h"
-/// @brief MinPatNaive の故障の順番を改良したクラス
+// @class McOp McOp.h "McOp.h"
 //////////////////////////////////////////////////////////////////////
-class MinPatSimple2 :
-  public MinPatNaive
+class McOp :
+  public FsimOp
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] group_dominance グループ支配を計算する．
-  MinPatSimple2(bool group_dominance);
+  /// @param[in] mincov 最小被覆問題のオブジェクト
+  /// @param[in] row_map 故障番号から行番号を得る表
+  /// @param[in] col_pos 列番号
+  McOp(MinCov& mincov,
+       const vector<ymuint>& row_map,
+       ymuint col_pos);
 
   /// @brief デストラクタ
   virtual
-  ~MinPatSimple2();
+  ~McOp();
 
 
 public:
@@ -37,21 +41,19 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 故障を検出したときの処理
+  /// @param[in] f 故障
+  /// @param[in] dpat 検出したパタンを表すビットベクタ
+  virtual
+  void
+  operator()(const TpgFault* f,
+	     PackedVal dpat);
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 初期化を行う．
-  /// @param[in] fid_list 検出された故障のリスト
-  /// @param[in] tvmgr テストベクタマネージャ
-  /// @param[in] fsim2 2値の故障シミュレータ(検証用)
-  virtual
-  void
-  init(const vector<ymuint>& fid_list,
-       TvMgr& tvmgr,
-       Fsim& fsim2);
 
 
 private:
@@ -59,8 +61,17 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 最小被覆問題
+  MinCov& mMinCov;
+
+  // 行番号を得るための表
+  const vector<ymuint>& mRowMap;
+
+  // 列番号
+  ymuint mColPos;
+
 };
 
 END_NAMESPACE_YM_SATPG
 
-#endif // MINPATSIMPLE2_H
+#endif // MCOP_H

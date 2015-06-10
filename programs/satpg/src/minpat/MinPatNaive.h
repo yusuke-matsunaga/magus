@@ -44,7 +44,7 @@ protected:
 
   /// @brief 故障リストを設定する．
   void
-  set_fault_list(const vector<const TpgFault*>& src_list);
+  set_fid_list(const vector<ymuint>& src_list);
 
 
 private:
@@ -53,12 +53,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
-  /// @param[in] fault_list 検出された故障のリスト
+  /// @param[in] fid_list 検出された故障番号のリスト
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<const TpgFault*>& fault_list,
+  init(const vector<ymuint>& fid_list,
        TvMgr& tvmgr,
        Fsim& fsim2);
 
@@ -67,9 +67,14 @@ private:
   ymuint
   fault_num();
 
+  /// @brief 故障番号のリストを返す．
+  virtual
+  const vector<ymuint>&
+  fid_list();
+
   /// @brief 最初の故障を選ぶ．
   virtual
-  const TpgFault*
+  ymuint
   get_first_fault();
 
   /// @brief 次に処理すべき故障を選ぶ．
@@ -78,7 +83,7 @@ private:
   ///
   /// 故障が残っていなければ NULL を返す．
   virtual
-  const TpgFault*
+  ymuint
   get_next_fault(FgMgr& fgmgr,
 		 const vector<ymuint>& group_list);
 
@@ -88,8 +93,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 故障リスト
-  vector<const TpgFault*> mFaultList;
+  // 故障番号のリスト
+  vector<ymuint> mFidList;
 
   // 次の故障の位置
   ymuint mNextPos;

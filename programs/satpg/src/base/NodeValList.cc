@@ -157,8 +157,9 @@ operator<<(ostream& s,
   ymuint n = src_list.size();
   for (ymuint i = 0; i < n; ++ i) {
     NodeVal nv = src_list[i];
-    cout << " Node#" << nv.node()->id()
-	 << ":" << nv.val();
+    s << " ";
+    print_node(s, nv.node());
+    s << ":" << nv.val();
   }
   return s;
 }

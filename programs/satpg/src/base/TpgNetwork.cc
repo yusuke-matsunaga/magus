@@ -1114,13 +1114,12 @@ TpgNetwork::bind(TpgNode* node,
   char* dst_name = NULL;
   if ( src_name != NULL ) {
     ymuint len = strlen(src_name) + 1;
-    char* dst_name = alloc_array<char>(mAlloc, len);
+    dst_name = alloc_array<char>(mAlloc, len);
     for (ymuint i = 0; i < len; ++ i) {
       dst_name[i] = src_name[i];
     }
   }
   node->mName = dst_name;
-
   mNodeMap[tgnode->gid()] = node;
 }
 
@@ -1301,33 +1300,51 @@ print_network(ostream& s,
   ymuint n = network.node_num();
   for (ymuint i = 0; i < n; ++ i) {
     const TpgNode* node = network.node(i);
-    cout << "Node#" << node->id() << ": ";
+    print_node(s, node);
+    s << ": ";
     if ( node->is_input() ) {
-      cout << "INPUT#" << node->input_id();
+      s << "INPUT#" << node->input_id();
     }
     else if ( node->is_output() ) {
-      cout << "OUTPUT#" << node->output_id();
+      s << "OUTPUT#" << node->output_id();
       const TpgNode* inode = node->fanin(0);
-      cout << " = Node#" << inode->id();
+      s << " = ";
+      print_node(s, inode);
     }
     else if ( node->is_logic() ) {
-      cout << node->gate_type();
+      s << node->gate_type();
       ymuint ni = node->fanin_num();
       if ( ni > 0 ) {
-	cout << "(";
+	s << "(";
 	for (ymuint j = 0; j < ni; ++ j) {
 	  const TpgNode* inode = node->fanin(j);
-	  cout << " Node#" << inode->id();
+	  s << " ";
+	  print_node(s, inode);
 	}
-	cout << ")";
+	s << " )";
       }
     }
     else {
       ASSERT_NOT_REACHED;
     }
-    cout << endl;
+    s << endl;
   }
-  cout << endl;
+  s << endl;
+}
+
+// @brief ノード名を出力する
+// @param[in] s 出力先のストリーム
+// @param[in] node 対象のノード
+void
+print_node(ostream& s,
+	   const TpgNode* node)
+{
+  if ( node->name() != NULL ) {
+    s << node->name();
+  }
+  else {
+    s << "[#" << node->id() << "]";
+  }
 }
 
 END_NAMESPACE_YM_SATPG
