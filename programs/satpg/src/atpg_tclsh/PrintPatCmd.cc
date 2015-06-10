@@ -27,6 +27,7 @@ PrintPatCmd::PrintPatCmd(AtpgMgr* mgr) :
 			 "print in hex mode");
   mPoptNum = new TclPopt(this, "num",
 			 "print with index numbering");
+  set_usage_string("?filename?");
 }
 
 // @brief デストラクタ
@@ -38,11 +39,28 @@ PrintPatCmd::~PrintPatCmd()
 int
 PrintPatCmd::cmd_proc(TclObjVector& objv)
 {
+  // このコマンドはファイル名のみを引数に取る．
+  // 引数がなければ標準出力に出す．
   ymuint objc = objv.size();
-  if ( objc != 1 ) {
+  if ( objc > 2 ) {
     print_usage();
     return TCL_ERROR;
   }
+
+  // 出力先のストリームを開く
+  ostream* osp = &cout;
+  ofstream ofs;
+  if ( objc == 2 ) {
+    string filename = objv[1];
+    if ( !open_ofile(ofs, filename) ) {
+      // ファイルが開けなかった．
+      return TCL_ERROR;
+    }
+    osp = &ofs;
+  }
+
+  // 参照を使いたいのでめんどくさいことをやっている．
+  ostream& out = *osp;
 
   bool hex_flag = mPoptHex->is_specified();
   bool num_flag = mPoptNum->is_specified();
@@ -52,15 +70,15 @@ PrintPatCmd::cmd_proc(TclObjVector& objv)
   for (ymuint i = 0; i < n; ++ i) {
     TestVector* tv = tvlist[i];
     if ( num_flag ) {
-      cout << setw(5) << setfill('0') << (i + 1) << ": ";
+      out << setw(5) << setfill('0') << (i + 1) << ": ";
     }
     if ( hex_flag ) {
-      cout << tv->hex_str();
+      out << tv->hex_str();
     }
     else {
-      cout << tv->bin_str();
+      out << tv->bin_str();
     }
-    cout << endl;
+    out << endl;
   }
 
   return TCL_OK;

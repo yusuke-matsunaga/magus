@@ -52,11 +52,11 @@ public:
   /// @brief 初期化する．
   /// @param[in] network ネットワーク
   /// @param[in] tvmgr テストベクタのマネージャ
-  /// @param[out] fault_list 検出された故障のリスト
+  ///
+  /// 結果には fid_list() でアクセスできる．
   void
   init(const TpgNetwork& network,
-       TvMgr& tvmgr,
-       vector<const TpgFault*>& fault_list);
+       TvMgr& tvmgr);
 
   /// @brief ノード番号の最大値を得る．
   ymuint
@@ -66,9 +66,9 @@ public:
   ymuint
   max_fault_id() const;
 
-  /// @brief 検出可能な故障のリストを得る．
-  const vector<const TpgFault*>&
-  fault_list() const;
+  /// @brief 検出可能な故障番号のリストを得る．
+  const vector<ymuint>&
+  fid_list() const;
 
   /// @brief 故障を得る．
   /// @param[in] fid 故障番号
@@ -99,6 +99,55 @@ public:
   /// @brief 故障に関連するノード集合を返す．
   const NodeSet&
   node_set(ymuint fid) const;
+
+  /// @brief 等価故障を記録する．
+  void
+  add_eq_fault(ymuint fid1,
+	       ymuint fid2);
+
+  /// @brief 支配故障を記録する．
+  void
+  add_dom_fault(ymuint fid1,
+		ymuint fid2);
+
+  /// @brief 故障の等価性をチェックする．
+  /// @param[in] f1_id, f2_id 対象の故障番号
+  /// @retval true f1_id と f2_id が等価だった．
+  /// @retval false f1_id と f2_id は等価ではなかった．
+  ///
+  /// f1 を検出するパタン集合と f2 を検出するパタン集合
+  /// が完全に一致するとき f1 と f2 が等価であると言う．
+  /// f1 が f2 を支配し，f2 が f1 を支配することと同値
+  bool
+  check_equivalence(ymuint f1_id,
+		    ymuint f2_id) const;
+
+  /// @brief 故障の支配関係をチェックする．
+  /// @param[in] f1_id, f2_id 対象の故障
+  /// @retval true f1_id が f2_id を支配している．
+  /// @retval false f1_id が f2_id を支配していない．
+  ///
+  /// f1 を検出するいかなるパタンも f2 を検出する時
+  /// f1 が f2 を支配すると言う．
+  bool
+  check_dominance(ymuint f1_id,
+		  ymuint f2_id) const;
+
+  /// @brief 故障の両立性をチェックする．
+  /// @param[in] f1_id, f2_id 対象の故障
+  /// @retval true f1 と f2 が両立する．
+  /// @retval false f1 と f2 が衝突している．
+  ///
+  /// f1 を検出するパタン集合と f2 を検出するパタン集合
+  /// の共通部分がからでない時 f1 と f2 は両立すると言う．
+  bool
+  check_compatibility(ymuint f1_id,
+		      ymuint f2_id) const;
+
+  /// @brief 処理時間の情報を出力する．
+  /// @param[in] s 出力先のストリーム
+  void
+  print_stats(ostream& s) const;
 
 
 private:
@@ -131,8 +180,8 @@ private:
   // テストベクタ用の乱数生成器
   RandGen mRandGen;
 
-  // オリジナルの故障リスト
-  vector<const TpgFault*> mOrigFaultList;
+  // 故障番号リスト
+  vector<ymuint> mOrigFidList;
 
   // 検出可能故障用のテストベクタリスト
   vector<TestVector*> mTestVectorList;
@@ -148,6 +197,27 @@ private:
 
   // 故障ごとの情報を収める配列
   vector<FaultInfo> mFaultInfoArray;
+
+  mutable
+  USTime mSuccessTime;
+
+  mutable
+  USTime mSuccessMax;
+
+  mutable
+  USTime mFailureTime;
+
+  mutable
+  USTime mFailureMax;
+
+  mutable
+  USTime mAbortTime;
+
+  mutable
+  USTime mAbortMax;
+
+  mutable
+  ymuint mDomCheckCount;
 
 };
 

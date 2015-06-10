@@ -11,51 +11,13 @@
 
 #include "FaultAnalyzer.h"
 
-#include "TpgFault.h"
 #include "TvMgr.h"
 #include "TestVector.h"
 #include "Fsim.h"
 #include "DetOp.h"
-#include "NodeSet.h"
-
-#include "GvalCnf.h"
-#include "FvalCnf.h"
-#include "SatEngine.h"
 
 
 BEGIN_NAMESPACE_YM_SATPG
-
-BEGIN_NONAMESPACE
-
-const TpgNode*
-common_node(const TpgNode* node1,
-	    const TpgNode* node2)
-{
-  ymuint id1 = node1->id();
-  ymuint id2 = node2->id();
-  for ( ; ; ) {
-    if ( node1 == node2 ) {
-      return node1;
-    }
-    if ( id1 < id2 ) {
-      node1 = node1->imm_dom();
-      if ( node1 == NULL ) {
-	return NULL;
-      }
-      id1 = node1->id();
-    }
-    else if ( id1 > id2 ) {
-      node2 = node2->imm_dom();
-      if ( node2 == NULL ) {
-	return NULL;
-      }
-      id2 = node2->id();
-    }
-  }
-}
-
-END_NONAMESPACE
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス EqChecker
@@ -73,7 +35,6 @@ EqChecker::EqChecker(FaultAnalyzer& analyzer,
   mFsim(fsim)
 {
   mVerbose = mAnalyzer.verbose();
-  mMaxNodeId = mAnalyzer.max_node_id();
   mMaxFaultId = mAnalyzer.max_fault_id();
 }
 
@@ -90,36 +51,100 @@ EqChecker::set_verbose(int verbose)
   mVerbose = verbose;
 }
 
+BEGIN_NONAMESPACE
+
+struct FaultLt
+{
+  FaultLt(const vector<ymuint>& size_array) :
+    mSizeArray(size_array)
+  {
+  }
+
+  bool
+  operator()(ymuint left,
+	     ymuint right)
+  {
+    return mSizeArray[left] < mSizeArray[right];
+  }
+
+  const vector<ymuint>& mSizeArray;
+
+};
+
+END_NONAMESPACE
+
 // @brief 等価故障の代表故障を求める．
+// @param[in] src_fault_list 故障リスト
+// @param[out] rep_fault_list 結果の代表故障を格納するスト
 void
-EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
-			  vector<const TpgFault*>& rep_fault_list)
+EqChecker::get_rep_faults(const vector<ymuint>& src_fid_list,
+			  vector<ymuint>& rep_fid_list)
 {
   StopWatch local_timer;
   local_timer.start();
-  {
-    vector<ymuint> elem_list;
-    elem_list.reserve(src_list.size());
-    for (ymuint i = 0; i < src_list.size(); ++ i) {
-      elem_list.push_back(src_list[i]->id());
-    }
-    mEqSet.init(elem_list);
-  }
 
-  do_fsim(src_list);
+  // mEqSet を初期化する．
+  mEqSet.init(src_fid_list);
+
+  // 故障シミュレーションを行う．
+  do_fsim(src_fid_list);
 
   USTime fsim_time = local_timer.time();
 
   ymuint n_check = 0;
   ymuint n_success = 0;
 
-  mDomCheckCount = 0;
-
+  // 等価故障を持つ故障につけるマーク
   vector<bool> mark(mMaxFaultId, false);
+
   ymuint nc = mEqSet.class_num();
   for (ymuint i = 0; i < nc; ++ i) {
+    // 1つの等価故障候補グループを取り出す．
     vector<ymuint> elem_list;
+#if 0
     mEqSet.class_list(i, elem_list);
+
+    {
+      vector<ymuint> size_array(mMaxFaultId);
+      for (ymuint j = 0; j < elem_list.size(); ++ j) {
+	ymuint fid = elem_list[j];
+	const FaultInfo& fi = mAnalyzer.fault_info(fid);
+	if ( fi.single_cube() ) {
+	  size_array[fid] = 0;
+	}
+	else {
+	  size_array[fid] = fi.sufficient_assignment().size() - fi.mandatory_assignment().size();
+	}
+      }
+      stable_sort(elem_list.begin(), elem_list.end(), FaultLt(size_array));
+    }
+#else
+    vector<ymuint> tmp_list;
+    mEqSet.class_list(i, tmp_list);
+
+    elem_list.reserve(tmp_list.size());
+    { // single cube 条件の故障が前に来るようにする．
+      ymuint wpos = 0;
+      for (ymuint i = 0; i < tmp_list.size(); ++ i) {
+	ymuint fid = tmp_list[i];
+	if ( mAnalyzer.fault_info(fid).single_cube() ) {
+	  elem_list.push_back(fid);
+	}
+	else {
+	  if ( wpos < i ) {
+	    tmp_list[wpos] = fid;
+	  }
+	  ++ wpos;
+	}
+      }
+      for (ymuint i = 0; i < wpos; ++ i) {
+	ymuint fid = tmp_list[i];
+	elem_list.push_back(fid);
+      }
+    }
+#endif
+
+    // グループから要素を1つ取り出す．
     ymuint n = elem_list.size();
     for (ymuint i1 = 0; i1 < n; ++ i1) {
       ymuint f1_id = elem_list[i1];
@@ -133,21 +158,22 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
 	     << "  " << setw(6) << i1;
       }
 
-      const FaultInfo& fi1 = mAnalyzer.fault_info(f1_id);
-      const TpgFault* f1 = fi1.fault();
-      rep_fault_list.push_back(f1);
+      rep_fid_list.push_back(f1_id);
 
+      // グループから別の要素を取り出す．
       for (ymuint i2 = i1 + 1; i2 < n; ++ i2) {
 	ymuint f2_id = elem_list[i2];
 	if ( mark[f2_id] ) {
 	  continue;
 	}
 
-	const FaultInfo& fi2 = mAnalyzer.fault_info(f2_id);
-	const TpgFault* f2 = fi2.fault();
+	// 等価性のチェックを行う．
 	++ n_check;
-	if ( check_fault_equivalence(f1, f2) ) {
+	if ( mAnalyzer.check_equivalence(f1_id, f2_id) ) {
+	  // f1 と f2 が等価だった．
+	  // f2 は以降スキップする．
 	  mark[f2_id] = true;
+	  mAnalyzer.add_eq_fault(f1_id, f2_id);
 	  ++ n_success;
 	}
       }
@@ -160,37 +186,32 @@ EqChecker::get_rep_faults(const vector<const TpgFault*>& src_list,
     if ( mVerbose > 1 ) {
       cout << endl;
     }
-    cout << "# original faults:       " << setw(8) << src_list.size() << endl
-	 << "# representative faults: " << setw(8) << rep_fault_list.size() << endl
+    cout << "# original faults:       " << setw(8) << src_fid_list.size() << endl
+	 << "# representative faults: " << setw(8) << rep_fid_list.size() << endl
 	 << "  # equivalence checks:  " << setw(8) << n_check << endl
 	 << "  # sucess:              " << setw(8) << n_success << endl
-	 << "  # smart checks:        " << setw(8) << mDomCheckCount << endl
 	 << "  # patterns simulated:  " << setw(8) << mPat << endl
 	 << "CPU time:                " << local_timer.time() << endl
-	 << "  CPU time (fsim)        " << fsim_time << endl
-	 << "  CPU time (success)     " << mSuccessTime << "(MAX " << mSuccessMax << ")" << endl
-	 << "  CPU time (failure)     " << mFailureTime << "(MAX " << mFailureMax << ")" << endl
-	 << "  CPU time (abort)       " << mAbortTime   << "(MAX " << mAbortMax << ")" << endl;
+	 << "  CPU time (fsim)        " << fsim_time << endl;
+    mAnalyzer.print_stats(cout);
   }
 }
 
 // @brief 故障シミュレーションを行い，故障検出パタンを記録する．
 // @param[in] fault_list 故障リスト
 void
-EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
+EqChecker::do_fsim(const vector<ymuint>& fid_list)
 {
   vector<TestVector*> cur_array;
   cur_array.reserve(kPvBitLen);
 
-  mFsim.set_faults(fault_list);
-
   DetOp op;
 
-  ymuint nf = fault_list.size();
+  ymuint nf = fid_list.size();
   ymuint npat = nf;
   for (ymuint i = 0; i < nf; ++ i) {
-    const TpgFault* fault = fault_list[i];
-    const FaultInfo& fi = mAnalyzer.fault_info(fault->id());
+    ymuint fid = fid_list[i];
+    const FaultInfo& fi = mAnalyzer.fault_info(fid);
     TestVector* tv = fi.testvector();
     cur_array.push_back(tv);
     if ( cur_array.size() == kPvBitLen ) {
@@ -250,171 +271,6 @@ EqChecker::do_fsim(const vector<const TpgFault*>& fault_list)
   }
 
   mPat = npat;
-}
-
-// @brief f1 と f2 が等価かどうか調べる．
-bool
-EqChecker::check_fault_equivalence(const TpgFault* f1,
-				   const TpgFault* f2)
-{
-  const TpgNode* fnode1 = f1->node();
-  const TpgNode* fnode2 = f2->node();
-  const TpgNode* dom_node = common_node(fnode1, fnode2);
-
-  if ( dom_node != NULL ) {
-    ++ mDomCheckCount;
-
-    StopWatch local_timer;
-    local_timer.start();
-
-    SatEngine engine(string(), string(), NULL);
-    GvalCnf gval_cnf(mMaxNodeId);
-
-    NodeSet node_set0;
-    node_set0.mark_region(mMaxNodeId, dom_node);
-
-    NodeSet node_set1;
-    node_set1.mark_region2(mMaxNodeId, fnode1, dom_node);
-
-    NodeSet node_set2;
-    node_set2.mark_region2(mMaxNodeId, fnode2, dom_node);
-
-    FvalCnf fval_cnf0(mMaxNodeId, gval_cnf);
-    FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-
-    engine.make_fval_cnf2(fval_cnf0, fval_cnf1, fval_cnf2,
-			  dom_node, f1, f2,
-			  node_set0, node_set1, node_set2);
-
-    Literal dlit1(fval_cnf1.dvar(dom_node));
-    Literal dlit2(fval_cnf2.dvar(dom_node));
-
-    // TODO 時間の計測集計用のコードをまとめる．
-
-    vector<Literal> assumption(2);
-    assumption[0] = dlit1;
-    assumption[1] = ~dlit2;
-    if ( engine.check_sat(assumption) != kB3False ) {
-      local_timer.stop();
-      USTime time = local_timer.time();
-      mFailureTime += time;
-      if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
-	if ( time.usr_time() > 1.0 ) {
-	  cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
-	}
-	mFailureMax = time;
-      }
-
-      return false;
-    }
-    assumption[0] = ~dlit1;
-    assumption[1] = dlit2;
-    if ( engine.check_sat(assumption) != kB3False ) {
-      local_timer.stop();
-      USTime time = local_timer.time();
-      mFailureTime += time;
-      if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
-	if ( time.usr_time() > 1.0 ) {
-	  cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
-	}
-	mFailureMax = time;
-      }
-
-      return false;
-    }
-    {
-      local_timer.stop();
-      USTime time = local_timer.time();
-      mSuccessTime += time;
-      if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
-	if ( time.usr_time() > 1.0 ) {
-	  cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
-	}
-	mSuccessMax = time;
-      }
-    }
-    return true;
-  }
-  else {
-    return check_fault_dominance2(f1, f2) && check_fault_dominance2(f2, f1);
-  }
-}
-
-// @brief f1 が f2 を支配しているか調べる．
-bool
-EqChecker::check_fault_dominance2(const TpgFault* f1,
-				  const TpgFault* f2)
-{
-  StopWatch timer;
-  timer.start();
-
-  SatEngine engine(string(), string(), NULL);
-  GvalCnf gval_cnf(mMaxNodeId);
-
-  const FaultInfo& fi1 = mAnalyzer.fault_info(f1->id());
-  const FaultInfo& fi2 = mAnalyzer.fault_info(f2->id());
-
-  if ( fi2.single_cube() ) {
-    // f2 を検出しない CNF を生成
-    engine.add_negation(gval_cnf, fi2.sufficient_assignment());
-  }
-  else {
-    FvalCnf fval_cnf2(mMaxNodeId, gval_cnf);
-    const NodeSet& node_set2 = mAnalyzer.node_set(f2->id());
-    // f2 を検出しない CNF を生成
-    engine.make_fval_cnf(fval_cnf2, f2, node_set2, kVal0);
-  }
-
-  if ( engine.check_sat(gval_cnf, fi1.mandatory_assignment()) == kB3False ) {
-    return true;
-  }
-
-  if ( fi1.single_cube() ) {
-    // sufficient_assignment() == mandatory_assignment() なので答は出ている．
-    return false;
-  }
-
-  FvalCnf fval_cnf1(mMaxNodeId, gval_cnf);
-  const NodeSet& node_set1 = mAnalyzer.node_set(f1->id());
-  // f1 を検出する CNF を生成
-  engine.make_fval_cnf(fval_cnf1, f1, node_set1, kVal1);
-
-  Bool3 sat_stat = engine.check_sat();
-
-  // TODO 時間の計測集計用のコードをまとめる．
-  timer.stop();
-  USTime time = timer.time();
-  if ( sat_stat == kB3False ) {
-    mSuccessTime += time;
-    if ( mSuccessMax.usr_time_usec() < time.usr_time_usec() ) {
-      if ( time.usr_time() > 1.0 ) {
-	cout << "UNSAT: " << f1 << ": " << f2 << "  " << time << endl;
-      }
-      mSuccessMax = time;
-    }
-    return true;
-  }
-  else if ( sat_stat == kB3True ) {
-    mFailureTime += time;
-    if ( mFailureMax.usr_time_usec() < time.usr_time_usec() ) {
-      if ( time.usr_time() > 1.0 ) {
-	cout << "SAT: " << f1 << ": " << f2 << "  " << time << endl;
-      }
-      mFailureMax = time;
-    }
-    return false;
-  }
-  else {
-    mAbortTime += timer.time();
-    if ( mAbortMax.usr_time_usec() < time.usr_time_usec() ) {
-      if ( time.usr_time() > 1.0 ) {
-	cout << "ABORT: " << f1 << ": " << f2 << "  " << time << endl;
-      }
-      mAbortMax = time;
-    }
-    return false;
-  }
 }
 
 END_NAMESPACE_YM_SATPG

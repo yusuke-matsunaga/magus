@@ -28,6 +28,18 @@ set (base_SOURCES
   src/base/TvMgr.cc
   )
 
+set (sat_engine_SOURCES
+  src/sat_engine/SatEngine.cc
+  src/sat_engine/VidLitMap.cc
+  src/sat_engine/GvalCnf.cc
+  src/sat_engine/FvalCnf.cc
+  src/sat_engine/MvalCnf.cc
+  src/sat_engine/Extractor.cc
+  src/sat_engine/LitMap.cc
+  src/sat_engine/ModelValMap.cc
+  src/sat_engine/GenVidMap.cc
+  )
+
 set (dtpg_SOURCES
   src/dtpg/bt/BackTracer.cc
   src/dtpg/bt/BtImpl.cc
@@ -44,20 +56,10 @@ set (dtpg_SOURCES
   src/dtpg/dop/DopVerify.cc
   src/dtpg/dop/FopDrop.cc
 
-  src/dtpg/engine/SatEngine.cc
-  src/dtpg/engine/VidLitMap.cc
-  src/dtpg/engine/GvalCnf.cc
-  src/dtpg/engine/FvalCnf.cc
-  src/dtpg/engine/MvalCnf.cc
-
-  src/dtpg/dtpg_engine/Extractor.cc
-  src/dtpg/dtpg_engine/LitMap.cc
-  src/dtpg/dtpg_engine/ModelValMap.cc
-  src/dtpg/dtpg_engine/GenVidMap.cc
-  src/dtpg/dtpg_engine/DtpgSat.cc
-  src/dtpg/dtpg_engine/DtpgSatBaseM.cc
-  src/dtpg/dtpg_engine/DtpgSatS.cc
-  src/dtpg/dtpg_engine/DtpgSatM.cc
+  src/dtpg/main/DtpgSat.cc
+  src/dtpg/main/DtpgSatBaseM.cc
+  src/dtpg/main/DtpgSatS.cc
+  src/dtpg/main/DtpgSatM.cc
 
   src/dtpg/uop/UopBase.cc
   src/dtpg/uop/UopDummy.cc
@@ -113,10 +115,10 @@ set (minpat_SOURCES
   src/minpat/DomChecker.cc
   src/minpat/ConflictChecker.cc
   src/minpat/FgMgrBase.cc
-  src/minpat/FgMgr1.cc
-  src/minpat/FgMgr2.cc
   src/minpat/Compactor.cc
   src/minpat/EqSet.cc
+  src/minpat/McOp.cc
+  src/minpat/McCompactor.cc
   )
 
 set (rtpg_SOURCES
@@ -147,6 +149,8 @@ set (atpg_tclsh_SOURCES
 # ===================================================================
 add_library(satpg_base OBJECT ${base_SOURCES})
 
+add_library(satpg_sat_engine OBJECT ${sat_engine_SOURCES})
+
 add_library(satpg_dtpg OBJECT ${dtpg_SOURCES})
 
 add_library(satpg_fsim OBJECT ${fsim_SOURCES})
@@ -160,6 +164,7 @@ add_library(satpg_rtpg OBJECT ${rtpg_SOURCES})
 if (TCL_FOUND)
   add_executable(atpg_tclsh
     ${atpg_tclsh_SOURCES}
+    $<TARGET_OBJECTS:satpg_sat_engine>
     $<TARGET_OBJECTS:satpg_dtpg>
 #    $<TARGET_OBJECTS:satpg_graphsat>
     $<TARGET_OBJECTS:satpg_fsim>

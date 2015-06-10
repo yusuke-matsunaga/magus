@@ -48,7 +48,6 @@ Compactor::Compactor()
   mVerbose = 0;
   mFast = false;
   mPrintDetail = false;
-  mThVal = UINT_MAX;
 }
 
 // @brief デストラクタ
@@ -69,13 +68,6 @@ void
 Compactor::set_print_detail(bool flag)
 {
   mPrintDetail = flag;
-}
-
-// @brief しきい値を設定する．
-void
-Compactor::set_thval(ymuint val)
-{
-  mThVal = val;
 }
 
 // @brief 故障グループを圧縮する．
@@ -270,52 +262,95 @@ Compactor::phase1(FgMgr& fgmgr,
 	 << setw(4) << group_list.size() << endl;
   }
 
-  ymuint ng = group_list.size();
   ymuint max_group_id = fgmgr.group_num();
+
+  ymuint ng = group_list.size();
   vector<bool> deleted(max_group_id, false);
-#if 1
-  vector<bool> locked(max_group_id, false);
-  for (ymuint count = 0; count < ng; ++ count) {
+  for (ymuint gpos = 0; gpos < ng; ++ gpos) {
 
-    // 要素数が最小のグループを求める．
-    ymuint min_gid = max_group_id;
-    {
-      ymuint min_size = 0;
-      for (ymuint gpos = 0; gpos < ng; ++ gpos) {
-	ymuint gid = group_list[gpos];
-	if ( locked[gid] ) {
-	  continue;
+    // 現在の情報を tmp_group_list にコピーしておく
+    vector<ymuint> tmp_group_list(ng);
+    for (ymuint j = gpos + 1; j < ng; ++ j) {
+      ymuint gid = group_list[j];
+      ymuint gid2 = fgmgr.duplicate_group(gid);
+      tmp_group_list[j] = gid2;
+    }
+
+    // fid の移動先を見つけるための作業用のグループ番号リスト
+    // min_gid 以外のグループ番号をコピーしておく
+    vector<ymuint> tmp_group_list1;
+    tmp_group_list1.reserve(ng - gpos - 1);
+    for (ymuint j = ng - 1; j > gpos; -- j) {
+      ymuint gid = tmp_group_list[j];
+      tmp_group_list1.push_back(gid);
+    }
+
+    // min_gid のグループの故障を他のグループへ移動できるか調べる．
+    ymuint min_gid = group_list[gpos];
+    bool red = true;
+    ymuint nf = fgmgr.fault_num(min_gid);
+    if ( nf > 100 ) {
+      continue;
+    }
+
+    vector<ymuint> move_list(nf);
+    for (ymuint fpos = 0; fpos < nf; ++ fpos) {
+      ymuint fid = fgmgr.fault_id(min_gid, fpos);
+
+      if ( mVerbose > 1 ) {
+	cout << "\r"
+	     << setw(4) << fpos << " / " << setw(4) << gpos << " / " << setw(4) << ng;
+	cout.flush();
+      }
+
+      // fid を移動可能なグループを見つける．
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list1, mFast);
+      if ( gid != fgmgr.group_num() ) {
+	// 見つけた．
+	fgmgr.add_fault(gid, fid);
+	move_list[fpos] = gid;
+      }
+      else {
+	// 見つからなかった．
+	// このグループの処理は中止する．
+	red = false;
+	break;
+      }
+    }
+    if ( red ) {
+      // 変更を確定する．
+      vector<ymuint> gmap(fgmgr.group_num());
+      for (ymuint j = gpos + 1; j < ng; ++ j) {
+	ymuint gid1 = group_list[j];
+	ymuint gid2 = tmp_group_list[j];
+	if ( fgmgr.fault_num(gid1) != fgmgr.fault_num(gid2) ) {
+	  fgmgr.replace_group(gid1, gid2);
+	  gmap[gid2] = gid1;
 	}
-
-	ymuint size = fgmgr.fault_num(gid);
-	if ( min_size == 0 || min_size > size ) {
-	  min_size = size;
-	  min_gid = gid;
+	else {
+	  fgmgr.delete_group(gid2);
 	}
       }
-      ASSERT_COND( min_gid != max_group_id );
-    }
-
-    if ( remove_group(fgmgr, min_gid, group_list, count, deleted) ) {
       deleted[min_gid] = true;
+      if ( mPrintDetail ) {
+	for (ymuint i = 0; i < nf; ++ i) {
+	  cout << "  MOVE " << fgmgr.fault_id(min_gid, i)
+	       << " from #" << min_gid << " to #"
+	       << gmap[move_list[i]] << endl;
+	}
+	cout << "  DELETE #" << min_gid << endl;
+      }
     }
-    locked[min_gid] = true;
-  }
-#else
-  // グループをサイズの昇順にソートする．
-  vector<ymuint> tmp_group_list = group_list;
-  sort(tmp_group_list.begin(), tmp_group_list.end(), GroupLt(fgmgr));
-  for (ymuint gpos = 0; gpos < ng; ++ gpos) {
-    ymuint gid = tmp_group_list[gpos];
-
-    if ( remove_group(fgmgr, gid, tmp_group_list, gpos, deleted) ) {
-      // group_list から gid を除く．
-      deleted[gid] = true;
+    else {
+      // 変更を破棄する．
+      for (ymuint j = gpos + 1; j < ng; ++ j) {
+	ymuint gid = tmp_group_list[j];
+	fgmgr.delete_group(gid);
+      }
     }
   }
-#endif
 
-  // deleted マークがついたグループを削除する．
+  // group_list から削除されたグループをを除く．
   ymuint wpos = 0;
   for (ymuint rpos = 0; rpos < ng; ++ rpos) {
     ymuint gid = group_list[rpos];
@@ -330,118 +365,12 @@ Compactor::phase1(FgMgr& fgmgr,
 
   local_timer.stop();
   if ( mVerbose > 0 ) {
-    if ( mVerbose > 1 ) {
-      cout << endl;
+    if ( mVerbose == 1 ) {
+      cout << "           ";
     }
     cout << "  final # of groups   = " << setw(4) << group_list.size()
 	 << ":  CPU time" << local_timer.time() << endl;
   }
-}
-
-// @brief 故障グループが削除できるか調べる．
-// @param[in] fmgr 故障グループマネージャ
-// @param[in] gid0 対象のグループ番号
-// @param[in] group_list グループ番号のリスト
-// @param[in] deleted 削除済みフラグの配列
-// @return 削除できたら true を返す．
-//
-// 削除が成功した場合，gid に含まれていた故障は
-// 他のグループに移動される．
-bool
-Compactor::remove_group(FgMgr& fgmgr,
-			ymuint gid0,
-			const vector<ymuint>& group_list,
-			ymuint count,
-			const vector<bool>& deleted)
-{
-  // グループ数
-  ymuint ng = group_list.size();
-
-  // 現在の情報を tmp_group_list にコピーしておく
-  vector<ymuint> tmp_group_list(ng);
-  for (ymuint i = 0; i < ng; ++ i) {
-    ymuint gid1 = group_list[i];
-    ymuint gid2 = fgmgr.duplicate_group(gid1);
-    tmp_group_list[i] = gid2;
-  }
-
-  // gid のグループの故障を他のグループへ移動できるか調べる．
-  bool red = true;
-  ymuint nf = fgmgr.fault_num(gid0);
-  vector<ymuint> move_list(nf);
-  for (ymuint fpos = 0; fpos < nf; ++ fpos) {
-    ymuint fid = fgmgr.fault_id(gid0, fpos);
-
-    if ( mVerbose > 1 ) {
-      cout << "\r"
-	   << setw(4) << fpos << " / " << setw(4) << nf
-	   << " | " << setw(4) << count << " / " << setw(4) << ng;
-      cout.flush();
-    }
-
-    // fid の移動先を見つけるための作業用のグループ番号リストを作る．
-    vector<ymuint> cand_list;
-    {
-      cand_list.reserve(ng - 1);
-      for (ymuint i = 0; i < ng; ++ i) {
-	ymuint gid1 = group_list[ng - i - 1];
-	ymuint gid2 = tmp_group_list[ng - i - 1];
-	if ( !deleted[gid1] && gid1 != gid0 ) {
-	  cand_list.push_back(gid2);
-	}
-      }
-    }
-
-    // fid を移動可能なグループを見つける．
-    ymuint gid1 = fgmgr.find_group2(fid, cand_list, mFast);
-    if ( gid1 != fgmgr.group_num() ) {
-      // 見つけた．
-      if ( mPrintDetail ) {
-	ymuint ipos = 0;
-	for (ipos = 0; ipos < ng; ++ ipos) {
-	  if ( tmp_group_list[ipos] == gid1 ) {
-	    break;
-	  }
-	}
-	move_list[fpos] = group_list[ipos];
-      }
-    }
-    else {
-      // 見つからなかった．
-      // このグループの処理は中止する．
-      red = false;
-      break;
-    }
-  }
-  if ( red ) {
-    // 変更を反映させる．
-    for (ymuint i = 0; i < ng; ++ i) {
-      ymuint gid1 = group_list[i];
-      ymuint gid2 = tmp_group_list[i];
-      if ( fgmgr.fault_num(gid1) != fgmgr.fault_num(gid2) ) {
-	fgmgr.replace_group(gid1, gid2);
-      }
-    }
-    if ( mPrintDetail ) {
-      if ( mVerbose > 1 ) {
-	cout << endl;
-      }
-      for (ymuint fpos = 0; fpos < nf; ++ fpos) {
-	ymuint fid = fgmgr.fault_id(gid0, fpos);
-	cout << "  MOVE " << fid << " from #" << gid0
-	     << " to #" << move_list[fpos] << endl;
-      }
-      cout << "  DEL #" << gid0 << endl;
-    }
-  }
-  else {
-    // 変更を破棄する．
-    for (ymuint i = 0; i < ng; ++ i) {
-      ymuint gid2 = tmp_group_list[i];
-      fgmgr.delete_group(gid2);
-    }
-  }
-  return red;
 }
 
 // @brief phase-2
@@ -468,16 +397,11 @@ Compactor::phase2(FgMgr& fgmgr,
   sort(tmp_group_list.begin(), tmp_group_list.end(), GroupLt(fgmgr));
 
   HashSet<ymuint> fault_lock;
-  for (ymuint i = 0; i < ng; ++ i) {
-    ymuint min_gid = tmp_group_list[i];
+  for (ymuint gpos = 0; gpos < ng; ++ gpos) {
+    ymuint min_gid = tmp_group_list[gpos];
 
     // 可能な限り故障を他のグループに移動する．
     ymuint nf = fgmgr.fault_num(min_gid);
-    if ( nf > mThVal ) {
-      // 故障の数が多い時はスキップする．
-      continue;
-    }
-
     vector<ymuint> del_fid_list;
     del_fid_list.reserve(nf);
     for (ymuint fpos = 0; fpos < nf; ++ fpos) {
@@ -489,28 +413,21 @@ Compactor::phase2(FgMgr& fgmgr,
 
       if ( mVerbose > 1 ) {
 	cout << "\r"
-	     << setw(4) << fpos << " / " << setw(4) << nf << " | "
-	     << setw(4) << i << " / " << setw(4) << ng;
+	     << setw(4) << fpos << " / " << setw(4) << gpos << " / " << setw(4) << ng;
 	cout.flush();
       }
 
-      vector<ymuint> cand_list;
-      cand_list.reserve(ng - i - 1);
-      for (ymuint j = i + 1; j < ng; ++ j) {
+      vector<ymuint> tmp_group_list1;
+      tmp_group_list.reserve(ng - gpos - 1);
+      for (ymuint j = gpos + 1; j < ng; ++ j) {
 	ymuint gid = tmp_group_list[j];
-	cand_list.push_back(gid);
+	tmp_group_list1.push_back(gid);
       }
 
-      ymuint gid = fgmgr.find_group2(fid, cand_list, mFast);
+      ymuint gid = fgmgr.find_group(fid, tmp_group_list1, mFast);
       if ( gid != fgmgr.group_num() ) {
+	fgmgr.add_fault(gid, fid);
 	del_fid_list.push_back(fid);
-	if ( mPrintDetail ) {
-	  if ( mVerbose > 1 ) {
-	    cout << endl;
-	  }
-	  cout << "  MOVE " << fid << " from #" << min_gid
-	       << "  to #" << gid << endl;
-	}
       }
     }
     if ( !del_fid_list.empty() ) {
@@ -520,8 +437,8 @@ Compactor::phase2(FgMgr& fgmgr,
 
   local_timer.stop();
   if ( mVerbose > 0 ) {
-    if ( mVerbose > 1 ) {
-      cout << endl;
+    if ( mVerbose == 1 ) {
+      cout << "           ";
     }
     cout << "  final # of groups   = " << setw(4) << group_list.size()
 	 << ":  CPU time" << local_timer.time() << endl;

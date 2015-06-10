@@ -44,8 +44,11 @@ public:
   /// @param[in] network 対象のネットワーク
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
+  /// @param[in] fsim3 3値の故障シミュレータ
   /// @param[in] exact 故障グループの両立性判定を厳密に行うときに true とする．
   /// @param[in] compaction 最後に圧縮を行うときに true とする．
+  /// @param[in] fast_compaction 最後に高速圧縮を行うときに true とする．
+  /// @param[in] mc_compaction 最後に最小被覆圧縮を行うときに true とする．
   /// @param[out] tv_list テストベクタのリスト
   /// @param[out] stats 実行結果の情報を格納する変数
   virtual
@@ -53,8 +56,13 @@ public:
   run(TpgNetwork& network,
       TvMgr& tvmgr,
       Fsim& fsim2,
+      Fsim& fsim3,
       bool exact,
       bool compaction,
+      bool fast_compaction,
+      bool mc_compaction,
+      bool has_thval,
+      ymuint thval,
       vector<TestVector*>& tv_list,
       USTime& time);
 
@@ -67,15 +75,6 @@ public:
   int
   verbose() const;
 
-  /// @brief dom_method を指定する．
-  virtual
-  void
-  set_dom_method(ymuint dom_method);
-
-  /// @brief get_dom_faults() のアルゴリズムを指定する．
-  ymuint
-  dom_method() const;
-
 
 protected:
   //////////////////////////////////////////////////////////////////////
@@ -83,12 +82,12 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化を行う．
-  /// @param[in] fault_list 故障のリスト
+  /// @param[in] fid_list 故障番号のリスト
   /// @param[in] tvmgr テストベクタマネージャ
   /// @param[in] fsim2 2値の故障シミュレータ(検証用)
   virtual
   void
-  init(const vector<const TpgFault*>& fault_list,
+  init(const vector<ymuint>& fault_list,
        TvMgr& tvmgr,
        Fsim& fsim2) = 0;
 
@@ -97,24 +96,27 @@ protected:
   ymuint
   fault_num() = 0;
 
+  /// @brief 故障番号のリストを返す．
+  virtual
+  const vector<ymuint>&
+  fid_list() = 0;
+
   /// @brief 最初の故障を選ぶ．
   virtual
-  const TpgFault*
+  ymuint
   get_first_fault() = 0;
 
   /// @brief 次に処理すべき故障を選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
   /// @param[in] group_list 現在のグループリスト
-  ///
-  /// 故障が残っていなければ NULL を返す．
   virtual
-  const TpgFault*
+  ymuint
   get_next_fault(FgMgr& fgmgr,
 		 const vector<ymuint>& group_list) = 0;
 
   /// @brief 故障を追加するグループを選ぶ．
   /// @param[in] fgmgr 故障グループを管理するオブジェクト
-  /// @param[in] fault 故障
+  /// @param[in] fid 故障番号
   /// @param[in] group_list 現在のグループリスト
   ///
   /// グループが見つからなければ fgmgr.group_num() を返す．
@@ -122,8 +124,18 @@ protected:
   virtual
   ymuint
   find_group(FgMgr& fgmgr,
-	     const TpgFault* fault,
+	     ymuint fid,
 	     const vector<ymuint>& group_list);
+
+  /// @brief 故障解析器を返す．
+  FaultAnalyzer&
+  analyzer();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で使われる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief テストパタンを作る．
   /// @param[in] network ネットワーク
@@ -133,10 +145,6 @@ protected:
   make_testvector(TpgNetwork& network,
 		  const NodeValList& suf_list,
 		  TestVector* tv);
-
-  /// @brief 故障解析器を返す．
-  FaultAnalyzer&
-  analyzer();
 
 
 private:
@@ -153,8 +161,8 @@ private:
   // group dominance フラグ
   bool mGroupDominance;
 
-  // get_dom_fatuls() のアルゴリズム
-  ymuint mDomMethod;
+  // fast フラグ
+  bool mFast;
 
   // 故障解析器
   FaultAnalyzer mAnalyzer;

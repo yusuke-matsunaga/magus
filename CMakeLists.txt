@@ -68,6 +68,8 @@ include (FindPOPT)
 
 include (FindReadline)
 
+include (FindGperftools)
+
 
 # ===================================================================
 # ヘッダファイルの検査

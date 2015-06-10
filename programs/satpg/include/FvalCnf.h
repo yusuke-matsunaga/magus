@@ -42,11 +42,6 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 初期化する．
-  /// @param[in] max_node_id ノード番号の最大値
-  void
-  init(ymuint max_node_id);
-
   /// @brief ノード番号の最大値を返す．
   ymuint
   max_node_id() const;

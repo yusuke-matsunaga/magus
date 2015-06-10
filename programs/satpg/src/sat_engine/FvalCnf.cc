@@ -42,16 +42,6 @@ FvalCnf::~FvalCnf()
 {
 }
 
-// @brief 初期化する．
-// @param[in] max_node_id ノード番号の最大値
-void
-FvalCnf::init(ymuint max_node_id)
-{
-  mMaxId = max_node_id;
-  mFvarMap.init(max_node_id);
-  mDvarMap.init(max_node_id);
-}
-
 // @brief 十分割当リストを求める．
 // @param[in] sat_model SAT問題の解
 // @param[in] fault 故障

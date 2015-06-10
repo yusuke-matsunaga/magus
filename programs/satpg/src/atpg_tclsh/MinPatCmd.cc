@@ -39,12 +39,18 @@ MinPatCmd::MinPatCmd(AtpgMgr* mgr) :
 				"print statistics");
   mPoptVerbose = new TclPoptInt(this, "verbose",
 				"<int>: specify verbose-level");
-  mPoptDomMethod = new TclPoptInt(this, "dom-method",
-				  "<int>: specify dominance check method(0-2)");
   mPoptExact = new TclPopt(this, "exact",
 			   "exact fault grouping");
   mPoptCompaction = new TclPopt(this, "compaction",
 				"do compaction");
+  mPoptFastCompaction = new TclPopt(this, "fast-compaction",
+				    "do fast compaction");
+  mPoptMcCompaction = new TclPopt(this, "mc-compaction",
+				  "do mincov compaction");
+  mPoptThVal = new TclPoptInt(this, "thval",
+			      "specify threshold value");
+  mPoptRepFaults = new TclPopt(this, "rep-faults",
+			       "get representative faults");
 }
 
 // @brief デストラクタ
@@ -72,11 +78,16 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
   bool group_dominance = mPoptGroupDominance->is_specified();
   bool exact = mPoptExact->is_specified();
   bool compaction = mPoptCompaction->is_specified();
+  bool fast_compaction = mPoptFastCompaction->is_specified();
+  bool mc_compaction = mPoptMcCompaction->is_specified();
+  bool has_thval = mPoptThVal->is_specified();
+  ymuint thval = mPoptThVal->val();
+  bool rep_faults = mPoptRepFaults->is_specified();
 
   MinPat* minpat = NULL;
 
   if ( simple ) {
-    minpat = new_MinPatSimple(group_dominance);
+    minpat = new_MinPatSimple(group_dominance, rep_faults);
   }
   else if ( simple2 ) {
     minpat = new_MinPatSimple2(group_dominance);
@@ -93,12 +104,10 @@ MinPatCmd::cmd_proc(TclObjVector& objv)
 
   minpat->set_verbose(verbose);
 
-  if ( mPoptDomMethod->is_specified() ) {
-    minpat->set_dom_method(mPoptDomMethod->val());
-  }
-
   USTime time;
-  minpat->run(_network(), _tv_mgr(),  _fsim(), exact, compaction, _tv_list(), time);
+  minpat->run(_network(), _tv_mgr(),  _fsim(), _fsim3(),
+	      exact, compaction, fast_compaction, mc_compaction, has_thval, thval,
+	      _tv_list(), time);
 
   delete minpat;
 

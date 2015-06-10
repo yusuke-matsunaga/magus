@@ -67,14 +67,24 @@ private:
   // verbose オプションの解析用オブジェクト
   TclPoptInt* mPoptVerbose;
 
-  // dom_method オプションの解析用オブジェクト
-  TclPoptInt* mPoptDomMethod;
-
   // exact オプションの解析用オブジェクト
   TclPopt* mPoptExact;
 
   // compaction オプションの解析用オブジェクト
   TclPopt* mPoptCompaction;
+
+  // fast-compaction オプションの解析用オブジェクト
+  TclPopt* mPoptFastCompaction;
+
+  // mc-compaction オプションの解析用オブジェクト
+  TclPopt* mPoptMcCompaction;
+
+  // thval オプションの解析用オブジェクト
+  TclPoptInt* mPoptThVal;
+
+  // rep-faults オプションの解析用オブジェクト
+  TclPopt* mPoptRepFaults;
+
 };
 
 END_NAMESPACE_YM_SATPG

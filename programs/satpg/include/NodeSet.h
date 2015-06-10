@@ -115,6 +115,12 @@ public:
   const vector<const TpgNode*>&
   output_list() const;
 
+  /// @brief mark_region2() を使った時の dom_node を返す．
+  ///
+  /// そうでなければ NULL を返す．
+  const TpgNode*
+  dom_node() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -154,6 +160,9 @@ private:
 
   // 現在の故障に関係ありそうな外部出力のリスト
   vector<const TpgNode*> mOutputList;
+
+  // mark_region2() のターゲットノード
+  const TpgNode* mDomNode;
 
 };
 
@@ -287,6 +296,16 @@ NodeSet::tfo_tfi_mark(const TpgNode* node)
   else {
     return false;
   }
+}
+
+// @brief mark_region2() を使った時の dom_node を返す．
+//
+// そうでなければ NULL を返す．
+inline
+const TpgNode*
+NodeSet::dom_node() const
+{
+  return mDomNode;
 }
 
 END_NAMESPACE_YM_SATPG

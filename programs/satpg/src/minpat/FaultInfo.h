@@ -71,6 +71,14 @@ public:
   bool
   single_cube() const;
 
+  /// @brief 等価な故障のリストを返す．
+  const vector<ymuint>&
+  eq_list() const;
+
+  /// @brief 支配する故障のリストを返す．
+  const vector<ymuint>&
+  dom_list() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -99,6 +107,12 @@ private:
   NodeValList mPiSufficientAssignment;
 
   bool mSingleCube;
+
+  // 等価故障の番号のリスト
+  vector<ymuint> mEqList;
+
+  // 支配している故障の番号のリスト
+  vector<ymuint> mDomList;
 
   vector<NodeValList> mOtherSufListArray;
 
@@ -186,6 +200,22 @@ bool
 FaultInfo::single_cube() const
 {
   return mSingleCube;
+}
+
+// @brief 等価な故障のリストを返す．
+inline
+const vector<ymuint>&
+FaultInfo::eq_list() const
+{
+  return mEqList;
+}
+
+// @brief 支配する故障のリストを返す．
+inline
+const vector<ymuint>&
+FaultInfo::dom_list() const
+{
+  return mDomList;
 }
 
 END_NAMESPACE_YM_SATPG
