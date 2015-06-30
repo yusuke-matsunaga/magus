@@ -13,7 +13,7 @@
 #include "magus_config.h"
 #endif
 
-#include <ym_YmNetworks/BNetwork.h>
+#include <YmNetworks/BNetwork.h>
 #include "SbjGraph.h"
 
 

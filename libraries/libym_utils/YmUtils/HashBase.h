@@ -1,4 +1,4 @@
-#ifndef YMUTILS_HASHBASE_H
+﻿#ifndef YMUTILS_HASHBASE_H
 #define YMUTILS_HASHBASE_H
 
 /// @file YmUtils/HashBase.h

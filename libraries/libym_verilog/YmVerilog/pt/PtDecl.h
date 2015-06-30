@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtIOHead PtDecl.h <ym_YmVerilog/pt/PtDecl.h>
+/// @class PtIOHead PtDecl.h <YmVerilog/pt/PtDecl.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief IO宣言のヘッダを表すクラス
@@ -95,7 +95,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtIOItem PtDecl.h <ym_YmVerilog/pt/PtDecl.h>
+/// @class PtIOItem PtDecl.h <YmVerilog/pt/PtDecl.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief IO宣言要素の基底クラス
@@ -126,7 +126,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtDeclHead PtDecl.h <ym_YmVerilog/pt/PtDecl.h>
+/// @class PtDeclHead PtDecl.h <YmVerilog/pt/PtDecl.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief 宣言要素のヘッダの基底クラス
@@ -225,7 +225,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtDeclItem PtDecl.h <ym_YmVerilog/pt/PtDecl.h>
+/// @class PtDeclItem PtDecl.h <YmVerilog/pt/PtDecl.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief 宣言要素のクラス
@@ -267,7 +267,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtRange PtDecl.h <ym_YmVerilog/pt/PtDecl.h>
+/// @class PtRange PtDecl.h <YmVerilog/pt/PtDecl.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief 範囲を表すクラス

@@ -14,7 +14,7 @@
 #endif
 
 #include "SealMgr.h"
-#include <ym_YmNetworks/TgNetwork.h>
+#include <YmNetworks/TgNetwork.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

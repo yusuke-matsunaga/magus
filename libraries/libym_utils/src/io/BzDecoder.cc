@@ -67,7 +67,7 @@ BzDecoder::is_ready() const
 // @brief 圧縮されたデータを伸長してバッファに書き込む．
 // @param[in] buff 伸長したデータを格納するバッファ
 // @param[in] size バッファの空きサイズ
-ssize_t
+ymint64
 BzDecoder::read(ymuint8* buff,
 		ymuint64 size)
 {

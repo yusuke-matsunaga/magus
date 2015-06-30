@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM
 // @param[in] buff データを格納したバッファ
 // @param[in] num 書き込むバイト数
 // @return 実際に書き込んだバイト数を返す．
-ssize_t
+ymint64
 FileBuff::write(const ymuint8* buff,
 		ymuint64 num)
 {
@@ -52,10 +52,14 @@ FileBuff::write(const ymuint8* buff,
 
     if ( mPos == mBuffSize ) {
       // バッファが満杯になったので実際の書き込みを行う．
-      ymuint tmp_size = mBuffSize;
+      ymuint64 tmp_size = mBuffSize;
       ymuint8* tmp_buff = mBuff;
       while ( tmp_size > 0 ) {
-	ssize_t n = ::write(mFd, reinterpret_cast<void*>(tmp_buff), tmp_size);
+#if defined(YM_WIN32)
+	ymint64 n = _write(mFd, reinterpret_cast<void*>(tmp_buff), static_cast<ymuint>(tmp_size));
+#else
+	ymint64 n = ::write(mFd, reinterpret_cast<void*>(tmp_buff), tmp_size);
+#endif
 	if ( n <= 0 ) {
 	  // 書き込みが失敗した．
 	  return -1;
@@ -76,7 +80,7 @@ FileBuff::write(const ymuint8* buff,
 // @param[in] buff データを格納するバッファ
 // @param[in] num 読み込むバイト数．
 // @return 実際に読み込んだバイト数を返す．
-ssize_t
+ymint64
 FileBuff::read(ymuint8* buff,
 	       ymuint64 num)
 {
@@ -130,7 +134,7 @@ FileBuff::read(ymuint8* buff,
 // @note ただし読み込んだデータは捨てる．
 // @param[in] num 読み込むバイト数．
 // @return 実際に読み込んだバイト数を返す．
-ssize_t
+ymint64
 FileBuff::dummy_read(ymuint64 num)
 {
   // read() との違いは中央の memcpy() がないだけ．
@@ -167,7 +171,11 @@ FileBuff::prepare()
 {
   if ( mPos == mDataSize ) {
     // バッファが空なら実際に読み込む．
-    ssize_t n = ::read(mFd, reinterpret_cast<void*>(mBuff), mBuffSize);
+#if defined(YM_WIN32)
+    ymint64 n = _read(mFd, reinterpret_cast<void*>(mBuff), static_cast<ymuint>(mBuffSize));
+#else
+    ymint64 n = ::read(mFd, reinterpret_cast<void*>(mBuff), mBuffSize);
+#endif
     if ( n < 0 ) {
       perror("FileBuff::prepare()");
       return false;

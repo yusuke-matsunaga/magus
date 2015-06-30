@@ -75,7 +75,7 @@ FileODO::close()
 // @param[in] buff データを収めた領域のアドレス
 // @param[in] n データサイズ
 // @return 実際に書き出した量を返す．
-ssize_t
+ymint64
 FileODO::write(const ymuint8* buff,
 	       ymuint64 n)
 {

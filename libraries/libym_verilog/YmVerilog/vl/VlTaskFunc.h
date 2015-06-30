@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlTaskFunc VlTaskFunc.h "ym_YmVerilog/vlVlTaskFunc.h"
+/// @class VlTaskFunc VlTaskFunc.h "YmVerilog/vlVlTaskFunc.h"
 /// @brief elaboration 中の task/function を表すクラス
 /// IEEE Std 1364-2001 26.6.18 Task, function declaration
 //////////////////////////////////////////////////////////////////////

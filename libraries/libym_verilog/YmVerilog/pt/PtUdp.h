@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtUdp PtUdp.h "ym_YmVerilog/pt/PtUdp.h"
+/// @class PtUdp PtUdp.h "YmVerilog/pt/PtUdp.h"
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief UDP を表すノード
@@ -70,7 +70,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtUdpEntry PtUdp.h "ym_YmVerilog/pt/PtUdp.h"
+/// @class PtUdpEntry PtUdp.h "YmVerilog/pt/PtUdp.h"
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief UDP の中身のテーブルを表すクラス
@@ -109,7 +109,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtUdpValue PtUdp.h "ym_YmVerilog/pt/PtUdp.h"
+/// @class PtUdpValue PtUdp.h "YmVerilog/pt/PtUdp.h"
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief UDP のテーブルの値を表すクラス

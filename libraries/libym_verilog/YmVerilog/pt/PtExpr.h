@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtExpr PtExpr.h <ym_YmVerilog/pt/PtExpr.h>
+/// @class PtExpr PtExpr.h <YmVerilog/pt/PtExpr.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief expression を表すクラスの共通の親クラス

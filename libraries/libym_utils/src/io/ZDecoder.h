@@ -67,7 +67,7 @@ public:
   /// @return 実際に読み出したバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
   virtual
-  ssize_t
+  ymint64
   read(ymuint8* rbuff,
        ymuint64 num);
 
@@ -96,17 +96,17 @@ private:
   char_type
   pop_stack();
 
-  u_short&
-  tab_prefixof(ymuint i);
+  code_int&
+  tab_prefixof(code_int i);
 
   char_type&
-  tab_suffixof(ymuint i);
+  tab_suffixof(code_int i);
 
   /// @brief num バイトを読み込み buff[] に格納する．
   /// @param[in] buff データを格納するバッファ
   /// @param[in] num 読み込むバイト数．
   /// @return 実際に読み込んだバイト数を返す．
-  ssize_t
+  ymint64
   _read(ymuint8* buff,
 	ymuint64 num);
 
@@ -140,19 +140,19 @@ private:
 
   char_type* mStackPtr;
 
-  u_short mPrefix[k_HSIZE];
+  code_int mPrefix[k_HSIZE];
 
   char_type mSuffix[1 << k_BITS];
 
-  ymint32 m_finchar;
-
   code_int m_oldcode;
+
+  char_type m_finchar;
 
   code_int m_incode;
 
-  ymint32 m_roffset;
+  ymuint32 m_roffset;
 
-  ymint32 m_size;
+  ymuint32 m_size;
 
   char_type m_gbuf[k_BITS];
 
@@ -167,15 +167,15 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 inline
-u_short&
-ZDecoder::tab_prefixof(ymuint i)
+code_int&
+ZDecoder::tab_prefixof(code_int i)
 {
   return mPrefix[i];
 }
 
 inline
 char_type&
-ZDecoder::tab_suffixof(ymuint i)
+ZDecoder::tab_suffixof(code_int i)
 {
   return mSuffix[i];
 }

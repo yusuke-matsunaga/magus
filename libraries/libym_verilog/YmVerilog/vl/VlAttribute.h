@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlAttribute VlAttribute.h "ym_YmVerilog/vl/VlAttribute.h"
+/// @class VlAttribute VlAttribute.h "YmVerilog/vl/VlAttribute.h"
 /// @brief attribute instance を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlAttribute :
@@ -52,7 +52,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlAttrList VlAttribute.h "ym_YmVerilog/vl/VlAttribute.h"
+/// @class VlAttrList VlAttribute.h "YmVerilog/vl/VlAttribute.h"
 /// @brief VlAttribute のリスト
 //////////////////////////////////////////////////////////////////////
 class VlAttrList

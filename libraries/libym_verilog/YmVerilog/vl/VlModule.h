@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlModuleArray VlModule.h "ym_YmVerilog/vl/VlModule.h"
+/// @class VlModuleArray VlModule.h "YmVerilog/vl/VlModule.h"
 /// @brief elaboration 中の module 配列を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlModuleArray :
@@ -75,7 +75,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlModule VlModule.h "ym_YmVerilog/vl/VlModule.h"
+/// @class VlModule VlModule.h "YmVerilog/vl/VlModule.h"
 /// @brief elaboration 中の module を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlModule :

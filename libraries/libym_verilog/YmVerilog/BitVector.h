@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class BitVector BitVector.h <ym_YmVerilog/BitVector.h>
+/// @class BitVector BitVector.h <YmVerilog/BitVector.h>
 /// @ingroup VlCommon
 /// @brief Verilog-HDL のビットベクタ値を表すクラス
 ///

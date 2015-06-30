@@ -1,7 +1,7 @@
 ﻿#ifndef LIBYM_VERILOG_SIMULATOR_SIMENGINE_H
 #define LIBYM_VERILOG_SIMULATOR_SIMENGINE_H
 
-/// @file libym_YmVerilog/simulator/SimEngine.h
+/// @file libYmVerilog/simulator/SimEngine.h
 /// @brief simulator の心臓部
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include <ym_YmVerilog/verilog.h>
-#include <ym_YmVerilog/VlTime.h>
+#include <YmVerilog/verilog.h>
+#include <YmVerilog/VlTime.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG

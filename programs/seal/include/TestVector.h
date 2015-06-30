@@ -12,7 +12,7 @@
 
 #include "seal_nsdef.h"
 #include "seal_utils.h"
-#include <ym_YmUtils/RandGen.h>
+#include <YmUtils/RandGen.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

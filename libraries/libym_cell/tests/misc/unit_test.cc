@@ -1,4 +1,4 @@
-﻿// $Source: /export/home/project/synth/cvsrepos/ymtools/src/libym_YmCell/tests/unit_test.cc,v $
+﻿// $Source: /export/home/project/synth/cvsrepos/ymtools/src/libYmCell/tests/unit_test.cc,v $
 // $Author: matsunaga $
 // $Revision: 1.1.1.1 $
 // $Date: 2005/12/11 17:07:26 $

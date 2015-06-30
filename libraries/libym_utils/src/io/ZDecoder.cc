@@ -22,7 +22,7 @@ ZDecoder::ZDecoder()
   m_state = kStart;
 
   m_maxbits = k_BITS;	/* User settable max # bits/code. */
-  m_maxmaxcode = 1L << m_maxbits;	/* Should NEVER generate this code. */
+  m_maxmaxcode = 1ULL << m_maxbits;	/* Should NEVER generate this code. */
   m_free_ent = 0;			/* First unused entry. */
   m_block_compress = k_BLOCK_MASK;
   m_clear_flg = 0;
@@ -71,7 +71,7 @@ ZDecoder::is_ready() const
 // @param[in] num 読み出すデータ数(バイト)
 // @return 実際に読み出したバイト数を返す．
 // @note エラーが起こったら -1 を返す．
-ssize_t
+ymint64
 ZDecoder::read(ymuint8* rbuff,
 	       ymuint64 num)
 {
@@ -98,7 +98,7 @@ ZDecoder::read(ymuint8* rbuff,
   // 先頭のマジックナンバーと最大ビット数を読む．
   {
     ymuint8 header[3];
-    ssize_t n = mBuff.read(header, sizeof(header));
+    ymint64 n = mBuff.read(header, sizeof(header));
     if ( n != sizeof(header) ||
 	 memcmp(header, k_MAGICHEADER, sizeof(k_MAGICHEADER)) != 0 ) {
       // ファイルタイプミスマッチ
@@ -108,7 +108,7 @@ ZDecoder::read(ymuint8* rbuff,
     m_maxbits = header[2];
     m_block_compress = m_maxbits & k_BLOCK_MASK;
     m_maxbits &= k_BIT_MASK;
-    m_maxmaxcode = 1UL << m_maxbits;
+    m_maxmaxcode = 1ULL << m_maxbits;
     if ( m_maxbits > k_BITS || m_maxbits < 12 ) {
       // EFTYPE
       cerr << "m_maxbits = " << m_maxbits << endl;
@@ -125,7 +125,8 @@ ZDecoder::read(ymuint8* rbuff,
   }
   m_free_ent = m_block_compress ? k_FIRST : 256;
 
-  m_finchar = m_oldcode = getcode();
+  m_oldcode = getcode();
+  m_finchar = static_cast<char_type>(m_oldcode & 0xFF);
   if ( m_oldcode == -1 ) {
     return 0;
   }
@@ -207,18 +208,19 @@ ZDecoder::getcode()
       m_maxcode = MAXCODE(m_n_bits = k_INIT_BITS);
       m_clear_flg = 0;
     }
-    ssize_t n = mBuff.read(m_gbuf, m_n_bits);
+    ymint64 n = mBuff.read(m_gbuf, m_n_bits);
     if ( n <= 0 ) {
       return -1;
     }
     m_roffset = 0;
-    m_size = (n << 3) - (m_n_bits - 1);
+    ymuint n1 = static_cast<ymuint>(n);
+    m_size = (n1 << 3) - (m_n_bits - 1);
   }
-  int r_off = m_roffset;
-  int bits = m_n_bits;
+  ymuint r_off = m_roffset;
+  ymuint bits = m_n_bits;
 
   // Get to the first byte.
-  bp += (r_off >> 3);
+  bp += static_cast<ymuint8>(r_off >> 3);
   r_off &= 7;
 
   // Get first part (low order bits).

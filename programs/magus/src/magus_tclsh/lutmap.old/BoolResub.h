@@ -10,8 +10,8 @@
 /// Copyright (C) 2005-2006 Yusuke Matsunaga
 /// All rights reserved.
 
-#include <ym_YmUtils/RandGen.h>
-#include <ym_YmUtils/Alloc.h>
+#include <YmUtils/RandGen.h>
+#include <YmUtils/Alloc.h>
 #include <ym_lexp/Expr.h>
 #include <ym_sat/sat_nsdef.h>
 

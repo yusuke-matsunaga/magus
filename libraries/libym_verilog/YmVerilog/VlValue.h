@@ -20,7 +20,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class VlValueRep;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlValue VlValue.h "ym_YmVerilog/VlValue.h"
+/// @class VlValue VlValue.h "YmVerilog/VlValue.h"
 /// @brief 値を表すクラス
 /// ElbValue が実際の処理を行う．
 //////////////////////////////////////////////////////////////////////
@@ -782,7 +782,7 @@ multi_concat(const vector<VlValue>& src_list);
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlValueRep VlValue.h "ym_YmVerilog/VlValue.h"
+/// @class VlValueRep VlValue.h "YmVerilog/VlValue.h"
 /// @brief VlValue の実体を表す仮想クラス
 //////////////////////////////////////////////////////////////////////
 class VlValueRep :

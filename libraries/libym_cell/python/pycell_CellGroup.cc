@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_YmCell/pycell.h"
-#include "ym_YmCell/CellGroup.h"
-#include "ym_YmCell/Cell.h"
+#include "YmCell/pycell.h"
+#include "YmCell/CellGroup.h"
+#include "YmCell/Cell.h"
 
 
 BEGIN_NAMESPACE_YM

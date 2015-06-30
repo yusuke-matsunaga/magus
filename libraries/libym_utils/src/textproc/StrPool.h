@@ -50,7 +50,7 @@ public:
   /// @brief 確保した文字列領域の総量を得る．
   /// @return 確保した文字列領域の総量を得る．
   /// @note デバッグ/解析用 -- 通常は使わない．
-  ymuint
+  ymuint64
   accum_alloc_size() const;
 
   /// @brief メモリを全部開放する．

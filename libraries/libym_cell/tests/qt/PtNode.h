@@ -1,7 +1,7 @@
 ﻿#ifndef PTNODE_H
 #define PTNODE_H
 
-/// @file libym_YmCell/tests/dotlib_ptview/PtNode.h
+/// @file libYmCell/tests/dotlib_ptview/PtNode.h
 /// @brief PtNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

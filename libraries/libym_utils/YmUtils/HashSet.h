@@ -1,4 +1,4 @@
-#ifndef YMUTILS_HASHSET_H
+﻿#ifndef YMUTILS_HASHSET_H
 #define YMUTILS_HASHSET_H
 
 /// @file YmUtils/HashSet.h

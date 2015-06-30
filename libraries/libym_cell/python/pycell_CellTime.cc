@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "ym_YmCell/pycell.h"
-#include "ym_YmCell/CellTime.h"
-#include "ym_YmUtils/FileODO.h"
-#include "ym_YmUtils/FileIDO.h"
+#include "YmCell/pycell.h"
+#include "YmCell/CellTime.h"
+#include "YmUtils/FileODO.h"
+#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM

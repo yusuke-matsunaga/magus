@@ -13,10 +13,14 @@
 #include "YmUtils/CodecType.h"
 
 
+#if defined(YM_WIN32)
+typedef int mode_t;
+#endif
+
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @calss FileCoder FileCoder.h "FileCoder.h"
+/// @class FileCoder FileCoder.h "FileCoder.h"
 /// @brief ファイルの圧縮を行うクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
 class FileCoder
@@ -116,7 +120,7 @@ public:
   /// @return 実際に書き込んだバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
   virtual
-  ssize_t
+  ymint64
   write(const ymuint8* rbuff,
 	ymuint64 num) = 0;
 

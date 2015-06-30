@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtStmt PtStmt.h <ym_YmVerilog/pt/PtStmt.h>
+/// @class PtStmt PtStmt.h <YmVerilog/pt/PtStmt.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief statement の共通の親クラス
@@ -168,7 +168,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtCaseItem PtStmt.h <ym_YmVerilog/pt/PtStmt.h>
+/// @class PtCaseItem PtStmt.h <YmVerilog/pt/PtStmt.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief caseitemを表すクラス

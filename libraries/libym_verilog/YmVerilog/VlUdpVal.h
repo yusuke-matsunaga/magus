@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlUdpVal VlUdpVal.h "ym_YmVerilog/VlUdpVal.h"
+/// @class VlUdpVal VlUdpVal.h "YmVerilog/VlUdpVal.h"
 /// @brief UDP のテーブルで使われる値を表すクラス
 /// 基本的には
 /// - 0

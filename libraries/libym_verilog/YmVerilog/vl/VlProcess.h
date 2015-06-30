@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlProcess VlProcess.h "ym_YmVerilog/vl/VlProcess.h"
+/// @class VlProcess VlProcess.h "YmVerilog/vl/VlProcess.h"
 /// @brief initial/always 文を表すクラス
 /// IEEE Std 1364-2001 26.6.27 Process, block, statement, event statement
 //////////////////////////////////////////////////////////////////////

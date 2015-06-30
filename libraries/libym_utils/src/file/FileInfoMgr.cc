@@ -58,7 +58,7 @@ FileInfoMgr::parent_loc(ymuint id)
 ymuint
 FileInfoMgr::new_file_info(const char* filename)
 {
-  ymuint id = mFiArray.size();
+  ymuint id = static_cast<ymuint>(mFiArray.size());
   mFiArray.push_back(_FileInfo(filename));
   return id;
 }
@@ -71,7 +71,7 @@ ymuint
 FileInfoMgr::new_file_info(const char* filename,
 			   const FileLoc& parent_loc)
 {
-  ymuint id = mFiArray.size();
+  ymuint id = static_cast<ymuint>(mFiArray.size());
   mFiArray.push_back(_FileInfo(filename, parent_loc));
   return id;
 }

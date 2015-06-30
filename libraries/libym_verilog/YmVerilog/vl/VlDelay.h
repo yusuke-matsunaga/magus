@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_VERILOG
 class VlExpr;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlDelay VlDelay.h "ym_YmVerilog/vl/VlDelay.h"
+/// @class VlDelay VlDelay.h "YmVerilog/vl/VlDelay.h"
 /// @brief 遅延式を表す基底クラス
 /// 基本的には VlExpr の配列だが要素数は3以下である．
 //////////////////////////////////////////////////////////////////////

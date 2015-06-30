@@ -60,7 +60,7 @@ public:
   /// @param[in] file_loc ファイル位置
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
+  /// @param[in] msg メッセージ本文
   void
   put_msg(const char* src_file,
 	  int src_line,
@@ -74,7 +74,7 @@ public:
   /// @param[in] src_line この関数を読んでいるソースの行番号
   /// @param[in] type メッセージの種類
   /// @param[in] label メッセージラベル
-  /// @param[in] body メッセージ本文
+  /// @param[in] msg メッセージ本文
   void
   put_msg(const char* src_file,
 	  int src_line,

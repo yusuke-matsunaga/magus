@@ -11,7 +11,7 @@
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
 #include "ym_smtlibv2/SmtVarFun.h"
-#include "ym_YmUtils/Alloc.h"
+#include "YmUtils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

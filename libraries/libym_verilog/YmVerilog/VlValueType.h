@@ -24,7 +24,7 @@ const ymuint32 kVpiSizeReal = 64U;
 const ymuint32 kVpiSizeTime = 64U;
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlValueType VlValueType.h "ym_YmVerilog/VlValueType.h"
+/// @class VlValueType VlValueType.h "YmVerilog/VlValueType.h"
 /// @brief verilog の値の型を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlValueType

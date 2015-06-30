@@ -134,8 +134,9 @@ public:
 
   /// @brief pos 番目の文字の取得
   /// @param[in] pos 取得する文字の位置
-  /// @retval pos 番目の文字
-  /// @retval '\\0' 範囲外の場合
+  /// @return pos 番目の文字を返す．
+  ///
+  /// 範囲外の場合は '\\0' を返す．
   char
   operator[](size_type pos) const;
 

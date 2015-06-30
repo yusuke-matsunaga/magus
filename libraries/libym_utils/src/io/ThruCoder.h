@@ -68,7 +68,7 @@ public:
   /// @return 実際に書き込んだバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
   virtual
-  ssize_t
+  ymint64
   write(const ymuint8* wbuff,
 	ymuint64 num);
 

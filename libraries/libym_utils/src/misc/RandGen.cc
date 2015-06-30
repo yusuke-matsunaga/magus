@@ -191,7 +191,7 @@ RandGen::ulong()
 #else
   ymulong ans = 0UL;
   ymuint n = SIZEOF_LONG / 4;
-  for (size_t i = 0; i < n; ++ i) {
+  for (ymuint i = 0; i < n; ++ i) {
     ans <<= 32;
     ans |= int32();
   }
@@ -299,7 +299,7 @@ RandCombiGen::generate(RandGen& randgen)
     ymuint n = mNum - i;
     ymuint p = (randgen.int32() % n) + i;
     if ( p != i ) {
-      size_t v = mArray[p];
+      ymuint v = mArray[p];
       mArray[p] = mArray[i];
       mArray[i] = v;
     }

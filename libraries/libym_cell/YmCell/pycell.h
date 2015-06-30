@@ -1,7 +1,7 @@
 ﻿#ifndef YM_CELL_PYCELL_H
 #define YM_CELL_PYCELL_H
 
-/// @file ym_YmCell/pycell.h
+/// @file YmCell/pycell.h
 /// @brief libym_cell の Python 用拡張モジュールの定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,7 +10,7 @@
 
 
 #include "ympython.h"
-#include "ym_YmCell/cell_nsdef.h"
+#include "YmCell/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM

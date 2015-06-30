@@ -33,9 +33,9 @@ BEGIN_NAMESPACE_YM_COMPCOMMON
 // 型の定義
 //////////////////////////////////////////////////////////////////////
 
-typedef long code_int;
-typedef long count_int;
-typedef u_char char_type;
+typedef ymint64 code_int;
+typedef ymint64 count_int;
+typedef ymuint8 char_type;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ MAXCODE(ymuint32 n_bits)
 inline
 void
 print_code(ostream& s,
-	   u_char suffix)
+	   char_type suffix)
 {
   s << static_cast<int>(suffix);
   if ( isprint(suffix) ) {

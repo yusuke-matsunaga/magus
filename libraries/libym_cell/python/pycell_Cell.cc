@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "ym_YmCell/pycell.h"
-#include "ym_YmCell/Cell.h"
-#include "ym_YmCell/CellPin.h"
-#include "ym_YmCell/CellTiming.h"
+#include "YmCell/pycell.h"
+#include "YmCell/Cell.h"
+#include "YmCell/CellPin.h"
+#include "YmCell/CellTiming.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -44,7 +44,7 @@ ZCoder::open(const char* filename,
   m_state = kStart;
 
   m_maxbits = level ? level : k_BITS;	/* User settable max # bits/code. */
-  m_maxmaxcode = 1L << m_maxbits;	/* Should NEVER generate this code. */
+  m_maxmaxcode = 1ULL << m_maxbits;	/* Should NEVER generate this code. */
   m_free_ent = 0;			/* First unused entry. */
   m_block_compress = k_BLOCK_MASK;
   m_clear_flg = 0;
@@ -90,7 +90,7 @@ ZCoder::is_ready() const
 // @param[in] num 書き込むデータ数(バイト)
 // @return 実際に書き込んだバイト数を返す．
 // @note エラーが起こったら -1 を返す．
-ssize_t
+ymint64
 ZCoder::write(const ymuint8* wbuff,
 	      ymuint64 num)
 {
@@ -104,8 +104,8 @@ ZCoder::write(const ymuint8* wbuff,
   if ( m_state == kStart ) {
     m_state = kMiddle;
 
-    m_maxmaxcode = 1UL << m_maxbits;
-    ssize_t n = mBuff.write(k_MAGICHEADER, sizeof(k_MAGICHEADER));
+    m_maxmaxcode = 1ULL << m_maxbits;
+    ymint64 n = mBuff.write(k_MAGICHEADER, sizeof(k_MAGICHEADER));
     if ( n != sizeof(k_MAGICHEADER) ) {
       return -1;
     }
@@ -140,7 +140,7 @@ ZCoder::write(const ymuint8* wbuff,
   }
 
   for (code_int i = 0; count -- > 0; ) {
-    int disp;
+    code_int disp;
     ymuint8 c = *(bp ++ );
     ++ m_in_count;
     code_int fcode = (static_cast<code_int>(c) << m_maxbits) + m_ent;
@@ -236,7 +236,7 @@ ZCoder::cl_hash(count_int cl_hsize)
 {
   long m1 = -1;
   count_int* htab_p = m_htab + cl_hsize;
-  long i = cl_hsize - 16;
+  count_int i = cl_hsize - 16;
   do {			/* Might use Sys V memset(3) here. */
     *(htab_p - 16) = m1;
     *(htab_p - 15) = m1;
@@ -282,21 +282,21 @@ ZCoder::output(code_int ocode)
 
     // Get any 8 bit parts in the middle (<=1 for up to 16 bits).
     if ( bits >= 8 ) {
-      *bp ++ = ocode;
+      *bp ++ = static_cast<char_type>(ocode & 0xFFL);
       ocode >>= 8;
       bits -= 8;
     }
 
     // Last bits.
     if ( bits ) {
-      *bp = ocode;
+      *bp = static_cast<char_type>(ocode);
     }
     m_offset += m_n_bits;
     if ( m_offset == (m_n_bits << 3) ) {
       bp = m_buf;
       bits = m_n_bits;
       m_bytes_out += bits;
-      ssize_t n = mBuff.write(bp, bits);
+      ymint64 n = mBuff.write(bp, bits);
       if ( n != bits ) {
 	return -1;
       }
@@ -311,7 +311,7 @@ ZCoder::output(code_int ocode)
       // Write the whole buffer, because the input side won't
       // discover the size increase until after it has read it.
       if ( m_offset > 0 ) {
-	ssize_t n = mBuff.write(m_buf, m_n_bits);
+	ymint64 n = mBuff.write(m_buf, m_n_bits);
 	if ( n != m_n_bits ) {
 	  return -1;
 	}
@@ -338,7 +338,7 @@ ZCoder::output(code_int ocode)
     // At EOF, write the rest of the buffer.
     if ( m_offset > 0 ) {
       m_offset = (m_offset + 7) / 8;
-      ssize_t n = mBuff.write(m_buf, m_offset);
+      ymint64 n = mBuff.write(m_buf, m_offset);
       if ( n != m_offset ) {
 	return -1;
       }

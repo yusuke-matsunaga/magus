@@ -7,17 +7,17 @@
 /// All rights reserved.
 
 
-#include "ym_YmCell/pycell.h"
-#include "ym_YmCell/CellLibrary.h"
-#include "ym_YmCell/CellDotlibReader.h"
-#include "ym_YmCell/CellMislibReader.h"
-#include "ym_YmCell/CellBus.h"
-#include "ym_YmCell/CellClass.h"
-#include "ym_YmCell/CellGroup.h"
-#include "ym_YmCell/Cell.h"
-#include "ym_YmUtils/pyutils.h"
-#include "ym_YmUtils/FileODO.h"
-#include "ym_YmUtils/FileIDO.h"
+#include "YmCell/pycell.h"
+#include "YmCell/CellLibrary.h"
+#include "YmCell/CellDotlibReader.h"
+#include "YmCell/CellMislibReader.h"
+#include "YmCell/CellBus.h"
+#include "YmCell/CellClass.h"
+#include "YmCell/CellGroup.h"
+#include "YmCell/Cell.h"
+#include "YmUtils/pyutils.h"
+#include "YmUtils/FileODO.h"
+#include "YmUtils/FileIDO.h"
 
 
 BEGIN_NAMESPACE_YM

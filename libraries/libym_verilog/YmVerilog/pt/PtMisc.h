@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtControl PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtControl PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief delay control/event control/repeat control を表すクラス
@@ -73,7 +73,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtConnection PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtConnection PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief orered_connection/named_connection を表すクラス
@@ -110,7 +110,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtStrength PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtStrength PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief strength を表すクラス
@@ -152,7 +152,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtDelay PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtDelay PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief delay を表すクラス
@@ -184,7 +184,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNameBranch PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtNameBranch PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief 階層名を表すクラス
@@ -234,7 +234,7 @@ expand_full_name(const PtNameBranchArray& nb_array,
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtAttrInst PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtAttrInst PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief attribute_instance を表すクラス
@@ -269,7 +269,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtAttrSpec PtMisc.h <ym_YmVerilog/pt/PtMisc.h>
+/// @class PtAttrSpec PtMisc.h <YmVerilog/pt/PtMisc.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief attr_spec を表すクラス

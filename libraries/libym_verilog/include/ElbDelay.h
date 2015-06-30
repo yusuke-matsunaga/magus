@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbDelay ElbDelay.h "ym_YmVerilog/vl/VlDelay.h"
+/// @class ElbDelay ElbDelay.h "YmVerilog/vl/VlDelay.h"
 /// @brief エラボレーション中の expression を表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class ElbDelay :

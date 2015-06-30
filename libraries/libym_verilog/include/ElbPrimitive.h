@@ -230,7 +230,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class ElbPrimTerm ElbPrimitive.h <ym_YmVerilog/vl/VlPrimitive.h>
+/// @class ElbPrimTerm ElbPrimitive.h <YmVerilog/vl/VlPrimitive.h>
 /// @brief プリミティブインスタンスのポート端子を表すクラス
 /// IEEE Std 1364-2001 26.6.13 Primitive, prim term
 //////////////////////////////////////////////////////////////////////

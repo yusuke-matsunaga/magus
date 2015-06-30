@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtModule PtModule.h <ym_YmVerilog/pt/PtModule.h>
+/// @class PtModule PtModule.h <YmVerilog/pt/PtModule.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief module を表すノード

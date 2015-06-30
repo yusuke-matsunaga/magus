@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_YmLogic/pylogic.h"
-#include "ym_YmLogic/BddMgr.h"
-#include "ym_YmLogic/Bdd.h"
+#include "YmLogic/pylogic.h"
+#include "YmLogic/BddMgr.h"
+#include "YmLogic/Bdd.h"
 
 
 BEGIN_NAMESPACE_YM

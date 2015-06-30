@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @calss FileDecoder FileDecoder.h "FileDecoder.h"
+/// @class FileDecoder FileDecoder.h "FileDecoder.h"
 /// @brief ファイルの伸長を行うクラスの基底クラス
 //////////////////////////////////////////////////////////////////////
 class FileDecoder
@@ -112,7 +112,7 @@ public:
   /// @return 実際に読み出したバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
   virtual
-  ssize_t
+  ymint64
   read(ymuint8* rbuff,
        ymuint64 num) = 0;
 

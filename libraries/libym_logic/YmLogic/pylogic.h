@@ -1,7 +1,7 @@
 ﻿#ifndef YM_YMYMLOGIC_PYYMYMLOGIC_H
 #define YM_YMYMLOGIC_PYYMYMLOGIC_H
 
-/// @file ym_YmLogic/pylogic.h
+/// @file YmLogic/pylogic.h
 /// @brief libym_logic の Python 用の拡張モジュールの定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,15 +10,15 @@
 
 
 #include "ympython.h"
-#include "ym_YmLogic/Bool3.h"
-#include "ym_YmLogic/VarId.h"
-#include "ym_YmLogic/Pol.h"
-#include "ym_YmLogic/Literal.h"
-#include "ym_YmLogic/TvFunc.h"
-#include "ym_YmLogic/lexp_nsdef.h"
-#include "ym_YmLogic/bdd_nsdef.h"
-#include "ym_YmLogic/aig_nsdef.h"
-#include "ym_YmLogic/sat_nsdef.h"
+#include "YmLogic/Bool3.h"
+#include "YmLogic/VarId.h"
+#include "YmLogic/Pol.h"
+#include "YmLogic/Literal.h"
+#include "YmLogic/TvFunc.h"
+#include "YmLogic/lexp_nsdef.h"
+#include "YmLogic/bdd_nsdef.h"
+#include "YmLogic/aig_nsdef.h"
+#include "YmLogic/sat_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM

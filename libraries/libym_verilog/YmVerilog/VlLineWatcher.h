@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlLineWatcher VlLineWatcher.h <ym_YmVerilog/VlLineWatcher.h>
+/// @class VlLineWatcher VlLineWatcher.h <YmVerilog/VlLineWatcher.h>
 /// @ingroup VlParser
 /// @brief Verilog-HDL 用の Lex 中で行番号を監視するクラス
 ///

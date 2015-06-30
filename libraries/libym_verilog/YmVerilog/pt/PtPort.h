@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtPort PtPort.h <ym_YmVerilog/pt/PtPort.h>
+/// @class PtPort PtPort.h <YmVerilog/pt/PtPort.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief port を表すクラス

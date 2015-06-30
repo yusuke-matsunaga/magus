@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_YmUtils/pyutils.h"
-#include "ym_YmCell/pycell.h"
+#include "YmUtils/pyutils.h"
+#include "YmCell/pycell.h"
 
 int
 main(int argc,

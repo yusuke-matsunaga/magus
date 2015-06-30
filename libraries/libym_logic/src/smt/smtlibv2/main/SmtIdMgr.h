@@ -10,8 +10,8 @@
 
 
 #include "ym_smtlibv2/smtlibv2_nsdef.h"
-#include "ym_YmUtils/ShString.h"
-#include "ym_YmUtils/Alloc.h"
+#include "YmUtils/ShString.h"
+#include "YmUtils/Alloc.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

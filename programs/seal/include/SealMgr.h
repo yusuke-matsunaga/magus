@@ -13,7 +13,7 @@
 
 
 #include "seal_nsdef.h"
-#include <ym_YmNetworks/tgnet.h>
+#include <YmNetworks/tgnet.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

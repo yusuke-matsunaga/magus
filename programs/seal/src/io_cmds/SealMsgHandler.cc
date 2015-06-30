@@ -15,7 +15,7 @@
 #endif
 
 #include "SealMsgHandler.h"
-#include <ym_YmUtils/FileRegion.h>
+#include <YmUtils/FileRegion.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL

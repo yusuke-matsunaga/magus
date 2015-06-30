@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlUserSystf VlUserSystf.h "ym_YmVerilog/vl/VlUserSystf.h"
+/// @class VlUserSystf VlUserSystf.h "YmVerilog/vl/VlUserSystf.h"
 /// @brief システムタスク/関数の定義を表すクラス
 /// IEEE Std 1364-2001 26.6.14 UDP
 //////////////////////////////////////////////////////////////////////

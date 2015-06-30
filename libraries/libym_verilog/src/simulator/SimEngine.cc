@@ -1,5 +1,5 @@
 ﻿
-/// @file libym_YmVerilog/simulator/SimEngine.cc
+/// @file libYmVerilog/simulator/SimEngine.cc
 /// @brief simulator の心臓部
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -13,7 +13,7 @@
 #include <ymconfig.h>
 #endif
 
-#include <ym_YmVerilog/vpi/VpiScope.h>
+#include <YmVerilog/vpi/VpiScope.h>
 
 #include "SimEngine.h"
 #include "SimEventQueue.h"

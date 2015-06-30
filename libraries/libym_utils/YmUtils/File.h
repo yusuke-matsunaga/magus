@@ -11,6 +11,18 @@
 
 #include "YmTools.h"
 
+/// @todo pwd.h や sys/param.h がないときの対処
+#if defined(HAVE_PWD_H)
+#  include <pwd.h>
+#endif
+#if defined(HAVE_SYS_PARAM_H)
+#  include <sys/param.h>
+#endif
+#if defined(HAVE_SYS_STAT_H) || defined(YM_WIN32)
+#  include <sys/stat.h>
+#  include <sys/types.h>
+#endif
+
 
 BEGIN_NAMESPACE_YM
 
@@ -30,7 +42,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief パスの型を表す列挙型
-  enum tType {
+  enum Type {
     /// @brief 絶対パス
     kAbsolute,
     /// @brief ホームからの相対パス．最初の文字列はユーザ名
@@ -76,7 +88,7 @@ public:
 
   /// @brief パスの型を返す．
   /// @return パスの型
-  tType
+  Type
   type() const;
 
   /// @brief パス名の文字列表現を返す．
@@ -114,12 +126,21 @@ public:
   PathName
   expand() const;
 
+#if defined(YM_WIN32)
+  /// @brief パスが存在しているか調べる．
+  /// @param[out] sbp stat システムコールの結果を格納する構造体
+  /// NULL ならどこにも結果を格納しない
+  /// @return 存在していたら true を返す．
+  bool
+  stat(struct _stat64i32* sbp = NULL) const;
+#else
   /// @brief パスが存在しているか調べる．
   /// @param[out] sbp stat システムコールの結果を格納する構造体
   /// NULL ならどこにも結果を格納しない
   /// @return 存在していたら true を返す．
   bool
   stat(struct stat* sbp = NULL) const;
+#endif
 
   /// @brief 末尾にパスをつなげる．
   /// @param[in] src 追加するパス
@@ -141,7 +162,7 @@ private:
   /// @param[in] path_list パスリスト
   /// @param[in] type パスタイプ
   PathName(const list<string>& path_list,
-	   tType type);
+	   Type type);
 
   /// @brief 拡張子の直前のドットの位置を返す．
   /// @param[in] path 対象のパス文字列
@@ -159,7 +180,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // タイプ
-  tType mType;
+  Type mType;
 
   // パス名を表す本体
   list<string> mPathList;

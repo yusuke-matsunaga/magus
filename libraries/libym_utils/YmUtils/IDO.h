@@ -102,7 +102,7 @@ public:
   /// @param[in] n 読み込むデータサイズ
   /// @return 実際に読み込んだ量を返す．
   virtual
-  ssize_t
+  ymint64
   read(ymuint8* buff,
        ymuint64 n) = 0;
 
@@ -205,7 +205,7 @@ IDO&
 operator>>(IDO& s,
 	   bool& val)
 {
-  val = s.read_8();
+  val = static_cast<bool>(s.read_8() != 0);
   return s;
 }
 

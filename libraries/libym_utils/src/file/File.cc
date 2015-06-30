@@ -10,12 +10,8 @@
 #include "YmUtils/File.h"
 
 
-/// @todo pwd.h や sys/param.h がないときの対処
-#if defined(HAVE_PWD_H)
-#  include <pwd.h>
-#endif
-#if defined(HAVE_SYS_PARAM_H)
-#  include <sys/param.h>
+#if defined(YM_WIN32)
+#include <direct.h>
 #endif
 
 
@@ -102,7 +98,7 @@ PathName::PathName(const char* path_str)
 
 // 文字列のリストからの変換コンストラクタ
 PathName::PathName(const list<string>& path_list,
-		   tType type) :
+		   Type type) :
   mType(type),
   mPathList(path_list)
 {
@@ -121,7 +117,7 @@ PathName::is_valid() const
 }
 
 // パスの型を返す．
-PathName::tType
+PathName::Type
 PathName::type() const
 {
   return mType;
@@ -235,6 +231,18 @@ PathName::expand() const
   return PathName();
 }
 
+#if defined(YM_WIN32)
+// パスが存在しているか調べる．
+bool
+PathName::stat(struct _stat64i32* sbp) const
+{
+  struct _stat64i32 dummy;
+  if ( !sbp ) {
+    sbp = &dummy;
+  }
+  return _stat(str().c_str(), sbp) == 0;
+}
+#else
 // パスが存在しているか調べる．
 bool
 PathName::stat(struct stat* sbp) const
@@ -245,6 +253,7 @@ PathName::stat(struct stat* sbp) const
   }
   return ::stat(str().c_str(), sbp) == 0;
 }
+#endif
 
 // 末尾にパスをつなげる．
 const PathName&
@@ -416,8 +425,17 @@ SearchPathList::to_list(const string& str,
 PathName
 cur_work_dir()
 {
-  char buff[MAXPATHLEN + 1];
+#if defined(YM_WIN32)
+  const int max_pathlen = _MAX_PATH;
+#else
+  const int max_pathlen = MAXPATHLEN;
+#endif
+  char buff[max_pathlen + 1];
+#if defined(YM_WIN32)
+  char* tmp = _getcwd(buff, sizeof(buff));
+#else
   char* tmp = getcwd(buff, sizeof(buff));
+#endif
   if ( tmp == NULL ) {
     // なんか知らないけどエラー
     return PathName();
@@ -432,17 +450,29 @@ user_home(const string& login)
 {
   string hdir;
   if ( login == string() ) {
+#if defined(YM_WIN32)
+    char* buffer;
+    size_t num;
+    errno_t en = _dupenv_s(&buffer, &num, "HOME");
+    if ( en == 0 ) {
+      hdir = buffer;
+      free(buffer);
+    }
+#else
     char* henv = getenv("HOME");
     if ( henv ) {
       hdir = henv;
     }
+#endif
   }
   else {
+#if defined(YM_UNIX)
     struct passwd* ppw = getpwnam(login.c_str());
     if ( ppw ) {
       hdir = ppw->pw_dir;
     }
     endpwent();
+#endif
   }
   return PathName(hdir);
 }

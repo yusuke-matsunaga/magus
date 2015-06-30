@@ -13,6 +13,11 @@
 
 #include <fcntl.h>
 
+#if defined(YM_WIN32)
+#include <io.h>
+typedef int mode_t;
+#endif
+
 
 BEGIN_NAMESPACE_YM
 
@@ -63,7 +68,7 @@ public:
   /// @param[in] buff データを格納したバッファ
   /// @param[in] num 書き込むバイト数
   /// @return 実際に書き込んだバイト数を返す．
-  ssize_t
+  ymint64
   write(const ymuint8* buff,
 	ymuint64 num);
 
@@ -71,7 +76,7 @@ public:
   /// @param[in] buff データを格納するバッファ
   /// @param[in] num 読み込むバイト数．
   /// @return 実際に読み込んだバイト数を返す．
-  ssize_t
+  ymint64
   read(ymuint8* buff,
        ymuint64 num);
 
@@ -79,7 +84,7 @@ public:
   /// @note ただし読み込んだデータは捨てる．
   /// @param[in] num 読み込むバイト数．
   /// @return 実際に読み込んだバイト数を返す．
-  ssize_t
+  ymint64
   dummy_read(ymuint64 num);
 
   /// @brief バッファにデータを読みだす．
@@ -175,7 +180,14 @@ FileBuff::open(const char* filename,
 	       mode_t mode)
 {
   close();
+#if defined(YM_WIN32)
+  errno_t en = _sopen_s(&mFd, filename, flags, _SH_DENYRW, mode);
+  if ( en != 0 ) {
+    return false;
+  }
+#else
   mFd = ::open(filename, flags, mode);
+#endif
   if ( flags == O_RDONLY ) {
     mPos = mBuffSize;
   }
@@ -197,7 +209,11 @@ FileBuff::close()
     if ( mNeedFlush ) {
       flush();
     }
+#if defined(YM_WIN32)
+    _close(mFd);
+#else
     ::close(mFd);
+#endif
   }
   mFd = -1;
   mNeedFlush = false;
@@ -216,8 +232,12 @@ inline
 bool
 FileBuff::flush()
 {
-  ssize_t n = ::write(mFd, mBuff, mPos);
-  if ( n < static_cast<ssize_t>(mPos) ) {
+#if defined(YM_WIN32)
+  ymint64 n = _write(mFd, mBuff, static_cast<ymuint>(mPos));
+#else
+  ymint64 n = ::write(mFd, mBuff, mPos);
+#endif
+  if ( n < static_cast<ymint64>(mPos) ) {
     // 書き込みが失敗した．
     return false;
   }

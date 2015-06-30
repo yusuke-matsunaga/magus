@@ -1,7 +1,7 @@
 ﻿#ifndef LIBYM_VERILOG_PARSER_PUHIERNAME_H
 #define LIBYM_VERILOG_PARSER_PUHIERNAME_H
 
-/// @file libym_YmVerilog/parser/PuHierName.h
+/// @file libYmVerilog/parser/PuHierName.h
 /// @brief PuHierName のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

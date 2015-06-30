@@ -108,7 +108,7 @@ inline
 ymuint
 MultiSetGenBase::group_num() const
 {
-  return mNumArray.size();
+  return static_cast<ymuint>(mNumArray.size());
 }
 
 // @brief 各要素の重複度を得る．

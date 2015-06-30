@@ -391,6 +391,14 @@ main(int argc,
     return 255;
   }
 
+  cout << "/// @brief double 型の整列境界値" << endl;
+#if defined(WIN32)
+    cout << "const int ALIGNOF_DOUBLE = " << __alignof(double) << ";" << endl;
+#else
+    cout << "const int ALIGNOF_DOUBLE = " << __alignof__(double) << ";" << endl;
+#endif
+  cout << endl;
+
   cout << header3;
 
   return 0;

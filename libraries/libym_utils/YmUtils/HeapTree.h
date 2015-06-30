@@ -97,7 +97,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SimpleHeapTree HeapTree.h "ym_YmUtils/HeapTree.h"
+/// @class SimpleHeapTree HeapTree.h "YmUtils/HeapTree.h"
 /// @ingroup YmUtils
 /// @brief 簡単に使えるヒープ木のテンプレートクラス
 /// @note ヒープ木に要素と比較用の値を保持する．

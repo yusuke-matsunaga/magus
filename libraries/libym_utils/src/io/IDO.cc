@@ -39,7 +39,7 @@ void
 IDO::_read(ymuint8* buff,
 	   ymuint64 n)
 {
-  ssize_t ret = read(buff, n);
+  ymint64 ret = read(buff, n);
   if ( static_cast<ymuint64>(ret) != n ) {
     ostringstream buf;
     buf << "IDO::read(" << n << ") failed. read " << ret << " bytes.";
@@ -176,7 +176,11 @@ StreamIDO::~StreamIDO()
 bool
 StreamIDO::is_ready() const
 {
+#if defined(YM_WIN32)
+  return mS.good();
+#else
   return mS;
+#endif
 }
 
 // @brief オープン中のファイル情報を得る．
@@ -200,7 +204,7 @@ StreamIDO::set_file_info(const FileInfo& file_info)
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @param[in] n 読み込むデータサイズ
 // @return 実際に読み込んだ量を返す．
-ssize_t
+ymint64
 StreamIDO::read(ymuint8* buff,
 		ymuint64 n)
 {
@@ -259,15 +263,15 @@ StrListIDO::set_file_info(const FileInfo& file_info)
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @param[in] n 読み込むデータサイズ
 // @return 実際に読み込んだ量を返す．
-ssize_t
+ymint64
 StrListIDO::read(ymuint8* buff,
 		 ymuint64 n)
 {
-  ymuint count = 0;
+  ymint64 count = 0;
   while ( n > 0 && mLineNum < mStrList.size() ) {
     const string& str = mStrList[mLineNum];
-    ymuint src_size = str.size() - mColumnNum;
-    ymuint n1 = src_size;
+    ymuint64 src_size = str.size() - mColumnNum;
+    ymuint64 n1 = src_size;
     if ( n1 > n ) {
       n1 = n;
     }
@@ -336,14 +340,14 @@ StringIDO::set_file_info(const FileInfo& file_info)
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @param[in] n 読み込むデータサイズ
 // @return 実際に読み込んだ量を返す．
-ssize_t
+ymint64
 StringIDO::read(ymuint8* buff,
 		ymuint64 n)
 {
-  ymuint count = 0;
+  ymint64 count = 0;
   while ( n > 0 && mColumnNum < mString.size() ) {
-    ymuint src_size = mString.size() - mColumnNum;
-    ymuint n1 = src_size;
+    ymuint64 src_size = mString.size() - mColumnNum;
+    ymuint64 n1 = src_size;
     if ( n1 > n ) {
       n1 = n;
     }

@@ -11,7 +11,7 @@
 // pylogic モジュール
 //////////////////////////////////////////////////////////////////////
 
-#include "ym_YmLogic/pylogic.h"
+#include "YmLogic/pylogic.h"
 
 
 BEGIN_NAMESPACE_YM

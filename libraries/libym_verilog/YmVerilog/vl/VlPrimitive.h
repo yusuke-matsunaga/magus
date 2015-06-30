@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPrimArray VlPrimitive.h "ym_YmVerilog/vl/VlPrimitive.h"
+/// @class VlPrimArray VlPrimitive.h "YmVerilog/vl/VlPrimitive.h"
 /// @brief gate/UDP instance の配列を表すクラス
 /// IEEE Std 1364-2001 26.6.13 Primitive, prim term
 //////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPrimitive VlPrimitive.h "ym_YmVerilog/vl/VlPrimitive.h"
+/// @class VlPrimitive VlPrimitive.h "YmVerilog/vl/VlPrimitive.h"
 /// @brief gate/UDP instance を表すクラス
 //////////////////////////////////////////////////////////////////////
 class VlPrimitive :
@@ -167,7 +167,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlPrimTerm VlPrimitive.h "ym_YmVerilog/vl/VlPrimitive.h"
+/// @class VlPrimTerm VlPrimitive.h "YmVerilog/vl/VlPrimitive.h"
 /// @brief プリミティブインスタンスのポート端子を表すクラス
 /// IEEE Std 1364-2001 26.6.13 Primitive, prim term
 //////////////////////////////////////////////////////////////////////

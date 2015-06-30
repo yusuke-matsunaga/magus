@@ -624,8 +624,8 @@ public:
   /// @brief alias を追加する．
   /// @param[in] long_name 長い名前 (--xxxx)
   /// @param[in] short_name 短い名前 (-x)
-  /// @param[in] alias 本体の引数の数
-  /// @param[in] alias 本体の文字列の配列()
+  /// @param[in] argc 本体の引数の数
+  /// @param[in] argv 本体の文字列の配列()
   /// @param[in] flags フラグ(現時点では未使用)
   int
   add_alias(const char* long_name,

@@ -8,8 +8,8 @@
 
 
 #include "ym_smtlibv2/SmtLibShell.h"
-#include "ym_YmUtils/MsgMgr.h"
-#include "ym_YmUtils/MsgHandler.h"
+#include "YmUtils/MsgMgr.h"
+#include "YmUtils/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_YM_SMTLIBV2

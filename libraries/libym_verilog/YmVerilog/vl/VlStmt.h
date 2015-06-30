@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlStmt VlStmt.h "ym_YmVerilog/vl/VlStmt.h"
+/// @class VlStmt VlStmt.h "YmVerilog/vl/VlStmt.h"
 /// @brief エラボレーション中の statement を表す基底クラス
 /// IEEE Std 1364-2001 26.6.27 Process, block, statement, event statement
 /// IEEE Std 1364-2001 26.6.28 Assignment
@@ -238,7 +238,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlCaseItem VlStmt.h "ym_YmVerilog/vl/VlStmt.h"
+/// @class VlCaseItem VlStmt.h "YmVerilog/vl/VlStmt.h"
 /// @brief caes item を表すクラス
 /// IEEE Std 1364-2001 26.6.36 Case
 //////////////////////////////////////////////////////////////////////

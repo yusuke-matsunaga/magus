@@ -28,7 +28,7 @@ void
 ODO::_write(const ymuint8* buff,
 	    ymuint64 n)
 {
-  ssize_t ret = write(buff, n);
+  ymint64 ret = write(buff, n);
   if ( static_cast<ymuint64>(ret) != n ) {
     ostringstream buf;
     buf << "ODO::write(" << n << ") failed. wrote " << ret << " bytes.";
@@ -162,7 +162,7 @@ StreamODO::~StreamODO()
 // @param[in] buff データを収めた領域のアドレス
 // @param[in] n データサイズ
 // @return 実際に書き出した量を返す．
-ssize_t
+ymint64
 StreamODO::write(const ymuint8* buff,
 		 ymuint64 n)
 {
@@ -253,7 +253,7 @@ CompODO::close()
 // @param[in] buff データを収めた領域のアドレス
 // @param[in] n データサイズ
 // @return 実際に書き出した量を返す．
-ssize_t
+ymint64
 CompODO::write(const ymuint8* buff,
 	       ymuint64 n)
 {

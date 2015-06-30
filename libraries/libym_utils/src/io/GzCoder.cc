@@ -148,7 +148,7 @@ GzCoder::close()
     ymuint8 trail[8];
     conv_to_4bytes(mCRC, &trail[0]);
     conv_to_4bytes(mOutSize, &trail[4]);
-    ssize_t tsize = mBuff.write(trail, sizeof(trail));
+    ymint64 tsize = mBuff.write(trail, sizeof(trail));
     if ( tsize != sizeof(trail) ) {
       // エラー
       goto end;
@@ -163,7 +163,7 @@ GzCoder::close()
 // @param[in] buff データを収めた領域のアドレス
 // @param[in] n データサイズ
 // @return 実際に書き出した量を返す．
-ssize_t
+ymint64
 GzCoder::write(const ymuint8* buff,
 	       ymuint64 n)
 {

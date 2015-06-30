@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtItem PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtItem PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief ブロック内要素の共通の親クラス
@@ -241,7 +241,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtDefParam PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtDefParam PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief defparam 文を表すクラス
@@ -282,7 +282,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtContAssign PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtContAssign PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief continuous assign 文
@@ -318,7 +318,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtInst PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtInst PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief module instance/UDP/gate instance を表すクラス
@@ -366,7 +366,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtGenCaseItem PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtGenCaseItem PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief gencaseitemを表すクラス
@@ -413,7 +413,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtPathDecl PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtPathDecl PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief path_delay_declaration を表すクラス
@@ -501,7 +501,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtPathDelay PtItem.h <ym_YmVerilog/pt/PtItem.h>
+/// @class PtPathDelay PtItem.h <YmVerilog/pt/PtItem.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief path_delay_value を表すクラス

@@ -61,7 +61,7 @@ ThruDecoder::is_ready() const
 // @param[in] num 読み出すデータ数(バイト)
 // @return 実際に読み出したバイト数を返す．
 // @note エラーが起こったら -1 を返す．
-ssize_t
+ymint64
 ThruDecoder::read(ymuint8* rbuff,
 		  ymuint64 num)
 {

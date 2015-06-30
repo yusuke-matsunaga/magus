@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlNamedObj VlNamedObj.h "ym_YmVerilog/vl/VlNamedObj.h"
+/// @class VlNamedObj VlNamedObj.h "YmVerilog/vl/VlNamedObj.h"
 /// @brief エラボレーション中の名前付きオブジェクトを表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class VlNamedObj :

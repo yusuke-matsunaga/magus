@@ -8,7 +8,7 @@
 /// All rights reserved.
 
 
-#include "ym_YmUtils/StopWatch.h"
+#include "YmUtils/StopWatch.h"
 #include "ym_npn/TvFunc.h"
 
 #include "TvFuncTimeCmd.h"

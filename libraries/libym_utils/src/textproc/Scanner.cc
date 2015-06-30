@@ -42,13 +42,13 @@ Scanner::update()
   for ( ; ; ) {
     if ( mReadPos >= mEndPos ) {
       mReadPos = 0;
-      ssize_t n = mIDO.read(mBuff, 4096);
+      ymint64 n = mIDO.read(mBuff, 4096);
       if ( n < 0 ) {
 	// ファイル読み込みエラー
 	c = -1;
 	break;
       }
-      mEndPos = n;
+      mEndPos = static_cast<ymuint32>(n);
     }
     if ( mEndPos == 0 ) {
       c = EOF;

@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "ym_YmNetworks/BNetwork.h"
-#include "ym_YmNetworks/BNetBlifReader.h"
-#include "ym_YmNetworks/BNetBlifWriter.h"
-#include "ym_YmUtils/MsgHandler.h"
+#include "YmNetworks/BNetwork.h"
+#include "YmNetworks/BNetBlifReader.h"
+#include "YmNetworks/BNetBlifWriter.h"
+#include "YmUtils/MsgHandler.h"
 
 
 int

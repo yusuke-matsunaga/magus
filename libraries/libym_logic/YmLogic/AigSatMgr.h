@@ -1,7 +1,7 @@
 ﻿#ifndef YM_YMYMLOGIC_AIGSATMGR_H
 #define YM_YMYMLOGIC_AIGSATMGR_H
 
-/// @file ym_YmLogic/AigSatMgr.h
+/// @file YmLogic/AigSatMgr.h
 /// @brief AigSatMgrのヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym_YmLogic/Aig.h"
-#include "ym_YmLogic/SatSolver.h"
+#include "YmLogic/Aig.h"
+#include "YmLogic/SatSolver.h"
 
 
 #error "Who need this?"
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_AIG
 
 //////////////////////////////////////////////////////////////////////
-/// @class AigSatMgr AigSatMgr.h "ym_YmLogic/AigSatMgr.h"
+/// @class AigSatMgr AigSatMgr.h "YmLogic/AigSatMgr.h"
 /// @brief AIG 上の充足可能性判定器
 //////////////////////////////////////////////////////////////////////
 class AigSatMgr

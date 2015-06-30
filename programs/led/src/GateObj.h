@@ -10,7 +10,7 @@
 /// Copyright(C) 2002 by Yusuke Matsunaga
 
 
-#include <ym_YmUtils/DlList.h>
+#include <YmUtils/DlList.h>
 #include "Glv.h"
 
 

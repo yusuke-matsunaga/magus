@@ -14,8 +14,8 @@
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
-#include <ym_YmTclpp/TclCmd.h>
-#include <ym_YmUtils/StopWatch.h>
+#include <YmTclpp/TclCmd.h>
+#include <YmUtils/StopWatch.h>
 #include "seal_nsdef.h"
 
 

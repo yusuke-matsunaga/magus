@@ -5,7 +5,7 @@
 
 // 一つの statement に対応したコントロールフローグラフ
 
-#include <ym_YmVerilog/verilog.h>
+#include <YmVerilog/verilog.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG

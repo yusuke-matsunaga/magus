@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlContAssign VlContAssign.h "ym_YmVerilog/vl/VlContAssign.h"
+/// @class VlContAssign VlContAssign.h "YmVerilog/vl/VlContAssign.h"
 /// @brief 継続的代入文を表すクラス
 /// IEEE Std 1364-2001 26.6.24 Continuous assignment
 //////////////////////////////////////////////////////////////////////

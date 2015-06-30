@@ -69,7 +69,7 @@ public:
   /// @return 実際に書き込んだバイト数を返す．
   /// @note エラーが起こったら -1 を返す．
   virtual
-  ssize_t
+  ymint64
   write(const ymuint8* wbuff,
 	ymuint64 num);
 
@@ -89,10 +89,10 @@ private:
   output(code_int code);
 
   count_int&
-  htabof(ymuint i);
+  htabof(code_int i);
 
-  u_short&
-  codetabof(ymuint i);
+  code_int&
+  codetabof(code_int i);
 
 
 private:
@@ -122,7 +122,7 @@ private:
 
   count_int m_htab[k_HSIZE];
 
-  u_short m_codetab[k_HSIZE];
+  code_int m_codetab[k_HSIZE];
 
   ymlong m_fcode;
 
@@ -136,7 +136,7 @@ private:
 
   code_int m_hsize;
 
-  ymlong m_ratio;
+  count_int m_ratio;
 
   count_int m_checkpoint;
 
@@ -160,14 +160,14 @@ private:
 
 inline
 count_int&
-ZCoder::htabof(ymuint i)
+ZCoder::htabof(code_int i)
 {
   return m_htab[i];
 }
 
 inline
-u_short&
-ZCoder::codetabof(ymuint i)
+code_int&
+ZCoder::codetabof(code_int i)
 {
   return m_codetab[i];
 }

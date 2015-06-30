@@ -14,12 +14,12 @@
 #endif
 
 #include "BddsimCmd.h"
-#include <ym_YmNetworks/TgNetwork.h>
-#include <ym_YmNetworks/TgNode.h>
+#include <YmNetworks/TgNetwork.h>
+#include <YmNetworks/TgNode.h>
 #include "SimNode.h"
 
 #include <ym_bdd/BmcFactory.h>
-#include <ym_YmTclpp/TclPopt.h>
+#include <YmTclpp/TclPopt.h>
 
 
 BEGIN_NAMESPACE_YM_SEAL_BDDSIM

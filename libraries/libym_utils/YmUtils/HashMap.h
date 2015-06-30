@@ -1,4 +1,4 @@
-#ifndef YMUTILS_HASHMAP_H
+﻿#ifndef YMUTILS_HASHMAP_H
 #define YMUTILS_HASHMAP_H
 
 /// @file YmUtils/HashMap.h

@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlRange VlRange.h "ym_YmVerilog/vl/VlRange.h"
+/// @class VlRange VlRange.h "YmVerilog/vl/VlRange.h"
 /// @brief 範囲を表すクラス
 /// IEEE Std 1364-2001 26.6.10 Object range
 //////////////////////////////////////////////////////////////////////

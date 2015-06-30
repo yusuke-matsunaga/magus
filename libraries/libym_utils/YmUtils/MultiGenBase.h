@@ -127,7 +127,7 @@ inline
 ymuint
 MultiGenBase::group_num() const
 {
-  return mNkArray.size();
+  return static_cast<ymuint>(mNkArray.size());
 }
 
 // grp 番目のグループの全要素数を得る．

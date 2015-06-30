@@ -1,4 +1,4 @@
-#ifndef YMUTILS_HASHFUNC_H
+﻿#ifndef YMUTILS_HASHFUNC_H
 #define YMUTILS_HASHFUNC_H
 
 /// @file YmUtils/HashFunc.h
@@ -44,7 +44,8 @@ HashFunc<void*>
   ymuint
   operator()(void* key) const
   {
-    return reinterpret_cast<ympuint>(key) / sizeof(void*);
+    ympuint tmp = reinterpret_cast<ympuint>(key) / sizeof(void*);
+    return static_cast<ymuint>(tmp);
   }
 };
 

@@ -20,7 +20,7 @@ class MFSetCell;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class MFSet MFSet.h "ym_YmUtils/MFSet.h"
+/// @class MFSet MFSet.h "YmUtils/MFSet.h"
 /// @ingroup YmUtils
 /// @brief Merge/Find set を実装したクラス
 ///

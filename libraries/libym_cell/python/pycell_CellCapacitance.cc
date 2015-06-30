@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "ym_YmCell/pycell.h"
-#include "ym_YmCell/CellCapacitance.h"
+#include "YmCell/pycell.h"
+#include "YmCell/CellCapacitance.h"
 
 
 BEGIN_NAMESPACE_YM

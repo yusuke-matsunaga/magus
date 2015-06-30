@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "ym_YmCell/pycell.h"
-#include "ym_YmCell/CellTiming.h"
-#include "ym_YmLogic/pylogic.h"
+#include "YmCell/pycell.h"
+#include "YmCell/CellTiming.h"
+#include "YmLogic/pylogic.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -14,7 +14,7 @@
 #endif
 
 #include <tcl.h>
-#include <ym_YmTclpp/TclCmd.h>
+#include <YmTclpp/TclCmd.h>
 #include "SealMgr.h"
 #include "SealCmd.h"
 #include "calc_cvf/CvfCmd.h"

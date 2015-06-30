@@ -17,7 +17,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtBase PtBase.h <ym_YmVerilog/pt/PtBase.h>
+/// @class PtBase PtBase.h <YmVerilog/pt/PtBase.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief 全ての Pt クラスの基底クラス
@@ -46,7 +46,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class PtNamedBase PtBase.h <ym_YmVerilog/pt/PtBase.h>
+/// @class PtNamedBase PtBase.h <YmVerilog/pt/PtBase.h>
 /// @ingroup VlParser
 /// @ingroup PtGroup
 /// @brief 名前を持つ PtBase

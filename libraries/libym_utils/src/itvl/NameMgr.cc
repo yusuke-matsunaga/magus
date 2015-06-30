@@ -57,7 +57,8 @@ NameMgr::new_name(bool add_name)
   int d = mInterval.avail_num();
   ASSERT_COND( d >= 0 );
 
-  mTmpString.reserve(mPrefix.size() + mSuffix.size() + 10);
+  ymuint size = static_cast<ymuint>(mPrefix.size() + mSuffix.size() + 10);
+  mTmpString.reserve(size);
   mTmpString.clear();
   mTmpString.put_str(mPrefix);
   mTmpString.put_digit(d);
@@ -112,9 +113,9 @@ NameMgr::erase(const char* name)
 int
 NameMgr::str_to_num(const char* name) const
 {
-  ymuint plen = mPrefix.size();
-  ymuint slen = mSuffix.size();
-  ymuint nlen = strlen(name);
+  ymuint plen = static_cast<ymuint>(mPrefix.size());
+  ymuint slen = static_cast<ymuint>(mSuffix.size());
+  ymuint nlen = static_cast<ymuint>(strlen(name));
 
   // 接頭語と接尾語を足した長さのほうが長ければ数値があるわけない．
   if ( plen + slen >= nlen ) {

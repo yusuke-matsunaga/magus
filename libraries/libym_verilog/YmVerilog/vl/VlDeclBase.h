@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlDeclBase VlDeclBase.h "ym_YmVerilog/vl/VlDeclBase.h"
+/// @class VlDeclBase VlDeclBase.h "YmVerilog/vl/VlDeclBase.h"
 /// @brief エラボレーション中の名前付きオブジェクトを表す基底クラス
 //////////////////////////////////////////////////////////////////////
 class VlDeclBase :

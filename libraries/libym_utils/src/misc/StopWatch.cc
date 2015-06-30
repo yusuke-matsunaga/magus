@@ -11,14 +11,32 @@
 #include "YmUtils/StopWatch.h"
 #include "YmUtils/MStopWatch.h"
 
+
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_TIME_H)
+#  include <sys/time.h>
+#  include <time.h>
+#elif defined(HAVE_SYS_TIME_H)
+#  include <sys/time.h>
+#elif defined(HAVE_TIME_H)
+#  include <time.h>
+#else
+#  error "Neither <sys/time.h> nor <time.h> are not found."
+#endif
+
 #if defined(HAVE_GETRUSAGE)
 #  include <sys/resource.h>
 #elif defined(HAVE_TIMES)
 // System V 系では rusage() の代りに times() を使う．
 #  include <sys/param.h>
 #  include <sys/times.h>
+#elif defined(YM_WIN32)
+#  include <windows.h>
+#  include <mmsystem.h>
+#  include <sys/types.h>
+#  include <sys/timeb.h>
+#  pragma comment(lib, "winmm.lib")
 #else
-#  error "neither getrusage() nor times() are found."
+#  error "Neither getrusage() nor times() are found."
 #endif
 
 
@@ -73,6 +91,20 @@ StopWatch::stop()
   }
 }
 
+#if !defined(YM_WIN32)
+BEGIN_NONAMESPACE
+
+// timeval構造体をdoubleに変換する関数
+inline
+double
+xchg(struct timeval& tv)
+{
+  return (double)tv.tv_sec * 1000.0 * 1000.0 + (double)tv.tv_usec;
+}
+
+END_NONAMESPACE
+#endif
+
 // 計測状態の場合にはラップタイムを求める．
 // 停止状態の場合には経過時間を返す．
 USTime
@@ -101,23 +133,26 @@ StopWatch::cur_time()
   (void) times(&buffer);
   u = (double)buffer.tms_utime * 1000.0 * 1000.0 / (double)CLK_TCK;
   s = (double)buffer.tms.stime * 1000.0 * 1000.0 / (double)CLK_TCK;
+#elif defined(YM_WIN32)
+  DWORD cur_time = timeGetTime();
+  u = (double) cur_time / 1000.0;
+  s = 0.0;
 #else
 # error "neither getrusage() nor times() are found"
 #endif
+#if defined(YM_WIN32)
+  _timeb tv;
+  _ftime_s(&tv);
+  r = (double)tv.time + (double)tv.millitm / 1000.0;
+#else
   struct timeval tv;
   (void) gettimeofday(&tv, NULL);
   // オーバーフローさせないためのオフセット
   const int kRTimeOffset = ((2000 - 1970)*365+(2000-1969)/4)*24*3600;
   tv.tv_sec -= kRTimeOffset;
   r = xchg(tv);
+#endif
   return USTime(u, s, r);
-}
-
-// timeval構造体をdoubleに変換する関数
-double
-StopWatch::xchg(struct timeval& tv)
-{
-  return (double)tv.tv_sec * 1000.0 * 1000.0 + (double)tv.tv_usec;
 }
 
 

@@ -1,7 +1,7 @@
 ﻿#ifndef LIBYM_VERILOG_SIMULATOR_SIMNODE_H
 #define LIBYM_VERILOG_SIMULATOR_SIMNODE_H
 
-/// @file libym_YmVerilog/simulator/SimNode.h
+/// @file libYmVerilog/simulator/SimNode.h
 /// @brief SimNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -11,8 +11,8 @@
 /// All rights reserved.
 
 
-#include <ym_YmVerilog/verilog.h>
-#include <ym_YmVerilog/BitVector.h>
+#include <YmVerilog/verilog.h>
+#include <YmVerilog/BitVector.h>
 
 
 BEGIN_NAMESPACE_YM_VERILOG

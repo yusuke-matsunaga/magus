@@ -1,7 +1,7 @@
 ﻿#ifndef EIBLOCKSCOPE_H
 #define EIBLOCKSCOPE_H
 
-/// @file libym_YmVerilog/elaborator/ei/EiBlockScope.h
+/// @file libYmVerilog/elaborator/ei/EiBlockScope.h
 /// @brief EiBlockScope のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

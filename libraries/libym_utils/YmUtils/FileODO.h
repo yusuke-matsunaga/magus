@@ -13,6 +13,10 @@
 #include "YmUtils/CodecType.h"
 
 
+#if defined(YM_WIN32)
+typedef int mode_t;
+#endif
+
 BEGIN_NAMESPACE_YM
 
 class FileCoder;
@@ -79,7 +83,7 @@ public:
   /// @param[in] n データサイズ
   /// @return 実際に書き出した量を返す．
   virtual
-  ssize_t
+  ymint64
   write(const ymuint8* buff,
 	ymuint64 n);
 

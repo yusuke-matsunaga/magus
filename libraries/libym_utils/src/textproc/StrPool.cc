@@ -81,8 +81,8 @@ StrPool::reg(const char* str)
     pos = hash_value & mHashMask;
   }
 
-  ymuint32 len = strlen(str);
-  ymuint32 cell_size = len + sizeof(Cell);
+  ymuint len = static_cast<ymuint>(strlen(str));
+  ymuint cell_size = len + sizeof(Cell);
   void* p = mCellAlloc.get_memory(cell_size);
   Cell* new_cell = new (p) Cell;
   memcpy(new_cell->mStr, str, len + 1);
@@ -94,7 +94,7 @@ StrPool::reg(const char* str)
 }
 
 // 確保した文字列領域の総量を得る．
-ymuint
+ymuint64
 StrPool::accum_alloc_size() const
 {
   return mCellAlloc.allocated_size();
@@ -143,7 +143,7 @@ ShString::set(const char* str)
 }
 
 // @brief ShString 関連でアロケートされたメモリサイズ
-ymuint
+ymuint64
 ShString::allocated_size()
 {
   return thePool.accum_alloc_size();

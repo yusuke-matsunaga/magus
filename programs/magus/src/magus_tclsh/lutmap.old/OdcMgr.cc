@@ -14,7 +14,7 @@
 #endif
 
 #include "OdcMgr.h"
-#include <ym_YmNetworks/BNetwork.h>
+#include <YmNetworks/BNetwork.h>
 
 
 BEGIN_NAMESPACE_MAGUS_LUTMAP

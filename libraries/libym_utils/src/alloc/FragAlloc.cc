@@ -20,8 +20,6 @@ BEGIN_NAMESPACE_YM
 FragAlloc::FragAlloc(ymuint64 max_size) :
   mMaxSize(max_size)
 {
-  const int ALIGNOF_DOUBLE = __alignof__(double);
-
   mMinSize = 1;
   mMinLogSize = 0;
   for ( ; mMinSize < ALIGNOF_DOUBLE; mMinSize <<= 1, ++ mMinLogSize) ;
@@ -33,7 +31,7 @@ FragAlloc::FragAlloc(ymuint64 max_size) :
   for ( ; mMaxPowerSize < max_size; mMaxPowerSize <<= 1, ++ mMaxLogSize) ;
 
   mBlockListArray = new Block*[mMaxLogSize - mMinLogSize + 1];
-  for (ymuint i = mMinLogSize; i <= mMaxLogSize; ++ i ) {
+  for (ymuint64 i = mMinLogSize; i <= mMaxLogSize; ++ i ) {
     mBlockListArray[i - mMinLogSize] = NULL;
   }
 }
@@ -118,7 +116,7 @@ FragAlloc::alloc_block(ymuint64 p)
   }
   else {
     char* block = alloc_block(p + 1);
-    char* block1 = &block[(1 << p)];
+    char* block1 = &block[(1ULL << p)];
     put_block(p, block1);
     return block;
   }

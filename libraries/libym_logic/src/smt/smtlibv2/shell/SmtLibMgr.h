@@ -10,8 +10,8 @@
 
 
 #include "smtlibv2_nsdef.h"
-#include "ym_YmUtils/ShString.h"
-#include "ym_YmUtils/SimpleAlloc.h"
+#include "YmUtils/ShString.h"
+#include "YmUtils/SimpleAlloc.h"
 
 #include "SmtSortedVar.h"
 #include "SmtVarBinding.h"

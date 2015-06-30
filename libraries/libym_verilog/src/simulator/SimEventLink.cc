@@ -8,7 +8,7 @@
 
 #include "SimEventNode.h"
 
-#include <ym_YmVerilog/vpi/VpiExpr.h>
+#include <YmVerilog/vpi/VpiExpr.h>
 #include "SimEngine.h"
 
 

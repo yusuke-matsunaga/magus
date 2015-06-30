@@ -19,7 +19,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlControl VlControl.h "ym_YmVerilog/vl/VlControl.h"
+/// @class VlControl VlControl.h "YmVerilog/vl/VlControl.h"
 /// @brief delay/event/repeat control statement を表すクラス
 /// IEEE Std 1364-2001 26.6.29 Delay control
 /// IEEE Std 1364-2001 26.6.30 Event control

@@ -84,11 +84,6 @@ private:
   USTime
   cur_time();
 
-  // timeval構造体をdoubleに変換する関数
-  static
-  double
-  xchg(struct timeval& tv);
-
 
 private:
   //////////////////////////////////////////////////////////////////////

@@ -10,7 +10,7 @@
 
 
 #include "YmTools.h"
-#include "YmUtils/msg_type.h"
+#include "YmUtils/MsgType.h"
 
 
 BEGIN_NAMESPACE_YM

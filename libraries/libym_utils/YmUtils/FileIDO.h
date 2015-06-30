@@ -68,7 +68,7 @@ public:
   /// @return 実際に読み込んだ量を返す．
   /// @note エラーが起こったら負の数を返す．
   virtual
-  ssize_t
+  ymint64
   read(ymuint8* buff,
        ymuint64 n);
 

@@ -90,7 +90,7 @@ public:
 
   /// @brief ShString 関連でアロケートされたメモリサイズ
   static
-  ymuint
+  ymuint64
   allocated_size();
 
   /// @brief ShString 関連でアロケートされたメモリをすべて開放する．
@@ -305,8 +305,8 @@ inline
 ymuint
 ShString::hash() const
 {
-  // 共有されているのでポインタ比較でOK
-  return reinterpret_cast<ympuint>(mPtr)/sizeof(void*);
+  ympuint tmp = reinterpret_cast<ympuint>(mPtr)/sizeof(void*);
+  return static_cast<ymuint>(tmp);
 }
 
 // 等価比較演算子

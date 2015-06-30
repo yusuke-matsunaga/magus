@@ -14,7 +14,7 @@
 #endif
 
 #include "NtwkIoCmd.h"
-#include <ym_YmNetworks/TgNetwork.h>
+#include <YmNetworks/TgNetwork.h>
 #include "SealMsgHandler.h"
 
 

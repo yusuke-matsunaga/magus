@@ -1,4 +1,4 @@
-
+﻿
 /// @file RandSampler.cc
 /// @brief RandSampler の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM
 // @param[in] weight_array 重みの配列
 RandSampler::RandSampler(const vector<ymuint>& weight_array)
 {
-  mNum = weight_array.size();
+  mNum = static_cast<ymuint>(weight_array.size());
   mWeightArray = new ymuint[mNum];
   for (ymuint i = 0; i < mNum; ++ i) {
     mWeightArray[i] = weight_array[i];

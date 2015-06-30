@@ -8,7 +8,7 @@
 
 #include "SimScope.h"
 
-#include <ym_YmVerilog/vpi/VpiScope.h>
+#include <YmVerilog/vpi/VpiScope.h>
 #include "SimEngine.h"
 
 

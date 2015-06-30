@@ -101,7 +101,7 @@ FileIDO::set_file_info(const FileInfo& file_info)
 // @param[in] buff 読み込んだデータを格納する領域の先頭アドレス．
 // @param[in] n 読み込むデータサイズ
 // @return 実際に読み込んだ量を返す．
-ssize_t
+ymint64
 FileIDO::read(ymuint8* buff,
 	      ymuint64 n)
 {

@@ -24,8 +24,10 @@ const bool ymtools_check = true;
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AssertError YmTools.h "ymassert.h"
+/// @class AssertError assert.h "YmUtils/assert.h"
 /// @brief assert 違反用の例外の基底クラス
+///
+/// このクラスは例外が起こったファイル名と行番号を持つ．
 //////////////////////////////////////////////////////////////////////
 class AssertError :
   public exception
@@ -44,11 +46,28 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief assert 違反の発生したソースファイル名
-  const char* mFileName;
+  const char*
+  file_name() const { return mFileName; }
 
   /// @brief assert 違反の発生したソースファイルの行番号
+  int
+  line_number() const { return mLineNumber; }
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ファイル名
+  const char* mFileName;
+
+  // 行番号
   int mLineNumber;
 
 };
@@ -66,15 +85,15 @@ ostream&
 operator<<(ostream& s,
 	   const AssertError& obj)
 {
-  s << "assertion failed at file: " << obj.mFileName
-    << ", line: " << obj.mLineNumber;
+  s << "assertion failed at file: " << obj.file_name()
+    << ", line: " << obj.line_number();
   return s;
 }
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class AssertNotReached YmTools.h "ymassert.h"
-/// @brief 到達してはいけない部分に達したときの例外
+/// @class AssertNotReached assert.h "YmUtils/assert.h"
+/// @brief 到達してはいけない部分に達したときの例外クラス
 //////////////////////////////////////////////////////////////////////
 class AssertNotReached :
   public AssertError

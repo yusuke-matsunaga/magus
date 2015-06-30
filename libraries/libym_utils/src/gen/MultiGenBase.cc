@@ -22,7 +22,7 @@ MultiGenBase::MultiGenBase(const vector<pair<ymuint, ymuint> >& nk_array) :
   mNkArray(nk_array),
   mElemArray(nk_array.size())
 {
-  ymuint ng = mNkArray.size();
+  ymuint ng = static_cast<ymuint>(mNkArray.size());
   for (ymuint g = 0; g < ng; ++ g) {
     mElemArray[g].resize(k(g));
   }

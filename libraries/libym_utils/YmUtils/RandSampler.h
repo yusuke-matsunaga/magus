@@ -1,4 +1,4 @@
-#ifndef YMUTILS_RANDSAMPLER_H
+﻿#ifndef YMUTILS_RANDSAMPLER_H
 #define YMUTILS_RANDSAMPLER_H
 
 /// @file YmUtils/RandSampler.h

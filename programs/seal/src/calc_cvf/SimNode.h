@@ -12,7 +12,7 @@
 
 
 #include "seal_utils.h"
-#include <ym_YmUtils/RandGen.h>
+#include <YmUtils/RandGen.h>
 #include "EqElem.h"
 #include "SimFFR.h"
 #include <ym_bdd/Bdd.h>

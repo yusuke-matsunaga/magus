@@ -16,7 +16,7 @@
 BEGIN_NAMESPACE_YM_VERILOG
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlParamAssign VlParamAssign.h "ym_YmVerilog/vl/VlParamAssign.h"
+/// @class VlParamAssign VlParamAssign.h "YmVerilog/vl/VlParamAssign.h"
 /// @brief parameter 代入文を表すクラス
 /// IEEE Std 1364-2001 26.6.12 Parameter, specparam
 //////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class VlDefParam VlParamAssign.h "ym_YmVerilog/vl/VlParamAssign.h"
+/// @class VlDefParam VlParamAssign.h "YmVerilog/vl/VlParamAssign.h"
 /// @brief defparam 文を表すクラス
 /// IEEE Std 1364-2001 26.6.12 Parameter, specparam
 //////////////////////////////////////////////////////////////////////
