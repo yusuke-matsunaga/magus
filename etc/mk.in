@@ -11,11 +11,13 @@ case $1 in
     boot|cmake)
 	(cd release; $CMAKE $srcdir -DCMAKE_BUILD_TYPE=RELEASE)
 	(cd debug;   $CMAKE $srcdir -DCMAKE_BUILD_TYPE=DEBUG)
+	(cd profile; $CMAKE $srcdir -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_CXX_FLAGS_RELEASE='-O2 -g -DNDEBUG' -DOPT_GPERFTOOLS=ON)
 	;;
 
     ""|make)
 	(cd release; $MAKE all)
 	(cd debug;   $MAKE all)
+	(cd profile; $MAKE all)
 	;;
 
     make-release)
@@ -26,10 +28,15 @@ case $1 in
 	(cd debug;   $MAKE all)
 	;;
 
+    make-profile)
+	(cd profile; $MAKE all)
+	;;
+
     *)
 	echo "USAGE: $0 boot        : run cmake"
 	echo "       $0 make        : run make"
 	echo "       $0 make-relase : run make for release build"
 	echo "       $0 make-debug  : run make for debug build"
+	echo "       $0 make-profile: run make for profile build"
 	;;
 esac

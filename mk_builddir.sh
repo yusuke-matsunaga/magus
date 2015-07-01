@@ -26,7 +26,7 @@ echo "Making compile directory $builddir for source tree $srcdir ..."
 test -d $builddir || mkdir -p $builddir
 
 # その下にサブディレクトリを作る．
-for subdir in release debug; do
+for subdir in release debug profile; do
     path="$builddir/$subdir"
     test -d $path || mkdir -p $path
 done
