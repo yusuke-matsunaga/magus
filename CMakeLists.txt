@@ -25,6 +25,8 @@ set (YMTOOLS_NAMESPACE "nsYm")
 # オプション
 # ===================================================================
 
+option (OPT_GPERFTOOLS "use google-perftools" OFF)
+
 option (BUILD_MAGUS "build magus" ON)
 option (BUILD_SATPG "build satpg" ON)
 option (BUILD_IGF "build igf" OFF)
@@ -55,7 +57,16 @@ include (FindQt4)
 find_package(Qt4 4.8.0 REQUIRED QtCore QtGui QtXml)
 include(${QT_USE_FILE})
 
+set( CMAKE_INCLUDE_CURRENT_DIR ON )
+set( CMAKE_AUTOMOC ON )
+find_package(Qt5Widgets)
+find_package(OpenGL)
+
 find_package(TCL)
+
+if ( OPT_GPERFTOOLS )
+  find_package(Gperftools)
+endif (OPT_GPERFTOOLS)
 
 include (FindBZip2)
 include (FindLibLZMA)
@@ -107,6 +118,52 @@ check_type_size (long        LONG_SIZE)
 check_type_size ("long long" LLONG_SIZE)
 check_type_size ("void *"    VOIDP_SIZE)
 
+if ( SHORT_SIZE EQUAL 2 )
+  set( INT16_TYPE short )
+  set( UINT16_TYPE "unsigned short" )
+elseif ( INT_SIZE EQUAL 2 )
+  set( INT16_TYPE int )
+  set( UINT16_TYPE "unsigned int" )
+else ()
+  # エラー
+endif ()
+
+if ( SHORT_SIZE EQUAL 4 )
+  set( INT32_TYPE short )
+  set( UINT32_TYPE "unsigned short" )
+elseif ( INT_SIZE EQUAL 4 )
+  set( INT32_TYPE int )
+  set( UINT32_TYPE "unsigned int" )
+elseif ( LONG_SIZE EQUAL 4 )
+  set( INT32_TYPE long )
+  set( UINT32_TYPE "unsigned long" )
+else ()
+  # エラー
+endif ()
+
+if ( INT_SIZE EQUAL 8 )
+  set( INT64_TYPE int )
+  set( UINT64_TYPE "unsigned int" )
+elseif ( LONG_SIZE EQUAL 8 )
+  set( INT64_TYPE long )
+  set( UINT64_TYPE "unsigned long" )
+elseif ( LLONG_SIZE EQUAL 8 )
+  set( INT64_TYPE "lon long" )
+  set( UINT64_TYPE "unsigned long long" )
+else ()
+  # エラー
+endif ()
+
+if ( INT_SIZE EQUAL VOIDP_SIZE )
+  set( PTRINT_TYPE int )
+elseif ( LONG_SIZE EQUAL VOIDP_SIZE )
+  set( PTRINT_TYPE long )
+elseif ( LLONG_SIZE EQUAL VOIDP_SIZE )
+  set( PTRINT_TYPE "long long" )
+else ()
+  # エラー
+endif ()
+
 
 # ===================================================================
 # サブディレクトリの設定
@@ -152,22 +209,9 @@ endif (BUILD_NLINK)
 # ===================================================================
 # YmTools.h を生成するプログラム
 # ===================================================================
-configure_file (
-  "${PROJECT_SOURCE_DIR}/etc/make_header.cc.in"
-  "${PROJECT_BINARY_DIR}/make_header.cc"
-  )
-
-add_executable(make_header
-  "${PROJECT_BINARY_DIR}/make_header.cc"
-  )
-
-add_custom_target(header ALL
-  DEPENDS "${PROJECT_BINARY_DIR}/YmTools.h"
-  )
-
-add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/YmTools.h"
-  COMMAND "${PROJECT_BINARY_DIR}/make_header" ">" "${PROJECT_BINARY_DIR}/YmTools.h"
-  DEPENDS "${PROJECT_BINARY_DIR}/make_header"
+configure_file(
+  "${PROJECT_SOURCE_DIR}/etc/YmTools.h.in"
+  "${PROJECT_BINARY_DIR}/YmTools.h"
   )
 
 install (

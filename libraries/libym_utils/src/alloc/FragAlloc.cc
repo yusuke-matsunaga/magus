@@ -20,6 +20,13 @@ BEGIN_NAMESPACE_YM
 FragAlloc::FragAlloc(ymuint64 max_size) :
   mMaxSize(max_size)
 {
+  // double 型の整列境界値
+#if defined(WIN32)
+  const int ALIGNOF_DOUBLE = __alignof(double);
+#else
+  const int ALIGNOF_DOUBLE = __alignof__(double);
+#endif
+
   mMinSize = 1;
   mMinLogSize = 0;
   for ( ; mMinSize < ALIGNOF_DOUBLE; mMinSize <<= 1, ++ mMinLogSize) ;

@@ -1,8 +1,16 @@
-#ifndef YMCONFIG_H
-#define YMCONFIG_H
+#ifndef YMTOOLS_H
+#define YMTOOLS_H
+
+/// @file YmTools.h
+/// @brief YmTools のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2014 Yusuke Matsunaga
+/// All rights reserved.
+
 
 //////////////////////////////////////////////////////////////////////
-// ymtools 用の設定ファイル
+// ymtools 用の設定
 //////////////////////////////////////////////////////////////////////
 
 // プロジェクトの major バージョン
@@ -70,8 +78,14 @@
 // lzma が使用可能の時定義されるマクロ
 #cmakedefine LIBLZMA_FOUND
 
+// Gperftools が使用可能の時定義されるマクロ
+#cmakedefine GPERFTOOLS_FOUND
+
 // Qt4 が使用可能の時定義されるマクロ
 #cmakedefine Qt4_FOUND
+
+// Qt5 が使用可能の時定義されるマクロ
+#cmakedefine Qt5Widgets_FOUND
 
 // Python ライブラリが使用可能の時定義されるマクロ
 #cmakedefine PYTHONINTERP_FOUND
@@ -103,11 +117,41 @@
 // UNIX の時 true となるマクロ
 #cmakedefine UNIX
 
-// WINDOWS の時 true となるマクロ
-#cmakedefine WIN32
-
 // MAC OS-X の時 true となるマクロ
 #cmakedefine APPLE
+
+
+//////////////////////////////////////////////////////////////////////
+// 標準ヘッダファイルのインクルード
+//////////////////////////////////////////////////////////////////////
+
+#if defined(HAVE_STDLIB_H)
+#include <stdlib.h>
+#endif
+
+#if defined(HAVE_STRING_H)
+#include <string.h>
+#endif
+
+#if defined(HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
+#if defined(HAVE_LIMITS_H)
+#include <limits.h>
+#endif
+
+#if defined(HAVE_FLOAT_H)
+#include <float.h>
+#endif
+
+#if defined(HAVE_MATH_H)
+#include <math.h>
+#endif
+
+#if defined(HAVE_SYS_STAT_H)
+#include <sys/stat.h>
+#endif
 
 
 //////////////////////////////////////////////////////////////////////
@@ -136,3 +180,35 @@ typedef char ymint8;
 
 /// @brief 符号なし8ビット整数型
 typedef unsigned char ymuint8;
+
+/// @brief 符号付き16ビット整数型
+typedef @INT16_TYPE@ ymint16;
+
+/// @brief 符号なし16ビット整数型
+typedef @UINT16_TYPE@ ymuint16;
+
+/// @brief 符号付き32ビット整数型
+typedef @INT32_TYPE@ ymint32;
+
+/// @brief 符号なし32ビット整数型
+typedef @UINT32_TYPE@ ymuint32;
+
+/// @brief 符号付き64ビット整数型
+typedef @INT64_TYPE@ ymint64;
+
+/// @brief 符号なし64ビット整数型
+typedef @UINT64_TYPE@ ymuint64;
+
+/// @brief ポインタと同サイズの符号なし整数型
+typedef @PTRINT_TYPE@ ympuint;
+
+
+//////////////////////////////////////////////////////////////////////
+// その他の YmTools に共通な定義ファイルのインクルード
+//////////////////////////////////////////////////////////////////////
+
+#include "YmUtils/nsdef.h"
+#include "YmUtils/stl.h"
+#include "YmUtils/assert.h"
+
+#endif // YMTOOLS_H
