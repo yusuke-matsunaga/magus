@@ -111,25 +111,20 @@ target_link_libraries(nlink
   ym_logic
   )
 
-if (Qt4_FOUND)
-  QT4_WRAP_CPP(HEADERS_MOC
-    src/gui/NlMainWindow.h
-    src/gui/NlView.h
-    )
-
+if (Qt5Wigets_FOUND)
   add_executable(nlview
     ${nlview_SOURCES}
-    ${HEADERS_MOC}
     $<TARGET_OBJECTS:nlink_common>
     )
+
+  QT5_USE_MODULES(nlview Widgets)
 
   target_link_libraries(nlview
     ym_logic
     ym_utils
-    ${QT_LIBRARIES}
     )
 
-endif (Qt4_FOUND)
+endif (Qt5Wigets_FOUND)
 
 
 # ===================================================================
