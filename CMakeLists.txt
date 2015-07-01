@@ -68,6 +68,8 @@ if ( OPT_GPERFTOOLS )
   find_package(Gperftools)
 endif (OPT_GPERFTOOLS)
 
+find_package (GTest)
+
 include (FindBZip2)
 include (FindLibLZMA)
 include (FindZLIB)
