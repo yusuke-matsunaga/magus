@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "YmUtils/Graph.h"
+#include "YmAlgo/Graph.h"
 
 
 BEGIN_NAMESPACE_YM

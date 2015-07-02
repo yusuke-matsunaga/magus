@@ -1,7 +1,7 @@
-﻿#ifndef YMUTILS_BTGMATCH_H
-#define YMUTILS_BTGMATCH_H
+﻿#ifndef YMALGO_BTGMATCH_H
+#define YMALGO_BTGMATCH_H
 
-/// @file YmUtils/BtgMatch.h
+/// @file YmAlgo/BtgMatch.h
 /// @brief BtgMatch のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -19,7 +19,7 @@ namespace nsBtg {
 }
 
 //////////////////////////////////////////////////////////////////////
-/// @class BtgMatch BtgMatch.h "YmUtils/BtgMatch.h"
+/// @class BtgMatch BtgMatch.h "YmAlgo/BtgMatch.h"
 /// @brief 2部グラフの最大マッチングを求めるためのクラス
 //////////////////////////////////////////////////////////////////////
 class BtgMatch
@@ -102,4 +102,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // YMUTILS_BTGMATCH_H
+#endif // YMALGO_BTGMATCH_H

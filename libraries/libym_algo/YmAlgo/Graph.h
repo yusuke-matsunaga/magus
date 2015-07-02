@@ -1,7 +1,7 @@
-﻿#ifndef YMUTILS_GRAPH_H
-#define YMUTILS_GRAPH_H
+﻿#ifndef YMALGO_GRAPH_H
+#define YMALGO_GRAPH_H
 
-/// @file YmUtils/Graph.h
+/// @file YmAlgo/Graph.h
 /// @brief Graph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM
 
 //////////////////////////////////////////////////////////////////////
-/// @class Graph Graph.h "YmUtils/Graph.h"
+/// @class Graph Graph.h "YmAlgo/Graph.h"
 /// @brief 一般的な無向グラフを表すクラス
 //////////////////////////////////////////////////////////////////////
 class Graph
@@ -117,4 +117,4 @@ max_clique_exact(const Graph& graph,
 
 END_NAMESPACE_YM
 
-#endif // YMUTILS_GRAPH_H
+#endif // YMALGO_GRAPH_H

@@ -9,7 +9,7 @@
 
 #include "LbMIS3.h"
 #include "McMatrix.h"
-#include "YmUtils/Graph.h"
+#include "YmAlgo/Graph.h"
 #include "YmUtils/SimpleAlloc.h"
 
 

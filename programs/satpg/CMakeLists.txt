@@ -176,6 +176,7 @@ if (TCL_FOUND)
   target_link_libraries(atpg_tclsh
     ym_networks
     ym_tclpp
+    ym_algo
     ${TCL_LIBRARIES}
     )
 endif (TCL_FOUND)

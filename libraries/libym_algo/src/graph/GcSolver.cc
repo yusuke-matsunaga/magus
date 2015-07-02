@@ -10,7 +10,7 @@
 #include "GcSolver.h"
 #include "GcNode.h"
 #include "NodeHeap.h"
-#include "YmUtils/Graph.h"
+#include "YmAlgo/Graph.h"
 
 
 BEGIN_NAMESPACE_YM

@@ -47,12 +47,6 @@ set (alloc_SOURCES
   src/alloc/UnitAlloc.cc
   )
 
-set (btg_SOURCES
-  src/btg/BtgHeapTree.cc
-  src/btg/BtgMatch.cc
-  src/btg/BtgMatchImpl.cc
-  )
-
 set (file_SOURCES
   src/file/File.cc
   src/file/FileInfo.cc
@@ -69,14 +63,6 @@ set (gen_SOURCES
   src/gen/MultiSetGenBase.cc
   src/gen/MultiSetPermGen.cc
   src/gen/PermGen.cc
-  )
-
-set (graph_SOURCES
-  src/graph/GcSolver.cc
-  src/graph/Graph.cc
-  src/graph/independent_set.cc
-  src/graph/max_clique.cc
-  src/graph/max_clique_exact.cc
   )
 
 set (io_SOURCES
@@ -122,30 +108,10 @@ set (itvl_SOURCES
   src/itvl/NameMgr.cc
   )
 
-set (mfset_SOURCES
-  src/mfset/MFSet.cc
-  )
-
-set (mincov_SOURCES
-  src/mincov/LbCS.cc
-  src/mincov/LbMAX.cc
-  src/mincov/LbMIS1.cc
-  src/mincov/LbMIS2.cc
-  src/mincov/LbMIS3.cc
-  src/mincov/MaxClique.cc
-  src/mincov/McMatrix.cc
-  src/mincov/McSolver.cc
-  src/mincov/McSolverImpl.cc
-  src/mincov/MinCov.cc
-  src/mincov/MisNodeHeap.cc
-  src/mincov/SelCS.cc
-  src/mincov/SelNaive.cc
-  src/mincov/SelSimple.cc
-  )
-
 set (misc_SOURCES
   src/misc/Binder.cc
   src/misc/DlList.cc
+  src/misc/MFSet.cc
   src/misc/MpInt.cc
   src/misc/RandGen.cc
   src/misc/RandSampler.cc
@@ -190,14 +156,10 @@ set (textproc_SOURCES
 
 add_library(ym_utils
   ${alloc_SOURCES}
-  ${btg_SOURCES}
   ${file_SOURCES}
   ${gen_SOURCES}
-  ${graph_SOURCES}
   ${io_SOURCES}
   ${itvl_SOURCES}
-  ${mfset_SOURCES}
-  ${mincov_SOURCES}
   ${misc_SOURCES}
   ${msg_SOURCES}
   ${parser_SOURCES}

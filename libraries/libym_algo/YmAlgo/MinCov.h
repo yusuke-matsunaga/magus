@@ -1,7 +1,7 @@
-﻿#ifndef YMUTILS_MINCOV_H
-#define YMUTILS_MINCOV_H
+﻿#ifndef YMALGO_MINCOV_H
+#define YMALGO_MINCOV_H
 
-/// @file YmUtils/MinCov.h
+/// @file YmAlgo/MinCov.h
 /// @brief MinCov のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -19,7 +19,7 @@ namespace nsMincov {
 }
 
 //////////////////////////////////////////////////////////////////////
-/// @class MinCov MinCov.h "YmUtils/MinCov.h"
+/// @class MinCov MinCov.h "YmAlgo/MinCov.h"
 /// @brief 最小被覆問題を解くクラス
 //////////////////////////////////////////////////////////////////////
 class MinCov
@@ -111,4 +111,4 @@ private:
 
 END_NAMESPACE_YM
 
-#endif // YMUTILS_MINCOV_H
+#endif // YMALGO_MINCOV_H

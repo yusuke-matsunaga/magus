@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "YmUtils/Graph.h"
+#include "YmAlgo/Graph.h"
 #include "Node.h"
 #include "NodeHeap.h"
 #include "YmUtils/SimpleAlloc.h"

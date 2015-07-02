@@ -171,6 +171,7 @@ endif ()
 # サブディレクトリの設定
 # ===================================================================
 add_subdirectory (libraries/libym_utils)
+add_subdirectory (libraries/libym_algo)
 add_subdirectory (libraries/libym_logic)
 add_subdirectory (libraries/libym_cell)
 add_subdirectory (libraries/libym_verilog)

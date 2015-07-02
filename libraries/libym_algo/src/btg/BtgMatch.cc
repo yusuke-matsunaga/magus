@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "YmUtils/BtgMatch.h"
+#include "YmAlgo/BtgMatch.h"
 #include "BtgMatchImpl.h"
 
 
