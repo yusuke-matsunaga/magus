@@ -191,6 +191,12 @@ if (POPT_FOUND)
     )
 endif (POPT_FOUND)
 
+if (GPERFTOOLS_FOUND)
+  target_link_libraries(ym_utils
+    ${GPERFTOOLS_LIBRARIES}
+    )
+endif (GPERFTOOLS_FOUND)
+
 add_executable(Grammer_test
   tests/parser/Grammer_test.cc
   )
